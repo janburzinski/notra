@@ -22,6 +22,14 @@ export interface GitHubInstallationReference {
   installationId: string;
 }
 
+/** An installation of the Notra GitHub App the user administers but this organization has not linked yet. */
+export interface LinkableGitHubAppInstallation {
+  installationId: string;
+  accountLogin: string;
+  accountAvatarUrl: string;
+  accountType: "User" | "Organization";
+}
+
 export interface GitHubAppPublishAccess {
   contents?: string;
   issues?: string;

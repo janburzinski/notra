@@ -57,3 +57,9 @@ export const PENDING_OUTPUT_ID_PREFIX = "pending-output:";
 export const REPOSITORY_ALREADY_CONNECTED_CODE = "REPOSITORY_ALREADY_CONNECTED";
 
 export const REPOSITORY_PROBE_UNAVAILABLE_CODE = "REPOSITORY_PROBE_UNAVAILABLE";
+
+/** `github.app.linkInstallation` error codes whose messages the server translates. */
+export const GITHUB_LINK_LOCALIZED_ERROR_CODES: ReadonlySet<string> = new Set([
+  "FORBIDDEN",
+  "TOO_MANY_REQUESTS",
+]);

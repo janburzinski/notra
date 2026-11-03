@@ -35,6 +35,7 @@ import type {
   SiteDomain,
   SiteDomainChipStatus,
   SiteDomainRecord,
+  SiteImportableAccount,
   SiteImportableRepository,
   SiteEditorDraft,
   SiteListItem,
@@ -646,6 +647,8 @@ export interface SiteImportListProps {
   organizationId: string;
   organizationSlug: string;
   repositories: SiteImportableRepository[];
+  /** Linked GitHub accounts; "Adjust access" opens the active one's installation settings. */
+  accounts?: SiteImportableAccount[];
   installed: boolean;
   isLoading: boolean;
   loadFailed: boolean;
@@ -656,6 +659,28 @@ export interface SiteImportListProps {
   actionLabel?: string;
   actionAriaLabel?: (repository: string) => string;
   currentRepository?: { owner: string; name: string } | null;
+}
+
+export interface SiteImportRepositoryRowProps extends Pick<
+  SiteImportListProps,
+  "importingId" | "onImport" | "actionLabel" | "actionAriaLabel"
+> {
+  repository: SiteImportableRepository;
+  isCurrent: boolean;
+}
+
+export interface SiteImportOwnerPickerProps {
+  owners: string[];
+  activeOwner: string | null;
+  onChange: (owner: string | null) => void;
+}
+
+export interface SiteImportAccessActionsProps {
+  organizationId: string;
+  /** Linked account of the owner being shown, when there is one. */
+  account?: SiteImportableAccount;
+  installing: boolean;
+  onInstall: () => void;
 }
 
 export type SiteCreateStepState = "active" | "done" | "locked";

@@ -321,6 +321,7 @@ function RepositoryPanel({ onDone }: { onDone: () => void }) {
   return (
     <div className="space-y-3">
       <SiteImportList
+        accounts={importable.data?.accounts}
         actionAriaLabel={(name) => t("useRepository", { repository: name })}
         actionLabel={t("use")}
         callbackPath={siteHref(organizationSlug, siteId, "settings")}

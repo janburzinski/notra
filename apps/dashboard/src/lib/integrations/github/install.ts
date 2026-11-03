@@ -1,6 +1,7 @@
 "use client";
 
 import { POSTHOG_EVENTS } from "@notra/posthog/events";
+import { buildCallbackUrl } from "@notra/utils/callback-url";
 import { ORPCError } from "@orpc/client";
 import { Effect } from "effect";
 
@@ -11,9 +12,29 @@ import { dashboardOrpc } from "@/lib/orpc/query";
 
 import {
   GitHubAccountConnectionIncompleteError,
+  GitHubInstallCancelledError,
   GitHubInstallStartError,
   type StartGitHubInstallResult,
 } from "../../../types/integrations/github";
+import { chooseGitHubInstallation } from "./installation-picker";
+
+/** Links an installation the user already administers, then lands where a fresh install would. */
+async function linkInstallation(params: {
+  organizationId: string;
+  callbackPath: string;
+  installationId: string;
+}) {
+  const { accountId } = await dashboardOrpc.github.app.linkInstallation.call({
+    organizationId: params.organizationId,
+    installationId: params.installationId,
+  });
+  window.location.assign(
+    buildCallbackUrl("", params.callbackPath, {
+      githubConnected: "true",
+      githubAccountId: accountId,
+    })
+  );
+}
 
 function authorizeGitHub(callbackURL: string) {
   return Effect.tryPromise({
@@ -57,6 +78,8 @@ export async function startGitHubInstall(params: {
   organizationId: string;
   callbackPath: string;
   allowAccountConnection?: boolean;
+  /** Close the caller's own dialog so the account picker is not stacked on it. */
+  onPickerOpen?: () => void;
 }): Promise<StartGitHubInstallResult> {
   const allowAccountConnection = params.allowAccountConnection ?? true;
 
@@ -79,7 +102,9 @@ export async function startGitHubInstall(params: {
           preparedInstall
         ): Effect.Effect<
           boolean,
-          GitHubInstallStartError | GitHubAccountConnectionIncompleteError
+          | GitHubInstallStartError
+          | GitHubAccountConnectionIncompleteError
+          | GitHubInstallCancelledError
         > => {
           if (preparedInstall.requiresAccountConnection) {
             if (!allowAccountConnection) {
@@ -101,16 +126,41 @@ export async function startGitHubInstall(params: {
             );
           }
 
-          return Effect.sync(() => {
-            window.location.assign(preparedInstall.url);
-            return true;
-          });
+          const { url, linkable } = preparedInstall;
+          if (linkable.length === 0) {
+            return Effect.sync(() => {
+              window.location.assign(url);
+              return true;
+            });
+          }
+
+          params.onPickerOpen?.();
+          return Effect.promise(() =>
+            chooseGitHubInstallation({
+              installations: linkable,
+              connect: (installationId) =>
+                linkInstallation({ ...params, installationId }),
+            })
+          ).pipe(
+            Effect.flatMap((choice) => {
+              if (choice === null) {
+                return Effect.fail(new GitHubInstallCancelledError());
+              }
+              if (choice === "new") {
+                window.location.assign(url);
+              }
+              return Effect.succeed(true);
+            })
+          );
         }
       ),
       Effect.match({
         onFailure: (error): StartGitHubInstallResult => {
           if (error._tag === "GitHubAccountConnectionIncompleteError") {
             return { started: false, reason: "account-connection-incomplete" };
+          }
+          if (error._tag === "GitHubInstallCancelledError") {
+            return { started: false, reason: "cancelled" };
           }
           const { cause } = error;
           const isForbidden =

@@ -40,9 +40,13 @@ export function GitHubIntegrationDialog({
     }
 
     const callbackPath = `/${organizationSlug}/integrations/github`;
-    const result = await startGitHubInstall({ organizationId, callbackPath });
+    const result = await startGitHubInstall({
+      organizationId,
+      callbackPath,
+      onPickerOpen: () => onOpenChange(false),
+    });
 
-    if (!result.started) {
+    if (!result.started && result.reason !== "cancelled") {
       toast.error(result.message ?? t("toasts.installFailed"));
     }
   };

@@ -47,6 +47,8 @@ export const GitHubAppRepositoryCacheSchema = Schema.Array(
   GitHubAppRepositorySchema
 );
 
+export type GitHubAppInstallationResponse =
+  typeof GitHubAppInstallationResponseSchema.Type;
 export type GitHubAppRepositoryResponse =
   typeof GitHubAppRepositoryResponseSchema.Type;
 export type GitHubAppRepository = typeof GitHubAppRepositorySchema.Type;

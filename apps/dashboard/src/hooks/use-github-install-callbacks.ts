@@ -96,7 +96,7 @@ export function useResumeGitHubInstall(params: GitHubInstallResumeParams) {
       callbackPath: params.callbackPath,
       allowAccountConnection: false,
     }).then((result) => {
-      if (result.started) {
+      if (result.started || result.reason === "cancelled") {
         return;
       }
       toast.error(

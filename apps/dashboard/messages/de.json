@@ -4703,6 +4703,16 @@
         "emptyTitle": "Verbinde dein erstes Repository",
         "refreshFailed": "Repositories konnten nicht aktualisiert werden. Es werden die zuletzt geladenen Daten angezeigt."
       },
+      "installationPicker": {
+        "title": "GitHub-Konto verbinden",
+        "description": "Notra ist auf diesen Konten bereits installiert. Verbinde eines mit diesem Workspace oder installiere es woanders.",
+        "organization": "Organisation",
+        "personal": "Persönliches Konto",
+        "connect": "Verbinden",
+        "connectAccount": "{account} verbinden",
+        "installElsewhere": "Auf einem anderen Konto installieren",
+        "linkFailed": "GitHub konnte nicht verbunden werden. Versuche es erneut."
+      },
       "connectDialog": {
         "install": "Auf GitHub installieren",
         "permissions": {
@@ -8146,6 +8156,7 @@
       "importFailed": "Repository konnte nicht importiert werden",
       "noRepositoryMatch": "Kein Repository passt.",
       "adjustAccess": "Repository fehlt? GitHub-App-Zugriff anpassen",
+      "connectAnotherAccount": "Weiteres Konto verbinden",
       "installTitle": "GitHub verbinden",
       "installDescription": "Seiten werden aus einem GitHub-Repository gebaut. Installiere die Notra-GitHub-App auf den Repositories, aus denen du veröffentlichen willst.",
       "installGitHub": "GitHub-App installieren",

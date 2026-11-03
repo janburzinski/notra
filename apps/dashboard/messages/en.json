@@ -4703,6 +4703,16 @@
         "emptyTitle": "Connect your first repository",
         "refreshFailed": "Unable to refresh repositories. Showing the last loaded data."
       },
+      "installationPicker": {
+        "title": "Connect a GitHub account",
+        "description": "Notra is already installed on these accounts. Connect one to this workspace, or install it somewhere else.",
+        "organization": "Organization",
+        "personal": "Personal account",
+        "connect": "Connect",
+        "connectAccount": "Connect {account}",
+        "installElsewhere": "Install on another account",
+        "linkFailed": "Connecting GitHub failed. Try again."
+      },
       "connectDialog": {
         "install": "Install on GitHub",
         "permissions": {
@@ -8146,6 +8156,7 @@
       "importFailed": "Couldn't import the repository",
       "noRepositoryMatch": "No repository matches.",
       "adjustAccess": "Missing a repository? Adjust GitHub App access",
+      "connectAnotherAccount": "Connect another account",
       "installTitle": "Connect GitHub",
       "installDescription": "Sites build from a GitHub repository. Install the Notra GitHub App on the repositories you want to publish from.",
       "installGitHub": "Install GitHub App",

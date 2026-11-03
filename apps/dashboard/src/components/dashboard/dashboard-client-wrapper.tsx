@@ -9,6 +9,7 @@ import {
 import { DashboardShell } from "@/components/dashboard/dashboard-shell";
 import { FeedbackProvider } from "@/components/dashboard/feedback-context";
 import { RightPanelProvider } from "@/components/dashboard/right-panel-context";
+import { GitHubInstallationPicker } from "@/components/integrations/github/github-installation-picker";
 import { DashboardRuntimeProviders } from "@/components/providers/dashboard-runtime-providers";
 import { DatabuddyFlagsProvider } from "@/components/providers/databuddy-flags-provider";
 import {
@@ -126,6 +127,7 @@ export function DashboardClientWrapper({
                 <Suspense fallback={null}>
                   <DashboardOverlays />
                 </Suspense>
+                <GitHubInstallationPicker />
               </RightPanelProvider>
             </CommandPaletteProvider>
           </FeedbackProvider>

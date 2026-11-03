@@ -353,6 +353,7 @@ export function SiteCreateForm({
             title={t("stepRepository")}
           >
             <SiteImportList
+              accounts={importable.data?.accounts}
               importingId={importingId}
               installed={importable.data?.installed ?? false}
               isLoading={importable.isPending}

@@ -36,6 +36,8 @@ export type SiteRepository = SitesOutputs["connectRepository"];
 export type SiteCreateStepId = (typeof SITE_CREATE_STEP_IDS)[number];
 export type SiteImportableRepository =
   SitesOutputs["importableRepositories"]["repositories"][number];
+export type SiteImportableAccount =
+  SitesOutputs["importableRepositories"]["accounts"][number];
 export type SiteEditorFiles = SitesOutputs["editor"]["files"];
 export type SiteEditorDraft = SiteEditorFiles["drafts"][number];
 export type SiteEditorDocument = SitesOutputs["editor"]["read"];

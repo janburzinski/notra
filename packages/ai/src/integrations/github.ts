@@ -20,11 +20,14 @@ import { customAlphabet } from "nanoid";
 import {
   GITHUB_APP_REPOSITORIES_CACHE_TTL_SECONDS,
   GITHUB_APP_REPOSITORIES_STALE_CACHE_TTL_SECONDS,
+  GITHUB_INSTALLATION_LOOKUP_CONCURRENCY,
+  GITHUB_MEMBERSHIP_PAGE_LIMIT,
 } from "../constants/github-app";
 import {
   decodeCachedGitHubAppRepositories,
   decodeGitHubAppInstallationResponse,
   decodeGitHubAppRepositoriesResponse,
+  type GitHubAppInstallationResponse,
   type GitHubAppRepository,
   type GitHubAppRepositoryResponse,
 } from "../schemas/github-app";
@@ -44,6 +47,7 @@ import type {
   GitHubInstallationReference,
   GitHubCredentialDependencies,
   GitHubInstallationTokenScope,
+  LinkableGitHubAppInstallation,
   SelectGitHubRepositoriesParams,
 } from "../types/github-operations";
 import type {
@@ -838,6 +842,143 @@ export async function listGitHubAppInstallationsByOrganization(
   });
 }
 
+/** Logins of every GitHub organization the user administers; a failed page keeps what was read. */
+async function listAdminOrganizationLogins(
+  octokit: ReturnType<typeof createOctokit>
+) {
+  const logins: string[] = [];
+  for (let page = 1; page <= GITHUB_MEMBERSHIP_PAGE_LIMIT; page += 1) {
+    const memberships = await octokit
+      .request("GET /user/memberships/orgs", {
+        state: "active",
+        per_page: 100,
+        page,
+        headers: GITHUB_API_VERSION_HEADERS,
+      })
+      .then(({ data }) => data)
+      .catch(() => []);
+    for (const membership of memberships) {
+      if (membership.role === "admin") {
+        logins.push(membership.organization.login);
+      }
+    }
+    if (memberships.length < 100) {
+      break;
+    }
+  }
+  return logins;
+}
+
+/** Runs installation lookups a few at a time so one click cannot burst GitHub. */
+async function settleInstallationLookups(
+  lookups: Array<() => Promise<{ data: unknown }>>
+) {
+  const results: PromiseSettledResult<GitHubAppInstallationResponse>[] = [];
+  for (
+    let index = 0;
+    index < lookups.length;
+    index += GITHUB_INSTALLATION_LOOKUP_CONCURRENCY
+  ) {
+    const batch = lookups.slice(
+      index,
+      index + GITHUB_INSTALLATION_LOOKUP_CONCURRENCY
+    );
+    results.push(
+      ...(await Promise.allSettled(
+        batch.map(async (lookup) =>
+          Effect.runPromise(
+            decodeGitHubAppInstallationResponse((await lookup()).data)
+          )
+        )
+      ))
+    );
+  }
+  return results;
+}
+
+/**
+ * Installations of the app on the user's own GitHub account or on GitHub
+ * organizations they administer that this Notra organization has not linked.
+ * These can be linked without sending the user back through GitHub, which only
+ * redirects to the setup URL for new installations. Best effort: any failure
+ * yields fewer results, and linking re-checks admin access.
+ */
+export async function listLinkableGitHubAppInstallations(params: {
+  organizationId: string;
+  userId: string;
+}): Promise<LinkableGitHubAppInstallation[]> {
+  const githubAccount = await db.query.socialConnections.findFirst({
+    where: and(
+      eq(socialConnections.userId, params.userId),
+      eq(socialConnections.provider, "github")
+    ),
+    columns: { encryptedAccessToken: true },
+  });
+  let accessToken: string | null = null;
+  try {
+    accessToken = githubAccount
+      ? resolveGitHubSocialToken(githubAccount)
+      : null;
+  } catch {
+    return [];
+  }
+  if (!accessToken) {
+    return [];
+  }
+
+  const options = { requestTimeoutMs: GITHUB_INTERACTIVE_READ_TIMEOUT_MS };
+  const userOctokit = createOctokit(accessToken, options);
+  const [user, adminOrganizations] = await Promise.all([
+    userOctokit
+      .request("GET /user", { headers: GITHUB_API_VERSION_HEADERS })
+      .then(({ data }) => data)
+      .catch(() => null),
+    listAdminOrganizationLogins(userOctokit),
+  ]);
+  if (!user) {
+    return [];
+  }
+
+  const appOctokit = createOctokit(createGitHubAppJwt(), options);
+  const lookups: Array<() => Promise<{ data: unknown }>> = [
+    () =>
+      appOctokit.request("GET /users/{username}/installation", {
+        username: user.login,
+        headers: GITHUB_API_VERSION_HEADERS,
+      }),
+    ...adminOrganizations.map(
+      (org) => () =>
+        appOctokit.request("GET /orgs/{org}/installation", {
+          org,
+          headers: GITHUB_API_VERSION_HEADERS,
+        })
+    ),
+  ];
+  const [results, linked] = await Promise.all([
+    settleInstallationLookups(lookups),
+    listGitHubAppInstallationsByOrganization(params.organizationId),
+  ]);
+  const linkedIds = new Set(linked.map((row) => row.installationId));
+
+  return results.flatMap((result) => {
+    if (result.status !== "fulfilled") {
+      return [];
+    }
+    const { id, account } = result.value;
+    if (!account || linkedIds.has(String(id))) {
+      return [];
+    }
+    return [
+      {
+        installationId: String(id),
+        accountLogin: account.login,
+        accountAvatarUrl: account.avatar_url,
+        accountType: account.type,
+      },
+    ];
+  });
+}
+
 function repositoryCacheKey(
   installation: GitHubInstallationReference,
   stale = false
@@ -1109,6 +1250,18 @@ export async function listStoredGitHubAppRepositories(
       },
     ];
   });
+}
+
+/** Drops the fresh repository lists so the next read asks GitHub; the stale fallback stays. */
+export async function expireGitHubAppRepositoryCache(
+  installations: GitHubInstallationReference[]
+) {
+  // Expiry is best effort; reads already tolerate Redis failures.
+  await Promise.allSettled(
+    installations.map((installation) =>
+      redis?.del(repositoryCacheKey(installation))
+    )
+  );
 }
 
 export function setSelectedGitHubAppRepositoriesEffect(

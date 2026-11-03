@@ -85,8 +85,15 @@ export function useGitHubSettings(organizationSlug: string) {
       return;
     }
     const callbackPath = pathname || `/${organizationSlug}/integrations/github`;
-    const result = await startGitHubInstall({ organizationId, callbackPath });
-    if (!result.started) {
+    const result = await startGitHubInstall({
+      organizationId,
+      callbackPath,
+      onPickerOpen: () => {
+        setConnectOpen(false);
+        setReposOpen(false);
+      },
+    });
+    if (!result.started && result.reason !== "cancelled") {
       toast.error(result.message ?? t("installFailed"));
     }
   };

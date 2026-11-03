@@ -1,4 +1,5 @@
 import {
+  expireGitHubAppRepositoryCache,
   listGitHubAppInstallationsByOrganization,
   listGitHubAppRepositoriesEffect,
   setSelectedGitHubAppRepositoriesEffect,
@@ -27,6 +28,7 @@ import {
   createSiteInputSchema,
   createSitesInputSchema,
   createPostPreviewInputSchema,
+  importableRepositoriesInputSchema,
   repositorySuggestionsInputSchema,
   siteRepositorySuggestionsInputSchema,
   listSiteDeploymentsInputSchema,
@@ -215,6 +217,7 @@ import type {
   SiteAccessOptions,
   SiteRequestContext,
 } from "@/types/sites-server";
+import { githubInstallationSettingsUrl } from "@/utils/github-installation-settings-url";
 import { toGitHubOperationOrpcError } from "@/utils/github-operation-error";
 import {
   prepareSiteImage,
@@ -417,13 +420,24 @@ export const sitesRouter = {
     }),
 
   importableRepositories: sitesAccessProcedure
-    .input(organizationIdInputSchema)
-    .handler(async ({ input }) => {
+    .input(importableRepositoriesInputSchema)
+    .handler(async ({ context, input }) => {
       const installations = await listGitHubAppInstallationsByOrganization(
         input.organizationId
       );
       if (installations.length === 0) {
-        return { installed: false, repositories: [] };
+        return { installed: false, accounts: [], repositories: [] };
+      }
+      if (input.refresh) {
+        const { success: withinLimit } =
+          await ratelimit.githubAppRepositories.limit(
+            `${context.user.id}:${input.organizationId}`
+          );
+        if (!withinLimit) {
+          const tErrors = await getTranslations("errors.github");
+          throw tooManyRequests(tErrors("tooManyRepositoryRequests"));
+        }
+        await expireGitHubAppRepositoryCache(installations);
       }
       const [available, connected] = await Promise.all([
         runOrpcEffect(
@@ -448,6 +462,10 @@ export const sitesRouter = {
       );
       return {
         installed: true,
+        accounts: installations.map((installation) => ({
+          login: installation.accountLogin,
+          installationSettingsUrl: githubInstallationSettingsUrl(installation),
+        })),
         repositories: available.map((repository) => ({
           githubRepositoryId: repository.id,
           owner: repository.owner,

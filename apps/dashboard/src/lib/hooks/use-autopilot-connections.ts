@@ -40,6 +40,9 @@ export function useAutopilotConnections({
     const result = await startGitHubInstall({ organizationId, callbackPath });
     if (!result.started) {
       setInstalling(false);
+      if (result.reason === "cancelled") {
+        return;
+      }
       toast.error(result.message ?? "Could not start the GitHub install");
     }
   };

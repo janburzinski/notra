@@ -1,3 +1,4 @@
+import type { LinkableGitHubAppInstallation } from "@notra/ai/types/github-operations";
 import type { WebhookConfig } from "@notra/ai/types/integrations";
 import type { createOctokit } from "@notra/ai/utils/octokit";
 import { Data } from "effect";
@@ -85,6 +86,10 @@ export class GitHubInstallStartError extends Data.TaggedError(
   readonly cause: unknown;
 }> {}
 
+export class GitHubInstallCancelledError extends Data.TaggedError(
+  "GitHubInstallCancelledError"
+) {}
+
 export class GitHubAccountConnectionIncompleteError extends Data.TaggedError(
   "GitHubAccountConnectionIncompleteError"
 )<{
@@ -115,7 +120,17 @@ export interface GitHubAppRepository {
 
 type GitHubInstallFailureReason =
   | "account-connection-incomplete"
-  | "install-start-failed";
+  | "install-start-failed"
+  | "cancelled";
+
+/** `connected` after linking an existing installation, `new` to install on GitHub, `null` when dismissed. */
+export type GitHubInstallationChoice = "connected" | "new" | null;
+
+export interface GitHubInstallationPickerRequest {
+  installations: LinkableGitHubAppInstallation[];
+  connect: (installationId: string) => Promise<void>;
+  resolve: (choice: GitHubInstallationChoice) => void;
+}
 
 export type StartGitHubInstallResult =
   | { started: true }

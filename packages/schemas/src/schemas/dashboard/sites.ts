@@ -259,6 +259,12 @@ export const connectSiteInthProjectInputSchema =
     projectId: z.string().trim().min(1).max(100),
   });
 
+export const importableRepositoriesInputSchema = z.object({
+  organizationId,
+  /** Skip the cached GitHub repository list, e.g. after changing app access. */
+  refresh: z.boolean().optional(),
+});
+
 export const connectSiteRepositoryInputSchema = z.object({
   organizationId,
   githubRepositoryId: z.string().trim().min(1).max(40),

@@ -1,17 +1,22 @@
 import { GITHUB_API_VERSION_HEADERS } from "@notra/ai/constants/github";
 import {
   deleteGitHubAppInstallationForOrganization,
-  getCachedGitHubAppCanPublish,
+  GitHubAccountRequiredError,
   GitHubAppNotConfiguredError,
+  GitHubInstallationAccessDeniedError,
+  GitHubReauthorizationRequiredError,
+  getCachedGitHubAppCanPublish,
   getGitHubAppInstallUrl,
   getSelectedGitHubAppRepositoryIds,
   githubAppRepositoryCacheIsWarm,
   isGitHubAccountConnectionRequired,
   listGitHubAppInstallationsByOrganization,
   listGitHubAppRepositoriesEffect,
+  listLinkableGitHubAppInstallations,
   listStoredGitHubAppRepositories,
   readCachedGitHubAppCanPublish,
   setSelectedGitHubAppRepositoriesEffect,
+  upsertGitHubAppInstallation,
 } from "@notra/ai/integrations/github";
 import { GitHubPersistenceError } from "@notra/ai/schemas/github-operations";
 import {
@@ -19,10 +24,12 @@ import {
   GITHUB_INTERACTIVE_READ_TIMEOUT_MS,
 } from "@notra/ai/utils/octokit";
 import { redis } from "@notra/ai/utils/redis";
+import { logError } from "@notra/ai/utils/server-log";
 import { POSTHOG_EVENTS } from "@notra/posthog/events";
 import { organizationIdInputSchema } from "@notra/schemas/dashboard/auth/organization";
 import {
   disconnectGitHubAppInputSchema,
+  linkGitHubAppInstallationInputSchema,
   type PrepareInstallUrlInput,
   prepareInstallUrlInputSchema,
   probeRepositoryInputSchema,
@@ -40,11 +47,13 @@ import {
 } from "@/constants/integration-analytics";
 import { trackServerEvent } from "@/lib/analytics/posthog-server";
 import { getTranslations } from "@/lib/i18n/server";
+import { trackIntegrationConnected } from "@/lib/integrations/connect-events";
 import { authorizedProcedure, withOrganizationAccess } from "@/lib/orpc/base";
 import { runOrpcEffect } from "@/lib/orpc/effect";
 import {
   assertNotDemo,
   badRequest,
+  forbidden,
   internalServerError,
   notFound,
   tooManyRequests,
@@ -189,8 +198,32 @@ const prepareGitHubAppInstall = Effect.fn("prepareGitHubAppInstall")(function* (
       }),
   });
 
-  return { requiresAccountConnection: false as const, url };
+  const linkable = yield* Effect.promise(() =>
+    listLinkableGitHubAppInstallations({
+      organizationId: input.organizationId,
+      userId: input.userId,
+    }).catch((error: unknown) => {
+      logError("[GitHub] Failed to list linkable installations", error);
+      return [];
+    })
+  );
+
+  return { requiresAccountConnection: false as const, url, linkable };
 });
+
+async function mapGitHubAppLinkError(error: unknown): Promise<Error> {
+  const t = await getTranslations("integrations.github.callbackErrors");
+  if (error instanceof GitHubInstallationAccessDeniedError) {
+    return forbidden(t("installationForbidden"));
+  }
+  if (
+    error instanceof GitHubAccountRequiredError ||
+    error instanceof GitHubReauthorizationRequiredError
+  ) {
+    return forbidden(t("reauthorizationRequired"));
+  }
+  return internalServerError("Failed to link GitHub App installation", error);
+}
 
 export const githubRouter = {
   app: {
@@ -369,6 +402,37 @@ export const githubRouter = {
           }),
           mapGitHubAppInstallPreparationError
         );
+      }),
+    linkInstallation: authorizedProcedure
+      .input(linkGitHubAppInstallationInputSchema)
+      .use(withOrganizationAccess)
+      .handler(async ({ context, input }) => {
+        assertNotDemo();
+        const userId = context.auth.user.id;
+        const { success: withinLimit } =
+          await ratelimit.githubAppCallback.limit(userId);
+        if (!withinLimit) {
+          const t = await getTranslations("integrations.github.callbackErrors");
+          throw tooManyRequests(t("tooManyRequests"));
+        }
+
+        const installation = await upsertGitHubAppInstallation({
+          organizationId: input.organizationId,
+          userId,
+          installationId: input.installationId,
+        }).catch(async (error: unknown) => {
+          throw await mapGitHubAppLinkError(error);
+        });
+
+        trackIntegrationConnected({
+          headers: context.headers,
+          userId,
+          organizationId: input.organizationId,
+          provider: INTEGRATION_PROVIDERS.GITHUB,
+          authKind: INTEGRATION_AUTH_KINDS.OAUTH,
+        });
+
+        return { accountId: installation.accountId };
       }),
   },
   probeRepository: authorizedProcedure
