@@ -166,4 +166,10 @@ To keep only the Markdown actions, use:
 }
 ```
 
+To change how the actions look, use the `page-actions` [styling hooks](/sites/customize/design#styling-hooks) in your own CSS:
+
+```css style.css
+.page-actions-copy-button { background: var(--accent); color: white; }
+```
+
 Unlike Mintlify's contextual menu, Notra Sites currently uses `"display": "meta"` (the default) or `"none"`, not `"header"` or `"toc"`. It does not support page-level overrides, a built-in assistant, MCP installation or PDF export.

@@ -10,11 +10,11 @@ const hasActions = copy || menu.length > 0;
 ---
 
 {hasActions && (
-<div class="relative" data-page-actions>
+<div class="page-actions relative" data-page-actions>
 <div class="split-button" role="group" aria-label="Page actions">
   {
     copy && (
-      <button type="button" data-copy-article={markdownHref} data-copy-idle-label={label} class="btn btn-secondary btn-sm">
+      <button type="button" data-copy-article={markdownHref} data-copy-idle-label={label} class="page-actions-copy-button btn btn-secondary btn-sm">
         <Icon name="copy" size={14} class="[[data-copied]_&]:hidden" />
         <Icon name="check" size={14} class="hidden [[data-copied]_&]:block" />
         <span data-copy-label>{label}</span>
@@ -26,14 +26,14 @@ const hasActions = copy || menu.length > 0;
       <details class="group" data-open-in>
         <summary
           aria-label={copy ? "More page actions" : undefined}
-          class:list={["btn btn-secondary btn-sm list-none [&::-webkit-details-marker]:hidden", copy && "btn-icon"]}
+          class:list={["page-actions-menu-button btn btn-secondary btn-sm list-none [&::-webkit-details-marker]:hidden", copy && "btn-icon"]}
         >
           {!copy && "Open in"}
           <Icon name="chevron-down" size={14} class="transition-transform duration-150 ease-out group-open:rotate-180" />
         </summary>
         <div
           class:list={[
-            "absolute top-full left-0 z-30 mt-2 origin-top-left rounded-xl border border-border bg-background p-1.5 font-sans shadow-lg motion-safe:animate-[menu-in_120ms_ease-out]",
+            "page-actions-menu absolute top-full left-0 z-30 mt-2 origin-top-left rounded-xl border border-border bg-background p-1.5 font-sans shadow-lg motion-safe:animate-[menu-in_120ms_ease-out]",
             menu.some((item) => item.description) ? "w-72" : "w-60",
           ]}
         >
