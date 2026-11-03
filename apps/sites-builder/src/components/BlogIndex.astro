@@ -24,7 +24,8 @@ const twoColumns = !filterable && rest.length % 3 !== 0 && rest.length % 2 === 0
 const pinnedAbove = filterable && (layout === "grid" || layout === "magazine") && featured.length > 0;
 const inGrid = pinnedAbove ? [] : featured;
 const tileCount = twoColumns ? 2 : 3;
-const tiles = layout === "grid" && !filterable && inGrid.length === 0 ? rest.slice(0, tileCount) : [];
+const tileAll = blogOptions.card.style === "tile";
+const tiles = blogOptions.card.style === "auto" && layout === "grid" && !filterable && inGrid.length === 0 ? rest.slice(0, tileCount) : [];
 const plain = rest.slice(tiles.length);
 const categoriesOf = (entry: (typeof entries)[number]) => (filterable ? entryCategorySlugs(entry, categories) : undefined);
 const searchTextOf = (entry: (typeof entries)[number]) => (blogOptions.search ? blogSearchText(entry) : undefined);
@@ -83,7 +84,7 @@ const searchTextOf = (entry: (typeof entries)[number]) => (blogOptions.search ? 
         </ul>
       )}
       {(filterable || plain.length + inGrid.length > 0) && (
-      <ul data-category-list class:list={["grid grid-cols-1 gap-x-6 max-sm:divide-y max-sm:divide-border sm:-mb-14 sm:grid-cols-2", !twoColumns && "lg:grid-cols-3", tiles.length > 0 && "max-sm:border-t max-sm:border-border"]}>
+      <ul data-category-list class:list={["grid grid-cols-1 gap-x-6 max-sm:divide-y max-sm:divide-border sm:grid-cols-2", tileAll ? "sm:-mb-6" : "sm:-mb-14", !twoColumns && "lg:grid-cols-3", tiles.length > 0 && "max-sm:border-t max-sm:border-border"]}>
         {inGrid.map((entry, index) => (
           <li data-categories={categoriesOf(entry)} data-search={searchTextOf(entry)} class:list={["h-full max-sm:pb-8 sm:col-span-2 sm:pb-14", !twoColumns && "lg:col-span-3"]}>
             <PostCard entry={entry} variant="feature" featured={layout === "grid" || split.featured.length > 0} images={images} priority={index === 0} />
@@ -91,13 +92,13 @@ const searchTextOf = (entry: (typeof entries)[number]) => (blogOptions.search ? 
         ))}
         {pinnedAbove &&
           featured.map((entry) => (
-            <li class:list={["max-sm:py-6 sm:pb-14", POST_CARD_CELL]} data-categories={categoriesOf(entry)} data-search={searchTextOf(entry)} data-pinned hidden>
-              <PostCard entry={entry} images={images} />
+            <li class:list={["max-sm:py-6", tileAll ? "sm:pb-6" : "sm:pb-14", POST_CARD_CELL]} data-categories={categoriesOf(entry)} data-search={searchTextOf(entry)} data-pinned hidden>
+              <PostCard entry={entry} images={images} tile={tileAll} />
             </li>
           ))}
         {plain.map((entry) => (
-          <li class:list={["max-sm:py-6 sm:pb-14", POST_CARD_CELL]} data-categories={categoriesOf(entry)} data-search={searchTextOf(entry)}>
-            <PostCard entry={entry} images={images} />
+          <li class:list={["max-sm:py-6", tileAll ? "sm:pb-6" : "sm:pb-14", POST_CARD_CELL]} data-categories={categoriesOf(entry)} data-search={searchTextOf(entry)}>
+            <PostCard entry={entry} images={images} tile={tileAll} />
           </li>
         ))}
       </ul>

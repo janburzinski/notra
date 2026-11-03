@@ -28,7 +28,7 @@ The `blog` and `changelog` objects in `blog.json` set how the blog index, its po
   "featured": "latest",
   "categories": false,
   "search": false,
-  "card": { "image": "auto", "excerpt": true, "author": true, "date": true, "readingTime": false },
+  "card": { "image": "auto", "excerpt": true, "author": true, "date": true, "readingTime": false, "style": "auto" },
   "post": { "toc": true, "authorCard": true, "readingTime": true, "pagination": true, "width": "wide", "header": "stacked", "cover": true },
   "authorPage": "inline"
 }
@@ -77,6 +77,13 @@ A `cards` card shows the title, up to three lines of excerpt, and the first auth
 | `card.author` | The first author | `true` |
 | `card.date` | The date | `true` |
 | `card.readingTime` | "5 min read" | `false` |
+| `card.style` | How cards in `grid` and `magazine` look. `"auto"` draws the first row of a `grid` as filled tiles when there's no category bar, search or featured post. `"tile"` draws every card as a filled tile, also next to the category bar. `"plain"` draws no tiles | `"auto"` |
+
+A tile has the date and first tag on top, then the title, excerpt and authors, on the `--card` color. When cards show cover images, a tile keeps its cover instead of the color. On phones, tiles show as rows like the other cards. Style them with the `post-card-tile` class:
+
+```css style.css
+.post-card-tile { border-radius: 1rem; }
+```
 
 ### Posts
 

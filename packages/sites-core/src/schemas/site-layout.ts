@@ -270,6 +270,7 @@ export const siteBlogSchema = z.object({
       author: z.boolean().default(true),
       date: z.boolean().default(true),
       readingTime: z.boolean().default(false),
+      style: z.enum(["auto", "tile", "plain"]).default("auto"),
     })
     .default({
       image: "auto",
@@ -277,6 +278,7 @@ export const siteBlogSchema = z.object({
       author: true,
       date: true,
       readingTime: false,
+      style: "auto",
     }),
   authorPage: z.enum(["inline", "stacked"]).default("inline"),
   post: z

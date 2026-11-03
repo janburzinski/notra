@@ -912,7 +912,8 @@
             "excerpt": true,
             "author": true,
             "date": true,
-            "readingTime": false
+            "readingTime": false,
+            "style": "auto"
           },
           "type": "object",
           "properties": {
@@ -943,6 +944,11 @@
             "readingTime": {
               "default": false,
               "type": "boolean"
+            },
+            "style": {
+              "default": "auto",
+              "type": "string",
+              "enum": ["auto", "tile", "plain"]
             }
           }
         },
