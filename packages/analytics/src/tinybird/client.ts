@@ -48,10 +48,27 @@ import type {
   WebHostsRow,
   WebAiOutcomesRow,
   WebEngagementRow,
+  McpClientsRow,
+  McpLogRow,
+  McpOverviewRow,
+  McpTimeseriesRow,
+  McpToolsRow,
+  McpToolNeighborsRow,
+  McpToolFailuresRow,
+  McpIntentsRow,
+  McpUiRendersRow,
+  McpUsersRow,
+  McpSessionsRow,
+  McpSessionEventsRow,
+  McpCatalogRow,
+  McpElicitationsRow,
+  McpModelsRow,
 } from "../types/tinybird-endpoints";
 import {
   type GeoTrafficEventRow,
   geoTrafficEvents,
+  type McpEventRow,
+  mcpEvents,
   type SocialAccountRow,
   type SocialAccountStatsRow,
   type SocialPostRow,
@@ -81,6 +98,23 @@ import {
   geoTrafficTrendsDaily,
   geoTrafficTrendsProjects,
 } from "./pipes/geo-traffic-trends";
+import {
+  mcpCatalog,
+  mcpClients,
+  mcpElicitations,
+  mcpIntents,
+  mcpLog,
+  mcpModels,
+  mcpOverview,
+  mcpSessionEvents,
+  mcpSessions,
+  mcpTimeseries,
+  mcpToolFailures,
+  mcpToolNeighbors,
+  mcpTools,
+  mcpUiRenders,
+  mcpUsers,
+} from "./pipes/mcp";
 import {
   accountLeaderboard,
   engagementTimeseries,
@@ -139,6 +173,7 @@ function createTinybirdClient(fetch?: typeof globalThis.fetch) {
       geoTrafficEvents,
       webPageViews,
       webPageEngagement,
+      mcpEvents,
     },
     pipes: {
       socialOverview,
@@ -167,6 +202,21 @@ function createTinybirdClient(fetch?: typeof globalThis.fetch) {
       webHosts,
       webAiOutcomes,
       webEngagement,
+      mcpOverview,
+      mcpTimeseries,
+      mcpTools,
+      mcpClients,
+      mcpLog,
+      mcpToolNeighbors,
+      mcpToolFailures,
+      mcpIntents,
+      mcpUsers,
+      mcpSessions,
+      mcpSessionEvents,
+      mcpCatalog,
+      mcpModels,
+      mcpElicitations,
+      mcpUiRenders,
     },
   });
 }
@@ -683,5 +733,196 @@ export function queryWebAiOutcomes(
     params,
     params.organization_id,
     (client) => client.webAiOutcomes.query(params)
+  );
+}
+
+export function ingestMcpEvents(
+  rows: McpEventRow[]
+): Promise<IngestResult | null> {
+  return ingestRows(
+    rows,
+    "geo",
+    rows.map((row) => row.organization_id),
+    (client, batch) => client.mcpEvents.ingestBatch(batch, { wait: false })
+  );
+}
+
+export function queryMcpOverview(
+  params: InferParams<typeof mcpOverview>
+): Promise<QueryResult<McpOverviewRow> | null> {
+  return cachedPipeQuery(
+    "geo",
+    "mcp_overview",
+    params,
+    params.organization_id,
+    (client) => client.mcpOverview.query(params)
+  );
+}
+
+export function queryMcpTimeseries(
+  params: InferParams<typeof mcpTimeseries>
+): Promise<QueryResult<McpTimeseriesRow> | null> {
+  return cachedPipeQuery(
+    "geo",
+    "mcp_timeseries",
+    params,
+    params.organization_id,
+    (client) => client.mcpTimeseries.query(params)
+  );
+}
+
+export function queryMcpTools(
+  params: InferParams<typeof mcpTools>
+): Promise<QueryResult<McpToolsRow> | null> {
+  return cachedPipeQuery(
+    "geo",
+    "mcp_tools",
+    params,
+    params.organization_id,
+    (client) => client.mcpTools.query(params)
+  );
+}
+
+export function queryMcpClients(
+  params: InferParams<typeof mcpClients>
+): Promise<QueryResult<McpClientsRow> | null> {
+  return cachedPipeQuery(
+    "geo",
+    "mcp_clients",
+    params,
+    params.organization_id,
+    (client) => client.mcpClients.query(params)
+  );
+}
+
+export function queryMcpLog(
+  params: InferParams<typeof mcpLog>
+): Promise<QueryResult<McpLogRow> | null> {
+  return cachedPipeQuery(
+    "geo",
+    "mcp_log",
+    params,
+    params.organization_id,
+    (client) => client.mcpLog.query(params)
+  );
+}
+
+export function queryMcpToolNeighbors(
+  params: InferParams<typeof mcpToolNeighbors>
+): Promise<QueryResult<McpToolNeighborsRow> | null> {
+  return cachedPipeQuery(
+    "geo",
+    "mcp_tool_neighbors",
+    params,
+    params.organization_id,
+    (client) => client.mcpToolNeighbors.query(params)
+  );
+}
+
+export function queryMcpToolFailures(
+  params: InferParams<typeof mcpToolFailures>
+): Promise<QueryResult<McpToolFailuresRow> | null> {
+  return cachedPipeQuery(
+    "geo",
+    "mcp_tool_failures",
+    params,
+    params.organization_id,
+    (client) => client.mcpToolFailures.query(params)
+  );
+}
+
+export function queryMcpIntents(
+  params: InferParams<typeof mcpIntents>
+): Promise<QueryResult<McpIntentsRow> | null> {
+  return cachedPipeQuery(
+    "geo",
+    "mcp_intents",
+    params,
+    params.organization_id,
+    (client) => client.mcpIntents.query(params)
+  );
+}
+
+export function queryMcpUsers(
+  params: InferParams<typeof mcpUsers>
+): Promise<QueryResult<McpUsersRow> | null> {
+  return cachedPipeQuery(
+    "geo",
+    "mcp_users",
+    params,
+    params.organization_id,
+    (client) => client.mcpUsers.query(params)
+  );
+}
+
+export function queryMcpSessions(
+  params: InferParams<typeof mcpSessions>
+): Promise<QueryResult<McpSessionsRow> | null> {
+  return cachedPipeQuery(
+    "geo",
+    "mcp_sessions",
+    params,
+    params.organization_id,
+    (client) => client.mcpSessions.query(params)
+  );
+}
+
+export function queryMcpSessionEvents(
+  params: InferParams<typeof mcpSessionEvents>
+): Promise<QueryResult<McpSessionEventsRow> | null> {
+  return cachedPipeQuery(
+    "geo",
+    "mcp_session_events",
+    params,
+    params.organization_id,
+    (client) => client.mcpSessionEvents.query(params)
+  );
+}
+
+export function queryMcpCatalog(
+  params: InferParams<typeof mcpCatalog>
+): Promise<QueryResult<McpCatalogRow> | null> {
+  return cachedPipeQuery(
+    "geo",
+    "mcp_catalog",
+    params,
+    params.organization_id,
+    (client) => client.mcpCatalog.query(params)
+  );
+}
+
+export function queryMcpModels(
+  params: InferParams<typeof mcpModels>
+): Promise<QueryResult<McpModelsRow> | null> {
+  return cachedPipeQuery(
+    "geo",
+    "mcp_models",
+    params,
+    params.organization_id,
+    (client) => client.mcpModels.query(params)
+  );
+}
+
+export function queryMcpElicitations(
+  params: InferParams<typeof mcpElicitations>
+): Promise<QueryResult<McpElicitationsRow> | null> {
+  return cachedPipeQuery(
+    "geo",
+    "mcp_elicitations",
+    params,
+    params.organization_id,
+    (client) => client.mcpElicitations.query(params)
+  );
+}
+
+export function queryMcpUiRenders(
+  params: InferParams<typeof mcpUiRenders>
+): Promise<QueryResult<McpUiRendersRow> | null> {
+  return cachedPipeQuery(
+    "geo",
+    "mcp_ui_renders",
+    params,
+    params.organization_id,
+    (client) => client.mcpUiRenders.query(params)
   );
 }

@@ -4,6 +4,7 @@ import {
 } from "@notra/ai/billing/ai-traffic-events";
 import {
   ingestGeoTrafficEvents,
+  ingestMcpEvents,
   ingestWebPageEngagement,
   ingestWebPageViews,
 } from "@notra/analytics/tinybird/client";
@@ -20,6 +21,7 @@ import {
 } from "@notra/geo-core/geo/ingest";
 import {
   geoRequestPayloadSchema,
+  mcpEventBatchSchema,
   webEngagementPayloadSchema,
 } from "@notra/geo-core/schemas/geo";
 import type {
@@ -56,6 +58,7 @@ import { loadIngestAllowedHosts } from "./hosts";
 import { assertGeoIngestIdentityActive } from "./identity";
 import { resolveJourneyId } from "./journey";
 import { announceGeoTrafficEvent, expediteForLiveViewers } from "./live";
+import { buildMcpEventRow, isMcpEventBody } from "./mcp";
 import {
   geoIngestAdmissionRatelimit,
   geoIngestRatelimit,
@@ -123,13 +126,14 @@ export const readBearerIdentity = Effect.fn("geoIngest.readBearerIdentity")(
 
 const enforceRateLimit = Effect.fn("geoIngest.rateLimit")(function* (
   organizationId: string,
-  admissionKey?: string
+  admissionKey?: string,
+  rate = 1
 ) {
   const limiter = admissionKey
     ? geoIngestAdmissionRatelimit
     : geoIngestRatelimit;
   const { success, reason } = yield* Effect.tryPromise({
-    try: () => limiter.limit(admissionKey ?? organizationId),
+    try: () => limiter.limit(admissionKey ?? organizationId, { rate }),
     catch: (cause) => new GeoIngestFailedError({ cause }),
   });
   // Upstash reports timeouts as success; an unavailable limiter is not approval.
@@ -203,11 +207,11 @@ const storeWebPageView = Effect.fn("geoIngest.storeWebPageView")(function* (
   );
 });
 
-export const writeGeoTrafficEvents = Effect.fn("geoIngest.ingest")(function* (
-  rows: GeoTrafficEventRow[]
+const writeTinybirdRows = Effect.fn("geoIngest.ingest")(function* (
+  ingest: () => ReturnType<typeof ingestGeoTrafficEvents>
 ) {
   const result = yield* Effect.tryPromise({
-    try: () => ingestGeoTrafficEvents(rows),
+    try: ingest,
     catch: (cause) => new GeoIngestFailedError({ cause }),
   }).pipe(
     Effect.timeoutOrElse({
@@ -237,6 +241,9 @@ export const writeGeoTrafficEvents = Effect.fn("geoIngest.ingest")(function* (
     );
   }
 });
+
+export const writeGeoTrafficEvents = (rows: GeoTrafficEventRow[]) =>
+  writeTinybirdRows(() => ingestGeoTrafficEvents(rows));
 
 const failWithAuthPrecedence = Effect.fn("geoIngest.failWithAuthPrecedence")(
   function* (
@@ -357,6 +364,54 @@ const runWebEngagementIngest = Effect.fn("geoIngest.engagement")(function* (
     buffer
   );
   return webOnlyResult(identity, "human");
+});
+
+const runMcpEventIngest = Effect.fn("geoIngest.mcp")(function* (
+  identity: GeoIngestIdentity,
+  body: unknown,
+  defer: GeoIngestDefer
+) {
+  const parsed = mcpEventBatchSchema.safeParse(body);
+  if (!parsed.success) {
+    return yield* failWithAuthPrecedence(
+      identity,
+      new GeoIngestInvalidPayloadError({ issues: parsed.error.issues })
+    );
+  }
+  yield* enforceRateLimit(
+    identity.organizationId,
+    geoIngestAdmissionKey(identity)
+  );
+  yield* assertGeoIngestIdentityActive(identity);
+  if (!(yield* hasAiTrafficEventsQuota(identity.organizationId))) {
+    return droppedResult(identity, "unknown", "quota");
+  }
+  const { events } = parsed.data;
+  yield* enforceRateLimit(identity.organizationId, undefined, events.length);
+
+  const rows = events.map((payload) =>
+    buildMcpEventRow({
+      identity,
+      payload,
+      capturedAt: toCapturedDate(payload.timestamp),
+    })
+  );
+  const ingestStartedAt = Date.now();
+  yield* writeTinybirdRows(() => ingestMcpEvents(rows));
+  const ingestMs = Date.now() - ingestStartedAt;
+  yield* Effect.sync(() =>
+    defer(() => trackAiTrafficEvent(identity.organizationId, rows.length))
+  );
+
+  return {
+    outcome: "ingested",
+    organizationId: identity.organizationId,
+    projectId: identity.projectId,
+    visitorType: "unknown",
+    source: "mcp",
+    agent: rows[0]?.client_name ?? "",
+    ingestMs,
+  } satisfies GeoIngestResult;
 });
 
 export const runGeoEnvelopeIngest = Effect.fn("geoIngest.envelope")(function* (
@@ -545,6 +600,9 @@ export const runGeoIngest = Effect.fn("geoIngest.run")(function* (
   const body = yield* readBody(request);
   if (isWebEngagementBody(body)) {
     return yield* runWebEngagementIngest(identity, body, buffer);
+  }
+  if (isMcpEventBody(body)) {
+    return yield* runMcpEventIngest(identity, body, defer);
   }
   return yield* runGeoEnvelopeIngest(identity, body, defer, buffer);
 });

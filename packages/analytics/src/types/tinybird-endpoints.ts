@@ -15,6 +15,23 @@ import type {
   geoTrafficTrendsProjects,
 } from "../tinybird/pipes/geo-traffic-trends";
 import type {
+  mcpCatalog,
+  mcpClients,
+  mcpElicitations,
+  mcpIntents,
+  mcpLog,
+  mcpModels,
+  mcpOverview,
+  mcpSessionEvents,
+  mcpSessions,
+  mcpTimeseries,
+  mcpToolFailures,
+  mcpToolNeighbors,
+  mcpTools,
+  mcpUiRenders,
+  mcpUsers,
+} from "../tinybird/pipes/mcp";
+import type {
   accountLeaderboard,
   engagementTimeseries,
   followerGrowth,
@@ -81,3 +98,18 @@ export type GeoTrafficTrendsDailyRow = InferOutputRow<
 export type GeoTrafficTrendsProjectsRow = InferOutputRow<
   typeof geoTrafficTrendsProjects
 >;
+export type McpOverviewRow = InferOutputRow<typeof mcpOverview>;
+export type McpTimeseriesRow = InferOutputRow<typeof mcpTimeseries>;
+export type McpToolsRow = InferOutputRow<typeof mcpTools>;
+export type McpClientsRow = InferOutputRow<typeof mcpClients>;
+export type McpLogRow = InferOutputRow<typeof mcpLog>;
+export type McpToolNeighborsRow = InferOutputRow<typeof mcpToolNeighbors>;
+export type McpToolFailuresRow = InferOutputRow<typeof mcpToolFailures>;
+export type McpIntentsRow = InferOutputRow<typeof mcpIntents>;
+export type McpUsersRow = InferOutputRow<typeof mcpUsers>;
+export type McpSessionsRow = InferOutputRow<typeof mcpSessions>;
+export type McpSessionEventsRow = InferOutputRow<typeof mcpSessionEvents>;
+export type McpCatalogRow = InferOutputRow<typeof mcpCatalog>;
+export type McpModelsRow = InferOutputRow<typeof mcpModels>;
+export type McpElicitationsRow = InferOutputRow<typeof mcpElicitations>;
+export type McpUiRendersRow = InferOutputRow<typeof mcpUiRenders>;

@@ -125,7 +125,7 @@ export const AGENT_FEEDBACK_CLIENT_BRAND_RULES: readonly AgentFeedbackClientBran
   [
     { brand: "claude", aliases: ["claude", "anthropic"] },
     { brand: "cursor", aliases: ["cursor"] },
-    { brand: "openai", aliases: ["openai", "chatgpt"] },
+    { brand: "openai", aliases: ["openai", "chatgpt", "gpt"] },
     { brand: "vercel", aliases: ["vercel"] },
     { brand: "windsurf", aliases: ["windsurf", "cascade"] },
     { brand: "amp", aliases: ["amp", "sourcegraph"] },

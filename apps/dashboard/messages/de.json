@@ -2219,7 +2219,7 @@
       "commandPalette": "Befehlspalette",
       "automation": "Automatisierung",
       "home": "Home",
-      "traffic": "Traffic",
+      "traffic": "Traffic & Analytics",
       "sendFeedback": "Feedback senden",
       "default": "Standard",
       "more": "Mehr",
@@ -4057,11 +4057,16 @@
         "setupDescription": "Richte zuerst das GEO-Tracking ein und sieh dann, welche Seiten KI-Engines zitieren und wer dort gelistet ist."
       },
       "traffic": {
-        "metaTitle": "GEO-Traffic",
-        "title": "KI-Traffic",
+        "metaTitle": "Traffic & Analytics",
+        "mcpMetaTitle": "MCP-Server-Analytics",
+        "tabs": {
+          "website": "Website",
+          "mcp": "MCP-Server"
+        },
+        "title": "Traffic & Analytics",
         "description": "KI-Crawler und Verweise, die deine Website besuchen",
         "setupDescription": "Richte zuerst das GEO-Tracking ein und beobachte dann KI-Crawler und Verweise, sobald sie eintreffen.",
-        "titleWithVisitors": "Traffic",
+        "titleWithVisitors": "Traffic & Analytics",
         "descriptionWithVisitors": "Menschen und AI-Agents auf deiner Website",
         "emptyRangeTitle": "Kein Traffic in diesem Zeitraum",
         "emptyRangeDescription": "Wähle einen anderen Zeitraum oder eine andere Domain.",
@@ -4069,6 +4074,181 @@
         "emptyPathDescription": "Weder Menschen noch AI-Agents haben diese Seite im gewählten Zeitraum geöffnet.",
         "emptyPathReset": "Alle Seiten anzeigen",
         "emptyPathWiden": "Letzte 90 Tage anzeigen"
+      },
+      "mcp": {
+        "description": "Anfragen, Tools, Sitzungen und Agents, die deinen MCP-Server erreichen.",
+        "loadFailed": {
+          "title": "MCP-Analytics konnten nicht geladen werden",
+          "hint": "Die Anfrage für diese Seite ist fehlgeschlagen. Dein Server sendet weiter Events, also geht nichts verloren, während du es erneut versuchst."
+        },
+        "setup": {
+          "title": "Verbinde deinen MCP-Server",
+          "hint": "Installiere @usenotra/geo und umschließe den Transport deines Servers mit deinem Token für AI-Traffic-Tracking. Jede Anfrage zählt zu deinen monatlichen AI-Traffic-Events."
+        },
+        "metrics": {
+          "toolCalls": "Tool-Aufrufe",
+          "sessions": "Sitzungen",
+          "errorRate": "Fehlerrate",
+          "p95Latency": "p95-Latenz"
+        },
+        "chart": {
+          "title": "Anfragen nach Methode",
+          "otherMethods": "Andere Methoden"
+        },
+        "columns": {
+          "tool": "Tool",
+          "calls": "Aufrufe",
+          "users": "Nutzer",
+          "errors": "Fehler",
+          "p95": "p95",
+          "avgResponse": "Ø Antwort",
+          "client": "Client",
+          "sessions": "Sitzungen",
+          "requests": "Anfragen",
+          "model": "Modell",
+          "asked": "Gefragt",
+          "accepted": "Angenommen",
+          "declined": "Abgelehnt",
+          "cancelled": "Abgebrochen",
+          "interface": "Oberfläche",
+          "renders": "Aufrufe",
+          "intent": "Absicht",
+          "routedTo": "Weitergeleitet an",
+          "user": "Nutzer",
+          "started": "Gestartet",
+          "toolCalls": "Tool-Aufrufe",
+          "duration": "Dauer",
+          "time": "Zeit",
+          "method": "Methode",
+          "status": "Status"
+        },
+        "fallback": {
+          "unknown": "Unbekannt",
+          "unknownClient": "Unbekannter Client",
+          "outsideToolCall": "Außerhalb eines Tool-Aufrufs",
+          "otherMethod": "Andere Methode",
+          "anonymous": "Anonym"
+        },
+        "uiBadge": "UI",
+        "serverRequests": {
+          "elicitation": "Elicitation",
+          "sampling": "Sampling"
+        },
+        "seconds": "{count, number} s",
+        "tools": {
+          "title": "Tools",
+          "hint": "Klick auf ein Tool, um zu sehen, was Agents davor und danach aufrufen, wie sie mit Fehlern umgehen und was sie erreichen wollten.",
+          "readout": "{called, number} aufgerufen",
+          "readoutWithUnused": "{called, number} aufgerufen · {unused, number} ungenutzt"
+        },
+        "unused": {
+          "title": "Nie aufgerufen",
+          "hint": "Deine letzte tools/list-Antwort hat diese Tools angeboten, aber kein Agent hat sie in diesem Zeitraum aufgerufen. Benenne sie um, verbessere die Beschreibung oder entferne sie.",
+          "readout": "{count, plural, one {# Tool} other {# Tools}}",
+          "noDescription": "Keine Beschreibung"
+        },
+        "elicitations": {
+          "title": "Rückfragen an Nutzer",
+          "hint": "Elicitation- und Sampling-Anfragen, die dein Server an den Client geschickt hat, gruppiert nach dem auslösenden Tool, und wie Nutzer geantwortet haben.",
+          "readout": "{count, number} gefragt",
+          "empty": "Keine Elicitation-Anfragen in diesem Zeitraum. Übergib relatedRequestId an elicitInput, damit jede Anfrage ihrem Tool zugeordnet wird."
+        },
+        "uiRenders": {
+          "title": "Interaktive Oberflächen",
+          "hint": "MCP-Apps-Oberflächen (ui://-Ressourcen), die Hosts geladen haben, mit den Tools, die sie deklarieren.",
+          "readout": "{count, number} Aufrufe",
+          "empty": "Kein Host hat in diesem Zeitraum eine ui://-Ressource geladen. Tools mit _meta.ui.resourceUri erscheinen hier, sobald ein Host sie anzeigt."
+        },
+        "clients": {
+          "title": "Clients",
+          "hint": "Aus den clientInfo-Angaben jeder initialize-Anfrage.",
+          "readout": "{count, plural, one {# Client} other {# Clients}}"
+        },
+        "models": {
+          "title": "Modelle",
+          "hint": "Agents geben ihr Modell über den optionalen Parameter _model an.",
+          "readout": "{count, plural, one {# Modell} other {# Modelle}}",
+          "empty": "Aktiviere contextParameters im SDK, um zu sehen, welche Modelle deinen Server aufrufen."
+        },
+        "sessions": {
+          "title": "Sitzungen",
+          "hint": "Jede Mcp-Session-Id ist ein Agent-Lauf. Klick auf eine Sitzung, um ihren ganzen Ablauf zu sehen.",
+          "readout": "{count, number} in diesem Zeitraum"
+        },
+        "intents": {
+          "title": "Was Agents vorhaben",
+          "hint": "Die häufigsten Absichten aus dem optionalen Parameter _intent und das Tool, an das jede weitergeleitet wurde.",
+          "empty": "Aktiviere contextParameters im SDK, damit Agents sagen können, warum sie ein Tool aufrufen."
+        },
+        "users": {
+          "title": "Nutzer",
+          "readout": "{count, number} erkannt",
+          "empty": "Übergib identify an das SDK, um zu sehen, für welche deiner Nutzer die Agents handeln."
+        },
+        "requests": {
+          "title": "Letzte Anfragen",
+          "hint": "Die letzten 100 JSON-RPC-Anfragen, die dein Server beantwortet hat.",
+          "filterLabel": "Anfragen filtern",
+          "all": "Alle",
+          "success": "Erfolgreich",
+          "errors": "Fehler"
+        },
+        "status": {
+          "ok": "OK",
+          "toolError": "Tool-Fehler",
+          "accept": "Angenommen",
+          "decline": "Abgelehnt",
+          "cancel": "Abgebrochen"
+        },
+        "rpcErrors": {
+          "parse": "Parse-Fehler",
+          "invalidRequest": "Ungültige Anfrage",
+          "methodNotFound": "Methode nicht gefunden",
+          "invalidParams": "Ungültige Parameter",
+          "internal": "Interner Fehler",
+          "resourceNotFound": "Ressource nicht gefunden",
+          "other": "Fehler {code}"
+        },
+        "requestSheet": {
+          "client": "Client",
+          "user": "Nutzer",
+          "model": "Modell",
+          "responseSize": "Antwortgröße",
+          "protocol": "Protokoll",
+          "rpcError": "JSON-RPC-Fehler",
+          "sessionId": "Mcp-Session-Id",
+          "intent": "Absicht",
+          "arguments": "Argumente",
+          "response": "Antwort"
+        },
+        "sessionSheet": {
+          "title": "{client}-Sitzung",
+          "requests": "{count, plural, one {# Anfrage} other {# Anfragen}}",
+          "sessionId": "Mcp-Session-Id: {id}",
+          "payload": "Payload"
+        },
+        "toolSheet": {
+          "noDescription": "In tools/list ist keine Beschreibung angegeben.",
+          "calledBefore": "Davor aufgerufen",
+          "calledAfter": "Danach aufgerufen",
+          "sessionStart": "Sitzungsbeginn",
+          "sessionEnd": "Sitzungsende",
+          "noCalls": "Noch keine Aufrufe.",
+          "afterFailure": "{count, number} nach Fehler",
+          "recoveryTitle": "Nach einem Fehler",
+          "retried": "Tool erneut aufgerufen",
+          "switched": "Gewechselt zu",
+          "gaveUp": "Sitzung beendet",
+          "failures": "Fehler",
+          "failuresReadout": "{count, number} verschiedene",
+          "noErrorMessage": "Keine Fehlermeldung",
+          "noFailures": "Keine Fehler in diesem Zeitraum.",
+          "wanted": "Was Agents wollten",
+          "wantedHint": "Aus dem optionalen Parameter _intent.",
+          "wantedEmpty": "Aktiviere contextParameters im SDK, um Absichten zu sehen.",
+          "topUsers": "Top-Nutzer",
+          "topUsersEmpty": "Übergib identify an das SDK, um zu sehen, wer dieses Tool aufruft."
+        }
       }
     },
     "toasts": {
@@ -4099,6 +4279,7 @@
       "startRescanFailed": "Erneuter Scan konnte nicht gestartet werden",
       "loadAgentReadinessFailed": "Agent Readiness konnte nicht geladen werden",
       "loadVisitorsFailed": "Besucher konnten nicht geladen werden",
+      "loadMcpAnalyticsFailed": "MCP-Server-Analytics konnten nicht geladen werden",
       "loadAITrafficFailed": "KI-Traffic konnte nicht geladen werden",
       "loadAITrackingLogFailed": "KI-Tracking-Log konnte nicht geladen werden",
       "loadTopAIPagesFailed": "Top-KI-Seiten konnten nicht geladen werden",

@@ -9,6 +9,7 @@ import type { z } from "zod";
 
 import type {
   geoRequestPayloadSchema,
+  mcpEventSchema,
   webEngagementPayloadSchema,
 } from "../schemas/geo";
 import type {
@@ -116,6 +117,12 @@ export type GeoIngestDropReason =
   | "quota"
   | "consent";
 
+export interface McpEventInput {
+  identity: GeoIngestIdentity;
+  payload: McpEventPayload;
+  capturedAt: Date;
+}
+
 export type GeoIngestResult =
   | {
       outcome: "ingested";
@@ -142,6 +149,8 @@ export interface BatchedRow {
 }
 
 export type GeoIngestPayload = z.infer<typeof geoRequestPayloadSchema>;
+
+export type McpEventPayload = z.infer<typeof mcpEventSchema>;
 
 type WebEngagementPayload = z.infer<typeof webEngagementPayloadSchema>;
 

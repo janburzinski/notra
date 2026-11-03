@@ -466,9 +466,89 @@ export const webAudienceDaily = defineDatasource("web_audience_daily", {
   jsonPaths: false,
 });
 
+export const mcpEvents = defineDatasource("mcp_events", {
+  description:
+    "Append-only log of JSON-RPC requests answered by customer MCP servers and of requests those servers send to clients (elicitation, sampling), captured by the geo SDK; arguments and responses only when the customer opts in, redacted by the SDK",
+  schema: {
+    organization_id: t.string(),
+    project_id: t.string().lowCardinality(),
+    captured_at: t.dateTime64(3),
+    sequence: t.uint32().default(0),
+    session_id: t.string(),
+    server_name: t.string().lowCardinality(),
+    server_version: t.string().lowCardinality(),
+    protocol_version: t.string().lowCardinality(),
+    client_name: t.string().lowCardinality(),
+    client_version: t.string().lowCardinality(),
+    method: t.string().lowCardinality(),
+    target: t.string(),
+    status: t.string().lowCardinality(),
+    error_code: t.int32(),
+    error_message: t.string(),
+    duration_ms: t.uint32(),
+    response_bytes: t.uint32(),
+    user_id: t.string(),
+    intent: t.string(),
+    model: t.string().lowCardinality(),
+    arguments: t.string(),
+    response: t.string(),
+    outcome: t.string().lowCardinality().default(""),
+    listed_tools: t.array(t.string()).jsonPath("$.listed_tools[:]"),
+    listed_descriptions: t
+      .array(t.string())
+      .jsonPath("$.listed_descriptions[:]"),
+    listed_ui_resources: t
+      .array(t.string())
+      .jsonPath("$.listed_ui_resources[:]"),
+  },
+  engine: engine.mergeTree({
+    sortingKey: ["organization_id", "project_id", "captured_at"],
+    partitionKey: "toYYYYMM(captured_at)",
+    ttl: "toDateTime(captured_at) + toIntervalDay(90)",
+    settings: { ttl_only_drop_parts: 1 },
+  }),
+});
+
+export const mcpDaily = defineDatasource("mcp_daily", {
+  description:
+    "Daily rollup of mcp_events per project, method, target, client and status; read with countMerge/uniqMerge/uniqIfMerge/sumMerge/quantilesTDigestMerge(0.5, 0.95)",
+  schema: {
+    day: t.date(),
+    organization_id: t.string(),
+    project_id: t.string().lowCardinality(),
+    method: t.string().lowCardinality(),
+    status: t.string().lowCardinality(),
+    client_name: t.string().lowCardinality(),
+    target: t.string(),
+    requests_state: t.aggregateFunction("count"),
+    sessions_state: t.aggregateFunction("uniq", t.string()),
+    users_state: t.aggregateFunction("uniqIf", t.string(), t.uint8()),
+    response_bytes_state: t.aggregateFunction("sum", t.uint32()),
+    duration_state: t.aggregateFunction(
+      "quantilesTDigest(0.5, 0.95)",
+      t.uint32()
+    ),
+    last_seen_state: t.aggregateFunction("max", t.dateTime()),
+  },
+  engine: engine.aggregatingMergeTree({
+    sortingKey: [
+      "organization_id",
+      "project_id",
+      "method",
+      "status",
+      "client_name",
+      "day",
+      "target",
+    ],
+    partitionKey: "toYYYYMM(day)",
+  }),
+  jsonPaths: false,
+});
+
 export type SocialAccountRow = InferRow<typeof socialAccounts>;
 export type SocialAccountStatsRow = InferRow<typeof socialAccountStats>;
 export type SocialPostRow = InferRow<typeof socialPosts>;
 export type SocialPostStatsRow = InferRow<typeof socialPostStats>;
 export type SocialPostSourceRow = InferRow<typeof socialPostSources>;
 export type GeoTrafficEventRow = InferRow<typeof geoTrafficEvents>;
+export type McpEventRow = InferRow<typeof mcpEvents>;

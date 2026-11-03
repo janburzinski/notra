@@ -2219,7 +2219,7 @@
       "commandPalette": "Command palette",
       "automation": "Automation",
       "home": "Home",
-      "traffic": "Traffic",
+      "traffic": "Traffic & Analytics",
       "sendFeedback": "Send feedback",
       "default": "Default",
       "more": "More",
@@ -4057,11 +4057,16 @@
         "setupDescription": "Set up GEO tracking first, then see which pages engines cite and who is listed on them."
       },
       "traffic": {
-        "metaTitle": "GEO Traffic",
-        "title": "AI traffic",
+        "metaTitle": "Traffic & Analytics",
+        "mcpMetaTitle": "MCP server analytics",
+        "tabs": {
+          "website": "Website",
+          "mcp": "MCP server"
+        },
+        "title": "Traffic & Analytics",
         "description": "AI crawlers and referrals visiting your site",
         "setupDescription": "Set up GEO tracking first, then watch AI crawlers and referrals as they arrive.",
-        "titleWithVisitors": "Traffic",
+        "titleWithVisitors": "Traffic & Analytics",
         "descriptionWithVisitors": "People and AI agents on your site",
         "emptyRangeTitle": "No traffic in this period",
         "emptyRangeDescription": "Try a different date range or domain.",
@@ -4069,6 +4074,181 @@
         "emptyPathDescription": "Neither people nor AI agents opened this page in the selected period.",
         "emptyPathReset": "Show all pages",
         "emptyPathWiden": "Try last 90 days"
+      },
+      "mcp": {
+        "description": "Requests, tools, sessions and agents that reach your MCP server.",
+        "loadFailed": {
+          "title": "MCP analytics didn't load",
+          "hint": "The request for this page failed. Your server keeps sending events in the meantime, so nothing is lost while you retry."
+        },
+        "setup": {
+          "title": "Connect your MCP server",
+          "hint": "Install @usenotra/geo and wrap your server transport with your AI traffic tracking token. Every request counts toward your monthly AI traffic events."
+        },
+        "metrics": {
+          "toolCalls": "Tool calls",
+          "sessions": "Sessions",
+          "errorRate": "Error rate",
+          "p95Latency": "p95 latency"
+        },
+        "chart": {
+          "title": "Requests by method",
+          "otherMethods": "Other methods"
+        },
+        "columns": {
+          "tool": "Tool",
+          "calls": "Calls",
+          "users": "Users",
+          "errors": "Errors",
+          "p95": "p95",
+          "avgResponse": "Avg response",
+          "client": "Client",
+          "sessions": "Sessions",
+          "requests": "Requests",
+          "model": "Model",
+          "asked": "Asked",
+          "accepted": "Accepted",
+          "declined": "Declined",
+          "cancelled": "Cancelled",
+          "interface": "Interface",
+          "renders": "Renders",
+          "intent": "Intent",
+          "routedTo": "Routed to",
+          "user": "User",
+          "started": "Started",
+          "toolCalls": "Tool calls",
+          "duration": "Duration",
+          "time": "Time",
+          "method": "Method",
+          "status": "Status"
+        },
+        "fallback": {
+          "unknown": "Unknown",
+          "unknownClient": "Unknown client",
+          "outsideToolCall": "Outside a tool call",
+          "otherMethod": "Other method",
+          "anonymous": "Anonymous"
+        },
+        "uiBadge": "UI",
+        "serverRequests": {
+          "elicitation": "Elicitation",
+          "sampling": "Sampling"
+        },
+        "seconds": "{count, number} s",
+        "tools": {
+          "title": "Tools",
+          "hint": "Click a tool to see what agents call before and after it, how they recover from failures and what they were trying to do.",
+          "readout": "{called, number} called",
+          "readoutWithUnused": "{called, number} called · {unused, number} unused"
+        },
+        "unused": {
+          "title": "Never called",
+          "hint": "Your latest tools/list answer advertised these tools, but no agent called them in this period. Rename them, improve the description or remove them.",
+          "readout": "{count, plural, one {# tool} other {# tools}}",
+          "noDescription": "No description"
+        },
+        "elicitations": {
+          "title": "Asking the user",
+          "hint": "Elicitation and sampling requests your server sent to the client, grouped by the tool that triggered them, and how users answered.",
+          "readout": "{count, number} asked",
+          "empty": "No elicitation requests in this period. Pass relatedRequestId to elicitInput so each request is tied to its tool."
+        },
+        "uiRenders": {
+          "title": "Interactive UI",
+          "hint": "MCP Apps interfaces (ui:// resources) that hosts loaded, with the tools that declare them.",
+          "readout": "{count, number} renders",
+          "empty": "No host loaded a ui:// resource in this period. Tools that declare _meta.ui.resourceUri appear here once a host renders them."
+        },
+        "clients": {
+          "title": "Clients",
+          "hint": "From the clientInfo sent in each initialize request.",
+          "readout": "{count, plural, one {# client} other {# clients}}"
+        },
+        "models": {
+          "title": "Models",
+          "hint": "Agents report their model through the optional _model parameter.",
+          "readout": "{count, plural, one {# model} other {# models}}",
+          "empty": "Turn on contextParameters in the SDK to see which models call your server."
+        },
+        "sessions": {
+          "title": "Sessions",
+          "hint": "Each Mcp-Session-Id is one agent run. Click a session to see its full timeline.",
+          "readout": "{count, number} in this period"
+        },
+        "intents": {
+          "title": "What agents are trying to do",
+          "hint": "The most frequent intents from the optional _intent parameter and the tool each one routed to.",
+          "empty": "Turn on contextParameters in the SDK so agents can say why they call a tool."
+        },
+        "users": {
+          "title": "Users",
+          "readout": "{count, number} identified",
+          "empty": "Pass identify to the SDK to see which of your users the agents act for."
+        },
+        "requests": {
+          "title": "Recent requests",
+          "hint": "The last 100 JSON-RPC requests your server answered.",
+          "filterLabel": "Filter requests",
+          "all": "All",
+          "success": "Success",
+          "errors": "Errors"
+        },
+        "status": {
+          "ok": "OK",
+          "toolError": "Tool error",
+          "accept": "Accepted",
+          "decline": "Declined",
+          "cancel": "Cancelled"
+        },
+        "rpcErrors": {
+          "parse": "Parse error",
+          "invalidRequest": "Invalid request",
+          "methodNotFound": "Method not found",
+          "invalidParams": "Invalid params",
+          "internal": "Internal error",
+          "resourceNotFound": "Resource not found",
+          "other": "Error {code}"
+        },
+        "requestSheet": {
+          "client": "Client",
+          "user": "User",
+          "model": "Model",
+          "responseSize": "Response size",
+          "protocol": "Protocol",
+          "rpcError": "JSON-RPC error",
+          "sessionId": "Mcp-Session-Id",
+          "intent": "Intent",
+          "arguments": "Arguments",
+          "response": "Response"
+        },
+        "sessionSheet": {
+          "title": "{client} session",
+          "requests": "{count, plural, one {# request} other {# requests}}",
+          "sessionId": "Mcp-Session-Id: {id}",
+          "payload": "Payload"
+        },
+        "toolSheet": {
+          "noDescription": "No description advertised in tools/list.",
+          "calledBefore": "Called before",
+          "calledAfter": "Called after",
+          "sessionStart": "Session start",
+          "sessionEnd": "Session end",
+          "noCalls": "No calls yet.",
+          "afterFailure": "{count, number} after failure",
+          "recoveryTitle": "After a failure",
+          "retried": "Retried this tool",
+          "switched": "Switched to",
+          "gaveUp": "Ended the session",
+          "failures": "Failures",
+          "failuresReadout": "{count, number} distinct",
+          "noErrorMessage": "No error message",
+          "noFailures": "No failures in this period.",
+          "wanted": "What agents wanted",
+          "wantedHint": "From the optional _intent parameter.",
+          "wantedEmpty": "Turn on contextParameters in the SDK to see intents.",
+          "topUsers": "Top users",
+          "topUsersEmpty": "Pass identify to the SDK to see who calls this tool."
+        }
       }
     },
     "toasts": {
@@ -4099,6 +4279,7 @@
       "startRescanFailed": "Failed to start rescan",
       "loadAgentReadinessFailed": "Failed to load agent readiness",
       "loadVisitorsFailed": "Failed to load visitors",
+      "loadMcpAnalyticsFailed": "Failed to load MCP server analytics",
       "loadAITrafficFailed": "Failed to load AI traffic",
       "loadAITrackingLogFailed": "Failed to load AI tracking log",
       "loadTopAIPagesFailed": "Failed to load top AI pages",

@@ -46,6 +46,17 @@ import {
   GEO_SHORT_FIELD_MAX_LENGTH,
   GEO_TRAFFIC_SITES_MODES,
   GEO_SEQUENCE_MAX_TURNS,
+  MCP_EVENT_BATCH_MAX_EVENTS,
+  MCP_EVENT_CAPTURE_MAX_LENGTH,
+  MCP_EVENT_CONTEXT_MAX_LENGTH,
+  MCP_EVENT_MAX_DURATION_MS,
+  MCP_EVENT_MAX_ERROR_CODE,
+  MCP_EVENT_MAX_SEQUENCE,
+  MCP_EVENT_MIN_ERROR_CODE,
+  MCP_EVENT_MAX_RESPONSE_BYTES,
+  MCP_EVENT_MAX_TOOLS,
+  MCP_EVENT_STATUSES,
+  MCP_ELICITATION_OUTCOMES,
   GEO_WRITER_TOPIC_MAX_LENGTH,
   GEO_WRITER_TOPIC_MIN_LENGTH,
 } from "../constants/geo";
@@ -530,6 +541,67 @@ export const webEngagementPayloadSchema = object({
   viewId: string().regex(SITE_ENGAGEMENT_VIEW_ID_PATTERN),
   visibleMs: number().int().min(0),
   scrollDepth: number().int().min(0).max(100),
+});
+
+const mcpPeerSchema = object({
+  name: string().max(GEO_SHORT_FIELD_MAX_LENGTH).optional(),
+  version: string().max(GEO_SHORT_FIELD_MAX_LENGTH).optional(),
+});
+
+export const mcpEventSchema = object({
+  timestamp: string().max(GEO_SHORT_FIELD_MAX_LENGTH).optional(),
+  sessionId: string().max(GEO_SHORT_FIELD_MAX_LENGTH).optional(),
+  protocolVersion: string().max(GEO_SHORT_FIELD_MAX_LENGTH).optional(),
+  server: mcpPeerSchema.optional(),
+  client: mcpPeerSchema.optional(),
+  method: string().min(1).max(GEO_SHORT_FIELD_MAX_LENGTH),
+  target: string().max(MAX_GEO_URL_LENGTH).optional(),
+  status: enumType(MCP_EVENT_STATUSES),
+  sequence: number().int().min(0).max(MCP_EVENT_MAX_SEQUENCE).optional(),
+  errorCode: number()
+    .int()
+    .min(MCP_EVENT_MIN_ERROR_CODE)
+    .max(MCP_EVENT_MAX_ERROR_CODE)
+    .optional(),
+  errorMessage: string().max(MAX_GEO_FIELD_LENGTH).optional(),
+  durationMs: number().int().min(0).max(MCP_EVENT_MAX_DURATION_MS),
+  responseBytes: number()
+    .int()
+    .min(0)
+    .max(MCP_EVENT_MAX_RESPONSE_BYTES)
+    .optional(),
+  userId: string().max(GEO_SHORT_FIELD_MAX_LENGTH).optional(),
+  intent: string().max(MCP_EVENT_CONTEXT_MAX_LENGTH).optional(),
+  model: string().max(GEO_SHORT_FIELD_MAX_LENGTH).optional(),
+  arguments: string().max(MCP_EVENT_CAPTURE_MAX_LENGTH).optional(),
+  response: string().max(MCP_EVENT_CAPTURE_MAX_LENGTH).optional(),
+  outcome: enumType(MCP_ELICITATION_OUTCOMES).optional(),
+  tools: array(
+    object({
+      name: string().min(1).max(GEO_SHORT_FIELD_MAX_LENGTH),
+      description: string().max(MCP_EVENT_CONTEXT_MAX_LENGTH).optional(),
+      uiResource: string().max(MAX_GEO_URL_LENGTH).optional(),
+    })
+  )
+    .max(MCP_EVENT_MAX_TOOLS)
+    .optional(),
+});
+
+export const mcpEventBatchSchema = object({
+  type: literal("mcp"),
+  events: array(mcpEventSchema).min(1).max(MCP_EVENT_BATCH_MAX_EVENTS),
+});
+
+export const mcpAnalyticsInputSchema = geoOrganizationInputSchema.extend({
+  ...geoWindowFields,
+});
+
+export const mcpToolDetailInputSchema = mcpAnalyticsInputSchema.extend({
+  tool: string().min(1).max(GEO_SHORT_FIELD_MAX_LENGTH),
+});
+
+export const mcpSessionInputSchema = mcpAnalyticsInputSchema.extend({
+  sessionId: string().min(1).max(GEO_SHORT_FIELD_MAX_LENGTH),
 });
 
 export const geoTrafficJourneysInputSchema = geoOrganizationInputSchema.extend({

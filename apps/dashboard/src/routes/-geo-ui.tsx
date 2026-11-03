@@ -23,6 +23,9 @@ const Overview = lazyPage(
 const Traffic = lazyPage(
   () => import("@/app/(dashboard)/[slug]/geo/traffic/page-client")
 );
+const McpTraffic = lazyPage(
+  () => import("@/app/(dashboard)/[slug]/geo/traffic/mcp/page-client")
+);
 const Competitors = lazyPage(
   () => import("@/app/(dashboard)/[slug]/geo/competitors/page-client")
 );
@@ -80,6 +83,13 @@ export function createGeoUiRoutes(parent: AnyRoute) {
           <Traffic layout={data.trafficLayout} organizationSlug={params.slug} />
         </HydrationBoundary>
       ),
+    }),
+    createUiRoute({
+      parent,
+      path: "traffic/mcp",
+      title: { namespace: "geo.pages.traffic", key: "mcpMetaTitle" },
+      preload: McpTraffic.preload,
+      component: ({ params }) => <McpTraffic organizationSlug={params.slug} />,
     }),
     createUiRoute({
       parent,

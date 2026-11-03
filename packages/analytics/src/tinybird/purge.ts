@@ -34,6 +34,7 @@ const WEB_DATASOURCES = [
   "web_sources_daily",
   "web_audience_daily",
 ];
+const MCP_DATASOURCES = ["mcp_events", "mcp_daily"];
 
 const JOB_POLL_INTERVAL_MS = 1000;
 const JOB_POLL_MAX_ATTEMPTS = 60;
@@ -235,7 +236,7 @@ export function purgeDeletedProjectAnalytics(
   waitForJobs = false
 ): Promise<void> {
   return submitDeletes(
-    [...GEO_DATASOURCES, ...WEB_DATASOURCES],
+    [...GEO_DATASOURCES, ...WEB_DATASOURCES, ...MCP_DATASOURCES],
     `organization_id = '${sanitize(input.organizationId)}' AND project_id = '${sanitize(input.projectId)}'`,
     waitForJobs
   );
@@ -246,7 +247,12 @@ export function purgeDeletedOrganizationAnalytics(
   waitForJobs = false
 ): Promise<void> {
   return submitDeletes(
-    [...ACCOUNT_SCOPED_DATASOURCES, ...GEO_DATASOURCES, ...WEB_DATASOURCES],
+    [
+      ...ACCOUNT_SCOPED_DATASOURCES,
+      ...GEO_DATASOURCES,
+      ...WEB_DATASOURCES,
+      ...MCP_DATASOURCES,
+    ],
     `organization_id = '${sanitize(input.organizationId)}'`,
     waitForJobs
   );

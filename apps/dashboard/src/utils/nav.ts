@@ -94,16 +94,21 @@ export function resolveNavGroupRow(
   rest: readonly NavMainItem[],
   activeLink: string | null
 ): NavGroupRowState {
-  const subRows = group.listsOwnPage ? [first, ...rest] : [...rest];
+  const listsOwnPage = group.listsOwnPage || first.link !== group.links[0];
+  const subRows = listsOwnPage
+    ? [first, ...rest].toSorted(
+        (a, b) => group.links.indexOf(a.link) - group.links.indexOf(b.link)
+      )
+    : [...rest];
   const groupActive =
     first.link === activeLink || rest.some((item) => item.link === activeLink);
   return {
     subRows,
     groupActive,
-    ownPageActive: first.link === activeLink && !group.listsOwnPage,
+    ownPageActive: first.link === activeLink && !listsOwnPage,
     showSubRows: groupActive && subRows.length > 0,
     // A row with one page is that page, so it carries the page's badge.
-    showOwnBadge: rest.length === 0 && !group.listsOwnPage,
+    showOwnBadge: rest.length === 0 && !listsOwnPage,
   };
 }
 

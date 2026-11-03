@@ -1,5 +1,6 @@
 import { afterAll, beforeAll, describe, expect, test } from "bun:test";
 
+import { INGEST_MAX_BODY_BYTES } from "../src/constants/server";
 import { startService } from "./utils/service";
 
 let configured: Awaited<ReturnType<typeof startService>>;
@@ -39,7 +40,7 @@ describe("standalone ingest HTTP service", () => {
   test("bounds the request body", async () => {
     const response = await fetch(`${configured.url}/api/geo/ingest`, {
       method: "POST",
-      body: "x".repeat(65 * 1024),
+      body: "x".repeat(INGEST_MAX_BODY_BYTES + 1),
     });
     expect(response.status).toBe(413);
   });

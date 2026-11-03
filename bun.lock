@@ -540,7 +540,7 @@
         "@tanstack/react-start": "^1.169.2",
         "@toolwind/corner-shape": "^0.0.8-3",
         "@upstash/redis": "catalog:",
-        "@usenotra/geo": "npm:@usenotra/geo@^0.6.2",
+        "@usenotra/geo": "npm:@usenotra/geo@^0.8.0",
         "ai": "catalog:",
         "c15t": "3.2.2",
         "dompurify": "^3.4.17",
@@ -734,7 +734,7 @@
         "@notra/utils": "workspace:*",
         "@upstash/ratelimit": "catalog:",
         "@upstash/redis": "catalog:",
-        "@usenotra/geo": "npm:@usenotra/geo@^0.6.2",
+        "@usenotra/geo": "npm:@usenotra/geo@^0.8.0",
         "ai": "catalog:",
         "drizzle-orm": "catalog:",
         "effect": "catalog:",
@@ -3365,7 +3365,7 @@
 
     "@upstash/redis": ["@upstash/redis@1.39.0", "", { "dependencies": { "uncrypto": "^0.1.3" } }, "sha512-VwkpYTdxSfjSulQS5h16NHtg/1UEheBfvez2AeGKinAujOoGXhXCcohQRzsQ/d2g/XzbjzTVGhG8Ds8uOI0Mxg=="],
 
-    "@usenotra/geo": ["@usenotra/geo@0.6.2", "", { "peerDependencies": { "zod": "^4.0.0" }, "optionalPeers": ["zod"] }, "sha512-7b4pK4d70yWCPKQkV+ezACF/5REX+V1mvCWTE4WaLRFhHkFOHYYOdUChB8rNMeioWBpgfyFUW68Kx9pY5wTtJg=="],
+    "@usenotra/geo": ["@usenotra/geo@0.8.0", "", { "peerDependencies": { "zod": "^4.0.0" }, "optionalPeers": ["zod"] }, "sha512-K0sQojGZYAEEly6BYOewQHVduwJdksUOiWRL2V+z1TbLfvgv9ACHEsBpQO4hti4T+D+I7sfZKS6uq9bP1OY4uQ=="],
 
     "@vercel/analytics": ["@vercel/analytics@2.0.1", "", { "peerDependencies": { "@remix-run/react": "^2", "@sveltejs/kit": "^1 || ^2", "next": ">= 13", "nuxt": ">= 3", "react": "^18 || ^19 || ^19.0.0-rc", "svelte": ">= 4", "vue": "^3", "vue-router": "^4" }, "optionalPeers": ["@remix-run/react", "@sveltejs/kit", "next", "nuxt", "react", "svelte", "vue", "vue-router"] }, "sha512-MTQG6V9qQrt1tsDeF+2Uoo5aPjqbVPys1xvnIftXSJYG2SrwXRHnqEvVoYID7BTruDz4lCd2Z7rM1BdkUehk2g=="],
 

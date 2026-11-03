@@ -52,7 +52,7 @@
     "@tanstack/react-start": "^1.169.2",
     "@toolwind/corner-shape": "^0.0.8-3",
     "@upstash/redis": "catalog:",
-    "@usenotra/geo": "npm:@usenotra/geo@^0.6.2",
+    "@usenotra/geo": "npm:@usenotra/geo@^0.8.0",
     "ai": "catalog:",
     "c15t": "3.2.2",
     "dompurify": "^3.4.17",

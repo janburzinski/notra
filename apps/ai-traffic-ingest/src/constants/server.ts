@@ -1,4 +1,4 @@
-export const INGEST_MAX_BODY_BYTES = 64 * 1024;
+export const INGEST_MAX_BODY_BYTES = 256 * 1024;
 export const INGEST_DEFAULT_PORT = 3101;
 // Nominal shutdown budget: 35s drain + 12s concurrent batcher stops + 2s
 // database close + 10s log flush = 59s. Verify the host's termination grace;

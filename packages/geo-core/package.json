@@ -32,7 +32,7 @@
     "@notra/utils": "workspace:*",
     "@upstash/ratelimit": "catalog:",
     "@upstash/redis": "catalog:",
-    "@usenotra/geo": "npm:@usenotra/geo@^0.6.2",
+    "@usenotra/geo": "npm:@usenotra/geo@^0.8.0",
     "ai": "catalog:",
     "drizzle-orm": "catalog:",
     "effect": "catalog:",

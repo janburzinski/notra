@@ -1013,6 +1013,42 @@ export const GEO_MAX_DOMAINS = 20;
 export const GEO_PROJECT_DOMAINS_PLACEHOLDER = "docs.example.com";
 export const GEO_COMPETITOR_MAX_SYNONYMS = 8;
 export const GEO_SHORT_FIELD_MAX_LENGTH = 128;
+
+export const MCP_EVENT_STATUSES = ["ok", "tool_error", "rpc_error"] as const;
+
+export const MCP_ELICITATION_OUTCOMES = [
+  "accept",
+  "decline",
+  "cancel",
+] as const;
+
+export const MCP_EVENT_MAX_DURATION_MS = 3_600_000;
+
+export const MCP_EVENT_MAX_RESPONSE_BYTES = 2_147_483_647;
+
+export const MCP_EVENT_MAX_SEQUENCE = 4_294_967_295;
+
+export const MCP_EVENT_MIN_ERROR_CODE = -2_147_483_648;
+
+export const MCP_EVENT_MAX_ERROR_CODE = 2_147_483_647;
+
+export const MCP_EVENT_CONTEXT_MAX_LENGTH = 512;
+
+export const MCP_EVENT_CAPTURE_MAX_LENGTH = 4096;
+
+export const MCP_EVENT_MAX_TOOLS = 500;
+
+export const MCP_EVENT_BATCH_MAX_EVENTS = 100;
+
+export const MCP_ANALYTICS_DEFAULT_DAYS = 14;
+
+export const MCP_ANALYTICS_TABLE_LIMIT = 50;
+
+export const MCP_ANALYTICS_LOG_LIMIT = 100;
+
+export const MCP_ANALYTICS_DETAIL_LIMIT = 20;
+
+export const MCP_SESSION_EVENTS_LIMIT = 500;
 export const GEO_DOMAIN_REGEX = /^[a-z0-9-]+(\.[a-z0-9-]+)+$/;
 /** Debounce before persisting GEO settings. Short enough for toggles. */
 export const GEO_SETTINGS_AUTO_SAVE_MS = 800;

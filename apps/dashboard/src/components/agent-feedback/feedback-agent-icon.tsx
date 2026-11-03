@@ -82,7 +82,7 @@ function AgentBrandMark({
   return <Gemini className={cn(className, "overflow-visible")} />;
 }
 
-function AgentFeedbackAgentIcon({
+export function AgentFeedbackAgentIcon({
   client,
   className,
 }: AgentFeedbackAgentIconProps) {

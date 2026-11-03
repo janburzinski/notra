@@ -2,7 +2,7 @@
 title: Data Processing Agreement
 ---
 
-**Last updated: October 27, 2026**
+**Last updated: November 3, 2026**
 
 ## TL;DR
 
@@ -222,6 +222,14 @@ United States
 - **Nature and purpose of the processing:** making the data visible to other members of the same workspace, managing roles and approvals and attributing work inside the workspace. Notra processes account data for its own purposes, such as authentication, billing, security and product analytics, as an independent controller under its Privacy Policy and not under this DPA.
 - **Retention:** for as long as the user remains a member of the workspace, and then as described in section 16.
 
+#### (f) MCP server analytics
+
+- **Data subjects:** people who use the Customer's own MCP servers through an AI client, where the Customer has added the Notra SDK to those servers.
+- **Categories of personal data:** the session ID, client name and version, model, the JSON-RPC method and tool, resource or prompt name, timestamp, duration, response size, status and error details of each request, and the user ID and intent the Customer's server passes. Tool arguments and responses are only sent when the Customer opts in, after the SDK has applied the Customer's redaction. No IP address is stored.
+- **Nature of the processing:** receiving request logs from the Customer's MCP servers, storing them and aggregating them into the MCP analytics shown in the dashboard.
+- **Purpose:** to show the Customer how AI clients use its MCP servers and where requests fail.
+- **Retention:** raw request logs are kept for 90 days after they are captured and then deleted in monthly batches, so each log is deleted at the latest about one month after that period ends. Daily aggregated rollups without user-level identifiers are kept for the life of the Customer's project.
+
 ### C. Competent Supervisory Authority
 
 The supervisory authority of the Member State in which the data exporter is established, as determined under Clause 13(a) of the SCCs. Where the data exporter is not established in the EU but falls under Article 3(2) GDPR and has appointed a representative, it is the supervisory authority of the Member State where that representative is established. Otherwise it is the supervisory authority of the Member State where the data subjects whose personal data is transferred are located. For UK transfers it is the Information Commissioner's Office, and for Swiss transfers it is the Federal Data Protection and Information Commissioner.
@@ -235,7 +243,7 @@ These are the measures Notra has in place for Customer Personal Data. Several of
 - Visitor IP addresses are used only transiently in memory to classify requests and to compute salted, daily-rotating hashes, and are never written to storage or logs.
 - Ordinary human visits are dropped from GEO AI traffic tracking. Notra Sites visitor analytics uses pseudonymous identifiers that change every day.
 - User-agent strings are truncated before storage and are not stored for AI referral visits, referrers are sanitised and tracking parameters are stripped from stored paths.
-- Raw traffic events have fixed retention periods enforced by the database (396 days for AI traffic and 90 days for Sites analytics, deleted in monthly batches once the period ends).
+- Raw traffic events have fixed retention periods enforced by the database (396 days for AI traffic and 90 days for Sites analytics and MCP server analytics, deleted in monthly batches once the period ends).
 - Product analytics events about AI traffic contain organisation-level classification data only, with no IP address or user-agent.
 
 **Encryption**

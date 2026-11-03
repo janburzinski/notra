@@ -58,7 +58,7 @@ const quota = Effect.runSync(
 export const hasAiTrafficEventsQuota = (organizationId: string) =>
   Cache.get(quota, organizationId);
 
-export async function trackAiTrafficEvent(organizationId: string) {
+export async function trackAiTrafficEvent(organizationId: string, value = 1) {
   if (!autumn) {
     warnMissingBilling();
     return;
@@ -67,7 +67,7 @@ export async function trackAiTrafficEvent(organizationId: string) {
     .track({
       customerId: organizationId,
       featureId: FEATURES.AI_TRAFFIC_EVENTS,
-      value: 1,
+      value,
     })
     .catch((error: unknown) => {
       logError("AI traffic events usage tracking failed", error, {

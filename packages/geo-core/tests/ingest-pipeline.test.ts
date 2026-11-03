@@ -66,6 +66,7 @@ const SITE_PAGE = {
 
 mock.module("@notra/analytics/tinybird/client", () => ({
   ingestGeoTrafficEvents,
+  ingestMcpEvents: ingestGeoTrafficEvents,
   ingestWebPageEngagement,
   ingestWebPageViews,
 }));

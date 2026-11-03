@@ -46,6 +46,11 @@ import {
   issueGeoIngestSetupResponse,
   rotateGeoIngestSetupResponse,
 } from "@notra/geo-core/geo/ingest";
+import {
+  loadMcpAnalytics,
+  loadMcpSession,
+  loadMcpToolDetail,
+} from "@notra/geo-core/geo/mcp-analytics";
 import { loadGeoModelCatalog } from "@notra/geo-core/geo/model-catalog";
 import {
   saveGeoOnboardingBrand,
@@ -212,6 +217,9 @@ import {
   geoTrafficLogInputSchema,
   geoTrafficPagesInputSchema,
   webAnalyticsInputSchema,
+  mcpAnalyticsInputSchema,
+  mcpSessionInputSchema,
+  mcpToolDetailInputSchema,
   geoWriterBriefIdInputSchema,
   geoWriterPlanInputSchema,
   geoWriterUpdateInputSchema,
@@ -1223,6 +1231,25 @@ export const geoRouter = {
           input.sites,
           "breakdowns"
         )
+      )
+    ),
+  mcpAnalytics: authorizedProcedure
+    .input(mcpAnalyticsInputSchema)
+    .handler(
+      geoOpenHandler((input) => loadMcpAnalytics(input, geoWindow(input)))
+    ),
+  mcpToolDetail: authorizedProcedure
+    .input(mcpToolDetailInputSchema)
+    .handler(
+      geoOpenHandler((input) =>
+        loadMcpToolDetail(input, geoWindow(input), input.tool)
+      )
+    ),
+  mcpSession: authorizedProcedure
+    .input(mcpSessionInputSchema)
+    .handler(
+      geoOpenHandler((input) =>
+        loadMcpSession(input, geoWindow(input), input.sessionId)
       )
     ),
   trafficLog: authorizedProcedure

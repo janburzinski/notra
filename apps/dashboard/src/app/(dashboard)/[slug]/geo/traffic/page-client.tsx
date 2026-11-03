@@ -19,6 +19,7 @@ import { GeoSetupButton } from "@/components/geo/geo-setup-button";
 import { TrafficDomainSelect } from "@/components/geo/traffic-domain-select";
 import { TrafficEmpty } from "@/components/geo/traffic-empty";
 import { TrafficExportMenu } from "@/components/geo/traffic-export-menu";
+import { TrafficNav } from "@/components/geo/traffic-nav";
 import { TrafficPagesCard } from "@/components/geo/traffic-pages-card";
 import { TrafficPathEmpty } from "@/components/geo/traffic-path-empty";
 import { TrafficPathFilter } from "@/components/geo/traffic-path-filter";
@@ -100,6 +101,7 @@ function TrafficPageView({
       <PageContainer className="flex flex-1 flex-col gap-4 py-4 md:gap-6 md:py-6">
         <div className="w-full min-w-0 space-y-6 px-4 lg:px-6">
           <PageHeading description={t("description")} title={t("title")} />
+          <TrafficNav slug={organizationSlug} />
           <EmptyState
             action={<GeoSetupButton organizationId={organizationId} />}
             description={t("setupDescription")}
@@ -141,6 +143,7 @@ function TrafficPageView({
       <PageContainer className="flex flex-1 flex-col gap-4 py-4 md:gap-6 md:py-6">
         <div className="flex w-full min-w-0 flex-col gap-6 px-4 lg:px-6">
           {header}
+          <TrafficNav slug={organizationSlug} />
           <div className="flex flex-col gap-2">
             {/* Existing embeds stay reachable, since an embed picks its own
                 period. */}
@@ -178,6 +181,7 @@ function TrafficPageView({
     <PageContainer className="flex flex-1 flex-col gap-4 py-4 md:gap-6 md:py-6">
       <div className="w-full space-y-6 px-4 lg:px-6">
         {header}
+        <TrafficNav slug={organizationSlug} />
         <div className="flex flex-col gap-2">
           <div className="flex flex-wrap items-center justify-end gap-2">
             <TrafficPathFilter paths={knownPaths} />
