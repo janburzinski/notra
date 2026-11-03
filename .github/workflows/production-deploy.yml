@@ -123,12 +123,11 @@ jobs:
             echo "::endgroup::"
           done
 
+  # Starts with the gates instead of after them: it boots, installs and builds
+  # the sites toolchain meanwhile, then production-deploy.mjs waits for every
+  # sites-e2e and agents job of this run to succeed before anything goes live.
   deploy:
-    needs: [release, sites-e2e, agents]
-    if: >-
-      ${{ !cancelled() && needs.release.result == 'success' &&
-      (needs.sites-e2e.result == 'success' || needs.sites-e2e.result == 'skipped') &&
-      (needs.agents.result == 'success' || needs.agents.result == 'skipped') }}
+    needs: release
     runs-on: depot-ubuntu-24.04
     timeout-minutes: 120
     steps:
@@ -174,6 +173,7 @@ jobs:
           DEMO_MIGRATION_DATABASE_URL: ${{ secrets.DEMO_MIGRATION_DATABASE_URL }}
           DRY_RUN: ${{ inputs.dry_run || false }}
           RELEASE_SHA: ${{ needs.release.outputs.sha }}
+          SITES_E2E_GATE: ${{ !inputs.skip_sites_e2e }}
 
   notify:
     needs: [release, sites-e2e, agents, deploy]

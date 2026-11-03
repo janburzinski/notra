@@ -16,6 +16,8 @@ function fixture({
   liveToolchain = "toolchain-1",
   readBody = () => {},
   toolchain = { version: "toolchain-1", snapshotId: null },
+  gates = async () => {},
+  migrationError,
 } = {}) {
   const sha = "a".repeat(40);
   const previousSha = "b".repeat(40);
@@ -24,6 +26,7 @@ function fixture({
   const published = new Map();
   const deploymentCounts = new Map();
   const toolchainBuilds = [];
+  const events = [];
   const env = {
     GH_TOKEN: "test",
     VERCEL_TOKEN: "test",
@@ -208,15 +211,30 @@ function fixture({
     calls,
     directories,
     toolchainBuilds,
+    events,
     run: () =>
       release({
         env,
         preflightOnly,
         fetchImpl,
         sleep: async () => {},
-        execFile: () => {},
+        execFile: (command, args) => {
+          if (args.includes("deploy")) {
+            events.push("worker");
+            return;
+          }
+          events.push(`demo-migrate@${builds(calls).length}`);
+          if (migrationError) {
+            throw new Error(migrationError);
+          }
+        },
+        waitForGates: async () => {
+          events.push(`gates@${builds(calls).length}`);
+          await gates();
+        },
         buildToolchain: (directory, liveVersion) => {
           toolchainBuilds.push({ directory, liveVersion });
+          events.push("toolchain");
           return toolchain;
         },
         buildChanged: (directory, previous, current) => {
@@ -244,6 +262,89 @@ function toolchainUpserts(calls) {
       url.pathname === "/v10/projects/notra/env" && method === "POST"
   );
 }
+
+test("the release prepares before the gates and changes nothing live until they pass", async () => {
+  const { calls, run, events } = fixture({ demo: true });
+  await run();
+  assert.deepEqual(events.slice(0, 3), ["toolchain", "gates@0", "worker"]);
+  assert.equal(builds(calls).length, 10);
+});
+
+test("a failed release gate stops the release before any build or live change", async () => {
+  const { calls, run, events } = fixture({
+    demo: true,
+    liveToolchain: null,
+    toolchain: { version: "toolchain-2", snapshotId: "snap-2" },
+    gates: async () => {
+      throw new Error("release gates: sites-e2e / Browser ended failure");
+    },
+  });
+  await assert.rejects(run(), /Browser ended failure/);
+  assert.deepEqual(events, ["toolchain", "gates@0"]);
+  assert.equal(builds(calls).length, 0);
+  // The new snapshot only reaches production through a later dashboard build.
+  assert.equal(toolchainUpserts(calls).length, 1);
+});
+
+test("the demo database is migrated once, after the dashboard and before the parallel releases", async () => {
+  const { calls, run, events } = fixture({ demo: true });
+  await run();
+  // Only the dashboard build exists when the synchronous migrator runs.
+  assert.deepEqual(
+    events.filter((event) => event.startsWith("demo-migrate")),
+    ["demo-migrate@1"]
+  );
+  assert.equal(builds(calls).length, 10);
+});
+
+test("a failed demo migration stops both demo builds and nothing else", async () => {
+  const { calls, run } = fixture({
+    demo: true,
+    migrationError: "migration exited 1",
+  });
+  await assert.rejects(run(), (error) => {
+    assert.equal(error.message, "migration exited 1");
+    return true;
+  });
+  const started = builds(calls).map(({ body }) => body.project ?? body.app);
+  assert.ok(!started.includes("app_demo-api"));
+  assert.ok(!started.includes("app_demo-dashboard"));
+  assert.equal(started.length, 8);
+});
+
+test("a demo app rolled back after planning stops the demo migration and both demo builds", async () => {
+  let dashboardReads = 0;
+  const { calls, run, events } = fixture({
+    demo: true,
+    override: ({ url, body }) => {
+      if (
+        url.pathname === "/v2/apps.getApp" &&
+        body.app === "app_demo-dashboard" &&
+        ++dashboardReads > 1
+      ) {
+        return {
+          id: body.app,
+          slug: "demo-dashboard",
+          git: { repository: "usenotra/notra", defaultBranch: "main" },
+          isRolledBack: true,
+          currentDeploymentId: "live-demo-dashboard",
+        };
+      }
+    },
+  });
+  await assert.rejects(run(), /demo-dashboard must track this repository/);
+  assert.ok(events.every((event) => !event.startsWith("demo-migrate")));
+  const started = builds(calls).map(({ body }) => body.project ?? body.app);
+  assert.ok(!started.includes("app_demo-api"));
+  assert.ok(!started.includes("app_demo-dashboard"));
+  assert.equal(started.length, 8);
+});
+
+test("dry runs do not wait for the release gates", async () => {
+  const { run, events } = fixture({ dryRun: true });
+  await run();
+  assert.ok(events.every((event) => !event.startsWith("gates@")));
+});
 
 test("unchanged sites toolchain keeps the live snapshot", async () => {
   const { calls, run, toolchainBuilds } = fixture({ changed: () => false });
@@ -764,11 +865,11 @@ for (const [path, error, attempts] of [
       assert.ok(failure.message.includes(error.message));
       return true;
     });
-    // Creations run once per target: six Vercel projects and three
-    // independent Unkey groups (the failed demo-api stops demo-dashboard).
+    // Creations run once per target: six Vercel projects and four
+    // independent Unkey services.
     const creations = {
       "/v13/deployments": 6,
-      "/v3/deployments.createDeployment": 3,
+      "/v3/deployments.createDeployment": 4,
     };
     assert.equal(reads, creations[path] ?? attempts);
   });
@@ -877,8 +978,8 @@ for (const app of ["demo-api", "demo-dashboard"]) {
     assert.equal(builds(calls).length, 0);
   });
 
-  test(`${app} failed deployment prevents subsequent provider deployments`, async () => {
-    const { run, calls } = fixture({
+  test(`${app} failed deployment fails the release without holding back the other demo app`, async () => {
+    const { run, calls, events } = fixture({
       demo: true,
       override: ({ url, body }) =>
         url.pathname === "/v2/deployments.getDeployment" &&
@@ -893,11 +994,23 @@ for (const app of ["demo-api", "demo-dashboard"]) {
           : undefined,
     });
     await assert.rejects(run(), new RegExp(`${app} deployment ended failed`));
-    if (app === "demo-api") {
-      assert.ok(
-        builds(calls).every(({ body }) => body.app !== "app_demo-dashboard")
-      );
-    }
+    // The shared demo database is migrated once, before either demo build.
+    assert.deepEqual(
+      events.filter((event) => event.startsWith("demo-migrate")),
+      ["demo-migrate@1"]
+    );
+    assert.deepEqual(
+      builds(calls)
+        .filter(({ url }) => url.hostname === "api.unkey.com")
+        .map(({ body }) => body.app)
+        .sort(),
+      [
+        "app_ai-traffic-ingest",
+        "app_demo-api",
+        "app_demo-dashboard",
+        "app_test",
+      ]
+    );
   });
 }
 
@@ -913,10 +1026,11 @@ test("Unkey discovers the verified production domain and deploys the pinned comm
     environment: "env_test",
     git: { branch: "main", commitSha: sha },
   });
-  assert.equal(directories.length, 14);
+  // The two demo apps are checked once more before their shared migration.
+  assert.equal(directories.length, 16);
   assert.equal(
     directories.filter((directory) => directory === "apps/api").length,
-    4
+    5
   );
 });
 
@@ -1055,7 +1169,7 @@ test("Unkey creation failure is not retried", async () => {
       .filter(({ url }) => url.pathname === "/v3/deployments.createDeployment")
       .map(({ body }) => body.app)
       .sort(),
-    ["app_ai-traffic-ingest", "app_demo-api", "app_test"]
+    ["app_ai-traffic-ingest", "app_demo-api", "app_demo-dashboard", "app_test"]
   );
 });
 

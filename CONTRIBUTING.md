@@ -741,8 +741,9 @@ this single shared CI credential, separate from runtime `UNKEY_ROOT_KEY`.
 After all four Unkey custom domains are verified and have current healthy deployments,
 run **Production deploy** with `dry_run` checked. Then disable production
 **Auto deploy** on both demo apps (keep their GitHub connection) and run a real
-release. The script checks all targets before any builds, deploys demo API
-before dashboard, and verifies the exact checked commit is current. The shared
+release. The script checks all targets before any builds, migrates the demo
+database once, then deploys all four services in parallel and verifies the
+exact checked commit is current on each. The shared
 `UNKEY_DEPLOY_ROOT_KEY` enables all four Unkey releases; no additional flags are
 needed. Without the key, the demo apps are not released.
 Inaccessible Unkey targets fail closed, without permission-error fallback.
@@ -791,6 +792,13 @@ Code quality includes the unit/integration suite and type checks. Missing,
 running, cancelled, or failed checks prevent all builds for that release window.
 There is no automatic deployment when CI finishes later; the next scheduled
 window checks again.
+
+The deploy job starts alongside the release gates (the Sites E2E suite and the
+agents boot check) instead of after them. Meanwhile it installs, plans every
+target and builds the sites toolchain snapshot, which only changes the
+environment of future dashboard builds. Before the first live change it waits
+for the latest run of every gate job in the workflow run to succeed; a failed,
+cancelled, skipped or missing gate job ends the release with nothing deployed.
 
 Each project is compared with the deployment serving its stable production alias
 (`notra-notra.vercel.app`, `notra-web-notra.vercel.app`,

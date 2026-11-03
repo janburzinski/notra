@@ -48,7 +48,7 @@
     "build": "dotenv -- turbo run build",
     "dev": "dotenv -- turbo run dev",
     "check-types": "dotenv -- turbo run check-types",
-    "test": "node --test scripts/github/production-deploy.test.mjs && turbo run test",
+    "test": "node --test scripts/github/production-deploy.test.mjs scripts/github/utils/release-gates.test.mjs && turbo run test",
     "sites:e2e": "bun --no-env-file run --cwd apps/sites-e2e test:e2e",
     "sites:e2e:cleanup": "bun --no-env-file run --cwd apps/sites-e2e test:cleanup",
     "sites:e2e:dashboard": "bun --no-env-file scripts/testing/dashboard/run.ts",

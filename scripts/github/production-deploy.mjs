@@ -7,6 +7,7 @@ import { setTimeout as delay } from "node:timers/promises";
 import { pathToFileURL } from "node:url";
 
 import { requireReleaseCI } from "./utils/release-ci.mjs";
+import { waitForReleaseGates } from "./utils/release-gates.mjs";
 
 const projects = [
   {
@@ -143,6 +144,7 @@ export async function release({
   execFile = execFileSync,
   sleep = delay,
   preflightOnly = false,
+  waitForGates = waitForReleaseGates,
 } = {}) {
   for (const key of [
     "GH_TOKEN",
@@ -510,6 +512,11 @@ export async function release({
     }
   }
 
+  // Everything above only prepares; the first live change waits for the gates.
+  if (env.DRY_RUN !== "true") {
+    await waitForGates({ env, fetchImpl, sleep, report });
+  }
+
   if (env.DRY_RUN === "true") {
     await report(`sites worker: would deploy ${sha}`);
   } else {
@@ -578,7 +585,7 @@ export async function release({
         const deadline = Date.now() + 10 * 60_000;
         for (
           let attempt = 0;
-          attempt < 60 && Date.now() < deadline;
+          attempt < 120 && Date.now() < deadline;
           attempt += 1
         ) {
           const status = await request(
@@ -627,7 +634,7 @@ export async function release({
           }
           const remaining = deadline - Date.now();
           if (remaining > 0) {
-            await sleep(Math.min(10_000, remaining));
+            await sleep(Math.min(5000, remaining));
           }
         }
         if (retry) {
@@ -645,23 +652,55 @@ export async function release({
       await report(error.message);
     }
   };
-  let demoDatabaseMigrated = false;
+  // Re-runs the planning checks (rollback, active deployment, ancestry) right
+  // before a target changes, since planning happened before the gates.
+  const refreshUnkeyPlan = async (plan) => {
+    const refreshed = await planUnkeyRelease(plan.service);
+    if (
+      Object.keys(plan.target).some(
+        (key) => plan.target[key] !== refreshed.target[key]
+      )
+    ) {
+      throw new Error(
+        "unkey: production domain target changed during Vercel releases"
+      );
+    }
+    return { ...plan, ...refreshed };
+  };
+  let demoMigration;
+  const migrateDemoDatabase = () => {
+    demoMigration ??= (async () => {
+      // Every demo app shares the database, so all of them must still pass
+      // their checks before it moves ahead, including unchanged ones.
+      await Promise.all(
+        unkeyPlans
+          .filter((plan) => plan.service.demoDatabase)
+          .map(refreshUnkeyPlan)
+      );
+      execFile(
+        "bun",
+        ["packages/db/src/scripts/migrate.ts", "packages/db/migrations"],
+        {
+          cwd: env.RELEASE_DIR,
+          env: {
+            PATH: env.PATH,
+            HOME: env.HOME,
+            MIGRATION_DATABASE_URL: env.DEMO_MIGRATION_DATABASE_URL,
+          },
+          stdio: "inherit",
+          timeout: 5 * 60_000,
+        }
+      );
+      await report(`unkey: demo database migrated to ${sha}`);
+    })();
+    return demoMigration;
+  };
   const unkeyDeployed = new Set();
   const deployUnkey = async (initialPlan) => {
     const { service } = initialPlan;
     let plan = initialPlan;
     if (env.DRY_RUN !== "true") {
-      const refreshed = await planUnkeyRelease(service);
-      if (
-        Object.keys(plan.target).some(
-          (key) => plan.target[key] !== refreshed.target[key]
-        )
-      ) {
-        throw new Error(
-          "unkey: production domain target changed during Vercel releases"
-        );
-      }
-      plan = refreshed;
+      plan = await refreshUnkeyPlan(initialPlan);
     }
     if (!plan.changed) {
       await report(
@@ -678,23 +717,8 @@ export async function release({
         `unkey: would ${service.demoDatabase ? "migrate the demo database and " : ""}deploy ${service.name} at ${sha}`
       );
     } else {
-      if (service.demoDatabase && !demoDatabaseMigrated) {
-        execFile(
-          "bun",
-          ["packages/db/src/scripts/migrate.ts", "packages/db/migrations"],
-          {
-            cwd: env.RELEASE_DIR,
-            env: {
-              PATH: env.PATH,
-              HOME: env.HOME,
-              MIGRATION_DATABASE_URL: env.DEMO_MIGRATION_DATABASE_URL,
-            },
-            stdio: "inherit",
-            timeout: 5 * 60_000,
-          }
-        );
-        demoDatabaseMigrated = true;
-        await report(`unkey: demo database migrated to ${sha}`);
+      if (service.demoDatabase) {
+        await migrateDemoDatabase();
       }
       const deployment = await unkey("v3/deployments.createDeployment", {
         ...plan.target,
@@ -710,7 +734,7 @@ export async function release({
       let completed = false;
       for (
         let attempt = 0;
-        attempt < 120 && Date.now() < deadline;
+        attempt < 240 && Date.now() < deadline;
         attempt += 1
       ) {
         const status = await unkey("v2/deployments.getDeployment", {
@@ -741,7 +765,7 @@ export async function release({
         }
         const remaining = deadline - Date.now();
         if (remaining > 0) {
-          await sleep(Math.min(10_000, remaining));
+          await sleep(Math.min(5000, remaining));
         }
       }
       if (!completed) {
@@ -751,20 +775,13 @@ export async function release({
       }
     }
   };
-  // The demo apps share a database and ship in order; the others are independent.
-  const unkeyGroups = [
-    ...unkeyPlans
-      .filter((plan) => !plan.service.demoDatabase)
-      .map((plan) => [plan]),
-    unkeyPlans.filter((plan) => plan.service.demoDatabase),
-  ];
+  // The demo apps share a database that is migrated once before either builds;
+  // after that every service ships independently.
   const releaseUnkey = () =>
     Promise.all(
-      unkeyGroups.map(async (group) => {
+      unkeyPlans.map(async (plan) => {
         try {
-          for (const plan of group) {
-            await deployUnkey(plan);
-          }
+          await deployUnkey(plan);
         } catch (error) {
           failures.push(error.message);
           await report(error.message);
@@ -780,6 +797,17 @@ export async function release({
   const migrated = failures.length === 0;
   if (!migrated && unkeyPlans.length > 0) {
     await report("unkey: skipped, the dashboard deployment failed");
+  }
+  // The migrator runs synchronously, so it finishes before any concurrent
+  // request is in flight instead of stalling their timeouts.
+  if (
+    migrated &&
+    env.DRY_RUN !== "true" &&
+    env.DEMO_MIGRATION_DATABASE_URL &&
+    unkeyPlans.some((plan) => plan.service.demoDatabase && plan.changed)
+  ) {
+    // A failure is reported by each demo deployment, which then stops.
+    await migrateDemoDatabase().catch(() => {});
   }
   await Promise.all([
     ...builds.filter((project) => !project.migratesDatabase).map(deployVercel),
@@ -830,7 +858,7 @@ export async function release({
     }
   }
   if (failures.length > 0) {
-    throw new Error(failures.join("\n"));
+    throw new Error([...new Set(failures)].join("\n"));
   }
 }
 

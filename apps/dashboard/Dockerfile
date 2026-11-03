@@ -8,8 +8,43 @@ RUN ln -s /usr/local/bin/bun /usr/local/bin/bunx
 WORKDIR /app
 
 FROM base AS builder
+# Dependency manifests first, so source edits reuse the installed layer.
+COPY package.json bun.lock bunfig.toml ./
+COPY patches ./patches
+COPY apps/agent/package.json ./apps/agent/package.json
+COPY apps/ai-traffic-ingest/package.json ./apps/ai-traffic-ingest/package.json
+COPY apps/api/package.json ./apps/api/package.json
+COPY apps/console/package.json ./apps/console/package.json
+COPY apps/dashboard/package.json ./apps/dashboard/package.json
+COPY apps/docs/package.json ./apps/docs/package.json
+COPY apps/evals/package.json ./apps/evals/package.json
+COPY apps/onboarding-agent/package.json ./apps/onboarding-agent/package.json
+COPY apps/sites-builder/package.json ./apps/sites-builder/package.json
+COPY apps/sites-e2e/package.json ./apps/sites-e2e/package.json
+COPY apps/sites/package.json ./apps/sites/package.json
+COPY apps/ui/package.json ./apps/ui/package.json
+COPY apps/web/package.json ./apps/web/package.json
+COPY packages/ai/package.json ./packages/ai/package.json
+COPY packages/analytics/package.json ./packages/analytics/package.json
+COPY packages/content-generation/package.json ./packages/content-generation/package.json
+COPY packages/db/package.json ./packages/db/package.json
+COPY packages/email/package.json ./packages/email/package.json
+COPY packages/geo-core/package.json ./packages/geo-core/package.json
+COPY packages/kiwi/package.json ./packages/kiwi/package.json
+COPY packages/memory/package.json ./packages/memory/package.json
+COPY packages/posthog/package.json ./packages/posthog/package.json
+COPY packages/schemas/package.json ./packages/schemas/package.json
+COPY packages/sites-compiler/package.json ./packages/sites-compiler/package.json
+COPY packages/sites-core/package.json ./packages/sites-core/package.json
+COPY packages/sites-server/package.json ./packages/sites-server/package.json
+COPY packages/tools/package.json ./packages/tools/package.json
+COPY packages/typescript-config/package.json ./packages/typescript-config/package.json
+COPY packages/ui/package.json ./packages/ui/package.json
+COPY packages/utils/package.json ./packages/utils/package.json
+COPY packages/webhooks/package.json ./packages/webhooks/package.json
+COPY packages/workflows/package.json ./packages/workflows/package.json
+RUN --mount=type=cache,target=/root/.bun/install/cache bun install --frozen-lockfile --ignore-scripts --filter 'dashboard...' --filter turbo
 COPY . .
-RUN bun install --frozen-lockfile --ignore-scripts
 
 ARG NOTRA_DEMO_MODE
 ARG NEXT_PUBLIC_SITE_URL
