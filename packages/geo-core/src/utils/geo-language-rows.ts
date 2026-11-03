@@ -95,7 +95,10 @@ export function buildLanguagePerformanceRows({
   slotCount: number;
 }): LanguagePerformanceRow[] {
   const configured = trackedGeoLanguages(configuredLanguages);
-  const tracked: LanguagePerformanceTrackedRow[] = points.map(toTrackedRow);
+  // A removed language keeps its history; it is offered again instead.
+  const tracked: LanguagePerformanceTrackedRow[] = points
+    .filter((point) => configured.includes(point.language))
+    .map(toTrackedRow);
   const seen = new Set(tracked.map((row) => row.language));
 
   for (const language of configured) {

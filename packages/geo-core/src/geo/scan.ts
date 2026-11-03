@@ -897,7 +897,6 @@ const buildGeoScanProjectPlan = Effect.fn("geo.buildScanProjectPlan")(
     }
     const sourceLanguage = settings.promptLanguage;
     const scanSourceLanguage = settings.languages.includes(sourceLanguage);
-    const scanEnglish = settings.languages.includes(DEFAULT_LANGUAGE);
     const groundedEngines: { grounded: GeoGroundedEngine; zdr: GeoZdrMode }[] =
       [];
     const groundedRoutes = resolveGroundedEngines(scanEngines, catalog);
@@ -1107,36 +1106,43 @@ const buildGeoScanProjectPlan = Effect.fn("geo.buildScanProjectPlan")(
                 cause,
               }),
           });
-    const personas: GeoScanPlannedPersona[] =
-      scanEnglish || scopedPersonaIds.length > 0
-        ? personaRows.flatMap((persona) => {
-            const snapshot = createPersonaSnapshot(
-              persona,
-              persona.memories,
-              persona.conversationPrompts.slice(0, GEO_PERSONA_MAX_TURNS)
-            );
-            return snapshot.conversationPrompts.length > 0
-              ? [
-                  ...groundedEngines.map(({ grounded, zdr }) => ({
-                    personaId: persona.id,
-                    prompts: snapshot.conversationPrompts,
-                    snapshot,
-                    engine: grounded.key,
-                    groundedKey: grounded.key,
-                    zdr,
-                  })),
-                  ...consumerEngines.map(({ engine, zdr }) => ({
-                    personaId: persona.id,
-                    prompts: snapshot.conversationPrompts,
-                    snapshot,
-                    engine,
-                    groundedKey: null,
-                    zdr,
-                  })),
-                ]
-              : [];
-          })
+    // A persona runs in the language its prompts were written in, when tracked.
+    const personas: GeoScanPlannedPersona[] = personaRows.flatMap((persona) => {
+      const language = persona.promptLanguage ?? DEFAULT_LANGUAGE;
+      if (
+        scopedPersonaIds.length === 0 &&
+        !settings.languages.includes(language)
+      ) {
+        return [];
+      }
+      const snapshot = createPersonaSnapshot(
+        persona,
+        persona.memories,
+        persona.conversationPrompts.slice(0, GEO_PERSONA_MAX_TURNS)
+      );
+      return snapshot.conversationPrompts.length > 0
+        ? [
+            ...groundedEngines.map(({ grounded, zdr }) => ({
+              personaId: persona.id,
+              prompts: snapshot.conversationPrompts,
+              snapshot,
+              engine: grounded.key,
+              groundedKey: grounded.key,
+              zdr,
+              language,
+            })),
+            ...consumerEngines.map(({ engine, zdr }) => ({
+              personaId: persona.id,
+              prompts: snapshot.conversationPrompts,
+              snapshot,
+              engine,
+              groundedKey: null,
+              zdr,
+              language,
+            })),
+          ]
         : [];
+    });
 
     const engines = [
       ...rawEngines.map((entry) => entry.engine),

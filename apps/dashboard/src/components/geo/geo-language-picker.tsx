@@ -50,6 +50,7 @@ export function GeoLanguagePicker({
 }: GeoLanguagePickerProps) {
   const t = useTranslations("geo.geoLanguagePicker");
   const tCommon = useTranslations("common");
+  const languageLabel = useLanguageLabel();
   const atLimit = selected.length >= GEO_MAX_LANGUAGES;
   const available = SUPPORTED_LANGUAGES.filter(
     (language) => !selected.includes(language)
@@ -64,7 +65,7 @@ export function GeoLanguagePicker({
           <p className="text-sm font-medium">{tCommon("labels.languages")}</p>
           <p className="text-muted-foreground text-xs">
             {t("description", {
-              language: DEFAULT_LANGUAGE,
+              language: languageLabel(lockedLanguage ?? DEFAULT_LANGUAGE),
               max: GEO_MAX_LANGUAGES,
             })}
           </p>

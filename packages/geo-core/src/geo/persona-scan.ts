@@ -1,3 +1,4 @@
+import { DEFAULT_LANGUAGE } from "@notra/ai/constants/languages";
 import { db } from "@notra/db/drizzle";
 import { geoPersonaMemories, geoPersonas, geoSettings } from "@notra/db/schema";
 import type { GeoCheckWrite } from "@notra/db/types/geo-checks";
@@ -128,6 +129,7 @@ const loadPersonaForScan = Effect.fn("geo.persona.load")(function* (
       profile: row.profile,
     },
     conversationPrompts: row.conversationPrompts,
+    language: row.promptLanguage ?? DEFAULT_LANGUAGE,
     memories: row.memories.map((memory) => ({
       id: memory.id,
       kind: memory.kind,
@@ -147,7 +149,8 @@ export const runGeoPersonaConversation = Effect.fn(
   context: GeoCheckContext,
   snapshot: GeoPersonaSnapshotV2,
   grounded: GeoConversationEngine,
-  zdr: GeoZdrMode
+  zdr: GeoZdrMode,
+  language: string
 ) {
   return yield* runGeoConversation(
     context,
@@ -156,6 +159,7 @@ export const runGeoPersonaConversation = Effect.fn(
       personaId: snapshot.persona.id,
       prompts: snapshot.conversationPrompts,
       snapshot,
+      language,
       timeoutMs: GEO_PERSONA_PAIR_TIMEOUT_MS,
     },
     grounded,
@@ -216,7 +220,8 @@ const runPlannedPersona = Effect.fn("geo.runPlannedPersona")(function* (
     checkContext,
     planned.snapshot,
     grounded,
-    planned.zdr
+    planned.zdr,
+    planned.language ?? DEFAULT_LANGUAGE
   );
   const remaining = tasks.filter(
     (task) => !outcome.rows.some((row) => row.turn === task.turn)
@@ -462,7 +467,13 @@ const runGeoPersonaNowProgram = Effect.fn("geo.runPersonaNow")(function* (
       Effect.forEach(
         groundedEngines,
         ({ grounded, zdr }) =>
-          runGeoPersonaConversation(context, snapshot, grounded, zdr).pipe(
+          runGeoPersonaConversation(
+            context,
+            snapshot,
+            grounded,
+            zdr,
+            loaded.language
+          ).pipe(
             geoSkip(
               "persona run failed",
               personaFailureFields(context, personaId, grounded.key)

@@ -1,3 +1,4 @@
+import { DEFAULT_LANGUAGE } from "@notra/ai/constants/languages";
 import { gateway } from "@notra/ai/gateway";
 import type { AgentTokenUsage } from "@notra/ai/types/agents";
 import { describeContentBillingDenial } from "@notra/ai/utils/content-billing-messages";
@@ -196,7 +197,7 @@ const loadGenerationContext = Effect.fn("geo.personas.context")(function* (
     ),
     geoDb("settings lookup failed", () =>
       db.query.geoSettings.findFirst({
-        columns: { companyName: true },
+        columns: { companyName: true, promptLanguage: true },
         where: eq(geoSettings.projectId, projectId),
       })
     ),
@@ -255,6 +256,7 @@ const loadGenerationContext = Effect.fn("geo.personas.context")(function* (
     competitors: competitors.competitors.map((competitor) => competitor.name),
     pages,
     prompts: prompts.map((row) => row.prompt),
+    language: settings?.promptLanguage ?? DEFAULT_LANGUAGE,
   };
   return context;
 });
@@ -312,7 +314,8 @@ export const persistGeneratedPersonas = Effect.fn("geo.personas.persist")(
     projectId: string,
     generation: GeoPersonaGeneration,
     target?: GeoPersona,
-    promptsOnly = false
+    promptsOnly = false,
+    promptLanguage: string = DEFAULT_LANGUAGE
   ) {
     const now = new Date();
     const personaRows: (typeof geoPersonas.$inferInsert)[] = [];
@@ -329,6 +332,7 @@ export const persistGeneratedPersonas = Effect.fn("geo.personas.persist")(
         summary: persona.summary,
         searchStyle: persona.searchStyle,
         conversationPrompts: persona.conversationPrompts,
+        promptLanguage,
         profile: {
           goals: persona.goals,
           painPoints: persona.painPoints,
@@ -373,7 +377,10 @@ export const persistGeneratedPersonas = Effect.fn("geo.personas.persist")(
             );
           }
           const replacementFields = promptsOnly
-            ? { conversationPrompts: replacement.conversationPrompts }
+            ? {
+                conversationPrompts: replacement.conversationPrompts,
+                promptLanguage,
+              }
             : {
                 name: replacement.name,
                 role: replacement.role,
@@ -381,6 +388,7 @@ export const persistGeneratedPersonas = Effect.fn("geo.personas.persist")(
                 summary: replacement.summary,
                 searchStyle: replacement.searchStyle,
                 conversationPrompts: replacement.conversationPrompts,
+                promptLanguage,
                 profile: replacement.profile,
               };
           const updated = yield* geoDb("personas persist failed", () =>
@@ -560,7 +568,8 @@ export const generateGeoPersonas = Effect.fn("geo.personasGenerate")(function* (
     scope.projectId,
     generated.generation,
     target,
-    promptsOnly
+    promptsOnly,
+    context.language
   ).pipe(Effect.tapError(() => settle("release")));
 
   yield* settle("confirm", generated.usage);

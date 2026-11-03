@@ -62,7 +62,7 @@ From the profile and memories Notra generates fixed **conversation prompts**. Ev
 
 ## Scans and cost
 
-- Personas talk to every enabled engine that has web search during each scan, but only when English is one of your [languages](/geo/languages). Engines labelled **No web search**, such as Grok and Cursor, don't get persona conversations. Each persona sends up to two messages per engine per scan, shown as **Max. messages**.
+- Personas talk to every enabled engine that has web search during each scan, in the [language](/geo/languages) their messages are written in, as long as you track it. New and regenerated personas write in your prompt language; personas created before that count as English and only run when English is tracked, so regenerate them to switch. Engines labelled **No web search**, such as Grok and Cursor, don't get persona conversations. Each persona sends up to two messages per engine per scan, shown as **Max. messages**.
 - Each persona answer counts as two AI answers against your quota.
 - A project can have up to five active personas, so archive one before you add or reactivate another.
 - **Pause scans** keeps a persona but skips it in scans, while **Archive** removes it from future scans and keeps its history.

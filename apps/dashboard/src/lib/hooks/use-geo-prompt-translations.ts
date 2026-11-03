@@ -65,7 +65,17 @@ export function useGeoPromptTranslationMutations(organizationId: string) {
   });
   const translate = useMutation({
     mutationFn: () => dashboardOrpc.geo.promptTranslationsTranslate.call(scope),
-    onSuccess,
+    onSuccess: (data) => {
+      onSuccess(data);
+      // A failed model call is skipped on the server, so the prompts come back untranslated.
+      if (
+        data.languages.some((plan) =>
+          plan.entries.some((entry) => entry.needsTranslation)
+        )
+      ) {
+        toast.error(tToast("translatePromptsFailed"));
+      }
+    },
     onError: (error: Error) => {
       toast.error(toErrorMessage(error, tToast("translatePromptsFailed")));
     },

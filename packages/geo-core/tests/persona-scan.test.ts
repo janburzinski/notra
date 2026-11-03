@@ -15,6 +15,7 @@ import {
   geoPersonaMemories,
   geoPersonas,
   geoScans,
+  geoSettings,
 } from "@notra/db/schema";
 import { createPersonaSnapshot } from "@notra/db/utils/persona-snapshot";
 import { eq } from "drizzle-orm";
@@ -387,5 +388,78 @@ describe("planned persona snapshots", () => {
     expect(await testDb.select().from(geoMentionChecks)).toHaveLength(
       checksBeforeArchivedReplay
     );
+  });
+});
+
+describe("persona languages", () => {
+  const prepare = (scope: { organizationId: string; projectId: string }) =>
+    Effect.runPromise(
+      prepareGeoScanProject(scope.organizationId, scope.projectId).pipe(
+        Effect.provideService(GeoContentBillingService, {
+          gateContentBilling: () => Effect.succeed(testBillingGate),
+          finalizeContentBilling: () => Effect.void,
+        }),
+        Effect.provideService(
+          GeoCodingAgentAccessService,
+          testCodingAgentAccess
+        ),
+        Effect.provideService(GeoModelService, fakeModels),
+        Effect.provideService(GeoEntitlementService, {
+          resolveZdrEntitlement: () => Effect.succeed("not_entitled"),
+          checkScanBilling: () => Effect.die("Unexpected billing check"),
+        })
+      )
+    );
+
+  const seedPersonas = async (projectId: string, languages: string[]) => {
+    const scope = await seedProject(projectId, {
+      enabled: true,
+      languages,
+      promptLanguage: "German",
+    });
+    const [german] = await Effect.runPromise(
+      persistGeneratedPersonas(
+        scope.organizationId,
+        scope.projectId,
+        { personas: [generatedPersona] },
+        undefined,
+        false,
+        "German"
+      )
+    );
+    const [legacy] = (
+      await Effect.runPromise(
+        persistGeneratedPersonas(scope.organizationId, scope.projectId, {
+          personas: [{ ...generatedPersona, name: "Legacy buyer" }],
+        })
+      )
+    ).filter((persona) => persona.id !== german?.id);
+    assert.ok(german && legacy);
+    await testDb
+      .update(geoPersonas)
+      .set({ promptLanguage: null })
+      .where(eq(geoPersonas.id, legacy.id));
+    const prepared = await prepare(scope);
+    assert.ok(prepared.status === "planned");
+    const languagesOf = (personaId: string) =>
+      new Set(
+        prepared.plan.personas
+          .filter((planned) => planned.personaId === personaId)
+          .map((planned) => planned.language)
+      );
+    return { german: languagesOf(german.id), legacy: languagesOf(legacy.id) };
+  };
+
+  test("runs each persona in its prompt language", async () => {
+    expect(
+      await seedPersonas("persona-languages-both", ["German", "English"])
+    ).toEqual({ german: new Set(["German"]), legacy: new Set(["English"]) });
+  });
+
+  test("older personas without a language only run when English is tracked", async () => {
+    expect(await seedPersonas("persona-languages-german", ["German"])).toEqual({
+      german: new Set(["German"]),
+      legacy: new Set(),
+    });
   });
 });

@@ -3169,14 +3169,14 @@
     },
     "languagePerformanceCard": {
       "addLanguageAria": "{language} hinzufügen",
-      "limitTooltip": "Du kannst bis zu {max} zusätzliche Sprachen tracken. Entferne eine unter Sprachen, um {language} hinzuzufügen.",
+      "limitTooltip": "Du kannst bis zu {max} Sprachen tracken, inklusive der Prompt-Sprache. Entferne eine unter Sprachen, um {language} hinzuzufügen.",
       "notTracked": "Nicht getrackt",
       "trendLabel": "Trend der Erwähnungsrate für {language}",
       "addedToTracking": "{language} zum Tracking hinzugefügt",
-      "hint": "Dieselben Prompts laufen in jeder getrackten Sprache. Sichtbarkeit umfasst Markenerwähnungen und Zitate aus eigenen Quellen.",
+      "hint": "Sprachen werden anhand der Prompts verglichen, die sie gemeinsam haben. Jede zusätzliche Sprache scannt bis zu {limit} übersetzte Prompts. Sichtbarkeit umfasst Markenerwähnungen und Zitate aus eigenen Quellen.",
       "noResults": "Noch keine Ergebnisse nach Sprache",
       "confirmTitle": "{language} hinzufügen?",
-      "confirmDescription": "Dieselben Prompts laufen dann auch auf {language}, damit du die Performance in dieser Sprache tracken kannst.",
+      "confirmDescription": "Bis zu {limit} deiner Prompts werden auf {language} übersetzt und darin gescannt, damit du die Performance in dieser Sprache vergleichen kannst.",
       "addLanguage": "Sprache hinzufügen"
     },
     "mentionRateCard": {

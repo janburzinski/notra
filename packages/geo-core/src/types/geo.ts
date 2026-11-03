@@ -710,6 +710,8 @@ export interface GeoScanPlannedPersona {
   /** Null for consumer apps scraped through Olostep. */
   groundedKey: string | null;
   zdr: GeoZdrMode;
+  /** Missing on plans serialized before personas followed the prompt language; means English. */
+  language?: string;
   /** Olostep result handle per prompt; null where the item never finished. */
   olostepRetrieveIds?: (string | null)[];
 }

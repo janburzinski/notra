@@ -14,13 +14,13 @@ docolin:
   status: stable
 ---
 
-Pick languages under **Settings > Languages**, where English is on by default. A project can scan up to four of the 28 supported languages, and the prompt language always takes one of the four slots.
+Pick languages under **Settings > Languages**. A project can scan up to four of the 28 supported languages, and the prompt language, the one your prompts are written in, always takes one of the four slots.
 
-- Notra translates your prompts into each language before the scan, so you maintain one prompt list.
-- Each added language multiplies the number of answers a scan uses.
-- [Conversations](/geo/conversations) and [brand sentiment](/geo/metrics/sentiment) use answers in your prompt language.
-- [Personas](/geo/personas) only run when English is one of your languages.
-- **Performance by language** on the GEO **Overview** page and `GET /geo/visibility/language-share` report mention rate per language.
+- Notra translates your prompts into each added language before the scan, so you maintain one prompt list.
+- Each added language scans up to five of your prompts. Choose which ones under **Translations** when you open a prompt.
+- Each added language adds up to five answers per engine to every scan.
+- [Conversations](/geo/conversations) and [brand sentiment](/geo/metrics/sentiment) use your prompt language. New [personas](/geo/personas) write in it too.
+- **Performance by language** on the GEO **Overview** page and `GET /geo/visibility/language-share` report visibility per language. They count tracked prompts only. In a scan that ran several languages, a prompt counts only where the same engine also answered it in another language, so each language is measured on prompts it shares with at least one other.
 
 ## Supported languages
 

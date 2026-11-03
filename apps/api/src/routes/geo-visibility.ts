@@ -184,7 +184,7 @@ const languageShareRoute = createRoute({
   tags: [GEO_OPENAPI_TAG],
   operationId: "getGeoVisibilityLanguageShare",
   summary: "Get mention rates per tracked language",
-  description: `Checks, mentions and average position broken down by language. ${WINDOW_NOTE}`,
+  description: `Checks, mentions and average position broken down by language. Only tracked prompts count, without sequences or personas. In a scan that ran several languages, a prompt counts only where the same engine also answered it in another language of that scan. ${WINDOW_NOTE}`,
   request: { params: projectParamsSchema, query: geoWindowQuerySchema },
   responses: {
     200: {

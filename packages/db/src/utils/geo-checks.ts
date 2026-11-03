@@ -2,16 +2,19 @@ import {
   and,
   desc,
   eq,
+  exists,
   ne,
   gte,
   inArray,
   ilike,
   isNull,
   lt,
+  notInArray,
   or,
   type SQL,
   sql,
 } from "drizzle-orm";
+import { alias } from "drizzle-orm/pg-core";
 
 import { db } from "../drizzle";
 import { geoMentionChecks, geoScans, geoSettings } from "../schema";
@@ -287,8 +290,8 @@ function capturedWithin(window: GeoCheckWindow | undefined): SQL[] {
 /**
  * Persona conversations are stored as mention checks under synthetic prompt
  * IDs. Prompt-level views (results, history, per-prompt competitors) reason
- * about tracked prompts and keep them out; the engine, language and brand
- * aggregates count them like every other answer.
+ * about tracked prompts and keep them out; the engine and brand aggregates
+ * count them like every other answer.
  */
 const withoutPersonaRows = isNull(geoMentionChecks.personaId);
 const unnestedCompetitorBrand = sql`unnest(${geoMentionChecks.competitors}) as brand`;
@@ -357,6 +360,63 @@ function mentionFilters(
     scopeWhere(scope),
     ...capturedWithin(window),
     ...mentionOptionFilters(options, scope.projectId)
+  ) as SQL;
+}
+
+const otherLanguageCheck = alias(geoMentionChecks, "other_language_check");
+const otherNormalizedLanguage = sql`case when ${otherLanguageCheck.language} = '' then 'English' else ${otherLanguageCheck.language} end`;
+
+/**
+ * Translated languages scan a few picked prompts while the prompt language
+ * scans all of them, plus sequences and personas. So languages are compared
+ * on tracked prompts only, and in a scan that ran several languages a prompt
+ * answered in just one of them stays out. Whether a scan ran several
+ * languages is read from the whole scan, since its batches can straddle the
+ * edge of the date window. Single-language scans count in full.
+ */
+function languageShareFilters(
+  scope: GeoCheckScope,
+  window: GeoCheckWindow | undefined
+): SQL {
+  const tracked = mentionFilters(scope, window, { trackedPromptsOnly: true });
+  const scansInWindow = db
+    .selectDistinct({ scanId: geoMentionChecks.scanId })
+    .from(geoMentionChecks)
+    .where(tracked);
+  const multiLanguageScans = db
+    .select({ scanId: otherLanguageCheck.scanId })
+    .from(otherLanguageCheck)
+    .where(
+      and(
+        inArray(otherLanguageCheck.scanId, scansInWindow),
+        isNull(otherLanguageCheck.personaId),
+        isNull(otherLanguageCheck.sequenceId)
+      )
+    )
+    .groupBy(otherLanguageCheck.scanId)
+    .having(sql`count(distinct ${otherNormalizedLanguage}) > 1`);
+  const answeredInOtherLanguage = exists(
+    db
+      .select({ id: otherLanguageCheck.id })
+      .from(otherLanguageCheck)
+      .where(
+        and(
+          eq(otherLanguageCheck.scanId, geoMentionChecks.scanId),
+          eq(otherLanguageCheck.engine, geoMentionChecks.engine),
+          eq(otherLanguageCheck.promptId, geoMentionChecks.promptId),
+          eq(otherLanguageCheck.turn, geoMentionChecks.turn),
+          ne(otherNormalizedLanguage, normalizedLanguage),
+          isNull(otherLanguageCheck.personaId),
+          isNull(otherLanguageCheck.sequenceId)
+        )
+      )
+  );
+  return and(
+    tracked,
+    or(
+      notInArray(geoMentionChecks.scanId, multiLanguageScans),
+      answeredInOtherLanguage
+    )
   ) as SQL;
 }
 
@@ -1165,7 +1225,7 @@ export async function queryGeoCheckLanguageShare(
         lastCheckedAt: sql<Date>`max(${geoMentionChecks.capturedAt})`,
       })
       .from(geoMentionChecks)
-      .where(mentionFilters(scope, window))
+      .where(languageShareFilters(scope, window))
       .groupBy(normalizedLanguage)
       .orderBy(
         sql`count(distinct ${checkUnit}) filter (where ${isVisible})::numeric / nullif(count(distinct ${checkUnit}), 0) desc`
@@ -1202,7 +1262,7 @@ export async function queryGeoCheckLanguageShareTrends(
         visibilityRate: checkRateWhere(isVisible),
       })
       .from(geoMentionChecks)
-      .where(mentionFilters(scope, window))
+      .where(languageShareFilters(scope, window))
       .groupBy(day, language)
       .orderBy(day, language)
   );

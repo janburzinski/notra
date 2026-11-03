@@ -3,6 +3,7 @@
 import { PlusSignIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
+  GEO_LANGUAGE_MAX_PROMPTS,
   GEO_MAX_LANGUAGES,
   GEO_SPARKLINE_MIN_POINTS,
   GEO_VISIBILITY_TABLE_ROWS,
@@ -142,6 +143,7 @@ export function LanguagePerformanceCard({
   const t = useTranslations("geo.languagePerformanceCard");
   const tCommon2 = useTranslations("common");
   const tGeoShared = useTranslations("geo.shared");
+  const languageLabel = useLanguageLabel();
   const [languageToAdd, setLanguageToAdd] = useState<string>();
   const addLanguage = useGeoSettingsLanguageAdd(organizationId);
   const savedExtras = trackedGeoLanguages(settings.languages);
@@ -166,7 +168,9 @@ export function LanguagePerformanceCard({
     }
     addLanguage.mutate(languageToAdd, {
       onSuccess: () =>
-        toast.success(t("addedToTracking", { language: languageToAdd })),
+        toast.success(
+          t("addedToTracking", { language: languageLabel(languageToAdd) })
+        ),
     });
     setLanguageToAdd(undefined);
   };
@@ -197,8 +201,17 @@ export function LanguagePerformanceCard({
             : Number.NEGATIVE_INFINITY,
         cell: (row) =>
           row.kind === "suggested" ? (
-            <span className="text-muted-foreground/50 text-xs">
-              {t("notTracked")}
+            <span className="flex items-center justify-between gap-2">
+              <span className="text-muted-foreground/50 text-xs">
+                {t("notTracked")}
+              </span>
+              <LanguageAddButton
+                disabled={adding || atLimit}
+                language={row.language}
+                limitReached={atLimit}
+                onAdd={setLanguageToAdd}
+                pending={pendingLanguage === row.language}
+              />
             </span>
           ) : (
             <span className="flex items-center gap-2">
@@ -220,21 +233,15 @@ export function LanguagePerformanceCard({
         width: "7.5rem",
         cell: (row) => {
           if (row.kind === "suggested") {
-            return (
-              <LanguageAddButton
-                disabled={adding || atLimit}
-                language={row.language}
-                limitReached={atLimit}
-                onAdd={setLanguageToAdd}
-                pending={pendingLanguage === row.language}
-              />
-            );
+            return null;
           }
           if ((row.trend?.length ?? 0) >= GEO_SPARKLINE_MIN_POINTS) {
             return (
               <GeoRateSparkline
                 className="text-geo-search"
-                label={t("trendLabel", { language: row.language })}
+                label={t("trendLabel", {
+                  language: languageLabel(row.language),
+                })}
                 points={row.trend ?? []}
               />
             );
@@ -243,7 +250,7 @@ export function LanguagePerformanceCard({
         },
       },
     ],
-    [adding, atLimit, pendingLanguage, t, tCommon2, tGeoShared]
+    [adding, atLimit, languageLabel, pendingLanguage, t, tCommon2, tGeoShared]
   );
 
   return (
@@ -252,7 +259,7 @@ export function LanguagePerformanceCard({
         bodyClassName="flex min-h-0 flex-1 flex-col"
         className="h-full"
         eyebrow={tGeoShared("performanceByLanguage")}
-        hint={t("hint")}
+        hint={t("hint", { limit: GEO_LANGUAGE_MAX_PROMPTS })}
       >
         <DataTable
           columns={columns}
@@ -268,7 +275,10 @@ export function LanguagePerformanceCard({
       </InstrumentSection>
       <ConfirmDialog
         confirmLabel={t("addLanguage")}
-        description={t("confirmDescription", { language: languageToAdd ?? "" })}
+        description={t("confirmDescription", {
+          language: languageToAdd ? languageLabel(languageToAdd) : "",
+          limit: GEO_LANGUAGE_MAX_PROMPTS,
+        })}
         onConfirm={handleConfirmAddLanguage}
         onOpenChange={(open) => {
           if (!open) {
@@ -276,7 +286,9 @@ export function LanguagePerformanceCard({
           }
         }}
         open={Boolean(languageToAdd)}
-        title={t("confirmTitle", { language: languageToAdd ?? "" })}
+        title={t("confirmTitle", {
+          language: languageToAdd ? languageLabel(languageToAdd) : "",
+        })}
       />
     </>
   );

@@ -10,5 +10,7 @@ export type ScanSettingsInput = Partial<
     | "scanLeaseUntil"
     | "scanStartedAt"
     | "lastScanAt"
+    | "languages"
+    | "promptLanguage"
   >
 >;

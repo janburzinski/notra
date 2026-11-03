@@ -24,10 +24,14 @@ export interface PersonaGenerationContext {
   competitors: string[];
   pages: { url: string; title: string | null }[];
   prompts: string[];
+  /** The project's prompt language; conversation prompts are written in it. */
+  language: string;
 }
 
 export interface PersonaForScan {
   persona: GeoPersonaSnapshot["persona"];
+  /** Language the conversation prompts are written in. */
+  language: string;
   memories: GeoPersonaMemory[];
   conversationPrompts: string[];
 }

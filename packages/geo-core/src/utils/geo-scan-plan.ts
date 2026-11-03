@@ -15,23 +15,22 @@ import type {
 import { personaPromptId } from "./geo-personas";
 
 export function geoScanPersonaTasks(
-  persona: Pick<GeoScanPlannedPersona, "personaId" | "prompts" | "engine">
+  persona: Pick<
+    GeoScanPlannedPersona,
+    "personaId" | "prompts" | "engine" | "language"
+  >
 ): GeoScanPlannedAnswer[] {
   const promptId = personaPromptId(persona.personaId);
+  const language = persona.language ?? DEFAULT_LANGUAGE;
   return persona.prompts
     .slice(0, GEO_PERSONA_MAX_TURNS)
     .map((prompt, index) => ({
-      key: geoScanAnswerKey(
-        promptId,
-        persona.engine,
-        DEFAULT_LANGUAGE,
-        index + 1
-      ),
+      key: geoScanAnswerKey(promptId, persona.engine, language, index + 1),
       promptId,
       personaId: persona.personaId,
       prompt,
       engine: persona.engine,
-      language: DEFAULT_LANGUAGE,
+      language,
       turn: index + 1,
     }));
 }

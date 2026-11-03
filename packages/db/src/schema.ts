@@ -1991,6 +1991,8 @@ export const geoPersonas = pgTable(
       .array()
       .notNull()
       .default(sql`ARRAY[]::text[]`),
+    /** Language the conversation prompts are written in; null predates it and means English. */
+    promptLanguage: text("prompt_language"),
     enabled: boolean("enabled").notNull().default(true),
     archivedAt: timestamp("archived_at"),
     createdAt: timestamp("created_at").defaultNow().notNull(),

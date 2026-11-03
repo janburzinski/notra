@@ -81,7 +81,7 @@ export function buildGeoOlostepQueries(
     .flatMap((persona) =>
       persona.prompts.map((prompt, index, prompts) => ({
         engine: persona.engine,
-        language: DEFAULT_LANGUAGE,
+        language: persona.language ?? DEFAULT_LANGUAGE,
         text: geoOlostepPersonaQuery(
           persona.snapshot,
           geoOlostepFollowUpQuery(prompts.slice(0, index), prompt)

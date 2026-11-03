@@ -1,0 +1,1 @@
+ALTER TABLE "geo_personas" ADD COLUMN IF NOT EXISTS "prompt_language" text;

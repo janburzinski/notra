@@ -3169,14 +3169,14 @@
     },
     "languagePerformanceCard": {
       "addLanguageAria": "Add {language}",
-      "limitTooltip": "You can track up to {max} additional languages. Remove one in Languages to add {language}.",
+      "limitTooltip": "You can track up to {max} languages, including the prompt language. Remove one in Languages to add {language}.",
       "notTracked": "Not tracked",
       "trendLabel": "{language} mention rate trend",
       "addedToTracking": "{language} added to tracking",
-      "hint": "The same prompts run in each tracked language. Visibility includes brand mentions and citations from owned sources.",
+      "hint": "Languages are compared on the prompts they share. Each added language scans up to {limit} translated prompts. Visibility includes brand mentions and citations from owned sources.",
       "noResults": "No language results yet",
       "confirmTitle": "Add {language}?",
-      "confirmDescription": "This will run the same prompts in {language} so you can track performance in this language.",
+      "confirmDescription": "Up to {limit} of your prompts are translated into {language} and scanned in it, so you can compare performance in this language.",
       "addLanguage": "Add language"
     },
     "mentionRateCard": {

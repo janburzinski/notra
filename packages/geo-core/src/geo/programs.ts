@@ -1,3 +1,4 @@
+import { DEFAULT_LANGUAGE } from "@notra/ai/constants/languages";
 import { describeContentBillingDenial } from "@notra/ai/utils/content-billing-messages";
 import {
   isTinybirdConfigured,
@@ -136,10 +137,7 @@ import {
   remapRetiredGeoEngineIds,
   scopeGeoScanEngines,
 } from "../utils/geo-engines";
-import {
-  trackedGeoLanguages,
-  withPromptLanguage,
-} from "../utils/geo-language-rows";
+import { withPromptLanguage } from "../utils/geo-language-rows";
 import {
   geoDefaultEngines,
   getGeoModelCatalogEntry,
@@ -690,9 +688,7 @@ export const addGeoTrackedEngine = Effect.fn("geo.settingsEngineAdd")(
 export const addGeoTrackedLanguage = Effect.fn("geo.settingsLanguageAdd")(
   function* (input: GeoSettingsLanguageAddInput) {
     const { projectId } = yield* requireGeoProject(input);
-    const initialLanguages = [
-      ...new Set([...trackedGeoLanguages([]), input.language]),
-    ];
+    const promptLanguage = sql`coalesce(${geoSettings.promptLanguage}, ${DEFAULT_LANGUAGE})`;
     const updated = yield* geoDb("tracked language update failed", () =>
       db
         .update(geoSettings)
@@ -700,7 +696,10 @@ export const addGeoTrackedLanguage = Effect.fn("geo.settingsLanguageAdd")(
           languages: sql<string[]>`
             CASE
               WHEN ${geoSettings.languages} IS NULL OR cardinality(${geoSettings.languages}) = 0
-                THEN ${sql.param(initialLanguages)}::text[]
+                THEN CASE
+                  WHEN ${promptLanguage} = ${input.language} THEN ARRAY[${input.language}]::text[]
+                  ELSE ARRAY[${promptLanguage}, ${input.language}]::text[]
+                END
               WHEN ${input.language} = ANY(${geoSettings.languages})
                 THEN ${geoSettings.languages}
               WHEN (
