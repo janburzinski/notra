@@ -35,6 +35,11 @@ describe("prepareAutumnRequest", () => {
     expect(body).toEqual({
       planId: "pro",
       metadata: { dubCustomerExternalId: "org_1", source: "ui" },
+      checkoutSessionParams: {
+        billing_address_collection: "required",
+        customer_update: { address: "auto", name: "auto" },
+        tax_id_collection: { enabled: true },
+      },
     });
   });
 
@@ -51,6 +56,9 @@ describe("prepareAutumnRequest", () => {
     expect(body).toEqual({
       plans: [{ planId: "pro" }],
       checkoutSessionParams: {
+        billing_address_collection: "required",
+        customer_update: { address: "auto", name: "auto" },
+        tax_id_collection: { enabled: true },
         metadata: { source: "ui", dubCustomerExternalId: "org_1" },
         subscription_data: { metadata: { source: "ui" } },
       },

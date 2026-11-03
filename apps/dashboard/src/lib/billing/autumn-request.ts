@@ -1,4 +1,7 @@
-import { AUTUMN_READ_ROUTES } from "@/constants/billing";
+import {
+  AUTUMN_BUSINESS_CHECKOUT_PARAMS,
+  AUTUMN_READ_ROUTES,
+} from "@/constants/billing";
 import { DUB_CUSTOMER_EXTERNAL_ID_METADATA_KEY } from "@/constants/dub";
 import {
   autumnAttachBodySchema,
@@ -38,6 +41,7 @@ function sanitizeBody(
         body: {
           ...parsed.data,
           metadata: { ...parsed.data.metadata, ...dubMetadata(customerId) },
+          checkoutSessionParams: AUTUMN_BUSINESS_CHECKOUT_PARAMS,
         },
       };
     }
@@ -53,6 +57,7 @@ function sanitizeBody(
           ...parsed.data,
           checkoutSessionParams: {
             ...session,
+            ...AUTUMN_BUSINESS_CHECKOUT_PARAMS,
             metadata: { ...session?.metadata, ...dubMetadata(customerId) },
           },
         },

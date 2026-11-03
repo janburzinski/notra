@@ -113,6 +113,12 @@ export const PLANS_ANCHOR = "plans";
 
 export const AUTUMN_ORGANIZATION_HEADER = "x-notra-organization";
 
+export const AUTUMN_BUSINESS_CHECKOUT_PARAMS = {
+  billing_address_collection: "required",
+  customer_update: { address: "auto", name: "auto" },
+  tax_id_collection: { enabled: true },
+} as const;
+
 export const USAGE_RANGES = ["7d", "30d", "90d"] as const;
 
 export const USAGE_RANGE_LABEL_KEYS = {
