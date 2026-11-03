@@ -8039,8 +8039,17 @@
       "description": "Lade die Seite neu, um es erneut zu versuchen."
     },
     "empty": {
-      "title": "Noch keine Seiten",
-      "description": "Hoste Blog und Changelog aus einem GitHub-Repo. Jeder Push geht live, jeder Pull Request bekommt eine Vorschau."
+      "title": "Erste Schritte mit Seiten",
+      "points": {
+        "write": "Schreibe Beiträge und Changelog-Einträge als MDX in deinem GitHub-Repository",
+        "deploy": "Jeder Push geht live, und jeder Pull Request bekommt eine eigene Vorschau",
+        "domain": "Veröffentliche unter blog.acme.com oder unter acme.com/blog"
+      },
+      "documentation": "Dokumentation",
+      "push": {
+        "title": "Veröffentliche deinen ersten Beitrag",
+        "description": "Committe und pushe die Datei, dann importiere das Repository"
+      }
     },
     "loadFailed": {
       "title": "Seiten konnten nicht geladen werden",

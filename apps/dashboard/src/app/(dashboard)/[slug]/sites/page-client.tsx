@@ -8,15 +8,11 @@ import { useTranslations } from "use-intl";
 
 import { buttonVariants } from "@/components/button";
 import { EmptyState } from "@/components/empty-state";
-import { EmptyStateTablePreview } from "@/components/empty-state-preview";
 import Link from "@/components/framework/link";
+import { SitesEmptyState } from "@/components/sites/sites-empty-state";
 import { SitesList } from "@/components/sites/sites-list";
 import { SitesPageShell } from "@/components/sites/sites-page-shell";
 import { SitesUnavailableState } from "@/components/sites/sites-unavailable-state";
-import {
-  EMPTY_STATE_TABLE_COLUMNS,
-  EMPTY_STATE_TABLE_ROWS,
-} from "@/constants/empty-state";
 import { useActiveProject } from "@/lib/hooks/use-active-project";
 import {
   useSitePlanLimitReached,
@@ -131,24 +127,7 @@ function ProjectSitesList({
         {sites.length > 0 ? newSiteButton : null}
       </PageHeading>
       {sites.length === 0 ? (
-        <EmptyState
-          action={
-            siteLimitReached ? null : (
-              <Link className={buttonVariants()} href={newSiteHref}>
-                <HugeiconsIcon className="size-4" icon={PlusSignIcon} />
-                {t("newSite")}
-              </Link>
-            )
-          }
-          description={t("empty.description")}
-          preview={
-            <EmptyStateTablePreview
-              columns={EMPTY_STATE_TABLE_COLUMNS.sites}
-              rows={EMPTY_STATE_TABLE_ROWS}
-            />
-          }
-          title={t("empty.title")}
-        />
+        <SitesEmptyState newSiteHref={siteLimitReached ? null : newSiteHref} />
       ) : (
         <SitesList
           organizationId={organizationId}

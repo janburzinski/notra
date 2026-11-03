@@ -52,6 +52,11 @@ export interface SitesPageShellProps {
   className?: string;
 }
 
+export interface SitesEmptyStateProps {
+  /** `null` once the plan's site limit is reached. */
+  newSiteHref: string | null;
+}
+
 export interface ProjectSitesListProps {
   organizationId: string;
   organizationSlug: string;

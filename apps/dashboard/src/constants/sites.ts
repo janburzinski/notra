@@ -2,6 +2,7 @@ import {
   Alert02Icon,
   Analytics01Icon,
   DashboardSquare01Icon,
+  FileEditIcon,
   PlugSocketIcon,
   GitPullRequestIcon,
   Globe02Icon,
@@ -24,6 +25,7 @@ import type {
   SiteDomainChipStatus,
   SiteSection,
   SiteSectionConfig,
+  SitesEmptyPoint,
   PostPreviewState,
   SiteStatusBadgeConfig,
 } from "@/types/sites";
@@ -68,6 +70,23 @@ export const SITE_NAV_SECTIONS: ReadonlySet<SiteSection> = new Set([
   "domains",
   "settings",
 ]);
+
+export const SITES_DOCS_URL = "https://www.usenotra.com/docs/sites";
+
+export const SITES_EMPTY_POINTS: readonly SitesEmptyPoint[] = [
+  { key: "write", icon: FileEditIcon },
+  { key: "deploy", icon: GitPullRequestIcon },
+  { key: "domain", icon: Globe02Icon },
+];
+export const SITES_EMPTY_EXAMPLE_FILENAME = "blog/hello-world.mdx";
+export const SITES_EMPTY_EXAMPLE_POST = `---
+title: "Hello, world"
+description: "The first post on our new blog."
+date: 2026-11-03
+---
+
+<Tip>This post went live with a single git push.</Tip>`;
+export const SITES_EMPTY_PUSH_COMMAND = `git add ${SITES_EMPTY_EXAMPLE_FILENAME} && git commit -m "Add first post" && git push`;
 
 export const SITE_RECENT_DEPLOYMENTS_LIMIT = 5;
 export const SITE_DEPLOYMENTS_PAGE_SIZE = 20;

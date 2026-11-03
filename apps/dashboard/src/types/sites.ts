@@ -63,6 +63,11 @@ export interface SiteStatusBadgeConfig {
 }
 export type SiteSection = (typeof SITE_DETAIL_TABS)[number];
 
+export interface SitesEmptyPoint {
+  key: "write" | "deploy" | "domain";
+  icon: IconSvgElement;
+}
+
 export interface SiteSectionConfig {
   section: SiteSection;
   path: string;

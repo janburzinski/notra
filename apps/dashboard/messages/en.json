@@ -8039,8 +8039,17 @@
       "description": "Reload the page to try again."
     },
     "empty": {
-      "title": "No sites yet",
-      "description": "Host a blog and changelog from a GitHub repo. Every push goes live, every pull request gets a preview."
+      "title": "Get started with Sites",
+      "points": {
+        "write": "Write posts and changelog entries as MDX in your GitHub repository",
+        "deploy": "Every push goes live, and every pull request gets its own preview",
+        "domain": "Serve it on blog.acme.com or under acme.com/blog"
+      },
+      "documentation": "Documentation",
+      "push": {
+        "title": "Publish your first post",
+        "description": "Commit the file and push it, then import the repository"
+      }
     },
     "loadFailed": {
       "title": "Couldn't load sites",
