@@ -1,4 +1,5 @@
 import { cn } from "@notra/ui/lib/utils";
+import { useEffect, useRef, useState } from "react";
 import type { CSSProperties, ReactNode } from "react";
 
 interface DiagramProps {
@@ -7,9 +8,39 @@ interface DiagramProps {
   children: ReactNode;
 }
 
+function useSeenOnce<T extends Element>() {
+  const ref = useRef<T>(null);
+  const [seen, setSeen] = useState(false);
+
+  useEffect(() => {
+    const node = ref.current;
+    if (!node || seen) {
+      return;
+    }
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry?.isIntersecting) {
+          setSeen(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: "0px 0px -20% 0px" }
+    );
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [seen]);
+
+  return [ref, seen] as const;
+}
+
 export function Diagram({ label, caption, children }: DiagramProps) {
+  const [ref, seen] = useSeenOnce<HTMLElement>();
   return (
-    <figure className="not-prose my-10 font-mono text-sm">
+    <figure
+      className="not-prose my-10 font-mono text-sm"
+      data-seen={seen ? "" : undefined}
+      ref={ref}
+    >
       {label ? (
         <div className="text-muted-foreground mb-4 text-xs tracking-widest uppercase">
           {label}

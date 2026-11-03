@@ -16,6 +16,12 @@ import {
   DemoPoolDiagram,
   DemoRebaseDiagram,
 } from "@/components/blog-diagrams/notra-demo";
+import {
+  SitesConsentDemo,
+  SitesDeployDiagram,
+  SitesFreePlanCard,
+  SitesReadersDemo,
+} from "@/components/blog-diagrams/notra-sites";
 import { MdxLink } from "@/components/mdx-link";
 import { getMDXComponents } from "@/mdx-components";
 import { getLogoLinkUrl } from "@/utils/outbound-link";
@@ -71,6 +77,10 @@ export function getBlogMDXComponents(): MDXComponents {
     DemoDeploymentsDiagram,
     DemoPoolDiagram,
     DemoRebaseDiagram,
+    SitesConsentDemo,
+    SitesDeployDiagram,
+    SitesFreePlanCard,
+    SitesReadersDemo,
     Brand,
     pre: ({ children, ...props }) => (
       <div className="code-block">

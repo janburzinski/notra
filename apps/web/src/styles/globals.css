@@ -470,7 +470,13 @@
 .diagram-flow-scan {
   --flow-cycle: 5s;
   animation: diagramFlowTravel var(--flow-cycle) linear
-    calc(var(--flow-delay, 0) * var(--flow-cycle)) infinite both;
+    calc(var(--flow-delay, 0) * var(--flow-cycle)) 1 both paused;
+}
+
+[data-seen] .diagram-flow-travel,
+[data-seen] .diagram-flow-travel-short,
+[data-seen] .diagram-flow-scan {
+  animation-play-state: running;
 }
 
 .diagram-flow-travel.diagram-flow-linear {
