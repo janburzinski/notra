@@ -7,7 +7,7 @@ import { groupExists, scopedProcesses } from "../src/utils/processes";
 import { fixtureToolchain } from "../src/utils/toolchain";
 
 const runner = resolve(import.meta.dir, "../src/run.ts");
-for (const [name, flags, signal, marker, expectedCode, expectedStatus] of [
+const scenarios = [
   ["pass", [], null, null, 0, "passed"],
   ["assertion failure", ["--failure-probe"], null, null, 1, "failed"],
   [
@@ -34,7 +34,19 @@ for (const [name, flags, signal, marker, expectedCode, expectedStatus] of [
     124,
     "timed-out",
   ],
-] as const) {
+] as const;
+
+// Each scenario owns its temp directory and process group, so they run
+// side by side; every scenario still checks that only its own resources
+// are gone.
+async function verify([
+  name,
+  flags,
+  signal,
+  marker,
+  expectedCode,
+  expectedStatus,
+]: (typeof scenarios)[number]) {
   const child = spawn(
     process.execPath,
     ["--no-env-file", runner, "--repetitions", "1", ...flags],
@@ -90,4 +102,15 @@ for (const [name, flags, signal, marker, expectedCode, expectedStatus] of [
   process.stdout.write(
     `${JSON.stringify({ name, exitCode: code, status: report.status, cleanup: report.cleanup })}\n`
   );
+}
+
+const results = await Promise.allSettled(scenarios.map(verify));
+const failures = results.flatMap((result) =>
+  result.status === "rejected" ? [result.reason] : []
+);
+if (failures.length > 0) {
+  for (const failure of failures) {
+    console.error(failure);
+  }
+  process.exit(1);
 }

@@ -60,6 +60,20 @@ const startup = mock(async (_snapshot: string, _config: unknown) => ({
   id: "box-test",
 }));
 const upload = mock(async () => new Response("ok"));
+// Source deliveries run in a real shell against a local stand-in for the Box
+// home, so tests see the bytes that would arrive.
+let boxHome = "";
+const runDelivery = (script: string) => {
+  const run = spawnSync(
+    "sh",
+    ["-c", script.replaceAll("/workspace/home", boxHome)],
+    {
+      encoding: "utf8",
+    }
+  );
+  return { output: `${run.stdout}${run.stderr}`, exit_code: run.status ?? 1 };
+};
+const execDelivery = mock(async (script: string) => runDelivery(script));
 const download = mock(async () => new Response(new Uint8Array([4, 5])));
 const fetchMock = spyOn(globalThis, "fetch");
 const key = spyOn(env, "getBoxApiKey");
@@ -76,6 +90,13 @@ const params: SandboxBuildParams = {
 };
 
 beforeEach(() => {
+  if (boxHome) {
+    rmSync(boxHome, { recursive: true, force: true });
+  }
+  boxHome = mkdtempSync(join(tmpdir(), "sites-box-home-"));
+  execDelivery
+    .mockReset()
+    .mockImplementation(async (script) => runDelivery(script));
   startup.mockReset();
   fetchMock.mockReset();
   completed = undefined;
@@ -143,6 +164,9 @@ beforeEach(() => {
           await logTail(body.command[3], Number(body.command[4]))
         );
       }
+      if (String(body.command[2]).includes("| base64 -d ")) {
+        return Response.json(await execDelivery(body.command[2]));
+      }
       const run: unknown = await command(body.command[2]);
       if (run instanceof Response) {
         return run;
@@ -168,6 +192,7 @@ afterEach(() => {
 });
 
 afterAll(() => {
+  rmSync(boxHome, { recursive: true, force: true });
   fetchMock.mockRestore();
   key.mockRestore();
   snapshot.mockRestore();
@@ -275,7 +300,7 @@ test("source archives over 100 MB upload in bounded parts and reassemble byte fo
   }
 }, 30_000);
 
-test.each([0, 8 * 1024 * 1024])(
+test.each([8 * 1024 * 1024])(
   "source archives of %i bytes retain a single upload without reassembly",
   async (size) => {
     await runSandboxBuild({ ...params, sourceArchive: new Uint8Array(size) });
@@ -362,11 +387,12 @@ test("startup failure still completes with redacted metrics and preserves the or
   expect(logTail).not.toHaveBeenCalled();
   expect(command).not.toHaveBeenCalled();
   expect(upload).not.toHaveBeenCalled();
+  expect(execDelivery).not.toHaveBeenCalled();
 });
 
 test("upload failure skips nonexistent guest artifacts and deletes the sandbox", async () => {
   const error = new Error("upload network failure");
-  upload.mockRejectedValueOnce(error);
+  execDelivery.mockRejectedValueOnce(error);
   await expect(runSandboxBuild(params)).rejects.toMatchObject({
     _tag: "SandboxRequestError",
     operation: "upload",
@@ -443,7 +469,7 @@ test("compiler failure skips download and missing guest counters remain null", a
   expect(build.outputArchive).toBeNull();
   expect(build.metrics?.sandboxCpuTimeMs).toBeNull();
   expect(build.metrics?.outputArchiveBytes).toBeNull();
-  expect(upload).toHaveBeenCalledTimes(1);
+  expect(execDelivery).toHaveBeenCalledTimes(2);
   expect(download).not.toHaveBeenCalled();
 });
 
@@ -595,6 +621,7 @@ test("successful compiler result cannot authorize output after packing failure o
   for (const exitText of ["3", "", "not-an-exit-code"]) {
     fetchMock.mockClear();
     upload.mockClear();
+    execDelivery.mockClear();
     download.mockClear();
     files.set("/workspace/home/exit-code", exitText);
     const build = await runSandboxBuild(params);
@@ -606,7 +633,7 @@ test("successful compiler result cannot authorize output after packing failure o
     expect(build.metrics?.outputArchiveBytes).toBeNull();
     expect(build.metrics?.phases.outputDownload).toBeUndefined();
     expect(build.metrics?.compilerAreas).toMatchObject(compilerResult.areas);
-    expect(upload).toHaveBeenCalledTimes(1);
+    expect(execDelivery).toHaveBeenCalledTimes(2);
     expect(download).not.toHaveBeenCalled();
     expect(completed?.result).toBeNull();
     expect(build.metrics?.cleanupSucceeded).toBe(true);
@@ -658,7 +685,11 @@ test("stopping a hung log body cancels its reader before result reads and deleti
         const body = url.pathname.endsWith("/exec")
           ? JSON.parse(String(init?.body))
           : null;
-        if (url.pathname.endsWith("/exec") && body?.command[0] === "sh") {
+        if (
+          url.pathname.endsWith("/exec") &&
+          body?.command[0] === "sh" &&
+          !body.command[2].includes("| base64 -d ")
+        ) {
           Effect.runSync(Deferred.succeed(executing, undefined));
           await Effect.runPromise(Deferred.await(finish));
           return Response.json({ output: "done", exit_code: 0 });
@@ -706,7 +737,8 @@ test("parent interruption aborts exec, joins polling cleanup, and completes afte
       fetchMock.mockImplementation((input, init) => {
         if (
           String(input).endsWith("/exec") &&
-          JSON.parse(String(init?.body)).command[0] === "sh"
+          JSON.parse(String(init?.body)).command[0] === "sh" &&
+          !JSON.parse(String(init?.body)).command[2].includes("| base64 -d ")
         ) {
           init?.signal?.addEventListener("abort", () => {
             aborted = true;
@@ -815,6 +847,7 @@ test("interruption during allocation waits for a known ID and deletes it without
       yield* Fiber.join(interrupting);
       expect(Exit.isFailure(yield* Fiber.await(fiber))).toBe(true);
       expect(upload).not.toHaveBeenCalled();
+      expect(execDelivery).not.toHaveBeenCalled();
       expect(remove).toHaveBeenCalledTimes(1);
       expect(completed?.metrics?.sandboxId).toBe("box-test");
       expect(completed?.metrics?.cleanupSucceeded).toBe(true);
@@ -868,6 +901,7 @@ test("a provider response arriving after allocation timeout triggers bounded orp
       yield* Deferred.succeed(deliver, undefined);
       yield* Deferred.await(deleted);
       expect(upload).not.toHaveBeenCalled();
+      expect(execDelivery).not.toHaveBeenCalled();
     }).pipe(Effect.scoped, Effect.provide(TestClock.layer()))
   );
 });
@@ -911,6 +945,7 @@ test("parent cancellation during an unknown allocation is bounded and never repo
       );
       expect(completed?.metrics?.phases.cleanup).toBeGreaterThanOrEqual(0);
       expect(upload).not.toHaveBeenCalled();
+      expect(execDelivery).not.toHaveBeenCalled();
       expect(remove).not.toHaveBeenCalled();
     }).pipe(Effect.scoped, Effect.provide(TestClock.layer()))
   );
@@ -983,6 +1018,7 @@ test("an empty allocation ID is rejected before any upload or deletion", async (
     message: "Sandbox returned an invalid create response",
   });
   expect(upload).not.toHaveBeenCalled();
+  expect(execDelivery).not.toHaveBeenCalled();
   expect(remove).not.toHaveBeenCalled();
   expect(completed?.metrics?.sandboxId).toBeNull();
   expect(completed?.metrics?.cleanupSucceeded).toBe(false);

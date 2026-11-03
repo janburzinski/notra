@@ -2,6 +2,11 @@ import { SITE_BUILD_LIMITS } from "@notra/sites-core/constants/sites";
 
 export const SANDBOX_REQUEST_TIMEOUT_MS = 30_000;
 export const SANDBOX_UPLOAD_CHUNK_BYTES = 8 * 1024 * 1024;
+// A Box's first file upload or write takes ~6.5 s while exec answers in
+// ~0.1 s, so small sources arrive base64-encoded inside exec commands. A chunk
+// stays below Linux's 128 KiB limit for one argument once encoded.
+export const SANDBOX_EXEC_DELIVERY_CHUNK_BYTES = 90_000;
+export const SANDBOX_EXEC_DELIVERY_MAX_BYTES = 2 * 1024 * 1024;
 export const SANDBOX_ERROR_RESPONSE_BYTES = 4096;
 export const SANDBOX_ERROR_RESPONSE_TIMEOUT_MS = 2000;
 export const SANDBOX_CLEANUP_TIMEOUT_MS = 5_000;

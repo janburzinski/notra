@@ -1,3 +1,4 @@
+import { posix } from "node:path";
 import { performance } from "node:perf_hooks";
 
 import { shellQuote } from "@notra/ai/utils/shell";
@@ -17,6 +18,8 @@ import {
 import { GUEST_BUILD_RUNNER } from "./constants/build-runner";
 import {
   SANDBOX_CLEANUP_TIMEOUT_MS,
+  SANDBOX_EXEC_DELIVERY_CHUNK_BYTES,
+  SANDBOX_EXEC_DELIVERY_MAX_BYTES,
   SANDBOX_EXEC_TIMEOUT_MS,
   SANDBOX_LOG_RESPONSE_BYTES,
   SANDBOX_LOG_TAIL_SCRIPT,
@@ -70,6 +73,64 @@ const uploadBytesEffect = Effect.fn("Sites.Sandbox.upload")(function* (
     "POST",
     form
   );
+});
+
+// Writes one file through exec: each chunk is decoded and appended, and the
+// last one checks the size, so a partial delivery fails before the build.
+const deliverBytesEffect = Effect.fn("Sites.Sandbox.deliver")(function* (
+  apiKey: string,
+  boxId: string,
+  file: SandboxUploadFile
+) {
+  const path = shellQuote(file.path);
+  const chunks = Math.max(
+    1,
+    Math.ceil(file.data.byteLength / SANDBOX_EXEC_DELIVERY_CHUNK_BYTES)
+  );
+  for (let index = 0; index < chunks; index++) {
+    const chunk = file.data.subarray(
+      index * SANDBOX_EXEC_DELIVERY_CHUNK_BYTES,
+      (index + 1) * SANDBOX_EXEC_DELIVERY_CHUNK_BYTES
+    );
+    const encoded = Buffer.from(
+      chunk.buffer,
+      chunk.byteOffset,
+      chunk.byteLength
+    ).toString("base64");
+    const script = [
+      ...(index === 0
+        ? [`mkdir -p ${shellQuote(posix.dirname(file.path))} || exit 3`]
+        : []),
+      `printf %s '${encoded}' | base64 -d ${index === 0 ? ">" : ">>"} ${path} || exit 3`,
+      ...(index === chunks - 1
+        ? [
+            `size=$(wc -c < ${path}) || exit 3`,
+            `[ $size -eq ${file.data.byteLength} ] || exit 4`,
+          ]
+        : []),
+    ].join("\n");
+    const bytes = yield* sandboxRequestEffect(
+      apiKey,
+      "upload",
+      `${encodeURIComponent(boxId)}/exec`,
+      "POST",
+      JSON.stringify({ command: ["sh", "-c", script] })
+    );
+    const run = yield* sandboxJsonEffect(
+      bytes,
+      sandboxExecutionSchema,
+      "upload"
+    );
+    if (run.exit_code !== 0) {
+      return yield* Effect.fail(
+        new SandboxRequestError({
+          operation: "upload",
+          status: null,
+          message: `Delivering ${posix.basename(file.path)} exited with code ${run.exit_code}`,
+        })
+      );
+    }
+  }
 });
 
 const downloadBytesEffect = Effect.fn("Sites.Sandbox.download")(function* (
@@ -356,6 +417,30 @@ export const runSandboxBuildEffect = Effect.fn("Sites.Sandbox.build")(
             try: () => siteBuildRequestSchema.parse(params.target),
             catch: (error) => error,
           });
+          const overlays = (params.overlayFiles ?? []).map((file) => ({
+            path: `${BOX_WORKDIR}/overlay/${file.path}`,
+            data: file.data,
+          }));
+          const deliveries: SandboxUploadFile[] = [
+            { path: `${BOX_WORKDIR}/source.tgz`, data: params.sourceArchive },
+            {
+              path: `${BOX_WORKDIR}/target.json`,
+              data: new TextEncoder().encode(JSON.stringify(target)),
+            },
+            ...overlays,
+          ];
+          if (
+            deliveries.reduce(
+              (total, file) => total + file.data.byteLength,
+              0
+            ) <= SANDBOX_EXEC_DELIVERY_MAX_BYTES
+          ) {
+            for (const file of deliveries) {
+              yield* deliverBytesEffect(apiKey, currentBoxId, file);
+            }
+            sourceParts.push(`${BOX_WORKDIR}/source.tgz`);
+            return;
+          }
           const partCount = Math.max(
             1,
             Math.ceil(
@@ -382,10 +467,8 @@ export const runSandboxBuildEffect = Effect.fn("Sites.Sandbox.build")(
             yield* uploadBytesEffect(apiKey, currentBoxId, files);
             sourceParts.push(path);
           }
-          for (const file of params.overlayFiles ?? []) {
-            yield* uploadBytesEffect(apiKey, currentBoxId, [
-              { path: `${BOX_WORKDIR}/overlay/${file.path}`, data: file.data },
-            ]);
+          for (const file of overlays) {
+            yield* uploadBytesEffect(apiKey, currentBoxId, [file]);
           }
         })
       );
