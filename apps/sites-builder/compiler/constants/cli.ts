@@ -2,7 +2,7 @@ export const USAGE = `notra-sites <command>
 
   validate [--source <dir>] [--target <file>] [--json]  Check settings, MDX and snippets
   build --source <dir> --target <file> --out <dir> [--json]
-  dev [--source <dir>] [--target <file>] [--area blog|changelog] [--port 4321]   (serves every area; --area picks the one "/" redirects to)`;
+  dev [--source <dir>] [--target <file>] [--area blog|changelog] [--port 4321]   (serves the areas with a folder, or those in --target; --area picks where "/" redirects and, without --target, also serves that area)`;
 
 export const DEV_READY_TIMEOUT_MS = 60_000;
 export const DEV_PORT_SEARCH_RANGE = 100;

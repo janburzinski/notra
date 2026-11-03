@@ -38,8 +38,10 @@ npm i -g notra
 notra dev
 ```
 
-Open `http://localhost:4321`. Both `/blog` and `/changelog` are available, and `/`
-redirects to `/blog`. Content, components, CSS, assets and configuration reload
+Open `http://localhost:4321`. The blog is at `/blog` and the changelog at
+`/changelog`, each only when the site has a `blog/` or `changelog/` folder (both
+when it has neither). Restart after adding the other folder. `/` redirects to the
+first one. Content, components, CSS, assets and configuration reload
 when you edit them. If a file has an error, the browser shows it in place of the
 page and reloads once you fix it. Drafts are included, and analytics integrations
 are disabled.

@@ -19,8 +19,9 @@ npx notra@latest dev
 bunx --bun notra@latest dev
 ```
 
-The default address is `http://localhost:4321`. Blog and changelog are served
-under `/blog` and `/changelog`; `/` redirects to the blog. Drafts are included,
+The default address is `http://localhost:4321`. The blog and changelog are served
+under `/blog` and `/changelog` when the site has a `blog/` or `changelog/` folder
+(both when it has neither), and `/` redirects to the first one. Drafts are included,
 and analytics integrations are disabled. Content, styling, components, and
 configuration refresh when their source files change. Stop with Ctrl+C.
 

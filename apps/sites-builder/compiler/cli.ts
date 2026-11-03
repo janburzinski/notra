@@ -33,7 +33,7 @@ import { prepareSite, readSiteFiles } from "./prepare";
 import type { DevAreaServer, RunningDevArea } from "./types/dev-server";
 import { startDevAreas } from "./utils/dev-areas";
 import { createDevRefresh } from "./utils/dev-refresh";
-import { localDefaultConfig } from "./utils/local-options";
+import { localDefaultConfig, localMounts } from "./utils/local-options";
 
 const TOOLCHAIN_ROOT = fileURLToPath(new URL("..", import.meta.url));
 
@@ -135,9 +135,11 @@ async function main() {
     const target = values.target
       ? await readBuildTarget(values.target)
       : undefined;
-    const mounts = normalizeSiteMounts(
-      target?.mounts ?? { blog: "/blog", changelog: "/changelog" }
-    );
+    const { area } = values;
+    if (area !== undefined && area !== "blog" && area !== "changelog") {
+      throw new Error("--area must be blog or changelog");
+    }
+    const mounts = normalizeSiteMounts(localMounts(siteRoot, target, area));
     const defaultConfig = localDefaultConfig(siteRoot, target);
     const requestedPort = Number(values.port ?? "4321");
     if (
@@ -152,9 +154,6 @@ async function main() {
       process.stderr.write(
         `Port ${requestedPort} is in use, using ${port} instead.\n`
       );
-    }
-    if (values.area && values.area !== "blog" && values.area !== "changelog") {
-      throw new Error("--area must be blog or changelog");
     }
     const workDir = await realpath(
       await mkdtemp(join(tmpdir(), "notra-sites-dev-"))
