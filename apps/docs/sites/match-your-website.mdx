@@ -59,7 +59,11 @@ Write your site name and links into the header and footer directly. Both get the
 
 If your blog runs under a path of your website and your main site already saves the light or dark choice, set [`appearance.storageKey`](/sites/customize/design#light-and-dark-mode) to the same key so `<ThemeToggle />` and your main site share it.
 
-With your own header, the navbar IDs like `#topbar-cta-button` don't exist, so use your own class names. When Notra branding is on, Notra adds a small "Powered by Notra" line under your footer.
+With your own header, the navbar IDs like `#topbar-cta-button` don't exist, so use your own class names. Under your footer, Notra adds a row with a "Report abuse" link and, when Notra branding is on, the "Powered by Notra" badge. Style it with `#notra-attribution` so it matches your footer:
+
+```css style.css
+#notra-attribution { background: var(--card); border-color: transparent; }
+```
 
 ## Slots
 
