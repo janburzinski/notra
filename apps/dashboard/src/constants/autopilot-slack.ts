@@ -14,4 +14,7 @@ export const AUTOPILOT_SLACK_KIND_LABELS: Record<AutopilotJobKind, string> = {
   commits: "Recent GitHub work",
   prompts: "Tracked prompts",
   competitors: "Competitors",
+  refresh: "Page refresh",
+  comparisons: "Comparison page",
+  rendering: "AI-readable pages",
 };

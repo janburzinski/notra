@@ -58,6 +58,7 @@ const out = (node: string, path?: string) =>
 const INSIGHTS = [
   out("gather", "prompts.insights"),
   out("gather", "competitors.insights"),
+  out("rendering", "insights"),
 ];
 
 const DRAFT_CONFIG = {
@@ -77,6 +78,13 @@ const contentCall = (observations: string[]): WorkflowNode => ({
     input: { autopilotRunId: RUN, observations },
   },
 });
+
+/** What a picked comparison hands the post writer. */
+const COMPARISON_DRAFT_CONFIG = {
+  proposal: out("comparisons", "proposal"),
+  brief: out("comparisons", "brief"),
+  confidence: out("comparisons", "confidence"),
+};
 
 const ACTED = {
   decision: out("content", "decision"),
@@ -158,6 +166,17 @@ export const AUTOPILOT_DAILY_WORKFLOW: WorkflowDefinition = {
       step("readiness", "autopilot.readiness", at(2, 0), {
         onError: "continue",
       }),
+      step("refresh", "autopilot.refresh", at(2, 2), { onError: "continue" }),
+      step("rendering", "autopilot.rendering", at(2, 3), {
+        onError: "continue",
+      }),
+      step("comparisons", "autopilot.comparisons", at(2, 4), {
+        onError: "continue",
+      }),
+      step("comparison-page", "autopilot.write-post", at(3, 4), {
+        onError: "continue",
+        config: COMPARISON_DRAFT_CONFIG,
+      }),
       contentCall([
         out("gather", "keywords.observations"),
         out("gather", "commits.observations"),
@@ -174,10 +193,17 @@ export const AUTOPILOT_DAILY_WORKFLOW: WorkflowDefinition = {
       edge("start", "close-stale"),
       edge("close-stale", "gather"),
       edge("close-stale", "readiness"),
+      edge("close-stale", "refresh"),
+      edge("close-stale", "rendering"),
+      edge("close-stale", "comparisons"),
+      edge("comparisons", "comparison-page"),
       edge("gather", "content"),
       edge("readiness", "content"),
       edge("gather", "brief"),
       edge("content", "brief"),
+      edge("refresh", "brief"),
+      edge("rendering", "brief"),
+      edge("comparison-page", "brief"),
     ],
     onFailure: {
       type: "autopilot.fail-run",
@@ -258,6 +284,49 @@ const AUTOPILOT_TEMPLATE_WORKFLOWS: WorkflowDefinition[] = [
     AUTOPILOT_TEMPLATE_WORKFLOW_KEYS.commits,
     "Write about releases",
     "commits"
+  ),
+  template(
+    AUTOPILOT_TEMPLATE_WORKFLOW_KEYS.refresh,
+    "Refresh pages AI stopped citing",
+    {
+      nodes: [
+        step("refresh", "autopilot.refresh", at(2, 1), { onError: "continue" }),
+      ],
+      edges: [edge("start", "refresh"), edge("refresh", "finish")],
+    }
+  ),
+  template(
+    AUTOPILOT_TEMPLATE_WORKFLOW_KEYS.comparisons,
+    "Write comparison pages",
+    {
+      nodes: [
+        step("comparisons", "autopilot.comparisons", at(2, 1), {
+          onError: "continue",
+        }),
+        step("comparison-page", "autopilot.write-post", at(3, 1), {
+          onError: "continue",
+          config: COMPARISON_DRAFT_CONFIG,
+        }),
+      ],
+      edges: [
+        edge("start", "comparisons"),
+        edge("comparisons", "comparison-page"),
+        edge("comparison-page", "finish"),
+      ],
+    }
+  ),
+  template(
+    AUTOPILOT_TEMPLATE_WORKFLOW_KEYS.rendering,
+    "Make pages readable for AI",
+    {
+      nodes: [
+        step("rendering", "autopilot.rendering", at(2, 1), {
+          onError: "continue",
+        }),
+      ],
+      edges: [edge("start", "rendering"), edge("rendering", "finish")],
+    },
+    { insights: [out("rendering", "insights")] }
   ),
 ];
 

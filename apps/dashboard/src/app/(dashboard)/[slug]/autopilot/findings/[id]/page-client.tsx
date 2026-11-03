@@ -26,7 +26,10 @@ import {
   AUTOPILOT_FROM_PARAM,
   AUTOPILOT_NAV_LINK,
 } from "@/constants/autopilot";
-import { AUTOPILOT_KIND_META } from "@/constants/autopilot-ui";
+import {
+  AUTOPILOT_KIND_META,
+  AUTOPILOT_PLANNED_KINDS,
+} from "@/constants/autopilot-ui";
 import { TABLE_ROW_HEIGHT } from "@/constants/table";
 import { useAutopilotActions } from "@/lib/hooks/use-autopilot";
 import { dashboardOrpc } from "@/lib/orpc/query";
@@ -113,7 +116,11 @@ function FindingPage({
     evidence.decision?.considered ?? []
   ).map((row, index) => ({ ...row, picked: index === 0 }));
   const idea = finding.status === "suggested";
-  const factCount = 2 + Number(Boolean(impact));
+  // Status, then Confidence for planned kinds and Before → now with an impact.
+  const factCount =
+    1 +
+    Number(AUTOPILOT_PLANNED_KINDS.includes(finding.kind)) +
+    Number(Boolean(impact));
   const canAct =
     overview.canManage &&
     !(writeSuggestion.isPending && writeSuggestion.variables === finding.id);
@@ -225,21 +232,23 @@ function FindingPage({
           <AutopilotFact label="Status">
             <AutopilotFindingStatus finding={finding} />
           </AutopilotFact>
-          <AutopilotFact label="Confidence">
-            {typeof evidence.confidence === "number"
-              ? `${Math.round(evidence.confidence * 100)}%`
-              : "Asked for"}
-            {idea ? (
-              <span className="text-muted-foreground">
-                {" "}
-                · pull requests need{" "}
-                {formatAutopilotPercent(
-                  evidence.decision?.threshold ??
-                    AUTOPILOT_ACTION_MIN_CONFIDENCE
-                )}
-              </span>
-            ) : null}
-          </AutopilotFact>
+          {AUTOPILOT_PLANNED_KINDS.includes(finding.kind) ? (
+            <AutopilotFact label="Confidence">
+              {typeof evidence.confidence === "number"
+                ? `${Math.round(evidence.confidence * 100)}%`
+                : "Asked for"}
+              {idea ? (
+                <span className="text-muted-foreground">
+                  {" "}
+                  · pull requests need{" "}
+                  {formatAutopilotPercent(
+                    evidence.decision?.threshold ??
+                      AUTOPILOT_ACTION_MIN_CONFIDENCE
+                  )}
+                </span>
+              ) : null}
+            </AutopilotFact>
+          ) : null}
           {impact ? (
             <AutopilotFact label="Before → now">
               {describeImpact(impact, finding.status === "merged").text}

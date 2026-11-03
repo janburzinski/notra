@@ -17,6 +17,7 @@ import {
   AUTOPILOT_COMMITS_PAGE_SIZE,
   AUTOPILOT_COMMITS_MAX_REPOSITORIES,
   AUTOPILOT_CONTEXT_FILE_MAX_CHARS,
+  AUTOPILOT_FAILURE_LABELS,
   AUTOPILOT_FINDING_MAX_FAILURES,
   AUTOPILOT_MAX_OBSERVATIONS,
   AUTOPILOT_JEV_MODEL_ID,
@@ -28,6 +29,10 @@ import {
   AUTOPILOT_PULL_REQUEST_CREATED_EVENT,
 } from "@/constants/autopilot";
 import { commitFilterSkipReason } from "@/lib/autopilot/commit-filters";
+import {
+  factCheckComparison,
+  factCheckSection,
+} from "@/lib/autopilot/fact-check";
 import {
   claimFinding,
   syncOfferReactionFeedback,
@@ -60,6 +65,7 @@ import { generateAutopilotObject } from "@/lib/autopilot/llm";
 import { createAutopilotLogger } from "@/lib/autopilot/log";
 import { listReadyTopicObservationIds } from "@/lib/autopilot/memory";
 import { loadDecisionMemory } from "@/lib/autopilot/rules";
+import { loadWritingRules, removeNewDashes } from "@/lib/autopilot/style";
 import { writeBlogPost } from "@/lib/autopilot/writer";
 import { geoCoreDashboardLayer } from "@/lib/geo/configure";
 import { autopilotRuleComplianceSchema } from "@/schemas/autopilot";
@@ -81,10 +87,12 @@ import type {
   AutopilotPostBrief as PostBrief,
   FindingClaim,
 } from "@/types/autopilot-runtime";
+import type { AutopilotFactSource } from "@/types/autopilot-templates-runtime";
 import {
   assertNoActiveContent,
   autopilotBlogSlug,
   detectBlogDirectory,
+  detectComparisonDirectory,
   keywordFingerprint,
   pageToUpdate,
   topQuery,
@@ -110,6 +118,7 @@ import {
   toMergedPullRequest,
 } from "@/utils/autopilot-github";
 import { findPagePath, isSafeRepositoryPath } from "@/utils/autopilot-paths";
+import { forceNoDashes } from "@/utils/autopilot-style";
 import { toErrorMessage } from "@/utils/error-message";
 
 function loadGaps(ctx: AutopilotRunContext) {
@@ -277,6 +286,49 @@ async function openPageUpdate(params: {
   return pullRequest;
 }
 
+/**
+ * The writer's draft, made publishable: no em or en dashes in what it wrote,
+ * and for a comparison page every claim checked against its sources.
+ */
+async function finishPost(params: {
+  ctx: AutopilotRunContext;
+  log: AutopilotLogger;
+  post: BlogFile;
+  previous: string | null;
+  factCheck: { competitor: string; sources: AutopilotFactSource[] } | null;
+  onUsage?: (usage: AgentTokenUsage) => void;
+}): Promise<BlogFile> {
+  const { ctx, log } = params;
+  let content = params.post.content;
+  let pullRequestBody = params.post.pullRequestBody;
+  if (params.factCheck) {
+    const checked = await factCheckComparison({
+      organizationId: ctx.organizationId,
+      log,
+      content,
+      sources: params.factCheck.sources,
+      brand: ctx.brand?.name ?? "the brand",
+      competitor: params.factCheck.competitor,
+      onUsage: params.onUsage,
+    });
+    content = checked.content;
+    pullRequestBody = `${pullRequestBody.trim()}\n\n${factCheckSection(checked.report)}`;
+  }
+  content = await removeNewDashes({
+    organizationId: ctx.organizationId,
+    log,
+    content,
+    previous: params.previous,
+    onUsage: params.onUsage,
+  });
+  return {
+    ...params.post,
+    title: forceNoDashes(params.post.title, null),
+    content,
+    pullRequestBody: forceNoDashes(pullRequestBody, null),
+  };
+}
+
 export async function writeBlogDraft(params: {
   decisionMemory: AutopilotDecisionMemory;
   ctx: AutopilotRunContext;
@@ -296,7 +348,11 @@ export async function writeBlogDraft(params: {
   );
   const baseSha = await getBaseBranchSha(octokit, ctx.repository);
   const paths = await listRepositoryPaths(octokit, ctx.repository, baseSha);
-  const directory = detectBlogDirectory(paths, ctx.contentPath);
+  // Comparison pages go where the site keeps them; most sites have none and use the blog.
+  const directory =
+    (claim.finding.kind === "comparisons"
+      ? detectComparisonDirectory(paths)
+      : null) ?? detectBlogDirectory(paths, ctx.contentPath);
   const postPaths = paths.filter(
     (path) => path.startsWith(`${directory}/`) && MARKDOWN_FILE.test(path)
   );
@@ -318,7 +374,9 @@ export async function writeBlogDraft(params: {
     postPaths,
     page: claim.finding.evidence.updatePage ?? null,
   });
-  const post = await writeBlogPost({
+  const comparison = claim.finding.kind === "comparisons";
+  const sources: AutopilotFactSource[] = [];
+  const written = await writeBlogPost({
     decisionMemory: params.decisionMemory,
     ctx,
     log,
@@ -331,6 +389,29 @@ export async function writeBlogDraft(params: {
     sample: sample ?? null,
     brief,
     existing,
+    writingRules: await loadWritingRules(ctx.organizationId),
+    onSource: comparison ? (source) => sources.push(source) : undefined,
+    onUsage: params.onUsage,
+  });
+  const post = await finishPost({
+    ctx,
+    log,
+    post: written,
+    previous: existing?.content ?? null,
+    factCheck: comparison
+      ? {
+          competitor:
+            claim.finding.evidence.comparison?.competitor ?? "the competitor",
+          sources: [
+            {
+              label: "brand description",
+              text: `${ctx.brand?.name ?? ""}: ${ctx.brand?.description ?? ""}`,
+            },
+            { label: "brief", text: brief.evidence },
+            ...sources,
+          ],
+        }
+      : null,
     onUsage: params.onUsage,
   });
   if (existing) {
@@ -728,8 +809,7 @@ export async function failDraft(params: {
 }) {
   const { claim, log, error } = params;
   const message = toErrorMessage(error, String(error));
-  const label =
-    claim.finding.kind === "readiness" ? "Readiness fix" : "Blog draft";
+  const label = AUTOPILOT_FAILURE_LABELS[claim.finding.kind] ?? "Blog draft";
   if (params.onFailure === "suggest") {
     await returnFindingToSuggested(claim, error);
     await log.error(`${label} failed; it is back on the ideas list`, {

@@ -18,6 +18,8 @@ export async function generateAutopilotObject<T extends z.ZodType>(params: {
   maxOutputTokens?: number;
   /** Reasoning for the retry when the first answer ran out of tokens. */
   retryReasoning?: "low" | "medium";
+  /** Vendor options, e.g. Anthropic thinking effort; thinking counts against maxOutputTokens. */
+  providerOptions?: Record<string, Record<string, unknown>>;
   log: AutopilotLogger;
   /** Reports what the call cost, e.g. to bill an @notra request. */
   onUsage?: (usage: AgentTokenUsage) => void;
@@ -32,7 +34,12 @@ export async function generateAutopilotObject<T extends z.ZodType>(params: {
       maxOutputTokens: params.maxOutputTokens,
       reasoning,
       providerOptions: withRouterDefaults(
-        { gateway: { tags: ["autopilot", params.tag] } },
+        {
+          ...(params.providerOptions as Parameters<
+            typeof withRouterDefaults
+          >[0]),
+          gateway: { tags: ["autopilot", params.tag] },
+        },
         { modelId: params.modelId }
       ),
       ...buildTelemetryOptions({

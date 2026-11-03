@@ -175,27 +175,7 @@ function AutopilotOverviewPage({
 
   return (
     <>
-      <PageHeading title="Autopilot">
-        <div className="flex items-center gap-2">
-          {canManage && activeRun?.workflowKey ? (
-            <AutopilotStopButton
-              organizationId={organizationId}
-              runId={activeRun.id}
-            />
-          ) : null}
-          {canManage ? (
-            <Button
-              disabled={isRunning}
-              loading={runNow.isPending || isRunning}
-              onClick={() => runNow.mutate(undefined)}
-              size="sm"
-            >
-              <HugeiconsIcon icon={PlayIcon} size={16} />
-              Run now
-            </Button>
-          ) : null}
-        </div>
-      </PageHeading>
+      <PageHeading title="Autopilot" />
 
       <Tabs
         onValueChange={(value) => {
@@ -243,9 +223,28 @@ function AutopilotOverviewPage({
               ) : null}
             </IconTabsList>
           </div>
-          {tab === "automations" || tab === "analytics" ? (
-            <AutopilotPeriodSelect onChange={setDays} value={days} />
-          ) : null}
+          <div className="flex items-center gap-2">
+            {tab === "automations" || tab === "analytics" ? (
+              <AutopilotPeriodSelect onChange={setDays} value={days} />
+            ) : null}
+            {canManage && activeRun?.workflowKey ? (
+              <AutopilotStopButton
+                organizationId={organizationId}
+                runId={activeRun.id}
+              />
+            ) : null}
+            {canManage ? (
+              <Button
+                disabled={isRunning}
+                loading={runNow.isPending || isRunning}
+                onClick={() => runNow.mutate(undefined)}
+                size="sm"
+              >
+                <HugeiconsIcon icon={PlayIcon} size={16} />
+                Run now
+              </Button>
+            ) : null}
+          </div>
         </div>
 
         <TabsContent className="mt-4" value="automations">

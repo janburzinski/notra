@@ -10,6 +10,7 @@ import {
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
+import { AUTOPILOT_AUTOMATION_KINDS } from "@notra/db/constants/autopilot";
 import {
   autopilotFindings,
   autopilotRunEvents,
@@ -79,6 +80,26 @@ if (process.env.NOTRA_AUTOPILOT_SANDBOX_TEST !== "1") {
     claimReadinessFix: notRun,
     writeReadinessFix: notRun,
     openReadinessPullRequest: notRun,
+  }));
+  // The templates have their own sandbox in autopilot-template-flows.
+  mock.module("@/lib/autopilot/refresh", () => ({
+    checkRefresh: async () => ({ ready: false, reason: "Not run here" }),
+    claimRefresh: notRun,
+    writeRefresh: notRun,
+    openRefreshPullRequest: notRun,
+  }));
+  mock.module("@/lib/autopilot/rendering", () => ({
+    checkRendering: async () => ({
+      ready: false,
+      reason: "Not run here",
+      insights: [],
+    }),
+    claimRenderingFix: notRun,
+    writeRenderingFix: notRun,
+    openRenderingPullRequest: notRun,
+  }));
+  mock.module("@/lib/autopilot/comparisons", () => ({
+    pickComparison: async () => ({ ready: false, reason: "Not run here" }),
   }));
   mock.module("@/lib/autopilot/prompts", () => ({ runPromptsJob: emptyJob }));
   // Planning is covered by autopilot-flow; here the jobs observe nothing.
@@ -820,10 +841,9 @@ if (process.env.NOTRA_AUTOPILOT_SANDBOX_TEST !== "1") {
     expect(commits?.creditsPerRun).toBe(8);
     // Only the automations that open pull requests are listed.
     expect(week.automations.map((row) => row.kind)).toEqual([
-      "readiness",
-      "keywords",
-      "commits",
+      ...AUTOPILOT_AUTOMATION_KINDS,
     ]);
+    expect(week.automations.map((row) => row.kind)).not.toContain("prompts");
     expect(
       (await loadAutopilotMetrics("sandbox-org", 30, now)).pullRequests
     ).toBe(2);

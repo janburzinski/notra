@@ -86,7 +86,10 @@ export async function writeSuggestedPost(
         "This queued write is no longer active. Try again."
       );
     }
-    const kind = finding.kind === "keywords" ? "keywords" : "commits";
+    const kind =
+      finding.kind === "keywords" || finding.kind === "comparisons"
+        ? finding.kind
+        : "commits";
     const log = createAutopilotLogger({ organizationId, runId }, kind);
     const acquired = await claimSuggestedFinding(
       organizationId,

@@ -81,6 +81,9 @@ export const autopilotJobsSchema = z.object({
   commits: z.boolean(),
   prompts: z.boolean().default(true),
   competitors: z.boolean(),
+  refresh: z.boolean().default(false),
+  comparisons: z.boolean().default(false),
+  rendering: z.boolean().default(false),
 });
 
 export const autopilotSaveInputSchema = autopilotOrganizationInputSchema.extend(

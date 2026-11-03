@@ -636,7 +636,7 @@ export async function countAutonomousProposals(
   return rows.length;
 }
 
-/** Posts being written, waiting as ideas or open as drafts: the planner must not double them. */
+/** Posts and pages being written, waiting as ideas or open as drafts: the planner must not double them. */
 export function listActiveBlogFindings(organizationId: string) {
   return db
     .select({
@@ -651,7 +651,7 @@ export function listActiveBlogFindings(organizationId: string) {
     .where(
       and(
         eq(autopilotFindings.organizationId, organizationId),
-        inArray(autopilotFindings.kind, ["keywords", "commits"]),
+        inArray(autopilotFindings.kind, ["keywords", "commits", "comparisons"]),
         inArray(autopilotFindings.status, ["open", "suggested", "proposed"])
       )
     );
@@ -676,6 +676,21 @@ export function listFindingStatuses(organizationId: string, ids: string[]) {
     );
 }
 
+/** Proposed, merged, dismissed, given up, or auto-closed within its cooldown. */
+function isSettledFinding() {
+  return or(
+    inArray(autopilotFindings.status, [...AUTOPILOT_SETTLED_FINDING_STATUSES]),
+    hasGivenUp(),
+    and(
+      eq(autopilotFindings.status, "expired"),
+      gte(
+        autopilotFindings.dismissedAt,
+        new Date(Date.now() - AUTOPILOT_EXPIRED_COOLDOWN_MS)
+      )
+    )
+  );
+}
+
 /** Fingerprints a job must not propose again, so it can skip them before spending tokens. */
 export async function listSettledFingerprints(
   organizationId: string,
@@ -688,22 +703,25 @@ export async function listSettledFingerprints(
       and(
         eq(autopilotFindings.organizationId, organizationId),
         eq(autopilotFindings.kind, kind),
-        or(
-          inArray(autopilotFindings.status, [
-            ...AUTOPILOT_SETTLED_FINDING_STATUSES,
-          ]),
-          hasGivenUp(),
-          and(
-            eq(autopilotFindings.status, "expired"),
-            gte(
-              autopilotFindings.dismissedAt,
-              new Date(Date.now() - AUTOPILOT_EXPIRED_COOLDOWN_MS)
-            )
-          )
-        )
+        isSettledFinding()
       )
     );
   return new Set(rows.map((row) => row.fingerprint));
+}
+
+/** Pages a settled rendering finding covered; a new page set must not bring them back. */
+export async function listSettledRenderingPages(organizationId: string) {
+  const rows = await db
+    .select({ evidence: autopilotFindings.evidence })
+    .from(autopilotFindings)
+    .where(
+      and(
+        eq(autopilotFindings.organizationId, organizationId),
+        eq(autopilotFindings.kind, "rendering"),
+        isSettledFinding()
+      )
+    );
+  return rows.flatMap((row) => row.evidence.pageUrls ?? []);
 }
 
 /** Readiness issues whose fix pull request was closed; Autopilot stops proposing them. */

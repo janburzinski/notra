@@ -84,6 +84,54 @@ export interface AutopilotFindingEvidence {
   } | null;
   /** When a 👍 action started; another 👍 waits until it settles or goes stale. */
   slackActingAt?: string;
+  /** The page a refresh or rendering fix is about. */
+  pageUrl?: string | null;
+  /** Every page a rendering finding covers; kept when it settles without a change. */
+  pageUrls?: string[];
+  /** Why a page is refreshed: AI citations before and now, and who took them. */
+  citations?: AutopilotCitationDrop | null;
+  /** What the refresh kept, updated, added and cut, one line per section. */
+  audit?: AutopilotPageAudit | null;
+  /** What AI crawlers get from a page compared with a browser. */
+  rendering?: AutopilotRenderingIssue | null;
+  /** The competitor and prompts a comparison page answers. */
+  comparison?: AutopilotComparisonTarget | null;
+}
+
+export interface AutopilotCitationDrop {
+  /** Share of answers to the page's prompts that cited it, 0 to 1. */
+  before: number;
+  now: number;
+  /** Prompts whose answers cited the page before and no longer do. */
+  lostPrompts: string[];
+  /** Pages the engines cite instead on those prompts, most cited first. */
+  citedInstead: string[];
+  /** What the engines searched for while answering those prompts. */
+  searches: string[];
+}
+
+export interface AutopilotPageAudit {
+  keep: string[];
+  update: string[];
+  add: string[];
+  cut: string[];
+}
+
+export interface AutopilotRenderingIssue {
+  url: string;
+  issue: "missing_content" | "blocked";
+  /** Words an AI crawler gets without running JavaScript. */
+  rawWords: number;
+  /** Words a browser shows after JavaScript ran. */
+  renderedWords: number;
+  /** Status an AI crawler gets; null when the request failed. */
+  status: number | null;
+}
+
+export interface AutopilotComparisonTarget {
+  competitor: string;
+  format: "versus" | "alternatives";
+  prompts: string[];
 }
 
 export interface AutopilotFindingDecision {
@@ -97,11 +145,13 @@ export interface AutopilotFindingDecision {
 
 /**
  * prompt: share of AI answers that name the brand (0 to 1). search: average
- * Search Console position. Readiness fixes use the report score instead.
+ * Search Console position. citations: share of AI answers to the page's
+ * prompts that cite the page (0 to 1). Readiness fixes use the report score.
  */
 export type AutopilotImpactTarget =
   | { kind: "prompt"; promptId: string; before: number }
-  | { kind: "search"; query: string; before: number | null };
+  | { kind: "search"; query: string; before: number | null }
+  | { kind: "citations"; url: string; promptIds: string[]; before: number };
 
 export interface AutopilotRunSummary {
   findings: number;

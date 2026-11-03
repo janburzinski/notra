@@ -4,7 +4,7 @@ import type { FindingClaim } from "@/types/autopilot-runtime";
 
 /** Retries of one attempt reuse its branch; a new claim can never share it. */
 export function autopilotDraftBranchSlug(
-  prefix: "blog" | "readiness",
+  prefix: "blog" | "readiness" | "refresh" | "comparison" | "rendering",
   claim: FindingClaim
 ) {
   const attempt = createHash("sha256")

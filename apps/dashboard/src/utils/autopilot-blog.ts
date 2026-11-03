@@ -12,6 +12,7 @@ import {
   AUTOPILOT_MARKDOWN_FILE,
   AUTOPILOT_SEARCH_GAP_MIN_IMPRESSIONS,
 } from "@/constants/autopilot";
+import { AUTOPILOT_COMPARISON_DIRECTORY_HINTS } from "@/constants/autopilot-comparisons";
 import { normalizeRepositoryDirectory } from "@/utils/autopilot-paths";
 
 export function autopilotBlogSlug(value: string) {
@@ -35,6 +36,16 @@ export function detectBlogDirectory(
     AUTOPILOT_BLOG_DIRECTORY_HINTS.find((hint) =>
       markdown.some((path) => path.startsWith(`${hint}/`))
     ) ?? "content/blog"
+  );
+}
+
+/** A directory the site keeps comparison pages in, when it has one with Markdown. */
+export function detectComparisonDirectory(paths: string[]) {
+  const markdown = paths.filter((path) => AUTOPILOT_MARKDOWN_FILE.test(path));
+  return (
+    AUTOPILOT_COMPARISON_DIRECTORY_HINTS.find((hint) =>
+      markdown.some((path) => path.startsWith(`${hint}/`))
+    ) ?? null
   );
 }
 

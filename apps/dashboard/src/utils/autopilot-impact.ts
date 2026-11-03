@@ -1,7 +1,7 @@
 import type { AutopilotImpact } from "@/types/autopilot-runtime";
 
 function formatValue(metric: AutopilotImpact["metric"], value: number) {
-  if (metric === "mentions") {
+  if (metric === "mentions" || metric === "citations") {
     return `${Math.round(value * 100)}%`;
   }
   if (metric === "position") {

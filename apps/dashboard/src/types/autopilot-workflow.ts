@@ -10,6 +10,10 @@ import type * as z from "zod";
 import type { renderBlogDraftHeroImage } from "@/lib/autopilot/blog";
 import type { writeReadinessFix } from "@/lib/autopilot/readiness";
 import type {
+  AutopilotRenderingCheck,
+  writeRenderingFix,
+} from "@/lib/autopilot/rendering";
+import type {
   autopilotRunConfigSchema,
   finishConfigSchema,
   gatherConfigSchema,
@@ -22,6 +26,10 @@ import type {
   AutopilotReadinessCheck,
   FindingClaim,
 } from "@/types/autopilot-runtime";
+import type {
+  AutopilotRefreshCheck,
+  AutopilotRefreshFix,
+} from "@/types/autopilot-templates-runtime";
 
 export type AutopilotBlockContext = WorkflowBlockContext<
   z.output<typeof autopilotRunConfigSchema>
@@ -36,6 +44,7 @@ export type WorkflowBlockFinalizerContext = WorkflowBlockStepContext<
   }
 > & { outcome: WorkflowNodeOutcome };
 
+export type AutopilotRunConfig = z.output<typeof autopilotRunConfigSchema>;
 export type ProposalConfig = z.output<typeof proposalConfigSchema>;
 export type GatherConfig = z.output<typeof gatherConfigSchema>;
 export type FinishConfig = z.output<typeof finishConfigSchema>;
@@ -62,5 +71,21 @@ export interface ReadinessState extends Record<string, unknown> {
   claim: FindingClaim;
   reservation: GitHubMentionBillingReservation;
   fix: Awaited<ReturnType<typeof writeReadinessFix>>;
+  usage: (AgentTokenUsage | null)[];
+}
+
+export interface RefreshState extends Record<string, unknown> {
+  check: AutopilotRefreshCheck;
+  claim: FindingClaim;
+  reservation: GitHubMentionBillingReservation;
+  fix: AutopilotRefreshFix | null;
+  usage: (AgentTokenUsage | null)[];
+}
+
+export interface RenderingState extends Record<string, unknown> {
+  check: Extract<AutopilotRenderingCheck, { ready: true }>;
+  claim: FindingClaim;
+  reservation: GitHubMentionBillingReservation;
+  fix: Awaited<ReturnType<typeof writeRenderingFix>>;
   usage: (AgentTokenUsage | null)[];
 }

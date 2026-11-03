@@ -19,6 +19,7 @@ import {
 } from "@/constants/autopilot";
 import type { AutopilotRepository } from "@/types/autopilot";
 import type { AutopilotOctokit } from "@/types/autopilot-runtime";
+import { fixNumericRanges, forceNoDashes } from "@/utils/autopilot-style";
 
 export class AutopilotRepositoryAccessError extends Error {
   override name = "AutopilotRepositoryAccessError";
@@ -241,6 +242,10 @@ export async function openAutopilotPullRequest(params: {
   headSha: string;
 }> {
   const { octokit, repository } = params;
+  // Every template's pull request text reads without em or en dashes.
+  // "10–20%" becomes "10-20%" first; only then do dashes become commas.
+  const title = forceNoDashes(fixNumericRanges(params.title), null);
+  const body = forceNoDashes(fixNumericRanges(params.body.trim()), null);
   const branch = `${AUTOPILOT_BRANCH_PREFIX}/${params.slug}`;
   // An earlier attempt for this finding got as far as the pull request:
   // return it as is, so a retry never commits over someone's review edits.
@@ -290,15 +295,15 @@ export async function openAutopilotPullRequest(params: {
     repo: repository.name,
     branch,
     expectedHeadOid: baseSha,
-    headline: params.title,
+    headline: title,
     files: params.files,
   });
   const pullRequest = await createDraftPullRequest({
     octokit,
     owner: repository.owner,
     repo: repository.name,
-    title: params.title,
-    body: `${params.body.trim()}\n\n---\n\n${AUTOPILOT_PULL_REQUEST_FOOTER}`,
+    title,
+    body: `${body}\n\n---\n\n${AUTOPILOT_PULL_REQUEST_FOOTER}`,
     head: branch,
     base: repository.branch,
   });

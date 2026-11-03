@@ -39,8 +39,26 @@ import type {
   AutopilotPostBrief,
   BlogFile,
 } from "@/types/autopilot-runtime";
+import type { AutopilotFactSource } from "@/types/autopilot-templates-runtime";
 import { autopilotDraftIssue } from "@/utils/autopilot-draft";
 import { describeAutopilotToolCall } from "@/utils/autopilot-events";
+
+/**
+ * The text a tool returned. Objects keep their string fields as they are:
+ * JSON-encoding them would turn line breaks into "\n" and break quotes.
+ */
+function sourceText(output: unknown): string {
+  if (typeof output === "string") {
+    return output;
+  }
+  if (Array.isArray(output)) {
+    return output.map(sourceText).join("\n");
+  }
+  if (output && typeof output === "object") {
+    return Object.values(output).map(sourceText).filter(Boolean).join("\n");
+  }
+  return output === null || output === undefined ? "" : String(output);
+}
 
 /**
  * Researches before writing: reads related posts in the repository and the
@@ -61,6 +79,10 @@ export async function writeBlogPost(params: {
   brief: AutopilotPostBrief;
   /** Rewrite this file instead of writing a new post. */
   existing?: { path: string; content: string } | null;
+  /** The workspace's writing rules (its "unslop" skill). */
+  writingRules?: string | null;
+  /** Gets every page and file the writer read, e.g. for a fact check. */
+  onSource?: (source: AutopilotFactSource) => void;
   onUsage?: (usage: AgentTokenUsage) => void;
 }): Promise<BlogFile> {
   const { ctx, log, brief } = params;
@@ -138,6 +160,9 @@ export async function writeBlogPost(params: {
     ctx.brand?.customInstructions
       ? `House rules from the brand, follow them: ${ctx.brand.customInstructions}`
       : "",
+    params.writingRules
+      ? `Writing rules, apply them to the title, description and every sentence. Never use em dashes or en dashes.\n${params.writingRules}`
+      : "Never use em dashes or en dashes.",
   ]
     .filter(Boolean)
     .join(" ");
@@ -219,6 +244,15 @@ export async function writeBlogPost(params: {
           );
           for (const call of calls) {
             await log.info(describeAutopilotToolCall(call.tool, call.input));
+          }
+          for (const toolResult of step.toolResults) {
+            if (toolResult && params.onSource) {
+              const input = toolResult.input as { path?: string; url?: string };
+              params.onSource({
+                label: input.url ?? input.path ?? toolResult.toolName,
+                text: sourceText(toolResult.output),
+              });
+            }
           }
           await log.trace(`Writer step ${stepNumber}`, {
             text: step.text,

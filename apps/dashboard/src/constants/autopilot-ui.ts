@@ -2,6 +2,7 @@ import {
   AiMagicIcon,
   AlertCircleIcon,
   Archive02Icon,
+  BalanceScaleIcon,
   BulbIcon,
   Calendar03Icon,
   Cancel01Icon,
@@ -17,12 +18,14 @@ import {
   MinusSignCircleIcon,
   PencilEdit02Icon,
   PlayIcon,
+  RefreshIcon,
   Robot01Icon,
   Rocket01Icon,
   Search01Icon,
   SlackIcon,
   Tick02Icon,
   UserGroupIcon,
+  ViewIcon,
 } from "@hugeicons/core-free-icons";
 import type { IconSvgElement } from "@hugeicons/react";
 import type {
@@ -213,6 +216,12 @@ export const AUTOPILOT_TRIGGER_ICONS: Record<
   onboarding: Rocket01Icon,
 };
 
+/** Kinds whose pull requests come from the planner's confidence; templates act on evidence instead. */
+export const AUTOPILOT_PLANNED_KINDS: readonly AutopilotJobKind[] = [
+  "keywords",
+  "commits",
+];
+
 /** Short labels for anything Autopilot did, e.g. the automation of a pull request. */
 export const AUTOPILOT_KIND_META: Record<
   AutopilotJobKind,
@@ -223,6 +232,9 @@ export const AUTOPILOT_KIND_META: Record<
   commits: { label: "Releases", icon: GitBranchIcon },
   prompts: { label: "Prompts", icon: AiMagicIcon },
   competitors: { label: "Competitors", icon: UserGroupIcon },
+  refresh: { label: "Page refresh", icon: RefreshIcon },
+  comparisons: { label: "Comparisons", icon: BalanceScaleIcon },
+  rendering: { label: "AI-readable pages", icon: ViewIcon },
 };
 
 /** How one automation in a run ended, as the run panel's section badge. */
@@ -296,6 +308,33 @@ export const AUTOPILOT_AUTOMATIONS: Record<
     noun: "post",
     alsoOn: "And when a pull request ships",
   },
+  refresh: {
+    name: "Refresh pages AI stopped citing",
+    description:
+      "Finds your pages that AI answers cite less than before and opens a pull request with targeted updates.",
+    source: "Your pages in AI citations",
+    output: "Opens a pull request",
+    noun: "refresh",
+    alsoOn: null,
+  },
+  comparisons: {
+    name: "Write comparison pages",
+    description:
+      "Drafts a comparison page when AI answers to comparison questions show a competitor and not you.",
+    source: "Comparison prompts you lose",
+    output: "Writes a page",
+    noun: "page",
+    alsoOn: null,
+  },
+  rendering: {
+    name: "Make pages readable for AI",
+    description:
+      "Checks what AI crawlers get from your key pages and opens a pull request when content only shows up with JavaScript.",
+    source: "Your pages, fetched like an AI crawler",
+    output: "Opens a pull request",
+    noun: "fix",
+    alsoOn: null,
+  },
 };
 
 /** One automation's outcome in a run, by the level it was logged at. */
@@ -318,6 +357,9 @@ export const AUTOPILOT_AUTOMATION_SLUGS: Record<
   readiness: "agent-readiness",
   keywords: "content-gaps",
   commits: "releases",
+  refresh: "page-refresh",
+  comparisons: "comparison-pages",
+  rendering: "ai-readable-pages",
 };
 
 /** GitHub's merge buttons, in GitHub's words; squash is the default. */

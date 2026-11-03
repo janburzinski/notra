@@ -64,6 +64,16 @@ export function describeFindingReason(
   if (finding.kind === "readiness") {
     return "Fixes website issues found by the readiness scan.";
   }
+  const { citations, rendering, comparison } = finding.evidence;
+  if (finding.kind === "refresh" && citations) {
+    return `AI answers cited this page ${percent(citations.before)} of the time a month ago and ${percent(citations.now)} now.`;
+  }
+  if (finding.kind === "rendering" && rendering) {
+    return `AI crawlers get ${rendering.rawWords} of the ${rendering.renderedWords} words a browser shows on this page.`;
+  }
+  if (finding.kind === "comparisons" && comparison) {
+    return `AI answers to ${comparison.prompts.length} comparison questions name ${comparison.competitor} and not you.`;
+  }
   const confidence = finding.evidence.confidence;
   const threshold =
     finding.evidence.decision?.threshold ?? AUTOPILOT_ACTION_MIN_CONFIDENCE;

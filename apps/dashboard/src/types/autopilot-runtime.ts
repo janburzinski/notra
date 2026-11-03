@@ -71,7 +71,13 @@ export type AutopilotProposeMode =
 
 export type AutopilotPostBrief = NonNullable<AutopilotFindingEvidence["brief"]>;
 
-export type AutopilotObservationJob = Exclude<AutopilotJobKind, "readiness">;
+/** Jobs that run as their own block and open their pull request directly. */
+type AutopilotDirectJob = "readiness" | "refresh" | "comparisons" | "rendering";
+
+export type AutopilotObservationJob = Exclude<
+  AutopilotJobKind,
+  AutopilotDirectJob
+>;
 
 export type AutopilotBlogDraft =
   | { kind: "update"; baseSha: string; post: BlogFile; existingPath: string }
@@ -148,11 +154,12 @@ export interface AutopilotKeywordCandidate {
 
 /**
  * Before and after for one pull request. mentions: share of AI answers naming
- * the brand (0 to 1); position: Search Console position (lower is better);
- * score: agent readiness score. after is null until there is data after the merge.
+ * the brand (0 to 1); citations: share of AI answers citing the page (0 to 1);
+ * position: Search Console position (lower is better); score: agent readiness
+ * score. after is null until there is data after the merge.
  */
 export interface AutopilotImpact {
-  metric: "mentions" | "position" | "score";
+  metric: "mentions" | "citations" | "position" | "score";
   before: number | null;
   after: number | null;
 }

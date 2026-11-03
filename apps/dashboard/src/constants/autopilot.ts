@@ -282,12 +282,16 @@ export const AUTOPILOT_BLOG_DIRECTORY_HINTS = [
   "_posts",
 ];
 
+/** Templates added after launch start off; a workspace turns them on. */
 export const AUTOPILOT_DEFAULT_JOBS = {
   readiness: true,
   keywords: true,
   commits: true,
   prompts: true,
   competitors: true,
+  refresh: false,
+  comparisons: false,
+  rendering: false,
 } as const;
 
 export const AUTOPILOT_FLAG_TIMEOUT_MS = 2000;
@@ -357,6 +361,16 @@ export const AUTOPILOT_RUN_TRIGGER_LABELS = {
   suggestion: "Suggestion written",
 } as const;
 
+/** What a failed write is called in the run log; posts are "Blog draft". */
+export const AUTOPILOT_FAILURE_LABELS: Partial<
+  Record<AutopilotJobKind, string>
+> = {
+  readiness: "Readiness fix",
+  refresh: "Page refresh",
+  comparisons: "Comparison page",
+  rendering: "AI-readable pages fix",
+};
+
 /** Short job names at the start of each run log line. */
 export const AUTOPILOT_RUN_LOG_TAGS: Record<string, string> = {
   readiness: "readiness",
@@ -364,6 +378,9 @@ export const AUTOPILOT_RUN_LOG_TAGS: Record<string, string> = {
   commits: "releases",
   prompts: "prompts",
   competitors: "competitors",
+  refresh: "refresh",
+  comparisons: "comparisons",
+  rendering: "ai-readable",
   run: "run",
 };
 
@@ -375,6 +392,9 @@ export const AUTOPILOT_RUN_SECTIONS: {
   { job: "readiness", label: "Fix agent readiness" },
   { job: "keywords", label: "Write for content gaps" },
   { job: "commits", label: "Write about releases" },
+  { job: "refresh", label: "Refresh pages AI stopped citing" },
+  { job: "comparisons", label: "Write comparison pages" },
+  { job: "rendering", label: "Make pages readable for AI" },
   { job: "prompts", label: "Prompt cleanup" },
   { job: "competitors", label: "Competitors" },
   { job: null, label: "Cleanup and brief" },

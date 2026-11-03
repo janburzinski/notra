@@ -16,4 +16,7 @@ export const AUTOPILOT_TEMPLATE_WORKFLOW_KEYS = {
   readiness: "autopilot.readiness",
   keywords: "autopilot.content-gaps",
   commits: "autopilot.releases",
+  refresh: "autopilot.refresh",
+  comparisons: "autopilot.comparisons",
+  rendering: "autopilot.rendering",
 } as const satisfies Record<AutopilotAutomationKind, string>;

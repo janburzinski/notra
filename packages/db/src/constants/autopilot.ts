@@ -4,6 +4,9 @@ export const AUTOPILOT_JOB_KINDS = [
   "commits",
   "prompts",
   "competitors",
+  "refresh",
+  "comparisons",
+  "rendering",
 ] as const;
 
 /**
@@ -15,6 +18,9 @@ export const AUTOPILOT_AUTOMATION_KINDS = [
   "readiness",
   "keywords",
   "commits",
+  "refresh",
+  "comparisons",
+  "rendering",
 ] as const satisfies readonly (typeof AUTOPILOT_JOB_KINDS)[number][];
 
 /**

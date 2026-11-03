@@ -1,5 +1,6 @@
 import { describe, expect, test } from "bun:test";
 
+import { AUTOPILOT_AUTOMATION_KINDS } from "@notra/db/constants/autopilot";
 import { renderToStaticMarkup } from "react-dom/server";
 
 import {
@@ -20,9 +21,9 @@ const actions: AutopilotTemplateActions = {
 describe("Autopilot templates", () => {
   test("shows the complete gallery without prototype controls or fake workspace data", () => {
     const html = renderToStaticMarkup(<AutopilotTemplatesPage {...actions} />);
-    expect(html.match(/<article/g)).toHaveLength(3);
+    expect(html.match(/<article/g)).toHaveLength(6);
     expect(html).not.toContain("Not yet available");
-    expect(html.match(/>Enable template<\/button>/g)).toHaveLength(3);
+    expect(html.match(/>Enable template<\/button>/g)).toHaveLength(6);
     expect(html).not.toContain("Dominik");
     expect(html).not.toContain("Keep pricing page in sync");
     expect(html).not.toContain("Create");
@@ -32,8 +33,8 @@ describe("Autopilot templates", () => {
     const html = renderToStaticMarkup(
       <AutopilotTemplatesPage {...actions} canManage={false} />
     );
-    expect(html.match(/<article/g)).toHaveLength(3);
-    expect(html.match(/<button[^>]*disabled=""/g)).toHaveLength(3);
+    expect(html.match(/<article/g)).toHaveLength(6);
+    expect(html.match(/<button[^>]*disabled=""/g)).toHaveLength(6);
     expect(html).toContain("Ask a workspace admin to enable templates.");
   });
 
@@ -46,13 +47,13 @@ describe("Autopilot templates", () => {
         jobs={{ readiness: true }}
       />
     );
-    expect(html.match(/<button[^>]*disabled=""/g)).toHaveLength(2);
+    expect(html.match(/<button[^>]*disabled=""/g)).toHaveLength(5);
     expect(html).toContain("Open automation");
     expect(html).toContain("Active");
     const pending = renderToStaticMarkup(
       <AutopilotTemplatesPage {...actions} isAdding />
     );
-    expect(pending.match(/<button[^>]*disabled=""/g)).toHaveLength(3);
+    expect(pending.match(/<button[^>]*disabled=""/g)).toHaveLength(6);
   });
 
   test("featured templates are visible to members and available kinds match real jobs", () => {
@@ -63,13 +64,11 @@ describe("Autopilot templates", () => {
         onMore={() => undefined}
       />
     );
-    expect(html.match(/<article/g)).toHaveLength(3);
+    expect(html.match(/<article/g)).toHaveLength(6);
     expect(html).toContain("Browse templates");
-    expect(AUTOPILOT_TEMPLATES.map((template) => template.kind)).toEqual([
-      "readiness",
-      "keywords",
-      "commits",
-    ]);
+    expect(AUTOPILOT_TEMPLATES.map((template) => template.kind).sort()).toEqual(
+      [...AUTOPILOT_AUTOMATION_KINDS].sort()
+    );
   });
 
   test("featured templates hide automations that are already on", () => {
@@ -80,7 +79,7 @@ describe("Autopilot templates", () => {
         onMore={() => undefined}
       />
     );
-    expect(html.match(/<article/g)).toHaveLength(2);
+    expect(html.match(/<article/g)).toHaveLength(5);
     expect(html).not.toContain("Fix agent readiness");
     expect(html).not.toContain("Open automation");
   });
@@ -89,7 +88,9 @@ describe("Autopilot templates", () => {
     const html = renderToStaticMarkup(
       <AutopilotTemplatesSection
         {...actions}
-        jobs={{ readiness: true, keywords: true, commits: true }}
+        jobs={Object.fromEntries(
+          AUTOPILOT_AUTOMATION_KINDS.map((kind) => [kind, true])
+        )}
         onMore={() => undefined}
       />
     );

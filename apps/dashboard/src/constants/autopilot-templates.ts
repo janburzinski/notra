@@ -1,7 +1,10 @@
 import {
+  BalanceScaleIcon,
   GitBranchIcon,
+  RefreshIcon,
   Robot01Icon,
   Search01Icon,
+  ViewIcon,
 } from "@hugeicons/core-free-icons";
 
 import type {
@@ -25,6 +28,9 @@ export const AUTOPILOT_TEMPLATE_TONES: Record<
   readiness: "info",
   keywords: "warning",
   commits: "success",
+  refresh: "warning",
+  comparisons: "info",
+  rendering: "destructive",
 };
 
 export const AUTOPILOT_TEMPLATES: AutopilotTemplate[] = [
@@ -43,6 +49,20 @@ export const AUTOPILOT_TEMPLATES: AutopilotTemplate[] = [
     trigger: "run",
   },
   {
+    id: "rendering",
+    kind: "rendering",
+    name: "Make pages readable for AI",
+    description:
+      "Fetches your key pages like ChatGPT does and fixes content that only shows up with JavaScript.",
+    instructions:
+      "Fetch the homepage, the pages AI cites and the sitemap's main pages without JavaScript and compare them with the rendered page. When most of the content is missing, render it on the server; never add copy.",
+    category: "site",
+    icon: ViewIcon,
+    source: "Your pages, fetched like an AI crawler",
+    output: "pull_request",
+    trigger: "run",
+  },
+  {
     id: "keywords",
     kind: "keywords",
     name: "Write for content gaps",
@@ -53,6 +73,34 @@ export const AUTOPILOT_TEMPLATES: AutopilotTemplate[] = [
     category: "content",
     icon: Search01Icon,
     source: "Prompts and searches you lose",
+    output: "post",
+    trigger: "run",
+  },
+  {
+    id: "refresh",
+    kind: "refresh",
+    name: "Refresh pages AI stopped citing",
+    description:
+      "Updates pages AI answers cite less than a month ago, with targeted edits based on what the engines now search and cite.",
+    instructions:
+      "Compare how often AI answers cited each of your pages this month and last. For the page that dropped most, audit each section against the searches and the pages cited instead, then open a pull request with targeted edits.",
+    category: "content",
+    icon: RefreshIcon,
+    source: "Your pages in AI citations",
+    output: "pull_request",
+    trigger: "drop",
+  },
+  {
+    id: "comparisons",
+    kind: "comparisons",
+    name: "Write comparison pages",
+    description:
+      "Drafts a fair comparison page when AI answers to comparison questions name a competitor and not you.",
+    instructions:
+      "Find comparison and alternatives questions where AI answers name a competitor and leave you out. Draft a comparison page for the competitor that loses you the most, sourced from the answers and its own site.",
+    category: "content",
+    icon: BalanceScaleIcon,
+    source: "Comparison prompts you lose",
     output: "post",
     trigger: "run",
   },
