@@ -134,7 +134,11 @@ function RootDocument({ children }: { children: ReactNode }) {
                 : {}),
             }}
           >
-            <ConsentBanner />
+            <ConsentBanner
+              variant="floating"
+              position="bottom-left"
+              layout={[["reject", "accept"], "customize"]}
+            />
             <ConsentDialog />
             {process.env.NODE_ENV !== "production" && <DevTools />}
             <FlagsProvider
