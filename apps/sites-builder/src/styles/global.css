@@ -292,6 +292,43 @@ body {
     z-index: 10;
   }
 
+  .page-actions-copy-swap {
+    display: grid;
+  }
+  .page-actions-copy-swap > * {
+    grid-area: 1 / 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.375rem;
+    transition-property: opacity, translate, filter, visibility;
+    transition-duration: 280ms;
+    transition-delay: 70ms;
+    transition-timing-function: cubic-bezier(0.23, 1, 0.32, 1);
+  }
+  .page-actions-copy-swap > :last-child,
+  [data-copied] .page-actions-copy-swap > :first-child {
+    visibility: hidden;
+    opacity: 0;
+    filter: blur(4px);
+    translate: 0 0.45em;
+    transition-duration: 360ms;
+    transition-delay: 0s;
+    transition-timing-function: cubic-bezier(0.45, 0, 0.25, 1);
+  }
+  [data-copied] .page-actions-copy-swap > :first-child {
+    translate: 0 -0.45em;
+  }
+  [data-copied] .page-actions-copy-swap > :last-child {
+    visibility: visible;
+    opacity: 1;
+    filter: none;
+    translate: none;
+    transition-duration: 280ms;
+    transition-delay: 70ms;
+    transition-timing-function: cubic-bezier(0.23, 1, 0.32, 1);
+  }
+
   .post-meta {
     color: var(--muted-foreground);
     font-family: var(--font-code);
