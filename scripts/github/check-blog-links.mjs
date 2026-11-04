@@ -5,7 +5,8 @@ import { join } from "node:path";
 const dir = "apps/web/src/content/blog";
 const publicDir = "apps/web/public";
 const base = "https://www.usenotra.com/blog/";
-const excluded = /^https:\/\/(x\.com|demo\.usenotra\.com|claude\.ai)\//;
+const excluded =
+  /^https:\/\/(x\.com|demo\.usenotra\.com|claude\.ai|chatgpt\.com)\//;
 const linkPattern = /(?:\]\(|href="|src=")([^)"\s]+)/g;
 
 const links = new Map();
