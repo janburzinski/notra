@@ -61,6 +61,43 @@ async function enqueueOrSkip(
   }
 }
 
+/**
+ * One job per site and delivery: GitHub redelivers the same delivery id, so
+ * a retry finds the sites it already queued instead of building them again.
+ */
+function deliveryJobKey(deliveryId: string, siteId: string) {
+  return `github:${deliveryId}:${siteId}`;
+}
+
+/**
+ * Queues every site even when one fails, so a failure cannot leave later
+ * sites unbuilt. Any failure still fails the delivery for a redelivery.
+ */
+async function enqueueForEachSite(
+  siteList: readonly Site[],
+  enqueue: (site: Site) => Promise<string | null>
+): Promise<string[]> {
+  const jobIds: string[] = [];
+  const failures: unknown[] = [];
+  for (const site of siteList) {
+    try {
+      const jobId = await enqueue(site);
+      if (jobId) {
+        jobIds.push(jobId);
+      }
+    } catch (error) {
+      failures.push(error);
+    }
+  }
+  if (failures.length === 1) {
+    throw failures[0];
+  }
+  if (failures.length > 1) {
+    throw new AggregateError(failures, "Some sites could not be queued");
+  }
+  return jobIds;
+}
+
 async function isPreviewOpen(
   siteId: string,
   previewKey: string
@@ -129,7 +166,10 @@ async function sitesForRepository(
     .then((rows) => rows.map(({ site }) => site));
 }
 
-async function handlePush(payload: PushPayload): Promise<string[]> {
+async function handlePush(
+  payload: PushPayload,
+  deliveryId: string
+): Promise<string[]> {
   if (
     !payload.ref.startsWith(BRANCH_REF_PREFIX) ||
     payload.deleted ||
@@ -145,11 +185,11 @@ async function handlePush(payload: PushPayload): Promise<string[]> {
     commitMessage: payload.head_commit?.message?.split("\n")[0] ?? null,
     commitAuthor: payload.head_commit?.author?.name ?? null,
   } as const;
-  const jobIds: string[] = [];
-  for (const site of await sitesForRepository(
+  const siteList = await sitesForRepository(
     payload.repository.id,
     payload.installation?.id
-  )) {
+  );
+  return await enqueueForEachSite(siteList, async (site) => {
     const previewKey =
       branch === site.productionBranch
         ? null
@@ -158,24 +198,21 @@ async function handlePush(payload: PushPayload): Promise<string[]> {
       previewKey &&
       !(site.previewsEnabled && (await isPreviewOpen(site.id, previewKey)))
     ) {
-      continue;
+      return null;
     }
     if (!pushTouchesRootDirectory(payload, site.rootDirectory)) {
-      continue;
+      return null;
     }
-    const jobId = await enqueueOrSkip({
+    return await enqueueOrSkip({
       deduplicateCommit: !previewKey,
+      dedupeKey: deliveryJobKey(deliveryId, site.id),
       ...commit,
       siteId: site.id,
       kind: previewKey ? "preview" : "production",
       previewKey,
       githubRepositoryId: String(payload.repository.id),
     });
-    if (jobId) {
-      jobIds.push(jobId);
-    }
-  }
-  return jobIds;
+  });
 }
 
 /**
@@ -202,21 +239,22 @@ function pullRequestPathsLookup() {
 }
 
 async function handlePullRequest(
-  payload: PullRequestPayload
+  payload: PullRequestPayload,
+  deliveryId: string
 ): Promise<string[]> {
   const previewKey = pullRequestPreviewKey(payload.number);
   const pullRequestTouchesRootDirectory = pullRequestPathsLookup();
-  const jobIds: string[] = [];
-  for (const site of await sitesForRepository(
+  const siteList = await sitesForRepository(
     payload.repository.id,
     payload.installation?.id
-  )) {
+  );
+  return await enqueueForEachSite(siteList, async (site) => {
+    const dedupeKey = deliveryJobKey(deliveryId, site.id);
     if (payload.action === "closed") {
-      jobIds.push(await enqueuePreviewRemoval(site.id, previewKey));
-      continue;
+      return await enqueuePreviewRemoval(site.id, previewKey, dedupeKey);
     }
     if (!(PREVIEW_PR_ACTIONS.has(payload.action) && site.previewsEnabled)) {
-      continue;
+      return null;
     }
     const fromSameRepository =
       payload.pull_request.head.repo?.id === payload.repository.id;
@@ -224,7 +262,7 @@ async function handlePullRequest(
       payload.pull_request.base.ref !== site.productionBranch ||
       !fromSameRepository
     ) {
-      continue;
+      return null;
     }
     if (
       site.rootDirectory &&
@@ -235,9 +273,10 @@ async function handlePullRequest(
         site.rootDirectory
       ))
     ) {
-      continue;
+      return null;
     }
-    const jobId = await enqueueOrSkip({
+    return await enqueueOrSkip({
+      dedupeKey,
       siteId: site.id,
       kind: "preview",
       previewKey,
@@ -249,14 +288,13 @@ async function handlePullRequest(
       pullRequestNumber: payload.number,
       githubRepositoryId: String(payload.repository.id),
     });
-    if (jobId) {
-      jobIds.push(jobId);
-    }
-  }
-  return jobIds;
+  });
 }
 
-async function handleCheckRun(payload: CheckRunPayload): Promise<string[]> {
+async function handleCheckRun(
+  payload: CheckRunPayload,
+  deliveryId: string
+): Promise<string[]> {
   if (
     payload.action !== "rerequested" ||
     !payload.check_run.external_id?.startsWith("dep_")
@@ -273,7 +311,10 @@ async function handleCheckRun(payload: CheckRunPayload): Promise<string[]> {
   if (!site) {
     return [];
   }
-  const jobId = await enqueueOrSkip(redeploymentInput(previous, null));
+  const jobId = await enqueueOrSkip({
+    ...redeploymentInput(previous, null),
+    dedupeKey: deliveryJobKey(deliveryId, site.id),
+  });
   return jobId ? [jobId] : [];
 }
 
@@ -329,11 +370,17 @@ export async function handleSitesWebhook(
     const payload = JSON.parse(params.rawBody) as unknown;
     let jobIds: string[] = [];
     if (params.event === "push") {
-      jobIds = await handlePush(payload as PushPayload);
+      jobIds = await handlePush(payload as PushPayload, params.deliveryId);
     } else if (params.event === "pull_request") {
-      jobIds = await handlePullRequest(payload as PullRequestPayload);
+      jobIds = await handlePullRequest(
+        payload as PullRequestPayload,
+        params.deliveryId
+      );
     } else if (params.event === "check_run") {
-      jobIds = await handleCheckRun(payload as CheckRunPayload);
+      jobIds = await handleCheckRun(
+        payload as CheckRunPayload,
+        params.deliveryId
+      );
     }
     await db
       .update(siteWebhookDeliveries)

@@ -20,6 +20,8 @@ export type DeploymentTransitionValues = Partial<
 
 export interface EnqueueDeploymentInput {
   deduplicateCommit?: boolean;
+  /** Returns the build already queued under this key instead of a new one. */
+  dedupeKey?: string;
   siteId: string;
   kind: "production" | "preview";
   previewKey: string | null;

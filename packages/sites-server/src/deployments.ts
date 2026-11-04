@@ -1,5 +1,11 @@
 import { db } from "@notra/db/drizzle";
-import { siteDeployments, siteJobs, sites, users } from "@notra/db/schema";
+import {
+  siteDeployments,
+  siteJobDedupeKeys,
+  siteJobs,
+  sites,
+  users,
+} from "@notra/db/schema";
 import {
   SITE_BUILD_LIMITS,
   SITE_DEPLOYMENT_IN_PROGRESS_STATUSES,
@@ -131,6 +137,23 @@ export async function enqueueSiteDeployment(
     if (!organizationId) {
       throw new SiteNotBuildableError("Site workspace not found");
     }
+    if (input.dedupeKey) {
+      const jobId = await jobForDedupeKey(tx, input.dedupeKey);
+      const [existing] = jobId
+        ? await tx
+            .select({ deployment: siteDeployments, jobId: siteJobs.id })
+            .from(siteJobs)
+            .innerJoin(
+              siteDeployments,
+              eq(siteJobs.deploymentId, siteDeployments.id)
+            )
+            .where(eq(siteJobs.id, jobId))
+            .limit(1)
+        : [];
+      if (existing) {
+        return existing;
+      }
+    }
     if (input.deduplicateCommit) {
       await tx.execute(
         sql`select pg_advisory_xact_lock(hashtextextended(${JSON.stringify(["sites-deploy-commit", input.siteId, input.kind, input.previewKey, input.commitSha])}, 0))`
@@ -162,6 +185,9 @@ export async function enqueueSiteDeployment(
         )
         .limit(1);
       if (existing) {
+        if (input.dedupeKey) {
+          await recordDedupeKey(tx, input.dedupeKey, existing.jobId);
+        }
         return existing;
       }
     }
@@ -174,7 +200,11 @@ export async function enqueueSiteDeployment(
         .for("update");
       await assertCurrentHead();
     }
-    return await insertDeployment(tx, input, organizationId);
+    const inserted = await insertDeployment(tx, input, organizationId);
+    if (input.dedupeKey) {
+      await recordDedupeKey(tx, input.dedupeKey, inserted.jobId);
+    }
+    return inserted;
   });
   await publishSiteDeploymentChange(
     enqueued.deployment.organizationId,
@@ -447,10 +477,17 @@ export async function enqueueSettingsDeployment(
 
 export async function enqueuePreviewRemoval(
   siteId: string,
-  previewKey: string
+  previewKey: string,
+  dedupeKey?: string
 ): Promise<string> {
-  const jobId = prefixedId("job");
-  await db.transaction(async (tx) => {
+  return await db.transaction(async (tx) => {
+    const existingJobId = dedupeKey
+      ? await jobForDedupeKey(tx, dedupeKey)
+      : null;
+    if (existingJobId) {
+      return existingJobId;
+    }
+    const jobId = prefixedId("job");
     const { lastGeneration } = await allocateGeneration(tx, siteId);
     await tx.insert(siteJobs).values({
       id: jobId,
@@ -458,8 +495,38 @@ export async function enqueuePreviewRemoval(
       kind: "remove_preview",
       payload: { previewKey, generation: lastGeneration },
     });
+    if (dedupeKey) {
+      await recordDedupeKey(tx, dedupeKey, jobId);
+    }
+    return jobId;
   });
-  return jobId;
+}
+
+/** Locks the key for this transaction and returns the job it already names. */
+async function jobForDedupeKey(
+  tx: SiteStorageTransaction,
+  dedupeKey: string
+): Promise<string | null> {
+  await tx.execute(
+    sql`select pg_advisory_xact_lock(hashtextextended(${`sites-job-dedupe:${dedupeKey}`}, 0))`
+  );
+  const [existing] = await tx
+    .select({ jobId: siteJobDedupeKeys.jobId })
+    .from(siteJobDedupeKeys)
+    .where(eq(siteJobDedupeKeys.dedupeKey, dedupeKey))
+    .limit(1);
+  return existing?.jobId ?? null;
+}
+
+async function recordDedupeKey(
+  tx: SiteStorageTransaction,
+  dedupeKey: string,
+  jobId: string
+) {
+  await tx
+    .insert(siteJobDedupeKeys)
+    .values({ dedupeKey, jobId })
+    .onConflictDoNothing();
 }
 
 export async function hasNewerDeployment(

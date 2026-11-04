@@ -4459,6 +4459,21 @@ export const siteJobs = pgTable(
   ]
 );
 
+// A job can answer several requests, e.g. a GitHub delivery that reused a
+// build already running for the same commit, so each request's key is its
+// own row rather than the job's single dedupe_key.
+export const siteJobDedupeKeys = pgTable(
+  "site_job_dedupe_keys",
+  {
+    dedupeKey: text("dedupe_key").primaryKey(),
+    jobId: text("job_id")
+      .notNull()
+      .references(() => siteJobs.id, { onDelete: "cascade" }),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [index("siteJobDedupeKeys_jobId_idx").on(table.jobId)]
+);
+
 export const siteSlugGrants = pgTable("site_slug_grants", {
   slug: text("slug").primaryKey(),
   // Null keeps the slug blocked for everyone, e.g. after the owning
