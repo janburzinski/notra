@@ -34,7 +34,7 @@
     "effect": "catalog:",
     "eve": "0.58.1",
     "evlog": "catalog:",
-    "marked": "^17.0.6",
+    "marked": "catalog:",
     "pg": "^8.23.1",
     "sanitize-html": "catalog:",
     "satori": "catalog:",

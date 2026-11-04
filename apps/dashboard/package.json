@@ -108,7 +108,7 @@
     "libheif-js": "1.23.5",
     "lucide-react": "catalog:",
     "mailchecker": "^6.0.21",
-    "marked": "^17.0.6",
+    "marked": "catalog:",
     "mdast-util-from-markdown": "^2.1.0",
     "motion": "^12.43.0",
     "nanoid": "catalog:",

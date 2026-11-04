@@ -37,9 +37,8 @@
     "evlog": "catalog:",
     "hono": "^4.13.13",
     "jose": "^6.2.12",
-    "marked": "^16.4.2",
+    "marked": "catalog:",
     "nanoid": "catalog:",
-    "sanitize-html": "catalog:",
     "sharp": "^0.35.5",
     "tsup": "^8.5.1",
     "wawoff2": "2.0.1",
@@ -48,7 +47,6 @@
   "devDependencies": {
     "@electric-sql/pglite": "catalog:",
     "@notra/typescript-config": "workspace:*",
-    "@types/sanitize-html": "catalog:",
     "knip": "^6.12.1",
     "nf3": "0.3.17",
     "typescript": "catalog:"

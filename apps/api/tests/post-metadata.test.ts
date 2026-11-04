@@ -138,6 +138,52 @@ describe("post metadata responses", () => {
   });
 });
 
+describe("PATCH markdown", () => {
+  test("keeps video embeds and strips unsafe HTML", async () => {
+    const prepared = await run(
+      preparePatchPost({
+        db: db as never,
+        organizationId: ORG,
+        postId: "post_social",
+        body: patchBody({
+          markdown: [
+            "# Clip",
+            "",
+            '<video controls src="https://cdn.example.com/clip.mp4"></video>',
+            "",
+            '<script>alert(1)</script><img src="https://cdn.example.com/a.png" onerror="alert(1)"><a href="data:text/html;base64,PHNjcmlwdD4=">x</a>',
+          ].join("\n"),
+        }),
+      })
+    );
+    if (prepared._tag === "Failure") {
+      throw new Error(String(prepared.failure));
+    }
+
+    const committed = await run(
+      commitPatchPost({
+        db: db as never,
+        organizationId: ORG,
+        postId: "post_social",
+        prepared: prepared.success.prepared,
+      })
+    );
+    if (committed._tag === "Failure") {
+      throw new Error(String(committed.failure));
+    }
+
+    const { content } = committed.success.post;
+    expect(content).toContain(
+      '<video controls src="https://cdn.example.com/clip.mp4"></video>'
+    );
+    expect(content).toContain('<img src="https://cdn.example.com/a.png" />');
+    expect(content).not.toContain("<script");
+    expect(content).not.toContain("onerror");
+    expect(content).not.toContain("data:");
+    expect(content).toContain("<a>x</a>");
+  });
+});
+
 describe("PATCH metadata", () => {
   test("rejects metadata for content types without site metadata", async () => {
     const result = await run(

@@ -50,7 +50,7 @@
         "effect": "catalog:",
         "eve": "0.58.1",
         "evlog": "catalog:",
-        "marked": "^17.0.6",
+        "marked": "catalog:",
         "pg": "^8.23.1",
         "sanitize-html": "catalog:",
         "satori": "catalog:",
@@ -111,9 +111,8 @@
         "evlog": "catalog:",
         "hono": "^4.13.13",
         "jose": "^6.2.12",
-        "marked": "^16.4.2",
+        "marked": "catalog:",
         "nanoid": "catalog:",
-        "sanitize-html": "catalog:",
         "sharp": "^0.35.5",
         "tsup": "^8.5.1",
         "wawoff2": "2.0.1",
@@ -122,7 +121,6 @@
       "devDependencies": {
         "@electric-sql/pglite": "catalog:",
         "@notra/typescript-config": "workspace:*",
-        "@types/sanitize-html": "catalog:",
         "knip": "^6.12.1",
         "nf3": "0.3.17",
         "typescript": "catalog:",
@@ -280,7 +278,7 @@
         "libheif-js": "1.23.5",
         "lucide-react": "catalog:",
         "mailchecker": "^6.0.21",
-        "marked": "^17.0.6",
+        "marked": "catalog:",
         "mdast-util-from-markdown": "^2.1.0",
         "motion": "^12.43.0",
         "nanoid": "catalog:",
@@ -623,7 +621,7 @@
         "evlog": "catalog:",
         "gray-matter": "^4.0.3",
         "hast-util-from-html": "2.0.3",
-        "marked": "^17.0.6",
+        "marked": "catalog:",
         "nanoid": "catalog:",
         "opentype.js": "^2.0.0",
         "react": "^19.3.1",
@@ -1116,6 +1114,7 @@
     "effect": "4.1.0",
     "evlog": "2.28.1",
     "lucide-react": "^0.562.0",
+    "marked": "^17.0.6",
     "nanoid": "^5.1.16",
     "next-themes": "^0.4.6",
     "sanitize-html": "^2.18.1",
@@ -7029,8 +7028,6 @@
     "anymatch/picomatch": ["picomatch@2.3.2", "", {}, "sha512-V7+vQEJ06Z+c5tSye8S+nHUfI51xoXIXjHQ99cQtKUkQqqO1kO/KCJUfZXuB47h/YBlDhah2H3hdUGXn8ie0oA=="],
 
     "api/eve": ["eve@0.19.0", "", { "dependencies": { "nitro": "3.0.260610-beta" }, "peerDependencies": { "@opentelemetry/api": "^1.0.0", "ai": "^7.0.0", "braintrust": "^3.0.0", "just-bash": "^3.0.0", "microsandbox": "^0.5.0" }, "optionalPeers": ["@opentelemetry/api", "braintrust", "just-bash", "microsandbox"], "bin": { "eve": "./bin/eve.js" } }, "sha512-fZ4gyBUoJ8FWtA+vUz6Q/OWJDXPf++RYsbVL+NrEAn2VJCrZyiuDj4todsBJlDib3+sZtzHMsNSn06EP0j0++w=="],
-
-    "api/marked": ["marked@16.4.2", "", { "bin": { "marked": "bin/marked.js" } }, "sha512-TI3V8YYWvkVf3KJe1dRkpnjs68JUPyEa5vjKrp1XEEJUAOaQc+Qj+L1qWbPd0SJuAdQkFU0h73sXXqwDYxsiDA=="],
 
     "astro/esbuild": ["esbuild@0.28.2", "", { "optionalDependencies": { "@esbuild/aix-ppc64": "0.28.2", "@esbuild/android-arm": "0.28.2", "@esbuild/android-arm64": "0.28.2", "@esbuild/android-x64": "0.28.2", "@esbuild/darwin-arm64": "0.28.2", "@esbuild/darwin-x64": "0.28.2", "@esbuild/freebsd-arm64": "0.28.2", "@esbuild/freebsd-x64": "0.28.2", "@esbuild/linux-arm": "0.28.2", "@esbuild/linux-arm64": "0.28.2", "@esbuild/linux-ia32": "0.28.2", "@esbuild/linux-loong64": "0.28.2", "@esbuild/linux-mips64el": "0.28.2", "@esbuild/linux-ppc64": "0.28.2", "@esbuild/linux-riscv64": "0.28.2", "@esbuild/linux-s390x": "0.28.2", "@esbuild/linux-x64": "0.28.2", "@esbuild/netbsd-arm64": "0.28.2", "@esbuild/netbsd-x64": "0.28.2", "@esbuild/openbsd-arm64": "0.28.2", "@esbuild/openbsd-x64": "0.28.2", "@esbuild/openharmony-arm64": "0.28.2", "@esbuild/sunos-x64": "0.28.2", "@esbuild/win32-arm64": "0.28.2", "@esbuild/win32-ia32": "0.28.2", "@esbuild/win32-x64": "0.28.2" }, "bin": { "esbuild": "bin/esbuild" } }, "sha512-HKVLS8dvII+xoKW9kmqxbRKrnWEXfJJr/FZhhJmiqIB0e053QNYFqOBouTMO/k5sID4MvCiUCvv8b9M4h32wIA=="],
 
