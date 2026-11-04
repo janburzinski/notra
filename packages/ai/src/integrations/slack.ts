@@ -1,7 +1,9 @@
-import { Effect } from "effect";
+import { Effect, Result } from "effect";
 
 import {
   SLACK_API_BASE_URL,
+  SLACK_CHANNEL_NAME_MAX_LENGTH,
+  SLACK_CONNECT_DOMAIN_PURPOSE_PREFIX,
   SLACK_REQUEST_TIMEOUT_MS,
 } from "../constants/slack";
 import {
@@ -22,7 +24,7 @@ import type {
   CreateSlackConnectChannelInput,
   CreateSlackConnectChannelInviteInput,
   CreateSlackConnectChannelInviteResult,
-  ReusableSlackConnectChannel,
+  SlackChannelSummary,
   SlackConnectChannel,
   SlackConnectInviteInput,
   SlackConnectInviteResult,
@@ -241,42 +243,36 @@ const archiveSlackChannelEffect = Effect.fn("archiveSlackChannel")(function* (
   }
 });
 
-const findSlackChannelByNameEffect = Effect.fn("findSlackChannelByName")(
-  function* (channelName: string) {
-    const operation = "conversations.list";
-    let cursor = "";
-    do {
-      const response = yield* requestSlack(
+const listSlackChannelsEffect = Effect.fn("listSlackChannels")(function* () {
+  const operation = "conversations.list";
+  const channels: SlackChannelSummary[] = [];
+  let cursor = "";
+  do {
+    const response = yield* requestSlack(
+      operation,
+      {
+        exclude_archived: true,
+        limit: 1000,
+        types: "public_channel,private_channel",
+        ...(cursor ? { cursor } : {}),
+      },
+      "GET"
+    );
+    const payload = yield* Effect.try({
+      try: () => slackConversationsListResponseSchema.parse(response),
+      catch: (cause) => new SlackResponseError({ cause, operation }),
+    });
+    if (!payload.ok) {
+      return yield* new SlackApiError({
+        code: payload.error ?? "unknown_error",
         operation,
-        {
-          exclude_archived: true,
-          limit: 1000,
-          types: "public_channel,private_channel",
-          ...(cursor ? { cursor } : {}),
-        },
-        "GET"
-      );
-      const payload = yield* Effect.try({
-        try: () => slackConversationsListResponseSchema.parse(response),
-        catch: (cause) => new SlackResponseError({ cause, operation }),
       });
-      if (!payload.ok) {
-        return yield* new SlackApiError({
-          code: payload.error ?? "unknown_error",
-          operation,
-        });
-      }
-      const match = payload.channels?.find(
-        (channel) => channel.name === channelName
-      );
-      if (match) {
-        return { channelId: match.id, channelName: match.name };
-      }
-      cursor = payload.response_metadata?.next_cursor ?? "";
-    } while (cursor);
-    return null;
-  }
-);
+    }
+    channels.push(...(payload.channels ?? []));
+    cursor = payload.response_metadata?.next_cursor ?? "";
+  } while (cursor);
+  return channels;
+});
 
 const listSlackChannelMemberIdsEffect = Effect.fn("listSlackChannelMemberIds")(
   function* (channelId: string) {
@@ -327,72 +323,25 @@ const getSlackUserEffect = Effect.fn("getSlackUser")(function* (
   };
 });
 
-/**
- * Reuses a taken channel only when it already belongs to the invitee's
- * company: a member shares their email domain, or nobody but Notra's support
- * members has joined yet because the first invite is still pending.
- */
-const findReusableSlackConnectChannelEffect = Effect.fn(
-  "findReusableSlackConnectChannel"
-)(function* (
-  channelName: string,
-  email: string | undefined,
-  supportMemberIds: string[]
-) {
-  const domain = email?.trim().toLowerCase().split("@").at(-1);
-  const channel = yield* findSlackChannelByNameEffect(channelName);
-  if (!(domain && channel)) {
-    return yield* new SlackApiError({
-      code: "name_taken",
-      operation: "conversations.create",
-    });
-  }
-
-  const memberIds = yield* listSlackChannelMemberIdsEffect(channel.channelId);
-  const others = memberIds.filter((id) => !supportMemberIds.includes(id));
-  const users = yield* Effect.forEach(others, getSlackUserEffect, {
-    concurrency: 5,
-  });
-  const people = users.filter((user) => !user.isBot);
-  const sameCompany =
-    people.length === 0 ||
-    people.some((user) => user.email?.endsWith(`@${domain}`));
-  if (!sameCompany) {
-    return yield* new SlackApiError({
-      code: "channel_domain_mismatch",
-      operation: "conversations.members",
-    });
-  }
-
-  return {
-    ...channel,
-    created: false,
-  } satisfies ReusableSlackConnectChannel;
-});
-
 const createSlackConnectChannelWithInviteEffect = Effect.fn(
   "createSlackConnectChannelWithInvite"
 )(function* (input: CreateSlackConnectChannelInviteInput) {
   yield* resolveInviteRecipient(input.email, input.userId);
   const supportMemberIds = yield* getSlackSupportMemberIds();
 
-  const channel: ReusableSlackConnectChannel =
-    yield* createSlackConnectChannelEffect({
-      channelName: input.channelName,
-      isPrivate: input.isPrivate,
-    }).pipe(
-      Effect.map((created) => ({ ...created, created: true })),
-      Effect.catchIf(
-        (error) =>
-          error._tag === "SlackApiError" && error.code === "name_taken",
-        () =>
-          findReusableSlackConnectChannelEffect(
-            input.channelName,
-            input.email,
-            supportMemberIds
-          )
-      )
-    );
+  const channel = yield* createSlackConnectChannelEffect({
+    channelName: input.channelName,
+    isPrivate: input.isPrivate,
+  }).pipe(
+    Effect.catchIf(
+      (error) => error._tag === "SlackApiError" && error.code === "name_taken",
+      () =>
+        createSlackConnectChannelEffect({
+          channelName: `${input.channelName.slice(0, SLACK_CHANNEL_NAME_MAX_LENGTH - 5)}-${crypto.randomUUID().slice(0, 4)}`,
+          isPrivate: input.isPrivate,
+        })
+    )
+  );
 
   const inviteEffect = Effect.gen(function* () {
     for (const memberId of supportMemberIds) {
@@ -408,22 +357,26 @@ const createSlackConnectChannelWithInviteEffect = Effect.fn(
         )
       );
     }
-    return yield* inviteToSlackConnectEffect({
+    const invite = yield* inviteToSlackConnectEffect({
       channelId: channel.channelId,
       email: input.email,
       userId: input.userId,
       externalLimited: input.externalLimited,
     });
+    if (input.domain) {
+      yield* setSlackChannelPurposeEffect(
+        channel.channelId,
+        `${SLACK_CONNECT_DOMAIN_PURPOSE_PREFIX}${input.domain}`
+      ).pipe(
+        Effect.catch((error) =>
+          Effect.logWarning("Slack channel purpose update failed").pipe(
+            Effect.annotateLogs({ channelId: channel.channelId, error })
+          )
+        )
+      );
+    }
+    return invite;
   });
-
-  if (!channel.created) {
-    const invite = yield* inviteEffect;
-    return {
-      channelId: channel.channelId,
-      channelName: channel.channelName,
-      ...invite,
-    } satisfies CreateSlackConnectChannelInviteResult;
-  }
 
   return yield* Effect.matchEffect(inviteEffect, {
     onFailure: (cause) =>
@@ -456,6 +409,76 @@ const createSlackConnectChannelWithInviteEffect = Effect.fn(
       } satisfies CreateSlackConnectChannelInviteResult),
   });
 });
+
+// ponytail: scans every Slack Connect channel per signup; index domain -> channel if it gets slow
+const setSlackChannelPurposeEffect = Effect.fn("setSlackChannelPurpose")(
+  function* (channelId: string, purpose: string) {
+    const operation = "conversations.setPurpose";
+    const response = yield* requestSlack(operation, {
+      channel: channelId,
+      purpose,
+    });
+    const payload = yield* Effect.try({
+      try: () => slackOkResponseSchema.parse(response),
+      catch: (cause) => new SlackResponseError({ cause, operation }),
+    });
+
+    if (!payload.ok) {
+      return yield* new SlackApiError({
+        code: payload.error ?? "unknown_error",
+        operation,
+      });
+    }
+  }
+);
+
+const channelHasDomainMemberEffect = Effect.fn("channelHasDomainMember")(
+  function* (channelId: string, domain: string, supportMemberIds: string[]) {
+    const memberIds = yield* listSlackChannelMemberIdsEffect(channelId);
+    const others = memberIds.filter((id) => !supportMemberIds.includes(id));
+    const users = yield* Effect.forEach(others, getSlackUserEffect, {
+      concurrency: 5,
+    });
+    return users.some((user) => user.email?.endsWith(`@${domain}`));
+  }
+);
+
+const hasSlackConnectChannelForDomainEffect = Effect.fn(
+  "hasSlackConnectChannelForDomain"
+)(function* (domain: string) {
+  const supportMemberIds = yield* getSlackSupportMemberIds();
+  const channels = yield* listSlackChannelsEffect();
+  const purpose = `${SLACK_CONNECT_DOMAIN_PURPOSE_PREFIX}${domain}`;
+  if (channels.some((channel) => channel.purpose?.value === purpose)) {
+    return true;
+  }
+  let lookupError: unknown;
+  for (const channel of channels) {
+    if (!channel.is_ext_shared) {
+      continue;
+    }
+    const lookup = yield* channelHasDomainMemberEffect(
+      channel.id,
+      domain,
+      supportMemberIds
+    ).pipe(Effect.retry({ times: 2 }), Effect.result);
+    if (Result.isFailure(lookup)) {
+      lookupError = lookup.failure;
+    } else if (lookup.success) {
+      return true;
+    }
+  }
+  if (lookupError) {
+    return yield* Effect.fail(lookupError);
+  }
+  return false;
+});
+
+export function hasSlackConnectChannelForDomain(
+  domain: string
+): Promise<boolean> {
+  return Effect.runPromise(hasSlackConnectChannelForDomainEffect(domain));
+}
 
 export function createSlackConnectChannelWithInvite(
   input: CreateSlackConnectChannelInviteInput

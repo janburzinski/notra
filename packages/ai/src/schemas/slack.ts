@@ -77,7 +77,14 @@ export const slackConversationsListResponseSchema = z.looseObject({
   ok: z.boolean(),
   error: z.string().optional(),
   channels: z
-    .array(z.looseObject({ id: z.string(), name: z.string() }))
+    .array(
+      z.looseObject({
+        id: z.string(),
+        name: z.string(),
+        is_ext_shared: z.boolean().optional(),
+        purpose: z.looseObject({ value: z.string().optional() }).optional(),
+      })
+    )
     .optional(),
   response_metadata: slackNextCursorSchema,
 });

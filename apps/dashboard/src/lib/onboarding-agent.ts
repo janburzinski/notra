@@ -5,6 +5,7 @@ import {
 } from "@notra/ai/constants/onboarding-agent";
 import {
   createSlackConnectChannelWithInvite,
+  hasSlackConnectChannelForDomain,
   hasSlackConnectConfigured,
 } from "@notra/ai/integrations/slack";
 import { logError } from "@notra/ai/utils/server-log";
@@ -197,8 +198,12 @@ export async function sendOnboardingSlackInvite({
   }
 
   try {
+    if (await hasSlackConnectChannelForDomain(domain)) {
+      return { invited: false };
+    }
     const result = await createSlackConnectChannelWithInvite({
       channelName: buildExternalChannelName(domain),
+      domain,
       email: normalizedEmail,
       externalLimited: false,
     });

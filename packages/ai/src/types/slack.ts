@@ -26,6 +26,7 @@ export interface SlackConnectChannel {
 
 export interface CreateSlackConnectChannelInviteInput {
   channelName: string;
+  domain?: string;
   email?: string;
   userId?: string;
   externalLimited?: boolean;
@@ -35,6 +36,9 @@ export interface CreateSlackConnectChannelInviteInput {
 export interface CreateSlackConnectChannelInviteResult
   extends SlackConnectChannel, SlackConnectInviteResult {}
 
-export interface ReusableSlackConnectChannel extends SlackConnectChannel {
-  created: boolean;
+export interface SlackChannelSummary {
+  id: string;
+  name: string;
+  is_ext_shared?: boolean;
+  purpose?: { value?: string };
 }
