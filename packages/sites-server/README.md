@@ -391,4 +391,6 @@ require `SITES_TEST_DATABASE_URL` pointing to the synthetic local database
 `postgresql://postgres@127.0.0.1:55447/notra_server_audit`, initialized with the
 current schema. They test real queries, serving-state CAS and pipeline decisions
 with simulated GitHub, model, sandbox and R2 adapters. Do not use a customer or
-production database for these suites.
+production database for these suites. CI runs this package's tests against a
+migrated database in the `infrastructure` job of
+`.github/workflows/code-quality.yml`.
