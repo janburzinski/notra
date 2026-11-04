@@ -160,11 +160,17 @@ if (!process.env.NOTRA_SITE_DEFAULTS_TEST_WORKER) {
       expect(html).toContain("Example build diagnostic");
       expect(html).toContain(messages.sites.new.deploy.retryDeployment);
       expect(html).toContain(messages.sites.new.deploy.editConfiguration);
-      expect(html).not.toContain(messages.sites.new.deploy.configMissingRetry);
+      expect(html).not.toContain(
+        locale === "en"
+          ? "This build reported a missing blog.json"
+          : "Dieser Build hat eine fehlende blog.json gemeldet"
+      );
       expect(html).not.toContain(messages.sites.new.deploy.viewDeployment);
       expect(html).not.toContain(messages.common.labels.copyAgentPrompt);
       expect(html).not.toContain(messages.sites.new.deploy.openSite);
-      expect(html).not.toContain(messages.sites.new.deploy.viewPullRequest);
+      expect(html).not.toContain(
+        locale === "en" ? "View pull request" : "Pull Request ansehen"
+      );
     });
   });
 
@@ -203,7 +209,7 @@ if (!process.env.NOTRA_SITE_DEFAULTS_TEST_WORKER) {
       </IntlProvider>
     );
     expect(html).toContain(en.sites.new.deploy.failed);
-    expect(html).not.toContain(en.sites.new.deploy.configMissingRetry);
-    expect(html).not.toContain(en.sites.new.deploy.viewPullRequest);
+    expect(html).not.toContain("This build reported a missing blog.json");
+    expect(html).not.toContain("View pull request");
   });
 }

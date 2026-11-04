@@ -268,7 +268,7 @@ if (!process.env.NOTRA_DEPLOY_SURFACE_TEST_WORKER) {
       </IntlProvider>
     );
     expect(html).toContain(messages.sites.new.deploy.failed);
-    expect(html).not.toContain(messages.sites.new.deploy.configMissingRetry);
+    expect(html).not.toContain("This build reported a missing blog.json");
     expect(html).toContain("Missing blog.json");
     expect(html).not.toContain(
       'href="https://github.example/repository/pull/1"'

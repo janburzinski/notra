@@ -995,7 +995,6 @@
       "enableTrackingFirst": "Enable brand tracking before starting a scan",
       "scanAlreadyRunning": "A scan is already running for this project",
       "selectModel": "Select at least one available model to scan",
-      "briefAlreadyInState": "This brief is already {status}. Start a new one.",
       "planChanged": "This plan changed while it was being saved. Try again.",
       "gscBusy": "Google Search Console is temporarily busy. Please try again.",
       "gscDisconnecting": "Google Search Console is being disconnected. Please try again.",
@@ -1964,7 +1963,6 @@
     },
     "errors": {
       "generic": "Something went wrong. Please try again.",
-      "network": "Network error. Please check your connection.",
       "unauthorized": "You don't have permission to do that.",
       "notFound": "Not found"
     },
@@ -2273,7 +2271,6 @@
       "brandIdentityTitle": "Brand identity",
       "contentSingular": "Content",
       "customOwn": "Custom",
-      "loadingLabel": "Loading",
       "otherNeuter": "Other",
       "thinkingLabel": "Thinking",
       "deleteAccount": "Delete account",
@@ -2413,7 +2410,6 @@
       "tags": "Tags",
       "outcome": "Outcome",
       "whatChanged": "What changed",
-      "saveView": "Save view",
       "searchQueries": "Search queries",
       "searchPerformance": "Search performance",
       "clickThroughRate": "Click-through rate",
@@ -2499,7 +2495,6 @@
       "runAScanToSeeAnswers": "Run a scan to see how engines answer this",
       "runScan": "Run scan",
       "scanInProgress": "Scan in progress",
-      "scorePosition": "Score position",
       "searchIndex": "Search index",
       "selectABrandIdentity": "Select a brand identity",
       "updatePage": "Update page",
@@ -2702,7 +2697,6 @@
       "runThis": "Run this conversation now",
       "includedInScans": "Included in scans",
       "pausedInScans": "Paused, skipped in scans",
-      "deleteNamed": "Delete {name}",
       "generate": "Generate",
       "emptyGenerating": "Writing conversations for your buyers…",
       "empty": "Track an opening question plus the follow-ups that close the deal, or generate a few to start",
@@ -4340,13 +4334,11 @@
       "runPersonaScanFailed": "Failed to run the persona scan",
       "loadPersonaResultsFailed": "Failed to load persona results",
       "loadContentGapsFailed": "Failed to load content gaps",
-      "loadBriefsFailed": "Failed to load briefs",
       "loadBriefFailed": "Failed to load the brief",
       "updateGapFailed": "Failed to update the gap",
       "planArticleFailed": "Failed to plan the article",
       "startWritingFailed": "Failed to start writing",
       "updatePlanFailed": "Failed to update the plan",
-      "loadRecentScansFailed": "Failed to load recent scans",
       "loadScanResultsFailed": "Failed to load scan results",
       "loadTeamMembersFailed": "Failed to load team members",
       "loadShelfSpaceFailed": "Failed to load shelf space",
@@ -4772,8 +4764,6 @@
       },
       "repositoryRow": {
         "noRepository": "No repository configured. Choose Edit repository from the menu to finish setup.",
-        "viaApp": "Connected through the GitHub App",
-        "viaToken": "Connected with an access token",
         "statusTitle": "Status",
         "statusActive": "Active. Notra uses this repository for content and publishing.",
         "statusPaused": "Paused. Notra won't use this repository until you turn it back on.",
@@ -5323,7 +5313,6 @@
     "shared": {
       "failedToUpdateSchedule": "Failed to update schedule",
       "activeCount": "Active ({count})",
-      "pausedCount": "Paused ({count})",
       "failedToUpdateTrigger": "Failed to update trigger",
       "notify": {
         "label": "Then notify",
@@ -5331,9 +5320,6 @@
       }
     },
     "brandVoice": {
-      "noIdentity": "No identity",
-      "noIdentityDescription": "No identity has been configured for this workspace yet.",
-      "defaultSuffix": "(Default)",
       "defaultIdentity": "Default identity"
     },
     "suggestions": {
@@ -5351,7 +5337,6 @@
       "dayPicker": {
         "dayOfWeek": "Day of week",
         "dayOfMonth": "Day of month",
-        "dayPlaceholder": "Day",
         "dayOption": "Day {day}",
         "skipNotes": {
           "day31": "Skipped in February, April, June, September and November.",
@@ -5445,10 +5430,7 @@
         "deleteDescription": "This will permanently delete <target></target>. This can't be undone.",
         "runs": "Runs: {value}",
         "repositories": "Repositories: {value}",
-        "thisSchedule": "this schedule",
-        "untitled": "Untitled schedule",
-        "scheduleFallback": "schedule",
-        "emptyCategory": "No schedules in this category."
+        "untitled": "Untitled schedule"
       },
       "frequencyLabel": {
         "notSet": "Not set",
@@ -5479,12 +5461,9 @@
         "deleteFailed": "Failed to delete trigger",
         "emptyDescription": "Create your first event trigger to react to GitHub activity.",
         "emptyTitle": "No event triggers yet",
-        "allEvents": "All events",
         "eventNames": {
           "push": "Push"
-        },
-        "githubWebhook": "GitHub webhook",
-        "emptyCategory": "No event triggers in this category."
+        }
       },
       "dialog": {
         "alreadyExists": "Trigger already exists",
@@ -5570,7 +5549,6 @@
       },
       "onGithub": "On {events}",
       "toggle": "Turn {name} on or off",
-      "emptyFilter": "Nothing here yet.",
       "integrationDeleted": "Can't turn this on because its integration was deleted. Edit it and pick another integration.",
       "updateFailed": "Couldn't update the automation",
       "removed": "Automation deleted",
@@ -6106,11 +6084,8 @@
       "theme": "Theme"
     },
     "upgrade": {
-      "upgradeNow": "Upgrade now",
       "freeDescription": "Your free plan includes agent feedback and 1M AI traffic events a month. Upgrade for AI content, visibility tracking and higher event limits.",
-      "freeHeading": "Get more from Notra",
-      "upgradeToPlan": "Upgrade to {plan}",
-      "paidDescription": "Get more AI answers, projects and higher usage limits."
+      "freeHeading": "Get more from Notra"
     },
     "sidebar": {
       "loadingChatHistory": "Loading chat history",
@@ -6123,8 +6098,6 @@
     },
     "orgSelector": {
       "tooltip": "Organization | {name}",
-      "noOrganizations": "No organizations found",
-      "newOrganization": "New organization",
       "subscribeToCreate": "Subscribe to create more organizations",
       "scheduleDemo": "Schedule a demo",
       "upgradeToGrowth": "Upgrade to Growth",
@@ -6912,8 +6885,6 @@
       "createDescription": "Notra creates a branch, adds the {kind, select, changelog {changelog} other {blog post}} as Markdown, and opens a draft pull request against the repository's default branch.",
       "createdDescription": "Notra added the {kind, select, changelog {changelog} other {blog post}} and opened a draft pull request.",
       "updatedDescription": "Notra updated the {kind, select, changelog {changelog} other {blog post}} in the existing pull request.",
-      "createDraftPr": "Create draft PR",
-      "creatingDraftPr": "Creating draft PR…",
       "openIntegration": "Open GitHub integration",
       "reviewOnGitHub": "Review on GitHub",
       "openPullRequest": "Open pull request",
@@ -7028,8 +6999,6 @@
       "collectionDeleted": "Content deleted",
       "deleteCollectionFailed": "Failed to delete content",
       "deletePostFailed": "Failed to delete post",
-      "loadContentFailed": "Failed to load content",
-      "loadRecentPostsFailed": "Failed to load recent posts",
       "loadDashboardContentFailed": "Failed to load dashboard content",
       "loadActiveGenerationsFailed": "Failed to load active generations",
       "contentGenerationSkipped": "Content generation skipped",
@@ -7385,8 +7354,6 @@
       "preview": "Preview",
       "removeTitle": "Also remove it from {target}?",
       "removeDescription": "Remove the entry and images published by Notra through the repository review process.",
-      "keepFiles": "Keep files",
-      "removeFiles": "Remove files",
       "publish": "Publish",
       "publishing": "Publishing…",
       "directHint": "Commit to the target branch. Scheduled posts commit at their scheduled time, including schedules without a merge step.",
@@ -7476,9 +7443,6 @@
       "description": "Chat with your dashboard agent.",
       "loadingTitle": "Loading agent",
       "loadingDescription": "Loading the dashboard agent."
-    },
-    "overlays": {
-      "commandPalette": "Command palette"
     },
     "brandSelector": {
       "createIdentity": "Create identity"
@@ -8030,8 +7994,6 @@
       "retrySave": "Retry save",
       "retry": "Try again",
       "noBranches": "No branches match your search.",
-      "copyBranch": "Copy branch name",
-      "branchCopied": "Branch name copied",
       "conflict": "The repository changed. Update the draft base before publishing.",
       "rebase": "Update draft base",
       "requestReviewHint": "Mark the pull request as ready so your team can review it.",
@@ -8184,19 +8146,16 @@
         "visit": "Visit",
         "openSite": "Go to site",
         "viewDeployment": "View deployment",
-        "configMissingRetry": "This build reported a missing blog.json. Retry the deployment from the site to use the standard layout and configuration. The starter pull request is optional.",
         "editConfiguration": "Edit configuration",
         "retryDeployment": "Retry deployment",
         "retryFailed": "Couldn't queue the deployment. Try again.",
         "retryStatus": "Retry status loading",
         "statusLoadFailed": "Couldn't load the deployment status.",
         "failureRecovery": "The deployment did not finish. Review the configuration or try again.",
-        "viewPullRequest": "View pull request",
         "notStarted": "The first build couldn't start."
       },
       "starter": {
         "existingTitle": "Existing site configuration found",
-        "existingDescription": "Choose an existing configuration, or keep the selected location for a new site.",
         "useExisting": "Use folder {path}",
         "useFolder": "Use folder",
         "selectedLocation": "Selected configuration: {path} on {branch}.",
@@ -8367,8 +8326,6 @@
         "confirmTitle": "Turn off analytics for this site?",
         "confirmDescription": "Notra stops counting visitors and AI agents right away and removes the measuring script from every page. Data collected so far stays in Analytics, and nothing is recorded while analytics is off. You can turn it back on at any time.",
         "done": "Analytics is off",
-        "enableTitle": "Turn on analytics",
-        "enableDescription": "Count visitors, time on page and AI agents on this site.",
         "enable": "Turn on",
         "enableConfirmTitle": "Turn on analytics for this site?",
         "enableConfirmDescription": "Notra counts page views as they are served, without cookies, and adds a small script that measures how long each page stays visible. AI agents are recorded too. Counting starts now; the time analytics was off stays empty.",
@@ -8413,7 +8370,6 @@
       "sectionsRowHint": "Where the blog and changelog live on your site.",
       "branchFieldHint": "Every push to this branch goes live. Changes apply on the next deploy.",
       "optional": "Optional",
-      "integrationsHint": "Analytics and tracking scripts for this site.",
       "manage": "Manage"
     },
     "previewFrame": {
@@ -8425,7 +8381,6 @@
       "updatedBy": "Updated <time></time> by {author}",
       "updatedVia": "Updated <time></time> · {trigger}",
       "notLiveYet": "Nothing is live yet. The first deployment goes live when its build finishes.",
-      "followBuild": "Follow build",
       "viewLogs": "View logs",
       "previewBuilding": "Building your site…",
       "previewOffline": "Site is offline",
@@ -8602,7 +8557,6 @@
       "created": "Building preview {key}",
       "createFailed": "Couldn't create the preview",
       "disabled": "Previews are turned off for this site.",
-      "turnOn": "Turn on in settings",
       "emptyTitle": "No previews yet",
       "emptyDescription": "Open a pull request and its preview shows up here. You can also preview any branch.",
       "columns": {
@@ -8645,7 +8599,6 @@
       "verified": "Domain verified",
       "verifiedRebuilding": "Domain verified. Rebuilding for the new address…",
       "notVerifiedYet": "Not verified yet",
-      "verifyNow": "Check now",
       "lastErrorTitle": "Domain check details:",
       "remove": "Remove",
       "removeConfirm": "Remove domain",
@@ -8719,7 +8672,6 @@
         "error": "Your DNS provider couldn't add the records",
         "errorDescription": "Add them yourself from the DNS configuration below."
       },
-      "setupErrorTitle": "Can't verify this domain yet",
       "connectTitle": "Connect your domain",
       "connectSubmit": "Continue"
     },
@@ -8740,7 +8692,6 @@
       "saveDraft": "Save draft",
       "saved": "Variables saved as a draft",
       "saveFailed": "Unable to save variables. Try again.",
-      "reviewAndPublish": "Review and publish",
       "hint": "Use a variable as '{{product_name}}'. Values are public and stay a draft until you publish."
     },
     "settingsPage": {
@@ -8810,13 +8761,9 @@
       "saveFailed": "Unable to save. Try again.",
       "unsaved": "Unsaved changes",
       "invalidValue": "Can't save: {path} in blog.json has an invalid value.",
-      "draftPending": "blog.json has unpublished changes",
       "reset": "Reset",
       "saveDraft": "Save draft",
       "publish": "Publish",
-      "publishMessage": "Update site design",
-      "noDrafts": "There's nothing to publish yet.",
-      "preparePublishFailed": "Unable to load your changes. Try again.",
       "brandTitle": "Brand identity",
       "brandHint": "Use the logo, colors and fonts from this project's brand identity.",
       "applyBrand": "Use brand identity",
@@ -9162,7 +9109,6 @@
       "options": "Options for {branch}",
       "moreOptions": "More options",
       "branches": "Branches",
-      "saveNow": "Save now",
       "requestReview": "Request review",
       "merge": "Merge and publish",
       "mergeConflicts": "Resolve the merge conflicts on GitHub before merging.",
@@ -9179,8 +9125,6 @@
       },
       "deployPending": "Published, deploy pending",
       "discardDeleted": "Discard drafts for deleted branch",
-      "renameFor": "Rename branch {branch}",
-      "deleteFor": "Delete branch {branch}",
       "search": "Find a branch…",
       "reviewIssues": "Review issues",
       "branchNotFound": "Branch not found, switched to {branch}"
@@ -9245,7 +9189,6 @@
       "more": "{provider} options",
       "edit": "Edit",
       "configExample": "Configuration in blog.json",
-      "copyConfig": "Copy configuration",
       "loadFailedDescription": "This site's blog.json couldn't be read. Try again in a moment.",
       "loadFailed": "Couldn't load integrations",
       "retry": "Try again",
@@ -9300,8 +9243,6 @@
       "autosavePending": "Waiting to save…",
       "autosaveSaving": "Saving draft…",
       "autosaveSaved": "Draft saved. Review your changes to publish them.",
-      "autosaveInvalid": "Enter valid settings to save your changes.",
-      "discardUnsaved": "Discard unsaved changes",
       "removeFailedDescription": "The integration was not removed. Retry the removal or discard the unsaved changes.",
       "consent": {
         "title": "Cookie banner",

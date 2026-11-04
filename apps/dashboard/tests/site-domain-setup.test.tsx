@@ -113,7 +113,9 @@ if (!process.env.NOTRA_DOMAIN_SETUP_TEST_WORKER) {
           "example.com"
         )
       );
-      expect(html).not.toContain(messages.sites.domainsPage.verifyNow);
+      expect(html).not.toContain(
+        locale === "en" ? "Check now" : "Jetzt prüfen"
+      );
       expect(html).toContain(
         'href="https://dash.cloudflare.com/?to=/:account/example.com/dns/records"'
       );
