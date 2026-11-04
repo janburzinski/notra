@@ -1,5 +1,4 @@
 import assert from "node:assert/strict";
-import { readFile } from "node:fs/promises";
 import { createRequire } from "node:module";
 import { performance } from "node:perf_hooks";
 import { gunzipSync } from "node:zlib";
@@ -78,28 +77,6 @@ for (const mode of ["baseline", "identity", "gzip"]) {
     cpuMsPerRequest: (usage.user + usage.system) / 500000,
   });
 }
-const images = [];
-for (const name of [
-  "grok-bot-submit-dark",
-  "grok-bot-submit-light",
-  "grok-bot-marketplace-dark",
-  "grok-bot-marketplace-light",
-  "grok-bot-gtm-result-dark",
-  "grok-bot-gtm-result-light",
-  "upstash-content-workflow",
-]) {
-  const baseline = await readFile(
-    new URL(`../../apps/web/public/blog/${name}.png`, import.meta.url)
-  );
-  const candidate = await readFile(
-    new URL(`../../apps/web/public/blog/${name}.webp`, import.meta.url)
-  );
-  images.push({
-    name,
-    baselineBytes: baseline.length,
-    candidateBytes: candidate.length,
-  });
-}
 console.log(
   JSON.stringify(
     {
@@ -108,7 +85,6 @@ console.log(
       iterations: 500,
       cards,
       api: measurements,
-      images,
     },
     null,
     2

@@ -14,6 +14,20 @@ export const SITE_REDIRECTS: SiteRedirect[] = [
     permanent: true,
   },
   { source: "/showcase", destination: "/changelog", permanent: true },
+  // These blog posts linked the PNG originals before switching to WebP.
+  ...[
+    "grok-bot-gtm-result-dark",
+    "grok-bot-gtm-result-light",
+    "grok-bot-marketplace-dark",
+    "grok-bot-marketplace-light",
+    "grok-bot-submit-dark",
+    "grok-bot-submit-light",
+    "upstash-content-workflow",
+  ].map((name) => ({
+    source: `/blog/${name}.png`,
+    destination: `/blog/${name}.webp`,
+    permanent: true,
+  })),
   {
     source: "/founder-chat",
     destination: "https://cal.com/dominikkoch",

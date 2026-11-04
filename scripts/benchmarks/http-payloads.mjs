@@ -1,6 +1,5 @@
 import { createHash } from "node:crypto";
 import { readdir, readFile, stat } from "node:fs/promises";
-import { createRequire } from "node:module";
 import { cpus } from "node:os";
 import { performance } from "node:perf_hooks";
 import {
@@ -100,74 +99,6 @@ for (const sample of samples) {
     });
   }
 }
-const require = createRequire(new URL("apps/web/package.json", root));
-const sharp = require("sharp");
-const images = [];
-for (const name of process.argv[2]
-  ? []
-  : [
-      "grok-bot-submit-dark.png",
-      "grok-bot-marketplace-light.png",
-      "upstash-content-workflow.png",
-    ]) {
-  const data = await readFile(new URL(`apps/web/public/blog/${name}`, root));
-  const metadata = await sharp(data).metadata();
-  for (const mode of [
-    "gzip6",
-    "webp-lossless",
-    "webp80",
-    "webp80-1600",
-    "avif50-1600",
-  ]) {
-    const encode = async () => {
-      if (mode === "gzip6") {
-        return gzipSync(data, { level: 6 });
-      }
-      let pipeline = sharp(data);
-      if (mode.endsWith("1600")) {
-        pipeline = pipeline.resize({ width: 1600, withoutEnlargement: true });
-      }
-      return mode.startsWith("avif")
-        ? pipeline.avif({ quality: 50 }).toBuffer()
-        : pipeline
-            .webp(
-              mode === "webp-lossless" ? { lossless: true } : { quality: 80 }
-            )
-            .toBuffer();
-    };
-    await encode();
-    const timings = [];
-    let output;
-    for (let i = 0; i < 5; i++) {
-      const start = performance.now();
-      output = await encode();
-      timings.push(performance.now() - start);
-    }
-    if (mode === "gzip6" && !gunzipSync(output).equals(data)) {
-      throw new Error("Image gzip roundtrip failed");
-    }
-    if (mode === "webp-lossless") {
-      const before = await sharp(data).ensureAlpha().raw().toBuffer();
-      const after = await sharp(output).ensureAlpha().raw().toBuffer();
-      if (!before.equals(after)) {
-        throw new Error("Lossless pixels differ");
-      }
-    }
-    timings.sort((a, b) => a - b);
-    images.push({
-      name,
-      width: metadata.width,
-      height: metadata.height,
-      rawBytes: data.length,
-      mode,
-      bytes: output.length,
-      savedPercent: +(100 * (1 - output.length / data.length)).toFixed(2),
-      medianMs: +timings[2].toFixed(3),
-      maxMs: +timings[4].toFixed(3),
-      runs: timings.length,
-    });
-  }
-}
 console.log(
   JSON.stringify(
     {
@@ -175,9 +106,7 @@ console.log(
       zlib: process.versions.zlib,
       brotli: process.versions.brotli,
       cpu: cpus()[0].model,
-      sharp: sharp.versions,
       results,
-      images,
     },
     null,
     2

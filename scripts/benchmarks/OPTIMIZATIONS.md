@@ -12,7 +12,7 @@ Dieser Patch setzt Optimierungen um; der ursprüngliche Audit in `README.md` dok
 
 Die Kartenmessung vergleicht die bisherige 2.000-Zeichen-Markdown-Projektion mit der implementierten 160-Zeichen-Home-Vorschau. Collection-Listen behalten die eigene 200-Zeichen-/3-Zeilen-Vorschau; Bildposts behalten Content und Markdown zur Bildauflösung. Detail-/Editor-Endpunkte bleiben unverändert. Die Vorschau wird vor der Kürzung bereinigt; lange Überschriften und Linkziele verschlucken deshalb keinen sichtbaren Text mehr. Dafür liest der Server jetzt das vollständige Markdown aus der Datenbank; die Ersparnis betrifft die Server-Browser-Strecke, nicht die Datenbankabfrage.
 
-Die Bilder verwenden WebP Q90 bei unveränderter Auflösung, feste Dimensionen, Lazy Loading und asynchrones Decoding. Die ursprünglichen PNGs bleiben für bestehende externe Links erhalten. Die Konvertierung ist verlustbehaftet, nicht pixelidentisch.
+Die Bilder verwenden WebP Q90 bei unveränderter Auflösung, feste Dimensionen, Lazy Loading und asynchrones Decoding. Die ursprünglichen PNGs wurden später aus dem Repository entfernt; ihre alten URLs leiten dauerhaft auf die WebP-Dateien weiter (`apps/web/src/constants/redirects.ts`). `optimized-payloads.mjs` misst die Bilder deshalb nicht mehr; die Bildzahlen oben und in `results/optimized.json` sind historische Messwerte. Die Konvertierung ist verlustbehaftet, nicht pixelidentisch.
 
 ## API-Kompression
 

@@ -12,9 +12,9 @@ Stand: 18.10.2026, Repository-Basis `2c41e2a`. Keine App-Verträge, Hosting-Eins
 ## Methode und Grenzen
 
 - Website mit `env -i` ohne Projekt-Credentials und ohne `.env` gebaut und als Nitro-Produktionsartefakt auf Loopback gestartet. Alle HTTP-Proben verwenden `127.0.0.1`.
-- Node 24.11.1, zlib `1.3.1-470d3a2`, Brotli 1.1.0, Sharp 0.35.5. Sandbox: burstbar bis 4 vCPU / 8 GiB; CPU-Modell wird vom Gast als `unknown` gemeldet. Keine dedizierte Benchmarkmaschine.
+- Node 24.11.1, zlib `1.3.1-470d3a2`, Brotli 1.1.0, Sharp 0.35.5 (nur für die historischen Bildmessungen). Sandbox: burstbar bis 4 vCPU / 8 GiB; CPU-Modell wird vom Gast als `unknown` gemeldet. Keine dedizierte Benchmarkmaschine.
 - Textkompression: 3 Aufwärmungen, 15 gemessene synchrone Kompressionen je Datei/Algorithmus/Stufe; Median und nearest-rank p95 (bei n=15 das Maximum). Dekompressions-Roundtrip wird geprüft.
-- Bilder: 1 Aufwärmung, 5 Messungen, Median und Maximum. Lossless-WebP zusätzlich pixelweise mit dem PNG verglichen. Keine visuelle Qualitätsprüfung verlustbehafteter Varianten vorgenommen; diese wurden nicht eingebaut.
+- Bilder (historisch, die Skripte messen keine Bilder mehr): 1 Aufwärmung, 5 Messungen, Median und Maximum. Lossless-WebP zusätzlich pixelweise mit dem PNG verglichen. Keine visuelle Qualitätsprüfung verlustbehafteter Varianten vorgenommen; diese wurden nicht eingebaut.
 - HTTP: je Pfad und Encoding 3 Aufwärmungen plus 30 sequenzielle GETs mit Keep-Alive; Status 200 geprüft; echte Body-Bytes über `node:http`, nicht automatisch dekomprimierendes `fetch`. Zeiten umfassen den ganzen Body, nicht nur TTFB. Header, Größenbereich und letzter Body-Hash werden gespeichert.
 - Die Versuche liefen in derselben Sandbox; zeitweise parallel zu anderen lokalen Prüfungen. CPU-/HTTP-Zeiten sind daher Richtwerte, keine belastbaren Durchsatz- oder SLA-Aussagen. Encoding-Reihenfolge ist fest, nicht randomisiert. Unterschiedliche HTTP-Zeiten ohne unterschiedliche Kodierung sind **kein** Kompressionsgewinn.
 - Dateikompression ist ein isolierter Größen-/CPU-Vergleich, kein End-to-End-Test einer eingebauten Middleware. Keine Lasttests, keine authentifizierten Browser-Sessions, kein Produktions-CDN-Test, keine Streams oder bezahlten Modellaufrufe gemessen.
@@ -65,7 +65,7 @@ Brotli 11 ist für Offline-/Build-Kompression denkbar, nicht die Standardwahl f�
 | grok-bot-marketplace-light | 6.491.881 | 6.361.096 | 2.951.712 | 119.918 | 45.512 | 30.495 |
 | upstash-content-workflow | 1.422.475 | 1.408.033 | 750.812 | 71.592 | 51.516 | 32.512 |
 
-Erste zwei Bilder: 3840×2160; drittes: 2032×856. Resizing erhält das Seitenverhältnis. Qualitätszahlen von WebP und AVIF sind nicht direkt vergleichbar. Lossless behält die dekodierten Pixel, nicht zwangsläufig alle Metadaten. Zeitwerte und Codec-Versionen stehen in `results/payloads.json`.
+Die PNG-Originale wurden inzwischen aus dem Repository entfernt, daher misst `http-payloads.mjs` keine Bilder mehr. Die Tabelle und die Bilddaten in `results/payloads.json` sind historische Messwerte. Erste zwei Bilder: 3840×2160; drittes: 2032×856. Resizing erhält das Seitenverhältnis. Qualitätszahlen von WebP und AVIF sind nicht direkt vergleichbar. Lossless behält die dekodierten Pixel, nicht zwangsläufig alle Metadaten. Zeitwerte und Codec-Versionen stehen in `results/payloads.json`.
 
 Die großen Dateien sind tatsächlich im Blog referenziert (`apps/web/src/content/blog/how-to-create-a-grok-bot-plugin.mdx`). Die Website hat keine Bildoptimierung; rohe MDX-`img`s werden unverändert ausgeliefert. Ein sinnvoller Folgepatch wäre generierte responsive Bildvarianten mit `picture`/`srcset`, nicht gzip für PNG. Auch `loading` und Theme-Varianten gezielt im Browser prüfen, statt aus CSS-Sichtbarkeit auf ausbleibende Downloads zu schließen.
 
@@ -122,8 +122,8 @@ node --input-type=module -e 'import {writeFile} from "node:fs/promises"; await w
 node scripts/benchmarks/http-payloads.mjs /tmp/notra-homepage.html
 ```
 
-Das optionale Dateiargument misst nur diese Datei und überspringt die Bildtests. Der HTTP-Benchmark lehnt andere Hosts als `127.0.0.1` ab. Die Bildkonvertierung kann mehrere Minuten dauern. Keine konvertierten Bilder werden ins Repository geschrieben.
+Das optionale Dateiargument misst nur diese Datei. Der HTTP-Benchmark lehnt andere Hosts als `127.0.0.1` ab.
 
-Verifikation: erfolgreicher Website-Produktionsbuild; alle Benchmarkskripte ausgeführt; Text/gzip-Roundtrips und lossless Bildpixel geprüft. Kein Produktiv-Deployment, kein PR, keine funktionalen App-Änderungen.
+Verifikation (Stand 18.10.2026, die Bildprüfungen sind seitdem entfallen): erfolgreicher Website-Produktionsbuild; alle Benchmarkskripte ausgeführt; Text/gzip-Roundtrips und lossless Bildpixel geprüft. Kein Produktiv-Deployment, kein PR, keine funktionalen App-Änderungen.
 
 Zusätzliche Checks: `bun run check` erfolgreich (0 Fehler; 9.339 bestehende Warnungen, überwiegend Design-/Theme-Diagnostik). Gezieltes `bunx ultracite check` für die neuen JS-/Markdown-/JSON-Dateien ohne Warnungen oder Fehler. Beide JS-Skripte zusätzlich mit `node --check` geprüft. Keine funktionalen App-Tests ausgeführt, weil keine App-Implementierung verändert wurde.

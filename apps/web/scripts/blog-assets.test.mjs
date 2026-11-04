@@ -4,13 +4,15 @@ import { test } from "node:test";
 
 import sharp from "sharp";
 
+const MAX_SCREENSHOT_BYTES = 512 * 1024;
+
 const articles = [
   "how-to-create-a-grok-bot-plugin",
   "how-notra-uses-upstash-to-run-an-ai-content-pipeline",
 ];
 
 for (const article of articles) {
-  test(`${article} uses smaller, full-resolution screenshots`, async () => {
+  test(`${article} uses small, full-resolution WebP screenshots`, async () => {
     const source = await readFile(
       new URL(`../src/content/blog/${article}.mdx`, import.meta.url),
       "utf8"
@@ -26,17 +28,12 @@ for (const article of articles) {
       const optimized = await readFile(
         new URL(`../public${src}`, import.meta.url)
       );
-      const original = await readFile(
-        new URL(`../public${src.replace(/\.webp$/, ".png")}`, import.meta.url)
-      );
-      const before = await sharp(original).metadata();
-      const after = await sharp(optimized).metadata();
-      assert.equal(after.format, "webp");
-      assert.equal(after.width, before.width);
-      assert.equal(after.height, before.height);
-      assert.ok(optimized.length < original.length / 10);
-      assert.ok(markup.includes(`width="${before.width}"`));
-      assert.ok(markup.includes(`height="${before.height}"`));
+      const metadata = await sharp(optimized).metadata();
+      assert.equal(metadata.format, "webp");
+      assert.ok(optimized.length < MAX_SCREENSHOT_BYTES);
+      assert.ok(markup.includes(`width="${metadata.width}"`));
+      assert.ok(markup.includes(`height="${metadata.height}"`));
+      assert.ok(metadata.width >= 2000);
       assert.ok(markup.includes('loading="lazy"'));
       assert.ok(markup.includes('decoding="async"'));
       await sharp(optimized).raw().toBuffer();
