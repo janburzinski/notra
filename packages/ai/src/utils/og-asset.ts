@@ -1,7 +1,11 @@
-import { OG_IMAGE_WIDTH } from "@notra/ai/constants/og-image";
+import {
+  OG_IMAGE_WIDTH,
+  OG_LOGO_MAX_ENLARGEMENT,
+} from "@notra/ai/constants/og-image";
 import type {
   OgAssetCrop,
   OgAssetTarget,
+  OgLayerBox,
   OgTemplate,
   OgBrandContext,
 } from "@notra/ai/types/og-image";
@@ -182,6 +186,52 @@ export async function loadOgAsset(
   return encodeOgPngAsset(png);
 }
 
+/**
+ * Removes transparent padding so a contained logo sits where it was placed;
+ * opaque backgrounds such as app-icon tiles are kept intact.
+ */
+export async function trimOgLogo(data: string) {
+  try {
+    const png = await sharp(Buffer.from(data.split(",")[1] ?? "", "base64"))
+      .trim({ background: { r: 0, g: 0, b: 0, alpha: 0 } })
+      .png()
+      .toBuffer();
+    return await encodeOgPngAsset(png);
+  } catch {
+    return data;
+  }
+}
+
+/**
+ * Shrinks a contain-fit logo box that would upscale its small source past the
+ * blur limit, keeping its left, centered or right anchor and vertical center.
+ */
+export function fitOgLogoBox(
+  box: OgLayerBox,
+  sourceWidth: number,
+  sourceHeight: number
+): OgLayerBox {
+  const scale = Math.min(box.width / sourceWidth, box.height / sourceHeight);
+  if (scale <= OG_LOGO_MAX_ENLARGEMENT) {
+    return box;
+  }
+  const width = Math.floor(sourceWidth * OG_LOGO_MAX_ENLARGEMENT);
+  const height = Math.floor(sourceHeight * OG_LOGO_MAX_ENLARGEMENT);
+  const center = box.x + box.width / 2;
+  let x = box.x;
+  if (Math.abs(center - OG_IMAGE_WIDTH / 2) <= 4) {
+    x = center - width / 2;
+  } else if (center > OG_IMAGE_WIDTH / 2) {
+    x = box.x + box.width - width;
+  }
+  return {
+    x: Math.round(x),
+    y: Math.round(box.y + (box.height - height) / 2),
+    width,
+    height,
+  };
+}
+
 /** Check the pixels actually embedded after the bounded asset resize. */
 export function validateOgAssetSize(
   width: number,
@@ -196,7 +246,7 @@ export function validateOgAssetSize(
   // Fill deliberately stretches diffuse decorative strips; cover must fill both axes.
   const enlargement =
     target.fit === "cover" ? Math.max(...scales) : Math.min(...scales);
-  if (enlargement > (target.decorative ? 4 : 1.25)) {
+  if (enlargement > (target.decorative ? 4 : OG_LOGO_MAX_ENLARGEMENT)) {
     throw new Error(
       `Asset is only ${Math.round(width * resizeScale)}x${Math.round(height * resizeScale)} pixels; choose a higher-resolution source, a smaller box, or omit this image`
     );

@@ -37,7 +37,7 @@ export function extractOgSiteEvidence(html: string, pageUrl: string) {
         /logo|mark|hero|background|pattern|texture|illustration|artwork|cover/i.test(
           label
         ) &&
-        !/customer|partner|competitor|testimonial|logocloud|integration|ai-engines|payment-methods/i.test(
+        !/customer|partner|competitor|testimonial|logocloud|integration|ai-engines|payment-methods|\b(?:backers?|investors?|press|frameworks?)\b/i.test(
           label
         )
       ) {

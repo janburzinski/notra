@@ -34,6 +34,12 @@ export interface OgRenderBounds {
   width: number;
   height: number;
 }
+export interface OgLayerBox {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
 export interface OgAssetTarget extends Pick<
   OgRenderBounds,
   "width" | "height"

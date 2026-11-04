@@ -1,6 +1,10 @@
 import {
+  OG_FLEX_ALIGN,
   OG_IMAGE_HEIGHT,
   OG_IMAGE_WIDTH,
+  OG_LOGO_INK_DELTA,
+  OG_LOGO_MAX_CANVAS_SHARE,
+  OG_LOGO_MIN_INK_RATIO,
   OG_TITLE_LINE_LIMITS,
   OG_WIDE_TITLE_MIN_WIDTH,
 } from "@notra/ai/constants/og-image";
@@ -14,6 +18,7 @@ import { validateOgGlyphCoverage } from "@notra/ai/utils/og-font";
 import { parseOgWebsiteUrl } from "@notra/ai/utils/og-website";
 import { loadRenderFont } from "@notra/ai/utils/render-font";
 import { createElement as h } from "react";
+import sharp from "sharp";
 
 export function validateOgLayout(template: OgTemplate) {
   const { title } = template;
@@ -58,6 +63,89 @@ export function validateOgLayout(template: OgTemplate) {
       );
     }
   }
+}
+
+/**
+ * Logos and symbols that render without visible ink, e.g. a black SVG that
+ * could not be recolored on a black card. Compares the probe with the same
+ * card rendered without its logos, so background detail never counts as ink.
+ */
+export async function findInvisibleOgLogos(
+  document: SavedOgTemplate,
+  title: string,
+  brand: Pick<OgBrandContext, "name" | "websiteUrl">,
+  pngBase64: string
+) {
+  // Oversized wordmarks are often deliberately faint background art.
+  const logos = new Set(
+    document.template.layers.flatMap((layer, index) =>
+      layer.kind === "image" &&
+      !layer.decorative &&
+      layer.width * layer.height <=
+        OG_IMAGE_WIDTH * OG_IMAGE_HEIGHT * OG_LOGO_MAX_CANVAS_SHARE
+        ? [index]
+        : []
+    )
+  );
+  if (!logos.size) {
+    return [];
+  }
+  const bare = await renderOgImage(
+    {
+      ...document,
+      template: {
+        ...document.template,
+        layers: document.template.layers.map((layer, index) =>
+          logos.has(index) ? { ...layer, opacity: 0 } : layer
+        ),
+      },
+    },
+    title,
+    brand
+  );
+  const [withLogos, withoutLogos] = await Promise.all(
+    [pngBase64, bare.pngBase64].map((png) =>
+      sharp(Buffer.from(png, "base64"))
+        .removeAlpha()
+        .raw()
+        .toBuffer({ resolveWithObject: true })
+    )
+  );
+  if (!(withLogos && withoutLogos)) {
+    return [];
+  }
+  const { width, height, channels } = withLogos.info;
+  return [...logos].filter((index) => {
+    const layer = document.template.layers[index];
+    if (!layer) {
+      return false;
+    }
+    const left = Math.max(0, Math.floor(layer.x));
+    const top = Math.max(0, Math.floor(layer.y));
+    const right = Math.min(width, Math.ceil(layer.x + layer.width));
+    const bottom = Math.min(height, Math.ceil(layer.y + layer.height));
+    let ink = 0;
+    for (let y = top; y < bottom; y += 1) {
+      for (let x = left; x < right; x += 1) {
+        const offset = (y * width + x) * channels;
+        // Per-channel distance: a saturated blue logo on black barely differs
+        // in luminance but is plainly visible.
+        for (let channel = 0; channel < 3; channel += 1) {
+          if (
+            Math.abs(
+              (withLogos.data[offset + channel] ?? 0) -
+                (withoutLogos.data[offset + channel] ?? 0)
+            ) > OG_LOGO_INK_DELTA
+          ) {
+            ink += 1;
+            break;
+          }
+        }
+      }
+    }
+    const area = Math.max(1, (right - left) * (bottom - top));
+    return ink / area < OG_LOGO_MIN_INK_RATIO;
+  });
 }
 
 export async function renderOgImage(
@@ -187,6 +275,7 @@ export async function renderOgImage(
                   display: "flex",
                   width: layer.width,
                   flexShrink: 0,
+                  justifyContent: OG_FLEX_ALIGN[layer.align],
                   wordBreak: "break-word",
                 },
               },
@@ -215,6 +304,8 @@ export async function renderOgImage(
                 display: "flex",
                 width: area.width,
                 flexShrink: 0,
+                // Satori shrink-wraps flex text; textAlign alone leaves it at the start.
+                justifyContent: OG_FLEX_ALIGN[area.align],
                 fontSize: size,
                 color: area.color,
                 lineHeight: area.lineHeight,
