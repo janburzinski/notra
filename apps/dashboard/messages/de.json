@@ -4094,10 +4094,6 @@
           "errorRate": "Fehlerrate",
           "p95Latency": "p95-Latenz"
         },
-        "chart": {
-          "title": "Anfragen nach Methode",
-          "otherMethods": "Andere Methoden"
-        },
         "columns": {
           "tool": "Tool",
           "calls": "Aufrufe",
@@ -4123,7 +4119,8 @@
           "duration": "Dauer",
           "time": "Zeit",
           "method": "Methode",
-          "status": "Status"
+          "status": "Status",
+          "description": "Beschreibung"
         },
         "fallback": {
           "unknown": "Unbekannt",
@@ -4132,6 +4129,12 @@
           "otherMethod": "Andere Methode",
           "anonymous": "Anonym"
         },
+        "version": {
+          "label": "Server-Version",
+          "all": "Alle Versionen",
+          "latest": "Neueste"
+        },
+        "emptyTitle": "Nichts in diesem Zeitraum",
         "uiBadge": "UI",
         "serverRequests": {
           "elicitation": "Elicitation",
@@ -4140,43 +4143,35 @@
         "seconds": "{count, number} s",
         "tools": {
           "title": "Tools",
-          "hint": "Klick auf ein Tool, um zu sehen, was Agents davor und danach aufrufen, wie sie mit Fehlern umgehen und was sie erreichen wollten.",
-          "readout": "{called, number} aufgerufen",
-          "readoutWithUnused": "{called, number} aufgerufen · {unused, number} ungenutzt"
+          "hint": "Klick auf ein Tool, um zu sehen, was Agents davor und danach aufrufen, wie sie mit Fehlern umgehen und was sie erreichen wollten."
         },
         "unused": {
           "title": "Nie aufgerufen",
           "hint": "Deine letzte tools/list-Antwort hat diese Tools angeboten, aber kein Agent hat sie in diesem Zeitraum aufgerufen. Benenne sie um, verbessere die Beschreibung oder entferne sie.",
-          "readout": "{count, plural, one {# Tool} other {# Tools}}",
           "noDescription": "Keine Beschreibung"
         },
         "elicitations": {
           "title": "Rückfragen an Nutzer",
           "hint": "Elicitation- und Sampling-Anfragen, die dein Server an den Client geschickt hat, gruppiert nach dem auslösenden Tool, und wie Nutzer geantwortet haben.",
-          "readout": "{count, number} gefragt",
           "empty": "Keine Elicitation-Anfragen in diesem Zeitraum. Übergib relatedRequestId an elicitInput, damit jede Anfrage ihrem Tool zugeordnet wird."
         },
         "uiRenders": {
           "title": "Interaktive Oberflächen",
           "hint": "MCP-Apps-Oberflächen (ui://-Ressourcen), die Hosts geladen haben, mit den Tools, die sie deklarieren.",
-          "readout": "{count, number} Aufrufe",
           "empty": "Kein Host hat in diesem Zeitraum eine ui://-Ressource geladen. Tools mit _meta.ui.resourceUri erscheinen hier, sobald ein Host sie anzeigt."
         },
         "clients": {
           "title": "Clients",
-          "hint": "Aus den clientInfo-Angaben jeder initialize-Anfrage.",
-          "readout": "{count, plural, one {# Client} other {# Clients}}"
+          "hint": "Aus den clientInfo-Angaben jeder initialize-Anfrage."
         },
         "models": {
           "title": "Modelle",
           "hint": "Agents geben ihr Modell über den optionalen Parameter _model an.",
-          "readout": "{count, plural, one {# Modell} other {# Modelle}}",
           "empty": "Aktiviere contextParameters im SDK, um zu sehen, welche Modelle deinen Server aufrufen."
         },
         "sessions": {
           "title": "Sitzungen",
-          "hint": "Jede Mcp-Session-Id ist ein Agent-Lauf. Klick auf eine Sitzung, um ihren ganzen Ablauf zu sehen.",
-          "readout": "{count, number} in diesem Zeitraum"
+          "hint": "Jede Mcp-Session-Id ist ein Agent-Lauf. Klick auf eine Sitzung, um ihren ganzen Ablauf zu sehen."
         },
         "intents": {
           "title": "Was Agents vorhaben",
@@ -4185,7 +4180,6 @@
         },
         "users": {
           "title": "Nutzer",
-          "readout": "{count, number} erkannt",
           "empty": "Übergib identify an das SDK, um zu sehen, für welche deiner Nutzer die Agents handeln."
         },
         "requests": {
@@ -4222,13 +4216,18 @@
           "sessionId": "Mcp-Session-Id",
           "intent": "Absicht",
           "arguments": "Argumente",
-          "response": "Antwort"
+          "response": "Antwort",
+          "error": "Fehler"
         },
         "sessionSheet": {
           "title": "{client}-Sitzung",
-          "requests": "{count, plural, one {# Anfrage} other {# Anfragen}}",
-          "sessionId": "Mcp-Session-Id: {id}",
-          "payload": "Payload"
+          "detail": "Detail",
+          "value": "Wert",
+          "time": "Zeit",
+          "request": "Anfrage",
+          "noEvents": "Für diese Sitzung wurden keine Anfragen aufgezeichnet.",
+          "duration": "Dauer",
+          "vsAverage": "im Vergleich zur durchschnittlichen Sitzung in diesem Zeitraum"
         },
         "toolSheet": {
           "noDescription": "In tools/list ist keine Beschreibung angegeben.",
@@ -4237,20 +4236,18 @@
           "sessionStart": "Sitzungsbeginn",
           "sessionEnd": "Sitzungsende",
           "noCalls": "Noch keine Aufrufe.",
-          "afterFailure": "{count, number} nach Fehler",
-          "recoveryTitle": "Nach einem Fehler",
-          "retried": "Tool erneut aufgerufen",
-          "switched": "Gewechselt zu",
-          "gaveUp": "Sitzung beendet",
           "failures": "Fehler",
-          "failuresReadout": "{count, number} verschiedene",
           "noErrorMessage": "Keine Fehlermeldung",
           "noFailures": "Keine Fehler in diesem Zeitraum.",
           "wanted": "Was Agents wollten",
-          "wantedHint": "Aus dem optionalen Parameter _intent.",
           "wantedEmpty": "Aktiviere contextParameters im SDK, um Absichten zu sehen.",
           "topUsers": "Top-Nutzer",
-          "topUsersEmpty": "Übergib identify an das SDK, um zu sehen, wer dieses Tool aufruft."
+          "topUsersEmpty": "Übergib identify an das SDK, um zu sehen, wer dieses Tool aufruft.",
+          "share": "Anteil",
+          "afterFailureColumn": "Nach Fehler",
+          "failure": "Fehler",
+          "user": "Nutzer",
+          "intent": "Absicht"
         }
       }
     },

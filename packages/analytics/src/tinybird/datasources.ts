@@ -511,11 +511,12 @@ export const mcpEvents = defineDatasource("mcp_events", {
 
 export const mcpDaily = defineDatasource("mcp_daily", {
   description:
-    "Daily rollup of mcp_events per project, method, target, client and status; read with countMerge/uniqMerge/uniqIfMerge/sumMerge/quantilesTDigestMerge(0.5, 0.95)",
+    "Daily rollup of mcp_events per project, server version, method, target, client and status; read with countMerge/uniqMerge/uniqIfMerge/sumMerge/quantilesTDigestMerge(0.5, 0.95). Rows rolled up before server_version existed carry an empty version.",
   schema: {
     day: t.date(),
     organization_id: t.string(),
     project_id: t.string().lowCardinality(),
+    server_version: t.string().lowCardinality().default(""),
     method: t.string().lowCardinality(),
     status: t.string().lowCardinality(),
     client_name: t.string().lowCardinality(),
@@ -537,11 +538,14 @@ export const mcpDaily = defineDatasource("mcp_daily", {
       "method",
       "status",
       "client_name",
+      "server_version",
       "day",
       "target",
     ],
     partitionKey: "toYYYYMM(day)",
   }),
+  forwardQuery:
+    "SELECT day, organization_id, project_id, defaultValueOfTypeName('LowCardinality(String)') AS server_version, method, status, client_name, target, requests_state, sessions_state, users_state, response_bytes_state, duration_state, last_seen_state",
   jsonPaths: false,
 });
 

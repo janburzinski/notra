@@ -18,6 +18,7 @@ import {
 import {
   TABLE_CELL_INNER_CLASS,
   TABLE_ROW_BORDER_CLASS,
+  TABLE_ROW_FOCUS_RING_CLASS,
 } from "@notra/ui/constants/table";
 import { alignText, readCell } from "@notra/ui/lib/data-table";
 import { cn } from "@notra/ui/lib/utils";
@@ -103,7 +104,8 @@ export function DataTableBodyRow<T>({
   const tableRow = (
     <TableRow
       className={cn(
-        "group hover:bg-muted data-[selected=true]:bg-primary/5 focus-visible:outline-ring focus-visible:outline-2 focus-visible:-outline-offset-2",
+        "group hover:bg-muted data-[selected=true]:bg-primary/5 outline-none",
+        TABLE_ROW_FOCUS_RING_CLASS,
         onRowClick && "cursor-pointer",
         className
       )}

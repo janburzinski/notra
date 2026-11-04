@@ -12,19 +12,14 @@ import { useTranslations } from "use-intl";
 import { AnalyticsSourceTabs } from "@/components/analytics/analytics-source-tabs";
 import { GeoRangePicker } from "@/components/geo/geo-range-picker";
 import { PageContainer } from "@/components/layout/container";
-import { McpChartHeader } from "@/components/mcp/mcp-chart-header";
 import {
-  TRAFFIC_HERO_CHART_SURFACE_CLASS,
-  TRAFFIC_HERO_FRAME_CLASS,
-  TRAFFIC_HERO_METRIC_CELL_CLASS,
-  TRAFFIC_HERO_METRICS_GRID_CLASS,
-  TRAFFIC_HERO_METRICS_SURFACE_CLASS,
-} from "@/constants/geo-traffic-hero";
-import { MCP_TOOLS_SKELETON_ROWS } from "@/constants/mcp-analytics";
+  MCP_METRIC_CARD_CLASS,
+  MCP_METRIC_CHART_SURFACE_CLASS,
+  MCP_TOOLS_SKELETON_ROWS,
+} from "@/constants/mcp-analytics";
 import { TABLE_ROW_HEIGHT } from "@/constants/table";
-import { cn } from "@/lib/utils";
 import type { McpTrafficSkeletonProps } from "@/types/mcp-analytics";
-import { paginatedTableHeightFor } from "@/utils/table";
+import { mcpTableHeight } from "@/utils/mcp-analytics";
 
 /** Mirrors the MCP tab: same header and tab row as Website, then hero and tools. */
 export function McpTrafficSkeleton({ geoRange }: McpTrafficSkeletonProps) {
@@ -93,42 +88,33 @@ export function McpTrafficSkeleton({ geoRange }: McpTrafficSkeletonProps) {
             )}
           </div>
         </PageHeading>
-        <AnalyticsSourceTabs
-          actions={<Skeleton className="h-6 w-60 rounded-md" />}
-        />
-        <div className={TRAFFIC_HERO_FRAME_CLASS}>
-          <div
-            className={cn(
-              TRAFFIC_HERO_METRICS_GRID_CLASS,
-              TRAFFIC_HERO_METRICS_SURFACE_CLASS
-            )}
-          >
-            {metricLabels.map((label) => (
-              <div className={TRAFFIC_HERO_METRIC_CELL_CLASS} key={label}>
+        <AnalyticsSourceTabs />
+        <div className="grid gap-4 lg:grid-cols-2">
+          {metricLabels.map((label) => (
+            <div className={MCP_METRIC_CARD_CLASS} key={label}>
+              <div className="flex items-center justify-between gap-3 px-4 py-3">
                 <p className="text-foreground/75 text-sm leading-5 font-semibold tracking-tight">
                   {label}
                 </p>
-                <div className="flex min-w-0 flex-wrap items-center gap-3">
-                  <Skeleton className="h-6 w-14 @4xl/hero:h-7.5 @4xl/hero:w-16" />
-                  <Skeleton className="h-5 w-16 rounded-full" />
+                <div className="flex items-center gap-2.5">
+                  <Skeleton className="h-5 w-12" />
+                  <Skeleton className="h-5 w-12 rounded-full" />
                 </div>
               </div>
-            ))}
-          </div>
-          <div className={TRAFFIC_HERO_CHART_SURFACE_CLASS}>
-            <McpChartHeader />
-            <Skeleton className="h-52 w-full rounded-xl @md/hero:h-72" />
-          </div>
+              <div className={MCP_METRIC_CHART_SURFACE_CLASS}>
+                <Skeleton className="h-40 w-full rounded-xl" />
+              </div>
+            </div>
+          ))}
         </div>
         <InstrumentSection
           eyebrow={t("mcp.tools.title")}
           hint={t("mcp.tools.hint")}
-          readout={<Skeleton className="inline-block h-3 w-24 align-middle" />}
         >
           <DataTable
             columns={toolColumns}
             data={[]}
-            height={paginatedTableHeightFor(MCP_TOOLS_SKELETON_ROWS)}
+            height={mcpTableHeight(MCP_TOOLS_SKELETON_ROWS)}
             loading
             rowHeight={TABLE_ROW_HEIGHT}
             scrollFade={false}

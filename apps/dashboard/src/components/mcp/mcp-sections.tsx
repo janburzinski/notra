@@ -1,62 +1,47 @@
 "use client";
 
-import { formatDayLabel } from "@notra/geo-core/utils/day-label";
+import { trafficVisitDelta } from "@notra/geo-core/utils/ai-traffic";
 import { InstrumentSection } from "@notra/ui/components/instrument/instrument-module";
-import { TrendBadge } from "@notra/ui/components/trend-badge";
 import { Button } from "@notra/ui/components/ui/button";
 import { DataTable } from "@notra/ui/components/ui/data-table";
 import { Tabs, TabsList, TabsTrigger } from "@notra/ui/components/ui/tabs";
 import { useState } from "react";
 import { useFormatter, useLocale, useTranslations } from "use-intl";
 
-import { EChartsAreaChart } from "@/components/evilcharts/charts/echarts-area-chart";
 import { CodeSnippet } from "@/components/geo/code-snippet";
-import { McpChartHeader } from "@/components/mcp/mcp-chart-header";
+import { McpMetricCard } from "@/components/mcp/mcp-metric-card";
+import { McpTableEmpty } from "@/components/mcp/mcp-sheet-parts";
 import {
-  TRAFFIC_HERO_CHART_OPTIONS,
-  TRAFFIC_HERO_CHART_SURFACE_CLASS,
-  TRAFFIC_HERO_FRAME_CLASS,
-  TRAFFIC_HERO_METRIC_CELL_CLASS,
-  TRAFFIC_HERO_METRIC_VALUE_CLASS,
-  TRAFFIC_HERO_METRICS_GRID_CLASS,
-  TRAFFIC_HERO_METRICS_SURFACE_CLASS,
-} from "@/constants/geo-traffic-hero";
-import {
-  MCP_DAILY_SERIES,
   MCP_LOG_FILTERS,
-  MCP_SERIES_COLORS,
+  MCP_LOG_TABLE_HEIGHT,
   MCP_SETUP_SNIPPET,
 } from "@/constants/mcp-analytics";
 import { TABLE_ROW_HEIGHT } from "@/constants/table";
+import { useDesktopBreakpoint } from "@/lib/hooks/use-desktop-breakpoint";
 import { useMcpColumns } from "@/lib/hooks/use-mcp-columns";
-import type { ChartConfig } from "@/types/charts";
 import type {
   McpAnalyticsHeroProps,
   McpAudienceSectionsProps,
   McpLoadFailedProps,
   McpLogFilter,
   McpMetric,
-  McpOptInHintProps,
   McpRequestLogProps,
   McpToolSectionsProps,
 } from "@/types/mcp-analytics";
-import { formatFullDayLabel } from "@/utils/analytics-charts";
-import { seriesColors } from "@/utils/chart-colors";
 import { formatMilliseconds } from "@/utils/format";
-import { formatChartInteger } from "@/utils/geo-charts";
-import { errorRate, percentChange } from "@/utils/mcp-analytics";
-import { paginatedTableHeightFor } from "@/utils/table";
+import {
+  errorRate,
+  mcpTableHeight,
+  percentChange,
+} from "@/utils/mcp-analytics";
 
-function trendTone(metric: McpMetric) {
-  const rounded = Math.round(metric.delta);
-  if (rounded === 0) {
-    return "flat";
-  }
-  return rounded > 0 !== Boolean(metric.lowerIsBetter) ? "up" : "down";
-}
-
-function OptInHint({ text }: McpOptInHintProps) {
-  return <p className="text-muted-foreground text-sm">{text}</p>;
+/** Side by side, a pair of tables shares the taller height so the cards line up. */
+function usePairHeight() {
+  const sideBySide = useDesktopBreakpoint();
+  return (first: number, second: number) =>
+    sideBySide
+      ? Math.max(mcpTableHeight(first), mcpTableHeight(second))
+      : undefined;
 }
 
 export function McpSetupPrompt() {
@@ -80,124 +65,76 @@ export function McpLoadFailed({ onRetry }: McpLoadFailedProps) {
   );
 }
 
-function useMcpMetrics({
-  data: { totals },
-}: McpAnalyticsHeroProps): McpMetric[] {
+/** Rate and latency changes only mean something once the last period had requests. */
+function comparableChange(
+  current: number,
+  previous: number,
+  previousRequests: number
+): number | null {
+  return previousRequests > 0 && previous > 0
+    ? percentChange(current, previous)
+    : null;
+}
+
+function useMcpMetrics({ totals }: McpAnalyticsHeroProps["data"]): McpMetric[] {
   const t = useTranslations("geo.pages.mcp.metrics");
   const format = useFormatter();
   const locale = useLocale();
   const rate = errorRate(totals.errors, totals.requests);
   return [
     {
+      key: "toolCalls",
       label: t("toolCalls"),
       value: format.number(totals.toolCalls),
-      delta: percentChange(totals.toolCalls, totals.previousToolCalls),
+      delta: trafficVisitDelta(totals.toolCalls, totals.previousToolCalls),
     },
     {
+      key: "sessions",
       label: t("sessions"),
       value: format.number(totals.sessions),
-      delta: percentChange(totals.sessions, totals.previousSessions),
+      delta: trafficVisitDelta(totals.sessions, totals.previousSessions),
     },
     {
+      key: "errorRate",
       label: t("errorRate"),
       value: format.number(rate / 100, {
         style: "percent",
         minimumFractionDigits: 1,
         maximumFractionDigits: 1,
       }),
-      delta: percentChange(
+      delta: comparableChange(
         rate,
-        errorRate(totals.previousErrors, totals.previousRequests)
+        errorRate(totals.previousErrors, totals.previousRequests),
+        totals.previousRequests
       ),
       lowerIsBetter: true,
     },
     {
+      key: "p95Latency",
       label: t("p95Latency"),
       value: formatMilliseconds(totals.p95Ms, locale),
-      delta: percentChange(totals.p95Ms, totals.previousP95Ms),
+      delta: comparableChange(
+        totals.p95Ms,
+        totals.previousP95Ms,
+        totals.previousRequests
+      ),
       lowerIsBetter: true,
     },
   ];
 }
 
-export function McpAnalyticsHero({ data }: McpAnalyticsHeroProps) {
-  const t = useTranslations("geo.pages.mcp.chart");
-  const locale = useLocale();
-  const metrics = useMcpMetrics({ data });
-  const seriesLabel = (series: (typeof MCP_DAILY_SERIES)[number]) =>
-    series.label || t("otherMethods");
-  const chartConfig: ChartConfig = Object.fromEntries(
-    MCP_DAILY_SERIES.map((series) => [
-      series.key,
-      {
-        label: seriesLabel(series),
-        colors: seriesColors(MCP_SERIES_COLORS[series.key]),
-      },
-    ])
-  );
-
+export function McpAnalyticsHero({ data, range }: McpAnalyticsHeroProps) {
+  const metrics = useMcpMetrics(data);
   return (
-    <div className={TRAFFIC_HERO_FRAME_CLASS}>
-      <div
-        className={`${TRAFFIC_HERO_METRICS_GRID_CLASS} ${TRAFFIC_HERO_METRICS_SURFACE_CLASS}`}
-      >
-        {metrics.map((metric) => (
-          <div className={TRAFFIC_HERO_METRIC_CELL_CLASS} key={metric.label}>
-            <p className="text-foreground/75 text-sm leading-5 font-semibold tracking-tight">
-              {metric.label}
-            </p>
-            <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
-              <span className={TRAFFIC_HERO_METRIC_VALUE_CLASS}>
-                {metric.value}
-              </span>
-              <TrendBadge
-                showIcon={!metric.lowerIsBetter}
-                tone={trendTone(metric)}
-              >
-                {metric.delta > 0 ? "+" : ""}
-                {Math.round(metric.delta)}%
-              </TrendBadge>
-            </div>
-          </div>
-        ))}
-      </div>
-      <div className={TRAFFIC_HERO_CHART_SURFACE_CLASS}>
-        <McpChartHeader />
-        <EChartsAreaChart
-          animationType="left-to-right"
-          chartOptions={TRAFFIC_HERO_CHART_OPTIONS}
-          className="h-52 w-full @md/hero:h-72"
-          config={chartConfig}
-          curveType="monotone"
-          data={data.daily.map((row) => ({
-            ...row,
-            rawDay: row.day,
-            day: formatDayLabel(row.day, locale),
-          }))}
-          xDataKey="day"
-        >
-          <EChartsAreaChart.Grid variant="solid" />
-          <EChartsAreaChart.XAxis dataKey="day" />
-          <EChartsAreaChart.YAxis />
-          {MCP_DAILY_SERIES.map((series) => (
-            <EChartsAreaChart.Area
-              dataKey={series.key}
-              key={series.key}
-              strokeVariant="solid"
-              strokeWidth={2}
-              variant="gradient"
-            />
-          ))}
-          <EChartsAreaChart.Tooltip
-            labelKey="rawDay"
-            labelFormatter={(day: string) => formatFullDayLabel(day, locale)}
-            roundness="xl"
-            valueFormatter={(value: number) =>
-              formatChartInteger(value, locale)
-            }
-          />
-        </EChartsAreaChart>
-      </div>
+    <div className="grid gap-4 lg:grid-cols-2">
+      {metrics.map((metric) => (
+        <McpMetricCard
+          data={data}
+          key={metric.key}
+          metric={metric}
+          range={range}
+        />
+      ))}
     </div>
   );
 }
@@ -208,47 +145,27 @@ export function McpToolSections({ data, onOpenTool }: McpToolSectionsProps) {
   const unusedTools = data.catalog?.unusedTools ?? [];
   return (
     <>
-      <InstrumentSection
-        eyebrow={t("tools.title")}
-        hint={t("tools.hint")}
-        readout={
-          unusedTools.length > 0
-            ? t("tools.readoutWithUnused", {
-                called: data.tools.length,
-                unused: unusedTools.length,
-              })
-            : t("tools.readout", { called: data.tools.length })
-        }
-      >
+      <InstrumentSection eyebrow={t("tools.title")} hint={t("tools.hint")}>
         <DataTable
           columns={columns.tools}
           data={data.tools}
           defaultSort={{ key: "calls", direction: "desc" }}
           getRowId={(row) => row.name}
-          height={paginatedTableHeightFor(data.tools.length)}
+          height={mcpTableHeight(data.tools.length)}
           onRowClick={(row) => onOpenTool(row.name)}
           rowHeight={TABLE_ROW_HEIGHT}
         />
       </InstrumentSection>
       {unusedTools.length > 0 ? (
-        <InstrumentSection
-          eyebrow={t("unused.title")}
-          hint={t("unused.hint")}
-          readout={t("unused.readout", { count: unusedTools.length })}
-        >
-          <ul className="divide-border divide-y text-sm">
-            {unusedTools.map((tool) => (
-              <li
-                className="flex flex-col gap-0.5 py-2 sm:flex-row sm:gap-4"
-                key={tool.name}
-              >
-                <span className="shrink-0 font-mono sm:w-56">{tool.name}</span>
-                <span className="text-muted-foreground min-w-0">
-                  {tool.description || t("unused.noDescription")}
-                </span>
-              </li>
-            ))}
-          </ul>
+        <InstrumentSection eyebrow={t("unused.title")} hint={t("unused.hint")}>
+          <DataTable
+            columns={columns.unusedTools}
+            data={unusedTools}
+            defaultSort={{ key: "name", direction: "asc" }}
+            getRowId={(row) => row.name}
+            height={mcpTableHeight(unusedTools.length)}
+            rowHeight={TABLE_ROW_HEIGHT}
+          />
         </InstrumentSection>
       ) : null}
     </>
@@ -261,48 +178,40 @@ export function McpServerRequestSections({
 }: McpToolSectionsProps) {
   const t = useTranslations("geo.pages.mcp");
   const columns = useMcpColumns();
+  const pairHeight = usePairHeight();
+  const height = pairHeight(data.elicitations.length, data.uiRenders.length);
   return (
-    <div className="grid gap-6 xl:grid-cols-2">
+    <div className="grid gap-4 lg:grid-cols-2">
       <InstrumentSection
         eyebrow={t("elicitations.title")}
         hint={t("elicitations.hint")}
-        readout={t("elicitations.readout", {
-          count: data.elicitations.reduce((sum, row) => sum + row.requests, 0),
-        })}
       >
-        {data.elicitations.length > 0 ? (
-          <DataTable
-            columns={columns.elicitations}
-            data={data.elicitations}
-            defaultSort={{ key: "requests", direction: "desc" }}
-            getRowId={(row) => `${row.method}-${row.tool}`}
-            height={paginatedTableHeightFor(data.elicitations.length)}
-            onRowClick={(row) => (row.tool ? onOpenTool(row.tool) : null)}
-            rowHeight={TABLE_ROW_HEIGHT}
-          />
-        ) : (
-          <OptInHint text={t("elicitations.empty")} />
-        )}
+        <DataTable
+          columns={columns.elicitations}
+          data={data.elicitations}
+          defaultSort={{ key: "requests", direction: "desc" }}
+          emptyState={<McpTableEmpty description={t("elicitations.empty")} />}
+          getRowId={(row) => `${row.method}-${row.tool}`}
+          height={height ?? mcpTableHeight(data.elicitations.length)}
+          minHeight={height}
+          onRowClick={(row) => (row.tool ? onOpenTool(row.tool) : null)}
+          rowHeight={TABLE_ROW_HEIGHT}
+        />
       </InstrumentSection>
       <InstrumentSection
         eyebrow={t("uiRenders.title")}
         hint={t("uiRenders.hint")}
-        readout={t("uiRenders.readout", {
-          count: data.uiRenders.reduce((sum, row) => sum + row.renders, 0),
-        })}
       >
-        {data.uiRenders.length > 0 ? (
-          <DataTable
-            columns={columns.uiRenders}
-            data={data.uiRenders}
-            defaultSort={{ key: "renders", direction: "desc" }}
-            getRowId={(row) => row.resource}
-            height={paginatedTableHeightFor(data.uiRenders.length)}
-            rowHeight={TABLE_ROW_HEIGHT}
-          />
-        ) : (
-          <OptInHint text={t("uiRenders.empty")} />
-        )}
+        <DataTable
+          columns={columns.uiRenders}
+          data={data.uiRenders}
+          defaultSort={{ key: "renders", direction: "desc" }}
+          emptyState={<McpTableEmpty description={t("uiRenders.empty")} />}
+          getRowId={(row) => row.resource}
+          height={height ?? mcpTableHeight(data.uiRenders.length)}
+          minHeight={height}
+          rowHeight={TABLE_ROW_HEIGHT}
+        />
       </InstrumentSection>
     </div>
   );
@@ -315,93 +224,82 @@ export function McpAudienceSections({
 }: McpAudienceSectionsProps) {
   const t = useTranslations("geo.pages.mcp");
   const columns = useMcpColumns();
+  const pairHeight = usePairHeight();
+  const clientsHeight = pairHeight(data.clients.length, data.models.length);
+  const intentsHeight = pairHeight(data.intents.length, data.users.length);
   return (
     <>
-      <div className="grid gap-6 xl:grid-cols-2">
+      <div className="grid gap-4 lg:grid-cols-2">
         <InstrumentSection
           eyebrow={t("clients.title")}
           hint={t("clients.hint")}
-          readout={t("clients.readout", { count: data.clients.length })}
         >
           <DataTable
             columns={columns.clients}
             data={data.clients}
             defaultSort={{ key: "sessions", direction: "desc" }}
             getRowId={(row) => row.name}
-            height={paginatedTableHeightFor(data.clients.length)}
+            height={clientsHeight ?? mcpTableHeight(data.clients.length)}
+            minHeight={clientsHeight}
             rowHeight={TABLE_ROW_HEIGHT}
           />
         </InstrumentSection>
-        <InstrumentSection
-          eyebrow={t("models.title")}
-          hint={t("models.hint")}
-          readout={t("models.readout", { count: data.models.length })}
-        >
-          {data.models.length > 0 ? (
-            <DataTable
-              columns={columns.models}
-              data={data.models}
-              defaultSort={{ key: "sessions", direction: "desc" }}
-              getRowId={(row) => row.name}
-              height={paginatedTableHeightFor(data.models.length)}
-              rowHeight={TABLE_ROW_HEIGHT}
-            />
-          ) : (
-            <OptInHint text={t("models.empty")} />
-          )}
+        <InstrumentSection eyebrow={t("models.title")} hint={t("models.hint")}>
+          <DataTable
+            columns={columns.models}
+            data={data.models}
+            defaultSort={{ key: "sessions", direction: "desc" }}
+            emptyState={<McpTableEmpty description={t("models.empty")} />}
+            getRowId={(row) => row.name}
+            height={clientsHeight ?? mcpTableHeight(data.models.length)}
+            minHeight={clientsHeight}
+            rowHeight={TABLE_ROW_HEIGHT}
+          />
         </InstrumentSection>
       </div>
 
       <InstrumentSection
         eyebrow={t("sessions.title")}
         hint={t("sessions.hint")}
-        readout={t("sessions.readout", { count: data.totals.sessions })}
       >
         <DataTable
           columns={columns.sessions}
           data={data.sessions}
           getRowId={(row) => row.id}
-          height={paginatedTableHeightFor(data.sessions.length)}
+          height={mcpTableHeight(data.sessions.length)}
           onRowClick={onOpenSession}
           rowHeight={TABLE_ROW_HEIGHT}
         />
       </InstrumentSection>
 
-      <div className="grid gap-6 xl:grid-cols-2">
+      <div className="grid gap-4 lg:grid-cols-2">
         <InstrumentSection
           eyebrow={t("intents.title")}
           hint={t("intents.hint")}
         >
-          {data.intents.length > 0 ? (
-            <DataTable
-              columns={columns.intents}
-              data={data.intents}
-              defaultSort={{ key: "calls", direction: "desc" }}
-              getRowId={(row) => `${row.intent}-${row.tool}`}
-              height={paginatedTableHeightFor(data.intents.length)}
-              onRowClick={(row) => (row.tool ? onOpenTool(row.tool) : null)}
-              rowHeight={TABLE_ROW_HEIGHT}
-            />
-          ) : (
-            <OptInHint text={t("intents.empty")} />
-          )}
+          <DataTable
+            columns={columns.intents}
+            data={data.intents}
+            defaultSort={{ key: "calls", direction: "desc" }}
+            emptyState={<McpTableEmpty description={t("intents.empty")} />}
+            getRowId={(row) => `${row.intent}-${row.tool}`}
+            height={intentsHeight ?? mcpTableHeight(data.intents.length)}
+            minHeight={intentsHeight}
+            onRowClick={(row) => (row.tool ? onOpenTool(row.tool) : null)}
+            rowHeight={TABLE_ROW_HEIGHT}
+          />
         </InstrumentSection>
-        <InstrumentSection
-          eyebrow={t("users.title")}
-          readout={t("users.readout", { count: data.totals.users })}
-        >
-          {data.users.length > 0 ? (
-            <DataTable
-              columns={columns.users}
-              data={data.users}
-              defaultSort={{ key: "calls", direction: "desc" }}
-              getRowId={(row) => row.id}
-              height={paginatedTableHeightFor(data.users.length)}
-              rowHeight={TABLE_ROW_HEIGHT}
-            />
-          ) : (
-            <OptInHint text={t("users.empty")} />
-          )}
+        <InstrumentSection eyebrow={t("users.title")}>
+          <DataTable
+            columns={columns.users}
+            data={data.users}
+            defaultSort={{ key: "calls", direction: "desc" }}
+            emptyState={<McpTableEmpty description={t("users.empty")} />}
+            getRowId={(row) => row.id}
+            height={intentsHeight ?? mcpTableHeight(data.users.length)}
+            minHeight={intentsHeight}
+            rowHeight={TABLE_ROW_HEIGHT}
+          />
         </InstrumentSection>
       </div>
     </>
@@ -440,11 +338,13 @@ export function McpRequestLog({ data, onOpenRequest }: McpRequestLogProps) {
       eyebrow={t("title")}
       hint={t("hint")}
     >
+      {/* One fixed height for every filter, so switching never moves the page. */}
       <DataTable
         columns={columns.requests}
         data={requests}
         getRowId={(row) => row.id}
-        height={paginatedTableHeightFor(requests.length)}
+        height={MCP_LOG_TABLE_HEIGHT}
+        minHeight={MCP_LOG_TABLE_HEIGHT}
         onRowClick={onOpenRequest}
         rowHeight={TABLE_ROW_HEIGHT}
       />

@@ -1,6 +1,12 @@
 import type { MCP_EVENT_STATUSES } from "../constants/geo";
+import type { GeoScopeInput } from "./geo";
 
 export type McpEventStatus = (typeof MCP_EVENT_STATUSES)[number];
+
+export interface McpScopeInput extends GeoScopeInput {
+  /** Server version filter, empty or missing for every version. */
+  serverVersion?: string;
+}
 
 export interface McpAnalyticsServer {
   name: string;
@@ -30,6 +36,25 @@ export interface McpAnalyticsDay {
   promptsGet: number;
   other: number;
   errors: number;
+  sessions: number;
+  p95Ms: number;
+}
+
+export interface McpAnalyticsHour {
+  /** Start of the hour, ISO in UTC. */
+  hour: string;
+  toolsCall: number;
+  requests: number;
+  errors: number;
+  sessions: number;
+  p95Ms: number;
+}
+
+export interface McpAnalyticsVersion {
+  version: string;
+  requests: number;
+  firstSeenAt: string;
+  lastSeenAt: string;
 }
 
 export interface McpAnalyticsTool {
@@ -136,6 +161,10 @@ export interface McpAnalyticsResponse {
   server: McpAnalyticsServer | null;
   totals: McpAnalyticsTotals;
   daily: McpAnalyticsDay[];
+  /** Filled only for single-day windows, where `daily` has one point. */
+  hourly: McpAnalyticsHour[];
+  /** Every version seen in the window, ignoring the version filter. */
+  versions: McpAnalyticsVersion[];
   tools: McpAnalyticsTool[];
   clients: McpAnalyticsClient[];
   requests: McpAnalyticsRequest[];

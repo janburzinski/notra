@@ -33,6 +33,20 @@ export const TABLE_INNER_RADIUS_CLASS = "rounded-[14px]";
 /** Row separator inside the white card. */
 export const TABLE_ROW_BORDER_CLASS = "border-table-row-border border-b";
 
+/**
+ * Keyboard focus ring for a body row, as inset shadows on its cells with
+ * rounded ends. An outline on the row stays square and cuts across the
+ * card's rounded corners.
+ */
+export const TABLE_ROW_FOCUS_RING_CLASS = [
+  "focus-visible:[&>td]:shadow-[inset_0_2px_0_var(--ring),inset_0_-2px_0_var(--ring)]",
+  "focus-visible:[&>td:first-child]:shadow-[inset_2px_0_0_var(--ring),inset_0_2px_0_var(--ring),inset_0_-2px_0_var(--ring)]",
+  "focus-visible:[&>td:last-child]:shadow-[inset_-2px_0_0_var(--ring),inset_0_2px_0_var(--ring),inset_0_-2px_0_var(--ring)]",
+  "focus-visible:[&>td:only-child]:shadow-[inset_0_0_0_2px_var(--ring)]",
+  // Rounded ends sit inside the card's 14px corner on the first and last row.
+  "focus-visible:[&>td:first-child]:rounded-l-[12px] focus-visible:[&>td:last-child]:rounded-r-[12px]",
+].join(" ");
+
 /** Inner box for table cells. Gives children a real used width so truncate /
  * max-width:100% resolve against the column, not the td's max-w-0 hack. */
 export const TABLE_CELL_INNER_CLASS =

@@ -1,7 +1,6 @@
 "use client";
 
 import { PageHeading } from "@notra/ui/components/shared/page-heading";
-import { Badge } from "@notra/ui/components/ui/badge";
 import { useState } from "react";
 import { useTranslations } from "use-intl";
 
@@ -20,15 +19,18 @@ import {
 } from "@/components/mcp/mcp-sections";
 import { McpSessionSheet } from "@/components/mcp/mcp-session-sheet";
 import { McpToolSheet } from "@/components/mcp/mcp-tool-sheet";
+import { McpVersionSelect } from "@/components/mcp/mcp-version-select";
 import { useOrganizationsContext } from "@/components/providers/organization-provider";
 import { SkeletonCrossfade } from "@/components/skeleton-crossfade";
 import { useGeoRange } from "@/lib/hooks/use-geo-range";
 import { useMcpAnalytics } from "@/lib/hooks/use-mcp-analytics";
+import { useMcpVersionQuery } from "@/lib/hooks/use-mcp-version";
 import type {
   McpAnalyticsPageProps,
   McpRequestLogEntry,
   McpSessionSummary,
 } from "@/types/mcp-analytics";
+import { mcpSessionAverages } from "@/utils/mcp-analytics";
 
 import { McpTrafficSkeleton } from "./skeleton";
 
@@ -51,20 +53,27 @@ export default function McpAnalyticsPage({
       : getOrganization(organizationSlug);
   const organizationId = organization?.id ?? "";
   const geoRange = useGeoRange();
-  const { data, isPending, isError, refetch } = useMcpAnalytics(
-    organizationId,
-    geoRange.query
-  );
+  const { data, isPending, isPlaceholderData, isError, refetch } =
+    useMcpAnalytics(organizationId, geoRange.query);
+  const [serverVersion] = useMcpVersionQuery();
+  // While a new range loads, the previous response stays on screen; chart it
+  // against the range it was fetched for, not the one still loading.
+  const [dataRange, setDataRange] = useState(geoRange.query);
+  if (
+    data &&
+    !isPlaceholderData &&
+    (dataRange.from !== geoRange.query.from ||
+      dataRange.to !== geoRange.query.to)
+  ) {
+    setDataRange(geoRange.query);
+  }
 
-  const hasData = data && data.totals.requests + data.requests.length > 0;
+  // A version filter with no traffic is an empty result, not a missing setup.
+  const hasData =
+    data &&
+    (data.totals.requests + data.requests.length > 0 || !!serverVersion);
   const selectedTool =
     data?.tools.find((tool) => tool.name === selectedToolName) ?? null;
-  const serverName = [data?.server?.name, data?.server?.version]
-    .filter(Boolean)
-    .join("@");
-  const serverLabel = [serverName, data?.server?.protocolVersion]
-    .filter(Boolean)
-    .join(" · ");
   const openTool = (name: string) => {
     const known = data?.tools.some((tool) => tool.name === name) ?? false;
     setSelectedToolName(known ? name : null);
@@ -82,27 +91,19 @@ export default function McpAnalyticsPage({
             description={t("mcp.description")}
             title={t("traffic.title")}
           >
-            <div className="flex min-h-8 items-center">
+            <div className="flex min-h-8 max-w-full flex-wrap items-center gap-3">
+              <McpVersionSelect versions={data?.versions ?? []} />
               <GeoRangePicker control={geoRange} />
             </div>
           </PageHeading>
-          <AnalyticsSourceTabs
-            actions={
-              serverLabel ? (
-                <Badge shape="rounded" size="md" variant="outline">
-                  <span className="font-mono">{serverLabel}</span>
-                </Badge>
-              ) : null
-            }
-          />
+          <AnalyticsSourceTabs />
 
           {isError && !data ? <McpLoadFailed onRetry={refetch} /> : null}
           {!isError && !hasData ? <McpSetupPrompt /> : null}
           {data && hasData ? (
             <>
-              <McpAnalyticsHero data={data} />
+              <McpAnalyticsHero data={data} range={dataRange} />
               <McpToolSections data={data} onOpenTool={openTool} />
-              <McpServerRequestSections data={data} onOpenTool={openTool} />
               <McpAudienceSections
                 data={data}
                 onOpenSession={(session) => {
@@ -111,6 +112,7 @@ export default function McpAnalyticsPage({
                 }}
                 onOpenTool={openTool}
               />
+              <McpServerRequestSections data={data} onOpenTool={openTool} />
               <McpRequestLog
                 data={data}
                 onOpenRequest={(entry) => {
@@ -130,6 +132,7 @@ export default function McpAnalyticsPage({
           tool={selectedTool}
         />
         <McpSessionSheet
+          averages={data ? mcpSessionAverages(data) : null}
           onOpenChange={setSessionOpen}
           open={sessionOpen}
           organizationId={organizationId}

@@ -10,9 +10,11 @@ import type {
   McpAnalyticsTool,
   McpAnalyticsUiRender,
   McpAnalyticsUser,
+  McpAnalyticsVersion,
   McpSessionEvent,
   McpToolNeighbor,
 } from "@notra/geo-core/types/mcp-analytics";
+import type { ReactNode } from "react";
 
 import type { MCP_LOG_FILTERS } from "@/constants/mcp-analytics";
 import type { GeoRangeControl, GeoRangeQuery } from "@/types/geo";
@@ -32,6 +34,10 @@ export type McpElicitationStats = McpAnalyticsElicitation;
 export type McpUiRenderStats = McpAnalyticsUiRender;
 
 export type McpSessionSummary = McpAnalyticsSession;
+
+export type McpUnusedTool = NonNullable<
+  McpAnalyticsResponse["catalog"]
+>["unusedTools"][number];
 
 export type McpRequestLogEntry = McpAnalyticsRequest;
 
@@ -71,40 +77,73 @@ export type McpRequestLogProps = Pick<
   "data" | "onOpenRequest"
 >;
 
-export interface McpOptInHintProps {
-  text: string;
+export interface McpTableEmptyProps {
+  description: string;
+}
+
+export interface McpSheetHeaderProps {
+  icon: ReactNode;
+  title: ReactNode;
+  description?: ReactNode;
+}
+
+export interface McpPropertyRow {
+  key: string;
+  label: string;
+  /** null hides the row, e.g. a session without a user. */
+  value: string | null;
+}
+
+export interface McpPropertyTableProps {
+  rows: McpPropertyRow[];
+}
+
+export interface McpNeighborRow {
+  key: string;
+  tool: string;
+  calls: number;
+  afterFailure: number;
+  share: number;
 }
 
 export interface McpAnalyticsHeroProps {
   data: McpAnalyticsResponse;
+  range: GeoRangeQuery;
 }
 
-export interface McpSessionEventItemProps {
-  event: McpSessionEvent;
-  startedAt: number;
+export type McpChartMetric =
+  | "toolCalls"
+  | "sessions"
+  | "errorRate"
+  | "p95Latency";
+
+export type McpTrendRow = { day: string; rawDay: string } & Record<
+  string,
+  number | string
+>;
+
+export interface McpAxisScale {
+  max: number;
+  interval: number;
+  decimals: number;
+}
+
+export interface McpMetricCardProps {
+  metric: McpMetric;
+  data: Pick<McpAnalyticsResponse, "daily" | "hourly">;
+  range: GeoRangeQuery;
 }
 
 export interface McpLoadFailedProps {
   onRetry: () => unknown;
 }
 
-export interface McpToolRecoveryProps {
-  tool: string;
-  after: McpToolNeighbor[];
-}
-
-export type McpToolDetailDataProps = Pick<McpToolDetailBodyProps, "data">;
-
-export interface McpToolDetailBodyProps {
-  data: McpToolDetailResponse | undefined;
-  tool: string;
-  onSelectTool: (name: string) => void;
-}
-
 export interface McpMetric {
+  key: McpChartMetric;
   label: string;
   value: string;
-  delta: number;
+  /** Percent change against the previous period; null hides the badge. */
+  delta: number | null;
   lowerIsBetter?: boolean;
 }
 
@@ -136,15 +175,10 @@ export interface McpSessionSheetProps {
   organizationId: string;
   range: GeoRangeQuery;
   session: McpSessionSummary | null;
+  /** Baseline for the stat deltas; null hides them. */
+  averages: McpSessionAverages | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-}
-
-export interface McpNeighborListProps {
-  title: string;
-  edgeLabel: string;
-  neighbors: McpToolNeighbor[];
-  onSelectTool: (name: string) => void;
 }
 
 export interface McpPayloadSnippetsProps {
@@ -154,4 +188,22 @@ export interface McpPayloadSnippetsProps {
 
 export interface McpTrafficSkeletonProps {
   geoRange?: GeoRangeControl;
+}
+
+export interface McpVersionSelectProps {
+  versions: readonly Pick<McpAnalyticsVersion, "version">[];
+}
+
+export interface McpNeighborTableProps {
+  title: string;
+  edgeLabel: string;
+  neighbors: McpToolNeighbor[];
+  loading: boolean;
+  onSelectTool: (name: string) => void;
+}
+
+export interface McpSessionAverages {
+  requests: number;
+  toolCalls: number;
+  durationSeconds: number;
 }

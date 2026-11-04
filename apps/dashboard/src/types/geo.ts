@@ -266,6 +266,10 @@ export interface GeoStatDeltaProps {
   variant?: "pill" | "plain";
   /** Rolls changed characters when the delta updates (range switches). */
   animated?: boolean;
+  /** A rise is bad news (error rate, latency), so it reads red. */
+  lowerIsBetter?: boolean;
+  /** Grey and arrowless: the change is neither good nor bad. */
+  neutral?: boolean;
   label?: string;
   hint?: string;
   className?: string;
@@ -548,6 +552,10 @@ export interface SheetStat {
   delta?: number | null;
   /** How `delta` reads: percent change by default, `rate` for percentage points. */
   deltaKind?: GeoStatDeltaKind;
+  /** What the delta compares against; defaults to the previous period. */
+  deltaHint?: string;
+  /** The change is neither good nor bad, e.g. a session vs the average one. */
+  deltaNeutral?: boolean;
 }
 
 export interface SheetStatGridProps {

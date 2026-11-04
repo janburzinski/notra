@@ -3,6 +3,7 @@ import {
   queryMcpCatalog,
   queryMcpClients,
   queryMcpElicitations,
+  queryMcpHourly,
   queryMcpIntents,
   queryMcpLog,
   queryMcpModels,
@@ -15,6 +16,7 @@ import {
   queryMcpTools,
   queryMcpUiRenders,
   queryMcpUsers,
+  queryMcpVersions,
 } from "@notra/analytics/tinybird/client";
 import type {
   McpIntentsRow,
@@ -33,13 +35,14 @@ import {
   MCP_EVENT_STATUSES,
   MCP_SESSION_EVENTS_LIMIT,
 } from "../constants/geo";
-import type { GeoScopeInput, GeoWindowInput } from "../types/geo";
+import type { GeoWindowInput } from "../types/geo";
 import type {
   McpAnalyticsIntent,
   McpAnalyticsRequest,
   McpAnalyticsResponse,
   McpAnalyticsUser,
   McpEventStatus,
+  McpScopeInput,
   McpSessionResponse,
   McpToolDetailResponse,
 } from "../types/mcp-analytics";
@@ -99,26 +102,33 @@ function toRequests(rows: readonly McpLogRow[] | undefined) {
 }
 
 const resolveMcpQuery = Effect.fn("mcp.resolveQuery")(function* (
-  input: GeoScopeInput,
+  input: McpScopeInput,
   window: GeoWindowInput
 ) {
   const scope = yield* resolveGeoScope(input);
   const configured = isTinybirdConfigured();
+  const scopeParams = {
+    ...geoScopeParams(scope),
+    ...geoTrafficWindowParams(window, MCP_ANALYTICS_DEFAULT_DAYS),
+  };
   return {
     configured,
     query: configured && !isDemoMode() ? geoRequiredQuery : geoQuery,
-    params: {
-      ...geoScopeParams(scope),
-      ...geoTrafficWindowParams(window, MCP_ANALYTICS_DEFAULT_DAYS),
-    },
+    scopeParams,
+    params: { ...scopeParams, server_version: input.serverVersion ?? "" },
   };
 });
 
 export const loadMcpAnalytics = Effect.fn("mcp.analytics")(function* (
-  input: GeoScopeInput,
+  input: McpScopeInput,
   window: GeoWindowInput
 ) {
-  const { configured, query, params } = yield* resolveMcpQuery(input, window);
+  const { configured, query, params, scopeParams } = yield* resolveMcpQuery(
+    input,
+    window
+  );
+  const isSingleDay =
+    params.date_from !== "" && params.date_from === params.date_to;
   const limited = { ...params, limit: MCP_ANALYTICS_TABLE_LIMIT };
 
   const [
@@ -135,6 +145,8 @@ export const loadMcpAnalytics = Effect.fn("mcp.analytics")(function* (
     catalog,
     elicitations,
     uiRenders,
+    versions,
+    hourly,
   ] = yield* Effect.all(
     [
       query("mcp overview query failed", () => queryMcpOverview(params)),
@@ -160,6 +172,13 @@ export const loadMcpAnalytics = Effect.fn("mcp.analytics")(function* (
         queryMcpElicitations(limited)
       ),
       query("mcp ui renders query failed", () => queryMcpUiRenders(limited)),
+      query("mcp versions query failed", () =>
+        queryMcpVersions({ ...scopeParams, limit: MCP_ANALYTICS_TABLE_LIMIT })
+      ),
+      // One day charts as one daily point, so single-day windows read hours.
+      isSingleDay
+        ? query("mcp hourly query failed", () => queryMcpHourly(params))
+        : Effect.succeed(null),
     ],
     { concurrency: "unbounded" }
   );
@@ -210,6 +229,22 @@ export const loadMcpAnalytics = Effect.fn("mcp.analytics")(function* (
       promptsGet: Number(row.prompts_get),
       other: Number(row.other),
       errors: Number(row.errors),
+      sessions: Number(row.sessions),
+      p95Ms: Math.round(Number(row.p95_ms)),
+    })),
+    hourly: (hourly?.data ?? []).map((row) => ({
+      hour: toIso(row.hour),
+      toolsCall: Number(row.tools_call),
+      requests: Number(row.requests),
+      errors: Number(row.errors),
+      sessions: Number(row.sessions),
+      p95Ms: Math.round(Number(row.p95_ms)),
+    })),
+    versions: (versions?.data ?? []).map((row) => ({
+      version: row.server_version,
+      requests: Number(row.requests),
+      firstSeenAt: toIso(row.first_seen_at),
+      lastSeenAt: toIso(row.last_seen_at),
     })),
     tools: (tools?.data ?? []).map((row) => ({
       name: row.name,
@@ -283,7 +318,7 @@ export const loadMcpAnalytics = Effect.fn("mcp.analytics")(function* (
 });
 
 export const loadMcpToolDetail = Effect.fn("mcp.toolDetail")(function* (
-  input: GeoScopeInput,
+  input: McpScopeInput,
   window: GeoWindowInput,
   tool: string
 ) {
@@ -327,7 +362,7 @@ export const loadMcpToolDetail = Effect.fn("mcp.toolDetail")(function* (
 });
 
 export const loadMcpSession = Effect.fn("mcp.session")(function* (
-  input: GeoScopeInput,
+  input: McpScopeInput,
   window: GeoWindowInput,
   sessionId: string
 ) {

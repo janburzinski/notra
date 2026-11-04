@@ -18,14 +18,28 @@ import {
 } from "../../constants/geo-queries";
 import { mcpDaily } from "../datasources";
 
-const MCP_QUERY_PARAMS = {
+const MCP_SCOPE_PARAMS = {
   organization_id: p.string().describe("Organization id"),
   ...GEO_PROJECT_SCOPE_PARAMS,
   ...GEO_WINDOW_PARAMS,
 };
 
-const MCP_WHERE = `WHERE organization_id = {{String(organization_id)}}
+const MCP_QUERY_PARAMS = {
+  ...MCP_SCOPE_PARAMS,
+  server_version: p
+    .string()
+    .optional("")
+    .describe("Server version filter, empty for every version"),
+};
+
+const MCP_SCOPE_WHERE = `WHERE organization_id = {{String(organization_id)}}
           ${GEO_PROJECT_SCOPE_SQL}`;
+
+const MCP_WHERE = `${MCP_SCOPE_WHERE}
+          AND (
+            {{String(server_version, '')}} = ''
+            OR server_version = {{String(server_version, '')}}
+          )`;
 
 const MCP_LIMIT_PARAM = {
   limit: p.int32().optional(50).describe("Maximum rows"),
@@ -42,6 +56,7 @@ export const mcpDailyMv = defineMaterializedView("mcp_daily_mv", {
           toDate(captured_at) AS day,
           organization_id,
           project_id,
+          server_version,
           method,
           status,
           client_name,
@@ -53,7 +68,7 @@ export const mcpDailyMv = defineMaterializedView("mcp_daily_mv", {
           quantilesTDigestState(0.5, 0.95)(duration_ms) AS duration_state,
           maxState(toDateTime(captured_at)) AS last_seen_state
         FROM mcp_events
-        GROUP BY day, organization_id, project_id, method, status, client_name, target
+        GROUP BY day, organization_id, project_id, server_version, method, status, client_name, target
       `,
     }),
   ],
@@ -103,7 +118,8 @@ export const mcpOverview = defineEndpoint("mcp_overview", {
 });
 
 export const mcpTimeseries = defineEndpoint("mcp_timeseries", {
-  description: "Daily requests split by MCP method family, plus errors",
+  description:
+    "Daily requests split by MCP method family, plus errors, sessions and p95 latency",
   params: MCP_QUERY_PARAMS,
   nodes: [
     node({
@@ -115,7 +131,9 @@ export const mcpTimeseries = defineEndpoint("mcp_timeseries", {
           countMergeIf(requests_state, method = 'resources/read') AS resources_read,
           countMergeIf(requests_state, method = 'prompts/get') AS prompts_get,
           countMergeIf(requests_state, method NOT IN ('tools/call', 'resources/read', 'prompts/get')) AS other,
-          countMergeIf(requests_state, status != 'ok') AS errors
+          countMergeIf(requests_state, status != 'ok') AS errors,
+          uniqMerge(sessions_state) AS sessions,
+          quantilesTDigestMerge(0.5, 0.95)(duration_state)[2] AS p95_ms
         FROM mcp_daily
         ${MCP_WHERE}
           ${GEO_DAY_WINDOW_SQL}
@@ -131,6 +149,72 @@ export const mcpTimeseries = defineEndpoint("mcp_timeseries", {
     prompts_get: t.uint64(),
     other: t.uint64(),
     errors: t.uint64(),
+    sessions: t.uint64(),
+    p95_ms: t.float32(),
+  },
+});
+
+export const mcpHourly = defineEndpoint("mcp_hourly", {
+  description:
+    "Hourly tool calls, requests, errors, sessions and p95 latency; read for single-day windows, where a daily series has one point",
+  params: MCP_QUERY_PARAMS,
+  nodes: [
+    node({
+      name: "hourly",
+      sql: `
+        SELECT
+          toStartOfHour(toDateTime(captured_at)) AS hour,
+          countIf(method = 'tools/call') AS tools_call,
+          count() AS requests,
+          countIf(status != 'ok') AS errors,
+          uniq(session_id) AS sessions,
+          quantileTDigest(0.95)(duration_ms) AS p95_ms
+        FROM mcp_events
+        ${MCP_WHERE}
+          ${GEO_CAPTURED_WINDOW_SQL}
+        GROUP BY hour
+        ORDER BY hour ASC
+      `,
+    }),
+  ],
+  output: {
+    hour: t.dateTime(),
+    tools_call: t.uint64(),
+    requests: t.uint64(),
+    errors: t.uint64(),
+    sessions: t.uint64(),
+    p95_ms: t.float32(),
+  },
+});
+
+export const mcpVersions = defineEndpoint("mcp_versions", {
+  description:
+    "Server versions that answered requests in the window, newest first; ignores the version filter so every version stays pickable",
+  params: { ...MCP_SCOPE_PARAMS, ...MCP_LIMIT_PARAM },
+  nodes: [
+    node({
+      name: "versions",
+      sql: `
+        SELECT
+          server_version,
+          count() AS requests,
+          min(captured_at) AS first_seen_at,
+          max(captured_at) AS last_seen_at
+        FROM mcp_events
+        ${MCP_SCOPE_WHERE}
+          ${GEO_CAPTURED_WINDOW_SQL}
+          AND server_version != ''
+        GROUP BY server_version
+        ORDER BY last_seen_at DESC
+        LIMIT {{Int32(limit, 50)}}
+      `,
+    }),
+  ],
+  output: {
+    server_version: t.string(),
+    requests: t.uint64(),
+    first_seen_at: t.dateTime64(3),
+    last_seen_at: t.dateTime64(3),
   },
 });
 

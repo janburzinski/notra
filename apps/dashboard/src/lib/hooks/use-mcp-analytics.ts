@@ -3,7 +3,7 @@ import type {
   McpSessionResponse,
   McpToolDetailResponse,
 } from "@notra/geo-core/types/mcp-analytics";
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { useTranslations } from "use-intl";
 
 import { useGeoProjectScope } from "@/components/providers/geo-project-provider";
@@ -11,10 +11,15 @@ import type { GeoRangeQuery } from "@/types/geo";
 import { geoOverviewQueryInput } from "@/utils/geo-query-input";
 
 import { dashboardOrpc } from "../orpc/query";
+import { useMcpVersionQuery } from "./use-mcp-version";
 
 function useMcpInput(organizationId: string, range: GeoRangeQuery) {
   const { projectId } = useGeoProjectScope();
-  return geoOverviewQueryInput({ organizationId, projectId }, range);
+  const [serverVersion] = useMcpVersionQuery();
+  return {
+    ...geoOverviewQueryInput({ organizationId, projectId }, range),
+    ...(serverVersion ? { serverVersion } : {}),
+  };
 }
 
 export function useMcpAnalytics(organizationId: string, range: GeoRangeQuery) {
@@ -24,6 +29,8 @@ export function useMcpAnalytics(organizationId: string, range: GeoRangeQuery) {
       input: useMcpInput(organizationId, range),
     }),
     enabled: !!organizationId,
+    // Switching range or version keeps the page and swaps the numbers in place.
+    placeholderData: keepPreviousData,
     meta: { errorMessage: tToast("loadMcpAnalyticsFailed") },
   });
 }

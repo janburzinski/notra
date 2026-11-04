@@ -1,4 +1,12 @@
-import type { ChartColorPair } from "@/types/charts";
+import {
+  BrowserIcon,
+  Rocket01Icon,
+  Wrench01Icon,
+} from "@hugeicons/core-free-icons";
+import type { StatusBadgeAppearance } from "@notra/ui/types/status-badge";
+
+import { CHART_PRIMARY_COLOR } from "@/constants/charts";
+import { TABLE_ROW_HEIGHT } from "@/constants/table";
 import type {
   McpOutcomeBadgeVariant,
   McpRpcErrorKey,
@@ -8,6 +16,18 @@ import type {
 export const MCP_ANALYTICS_NAV_LINK = "/geo/traffic/mcp";
 
 export const MCP_TOOLS_SKELETON_ROWS = 5;
+
+/** Tables grow with their rows up to this many, then scroll. */
+export const MCP_TABLE_MAX_ROWS = 8;
+
+/** Compact rows for the tables inside the tool, session and request sheets. */
+export const MCP_SHEET_ROW_HEIGHT = 44;
+
+/** Empty tables keep room for the icon, title and opt-in hint. */
+export const MCP_TABLE_EMPTY_HEIGHT = 300;
+
+/** The request log keeps one height for every filter. */
+export const MCP_LOG_TABLE_HEIGHT = (MCP_TABLE_MAX_ROWS + 1) * TABLE_ROW_HEIGHT;
 
 export const JSON_RPC_ERROR_KEYS: Partial<Record<number, McpRpcErrorKey>> = {
   [-32_700]: "parse",
@@ -31,33 +51,6 @@ export const MCP_SERVER_REQUEST_KEYS: Partial<
   "sampling/createMessage": "sampling",
 };
 
-export const MCP_DAILY_SERIES = [
-  { key: "toolsCall", label: "tools/call" },
-  { key: "resourcesRead", label: "resources/read" },
-  { key: "promptsGet", label: "prompts/get" },
-  { key: "other", label: "" },
-] as const;
-
-export const MCP_SERIES_COLORS: Record<
-  (typeof MCP_DAILY_SERIES)[number]["key"],
-  ChartColorPair
-> = {
-  toolsCall: { light: "#8B5CF6", dark: "#9C87E3" },
-  resourcesRead: { light: "#18929F", dark: "#20ABBA" },
-  promptsGet: { light: "#E89A1C", dark: "#FFB547" },
-  other: { light: "#8A8A94", dark: "#9A9AA4" },
-};
-
-export const MCP_SERIES_DOT_CLASS: Record<
-  (typeof MCP_DAILY_SERIES)[number]["key"],
-  string
-> = {
-  toolsCall: "bg-[#8B5CF6] dark:bg-[#9C87E3]",
-  resourcesRead: "bg-[#18929F] dark:bg-[#20ABBA]",
-  promptsGet: "bg-[#E89A1C] dark:bg-[#FFB547]",
-  other: "bg-[#8A8A94] dark:bg-[#9A9AA4]",
-};
-
 export const MCP_LOG_FILTERS = ["all", "success", "errors"] as const;
 
 export const MCP_SETUP_SNIPPET = `import { trackMcpTransport } from "@usenotra/geo/mcp";
@@ -65,3 +58,46 @@ export const MCP_SETUP_SNIPPET = `import { trackMcpTransport } from "@usenotra/g
 await server.connect(
   trackMcpTransport(transport, { token: process.env.NOTRA_GEO_TOKEN ?? "" })
 );`;
+
+export const MCP_VERSION_PARAM = "version";
+
+/** Select value for every version; the URL drops the param instead. */
+export const MCP_VERSION_ALL = "*";
+
+export const MCP_METRIC_SERIES_KEY = "value";
+
+/** The metric charts are 160px tall; more than four steps crowd the labels. */
+export const MCP_AXIS_MAX_STEPS = 4;
+
+export const MCP_AXIS_NICE_STEPS = [1, 2, 2.5, 5, 10] as const;
+
+/** Above these, tick labels switch to "12K" and "2.5 s" to stay narrow. */
+export const MCP_AXIS_COMPACT_COUNT = 10_000;
+export const MCP_AXIS_SECONDS_FROM_MS = 1000;
+
+export const MCP_HOURS_PER_DAY = 24;
+export const MCP_HOUR_MS = 3_600_000;
+
+export const MCP_METRIC_COLOR = CHART_PRIMARY_COLOR;
+
+/** Same shell rim as the website hero, one per metric. */
+export const MCP_METRIC_CARD_CLASS =
+  "min-w-0 rounded-2xl border border-shell-border bg-shell px-0.5 pb-0.5";
+
+export const MCP_METRIC_CHART_SURFACE_CLASS =
+  "border-table-card-border bg-table-card shadow-table-card rounded-[14px] border px-3 pt-3 pb-2";
+
+/** Marks the newest server version in the version select. */
+export const MCP_LATEST_VERSION_BADGE: StatusBadgeAppearance = {
+  variant: "success",
+  icon: Rocket01Icon,
+};
+
+/** Tags tools that declare an MCP Apps ui:// interface. */
+export const MCP_UI_TOOL_BADGE: StatusBadgeAppearance = {
+  variant: "info",
+  icon: BrowserIcon,
+};
+
+/** Header tile of the tool sheet. */
+export const MCP_TOOL_SHEET_ICON = Wrench01Icon;

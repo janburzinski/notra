@@ -12,6 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from "@notra/ui/components/ui/table";
+import { TABLE_ROW_FOCUS_RING_CLASS } from "@notra/ui/constants/table";
 import { cn } from "@notra/ui/lib/utils";
 import type { KeyboardEvent, ReactNode } from "react";
 
@@ -129,8 +130,8 @@ export function ReportList<T>({
         {rows.map((row) => (
           <TableRow
             className={cn(
-              interactive &&
-                "focus-visible:outline-ring cursor-pointer focus-visible:outline-2 focus-visible:-outline-offset-2"
+              interactive && "cursor-pointer outline-none",
+              interactive && TABLE_ROW_FOCUS_RING_CLASS
             )}
             key={getKey(row)}
             onClick={interactive ? () => activate(row) : undefined}

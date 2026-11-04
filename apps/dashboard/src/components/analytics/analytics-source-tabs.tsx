@@ -3,6 +3,7 @@
 import { AtIcon, Globe02Icon, McpServerIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Tabs, TabsList, TabsTrigger } from "@notra/ui/components/ui/tabs";
+import { useEffect, useState } from "react";
 import { useTranslations } from "use-intl";
 
 import Link from "@/components/framework/link";
@@ -14,6 +15,10 @@ import { useNavVisibility } from "@/lib/hooks/use-nav-visibility";
 import { useParams, usePathname } from "@/lib/navigation";
 import type { AnalyticsSourceTabsProps } from "@/types/analytics";
 import { geoTrafficPath, withGeoProject } from "@/utils/geo-paths";
+
+// Every source is its own route, so the tab list remounts on each switch.
+// Remembering the last active tab lets the new list start there and slide.
+let lastSourceTab: string | null = null;
 
 /**
  * Switches Analytics between website, MCP server and social. Every tab and
@@ -38,10 +43,20 @@ export function AnalyticsSourceTabs({ actions }: AnalyticsSourceTabsProps) {
   } else if (pathname.startsWith(socialPath)) {
     value = "social";
   }
+  const [shownValue, setShownValue] = useState(() => lastSourceTab ?? value);
+  useEffect(() => {
+    lastSourceTab = value;
+    if (shownValue === value) {
+      return;
+    }
+    // One frame at the old tab so the indicator has a position to slide from.
+    const frame = requestAnimationFrame(() => setShownValue(value));
+    return () => cancelAnimationFrame(frame);
+  }, [shownValue, value]);
 
   return (
     <div className="flex min-h-8 flex-wrap items-center justify-between gap-2">
-      <Tabs value={value}>
+      <Tabs value={shownValue}>
         <TabsList aria-label={t("label")}>
           <TabsTrigger
             nativeButton={false}

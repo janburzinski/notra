@@ -4094,10 +4094,6 @@
           "errorRate": "Error rate",
           "p95Latency": "p95 latency"
         },
-        "chart": {
-          "title": "Requests by method",
-          "otherMethods": "Other methods"
-        },
         "columns": {
           "tool": "Tool",
           "calls": "Calls",
@@ -4123,7 +4119,8 @@
           "duration": "Duration",
           "time": "Time",
           "method": "Method",
-          "status": "Status"
+          "status": "Status",
+          "description": "Description"
         },
         "fallback": {
           "unknown": "Unknown",
@@ -4132,6 +4129,12 @@
           "otherMethod": "Other method",
           "anonymous": "Anonymous"
         },
+        "version": {
+          "label": "Server version",
+          "all": "All versions",
+          "latest": "Latest"
+        },
+        "emptyTitle": "Nothing in this period",
         "uiBadge": "UI",
         "serverRequests": {
           "elicitation": "Elicitation",
@@ -4140,43 +4143,35 @@
         "seconds": "{count, number} s",
         "tools": {
           "title": "Tools",
-          "hint": "Click a tool to see what agents call before and after it, how they recover from failures and what they were trying to do.",
-          "readout": "{called, number} called",
-          "readoutWithUnused": "{called, number} called · {unused, number} unused"
+          "hint": "Click a tool to see what agents call before and after it, how they recover from failures and what they were trying to do."
         },
         "unused": {
           "title": "Never called",
           "hint": "Your latest tools/list answer advertised these tools, but no agent called them in this period. Rename them, improve the description or remove them.",
-          "readout": "{count, plural, one {# tool} other {# tools}}",
           "noDescription": "No description"
         },
         "elicitations": {
           "title": "Asking the user",
           "hint": "Elicitation and sampling requests your server sent to the client, grouped by the tool that triggered them, and how users answered.",
-          "readout": "{count, number} asked",
           "empty": "No elicitation requests in this period. Pass relatedRequestId to elicitInput so each request is tied to its tool."
         },
         "uiRenders": {
           "title": "Interactive UI",
           "hint": "MCP Apps interfaces (ui:// resources) that hosts loaded, with the tools that declare them.",
-          "readout": "{count, number} renders",
           "empty": "No host loaded a ui:// resource in this period. Tools that declare _meta.ui.resourceUri appear here once a host renders them."
         },
         "clients": {
           "title": "Clients",
-          "hint": "From the clientInfo sent in each initialize request.",
-          "readout": "{count, plural, one {# client} other {# clients}}"
+          "hint": "From the clientInfo sent in each initialize request."
         },
         "models": {
           "title": "Models",
           "hint": "Agents report their model through the optional _model parameter.",
-          "readout": "{count, plural, one {# model} other {# models}}",
           "empty": "Turn on contextParameters in the SDK to see which models call your server."
         },
         "sessions": {
           "title": "Sessions",
-          "hint": "Each Mcp-Session-Id is one agent run. Click a session to see its full timeline.",
-          "readout": "{count, number} in this period"
+          "hint": "Each Mcp-Session-Id is one agent run. Click a session to see its full timeline."
         },
         "intents": {
           "title": "What agents are trying to do",
@@ -4185,7 +4180,6 @@
         },
         "users": {
           "title": "Users",
-          "readout": "{count, number} identified",
           "empty": "Pass identify to the SDK to see which of your users the agents act for."
         },
         "requests": {
@@ -4222,13 +4216,18 @@
           "sessionId": "Mcp-Session-Id",
           "intent": "Intent",
           "arguments": "Arguments",
-          "response": "Response"
+          "response": "Response",
+          "error": "Error"
         },
         "sessionSheet": {
           "title": "{client} session",
-          "requests": "{count, plural, one {# request} other {# requests}}",
-          "sessionId": "Mcp-Session-Id: {id}",
-          "payload": "Payload"
+          "detail": "Detail",
+          "value": "Value",
+          "time": "Time",
+          "request": "Request",
+          "noEvents": "No requests recorded for this session.",
+          "duration": "Duration",
+          "vsAverage": "vs the average session in this period"
         },
         "toolSheet": {
           "noDescription": "No description advertised in tools/list.",
@@ -4237,20 +4236,18 @@
           "sessionStart": "Session start",
           "sessionEnd": "Session end",
           "noCalls": "No calls yet.",
-          "afterFailure": "{count, number} after failure",
-          "recoveryTitle": "After a failure",
-          "retried": "Retried this tool",
-          "switched": "Switched to",
-          "gaveUp": "Ended the session",
           "failures": "Failures",
-          "failuresReadout": "{count, number} distinct",
           "noErrorMessage": "No error message",
           "noFailures": "No failures in this period.",
           "wanted": "What agents wanted",
-          "wantedHint": "From the optional _intent parameter.",
           "wantedEmpty": "Turn on contextParameters in the SDK to see intents.",
           "topUsers": "Top users",
-          "topUsersEmpty": "Pass identify to the SDK to see who calls this tool."
+          "topUsersEmpty": "Pass identify to the SDK to see who calls this tool.",
+          "share": "Share",
+          "afterFailureColumn": "After failure",
+          "failure": "Failure",
+          "user": "User",
+          "intent": "Intent"
         }
       }
     },

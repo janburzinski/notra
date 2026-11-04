@@ -18,6 +18,7 @@ import type {
   mcpCatalog,
   mcpClients,
   mcpElicitations,
+  mcpHourly,
   mcpIntents,
   mcpLog,
   mcpModels,
@@ -30,6 +31,7 @@ import type {
   mcpTools,
   mcpUiRenders,
   mcpUsers,
+  mcpVersions,
 } from "../tinybird/pipes/mcp";
 import type {
   accountLeaderboard,
@@ -113,3 +115,5 @@ export type McpCatalogRow = InferOutputRow<typeof mcpCatalog>;
 export type McpModelsRow = InferOutputRow<typeof mcpModels>;
 export type McpElicitationsRow = InferOutputRow<typeof mcpElicitations>;
 export type McpUiRendersRow = InferOutputRow<typeof mcpUiRenders>;
+export type McpVersionsRow = InferOutputRow<typeof mcpVersions>;
+export type McpHourlyRow = InferOutputRow<typeof mcpHourly>;

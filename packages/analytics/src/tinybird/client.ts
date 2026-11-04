@@ -57,6 +57,8 @@ import type {
   McpToolFailuresRow,
   McpIntentsRow,
   McpUiRendersRow,
+  McpVersionsRow,
+  McpHourlyRow,
   McpUsersRow,
   McpSessionsRow,
   McpSessionEventsRow,
@@ -102,6 +104,7 @@ import {
   mcpCatalog,
   mcpClients,
   mcpElicitations,
+  mcpHourly,
   mcpIntents,
   mcpLog,
   mcpModels,
@@ -114,6 +117,7 @@ import {
   mcpTools,
   mcpUiRenders,
   mcpUsers,
+  mcpVersions,
 } from "./pipes/mcp";
 import {
   accountLeaderboard,
@@ -217,6 +221,8 @@ function createTinybirdClient(fetch?: typeof globalThis.fetch) {
       mcpModels,
       mcpElicitations,
       mcpUiRenders,
+      mcpVersions,
+      mcpHourly,
     },
   });
 }
@@ -924,5 +930,29 @@ export function queryMcpUiRenders(
     params,
     params.organization_id,
     (client) => client.mcpUiRenders.query(params)
+  );
+}
+
+export function queryMcpVersions(
+  params: InferParams<typeof mcpVersions>
+): Promise<QueryResult<McpVersionsRow> | null> {
+  return cachedPipeQuery(
+    "geo",
+    "mcp_versions",
+    params,
+    params.organization_id,
+    (client) => client.mcpVersions.query(params)
+  );
+}
+
+export function queryMcpHourly(
+  params: InferParams<typeof mcpHourly>
+): Promise<QueryResult<McpHourlyRow> | null> {
+  return cachedPipeQuery(
+    "geo",
+    "mcp_hourly",
+    params,
+    params.organization_id,
+    (client) => client.mcpHourly.query(params)
   );
 }

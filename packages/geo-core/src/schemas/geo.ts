@@ -594,6 +594,7 @@ export const mcpEventBatchSchema = object({
 
 export const mcpAnalyticsInputSchema = geoOrganizationInputSchema.extend({
   ...geoWindowFields,
+  serverVersion: string().max(GEO_SHORT_FIELD_MAX_LENGTH).optional(),
 });
 
 export const mcpToolDetailInputSchema = mcpAnalyticsInputSchema.extend({

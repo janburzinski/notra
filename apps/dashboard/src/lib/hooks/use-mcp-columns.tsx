@@ -1,5 +1,6 @@
 "use client";
 
+import { StatusBadge } from "@notra/ui/components/status-badge";
 import { Badge } from "@notra/ui/components/ui/badge";
 import type { TableColumn } from "@notra/ui/components/ui/data-table";
 import type { ReactNode } from "react";
@@ -7,7 +8,10 @@ import { useFormatter, useLocale, useTranslations } from "use-intl";
 
 import { AgentFeedbackAgentIcon } from "@/components/agent-feedback/feedback-agent-icon";
 import { McpRequestStatusBadge } from "@/components/mcp/mcp-request-sheet";
-import { MCP_SERVER_REQUEST_KEYS } from "@/constants/mcp-analytics";
+import {
+  MCP_SERVER_REQUEST_KEYS,
+  MCP_UI_TOOL_BADGE,
+} from "@/constants/mcp-analytics";
 import type {
   McpClientStats,
   McpElicitationStats,
@@ -17,6 +21,7 @@ import type {
   McpSessionSummary,
   McpToolStats,
   McpUiRenderStats,
+  McpUnusedTool,
   McpUserStats,
 } from "@/types/mcp-analytics";
 import { formatBytes, formatMilliseconds } from "@/utils/format";
@@ -76,9 +81,7 @@ export function useMcpColumns() {
         <span className="flex min-w-0 items-center gap-2">
           {named(row.name)}
           {row.uiResource ? (
-            <Badge size="sm" variant="info">
-              {t("uiBadge")}
-            </Badge>
+            <StatusBadge appearance={MCP_UI_TOOL_BADGE} label={t("uiBadge")} />
           ) : null}
         </span>
       ),
@@ -127,6 +130,27 @@ export function useMcpColumns() {
       cell: (row) => (
         <span className="tabular-nums">
           {formatBytes(row.avgResponseBytes, locale)}
+        </span>
+      ),
+    },
+  ];
+
+  const unusedTools: TableColumn<McpUnusedTool>[] = [
+    {
+      key: "name",
+      header: t("columns.tool"),
+      width: "minmax(10rem, 1fr)",
+      sortable: true,
+      cell: (row) => named(row.name),
+    },
+    {
+      key: "description",
+      header: t("columns.description"),
+      width: "2fr",
+      collapsePriority: 1,
+      cell: (row) => (
+        <span className="text-muted-foreground truncate text-sm">
+          {row.description || t("unused.noDescription")}
         </span>
       ),
     },
@@ -445,6 +469,7 @@ export function useMcpColumns() {
 
   return {
     tools,
+    unusedTools,
     clients,
     models,
     elicitations,

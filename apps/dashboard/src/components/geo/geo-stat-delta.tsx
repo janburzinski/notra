@@ -11,13 +11,19 @@ import {
 import { useLocale, useTranslations } from "use-intl";
 
 import type { GeoStatDeltaProps } from "@/types/geo";
-import { formatGeoStatDelta, geoStatDeltaTone } from "@/utils/geo-charts";
+import {
+  formatGeoStatDelta,
+  geoStatDeltaTone,
+  invertGeoStatDeltaTone,
+} from "@/utils/geo-charts";
 
 export function GeoStatDelta({
   delta,
   kind = "mentions",
   variant = "pill",
   animated = false,
+  lowerIsBetter = false,
+  neutral = false,
   label,
   hint,
   className,
@@ -29,7 +35,9 @@ export function GeoStatDelta({
     return null;
   }
 
-  const tone = geoStatDeltaTone(delta, kind);
+  const tone = neutral
+    ? "flat"
+    : invertGeoStatDeltaTone(geoStatDeltaTone(delta, kind), lowerIsBetter);
   const formatted = formatGeoStatDelta(delta, kind, locale, {
     new: tCommon("labels.new"),
     points: (value) => tUnits("points", { value }),
@@ -41,7 +49,8 @@ export function GeoStatDelta({
     <TrendBadge
       appearance={variant === "plain" ? "plain" : "badge"}
       className={className}
-      showIcon={!isNew}
+      // The arrow follows the tone, which an inverted metric no longer matches.
+      showIcon={!(isNew || neutral) && (!lowerIsBetter || tone === "flat")}
       tone={tone}
     >
       {displayedValue}

@@ -757,6 +757,17 @@ export function geoStatDeltaTone(
   return "flat";
 }
 
+/** Swaps up and down for metrics where a rise is bad news. */
+export function invertGeoStatDeltaTone(
+  tone: GeoStatDeltaTone,
+  invert: boolean
+): GeoStatDeltaTone {
+  if (!invert || tone === "flat") {
+    return tone;
+  }
+  return tone === "up" ? "down" : "up";
+}
+
 export function formatGeoStatDelta(
   delta: number,
   kind: GeoStatDeltaKind,

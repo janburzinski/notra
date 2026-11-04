@@ -49,9 +49,10 @@ export function TrafficSheetHero({
               {stat.delta === undefined ? null : (
                 <GeoStatDelta
                   delta={stat.delta}
-                  hint={GEO_TRAFFIC_STAT_TREND_HINT}
+                  hint={stat.deltaHint ?? GEO_TRAFFIC_STAT_TREND_HINT}
                   kind={stat.deltaKind}
                   label={stat.label}
+                  neutral={stat.deltaNeutral}
                 />
               )}
             </dd>
