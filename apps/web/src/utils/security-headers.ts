@@ -2,18 +2,23 @@ import { APP_URL } from "./urls";
 
 const LOCAL_DASHBOARD_ORIGIN = "http://localhost:3000";
 
+// Notra Sites sends its own CSP, X-Content-Type-Options and Referrer-Policy.
+export const PROXIED_SITE_SECURITY_HEADERS = {
+  "X-Frame-Options": "DENY",
+  "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
+  "Strict-Transport-Security": "max-age=63072000; includeSubDomains; preload",
+  "X-DNS-Prefetch-Control": "on",
+};
+
 export function buildSecurityHeaders(isDevelopment: boolean) {
   const dashboardSessionOrigin = isDevelopment
     ? LOCAL_DASHBOARD_ORIGIN
     : APP_URL;
 
   return {
+    ...PROXIED_SITE_SECURITY_HEADERS,
     "X-Content-Type-Options": "nosniff",
-    "X-Frame-Options": "DENY",
     "Referrer-Policy": "strict-origin-when-cross-origin",
-    "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
-    "Strict-Transport-Security": "max-age=63072000; includeSubDomains; preload",
-    "X-DNS-Prefetch-Control": "on",
     "Content-Security-Policy": [
       "default-src 'self'",
       "script-src 'self' 'unsafe-inline' 'unsafe-eval' databuddy.cc *.databuddy.cc https://challenges.cloudflare.com www.dubcdn.com",

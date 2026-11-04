@@ -10,8 +10,15 @@ import { nitro } from "nitro/vite";
 import { defineConfig } from "vite";
 
 import * as sourceConfig from "./source.config";
-import { DOCS_PROXY_ORIGIN, OAUTH_ISSUER_ORIGIN } from "./src/constants/proxy";
-import { buildSecurityHeaders } from "./src/utils/security-headers";
+import {
+  BLOG_PROXY_ORIGIN,
+  DOCS_PROXY_ORIGIN,
+  OAUTH_ISSUER_ORIGIN,
+} from "./src/constants/proxy";
+import {
+  buildSecurityHeaders,
+  PROXIED_SITE_SECURITY_HEADERS,
+} from "./src/utils/security-headers";
 
 const SERVER_ONLY_PACKAGES = [
   "@remotion/bundler",
@@ -22,6 +29,9 @@ const SERVER_ONLY_PACKAGES = [
 ];
 
 const RAW_QUERY_REGEX = /\?(.*&)?raw(&|$)/;
+
+const BLOG_DEV_PROXY_TARGET =
+  process.env.BLOG_DEV_PROXY_ORIGIN || BLOG_PROXY_ORIGIN;
 
 async function contentMdx(): ReturnType<typeof mdx> {
   const plugin = await mdx(sourceConfig);
@@ -115,6 +125,10 @@ export default defineConfig(({ command }) => ({
         "/**": { headers: buildSecurityHeaders(command === "serve") },
       },
       devProxy: {
+        "/blog/_notra/**": {
+          target: BLOG_DEV_PROXY_TARGET,
+          changeOrigin: true,
+        },
         "/docs": { target: DOCS_PROXY_ORIGIN, changeOrigin: true },
         "/docs/**": { target: DOCS_PROXY_ORIGIN, changeOrigin: true },
       },
@@ -122,6 +136,12 @@ export default defineConfig(({ command }) => ({
         config: {
           version: 3,
           routes: [
+            // Only the Notra Sites files (domain check, assets) until the old blog routes are removed.
+            {
+              src: "^/blog/_notra/(.*)$",
+              dest: `${BLOG_PROXY_ORIGIN}/blog/_notra/$1`,
+              headers: PROXIED_SITE_SECURITY_HEADERS,
+            },
             { src: "^/docs(/.*)?$", dest: `${DOCS_PROXY_ORIGIN}/docs$1` },
             {
               src: "^/\\.well-known/(oauth-authorization-server|openid-configuration)$",

@@ -4,7 +4,8 @@
   "workspaces": {
     "packages": [
       "apps/*",
-      "packages/*"
+      "packages/*",
+      "!apps/blog"
     ],
     "catalog": {
       "@ai-sdk/devtools": "1.0.32",

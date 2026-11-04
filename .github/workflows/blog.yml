@@ -3,9 +3,9 @@ name: Blog
 on:
   push:
     branches: [main]
-    paths: ["apps/web/src/content/blog/**/*.mdx", ".github/workflows/blog.yml", "scripts/github/check-blog-links.mjs"]
+    paths: ["apps/web/src/content/blog/**/*.mdx", "apps/blog/blog/**", ".github/workflows/blog.yml", "scripts/github/check-blog-links.mjs"]
   pull_request:
-    paths: ["apps/web/src/content/blog/**/*.mdx", ".github/workflows/blog.yml", "scripts/github/check-blog-links.mjs"]
+    paths: ["apps/web/src/content/blog/**/*.mdx", "apps/blog/blog/**", ".github/workflows/blog.yml", "scripts/github/check-blog-links.mjs"]
 
 permissions:
   contents: read
@@ -26,3 +26,22 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
           PR: ${{ github.event.pull_request.number }}
+
+  # Until usenotra.com/blog is served from Notra Sites, every post must also exist in apps/blog,
+  # or it disappears at the cutover.
+  notra-sites-copy:
+    runs-on: depot-ubuntu-24.04
+    timeout-minutes: 2
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - run: |
+          missing=0
+          for post in apps/web/src/content/blog/*.mdx; do
+            if [ ! -f "apps/blog/blog/$(basename "$post")" ]; then
+              echo "::error file=$post::Also add this post to apps/blog/blog/ (rename updatedAt to updated). See apps/blog/README.md."
+              missing=1
+            fi
+          done
+          exit "$missing"

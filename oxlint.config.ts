@@ -21,6 +21,7 @@ export default defineConfig({
     ".temp/**",
     "**/*.astro",
     "apps/sites-builder/fixtures/**",
+    "apps/blog/**",
   ],
   options: {
     reportUnusedDisableDirectives: "warn",

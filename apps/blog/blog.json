@@ -1,0 +1,105 @@
+{
+  "$schema": "https://usenotra.com/schemas/blog.json",
+  "name": "Notra",
+  "description": "Insights, guides and stories from the Notra team.",
+  "logo": {
+    "light": "/brand/notra-mark.svg",
+    "dark": "/brand/notra-mark.svg",
+    "href": "https://www.usenotra.com"
+  },
+  "favicon": "/brand/favicon.svg",
+  "colors": { "primary": "#8B5CF6", "light": "#A78BFA", "dark": "#8B5CF6" },
+  "appearance": { "default": "system", "storageKey": "theme" },
+  "fonts": {
+    "heading": {
+      "family": "Satoshi",
+      "source": "/fonts/satoshi.woff2",
+      "format": "woff2",
+      "weight": 500
+    },
+    "body": { "family": "Inter" }
+  },
+  "background": { "color": { "light": "#FFFFFF", "dark": "#131316" } },
+  "styling": {
+    "codeblocks": { "light": "github-light", "dark": "github-dark" },
+    "smartQuotes": false
+  },
+  "navbar": { "areas": [] },
+  "contextual": { "options": ["copy", "view", "chatgpt", "claude"] },
+  "blog": {
+    "title": "Notra Blog",
+    "description": "Insights, guides and stories from the Notra team.",
+    "layout": "cards",
+    "hero": { "style": "wash" },
+    "card": { "image": false, "excerpt": true, "author": true, "date": true },
+    "post": {
+      "header": "compact",
+      "toc": true,
+      "authorCard": true,
+      "readingTime": true,
+      "pagination": true,
+      "cover": false
+    }
+  },
+  "metadata": { "dateFormat": "long" },
+  "authors": {
+    "dominik": {
+      "name": "Dominik Koch",
+      "title": "Founder",
+      "avatar": "/authors/dominik.png",
+      "x": "https://x.com/dominikkoch",
+      "url": "https://dominikkoch.dev/"
+    },
+    "josh": {
+      "name": "Josh",
+      "title": "Head of Propaganda @ Upstash",
+      "avatar": "/authors/josh.webp",
+      "bio": "Guest author and developer relations at Upstash.",
+      "x": "https://x.com/joshtriedcoding",
+      "youtube": "https://www.youtube.com/@joshtriedcoding"
+    },
+    "jan": {
+      "name": "Jan Burzinski",
+      "title": "Founding Engineer",
+      "avatar": "/authors/jan.webp",
+      "x": "https://x.com/miaugladiator1",
+      "url": "https://www.janburzinski.de/"
+    },
+    "notra": {
+      "name": "Notra Team",
+      "avatar": "/authors/notra.png"
+    }
+  },
+  "footer": {
+    "socials": {
+      "x": "https://x.com/usenotra",
+      "youtube": "https://www.youtube.com/@usenotra",
+      "linkedin": "https://www.linkedin.com/company/usenotra",
+      "discord": "https://discord.gg/2qzGZDsnwB",
+      "github": "https://github.com/usenotra",
+      "reddit": "https://www.reddit.com/r/notra/"
+    }
+  },
+  "seo": {
+    "organization": {
+      "name": "Notra",
+      "legalName": "Notra, Inc.",
+      "url": "https://www.usenotra.com",
+      "logo": "/brand/notra-mark.svg"
+    }
+  },
+  "thumbnails": {
+    "layout": "author",
+    "label": "BLOG",
+    "background": "/brand/og-background.svg"
+  },
+  "markdown": {
+    "instructions": "This is the Notra blog. Notra helps teams find out what AI engines say about them and fix it. Product details and pricing live at https://www.usenotra.com."
+  },
+  "integrations": {
+    "c15t": {
+      "backendURL": "https://notra-prod-notra.inth.app",
+      "crossSubdomain": true
+    }
+  }
+}

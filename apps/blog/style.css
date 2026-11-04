@@ -1,0 +1,1427 @@
+/* Matches the usenotra.com marketing site (apps/web). Values come from its Tailwind classes. */
+
+#body-content {
+  --ink: #1e1e1e;
+  --ink-muted: #1e1e1e99;
+  --lilac: #c8b2ee;
+  --layout-index: 55rem;
+  --layout-post: 76rem;
+  --layout-reading: 48rem;
+  --foreground: hsl(0 0% 9%);
+  --muted-foreground: hsl(0 0% 45.1%);
+  --border: hsl(0 0% 89.8%);
+  -webkit-font-smoothing: antialiased;
+}
+
+html.dark #body-content {
+  --ink: #fff;
+  --ink-muted: rgb(255 255 255 / 0.6);
+  --foreground: hsl(0 0% 98%);
+  --muted-foreground: hsl(0 0% 63.9%);
+  --border: hsl(0 1% 17%);
+  --card: hsl(240 6% 10%);
+}
+
+#content-area {
+  padding-bottom: 0;
+}
+
+.legacy-anchor {
+  display: block;
+  scroll-margin-top: 6rem;
+}
+
+/* Navbar */
+
+.notra-nav {
+  position: relative;
+  z-index: 50;
+  width: 100%;
+}
+
+.notra-nav[data-page="index"] {
+  position: fixed;
+  inset-inline: 1rem;
+  top: 2.5rem;
+  width: auto;
+  transition: top 300ms ease-out;
+}
+
+.notra-nav-shell {
+  margin-inline: auto;
+  max-width: 80rem;
+  padding-inline: 1rem;
+  border-radius: 1rem;
+  transition:
+    background-color 300ms ease-out,
+    box-shadow 300ms ease-out;
+}
+
+.notra-nav[data-page="index"] .notra-nav-shell {
+  max-width: 80.9375rem;
+  padding-inline: 1.75rem;
+}
+
+.notra-nav[data-scrolled] {
+  top: 1rem;
+}
+
+.notra-nav[data-scrolled] .notra-nav-shell {
+  background: rgb(255 255 255 / 0.85);
+  backdrop-filter: blur(12px);
+  box-shadow:
+    0 0 0 1px #ececec,
+    0 1px 2px #28282814;
+}
+
+html.dark .notra-nav[data-scrolled] .notra-nav-shell {
+  background: rgb(19 19 22 / 0.85);
+  box-shadow: 0 0 0 1px rgb(255 255 255 / 0.08);
+}
+
+.notra-nav-row {
+  position: relative;
+  display: flex;
+  height: 4rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.notra-nav[data-page="index"]:not([data-scrolled]) .notra-nav-row {
+  height: 2.75rem;
+}
+
+.notra-nav-logo {
+  display: inline-flex;
+  flex: 1;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--ink);
+  font-size: 1.125rem;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+}
+
+.notra-nav-mark {
+  display: flex;
+  width: 2.5rem;
+  height: 2.5rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.5rem;
+}
+
+html.dark .notra-nav-mark {
+  background: #f6f3f1;
+  box-shadow:
+    0 0 0 1px rgb(255 255 255 / 0.1),
+    0 1px 2px rgb(0 0 0 / 0.4);
+}
+
+.notra-nav-mark img {
+  width: 1.75rem;
+  height: 1.75rem;
+}
+
+.notra-nav-links {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: none;
+  align-items: center;
+  gap: 2rem;
+  transform: translate(-50%, -50%);
+}
+
+.notra-nav-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  border-radius: 0.375rem;
+  color: #1e1e1e;
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1.25rem;
+  letter-spacing: -0.02em;
+  transition: color 150ms ease-out;
+  cursor: pointer;
+}
+
+html.dark .notra-nav-trigger {
+  color: rgb(255 255 255 / 0.75);
+}
+
+.notra-nav-trigger:hover,
+.notra-nav-menu:focus-within .notra-nav-trigger {
+  color: var(--ink);
+}
+
+.notra-nav-trigger svg {
+  width: 0.875rem;
+  height: 0.875rem;
+  transition: transform 200ms ease-out;
+}
+
+.notra-nav-menu {
+  position: relative;
+}
+
+.notra-nav-menu:hover .notra-nav-trigger svg,
+.notra-nav-menu:focus-within .notra-nav-trigger svg {
+  transform: rotate(180deg);
+}
+
+.notra-nav-panel {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  padding-top: 1rem;
+  visibility: hidden;
+  opacity: 0;
+  transform: translate(-50%, -0.25rem);
+  transition:
+    opacity 150ms ease-out,
+    transform 150ms ease-out,
+    visibility 150ms;
+}
+
+.notra-nav-menu:hover .notra-nav-panel,
+.notra-nav-menu:focus-within .notra-nav-panel {
+  visibility: visible;
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+.notra-nav-panel-inner {
+  display: flex;
+  gap: 2rem;
+  width: max-content;
+  padding: 1.5rem;
+  border-radius: 1rem;
+  background: #fff;
+  box-shadow:
+    0 0 0 1px #ececec,
+    0 8px 24px rgb(40 40 40 / 0.08);
+}
+
+html.dark .notra-nav-panel-inner {
+  background: #18181b;
+  box-shadow: 0 0 0 1px rgb(255 255 255 / 0.1);
+}
+
+.notra-nav-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  width: 17rem;
+}
+
+.notra-nav-group + .notra-nav-group {
+  padding-left: 2rem;
+  border-left: 1px solid #1e1e1e1a;
+}
+
+html.dark .notra-nav-group + .notra-nav-group {
+  border-color: rgb(255 255 255 / 0.1);
+}
+
+.notra-nav-group p {
+  margin-bottom: 0.5rem;
+  color: var(--muted-foreground);
+  font-size: 0.8125rem;
+  font-weight: 500;
+}
+
+.notra-nav-group a {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  margin-inline: -0.5rem;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  transition: background-color 150ms ease-out;
+}
+
+.notra-nav-group a:hover,
+.notra-nav-group a:focus-visible {
+  background: #c8b2ee26;
+  outline: none;
+}
+
+.notra-nav-group strong {
+  color: var(--ink);
+  font-size: 0.9375rem;
+  font-weight: 600;
+}
+
+.notra-nav-group span {
+  color: rgb(30 30 30 / 0.7);
+  font-size: 0.8125rem;
+  line-height: 1.125rem;
+}
+
+html.dark .notra-nav-group span {
+  color: rgb(255 255 255 / 0.6);
+}
+
+.notra-nav-actions {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+.notra-theme-toggle {
+  display: inline-flex;
+  width: 2.25rem;
+  height: 2.25rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.5rem;
+  color: var(--foreground);
+  cursor: pointer;
+  transition: background-color 150ms ease-out;
+}
+
+.notra-theme-toggle:hover {
+  background: var(--muted);
+}
+
+.notra-theme-toggle svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.notra-theme-sun,
+html.dark .notra-theme-moon {
+  display: none;
+}
+
+html.dark .notra-theme-sun {
+  display: block;
+}
+
+.notra-nav-actions kbd {
+  display: inline-flex;
+  width: 1.125rem;
+  height: 1.125rem;
+  align-items: center;
+  justify-content: center;
+  margin-left: 0.375rem;
+  border-radius: 9999px;
+  background: rgb(30 30 30 / 0.08);
+  color: rgb(30 30 30 / 0.6);
+  font-family: var(--font-body);
+  font-size: 0.625rem;
+  font-weight: 500;
+}
+
+html.dark .notra-nav-signin kbd {
+  background: rgb(255 255 255 / 0.12);
+  color: rgb(255 255 255 / 0.6);
+}
+
+.notra-nav-signin {
+  display: none;
+  align-items: center;
+  color: var(--ink);
+  font-family: var(--font-heading);
+  font-size: 1rem;
+  letter-spacing: -0.015em;
+  transition: opacity 150ms ease-out;
+}
+
+.notra-nav-signin:hover {
+  opacity: 0.7;
+}
+
+.notra-nav-signup {
+  display: none;
+  height: 2rem;
+  align-items: center;
+  padding-inline: 0.625rem 0.375rem;
+  border-radius: 1rem;
+  background: #fff;
+  color: #1e1e1e;
+  font-family: var(--font-heading);
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  box-shadow:
+    0 0 0 1px #ececec,
+    0 1px 2px #28282814;
+  transition:
+    opacity 150ms ease-out,
+    transform 150ms ease-out;
+}
+
+.notra-nav-signup:hover {
+  opacity: 0.9;
+}
+
+.notra-nav-signup:active {
+  transform: scale(0.96);
+}
+
+.notra-nav-mobile {
+  position: relative;
+}
+
+.notra-nav-mobile summary {
+  display: inline-flex;
+  width: 2.25rem;
+  height: 2.25rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.375rem;
+  color: var(--ink);
+  list-style: none;
+  cursor: pointer;
+}
+
+.notra-nav-mobile summary::-webkit-details-marker {
+  display: none;
+}
+
+.notra-nav-mobile summary svg {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.notra-nav-mobile-panel {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  width: min(18rem, calc(100vw - 2rem));
+  padding: 1rem;
+  border-radius: 1rem;
+  background: #fff;
+  box-shadow:
+    0 0 0 1px #ececec,
+    0 8px 24px rgb(40 40 40 / 0.08);
+}
+
+html.dark .notra-nav-mobile-panel {
+  background: #18181b;
+  box-shadow: 0 0 0 1px rgb(255 255 255 / 0.1);
+}
+
+.notra-nav-mobile-panel p {
+  margin: 0.75rem 0 0.25rem;
+  color: var(--muted-foreground);
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.notra-nav-mobile-panel p:first-child {
+  margin-top: 0;
+}
+
+.notra-nav-mobile-panel a {
+  padding: 0.375rem 0;
+  color: var(--ink);
+  font-size: 0.9375rem;
+}
+
+.notra-nav-mobile-panel .notra-nav-signup {
+  display: inline-flex;
+  justify-content: center;
+  margin-top: 0.5rem;
+}
+
+@media (min-width: 40rem) {
+  .notra-nav[data-page="index"] {
+    inset-inline: 1.5rem;
+  }
+
+  .notra-nav-shell {
+    padding-inline: 1.5rem;
+  }
+}
+
+@media (min-width: 64rem) {
+  .notra-nav-links,
+  .notra-nav-signup {
+    display: flex;
+  }
+
+  .notra-nav-signin {
+    display: inline-flex;
+  }
+
+  .notra-nav-mobile {
+    display: none;
+  }
+
+  .notra-nav[data-page="index"]:not([data-scrolled]) .notra-nav-row {
+    height: 2.4375rem;
+  }
+}
+
+@media (min-width: 87rem) {
+  .notra-nav[data-page="index"]:not([data-scrolled]) .notra-nav-shell {
+    padding-inline: 0;
+  }
+}
+
+/* Blog index hero */
+
+.notra-hero {
+  position: relative;
+  isolation: isolate;
+  overflow: clip;
+  width: 100%;
+  border-radius: 1.5rem;
+  background: #c8b2ee40 url("/brand/dither-hero.png") center / cover no-repeat;
+}
+
+/* usenotra.com keeps 1.5rem around the hero on phones too, where the page padding is 1rem. */
+@media (max-width: 39.999rem) {
+  .notra-hero {
+    width: calc(100% - 1rem);
+    margin: 0.5rem auto 0;
+    background-image: none;
+  }
+}
+
+html.dark .notra-hero {
+  background: #2a2140;
+}
+
+.notra-hero-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 7rem 1.5rem 4rem;
+  text-align: center;
+}
+
+.notra-hero h1 {
+  max-width: 56.875rem;
+  color: var(--ink);
+  font-family: var(--font-heading);
+  font-size: 2.5rem;
+  font-weight: 500;
+  line-height: 1.08;
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+}
+
+.notra-hero p {
+  max-width: 42.875rem;
+  color: #1e1e1ebf;
+  font-size: 1.125rem;
+  font-weight: 500;
+  line-height: 1.75rem;
+  text-wrap: balance;
+}
+
+html.dark .notra-hero p {
+  color: rgb(255 255 255 / 0.7);
+}
+
+@media (min-width: 40rem) {
+  .notra-hero h1 {
+    font-size: 3.25rem;
+  }
+}
+
+@media (min-width: 48rem) {
+  .notra-hero-inner {
+    padding-inline: 6rem;
+  }
+}
+
+@media (min-width: 64rem) {
+  .notra-hero-inner {
+    padding-top: 9.5rem;
+    padding-bottom: 6rem;
+  }
+
+  .notra-hero h1 {
+    font-size: 4rem;
+    line-height: 1.12;
+  }
+}
+
+.blog-index {
+  gap: 3rem;
+}
+
+@media (min-width: 48rem) {
+  .blog-index {
+    gap: 4rem;
+  }
+}
+
+/* Post cards */
+
+.post-card-box {
+  border-color: #1e1e1e1a;
+  background: #c8b2ee26;
+}
+
+.post-card-box::before {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  bottom: -2rem;
+  z-index: -1;
+  height: 12rem;
+  background: url("/brand/dither-card.png") center / cover no-repeat;
+  mask-image: linear-gradient(to bottom, transparent 0%, black 100%);
+  pointer-events: none;
+}
+
+.post-card-box:hover {
+  border-color: color-mix(in oklab, var(--primary) 40%, transparent);
+  background: #c8b2ee40;
+}
+
+html.dark .post-card-box {
+  border-color: rgb(255 255 255 / 0.1);
+  background: rgb(255 255 255 / 0.02);
+}
+
+html.dark .post-card-box:hover {
+  background: rgb(255 255 255 / 0.04);
+}
+
+html.dark .post-card-box::before {
+  display: none;
+}
+
+.post-card-title {
+  color: var(--ink);
+  text-wrap: wrap;
+}
+
+.post-card-excerpt,
+.post-card-meta {
+  color: var(--ink-muted);
+}
+
+/* Post page */
+
+.post-compact {
+  padding-top: 2rem;
+}
+
+@media (min-width: 40rem) {
+  .post-compact {
+    padding-top: 5rem;
+  }
+}
+
+@media (min-width: 48rem) {
+  .post-compact {
+    padding-top: 6rem;
+  }
+}
+
+.post-compact #header > a:first-child,
+.post-compact #header .post-meta {
+  font-family: var(--font-code);
+  font-size: 0.875rem;
+}
+
+.post-compact #header > a:first-child {
+  color: #737373;
+}
+
+.post-compact #header > a:first-child:hover {
+  color: #171717;
+}
+
+html.dark .post-compact #header > a:first-child {
+  color: #a3a3a3;
+}
+
+html.dark .post-compact #header > a:first-child:hover {
+  color: #fafafa;
+}
+
+.post-compact #header .post-meta {
+  color: #404040;
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+.post-compact
+  .page-actions
+  :is(.page-actions-copy-button, .page-actions-menu-button) {
+  height: auto;
+  padding: 0;
+  border: 0;
+  background: none;
+  box-shadow: none;
+  color: #737373;
+  font-family: var(--font-code);
+  font-size: 0.875rem;
+  font-weight: 400;
+}
+
+.post-compact .page-actions .page-actions-menu-button {
+  margin-left: 0.75rem;
+  padding-left: 0.75rem;
+  border-left: 1px solid var(--border);
+  border-radius: 0;
+}
+
+.post-compact
+  .page-actions
+  :is(.page-actions-copy-button, .page-actions-menu-button):hover {
+  color: var(--foreground);
+}
+
+html.dark
+  .post-compact
+  .page-actions
+  :is(.page-actions-copy-button, .page-actions-menu-button) {
+  color: #a3a3a3;
+}
+
+.post-compact .page-actions .split-button {
+  align-items: center;
+  border: 0;
+  box-shadow: none;
+}
+
+html.dark .post-compact #header .post-meta {
+  color: #e5e5e5;
+}
+
+#page-title {
+  color: var(--ink);
+}
+
+.post-compact #page-title {
+  font-size: 2.5rem;
+  letter-spacing: -0.03em;
+  overflow-wrap: break-word;
+}
+
+@media (min-width: 40rem) {
+  .post-compact #page-title {
+    font-size: 3rem;
+    letter-spacing: -0.02em;
+  }
+}
+
+/* Article text, as in ARTICLE_CLASS_NAME on usenotra.com */
+
+.mdx-content {
+  --tw-prose-body: color-mix(in oklab, var(--foreground) 80%, transparent);
+  margin-top: 2rem;
+  font-size: 1rem;
+}
+
+/* The theme's code frame sets its background with !important. */
+.mdx-content pre:not(.not-prose *) {
+  background: var(--card) !important;
+  font-size: 0.875rem;
+}
+
+.mdx-content pre:not(.not-prose *) code {
+  font-size: inherit;
+}
+
+.mdx-content :is(h2, h3, h4):not(.not-prose *) {
+  font-family: var(--font-body);
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  scroll-margin-top: 6rem;
+}
+
+.mdx-content h2:not(.not-prose *) {
+  margin: 3rem 0 1.5rem;
+  font-size: 1.5rem;
+  line-height: 2rem;
+}
+
+.mdx-content h3:not(.not-prose *) {
+  margin: 2rem 0 0.75rem;
+  font-size: 1.25rem;
+  line-height: 2rem;
+}
+
+#table-of-contents a {
+  font-size: 0.875rem;
+  line-height: 1.375;
+}
+
+#table-of-contents .post-meta {
+  line-height: 1rem;
+  letter-spacing: 0.05em;
+}
+
+/* The theme's prose heading margins also reach into not-prose components. */
+.not-prose :where(h1, h2, h3, h4) {
+  margin: 0;
+}
+
+.mdx-content :is(p, li):not(.not-prose *) {
+  line-height: 1.75rem;
+  text-wrap: wrap;
+}
+
+.mdx-content a:not(.not-prose a) {
+  color: var(--primary);
+  text-decoration: none;
+}
+
+html.dark .mdx-content a:not(.not-prose a) {
+  color: var(--accent);
+}
+
+.mdx-content a:not(.not-prose a):hover {
+  text-decoration: underline;
+}
+
+.mdx-content figcaption:not(.not-prose *) {
+  text-align: center;
+}
+
+.mdx-content img:not(.not-prose *) {
+  border-radius: 0.75rem;
+}
+
+/* Call to action under every post */
+
+.notra-cta {
+  position: relative;
+  display: flex;
+  overflow: clip;
+  max-width: 87rem;
+  margin: 4rem auto 0;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1.5rem;
+  border-radius: 1.5625rem;
+  background: #c8b2ee40 url("/brand/dither-hero.png") center / cover no-repeat;
+}
+
+html.dark .notra-cta {
+  background: #231d3a;
+}
+
+.notra-cta-inner {
+  display: flex;
+  max-width: 53.3125rem;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  text-align: center;
+}
+
+.notra-cta h2 {
+  max-width: 46.625rem;
+  color: var(--ink);
+  font-family: var(--font-heading);
+  font-size: 2.25rem;
+  font-weight: 500;
+  line-height: 1.1;
+  letter-spacing: -0.0625rem;
+  text-wrap: balance;
+}
+
+.notra-cta p {
+  max-width: 33.5rem;
+  color: #1e1e1ee6;
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1.5rem;
+  letter-spacing: -0.03125rem;
+  text-wrap: balance;
+}
+
+html.dark .notra-cta p {
+  color: rgb(255 255 255 / 0.85);
+}
+
+.notra-cta-actions {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.notra-cta-button {
+  display: inline-flex;
+  height: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  padding-inline: 1.5rem;
+  border-radius: 9999px;
+  font-size: 1.125rem;
+  font-weight: 500;
+  letter-spacing: -0.015em;
+  white-space: nowrap;
+}
+
+.notra-cta-primary {
+  background: linear-gradient(
+    180deg in oklab,
+    oklab(69.9% 0.067 -0.16) 0%,
+    oklab(52.6% 0.113 -0.27) 100%
+  );
+  color: #fff;
+  box-shadow:
+    #8b5cf640 0 0 0 0.5rem,
+    #28282814 0 0.0625rem 0.125rem,
+    #1e1e1e40 0 0 0 0.0625rem;
+}
+
+.notra-cta-primary:hover {
+  background: linear-gradient(
+    180deg in oklab,
+    oklab(69.9% 0.067 -0.16) 0%,
+    oklab(33.9% 0.073 -0.174) 100%
+  );
+}
+
+.notra-cta-light {
+  background: linear-gradient(
+    180deg in oklab,
+    oklab(100% 0 0) 0%,
+    oklab(95.5% 0 0) 100%
+  );
+  color: #1e1e1e;
+  box-shadow:
+    #ececec 0 0 0 0.0625rem,
+    #28282814 0 0.0625rem 0.125rem;
+}
+
+.notra-cta-light:hover {
+  background: linear-gradient(
+    180deg in oklab,
+    oklab(100% 0 0) 0%,
+    oklab(89% 0 0) 100%
+  );
+}
+
+@media (min-width: 40rem) {
+  .notra-cta {
+    min-height: 27.4375rem;
+    padding-block: 4rem;
+  }
+
+  .notra-cta-inner {
+    gap: 1.125rem;
+  }
+
+  .notra-cta h2 {
+    font-size: 3rem;
+    letter-spacing: -0.125rem;
+  }
+
+  .notra-cta p {
+    font-size: 1.125rem;
+    line-height: 1.375rem;
+  }
+
+  .notra-cta-actions {
+    width: auto;
+    flex-direction: row;
+    justify-content: center;
+    gap: 1.75rem;
+    margin-top: 2.625rem;
+  }
+}
+
+@media (min-width: 64rem) {
+  .notra-cta h2 {
+    font-size: 4rem;
+  }
+}
+
+/* Footer */
+
+.notra-footer {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  margin-top: 6rem;
+  padding-top: 1.5rem;
+  border-radius: 1.5rem 1.5rem 0 0;
+  background:
+    url("/brand/dither-footer.png") left 0 top 8.8125rem /
+      max(112.08%, 100.875rem) auto no-repeat,
+    linear-gradient(
+      in oklab 180deg,
+      oklab(80.3% 0.045 -0.074 / 15%) 0%,
+      oklab(71.8% 0.066 -0.109 / 50%) 100%
+    );
+  box-shadow:
+    0 0.0625rem 0.125rem #28282814,
+    0 0 0 0.0625rem #ececec;
+}
+
+html.dark .notra-footer {
+  background: #141019 url("/brand/dither-footer.png") left 0 top 8.8125rem /
+    max(112.08%, 100.875rem) auto no-repeat;
+  box-shadow: none;
+}
+
+.notra-footer-wordmark {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  z-index: -1;
+  width: 100%;
+  min-width: 60rem;
+  height: auto;
+  transform: translate(-50%, 23%);
+  pointer-events: none;
+}
+
+html.dark .notra-footer-wordmark {
+  opacity: 0.4;
+}
+
+.notra-footer-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+  max-width: 87rem;
+  margin-inline: auto;
+  padding: 1.75rem 1.5rem 16rem;
+}
+
+.notra-footer-brand {
+  display: flex;
+  width: 100%;
+  max-width: 18.5rem;
+  flex-direction: column;
+  gap: 1.75rem;
+}
+
+.notra-footer-brand .notra-nav-logo {
+  flex: none;
+}
+
+.notra-footer-tagline {
+  margin-top: 0.625rem;
+  color: #1e1e1e99;
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1.5rem;
+  letter-spacing: -0.01em;
+}
+
+html.dark .notra-footer-tagline {
+  color: color-mix(in oklab, var(--foreground) 70%, transparent);
+}
+
+.notra-footer-socials {
+  display: flex;
+  gap: 1rem;
+}
+
+.notra-footer-socials a {
+  color: #1e1e1e80;
+  transition: color 150ms ease-out;
+}
+
+.notra-footer-socials a:hover {
+  color: #1e1e1e;
+}
+
+html.dark .notra-footer-socials a {
+  color: color-mix(in oklab, var(--foreground) 50%, transparent);
+}
+
+html.dark .notra-footer-socials a:hover {
+  color: var(--foreground);
+}
+
+.notra-footer-socials svg {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.notra-footer-legal {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.notra-footer-legal div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 0.75rem;
+}
+
+.notra-footer-legal :is(a, button, p) {
+  color: #1e1e1e66;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  line-height: 1.125rem;
+}
+
+.notra-footer-legal :is(a, button):hover {
+  color: #1e1e1e;
+}
+
+html.dark .notra-footer-legal :is(a, button, p) {
+  color: color-mix(in oklab, var(--foreground) 50%, transparent);
+}
+
+.notra-footer-columns {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 2.5rem 2rem;
+}
+
+.notra-footer-columns > div {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.notra-footer-group {
+  display: flex;
+  flex-direction: column;
+  gap: 1.125rem;
+}
+
+.notra-footer-group h3 {
+  margin-bottom: -0.125rem;
+  color: #8b5cf6;
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1.5rem;
+  letter-spacing: -0.01em;
+}
+
+.notra-footer-group a {
+  color: #1e1e1e99;
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1.5rem;
+  letter-spacing: -0.01em;
+  transition: color 150ms ease-out;
+}
+
+.notra-footer-group a:hover {
+  color: #8b5cf6;
+}
+
+html.dark .notra-footer-group h3,
+html.dark .notra-footer-group a:hover {
+  color: #a78bfa;
+}
+
+html.dark .notra-footer-group a {
+  color: color-mix(in oklab, var(--foreground) 60%, transparent);
+}
+
+@media (min-width: 40rem) {
+  .notra-footer-columns {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 48rem) {
+  .notra-footer-inner {
+    padding-inline: 2rem;
+    padding-bottom: 30rem;
+  }
+}
+
+@media (min-width: 64rem) {
+  .notra-footer-inner {
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 6rem;
+  }
+
+  .notra-footer-columns {
+    flex: 1;
+    justify-items: end;
+  }
+}
+
+/* Diagrams in "How we built demo.usenotra.com" */
+
+.diagram-flow-travel,
+.diagram-flow-travel-short,
+.diagram-flow-scan {
+  --flow-cycle: 5s;
+  animation: diagramFlowTravel var(--flow-cycle) linear
+    calc(var(--flow-delay, 0) * var(--flow-cycle)) 1 both paused;
+}
+
+[data-seen] .diagram-flow-travel,
+[data-seen] .diagram-flow-travel-short,
+[data-seen] .diagram-flow-scan {
+  animation-play-state: running;
+}
+
+.diagram-flow-travel.diagram-flow-linear {
+  animation-name: diagramFlowTravelLinear;
+}
+
+.diagram-flow-travel-short {
+  animation-name: diagramFlowTravelShort;
+}
+
+.diagram-flow-scan {
+  animation-name: diagramFlowScan;
+}
+
+@keyframes diagramFlowTravel {
+  0% {
+    transform: none;
+    opacity: 0;
+    animation-timing-function: cubic-bezier(0.45, 0, 0.55, 1);
+  }
+  1%,
+  11% {
+    opacity: 1;
+  }
+  12%,
+  100% {
+    transform: var(--flow-target);
+    opacity: 0;
+  }
+}
+
+@keyframes diagramFlowTravelLinear {
+  0% {
+    transform: none;
+    opacity: 0;
+  }
+  1%,
+  11% {
+    opacity: 1;
+  }
+  12%,
+  100% {
+    transform: var(--flow-target);
+    opacity: 0;
+  }
+}
+
+@keyframes diagramFlowTravelShort {
+  0% {
+    transform: none;
+    opacity: 0;
+  }
+  1%,
+  4% {
+    opacity: 1;
+  }
+  5%,
+  100% {
+    transform: var(--flow-target);
+    opacity: 0;
+  }
+}
+
+@keyframes diagramFlowScan {
+  0% {
+    transform: translateY(-100%);
+    opacity: 1;
+    animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  11% {
+    transform: none;
+    opacity: 1;
+    animation-timing-function: ease-out;
+  }
+  32%,
+  100% {
+    transform: none;
+    opacity: 0;
+  }
+}
+
+/* Page transitions between blog pages, with the timing of usenotra.com. script.js names the morphing title. */
+@view-transition {
+  navigation: auto;
+}
+
+.post-compact #page-title {
+  view-transition-name: post-title;
+}
+
+::view-transition-group(*),
+::view-transition-old(*),
+::view-transition-new(*) {
+  animation-duration: 420ms;
+  animation-timing-function: cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.consent-log-row {
+  animation: consentLogIn 300ms ease-out both;
+}
+
+@keyframes consentLogIn {
+  from {
+    opacity: 0;
+    transform: translateY(0.25rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .consent-log-row,
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none;
+  }
+
+  .notra-nav,
+  .notra-nav-shell,
+  .notra-nav-panel {
+    transition: none;
+  }
+}
+
+/* Cookie banner and privacy dialog, styled like usenotra.com (apps/web/src/lib/consent-manager/theme.ts). */
+
+#body-content [data-testid="consent-banner-card"] {
+  border-color: #ececec;
+  border-radius: 1.5rem;
+  background: #fff;
+  box-shadow:
+    0 1px 2px rgb(40 40 40 / 0.08),
+    0 16px 40px -12px rgb(76 29 149 / 0.22);
+  -webkit-font-smoothing: antialiased;
+}
+
+html.dark #body-content [data-testid="consent-banner-card"] {
+  border-color: hsl(0 1% 17%);
+  background: #18181b;
+}
+
+#body-content
+  [data-testid="consent-banner-card"]
+  > :has(> [data-testid="consent-banner-title"]) {
+  gap: 0.375rem;
+  padding: 1.375rem 1.5rem 0;
+}
+
+#body-content
+  :is(
+    [data-testid="consent-banner-title"],
+    [data-testid="consent-dialog-title"]
+  ) {
+  color: var(--ink);
+  font-family: var(--font-heading);
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+}
+
+#body-content [data-testid="consent-banner-description"],
+#body-content [data-testid="consent-dialog-card"] [data-context="dialog"] {
+  margin-top: 0;
+  color: rgb(30 30 30 / 0.75);
+  font-size: 0.90625rem;
+  line-height: 1.5;
+  text-wrap: pretty;
+}
+
+html.dark #body-content [data-testid="consent-banner-description"],
+html.dark
+  #body-content
+  [data-testid="consent-dialog-card"]
+  [data-context="dialog"] {
+  color: hsl(0 0% 63.9%);
+}
+
+#body-content [data-testid="consent-banner-footer"] {
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding: 1.375rem 1.5rem 1.5rem;
+  border: 0;
+  background: transparent;
+}
+
+#body-content [data-testid="consent-banner-footer-sub-group"] {
+  gap: 0.75rem;
+}
+
+#body-content button[data-action][data-testid^="consent-"] {
+  height: 2.5rem;
+  min-width: 7.25rem;
+  padding-inline: 1.375rem;
+  border: 0;
+  border-radius: 9999px;
+  background: linear-gradient(
+    180deg in oklab,
+    oklab(100% 0 0) 0%,
+    oklab(95.5% 0 0) 100%
+  );
+  color: #1e1e1e;
+  font-family: var(--font-heading);
+  font-size: 1rem;
+  font-weight: 500;
+  letter-spacing: -0.015em;
+  box-shadow:
+    #ececec 0 0 0 1px,
+    #28282814 0 1px 2px;
+}
+
+#body-content button[data-action][data-testid^="consent-"]:hover {
+  background: linear-gradient(
+    180deg in oklab,
+    oklab(100% 0 0) 0%,
+    oklab(89% 0 0) 100%
+  );
+}
+
+@media (max-width: 39.999rem) {
+  #body-content
+    :is(
+      [data-testid="consent-banner-title"],
+      [data-testid="consent-dialog-title"]
+    ) {
+    font-size: 1.125rem;
+  }
+
+  #body-content button[data-action][data-testid^="consent-"] {
+    height: 2.75rem;
+  }
+}
+
+#body-content [data-testid="consent-dialog-card"] {
+  width: 100%;
+  max-width: 36.25rem;
+  border-radius: 1.5rem;
+  box-shadow:
+    0 1px 2px rgb(40 40 40 / 0.08),
+    0 24px 60px -16px rgb(76 29 149 / 0.3);
+  -webkit-font-smoothing: antialiased;
+}
+
+#body-content
+  [data-testid="consent-dialog-card"]
+  > :has(> [data-testid="consent-dialog-title"]) {
+  gap: 0.375rem;
+  padding: 1.5rem 1.5rem 1rem;
+}
+
+#body-content [data-testid="consent-widget-footer"] {
+  flex-wrap: wrap;
+  gap: 1rem;
+  width: calc(100% + 3rem);
+  margin: 1.25rem -1.5rem 0;
+  padding: 1.125rem 1.5rem 0;
+  border-top: 1px solid var(--border);
+}
+
+#body-content [data-testid="consent-widget-footer-sub-group"] {
+  gap: 0.75rem;
+}
