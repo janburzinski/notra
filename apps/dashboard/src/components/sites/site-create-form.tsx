@@ -457,7 +457,7 @@ export function SiteCreateForm({
                 rows={bulk.submittedRows}
               />
             ) : (
-              <div className="h-80" />
+              <div className="h-50" />
             )}
           </SiteCreateDeploy>
         </SiteCreateStage>

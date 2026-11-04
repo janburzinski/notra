@@ -107,7 +107,7 @@ function LogLine({ line, offset, query }: SiteBuildLogLineProps) {
     <div
       className={cn(
         SITE_BUILD_LOG_ROW_GRID,
-        "[contain-intrinsic-size:auto_1.25rem] [content-visibility:auto]",
+        "[contain-intrinsic-size:auto_1.25rem] [content-visibility:auto] motion-safe:transition-opacity motion-safe:duration-200 motion-safe:group-data-[streaming=true]/log:starting:opacity-0",
         line.tone === "error" && "bg-destructive/[0.04]",
         (line.continued || line.tone === "muted") && "text-muted-foreground"
       )}

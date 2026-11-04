@@ -88,6 +88,7 @@ export function SiteBuildLogs({
   const t = useTranslations("sites.deploymentPage.log");
   const scrollRef = useRef<HTMLDivElement>(null);
   const followRef = useRef(true);
+  const lastScrollTopRef = useRef(0);
   const followedLiveRef = useRef(inProgress || startAtEnd);
   const [following, setFollowing] = useState(true);
   const [query, setQuery] = useState("");
@@ -121,7 +122,18 @@ export function SiteBuildLogs({
       followRef.current &&
       !trimmedQuery
     ) {
-      element.scrollTop = element.scrollHeight;
+      const reduceMotion = window.matchMedia(
+        "(prefers-reduced-motion: reduce)"
+      ).matches;
+      // A new scrollTo cancels a running smooth one; when updates outpace the
+      // animation and the gap grows past a screen, jump instead of lagging.
+      const behind =
+        element.scrollHeight - element.scrollTop - element.clientHeight >
+        element.clientHeight;
+      element.scrollTo({
+        top: element.scrollHeight,
+        behavior: inProgress && !reduceMotion && !behind ? "smooth" : "instant",
+      });
     }
   }, [log, inProgress, trimmedQuery]);
 
@@ -135,7 +147,7 @@ export function SiteBuildLogs({
   };
 
   const body =
-    lines.length === 0 ? (
+    lines.length === 0 && !heading ? (
       <BuildLogEmpty inProgress={inProgress} queued={queued} />
     ) : (
       <div className="relative">
@@ -144,17 +156,20 @@ export function SiteBuildLogs({
           aria-label={t("label")}
           className={cn(
             "scrollbar-floating overflow-auto py-2.5 font-mono text-xs leading-5",
-            heading
-              ? "max-h-48 min-h-24 group-data-[streaming=true]/log:h-48"
-              : "max-h-[min(30rem,60vh)]"
+            heading ? "h-48" : "max-h-[min(30rem,60vh)]"
           )}
           onScroll={(event) => {
             const element = event.currentTarget;
+            const scrolledUp = element.scrollTop < lastScrollTopRef.current;
+            lastScrollTopRef.current = element.scrollTop;
             const atBottom =
               element.scrollHeight - element.scrollTop - element.clientHeight <
               SITE_BUILD_LOG_FOLLOW_THRESHOLD;
-            followRef.current = atBottom;
-            setFollowing(atBottom);
+            // A smooth follow scroll passes through positions above the
+            // bottom; only a scroll back up means the reader stopped following.
+            const follow = atBottom || (followRef.current && !scrolledUp);
+            followRef.current = follow;
+            setFollowing(follow);
           }}
           ref={scrollRef}
           role="log"
@@ -195,23 +210,17 @@ export function SiteBuildLogs({
   );
 
   if (heading) {
-    const hasLines = lines.length > 0;
     return (
       <div
         className="group/log min-w-0"
         data-streaming={inProgress}
         data-timestamps={offsets.size > 0}
       >
-        <div
-          className={cn(
-            "flex min-h-12 min-w-0 items-center gap-2 py-1.5 ps-4 pe-2",
-            hasLines && "border-b"
-          )}
-        >
+        <div className="flex min-h-12 min-w-0 items-center gap-2 border-b py-1.5 ps-4 pe-2">
           <div className="min-w-0 flex-1 text-sm tabular-nums">{heading}</div>
-          {hasLines ? <BuildLogCopyButton log={log} /> : null}
+          <BuildLogCopyButton log={log} />
         </div>
-        {hasLines ? body : null}
+        {body}
       </div>
     );
   }

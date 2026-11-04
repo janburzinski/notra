@@ -122,7 +122,7 @@ if (!process.env.NOTRA_DEPLOY_SURFACE_TEST_WORKER) {
   const { SiteCreateDeploy } =
     await import("../src/components/sites/site-create-deploy");
 
-  test("an empty live build is a single status row in the step card", () => {
+  test("an empty live build keeps the log viewport height", () => {
     const html = renderToStaticMarkup(
       <IntlProvider locale="en" messages={messages} timeZone="UTC">
         <SiteCreateDeploy
@@ -140,7 +140,10 @@ if (!process.env.NOTRA_DEPLOY_SURFACE_TEST_WORKER) {
     expect(html).not.toContain("h-80");
     expect(html).not.toContain("rounded-xl border");
     expect(html).not.toContain(messages.sites.deploymentPage.log.starting);
-    expect(html).not.toContain(messages.sites.deploymentPage.log.copy);
+    expect(html).toContain('role="log"');
+    expect(html).toContain(
+      'class="scrollbar-floating overflow-auto py-2.5 font-mono text-xs leading-5 h-48"'
+    );
   });
 
   test("actual log output has a copy control and a bounded log viewport", () => {
@@ -204,10 +207,9 @@ if (!process.env.NOTRA_DEPLOY_SURFACE_TEST_WORKER) {
         expect(html).toContain(messages.sites.new.deploy.editConfiguration);
         expect(html.match(/<a\b/g)).toHaveLength(1);
         expect(html).not.toContain('role="alert"');
-        expect(html).toContain("min-h-24");
-        expect(html).toContain("max-h-48");
+        expect(html).toContain(" h-48");
+        expect(html).not.toContain("min-h-24");
         expect(html).toContain('data-streaming="false"');
-        expect(html).not.toContain(" h-48");
       }
       expect(html).not.toContain("motion-safe:animate-spin");
     }
@@ -313,8 +315,8 @@ if (!process.env.NOTRA_DEPLOY_SURFACE_TEST_WORKER) {
       </IntlProvider>
     );
     expect(html).toContain('data-timestamps="false"');
-    expect(html).toContain("min-h-24");
-    expect(html).toContain("max-h-48");
+    expect(html).toContain(" h-48");
+    expect(html).not.toContain("max-h-48");
     expect(html).toContain("Same URL as blog/example.md");
     expect(html).not.toContain("✘");
     expect(html).toContain("group-data-[timestamps=false]/log:hidden");
