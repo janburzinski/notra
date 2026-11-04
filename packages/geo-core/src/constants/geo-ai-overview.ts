@@ -1,10 +1,5 @@
 import type { GeoAiOverviewLocale } from "../types/geo-ai-overview";
 
-export const GEO_AI_OVERVIEW_INVALID_ENVELOPE =
-  "Unrecognized SerpApi Google response";
-export const GEO_AI_OVERVIEW_INVALID_OVERVIEW = "Malformed AI Overview payload";
-export const GEO_AI_OVERVIEW_INVALID_SHAPE = "Unrecognized AI Overview shape";
-
 export const GEO_AI_OVERVIEW_ABSENT_ANSWER =
   "No AI Overview was shown for this query.";
 

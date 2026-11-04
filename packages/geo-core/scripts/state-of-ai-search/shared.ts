@@ -82,6 +82,6 @@ export interface RawAnswer {
   };
   /** Provider metadata preserves grounding and billing evidence, never credentials. */
   providerMetadata?: unknown;
-  /** SerpApi's structured overview, kept to render it block by block. */
+  /** Legacy SerpApi structured overview from old caches; new captures store null. */
   overview: { text_blocks: unknown; references: unknown } | null;
 }
