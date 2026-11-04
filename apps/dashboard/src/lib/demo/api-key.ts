@@ -17,7 +17,9 @@ export async function createDemoApiKey(input: {
 }): Promise<{ key: string; keyId: string } | null> {
   const apiId = process.env.UNKEY_API_ID;
   if (!(unkey && apiId)) {
-    return null;
+    throw new Error(
+      "Demo API keys need UNKEY_ROOT_KEY and UNKEY_API_ID on the demo dashboard"
+    );
   }
 
   const created = await unkey.keys.createKey({

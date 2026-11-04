@@ -17,8 +17,14 @@ const client = new Unkey({
 
 mock.module("@/lib/api-keys/unkey", () => ({ unkey: client }));
 
-const { deleteDemoApiKey, updateDemoApiKey } =
+const { createDemoApiKey, deleteDemoApiKey, updateDemoApiKey } =
   await import("../../src/lib/demo/api-key");
+
+const createInput = {
+  organizationId: "org-demo",
+  anonymousId: "anon-demo",
+  expiresAt: new Date("2026-11-03T12:00:00Z"),
+};
 
 beforeEach(() => {
   mock.module("@/lib/api-keys/unkey", () => ({ unkey: client }));
@@ -106,6 +112,41 @@ test("preserves unknown failures even when they resemble a 404", async () => {
     },
   }));
   await expect(deleteDemoApiKey("key-demo")).rejects.toBe(failure);
+});
+
+test("creates a sandbox key in the demo keyspace", async () => {
+  process.env.UNKEY_API_ID = "api-demo";
+  fetcher.mockImplementation(async () =>
+    Response.json({
+      meta: { requestId: "local-create" },
+      data: { key: "ntra_demo_secret", keyId: "key-new" },
+    })
+  );
+  await expect(createDemoApiKey(createInput)).resolves.toEqual({
+    key: "ntra_demo_secret",
+    keyId: "key-new",
+  });
+  const [request] = fetcher.mock.calls[0] ?? [];
+  expect(new URL(request?.url ?? "").pathname).toBe("/v2/keys.createKey");
+  expect(await request?.json()).toMatchObject({
+    apiId: "api-demo",
+    externalId: "org-demo",
+  });
+});
+
+test("creating a key fails loudly when Unkey is not configured", async () => {
+  process.env.UNKEY_API_ID = "api-demo";
+  mock.module("@/lib/api-keys/unkey", () => ({ unkey: null }));
+  await expect(createDemoApiKey(createInput)).rejects.toThrow(
+    "UNKEY_ROOT_KEY and UNKEY_API_ID"
+  );
+
+  mock.module("@/lib/api-keys/unkey", () => ({ unkey: client }));
+  delete process.env.UNKEY_API_ID;
+  await expect(createDemoApiKey(createInput)).rejects.toThrow(
+    "UNKEY_ROOT_KEY and UNKEY_API_ID"
+  );
+  expect(fetcher).not.toHaveBeenCalled();
 });
 
 test("cleanup is a no-op when Unkey is not configured", async () => {
