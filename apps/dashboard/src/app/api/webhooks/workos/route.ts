@@ -5,12 +5,15 @@ import { getWorkOS } from "@workos/authkit-session";
 import { Effect } from "effect";
 
 import {
+  deleteUserFromWebhook,
   removeMembershipFromWebhook,
   syncMembershipFromWebhook,
 } from "@/lib/auth/webhook-sync";
 
-function handleMembershipEvent(event: WorkOSEvent) {
+function handleWebhookEvent(event: WorkOSEvent) {
   switch (event.event) {
+    case "user.deleted":
+      return deleteUserFromWebhook(event.data);
     case "organization_membership.created":
     case "organization_membership.updated":
       return syncMembershipFromWebhook(event.data);
@@ -63,10 +66,10 @@ export async function POST(request: Request) {
   }
 
   const synced = await Effect.runPromise(
-    handleMembershipEvent(event).pipe(
+    handleWebhookEvent(event).pipe(
       Effect.as(true),
       Effect.catch((error) =>
-        Effect.logWarning("Webhook membership sync failed").pipe(
+        Effect.logWarning("WorkOS webhook sync failed").pipe(
           Effect.annotateLogs({
             event: event.event,
             error: error.message,

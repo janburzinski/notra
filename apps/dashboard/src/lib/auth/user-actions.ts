@@ -1,5 +1,5 @@
 import { db } from "@notra/db/drizzle";
-import { abuseActions, socialConnections, users } from "@notra/db/schema";
+import { socialConnections, users } from "@notra/db/schema";
 import { deleteBrewContact } from "@notra/email/utils/brew";
 import { POSTHOG_EVENTS } from "@notra/posthog/events";
 import {
@@ -9,7 +9,6 @@ import {
 } from "@notra/schemas/dashboard/auth/user-actions";
 import { isDemoMode } from "@notra/utils/demo-mode";
 import { getWorkOS } from "@workos/authkit-session";
-import { getAuthKitContext } from "@workos/authkit-tanstack-react-start";
 import { and, eq } from "drizzle-orm";
 import { Effect } from "effect";
 
@@ -20,17 +19,16 @@ import { validateActionInput } from "@/lib/actions/validate-input";
 import { runAfterResponse } from "@/lib/after-response";
 import { trackServerEvent } from "@/lib/analytics/posthog-server";
 import { readRequestHeaders } from "@/lib/analytics/request-headers";
+import { deleteAccount } from "@/lib/auth/delete-account";
 import { getAuthIdentity } from "@/lib/auth/server";
 import { clearAuthSessionCookie } from "@/lib/auth/session-cookie";
 import { clearSignedCookie } from "@/lib/auth/signed-cookie";
 import { signOutAuthSession } from "@/lib/auth/workos";
-import { isWorkOSNotFound } from "@/lib/auth/workos-error";
 import { syncBrewContacts } from "@/lib/email/brew-contacts";
 import { clearLocaleCookie, writeLocaleCookie } from "@/lib/i18n/locale-cookie";
 import { failWithOrganizationMessage } from "@/lib/organizations/action-messages";
 import { requireSession } from "@/lib/organizations/guards";
 import { revokeSitePreviewSessions } from "@/lib/sites/preview-revocation";
-import { notifyInfoChannel } from "@/lib/slack/info-channel";
 import type { SessionUser } from "@/types/auth/session";
 import type {
   SignOutActionOptions,
@@ -155,52 +153,18 @@ export async function deleteUser(): Promise<
       }
       const session = yield* requireSession();
 
+      // A Brew outage stops the deletion here instead of leaving the contact
+      // behind; `finishUserDeletion` removes it again once the account is gone.
       yield* tryAction(
         () => deleteBrewContact(session.user.email),
         "Failed to delete email contact"
       );
 
-      const auth = yield* tryAction(
-        async () => getAuthKitContext().auth(),
-        "Failed to read auth session"
-      );
-
-      if (auth.user && auth.sessionId) {
-        yield* tryAction(
-          () =>
-            getWorkOS().userManagement.revokeSession({
-              sessionId: auth.sessionId,
-            }),
-          "Failed to revoke WorkOS session"
-        ).pipe(
-          Effect.catch((error) =>
-            Effect.logWarning("Could not revoke WorkOS session").pipe(
-              Effect.annotateLogs({
-                userId: session.user.id,
-                error: error.message,
-              })
-            )
-          )
-        );
-      }
-
-      if (session.user.workosUserId) {
-        yield* tryAction(
-          () =>
-            getWorkOS().userManagement.deleteUser(
-              session.user.workosUserId ?? ""
-            ),
-          "Failed to delete WorkOS user"
-        ).pipe(
-          Effect.catch((error) =>
-            isWorkOSNotFound(error.cause)
-              ? Effect.logWarning("WorkOS user was already deleted").pipe(
-                  Effect.annotateLogs({ userId: session.user.id })
-                )
-              : Effect.fail(error)
-          )
-        );
-      }
+      yield* deleteAccount({
+        userId: session.user.id,
+        email: session.user.email,
+        workosUserId: session.user.workosUserId,
+      });
 
       const requestHeaders = yield* Effect.promise(readRequestHeaders);
       yield* Effect.sync(() => {
@@ -209,34 +173,6 @@ export async function deleteUser(): Promise<
           headers: requestHeaders,
           userId: session.user.id,
           properties: { had_paid_history: null },
-        });
-      });
-
-      yield* tryAction(
-        () =>
-          db.transaction(async (tx) => {
-            // Moderation records about the account go with it; its id can't
-            // match a new sign-up, so keeping them would protect nothing.
-            await tx
-              .delete(abuseActions)
-              .where(
-                and(
-                  eq(abuseActions.subjectType, "user"),
-                  eq(abuseActions.subjectId, session.user.id)
-                )
-              );
-            await tx.delete(users).where(eq(users.id, session.user.id));
-          }),
-        "Failed to delete user"
-      );
-      yield* Effect.sync(() => {
-        runAfterResponse("[BrewContacts] Delete failed", () =>
-          deleteBrewContact(session.user.email)
-        );
-        notifyInfoChannel({
-          emoji: ":door:",
-          title: "Account deleted",
-          fields: { "User ID": session.user.id },
         });
       });
 

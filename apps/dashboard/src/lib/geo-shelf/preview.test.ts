@@ -12,7 +12,10 @@ const fetchWebpage = mock(async ({ url }: { url: string }) => ({
 }));
 
 mock.module("node:dns/promises", () => ({ lookup }));
+// Keep the other exports: mocks last for the whole `bun test ./src` process.
+const contextDev = { ...(await import("@notra/ai/utils/context-dev")) };
 mock.module("@notra/ai/utils/context-dev", () => ({
+  ...contextDev,
   fetchWebpage,
   isContextDevConfigured: () => Boolean(process.env.CONTEXT_DEV_API_KEY),
 }));

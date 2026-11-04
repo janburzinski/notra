@@ -53,6 +53,33 @@ export async function deleteUserFiles(userId: string) {
   }
 }
 
+/**
+ * Never throws: the user row is already gone, so a failure is logged with the
+ * keys rather than failing the account deletion.
+ */
+export async function deleteUserChatAttachmentObjects(
+  userId: string,
+  keys: string[]
+) {
+  if (keys.length === 0) {
+    return 0;
+  }
+  try {
+    const deleted = await deleteR2Keys(keys);
+    log.info({ event: "upload.cleanup.user_chat", userId, deleted });
+    return deleted;
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    log.error({
+      event: "upload.cleanup.user_chat.failed",
+      userId,
+      keys,
+      error: message,
+    });
+    return 0;
+  }
+}
+
 function extractKeyFromPublicUrl(
   url: string,
   publicUrl: string

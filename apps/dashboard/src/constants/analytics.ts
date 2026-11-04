@@ -13,6 +13,9 @@ export const ANALYTICS_FLAGS_API_URL =
   process.env.DATABUDDY_FLAGS_API_URL ??
   "https://api.databuddy.cc/public/v1/flags/bulk";
 export const ANALYTICS_FLAG_ERROR_REASON = "ERROR";
+export const DATABUDDY_VISITOR_DELETION_URL =
+  "https://api.databuddy.cc/visitor-data/delete";
+export const DATABUDDY_VISITOR_DELETION_TIMEOUT_MS = 10_000;
 
 export const ANALYTICS_TIMESERIES_DAYS = 30;
 export const TOP_POST_CONTENT_PREVIEW_LENGTH = 96;

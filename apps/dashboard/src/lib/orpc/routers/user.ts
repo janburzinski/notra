@@ -27,7 +27,6 @@ import { notifyInfoChannel } from "@/lib/slack/info-channel";
 import {
   deleteOrganizationChatFiles,
   deleteOrganizationFiles,
-  deleteUserFiles,
 } from "@/lib/upload/cleanup";
 import type {
   NextOwnerCandidate,
@@ -326,10 +325,21 @@ export const userRouter = {
               );
             }
 
-            await tx
+            // A concurrent deletion of the new owner (the WorkOS webhook) can
+            // remove the membership first; then nothing is promoted and the
+            // previous owner must stay.
+            const [promoted] = await tx
               .update(members)
               .set({ role: "owner" })
-              .where(eq(members.id, newOwner.id));
+              .where(eq(members.id, newOwner.id))
+              .returning({ id: members.id });
+
+            if (!promoted) {
+              const tErrors = await getTranslations("errors.user");
+              throw badRequest(
+                tErrors("noTransferTarget", { orgId: transfer.orgId })
+              );
+            }
 
             await tx
               .delete(members)
@@ -403,12 +413,6 @@ export const userRouter = {
       }
 
       await Promise.all(organizationsToCleanup.map(cleanupDeletedOrganization));
-
-      await deleteUserFiles(context.user.id).catch((error) => {
-        logError("[Delete User] Failed to cleanup R2 files", error, {
-          userId: context.user.id,
-        });
-      });
 
       return {
         message: "Organizations processed. You can now delete your account.",

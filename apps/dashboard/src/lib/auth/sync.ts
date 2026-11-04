@@ -15,6 +15,7 @@ import {
   trackServerEvent,
 } from "@/lib/analytics/posthog-server";
 import { readRequestHeaders } from "@/lib/analytics/request-headers";
+import { isAccountDeletionPending } from "@/lib/auth/account-deletion-marker";
 import { SocialConnectionError, UserSyncError } from "@/lib/auth/errors";
 import { upsertMembership } from "@/lib/auth/membership-upsert";
 import { isWorkOSNotFound } from "@/lib/auth/workos-error";
@@ -214,6 +215,29 @@ export const ensureLocalUser = Effect.fn("auth.sync.ensureLocalUser")(
 
       yield* linkWorkOSExternalId(workosUser.id, byEmail.id);
       return linked ?? byEmail;
+    }
+
+    // Another session must not recreate an account that is being deleted.
+    // A Redis outage must not block sign-ups, so a failed check allows it.
+    const deletionPending = yield* Effect.tryPromise({
+      try: () => isAccountDeletionPending(workosUser.id),
+      catch: (cause) =>
+        new UserSyncError({
+          message: "Failed to check for a pending account deletion",
+          cause,
+        }),
+    }).pipe(
+      Effect.catch((error) =>
+        Effect.logWarning(error.message).pipe(
+          Effect.annotateLogs({ workosUserId: workosUser.id }),
+          Effect.as(false)
+        )
+      )
+    );
+    if (deletionPending) {
+      return yield* Effect.fail(
+        new UserSyncError({ message: "This account is being deleted" })
+      );
     }
 
     // Signup-only dependencies (multi-MB domain lists, email templates) load

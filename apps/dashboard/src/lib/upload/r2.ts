@@ -109,9 +109,10 @@ export async function deleteR2Keys(keys: string[]) {
   }
   const { client, bucketName } = getR2StorageConfig();
   let totalDeleted = 0;
+  const failedKeys: string[] = [];
   for (let i = 0; i < keys.length; i += MAX_KEYS_PER_DELETE) {
     const chunk = keys.slice(i, i + MAX_KEYS_PER_DELETE);
-    await client.send(
+    const result = await client.send(
       new DeleteObjectsCommand({
         Bucket: bucketName,
         Delete: {
@@ -120,7 +121,12 @@ export async function deleteR2Keys(keys: string[]) {
         },
       })
     );
-    totalDeleted += chunk.length;
+    const failed = (result.Errors ?? []).map((error) => error.Key ?? "");
+    failedKeys.push(...failed);
+    totalDeleted += chunk.length - failed.length;
+  }
+  if (failedKeys.length > 0) {
+    throw new Error(`Failed to delete R2 objects: ${failedKeys.join(", ")}`);
   }
   return totalDeleted;
 }

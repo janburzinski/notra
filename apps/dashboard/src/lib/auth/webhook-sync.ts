@@ -1,7 +1,7 @@
 import { db } from "@notra/db/drizzle";
 import { members, organizations, users } from "@notra/db/schema";
 import { isSitesConfigured } from "@notra/sites-server/env";
-import type { OrganizationMembership } from "@workos-inc/node";
+import type { OrganizationMembership, User } from "@workos-inc/node";
 import { getWorkOS } from "@workos/authkit-session";
 import { and, eq } from "drizzle-orm";
 import { Data, Effect } from "effect";
@@ -221,3 +221,68 @@ export const syncMembershipFromWebhook = Effect.fn(
   }
   return yield* upsertMembershipFromWebhook(current);
 });
+
+/**
+ * Backstop for account deletion: a local account must not outlive its WorkOS
+ * user. The payload is only a hint, so WorkOS must confirm the user is gone.
+ * Owners of a workspace are skipped and logged: deleting them here would
+ * leave the workspace without an owner (the account deletion flow hands
+ * workspaces over first). Ownership is checked inside the deletion
+ * transaction, under the user lock, so a concurrent transfer can't slip in.
+ */
+export const deleteUserFromWebhook = Effect.fn("auth.webhook.deleteUser")(
+  function* (workosUser: User) {
+    const local = yield* Effect.tryPromise({
+      try: async () => {
+        const remote = await getWorkOS()
+          .userManagement.getUser(workosUser.id)
+          .catch(nullIfWorkOSNotFound);
+        if (remote) {
+          return null;
+        }
+        return (
+          (await db.query.users.findFirst({
+            where: eq(users.workosUserId, workosUser.id),
+            columns: { id: true, email: true },
+          })) ?? null
+        );
+      },
+      catch: (cause) =>
+        new WebhookSyncError({
+          message: "Failed to resolve deleted user",
+          cause,
+        }),
+    });
+
+    if (!local) {
+      return;
+    }
+
+    const deleted = yield* Effect.tryPromise({
+      try: async () => {
+        const [{ deleteUserRecord }, { finishUserDeletion }] =
+          await Promise.all([
+            import("@/lib/auth/delete-user-record"),
+            import("@/lib/auth/finish-user-deletion"),
+          ]);
+        const removed = await deleteUserRecord(local.id, {
+          keepWorkspaceOwners: true,
+        });
+        if (removed) {
+          finishUserDeletion({ userId: local.id, email: local.email });
+        }
+        return removed;
+      },
+      catch: (cause) =>
+        new WebhookSyncError({ message: "Failed to delete user", cause }),
+    });
+
+    if (!deleted) {
+      yield* Effect.logWarning(
+        "Deleted WorkOS user still owns a workspace; local account kept"
+      ).pipe(
+        Effect.annotateLogs({ workosUserId: workosUser.id, userId: local.id })
+      );
+    }
+  }
+);

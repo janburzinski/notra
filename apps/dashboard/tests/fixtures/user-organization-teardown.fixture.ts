@@ -1,7 +1,10 @@
 import { afterAll, beforeEach, expect, mock, spyOn, test } from "bun:test";
 
+import * as schema from "@notra/db/schema";
 import {
   autopilotNamespaceDeletions,
+  chatAttachments,
+  chatSessions,
   members,
   organizations,
   users,
@@ -10,6 +13,7 @@ import { setMemoryStore } from "@notra/memory/memory";
 import { createInMemoryStore } from "@notra/memory/stores/in-memory";
 import { call, os } from "@orpc/server";
 import { eq } from "drizzle-orm";
+import { drizzle } from "drizzle-orm/pglite";
 import { Effect } from "effect";
 
 import { AUTOPILOT_NAMESPACE_CLEANUP_BUDGET_MS } from "../../src/constants/autopilot";
@@ -29,6 +33,23 @@ let stalledRequest = 0;
 let expireCleanupBudget = () => {};
 let abortedRequests = 0;
 let activeRequests = 0;
+const deletedChatAttachmentObjects: string[][] = [];
+const deleteUserChatAttachmentObjects = mock(
+  async (userId: string, keys: string[]) => {
+    // Objects go only once the rows are committed away, never before.
+    expect(
+      await db.query.users.findFirst({ where: eq(users.id, userId) })
+    ).toBeUndefined();
+    deletedChatAttachmentObjects.push(keys);
+    return keys.length;
+  }
+);
+const deleteUserFiles = mock(async (userId: string) => {
+  expect(
+    await db.query.users.findFirst({ where: eq(users.id, userId) })
+  ).toBeUndefined();
+  return 0;
+});
 const teardown = mock(async () => {
   if (failTeardown) {
     throw new Error("Synthetic teardown failure");
@@ -67,7 +88,13 @@ const deleteNamespace = mock(
 setMemoryStore({ ...createInMemoryStore(), deleteRepo: deleteNamespace });
 afterAll(() => setMemoryStore(null));
 
-mock.module("@notra/db/drizzle", () => ({ db }));
+// The app's queries are logged so tests can check statement order.
+const queryLog: { query: string; params: unknown[] }[] = [];
+const loggedDb = drizzle(postgres, {
+  schema,
+  logger: { logQuery: (query, params) => queryLog.push({ query, params }) },
+});
+mock.module("@notra/db/drizzle", () => ({ db: loggedDb }));
 mock.module("@notra/sites-server/organization", () => ({
   deleteOrganizationSites: teardown,
 }));
@@ -103,7 +130,8 @@ mock.module("@/lib/sites/preview-revocation", () => ({
 mock.module("@/lib/upload/cleanup", () => ({
   deleteOrganizationChatFiles: async () => {},
   deleteOrganizationFiles: async () => {},
-  deleteUserFiles: async () => {},
+  deleteUserChatAttachmentObjects,
+  deleteUserFiles,
 }));
 mock.module("../../src/lib/orpc/routers/user-account", () => ({
   userAccountRouter: {},
@@ -119,6 +147,8 @@ const { userRouter } = await import("../../src/lib/orpc/routers/user");
 const { cleanupAutopilotNamespaces } =
   await import("../../src/lib/autopilot/namespace-deletions");
 const { GET } = await import("../../src/app/api/cron/autopilot/route");
+const { deleteUserRecord } =
+  await import("../../src/lib/auth/delete-user-record");
 const context = await createORPCContext({ headers: new Headers() });
 
 await postgres.exec(
@@ -126,6 +156,7 @@ await postgres.exec(
 );
 beforeEach(async () => {
   await postgres.exec(`DROP TRIGGER IF EXISTS fail_cascade ON organizations;
+    DROP TRIGGER IF EXISTS fail_user_delete ON users;
     DROP TRIGGER IF EXISTS fail_ack ON autopilot_namespace_deletions;
     TRUNCATE organizations, users, autopilot_namespace_deletions CASCADE;`);
   await db.insert(users).values([
@@ -172,6 +203,10 @@ beforeEach(async () => {
   abortedRequests = 0;
   activeRequests = 0;
   runDueAutopilots.mockClear();
+  deleteUserChatAttachmentObjects.mockClear();
+  deleteUserFiles.mockClear();
+  queryLog.length = 0;
+  deletedChatAttachmentObjects.length = 0;
 });
 
 async function deleteWorkspace(route: string) {
@@ -344,6 +379,370 @@ test("account deletion preserves transferred workspace memory and ownership sync
   await cleanupAutopilotNamespaces();
   expect(memory.has("workspace")).toBe(true);
   expect(memory.has("other")).toBe(false);
+});
+
+function chatAttachment(id: string, organizationId: string, userId: string) {
+  return {
+    id,
+    organizationId,
+    userId,
+    key: `organization/${organizationId}/chat/${id}.png`,
+    filename: `${id}.png`,
+    mediaType: "image/png",
+    size: 1,
+  };
+}
+
+test("account deletion removes the user's chat attachments from a transferred workspace", async () => {
+  await db.insert(members).values({
+    id: "next-membership",
+    organizationId: "workspace",
+    userId: "next-owner",
+    role: "admin",
+    createdAt: new Date(),
+  });
+  await db
+    .insert(chatAttachments)
+    .values([
+      chatAttachment("mine", "workspace", "synthetic-user"),
+      chatAttachment("theirs", "workspace", "next-owner"),
+    ]);
+  await call(
+    userRouter.deleteWithTransfers,
+    { transfers: [{ orgId: "workspace", action: "transfer" }] },
+    { context }
+  );
+  // The transferred workspace keeps the attachment until the account goes.
+  expect(await db.select().from(chatAttachments)).toHaveLength(2);
+  expect(deleteUserFiles).not.toHaveBeenCalled();
+
+  await postgres.exec(
+    "CREATE TRIGGER fail_user_delete BEFORE DELETE ON users FOR EACH ROW EXECUTE FUNCTION fail_deletion()"
+  );
+  await expect(deleteUserRecord("synthetic-user")).rejects.toThrow();
+  expect(deleteUserChatAttachmentObjects).not.toHaveBeenCalled();
+  expect(deleteUserFiles).not.toHaveBeenCalled();
+  expect(await db.select().from(chatAttachments)).toHaveLength(2);
+  await postgres.exec("DROP TRIGGER fail_user_delete ON users");
+
+  await deleteUserRecord("synthetic-user");
+  expect(deletedChatAttachmentObjects).toEqual([
+    ["organization/workspace/chat/mine.png"],
+  ]);
+  expect(
+    (await db.select().from(chatAttachments)).map((row) => row.id)
+  ).toEqual(["theirs"]);
+  expect(deleteUserFiles).toHaveBeenCalledWith("synthetic-user");
+});
+
+test("account deletion removes user files without an owned workspace", async () => {
+  await db.insert(members).values({
+    id: "next-membership",
+    organizationId: "workspace",
+    userId: "next-owner",
+    role: "member",
+    createdAt: new Date(),
+  });
+  await deleteUserRecord("next-owner");
+  expect(deleteUserFiles.mock.calls).toEqual([["next-owner"]]);
+  expect(deleteUserChatAttachmentObjects).toHaveBeenCalledWith(
+    "next-owner",
+    []
+  );
+});
+
+function fileMessage(id: string, file: string, authorUserId?: string) {
+  return {
+    id,
+    role: "user",
+    parts: [
+      {
+        type: "file",
+        url: `https://files.example.test/organization/workspace/chat/${file}.png`,
+        mediaType: "image/png",
+      },
+    ],
+    ...(authorUserId ? { metadata: { authorUserId } } : {}),
+  };
+}
+
+async function seedSharedChat(messages: ReturnType<typeof fileMessage>[][]) {
+  await db.insert(users).values([
+    { id: "third-member", name: "Third", email: "third@example.test" },
+    { id: "former-member", name: "Former", email: "former@example.test" },
+  ]);
+  await db.insert(members).values(
+    ["next-owner", "third-member"].map((userId) => ({
+      id: `${userId}-membership`,
+      organizationId: "workspace",
+      userId,
+      role: "member",
+      createdAt: new Date(),
+    }))
+  );
+  await db
+    .insert(chatAttachments)
+    .values([chatAttachment("mine", "workspace", "synthetic-user")]);
+  await db.insert(chatSessions).values(
+    messages.map((sessionMessages, index) => ({
+      id: `chat-${index}`,
+      organizationId: "workspace",
+      title: "Shared chat",
+      messages: sessionMessages,
+      createdAt: new Date(Date.UTC(2026, 0, index + 1)),
+    }))
+  );
+}
+
+test("account deletion hands a file another member sent to the earliest such member", async () => {
+  await seedSharedChat([
+    [
+      fileMessage("own", "mine", "synthetic-user"),
+      fileMessage("third", "mine", "third-member"),
+    ],
+    [fileMessage("next", "mine", "next-owner")],
+  ]);
+  await deleteUserRecord("synthetic-user");
+  expect(deletedChatAttachmentObjects).toEqual([[]]);
+  expect(
+    (await db.select().from(chatAttachments)).map((row) => [
+      row.key,
+      row.userId,
+    ])
+  ).toEqual([["organization/workspace/chat/mine.png", "third-member"]]);
+});
+
+test("account deletion removes a file only unattributable messages or former members used", async () => {
+  await seedSharedChat([
+    [
+      fileMessage("anonymous", "mine"),
+      fileMessage("former", "mine", "former-member"),
+      fileMessage("other-file", "other", "next-owner"),
+    ],
+  ]);
+  await deleteUserRecord("synthetic-user");
+  expect(deletedChatAttachmentObjects).toEqual([
+    ["organization/workspace/chat/mine.png"],
+  ]);
+  expect(await db.select().from(chatAttachments)).toEqual([]);
+});
+
+test("account deletion keeps a file that was uploaded again after the commit", async () => {
+  await db
+    .insert(chatAttachments)
+    .values([chatAttachment("mine", "workspace", "synthetic-user")]);
+  // Fires after the cascade (constraint triggers sort first), like a re-upload
+  // recorded between the commit and the R2 delete.
+  await postgres.exec(`
+    CREATE FUNCTION reupload() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN
+      INSERT INTO chat_attachments (id, organization_id, user_id, key, filename, media_type, size)
+      VALUES ('again', 'workspace', 'next-owner', 'organization/workspace/chat/mine.png', 'mine.png', 'image/png', 1);
+      RETURN OLD;
+    END $$;
+    CREATE TRIGGER zz_reupload AFTER DELETE ON users FOR EACH ROW EXECUTE FUNCTION reupload();`);
+  try {
+    await deleteUserRecord("synthetic-user");
+  } finally {
+    await postgres.exec(
+      "DROP TRIGGER zz_reupload ON users; DROP FUNCTION reupload();"
+    );
+  }
+  expect(deletedChatAttachmentObjects).toEqual([[]]);
+  expect(
+    (await db.select().from(chatAttachments)).map((row) => row.id)
+  ).toEqual(["again"]);
+});
+
+async function withSyntheticDeadlocks(
+  times: number,
+  run: () => Promise<unknown>
+) {
+  await postgres.exec(`
+    CREATE SEQUENCE delete_attempts;
+    CREATE FUNCTION deadlock_user_delete() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN
+      IF nextval('delete_attempts') <= ${times} THEN
+        RAISE EXCEPTION 'Synthetic deadlock' USING ERRCODE = '40P01';
+      END IF;
+      RETURN OLD;
+    END $$;
+    CREATE TRIGGER deadlock_user_delete BEFORE DELETE ON users FOR EACH ROW EXECUTE FUNCTION deadlock_user_delete();`);
+  try {
+    await run();
+  } finally {
+    await postgres.exec(`DROP TRIGGER deadlock_user_delete ON users;
+      DROP FUNCTION deadlock_user_delete(); DROP SEQUENCE delete_attempts;`);
+  }
+}
+
+test("account deletion retries a transaction Postgres cancelled as a deadlock", async () => {
+  await db
+    .insert(chatAttachments)
+    .values([chatAttachment("mine", "workspace", "synthetic-user")]);
+  await withSyntheticDeadlocks(2, () => deleteUserRecord("synthetic-user"));
+  expect(
+    await db.query.users.findFirst({ where: eq(users.id, "synthetic-user") })
+  ).toBeUndefined();
+  expect(deletedChatAttachmentObjects).toEqual([
+    ["organization/workspace/chat/mine.png"],
+  ]);
+});
+
+test("account deletion gives up after three deadlocks and keeps everything", async () => {
+  await db
+    .insert(chatAttachments)
+    .values([chatAttachment("mine", "workspace", "synthetic-user")]);
+  await withSyntheticDeadlocks(3, async () => {
+    await expect(deleteUserRecord("synthetic-user")).rejects.toMatchObject({
+      cause: { code: "40P01" },
+    });
+    const attempts = await postgres.query<{ attempts: number }>(
+      "SELECT last_value::int AS attempts FROM delete_attempts"
+    );
+    expect(attempts.rows).toEqual([{ attempts: 3 }]);
+  });
+  expect(
+    await db.query.users.findFirst({ where: eq(users.id, "synthetic-user") })
+  ).toBeDefined();
+  expect(await db.select().from(chatAttachments)).toHaveLength(1);
+  expect(deleteUserChatAttachmentObjects).not.toHaveBeenCalled();
+  expect(deleteUserFiles).not.toHaveBeenCalled();
+});
+
+test("account deletion locks the user and recipients in id order before the hand-over", async () => {
+  await seedSharedChat([
+    [
+      fileMessage("third", "mine", "third-member"),
+      fileMessage("next", "theirs", "next-owner"),
+    ],
+  ]);
+  await db
+    .insert(chatAttachments)
+    .values([chatAttachment("theirs", "workspace", "synthetic-user")]);
+  await deleteUserRecord("synthetic-user");
+
+  const lockIndex = queryLog.findIndex(({ query }) =>
+    /from "users" where "users"\."id" in .* order by "users"\."id" for update$/.test(
+      query
+    )
+  );
+  const handOverIndex = queryLog.findIndex(({ query }) =>
+    /^\s*update "chat_attachments"/.test(query)
+  );
+  expect(lockIndex).toBeGreaterThan(-1);
+  expect(queryLog[lockIndex]?.params.toSorted()).toEqual([
+    "next-owner",
+    "synthetic-user",
+    "third-member",
+  ]);
+  expect(handOverIndex).toBeGreaterThan(lockIndex);
+  expect(
+    queryLog
+      .slice(0, handOverIndex)
+      .filter(({ query }) => /for update/.test(query))
+  ).toHaveLength(1);
+  expect(
+    (await db.select().from(chatAttachments)).map((row) => [row.id, row.userId])
+  ).toEqual([
+    ["mine", "third-member"],
+    ["theirs", "next-owner"],
+  ]);
+});
+
+test("two members who sent each other's files can both delete their accounts", async () => {
+  await seedSharedChat([
+    [
+      fileMessage("next", "mine", "next-owner"),
+      fileMessage("synthetic", "theirs", "synthetic-user"),
+    ],
+  ]);
+  await db
+    .insert(chatAttachments)
+    .values([chatAttachment("theirs", "workspace", "next-owner")]);
+  await deleteUserRecord("synthetic-user");
+  await deleteUserRecord("next-owner");
+  expect(deletedChatAttachmentObjects.map((keys) => keys.toSorted())).toEqual([
+    [],
+    [
+      "organization/workspace/chat/mine.png",
+      "organization/workspace/chat/theirs.png",
+    ],
+  ]);
+});
+
+test("keepWorkspaceOwners rechecks ownership inside the transaction and keeps a new owner", async () => {
+  await db.insert(members).values({
+    id: "next-membership",
+    organizationId: "workspace",
+    userId: "next-owner",
+    role: "member",
+    createdAt: new Date(),
+  });
+  await db
+    .insert(chatAttachments)
+    .values([chatAttachment("theirs", "workspace", "next-owner")]);
+  // Promotes the user after the transaction started and before the ownership
+  // check, like a transfer that commits while the deletion runs.
+  await postgres.exec(`
+    CREATE FUNCTION promote_mid_deletion() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN
+      UPDATE members SET role = 'owner' WHERE user_id = 'next-owner';
+      RETURN NULL;
+    END $$;
+    CREATE TRIGGER promote_mid_deletion AFTER DELETE ON abuse_actions
+      FOR EACH STATEMENT EXECUTE FUNCTION promote_mid_deletion();`);
+  try {
+    expect(
+      await deleteUserRecord("next-owner", { keepWorkspaceOwners: true })
+    ).toBe(false);
+  } finally {
+    await postgres.exec(`DROP TRIGGER promote_mid_deletion ON abuse_actions;
+      DROP FUNCTION promote_mid_deletion();`);
+  }
+  expect(
+    await db.query.users.findFirst({ where: eq(users.id, "next-owner") })
+  ).toBeDefined();
+  expect(await db.select().from(chatAttachments)).toHaveLength(1);
+  expect(deleteUserChatAttachmentObjects).not.toHaveBeenCalled();
+  expect(deleteUserFiles).not.toHaveBeenCalled();
+
+  expect(
+    await deleteUserRecord("next-owner", { keepWorkspaceOwners: true })
+  ).toBe(true);
+  expect(
+    await db.query.users.findFirst({ where: eq(users.id, "next-owner") })
+  ).toBeUndefined();
+});
+
+test("a transfer whose new owner disappears keeps the previous owner", async () => {
+  await db.insert(members).values({
+    id: "next-membership",
+    organizationId: "workspace",
+    userId: "next-owner",
+    role: "admin",
+    createdAt: new Date(),
+  });
+  // Skips the promotion, like a concurrent deletion of the new owner.
+  await postgres.exec(`
+    CREATE FUNCTION skip_promotion() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN
+      RETURN NULL;
+    END $$;
+    CREATE TRIGGER skip_promotion BEFORE UPDATE ON members FOR EACH ROW
+      WHEN (NEW.role = 'owner') EXECUTE FUNCTION skip_promotion();`);
+  try {
+    await expect(
+      call(
+        userRouter.deleteWithTransfers,
+        { transfers: [{ orgId: "workspace", action: "transfer" }] },
+        { context }
+      )
+    ).rejects.toThrow("noTransferTarget");
+  } finally {
+    await postgres.exec(`DROP TRIGGER skip_promotion ON members;
+      DROP FUNCTION skip_promotion();`);
+  }
+  expect(
+    (await db.query.members.findFirst({ where: eq(members.id, owner.id) }))
+      ?.role
+  ).toBe("owner");
 });
 
 test("account deletion retains earlier cleanup if a later organization action fails", async () => {
