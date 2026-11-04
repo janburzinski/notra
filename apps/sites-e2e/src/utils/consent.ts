@@ -32,7 +32,18 @@ export async function assertConsentVisits(options: {
   const landing = `${origin}/blog/hello-world?utm_source=newsletter`;
   const next = `${origin}/blog`;
   const viewBeacons: string[] = [];
+  // Every time-on-page beacon carries the random ID of the page view that sent
+  // it. Rejected pages never load the script, so their IDs cannot appear.
+  const grantedViews = new Set<string>();
   page.on("request", (request) => {
+    const body = request.postData();
+    if (
+      request.url().endsWith(`/${SITE_ANALYTICS_EVENT_FILE}`) &&
+      request.method() === "POST" &&
+      body?.includes('"v":')
+    ) {
+      grantedViews.add(String(JSON.parse(body).v));
+    }
     if (isViewBeacon(request.url(), request.method(), request.postData())) {
       viewBeacons.push(request.postData() ?? "");
     }
@@ -82,10 +93,32 @@ export async function assertConsentVisits(options: {
     [next, true, landing],
   ]);
   assert.equal(viewBeacons.length, 1, "the granted page is not reported twice");
+  // A beacon sent while the browser leaves a page can arrive after any quiet
+  // period, so wait for one from a granted page instead.
+  for (
+    let waited = 0;
+    waited < 15_000 &&
+    !ingest
+      .slice(from)
+      .some(
+        (event) =>
+          isEngagement(event) && grantedViews.has(String(event.body.viewId))
+      );
+    waited += 100
+  ) {
+    await new Promise((resolveWait) => setTimeout(resolveWait, 100));
+  }
   assert.ok(
-    ingest.slice(from).some((event) => isEngagement(event)),
+    ingest
+      .slice(from)
+      .some(
+        (event) =>
+          isEngagement(event) && grantedViews.has(String(event.body.viewId))
+      ),
     "time on page is measured after the grant"
   );
+  // Frozen here, so a beacon from a rejected page is never excused.
+  const granted = new Set(grantedViews);
 
   await context.clearCookies();
   await page.evaluate(() => {
@@ -108,8 +141,14 @@ export async function assertConsentVisits(options: {
     [next, false, landing],
   ]);
   assert.equal(viewBeacons.length, beaconsBefore, "a rejection sends no view");
+  // Late beacons from the granted pages above may still arrive here.
   assert.equal(
-    ingest.slice(from).filter((event) => isEngagement(event)).length,
+    ingest
+      .slice(from)
+      .filter(
+        (event) =>
+          isEngagement(event) && !granted.has(String(event.body.viewId))
+      ).length,
     0,
     "a rejection measures no time on page"
   );
