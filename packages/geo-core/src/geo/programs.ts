@@ -745,7 +745,7 @@ export const upsertGeoSettings = Effect.fn("geo.settingsUpsert")(function* (
   const entitlement = yield* entitlements.resolveZdrEntitlement(
     input.organizationId
   );
-  const enforceZdr = entitlement === "entitled" && input.enforceZdr;
+  const enforceZdr = entitlement !== "not_entitled" && input.enforceZdr;
   const catalog = yield* loadGeoModelCatalog(input.organizationId);
   const unavailableStaticEngines = new Set<string>();
   for (const entry of GEO_MODEL_CATALOG_STATIC) {
