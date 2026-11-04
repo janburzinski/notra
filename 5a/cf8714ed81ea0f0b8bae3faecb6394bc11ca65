@@ -1,0 +1,26 @@
+apps/api/src/routes/geo-personas.ts
+  s_7cd61f875ec07f::t_b4fbe991da5317 1-295,298-526
+apps/dashboard/src/app/api/internal/geo/persona-run/route.ts
+  s_7cd61f875ec07f::t_773a6652902dcc 1-67
+apps/dashboard/src/app/api/internal/geo/persona-generation/route.ts
+  s_7cd61f875ec07f::t_f36f834d711789 1-77,81-104
+  s_7cd61f875ec07f::t_6f276ebc3ea15b 78-80
+packages/schemas/src/schemas/api/geo-personas.ts
+  s_7cd61f875ec07f::t_37473bb08adea9 1-244
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "5acf8714ed81ea0f0b8bae3faecb6394bc11ca65",
+  "prompts": {},
+  "sessions": {
+    "s_7cd61f875ec07f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "dde47fce-dfcb-4a3c-ac72-2c607b49ad9a",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
