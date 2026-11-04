@@ -9,7 +9,10 @@ import {
   SOCIAL_PUBLISH_POLL_ATTEMPTS,
   SOCIAL_PUBLISH_POLL_DELAY,
 } from "../constants/social";
-import { SocialPublishError } from "../schemas/social";
+import {
+  SocialPublishDeliveryUnknownError,
+  SocialPublishError,
+} from "../schemas/social";
 import type {
   PublishTwitterPostParams,
   PublishTwitterPostResult,
@@ -50,9 +53,22 @@ function getResultErrorMessage(result: SocialPostResult): string {
   return "The platform rejected the post";
 }
 
+function isDeliveryUnknown(cause: unknown) {
+  const status =
+    cause instanceof Error &&
+    "status" in cause &&
+    typeof cause.status === "number"
+      ? cause.status
+      : null;
+  return status === null || status === 408 || status >= 500;
+}
+
 export function publishTwitterPost(
   params: PublishTwitterPostParams
-): Effect.Effect<PublishTwitterPostResult, SocialPublishError> {
+): Effect.Effect<
+  PublishTwitterPostResult,
+  SocialPublishError | SocialPublishDeliveryUnknownError
+> {
   return Effect.gen(function* () {
     const client = getTwitterPublishClient();
     if (!client) {
@@ -90,14 +106,27 @@ export function publishTwitterPost(
       );
     }
 
+    // Creating a post is not idempotent, so the SDK must not resend it on a
+    // timeout or a server error: the first request may have posted already.
     const post = yield* Effect.tryPromise({
       try: () =>
-        client.socialPosts.create({
-          caption: params.content,
-          social_accounts: [account.providerAccountId],
-        }),
+        client.socialPosts.create(
+          {
+            caption: params.content,
+            social_accounts: [account.providerAccountId],
+          },
+          { maxRetries: 0 }
+        ),
       catch: (cause) =>
-        new SocialPublishError({ cause, message: "Failed to publish post" }),
+        isDeliveryUnknown(cause)
+          ? new SocialPublishDeliveryUnknownError({
+              cause,
+              message: "X did not confirm the post",
+            })
+          : new SocialPublishError({
+              cause,
+              message: "Failed to publish post",
+            }),
     });
 
     // A failed read counts as "no result yet": the post is already

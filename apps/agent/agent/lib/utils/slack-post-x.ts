@@ -267,7 +267,19 @@ export async function publishPendingPostToX(
         failed: false,
         confirmed: result.confirmed,
       })),
-      Effect.catch((error) =>
+      // X may already show the post, so it stays claimed: a second click must
+      // not send it again before someone checks the account.
+      Effect.catchTag("SocialPublishDeliveryUnknownError", (error) =>
+        Effect.logWarning("[agent] Post to X was not confirmed", error).pipe(
+          Effect.as<PostToXOutcome>({
+            turnId,
+            postUrl: null,
+            failed: false,
+            confirmed: false,
+          })
+        )
+      ),
+      Effect.catchTag("SocialPublishError", (error) =>
         Effect.logWarning("[agent] Post to X failed", error).pipe(
           // A rejected publish never reached X, so put the post back for the
           // retry the completion message offers.
@@ -296,10 +308,10 @@ export function getPostToXCompletionMessage(
     return "Nothing was published from Notra. If you posted it from X's composer, want me to save it as a reference?";
   }
   if (outcome.failed) {
-    return "Posting to X failed or couldn't be confirmed. Check the X account before retrying from the tweet card, so it isn't posted twice.";
+    return "Posting to X failed, so nothing was published. You can retry from the tweet card.";
   }
   if (!outcome.confirmed) {
-    return "The post was sent to X, but confirmation timed out. Check the account before retrying to avoid a duplicate.";
+    return "The post was sent to X, but X didn't confirm it. Check the account before posting it again, so it isn't published twice.";
   }
   if (outcome.postUrl) {
     return `Posted to X: <${outcome.postUrl}|view the post>. Want me to save it as a reference?`;
