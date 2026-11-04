@@ -6,7 +6,10 @@ import type {
   OrchestrateInput,
   OrchestrateResult,
 } from "@notra/ai/types/orchestration";
-import { normalizeMarkdownFileAttachments } from "@notra/ai/utils/message-attachments";
+import {
+  normalizeMarkdownFileAttachments,
+  replaceMissingFileAttachments,
+} from "@notra/ai/utils/message-attachments";
 import { resolveConversationRoute } from "@notra/ai/utils/resolve-conversation-route";
 import { summarizeRouteUsage } from "@notra/ai/utils/route-usage";
 import { logError } from "@notra/ai/utils/server-log";
@@ -108,7 +111,9 @@ export async function orchestrateChat(
     timezone,
   });
 
-  const messagesForModel = normalizeMarkdownFileAttachments(messages);
+  const messagesForModel = normalizeMarkdownFileAttachments(
+    await replaceMissingFileAttachments(organizationId, messages, abortSignal)
+  );
   let firstChunkFired = false;
 
   const thinkingProviderOptions = getThinkingProviderOptions(

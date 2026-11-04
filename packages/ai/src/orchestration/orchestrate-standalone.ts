@@ -24,7 +24,10 @@ import type {
 } from "@notra/ai/types/standalone-chat";
 import { loadChatWorkspace } from "@notra/ai/utils/chat-workspace";
 import { withStandaloneCodeMode } from "@notra/ai/utils/code-mode";
-import { normalizeMarkdownFileAttachments } from "@notra/ai/utils/message-attachments";
+import {
+  normalizeMarkdownFileAttachments,
+  replaceMissingFileAttachments,
+} from "@notra/ai/utils/message-attachments";
 import { resolveConversationRoute } from "@notra/ai/utils/resolve-conversation-route";
 import { summarizeRouteUsage } from "@notra/ai/utils/route-usage";
 import { logError, logInfo } from "@notra/ai/utils/server-log";
@@ -221,7 +224,11 @@ export async function orchestrateStandaloneChat(
   );
 
   const messagesForModel = normalizeMarkdownFileAttachments(
-    stripIncompleteToolParts(messages)
+    await replaceMissingFileAttachments(
+      organizationId,
+      stripIncompleteToolParts(messages),
+      abortSignal
+    )
   );
 
   const modelMessages = await convertToModelMessages(messagesForModel, {
