@@ -55,13 +55,6 @@ export interface AgentReadinessChangeBadgeProps {
   change: AgentReadinessIssueChange | undefined;
 }
 
-export interface AgentReadinessScanDialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  onConfirm: () => void;
-  isPending: boolean;
-}
-
 export interface AgentReadinessBodyProps {
   data: AgentReadinessResponse;
   isScanPending: boolean;

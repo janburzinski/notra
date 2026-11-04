@@ -42,7 +42,6 @@ export interface AgentReadinessReportView {
   scoreBreakdown: AgentReadinessScoreBreakdown | null;
   issues: AgentReadinessIssue[];
   eligibleChecks: number | null;
-  reportUrl: string | null;
   errorMessage: string | null;
   scannedAt: string | null;
   createdAt: string;

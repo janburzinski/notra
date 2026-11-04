@@ -46,7 +46,6 @@ type AgentReadinessReportFields = Pick<
   | "scoreBreakdown"
   | "issues"
   | "eligibleChecks"
-  | "reportUrl"
   | "errorMessage"
   | "scannedAt"
   | "createdAt"
@@ -64,7 +63,6 @@ function toReportView(
     scoreBreakdown: row.scoreBreakdown ?? null,
     issues: row.issues,
     eligibleChecks: row.eligibleChecks,
-    reportUrl: row.reportUrl,
     errorMessage: row.errorMessage,
     scannedAt: row.scannedAt?.toISOString() ?? null,
     createdAt: row.createdAt.toISOString(),
@@ -124,7 +122,6 @@ const readinessReportColumns = {
   scoreBreakdown: geoAgentReadinessReports.scoreBreakdown,
   issues: geoAgentReadinessReports.issues,
   eligibleChecks: geoAgentReadinessReports.eligibleChecks,
-  reportUrl: geoAgentReadinessReports.reportUrl,
   errorMessage: geoAgentReadinessReports.errorMessage,
   scannedAt: geoAgentReadinessReports.scannedAt,
   createdAt: geoAgentReadinessReports.createdAt,

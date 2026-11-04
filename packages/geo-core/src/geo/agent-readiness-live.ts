@@ -99,7 +99,7 @@ async function fetchStoredReport(
   const parsed = agentReadinessApiReportSchema.safeParse(await response.json());
   if (!parsed.success) {
     throw new AgentReadinessApiError({
-      message: "Is Agentic returned a report in an unexpected format",
+      message: "The scan returned a report in an unexpected format",
     });
   }
   return parseApiReport(parsed.data);
@@ -137,7 +137,7 @@ function assertScanFrameOk(frame: string): void {
     (event as AgentReadinessSseEvent).type === "error"
   ) {
     throw new AgentReadinessApiError({
-      message: "Is Agentic could not complete the scan for this website",
+      message: "The scan could not be completed for this website",
     });
   }
 }
@@ -216,7 +216,7 @@ function readinessNetwork<A>(run: (signal: AbortSignal) => Promise<A>) {
       cause instanceof AgentReadinessApiError
         ? cause
         : new AgentReadinessApiError({
-            message: "Is Agentic could not be reached. Please try again.",
+            message: "The scan service could not be reached. Please try again.",
             cause,
           }),
   });

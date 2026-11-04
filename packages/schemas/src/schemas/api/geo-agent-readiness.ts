@@ -38,7 +38,6 @@ const readinessReportSchema = z
     scoreBreakdown: readinessScoreBreakdownSchema.nullable(),
     issues: z.array(readinessIssueSchema),
     eligibleChecks: z.number().int().nullable(),
-    reportUrl: z.string().nullable(),
     errorMessage: z.string().nullable(),
     scannedAt: z.string().nullable(),
     createdAt: z.string(),

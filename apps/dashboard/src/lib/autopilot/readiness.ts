@@ -250,7 +250,7 @@ export async function checkReadiness(
         .filter((issue) => dismissed.has(issue.id))
         .map((issue) => issue.name),
     },
-    { reportUrl: report.reportUrl, score: report.score, issues: report.issues }
+    { score: report.score, issues: report.issues }
   );
   if (issues.length === 0) {
     return { ready: false, reason: "Nothing to fix in the repository" };
@@ -285,7 +285,7 @@ export async function claimReadinessFix(params: {
         .map((issue) => issue.name)
         .join(", "),
       evidence: {
-        sourceUrl: check.report.reportUrl ?? check.targetUrl,
+        sourceUrl: check.targetUrl,
         score: check.report.score,
         issueIds,
       },
@@ -402,7 +402,7 @@ export async function openReadinessPullRequest(params: {
           : `Changes ${fix.files.map((file) => file.path).join(", ")}`,
       // Only what the pull request touches: dismissing it must not mute issues it left alone.
       evidence: {
-        sourceUrl: check.report.reportUrl ?? check.targetUrl,
+        sourceUrl: check.targetUrl,
         score: check.report.score,
         issueIds: fixedIds,
       },

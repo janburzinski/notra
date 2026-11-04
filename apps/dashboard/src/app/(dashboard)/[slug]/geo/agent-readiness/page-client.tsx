@@ -5,14 +5,12 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { getAgentReadinessScanErrorMessage } from "@notra/geo-core/utils/agent-readiness";
 import { stripWebsiteProtocol } from "@notra/geo-core/utils/geo-website";
 import { PageHeading } from "@notra/ui/components/shared/page-heading";
-import { useState } from "react";
 import { useTranslations } from "use-intl";
 
 import { EmptyState } from "@/components/empty-state";
 import { EmptyStateReadinessPreview } from "@/components/empty-state-preview";
 import { AgentReadinessChangesCard } from "@/components/geo/agent-readiness/readiness-changes-card";
 import { AgentReadinessChecklist } from "@/components/geo/agent-readiness/readiness-checklist";
-import { AgentReadinessScanDialog } from "@/components/geo/agent-readiness/readiness-scan-dialog";
 import { AgentReadinessScanningNotice } from "@/components/geo/agent-readiness/readiness-scanning-notice";
 import { AgentReadinessScoreCard } from "@/components/geo/agent-readiness/readiness-score-card";
 import { GeoSetupButton } from "@/components/geo/geo-setup-button";
@@ -124,7 +122,6 @@ export default function PageClient({ organizationSlug }: GeoPageClientProps) {
     useGeoSettings(organizationId);
   const readinessQuery = useAgentReadiness(organizationId);
   const scanMutation = useAgentReadinessScan(organizationId);
-  const [dialogOpen, setDialogOpen] = useState(false);
 
   if (!(isSettingsPending || settingsData?.settings)) {
     return (
@@ -161,7 +158,7 @@ export default function PageClient({ organizationSlug }: GeoPageClientProps) {
           <ReadinessBody
             data={readinessQuery.data}
             isScanPending={scanMutation.isPending}
-            onRequestScan={() => setDialogOpen(true)}
+            onRequestScan={() => scanMutation.mutate()}
           />
         ) : (
           <EmptyState
@@ -171,16 +168,6 @@ export default function PageClient({ organizationSlug }: GeoPageClientProps) {
           />
         )}
       </div>
-
-      <AgentReadinessScanDialog
-        isPending={scanMutation.isPending}
-        onConfirm={() => {
-          setDialogOpen(false);
-          scanMutation.mutate();
-        }}
-        onOpenChange={setDialogOpen}
-        open={dialogOpen}
-      />
     </PageContainer>
   );
 }

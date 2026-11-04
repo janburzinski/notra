@@ -2542,12 +2542,7 @@
         "allPassed": "Alle relevanten Checks bestanden",
         "whatWeFound": "Was wir gefunden haben",
         "noDetails": "Keine Details gemeldet.",
-        "noRecommendation": "Mehr Hinweise im vollständigen Bericht."
-      },
-      "scanDialog": {
-        "title": "Öffentlichen Scan starten?",
-        "body": "Der Scan läuft über is-agentic.com, einen offenen Dienst von Vercel Labs. Er liest nur die öffentlichen Teile deiner Website und ändert nichts. Alle, die deine Domain kennen, können den Bericht auf is-agentic.com abrufen.",
-        "confirm": "Scan starten"
+        "noRecommendation": "Für diese Prüfung gibt es noch keinen Lösungsvorschlag."
       },
       "scanningNotice": {
         "ariaLabel": "{domain} wird gescannt",
@@ -2560,7 +2555,6 @@
         "noScore": "Noch kein Score",
         "scanned": "Gescannt {time}",
         "eligibleChecks": "{count, plural, one {# relevanter Check} other {# relevante Checks}}",
-        "fullReport": "Vollständiger Bericht",
         "tierSummary": "<strong>{passing}</strong> von {total} bestanden · <strong>{earned}</strong>/{available} Pkt.",
         "bonusSummary": "Bonus +{points} Pkt. durch {count, plural, one {# zusätzliches Signal} other {# zusätzliche Signale}}",
         "nextStepMustDo": "{count, plural, one {# Pflicht-Check ist offen} other {# Pflicht-Checks sind offen}}, bis zu {points} Pkt. wert. Fang an mit <strong>{name}</strong>",

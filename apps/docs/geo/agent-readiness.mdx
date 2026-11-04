@@ -17,7 +17,6 @@ docolin:
   aliases:
     - agent readiness
     - readiness score
-    - is-agentic
     - feedback.md
     - llms.txt check
 ---
@@ -37,7 +36,7 @@ The **Agent Readiness** page answers one question: "How well AI agents can disco
 
 ## What the scan checks
 
-is-agentic.com, an open service by Vercel Labs, runs the scan, which only reads the public parts of your website and changes nothing. It returns a score from 0 to 100, a score label and a list of issues, and each issue has:
+The scan only reads the public parts of your website and changes nothing. It returns a score from 0 to 100, a score label and a list of issues, and each issue has:
 
 - `id` and `name`, the check that did not fully pass.
 - `tier`: `essential`, `recommended` or `bonus`.
@@ -60,7 +59,7 @@ For each of the essential and recommended tiers the report carries `earned`, `av
 </Visibility>
 
 <Note>
-  The check list belongs to is-agentic.com and changes over time. Notra stores whatever the current report contains rather than a fixed list, so the checks you see may change between scans.
+  The check list changes over time. Notra stores whatever the current report contains rather than a fixed list, so the checks you see may change between scans.
 </Note>
 
 ### The Notra `feedback.md` bonus check
@@ -97,9 +96,6 @@ Notra keeps every completed scan for the current website URL, and the page loads
   </Step>
   <Step title="Open Agent Readiness">
     With no report yet, the page shows **No scan yet** and a **Scan your website** button. Once a report exists, it shows the **Readiness score** card with a **Rescan** button and the **Checklist** below it.
-  </Step>
-  <Step title="Confirm the public scan">
-    A dialog titled **Run a public scan?** explains: "The scan runs through is-agentic.com, an open service by Vercel Labs. It only reads the public parts of your website and changes nothing. The resulting report is publicly retrievable on is-agentic.com by anyone who knows your domain." Press **Start scan** to continue.
   </Step>
   <Step title="Wait a few minutes">
     Scans usually finish in one to three minutes, and the page polls every five seconds while the scan is running. If the scan fails, the page shows **Scan failed** with the reason and a **Try again** button. When a rescan fails after an earlier success, the last completed report stays visible with a notice above it.
@@ -138,7 +134,7 @@ curl -X POST https://api.usenotra.com/v1/projects/$PROJECT_ID/geo/agent-readines
 
 The response is `202 Accepted`. If a scan is already running against the same URL, Notra reuses it instead of starting a duplicate and sets `alreadyRunning` to `true`. Notra treats a running scan older than ten minutes as stuck and replaces it. If the brand identity has no website URL, the request fails with "Add a website URL in brand settings before scanning".
 
-Notra first asks is-agentic.com for a stored report of your URL. If that report is newer than the last one Notra has, Notra adopts it without a rescan, and otherwise it streams a fresh scan and fetches the finished report afterwards. Scans abort after eight minutes.
+Scans abort after eight minutes.
 
 Then poll the read route, which returns stored data only and never starts a scan:
 
@@ -160,7 +156,7 @@ if (scan?.status === "running") {
   The normalised website URL the reports belong to.
 </ResponseField>
 <ResponseField name="report" type="object | null">
-  The latest completed report: `id`, `status`, `targetUrl`, `score`, `scoreLabel`, `scoreBreakdown`, `issues[]`, `eligibleChecks`, `reportUrl`, `errorMessage`, `scannedAt`, `createdAt`.
+  The latest completed report: `id`, `status`, `targetUrl`, `score`, `scoreLabel`, `scoreBreakdown`, `issues[]`, `eligibleChecks`, `errorMessage`, `scannedAt`, `createdAt`.
 </ResponseField>
 <ResponseField name="scan" type="object | null">
   A run newer than the completed report that is still `running` or has `failed`, in the same shape.
@@ -168,8 +164,6 @@ if (scan?.status === "running") {
 <ResponseField name="history" type="array">
   Completed scans, oldest first, each with `id`, `score`, `failedCount`, `partialCount`, `scannedAt`.
 </ResponseField>
-
-`reportUrl` links to the public report on is-agentic.com.
 
 </Visibility>
 

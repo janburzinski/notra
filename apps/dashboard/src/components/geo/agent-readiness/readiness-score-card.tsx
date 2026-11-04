@@ -1,10 +1,6 @@
 "use client";
 
-import {
-  Alert02Icon,
-  LinkSquare02Icon,
-  Refresh03Icon,
-} from "@hugeicons/core-free-icons";
+import { Alert02Icon, Refresh03Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { AGENT_READINESS_MAX_SCORE } from "@notra/geo-core/constants/agent-readiness";
 import {
@@ -12,7 +8,6 @@ import {
   getAgentReadinessScoreBand,
   groupAgentReadinessIssues,
 } from "@notra/geo-core/utils/agent-readiness";
-import { POSTHOG_EVENTS } from "@notra/posthog/events";
 import { TrendBadge } from "@notra/ui/components/trend-badge";
 import type { CSSProperties, ReactNode } from "react";
 import { InstrumentModule } from "ui/card";
@@ -23,7 +18,6 @@ import { AgentReadinessCopyPromptButton } from "@/components/geo/agent-readiness
 import { AgentReadinessScoreGauge } from "@/components/geo/agent-readiness/readiness-score-gauge";
 import { AGENT_READINESS_BAND_BG_CLASS } from "@/constants/agent-readiness";
 import { AGENT_READINESS_FIX_COPY_KINDS } from "@/constants/geo-analytics";
-import { trackEvent } from "@/lib/analytics/posthog-client";
 import { cn } from "@/lib/utils";
 import type {
   AgentReadinessNextStepProps,
@@ -209,23 +203,6 @@ export function AgentReadinessScoreCard({
               {t("scoreCard.eligibleChecks", { count: report.eligibleChecks })}
             </span>
           )}
-          {report.reportUrl ? (
-            <a
-              className="hover:text-foreground inline-flex items-center gap-1 underline underline-offset-2"
-              href={report.reportUrl}
-              onClick={() =>
-                trackEvent(POSTHOG_EVENTS.AGENT_READINESS_REPORT_OPENED, {
-                  report_id: report.id,
-                  score,
-                })
-              }
-              rel="noopener noreferrer"
-              target="_blank"
-            >
-              {t("scoreCard.fullReport")}
-              <HugeiconsIcon icon={LinkSquare02Icon} size={12} />
-            </a>
-          ) : null}
         </span>
       }
       variant="table"
