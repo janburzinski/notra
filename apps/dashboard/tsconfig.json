@@ -17,10 +17,6 @@
     },
     "types": ["node", "bun-types/test", "react", "react-dom", "vite/client"]
   },
-  "include": [
-    "**/*.ts",
-    "**/*.tsx",
-    "../../packages/ui/src/hooks/use-controllable-state.ts"
-  ],
+  "include": ["**/*.ts", "**/*.tsx"],
   "exclude": ["node_modules", ".output", ".vercel"]
 }

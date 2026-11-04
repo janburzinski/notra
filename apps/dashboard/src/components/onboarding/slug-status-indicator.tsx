@@ -1,7 +1,8 @@
 "use client";
 
+import { Cancel01Icon, Tick02Icon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import { Spinner } from "@notra/ui/components/ui/spinner";
-import { CheckIcon, XIcon } from "lucide-react";
 import { useTranslations } from "use-intl";
 
 import type { SlugStatusIndicatorProps } from "@/types/onboarding";
@@ -23,15 +24,17 @@ export function SlugStatusIndicator({ status }: SlugStatusIndicatorProps) {
       <span
         className={`bg-success/15 text-success duration-fast absolute flex size-6 items-center justify-center rounded-full transition-[opacity,transform] motion-reduce:transition-none ${status === "available" ? "scale-100 opacity-100" : "scale-75 opacity-0"}`}
       >
-        <CheckIcon className="size-4" />
+        <HugeiconsIcon className="size-4" icon={Tick02Icon} strokeWidth={2} />
       </span>
       <span
         className={`bg-destructive/10 text-destructive duration-fast absolute flex size-6 items-center justify-center rounded-full transition-[opacity,transform] motion-reduce:transition-none ${status === "unavailable" ? "scale-100 opacity-100" : "scale-75 opacity-0"}`}
       >
-        <XIcon className="size-4" />
+        <HugeiconsIcon className="size-4" icon={Cancel01Icon} strokeWidth={2} />
       </span>
-      <XIcon
+      <HugeiconsIcon
         className={`text-muted-foreground duration-fast absolute size-4 transition-opacity motion-reduce:transition-none ${status === "error" ? "opacity-100" : "opacity-0"}`}
+        icon={Cancel01Icon}
+        strokeWidth={2}
       />
     </span>
   );

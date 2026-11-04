@@ -39,7 +39,6 @@ export interface ChatModelOption {
   description: ChatModelDescriptionKey | null;
   pricing: ChatModelPricing | "varies" | null;
   provider: ChatModelProvider;
-  beta?: boolean;
 }
 
 export type ContentChatInputHandle = Pick<ChatInputHandle, "setAttachments"> & {
