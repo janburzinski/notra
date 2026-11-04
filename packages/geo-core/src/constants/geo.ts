@@ -555,6 +555,11 @@ export const GEO_DRAIN_DOCS_URLS = {
   vercel: "https://docs.usenotra.com/ai-traffic/install/vercel-log-drain",
   cloudflare: "https://docs.usenotra.com/ai-traffic/install/cloudflare-logpush",
 } as const satisfies Record<GeoDrainProvider, string>;
+export const GEO_DRAIN_DASHBOARD_URLS = {
+  vercel:
+    "https://vercel.com/d?to=%2F%5Bteam%5D%2F%7E%2Fsettings%2Fdrains&title=Go+to+Drains+settings",
+  cloudflare: "https://dash.cloudflare.com/?to=/:account/:zone/analytics/logs",
+} as const satisfies Record<GeoDrainProvider, string>;
 export const GEO_INGEST_DEFAULT_METHOD: GeoIngestMethod = "sdk";
 export const GEO_INGEST_METHODS = [
   "sdk",

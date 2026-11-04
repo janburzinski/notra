@@ -2979,29 +2979,41 @@
         "cloudflare": "Cloudflare Logpush"
       },
       "drains": {
-        "stepsTitle": "Einrichten",
         "docsLink": "Zur Anleitung",
         "vercel": {
-          "requirements": "Ohne Codeänderungen. Vercel schickt deine Request-Logs an Notra und Notra behält nur den KI-Traffic. Drains brauchen ein Vercel Pro- oder Enterprise-Team.",
-          "endpointTitle": "Endpoint-URL",
-          "headerTitle": "Custom Header",
-          "headerDescription": "Füge diese Zeile unter Custom Headers hinzu, damit Notra weiß, zu welchem Projekt die Logs gehören.",
-          "stepOne": "Öffne in Vercel Team Settings, dann Drains, und klicke auf Add Drain. Wähle Logs.",
-          "stepTwo": "Wähle die Projekte hinter dieser Website, behalte die Quellen static, lambda und edge und wähle die Production-Umgebung.",
-          "stepThree": "Wähle Custom Endpoint, füge die Endpoint-URL ein, wähle JSON oder NDJSON, füge den Custom Header hinzu und lege den Drain an.",
-          "limitation": "Bekannte Einschränkung: Vercel Drains enthalten keine Request-Header wie Accept. Notra sieht deshalb keine Markdown-Anfragen und erkennt keine Agents, die sich als Browser ausgeben. Das Paket bleibt die genauere Option."
+          "openTitle": "Drains öffnen",
+          "openDescription": "Braucht ein Pro- oder Enterprise-Team. Füge einen Drain hinzu und wähle Logs.",
+          "openAction": "Vercel öffnen",
+          "projectsTitle": "Projekte dieser Website wählen",
+          "projectsDescription": "Behalte alle Quellen und wähle Production.",
+          "endpointTitle": "Endpoint einfügen",
+          "endpointDescription": "Wähle Custom Endpoint und NDJSON.",
+          "headerTitle": "Header hinzufügen und speichern"
         },
         "cloudflare": {
-          "requirements": "Ohne Codeänderungen. Deine Website kann überall gehostet sein, ihr Traffic muss aber über Cloudflare laufen (die orange Wolke am DNS-Eintrag). Logpush gibt es in jedem Cloudflare-Plan.",
-          "destinationTitle": "Ziel-URL",
-          "destinationDescription": "Füge die URL als HTTP-Ziel ein. Dein Token ist darin als Authorization-Header enthalten.",
-          "fieldsTitle": "Felder",
-          "stepOne": "Öffne in Cloudflare deine Domain, geh zu Analytics & Logs, dann Logpush, und lege einen Job mit HTTP-Ziel an.",
-          "stepTwo": "Füge die Ziel-URL ein, wähle das Dataset HTTP requests und die Felder oben. Stell das Zeitformat auf RFC 3339.",
-          "stepThree": "Optional: Logge die Request-Header accept, sec-fetch-mode und sec-ch-ua als Custom Fields und füge RequestHeaders hinzu, damit Notra Markdown-Anfragen und getarnte Agents erkennt.",
-          "apiTitle": "Oder lege den Job per API an",
-          "apiFilename": "Logpush-Job anlegen",
-          "limitation": "Logpush lädt in Batches hoch, neuer Traffic erscheint deshalb nach ein bis zwei Minuten statt sofort."
+          "openTitle": "Logpush öffnen",
+          "openDescription": "Wähle eine Domain über Cloudflare und lege einen Job mit HTTP-Ziel an.",
+          "openAction": "Cloudflare öffnen",
+          "destinationTitle": "Ziel einfügen",
+          "fieldsTitle": "Dataset und Felder wählen",
+          "fieldsDescription": "{count} Felder aus dem Dataset HTTP requests, mit RFC-3339-Zeitstempeln.",
+          "saveTitle": "Job speichern",
+          "saveDescription": "Traffic erscheint hier ein bis zwei Minuten später.",
+          "customFieldsNote": "Logge außerdem die Request-Header accept, sec-ch-ua und sec-fetch-mode als Logpush Custom Fields. RequestHeaders allein enthält sie nicht, und Notra braucht sie, um Markdown-Anfragen und als Browser getarnte Agents zu erkennen."
+        }
+      },
+      "footer": {
+        "sdk": {
+          "title": "Lass deinen Agent das einrichten",
+          "description": "Füge den Prompt in Claude Code, Cursor oder Codex ein."
+        },
+        "cloudflare": {
+          "title": "Lass deinen Agent das einrichten",
+          "description": "Er legt den Logpush-Job über die Cloudflare-API an."
+        },
+        "vercel": {
+          "title": "Mehr Details?",
+          "description": "Die Anleitung geht die Einrichtung des Drains durch."
         }
       }
     },

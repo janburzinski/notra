@@ -3,6 +3,7 @@
 import { PackageIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
+  GEO_DRAIN_DOCS_URLS,
   GEO_DRAIN_PROVIDERS,
   GEO_INGEST_DEFAULT_FRAMEWORK,
   GEO_INGEST_DEFAULT_METHOD,
@@ -13,6 +14,7 @@ import {
   GEO_INGEST_TOKEN_ENV,
 } from "@notra/geo-core/constants/geo";
 import { POSTHOG_EVENTS } from "@notra/posthog/events";
+import { AgentPromptButton } from "@notra/ui/components/ui/agent-prompt-button";
 import { Cloudflare } from "@notra/ui/components/ui/svgs/cloudflare";
 import { Vercel } from "@notra/ui/components/ui/svgs/vercel";
 import {
@@ -24,20 +26,21 @@ import {
 import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "use-intl";
 
-import { ApiKeyRevealField } from "@/components/api-keys/api-key-reveal-field";
-import {
-  CodeSnippet,
-  CodeSnippetTabs,
-  CopyPromptButton,
-} from "@/components/geo/code-snippet";
+import { CodeSnippet, CodeSnippetTabs } from "@/components/geo/code-snippet";
+import { GeoExternalLinkButton } from "@/components/geo/geo-external-link-button";
 import { GeoIngestDrainSetup } from "@/components/geo/geo-ingest-drain-setup";
+import { GeoSetupCopyField } from "@/components/geo/geo-setup-copy-field";
+import { GeoSetupStep } from "@/components/geo/geo-setup-step";
 import { GeoPackageManagerIcon } from "@/components/geo/package-manager-icon";
 import { TRAFFIC_INSTALL_COPY_KINDS } from "@/constants/geo-analytics";
+import { GEO_SETUP_MASKED_TOKEN } from "@/constants/geo-ingest-setup";
 import { trackEvent } from "@/lib/analytics/posthog-client";
 import { cn } from "@/lib/utils";
 import type { TrafficInstallCopyKind } from "@/types/analytics/geo-events";
 import type { GeoIngestSetupPanelProps } from "@/types/geo";
+import { toastCopyError } from "@/utils/copy-to-clipboard";
 import {
+  geoCloudflareAgentPrompt,
   geoIngestAgentPrompt,
   geoIngestInstallCommand,
   geoIngestSnippet,
@@ -74,6 +77,7 @@ export function GeoIngestSetup({ setup, className }: GeoIngestSetupPanelProps) {
     GEO_INGEST_FRAMEWORK_OPTIONS.find((option) => option.value === framework)
       ?.file ?? "proxy.ts";
   const token = setup?.token ?? "";
+  const cloudflareAgentPrompt = geoCloudflareAgentPrompt(setup);
   const viewedRef = useRef(false);
   const hasToken = token.length > 0;
 
@@ -99,7 +103,12 @@ export function GeoIngestSetup({ setup, className }: GeoIngestSetupPanelProps) {
   };
 
   return (
-    <div className={className}>
+    <div
+      className={cn(
+        "border-shell-border bg-shell overflow-hidden rounded-2xl border",
+        className
+      )}
+    >
       <Tabs
         onValueChange={(value) => {
           if (isGeoIngestMethod(value)) {
@@ -108,35 +117,30 @@ export function GeoIngestSetup({ setup, className }: GeoIngestSetupPanelProps) {
         }}
         value={method}
       >
-        <TabsList aria-label={t("method")} className="w-full">
-          {GEO_INGEST_METHODS.map((option) => (
-            <TabsTrigger key={option} value={option}>
-              {METHOD_ICONS[option]}
-              {t(`methods.${option}`)}
-            </TabsTrigger>
-          ))}
-        </TabsList>
-        {GEO_DRAIN_PROVIDERS.map((provider) => (
-          <TabsContent className="mt-3" key={provider} value={provider}>
-            <GeoIngestDrainSetup
-              onCopy={() => trackCopied(TRAFFIC_INSTALL_COPY_KINDS.DRAIN_SETUP)}
-              provider={provider}
-              setup={setup}
-            />
-          </TabsContent>
-        ))}
-        <TabsContent className="mt-3" value="sdk">
-          <div className="space-y-5">
-            <section className="space-y-2">
-              <h3 className="text-sm font-medium">
-                {tCommon("labels.installThePackage")}
-              </h3>
-              <CodeSnippet
-                code={installCommand}
+        <div className="border-table-card-border bg-table-card shadow-table-card m-0.5 rounded-[14px] border p-5">
+          <TabsList aria-label={t("method")} className="mb-5 w-full">
+            {GEO_INGEST_METHODS.map((option) => (
+              <TabsTrigger key={option} value={option}>
+                {METHOD_ICONS[option]}
+                {t(`methods.${option}`)}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+          {GEO_DRAIN_PROVIDERS.map((provider) => (
+            <TabsContent key={provider} value={provider}>
+              <GeoIngestDrainSetup
                 onCopy={() =>
-                  trackCopied(TRAFFIC_INSTALL_COPY_KINDS.INSTALL_COMMAND)
+                  trackCopied(TRAFFIC_INSTALL_COPY_KINDS.DRAIN_SETUP)
                 }
-                tabs={
+                provider={provider}
+                setup={setup}
+              />
+            </TabsContent>
+          ))}
+          <TabsContent value="sdk">
+            <ol>
+              <GeoSetupStep
+                action={
                   <CodeSnippetTabs
                     label={tCommon("labels.packageManager")}
                     onValueChange={(value) => {
@@ -148,57 +152,88 @@ export function GeoIngestSetup({ setup, className }: GeoIngestSetupPanelProps) {
                     value={packageManager}
                   />
                 }
-              />
-            </section>
-            {token ? (
-              <section className="space-y-2">
-                <h3 className="text-sm font-medium">{t("tokenTitle")}</h3>
-                <p className="text-muted-foreground text-xs">
-                  {t("tokenDescription", { env: GEO_INGEST_TOKEN_ENV })}
-                </p>
-                <ApiKeyRevealField value={token} />
-              </section>
-            ) : null}
-            <section className="space-y-2">
-              <h3 className="text-sm font-medium">{t("proxyTitle")}</h3>
-              <CodeSnippet
-                code={snippet}
-                filename={file}
-                onCopy={() =>
-                  trackCopied(TRAFFIC_INSTALL_COPY_KINDS.PROXY_SNIPPET)
-                }
-                tabs={
-                  <CodeSnippetTabs
-                    label={t("framework")}
-                    onValueChange={(value) => {
-                      if (isGeoIngestFramework(value)) {
-                        setFramework(value);
-                      }
-                    }}
-                    options={GEO_INGEST_FRAMEWORK_OPTIONS}
-                    value={framework}
+                index={1}
+                title={tCommon("labels.installThePackage")}
+              >
+                <CodeSnippet
+                  code={installCommand}
+                  onCopy={() =>
+                    trackCopied(TRAFFIC_INSTALL_COPY_KINDS.INSTALL_COMMAND)
+                  }
+                  variant="command"
+                />
+              </GeoSetupStep>
+              <GeoSetupStep
+                description={t("tokenDescription", {
+                  env: GEO_INGEST_TOKEN_ENV,
+                })}
+                index={2}
+                title={t("tokenTitle")}
+              >
+                {token ? (
+                  <GeoSetupCopyField
+                    display={`${GEO_INGEST_TOKEN_ENV}=${GEO_SETUP_MASKED_TOKEN}`}
+                    label={t("tokenTitle")}
+                    value={`${GEO_INGEST_TOKEN_ENV}=${token}`}
                   />
-                }
-              />
-            </section>
-            <div className="space-y-2">
-              <div aria-hidden className="flex items-center gap-3 py-1">
-                <span className="bg-border/80 h-px flex-1" />
-                <span className="text-muted-foreground text-xs">
-                  {tCommon("labels.or")}
-                </span>
-                <span className="bg-border/80 h-px flex-1" />
-              </div>
-              <CopyPromptButton
-                className="mx-auto flex w-fit"
+                ) : null}
+              </GeoSetupStep>
+              <GeoSetupStep index={3} title={t("proxyTitle")}>
+                <CodeSnippet
+                  code={snippet}
+                  filename={file}
+                  onCopy={() =>
+                    trackCopied(TRAFFIC_INSTALL_COPY_KINDS.PROXY_SNIPPET)
+                  }
+                  tabs={
+                    <CodeSnippetTabs
+                      label={t("framework")}
+                      onValueChange={(value) => {
+                        if (isGeoIngestFramework(value)) {
+                          setFramework(value);
+                        }
+                      }}
+                      options={GEO_INGEST_FRAMEWORK_OPTIONS}
+                      value={framework}
+                    />
+                  }
+                />
+              </GeoSetupStep>
+            </ol>
+          </TabsContent>
+        </div>
+        <div className="flex flex-col items-center gap-2.5 px-3.5 py-3 text-center">
+          <div className="min-w-0 text-xs">
+            <p className="text-foreground font-medium">
+              {t(`footer.${method}.title`)}
+            </p>
+            <p className="text-muted-foreground text-pretty">
+              {t(`footer.${method}.description`)}
+            </p>
+          </div>
+          <div className="flex flex-wrap items-center justify-center gap-2">
+            {method === "vercel" ? null : (
+              <AgentPromptButton
+                copiedLabel={tCommon("labels.promptCopied")}
+                label={tCommon("labels.copyAgentPrompt")}
                 onCopy={() =>
                   trackCopied(TRAFFIC_INSTALL_COPY_KINDS.AGENT_PROMPT)
                 }
-                prompt={agentPrompt}
+                onCopyError={toastCopyError}
+                prompt={
+                  method === "cloudflare" ? cloudflareAgentPrompt : agentPrompt
+                }
               />
-            </div>
+            )}
+            {method === "sdk" ? null : (
+              <GeoExternalLinkButton
+                href={GEO_DRAIN_DOCS_URLS[method]}
+                label={t("drains.docsLink")}
+                variant={method === "cloudflare" ? "ghost" : "outline"}
+              />
+            )}
           </div>
-        </TabsContent>
+        </div>
       </Tabs>
     </div>
   );

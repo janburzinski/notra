@@ -104,7 +104,7 @@ export function geoCloudflareDestination(
   return `${endpoint}?header_Authorization=Bearer%20${token}`;
 }
 
-export function geoCloudflareLogpushCommand(
+function geoCloudflareLogpushCommand(
   setup: GeoIngestSetupResponse | undefined
 ): string {
   const filter = JSON.stringify({
@@ -135,5 +135,29 @@ export function geoCloudflareLogpushCommand(
     "  --json @- <<EOF",
     JSON.stringify(body, null, 2),
     "EOF",
+  ].join("\n");
+}
+
+export function withoutProtocol(url: string): string {
+  return url.replace(/^https?:\/\//, "");
+}
+
+export function geoCloudflareAgentPrompt(
+  setup: GeoIngestSetupResponse | undefined
+): string {
+  return [
+    "Connect this site's Cloudflare zone to Notra AI traffic with a Logpush job.",
+    "",
+    `1. Ask me for the zone ID, a Cloudflare API token that can edit Logs, and the value of ${GEO_INGEST_TOKEN_ENV}. Never hardcode or commit them.`,
+    "2. Export ZONE_ID, CLOUDFLARE_API_TOKEN and " +
+      `${GEO_INGEST_TOKEN_ENV}, then run this request:`,
+    "",
+    "```sh",
+    geoCloudflareLogpushCommand(setup),
+    "```",
+    "",
+    "3. Confirm the job is enabled and tell me its id.",
+    "",
+    NOTRA_AGENT_FEEDBACK_PROMPT,
   ].join("\n");
 }

@@ -2979,29 +2979,41 @@
         "cloudflare": "Cloudflare Logpush"
       },
       "drains": {
-        "stepsTitle": "Set it up",
         "docsLink": "Read the guide",
         "vercel": {
-          "requirements": "No code changes. Vercel sends your request logs to Notra and Notra keeps only the AI traffic. Drains need a Vercel Pro or Enterprise team.",
-          "endpointTitle": "Endpoint URL",
-          "headerTitle": "Custom header",
-          "headerDescription": "Add this line under Custom Headers so Notra knows which project the logs belong to.",
-          "stepOne": "In Vercel, open Team Settings, then Drains, and click Add Drain. Choose Logs.",
-          "stepTwo": "Select the projects behind this site, keep the static, lambda and edge sources and pick the production environment.",
-          "stepThree": "Choose Custom Endpoint, paste the endpoint URL, pick JSON or NDJSON, add the custom header and create the drain.",
-          "limitation": "Known limitation: Vercel drains don't include request headers like Accept, so Notra can't see markdown requests or catch agents that pose as browsers. The package stays the more accurate option."
+          "openTitle": "Open Drains",
+          "openDescription": "Needs a Pro or Enterprise team. Add a drain and choose Logs.",
+          "openAction": "Open Vercel",
+          "projectsTitle": "Pick this site's projects",
+          "projectsDescription": "Keep all sources and choose production.",
+          "endpointTitle": "Paste the endpoint",
+          "endpointDescription": "Choose Custom Endpoint and NDJSON.",
+          "headerTitle": "Add the header and save"
         },
         "cloudflare": {
-          "requirements": "No code changes. Your site can be hosted anywhere, but its traffic has to be proxied through Cloudflare (the orange cloud on the DNS record). Logpush is available on every Cloudflare plan.",
-          "destinationTitle": "Destination URL",
-          "destinationDescription": "Paste this as the HTTP destination. It carries your token as the Authorization header.",
-          "fieldsTitle": "Fields",
-          "stepOne": "In Cloudflare, open your domain, go to Analytics & Logs, then Logpush, and create a job with an HTTP destination.",
-          "stepTwo": "Paste the destination URL, pick the HTTP requests dataset and select the fields above. Set the timestamp format to RFC 3339.",
-          "stepThree": "Optionally log the accept, sec-fetch-mode and sec-ch-ua request headers as custom fields and add RequestHeaders, so Notra can spot markdown requests and disguised agents.",
-          "apiTitle": "Or create the job with the API",
-          "apiFilename": "Create the Logpush job",
-          "limitation": "Logpush uploads in batches, so new traffic shows up after a minute or two instead of instantly."
+          "openTitle": "Open Logpush",
+          "openDescription": "Pick a proxied domain and create a job with an HTTP destination.",
+          "openAction": "Open Cloudflare",
+          "destinationTitle": "Paste the destination",
+          "fieldsTitle": "Choose the dataset and fields",
+          "fieldsDescription": "{count} fields from the HTTP requests dataset, with RFC 3339 timestamps.",
+          "saveTitle": "Save the job",
+          "saveDescription": "Traffic shows up here a minute or two later.",
+          "customFieldsNote": "Also log the accept, sec-ch-ua and sec-fetch-mode request headers as Logpush custom fields. RequestHeaders alone doesn't include them, and Notra needs them to spot Markdown requests and agents posing as browsers."
+        }
+      },
+      "footer": {
+        "sdk": {
+          "title": "Let your agent set it up",
+          "description": "Paste the prompt into Claude Code, Cursor or Codex."
+        },
+        "cloudflare": {
+          "title": "Let your agent set it up",
+          "description": "It creates the Logpush job through the Cloudflare API."
+        },
+        "vercel": {
+          "title": "Need more detail?",
+          "description": "The guide walks through the drain setup."
         }
       }
     },

@@ -1,3 +1,4 @@
+import type { IconSvgElement } from "@hugeicons/react";
 import type { ToneProfile } from "@notra/ai/schemas/tone";
 import type { GeoWriterBrief } from "@notra/ai/types/geo-writer";
 import type { GeoWriterSourceKind } from "@notra/db/types/geo-writer";
@@ -680,6 +681,37 @@ export interface GeoIngestDrainSetupProps {
   provider: GeoDrainProvider;
   setup: GeoIngestSetupResponse | undefined;
   onCopy: () => void;
+}
+
+export interface GeoExternalLinkButtonProps {
+  href: string;
+  label: string;
+  icon?: ReactNode;
+  variant?: "outline" | "ghost";
+}
+
+export interface GeoSetupCopyFieldProps {
+  display: string;
+  value: string;
+  label: string;
+  onCopy?: () => void;
+  icon?: IconSvgElement;
+  mono?: boolean;
+  raised?: boolean;
+  className?: string;
+}
+
+export interface GeoLogpushFieldListProps {
+  label: string;
+  onCopy: () => void;
+}
+
+export interface GeoSetupStepProps {
+  index: number;
+  title: string;
+  description?: string;
+  action?: ReactNode;
+  children?: ReactNode;
 }
 
 export interface TrafficEmptyProps {

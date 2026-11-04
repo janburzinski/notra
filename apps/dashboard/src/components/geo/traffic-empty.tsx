@@ -24,10 +24,7 @@ export function TrafficEmpty({ setup }: TrafficEmptyProps) {
           {t("description")}
         </p>
         <div className="mt-6 w-full text-left">
-          <GeoIngestSetup
-            className="border-border/80 bg-card rounded-2xl border p-4 sm:p-5"
-            setup={setup}
-          />
+          <GeoIngestSetup setup={setup} />
         </div>
       </div>
     </div>
