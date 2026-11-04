@@ -3,7 +3,6 @@
 import { Mail01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { TruncateWithTooltip } from "@notra/ui/components/shared/truncate-with-tooltip";
-import { Badge } from "@notra/ui/components/ui/badge";
 import type { TableColumn } from "ui/table";
 import { useLocale, useNow, useTranslations } from "use-intl";
 
@@ -11,23 +10,7 @@ import { cn } from "@/lib/utils";
 import type { InvitationSummary } from "@/types/organizations/actions";
 
 import { InvitationActions } from "./invitation-actions";
-
-function RoleBadge({ role }: { role: string | null | undefined }) {
-  const t = useTranslations("members");
-  const variants: Record<string, "default" | "secondary" | "outline"> = {
-    owner: "default",
-    admin: "secondary",
-    member: "outline",
-  };
-
-  const roleValue = role || "member";
-
-  return (
-    <Badge variant={variants[roleValue] ?? "outline"}>
-      {t("roleLabel", { role: roleValue })}
-    </Badge>
-  );
-}
+import { RoleBadge } from "./role-badge";
 
 export function useInvitationColumns(): TableColumn<InvitationSummary>[] {
   const tCommon = useTranslations("common");

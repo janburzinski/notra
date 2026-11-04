@@ -1,15 +1,13 @@
-import { DeleteObjectsCommand, ListObjectsV2Command } from "@aws-sdk/client-s3";
+import { ListObjectsV2Command } from "@aws-sdk/client-s3";
 import { purgeOrganizationChatData } from "@notra/ai/chat/history";
 import { log } from "@notra/ai/evlog";
 import { db } from "@notra/db/drizzle";
 import { chatAttachments } from "@notra/db/schema";
 import { inArray } from "drizzle-orm";
 
-import { getR2Config } from "./r2";
+import { deleteR2Keys, getR2Config } from "./r2";
 
 const TRAILING_SLASH_REGEX = /\/$/;
-
-const MAX_KEYS_PER_DELETE = 1000;
 
 async function deleteObjectsByPrefix(prefix: string) {
   let totalDeleted = 0;
@@ -65,28 +63,6 @@ function extractKeyFromPublicUrl(
     return null;
   }
   return url.slice(prefix.length);
-}
-
-async function deleteR2Keys(keys: string[]) {
-  if (keys.length === 0) {
-    return 0;
-  }
-  const { client: r2, bucketName } = getR2Config();
-  let totalDeleted = 0;
-  for (let i = 0; i < keys.length; i += MAX_KEYS_PER_DELETE) {
-    const chunk = keys.slice(i, i + MAX_KEYS_PER_DELETE);
-    await r2.send(
-      new DeleteObjectsCommand({
-        Bucket: bucketName,
-        Delete: {
-          Objects: chunk.map((Key) => ({ Key })),
-          Quiet: true,
-        },
-      })
-    );
-    totalDeleted += chunk.length;
-  }
-  return totalDeleted;
 }
 
 export async function deleteOrganizationChatFiles(organizationId: string) {

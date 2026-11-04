@@ -12,10 +12,10 @@ import { useState } from "react";
 
 import { Calendar } from "@/components/calendar";
 import { ANALYTICS_RANGE_PRESETS } from "@/constants/analytics";
-import { localDayString, parseLocalDay } from "@/lib/analytics/date-range";
 import { useAnalyticsRangeLabels } from "@/lib/hooks/use-analytics-range-labels";
 import { useRangeSelection } from "@/lib/hooks/use-range-selection";
 import type { AnalyticsRangePickerProps } from "@/types/analytics";
+import { localDayString, parseLocalDay } from "@/utils/local-day";
 
 export function AnalyticsRangePicker({ control }: AnalyticsRangePickerProps) {
   const presetLabels = useAnalyticsRangeLabels();

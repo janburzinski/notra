@@ -1,4 +1,3 @@
-import { DeleteObjectsCommand } from "@aws-sdk/client-s3";
 import { db } from "@notra/db/drizzle";
 import { chatAttachments, members } from "@notra/db/schema";
 import {
@@ -11,8 +10,8 @@ import { and, desc, eq, inArray, lt, notInArray, or } from "drizzle-orm";
 
 import { authorizedProcedure } from "@/lib/orpc/base";
 import {
+  deleteR2Keys,
   getOptionalR2PublicUrl,
-  getR2StorageConfig,
   isR2StorageConfigured,
 } from "@/lib/upload/r2";
 import { recordAuthorizedOrganization } from "@/utils/rpc-telemetry";
@@ -62,26 +61,6 @@ function buildFilterCondition(
     );
   }
   return orgCondition;
-}
-
-async function deleteR2Keys(keys: string[]) {
-  if (keys.length === 0 || !isR2StorageConfigured()) {
-    return;
-  }
-  const { client, bucketName } = getR2StorageConfig();
-  const MAX = 1000;
-  for (let i = 0; i < keys.length; i += MAX) {
-    const chunk = keys.slice(i, i + MAX);
-    await client.send(
-      new DeleteObjectsCommand({
-        Bucket: bucketName,
-        Delete: {
-          Objects: chunk.map((Key) => ({ Key })),
-          Quiet: true,
-        },
-      })
-    );
-  }
 }
 
 function buildPublicUrl(key: string) {
@@ -199,7 +178,9 @@ export const attachmentsRouter = {
         return { success: true, deleted: 0 };
       }
 
-      await deleteR2Keys(ownedKeys);
+      if (isR2StorageConfigured()) {
+        await deleteR2Keys(ownedKeys);
+      }
       await db
         .delete(chatAttachments)
         .where(

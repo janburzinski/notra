@@ -6,7 +6,6 @@ import {
   AvatarFallback,
   AvatarImage,
 } from "@notra/ui/components/ui/avatar";
-import { Badge } from "@notra/ui/components/ui/badge";
 import type { TableColumn } from "ui/table";
 import { useTranslations } from "use-intl";
 
@@ -14,6 +13,7 @@ import { getUserAvatarUrl } from "@/utils/avatar";
 import { nameInitials } from "@/utils/name-initials";
 
 import { MemberActions } from "./member-actions";
+import { RoleBadge } from "./role-badge";
 
 export interface Member {
   id: string;
@@ -25,21 +25,6 @@ export interface Member {
     email: string;
     image?: string | null;
   };
-}
-
-function RoleBadge({ role }: { role: string }) {
-  const t = useTranslations("members");
-  const variants: Record<string, "default" | "secondary" | "outline"> = {
-    owner: "default",
-    admin: "secondary",
-    member: "outline",
-  };
-
-  return (
-    <Badge variant={variants[role] ?? "outline"}>
-      {t("roleLabel", { role })}
-    </Badge>
-  );
 }
 
 export function useMemberColumns(): TableColumn<Member>[] {

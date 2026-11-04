@@ -8,21 +8,10 @@ import type {
   AnalyticsRangePreset,
   AnalyticsRangeState,
 } from "@/types/analytics";
+import { localDayString, parseLocalDay } from "@/utils/local-day";
 
-const DAY_PAD_LENGTH = 2;
 const MAX_TIMELINE_DAYS = 400;
 const CUSTOM_PARAM_REGEX = /^custom_(\d{4}-\d{2}-\d{2})_(\d{4}-\d{2}-\d{2})$/;
-
-export function localDayString(date: Date): string {
-  const month = String(date.getMonth() + 1).padStart(DAY_PAD_LENGTH, "0");
-  const day = String(date.getDate()).padStart(DAY_PAD_LENGTH, "0");
-  return `${date.getFullYear()}-${month}-${day}`;
-}
-
-export function parseLocalDay(day: string): Date {
-  const [year, month, date] = day.split("-").map(Number);
-  return new Date(year ?? 0, (month ?? 1) - 1, date ?? 1);
-}
 
 const MONTHS_PER_QUARTER = 3;
 

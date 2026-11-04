@@ -1,4 +1,4 @@
-import { S3Client } from "@aws-sdk/client-s3";
+import { DeleteObjectsCommand, S3Client } from "@aws-sdk/client-s3";
 
 interface R2StorageEnv {
   accessKeyId: string;
@@ -11,6 +11,7 @@ let cachedR2Client: S3Client | undefined;
 let cachedR2StorageEnv: R2StorageEnv | undefined;
 
 const TRAILING_SLASHES_RE = /\/+$/;
+const MAX_KEYS_PER_DELETE = 1000;
 
 function normalizeEndpoint(endpoint: string, bucketName: string) {
   const trimmed = endpoint.replace(TRAILING_SLASHES_RE, "");
@@ -100,6 +101,28 @@ export function getR2StorageConfig() {
     bucketName: getR2StorageEnv().bucketName,
     client: getR2Client(),
   };
+}
+
+export async function deleteR2Keys(keys: string[]) {
+  if (keys.length === 0) {
+    return 0;
+  }
+  const { client, bucketName } = getR2StorageConfig();
+  let totalDeleted = 0;
+  for (let i = 0; i < keys.length; i += MAX_KEYS_PER_DELETE) {
+    const chunk = keys.slice(i, i + MAX_KEYS_PER_DELETE);
+    await client.send(
+      new DeleteObjectsCommand({
+        Bucket: bucketName,
+        Delete: {
+          Objects: chunk.map((Key) => ({ Key })),
+          Quiet: true,
+        },
+      })
+    );
+    totalDeleted += chunk.length;
+  }
+  return totalDeleted;
 }
 
 export function getOptionalR2PublicUrl() {

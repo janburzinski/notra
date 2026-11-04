@@ -1,32 +1,7 @@
-import {
-  createServerFlagsManager,
-  type ServerFlagsManager,
-} from "@databuddy/sdk/node";
 import { isCodeResearchConfigured } from "@notra/ai/utils/code-research-box";
 
-import {
-  CODE_RESEARCH_FLAG_CACHE_TTL_MS,
-  CODE_RESEARCH_FLAG_KEY,
-  CODE_RESEARCH_FLAG_STALE_TIME_MS,
-} from "@/constants/code-research";
-
-const clientId = process.env.NEXT_PUBLIC_DATABUDDY_DASHBOARD_WEBSITE_ID ?? "";
-
-let cachedManager: ServerFlagsManager | null = null;
-
-function getFlagsManager(): ServerFlagsManager | null {
-  if (clientId.length === 0) {
-    return null;
-  }
-  if (!cachedManager) {
-    cachedManager = createServerFlagsManager({
-      clientId,
-      cacheTtl: CODE_RESEARCH_FLAG_CACHE_TTL_MS,
-      staleTime: CODE_RESEARCH_FLAG_STALE_TIME_MS,
-    });
-  }
-  return cachedManager;
-}
+import { CODE_RESEARCH_FLAG_KEY } from "@/constants/code-research";
+import { getFlagsManager } from "@/lib/geo/flag";
 
 /**
  * Whether the content agent may read the organization's repository in a

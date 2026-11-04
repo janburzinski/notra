@@ -8,23 +8,12 @@ import {
 import type { GeoRangePreset } from "@notra/geo-core/types/geo";
 
 import type { GeoDateRange, GeoRangeQuery, GeoRangeState } from "@/types/geo";
+import { parseLocalDay } from "@/utils/local-day";
 
-const DAY_PAD_LENGTH = 2;
 const DAY_STRING_LENGTH = 10;
 const YEAR_STRING_LENGTH = 4;
 const DAY_MS = 86_400_000;
 const CUSTOM_PARAM_REGEX = /^custom_(\d{4}-\d{2}-\d{2})_(\d{4}-\d{2}-\d{2})$/;
-
-export function localDayString(date: Date): string {
-  const month = String(date.getMonth() + 1).padStart(DAY_PAD_LENGTH, "0");
-  const day = String(date.getDate()).padStart(DAY_PAD_LENGTH, "0");
-  return `${date.getFullYear()}-${month}-${day}`;
-}
-
-export function parseLocalDay(day: string): Date {
-  const [year, month, date] = day.split("-").map(Number);
-  return new Date(year ?? 0, (month ?? 1) - 1, date ?? 1);
-}
 
 function shiftedDay(offsetDays: number): string {
   const date = new Date();

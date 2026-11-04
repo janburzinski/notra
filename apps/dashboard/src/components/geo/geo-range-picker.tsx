@@ -25,9 +25,8 @@ import type { GeoRangePickerProps } from "@/types/geo";
 import {
   geoCalendarDefaultMonth,
   geoCustomRangeLabel,
-  localDayString,
-  parseLocalDay,
 } from "@/utils/geo-range";
+import { localDayString, parseLocalDay } from "@/utils/local-day";
 
 const loadMotionFeatures = () =>
   import("@/lib/motion-features").then((mod) => mod.default);

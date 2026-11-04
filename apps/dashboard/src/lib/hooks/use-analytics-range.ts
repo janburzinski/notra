@@ -5,7 +5,6 @@ import { useMemo } from "react";
 import { useFormatter } from "use-intl";
 
 import {
-  parseLocalDay,
   parseRangeParam,
   rangeIncludesToday,
   serializeCustomRange,
@@ -16,6 +15,7 @@ import type {
   AnalyticsRangeControl,
   AnalyticsRangePreset,
 } from "@/types/analytics";
+import { parseLocalDay } from "@/utils/local-day";
 
 export function useAnalyticsRange(
   paramKey: string,
