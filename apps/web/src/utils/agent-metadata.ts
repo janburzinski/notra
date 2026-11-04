@@ -74,6 +74,34 @@ export function buildProtectedResourceMetadata() {
   };
 }
 
+export function buildApiDiscovery() {
+  return {
+    name: "Notra API",
+    description:
+      "Public API discovery endpoint. Use the production API host for versioned operations.",
+    status: siteUrl("/api/status"),
+    production: apiUrl(),
+    openapi: apiUrl("/openapi.json"),
+    catalog: siteUrl(AGENT_DISCOVERY_PATHS.apiCatalog),
+    auth: siteUrl(AGENT_DISCOVERY_PATHS.authMarkdown),
+  };
+}
+
+export function buildApiStatus() {
+  return {
+    status: "ok",
+    service: "Notra API discovery",
+    public: true,
+    production_status: apiUrl("/v1/status"),
+    openapi: apiUrl("/openapi.json"),
+    authentication: {
+      type: "bearer",
+      resource_metadata: apiUrl(AGENT_DISCOVERY_PATHS.oauthProtectedResource),
+      guide: siteUrl(AGENT_DISCOVERY_PATHS.authMarkdown),
+    },
+  };
+}
+
 export function buildAgentJson() {
   return {
     name: "Notra",

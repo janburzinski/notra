@@ -51,12 +51,6 @@ export default defineConfig(({ command }) => ({
           new URL("../../packages/ui/src/components/ui/", import.meta.url)
         ),
       },
-      {
-        find: "next/image",
-        replacement: fileURLToPath(
-          new URL("src/lib/shims/next-image.tsx", import.meta.url)
-        ),
-      },
     ],
   },
   server: {

@@ -6,7 +6,6 @@ import {
   getMcpStoreListingsByOrganization,
   listMcpServerToolsPreview,
   serializeMcpServerIntegration,
-  testMcpServerConnection,
   updateMcpStoreListing,
 } from "@notra/ai/integrations/mcp";
 import { beginMcpOAuthAuthorization } from "@notra/ai/integrations/mcp-oauth";
@@ -566,24 +565,6 @@ export const integrationsRouter = {
             "Could not read tools from this server. Check the URL and credentials."
           );
         }
-      }),
-    test: baseProcedure
-      .input(testMcpServerRequestSchema)
-      .handler(async ({ context, input }) => {
-        await assertOrganizationAccess({
-          headers: context.headers,
-          organizationId: input.organizationId,
-        });
-
-        await assertRateLimit({
-          key: `mcp-test:${input.organizationId}`,
-          ...MCP_CONNECTION_RATE_LIMIT,
-        });
-
-        return testMcpServerConnection({
-          url: input.url,
-          headers: input.headers,
-        });
       }),
   },
 };

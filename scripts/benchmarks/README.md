@@ -67,7 +67,7 @@ Brotli 11 ist für Offline-/Build-Kompression denkbar, nicht die Standardwahl f�
 
 Erste zwei Bilder: 3840×2160; drittes: 2032×856. Resizing erhält das Seitenverhältnis. Qualitätszahlen von WebP und AVIF sind nicht direkt vergleichbar. Lossless behält die dekodierten Pixel, nicht zwangsläufig alle Metadaten. Zeitwerte und Codec-Versionen stehen in `results/payloads.json`.
 
-Die großen Dateien sind tatsächlich im Blog referenziert (`apps/web/src/content/blog/how-to-create-a-grok-bot-plugin.mdx`). Der Website-`next/image`-Shim ist ein `<img>` ohne Bildoptimierung (`apps/web/src/lib/shims/next-image.tsx`); rohe MDX-`img`s durchlaufen ihn ohnehin nicht. Ein sinnvoller Folgepatch wäre generierte responsive Bildvarianten mit `picture`/`srcset`, nicht gzip für PNG. Auch `loading` und Theme-Varianten gezielt im Browser prüfen, statt aus CSS-Sichtbarkeit auf ausbleibende Downloads zu schließen.
+Die großen Dateien sind tatsächlich im Blog referenziert (`apps/web/src/content/blog/how-to-create-a-grok-bot-plugin.mdx`). Die Website hat keine Bildoptimierung; rohe MDX-`img`s werden unverändert ausgeliefert. Ein sinnvoller Folgepatch wäre generierte responsive Bildvarianten mit `picture`/`srcset`, nicht gzip für PNG. Auch `loading` und Theme-Varianten gezielt im Browser prüfen, statt aus CSS-Sichtbarkeit auf ausbleibende Downloads zu schließen.
 
 ## Synthetische Payload-Verkleinerung
 
