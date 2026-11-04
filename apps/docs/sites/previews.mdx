@@ -60,6 +60,21 @@ notra dev --source ./hosted-site --port 4400
 same renderer as hosted Notra Sites; it does not run your repository's app or its
 build scripts.
 
+### In a monorepo
+
+If your site lives inside a repository that uses Bun or pnpm catalogs, run the CLI with that package manager:
+
+```bash
+bunx --bun notra@latest dev
+pnpm dlx notra@latest dev
+```
+
+Before it starts the CLI, `npx` reads the `package.json` at the root of your repository. If that file has `overrides` for a package that a workspace lists as `catalog:`, npm stops with `Unsupported URL Type "catalog:"` and Notra never runs. To keep using `npx`, run it from a folder outside the repository and point it at the site:
+
+```bash
+npx notra@latest dev --source /path/to/repo/apps/blog
+```
+
 ## Pull request previews
 
 Every pull request into the production branch gets a preview at `https://pr-<number>--<address>.notra.site`, which updates with every new commit and goes away when the pull request is closed. The **Notra Sites preview** check on the pull request links to it. Pull requests from forks don't get a preview, and if the site is in a subdirectory, a pull request that changes nothing in its folder doesn't get one either.

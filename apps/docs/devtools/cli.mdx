@@ -49,7 +49,7 @@ bun add -g notra
 ```
 </CodeGroup>
 
-You can also run any command without installing using `npx notra <command>` or `bunx notra <command>`.
+You can also run any command without installing using `npx notra <command>` or `bunx notra <command>`. In a monorepo that uses Bun or pnpm catalogs, use `bunx` or `pnpm dlx`, because `npx` can fail there before Notra starts. See [Local development in a monorepo](/sites/previews#in-a-monorepo).
 
 Verify the install:
 

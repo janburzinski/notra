@@ -40,7 +40,7 @@ Already have a Notra site with a `blog.json`? Skip adding a first post and selec
 
     Posts go in `blog/` and changelog entries in `changelog/`, and you don't need a `blog.json` yet.
 
-    To see it before you push, run `npx notra@latest dev` in the site folder and open the URL it prints, usually `http://localhost:4321/blog`. See [Local development](/sites/previews#local-development).
+    To see it before you push, run `npx notra@latest dev` in the site folder and open the URL it prints, usually `http://localhost:4321/blog`. In a monorepo, use `bunx --bun notra@latest dev` with Bun or `pnpm dlx notra@latest dev` with pnpm. See [Local development in a monorepo](/sites/previews#in-a-monorepo).
   </Step>
   <Step title="Import the repository">
     In Notra, switch the sidebar to **Studio**, open **Sites** and click **New site**. If the Notra GitHub App isn't installed yet, click **Install GitHub App** and give it access to the repository, then click **Import** next to the repository.
