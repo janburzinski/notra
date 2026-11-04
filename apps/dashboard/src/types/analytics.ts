@@ -219,6 +219,10 @@ export interface AnalyticsNavProps {
   slug: string;
 }
 
+export interface AnalyticsSourceTabsProps {
+  actions?: ReactNode;
+}
+
 export interface PlatformTabItem {
   value: string;
   label: string;

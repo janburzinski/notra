@@ -15,7 +15,7 @@ import type {
 } from "@notra/geo-core/types/mcp-analytics";
 
 import type { MCP_LOG_FILTERS } from "@/constants/mcp-analytics";
-import type { GeoRangeQuery } from "@/types/geo";
+import type { GeoRangeControl, GeoRangeQuery } from "@/types/geo";
 
 export type McpToolStats = McpAnalyticsTool;
 
@@ -152,6 +152,6 @@ export interface McpPayloadSnippetsProps {
   response: string;
 }
 
-export interface TrafficNavProps {
-  slug: string;
+export interface McpTrafficSkeletonProps {
+  geoRange?: GeoRangeControl;
 }

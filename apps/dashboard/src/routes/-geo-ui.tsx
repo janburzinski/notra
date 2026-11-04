@@ -9,6 +9,7 @@ import PromptsLoading from "@/app/(dashboard)/[slug]/geo/prompts/loading";
 import ShelfLoading from "@/app/(dashboard)/[slug]/geo/shelf-space/loading";
 import { GeoPageSkeleton } from "@/app/(dashboard)/[slug]/geo/skeleton";
 import TrafficLoading from "@/app/(dashboard)/[slug]/geo/traffic/loading";
+import McpTrafficLoading from "@/app/(dashboard)/[slug]/geo/traffic/mcp/loading";
 import { geoCompetitorDetailPath } from "@/utils/geo-competitors";
 import { withGeoProject } from "@/utils/geo-paths";
 import { lazyPage } from "@/utils/lazy-page";
@@ -88,6 +89,7 @@ export function createGeoUiRoutes(parent: AnyRoute) {
       parent,
       path: "traffic/mcp",
       title: { namespace: "geo.pages.traffic", key: "mcpMetaTitle" },
+      pendingComponent: McpTrafficLoading,
       preload: McpTraffic.preload,
       component: ({ params }) => <McpTraffic organizationSlug={params.slug} />,
     }),

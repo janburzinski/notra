@@ -7,6 +7,8 @@ import type {
 
 export const MCP_ANALYTICS_NAV_LINK = "/geo/traffic/mcp";
 
+export const MCP_TOOLS_SKELETON_ROWS = 5;
+
 export const JSON_RPC_ERROR_KEYS: Partial<Record<number, McpRpcErrorKey>> = {
   [-32_700]: "parse",
   [-32_600]: "invalidRequest",

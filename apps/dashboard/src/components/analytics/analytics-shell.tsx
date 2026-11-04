@@ -10,6 +10,7 @@ import { AnalyticsPageSkeleton } from "@/app/(dashboard)/[slug]/analytics/skelet
 import { AccountFilter } from "@/components/analytics/account-filter";
 import { useAnalyticsAccounts } from "@/components/analytics/analytics-context";
 import { AnalyticsNav } from "@/components/analytics/analytics-nav";
+import { AnalyticsSourceTabs } from "@/components/analytics/analytics-source-tabs";
 import { ConnectAccountsButtons } from "@/components/analytics/connect-accounts-buttons";
 import { SummaryStats } from "@/components/analytics/summary-stats";
 import { EmptyState } from "@/components/empty-state";
@@ -91,11 +92,12 @@ export function AnalyticsShell({ children }: { children: ReactNode }) {
   if (accounts.length === 0) {
     return (
       <PageContainer className="flex flex-1 flex-col gap-4 py-4 md:gap-6 md:py-6">
-        <div className="w-full space-y-6 px-4 lg:px-6">
+        <div className="w-full min-w-0 space-y-6 px-4 lg:px-6">
           <PageHeading
             description={t("description")}
             title={tCommon("labels.analytics")}
           />
+          <AnalyticsSourceTabs />
           <EmptyState
             action={<ConnectAccountsButtons organizationId={organizationId} />}
             description={t("emptyDescription")}
@@ -109,31 +111,34 @@ export function AnalyticsShell({ children }: { children: ReactNode }) {
 
   return (
     <PageContainer className="flex flex-1 flex-col gap-4 py-4 md:gap-6 md:py-6">
-      <div className="w-full space-y-4 px-4 lg:px-6">
-        <header className="space-y-3">
-          <AnalyticsHeader organizationId={organizationId} />
-          <AccountFilter
-            accounts={accounts}
-            onToggle={toggleAccount}
-            selectedKeys={selectedKeys}
-          />
-        </header>
-
-        {!configured && (
-          <Alert>
-            <AlertDescription>{t("notConfigured")}</AlertDescription>
-          </Alert>
-        )}
-
-        <SummaryStats
-          accounts={visibleAccounts}
-          points={visiblePoints}
-          rangeHint={engagementRange.hint}
+      <div className="w-full min-w-0 space-y-6 px-4 lg:px-6">
+        <AnalyticsHeader organizationId={organizationId} />
+        <AnalyticsSourceTabs
+          actions={
+            <AccountFilter
+              accounts={accounts}
+              onToggle={toggleAccount}
+              selectedKeys={selectedKeys}
+            />
+          }
         />
+        <div className="space-y-4">
+          {!configured && (
+            <Alert>
+              <AlertDescription>{t("notConfigured")}</AlertDescription>
+            </Alert>
+          )}
 
-        <AnalyticsNav slug={organizationSlug} />
+          <SummaryStats
+            accounts={visibleAccounts}
+            points={visiblePoints}
+            rangeHint={engagementRange.hint}
+          />
 
-        <div className="mt-6">{children}</div>
+          <AnalyticsNav slug={organizationSlug} />
+
+          <div className="mt-6">{children}</div>
+        </div>
       </div>
     </PageContainer>
   );

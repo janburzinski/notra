@@ -2224,7 +2224,7 @@
       "commandPalette": "Befehlspalette",
       "automation": "Automatisierung",
       "home": "Home",
-      "traffic": "Traffic & Analytics",
+      "socialAnalytics": "Social-Analytics",
       "sendFeedback": "Feedback senden",
       "default": "Standard",
       "more": "Mehr",
@@ -4052,16 +4052,11 @@
         "setupDescription": "Richte zuerst das GEO-Tracking ein und sieh dann, welche Seiten KI-Engines zitieren und wer dort gelistet ist."
       },
       "traffic": {
-        "metaTitle": "Traffic & Analytics",
+        "metaTitle": "Website-Analytics",
         "mcpMetaTitle": "MCP-Server-Analytics",
-        "tabs": {
-          "website": "Website",
-          "mcp": "MCP-Server"
-        },
-        "title": "Traffic & Analytics",
+        "title": "Analytics",
         "description": "KI-Crawler und Verweise, die deine Website besuchen",
         "setupDescription": "Richte zuerst das GEO-Tracking ein und beobachte dann KI-Crawler und Verweise, sobald sie eintreffen.",
-        "titleWithVisitors": "Traffic & Analytics",
         "descriptionWithVisitors": "Menschen und AI-Agents auf deiner Website",
         "emptyRangeTitle": "Kein Traffic in diesem Zeitraum",
         "emptyRangeDescription": "Wähle einen anderen Zeitraum oder eine andere Domain.",
@@ -4071,7 +4066,7 @@
         "emptyPathWiden": "Letzte 90 Tage anzeigen"
       },
       "mcp": {
-        "description": "Anfragen, Tools, Sitzungen und Agents, die deinen MCP-Server erreichen.",
+        "description": "AI-Agents und Tool-Aufrufe auf deinem MCP-Server",
         "loadFailed": {
           "title": "MCP-Analytics konnten nicht geladen werden",
           "hint": "Die Anfrage für diese Seite ist fehlgeschlagen. Dein Server sendet weiter Events, also geht nichts verloren, während du es erneut versuchst."
@@ -5179,6 +5174,12 @@
     }
   },
   "analytics": {
+    "sources": {
+      "label": "Analytics-Quelle",
+      "website": "Website",
+      "mcp": "MCP-Server",
+      "social": "Social"
+    },
     "shared": {
       "interactions": "Interaktionen",
       "posted": "Gepostet",
@@ -5234,7 +5235,7 @@
       }
     },
     "shell": {
-      "description": "So performen deine X- und LinkedIn-Konten.",
+      "description": "So performen deine X- und LinkedIn-Konten",
       "emptyDescription": "Verbinde ein X- oder LinkedIn-Konto, um Follower, Impressionen und Engagement zu tracken.",
       "emptyTitle": "Keine verbundenen Konten",
       "notConfigured": "Die Analytics-Erfassung ist noch nicht eingerichtet. Verbundene Konten werden angezeigt, Statistiken erscheinen, sobald das Analytics-Backend eingerichtet ist."

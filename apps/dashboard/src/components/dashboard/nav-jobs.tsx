@@ -4,7 +4,11 @@ import { SidebarGroup } from "@notra/ui/components/ui/sidebar";
 import { useRouterState } from "@tanstack/react-router";
 
 import { useOrganizationsContext } from "@/components/providers/organization-provider";
-import { NAV_GROUPS, NAV_WORKSPACE_GROUP } from "@/constants/nav";
+import {
+  NAV_ACTIVE_LINK_ALIASES,
+  NAV_GROUPS,
+  NAV_WORKSPACE_GROUP,
+} from "@/constants/nav";
 import { useGeoProjectQueryState } from "@/lib/hooks/use-geo-project-query";
 import { useNavVisibility } from "@/lib/hooks/use-nav-visibility";
 import { useSidebarMode } from "@/lib/hooks/use-sidebar-mode";
@@ -14,9 +18,14 @@ import { resolveActiveNavLink, sidebarRouteFromPathname } from "@/utils/nav";
 import { NavGroupList } from "./nav-group-list";
 
 const NAV_LINKS: readonly string[] = [
-  ...NAV_GROUPS,
-  NAV_WORKSPACE_GROUP,
-].flatMap((group) => group.links);
+  ...[...NAV_GROUPS, NAV_WORKSPACE_GROUP].flatMap((group) => group.links),
+  ...Object.keys(NAV_ACTIVE_LINK_ALIASES),
+];
+
+function resolveNavRowLink(pathname: string, slug: string) {
+  const link = resolveActiveNavLink(pathname, slug, NAV_LINKS);
+  return link === null ? null : (NAV_ACTIVE_LINK_ALIASES[link] ?? link);
+}
 
 /**
  * Follows the navigation target while a route is still loading, so a clicked
@@ -29,9 +38,9 @@ export function useActiveNavLink(slug: string) {
       state.status === "pending" ? state.location.pathname : null,
   });
   const pendingLink = pendingPathname
-    ? resolveActiveNavLink(pendingPathname, slug, NAV_LINKS)
+    ? resolveNavRowLink(pendingPathname, slug)
     : null;
-  return pendingLink ?? resolveActiveNavLink(pathname, slug, NAV_LINKS);
+  return pendingLink ?? resolveNavRowLink(pathname, slug);
 }
 
 export function NavJobs() {

@@ -23,6 +23,15 @@
   --font-sans: var(--font-inter);
   --font-mono: var(--font-geist-mono);
   --animate-shimmer: shimmer var(--shimmer-duration, 1.7s) linear infinite;
+  /* Not tw-animate's `exit`: the consent banner's CSS redefines that name
+     globally with a scale, which made skeletons shrink while fading out. */
+  --animate-skeleton-exit: skeleton-exit 200ms ease-out forwards;
+
+  @keyframes skeleton-exit {
+    to {
+      opacity: 0;
+    }
+  }
 
   @keyframes shimmer {
     from {

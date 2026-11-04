@@ -1,6 +1,5 @@
 import { AUTOPILOT_NAV_LINK } from "@/constants/autopilot";
 import {
-  ANALYTICS_NAV_LINK,
   DEFAULT_NAV_VISIBILITY,
   GEO_OVERVIEW_NAV_LINK,
   GEO_ROUTE_SECTIONS,
@@ -123,12 +122,9 @@ export function resolveNavItems(
       items.push(item);
     }
   }
-  const withAnalytics = visibility.analytics
-    ? items
-    : items.filter((item) => item.link !== ANALYTICS_NAV_LINK);
   const withSites = visibility.sites
-    ? withAnalytics
-    : withAnalytics.filter((item) => item.link !== SITES_NAV_LINK);
+    ? items
+    : items.filter((item) => item.link !== SITES_NAV_LINK);
   return visibility.autopilot
     ? withSites
     : withSites.filter((item) => item.link !== AUTOPILOT_NAV_LINK);

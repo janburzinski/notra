@@ -15,7 +15,6 @@ type NavItemLabelKey =
   | "automations"
   | "integrations"
   | "overview"
-  | "traffic"
   | "prompts"
   | "contentGaps"
   | "shelfSpace"

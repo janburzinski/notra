@@ -40,10 +40,10 @@ import type {
 export const COMMAND_ROUTE_LABEL_KEYS = {
   home: "home",
   chat: "chat",
-  analytics: "analytics",
+  analytics: "socialAnalytics",
   autopilot: "autopilot",
   geo: "overview",
-  "geo-traffic": "traffic",
+  "geo-traffic": "analytics",
   "geo-prompts": "prompts",
   "geo-personas": "personas",
   "geo-gaps": "contentGaps",
@@ -108,7 +108,7 @@ export const COMMAND_ROUTES: CommandRoute[] = [
   },
   {
     id: "analytics",
-    label: "Analytics",
+    label: "Social analytics",
     keywords: ["stats", "metrics", "followers", "engagement", "social"],
     icon: Analytics01Icon,
     section: "Navigation",
@@ -125,11 +125,14 @@ export const COMMAND_ROUTES: CommandRoute[] = [
   },
   {
     id: "geo-traffic",
-    label: "Traffic",
+    label: "Analytics",
     keywords: [
       "geo",
       "ai",
       "traffic",
+      "website",
+      "visitors",
+      "mcp",
       "crawlers",
       "referrals",
       "visits",

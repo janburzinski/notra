@@ -1,5 +1,4 @@
 import {
-  Activity01Icon,
   AiBrowserIcon,
   AiChat01Icon,
   Analytics01Icon,
@@ -92,7 +91,6 @@ export const NAV_MAIN_ITEMS: NavMainItem[] = [
   { link: CHAT_NAV_LINK, icon: Message01Icon, labelKey: "chat" },
   { link: CONTENT_NAV_LINK, icon: NoteIcon, labelKey: "content" },
   { link: SITES_NAV_LINK, icon: WebDesign01Icon, labelKey: "sites" },
-  { link: ANALYTICS_NAV_LINK, icon: Analytics01Icon, labelKey: "analytics" },
   {
     link: AGENT_FEEDBACK_NAV_LINK,
     icon: Comment01Icon,
@@ -111,7 +109,7 @@ export const NAV_MAIN_ITEMS: NavMainItem[] = [
   },
   { link: INTEGRATIONS_NAV_LINK, icon: PlugIcon, labelKey: "integrations" },
   { link: GEO_OVERVIEW_NAV_LINK, icon: AiBrowserIcon, labelKey: "overview" },
-  { link: GEO_TRAFFIC_NAV_LINK, icon: Activity01Icon, labelKey: "traffic" },
+  { link: GEO_TRAFFIC_NAV_LINK, icon: Analytics01Icon, labelKey: "analytics" },
   { link: GEO_PROMPTS_NAV_LINK, icon: AiChat01Icon, labelKey: "prompts" },
   { link: GEO_GAPS_NAV_LINK, icon: SearchList01Icon, labelKey: "contentGaps" },
   {
@@ -144,6 +142,11 @@ export const NAV_MAIN_ITEMS: NavMainItem[] = [
   { link: API_KEYS_NAV_LINK, icon: Key01Icon, labelKey: "apiKeys" },
 ];
 
+/** Pages without a row of their own that light up another row's link. */
+export const NAV_ACTIVE_LINK_ALIASES: Readonly<Record<string, string>> = {
+  [ANALYTICS_NAV_LINK]: GEO_TRAFFIC_NAV_LINK,
+};
+
 export const NAV_GEO_IMPROVE_LINKS: readonly string[] = [
   GEO_GAPS_NAV_LINK,
   GEO_SHELF_SPACE_NAV_LINK,
@@ -161,12 +164,7 @@ export const NAV_GROUPS: readonly NavGroup[] = [
     id: "overview",
     icon: Home01Icon,
     labelKey: "overview",
-    links: [
-      GEO_OVERVIEW_NAV_LINK,
-      HOME_NAV_LINK,
-      GEO_TRAFFIC_NAV_LINK,
-      ANALYTICS_NAV_LINK,
-    ],
+    links: [GEO_OVERVIEW_NAV_LINK, HOME_NAV_LINK, GEO_TRAFFIC_NAV_LINK],
   },
   {
     id: "prompts",

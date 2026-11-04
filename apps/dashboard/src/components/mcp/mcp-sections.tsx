@@ -11,6 +11,7 @@ import { useFormatter, useLocale, useTranslations } from "use-intl";
 
 import { EChartsAreaChart } from "@/components/evilcharts/charts/echarts-area-chart";
 import { CodeSnippet } from "@/components/geo/code-snippet";
+import { McpChartHeader } from "@/components/mcp/mcp-chart-header";
 import {
   TRAFFIC_HERO_CHART_OPTIONS,
   TRAFFIC_HERO_CHART_SURFACE_CLASS,
@@ -24,7 +25,6 @@ import {
   MCP_DAILY_SERIES,
   MCP_LOG_FILTERS,
   MCP_SERIES_COLORS,
-  MCP_SERIES_DOT_CLASS,
   MCP_SETUP_SNIPPET,
 } from "@/constants/mcp-analytics";
 import { TABLE_ROW_HEIGHT } from "@/constants/table";
@@ -162,22 +162,7 @@ export function McpAnalyticsHero({ data }: McpAnalyticsHeroProps) {
         ))}
       </div>
       <div className={TRAFFIC_HERO_CHART_SURFACE_CLASS}>
-        <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
-          <h2 className="text-sm font-medium">{t("title")}</h2>
-          <ul className="text-muted-foreground flex flex-wrap items-center gap-x-4 gap-y-1 text-xs">
-            {MCP_DAILY_SERIES.map((series) => (
-              <li className="flex items-center gap-1.5" key={series.key}>
-                <span
-                  aria-hidden="true"
-                  className={`size-2 rounded-xs ${MCP_SERIES_DOT_CLASS[series.key]}`}
-                />
-                <span className={series.label ? "font-mono" : undefined}>
-                  {seriesLabel(series)}
-                </span>
-              </li>
-            ))}
-          </ul>
-        </div>
+        <McpChartHeader />
         <EChartsAreaChart
           animationType="left-to-right"
           chartOptions={TRAFFIC_HERO_CHART_OPTIONS}

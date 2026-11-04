@@ -2224,7 +2224,7 @@
       "commandPalette": "Command palette",
       "automation": "Automation",
       "home": "Home",
-      "traffic": "Traffic & Analytics",
+      "socialAnalytics": "Social analytics",
       "sendFeedback": "Send feedback",
       "default": "Default",
       "more": "More",
@@ -4052,16 +4052,11 @@
         "setupDescription": "Set up GEO tracking first, then see which pages engines cite and who is listed on them."
       },
       "traffic": {
-        "metaTitle": "Traffic & Analytics",
+        "metaTitle": "Website analytics",
         "mcpMetaTitle": "MCP server analytics",
-        "tabs": {
-          "website": "Website",
-          "mcp": "MCP server"
-        },
-        "title": "Traffic & Analytics",
+        "title": "Analytics",
         "description": "AI crawlers and referrals visiting your site",
         "setupDescription": "Set up GEO tracking first, then watch AI crawlers and referrals as they arrive.",
-        "titleWithVisitors": "Traffic & Analytics",
         "descriptionWithVisitors": "People and AI agents on your site",
         "emptyRangeTitle": "No traffic in this period",
         "emptyRangeDescription": "Try a different date range or domain.",
@@ -4071,7 +4066,7 @@
         "emptyPathWiden": "Try last 90 days"
       },
       "mcp": {
-        "description": "Requests, tools, sessions and agents that reach your MCP server.",
+        "description": "AI agents and tool calls on your MCP server",
         "loadFailed": {
           "title": "MCP analytics didn't load",
           "hint": "The request for this page failed. Your server keeps sending events in the meantime, so nothing is lost while you retry."
@@ -5179,6 +5174,12 @@
     }
   },
   "analytics": {
+    "sources": {
+      "label": "Analytics source",
+      "website": "Website",
+      "mcp": "MCP server",
+      "social": "Social"
+    },
     "shared": {
       "interactions": "Interactions",
       "posted": "Posted",
@@ -5234,7 +5235,7 @@
       }
     },
     "shell": {
-      "description": "How your X and LinkedIn accounts are performing.",
+      "description": "How your X and LinkedIn accounts perform",
       "emptyDescription": "Connect an X or LinkedIn account to start tracking followers, impressions and engagement.",
       "emptyTitle": "No connected accounts",
       "notConfigured": "Analytics ingestion is not configured yet. Connected accounts are shown, but stats will appear once the analytics backend is set up."

@@ -21,6 +21,7 @@ import { useCollapsibleColumns } from "ui/table/hooks/use-collapsible-columns";
 import { tableMinWidthCss } from "ui/table/lib";
 import { useTranslations } from "use-intl";
 
+import { AnalyticsSourceTabs } from "@/components/analytics/analytics-source-tabs";
 import { GeoRangePicker } from "@/components/geo/geo-range-picker";
 import { PageContainer } from "@/components/layout/container";
 import {
@@ -300,7 +301,7 @@ function WebVisitorsSkeleton() {
                   {label}
                 </p>
                 <div className="flex min-w-0 flex-wrap items-center gap-3">
-                  <Skeleton className="h-6 w-14 @4xl/hero:h-8 @4xl/hero:w-16" />
+                  <Skeleton className="h-6 w-14 @4xl/hero:h-7.5 @4xl/hero:w-16" />
                   <Skeleton className="h-5 w-16 rounded-full" />
                 </div>
               </div>
@@ -378,7 +379,7 @@ function AgentsHeroSkeleton() {
           <div className={TRAFFIC_HERO_METRIC_CELL_CLASS} key={stage.key}>
             <Skeleton className="h-5 w-28" />
             <div className="flex min-w-0 flex-wrap items-center gap-3">
-              <Skeleton className="h-6 w-14 @4xl/hero:h-8 @4xl/hero:w-16" />
+              <Skeleton className="h-6 w-14 @4xl/hero:h-7.5 @4xl/hero:w-16" />
               <Skeleton className="h-5 w-16 rounded-full" />
             </div>
           </div>
@@ -409,28 +410,30 @@ export function GeoTrafficSkeleton({
           description={
             withVisitors ? t("descriptionWithVisitors") : t("description")
           }
-          title={withVisitors ? t("titleWithVisitors") : t("title")}
+          title={t("title")}
         >
-          {geoRange ? (
-            <GeoRangePicker control={geoRange} />
-          ) : (
-            <Skeleton className="h-7 w-40 rounded-lg" />
-          )}
+          <div className="flex min-h-8 items-center">
+            {geoRange ? (
+              <GeoRangePicker control={geoRange} />
+            ) : (
+              <Skeleton className="h-7 w-40 rounded-lg" />
+            )}
+          </div>
         </PageHeading>
-        <div className="flex flex-col gap-2">
-          <div className="flex flex-wrap items-center justify-end gap-2">
-            <Skeleton className="h-7 w-28 rounded-lg" />
-            <Skeleton className="h-7 w-20 rounded-lg" />
-          </div>
-          <div className="flex flex-col gap-6">
-            {withVisitors ? <WebVisitorsSkeleton /> : <AgentsHeroSkeleton />}
-            <InstrumentSection eyebrow={tCommon("labels.sources")}>
-              <TrafficSourcesSkeleton />
-            </InstrumentSection>
-            <TrafficPagesSkeleton />
-            <TrafficLogSkeleton />
-          </div>
-        </div>
+        <AnalyticsSourceTabs
+          actions={
+            <>
+              <Skeleton className="h-7 w-20 rounded-lg" />
+              <Skeleton className="h-7 w-24 rounded-lg" />
+            </>
+          }
+        />
+        {withVisitors ? <WebVisitorsSkeleton /> : <AgentsHeroSkeleton />}
+        <InstrumentSection eyebrow={tCommon("labels.sources")}>
+          <TrafficSourcesSkeleton />
+        </InstrumentSection>
+        <TrafficPagesSkeleton />
+        <TrafficLogSkeleton />
       </div>
     </PageContainer>
   );

@@ -10,6 +10,7 @@ import { PageHeading } from "@notra/ui/components/shared/page-heading";
 import { useEffect, useRef } from "react";
 import { useTranslations } from "use-intl";
 
+import { AnalyticsSourceTabs } from "@/components/analytics/analytics-source-tabs";
 import { EmptyState } from "@/components/empty-state";
 import { EmptyStateTablePreview } from "@/components/empty-state-preview";
 import { AiTrafficCard } from "@/components/geo/ai-traffic-card";
@@ -19,7 +20,6 @@ import { GeoSetupButton } from "@/components/geo/geo-setup-button";
 import { TrafficDomainSelect } from "@/components/geo/traffic-domain-select";
 import { TrafficEmpty } from "@/components/geo/traffic-empty";
 import { TrafficExportMenu } from "@/components/geo/traffic-export-menu";
-import { TrafficNav } from "@/components/geo/traffic-nav";
 import { TrafficPagesCard } from "@/components/geo/traffic-pages-card";
 import { TrafficPathEmpty } from "@/components/geo/traffic-path-empty";
 import { TrafficPathFilter } from "@/components/geo/traffic-path-filter";
@@ -101,7 +101,7 @@ function TrafficPageView({
       <PageContainer className="flex flex-1 flex-col gap-4 py-4 md:gap-6 md:py-6">
         <div className="w-full min-w-0 space-y-6 px-4 lg:px-6">
           <PageHeading description={t("description")} title={t("title")} />
-          <TrafficNav slug={organizationSlug} />
+          <AnalyticsSourceTabs />
           <EmptyState
             action={<GeoSetupButton organizationId={organizationId} />}
             description={t("setupDescription")}
@@ -126,9 +126,9 @@ function TrafficPageView({
       description={
         showVisitors ? t("descriptionWithVisitors") : t("description")
       }
-      title={showVisitors ? t("titleWithVisitors") : t("title")}
+      title={t("title")}
     >
-      <div className="flex max-w-full flex-wrap items-center gap-3">
+      <div className="flex min-h-8 max-w-full flex-wrap items-center gap-3">
         <TrafficDomainSelect hosts={knownHosts} siteHosts={siteHosts} />
         <GeoRangePicker control={geoRange} />
       </div>
@@ -143,35 +143,34 @@ function TrafficPageView({
       <PageContainer className="flex flex-1 flex-col gap-4 py-4 md:gap-6 md:py-6">
         <div className="flex w-full min-w-0 flex-col gap-6 px-4 lg:px-6">
           {header}
-          <TrafficNav slug={organizationSlug} />
-          <div className="flex flex-col gap-2">
-            {/* Existing embeds stay reachable, since an embed picks its own
-                period. */}
-            <div className="flex flex-wrap items-center justify-end gap-2">
-              {pathQuery ? <TrafficPathFilter paths={knownPaths} /> : null}
-              <TrafficExportMenu
-                organizationId={organizationId}
-                path={pathQuery}
-                range={geoRange.query}
-                traffic={traffic}
-                web={web}
-              />
-            </div>
-            {pathQuery ? <TrafficPathEmpty geoRange={geoRange} /> : null}
-            {!pathQuery && (hasPreviousTraffic || sitesHidden) ? (
-              <EmptyState
-                description={
-                  sitesHidden
-                    ? tSites("hiddenHint")
-                    : t("emptyRangeDescription")
-                }
-                title={t("emptyRangeTitle")}
-              />
-            ) : null}
-            {pathQuery || hasPreviousTraffic || sitesHidden ? null : (
-              <TrafficEmpty setup={ingestSetup} />
-            )}
-          </div>
+          {/* Existing embeds stay reachable, since an embed picks its own
+              period. */}
+          <AnalyticsSourceTabs
+            actions={
+              <>
+                {pathQuery ? <TrafficPathFilter paths={knownPaths} /> : null}
+                <TrafficExportMenu
+                  organizationId={organizationId}
+                  path={pathQuery}
+                  range={geoRange.query}
+                  traffic={traffic}
+                  web={web}
+                />
+              </>
+            }
+          />
+          {pathQuery ? <TrafficPathEmpty geoRange={geoRange} /> : null}
+          {!pathQuery && (hasPreviousTraffic || sitesHidden) ? (
+            <EmptyState
+              description={
+                sitesHidden ? tSites("hiddenHint") : t("emptyRangeDescription")
+              }
+              title={t("emptyRangeTitle")}
+            />
+          ) : null}
+          {pathQuery || hasPreviousTraffic || sitesHidden ? null : (
+            <TrafficEmpty setup={ingestSetup} />
+          )}
         </div>
       </PageContainer>
     );
@@ -179,45 +178,44 @@ function TrafficPageView({
 
   return (
     <PageContainer className="flex flex-1 flex-col gap-4 py-4 md:gap-6 md:py-6">
-      <div className="w-full space-y-6 px-4 lg:px-6">
+      <div className="w-full min-w-0 space-y-6 px-4 lg:px-6">
         {header}
-        <TrafficNav slug={organizationSlug} />
-        <div className="flex flex-col gap-2">
-          <div className="flex flex-wrap items-center justify-end gap-2">
-            <TrafficPathFilter paths={knownPaths} />
-            <TrafficExportMenu
-              organizationId={organizationId}
-              path={pathQuery}
-              range={geoRange.query}
-              traffic={traffic}
-              web={web}
-            />
-          </div>
-          <div className="flex flex-col gap-6">
-            {showVisitors && web ? (
-              <WebVisitorsSection
-                breakdownsPending={webBreakdownsPending}
+        <AnalyticsSourceTabs
+          actions={
+            <>
+              <TrafficPathFilter paths={knownPaths} />
+              <TrafficExportMenu
+                organizationId={organizationId}
+                path={pathQuery}
                 range={geoRange.query}
                 traffic={traffic}
                 web={web}
               />
-            ) : null}
-            <AiTrafficCard
-              isPending={isTrafficPending}
-              pages={trafficPages}
-              range={geoRange.query}
-              settingsHref={withGeoProject(
-                geoSettingsPath(organizationSlug),
-                projectId
-              )}
-              showHero={!showVisitors}
-              sourcePaths={sourcePaths}
-              traffic={traffic}
-            />
-            <TrafficPagesCard isPending={isPagesPending} pages={trafficPages} />
-            <AiTrafficLogCard organizationId={organizationId} />
-          </div>
-        </div>
+            </>
+          }
+        />
+        {showVisitors && web ? (
+          <WebVisitorsSection
+            breakdownsPending={webBreakdownsPending}
+            range={geoRange.query}
+            traffic={traffic}
+            web={web}
+          />
+        ) : null}
+        <AiTrafficCard
+          isPending={isTrafficPending}
+          pages={trafficPages}
+          range={geoRange.query}
+          settingsHref={withGeoProject(
+            geoSettingsPath(organizationSlug),
+            projectId
+          )}
+          showHero={!showVisitors}
+          sourcePaths={sourcePaths}
+          traffic={traffic}
+        />
+        <TrafficPagesCard isPending={isPagesPending} pages={trafficPages} />
+        <AiTrafficLogCard organizationId={organizationId} />
       </div>
     </PageContainer>
   );

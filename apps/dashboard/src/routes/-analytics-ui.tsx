@@ -23,7 +23,7 @@ export function createAnalyticsUiRoutes(parent: AnyRoute) {
     createUiRoute({
       parent,
       path: "/",
-      title: { namespace: "common", key: "labels.analytics" },
+      title: { namespace: "common", key: "labels.socialAnalytics" },
       pendingComponent: Loading,
       preload: Overview.preload,
       component: () => <Overview />,
