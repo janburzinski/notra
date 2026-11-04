@@ -31,7 +31,10 @@ export function BrandReviewLoading() {
     >
       <Spinner className="text-primary size-6" />
       <Shimmer as="p" className="text-sm" key={step}>
-        {t(ONBOARDING_DISCOVERY_LOADING_STEPS[step])}
+        {t(
+          ONBOARDING_DISCOVERY_LOADING_STEPS[step] ??
+            ONBOARDING_DISCOVERY_LOADING_STEPS[0]
+        )}
       </Shimmer>
     </div>
   );
