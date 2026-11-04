@@ -12,7 +12,6 @@ import { isPgUniqueViolation } from "@notra/db/utils/pg-errors";
 import { eq } from "drizzle-orm";
 
 import { DEFAULT_BRAND_CONSTRAINT } from "@/constants/brand";
-import { afterResponse } from "@/lib/framework/after-response";
 import { getTranslations } from "@/lib/i18n/server";
 import { startBrandAnalysisRun } from "@/lib/workflows/start";
 import type {
@@ -64,61 +63,49 @@ async function insertBrandIdentity({
   return fallback;
 }
 
-async function dispatchBrandAnalysisWorkflow({
-  organizationId,
-  websiteUrl,
-  brandIdentityId,
-  jobId,
-}: DispatchBrandAnalysisInput) {
-  if (!redis) {
-    return;
-  }
-
+async function dispatchBrandAnalysisWorkflow(
+  store: NonNullable<typeof redis>,
+  {
+    organizationId,
+    websiteUrl,
+    brandIdentityId,
+    jobId,
+  }: DispatchBrandAnalysisInput
+) {
   const now = new Date().toISOString();
+  await createBrandAnalysisJob(store, {
+    id: jobId,
+    organizationId,
+    brandIdentityId,
+    status: "queued",
+    step: null,
+    currentStep: 0,
+    totalSteps: 3,
+    workflowRunId: null,
+    error: null,
+    createdAt: now,
+    updatedAt: now,
+    completedAt: null,
+  });
 
-  try {
-    await createBrandAnalysisJob(redis, {
-      id: jobId,
-      organizationId,
-      brandIdentityId,
-      status: "queued",
-      step: null,
-      currentStep: 0,
-      totalSteps: 3,
-      workflowRunId: null,
-      error: null,
-      createdAt: now,
-      updatedAt: now,
-      completedAt: null,
-    });
+  const result = await startBrandAnalysisRun({
+    organizationId,
+    url: websiteUrl,
+    voiceId: brandIdentityId,
+    jobId,
+  });
 
-    const result = await startBrandAnalysisRun({
-      organizationId,
-      url: websiteUrl,
-      voiceId: brandIdentityId,
-      jobId,
-    });
-
-    await updateBrandAnalysisJob(redis, jobId, {
-      workflowRunId: result.runId,
-    });
-  } catch (error) {
-    const message =
-      error instanceof Error ? error.message : "Failed to trigger workflow";
-
-    logError("[Onboarding] Brand analysis workflow dispatch failed", error, {
+  // The run is queued once start() resolves, so a failed bookkeeping write
+  // must not roll the brand identity back.
+  await updateBrandAnalysisJob(store, jobId, {
+    workflowRunId: result.runId,
+  }).catch((error) => {
+    logError("[Onboarding] Failed to record brand analysis run id", error, {
       organizationId,
       brandIdentityId,
       jobId,
     });
-
-    await setBrandAnalysisJobStatus(redis, jobId, "failed", {
-      step: null,
-      currentStep: 0,
-      totalSteps: 3,
-      error: message,
-    });
-  }
+  });
 }
 
 export async function queueBrandAnalysisForOnboarding({
@@ -137,15 +124,45 @@ export async function queueBrandAnalysisForOnboarding({
     websiteUrl,
   });
 
-  if (redis) {
-    afterResponse(() =>
-      dispatchBrandAnalysisWorkflow({
-        organizationId,
-        websiteUrl,
-        brandIdentityId: brandIdentity.id,
-        jobId,
-      })
-    );
+  if (!redis) {
+    return { jobId, brandIdentityId: brandIdentity.id };
+  }
+
+  // Start the run before responding: work left for after the response is
+  // lost if the function stops, which left an identity nobody analyzes.
+  try {
+    await dispatchBrandAnalysisWorkflow(redis, {
+      organizationId,
+      websiteUrl,
+      brandIdentityId: brandIdentity.id,
+      jobId,
+    });
+  } catch (error) {
+    logError("[Onboarding] Brand analysis workflow dispatch failed", error, {
+      organizationId,
+      brandIdentityId: brandIdentity.id,
+      jobId,
+    });
+    await setBrandAnalysisJobStatus(redis, jobId, "failed", {
+      step: null,
+      currentStep: 0,
+      totalSteps: 3,
+      error:
+        error instanceof Error ? error.message : "Failed to trigger workflow",
+    }).catch(() => undefined);
+    // Remove the identity so retrying onboarding queues the analysis again
+    // instead of finding an identity and skipping it.
+    await db
+      .delete(brandSettings)
+      .where(eq(brandSettings.id, brandIdentity.id))
+      .catch((deleteError) => {
+        logError(
+          "[Onboarding] Failed to remove unanalyzed brand identity",
+          deleteError,
+          { organizationId, brandIdentityId: brandIdentity.id }
+        );
+      });
+    throw error;
   }
 
   return { jobId, brandIdentityId: brandIdentity.id };

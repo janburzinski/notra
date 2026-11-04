@@ -161,21 +161,25 @@ async function isWorkspaceSlugAvailableImpl(slug: string): Promise<boolean> {
   return !existing;
 }
 
+function brandAnalysisLockKey(organizationId: string) {
+  return `onboarding:brand-analysis:lock:${organizationId}`;
+}
+
 async function tryAcquireBrandAnalysisLock(organizationId: string) {
   if (!redis) {
     return true;
   }
 
-  const result = await redis.set(
-    `onboarding:brand-analysis:lock:${organizationId}`,
-    "1",
-    {
-      ex: ANALYSIS_LOCK_TTL_SECONDS,
-      nx: true,
-    }
-  );
+  const result = await redis.set(brandAnalysisLockKey(organizationId), "1", {
+    ex: ANALYSIS_LOCK_TTL_SECONDS,
+    nx: true,
+  });
 
   return result === "OK";
+}
+
+async function releaseBrandAnalysisLock(organizationId: string) {
+  await redis?.del(brandAnalysisLockKey(organizationId)).catch(() => undefined);
 }
 
 async function runOnboardingAgentSetup({
@@ -311,6 +315,8 @@ async function triggerOnboardingBrandAnalysisImpl(
       name: input.name,
     });
   } catch (error) {
+    // Nothing was queued, so let the retry the error message asks for run now.
+    await releaseBrandAnalysisLock(input.organizationId);
     logError("[Onboarding] Failed to queue brand analysis", undefined, {
       organizationId: input.organizationId,
       errorName: error instanceof Error ? error.name : "UnknownError",
