@@ -309,27 +309,7 @@ export function SiteCreateForm({
     },
   }[activeStep];
 
-  let deployContent = <div className="h-80" />;
-  if (isBulk && bulk.submittedRows.length > 0) {
-    deployContent = (
-      <SiteCreateBulkResults
-        isRetrying={createManyMutation.isPending}
-        onEdit={() => goTo("configure", configureFocusId)}
-        onRetry={retryFailedBulkRows}
-        organizationSlug={organizationSlug}
-        rows={bulk.submittedRows}
-      />
-    );
-  } else if (created) {
-    deployContent = (
-      <SiteCreateDeploy
-        deploymentQueued={createMutation.data?.deploymentQueued ?? true}
-        organizationId={organizationId}
-        organizationSlug={organizationSlug}
-        site={created}
-      />
-    );
-  }
+  const showsBulkResults = isBulk && bulk.submittedRows.length > 0;
 
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-6" data-site-fill>
@@ -460,9 +440,26 @@ export function SiteCreateForm({
             </MotionConfig>
           </SiteCreateStep>
 
-          <SiteCreateStep state={stateOf("deploy")} title={t("stepDeploy")}>
-            {deployContent}
-          </SiteCreateStep>
+          <SiteCreateDeploy
+            deploymentQueued={createMutation.data?.deploymentQueued ?? true}
+            organizationId={organizationId}
+            organizationSlug={organizationSlug}
+            site={showsBulkResults ? null : created}
+            state={stateOf("deploy")}
+            title={t("stepDeploy")}
+          >
+            {showsBulkResults ? (
+              <SiteCreateBulkResults
+                isRetrying={createManyMutation.isPending}
+                onEdit={() => goTo("configure", configureFocusId)}
+                onRetry={retryFailedBulkRows}
+                organizationSlug={organizationSlug}
+                rows={bulk.submittedRows}
+              />
+            ) : (
+              <div className="h-80" />
+            )}
+          </SiteCreateDeploy>
         </SiteCreateStage>
       </div>
     </div>

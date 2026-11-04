@@ -122,7 +122,7 @@ if (!process.env.NOTRA_DEPLOY_SURFACE_TEST_WORKER) {
   const { SiteCreateDeploy } =
     await import("../src/components/sites/site-create-deploy");
 
-  test("an empty live build has one toolbar status and one spinner", () => {
+  test("an empty live build is a single status row in the step card", () => {
     const html = renderToStaticMarkup(
       <IntlProvider locale="en" messages={messages} timeZone="UTC">
         <SiteCreateDeploy
@@ -130,19 +130,20 @@ if (!process.env.NOTRA_DEPLOY_SURFACE_TEST_WORKER) {
           organizationId="organization"
           organizationSlug="organization"
           site={site}
+          state="active"
+          title="Deploy"
         />
       </IntlProvider>
     );
     expect(html.match(/Deployment started/g)).toHaveLength(1);
     expect(html.match(/motion-safe:animate-spin/g)).toHaveLength(1);
-    expect(html).toContain("min-h-28");
     expect(html).not.toContain("h-80");
-    expect(html.match(/rounded-xl border/g)).toHaveLength(1);
-    expect(html).toContain(messages.sites.deploymentPage.log.starting);
-    expect(html).toContain(messages.sites.deploymentPage.log.copy);
+    expect(html).not.toContain("rounded-xl border");
+    expect(html).not.toContain(messages.sites.deploymentPage.log.starting);
+    expect(html).not.toContain(messages.sites.deploymentPage.log.copy);
   });
 
-  test("actual log output keeps the filter and a bounded log viewport", () => {
+  test("actual log output has a copy control and a bounded log viewport", () => {
     log = "12:00:00 Building site\n12:00:01 Built site";
     const html = renderToStaticMarkup(
       <IntlProvider locale="en" messages={messages} timeZone="UTC">
@@ -151,6 +152,8 @@ if (!process.env.NOTRA_DEPLOY_SURFACE_TEST_WORKER) {
           organizationId="organization"
           organizationSlug="organization"
           site={site}
+          state="active"
+          title="Deploy"
         />
       </IntlProvider>
     );
@@ -158,7 +161,8 @@ if (!process.env.NOTRA_DEPLOY_SURFACE_TEST_WORKER) {
     expect(html).toContain('data-streaming="true"');
     expect(html).toContain('role="log"');
     expect(html).toContain('aria-busy="true"');
-    expect(html).toContain(messages.sites.deploymentPage.log.filter);
+    expect(html).toContain(messages.sites.deploymentPage.log.copy);
+    expect(html).not.toContain(messages.sites.deploymentPage.log.filter);
     expect(html).toContain("Building site");
   });
 
@@ -174,6 +178,8 @@ if (!process.env.NOTRA_DEPLOY_SURFACE_TEST_WORKER) {
             organizationId="organization"
             organizationSlug="organization"
             site={site}
+            state="active"
+            title="Deploy"
           />
         </IntlProvider>
       );
@@ -217,6 +223,8 @@ if (!process.env.NOTRA_DEPLOY_SURFACE_TEST_WORKER) {
           organizationId="organization"
           organizationSlug="organization"
           site={site}
+          state="active"
+          title="Deploy"
         />
       </IntlProvider>
     );
@@ -245,6 +253,8 @@ if (!process.env.NOTRA_DEPLOY_SURFACE_TEST_WORKER) {
           organizationId="organization"
           organizationSlug="organization"
           site={site}
+          state="active"
+          title="Deploy"
         />
       </IntlProvider>
     );
@@ -264,6 +274,8 @@ if (!process.env.NOTRA_DEPLOY_SURFACE_TEST_WORKER) {
           organizationId="organization"
           organizationSlug="organization"
           site={site}
+          state="active"
+          title="Deploy"
         />
       </IntlProvider>
     );

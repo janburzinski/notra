@@ -10,6 +10,7 @@ export function SiteCreateStep({
   description,
   state,
   footer,
+  flush = false,
   onActivate,
   children,
 }: SiteCreateStepProps) {
@@ -27,11 +28,17 @@ export function SiteCreateStep({
       <div className="inert:select-none" inert={!isActive}>
         <div
           className={cn(
-            "border-table-card-border bg-table-card shadow-table-card m-0.5 rounded-[14px] border p-5",
+            "border-table-card-border bg-table-card shadow-table-card m-0.5 rounded-[14px] border",
+            flush ? "overflow-hidden" : "p-5",
             footer ? "mb-0" : null
           )}
         >
-          <div className="mb-5 space-y-1 @min-[64rem]/main:sr-only">
+          <div
+            className={cn(
+              "space-y-1 @min-[64rem]/main:sr-only",
+              flush ? "px-4 pt-4" : "mb-5"
+            )}
+          >
             <h2
               className="text-base font-semibold tracking-tight"
               id={headingId}
@@ -47,7 +54,7 @@ export function SiteCreateStep({
           {children}
         </div>
         {footer ? (
-          <div className="flex items-center justify-end gap-3 px-3 py-2.5">
+          <div className="flex flex-wrap items-center justify-end gap-3 px-3 py-2.5">
             {footer}
           </div>
         ) : null}

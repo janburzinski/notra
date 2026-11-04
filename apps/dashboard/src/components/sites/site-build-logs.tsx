@@ -31,11 +31,7 @@ import type {
 } from "@/types/components/sites";
 import { toastCopyError } from "@/utils/copy-to-clipboard";
 
-function BuildLogEmpty({
-  inProgress,
-  queued,
-  showSpinner = true,
-}: SiteBuildLogEmptyProps) {
+function BuildLogEmpty({ inProgress, queued }: SiteBuildLogEmptyProps) {
   const t = useTranslations("sites.deploymentPage.log");
   let message = t("empty");
   if (queued) {
@@ -45,7 +41,7 @@ function BuildLogEmpty({
   }
   return (
     <div className="text-muted-foreground flex h-full min-h-28 items-center justify-center gap-2 px-4 py-8 text-sm">
-      {inProgress && showSpinner ? (
+      {inProgress ? (
         <HugeiconsIcon
           aria-hidden="true"
           className="size-4 motion-safe:animate-spin"
@@ -140,11 +136,7 @@ export function SiteBuildLogs({
 
   const body =
     lines.length === 0 ? (
-      <BuildLogEmpty
-        inProgress={inProgress}
-        queued={queued}
-        showSpinner={!heading}
-      />
+      <BuildLogEmpty inProgress={inProgress} queued={queued} />
     ) : (
       <div className="relative">
         <div
@@ -203,21 +195,23 @@ export function SiteBuildLogs({
   );
 
   if (heading) {
+    const hasLines = lines.length > 0;
     return (
       <div
         className="group/log min-w-0"
         data-streaming={inProgress}
         data-timestamps={offsets.size > 0}
       >
-        <div className="flex min-h-11 min-w-0 flex-wrap items-center gap-2 border-b py-1.5 ps-4 pe-2">
-          <div className="min-w-0 flex-[1_1_12rem] text-sm tabular-nums">
-            {heading}
-          </div>
-          {controls}
+        <div
+          className={cn(
+            "flex min-h-12 min-w-0 items-center gap-2 py-1.5 ps-4 pe-2",
+            hasLines && "border-b"
+          )}
+        >
+          <div className="min-w-0 flex-1 text-sm tabular-nums">{heading}</div>
+          {hasLines ? <BuildLogCopyButton log={log} /> : null}
         </div>
-        <div className="bg-background relative min-w-0 overflow-hidden">
-          {body}
-        </div>
+        {hasLines ? body : null}
       </div>
     );
   }

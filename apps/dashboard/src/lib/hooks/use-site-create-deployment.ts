@@ -22,6 +22,7 @@ export function useSiteCreateDeployment({
   const detail = useQuery(
     dashboardOrpc.sites.get.queryOptions({
       input: { organizationId, siteId },
+      enabled: siteId.length > 0,
       refetchInterval: (query) => {
         const latest = query.state.data?.deployments[0];
         const settled =

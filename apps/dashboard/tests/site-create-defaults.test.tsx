@@ -154,6 +154,8 @@ if (!process.env.NOTRA_SITE_DEFAULTS_TEST_WORKER) {
             organizationId="organization"
             organizationSlug="organization"
             site={site}
+            state="active"
+            title="Deploy"
           />
         </IntlProvider>
       );
@@ -205,6 +207,8 @@ if (!process.env.NOTRA_SITE_DEFAULTS_TEST_WORKER) {
           organizationId="organization"
           organizationSlug="organization"
           site={site}
+          state="active"
+          title="Deploy"
         />
       </IntlProvider>
     );

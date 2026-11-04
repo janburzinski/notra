@@ -40,7 +40,7 @@ export function SiteCreateDeployActions({
   return (
     <>
       <Link
-        className="text-muted-foreground hover:text-foreground inline-flex min-h-8 items-center rounded-md text-sm underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2"
+        className={buttonVariants({ variant: "secondary", size: "sm" })}
         href={settingsHref}
       >
         {t("editConfiguration")}

@@ -328,7 +328,6 @@ export interface SiteBuildLogFilterProps {
 export interface SiteBuildLogEmptyProps {
   inProgress: boolean;
   queued: boolean;
-  showSpinner?: boolean;
 }
 
 export interface SiteBuildLogCopyButtonProps {
@@ -692,6 +691,7 @@ export interface SiteCreateStepProps {
   description?: string;
   state: SiteCreateStepState;
   footer?: ReactNode;
+  flush?: boolean;
   onActivate?: () => void;
   children: ReactNode;
 }
@@ -746,8 +746,29 @@ export interface SiteCreateDeployProps {
     | "repository"
     | "productionBranch"
     | "rootDirectory"
-  >;
+  > | null;
   deploymentQueued: boolean;
+  state: SiteCreateStepState;
+  title: string;
+  /** Shown while there is no created site to follow. */
+  children?: ReactNode;
+}
+
+interface SiteCreateDeployView {
+  heading: ReactNode;
+  actions: ReactNode;
+  log: string | null;
+  inProgress: boolean;
+  queued: boolean;
+  lookupFailed: boolean;
+  error: string | null;
+}
+
+export interface SiteCreateDeployStepProps {
+  state: SiteCreateStepState;
+  title: string;
+  deploy: SiteCreateDeployView | null;
+  children?: ReactNode;
 }
 
 export interface SiteCreateStarterProps {
