@@ -108,7 +108,10 @@ const workflowCoreBlocks: Record<string, WorkflowCoreBlock> = {
             ...parsed.data.cases.map(({ id, label }) =>
               label ? { id, label } : { id }
             ),
-            { id: WORKFLOW_OTHERWISE_PORT, label: "Otherwise" },
+            {
+              id: WORKFLOW_OTHERWISE_PORT,
+              label: parsed.data.otherwiseLabel ?? "Otherwise",
+            },
           ]
         : undefined;
     },

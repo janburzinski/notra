@@ -33,6 +33,7 @@ export const workflowSwitchConfigSchema = z.object({
       (cases) => new Set(cases.map((item) => item.id)).size === cases.length,
       "Two cases share an id"
     ),
+  otherwiseLabel: z.string().max(80).optional(),
 });
 
 export const workflowCallConfigSchema = z.object({

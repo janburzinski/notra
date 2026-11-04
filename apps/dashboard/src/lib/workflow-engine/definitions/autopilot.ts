@@ -67,11 +67,14 @@ const DRAFT_CONFIG = {
   confidence: out("plan", "confidence"),
 };
 
-const contentCall = (observations: string[]): WorkflowNode => ({
+const contentCall = (
+  observations: string[],
+  position = at(3, 1)
+): WorkflowNode => ({
   id: "content",
   type: "core.run-workflow",
   title: "Plan and write content",
-  position: at(3, 1),
+  position,
   onError: "continue",
   config: {
     workflow: AUTOPILOT_CONTENT_WORKFLOW_KEY,
@@ -85,6 +88,13 @@ const COMPARISON_DRAFT_CONFIG = {
   brief: out("comparisons", "brief"),
   confidence: out("comparisons", "confidence"),
 };
+
+const comparisonPage = (position: { x: number; y: number }) =>
+  step("comparison-page", "autopilot.write-post", position, {
+    title: "Write the comparison page",
+    onError: "continue",
+    config: COMPARISON_DRAFT_CONFIG,
+  });
 
 const ACTED = {
   decision: out("content", "decision"),
@@ -122,6 +132,7 @@ const AUTOPILOT_CONTENT_WORKFLOW: WorkflowDefinition = {
             { ...outcomeIs("open"), label: "Write a draft" },
             { ...outcomeIs("suggest"), label: "Save as an idea" },
           ],
+          otherwiseLabel: "Nothing to write",
         },
       },
       step("write", "autopilot.write-post", at(3, 0), {
@@ -173,14 +184,16 @@ export const AUTOPILOT_DAILY_WORKFLOW: WorkflowDefinition = {
       step("comparisons", "autopilot.comparisons", at(2, 4), {
         onError: "continue",
       }),
-      step("comparison-page", "autopilot.write-post", at(3, 4), {
-        onError: "continue",
-        config: COMPARISON_DRAFT_CONFIG,
-      }),
-      contentCall([
-        out("gather", "keywords.observations"),
-        out("gather", "commits.observations"),
-      ]),
+      comparisonPage(at(3, 4)),
+      // Column 3 of the brief's row stays empty: edges into the brief bend
+      // there, and a node in that spot looks like where they lead.
+      contentCall(
+        [
+          out("gather", "keywords.observations"),
+          out("gather", "commits.observations"),
+        ],
+        at(3, 0)
+      ),
       step("brief", "autopilot.brief", at(4, 1), {
         config: {
           ...ACTED,
@@ -303,10 +316,7 @@ const AUTOPILOT_TEMPLATE_WORKFLOWS: WorkflowDefinition[] = [
         step("comparisons", "autopilot.comparisons", at(2, 1), {
           onError: "continue",
         }),
-        step("comparison-page", "autopilot.write-post", at(3, 1), {
-          onError: "continue",
-          config: COMPARISON_DRAFT_CONFIG,
-        }),
+        comparisonPage(at(3, 1)),
       ],
       edges: [
         edge("start", "comparisons"),
