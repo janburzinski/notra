@@ -20,6 +20,14 @@ export const ONBOARDING_STEP_COMPETITORS = 3;
 export const ONBOARDING_VISIBILITY_MAX_PROMPTS = 20;
 export const ONBOARDING_VISIBLE_SUGGESTIONS = 3;
 export const ONBOARDING_SUGGESTION_SKELETON_ROWS = [0, 1, 2, 3] as const;
+export const ONBOARDING_DISCOVERY_LOADING_STEPS = [
+  "reading",
+  "brand",
+  "competitors",
+  "questions",
+  "polish",
+] as const;
+export const ONBOARDING_DISCOVERY_LOADING_STEP_MS = 7000;
 export const ONBOARDING_PREVIEW_SKELETON_TABS = [
   "w-16",
   "w-24",

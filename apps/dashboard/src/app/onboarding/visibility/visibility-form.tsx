@@ -15,7 +15,7 @@ import { useTranslations } from "use-intl";
 import { Button } from "@/components/button";
 import Link from "@/components/framework/link";
 import { GeoLanguagePicker } from "@/components/geo/geo-language-picker";
-import { BrandReviewSkeleton } from "@/components/onboarding/brand-review-skeleton";
+import { BrandReviewLoading } from "@/components/onboarding/brand-review-loading";
 import { OnboardingDashboardPreview } from "@/components/onboarding/dashboard-preview";
 import { OnboardingProgress } from "@/components/onboarding/progress";
 import { PromptChoiceRow } from "@/components/onboarding/prompt-choice-row";
@@ -348,7 +348,7 @@ export function VisibilityForm({
                 name={companyName ?? ""}
                 website={discoveredWebsite}
               />
-              <BrandReviewSkeleton />
+              <BrandReviewLoading />
             </>
           ) : (
             <VisibilityReview
