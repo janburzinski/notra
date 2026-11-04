@@ -40,7 +40,7 @@ jobs:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
         run: |
           if [ "$GITHUB_EVENT_NAME" != pull_request ] || git diff --name-only "$BASE_SHA"...HEAD | grep -q '^\.github/workflows/code-quality\.yml$'; then
-            echo 'checks=["lint","tests","tests-sites-builder","browser","build-api","build-web","build-dashboard","build-console","typecheck"]' >> "$GITHUB_OUTPUT"
+            echo 'checks=["lint","tests","tests-sites-builder","browser","build-api","build-web","build-dashboard","build-console","build-ui","typecheck"]' >> "$GITHUB_OUTPUT"
             echo infrastructure=true >> "$GITHUB_OUTPUT"
             exit 0
           fi
@@ -58,6 +58,7 @@ jobs:
           has web && checks="$checks,\"build-web\""
           has dashboard && checks="$checks,\"build-dashboard\""
           has console && checks="$checks,\"build-console\""
+          has ui && checks="$checks,\"build-ui\""
           echo "checks=$checks]" >> "$GITHUB_OUTPUT"
           if grep -qE '^(packages/db|packages/sites-server|packages/schemas)/|^(bun\.lock|package\.json)$' <<< "$files"; then
             echo infrastructure=true >> "$GITHUB_OUTPUT"
@@ -178,6 +179,11 @@ jobs:
       - name: Verify console build
         if: matrix.check == 'build-console'
         run: bun run build --filter=console
+
+      # Needs network access: the build fetches fallback fonts from Google Fonts.
+      - name: Verify ui build
+        if: matrix.check == 'build-ui'
+        run: bun run build --filter=ui
 
       - name: Restore incremental TypeScript state
         if: matrix.check == 'typecheck'
