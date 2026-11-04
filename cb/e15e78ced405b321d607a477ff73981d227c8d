@@ -1,0 +1,64 @@
+apps/dashboard/src/utils/mcp-analytics.ts
+  s_3b452b0f49ddee::t_0d20f80bd14d84 3,5-6,214-229
+  s_3b452b0f49ddee::t_fe7308b2a0af48 29,200-213
+  s_3b452b0f49ddee::t_dfcdde785eebd8 192-195,199
+apps/dashboard/src/constants/mcp-analytics.ts
+  s_3b452b0f49ddee::t_dfcdde785eebd8 1-5,23-25,101-103
+apps/dashboard/src/components/mcp/mcp-sheet-parts.tsx
+  s_3b452b0f49ddee::t_559451739af966 1-55,71-106
+  s_3b452b0f49ddee::t_b45cb6096fc18c 56-65,68-70
+  s_3b452b0f49ddee::t_1c512c9c64cc3b 66-67
+apps/web/src/components/state-of-ai-search/report-ui.tsx
+  s_3b452b0f49ddee::t_8568290e83eead 15
+  s_3b452b0f49ddee::t_a33ec093492263 133-134
+apps/dashboard/src/components/mcp/mcp-request-sheet.tsx
+  s_3b452b0f49ddee::t_b45cb6096fc18c 52
+  s_3b452b0f49ddee::t_91c0ce350a0e5e 5,8,10-13,77,84-91,94-99,102-104,106-107,113-157
+  s_3b452b0f49ddee::t_0d20f80bd14d84 108-112
+apps/dashboard/src/components/mcp/mcp-session-sheet.tsx
+  s_3b452b0f49ddee::t_0d20f80bd14d84 13,27,42-45,128,131,146-161,171-174,178-185
+  s_3b452b0f49ddee::t_323ce19158ab6a 3,5-7,10-11,16-21,23-26,28-30,40,51,53-120,124,127,129-130,132-135,137-145,162-170,175-176
+apps/dashboard/src/types/mcp-analytics.ts
+  s_3b452b0f49ddee::t_dfcdde785eebd8 17,84-106
+  s_3b452b0f49ddee::t_fe7308b2a0af48 194-200
+apps/dashboard/messages/en.json
+  s_3b452b0f49ddee::t_eb0d1efbf23f87 4224-4229,4244-4249
+  s_3b452b0f49ddee::t_20367103c6b9ea 4146,4165,4174
+  s_3b452b0f49ddee::t_0d20f80bd14d84 4219-4220
+packages/ui/src/constants/table.ts
+  s_3b452b0f49ddee::t_09bf6fd42ef451 105-107,114-115
+  s_3b452b0f49ddee::t_e829bfeefbe926 103-104,108-113,116
+apps/ui/registry/notra/table/constants/data-table.ts
+  s_3b452b0f49ddee::t_8568290e83eead 36-49
+apps/dashboard/messages/de.json
+  s_3b452b0f49ddee::t_eb0d1efbf23f87 4224-4229,4244-4249
+  s_3b452b0f49ddee::t_0d20f80bd14d84 4219-4220
+  s_3b452b0f49ddee::t_20367103c6b9ea 4146,4165,4174
+packages/ui/src/components/data-table/body.tsx
+  s_3b452b0f49ddee::t_155b2c7542826f 21
+  s_3b452b0f49ddee::t_e829bfeefbe926 107-108
+apps/ui/registry/notra/table/components/data-table-body.tsx
+  s_3b452b0f49ddee::t_8568290e83eead 18,104-105
+apps/dashboard/src/components/mcp/mcp-sections.tsx
+  s_3b452b0f49ddee::t_fd699902f234c5 148,160,247,292
+  s_3b452b0f49ddee::t_20367103c6b9ea 13
+apps/dashboard/src/components/mcp/mcp-tool-sheet.tsx
+  s_3b452b0f49ddee::t_29142e32a09a77 4-9,11-12,15,17-25,27,29-30,33,40-41,45,47,49-58,60-73,75-89,91-101,121-122,124-127,132-136,140-212,215,218-290
+  s_3b452b0f49ddee::t_fd699902f234c5 3,34-38
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "cbe15e78ced405b321d607a477ff73981d227c8d",
+  "prompts": {},
+  "sessions": {
+    "s_3b452b0f49ddee": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "302e386a-8015-4307-b52b-66b8e38174a0",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
