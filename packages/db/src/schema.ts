@@ -2457,6 +2457,9 @@ export const geoPromptSuggestions = pgTable(
           clicks: number;
           impressions: number;
           position: number;
+          page?: string;
+          pagePosition?: number;
+          pageImpressions?: number;
         }[]
       >()
       .notNull()

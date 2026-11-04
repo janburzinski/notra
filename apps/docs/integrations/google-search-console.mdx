@@ -28,7 +28,7 @@ The Google Search Console integration reads the queries your site ranks for and 
 
 ## What Notra reads
 
-Notra requests Google's `webmasters.readonly` scope plus `openid` and `email` (to show which Google account is connected). It reads search analytics for one property you choose: query, impressions and position. It cannot change anything in Search Console.
+Notra requests Google's `webmasters.readonly` scope plus `openid` and `email` (to show which Google account is connected). It reads search analytics for one property you choose: query, page, clicks, impressions and position. It cannot change anything in Search Console.
 
 ## Setup
 
@@ -55,7 +55,8 @@ Notra requests Google's `webmasters.readonly` scope plus `openid` and `email` (t
 * Notra pulls the last 28 days of query data for the property (Search Console data lags by about 3 days).
 * It reads up to 2000 queries. Google returns them sorted by clicks, so the wider pull keeps high-impression queries that get few clicks.
 * Notra drops branded queries and own-site lookups (login, careers, impressum). Category queries that only mention those words ("changelog generator") stay.
-* Up to 80 of the remaining queries go to the model, with a preference for queries the site shows up for but does not win. Notra also caps near-duplicate head terms.
+* Up to 80 of the remaining queries go to the model, with a preference for queries the site shows up for but does not win. Queries from people comparing options, checking prices or reading reviews ("best changelog tools", "notion alternatives", "crm software pricing") rank higher. Notra also caps near-duplicate head terms.
+* Notra also reads which page Google shows for each query. When Google already ranks a page other than the homepage in the top 20 for a suggestion's queries, [Content gaps](/geo/content-gaps#search-gaps) usually recommends updating that page.
 * The model returns up to 15 prompt suggestions per sync, each citing up to 8 of your queries.
 * The sync repeats every Monday at 06:00 UTC while the property stays connected.
 

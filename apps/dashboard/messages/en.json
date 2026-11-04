@@ -3571,6 +3571,7 @@
       "relatedPages": "Related pages",
       "websitePage": "Website page",
       "match": "· {percent}% match",
+      "googleRank": "· Ranks #{position} on Google",
       "untitledContent": "Untitled content",
       "noRelatedPage": "No related page found."
     },

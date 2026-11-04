@@ -40,6 +40,7 @@ import type {
   GscIntegrationRow,
   GscIntegrationUpdate,
   GscOAuthCredentials,
+  GscQueryPageRow,
   GscQueryRow,
   GscSite,
   QueryGscTopQueriesParams,
@@ -641,10 +642,11 @@ function toIsoDate(date: Date): string {
   return date.toISOString().slice(0, 10);
 }
 
-export async function queryGscTopQueries(
+async function querySearchAnalytics(
   integration: GscIntegrationRow,
-  params: QueryGscTopQueriesParams
-): Promise<GscQueryRow[]> {
+  params: QueryGscTopQueriesParams,
+  dimensions: readonly string[]
+) {
   const endDate = new Date(Date.now() - GSC_DATA_LAG_DAYS * MS_PER_DAY);
   const startDate = new Date(endDate.getTime() - params.days * MS_PER_DAY);
   const url = `${GSC_SEARCH_ANALYTICS_BASE_URL}/${encodeURIComponent(params.siteUrl)}/searchAnalytics/query`;
@@ -655,7 +657,7 @@ export async function queryGscTopQueries(
     body: JSON.stringify({
       startDate: toIsoDate(startDate),
       endDate: toIsoDate(endDate),
-      dimensions: ["query"],
+      dimensions,
       type: "web",
       rowLimit: Math.min(params.rowLimit, GSC_MAX_ROW_LIMIT),
       ...(params.queryPattern
@@ -688,14 +690,48 @@ export async function queryGscTopQueries(
   if (!parsed.success) {
     throw new GscApiError("Unexpected Search Console response", 502);
   }
+  return parsed.data.rows ?? [];
+}
 
-  return (parsed.data.rows ?? []).flatMap((row) => {
+export async function queryGscTopQueries(
+  integration: GscIntegrationRow,
+  params: QueryGscTopQueriesParams
+): Promise<GscQueryRow[]> {
+  const rows = await querySearchAnalytics(integration, params, ["query"]);
+  return rows.flatMap((row) => {
     const query = row.keys[0] ?? "";
     if (query.length === 0) {
       return [];
     }
     return {
       query,
+      clicks: row.clicks,
+      impressions: row.impressions,
+      position: row.position,
+    };
+  });
+}
+
+/**
+ * Query and page pairs. Metrics are per pair, so they do not sum to a query's
+ * totals; use them to find which page ranks, and the query pull for numbers.
+ */
+export async function queryGscQueryPages(
+  integration: GscIntegrationRow,
+  params: QueryGscTopQueriesParams
+): Promise<GscQueryPageRow[]> {
+  const rows = await querySearchAnalytics(integration, params, [
+    "query",
+    "page",
+  ]);
+  return rows.flatMap((row) => {
+    const [query = "", page = ""] = row.keys;
+    if (query.length === 0 || page.length === 0) {
+      return [];
+    }
+    return {
+      query,
+      page,
       clicks: row.clicks,
       impressions: row.impressions,
       position: row.position,

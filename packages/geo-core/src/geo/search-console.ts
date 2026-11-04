@@ -2,7 +2,10 @@ import {
   getGscIntegration,
   updateGscIntegrationIfUnchanged,
 } from "@notra/ai/integrations/google-search-console";
-import type { GscIntegrationRow } from "@notra/ai/types/google-search-console";
+import type {
+  GscIntegrationRow,
+  GscQueryPageRow,
+} from "@notra/ai/types/google-search-console";
 import { GEO_CONTEXT_COMPETITOR_LIMIT } from "@notra/db/constants/geo-context-competitors";
 import { db } from "@notra/db/drizzle";
 import {
@@ -34,6 +37,7 @@ import { logGeoFailure } from "../utils/geo-log";
 import { geoDb } from "./effect";
 import { requireGeoProject } from "./projects";
 import {
+  attachTopPages,
   buildBrandTerms,
   mergeQueryRows,
   normalizeSuggestionKey,
@@ -326,6 +330,7 @@ const runSync = Effect.fn("geo.searchConsole.generateSuggestions")(function* (
   const [
     topRows,
     questionRows,
+    pageRows,
     settingsRow,
     brandRow,
     competitorRows,
@@ -335,6 +340,19 @@ const runSync = Effect.fn("geo.searchConsole.generateSuggestions")(function* (
     [
       google.topQueries(integration, siteUrl),
       google.questionQueries(integration, siteUrl),
+      // Ranking pages only sharpen gap advice; a failed pull must not cost the sync.
+      google.queryPages(integration, siteUrl).pipe(
+        Effect.catch((error) => {
+          logGeoFailure(
+            "geo.gsc.query_pages_failed",
+            "Search Console page pull failed; syncing without ranking pages",
+            error,
+            { projectId },
+            "warn"
+          );
+          return Effect.succeed<GscQueryPageRow[]>([]);
+        })
+      ),
       geoDb("read suggestion settings", () =>
         db.query.geoSettings.findFirst({
           where: and(
@@ -381,7 +399,7 @@ const runSync = Effect.fn("geo.searchConsole.generateSuggestions")(function* (
     { concurrency: "unbounded" }
   );
 
-  const rows = mergeQueryRows(topRows, questionRows);
+  const rows = attachTopPages(mergeQueryRows(topRows, questionRows), pageRows);
   const brandTerms = buildBrandTerms(settingsRow);
   const keywords = selectKeywordsForModel(rows, brandTerms);
   if (keywords.length === 0) {

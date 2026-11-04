@@ -30,6 +30,7 @@ import type {
   GeoTrafficSourceGroupDefinition,
   GeoVisitorType,
 } from "../types/geo";
+import type { GscBuyingIntentSection } from "../types/google-search-console";
 import {
   GEO_MODEL_CATALOG_SEED,
   GEO_MODEL_CATALOG_STATIC,
@@ -145,6 +146,21 @@ export const GEO_GAPS_LOGO_STACK_LIMIT = 4;
 export const GEO_GAPS_TABLE_LOGO_LIMIT = 3;
 export const GEO_EXISTING_PAGE_URL_MAX_LENGTH = 2048;
 export const GEO_SEARCH_GAP_MIN_IMPRESSIONS = 25;
+/** Google's first two pages: the ranking page is relevant enough to extend. */
+export const GEO_SEARCH_GAP_RANKING_MAX_POSITION = 20;
+/** Query parameters that only track a visit and never select content. */
+export const GEO_TRACKING_PARAM_RE =
+  /^(?:utm_[a-z_]+|gclid|gbraid|wbraid|fbclid|msclkid|srsltid|ref)$/i;
+/** What to add to a ranking page, by the buying intent of its queries. */
+export const GEO_SEARCH_GAP_SECTION_ADVICE: Record<
+  GscBuyingIntentSection,
+  string
+> = {
+  alternatives: "a list of alternatives",
+  comparison: "a comparison",
+  pricing: "a pricing section",
+  reviews: "a reviews section",
+};
 export const GEO_COLLISION_STRONG_SCORE = 0.55;
 export const GEO_COLLISION_PARTIAL_SCORE = 0.35;
 export const GEO_COLLISION_MERGE_TARGET_LIMIT = 3;

@@ -3571,6 +3571,7 @@
       "relatedPages": "Verwandte Seiten",
       "websitePage": "Website-Seite",
       "match": "· {percent} % Übereinstimmung",
+      "googleRank": "· Platz {position} bei Google",
       "untitledContent": "Inhalt ohne Titel",
       "noRelatedPage": "Keine verwandte Seite gefunden."
     },

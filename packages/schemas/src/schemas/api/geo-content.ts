@@ -66,12 +66,16 @@ const searchGapTargetSchema = z.object({
   url: z.string().nullable(),
   title: z.string(),
   score: z.number(),
+  googlePosition: z.number().optional().openapi({
+    description:
+      "Google position of the gap's queries on this page, when Search Console shows it already ranks there.",
+  }),
 });
 
 const searchGapRecommendationSchema = z.object({
   action: z.enum(["create", "update", "merge", "ignore"]).openapi({
     description:
-      "What to do with this query cluster: create a new page, update the strongest existing page, merge overlapping pages, or ignore thin demand.",
+      "What to do with this query cluster: create a new page, update the page Google already ranks or the strongest existing page, merge overlapping pages, or ignore thin demand.",
   }),
   reason: z.string(),
   targets: z.array(searchGapTargetSchema),
@@ -90,6 +94,15 @@ const searchGapSchema = z.object({
       clicks: z.number(),
       impressions: z.number(),
       position: z.number(),
+      page: z.string().optional().openapi({
+        description: "Page Google showed most for this query.",
+      }),
+      pagePosition: z.number().optional().openapi({
+        description: "Google position of that page for this query.",
+      }),
+      pageImpressions: z.number().optional().openapi({
+        description: "Impressions of that page for this query.",
+      }),
     })
   ),
   brief: gapBriefRefSchema.nullable(),

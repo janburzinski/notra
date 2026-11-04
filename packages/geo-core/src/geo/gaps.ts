@@ -50,6 +50,7 @@ import { competitorCanonicalMap } from "../utils/geo-competitor-names";
 import {
   recommendSearchGapAction,
   scoreContentCollisions,
+  searchGapRankingPage,
 } from "../utils/geo-content-collision";
 import {
   aiSearchGapId,
@@ -618,6 +619,8 @@ function searchGapRecommendation(
     matches,
     impressions: searchGapImpressions(suggestion.sourceKeywords),
     clicks: searchGapClicks(suggestion.sourceKeywords),
+    rankingPage: searchGapRankingPage(suggestion.sourceKeywords),
+    candidates,
   });
 }
 

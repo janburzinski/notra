@@ -19,6 +19,7 @@ import { Effect, Result } from "effect";
 
 import { GeoModelService, GeoSearchConsoleService } from "../src/deps";
 import { GeoModelError } from "../src/schemas/model-errors";
+import { GeoSearchConsoleError } from "../src/schemas/search-console-errors";
 import { fakeModels } from "./constants/geo-boundaries";
 import {
   initializeDatabase,
@@ -35,6 +36,7 @@ import {
 
 const { syncGscSuggestions, selectGscSiteAndSyncSuggestions } =
   await import("../src/geo/search-console");
+const { refreshGeoContentGaps } = await import("../src/geo/gaps");
 
 beforeAll(initializeDatabase, 30_000);
 afterAll(() => database.postgres.close());
@@ -57,6 +59,7 @@ describe("Search Console Effect sync", () => {
         Effect.provideService(GeoSearchConsoleService, {
           topQueries: () => Effect.succeed([]),
           questionQueries: () => Effect.succeed([]),
+          queryPages: () => Effect.succeed([]),
         })
       )
     );
@@ -179,6 +182,94 @@ describe("Search Console Effect sync", () => {
     expect((await testDb.query.projects.findFirst())?.gscLastError).toBe(
       "We could not turn your Search Console keywords into prompt suggestions."
     );
+  });
+
+  test("stores the page Google ranks and recommends updating it", async () => {
+    await seedGsc();
+    const outcome = await Effect.runPromise(
+      withGscServices(syncGscSuggestions("org-test"), undefined, {
+        queryPages: () =>
+          Effect.succeed([
+            {
+              query: "email tools",
+              page: "https://example.com/email-tools",
+              clicks: 4,
+              impressions: 110,
+              position: 5.8,
+            },
+            {
+              query: "email tools",
+              page: "https://example.com/",
+              clicks: 0,
+              impressions: 10,
+              position: 40,
+            },
+          ]),
+      })
+    );
+    expect(outcome.status).toBe("completed");
+    const suggestion = await testDb.query.geoPromptSuggestions.findFirst({
+      where: eq(geoPromptSuggestions.projectId, "gsc"),
+    });
+    expect(suggestion?.sourceKeywords).toEqual([
+      {
+        query: "email tools",
+        clicks: 4,
+        impressions: 120,
+        position: 6,
+        page: "https://example.com/email-tools",
+        pagePosition: 5.8,
+        pageImpressions: 110,
+      },
+    ]);
+    expect(
+      (await testDb.query.projects.findFirst({ where: eq(projects.id, "gsc") }))
+        ?.gscTopQueries?.[0]?.page
+    ).toBe("https://example.com/email-tools");
+
+    const gaps = await Effect.runPromise(
+      refreshGeoContentGaps({ organizationId: "org-test", projectId: "gsc" })
+    );
+    expect(gaps.searchGaps).toHaveLength(1);
+    expect(gaps.searchGaps[0]?.recommendation).toEqual({
+      action: "update",
+      reason:
+        "Google already ranks this page at #5.8 for these queries; update it to answer them instead of publishing a new page.",
+      targets: [
+        {
+          kind: "page",
+          id: "https://example.com/email-tools",
+          url: "https://example.com/email-tools",
+          title: "https://example.com/email-tools",
+          score: 0,
+          googlePosition: 5.8,
+        },
+      ],
+    });
+  });
+
+  test("a failed page pull still syncs, without ranking pages", async () => {
+    await seedGsc();
+    const outcome = await Effect.runPromise(
+      withGscServices(syncGscSuggestions("org-test"), undefined, {
+        queryPages: () =>
+          Effect.fail(
+            new GeoSearchConsoleError({
+              reauthRequired: false,
+              status: 500,
+              cause: new Error("private test diagnostic"),
+            })
+          ),
+      })
+    );
+    expect(outcome.status).toBe("completed");
+    const suggestion = await testDb.query.geoPromptSuggestions.findFirst({
+      where: eq(geoPromptSuggestions.projectId, "gsc"),
+    });
+    expect(suggestion?.prompt).toBe(
+      "What are the best tools for sending email?"
+    );
+    expect(suggestion?.sourceKeywords[0]).not.toHaveProperty("page");
   });
 
   test("transaction failure rolls back deletion and lastSyncedAt", async () => {

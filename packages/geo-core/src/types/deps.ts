@@ -1,6 +1,7 @@
 import type { ContentBillingReservation } from "@notra/ai/types/billing";
 import type {
   GscIntegrationRow,
+  GscQueryPageRow,
   GscQueryRow,
 } from "@notra/ai/types/google-search-console";
 import type { Effect } from "effect";
@@ -30,6 +31,11 @@ export interface GeoSearchConsoleServiceShape {
     integration: GscIntegrationRow,
     siteUrl: string
   ) => Effect.Effect<GscQueryRow[], GeoSearchConsoleError>;
+  /** Query and page pairs, to tell which page Google ranks for a query. */
+  readonly queryPages: (
+    integration: GscIntegrationRow,
+    siteUrl: string
+  ) => Effect.Effect<GscQueryPageRow[], GeoSearchConsoleError>;
 }
 
 export interface GeoWorkflowServiceShape {

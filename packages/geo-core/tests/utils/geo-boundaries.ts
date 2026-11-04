@@ -16,13 +16,15 @@ import type {
   AgentReadinessNetworkShape,
   AgentReadinessWorkflowPayload,
 } from "../../src/types/agent-readiness";
+import type { GeoSearchConsoleServiceShape } from "../../src/types/deps";
 import type { GeoModelServiceShape } from "../../src/types/model";
 import { fakeModels, readinessNetwork } from "../constants/geo-boundaries";
 import { seedProject, testDb } from "./database";
 
 export function withGscServices<A, E>(
   effect: Effect.Effect<A, E, GeoModelService | GeoSearchConsoleService>,
-  models: GeoModelServiceShape = fakeModels
+  models: GeoModelServiceShape = fakeModels,
+  searchConsole: Partial<GeoSearchConsoleServiceShape> = {}
 ) {
   return effect.pipe(
     Effect.provideService(GeoModelService, models),
@@ -32,6 +34,8 @@ export function withGscServices<A, E>(
           { query: "email tools", clicks: 4, impressions: 120, position: 6 },
         ]),
       questionQueries: () => Effect.succeed([]),
+      queryPages: () => Effect.succeed([]),
+      ...searchConsole,
     })
   );
 }

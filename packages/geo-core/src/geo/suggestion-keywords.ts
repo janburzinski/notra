@@ -1,7 +1,11 @@
-import type { GscQueryRow } from "@notra/ai/types/google-search-console";
+import type {
+  GscQueryPageRow,
+  GscQueryRow,
+} from "@notra/ai/types/google-search-console";
 import { escapeRegExp } from "@notra/utils/escape";
 
 import {
+  GSC_BUYING_INTENT_WEIGHT,
   GSC_QUERY_CLUSTER_CAP,
   GSC_QUERY_CLUSTER_WORDS,
   GSC_QUESTION_MIN_IMPRESSIONS,
@@ -10,6 +14,7 @@ import {
   GSC_SYNC_MIN_IMPRESSIONS,
 } from "../constants/google-search-console";
 import type { GeoSuggestionKeyword } from "../types/geo";
+import { buyingIntentSection } from "../utils/gsc-buying-intent";
 import { isQuestionQuery } from "../utils/gsc-question";
 
 const MIN_BRAND_TERM_LENGTH = 3;
@@ -110,7 +115,8 @@ function opportunityScore(row: GscQueryRow): number {
   } else if (row.position <= WEAK_POSITION) {
     weight = WEAK_WEIGHT;
   }
-  return row.impressions * weight * (1 - ctr);
+  const intent = buyingIntentSection(row.query) ? GSC_BUYING_INTENT_WEIGHT : 1;
+  return row.impressions * weight * (1 - ctr) * intent;
 }
 
 function clusterKey(query: string): string {
@@ -119,6 +125,40 @@ function clusterKey(query: string): string {
     .filter(Boolean)
     .slice(0, GSC_QUERY_CLUSTER_WORDS)
     .join(" ");
+}
+
+/**
+ * Tags each query with the page Google showed it for most, and that page's
+ * own position and impressions. The query row keeps its own totals.
+ */
+export function attachTopPages(
+  rows: readonly GscQueryRow[],
+  pageRows: readonly GscQueryPageRow[]
+): GscQueryRow[] {
+  const topPage = new Map<string, GscQueryPageRow>();
+  for (const pair of pageRows) {
+    const key = normalizeSuggestionKey(pair.query);
+    const current = topPage.get(key);
+    if (
+      !current ||
+      pair.impressions > current.impressions ||
+      (pair.impressions === current.impressions &&
+        pair.position < current.position)
+    ) {
+      topPage.set(key, pair);
+    }
+  }
+  return rows.map((row) => {
+    const pair = topPage.get(normalizeSuggestionKey(row.query));
+    return pair
+      ? {
+          ...row,
+          page: pair.page,
+          pagePosition: pair.position,
+          pageImpressions: pair.impressions,
+        }
+      : row;
+  });
 }
 
 /** Both pulls can return the same query; the first row wins. */
@@ -146,21 +186,21 @@ export function selectKeywordsForModel(
   rows: GscQueryRow[],
   brandTerms: string[]
 ): GscQueryRow[] {
-  const ranked = rows
-    .filter(
-      (row) =>
-        row.impressions >=
-          (isQuestionQuery(row.query)
-            ? GSC_QUESTION_MIN_IMPRESSIONS
-            : GSC_SYNC_MIN_IMPRESSIONS) &&
-        !promptMentionsBrand(row.query, brandTerms) &&
-        !isNavigationalQuery(row.query)
-    )
-    .sort(
-      (left, right) =>
-        opportunityScore(right) - opportunityScore(left) ||
-        right.impressions - left.impressions
-    );
+  const eligible = rows.filter(
+    (row) =>
+      row.impressions >=
+        (isQuestionQuery(row.query)
+          ? GSC_QUESTION_MIN_IMPRESSIONS
+          : GSC_SYNC_MIN_IMPRESSIONS) &&
+      !promptMentionsBrand(row.query, brandTerms) &&
+      !isNavigationalQuery(row.query)
+  );
+  const score = new Map(eligible.map((row) => [row, opportunityScore(row)]));
+  const ranked = eligible.sort(
+    (left, right) =>
+      (score.get(right) ?? 0) - (score.get(left) ?? 0) ||
+      right.impressions - left.impressions
+  );
 
   const picked = new Set<GscQueryRow>();
   for (const row of ranked) {
@@ -214,6 +254,13 @@ export function resolveSourceKeywords(
         clicks: match.clicks,
         impressions: match.impressions,
         position: Number(match.position.toFixed(1)),
+        ...(match.page ? { page: match.page } : {}),
+        ...(match.pagePosition === undefined
+          ? {}
+          : { pagePosition: Number(match.pagePosition.toFixed(1)) }),
+        ...(match.pageImpressions === undefined
+          ? {}
+          : { pageImpressions: match.pageImpressions }),
       });
     }
   }

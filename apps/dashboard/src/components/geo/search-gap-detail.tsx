@@ -246,9 +246,16 @@ function ConsoleSearchGapDetails({ gap, ai }: GeoConsoleSearchGapDetailsProps) {
                         : t("websitePage")}
                     </p>
                     <span className="text-muted-foreground text-xs tabular-nums">
-                      {t("match", {
-                        percent: Math.round(target.score * 100),
-                      })}
+                      {target.googlePosition === undefined
+                        ? t("match", {
+                            percent: Math.round(target.score * 100),
+                          })
+                        : t("googleRank", {
+                            position: formatOneDecimal(
+                              target.googlePosition,
+                              locale
+                            ),
+                          })}
                     </span>
                   </div>
                   {target.url ? (

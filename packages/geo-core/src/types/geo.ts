@@ -25,6 +25,7 @@ import type {
   geoJudgeResultSchema,
 } from "../schemas/geo";
 import type { geoGatewayModelSchema } from "../schemas/geo-model-feed";
+import type { GscBuyingIntentSection } from "./google-search-console";
 import type { GeoModelTokenUsage } from "./token-usage";
 
 export interface GeoProject {
@@ -1678,6 +1679,12 @@ export interface GeoSuggestionKeyword {
   clicks: number;
   impressions: number;
   position: number;
+  /** Page Google showed most for the query; absent before pages were pulled. */
+  page?: string;
+  /** Google position of `page` for this query. */
+  pagePosition?: number;
+  /** Impressions of `page` for this query. */
+  pageImpressions?: number;
 }
 
 export type GeoWriterSourceKind =
@@ -1842,6 +1849,8 @@ export interface GeoContentCollisionMatch {
   url: string | null;
   title: string;
   score: number;
+  /** Google position when Search Console ranks this page for the gap. */
+  googlePosition?: number;
 }
 
 export interface GeoContentCollisionGap {
@@ -1850,10 +1859,22 @@ export interface GeoContentCollisionGap {
   queries: readonly string[];
 }
 
+/** The page Google already ranks for a search gap's queries. */
+export interface GeoSearchGapRankingPage {
+  url: string;
+  /** Impression-weighted position of this page for the gap's queries. */
+  position: number;
+  /** What searchers are deciding, when the queries carry buying intent. */
+  section: GscBuyingIntentSection | null;
+}
+
 export interface GeoSearchGapRecommendationInput {
   matches: readonly GeoContentCollisionMatch[];
   impressions: number | null;
   clicks: number | null;
+  rankingPage?: GeoSearchGapRankingPage | null;
+  /** Looked up by URL so a ranking page keeps its title without sharing terms. */
+  candidates?: readonly GeoContentCollisionCandidate[];
 }
 
 export interface GeoSearchGapRecommendation {

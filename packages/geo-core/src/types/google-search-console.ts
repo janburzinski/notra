@@ -12,6 +12,18 @@ export interface GscOAuthState {
 
 type GscIntegrationStatus = "active" | "reauth_required";
 
+/** The section a page needs to answer a buying-intent query. */
+export type GscBuyingIntentSection =
+  | "alternatives"
+  | "comparison"
+  | "pricing"
+  | "reviews";
+
+export interface GscBuyingIntentRule {
+  section: GscBuyingIntentSection;
+  terms: readonly string[];
+}
+
 export interface GeoSearchConsoleStatus {
   configured: boolean;
   connected: boolean;

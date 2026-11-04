@@ -13,6 +13,15 @@ export interface GscSite {
 
 export type GscQueryRow = GoogleSearchConsoleQuery;
 
+/** One query and one page Google showed for it, with that pair's metrics. */
+export interface GscQueryPageRow {
+  query: string;
+  page: string;
+  clicks: number;
+  impressions: number;
+  position: number;
+}
+
 export type GscIntegrationRow =
   typeof googleSearchConsoleIntegrations.$inferSelect;
 
