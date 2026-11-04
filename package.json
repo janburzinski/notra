@@ -66,7 +66,7 @@
     "devtools:api": "cd apps/api && bunx @ai-sdk/devtools",
     "devtools:dashboard": "cd apps/dashboard && bunx @ai-sdk/devtools",
     "check": "bun run check:effect && ultracite check --threads=4",
-    "check:effect": "oxlint --config oxlint.effect.config.ts apps/api/src apps/console/src apps/dashboard/src apps/web/src apps/agent/agent apps/onboarding-agent/agent packages/ai/src packages/analytics/src packages/db/src packages/geo-core/src packages/schemas/src packages/sites-server/src packages/tools/src packages/webhooks/src --threads=2",
+    "check:effect": "oxlint --config oxlint.effect.config.ts apps/api/src apps/console/src apps/dashboard/src apps/web/src apps/agent/agent apps/onboarding-agent/agent apps/sites/src packages/ai/src packages/analytics/src packages/db/src packages/geo-core/src packages/schemas/src packages/sites-server/src packages/tools/src packages/webhooks/src --threads=2",
     "format": "ultracite fix --threads=4",
     "format:unsafe": "ultracite fix --unsafe --threads=4",
     "commitlint": "commitlint",

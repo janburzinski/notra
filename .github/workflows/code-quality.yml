@@ -50,6 +50,7 @@ jobs:
           has() { jq -e --arg p "$1" 'index($p) != null' <<< "$affected" > /dev/null; }
           checks='["lint"'
           if [ "$affected" != "[]" ] || grep -qE '^scripts/github/' <<< "$files"; then checks="$checks,\"tests\""; fi
+          [ "$affected" != "[]" ] && checks="$checks,\"typecheck\""
           has @notra/sites-builder && checks="$checks,\"tests-sites-builder\""
           # menu-highlight builds both the dashboard and the web stylesheet.
           if has dashboard || has web; then checks="$checks,\"browser\""; fi
@@ -57,7 +58,6 @@ jobs:
           has web && checks="$checks,\"build-web\""
           has dashboard && checks="$checks,\"build-dashboard\""
           has console && checks="$checks,\"build-console\""
-          if jq -e 'any(.[]; IN("@notra/agent","@notra/ai","@notra/db","@notra/utils","@notra/geo-core","dashboard","console","ui","web"))' <<< "$affected" > /dev/null; then checks="$checks,\"typecheck\""; fi
           echo "checks=$checks]" >> "$GITHUB_OUTPUT"
           if grep -qE '^(packages/db|packages/sites-server|packages/schemas)/|^(bun\.lock|package\.json)$' <<< "$files"; then
             echo infrastructure=true >> "$GITHUB_OUTPUT"
@@ -190,9 +190,10 @@ jobs:
           restore-keys: |
             typecheck-v1-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('bun.lock', 'package.json', 'apps/*/package.json', 'packages/*/package.json', 'apps/*/tsconfig*.json', 'packages/*/tsconfig*.json', 'packages/typescript-config/*.json') }}-
 
-      - name: Typecheck tested packages and UI docs
+      # No filter: every workspace with a check-types script, including new ones.
+      - name: Typecheck all workspaces
         if: matrix.check == 'typecheck'
-        run: bun run check-types --concurrency=2 --filter=@notra/agent --filter=@notra/ai --filter=@notra/db --filter=@notra/utils --filter=@notra/geo-core --filter=dashboard --filter=console --filter=ui --filter=web
+        run: bun run check-types --concurrency=2
 
   infrastructure:
     needs: changes
