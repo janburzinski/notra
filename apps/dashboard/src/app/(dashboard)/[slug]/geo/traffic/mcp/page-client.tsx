@@ -59,6 +59,12 @@ export default function McpAnalyticsPage({
   const hasData = data && data.totals.requests + data.requests.length > 0;
   const selectedTool =
     data?.tools.find((tool) => tool.name === selectedToolName) ?? null;
+  const serverName = [data?.server?.name, data?.server?.version]
+    .filter(Boolean)
+    .join("@");
+  const serverLabel = [serverName, data?.server?.protocolVersion]
+    .filter(Boolean)
+    .join(" · ");
   const openTool = (name: string) => {
     const known = data?.tools.some((tool) => tool.name === name) ?? false;
     setSelectedToolName(known ? name : null);
@@ -82,12 +88,9 @@ export default function McpAnalyticsPage({
           </PageHeading>
           <AnalyticsSourceTabs
             actions={
-              data?.server ? (
+              serverLabel ? (
                 <Badge shape="rounded" size="md" variant="outline">
-                  <span className="font-mono">
-                    {data.server.name}@{data.server.version} ·{" "}
-                    {data.server.protocolVersion}
-                  </span>
+                  <span className="font-mono">{serverLabel}</span>
                 </Badge>
               ) : null
             }
