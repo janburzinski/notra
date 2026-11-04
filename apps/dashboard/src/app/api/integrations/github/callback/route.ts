@@ -97,6 +97,16 @@ export async function GET(request: Request) {
       );
     }
 
+    // Org members who are not owners can only request the app; GitHub then
+    // returns without an installation until an owner approves it.
+    if (searchParams.get("setup_action") === "request") {
+      return redirectResponse(
+        buildCallbackUrl(baseUrl, callbackPath ?? "/", {
+          githubInstallRequested: "true",
+        })
+      );
+    }
+
     if (!(installationId && state && redis)) {
       return fail("invalid_callback");
     }

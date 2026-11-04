@@ -14,6 +14,7 @@ import { toast } from "sonner";
 import { useTranslations } from "use-intl";
 
 import { Button } from "@/components/button";
+import { GitHubInstallRequestedNotice } from "@/components/integrations/github/github-install-requested-notice";
 import { SiteCreateBulkFields } from "@/components/sites/site-create-bulk-fields";
 import { SiteCreateBulkResults } from "@/components/sites/site-create-bulk-results";
 import { SiteCreateBulkToggle } from "@/components/sites/site-create-bulk-toggle";
@@ -34,6 +35,7 @@ import {
 } from "@/constants/site-create";
 import {
   useGitHubCallbackErrorToast,
+  useGitHubInstallRequested,
   useResumeGitHubInstall,
 } from "@/hooks/use-github-install-callbacks";
 import { useActiveProject } from "@/lib/hooks/use-active-project";
@@ -79,10 +81,11 @@ export function SiteCreateForm({
   const id = useId();
   const reduceMotion = useReducedMotion();
   useGitHubCallbackErrorToast();
-  useResumeGitHubInstall({
+  const { resuming: resumingGitHubInstall } = useResumeGitHubInstall({
     organizationId,
     callbackPath: `/${organizationSlug}/sites/new`,
   });
+  const githubInstallRequest = useGitHubInstallRequested();
 
   const importable = useImportableRepositories(organizationId);
   const connect = useConnectSiteRepository(organizationId);
@@ -361,6 +364,12 @@ export function SiteCreateForm({
             state={stateOf("repository")}
             title={t("stepRepository")}
           >
+            {githubInstallRequest.requested ? (
+              <GitHubInstallRequestedNotice
+                className="mb-3"
+                onDismiss={githubInstallRequest.dismiss}
+              />
+            ) : null}
             <SiteImportList
               accounts={importable.data?.accounts}
               importingId={importingId}
@@ -372,6 +381,7 @@ export function SiteCreateForm({
               organizationId={organizationId}
               organizationSlug={organizationSlug}
               repositories={importable.data?.repositories ?? []}
+              resuming={resumingGitHubInstall}
             />
             <FieldError className="mt-3">{errors.repository}</FieldError>
           </SiteCreateStep>

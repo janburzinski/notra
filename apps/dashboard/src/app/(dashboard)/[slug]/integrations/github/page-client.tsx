@@ -9,10 +9,12 @@ import { useTranslations } from "use-intl";
 import { Button } from "@/components/button";
 import { ConnectGitHubDialog } from "@/components/integrations/github/connect-github-dialog";
 import { GitHubAppSection } from "@/components/integrations/github/github-app-section";
+import { GitHubInstallRequestedNotice } from "@/components/integrations/github/github-install-requested-notice";
 import { GitHubRepositoriesSection } from "@/components/integrations/github/github-repositories-section";
 import { SelectRepositoriesDialog } from "@/components/integrations/github/select-repositories-dialog";
 import { LegacyAddIntegrationDialog } from "@/components/integrations/legacy/add-integration-dialog";
 import { PageContainer } from "@/components/layout/container";
+import { useGitHubInstallRequested } from "@/hooks/use-github-install-callbacks";
 import { useGitHubSettings } from "@/hooks/use-github-settings";
 import type { GitHubSettingsPageProps } from "@/types/integrations/github-settings";
 
@@ -23,6 +25,7 @@ export default function PageClient({
   const tApp = useTranslations("integrations.github.appSection");
   const tIntegrationsShared = useTranslations("integrations.shared");
   const settings = useGitHubSettings(organizationSlug);
+  const installRequest = useGitHubInstallRequested();
   const {
     githubIntegrations,
     isConnected,
@@ -66,6 +69,9 @@ export default function PageClient({
             )}
           </div>
         </PageHeading>
+        {installRequest.requested ? (
+          <GitHubInstallRequestedNotice onDismiss={installRequest.dismiss} />
+        ) : null}
         {showGitHubAppSection ? <GitHubAppSection {...settings} /> : null}
         <GitHubRepositoriesSection {...settings} />
       </div>

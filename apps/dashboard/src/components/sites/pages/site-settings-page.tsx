@@ -34,6 +34,7 @@ import { useTranslations } from "use-intl";
 
 import { Button, buttonVariants } from "@/components/button";
 import Link from "@/components/framework/link";
+import { GitHubInstallRequestedNotice } from "@/components/integrations/github/github-install-requested-notice";
 import { useSite } from "@/components/sites/site-context";
 import { SiteImportList } from "@/components/sites/site-import-list";
 import { SiteNameField } from "@/components/sites/site-name-field";
@@ -56,6 +57,7 @@ import {
 } from "@/components/sites/site-variables-settings";
 import {
   useGitHubCallbackErrorToast,
+  useGitHubInstallRequested,
   useResumeGitHubInstall,
 } from "@/hooks/use-github-install-callbacks";
 import {
@@ -102,6 +104,7 @@ function SiteSettingsContent() {
   const tVariables = useTranslations("sites.variables");
   const tSections = useTranslations("sites.sections");
   const [openRow, setOpenRow] = useState<SiteSettingsRowKey | null>(null);
+  const githubInstallRequest = useGitHubInstallRequested();
   const { site } = detail;
 
   const row = (key: SiteSettingsRowKey) => ({
@@ -114,6 +117,11 @@ function SiteSettingsContent() {
   return (
     <div className="space-y-8">
       <PageHeading description={tPage("description")} title={tPage("title")} />
+      {githubInstallRequest.requested ? (
+        <GitHubInstallRequestedNotice
+          onDismiss={githubInstallRequest.dismiss}
+        />
+      ) : null}
 
       <SiteSettingsList>
         <SiteSettingsItem

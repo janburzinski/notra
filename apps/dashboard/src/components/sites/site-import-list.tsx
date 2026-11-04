@@ -177,6 +177,7 @@ export function SiteImportList({
   actionLabel,
   actionAriaLabel,
   currentRepository = null,
+  resuming = false,
 }: SiteImportListProps) {
   const t = useTranslations("sites.new");
   // Linked accounts without any granted repository stay selectable so their access can be adjusted.
@@ -189,10 +190,11 @@ export function SiteImportList({
   const [owner, setOwner] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [hasMoreBelow, setHasMoreBelow] = useState(false);
-  const { installing, install } = useSiteGitHubInstall({
+  const { installing: startingInstall, install } = useSiteGitHubInstall({
     organizationId,
     callbackPath: callbackPath ?? `/${organizationSlug}/sites/new`,
   });
+  const installing = startingInstall || resuming;
   const isLoading =
     useIsRefreshingImportableRepositories(organizationId) ||
     isLoadingRepositories;

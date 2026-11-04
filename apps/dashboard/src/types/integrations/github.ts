@@ -29,6 +29,11 @@ export interface GitHubRepositoryActionsProps {
 
 export type GitHubRepositoryDialog = "edit" | "token" | "delete" | null;
 
+export interface GitHubInstallRequestedNoticeProps {
+  onDismiss: () => void;
+  className?: string;
+}
+
 export interface GitHubRepositoryMenuProps extends GitHubRepositoryActionsProps {
   isEnabled: boolean;
   isPending: boolean;

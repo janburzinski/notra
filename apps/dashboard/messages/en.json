@@ -4682,6 +4682,11 @@
         "migrated": "Switched to GitHub App. Your repository settings were kept.",
         "migrationFailed": "Unable to switch to the GitHub App. Refresh the page and try again."
       },
+      "installRequested": {
+        "title": "Waiting for approval on GitHub",
+        "description": "We sent your request to the owners of the GitHub organization. Once one of them approves Notra AI, an owner can connect it here.",
+        "dismiss": "Dismiss"
+      },
       "callbackErrors": {
         "accountLinkCancelled": "GitHub access was not granted, so the GitHub App was not installed.",
         "installCancelled": "The GitHub installation was cancelled.",

@@ -4682,6 +4682,11 @@
         "migrated": "Zur GitHub App gewechselt. Deine Repository-Einstellungen wurden übernommen.",
         "migrationFailed": "Wechsel zur GitHub App fehlgeschlagen. Lade die Seite neu und versuche es erneut."
       },
+      "installRequested": {
+        "title": "Freigabe auf GitHub ausstehend",
+        "description": "Wir haben deine Anfrage an die Owner der GitHub-Organisation gesendet. Sobald einer von ihnen Notra AI freigibt, kann ein Owner sie hier verbinden.",
+        "dismiss": "Schließen"
+      },
       "callbackErrors": {
         "accountLinkCancelled": "Der Zugriff auf GitHub wurde nicht erlaubt, daher wurde die GitHub App nicht installiert.",
         "installCancelled": "Die GitHub-Installation wurde abgebrochen.",

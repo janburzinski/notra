@@ -1,5 +1,5 @@
 import { parseAsBoolean, parseAsString, useQueryStates } from "nuqs";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { useTranslations } from "use-intl";
 
@@ -34,6 +34,24 @@ export function useGitHubCallbackErrorToast() {
   }, [errorCode, setParams, t, tShared]);
 }
 
+/**
+ * GitHub returns here after an org member who is not an owner requests the
+ * app. Keeps the notice until dismissed so the page can explain what happens next.
+ */
+export function useGitHubInstallRequested() {
+  const [{ githubInstallRequested }, setParams] = useQueryStates(
+    { githubInstallRequested: parseAsBoolean },
+    { history: "replace" }
+  );
+  const [requested, setRequested] = useState(githubInstallRequested === true);
+  useEffect(() => {
+    if (githubInstallRequested) {
+      void setParams({ githubInstallRequested: null });
+    }
+  }, [githubInstallRequested, setParams]);
+  return { requested, dismiss: () => setRequested(false) };
+}
+
 export function useResumeGitHubInstall(params: GitHubInstallResumeParams) {
   const t = useTranslations("integrations.github.toasts");
   const [
@@ -52,6 +70,8 @@ export function useResumeGitHubInstall(params: GitHubInstallResumeParams) {
     { history: "replace" }
   );
   const resumedInstallRef = useRef(false);
+  // Finding linkable installations takes a moment after returning from GitHub.
+  const [resuming, setResuming] = useState(shouldResume === true);
   useEffect(() => {
     if (
       (!shouldResume &&
@@ -96,8 +116,13 @@ export function useResumeGitHubInstall(params: GitHubInstallResumeParams) {
       organizationId: params.organizationId,
       callbackPath: params.callbackPath,
       allowAccountConnection: false,
+      onPickerOpen: () => setResuming(false),
     }).then((result) => {
-      if (result.started || result.reason === "cancelled") {
+      if (result.started) {
+        return;
+      }
+      setResuming(false);
+      if (result.reason === "cancelled") {
         return;
       }
       toast.error(
@@ -115,4 +140,6 @@ export function useResumeGitHubInstall(params: GitHubInstallResumeParams) {
     setParams,
     t,
   ]);
+
+  return { resuming };
 }

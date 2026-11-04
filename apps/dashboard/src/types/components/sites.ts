@@ -659,6 +659,8 @@ export interface SiteImportListProps {
   actionLabel?: string;
   actionAriaLabel?: (repository: string) => string;
   currentRepository?: { owner: string; name: string } | null;
+  /** True while the install resumes after linking the user's GitHub account. */
+  resuming?: boolean;
 }
 
 export interface SiteImportRepositoryRowProps extends Pick<
