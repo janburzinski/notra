@@ -647,9 +647,11 @@ export async function release({
         }
         break;
       }
+      return true;
     } catch (error) {
       failures.push(error.message);
       await report(error.message);
+      return false;
     }
   };
   // Re-runs the planning checks (rollback, active deployment, ancestry) right
@@ -777,9 +779,9 @@ export async function release({
   };
   // The demo apps share a database that is migrated once before either builds;
   // after that every service ships independently.
-  const releaseUnkey = () =>
+  const releaseUnkey = (plans) =>
     Promise.all(
-      unkeyPlans.map(async (plan) => {
+      plans.map(async (plan) => {
         try {
           await deployUnkey(plan);
         } catch (error) {
@@ -789,40 +791,49 @@ export async function release({
       })
     );
 
-  // The dashboard build migrates the production database, so everything else,
-  // Unkey included, starts only once it is live; the rest then ships together.
-  await Promise.all(
-    builds.filter((project) => project.migratesDatabase).map(deployVercel)
+  const demoPlans = unkeyPlans.filter((plan) => plan.service.demoDatabase);
+  const productionPlans = unkeyPlans.filter(
+    (plan) => !plan.service.demoDatabase
   );
-  const migrated = failures.length === 0;
-  if (!migrated && unkeyPlans.length > 0) {
-    await report("unkey: skipped, the dashboard deployment failed");
-  }
-  // The migrator runs synchronously, so it finishes before any concurrent
-  // request is in flight instead of stalling their timeouts.
+  // The demo apps use only the demo database, which the release migrates
+  // itself. Unkey runs one deployment at a time per workspace, so they go
+  // first and build while the dashboard builds. The migrator runs
+  // synchronously, so it finishes before any request is in flight.
   if (
-    migrated &&
     env.DRY_RUN !== "true" &&
     env.DEMO_MIGRATION_DATABASE_URL &&
-    unkeyPlans.some((plan) => plan.service.demoDatabase && plan.changed)
+    demoPlans.some((plan) => plan.changed)
   ) {
     // A failure is reported by each demo deployment, which then stops.
     await migrateDemoDatabase().catch(() => {});
   }
+  const demoRelease = releaseUnkey(demoPlans);
+
+  // The dashboard build migrates the production database, so the other apps
+  // and production Unkey services start only once it is live.
+  // Demo failures land in the same list while this runs, so only the
+  // dashboard's own result decides whether production was migrated.
+  const migrated = (
+    await Promise.all(
+      builds.filter((project) => project.migratesDatabase).map(deployVercel)
+    )
+  ).every(Boolean);
+  if (!migrated && productionPlans.length > 0) {
+    await report(
+      "unkey: skipped production services, the dashboard deployment failed"
+    );
+  }
   await Promise.all([
     ...builds.filter((project) => !project.migratesDatabase).map(deployVercel),
-    ...(migrated ? [releaseUnkey()] : []),
+    ...(migrated ? [releaseUnkey(productionPlans)] : []),
+    demoRelease,
   ]);
 
   // Unkey's probe only proves the dashboard boots. Visitors also need the
   // migrated schema to be readable through the demo's own database role.
   // Unchanged demo builds are checked too, so a retry cannot skip a failure,
   // and an unrelated failed deployment does not hide one.
-  if (
-    migrated &&
-    env.DRY_RUN !== "true" &&
-    unkeyPlans.some((plan) => plan.service.demoDatabase)
-  ) {
+  if (env.DRY_RUN !== "true" && demoPlans.length > 0) {
     try {
       const expectedSha = unkeyDeployed.has("demo-dashboard") ? sha : null;
       // A shallow response (demo mode off) has no table count.

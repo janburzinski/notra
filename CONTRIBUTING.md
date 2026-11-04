@@ -741,9 +741,11 @@ this single shared CI credential, separate from runtime `UNKEY_ROOT_KEY`.
 After all four Unkey custom domains are verified and have current healthy deployments,
 run **Production deploy** with `dry_run` checked. Then disable production
 **Auto deploy** on both demo apps (keep their GitHub connection) and run a real
-release. The script checks all targets before any builds, migrates the demo
-database once, then deploys all four services in parallel and verifies the
-exact checked commit is current on each. The shared
+release. The script checks all targets before any builds and migrates the demo
+database once. Unkey runs one deployment at a time per workspace, so the demo
+apps start first and build while the production dashboard builds on Vercel;
+API and ingest follow once the dashboard has migrated the production database.
+It verifies the exact checked commit is current on each. The shared
 `UNKEY_DEPLOY_ROOT_KEY` enables all four Unkey releases; no additional flags are
 needed. Without the key, the demo apps are not released.
 Inaccessible Unkey targets fail closed, without permission-error fallback.

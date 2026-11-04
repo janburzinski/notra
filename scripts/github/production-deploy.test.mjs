@@ -286,13 +286,23 @@ test("a failed release gate stops the release before any build or live change", 
   assert.equal(toolchainUpserts(calls).length, 1);
 });
 
-test("the demo database is migrated once, after the dashboard and before the parallel releases", async () => {
-  const { calls, run, events } = fixture({ demo: true });
+test("the demo database is migrated before any build and the demo apps start while the dashboard builds", async () => {
+  const demoStarted = () =>
+    builds(calls).filter(({ body }) => body.app?.startsWith("app_demo-"))
+      .length === 2;
+  const { calls, run, events } = fixture({
+    demo: true,
+    // The dashboard only finishes once both demo deployments exist.
+    override: ({ url }) =>
+      url.pathname === "/v13/deployments/new-notra" && !demoStarted()
+        ? { readyState: "BUILDING" }
+        : undefined,
+  });
   await run();
-  // Only the dashboard build exists when the synchronous migrator runs.
+  // The synchronous migrator runs before any request is in flight.
   assert.deepEqual(
     events.filter((event) => event.startsWith("demo-migrate")),
-    ["demo-migrate@1"]
+    ["demo-migrate@0"]
   );
   assert.equal(builds(calls).length, 10);
 });
@@ -338,6 +348,55 @@ test("a demo app rolled back after planning stops the demo migration and both de
   assert.ok(!started.includes("app_demo-api"));
   assert.ok(!started.includes("app_demo-dashboard"));
   assert.equal(started.length, 8);
+});
+
+test("a demo failure during the dashboard build does not hold back production API and ingest", async () => {
+  let demoFailed = false;
+  const { run, calls } = fixture({
+    demo: true,
+    override: ({ url, body }) => {
+      if (
+        url.pathname === "/v2/deployments.getDeployment" &&
+        body.deploymentId === "new-demo-api"
+      ) {
+        demoFailed = true;
+        return {
+          id: body.deploymentId,
+          app: "demo-api",
+          project: "notra",
+          environment: "production",
+          status: "failed",
+        };
+      }
+      // The dashboard finishes only after the demo failure was recorded.
+      if (url.pathname === "/v13/deployments/new-notra" && !demoFailed) {
+        return { readyState: "BUILDING" };
+      }
+    },
+  });
+  await assert.rejects(run(), /demo-api deployment ended failed/);
+  const unkeyApps = builds(calls)
+    .filter(({ url }) => url.hostname === "api.unkey.com")
+    .map(({ body }) => body.app)
+    .sort();
+  assert.deepEqual(unkeyApps, [
+    "app_ai-traffic-ingest",
+    "app_demo-api",
+    "app_demo-dashboard",
+    "app_test",
+  ]);
+});
+
+test("the demo health check still runs when the production dashboard fails", async () => {
+  const { run, calls } = fixture({
+    demo: true,
+    override: ({ url }) =>
+      url.pathname === "/v13/deployments/new-notra"
+        ? { readyState: "ERROR", errorCode: "BUILD_FAILED" }
+        : undefined,
+  });
+  await assert.rejects(run(), /notra: deployment ended ERROR/);
+  assert.ok(calls.some(({ url }) => url.hostname === "demo.usenotra.com"));
 });
 
 test("dry runs do not wait for the release gates", async () => {
@@ -517,7 +576,7 @@ test("an unrelated failed deployment still runs the demo database check", async 
   assert.ok(calls.some(({ url }) => url.hostname === "demo.usenotra.com"));
 });
 
-test("a failed dashboard deployment starts no Unkey deployment", async () => {
+test("a failed dashboard deployment starts no production Unkey deployment", async () => {
   const { run, calls } = fixture({
     api: true,
     override: ({ url }) =>
@@ -526,10 +585,13 @@ test("a failed dashboard deployment starts no Unkey deployment", async () => {
         : undefined,
   });
   await assert.rejects(run(), /notra: deployment ended ERROR/);
-  assert.ok(
-    builds(calls).every(({ url }) => url.hostname === "api.vercel.com")
-  );
-  assert.equal(builds(calls).length, 6);
+  // The demo apps need only the demo database; API and ingest need the
+  // production migration the failed dashboard build would have run.
+  const unkeyApps = builds(calls)
+    .filter(({ url }) => url.hostname === "api.unkey.com")
+    .map(({ body }) => body.app)
+    .sort();
+  assert.deepEqual(unkeyApps, ["app_demo-api", "app_demo-dashboard"]);
 });
 
 test("dry run validates every target without creating any builds", async () => {
@@ -901,15 +963,14 @@ test("demo apps deploy to Unkey with the shared deployment key", async () => {
   const deployments = builds(calls).filter(
     ({ url }) => url.hostname === "api.unkey.com"
   );
+  // Unkey runs one deployment at a time, so the demo apps queue first.
   assert.deepEqual(
     deployments.map(({ body }) => body.app),
-    ["app_test", "app_ai-traffic-ingest", "app_demo-api", "app_demo-dashboard"]
+    ["app_demo-api", "app_demo-dashboard", "app_test", "app_ai-traffic-ingest"]
   );
   for (const { body } of deployments) {
     assert.deepEqual(body.git, { branch: "main", commitSha: sha });
   }
-  assert.ok(calls.indexOf(deployments[0]) < calls.indexOf(deployments[1]));
-  assert.ok(calls.indexOf(deployments[1]) < calls.indexOf(deployments[2]));
 });
 
 test("demo dry run validates both domains without starting builds", async () => {
@@ -997,7 +1058,7 @@ for (const app of ["demo-api", "demo-dashboard"]) {
     // The shared demo database is migrated once, before either demo build.
     assert.deepEqual(
       events.filter((event) => event.startsWith("demo-migrate")),
-      ["demo-migrate@1"]
+      ["demo-migrate@0"]
     );
     assert.deepEqual(
       builds(calls)
@@ -1018,7 +1079,9 @@ test("Unkey discovers the verified production domain and deploys the pinned comm
   const { run, calls, sha, directories } = fixture({ api: true });
   await run();
   const deployment = calls.find(
-    ({ url }) => url.pathname === "/v3/deployments.createDeployment"
+    ({ url, body }) =>
+      url.pathname === "/v3/deployments.createDeployment" &&
+      body.app === "app_test"
   );
   assert.deepEqual(deployment.body, {
     project: "proj_test",
