@@ -75,6 +75,7 @@ if (process.env.NOTRA_AUTOPILOT_WRITER_TEST !== "1") {
       projectId: null,
       repository,
       contentPath: "content/blog",
+      integrationContentPath: null,
       jobs: {
         readiness: true,
         keywords: true,

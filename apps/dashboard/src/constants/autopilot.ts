@@ -281,6 +281,9 @@ export const AUTOPILOT_BLOG_DIRECTORY_HINTS = [
   "src/app/blog",
   "_posts",
 ];
+/** Monorepo folders whose packages are searched for the hints above (apps/web/src/content/blog). */
+export const AUTOPILOT_WORKSPACE_ROOTS = ["apps", "packages"];
+export const AUTOPILOT_BLOG_DIRECTORY_FALLBACK = "content/blog";
 
 /** Templates added after launch start off; a workspace turns them on. */
 export const AUTOPILOT_DEFAULT_JOBS = {

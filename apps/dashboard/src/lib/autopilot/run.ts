@@ -5,8 +5,10 @@ import {
   autopilotRuns,
   autopilotSettings,
   brandSettings,
+  githubIntegrations,
   organizations,
   projects,
+  repositoryOutputs,
 } from "@notra/db/schema";
 import type { AutopilotJobKind } from "@notra/db/types/autopilot";
 import { and, asc, eq, gte, inArray, lt, or, sql } from "drizzle-orm";
@@ -40,6 +42,7 @@ import type {
   AutopilotObservationJob,
   AutopilotRunTrigger,
 } from "@/types/autopilot-runtime";
+import { integrationBlogDirectory } from "@/utils/autopilot-blog";
 import { toAutopilotCommitFilters } from "@/utils/autopilot-commit-filters";
 import { toErrorMessage } from "@/utils/error-message";
 
@@ -143,6 +146,30 @@ export function findAutopilotProject(
       });
 }
 
+/** The blog folder manual GitHub publishes to the same repository use. */
+async function findIntegrationContentPath(
+  organizationId: string,
+  repository: { owner: string; name: string }
+) {
+  const [output] = await db
+    .select({ config: repositoryOutputs.config })
+    .from(repositoryOutputs)
+    .innerJoin(
+      githubIntegrations,
+      eq(githubIntegrations.id, repositoryOutputs.repositoryId)
+    )
+    .where(
+      and(
+        eq(githubIntegrations.organizationId, organizationId),
+        eq(githubIntegrations.owner, repository.owner),
+        eq(githubIntegrations.repo, repository.name),
+        eq(repositoryOutputs.outputType, "blog_post")
+      )
+    )
+    .limit(1);
+  return integrationBlogDirectory(output?.config);
+}
+
 export async function buildAutopilotRunContext(
   organizationId: string,
   runId: string
@@ -195,6 +222,9 @@ export async function buildAutopilotRunContext(
     projectId: project?.id ?? null,
     repository,
     contentPath: settings.contentPath,
+    integrationContentPath: repository
+      ? await findIntegrationContentPath(organizationId, repository)
+      : null,
     jobs: { ...AUTOPILOT_DEFAULT_JOBS, ...settings.jobs },
     maxOpenPullRequests: settings.maxOpenPullRequests,
     stalePullRequestDays: settings.stalePullRequestDays,

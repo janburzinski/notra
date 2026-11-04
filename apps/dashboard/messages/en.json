@@ -9296,5 +9296,12 @@
       "unavailableDescription": "We couldn't load your workspace's Sites plan. Try again in a moment.",
       "brandingRequired": "The Free plan always shows the \"Powered by Notra\" badge. Upgrade to remove it."
     }
+  },
+  "autopilot": {
+    "settings": {
+      "blogFolder": "Blog folder",
+      "blogFolderDescription": "Where new posts go. Leave it empty to use your GitHub publishing path or find the folder automatically.",
+      "blogFolderPlaceholder": "Find automatically"
+    }
   }
 }

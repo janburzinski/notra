@@ -4,11 +4,13 @@ import {
   AiChat01Icon,
   Archive02Icon,
   Clock01Icon,
+  Folder01Icon,
   Github01Icon,
   PowerIcon,
   SlackIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
+import { Input } from "@notra/ui/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -19,6 +21,7 @@ import {
 import { Switch } from "@notra/ui/components/ui/switch";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { useTranslations } from "use-intl";
 
 import { AutopilotReleaseFiltersSection } from "@/components/autopilot/autopilot-release-filters-section";
 import { AutopilotRepositoryPicker } from "@/components/autopilot/autopilot-repository-picker";
@@ -75,6 +78,7 @@ export function AutopilotSettingsPanel({
   overview,
 }: AutopilotSettingsPanelProps) {
   const queryClient = useQueryClient();
+  const t = useTranslations("autopilot.settings");
   const { settings } = overview;
   const {
     githubConnected,
@@ -168,6 +172,32 @@ export function AutopilotSettingsPanel({
                 Connect
               </Button>
             )}
+          </SettingsRow>
+          <SettingsRow
+            description={t("blogFolderDescription")}
+            htmlFor="autopilot-blog-folder"
+            icon={Folder01Icon}
+            label={t("blogFolder")}
+          >
+            <Input
+              className="w-64"
+              defaultValue={settings.contentPath ?? ""}
+              id="autopilot-blog-folder"
+              // Remounts with the saved, normalized value after each save.
+              key={settings.contentPath ?? ""}
+              onBlur={(event) => {
+                const contentPath = event.currentTarget.value.trim();
+                if (contentPath !== (settings.contentPath ?? "")) {
+                  save.mutate({ contentPath: contentPath || null });
+                }
+              }}
+              onKeyDown={(event) => {
+                if (event.key === "Enter") {
+                  event.currentTarget.blur();
+                }
+              }}
+              placeholder={t("blogFolderPlaceholder")}
+            />
           </SettingsRow>
           <SettingsRow
             description={

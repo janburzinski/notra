@@ -33,6 +33,8 @@ export interface AutopilotRunContext {
   projectId: string | null;
   repository: AutopilotRepository | null;
   contentPath: string | null;
+  /** The blog folder from the repository's GitHub publishing settings. */
+  integrationContentPath: string | null;
   jobs: Record<AutopilotJobKind, boolean>;
   maxOpenPullRequests: number;
   /** Untouched drafts are closed after this many days; null keeps them. */

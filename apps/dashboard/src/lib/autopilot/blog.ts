@@ -140,7 +140,10 @@ export async function listBlogPostPaths(ctx: AutopilotRunContext) {
     ctx.repository
   );
   const paths = await listRepositoryPaths(octokit, ctx.repository);
-  const directory = detectBlogDirectory(paths, ctx.contentPath);
+  const directory = detectBlogDirectory(paths, {
+    setting: ctx.contentPath,
+    integration: ctx.integrationContentPath,
+  });
   return paths
     .filter(
       (path) => path.startsWith(`${directory}/`) && MARKDOWN_FILE.test(path)
@@ -352,7 +355,11 @@ export async function writeBlogDraft(params: {
   const directory =
     (claim.finding.kind === "comparisons"
       ? detectComparisonDirectory(paths)
-      : null) ?? detectBlogDirectory(paths, ctx.contentPath);
+      : null) ??
+    detectBlogDirectory(paths, {
+      setting: ctx.contentPath,
+      integration: ctx.integrationContentPath,
+    });
   const postPaths = paths.filter(
     (path) => path.startsWith(`${directory}/`) && MARKDOWN_FILE.test(path)
   );

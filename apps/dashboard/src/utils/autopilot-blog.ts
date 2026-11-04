@@ -3,14 +3,17 @@ import type {
   GeoPromptGapRow,
   GeoSearchGapRow,
 } from "@notra/geo-core/types/geo";
+import { repositoryContentDirectoryConfigSchema } from "@notra/schemas/dashboard/integrations";
 import { slugify } from "@notra/utils/slugify";
 
 import {
+  AUTOPILOT_BLOG_DIRECTORY_FALLBACK,
   AUTOPILOT_BLOG_DIRECTORY_HINTS,
   AUTOPILOT_BLOG_SLUG_MAX_CHARS,
   AUTOPILOT_KEYWORD_MAX_MENTION_RATE,
   AUTOPILOT_MARKDOWN_FILE,
   AUTOPILOT_SEARCH_GAP_MIN_IMPRESSIONS,
+  AUTOPILOT_WORKSPACE_ROOTS,
 } from "@/constants/autopilot";
 import { AUTOPILOT_COMPARISON_DIRECTORY_HINTS } from "@/constants/autopilot-comparisons";
 import { normalizeRepositoryDirectory } from "@/utils/autopilot-paths";
@@ -23,20 +26,86 @@ export function keywordFingerprint(keyword: string) {
   return `keyword:${autopilotBlogSlug(keyword)}`;
 }
 
+/**
+ * Where Autopilot writes posts: the Autopilot setting, then the GitHub
+ * publishing path, then a detected blog folder, then the default.
+ */
 export function detectBlogDirectory(
   paths: string[],
-  configured: string | null
+  configured: { setting: string | null; integration: string | null }
 ) {
-  const directory = configured && normalizeRepositoryDirectory(configured);
-  if (directory) {
-    return directory;
+  for (const path of [configured.setting, configured.integration]) {
+    const directory = path && normalizeRepositoryDirectory(path);
+    if (directory) {
+      return directory;
+    }
   }
-  const markdown = paths.filter((path) => AUTOPILOT_MARKDOWN_FILE.test(path));
+  return findBlogDirectory(paths) ?? AUTOPILOT_BLOG_DIRECTORY_FALLBACK;
+}
+
+/**
+ * The hinted folder with the most posts, at the root or inside a workspace
+ * (apps/web/src/content/blog). Ties go to the earlier hint, then the root,
+ * then the path, so the same tree always gives the same folder.
+ */
+function findBlogDirectory(paths: string[]) {
+  const candidates = new Map<
+    string,
+    { posts: number; hint: number; depth: number }
+  >();
+  for (const path of paths) {
+    if (!AUTOPILOT_MARKDOWN_FILE.test(path)) {
+      continue;
+    }
+    const [root, workspace] = path.split("/");
+    const prefixes = [""];
+    if (root && workspace && AUTOPILOT_WORKSPACE_ROOTS.includes(root)) {
+      prefixes.push(`${root}/${workspace}/`);
+    }
+    for (const prefix of prefixes) {
+      AUTOPILOT_BLOG_DIRECTORY_HINTS.forEach((hint, index) => {
+        const directory = `${prefix}${hint}`;
+        if (path.startsWith(`${directory}/`)) {
+          const candidate = candidates.get(directory);
+          candidates.set(directory, {
+            posts: (candidate?.posts ?? 0) + 1,
+            hint: index,
+            depth: prefix ? 1 : 0,
+          });
+        }
+      });
+    }
+  }
   return (
-    AUTOPILOT_BLOG_DIRECTORY_HINTS.find((hint) =>
-      markdown.some((path) => path.startsWith(`${hint}/`))
-    ) ?? "content/blog"
+    [...candidates.entries()].sort(
+      ([pathA, a], [pathB, b]) =>
+        b.posts - a.posts ||
+        a.hint - b.hint ||
+        a.depth - b.depth ||
+        (pathA < pathB ? -1 : 1)
+    )[0]?.[0] ?? null
   );
+}
+
+/** The folder a GitHub integration's blog publishing settings point at, if any. */
+export function integrationBlogDirectory(config: unknown) {
+  const parsed = repositoryContentDirectoryConfigSchema.safeParse(config);
+  if (!parsed.success) {
+    return null;
+  }
+  const { contentPath, directory } = parsed.data;
+  if (!contentPath) {
+    return directory ? normalizeRepositoryDirectory(directory) : null;
+  }
+  // "apps/web/src/content/blog/:slug.mdx" → "apps/web/src/content/blog"
+  const segments = contentPath.split("/");
+  const folder = segments
+    .slice(
+      0,
+      segments.findIndex((segment) => segment.includes(":slug"))
+    )
+    .join("/");
+  return folder ? normalizeRepositoryDirectory(folder) : null;
 }
 
 /** A directory the site keeps comparison pages in, when it has one with Markdown. */

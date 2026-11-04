@@ -9296,5 +9296,12 @@
       "unavailableDescription": "Der Sites-Tarif deines Workspace konnte nicht geladen werden. Versuch es gleich noch einmal.",
       "brandingRequired": "Im Free-Plan wird das „Powered by Notra“-Badge immer angezeigt. Upgrade, um es zu entfernen."
     }
+  },
+  "autopilot": {
+    "settings": {
+      "blogFolder": "Blog-Ordner",
+      "blogFolderDescription": "Hier landen neue Beiträge. Lass das Feld leer, um deinen GitHub-Veröffentlichungspfad zu nutzen oder den Ordner automatisch zu finden.",
+      "blogFolderPlaceholder": "Automatisch finden"
+    }
   }
 }
