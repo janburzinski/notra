@@ -3,19 +3,12 @@
 import { Cancel01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { POSTHOG_EVENTS } from "@notra/posthog/events";
-import { CopyStateIcon } from "@notra/ui/components/ui/copy-button";
-import { ClaudeAiIcon } from "@notra/ui/components/ui/svgs/claudeAiIcon";
-import { Grok } from "@notra/ui/components/ui/svgs/grok";
-import { GrokDark } from "@notra/ui/components/ui/svgs/grokDark";
-import { Openai } from "@notra/ui/components/ui/svgs/openai";
-import { OpenaiDark } from "@notra/ui/components/ui/svgs/openaiDark";
+import { AgentPromptButton } from "@notra/ui/components/ui/agent-prompt-button";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@notra/ui/components/ui/tooltip";
-import { useCopyToClipboard } from "@notra/ui/hooks/use-copy-to-clipboard";
-import { cn } from "@notra/ui/lib/utils";
 import {
   AnimatePresence,
   domAnimation,
@@ -23,7 +16,6 @@ import {
   m,
   useReducedMotion,
 } from "motion/react";
-import { useState } from "react";
 import { toast } from "sonner";
 import { useTranslations } from "use-intl";
 
@@ -32,21 +24,9 @@ import { localStorageKeys } from "@/constants/storage";
 import { trackEvent } from "@/lib/analytics/posthog-client";
 import { useIsClient } from "@/lib/hooks/use-is-client";
 import { useStoredDismissal } from "@/lib/hooks/use-stored-dismissal";
-import type {
-  ConnectAgentDismissButtonProps,
-  ConnectAgentSwapLabelProps,
-} from "@/types/connect-agent";
+import type { ConnectAgentDismissButtonProps } from "@/types/connect-agent";
 import { getConnectAgentPrompt } from "@/utils/connect-agent";
 import { toastCopyError } from "@/utils/copy-to-clipboard";
-
-// Solid circles, so each logo covers the one to its left.
-const LOGO_CLASSNAME =
-  "bg-background border-foreground/15 relative grid size-7 shrink-0 place-items-center rounded-full border";
-
-// Same label swap as CopyButton: the old label leaves upwards, the new one
-// rises in 70ms later.
-const SWAP_IN_CLASSNAME = "animate-button-swap-in [animation-delay:70ms]";
-const SWAP_OUT_CLASSNAME = "animate-button-swap-out";
 
 const PILL_HIDDEN = { opacity: 0, height: 0, paddingBottom: 0, scale: 0.96 };
 const PILL_SHOWN = { opacity: 1, height: "auto", paddingBottom: 6, scale: 1 };
@@ -57,24 +37,6 @@ const PILL_TRANSITION = {
   opacity: { duration: 0.12 },
 } as const;
 
-function AgentLogoStack() {
-  return (
-    <span aria-hidden="true" className="flex shrink-0 items-center">
-      <span className={LOGO_CLASSNAME}>
-        <ClaudeAiIcon className="size-3.5" />
-      </span>
-      <span className={cn(LOGO_CLASSNAME, "-ms-2")}>
-        <Openai className="size-3.5 dark:hidden" />
-        <OpenaiDark className="hidden size-3.5 dark:block" />
-      </span>
-      <span className={cn(LOGO_CLASSNAME, "-ms-2")}>
-        <Grok className="size-3.5 dark:hidden" />
-        <GrokDark className="hidden size-3.5 dark:block" />
-      </span>
-    </span>
-  );
-}
-
 function pillMotion(reduceMotion: boolean | null) {
   if (reduceMotion) {
     return {
@@ -84,41 +46,6 @@ function pillMotion(reduceMotion: boolean | null) {
     };
   }
   return { initial: PILL_HIDDEN, animate: PILL_SHOWN, exit: PILL_HIDDEN };
-}
-
-function SwapLabel({
-  copied,
-  animate,
-  label,
-  copiedLabel,
-}: ConnectAgentSwapLabelProps) {
-  const labelAnimation = copied ? SWAP_OUT_CLASSNAME : SWAP_IN_CLASSNAME;
-  const copiedAnimation = copied ? SWAP_IN_CLASSNAME : SWAP_OUT_CLASSNAME;
-
-  return (
-    <span className="grid min-w-0 flex-1 text-start">
-      <span
-        aria-hidden={copied}
-        className={cn(
-          "col-start-1 row-start-1 truncate motion-reduce:animate-none",
-          animate && labelAnimation,
-          copied && "opacity-0"
-        )}
-      >
-        {label}
-      </span>
-      <span
-        aria-hidden={!copied}
-        className={cn(
-          "col-start-1 row-start-1 motion-reduce:animate-none",
-          animate && copiedAnimation,
-          !copied && "opacity-0"
-        )}
-      >
-        {copiedLabel}
-      </span>
-    </span>
-  );
 }
 
 function DismissButton({ label, onDismiss }: ConnectAgentDismissButtonProps) {
@@ -134,23 +61,17 @@ function DismissButton({ label, onDismiss }: ConnectAgentDismissButtonProps) {
   );
 }
 
-function useConnectAgentCopy() {
+function useConnectAgentPrompt() {
   const t = useTranslations("connectAgent");
   const { activeOrganization } = useOrganizationsContext();
-  const { copied, copy } = useCopyToClipboard({ onError: toastCopyError });
-  const [hasCopied, setHasCopied] = useState(false);
   const prompt = getConnectAgentPrompt(activeOrganization);
 
-  async function copyPrompt() {
-    if (!(await copy(prompt))) {
-      return;
-    }
-    setHasCopied(true);
+  function onCopied() {
     toast.success(t("toast"));
     trackEvent(POSTHOG_EVENTS.AGENT_ONBOARD_PROMPT_COPIED);
   }
 
-  return { prompt, copied, hasCopied, copyPrompt };
+  return { prompt, onCopied };
 }
 
 export function ConnectAgentPill() {
@@ -163,7 +84,7 @@ export function ConnectAgentPill() {
   const { dismissed, dismiss } = useStoredDismissal(
     localStorageKeys.connectAgentDismissed
   );
-  const { prompt, copied, hasCopied, copyPrompt } = useConnectAgentCopy();
+  const { prompt, onCopied } = useConnectAgentPrompt();
   const visible = isClient && !dismissed;
 
   function handleDismiss() {
@@ -183,25 +104,16 @@ export function ConnectAgentPill() {
             <Tooltip>
               <TooltipTrigger
                 render={
-                  <button
-                    aria-label={copied ? tCommon("actions.copied") : t("label")}
-                    className="border-sidebar-border bg-background text-sidebar-foreground hover:bg-sidebar-accent focus-visible:ring-sidebar-ring duration-fast flex h-9 w-full cursor-pointer items-center gap-2 overflow-hidden rounded-full border ps-1 pe-3 text-sm font-medium transition-all ease-out outline-none focus-visible:ring-2 active:scale-[0.97] motion-reduce:transition-none"
-                    onClick={copyPrompt}
-                    type="button"
+                  <AgentPromptButton
+                    copiedLabel={tCommon("actions.copied")}
+                    label={t("label")}
+                    onCopy={onCopied}
+                    onCopyError={toastCopyError}
+                    prompt={prompt}
+                    variant="sidebar"
                   />
                 }
-              >
-                <AgentLogoStack />
-                <SwapLabel
-                  animate={hasCopied}
-                  copied={copied}
-                  copiedLabel={tCommon("actions.copied")}
-                  label={t("label")}
-                />
-                <span className="text-muted-foreground shrink-0">
-                  <CopyStateIcon copied={copied} iconClassName="size-3.5" />
-                </span>
-              </TooltipTrigger>
+              />
               <TooltipContent className="max-w-64" side="right" sideOffset={8}>
                 {prompt}
               </TooltipContent>
