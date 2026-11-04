@@ -47,6 +47,11 @@ export const GitHubAppRepositoryCacheSchema = Schema.Array(
   GitHubAppRepositorySchema
 );
 
+export const GitHubUserAccessTokenResponseSchema = Schema.Struct({
+  access_token: Schema.String,
+  expires_in: Schema.optional(Schema.Number),
+});
+
 export type GitHubAppInstallationResponse =
   typeof GitHubAppInstallationResponseSchema.Type;
 export type GitHubAppRepositoryResponse =
@@ -61,4 +66,7 @@ export const decodeGitHubAppRepositoriesResponse = Schema.decodeUnknownEffect(
 );
 export const decodeCachedGitHubAppRepositories = Schema.decodeUnknownEffect(
   GitHubAppRepositoryCacheSchema
+);
+export const decodeGitHubUserAccessTokenResponse = Schema.decodeUnknownEffect(
+  GitHubUserAccessTokenResponseSchema
 );

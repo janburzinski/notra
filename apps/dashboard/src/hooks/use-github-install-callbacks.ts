@@ -82,13 +82,14 @@ export function useResumeGitHubInstall(params: GitHubInstallResumeParams) {
         reauthorizationInstallationId
       );
       callbackUrl.searchParams.set("state", reauthorizationState);
-      reauthorizeGitHub(`${callbackUrl.pathname}${callbackUrl.search}`).then(
-        (started) => {
-          if (!started) {
-            toast.error(t("reconnectFailed"));
-          }
+      reauthorizeGitHub(
+        `${callbackUrl.pathname}${callbackUrl.search}`,
+        params.callbackPath
+      ).then((started) => {
+        if (!started) {
+          toast.error(t("reconnectFailed"));
         }
-      );
+      });
       return;
     }
     startGitHubInstall({

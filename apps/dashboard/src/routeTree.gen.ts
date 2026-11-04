@@ -89,6 +89,7 @@ import { Route as ApiInternalWorkflowsOnDemandContentRouteImport } from './route
 import { Route as ApiOrganizationsOrganizationIdChatRouteImport } from './routes/api.organizations.$organizationId.chat'
 import { Route as ApiUploadsContentImagesSplatRouteImport } from './routes/api.uploads.content-images.$'
 import { Route as ApiWebhooksGithubAppRouteImport } from './routes/api.webhooks.github.app'
+import { Route as ApiIntegrationsGithubAccountCallbackRouteImport } from './routes/api.integrations.github.account.callback'
 import { Route as ApiIntegrationsMcpOauthCallbackRouteImport } from './routes/api.integrations.mcp.oauth.callback'
 import { Route as ApiOrganizationsOrganizationIdAgentSplatRouteImport } from './routes/api.organizations.$organizationId.agent.$'
 import { Route as ApiOrganizationsOrganizationIdDashboardAgentChatRouteImport } from './routes/api.organizations.$organizationId.dashboard-agent.chat'
@@ -540,6 +541,12 @@ const ApiWebhooksGithubAppRoute = ApiWebhooksGithubAppRouteImport.update({
   path: '/api/webhooks/github/app',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiIntegrationsGithubAccountCallbackRoute =
+  ApiIntegrationsGithubAccountCallbackRouteImport.update({
+    id: '/api/integrations/github/account/callback',
+    path: '/api/integrations/github/account/callback',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiIntegrationsMcpOauthCallbackRoute =
   ApiIntegrationsMcpOauthCallbackRouteImport.update({
     id: '/api/integrations/mcp/oauth/callback',
@@ -701,6 +708,7 @@ export interface FileRoutesByFullPath {
   '/api/organizations/$organizationId/chat': typeof ApiOrganizationsOrganizationIdChatRouteWithChildren
   '/api/uploads/content-images/$': typeof ApiUploadsContentImagesSplatRoute
   '/api/webhooks/github/app': typeof ApiWebhooksGithubAppRoute
+  '/api/integrations/github/account/callback': typeof ApiIntegrationsGithubAccountCallbackRoute
   '/api/integrations/mcp/oauth/callback': typeof ApiIntegrationsMcpOauthCallbackRoute
   '/api/organizations/$organizationId/agent/$': typeof ApiOrganizationsOrganizationIdAgentSplatRoute
   '/api/organizations/$organizationId/dashboard-agent/chat': typeof ApiOrganizationsOrganizationIdDashboardAgentChatRouteWithChildren
@@ -796,6 +804,7 @@ export interface FileRoutesByTo {
   '/api/organizations/$organizationId/chat': typeof ApiOrganizationsOrganizationIdChatRouteWithChildren
   '/api/uploads/content-images/$': typeof ApiUploadsContentImagesSplatRoute
   '/api/webhooks/github/app': typeof ApiWebhooksGithubAppRoute
+  '/api/integrations/github/account/callback': typeof ApiIntegrationsGithubAccountCallbackRoute
   '/api/integrations/mcp/oauth/callback': typeof ApiIntegrationsMcpOauthCallbackRoute
   '/api/organizations/$organizationId/agent/$': typeof ApiOrganizationsOrganizationIdAgentSplatRoute
   '/api/organizations/$organizationId/dashboard-agent/chat': typeof ApiOrganizationsOrganizationIdDashboardAgentChatRouteWithChildren
@@ -892,6 +901,7 @@ export interface FileRoutesById {
   '/api/organizations/$organizationId/chat': typeof ApiOrganizationsOrganizationIdChatRouteWithChildren
   '/api/uploads/content-images/$': typeof ApiUploadsContentImagesSplatRoute
   '/api/webhooks/github/app': typeof ApiWebhooksGithubAppRoute
+  '/api/integrations/github/account/callback': typeof ApiIntegrationsGithubAccountCallbackRoute
   '/api/integrations/mcp/oauth/callback': typeof ApiIntegrationsMcpOauthCallbackRoute
   '/api/organizations/$organizationId/agent/$': typeof ApiOrganizationsOrganizationIdAgentSplatRoute
   '/api/organizations/$organizationId/dashboard-agent/chat': typeof ApiOrganizationsOrganizationIdDashboardAgentChatRouteWithChildren
@@ -989,6 +999,7 @@ export interface FileRouteTypes {
     | '/api/organizations/$organizationId/chat'
     | '/api/uploads/content-images/$'
     | '/api/webhooks/github/app'
+    | '/api/integrations/github/account/callback'
     | '/api/integrations/mcp/oauth/callback'
     | '/api/organizations/$organizationId/agent/$'
     | '/api/organizations/$organizationId/dashboard-agent/chat'
@@ -1084,6 +1095,7 @@ export interface FileRouteTypes {
     | '/api/organizations/$organizationId/chat'
     | '/api/uploads/content-images/$'
     | '/api/webhooks/github/app'
+    | '/api/integrations/github/account/callback'
     | '/api/integrations/mcp/oauth/callback'
     | '/api/organizations/$organizationId/agent/$'
     | '/api/organizations/$organizationId/dashboard-agent/chat'
@@ -1179,6 +1191,7 @@ export interface FileRouteTypes {
     | '/api/organizations/$organizationId/chat'
     | '/api/uploads/content-images/$'
     | '/api/webhooks/github/app'
+    | '/api/integrations/github/account/callback'
     | '/api/integrations/mcp/oauth/callback'
     | '/api/organizations/$organizationId/agent/$'
     | '/api/organizations/$organizationId/dashboard-agent/chat'
@@ -1269,6 +1282,7 @@ export interface RootRouteChildren {
   ApiOrganizationsOrganizationIdChatRoute: typeof ApiOrganizationsOrganizationIdChatRouteWithChildren
   ApiUploadsContentImagesSplatRoute: typeof ApiUploadsContentImagesSplatRoute
   ApiWebhooksGithubAppRoute: typeof ApiWebhooksGithubAppRoute
+  ApiIntegrationsGithubAccountCallbackRoute: typeof ApiIntegrationsGithubAccountCallbackRoute
   ApiIntegrationsMcpOauthCallbackRoute: typeof ApiIntegrationsMcpOauthCallbackRoute
   ApiOrganizationsOrganizationIdAgentSplatRoute: typeof ApiOrganizationsOrganizationIdAgentSplatRoute
   ApiOrganizationsOrganizationIdDashboardAgentChatRoute: typeof ApiOrganizationsOrganizationIdDashboardAgentChatRouteWithChildren
@@ -1839,6 +1853,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiWebhooksGithubAppRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/integrations/github/account/callback': {
+      id: '/api/integrations/github/account/callback'
+      path: '/api/integrations/github/account/callback'
+      fullPath: '/api/integrations/github/account/callback'
+      preLoaderRoute: typeof ApiIntegrationsGithubAccountCallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/integrations/mcp/oauth/callback': {
       id: '/api/integrations/mcp/oauth/callback'
       path: '/api/integrations/mcp/oauth/callback'
@@ -2122,6 +2143,8 @@ const rootRouteChildren: RootRouteChildren = {
     ApiOrganizationsOrganizationIdChatRouteWithChildren,
   ApiUploadsContentImagesSplatRoute: ApiUploadsContentImagesSplatRoute,
   ApiWebhooksGithubAppRoute: ApiWebhooksGithubAppRoute,
+  ApiIntegrationsGithubAccountCallbackRoute:
+    ApiIntegrationsGithubAccountCallbackRoute,
   ApiIntegrationsMcpOauthCallbackRoute: ApiIntegrationsMcpOauthCallbackRoute,
   ApiOrganizationsOrganizationIdAgentSplatRoute:
     ApiOrganizationsOrganizationIdAgentSplatRoute,

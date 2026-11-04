@@ -11,3 +11,11 @@ export function resolveGitHubSocialToken(
     ? decryptToken(connection.encryptedAccessToken)
     : null;
 }
+
+/** GitHub App user tokens expire after a few hours; sign-in tokens have no expiry. */
+export function isGitHubSocialTokenExpired(
+  expiresAt: Date | null | undefined,
+  now = new Date()
+) {
+  return Boolean(expiresAt && expiresAt <= now);
+}

@@ -36,22 +36,32 @@ async function linkInstallation(params: {
   );
 }
 
-function authorizeGitHub(callbackURL: string) {
+/**
+ * Links the user's GitHub account to the signed-in Notra user. Falls back to
+ * signing in with GitHub only when the GitHub App has no OAuth credentials,
+ * since sign-in picks whichever Notra login already owns that GitHub account.
+ */
+function authorizeGitHub(returnTo: string, callbackPath: string) {
   return Effect.tryPromise({
     try: async () => {
-      await startSocialSignInAction({
-        provider: "github",
-        returnTo: callbackURL,
+      const { url } = await dashboardOrpc.github.account.prepareLink.call({
+        returnTo,
+        callbackPath,
       });
+      if (url) {
+        window.location.assign(url);
+        return true;
+      }
+      await startSocialSignInAction({ provider: "github", returnTo });
       return true;
     },
     catch: (cause) => new GitHubInstallStartError({ cause }),
   });
 }
 
-export function reauthorizeGitHub(callbackURL: string) {
+export function reauthorizeGitHub(returnTo: string, callbackPath: string) {
   return Effect.runPromise(
-    authorizeGitHub(callbackURL).pipe(
+    authorizeGitHub(returnTo, callbackPath).pipe(
       Effect.match({
         onFailure: () => false,
         onSuccess: () => true,
@@ -122,7 +132,8 @@ export async function startGitHubInstall(params: {
             callbackUrl.searchParams.set("githubAccountConnected", "true");
 
             return authorizeGitHub(
-              `${callbackUrl.pathname}${callbackUrl.search}`
+              `${callbackUrl.pathname}${callbackUrl.search}`,
+              params.callbackPath
             );
           }
 

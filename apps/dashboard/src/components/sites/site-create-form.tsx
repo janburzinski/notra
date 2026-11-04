@@ -32,6 +32,10 @@ import {
   SITE_CREATE_STEP_IDS,
   SITE_CREATE_VALUE_FIELDS,
 } from "@/constants/site-create";
+import {
+  useGitHubCallbackErrorToast,
+  useResumeGitHubInstall,
+} from "@/hooks/use-github-install-callbacks";
 import { useActiveProject } from "@/lib/hooks/use-active-project";
 import { useCreateSite } from "@/lib/hooks/use-create-site";
 import { useCreateSites } from "@/lib/hooks/use-create-sites";
@@ -74,6 +78,11 @@ export function SiteCreateForm({
   const t = useTranslations("sites.new");
   const id = useId();
   const reduceMotion = useReducedMotion();
+  useGitHubCallbackErrorToast();
+  useResumeGitHubInstall({
+    organizationId,
+    callbackPath: `/${organizationSlug}/sites/new`,
+  });
 
   const importable = useImportableRepositories(organizationId);
   const connect = useConnectSiteRepository(organizationId);

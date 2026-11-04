@@ -20,13 +20,17 @@ import { customAlphabet } from "nanoid";
 import {
   GITHUB_APP_REPOSITORIES_CACHE_TTL_SECONDS,
   GITHUB_APP_REPOSITORIES_STALE_CACHE_TTL_SECONDS,
+  GITHUB_APP_USER_TOKEN_PREFIX,
   GITHUB_INSTALLATION_LOOKUP_CONCURRENCY,
   GITHUB_MEMBERSHIP_PAGE_LIMIT,
+  GITHUB_OAUTH_AUTHORIZE_URL,
+  GITHUB_OAUTH_TOKEN_URL,
 } from "../constants/github-app";
 import {
   decodeCachedGitHubAppRepositories,
   decodeGitHubAppInstallationResponse,
   decodeGitHubAppRepositoriesResponse,
+  decodeGitHubUserAccessTokenResponse,
   type GitHubAppInstallationResponse,
   type GitHubAppRepository,
   type GitHubAppRepositoryResponse,
@@ -62,7 +66,10 @@ import type {
 } from "../types/integrations";
 import type { GitHubToolRepositoryContext } from "../types/tools";
 import { githubAppInstallationCanPublishContent } from "../utils/github-app-publish-access";
-import { resolveGitHubSocialToken } from "../utils/github-social-token";
+import {
+  isGitHubSocialTokenExpired,
+  resolveGitHubSocialToken,
+} from "../utils/github-social-token";
 import {
   createOctokit,
   GITHUB_INTERACTIVE_READ_TIMEOUT_MS,
@@ -492,8 +499,9 @@ async function assertGitHubInstallationAdmin(params: {
 
   const tokenScopes =
     userResponse.headers["x-oauth-scopes"] ?? githubAccount.scope;
+  const isAppUserToken = accessToken.startsWith(GITHUB_APP_USER_TOKEN_PREFIX);
 
-  if (!hasGitHubScope(tokenScopes, "read:org")) {
+  if (!(isAppUserToken || hasGitHubScope(tokenScopes, "read:org"))) {
     throw new GitHubReauthorizationRequiredError();
   }
 
@@ -514,11 +522,93 @@ async function assertGitHubInstallationAdmin(params: {
     if (error instanceof GitHubInstallationAccessDeniedError) {
       throw error;
     }
-    if (status === 401 || status === 403) {
+    // Reauthorizing cannot widen a GitHub App token; only the app's permissions can.
+    if (status === 401 || (status === 403 && !isAppUserToken)) {
       throw new GitHubReauthorizationRequiredError();
     }
     throw new GitHubInstallationAccessDeniedError();
   }
+}
+
+export function getGitHubAppOAuthConfig() {
+  const clientId = process.env.GITHUB_APP_CLIENT_ID;
+  const clientSecret = process.env.GITHUB_APP_CLIENT_SECRET;
+  return clientId && clientSecret ? { clientId, clientSecret } : null;
+}
+
+export function getGitHubAppUserAuthorizeUrl(params: {
+  clientId: string;
+  redirectUri: string;
+  state: string;
+}) {
+  const url = new URL(GITHUB_OAUTH_AUTHORIZE_URL);
+  url.searchParams.set("client_id", params.clientId);
+  url.searchParams.set("redirect_uri", params.redirectUri);
+  url.searchParams.set("state", params.state);
+  return url.toString();
+}
+
+/**
+ * Saves the GitHub account the user just authorized on that Notra user. Unlike
+ * signing in with GitHub, this works when the GitHub account is already the
+ * sign-in method of another Notra login.
+ */
+export async function linkGitHubUserAccount(params: {
+  userId: string;
+  code: string;
+  redirectUri: string;
+}) {
+  const config = getGitHubAppOAuthConfig();
+  if (!config) {
+    throw new GitHubAppNotConfiguredError();
+  }
+
+  const response = await fetch(GITHUB_OAUTH_TOKEN_URL, {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      client_id: config.clientId,
+      client_secret: config.clientSecret,
+      code: params.code,
+      redirect_uri: params.redirectUri,
+    }),
+  });
+  if (!response.ok) {
+    throw new Error(
+      `GitHub token exchange failed with status ${response.status}`
+    );
+  }
+  const token = await Effect.runPromise(
+    decodeGitHubUserAccessTokenResponse(await response.json())
+  );
+  const { data: githubUser } = await createOctokit(token.access_token).request(
+    "GET /user",
+    { headers: GITHUB_API_VERSION_HEADERS }
+  );
+
+  const connection = {
+    providerAccountId: String(githubUser.id),
+    encryptedAccessToken: encryptToken(token.access_token),
+    scope: null,
+    accessTokenExpiresAt: token.expires_in
+      ? new Date(Date.now() + token.expires_in * 1000)
+      : null,
+  };
+  await db
+    .insert(socialConnections)
+    .values({
+      id: crypto.randomUUID(),
+      userId: params.userId,
+      provider: "github",
+      ...connection,
+    })
+    .onConflictDoUpdate({
+      target: [socialConnections.userId, socialConnections.provider],
+      set: connection,
+    });
 }
 
 export async function isGitHubAccountConnectionRequired(userId: string) {
@@ -529,10 +619,15 @@ export async function isGitHubAccountConnectionRequired(userId: string) {
     ),
     columns: {
       encryptedAccessToken: true,
+      accessTokenExpiresAt: true,
     },
   });
 
-  return !githubAccount?.encryptedAccessToken;
+  // Relinking an expired token is one redirect since the app is already authorized.
+  return (
+    !githubAccount?.encryptedAccessToken ||
+    isGitHubSocialTokenExpired(githubAccount.accessTokenExpiresAt)
+  );
 }
 
 function toRepositoryRecord(integration: {

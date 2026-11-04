@@ -4675,6 +4675,7 @@
         "migrationFailed": "Wechsel zur GitHub App fehlgeschlagen. Lade die Seite neu und versuche es erneut."
       },
       "callbackErrors": {
+        "accountLinkCancelled": "Der Zugriff auf GitHub wurde nicht erlaubt, daher wurde die GitHub App nicht installiert.",
         "installCancelled": "Die GitHub-Installation wurde abgebrochen.",
         "invalidCallback": "Beim GitHub-Callback fehlten erforderliche Parameter. Versuch es nochmal.",
         "expiredState": "Der GitHub-Installationslink ist abgelaufen. Verbinde dich noch einmal.",

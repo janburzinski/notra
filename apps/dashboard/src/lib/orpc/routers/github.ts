@@ -7,6 +7,8 @@ import {
   GitHubReauthorizationRequiredError,
   getCachedGitHubAppCanPublish,
   getGitHubAppInstallUrl,
+  getGitHubAppOAuthConfig,
+  getGitHubAppUserAuthorizeUrl,
   getSelectedGitHubAppRepositoryIds,
   githubAppRepositoryCacheIsWarm,
   isGitHubAccountConnectionRequired,
@@ -25,11 +27,13 @@ import {
 } from "@notra/ai/utils/octokit";
 import { redis } from "@notra/ai/utils/redis";
 import { logError } from "@notra/ai/utils/server-log";
+import { getAppUrl } from "@notra/ai/utils/url";
 import { POSTHOG_EVENTS } from "@notra/posthog/events";
 import { organizationIdInputSchema } from "@notra/schemas/dashboard/auth/organization";
 import {
   disconnectGitHubAppInputSchema,
   linkGitHubAppInstallationInputSchema,
+  prepareGitHubAccountLinkInputSchema,
   type PrepareInstallUrlInput,
   prepareInstallUrlInputSchema,
   probeRepositoryInputSchema,
@@ -38,6 +42,8 @@ import {
 import { Data, Effect } from "effect";
 
 import {
+  GITHUB_ACCOUNT_LINK_CALLBACK_PATH,
+  GITHUB_ACCOUNT_LINK_STATE_PREFIX,
   GITHUB_INSTALL_STATE_TTL_SECONDS,
   REPOSITORY_PROBE_UNAVAILABLE_CODE,
 } from "@/constants/github";
@@ -433,6 +439,34 @@ export const githubRouter = {
         });
 
         return { accountId: installation.accountId };
+      }),
+  },
+  account: {
+    /** Returns null when the GitHub App has no OAuth credentials, so the client falls back to GitHub sign-in. */
+    prepareLink: authorizedProcedure
+      .input(prepareGitHubAccountLinkInputSchema)
+      .handler(async ({ context, input }) => {
+        assertNotDemo();
+        const config = getGitHubAppOAuthConfig();
+        const appUrl = getAppUrl();
+        if (!(config && appUrl && redis)) {
+          return { url: null };
+        }
+
+        const state = crypto.randomUUID();
+        await redis.set(
+          `${GITHUB_ACCOUNT_LINK_STATE_PREFIX}${state}`,
+          JSON.stringify({ ...input, userId: context.user.id }),
+          { ex: GITHUB_INSTALL_STATE_TTL_SECONDS }
+        );
+
+        return {
+          url: getGitHubAppUserAuthorizeUrl({
+            clientId: config.clientId,
+            redirectUri: `${appUrl}${GITHUB_ACCOUNT_LINK_CALLBACK_PATH}`,
+            state,
+          }),
+        };
       }),
   },
   probeRepository: authorizedProcedure

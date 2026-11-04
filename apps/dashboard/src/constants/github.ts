@@ -4,10 +4,14 @@ import type {
 } from "@/types/integrations/github";
 
 export const GITHUB_INSTALL_STATE_TTL_SECONDS = 1800;
+export const GITHUB_ACCOUNT_LINK_STATE_PREFIX = "github_account_link:";
+export const GITHUB_ACCOUNT_LINK_CALLBACK_PATH =
+  "/api/integrations/github/account/callback";
 export const GITHUB_CALLBACK_ERROR_MESSAGE_KEYS: Record<
   string,
   GitHubCallbackErrorMessageKey
 > = {
+  account_link_cancelled: "accountLinkCancelled",
   install_cancelled: "installCancelled",
   invalid_callback: "invalidCallback",
   expired_state: "expiredState",
