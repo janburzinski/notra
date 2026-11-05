@@ -140,6 +140,9 @@ test("custom events cannot substitute for page views", () => {
     let body = event.body;
     let url = event.url;
     switch (event.provider) {
+      case "capless":
+        body = body?.replace('"pageview"', '"custom"') ?? null;
+        break;
       case "databuddy":
         body = body?.replace("screen_view", "click") ?? null;
         break;

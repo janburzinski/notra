@@ -5,6 +5,16 @@ export const ANALYTICS_PAGE = "http://acme.localhost:4321/blog/hello-world";
 // Real SDK wire formats, not the stand-ins' deliberately simpler payloads.
 export const LIVE_PAGE_VIEWS: CollectedEvent[] = [
   {
+    provider: "capless",
+    url: "https://c.capless.sh/e?k=cs_e2e0000000000000000",
+    method: "POST",
+    body: JSON.stringify({
+      c: { a: "anon", s: "session", v: "0.1.4" },
+      e: [["pageview", 0, ANALYTICS_PAGE, { n: "load", t: "Hello" }]],
+    }),
+    at: 0,
+  },
+  {
     provider: "databuddy",
     url: "https://basket.databuddy.cc/batch?client_id=e2e_databuddy_client",
     method: "POST",

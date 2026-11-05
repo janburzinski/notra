@@ -1,4 +1,5 @@
 import {
+  CAPLESS_KEY,
   C15T_ACTION_DIRECTIONS,
   C15T_BAR_POSITIONS,
   C15T_COLOR_TOKENS,
@@ -51,6 +52,21 @@ const httpsBaseUrlSchema = z
   .optional();
 
 const optionalBooleanSchema = z.boolean().optional();
+
+const caplessSchema = z.strictObject({
+  key: z
+    .string({
+      error: "Copy the public key (cs_…) from your Capless tracking code",
+    })
+    .trim()
+    .regex(
+      CAPLESS_KEY,
+      "Copy the public key (cs_…) from your Capless tracking code"
+    )
+    .describe(
+      "Public Capless ingest key (cs_…) from your tracking code (data-key). It can only write events, so it is safe in HTML."
+    ),
+});
 
 const ga4Schema = z.strictObject({
   measurementId: z
@@ -407,6 +423,7 @@ const databuddySchema = z.strictObject({
 } satisfies DatabuddySchemaShape);
 
 export const siteIntegrationSchemas = {
+  capless: caplessSchema,
   databuddy: databuddySchema,
   ga4: ga4Schema,
   plausible: plausibleSchema,
@@ -415,6 +432,10 @@ export const siteIntegrationSchemas = {
 };
 
 export const siteIntegrationUpdateSchema = z.discriminatedUnion("provider", [
+  z.object({
+    provider: z.literal("capless"),
+    settings: caplessSchema.nullable(),
+  }),
   z.object({
     provider: z.literal("databuddy"),
     settings: databuddySchema.nullable(),
@@ -436,6 +457,7 @@ export const siteIntegrationUpdateSchema = z.discriminatedUnion("provider", [
 
 export const siteIntegrationsSchema = z
   .strictObject({
+    capless: caplessSchema.optional(),
     databuddy: databuddySchema.optional(),
     ga4: ga4Schema.optional(),
     plausible: plausibleSchema.optional(),

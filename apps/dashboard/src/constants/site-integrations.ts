@@ -1,4 +1,5 @@
 import { Tick02Icon } from "@hugeicons/core-free-icons";
+import { Capless } from "@notra/ui/components/ui/svgs/capless";
 import { Databuddy } from "@notra/ui/components/ui/svgs/databuddy";
 import { GoogleAnalytics } from "@notra/ui/components/ui/svgs/googleAnalytics";
 import { Plausible } from "@notra/ui/components/ui/svgs/plausible";
@@ -38,6 +39,13 @@ export const SITE_INTEGRATION_PROVIDERS: readonly SiteIntegrationProvider[] = [
       { key: "trackOutgoingLinks", type: "boolean", defaultValue: false },
       { key: "trackInteractions", type: "boolean", defaultValue: false },
     ],
+  },
+  {
+    id: "capless",
+    name: "Capless",
+    logo: Capless,
+    docsUrl: "https://analytics.capless.sh/docs/web-sdk",
+    fields: [{ key: "key", placeholder: "cs_…" }],
   },
   {
     id: "ga4",

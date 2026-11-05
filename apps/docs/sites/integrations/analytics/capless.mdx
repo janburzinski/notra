@@ -1,0 +1,55 @@
+---
+title: "Capless"
+description: "Send visits on your Notra site to Capless analytics with your public key."
+authors:
+  - handle: jan
+
+docolin:
+  schema_version: 1
+  kind: tools/notra/sites/integrations/analytics/capless
+  type: how-to
+  applies_to:
+    - notra
+  language: en
+  status: stable
+---
+
+<Info>
+  The Capless integration is in beta.
+</Info>
+
+Notra loads the Capless tracker on every live page and allows its origin in the CSP. The only value it needs is your public key, which can only write events, so it is safe to publish.
+
+<Steps>
+  <Step title="Copy your public key">
+    In Capless, open your tracking code and copy the `cs_…` value from `data-key`. See [Capless's web SDK docs](https://analytics.capless.sh/docs/web-sdk).
+  </Step>
+  <Step title="Add it to Notra">
+    Open **Studio → Sites**, select your site, open **Integrations** and click **Add Capless**. Paste the key into **Public key**. To configure it in your repository instead, add it to `blog.json`:
+
+    ```json blog.json
+    {
+      "$schema": "https://usenotra.com/schemas/blog.json",
+      "name": "Acme",
+      "integrations": {
+        "capless": {
+          "key": "cs_your_public_key"
+        }
+      }
+    }
+    ```
+  </Step>
+  <Step title="Publish and verify">
+    After you [publish the change](/sites/integrations/analytics/overview#set-up-in-the-dashboard) and the production deployment finishes, visit your live site and check that the visit appears in Capless.
+  </Step>
+</Steps>
+
+Notra loads `https://c.capless.sh/c.js` and allows `https://c.capless.sh` in `script-src` and `connect-src`. Capless sets no cookies, but it keeps an anonymous visitor ID in local storage.
+
+## Session replay
+
+Capless records a session replay of every visit by default. Notra has no setting for it, because Capless controls replay per project. To record fewer sessions or none, lower the replay sample rate in your Capless project settings, or set it to 0 to turn replay off. Capless masks form inputs and never records password fields. To hide other content, add `data-capless-block` to the element. See [Capless's web SDK docs](https://analytics.capless.sh/docs/web-sdk).
+
+## With the cookie banner
+
+When the [c15t cookie banner](/sites/integrations/consent/c15t) is on, the Capless script is left out of the page and only loads after a visitor allows the measurement category. Visitors who reject are never tracked.

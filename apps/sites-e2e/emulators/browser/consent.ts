@@ -3,6 +3,7 @@ import { join } from "node:path";
 
 import type { Route } from "playwright";
 
+import { capless } from "./providers/capless";
 import type { CollectedEvent } from "./types";
 
 // The c15t backend a consent-banner site saves choices to. `/init` answers
@@ -10,8 +11,12 @@ import type { CollectedEvent } from "./types";
 // fixtures/c15t-init.json); every other call is recorded and acknowledged.
 export const CONSENT_BACKEND_URL = "https://consent.sites-e2e.example";
 
+// Capless loads only through the banner, never from the page's own HTML.
 export function consentIntegrations() {
-  return { c15t: { backendURL: CONSENT_BACKEND_URL } };
+  return {
+    c15t: { backendURL: CONSENT_BACKEND_URL },
+    capless: capless.settings,
+  };
 }
 
 export async function answerConsentBackend(

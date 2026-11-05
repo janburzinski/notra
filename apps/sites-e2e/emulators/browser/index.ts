@@ -6,6 +6,7 @@ import { gunzipSync } from "node:zlib";
 import type { BrowserContext, Request } from "playwright";
 
 import { answerConsentBackend, CONSENT_BACKEND_URL } from "./consent";
+import { capless } from "./providers/capless";
 import { databuddy } from "./providers/databuddy";
 import { ga4 } from "./providers/ga4";
 import { plausible } from "./providers/plausible";
@@ -17,6 +18,7 @@ import type { AnalyticsProvider, CollectedEvent, VendorScripts } from "./types";
 // write providers/<name>.ts (and its stand-in script in fixtures/) and list
 // it here; the site build, routing, CSP and payload checks pick it up.
 export const ANALYTICS_PROVIDERS: AnalyticsProvider[] = [
+  capless,
   databuddy,
   ga4,
   plausible,

@@ -125,6 +125,7 @@ export function patchConfigValue(
   if (
     value === "" &&
     [
+      "integrations.capless.key",
       "integrations.ga4.measurementId",
       "integrations.plausible.domain",
       "integrations.posthog.apiKey",

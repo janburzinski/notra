@@ -7,6 +7,7 @@ import { siteIntegrationUpdateSchema } from "../src/schemas/site-integrations";
 import { buildSiteContentSecurityPolicy } from "../src/utils/content-security-policy";
 import { sortCustomScriptPaths } from "../src/utils/custom-scripts";
 import {
+  analyticsGatedByConsent,
   inlineScriptLiteral,
   integrationCspSources,
   integrationHeadScripts,
@@ -366,6 +367,34 @@ describe("head scripts", () => {
       .join("");
     expect(code).not.toContain("location");
     expect(code).not.toContain("cookie");
+  });
+
+  test("Capless loads at once with its public key and permits its single origin", () => {
+    const integrations = { capless: { key: "cs_abcdefghijklmnop" } };
+    expect(integrationHeadScripts(integrations)).toEqual([
+      {
+        kind: "external",
+        src: "https://c.capless.sh/c.js",
+        attributes: { async: true, "data-key": integrations.capless.key },
+      },
+    ]);
+    expect(integrationCspSources(integrations)).toEqual({
+      scriptSrc: ["https://c.capless.sh"],
+      connectSrc: ["https://c.capless.sh"],
+    });
+    expect(analyticsGatedByConsent(integrations)).toBe(false);
+    expect(
+      analyticsGatedByConsent({
+        ...integrations,
+        c15t: { backendURL: "https://acme.inth.app", devTools: true },
+      })
+    ).toBe(true);
+    expect(
+      issuePaths({ integrations: { capless: { key: 'cs_x"><script>' } } })
+    ).toEqual(["integrations.capless.key"]);
+    expect(
+      issuePaths({ integrations: { capless: { key: "phc_abcdefghijklmnop" } } })
+    ).toEqual(["integrations.capless.key"]);
   });
 
   test("Umami Cloud uses its public Website ID and permits the collection gateway", () => {

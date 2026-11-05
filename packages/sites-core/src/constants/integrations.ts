@@ -23,6 +23,9 @@ export const DATABUDDY_MAX_DELAY_MS = 60_000;
 export const CAMEL_CASE_BOUNDARY = /[A-Z]/g;
 export const TRAILING_SLASHES = /\/+$/;
 
+export const CAPLESS_SCRIPT_URL = "https://c.capless.sh/c.js";
+export const CAPLESS_KEY = /^cs_[A-Za-z0-9_-]{8,128}$/;
+
 export const PLAUSIBLE_SCRIPT_URL = "https://plausible.io/js/script.js";
 
 export const POSTHOG_DEFAULT_API_HOST = "https://us.i.posthog.com";

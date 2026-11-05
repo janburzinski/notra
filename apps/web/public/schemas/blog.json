@@ -1452,6 +1452,18 @@
       "description": "Analytics providers and the c15t consent banner for the live site. Notra installs their scripts automatically. Preview deployments and local development do not send provider events.",
       "type": "object",
       "properties": {
+        "capless": {
+          "type": "object",
+          "properties": {
+            "key": {
+              "type": "string",
+              "pattern": "^cs_[A-Za-z0-9_-]{8,128}$",
+              "description": "Public Capless ingest key (cs_…) from your tracking code (data-key). It can only write events, so it is safe in HTML."
+            }
+          },
+          "required": ["key"],
+          "additionalProperties": false
+        },
         "databuddy": {
           "type": "object",
           "properties": {

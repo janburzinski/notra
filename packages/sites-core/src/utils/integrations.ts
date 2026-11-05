@@ -1,4 +1,5 @@
 import {
+  CAPLESS_SCRIPT_URL,
   DATABUDDY_API_URL,
   DATABUDDY_REPLAY_SCRIPT_URL,
   DATABUDDY_SCRIPT_URL,
@@ -33,7 +34,14 @@ export function integrationHeadScripts(
   const onHostingDomain =
     hostingDomain &&
     `("."+location.hostname).endsWith(${inlineScriptLiteral(`.${hostingDomain}`)})`;
-  const { databuddy, ga4, plausible, posthog, umami } = integrations;
+  const { capless, databuddy, ga4, plausible, posthog, umami } = integrations;
+  if (capless) {
+    scripts.push({
+      kind: "external",
+      src: CAPLESS_SCRIPT_URL,
+      attributes: { async: true, "data-key": capless.key },
+    });
+  }
   if (databuddy) {
     const { scriptUrl, replay, ...options } = databuddy;
     scripts.push({
@@ -121,9 +129,15 @@ export function integrationCspSources(
 ): SiteCspSources {
   const scriptSrc: string[] = [];
   const connectSrc: string[] = [];
-  const { c15t, databuddy, ga4, plausible, posthog, umami } = integrations;
+  const { c15t, capless, databuddy, ga4, plausible, posthog, umami } =
+    integrations;
   if (c15t) {
     connectSrc.push(new URL(c15t.backendURL).origin);
+  }
+  if (capless) {
+    const origin = new URL(CAPLESS_SCRIPT_URL).origin;
+    scriptSrc.push(origin);
+    connectSrc.push(origin);
   }
   if (databuddy) {
     scriptSrc.push(new URL(databuddy.scriptUrl ?? DATABUDDY_SCRIPT_URL).origin);

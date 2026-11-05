@@ -12,6 +12,7 @@ import {
 
 test("every dashboard provider submits the same shape accepted by the API", () => {
   const settings = {
+    capless: { key: "cs_abcdefghijklmnop" },
     databuddy: {
       clientId: "3ed1fce1-5a56-4cbc-a917-66864f6d18e3",
       trackWebVitals: true,
@@ -134,6 +135,7 @@ test("Umami Cloud needs only a Website ID and invalid inputs cannot autosave", (
     hostUrl: expect.any(String),
   });
   expect(SITE_INTEGRATION_PROVIDERS.map((entry) => entry.id).sort()).toEqual([
+    "capless",
     "databuddy",
     "ga4",
     "plausible",

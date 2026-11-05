@@ -3,10 +3,12 @@ import assert from "node:assert/strict";
 import { SITE_ANALYTICS_EVENT_FILE } from "@notra/sites-core/constants/sites";
 import type { BrowserContext, Page } from "playwright";
 
+import { capless } from "../../emulators/browser/providers/capless";
 import type { IngestRequest } from "../types/harness";
 import { isEngagement } from "./ingest";
 
 const SEARCH_REFERRER = "https://www.google.com/";
+const CAPLESS_ORIGIN = new URL(capless.script).origin;
 const INSIGHTS_SCRIPT = 'script[src$="/_notra/insights.js"]';
 
 function isViewBeacon(url: string, method: string, body: string | null) {
@@ -50,7 +52,11 @@ export async function assertConsentVisits(options: {
       );
     });
   const viewBeacons: string[] = [];
+  const caplessRequests: string[] = [];
   page.on("request", (request) => {
+    if (request.url().startsWith(`${CAPLESS_ORIGIN}/`)) {
+      caplessRequests.push(request.url());
+    }
     if (isViewBeacon(request.url(), request.method(), request.postData())) {
       viewBeacons.push(request.postData() ?? "");
     }
@@ -76,11 +82,39 @@ export async function assertConsentVisits(options: {
     /<script type="text\/plain" data-c15t-category="measurement" src="\/blog\/_notra\/insights\.js" data-endpoint="\/blog\/_notra\/e" data-view defer><\/script>/,
     "a visitor without a stored grant gets the gated view reporter"
   );
+  assert.ok(
+    !((await first?.text()) ?? "").includes(capless.script),
+    "Capless is not in the HTML when the banner gates analytics"
+  );
+  await page
+    .getByRole("button", { name: /accept/i })
+    .first()
+    .waitFor({ state: "visible" });
+  assert.deepEqual(caplessRequests, [], "Capless waits for consent");
+  const caplessPageView = page.waitForRequest(
+    (request) =>
+      request.url().startsWith(capless.endpoint) && request.method() === "POST"
+  );
   await page
     .getByRole("button", { name: /accept/i })
     .first()
     .click();
   const beacon = await accepted;
+  const caplessEvent = await caplessPageView;
+  assert.equal(
+    new URL(caplessEvent.url()).searchParams.get("k"),
+    capless.identifier,
+    "Capless loads after the grant with the configured key"
+  );
+  assert.equal(
+    await page
+      .locator(
+        `script[src="${capless.script}"][data-key="${capless.identifier}"]`
+      )
+      .count(),
+    1,
+    "c15t injects the Capless script with its data-key"
+  );
   assert.equal((await beacon.response())?.status(), 204);
   assert.ok(
     (await context.cookies(origin)).some((cookie) => cookie.name === "c15t"),
@@ -122,12 +156,18 @@ export async function assertConsentVisits(options: {
   from = ingest.length;
   const beaconsBefore = viewBeacons.length;
   await page.goto(rejectedLanding, { referer: SEARCH_REFERRER });
+  const caplessBefore = caplessRequests.length;
   await page
     .getByRole("button", { name: /reject/i })
     .first()
     .click();
   await page.waitForFunction(() => document.cookie.includes("c15t="));
   await page.goto(rejectedNext, { referer: rejectedLanding });
+  assert.equal(
+    caplessRequests.length,
+    caplessBefore,
+    "a rejection never loads Capless"
+  );
   await page.evaluate(() => window.dispatchEvent(new Event("pagehide")));
   await settle();
   assert.deepEqual(views(from), [
@@ -146,7 +186,7 @@ export async function assertConsentVisits(options: {
     await page.locator(`${INSIGHTS_SCRIPT}[data-c15t-activated]`).count(),
     0
   );
-  return "consent banner: without a stored grant the page reports its own view; accept counts the landing view once with its search referrer and later pages server-side; reject sends no view or engagement and every server report carries no consent";
+  return "consent banner: Capless stays out of the HTML and loads only after accept, with its key, and never after reject; without a stored grant the page reports its own view; accept counts the landing view once with its search referrer and later pages server-side; reject sends no view or engagement and every server report carries no consent";
 }
 
 // The same banner served over HTTPS, as in production: the choice lives in a

@@ -301,7 +301,8 @@
                   "sites/integrations/analytics/google-analytics",
                   "sites/integrations/analytics/posthog",
                   "sites/integrations/analytics/plausible",
-                  "sites/integrations/analytics/umami"
+                  "sites/integrations/analytics/umami",
+                  "sites/integrations/analytics/capless"
                 ]
               },
               {

@@ -9182,6 +9182,7 @@
       "invalidTitle": "Invalid blog.json configuration",
       "invalidDescription": "Fix the integrations in blog.json on GitHub, then come back.",
       "providers": {
+        "capless": "Cookieless analytics with events and session replay.",
         "databuddy": "Privacy-first analytics with web vitals, errors and events.",
         "plausible": "Easy to use and privacy-friendly Google Analytics alternative.",
         "posthog": "Product analytics with session replay and feature flags.",
@@ -9189,6 +9190,9 @@
         "ga4": "Web analytics from Google."
       },
       "fields": {
+        "capless": {
+          "key": "Public key"
+        },
         "databuddy": {
           "clientId": "Client ID",
           "trackWebVitals": "Web vitals",
@@ -9224,6 +9228,9 @@
       "loadFailed": "Couldn't load integrations",
       "retry": "Try again",
       "fieldErrors": {
+        "capless": {
+          "key": "Copy the public key (cs_…) from your Capless tracking code"
+        },
         "databuddy": {
           "clientId": "Copy the Client ID from your Databuddy website settings"
         },
@@ -9245,6 +9252,9 @@
         }
       },
       "fieldDescriptions": {
+        "capless": {
+          "key": "In Capless, copy data-key (cs_…) from your tracking code. It can only write events."
+        },
         "databuddy": {
           "clientId": "In Databuddy, open your website and copy data-client-id from the tracking code.",
           "trackWebVitals": "Send Core Web Vitals for every page.",

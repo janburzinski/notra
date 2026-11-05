@@ -59,3 +59,23 @@ test("consent-gated GA4 and PostHog keep their defaults on a custom domain", asy
   expect(code).not.toContain("cookie_domain");
   expect(code).not.toContain("cross_subdomain_cookie");
 });
+
+test("consent-gated Capless loads its script with the key only after a measurement grant", async () => {
+  Object.assign(globals, {
+    __NOTRA_CONSENT_ANALYTICS__: { capless: { key: "cs_abcdefghijklmnop" } },
+    __NOTRA_HOSTING_DOMAIN__: null,
+    __NOTRA_CONSENT_STORAGE_KEY__: "__Host-c15t",
+    location: { hostname: "blog.acme.com" },
+    document: { cookie: "" },
+  });
+  const { default: client } = await import("../src/c15t.client.ts?capless");
+  expect(client.scripts).toEqual([
+    {
+      id: "capless",
+      src: "https://c.capless.sh/c.js",
+      category: "measurement",
+      async: true,
+      attributes: { "data-key": "cs_abcdefghijklmnop" },
+    },
+  ]);
+});

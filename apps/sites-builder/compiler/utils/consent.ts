@@ -21,6 +21,7 @@ import {
 import type { PreparedCustomScript } from "../types/source";
 
 function consentAnalytics({
+  capless,
   databuddy,
   ga4,
   plausible,
@@ -39,6 +40,7 @@ function consentAnalytics({
     ),
   };
   return {
+    capless: capless && { key: capless.key },
     databuddy: databuddyConfig,
     gtag: ga4 && { id: ga4.measurementId },
     posthog: posthog && {
