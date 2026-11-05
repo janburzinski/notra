@@ -443,18 +443,24 @@ if (!databaseUrl) {
   });
 
   test("racing integration merges preserve both provider settings or report an explicit conflict", async () => {
-    const original = editor.listSiteDrafts;
+    // Both merges must observe the same draft before either writes, so hold
+    // each read of the config draft until both have read it.
+    const original = editor.readSiteDraft;
     const gate = deferred();
     let reads = 0;
-    const observation = spyOn(editor, "listSiteDrafts").mockImplementation(
-      async (siteId) => {
-        const rows = await original(siteId);
+    const observation = spyOn(editor, "readSiteDraft").mockImplementation(
+      async (...args) => {
+        // A failed read opens the gate, so the other merge fails fast too.
+        const draft = await original(...args).catch((error: unknown) => {
+          gate.resolve();
+          throw error;
+        });
         reads += 1;
         if (reads === 2) {
           gate.resolve();
         }
         await gate.promise;
-        return rows;
+        return draft;
       }
     );
     try {
@@ -470,6 +476,7 @@ if (!databaseUrl) {
           userId,
         }),
       ]);
+      expect(reads, "both merges read the draft through the gate").toBe(2);
       expect(
         results.filter((result) => result.status === "fulfilled")
       ).toHaveLength(1);
