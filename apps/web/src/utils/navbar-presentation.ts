@@ -19,7 +19,6 @@ interface NavbarVariantSpec {
   floatingPadding: string;
   floatingTop: string;
   expandedMaxWidth: string;
-  floatingBox?: boolean;
 }
 
 const LANDING_SPEC: NavbarVariantSpec = {
@@ -49,11 +48,8 @@ const NAVBAR_VARIANT_SPEC: Record<NavbarVariant, NavbarVariantSpec> = {
   landing: LANDING_SPEC,
   announcement: {
     ...LANDING_SPEC,
-    positionClass: "fixed inset-x-9 sm:inset-x-10",
     overlayLayout: "announcement",
     floatingTop: "5rem",
-    floatingPadding: "px-4 py-1 sm:px-5 sm:py-1.5",
-    floatingBox: true,
   },
   page: {
     positionClass: "fixed inset-x-3 sm:inset-x-4",
@@ -100,7 +96,6 @@ export function getNavbarChromePresentation(
 
   return {
     chrome,
-    boxed: floating && Boolean(spec.floatingBox),
     innerPaddingClass: floating ? spec.floatingPadding : CHROME_PADDING,
     overlayLayout: spec.overlayLayout,
     positionClass: spec.positionClass,
