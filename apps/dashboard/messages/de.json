@@ -1158,6 +1158,7 @@
       "tooManyImportRequests": "Zu viele Importanfragen. Bitte versuch es gleich nochmal.",
       "fetchXProfileFailed": "Das X-Profil für dieses Konto konnte nicht abgerufen werden",
       "referenceLimitImport": "Referenzlimit erreicht. Upgrade deinen Tarif, um weitere zu importieren.",
+      "referenceLimitCheckUnavailable": "Wir konnten dein Referenzlimit gerade nicht prüfen. Es wurde nichts hinzugefügt. Bitte versuch es gleich nochmal.",
       "tooManyRequests": "Zu viele Anfragen. Bitte versuch es gleich nochmal."
     },
     "content": {

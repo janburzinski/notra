@@ -1158,6 +1158,7 @@
       "tooManyImportRequests": "Too many import requests. Please try again shortly.",
       "fetchXProfileFailed": "Failed to fetch the X profile for this account",
       "referenceLimitImport": "Reference limit reached. Upgrade your plan to import more.",
+      "referenceLimitCheckUnavailable": "We couldn't check your reference limit right now. Nothing was added. Please try again in a moment.",
       "tooManyRequests": "Too many requests. Please try again shortly."
     },
     "content": {

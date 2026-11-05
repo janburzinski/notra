@@ -111,6 +111,7 @@ import {
   forbidden,
   internalServerError,
   notFound,
+  serviceUnavailable,
   tooManyRequests,
 } from "../utils/errors";
 import { brandSitemapsRouter } from "./brand-sitemaps";
@@ -1038,9 +1039,18 @@ export const brandRouter = {
               requiredBalance: 1,
               sendEvent: true,
             })
-            .catch(() => null);
+            .catch((error: unknown) => {
+              logError("[Brand] Reference quota check failed", error, {
+                organizationId: input.organizationId,
+              });
+              return null;
+            });
 
-          if (!data?.allowed) {
+          if (!data) {
+            const tErrors = await getTranslations("errors.brand");
+            throw serviceUnavailable(tErrors("referenceLimitCheckUnavailable"));
+          }
+          if (!data.allowed) {
             trackReferenceLimitReached({
               headers: context.headers,
               userId: auth.user.id,
@@ -1355,9 +1365,21 @@ export const brandRouter = {
                 featureId: FEATURES.REFERENCES,
                 requiredBalance: 1,
               })
-              .catch(() => null);
+              .catch((error: unknown) => {
+                logError("[Brand] Reference quota check failed", error, {
+                  organizationId: input.organizationId,
+                });
+                return null;
+              });
 
-            if (data?.allowed) {
+            // Importing only the free tweets would silently drop the rest.
+            if (!data) {
+              const tErrors = await getTranslations("errors.brand");
+              throw serviceUnavailable(
+                tErrors("referenceLimitCheckUnavailable")
+              );
+            }
+            if (data.allowed) {
               if (data.balance?.unlimited) {
                 paidImportCount = tweetsRequiringEntitlement;
               } else if (typeof data.balance?.remaining === "number") {

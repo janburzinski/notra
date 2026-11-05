@@ -289,7 +289,13 @@ export function createAddBrandReferenceTool(config: {
           });
           allowed = check?.allowed === true;
         } catch {
-          // Fail closed: an unreachable billing service must not grant quota.
+          // Fail closed: an unreachable billing service must not grant quota,
+          // but it is not a reason to ask the user to upgrade.
+          return {
+            success: false,
+            error:
+              "The reference quota couldn't be checked right now, so the reference was not saved. Ask the user to try again in a moment.",
+          };
         }
 
         if (!allowed) {
