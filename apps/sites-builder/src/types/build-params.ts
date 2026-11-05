@@ -13,7 +13,7 @@ import type {
 import type { FontFallback } from "./theme";
 
 export interface SiteConsentAnalytics {
-  capless?: { key: string };
+  capless?: { key: string; scriptUrl: string };
   databuddy?: {
     clientId: string;
     scriptUrl?: string;

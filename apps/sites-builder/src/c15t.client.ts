@@ -4,7 +4,6 @@ import { gtag } from "@c15t/integrations/google-tag";
 import { plausibleAnalytics } from "@c15t/integrations/plausible-analytics";
 import { posthog } from "@c15t/integrations/posthog";
 import { umamiAnalytics } from "@c15t/integrations/umami-analytics";
-import { CAPLESS_SCRIPT_URL } from "@notra/sites-core/constants/integrations";
 
 import {
   dropSharedConsentCookie,
@@ -31,7 +30,7 @@ export default {
       ? [
           {
             id: "capless",
-            src: CAPLESS_SCRIPT_URL,
+            src: analytics.capless.scriptUrl,
             category: "measurement",
             async: true,
             attributes: { "data-key": analytics.capless.key },

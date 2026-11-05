@@ -1,5 +1,6 @@
 import {
   C15T_ANALYTICS_CATEGORY,
+  CAPLESS_SCRIPT_URL,
   C15T_HOST_STORAGE_KEY,
   POSTHOG_DEFAULT_API_HOST,
 } from "@notra/sites-core/constants/integrations";
@@ -40,7 +41,7 @@ function consentAnalytics({
     ),
   };
   return {
-    capless: capless && { key: capless.key },
+    capless: capless && { key: capless.key, scriptUrl: CAPLESS_SCRIPT_URL },
     databuddy: databuddyConfig,
     gtag: ga4 && { id: ga4.measurementId },
     posthog: posthog && {
