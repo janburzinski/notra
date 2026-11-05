@@ -1,0 +1,25 @@
+packages/ai/src/utils/trigger-hash.ts
+  s_277f37bc0ae55d::t_0097fb736eafc2 11-15,19-40
+  s_277f37bc0ae55d::t_c2f6338f8108db 49
+  s_277f37bc0ae55d::t_02e9d6b4e8fa4d 64
+apps/api/src/utils/triggers.ts
+  s_277f37bc0ae55d::t_018497b86adc44 63,67-71
+apps/api/tests/integration-trigger-cleanup.test.ts
+  s_277f37bc0ae55d::t_9be03567ef7f02 1-2,4-31
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "098d3f93b089d33466ad72964c050ded0a0db32a",
+  "prompts": {},
+  "sessions": {
+    "s_277f37bc0ae55d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "3c8b163b-7516-40bf-99a2-bd737bf27446",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
