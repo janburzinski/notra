@@ -1,0 +1,276 @@
+packages/ui/src/components/evilcharts/ui/chart-environment.tsx
+  s_2a641a79c946c6::t_fc7603e7835d7e 1-28
+apps/dashboard/src/routeTree.gen.ts
+  s_2a641a79c946c6::t_1de999c2cb062b 37,90,235-239,532-536,654,707,750,803,847,900,945,998,1041,1094,1137,1190,1234,1281,1469-1475,1840-1846,2084,2142
+apps/dashboard/src/components/charts/dashboard-chart-environment.tsx
+  s_2a641a79c946c6::t_1eebfcf035c057 40-44
+  s_2a641a79c946c6::t_fc189ebfbe7db8 1-39,45
+apps/web/src/components/data/data-traffic-chart.tsx
+  s_2a641a79c946c6::t_97751794048ffd 1-2,7,11,17,34,37,42-43,48,62-63,126-127
+  s_2a641a79c946c6::t_bd76f3642f5cbe 54-57
+  s_2a641a79c946c6::t_1dcc7f3baaa56c 3,5-6,8-10,12-16,35-36,38-41,44-47,49-53,58-60,64,78-81,83-125
+  s_2a641a79c946c6::t_c525b5f1fcbc94 4,18-33,61,65-77,82
+packages/ui/src/components/evilcharts/ui/echarts-dot.tsx
+  s_2a641a79c946c6::t_db0eb16b4681ae 1-100
+apps/dashboard/src/routes/api.cron.public-data.ts
+  s_2a641a79c946c6::t_45d60af9f071d9 1-18
+packages/ui/src/lib/charts/echarts-scrub.ts
+  s_2a641a79c946c6::t_db0eb16b4681ae 1-301
+apps/web/src/constants/landing/footer.ts
+  s_2a641a79c946c6::t_2037f4abd1e504 126
+  s_2a641a79c946c6::t_f1594a3b1061c2 124-125,127
+apps/web/src/lib/data/functions.ts
+  s_2a641a79c946c6::t_be2a91cd7afa9b 1-3,5,9
+  s_2a641a79c946c6::t_4a11853a9cddb5 4,6
+  s_2a641a79c946c6::t_e9de09cc6c4cb3 7-8
+packages/ui/src/components/evilcharts/charts/echarts-area-chart.tsx
+  s_2a641a79c946c6::t_f1bb74e7ce6ac4 1-15,17-32,37-44,46-54,56-60,62-64,67-81,83-85,87,89-100,102-1891,1893-2937
+  s_2a641a79c946c6::t_db0eb16b4681ae 36
+  s_2a641a79c946c6::t_69138aca315c8d 16,1892
+  s_2a641a79c946c6::t_7a4e6cf250cf99 33-35,45,55,61,65-66,82,86,88,101
+apps/dashboard/src/routes/api.public.data.ai-traffic.ts
+  s_2a641a79c946c6::t_45d60af9f071d9 1-18
+packages/schemas/src/types/api/public-ai-traffic.ts
+  s_2a641a79c946c6::t_2fedf8323d298b 1-19
+apps/web/src/lib/data/snapshot.ts
+  s_2a641a79c946c6::t_be2a91cd7afa9b 1-59
+packages/ui/src/components/evilcharts/ui/echarts-chart.tsx
+  s_2a641a79c946c6::t_f1bb74e7ce6ac4 1-176
+apps/dashboard/src/app/api/cron/public-data/route.ts
+  s_2a641a79c946c6::t_ef4d3df901bcf2 1-20
+apps/dashboard/src/types/geo.ts
+  s_2a641a79c946c6::t_1eebfcf035c057 70
+apps/web/src/components/data/data-heatmap.tsx
+  s_2a641a79c946c6::t_00b5d9c3e462b2 1-101,103-111
+  s_2a641a79c946c6::t_ea1ff352f75734 102
+packages/ui/src/lib/charts/chart-zero-baseline.ts
+  s_2a641a79c946c6::t_db0eb16b4681ae 1-19
+apps/web/src/utils/markdown.ts
+  s_2a641a79c946c6::t_70c801a83e697b 3-5,27-51
+packages/ui/src/lib/charts/echarts-marker.ts
+  s_2a641a79c946c6::t_7a4e6cf250cf99 1
+  s_2a641a79c946c6::t_f1bb74e7ce6ac4 2-63
+apps/web/src/lib/data/markdown.ts
+  s_2a641a79c946c6::t_d8d89d702374b9 1-34,36-62,64-73,75-141
+  s_2a641a79c946c6::t_a06182056f6a2d 35
+  s_2a641a79c946c6::t_267f945a593b30 63,74
+apps/web/src/routes/_site/data/index[.]json.ts
+  s_2a641a79c946c6::t_a183cb5abcdfb0 1-24
+packages/ui/src/lib/charts/chart-locale.ts
+  s_2a641a79c946c6::t_f1bb74e7ce6ac4 1-31
+packages/ui/src/lib/charts/chart-tooltip-position.ts
+  s_2a641a79c946c6::t_db0eb16b4681ae 1-67
+apps/web/src/components/state-of-ai-search/report-ui.tsx
+  s_2a641a79c946c6::t_d0e638c42e3b54 23-34,111,118-122,132-134,184-190,193-196
+apps/dashboard/src/components/charts/chart-sparkline.tsx
+  s_2a641a79c946c6::t_1eebfcf035c057 5
+  s_2a641a79c946c6::t_7a4e6cf250cf99 3-4
+  s_2a641a79c946c6::t_f1bb74e7ce6ac4 12
+apps/web/src/components/data/data-market-share.tsx
+  s_2a641a79c946c6::t_f394c99b88c141 16-17,45
+  s_2a641a79c946c6::t_a016c09fd09d14 1-9,13-15,18-36,41-44,46-61,63-65,70-73,77-99,101-104,110-135
+  s_2a641a79c946c6::t_ccc46e14b5015b 10-12,62,74-76,100
+  s_2a641a79c946c6::t_9e665ed7567840 109
+  s_2a641a79c946c6::t_bd76f3642f5cbe 37-40,66-69,105-108
+packages/ui/src/lib/charts/chart-stack-gap.ts
+  s_2a641a79c946c6::t_db0eb16b4681ae 1-34
+apps/web/package.json
+  s_2a641a79c946c6::t_f1594a3b1061c2 39
+apps/web/src/components/data/data-ranking.tsx
+  s_2a641a79c946c6::t_40d264ff9e040e 21-23,30-33,35-37,41-52,57
+  s_2a641a79c946c6::t_c329ca23042795 53-56,58-70
+  s_2a641a79c946c6::t_a9306744ee9c7b 1-20,24-29,34,38-40,71-72
+apps/web/src/constants/data.ts
+  s_2a641a79c946c6::t_70892fe1032256 5
+  s_2a641a79c946c6::t_2e8250ec8c2a3f 37-38
+  s_2a641a79c946c6::t_2037f4abd1e504 8,40-41
+  s_2a641a79c946c6::t_a6d5effaed5569 1-4,6-7,9,11-24,54-91
+  s_2a641a79c946c6::t_267f945a593b30 10
+  s_2a641a79c946c6::t_e9de09cc6c4cb3 26-33
+  s_2a641a79c946c6::t_a360c57d57a492 25,34-36
+  s_2a641a79c946c6::t_01034ace0e559d 42
+  s_2a641a79c946c6::t_7e0c93cd7fcf34 43-47
+  s_2a641a79c946c6::t_343c9957bc4795 39
+  s_2a641a79c946c6::t_69b6b0dc599850 48-53
+apps/dashboard/src/constants/charts.ts
+  s_2a641a79c946c6::t_f1bb74e7ce6ac4 1
+packages/ui/src/lib/charts/echarts-datum.ts
+  s_2a641a79c946c6::t_db0eb16b4681ae 1-12
+packages/ui/src/components/evilcharts/ui/echarts-plot-frame.tsx
+  s_2a641a79c946c6::t_69138aca315c8d 3,7-8,20,33,45
+  s_2a641a79c946c6::t_f1bb74e7ce6ac4 1-2,4-6,9-19,21-32,34-44,46-51
+apps/dashboard/vercel.json
+  s_2a641a79c946c6::t_45d60af9f071d9 44-46
+packages/ui/src/components/evilcharts/ui/echarts-legend.tsx
+  s_2a641a79c946c6::t_7a4e6cf250cf99 7
+  s_2a641a79c946c6::t_f1bb74e7ce6ac4 1-6,8-148
+apps/dashboard/src/lib/public-data/ai-traffic.ts
+  s_2a641a79c946c6::t_faccb1538eef27 1-144
+apps/dashboard/tests/site-analytics-page.test.tsx
+  s_2a641a79c946c6::t_81ebd55cb22ba2 60
+  s_2a641a79c946c6::t_1eebfcf035c057 7,64-69
+apps/web/src/lib/state-of-ai-search/markdown.ts
+  s_2a641a79c946c6::t_71bd3e7a9b3f87 34
+  s_2a641a79c946c6::t_70c801a83e697b 16-20
+apps/web/src/components/data/data-view.tsx
+  s_2a641a79c946c6::t_2357d45fa8138b 1-2,6,14,28-29,32-33,36,38-39,41,146,159-160,164,180,195,349,365-367,369,380-391
+  s_2a641a79c946c6::t_aa7addef094d5a 3,11,13,15-20,34,161,179,194,342,350-364,370-375,377-378
+  s_2a641a79c946c6::t_28384a673f45f4 47-49,51-55,64-65
+  s_2a641a79c946c6::t_40d264ff9e040e 147-151,153-154,158
+  s_2a641a79c946c6::t_48af5972c829c3 40
+  s_2a641a79c946c6::t_c35efd7a3306db 44-45,197,201-207,223-332
+  s_2a641a79c946c6::t_bd76f3642f5cbe 100-104,189-192,209-212
+  s_2a641a79c946c6::t_020652cf198ac9 5,7,26-27,31,152,181,184-185,187-188,193,343-344,348,368,379
+  s_2a641a79c946c6::t_e2fdfa66a305a0 9-10,12,35,43,86-99,105-129,132-137,155-157,162,165-178,196,198-200,208,213-214,216-221,376
+  s_2a641a79c946c6::t_507143dedeefbe 21-25,30,37,46,50,56-63,66-85,130-131,138-145,163,182-183,186,215,222,336-337,345-347
+  s_2a641a79c946c6::t_ea1ff352f75734 8,333-335,338-341
+  s_2a641a79c946c6::t_45c7134394e02e 4,42
+apps/web/src/components/data/data-cells.tsx
+  s_2a641a79c946c6::t_317961049b1e31 15-19,38
+  s_2a641a79c946c6::t_cd59f9991315d9 1-3,5-14,20-22,24-27,29-32,34-35,37,40-46
+  s_2a641a79c946c6::t_b175270bd77334 4,23,28,33,36,39
+packages/ui/src/components/evilcharts/ui/echarts-brush.tsx
+  s_2a641a79c946c6::t_db0eb16b4681ae 1-6,8-214
+  s_2a641a79c946c6::t_7a4e6cf250cf99 7
+apps/web/src/components/state-of-ai-search/report-section.tsx
+  s_2a641a79c946c6::t_1a88da069d5632 88
+apps/web/src/routes/_site/data/index.tsx
+  s_2a641a79c946c6::t_4a11853a9cddb5 11,23,51,60,62-63,85
+  s_2a641a79c946c6::t_a183cb5abcdfb0 1-10,12-22,24-50,52-59,61,64-84,86-88
+apps/dashboard/src/lib/analytics/real-traffic-projects.ts
+  s_2a641a79c946c6::t_87c44d7d9e75b5 1-32
+packages/ui/src/lib/charts/echarts-resize.ts
+  s_2a641a79c946c6::t_1eebfcf035c057 1
+  s_2a641a79c946c6::t_db0eb16b4681ae 2-63
+apps/dashboard/src/components/analytics/account-series-chart-card.tsx
+  s_2a641a79c946c6::t_7a4e6cf250cf99 3-5
+packages/ui/src/lib/charts/chart-tooltip-size.ts
+  s_2a641a79c946c6::t_7a4e6cf250cf99 4
+  s_2a641a79c946c6::t_db0eb16b4681ae 1-3,5-167
+apps/dashboard/src/utils/chart-tooltip-scrub.test.ts
+  s_2a641a79c946c6::t_7a4e6cf250cf99 3-4
+apps/web/src/utils/data.ts
+  s_2a641a79c946c6::t_c0c537025da8b8 6
+  s_2a641a79c946c6::t_28384a673f45f4 107-109
+  s_2a641a79c946c6::t_a360c57d57a492 2-5,7-8,136,138-139,144,182-187,190-194,197-212,215,217,267
+  s_2a641a79c946c6::t_b1de78c976e3f5 15,19-68,70-83,268
+  s_2a641a79c946c6::t_7e0c93cd7fcf34 251-266
+  s_2a641a79c946c6::t_13fdc57efe247e 1,12-14,16,84-88,90,92-93
+  s_2a641a79c946c6::t_82c9145a8bde93 9,156-181,227-236
+  s_2a641a79c946c6::t_57a9305db66dcb 69,96
+  s_2a641a79c946c6::t_f69004d26c0140 94-95,97-106,110-112,213-214,216,218,220-226,237-250
+  s_2a641a79c946c6::t_f394c99b88c141 219
+  s_2a641a79c946c6::t_ca1c4cf2c6327c 17-18
+  s_2a641a79c946c6::t_b15e91843a9b38 89,91
+  s_2a641a79c946c6::t_7ba2735c0dd353 154-155,188
+  s_2a641a79c946c6::t_01034ace0e559d 189
+  s_2a641a79c946c6::t_2e8250ec8c2a3f 10-11,113-135,137,140-143,145-153,195-196
+apps/web/src/lib/sitemap/entries.ts
+  s_2a641a79c946c6::t_52be9dbe3ead4b 4,217-219
+packages/schemas/src/schemas/api/public-ai-traffic.ts
+  s_2a641a79c946c6::t_8557a16180abeb 1-31,40-55,68-72,74-75,77-106,122
+  s_2a641a79c946c6::t_127578357c5744 32-33,73,76,107-114
+  s_2a641a79c946c6::t_ac378a8dbe68d6 34-35,63-67,116-121
+  s_2a641a79c946c6::t_8366f197e98c57 36-39,56-62,115
+apps/web/src/utils/markdown-twins.ts
+  s_2a641a79c946c6::t_f1594a3b1061c2 9,350
+  s_2a641a79c946c6::t_52be9dbe3ead4b 23
+apps/dashboard/src/app/api/internal/ai-trends/traffic/route.ts
+  s_2a641a79c946c6::t_87c44d7d9e75b5 9,43
+apps/dashboard/src/utils/public-ai-traffic.test.ts
+  s_2a641a79c946c6::t_1f51765c8e1af1 1-118,120-126,128-129,139-154
+  s_2a641a79c946c6::t_231a69c94a4317 119,127,130-138
+apps/dashboard/src/constants/public-data.ts
+  s_2a641a79c946c6::t_127578357c5744 19-22
+  s_2a641a79c946c6::t_a8a6f1b06ca3a3 65-72
+  s_2a641a79c946c6::t_1daa2d0796f25a 1-18,23-64
+apps/web/src/components/data/data-trend.tsx
+  s_2a641a79c946c6::t_2b2e089f2435ae 4,11,18-23
+  s_2a641a79c946c6::t_a0192c4ad1b500 6-9
+  s_2a641a79c946c6::t_a03e71c0bdfddb 2,10,13,15
+  s_2a641a79c946c6::t_17c75b1a6a8b35 1,3,5,12,14,16-17,25
+  s_2a641a79c946c6::t_2b359d2d9f6934 24
+packages/ui/src/components/evilcharts/ui/echarts-tooltip.tsx
+  s_2a641a79c946c6::t_7a4e6cf250cf99 5,11,16-17
+  s_2a641a79c946c6::t_f1bb74e7ce6ac4 1-4,6-10,12-15,18-580
+apps/dashboard/src/components/geo/directions/direction-donut.tsx
+  s_2a641a79c946c6::t_7a4e6cf250cf99 3
+apps/dashboard/src/components/charts/chart-color-scope.tsx
+  s_2a641a79c946c6::t_1eebfcf035c057 3
+apps/dashboard/src/utils/providers.tsx
+  s_2a641a79c946c6::t_fc189ebfbe7db8 20
+  s_2a641a79c946c6::t_1eebfcf035c057 130-132
+packages/ui/src/components/evilcharts/charts/echarts-line-chart.tsx
+  s_2a641a79c946c6::t_69138aca315c8d 16,1264
+  s_2a641a79c946c6::t_f1bb74e7ce6ac4 1-15,17-32,36-43,45-52,54-59,61-63,66-74,76-78,80,82-1263,1265-1891
+  s_2a641a79c946c6::t_7a4e6cf250cf99 33-35,44,53,60,64-65,75,79,81
+apps/dashboard/tests/setup-legend-accessibility.test.tsx
+  s_2a641a79c946c6::t_81ebd55cb22ba2 80
+apps/dashboard/src/types/charts.ts
+  s_2a641a79c946c6::t_f1bb74e7ce6ac4 1-6
+apps/dashboard/src/types/public-data.ts
+  s_2a641a79c946c6::t_a8a6f1b06ca3a3 1-51
+apps/web/src/styles/ui-sources.css
+  s_2a641a79c946c6::t_48af5972c829c3 84,194,219,280
+  s_2a641a79c946c6::t_e512310f34dbc3 54-61,199,232-239,262
+packages/ui/src/constants/chart-tooltip.ts
+  s_2a641a79c946c6::t_fc7603e7835d7e 3-7
+  s_2a641a79c946c6::t_db0eb16b4681ae 1-2
+packages/ui/src/types/charts.ts
+  s_2a641a79c946c6::t_6700a777468166 1-83
+apps/dashboard/src/types/geo-competitors.ts
+  s_2a641a79c946c6::t_81ebd55cb22ba2 7
+apps/dashboard/src/utils/public-ai-traffic.ts
+  s_2a641a79c946c6::t_5349b305d9c4ec 1-15,18-20,22-27,29-39,43-224,229-314,321-322,324-328,330-333,335-339,341-343,346,350-353,358-362,364-370,397-439,444-471,473-493,526-535,538-542,544-545,556,558-559,561,574-576
+  s_2a641a79c946c6::t_127578357c5744 16-17,225-228,315-320,323,329,334,340,344-345,347-349,354-355,363,371-377,381-392,440-443,494-525,543,546-555,557,560,566-573
+  s_2a641a79c946c6::t_b824eb98858dab 393-396,472
+  s_2a641a79c946c6::t_a8a6f1b06ca3a3 21,28,40-42,562-565
+  s_2a641a79c946c6::t_267f945a593b30 356-357,378-380
+  s_2a641a79c946c6::t_52be9dbe3ead4b 536-537
+packages/ui/src/components/evilcharts/charts/echarts-bar-chart.tsx
+  s_2a641a79c946c6::t_f1bb74e7ce6ac4 1-15,17-32,35-42,44-50,53-55,58-67,69-71,73,77-1663,1665-2249
+  s_2a641a79c946c6::t_69138aca315c8d 16,1664
+  s_2a641a79c946c6::t_7a4e6cf250cf99 33-34,43,51-52,56-57,68,72,74-76
+apps/web/src/components/data/data-hero.tsx
+  s_2a641a79c946c6::t_c32f642c0da762 1-5,7-63,65-66,68-69
+  s_2a641a79c946c6::t_9006a6f386b992 6,64,67
+apps/dashboard/src/app/api/public/data/ai-traffic/route.ts
+  s_2a641a79c946c6::t_ef4d3df901bcf2 1-37
+apps/web/src/types/data.ts
+  s_2a641a79c946c6::t_5c8d9c2a21765a 1,8-9,12,14,25-26,28-34,38,40,42,45-46,66-67,88-96,98-99
+  s_2a641a79c946c6::t_e3417c001838e3 6
+  s_2a641a79c946c6::t_3257e00d8d5ffa 27,37
+  s_2a641a79c946c6::t_f69004d26c0140 43-44,47-48,50,52-65,100,106-107
+  s_2a641a79c946c6::t_bd78dc53628134 3-5,7,35-36,39,41
+  s_2a641a79c946c6::t_82c9145a8bde93 76-84,101-105
+  s_2a641a79c946c6::t_f394c99b88c141 49
+  s_2a641a79c946c6::t_b99e98550bc617 2,110
+  s_2a641a79c946c6::t_2e8250ec8c2a3f 10-11,13,15-24,97
+  s_2a641a79c946c6::t_7e0c93cd7fcf34 51,68-75,85-87,108-109
+apps/dashboard/src/types/analytics.ts
+  s_2a641a79c946c6::t_1eebfcf035c057 1-5
+packages/ui/src/components/evilcharts/charts/echarts-pie-chart.tsx
+  s_2a641a79c946c6::t_f1bb74e7ce6ac4 1-10,12-25,28-33,35-37,39-47,49-51,53,55-896,898-1168
+  s_2a641a79c946c6::t_69138aca315c8d 11,897
+  s_2a641a79c946c6::t_7a4e6cf250cf99 26-27,34,38,48,52,54
+apps/dashboard/src/hooks/use-traffic-zoom.ts
+  s_2a641a79c946c6::t_7a4e6cf250cf99 3
+apps/dashboard/src/middleware/auth.ts
+  s_2a641a79c946c6::t_45d60af9f071d9 38
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "32d9a1acca10e37f90a43faad690644a17618d85",
+  "prompts": {},
+  "sessions": {
+    "s_2a641a79c946c6": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "712a2427-7f87-4390-a750-259eed0c22d3",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
