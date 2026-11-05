@@ -155,6 +155,15 @@ Put images in `public/` and use paths from the root of the site:
 - Posts without an `image` get a generated share image with the title, your site name and your brand color. See [Share images](/sites/customize/seo#share-images).
 - Wrap a screenshot in [`<Frame>`](/sites/components/media#frame) to give it a border and a caption.
 
+### Smaller copies for readers
+
+When your site is published, JPEG, PNG and WebP images in a post or changelog entry that are wider than 640 pixels get smaller WebP copies, and each reader's browser loads the size that fits their screen. You don't need to resize screenshots yourself.
+
+- Your original file stays published at the same path and is used when it's the best fit, so links to it keep working.
+- GIFs, SVGs, animated images and images from other websites are left as they are, and so is any image you give your own `srcset`.
+- Images keep exactly the size they had before. Browsers pick a copy by screen width, so phones gain the most. If an image always shows smaller than the screen, like a thumbnail in a custom component, set `sizes` on it (for example `sizes="240px"`), or give a lazy image `width` and `height` so browsers can pick by its rendered size.
+- `notra dev` serves your original files; the copies are only made when the site is published.
+
 ## Drafts
 
 `draft: true` keeps a post off the live site, its feeds and sitemaps, but shows it in every [preview](/sites/previews). Remove the line or set it to `false` to publish.

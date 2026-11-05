@@ -27,6 +27,8 @@ export async function stageBoxToolchain(stage: string) {
       "satori",
       "--external",
       "@resvg/resvg-js",
+      "--external",
+      "sharp",
     ],
     {
       cwd: root,

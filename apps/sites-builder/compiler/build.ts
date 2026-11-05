@@ -25,6 +25,7 @@ import { footerFaviconHost } from "../src/utils/favicons";
 import { rewritePublicAssetUrls } from "../src/utils/public-assets";
 import { normalizeAgentInstructions, writeAgentFiles } from "./agent-files";
 import { AREA_PAGES_FILE } from "./constants/build";
+import { optimizeContentImages } from "./content-images";
 import { writeOgImages } from "./og-images";
 import { prepareSite } from "./prepare";
 import type { AreaPages } from "./types/agent-files";
@@ -260,6 +261,22 @@ export async function buildSite(
       `notra-site=${options.target.siteId}\narea=${area}\n`
     );
     areas.push({ area, mount, durationMs: Date.now() - started });
+  }
+
+  const contentImages = await optimizeContentImages({
+    outDir: options.outDir,
+    pageHtml,
+    mounts: listMountedAreas(mounts).map(({ mount }) => mount),
+  });
+  diagnostics.push(...contentImages.diagnostics);
+  for (const [urlPath, html] of contentImages.pages) {
+    pageHtml.set(urlPath, html);
+    await writeFile(join(options.outDir, urlPath), html);
+  }
+  if (contentImages.images > 0) {
+    process.stderr.write(
+      `Made ${contentImages.variants} smaller copies of ${contentImages.images} ${contentImages.images === 1 ? "image" : "images"} in ${contentImages.durationMs} ms\n`
+    );
   }
 
   await writeAgentFiles({

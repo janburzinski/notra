@@ -156,6 +156,66 @@ export async function assertContentFeatures(
   );
   checks.push("Powered by Notra badge stays visible under site CSS hiding it");
 
+  const loaded = async (name: string) => {
+    const image = page.getByRole("img", { name, exact: true });
+    await image.scrollIntoViewIfNeeded();
+    await image.evaluate(
+      (element) =>
+        new Promise<void>((resolve, reject) => {
+          const img = element as HTMLImageElement;
+          if (img.complete) {
+            if (img.naturalWidth > 0) {
+              resolve();
+            } else {
+              reject(new Error(`image failed to load: ${img.currentSrc}`));
+            }
+            return;
+          }
+          img.addEventListener("load", () => resolve(), { once: true });
+          img.addEventListener(
+            "error",
+            () => reject(new Error(`image failed to load: ${img.currentSrc}`)),
+            { once: true }
+          );
+        })
+    );
+    return image;
+  };
+  const widthsOf = async (image: Awaited<ReturnType<typeof loaded>>) =>
+    ((await image.getAttribute("srcset")) ?? "")
+      .split(", ")
+      .map((candidate) => candidate.split(" ")[1]);
+
+  // A srcset must not change layout: an image narrower than the column keeps its own width.
+  const small = await loaded("E2E small photo");
+  assert.deepEqual(await widthsOf(small), ["640w", "680w"]);
+  assert.equal(
+    Math.round((await small.boundingBox())?.width ?? 0),
+    680,
+    "an image narrower than the post keeps its width"
+  );
+
+  // A lazy image with width and height lets the browser pick by rendered width.
+  // It uses its own file: a browser reuses a candidate it already has in memory.
+  const sized = await loaded("E2E sized photo");
+  assert.equal(await sized.getAttribute("sizes"), "auto, min(1600px, 100vw)");
+  const shown = await sized.evaluate(
+    (image) => new URL((image as HTMLImageElement).currentSrc).pathname
+  );
+  assert.match(
+    shown,
+    /^\/blog\/_notra\/assets\/images\/e2e-sized-photo-[0-9a-f]{10}-\d+\.webp$/,
+    `the browser shows a WebP copy, not the original: ${shown}`
+  );
+  const copy = await page.goto(`${origin}${shown}`);
+  await waitForResources();
+  assert.equal(copy?.status(), 200);
+  assert.equal(copy?.headers()["content-type"], "image/webp");
+  assert.match(copy?.headers()["cache-control"] ?? "", /immutable/);
+  checks.push(
+    "content images get a WebP srcset without changing layout; copies are served immutable"
+  );
+
   await page.goto(`${origin}/blog/hello-world`, {
     waitUntil: "domcontentloaded",
   });
