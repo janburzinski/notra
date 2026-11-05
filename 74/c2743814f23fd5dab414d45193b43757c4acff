@@ -1,0 +1,47 @@
+apps/dashboard/src/types/content/create-post.ts
+  s_0fa3df9ade89fa::t_94ca73ec0a687d 33,36
+apps/dashboard/src/components/geo/writer/write-dialog.tsx
+  s_0fa3df9ade89fa::t_4bf191cba28e90 135
+apps/dashboard/src/components/dashboard/nav-mode-primary-action.tsx
+  s_0fa3df9ade89fa::t_5abda0547a08fc 51-53
+apps/dashboard/src/constants/geo-analytics.ts
+  s_0fa3df9ade89fa::t_4bf191cba28e90 35
+apps/dashboard/src/constants/nav.ts
+  s_0fa3df9ade89fa::t_11be22fa4c35c9 247
+apps/dashboard/messages/en.json
+  s_0fa3df9ade89fa::t_94ca73ec0a687d 6009-6010
+apps/docs/geo/product-map.mdx
+  s_0fa3df9ade89fa::t_919ee1d3328549 46
+apps/dashboard/src/components/content/create-content-button-group.tsx
+  s_0fa3df9ade89fa::t_94ca73ec0a687d 3-7,19,22,42-57
+apps/dashboard/src/routes/-geo-ui.tsx
+  s_0fa3df9ade89fa::t_e82685c0327713 157-161
+apps/dashboard/messages/de.json
+  s_0fa3df9ade89fa::t_94ca73ec0a687d 6009-6010
+apps/docs/geo/writer.mdx
+  ai_agent 21
+  s_0fa3df9ade89fa::t_919ee1d3328549 27
+apps/dashboard/src/components/dashboard/nav-geo.tsx
+  s_0fa3df9ade89fa::t_11be22fa4c35c9 9-13,17,53
+apps/dashboard/src/components/content/lazy-create-content-dialog.tsx
+  s_0fa3df9ade89fa::t_94ca73ec0a687d 7-8,23,25,27,37-38,49,67-69,83-89
+  s_0fa3df9ade89fa::t_0fcb3497598beb 24,60-62
+apps/dashboard/src/lib/hooks/use-geo-writer.ts
+  s_0fa3df9ade89fa::t_4bf191cba28e90 21-28
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "74c2743814f23fd5dab414d45193b43757c4acff",
+  "prompts": {},
+  "sessions": {
+    "s_0fa3df9ade89fa": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "afc64d84-f8a2-4f5b-bfbd-d92169bb7f65",
+        "model": "claude-sonnet-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

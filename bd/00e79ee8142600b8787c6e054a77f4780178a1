@@ -1,0 +1,26 @@
+apps/dashboard/src/lib/slack/info-channel.ts
+  s_ca163610ec172c::t_604d272a4f5998 6,14-16
+apps/dashboard/src/lib/orpc/routers/sites.ts
+  s_ca163610ec172c::t_ea8544dda6bf69 193,608,628,644,658
+apps/dashboard/src/lib/orpc/routers/user.ts
+  s_ca163610ec172c::t_604d272a4f5998 350,374,394-401
+apps/dashboard/src/lib/sites/info-channel.ts
+  s_ca163610ec172c::t_604d272a4f5998 19-24,30-38
+  s_ca163610ec172c::t_251e0dd044a6bc 27-28
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "bd00e79ee8142600b8787c6e054a77f4780178a1",
+  "prompts": {},
+  "sessions": {
+    "s_ca163610ec172c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "dc7a3129-202a-4b06-9dc8-8df6b1a9e69a",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

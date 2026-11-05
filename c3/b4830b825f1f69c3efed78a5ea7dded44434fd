@@ -1,0 +1,24 @@
+packages/geo-core/src/geo/suggestion-keywords.ts
+  s_9352e7c0a055e6::t_034732f799f3bd 185-186
+packages/geo-core/tests/search-console.test.ts
+  s_9352e7c0a055e6::t_715773727a0700 90-91,116-120,126,130-132
+  s_9352e7c0a055e6::t_034732f799f3bd 87-89,92
+packages/geo-core/src/constants/google-search-console.ts
+  s_9352e7c0a055e6::t_034732f799f3bd 37-40
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "c3b4830b825f1f69c3efed78a5ea7dded44434fd",
+  "prompts": {},
+  "sessions": {
+    "s_9352e7c0a055e6": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ad3222b4-2ea7-406b-a9bb-ed220894f017",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

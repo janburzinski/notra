@@ -1,0 +1,19 @@
+apps/dashboard/src/components/geo/engine-rate-table.tsx
+  s_78e82365a3f81b::t_eadee5ac7bc02c 74,76
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "d2010431cd01378d83ea471f62d603b9ad7a9313",
+  "prompts": {},
+  "sessions": {
+    "s_78e82365a3f81b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "1bf96a23-5c76-4c48-bf0c-02e87c787175",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

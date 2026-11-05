@@ -1,0 +1,11 @@
+packages/db/migrations/meta/0137_snapshot.json
+  ai_agent 14348-14359
+packages/db/migrations/0137_encrypt_social_connection_tokens.sql
+  ai_agent 1,4-5,7
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "018906c751f3695d73f1e6b1495abf5ec71134f8",
+  "prompts": {}
+}

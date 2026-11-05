@@ -1,0 +1,56 @@
+packages/db/migrations/meta/0091_snapshot.json
+  ai_agent 1-11402
+apps/dashboard/src/lib/auth/mfa.ts
+  s_1e325abf04c4e2::t_63463bde3eb85d 106
+packages/ui/src/lib/auth-types.ts
+  s_1e325abf04c4e2::t_63463bde3eb85d 22-23,65,118-123,225
+packages/db/migrations/meta/_journal.json
+  ai_agent 641-647
+packages/ui/src/lib/security-types.ts
+  s_1e325abf04c4e2::t_63463bde3eb85d 4,23,57-59
+apps/dashboard/src/types/design-system/auth-flow.ts
+  s_1e325abf04c4e2::t_ce6fb00bee89e3 6
+apps/dashboard/src/lib/auth/factor-labels.ts
+  s_1e325abf04c4e2::t_63463bde3eb85d 1-43
+packages/ui/src/components/shared/security/two-factor-settings.tsx
+  s_1e325abf04c4e2::t_ce6fb00bee89e3 7,113,119,122-130,132-137
+apps/dashboard/src/types/auth/security.ts
+  s_1e325abf04c4e2::t_ce6fb00bee89e3 29
+apps/dashboard/src/components/design-system/use-auth-flow-playground.ts
+  s_1e325abf04c4e2::t_ce6fb00bee89e3 6,70,109,175,242,280,308-311,325,354,366
+apps/dashboard/src/components/settings/two-factor-section.tsx
+  s_1e325abf04c4e2::t_ce6fb00bee89e3 5-8,87-90,98
+packages/schemas/src/schemas/dashboard/auth/mfa.ts
+  s_1e325abf04c4e2::t_63463bde3eb85d 20-29,38-40,61
+apps/dashboard/src/components/design-system/auth-security-demo.tsx
+  s_1e325abf04c4e2::t_ce6fb00bee89e3 16,61,141-143,190-193,201
+packages/ui/src/components/shared/auth/mfa-enrollment-form.tsx
+  s_1e325abf04c4e2::t_ce6fb00bee89e3 7,25-28,34
+packages/db/src/schema.ts
+  s_1e325abf04c4e2::t_63463bde3eb85d 104-118
+apps/dashboard/src/lib/auth/security-actions.ts
+  s_1e325abf04c4e2::t_63463bde3eb85d 28-32,100-101,103-112,118,131-134,206-217,239-242,275-278,290
+apps/dashboard/src/lib/auth/password-actions.ts
+  s_1e325abf04c4e2::t_63463bde3eb85d 45,361-371,377-380,477
+  s_1e325abf04c4e2::t_e838ad36c75344 372-376
+packages/ui/src/components/shared/auth/totp-enrollment-panel.tsx
+  s_1e325abf04c4e2::t_ce6fb00bee89e3 13-14,24,121,136-139,280-288
+packages/db/migrations/0091_user_auth_factor_labels.sql
+  ai_agent 1-11
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "1efe19ce33b8cd946e321a5395456a0628f015c5",
+  "prompts": {},
+  "sessions": {
+    "s_1e325abf04c4e2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f98b95b6-a893-4a57-9f87-93bd7c030132",
+        "model": "claude-fable-5-1"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

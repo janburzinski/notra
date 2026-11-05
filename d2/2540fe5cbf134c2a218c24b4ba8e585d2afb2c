@@ -1,0 +1,26 @@
+apps/api/tests/schedule-patch.test.ts
+  s_277f37bc0ae55d::t_c2b59c13957167 110
+  s_277f37bc0ae55d::t_376fc20b66a54b 1-81,83-109,111-126
+packages/schemas/src/schemas/api/schedules.ts
+  s_277f37bc0ae55d::t_04d2affa47672b 117-140,143-156,158-163
+  s_277f37bc0ae55d::t_8bd94879062daa 233-285,293
+  s_277f37bc0ae55d::t_8715107af0435f 157
+apps/api/src/utils/schedules.ts
+  s_277f37bc0ae55d::t_fe4b9be4a33ace 153-167
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "d22540fe5cbf134c2a218c24b4ba8e585d2afb2c",
+  "prompts": {},
+  "sessions": {
+    "s_277f37bc0ae55d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "3c8b163b-7516-40bf-99a2-bd737bf27446",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

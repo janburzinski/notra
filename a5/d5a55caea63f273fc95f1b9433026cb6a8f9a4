@@ -1,0 +1,36 @@
+apps/dashboard/messages/de.json
+  s_5ff307d7b8e981::t_b5047002dfd4b8 8671-8684,8741-8742,8751-8752
+apps/dashboard/src/components/sites/site-seo-fields.tsx
+  s_5ff307d7b8e981::t_3b2bc43d628570 89
+  s_5ff307d7b8e981::t_4e5082b402ce94 1-88,90-122
+apps/dashboard/tests/site-design.test.ts
+  s_5ff307d7b8e981::t_adb7041026c206 488-534
+apps/dashboard/messages/en.json
+  s_5ff307d7b8e981::t_b5047002dfd4b8 8671-8684,8741-8742,8751-8752
+apps/dashboard/src/constants/site-design-sections.ts
+  s_5ff307d7b8e981::t_dffab07d802fd7 8,29,39
+apps/dashboard/src/types/site-design.ts
+  s_5ff307d7b8e981::t_dffab07d802fd7 12,24,49-54,95-96
+apps/dashboard/src/constants/site-design.ts
+  s_5ff307d7b8e981::t_dffab07d802fd7 21-22
+apps/dashboard/src/utils/site-design.ts
+  s_5ff307d7b8e981::t_0334e0eda721d1 17,28,99-100,356-365,399-422,651-653,661-662
+apps/dashboard/src/components/sites/site-design-appearance.tsx
+  s_5ff307d7b8e981::t_b5047002dfd4b8 13,139-142
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "a5d5a55caea63f273fc95f1b9433026cb6a8f9a4",
+  "prompts": {},
+  "sessions": {
+    "s_5ff307d7b8e981": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f5d568b3-15cb-4ea7-8e92-094690766fad",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

@@ -1,0 +1,42 @@
+packages/ai/src/utils/github-mention-ingest.ts
+  s_f42d08e1cc3e9b::t_d70d276fa9b0bc 70-76,81-82
+packages/ai/src/prompts/github-mention.test.ts
+  s_f42d08e1cc3e9b::t_575a710d183f8b 83-84
+  s_f42d08e1cc3e9b::t_ad93203830a35b 94
+packages/ai/src/utils/github-mention-ingest.test.ts
+  s_f42d08e1cc3e9b::t_7a0676bf321298 303-321,325-328
+  s_f42d08e1cc3e9b::t_9b905d2e678169 322-324
+  s_f42d08e1cc3e9b::t_40927f392ce5ae 294
+  s_f42d08e1cc3e9b::t_4d652be65c0a68 152
+  s_f42d08e1cc3e9b::t_a330e7e9eb7557 264-265
+packages/ai/src/utils/github-mention.local.test.ts
+  s_f42d08e1cc3e9b::t_9262201aeaf636 270-271
+  s_f42d08e1cc3e9b::t_6f2dee8eb997f9 62
+  s_f42d08e1cc3e9b::t_7eb52a104968d4 165-173
+  s_f42d08e1cc3e9b::t_9057e7406ce440 211-212
+  s_f42d08e1cc3e9b::t_3ee3f5f5544211 79-89,99
+  s_f42d08e1cc3e9b::t_779851bdb315a8 41
+  s_f42d08e1cc3e9b::t_c0188f1f7ef44e 159-160
+packages/ai/src/utils/content-publication.ts
+  s_f42d08e1cc3e9b::t_66e48c296386ba 351-352,354-362,364-378
+  s_f42d08e1cc3e9b::t_e88508c4834f33 11-16
+  s_f42d08e1cc3e9b::t_9b905d2e678169 363
+packages/ai/src/prompts/github-mention.ts
+  s_f42d08e1cc3e9b::t_8f37a6f3a29104 189
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "6d2059a2c217b4319fcb9e68882348720390123f",
+  "prompts": {},
+  "sessions": {
+    "s_f42d08e1cc3e9b": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "70babf50-e845-4cf2-9b7c-0819910cf726",
+        "model": "grok-4.6"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

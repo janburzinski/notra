@@ -1,0 +1,25 @@
+apps/ui/src/components/previews/tooltip-preview.tsx
+  s_c919190ee6b695::t_f5c5117f13e338 20-24,28,36-41,44-49
+packages/ui/src/components/ui/tooltip.tsx
+  s_c919190ee6b695::t_5a1838bb522b3e 6,8,11,27-31,35,42,151,156,164,181-185,189,221-245,259-264,275-283,286-287,289-290,292-294
+  s_c919190ee6b695::t_c82b5a48cb9fd6 136-137
+apps/ui/components/ui/tooltip.tsx
+  s_c919190ee6b695::t_5a1838bb522b3e 7,9,12,23-27,31,36,137,142,149,165,169,197-220,222,225-228,230-239,254-255,258-259,261-262,264-265
+  s_c919190ee6b695::t_c82b5a48cb9fd6 123-124
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "2550ff47c5ba0a251cbef74f2a74acb4c3791576",
+  "prompts": {},
+  "sessions": {
+    "s_c919190ee6b695": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "05c378cd-aaae-438b-a0f7-c5cd5c9e7f3a",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

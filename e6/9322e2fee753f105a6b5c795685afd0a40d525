@@ -1,0 +1,55 @@
+packages/geo-core/src/constants/google-search-console.ts
+  s_9352e7c0a055e6::t_f3c40d3a1b42d8 21-38
+packages/ai/src/integrations/google-search-console.ts
+  s_9352e7c0a055e6::t_eec5d83bd5ebed 661-675
+packages/geo-core/src/geo/suggestion-prompt.ts
+  s_9352e7c0a055e6::t_331192846f64da 15,32-33,78
+packages/geo-core/src/geo/search-console-live.ts
+  s_9352e7c0a055e6::t_e8e05095de63d3 6-9,13-14,21-35,42-54
+packages/geo-core/src/geo/search-console.ts
+  s_9352e7c0a055e6::t_331192846f64da 38,327-328,337,384
+packages/geo-core/tests/search-console.test.ts
+  s_9352e7c0a055e6::t_e32113a74aad48 59
+  s_9352e7c0a055e6::t_ebe837dbd3b443 108-110
+  s_9352e7c0a055e6::t_932c112678b357 73-107,111-134
+packages/geo-core/src/utils/gsc-question.ts
+  s_9352e7c0a055e6::t_eec5d83bd5ebed 1-8
+apps/dashboard/src/types/components/geo.ts
+  s_9352e7c0a055e6::t_f809e4e762ad3f 43
+apps/dashboard/messages/en.json
+  s_9352e7c0a055e6::t_f809e4e762ad3f 3377,3385-3386
+packages/ai/src/types/google-search-console.ts
+  s_9352e7c0a055e6::t_eec5d83bd5ebed 58-59
+packages/geo-core/tests/utils/geo-boundaries.ts
+  s_9352e7c0a055e6::t_e32113a74aad48 34
+apps/dashboard/src/utils/geo-prompt-suggestions.ts
+  s_9352e7c0a055e6::t_f809e4e762ad3f 2,26-40
+apps/dashboard/messages/de.json
+  s_9352e7c0a055e6::t_f809e4e762ad3f 3377,3385-3386
+apps/dashboard/src/components/geo/prompt-suggestion-sheet.tsx
+  s_9352e7c0a055e6::t_83d352a8092f07 49
+  s_9352e7c0a055e6::t_f809e4e762ad3f 4-5,48,50-52
+packages/geo-core/src/geo/suggestion-keywords.ts
+  s_9352e7c0a055e6::t_331192846f64da 185
+  s_9352e7c0a055e6::t_3a9d97496bda7e 6,8,12,128-141,145-147,156-159,169-179,182,186-187,194,196
+packages/geo-core/src/types/deps.ts
+  s_9352e7c0a055e6::t_eec5d83bd5ebed 28-32
+apps/dashboard/src/components/geo/prompt-suggestions.tsx
+  s_9352e7c0a055e6::t_f809e4e762ad3f 3-7,41-44,140-167,438
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "e69322e2fee753f105a6b5c795685afd0a40d525",
+  "prompts": {},
+  "sessions": {
+    "s_9352e7c0a055e6": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ad3222b4-2ea7-406b-a9bb-ed220894f017",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

@@ -1,0 +1,37 @@
+apps/dashboard/src/app/(dashboard)/[slug]/autopilot/_variants/index.tsx
+  s_2e8f070aa70e1a::t_3a9e6248b85569 39,100,103-104,107-111,113-117,120-124,126-132
+  s_2e8f070aa70e1a::t_40183f6dbc6e84 189,191-192,321-323
+  s_2e8f070aa70e1a::t_c40d5d57c8f5e3 1-38,40-99,101-102,105-106,112,118-119,125,133-188,190,193-320,324-328
+apps/dashboard/src/app/(dashboard)/[slug]/autopilot/page-client.tsx
+  s_2e8f070aa70e1a::t_34d9a88a8b0f86 19,58-65,97-101,162-184,189-202,274-281
+apps/dashboard/src/app/(dashboard)/[slug]/autopilot/_variants/fixtures.ts
+  s_2e8f070aa70e1a::t_8fd87a9261b1a9 1-18,20-44,46-48,79,82-84,89-290,292-296
+  s_2e8f070aa70e1a::t_40183f6dbc6e84 59-62
+  s_2e8f070aa70e1a::t_587b2c2f8ac476 80,87,291
+  s_2e8f070aa70e1a::t_982c28663bffd4 19
+  s_2e8f070aa70e1a::t_112e3522e130b0 45,49-58,63-78,81,85-86,88
+apps/dashboard/src/app/(dashboard)/[slug]/autopilot/_variants/store.ts
+  s_2e8f070aa70e1a::t_112e3522e130b0 1-39
+apps/dashboard/src/app/(dashboard)/[slug]/autopilot/_variants/shared.tsx
+  s_2e8f070aa70e1a::t_9d5d30ca74845d 1-3,14-15,24-74,81,86,94,96-99,101-104,110-112,123,249-250
+  ai_agent 23,157-160,167-173
+  s_2e8f070aa70e1a::t_11fd99d58a6bf3 106-109
+  s_2e8f070aa70e1a::t_6c77b3dd573031 4-13,16-22,75-80,82-85,87-93,95,100,105,113-122,124-151,153-156,161-166,174-248
+  s_2e8f070aa70e1a::t_3a9e6248b85569 152
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "ebd285916f9177e55c2a3f2999fcf09bd85b3013",
+  "prompts": {},
+  "sessions": {
+    "s_2e8f070aa70e1a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7110d2d9-a3b3-4ea4-99ee-24af80050702",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

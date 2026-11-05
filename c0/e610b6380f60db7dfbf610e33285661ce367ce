@@ -1,0 +1,21 @@
+apps/dashboard/messages/en.json
+  s_e4e5854f61e12d::t_d9892d9f13f66c 8745
+apps/dashboard/messages/de.json
+  s_e4e5854f61e12d::t_d9892d9f13f66c 8745
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "c0e610b6380f60db7dfbf610e33285661ce367ce",
+  "prompts": {},
+  "sessions": {
+    "s_e4e5854f61e12d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6df5002a-66f6-4c5e-95a3-adde36763582",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

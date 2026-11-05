@@ -1,0 +1,116 @@
+packages/geo-core/src/geo/scan.ts
+  s_4e2cd74095b28c::t_0728f135414201 208,938-941,964,971,999,1006,1013,1089,1094,1102,1747,1853
+  s_4e2cd74095b28c::t_a61ce9eb47f684 1431
+  s_4e2cd74095b28c::t_b9483dfc5879ba 1939
+  s_4e2cd74095b28c::t_2319edf0df4472 2090-2095,2101,2109,2117,2125
+  s_4e2cd74095b28c::t_7b32cb53fa6c72 2132-2133
+packages/geo-core/src/types/geo.ts
+  s_4e2cd74095b28c::t_092a03977e3e10 26-27
+  s_4e2cd74095b28c::t_3b4d3236f36882 1456-1457
+  s_4e2cd74095b28c::t_a61ce9eb47f684 638-639
+  s_4e2cd74095b28c::t_c62c4f4a2cc31e 75-76,110,442-443,796,919
+apps/dashboard/src/lib/db/geo-collections.ts
+  s_4e2cd74095b28c::t_092a03977e3e10 184
+packages/geo-core/tests/geo-locale-language.test.ts
+  s_4e2cd74095b28c::t_cf4d446c2b350f 1-22
+apps/dashboard/src/lib/hooks/use-geo.ts
+  s_4e2cd74095b28c::t_02fa28491e4331 649-650,654
+packages/geo-core/src/geo/cache.ts
+  s_4e2cd74095b28c::t_2bc5646059dab9 35,38-39
+apps/dashboard/messages/de.json
+  s_4e2cd74095b28c::t_6c5b21c7328ecc 3004
+  s_4e2cd74095b28c::t_c11745f1c11003 3003,3007
+  s_4e2cd74095b28c::t_d8bbce393c9163 1075-1076
+packages/geo-core/src/utils/geo-discovery-cache.ts
+  s_4e2cd74095b28c::t_1de53fd8fd635d 5-6,10
+apps/dashboard/src/lib/hooks/use-geo-scan-estimate.ts
+  s_4e2cd74095b28c::t_3b4d3236f36882 33
+packages/geo-core/src/utils/geo-locale-language.ts
+  s_4e2cd74095b28c::t_45ace18a6b14dd 9
+  s_4e2cd74095b28c::t_84e2f2b06ea45e 15-16
+  s_4e2cd74095b28c::t_af40aa24eccd25 1-8,10-14,17-39
+apps/dashboard/src/lib/hooks/use-geo-db.ts
+  s_4e2cd74095b28c::t_092a03977e3e10 241
+packages/geo-core/src/geo/onboarding.ts
+  s_4e2cd74095b28c::t_9795ae6123e48f 144-145,151,155
+  s_4e2cd74095b28c::t_3b4d3236f36882 44
+  s_4e2cd74095b28c::t_84e2f2b06ea45e 152-154
+apps/dashboard/src/types/geo.ts
+  s_4e2cd74095b28c::t_092a03977e3e10 80-81
+apps/dashboard/src/utils/onboarding-brand.test.ts
+  s_4e2cd74095b28c::t_c1136306f5fb4e 33,43,47-56
+packages/geo-core/src/geo/prompts.ts
+  s_4e2cd74095b28c::t_85221678b87c42 1,427-428,431-435
+packages/geo-core/src/utils/geo-scan-plan.ts
+  s_4e2cd74095b28c::t_a61ce9eb47f684 54,62
+  s_4e2cd74095b28c::t_84e2f2b06ea45e 58
+packages/geo-core/src/geo/programs.ts
+  s_4e2cd74095b28c::t_3b4d3236f36882 749,768-770
+packages/geo-core/src/schemas/geo.ts
+  s_4e2cd74095b28c::t_2a7074517cb54d 130-135,148,379-382,396
+  s_4e2cd74095b28c::t_2b57a46fdc1c25 136-145,279-280
+packages/geo-core/src/geo/discover.ts
+  s_4e2cd74095b28c::t_1de53fd8fd635d 1,7,39,64-68,90,92,94,203-204,214,232-233,235,244-249,281-282,297-298,403-428,432-438,503-504,533-534,539-544,576-577
+  s_4e2cd74095b28c::t_84e2f2b06ea45e 536-538
+apps/dashboard/messages/en.json
+  s_4e2cd74095b28c::t_6c5b21c7328ecc 3003-3004,3007
+  s_4e2cd74095b28c::t_d8bbce393c9163 1075-1076
+apps/dashboard/src/components/geo/project-create-dialog.tsx
+  s_4e2cd74095b28c::t_092a03977e3e10 20,36-43,59,83,116,200-206
+  s_4e2cd74095b28c::t_84e2f2b06ea45e 3
+apps/dashboard/src/types/onboarding.ts
+  s_4e2cd74095b28c::t_02fa28491e4331 80-81,93-94,190
+apps/dashboard/src/lib/orpc/routers/geo.ts
+  s_4e2cd74095b28c::t_82dcbb46018a74 161,1624-1625,1691,1694-1699
+packages/geo-core/tests/auto-prompts.test.ts
+  s_4e2cd74095b28c::t_0bccf9134c1221 117-129
+packages/db/migrations/0104_geo_prompt_language.sql
+  ai_agent 1
+packages/db/src/schema.ts
+  s_4e2cd74095b28c::t_c62c4f4a2cc31e 1481-1482
+apps/dashboard/src/utils/onboarding-brand.ts
+  s_4e2cd74095b28c::t_02fa28491e4331 60-61
+packages/geo-core/src/types/geo-conversations.ts
+  s_4e2cd74095b28c::t_7af94186357564 25-26
+packages/geo-core/src/constants/geo-languages.ts
+  s_4e2cd74095b28c::t_af40aa24eccd25 1-37
+packages/geo-core/src/geo/mappers.ts
+  s_4e2cd74095b28c::t_952a761766b975 1,56
+packages/geo-core/src/utils/geo-scan.ts
+  s_4e2cd74095b28c::t_3b4d3236f36882 274-275,277,279,290,301
+apps/dashboard/src/app/onboarding/visibility/visibility-form.tsx
+  s_4e2cd74095b28c::t_84e2f2b06ea45e 239
+  s_4e2cd74095b28c::t_02fa28491e4331 18,34,51,106,114,223,231,240-245,354-372,379-380
+packages/db/migrations/meta/_journal.json
+  ai_agent 732-738,741
+packages/db/migrations/meta/0104_snapshot.json
+  ai_agent 1-12569
+apps/dashboard/src/app/onboarding/visibility/page.tsx
+  s_4e2cd74095b28c::t_02fa28491e4331 4,8,64,67,79-81
+packages/geo-core/tests/geo-scan-size.test.ts
+  s_4e2cd74095b28c::t_cf4d446c2b350f 4-6,125-150
+packages/geo-core/src/geo/projects.ts
+  s_4e2cd74095b28c::t_9795ae6123e48f 15,276,278,282
+  s_4e2cd74095b28c::t_2bc5646059dab9 280,283-286
+apps/dashboard/src/app/onboarding/workspace/actions.ts
+  s_4e2cd74095b28c::t_f2b312886fcb7d 7,204-205,207-209
+  s_4e2cd74095b28c::t_84e2f2b06ea45e 206
+packages/geo-core/src/geo/conversation.ts
+  s_4e2cd74095b28c::t_952a761766b975 39,79,119
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "b0d0f2970dd4252b087ed1fd0929ae46c3bacd79",
+  "prompts": {},
+  "sessions": {
+    "s_4e2cd74095b28c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "70a40795-46d3-4b33-aba5-6c32d88bd65b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

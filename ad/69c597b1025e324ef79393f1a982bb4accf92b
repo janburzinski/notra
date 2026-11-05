@@ -1,0 +1,9 @@
+apps/web/src/components/mcp-use-cases/use-case-prompt-block.tsx
+  ai_agent 7,116-127
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "ad69c597b1025e324ef79393f1a982bb4accf92b",
+  "prompts": {}
+}

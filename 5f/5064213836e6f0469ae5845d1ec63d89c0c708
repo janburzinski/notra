@@ -1,0 +1,22 @@
+packages/sites-server/tests/branch-workflow.test.ts
+  s_eae24aa58901b2::t_d5ae8b94654aef 7,10,196-201,213,229-245,378-381,385-391,395,406,434,547-556,561,576-612,617-622,624,674,676-686,699-749,755,760-763,786-790,794-797,804-869
+  s_eae24aa58901b2::t_2411e093183e71 117-119,219-228,382-384,392-394,396-405,407-433,435,445-468,470-490,492-498,675,687-698,750-754,756-759,764-785,791-793,798-803
+packages/sites-server/src/editor.ts
+  s_eae24aa58901b2::t_ce76d8f8c87059 366-383,397,443-473,542,577-590,701-716,718-722,724,727-729,731-735,737-745,749-829,831-864,866-867
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "5f5064213836e6f0469ae5845d1ec63d89c0c708",
+  "prompts": {},
+  "sessions": {
+    "s_eae24aa58901b2": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a154c8-0ea4-72d2-9abf-724136a31408",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

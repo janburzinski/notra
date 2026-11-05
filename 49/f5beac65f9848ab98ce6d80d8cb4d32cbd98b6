@@ -1,0 +1,25 @@
+packages/geo-core/src/utils/ai-traffic.ts
+  s_613bf42aae7038::t_50f5de69772c35 9,247-257,259
+apps/dashboard/src/components/geo/traffic-hero.tsx
+  s_613bf42aae7038::t_50f5de69772c35 271,285
+packages/geo-core/tests/ai-traffic-trend.test.ts
+  s_613bf42aae7038::t_f8d8f0ab9edf30 31-47
+apps/dashboard/src/app/(dashboard)/[slug]/geo/traffic/page-client.tsx
+  s_613bf42aae7038::t_50f5de69772c35 178
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "49f5beac65f9848ab98ce6d80d8cb4d32cbd98b6",
+  "prompts": {},
+  "sessions": {
+    "s_613bf42aae7038": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0ecb3-4609-7a51-99b5-0394d04280ad",
+        "model": "gpt-6-sol"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

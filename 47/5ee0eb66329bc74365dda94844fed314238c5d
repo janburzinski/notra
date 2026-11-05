@@ -1,0 +1,47 @@
+apps/dashboard/src/components/autopilot/autopilot-runs-table.tsx
+  s_98c5e4bab61524::t_a24ab092042e36 150
+  s_98c5e4bab61524::t_1503ea1bf7b23e 23,39,112
+  s_98c5e4bab61524::t_05304d9e88cbd3 144,151
+  s_98c5e4bab61524::t_e9428312f5f832 120
+  s_98c5e4bab61524::t_4778f233c2b144 3,19,36,56-68,80,87-105,128-130,172
+  s_98c5e4bab61524::t_196c09ea2fb6fd 4-6,20-22,25-26,28,32-33,37-38,40-55,69-79,81-86,106,115,127,131-136,140-143,145,154-159,161-166,176
+  s_98c5e4bab61524::t_d33217ae2ea294 118
+  s_98c5e4bab61524::t_536307225d14a0 121-126
+apps/dashboard/src/app/(dashboard)/[slug]/autopilot/runs/[id]/page-client.tsx
+  s_98c5e4bab61524::t_0052045a8d886e 59,117,131
+  s_98c5e4bab61524::t_f211d4fdf55c79 119-130
+apps/dashboard/src/constants/autopilot-ui.ts
+  s_98c5e4bab61524::t_3135448d1cf9a2 6,14,19,21,204-213
+apps/dashboard/src/lib/orpc/routers/autopilot.ts
+  s_98c5e4bab61524::t_23bc612f93c673 50,184-195,230-234
+  s_98c5e4bab61524::t_35972677ebcc51 5
+apps/dashboard/src/utils/autopilot-events.ts
+  s_98c5e4bab61524::t_f4e0ec3a535463 12,14,337-364
+apps/dashboard/src/types/autopilot-metrics.ts
+  s_98c5e4bab61524::t_7922aa7b337a99 112-114
+  s_98c5e4bab61524::t_0052045a8d886e 7
+apps/dashboard/src/lib/autopilot/log.ts
+  s_98c5e4bab61524::t_904a656f216eba 114-162
+apps/dashboard/src/types/autopilot.ts
+  s_98c5e4bab61524::t_f4e0ec3a535463 136-140
+apps/dashboard/src/app/(dashboard)/[slug]/autopilot/page-client.tsx
+  s_98c5e4bab61524::t_7922aa7b337a99 315,317
+apps/dashboard/src/components/autopilot/autopilot-analytics-panel.tsx
+  s_98c5e4bab61524::t_7922aa7b337a99 18,74-75,123-128
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "475ee0eb66329bc74365dda94844fed314238c5d",
+  "prompts": {},
+  "sessions": {
+    "s_98c5e4bab61524": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a8257cfb-b2be-4505-b505-b560a3296786",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

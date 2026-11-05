@@ -1,0 +1,39 @@
+apps/web/src/components/blog-diagrams/notra-demo.tsx
+  s_996bc2fa8dc596::t_dbced57adc34c8 66,71,76,79,85,88,96,110,168,170,174,201-202,345,349,355,359
+  s_996bc2fa8dc596::t_70dd44e7f282bb 14,70,72,81,90,169,171-173,344,346-348,354,356-358
+  s_996bc2fa8dc596::t_0cf988ccbd94ce 73-75,77-78,80,86-87,89
+  s_996bc2fa8dc596::t_13d52f1dda13f2 318,321-327,332,343
+  s_996bc2fa8dc596::t_39cb7c1b07b398 61
+  s_996bc2fa8dc596::t_52a223ab94f755 82-84
+apps/web/src/components/blog-diagrams/primitives.tsx
+  s_996bc2fa8dc596::t_1b94e08d601a52 172,177-182,205,220
+  s_996bc2fa8dc596::t_70dd44e7f282bb 161-164,166,189-191,261-265
+  s_996bc2fa8dc596::t_96da324238287d 2,152-155,158-159,167-171,173-176,183-185,187-188,221,224,226-230,234,247
+  s_996bc2fa8dc596::t_dbced57adc34c8 33-34,44,51,81,144-151,156-157,160,165,186,192-204,206-219,222-223,233
+  s_996bc2fa8dc596::t_fd6cd489568ee1 143,225
+apps/web/src/components/blog-mdx-components.tsx
+  s_996bc2fa8dc596::t_db93dcbf5f0ab3 4,6-11,21-43,51
+apps/web/src/styles/globals.css
+  s_996bc2fa8dc596::t_1b94e08d601a52 436-451
+  s_996bc2fa8dc596::t_dbced57adc34c8 452,454,458-459,462,464,469,471,474-475,478,480,485,487-489,491-492,494,496,498
+  s_996bc2fa8dc596::t_493ef4e6b3c43a 435,453,455-457,460-461,463,465-468,470,472-473,476-477,479,481-484,486,490,493,495,497,499-502
+apps/web/src/content/blog/how-we-built-the-notra-demo.mdx
+  s_996bc2fa8dc596::t_db93dcbf5f0ab3 15,21
+  s_996bc2fa8dc596::t_50c2d9e389ad4c 11,19,29,33-35,40,64-65,67,69-71,84-85,95,117,121,124-126,154,165,182,186,190
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "f0c194c77a5ea217498d85a78822b27aedea5067",
+  "prompts": {},
+  "sessions": {
+    "s_996bc2fa8dc596": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "37826b10-31a3-42fa-be2c-6de31ce5ea10",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

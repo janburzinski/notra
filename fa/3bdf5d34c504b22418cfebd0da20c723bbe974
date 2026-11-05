@@ -1,0 +1,29 @@
+apps/dashboard/src/components/motion/table/types.ts
+  s_023e6c4703dd3e::t_b5a0355a3ef62f 15-20
+apps/dashboard/src/components/motion/table/utils.ts
+  s_023e6c4703dd3e::t_b5a0355a3ef62f 99-101,119-122,131-134
+  s_023e6c4703dd3e::t_a5ff0e0533162a 108-111
+packages/geo-core/src/constants/geo.ts
+  s_023e6c4703dd3e::t_be6dfb7092e140 1091-1104
+apps/dashboard/src/components/motion/table/table-header.tsx
+  s_023e6c4703dd3e::t_f1b371e0e28a74 333-341,343-366,385-394
+  s_023e6c4703dd3e::t_3adbcdbd9d3b29 9,13-17,19-23,163-202
+apps/dashboard/src/components/geo/engine-rate-table.tsx
+  s_023e6c4703dd3e::t_a308b25ab9593a 8,119,149,170,180
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "fa3bdf5d34c504b22418cfebd0da20c723bbe974",
+  "prompts": {},
+  "sessions": {
+    "s_023e6c4703dd3e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "fc4c91ba-a673-4815-880e-5500bc8e78e3",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

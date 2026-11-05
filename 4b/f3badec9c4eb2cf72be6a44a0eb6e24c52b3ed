@@ -1,0 +1,25 @@
+scripts/testing/dashboard/redis-rest.ts
+  s_44cf84a7c2985f::t_cdcbf8bd8ba955 12-26
+apps/dashboard/src/lib/sites/flag.ts
+  s_44cf84a7c2985f::t_62b7e0957960b1 13-15
+packages/db/tests/build-telemetry-postgres.test.ts
+  s_44cf84a7c2985f::t_0e834479b63299 65
+  s_44cf84a7c2985f::t_32470132be472c 68-69
+  s_44cf84a7c2985f::t_ede5043bf0622c 8,66-67
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "4bf3badec9c4eb2cf72be6a44a0eb6e24c52b3ed",
+  "prompts": {},
+  "sessions": {
+    "s_44cf84a7c2985f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7369f024-3389-49d4-ad32-cf5f47956db1",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

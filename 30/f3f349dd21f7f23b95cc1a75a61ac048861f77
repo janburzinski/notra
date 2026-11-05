@@ -1,0 +1,95 @@
+apps/dashboard/src/components/dashboard/sidebar-user-menu.tsx
+  s_44cf84a7c2985f::t_21089cadc66a4f 1-230
+apps/dashboard/src/components/dashboard/sidebar-project-switcher.tsx
+  s_44cf84a7c2985f::t_21089cadc66a4f 25-26,42-45,53-58,62-188,191,210,263-264,268,270-272,281-285,288-295,297,303-315,320
+apps/ai-traffic-ingest/README.md
+  s_44cf84a7c2985f::t_21089cadc66a4f 67-69,72-73
+apps/dashboard/src/utils/client-session.ts
+  s_44cf84a7c2985f::t_21089cadc66a4f 1-27
+apps/dashboard/src/routes/-dashboard-ui.tsx
+  s_44cf84a7c2985f::t_21089cadc66a4f 116,118-124
+apps/dashboard/src/utils/chat-minimap.ts
+  s_44cf84a7c2985f::t_21089cadc66a4f 1,7-8,17,29,33-37,45
+apps/web/src/schemas/content.ts
+  s_44cf84a7c2985f::t_21089cadc66a4f 18-21
+apps/dashboard/src/components/dashboard/header.tsx
+  s_44cf84a7c2985f::t_21089cadc66a4f 45-48,99
+apps/dashboard/tests/chat-share-snapshot.test.ts
+  s_44cf84a7c2985f::t_21089cadc66a4f 145-167
+apps/dashboard/src/utils/organization-shell-prefetch.server.ts
+  s_44cf84a7c2985f::t_21089cadc66a4f 1-60
+apps/dashboard/src/app/api/session/route.ts
+  s_44cf84a7c2985f::t_21089cadc66a4f 3-4,30,32
+apps/dashboard/src/utils/dashboard-paths.ts
+  s_44cf84a7c2985f::t_21089cadc66a4f 17-21
+apps/web/types/blog.ts
+  s_44cf84a7c2985f::t_21089cadc66a4f 57
+apps/docs/favicon.svg
+  s_44cf84a7c2985f::t_21089cadc66a4f 1-5
+bun.lock
+  ai_agent 4376,6482-6483
+apps/dashboard/src/utils/chat-share-snapshot.ts
+  s_44cf84a7c2985f::t_21089cadc66a4f 1-4,28-46,144-146,148-157,176-197
+apps/dashboard/src/types/chat-share.ts
+  s_44cf84a7c2985f::t_21089cadc66a4f 11,19-22
+apps/dashboard/src/constants/chat-share.ts
+  s_44cf84a7c2985f::t_21089cadc66a4f 13-15
+apps/web/src/utils/markdown-twins.ts
+  s_44cf84a7c2985f::t_21089cadc66a4f 45,218
+package.json
+  ai_agent 51
+apps/dashboard/src/app/design-system/break-ui/page-client.tsx
+  s_44cf84a7c2985f::t_21089cadc66a4f 13,277-279,285
+apps/dashboard/src/components/dashboard/sidebar-org-menu.tsx
+  s_44cf84a7c2985f::t_21089cadc66a4f 4-5,22-24,54,56-61,65,76-100,102-115,125,129-144,146-151,153-207,209-212,214-248,250-270
+.github/workflows/code-quality.yml
+  s_44cf84a7c2985f::t_21089cadc66a4f 52,58
+apps/dashboard/src/components/dashboard/app-sidebar.tsx
+  s_44cf84a7c2985f::t_21089cadc66a4f 36,226
+apps/dashboard/src/types/components/sidebar-project-switcher.ts
+  s_44cf84a7c2985f::t_21089cadc66a4f 1,4,7-10,13-17
+apps/web/src/lib/blog/functions.ts
+  s_44cf84a7c2985f::t_21089cadc66a4f 11,34
+apps/web/src/utils/blog.ts
+  s_44cf84a7c2985f::t_21089cadc66a4f 21,32-35,83
+apps/dashboard/src/lib/chat/shares.ts
+  s_44cf84a7c2985f::t_21089cadc66a4f 1,11-14,152,159-186
+apps/dashboard/messages/en.json
+  s_44cf84a7c2985f::t_21089cadc66a4f 5926-5928,5954-5959,6284,6296-6301
+apps/dashboard/src/types/chat-minimap.ts
+  s_44cf84a7c2985f::t_21089cadc66a4f 1-7
+packages/schemas/src/schemas/dashboard/chat.ts
+  s_44cf84a7c2985f::t_21089cadc66a4f 21-24
+apps/dashboard/messages/de.json
+  s_44cf84a7c2985f::t_21089cadc66a4f 5926-5928,5954-5959,6284,6296-6301
+apps/dashboard/src/components/chat/shared-chat-page.tsx
+  s_44cf84a7c2985f::t_21089cadc66a4f 5,14-18,20-27,30,32-37,39-44,47,49-50,124-141,143-149,151-203,211,213,221-228,230,234,236,240-246,250-255,259-273,276-278,280-281,284-285,288-300,302-309,311-355,357
+apps/dashboard/src/lib/i18n/locale-cookie.ts
+  s_44cf84a7c2985f::t_21089cadc66a4f 35-42
+apps/dashboard/src/routes/-dashboard-loaders.ts
+  s_44cf84a7c2985f::t_21089cadc66a4f 28-31,34,37-43,45
+apps/dashboard/src/lib/orpc/routers/chat.ts
+  s_44cf84a7c2985f::t_21089cadc66a4f 21,31,142-155
+apps/web/source.config.ts
+  s_44cf84a7c2985f::t_21089cadc66a4f 5,21
+apps/dashboard/src/components/chat/shared-chat-continue.tsx
+  s_44cf84a7c2985f::t_21089cadc66a4f 1-5,7-16,18-25,27-42,44-53,55-57,59-68,71-76,78-89,91-117
+CONTRIBUTING.md
+  s_44cf84a7c2985f::t_21089cadc66a4f 457-459
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "30f3f349dd21f7f23b95cc1a75a61ac048861f77",
+  "prompts": {},
+  "sessions": {
+    "s_44cf84a7c2985f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7369f024-3389-49d4-ad32-cf5f47956db1",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

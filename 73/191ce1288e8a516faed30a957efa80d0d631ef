@@ -1,0 +1,189 @@
+apps/dashboard/src/lib/hooks/use-geo.ts
+  s_d113ac8d75c5ad::t_35f56eb67cd6d3 843-863
+packages/geo-core/src/types/geo.ts
+  s_d113ac8d75c5ad::t_35f56eb67cd6d3 52,694,1083
+apps/dashboard/src/components/motion/table/table-surfaces.tsx
+  s_d113ac8d75c5ad::t_35f56eb67cd6d3 5,30-41
+packages/geo/src/types.ts
+  s_d113ac8d75c5ad::t_35f56eb67cd6d3 129-133
+apps/api/src/runtime/geo.ts
+  s_d113ac8d75c5ad::t_35f56eb67cd6d3 90
+.github/workflows/code-quality.yml
+  s_d113ac8d75c5ad::t_35f56eb67cd6d3 48
+apps/dashboard/src/components/motion/table/index.tsx
+  s_d113ac8d75c5ad::t_35f56eb67cd6d3 5,14-18,20-21,29,81,122,136,175-177,273
+apps/dashboard/src/components/geo/journeys-card.tsx
+  s_d113ac8d75c5ad::t_35f56eb67cd6d3 13,22,26-27,30-32,96,103-122,124
+apps/dashboard/src/components/motion/table/types.ts
+  s_d113ac8d75c5ad::t_35f56eb67cd6d3 109-110
+apps/dashboard/src/utils/geo-overview-page.ts
+  s_d113ac8d75c5ad::t_35f56eb67cd6d3 50,93
+packages/db/src/constants/geo-shelf.ts
+  s_d113ac8d75c5ad::t_35f56eb67cd6d3 1-9
+apps/dashboard/src/components/geo/prompt-scan-button.tsx
+  s_d113ac8d75c5ad::t_35f56eb67cd6d3 8-12,35,53-54,56
+apps/docs/quickstart.mdx
+  s_d113ac8d75c5ad::t_35f56eb67cd6d3 161
+apps/dashboard/src/components/geo/competitor-detail-view.tsx
+  s_d113ac8d75c5ad::t_35f56eb67cd6d3 35,43,45-49,70,193,200,223,272-281,464-466,472-483
+apps/dashboard/src/components/geo/shelf/shelf-board.tsx
+  s_d113ac8d75c5ad::t_35f56eb67cd6d3 43,176-178
+apps/web/src/constants/landing/faq.ts
+  s_d113ac8d75c5ad::t_35f56eb67cd6d3 32
+apps/dashboard/src/components/motion/table/use-active-row.ts
+  s_d113ac8d75c5ad::t_35f56eb67cd6d3 1-28
+packages/geo-core/src/geo/ingest.ts
+  s_d113ac8d75c5ad::t_35f56eb67cd6d3 296-311,316-318,333
+packages/geo-core/src/geo/shelf.ts
+  s_d113ac8d75c5ad::t_35f56eb67cd6d3 1,4,22-24
+packages/geo/README.md
+  s_d113ac8d75c5ad::t_35f56eb67cd6d3 54-72
+apps/dashboard/src/components/geo/competitor-share-card.tsx
+  s_d113ac8d75c5ad::t_35f56eb67cd6d3 13,55
+apps/dashboard/src/components/geo/competitor-modal.tsx
+  s_d113ac8d75c5ad::t_35f56eb67cd6d3 4-9,14-16,21,29-32,34-35,37-38
+packages/schemas/src/utils/dashboard/shelf-url.ts
+  s_d113ac8d75c5ad::t_35f56eb67cd6d3 1-2,136-138
+apps/dashboard/src/app/(dashboard)/[slug]/geo/competitors/page-client.tsx
+  s_d113ac8d75c5ad::t_35f56eb67cd6d3 67-68,71,158
+apps/dashboard/src/components/geo/journey-path-tree.tsx
+  s_d113ac8d75c5ad::t_35f56eb67cd6d3 1-86
+apps/dashboard/src/components/geo/scan-answer-sheet.tsx
+  s_d113ac8d75c5ad::t_35f56eb67cd6d3 21,29,35-36,57-58,62-63,72-73,77-78
+apps/dashboard/src/components/geo/share-of-voice-chart.tsx
+  s_d113ac8d75c5ad::t_35f56eb67cd6d3 5,14,68-70,102,124-134,154-166,196,200-207,276-288,290-294,302,314,357
+apps/dashboard/src/types/table.ts
+  s_d113ac8d75c5ad::t_35f56eb67cd6d3 50-56
+apps/dashboard/src/lib/hooks/use-table-viewport.ts
+  s_d113ac8d75c5ad::t_35f56eb67cd6d3 58-82,112-114,135
+apps/dashboard/src/lib/geo-shelf/citations.ts
+  s_d113ac8d75c5ad::t_35f56eb67cd6d3 3,72,87
+apps/dashboard/src/utils/geo-share-of-voice.ts
+  s_d113ac8d75c5ad::t_35f56eb67cd6d3 1-6,12,25,31-112,115,122-127,130-134,144,159,162-164,184-201,219-230
+apps/dashboard/src/components/motion/table/utils.ts
+  s_d113ac8d75c5ad::t_35f56eb67cd6d3 52-64
+packages/geo/package.json
+  s_d113ac8d75c5ad::t_35f56eb67cd6d3 3,19-20,51-54,82,88
+apps/dashboard/src/lib/hooks/use-geo-overview-page.ts
+  s_d113ac8d75c5ad::t_35f56eb67cd6d3 8,131-136,181,188-199
+packages/geo/tests/types/tanstack.ts
+  s_d113ac8d75c5ad::t_35f56eb67cd6d3 1-26
+apps/dashboard/src/utils/geo-journey.ts
+  s_d113ac8d75c5ad::t_35f56eb67cd6d3 25,210-213,253,265,267-269,294-400
+apps/dashboard/src/components/geo/persona-detail-dialog.tsx
+  s_d113ac8d75c5ad::t_35f56eb67cd6d3 42,238,240,261-265
+apps/dashboard/src/utils/geo-share-of-voice.test.ts
+  s_d113ac8d75c5ad::t_35f56eb67cd6d3 1-30
+apps/dashboard/src/lib/geo-shelf/citations.test.ts
+  s_d113ac8d75c5ad::t_35f56eb67cd6d3 4,27-38,77-87
+packages/schemas/src/schemas/api/geo-traffic.ts
+  s_d113ac8d75c5ad::t_35f56eb67cd6d3 252
+apps/dashboard/src/utils/geo-journey.test.ts
+  s_d113ac8d75c5ad::t_35f56eb67cd6d3 1-88
+apps/dashboard/src/utils/geo-shelf.ts
+  s_d113ac8d75c5ad::t_35f56eb67cd6d3 3-5,433-455
+apps/dashboard/src/components/geo/journeys-tab.tsx
+  s_d113ac8d75c5ad::t_35f56eb67cd6d3 1-93
+apps/dashboard/src/components/analytics/connect-accounts-buttons.tsx
+  s_d113ac8d75c5ad::t_35f56eb67cd6d3 27,30
+apps/dashboard/src/components/geo/prompt-detail-dialog.tsx
+  s_d113ac8d75c5ad::t_35f56eb67cd6d3 52,569-570,581,584-591
+apps/web/src/constants/features-page.ts
+  s_d113ac8d75c5ad::t_35f56eb67cd6d3 107
+packages/geo/tests/tanstack.test.ts
+  s_d113ac8d75c5ad::t_35f56eb67cd6d3 1-126
+apps/dashboard/src/components/motion/table/use-active-column.ts
+  s_d113ac8d75c5ad::t_35f56eb67cd6d3 1-21
+apps/dashboard/src/components/geo/shelf/shelf-detail-dialog.tsx
+  s_d113ac8d75c5ad::t_35f56eb67cd6d3 19,22,44,52,75-79,139-153
+apps/dashboard/src/app/(auth)/layout.tsx
+  s_d113ac8d75c5ad::t_35f56eb67cd6d3 67
+apps/dashboard/src/constants/geo-shelf.ts
+  s_d113ac8d75c5ad::t_35f56eb67cd6d3 191
+apps/docs/geo/traffic.mdx
+  s_d113ac8d75c5ad::t_35f56eb67cd6d3 66,116-131
+apps/dashboard/src/lib/geo-shelf/url.test.ts
+  s_d113ac8d75c5ad::t_35f56eb67cd6d3 6,33-44
+packages/geo/tsup.config.ts
+  s_d113ac8d75c5ad::t_35f56eb67cd6d3 9
+apps/dashboard/src/components/geo/journey-detail-sheet.tsx
+  s_d113ac8d75c5ad::t_35f56eb67cd6d3 1-267
+apps/dashboard/src/components/onboarding/split-layout.tsx
+  s_d113ac8d75c5ad::t_35f56eb67cd6d3 30
+apps/dashboard/src/constants/geo-analytics.ts
+  s_d113ac8d75c5ad::t_35f56eb67cd6d3 22
+apps/dashboard/src/types/geo.ts
+  s_d113ac8d75c5ad::t_35f56eb67cd6d3 449,454,457-459,467-481,487-496,498-499,503-504,518-522,745,1121-1122,1136,1147-1148,1175,1299-1300
+apps/dashboard/src/utils/geo-scan-models.ts
+  s_d113ac8d75c5ad::t_35f56eb67cd6d3 1-69
+apps/dashboard/src/app/(auth-public)/layout.tsx
+  s_d113ac8d75c5ad::t_35f56eb67cd6d3 14
+apps/dashboard/src/components/logs/log-details-sheet.tsx
+  s_d113ac8d75c5ad::t_35f56eb67cd6d3 19,27,33,47-51
+packages/geo-core/src/geo/scan.ts
+  s_d113ac8d75c5ad::t_35f56eb67cd6d3 864-868
+packages/geo-core/src/utils/geo-engines.ts
+  s_d113ac8d75c5ad::t_35f56eb67cd6d3 44-46,49,56,61
+apps/dashboard/src/components/geo/journey-paths-card.tsx
+  s_d113ac8d75c5ad::t_35f56eb67cd6d3 4,6,10,13-49,52-76
+packages/geo/tsconfig.json
+  s_d113ac8d75c5ad::t_35f56eb67cd6d3 9
+apps/dashboard/src/app/(dashboard)/[slug]/geo/components/geo-tabs.tsx
+  s_d113ac8d75c5ad::t_35f56eb67cd6d3 13,74,190-195
+apps/dashboard/src/components/geo/engine-family-sheet.tsx
+  s_d113ac8d75c5ad::t_35f56eb67cd6d3 65,97,543-547,554-560,610-614,669,679,696
+packages/geo/src/tanstack.ts
+  s_d113ac8d75c5ad::t_35f56eb67cd6d3 1-18
+packages/geo-core/src/constants/geo.ts
+  s_d113ac8d75c5ad::t_35f56eb67cd6d3 639,1009
+apps/dashboard/src/components/geo/sentiment-results-table.tsx
+  s_d113ac8d75c5ad::t_35f56eb67cd6d3 16,35-36,166,172
+apps/dashboard/src/components/geo/shelf/shelf-table.tsx
+  s_d113ac8d75c5ad::t_35f56eb67cd6d3 51,57,60,86-95,97-107
+apps/dashboard/src/types/geo-scan-activity.ts
+  s_d113ac8d75c5ad::t_35f56eb67cd6d3 1,33-40,43,45-48
+apps/web/src/utils/site-markdown.ts
+  s_d113ac8d75c5ad::t_35f56eb67cd6d3 112
+apps/dashboard/src/components/geo/share-of-voice-brands-dialog.tsx
+  s_d113ac8d75c5ad::t_35f56eb67cd6d3 5,15-20,25,33-37,40-42,45,83,86,103-111,115-133,143,169-171,186,188-192,196-203,205-249,251-332,340-341,343-344
+apps/dashboard/src/components/geo/journey-overview-card.tsx
+  s_d113ac8d75c5ad::t_35f56eb67cd6d3 7,16-46,51-54,56-87
+apps/dashboard/src/components/geo/journey-stat-card.tsx
+  s_d113ac8d75c5ad::t_35f56eb67cd6d3 1-53
+apps/dashboard/src/constants/button.ts
+  s_d113ac8d75c5ad::t_35f56eb67cd6d3 2,5,8
+apps/docs/overview.mdx
+  s_d113ac8d75c5ad::t_35f56eb67cd6d3 100
+packages/analytics/src/tinybird/pipes/geo-traffic.ts
+  s_d113ac8d75c5ad::t_35f56eb67cd6d3 388
+apps/dashboard/src/utils/geo-scan-models.test.ts
+  s_d113ac8d75c5ad::t_35f56eb67cd6d3 1-62
+apps/dashboard/src/lib/hooks/use-retained-value.ts
+  s_d113ac8d75c5ad::t_35f56eb67cd6d3 1-20
+apps/dashboard/src/components/geo/scan-model-menu.tsx
+  s_d113ac8d75c5ad::t_35f56eb67cd6d3 3-8,11-14,20,24-97,101-103,111-120,122-127,130-136,163-198,200-210,233-234,236-237,239-266,268-295
+apps/dashboard/src/lib/geo-shelf/store.ts
+  s_d113ac8d75c5ad::t_35f56eb67cd6d3 1,75-84,220,240,293
+apps/dashboard/src/lib/orpc/utils/geo-errors.ts
+  s_d113ac8d75c5ad::t_35f56eb67cd6d3 78
+packages/geo-core/src/geo/programs.ts
+  s_d113ac8d75c5ad::t_35f56eb67cd6d3 973-974,1800-1805
+README.md
+  s_d113ac8d75c5ad::t_35f56eb67cd6d3 38
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "73191ce1288e8a516faed30a957efa80d0d631ef",
+  "prompts": {},
+  "sessions": {
+    "s_d113ac8d75c5ad": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "3a15bcbc-b026-41aa-a036-4a7a3cea07dc",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

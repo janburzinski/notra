@@ -1,0 +1,51 @@
+apps/dashboard/src/components/geo/conversations-card.tsx
+  s_9acb868acb273f::t_1e553c07143888 108
+  s_9acb868acb273f::t_94d563c03ad614 51
+  s_9acb868acb273f::t_00213abf974a34 80-85,94,190-191,248,264,367,374
+apps/dashboard/src/components/geo/personas-table.tsx
+  s_9acb868acb273f::t_0c7a93fdc31409 75-77
+  s_9acb868acb273f::t_1e553c07143888 45
+  s_9acb868acb273f::t_bf0767aeec4a7d 52,307
+apps/dashboard/src/types/geo-personas-ui.ts
+  s_9acb868acb273f::t_bf0767aeec4a7d 63
+apps/dashboard/src/lib/hooks/use-geo.ts
+  s_9acb868acb273f::t_1e553c07143888 892
+  s_9acb868acb273f::t_47b86b37d6e4c4 883-891,893-894
+  s_9acb868acb273f::t_00213abf974a34 55
+apps/dashboard/src/types/geo.ts
+  s_9acb868acb273f::t_00213abf974a34 378
+apps/dashboard/messages/de.json
+  s_9acb868acb273f::t_ea8fa89e2b6d1e 2907-2910
+apps/dashboard/messages/en.json
+  s_9acb868acb273f::t_ea8fa89e2b6d1e 2907-2910
+apps/dashboard/src/lib/hooks/use-geo-personas.ts
+  s_9acb868acb273f::t_00213abf974a34 10-15,220-233,239
+apps/dashboard/src/components/geo/conversation-results-dialog.tsx
+  s_9acb868acb273f::t_00213abf974a34 47,52,56-62,76
+  s_9acb868acb273f::t_94d563c03ad614 192
+apps/dashboard/src/components/geo/persona-detail-dialog.tsx
+  s_9acb868acb273f::t_0c7a93fdc31409 54-61,356-358
+  s_9acb868acb273f::t_bf0767aeec4a7d 98,133-134,407
+  s_9acb868acb273f::t_1e553c07143888 432
+apps/dashboard/src/components/geo/geo-engine-picker.tsx
+  s_9acb868acb273f::t_ea8fa89e2b6d1e 16,293-305,309-316,320-327,334-339,367,371-378,533-537
+  s_9acb868acb273f::t_1e553c07143888 306-308,317-319
+apps/dashboard/tests/geo-scan-model-options.test.ts
+  s_9acb868acb273f::t_b47d1e3bd41fe8 1-27
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "31b3d400186695cb7a60ff8525d9dc046d625df4",
+  "prompts": {},
+  "sessions": {
+    "s_9acb868acb273f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "03ce46c3-a19d-4400-a9bf-698b31d0af2b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

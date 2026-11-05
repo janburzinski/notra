@@ -1,0 +1,59 @@
+apps/dashboard/src/components/geo/social-posts/social-post-parts.tsx
+  s_e9c4e2b8de4eda::t_cd4a4b37de4c42 1-2,4,8-19,28-29,36,39-41,43-46,52,54-69,78,82,92-94,96,112-113,123-124,130-269
+apps/dashboard/src/components/geo/social-posts/social-insights-card.tsx
+  s_e9c4e2b8de4eda::t_17ff395182a7ea 1-10,13-57,59-69,71-76,78-88,90-103,105-117,119-144,146-165,167-205
+apps/dashboard/src/components/geo/social-posts/social-posts-filters.tsx
+  s_e9c4e2b8de4eda::t_64dca68915bb40 1-3,10-15,20-27,30-32,51-59,62-64,66-80,83-85,87-94
+  s_e9c4e2b8de4eda::t_0fc66b861d586d 4-9,16-19,28-29,33-50,60-61,65,81-82,86
+apps/dashboard/src/utils/geo-social-posts.ts
+  s_e9c4e2b8de4eda::t_3b849dacd9676f 3-55,62-104,106,108-118,120-129,132,139-194,196-200,203-277
+apps/dashboard/src/lib/geo-social-posts/service.ts
+  s_e9c4e2b8de4eda::t_deae34d1c3083e 1-83,85-300,303-343
+apps/dashboard/src/lib/geo-social-posts/fetch.ts
+  s_e9c4e2b8de4eda::t_6bfd162f44e58c 180-181,183-191
+  s_e9c4e2b8de4eda::t_409823ea2afb21 1-27,34-71,83,94-112,115-117,140-179,182,192-193,209-286,288-302,305,308,310-313,317-339,341-346,349-354,356-383
+apps/dashboard/src/components/geo/social-posts/social-citation-activity-card.tsx
+  s_e9c4e2b8de4eda::t_179687ff17039d 1-114
+packages/schemas/src/schemas/dashboard/geo-social-posts.ts
+  s_e9c4e2b8de4eda::t_d7bc98e4497fac 1-64
+packages/ai/src/utils/context-dev.ts
+  s_e9c4e2b8de4eda::t_003b413b8dd6e4 603-605,607-620
+apps/dashboard/src/components/geo/social-posts/social-posts-overview.tsx
+  s_e9c4e2b8de4eda::t_9d7f490e1a2532 7-8,23-27,31,66,70-71,73,92-97,100-101,111-129
+  s_e9c4e2b8de4eda::t_f8809fb8b8c306 1-2,4-6,11-21,28-30,34-41,44-50,53-54,57-59,62,64-65,68,77,79-91,98-99,102-103,130-144
+apps/dashboard/src/components/geo/social-posts/social-citations-card.tsx
+  s_e9c4e2b8de4eda::t_c5d51d667d3463 1-97
+apps/dashboard/src/components/geo/social-posts/social-communities-table.tsx
+  s_e9c4e2b8de4eda::t_23a934025b61d7 1-185
+apps/dashboard/src/app/(dashboard)/[slug]/geo/social-posts/page-client.tsx
+  s_e9c4e2b8de4eda::t_c26678228483f2 4,9-14,22-24,26-27,41-45,48-54,57-63,68-70,93-94,96,98,100-102,105-109
+  s_e9c4e2b8de4eda::t_4a96f52fe3690d 1-3,5-8,16-21,25,28-40,55-56,74-83,87-92,111-114
+apps/dashboard/src/components/geo/social-posts/social-posts-table.tsx
+  s_e9c4e2b8de4eda::t_a6312e47fad1f2 4,7-15,35-36,39-44,46,51,53-54,56-65,67-73,76-79,81,86-87,121-122,124-132,137-141,145-147,150-152,154-155,161-166,169-172,175-179,181-182,188,200,209,215,217-266,268-272,274-283,285-288
+  s_e9c4e2b8de4eda::t_1bd2f0e7d59fa5 19,22,24-33,38,55,66,99-106,110-114,120,123,143,148-149,167-168,273,284
+  s_e9c4e2b8de4eda::t_1a2fdb139059f1 1-2,6,16,18,52,94-98,108,119,133,135-136,142,144,159-160,173,180,203-204,208,212-214,289-290
+apps/dashboard/src/components/geo/social-posts/social-post-sheet.tsx
+  s_e9c4e2b8de4eda::t_4896a555a27ae9 1-24,26-28,31-40,42-95,97,99-111,114-182
+apps/dashboard/src/utils/geo-social-posts-view.ts
+  s_e9c4e2b8de4eda::t_0779e5ae00cc20 3-11,15-61,63-65,68-75,79-89,91-95,109-121,123-124,136,152-153,156-159,161-364
+packages/db/src/schema.ts
+  s_e9c4e2b8de4eda::t_16e0526a95859a 2046-2053,2055-2063,2065-2081
+apps/dashboard/src/constants/geo-social-posts.ts
+  s_e9c4e2b8de4eda::t_a0454b2b578506 1-6,13-14,21-69
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "5449fa11e382a004a7efdd173dc09148de40854c",
+  "prompts": {},
+  "sessions": {
+    "s_e9c4e2b8de4eda": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "793a17e4-e3ba-49d3-857b-0c645a8c44aa",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

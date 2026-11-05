@@ -1,0 +1,25 @@
+apps/dashboard/tests/geo-recap-brand.test.ts
+  s_6ed10367b8c6eb::t_525c113e78a312 1-35
+apps/dashboard/src/utils/geo-recap.ts
+  s_6ed10367b8c6eb::t_525c113e78a312 25,30-40
+apps/dashboard/src/types/email/geo-recap.ts
+  s_6ed10367b8c6eb::t_525c113e78a312 5-9
+apps/dashboard/src/lib/email/geo-recap.ts
+  s_6ed10367b8c6eb::t_525c113e78a312 63,191-206,296,298,306
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "fd260d3a660c8b7028befb75fe333d78675d01ac",
+  "prompts": {},
+  "sessions": {
+    "s_6ed10367b8c6eb": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a17770-0da6-7b20-a395-9f0437c8c5b9",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

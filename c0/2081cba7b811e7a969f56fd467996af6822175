@@ -1,0 +1,19 @@
+apps/dashboard/src/components/sites/site-design-integrations.tsx
+  s_8ff470b5e79e4a::t_79713bfeb76847 1-178
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "c02081cba7b811e7a969f56fd467996af6822175",
+  "prompts": {},
+  "sessions": {
+    "s_8ff470b5e79e4a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "04e358e8-8889-4650-9310-e338b0a5de3e",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

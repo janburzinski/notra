@@ -1,0 +1,21 @@
+apps/dashboard/src/components/geo/scan-run-detail.tsx
+  s_1693f1917d1e9d::t_233e85e949ad04 48,533,561-563,607-613,651,653,655
+apps/dashboard/src/types/geo-scan-activity.ts
+  s_1693f1917d1e9d::t_233e85e949ad04 68-73
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "e39cb19edcd1afeb938246c4a4c62a83ffb73ad3",
+  "prompts": {},
+  "sessions": {
+    "s_1693f1917d1e9d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "fdb0a4c0-1c1e-46a4-88de-75eeed33039a",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

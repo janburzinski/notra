@@ -1,0 +1,47 @@
+packages/ui/src/constants/table.ts
+  s_a7700a9c0ec3fc::t_699f0061011d04 20
+  s_a7700a9c0ec3fc::t_92adb41b8cab9a 5,17-19,21-23,32
+  s_a7700a9c0ec3fc::t_8a15c2b179a41d 9
+apps/dashboard/src/app/design-system/tables/page.dev.tsx
+  s_a7700a9c0ec3fc::t_ec2024f4168b69 1-5
+apps/dashboard/src/app/design-system/scan-filters/page-client.tsx
+  s_a7700a9c0ec3fc::t_e9dfec71c9290c 63
+  s_a7700a9c0ec3fc::t_7a26d3a6b82480 5,65-72
+packages/ui/src/styles/globals.css
+  s_a7700a9c0ec3fc::t_699f0061011d04 130-131
+  s_a7700a9c0ec3fc::t_92adb41b8cab9a 42-46,124-128,203-207
+  s_a7700a9c0ec3fc::t_8a15c2b179a41d 47-48,129,208
+packages/ui/src/components/data-table/surfaces.tsx
+  s_a7700a9c0ec3fc::t_92adb41b8cab9a 81
+apps/dashboard/public/design.md
+  s_a7700a9c0ec3fc::t_87daa50e80578e 71
+apps/dashboard/src/app/design-system/tables/page-client.tsx
+  s_a7700a9c0ec3fc::t_b74e3fbe263a3b 19,174,234-235
+  s_a7700a9c0ec3fc::t_ec2024f4168b69 1-2,5-17,20-27,37,56,66-91,93,102-113,142-143,150-151,163-173,175-216,218-225,228-233,237,240-241,245-294,299-309
+  s_a7700a9c0ec3fc::t_7103d1a776aa34 144-149,152-162
+  s_a7700a9c0ec3fc::t_124cc3eb01ae4e 18,40,46,52,217,226-227,238-239,242-244
+  s_a7700a9c0ec3fc::t_7a26d3a6b82480 3-4,28-36,38-39,41-45,47-51,53-55,57-65,94-101,114-141,236,295-298
+  s_a7700a9c0ec3fc::t_e9dfec71c9290c 92
+apps/dashboard/src/routes/-development-ui.tsx
+  s_a7700a9c0ec3fc::t_ec2024f4168b69 53,150-154
+apps/dashboard/src/components/geo/scan-run-detail.tsx
+  s_a7700a9c0ec3fc::t_7a26d3a6b82480 15
+  s_a7700a9c0ec3fc::t_e9dfec71c9290c 222,289
+  s_a7700a9c0ec3fc::t_2cb39e7582eb54 124-131
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "6ded1e18e85e3184379ffdcbb8ddc3491261559f",
+  "prompts": {},
+  "sessions": {
+    "s_a7700a9c0ec3fc": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "91584822-240f-4cff-81a1-a13c297c984c",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

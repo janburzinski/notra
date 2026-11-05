@@ -1,0 +1,88 @@
+apps/dashboard/src/routes/api.internal.ai-trends.traffic.ts
+  s_3ec3deb7cdb2f9::t_6be3047885113c 13-14
+  s_3ec3deb7cdb2f9::t_cd94aecbfd44b9 1-12,15-19
+packages/schemas/src/schemas/api/ai-trends-traffic.ts
+  s_3ec3deb7cdb2f9::t_3c9dd545fdc2e7 5-7,10,13
+  s_3ec3deb7cdb2f9::t_cc14abfb5e98f4 8-9
+  s_3ec3deb7cdb2f9::t_c1dffd36b735ed 1-4,11-12,14-41
+apps/dashboard/src/app/api/internal/ai-trends/traffic/route.ts
+  s_3ec3deb7cdb2f9::t_3c9dd545fdc2e7 60,66,68,77-78
+  s_3ec3deb7cdb2f9::t_2ee1944c419354 1-59,61-64,69-76,79-88,90-91
+  s_3ec3deb7cdb2f9::t_cc14abfb5e98f4 65,67
+  s_3ec3deb7cdb2f9::t_6be3047885113c 89
+packages/analytics/src/types/tinybird-endpoints.ts
+  s_3ec3deb7cdb2f9::t_f18518764519c9 14-16,78-83
+apps/console/src/types/ai-trends.ts
+  s_3ec3deb7cdb2f9::t_efa3b5c7680eb1 16-28,124-146,148-177,185-186,295-298,302-303,305-308
+  s_3ec3deb7cdb2f9::t_481a73b443b7ef 299-301,304
+  s_3ec3deb7cdb2f9::t_fda5a24cce85ce 147,178-184
+  s_3ec3deb7cdb2f9::t_88c11d06387753 221,224-225
+packages/analytics/tinybird.config.json
+  s_3ec3deb7cdb2f9::t_f18518764519c9 6
+packages/analytics/src/tinybird/pipes/geo-traffic-trends.ts
+  s_3ec3deb7cdb2f9::t_8047f674943259 50-51,71-79
+  s_3ec3deb7cdb2f9::t_cc14abfb5e98f4 101,104-106,121-122,125
+  s_3ec3deb7cdb2f9::t_5da9f6ffcfbd16 1-18,21-34,36-47,55-62,81-100,102-103,107-119,126-142
+  s_3ec3deb7cdb2f9::t_75e952a1ee7557 19-20,120,123-124
+packages/analytics/src/tinybird/client.ts
+  s_3ec3deb7cdb2f9::t_f18518764519c9 33-34,80-83,155-156,510-531
+apps/console/src/components/ai-trends/ai-trends-traffic-section.tsx
+  s_3ec3deb7cdb2f9::t_8722d89eb0525e 1-4,6-17,22-28,36-50,52,58-66,74-98
+  s_3ec3deb7cdb2f9::t_d84b5954964154 51,53-57
+  s_3ec3deb7cdb2f9::t_481a73b443b7ef 18-21,67-68,72-73
+  s_3ec3deb7cdb2f9::t_9417271ce66ac2 5,29-35
+  s_3ec3deb7cdb2f9::t_6be3047885113c 69-71
+apps/console/src/components/ai-trends/ai-trends-traffic-sources.tsx
+  s_3ec3deb7cdb2f9::t_53e316408e23c6 1-28,32-36,39,44,49,54,79-86
+  s_3ec3deb7cdb2f9::t_6be3047885113c 29,31,37-38,40-43,45-48,50-53,55-78
+  s_3ec3deb7cdb2f9::t_9417271ce66ac2 30
+apps/console/src/schemas/dashboard.ts
+  s_3ec3deb7cdb2f9::t_868705f93ad64f 1-3
+apps/console/src/utils/ai-trends-traffic.test.ts
+  s_3ec3deb7cdb2f9::t_d6daa9a4f2b4c0 1-3,8-52,64-65
+  s_3ec3deb7cdb2f9::t_9311c4a52a5b33 54
+  s_3ec3deb7cdb2f9::t_9417271ce66ac2 4-7,53,55-63
+apps/console/src/utils/ai-trends-traffic.ts
+  s_3ec3deb7cdb2f9::t_4aec182771df3e 1-18,20-47,59-63,66-68,70-87,96-106,108-118,122-124,126-135,137-251
+  s_3ec3deb7cdb2f9::t_fda5a24cce85ce 19,48-58,64-65,69,94,107,119-121,125,136
+  s_3ec3deb7cdb2f9::t_6be3047885113c 88-93,95
+apps/console/src/lib/orpc/routers/ai-trends.ts
+  s_3ec3deb7cdb2f9::t_205e503ceac762 5,27-32
+apps/console/src/components/ai-trends/ai-trends-client.tsx
+  s_3ec3deb7cdb2f9::t_b8da823975a2c2 123-124
+  s_3ec3deb7cdb2f9::t_8155ee72118c85 14
+apps/dashboard/src/routeTree.gen.ts
+  s_3ec3deb7cdb2f9::t_4fcb9d3b7a6efe 68,397-402,640,729,819,910,999,1088,1172,1592-1598,1969
+apps/console/src/lib/ai-trends/traffic.ts
+  s_3ec3deb7cdb2f9::t_9533dc11c6eb9a 1-92,98,111-126,130-170
+  s_3ec3deb7cdb2f9::t_6be3047885113c 93-97,99-110
+  s_3ec3deb7cdb2f9::t_9417271ce66ac2 127-129
+apps/console/src/utils/ai-trends.ts
+  s_3ec3deb7cdb2f9::t_13b36ad8df15ad 32,137,440-442,457-461
+apps/console/src/lib/dashboard.ts
+  s_3ec3deb7cdb2f9::t_868705f93ad64f 1-54
+apps/console/src/components/ai-trends/ai-trends-traffic-chart.tsx
+  s_3ec3deb7cdb2f9::t_6be3047885113c 77
+  s_3ec3deb7cdb2f9::t_481a73b443b7ef 79-82
+  s_3ec3deb7cdb2f9::t_1551747fe695e0 1-76,78,83-128
+apps/console/src/constants/ai-trends.ts
+  s_3ec3deb7cdb2f9::t_bb0e2b832da621 1-4,102-147
+apps/console/src/lib/sites/dashboard.ts
+  s_3ec3deb7cdb2f9::t_868705f93ad64f 2,6,12-13
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "e1c5be5428e51eef6f687b818f70cfa8f79d29ea",
+  "prompts": {},
+  "sessions": {
+    "s_3ec3deb7cdb2f9": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "736bbb8d-09a8-4f6d-b5dd-00c90b8b8236",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

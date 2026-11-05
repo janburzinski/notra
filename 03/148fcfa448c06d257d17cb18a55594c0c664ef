@@ -1,0 +1,23 @@
+apps/web/src/utils/site-markdown.ts
+  s_faf314cda5b1a8::t_ddeb4f3f3debfc 271
+apps/web/src/components/landing/prompt-calculator.tsx
+  s_faf314cda5b1a8::t_7a862fcf96aaf3 326-335,404-417,469,568-584,656-660,698-707,709-713
+  s_faf314cda5b1a8::t_f23c494faa963a 347-403,470-567,585-651,655
+  s_faf314cda5b1a8::t_5b827b58a1404f 654,661
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "03148fcfa448c06d257d17cb18a55594c0c664ef",
+  "prompts": {},
+  "sessions": {
+    "s_faf314cda5b1a8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6e656d0e-e558-446f-b1b4-4964a61637ce",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

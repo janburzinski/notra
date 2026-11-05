@@ -1,0 +1,37 @@
+apps/ui/docs/components/step-slider.mdx
+  s_806a85cabd9a25::t_13ba5a2878f1fa 1-35
+apps/ui/registry/notra/step-slider/lib/step-slider.ts
+  s_806a85cabd9a25::t_d00dbed925f452 1-14
+apps/ui/registry/notra/step-slider/examples/step-slider.tsx
+  s_806a85cabd9a25::t_ee407e1bf74d45 1-33
+apps/ui/registry/notra/step-slider/types/step-slider.ts
+  s_806a85cabd9a25::t_c745cdb4e7a6fa 1-3,18-35
+  s_806a85cabd9a25::t_847435145ea86f 4-17
+apps/ui/src/styles/blocks.css
+  s_806a85cabd9a25::t_ea496f95e32635 103-114
+apps/ui/registry.json
+  s_806a85cabd9a25::t_250844d224fd62 937-941,943-972
+  s_806a85cabd9a25::t_ebdc7e3675c82e 942
+apps/ui/registry/notra/step-slider/components/step-slider.tsx
+  s_806a85cabd9a25::t_847435145ea86f 14,108
+  s_806a85cabd9a25::t_83e98855360154 1-13,15-78,80-107,109-154
+  s_806a85cabd9a25::t_c48d9a5a57deed 79
+apps/ui/docs/components/meta.ts
+  s_806a85cabd9a25::t_847435145ea86f 10
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "1c71c0c144842ab7a6a31e55546ce8be93b83fdd",
+  "prompts": {},
+  "sessions": {
+    "s_806a85cabd9a25": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "776afac6-b58f-4a94-a058-ac7e5b4494d7",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

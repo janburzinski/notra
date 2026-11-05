@@ -1,0 +1,93 @@
+apps/dashboard/src/utils/schedule-demo.ts
+  s_f627da06a4f228::t_bcced3da9f5e7e 1-32
+apps/dashboard/src/components/auth/pixel-blast-background.tsx
+  s_f627da06a4f228::t_bcced3da9f5e7e 1-48
+apps/dashboard/src/components/geo/prompt-detail-dialog.tsx
+  ai_agent 34,243
+apps/dashboard/src/components/dashboard/org-selector.tsx
+  s_f627da06a4f228::t_bcced3da9f5e7e 61,443-445
+apps/dashboard/src/types/tracked-anchor-click.ts
+  s_f627da06a4f228::t_bcced3da9f5e7e 1-12
+apps/dashboard/src/constants/posthog.ts
+  s_f627da06a4f228::t_bcced3da9f5e7e 28-34
+apps/dashboard/src/components/integrations/add-slack-integration-dialog.tsx
+  s_f627da06a4f228::t_bcced3da9f5e7e 20,68,70-71
+apps/dashboard/src/components/geo/lazy-geo-prompt-answer-thread.tsx
+  s_f627da06a4f228::t_bcced3da9f5e7e 1-18
+apps/dashboard/src/lib/integrations/github/install.ts
+  s_f627da06a4f228::t_bcced3da9f5e7e 7,60,67
+apps/dashboard/src/components/dashboard/header.tsx
+  s_f627da06a4f228::t_bcced3da9f5e7e 29,43,94
+apps/dashboard/src/lib/analytics/posthog-lazy.ts
+  s_f627da06a4f228::t_bcced3da9f5e7e 1-193
+apps/dashboard/src/lib/content/image-export.test.ts
+  s_f627da06a4f228::t_bcced3da9f5e7e 1-318
+apps/dashboard/src/constants/auth-split-panel.ts
+  s_f627da06a4f228::t_bcced3da9f5e7e 1-2
+apps/dashboard/src/components/geo/conversation-replay-thread.tsx
+  s_f627da06a4f228::t_bcced3da9f5e7e 10,24-121
+apps/dashboard/src/app/(auth-public)/layout.tsx
+  s_f627da06a4f228::t_bcced3da9f5e7e 3,15
+apps/dashboard/src/components/billing/credit-topup-content.tsx
+  s_f627da06a4f228::t_bcced3da9f5e7e 21,101
+apps/dashboard/src/utils/tracked-anchor-click.test.ts
+  s_f627da06a4f228::t_bcced3da9f5e7e 1-104
+apps/dashboard/src/components/PixelBlast.tsx
+  s_f627da06a4f228::t_bcced3da9f5e7e 397-415,451-456,458-467,469-521,525-529,531-555,557-565,567-570,572-588,590,592-596,598-608,610-616,618-645,647-651,653-673,677-679,681-685,687-701,706-712,726,731-789,791-792,796,807
+packages/kiwi/src/fonts/loader.ts
+  s_f627da06a4f228::t_bcced3da9f5e7e 14-19,21-25
+apps/dashboard/src/components/integrations/add-linear-integration-dialog.tsx
+  s_f627da06a4f228::t_bcced3da9f5e7e 20,75,77-78
+apps/dashboard/src/app/(dashboard)/[slug]/content/[id]/page-client.tsx
+  s_f627da06a4f228::t_bcced3da9f5e7e 99,1276,1683-1690,1729-1732
+apps/dashboard/src/utils/webgl.test.ts
+  s_f627da06a4f228::t_bcced3da9f5e7e 1-31
+apps/dashboard/src/utils/webgl.ts
+  s_f627da06a4f228::t_bcced3da9f5e7e 1-12
+apps/dashboard/src/components/dashboard/nav-user.tsx
+  s_f627da06a4f228::t_bcced3da9f5e7e 26,54
+apps/dashboard/src/components/geo/prompt-answer-content.tsx
+  s_f627da06a4f228::t_bcced3da9f5e7e 4,40
+apps/dashboard/src/utils/tracked-anchor-click.ts
+  s_f627da06a4f228::t_bcced3da9f5e7e 1-34
+apps/dashboard/src/instrumentation-client.ts
+  s_f627da06a4f228::t_bcced3da9f5e7e 1-2,4,7-13
+apps/dashboard/src/components/auth/auth-brand-panel.tsx
+  s_f627da06a4f228::t_bcced3da9f5e7e 4-5,8-20,24,26-38,44-57
+apps/dashboard/src/components/geo/search-console-card.tsx
+  s_f627da06a4f228::t_bcced3da9f5e7e 32,38,62,69-77,142,289,366
+apps/dashboard/src/lib/analytics/posthog-client.ts
+  s_f627da06a4f228::t_bcced3da9f5e7e 6-13,19-32,35-58,65
+packages/kiwi/src/index.ts
+  s_f627da06a4f228::t_bcced3da9f5e7e 12-13
+apps/dashboard/knip.json
+  s_f627da06a4f228::t_bcced3da9f5e7e 36-38
+apps/dashboard/src/components/billing/zdr-addon-card.tsx
+  s_f627da06a4f228::t_bcced3da9f5e7e 25,77
+apps/dashboard/src/lib/billing/attach-plan.ts
+  s_f627da06a4f228::t_bcced3da9f5e7e 3,23,37
+apps/dashboard/src/lib/analytics/posthog-lazy.test.ts
+  s_f627da06a4f228::t_bcced3da9f5e7e 1-308
+apps/dashboard/src/lib/content/image-export.ts
+  s_f627da06a4f228::t_bcced3da9f5e7e 3,11-103,166-171,176-178,198-203,208-210
+apps/dashboard/src/components/dashboard/sidebar-upgrade.tsx
+  s_f627da06a4f228::t_bcced3da9f5e7e 14,111
+apps/dashboard/src/components/providers/posthog-identity.tsx
+  s_f627da06a4f228::t_bcced3da9f5e7e 7,26-27,29-33,36-38,40-44,52-53,55-60,62-68
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "d309a6139345d0361a48f1e2505aaf59c13f9a30",
+  "prompts": {},
+  "sessions": {
+    "s_f627da06a4f228": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "2e97c900-7ba6-45fa-b6d0-633e991e8546",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

@@ -1,0 +1,22 @@
+packages/sites-server/src/utils/starter-files.ts
+  s_31c707ccbe1409::t_f395373105341e 183-188,236
+  s_31c707ccbe1409::t_38870889c60e35 182,228-230
+apps/sites-builder/src/components/SiteAreas.astro
+  s_31c707ccbe1409::t_4712c80de383df 17
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "2987a1fa35f9dd47700b1a9c53a9b91e9c741039",
+  "prompts": {},
+  "sessions": {
+    "s_31c707ccbe1409": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7e8a406a-ccd2-43bb-96bc-ad320ef46eac",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

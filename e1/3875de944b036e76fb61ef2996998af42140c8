@@ -1,0 +1,23 @@
+apps/console/src/components/ai-trends/ai-trends-share-button.tsx
+  s_3ec3deb7cdb2f9::t_d3190bedd8ebee 113-115
+packages/geo-core/src/schemas/geo-olostep.ts
+  s_3ec3deb7cdb2f9::t_d3190bedd8ebee 40-43,46-49
+packages/geo-core/tests/geo-olostep-answer.test.ts
+  s_3ec3deb7cdb2f9::t_5b35f95ea8bb97 112-117
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "e13875de944b036e76fb61ef2996998af42140c8",
+  "prompts": {},
+  "sessions": {
+    "s_3ec3deb7cdb2f9": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "736bbb8d-09a8-4f6d-b5dd-00c90b8b8236",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

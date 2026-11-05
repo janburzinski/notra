@@ -1,0 +1,19 @@
+packages/geo-core/tests/geo-olostep-answer.test.ts
+  s_209fd3be1e73ed::t_e7f10c1256bf7b 41-68
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "e86dbfd2efb9892b27f624baf6c92299f17d1bca",
+  "prompts": {},
+  "sessions": {
+    "s_209fd3be1e73ed": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b8b73c1a-6154-4a67-833f-24511c654b26",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

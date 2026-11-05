@@ -1,0 +1,58 @@
+packages/sites-core/src/schemas/site-config.ts
+  s_97db807d65ac2c::t_36bfff415f9453 156-161,163
+apps/docs/sites/repository.mdx
+  s_97db807d65ac2c::t_fe4a01f9a1b7ff 136
+apps/docs/sites/customize/design.mdx
+  s_97db807d65ac2c::t_1ea758d9ef3dab 88-97,111
+packages/sites-server/src/constants/content-types.ts
+  s_97db807d65ac2c::t_d98f52903876fb 25-26
+apps/sites-builder/astro.config.mjs
+  s_97db807d65ac2c::t_715e6c13da1189 34-44
+  s_97db807d65ac2c::t_400a4c8e64196c 62
+apps/sites-builder/src/components/TagFilter.astro
+  s_97db807d65ac2c::t_c535833ba87653 1-35
+apps/sites-builder/src/pages/tags/[...tag].astro
+  s_97db807d65ac2c::t_17adb6cad3719e 7,23,51
+  s_97db807d65ac2c::t_681b0b46f68020 37
+packages/sites-core/src/schemas/site-integrations.ts
+  s_97db807d65ac2c::t_d98f52903876fb 152-157,159-163
+apps/sites-builder/src/types/tags.ts
+  s_97db807d65ac2c::t_17adb6cad3719e 26-31
+apps/docs/sites/customize/layouts.mdx
+  s_97db807d65ac2c::t_1ea758d9ef3dab 29,47,51
+apps/docs/sites/custom-scripts.mdx
+  s_97db807d65ac2c::t_1ea758d9ef3dab 74-85
+packages/sites-core/src/constants/sites.ts
+  s_97db807d65ac2c::t_d98f52903876fb 107-108
+packages/sites-core/src/utils/content-security-policy.ts
+  s_97db807d65ac2c::t_d98f52903876fb 23
+apps/sites-builder/src/components/BlogIndex.astro
+  s_97db807d65ac2c::t_17adb6cad3719e 8,12,21,29
+apps/web/public/schemas/blog.json
+  s_97db807d65ac2c::t_a7d4b37ac6caaa 860
+  s_97db807d65ac2c::t_681b0b46f68020 249-250,280-284,856-859,1351-1352,1368-1372
+packages/sites-core/tests/integrations.test.ts
+  s_97db807d65ac2c::t_7bfd53e9924339 105
+  s_97db807d65ac2c::t_a7d4b37ac6caaa 519-523
+  s_97db807d65ac2c::t_fe6a9fe8a9918c 465,489-493,505-509,515-518,524-530,535-539
+packages/sites-core/src/schemas/site-layout.ts
+  s_97db807d65ac2c::t_ac8689811ea198 233-238
+apps/docs/sites/reference/blog-json.mdx
+  s_97db807d65ac2c::t_1ea758d9ef3dab 89,125,225
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "2b45954ad9bfbc004eb36c663aadca2a8d8ae15d",
+  "prompts": {},
+  "sessions": {
+    "s_97db807d65ac2c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "989ff5fd-49b6-42ea-93fb-05c561ac2a19",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

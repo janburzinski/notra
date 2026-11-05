@@ -1,0 +1,48 @@
+packages/sites-server/src/previews.ts
+  s_14f46631d4b404::t_c01cdea61d1e08 16,18,35,93-95,104,108-129,146,150-155,157-162,164-186
+  s_14f46631d4b404::t_726c9f8dd8852a 106,147-149
+packages/sites-server/src/activation.ts
+  s_14f46631d4b404::t_78daf43f8e8efb 104-108
+packages/sites-server/src/pipeline.ts
+  s_14f46631d4b404::t_b06fb4195d380b 68,70,194-199
+  s_14f46631d4b404::t_714c9be37875fd 283
+apps/dashboard/src/lib/sites/post-preview.ts
+  s_14f46631d4b404::t_f34ebde5756323 113,118-119,209,237-238
+apps/dashboard/src/components/content/content-site-preview-panel.tsx
+  s_14f46631d4b404::t_efe5c2d01b8541 367
+packages/sites-server/tests/deployment-timeline.test.ts
+  s_14f46631d4b404::t_cdbb436e27e695 57
+apps/dashboard/src/constants/site-github-publish.ts
+  s_14f46631d4b404::t_efe5c2d01b8541 9
+apps/dashboard/src/lib/content-panel-tab.ts
+  s_14f46631d4b404::t_efe5c2d01b8541 83-85
+packages/sites-server/src/types/sites.ts
+  s_14f46631d4b404::t_c01cdea61d1e08 116
+packages/sites-server/src/constants/build-runner.ts
+  s_14f46631d4b404::t_24db6eccdf02f5 19-31,46
+packages/sites-server/src/post-preview-source.ts
+  s_14f46631d4b404::t_78daf43f8e8efb 4,9,44-57
+packages/sites-server/src/runner.ts
+  s_14f46631d4b404::t_df99157a353d16 23
+  s_14f46631d4b404::t_78daf43f8e8efb 80
+packages/sites-server/src/schemas/post-preview.ts
+  s_14f46631d4b404::t_843d8ae41a50d4 11-14
+apps/dashboard/src/lib/hooks/use-post-site-preview.ts
+  s_14f46631d4b404::t_efe5c2d01b8541 78-83,147,151-152
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "7c686d08dce37f43af1789fdec63c2843add8602",
+  "prompts": {},
+  "sessions": {
+    "s_14f46631d4b404": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "023faea7-d05b-41ec-bc7d-ed517f77896a",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

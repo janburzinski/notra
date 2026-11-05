@@ -1,0 +1,50 @@
+packages/schemas/src/schemas/api/content.ts
+  s_f2137bb6ba04d1::t_eae8575d5e2372 23-26,28-30,33-34,355-366,370,386-413,415-418,441-444,470-471,483-486,492-504,506-518,555,562-563,589-592
+  s_f2137bb6ba04d1::t_51479a11b600f8 31-32
+  s_f2137bb6ba04d1::t_8055ab705e1a8f 367-369,371-384,472-476,478-482,574-588
+  s_f2137bb6ba04d1::t_dc0123b2aff798 385,414
+  s_f2137bb6ba04d1::t_521cdd0737a883 477,487,505
+  s_f2137bb6ba04d1::t_214213ecc14d26 488-491
+apps/api/src/routes/posts.ts
+  s_f2137bb6ba04d1::t_6a13226f6dce11 17,35,76,105,126-149,183,204-206,382-383,386,394-419,448-450,547,561-562,615
+apps/api/src/errors/posts.ts
+  s_f2137bb6ba04d1::t_da07c081a16af2 13-23
+apps/api/tests/post-metadata.test.ts
+  s_f2137bb6ba04d1::t_33d444ee2821fc 1-234
+apps/api/src/programs/posts.ts
+  s_f2137bb6ba04d1::t_3a467844f53d5d 11,22,31,35,50-51,56-58,79-84,96-115,117-129,298,304,329-330,333,337-361,442,517-527,529-537,612,635-636,639
+  s_f2137bb6ba04d1::t_a702e0d9ff7388 13-16,116,528
+apps/docs/api/pagination.mdx
+  s_f2137bb6ba04d1::t_d0bae03989a8f2 209-217
+apps/docs/api/common-tasks.mdx
+  s_f2137bb6ba04d1::t_d0bae03989a8f2 37,48-56,76-91,154-243
+apps/api/src/types/posts.ts
+  s_f2137bb6ba04d1::t_da07c081a16af2 2,18,22,37-43,49-56,58-70,74-75,94,111-113,115-117,159
+  s_f2137bb6ba04d1::t_c2e6363f657087 57
+  s_f2137bb6ba04d1::t_c6ba59e8a0d07f 114
+apps/api/src/utils/posts.ts
+  s_f2137bb6ba04d1::t_feea607b154935 1-2,13-14,22-33,35-76,90,108-114,121-145,173-185
+  s_f2137bb6ba04d1::t_214213ecc14d26 4
+  s_f2137bb6ba04d1::t_8055ab705e1a8f 9
+  s_f2137bb6ba04d1::t_b62e0966ed7bcf 34
+apps/docs/docs.json
+  s_f2137bb6ba04d1::t_3db87e8b887f2a 478
+apps/docs/api/types.mdx
+  s_f2137bb6ba04d1::t_51372f7dd2c2be 108-129,145-146,172-183,189-203,239-240,263-280,292,320-339,346,353-354
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "1c7e2ed809b6946987ea78fb8dcdd4f8f07e4aa6",
+  "prompts": {},
+  "sessions": {
+    "s_f2137bb6ba04d1": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "05d9cd4e-8273-4590-8796-cf8becc4d59b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

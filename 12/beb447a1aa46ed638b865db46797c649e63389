@@ -1,0 +1,26 @@
+packages/ui/src/lib/get-page-numbers.test.ts
+  s_19bdc0a7360a16::t_08f8241938ea12 6-7,14-15,23-59
+packages/ui/src/lib/get-page-numbers.ts
+  s_19bdc0a7360a16::t_08f8241938ea12 5,11-13,15,17
+packages/ui/src/components/ui/pagination.tsx
+  s_19bdc0a7360a16::t_bb5e26fc2aaeec 84-86,103-105
+packages/ui/src/components/shared/table-pagination.tsx
+  s_19bdc0a7360a16::t_bb5e26fc2aaeec 96,100,112-115,130,132,153,155
+  s_19bdc0a7360a16::t_58a0fa7db0f773 31-73,135-140
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "12beb447a1aa46ed638b865db46797c649e63389",
+  "prompts": {},
+  "sessions": {
+    "s_19bdc0a7360a16": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0e76b-b910-7d51-8433-378f16888a68",
+        "model": "gpt-6-sol"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

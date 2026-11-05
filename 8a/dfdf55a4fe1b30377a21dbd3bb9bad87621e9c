@@ -1,0 +1,53 @@
+packages/sites-core/src/schemas/site-layout.ts
+  s_d41f0e498c8778::t_db7c000182fada 11
+  s_d41f0e498c8778::t_f16f5d92161204 234-242
+packages/sites-compiler/tests/validate.test.ts
+  s_d41f0e498c8778::t_370484f31c857e 549-572
+packages/sites-compiler/src/utils/config-checks.ts
+  s_d41f0e498c8778::t_61d94fbdd8c974 5,74-89
+apps/sites-builder/src/lib/categories.ts
+  s_d41f0e498c8778::t_77dde0646a73ac 1-2,4-38
+  s_d41f0e498c8778::t_b3ddf18931d6af 3
+apps/docs/sites/reference/blog-json.mdx
+  s_d41f0e498c8778::t_7ae10a237dd1b0 125
+apps/web/public/schemas/blog.json
+  s_d41f0e498c8778::t_94f4835ea0821d 850-863
+apps/sites-builder/src/types/categories.ts
+  s_d41f0e498c8778::t_77dde0646a73ac 1-9
+packages/sites-compiler/src/validate.ts
+  s_d41f0e498c8778::t_583ccc5b750d26 21
+  s_d41f0e498c8778::t_61d94fbdd8c974 44,402,434-437,439-444,469
+apps/docs/sites/customize/layouts.mdx
+  s_d41f0e498c8778::t_7ae10a237dd1b0 29,47,51-61
+packages/sites-core/src/utils/tags.ts
+  s_d41f0e498c8778::t_bf5d7f3267da86 1-10
+apps/sites-builder/src/components/CategoryBar.astro
+  s_d41f0e498c8778::t_e2064f999b27ce 43-45,72-75,77-79,110-114
+  s_d41f0e498c8778::t_888e3ebad5d170 56
+  s_d41f0e498c8778::t_bfe6b91343ff91 1-11,13-42,46-55,57-71,76,80-109,115-117
+  s_d41f0e498c8778::t_7e502343cef914 12
+apps/docs/sites/posts.mdx
+  s_d41f0e498c8778::t_7ae10a237dd1b0 141
+packages/sites-core/src/constants/tags.ts
+  s_d41f0e498c8778::t_bf5d7f3267da86 1-7
+apps/sites-builder/src/components/BlogIndex.astro
+  s_d41f0e498c8778::t_721e23e79fb785 62
+  s_d41f0e498c8778::t_71d0a3b2af098c 3,10,20-21,23-25,33-46,54,56,64,70-72,83,90-94
+  s_d41f0e498c8778::t_4dc2aced0e5f0d 22,76-81
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "8adfdf55a4fe1b30377a21dbd3bb9bad87621e9c",
+  "prompts": {},
+  "sessions": {
+    "s_d41f0e498c8778": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "0d433889-7027-454e-b287-b188dbf98dab",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

@@ -1,0 +1,21 @@
+packages/geo-core/tests/types/fixtures.ts
+  s_74f1f222337464::t_ee0c40c46606b2 13-15
+packages/geo-core/tests/olostep-manual-runs.test.ts
+  s_74f1f222337464::t_5ce6008bf688ba 73
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "657a685e300e3a56731b26132f5e47c5be7b2d34",
+  "prompts": {},
+  "sessions": {
+    "s_74f1f222337464": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "17b3f2f7-5ea4-4493-830e-fd0cb7942987",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

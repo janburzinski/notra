@@ -1,0 +1,28 @@
+packages/ui/src/components/ui/dropdown-menu.tsx
+  s_68247b121a0051::t_3f7a11e916a349 97,124
+apps/ui/components/constants/dropdown.ts
+  s_68247b121a0051::t_5375ffb8d6c487 6-7,9,11-12,14
+packages/ui/src/constants/dropdown.ts
+  s_68247b121a0051::t_b67ba5599db798 6-7,9,11-12,14
+apps/ui/components/ui/dropdown-menu.tsx
+  s_68247b121a0051::t_ebc1964b8e53fd 126
+  s_68247b121a0051::t_5375ffb8d6c487 100
+apps/dashboard/src/app/design-system/page-client.tsx
+  s_68247b121a0051::t_cd6d75be200bb2 339-345,815
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "2e710863dc55980b3240831642e8c47dc541dc03",
+  "prompts": {},
+  "sessions": {
+    "s_68247b121a0051": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "639b30f6-b2fb-46f1-83ae-86a9714bd877",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

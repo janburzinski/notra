@@ -1,0 +1,361 @@
+apps/sites-builder/compiler/constants/cli.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 13-14
+scripts/testing/cloud/run.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-912
+apps/sites-e2e/emulators/github/types.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-47
+packages/sites-server/src/github.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 3,184
+apps/sites-e2e/emulators/browser/providers/posthog.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-71
+apps/sites-e2e/tests/constants/analytics.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-58
+packages/sites-server/tests/postgres-lifecycle.test.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 31,44-45
+packages/sites-server/src/r2.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 17,27
+scripts/testing/cloud/cleanup.test.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-201
+apps/sites-e2e/emulators/README.md
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-54
+apps/sites-e2e/emulators/dns/types.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-9
+apps/sites-e2e/scripts/constants/mutations.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-127
+packages/ai/src/utils/octokit.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 6,77
+apps/sites-e2e/emulators/browser/providers/plausible.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-39
+turbo.json
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 55-60
+scripts/testing/dashboard/verify.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-52
+apps/sites-e2e/fixtures/plausible.js
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-8
+scripts/testing/github-app/utils/config.mjs
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-88
+apps/dashboard/src/constants/sites-testing.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-4
+apps/sites-e2e/tests/types/lifecycle-webhooks.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-9
+apps/sites-e2e/emulators/browser/providers/ga4.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-41
+AGENTS.md
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 41-50
+apps/dashboard/src/utils/sites-test-access.test.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-131
+apps/sites-e2e/emulators/box/index.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-269
+scripts/testing/github-app/server.mjs
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-235
+scripts/testing/github-app/ui.html
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-116
+apps/dashboard/tests/sites-test-status.test.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-87
+apps/sites-e2e/emulators/cloudflare/types.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-22
+apps/sites-e2e/tests/compiler-isolation.test.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-45
+apps/sites-builder/astro.config.mjs
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 102
+packages/sites-server/tests/host-reclaim.test.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 29,42-43
+scripts/testing/cloud/account.test.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-65
+scripts/testing/cloud/prepared-bucket.test.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-65
+apps/sites-builder/compiler/constants/build.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 7-8
+scripts/testing/dashboard/fixtures.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-102
+apps/sites-e2e/fixtures/ga4.js
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-21
+packages/sites-server/tests/deployment-admission.test.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 29,43-44
+scripts/testing/dashboard/tests/postgres-cleanup.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-65
+scripts/testing/cloud/utils/prepared-bucket.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-44
+scripts/testing/dashboard/types/redis-rest.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-11
+apps/sites-builder/scripts/create-box-snapshot.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 2,4,7,10,19-20,33-45,47-48,50-80,90,105,121-127
+apps/sites-e2e/fixtures/posthog.js
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-17
+apps/sites-e2e/tests/cleanup.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-87
+apps/dashboard/src/app/__tests/sites/route.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-61
+.github/workflows/production-deploy.yml
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 13-16,27,30-32,34,53,69-98,108,153-194
+apps/sites-e2e/emulators/dns/zone.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-58
+apps/docs/sites/previews.mdx
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 43-45,50-51
+scripts/testing/github-app/constants/manifest.mjs
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-16
+scripts/testing/railway/README.md
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-14
+apps/sites-e2e/fixtures/umami.js
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-17
+apps/sites-e2e/emulators/github/index.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-613
+apps/dashboard/src/middleware/auth.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 20,25-30
+.github/workflows/sites-e2e.yml
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-262
+apps/sites-e2e/scripts/mutation-check.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-200
+apps/sites-e2e/src/utils/tenants.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-125
+scripts/testing/dashboard/tests/redis-rest.test.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-402
+apps/sites-e2e/fixtures/site/script.js
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-2
+apps/dashboard/src/routeTree.gen.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 13,107-112,592,682,773,865,955,1045,1136,1221-1227,1938
+apps/sites-builder/tests/dev-staging.test.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 141,189-195,197-200,250-252
+apps/sites-builder/compiler/utils/dev-generated-assets.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 43-48
+packages/sites-server/src/utils/domain-ownership.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 15,39
+scripts/testing/github-app/server.test.mjs
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-400
+packages/sites-server/tests/production-projection.test.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 22,35-36
+scripts/testing/dashboard/utils/database.test.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-34
+apps/sites-e2e/fixtures/site/changelog/2026-10-01-components.mdx
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-9
+apps/sites-e2e/emulators/cloudflare/index.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-149
+apps/sites-e2e/src/utils/ingest.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-16
+apps/sites-e2e/emulators/core/types.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-39
+apps/sites-e2e/fixtures/databuddy.js
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-16
+scripts/testing/dashboard/bootstrap-github-cli.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-119
+apps/sites-e2e/emulators/core/summary.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-21
+apps/sites-e2e/emulators/core/service.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-105
+apps/sites-e2e/tsconfig.lifecycle.json
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-14
+apps/sites-e2e/src/worker.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-973
+apps/dashboard/src/lib/sites/flag.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-2,10-24,38-45
+apps/dashboard/src/utils/sites-test-access.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-53
+apps/dashboard/src/routes/[__tests].sites.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-18
+apps/sites-e2e/fixtures/site/style.css
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-4
+apps/sites-builder/compiler/cli.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 24,140-145,148-153,186,213-218,269,280-288,295-296,298,300-304,306-308
+packages/sites-server/tests/smart-deployments-postgres.test.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 30,47-48
+apps/sites-e2e/emulators/index.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-106
+scripts/testing/cloud/utils/owned-box-fetch.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-71
+scripts/testing/dashboard/tests/github-bootstrap-guard.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-37
+apps/sites-e2e/src/run.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-252
+apps/sites-e2e/scripts/seed-r2.mjs
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-35
+scripts/testing/github-app/README.md
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-52
+scripts/testing/railway/cleanup.mjs
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-36
+apps/sites-e2e/emulators/vercel/types.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-15
+scripts/testing/cloud/tsconfig.json
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-16
+scripts/testing/railway/constants/cleanup.mjs
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-4
+apps/sites-e2e/emulators/core/http-server.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-54
+apps/sites-e2e/emulators/vercel/index.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-133
+packages/sites-server/src/github-source.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 2,53
+apps/docs/sites/quickstart.mdx
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 42-43
+apps/sites-e2e/emulators/r2/index.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-345
+scripts/testing/cloud/utils/ownership.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-108
+apps/sites-e2e/tests/processes.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-106
+packages/geo-core/tests/site-project-delete.test.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 17,30-31
+scripts/testing/railway/utils/cleanup.mjs
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-55
+apps/sites-builder/src/components/DevReload.astro
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 4,9,15-33
+apps/sites-e2e/emulators/box/types.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-21
+scripts/testing/dashboard/redis-rest.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-107
+apps/sites-builder/scripts/utils/stage-box-toolchain.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-59
+scripts/testing/github-app/schemas/conversion.mjs
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-27
+apps/sites-e2e/emulators/browser/types.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-37
+apps/sites-e2e/src/types/worker-runtime.d.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-11
+apps/sites-e2e/src/utils/sites-worker.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-202
+packages/ai/src/constants/github.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 16-17
+packages/ui/src/components/geo/geo-bar.tsx
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 19
+scripts/testing/dashboard/associate-repository.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-55
+scripts/testing/dashboard/constants/redis-rest.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-13
+apps/sites-e2e/package.json
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-26
+apps/sites-builder/compiler/utils/dev-error-page.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-98
+packages/sites-server/src/utils/dns.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 4,7-12
+apps/sites-builder/tests/box-toolchain.test.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-194
+apps/sites-e2e/src/constants/processes.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-9
+apps/sites-e2e/src/utils/processes.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-201
+scripts/testing/cloud/utils/cloudflare-account.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-20
+apps/sites-e2e/src/utils/content.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-165
+scripts/testing/dashboard/constants/database-regressions.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-16
+apps/sites-e2e/src/types/harness.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-19
+scripts/testing/dashboard/README.md
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-316
+scripts/testing/cloud/README.md
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-104
+apps/sites-e2e/tests/types/lifecycle-journal.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-31
+packages/sites-server/src/constants/domains.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1
+scripts/testing/railway/cleanup.test.mjs
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-127
+apps/sites-e2e/src/utils/compiler.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-123
+bun.lock
+  ai_agent 8,450-468,1985-1986,5327,5329,6579-6580,7027-7028,7049-7050,7119-7120,7255-7256,7783-7784,8257-8258,8335-8337
+scripts/testing/dashboard/constants/fixtures.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-18
+packages/sites-server/src/vercel-dns.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 36,139-140,221
+apps/sites-e2e/emulators/r2/types.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-14
+apps/sites-e2e/src/constants/fixtures.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-17
+package.json
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 52-54,77
+apps/sites-e2e/emulators/dns/server.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-114
+packages/sites-server/src/utils/sandbox-transport.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 20,60
+packages/sites-server/tests/draft-cas-postgres.test.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 39,52-53
+scripts/testing/dashboard/types/database-regressions.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-10
+apps/sites-e2e/emulators/types.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-12
+apps/sites-e2e/tests/csp.test.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-48
+scripts/testing/dashboard/migrate.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-26
+scripts/testing/dashboard/utils/redis-rest.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-221
+apps/dashboard/src/lib/auth/middleware.test.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 14-15,49-67
+scripts/testing/github-app/utils/output.mjs
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-52
+apps/sites-e2e/scripts/summary.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-220
+apps/sites-e2e/tests/analytics.test.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-216
+apps/sites-e2e/tests/connected-lifecycle-postgres.test.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-1298
+scripts/testing/dashboard/postgres.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-166
+scripts/testing/dashboard/utils/box-snapshot.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-111
+apps/sites-e2e/src/utils/csp.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-31
+scripts/testing/cloud/types/resources.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-31
+packages/sites-server/tests/github-consent.test.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 22,35-36
+apps/sites-e2e/emulators/browser/providers/umami.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-43
+apps/sites-e2e/fixtures/site/blog/components.mdx
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-57
+packages/ai/src/utils/github-api-url.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-13
+apps/sites-e2e/README.md
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-209
+apps/sites-e2e/emulators/browser/index.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-232
+packages/sites-server/src/cloudflare-saas.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 14,49
+packages/sites-server/src/utils/provider-urls.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-39
+apps/sites-builder/tests/dev-startup.test.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 84-175
+apps/sites-e2e/emulators/browser/utils.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-25
+packages/sites-core/tests/serving-state.test.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 81-107
+packages/sites-server/tests/organization-teardown.test.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 29,43-44
+scripts/testing/cloud/utils/redaction.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-22
+apps/sites-e2e/scripts/types/mutations.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-25
+scripts/testing/dashboard/tests/box-snapshot.test.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-51
+scripts/testing/dashboard/utils/database.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-22
+apps/sites-e2e/tests/utils/lifecycle-journal.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-108
+apps/sites-e2e/tsconfig.json
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-23
+scripts/testing/dashboard/run.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-587
+apps/sites-builder/scripts/constants/box-snapshot.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 2
+apps/sites-e2e/emulators/browser/providers/databuddy.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 1-56
+packages/db/tests/build-telemetry-postgres.test.ts
+  s_6d4a65b8409eaa::t_88d7f1ed0c24d1 8,24,31-32,74-78,97
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "2ad361144f27e8208d91b3cd68265c6b284c1d75",
+  "prompts": {},
+  "sessions": {
+    "s_6d4a65b8409eaa": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "95354687-09ce-4ca1-b5c3-290a6eccd0b6",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

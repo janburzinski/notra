@@ -1,0 +1,27 @@
+apps/dashboard/src/components/sites/site-create-deploy.tsx
+  s_229d6319e92c18::t_0e55cd1d2392bf 8,10,18,44
+  s_229d6319e92c18::t_3e3b81069f4485 29-30,32,34,39,42,71,74-75
+apps/dashboard/src/types/site-create-deploy.ts
+  s_229d6319e92c18::t_3e3b81069f4485 25-35
+apps/dashboard/src/utils/site-create-deploy.ts
+  s_229d6319e92c18::t_3e3b81069f4485 1,5,10-15,80-94
+apps/dashboard/src/lib/hooks/use-site-create-deployment.ts
+  s_229d6319e92c18::t_3e3b81069f4485 1-28,31-66
+  s_229d6319e92c18::t_0e55cd1d2392bf 29-30
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "77a34b3c25f4982c8b5d6e443575a9794b21530f",
+  "prompts": {},
+  "sessions": {
+    "s_229d6319e92c18": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "891779d2-d71b-4d7f-a43d-3eec1e570918",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

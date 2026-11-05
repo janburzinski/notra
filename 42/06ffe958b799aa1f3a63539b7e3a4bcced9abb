@@ -1,0 +1,41 @@
+apps/dashboard/src/utils/local-dev-auth.ts
+  s_ce7055b7518d19::t_ed09a55e875851 142-158
+apps/dashboard/src/lib/social-connect/connect.ts
+  s_ce7055b7518d19::t_63e8b721d9f0e9 3,242-258
+apps/dashboard/src/utils/ratelimit.ts
+  s_ce7055b7518d19::t_95f5bcb7fc9fde 235,240-244,256-258
+apps/dashboard/src/lib/organizations/actions.ts
+  s_ce7055b7518d19::t_1866f7e76d01e0 50,60,63,183-185,768-769,883-884
+  s_ce7055b7518d19::t_8f15b87bb67935 85
+  s_ce7055b7518d19::t_871344e23eb007 770-776,885-891
+apps/dashboard/src/lib/workflows/internal-auth.ts
+  s_ce7055b7518d19::t_ddc359de873138 69-70
+  s_ce7055b7518d19::t_ed09a55e875851 66-68
+  s_ce7055b7518d19::t_41c6d067d03406 12
+apps/dashboard/src/lib/auth/webhook-sync.ts
+  s_ce7055b7518d19::t_dcb300c723838c 103-111
+apps/dashboard/src/middleware/auth.ts
+  s_ce7055b7518d19::t_ed09a55e875851 64-65
+  s_ce7055b7518d19::t_41c6d067d03406 16
+  s_ce7055b7518d19::t_ddc359de873138 61-63,66-70
+apps/dashboard/src/lib/auth/mfa-cookies.ts
+  s_ce7055b7518d19::t_33fb47cc896d68 29-30,52-76,92-94,103,110,128,132
+apps/dashboard/src/lib/organizations/workos-sync.ts
+  s_ce7055b7518d19::t_f64fc931655b0a 182-184,220-230,250-255,281-289
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "4206ffe958b799aa1f3a63539b7e3a4bcced9abb",
+  "prompts": {},
+  "sessions": {
+    "s_ce7055b7518d19": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "21e8c896-059f-447f-942a-2627be2504f7",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

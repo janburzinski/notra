@@ -1,0 +1,50 @@
+apps/dashboard/src/workflows/steps/chat-steps.ts
+  s_d113ac8d75c5ad::t_13db2890d745a7 34
+  s_d113ac8d75c5ad::t_96306c1b1cb4a1 286
+packages/ai/src/utils/token-usage.ts
+  s_d113ac8d75c5ad::t_2fc45b70cc8be1 1-48
+packages/ai/src/types/agents.ts
+  s_d113ac8d75c5ad::t_96306c1b1cb4a1 50
+apps/agent/agent/lib/hooks/usage.ts
+  s_d113ac8d75c5ad::t_13db2890d745a7 9,126-128,130-133,165-166
+packages/ai/src/utils/token-usage.test.ts
+  s_d113ac8d75c5ad::t_56b095b45712db 1-53
+packages/ai/src/agents/background-gen.ts
+  s_d113ac8d75c5ad::t_4689ef51c8fb31 30,221
+packages/ai/src/agents/geo-writer.ts
+  s_d113ac8d75c5ad::t_4689ef51c8fb31 53,86
+packages/geo-core/src/geo/personas.ts
+  s_d113ac8d75c5ad::t_4689ef51c8fb31 4,290
+packages/geo-core/src/geo/sentiment-analysis-billing.ts
+  s_d113ac8d75c5ad::t_4689ef51c8fb31 3,37,45
+packages/ai/src/utils/route-usage.test.ts
+  s_d113ac8d75c5ad::t_56b095b45712db 18-38
+apps/dashboard/src/app/api/organizations/[organizationId]/content/[contentId]/chat/route.ts
+  s_d113ac8d75c5ad::t_13db2890d745a7 23
+  s_d113ac8d75c5ad::t_96306c1b1cb4a1 258
+apps/dashboard/src/app/api/organizations/[organizationId]/chat/route.ts
+  s_d113ac8d75c5ad::t_13db2890d745a7 42
+  s_d113ac8d75c5ad::t_96306c1b1cb4a1 506
+packages/ai/src/utils/route-usage.ts
+  s_d113ac8d75c5ad::t_96306c1b1cb4a1 16
+  s_d113ac8d75c5ad::t_13db2890d745a7 12
+apps/api/src/lib/chat/direct-stream.ts
+  s_d113ac8d75c5ad::t_13db2890d745a7 16
+  s_d113ac8d75c5ad::t_96306c1b1cb4a1 116
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "3c9a500314fa859d18a26d12f6dbde2c2e12df38",
+  "prompts": {},
+  "sessions": {
+    "s_d113ac8d75c5ad": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "3a15bcbc-b026-41aa-a036-4a7a3cea07dc",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

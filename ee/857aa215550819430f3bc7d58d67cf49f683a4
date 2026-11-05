@@ -1,0 +1,90 @@
+apps/dashboard/src/components/sites/editor/site-editor-pane.tsx
+  s_bd6cd688d4813d::t_d6e922f2a6bede 73
+packages/sites-server/tests/draft-cas-postgres.test.ts
+  s_bd6cd688d4813d::t_5b19581c680016 150
+apps/dashboard/tests/site-create-deploy-surface.test.tsx
+  s_bd6cd688d4813d::t_5b19581c680016 61,394
+packages/sites-server/src/deployments.ts
+  s_bd6cd688d4813d::t_f8fedcdb2e310a 164-171,195-197,292-296,300,303-308,312
+packages/sites-server/src/utils/source-context.ts
+  s_bd6cd688d4813d::t_ec499c907cafb2 1-12
+apps/dashboard/tests/site-deployments-surface.test.tsx
+  s_bd6cd688d4813d::t_5b19581c680016 169
+packages/sites-server/src/activation.ts
+  s_bd6cd688d4813d::t_f8fedcdb2e310a 72-74
+packages/sites-server/src/utils/deployments.ts
+  s_bd6cd688d4813d::t_f8fedcdb2e310a 21
+packages/sites-server/src/editor.ts
+  s_bd6cd688d4813d::t_ec499c907cafb2 272
+apps/dashboard/tests/constants/site-editor.ts
+  s_bd6cd688d4813d::t_c4a009c5b0bc3d 2-6
+packages/sites-server/src/integrations.ts
+  s_bd6cd688d4813d::t_ec499c907cafb2 93
+  s_bd6cd688d4813d::t_a5b0a5637b4c57 22
+apps/dashboard/src/components/sites/site-import-list.tsx
+  s_bd6cd688d4813d::t_b3b4d4113ef7e4 69,122
+apps/dashboard/src/lib/orpc/routers/sites.ts
+  s_bd6cd688d4813d::t_6a78a551afbbc3 129
+  s_bd6cd688d4813d::t_ec499c907cafb2 916,954
+packages/sites-server/src/types/editor.ts
+  s_bd6cd688d4813d::t_ec499c907cafb2 50
+apps/dashboard/src/components/sites/pages/site-deployment-detail-page.tsx
+  s_bd6cd688d4813d::t_1e43cd313c6cd2 260
+  s_bd6cd688d4813d::t_b3b4d4113ef7e4 50
+packages/db/migrations/meta/_journal.json
+  ai_agent 893-899
+apps/dashboard/src/components/sites/site-deployment-summary.tsx
+  s_bd6cd688d4813d::t_1e43cd313c6cd2 88
+packages/sites-server/src/types/deployments.ts
+  s_bd6cd688d4813d::t_f8fedcdb2e310a 32-33
+packages/db/migrations/meta/0127_snapshot.json
+  ai_agent 1-15105
+apps/dashboard/tests/site-create-defaults.test.tsx
+  s_bd6cd688d4813d::t_5b19581c680016 34
+packages/db/src/schema.ts
+  s_bd6cd688d4813d::t_f87d009961de4a 4055-4057
+apps/dashboard/tests/sites-get-read-only.test.ts
+  s_bd6cd688d4813d::t_5b19581c680016 90-92
+packages/sites-server/src/webhooks.ts
+  s_bd6cd688d4813d::t_f7c1b54c731778 171,249
+apps/dashboard/src/components/sites/site-deployment-menu.tsx
+  s_bd6cd688d4813d::t_1e43cd313c6cd2 37,115
+apps/dashboard/src/components/sites/site-deployments-table.tsx
+  s_bd6cd688d4813d::t_a5b0a5637b4c57 12
+  s_bd6cd688d4813d::t_b3b4d4113ef7e4 39
+  s_bd6cd688d4813d::t_1e43cd313c6cd2 64,236
+packages/db/migrations/0127_site_deployment_repository.sql
+  ai_agent 1-4
+apps/dashboard/src/types/components/sites.ts
+  s_bd6cd688d4813d::t_1e43cd313c6cd2 356
+apps/dashboard/src/lib/sites/serialize.ts
+  s_bd6cd688d4813d::t_d6e922f2a6bede 41-45,81-88
+packages/schemas/src/schemas/dashboard/sites.ts
+  s_bd6cd688d4813d::t_ec499c907cafb2 174
+apps/dashboard/src/utils/site-deployments.ts
+  s_bd6cd688d4813d::t_1e43cd313c6cd2 21,225-234
+apps/dashboard/tests/sites-feature-flag.test.tsx
+  s_bd6cd688d4813d::t_5b19581c680016 204-208
+apps/dashboard/src/utils/site-editor-save-queue.test.ts
+  s_bd6cd688d4813d::t_a5b0a5637b4c57 28-32
+packages/sites-server/tests/lifecycle.test.ts
+  s_bd6cd688d4813d::t_5b19581c680016 340-342
+apps/dashboard/src/components/sites/pages/site-editor-page.tsx
+  s_bd6cd688d4813d::t_d6e922f2a6bede 120
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "ee857aa215550819430f3bc7d58d67cf49f683a4",
+  "prompts": {},
+  "sessions": {
+    "s_bd6cd688d4813d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "03456ad8-930b-40e7-babd-71e9eea0ee51",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

@@ -1,0 +1,21 @@
+apps/sites-builder/src/components/PostCard.astro
+  s_31c707ccbe1409::t_6a00e49f94076d 20-21,136
+apps/sites-builder/src/styles/global.css
+  s_31c707ccbe1409::t_6a00e49f94076d 462
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "8903a62dc29db66db2cdb9ac21b6cd8f3bd2fa87",
+  "prompts": {},
+  "sessions": {
+    "s_31c707ccbe1409": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7e8a406a-ccd2-43bb-96bc-ad320ef46eac",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

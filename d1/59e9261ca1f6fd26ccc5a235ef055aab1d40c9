@@ -1,0 +1,25 @@
+apps/dashboard/src/types/components/sites.ts
+  s_3948eb91c976f2::t_620aa996bc3382 651-654
+apps/dashboard/src/components/sites/site-create-starter.tsx
+  s_3948eb91c976f2::t_620aa996bc3382 13,62,85
+apps/dashboard/src/components/sites/site-create-scroll-list.tsx
+  s_3948eb91c976f2::t_620aa996bc3382 1-27,29-43
+apps/dashboard/src/constants/site-create.ts
+  s_3948eb91c976f2::t_620aa996bc3382 83
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "d159e9261ca1f6fd26ccc5a235ef055aab1d40c9",
+  "prompts": {},
+  "sessions": {
+    "s_3948eb91c976f2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "1d3feb4f-6dda-4cf0-821e-499f0a376c11",
+        "model": "claude-sonnet-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

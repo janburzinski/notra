@@ -1,0 +1,23 @@
+apps/dashboard/src/lib/hooks/use-discussion.ts
+  s_70da08a6fe7511::t_ef2ddff03585a6 34,168
+apps/dashboard/src/components/content/overview/content-overview.tsx
+  s_70da08a6fe7511::t_1267ed429c7b1b 66,69-72,176,197
+apps/dashboard/src/types/content/overview.ts
+  s_70da08a6fe7511::t_1267ed429c7b1b 62
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "0ba85ff654f2620ec41b94b9c1c330693777e93a",
+  "prompts": {},
+  "sessions": {
+    "s_70da08a6fe7511": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c3bbda86-e10c-4ba4-9774-19b5bd801343",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

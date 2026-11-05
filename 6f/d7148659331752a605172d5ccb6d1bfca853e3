@@ -1,0 +1,132 @@
+apps/dashboard/src/lib/autopilot/start.ts
+  s_985d322a22a6f8::t_4757ebc6c63a97 5,33
+apps/dashboard/tests/autopilot-graph.test.ts
+  s_985d322a22a6f8::t_7367b0e736bd53 241,277-278,282-283,285,287
+  s_985d322a22a6f8::t_74c0d3e78ec862 240,254
+packages/workflows/tests/interpreter.test.ts
+  s_985d322a22a6f8::t_0d1134db22d386 185,198-236
+apps/dashboard/src/lib/workflow-engine/blocks/autopilot/drafts.ts
+  s_985d322a22a6f8::t_a8059085487d4d 128
+packages/workflows/tests/block-steps.test.ts
+  s_985d322a22a6f8::t_7f5ea5915d1f18 13-14,28-29,39-40,66-67
+apps/dashboard/src/lib/workflow-engine/start.ts
+  s_985d322a22a6f8::t_0022713880e33e 2,4,9,18,21,23-25,28-29,37-39,44,51,53-55
+  s_985d322a22a6f8::t_77e0996af42106 3,5-6,26-27,30-36,40-41,45-46
+packages/db/src/constants/workflows.ts
+  s_985d322a22a6f8::t_ce1babfa92bd0f 16-23
+packages/db/src/schema.ts
+  s_985d322a22a6f8::t_d18440c3791505 122
+  s_985d322a22a6f8::t_13b3280f36107c 4666-4671,4679,4695-4699
+  s_985d322a22a6f8::t_ce1babfa92bd0f 4691-4694,4700,4716-4719
+packages/workflows/tests/fixtures.ts
+  s_985d322a22a6f8::t_7f5ea5915d1f18 7-8,13,22-23,43,45-46
+packages/workflows/src/runtime/errors.ts
+  s_985d322a22a6f8::t_324e8fb6388a72 3-4,11-18
+packages/db/src/types/workflows.ts
+  s_985d322a22a6f8::t_ce1babfa92bd0f 1-10
+packages/workflows/src/runtime/validate.ts
+  s_985d322a22a6f8::t_6b4bf641cd5837 3-7,11,14,424-464,474-519,529-544,546
+  s_985d322a22a6f8::t_a9fa52eaf300b2 19,96,100-115,118,123,194,323-334,391,398-399
+  s_985d322a22a6f8::t_55686f0f2d678b 10,12-13,15-17,20,97-99,116-117,119-122,124-175,203,205-206,210-211,217,277,371-372,374-375,377-386,388-390,392,395-396,405,408,411-423
+  s_985d322a22a6f8::t_7413686d591065 465-473,520-528
+apps/dashboard/src/lib/workflow-engine/execute-node.ts
+  s_985d322a22a6f8::t_689b66183f9054 10,62-74,77-80,88,90,94-95
+apps/dashboard/src/lib/workflow-engine/blocks/autopilot/run.ts
+  s_985d322a22a6f8::t_a8059085487d4d 86,150
+  s_985d322a22a6f8::t_69ffd1886c4f99 143
+packages/workflows/src/constants/graph.ts
+  s_985d322a22a6f8::t_3244c649f00d70 6-8,13-26,31-32,35-43
+packages/workflows/src/runtime/rules.ts
+  s_985d322a22a6f8::t_3e989beac22e00 1-53,57,61-64
+  s_985d322a22a6f8::t_7367b0e736bd53 54-56,58-60
+apps/dashboard/src/lib/workflow-engine/blocks/autopilot/readiness.ts
+  s_985d322a22a6f8::t_a8059085487d4d 45
+packages/workflows/src/schemas/core.ts
+  s_985d322a22a6f8::t_32095da9a9bc01 1-41
+packages/workflows/src/runtime/core-blocks.ts
+  s_985d322a22a6f8::t_eb5afea9b5546e 1-106
+apps/dashboard/src/workflows/steps/workflow-graph-steps.ts
+  s_985d322a22a6f8::t_5a6949f47f4b0c 11,14,54-56
+apps/dashboard/tests/utils/workflow-graph-runner.ts
+  s_985d322a22a6f8::t_d933cae42168f6 137,145,148
+  s_985d322a22a6f8::t_7367b0e736bd53 7,15,27,111-115,131,136,138-144,149,174,176
+packages/workflows/tests/composition.test.ts
+  s_985d322a22a6f8::t_defdb9420b453e 1-65,84,88-315
+  s_985d322a22a6f8::t_7367b0e736bd53 66-83,85-87
+apps/dashboard/tests/autopilot-flow.test.ts
+  s_985d322a22a6f8::t_74c0d3e78ec862 866
+  s_985d322a22a6f8::t_d933cae42168f6 1717
+  s_985d322a22a6f8::t_98d676cc935902 1752-1754
+  s_985d322a22a6f8::t_94ad4119a1b852 1755
+  s_985d322a22a6f8::t_7367b0e736bd53 547-548,1707-1709
+packages/workflows/src/runtime/registry.ts
+  s_985d322a22a6f8::t_97c19b8a9ded3f 17,67-78,113-117,155-176
+  s_985d322a22a6f8::t_4912fa23bf1a43 3-6,123-125,133-136,146-154
+packages/workflows/src/types/blocks.ts
+  s_985d322a22a6f8::t_324e8fb6388a72 3-7,21-22,30
+packages/workflows/src/schemas/graph.ts
+  s_985d322a22a6f8::t_1885ed849082df 6,13,23-26,32
+  s_985d322a22a6f8::t_461aaaacfaba6f 3,30-31
+packages/workflows/src/runtime/interpreter.ts
+  s_985d322a22a6f8::t_5ad577ad4300cf 1-7,17-18,45-50,53,60,152,154,156-174,176-185,231-246
+  s_985d322a22a6f8::t_43e904fbe1f16d 9-11,65-89,104,106-107,111,114,120-123
+apps/dashboard/tests/workflow-engine.test.ts
+  s_985d322a22a6f8::t_7367b0e736bd53 194
+  s_985d322a22a6f8::t_b83bc501a04ddf 278-287,294-297,343-346,391-399,449,463,470-483,508
+  s_985d322a22a6f8::t_d933cae42168f6 516
+  s_985d322a22a6f8::t_fee6a159dfbff8 484-487
+  s_985d322a22a6f8::t_d615d0cd83a614 542-633
+packages/db/migrations/meta/_journal.json
+  ai_agent 967
+packages/workflows/src/types/graph.ts
+  s_985d322a22a6f8::t_d8925eb9840673 44-45,51-56
+  s_985d322a22a6f8::t_56d21333d7e75e 4-5,12-21,47,60-61,64-67
+packages/workflows/src/runtime/scheduler.ts
+  s_985d322a22a6f8::t_43e904fbe1f16d 3-5,122-127
+packages/workflows/src/runtime/ports.ts
+  s_985d322a22a6f8::t_43e904fbe1f16d 5-9,11,37
+  s_985d322a22a6f8::t_fee6a159dfbff8 17-19,26-29
+apps/dashboard/src/types/workflow-engine.ts
+  s_985d322a22a6f8::t_4757ebc6c63a97 2,14,19-27,43
+  s_985d322a22a6f8::t_77e0996af42106 3-5,33
+packages/workflows/src/types/run.ts
+  s_985d322a22a6f8::t_1cdb2572b15386 36,40-56,63,65,70,74
+  s_985d322a22a6f8::t_d9307f37cd0a87 57-62,67
+apps/dashboard/src/workflows/workflow-graph.ts
+  s_985d322a22a6f8::t_224917c584222c 8,18,26,29-32,34-98,100-101,103-128,131-134
+  s_985d322a22a6f8::t_bfd4734a5dd890 33,99,135
+apps/dashboard/src/lib/workflow-engine/store.ts
+  s_985d322a22a6f8::t_5a6949f47f4b0c 14,55,78-102,132
+  s_985d322a22a6f8::t_689b66183f9054 3,5-6,45-46,54,56,114-127,135,197,199-204,206-236
+apps/dashboard/src/constants/workflow-engine.ts
+  s_985d322a22a6f8::t_c58acf04069331 8-9
+packages/db/migrations/0137_workflow_engine.sql
+  ai_agent 7,21-23,29,40,42-45
+apps/dashboard/src/lib/workflow-engine/definitions/autopilot.ts
+  s_985d322a22a6f8::t_efa4ac51a1cec5 72
+  s_985d322a22a6f8::t_c58acf04069331 7-10,61-71,73-121,124-125,142-146,149-156,158-159,161-162,172-173,175,183-187
+packages/workflows/tests/validate.test.ts
+  s_985d322a22a6f8::t_dfa62b1c85ff79 10-13,79-105,107,136-137,139-142,147,189,191,195-196,198-204,213-233,268-296,300-301
+  s_985d322a22a6f8::t_d64388d88fdc30 48,124,138
+  s_985d322a22a6f8::t_a7585c01fd8e82 256,258,265,297-299
+packages/db/migrations/meta/0137_snapshot.json
+  ai_agent 2,15662-15664,15667,15792-15809,15841-15846,15900-15962,15978-15984
+packages/workflows/src/runtime/block-steps.ts
+  s_985d322a22a6f8::t_97c19b8a9ded3f 23
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "6fd7148659331752a605172d5ccb6d1bfca853e3",
+  "prompts": {},
+  "sessions": {
+    "s_985d322a22a6f8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "efce3ecd-755b-429d-9b5c-035b1f703d5b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

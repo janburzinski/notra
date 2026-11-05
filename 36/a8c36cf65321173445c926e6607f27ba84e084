@@ -1,0 +1,20 @@
+apps/ui/registry/notra/opencode/components/opencode-scroll-area.tsx
+  s_3bc1ef60da84e3::t_2e4ca41fcc28ae 30
+  s_3bc1ef60da84e3::t_eeaf04c949b4e1 25,27
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "36a8c36cf65321173445c926e6607f27ba84e084",
+  "prompts": {},
+  "sessions": {
+    "s_3bc1ef60da84e3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7841d8a4-16e3-4626-92f5-41577a376bc9",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

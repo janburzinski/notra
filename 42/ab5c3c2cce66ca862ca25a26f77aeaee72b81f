@@ -1,0 +1,19 @@
+apps/ui/registry.json
+  s_722cc11de57c72::t_0bbd37b3dc27e7 836-837,981-982,2067-2074,2094-2100,2155-2161,2191,2221
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "42ab5c3c2cce66ca862ca25a26f77aeaee72b81f",
+  "prompts": {},
+  "sessions": {
+    "s_722cc11de57c72": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0e769-f4b6-7900-87e3-7854599b7356",
+        "model": "gpt-6-sol"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

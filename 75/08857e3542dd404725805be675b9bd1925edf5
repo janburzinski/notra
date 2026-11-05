@@ -1,0 +1,23 @@
+packages/ai/src/types/github-mention.ts
+  s_d23dc21c3bdc65::t_2f72b2b124c008 243,245
+packages/ai/src/utils/github-pr-commit.ts
+  s_d23dc21c3bdc65::t_2f72b2b124c008 50-56,66,92
+packages/ai/src/utils/repo-image-render.ts
+  s_d23dc21c3bdc65::t_e3842ead887e1b 149-153
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "7508857e3542dd404725805be675b9bd1925edf5",
+  "prompts": {},
+  "sessions": {
+    "s_d23dc21c3bdc65": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "4f6c123f-8e20-4369-bb4f-7c3b3b78269d",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

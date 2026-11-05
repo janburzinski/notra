@@ -1,0 +1,37 @@
+packages/geo-core/src/utils/geo-engines.ts
+  s_4db61421f50e46::t_18c9796a17f0e2 94-95
+packages/geo-core/src/geo/olostep-conversation-scan.ts
+  s_4db61421f50e46::t_18c9796a17f0e2 51-52
+apps/dashboard/messages/en.json
+  s_7053252fb98b5a::t_a59c63d4fed888 2905,2907
+packages/geo-core/src/geo/persona-scan.ts
+  s_4db61421f50e46::t_18c9796a17f0e2 344-345
+apps/dashboard/messages/de.json
+  s_7053252fb98b5a::t_a59c63d4fed888 2905,2907
+packages/geo-core/src/geo/conversation.ts
+  s_4db61421f50e46::t_18c9796a17f0e2 84-92
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "d76019c588cab48f32262e7205972a84985c0dbc",
+  "prompts": {},
+  "sessions": {
+    "s_4db61421f50e46": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d39e31ea-f81d-4c85-90e3-a87663e4802f",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    },
+    "s_7053252fb98b5a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e0cbe3e5-ff36-4442-a362-b3f850058070",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

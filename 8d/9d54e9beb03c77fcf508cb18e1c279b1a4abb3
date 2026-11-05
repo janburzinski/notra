@@ -1,0 +1,34 @@
+apps/dashboard/src/components/content/overview/content-overview.tsx
+  s_70da08a6fe7511::t_7aaefe5b181eb7 67-83,194
+  s_70da08a6fe7511::t_1a49ebaa3f9056 38,66
+apps/dashboard/src/types/content/overview.ts
+  s_70da08a6fe7511::t_1a49ebaa3f9056 13,63-64
+apps/dashboard/src/components/content/content-detail-document-actions.tsx
+  s_70da08a6fe7511::t_42cd8d063d63a9 18,55-58
+apps/dashboard/src/components/content/inline-comments/content-comments-gutter.tsx
+  s_70da08a6fe7511::t_b2838b35e3d23d 4,24-26,28-31,33,38
+apps/dashboard/src/components/content/content-pull-request-button.tsx
+  s_70da08a6fe7511::t_42cd8d063d63a9 1-69
+apps/dashboard/src/lib/hooks/use-discussion.ts
+  s_70da08a6fe7511::t_e1671963467329 32-36,122,124,127-153,155-170,178,229
+  s_70da08a6fe7511::t_e31de89f67a356 29,37
+  s_70da08a6fe7511::t_1a49ebaa3f9056 154
+apps/dashboard/src/types/components/content-detail-toolbar.ts
+  s_70da08a6fe7511::t_42cd8d063d63a9 26-32
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "8d9d54e9beb03c77fcf508cb18e1c279b1a4abb3",
+  "prompts": {},
+  "sessions": {
+    "s_70da08a6fe7511": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c3bbda86-e10c-4ba4-9774-19b5bd801343",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

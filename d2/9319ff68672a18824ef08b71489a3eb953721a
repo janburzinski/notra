@@ -1,0 +1,47 @@
+apps/dashboard/src/components/chat/chat-image-attachment.tsx
+  s_d6564c67c0368a::t_0141e134b9e3ff 41
+apps/dashboard/src/components/chat-input.tsx
+  s_d6564c67c0368a::t_efacff5e8202c6 348
+  s_d6564c67c0368a::t_7d19fc0fe8afb2 362-380
+  s_d6564c67c0368a::t_1fb89a698e658a 473-675
+  s_d6564c67c0368a::t_250260d363edbe 421-422,424-430
+  s_d6564c67c0368a::t_1319ae50db8b64 60-61,71-72
+  s_d6564c67c0368a::t_1ad8aaa5c1cdae 400-409
+apps/dashboard/src/lib/hooks/use-chat-composer-attachments.ts
+  s_d6564c67c0368a::t_4795f1998ea1a5 312-313
+apps/dashboard/src/components/chat/chat-input.tsx
+  s_d6564c67c0368a::t_aefe381c323bf5 114-117
+apps/dashboard/src/types/components/chat-input.ts
+  s_d6564c67c0368a::t_ce95599a1746a1 75-95,97-103
+  s_d6564c67c0368a::t_ee3c6cfe31e5e0 9
+  s_d6564c67c0368a::t_89f911b2e35885 96
+apps/dashboard/src/utils/chat-message-parts.ts
+  s_d6564c67c0368a::t_4d8b00936a8d87 3-11
+  s_d6564c67c0368a::t_153edb102dcf03 32,34
+packages/ai/src/schemas/chat.ts
+  s_d6564c67c0368a::t_5ff4ba001380d2 75-83,88,92-98
+packages/ai/src/agents/geo-writer.ts
+  s_d6564c67c0368a::t_3133d12057f8ba 578-579,588-590
+  s_d6564c67c0368a::t_fdb61ed484fd8f 558
+  s_d6564c67c0368a::t_fca99a51eced89 381-471
+packages/ai/src/prompts/geo_writer/writer.ts
+  s_d6564c67c0368a::t_7e6152e0316941 125
+apps/dashboard/src/utils/chat-input.ts
+  s_d6564c67c0368a::t_87f7aea769e705 11-44
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "d29319ff68672a18824ef08b71489a3eb953721a",
+  "prompts": {},
+  "sessions": {
+    "s_d6564c67c0368a": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "7e57542d-82ce-49fe-bfd8-be3967312d1d",
+        "model": "grok-4.6"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

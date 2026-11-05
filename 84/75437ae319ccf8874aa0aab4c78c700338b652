@@ -1,0 +1,24 @@
+apps/sites-builder/src/components/BlogIndex.astro
+  s_a777f4d8dd8453::t_f648757255b9e6 21,92
+apps/sites-builder/src/components/CategoryBar.astro
+  s_a777f4d8dd8453::t_31e86f214faa2e 92
+  s_a777f4d8dd8453::t_9076ae42c8c4e5 84,87
+packages/sites-compiler/src/validate.ts
+  s_a777f4d8dd8453::t_f648757255b9e6 442-445
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "8475437ae319ccf8874aa0aab4c78c700338b652",
+  "prompts": {},
+  "sessions": {
+    "s_a777f4d8dd8453": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c56b4823-b3d9-4347-8cbf-4983477b1596",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

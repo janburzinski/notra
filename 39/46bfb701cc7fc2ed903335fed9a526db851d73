@@ -1,0 +1,20 @@
+apps/dashboard/src/components/geo/prompt-suggestion-sheet.tsx
+  s_9352e7c0a055e6::t_dbbc5e047222d3 63,74,85,94-97
+  s_9352e7c0a055e6::t_a3fc3535584532 3-4,46,48-54,56,65-69,76-80,87-91,133
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "3946bfb701cc7fc2ed903335fed9a526db851d73",
+  "prompts": {},
+  "sessions": {
+    "s_9352e7c0a055e6": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ad3222b4-2ea7-406b-a9bb-ed220894f017",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

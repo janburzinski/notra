@@ -1,0 +1,26 @@
+apps/dashboard/src/components/api-keys/account-api-keys-section.tsx
+  s_f871e6fe06f929::t_62740ab71db03a 5,109-115,328,360-404,407-411
+apps/api/src/index.ts
+  s_f871e6fe06f929::t_62740ab71db03a 17
+  s_f871e6fe06f929::t_fdaa1c89c74373 175-180
+apps/dashboard/messages/de.json
+  s_f871e6fe06f929::t_62740ab71db03a 674-676
+apps/dashboard/messages/en.json
+  s_f871e6fe06f929::t_62740ab71db03a 674-676
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "d47811020d9024a2527b0e2d6e455e36273e45d8",
+  "prompts": {},
+  "sessions": {
+    "s_f871e6fe06f929": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "70903be8-237c-44ea-8cb8-704c987ae22d",
+        "model": "unknown"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

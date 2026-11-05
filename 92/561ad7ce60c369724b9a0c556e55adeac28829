@@ -1,0 +1,48 @@
+apps/dashboard/src/constants/nav.ts
+  s_0e0865e9491ac9::t_ef87ac2938d235 40,143-204,207-217
+apps/dashboard/messages/de.json
+  s_0e0865e9491ac9::t_ef87ac2938d235 2134-2135
+apps/dashboard/src/utils/dashboard-paths.ts
+  s_0e0865e9491ac9::t_2aaa0b4dab71ef 16-41
+apps/dashboard/src/components/dashboard/nav-footer.tsx
+  s_0e0865e9491ac9::t_60b6b3218e86b1 32
+  s_0e0865e9491ac9::t_5f208f273c73d6 3-7,9,16,19,34-36,43,48-61
+  s_0e0865e9491ac9::t_6e6fbc0211fa5f 8,12-14,20-22,25-30,33,38-42,46-47,62-77,79,81-94
+apps/dashboard/src/components/dashboard/app-sidebar.tsx
+  s_0e0865e9491ac9::t_53c2a4914aed61 31,39,66-67,70-71,162-167,212
+  s_0e0865e9491ac9::t_5f208f273c73d6 68-69
+apps/dashboard/src/components/dashboard/nav-group-list.tsx
+  s_0e0865e9491ac9::t_6e6fbc0211fa5f 9-11,15-20,28-52,57,60-62,66-123,126-135
+apps/dashboard/src/components/dashboard/header.tsx
+  s_0e0865e9491ac9::t_2aaa0b4dab71ef 12,41,56,59-64,67-68,70-78,81-82,85,91-92
+apps/dashboard/src/components/dashboard/dashboard-global-actions.tsx
+  s_0e0865e9491ac9::t_2aaa0b4dab71ef 4-10,13-15,17,19-25,27-55,57-59,62-93
+apps/dashboard/src/components/dashboard/org-selector.tsx
+  s_0e0865e9491ac9::t_7a9dfab9a3db27 6,17,51-52,238-251,377-387
+  s_0e0865e9491ac9::t_2c83f1a1fed15c 212
+apps/dashboard/src/components/dashboard/nav-main.tsx
+  s_0e0865e9491ac9::t_6e6fbc0211fa5f 3,6,8,10-11,13,19-23,29,31-33,35,40-44,46,48
+  s_0e0865e9491ac9::t_7ac595699898d9 15-18
+apps/dashboard/messages/en.json
+  s_0e0865e9491ac9::t_ef87ac2938d235 2134-2135
+apps/dashboard/src/components/dashboard/dashboard-shell.tsx
+  s_0e0865e9491ac9::t_7a9dfab9a3db27 21,349
+apps/dashboard/src/types/components/nav.ts
+  s_0e0865e9491ac9::t_ef87ac2938d235 36-56
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "92561ad7ce60c369724b9a0c556e55adeac28829",
+  "prompts": {},
+  "sessions": {
+    "s_0e0865e9491ac9": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "556dc17f-9709-4dc2-aa99-7e99cc389dba",
+        "model": "claude-sonnet-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

@@ -1,0 +1,25 @@
+apps/dashboard/src/components/geo/persona-prompts.tsx
+  s_932c61e3f9ba4c::t_3486aadd4e6e78 30
+apps/dashboard/src/components/geo/persona-profile-editor.tsx
+  s_932c61e3f9ba4c::t_3486aadd4e6e78 24-32,82-86,221
+apps/dashboard/src/components/geo/persona-detail-dialog.tsx
+  s_932c61e3f9ba4c::t_3486aadd4e6e78 382-385
+apps/dashboard/src/utils/geo-personas.ts
+  s_932c61e3f9ba4c::t_3486aadd4e6e78 70-74
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "ad9e741d057a28cdeb0a29dd8e00b27a63a79765",
+  "prompts": {},
+  "sessions": {
+    "s_932c61e3f9ba4c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6691de1a-0aa4-4912-80e2-b22436ca0124",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

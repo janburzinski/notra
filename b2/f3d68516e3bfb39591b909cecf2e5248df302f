@@ -1,0 +1,54 @@
+packages/ui/src/components/ai-skins/gemini/gemini-actions.tsx
+  s_0a7c546ca46997::t_ee96469c3e3fb7 13,19,37,39-40,42,44,46
+  s_0a7c546ca46997::t_27f18d7fb3e099 41
+packages/ui/src/components/ai-skins/gemini/gemini-composer.tsx
+  s_0a7c546ca46997::t_ee96469c3e3fb7 10-20,66,69-70,73,75-76,86,98,144-149,151-186
+packages/ui/src/components/ai-skins/claude-chat/claude-chat-composer.tsx
+  s_0a7c546ca46997::t_c17684837e8484 11-21,67,70-71,75,79,119,122-123,125-126,136,148,211-232,234-257
+packages/ui/src/components/ai-skins/chatgpt/chatgpt-activity.tsx
+  s_0a7c546ca46997::t_9e4ed0f6bb7996 15-16,142,144-148,150
+packages/ui/src/components/ai-skins/chatgpt/chatgpt-actions.tsx
+  s_0a7c546ca46997::t_9e4ed0f6bb7996 12,19,36,38-39,41,43,45
+  s_0a7c546ca46997::t_069bc34ebdba98 40
+packages/ui/src/components/ai-skins/chatgpt/chatgpt-composer.tsx
+  s_0a7c546ca46997::t_2240bc1b7a6f5b 89,91-94,100-111,122-128,132-133,135-136
+  s_0a7c546ca46997::t_27f18d7fb3e099 81-85
+  s_0a7c546ca46997::t_069bc34ebdba98 72
+packages/ui/src/components/ai-skins/perplexity/perplexity-sources-sheet.tsx
+  s_0a7c546ca46997::t_4093b1787b3591 7,17,70-71,74,99,101-105,107
+packages/ui/src/components/ai-skins/perplexity/perplexity-composer.tsx
+  s_0a7c546ca46997::t_4093b1787b3591 13,17-18,21-31,59,62-63,66,69,85,88-89,91,103,111,180-223,225-226,228-230,232-248,250-285
+packages/ui/src/components/ai-skins/perplexity/perplexity-model-selector.tsx
+  s_0a7c546ca46997::t_4093b1787b3591 10,17,82,85-86,91
+packages/ui/src/components/ai-skins/perplexity/perplexity-actions.tsx
+  s_0a7c546ca46997::t_4093b1787b3591 17,23,41,43-46,48,50
+packages/ui/src/constants/ai-skin-primitives.ts
+  s_0a7c546ca46997::t_069bc34ebdba98 6-10,12,14-17,19
+  s_0a7c546ca46997::t_86e38533b587f4 1-5,11,13,18,20-23
+packages/ui/src/components/ai-skins/chatgpt/chatgpt-search.tsx
+  s_0a7c546ca46997::t_9e4ed0f6bb7996 3-4,50,52-53,57,64
+packages/ui/src/components/ai-skins/chatgpt/chatgpt-model-selector.tsx
+  s_0a7c546ca46997::t_9e4ed0f6bb7996 5,16,57,60-61,65
+packages/ui/src/components/ai-skins/claude-chat/claude-chat-model-selector.tsx
+  s_0a7c546ca46997::t_c17684837e8484 9,22,66,69-70,74
+packages/ui/src/components/ai-skins/gemini/gemini-model-selector.tsx
+  s_0a7c546ca46997::t_ee96469c3e3fb7 5,9-10,14,34-37,64,86,89-90,95,116-144
+apps/web/src/styles/ui-sources.css
+  s_0a7c546ca46997::t_cb4e14c920802a 151
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "b2f3d68516e3bfb39591b909cecf2e5248df302f",
+  "prompts": {},
+  "sessions": {
+    "s_0a7c546ca46997": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f4629158-9e1c-4378-a825-ace111c4f25a",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

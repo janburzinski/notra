@@ -1,0 +1,21 @@
+apps/dashboard/src/hooks/use-github-settings.ts
+  s_32ffa205186666::t_5e38e7eb1ba779 105
+packages/ai/src/integrations/github.ts
+  s_32ffa205186666::t_24ec0a1a8ecb94 1190-1191
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "0a63ecb970e290fd4ba933c9c4f72b1143d2e2b1",
+  "prompts": {},
+  "sessions": {
+    "s_32ffa205186666": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "617d1014-f81a-4766-8cc5-2f058ac5cd82",
+        "model": "grok-4.7"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

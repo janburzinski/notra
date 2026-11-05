@@ -1,0 +1,110 @@
+apps/web/src/components/feature-pages/sites-card-config.tsx
+  s_c5ad10028eff22::t_a9a5b6d5f49caf 1-28
+apps/web/src/components/feature-pages/sites-card-domains.tsx
+  s_c5ad10028eff22::t_a9a5b6d5f49caf 1-3,6,8-17,19-23,26,28-34,41-83
+  s_c5ad10028eff22::t_eb72b393e1281f 36-38
+apps/web/src/components/feature-pages/sites-headline.tsx
+  s_c5ad10028eff22::t_3aca66133d86f9 5,9,13,15
+  s_c5ad10028eff22::t_25b810fe46c77d 1,3,7-8,10-12,14,16
+  s_c5ad10028eff22::t_bd3b64cf5d8856 2,4,6,17-18
+apps/web/src/content/pages/features/sites.md
+  s_c5ad10028eff22::t_d368e4443f1363 53
+  s_c5ad10028eff22::t_eb72b393e1281f 7,9,11,13,15,17,19,21,23,25
+  s_c5ad10028eff22::t_46ffa9a61f971a 41,43,45-47,50,67-69
+  s_c5ad10028eff22::t_7c78e461eea729 55,57,59,61,63,65,70-77
+  s_c5ad10028eff22::t_5a0f4c2d5a6a53 3,49,51
+apps/web/src/utils/json-tokens.ts
+  s_c5ad10028eff22::t_eb72b393e1281f 3-4,11-14
+  s_c5ad10028eff22::t_a9a5b6d5f49caf 1-2,5-10,15-30
+apps/web/src/components/feature-pages/sites-card-deployments.tsx
+  s_c5ad10028eff22::t_3fc321b3b1c62e 82,84-86,91
+  s_c5ad10028eff22::t_a9a5b6d5f49caf 2-3,6,8-18,20,22-23,26-27,30-35,37-39,42-81,87-90,92-98
+  s_c5ad10028eff22::t_cc226b629e6dfc 83
+  s_c5ad10028eff22::t_fac7be6e071d3e 24
+apps/web/src/constants/feature-pages/stage.ts
+  s_c5ad10028eff22::t_c39456f27085a9 1,3-4,8
+apps/web/src/utils/navigation.ts
+  s_c5ad10028eff22::t_dcfe1000a295e9 5,80-84
+apps/web/src/constants/navbar-products.ts
+  s_c5ad10028eff22::t_01fee437a6e847 203-204,207
+  s_c5ad10028eff22::t_dcfe1000a295e9 38-41
+  s_c5ad10028eff22::t_1f99470d34663e 205-206
+apps/web/src/constants/navbar-bento.ts
+  s_c5ad10028eff22::t_dcfe1000a295e9 47
+apps/web/src/routes/_site/features/sites.tsx
+  s_c5ad10028eff22::t_25b810fe46c77d 5
+  s_c5ad10028eff22::t_1c990cafc05f2e 6,21
+  s_c5ad10028eff22::t_a9a5b6d5f49caf 7-8
+  s_c5ad10028eff22::t_43dd0b3d5e1302 20
+  s_c5ad10028eff22::t_3aca66133d86f9 4,22,24
+apps/web/src/components/feature-pages/sites-stage.tsx
+  s_c5ad10028eff22::t_1e0b9bfdd3ea3f 114
+  s_c5ad10028eff22::t_30a062b6d64a59 3-4,37-44,98-99,102-104,106-107
+  s_c5ad10028eff22::t_b6c46b8888d1fd 117-122,124-126,128
+  s_c5ad10028eff22::t_1c990cafc05f2e 5,7,11-13,20-26,32-35,47-72,74-97,108-109,111,115,130
+  s_c5ad10028eff22::t_3e21f5d30ca181 113,123
+  s_c5ad10028eff22::t_ef08c393c38cf1 1,9,100-101,105
+  s_c5ad10028eff22::t_2d18ed29dc3f1b 10,28,30-31
+  s_c5ad10028eff22::t_f0d45e03bf8a4f 16-19,29
+apps/web/src/components/feature-pages/sites-features.tsx
+  s_c5ad10028eff22::t_a9a5b6d5f49caf 3-4,6,13-16,24,26-27,29-43
+  s_c5ad10028eff22::t_3aca66133d86f9 20,22,44-45
+  s_c5ad10028eff22::t_eb72b393e1281f 25,28
+apps/web/src/components/feature-pages/sites-card-files.tsx
+  s_c5ad10028eff22::t_a9a5b6d5f49caf 1-15,17-51
+apps/web/src/types/landing/faq.ts
+  s_c5ad10028eff22::t_43dd0b3d5e1302 16
+apps/web/src/constants/feature-pages/sites.ts
+  s_c5ad10028eff22::t_43dd0b3d5e1302 235-238
+  s_c5ad10028eff22::t_a9a5b6d5f49caf 16,250-256
+  s_c5ad10028eff22::t_380677826fb02e 14
+  s_c5ad10028eff22::t_eb72b393e1281f 40,42,134-138,169-172,200-202,220-223
+  s_c5ad10028eff22::t_034be33677030a 1,6,15,129-130
+  s_c5ad10028eff22::t_2d18ed29dc3f1b 11-13,257-258
+  s_c5ad10028eff22::t_46f49a09edb23d 33,78,80-100,108-124
+  s_c5ad10028eff22::t_c9f93aa0bfb41e 43,101-107
+  s_c5ad10028eff22::t_b9ddc7ba450ba2 2-4,7,17-23,25,127-128,131-133,139-163,165-166,168,173-177,179-182,184-188,190-199,204-206,208,210-215,217-219,224-227,229-234,239-249
+  s_c5ad10028eff22::t_15636a1f7c7326 79
+  s_c5ad10028eff22::t_49a210a0398a90 259-263
+  s_c5ad10028eff22::t_40a4103be981f0 24,266,268,279,281,283-290,293-308,312-314
+  s_c5ad10028eff22::t_e8c602e5925629 267
+  s_c5ad10028eff22::t_5e7cd2849a0537 72,74
+  s_c5ad10028eff22::t_ef08c393c38cf1 5,8,271-278
+  s_c5ad10028eff22::t_22558449c2410e 37,73,75
+apps/web/src/components/feature-pages/feature-detail-page.tsx
+  s_c5ad10028eff22::t_b37c43b458c71f 29,117
+apps/web/src/types/feature-detail-page.ts
+  s_c5ad10028eff22::t_c39456f27085a9 111-112,120
+  s_c5ad10028eff22::t_b37c43b458c71f 45
+apps/web/src/types/navbar-bento.ts
+  s_c5ad10028eff22::t_01fee437a6e847 112
+apps/web/src/components/feature-pages/stage-shell.tsx
+  s_c5ad10028eff22::t_c39456f27085a9 3,9,17,24,28,33
+  s_c5ad10028eff22::t_93fad9bb577185 20-23,25-27,29-32,34-39
+apps/web/src/types/sites-page.ts
+  s_c5ad10028eff22::t_40a4103be981f0 5,7-10,12
+  s_c5ad10028eff22::t_a9a5b6d5f49caf 67-69
+  s_c5ad10028eff22::t_2d68f670dde93e 1,3,15-17,20,22,25,27,29-42,45,47-51,54-58,61-64
+apps/web/src/components/navbar-products-panel.tsx
+  s_c5ad10028eff22::t_645c8fb7e53e4b 184
+  s_c5ad10028eff22::t_01fee437a6e847 31,181-183,185,187-188,192,227-235,280-281
+  s_c5ad10028eff22::t_534a36934dac8e 214
+  s_c5ad10028eff22::t_ed8774b2cb5631 294
+  s_c5ad10028eff22::t_1f99470d34663e 3-5,17-21,186,189-191,193-213,215-226
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "f8836763769f0f0c4074fb047f0fbd4caae3ebc1",
+  "prompts": {},
+  "sessions": {
+    "s_c5ad10028eff22": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "06783a3c-f13c-4414-adc0-b18d548f4d44",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

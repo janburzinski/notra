@@ -1,0 +1,119 @@
+packages/sites-server/src/activation.ts
+  s_8ff470b5e79e4a::t_341a15a76addb6 72-74
+packages/sites-server/src/integrations.ts
+  s_8ff470b5e79e4a::t_341a15a76addb6 22,93
+packages/sites-server/src/types/deployments.ts
+  s_8ff470b5e79e4a::t_341a15a76addb6 32-33
+apps/dashboard/src/components/sites/site-deployments-table.tsx
+  s_8ff470b5e79e4a::t_341a15a76addb6 12,39,64,236
+apps/agent/agent/instructions.md
+  s_8ff470b5e79e4a::t_341a15a76addb6 38
+apps/dashboard/src/components/sites/editor/site-editor-pane.tsx
+  s_8ff470b5e79e4a::t_341a15a76addb6 22-26,76
+apps/dashboard/messages/de.json
+  s_8ff470b5e79e4a::t_341a15a76addb6 8026-8032
+apps/dashboard/tests/site-create-defaults.test.tsx
+  s_8ff470b5e79e4a::t_341a15a76addb6 34
+packages/sites-server/src/editor.ts
+  s_8ff470b5e79e4a::t_341a15a76addb6 272
+apps/dashboard/src/components/sites/pages/site-settings-page.tsx
+  s_8ff470b5e79e4a::t_b569b660aa9d78 47,69-72,84-89,151,341,345-367,369-370,372,375-394,396,399-400,402-424
+packages/sites-server/src/types/sites.ts
+  s_8ff470b5e79e4a::t_341a15a76addb6 64,119
+packages/sites-server/src/sites.ts
+  s_8ff470b5e79e4a::t_341a15a76addb6 252-266,289-293,295,308,312,314-315,319
+packages/tools/src/assistant/preview-content.ts
+  s_8ff470b5e79e4a::t_341a15a76addb6 1-48
+apps/dashboard/src/utils/site-deployments.ts
+  s_8ff470b5e79e4a::t_341a15a76addb6 21,225-234
+apps/dashboard/tests/constants/site-editor.ts
+  s_8ff470b5e79e4a::t_341a15a76addb6 2-6
+apps/dashboard/tests/sites-feature-flag.test.tsx
+  s_8ff470b5e79e4a::t_341a15a76addb6 204-208
+apps/dashboard/src/lib/sites/serialize.ts
+  s_8ff470b5e79e4a::t_341a15a76addb6 41-45,81-88
+apps/dashboard/src/types/components/sites.ts
+  s_8ff470b5e79e4a::t_341a15a76addb6 352,671-674
+apps/dashboard/src/lib/orpc/routers/sites.ts
+  s_8ff470b5e79e4a::t_341a15a76addb6 129,916,954
+apps/dashboard/tests/site-create-deploy-surface.test.tsx
+  s_8ff470b5e79e4a::t_341a15a76addb6 61,394
+apps/dashboard/src/components/sites/pages/site-editor-page.tsx
+  s_8ff470b5e79e4a::t_341a15a76addb6 33-36,122
+packages/sites-server/tests/draft-cas-postgres.test.ts
+  s_8ff470b5e79e4a::t_341a15a76addb6 150
+apps/dashboard/tests/sites-get-read-only.test.ts
+  s_8ff470b5e79e4a::t_341a15a76addb6 90-92
+apps/dashboard/src/components/sites/site-import-list.tsx
+  s_8ff470b5e79e4a::t_341a15a76addb6 15,69-72,75-79,93,122,256-275
+packages/sites-server/src/runner.ts
+  s_8ff470b5e79e4a::t_341a15a76addb6 161
+apps/dashboard/src/lib/sites/post-preview.ts
+  s_8ff470b5e79e4a::t_341a15a76addb6 149
+apps/dashboard/src/routes/api.internal.content.preview.ts
+  s_8ff470b5e79e4a::t_341a15a76addb6 1-19
+packages/schemas/src/schemas/dashboard/sites.ts
+  s_8ff470b5e79e4a::t_341a15a76addb6 91,174
+apps/dashboard/src/utils/site-editor-save-queue.test.ts
+  s_8ff470b5e79e4a::t_341a15a76addb6 28-32
+packages/sites-server/src/utils/deployments.ts
+  s_8ff470b5e79e4a::t_341a15a76addb6 21
+packages/sites-server/src/webhooks.ts
+  s_8ff470b5e79e4a::t_341a15a76addb6 171,249
+packages/db/migrations/meta/0127_snapshot.json
+  ai_agent 1-15105
+apps/dashboard/messages/en.json
+  s_8ff470b5e79e4a::t_341a15a76addb6 8026-8032
+apps/agent/agent/tools/preview_content.ts
+  s_8ff470b5e79e4a::t_341a15a76addb6 1-8
+apps/dashboard/src/components/sites/pages/site-deployment-detail-page.tsx
+  s_8ff470b5e79e4a::t_341a15a76addb6 50,260
+packages/sites-server/src/deploy.ts
+  s_8ff470b5e79e4a::t_341a15a76addb6 28
+packages/sites-server/src/utils/source-context.ts
+  s_8ff470b5e79e4a::t_341a15a76addb6 1-12
+apps/dashboard/src/components/sites/site-deployment-summary.tsx
+  s_8ff470b5e79e4a::t_341a15a76addb6 88
+packages/sites-server/src/deployments.ts
+  s_8ff470b5e79e4a::t_341a15a76addb6 164-171,195-197,292-296,300,303-308,312
+packages/db/migrations/0127_site_deployment_repository.sql
+  ai_agent 1-4
+packages/sites-server/tests/lifecycle.test.ts
+  s_8ff470b5e79e4a::t_341a15a76addb6 340-342
+apps/dashboard/src/app/api/internal/content/preview/route.ts
+  s_8ff470b5e79e4a::t_341a15a76addb6 1-128
+apps/dashboard/tests/site-deployments-surface.test.tsx
+  s_8ff470b5e79e4a::t_341a15a76addb6 169
+apps/dashboard/src/routeTree.gen.ts
+  s_8ff470b5e79e4a::t_341a15a76addb6 70,408-413,635,723,812,902,990,1078,1161,1592-1598,1951,1987-1996
+packages/db/src/schema.ts
+  s_8ff470b5e79e4a::t_341a15a76addb6 4055-4057
+packages/sites-server/src/types/editor.ts
+  s_8ff470b5e79e4a::t_341a15a76addb6 50
+packages/db/migrations/meta/_journal.json
+  ai_agent 893-899
+packages/ai/src/schemas/content-preview.ts
+  s_8ff470b5e79e4a::t_341a15a76addb6 1-48
+apps/dashboard/src/utils/site-editor.ts
+  s_8ff470b5e79e4a::t_341a15a76addb6 290-300
+apps/dashboard/src/components/sites/site-deployment-menu.tsx
+  s_8ff470b5e79e4a::t_341a15a76addb6 37,115
+apps/dashboard/src/types/sites.ts
+  s_8ff470b5e79e4a::t_341a15a76addb6 170
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "5e446f18204e39be6b709ac4f38316ed229b9d25",
+  "prompts": {},
+  "sessions": {
+    "s_8ff470b5e79e4a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "04e358e8-8889-4650-9310-e338b0a5de3e",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

@@ -1,0 +1,9 @@
+apps/sites-builder/tests/packaged-dev.test.ts
+  ai_agent 172-175
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "37204ac14f057bdeb3455dc10414fafd575566d5",
+  "prompts": {}
+}

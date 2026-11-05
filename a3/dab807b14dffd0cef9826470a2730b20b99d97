@@ -1,0 +1,39 @@
+packages/sites-server/src/types/sites.ts
+  s_bd6cd688d4813d::t_954a690f427835 64
+packages/sites-server/src/sites.ts
+  s_bd6cd688d4813d::t_954a690f427835 256-266,289-293,295,308,312,314-315,319
+  s_bd6cd688d4813d::t_fb561e50014af2 252-255
+apps/dashboard/src/components/sites/pages/site-settings-page.tsx
+  s_bd6cd688d4813d::t_68c43fcc4abda1 67-70,82-87,148,325,329-351,353-354,356,359-378,380,383-384,386-408
+  s_bd6cd688d4813d::t_fb561e50014af2 45
+  s_bd6cd688d4813d::t_5586a3894027f6 43
+packages/schemas/src/schemas/dashboard/sites.ts
+  s_bd6cd688d4813d::t_954a690f427835 91
+apps/dashboard/src/types/sites.ts
+  s_bd6cd688d4813d::t_954a690f427835 170
+apps/dashboard/messages/de.json
+  s_bd6cd688d4813d::t_5586a3894027f6 8031-8037
+apps/dashboard/messages/en.json
+  s_bd6cd688d4813d::t_5586a3894027f6 8031-8037
+apps/dashboard/src/components/sites/site-import-list.tsx
+  s_bd6cd688d4813d::t_fb561e50014af2 15,257-259
+  s_bd6cd688d4813d::t_420a25d7e151be 69-72,75-79,93,122,256,260-275
+apps/dashboard/src/types/components/sites.ts
+  s_bd6cd688d4813d::t_420a25d7e151be 674-677
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "a3dab807b14dffd0cef9826470a2730b20b99d97",
+  "prompts": {},
+  "sessions": {
+    "s_bd6cd688d4813d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "03456ad8-930b-40e7-babd-71e9eea0ee51",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

@@ -1,0 +1,21 @@
+apps/web/src/constants/offering-check.ts
+  s_595b88a3fa62a3::t_e99fecbe0136cc 135,150
+apps/web/src/components/offering-check/offering-verdict-summary.tsx
+  s_595b88a3fa62a3::t_e99fecbe0136cc 163-164
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "6de622ab130fba95ec515628b72be26864298d9b",
+  "prompts": {},
+  "sessions": {
+    "s_595b88a3fa62a3": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0e966-9afc-7df0-a794-20fbc4417bb4",
+        "model": "gpt-6-sol"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

@@ -1,0 +1,42 @@
+apps/dashboard/src/lib/autopilot/brief.ts
+  s_8a49709711c886::t_26d0c26f5f2a86 56
+  s_8a49709711c886::t_0178ae320faa51 14
+apps/dashboard/src/types/autopilot.ts
+  s_8a49709711c886::t_4fd54e63367be9 380-381
+apps/dashboard/src/utils/autopilot-findings.ts
+  s_8a49709711c886::t_0178ae320faa51 14-16
+  s_8a49709711c886::t_26d0c26f5f2a86 10-13,17-21
+  s_8a49709711c886::t_b9c1148805f0cb 31,38-39,41-42,47
+apps/dashboard/src/app/(dashboard)/[slug]/autopilot/[automation]/page-client.tsx
+  s_8a49709711c886::t_e722eb2180014a 37,94,200-202
+  s_8a49709711c886::t_944c41ef7f01eb 166,190-192,194-199,203-223
+  s_8a49709711c886::t_cfe4b65596af1d 193
+apps/dashboard/src/components/autopilot/autopilot-pull-requests-table.tsx
+  s_8a49709711c886::t_26d0c26f5f2a86 33-36,89
+  s_8a49709711c886::t_771a7c2c496ea7 172
+  s_8a49709711c886::t_0e14f2b99e8034 120
+  s_8a49709711c886::t_e722eb2180014a 10,28
+  s_8a49709711c886::t_4fd54e63367be9 3-8,21,24,44-45,49,76-88,90-99,103,117-119,121-143,147,166-171,190-202
+apps/dashboard/src/app/(dashboard)/[slug]/autopilot/page-client.tsx
+  s_8a49709711c886::t_0e14f2b99e8034 114-115
+  s_8a49709711c886::t_cfe4b65596af1d 51,57,116-129,304-330
+  s_8a49709711c886::t_e722eb2180014a 58
+apps/dashboard/src/constants/autopilot-ui.ts
+  s_8a49709711c886::t_b1c6e326365b52 3,9,229-244
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "65329b227e144638661b4d4ebd187b8448a90b05",
+  "prompts": {},
+  "sessions": {
+    "s_8a49709711c886": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "35462f9b-2798-496a-aeba-07ac8d3cf9f0",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

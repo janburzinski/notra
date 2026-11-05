@@ -1,0 +1,19 @@
+packages/geo-core/src/geo/sentiment-analysis.ts
+  s_6c80644add4551::t_55a3eb45da19c1 40
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "9c95ef3f52d15621a4a5eaa34956544a3753a914",
+  "prompts": {},
+  "sessions": {
+    "s_6c80644add4551": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "4ab5cfc4-776d-4678-a9d3-b0dc4fc3c577",
+        "model": "grok-4.7"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

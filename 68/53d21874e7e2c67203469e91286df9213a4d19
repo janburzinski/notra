@@ -1,0 +1,33 @@
+packages/workflows/src/runtime/scheduler.ts
+  s_985d322a22a6f8::t_b06f246598a4e5 101
+apps/dashboard/tests/workflow-engine.test.ts
+  s_985d322a22a6f8::t_72973452dfae8b 543-558,561-600,605
+  s_985d322a22a6f8::t_ee495ff14713eb 634-691
+packages/workflows/src/runtime/references.ts
+  s_985d322a22a6f8::t_348e06a6e0f13c 103-111
+packages/workflows/src/runtime/core-blocks.ts
+  s_985d322a22a6f8::t_833dd8f69c18aa 19,21,81-111,114-115,117-124,131-150
+packages/workflows/src/types/run.ts
+  s_985d322a22a6f8::t_027c90f67d708e 26-31
+packages/workflows/src/runtime/interpreter.ts
+  s_985d322a22a6f8::t_37890f12316b6c 156-160,162
+packages/workflows/tests/composition.test.ts
+  s_985d322a22a6f8::t_475477c759c59e 142,145-167,173-231
+  s_985d322a22a6f8::t_4ef2a89921b102 168-172
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "6853d21874e7e2c67203469e91286df9213a4d19",
+  "prompts": {},
+  "sessions": {
+    "s_985d322a22a6f8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "efce3ecd-755b-429d-9b5c-035b1f703d5b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

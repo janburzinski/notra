@@ -1,0 +1,19 @@
+apps/dashboard/src/components/settings/organizations-section.tsx
+  s_1608a20a569a81::t_e66fa8c4b90622 162,165-167,172
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "2a79fc7273e218e8aeac965b910258bdc71675b5",
+  "prompts": {},
+  "sessions": {
+    "s_1608a20a569a81": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "712c20db-e25e-4f53-aaa6-53db123fa0d6",
+        "model": "grok-4.7"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

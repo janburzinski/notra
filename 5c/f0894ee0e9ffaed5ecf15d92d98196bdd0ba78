@@ -1,0 +1,27 @@
+apps/dashboard/src/components/providers/organization-provider.tsx
+  s_b6ed61123bf718::t_8f8c7fa117ada1 108-109
+apps/dashboard/src/workflows/steps/persona-generation-steps.ts
+  s_b6ed61123bf718::t_24da77a682a63d 58
+  s_b6ed61123bf718::t_e835bba5e63ab2 59-69
+apps/dashboard/tests/persona-generation-billing.test.ts
+  s_b6ed61123bf718::t_d2196a3576b8b7 1,3-20,24-25
+  ai_agent 2,21-23
+apps/dashboard/tests/organization-provider.test.tsx
+  s_b6ed61123bf718::t_9f93ceaa964c44 56-57,60-61,68,82
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "5cf0894ee0e9ffaed5ecf15d92d98196bdd0ba78",
+  "prompts": {},
+  "sessions": {
+    "s_b6ed61123bf718": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "81e163b3-e7e9-4201-ae2b-f8bface679d9",
+        "model": "grok-4.7"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

@@ -1,0 +1,9 @@
+packages/ai/src/utils/post-markdown.ts
+  ai_agent 9-11
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "5e20d509e281c33440585a27eb9aabf7d203b612",
+  "prompts": {}
+}

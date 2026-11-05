@@ -1,0 +1,45 @@
+packages/ai/src/prompts/github-mention.test.ts
+  s_00cec8ec03e505::t_ccb9e8af395ea1 3-12,16-20
+  s_59eb9d124f835a::t_d37f0e10a18350 13-15
+packages/ai/src/utils/github-mention.ts
+  s_7aec075ca4da57::t_66f0d37aa1b34f 18-19,66
+  ai_agent 67-69
+apps/docs/integrations/github.mdx
+  s_7aec075ca4da57::t_66f0d37aa1b34f 99
+packages/ai/src/prompts/github-mention.ts
+  s_59eb9d124f835a::t_d37f0e10a18350 162
+packages/ai/src/utils/github-mention.test.ts
+  s_7aec075ca4da57::t_66f0d37aa1b34f 36
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "8f60d73c4e8bd8863ad218e3055a60666fb363ed",
+  "prompts": {},
+  "sessions": {
+    "s_00cec8ec03e505": {
+      "agent_id": {
+        "tool": "amp",
+        "id": "TU-034S2WPxyDlXpsMCyhCSWm",
+        "model": "unknown"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    },
+    "s_59eb9d124f835a": {
+      "agent_id": {
+        "tool": "amp",
+        "id": "TU-034S2k4WHRc8ceh7IvcVJZ",
+        "model": "unknown"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    },
+    "s_7aec075ca4da57": {
+      "agent_id": {
+        "tool": "amp",
+        "id": "TU-034S1gCFKONioE7zToRq24",
+        "model": "unknown"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

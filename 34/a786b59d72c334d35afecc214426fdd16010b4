@@ -1,0 +1,26 @@
+packages/geo-core/tests/traffic-baseline.test.ts
+  s_67d72b59596675::t_44f41dc0c3975f 149-182
+apps/dashboard/src/utils/ai-traffic-groups.ts
+  s_67d72b59596675::t_44f41dc0c3975f 16,261-266,269-271,273,279-280,283
+apps/dashboard/src/components/geo/traffic-source-sheet.tsx
+  s_67d72b59596675::t_44f41dc0c3975f 46,154
+apps/dashboard/src/utils/ai-traffic-groups.test.ts
+  s_67d72b59596675::t_44f41dc0c3975f 15,134-145,154
+  s_67d72b59596675::t_207252240e6c37 146-153,155-161
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "34a786b59d72c334d35afecc214426fdd16010b4",
+  "prompts": {},
+  "sessions": {
+    "s_67d72b59596675": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e99a2e3d-270f-4f2b-a5ea-31ca473f2d8c",
+        "model": "claude-sonnet-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

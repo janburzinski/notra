@@ -1,0 +1,27 @@
+apps/dashboard/src/routes/-dashboard-ui.tsx
+  s_4a543cd3863692::t_b1534929e6ba03 54-58,238
+apps/dashboard/src/routes/-entry-ui.tsx
+  s_4a543cd3863692::t_2ca6ccaa1df831 29-48,93-94,153,168
+apps/dashboard/src/routes/-sites-ui.tsx
+  s_4a543cd3863692::t_99f513306bc056 77
+  s_4a543cd3863692::t_b1534929e6ba03 24-28
+apps/dashboard/src/utils/lazy-page.ts
+  s_4a543cd3863692::t_6a638b2f13fb90 8-11,17,19-28,32-35,42
+  s_4a543cd3863692::t_d23db38ad6b9be 31,36-41,43
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "a2c5328d3308bd3460644eb472ab203b753c4a6e",
+  "prompts": {},
+  "sessions": {
+    "s_4a543cd3863692": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "fa65703c-8316-42d7-b530-577326c6bf43",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

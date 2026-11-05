@@ -1,0 +1,31 @@
+packages/sites-server/src/utils/unreferenced-uploads.ts
+  s_69c6b08f0d57d2::t_c29cb52dba5849 71-75,91,93-95
+apps/dashboard/src/utils/shrink-site-image.ts
+  s_69c6b08f0d57d2::t_7e0e8b0dd65920 26-46,50,56
+packages/sites-server/tests/image-upload-postgres.test.ts
+  s_69c6b08f0d57d2::t_fcf4623c921705 46-47
+  s_69c6b08f0d57d2::t_0028721ce3129e 272-279
+apps/dashboard/src/utils/prepare-site-image.ts
+  s_69c6b08f0d57d2::t_dd9f09055d83fa 39-41,53-56,59-60,91
+apps/dashboard/src/lib/hooks/use-site-image-upload.ts
+  s_69c6b08f0d57d2::t_f94fe0c5d6d159 40-48,72-84,89
+apps/dashboard/src/utils/prepare-site-image.test.ts
+  s_69c6b08f0d57d2::t_1006c46a904d21 67,73-78,80-86
+  s_69c6b08f0d57d2::t_e26295fd165341 68-72,79
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "1930760d1d058642a6a38d0b5f9db88ee7c22644",
+  "prompts": {},
+  "sessions": {
+    "s_69c6b08f0d57d2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cb0e469f-88c0-4467-bf21-359bc543ea5f",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

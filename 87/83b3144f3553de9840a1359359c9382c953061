@@ -1,0 +1,62 @@
+examples/hosts/nginx/nginx.conf
+  s_679a387b188ae8::t_a8bc6ca130dedf 30-33
+apps/docs/sites/domains/astro.mdx
+  s_679a387b188ae8::t_a8bc6ca130dedf 46-47
+examples/hosts/nextjs/app/globals.css
+  s_679a387b188ae8::t_a8bc6ca130dedf 164-175
+packages/sites-server/src/utils/push-paths.ts
+  s_679a387b188ae8::t_37362cc401516b 20-24
+apps/docs/sites/domains/nginx.mdx
+  s_679a387b188ae8::t_f0d364de0de758 43
+  s_679a387b188ae8::t_a8bc6ca130dedf 35
+examples/hosts/astro/.env.example
+  s_679a387b188ae8::t_a8bc6ca130dedf 4-5
+examples/hosts/netlify/public/style.css
+  s_679a387b188ae8::t_a8bc6ca130dedf 162-175
+examples/hosts/nextjs/.gitignore
+  s_679a387b188ae8::t_a8bc6ca130dedf 4-5
+examples/hosts/tanstack-start/src/styles.css
+  s_679a387b188ae8::t_a8bc6ca130dedf 8,175-187
+examples/sites/nginx/style.css
+  s_679a387b188ae8::t_a8bc6ca130dedf 2
+examples/sites/match-your-website/style.css
+  s_679a387b188ae8::t_d1db4301d1490f 10,45,52,57
+examples/hosts/astro/src/lib/notra-proxy.ts
+  s_679a387b188ae8::t_a8bc6ca130dedf 36-38
+examples/hosts/cloudflare/wrangler.jsonc
+  s_679a387b188ae8::t_a8bc6ca130dedf 9
+examples/sites/custom-components/style.css
+  s_679a387b188ae8::t_d1db4301d1490f 3
+examples/hosts/netlify/public/index.html
+  s_679a387b188ae8::t_a8bc6ca130dedf 18,63
+examples/sites/netlify/style.css
+  s_679a387b188ae8::t_d1db4301d1490f 38-40
+apps/sites-builder/src/styles/global.css
+  s_679a387b188ae8::t_37362cc401516b 628-635,678-682
+examples/sites/custom-components/snippets/before-after.jsx
+  s_679a387b188ae8::t_d1db4301d1490f 8-9
+examples/sites/open-source/blog.json
+  s_679a387b188ae8::t_d1db4301d1490f 135
+apps/sites-builder/compiler/utils/site-fonts.ts
+  s_679a387b188ae8::t_37362cc401516b 213-218
+apps/sites-builder/src/layouts/Base.astro
+  s_679a387b188ae8::t_37362cc401516b 78-81
+apps/sites-builder/src/components/CodeBlocks.astro
+  s_679a387b188ae8::t_37362cc401516b 10-13
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "8783b3144f3553de9840a1359359c9382c953061",
+  "prompts": {},
+  "sessions": {
+    "s_679a387b188ae8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5cda3aa5-c3b0-46de-afc0-446f42005067",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

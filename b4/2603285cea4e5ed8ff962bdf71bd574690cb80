@@ -1,0 +1,24 @@
+apps/web/src/constants/navbar-products.ts
+  s_c5ad10028eff22::t_983e94c2f5ae32 1-5,16,27-49,51,54-58,60,63-67,69,72
+apps/web/src/types/navbar-bento.ts
+  s_c5ad10028eff22::t_983e94c2f5ae32 116-121
+apps/web/src/components/navbar-products-panel.tsx
+  s_c5ad10028eff22::t_983e94c2f5ae32 16,24-25,39,186,291-292,294-297,299-326,329-333
+  s_c5ad10028eff22::t_ff1a106793b336 327
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "b42603285cea4e5ed8ff962bdf71bd574690cb80",
+  "prompts": {},
+  "sessions": {
+    "s_c5ad10028eff22": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "06783a3c-f13c-4414-adc0-b18d548f4d44",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

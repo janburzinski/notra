@@ -1,0 +1,21 @@
+apps/dashboard/src/app/(dashboard)/[slug]/automation/page-client.tsx
+  s_b2263adfe8aa43::t_85d85b21cdbb3c 8,149-180,208-223
+  s_b2263adfe8aa43::t_48d673ffc7671a 46
+  s_b2263adfe8aa43::t_6a764ce6448722 140-143,145-148,181,206-207,260
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "855f4a3beedca81c7e278160a8cc701da530690f",
+  "prompts": {},
+  "sessions": {
+    "s_b2263adfe8aa43": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7b19bc50-9f11-4ef7-a695-fdbe497a25a7",
+        "model": "claude-sonnet-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

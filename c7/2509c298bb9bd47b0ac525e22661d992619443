@@ -1,0 +1,163 @@
+packages/geo-core/src/geo/conversation-replay.ts
+  s_a0799efed517c8::t_b6cdd9bbf7cb6b 46-50
+packages/geo-core/src/geo/scan-handoff.ts
+  s_a0799efed517c8::t_6b5ab2b151cf3c 107-109
+packages/geo-core/src/ingest/sites.ts
+  s_a0799efed517c8::t_6d514d1b5bc1da 20,22-28,32-38,44,83-84
+  s_a0799efed517c8::t_32b3223cad1d82 29-31
+packages/geo-core/src/geo/programs.ts
+  s_a0799efed517c8::t_2ac691c38e8327 198
+  s_a0799efed517c8::t_2737529370f050 382-388,1682-1689,1757-1762,1891
+packages/ai/src/utils/geo-opencode-box.ts
+  s_a0799efed517c8::t_70e81766dd5f4f 352
+packages/geo-core/tests/scan-lifecycle.test.ts
+  s_a0799efed517c8::t_2ef01c05ddb999 31-34,383-385,448-452,502-506,552-556,601-605,664-668,684-686,787-789
+packages/geo-core/src/geo/discover.ts
+  s_a0799efed517c8::t_b2f7644d1aed95 466-487,521-524,532-539,542-566
+  s_a0799efed517c8::t_2ac691c38e8327 45,62
+packages/ai/src/utils/box-retry.test.ts
+  s_a0799efed517c8::t_f15594a408bbbd 1-8,10-12,14-20,23-27,29,31,33-34,36-37,51
+  s_a0799efed517c8::t_f0064687b6f2e2 9,21-22,28,30,32,35
+  s_a0799efed517c8::t_796f7d4ceaf645 13,38-50
+packages/geo-core/src/geo/projects.ts
+  s_a0799efed517c8::t_17f74d2d0dde25 256-263,265-269,271-277,279-286,288-298,300-301
+  s_a0799efed517c8::t_9745d4f88a69d4 36,251-255,302
+packages/geo-core/tests/ingest-sites.test.ts
+  s_a0799efed517c8::t_d604c4bcf26798 13,17-20,163-165
+  s_a0799efed517c8::t_75bfc425c9c03d 161-162,166-173
+packages/geo-core/src/geo/agent-readiness.ts
+  s_a0799efed517c8::t_b6cdd9bbf7cb6b 361-363
+packages/geo-core/src/geo/sequence-generation.ts
+  s_a0799efed517c8::t_922055e7ad4857 233-257
+packages/ai/src/router/resolve.ts
+  ai_agent 25-26,29,48-49
+packages/geo-core/src/schemas/host-service-errors.ts
+  s_a0799efed517c8::t_b7f5b3d985196d 1-19
+apps/api/src/programs/skills.ts
+  s_a0799efed517c8::t_a7ce9a2015f325 3
+packages/geo-core/src/types/deps.ts
+  s_a0799efed517c8::t_b7f5b3d985196d 9-13,38,41,44,50,53,66,79
+packages/ai/src/constants/router.ts
+  ai_agent 8-10
+packages/db/src/utils/pg-errors.ts
+  s_a0799efed517c8::t_90d812fd41dccc 1-4,6-24,26-29,31,33,35
+apps/dashboard/src/lib/geo-shelf/request-service.ts
+  s_a0799efed517c8::t_4ce4c734ea9843 2
+  s_a0799efed517c8::t_5af21e4f786695 119
+packages/ai/src/router/README.md
+  s_a0799efed517c8::t_9a44e4e74e875a 30-31
+packages/ai/src/utils/content-schedules.ts
+  s_a0799efed517c8::t_e5c3f9167fdb08 27
+  s_a0799efed517c8::t_2c2f40f8eb0a15 210
+packages/ai/src/constants/box-retry.ts
+  s_a0799efed517c8::t_aeeafd3d2ae5a3 1-11,17-23
+  s_a0799efed517c8::t_2efe63eb5570c8 12-16
+packages/ai/src/router/router.test.ts
+  s_a0799efed517c8::t_6d633a5421180e 6,96-97,100,124-127,132-151
+packages/geo-core/src/geo/personas.ts
+  s_a0799efed517c8::t_b6cdd9bbf7cb6b 506,509
+  s_a0799efed517c8::t_f830b8458151f9 83
+  s_a0799efed517c8::t_bd43e139cec8a7 355-357,359-360,369-373,386-409,411-412,417-421,424-426,429-431,433,692-695
+packages/tools/src/utils/social-publish.ts
+  s_a0799efed517c8::t_5a9418640edbfe 4,103-115,117-124
+packages/geo-core/src/geo/writer.ts
+  s_a0799efed517c8::t_b6cdd9bbf7cb6b 587-589,740,743
+apps/dashboard/src/lib/orpc/routers/brand.ts
+  s_a0799efed517c8::t_5af21e4f786695 424,476,907
+  s_a0799efed517c8::t_a7ce9a2015f325 29
+packages/ai/src/integrations/mcp-tool-index.ts
+  s_a0799efed517c8::t_2c2f40f8eb0a15 879
+  s_a0799efed517c8::t_e5c3f9167fdb08 9
+packages/ai/src/tools/tool-cache.test.ts
+  s_a0799efed517c8::t_1d018cba8773bc 1-34
+apps/api/src/lib/geo/configure.ts
+  s_a0799efed517c8::t_0283ffa066ca01 18-22,46-49,103,113
+apps/dashboard/src/lib/orpc/routers/content-authors.ts
+  s_a0799efed517c8::t_a7ce9a2015f325 3
+  s_a0799efed517c8::t_5af21e4f786695 52,116
+packages/ai/src/types/router.ts
+  ai_agent 254,256-271,325-326
+apps/dashboard/src/lib/brand-analysis.ts
+  s_a0799efed517c8::t_a7ce9a2015f325 11,14
+  s_a0799efed517c8::t_5af21e4f786695 51
+packages/ai/src/router/create-router.ts
+  s_a0799efed517c8::t_c102da84653a20 5-6,10,21,26,36-41,63-66,70-95,102-130,132-135,138
+packages/geo-core/src/geo/prompt-translations.ts
+  s_a0799efed517c8::t_2737529370f050 143,259-261,519
+  s_a0799efed517c8::t_05b9090602a90c 31,42,150-152,417-422,428-430,458-460
+  s_a0799efed517c8::t_1967deab69d07b 133,141,155
+apps/dashboard/src/lib/orpc/routers/content.ts
+  s_a0799efed517c8::t_5af21e4f786695 312
+  s_a0799efed517c8::t_17f74d2d0dde25 27
+packages/db/tests/pg-errors.test.ts
+  s_a0799efed517c8::t_e40813744be042 1-39
+packages/geo-core/src/geo/transaction.ts
+  s_a0799efed517c8::t_7936f92650fca0 32-34,36,38-49
+  s_a0799efed517c8::t_2efe63eb5570c8 19-22,35,37
+  s_a0799efed517c8::t_def5c32f50b3f3 23-26
+  s_a0799efed517c8::t_48283570207a62 1-18,27-31,50-55
+apps/api/src/programs/event-triggers.ts
+  s_a0799efed517c8::t_a7ce9a2015f325 8
+apps/api/src/programs/brand-identities.ts
+  s_a0799efed517c8::t_a7ce9a2015f325 9
+  s_a0799efed517c8::t_17f74d2d0dde25 438
+  s_a0799efed517c8::t_5af21e4f786695 73,99
+packages/geo-core/tests/geo-transaction.test.ts
+  s_a0799efed517c8::t_f2d05ce9bcc241 1-5,7-24,32-33,37-53,55-56,60,62-63,65-69,73-76
+  s_a0799efed517c8::t_9389198258cbf9 6,25-31,34-36,54,57-59,61,64,70-72
+packages/geo-core/src/geo/scan.ts
+  s_a0799efed517c8::t_b6cdd9bbf7cb6b 742-746
+apps/api/src/programs/integrations.ts
+  s_a0799efed517c8::t_5af21e4f786695 55
+  s_a0799efed517c8::t_a7ce9a2015f325 6
+apps/dashboard/src/lib/auth/membership-upsert.ts
+  s_a0799efed517c8::t_4ce4c734ea9843 4,102
+packages/ai/src/utils/post-service.ts
+  s_a0799efed517c8::t_e5c3f9167fdb08 17
+  s_a0799efed517c8::t_17f74d2d0dde25 173-179
+packages/analytics/src/tinybird/purge.ts
+  s_a0799efed517c8::t_f830b8458151f9 91,95-96
+  s_a0799efed517c8::t_c62fff835017b4 1,60-72,75-78,89-90,92-94,97-113,116,118-119,139,148-154,165-169,185-189
+packages/geo-core/src/geo/sequences.ts
+  s_a0799efed517c8::t_922055e7ad4857 55-77
+packages/ai/src/utils/geo-opencode-box.test.ts
+  s_a0799efed517c8::t_f0064687b6f2e2 100-118
+packages/ai/src/tools/tool-cache.ts
+  s_a0799efed517c8::t_9705ce858b546f 2,8-41,44-74,105-118,120-121,123-124
+apps/dashboard/src/lib/geo/configure.ts
+  s_a0799efed517c8::t_0283ffa066ca01 15-19,31,39,48,60,69,88,98
+packages/ai/src/utils/repo-image-box.ts
+  s_a0799efed517c8::t_265e00008cde4f 1-9,11,13-29,33-38,40
+apps/api/src/programs/posts.ts
+  s_a0799efed517c8::t_5af21e4f786695 210
+  s_a0799efed517c8::t_17f74d2d0dde25 12
+packages/ai/src/router/organization-cache.ts
+  s_a0799efed517c8::t_a694180f387a1a 1-5,8-9,11-12,14-41,44,47-53,59-62,65-68,70-73,75-81
+  s_a0799efed517c8::t_32b3223cad1d82 42-43,45-46,54-56,58,63-64,69,74
+apps/dashboard/src/lib/orpc/routers/integrations.ts
+  s_a0799efed517c8::t_5af21e4f786695 1824,1829,1875,1959
+  s_a0799efed517c8::t_a7ce9a2015f325 84
+packages/ai/src/utils/scheduled-publications.ts
+  s_a0799efed517c8::t_e5c3f9167fdb08 12,392,536
+packages/geo-core/src/ingest/batcher.ts
+  s_a0799efed517c8::t_70e81766dd5f4f 61-64
+  s_a0799efed517c8::t_870003afd83f5d 4,57-60,65-70,75-77,138
+packages/ai/src/utils/box-retry.ts
+  s_a0799efed517c8::t_576ec84ee3741e 1-19,22-26,29-83
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "c72509c298bb9bd47b0ac525e22661d992619443",
+  "prompts": {},
+  "sessions": {
+    "s_a0799efed517c8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cd2fba69-476b-482b-aae2-b39793aeb150",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

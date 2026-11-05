@@ -1,0 +1,113 @@
+apps/dashboard/src/lib/autopilot/analytics.ts
+  s_69c6b08f0d57d2::t_498435cf3fc16f 1-263
+packages/db/migrations/0132_autopilot_commit_filters.sql
+  ai_agent 1
+apps/dashboard/src/types/autopilot.ts
+  s_69c6b08f0d57d2::t_498435cf3fc16f 3,38-39,229-231,428-457
+apps/dashboard/src/app/(dashboard)/[slug]/autopilot/page-client.tsx
+  s_69c6b08f0d57d2::t_498435cf3fc16f 4,28,248-253,264,326-329
+apps/dashboard/src/lib/autopilot/writer.test.ts
+  s_69c6b08f0d57d2::t_498435cf3fc16f 87
+apps/dashboard/src/types/autopilot-runtime.ts
+  s_69c6b08f0d57d2::t_498435cf3fc16f 45
+packages/sites-server/src/utils/branch-protection.ts
+  s_69c6b08f0d57d2::t_498435cf3fc16f 23-32,70-76
+apps/dashboard/src/components/autopilot/autopilot-settings-panel.tsx
+  s_69c6b08f0d57d2::t_498435cf3fc16f 23,303-308
+apps/dashboard/src/lib/autopilot/commit-filters.ts
+  s_69c6b08f0d57d2::t_498435cf3fc16f 1-88
+apps/dashboard/messages/en.json
+  s_69c6b08f0d57d2::t_498435cf3fc16f 8546-8564,8632-8646
+apps/dashboard/src/constants/autopilot.ts
+  s_69c6b08f0d57d2::t_498435cf3fc16f 2,10-11,27-37,85-115,395,397,399
+apps/dashboard/src/components/autopilot/autopilot-release-filters-section.tsx
+  s_69c6b08f0d57d2::t_498435cf3fc16f 1-282
+apps/dashboard/src/utils/site-design-sections.ts
+  s_69c6b08f0d57d2::t_498435cf3fc16f 4
+apps/dashboard/src/components/sites/site-changes-banner.tsx
+  s_69c6b08f0d57d2::t_498435cf3fc16f 1-173
+packages/schemas/src/schemas/dashboard/autopilot.ts
+  s_69c6b08f0d57d2::t_498435cf3fc16f 17-28,121-170
+packages/sites-server/tests/utils/fake-github.ts
+  s_69c6b08f0d57d2::t_498435cf3fc16f 23,272-280
+packages/db/migrations/meta/_journal.json
+  ai_agent 928-934
+apps/dashboard/src/types/components/sites.ts
+  s_69c6b08f0d57d2::t_498435cf3fc16f 13,750-758
+apps/dashboard/src/components/autopilot/autopilot-tag-input.tsx
+  s_69c6b08f0d57d2::t_498435cf3fc16f 1-148
+packages/db/migrations/meta/0132_snapshot.json
+  ai_agent 1-15264
+apps/dashboard/src/lib/autopilot/blog.ts
+  s_69c6b08f0d57d2::t_498435cf3fc16f 31,106,1070-1071,1113-1119,1121,1132-1149,1165,1173-1176,1181,1184-1186,1209-1214,1219,1226,1228,1257-1258,1261,1282-1289
+apps/dashboard/src/lib/autopilot/pull-request-events.ts
+  s_69c6b08f0d57d2::t_498435cf3fc16f 9,24,31-34,56,77-80,85,98-101,132-133,136,179-196
+apps/dashboard/messages/de.json
+  s_69c6b08f0d57d2::t_498435cf3fc16f 8546-8564,8632-8646
+apps/dashboard/browser-tests/site-workspace.test.ts
+  s_69c6b08f0d57d2::t_498435cf3fc16f 300
+apps/dashboard/browser-tests/fixtures/site-workspace.tsx
+  s_69c6b08f0d57d2::t_498435cf3fc16f 14,240
+apps/dashboard/src/utils/autopilot-analytics.ts
+  s_69c6b08f0d57d2::t_498435cf3fc16f 1-52
+apps/dashboard/src/components/sites/site-styling-fields.tsx
+  s_69c6b08f0d57d2::t_498435cf3fc16f 15-19,49-53,160,167-172,186,193-198,216,223-225
+apps/dashboard/src/lib/orpc/routers/autopilot.ts
+  s_69c6b08f0d57d2::t_498435cf3fc16f 25,38-39,72,106-121,204,264-274,360-368
+apps/dashboard/tests/site-build-telemetry-access.test.ts
+  s_69c6b08f0d57d2::t_498435cf3fc16f 102-106
+apps/dashboard/src/utils/autopilot-commit-filters.ts
+  s_69c6b08f0d57d2::t_498435cf3fc16f 1-111
+packages/sites-server/tests/branch-workflow.test.ts
+  s_69c6b08f0d57d2::t_498435cf3fc16f 211-221
+apps/dashboard/src/types/site-design.ts
+  ai_agent 3,147-150,178-193
+packages/db/src/schema.ts
+  s_69c6b08f0d57d2::t_498435cf3fc16f 78,4365-4373
+packages/db/src/types/autopilot.ts
+  s_69c6b08f0d57d2::t_498435cf3fc16f 17-27
+apps/dashboard/src/lib/autopilot/authors.ts
+  s_69c6b08f0d57d2::t_498435cf3fc16f 1-118
+apps/dashboard/src/components/sites/site-page-tabs.tsx
+  s_69c6b08f0d57d2::t_498435cf3fc16f 24,204
+apps/dashboard/src/constants/autopilot-ui.ts
+  s_69c6b08f0d57d2::t_498435cf3fc16f 4-5,10-11,39-40,49,118-199
+apps/dashboard/src/components/sites/site-design-preview.tsx
+  s_69c6b08f0d57d2::t_498435cf3fc16f 1-210
+apps/dashboard/src/lib/autopilot/run.ts
+  s_69c6b08f0d57d2::t_498435cf3fc16f 42,188
+apps/dashboard/src/components/sites/site-header-actions.tsx
+  s_69c6b08f0d57d2::t_498435cf3fc16f 15,21
+apps/dashboard/src/types/autopilot-metrics.ts
+  s_69c6b08f0d57d2::t_498435cf3fc16f 1,10-11,55-110
+apps/dashboard/src/utils/autopilot-github.ts
+  s_69c6b08f0d57d2::t_498435cf3fc16f 2,32-46,72,74
+apps/dashboard/tests/autopilot-flow.test.ts
+  s_69c6b08f0d57d2::t_498435cf3fc16f 19-20,71-78,104-123,218-231,477-480,554-555,572-576,579,597,773-781,811-925
+apps/dashboard/src/components/autopilot/autopilot-repository-picker.tsx
+  s_69c6b08f0d57d2::t_498435cf3fc16f 29-30,48,57
+apps/dashboard/src/components/sites/site-option-select.tsx
+  s_69c6b08f0d57d2::t_498435cf3fc16f 10,21-22,24-26,29-33,51-76,80-89
+packages/sites-server/tests/types/fake-github.ts
+  s_69c6b08f0d57d2::t_498435cf3fc16f 30-31
+packages/ui/src/components/ui/select.tsx
+  s_69c6b08f0d57d2::t_498435cf3fc16f 90,96-99,106-109,127
+apps/dashboard/src/components/autopilot/autopilot-analytics-panel.tsx
+  s_69c6b08f0d57d2::t_498435cf3fc16f 1-504
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "0b499a09e4182363c2c92392b74fa381e89e82d6",
+  "prompts": {},
+  "sessions": {
+    "s_69c6b08f0d57d2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cb0e469f-88c0-4467-bf21-359bc543ea5f",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

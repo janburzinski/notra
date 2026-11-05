@@ -1,0 +1,22 @@
+apps/dashboard/src/utils/site-design.ts
+  s_65e24a33296264::t_6a4cdd25540a6c 441-458,460,464-471,474
+apps/dashboard/tests/site-design.test.ts
+  s_65e24a33296264::t_e1fd8533684fd7 333-339
+  s_65e24a33296264::t_3271fb056cc4b3 277-332,340-371
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "5a16beb12d055c1ecaabe1efa546428d779279ce",
+  "prompts": {},
+  "sessions": {
+    "s_65e24a33296264": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a15eee-a8dd-7ec2-acb6-9c6e4d29bf62",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

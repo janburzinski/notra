@@ -1,0 +1,19 @@
+apps/web/src/utils/navigation.ts
+  s_a8f3f91612c851::t_2b13262d3a51e6 74-77
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "07a813081d2c6d3082cef038043354b396d7cbb7",
+  "prompts": {},
+  "sessions": {
+    "s_a8f3f91612c851": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a6be8c5e-057e-4ceb-a1ad-1ab08ca855b7",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

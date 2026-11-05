@@ -1,0 +1,48 @@
+infra/observability/utils/prometheus-fixture.mjs
+  s_0b8998e437ee65::t_a0de2eedced08c 52-56
+packages/ai/src/utils/telemetry-event.ts
+  s_0b8998e437ee65::t_3ab81e419c9282 61-65
+  s_0b8998e437ee65::t_571d78ee6db886 10,12,66-68
+apps/dashboard/tests/monitoring-telemetry.test.ts
+  s_0b8998e437ee65::t_f00e33a77ad15f 1-13,15-26,28-30,32-33,35-36,38-39,41-42,44-64,66-79
+infra/observability/README.md
+  s_0b8998e437ee65::t_342a8fa17b6bd0 63-67,70
+  s_0b8998e437ee65::t_48456420689d12 5-62,68-69,71-80
+infra/observability/constants/prometheus-fixtures.mjs
+  s_0b8998e437ee65::t_a0de2eedced08c 13,24-26
+infra/observability/check-prometheus-resources.mjs
+  s_0b8998e437ee65::t_a0de2eedced08c 312-313
+packages/ai/src/utils/telemetry-event.test.ts
+  s_0b8998e437ee65::t_3ab81e419c9282 149-161,163-166,173-180,199-210,213-215,217-248
+  s_0b8998e437ee65::t_ec1eee3c544630 129-148,162,167-172,181-198,211-212,216,249
+packages/ai/src/constants/workflow-telemetry.ts
+  s_0b8998e437ee65::t_571d78ee6db886 1,8,12-15,30,44,46-47,53,61-62,67,71,107-108,117
+  s_0b8998e437ee65::t_3ab81e419c9282 2-7,9-11,16-27,29,31-43,45,48-52,54-60,63-66,68-70,72-106,109-114,116
+infra/observability/grafana/dashboards/notra-vercel.json
+  s_0b8998e437ee65::t_a0de2eedced08c 66,159,337-392
+  s_0b8998e437ee65::t_6983feccb2e8b2 3,61,71,78-79,82-85,88-91,99-100
+packages/ai/src/utils/workflow-telemetry-value.ts
+  s_0b8998e437ee65::t_3ab81e419c9282 14-16,24-27
+  s_0b8998e437ee65::t_571d78ee6db886 1-13,17-23,28
+apps/dashboard/src/app/api/cron/monitoring/route.ts
+  s_0b8998e437ee65::t_571d78ee6db886 2,39-40
+infra/observability/config.test.mjs
+  s_0b8998e437ee65::t_cb78765407960f 178-179
+  s_0b8998e437ee65::t_8ef489265e5554 104
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "f5bc918c2d08233105b35b9acdc0ba6921bc6e5d",
+  "prompts": {},
+  "sessions": {
+    "s_0b8998e437ee65": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a13e5a-65de-7e41-8940-524865c48441",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

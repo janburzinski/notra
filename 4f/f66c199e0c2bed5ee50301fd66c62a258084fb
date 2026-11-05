@@ -1,0 +1,38 @@
+apps/dashboard/src/constants/command-palette.ts
+  s_1359d1465ed409::t_ed15aadf9fe25f 467-472
+  s_1359d1465ed409::t_ba04c99d0f2a5a 418-420
+apps/dashboard/src/types/components/command-palette.ts
+  s_1359d1465ed409::t_ed15aadf9fe25f 255-275
+apps/dashboard/src/lib/hooks/use-command-palette-recents.ts
+  s_1359d1465ed409::t_3857e4d4e34ef3 35-45,53
+apps/dashboard/src/components/command-palette/command-palette.tsx
+  s_1359d1465ed409::t_10fbb05d07295e 60-61,205-242
+  s_1359d1465ed409::t_cc39401aafada8 243
+  s_1359d1465ed409::t_ed15aadf9fe25f 318
+  s_1359d1465ed409::t_f975a749249400 337
+apps/dashboard/src/lib/hooks/use-command-palette-ai.ts
+  s_1359d1465ed409::t_cc39401aafada8 4,66,70
+  s_1359d1465ed409::t_63be9ca45d8ff6 1-3,5-65,67-69,71-137
+apps/dashboard/src/lib/hooks/use-command-palette-entity-search.ts
+  s_1359d1465ed409::t_10fbb05d07295e 126-129,206-209
+  s_1359d1465ed409::t_63be9ca45d8ff6 1-125,130-205,210-388
+apps/dashboard/src/lib/command-palette/jev-navigation.ts
+  s_1359d1465ed409::t_c0a7c921c064c7 65,67
+  s_1359d1465ed409::t_ba04c99d0f2a5a 66,68-73,78
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "4ff66c199e0c2bed5ee50301fd66c62a258084fb",
+  "prompts": {},
+  "sessions": {
+    "s_1359d1465ed409": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d7bb4d01-e901-46b4-bbf5-8ebe8bb2803b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

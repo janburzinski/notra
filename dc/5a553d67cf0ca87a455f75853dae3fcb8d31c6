@@ -1,0 +1,23 @@
+apps/web/src/components/blog-diagrams/primitives.tsx
+  s_3f20e79b23afe9::t_318a09f9d4f466 158-159,168,176
+apps/web/src/styles/globals.css
+  s_3f20e79b23afe9::t_ba1e5d464f2e2b 448-450,454,459-463,479-495,498,511,514,527,532
+apps/web/src/components/blog-diagrams/notra-demo.tsx
+  s_3f20e79b23afe9::t_318a09f9d4f466 71,76,79,85,88,94,97,107,170,174,201-202,345,349,355,359
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "dc5a553d67cf0ca87a455f75853dae3fcb8d31c6",
+  "prompts": {},
+  "sessions": {
+    "s_3f20e79b23afe9": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "453eb818-1aeb-4a07-b0a3-5aef85f06df2",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

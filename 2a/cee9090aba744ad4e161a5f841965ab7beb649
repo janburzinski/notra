@@ -1,0 +1,19 @@
+packages/ai/src/utils/repo-image-skills.ts
+  s_310c00cd760ef5::t_51880c8d91115f 25,138-141
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "2acee9090aba744ad4e161a5f841965ab7beb649",
+  "prompts": {},
+  "sessions": {
+    "s_310c00cd760ef5": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "57197665-3dbb-4aae-b2fe-63eecdce7ef5",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

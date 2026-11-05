@@ -1,0 +1,142 @@
+packages/ai/src/utils/tool-error-payload.ts
+  s_789a1240c5b3e3::t_8087499493bfd6 36-57,68-73,76-77,79,81-88,90-92
+apps/dashboard/src/types/components/chat-subagent-block.ts
+  s_789a1240c5b3e3::t_20a1a7011c9c34 1-8,23-27,31,33-34
+  s_789a1240c5b3e3::t_b034af155eb18f 9-13,28-30,32
+.env.example
+  s_789a1240c5b3e3::t_ff2ddd1810bb9f 66-67,69-70
+apps/dashboard/src/workflows/steps/chat-steps.ts
+  s_789a1240c5b3e3::t_f3720a8022edba 178,181,271-272
+apps/agent/agent/subagents/content-writer/instructions.md
+  s_789a1240c5b3e3::t_ff2ddd1810bb9f 13-27
+packages/ai/src/orchestration/orchestrate-standalone.ts
+  s_789a1240c5b3e3::t_64c4edfa79fd63 145-146
+  s_789a1240c5b3e3::t_3cd9595061ccd0 1,200
+apps/dashboard/src/constants/chat-subagents.ts
+  s_789a1240c5b3e3::t_beea8b27798e42 1-29
+packages/ai/src/utils/code-researcher-steps.ts
+  s_789a1240c5b3e3::t_086125d9deabe7 1-78
+apps/agent/agent/channels/eve.ts
+  s_789a1240c5b3e3::t_ff2ddd1810bb9f 14,19,50
+packages/ai/src/utils/code-mode.test.ts
+  s_789a1240c5b3e3::t_91fbaf878c23d8 19-21,27,49
+apps/dashboard/src/utils/chat-subagents.ts
+  s_789a1240c5b3e3::t_93bfec39fe23f6 1,6,9-10,72
+  s_789a1240c5b3e3::t_1a3b59f6447a35 21-48
+  s_789a1240c5b3e3::t_5facc0057e3afc 2,5,7-8,11-20,49-71
+apps/dashboard/src/lib/design-system/code-research-playback.ts
+  s_789a1240c5b3e3::t_058c937eb1fe82 24
+packages/tools/src/code-research/search-repository.ts
+  s_789a1240c5b3e3::t_6b4bb3e14a2d69 2-9,11-16
+  s_789a1240c5b3e3::t_26b0823976473d 1,10
+apps/dashboard/src/app/api/organizations/[organizationId]/chat/route.ts
+  s_789a1240c5b3e3::t_f3720a8022edba 70,212-215,321,406,428,476-477
+packages/ai/src/types/prompts.ts
+  s_789a1240c5b3e3::t_3cd9595061ccd0 65
+packages/tools/src/code-research/read-repository-file.ts
+  s_789a1240c5b3e3::t_26b0823976473d 1,10
+  s_789a1240c5b3e3::t_6b4bb3e14a2d69 2-9,11-16
+apps/dashboard/messages/en.json
+  s_789a1240c5b3e3::t_3733a7b0606012 6227,6303
+  s_789a1240c5b3e3::t_01123398dfd787 6300-6302,6304-6309
+  s_789a1240c5b3e3::t_627e81f86e0921 6232-6239
+  s_789a1240c5b3e3::t_8f9a2501676621 6219-6226,6228-6231,6240
+packages/tools/src/code-research/show-repository-change.ts
+  s_789a1240c5b3e3::t_26b0823976473d 1,10
+  s_789a1240c5b3e3::t_6b4bb3e14a2d69 2-9,11-16
+apps/agent/agent/subagents/content-writer/agent.ts
+  s_789a1240c5b3e3::t_ff2ddd1810bb9f 10
+packages/tools/src/code-research/list-repository-files.ts
+  s_789a1240c5b3e3::t_26b0823976473d 1,10
+  s_789a1240c5b3e3::t_6b4bb3e14a2d69 2-9,11-16
+apps/dashboard/src/components/ai/chat-subagent-block.tsx
+  s_789a1240c5b3e3::t_fa47aedd7d58aa 166-167,171,173-174
+  s_789a1240c5b3e3::t_4336d6042a2cb5 5,81-83,117-142,147-152,157-165,168-170,172,175-177
+  s_789a1240c5b3e3::t_ac2604ab8b2667 101
+  s_789a1240c5b3e3::t_beea8b27798e42 153-155
+  s_789a1240c5b3e3::t_7f3070bd701ad0 35-42,45-48,50,110
+  s_789a1240c5b3e3::t_1ebbbd69cb61a9 24-32,51-79,90-91,93,105-109,111-113,143-146
+  s_789a1240c5b3e3::t_a04a527ab2339f 1-4,6-23,33-34,43-44,49,80,84-89,92,94-100,102-104,114-116,156,178-179
+packages/ai/src/types/code-research.ts
+  s_789a1240c5b3e3::t_14441fc6ef029a 64-78
+packages/ai/src/prompts/code-researcher.ts
+  s_789a1240c5b3e3::t_a00618e3997a5e 9
+  s_789a1240c5b3e3::t_4cbd0e6bd1b618 1-8,10-22
+apps/dashboard/src/components/design-system/code-research-playground.tsx
+  s_789a1240c5b3e3::t_15d56a877bb1df 120-122,158-162,223-225
+  s_789a1240c5b3e3::t_7c7b6933593796 182,184
+  s_789a1240c5b3e3::t_d9197acbccbf0f 137-141
+  s_789a1240c5b3e3::t_d36a73040acae3 25-119,123-136,142-155,165-181,183,185-222,226-241
+packages/ai/src/types/orchestration.ts
+  s_789a1240c5b3e3::t_64c4edfa79fd63 201-203
+packages/ai/src/constants/code-research.ts
+  s_789a1240c5b3e3::t_a9222c35fd087d 90-99
+  s_789a1240c5b3e3::t_26b0823976473d 1-89,100-114
+apps/dashboard/src/constants/chat-tool-icons.ts
+  s_789a1240c5b3e3::t_617e7ccd70e42b 1-42
+apps/dashboard/messages/de.json
+  s_789a1240c5b3e3::t_3733a7b0606012 6227,6303
+  s_789a1240c5b3e3::t_01123398dfd787 6300-6302,6304-6309
+  s_789a1240c5b3e3::t_8f9a2501676621 6219-6226,6228-6231,6240
+  s_789a1240c5b3e3::t_627e81f86e0921 6232-6239
+packages/ai/src/tools/code-researcher.ts
+  s_789a1240c5b3e3::t_9344a0da61ce35 38-45
+  s_789a1240c5b3e3::t_6bd3e6aa8c940d 1-36,47-231,233,235,237-239
+  s_789a1240c5b3e3::t_dcb96cb67c21f4 232
+  s_789a1240c5b3e3::t_de4524d622ec99 234,236
+apps/dashboard/src/app/api/organizations/[organizationId]/agent/[...eve]/route.ts
+  s_789a1240c5b3e3::t_ff2ddd1810bb9f 23,123,126,162,206
+packages/ai/src/orchestration/standalone-tool-registry.ts
+  s_789a1240c5b3e3::t_64c4edfa79fd63 1,7,64,210-223
+apps/dashboard/src/utils/chat-tool-icon.test.ts
+  s_789a1240c5b3e3::t_907829e0e6cd78 6-7,22-26,29
+apps/agent/agent/instructions.md
+  s_789a1240c5b3e3::t_ff2ddd1810bb9f 17-18
+apps/dashboard/src/utils/chat-subagents.test.ts
+  s_789a1240c5b3e3::t_2452fc5565b0a8 1-50
+packages/ai/src/billing/code-research-billing.ts
+  s_789a1240c5b3e3::t_77b855ea80e64d 1-54
+packages/tools/src/code-research/repository-history.ts
+  s_789a1240c5b3e3::t_6b4bb3e14a2d69 2-9,11-16
+  s_789a1240c5b3e3::t_26b0823976473d 1,10
+packages/ai/src/utils/tool-error-payload.test.ts
+  s_789a1240c5b3e3::t_a7d41280ae9ae5 27
+  s_789a1240c5b3e3::t_646107219e0b79 1-26,28-72
+packages/tools/src/utils/code-research.ts
+  s_789a1240c5b3e3::t_d88cac423a3a99 2-31
+apps/dashboard/src/utils/chat-tool-icon.ts
+  s_789a1240c5b3e3::t_617e7ccd70e42b 1-3
+  s_789a1240c5b3e3::t_7bcf319843f89a 6-8
+packages/tools/src/code-research/open-repository.ts
+  s_789a1240c5b3e3::t_6b4bb3e14a2d69 2-13,15-27
+  s_789a1240c5b3e3::t_26b0823976473d 1,14
+packages/ai/src/types/standalone-chat.ts
+  s_789a1240c5b3e3::t_64c4edfa79fd63 34-35
+packages/ai/src/prompts/standalone-chat.ts
+  s_789a1240c5b3e3::t_3cd9595061ccd0 22,46,48-49,96
+  s_789a1240c5b3e3::t_ad47f5c2a0e757 47
+apps/dashboard/src/components/ai/chat-activity-group.tsx
+  s_789a1240c5b3e3::t_cf619668aefc36 122-124
+apps/dashboard/src/app/(dashboard)/[slug]/chat/page-client.tsx
+  s_789a1240c5b3e3::t_fa139aabdb476e 68,2472,2481-2484,2488,2490,2496,2516-2518,2835-2836
+  s_789a1240c5b3e3::t_66d6f9a7456706 166-170,2473-2480,2485-2487,2489,2491-2495,2497-2515
+packages/ai/src/utils/code-research-actions.ts
+  s_789a1240c5b3e3::t_26b0823976473d 42,129-131
+  s_789a1240c5b3e3::t_c1da9e773035d9 1-41,43-128,132-280
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "18dc29e619a1ae705041b84beb02f6d885a579a1",
+  "prompts": {},
+  "sessions": {
+    "s_789a1240c5b3e3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "fe45ce4b-5c51-424d-b9d3-be060c25613c",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

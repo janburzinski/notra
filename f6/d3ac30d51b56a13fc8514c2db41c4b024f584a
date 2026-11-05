@@ -1,0 +1,21 @@
+apps/dashboard/src/components/dashboard/sidebar-project-switcher.tsx
+  s_f37fef8cc7fede::t_9a7ac745615693 42-45,62-170,270-273,278-283
+apps/dashboard/src/types/components/sidebar-project-switcher.ts
+  s_f37fef8cc7fede::t_9a7ac745615693 1-17
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "f6d3ac30d51b56a13fc8514c2db41c4b024f584a",
+  "prompts": {},
+  "sessions": {
+    "s_f37fef8cc7fede": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b479536e-9de4-45c4-9c5b-5703d3f3b847",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

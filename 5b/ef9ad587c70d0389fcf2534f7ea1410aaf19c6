@@ -1,0 +1,152 @@
+apps/dashboard/src/components/sites/site-workspace.tsx
+  s_69c6b08f0d57d2::t_3800a544c08c80 63-64
+packages/sites-core/src/schemas/deployment.ts
+  s_69c6b08f0d57d2::t_cec0ff2a71f24d 35-36
+apps/dashboard/src/constants/site-image-upload.ts
+  s_69c6b08f0d57d2::t_47617a80be25d0 1-7
+apps/dashboard/src/lib/hooks/use-site-workspace-state.ts
+  s_69c6b08f0d57d2::t_c394eab8cbd5a4 179-182,187,200-201
+  s_69c6b08f0d57d2::t_2bc63011dd4ea5 202-205
+  s_69c6b08f0d57d2::t_007dc4b46733c6 3-6,16,56,71-78,80-84,183,188,198-199,206,288
+  s_69c6b08f0d57d2::t_c2456bdb5f9456 2
+  s_69c6b08f0d57d2::t_94fccb016288cb 8,57-64
+  s_69c6b08f0d57d2::t_3800a544c08c80 17,70,79,85-86,178,184-186,189-197,207-209,286-287
+apps/dashboard/src/lib/orpc/routers/sites.ts
+  s_69c6b08f0d57d2::t_1a5b0841a67c3e 1130,1143
+  s_69c6b08f0d57d2::t_432a0f4ca5160c 215,1147
+  s_69c6b08f0d57d2::t_570077e6d8f679 96,509,512,531
+  s_69c6b08f0d57d2::t_02308875155811 176
+  s_69c6b08f0d57d2::t_967b94f1bac0b8 1070-1071,1083,1097-1100
+  s_69c6b08f0d57d2::t_148e1996d3e0d1 214,216,1144-1146,1148-1151
+  s_69c6b08f0d57d2::t_35fe910f7616fd 63,1128,1131-1139,1141
+  s_69c6b08f0d57d2::t_f0bf184201a7bd 1129
+  s_69c6b08f0d57d2::t_bce590198adeeb 53,97,100,104,1066,1068,1122-1127,1140,1142,1152-1172
+  s_69c6b08f0d57d2::t_6c59e48f567cba 153,171,204,1032-1035
+  s_69c6b08f0d57d2::t_b51b4625176925 1072,1075
+packages/schemas/src/schemas/dashboard/sites.ts
+  s_69c6b08f0d57d2::t_f0bf184201a7bd 5-8,239
+  s_69c6b08f0d57d2::t_f421217f788198 237-238,240-248
+apps/sites/src/responses.ts
+  s_69c6b08f0d57d2::t_cec0ff2a71f24d 21,32-34
+packages/sites-server/src/integrations.ts
+  s_69c6b08f0d57d2::t_3e8588aed20682 6,25,27
+apps/dashboard/src/lib/upload/mime.ts
+  s_69c6b08f0d57d2::t_3313ef1b081890 5,8
+apps/dashboard/src/components/sites/site-styling-fields.tsx
+  s_69c6b08f0d57d2::t_80cf45afab9b24 132
+apps/dashboard/src/utils/optimize-site-image.ts
+  s_69c6b08f0d57d2::t_f0bf184201a7bd 3
+  s_69c6b08f0d57d2::t_df6478a67e0c0a 10-12,36
+  s_69c6b08f0d57d2::t_432a0f4ca5160c 15-16,42,56,58,60,62-64
+  s_69c6b08f0d57d2::t_148e1996d3e0d1 17,20,29-30,41,43-45,65-71
+  s_69c6b08f0d57d2::t_47617a80be25d0 1-2,4-9,13-14,18-19,21-28,31-35,37-40,46-49,57,59,61,72
+  s_69c6b08f0d57d2::t_c2456bdb5f9456 50-55
+packages/sites-core/src/constants/uploads.ts
+  s_69c6b08f0d57d2::t_967b94f1bac0b8 13-14
+  s_69c6b08f0d57d2::t_c2456bdb5f9456 16-20
+  s_69c6b08f0d57d2::t_6a7620844e73fc 11,29-30,41,46-47
+  s_69c6b08f0d57d2::t_6c59e48f567cba 42-43
+  s_69c6b08f0d57d2::t_c44ac3c8945fdc 44-45
+  s_69c6b08f0d57d2::t_cec0ff2a71f24d 15,21-28,35-40
+  s_69c6b08f0d57d2::t_18f15d08af2056 31-34
+  s_69c6b08f0d57d2::t_3313ef1b081890 1-10,12
+apps/dashboard/tests/site-editor-rebase.test.ts
+  s_69c6b08f0d57d2::t_5c59d356c09411 180,314
+apps/dashboard/src/lib/hooks/use-site-publish-diff.ts
+  s_69c6b08f0d57d2::t_bc7385558647e1 43,50,53
+  s_69c6b08f0d57d2::t_94fccb016288cb 1,3-5,10,14,34-41
+  s_69c6b08f0d57d2::t_71100da291394b 2,33
+apps/dashboard/src/utils/optimize-site-image.test.ts
+  s_69c6b08f0d57d2::t_2c07c6d1f82bef 1-5,7-8,11-56,88
+  s_69c6b08f0d57d2::t_6968b87adbdf13 6,9-10,57-87
+packages/sites-server/tests/publish-effect.test.ts
+  s_69c6b08f0d57d2::t_e5c8afabbb5f17 32,64-86
+packages/sites-core/src/utils/image-drafts.ts
+  s_69c6b08f0d57d2::t_18f15d08af2056 4
+  s_69c6b08f0d57d2::t_c4ef880c9c387a 1,3,5,25-42
+  s_69c6b08f0d57d2::t_3313ef1b081890 2,17-24
+  s_69c6b08f0d57d2::t_29740bf71095c0 6-16,43
+apps/dashboard/src/components/sites/site-branding-fields.tsx
+  s_69c6b08f0d57d2::t_80cf45afab9b24 25,56
+apps/dashboard/src/utils/shrink-site-image.ts
+  s_69c6b08f0d57d2::t_c394eab8cbd5a4 1-6,11,18,25,29-33,35-41,49-54,65
+  s_69c6b08f0d57d2::t_71100da291394b 7-10,19-24,26-28,34,42-48,55-56,61-64
+  s_69c6b08f0d57d2::t_3313ef1b081890 12-17,57-60
+apps/dashboard/src/components/sites/site-separate-asset-rows.tsx
+  s_69c6b08f0d57d2::t_80cf45afab9b24 16,32,39,54
+apps/dashboard/src/types/site-design.ts
+  s_69c6b08f0d57d2::t_c2456bdb5f9456 2
+  s_69c6b08f0d57d2::t_80cf45afab9b24 105,120
+apps/dashboard/src/components/sites/site-publish-change.tsx
+  s_69c6b08f0d57d2::t_71100da291394b 45,58-67
+  s_69c6b08f0d57d2::t_bc7385558647e1 3-7,35-36,85
+  s_69c6b08f0d57d2::t_6c59e48f567cba 37-43
+packages/sites-server/src/types/editor.ts
+  s_69c6b08f0d57d2::t_57db3821a89098 25-26
+  s_69c6b08f0d57d2::t_24e6ef6064675d 4,51-59,90
+apps/dashboard/messages/de.json
+  s_69c6b08f0d57d2::t_72adf5a54a71c2 8460-8468
+apps/dashboard/messages/en.json
+  s_69c6b08f0d57d2::t_72adf5a54a71c2 8460-8468
+packages/sites-core/src/types/uploads.ts
+  s_69c6b08f0d57d2::t_f0bf184201a7bd 1-3
+apps/dashboard/src/components/sites/site-asset-field.tsx
+  s_69c6b08f0d57d2::t_c25b239c08d30e 3,5-6,8-9,13,16-17,19-20,22-23,25,36-39,41-42,44,51-59,61-63,66-69,77-79,82-84,87,90,97-111,122-124,127-128,130
+  s_69c6b08f0d57d2::t_6d776946cf0f73 18,45-50,76
+  s_69c6b08f0d57d2::t_f05cbcdebb75f5 86,88-89,112-121,125-126,129,131-152,154-161,163-184
+  s_69c6b08f0d57d2::t_71100da291394b 91-96
+  s_69c6b08f0d57d2::t_c394eab8cbd5a4 7,26,30,60,64-65,70-75,80-81
+packages/sites-server/src/editor.ts
+  s_69c6b08f0d57d2::t_87d494034d40bf 23
+  s_69c6b08f0d57d2::t_570077e6d8f679 466,472,476-477,488,507-508,512-532,544-545,550-558,560-562
+  s_69c6b08f0d57d2::t_24e6ef6064675d 734-739,741-767,794-795
+  s_69c6b08f0d57d2::t_c44ac3c8945fdc 15,467-470,479-487,503-506,509,511,546-549,559
+  s_69c6b08f0d57d2::t_57db3821a89098 255,273-280,287-289
+  s_69c6b08f0d57d2::t_3c535e6524f9d1 13-14,16-18,20-22,24,61,64,77,99,111-119,157-171,334-337,425-429,432,435-436,442-450,455-457,460-462,595,598-599,706,966-970,1091,1101-1108,1124-1126
+  s_69c6b08f0d57d2::t_2bc63011dd4ea5 143-145,439-441
+  s_69c6b08f0d57d2::t_c34f35e35180a4 30-38,390-392,394-395,402,406-424,430-431,433-434,437,458,463-465,471,473-475,478,489-502,510,533-543,596-597,740,768-793,1046-1053
+  s_69c6b08f0d57d2::t_30d22a414093c8 122-142,146-156
+packages/sites-server/src/utils/image-type.ts
+  s_69c6b08f0d57d2::t_87fba222b53d43 1-2,5,8-47
+  s_69c6b08f0d57d2::t_6c59e48f567cba 3-4
+  s_69c6b08f0d57d2::t_a3ee24f39d1c43 6-7
+apps/dashboard/src/lib/hooks/use-site-asset-preview.ts
+  s_69c6b08f0d57d2::t_7e8dad3843973e 14,25-26,39
+  s_69c6b08f0d57d2::t_38b3617b721143 1-13,15-20,23-24,27-29,34-38,40
+  s_69c6b08f0d57d2::t_007dc4b46733c6 21-22,31,33
+  s_69c6b08f0d57d2::t_c394eab8cbd5a4 30
+  s_69c6b08f0d57d2::t_94fccb016288cb 32
+packages/sites-server/tests/image-upload-postgres.test.ts
+  s_69c6b08f0d57d2::t_8af1cc24d71771 260
+  s_69c6b08f0d57d2::t_6968b87adbdf13 271-280
+  s_69c6b08f0d57d2::t_9c4aed8926ac39 1-62,69-214,218,221-230,251-259,261-265,267-270,281-292
+  s_69c6b08f0d57d2::t_5e511a59fa4617 215-217,219-220,231,235-250
+  s_69c6b08f0d57d2::t_2bc63011dd4ea5 232-234
+  s_69c6b08f0d57d2::t_8599eed27f0367 63-68,266
+apps/dashboard/tests/sites-default-editor.test.ts
+  s_69c6b08f0d57d2::t_4c53e377740aa2 65-66
+apps/sites/tests/responses.test.ts
+  s_69c6b08f0d57d2::t_e5c8afabbb5f17 61-110
+apps/dashboard/browser-tests/fixtures/site-workspace.tsx
+  s_69c6b08f0d57d2::t_4be59f72fb7a37 62
+packages/sites-server/src/branches.ts
+  s_69c6b08f0d57d2::t_3e8588aed20682 19-20,244-251,497-505
+packages/sites-server/src/publish.ts
+  s_69c6b08f0d57d2::t_cec0ff2a71f24d 5,20,23-28,63
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "5bef9ad587c70d0389fcf2534f7ea1410aaf19c6",
+  "prompts": {},
+  "sessions": {
+    "s_69c6b08f0d57d2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cb0e469f-88c0-4467-bf21-359bc543ea5f",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

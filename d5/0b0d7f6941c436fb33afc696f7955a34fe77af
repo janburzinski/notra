@@ -1,0 +1,19 @@
+apps/dashboard/src/utils/geo-write-entry.ts
+  s_294615cc1975f7::t_16fc97c82779c2 68,75,84-86
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "d50b0d7f6941c436fb33afc696f7955a34fe77af",
+  "prompts": {},
+  "sessions": {
+    "s_294615cc1975f7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6df90424-7fc4-4d74-9264-9f4f82a17ccb",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

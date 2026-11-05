@@ -1,0 +1,80 @@
+apps/dashboard/src/lib/workflow-engine/execute-node.ts
+  s_985d322a22a6f8::t_3a2d20da198196 10-13,71-72
+packages/db/src/constants/autopilot.ts
+  s_985d322a22a6f8::t_a86bb873c06590 33
+apps/dashboard/src/lib/autopilot/start.ts
+  s_985d322a22a6f8::t_89e3c5d0709927 5-9,13,18-19,26,32-39,45,47,51-52
+apps/dashboard/src/lib/orpc/routers/autopilot.ts
+  s_985d322a22a6f8::t_7ebf54df871b26 40-43,111-112,422-426,433
+  s_985d322a22a6f8::t_12c198c3c495f0 74,78,80,115-122,252,427-428,430-432,434,440-454
+  s_985d322a22a6f8::t_8f2811e7b80750 253
+apps/dashboard/src/app/(dashboard)/[slug]/autopilot/[automation]/page-client.tsx
+  s_985d322a22a6f8::t_262e6488ed5e15 3-5,21,79,98-102
+  s_985d322a22a6f8::t_1dda82a5cb4dfd 139-162
+apps/dashboard/src/app/(dashboard)/[slug]/autopilot/runs/[id]/page-client.tsx
+  s_985d322a22a6f8::t_262e6488ed5e15 3,19,31,55,75,81,137-149,176-183
+packages/schemas/src/schemas/dashboard/autopilot.ts
+  s_985d322a22a6f8::t_12c198c3c495f0 188
+packages/db/src/schema.ts
+  s_985d322a22a6f8::t_a86bb873c06590 4541
+apps/dashboard/tests/autopilot-graph.test.ts
+  s_985d322a22a6f8::t_4246b393510435 5-6,35-36,47,68-81,96-103,108,111,266-268,276-279,287-292,300-301,312,316,321-348,352-362,383-412,416-417,419-444
+  s_985d322a22a6f8::t_44be16df580d10 363-382
+  s_985d322a22a6f8::t_f657a5eb2b0a94 418
+  s_985d322a22a6f8::t_8f2811e7b80750 263,283-285,349-351,413-415
+packages/db/src/constants/workflows.ts
+  s_985d322a22a6f8::t_a86bb873c06590 6
+apps/dashboard/src/lib/autopilot/run.ts
+  s_985d322a22a6f8::t_89e3c5d0709927 48-49,78
+apps/dashboard/tests/autopilot-sandbox.test.ts
+  s_985d322a22a6f8::t_77417124ea3b82 19,123-129,859-863,871-1012
+  s_985d322a22a6f8::t_755a0c9de311a4 858,864-870
+  s_985d322a22a6f8::t_dc885ba84e0d53 246-247
+  s_985d322a22a6f8::t_8f2811e7b80750 251-253,328-330,338-340
+apps/dashboard/src/constants/autopilot.ts
+  s_985d322a22a6f8::t_12c198c3c495f0 340
+apps/dashboard/src/app/(dashboard)/[slug]/autopilot/page-client.tsx
+  s_985d322a22a6f8::t_1dda82a5cb4dfd 183-206
+  s_985d322a22a6f8::t_262e6488ed5e15 8,86,129,134,143
+packages/db/migrations/0137_workflow_engine.sql
+  ai_agent 37
+apps/dashboard/src/types/autopilot.ts
+  s_985d322a22a6f8::t_262e6488ed5e15 293
+apps/dashboard/src/lib/workflow-engine/store.ts
+  s_985d322a22a6f8::t_3a2d20da198196 44,51,72,146-168,170-173
+  s_985d322a22a6f8::t_14f0970e26c6ac 132,169
+apps/dashboard/src/lib/hooks/use-autopilot.ts
+  s_985d322a22a6f8::t_262e6488ed5e15 55-66,73-83,121
+apps/dashboard/src/lib/autopilot/stop.ts
+  s_985d322a22a6f8::t_89e3c5d0709927 1-33
+packages/db/migrations/meta/0137_snapshot.json
+  ai_agent 1065-1070
+apps/dashboard/src/constants/workflow-engine.ts
+  s_985d322a22a6f8::t_b72aa002447da5 1-2,12-17
+apps/dashboard/src/utils/autopilot-events.ts
+  s_985d322a22a6f8::t_12c198c3c495f0 349-351
+apps/dashboard/src/lib/workflow-engine/blocks/autopilot/run.ts
+  s_985d322a22a6f8::t_caf687ca886e97 45,47-49,69,77-79,88-107,122,126,133,135-137,183,218-242,250,259
+  s_985d322a22a6f8::t_8f2811e7b80750 46
+apps/dashboard/src/lib/workflow-engine/start.ts
+  s_985d322a22a6f8::t_3a2d20da198196 17,37
+apps/dashboard/src/lib/workflow-engine/definitions/autopilot.ts
+  s_985d322a22a6f8::t_44be16df580d10 229-233
+  s_985d322a22a6f8::t_b72aa002447da5 10,68-84,158-161,163-166,170-180,182,191-192,205-228,234-294
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "292d733b49c57b25f53be55accc5fbd1e4d04171",
+  "prompts": {},
+  "sessions": {
+    "s_985d322a22a6f8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "efce3ecd-755b-429d-9b5c-035b1f703d5b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

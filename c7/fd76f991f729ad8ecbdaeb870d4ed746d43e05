@@ -1,0 +1,19 @@
+apps/dashboard/src/components/comments/comment-timestamp.tsx
+  s_a1f3852b1ae097::t_8b153ac77b4ec0 27
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "c7fd76f991f729ad8ecbdaeb870d4ed746d43e05",
+  "prompts": {},
+  "sessions": {
+    "s_a1f3852b1ae097": {
+      "agent_id": {
+        "tool": "amp",
+        "id": "TU-034R5dEhq5zmHYffTojaXQ",
+        "model": "unknown"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

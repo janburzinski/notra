@@ -1,0 +1,40 @@
+apps/dashboard/src/utils/traffic-embed-name.ts
+  s_e97a5ffa0def08::t_fc2f0320e5f485 1-10
+apps/dashboard/messages/de.json
+  s_e97a5ffa0def08::t_06207bf9be085a 4237
+  s_e97a5ffa0def08::t_c2bc7f82c6aaf7 4238
+apps/dashboard/messages/en.json
+  s_e97a5ffa0def08::t_c2bc7f82c6aaf7 4237-4238
+apps/dashboard/src/components/geo/traffic-embed-dialog.tsx
+  s_e97a5ffa0def08::t_fc2f0320e5f485 55
+  s_e97a5ffa0def08::t_abda8b3adbadb9 3,41,146-148,154-155,174-175,177,185-186,191,203,299,301,317,324-333,357
+apps/dashboard/src/app/(dashboard)/[slug]/geo/traffic/page-client.tsx
+  s_e97a5ffa0def08::t_0d6fdd16833c4c 144-155,157-171
+apps/dashboard/src/utils/providers.tsx
+  s_e97a5ffa0def08::t_a40c810e2511a5 24,120-122
+apps/dashboard/src/constants/traffic-embed.ts
+  s_e97a5ffa0def08::t_a40c810e2511a5 48-50
+  s_e97a5ffa0def08::t_cdecf447b038af 45-47
+packages/schemas/src/schemas/dashboard/traffic-embed.ts
+  s_e97a5ffa0def08::t_c2bc7f82c6aaf7 6
+apps/dashboard/src/lib/geo/traffic-embeds.ts
+  s_e97a5ffa0def08::t_cdecf447b038af 13,260,281
+  s_e97a5ffa0def08::t_7b9e0cc7387b39 7,49-54,153-169,171-179,181-202,248-249,279-280,282-284,302-306,319-327
+  s_e97a5ffa0def08::t_1f50c0577adc30 257-259
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "c0523576f86e14d847c2b454f4811c1cbda4c287",
+  "prompts": {},
+  "sessions": {
+    "s_e97a5ffa0def08": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "32a270ce-f745-4769-a1ff-3851c17b56b7",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

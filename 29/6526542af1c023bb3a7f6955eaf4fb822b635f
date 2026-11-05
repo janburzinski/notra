@@ -1,0 +1,39 @@
+apps/dashboard/src/components/content/content-plan-read-view.tsx
+  s_be3beb30168802::t_a9d7cd662aff68 74-77
+  s_be3beb30168802::t_8399a8d8078ed8 32-35
+  s_be3beb30168802::t_f584f0f68ae0e4 27-31
+apps/dashboard/src/types/content/detail.ts
+  s_be3beb30168802::t_a9d7cd662aff68 3
+  s_be3beb30168802::t_40b4351e0d0227 114-117,119-120
+  s_be3beb30168802::t_f584f0f68ae0e4 118
+apps/dashboard/src/lib/hooks/use-content-document-tab.ts
+  s_be3beb30168802::t_7f95afbdcf8c5d 1-30,32-33
+  s_be3beb30168802::t_1422791dc4ef83 31
+apps/dashboard/src/constants/content-detail.ts
+  s_be3beb30168802::t_40b4351e0d0227 5
+apps/dashboard/src/components/content/content-document-tabs.tsx
+  s_be3beb30168802::t_40b4351e0d0227 1-10,12-18,20-27,30,34-46,48-61,67-111
+  s_be3beb30168802::t_086bd2c346ed44 11,28-29,47,62
+  s_be3beb30168802::t_f584f0f68ae0e4 19,31-33,63-66
+apps/dashboard/src/components/content/content-detail-loaded-view.tsx
+  s_be3beb30168802::t_7f95afbdcf8c5d 11,28
+  s_be3beb30168802::t_1422791dc4ef83 65-66,152-158,167
+  s_be3beb30168802::t_f584f0f68ae0e4 134-138,151
+  s_be3beb30168802::t_40b4351e0d0227 16
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "296526542af1c023bb3a7f6955eaf4fb822b635f",
+  "prompts": {},
+  "sessions": {
+    "s_be3beb30168802": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "565cb91f-1e42-4dfd-a186-9ed15a46557c",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

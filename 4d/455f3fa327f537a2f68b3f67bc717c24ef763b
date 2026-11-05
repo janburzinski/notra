@@ -1,0 +1,1120 @@
+apps/api/src/routes/geo-diagnostics.ts
+  s_a0799efed517c8::t_f313c6b502eab1 31-35
+  s_a0799efed517c8::t_7fa84d2bec0e5c 47,56,63,79,86,97,104,117,124,138,149,165,179,193
+packages/db/src/utils/post-collections.ts
+  s_a0799efed517c8::t_f74758008f16d7 30,41
+packages/tools/src/utils/organization.ts
+  s_a0799efed517c8::t_b17ce99a4ba916 4,7
+packages/ai/src/integrations/slack-post.ts
+  s_a0799efed517c8::t_dc34ad9cd60bcb 260,263
+apps/dashboard/src/lib/orpc/routers/search.ts
+  s_a0799efed517c8::t_4c8cc985bc45ea 10
+packages/tools/src/schemas/assistant-tools.ts
+  s_a0799efed517c8::t_918f40b1ed90ff 8,18
+apps/ai-traffic-ingest/package.json
+  s_a0799efed517c8::t_6c0c1fd77417b2 21-22
+packages/ai/src/router/model-ids.ts
+  s_a0799efed517c8::t_fb39a7b0acad25 11
+apps/sites/package.json
+  s_a0799efed517c8::t_6c0c1fd77417b2 16,21-22
+apps/dashboard/src/app/api/cron/brew-contacts/route.ts
+  s_a0799efed517c8::t_2f39131de9330b 4,8
+packages/geo-core/src/geo/gaps.ts
+  s_a0799efed517c8::t_6d73c818dce62d 315,319-322,354-360,569-571,576-578,583-584
+apps/dashboard/src/lib/orpc/routers/attachments.test.ts
+  s_a0799efed517c8::t_6c1e9aac288f6f 45
+apps/dashboard/src/routes/api.cron.brew-contacts.ts
+  s_a0799efed517c8::t_3795bfb70a7a1b 4,8,10-12,14
+apps/dashboard/src/routes/api.cron.scheduled-publications.ts
+  s_a0799efed517c8::t_3795bfb70a7a1b 4,8,10-12,15
+apps/dashboard/src/app/api/workflows/iris/route.ts
+  s_a0799efed517c8::t_46dcad3bc4caf8 1,21
+packages/geo-core/src/geo/sentiment-analysis.ts
+  s_a0799efed517c8::t_8762bd7a294d49 75-93,141-143,228-229
+packages/geo-core/src/geo/agent-readiness.ts
+  s_a0799efed517c8::t_b2a12e9d47999c 96,100-103,280,328
+apps/dashboard/src/lib/organizations/guards.ts
+  s_a0799efed517c8::t_3c6904d5df37f7 57
+  s_a0799efed517c8::t_f582b1b7fb1516 9
+  s_a0799efed517c8::t_1ab822a610c0e9 29-30,70-71
+apps/sites-builder/package.json
+  s_a0799efed517c8::t_6c0c1fd77417b2 42-43,54-56
+packages/analytics/package.json
+  s_a0799efed517c8::t_6c0c1fd77417b2 19-20,25
+packages/geo-core/src/geo/check-evaluation.ts
+  s_a0799efed517c8::t_f295e939c2c924 23-28,35,43
+apps/api/src/runtime/geo.ts
+  s_a0799efed517c8::t_8d47663d6308e9 102-103,105-108,110-113,132-139,168,193-207,209,211,213,220-221,227-236,240-242,253
+apps/dashboard/src/workflows/steps/geo-writer-steps.ts
+  s_a0799efed517c8::t_f116a1bb41d64c 110-111,118,120-135,185-191,217,230-234,259
+apps/agent/agent/lib/utils/chat-mirror.ts
+  s_a0799efed517c8::t_03b11cc06c626b 40,86-91,110
+apps/dashboard/src/app/api/integrations/slack/authorize/route.ts
+  s_a0799efed517c8::t_70cc9b7696b480 5,57-59,65-67
+  s_a0799efed517c8::t_422990e9ae8477 18
+packages/tools/src/image/generate-image.ts
+  s_a0799efed517c8::t_5e223426a0afa7 27
+packages/kiwi/package.json
+  s_a0799efed517c8::t_6c0c1fd77417b2 20,26
+packages/ai/src/integrations/github-publish-auth.ts
+  s_a0799efed517c8::t_d14eb8b2109003 59-64
+packages/utils/src/ingest-token.ts
+  s_a0799efed517c8::t_90c0df4576e587 20
+packages/ai/src/utils/ignore-commit-patterns.ts
+  s_a0799efed517c8::t_8eee1d990e349e 3,96,143
+apps/dashboard/src/app/api/integrations/slack/callback/route.ts
+  s_a0799efed517c8::t_157b453da398f9 31-39,58,63,170,182,216
+  s_a0799efed517c8::t_422990e9ae8477 28
+packages/tools/src/researcher/fetch-github-activity.ts
+  s_a0799efed517c8::t_5e223426a0afa7 16,28
+apps/dashboard/src/app/api/organizations/[organizationId]/chat/[chatId]/relay-approval/route.ts
+  s_a0799efed517c8::t_cd20c46124e1d5 13-16,29-31
+  s_a0799efed517c8::t_8c67865b148076 10
+apps/api/src/utils/organizations.ts
+  s_a0799efed517c8::t_304d785da6c9d6 3,5-8,24-38
+apps/dashboard/src/app/api/social-accounts/callback/route.ts
+  s_a0799efed517c8::t_422990e9ae8477 36
+apps/dashboard/src/app/api/internal/geo/sequence-run/route.ts
+  s_a0799efed517c8::t_0152fe02c51e7b 54-55,57-60
+  s_a0799efed517c8::t_7db6f8224c4832 23
+apps/api/src/programs/schedules.ts
+  s_a0799efed517c8::t_ef9b5205c3dc59 65,84,101,114,120-141,152,159-164,253,275,358,365-369,488-497,500
+  s_a0799efed517c8::t_0c744ca7e0f857 44-48,437-438,468,644
+apps/dashboard/src/app/api/cron/monitoring/route.ts
+  s_a0799efed517c8::t_913cf54e89f48a 7
+  s_a0799efed517c8::t_2f39131de9330b 13
+packages/sites-server/src/editor.ts
+  s_a0799efed517c8::t_a0d15acc3c8089 93,166,194,242,484
+  s_a0799efed517c8::t_10dc6b65073963 1-4
+apps/dashboard/src/app/api/workflows/schedule/route.ts
+  s_a0799efed517c8::t_46dcad3bc4caf8 1,18
+packages/ai/src/integrations/google-search-console.ts
+  s_a0799efed517c8::t_d14eb8b2109003 205,272,330,426,450
+packages/ai/src/utils/diagram-post.ts
+  s_a0799efed517c8::t_55ce4f76c81865 20
+packages/ai/src/utils/request-ai-usage.ts
+  s_a0799efed517c8::t_43154dc06a28cc 10,31,33
+apps/dashboard/src/lib/agent-feedback/snippet.ts
+  s_a0799efed517c8::t_d2306fbe37b109 21-24
+packages/tools/src/schemas/content-writer-tools.ts
+  s_a0799efed517c8::t_918f40b1ed90ff 5,9-11,18
+packages/analytics/src/tinybird/purge.ts
+  s_a0799efed517c8::t_c6beb244410c78 19-26
+apps/dashboard/src/lib/databuddy.ts
+  s_a0799efed517c8::t_b17ce99a4ba916 43-47,55,57-58,62-63,69-70,77-78,80-86,88-96,99,102-107
+packages/ai/src/utils/github-mention-reply.ts
+  s_a0799efed517c8::t_8924a111fa4f68 80
+apps/dashboard/scripts/register-analytics-schedule.ts
+  s_a0799efed517c8::t_46dcad3bc4caf8 1,13
+apps/api/src/utils/geo-visibility.ts
+  s_a0799efed517c8::t_f1c94de63a3231 67,93
+packages/ai/src/integrations/mcp-oauth.ts
+  s_a0799efed517c8::t_3cdd2fbc0ce3ef 306-310,321-323,335-337,371-373,458
+packages/ai/src/utils/github-mention-process.ts
+  s_a0799efed517c8::t_369c1eeb48c1ee 458
+  s_a0799efed517c8::t_9bfaf7a1e5cd84 58,64-75
+  s_a0799efed517c8::t_8dd82763b79dd6 365
+  s_a0799efed517c8::t_f53571f6044d7a 226-227
+  s_a0799efed517c8::t_f768a228c7b15d 477,482
+  s_a0799efed517c8::t_7f57aec81a771c 395
+  s_a0799efed517c8::t_20e7e0d156c71b 507
+  s_a0799efed517c8::t_978508d1a6880e 89-90
+packages/ai/src/tools/brand-references.ts
+  s_a0799efed517c8::t_86128ec5176804 9-12,311-314,361-364
+  s_a0799efed517c8::t_96749808869759 64,75-77,83-91,131,202,210,223
+  s_a0799efed517c8::t_047d5bd31dbe02 325
+apps/dashboard/src/lib/orpc/routers/onboarding.ts
+  s_a0799efed517c8::t_408e6094c3557a 138-140,152
+apps/dashboard/src/lib/orpc/routers/content.ts
+  s_a0799efed517c8::t_4fed96eb321913 387,452,531
+  s_a0799efed517c8::t_d59a4f7008402c 98,312
+  s_a0799efed517c8::t_a6627a17fcadd5 295-311,313-318,796,814,816,857-858,891-892,947,952-953,1008-1009,1019,1021,1044,1046,1087-1088,1154,1173,1198-1199,1240-1242,1245,1263,1265,1307-1308,1346-1347,1374-1375,1381-1382,1465-1471,1475,1478,1481,1486-1492,1497-1498,1500-1504,1542-1546,1550,1555-1558,1580
+  s_a0799efed517c8::t_10dc6b65073963 2
+packages/ai/src/constants/repo-image.ts
+  s_a0799efed517c8::t_30666422be47f1 13
+packages/ai/src/utils/github-pr-comments.ts
+  s_a0799efed517c8::t_a0d15acc3c8089 1
+apps/dashboard/src/lib/auth/organization.ts
+  s_a0799efed517c8::t_0e7b68f0859c58 38,120,146,151
+packages/sites-compiler/package.json
+  s_a0799efed517c8::t_6c0c1fd77417b2 26,32-33
+packages/ai/src/utils/repo-image-render.ts
+  s_a0799efed517c8::t_935ecd7fb458f1 102,105
+packages/tools/src/utils/references.ts
+  s_a0799efed517c8::t_86128ec5176804 3,136-139
+packages/ai/src/integrations/slack-workspace.ts
+  s_a0799efed517c8::t_d14eb8b2109003 15-17
+  s_a0799efed517c8::t_dc34ad9cd60bcb 14,18,40,44,63,74
+packages/geo-core/src/geo/scan-schedule.ts
+  s_a0799efed517c8::t_c9fe175364cbda 51,326-327
+apps/dashboard/src/lib/webhooks/linear.ts
+  s_a0799efed517c8::t_55d4e5804da023 14-17,33-39,43-48,78,95,107,128
+packages/ai/src/provider-options.ts
+  s_a0799efed517c8::t_01c3278b472402 11
+packages/ai/src/agents/repo-image-marketing.ts
+  s_a0799efed517c8::t_031010401a38a8 2,41-45
+packages/ai/src/utils/iris-usage.ts
+  s_a0799efed517c8::t_8eee1d990e349e 5
+apps/dashboard/src/lib/skills/parse-frontmatter.ts
+  s_a0799efed517c8::t_c22e22143bef49 3
+apps/api/src/lib/qstash.ts
+  s_a0799efed517c8::t_88757bc1b19f35 31-56,65,78,119-120,124,128,146-147,154,159
+apps/dashboard/src/workflows/event-content.ts
+  s_a0799efed517c8::t_ef9b5205c3dc59 289
+  s_a0799efed517c8::t_984be8b30893b6 112-118,135,143,149-218,255-258,263-267,272-275,292-294,304,331-332,336,388-391
+apps/api/src/programs/integrations.ts
+  s_a0799efed517c8::t_0c744ca7e0f857 38,40,240
+apps/dashboard/src/workflows/geo-scan.ts
+  s_a0799efed517c8::t_3fc71b04a25472 69-71
+  s_a0799efed517c8::t_49fc4578c663d8 300,332-333,335-336
+  s_a0799efed517c8::t_7fdd8ce8595b50 334,339-341
+  s_a0799efed517c8::t_05bde56c271944 299
+packages/webhooks/src/programs/history.ts
+  s_a0799efed517c8::t_7d6be22e52669f 17-22,30,83
+packages/ai/src/utils/github-mention-published-file.test.ts
+  s_a0799efed517c8::t_fcfb1cd305b5db 35
+apps/dashboard/src/app/api/workflows/scheduled-publication-wake/route.ts
+  s_a0799efed517c8::t_46dcad3bc4caf8 2,21
+apps/dashboard/src/lib/auth/signed-cookie.ts
+  s_a0799efed517c8::t_78c5824115748f 82
+  s_a0799efed517c8::t_da6a9d7caa324f 3-8,11,36-41,48,75-76,79-81,83-84
+apps/dashboard/src/app/api/cron/geo-content-gaps/route.ts
+  s_a0799efed517c8::t_2f39131de9330b 1,5
+apps/dashboard/src/lib/integrations/github/pull-request-body.ts
+  s_a0799efed517c8::t_48bca2ab4d63ae 1,42
+  s_a0799efed517c8::t_1b699d411fec0d 22,40-41
+apps/dashboard/src/app/api/internal/geo/writer-plan/route.ts
+  s_a0799efed517c8::t_0152fe02c51e7b 50-51,53-56
+apps/agent/agent/lib/utils/model.ts
+  s_a0799efed517c8::t_c7b82571d39c98 3,59
+  s_a0799efed517c8::t_b74d3666195c6a 38-42,95,100,108,123,142,182
+packages/utils/package.json
+  s_a0799efed517c8::t_6c0c1fd77417b2 36
+apps/dashboard/src/lib/organizations/workos-sync.ts
+  s_a0799efed517c8::t_6090ac23cb1d23 22-42,151-152,158-159,165-166,187-188,194-195,209-210,244-245,251-252
+packages/ai/src/tools/post.ts
+  s_a0799efed517c8::t_a0e4814c832ab4 87-101,150,171,246-248,257-258
+apps/dashboard/src/workflows/on-demand-content.ts
+  s_a0799efed517c8::t_5c7c1c582fdf67 73-82,88-89,93-103,106-111,125,129-156,167-170,186-194,212-220,226-234,241,243,265-271,293-296
+apps/api/src/programs/geo.ts
+  s_a0799efed517c8::t_37e2afa4edff91 23,84,103,122-133,254,288,302
+packages/ai/src/integrations/mcp-store.ts
+  s_a0799efed517c8::t_07cc69b0ae361d 2-3
+packages/geo-core/src/types/geo-sample.ts
+  s_a0799efed517c8::t_6fb4b12548f1d2 30-34
+  s_a0799efed517c8::t_ce9a2e36d62e79 15
+packages/ai/src/utils/github-mention-auth.ts
+  s_a0799efed517c8::t_724253267d5ae8 11-17,71,85
+  s_a0799efed517c8::t_6efb4313d4b272 38
+packages/tools/src/analytics/get-social-analytics-overview.ts
+  s_a0799efed517c8::t_dc5a37e579f572 15
+  s_a0799efed517c8::t_29deea023f4c4c 1,5,16-18,28-29
+apps/api/src/programs/brand-identities.ts
+  s_a0799efed517c8::t_5a97099021662d 63-70
+  s_a0799efed517c8::t_5a5c15d1131cfa 224,233,260-267,279-288,296-298,400
+  s_a0799efed517c8::t_f0964d598e4bf3 436-441
+  s_a0799efed517c8::t_2ab834b43b421c 8
+  s_a0799efed517c8::t_b7385d5e5f339e 50,52,508-514,523
+apps/dashboard/src/lib/integrations/github/github-publish-failure-state.ts
+  s_a0799efed517c8::t_1bdf83b3f6c983 48,50,59,69,76,89,91,96
+apps/dashboard/src/lib/auth/password-actions.ts
+  s_a0799efed517c8::t_5c16bf3bc316cc 77-91,111,148
+  s_a0799efed517c8::t_65cc296770c495 76
+  s_a0799efed517c8::t_0b38b183dcce82 69
+packages/ai/src/utils/chart-artifact.ts
+  s_a0799efed517c8::t_55ce4f76c81865 75-78,115-118
+packages/geo-core/src/geo/grounding.ts
+  s_a0799efed517c8::t_f63a1937418bb8 15-22,27-30,79,95,152-159
+packages/ai/src/utils/chat-surface.ts
+  s_a0799efed517c8::t_35f870d49ed76e 11
+packages/ai/src/model.ts
+  s_a0799efed517c8::t_01c3278b472402 13,30,65,77,83,89
+apps/dashboard/src/workflows/iris-controller.ts
+  s_a0799efed517c8::t_ef9b5205c3dc59 356-358
+packages/ai/src/billing/token-pricing.ts
+  s_a0799efed517c8::t_f582b1b7fb1516 254,256
+packages/posthog/package.json
+  s_a0799efed517c8::t_6c0c1fd77417b2 22
+apps/api/src/utils/geo.ts
+  s_a0799efed517c8::t_876fa3f944393f 1-2,5-6,58-59,74-77,92-97
+  s_a0799efed517c8::t_ed2c873c20f424 65-66
+  s_a0799efed517c8::t_60762e83e188a0 27-47
+  s_a0799efed517c8::t_29ce666e7b4776 57,60,62-64,67,69-73,78-85
+  s_a0799efed517c8::t_4556a758bc89a9 61,68,86-89
+packages/geo-core/src/types/ingest.ts
+  s_a0799efed517c8::t_ce9a2e36d62e79 144
+apps/dashboard/src/lib/webhooks/github.ts
+  s_a0799efed517c8::t_e8517ace9b3144 30,90,135,161,253-259,263-268,282,315,329,343,359,378,391,421,438,454,470,492-512
+packages/schemas/src/schemas/dashboard/content.ts
+  s_a0799efed517c8::t_6e264648bd01c9 105,152,159,165,203,212,218,224,239,247,259,272,279,287,291,307
+apps/api/src/utils/posts.ts
+  s_a0799efed517c8::t_5ce65257d8445a 213-219
+packages/geo-core/src/geo/sequence-generation.ts
+  s_a0799efed517c8::t_5a3b351116dc8b 118-123,173,258
+packages/ai/src/orchestration/orchestrate.ts
+  s_a0799efed517c8::t_a56aa9c20041c1 69
+packages/geo-core/src/types/geo-conversations.ts
+  s_a0799efed517c8::t_e6a952a628d85f 32-35
+packages/ai/src/utils/code-research-commands.test.ts
+  s_a0799efed517c8::t_d582799f40399c 18
+packages/ai/src/tools/tool-cache.ts
+  s_a0799efed517c8::t_b4a05694a04d66 22-23
+  s_a0799efed517c8::t_da6a9d7caa324f 25,27,29-30,41,46,59,70-72,86
+packages/geo-core/src/geo/prompt-translations.ts
+  s_a0799efed517c8::t_39bab8a5b8d41a 140
+packages/geo-core/src/constants/geo-sample.ts
+  s_a0799efed517c8::t_071b966309458d 15-16,63,101,144,189,236,255
+packages/ai/src/utils/agent-proxy.ts
+  s_a0799efed517c8::t_55ce4f76c81865 49
+packages/ai/src/utils/env-switch.ts
+  s_a0799efed517c8::t_c7b82571d39c98 1-23
+packages/ai/src/agents/repo-image-diagram.ts
+  s_a0799efed517c8::t_031010401a38a8 2,49-51
+packages/geo-core/src/geo/discover.ts
+  s_a0799efed517c8::t_76da306c2a2026 89,105,132,155-156
+packages/db/package.json
+  s_a0799efed517c8::t_6c0c1fd77417b2 25,27,29,35-36
+packages/geo-core/src/geo/persona-scan.ts
+  s_a0799efed517c8::t_e6a952a628d85f 26,193-195,201,274,283-285,319
+  s_a0799efed517c8::t_11c4d16d413833 250-256,258,267-268,309,314,318
+  s_a0799efed517c8::t_33b1bc92e1335c 64-67,139-159,207,219
+  s_a0799efed517c8::t_81b940bad279af 222-223
+  s_a0799efed517c8::t_8eeefe84eafa5b 192
+  s_a0799efed517c8::t_13ce3db699cb75 196-200,202-203
+apps/dashboard/src/lib/auth/user-actions.ts
+  s_a0799efed517c8::t_f582b1b7fb1516 30
+  s_a0799efed517c8::t_1ab822a610c0e9 105-106
+  s_a0799efed517c8::t_df0bbd13d6b491 16-17,153,238
+apps/dashboard/src/app/api/organizations/[organizationId]/chat/[chatId]/mirror-stream/route.ts
+  s_a0799efed517c8::t_724a09ad07c073 65-71,81,117,121
+  s_a0799efed517c8::t_8c67865b148076 8,15-18
+apps/dashboard/src/lib/orpc/routers/integrations.ts
+  s_a0799efed517c8::t_10dc6b65073963 2,81
+  s_a0799efed517c8::t_36e701ed0d70cd 449-470,1259,1280,1317,1319-1320,1537,1622,1660,1662-1663
+  s_a0799efed517c8::t_81f21b73edf87c 132
+  s_a0799efed517c8::t_422990e9ae8477 472
+  s_a0799efed517c8::t_4f1ac5f975680b 180,186,193-203,205-224,242-244,260-265,278-285,391-448,471,473-478,482-483,493,495,535-536,546,548,667,669,727-728,750,752,769,771,797-798,808-809,857-858,863,904-905,918,985-986,992-994,1001-1002,1024-1026,1033-1034,1043,1251,1270,1359,1365-1366,1418,1420,1486,1488,1516-1517,1529,1545,1855,1921,1944,1993,2005,2025,2027-2028,2064
+  s_a0799efed517c8::t_fb5095036c9192 1100-1106
+packages/tools/src/assistant/get-pull-requests.ts
+  s_a0799efed517c8::t_81f21b73edf87c 1
+  s_a0799efed517c8::t_4fed96eb321913 37
+apps/dashboard/src/lib/services/integrations.ts
+  s_a0799efed517c8::t_8969fa17bef178 14,108
+  s_a0799efed517c8::t_1ab822a610c0e9 114
+apps/dashboard/src/lib/brand-analysis.ts
+  s_a0799efed517c8::t_67ba7bf2671973 114-119,139-147
+apps/dashboard/src/routes/api.workflows.scheduled-publication-wake.ts
+  s_a0799efed517c8::t_3795bfb70a7a1b 4,10,12-14,17
+packages/ai/src/utils/github-rate-limit.ts
+  s_a0799efed517c8::t_331e7166cfae80 1-131
+apps/api/src/routes/schedules.ts
+  s_a0799efed517c8::t_ee6249d4585d8a 20,26
+  s_a0799efed517c8::t_4aa90596cee021 30-33,35-42,44-46
+  s_a0799efed517c8::t_c7c31a93fc91f7 187,207,241,286
+  s_a0799efed517c8::t_c9a68e19cd455b 182,184,186,202,204,206,236,238,240,281,283,285
+apps/api/src/routes/geo-traffic.ts
+  s_a0799efed517c8::t_7fa84d2bec0e5c 77,90,97,108,115,128,135,144,151,162,169,179,186,197,204,217,232,250,266,281,299
+  s_a0799efed517c8::t_f313c6b502eab1 44,46
+apps/api/src/middleware/geo-context.ts
+  s_a0799efed517c8::t_324ddb90893303 33-34
+  s_a0799efed517c8::t_c1c8140bdd543f 4-5
+  s_a0799efed517c8::t_0e1e7454b65317 1,10,18,28,32,35
+packages/ui/package.json
+  s_a0799efed517c8::t_6c0c1fd77417b2 26-28,30-31,37,41,48,50,52-53,63,68,77,79-80
+apps/agent/tests/slack-channel.test.ts
+  s_a0799efed517c8::t_254660744e29ed 66,196
+  s_a0799efed517c8::t_9904899518d365 18-21,51-53,59-65,67-72,84,182-195,197-206,262-265
+  s_a0799efed517c8::t_96a9783113a688 54-58,210
+apps/dashboard/src/app/api/organizations/[organizationId]/chat/route.ts
+  s_a0799efed517c8::t_8c67865b148076 87,170,177-181,183-201,486,501
+packages/geo-core/src/geo/personas.ts
+  s_a0799efed517c8::t_75ec306e084208 51,130-132,135-142,145-146,168,171,358-363,695-700
+packages/ai/src/utils/github-mention-destination.ts
+  s_a0799efed517c8::t_b292242bc229cc 22-24
+packages/ai/src/utils/public-fetch.ts
+  s_a0799efed517c8::t_93eed5ba1452fa 79,97,118,123
+apps/dashboard/src/app/api/cron/geo-recap/route.ts
+  s_a0799efed517c8::t_2f39131de9330b 3,7
+apps/dashboard/src/lib/integrations/github/publish-saved-content.ts
+  s_a0799efed517c8::t_6d081630efad87 403-406,409,435,552-561
+packages/ai/src/utils/iris-image-markers.ts
+  s_a0799efed517c8::t_8eee1d990e349e 14,17,32
+turbo.json
+  s_a0799efed517c8::t_331e7166cfae80 20-22,40,75,115,120-126,142,154,159
+packages/geo-core/src/geo/ingest.ts
+  s_a0799efed517c8::t_cfe50a9ce7893a 81,84,101,120,219,225,234-237,245,261,277,295,310,322,328,330-335
+  s_a0799efed517c8::t_116c9f8d6de187 365-366
+packages/ai/src/utils/github-mention-sandbox.ts
+  s_a0799efed517c8::t_da5e1ad8954c70 20
+  s_a0799efed517c8::t_f26b1c39b1d8d3 256,312,321
+packages/ai/src/schemas/geo-tools.ts
+  s_a0799efed517c8::t_00a2c63a4b03af 40
+apps/dashboard/src/lib/webhooks/logging.ts
+  s_a0799efed517c8::t_55d4e5804da023 15
+apps/api/src/utils/github-integrations.ts
+  s_a0799efed517c8::t_10dc6b65073963 3
+  s_a0799efed517c8::t_5c7aea30cf33b4 17
+  s_a0799efed517c8::t_4fed96eb321913 87
+packages/ai/src/billing/ai-credit-cost.ts
+  s_a0799efed517c8::t_f582b1b7fb1516 4-8
+apps/api/src/routes/posts.ts
+  s_a0799efed517c8::t_ee6249d4585d8a 52-54,619
+  s_a0799efed517c8::t_f582b1b7fb1516 611
+  s_a0799efed517c8::t_c9a68e19cd455b 349,351,353,380,382,384,398,400,402,428,430,432,453,455,457,565,567,569
+  s_a0799efed517c8::t_3184d316ae417f 28,605,693
+  s_a0799efed517c8::t_5ce65257d8445a 472,490,587
+packages/schemas/src/schemas/dashboard/organization.ts
+  s_a0799efed517c8::t_6e264648bd01c9 27
+apps/agent/agent/hooks/chat-mirror.ts
+  s_a0799efed517c8::t_ef9b5205c3dc59 8,19-23,25-31
+packages/schemas/src/schemas/dashboard/onboarding/workspace.ts
+  s_a0799efed517c8::t_6e264648bd01c9 19
+packages/geo-core/tests/geo-grounded-engines.test.ts
+  s_a0799efed517c8::t_5ad62fb0f41f7a 374
+apps/dashboard/src/lib/workflows/on-demand/helpers.ts
+  s_a0799efed517c8::t_ef82cf09d7d312 53,56,61
+packages/geo-core/src/schemas/geo.ts
+  s_a0799efed517c8::t_c47636e7357c44 26,138,463
+  s_a0799efed517c8::t_b1febdbf7ef3ad 114,122,298,422
+packages/ai/src/agents/blog-post.ts
+  s_a0799efed517c8::t_bdf368bcf50ae6 12
+packages/content-generation/package.json
+  s_a0799efed517c8::t_6c0c1fd77417b2 17-18,22
+packages/ai/src/utils/current-date.ts
+  s_a0799efed517c8::t_35f870d49ed76e 7-8
+packages/geo-core/src/geo/scan-task-status.ts
+  s_a0799efed517c8::t_faa1e4ea344cf7 3,119-139
+apps/api/src/utils/brand-identities.ts
+  s_a0799efed517c8::t_5ce65257d8445a 109
+packages/webhooks/src/runtime/worker.ts
+  s_a0799efed517c8::t_7d6be22e52669f 6,14
+apps/dashboard/src/lib/orpc/routers/skills.ts
+  s_a0799efed517c8::t_84ebaddf255df1 55-65,69-70,92-93,98,110,113,152,154,164-168,170,187,207,209,222,299-301
+packages/ai/src/orchestration/standalone-tool-registry.ts
+  s_a0799efed517c8::t_a0e4814c832ab4 65
+  s_a0799efed517c8::t_4a00bd96768139 17,68-74,218-221,223-229,252-258,263-266
+packages/db/src/utils/post-metadata.ts
+  s_a0799efed517c8::t_f74758008f16d7 7
+packages/ai/src/orchestration/router-evaluation.ts
+  s_a0799efed517c8::t_a56aa9c20041c1 9
+packages/ai/src/utils/iris-poll-github.ts
+  s_a0799efed517c8::t_10dc6b65073963 17
+  s_a0799efed517c8::t_a0d15acc3c8089 98,162
+apps/dashboard/tests/geo-scan-workflow.test.ts
+  s_a0799efed517c8::t_3c026be7f7aa4e 144-176,179,228-271
+packages/sites-server/src/starter.ts
+  s_a0799efed517c8::t_a0d15acc3c8089 1,85
+apps/api/src/routes/chats.ts
+  s_a0799efed517c8::t_3184d316ae417f 21,96,106,122,146
+packages/tools/src/assistant/get-commits-by-timeframe.ts
+  s_a0799efed517c8::t_4fed96eb321913 51
+  s_a0799efed517c8::t_81f21b73edf87c 1
+  s_a0799efed517c8::t_5e223426a0afa7 80
+packages/ai/src/integrations/linear.ts
+  s_a0799efed517c8::t_d14eb8b2109003 13-15
+  s_a0799efed517c8::t_dc34ad9cd60bcb 12,16,39,43,57,68,146-153
+packages/tools/src/utils/brand-references.ts
+  s_a0799efed517c8::t_5e223426a0afa7 37-44
+apps/dashboard/src/lib/orpc/routers/agent-feedback.ts
+  s_a0799efed517c8::t_820d211eb9e48d 70-72
+  s_a0799efed517c8::t_51256764b6566a 30-31,37,41,65,75
+  s_a0799efed517c8::t_36a9b6fd025ebd 26
+packages/tools/src/researcher/fetch-github-repo.ts
+  s_a0799efed517c8::t_5e223426a0afa7 6,15
+apps/dashboard/src/workflows/brand-analysis.ts
+  s_a0799efed517c8::t_534e0a3f0bc46a 87-91,95,97-101,104,108-109,111,114-130,139,143,152,163
+packages/ai/src/agents/repo-image-agent.ts
+  s_a0799efed517c8::t_031010401a38a8 16,43-53
+  s_a0799efed517c8::t_a580529a917b0a 77-82,133-137,141,145,147
+apps/agent/agent/lib/utils/render-chart.ts
+  s_a0799efed517c8::t_ef9b5205c3dc59 1-4,27-28,30-31,85
+apps/dashboard/src/lib/analytics/programs.ts
+  s_a0799efed517c8::t_751187b297ed01 59-68,166,314
+packages/ai/src/tools/sitemap.ts
+  s_a0799efed517c8::t_ee324e1e67bf1c 58
+packages/sites-server/src/github-source.ts
+  s_a0799efed517c8::t_a0d15acc3c8089 1,57
+packages/geo-core/src/utils/geo-prompt-intent.ts
+  s_a0799efed517c8::t_685b22084c9d4a 1
+packages/geo-core/src/ingest/classify-visitor.ts
+  s_a0799efed517c8::t_b9a3aee0f75e44 47,212
+packages/geo-core/tests/persona-scan.test.ts
+  s_a0799efed517c8::t_3c026be7f7aa4e 386
+packages/ai/src/chat/history.ts
+  s_a0799efed517c8::t_b579aa82fc0014 169
+apps/dashboard/src/lib/webhooks/dispatch-event-triggers.ts
+  s_a0799efed517c8::t_d6b5efe19800c8 22,25,27-31,35-38,42-45
+packages/ai/src/autonomy/signals.ts
+  s_a0799efed517c8::t_b092a71ab2a71e 311-313
+apps/api/src/types/geo.ts
+  s_a0799efed517c8::t_d582799f40399c 25,30-35
+packages/geo-core/src/utils/token-usage.ts
+  s_a0799efed517c8::t_9e38a75e23b65d 170-171,179-181
+apps/dashboard/src/lib/email/send.ts
+  s_a0799efed517c8::t_2b0fdf0163728d 27
+  s_a0799efed517c8::t_96215c6c0119f0 28-34,63,101,116,156
+apps/api/src/routes/geo-briefs.ts
+  s_a0799efed517c8::t_071b966309458d 29-30,35,38,179,181,187,189,201-205,207,237-238,241-243
+  s_a0799efed517c8::t_7fa84d2bec0e5c 48,59,66,75,82,91,98,115,129,140,156,167
+  s_a0799efed517c8::t_eff6c82fc9b6ab 36
+packages/ai/src/agents/geo-opencode.ts
+  s_a0799efed517c8::t_98c5dcb163f497 49,55,60
+  s_a0799efed517c8::t_282c1686d935cb 52,57,166,284
+packages/tools/package.json
+  s_a0799efed517c8::t_6c0c1fd77417b2 13,18-19,22,27
+apps/api/src/utils/logging.ts
+  s_a0799efed517c8::t_8a62dc87169900 1
+packages/schemas/src/schemas/dashboard/skills.ts
+  s_a0799efed517c8::t_6e264648bd01c9 18,31
+packages/ai/src/utils/autonomy-hash.ts
+  s_a0799efed517c8::t_35f870d49ed76e 20
+packages/geo-core/src/geo/scan.ts
+  s_a0799efed517c8::t_8eeefe84eafa5b 768-773,1677
+  s_a0799efed517c8::t_1b167e7f3a943b 160
+  s_a0799efed517c8::t_7eefe2b99c06de 1931,1936,1973-1975,1987-1999,2014
+  s_a0799efed517c8::t_97c72f5306b242 577,1460
+apps/dashboard/src/lib/auth/security-actions.ts
+  s_a0799efed517c8::t_1ab822a610c0e9 112-114,193-195,206-208,338-340
+  s_a0799efed517c8::t_086de4fde4221e 26,65-80,201,266,328,344,380,386,413
+packages/ai/src/tools/github-mention.ts
+  s_a0799efed517c8::t_b74d3666195c6a 621
+  s_a0799efed517c8::t_a92277c9176884 53-54,56,58-60,170-186,267,273,547,561,623,644,675,681
+apps/dashboard/src/app/api/integrations/mcp/oauth/callback/route.ts
+  s_a0799efed517c8::t_422990e9ae8477 35
+apps/api/src/middleware/subscription.ts
+  s_a0799efed517c8::t_5c7c1c582fdf67 9,14,40,45-50
+packages/ai/src/agents/geo-writer.ts
+  s_a0799efed517c8::t_77bd7f003150f4 139-141
+  s_a0799efed517c8::t_6b6629e6d1f643 81,142-146,170,172-181,183-184,188-193,226-227,281,288,301,305,372,431-436,531-534
+  s_a0799efed517c8::t_852a7c53d0f9dd 169
+apps/api/src/utils/pg-errors.ts
+  s_a0799efed517c8::t_8a62dc87169900 1-3,6,9-14,16-17,19,22-23,31-33,37-40
+apps/dashboard/src/lib/auth/mfa.ts
+  s_a0799efed517c8::t_a3a0678e39790f 10,18,50
+packages/geo-core/src/geo/agent-readiness-live.ts
+  s_a0799efed517c8::t_5a012bcd4a0f7e 57-72,96,169,225
+apps/dashboard/src/lib/social-connect/publish.ts
+  s_a0799efed517c8::t_f582b1b7fb1516 71-77,129
+  s_a0799efed517c8::t_65cc296770c495 45
+apps/dashboard/src/app/api/integrations/linear/authorize/route.ts
+  s_a0799efed517c8::t_422990e9ae8477 13
+packages/sites-server/src/github.ts
+  s_a0799efed517c8::t_a0d15acc3c8089 1,162,258,287,321,356,377,452,473,519,539,563
+packages/ai/src/integrations/mcp-tool-index.ts
+  s_a0799efed517c8::t_d14eb8b2109003 345,393,426,667,684,976,978,992
+  s_a0799efed517c8::t_cd135d653d10f4 51-63,204-215,278,318-320,1125-1139,1141
+apps/agent/agent/lib/utils/slack-input-request.ts
+  s_a0799efed517c8::t_d33255f24a588c 155
+packages/tools/src/types/github-tools.ts
+  s_a0799efed517c8::t_918f40b1ed90ff 1,3,5
+apps/dashboard/src/workflows/steps/on-demand-generation-step.ts
+  s_a0799efed517c8::t_b092ac0f5f7415 127,153,165
+apps/dashboard/src/lib/upload/content-image-store.ts
+  s_a0799efed517c8::t_6c8a66feed0946 166
+apps/dashboard/src/lib/orpc/routers/iris.ts
+  s_a0799efed517c8::t_e286f1eeabe059 97-104,107,129-130,211,269,326,361,366-370,373,375
+packages/schemas/src/schemas/dashboard/upload.ts
+  s_a0799efed517c8::t_6e264648bd01c9 15,27,39,51,63,75
+apps/dashboard/src/lib/demo/sandbox.ts
+  s_a0799efed517c8::t_6fc304025b4535 257-258,260,268-273,275,455-459,739-740,742-748,750-758
+  s_a0799efed517c8::t_de4d0981393315 259,274,741,749
+packages/ai/src/utils/chat.ts
+  s_a0799efed517c8::t_55ce4f76c81865 14-16
+packages/ai/src/autonomy/ship.ts
+  s_a0799efed517c8::t_4eaaf4a537514e 28,44,55,68,106,166,170,174,178,207,211,221,225
+  s_a0799efed517c8::t_48656cec31e7a1 42-43
+packages/ai/src/agents/repo-image.ts
+  s_a0799efed517c8::t_10dc6b65073963 10
+  s_a0799efed517c8::t_da5e1ad8954c70 41
+  s_a0799efed517c8::t_4fed96eb321913 175,182,224
+  s_a0799efed517c8::t_9c0de2cc81ff33 325,343-347
+apps/dashboard/src/lib/orpc/routers/upload.ts
+  s_a0799efed517c8::t_48656cec31e7a1 48-52
+  s_a0799efed517c8::t_dc54a33673d813 1-4,53-85,136,152,154,171-175,181,199-206
+packages/geo-core/src/utils/geo-locale-language.ts
+  s_a0799efed517c8::t_33668de92a6075 15
+packages/geo-core/src/types/geo.ts
+  s_a0799efed517c8::t_8976bf11c77cdd 21-24,983-985,997,999
+  s_a0799efed517c8::t_e6a952a628d85f 751-755
+  s_a0799efed517c8::t_21c18928b559ad 18,25,1525
+  s_a0799efed517c8::t_ce9a2e36d62e79 37,415,455,462,1001,1252,1456,1798,2033,2051,2083,2108
+packages/analytics/src/cache/query-cache.ts
+  s_a0799efed517c8::t_c541e730a632bf 5
+apps/web/.env.example
+  s_a0799efed517c8::t_59632ed8f522be 15-23
+apps/web/package.json
+  s_a0799efed517c8::t_6c0c1fd77417b2 22,25-27,35-36,50,55-56,59,62,67,75-77,88,92,95-96
+apps/agent/agent/lib/types/slack.ts
+  s_a0799efed517c8::t_03b11cc06c626b 23
+packages/tools/src/assistant/get-release-by-tag.ts
+  s_a0799efed517c8::t_81f21b73edf87c 1
+  s_a0799efed517c8::t_4fed96eb321913 43
+apps/dashboard/src/lib/slack/relay.ts
+  s_a0799efed517c8::t_5b1aea127322ee 36-39
+packages/geo-core/src/types/geo-sentiment.ts
+  s_a0799efed517c8::t_ce9a2e36d62e79 35
+apps/onboarding-agent/package.json
+  s_a0799efed517c8::t_6c0c1fd77417b2 16-17,22-24,27,32,34
+apps/api/src/routes/event-triggers.ts
+  s_a0799efed517c8::t_69c8e8567e9092 208,235,270,301,345
+  s_a0799efed517c8::t_ee6249d4585d8a 27,32
+  s_a0799efed517c8::t_4aa90596cee021 39-42,48-51
+  s_a0799efed517c8::t_c9a68e19cd455b 207,209,211,234,236,238,269,271,273,300,302,304,344,346,348
+packages/ai/src/utils/scheduled-publications.ts
+  s_a0799efed517c8::t_a3a0678e39790f 737
+  s_a0799efed517c8::t_d59a4f7008402c 75-83
+apps/dashboard/src/app/api/integrations/google-search-console/authorize/route.ts
+  s_a0799efed517c8::t_422990e9ae8477 25
+packages/schemas/src/schemas/api/webhooks.ts
+  s_a0799efed517c8::t_6e264648bd01c9 45,54,74
+apps/dashboard/src/workflows/steps/schedule-generation-step.ts
+  s_a0799efed517c8::t_9c5337c2d21185 89,101
+apps/dashboard/src/lib/orpc/routers/logs.ts
+  s_a0799efed517c8::t_4c8cc985bc45ea 93,96
+apps/dashboard/src/lib/upload/cleanup.ts
+  s_a0799efed517c8::t_9593fb37e0909c 28,31
+apps/api/src/constants/request-limits.ts
+  s_a0799efed517c8::t_23e45ca28652fc 1-4
+apps/dashboard/src/lib/auth/mfa-actions.ts
+  s_a0799efed517c8::t_1ab822a610c0e9 65
+apps/dashboard/src/workflows/steps/iris-steps.ts
+  s_a0799efed517c8::t_dc5a37e579f572 495-521,587,589-590,616
+  s_a0799efed517c8::t_ef9b5205c3dc59 273
+packages/ai/src/utils/telemetry-event.ts
+  s_a0799efed517c8::t_e6cf38be30ea25 11,60-61
+apps/dashboard/src/app/api/workflows/social-analytics-sync/route.ts
+  s_a0799efed517c8::t_46dcad3bc4caf8 1,16
+packages/tools/src/utils/analytics.ts
+  s_a0799efed517c8::t_29deea023f4c4c 1-27
+packages/ai/src/tools/mcp-lazy.ts
+  s_a0799efed517c8::t_1b699d411fec0d 416
+apps/dashboard/src/app/api/cron/sites-cleanup/route.ts
+  s_a0799efed517c8::t_913cf54e89f48a 9
+  s_a0799efed517c8::t_2f39131de9330b 14
+apps/agent/agent/lib/utils/slack-post-x.ts
+  s_a0799efed517c8::t_ef34510bac0995 23-24,29-38,193-199,270-272,275-276
+  s_a0799efed517c8::t_d319127eaa818f 273-274
+  s_a0799efed517c8::t_7fbfa46e3fd951 50
+  s_a0799efed517c8::t_83b0b52fd66c56 41-47,56-66,69,71-79,159-160,186-189,251
+apps/dashboard/src/lib/integrations/github/site-publish-target.ts
+  s_a0799efed517c8::t_81f21b73edf87c 1
+packages/ai/src/integrations/github.ts
+  s_a0799efed517c8::t_d14eb8b2109003 900-908,1650-1653,1657-1658,1706-1713
+  s_a0799efed517c8::t_10dc6b65073963 3
+  s_a0799efed517c8::t_7025dd4bac34ea 133,179,545,606-608,617,663,677,684,1190,1239,1443,1453,1502-1504,1514,1777
+  s_a0799efed517c8::t_4fed96eb321913 229,251,269,382,436,484,614,675,877,1451,1511,1559
+apps/dashboard/src/app/api/cron/scheduled-publications/route.ts
+  s_a0799efed517c8::t_2f39131de9330b 1,5
+packages/ai/src/utils/code-research-actions.ts
+  s_a0799efed517c8::t_a028d10bcf21e0 181
+packages/db/src/scripts/seed-brand-identity.ts
+  s_a0799efed517c8::t_53e79fab758715 101-113,120,128,162-166,179,189
+packages/tools/src/analytics/get-top-posts.ts
+  s_a0799efed517c8::t_dc5a37e579f572 15
+  s_a0799efed517c8::t_29deea023f4c4c 1,5,16-18,29-30
+packages/email/src/utils/brew.ts
+  s_a0799efed517c8::t_e2e285eb8dcc2f 41-52,97,109
+packages/schemas/src/schemas/dashboard/notification-settings.ts
+  s_a0799efed517c8::t_6e264648bd01c9 6
+packages/sites-core/package.json
+  s_a0799efed517c8::t_6c0c1fd77417b2 19,23-24
+packages/ai/src/gateway.ts
+  s_a0799efed517c8::t_01c3278b472402 91,96,102-104,106-107
+packages/ai/src/utils/geo-opencode-box.ts
+  s_a0799efed517c8::t_ecd31b66ebce32 96-97,99-100,102-109,116-128,133,142
+apps/dashboard/src/lib/orpc/routers/automation.ts
+  s_a0799efed517c8::t_9744e3c436fbba 211-215
+  s_a0799efed517c8::t_b092ac0f5f7415 130-134,194-210,216-245,250-251,269,271,310,351,353,399,456,461-462,496-498,541,543,582,636,641,656,688,690,731,734-737,746,799,804,811,844
+apps/dashboard/src/lib/orpc/routers/content-authors.ts
+  s_a0799efed517c8::t_0e7b68f0859c58 51-58,62,64,78,80-88,132-133,148,154-155,172
+packages/ai/src/router/lazy-model.ts
+  s_a0799efed517c8::t_fb39a7b0acad25 148,636
+apps/dashboard/src/lib/auth/actions.ts
+  s_a0799efed517c8::t_1ab822a610c0e9 17,19-21,23-24,26-32,35-41,43-44,46-51,54-58
+apps/dashboard/src/app/api/cron/sites/route.ts
+  s_a0799efed517c8::t_2f39131de9330b 3,9
+apps/web/src/lib/star-video/github-oauth.ts
+  s_a0799efed517c8::t_10dc6b65073963 8
+  s_a0799efed517c8::t_4fed96eb321913 133
+apps/dashboard/src/lib/orpc/routers/brand.ts
+  s_a0799efed517c8::t_b0155f78fec527 1577-1584
+  s_a0799efed517c8::t_ea86479381fd2c 1036-1041,1077-1079,1084-1085,1088,1105,1134,1136,1164-1167,1169,1574-1576
+  s_a0799efed517c8::t_bc660f2776b4ee 1334,1346,1348,1360,1434,1453,1484-1487,1529-1530,1534-1535,1550,1569,1618,1624-1627,1629
+  s_a0799efed517c8::t_ec684ca9382af6 1223-1226,1228
+  s_a0799efed517c8::t_31d880f83f731a 257-258,262-272,274-277,1229
+  s_a0799efed517c8::t_605c9abfe8ced8 1585-1587,1633-1635
+  s_a0799efed517c8::t_86128ec5176804 9-12
+  s_a0799efed517c8::t_a336e13de2558a 88,148-160,174-179,211-243
+packages/ai/src/utils/brand-references.ts
+  s_a0799efed517c8::t_b0155f78fec527 35-37,49,51,55
+  s_a0799efed517c8::t_03774af5b81b6a 22-34,38-48,50,52-54,56
+apps/dashboard/src/lib/orpc/routers/github.ts
+  s_a0799efed517c8::t_81f21b73edf87c 1
+  s_a0799efed517c8::t_4fed96eb321913 397
+packages/tools/src/content-writer/get-brand-references.ts
+  s_a0799efed517c8::t_5e223426a0afa7 4-7,29
+apps/dashboard/src/app/api/organizations/[organizationId]/chat/[chatId]/relay/route.ts
+  s_a0799efed517c8::t_cd20c46124e1d5 17-20,33-35
+  s_a0799efed517c8::t_8c67865b148076 14
+apps/dashboard/src/app/rpc/[[...rest]]/route.ts
+  s_a0799efed517c8::t_f4d8ee7fcdd489 3,6,36-41,43,45-51
+packages/schemas/src/schemas/dashboard/ai/chat-tool-block.ts
+  s_a0799efed517c8::t_6e264648bd01c9 17
+apps/api/src/programs/event-triggers.ts
+  s_a0799efed517c8::t_0c744ca7e0f857 7-8,28-31,57,72-78,82,87-98,127-128,138,201,267
+  s_a0799efed517c8::t_40b01dea2db1d2 86
+packages/ai/src/router/adapters/openrouter.ts
+  s_a0799efed517c8::t_fb39a7b0acad25 132
+packages/schemas/src/schemas/dashboard/workflows.ts
+  s_a0799efed517c8::t_c22e22143bef49 2
+apps/dashboard/src/lib/workflows/shared/ai-credit-notifications.ts
+  s_a0799efed517c8::t_936c127e4b8e19 8,22-36
+packages/ai/src/utils/shell.ts
+  s_a0799efed517c8::t_2498a25a8c7d65 1-7
+packages/ai/src/utils/context-dev.ts
+  s_a0799efed517c8::t_edb3dd85daf654 91-93,372-376,663
+  s_a0799efed517c8::t_b092ac0f5f7415 657
+apps/dashboard/src/app/api/organizations/[organizationId]/chat/[chatId]/stop/route.ts
+  s_a0799efed517c8::t_8c67865b148076 16,19-22
+apps/api/src/routes/geo-scans.ts
+  s_a0799efed517c8::t_3d6117de72dca9 23-27,37,54,65,76,83,94,151,166
+apps/dashboard/src/lib/analytics/workflow-lifecycle.ts
+  s_a0799efed517c8::t_d4d69e3dbced06 25-27,56,59,66,70,81-83,86-93,134
+packages/ai/src/autonomy/capabilities.ts
+  s_a0799efed517c8::t_a3f38ca6526ae7 114,116-117,121,124,128-138,234,240-245,287-292,349-354,383-388,549-563,581,587-597,634,655,693,800,904-909,947-952,996,1050,1398-1403
+packages/geo-core/src/geo/writer.ts
+  s_a0799efed517c8::t_fb07904463de53 127-137,151,171,364-367,372,453,522,568,572,608,869-873,877-878
+  s_a0799efed517c8::t_1f4495c3cf2cbf 799
+packages/utils/src/url.ts
+  s_a0799efed517c8::t_6b1674e550e00f 211-221,245-246,280-281
+packages/schemas/src/schemas/dashboard/granola.ts
+  s_a0799efed517c8::t_6e264648bd01c9 6
+apps/dashboard/src/workflows/schedule-content.ts
+  s_a0799efed517c8::t_3ed5184e658b9a 126-131,149,158,164-234,238-256,264,312,315-316,321-324,329-333,338-341,358-360,370,378-385,393,400,454-457
+  s_a0799efed517c8::t_ef9b5205c3dc59 235-237,355
+packages/ai/src/utils/content-schedules.ts
+  s_a0799efed517c8::t_01c3278b472402 137-138,174,219-224,233,239,398,462
+packages/ai/src/utils/url.ts
+  s_a0799efed517c8::t_422990e9ae8477 17-34
+apps/dashboard/package.json
+  s_a0799efed517c8::t_6c0c1fd77417b2 23,25,29,32-33,37-38,72,82,84,86,91-92,98-100,102,107,112-113,125,128,134,137,142-143,150-151
+apps/dashboard/src/lib/workflows/shared/auto-pause.ts
+  s_a0799efed517c8::t_936c127e4b8e19 4,17,91-92
+  s_a0799efed517c8::t_859187bdc9c891 136-139
+packages/email/package.json
+  s_a0799efed517c8::t_6c0c1fd77417b2 39
+packages/geo-core/src/types/google-search-console.ts
+  s_a0799efed517c8::t_ce9a2e36d62e79 13
+apps/dashboard/src/lib/billing/subscription.ts
+  s_a0799efed517c8::t_c22e22143bef49 205,245
+apps/dashboard/src/lib/auth/org-selection.ts
+  s_a0799efed517c8::t_a3a0678e39790f 5,13,26
+apps/dashboard/src/lib/analytics/effect.ts
+  s_a0799efed517c8::t_c23d674918e672 51
+apps/web/src/lib/offering-check/request.ts
+  s_a0799efed517c8::t_d54667820ad8e2 1-2
+  s_a0799efed517c8::t_c7b82571d39c98 41
+packages/ai/src/autonomy/gate.ts
+  s_a0799efed517c8::t_b74d3666195c6a 24-29,89,122
+apps/web/src/lib/star-video/stargazers.ts
+  s_a0799efed517c8::t_81f21b73edf87c 1
+  s_a0799efed517c8::t_4fed96eb321913 29
+apps/agent/package.json
+  s_a0799efed517c8::t_6c0c1fd77417b2 16-18,27-32,36-37,39,44,46
+apps/dashboard/src/utils/content-image-key.ts
+  s_a0799efed517c8::t_48bca2ab4d63ae 1-2,101
+packages/ai/src/jobs/feedback-evaluation.ts
+  s_a0799efed517c8::t_f582b1b7fb1516 10
+apps/dashboard/src/lib/auth/cron.ts
+  s_a0799efed517c8::t_f68e9addcbc5b3 1-19
+apps/api/src/programs/posts.ts
+  s_a0799efed517c8::t_96749808869759 65-66,132-135,140-141,143,155-157,162-182,190,194-195,199-201,206-207,209-213,402,547,549-550,563-565,625-633,646-654,671-679,701-709,717-725,738-746
+apps/dashboard/src/lib/orpc/base.ts
+  s_a0799efed517c8::t_b74d3666195c6a 60-71
+apps/dashboard/tests/fixtures/demo-storage.fixture.ts
+  s_a0799efed517c8::t_5fa90ce096e524 554
+packages/geo-core/src/ingest/README.md
+  s_a0799efed517c8::t_c62dc1ddc10aee 17
+packages/geo-core/src/geo/projects.ts
+  s_a0799efed517c8::t_b00dd0f2701093 404
+packages/tools/src/utils/github.ts
+  s_a0799efed517c8::t_5e223426a0afa7 3-12
+  s_a0799efed517c8::t_e30de02118a522 1
+package.json
+  s_a0799efed517c8::t_6c0c1fd77417b2 4-45,80-81,83,92
+apps/api/src/utils/feedback.ts
+  s_a0799efed517c8::t_5ce65257d8445a 74
+packages/tools/src/utils/sites.ts
+  s_a0799efed517c8::t_5e223426a0afa7 13
+packages/tools/src/assistant/get-linear-issues.ts
+  s_a0799efed517c8::t_5e223426a0afa7 29,31,34,36
+packages/ai/src/utils/description.ts
+  s_a0799efed517c8::t_35f870d49ed76e 4-9,11-16
+packages/sites-server/package.json
+  s_a0799efed517c8::t_6c0c1fd77417b2 14,20-21,23,29-30
+apps/api/src/utils/content-generation.ts
+  s_a0799efed517c8::t_5c7aea30cf33b4 15
+apps/ui/package.json
+  s_a0799efed517c8::t_6c0c1fd77417b2 14,24,26,29,34,37
+apps/dashboard/src/app/api/organizations/[organizationId]/chat/[chatId]/stream/route.ts
+  s_a0799efed517c8::t_724a09ad07c073 92-99,112,224,228
+  s_a0799efed517c8::t_8c67865b148076 20,28-31
+apps/dashboard/src/lib/integrations/github/content-assets.ts
+  s_a0799efed517c8::t_7cd0415ca16423 182-188,190,220,349
+apps/api/src/routes/geo-competitors.ts
+  s_a0799efed517c8::t_9968b712c6d683 161-164,170-172,174,180,183-185,188,222,225-227,230,265,268-276,279
+  s_a0799efed517c8::t_33668de92a6075 12,33
+  s_a0799efed517c8::t_7fa84d2bec0e5c 43,54,61,80,87,103,114,125,132,153,216
+apps/api/src/routes/geo-projects.ts
+  s_a0799efed517c8::t_7fa84d2bec0e5c 32,40,47,61,68,77,84,99,106,117
+  s_a0799efed517c8::t_5100332d064182 168-170
+  s_a0799efed517c8::t_6ecb37587c8e71 17,24,125-127,129,137-139,141,172,180-182,184
+packages/ai/src/autonomy/claims.ts
+  s_a0799efed517c8::t_4eaaf4a537514e 1-4
+apps/api/package.json
+  s_a0799efed517c8::t_6c0c1fd77417b2 27-29,31-34,36,40-41,43,46,48,50
+packages/ai/src/utils/model-call-telemetry.ts
+  s_a0799efed517c8::t_b74d3666195c6a 48-50,71,100,172,175-176,178-180,183,186-188,196
+  s_a0799efed517c8::t_43154dc06a28cc 20
+apps/dashboard/src/lib/orpc/routers/content-calendar.ts
+  s_a0799efed517c8::t_05de8de1f3066b 27
+packages/geo-core/tests/geo-project-domains.test.ts
+  s_a0799efed517c8::t_5ad62fb0f41f7a 36
+apps/dashboard/src/lib/integrations/github/publish-content-to-github.ts
+  s_a0799efed517c8::t_10dc6b65073963 5-7
+apps/dashboard/src/lib/orpc/routers/analytics.ts
+  s_a0799efed517c8::t_820d211eb9e48d 57,66,80,93,102,116,129,138,170
+  s_a0799efed517c8::t_4b2fffaf72ff6a 11,40-51,56,65,79,92,101,115,128,137,146,169
+packages/geo-core/src/schemas/geo-personas.ts
+  s_a0799efed517c8::t_6024f19867914a 19
+packages/ai/src/agents/changelog.ts
+  s_a0799efed517c8::t_bdf368bcf50ae6 12
+packages/tools/src/utils/session.ts
+  s_a0799efed517c8::t_b17ce99a4ba916 3-4,6
+apps/dashboard/src/app/api/integrations/linear/callback/route.ts
+  s_a0799efed517c8::t_422990e9ae8477 32
+  s_a0799efed517c8::t_157b453da398f9 35-43,52,57,146,190,225
+packages/utils/src/oauth-consent.ts
+  s_a0799efed517c8::t_b65b28b89efe5e 63
+  s_a0799efed517c8::t_6b1674e550e00f 8,19-24
+  s_a0799efed517c8::t_90c0df4576e587 25,64-66
+packages/geo-core/src/types/geo-personas.ts
+  s_a0799efed517c8::t_6024f19867914a 8,10-14,125,127,129
+packages/ai/package.json
+  s_a0799efed517c8::t_6c0c1fd77417b2 44,47-48,65-67,69-71,75,79-80,83,86-87,92,94
+apps/api/src/routes/geo-sequences.ts
+  s_a0799efed517c8::t_eff6c82fc9b6ab 34
+  s_a0799efed517c8::t_7fa84d2bec0e5c 46,55,62,77,84,99,106,115,122,133
+packages/ai/src/integrations/granola.ts
+  s_a0799efed517c8::t_d14eb8b2109003 18-20
+  s_a0799efed517c8::t_96215c6c0119f0 17,21,68,72,83,94,131-136
+packages/schemas/src/schemas/dashboard/agent-feedback.ts
+  s_a0799efed517c8::t_6e264648bd01c9 16
+packages/sites-server/src/box-build.ts
+  s_a0799efed517c8::t_10dc6b65073963 3
+apps/dashboard/src/lib/organizations/actions.ts
+  s_a0799efed517c8::t_1ab822a610c0e9 96-97,228-229,243-244,471-472,559-560,593-594,732-733,743-744,749-750,848-849,860-861,949-950,955-956
+  s_a0799efed517c8::t_9d71c4811c0d35 48,113-116,137-143,422,494
+  s_a0799efed517c8::t_df0bbd13d6b491 34-38,233,271,307,346,460,509,553,584,619,643,692,723,754,783,819,865
+  s_a0799efed517c8::t_e5eb2316c4f38b 180,203,262,566,932
+packages/ai/src/utils/github-mention-change-review.ts
+  s_a0799efed517c8::t_f24a25a7700e99 10-13,48
+packages/geo-core/tests/coding-agent-catalog.test.ts
+  s_a0799efed517c8::t_5ad62fb0f41f7a 1
+packages/ai/src/jobs/brand-analysis.ts
+  s_a0799efed517c8::t_f582b1b7fb1516 8,30
+packages/ai/src/agents/background-gen.ts
+  s_a0799efed517c8::t_bdf368bcf50ae6 81,100
+packages/tools/src/analytics/get-posting-performance.ts
+  s_a0799efed517c8::t_29deea023f4c4c 1,5,16-19
+  s_a0799efed517c8::t_dc5a37e579f572 15
+packages/ai/src/billing/content-billing.ts
+  s_a0799efed517c8::t_f582b1b7fb1516 43,73,104
+apps/dashboard/src/lib/email/scheduled-publication.ts
+  s_a0799efed517c8::t_2b0fdf0163728d 16-19,130
+packages/ai/src/orchestration/tool-registry.ts
+  s_a0799efed517c8::t_a56aa9c20041c1 254-256
+packages/ai/src/utils/iris-markdown.ts
+  s_a0799efed517c8::t_8eee1d990e349e 7-8
+packages/geo-core/src/geo/prompts.ts
+  s_a0799efed517c8::t_9912ed2f149b09 114,118,155
+  s_a0799efed517c8::t_1f4495c3cf2cbf 465-467
+apps/api/src/routes/geo-visibility.ts
+  s_a0799efed517c8::t_7fa84d2bec0e5c 61,73,80,92,99,111,118,136,143,158,165,177,184,196,203,221,336,363
+  s_a0799efed517c8::t_f313c6b502eab1 37-40
+  s_a0799efed517c8::t_ed2c873c20f424 235,248,261,282-288,292-293,349
+packages/ai/src/skills/functions/guidance.ts
+  s_a0799efed517c8::t_a56aa9c20041c1 10
+apps/agent/agent/channels/slack.ts
+  s_a0799efed517c8::t_d33255f24a588c 60,177-183,201-210,215,273,323,329,383
+apps/dashboard/src/lib/orpc/routers/geo.ts
+  s_a0799efed517c8::t_ab74f5fc317617 466-472,477,480-482,2041-2043,2057-2059,2144-2146
+  s_a0799efed517c8::t_46096a83b58645 665,749,847,880,1097,1110,1217,1233,1378,1440,1503,1533,1594,1743,1758,1835,1887,1914,1953,2017,2039,2055,2128,2169,2248,2256,2298,2332
+  s_a0799efed517c8::t_0e87e426f28ce2 345-352,356-357,359-368,370-376,379-382,526-528,654,1140,1504,1514-1516,2101
+packages/ai/src/router/README.md
+  s_a0799efed517c8::t_fb39a7b0acad25 15,107-108
+packages/ai/src/utils/code-research-commands.ts
+  s_a0799efed517c8::t_b092ac0f5f7415 242
+  s_a0799efed517c8::t_da5e1ad8954c70 37
+  s_a0799efed517c8::t_05de8de1f3066b 49-51,520,637
+  s_a0799efed517c8::t_3177ce4f2f4614 65,203,217,244-245,270,317,319,321,410,420,510,586,599,620,638,653
+packages/ai/src/utils/github-pr-commit.ts
+  s_a0799efed517c8::t_10dc6b65073963 4
+  s_a0799efed517c8::t_f24a25a7700e99 205,207
+apps/dashboard/src/lib/integrations/github/content-pull-request.ts
+  s_a0799efed517c8::t_81f21b73edf87c 1
+  s_a0799efed517c8::t_10dc6b65073963 2
+apps/api/src/routes/geo-agent-readiness.ts
+  s_a0799efed517c8::t_7fa84d2bec0e5c 34,47,54,67,83
+  s_a0799efed517c8::t_f313c6b502eab1 20-24
+apps/dashboard/src/lib/actions/errors.ts
+  s_a0799efed517c8::t_df0bbd13d6b491 1-3,10-19
+packages/ai/src/evaluation/client.ts
+  s_a0799efed517c8::t_64acd70a3cfebf 60
+  s_a0799efed517c8::t_c7b82571d39c98 16,21
+packages/ai/src/constants/github.ts
+  s_a0799efed517c8::t_db1f1bf90e34dc 13-18
+packages/ai/src/qstash/triggers.ts
+  s_a0799efed517c8::t_69ce942e317ac4 60-71,166,171,205
+  s_a0799efed517c8::t_a0e4814c832ab4 17,148-153
+  s_a0799efed517c8::t_913cf54e89f48a 15
+apps/api/src/routes/legacy-redirects.ts
+  s_a0799efed517c8::t_23a19b728165b9 1,3,12-30,32-34,38-41,43-46,48-50
+  s_a0799efed517c8::t_c1c8140bdd543f 6,36
+apps/dashboard/src/workflows/steps/social-analytics-steps.ts
+  s_a0799efed517c8::t_b092ac0f5f7415 34-36,42-54,95,99,105
+  s_a0799efed517c8::t_ef9b5205c3dc59 103
+packages/ai/src/constants/env-switch.ts
+  s_a0799efed517c8::t_c7b82571d39c98 1-12
+packages/geo-core/src/constants/geo-import.ts
+  s_a0799efed517c8::t_071b966309458d 28,35
+apps/api/src/middleware/geo-entitlement.ts
+  s_a0799efed517c8::t_fb07904463de53 8,33,61,63
+  s_a0799efed517c8::t_c1c8140bdd543f 6-7
+packages/geo-core/src/constants/geo-model-catalog.ts
+  s_a0799efed517c8::t_735bc4977946f2 5,584
+packages/schemas/src/schemas/dashboard/social-accounts.ts
+  s_a0799efed517c8::t_6e264648bd01c9 28,32
+packages/sites-server/tests/guest-build-runner.test.ts
+  s_a0799efed517c8::t_10dc6b65073963 7-8
+apps/evals/package.json
+  s_a0799efed517c8::t_6c0c1fd77417b2 11,15,17,22-23
+packages/schemas/src/schemas/shared/post-metadata.ts
+  s_a0799efed517c8::t_6e264648bd01c9 100
+packages/geo-core/package.json
+  s_a0799efed517c8::t_6c0c1fd77417b2 33-34,36-40,43,47
+apps/api/src/routes/geo-prompts.ts
+  s_a0799efed517c8::t_7fa84d2bec0e5c 41,52,59,74,81,98,105,114,121,138
+  s_a0799efed517c8::t_d72dfe9f61c393 31,151-153,155,162,165-167,170,177,180-182,185,191,194-196,199,233,236-243,246
+.env.example
+  s_a0799efed517c8::t_a9a2103994329a 21-23,34-35,55,83-85,92-96,108,123,139-141,179-181
+packages/schemas/src/constants/dashboard/api-keys.ts
+  s_a0799efed517c8::t_9d11181db3a95d 1
+packages/ai/src/billing/team-members.ts
+  s_a0799efed517c8::t_f582b1b7fb1516 14,30
+packages/ai/src/utils/github-check-run.ts
+  s_a0799efed517c8::t_a0d15acc3c8089 1
+packages/tools/src/analytics/get-engagement-timeseries.ts
+  s_a0799efed517c8::t_29deea023f4c4c 1,5,16-19
+  s_a0799efed517c8::t_dc5a37e579f572 15
+packages/geo-core/src/ingest/journey.ts
+  s_a0799efed517c8::t_b9a3aee0f75e44 13,78,81,84
+packages/ai/src/utils/excalidraw-layout-check.ts
+  s_a0799efed517c8::t_96749808869759 99-103,131,164-166,220
+apps/dashboard/src/workflows/steps/on-demand-steps.ts
+  s_a0799efed517c8::t_5c7c1c582fdf67 130
+  s_a0799efed517c8::t_9c5337c2d21185 178,183
+packages/tools/src/assistant/update-published-content.ts
+  s_a0799efed517c8::t_afe1b92a497c78 86
+packages/ai/src/router/resolve.ts
+  s_a0799efed517c8::t_fb39a7b0acad25 21,48
+apps/api/src/routes/agent-chats.ts
+  s_a0799efed517c8::t_935ecd7fb458f1 332-334,337-340
+  s_a0799efed517c8::t_be034cddf3b2a1 45,48,54,61-62,71,73
+apps/dashboard/src/lib/auth/membership-upsert.ts
+  s_a0799efed517c8::t_a9da8dbefe9657 7,124,128,133,136,140-143
+packages/analytics/src/constants/web-queries.ts
+  s_a0799efed517c8::t_6e264648bd01c9 12
+apps/api/src/routes/post-schedules.ts
+  s_a0799efed517c8::t_c9a68e19cd455b 127,129,131,141,143,145,168,170,172
+  s_a0799efed517c8::t_5c7aea30cf33b4 17
+  s_a0799efed517c8::t_ee6249d4585d8a 20
+apps/dashboard/src/lib/orpc/routers/api-keys.ts
+  s_a0799efed517c8::t_b74d3666195c6a 5,35,106-115,122-126,129-168,173-177,228,248-249,261,266,268-269,293,299,303,348,352,356,392,394-395,422,424,473,475
+apps/api/src/routes/brand-identities.ts
+  s_a0799efed517c8::t_ee6249d4585d8a 32
+  s_a0799efed517c8::t_c9a68e19cd455b 255,257,259,281,283,285,332,334,336,366,368,370,398,400,402,430,432,434
+  s_a0799efed517c8::t_69c8e8567e9092 256,282,333,367,399,431
+  s_a0799efed517c8::t_5ce65257d8445a 306,325,417,449
+packages/ai/src/utils/image-post-service.ts
+  s_a0799efed517c8::t_f40e11d68139b3 22,28,35,124-126,131,142,153,161,173,180,233,308-312,315,325
+packages/geo-core/src/constants/geo-hidden-sources.ts
+  s_a0799efed517c8::t_071b966309458d 8,14
+packages/ai/src/skills/seed.ts
+  s_a0799efed517c8::t_226fc6c57ac45d 35,39-41,44-46
+  s_a0799efed517c8::t_a927790d47fdb0 3
+  s_a0799efed517c8::t_d0dbf42a32a44f 36-38,47,57-71
+apps/dashboard/src/workflows/steps/geo-scan-steps.ts
+  s_a0799efed517c8::t_9dd38fc7403b91 31,61-75,78,166,174-177,185
+packages/schemas/src/schemas/dashboard/github-webhook.ts
+  s_a0799efed517c8::t_7025dd4bac34ea 92
+apps/api/src/routes/integrations.ts
+  s_a0799efed517c8::t_ee6249d4585d8a 23
+  s_a0799efed517c8::t_5ce65257d8445a 170,192
+  s_a0799efed517c8::t_c9a68e19cd455b 124,126,128,149,151,153,199,201,203
+apps/dashboard/src/app/api/organizations/[organizationId]/content/[contentId]/excalidraw/route.ts
+  s_a0799efed517c8::t_3dda2a65fe2223 98
+apps/dashboard/src/app/api/integrations/google-search-console/callback/route.ts
+  s_a0799efed517c8::t_422990e9ae8477 32
+packages/schemas/package.json
+  s_a0799efed517c8::t_6c0c1fd77417b2 25-26,31
+packages/geo-core/src/geo/scan-status.ts
+  s_a0799efed517c8::t_447f15c6e877fa 38-51
+  s_a0799efed517c8::t_258f703a7f5496 70-74
+  s_a0799efed517c8::t_1b167e7f3a943b 104
+packages/geo-core/src/types/sentiment-analysis.ts
+  s_a0799efed517c8::t_ce9a2e36d62e79 39
+apps/dashboard/src/app/api/integrations/github/callback/route.ts
+  s_a0799efed517c8::t_422990e9ae8477 65,90,93-97
+  s_a0799efed517c8::t_c25c963c6bf947 36,49-51,61,101,105,112,119,130,168,171,174
+apps/dashboard/src/lib/auth/return-to.ts
+  s_a0799efed517c8::t_78c5824115748f 35
+packages/ai/src/utils/gsc-integration-lock.ts
+  s_a0799efed517c8::t_935ecd7fb458f1 135,219
+packages/ai/src/utils/route-usage.ts
+  s_a0799efed517c8::t_43154dc06a28cc 14,64-66,68-71,73,75-78
+apps/dashboard/src/lib/agent/client.ts
+  s_a0799efed517c8::t_8a62dc87169900 77,80,83,102,178-183,202,206,223
+packages/ai/src/utils/unknown-record.ts
+  s_a0799efed517c8::t_43154dc06a28cc 12-17
+apps/api/src/programs/feedback.ts
+  s_a0799efed517c8::t_3802509637059a 216-220,222-230
+packages/schemas/src/schemas/dashboard/attachments.ts
+  s_a0799efed517c8::t_7025dd4bac34ea 6
+packages/ai/src/autonomy/deliver.ts
+  s_a0799efed517c8::t_f40e11d68139b3 6,35-48,217,222,249,254,262,301,315,320,387,392,434-436,441,443,462,465-467,478,549
+packages/ai/src/tools/github.ts
+  s_a0799efed517c8::t_4fed96eb321913 167,296,436
+  s_a0799efed517c8::t_81f21b73edf87c 1
+  s_a0799efed517c8::t_e30de02118a522 12,20-21
+apps/api/src/types/geo-context.ts
+  s_a0799efed517c8::t_0e1e7454b65317 6-9
+packages/geo-core/src/geo/programs.ts
+  s_a0799efed517c8::t_33b1bc92e1335c 790-791
+apps/api/src/routes/geo-settings.ts
+  s_a0799efed517c8::t_7fa84d2bec0e5c 23,32,39,56
+  s_a0799efed517c8::t_39ef8495551981 67,73,77-78,82
+packages/posthog/src/server.ts
+  s_a0799efed517c8::t_06d95fffb2f3a8 48,100-103,106,108-109,112,117,120-127,130,132-135,149,151,156
+  s_a0799efed517c8::t_31cdddcd1d4baa 22-23,99,107
+apps/api/src/utils/integrations.ts
+  s_a0799efed517c8::t_5ce65257d8445a 45
+packages/geo-core/src/types/geo-import.ts
+  s_a0799efed517c8::t_2a70b12607c005 1-7,11,13-15
+apps/dashboard/src/app/api/cron/geo-scan/route.ts
+  s_a0799efed517c8::t_2f39131de9330b 6,10
+apps/api/src/index.ts
+  s_a0799efed517c8::t_290ec7f269c7a0 25-26,208-214
+apps/dashboard/src/workflows/steps/content-generation-steps.ts
+  s_a0799efed517c8::t_ef9b5205c3dc59 113-116
+apps/dashboard/src/lib/auth/errors.ts
+  s_a0799efed517c8::t_a3a0678e39790f 1,24-29
+packages/geo-core/src/constants/geo.ts
+  s_a0799efed517c8::t_95ef6699cc78ed 57,573
+packages/ai/src/agents/linkedin.ts
+  s_a0799efed517c8::t_bdf368bcf50ae6 12
+packages/ai/src/billing/features.ts
+  s_a0799efed517c8::t_f582b1b7fb1516 45
+apps/web/src/utils/github.ts
+  s_a0799efed517c8::t_4fed96eb321913 38
+  s_a0799efed517c8::t_81f21b73edf87c 1
+packages/ai/src/utils/repo-image-skills.ts
+  s_a0799efed517c8::t_da5e1ad8954c70 43
+packages/ai/src/integrations/mcp.ts
+  s_a0799efed517c8::t_d14eb8b2109003 29-31
+  s_a0799efed517c8::t_c8f5584b693781 28,32-33,198,217,302
+packages/tools/src/content-writer/search-brand-references.ts
+  s_a0799efed517c8::t_5e223426a0afa7 8-11,57,70
+apps/dashboard/src/lib/analytics/flag-client.ts
+  s_a0799efed517c8::t_09f770c2aedf65 64,71
+apps/api/src/utils/triggers.ts
+  s_a0799efed517c8::t_0c744ca7e0f857 1,6,10,12,73,76-77,99,133-200
+  s_a0799efed517c8::t_88757bc1b19f35 105,108
+apps/api/src/runtime/geo-remote.ts
+  s_a0799efed517c8::t_5315ef48a5a2a5 11-33
+packages/utils/src/oauth-popup.ts
+  s_a0799efed517c8::t_90c0df4576e587 115
+packages/ai/src/utils/content-publication-repair-scheduler.ts
+  s_a0799efed517c8::t_afe1b92a497c78 1,8
+apps/agent/agent/lib/hooks/usage.ts
+  s_a0799efed517c8::t_ef9b5205c3dc59 36-54,141,186-187,208,271,286
+apps/ai-traffic-ingest/src/index.ts
+  s_a0799efed517c8::t_8f5bf8a05f4943 3
+  s_a0799efed517c8::t_d582799f40399c 106-107,156-170,173-177
+apps/agent/agent/lib/utils/session-model.ts
+  s_a0799efed517c8::t_fe428c8d0d88f5 5,15-24,26-27
+packages/schemas/src/types/dashboard/auth.ts
+  s_a0799efed517c8::t_6e264648bd01c9 66,71,96,114
+apps/api/src/routes/feedback.ts
+  s_a0799efed517c8::t_5ce65257d8445a 201,225,309,331
+  s_a0799efed517c8::t_19117f3d22c96c 204-208
+apps/dashboard/src/app/api/workflows/gsc-sync/route.ts
+  s_a0799efed517c8::t_46dcad3bc4caf8 1,15
+packages/ai/src/utils/github-mention-move.ts
+  s_a0799efed517c8::t_f24a25a7700e99 10-13,38
+packages/geo-core/tests/ingest-pipeline.test.ts
+  s_a0799efed517c8::t_550b78a7cd8542 165,175,184,194,200,206,219,223,229
+  s_a0799efed517c8::t_14e4bbd497facd 34-42,135-139,157,304
+  s_a0799efed517c8::t_66ed9adfdebdd8 160-164,166-174,176-183,185-193,195-199,201-205,207-218,220-222,224-228,231-241,243
+packages/ai/src/agents/twitter.ts
+  s_a0799efed517c8::t_bdf368bcf50ae6 12
+packages/schemas/src/schemas/dashboard/usage-alerts.ts
+  s_a0799efed517c8::t_6e264648bd01c9 14
+apps/agent/agent/lib/types/sites.ts
+  s_a0799efed517c8::t_21f4b6890e657b 4
+packages/ai/src/utils/code-research-box.ts
+  s_a0799efed517c8::t_2498a25a8c7d65 24
+  s_a0799efed517c8::t_c7b82571d39c98 52
+  s_a0799efed517c8::t_9687fa71b731d6 173,191
+packages/webhooks/package.json
+  s_a0799efed517c8::t_6c0c1fd77417b2 26-27,33,37
+apps/dashboard/src/lib/orpc/routers/usage-alerts.ts
+  s_a0799efed517c8::t_4c8cc985bc45ea 17
+apps/dashboard/src/lib/organizations/action-messages.ts
+  s_a0799efed517c8::t_3c6904d5df37f7 3,12-16
+apps/api/src/utils/agent-discovery.ts
+  s_a0799efed517c8::t_600d5ddb5f2ba7 14
+packages/tools/src/image/revise-image.ts
+  s_a0799efed517c8::t_5e223426a0afa7 23
+packages/webhooks/src/programs/endpoints.ts
+  s_a0799efed517c8::t_7d6be22e52669f 8,11-12,31,45
+packages/ai/src/billing/autumn.ts
+  s_a0799efed517c8::t_f582b1b7fb1516 14
+packages/ai/src/utils/update-published-content.ts
+  s_a0799efed517c8::t_f40e11d68139b3 180
+packages/ai/src/billing/chat-billing.ts
+  s_a0799efed517c8::t_f582b1b7fb1516 15-16,28
+apps/dashboard/src/lib/agent/content-task.ts
+  s_a0799efed517c8::t_8a62dc87169900 36
+apps/api/src/middleware/auth.ts
+  s_a0799efed517c8::t_68045a0f8fc87c 545
+  s_a0799efed517c8::t_ca47cf40f81d12 616-620
+apps/dashboard/src/lib/orpc/utils/geo-errors.ts
+  s_a0799efed517c8::t_3f4aec7a87a219 19,27,94
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "4d455f3fa327f537a2f68b3f67bc717c24ef763b",
+  "prompts": {},
+  "sessions": {
+    "s_a0799efed517c8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cd2fba69-476b-482b-aae2-b39793aeb150",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

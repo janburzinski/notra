@@ -1,0 +1,71 @@
+packages/ai/src/tools/linear.ts
+  s_ce7055b7518d19::t_7bf9a85aaa05ad 57,127,213
+packages/ai/src/constants/github-mention-content-policy.ts
+  s_ce7055b7518d19::t_ed41d67458e580 7
+packages/ai/src/utils/remove-html-comments.ts
+  s_ce7055b7518d19::t_2500ae40edc67f 20
+  s_ce7055b7518d19::t_2a7518a9ef9690 3-5,10-11,16-19
+packages/ai/src/utils/mcp-oauth-fetch.ts
+  s_ce7055b7518d19::t_deba91a4d51ec1 9-10
+  s_ce7055b7518d19::t_962e7891db2d40 2,11-12
+packages/ai/src/tools/post.ts
+  s_ce7055b7518d19::t_d0ab7fea953fd8 194-195,234-240
+packages/ai/src/tools/github.ts
+  s_ce7055b7518d19::t_7bf9a85aaa05ad 127,232,371
+  s_ce7055b7518d19::t_8f0e9e70df7dd7 385-401,439-441,496-498
+packages/ai/src/integrations/mcp-tool-index.ts
+  s_ce7055b7518d19::t_7f17b1853a7e6d 30-31,810-811,813,818-821,824,826-828,830-845
+  s_ce7055b7518d19::t_838f728a999df3 33
+packages/ai/src/tools/tool-cache.ts
+  s_ce7055b7518d19::t_7bf9a85aaa05ad 1-2,89-93,97-104
+packages/ai/src/tools/mcp-lazy.ts
+  ai_agent 363-371
+packages/ai/src/utils/github-mention-content-policy.test.ts
+  s_ce7055b7518d19::t_ed41d67458e580 417-429
+  s_ce7055b7518d19::t_aa9dc5792bf719 408-416,430-432
+packages/ai/src/utils/code-research-commands.test.ts
+  s_ce7055b7518d19::t_923813d033b978 124
+  s_ce7055b7518d19::t_8dc941c2778735 165-173
+  s_ce7055b7518d19::t_b4a2181ba25680 13,122-123,125-142
+packages/ai/src/schemas/code-research-tools.ts
+  s_ce7055b7518d19::t_1cd4969ebb5881 19
+packages/ai/src/utils/parse-github-mention-content.ts
+  s_ce7055b7518d19::t_ed41d67458e580 126,187-190
+  s_ce7055b7518d19::t_aa9dc5792bf719 127,191
+packages/ai/src/tools/edit-markdown.ts
+  s_ce7055b7518d19::t_91e465270eda35 23-41,43,92,94-98
+packages/ai/src/constants/mcp-tool-index.ts
+  s_ce7055b7518d19::t_7f17b1853a7e6d 6
+packages/ai/src/utils/code-research-commands.ts
+  s_ce7055b7518d19::t_1cd4969ebb5881 43
+  s_ce7055b7518d19::t_31e653ca62849b 476
+  s_ce7055b7518d19::t_8dc941c2778735 648-649,653
+  s_ce7055b7518d19::t_c91025c68193af 441-446,448-474,484-485,487,506,510-511,514-515,518,524
+  s_ce7055b7518d19::t_631f996c81af1d 650-652
+  s_ce7055b7518d19::t_9b50ca7805b231 477-482,486,488,491,493,496-497,500-501,505,507-509,529,532-534
+  s_ce7055b7518d19::t_fb59211946375d 447,475,483,489-490,492,494-495,498-499,502-504,512-513,516-517,519-523,525-528,530-531,535-539,549,553-554
+packages/ai/src/integrations/mcp-oauth.ts
+  s_ce7055b7518d19::t_0c28a5049e9871 79
+packages/ai/src/utils/github-mention-published-file.ts
+  s_ce7055b7518d19::t_4b924a3c425c95 8-11
+packages/ai/src/tools/granola.ts
+  s_ce7055b7518d19::t_cf67947cd0bfbb 87,157,210
+packages/ai/src/agents/background-gen.ts
+  s_ce7055b7518d19::t_d0ab7fea953fd8 167-169
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "87db7058b7c6f6011ea672383e7f83e5dd378807",
+  "prompts": {},
+  "sessions": {
+    "s_ce7055b7518d19": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "21e8c896-059f-447f-942a-2627be2504f7",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

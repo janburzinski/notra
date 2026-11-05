@@ -1,0 +1,21 @@
+apps/dashboard/src/components/evilcharts/charts/echarts-pie-chart.tsx
+  s_677bcce567202f::t_b7cc32c8c094a3 766
+apps/dashboard/src/app/(dashboard)/[slug]/geo/competitors/page-client.tsx
+  s_677bcce567202f::t_b7cc32c8c094a3 94-95,198
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "9dc70d0c06329593d03c100c8e75956ef14dc252",
+  "prompts": {},
+  "sessions": {
+    "s_677bcce567202f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f5d1389c-2218-4a20-ac79-55e67065b6a4",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

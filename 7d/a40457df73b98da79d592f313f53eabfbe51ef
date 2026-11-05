@@ -1,0 +1,19 @@
+apps/dashboard/tests/conversations-card.test.tsx
+  s_b10a587b1b70db::t_17415cbc9e022f 1-52
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "7da40457df73b98da79d592f313f53eabfbe51ef",
+  "prompts": {},
+  "sessions": {
+    "s_b10a587b1b70db": {
+      "agent_id": {
+        "tool": "amp",
+        "id": "TU-034SEv0DA2u0GIbyfaZyUm",
+        "model": "unknown"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

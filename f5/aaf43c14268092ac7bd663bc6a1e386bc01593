@@ -1,0 +1,19 @@
+apps/sites-builder/src/components/CategoryBar.astro
+  s_31c707ccbe1409::t_010719f07350f0 94-95
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "f5aaf43c14268092ac7bd663bc6a1e386bc01593",
+  "prompts": {},
+  "sessions": {
+    "s_31c707ccbe1409": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7e8a406a-ccd2-43bb-96bc-ad320ef46eac",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

@@ -1,0 +1,27 @@
+apps/dashboard/src/schemas/billing-checkout.ts
+  s_eba39e9a0f8071::t_0cb6ab60f36b4a 3-24,26-30,33-43
+apps/dashboard/src/lib/billing/autumn-request.ts
+  s_eba39e9a0f8071::t_fb5bd4a2e57018 10-14,19-23,25,27-74,78-80,94-99,102,108
+  s_eba39e9a0f8071::t_377cd5ac364c55 15-18,100,103
+  s_eba39e9a0f8071::t_45c8d13a6e7ffa 1,3-8,24,26,75-76,81,84-85,89-90
+apps/dashboard/src/constants/billing.ts
+  s_eba39e9a0f8071::t_178c5e8edaf014 139-146
+apps/dashboard/src/app/api/autumn/[...all]/route.ts
+  s_eba39e9a0f8071::t_7dc5a2011a0b15 4,50-57
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "1a5f9827b40a4718cc475bead9eebd8e2e3cf055",
+  "prompts": {},
+  "sessions": {
+    "s_eba39e9a0f8071": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "97b4841e-e30e-43ae-8a89-ded91c131bb3",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

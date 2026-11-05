@@ -1,0 +1,9 @@
+apps/sites-builder/src/styles/global.css
+  ai_agent 111,115-116
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "dec9ae3574f62aeb612b61abebdba518e80ae288",
+  "prompts": {}
+}

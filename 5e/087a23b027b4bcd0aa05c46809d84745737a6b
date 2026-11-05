@@ -1,0 +1,249 @@
+packages/db/src/schema.ts
+  s_d23dc21c3bdc65::t_b1db90507bee6c 74-75,77-78,4744-4756,4761-4832,4834-4853,4879-4880
+  s_d23dc21c3bdc65::t_f7d29367376ae1 73
+  s_d23dc21c3bdc65::t_21e68e1b52cd4c 45,76,4854-4878
+  s_d23dc21c3bdc65::t_92305fe8e8a41a 4757-4760
+  s_d23dc21c3bdc65::t_73c5fcc5200351 46-50
+  s_d23dc21c3bdc65::t_30781eb88d29ca 4833
+apps/dashboard/src/lib/autopilot/findings.ts
+  s_d23dc21c3bdc65::t_23d9687c140f1f 1,3-5,7-70,78-87,89-104,154-198,217-245,249-270,273-275,277-301,303-310
+  s_d23dc21c3bdc65::t_30781eb88d29ca 76,88,271-272
+  s_d23dc21c3bdc65::t_13ec7b031b6232 105-138
+  s_d23dc21c3bdc65::t_1bc3c52ef7433d 139-153
+  s_d23dc21c3bdc65::t_f7d29367376ae1 71-75,77
+  s_d23dc21c3bdc65::t_7437c4504dd865 6,199-216,246-248,276,302
+apps/dashboard/src/app/api/cron/autopilot/route.ts
+  s_d23dc21c3bdc65::t_f274e21c81f857 1-11
+apps/dashboard/src/components/autopilot/autopilot-settings-sheet.tsx
+  s_d23dc21c3bdc65::t_c679ea50582272 1-49
+apps/dashboard/vercel.json
+  s_d23dc21c3bdc65::t_f274e21c81f857 42-45
+apps/dashboard/src/components/autopilot/autopilot-proposals-card.tsx
+  s_d23dc21c3bdc65::t_0444ce8a2bebd5 1-100
+apps/dashboard/src/lib/orpc/router.ts
+  s_d23dc21c3bdc65::t_f7d29367376ae1 6
+  s_d23dc21c3bdc65::t_8fc1c95f3a2876 45
+apps/dashboard/src/constants/onboarding.ts
+  s_d23dc21c3bdc65::t_99bb8fa0ccb5ff 3,7-8
+apps/dashboard/src/components/autopilot/autopilot-setup-form.tsx
+  s_d23dc21c3bdc65::t_8574c4bb7d20fb 1-81,88-96,98,103-129,131-152,154-177,180-203,208-245,252-259,263,266,269-279,284-301,319-331
+  s_d23dc21c3bdc65::t_7fe41dcc75f1db 261-262,264-265,267-268
+  s_d23dc21c3bdc65::t_e3d900d080e48d 97,99-102,130,153,280-283,302-318
+  s_d23dc21c3bdc65::t_f7d29367376ae1 204-207,246-249,260
+  s_d23dc21c3bdc65::t_cb25c9411dc1b9 250-251
+  s_d23dc21c3bdc65::t_bad80b3ef010fd 82-87
+  s_d23dc21c3bdc65::t_f3a22ba3e3afbe 178-179
+apps/dashboard/src/constants/nav.ts
+  s_d23dc21c3bdc65::t_95089c1fc6d7b5 21,39
+  s_d23dc21c3bdc65::t_571ea5969e1964 113,133,227-232
+  s_d23dc21c3bdc65::t_8d539b194808e9 312
+apps/dashboard/src/app/(dashboard)/[slug]/autopilot/page-client.tsx
+  s_d23dc21c3bdc65::t_edec82da083bcc 155-174,214
+  s_d23dc21c3bdc65::t_53c5e4589a9a77 88,211,213
+  s_d23dc21c3bdc65::t_924f20a6a454d7 1-2,4,6-10,16,19-31,33,38,42-47,49-64,66-71,77,79-86,92-145,149,153,175-176,179-181,183-191,209,212,215-216,237-241,243-257
+  s_d23dc21c3bdc65::t_da69230f350a28 65,72-76,78
+  s_d23dc21c3bdc65::t_02ad88a7588b07 3,32
+  s_d23dc21c3bdc65::t_f7d29367376ae1 5,34-37,39-41,87,89-91,150-152
+  s_d23dc21c3bdc65::t_6dd2a2d524e93b 11-15,17-18,48,146-148,154,177-178,182,192-208,210,217-236
+  s_d23dc21c3bdc65::t_e3d900d080e48d 242
+apps/dashboard/src/utils/geo-paths.ts
+  s_d23dc21c3bdc65::t_99bb8fa0ccb5ff 53-59
+packages/ai/src/integrations/slack-post.ts
+  s_d23dc21c3bdc65::t_d4e494eea926c4 38-42,63,69,71,78,216-220
+apps/dashboard/src/routes/-dashboard-ui.tsx
+  s_d23dc21c3bdc65::t_882f69b0e3b4f6 93-95,398-401
+apps/dashboard/src/routes/-onboarding-loaders.ts
+  s_d23dc21c3bdc65::t_7bc57959fbd86a 21,41,270-274,276-277,279-282,286-302
+  s_d23dc21c3bdc65::t_390157f7763f47 244-248,255
+  s_d23dc21c3bdc65::t_e90f5462c2bb36 31,243,275,278,283-285
+apps/dashboard/src/routes/-onboarding-ui.tsx
+  s_d23dc21c3bdc65::t_572b3f6f286b12 16,41-45,115-123
+apps/dashboard/src/components/autopilot/autopilot-status-card.tsx
+  s_d23dc21c3bdc65::t_3c942ebff144f0 1-2,4-125
+  s_d23dc21c3bdc65::t_02ad88a7588b07 3
+apps/dashboard/src/app/api/command-palette/navigate/route.ts
+  s_d23dc21c3bdc65::t_3eb4fdc9efe2f0 17,162-175,178
+apps/dashboard/src/components/autopilot/autopilot-run-sheet.tsx
+  s_d23dc21c3bdc65::t_02ad88a7588b07 245-247
+  s_d23dc21c3bdc65::t_8cd6dbf9b7cb98 1-2,4-40,42,54-84,96-244,248-251
+  s_d23dc21c3bdc65::t_565c7e03b24862 3,41,43-53,85-95
+apps/dashboard/src/routeTree.gen.ts
+  s_d23dc21c3bdc65::t_cefa87a7ee47e5 28,176-180,558,641,725,810,893,976,1060,1228-1234,1806
+apps/dashboard/messages/de.json
+  s_d23dc21c3bdc65::t_571ea5969e1964 2129
+apps/dashboard/src/constants/autopilot.ts
+  s_d23dc21c3bdc65::t_b1fe864459149f 44,47,49-50,53-57,59-70
+  s_d23dc21c3bdc65::t_34328cad7faa2a 29-41
+  s_d23dc21c3bdc65::t_8346d9e3499727 101-130
+  s_d23dc21c3bdc65::t_7f81afacf7c854 99
+  s_d23dc21c3bdc65::t_02ad88a7588b07 172-181
+  s_d23dc21c3bdc65::t_d0f1e9b7044493 13-22,26-28,42-43,45-46,48,71-98
+  s_d23dc21c3bdc65::t_61c07023e787b1 51-52,58
+  s_d23dc21c3bdc65::t_e981772af386fe 23-25
+  s_d23dc21c3bdc65::t_c3d868e115ccb7 1-12,100,131-171,182-218
+apps/dashboard/src/workflows/steps/autopilot-steps.ts
+  s_d23dc21c3bdc65::t_06cddc9a464a4d 1-46
+packages/db/src/constants/autopilot.ts
+  s_d23dc21c3bdc65::t_73c5fcc5200351 1-9,15-22
+  s_d23dc21c3bdc65::t_f7d29367376ae1 10-14
+  s_d23dc21c3bdc65::t_21e68e1b52cd4c 23-34
+apps/dashboard/src/lib/autopilot/llm.ts
+  s_d23dc21c3bdc65::t_fdbb44ca3cb589 1-6,9-16,18,21-34,41-43
+  s_d23dc21c3bdc65::t_975536ca11d00d 7-8,17,19-20,35-40
+apps/dashboard/src/utils/onboarding-progress.ts
+  s_d23dc21c3bdc65::t_99bb8fa0ccb5ff 8,45
+apps/dashboard/src/lib/autopilot/log.ts
+  s_d23dc21c3bdc65::t_6302455b3340d0 1-7,9-35,37-48,50,55-57
+  s_d23dc21c3bdc65::t_8a3a70d548bb95 8,49,51-54
+  s_d23dc21c3bdc65::t_565c7e03b24862 36
+packages/ai/src/utils/octokit.ts
+  s_d23dc21c3bdc65::t_6e080d045145c7 15-45,49-56,61,63
+apps/dashboard/src/workflows/autopilot.ts
+  s_d23dc21c3bdc65::t_06cddc9a464a4d 1-54
+apps/dashboard/src/lib/autopilot/start.ts
+  s_d23dc21c3bdc65::t_7f81afacf7c854 1-40
+apps/dashboard/src/app/onboarding/autopilot/autopilot-step.tsx
+  s_d23dc21c3bdc65::t_572b3f6f286b12 1-30,32-72
+  s_d23dc21c3bdc65::t_deaf68ecd58f9a 31
+apps/dashboard/src/constants/workflow-analytics.ts
+  s_d23dc21c3bdc65::t_06cddc9a464a4d 15
+apps/dashboard/src/lib/autopilot/flag.ts
+  s_d23dc21c3bdc65::t_7f81afacf7c854 1-21
+apps/dashboard/src/components/autopilot/autopilot-history-table.tsx
+  s_d23dc21c3bdc65::t_02ad88a7588b07 26-28
+  s_d23dc21c3bdc65::t_5723d48e21bfb1 1-25,29-124
+apps/dashboard/src/lib/orpc/routers/autopilot.ts
+  s_d23dc21c3bdc65::t_4297516ce3bd09 44-56,65,96,146-147,195-196,224-225,240-241
+  s_d23dc21c3bdc65::t_bad80b3ef010fd 109,150-158,174
+  s_d23dc21c3bdc65::t_4c99fdca57bd28 36,162-167,173
+  s_d23dc21c3bdc65::t_72e7ab8362a015 211
+  s_d23dc21c3bdc65::t_cd09fd377a2823 1-13,16-31,33-35,37-43,57-64,66-95,97,99-108,110-145,148-149,159-161,168-172,175-192,194,197-204,206,212-223,226-239,242-252
+  s_d23dc21c3bdc65::t_17f6011b864812 15,193,205
+  s_d23dc21c3bdc65::t_8a3a70d548bb95 14,32,207-210
+  s_d23dc21c3bdc65::t_e3d900d080e48d 98
+apps/dashboard/tests/sites-feature-flag.test.tsx
+  s_d23dc21c3bdc65::t_ffa74905b19749 230
+apps/dashboard/src/types/autopilot.ts
+  s_d23dc21c3bdc65::t_85e38124261d7c 1-4,6,9-42,45-55
+  s_d23dc21c3bdc65::t_8a3a70d548bb95 83-85
+  s_d23dc21c3bdc65::t_572b3f6f286b12 75-82
+  s_d23dc21c3bdc65::t_deeb36bbbb7e8c 86-124
+  s_d23dc21c3bdc65::t_f7d29367376ae1 5,57-58
+  s_d23dc21c3bdc65::t_ce7639b80befa1 43-44
+  s_d23dc21c3bdc65::t_8346d9e3499727 7-8,56,59-74
+apps/dashboard/src/utils/autopilot-events.ts
+  s_d23dc21c3bdc65::t_deeb36bbbb7e8c 1-95
+packages/db/src/types/autopilot.ts
+  s_d23dc21c3bdc65::t_5f1b505fbf3760 30-31
+  s_d23dc21c3bdc65::t_73c5fcc5200351 1,3-17,20-29,32
+  s_d23dc21c3bdc65::t_21e68e1b52cd4c 2,18-19,33-39
+packages/schemas/src/schemas/dashboard/autopilot.ts
+  s_d23dc21c3bdc65::t_ba5fcb2a15ce0f 6-14,56-61
+  s_d23dc21c3bdc65::t_17f6011b864812 66
+  s_d23dc21c3bdc65::t_788424c1e58401 1-5,15-20,25,30-36
+  s_d23dc21c3bdc65::t_72e7ab8362a015 26-28
+  s_d23dc21c3bdc65::t_390157f7763f47 67-70
+  s_d23dc21c3bdc65::t_8a3a70d548bb95 29
+  s_d23dc21c3bdc65::t_f7d29367376ae1 21-24,37-55,62-65
+apps/dashboard/src/routes/api.cron.autopilot.ts
+  s_d23dc21c3bdc65::t_f274e21c81f857 1-18
+apps/dashboard/src/lib/autopilot/github.ts
+  s_d23dc21c3bdc65::t_dd31e49435fc9c 1-21,23-51,54-69,77,79-82,85-90,92-99,112-113,115-117,120-127,129-133,135-146,155-156,165-177,179-195,202
+  s_d23dc21c3bdc65::t_6e080d045145c7 52-53,78
+  s_d23dc21c3bdc65::t_30781eb88d29ca 149-154,178,196-201
+  s_d23dc21c3bdc65::t_f7d29367376ae1 70-76
+  s_d23dc21c3bdc65::t_487e89f7c2bd99 22
+  s_d23dc21c3bdc65::t_1f0f6faa153408 83-84,91,100-111,114,118-119,128,134,147-148,157-164
+apps/dashboard/src/lib/autopilot/brief.ts
+  s_d23dc21c3bdc65::t_13092046f47390 1-3,11-90,95-120,123-125,154,156
+  s_d23dc21c3bdc65::t_bad80b3ef010fd 4-10,121-122,126-153,155
+  s_d23dc21c3bdc65::t_f7d29367376ae1 91-94
+apps/dashboard/src/lib/hooks/use-nav-visibility.ts
+  s_d23dc21c3bdc65::t_8d539b194808e9 7,19,25
+packages/ai/src/types/slack-delivery.ts
+  s_d23dc21c3bdc65::t_d4e494eea926c4 26-27
+apps/dashboard/messages/en.json
+  s_d23dc21c3bdc65::t_571ea5969e1964 2129
+apps/dashboard/src/utils/autopilot-paths.ts
+  s_d23dc21c3bdc65::t_62fa6a3b09a7f3 19-41
+  s_d23dc21c3bdc65::t_2d7edd132492e8 1-18
+apps/dashboard/src/lib/workflows/start.ts
+  s_d23dc21c3bdc65::t_6864618f2b2968 40,45
+  s_d23dc21c3bdc65::t_06cddc9a464a4d 305-317
+apps/dashboard/src/utils/nav.ts
+  s_d23dc21c3bdc65::t_f7d29367376ae1 3
+  s_d23dc21c3bdc65::t_8d539b194808e9 139-142
+apps/dashboard/src/lib/autopilot/readiness.ts
+  s_d23dc21c3bdc65::t_2dca61b3efd5ad 292,427-429
+  s_d23dc21c3bdc65::t_d864f3c51ab3f7 4-6,16,25,27,31,36,57-61,63,72-84,106-108,128-133,136,138-140,152-156,159-160,165,167-170,172-282,284-285,287,289,293,295-296,299-305,307-313,319-320,322,327,330,333,336-359,377,381,387-394,396-400,403,405,408,411,418,425,430-435,442-445,448-450
+  s_d23dc21c3bdc65::t_d3a64ffc8fab94 17
+  s_d23dc21c3bdc65::t_487e89f7c2bd99 105
+  s_d23dc21c3bdc65::t_3f758f95a08082 3,7-15,18-21,23-24,26,28-30,32-34,37-40,42-46,51-56,62,69-71,85-104,109-127,134-135,137,141-151,157-158,161-164,166,283,286,288,290-291,294,297-298,314-318,321,328-329,331-332,334-335,360-365,369-376,378-380,382-386,395,401-402,404,406-407,409-410,412-415,419-424,436-441,446-447,451-453
+  s_d23dc21c3bdc65::t_f7d29367376ae1 64-68,426
+  s_d23dc21c3bdc65::t_13ec7b031b6232 326
+  s_d23dc21c3bdc65::t_dcf90126696af8 35
+  s_d23dc21c3bdc65::t_49fa4430b9fd2a 22,41,171,306,417
+  s_d23dc21c3bdc65::t_c457b6ee2505fd 1-2,323-325,366-368,416
+  s_d23dc21c3bdc65::t_72e7ab8362a015 47-50
+apps/dashboard/src/lib/autopilot/blog.ts
+  s_d23dc21c3bdc65::t_72e7ab8362a015 39-42,350-352,482-483,507-509
+  s_d23dc21c3bdc65::t_c38692685fb651 33,143-144,155-156,219
+  s_d23dc21c3bdc65::t_4c99fdca57bd28 49-52,98-100,203-205
+  s_d23dc21c3bdc65::t_882ca49cf0a7bc 271
+  s_d23dc21c3bdc65::t_332cdd51b388d7 583-585,591-592
+  s_d23dc21c3bdc65::t_49fa4430b9fd2a 194,196-201,209-210
+  s_d23dc21c3bdc65::t_f75ae8b84a5b4f 363,371-372
+  s_d23dc21c3bdc65::t_9613ade1e77878 445-457,459-464,466-476,480,487,489-491,493,501-503,506
+  s_d23dc21c3bdc65::t_abe0cc00a83645 157
+  s_d23dc21c3bdc65::t_84265c3e9251bf 608
+  s_d23dc21c3bdc65::t_3ae26f05116f8c 3,5-13,22-24,27-32,34-38,43-48,54-76,81-82,87-97,101-110,130-132,135-142,145-154,158-163,165-193,195,202,206-208,211-218,220-223,229-232,241-243,245-246,248-249,251,253-254,319-320,329-331,334,341-342,364-366,369,373-375,377,394,414,436-444,458,521-525,528,530-531,534-535,555-556,571-572,574,578,582,587-588,594,596-602,605-607,609-612,616,620-621
+  s_d23dc21c3bdc65::t_aad9b9d841fd3e 367
+  s_d23dc21c3bdc65::t_c4e4131db36ae6 376
+  s_d23dc21c3bdc65::t_5b2570049979f3 15
+  s_d23dc21c3bdc65::t_24650ad923cb89 111-129
+  s_d23dc21c3bdc65::t_11a11eddd921c5 1-2,14,16-21,25-26,77-80,83-86,259-266,268-270,272-277,279-287,289,294-298,302,321-328,336-339,343-348,353,368,370,380,393,395-400,402-413,416,420-429,431-434,488,492,532,536-539,541,553-554,557-558,560-570,579-581,586,590,593
+  s_d23dc21c3bdc65::t_4fa4c2e8bf9ccd 4
+apps/dashboard/src/components/autopilot/autopilot-runs-table.tsx
+  s_d23dc21c3bdc65::t_02ad88a7588b07 31-34
+  s_d23dc21c3bdc65::t_63c94df28a9b7a 1-30,35-114
+apps/dashboard/src/lib/autopilot/run.ts
+  s_d23dc21c3bdc65::t_1f0f6faa153408 177-190
+  s_d23dc21c3bdc65::t_487e89f7c2bd99 38
+  s_d23dc21c3bdc65::t_565c7e03b24862 69-70
+  s_d23dc21c3bdc65::t_e981772af386fe 11,15-18,47-65,191-192
+  s_d23dc21c3bdc65::t_6707401bd07d4b 250-254
+  s_d23dc21c3bdc65::t_8e552f0129133d 1-10,12-14,19-27,29-33,35-37,39-46,66-68,71-169,172,174-176,193-194,199-203,208-242,244,246-248,260-290,292-299
+  s_d23dc21c3bdc65::t_5f1b505fbf3760 291
+  s_d23dc21c3bdc65::t_62baeccfde672d 28,34,170-171,173,195-198,204-207,243,245,249,255-259
+apps/dashboard/src/lib/autopilot/schedule.ts
+  s_d23dc21c3bdc65::t_eb87985a85ab63 24-32,41-42,62-67
+  s_d23dc21c3bdc65::t_17f6011b864812 33-36,49-50
+  s_d23dc21c3bdc65::t_487e89f7c2bd99 37
+  s_d23dc21c3bdc65::t_f274e21c81f857 1-23,38-40,43-48,51-61,68-77
+apps/dashboard/src/constants/command-palette.ts
+  s_d23dc21c3bdc65::t_e90f5462c2bb36 31,103-110
+  s_d23dc21c3bdc65::t_957ccf122f713c 46
+apps/dashboard/src/types/components/nav.ts
+  s_d23dc21c3bdc65::t_8d539b194808e9 94
+  s_d23dc21c3bdc65::t_571ea5969e1964 18,38
+apps/dashboard/src/types/components/command-palette.ts
+  s_d23dc21c3bdc65::t_957ccf122f713c 20
+apps/dashboard/src/constants/analytics-events.ts
+  s_d23dc21c3bdc65::t_99bb8fa0ccb5ff 43
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "5e087a23b027b4bcd0aa05c46809d84745737a6b",
+  "prompts": {},
+  "sessions": {
+    "s_d23dc21c3bdc65": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "4f6c123f-8e20-4369-bb4f-7c3b3b78269d",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

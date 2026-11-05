@@ -1,0 +1,21 @@
+packages/webhooks/package.json
+  s_a0799efed517c8::t_e175babf63914e 26-27,33,37
+bun.lock
+  ai_agent 857-858,864,868
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "d8c9a8358b992f79c39ee3175c5ca99e82f7b4d5",
+  "prompts": {},
+  "sessions": {
+    "s_a0799efed517c8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cd2fba69-476b-482b-aae2-b39793aeb150",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

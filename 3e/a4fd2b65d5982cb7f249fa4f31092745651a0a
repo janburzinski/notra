@@ -1,0 +1,22 @@
+apps/dashboard/src/components/autopilot/autopilot-tag-input.tsx
+  s_b668483d6cc438::t_e29ff0a7f9be8f 73
+  ai_agent 76
+apps/dashboard/src/components/autopilot/autopilot-repository-picker.tsx
+  s_b668483d6cc438::t_e29ff0a7f9be8f 52
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "3ea4fd2b65d5982cb7f249fa4f31092745651a0a",
+  "prompts": {},
+  "sessions": {
+    "s_b668483d6cc438": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b5de09de-5eee-4b65-a811-2f3d23d1abad",
+        "model": "claude-sonnet-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

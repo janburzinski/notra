@@ -1,0 +1,26 @@
+apps/ui/registry/notra/chat-ui/components/perplexity/perplexity-research.tsx
+  s_722cc11de57c72::t_efc29cdebb5657 20,49,80
+apps/ui/registry/notra/chat-ui/examples/perplexity-preview.tsx
+  s_722cc11de57c72::t_521ebff7a4eb51 186-189
+  s_722cc11de57c72::t_efc29cdebb5657 49,55,154,204,219
+apps/ui/registry/notra/chat-ui/components/perplexity/perplexity-search.tsx
+  s_722cc11de57c72::t_efc29cdebb5657 27,125,128,196-199,252
+apps/ui/registry/notra/chat-ui/components/perplexity/perplexity-search-timing.tsx
+  s_722cc11de57c72::t_efc29cdebb5657 1-6,10,20
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "3136ed45e6ca96894549ccac1780af77dddd4d61",
+  "prompts": {},
+  "sessions": {
+    "s_722cc11de57c72": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0e769-f4b6-7900-87e3-7854599b7356",
+        "model": "gpt-6-sol"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

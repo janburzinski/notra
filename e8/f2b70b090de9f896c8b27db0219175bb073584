@@ -1,0 +1,38 @@
+apps/dashboard/src/app/(dashboard)/[slug]/chat/skeleton.tsx
+  s_0e0865e9491ac9::t_bd57b4025481fa 41-63
+apps/dashboard/src/components/geo/competitor-engine-matrix-card.tsx
+  s_0e0865e9491ac9::t_7757c2b29f6310 132
+apps/dashboard/src/app/(dashboard)/[slug]/chat/new-loading.tsx
+  s_0e0865e9491ac9::t_bd57b4025481fa 1-5
+apps/dashboard/src/routes/-dashboard-ui.tsx
+  s_0e0865e9491ac9::t_bd57b4025481fa 15,343
+apps/dashboard/messages/en.json
+  s_0e0865e9491ac9::t_ca8bc3132d2e79 3970
+apps/dashboard/src/components/api-keys/account-api-keys-section.tsx
+  s_0e0865e9491ac9::t_7fbd5eca9477c8 343,422
+apps/dashboard/src/app/(dashboard)/[slug]/geo/skeleton.tsx
+  s_0e0865e9491ac9::t_d2140fea9cde4b 55
+  s_0e0865e9491ac9::t_f58660bb4f6f3f 14,20-21,33,54,56-72,76,79,86-88
+apps/dashboard/src/components/geo/share-of-voice-chart.tsx
+  s_0e0865e9491ac9::t_7757c2b29f6310 254
+apps/dashboard/src/app/(dashboard)/[slug]/api-keys/page.tsx
+  s_0e0865e9491ac9::t_7fbd5eca9477c8 419-421
+apps/dashboard/messages/de.json
+  s_0e0865e9491ac9::t_ca8bc3132d2e79 3970
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "e8f2b70b090de9f896c8b27db0219175bb073584",
+  "prompts": {},
+  "sessions": {
+    "s_0e0865e9491ac9": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "556dc17f-9709-4dc2-aa99-7e99cc389dba",
+        "model": "claude-sonnet-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

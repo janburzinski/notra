@@ -1,0 +1,28 @@
+apps/dashboard/src/lib/auth/backup-codes.ts
+  s_a0799efed517c8::t_30d6e4d815d581 7
+  s_a0799efed517c8::t_a4e7b1b5ad9df4 90-91,94-95,97,102,104
+apps/dashboard/src/lib/auth/mfa-actions.ts
+  s_a0799efed517c8::t_a4e7b1b5ad9df4 223-226,228,254-259
+  s_a0799efed517c8::t_30d6e4d815d581 62
+packages/sites-server/src/editor.ts
+  s_a0799efed517c8::t_83f2595b9b28ac 59-62,580
+apps/dashboard/src/lib/auth/security-actions.ts
+  s_a0799efed517c8::t_e43d418181cf92 35
+  s_a0799efed517c8::t_7c716527fefbb7 201-202,205,223-224,226,228-229
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "eeee7920b07bf8dd071c5e1713abffff90e4a4f4",
+  "prompts": {},
+  "sessions": {
+    "s_a0799efed517c8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cd2fba69-476b-482b-aae2-b39793aeb150",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

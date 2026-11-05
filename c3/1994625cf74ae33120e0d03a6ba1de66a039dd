@@ -1,0 +1,23 @@
+apps/dashboard/src/components/content/schedule/schedule-video-section.tsx
+  s_85753d5c8f112b::t_a6f9550db0ba46 18,27-28
+apps/dashboard/src/components/content/schedule/schedule-content-dialog.tsx
+  s_85753d5c8f112b::t_a6f9550db0ba46 73-74,105,177,192
+apps/dashboard/src/types/content/schedule.ts
+  s_85753d5c8f112b::t_a6f9550db0ba46 23
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "c31994625cf74ae33120e0d03a6ba1de66a039dd",
+  "prompts": {},
+  "sessions": {
+    "s_85753d5c8f112b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "004d0687-4851-4405-be33-54a42614e6ad",
+        "model": "claude-sonnet-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

@@ -1,0 +1,9 @@
+.github/workflows/sites-e2e.yml
+  ai_agent 50
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "663caf2e5192b1b19f8035424ecd48c647f92cb4",
+  "prompts": {}
+}

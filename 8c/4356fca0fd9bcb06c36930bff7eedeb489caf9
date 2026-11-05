@@ -1,0 +1,19 @@
+apps/ui/registry/notra/composer/components/composer.tsx
+  s_d0abf363d9fa08::t_4baf9b866bfe1c 68,71,73
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "8c4356fca0fd9bcb06c36930bff7eedeb489caf9",
+  "prompts": {},
+  "sessions": {
+    "s_d0abf363d9fa08": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "23ca2782-3db9-4e50-8003-34deb0efe42d",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

@@ -1,0 +1,162 @@
+apps/dashboard/messages/de.json
+  s_e6063122d20d7b::t_672903b9fcce4b 6701
+  s_e6063122d20d7b::t_33c3edec002b78 6693-6695
+  s_e6063122d20d7b::t_5f6d74665450c6 6732
+  s_e6063122d20d7b::t_ecc1d773ca1694 7112-7113
+apps/dashboard/src/lib/hooks/use-discussion.ts
+  s_2d0cdfefb6374f::t_32ea332d5b4a98 90
+  s_2d0cdfefb6374f::t_2d8cf74b841e7e 340
+  s_2d0cdfefb6374f::t_18442337c887cc 159-163,168-170,172
+  s_2d0cdfefb6374f::t_9cdab513b3b21f 4
+  s_2d0cdfefb6374f::t_26cef84a4933d9 191,200,205-207,209-221
+apps/dashboard/src/types/content/history.ts
+  s_2d0cdfefb6374f::t_7f57f9fc73ff72 4-6,11-16,37-39
+  s_e6063122d20d7b::t_eb018ee648c230 32-35
+apps/dashboard/src/utils/comment-submit-id.ts
+  s_2d0cdfefb6374f::t_fcae03b54f30c7 2-7,9-10,12-14
+apps/dashboard/src/schemas/comments.ts
+  s_2d0cdfefb6374f::t_08ef1699496a50 3-4,6-8,14-20,22-25,37-48
+  s_2d0cdfefb6374f::t_4453e3edbb7e86 29-36
+  s_2d0cdfefb6374f::t_a0dd62832452c7 5
+apps/dashboard/src/lib/orpc/routers/comments.ts
+  s_2d0cdfefb6374f::t_1936085b5a9808 223-227
+  s_2d0cdfefb6374f::t_830b77ef3597cd 138-180
+  s_2d0cdfefb6374f::t_23496de4379ec0 15
+  s_2d0cdfefb6374f::t_2515f75fbf4677 7
+  s_2d0cdfefb6374f::t_d6004936f82a1a 213
+packages/db/src/types/discussion-comments.ts
+  s_2d0cdfefb6374f::t_f862aaefd6cf28 1-8
+apps/dashboard/src/types/components/header-actions-portal.ts
+  s_2d0cdfefb6374f::t_7b19cf1efe4b8f 1-5
+apps/dashboard/src/components/dashboard/header.tsx
+  s_2d0cdfefb6374f::t_426c590add4682 30-33
+  s_2d0cdfefb6374f::t_0120e9164a2142 495-502
+  s_2d0cdfefb6374f::t_79fcb01f345d27 150
+apps/dashboard/src/types/content/inline-comments.ts
+  s_2d0cdfefb6374f::t_a073587ba98c54 60
+  s_2d0cdfefb6374f::t_7a921566bf7082 94-95,100-111
+  s_2d0cdfefb6374f::t_6c7b68eb57434a 78
+  s_2d0cdfefb6374f::t_3ceb96db44bc3c 2
+  s_2d0cdfefb6374f::t_2ae96e5426cdfc 81
+  s_2d0cdfefb6374f::t_084b25102f7845 38
+  s_2d0cdfefb6374f::t_84886d13d19248 42
+  s_2d0cdfefb6374f::t_6f4a08e990b57e 1,3-37,39-41,43-50,52-54,56-59,61-62,65-66,71,73-77,79-80,82-88,96-99,112
+  s_2d0cdfefb6374f::t_c3cd53c0e886e3 51,55,63-64,67-70,72
+apps/dashboard/src/utils/comment-anchor.ts
+  s_2d0cdfefb6374f::t_22677972ff4448 272-273
+  s_2d0cdfefb6374f::t_400b4de1fa7545 3,5
+  s_2d0cdfefb6374f::t_7f5ab0064264c6 1-2,4,6-14,16-78,80-144,146-150,152-160,162-167,169-178,183-198,262-263,266-267,274-312
+  s_2d0cdfefb6374f::t_7fcf9525b740f6 161,168,179-182
+  s_2d0cdfefb6374f::t_d9c2d274bfcfda 199-225,227-249
+  s_2d0cdfefb6374f::t_fcc6d9ca588f3b 250-261
+  s_2d0cdfefb6374f::t_b7d42078e0c175 15
+apps/dashboard/src/components/content/content-collaboration.tsx
+  s_e6063122d20d7b::t_70bab894422055 4
+  s_e6063122d20d7b::t_07ceda778993b0 22-26
+  s_e6063122d20d7b::t_826135bdf867fb 63-65,67-68,72-73
+apps/dashboard/src/components/content/inline-comments/content-comment-composer.tsx
+  s_2d0cdfefb6374f::t_31af7803ec8fab 1-7,9-11,13-79,81-82,84-119,121-132
+  s_2d0cdfefb6374f::t_42202d0d4c972c 12
+apps/dashboard/src/components/content/content-history.tsx
+  s_e6063122d20d7b::t_0cb102be423df8 4-15,26-27,31-35,46-50,67-68,72-74,76-100,102-211,218,231-239,242-251,259-260,262-270,273-291,294-376,380-389,391-400,402-412
+apps/dashboard/messages/en.json
+  s_e6063122d20d7b::t_23f9ddadbd1d4e 6732
+  s_e6063122d20d7b::t_10ac0dab5c8a16 6701
+  s_e6063122d20d7b::t_36bde552fb1fff 7112-7113
+  s_e6063122d20d7b::t_6a7c5ade268983 6693-6695
+apps/dashboard/src/components/comments/discussion.tsx
+  s_e6063122d20d7b::t_d3ecda6bcfd112 111-205,207-221
+  s_e6063122d20d7b::t_e70cf0ae464113 233,237-239
+apps/dashboard/src/components/content/editor/lexical-editor.tsx
+  s_2d0cdfefb6374f::t_9d0ac3ad4bec0f 155
+  s_2d0cdfefb6374f::t_e05f5d0322cee3 30
+apps/dashboard/src/components/content/inline-comments/content-comment-thread-card.tsx
+  s_2d0cdfefb6374f::t_07606d1810589e 1-4,6,8-10,12-51,55-56,58-59,76-81,83-88,90-93,98,100-113,115-116,118-119,128,131,134,149-171,203-206
+apps/dashboard/src/lib/hooks/use-content-detail-document.ts
+  s_2d0cdfefb6374f::t_e8541fef9c300d 1127
+apps/dashboard/src/styles/globals.css
+  s_2d0cdfefb6374f::t_5485b68987d888 369-385
+apps/dashboard/src/types/comments.ts
+  s_2d0cdfefb6374f::t_d0c9794198f138 2
+  s_2d0cdfefb6374f::t_4d69f46d43ecd9 35
+apps/dashboard/src/constants/comments.ts
+  s_2d0cdfefb6374f::t_674112a1db30c3 16-17,20-25,27
+  s_2d0cdfefb6374f::t_2758206ee31236 11-15
+  s_2d0cdfefb6374f::t_0cd11537ee66f2 18-19
+  s_2d0cdfefb6374f::t_839bbbe6cb6aa0 26
+apps/dashboard/src/components/dashboard/content-topbar-title.tsx
+  s_2d0cdfefb6374f::t_e74f8d7d653089 3-10,13,16,32-33,35-48,50-64
+apps/dashboard/src/components/content/publish-content-to-github-dialog.tsx
+  s_2d0cdfefb6374f::t_8d0a510dcd8c90 215,218
+  s_2d0cdfefb6374f::t_b4c577bc1ca458 95-96
+apps/dashboard/src/components/content/editor/plugins/comment-anchors-plugin.tsx
+  s_2d0cdfefb6374f::t_0888ac6e6876bf 1-39,43-80,82-91,93-106,108-168,180-209
+apps/dashboard/src/components/content/editor/plugins/floating-toolbar-plugin.tsx
+  s_2d0cdfefb6374f::t_7700ebca7059b2 301-310,312-333
+  s_2d0cdfefb6374f::t_d1c04ff49dc2ba 392
+  s_2d0cdfefb6374f::t_f4672dc6de7cd8 63
+  s_2d0cdfefb6374f::t_ce2365bdc98de9 5
+  s_2d0cdfefb6374f::t_7f0f796a9fa7f0 27,32-33
+  s_2d0cdfefb6374f::t_a499fbc5ddfd98 472
+apps/dashboard/src/types/content/detail.ts
+  s_2d0cdfefb6374f::t_a4e27c97e00506 24-25
+apps/dashboard/src/utils/comment-anchor.test.ts
+  s_2d0cdfefb6374f::t_753eaad484596b 12
+  s_2d0cdfefb6374f::t_0ec586d7628a35 19
+  s_2d0cdfefb6374f::t_521c11128cae48 81-109
+  s_2d0cdfefb6374f::t_e884413bd95e94 247-251
+  s_2d0cdfefb6374f::t_220bc7fe89915a 1-11,13-18,20-42,45-47,49-60,62-66,68-80,110-165,167-170,172-174,177-246,252-264,294-359
+  s_2d0cdfefb6374f::t_953b1c1fae2e00 171,175-176
+  s_2d0cdfefb6374f::t_276defe3724dbf 265
+apps/dashboard/src/lib/hooks/use-content-comment-rail.ts
+  s_2d0cdfefb6374f::t_6b7e8a9dcc67b9 1-2,4,9-10,13-74,76-77,85,99,101
+apps/dashboard/src/components/comments/comment-resolution.tsx
+  s_e6063122d20d7b::t_e0aeb687cd9996 3-4,21-37
+apps/dashboard/src/components/content/inline-comments/content-comments-provider.tsx
+  s_2d0cdfefb6374f::t_010ed61eb1e7c1 1-66,68-73,76-91,93-129,135-150,155-168,173-180,182-184,187-206,211,213-229,238,243,246,249-289,296-298,301-303,306-314,319-325,331-349,351-353,355-367,369-371,373,375
+  s_2d0cdfefb6374f::t_85f215bf6046dc 74-75
+  s_2d0cdfefb6374f::t_a7dd68fb56e806 290-295,299-300,304-305
+  s_2d0cdfefb6374f::t_084982c291c3d6 209-210
+  s_2d0cdfefb6374f::t_28cafc39007ede 67
+  s_2d0cdfefb6374f::t_1d2ef4b0b27025 239-242
+  s_2d0cdfefb6374f::t_b3334355e11736 368
+  s_2d0cdfefb6374f::t_54dbd07aadb08e 130-134
+  s_2d0cdfefb6374f::t_77fe151f795540 354
+  s_2d0cdfefb6374f::t_ddb4bbd600d7ed 326-330
+  s_2d0cdfefb6374f::t_fae807606126f0 350
+packages/db/src/schema.ts
+  s_2d0cdfefb6374f::t_b0742c68266c9d 67
+  s_2d0cdfefb6374f::t_96f21bd4ce5f3b 4145-4146,4148
+  s_2d0cdfefb6374f::t_a2dcf9891135bc 4111
+apps/dashboard/src/components/content/content-save-conflict.tsx
+  s_e6063122d20d7b::t_298f981147f395 3-4
+  s_2d0cdfefb6374f::t_fcaeb2b3d878d6 14-22,27-30,34-37,42,46-49,52-53,66-76,78-87,89-114,117-118,121,125-129,131-135,138-142,149-151,153,155,160
+  s_e6063122d20d7b::t_6c3269dc22f95c 147
+  s_e6063122d20d7b::t_016d9d1952192f 77
+apps/dashboard/src/components/dashboard/header-actions-portal.tsx
+  s_2d0cdfefb6374f::t_47d3e8de0f9822 1-56
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "9a7a029486b93bf62dea509c97ad17012b006ada",
+  "prompts": {},
+  "sessions": {
+    "s_2d0cdfefb6374f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "fa50e0d3-ac5f-489d-8701-0b964342ac2b",
+        "model": "unknown"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    },
+    "s_e6063122d20d7b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ea5b232f-7ae8-4c41-b980-af2d61b46923",
+        "model": "unknown"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

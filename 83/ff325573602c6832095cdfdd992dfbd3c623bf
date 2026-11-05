@@ -1,0 +1,25 @@
+apps/dashboard/src/lib/orpc/routers/integrations.ts
+  s_996bc2fa8dc596::t_d35c210796b2e0 2034-2035,2106-2107,2171-2172,2266-2267
+apps/dashboard/src/lib/demo/sandbox.ts
+  s_996bc2fa8dc596::t_d35c210796b2e0 310-332,334-335
+apps/api/src/constants/demo.ts
+  s_996bc2fa8dc596::t_d35c210796b2e0 7-8,10
+apps/dashboard/tests/fixtures/demo-storage.fixture.ts
+  s_996bc2fa8dc596::t_6a0711eb0be5ee 196-198,202-204
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "83ff325573602c6832095cdfdd992dfbd3c623bf",
+  "prompts": {},
+  "sessions": {
+    "s_996bc2fa8dc596": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "37826b10-31a3-42fa-be2c-6de31ce5ea10",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

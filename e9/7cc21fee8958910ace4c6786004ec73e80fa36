@@ -1,0 +1,49 @@
+apps/dashboard/src/components/providers/geo-live-provider.tsx
+  s_1493644349eb54::t_1cc99da29fbedd 3,7,10,54,57
+packages/sites-server/src/deployments.ts
+  s_1493644349eb54::t_c182ce94ce414b 324,352,381-387,389-392
+  s_1493644349eb54::t_73f8fba0f054df 24,96-105,137,144-148,254,313-317
+  s_1493644349eb54::t_f528f0869da77f 114,126-131
+packages/ai/src/realtime.ts
+  s_1493644349eb54::t_30f2bc2123d10a 1,37
+  s_1493644349eb54::t_558335e911e377 18
+packages/sites-core/src/constants/sites.ts
+  s_1493644349eb54::t_558335e911e377 196
+apps/dashboard/src/lib/hooks/use-guarded-realtime.ts
+  s_1493644349eb54::t_30f2bc2123d10a 3
+  s_1493644349eb54::t_31e0651d7f44d4 1-2,4-12,14-50
+  s_1493644349eb54::t_edf77f87a2dcbe 13
+packages/sites-core/src/utils/live.ts
+  s_1493644349eb54::t_558335e911e377 1-5
+packages/sites-server/src/smart-deployments.ts
+  s_1493644349eb54::t_c182ce94ce414b 22,190,312-315
+apps/dashboard/src/constants/sites.ts
+  s_1493644349eb54::t_1cc99da29fbedd 215-216
+apps/dashboard/src/components/providers/sites-live-provider.tsx
+  s_1493644349eb54::t_a1936d5910f8ca 1-49
+apps/dashboard/src/lib/realtime/channel-acl.ts
+  s_1493644349eb54::t_66aa29a917ebde 12,77-83
+apps/dashboard/src/routes/-sites-ui.tsx
+  s_1493644349eb54::t_a1936d5910f8ca 11,43,45-51,63
+  s_1493644349eb54::t_e6d2f691251b42 44
+packages/sites-server/src/live.ts
+  s_1493644349eb54::t_34a27276ee5f3d 1-25
+apps/dashboard/src/types/components/sites.ts
+  s_1493644349eb54::t_a1936d5910f8ca 721-725
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "e97cc21fee8958910ace4c6786004ec73e80fa36",
+  "prompts": {},
+  "sessions": {
+    "s_1493644349eb54": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d134c4b9-c28e-47f3-a8ee-5d16b21c4720",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

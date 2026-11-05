@@ -1,0 +1,19 @@
+apps/dashboard/src/lib/hooks/use-geo-competitor-domain-backfill.ts
+  s_f53a31e6153529::t_58313e1ac08037 32,36,41-43,59
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "73f36a4878c439146954734b199b83189bc63baa",
+  "prompts": {},
+  "sessions": {
+    "s_f53a31e6153529": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ccb45782-d0f1-430f-b96e-5816ba3ceebf",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

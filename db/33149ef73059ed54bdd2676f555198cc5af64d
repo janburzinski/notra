@@ -1,0 +1,41 @@
+apps/dashboard/src/components/settings/organizations-section.tsx
+  s_840bed0d7e97b9::t_c0b3006dd8f36a 169-170,199
+  s_840bed0d7e97b9::t_3056d234230470 173,218
+apps/dashboard/src/constants/settings.ts
+  s_840bed0d7e97b9::t_25753aa4fd72d6 75,77-80,141-158
+apps/dashboard/src/components/settings/connected-accounts-section.tsx
+  s_840bed0d7e97b9::t_c0b3006dd8f36a 82
+  s_840bed0d7e97b9::t_3056d234230470 98-99,148
+apps/dashboard/src/components/settings/panes/appearance-pane.tsx
+  s_840bed0d7e97b9::t_25753aa4fd72d6 8-10,115-117
+apps/dashboard/src/components/settings/chat-section.tsx
+  s_840bed0d7e97b9::t_3056d234230470 17
+apps/dashboard/src/types/settings/modal.ts
+  ai_agent 27-32
+apps/dashboard/src/lib/hooks/use-settings-nav-labels.ts
+  s_840bed0d7e97b9::t_25753aa4fd72d6 14
+apps/dashboard/messages/en.json
+  s_840bed0d7e97b9::t_25753aa4fd72d6 11,14-15,61-62
+apps/dashboard/messages/de.json
+  s_840bed0d7e97b9::t_25753aa4fd72d6 11,14-15,61-62
+apps/dashboard/src/components/settings/privacy-section.tsx
+  s_840bed0d7e97b9::t_3056d234230470 16
+apps/dashboard/src/components/settings/language-section.tsx
+  s_840bed0d7e97b9::t_272be0e4926802 27-28
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "db33149ef73059ed54bdd2676f555198cc5af64d",
+  "prompts": {},
+  "sessions": {
+    "s_840bed0d7e97b9": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "2230cf4a-5aeb-410b-bdf3-e5a69cccd0c6",
+        "model": "claude-sonnet-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

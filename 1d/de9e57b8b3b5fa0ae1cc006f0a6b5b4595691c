@@ -1,0 +1,23 @@
+packages/geo-core/src/geo/programs.ts
+  s_4e2cd74095b28c::t_663d3b27ae8cda 699-710
+apps/api/src/routes/geo-settings.ts
+  s_4e2cd74095b28c::t_663d3b27ae8cda 46
+apps/api/src/runtime/geo.ts
+  s_4e2cd74095b28c::t_663d3b27ae8cda 122
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "1dde9e57b8b3b5fa0ae1cc006f0a6b5b4595691c",
+  "prompts": {},
+  "sessions": {
+    "s_4e2cd74095b28c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "70a40795-46d3-4b33-aba5-6c32d88bd65b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

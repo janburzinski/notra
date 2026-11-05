@@ -1,0 +1,19 @@
+apps/dashboard/src/lib/workflow-engine/run-view.ts
+  s_985d322a22a6f8::t_12d58551147cca 3,14,18-48,80-83,92-94,99,104,106
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "77031088dba8b4ee9368db27cf6fc2466578593a",
+  "prompts": {},
+  "sessions": {
+    "s_985d322a22a6f8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "efce3ecd-755b-429d-9b5c-035b1f703d5b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

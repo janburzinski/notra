@@ -1,0 +1,23 @@
+apps/dashboard/src/components/command-palette/command-palette.tsx
+  s_4d1b63d4a09c89::t_eeaf41c0597812 34-41,599-605,607-631
+apps/dashboard/messages/en.json
+  s_4d1b63d4a09c89::t_e1528c21fd0235 6703
+apps/dashboard/messages/de.json
+  s_4d1b63d4a09c89::t_598fbbc2c0eec0 6703
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "848795f0076856e546b7c89498b299fe62088d01",
+  "prompts": {},
+  "sessions": {
+    "s_4d1b63d4a09c89": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "fdabbe7b-dec2-4be2-9c37-c8280c2575c9",
+        "model": "claude-sonnet-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

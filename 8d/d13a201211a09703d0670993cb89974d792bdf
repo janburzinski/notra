@@ -1,0 +1,23 @@
+examples/sites/cloudflare/style.css
+  s_679a387b188ae8::t_2a2e91eebaec95 48
+examples/sites/custom-components/style.css
+  s_679a387b188ae8::t_2a2e91eebaec95 1-3,8
+examples/sites/match-your-website/style.css
+  s_679a387b188ae8::t_1c87d6ded3dea8 1-4,22
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "8dd13a201211a09703d0670993cb89974d792bdf",
+  "prompts": {},
+  "sessions": {
+    "s_679a387b188ae8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5cda3aa5-c3b0-46de-afc0-446f42005067",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

@@ -1,0 +1,49 @@
+packages/db/src/schema.ts
+  s_db5c07f8abde8f::t_bdfd9b7d93ffc6 4499-4500
+apps/dashboard/src/app/(dashboard)/[slug]/autopilot/page-client.tsx
+  s_db5c07f8abde8f::t_bdfd9b7d93ffc6 100-101,162-188,193-206
+apps/dashboard/src/routeTree.gen.ts
+  s_db5c07f8abde8f::t_bdfd9b7d93ffc6 405-406,620-621,627,707-708,714,795-796,802,884-885,891,971-972,978,1058-1059,1065,1140-1141,1147,1522-1535,1571-1577
+apps/dashboard/src/components/autopilot/autopilot-run-panel.tsx
+  s_db5c07f8abde8f::t_bdfd9b7d93ffc6 19,213
+apps/dashboard/src/components/autopilot/autopilot-rules-section.tsx
+  s_db5c07f8abde8f::t_bdfd9b7d93ffc6 47
+apps/dashboard/src/app/(dashboard)/[slug]/autopilot/findings/[id]/page-client.tsx
+  s_db5c07f8abde8f::t_bdfd9b7d93ffc6 10,214-215
+apps/dashboard/messages/de.json
+  s_a2e9acdd37bd1a::t_eb333bf23a256f 8548
+apps/dashboard/src/components/sites/pages/site-integrations-page.tsx
+  s_db5c07f8abde8f::t_bdfd9b7d93ffc6 129-141,143-148
+apps/dashboard/src/components/autopilot/autopilot-settings-panel.tsx
+  s_db5c07f8abde8f::t_bdfd9b7d93ffc6 138
+packages/sites-core/src/utils/integrations.ts
+  s_db5c07f8abde8f::t_bdfd9b7d93ffc6 101
+apps/dashboard/messages/en.json
+  s_a2e9acdd37bd1a::t_eb333bf23a256f 8548
+apps/dashboard/src/lib/autopilot/pull-request-events.ts
+  s_db5c07f8abde8f::t_bdfd9b7d93ffc6 280,295-303,309
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "0c22521420861fabcbbfe8a8bb70dcb1f655ddca",
+  "prompts": {},
+  "sessions": {
+    "s_a2e9acdd37bd1a": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a153c0-648e-74a3-9bef-15bf1ca8d1b4",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    },
+    "s_db5c07f8abde8f": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a158fb-61d8-7fa2-9b4c-b2ee86fbf456",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

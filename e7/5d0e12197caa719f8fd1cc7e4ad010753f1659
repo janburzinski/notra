@@ -1,0 +1,29 @@
+apps/dashboard/src/hooks/use-github-repository-selection.ts
+  s_32ffa205186666::t_5fe44136bc0c31 39-44,47,49,53
+  s_32ffa205186666::t_90d25e841dcefa 93
+  s_32ffa205186666::t_f0c1d92077aaa0 62
+packages/ai/src/integrations/github.ts
+  s_32ffa205186666::t_7d834398a744a2 973,979-994
+  s_32ffa205186666::t_ebf8beb0f60746 1187-1190
+apps/dashboard/src/components/integrations/github/github-create-branch-form.tsx
+  s_32ffa205186666::t_d3a53322f6d304 52,56
+  s_32ffa205186666::t_63f8e8fc2273cd 22
+  ai_agent 53-55
+  s_32ffa205186666::t_15496907e53626 70-72
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "e75d0e12197caa719f8fd1cc7e4ad010753f1659",
+  "prompts": {},
+  "sessions": {
+    "s_32ffa205186666": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "617d1014-f81a-4766-8cc5-2f058ac5cd82",
+        "model": "grok-4.7"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

@@ -1,0 +1,86 @@
+packages/ai/src/utils/load-brand-guideline-source.ts
+  s_f54b06300e2289::t_8205827319129f 2,25
+  s_f54b06300e2289::t_b3ebbb03af229f 1,3-23,26-28
+apps/dashboard/src/app/(dashboard)/[slug]/brand/identity/components/guidelines-source-pdf-section.tsx
+  s_f54b06300e2289::t_c745f74e9eeb90 31,140,196-200
+  s_f54b06300e2289::t_31f776b7748e28 13,19,29-30,37,40,62-66,75-80,84,88-89,136-139,141-143,148,172
+apps/dashboard/src/types/brand-guidelines.ts
+  s_f54b06300e2289::t_449788721eb728 190-207
+packages/ai/src/constants/brand-guideline-source.ts
+  s_f54b06300e2289::t_b3ebbb03af229f 1-9
+apps/dashboard/messages/de.json
+  s_f54b06300e2289::t_1edced049a30f0 1092-1097
+  s_f54b06300e2289::t_31f776b7748e28 1469
+apps/dashboard/src/workflows/steps/on-demand-generation-step.ts
+  s_f54b06300e2289::t_055914819d9afa 5,67-69
+apps/dashboard/src/workflows/steps/event-generation-step.ts
+  s_f54b06300e2289::t_055914819d9afa 4,26-28
+packages/ai/src/types/context-dev.ts
+  s_f54b06300e2289::t_8205827319129f 139,141
+apps/dashboard/src/lib/brand-guidelines.ts
+  s_f54b06300e2289::t_449788721eb728 33,35-36
+  s_f54b06300e2289::t_055914819d9afa 40-42,511-512
+  s_f54b06300e2289::t_bed4a8a0f89204 1,3,11,22,30,487,490-492,495-497,499-510,514-515,519-521,525-526,528-532,535-539,542,544,546-547,549-550,552,554-555,557-560,562,564-577,585-599,602-604,608-609,620,624,635-640,642-643,648-650,652-653
+  s_f54b06300e2289::t_bd88cf6e73231b 534
+packages/schemas/src/schemas/dashboard/brand-guidelines.ts
+  s_f54b06300e2289::t_38123b33956dbe 101-108,110,115,122
+  s_f54b06300e2289::t_449788721eb728 6-9
+apps/dashboard/src/lib/upload/client.ts
+  s_f54b06300e2289::t_93f5363d079faf 22-23,25,28,32,64
+packages/schemas/src/schemas/dashboard/upload.ts
+  s_f54b06300e2289::t_93f5363d079faf 53
+packages/ai/src/agents/geo-writer.ts
+  s_f54b06300e2289::t_e5eec0e796de5c 52,59,550-551,561
+packages/ai/src/utils/brand-guideline-source.test.ts
+  s_f54b06300e2289::t_22a5ed5f4fcaec 3,44-48,52
+  s_f54b06300e2289::t_055914819d9afa 49-51
+apps/dashboard/src/lib/upload/validate.ts
+  s_f54b06300e2289::t_51e3a892d823f1 30-51,70-72
+apps/dashboard/src/types/brand-identity.ts
+  s_f54b06300e2289::t_fac120e6fbe0c6 10
+  s_f54b06300e2289::t_af1113ec2b90f7 47-50
+packages/ai/src/utils/brand-guideline-source.ts
+  s_f54b06300e2289::t_b3ebbb03af229f 1-7,9-10,12-16,25,28-29,31
+apps/dashboard/src/lib/orpc/routers/brand.ts
+  s_f54b06300e2289::t_449788721eb728 1003
+apps/dashboard/src/utils/brand-guideline-pdf.ts
+  s_f54b06300e2289::t_61c71a5de751d1 1-29
+packages/schemas/src/constants/dashboard/upload.ts
+  s_f54b06300e2289::t_38123b33956dbe 41-42
+apps/dashboard/src/lib/hooks/use-brand-guidelines.ts
+  s_f54b06300e2289::t_fac120e6fbe0c6 22-26
+  s_f54b06300e2289::t_af1113ec2b90f7 65-66,233,265
+packages/ai/src/tools/organization.ts
+  s_f54b06300e2289::t_22a5ed5f4fcaec 6,78,118-119
+apps/dashboard/messages/en.json
+  s_f54b06300e2289::t_31f776b7748e28 1461,1469
+  s_f54b06300e2289::t_1edced049a30f0 1092-1097
+packages/ai/src/utils/context-dev.ts
+  s_f54b06300e2289::t_8205827319129f 11,558-561,565-566,569,571,574
+  s_f54b06300e2289::t_e5eec0e796de5c 36
+  s_f54b06300e2289::t_52bf4f1f5d23a2 563-564,568
+apps/dashboard/src/workflows/steps/schedule-generation-step.ts
+  s_f54b06300e2289::t_055914819d9afa 5,61-62
+apps/dashboard/src/constants/brand-guidelines.ts
+  s_f54b06300e2289::t_449788721eb728 29-30
+apps/dashboard/src/types/hooks/brand-guidelines.ts
+  s_f54b06300e2289::t_af1113ec2b90f7 119-127
+packages/ai/src/constants/context-dev.ts
+  s_f54b06300e2289::t_8205827319129f 4
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "6dd587c002f12b67f7f7dc67567e705972ea01be",
+  "prompts": {},
+  "sessions": {
+    "s_f54b06300e2289": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "1bb5baa0-60a5-4b8a-aed8-b90b015797b0",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

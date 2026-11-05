@@ -1,0 +1,35 @@
+apps/docs/sites/customize/seo.mdx
+  s_679a387b188ae8::t_d0a96328c985fb 39
+examples/sites/custom-components/style.css
+  s_679a387b188ae8::t_80eec800ee3f56 1-2,7
+examples/sites/match-your-website/style.css
+  s_679a387b188ae8::t_80eec800ee3f56 1-2,20
+apps/docs/sites/domains/nextjs.mdx
+  s_679a387b188ae8::t_d637c1a2d451ff 65
+apps/docs/sites/domains/vercel.mdx
+  s_679a387b188ae8::t_d637c1a2d451ff 60
+packages/sites-server/tests/smart-deployments-postgres.test.ts
+  s_679a387b188ae8::t_dd7fa8fe925fb6 394
+apps/sites-builder/src/lib/theme.ts
+  s_679a387b188ae8::t_928a618be01c87 35-37,41-43,49-51
+packages/sites-server/src/pipeline.ts
+  s_679a387b188ae8::t_3f8e54df8fa5d2 66-69,85
+apps/sites-builder/src/styles/global.css
+  s_679a387b188ae8::t_928a618be01c87 27-29,31-32,55,57-58
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "5eedab7a58d57991c5817b2a6f1cf116f3605fb9",
+  "prompts": {},
+  "sessions": {
+    "s_679a387b188ae8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5cda3aa5-c3b0-46de-afc0-446f42005067",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

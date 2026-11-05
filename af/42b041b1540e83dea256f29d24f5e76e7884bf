@@ -1,0 +1,23 @@
+infra/observability/README.md
+  s_0b8998e437ee65::t_47a36bbf58ec8b 40-41
+infra/observability/check-queries.mjs
+  s_0b8998e437ee65::t_5135df19b380db 324
+infra/observability/config.test.mjs
+  s_0b8998e437ee65::t_47a36bbf58ec8b 151,165,174-178,182
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "af42b041b1540e83dea256f29d24f5e76e7884bf",
+  "prompts": {},
+  "sessions": {
+    "s_0b8998e437ee65": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a13e5a-65de-7e41-8940-524865c48441",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

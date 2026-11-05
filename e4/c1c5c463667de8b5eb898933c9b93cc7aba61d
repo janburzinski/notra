@@ -1,0 +1,25 @@
+apps/web/src/components/mcp-use-cases/use-case-prompt-block.tsx
+  s_f18de9a04242c6::t_4a87eed456982e 6,16,54,56,60-86
+apps/web/src/components/mcp-use-cases/use-case-category-pill.tsx
+  s_f18de9a04242c6::t_4a87eed456982e 6
+apps/web/src/components/mcp-use-cases/use-case-detail-view.tsx
+  s_f18de9a04242c6::t_4a87eed456982e 1,15
+apps/web/src/components/mcp-use-cases/use-cases-browser.tsx
+  s_f18de9a04242c6::t_4a87eed456982e 5,30-32,36-37,52,54,118-127,129,131-132
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "e4c1c5c463667de8b5eb898933c9b93cc7aba61d",
+  "prompts": {},
+  "sessions": {
+    "s_f18de9a04242c6": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "df56ede8-f316-461b-918a-4921d954c4f6",
+        "model": "claude-fable-5-1"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

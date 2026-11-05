@@ -1,0 +1,20 @@
+packages/ai/src/utils/update-published-content.ts
+  ai_agent 64
+  s_de8ac50ae39290::t_d163bf6bc8dc92 83-98,109
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "7cb5eb7fcc06cafec4a76ae6e35fbf09ba4fdf9c",
+  "prompts": {},
+  "sessions": {
+    "s_de8ac50ae39290": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "632f80fc-df24-4671-95a8-4741af8eb2bc",
+        "model": "claude-fable-5-1"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

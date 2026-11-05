@@ -1,0 +1,28 @@
+apps/dashboard/messages/en.json
+  s_09fcb2ae3d83ec::t_36409c5eb0b2c2 3337
+apps/dashboard/src/components/geo/share-of-voice-chart.tsx
+  s_09fcb2ae3d83ec::t_750998da8dce8f 227
+  s_09fcb2ae3d83ec::t_36409c5eb0b2c2 239
+apps/dashboard/src/utils/geo-share-of-voice.ts
+  s_09fcb2ae3d83ec::t_750998da8dce8f 169-171,228,245-246
+apps/dashboard/src/components/geo/competitors-table.tsx
+  s_09fcb2ae3d83ec::t_36409c5eb0b2c2 128-134,136
+apps/dashboard/messages/de.json
+  s_09fcb2ae3d83ec::t_36409c5eb0b2c2 3337
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "f4e46cb616e360042bda4a9ab4086ac91a540823",
+  "prompts": {},
+  "sessions": {
+    "s_09fcb2ae3d83ec": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "4f04e3c6-7125-4e05-a0f7-788dad1a035b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

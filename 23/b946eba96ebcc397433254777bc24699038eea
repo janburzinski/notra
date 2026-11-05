@@ -1,0 +1,63 @@
+packages/db/src/constants/geo-shelf.ts
+  s_589a4025f23504::t_eb81d8c3239185 1-9
+apps/dashboard/src/utils/geo-share-of-voice.ts
+  s_589a4025f23504::t_3e86961adf6bf3 12
+  s_589a4025f23504::t_a23578a9151b5d 1-6,30-103,127,142,145-148,185-195
+apps/dashboard/src/lib/geo-shelf/citations.ts
+  s_589a4025f23504::t_37384dfc689191 3,72,87
+packages/geo-core/src/geo/shelf.ts
+  s_589a4025f23504::t_eb81d8c3239185 1
+  s_589a4025f23504::t_1454e3c28ba782 4,22-24
+apps/dashboard/src/constants/geo-shelf.ts
+  s_589a4025f23504::t_03aebf5d9063f9 191
+apps/dashboard/src/components/geo/shelf/shelf-table.tsx
+  s_589a4025f23504::t_cf9e95fb7371fd 107
+  s_589a4025f23504::t_d3a9c2ee61473b 51,86-95
+  s_589a4025f23504::t_000c8fc1396692 57,60
+  s_589a4025f23504::t_03aebf5d9063f9 97-106
+packages/schemas/src/utils/dashboard/shelf-url.ts
+  s_589a4025f23504::t_37384dfc689191 136-138
+  s_589a4025f23504::t_eb81d8c3239185 1-2
+apps/dashboard/src/components/geo/shelf/shelf-board.tsx
+  s_589a4025f23504::t_9346633c2c5155 43,176-178
+apps/dashboard/src/lib/geo-shelf/store.ts
+  s_589a4025f23504::t_eb81d8c3239185 1
+  s_589a4025f23504::t_37384dfc689191 75-84,220,240,293
+apps/dashboard/src/components/geo/share-of-voice-chart.tsx
+  s_589a4025f23504::t_a23578a9151b5d 154-165,195,199-206,275-287,290-291
+  s_589a4025f23504::t_ef2cab8caefbea 69-70,289,292-293
+  s_589a4025f23504::t_03aebf5d9063f9 68,102,124-134,301,313
+  s_589a4025f23504::t_2ac2065138c871 5,14
+apps/dashboard/src/utils/geo-shelf.ts
+  s_589a4025f23504::t_d3a9c2ee61473b 3-5,433-455
+apps/dashboard/src/components/geo/share-of-voice-brands-dialog.tsx
+  s_589a4025f23504::t_decdaaeed31bc0 15-20,40-42,82,85,114-132,167-169,194-201,203-247,249,256-329,337-338,340-341
+  s_589a4025f23504::t_d86841bba2e82d 5,25,33-37,102-109,184,186-190,250-255
+apps/dashboard/src/utils/geo-share-of-voice.test.ts
+  s_589a4025f23504::t_2ac2065138c871 1-77
+apps/dashboard/src/lib/geo-shelf/url.test.ts
+  s_589a4025f23504::t_92d20f2f2574d0 6,33-44
+apps/dashboard/src/components/geo/shelf/shelf-detail-dialog.tsx
+  s_589a4025f23504::t_d3a9c2ee61473b 21,133-147
+apps/dashboard/src/components/geo/competitor-modal.tsx
+  s_589a4025f23504::t_3e86961adf6bf3 4-9,14-16,21,29-32,34-35,37-38
+apps/dashboard/src/lib/geo-shelf/citations.test.ts
+  s_589a4025f23504::t_f8f0381f88005b 4,77-87
+  s_589a4025f23504::t_03aebf5d9063f9 27-38
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "23b946eba96ebcc397433254777bc24699038eea",
+  "prompts": {},
+  "sessions": {
+    "s_589a4025f23504": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "47d77ed5-a07d-4963-aa3f-8e0c1cb6fa49",
+        "model": "claude-fable-5-1"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

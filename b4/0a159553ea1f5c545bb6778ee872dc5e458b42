@@ -1,0 +1,29 @@
+apps/dashboard/src/app/(dashboard)/[slug]/integrations/linear/[id]/page-client.tsx
+  s_8ff470b5e79e4a::t_a8b0b8fe04636a 16
+  s_8ff470b5e79e4a::t_8546432358fe0e 85,94,127,241
+apps/dashboard/src/components/geo/geo-upgrade-gate.tsx
+  s_8ff470b5e79e4a::t_80217252a2cecc 98-111
+  s_8ff470b5e79e4a::t_8546432358fe0e 96-97,112
+apps/dashboard/src/app/(dashboard)/[slug]/geo/gaps/page-client.tsx
+  s_8ff470b5e79e4a::t_8546432358fe0e 64-65
+apps/dashboard/src/components/sites/sites-page-shell.tsx
+  s_8ff470b5e79e4a::t_80217252a2cecc 7
+apps/dashboard/src/app/(dashboard)/[slug]/integrations/linear/[id]/skeleton.tsx
+  s_8ff470b5e79e4a::t_c6b0cd4df7ae39 6-7,11,31
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "b40a159553ea1f5c545bb6778ee872dc5e458b42",
+  "prompts": {},
+  "sessions": {
+    "s_8ff470b5e79e4a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "04e358e8-8889-4650-9310-e338b0a5de3e",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

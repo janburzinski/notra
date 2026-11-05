@@ -1,0 +1,26 @@
+apps/dashboard/scripts/workflow-production.test.mjs
+  s_9d7e1f86afd013::t_fcf4bbf1a76ef7 10
+  s_9d7e1f86afd013::t_8c02592b9318ca 31
+apps/dashboard/package.json
+  s_9d7e1f86afd013::t_1ce2a4fe5dc569 8
+apps/dashboard/scripts/copy-hb-wasm.mjs
+  s_9d7e1f86afd013::t_2a045d49afff50 12-13
+  s_9d7e1f86afd013::t_6732e9b6ab2f6c 5-6,8
+  s_9d7e1f86afd013::t_1ce2a4fe5dc569 1-4,7,9-11,14-16
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "f0f455e37a8705d1ac786516fab2b7ef88188272",
+  "prompts": {},
+  "sessions": {
+    "s_9d7e1f86afd013": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "1851fdd4-4e97-4a89-ae76-1d91312a3939",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

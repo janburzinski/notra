@@ -1,0 +1,105 @@
+packages/geo-core/tests/constants/coding-agents.ts
+  ai_agent 2-8,10-11
+packages/sites-server/package.json
+  ai_agent 22,28
+apps/agent/tests/slack-channel.test.ts
+  ai_agent 53,58,109,111-125,199-200
+packages/geo-core/tests/coding-agent-scan.test.ts
+  ai_agent 73
+bun.lock
+  ai_agent 746,752,3071-3072,3439-3446,5747-5749,7357,8657,9303
+packages/sites-server/src/schemas/github-source.ts
+  ai_agent 1-14
+packages/sites-server/tests/github-source.test.ts
+  ai_agent 1-3,7-10,12-34,36-41,43-105,107-125,127-146,148-167,169-190,192-228,230,232-250,252-335,337-366,368-387,389-435,437-447,449-479,481-496,498-506,508-537,539-547,549-570,572-585,587-602,604-634,636-655,657-668,670-778,780-785,787-796,798-854,856-898,901-903,905-917,919,921-950,953-954,957-965
+apps/dashboard/src/constants/site-create.ts
+  ai_agent 83
+packages/ai/src/agents/geo-opencode.ts
+  s_2c6e079636561d::t_d43e6a9b339d71 211,234,306
+apps/dashboard/src/types/components/sites.ts
+  ai_agent 362-363,653-654
+packages/sites-server/src/github-source.ts
+  ai_agent 1,3-8,10-28,30-47,49-57,59-61,63-92,95-122,124,127-143,145-160,162,165-175,177-192,194-212,214-256,259-313,315-321,323-338,340-391,393-427
+packages/sites-server/src/types/github-source.ts
+  ai_agent 1-7
+packages/geo-core/src/constants/geo.ts
+  ai_agent 56-63,65-66,70-71,83
+apps/dashboard/src/utils/site-deployments.ts
+  ai_agent 36-65
+packages/ui/src/components/data-table/body.tsx
+  ai_agent 158-165
+packages/ui/src/types/data-table.ts
+  ai_agent 32-33
+apps/docs/geo/how-scans-work.mdx
+  s_2c6e079636561d::t_50df842db3d620 45
+packages/geo-core/src/geo/scan.ts
+  ai_agent 2060
+packages/sites-server/src/constants/github.ts
+  ai_agent 43-50
+apps/docs/geo/engines.mdx
+  s_2c6e079636561d::t_50df842db3d620 50
+apps/dashboard/src/components/sites/pages/site-deployments-page.tsx
+  ai_agent 371
+packages/ai/src/constants/geo-opencode.ts
+  ai_agent 1
+apps/sites-builder/src/components/Header.astro
+  ai_agent 29
+apps/dashboard/src/components/sites/site-deployments-table.tsx
+  ai_agent 38,49,137,152,170,180,198,217
+packages/sites-server/src/constants/sandbox.ts
+  ai_agent 4
+packages/ai/src/orchestration/standalone-tool-registry.ts
+  ai_agent 80-81,84-85
+packages/sites-server/tests/box-build-runtime.test.ts
+  ai_agent 11-12,14,223-333
+apps/docs/geo/metrics/citations.mdx
+  s_2c6e079636561d::t_50df842db3d620 23
+apps/dashboard/src/components/sites/site-create-starter.tsx
+  ai_agent 13,62,85
+apps/agent/agent/channels/slack.ts
+  ai_agent 108
+packages/sites-server/src/utils/write-tar-gz.ts
+  ai_agent 1-34
+packages/sites-server/src/box-build.ts
+  ai_agent 22,350,359-384,393-398
+packages/ai/src/constants/geo-fx.ts
+  s_2c6e079636561d::t_d43e6a9b339d71 180,186-187,220
+packages/geo-core/src/types/geo.ts
+  s_2c6e079636561d::t_50df842db3d620 1499
+apps/web/src/content/legal/privacy.mdx
+  ai_agent 5,29,31,33,35-37,53-56,61-68,73-74,76,89,108-109
+packages/geo-core/src/constants/geo-coding-agents.ts
+  s_2c6e079636561d::t_d43e6a9b339d71 10-37,42-44,46,48,50,52
+packages/geo-core/tests/coding-agent-catalog.test.ts
+  ai_agent 77-103,117,132,139,146,179-180
+packages/ai/src/billing/token-pricing.ts
+  ai_agent 69,81,146-158,328-330,333
+packages/geo-core/tests/token-usage.test.ts
+  ai_agent 5,16-36,96,120,144,157,160
+apps/dashboard/src/components/sites/site-create-scroll-list.tsx
+  ai_agent 1-55
+packages/sites-server/src/pipeline.ts
+  ai_agent 25,235,238-239
+packages/sites-server/src/utils/git-lfs.ts
+  ai_agent 1-11
+packages/geo-core/src/constants/geo-model-catalog.ts
+  ai_agent 449,451,453-507,521-523,525,530,532,534,539,541,543,626-632,634-635,708-710
+packages/geo-core/src/utils/geo-model-catalog.ts
+  ai_agent 138-141
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "0af9136feeee9369feca2d589104571a56f82bbc",
+  "prompts": {},
+  "sessions": {
+    "s_2c6e079636561d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "1a37628b-62fd-46ad-a1a5-a6cee7ecf51f",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

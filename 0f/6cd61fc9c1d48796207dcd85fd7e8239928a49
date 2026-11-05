@@ -1,0 +1,85 @@
+apps/dashboard/src/components/providers/dashboard-runtime-providers.tsx
+  s_06b3a663ddd463::t_b355f0d0fbeb29 1-3,5-6,8-19,21-33,35-36
+  s_06b3a663ddd463::t_39d3d3d6c55cb0 4,7,20,34
+apps/dashboard/src/lib/hooks/use-deferred-mount.ts
+  s_06b3a663ddd463::t_9e9383f9480fd3 1-9,13-15,18-21
+  s_06b3a663ddd463::t_02ec64fc6436b3 10-12
+  s_06b3a663ddd463::t_d0ba97759adb96 16-17
+apps/dashboard/src/lib/hooks/use-brand-analysis.ts
+  s_06b3a663ddd463::t_9e9383f9480fd3 29,33
+apps/dashboard/src/lib/hooks/use-posts.ts
+  s_06b3a663ddd463::t_55bac9613bb64a 32,34-36,43
+apps/dashboard/src/components/dashboard/lazy-content-activity-card.tsx
+  s_06b3a663ddd463::t_6d276687302deb 1-15
+apps/dashboard/src/components/providers/database-provider.tsx
+  s_06b3a663ddd463::t_50aecad2854f0e 7
+  s_06b3a663ddd463::t_39d3d3d6c55cb0 1-6,8-12
+apps/dashboard/src/app/(dashboard)/[slug]/(overview)/page.tsx
+  s_06b3a663ddd463::t_7b01093579bc9b 1,3,7,30-38,44-54
+  s_06b3a663ddd463::t_aaeb4aba2a36ff 10
+packages/schemas/src/schemas/dashboard/api-params.ts
+  s_06b3a663ddd463::t_55bac9613bb64a 62-65
+apps/dashboard/src/components/dashboard/dashboard-shell.tsx
+  s_06b3a663ddd463::t_6d276687302deb 36-41
+apps/dashboard/tests/home-posts.test.tsx
+  s_06b3a663ddd463::t_40147b871ef69c 17-20,22-24,40,55,65
+  s_06b3a663ddd463::t_3b0f4e19fde5ef 35-36
+apps/dashboard/src/components/dashboard/app-sidebar.tsx
+  s_06b3a663ddd463::t_9e9383f9480fd3 23,142
+apps/dashboard/src/app/(dashboard)/[slug]/page.tsx
+  s_06b3a663ddd463::t_7b01093579bc9b 1,3,7,30-38,44-54
+  s_06b3a663ddd463::t_aaeb4aba2a36ff 10
+apps/dashboard/src/components/providers/onboarding-runtime-providers.tsx
+  s_06b3a663ddd463::t_b355f0d0fbeb29 1-5,7-15,26-27
+  s_06b3a663ddd463::t_39d3d3d6c55cb0 6,16-25
+apps/dashboard/src/app/onboarding/layout.tsx
+  s_06b3a663ddd463::t_b355f0d0fbeb29 2,10-15,17
+apps/dashboard/src/components/dashboard/sidebar-project-switcher.tsx
+  s_06b3a663ddd463::t_9e9383f9480fd3 38,61
+  s_06b3a663ddd463::t_02ec64fc6436b3 69
+apps/dashboard/src/components/dashboard/dashboard-client-wrapper.tsx
+  s_06b3a663ddd463::t_6d276687302deb 3,16-31
+  s_06b3a663ddd463::t_b355f0d0fbeb29 10,49-73
+apps/dashboard/src/utils/dashboard-home-prefetch.server.ts
+  s_06b3a663ddd463::t_55bac9613bb64a 28,39-40
+  s_06b3a663ddd463::t_7b01093579bc9b 1-27,29-38,41-49
+apps/dashboard/src/components/dashboard/deferred-sidebar-status.tsx
+  s_06b3a663ddd463::t_9e9383f9480fd3 1-45
+apps/dashboard/src/app/(dashboard)/[slug]/page-client.tsx
+  s_06b3a663ddd463::t_55bac9613bb64a 20,37
+  s_06b3a663ddd463::t_6d276687302deb 12-13,138-141,155
+apps/dashboard/src/components/providers/databuddy-analytics.tsx
+  s_06b3a663ddd463::t_b355f0d0fbeb29 1-28
+apps/dashboard/src/app/(dashboard)/[slug]/(overview)/page-client.tsx
+  s_06b3a663ddd463::t_6d276687302deb 13,169
+  s_06b3a663ddd463::t_55bac9613bb64a 20,51
+apps/dashboard/src/lib/content/content-publishing-metrics.server.ts
+  s_06b3a663ddd463::t_b400a45f7e7d3a 14
+  s_06b3a663ddd463::t_55bac9613bb64a 1-13,15-82
+apps/dashboard/src/lib/orpc/routers/content.ts
+  s_06b3a663ddd463::t_55bac9613bb64a 45-48,86,99,535-562,564-568,570-575,1461
+apps/dashboard/src/components/dashboard/content-activity-card.tsx
+  s_06b3a663ddd463::t_55bac9613bb64a 49,53,58,111,113,115
+  s_06b3a663ddd463::t_a4278eb1f3c05f 22-25
+apps/dashboard/src/utils/providers.tsx
+  s_06b3a663ddd463::t_b355f0d0fbeb29 13,16-22,80,84,89-95
+  s_06b3a663ddd463::t_11b8a72997a232 88
+apps/dashboard/src/types/dashboard.ts
+  s_06b3a663ddd463::t_55bac9613bb64a 15-22,27
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "0f6cd61fc9c1d48796207dcd85fd7e8239928a49",
+  "prompts": {},
+  "sessions": {
+    "s_06b3a663ddd463": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a09ae2-a4a2-7620-8128-dd6da00ca48d",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

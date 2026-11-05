@@ -1,0 +1,50 @@
+apps/dashboard/src/components/content/content-detail-chat-shell.tsx
+  s_f2137bb6ba04d1::t_af82aa0190d220 10-15,123-127,133-134
+apps/dashboard/src/components/content/overview/content-authors-dialog.tsx
+  s_f2137bb6ba04d1::t_a60c13030ded55 68,126,166,198
+  s_f2137bb6ba04d1::t_a75f466c2c1079 108
+apps/dashboard/src/components/content/overview/overview-cover-field.tsx
+  s_f2137bb6ba04d1::t_a60c13030ded55 67
+  s_f2137bb6ba04d1::t_a75f466c2c1079 61
+apps/dashboard/src/components/content/content-detail-source-metadata.tsx
+  s_f2137bb6ba04d1::t_1cbfd59c6c0178 17,19-23
+apps/dashboard/src/lib/hooks/use-content-metadata.ts
+  s_f2137bb6ba04d1::t_af82aa0190d220 6,110-111
+apps/dashboard/src/utils/content-detail.ts
+  s_f2137bb6ba04d1::t_1cbfd59c6c0178 1-2,31-63
+  s_f2137bb6ba04d1::t_aa9478939a5e55 4
+apps/dashboard/src/types/content/detail.ts
+  s_f2137bb6ba04d1::t_1cbfd59c6c0178 101-110
+apps/dashboard/src/types/components/content-chat-activity-panel.ts
+  s_f2137bb6ba04d1::t_8970a926605c4e 1,54-62
+apps/dashboard/src/components/content/overview/content-overview.tsx
+  s_f2137bb6ba04d1::t_a75f466c2c1079 114
+  s_f2137bb6ba04d1::t_1cbfd59c6c0178 21,41
+apps/dashboard/src/components/content/content-panel-header-button.tsx
+  s_f2137bb6ba04d1::t_8970a926605c4e 1-40
+apps/dashboard/src/components/content/overview/content-panel-tabs.tsx
+  s_f2137bb6ba04d1::t_8970a926605c4e 12,102-118
+  s_f2137bb6ba04d1::t_27a8c3764927aa 8,11
+apps/dashboard/src/components/content/content-chat-activity-panel.tsx
+  s_f2137bb6ba04d1::t_8970a926605c4e 57,505-517,521-529
+apps/dashboard/src/components/content/overview/overview-date-field.tsx
+  s_f2137bb6ba04d1::t_a60c13030ded55 10,31-37,39
+apps/dashboard/src/components/content/overview/overview-tags-input.tsx
+  s_f2137bb6ba04d1::t_a60c13030ded55 115-118
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "1b7d03e36e9d0883fad3625b6b26177e5f3ac9ee",
+  "prompts": {},
+  "sessions": {
+    "s_f2137bb6ba04d1": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "05d9cd4e-8273-4590-8796-cf8becc4d59b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

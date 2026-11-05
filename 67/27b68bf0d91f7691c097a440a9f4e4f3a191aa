@@ -1,0 +1,19 @@
+apps/dashboard/src/components/geo/traffic-domain-select.tsx
+  s_45653f0d0b10dd::t_453a4968e6fca0 46
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "6727b68bf0d91f7691c097a440a9f4e4f3a191aa",
+  "prompts": {},
+  "sessions": {
+    "s_45653f0d0b10dd": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "3bc75d79-181f-49a7-91d3-42e599a5561f",
+        "model": "claude-sonnet-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

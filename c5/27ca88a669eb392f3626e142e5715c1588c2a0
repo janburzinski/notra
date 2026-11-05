@@ -1,0 +1,23 @@
+apps/dashboard/src/components/sites/pages/site-deployments-page.tsx
+  s_be40676676be6b::t_282bd17b9a7bc8 371
+apps/dashboard/src/components/sites/site-deployments-table.tsx
+  s_be40676676be6b::t_282bd17b9a7bc8 49,170
+apps/dashboard/src/types/components/sites.ts
+  s_be40676676be6b::t_282bd17b9a7bc8 362-363
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "c527ca88a669eb392f3626e142e5715c1588c2a0",
+  "prompts": {},
+  "sessions": {
+    "s_be40676676be6b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9c3eab04-324f-4038-abe8-4d1e5107691e",
+        "model": "claude-sonnet-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

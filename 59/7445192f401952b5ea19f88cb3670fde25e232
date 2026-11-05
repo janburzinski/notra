@@ -1,0 +1,171 @@
+apps/ui/docs/components/(desktop-apps)/gemini/sparkle.mdx
+  s_68efd06bd8cdc3::t_63773645deb3d7 9
+apps/ui/docs/components/(desktop-apps)/perplexity/composer.mdx
+  s_68efd06bd8cdc3::t_63773645deb3d7 9
+apps/ui/docs/components/(search)/ai-overview/header.mdx
+  s_68efd06bd8cdc3::t_63773645deb3d7 9
+apps/ui/src/constants/landing.ts
+  s_68efd06bd8cdc3::t_3b41c3b1006b46 7-8
+apps/ui/docs/components/(terminal-apps)/opencode/sources.mdx
+  s_68efd06bd8cdc3::t_63773645deb3d7 9
+apps/ui/docs/components/(desktop-apps)/chatgpt/thinking.mdx
+  s_68efd06bd8cdc3::t_63773645deb3d7 9
+apps/ui/docs/components/(desktop-apps)/gemini/model-selector.mdx
+  s_68efd06bd8cdc3::t_63773645deb3d7 9
+apps/ui/docs/components/(desktop-apps)/gemini/thoughts.mdx
+  s_68efd06bd8cdc3::t_63773645deb3d7 9
+apps/ui/docs/components/(terminal-apps)/codex/message.mdx
+  s_68efd06bd8cdc3::t_63773645deb3d7 9
+apps/ui/docs/components/(desktop-apps)/perplexity/model-icon.mdx
+  s_68efd06bd8cdc3::t_63773645deb3d7 9
+apps/ui/registry/notra/chatgpt/components/chatgpt-model-selector.tsx
+  s_68efd06bd8cdc3::t_7b545c3cf03ecb 218
+apps/ui/docs/components/(desktop-apps)/perplexity/search.mdx
+  s_68efd06bd8cdc3::t_63773645deb3d7 9
+apps/ui/docs/components/(terminal-apps)/claude-code/message.mdx
+  s_68efd06bd8cdc3::t_63773645deb3d7 9
+apps/ui/docs/components/(desktop-apps)/claude/search.mdx
+  s_68efd06bd8cdc3::t_63773645deb3d7 9
+apps/ui/docs/components/(terminal-apps)/codex/terminal.mdx
+  s_68efd06bd8cdc3::t_63773645deb3d7 9
+apps/ui/docs/components/(terminal-apps)/opencode/logo.mdx
+  s_68efd06bd8cdc3::t_63773645deb3d7 9
+apps/ui/docs/components/marketing-button.mdx
+  s_68efd06bd8cdc3::t_63773645deb3d7 9
+apps/ui/docs/components/(desktop-apps)/claude/thinking.mdx
+  s_68efd06bd8cdc3::t_63773645deb3d7 9
+apps/ui/docs/components/(terminal-apps)/codex/reasoning.mdx
+  s_68efd06bd8cdc3::t_63773645deb3d7 9
+apps/ui/docs/components/(terminal-apps)/opencode/window.mdx
+  s_68efd06bd8cdc3::t_63773645deb3d7 9
+apps/ui/docs/components/(desktop-apps)/claude/actions.mdx
+  s_68efd06bd8cdc3::t_63773645deb3d7 9
+apps/ui/docs/components/(desktop-apps)/chatgpt/reasoning.mdx
+  s_68efd06bd8cdc3::t_63773645deb3d7 9
+apps/ui/docs/components/(desktop-apps)/chatgpt/search.mdx
+  s_68efd06bd8cdc3::t_63773645deb3d7 9
+apps/ui/docs/components/(desktop-apps)/claude/sources.mdx
+  s_68efd06bd8cdc3::t_63773645deb3d7 9
+apps/ui/docs/components/(search)/ai-overview/citation.mdx
+  s_68efd06bd8cdc3::t_63773645deb3d7 9
+apps/ui/docs/components/(terminal-apps)/opencode/message.mdx
+  s_68efd06bd8cdc3::t_63773645deb3d7 9
+apps/ui/docs/components/(search)/ai-overview/highlight.mdx
+  s_68efd06bd8cdc3::t_63773645deb3d7 9
+apps/ui/docs/components/(desktop-apps)/perplexity/sources-summary.mdx
+  s_68efd06bd8cdc3::t_63773645deb3d7 9
+apps/ui/docs/components/(desktop-apps)/claude/model-selector.mdx
+  s_68efd06bd8cdc3::t_63773645deb3d7 9
+apps/ui/docs/blocks/(terminal-apps)/claude-code.mdx
+  s_68efd06bd8cdc3::t_63773645deb3d7 13
+apps/ui/docs/components/(terminal-apps)/opencode/activity.mdx
+  s_68efd06bd8cdc3::t_63773645deb3d7 9
+apps/ui/docs/components/(desktop-apps)/gemini/source-chip.mdx
+  s_68efd06bd8cdc3::t_63773645deb3d7 9
+apps/ui/docs/components/(desktop-apps)/gemini/thinking.mdx
+  s_68efd06bd8cdc3::t_63773645deb3d7 9
+apps/ui/docs/components/(terminal-apps)/claude-code/header.mdx
+  s_68efd06bd8cdc3::t_63773645deb3d7 9
+apps/ui/docs/blocks/(desktop-apps)/perplexity.mdx
+  s_68efd06bd8cdc3::t_63773645deb3d7 13
+apps/ui/docs/components/(desktop-apps)/perplexity/rewrite-panel.mdx
+  s_68efd06bd8cdc3::t_63773645deb3d7 9
+apps/ui/docs/components/button.mdx
+  s_68efd06bd8cdc3::t_63773645deb3d7 13
+apps/ui/docs/components/shimmer.mdx
+  s_68efd06bd8cdc3::t_63773645deb3d7 9
+apps/ui/docs/components/(terminal-apps)/codex/header.mdx
+  s_68efd06bd8cdc3::t_63773645deb3d7 9
+apps/ui/docs/components/(terminal-apps)/claude-code/todo-list.mdx
+  s_68efd06bd8cdc3::t_63773645deb3d7 9
+apps/ui/docs/components/(desktop-apps)/claude/spinner.mdx
+  s_68efd06bd8cdc3::t_63773645deb3d7 9
+apps/ui/docs/components/(terminal-apps)/claude-code/tool-call.mdx
+  s_68efd06bd8cdc3::t_63773645deb3d7 9
+apps/ui/docs/components/(desktop-apps)/chatgpt/thread.mdx
+  s_68efd06bd8cdc3::t_63773645deb3d7 9
+apps/ui/docs/components/(desktop-apps)/perplexity/thinking.mdx
+  s_68efd06bd8cdc3::t_63773645deb3d7 9
+apps/ui/docs/components/(desktop-apps)/gemini/message.mdx
+  s_68efd06bd8cdc3::t_63773645deb3d7 9
+apps/ui/docs/blocks/(terminal-apps)/opencode.mdx
+  s_68efd06bd8cdc3::t_63773645deb3d7 13
+apps/ui/docs/components/(desktop-apps)/chatgpt/message.mdx
+  s_68efd06bd8cdc3::t_63773645deb3d7 9
+apps/ui/docs/blocks/(desktop-apps)/claude.mdx
+  s_68efd06bd8cdc3::t_63773645deb3d7 13
+apps/ui/docs/components/(desktop-apps)/perplexity/message.mdx
+  s_68efd06bd8cdc3::t_63773645deb3d7 9
+apps/ui/docs/components/(terminal-apps)/claude-code/prompt.mdx
+  s_68efd06bd8cdc3::t_63773645deb3d7 9
+apps/ui/docs/components/(terminal-apps)/codex/composer.mdx
+  s_68efd06bd8cdc3::t_63773645deb3d7 9
+apps/ui/docs/components/(desktop-apps)/claude/composer.mdx
+  s_68efd06bd8cdc3::t_63773645deb3d7 9
+apps/ui/docs/blocks/(terminal-apps)/codex.mdx
+  s_68efd06bd8cdc3::t_63773645deb3d7 13
+apps/ui/docs/components/(desktop-apps)/chatgpt/activity.mdx
+  s_68efd06bd8cdc3::t_63773645deb3d7 9
+apps/ui/docs/components/(desktop-apps)/gemini/composer.mdx
+  s_68efd06bd8cdc3::t_63773645deb3d7 9
+apps/ui/docs/components/(terminal-apps)/opencode/composer.mdx
+  s_68efd06bd8cdc3::t_63773645deb3d7 9
+apps/ui/docs/components/(desktop-apps)/perplexity/user-actions.mdx
+  s_68efd06bd8cdc3::t_63773645deb3d7 9
+apps/ui/docs/components/(terminal-apps)/claude-code/terminal.mdx
+  s_68efd06bd8cdc3::t_63773645deb3d7 9
+apps/ui/docs/components/(terminal-apps)/opencode/sidebar.mdx
+  s_68efd06bd8cdc3::t_63773645deb3d7 9
+apps/ui/docs/components/(desktop-apps)/chatgpt/model-selector.mdx
+  s_68efd06bd8cdc3::t_63773645deb3d7 9
+apps/ui/docs/components/(desktop-apps)/gemini/actions.mdx
+  s_68efd06bd8cdc3::t_63773645deb3d7 9
+apps/ui/docs/components/(desktop-apps)/perplexity/actions.mdx
+  s_68efd06bd8cdc3::t_63773645deb3d7 9
+apps/ui/docs/components/(desktop-apps)/perplexity/model-selector.mdx
+  s_68efd06bd8cdc3::t_63773645deb3d7 9
+apps/ui/docs/components/(terminal-apps)/claude-code/thinking.mdx
+  s_68efd06bd8cdc3::t_63773645deb3d7 9
+apps/ui/docs/components/(desktop-apps)/chatgpt/actions.mdx
+  s_68efd06bd8cdc3::t_63773645deb3d7 9
+apps/ui/docs/blocks/(desktop-apps)/gemini.mdx
+  s_68efd06bd8cdc3::t_63773645deb3d7 13
+apps/ui/docs/components/(desktop-apps)/perplexity/citation.mdx
+  s_68efd06bd8cdc3::t_63773645deb3d7 9
+apps/ui/docs/components/(desktop-apps)/perplexity/favicon.mdx
+  s_68efd06bd8cdc3::t_63773645deb3d7 9
+apps/ui/docs/components/(desktop-apps)/claude/message.mdx
+  s_68efd06bd8cdc3::t_63773645deb3d7 9
+apps/ui/docs/components/(search)/ai-overview/skeleton.mdx
+  s_68efd06bd8cdc3::t_63773645deb3d7 9
+apps/ui/docs/components/(search)/ai-overview/content.mdx
+  s_68efd06bd8cdc3::t_63773645deb3d7 9
+apps/ui/docs/components/(desktop-apps)/chatgpt/composer.mdx
+  s_68efd06bd8cdc3::t_63773645deb3d7 9
+apps/ui/docs/blocks/(desktop-apps)/chatgpt.mdx
+  s_68efd06bd8cdc3::t_63773645deb3d7 13
+apps/ui/docs/components/(desktop-apps)/chatgpt/source-chip.mdx
+  s_68efd06bd8cdc3::t_63773645deb3d7 9
+apps/ui/docs/components/(desktop-apps)/claude/plus-menu.mdx
+  s_68efd06bd8cdc3::t_63773645deb3d7 9
+apps/ui/docs/blocks/(search)/google-ai-overview.mdx
+  s_68efd06bd8cdc3::t_63773645deb3d7 15
+apps/ui/docs/components/(terminal-apps)/codex/exec.mdx
+  s_68efd06bd8cdc3::t_63773645deb3d7 9
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "597445192f401952b5ea19f88cb3670fde25e232",
+  "prompts": {},
+  "sessions": {
+    "s_68efd06bd8cdc3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ff5b0bb1-cc5d-44be-af5f-6d10a56bd786",
+        "model": "claude-sonnet-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

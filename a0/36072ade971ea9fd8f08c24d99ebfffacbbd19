@@ -1,0 +1,124 @@
+apps/dashboard/src/lib/orpc/routers/skills.ts
+  s_310c00cd760ef5::t_0daae3b2d11fa9 1-6,16,76-90,95,103,106-114,121-133,262-287
+apps/dashboard/src/utils/skills.ts
+  s_310c00cd760ef5::t_13774de55271fe 5
+  s_310c00cd760ef5::t_5cd46a5c559e7e 112-117
+packages/ai/src/skills/errors.ts
+  s_310c00cd760ef5::t_537878b8007bac 1-14
+apps/dashboard/src/types/skills/page.ts
+  s_310c00cd760ef5::t_5cd46a5c559e7e 21-35,42,89-97
+apps/console/src/types/skills.ts
+  s_310c00cd760ef5::t_62f415c557e469 18-21
+  s_310c00cd760ef5::t_c4367a90a6f252 3-17,22-35,41
+  s_310c00cd760ef5::t_cbe29b237ed0d7 1-2,36-40
+packages/ai/src/skills/seed.ts
+  s_310c00cd760ef5::t_90866123a90b69 2,5,7,11-14,18-29,32
+apps/console/src/utils/line-diff.test.ts
+  s_310c00cd760ef5::t_c4367a90a6f252 1-22
+apps/console/src/components/skills/system-skills-client.tsx
+  s_310c00cd760ef5::t_6122d2f895523f 12,19,74,86-91,94-99,102-107,112
+  s_310c00cd760ef5::t_f32df71e92c12e 71
+  s_310c00cd760ef5::t_62f415c557e469 36-39
+  s_310c00cd760ef5::t_60bf4b3a02bd9a 1-11,13-18,20-35,40-70,72-73,75-85,92-93,100-101,108-110,114-123
+  s_310c00cd760ef5::t_86c523c054c9d2 111,113
+apps/console/src/components/skills/system-skill-editor-client.tsx
+  s_310c00cd760ef5::t_fcbf70563ebe57 1-2,5,7-23,25,27-32,34-137,139-140,142-143,154,166-172,193-267,269,271,273,277-300,305-308,314-315,326-341,343-353,355-361,367-379,381-391
+  s_310c00cd760ef5::t_62f415c557e469 301-304,323-325,363-366
+  s_310c00cd760ef5::t_6122d2f895523f 33,321
+  s_310c00cd760ef5::t_bbcde499d3b6c6 380
+  s_310c00cd760ef5::t_86c523c054c9d2 316-320,322
+  s_310c00cd760ef5::t_cbe29b237ed0d7 3-4,6,24,26,138,141,144-153,155-165,173-192,268,270,272,274-276,309-313,342,354,362
+apps/console/src/components/skills/diff-section.tsx
+  s_310c00cd760ef5::t_cbe29b237ed0d7 1-12
+packages/ai/src/skills/registry-admin.ts
+  s_310c00cd760ef5::t_08e19986aa2bd1 1,8-118
+  s_310c00cd760ef5::t_62f415c557e469 2-7
+apps/console/src/lib/orpc/routers/skills.ts
+  s_310c00cd760ef5::t_a6954499ac6809 1-62
+apps/console/src/app/(console)/[slug]/skills/new/page.tsx
+  s_310c00cd760ef5::t_62f415c557e469 1-20
+packages/ai/src/skills/registry.test.ts
+  s_310c00cd760ef5::t_2e973afbd5eb69 153-154,202
+  s_310c00cd760ef5::t_8541f846b1df4b 1-152,155-201,203-209,213-226
+  s_310c00cd760ef5::t_29474996cf7dfc 210-212
+packages/ai/src/skills/types.ts
+  s_310c00cd760ef5::t_a44b6e0f424f8f 24-61
+  s_310c00cd760ef5::t_70852214100941 62-70
+apps/console/src/schemas/skills.ts
+  s_310c00cd760ef5::t_a6954499ac6809 1-13,16-20
+  s_310c00cd760ef5::t_62f415c557e469 14-15
+apps/console/src/components/layout/console-shell.tsx
+  s_310c00cd760ef5::t_fea477b398d6c5 9,209
+  s_310c00cd760ef5::t_a6954499ac6809 206-208,210
+apps/dashboard/src/components/content/diff-view.tsx
+  s_310c00cd760ef5::t_f763d79fef1680 4,7-11
+  s_310c00cd760ef5::t_5cd46a5c559e7e 16-17,20-25,46,49
+apps/api/src/programs/skills.ts
+  s_310c00cd760ef5::t_7118714500355d 3,21-24,70,95,142
+  s_310c00cd760ef5::t_e3d9cb3a2fc4f9 76
+packages/ai/src/skills/functions/service.ts
+  s_310c00cd760ef5::t_feabb28edc5dd9 6-7,30,58,83-85,89-91
+apps/dashboard/src/app/(dashboard)/[slug]/skills/[name]/page-client.tsx
+  s_310c00cd760ef5::t_65c1c705b412ac 14,21,143-174,233-243
+apps/console/src/app/(console)/[slug]/skills/page.tsx
+  s_310c00cd760ef5::t_7ac6fbb97b9825 1-6,8-10,14-20
+  s_310c00cd760ef5::t_62f415c557e469 7,11-13
+apps/console/src/app/(console)/[slug]/skills/[name]/page.tsx
+  s_310c00cd760ef5::t_62f415c557e469 1-22
+packages/db/src/schema.ts
+  s_310c00cd760ef5::t_62f415c557e469 2847-2849
+  s_310c00cd760ef5::t_1b524aa39db182 2819-2846,2850-2859,2871-2876,2885,3725-3728,3731-3748
+apps/console/src/components/skills/line-diff.tsx
+  s_310c00cd760ef5::t_cbe29b237ed0d7 44-46,48-53
+  s_310c00cd760ef5::t_88f7983163620c 30,38,47,55-63
+  s_310c00cd760ef5::t_60bf4b3a02bd9a 1-29,31-37,41-43,54,64-69
+  s_310c00cd760ef5::t_38dc58513d7943 39-40
+apps/dashboard/src/components/skills/skill-card.tsx
+  s_310c00cd760ef5::t_65c1c705b412ac 9-13,26,77-86
+packages/tools/src/skill-editor/get-skill.ts
+  s_310c00cd760ef5::t_e3d9cb3a2fc4f9 36
+packages/schemas/src/schemas/dashboard/skills.ts
+  s_310c00cd760ef5::t_0daae3b2d11fa9 68-73
+apps/console/AGENTS.md
+  s_310c00cd760ef5::t_9fe0e7b68d5c8d 18-20
+  s_310c00cd760ef5::t_98ffc616fb8539 24-33
+apps/console/src/constants/skills.ts
+  s_310c00cd760ef5::t_c4367a90a6f252 1-2
+  s_310c00cd760ef5::t_cbe29b237ed0d7 3-8
+apps/console/src/utils/skills.ts
+  s_310c00cd760ef5::t_bbcde499d3b6c6 1-3
+  s_310c00cd760ef5::t_6122d2f895523f 4-12
+apps/dashboard/messages/en.json
+  s_310c00cd760ef5::t_13774de55271fe 1858-1871
+apps/console/src/utils/line-diff.ts
+  s_310c00cd760ef5::t_c4367a90a6f252 1-14,19-30,34-36,40-76
+  s_310c00cd760ef5::t_62f415c557e469 15-18
+  s_310c00cd760ef5::t_29474996cf7dfc 31-33,37-39
+apps/dashboard/messages/de.json
+  s_310c00cd760ef5::t_13774de55271fe 1858-1871
+packages/ai/src/skills/registry.ts
+  s_310c00cd760ef5::t_90866123a90b69 103,109-110
+  s_310c00cd760ef5::t_7c9d7ccfc39714 1-102,104-108,111-329
+apps/console/src/lib/orpc/router.ts
+  s_310c00cd760ef5::t_a6954499ac6809 6,14
+packages/ai/src/skills/system-skills.ts
+  s_310c00cd760ef5::t_a44b6e0f424f8f 7,10-13
+apps/dashboard/src/components/skills/skill-update-notice.tsx
+  s_310c00cd760ef5::t_13774de55271fe 1-98
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "a036072ade971ea9fd8f08c24d99ebfffacbbd19",
+  "prompts": {},
+  "sessions": {
+    "s_310c00cd760ef5": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "57197665-3dbb-4aae-b2fe-63eecdce7ef5",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

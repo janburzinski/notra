@@ -1,0 +1,36 @@
+packages/sites-server/src/utils/html.ts
+  s_ce7055b7518d19::t_4dba6b22874b06 46-72,78,81,83-88,90,94-99,124-126,128-129,144-145,147
+  s_ce7055b7518d19::t_6f9074ee09e069 73-77,79-80,82,92,100-123
+packages/sites-compiler/src/utils/variables.ts
+  s_ce7055b7518d19::t_e1756b8dd330a0 9,25-57,105,127
+packages/sites-core/tests/preview-password.test.ts
+  s_ce7055b7518d19::t_b1f6d1ce6f3cfa 61-62
+packages/sites-compiler/src/utils/paths.ts
+  s_ce7055b7518d19::t_e1756b8dd330a0 61-77,79,81-88,91-92
+packages/sites-core/src/utils/preview-path.ts
+  s_ce7055b7518d19::t_9e346a209da89c 11-13
+packages/sites-server/src/github.ts
+  s_ce7055b7518d19::t_422ebb8a6960ae 626-627,640,642,660-664
+apps/dashboard/src/utils/site-proxy-recipes.ts
+  s_ce7055b7518d19::t_2540c670778290 118-122
+packages/sites-server/src/utils/landing-page.ts
+  ai_agent 140-141,172-174,179-181,265
+apps/docs/sites/domains/cloudflare.mdx
+  s_ce7055b7518d19::t_2e11ecd1d9ffc0 43-47
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "72608410d3a193a38462092808cb7e04f48fdaf0",
+  "prompts": {},
+  "sessions": {
+    "s_ce7055b7518d19": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "21e8c896-059f-447f-942a-2627be2504f7",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

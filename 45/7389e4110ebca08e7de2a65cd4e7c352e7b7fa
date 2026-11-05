@@ -1,0 +1,129 @@
+apps/dashboard/src/app/(dashboard)/[slug]/geo/skeleton.tsx
+  ai_agent 14,20-21,33,54-72,76,79,86-88
+apps/dashboard/src/components/dashboard/org-selector.tsx
+  ai_agent 6,17,51-53,210-243,247,398-399
+packages/ai/src/utils/geo-opencode-box.ts
+  ai_agent 1,178-191
+packages/geo-core/src/constants/geo.ts
+  ai_agent 74-81,86,364
+apps/dashboard/src/utils/cookies.ts
+  ai_agent 2,7,161-168
+apps/dashboard/src/app/(dashboard)/[slug]/chat/new-loading.tsx
+  ai_agent 1-5
+packages/ui/src/components/geo/engine-icon.tsx
+  ai_agent 26,99
+apps/dashboard/src/app/(dashboard)/[slug]/chat/skeleton.tsx
+  ai_agent 41-63
+packages/ai/src/types/geo-fx.ts
+  ai_agent 1-9
+apps/dashboard/src/components/dashboard/app-sidebar.tsx
+  ai_agent 18,32-33,42,69-74,90,166-175,185,220
+apps/dashboard/src/components/geo/competitor-engine-matrix-card.tsx
+  ai_agent 131
+packages/ui/src/lib/geo-chat-skin.ts
+  ai_agent 21
+packages/ai/src/utils/geo-opencode-sources.ts
+  ai_agent 58-60
+apps/dashboard/src/components/dashboard/nav-group-list.tsx
+  ai_agent 1-225
+packages/ui/src/lib/geo-engine-icon.ts
+  ai_agent 5-8
+apps/dashboard/src/components/dashboard/header.tsx
+  ai_agent 13,44,100-142,144-147
+packages/ai/src/schemas/geo-fx.ts
+  ai_agent 1-17
+packages/geo-core/src/constants/geo-coding-agents.ts
+  ai_agent 54-77
+apps/dashboard/src/utils/dashboard-paths.ts
+  ai_agent 16-41
+apps/web/src/constants/landing/live-demo.ts
+  ai_agent 3
+apps/dashboard/src/components/api-keys/account-api-keys-section.tsx
+  ai_agent 341,420
+apps/web/src/components/landing/hero-section.tsx
+  ai_agent 8,78
+apps/dashboard/src/constants/nav.ts
+  ai_agent 41,49-51,218-292
+apps/ui/docs/blocks/(ai-search)/google-ai-overview.mdx
+  ai_agent 24
+packages/ai/src/utils/geo-fx-usage.ts
+  ai_agent 1-28
+packages/ui/src/components/ui/svgs/fx.tsx
+  ai_agent 1-10
+apps/dashboard/src/components/providers/jobs-sidebar-provider.tsx
+  ai_agent 1-44
+apps/dashboard/src/utils/geo-chat-skin.ts
+  ai_agent 21
+packages/ui/src/components/geo/geo-prompt-answer-thread.tsx
+  ai_agent 342-351
+apps/dashboard/src/app/(dashboard)/[slug]/content/loading.tsx
+  ai_agent 16,19-22,24-29
+apps/dashboard/src/types/components/nav.ts
+  ai_agent 38-58
+apps/dashboard/src/constants/geo-engine-icons.ts
+  ai_agent 19,51
+packages/ai/src/utils/geo-box-operation.ts
+  ai_agent 1-26
+apps/dashboard/src/components/dashboard/dashboard-global-actions.tsx
+  ai_agent 1,4-11,13-17,19-37,39-43,45-48,50,53-55,57-93,95
+apps/dashboard/src/routes/-dashboard-loaders.ts
+  ai_agent 11,43
+apps/dashboard/src/routes/-dashboard-ui.tsx
+  ai_agent 11-23,337
+apps/dashboard/src/components/dashboard/dashboard-client-wrapper.tsx
+  ai_agent 14,92,104,117-136
+packages/geo-core/src/constants/geo-model-catalog.ts
+  ai_agent 102-107,608-661,669-672,689-694
+apps/dashboard/src/app/(dashboard)/[slug]/api-keys/page.tsx
+  ai_agent 417-419
+apps/docs/geo/how-scans-work.mdx
+  ai_agent 45
+apps/docs/geo/engines.mdx
+  ai_agent 47,50
+packages/ai/src/types/geo-opencode.ts
+  ai_agent 3
+packages/ai/src/constants/geo-fx.ts
+  ai_agent 1-226
+apps/dashboard/src/routes/-integrations-ui.tsx
+  ai_agent 4-6
+apps/dashboard/src/routes/-analytics-ui.tsx
+  ai_agent 3
+apps/dashboard/src/components/dashboard/nav-footer.tsx
+  ai_agent 1-96
+apps/docs/geo/metrics/citations.mdx
+  ai_agent 23
+apps/dashboard/src/constants/cookies.ts
+  ai_agent 4-5
+packages/ai/src/agents/geo-opencode.ts
+  ai_agent 2-7,19-30,49-51,62-64,72-74,145,154-155,159,176-186,192-200,210-212,221-227,233-235,248-249,289-319,323-325,329-330,350-355,393-394,402-403
+apps/web/src/utils/security-headers.ts
+  ai_agent 1,24
+apps/dashboard/src/components/dashboard/nav-jobs.tsx
+  ai_agent 1-62
+packages/geo-core/src/utils/geo-engine-icon.ts
+  ai_agent 5-8
+packages/ui/src/types/geo.ts
+  ai_agent 59
+apps/dashboard/src/app/(dashboard)/[slug]/geo/competitors/skeleton.tsx
+  ai_agent 3-4,7,11,51-57
+packages/geo-core/src/geo/errors.ts
+  ai_agent 10
+apps/ui/registry/notra/google-ai-overview/components/ai-overview.tsx
+  ai_agent 39
+apps/dashboard/src/components/dashboard/dashboard-shell.tsx
+  ai_agent 21-22,26,246,337,346
+apps/web/src/components/landing/live-demo-link.tsx
+  ai_agent 1,7,10,13-16,18-25
+apps/web/src/styles/ui-sources.css
+  ai_agent 134
+packages/ui/src/components/ai-skins/google-ai-overview/ai-overview.tsx
+  ai_agent 39
+apps/dashboard/src/components/geo/share-of-voice-chart.tsx
+  ai_agent 253
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "457389e4110ebca08e7de2a65cd4e7c352e7b7fa",
+  "prompts": {}
+}

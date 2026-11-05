@@ -1,0 +1,23 @@
+apps/dashboard/src/lib/autopilot/memory.ts
+  s_b371eaad1f2c9d::t_20d1483bd36f2f 129-130
+apps/dashboard/src/lib/autopilot/rules.ts
+  s_b371eaad1f2c9d::t_e2a116aaff83cd 153-155
+apps/dashboard/src/schemas/autopilot-memory.ts
+  s_b371eaad1f2c9d::t_881aed03aeaa81 8-9
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "08bffd830187918b706e2a16b77220a2619fb726",
+  "prompts": {},
+  "sessions": {
+    "s_b371eaad1f2c9d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "af637551-b89b-459a-9cbb-5ec28995fc47",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

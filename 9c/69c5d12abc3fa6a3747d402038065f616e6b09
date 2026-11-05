@@ -1,0 +1,306 @@
+apps/dashboard/src/components/motion/table/types.ts
+  s_678d9e5def6f47::t_7de9c6b52369c3 109-110
+apps/dashboard/src/components/geo/engine-family-sheet.tsx
+  s_210e218ec3cbb8::t_43e01c47fecc7c 542-546,609-613,668,678,695
+  s_210e218ec3cbb8::t_d337f1e58c44b5 65
+apps/dashboard/src/components/geo/scan-model-menu.tsx
+  s_210e218ec3cbb8::t_1b0eb02edb2679 3-8,11-14,20,24-41,50-88,90-97,101-103,111-120,122-127,130-136,163-198,200-210,233-234,236-237,239-266,268-295
+  s_210e218ec3cbb8::t_5b4a97de7439e4 42-44
+  s_210e218ec3cbb8::t_b9baaa75a54773 45-49
+  s_210e218ec3cbb8::t_e99a1f17021222 89
+apps/dashboard/src/lib/orpc/utils/geo-errors.ts
+  s_210e218ec3cbb8::t_6e54ca43870227 78
+apps/dashboard/src/components/geo/persona-detail-dialog.tsx
+  s_210e218ec3cbb8::t_43e01c47fecc7c 238,240,261-265
+  s_210e218ec3cbb8::t_d337f1e58c44b5 42
+apps/dashboard/src/components/geo/shelf/shelf-detail-dialog.tsx
+  s_210e218ec3cbb8::t_43e01c47fecc7c 45,53,76-80
+  s_210e218ec3cbb8::t_d337f1e58c44b5 20
+apps/dashboard/src/types/geo.ts
+  s_210e218ec3cbb8::t_43e01c47fecc7c 1290-1291
+  s_210e218ec3cbb8::t_76fffbea652660 449,454,464-478,495-496,500-501,515-519,742
+  s_210e218ec3cbb8::t_0e12b2249f7cdd 484-493
+apps/dashboard/src/components/geo/prompt-detail-dialog.tsx
+  s_210e218ec3cbb8::t_b9baaa75a54773 52,569-570,581,584-591
+apps/dashboard/src/utils/geo-journey.ts
+  s_210e218ec3cbb8::t_8c00cf78f799d6 25,253,265,291-381
+  s_210e218ec3cbb8::t_e99a1f17021222 210-213
+  s_210e218ec3cbb8::t_b0bf6c81fc76e7 383-398
+apps/dashboard/src/components/geo/journey-path-tree.tsx
+  s_210e218ec3cbb8::t_b99d3dfe81559e 1-3,5,24,29,32,43-45,47-49,52,57-77,85-86
+  s_210e218ec3cbb8::t_67e51a0935f68e 4,6-23,25-28,30-31,33-42,46,50-51,53-56,78-84
+apps/dashboard/src/components/geo/journey-stat-card.tsx
+  s_210e218ec3cbb8::t_0e12b2249f7cdd 1-20,22,28-53
+  s_210e218ec3cbb8::t_e99a1f17021222 23-27
+  s_f9c0c52b2a03c3::t_4ebf36865c3f11 21
+apps/dashboard/src/components/geo/journey-overview-card.tsx
+  s_210e218ec3cbb8::t_b0bf6c81fc76e7 7,16-46,51-54,79,82,86
+  s_34786cc6be1f82::t_d1c53996f7a76b 85
+  s_048e3e46140cde::t_02da5f068e3e3e 56-78,80-81,83-84,87
+apps/api/src/runtime/geo.ts
+  s_210e218ec3cbb8::t_6e54ca43870227 90
+apps/dashboard/src/components/geo/journeys-tab.tsx
+  s_210e218ec3cbb8::t_e99a1f17021222 1-2,4-37,39-42,44-68,70-93
+  s_eaabbd37685195::t_aef34be5a0e4c7 43
+  s_210e218ec3cbb8::t_adb5f0dcafb1e0 3,38,69
+apps/dashboard/src/utils/geo-journey.test.ts
+  s_210e218ec3cbb8::t_71ef970a98f9b0 1-26,28-88
+  s_210e218ec3cbb8::t_cbc5c0031bc212 27
+apps/dashboard/src/components/logs/log-details-sheet.tsx
+  s_210e218ec3cbb8::t_d337f1e58c44b5 19
+  s_210e218ec3cbb8::t_43e01c47fecc7c 27,33,47-51
+apps/dashboard/src/lib/hooks/use-geo.ts
+  s_97ba5b4110f36c::t_0748dfd7b59f25 843-863
+apps/dashboard/src/lib/hooks/use-table-viewport.ts
+  s_41ee57dd3a84b7::t_926af1b84121a6 58-82
+  s_2ff958f37afcc4::t_20c11addb0b205 112-114
+  s_15f7ff1f5fcab9::t_1cbd77b8d7cc2e 135
+apps/dashboard/src/utils/geo-scan-models.ts
+  s_210e218ec3cbb8::t_6ea6b6d5f83642 1-69
+apps/dashboard/src/components/motion/table/index.tsx
+  s_e229b7495a07c7::t_eeea3496d54a2a 74
+  s_11881fff420154::t_c71d5a3150a37b 133
+  s_a77d311fb07a5d::t_f7def26b32fe4a 306-314
+apps/dashboard/src/components/geo/journey-paths-card.tsx
+  s_ddc9601a0161b2::t_e8ffb8e2080a91 4,13
+  s_210e218ec3cbb8::t_b0bf6c81fc76e7 6,10,15-46,61,64,74
+  s_b8b7649099e2d9::t_de4523339d5374 51-60,62-63,65-72,75
+apps/dashboard/src/types/geo-scan-activity.ts
+  s_210e218ec3cbb8::t_6ea6b6d5f83642 1,33-40,43,45-48
+apps/dashboard/src/utils/geo-scan-models.test.ts
+  s_210e218ec3cbb8::t_71ef970a98f9b0 1-23,25-62
+  s_210e218ec3cbb8::t_cbc5c0031bc212 24
+apps/dashboard/src/components/geo/journeys-card.tsx
+  s_abe32e39623a17::t_ae450b1d8792c7 22,32
+  s_30576b1df229a3::t_cfabdae9a7eb97 26-27,30-31
+  s_48fb5051f0be10::t_38ddcf57816a2e 117
+  s_210e218ec3cbb8::t_e99a1f17021222 13,96,103-110,116,119-120,122,124
+  s_56c7348fa12c1f::t_2bbca28e6d23c9 111-115,118,121
+apps/dashboard/src/utils/geo-overview-page.ts
+  s_210e218ec3cbb8::t_e99a1f17021222 50,93
+apps/dashboard/src/lib/hooks/use-retained-value.ts
+  s_210e218ec3cbb8::t_b9baaa75a54773 1-20
+apps/dashboard/src/components/geo/journey-detail-sheet.tsx
+  s_3161fa0349dc08::t_e35b3b3b57b322 185
+  s_210e218ec3cbb8::t_e99a1f17021222 187-190
+  s_210e218ec3cbb8::t_52fb0121ab5f9c 7,13-29,31-44,51-77,84-156,162-184,186,191-209,211,213-214,216-226,228-248
+  s_210e218ec3cbb8::t_3a1086839619c5 30,45-48,210,212,215
+  s_824e302ed7574c::t_94da32fc79079a 11
+  s_210e218ec3cbb8::t_fa7d84664875e1 82
+  s_0c050398fe39b2::t_cfddc33406b6a7 157-161
+  s_88343ae76a3c7f::t_6bc9028c856ba0 227
+apps/dashboard/src/lib/hooks/use-geo-overview-page.ts
+  s_210e218ec3cbb8::t_e99a1f17021222 130-135,180
+apps/dashboard/src/components/geo/scan-answer-sheet.tsx
+  s_210e218ec3cbb8::t_43e01c47fecc7c 21,29,35-36,57-58,62-63,72-73,77-78
+packages/geo-core/src/types/geo.ts
+  s_210e218ec3cbb8::t_6e54ca43870227 52,694
+packages/geo-core/src/utils/geo-engines.ts
+  s_210e218ec3cbb8::t_6e54ca43870227 61
+  s_210e218ec3cbb8::t_c1c1dfc22b3d2f 44-46,49,56
+apps/dashboard/src/components/geo/prompt-scan-button.tsx
+  s_210e218ec3cbb8::t_0a0e8c87835816 8-12,35,53-54,56
+apps/dashboard/src/app/(dashboard)/[slug]/geo/components/geo-tabs.tsx
+  s_210e218ec3cbb8::t_e99a1f17021222 13,74,190-195
+packages/geo-core/src/geo/programs.ts
+  s_210e218ec3cbb8::t_c1c1dfc22b3d2f 1800-1805
+apps/dashboard/src/components/geo/sentiment-results-table.tsx
+  s_210e218ec3cbb8::t_d337f1e58c44b5 35-36,166,172
+  s_210e218ec3cbb8::t_e99a1f17021222 16
+packages/geo-core/src/geo/scan.ts
+  s_210e218ec3cbb8::t_c1c1dfc22b3d2f 864-868
+packages/geo-core/src/constants/geo.ts
+  s_210e218ec3cbb8::t_adb5f0dcafb1e0 1008
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "9c69c5d12abc3fa6a3747d402038065f616e6b09",
+  "prompts": {},
+  "sessions": {
+    "s_048e3e46140cde": {
+      "agent_id": {
+        "tool": "amp",
+        "id": "TU-034QVluUjJI41Wu0YelJCu",
+        "model": "unknown"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    },
+    "s_0c050398fe39b2": {
+      "agent_id": {
+        "tool": "amp",
+        "id": "TU-034QVl4YlZI8BdOHGdg4Rf",
+        "model": "unknown"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    },
+    "s_11881fff420154": {
+      "agent_id": {
+        "tool": "amp",
+        "id": "TU-034QWBCN3swIYzrElyskcR",
+        "model": "unknown"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    },
+    "s_15f7ff1f5fcab9": {
+      "agent_id": {
+        "tool": "amp",
+        "id": "TU-034QWAfUSe6zdhkmBqoMDC",
+        "model": "unknown"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    },
+    "s_210e218ec3cbb8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "2bb21427-c56d-4b11-ae54-9883899256d2",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    },
+    "s_2ff958f37afcc4": {
+      "agent_id": {
+        "tool": "amp",
+        "id": "TU-034QWARhekueSyMkhLYWQ2",
+        "model": "unknown"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    },
+    "s_30576b1df229a3": {
+      "agent_id": {
+        "tool": "amp",
+        "id": "TU-034QWIZy9xWxqhYIAJHlnt",
+        "model": "unknown"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    },
+    "s_3161fa0349dc08": {
+      "agent_id": {
+        "tool": "amp",
+        "id": "TU-034QVlOZORlLKKJiS1s3PZ",
+        "model": "unknown"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    },
+    "s_34786cc6be1f82": {
+      "agent_id": {
+        "tool": "amp",
+        "id": "TU-034QWDB2wpSoZivjWICdS1",
+        "model": "unknown"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    },
+    "s_41ee57dd3a84b7": {
+      "agent_id": {
+        "tool": "amp",
+        "id": "TU-034QWA22ON1o0vESeChEFb",
+        "model": "unknown"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    },
+    "s_48fb5051f0be10": {
+      "agent_id": {
+        "tool": "amp",
+        "id": "TU-034QVk6RiB2mLZ9JFdWSoA",
+        "model": "unknown"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    },
+    "s_56c7348fa12c1f": {
+      "agent_id": {
+        "tool": "amp",
+        "id": "TU-034QWIqtd9wFWSPyQUVObc",
+        "model": "unknown"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    },
+    "s_678d9e5def6f47": {
+      "agent_id": {
+        "tool": "amp",
+        "id": "TU-034QW9k9AIFuPyEDjOlFZy",
+        "model": "unknown"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    },
+    "s_824e302ed7574c": {
+      "agent_id": {
+        "tool": "amp",
+        "id": "TU-034QVkRXnSGeL2HyWEWsx0",
+        "model": "unknown"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    },
+    "s_88343ae76a3c7f": {
+      "agent_id": {
+        "tool": "amp",
+        "id": "TU-034QVlZJHUvtAZeqeooLWQ",
+        "model": "unknown"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    },
+    "s_97ba5b4110f36c": {
+      "agent_id": {
+        "tool": "amp",
+        "id": "TU-034QVjIc52yQr0OjnSgDVd",
+        "model": "unknown"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    },
+    "s_a77d311fb07a5d": {
+      "agent_id": {
+        "tool": "amp",
+        "id": "TU-034QWBTVt63aLhqEm8USEF",
+        "model": "unknown"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    },
+    "s_abe32e39623a17": {
+      "agent_id": {
+        "tool": "amp",
+        "id": "TU-034QVjoaEuCXxkX05spFcH",
+        "model": "unknown"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    },
+    "s_b8b7649099e2d9": {
+      "agent_id": {
+        "tool": "amp",
+        "id": "TU-034QVmXm4isp8OMoPCJPYk",
+        "model": "unknown"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    },
+    "s_ddc9601a0161b2": {
+      "agent_id": {
+        "tool": "amp",
+        "id": "TU-034QWDR5F8aHnQ4lbbWifi",
+        "model": "unknown"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    },
+    "s_e229b7495a07c7": {
+      "agent_id": {
+        "tool": "amp",
+        "id": "TU-034QWAv7zqJEUulOVMQgaj",
+        "model": "unknown"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    },
+    "s_eaabbd37685195": {
+      "agent_id": {
+        "tool": "amp",
+        "id": "TU-034QXcjM5YKGQRtBhU1inp",
+        "model": "unknown"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    },
+    "s_f9c0c52b2a03c3": {
+      "agent_id": {
+        "tool": "amp",
+        "id": "TU-034QVmwtJraLnD3TLoFCY2",
+        "model": "unknown"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

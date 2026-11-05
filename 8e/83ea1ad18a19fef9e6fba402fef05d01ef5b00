@@ -1,0 +1,98 @@
+apps/ui/src/types/landing.ts
+  s_d0abf363d9fa08::t_63629e8c2bf420 9
+apps/ui/registry/notra/composer/examples/composer-state-ready.tsx
+  s_d0abf363d9fa08::t_6953279efd383a 1-42
+packages/ui/src/types/composer.ts
+  s_d0abf363d9fa08::t_55e8e2bc459b07 1,35-36,42-43
+apps/ui/src/constants/landing.ts
+  s_d0abf363d9fa08::t_63629e8c2bf420 87-91
+apps/ui/registry/notra/composer/examples/composer-queue.tsx
+  s_d0abf363d9fa08::t_4b54f099a94a5a 1-98
+apps/ui/registry/notra/composer/types/composer.ts
+  s_d0abf363d9fa08::t_5cf5f9fd3199e5 1-58
+apps/ui/registry/notra/composer/examples/composer-state-waiting.tsx
+  s_d0abf363d9fa08::t_6953279efd383a 1-49
+packages/ui/src/constants/composer.ts
+  s_d0abf363d9fa08::t_8062e5113a8154 20
+  s_d0abf363d9fa08::t_6a2dc3b9cd928d 4,6,8-12,14,17,23
+  s_d0abf363d9fa08::t_55e8e2bc459b07 5,15-16,18-19
+apps/dashboard/src/components/chat-input.tsx
+  s_d0abf363d9fa08::t_34d04f84c1d5cf 198,212
+  s_d0abf363d9fa08::t_d56f841db6100a 408-421,423-436,438-449,451-493
+apps/ui/registry/notra/composer/components/composer.tsx
+  s_d0abf363d9fa08::t_b41e69597a43b7 52-53
+  s_d0abf363d9fa08::t_5cf5f9fd3199e5 1-51,54-115,117-132,134-147,151-333
+  s_d0abf363d9fa08::t_f36aaa158ba86c 116
+  s_d0abf363d9fa08::t_d52a8bccba2329 133,148-150
+apps/ui/docs/components/meta.ts
+  s_d0abf363d9fa08::t_4b54f099a94a5a 19
+apps/ui/registry/notra/composer/examples/composer-state-limit.tsx
+  s_d0abf363d9fa08::t_6953279efd383a 1-66
+apps/ui/registry/notra/composer/examples/composer-state-streaming.tsx
+  s_d0abf363d9fa08::t_6953279efd383a 1-41
+apps/ui/registry/notra/composer/constants/composer.ts
+  s_d0abf363d9fa08::t_5cf5f9fd3199e5 1-13,18-28,30-32
+  s_d0abf363d9fa08::t_8062e5113a8154 29
+  ai_agent 14-17
+apps/ui/registry/notra/composer/examples/composer.tsx
+  s_d0abf363d9fa08::t_4b54f099a94a5a 1-63
+packages/ui/src/components/ui/composer.tsx
+  s_d0abf363d9fa08::t_7a373ca78840fd 8,13,21-22,24,26,43,108,125,140,142,161-182,211,219,221,225,230-232,234,237-239,241,244-246,248,254-265,268-271,279,282-283,285-292,349
+  s_d0abf363d9fa08::t_d52a8bccba2329 139,154-156
+  s_d0abf363d9fa08::t_a7ab62e839f42d 325-329,334-336
+  s_d0abf363d9fa08::t_b18e9a814cd7cc 11,308,312,314-320
+  s_d0abf363d9fa08::t_f36aaa158ba86c 122
+  s_d0abf363d9fa08::t_b41e69597a43b7 55-56
+apps/ui/registry/notra/composer/examples/composer-state-stopping.tsx
+  s_d0abf363d9fa08::t_6953279efd383a 1-41
+apps/dashboard/src/components/chat/chat-composer-attachments.tsx
+  s_d0abf363d9fa08::t_97d21a4430f262 47-48
+  s_d0abf363d9fa08::t_34d04f84c1d5cf 42
+apps/ui/registry/notra/composer/examples/composer-state-flat.tsx
+  s_d0abf363d9fa08::t_6953279efd383a 1-46
+apps/ui/src/components/landing-sections.astro
+  s_d0abf363d9fa08::t_63629e8c2bf420 11,32
+apps/dashboard/src/components/chat/chat-input.tsx
+  s_d0abf363d9fa08::t_d56f841db6100a 958-971,973,975-998,1000-1065
+apps/ui/registry/notra/composer/examples/composer-state-empty.tsx
+  s_d0abf363d9fa08::t_6953279efd383a 1-41
+apps/ui/registry/notra/composer/examples/composer-state-queued.tsx
+  s_d0abf363d9fa08::t_6953279efd383a 1-55
+apps/dashboard/src/components/comments/discussion-composer.tsx
+  s_d0abf363d9fa08::t_1c92efef4adba7 57,65
+  s_d0abf363d9fa08::t_2857bb9a4275be 56
+apps/ui/registry.json
+  s_d0abf363d9fa08::t_4b54f099a94a5a 1309,1314,1330-1332
+  s_d0abf363d9fa08::t_f0645d19eea290 1304-1308,1310-1313,1317-1329
+apps/ui/registry/notra/composer/examples/composer-state-uploading.tsx
+  s_d0abf363d9fa08::t_6953279efd383a 1-67
+apps/ui/docs/components/composer.mdx
+  s_d0abf363d9fa08::t_ef622a644b79c4 37-40,42
+  s_d0abf363d9fa08::t_4b54f099a94a5a 1-36,101-113
+  s_d0abf363d9fa08::t_ebcf21206c9142 41,43-100
+  s_d0abf363d9fa08::t_25f39bda57ebbb 114
+apps/ui/registry/notra/composer/examples/composer-state-notice.tsx
+  s_d0abf363d9fa08::t_6953279efd383a 1-2,9-33,42-68
+  s_d0abf363d9fa08::t_0e561ae91710d6 3-8
+apps/ui/src/components/previews/composer-preview.tsx
+  s_d0abf363d9fa08::t_63629e8c2bf420 2-37,39-51
+  s_d0abf363d9fa08::t_fcdd493fa96acc 1,38
+apps/dashboard/src/components/design-system/design-system-composer-demo.tsx
+  s_d0abf363d9fa08::t_34d04f84c1d5cf 67,85,88
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "8e83ea1ad18a19fef9e6fba402fef05d01ef5b00",
+  "prompts": {},
+  "sessions": {
+    "s_d0abf363d9fa08": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "23ca2782-3db9-4e50-8003-34deb0efe42d",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

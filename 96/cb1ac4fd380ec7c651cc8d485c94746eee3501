@@ -1,0 +1,86 @@
+apps/sites-builder/src/components/BlogIndex.astro
+  s_679a387b188ae8::t_64c8ba7544d6fd 17-18,41,43
+apps/sites-builder/src/builtins/Update.astro
+  s_679a387b188ae8::t_bc62b4c23987b5 8-9,13
+apps/sites-builder/src/builtins/Callout.astro
+  s_679a387b188ae8::t_0068d169050a13 10
+  s_679a387b188ae8::t_0c371e12318a43 12
+apps/sites-builder/src/builtins/CodeGroup.astro
+  s_679a387b188ae8::t_0068d169050a13 1
+apps/docs/sites/components/code.mdx
+  s_679a387b188ae8::t_ab362cbfac7ed6 74
+apps/docs/sites/match-your-website.mdx
+  s_679a387b188ae8::t_09b0140e813a2f 75-76
+apps/docs/sites/customize/design.mdx
+  s_679a387b188ae8::t_ab362cbfac7ed6 62
+  s_679a387b188ae8::t_09b0140e813a2f 69
+apps/sites-builder/src/builtins/Accordion.astro
+  s_679a387b188ae8::t_0068d169050a13 7
+apps/sites-builder/compiler/constants/fonts.ts
+  s_679a387b188ae8::t_175fc89ad2cd95 24-27
+  s_679a387b188ae8::t_f5a27cb6a1e044 17-23
+apps/sites-builder/src/layouts/Base.astro
+  s_679a387b188ae8::t_d8310fce148c5a 42-46,57,61,65-66,77,82,84-85
+  s_679a387b188ae8::t_a3379410e00e49 39-41,59,70-76,83
+apps/sites-builder/compiler/utils/site-fonts.ts
+  s_679a387b188ae8::t_0028e70f33d87c 38-45,49,51,56-69,71-73,75-77,84-86,88-90,92-95,107-126,133-139,194-195,231,277,295-296,299-301
+  s_679a387b188ae8::t_12f745c3e0db6f 293-294,302-303
+  s_679a387b188ae8::t_175fc89ad2cd95 20,22,70,74,78-83,87,91,223,232-237,278,297-298
+  s_679a387b188ae8::t_f5a27cb6a1e044 21,29,33,35-37,46-48,50,52-55,96-106,127-132,140-141,150,202-212,222,224-230,238
+  s_679a387b188ae8::t_5c46acf5449894 30-32,34
+apps/docs/sites/customize/seo.mdx
+  s_679a387b188ae8::t_84a67f390ae041 38
+apps/sites-builder/src/components/PostPagination.astro
+  s_679a387b188ae8::t_63456057adb725 9,11-12,19
+packages/sites-compiler/src/validate.ts
+  s_679a387b188ae8::t_4745ace1d1cb63 11,114
+  s_679a387b188ae8::t_ce7de1e3a5f24c 99-113,115-127,145-149,154
+apps/sites-builder/src/styles/global.css
+  s_679a387b188ae8::t_71dd83b6675ea8 691-694
+  s_679a387b188ae8::t_ada4765b4bf67a 687
+  s_679a387b188ae8::t_fec22fc2cf32e6 688-690
+  s_679a387b188ae8::t_0068d169050a13 624-626,628,671
+  s_679a387b188ae8::t_3c2959dc6b13d5 43,580
+  s_679a387b188ae8::t_8e16a40302feb5 98
+  s_679a387b188ae8::t_bc62b4c23987b5 627,670
+apps/docs/sites/posts.mdx
+  s_679a387b188ae8::t_09b0140e813a2f 137
+apps/sites-builder/src/components/CodeBlocks.astro
+  s_679a387b188ae8::t_0068d169050a13 10-11
+  s_679a387b188ae8::t_bc62b4c23987b5 12
+apps/sites-builder/src/components/AreaHero.astro
+  s_679a387b188ae8::t_3c2959dc6b13d5 20,28
+apps/sites-builder/src/components/BlogPost.astro
+  s_679a387b188ae8::t_3c2959dc6b13d5 50
+apps/sites-builder/src/builtins/Tabs.astro
+  s_679a387b188ae8::t_0068d169050a13 4
+apps/sites-builder/src/components/ChangelogEntry.astro
+  s_679a387b188ae8::t_3c2959dc6b13d5 26,42,59
+apps/sites-builder/src/components/PostCard.astro
+  s_679a387b188ae8::t_3c2959dc6b13d5 36,87
+apps/docs/sites/reference/blog-json.mdx
+  s_679a387b188ae8::t_ab362cbfac7ed6 80,83,188
+apps/sites-builder/src/builtins/Steps.astro
+  s_679a387b188ae8::t_0068d169050a13 1
+apps/sites-builder/src/lib/theme.ts
+  s_679a387b188ae8::t_1a44fa2e7f736e 38,41,44-48
+  s_679a387b188ae8::t_c72c52c1bd44c7 22-23,37,68
+  s_679a387b188ae8::t_3c2959dc6b13d5 60-67
+  s_679a387b188ae8::t_b1e70a444ba45f 35,39-40
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "96cb1ac4fd380ec7c651cc8d485c94746eee3501",
+  "prompts": {},
+  "sessions": {
+    "s_679a387b188ae8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5cda3aa5-c3b0-46de-afc0-446f42005067",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

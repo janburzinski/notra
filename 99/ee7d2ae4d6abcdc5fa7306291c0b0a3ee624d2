@@ -1,0 +1,19 @@
+apps/dashboard/src/components/dashboard/app-sidebar.tsx
+  s_e36704634bb33b::t_de60d52cd28adb 17,76-78,82
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "99ee7d2ae4d6abcdc5fa7306291c0b0a3ee624d2",
+  "prompts": {},
+  "sessions": {
+    "s_e36704634bb33b": {
+      "agent_id": {
+        "tool": "amp",
+        "id": "TU-034PwhfBV2liNQm5Wi8uBF",
+        "model": "unknown"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

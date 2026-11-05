@@ -1,0 +1,71 @@
+packages/memory/src/stores/code-storage.ts
+  s_ed0837d744d10b::t_b37ced6f05fec5 1-2,9,18,20-25,55-79,142-150,155-161
+  s_ed0837d744d10b::t_e3e83ca3c4a90d 186-191
+  s_ed0837d744d10b::t_d85d3dcdd8f3c4 141
+packages/ai/src/schemas/company-knowledge.ts
+  s_ed0837d744d10b::t_77bab98c2e98cb 1-2
+  s_ed0837d744d10b::t_b6825e5ffb8936 3-7
+packages/ai/src/orchestration/tool-registry.ts
+  s_ed0837d744d10b::t_27724709e52e0d 183-185,199
+  s_ed0837d744d10b::t_cf00252fdf5346 7
+packages/memory/src/constants/knowledge.ts
+  s_ed0837d744d10b::t_d8e81aa2b7fb74 1-10
+apps/agent/agent/subagents/content-writer/tools/search_company_knowledge.ts
+  s_ed0837d744d10b::t_27724709e52e0d 1-3
+apps/agent/agent/tools/search_company_knowledge.ts
+  s_ed0837d744d10b::t_27724709e52e0d 1-3
+bun.lock
+  ai_agent 571
+packages/memory/src/stores/in-memory.ts
+  s_ed0837d744d10b::t_b37ced6f05fec5 55-56
+packages/memory/src/utils/knowledge.ts
+  s_ed0837d744d10b::t_d8e81aa2b7fb74 3,5,11,13-15,41-52
+packages/tools/src/assistant/search-company-knowledge.ts
+  s_ed0837d744d10b::t_b6825e5ffb8936 1-2,12-17
+  s_ed0837d744d10b::t_d9e559f09c01d4 3-9,11,18-19
+  s_ed0837d744d10b::t_16ea56ea4de9b4 10
+packages/memory/src/memory.ts
+  s_ed0837d744d10b::t_e3e83ca3c4a90d 1-6,125
+apps/agent/README.md
+  s_ed0837d744d10b::t_a4ce9b26bb5068 88
+packages/ai/src/tools/company-knowledge.ts
+  s_ed0837d744d10b::t_b6825e5ffb8936 1-3,7-9,22-28
+  s_ed0837d744d10b::t_16ea56ea4de9b4 20
+  s_ed0837d744d10b::t_d9e559f09c01d4 4-6,10-19,21,29-30
+packages/ai/src/types/company-knowledge.ts
+  s_ed0837d744d10b::t_b6825e5ffb8936 1-8
+packages/memory/src/constants/memory.ts
+  s_ed0837d744d10b::t_b0fa4f15ba406a 17
+  s_ed0837d744d10b::t_e3e83ca3c4a90d 18-23
+  s_ed0837d744d10b::t_b37ced6f05fec5 46
+packages/memory/src/types/knowledge.ts
+  s_ed0837d744d10b::t_b6825e5ffb8936 7-11
+packages/ai/src/utils/company-knowledge.ts
+  s_ed0837d744d10b::t_b6825e5ffb8936 1,4,19,45-66
+  s_ed0837d744d10b::t_77bab98c2e98cb 5
+  s_ed0837d744d10b::t_f5167d48a2f940 2-3,6-18,20-44,67
+apps/agent/agent/subagents/content-writer/instructions.md
+  s_ed0837d744d10b::t_6c531e1616e8ad 12
+packages/ai/package.json
+  s_ed0837d744d10b::t_795edb349bdf93 58
+packages/tools/src/onboarding/save-memory.ts
+  s_ed0837d744d10b::t_f2c009b6a80225 1-4,6
+packages/tools/src/onboarding/search-memory.ts
+  s_ed0837d744d10b::t_f2c009b6a80225 1,15-16
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "02c5c51dae2707f59f00b2ba5a287a4e57856576",
+  "prompts": {},
+  "sessions": {
+    "s_ed0837d744d10b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "0620c616-3e4c-4b3f-a010-95a6e321ffa0",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

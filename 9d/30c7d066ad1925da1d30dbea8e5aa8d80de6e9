@@ -1,0 +1,85 @@
+apps/dashboard/src/components/dashboard/header.tsx
+  s_8ff470b5e79e4a::t_6b0f1397a61a7e 45-47,54,56,71
+  s_8ff470b5e79e4a::t_f7f12937b64a51 101,110,197-201,233
+  s_8ff470b5e79e4a::t_0fd5530fd14771 64-69
+apps/dashboard/src/constants/sites.ts
+  s_8ff470b5e79e4a::t_1ea038c980e210 66
+apps/dashboard/tests/site-variables-surface.test.tsx
+  s_8ff470b5e79e4a::t_afe0ae0ec30342 104
+apps/dashboard/src/components/sites/site-design-editor.tsx
+  s_8ff470b5e79e4a::t_c085dd52ca15f3 147,201-204
+apps/sites-builder/src/components/Header.astro
+  s_8ff470b5e79e4a::t_05cf18ab1c2351 11-12,30-38
+apps/dashboard/src/components/sites/site-typography-fields.tsx
+  s_8ff470b5e79e4a::t_fccc7e87178e8c 39,49
+apps/dashboard/src/components/sites/site-layout.tsx
+  s_8ff470b5e79e4a::t_092579d0728fb2 80-81,83-87,89-123
+  s_8ff470b5e79e4a::t_292026cecc3406 32
+  s_8ff470b5e79e4a::t_36cc42eb43320f 71-79
+apps/dashboard/src/components/sites/site-variables-settings.tsx
+  s_8ff470b5e79e4a::t_c085dd52ca15f3 194
+apps/dashboard/src/components/sites/site-font-rows.tsx
+  s_8ff470b5e79e4a::t_fccc7e87178e8c 43,190-216,218-227
+apps/dashboard/src/utils/site-design.ts
+  s_8ff470b5e79e4a::t_c085dd52ca15f3 172,178
+  s_8ff470b5e79e4a::t_95e4ae2237f365 371-375,413-441
+apps/dashboard/src/components/sites/site-color-input.tsx
+  s_8ff470b5e79e4a::t_8fd67c9501e12b 16,32,43
+apps/dashboard/messages/de.json
+  s_8ff470b5e79e4a::t_8fd67c9501e12b 8311
+  s_8ff470b5e79e4a::t_c085dd52ca15f3 8300
+  s_8ff470b5e79e4a::t_5b3cc036e2b2e1 7587-7588
+apps/dashboard/src/components/dashboard/nav-group-list.tsx
+  s_8ff470b5e79e4a::t_1ea038c980e210 88,151,153
+apps/dashboard/src/components/sites/site-styling-fields.tsx
+  s_8ff470b5e79e4a::t_2a89a449ac12dd 54,68,83,99,101,114,116
+apps/dashboard/src/utils/dashboard-paths.ts
+  s_8ff470b5e79e4a::t_6b0f1397a61a7e 18-20,34
+apps/dashboard/src/types/framework.ts
+  s_8ff470b5e79e4a::t_6397c4d558616d 8-9
+apps/dashboard/src/types/dashboard/breadcrumbs.ts
+  s_8ff470b5e79e4a::t_7edaf74470e0b1 1
+apps/dashboard/src/components/sites/site-page-tabs.tsx
+  s_8ff470b5e79e4a::t_9865cf60c8bf46 129,161-167,169-172,174-175,178-189,191-200
+  s_8ff470b5e79e4a::t_36cc42eb43320f 17,68,70-71,79,82,158
+  s_8ff470b5e79e4a::t_466004d5058af3 21,29-30,32-34,36,38-40,46-47,77,93,136-137,143,203
+  s_8ff470b5e79e4a::t_e42df92180e370 23,159-160,201-202
+  s_8ff470b5e79e4a::t_d6caadcec8a8e6 176-177
+  s_8ff470b5e79e4a::t_92c0439efc03f4 18,144-146,156
+  s_8ff470b5e79e4a::t_6397c4d558616d 190
+  s_8ff470b5e79e4a::t_0ddf666b3aceb8 147-155
+  s_8ff470b5e79e4a::t_ae6c046815fe9e 54,58-59,130,133-134
+apps/dashboard/src/types/components/sites.ts
+  s_8ff470b5e79e4a::t_ae6c046815fe9e 60-70
+apps/dashboard/src/utils/dashboard-breadcrumbs.ts
+  s_8ff470b5e79e4a::t_7edaf74470e0b1 1-2
+apps/dashboard/tests/site-design.test.ts
+  s_8ff470b5e79e4a::t_8abe09d37a92a9 2,84-87,153-163,173-180,290-293,347,365-368
+  s_8ff470b5e79e4a::t_d278f893d9a7a1 1,3-83,88-152,164-172,181-258,260-289,294-346,348-364,369-371
+  s_8ff470b5e79e4a::t_c085dd52ca15f3 259
+apps/dashboard/src/components/framework/link.tsx
+  s_8ff470b5e79e4a::t_6397c4d558616d 8,30
+apps/dashboard/messages/en.json
+  s_8ff470b5e79e4a::t_8fd67c9501e12b 8311
+  s_8ff470b5e79e4a::t_c085dd52ca15f3 8300
+  s_8ff470b5e79e4a::t_5b3cc036e2b2e1 7587-7588
+apps/dashboard/src/types/site-design.ts
+  s_8ff470b5e79e4a::t_8fd67c9501e12b 100-101
+  s_8ff470b5e79e4a::t_fccc7e87178e8c 115-116
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "9d30c7d066ad1925da1d30dbea8e5aa8d80de6e9",
+  "prompts": {},
+  "sessions": {
+    "s_8ff470b5e79e4a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "04e358e8-8889-4650-9310-e338b0a5de3e",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

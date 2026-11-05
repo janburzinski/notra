@@ -1,0 +1,99 @@
+apps/ui/registry.json
+  s_e6b940b0cae1df::t_423c2e6a5c8609 7299,7318-7338,7346,7398,7417-7437,7445,7512,7531-7551,7559,7616,7635-7655,7663,7720,7739-7759,7767,7819,7838-7858,7866,7923,7942-7962,7970,8032,8051-8071,8079,8143,8162-8182,8190,8307,8329-8352,8360,8415,8437-8460,8468,8521,8543-8566,8574,8627,8645-8672,8680,8733,8755-8778,8786,8851,8873-8896,8904,8964,8986-9009,9017,9070,9092-9115,9123,9171,9193-9216,9224,9285,9307-9330,9338,9468-9479,9540-9551,9610-9621,9675-9686,9745-9756,9825-9836,9915-9926,10000-10011,10081-10092
+  s_e6b940b0cae1df::t_616be0800dca35 7712,7811,8129,8274-8277,9425-9428,10176-10178
+  s_e6b940b0cae1df::t_61a02b887ea8c2 7289,9448
+apps/ui/registry/notra/opencode/components/opencode-composer.tsx
+  s_e6b940b0cae1df::t_3c31fdb06db3c3 34
+  s_e6b940b0cae1df::t_91e8bf30f54dab 4-5,38-41,44,46-124,127-136,138,141-144
+apps/ui/registry/notra/codex/components/codex-composer.tsx
+  s_e6b940b0cae1df::t_91448ef0cb4228 4-5,32,41-43,51-53,61-80,82,88,118-119,121,123,164
+apps/ui/registry/notra/opencode/constants/opencode-demo.ts
+  s_e6b940b0cae1df::t_3c31fdb06db3c3 5,183-266
+apps/ui/registry/notra/claude-code/components/claude-code-prompt.tsx
+  s_e6b940b0cae1df::t_c7115491de6390 109
+  s_e6b940b0cae1df::t_5ff8fdcbf893b6 5,24,33-34,42-43,54-73,75,81,91,97,99,104,142
+apps/ui/registry/notra/opencode/constants/opencode.ts
+  s_e6b940b0cae1df::t_1d85b3c3532a6b 85-96
+apps/ui/registry/notra/opencode/hooks/use-opencode-chat.ts
+  s_e6b940b0cae1df::t_b9c350cc853d94 1-166
+apps/ui/docs/components/(coding-agents)/claude-code/prompt.mdx
+  s_e6b940b0cae1df::t_856ede3c27536e 19-21,26
+apps/ui/registry/notra/codex/types/codex.ts
+  s_e6b940b0cae1df::t_75b5b1ed5adf70 78-81,96-97,104-107,156-181
+apps/ui/registry/notra/claude-code/constants/claude-code-session.ts
+  s_e6b940b0cae1df::t_b22b13d6a35524 1,58-83,86-143
+apps/ui/docs/components/(coding-agents)/codex/working.mdx
+  s_e6b940b0cae1df::t_856ede3c27536e 19-20
+apps/ui/registry/notra/claude-code/components/claude-code-status.tsx
+  s_e6b940b0cae1df::t_25ad02943a4a26 13,112-130
+apps/ui/docs/blocks/(coding-agents)/codex.mdx
+  s_e6b940b0cae1df::t_66a1ed059aae32 18
+  s_e6b940b0cae1df::t_34f291fe2db569 28
+  s_e6b940b0cae1df::t_c6dd21f816b315 6
+  s_e6b940b0cae1df::t_1efc6cf95b0e78 30
+apps/ui/registry/notra/claude-code/examples/claude-code-demo.tsx
+  s_e6b940b0cae1df::t_3f315f7ff8a89c 3,10,21-26,33-68,72,74-89,103,106-107,112,116-117,119-131
+apps/ui/registry/notra/codex/hooks/use-codex-chat.ts
+  s_e6b940b0cae1df::t_6f99399a50ac3a 1-70,72-161
+  s_e6b940b0cae1df::t_7d04f88aa8ce8a 71
+apps/ui/registry/notra/claude-code/components/claude-code-thinking.tsx
+  s_e6b940b0cae1df::t_25ad02943a4a26 5,28-30,32-35
+  s_e6b940b0cae1df::t_616be0800dca35 31
+apps/ui/registry/notra/codex/components/codex-working.tsx
+  s_e6b940b0cae1df::t_75b5b1ed5adf70 63-78
+  s_e6b940b0cae1df::t_616be0800dca35 11
+apps/ui/registry/notra/opencode/components/opencode-turn-footer.tsx
+  s_e6b940b0cae1df::t_1d85b3c3532a6b 13,40-43
+apps/ui/docs/components/(coding-agents)/codex/composer.mdx
+  s_e6b940b0cae1df::t_856ede3c27536e 25-27
+apps/ui/docs/components/(coding-agents)/claude-code/status.mdx
+  s_e6b940b0cae1df::t_856ede3c27536e 25-26
+apps/ui/docs/blocks/(coding-agents)/claude-code.mdx
+  s_e6b940b0cae1df::t_c6dd21f816b315 6,16-26,41
+  s_e6b940b0cae1df::t_1efc6cf95b0e78 43
+apps/ui/docs/components/(coding-agents)/opencode/turn-footer.mdx
+  s_e6b940b0cae1df::t_856ede3c27536e 19
+apps/ui/docs/blocks/(coding-agents)/opencode.mdx
+  s_e6b940b0cae1df::t_1efc6cf95b0e78 28
+  s_e6b940b0cae1df::t_856ede3c27536e 6,16
+apps/ui/registry/notra/claude-code/types/claude-code.ts
+  s_e6b940b0cae1df::t_6afd649a6be87a 118-122,151-152,154-155,163-166,203,205-247
+apps/ui/registry/notra/codex/constants/codex.ts
+  s_e6b940b0cae1df::t_75b5b1ed5adf70 19-32
+apps/ui/docs/components/(coding-agents)/opencode/composer.mdx
+  s_e6b940b0cae1df::t_856ede3c27536e 12,22-24
+apps/ui/registry/notra/opencode/examples/opencode-demo.tsx
+  s_e6b940b0cae1df::t_93c0c04cd3712e 3,15,17,19,62-63,77,79,81,86-91,94-101,108,113-116,120-135,142,147-148
+apps/ui/registry/notra/claude-code/hooks/use-claude-code-chat.ts
+  s_e6b940b0cae1df::t_4cbb57bbd3d6f7 1-96,98-202
+  s_e6b940b0cae1df::t_92b0a07e3918ab 97
+apps/ui/registry/notra/claude-code/constants/claude-code.ts
+  s_e6b940b0cae1df::t_b22b13d6a35524 111-124
+apps/ui/registry/notra/claude-code/components/claude-code-tool-call.tsx
+  s_e6b940b0cae1df::t_7132a686b304f2 84
+  s_e6b940b0cae1df::t_25ad02943a4a26 5,24-27,82-83,85-87,128-132
+apps/ui/registry/notra/opencode/types/opencode.ts
+  s_e6b940b0cae1df::t_1d85b3c3532a6b 34-35,69-72,82-85,179,185-210
+  s_e6b940b0cae1df::t_616be0800dca35 180-184
+apps/ui/registry/notra/codex/examples/codex-demo.tsx
+  s_e6b940b0cae1df::t_0d250676559c3d 1-3,13-61,65-80,87-105,107,131-133
+  s_e6b940b0cae1df::t_616be0800dca35 9,12
+apps/ui/registry/notra/codex/constants/codex-demo.ts
+  s_e6b940b0cae1df::t_757e57fde1cd67 1-5,108-149
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "a31fa218952b73e60de8d674c967fd3b0cc59e06",
+  "prompts": {},
+  "sessions": {
+    "s_e6b940b0cae1df": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9243a46f-3df5-43b5-bff1-11626158f24e",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

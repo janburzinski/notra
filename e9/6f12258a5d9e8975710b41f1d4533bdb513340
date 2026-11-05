@@ -1,0 +1,57 @@
+packages/geo-core/src/geo/programs.ts
+  s_4e2cd74095b28c::t_fea96b76d3a68c 678,695-702,757-758,776-777,1678,1706
+apps/dashboard/src/lib/hooks/use-geo-scan-estimate.ts
+  s_4e2cd74095b28c::t_b9f470393380df 17-18,24
+apps/dashboard/src/types/onboarding.ts
+  s_4e2cd74095b28c::t_403e91b41565ce 80-83
+apps/dashboard/src/components/geo/geo-language-picker.tsx
+  s_4e2cd74095b28c::t_c1100d15d6b28d 46-47,84,86,108-110
+apps/dashboard/src/app/onboarding/visibility/visibility-form.tsx
+  s_4e2cd74095b28c::t_b9f470393380df 3,224-225,241-242,358,360,369,371
+packages/geo-core/src/geo/prompts.ts
+  s_4e2cd74095b28c::t_fea96b76d3a68c 420-421
+packages/geo-core/src/geo/sequence-generation.ts
+  s_4e2cd74095b28c::t_fea96b76d3a68c 1,125,185-187
+packages/geo-core/tests/geo-locale-language.test.ts
+  s_4e2cd74095b28c::t_074c587327aa35 3,33-55
+  s_4e2cd74095b28c::t_6af8e2c0184090 24-32,56
+packages/geo-core/src/schemas/geo.ts
+  s_4e2cd74095b28c::t_403e91b41565ce 384-418
+packages/geo-core/src/geo/onboarding-status.ts
+  s_4e2cd74095b28c::t_a2433c6a332f58 6-7,9,12,26-27,29-34,40,52-71,73-74,80
+  s_4e2cd74095b28c::t_c1100d15d6b28d 72,75-79
+packages/geo-core/src/utils/geo-locale-language.ts
+  s_4e2cd74095b28c::t_6af8e2c0184090 9-12,20-44,49,55
+packages/geo-core/src/types/geo.ts
+  s_4e2cd74095b28c::t_c1100d15d6b28d 913-914
+  s_4e2cd74095b28c::t_a2433c6a332f58 912,915-918
+apps/api/src/routes/geo-settings.ts
+  s_4e2cd74095b28c::t_074c587327aa35 46
+apps/dashboard/src/types/geo.ts
+  s_4e2cd74095b28c::t_c1100d15d6b28d 1282-1285
+  s_4e2cd74095b28c::t_b906a6a5fe5d74 1141
+packages/geo-core/src/geo/discover.ts
+  s_4e2cd74095b28c::t_6af8e2c0184090 52,403-406,409-417
+apps/dashboard/src/components/geo/project-create-dialog.tsx
+  s_4e2cd74095b28c::t_b9f470393380df 201-203,206
+apps/dashboard/src/app/onboarding/visibility/page.tsx
+  s_4e2cd74095b28c::t_403e91b41565ce 3-6,67-73,84-89
+apps/dashboard/src/components/geo/geo-settings-form.tsx
+  s_4e2cd74095b28c::t_b906a6a5fe5d74 170,462,473
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "e96f12258a5d9e8975710b41f1d4533bdb513340",
+  "prompts": {},
+  "sessions": {
+    "s_4e2cd74095b28c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "70a40795-46d3-4b33-aba5-6c32d88bd65b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

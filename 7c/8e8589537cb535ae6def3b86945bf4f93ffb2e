@@ -1,0 +1,177 @@
+apps/dashboard/src/components/integrations/github/github-app-section.tsx
+  s_5a01a3e585fe00::t_02752b560a49e6 9,52-65,71-78,84,90,92-93
+  s_a64a959749a3d0::t_af4bff0fa7e040 3,32,87-89,91,94-95,97-101,103-112
+apps/dashboard/src/components/integrations/github/github-publishing-settings.tsx
+  s_5a01a3e585fe00::t_985defa0cc3955 24
+  s_b859a383ff2fdb::t_ff5679d4b6ba5c 50
+  s_b859a383ff2fdb::t_567770428ed2de 36
+  s_5a01a3e585fe00::t_1209b2831c1f7d 161,164
+  s_fd2b297d901ea6::t_5aa17a40acf079 16,28,30,37-39,101,108,128,130-132,134-135,142-143,145,147-152
+  s_f0eaa872c709a1::t_d3ea31e2133f54 5,35,99,102-107,109-127,129,133,136-141,144,146,153
+  s_b859a383ff2fdb::t_ed601644f49a51 63-85
+  s_a64a959749a3d0::t_293f023fff61bc 86-94,96,100
+  s_b859a383ff2fdb::t_eb49626a177618 3-4,7-11
+  s_5a01a3e585fe00::t_791729160fbb52 42-49,51,53-62,97
+apps/dashboard/messages/de.json
+  s_f0eaa872c709a1::t_b1ca4aba951d91 4513-4514
+  s_5a01a3e585fe00::t_778027a2fb2c7d 4516
+  s_f0eaa872c709a1::t_a3f2af3f5ae965 4503
+  s_b859a383ff2fdb::t_3720ca7407023c 4515
+  s_5a01a3e585fe00::t_76ddec05455b61 4472,4474-4478
+  s_f0eaa872c709a1::t_0e2346569aed1d 4471
+  s_f0eaa872c709a1::t_e301b106e6a43a 4493-4494
+  s_5a01a3e585fe00::t_033825a8f13e97 4557
+  s_5a01a3e585fe00::t_54f3e86c1dab68 4436-4439
+apps/dashboard/src/components/integrations/github/github-webhook-repair-dialog.tsx
+  s_f0eaa872c709a1::t_01f30efb584f75 1-51
+apps/dashboard/src/types/integrations/github.ts
+  s_5a01a3e585fe00::t_c1d3a38dddb52e 53-57
+  s_f0eaa872c709a1::t_d43f2735cfc4df 209-211
+  s_f0eaa872c709a1::t_873c382fb26776 267-268
+  s_f0eaa872c709a1::t_76d1aa1876334b 8-9,24,39-47,50,58-61,71-77
+  s_f0eaa872c709a1::t_cb82400f80ed31 199-203,208
+apps/dashboard/src/components/integrations/github/github-repository-row.tsx
+  s_5a01a3e585fe00::t_15d53a938f9f47 6,9-10,20,31-32,34,38-41,49,51,69,72-83,85-93,129,157,178
+  s_a64a959749a3d0::t_43e0996db1badc 5,33,98-101,103-115,117-124,126-128,130-134,139-140,145-147,149-156,158-169,171
+  s_f0eaa872c709a1::t_9c033a0baee134 11-15,35-37,44-48,84,172-177
+  s_a64a959749a3d0::t_814b64ed4427be 52-53,56-68,71,94-97
+apps/dashboard/messages/en.json
+  s_5a01a3e585fe00::t_0ee8049389bb89 4436-4439
+  s_5a01a3e585fe00::t_6c1ed5b94bb8ac 4557,4559-4560
+  s_f0eaa872c709a1::t_5a4f673f078cdb 4513-4514
+  s_b859a383ff2fdb::t_4d622f1fa2daf7 4515
+  s_f0eaa872c709a1::t_7bda6feb5657cd 4493-4494
+  s_f0eaa872c709a1::t_54e9273b2cf685 4471
+  s_5a01a3e585fe00::t_d847b2555e4b9f 4472-4478
+  s_f0eaa872c709a1::t_b788b9ee974c6b 4503
+  s_5a01a3e585fe00::t_e80a81b239da8d 4516
+apps/dashboard/src/app/(dashboard)/[slug]/integrations/github/skeleton.tsx
+  s_a64a959749a3d0::t_07b3655aa2d80e 2,16-20,22,41-48,53,56-58,60,63
+  s_5a01a3e585fe00::t_ede780a3051e4c 13,49-52,54-55,61-62
+apps/dashboard/src/components/integrations/github/github-account-card.tsx
+  s_5a01a3e585fe00::t_a183bc5dda32bf 3
+  s_5a01a3e585fe00::t_076f9a297f26f5 68
+  s_5a01a3e585fe00::t_b242d84e182a96 85,89
+  s_a64a959749a3d0::t_255eaf04a542ff 61-66
+apps/dashboard/src/components/integrations/github/github-branch-picker.tsx
+  s_5a01a3e585fe00::t_e857a5a953ffa2 120
+  s_5a01a3e585fe00::t_2160a11f528e36 100,103
+apps/dashboard/src/types/services/integrations.ts
+  s_d30bcf76657738::t_c43e03076a330c 59
+apps/dashboard/src/components/integrations/github/github-repositories-section.tsx
+  s_5a01a3e585fe00::t_2e7e7b5df5b899 31-32,34,39
+  s_a64a959749a3d0::t_1a47f9ecd06fcc 93
+  s_5a01a3e585fe00::t_3c5f1cc6b501fd 102-105,109-112,114-118
+  s_a64a959749a3d0::t_5c2792b6781215 98,100-101,106,108
+  s_a64a959749a3d0::t_823efa380f3753 33,35-37
+apps/dashboard/src/components/integrations/github/github-repository-actions.tsx
+  s_5a01a3e585fe00::t_b1a1511f31c429 28-34
+apps/dashboard/src/lib/orpc/routers/integrations.ts
+  s_d30bcf76657738::t_1009446c41e775 201,208-214,221
+  s_d30bcf76657738::t_cec811674724ca 250,288
+apps/dashboard/src/components/integrations/github/github-repository-menu.tsx
+  s_f0eaa872c709a1::t_d55d4e60c62e65 36,39-41
+  s_5a01a3e585fe00::t_7a335c08bda9a1 51,55
+  s_5a01a3e585fe00::t_b1b13be6c40ac1 10
+  s_f0eaa872c709a1::t_fdc1ed2d2ad8fb 9,11
+  s_f0eaa872c709a1::t_a6bb186d88f257 77-83,96-114
+apps/dashboard/src/components/integrations/github/github-webhook-settings.tsx
+  s_f0eaa872c709a1::t_1292707a3df153 5-15,18-20,27,31-37,40-46,48-69,71-152,154-155,157,159
+apps/dashboard/src/hooks/use-github-webhook-actions.ts
+  s_f0eaa872c709a1::t_2641a0f242434f 84
+  s_f0eaa872c709a1::t_a74af9187aa4b9 1-83,85-89
+apps/dashboard/src/components/integrations/github/github-publishing-path-fields.tsx
+  s_f0eaa872c709a1::t_b45c6805b31927 74-79
+  s_f0eaa872c709a1::t_2645f73c372e17 102-109
+  s_f0eaa872c709a1::t_c2d8b39375ed7c 22-23,31-42
+apps/dashboard/tests/github-webhook-settings.test.tsx
+  s_efec679bfff8fe::t_1c681227d26c6c 308
+  s_efec679bfff8fe::t_238034af6d5f79 205
+  s_f0eaa872c709a1::t_f9f0168f191572 6-145,147-175,177-201,206-235,237-307,309-368
+  s_efec679bfff8fe::t_6a8ce632a10fa0 236
+  s_efec679bfff8fe::t_02ec4b1428d242 176
+  s_efec679bfff8fe::t_ed92752a5b806e 146
+apps/dashboard/src/lib/orpc/routers/integrations-list.test.ts
+  s_d30bcf76657738::t_c1f74e3a7c296a 82-83
+  s_d30bcf76657738::t_2d647ede93ba32 102-107,111
+  s_d30bcf76657738::t_fca6ee146f5c24 1-81,84-101,108-110,112-142
+apps/dashboard/src/components/integrations/github/github-setting-row.tsx
+  s_5a01a3e585fe00::t_06703a8e7574f7 1-11,14,16-21,23-28
+  s_a64a959749a3d0::t_6168cae70d37a3 12-13,22
+apps/dashboard/src/app/(dashboard)/[slug]/integrations/github/page-client.tsx
+  s_5a01a3e585fe00::t_cc61a4ba4fa4f3 68
+apps/dashboard/src/app/(dashboard)/[slug]/integrations/github/loading.tsx
+  s_5a01a3e585fe00::t_7a5abece4ab2cc 23
+  s_a64a959749a3d0::t_5b337493c2081f 6
+  s_5a01a3e585fe00::t_40eb1082b4efbf 5
+  s_a64a959749a3d0::t_3d2fea9e4b348a 36-42
+apps/dashboard/src/lib/services/integrations.ts
+  s_d30bcf76657738::t_c5769f63f235c2 45
+apps/dashboard/src/hooks/use-github-content-publishing.ts
+  s_fd2b297d901ea6::t_7b01a50f677093 1-161,165-196
+  s_fd2b297d901ea6::t_90c632e879062e 162-164
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "7c8e8589537cb535ae6def3b86945bf4f93ffb2e",
+  "prompts": {},
+  "sessions": {
+    "s_5a01a3e585fe00": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "87e75a38-9d5f-49e4-af41-e8a7e39c8229",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    },
+    "s_a64a959749a3d0": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e1f3993c-40cc-49d4-a92f-cebfad6744d6",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    },
+    "s_b859a383ff2fdb": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a954bb07-f701-4656-9a0c-302492daa139",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    },
+    "s_d30bcf76657738": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "558f124d-2ea6-4478-9f6e-a7ee75271d61",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    },
+    "s_efec679bfff8fe": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "fe65f3b2-f2e5-4916-b96a-0b1a86905a13",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    },
+    "s_f0eaa872c709a1": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "09545acf-c003-4c29-9060-55615c0eac6b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    },
+    "s_fd2b297d901ea6": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "4c960f57-88aa-4525-8b37-1ab4d17111d4",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

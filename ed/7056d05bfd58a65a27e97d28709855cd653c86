@@ -1,0 +1,71 @@
+apps/dashboard/src/lib/orpc/routers/upload.ts
+  s_996bc2fa8dc596::t_e7e42b365a7aa4 59,68
+apps/api/src/index.ts
+  s_996bc2fa8dc596::t_66c6ad4333727e 21,25,210-216
+packages/utils/package.json
+  s_996bc2fa8dc596::t_dd198f457fdc48 25
+apps/dashboard/src/app/api/demo/sandbox/reset/route.ts
+  s_996bc2fa8dc596::t_3805af90997c41 1,3-5
+apps/dashboard/src/app/api/demo/sandbox/timezone/route.ts
+  s_996bc2fa8dc596::t_3805af90997c41 8,22-31
+apps/dashboard/src/utils/demo-same-origin.ts
+  s_996bc2fa8dc596::t_6fa30d84a17728 37,39-44
+  s_996bc2fa8dc596::t_2955977cfb34ae 1-36,45
+  s_996bc2fa8dc596::t_f913a55c2711de 38
+packages/utils/src/types/client-ip.ts
+  s_996bc2fa8dc596::t_dd198f457fdc48 1-4
+apps/dashboard/tests/fixtures/demo-storage.fixture.ts
+  s_996bc2fa8dc596::t_5308df2ee6e3ef 20-21,57,70-72,309,450-457
+apps/dashboard/src/lib/orpc/routers/integrations.ts
+  s_996bc2fa8dc596::t_d11597f2bf917f 2047-2051
+  s_996bc2fa8dc596::t_e7e42b365a7aa4 164,1936-1937,2318
+apps/dashboard/src/utils/demo-ip-hash.ts
+  s_996bc2fa8dc596::t_ed5c677cd793b0 3-8,10,14-15,20-23,32-37
+apps/dashboard/src/lib/demo/route.ts
+  s_996bc2fa8dc596::t_2955977cfb34ae 1,4,7-8,11-12,15-21,25-27,32,35-60
+apps/dashboard/src/lib/demo/sandbox.ts
+  s_996bc2fa8dc596::t_3aa9b3bdde8d90 47-48,484-500,503,506,509,511,633-647
+  s_996bc2fa8dc596::t_8c9406edad9946 38,259-261,308-309,313
+  ai_agent 602
+  s_996bc2fa8dc596::t_f913a55c2711de 314
+apps/dashboard/src/app/api/demo/sandbox/customize/route.ts
+  s_996bc2fa8dc596::t_3805af90997c41 1,15
+apps/dashboard/src/app/api/demo/sandbox/route.ts
+  s_996bc2fa8dc596::t_3805af90997c41 9,16-17
+packages/utils/src/client-ip.ts
+  s_996bc2fa8dc596::t_f913a55c2711de 69-73,112
+  s_996bc2fa8dc596::t_0e4aa11e6e0fe3 6,81,116-121
+  s_996bc2fa8dc596::t_dd198f457fdc48 2
+  s_996bc2fa8dc596::t_252b71aec9483f 9-10,22,28,68
+  s_996bc2fa8dc596::t_ebf901d0d96d2c 1,3-5,7-8,14-21,23-27,29-67,74-80,82-89,91-111,113-115,122,125-152
+  s_996bc2fa8dc596::t_4fc11c00a28fbc 11-13,90,123-124
+apps/api/src/utils/ratelimit.ts
+  s_996bc2fa8dc596::t_4e4dc308f732de 10-11,172-177
+apps/dashboard/src/utils/ratelimit.ts
+  s_996bc2fa8dc596::t_3e38ceb5018e98 9-12,195-208
+apps/dashboard/src/constants/demo.ts
+  s_996bc2fa8dc596::t_3aa9b3bdde8d90 62
+  s_996bc2fa8dc596::t_8c9406edad9946 80-88,158-163
+apps/api/src/constants/demo.ts
+  s_996bc2fa8dc596::t_66c6ad4333727e 3-9
+packages/utils/src/constants/cloudflare-ips.ts
+  s_996bc2fa8dc596::t_baa59268b95adc 1-30
+apps/dashboard/src/app/api/uploads/content-image/route.ts
+  s_996bc2fa8dc596::t_d11597f2bf917f 2,6,36-39
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "ed7056d05bfd58a65a27e97d28709855cd653c86",
+  "prompts": {},
+  "sessions": {
+    "s_996bc2fa8dc596": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "37826b10-31a3-42fa-be2c-6de31ce5ea10",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

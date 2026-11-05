@@ -1,0 +1,19 @@
+apps/dashboard/src/lib/orpc/routers/brand-sitemaps.ts
+  s_eba39e9a0f8071::t_16e61140f0a1b2 126-127
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "ee6651f02fa76e60475a66fb74588f25a3965cac",
+  "prompts": {},
+  "sessions": {
+    "s_eba39e9a0f8071": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "97b4841e-e30e-43ae-8a89-ded91c131bb3",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

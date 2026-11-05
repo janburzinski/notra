@@ -1,0 +1,21 @@
+apps/dashboard/src/utils/chat-minimap.ts
+  s_492d69f8779584::t_04f19a896f5a37 9-13,21-43,58,68
+apps/dashboard/src/components/chat/chat-minimap-rail.tsx
+  s_492d69f8779584::t_04f19a896f5a37 11,14,25-26,35-54,72,75-78,91-95
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "ac7a078a101c2da26868cecded595826d4e40189",
+  "prompts": {},
+  "sessions": {
+    "s_492d69f8779584": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "235864aa-569e-4bc1-ae72-3878ba3cc1d8",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

@@ -1,0 +1,22 @@
+apps/dashboard/src/lib/hooks/use-content-chat-input.ts
+  s_d6564c67c0368a::t_786e1a782898b4 245,257
+apps/dashboard/src/components/content/editor/plugins/selection-plugin.tsx
+  s_d6564c67c0368a::t_6683b408b017e9 5-10
+  s_d6564c67c0368a::t_8627451ef87307 37-38,40-49
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "3bb3e648220d08a8a274228af7b852d68ac8e4b8",
+  "prompts": {},
+  "sessions": {
+    "s_d6564c67c0368a": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "7e57542d-82ce-49fe-bfd8-be3967312d1d",
+        "model": "grok-4.6"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

@@ -1,0 +1,417 @@
+apps/dashboard/src/lib/upload/server.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 24,81
+apps/dashboard/tests/rpc-custom-attribution.test.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 1-333
+packages/ai/src/utils/model-call-telemetry.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 23,27,45,74,102-104,107,116-150,152
+infra/observability/check-prometheus-resources.mjs
+  s_f54b06300e2289::t_f46a0c8ad7555b 1-460
+packages/ai/src/constants/router-test.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 1-5
+packages/db/src/schema.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 4228-4230,4282
+infra/observability/history/history.test.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 1-172
+.railway/observability.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 1-92
+infra/observability/grafana/dashboards/notra-accounting.json
+  s_f54b06300e2289::t_f46a0c8ad7555b 1-218
+packages/geo-core/src/geo/errors.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 133-134,140
+packages/sites-server/src/types/sites.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 31
+packages/ai/src/utils/otlp-buffering.test.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 1-77
+infra/observability/grafana/provisioning/datasources/notra.yml
+  s_f54b06300e2289::t_f46a0c8ad7555b 1-17
+packages/ai/src/utils/shipping-pipeline.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 1-80
+packages/db/migrations/meta/0116_snapshot.json
+  ai_agent 1-15563
+apps/dashboard/src/app/(dashboard)/[slug]/api-keys/page.tsx
+  s_f54b06300e2289::t_f46a0c8ad7555b 10,51-58,78,96,106,108,120,280,283,288,291,406-407,413-429,431,1065,1085,1088-1090,1100
+packages/sites-server/tests/utils/site-project.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 1-24
+infra/observability/utils/cost-capacity.mjs
+  s_f54b06300e2289::t_f46a0c8ad7555b 1-37
+infra/observability/history/constants/history.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 1-9
+infra/observability/utils/prometheus-fixture.mjs
+  s_f54b06300e2289::t_f46a0c8ad7555b 1-101
+packages/db/migrations/0115_sites_required_project.sql
+  ai_agent 1-36
+packages/ai/src/utils/checkpoint-pipeline.test.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 1-62
+infra/observability/vercel/constants/metrics.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 1-48
+apps/dashboard/src/lib/orpc/base.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 1-4,10,29-41,48-51
+infra/observability/grafana/surface-query-fixtures.json
+  s_f54b06300e2289::t_f46a0c8ad7555b 1-262
+packages/sites-server/tests/deployment-admission.test.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 9,109
+apps/dashboard/src/utils/site-project.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 1-10
+infra/observability/tunnel/ingress.json
+  s_f54b06300e2289::t_f46a0c8ad7555b 1-25
+packages/ai/src/router/model-ids.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 1,6,43-53
+apps/dashboard/src/app/api/organizations/[organizationId]/chat/route.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 97
+packages/ai/src/utils/telemetry-event.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 1-70
+apps/api/src/utils/analytics.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 29,65,144,156
+apps/dashboard/src/app/rpc/[[...rest]]/route.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 21-24,86-90,97,108
+packages/geo-core/src/geo/projects.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 5,199-200,280-288,303,305
+infra/observability/collector/entrypoint.sh
+  s_f54b06300e2289::t_f46a0c8ad7555b 1-4
+apps/dashboard/src/lib/auth/organization.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 16,65-67,143-147
+infra/observability/grafana/entrypoint.sh
+  s_f54b06300e2289::t_f46a0c8ad7555b 1-4
+packages/ai/src/utils/checkpoint-pipeline.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 1-91
+apps/dashboard/src/lib/orpc/routers/user.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 30,57-63,161-165,279-283
+apps/dashboard/tests/sites-feature-flag.test.tsx
+  s_f54b06300e2289::t_f46a0c8ad7555b 162-164,185
+infra/observability/history/import-axiom.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 1-50
+apps/dashboard/tests/site-create-deploy-surface.test.tsx
+  s_f54b06300e2289::t_f46a0c8ad7555b 39
+packages/ai/src/utils/request-ai-usage.test.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 1-109
+packages/geo-core/src/geo/failure-wire.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 1,20,39-40
+infra/observability/check-queries.mjs
+  s_f54b06300e2289::t_f46a0c8ad7555b 1-644
+apps/dashboard/src/app/api/organizations/[organizationId]/content/[contentId]/chat/route.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 92
+apps/dashboard/src/lib/orpc/routers/api-keys.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 6,8,12,23,85,88,92,107,110,113,117-194,206,212,293,304-309,332-334,359,384-542
+apps/dashboard/src/lib/api-keys/expiration.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 1-29
+infra/observability/grafana/dashboards/notra-surfaces.json
+  s_f54b06300e2289::t_f46a0c8ad7555b 1-221
+infra/observability/check-queries.test.mjs
+  s_f54b06300e2289::t_f46a0c8ad7555b 1-190
+packages/ai/src/router/test-helpers.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 10,30-34
+apps/dashboard/src/components/sites/site-layout.tsx
+  s_f54b06300e2289::t_f46a0c8ad7555b 11,17,19-22,38-39,41-43,45-53,56-58,97-125
+apps/dashboard/src/lib/organizations/guards.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 13,68
+packages/ai/src/types/log-shipping.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 1-12
+packages/ai/src/utils/otlp-pipeline.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 1-64
+packages/schemas/src/schemas/dashboard/api-keys.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 50-62
+packages/ai/src/router/adapters/vercel.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 10-14,67-68,71-79,98-100,102,104-110
+packages/ai/src/utils/evlog-runtime.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 7,25
+infra/observability/history/tsconfig.json
+  s_f54b06300e2289::t_f46a0c8ad7555b 1-12
+packages/ai/src/utils/telemetry-event.test.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 1-128
+packages/utils/src/account-api-key.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 1-17
+infra/observability/validate-config.mjs
+  s_f54b06300e2289::t_f46a0c8ad7555b 1-126
+infra/observability/vercel/types/metrics.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 1-62
+packages/sites-server/src/sites.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 4,104-115,155
+.github/workflows/code-quality.yml
+  s_f54b06300e2289::t_f46a0c8ad7555b 76-90
+infra/observability/grafana/dashboards/notra.json
+  s_f54b06300e2289::t_f46a0c8ad7555b 1-789
+infra/observability/check-loki-resources.mjs
+  s_f54b06300e2289::t_f46a0c8ad7555b 1-330
+infra/observability/prometheus/prometheus.yml
+  s_f54b06300e2289::t_f46a0c8ad7555b 1-75
+apps/dashboard/src/lib/sites/serialize.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 34
+apps/dashboard/tests/rpc-request-id.test.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 1-93
+infra/observability/prometheus/Dockerfile
+  s_f54b06300e2289::t_f46a0c8ad7555b 1-9
+packages/ai/src/constants/telemetry-test.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 1-8
+packages/ai/src/types/operational-log.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 16,27
+infra/observability/vercel/utils/api.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 1-80
+infra/observability/vercel/utils/metrics.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 1-217
+infra/observability/history/utils/push-history.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 1-73
+apps/dashboard/src/components/sites/site-create-form.tsx
+  s_f54b06300e2289::t_f46a0c8ad7555b 18,60,84,95,173,229
+infra/observability/prometheus/entrypoint.sh
+  s_f54b06300e2289::t_f46a0c8ad7555b 1-4
+apps/dashboard/src/utils/site-links.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 7-8,13-21
+apps/dashboard/src/utils/rpc-telemetry.test.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 1-182
+apps/dashboard/src/app/(dashboard)/[slug]/sites/page-client.tsx
+  s_f54b06300e2289::t_f46a0c8ad7555b 20,23,26,36-76,96-106
+infra/observability/vercel/server.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 1-73
+apps/dashboard/src/components/dashboard/sidebar-project-switcher.tsx
+  s_f54b06300e2289::t_f46a0c8ad7555b 34,39-40,42,45,55,60-69,82-87,126-130,201,245
+infra/observability/history/types/history.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 1-30
+infra/observability/utils/docker.mjs
+  s_f54b06300e2289::t_f46a0c8ad7555b 1-14
+.railway/tests/config.test.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 9,121,143
+apps/dashboard/src/lib/orpc/routers/attachments.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 18,93,117,126,182
+infra/observability/vercel/tsconfig.json
+  s_f54b06300e2289::t_f46a0c8ad7555b 1-13
+infra/observability/blackbox/Dockerfile
+  s_f54b06300e2289::t_f46a0c8ad7555b 1-4
+packages/schemas/src/schemas/api/internal-geo.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 23
+packages/ai/src/evlog.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 16,34-38,42,56-58,90
+apps/dashboard/src/utils/rpc-request-scope.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 1-16
+.railway/tsconfig.json
+  s_f54b06300e2289::t_f46a0c8ad7555b 8
+.railway/README.md
+  s_f54b06300e2289::t_f46a0c8ad7555b 1,3-4,10-132,166,169,171-172
+packages/ai/src/constants/evlog.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 4-15,18-24
+apps/dashboard/src/utils/site-create.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 41
+packages/ai/src/constants/router.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 24-38
+apps/dashboard/src/lib/orpc/routers/sites.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 23,235,237-246,253-258,458
+apps/dashboard/src/app/(dashboard)/[slug]/sites/new/page-client.tsx
+  s_f54b06300e2289::t_f46a0c8ad7555b 6,10,18,21,24-60,66-71
+infra/observability/loki/Dockerfile
+  s_f54b06300e2289::t_f46a0c8ad7555b 1-9
+apps/dashboard/messages/de.json
+  s_f54b06300e2289::t_f46a0c8ad7555b 653-676,975,7068-7075,7159-7162
+packages/ai/src/router/adapters/vercel.test.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 1-252
+package.json
+  s_f54b06300e2289::t_f46a0c8ad7555b 14,52
+packages/ai/src/types/mcp-telemetry.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 1-25
+infra/observability/grafana/provisioning/dashboards/notra.yml
+  s_f54b06300e2289::t_f46a0c8ad7555b 1-9
+packages/ai/src/utils/observe-mcp-tool.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 1-60
+apps/api/src/utils/workspaces.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 7,47,160-166
+packages/geo-core/tests/site-project-delete.test.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 9,11,39-40,51,54-56,60,67,69-70,73-75,77-112,114-117,119-123,125,127-139,141-152
+packages/ai/src/utils/observe-mcp-tool.test.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 1-46
+apps/dashboard/src/components/sites/site-create-project.tsx
+  s_f54b06300e2289::t_f46a0c8ad7555b 1-29
+infra/observability/vercel/server.test.mjs
+  s_f54b06300e2289::t_f46a0c8ad7555b 1-80
+packages/ai/src/router/credits.test.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 1-155
+apps/dashboard/src/components/sites/sites-list.tsx
+  s_f54b06300e2289::t_f46a0c8ad7555b 95,184-189
+packages/db/migrations/meta/_journal.json
+  ai_agent 813-821
+patches/evlog@2.28.1.patch
+  s_f54b06300e2289::t_f46a0c8ad7555b 24-54
+packages/ai/src/router/router.test.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 9-14,29
+infra/observability/history/utils/project-day.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 1-61
+apps/dashboard/src/components/sites/site-list-menu-items.tsx
+  s_f54b06300e2289::t_f46a0c8ad7555b 43-54,89-93,104-111,122-131
+infra/observability/validate-config.test.mjs
+  s_f54b06300e2289::t_f46a0c8ad7555b 1-64
+infra/observability/vercel/metrics.test.mjs
+  s_f54b06300e2289::t_f46a0c8ad7555b 1-147
+apps/dashboard/src/types/sites.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 161
+packages/db/migrations/meta/0115_snapshot.json
+  ai_agent 2,13400,13588-13608,13685
+apps/dashboard/src/components/sites/site-create-deploy.tsx
+  s_f54b06300e2289::t_f46a0c8ad7555b 203-208
+apps/dashboard/src/types/components/sites.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 44-59,607
+infra/observability/loki/loki.yml
+  s_f54b06300e2289::t_f46a0c8ad7555b 1-79
+packages/ai/src/router/create-router.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 153-174,178-186
+infra/observability/vercel/utils/poll.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 1-72
+apps/api/src/routes/geo-projects.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 112
+apps/api/src/middleware/observability.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 2-5,8-12,15-33
+apps/dashboard/src/lib/hooks/use-sites.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 40,43-44,62
+infra/observability/blackbox/blackbox.yml
+  s_f54b06300e2289::t_f46a0c8ad7555b 1-11
+infra/observability/check-loki-resources.test.mjs
+  s_f54b06300e2289::t_f46a0c8ad7555b 1-56
+infra/observability/collector/collector.yml
+  s_f54b06300e2289::t_f46a0c8ad7555b 1-55
+packages/ai/src/tools/mcp-lazy.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 2,340-354,356-360,362-364,366-371,373-402,405-410,412-432
+packages/ai/src/types/router.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 88,96-100,117-128,160-161
+infra/observability/config.test.mjs
+  s_f54b06300e2289::t_f46a0c8ad7555b 1-324
+packages/ai/src/utils/telemetry-value.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 1-89
+packages/sites-server/tests/draft-cas-postgres.test.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 15,177
+apps/dashboard/src/constants/api-keys.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 102-104
+apps/dashboard/src/lib/orpc/utils/geo-errors.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 27-33
+packages/ai/src/utils/observe-model-stream.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 23
+packages/ai/src/router/lazy-model.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 165-167,177-183
+packages/sites-server/tests/host-reclaim.test.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 13,255-257,264,508
+packages/ai/src/types/request-ai-usage.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 1-38
+infra/observability/grafana/dashboards/notra-vercel.json
+  s_f54b06300e2289::t_f46a0c8ad7555b 1-329
+apps/dashboard/src/lib/orpc/routers/upload.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 33,112,193
+packages/ai/src/utils/send-otlp-batch.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 1-97
+packages/sites-server/tests/postgres-lifecycle.test.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 16-17,149,187,271,314
+apps/dashboard/tests/sites-get-read-only.test.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 43
+packages/ai/src/utils/request-ai-usage.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 3-8,10,16-18,23-27,30-33,35-36,56,59,62-75,80-87,115-121,124-128,130-131,166-167
+infra/observability/constants/prometheus-fixtures.mjs
+  s_f54b06300e2289::t_f46a0c8ad7555b 1-55
+packages/ai/src/utils/request-id.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 1-13
+packages/schemas/src/schemas/dashboard/sites.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 29-33,64
+packages/sites-server/README.md
+  s_f54b06300e2289::t_f46a0c8ad7555b 232-328
+infra/observability/railway.test.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 1-71
+apps/dashboard/src/types/orpc/context.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 8-10
+packages/ai/src/router/route-usage.test.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 1-29
+packages/sites-server/tests/github-consent.test.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 7,115
+packages/ai/src/utils/axiom-pipeline.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 4,6,9,15-17,19-22,24-28,30-31
+packages/sites-server/tests/organization-teardown.test.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 9,168-170,179,486
+packages/sites-server/tests/production-projection.test.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 7-8,99,282
+packages/utils/package.json
+  s_f54b06300e2289::t_f46a0c8ad7555b 25-27
+apps/api/src/routes/workspaces.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 10,28,66-70
+packages/ai/src/router/adapters/openrouter.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 117-120,122,132-137
+packages/utils/src/constants/account-api-key.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 1-8
+packages/ai/src/utils/evlog-request.test.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 1-192
+packages/ai/src/observability.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 1-4,14-35
+infra/observability/history/schemas/history.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 1-34
+infra/observability/README.md
+  s_f54b06300e2289::t_f46a0c8ad7555b 1-632
+packages/ai/src/utils/otlp-pipeline.test.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 1-164
+apps/api/src/middleware/auth.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 3,5,9,12-15,17,28,58-61,246-249,467-563,628-629,638-661
+apps/dashboard/src/lib/orpc/context.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 7
+apps/dashboard/src/components/api-keys/account-api-keys-section.tsx
+  s_f54b06300e2289::t_f46a0c8ad7555b 1-686
+apps/api/tests/auth-telemetry.test.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 1-84
+infra/observability/history/backfill-db.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 1-106
+apps/dashboard/src/lib/orpc/routers/attachments.test.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 1-79
+apps/dashboard/messages/en.json
+  s_f54b06300e2289::t_f46a0c8ad7555b 653-676,975,7068-7075,7159-7162
+apps/api/src/runtime/geo.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 55-57
+packages/ai/src/constants/telemetry.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 1-309
+apps/api/src/types/auth.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 25-33,44-50
+infra/observability/tunnel/Dockerfile
+  s_f54b06300e2289::t_f46a0c8ad7555b 1-2
+turbo.json
+  s_f54b06300e2289::t_f46a0c8ad7555b 103-106
+apps/api/src/index.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 17,33-36,178-183,275-276,379-388
+infra/observability/loki/entrypoint.sh
+  s_f54b06300e2289::t_f46a0c8ad7555b 1-4
+packages/ai/src/types/evlog.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 33-36,38
+packages/sites-server/tests/smart-deployments-postgres.test.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 15,296,902
+infra/observability/collector/Dockerfile
+  s_f54b06300e2289::t_f46a0c8ad7555b 1-8
+packages/ai/src/utils/model-call-telemetry.test.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 1-286
+bun.lock
+  ai_agent 23,5245
+apps/dashboard/tests/site-create-defaults.test.tsx
+  s_f54b06300e2289::t_f46a0c8ad7555b 31
+packages/ai/src/utils/evlog-request.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 1-2,22-25,27-36,54
+infra/observability/grafana/query-fixtures.json
+  s_f54b06300e2289::t_f46a0c8ad7555b 1-490
+apps/dashboard/src/utils/rpc-telemetry.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 1-57
+infra/observability/vercel/schemas/metrics.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 1-81
+infra/observability/grafana/Dockerfile
+  s_f54b06300e2289::t_f46a0c8ad7555b 1-26
+apps/dashboard/src/types/api-keys.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 8,11,79-92
+infra/observability/vercel/Dockerfile
+  s_f54b06300e2289::t_f46a0c8ad7555b 1-10
+apps/dashboard/tests/fixtures/schedule-dedupe.fixture.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 59
+infra/observability/check-prometheus-resources.test.mjs
+  s_f54b06300e2289::t_f46a0c8ad7555b 1-202
+.railway/constants/observability.ts
+  s_f54b06300e2289::t_f46a0c8ad7555b 1-23
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "71ab23db4f5d4e3b209b933a4ff44b69134dbb7b",
+  "prompts": {},
+  "sessions": {
+    "s_f54b06300e2289": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "1bb5baa0-60a5-4b8a-aed8-b90b015797b0",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

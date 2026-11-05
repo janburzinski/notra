@@ -1,0 +1,21 @@
+packages/tools/src/code-research/open-repository.ts
+  s_789a1240c5b3e3::t_5cfbff89a31f6c 13-15,25-36,38-42,46,53-55
+packages/ai/src/utils/code-research-session.ts
+  s_789a1240c5b3e3::t_5cfbff89a31f6c 232-234,236,238,241
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "1e306fb901a4b7d353ca69e65e7dcb3e3270ee8c",
+  "prompts": {},
+  "sessions": {
+    "s_789a1240c5b3e3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "fe45ce4b-5c51-424d-b9d3-be060c25613c",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

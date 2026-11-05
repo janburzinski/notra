@@ -1,0 +1,51 @@
+packages/ui/src/components/shared/auth/mfa-challenge-form.tsx
+  s_1e325abf04c4e2::t_8c65a8bc767c22 96,107,216-224
+apps/dashboard/src/constants/settings.ts
+  s_1e325abf04c4e2::t_fb4b3b2eee20be 69,79,276
+packages/ui/src/lib/auth-types.ts
+  s_1e325abf04c4e2::t_7a28f14fc301f4 3
+  s_1e325abf04c4e2::t_8c65a8bc767c22 193,195,211,228,231,253
+apps/dashboard/src/lib/auth/security-actions.ts
+  s_1e325abf04c4e2::t_fb4b3b2eee20be 8,10,116
+apps/dashboard/src/components/auth/signup-form.tsx
+  s_1e325abf04c4e2::t_8c65a8bc767c22 28,198-203,205
+apps/dashboard/src/lib/actions/errors.ts
+  s_1e325abf04c4e2::t_fb4b3b2eee20be 5
+apps/dashboard/src/types/auth/security.ts
+  s_1e325abf04c4e2::t_fb4b3b2eee20be 1
+apps/dashboard/src/types/design-system/auth-flow.ts
+  s_1e325abf04c4e2::t_8c65a8bc767c22 30
+apps/dashboard/src/components/design-system/auth-flow-simulator-panel.tsx
+  s_1e325abf04c4e2::t_fb4b3b2eee20be 143,205
+packages/ui/src/components/shared/auth/login-form.tsx
+  s_1e325abf04c4e2::t_fb4b3b2eee20be 39,83
+packages/ui/src/components/shared/auth/totp-enrollment-panel.tsx
+  s_1e325abf04c4e2::t_8c65a8bc767c22 235
+apps/dashboard/src/components/design-system/auth-security-demo.tsx
+  s_1e325abf04c4e2::t_fb4b3b2eee20be 237
+apps/dashboard/scripts/create-dev-auth-account.ts
+  s_1e325abf04c4e2::t_c14e30ea1214ed 2
+apps/dashboard/src/components/design-system/auth-flow-playground.tsx
+  s_1e325abf04c4e2::t_e515aa55133732 29,393-395
+  s_1e325abf04c4e2::t_46ec55cfa8fa17 28
+packages/ui/src/lib/security-types.ts
+  s_1e325abf04c4e2::t_8c65a8bc767c22 30,51-53,58,60
+packages/ui/src/components/shared/security/two-factor-settings.tsx
+  s_1e325abf04c4e2::t_8c65a8bc767c22 34,156-157,249
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "0010942b96004112f75816f93123271afaacdfa1",
+  "prompts": {},
+  "sessions": {
+    "s_1e325abf04c4e2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f98b95b6-a893-4a57-9f87-93bd7c030132",
+        "model": "claude-fable-5-1"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

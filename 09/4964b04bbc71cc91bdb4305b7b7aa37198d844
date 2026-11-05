@@ -1,0 +1,26 @@
+packages/sites-server/tests/branch-workflow.test.ts
+  s_e826847ee1f404::t_2e78b9a848f6bf 211
+apps/dashboard/src/types/components/sites.ts
+  s_e826847ee1f404::t_a1c426f775e527 757-759
+  s_e826847ee1f404::t_fdb9b53c893522 13
+apps/dashboard/src/components/sites/site-changes-banner.tsx
+  s_e826847ee1f404::t_37eee85d0bcd44 6,14-18,156
+  s_e826847ee1f404::t_4fd5b0840fc904 60-66,124-136,140-142,144-145,147-148,157-163,165-172
+  s_e826847ee1f404::t_fdb9b53c893522 143
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "094964b04bbc71cc91bdb4305b7b7aa37198d844",
+  "prompts": {},
+  "sessions": {
+    "s_e826847ee1f404": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "be74ce0a-7811-423c-9063-df9fff5dae16",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

@@ -1,0 +1,28 @@
+packages/geo-core/src/geo/sentiment-automation.ts
+  s_6c80644add4551::t_422f54586876dc 75-77,81
+packages/geo-core/src/utils/sentiment-analysis.ts
+  s_6c80644add4551::t_d081551f433feb 38-39,41,43,50-51
+packages/geo-core/src/geo/sentiment-analysis.ts
+  s_6c80644add4551::t_03610d5eef4ebd 42,57-58
+  s_6c80644add4551::t_d70c9606718eaa 211
+  s_6c80644add4551::t_be62debb14e6ba 131-138,144
+  s_6c80644add4551::t_ce0b6726051a43 139-143
+packages/geo-core/tests/sentiment-analysis.test.ts
+  s_6c80644add4551::t_8ecb647b7f6ff6 663,668-669,675-676,684-701
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "44112d5695db60477f8ffa0cc6772656f071ae20",
+  "prompts": {},
+  "sessions": {
+    "s_6c80644add4551": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "4ab5cfc4-776d-4678-a9d3-b0dc4fc3c577",
+        "model": "grok-4.7"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

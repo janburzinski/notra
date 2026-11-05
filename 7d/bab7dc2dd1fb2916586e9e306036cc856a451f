@@ -1,0 +1,21 @@
+scripts/testing/dashboard/run.ts
+  s_44cf84a7c2985f::t_4ad57c894d67cb 224
+scripts/testing/dashboard/utils/box-snapshot.ts
+  s_44cf84a7c2985f::t_4ad57c894d67cb 2,14,43-50
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "7dbab7dc2dd1fb2916586e9e306036cc856a451f",
+  "prompts": {},
+  "sessions": {
+    "s_44cf84a7c2985f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7369f024-3389-49d4-ad32-cf5f47956db1",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

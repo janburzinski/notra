@@ -1,0 +1,24 @@
+apps/dashboard/tests/geo-gaps-page.test.tsx
+  s_2c5b3ad6297ff7::t_d44e50d493a5fc 3,6-7,73-80,90,99,107,116,126
+packages/geo-core/tests/writer-brief-revision.test.ts
+  s_2c5b3ad6297ff7::t_57550d080d0527 1-56,67-71,75
+  s_2c5b3ad6297ff7::t_cfee442845eae5 57-66,72-74
+packages/geo-core/src/geo/writer.ts
+  s_2c5b3ad6297ff7::t_ff5ee5493dd312 417-419
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "e3620c999de63ed4309b17cf114bf980446e91d2",
+  "prompts": {},
+  "sessions": {
+    "s_2c5b3ad6297ff7": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0e771-370d-7cb1-91f5-637f533cedf1",
+        "model": "gpt-6-sol"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

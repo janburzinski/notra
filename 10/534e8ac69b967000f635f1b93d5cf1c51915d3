@@ -1,0 +1,29 @@
+apps/dashboard/src/lib/hooks/use-site-workspace-state.ts
+  s_3fe33d191b4af7::t_7ca43f5f413e43 27,36,109-119,121,143-145,155
+  s_3fe33d191b4af7::t_91cdb611304048 135,137-139
+apps/dashboard/src/components/sites/site-variables-settings.tsx
+  s_3fe33d191b4af7::t_7ca43f5f413e43 13,15-23
+apps/dashboard/src/components/sites/site-design-appearance.tsx
+  s_3fe33d191b4af7::t_7ca43f5f413e43 31,35-38,40-42
+apps/dashboard/src/types/site-workspace.ts
+  s_3fe33d191b4af7::t_7ca43f5f413e43 14
+apps/dashboard/src/components/sites/site-workspace.tsx
+  s_3fe33d191b4af7::t_7ca43f5f413e43 4,27-32,46-48,54,87-98,114-118,141,144-154
+  s_3fe33d191b4af7::t_aea384e4237b48 37-43,86,111-113,125-127,132-136
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "10534e8ac69b967000f635f1b93d5cf1c51915d3",
+  "prompts": {},
+  "sessions": {
+    "s_3fe33d191b4af7": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a15ece-3943-7fb2-a7f2-cf43d74c4ce0",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

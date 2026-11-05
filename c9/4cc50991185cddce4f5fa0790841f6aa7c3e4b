@@ -1,0 +1,23 @@
+packages/geo-core/tests/geo-grounded-engines.test.ts
+  s_fa21dd822f8f79::t_a816e1dfef78e2 95-100
+packages/geo-core/src/constants/geo-model-catalog.ts
+  s_fa21dd822f8f79::t_a816e1dfef78e2 572
+apps/docs/geo/engines.mdx
+  s_fa21dd822f8f79::t_a816e1dfef78e2 40
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "c94cc50991185cddce4f5fa0790841f6aa7c3e4b",
+  "prompts": {},
+  "sessions": {
+    "s_fa21dd822f8f79": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a13a36-ac0f-7fa1-9a76-b8eab8fd814b",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

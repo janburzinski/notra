@@ -1,0 +1,27 @@
+apps/dashboard/src/lib/integrations/github/content-pull-request.ts
+  s_47ffee016a5a9d::t_27cec9c2de3126 50-61,84
+apps/dashboard/src/lib/autopilot/pull-request-events.ts
+  s_47ffee016a5a9d::t_46bfb7a4438c80 39-42
+  s_47ffee016a5a9d::t_27cec9c2de3126 280,295-303
+  s_47ffee016a5a9d::t_bc67381b519f6b 309
+apps/dashboard/tests/autopilot-flow.test.ts
+  s_47ffee016a5a9d::t_ca0e7ca6be13ee 280
+apps/dashboard/tests/autopilot-sandbox.test.ts
+  s_47ffee016a5a9d::t_46bfb7a4438c80 83
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "ed966ae4ac329b308e31f4021c6a34757c6f14fa",
+  "prompts": {},
+  "sessions": {
+    "s_47ffee016a5a9d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "1c119c71-6a99-4246-85b2-8af1618735f7",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

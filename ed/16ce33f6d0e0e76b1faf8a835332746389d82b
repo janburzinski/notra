@@ -1,0 +1,68 @@
+packages/workflows/src/runtime/scheduler.ts
+  ai_agent 5,69-110,118,160-162
+apps/dashboard/src/components/autopilot/autopilot-workflow-graph.tsx
+  s_985d322a22a6f8::t_7f986cc213b5b2 1-8,10,15-23,25-77,93-102,113-115
+  s_985d322a22a6f8::t_5048f8149340b3 9
+  s_985d322a22a6f8::t_e09cbd750903a3 11-14,24,103-105,107-112
+  s_985d322a22a6f8::t_3a62fd3072efd7 78-92
+  s_985d322a22a6f8::t_8942cf334c9391 106
+apps/dashboard/src/lib/orpc/routers/autopilot.ts
+  s_985d322a22a6f8::t_9601fa53108cc0 49-52,79,458-463,467-469
+  s_985d322a22a6f8::t_af7f571f4df568 464-466
+apps/dashboard/src/lib/workflow-engine/run-view.ts
+  s_985d322a22a6f8::t_594274d1d8a085 1-3,5-73,76-83,85-100
+  s_985d322a22a6f8::t_af7f571f4df568 4
+  s_985d322a22a6f8::t_d403abf1abb114 74-75
+  s_985d322a22a6f8::t_e09cbd750903a3 84
+apps/dashboard/src/utils/workflow-run-view.ts
+  s_985d322a22a6f8::t_af18a6644ecfe8 1-33,35-41,43-77,86-90,92-120,124-149,151-155,157-165,169-173,175-184,186,188-191,197-199
+  s_985d322a22a6f8::t_7785c9dde09fae 34,42,187
+  s_985d322a22a6f8::t_8942cf334c9391 78-85,121-123
+  s_985d322a22a6f8::t_a5e00249ebd6ce 91
+  s_985d322a22a6f8::t_3373e02bce61b9 150,156,174,185
+  s_985d322a22a6f8::t_c408fe85e693cb 166-168,192-196
+apps/ui/registry/notra/workflow/components/workflow-node-sheet.tsx
+  s_985d322a22a6f8::t_f2b058a1b70e8b 81
+  s_985d322a22a6f8::t_550cb63a6dea63 115,125
+apps/dashboard/src/types/autopilot.ts
+  s_985d322a22a6f8::t_e09cbd750903a3 21,303-304,306-311
+  s_985d322a22a6f8::t_3488491411b476 305
+apps/ui/registry/notra/workflow/lib/workflow.ts
+  s_985d322a22a6f8::t_af7f571f4df568 391-393
+apps/ui/package.json
+  s_985d322a22a6f8::t_550cb63a6dea63 16-20
+apps/ui/registry/notra/workflow/components/workflow-node.tsx
+  s_985d322a22a6f8::t_f2b058a1b70e8b 269,271
+apps/dashboard/src/constants/autopilot.ts
+  s_985d322a22a6f8::t_aca1e82d1d2599 13
+apps/dashboard/src/types/workflow-engine.ts
+  s_985d322a22a6f8::t_4b0eabc921555f 1
+  s_985d322a22a6f8::t_6efb611bf5e3f7 3,8-9,56-62,65-66,71-89,91-93
+  s_985d322a22a6f8::t_d403abf1abb114 63-64
+  s_985d322a22a6f8::t_af7f571f4df568 67-70
+  s_985d322a22a6f8::t_e09cbd750903a3 90
+apps/dashboard/src/lib/autopilot/flag.ts
+  s_985d322a22a6f8::t_aca1e82d1d2599 6,10-11,18,24-30
+apps/dashboard/src/lib/orpc/routers/autopilot.test.ts
+  s_985d322a22a6f8::t_550cb63a6dea63 79
+apps/dashboard/src/styles/globals.css
+  s_985d322a22a6f8::t_550cb63a6dea63 6
+apps/dashboard/src/app/(dashboard)/[slug]/autopilot/runs/[id]/page-client.tsx
+  s_985d322a22a6f8::t_3488491411b476 3,21,30,126-129,198-204
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "ed16ce33f6d0e0e76b1faf8a835332746389d82b",
+  "prompts": {},
+  "sessions": {
+    "s_985d322a22a6f8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "efce3ecd-755b-429d-9b5c-035b1f703d5b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

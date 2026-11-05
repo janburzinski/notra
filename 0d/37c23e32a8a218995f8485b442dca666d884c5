@@ -1,0 +1,36 @@
+packages/ai/src/utils/code-research-commands.ts
+  s_789a1240c5b3e3::t_a8333ffe5c8d69 39-40,277-281,284,286,288,290,292,362-395,401-402,404-411,415-417,422,454,476-485,490-491,500-504,533,538-540,542-547,569,576,591,602,619-630,634-635,637,650-652,654,664-673,678-687,702
+  s_789a1240c5b3e3::t_8622c50b77bcfc 412-414,631-633,674-677
+  s_789a1240c5b3e3::t_2fef87d1c747f7 5,15
+packages/ai/src/utils/code-research-actions.ts
+  s_789a1240c5b3e3::t_2fef87d1c747f7 104,126,135-140,153,170-171,206,238,267
+packages/ai/src/constants/code-research.ts
+  s_789a1240c5b3e3::t_2fef87d1c747f7 26-27,34-36
+packages/ai/src/tools/code-researcher.ts
+  s_789a1240c5b3e3::t_e87b5a1c94d053 22-24,38-42,202-213,220-243
+  s_789a1240c5b3e3::t_8622c50b77bcfc 214-219
+packages/ai/src/utils/code-research-session.ts
+  s_789a1240c5b3e3::t_f2dff7cf6936db 90-96,101
+packages/ai/src/utils/code-researcher-steps.ts
+  s_789a1240c5b3e3::t_e87b5a1c94d053 7-8,82-113
+  s_789a1240c5b3e3::t_8622c50b77bcfc 1
+packages/ai/src/utils/code-research-commands.test.ts
+  s_789a1240c5b3e3::t_8622c50b77bcfc 173-175,275-277
+  s_789a1240c5b3e3::t_6e7f78e192500f 11-14,20,154,161,165-172,176-189,207-238,271-274,278-292
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "0d37c23e32a8a218995f8485b442dca666d884c5",
+  "prompts": {},
+  "sessions": {
+    "s_789a1240c5b3e3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "fe45ce4b-5c51-424d-b9d3-be060c25613c",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

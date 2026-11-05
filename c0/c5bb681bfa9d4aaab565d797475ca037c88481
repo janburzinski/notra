@@ -1,0 +1,19 @@
+apps/dashboard/tests/sites-get-read-only.test.ts
+  s_d991f0612e1ac0::t_5d58943466348a 38-40
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "c0c5bb681bfa9d4aaab565d797475ca037c88481",
+  "prompts": {},
+  "sessions": {
+    "s_d991f0612e1ac0": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "158e604e-5dc5-436b-a149-4e80fba1e837",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

@@ -1,0 +1,31 @@
+apps/docs/geo/prompts-and-competitors.mdx
+  s_144501959684d3::t_53d58b33bf1e9c 36
+packages/geo-core/src/geo/prompts.ts
+  s_144501959684d3::t_53d58b33bf1e9c 174-183,214,224-227,232-234,315,353-355,357-360,363,367,375,383,390
+  s_144501959684d3::t_1c8d640d5a5a8c 371,379
+apps/dashboard/src/components/geo/prompt-add-dialog.tsx
+  s_144501959684d3::t_53d58b33bf1e9c 201
+packages/geo-core/tests/auto-prompts.test.ts
+  s_144501959684d3::t_53d58b33bf1e9c 5,115-131,134-153
+  s_144501959684d3::t_8b534121dccf2d 132-133
+packages/geo-core/src/geo/discover.ts
+  s_144501959684d3::t_ceed00d96c869f 71-72,74-82
+packages/geo-core/src/constants/geo.ts
+  s_144501959684d3::t_ceed00d96c869f 594,596
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "75ea78a59b88d1484c14fa581ef65ca803983919",
+  "prompts": {},
+  "sessions": {
+    "s_144501959684d3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "06e9c3a8-7daf-4ed9-957f-b92292ea1e3d",
+        "model": "claude-fable-5-1"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

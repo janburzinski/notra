@@ -1,0 +1,131 @@
+apps/dashboard/tests/geo-scan-workflow.test.ts
+  s_6554d5e7a6538d::t_a08361e3a4da39 422-428,468-477,486,554-563,723-732
+packages/ai/src/utils/context-dev.ts
+  s_6554d5e7a6538d::t_a08361e3a4da39 458-459,465,486-487,497
+packages/schemas/src/schemas/api/geo-scans.ts
+  s_6554d5e7a6538d::t_a08361e3a4da39 14-32
+apps/dashboard/vercel.json
+  s_6554d5e7a6538d::t_a08361e3a4da39 3
+apps/api/tests/workspaces.test.ts
+  s_6554d5e7a6538d::t_a08361e3a4da39 1-325
+apps/dashboard/src/lib/geo-ingest/identity.ts
+  s_6554d5e7a6538d::t_a08361e3a4da39 42-48,60-65
+apps/api/src/types/env.ts
+  s_6554d5e7a6538d::t_a08361e3a4da39 20
+packages/geo-core/tests/scan-history.test.ts
+  s_6554d5e7a6538d::t_a08361e3a4da39 188-198,218-237
+apps/dashboard/src/constants/company-logo.ts
+  s_6554d5e7a6538d::t_a08361e3a4da39 11-13
+apps/dashboard/src/lib/hooks/use-brand-sitemaps.ts
+  s_6554d5e7a6538d::t_a08361e3a4da39 9,15-19,26
+apps/dashboard/src/lib/auth/authkit-metadata.ts
+  s_6554d5e7a6538d::t_a08361e3a4da39 2-3
+packages/geo-core/src/geo/scan-task-status.ts
+  s_6554d5e7a6538d::t_a08361e3a4da39 60-97
+apps/dashboard/src/proxy.ts
+  s_6554d5e7a6538d::t_a08361e3a4da39 31-33,36
+apps/api/src/programs/geo.ts
+  s_6554d5e7a6538d::t_a08361e3a4da39 2-3,17,21,130-134,140-213,221-225,229-258,274-275,285-288,291-296,322-323,333-334
+apps/dashboard/tests/proxy-matcher.test.ts
+  s_6554d5e7a6538d::t_a08361e3a4da39 1-88
+apps/dashboard/src/constants/geo-traffic-hero.ts
+  s_6554d5e7a6538d::t_a08361e3a4da39 1,6-14,16
+apps/dashboard/src/utils/dashboard-home-prefetch.server.ts
+  s_6554d5e7a6538d::t_a08361e3a4da39 1,10,13-36,46-47,49-60,74-77,81-83,89-91
+apps/dashboard/src/app/(dashboard)/[slug]/page.tsx
+  s_6554d5e7a6538d::t_a08361e3a4da39 31-36,51-52
+packages/ai/src/types/agents.ts
+  s_6554d5e7a6538d::t_a08361e3a4da39 3
+apps/api/tests/geo-scans-program.test.ts
+  s_6554d5e7a6538d::t_a08361e3a4da39 7-8,14-20,22,37-40,99-104,110,114,117-122,143,147-154,184-187,190-305,329,341-345,367-377,379-380,386-482
+apps/api/src/routes/geo-scans.ts
+  s_6554d5e7a6538d::t_a08361e3a4da39 67-68,85-86
+apps/dashboard/src/types/hooks/brand-analysis.ts
+  s_6554d5e7a6538d::t_a08361e3a4da39 22-25
+apps/dashboard/src/workflows/geo-scan.ts
+  s_6554d5e7a6538d::t_a08361e3a4da39 12,19,164,171,325
+packages/geo-core/tests/scan-lifecycle.test.ts
+  s_6554d5e7a6538d::t_a08361e3a4da39 24,587-592,772-827,920-926,936-955,1009-1014
+packages/geo-core/src/types/geo.ts
+  s_6554d5e7a6538d::t_a08361e3a4da39 665-671
+packages/geo-core/src/utils/geo-scan-plan.ts
+  s_6554d5e7a6538d::t_a08361e3a4da39 5,98-120
+packages/db/src/drizzle.ts
+  s_6554d5e7a6538d::t_a08361e3a4da39 1,20-21,36-38
+apps/api/src/utils/workos-invitations.ts
+  s_6554d5e7a6538d::t_a08361e3a4da39 1-26
+apps/dashboard/src/lib/geo-ingest/pipeline.ts
+  s_6554d5e7a6538d::t_a08361e3a4da39 11,29,85-86,134-150,156-169
+packages/geo-core/src/geo/scan-status.ts
+  s_6554d5e7a6538d::t_a08361e3a4da39 4,10,12,20-37,413-420,466-470,486-487,492-499,548-551
+apps/api/src/types/workspaces.ts
+  s_6554d5e7a6538d::t_a08361e3a4da39 1-10
+apps/api/src/errors/workspaces.ts
+  s_6554d5e7a6538d::t_a08361e3a4da39 1-7
+apps/api/src/types/auth.ts
+  s_6554d5e7a6538d::t_a08361e3a4da39 5,25-26,35-37
+packages/geo-core/src/utils/geo-scan.ts
+  s_6554d5e7a6538d::t_a08361e3a4da39 19,22,158-164,170-204
+apps/api/src/utils/geo-scan-plan-summary.ts
+  s_6554d5e7a6538d::t_a08361e3a4da39 1-46
+apps/api/src/index.ts
+  s_6554d5e7a6538d::t_a08361e3a4da39 48,183-186,281
+packages/db/src/schema.ts
+  s_6554d5e7a6538d::t_a08361e3a4da39 41,1721-1727
+apps/api/src/utils/workspaces.ts
+  s_6554d5e7a6538d::t_a08361e3a4da39 1-169
+apps/api/src/routes/workspaces.ts
+  s_6554d5e7a6538d::t_a08361e3a4da39 1-90
+apps/dashboard/src/app/(dashboard)/[slug]/brand/identity/components/tone-language-fields.tsx
+  s_6554d5e7a6538d::t_a08361e3a4da39 22-27,92,100-101,103,105-115,120-122
+packages/db/package.json
+  s_6554d5e7a6538d::t_a08361e3a4da39 22
+apps/dashboard/next.config.ts
+  s_6554d5e7a6538d::t_a08361e3a4da39 13-15
+packages/schemas/src/schemas/api/workspaces.ts
+  s_6554d5e7a6538d::t_a08361e3a4da39 1-31
+apps/dashboard/tests/geo-traffic-hero-layout.test.ts
+  s_6554d5e7a6538d::t_a08361e3a4da39 4,7,18-24
+apps/dashboard/src/app/(dashboard)/[slug]/geo/traffic/skeleton.tsx
+  s_6554d5e7a6538d::t_a08361e3a4da39 12,16,38-43,54
+turbo.json
+  s_6554d5e7a6538d::t_a08361e3a4da39 113-114
+apps/dashboard/src/components/geo/traffic-hero.tsx
+  s_6554d5e7a6538d::t_a08361e3a4da39 28,33-34,206-208,221
+packages/db/src/types/geo-scan.ts
+  s_6554d5e7a6538d::t_a08361e3a4da39 11-23
+packages/utils/src/api-scopes.ts
+  s_6554d5e7a6538d::t_a08361e3a4da39 67,380-383
+apps/dashboard/src/lib/orpc/routers/onboarding.ts
+  s_6554d5e7a6538d::t_a08361e3a4da39 21,68-69,72,79,86-88,93-95
+apps/api/package.json
+  s_6554d5e7a6538d::t_a08361e3a4da39 28,43
+apps/dashboard/src/components/geo/writer/write-dialog.tsx
+  s_6554d5e7a6538d::t_a08361e3a4da39 127,214-216,221-223
+apps/dashboard/src/constants/brand-identity.ts
+  s_6554d5e7a6538d::t_a08361e3a4da39 21-45,48-53
+bunfig.toml
+  s_6554d5e7a6538d::t_a08361e3a4da39 29
+apps/dashboard/src/types/hooks/brand-sitemaps.ts
+  s_6554d5e7a6538d::t_a08361e3a4da39 23-26
+apps/dashboard/src/lib/hooks/use-brand-analysis.ts
+  s_6554d5e7a6538d::t_a08361e3a4da39 13,30-33,37
+apps/api/tests/geo-scan-plan-summary.test.ts
+  s_6554d5e7a6538d::t_a08361e3a4da39 1-97
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "09138146ec148bfb565d4aa8ddbe1c45d1ec4c92",
+  "prompts": {},
+  "sessions": {
+    "s_6554d5e7a6538d": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0a71e-e287-7ff1-9b25-c95193f84e0a",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

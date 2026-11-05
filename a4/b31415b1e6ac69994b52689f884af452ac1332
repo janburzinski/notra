@@ -1,0 +1,21 @@
+packages/ui/src/components/shared/security/security-method-row.tsx
+  s_1e325abf04c4e2::t_52a49a79400e33 32
+packages/ui/src/components/shared/auth/totp-enrollment-panel.tsx
+  s_1e325abf04c4e2::t_52a49a79400e33 154-174,212-213,249,285
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "a4b31415b1e6ac69994b52689f884af452ac1332",
+  "prompts": {},
+  "sessions": {
+    "s_1e325abf04c4e2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f98b95b6-a893-4a57-9f87-93bd7c030132",
+        "model": "claude-fable-5-1"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

@@ -1,0 +1,19 @@
+apps/dashboard/src/app/(dashboard)/[slug]/geo/traffic/skeleton.tsx
+  s_1dd2cba099ccef::t_b629e209f572de 24,170-173
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "a454af6aef75834bd396e802f89c25b233893b68",
+  "prompts": {},
+  "sessions": {
+    "s_1dd2cba099ccef": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c0d1300c-e2ec-4c77-8480-c301dcc167d7",
+        "model": "claude-sonnet-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

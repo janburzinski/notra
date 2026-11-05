@@ -1,0 +1,27 @@
+apps/dashboard/src/app/(dashboard)/[slug]/geo/traffic/mcp/page-client.tsx
+  s_3b452b0f49ddee::t_c75445698ec2a3 73-74
+  s_3b452b0f49ddee::t_8c5c202b90dc9c 27,56-69,71-72,105
+apps/dashboard/src/utils/mcp-analytics.ts
+  s_3b452b0f49ddee::t_8c5c202b90dc9c 261-277
+packages/analytics/src/tinybird/pipes/mcp.ts
+  s_3b452b0f49ddee::t_8c5c202b90dc9c 170
+apps/dashboard/src/components/mcp/mcp-version-select.tsx
+  s_3b452b0f49ddee::t_c75445698ec2a3 19
+  s_3b452b0f49ddee::t_8c5c202b90dc9c 34
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "a492a47b330a0cdf50d735e307aceaee06e63766",
+  "prompts": {},
+  "sessions": {
+    "s_3b452b0f49ddee": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "302e386a-8015-4307-b52b-66b8e38174a0",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

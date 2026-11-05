@@ -1,0 +1,120 @@
+apps/dashboard/src/types/mcp-analytics.ts
+  s_3b452b0f49ddee::t_53aa0c4baf4c84 105-106
+  s_3b452b0f49ddee::t_32883478699ac4 191
+  s_3b452b0f49ddee::t_114b0ec7a68e23 85,93-94,97-98,108,137-138
+  s_3b452b0f49ddee::t_bdc2a2c9677246 88-92,95,134
+  s_3b452b0f49ddee::t_4c5d882c334bbc 13,189-190
+  s_3b452b0f49ddee::t_c0e3828b614464 99-104
+  s_3b452b0f49ddee::t_19dd37ac60ba6d 37-40,79-80
+  s_3b452b0f49ddee::t_825ac6701e8e40 96
+  s_3b452b0f49ddee::t_654d6850e8e365 107
+apps/dashboard/src/utils/geo-charts.ts
+  s_3b452b0f49ddee::t_427ea6bfa05195 760-770
+packages/analytics/src/tinybird/client.ts
+  s_3b452b0f49ddee::t_c09416dc76e5cf 60-61,107,120,224-225,935-944
+apps/dashboard/src/utils/mcp-analytics.ts
+  s_3b452b0f49ddee::t_59f9cadffd33eb 142
+  s_3b452b0f49ddee::t_825ac6701e8e40 86,93,95,172,175
+  s_3b452b0f49ddee::t_654d6850e8e365 3,16-17,74-82,85,88,91,96-122,124,127-130,132,135-136,138-141,143-146,148-164
+  s_3b452b0f49ddee::t_53aa0c4baf4c84 18,83,87,89,131
+  s_3b452b0f49ddee::t_114b0ec7a68e23 1-2,4-10,12,15,21,73,134,137
+  s_3b452b0f49ddee::t_2f732b30b5e93f 189-190
+  s_3b452b0f49ddee::t_c0e3828b614464 13-14,23-27,165-171,173-174,176-188,191-193
+  s_3b452b0f49ddee::t_385ce12ff80627 19-20,22,194-201
+  s_3b452b0f49ddee::t_bdc2a2c9677246 84,90,92,94,123,125-126,133,147
+packages/analytics/src/tinybird/pipes/mcp.ts
+  s_3b452b0f49ddee::t_fa40ef59b38d1c 21,27-35,38-43,59,71,121-122,134-136,152-217
+apps/dashboard/src/components/mcp/mcp-sections.tsx
+  s_3b452b0f49ddee::t_385ce12ff80627 24,193,204-211,224-225,227,235-245,254-263,276-278,281,292-293,302-311,324,330,335-345,351-360,399,404-405
+  s_3b452b0f49ddee::t_f24d03390ec4bf 3-5,9-15,28,37,47-63,66-72
+  s_3b452b0f49ddee::t_96c647799f7af8 96-107,117,123,133,135-136,144-148,154-155
+  s_3b452b0f49ddee::t_bd2d22bb6255a4 21,157-159,161-165
+  s_3b452b0f49ddee::t_fe822a53e093a6 41-45
+  s_3b452b0f49ddee::t_ccd9a41a12462c 114,120,126,141
+  s_3b452b0f49ddee::t_654d6850e8e365 160
+apps/dashboard/messages/en.json
+  s_3b452b0f49ddee::t_32883478699ac4 4135
+  s_3b452b0f49ddee::t_19dd37ac60ba6d 4122-4123,4137
+  s_3b452b0f49ddee::t_4c5d882c334bbc 4132-4134,4136
+apps/dashboard/src/app/(dashboard)/[slug]/geo/traffic/mcp/page-client.tsx
+  s_3b452b0f49ddee::t_bc1f46ce886efa 90,100
+  s_3b452b0f49ddee::t_4e1c04d14a5563 22,79-80,84
+apps/dashboard/src/components/analytics/analytics-source-tabs.tsx
+  s_3b452b0f49ddee::t_57180698e43d6b 6,19-22,46-55,59
+packages/geo-core/src/geo/mcp-analytics.ts
+  s_3b452b0f49ddee::t_df2745a8757684 6,130-131,149,178-181,232-238
+  s_3b452b0f49ddee::t_4fd10cba2cab77 19,38,45,105,110-113,117-118,123,126-129,148,175-177,242-247,321,365
+  s_3b452b0f49ddee::t_4b8eb7d07830fa 240-241
+apps/dashboard/src/lib/hooks/use-mcp-analytics.ts
+  s_3b452b0f49ddee::t_5963bc910ce8ba 18-22
+  s_3b452b0f49ddee::t_6d771800fe3005 6,32-33
+  s_3b452b0f49ddee::t_d4a36a4991c61d 14
+apps/dashboard/src/types/geo.ts
+  s_3b452b0f49ddee::t_427ea6bfa05195 269-270
+packages/geo-core/src/schemas/geo.ts
+  s_3b452b0f49ddee::t_4fd10cba2cab77 597
+packages/analytics/src/types/tinybird-endpoints.ts
+  s_3b452b0f49ddee::t_c09416dc76e5cf 34,118
+apps/dashboard/messages/de.json
+  s_3b452b0f49ddee::t_32883478699ac4 4135
+  s_3b452b0f49ddee::t_19dd37ac60ba6d 4122-4123,4137
+  s_3b452b0f49ddee::t_4c5d882c334bbc 4132-4134,4136
+apps/dashboard/src/constants/mcp-analytics.ts
+  s_3b452b0f49ddee::t_d4a36a4991c61d 5
+  s_3b452b0f49ddee::t_654d6850e8e365 71-73
+  s_3b452b0f49ddee::t_3af7b8cb0ede0d 2-3,82-86,93
+  s_3b452b0f49ddee::t_53aa0c4baf4c84 4,60,75-78,80-81
+  s_3b452b0f49ddee::t_c0e3828b614464 62-70
+  s_3b452b0f49ddee::t_ccd9a41a12462c 79
+  s_3b452b0f49ddee::t_34ac0f4192f395 1,87-92
+  s_3b452b0f49ddee::t_5963bc910ce8ba 54-58
+  s_3b452b0f49ddee::t_385ce12ff80627 16-23
+  s_3b452b0f49ddee::t_bdc2a2c9677246 59,61,74
+packages/analytics/src/tinybird/datasources.ts
+  s_3b452b0f49ddee::t_fa40ef59b38d1c 514,519,541,547-548
+apps/dashboard/src/lib/hooks/use-mcp-version.ts
+  s_3b452b0f49ddee::t_5963bc910ce8ba 1-13
+apps/dashboard/src/components/mcp/mcp-version-select.tsx
+  s_3b452b0f49ddee::t_58da447bb8cc3c 3,14-15,59-62
+  s_3b452b0f49ddee::t_3cc25b3d3bbbc6 49
+  s_3b452b0f49ddee::t_32883478699ac4 29,56
+  s_3b452b0f49ddee::t_6d771800fe3005 4-10,17-18,20-28,30-33,35-48,50-55,57-58,63,65,67-68
+packages/geo-core/src/types/mcp-analytics.ts
+  s_3b452b0f49ddee::t_4fd10cba2cab77 2,6-10,39-42,53-57,166-167
+  s_3b452b0f49ddee::t_df2745a8757684 43-52,164-165
+apps/dashboard/src/lib/hooks/use-mcp-columns.tsx
+  s_3b452b0f49ddee::t_34ac0f4192f395 3,11-14
+  s_3b452b0f49ddee::t_19dd37ac60ba6d 24,138-158,472
+  s_3b452b0f49ddee::t_0c70821bfb8b4d 84
+apps/dashboard/src/components/mcp/mcp-metric-card.tsx
+  s_3b452b0f49ddee::t_13d68f63d0f802 1-12,15-25,27-28,30-32,39-48,50-55,80-83,86-87,90-113,118-120,122-128,138-147
+  s_3b452b0f49ddee::t_71d26b8c9b2853 84-85,88-89
+  s_3b452b0f49ddee::t_654d6850e8e365 29,33-34,121,129-137
+  s_3b452b0f49ddee::t_825ac6701e8e40 36
+  s_3b452b0f49ddee::t_494f9aac7671cc 13-14,26,35,37-38,49,56-58,61-62,65-71,73-79,114-117
+  s_3b452b0f49ddee::t_c262e1396c8ac3 59-60,63-64,72
+apps/dashboard/src/components/geo/geo-stat-delta.tsx
+  s_3b452b0f49ddee::t_427ea6bfa05195 14-18,25,37-40
+  s_3b452b0f49ddee::t_f6650f54fc614e 52-53
+apps/dashboard/src/app/(dashboard)/[slug]/geo/traffic/mcp/skeleton.tsx
+  s_3b452b0f49ddee::t_f6430324a2c545 16-19,92-94,104-106,108
+  s_3b452b0f49ddee::t_bc1f46ce886efa 22,107,118
+  s_3b452b0f49ddee::t_4e1c04d14a5563 91
+  s_3b452b0f49ddee::t_71d26b8c9b2853 95,99-101
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "fb47f75615f0eda6e33f1b3c39945766af762bbf",
+  "prompts": {},
+  "sessions": {
+    "s_3b452b0f49ddee": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "302e386a-8015-4307-b52b-66b8e38174a0",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

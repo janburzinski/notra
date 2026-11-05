@@ -1,0 +1,24 @@
+apps/dashboard/src/utils/validate-content-video.test.ts
+  s_f42d08e1cc3e9b::t_b7fd67d005943a 30-43
+  s_f42d08e1cc3e9b::t_ddd8d671f19747 28-29,44-47
+  s_f42d08e1cc3e9b::t_0678f4e8b3c79c 53-73
+apps/dashboard/src/utils/validate-content-video.ts
+  s_f42d08e1cc3e9b::t_57e7eb55d41857 35,44-47
+  s_f42d08e1cc3e9b::t_4eb58b4d9166c5 87-90,99
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "bad0cf138a3c553f555e1a0994b2883f61cd38f8",
+  "prompts": {},
+  "sessions": {
+    "s_f42d08e1cc3e9b": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "70babf50-e845-4cf2-9b7c-0819910cf726",
+        "model": "grok-4.6"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

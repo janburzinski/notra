@@ -1,0 +1,21 @@
+packages/ai/src/gateway.ts
+  s_19eba205e6a8c3::t_360d19e5848f91 75-79
+apps/geo-runner/src/index.ts
+  s_19eba205e6a8c3::t_32f3a457c4cd96 76-78
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "034efc42d85b52e27c99ceb37c2d22420c17862c",
+  "prompts": {},
+  "sessions": {
+    "s_19eba205e6a8c3": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "b6224547-67db-48c3-b061-f52a941f789b",
+        "model": "grok-4.7"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

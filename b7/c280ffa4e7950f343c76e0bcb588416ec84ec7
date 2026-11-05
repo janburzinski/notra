@@ -1,0 +1,37 @@
+apps/dashboard/src/components/geo/geo-engine-picker.tsx
+  s_e821db8ddc222f::t_f89b050d2c3b23 468-494
+  s_8ce36d52032314::t_da218b16c41dfa 235-238
+  s_ec6c23929ccb33::t_c440f53b0afcd2 262-269
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "b7c280ffa4e7950f343c76e0bcb588416ec84ec7",
+  "prompts": {},
+  "sessions": {
+    "s_8ce36d52032314": {
+      "agent_id": {
+        "tool": "amp",
+        "id": "TU-034QvBAhRUVJcCrop2XLyB",
+        "model": "unknown"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    },
+    "s_e821db8ddc222f": {
+      "agent_id": {
+        "tool": "amp",
+        "id": "TU-034QvBUgzwYJ5ySqhYoOFY",
+        "model": "unknown"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    },
+    "s_ec6c23929ccb33": {
+      "agent_id": {
+        "tool": "amp",
+        "id": "TU-034QvBQDH9iaommH9AtKTk",
+        "model": "unknown"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

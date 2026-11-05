@@ -1,0 +1,19 @@
+apps/dashboard/src/components/dashboard/sidebar-quick-actions.tsx
+  s_1f08c4fcc4cc5b::t_aff64f66b23390 102
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "15cd9e00fa6a8a14a3c6934af63c642e1ed236a2",
+  "prompts": {},
+  "sessions": {
+    "s_1f08c4fcc4cc5b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e8c1e36c-e428-4210-bdba-88a00f9a5a9c",
+        "model": "claude-sonnet-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

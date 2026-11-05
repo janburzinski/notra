@@ -1,0 +1,48 @@
+packages/ai/src/utils/github-mention-suggestion.ts
+  s_de8ac50ae39290::t_a79c2901671aea 8,142-143,250,252-257
+  s_de8ac50ae39290::t_a644e6ad00cb2e 1-7,10-105,110-135,144-153,156-162,165-200,202-249,251,258-278
+  s_de8ac50ae39290::t_1e849deeac28d1 9,136-141,154-155,201
+  s_de8ac50ae39290::t_2b82812697cba8 106-109,163-164
+packages/ai/src/utils/github-mention-suggestion.test.ts
+  s_de8ac50ae39290::t_07998f0daf324e 126
+  s_de8ac50ae39290::t_2b82812697cba8 2
+  s_de8ac50ae39290::t_897e13c79c1077 1,3-125,127-240
+packages/ai/src/utils/github-mention-voice.ts
+  s_de8ac50ae39290::t_ee4b6035c1fa61 1-52
+packages/ai/src/schemas/github-mention.ts
+  s_de8ac50ae39290::t_a79c2901671aea 31-32
+packages/ai/src/agents/github-mention.ts
+  s_de8ac50ae39290::t_2b82812697cba8 24,78-80,86,97-100,110-112
+  s_de8ac50ae39290::t_2b013c7ce8d824 48,146-147
+packages/ai/src/utils/github-mention-reply.ts
+  s_de8ac50ae39290::t_2b82812697cba8 265-268
+  s_de8ac50ae39290::t_4f00c931ae68dc 2-10,213-264
+packages/ai/src/utils/github-mention-process.ts
+  s_de8ac50ae39290::t_3c4542adcce5d4 13,30-31,35-38,45,296-399,488-515
+  s_de8ac50ae39290::t_a79c2901671aea 188-189
+packages/ai/src/utils/github-mention-log.ts
+  s_de8ac50ae39290::t_3c4542adcce5d4 116-117
+packages/ai/src/prompts/github-mention.ts
+  s_de8ac50ae39290::t_2b82812697cba8 1-5,8-40,48-50,64,75,80-82,96-115,118,128,130,138-141,155-158,167
+packages/ai/src/types/github-mention.ts
+  s_de8ac50ae39290::t_ee4b6035c1fa61 99-110
+  s_de8ac50ae39290::t_a79c2901671aea 25-28,131-152,158,167
+packages/ai/src/utils/github-mention-reply.test.ts
+  s_de8ac50ae39290::t_1498942158cf1e 5-6,148-197
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "ed1ca28fe3298dd4530d222f8dc6276bdf360466",
+  "prompts": {},
+  "sessions": {
+    "s_de8ac50ae39290": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "632f80fc-df24-4671-95a8-4741af8eb2bc",
+        "model": "claude-fable-5-1"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

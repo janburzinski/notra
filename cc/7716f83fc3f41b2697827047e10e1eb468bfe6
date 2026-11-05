@@ -1,0 +1,41 @@
+apps/dashboard/src/components/geo/traffic-breakdown-card.tsx
+  s_4baa408569e898::t_646afb12d4b172 24
+apps/dashboard/src/components/agent-feedback/feedback-empty.tsx
+  s_4baa408569e898::t_646afb12d4b172 48,66
+packages/ui/src/styles/globals.css
+  s_4baa408569e898::t_b08b5fb3974804 39-40,114-115
+  s_4baa408569e898::t_66f48b5784500c 113
+  s_4baa408569e898::t_9ff70903675193 32,41-42,116-117,185-187
+apps/dashboard/public/design.md
+  s_4baa408569e898::t_eb4053d83fb606 66
+  s_4baa408569e898::t_93847219d8f85a 71,207
+  s_4baa408569e898::t_f6c0565a83bb7a 13-15,51,54,57,68,90-93
+apps/dashboard/src/components/motion/table/table-header.tsx
+  s_4baa408569e898::t_93847219d8f85a 270,294,432
+apps/dashboard/src/components/motion/table/table-surfaces.tsx
+  s_4baa408569e898::t_646afb12d4b172 18,61,88
+apps/dashboard/src/constants/geo-traffic-hero.ts
+  s_4baa408569e898::t_646afb12d4b172 7,10,13
+apps/dashboard/src/components/instrument/instrument-module.tsx
+  s_4baa408569e898::t_646afb12d4b172 59,61,68,70
+apps/ui/components/ui/button.tsx
+  s_4baa408569e898::t_60790c09869682 15
+packages/ui/src/components/ui/button.tsx
+  s_4baa408569e898::t_60790c09869682 16
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "cc7716f83fc3f41b2697827047e10e1eb468bfe6",
+  "prompts": {},
+  "sessions": {
+    "s_4baa408569e898": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "241d7d30-8eee-46fc-91e5-b12cdcfff521",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

@@ -1,0 +1,23 @@
+apps/api/src/types/auth.ts
+  s_f871e6fe06f929::t_30e515531108e7 44-45
+apps/dashboard/src/components/api-keys/account-api-keys-section.tsx
+  s_f871e6fe06f929::t_6f2e01dc2c3fb0 8,325,358-365,373,375
+apps/dashboard/src/lib/orpc/routers/api-keys.ts
+  s_f871e6fe06f929::t_67a0777587e2e7 139
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "fcd0e0661616eb3c19a5ac9b0cd0336d47f23bfe",
+  "prompts": {},
+  "sessions": {
+    "s_f871e6fe06f929": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "70903be8-237c-44ea-8cb8-704c987ae22d",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

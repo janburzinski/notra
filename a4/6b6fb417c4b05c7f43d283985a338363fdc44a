@@ -1,0 +1,19 @@
+packages/geo-core/tests/ingest-pipeline.test.ts
+  s_e2cad4451b0e73::t_32925ec4123d86 26
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "a46b6fb417c4b05c7f43d283985a338363fdc44a",
+  "prompts": {},
+  "sessions": {
+    "s_e2cad4451b0e73": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a133cd-035d-7f01-9ba2-4908125645d7",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

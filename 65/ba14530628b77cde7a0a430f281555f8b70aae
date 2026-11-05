@@ -1,0 +1,67 @@
+apps/dashboard/src/workflows/geo-scan.ts
+  s_b2263adfe8aa43::t_6e24a7d02383bc 288-289,354-365,503,521
+apps/dashboard/messages/en.json
+  s_b2263adfe8aa43::t_f0ebf01b51c620 5627-5636
+packages/posthog/src/events.ts
+  s_b2263adfe8aa43::t_7f0a702e22d11f 188
+apps/dashboard/src/lib/hooks/use-automation-rows.ts
+  s_b2263adfe8aa43::t_a2cfc884d702bb 44,48-57
+apps/dashboard/src/components/automation/automation-load-error.tsx
+  s_b2263adfe8aa43::t_0f215620ff9ea8 1-50
+apps/dashboard/src/components/automation/automation-template-gallery.tsx
+  s_b2263adfe8aa43::t_424c795e7c25a0 42-43,71,73,76-78,82,98,104-105,155-156,158-161
+  s_b2263adfe8aa43::t_f6a479a655e09a 157
+apps/dashboard/src/app/(dashboard)/[slug]/automation/editor/page-client.tsx
+  s_b2263adfe8aa43::t_18883a7a0ab956 12
+  s_b2263adfe8aa43::t_fa6808439814cd 179-189
+apps/dashboard/src/components/automation/events/event-trigger-repositories-section.tsx
+  s_b2263adfe8aa43::t_9f87cdab0025d4 38-45
+apps/dashboard/src/app/(dashboard)/[slug]/automation/page-client.tsx
+  s_b2263adfe8aa43::t_424c795e7c25a0 40,107,109-111,204-212,282
+packages/schemas/src/schemas/dashboard/automation/geo-alerts.ts
+  s_b2263adfe8aa43::t_d949e36c53b521 52-57
+packages/db/src/utils/geo-checks.ts
+  s_b2263adfe8aa43::t_0ae4c3d260d0ae 1331,1334-1337,1368
+  s_b2263adfe8aa43::t_715da1c7a50435 1393
+apps/dashboard/src/app/(dashboard)/[slug]/automation/templates/page-client.tsx
+  s_b2263adfe8aa43::t_424c795e7c25a0 8,57-63,70
+apps/dashboard/src/lib/orpc/routers/automation.ts
+  s_b2263adfe8aa43::t_7f0a702e22d11f 253
+apps/dashboard/src/app/(dashboard)/[slug]/automation/runs/page-client.tsx
+  s_b2263adfe8aa43::t_fa6808439814cd 18,154-168
+apps/dashboard/messages/de.json
+  s_b2263adfe8aa43::t_f0ebf01b51c620 5627-5636
+packages/webhooks/README.md
+  s_b2263adfe8aa43::t_2657db7201e1e7 149-151
+  s_b2263adfe8aa43::t_55a70205d9ea17 103,119,148
+apps/dashboard/src/components/automation/automations-table.tsx
+  s_b2263adfe8aa43::t_3c4de627cf0f9a 194-196,199-212
+apps/dashboard/src/components/automation/schedules/schedule-form.tsx
+  s_b2263adfe8aa43::t_0655769947d205 199
+packages/geo-core/src/geo/programs.ts
+  s_b2263adfe8aa43::t_715da1c7a50435 1093-1099,1131-1133
+apps/dashboard/src/lib/orpc/routers/automation-alerts.ts
+  s_b2263adfe8aa43::t_18883a7a0ab956 9,32,254-255
+  s_b2263adfe8aa43::t_d949e36c53b521 14,47-50,53-56,204
+  s_b2263adfe8aa43::t_7f0a702e22d11f 228-253,256-260
+apps/dashboard/src/components/automation/alerts/geo-alert-form.tsx
+  s_b2263adfe8aa43::t_ea6497f6525e1b 112-117,132,137-139,144
+apps/dashboard/src/components/automation/editor/editor-parts.tsx
+  s_b2263adfe8aa43::t_ea78ad884b0418 261-263
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "65ba14530628b77cde7a0a430f281555f8b70aae",
+  "prompts": {},
+  "sessions": {
+    "s_b2263adfe8aa43": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7b19bc50-9f11-4ef7-a695-fdbe497a25a7",
+        "model": "claude-sonnet-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

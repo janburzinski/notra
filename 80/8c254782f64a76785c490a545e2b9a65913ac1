@@ -1,0 +1,21 @@
+apps/dashboard/src/components/design-system/use-code-research-playback.ts
+  s_789a1240c5b3e3::t_2e6fd77d67119c 19,27-28
+apps/dashboard/src/components/design-system/code-research-playground.tsx
+  s_789a1240c5b3e3::t_9e78a5dac7bccd 58
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "808c254782f64a76785c490a545e2b9a65913ac1",
+  "prompts": {},
+  "sessions": {
+    "s_789a1240c5b3e3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "fe45ce4b-5c51-424d-b9d3-be060c25613c",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

@@ -1,0 +1,20 @@
+apps/dashboard/src/components/sites/site-page-tabs.tsx
+  s_50d80449c2b8ce::t_351abc4057e299 94
+  s_50d80449c2b8ce::t_82b34c729561be 191
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "e5325fb28435cdfebc54869d1f6595b9ffb826bd",
+  "prompts": {},
+  "sessions": {
+    "s_50d80449c2b8ce": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "01a16006-0901-70d8-bb81-35a71101967a",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

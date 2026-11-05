@@ -1,0 +1,52 @@
+apps/dashboard/vite.config.ts
+  s_b05215cb6a0858::t_c838fe2f4546f4 6,73-75
+apps/dashboard/src/constants/posthog.ts
+  s_b05215cb6a0858::t_f4219e1e0bb57f 26-28,32,36-38
+apps/dashboard/src/app/api/c15t/[...all]/route.ts
+  s_b05215cb6a0858::t_1545fb90048dec 1-24
+apps/dashboard/src/lib/consent-manager/theme.ts
+  s_b05215cb6a0858::t_c838fe2f4546f4 5
+  s_b05215cb6a0858::t_24276cf3eac2d0 1-4,6-45
+apps/dashboard/src/components/settings/privacy-section.tsx
+  s_b05215cb6a0858::t_0d247c437f3f98 6,9,16,39-53
+apps/dashboard/messages/de.json
+  s_b05215cb6a0858::t_6ecbf904e06f71 354-357
+apps/dashboard/src/routes/api.c15t.$.ts
+  s_b05215cb6a0858::t_c838fe2f4546f4 1-2,6,21
+  s_b05215cb6a0858::t_1545fb90048dec 3-5,7-20
+apps/dashboard/src/components/providers/posthog-identity.tsx
+  s_b05215cb6a0858::t_7535438f3f6375 4,8-11,25-31,57,81
+apps/dashboard/src/lib/analytics/posthog-lazy.ts
+  s_b05215cb6a0858::t_59e160d010a990 23,43-45,50-61,131-139
+packages/ui/src/components/shared/security/backup-codes-panel.tsx
+  s_b05215cb6a0858::t_9b5fc7503c5de3 125-126
+apps/dashboard/src/routeTree.gen.ts
+  s_b05215cb6a0858::t_2a4212d1fa771d 27,169-173,551,633,716,800,882,964,1047,1208-1214,1785
+bun.lock
+  ai_agent 201
+packages/ui/src/components/shared/security/two-factor-settings.tsx
+  s_b05215cb6a0858::t_99fe23c9645628 255-256
+apps/dashboard/src/routes/__root.tsx
+  s_b05215cb6a0858::t_62bce9c1f0b53f 96-98
+  s_b05215cb6a0858::t_32bc3e148878a2 9-16,23,34-42,47,49,82,90-95,99-109
+apps/dashboard/package.json
+  s_b05215cb6a0858::t_9b0df5d0374c75 93
+apps/dashboard/messages/en.json
+  s_b05215cb6a0858::t_6ecbf904e06f71 354-357
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "218a8eed784750e8145c132390de32e42238491a",
+  "prompts": {},
+  "sessions": {
+    "s_b05215cb6a0858": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "793740ec-b587-41ed-9b70-cf537dd3cd6e",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

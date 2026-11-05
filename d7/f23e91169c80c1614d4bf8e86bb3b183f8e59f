@@ -1,0 +1,55 @@
+apps/agent/agent/subagents/image-designer/agent.ts
+  s_d113ac8d75c5ad::t_b7fbd0299dcb1d 5,13
+apps/agent/agent/hooks/usage.ts
+  s_d113ac8d75c5ad::t_9d80eaa479de2c 2,4
+.env.example
+  s_d113ac8d75c5ad::t_64145a4846ae9e 53-54
+apps/agent/README.md
+  s_d113ac8d75c5ad::t_64145a4846ae9e 28-43
+  s_d113ac8d75c5ad::t_52c87c853b9fec 20
+apps/agent/agent/lib/utils/model.ts
+  s_d113ac8d75c5ad::t_5883ab8a573161 77-78,86-88,90-93,97,99,102-103,105
+  s_d113ac8d75c5ad::t_ae1feeff959364 3-11,13,26-47,65-76,79-80,82-85,98,100-101,106-107
+  s_d113ac8d75c5ad::t_bd941098b1c480 12,81,89,104
+  s_d113ac8d75c5ad::t_5631f98770b8b9 48-64,94-96
+apps/agent/agent/channels/slack.ts
+  s_d113ac8d75c5ad::t_fa2def70fc3bbf 174
+apps/agent/agent/hooks/chat-mirror.ts
+  s_d113ac8d75c5ad::t_f34fe34d41030a 8
+  s_d113ac8d75c5ad::t_b7fbd0299dcb1d 39
+apps/agent/agent/lib/constants/models.ts
+  s_d113ac8d75c5ad::t_bd941098b1c480 1-3,9-14,16-20,23,28
+  s_d113ac8d75c5ad::t_ae1feeff959364 8,15,21-22,24-27,29-39
+  s_d113ac8d75c5ad::t_b7fbd0299dcb1d 4-5
+apps/agent/agent/lib/constants/chat-mirror.ts
+  s_d113ac8d75c5ad::t_b7fbd0299dcb1d 3-4
+apps/agent/agent/agent.ts
+  s_d113ac8d75c5ad::t_ae1feeff959364 3,24
+apps/agent/package.json
+  s_d113ac8d75c5ad::t_26892bddde0e4d 32
+apps/agent/agent/subagents/image-designer/hooks/usage.ts
+  s_d113ac8d75c5ad::t_b7fbd0299dcb1d 1,4
+apps/agent/agent/lib/utils/chat-mirror.ts
+  s_d113ac8d75c5ad::t_b7fbd0299dcb1d 25,217-223,262
+  s_d113ac8d75c5ad::t_9d80eaa479de2c 247-250
+  s_d113ac8d75c5ad::t_6f51a5b7e16503 34
+  s_d113ac8d75c5ad::t_fa2def70fc3bbf 38-39,234-245,253-254,261
+apps/agent/agent/lib/hooks/usage.ts
+  s_d113ac8d75c5ad::t_9d80eaa479de2c 91-97,118-132,191
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "d7f23e91169c80c1614d4bf8e86bb3b183f8e59f",
+  "prompts": {},
+  "sessions": {
+    "s_d113ac8d75c5ad": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "3a15bcbc-b026-41aa-a036-4a7a3cea07dc",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

@@ -1,0 +1,9 @@
+packages/geo-core/src/geo/programs.ts
+  ai_agent 699,701-702,710-711
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "dcd1c354311573ee17965e83e8d26ecb6deda65e",
+  "prompts": {}
+}

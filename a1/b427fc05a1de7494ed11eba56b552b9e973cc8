@@ -1,0 +1,19 @@
+apps/dashboard/src/components/sites/site-header-menu.tsx
+  s_6097e2c789734c::t_1aeb65cbfa3080 18,97-101,109-118
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "a1b427fc05a1de7494ed11eba56b552b9e973cc8",
+  "prompts": {},
+  "sessions": {
+    "s_6097e2c789734c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8c677725-0ea5-4467-8a05-a39e6a2eb785",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

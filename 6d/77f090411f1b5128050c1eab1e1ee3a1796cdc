@@ -1,0 +1,57 @@
+apps/dashboard/src/components/geo/persona-prompts.tsx
+  s_932c61e3f9ba4c::t_752feaef57416b 34,38,42-43,45
+  s_932c61e3f9ba4c::t_573720813cff19 18,21,26,28-33,35-37,39-41,44,46-49
+apps/dashboard/messages/en.json
+  s_932c61e3f9ba4c::t_cc7ff75ab37eb4 3843-3844
+  s_932c61e3f9ba4c::t_6566f5b7a5a688 2913,2915-2917
+  s_932c61e3f9ba4c::t_a095e17bdddbee 3845
+apps/dashboard/src/components/instrument/instrument-module.tsx
+  s_932c61e3f9ba4c::t_36bf9a2e3c7249 5,281
+apps/dashboard/messages/de.json
+  s_932c61e3f9ba4c::t_a095e17bdddbee 3845
+  s_932c61e3f9ba4c::t_cc7ff75ab37eb4 3843-3844
+  s_932c61e3f9ba4c::t_6566f5b7a5a688 2913,2915-2917
+apps/dashboard/src/components/geo/persona-profile-editor.tsx
+  s_932c61e3f9ba4c::t_752feaef57416b 22,130-133,145-148,167-170
+  s_932c61e3f9ba4c::t_1030aebb869d9d 112,114,126,128-129,144,163,165-166,177,183,194,201,287
+  s_932c61e3f9ba4c::t_4d9ac3ec3a8332 209-216,242
+  s_932c61e3f9ba4c::t_fb3306ee36b4fb 115,185,203
+apps/dashboard/src/lib/hooks/use-persona-conversation.ts
+  s_932c61e3f9ba4c::t_6566f5b7a5a688 25,40-42
+apps/dashboard/src/app/(dashboard)/[slug]/geo/personas/page-client.tsx
+  s_932c61e3f9ba4c::t_22c762915bb648 5,105-110
+  s_932c61e3f9ba4c::t_a20fd49c456140 7-14,243-251,257-258
+apps/dashboard/src/utils/persona-activity.ts
+  s_932c61e3f9ba4c::t_15dded34d7c421 72-73,79-81,84-102,116,126,163-176
+  s_932c61e3f9ba4c::t_35088a38311e80 9-10,224-245
+apps/dashboard/src/constants/geo-personas.ts
+  s_932c61e3f9ba4c::t_35088a38311e80 11-14
+apps/dashboard/src/components/geo/persona-detail-dialog.tsx
+  s_932c61e3f9ba4c::t_6566f5b7a5a688 6,11-19,46,54,207-212,214-232,234-240,242-252,260,262-263,283-290,315-316,321-325,365,385-388
+  s_932c61e3f9ba4c::t_d895f21aa4d2d6 381-383
+apps/dashboard/src/utils/geo-personas.ts
+  s_932c61e3f9ba4c::t_1030aebb869d9d 69-79
+apps/dashboard/src/types/geo-personas-ui.ts
+  s_932c61e3f9ba4c::t_6566f5b7a5a688 115-121
+apps/dashboard/src/lib/hooks/use-geo-personas.ts
+  s_932c61e3f9ba4c::t_cc7ff75ab37eb4 117,119-125
+apps/dashboard/src/components/geo/persona-activity-card.tsx
+  s_932c61e3f9ba4c::t_a26dc011d9fb41 69
+  s_932c61e3f9ba4c::t_35088a38311e80 29,66-68,70-71,173
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "6d77f090411f1b5128050c1eab1e1ee3a1796cdc",
+  "prompts": {},
+  "sessions": {
+    "s_932c61e3f9ba4c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6691de1a-0aa4-4912-80e2-b22436ca0124",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

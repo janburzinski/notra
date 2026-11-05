@@ -1,0 +1,19 @@
+apps/sites-builder/tests/dev-startup.test.ts
+  s_bb222c89064ca0::t_b5f3cc75eb04cd 108-112,172
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "ee830cc4919b0eb943538b748e067ddc54acb92c",
+  "prompts": {},
+  "sessions": {
+    "s_bb222c89064ca0": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7a3e81f7-08fa-4ea7-91a2-f410be997279",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

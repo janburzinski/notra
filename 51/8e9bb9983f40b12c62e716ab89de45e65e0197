@@ -1,0 +1,80 @@
+packages/ui/src/components/ui/select.tsx
+  s_de71bb439480c7::t_4c2939a3e6bf11 39,44-45,51-52,57
+apps/dashboard/src/components/comments/discussion-composer.tsx
+  s_de71bb439480c7::t_33233b13470e73 6,22,27-30
+  s_de71bb439480c7::t_6332957c91c86b 38
+apps/dashboard/src/components/comments/discussion.tsx
+  s_de71bb439480c7::t_33233b13470e73 144
+  s_de71bb439480c7::t_1b5e5e59fceb55 3-4,17
+  s_de71bb439480c7::t_f8c863db4d94b0 5-11,71,91-92,125,127-135
+  s_de71bb439480c7::t_1ff26b92049f64 126
+  s_de71bb439480c7::t_a8225f1dc3c3c8 70,72-73
+apps/dashboard/src/utils/agent-feedback-client.ts
+  s_de71bb439480c7::t_9a8145a1098764 1-4,15-34
+apps/dashboard/src/lib/hooks/use-agent-feedback.ts
+  s_de71bb439480c7::t_b7a5dab637a94d 66-67
+  s_de71bb439480c7::t_556608cc29de7b 17,21,57,64-65,69-73,75-78,81-82
+apps/dashboard/messages/en.json
+  s_de71bb439480c7::t_044747bb8db638 6423
+  s_de71bb439480c7::t_0564f536aee1e9 589-591,620-639
+  s_de71bb439480c7::t_beee9186408444 6424
+  s_de71bb439480c7::t_9edbfd3c12b715 592-594
+  s_de71bb439480c7::t_1b5e5e59fceb55 6422
+apps/dashboard/src/constants/agent-feedback.ts
+  s_de71bb439480c7::t_9a8145a1098764 130-144
+apps/dashboard/src/components/agent-feedback/feedback-detail-dialog.tsx
+  s_de71bb439480c7::t_cdd8c8f44c7562 299,301,303-306
+  s_de71bb439480c7::t_757b595b8630b9 85
+  s_de71bb439480c7::t_4a7ea3862a913b 4,6,30,180-191,193-195,197,200-206,219
+  s_de71bb439480c7::t_0fdd95b5ecfbfd 43,154
+  s_de71bb439480c7::t_a8225f1dc3c3c8 192
+  s_de71bb439480c7::t_d7a6ab19b5515d 3,17,199,207-210,229-230,260-272,278-289,291-294,296-298,300,302,307-310,312-314
+  s_de71bb439480c7::t_9edbfd3c12b715 32,37-38,41,44-84,86-153,155-176,274-276
+  s_de71bb439480c7::t_f8c863db4d94b0 290
+apps/dashboard/messages/de.json
+  s_de71bb439480c7::t_0564f536aee1e9 589-591,620-639
+  s_de71bb439480c7::t_044747bb8db638 6423
+  s_de71bb439480c7::t_1b5e5e59fceb55 6422
+  s_de71bb439480c7::t_9edbfd3c12b715 592-594
+  s_de71bb439480c7::t_beee9186408444 6424
+apps/dashboard/src/lib/agent-feedback/programs.ts
+  s_de71bb439480c7::t_45355d20441051 31-48,74-88
+apps/dashboard/src/components/composer/composer-shell.tsx
+  s_de71bb439480c7::t_6332957c91c86b 38,46-47,59-60
+apps/dashboard/src/utils/agent-feedback.ts
+  s_de71bb439480c7::t_556608cc29de7b 9,31-41,49-50,54-56,58-64
+  s_de71bb439480c7::t_b9049319a68896 42-48,51-53,57
+apps/dashboard/src/app/(dashboard)/[slug]/feedback/page-client.tsx
+  s_de71bb439480c7::t_a2060c4ad894c8 16-22,36,73-75,89-91,104-107,111-112,117,131,179,183,191-195,198,300-307,337-363
+apps/dashboard/src/components/agent-feedback/feedback-table.tsx
+  s_de71bb439480c7::t_a2060c4ad894c8 141,169
+apps/dashboard/src/components/agent-feedback/feedback-agent-icon.tsx
+  s_de71bb439480c7::t_9a8145a1098764 26-29,110,120
+apps/dashboard/src/types/agent-feedback.ts
+  s_de71bb439480c7::t_9edbfd3c12b715 171-172,174
+  s_de71bb439480c7::t_45355d20441051 46-47
+  s_de71bb439480c7::t_a2060c4ad894c8 92,111
+  s_de71bb439480c7::t_556608cc29de7b 50-52
+apps/dashboard/src/types/components/composer.ts
+  s_de71bb439480c7::t_6332957c91c86b 7-8
+apps/dashboard/src/types/comments.ts
+  s_de71bb439480c7::t_33233b13470e73 106-107
+  s_de71bb439480c7::t_1b5e5e59fceb55 76,79-80
+  s_de71bb439480c7::t_f8c863db4d94b0 77-78
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "518e9bb9983f40b12c62e716ab89de45e65e0197",
+  "prompts": {},
+  "sessions": {
+    "s_de71bb439480c7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d4b1da1a-ef4c-412d-bd5e-a98a49faa37c",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

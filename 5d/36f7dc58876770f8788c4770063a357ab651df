@@ -1,0 +1,21 @@
+apps/dashboard/src/lib/auth/mfa.ts
+  s_1e325abf04c4e2::t_92d5bb94df84f6 1-2,5,15,17,58-71,120-123
+apps/dashboard/scripts/create-dev-auth-account.ts
+  s_1e325abf04c4e2::t_92d5bb94df84f6 14-20,162,165-172
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "5d36f7dc58876770f8788c4770063a357ab651df",
+  "prompts": {},
+  "sessions": {
+    "s_1e325abf04c4e2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f98b95b6-a893-4a57-9f87-93bd7c030132",
+        "model": "claude-fable-5-1"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

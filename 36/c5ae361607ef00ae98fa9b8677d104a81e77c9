@@ -1,0 +1,25 @@
+apps/sites-e2e/tests/connected-lifecycle-postgres.test.ts
+  s_44cf84a7c2985f::t_39e0baed1b8bb1 309
+packages/db/tests/build-telemetry-postgres.test.ts
+  s_44cf84a7c2985f::t_bc097ef4e844af 97
+apps/sites-e2e/src/utils/sites-worker.ts
+  s_44cf84a7c2985f::t_d79077dc661bf4 73-77
+.github/workflows/sites-e2e.yml
+  s_44cf84a7c2985f::t_ce66b807697d34 66-67,92
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "36c5ae361607ef00ae98fa9b8677d104a81e77c9",
+  "prompts": {},
+  "sessions": {
+    "s_44cf84a7c2985f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7369f024-3389-49d4-ad32-cf5f47956db1",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

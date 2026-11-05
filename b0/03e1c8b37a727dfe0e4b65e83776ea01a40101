@@ -1,0 +1,41 @@
+apps/dashboard/src/lib/hooks/use-geo.ts
+  s_74f1f222337464::t_759d2cc5052cff 1162-1172
+packages/geo-core/tests/olostep-manual-runs.test.ts
+  s_74f1f222337464::t_e487ea92f1ad3f 1-206
+packages/geo-core/src/geo/olostep-conversation-scan.ts
+  s_74f1f222337464::t_1036343568b6e2 1-67
+packages/geo-core/src/geo/persona-scan.ts
+  s_74f1f222337464::t_5c818f01cfc58d 59-62,343-344,410-421,424-440,495-496
+packages/geo-core/src/utils/geo-olostep-answer.ts
+  s_74f1f222337464::t_fb0b99fb521120 32-35,57
+packages/geo-core/src/geo/scan.ts
+  s_74f1f222337464::t_5c818f01cfc58d 50,151-154,173-174,176-186,879-891,1055-1067,1084-1086,1114-1117,1144-1146,2005-2006,2112-2123,2126-2142,2226-2227
+  ai_agent 1068-1076,1087-1112,1118-1126,1128-1143,1147-1173
+apps/dashboard/messages/de.json
+  s_74f1f222337464::t_e54bf94a01a3f3 4094
+apps/dashboard/src/lib/hooks/use-geo-personas.ts
+  ai_agent 31
+  s_74f1f222337464::t_759d2cc5052cff 236-246
+packages/geo-core/src/types/geo.ts
+  s_74f1f222337464::t_cc800d1169dad6 657-659
+packages/geo-core/src/types/geo-personas.ts
+  s_74f1f222337464::t_cc800d1169dad6 124-126
+apps/dashboard/messages/en.json
+  s_74f1f222337464::t_e54bf94a01a3f3 4094
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "b003e1c8b37a727dfe0e4b65e83776ea01a40101",
+  "prompts": {},
+  "sessions": {
+    "s_74f1f222337464": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "17b3f2f7-5ea4-4493-830e-fd0cb7942987",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

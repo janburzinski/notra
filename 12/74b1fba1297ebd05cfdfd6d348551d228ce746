@@ -1,0 +1,26 @@
+packages/geo-core/tests/geo-changes.test.ts
+  s_b7c9597157c9a8::t_673a1b482ee627 1-86
+apps/dashboard/src/lib/email/daily-summary.ts
+  s_b7c9597157c9a8::t_d9eff9c1c8ac4d 3,18,218-226,236-237,338
+apps/dashboard/src/utils/daily-summary.test.ts
+  s_b7c9597157c9a8::t_d9eff9c1c8ac4d 9-11,13-14,16-18,35,46-47
+  s_b7c9597157c9a8::t_a0a109cb16d5c0 26-28
+apps/dashboard/src/utils/daily-summary.ts
+  s_b7c9597157c9a8::t_d9eff9c1c8ac4d 67,69-71,74
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "1274b1fba1297ebd05cfdfd6d348551d228ce746",
+  "prompts": {},
+  "sessions": {
+    "s_b7c9597157c9a8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "721abca7-fb5f-4e2c-999e-faba00db0c2f",
+        "model": "claude-fable-5-1"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

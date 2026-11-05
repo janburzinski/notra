@@ -1,0 +1,197 @@
+examples/sites/vercel/slots/changelog-hero.mdx
+  s_679a387b188ae8::t_d0c18baf89d379 2-11
+  s_679a387b188ae8::t_f03c39230d0da8 1
+examples/sites/cloudflare/README.md
+  s_679a387b188ae8::t_b8b442e5d0b45f 7-8,24-25,28
+examples/sites/google-analytics/README.md
+  s_679a387b188ae8::t_58bb4e1e45473c 7-8,35-37
+examples/sites/dark-launch/style.css
+  s_679a387b188ae8::t_91f809cf326834 1-127
+examples/sites/editorial/style.css
+  s_679a387b188ae8::t_d04e6ff48340e9 45-47
+  s_679a387b188ae8::t_a11e2780bb961a 49
+  s_679a387b188ae8::t_4b6cb47968e941 44,48,50-55
+examples/sites/plausible/public/images/logo.svg
+  s_679a387b188ae8::t_e558ce163ee05d 2-4
+examples/sites/umami/blog/planning-a-shared-kiln-load.mdx
+  s_679a387b188ae8::t_12ec0185bb2ad3 6
+examples/sites/subdomain/README.md
+  s_679a387b188ae8::t_84852e2029b7e2 7
+examples/sites/custom-components/style.css
+  s_679a387b188ae8::t_006ba58668ed73 13-34,36-38
+  s_679a387b188ae8::t_ae49a64e687b3d 35
+examples/sites/dark-launch/README.md
+  s_679a387b188ae8::t_bfdadefaa04708 7,14,19-21
+examples/sites/umami/README.md
+  s_679a387b188ae8::t_79e9eabace9370 7-8,39-40,43
+examples/sites/umami/blog/glaze-batches-by-the-gram.mdx
+  s_679a387b188ae8::t_12ec0185bb2ad3 6
+examples/sites/nginx/changelog/2026-10-01.mdx
+  ai_agent 6
+examples/sites/nginx/changelog/2026-08-20.mdx
+  ai_agent 6
+examples/sites/match-your-website/style.css
+  s_679a387b188ae8::t_5f29acfb4f7de4 40-44
+  s_679a387b188ae8::t_22f72756fe7e07 48
+  s_679a387b188ae8::t_f4fc5760c1686d 79-80,82-87,89-101,107-120,122,127
+  s_679a387b188ae8::t_083b033e6abf74 58-66
+  s_679a387b188ae8::t_9ec5e9f081977d 121,123-124
+examples/sites/netlify/slots/blog-hero.mdx
+  s_679a387b188ae8::t_f7bb1d245ab81e 1-8
+examples/sites/netlify/README.md
+  s_679a387b188ae8::t_b8b442e5d0b45f 7-8,24-25
+examples/sites/cloudflare/blog.json
+  s_679a387b188ae8::t_bb17e479314ee9 49-50
+examples/sites/cloudflare/slots/changelog-hero.mdx
+  s_679a387b188ae8::t_785e28294f3c7d 1
+examples/sites/netlify/style.css
+  s_679a387b188ae8::t_f10bb03faaaafa 44-83
+examples/sites/cloudflare/blog/retries-without-thundering-herds.mdx
+  s_679a387b188ae8::t_bb17e479314ee9 4
+examples/sites/google-analytics/slots/blog-hero.mdx
+  ai_agent 1-18
+examples/sites/plausible/README.md
+  s_679a387b188ae8::t_8775c9611bae12 7-8,42-44
+examples/sites/vercel/slots/blog-hero.mdx
+  s_679a387b188ae8::t_d0c18baf89d379 1-11
+examples/sites/devtool-changelog/style.css
+  s_679a387b188ae8::t_d04e6ff48340e9 59-61
+  s_679a387b188ae8::t_c022c13605237f 17,43-44,55-56,62-63
+  s_679a387b188ae8::t_ca849dba7688ec 1-16,18-42,45-54,57-58,64-70
+examples/sites/nginx/README.md
+  s_679a387b188ae8::t_b8b442e5d0b45f 7-8,25
+examples/sites/tanstack-start/slots/blog-hero.mdx
+  s_679a387b188ae8::t_5bbe2449ae2b98 18
+  s_679a387b188ae8::t_73cb81560eb69c 1-17,19-20
+examples/sites/nextjs/blog.json
+  s_679a387b188ae8::t_177b8b0543cd77 9
+  s_679a387b188ae8::t_38b67e4ebf28cc 8,10-16,49
+examples/sites/match-your-website/slots/after-post.mdx
+  s_679a387b188ae8::t_22f72756fe7e07 9
+examples/sites/open-source/style.css
+  s_679a387b188ae8::t_bd0c807496363a 1-6
+examples/sites/cloudflare/style.css
+  ai_agent 1-50
+examples/sites/plausible/public/images/favicon.svg
+  s_679a387b188ae8::t_e558ce163ee05d 2-4
+examples/sites/plausible/blog.json
+  s_679a387b188ae8::t_e558ce163ee05d 7-13
+examples/sites/umami/style.css
+  s_679a387b188ae8::t_12ec0185bb2ad3 1-39
+examples/sites/posthog/style.css
+  s_679a387b188ae8::t_bb3296e25ddf14 1-3,6-15,17-39,41-51,56
+  s_679a387b188ae8::t_f5ededd3608cc8 40
+  s_679a387b188ae8::t_1ba8ab4db3335e 4-5,16,52-55
+examples/sites/cloudflare/blog/delivery-logs-in-your-warehouse.mdx
+  s_679a387b188ae8::t_bb17e479314ee9 4
+examples/sites/umami/slots/blog-hero.mdx
+  s_679a387b188ae8::t_12ec0185bb2ad3 1-12
+examples/sites/editorial/README.md
+  s_679a387b188ae8::t_bfdadefaa04708 7,20
+examples/sites/tanstack-start/style.css
+  s_679a387b188ae8::t_5bbe2449ae2b98 22
+  s_679a387b188ae8::t_73cb81560eb69c 1-21,23-29
+examples/sites/dark-launch/blog.json
+  s_679a387b188ae8::t_eaec97a4f87500 9,51
+examples/sites/cloudflare/slots/blog-hero.mdx
+  ai_agent 1-5
+examples/sites/vercel/README.md
+  s_679a387b188ae8::t_b8b442e5d0b45f 7-8,24-25
+examples/sites/custom-components/blog.json
+  s_679a387b188ae8::t_006ba58668ed73 47
+examples/sites/nginx/blog/s3-object-lock-guide.mdx
+  s_679a387b188ae8::t_2290663f0f5b92 4
+examples/sites/posthog/slots/blog-hero.mdx
+  s_679a387b188ae8::t_f5ededd3608cc8 10
+  s_679a387b188ae8::t_bb3296e25ddf14 2-6,11,37,40,42-44
+  s_679a387b188ae8::t_1ba8ab4db3335e 1,7-9,12-36,38-39,41
+examples/sites/astro/blog.json
+  s_679a387b188ae8::t_9ec5e9f081977d 9,12,45
+examples/sites/open-source/blog.json
+  s_679a387b188ae8::t_bd0c807496363a 12-20,23-24,26-29,32
+  s_679a387b188ae8::t_e4acc28d4b5b31 22,25
+examples/sites/match-your-website/slots/blog-hero.mdx
+  s_679a387b188ae8::t_f4fc5760c1686d 1
+examples/sites/personal/blog.json
+  ai_agent 9-10
+examples/hosts/nextjs/app/globals.css
+  s_679a387b188ae8::t_1ee8305e23375d 1-2,18,20,95-98
+examples/sites/posthog/README.md
+  ai_agent 7-8,39-41
+examples/sites/cloudflare/blog/signing-webhooks-with-ed25519.mdx
+  s_679a387b188ae8::t_bb17e479314ee9 4
+examples/sites/nginx/blog/scheduled-restore-tests.mdx
+  s_679a387b188ae8::t_2290663f0f5b92 4
+examples/sites/plausible/style.css
+  s_679a387b188ae8::t_f7b4ebf3fc0baa 23-28
+  s_679a387b188ae8::t_e558ce163ee05d 1-22
+examples/hosts/astro/src/pages/index.astro
+  s_679a387b188ae8::t_1ee8305e23375d 30,106,154-155
+examples/sites/subdomain/blog/month-end-close-checklist.mdx
+  s_679a387b188ae8::t_bc2704d86c3233 3
+examples/sites/umami/blog/from-spreadsheet-to-kilnworks.mdx
+  s_679a387b188ae8::t_12ec0185bb2ad3 6
+examples/sites/custom-components/components.css
+  s_679a387b188ae8::t_ae49a64e687b3d 51,55-58,68,93,112,123,147,153-157
+examples/sites/netlify/slots/changelog-hero.mdx
+  s_679a387b188ae8::t_f7bb1d245ab81e 1-8
+examples/sites/dark-launch/slots/blog-hero.mdx
+  s_679a387b188ae8::t_eaec97a4f87500 1-28
+examples/sites/custom-components/public/images/cover-redraw.svg
+  ai_agent 3,10
+examples/sites/google-analytics/blog.json
+  ai_agent 8-11
+examples/sites/posthog/blog.json
+  s_679a387b188ae8::t_bb3296e25ddf14 8,11
+  s_679a387b188ae8::t_052686bd5e7f3b 9-10
+examples/sites/custom-components/README.md
+  ai_agent 7,20
+examples/sites/vercel/style.css
+  s_679a387b188ae8::t_9ac3a3779ff174 1-71,77-100,103-107
+  s_679a387b188ae8::t_46617da5fc3bf5 72-76,101-102
+examples/sites/personal/README.md
+  s_679a387b188ae8::t_bfdadefaa04708 7,21
+examples/sites/nextjs/README.md
+  s_679a387b188ae8::t_84852e2029b7e2 7
+examples/sites/nginx/blog/deduplication-40tb-into-6.mdx
+  s_679a387b188ae8::t_2290663f0f5b92 4
+examples/sites/nginx/blog.json
+  s_679a387b188ae8::t_2290663f0f5b92 9,46-48
+examples/sites/devtool-changelog/README.md
+  s_679a387b188ae8::t_bfdadefaa04708 7,21
+examples/sites/open-source/README.md
+  s_679a387b188ae8::t_deb211fe0f3ab9 7,16,24
+examples/sites/astro/README.md
+  s_679a387b188ae8::t_84852e2029b7e2 7
+  ai_agent 24
+examples/sites/tanstack-start/blog.json
+  s_679a387b188ae8::t_f7bb1d245ab81e 7,46
+examples/sites/google-analytics/style.css
+  s_679a387b188ae8::t_db65d33579a3c4 1-91
+examples/sites/tanstack-start/README.md
+  s_679a387b188ae8::t_e4acc28d4b5b31 8,25-26
+  s_679a387b188ae8::t_84852e2029b7e2 7
+examples/sites/plausible/slots/blog-hero.mdx
+  s_679a387b188ae8::t_85abdb6193d101 4
+  s_679a387b188ae8::t_e558ce163ee05d 1-3,5-9
+examples/sites/devtool-changelog/blog.json
+  s_679a387b188ae8::t_1ae78f40baf52b 46
+examples/sites/umami/blog.json
+  s_679a387b188ae8::t_12ec0185bb2ad3 9,43
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "1544344b205cbd953dbdcfc34a071237413c2d6a",
+  "prompts": {},
+  "sessions": {
+    "s_679a387b188ae8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5cda3aa5-c3b0-46de-afc0-446f42005067",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

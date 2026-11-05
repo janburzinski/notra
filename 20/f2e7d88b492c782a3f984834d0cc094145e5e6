@@ -1,0 +1,40 @@
+apps/dashboard/src/constants/autopilot-slack.ts
+  s_577d2420b1855f::t_ab2cf7bed15e64 1-3
+apps/dashboard/src/lib/autopilot/billing.ts
+  s_577d2420b1855f::t_7aa1fb722fef2d 11-14,58,67-72
+apps/dashboard/src/utils/autopilot-slack.ts
+  s_577d2420b1855f::t_fc968c3b04e825 1-2,7
+apps/dashboard/tests/autopilot-flow.test.ts
+  s_577d2420b1855f::t_63c3f1ce81f78f 264-265,273
+apps/dashboard/src/lib/autopilot/slack.test.ts
+  s_577d2420b1855f::t_b9104601bc9923 1-5,23-41,44,47,50-51,54,60,67,72-84,97
+apps/dashboard/src/lib/autopilot/brief.ts
+  s_577d2420b1855f::t_63c3f1ce81f78f 9,11,13,157,178-188
+apps/dashboard/src/lib/autopilot/pull-request-events.ts
+  s_577d2420b1855f::t_7aa1fb722fef2d 145-151
+apps/dashboard/src/lib/autopilot/errors.ts
+  s_577d2420b1855f::t_5f1e6cbf2bcb05 1-10
+apps/dashboard/src/types/autopilot-slack.ts
+  s_577d2420b1855f::t_ba8ad4d01c9fe1 1-18,20-27
+apps/dashboard/src/schemas/autopilot-slack.ts
+  s_577d2420b1855f::t_1bf9628dc35345 1-11
+apps/dashboard/src/lib/autopilot/slack.ts
+  s_577d2420b1855f::t_5c8e07a68c588d 24,30
+  s_577d2420b1855f::t_fe2d3171b259a3 1-23,25-29,31-64
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "20f2e7d88b492c782a3f984834d0cc094145e5e6",
+  "prompts": {},
+  "sessions": {
+    "s_577d2420b1855f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "06c8feb8-315e-49e8-8d2f-0af8b06622cd",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
