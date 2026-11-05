@@ -1,5 +1,4 @@
 import { DatabuddyWordmark } from "@notra/ui/components/ui/svgs/databuddyWordmark";
-import { Hexclave } from "@notra/ui/components/ui/svgs/hexclave";
 import { Inth } from "@notra/ui/components/ui/svgs/inth";
 import type { ComponentType, SVGProps } from "react";
 
@@ -322,11 +321,5 @@ export const SOCIAL_PROOF_LOGOS: {
     Component: DatabuddyWordmark,
     href: "https://databuddy.cc?utm_source=notra",
     className: "h-8",
-  },
-  {
-    name: "Hexclave",
-    Component: Hexclave,
-    href: "https://hexclave.com?utm_source=notra",
-    className: "h-8 text-[#49423d] dark:text-[#f3eeea]",
   },
 ];

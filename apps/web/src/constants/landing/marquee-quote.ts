@@ -1,5 +1,3 @@
-import { Hexclave } from "@notra/ui/components/ui/svgs/hexclave";
-
 import { DatabuddyLogo } from "@/components/landing/marquee-logos/databuddy-logo";
 import { HopliteLogo } from "@/components/landing/marquee-logos/hoplite-logo";
 import { InthLogo } from "@/components/landing/marquee-logos/inth-logo";
@@ -20,6 +18,5 @@ export const MARQUEE_LOGOS: MarqueeLogo[] = [
     Logo: HopliteLogo,
     href: "https://hoplite.sh",
   },
-  { name: "hexclave", label: "Hexclave", Logo: Hexclave },
   { name: "top-gg", label: "Top.gg", Logo: TopGgLogo },
 ];

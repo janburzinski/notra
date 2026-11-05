@@ -18,7 +18,7 @@ const COMPARE_CUSTOMER_LINKS: Record<string, string> = {
   "top-gg": "https://top.gg",
 };
 
-const COMPARE_HIDDEN_CUSTOMERS = new Set(["inth", "hexclave"]);
+const COMPARE_HIDDEN_CUSTOMERS = new Set(["inth"]);
 
 export const COMPARE_CUSTOMER_LOGOS: MarqueeLogo[] = [
   ...MARQUEE_LOGOS.filter(
