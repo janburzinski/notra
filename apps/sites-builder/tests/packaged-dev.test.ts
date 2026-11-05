@@ -1,5 +1,12 @@
 import { afterAll, expect, test } from "bun:test";
-import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import {
+  mkdir,
+  mkdtemp,
+  readdir,
+  readFile,
+  rm,
+  writeFile,
+} from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -224,6 +231,87 @@ test.each(Object.keys(launchers) as (keyof typeof launchers)[])(
         child.kill("SIGTERM");
         await child.exited;
       }
+      await rm(root, { recursive: true, force: true });
+    }
+  },
+  120_000
+);
+
+test.each(Object.keys(launchers) as (keyof typeof launchers)[])(
+  "the installed package builds and previews only the --mount sections, at their paths, on %s",
+  async (runtime) => {
+    const root = await mkdtemp(join(tmpdir(), "notra-packaged-mount-test-"));
+    let child: ReturnType<typeof Bun.spawn> | undefined;
+    try {
+      const source = join(root, "customer site");
+      for (const area of ["blog", "changelog"]) {
+        await mkdir(join(source, area), { recursive: true });
+        await writeFile(
+          join(source, area, "hello.mdx"),
+          '---\ntitle: "Hello"\ndate: 2026-10-12\n---\n\nNewsroom content.\n'
+        );
+      }
+      const launch = await launchers[runtime](root);
+      const mount = ["--source", source, "--mount", "blog=/newsroom"];
+      const out = join(root, "out");
+      const build = Bun.spawn(
+        [
+          ...launch,
+          "build",
+          ...mount,
+          "--out",
+          out,
+          "--origin",
+          "https://www.example.com",
+        ],
+        {
+          cwd: source,
+          stdout: "pipe",
+          stderr: "pipe",
+        }
+      );
+      const [code, stderr] = await Promise.all([
+        build.exited,
+        new Response(build.stderr).text(),
+      ]);
+      expect(code, stderr).toBe(0);
+      expect(stderr).toContain("Built blog at /newsroom");
+      const page = await readFile(
+        join(out, "newsroom", "hello", "index.html"),
+        "utf8"
+      );
+      expect(page).toContain('href="https://www.example.com/newsroom/hello"');
+      expect(page).toContain('content="noindex, nofollow"');
+      const built = await readdir(out);
+      expect(built).not.toContain("blog");
+      expect(built).not.toContain("changelog");
+
+      const port = await findFreePort(19200);
+      const url = (path: string) => `http://127.0.0.1:${port}${path}`;
+      child = Bun.spawn([...launch, "dev", ...mount, "--port", String(port)], {
+        cwd: source,
+        stdout: "ignore",
+        stderr: "ignore",
+      });
+      const deadline = Date.now() + 60_000;
+      let body = "";
+      while (Date.now() < deadline && !body.includes("Newsroom content.")) {
+        expect(child.exitCode).toBeNull();
+        const response = await fetch(url("/newsroom/hello"), {
+          signal: AbortSignal.timeout(2000),
+        }).catch(() => null);
+        body = response?.ok ? await response.text() : "";
+        await Bun.sleep(body ? 0 : 200);
+      }
+      expect(body).toContain("Newsroom content.");
+      const home = await fetch(url("/"), { redirect: "manual" });
+      expect(home.headers.get("location")).toEndWith("/newsroom");
+      for (const path of ["/blog/hello", "/changelog"]) {
+        expect((await fetch(url(path))).status).toBe(404);
+      }
+    } finally {
+      child?.kill("SIGTERM");
+      await child?.exited;
       await rm(root, { recursive: true, force: true });
     }
   },

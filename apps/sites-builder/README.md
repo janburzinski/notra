@@ -25,6 +25,41 @@ under `/blog` and `/changelog` when the site has a `blog/` or `changelog/` folde
 and analytics integrations are disabled. Content, styling, components, and
 configuration refresh when their source files change. Stop with Ctrl+C.
 
+### Serve a section at another path
+
+To preview the site at the path you will serve it from, for example behind
+your own proxy, pass `--mount <section>=<path>` once per section. Only the
+sections you list are served:
+
+```bash
+notra dev --mount blog=/newsroom
+notra dev --mount blog=/news --mount changelog=/releases
+```
+
+Paths start with `/` and use lowercase letters, digits and dashes, at most three
+segments deep. `/` mounts a section at the root. The two sections need different
+paths that don't contain each other, unless one of them is `/`.
+
+### Check and build a site
+
+```bash
+notra sites validate
+notra sites build --mount blog=/newsroom
+```
+
+`validate` checks `blog.json`, MDX and snippets without building. `build` makes
+the same static output a hosted deployment serves, in `./.notra/out` by default
+(`--out <dir>` to change it), with each section in the folder of its path, such
+as `.notra/out/newsroom/`. Sections and `--mount` work as in `notra dev`. A local
+build leaves out drafts, like a hosted build, and is marked `noindex`.
+Canonical links, feeds and sitemaps use `http://localhost` unless you pass
+`--origin https://www.example.com`.
+
+The renderer takes the same flags directly, for example
+`bun compiler/cli.ts build --source /path/to/site --out out --mount blog=/newsroom`.
+With `--target <file>` (the hosted build request), `--mount` and `--origin`
+replace the target's mounts and public origin and keep the rest.
+
 ## Work on the renderer
 
 ```bash

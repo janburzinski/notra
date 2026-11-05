@@ -1,10 +1,15 @@
 import { statSync } from "node:fs";
-import { basename, join } from "node:path";
+import { basename, isAbsolute, join, relative, sep } from "node:path";
 
+import { siteBuildRequestSchema } from "@notra/sites-core/schemas/build";
 import { siteConfigSchema } from "@notra/sites-core/schemas/site-config";
 import type { SiteBuildRequest } from "@notra/sites-core/types/build";
 import type { SiteArea, SiteMounts } from "@notra/sites-core/types/deployment";
 import { createDefaultSiteConfig } from "@notra/sites-core/utils/default-config";
+import { normalizeSiteMounts } from "@notra/sites-core/utils/mounts";
+
+import { LOCAL_BUILD_ORIGIN, LOCAL_SITE_ID } from "../constants/cli";
+import { UsageError } from "./usage-error";
 
 function isDirectory(path: string): boolean {
   try {
@@ -18,12 +23,59 @@ function isDirectory(path: string): boolean {
   }
 }
 
-// Without a target, preview the requested section and those that have a folder, or both when neither does.
+function isSiteArea(value: string): value is SiteArea {
+  return value === "blog" || value === "changelog";
+}
+
+// `--mount blog=/newsroom`, repeatable. The sections listed are the ones served.
+export function parseMountFlags(
+  flags: readonly string[] = []
+): SiteMounts | undefined {
+  if (flags.length === 0) {
+    return undefined;
+  }
+  const mounts: SiteMounts = {};
+  for (const flag of flags) {
+    const separator = flag.indexOf("=");
+    const area = flag.slice(0, Math.max(separator, 0)).trim();
+    const path = flag.slice(separator + 1).trim();
+    if (separator === -1 || !isSiteArea(area)) {
+      throw new UsageError(
+        `--mount ${flag}: expected blog=<path> or changelog=<path>, like --mount blog=/newsroom`
+      );
+    }
+    if (!path.startsWith("/")) {
+      throw new UsageError(`--mount ${flag}: the path must start with /`);
+    }
+    if (mounts[area] !== undefined) {
+      throw new UsageError(`--mount ${flag}: ${area} is mounted twice`);
+    }
+    mounts[area] = path;
+  }
+  try {
+    return normalizeSiteMounts(mounts);
+  } catch (error) {
+    throw new UsageError(
+      `--mount: ${error instanceof Error ? error.message : String(error)}`
+    );
+  }
+}
+
+// --mount lists the sections to serve and replaces a target's mounts. Without
+// either, preview the requested section and those that have a folder, or both
+// when neither does.
 export function localMounts(
   siteRoot: string,
   target?: SiteBuildRequest,
-  area?: SiteArea
+  area?: SiteArea,
+  mounts?: SiteMounts
 ): SiteMounts {
+  if (mounts) {
+    if (area && !mounts[area]) {
+      throw new UsageError(`--area ${area} needs a --mount ${area}=<path>`);
+    }
+    return mounts;
+  }
   if (target) {
     return target.mounts;
   }
@@ -49,4 +101,53 @@ export function localDefaultConfig(
         .trim() || "Local site"
     )
   );
+}
+
+function parseOrigin(origin: string): string {
+  const url = URL.canParse(origin) ? new URL(origin) : null;
+  if (!(url?.protocol === "http:" || url?.protocol === "https:")) {
+    throw new UsageError(
+      `--origin ${origin}: expected an http(s) URL, like https://example.com`
+    );
+  }
+  return url.origin;
+}
+
+// A build without --target is a local check: drafts left out like a hosted
+// build, but noindex so the output never gets indexed by accident. --origin and
+// --mount replace the matching fields of a --target.
+export function localBuildTarget(
+  siteRoot: string,
+  target: SiteBuildRequest | undefined,
+  overrides: { origin?: string; mounts?: SiteMounts }
+): SiteBuildRequest {
+  const origin =
+    overrides.origin === undefined ? undefined : parseOrigin(overrides.origin);
+  if (target) {
+    return {
+      ...target,
+      ...(origin ? { publicOrigin: origin } : {}),
+      ...(overrides.mounts ? { mounts: overrides.mounts } : {}),
+    };
+  }
+  return siteBuildRequestSchema.parse({
+    siteId: LOCAL_SITE_ID,
+    deploymentId: LOCAL_SITE_ID,
+    publicOrigin: origin ?? LOCAL_BUILD_ORIGIN,
+    mounts: localMounts(siteRoot, undefined, undefined, overrides.mounts),
+    noindex: true,
+    defaultConfig: localDefaultConfig(siteRoot),
+  });
+}
+
+// The build empties --out first, so it may not hold the site itself.
+export function assertOutsideSource(siteRoot: string, outDir: string) {
+  const path = relative(outDir, siteRoot);
+  const outside =
+    path === ".." || path.startsWith(`..${sep}`) || isAbsolute(path);
+  if (!outside) {
+    throw new UsageError(
+      `--out ${outDir} holds the site source, and the build empties it first. Use a separate folder, like ${join(siteRoot, ".notra", "out")}`
+    );
+  }
 }

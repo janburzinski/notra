@@ -33,7 +33,14 @@ import { prepareSite, readSiteFiles } from "./prepare";
 import type { DevAreaServer, RunningDevArea } from "./types/dev-server";
 import { startDevAreas } from "./utils/dev-areas";
 import { createDevRefresh } from "./utils/dev-refresh";
-import { localDefaultConfig, localMounts } from "./utils/local-options";
+import {
+  assertOutsideSource,
+  localBuildTarget,
+  localDefaultConfig,
+  localMounts,
+  parseMountFlags,
+} from "./utils/local-options";
+import { UsageError } from "./utils/usage-error";
 
 const TOOLCHAIN_ROOT = fileURLToPath(new URL("..", import.meta.url));
 
@@ -62,6 +69,8 @@ async function main() {
       source: { type: "string", default: "." },
       target: { type: "string" },
       out: { type: "string" },
+      mount: { type: "string", multiple: true },
+      origin: { type: "string" },
       area: { type: "string" },
       port: { type: "string", default: "4321" },
       json: { type: "boolean", default: false },
@@ -105,15 +114,21 @@ async function main() {
   }
 
   if (command === "build") {
-    if (!(values.target && values.out)) {
-      throw new Error("build needs --target and --out");
+    if (!values.out) {
+      throw new UsageError("build needs --out <dir>");
     }
-    const target = await readBuildTarget(values.target);
+    const outDir = resolve(values.out);
+    assertOutsideSource(siteRoot, outDir);
+    const target = localBuildTarget(
+      siteRoot,
+      values.target ? await readBuildTarget(values.target) : undefined,
+      { origin: values.origin, mounts: parseMountFlags(values.mount) }
+    );
     const result = await buildSite({
       toolchainRoot: TOOLCHAIN_ROOT,
       siteRoot,
       target,
-      outDir: resolve(values.out),
+      outDir,
     });
     if (values["result-file"]) {
       await writeFile(values["result-file"], JSON.stringify(result));
@@ -124,7 +139,7 @@ async function main() {
       printDiagnostics(result.diagnostics);
       process.stderr.write(
         result.ok
-          ? `✔ Built ${result.areas.map((area) => `${area.area} at ${area.mount} (${area.durationMs} ms)`).join(", ")}: ${result.fileCount} files, ${(result.totalBytes / 1024).toFixed(0)} KB\n`
+          ? `✔ Built ${result.areas.map((area) => `${area.area} at ${area.mount} (${area.durationMs} ms)`).join(", ")}: ${result.fileCount} files, ${(result.totalBytes / 1024).toFixed(0)} KB in ${outDir}\n`
           : "Build failed\n"
       );
     }
@@ -137,9 +152,11 @@ async function main() {
       : undefined;
     const { area } = values;
     if (area !== undefined && area !== "blog" && area !== "changelog") {
-      throw new Error("--area must be blog or changelog");
+      throw new UsageError("--area must be blog or changelog");
     }
-    const mounts = normalizeSiteMounts(localMounts(siteRoot, target, area));
+    const mounts = normalizeSiteMounts(
+      localMounts(siteRoot, target, area, parseMountFlags(values.mount))
+    );
     const defaultConfig = localDefaultConfig(siteRoot, target);
     const requestedPort = Number(values.port ?? "4321");
     if (
@@ -147,7 +164,7 @@ async function main() {
       requestedPort < 1 ||
       requestedPort > 65533
     ) {
-      throw new Error("--port must be an integer between 1 and 65533");
+      throw new UsageError("--port must be an integer between 1 and 65533");
     }
     const port = await findUnusedPort(requestedPort);
     if (port !== requestedPort) {
@@ -324,8 +341,16 @@ async function main() {
 }
 
 main().catch((error: unknown) => {
-  process.stderr.write(
-    `${error instanceof Error ? (error.stack ?? error.message) : String(error)}\n`
-  );
+  let message = String(error);
+  const code = (error as NodeJS.ErrnoException | null)?.code;
+  if (
+    error instanceof UsageError ||
+    (error instanceof TypeError && code?.startsWith("ERR_PARSE_ARGS"))
+  ) {
+    message = error.message;
+  } else if (error instanceof Error) {
+    message = error.stack ?? error.message;
+  }
+  process.stderr.write(`${message}\n`);
   process.exit(1);
 });
