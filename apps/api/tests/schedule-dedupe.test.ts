@@ -27,36 +27,67 @@ const request = {
   autoPublish: false,
 };
 
-describe("schedule identity", () => {
-  test("API update excludes its own row before entering the write transaction", async () => {
-    const body = createScheduleRequestSchema.parse(request);
-    const db = {
-      query: {
-        contentTriggers: {
-          findFirst: mock(async ({ where }) => {
-            const query = new PgDialect().sqlToQuery(where);
-            expect(query.sql).toContain('"content_triggers"."id" <>');
-            expect(query.params).toContain("own-row");
-            return undefined;
-          }),
-        },
+const storedRow = {
+  id: "own-row",
+  organizationId: "org-a",
+  name: "Weekly summary",
+  sourceType: "cron",
+  sourceConfig: request.sourceConfig,
+  targets: { repositoryIds: ["repo-a"] },
+  outputType: "changelog",
+  outputConfig: null,
+  dedupeHash: "stored-hash",
+  enabled: false,
+  autoPublish: false,
+  qstashScheduleId: null,
+  createdAt: new Date("2026-11-01T00:00:00Z"),
+  updatedAt: new Date("2026-11-01T00:00:00Z"),
+};
+
+function lockedScheduleDb(
+  findDuplicate: (input: { where: unknown }) => Promise<unknown>
+) {
+  const tx = {
+    select: () => ({
+      from: () => ({ where: () => ({ for: async () => [storedRow] }) }),
+    }),
+    query: {
+      contentTriggerLookbackWindows: {
+        findFirst: async () => ({ window: "last_7_days" }),
       },
-      transaction: mock(async () => {
-        throw new Error("Reached write transaction");
-      }),
-    };
+      contentTriggers: { findFirst: mock(findDuplicate) },
+    },
+  };
+  return {
+    tx,
+    db: {
+      transaction: mock(async (run: (client: typeof tx) => unknown) => run(tx)),
+    },
+  };
+}
+
+describe("schedule identity", () => {
+  test("API update checks duplicates under the row lock and excludes its own row", async () => {
+    const { db, tx } = lockedScheduleDb(async ({ where }) => {
+      const query = new PgDialect().sqlToQuery(where as never);
+      expect(query.sql).toContain('"content_triggers"."id" <>');
+      expect(query.params).toContain("own-row");
+      return undefined;
+    });
     const result = await Effect.runPromise(
       Effect.result(
         patchSchedule({
           db: db as unknown as DbClient,
           organizationId: "org-a",
           scheduleId: "own-row",
-          body,
+          body: { name: "Renamed" },
           env: {},
         })
       )
     );
     expect(db.transaction).toHaveBeenCalledTimes(1);
+    expect(tx.query.contentTriggers.findFirst).toHaveBeenCalledTimes(1);
+    // The mock has no update(); reaching it proves every check passed.
     expect(result).toMatchObject({
       _tag: "Failure",
       failure: { _tag: "ScheduleDatabaseError" },
@@ -174,8 +205,8 @@ describe("schedule identity", () => {
       const body = createScheduleRequestSchema.parse(request);
       const hashes = scheduleDedupeHashes(body);
       const existingHash = hashes[key === "canonical" ? 0 : 1];
-      const findFirst = mock(async ({ where }) => {
-        const query = new PgDialect().sqlToQuery(where);
+      const findDuplicate = async ({ where }: { where: unknown }) => {
+        const query = new PgDialect().sqlToQuery(where as never);
         expect(query.sql).toContain('"content_triggers"."organization_id" =');
         expect(query.sql).toContain('"content_triggers"."dedupe_hash" in');
         expect(query.params).toContain("org-a");
@@ -184,16 +215,31 @@ describe("schedule identity", () => {
         return query.params.includes(existingHash)
           ? { id: "other-row" }
           : undefined;
-      });
-      const db = {
-        query: { contentTriggers: { findFirst } },
+      };
+      const createDb = {
+        query: { contentTriggers: { findFirst: mock(findDuplicate) } },
       } as unknown as DbClient;
-      const input = { db, organizationId: "org-a", body, env: {} };
       const created = await Effect.runPromise(
-        Effect.result(createSchedule(input))
+        Effect.result(
+          createSchedule({
+            db: createDb,
+            organizationId: "org-a",
+            body,
+            env: {},
+          })
+        )
       );
+      const { db: patchDb } = lockedScheduleDb(findDuplicate);
       const updated = await Effect.runPromise(
-        Effect.result(patchSchedule({ ...input, scheduleId: "own-row" }))
+        Effect.result(
+          patchSchedule({
+            db: patchDb as unknown as DbClient,
+            organizationId: "org-a",
+            scheduleId: "own-row",
+            body: { targets: { repositoryIds: ["repo-b", "repo-a"] } },
+            env: {},
+          })
+        )
       );
       expect(created).toMatchObject({
         _tag: "Failure",
@@ -203,11 +249,6 @@ describe("schedule identity", () => {
         _tag: "Failure",
         failure: { _tag: "ScheduleDuplicateError" },
       });
-      const updateQuery = new PgDialect().sqlToQuery(
-        findFirst.mock.calls[1][0].where
-      );
-      expect(updateQuery.sql).toContain('"content_triggers"."id" <>');
-      expect(updateQuery.params).toContain("own-row");
     }
   );
 });

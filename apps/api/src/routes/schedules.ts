@@ -87,7 +87,7 @@ const createScheduleRoute = createRoute({
   operationId: "createSchedule",
   summary: "Create a schedule",
   description:
-    "Creates a recurring schedule that generates one content type from the selected GitHub integrations. Times are in UTC. A schedule with the same source, targets, output, and lookback settings as an existing one is rejected with 409.",
+    "Creates a recurring schedule that generates one content type from the selected GitHub and Linear integrations. Set at least one in targets.repositoryIds or targets.linearIntegrationIds. Times are in UTC. A schedule with the same source, targets, output, and lookback settings as an existing one is rejected with 409.",
   request: {
     body: {
       required: true,
@@ -124,7 +124,7 @@ const patchScheduleRoute = createRoute({
   operationId: "updateSchedule",
   summary: "Update a schedule",
   description:
-    "Replaces the schedule. Send the full schedule body; fields that are omitted are not preserved from the existing schedule.",
+    "Updates only the fields you send; everything else keeps its current value. targets and outputConfig merge field by field, sourceConfig.cron is replaced as a whole, and null clears an outputConfig field. The updated schedule is validated like a new one, so it must keep at least one GitHub or Linear integration.",
   request: {
     params: scheduleParamsSchema,
     body: {
@@ -331,7 +331,10 @@ schedulesRoutes.openapi(patchScheduleRoute, async (c) => {
     if (failure._tag === "ScheduleDuplicateError") {
       return c.json({ error: "Duplicate schedule" }, 409);
     }
-    if (failure._tag === "ScheduleMissingTargetsError") {
+    if (
+      failure._tag === "ScheduleMissingTargetsError" ||
+      failure._tag === "ScheduleInvalidUpdateError"
+    ) {
       return c.json({ error: failure.message }, 400);
     }
     if (failure._tag === "ScheduleQstashError") {

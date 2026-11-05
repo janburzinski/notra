@@ -114,15 +114,53 @@ export const scheduleSourceConfigSchema = z.object({
   cron: cronConfigSchema,
 });
 
-export const scheduleTargetsSchema = z.object({
-  repositoryIds: z
-    .array(z.string().trim().min(1))
-    .min(1)
-    .openapi({
-      description:
-        "GitHub integration IDs to generate from, as returned by GET /v1/integrations.",
+const integrationIdsSchema = z.array(z.string().trim().min(1));
+
+const repositoryIdsDescription =
+  "GitHub integration IDs to generate from, as returned in the github array of GET /v1/integrations.";
+const linearIntegrationIdsDescription =
+  "Linear integration IDs to generate from, as returned in the linear array of GET /v1/integrations.";
+
+function hasScheduleSource(targets: {
+  repositoryIds: string[];
+  linearIntegrationIds?: string[];
+}) {
+  return (
+    targets.repositoryIds.length > 0 ||
+    (targets.linearIntegrationIds?.length ?? 0) > 0
+  );
+}
+
+const SCHEDULE_SOURCE_REQUIRED_MESSAGE =
+  "Select at least one GitHub or Linear integration";
+
+export const scheduleTargetsSchema = z
+  .object({
+    repositoryIds: integrationIdsSchema.default([]).openapi({
+      description: `${repositoryIdsDescription} Defaults to none when linearIntegrationIds is set.`,
       example: ["51c2f3aa-efdd-4e28-8e69-23fa2dfd3561"],
     }),
+    linearIntegrationIds: integrationIdsSchema.optional().openapi({
+      description: linearIntegrationIdsDescription,
+      example: ["7f9a2b3c-1d4e-4f5a-9b6c-8d7e6f5a4b3c"],
+    }),
+  })
+  .refine(hasScheduleSource, {
+    message: SCHEDULE_SOURCE_REQUIRED_MESSAGE,
+    path: ["repositoryIds"],
+  })
+  .openapi({
+    description:
+      "Data sources each run reads from. Set at least one GitHub or Linear integration.",
+  });
+
+export const storedScheduleTargetsSchema = z.object({
+  repositoryIds: z.array(z.string()).openapi({
+    description: repositoryIdsDescription,
+  }),
+  linearIntegrationIds: z.array(z.string()).optional().openapi({
+    description: linearIntegrationIdsDescription,
+  }),
 });
 
 export const scheduleOutputConfigSchema = z
@@ -192,9 +230,59 @@ export const createScheduleRequestSchema = z.object({
     }),
 });
 
-export const patchScheduleRequestSchema = createScheduleRequestSchema.openapi(
-  "PatchScheduleRequest"
-);
+const scheduleOutputConfigFields = scheduleOutputConfigSchema.unwrap().shape;
+const createScheduleFields = createScheduleRequestSchema.shape;
+
+export const patchScheduleRequestSchema = z
+  .object({
+    name: createScheduleFields.name.optional(),
+    sourceType: createScheduleFields.sourceType.optional(),
+    sourceConfig: scheduleSourceConfigSchema.optional().openapi({
+      description:
+        "Replaces the cron settings as a whole. Send every cron field the frequency needs.",
+    }),
+    targets: z
+      .object({
+        repositoryIds: integrationIdsSchema.optional().openapi({
+          description: `${repositoryIdsDescription} Replaces the current GitHub targets; omit to keep them.`,
+        }),
+        linearIntegrationIds: integrationIdsSchema.optional().openapi({
+          description: `${linearIntegrationIdsDescription} Replaces the current Linear targets; omit to keep them, send [] to remove them.`,
+        }),
+      })
+      .optional()
+      .openapi({
+        description:
+          "Data source changes. The schedule must keep at least one GitHub or Linear integration.",
+      }),
+    outputType: createScheduleFields.outputType.optional(),
+    outputConfig: z
+      .object({
+        publishDestination:
+          scheduleOutputConfigFields.publishDestination.nullable(),
+        brandVoiceId: scheduleOutputConfigFields.brandVoiceId.nullable(),
+        instructions: scheduleOutputConfigFields.instructions.nullable(),
+        notify: scheduleOutputConfigFields.notify.nullable(),
+      })
+      .nullable()
+      .optional()
+      .openapi({
+        description:
+          "Output setting changes, merged field by field into the current settings. Set a field to null to clear it, or send null to clear all of them.",
+      }),
+    enabled: createScheduleFields.enabled.optional(),
+    autoPublish: z.boolean().optional().openapi({
+      description:
+        "Publish generated posts automatically instead of saving them as drafts.",
+    }),
+    lookbackWindow: z.enum(lookbackWindowEnum.enumValues).optional().openapi({
+      description: "How far back each run collects source activity.",
+    }),
+  })
+  .refine((body) => Object.values(body).some((value) => value !== undefined), {
+    message: "Send at least one field to update",
+  })
+  .openapi("PatchScheduleRequest");
 
 const scheduleSchema = z.object({
   id: z.string(),
@@ -202,7 +290,7 @@ const scheduleSchema = z.object({
   name: z.string(),
   sourceType: z.literal("cron"),
   sourceConfig: scheduleSourceConfigSchema,
-  targets: scheduleTargetsSchema,
+  targets: storedScheduleTargetsSchema,
   outputType: z.enum(SUPPORTED_CONTENT_GENERATION_TYPES),
   outputConfig: scheduleOutputConfigSchema.nullable().optional(),
   enabled: z.boolean(),

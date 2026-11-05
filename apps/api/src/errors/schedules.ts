@@ -15,6 +15,11 @@ export class ScheduleMissingTargetsError extends Schema.TaggedError<ScheduleMiss
   { message: Schema.String }
 ) {}
 
+export class ScheduleInvalidUpdateError extends Schema.TaggedError<ScheduleInvalidUpdateError>()(
+  "ScheduleInvalidUpdateError",
+  { message: Schema.String }
+) {}
+
 export class ScheduleQstashError extends Schema.TaggedError<ScheduleQstashError>()(
   "ScheduleQstashError",
   {

@@ -14,11 +14,13 @@ import { QstashError } from "@notra/schemas/api/qstash";
 import { scheduleSourceConfigSchema } from "@notra/schemas/api/schedules";
 import { and, desc, eq, inArray, ne } from "drizzle-orm";
 import { Effect } from "effect";
+import type * as z from "zod";
 
 import {
   ScheduleDatabaseError,
   ScheduleDisabledError,
   ScheduleDuplicateError,
+  ScheduleInvalidUpdateError,
   ScheduleMissingTargetsError,
   ScheduleNotFoundError,
   ScheduleQstashError,
@@ -47,7 +49,9 @@ import {
   filterSchedulesByRepositoryIds,
   hashSchedule,
   mapQstashError,
+  mergeSchedulePatch,
   normalizeSchedule,
+  scheduleBodyFromTrigger,
   safeSerializeSchedule,
   serializeSchedule,
 } from "../utils/schedules";
@@ -201,6 +205,7 @@ function isScheduleDomainError(
 ): error is
   | ScheduleNotFoundError
   | ScheduleDuplicateError
+  | ScheduleInvalidUpdateError
   | ScheduleMissingTargetsError
   | ScheduleQstashError {
   return (
@@ -209,6 +214,7 @@ function isScheduleDomainError(
     "_tag" in error &&
     (error._tag === "ScheduleNotFoundError" ||
       error._tag === "ScheduleDuplicateError" ||
+      error._tag === "ScheduleInvalidUpdateError" ||
       error._tag === "ScheduleMissingTargetsError" ||
       error._tag === "ScheduleQstashError")
   );
@@ -265,15 +271,22 @@ function cleanupQstashSchedule(
   );
 }
 
+function describeInvalidUpdate(error: z.ZodError) {
+  const issue = error.issues[0];
+  if (!issue) {
+    return "Invalid schedule update";
+  }
+  const path = issue.path.join(".");
+  return path ? `${path}: ${issue.message}` : issue.message;
+}
+
 async function executePatchSchedule({
   db,
   organizationId,
   scheduleId,
-  body,
+  body: patch,
   env,
 }: PatchScheduleProgramInput) {
-  const normalized = normalizeSchedule(body);
-  const dedupeHash = hashSchedule(normalized);
   const affectedQstashIds = new Set<string>();
   let committed = false;
 
@@ -287,6 +300,54 @@ async function executePatchSchedule({
 
       if (!existing) {
         throw new ScheduleNotFoundError();
+      }
+
+      const storedLookback =
+        await tx.query.contentTriggerLookbackWindows.findFirst({
+          where: eq(contentTriggerLookbackWindows.triggerId, scheduleId),
+          columns: { window: true },
+        });
+      const merged = mergeSchedulePatch(
+        scheduleBodyFromTrigger({
+          ...existing,
+          lookbackWindow: storedLookback?.window ?? "last_7_days",
+        }),
+        patch
+      );
+      if (!merged.success) {
+        throw new ScheduleInvalidUpdateError({
+          message: describeInvalidUpdate(merged.error),
+        });
+      }
+      const body = merged.data;
+      const normalized = normalizeSchedule(body);
+      const dedupeHash = hashSchedule(normalized);
+
+      const duplicate = await tx.query.contentTriggers.findFirst({
+        columns: { id: true },
+        where: and(
+          eq(contentTriggers.organizationId, organizationId),
+          inArray(contentTriggers.dedupeHash, scheduleDedupeHashes(normalized)),
+          ne(contentTriggers.id, scheduleId)
+        ),
+      });
+      if (duplicate) {
+        throw new ScheduleDuplicateError();
+      }
+
+      if (body.enabled) {
+        const missingTargets = await ensureTriggerTargetsExist(
+          tx,
+          organizationId,
+          normalized.targets.repositoryIds,
+          "Cannot enable schedule: one or more integrations have been deleted",
+          normalized.targets.linearIntegrationIds
+        );
+        if (missingTargets) {
+          throw new ScheduleMissingTargetsError({
+            message: missingTargets.error,
+          });
+        }
       }
 
       let qstashScheduleId: string | null = null;
@@ -313,7 +374,7 @@ async function executePatchSchedule({
       const [updatedTrigger] = await tx
         .update(contentTriggers)
         .set({
-          name: body.name.trim() || existing.name || DEFAULT_SCHEDULE_NAME,
+          name: body.name || existing.name || DEFAULT_SCHEDULE_NAME,
           sourceType: "cron",
           sourceConfig: normalized.sourceConfig,
           targets: normalized.targets,
@@ -479,7 +540,8 @@ export const createSchedule = Effect.fn("schedules.create")(function* ({
         db,
         organizationId,
         normalized.targets.repositoryIds,
-        "Cannot create enabled schedule: one or more integrations not found"
+        "Cannot create enabled schedule: one or more integrations not found",
+        normalized.targets.linearIntegrationIds
       )
     );
 
@@ -634,38 +696,6 @@ export const patchSchedule = Effect.fn("schedules.patch")(function* ({
   body,
   env,
 }: PatchScheduleProgramInput) {
-  const normalized = normalizeSchedule(body);
-  const duplicate = yield* database(() =>
-    db.query.contentTriggers.findFirst({
-      where: and(
-        eq(contentTriggers.organizationId, organizationId),
-        inArray(contentTriggers.dedupeHash, scheduleDedupeHashes(normalized)),
-        ne(contentTriggers.id, scheduleId)
-      ),
-    })
-  );
-
-  if (duplicate) {
-    return yield* new ScheduleDuplicateError();
-  }
-
-  if (body.enabled) {
-    const missingTargets = yield* database(() =>
-      ensureTriggerTargetsExist(
-        db,
-        organizationId,
-        normalized.targets.repositoryIds,
-        "Cannot enable schedule: one or more integrations have been deleted"
-      )
-    );
-
-    if (missingTargets) {
-      return yield* new ScheduleMissingTargetsError({
-        message: missingTargets.error,
-      });
-    }
-  }
-
   return yield* Effect.tryPromise({
     try: () =>
       executePatchSchedule({

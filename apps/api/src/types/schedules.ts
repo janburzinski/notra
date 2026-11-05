@@ -9,6 +9,7 @@ import type { z } from "zod";
 import type {
   ScheduleDisabledError,
   ScheduleDuplicateError,
+  ScheduleInvalidUpdateError,
   ScheduleMissingTargetsError,
   ScheduleNotFoundError,
   ScheduleQstashError,
@@ -27,6 +28,7 @@ export type ScheduleTriggerWithLookbackWindow = ScheduleTriggerRow & {
 export type ScheduleDomainError =
   | ScheduleNotFoundError
   | ScheduleDuplicateError
+  | ScheduleInvalidUpdateError
   | ScheduleMissingTargetsError
   | ScheduleQstashError
   | ScheduleDisabledError
@@ -43,7 +45,7 @@ export interface ListSchedulesProgramInput extends ScheduleProgramInput {
 
 export interface PatchScheduleProgramInput extends ScheduleProgramInput {
   scheduleId: string;
-  body: z.infer<typeof patchScheduleRequestSchema>;
+  body: PatchScheduleBody;
   env: QstashEnv;
 }
 
@@ -69,3 +71,5 @@ export interface DeleteScheduleProgramInput extends ScheduleProgramInput {
 }
 
 export type CreateScheduleBody = z.infer<typeof createScheduleRequestSchema>;
+
+export type PatchScheduleBody = z.infer<typeof patchScheduleRequestSchema>;

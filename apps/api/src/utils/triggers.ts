@@ -1,4 +1,8 @@
-import { contentTriggers, githubIntegrations } from "@notra/db/schema";
+import {
+  contentTriggers,
+  githubIntegrations,
+  linearIntegrations,
+} from "@notra/db/schema";
 import { and, eq, inArray } from "drizzle-orm";
 import { Effect } from "effect";
 
@@ -145,27 +149,44 @@ export function serializeDisabledTriggers(
 }
 
 export async function ensureTriggerTargetsExist(
-  db: DbClient,
+  db: DbClient | DbTransaction,
   organizationId: string,
   repositoryIds: string[],
-  message: string
+  message: string,
+  linearIntegrationIds: string[] = []
 ) {
-  if (repositoryIds.length === 0) {
+  if (repositoryIds.length === 0 && linearIntegrationIds.length === 0) {
     return null;
   }
 
-  const integrations = await db.query.githubIntegrations.findMany({
-    where: and(
-      eq(githubIntegrations.organizationId, organizationId),
-      inArray(githubIntegrations.id, repositoryIds)
-    ),
-    columns: { id: true },
-  });
+  const [integrations, linearTargets] = await Promise.all([
+    repositoryIds.length === 0
+      ? Promise.resolve([])
+      : db.query.githubIntegrations.findMany({
+          where: and(
+            eq(githubIntegrations.organizationId, organizationId),
+            inArray(githubIntegrations.id, repositoryIds)
+          ),
+          columns: { id: true },
+        }),
+    linearIntegrationIds.length === 0
+      ? Promise.resolve([])
+      : db.query.linearIntegrations.findMany({
+          where: and(
+            eq(linearIntegrations.organizationId, organizationId),
+            eq(linearIntegrations.enabled, true),
+            inArray(linearIntegrations.id, linearIntegrationIds)
+          ),
+          columns: { id: true },
+        }),
+  ]);
 
   const existingIds = new Set(
-    integrations.map((integration) => integration.id)
+    [...integrations, ...linearTargets].map((integration) => integration.id)
   );
-  const hasMissingTarget = repositoryIds.some((id) => !existingIds.has(id));
+  const hasMissingTarget = [...repositoryIds, ...linearIntegrationIds].some(
+    (id) => !existingIds.has(id)
+  );
 
   return hasMissingTarget ? { error: message } : null;
 }
