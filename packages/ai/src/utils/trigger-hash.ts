@@ -42,7 +42,9 @@ export function scheduleDedupeHashes(
     )
     .digest("hex");
 
-  // Legacy hashes do not encode a Linear selection and must not match one.
+  // An omitted Linear list reads every enabled Linear integration and [] reads
+  // none, so the two stay distinct. Legacy hashes predate the Linear field and
+  // only match schedules that omit it.
   return input.targets.linearIntegrationIds === undefined
     ? [canonical, legacy]
     : [canonical];

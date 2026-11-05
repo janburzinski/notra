@@ -67,7 +67,6 @@ import {
   getSlackIntegrationsByOrganization,
   updateSlackIntegration,
 } from "@notra/ai/integrations/slack-workspace";
-import { deleteQstashSchedule } from "@notra/ai/qstash/triggers";
 import {
   GitHubInstallationMissingError,
   GitHubMultiRepositoryUnsupportedError,
@@ -82,12 +81,7 @@ import {
 import { logError } from "@notra/ai/utils/server-log";
 import { getAppUrl } from "@notra/ai/utils/url";
 import { db } from "@notra/db/drizzle";
-import {
-  posts,
-  githubIntegrations,
-  contentTriggers,
-  repositoryOutputs,
-} from "@notra/db/schema";
+import { posts, githubIntegrations, repositoryOutputs } from "@notra/db/schema";
 import { isPgUniqueViolation } from "@notra/db/utils/pg-errors";
 import { POSTHOG_EVENTS } from "@notra/posthog/events";
 import { organizationIdInputSchema } from "@notra/schemas/dashboard/auth/organization";
@@ -117,7 +111,6 @@ import {
   repositoryIdParamSchema,
   repositoryInputSchema,
   testMcpServerRequestSchema,
-  triggerTargetsSchema,
   updateIntegrationBodySchema,
   updateMcpServerBodySchema,
   updateOutputBodySchema,
@@ -131,7 +124,6 @@ import {
   slackListChannelsOptionsSchema,
   updateSlackIntegrationBodySchema,
 } from "@notra/schemas/dashboard/slack-integration";
-import { mapWithConcurrency } from "@notra/sites-server/utils/concurrency";
 import { isDemoMode } from "@notra/utils/demo-mode";
 import { PublicUrlValidationError } from "@notra/utils/url";
 import { ORPCError } from "@orpc/server";
@@ -157,6 +149,10 @@ import {
   findSiteGitHubPublishTarget,
   listSiteGitHubPublishTargets,
 } from "@/lib/integrations/github/site-publish-target";
+import {
+  disableSchedulesForIntegration,
+  getAffectedSchedulesForIntegration,
+} from "@/lib/integrations/schedule-cleanup";
 import {
   clearCachedSlackChannels,
   getCachedSlackChannels,
@@ -344,35 +340,6 @@ async function requireOutputInOrganization(
   }
 
   return output;
-}
-
-async function getAffectedSchedulesForIntegration(
-  organizationId: string,
-  integrationId: string
-) {
-  const allSchedules = await db.query.contentTriggers.findMany({
-    columns: {
-      enabled: true,
-      id: true,
-      name: true,
-      qstashScheduleId: true,
-      targets: true,
-    },
-    where: and(
-      eq(contentTriggers.organizationId, organizationId),
-      eq(contentTriggers.sourceType, "cron")
-    ),
-  });
-
-  return allSchedules.filter((schedule) => {
-    const parsed = triggerTargetsSchema.safeParse(schedule.targets);
-
-    if (!parsed.success) {
-      return false;
-    }
-
-    return parsed.data.repositoryIds.includes(integrationId);
-  });
 }
 
 async function toKnownIntegrationError(error: unknown): Promise<Error> {
@@ -780,31 +747,10 @@ export const integrationsRouter = {
         input.integrationId
       );
 
-      const affectedSchedules = await getAffectedSchedulesForIntegration(
+      const affectedSchedules = await disableSchedulesForIntegration(
         input.organizationId,
         input.integrationId
       );
-
-      await mapWithConcurrency(affectedSchedules, 4, async (schedule) => {
-        if (schedule.qstashScheduleId) {
-          await deleteQstashSchedule(schedule.qstashScheduleId).catch(
-            (error) => {
-              logError("Failed to delete qstash schedule", error, {
-                scheduleId: schedule.qstashScheduleId,
-              });
-            }
-          );
-        }
-
-        await db
-          .update(contentTriggers)
-          .set({
-            enabled: false,
-            qstashScheduleId: null,
-            updatedAt: new Date(),
-          })
-          .where(eq(contentTriggers.id, schedule.id));
-      });
 
       await deleteGitHubIntegration(input.integrationId);
 
@@ -1480,6 +1426,10 @@ export const integrationsRouter = {
       .handler(async ({ context, input }) => {
         const { auth } = context;
         const existing = await requireLinearIntegration(input);
+        const affectedSchedules = await disableSchedulesForIntegration(
+          input.organizationId,
+          input.integrationId
+        );
 
         await deleteLinearIntegration(input.integrationId);
 
@@ -1493,10 +1443,17 @@ export const integrationsRouter = {
           properties: {
             provider: INTEGRATION_PROVIDERS.LINEAR,
             integration_id: input.integrationId,
+            disabled_schedule_count: affectedSchedules.length,
           },
         });
 
-        return { success: true };
+        return {
+          success: true,
+          disabledSchedules: affectedSchedules.map((schedule) => ({
+            id: schedule.id,
+            name: schedule.name,
+          })),
+        };
       }),
   },
   slack: {

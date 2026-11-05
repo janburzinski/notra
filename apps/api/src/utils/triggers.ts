@@ -60,16 +60,15 @@ export async function getTriggersForIntegration(
     const targets = trigger.targets as
       | {
           repositoryIds?: string[];
+          linearIntegrationIds?: string[];
         }
       | undefined;
 
-    if (!targets?.repositoryIds?.length) {
-      return false;
-    }
-
-    return targets.repositoryIds.some(
-      (targetId) =>
-        targetId === integrationId || targetId === `linear:${integrationId}`
+    return (
+      (targets?.repositoryIds ?? []).some(
+        (targetId) =>
+          targetId === integrationId || targetId === `linear:${integrationId}`
+      ) || (targets?.linearIntegrationIds ?? []).includes(integrationId)
     );
   });
 }

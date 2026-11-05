@@ -119,7 +119,7 @@ const integrationIdsSchema = z.array(z.string().trim().min(1));
 const repositoryIdsDescription =
   "GitHub integration IDs to generate from, as returned in the github array of GET /v1/integrations.";
 const linearIntegrationIdsDescription =
-  "Linear integration IDs to generate from, as returned in the linear array of GET /v1/integrations.";
+  "Linear integration IDs to generate from, as returned in the linear array of GET /v1/integrations. When omitted, runs read every enabled Linear integration; send [] to read none.";
 
 function hasScheduleSource(targets: {
   repositoryIds: string[];
