@@ -97,6 +97,7 @@ export const SITE_ICON_NAMES = [
   "lightbulb",
   "link",
   "linkedin",
+  "list",
   "lock",
   "mail",
   "map",

@@ -93,7 +93,7 @@ A tile has the date and first tag on top, then the title, excerpt and authors, o
 
 | Setting | Shows | Default |
 | --- | --- | --- |
-| `post.toc` | "On this page" next to the post on wide screens when it has at least two `##` or `###` headings, only in the `wide` layout or with the compact header | `true` |
+| `post.toc` | "On this page" next to the post on wide screens when it has at least two `##` or `###` headings, only in the `wide` layout or with the compact header. On phones it's a menu above the post in every layout | `true` |
 | `post.authorCard` | The authors with avatar and title, beside the post (`wide`), under the title (`narrow`) or in the sidebar (compact header) | `true` |
 | `post.readingTime` | The reading time next to the date | `true` |
 | `post.pagination` | The previous and next post at the end | `true` |
@@ -101,7 +101,7 @@ A tile has the date and first tag on top, then the title, excerpt and authors, o
 | `post.header` | `stacked`: date, title, description and authors stacked above the post. `compact`: see below | `stacked` |
 | `post.cover` | The post's `image` above the text. With `false`, the image is still used for share images | `true` |
 
-To hide the "Updated" date, set `"metadata": { "timestamp": false }`. Dates read "Oct 12, 2026" by default, and `"metadata": { "dateFormat": "long" }` writes "October 12, 2026" everywhere.
+A post with an `updated` date shows it next to the publish date, or under the author as "Last edited" when `post.header` is `compact`. To hide it, set `"metadata": { "timestamp": false }`. Dates read "Oct 12, 2026" by default, and `"metadata": { "dateFormat": "long" }` writes "October 12, 2026" everywhere.
 
 ### Compact post header
 
@@ -110,7 +110,8 @@ To hide the "Updated" date, set `"metadata": { "timestamp": false }`. Dates read
 - A "Back to blog" link, then one row with "Published Oct 12, 2026 · 5 min read" and the [page actions](/sites/customize/navigation#page-actions) on the right, labeled **Copy article**.
 - The title and a divider, without the description.
 - The authors move into the sidebar as a "Written by" card above the table of contents.
-- "On this page" shows from a single heading, on wide screens only, and there's no "On this page" menu on phones.
+- A post with an `updated` date shows "Last edited" and that date under the authors.
+- "On this page" shows from a single heading on wide screens. On phones it's a menu above the post that counts and lists the sections, once the post has two `##` or `###` headings.
 
 The compact header always has a sidebar, so it ignores `post.width`.
 

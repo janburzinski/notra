@@ -280,6 +280,23 @@ export async function assertContentFeatures(
   );
   checks.push("header/footer/after-post slot, content variables, author");
 
+  await page.setViewportSize({ width: 390, height: 900 });
+  await page.goto(`${origin}/blog/calm-software`, {
+    waitUntil: "domcontentloaded",
+  });
+  await waitForResources();
+  const mobileToc = page.locator("[data-mobile-toc]");
+  const mobileTocSummary = mobileToc.locator("summary");
+  assert.match(await mobileTocSummary.innerText(), /On this page\s+3 sections/);
+  const firstSection = mobileToc.getByRole("link", {
+    name: "Defaults over settings",
+  });
+  assert.equal(await firstSection.isVisible(), false);
+  await mobileTocSummary.click();
+  assert.equal(await firstSection.isVisible(), true);
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  checks.push("mobile table of contents counts sections and opens");
+
   // Every slot gets the area; its root-relative path links back to the index.
   const areaLink = page.getByRole("link", { name: "More from Acme Blog" });
   assert.equal(await areaLink.getAttribute("href"), "/blog");
