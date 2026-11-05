@@ -810,9 +810,13 @@ deployment ID, then reads its commit SHA. A missing alias, wrong project, or uni
 commit blocks all new builds. Neither the latest successful build nor
 `targets.production` is used as a substitute: the latter can refer to a skipped
 build that was never published. GitHub must confirm the
-selected commit is ahead of each project's production commit, or already identical.
-An older workflow rerun, diverged history, or a failed history lookup blocks all new
-builds. This prevents
+selected commit is ahead of, identical to, or behind each project's production
+commit; behind means that project is skipped, as described next. When a project's production is already newer than the selected commit, for example
+after a manual hotfix deploy from a later `main` commit, that project or Unkey
+service is skipped so it is not rolled back, and the others still release. The
+dashboard is the exception: a newer dashboard blocks all new builds, because it
+carries the production migration and the sites toolchain snapshot. Diverged history
+or a failed history lookup blocks all new builds. This prevents
 old runs from overwriting newer releases; use Vercel's rollback flow for a
 deliberate rollback.
 
@@ -868,9 +872,10 @@ replacement configuration is ready.
 Changed API builds use [createDeployment](https://unkey.com/docs/compute/api-reference/deployments/create-deployment)
 with the exact checked `git.commitSha`. After the Vercel releases succeed, the
 workflow rechecks the API's production configuration, active deployments and live
-commit before creating its build. An intervening newer release, rollback, or domain
-target change blocks the API deployment; an intervening release of the selected
-commit skips the duplicate build. It then polls for up to 20 minutes until that deployment is
+commit before creating its build. An intervening newer release skips the API
+deployment so it is not rolled back, and the rest of the release continues; a
+rollback or domain target change blocks the API deployment; an intervening release
+of the selected commit skips the duplicate build. It then polls for up to 20 minutes until that deployment is
 `ready`, has the expected target and commit, and is current in production. Deployment creation is not retried, and no
 provider settings are changed by the workflow. The release is not atomic: an API
 failure does not roll back Vercel projects that have already published.

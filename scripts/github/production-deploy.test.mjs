@@ -1313,8 +1313,49 @@ test("Unkey intervening newer commit cannot be overwritten by the scheduled rele
       }
     },
   });
-  await assert.rejects(run(), /unkey API: release commit is not ahead/);
+  // API is skipped, never rolled back; the rest of the release still ships.
+  await run();
   assert.ok(builds(calls).every(({ body }) => body.app !== "app_test"));
+  assert.ok(builds(calls).some(({ body }) => body.project === "notra-web"));
+});
+
+test("a Vercel project whose production is newer is skipped and the rest ships", async () => {
+  const newer = "c".repeat(40);
+  const { run, calls } = fixture({
+    demo: true,
+    override: ({ url }) => {
+      if (url.pathname === "/v13/deployments/live-notra-web") {
+        return { readyState: "READY", gitSource: { sha: newer } };
+      }
+      if (url.pathname.includes(`/compare/${newer}`)) {
+        return { status: "behind" };
+      }
+    },
+  });
+  await run();
+  const started = builds(calls).map(({ body }) => body.project ?? body.app);
+  assert.ok(!started.includes("notra-web"));
+  assert.equal(started.length, 9);
+});
+
+test("a dashboard whose production is newer still stops the whole release", async () => {
+  const newer = "c".repeat(40);
+  const { run, calls } = fixture({
+    demo: true,
+    override: ({ url }) => {
+      if (url.pathname === "/v13/deployments/live-notra") {
+        return { readyState: "READY", gitSource: { sha: newer } };
+      }
+      if (url.pathname.includes(`/compare/${newer}`)) {
+        return { status: "behind" };
+      }
+    },
+  });
+  await assert.rejects(
+    run(),
+    /notra: production is newer than the release commit/
+  );
+  assert.equal(builds(calls).length, 0);
 });
 
 test("Unkey intervening release of the selected SHA skips duplicate API creation", async () => {

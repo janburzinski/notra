@@ -242,19 +242,26 @@ export async function release({
       { retry: !body }
     );
   };
-  const assertAheadOf = async (name, previousSha) => {
+  // "newer" means production already contains the release commit, for example
+  // after a manual hotfix deploy from a later main commit. Releasing that target
+  // would roll it back, so it is skipped; any other history blocks the release.
+  const productionHistory = async (name, previousSha) => {
     if (previousSha === sha) {
-      return;
+      return "identical";
     }
     const comparison = await request(
       "github",
       `/repos/${env.GITHUB_REPOSITORY}/compare/${previousSha}...${sha}`
     );
-    if (comparison.status !== "ahead") {
-      throw new Error(
-        `${name}: release commit is not ahead of production (${comparison.status}); no builds started`
-      );
+    if (comparison.status === "ahead") {
+      return "ahead";
     }
+    if (comparison.status === "behind") {
+      return "newer";
+    }
+    throw new Error(
+      `${name}: release commit is not ahead of production (${comparison.status}); no builds started`
+    );
   };
 
   await requireReleaseCI({ env, sha, fetchImpl, sleep, report });
@@ -364,12 +371,16 @@ export async function release({
         `unkey: cannot identify ${service.name}'s live production commit`
       );
     }
-    await assertAheadOf(`unkey ${service.name}`, live.git.commitSha);
+    const history = await productionHistory(
+      `unkey ${service.name}`,
+      live.git.commitSha
+    );
     return {
       target,
       live,
+      newer: history === "newer",
       changed:
-        live.git.commitSha !== sha &&
+        history === "ahead" &&
         [service.directory, ...(service.alsoBuilds ?? [])].some((directory) =>
           buildChanged(directory, live.git.commitSha, sha)
         ),
@@ -435,15 +446,23 @@ export async function release({
             production.meta?.githubCommitRepoId ??
             ""
         );
-    if (!importingStandalone) {
-      await assertAheadOf(project.name, previousSha);
+    const history = importingStandalone
+      ? "ahead"
+      : await productionHistory(project.name, previousSha);
+    // The dashboard carries the production migration and the sites toolchain
+    // snapshot, so a newer dashboard still stops the whole release.
+    if (history === "newer" && project.name === sitesToolchain.project) {
+      throw new Error(
+        `${project.name}: production is newer than the release commit; no builds started`
+      );
     }
     const changed =
       importingStandalone ||
-      [project.directory, ...(project.alsoBuilds ?? [])].some((directory) =>
-        buildChanged(directory, previousSha, sha)
-      );
-    plans.push({ ...project, changed });
+      (history === "ahead" &&
+        [project.directory, ...(project.alsoBuilds ?? [])].some((directory) =>
+          buildChanged(directory, previousSha, sha)
+        ));
+    plans.push({ ...project, changed, newer: history === "newer" });
   }
 
   if (preflightOnly) {
@@ -548,7 +567,9 @@ export async function release({
   for (const project of plans) {
     if (!project.changed) {
       await report(
-        `${project.name}: skipped, no build changes since production`
+        project.newer
+          ? `${project.name}: skipped, production is newer than the release commit`
+          : `${project.name}: skipped, no build changes since production`
       );
     } else if (env.DRY_RUN === "true") {
       await report(`${project.name}: would deploy ${sha}`);
@@ -706,7 +727,9 @@ export async function release({
     }
     if (!plan.changed) {
       await report(
-        `unkey: skipped, no ${service.name} build changes since production`
+        plan.newer
+          ? `unkey: skipped ${service.name}, production is newer than the release commit`
+          : `unkey: skipped, no ${service.name} build changes since production`
       );
     } else if (service.demoDatabase && !env.DEMO_MIGRATION_DATABASE_URL) {
       // Demo code must never run ahead of its schema; the live demo keeps
