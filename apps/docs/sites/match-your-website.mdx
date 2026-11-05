@@ -67,26 +67,30 @@ With your own header, the navbar IDs like `#topbar-cta-button` don't exist, so u
 
 ## Slots
 
-Slots add your own content at fixed places, and each one is a file in `slots/`:
+Slots add your own content at fixed places, and each one is a file in `slots/`. Every slot gets `site` and `area`, and some get more:
 
-| File | Where it appears | Data you can use |
+| File | Where it appears | More data you can use |
 | --- | --- | --- |
-| `slots/blog-hero.mdx` | Replaces the top of the blog home | `site`, `area` |
-| `slots/changelog-hero.mdx` | Replaces the top of the changelog | `site`, `area` |
+| `slots/blog-hero.mdx` | Replaces the top of the blog home | |
+| `slots/changelog-hero.mdx` | Replaces the top of the changelog | |
 | `slots/before-post.mdx` | Above every post | `post` |
 | `slots/after-post.mdx` | Below every post | `post` |
 | `slots/sidebar.mdx` | Next to every post under "On this page" on wide screens, above the post on phones and below the post in the narrow layout | `post` |
 | `slots/after-changelog-entry.mdx` | Below every changelog entry, on the index and on the entry's page | `entry` |
-| `slots/before-footer.mdx` | On every page, below the content and above the footer | `page`, `area`, `path` |
+| `slots/before-footer.mdx` | On every page, below the content and above the footer | `page`, `path`, `section` |
 
 | Data | Fields |
 | --- | --- |
 | `site` | `name`, `description` |
-| `area` | `id` (`blog` or `changelog`), `title`, `description`, `url` |
-| `post` | `title`, `description`, `date` (formatted), `tags`, `authors` (each with `name`, `title`, `url`), `url` |
-| `entry` | `title`, `version`, `date` (formatted), `url` |
+| `area` | `id` (`blog` or `changelog`), `title`, `description`, `url`, `path` |
+| `post` | `title`, `description`, `date` (formatted), `tags`, `authors` (each with `name`, `title`, `url`), `url`, `path` |
+| `entry` | `title`, `version`, `date` (formatted), `url`, `path` |
 | `page` | `index`, `entry`, `author`, `tag` or `not-found` |
 | `path` | The page's path, like `/blog/2026/launch` |
+
+`url` is the full address on your site's domain, like `https://acme.com/blog`. `path` is the same address without the domain, like `/blog`, as the theme's own links use it, so links stay on previews and on the domain the page is served from. Use `path` for links on the page and `url` where you need a full address, like a share link.
+
+To link back to the blog or changelog home, use `area.path`. Don't write a relative link like `../`: pages have no trailing slash (`/blog/launch`, and `/blog/launch/` redirects there), so `../` from a post goes to the root of the domain, not to `/blog`.
 
 The hero slots span the full content width, so wrap their content in `<div className="mx-auto max-w-(--layout-index)">` to line it up with the posts below.
 
@@ -96,9 +100,10 @@ The hero slots span the full content width, so wrap their content in `<div class
   <p className="mt-1 text-sm text-muted-foreground">Try Acme free for 14 days.</p>
   <a href="https://acme.com/signup" className="mt-4 inline-block rounded-lg bg-primary px-4 py-2 text-sm text-white">Start free trial</a>
 </div>
+<a href={area.path} className="mt-6 inline-block text-sm text-muted-foreground hover:text-foreground">← More from {area.title}</a>
 ```
 
-`before-footer` gets `area` as `blog` or `changelog` rather than the object above. To show it on posts only, check the page:
+`before-footer` gets `area` as `blog` or `changelog` rather than the object above, and the object as `section` instead, so `section.path` links to the current home. To show it on posts only, check the page:
 
 ```mdx slots/before-footer.mdx
 {props.page === "entry" && props.area === "blog" && (

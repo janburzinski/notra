@@ -152,6 +152,14 @@ export async function assertContentFeatures(
   );
   checks.push("header/footer/after-post slot, content variables, author");
 
+  // Every slot gets the area; its root-relative path links back to the index.
+  const areaLink = page.getByRole("link", { name: "More from Acme Blog" });
+  assert.equal(await areaLink.getAttribute("href"), "/blog");
+  await Promise.all([page.waitForURL(`${origin}/blog`), areaLink.click()]);
+  await waitForResources();
+  assert.equal(new URL(page.url()).pathname, "/blog");
+  checks.push("before-post slot links back to area.path");
+
   for (const [path, text] of [
     ["/blog/tags/components", "Every built-in component"],
     ["/changelog/tags/feature", "Component updates"],

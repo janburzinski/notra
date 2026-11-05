@@ -18,6 +18,7 @@ import { extraMetaTags, socialImage, structuredData, themeColors, touchIcon, twi
 import { listedAreas } from "../lib/entries";
 import { chromeComponent } from "../lib/site-files";
 import { decorationClass, faviconFor, fontFaces, fontStylesheetUrl, themeStyle } from "../lib/theme";
+import { slotArea } from "../lib/slot-data";
 import { mountPath } from "../utils/paths";
 
 const { page, title, description, image, imageAlt, generatedImage, type = "website", noindex = false, publishedTime, modifiedTime, tags = [], markdown, jsonLd } = Astro.props;
@@ -122,7 +123,7 @@ const pageContext: SitePageContext = { page, area: params.area, path: canonicalP
     {customHeader ? <CustomChrome part="header" context={pageContext} /> : <Header />}
     <main id="content-area" tabindex="-1" class="w-full flex-1 px-4 pt-4 pb-24 outline-none sm:px-6 sm:pt-6">
       <div id="content"><slot /></div>
-      <SiteSlot name="before-footer" data={pageContext} class="mt-16 empty:hidden" />
+      <SiteSlot name="before-footer" data={{ ...pageContext, section: slotArea() }} class="mt-16 empty:hidden" />
     </main>
     {customFooter ? <CustomChrome part="footer" context={pageContext} /> : <Footer />}
     <CodeBlocks />
