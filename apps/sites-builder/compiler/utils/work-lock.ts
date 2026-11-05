@@ -1,12 +1,15 @@
 import { randomUUID } from "node:crypto";
-import { link, mkdir, open, rm, stat, writeFile } from "node:fs/promises";
+import { link, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { dirname } from "node:path";
 
 import { UsageError } from "./usage-error";
 
 interface LockOwner {
   pid: number;
-  ino: number;
+  // The lock's whole contents. A new lock can reuse a deleted one's inode
+  // number (ext4 hands the freed number straight back), so the owner is told
+  // apart by a token only it wrote.
+  token: string;
 }
 
 function isRunning(pid: number): boolean {
@@ -24,16 +27,17 @@ function isRunning(pid: number): boolean {
 }
 
 /**
- * Creates `path` holding this process's PID, or returns null if it exists.
- * The PID is written to a private file first and hard-linked into place, so
- * the lock is never visible without its owner.
+ * Creates `path` holding this process's PID and a random token, or returns
+ * null if it exists. The contents are written to a private file first and
+ * hard-linked into place, so the lock is never visible without its owner.
  */
-async function publish(path: string): Promise<number | null> {
+async function publish(path: string): Promise<string | null> {
+  const token = `${process.pid} ${randomUUID()}`;
   const draft = `${path}.${process.pid}.${randomUUID()}`;
-  await writeFile(draft, String(process.pid));
+  await writeFile(draft, token);
   try {
     await link(draft, path);
-    return (await stat(draft)).ino;
+    return token;
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code === "EEXIST") {
       return null;
@@ -44,25 +48,18 @@ async function publish(path: string): Promise<number | null> {
   }
 }
 
-/** Who holds `path`: PID and inode read from the same open file. */
+/** Who holds `path`: the PID and token it was published with. */
 async function ownerOf(path: string): Promise<LockOwner | null> {
-  const handle = await open(path, "r").catch(() => null);
-  if (!handle) {
+  const token = await readFile(path, "utf8").catch(() => null);
+  if (token === null) {
     return null;
   }
-  try {
-    const [{ ino }, text] = await Promise.all([
-      handle.stat(),
-      handle.readFile("utf8"),
-    ]);
-    return { pid: Number(text), ino };
-  } finally {
-    await handle.close();
-  }
+  // Locks from before the token hold only a PID.
+  return { pid: Number(token.split(" ")[0]), token };
 }
 
-async function removeIfStill(path: string, ino: number) {
-  if ((await ownerOf(path))?.ino === ino) {
+async function removeIfStill(path: string, token: string) {
+  if ((await ownerOf(path))?.token === token) {
     await rm(path, { force: true });
   }
 }
@@ -74,19 +71,19 @@ async function removeIfStill(path: string, ino: number) {
  */
 async function clearStale(lockPath: string, stale: LockOwner) {
   const guard = `${lockPath}.takeover`;
-  const guardIno = await publish(guard);
-  if (guardIno === null) {
+  const guardToken = await publish(guard);
+  if (guardToken === null) {
     const holder = await ownerOf(guard);
     // A takeover takes milliseconds; a guard whose owner exited is left over from a crash.
     if (holder && !isRunning(holder.pid)) {
-      await removeIfStill(guard, holder.ino);
+      await removeIfStill(guard, holder.token);
     }
     return;
   }
   try {
-    await removeIfStill(lockPath, stale.ino);
+    await removeIfStill(lockPath, stale.token);
   } finally {
-    await removeIfStill(guard, guardIno);
+    await removeIfStill(guard, guardToken);
   }
 }
 
@@ -100,9 +97,9 @@ export async function lockWorkDir(
 ): Promise<() => Promise<void>> {
   await mkdir(dirname(lockPath), { recursive: true });
   for (let attempt = 0; attempt < 5; attempt += 1) {
-    const ino = await publish(lockPath);
-    if (ino !== null) {
-      return () => removeIfStill(lockPath, ino);
+    const token = await publish(lockPath);
+    if (token !== null) {
+      return () => removeIfStill(lockPath, token);
     }
     const owner = await ownerOf(lockPath);
     if (owner && isRunning(owner.pid)) {
