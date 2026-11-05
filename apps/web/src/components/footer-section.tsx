@@ -116,7 +116,10 @@ export default function FooterSection() {
                     {link.label}
                   </Link>
                 ))}
-                <ConsentDialogLink className="dark:text-foreground/50 dark:hover:text-foreground font-sans text-[0.8125rem] leading-[1.125rem] font-medium text-[#1e1e1e66] transition-colors hover:text-[#1e1e1e]">
+                <ConsentDialogLink
+                  slotKey="trigger.text"
+                  className="dark:text-foreground/50 dark:hover:text-foreground font-sans text-[0.8125rem] leading-[1.125rem] font-medium text-[#1e1e1e66] transition-colors hover:text-[#1e1e1e]"
+                >
                   Privacy settings
                 </ConsentDialogLink>
               </div>
