@@ -3,6 +3,7 @@ import type {
   SiteBuildResult,
 } from "@notra/sites-core/types/build";
 import type { SiteBuildMetrics } from "@notra/sites-core/types/build-metrics";
+import type { SiteFontCache } from "@notra/sites-core/types/fonts";
 import type { Effect } from "effect";
 
 export interface SandboxBuildResult {
@@ -20,6 +21,8 @@ export interface SandboxBuildParams {
   rootDirectory: string;
   /** Repository-relative files written over the source after extraction. */
   overlayFiles?: SandboxUploadFile[];
+  /** Google Fonts downloaded before the build, which has no network access. */
+  fontCache?: SiteFontCache | null;
   snapshotId?: string;
   target: SiteBuildRequestInput;
   onLog?: (log: string) => Promise<void>;

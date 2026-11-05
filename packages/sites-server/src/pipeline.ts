@@ -29,6 +29,7 @@ import { readPostPreviewSourceEffect } from "./post-preview-source";
 import { publishDeploymentFilesEffect } from "./publish";
 import { r2PutEffect } from "./r2";
 import { openCheckRun, reportOutcome } from "./reporting";
+import { prefetchSiteFonts } from "./site-fonts";
 import {
   compareSmartDeployment,
   skipUnchangedDeployment,
@@ -260,17 +261,47 @@ const buildAndPublish = Effect.fn("Sites.buildAndPublish")(function* (
     }
     yield* writeBuildLog(site.id, deployment.id, phaseLog);
     const sourceStarted = performance.now();
-    const sourceArchive = yield* downloadSiteSourceEffect(
-      access.repository,
-      access.token,
-      deployment.commitSha,
-      site.rootDirectory
-    ).pipe(
-      Effect.ensuring(
-        Effect.sync(() => {
-          metrics.phases.sourceDownload = performance.now() - sourceStarted;
-        })
-      )
+    const [sourceArchive, fontCache] = yield* Effect.all(
+      [
+        downloadSiteSourceEffect(
+          access.repository,
+          access.token,
+          deployment.commitSha,
+          site.rootDirectory
+        ).pipe(
+          Effect.ensuring(
+            Effect.sync(() => {
+              metrics.phases.sourceDownload = performance.now() - sourceStarted;
+            })
+          )
+        ),
+        // The Box has no network, so its build uses these instead of downloading fonts itself.
+        Effect.tryPromise({
+          try: (signal) =>
+            prefetchSiteFonts({
+              site,
+              commitSha: deployment.commitSha,
+              access,
+              overlayFiles: overlayFiles ?? [],
+              defaultConfig: deployment.target.defaultConfig,
+              signal,
+            }),
+          catch: (error) => error,
+        }).pipe(
+          Effect.catch((error) =>
+            Effect.sync(() => {
+              phaseLog += `[fonts] Could not download the site's fonts before the build: ${errorMessage(error)}\n`;
+              return null;
+            })
+          ),
+          Effect.ensuring(
+            Effect.sync(() => {
+              metrics.phases.fontDownload = performance.now() - sourceStarted;
+            })
+          )
+        ),
+      ],
+      { concurrency: 2 }
     );
     metrics.sourceArchiveBytes = sourceArchive.byteLength;
     phaseTimestamp = Math.max(phaseTimestamp, Date.now());
@@ -280,6 +311,7 @@ const buildAndPublish = Effect.fn("Sites.buildAndPublish")(function* (
       sourceArchive,
       rootDirectory: site.rootDirectory,
       overlayFiles: overlayFiles ?? [],
+      fontCache,
       snapshotId: smartComparison?.snapshotId ?? undefined,
       target: {
         siteId: site.id,

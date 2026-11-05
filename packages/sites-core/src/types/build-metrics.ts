@@ -3,6 +3,7 @@ import type { SiteBuildResult } from "@notra/sites-core/types/build";
 export type SiteBuildMetricPhase =
   | "repositoryAccess"
   | "sourceDownload"
+  | "fontDownload"
   | "sandboxStartup"
   | "sourceUpload"
   | "execution"

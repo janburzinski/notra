@@ -1085,3 +1085,51 @@ test("late recovery defects have an explicit sanitized failure disposition and d
     }).pipe(Effect.scoped, Effect.provide(TestClock.layer()))
   );
 });
+
+test("prefetched fonts reach the builder's font cache while the Box stays offline", async () => {
+  const fontCache = {
+    key: "a".repeat(64),
+    files: [
+      {
+        name: "fonts-0123456789abcdef.css",
+        data: new TextEncoder().encode("@font-face{}"),
+      },
+      {
+        name: "font-0123456789abcdef.woff2",
+        data: new Uint8Array([0, 1, 2, 255]),
+      },
+      {
+        name: "font-license-0123456789abcdef.txt",
+        data: new TextEncoder().encode("OFL"),
+      },
+    ],
+  };
+  const build = await runSandboxBuild({ ...params, fontCache });
+  expect(build.result?.ok).toBe(true);
+  expect(startup.mock.calls[0]?.[1]).toMatchObject({
+    network_policy: { mode: "deny-all" },
+  });
+  const script = command.mock.calls[0]?.[0] ?? "";
+  const unpack = (script.split("node -e")[0] ?? "").replaceAll(
+    "/workspace/home",
+    boxHome
+  );
+  const run = spawnSync("sh", ["-c", unpack], { encoding: "utf8" });
+  expect(run.status).toBe(0);
+  const cache = join(
+    boxHome,
+    "toolchain/.notra/work/font-cache",
+    fontCache.key
+  );
+  for (const file of fontCache.files) {
+    expect(new Uint8Array(readFileSync(join(cache, file.name)))).toEqual(
+      file.data
+    );
+  }
+  expect(spawnSync("test", ["-e", join(boxHome, "fonts.tgz")]).status).toBe(1);
+});
+
+test("builds without fonts deliver no font archive", async () => {
+  await runSandboxBuild({ ...params, fontCache: null });
+  expect(command.mock.calls[0]?.[0]).not.toContain("fonts.tgz");
+});

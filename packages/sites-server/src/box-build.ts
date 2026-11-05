@@ -11,6 +11,8 @@ import { Effect, Exit, Fiber, Schedule } from "effect";
 
 import {
   BOX_TTL_SECONDS,
+  BOX_FONT_ARCHIVE,
+  BOX_FONT_CACHE_DIR,
   BOX_WORKDIR,
   BUILD_LOG_POLL_MS,
   BUILD_TIMEOUT_EXIT_CODE,
@@ -51,6 +53,7 @@ import {
   sandboxJsonEffect,
   sandboxRequestEffect,
 } from "./utils/sandbox-transport";
+import { writeTarGz } from "./utils/write-tar-gz";
 
 const uploadBytesEffect = Effect.fn("Sites.Sandbox.upload")(function* (
   apiKey: string,
@@ -417,10 +420,34 @@ export const runSandboxBuildEffect = Effect.fn("Sites.Sandbox.build")(
             try: () => siteBuildRequestSchema.parse(params.target),
             catch: (error) => error,
           });
-          const overlays = (params.overlayFiles ?? []).map((file) => ({
-            path: `${BOX_WORKDIR}/overlay/${file.path}`,
-            data: file.data,
-          }));
+          const fontCache = params.fontCache;
+          // One archive instead of a delivery per font file; the script unpacks it into the
+          // builder's font cache.
+          const fonts = fontCache?.files.length
+            ? [
+                {
+                  path: `${BOX_WORKDIR}/${BOX_FONT_ARCHIVE}`,
+                  data: yield* Effect.tryPromise({
+                    try: () =>
+                      writeTarGz(
+                        fontCache.files.map((file) => ({
+                          path: `${fontCache.key}/${file.name}`,
+                          data: file.data,
+                        })),
+                        `${fontCache.key}/`
+                      ),
+                    catch: (error) => error,
+                  }),
+                },
+              ]
+            : [];
+          const overlays = [
+            ...(params.overlayFiles ?? []).map((file) => ({
+              path: `${BOX_WORKDIR}/overlay/${file.path}`,
+              data: file.data,
+            })),
+            ...fonts,
+          ];
           const deliveries: SandboxUploadFile[] = [
             { path: `${BOX_WORKDIR}/source.tgz`, data: params.sourceArchive },
             {
@@ -486,6 +513,13 @@ export const runSandboxBuildEffect = Effect.fn("Sites.Sandbox.build")(
           : []),
         "rm -rf src out out.tgz result.json build.log exit-code build-metrics.json",
         "mkdir -p src",
+        ...(params.fontCache?.files.length
+          ? [
+              `mkdir -p ${shellQuote(BOX_FONT_CACHE_DIR)} || exit 3`,
+              `tar xzf ${BOX_FONT_ARCHIVE} -C ${shellQuote(BOX_FONT_CACHE_DIR)} --no-same-owner --no-same-permissions || exit 3`,
+              `rm ${BOX_FONT_ARCHIVE} || exit 3`,
+            ]
+          : []),
         `node -e ${shellQuote(GUEST_BUILD_RUNNER)} -- ${shellQuote(sourceDir)} ${SITE_BUILD_LIMITS.buildTimeoutSeconds}`,
       ].join("\n");
       const onLog = params.onLog;
