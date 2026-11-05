@@ -379,6 +379,13 @@ Start with `get_geo_snapshot`. It returns a compact diagnosis of a project and t
 
 Issue and rotate ingest tokens in the dashboard.
 
+**MCP server analytics**
+
+- `get_geo_mcp_analytics` summarizes how agents use your own MCP server: tool calls, errors, latency, clients, models and tools nobody calls.
+- `get_geo_mcp_tool_analytics` shows one tool's failures and which tools agents call right before and after it.
+
+These read the events your server sends through the `@usenotra/geo` SDK. Captured arguments, responses and end-user IDs stay in the dashboard.
+
 **Feedback**
 
 - `list_feedback`, `get_feedback` and `update_feedback` work with the feedback your own users send you.

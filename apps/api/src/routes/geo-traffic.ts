@@ -6,6 +6,10 @@ import {
   rotateGeoIngestSetupResponse,
 } from "@notra/geo-core/geo/ingest";
 import {
+  loadMcpAnalytics,
+  loadMcpToolDetail,
+} from "@notra/geo-core/geo/mcp-analytics";
+import {
   loadAiTraffic,
   loadGeoJourneyDetail,
   loadGeoTrafficJourneys,
@@ -21,6 +25,9 @@ import {
   ingestTokenResponseSchema,
   journeyDetailResponseSchema,
   journeyParamsSchema,
+  mcpAnalyticsResponseSchema,
+  mcpToolDetailResponseSchema,
+  mcpToolParamsSchema,
   trafficJourneysQuerySchema,
   trafficJourneysResponseSchema,
   trafficLogQuerySchema,
@@ -163,6 +170,42 @@ const trafficPagesRoute = createRoute({
   },
 });
 
+const mcpAnalyticsRoute = createRoute({
+  method: "get",
+  path: "/projects/{projectId}/geo/traffic/mcp",
+  tags: [GEO_OPENAPI_TAG],
+  operationId: "getGeoMcpAnalytics",
+  summary: "Get MCP server analytics",
+  description:
+    "Usage of your own MCP server, as reported by the `@usenotra/geo` SDK: request and error totals against the previous window, per-tool latency and errors, clients, models, intents, recent failures and tools that were never called. Captured arguments, responses and end-user IDs are not returned.",
+  request: { params: projectParamsSchema, query: trafficOverviewQuerySchema },
+  responses: {
+    200: {
+      description: "MCP analytics fetched successfully",
+      content: { "application/json": { schema: mcpAnalyticsResponseSchema } },
+    },
+    ...GEO_COMMON_ERROR_RESPONSES,
+  },
+});
+
+const mcpToolDetailRoute = createRoute({
+  method: "get",
+  path: "/projects/{projectId}/geo/traffic/mcp/tools/{toolName}",
+  tags: [GEO_OPENAPI_TAG],
+  operationId: "getGeoMcpToolDetail",
+  summary: "Get one MCP tool's analytics",
+  description:
+    "Which tools agents call right before and after this one, its failures grouped by message, and the intents it was called for.",
+  request: { params: mcpToolParamsSchema, query: trafficOverviewQuerySchema },
+  responses: {
+    200: {
+      description: "MCP tool analytics fetched successfully",
+      content: { "application/json": { schema: mcpToolDetailResponseSchema } },
+    },
+    ...GEO_COMMON_ERROR_RESPONSES,
+  },
+});
+
 const ingestSetupRoute = createRoute({
   method: "get",
   path: "/geo/ingest/setup",
@@ -297,6 +340,47 @@ geoTrafficRoutes.openapi(trafficPagesRoute, async (c) => {
     )
   );
   return geoOutcomeResponse(c, outcome, 200);
+});
+
+const mcpAnalyticsBodySchema = mcpAnalyticsResponseSchema.omit({
+  organization: true,
+});
+
+geoTrafficRoutes.openapi(mcpAnalyticsRoute, async (c) => {
+  const base = c.get("geo");
+  const { projectId } = c.req.valid("param");
+
+  const outcome = await runGeoEffect(
+    "mcpAnalytics",
+    loadMcpAnalytics(
+      { organizationId: base.organizationId, projectId },
+      geoWindow(c.req.valid("query"))
+    )
+  );
+  return geoOutcomeResponse(c, outcome, 200, (value) =>
+    mcpAnalyticsBodySchema.parse(value)
+  );
+});
+
+const mcpToolDetailBodySchema = mcpToolDetailResponseSchema.omit({
+  organization: true,
+});
+
+geoTrafficRoutes.openapi(mcpToolDetailRoute, async (c) => {
+  const base = c.get("geo");
+  const { projectId, toolName } = c.req.valid("param");
+
+  const outcome = await runGeoEffect(
+    "mcpToolDetail",
+    loadMcpToolDetail(
+      { organizationId: base.organizationId, projectId },
+      geoWindow(c.req.valid("query")),
+      toolName
+    )
+  );
+  return geoOutcomeResponse(c, outcome, 200, (value) =>
+    mcpToolDetailBodySchema.parse(value)
+  );
 });
 
 geoTrafficRoutes.openapi(ingestSetupRoute, async (c) => {

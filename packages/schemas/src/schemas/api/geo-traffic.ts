@@ -1,8 +1,12 @@
 import "zod/compile";
 import { z } from "@hono/zod-openapi";
-import { GEO_SHORT_FIELD_MAX_LENGTH } from "@notra/geo-core/constants/geo";
+import {
+  GEO_SHORT_FIELD_MAX_LENGTH,
+  MCP_EVENT_STATUSES,
+} from "@notra/geo-core/constants/geo";
 
 import { organizationResponseSchema } from "./content";
+import { createGeoShortTextSchema } from "./geo-fields";
 import { projectParamsSchema } from "./geo-params";
 import { geoWindowQuerySchema } from "./geo-visibility";
 import { resourceIdSchema } from "./ids";
@@ -225,6 +229,178 @@ export const trafficPagesResponseSchema = z
     organization: organizationResponseSchema,
   })
   .openapi("GeoTrafficPagesResponse");
+
+export const mcpToolParamsSchema = projectParamsSchema.extend({
+  toolName: createGeoShortTextSchema().openapi({
+    param: { name: "toolName", in: "path" },
+    description: "Tool name as your MCP server registers it.",
+  }),
+});
+
+const mcpStatusSchema = z.enum(MCP_EVENT_STATUSES);
+
+const mcpIntentSchema = z.object({
+  intent: z.string(),
+  tool: z.string(),
+  calls: z.number().int(),
+  errors: z.number().int(),
+});
+
+/**
+ * Captured arguments, responses, end-user IDs and sessions are left out on
+ * purpose: they can hold your users' data and text written by other agents.
+ * Routes parse through these schemas, so fields not listed here are dropped.
+ */
+export const mcpAnalyticsResponseSchema = z
+  .object({
+    configured: trafficConfiguredField,
+    server: z
+      .object({
+        name: z.string(),
+        version: z.string(),
+        protocolVersion: z.string(),
+      })
+      .nullable()
+      .openapi({
+        description: "Server info from the newest event. Null before any.",
+      }),
+    totals: z.object({
+      requests: z.number().int(),
+      previousRequests: z.number().int(),
+      toolCalls: z.number().int(),
+      previousToolCalls: z.number().int(),
+      errors: z.number().int(),
+      previousErrors: z.number().int(),
+      sessions: z.number().int(),
+      previousSessions: z.number().int(),
+      users: z.number().int(),
+      previousUsers: z.number().int(),
+      p95Ms: z.number().int(),
+      previousP95Ms: z.number().int(),
+    }),
+    daily: z.array(
+      z.object({
+        day: z.string(),
+        toolsCall: z.number().int(),
+        resourcesRead: z.number().int(),
+        promptsGet: z.number().int(),
+        other: z.number().int(),
+        errors: z.number().int(),
+      })
+    ),
+    tools: z.array(
+      z.object({
+        name: z.string(),
+        description: z.string(),
+        calls: z.number().int(),
+        errors: z.number().int(),
+        users: z.number().int(),
+        avgResponseBytes: z.number().int(),
+        p50Ms: z.number().int(),
+        p95Ms: z.number().int(),
+        uiResource: z.string(),
+      })
+    ),
+    clients: z.array(
+      z.object({
+        name: z.string(),
+        sessions: z.number().int(),
+        requests: z.number().int(),
+        errors: z.number().int(),
+        lastSeenAt: z.string(),
+      })
+    ),
+    errorRequests: z
+      .array(
+        z.object({
+          capturedAt: z.string(),
+          clientName: z.string(),
+          clientVersion: z.string(),
+          method: z.string(),
+          target: z.string(),
+          status: mcpStatusSchema,
+          errorCode: z.number().int(),
+          errorMessage: z.string(),
+          durationMs: z.number().int(),
+          model: z.string(),
+        })
+      )
+      .openapi({ description: "Most recent failed requests, newest first." }),
+    models: z.array(
+      z.object({
+        name: z.string(),
+        sessions: z.number().int(),
+        calls: z.number().int(),
+        errors: z.number().int(),
+      })
+    ),
+    intents: z.array(mcpIntentSchema),
+    elicitations: z.array(
+      z.object({
+        method: z.string(),
+        tool: z.string(),
+        requests: z.number().int(),
+        accepted: z.number().int(),
+        declined: z.number().int(),
+        cancelled: z.number().int(),
+        errors: z.number().int(),
+      })
+    ),
+    uiRenders: z.array(
+      z.object({
+        resource: z.string(),
+        tools: z.array(z.string()),
+        renders: z.number().int(),
+        sessions: z.number().int(),
+        errors: z.number().int(),
+      })
+    ),
+    catalog: z
+      .object({
+        listedAt: z.string(),
+        unusedTools: z.array(
+          z.object({ name: z.string(), description: z.string() })
+        ),
+      })
+      .nullable()
+      .openapi({
+        description:
+          "Tools from the latest tools/list that were never called in the window. Null before a listing is seen.",
+      }),
+    organization: organizationResponseSchema,
+  })
+  .openapi("GeoMcpAnalyticsResponse");
+
+const mcpToolNeighborSchema = z.object({
+  tool: z.string(),
+  calls: z.number().int(),
+  afterFailure: z.number().int(),
+});
+
+export const mcpToolDetailResponseSchema = z
+  .object({
+    before: z.array(mcpToolNeighborSchema).openapi({
+      description: "Tools called right before this one in the same session.",
+    }),
+    after: z.array(mcpToolNeighborSchema).openapi({
+      description: "Tools called right after this one in the same session.",
+    }),
+    failures: z
+      .array(
+        z.object({
+          message: z.string(),
+          clientName: z.string(),
+          status: mcpStatusSchema,
+          errorCode: z.number().int(),
+          calls: z.number().int(),
+          lastSeenAt: z.string(),
+        })
+      )
+      .openapi({ description: "Failures grouped by error message." }),
+    intents: z.array(mcpIntentSchema),
+    organization: organizationResponseSchema,
+  })
+  .openapi("GeoMcpToolDetailResponse");
 
 export const ingestTokenQuerySchema = z.object({
   projectId: resourceIdSchema("projectId")
