@@ -18,6 +18,10 @@ import { GitHubPublishDialogFooter } from "@/components/content/github-publish-d
 import { GitHubPublishRecoveryAlert } from "@/components/content/github-publish-recovery-alert";
 import { GitHubPublishRepositoryField } from "@/components/content/github-publish-repository-field";
 import { GitHubPublishResultCard } from "@/components/content/github-publish-result-card";
+import {
+  useGitHubAutoPublish,
+  useGitHubPublishOnlySite,
+} from "@/lib/hooks/use-github-publish-only-site";
 import { useGitHubPublishRepositorySelection } from "@/lib/hooks/use-github-publish-repository-selection";
 import { dashboardOrpc } from "@/lib/orpc/query";
 import type {
@@ -101,17 +105,23 @@ export function PublishContentToGitHubDialog({
 }: PublishContentToGitHubDialogProps) {
   const t = useTranslations("content.githubPublish");
   const tGit = useTranslations("content.gitPublishing");
+  const tContentShared = useTranslations("content.shared");
+  const queryClient = useQueryClient();
+  const { onlySite, loading: sitesLoading } = useGitHubPublishOnlySite({
+    organizationId,
+    contentId,
+    enabled: open && !githubPublish,
+  });
   const [siteId, setSiteId] = useState<string | undefined>(
     githubPublish?.siteId
   );
-  const tContentShared = useTranslations("content.shared");
-  const queryClient = useQueryClient();
-  const [repositoryId, setRepositoryId] = useState(
-    () =>
-      githubPublish?.repositoryId ??
-      readStoredGitHubPublishRepositoryId(organizationId) ??
-      ""
-  );
+  const [chosenRepositoryId, setRepositoryId] = useState<string>();
+  const repositoryId =
+    chosenRepositoryId ??
+    githubPublish?.repositoryId ??
+    onlySite?.repositoryId ??
+    readStoredGitHubPublishRepositoryId(organizationId) ??
+    "";
   const {
     repositories,
     selectedRepositoryId,
@@ -133,10 +143,13 @@ export function PublishContentToGitHubDialog({
         contentType,
         contentId,
       },
-      enabled: open && Boolean(selectedRepositoryId),
+      enabled: open && Boolean(selectedRepositoryId) && !sitesLoading,
     })
   );
-  const selectedSiteId = resolveGitHubPublishingSiteId(siteId, target.data);
+  const selectedSiteId = resolveGitHubPublishingSiteId(
+    siteId ?? onlySite?.id,
+    target.data
+  );
   const branch =
     target.data?.sites.find((site) => site.id === selectedSiteId)
       ?.productionBranch ??
@@ -291,6 +304,19 @@ export function PublishContentToGitHubDialog({
     }
   };
 
+  useGitHubAutoPublish({
+    open,
+    ready: Boolean(
+      onlySite &&
+      !sitesLoading &&
+      publishMutation.isIdle &&
+      selectedRepository?.id === onlySite.repositoryId &&
+      selectedPublishingEnabled &&
+      selectedSiteId === onlySite.id
+    ),
+    publish: handleSubmit,
+  });
+
   return (
     <ResponsiveDialog onOpenChange={handleOpenChange} open={open}>
       <ResponsiveDialogContent className="min-w-0 sm:max-w-[600px]">
@@ -328,6 +354,7 @@ export function PublishContentToGitHubDialog({
               onPublish={handleSubmit}
               hasSelectedRepository={
                 Boolean(selectedRepository) &&
+                !sitesLoading &&
                 !target.isLoading &&
                 !(
                   target.data &&

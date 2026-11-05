@@ -81,6 +81,7 @@ export async function listPostPreviewSites(
       name: sites.name,
       mounts: sites.mounts,
       previewsEnabled: sites.previewsEnabled,
+      repositoryId: sites.repositoryId,
       status: sites.status,
     })
     .from(sites)
@@ -92,6 +93,7 @@ export async function listPostPreviewSites(
       id: site.id,
       name: site.name,
       previewsEnabled: site.previewsEnabled,
+      repositoryId: site.repositoryId,
     }));
 }
 

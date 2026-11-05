@@ -78,6 +78,18 @@ export interface GitHubPublishRepositorySelectionOptions {
   enabled: boolean;
 }
 
+export interface GitHubPublishOnlySiteOptions {
+  organizationId: string;
+  contentId: string;
+  enabled: boolean;
+}
+
+export interface GitHubPublishAutoPublishOptions {
+  open: boolean;
+  ready: boolean;
+  publish: () => void;
+}
+
 export interface GitHubPublishRepositoryStatusProps {
   connectedRepositoryCount: number;
   contentTypeLabel: string;
