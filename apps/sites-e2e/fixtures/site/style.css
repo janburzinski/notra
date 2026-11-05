@@ -11,3 +11,8 @@ a[href^="https://usenotra.com"] {
   visibility: hidden !important;
   opacity: 0 !important;
 }
+
+/* Absolute public-file URLs in site CSS resolve below each area's mount. */
+:root::after {
+  background-image: url("/images/e2e-css-asset.png");
+}

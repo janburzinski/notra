@@ -7,6 +7,25 @@ import { cspAllowsOrigin } from "./csp";
 // Content checks select by role, accessible name, fixture text and the public
 // styling contract (stable IDs, data attributes), never by theme classes or
 // layout, so visual changes to the theme do not break them.
+
+// fixtures/site/style.css points :root::after at a public file by absolute
+// path; the pseudo-element has no content, so nothing renders.
+function siteCssAsset(page: Page) {
+  return page.evaluate(async () => {
+    const value = getComputedStyle(
+      document.documentElement,
+      "::after"
+    ).backgroundImage;
+    const url = /^url\("(.+)"\)$/.exec(value)?.[1];
+    if (!url) {
+      return { path: value, status: 0 };
+    }
+    // Reads the body so the next navigation doesn't abort the request.
+    const response = await fetch(url);
+    await response.arrayBuffer();
+    return { path: new URL(url).pathname, status: response.status };
+  });
+}
 export async function assertContentFeatures(
   page: Page,
   origin: string,
@@ -122,6 +141,11 @@ export async function assertContentFeatures(
   );
   checks.push("global style.css and script.js apply under the CSP");
 
+  assert.deepEqual(await siteCssAsset(page), {
+    path: "/blog/images/e2e-css-asset.png",
+    status: 200,
+  });
+
   const badge = page.getByRole("link", { name: "Powered by Notra" });
   assert.equal(await badge.count(), 1);
   assert.equal(await badge.isVisible(), true);
@@ -178,6 +202,11 @@ export async function assertContentFeatures(
     (await update.innerText()).includes("The update body for October.")
   );
   checks.push("tag pages for blog and changelog, changelog Update entry");
+  assert.deepEqual(await siteCssAsset(page), {
+    path: "/changelog/images/e2e-css-asset.png",
+    status: 200,
+  });
+  checks.push("absolute public-file url() in site CSS loads under each mount");
 
   await page.goto(`${origin}/blog/2026/launch`, {
     waitUntil: "domcontentloaded",

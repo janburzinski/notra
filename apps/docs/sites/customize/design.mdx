@@ -108,6 +108,16 @@ The theme's colors are CSS variables that switch with light and dark mode, and y
 
 Tailwind classes also work in your MDX, header, footer and components.
 
+To use a font or image from `public/` in your CSS, reference it from the root of the site, the same way as in posts. Notra adds the section's path, so `/fonts/acme-sans.woff2` loads from `/blog/fonts/acme-sans.woff2` on the blog and from `/changelog/fonts/acme-sans.woff2` on the changelog, both in `notra dev` and on your published site:
+
+```css style.css
+@font-face {
+  font-family: "Acme Sans";
+  src: url("/fonts/acme-sans.woff2") format("woff2");
+}
+.hero { background-image: url("/images/texture.jpg"); }
+```
+
 If you wrap your CSS in `@scope (.header)`, its rules apply to elements inside `.header` but not to `.header` itself, which is how `@scope` works in every browser. Style the root with `:scope { ... }` inside the block.
 
 ## Styling hooks
