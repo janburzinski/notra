@@ -14,10 +14,14 @@ export function deploymentCheckReport(
         deployment.target.mounts
       );
       const isProduction = deployment.kind === "production";
+      const commit = deployment.commitSha.slice(0, 7);
+      const builtAt = deployment.finishedAt
+        ? ` on ${deployment.finishedAt.toISOString().slice(0, 16).replace("T", " ")} UTC`
+        : "";
       return {
         conclusion: "success",
-        title: isProduction ? "Live" : "Preview ready",
-        summary: `${isProduction ? "Published" : "Preview"}: ${url}\n\n${deployment.fileCount ?? 0} files, built in ${Math.round((deployment.buildDurationMs ?? 0) / 1000)} s.`,
+        title: `${isProduction ? "Live" : "Preview ready"} · ${commit}`,
+        summary: `${isProduction ? "Published" : "Preview"}: ${url}\n\nBuilt from \`${commit}\`${builtAt}: ${deployment.fileCount ?? 0} files in ${Math.round((deployment.buildDurationMs ?? 0) / 1000)} s.`,
         liveUrl: url,
       };
     }
