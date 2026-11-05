@@ -66,3 +66,39 @@ From the profile and memories Notra generates fixed **conversation prompts**. Ev
 - Each persona answer counts as two AI answers against your quota.
 - A project can have up to five active personas, so archive one before you add or reactivate another.
 - **Pause scans** keeps a persona but skips it in scans, while **Archive** removes it from future scans and keeps its history.
+
+## Personas in the API
+
+<Visibility for="agents">
+
+Generation runs in the background, and only one job runs per project at a time. With no body it creates the starting set of five; `brief` adds one persona; `personaId` regenerates one in place, and with `promptsOnly: true` only its conversation prompts.
+
+```bash
+curl -X POST https://api.usenotra.com/v1/projects/$PROJECT_ID/geo/personas/generate \
+  -H "Authorization: Bearer $NOTRA_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{ "brief": "an agency founder comparing AI visibility tools for clients, with a tight budget" }'
+
+# Poll until job.status is "completed" or "failed"
+curl https://api.usenotra.com/v1/projects/$PROJECT_ID/geo/personas/generation \
+  -H "Authorization: Bearer $NOTRA_API_KEY"
+```
+
+Play one persona now and read its conversation turns:
+
+```bash
+curl -X POST https://api.usenotra.com/v1/projects/$PROJECT_ID/geo/personas/$PERSONA_ID/run \
+  -H "Authorization: Bearer $NOTRA_API_KEY" \
+  --max-time 330
+
+curl "https://api.usenotra.com/v1/projects/$PROJECT_ID/geo/personas/$PERSONA_ID/results" \
+  -H "Authorization: Bearer $NOTRA_API_KEY"
+```
+
+<Warning>
+  A run behaves like a [conversation run](/geo/conversations#running-a-conversation-now): API engines answer during the request, consumer apps are queued as a scan named by `queuedScanId`, and after four minutes the API answers `409` while the run finishes on its own. Don't retry; read the results instead. Runs allow 10 requests and generation 5 requests per 10 minutes per organization.
+</Warning>
+
+`PATCH /geo/personas/{personaId}` accepts `enabled` and any of `name`, `role`, `company`, `summary`, `searchStyle` and `profile` lists; editing details clears the conversation prompts, so regenerate them with `personaId` and `promptsOnly: true` before the next run. `DELETE` archives the persona and `POST …/restore` brings it back paused. `GET /geo/personas/activity` returns daily checks and mentions per persona.
+
+</Visibility>

@@ -36,6 +36,8 @@ export const RATE_LIMITS = {
   },
   scanTrigger: { requests: 4, window: "1 hour" },
   sequenceRun: { requests: 10, window: "10 minutes" },
+  personaRun: { requests: 10, window: "10 minutes" },
+  personaGenerate: { requests: 5, window: "10 minutes" },
   promptImport: { requests: 10, window: "10 minutes" },
   competitorImport: { requests: 10, window: "10 minutes" },
   competitorSuggestions: { requests: 10, window: "10 minutes" },
@@ -94,6 +96,16 @@ export const ratelimit = {
   sequenceRun: createLimiter({
     prefix: "ratelimit:api:geo-sequence-run",
     requests: RATE_LIMITS.sequenceRun.requests,
+    window: "10m",
+  }),
+  personaRun: createLimiter({
+    prefix: "ratelimit:api:geo-persona-run",
+    requests: RATE_LIMITS.personaRun.requests,
+    window: "10m",
+  }),
+  personaGenerate: createLimiter({
+    prefix: "ratelimit:api:geo-persona-generate",
+    requests: RATE_LIMITS.personaGenerate.requests,
     window: "10m",
   }),
   promptImport: createLimiter({

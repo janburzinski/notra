@@ -177,9 +177,11 @@ export const API_SCOPE_RESOURCES = [
     pathPatterns: [
       "/projects/{projectId}/geo/prompts",
       "/projects/{projectId}/geo/sequences",
+      "/projects/{projectId}/geo/personas",
     ],
     label: "GEO prompts",
-    description: "Read and manage tracked GEO prompts and prompt sequences",
+    description:
+      "Read and manage tracked GEO prompts, prompt sequences and personas",
     openApiTag: "GEO",
   },
   {

@@ -40,6 +40,28 @@ function toGeoFailure(failure: GeoFailureWire): GeoFailure {
       return { status: 404, error: "Prompt not found" };
     case "GeoSequenceNotFoundError":
       return { status: 404, error: "Sequence not found" };
+    case "GeoPersonaNotFoundError":
+      return { status: 404, error: "Persona not found" };
+    case "GeoPersonaLimitError":
+      return {
+        status: 400,
+        error: `A project can have up to ${failure.limit ?? "5"} active personas. Archive one before adding another.`,
+      };
+    case "GeoPersonaRunUnavailableError":
+      return {
+        status: 400,
+        error: "No engine is available for this project's retention policy",
+      };
+    case "GeoPersonaRunError":
+      return {
+        status: 400,
+        error: "The persona run failed. Please try again.",
+      };
+    case "GeoPersonaGenerateError":
+      return {
+        status: 400,
+        error: "Persona generation failed. Please try again.",
+      };
     case "GeoContentBriefNotFoundError":
       return { status: 404, error: "Content brief not found" };
     case "GeoBrandIdentityNotFoundError":
@@ -139,7 +161,9 @@ function logsFailureDetail(tag: string, failure: GeoFailure) {
   return (
     failure.status === 500 ||
     tag === "GeoDiscoveryError" ||
-    tag === "GeoSequenceRunError"
+    tag === "GeoSequenceRunError" ||
+    tag === "GeoPersonaRunError" ||
+    tag === "GeoPersonaGenerateError"
   );
 }
 

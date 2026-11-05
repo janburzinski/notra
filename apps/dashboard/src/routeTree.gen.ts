@@ -77,6 +77,8 @@ import { Route as ApiInternalContentPreviewRouteImport } from './routes/api.inte
 import { Route as ApiInternalContentScheduledPublicationAttemptRouteImport } from './routes/api.internal.content.scheduled-publication-attempt'
 import { Route as ApiInternalContentSyncGithubRouteImport } from './routes/api.internal.content.sync-github'
 import { Route as ApiInternalGeoFreeScanRouteImport } from './routes/api.internal.geo.free-scan'
+import { Route as ApiInternalGeoPersonaGenerationRouteImport } from './routes/api.internal.geo.persona-generation'
+import { Route as ApiInternalGeoPersonaRunRouteImport } from './routes/api.internal.geo.persona-run'
 import { Route as ApiInternalGeoSequenceRunRouteImport } from './routes/api.internal.geo.sequence-run'
 import { Route as ApiInternalGeoWriterPlanRouteImport } from './routes/api.internal.geo.writer-plan'
 import { Route as ApiInternalSitesAdminRouteImport } from './routes/api.internal.sites.admin'
@@ -471,6 +473,18 @@ const ApiInternalGeoFreeScanRoute = ApiInternalGeoFreeScanRouteImport.update({
   path: '/api/internal/geo/free-scan',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiInternalGeoPersonaGenerationRoute =
+  ApiInternalGeoPersonaGenerationRouteImport.update({
+    id: '/api/internal/geo/persona-generation',
+    path: '/api/internal/geo/persona-generation',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiInternalGeoPersonaRunRoute =
+  ApiInternalGeoPersonaRunRouteImport.update({
+    id: '/api/internal/geo/persona-run',
+    path: '/api/internal/geo/persona-run',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiInternalGeoSequenceRunRoute =
   ApiInternalGeoSequenceRunRouteImport.update({
     id: '/api/internal/geo/sequence-run',
@@ -696,6 +710,8 @@ export interface FileRoutesByFullPath {
   '/api/internal/content/scheduled-publication-attempt': typeof ApiInternalContentScheduledPublicationAttemptRoute
   '/api/internal/content/sync-github': typeof ApiInternalContentSyncGithubRoute
   '/api/internal/geo/free-scan': typeof ApiInternalGeoFreeScanRoute
+  '/api/internal/geo/persona-generation': typeof ApiInternalGeoPersonaGenerationRoute
+  '/api/internal/geo/persona-run': typeof ApiInternalGeoPersonaRunRoute
   '/api/internal/geo/sequence-run': typeof ApiInternalGeoSequenceRunRoute
   '/api/internal/geo/writer-plan': typeof ApiInternalGeoWriterPlanRoute
   '/api/internal/sites/admin': typeof ApiInternalSitesAdminRoute
@@ -792,6 +808,8 @@ export interface FileRoutesByTo {
   '/api/internal/content/scheduled-publication-attempt': typeof ApiInternalContentScheduledPublicationAttemptRoute
   '/api/internal/content/sync-github': typeof ApiInternalContentSyncGithubRoute
   '/api/internal/geo/free-scan': typeof ApiInternalGeoFreeScanRoute
+  '/api/internal/geo/persona-generation': typeof ApiInternalGeoPersonaGenerationRoute
+  '/api/internal/geo/persona-run': typeof ApiInternalGeoPersonaRunRoute
   '/api/internal/geo/sequence-run': typeof ApiInternalGeoSequenceRunRoute
   '/api/internal/geo/writer-plan': typeof ApiInternalGeoWriterPlanRoute
   '/api/internal/sites/admin': typeof ApiInternalSitesAdminRoute
@@ -889,6 +907,8 @@ export interface FileRoutesById {
   '/api/internal/content/scheduled-publication-attempt': typeof ApiInternalContentScheduledPublicationAttemptRoute
   '/api/internal/content/sync-github': typeof ApiInternalContentSyncGithubRoute
   '/api/internal/geo/free-scan': typeof ApiInternalGeoFreeScanRoute
+  '/api/internal/geo/persona-generation': typeof ApiInternalGeoPersonaGenerationRoute
+  '/api/internal/geo/persona-run': typeof ApiInternalGeoPersonaRunRoute
   '/api/internal/geo/sequence-run': typeof ApiInternalGeoSequenceRunRoute
   '/api/internal/geo/writer-plan': typeof ApiInternalGeoWriterPlanRoute
   '/api/internal/sites/admin': typeof ApiInternalSitesAdminRoute
@@ -987,6 +1007,8 @@ export interface FileRouteTypes {
     | '/api/internal/content/scheduled-publication-attempt'
     | '/api/internal/content/sync-github'
     | '/api/internal/geo/free-scan'
+    | '/api/internal/geo/persona-generation'
+    | '/api/internal/geo/persona-run'
     | '/api/internal/geo/sequence-run'
     | '/api/internal/geo/writer-plan'
     | '/api/internal/sites/admin'
@@ -1083,6 +1105,8 @@ export interface FileRouteTypes {
     | '/api/internal/content/scheduled-publication-attempt'
     | '/api/internal/content/sync-github'
     | '/api/internal/geo/free-scan'
+    | '/api/internal/geo/persona-generation'
+    | '/api/internal/geo/persona-run'
     | '/api/internal/geo/sequence-run'
     | '/api/internal/geo/writer-plan'
     | '/api/internal/sites/admin'
@@ -1179,6 +1203,8 @@ export interface FileRouteTypes {
     | '/api/internal/content/scheduled-publication-attempt'
     | '/api/internal/content/sync-github'
     | '/api/internal/geo/free-scan'
+    | '/api/internal/geo/persona-generation'
+    | '/api/internal/geo/persona-run'
     | '/api/internal/geo/sequence-run'
     | '/api/internal/geo/writer-plan'
     | '/api/internal/sites/admin'
@@ -1270,6 +1296,8 @@ export interface RootRouteChildren {
   ApiInternalContentScheduledPublicationAttemptRoute: typeof ApiInternalContentScheduledPublicationAttemptRoute
   ApiInternalContentSyncGithubRoute: typeof ApiInternalContentSyncGithubRoute
   ApiInternalGeoFreeScanRoute: typeof ApiInternalGeoFreeScanRoute
+  ApiInternalGeoPersonaGenerationRoute: typeof ApiInternalGeoPersonaGenerationRoute
+  ApiInternalGeoPersonaRunRoute: typeof ApiInternalGeoPersonaRunRoute
   ApiInternalGeoSequenceRunRoute: typeof ApiInternalGeoSequenceRunRoute
   ApiInternalGeoWriterPlanRoute: typeof ApiInternalGeoWriterPlanRoute
   ApiInternalSitesAdminRoute: typeof ApiInternalSitesAdminRoute
@@ -1769,6 +1797,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiInternalGeoFreeScanRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/internal/geo/persona-generation': {
+      id: '/api/internal/geo/persona-generation'
+      path: '/api/internal/geo/persona-generation'
+      fullPath: '/api/internal/geo/persona-generation'
+      preLoaderRoute: typeof ApiInternalGeoPersonaGenerationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/internal/geo/persona-run': {
+      id: '/api/internal/geo/persona-run'
+      path: '/api/internal/geo/persona-run'
+      fullPath: '/api/internal/geo/persona-run'
+      preLoaderRoute: typeof ApiInternalGeoPersonaRunRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/internal/geo/sequence-run': {
       id: '/api/internal/geo/sequence-run'
       path: '/api/internal/geo/sequence-run'
@@ -2126,6 +2168,8 @@ const rootRouteChildren: RootRouteChildren = {
     ApiInternalContentScheduledPublicationAttemptRoute,
   ApiInternalContentSyncGithubRoute: ApiInternalContentSyncGithubRoute,
   ApiInternalGeoFreeScanRoute: ApiInternalGeoFreeScanRoute,
+  ApiInternalGeoPersonaGenerationRoute: ApiInternalGeoPersonaGenerationRoute,
+  ApiInternalGeoPersonaRunRoute: ApiInternalGeoPersonaRunRoute,
   ApiInternalGeoSequenceRunRoute: ApiInternalGeoSequenceRunRoute,
   ApiInternalGeoWriterPlanRoute: ApiInternalGeoWriterPlanRoute,
   ApiInternalSitesAdminRoute: ApiInternalSitesAdminRoute,
@@ -2160,6 +2204,7 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
 
 import type { getRouter } from './router.tsx'
 import type { startInstance } from './start.ts'

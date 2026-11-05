@@ -1,3 +1,4 @@
+import { geoPersonasGenerateInputSchema } from "@notra/geo-core/schemas/geo-personas";
 import { z } from "zod";
 
 export const personaGenerationJobSchema = z.object({
@@ -12,3 +13,19 @@ export const personaGenerationJobSchema = z.object({
   runId: z.string().nullable().default(null),
   error: z.string().nullable().default(null),
 });
+
+/** Body the public API sends to the internal persona-generation route. */
+export const internalPersonaGenerationInputSchema = z.discriminatedUnion(
+  "action",
+  [
+    z.object({
+      action: z.literal("status"),
+      organizationId: z.string().min(1),
+      projectId: z.string().min(1),
+    }),
+    geoPersonasGenerateInputSchema.safeExtend({
+      action: z.literal("start"),
+      projectId: z.string().min(1),
+    }),
+  ]
+);

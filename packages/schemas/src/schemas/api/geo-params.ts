@@ -23,6 +23,12 @@ export const sequenceParamsSchema = projectParamsSchema.extend({
   }),
 });
 
+export const personaParamsSchema = projectParamsSchema.extend({
+  personaId: resourceIdSchema("personaId").openapi({
+    param: { name: "personaId", in: "path" },
+  }),
+});
+
 export const scanParamsSchema = projectParamsSchema.extend({
   scanId: resourceIdSchema("scanId").openapi({
     param: { name: "scanId", in: "path" },

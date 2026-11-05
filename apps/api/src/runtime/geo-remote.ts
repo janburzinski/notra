@@ -1,10 +1,14 @@
 import {
+  internalGeoPersonaGenerationResponseSchema,
+  internalGeoPersonaRunResponseSchema,
   internalGeoSequenceRunResponseSchema,
   internalGeoWriterPlanResponseSchema,
 } from "@notra/schemas/api/internal-geo";
 import type { z } from "zod";
 
 import {
+  GEO_PERSONA_GENERATION_INTERNAL_PATH,
+  GEO_PERSONA_RUN_INTERNAL_PATH,
   GEO_SEQUENCE_RUN_INTERNAL_PATH,
   GEO_WRITER_PLAN_INTERNAL_PATH,
 } from "../constants/geo";
@@ -30,4 +34,26 @@ export const GEO_REMOTE_SEQUENCE_RUN: RemoteGeoOperation<
   timeoutMessage:
     "The sequence run is taking longer than expected and is still in progress. Do not retry. Check the project's GEO checks for the result.",
   unavailableMessage: "Sequence runs are unavailable",
+};
+
+export const GEO_REMOTE_PERSONA_RUN: RemoteGeoOperation<
+  z.infer<typeof internalGeoPersonaRunResponseSchema>
+> = {
+  label: "personaRun",
+  path: GEO_PERSONA_RUN_INTERNAL_PATH,
+  responseSchema: internalGeoPersonaRunResponseSchema,
+  timeoutMessage:
+    "The persona run is taking longer than expected and is still in progress. Do not retry. Read the persona's results for the outcome.",
+  unavailableMessage: "Persona runs are unavailable",
+};
+
+export const GEO_REMOTE_PERSONA_GENERATION: RemoteGeoOperation<
+  z.infer<typeof internalGeoPersonaGenerationResponseSchema>
+> = {
+  label: "personaGeneration",
+  path: GEO_PERSONA_GENERATION_INTERNAL_PATH,
+  responseSchema: internalGeoPersonaGenerationResponseSchema,
+  timeoutMessage:
+    "Persona generation did not answer in time. Do not retry. Read the generation status instead.",
+  unavailableMessage: "Persona generation is unavailable",
 };

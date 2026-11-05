@@ -3,6 +3,11 @@ export const GEO_SCAN_INTERNAL_WORKFLOW_PATH =
 
 export const GEO_SEQUENCE_RUN_INTERNAL_PATH = "/api/internal/geo/sequence-run";
 
+export const GEO_PERSONA_RUN_INTERNAL_PATH = "/api/internal/geo/persona-run";
+
+export const GEO_PERSONA_GENERATION_INTERNAL_PATH =
+  "/api/internal/geo/persona-generation";
+
 export const GEO_WRITER_INTERNAL_WORKFLOW_PATH =
   "/api/internal/workflows/geo-writer";
 
