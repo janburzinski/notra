@@ -6,8 +6,23 @@ export interface BuildSiteOptions {
   target: SiteBuildRequest;
   outDir: string;
   workDir?: string;
+  /** No Notra worker will serve this output, so it writes the footer favicon itself. */
+  localFavicons?: boolean;
+}
+
+export interface WriteLocalFaviconsParams {
+  outDir: string;
+  mounts: readonly string[];
+  host: string;
+  /** Overrides fetch, for tests. */
+  fetch?: FaviconFetch;
 }
 
 export interface AstroPackageJson {
   bin: string | Record<string, string>;
 }
+
+export type FaviconFetch = (
+  url: string,
+  init: RequestInit
+) => Promise<Response>;

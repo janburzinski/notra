@@ -301,6 +301,10 @@ export const SITE_ANALYTICS_EVENT_FILE = "_notra/e";
 export const SITE_FAVICON_DIR = "_notra/favicon";
 /** Lowercase ASCII hostnames; `new URL()` already punycodes the rest. */
 export const SITE_FAVICON_HOST = /^(?=.{1,253}$)[a-z0-9-]+(?:\.[a-z0-9-]+)+$/;
+/** Largest favicon the worker (or a local build) passes on from the upstream. */
+export const SITE_FAVICON_MAX_BYTES = 256 * 1024;
+/** Shown when the host has no favicon, so the footer never shows a broken image. */
+export const SITE_FAVICON_FALLBACK_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#71717a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>`;
 /** Longer visible times are capped: a tab left open overnight is not reading. */
 export const SITE_ENGAGEMENT_MAX_VISIBLE_MS = 30 * 60 * 1000;
 export const SITE_ENGAGEMENT_VIEW_ID_PATTERN = /^[a-z0-9]{16,32}$/;

@@ -1,6 +1,15 @@
-import { statSync } from "node:fs";
-import { basename, isAbsolute, join, relative, sep } from "node:path";
+import { realpathSync, statSync } from "node:fs";
+import {
+  basename,
+  dirname,
+  isAbsolute,
+  join,
+  relative,
+  resolve,
+  sep,
+} from "node:path";
 
+import { SITE_SOURCE_ROOTS } from "@notra/sites-core/constants/sites";
 import { siteBuildRequestSchema } from "@notra/sites-core/schemas/build";
 import { siteConfigSchema } from "@notra/sites-core/schemas/site-config";
 import type { SiteBuildRequest } from "@notra/sites-core/types/build";
@@ -140,14 +149,47 @@ export function localBuildTarget(
   });
 }
 
-// The build empties --out first, so it may not hold the site itself.
+/** The real path of `path`, following symlinks; a folder that doesn't exist yet resolves through its nearest existing parent. */
+function realPath(path: string): string {
+  const missing: string[] = [];
+  let existing = resolve(path);
+  for (;;) {
+    try {
+      return join(realpathSync(existing), ...missing.reverse());
+    } catch (error) {
+      const parent = dirname(existing);
+      if (
+        (error as NodeJS.ErrnoException).code !== "ENOENT" ||
+        parent === existing
+      ) {
+        throw error;
+      }
+      missing.push(basename(existing));
+      existing = parent;
+    }
+  }
+}
+
+// The build empties --out first, so it may neither hold the site nor sit in one
+// of its source folders (`--out blog` would delete the posts). Real paths are
+// compared, so a symlink can't hide either.
 export function assertOutsideSource(siteRoot: string, outDir: string) {
-  const path = relative(outDir, siteRoot);
+  const out = realPath(outDir);
+  const source = realPath(siteRoot);
+  const path = relative(out, source);
   const outside =
     path === ".." || path.startsWith(`..${sep}`) || isAbsolute(path);
-  if (!outside) {
+  const [firstSegment] = relative(source, out).split(sep);
+  const inSourceFolder =
+    outside &&
+    firstSegment !== ".." &&
+    SITE_SOURCE_ROOTS.has(firstSegment ?? "");
+  if (!outside || inSourceFolder) {
+    const problem = outside
+      ? `is inside the site's ${firstSegment} folder`
+      : "holds the site source";
     throw new UsageError(
-      `--out ${outDir} holds the site source, and the build empties it first. Use a separate folder, like ${join(siteRoot, ".notra", "out")}`
+      `--out ${outDir} ${problem}, and the build empties it first. Use a separate folder, like ${join(siteRoot, ".notra", "out")}`
     );
   }
 }

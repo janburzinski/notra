@@ -129,6 +129,8 @@ async function main() {
       siteRoot,
       target,
       outDir,
+      // Hosted builds (--target) are served by the Notra worker; local ones aren't.
+      localFavicons: !values.target,
     });
     if (values["result-file"]) {
       await writeFile(values["result-file"], JSON.stringify(result));

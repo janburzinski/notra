@@ -26,6 +26,7 @@ import { rewritePublicAssetUrls } from "../src/utils/public-assets";
 import { normalizeAgentInstructions, writeAgentFiles } from "./agent-files";
 import { AREA_PAGES_FILE } from "./constants/build";
 import { optimizeContentImages } from "./content-images";
+import { writeLocalFavicons } from "./local-favicons";
 import { writeOgImages } from "./og-images";
 import { prepareSite } from "./prepare";
 import type { AreaPages } from "./types/agent-files";
@@ -37,6 +38,7 @@ import { siteHeadScripts } from "./utils/head-scripts";
 import { inlineScriptHashes } from "./utils/inline-scripts";
 import { unnestLinks } from "./utils/nested-links";
 import { hasReactComponents } from "./utils/react";
+import { lockWorkDir } from "./utils/work-lock";
 
 export function astroBin(toolchainRoot: string): string {
   const require = createRequire(join(toolchainRoot, "package.json"));
@@ -110,8 +112,23 @@ function failedBuild(
 export async function buildSite(
   options: BuildSiteOptions
 ): Promise<SiteBuildResult> {
-  const workDir =
-    options.workDir ?? join(options.toolchainRoot, ".notra", "work");
+  if (options.workDir) {
+    return buildInWorkDir(options, options.workDir);
+  }
+  // The shared folder is the one global.css tells Tailwind to scan for site classes.
+  const workDir = join(options.toolchainRoot, ".notra", "work");
+  const unlock = await lockWorkDir(`${workDir}.lock`);
+  try {
+    return await buildInWorkDir(options, workDir);
+  } finally {
+    await unlock();
+  }
+}
+
+async function buildInWorkDir(
+  options: BuildSiteOptions,
+  workDir: string
+): Promise<SiteBuildResult> {
   const mounts = normalizeSiteMounts(options.target.mounts);
   const prepared = await prepareSite({
     siteRoot: options.siteRoot,
@@ -280,6 +297,15 @@ export async function buildSite(
     );
   }
 
+  const faviconHost = footerFaviconHost(config);
+  if (options.localFavicons && faviconHost) {
+    await writeLocalFavicons({
+      outDir: options.outDir,
+      mounts: listMountedAreas(mounts).map(({ mount }) => mount),
+      host: faviconHost,
+    });
+  }
+
   await writeAgentFiles({
     outDir: options.outDir,
     origin: publicOrigin,
@@ -327,7 +353,7 @@ export async function buildSite(
     contentSecurityPolicy,
     analyticsConsent: analyticsGatedByConsent(config.integrations),
     consentStorageKey: consent?.options.storageConfig.storageKey,
-    faviconHost: footerFaviconHost(config),
+    faviconHost,
   };
 }
 

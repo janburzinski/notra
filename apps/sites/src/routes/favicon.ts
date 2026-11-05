@@ -1,14 +1,14 @@
 import {
   SITE_FAVICON_DIR,
+  SITE_FAVICON_FALLBACK_SVG,
   SITE_FAVICON_HOST,
+  SITE_FAVICON_MAX_BYTES,
 } from "@notra/sites-core/constants/sites";
 import { googleFaviconUrl } from "@notra/utils/google-favicon";
 import { Effect, Option } from "effect";
 
 import {
   FAVICON_CACHE_CONTROL,
-  FAVICON_FALLBACK_SVG,
-  FAVICON_MAX_BYTES,
   FAVICON_RETRY_CACHE_CONTROL,
 } from "../constants/favicons";
 import { EDGE_CACHE_ORIGIN } from "../constants/responses";
@@ -36,14 +36,14 @@ function faviconResponse(
 async function lookupFavicon(host: string, deps: SitesDeps) {
   const upstream = googleFaviconUrl(host);
   if (!upstream) {
-    return faviconResponse(FAVICON_FALLBACK_SVG, "image/svg+xml");
+    return faviconResponse(SITE_FAVICON_FALLBACK_SVG, "image/svg+xml");
   }
   const response = await deps
     .fetch(upstream, { redirect: "follow" })
     .catch(() => null);
   // Google answers hosts without a favicon with 404; that is a real answer.
   if (response?.status === 404) {
-    return faviconResponse(FAVICON_FALLBACK_SVG, "image/svg+xml");
+    return faviconResponse(SITE_FAVICON_FALLBACK_SVG, "image/svg+xml");
   }
   const contentType = response?.headers.get("Content-Type") ?? "";
   if (!(response?.ok && contentType.startsWith("image/"))) {
@@ -53,7 +53,7 @@ async function lookupFavicon(host: string, deps: SitesDeps) {
   if (
     !bytes ||
     bytes.byteLength === 0 ||
-    bytes.byteLength > FAVICON_MAX_BYTES
+    bytes.byteLength > SITE_FAVICON_MAX_BYTES
   ) {
     return null;
   }
@@ -70,7 +70,7 @@ async function fetchFavicon(deps: SitesDeps, host: string): Promise<Response> {
   const favicon = await lookupFavicon(host, deps);
   if (!favicon) {
     return faviconResponse(
-      FAVICON_FALLBACK_SVG,
+      SITE_FAVICON_FALLBACK_SVG,
       "image/svg+xml",
       FAVICON_RETRY_CACHE_CONTROL
     );

@@ -1,5 +1,8 @@
 export const AREA_PAGES_FILE = "notra-pages.json";
 
+/** A local build waits this long for the footer website's favicon before using the globe. */
+export const LOCAL_FAVICON_FETCH_TIMEOUT_MS = 5000;
+
 export const ASTRO_LOG_NOISE: readonly RegExp[] = [
   /\[glob-loader\] No files found matching/,
   /\[glob-loader\] The base directory .* does not exist/,

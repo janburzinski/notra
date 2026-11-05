@@ -1,5 +1,5 @@
 import { afterEach, expect, test } from "bun:test";
-import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, rm, symlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
@@ -152,4 +152,32 @@ test("--out may not hold the site source", () => {
   ]) {
     expect(() => assertOutsideSource(root, out)).not.toThrow();
   }
+});
+
+test("--out can't reach the site source through a symlink", async () => {
+  const base = await site("projects");
+  const root = join(base, "projects", "site");
+  await mkdir(root);
+  await symlink(join(base, "projects"), join(base, "link"));
+  expect(() => assertOutsideSource(root, join(base, "link", "site"))).toThrow(
+    "holds the site source"
+  );
+  expect(() =>
+    assertOutsideSource(root, join(base, "link", "site-out", "new"))
+  ).not.toThrow();
+});
+
+test("--out can't sit in one of the site's source folders", () => {
+  const root = join(tmpdir(), "site");
+  for (const [folder, name] of [
+    ["blog", "blog"],
+    ["changelog", "changelog"],
+    ["public", "public"],
+    [join("blog", "out"), "blog"],
+  ]) {
+    expect(() => assertOutsideSource(root, join(root, folder ?? ""))).toThrow(
+      `is inside the site's ${name} folder`
+    );
+  }
+  expect(() => assertOutsideSource(root, join(root, "dist"))).not.toThrow();
 });
