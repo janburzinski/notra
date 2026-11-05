@@ -5,8 +5,10 @@ import { useState } from "react";
 import { useTranslations } from "use-intl";
 
 import { AnalyticsSourceTabs } from "@/components/analytics/analytics-source-tabs";
+import { EmptyState } from "@/components/empty-state";
 import { GeoRangePicker } from "@/components/geo/geo-range-picker";
 import { PageContainer } from "@/components/layout/container";
+import { McpEmpty } from "@/components/mcp/mcp-empty";
 import { McpRequestSheet } from "@/components/mcp/mcp-request-sheet";
 import {
   McpAnalyticsHero,
@@ -14,7 +16,6 @@ import {
   McpLoadFailed,
   McpRequestLog,
   McpServerRequestSections,
-  McpSetupPrompt,
   McpToolSections,
 } from "@/components/mcp/mcp-sections";
 import { McpSessionSheet } from "@/components/mcp/mcp-session-sheet";
@@ -22,6 +23,7 @@ import { McpToolSheet } from "@/components/mcp/mcp-tool-sheet";
 import { McpVersionSelect } from "@/components/mcp/mcp-version-select";
 import { useOrganizationsContext } from "@/components/providers/organization-provider";
 import { SkeletonCrossfade } from "@/components/skeleton-crossfade";
+import { useGeoIngestSetup } from "@/lib/hooks/use-geo";
 import { useGeoRange } from "@/lib/hooks/use-geo-range";
 import { useMcpAnalytics } from "@/lib/hooks/use-mcp-analytics";
 import { useMcpVersionQuery } from "@/lib/hooks/use-mcp-version";
@@ -56,6 +58,11 @@ export default function McpAnalyticsPage({
   const { data, isPending, isPlaceholderData, isError, refetch } =
     useMcpAnalytics(organizationId, geoRange.query);
   const [serverVersion] = useMcpVersionQuery();
+  const {
+    data: ingestSetup,
+    isError: isIngestSetupError,
+    refetch: refetchIngestSetup,
+  } = useGeoIngestSetup(organizationId);
   // While a new range loads, the previous response stays on screen; chart it
   // against the range it was fetched for, not the one still loading.
   const [dataRange, setDataRange] = useState(geoRange.query);
@@ -72,6 +79,8 @@ export default function McpAnalyticsPage({
   const hasData =
     data &&
     (data.totals.requests + data.requests.length > 0 || !!serverVersion);
+  // A quiet period after earlier traffic is not a missing setup either.
+  const hasPreviousData = (data?.totals.previousRequests ?? 0) > 0;
   const selectedTool =
     data?.tools.find((tool) => tool.name === selectedToolName) ?? null;
   const openTool = (name: string) => {
@@ -99,7 +108,19 @@ export default function McpAnalyticsPage({
           <AnalyticsSourceTabs />
 
           {isError && !data ? <McpLoadFailed onRetry={refetch} /> : null}
-          {!isError && !hasData ? <McpSetupPrompt /> : null}
+          {!isError && !hasData && hasPreviousData ? (
+            <EmptyState
+              description={t("mcp.emptyRangeDescription")}
+              title={t("mcp.emptyTitle")}
+            />
+          ) : null}
+          {!isError && !hasData && !hasPreviousData ? (
+            <McpEmpty
+              onRetrySetup={() => refetchIngestSetup()}
+              setup={ingestSetup}
+              setupFailed={isIngestSetupError}
+            />
+          ) : null}
           {data && hasData ? (
             <>
               <McpAnalyticsHero data={data} range={dataRange} />

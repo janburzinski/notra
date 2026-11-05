@@ -8,13 +8,11 @@ import { Tabs, TabsList, TabsTrigger } from "@notra/ui/components/ui/tabs";
 import { useState } from "react";
 import { useFormatter, useLocale, useTranslations } from "use-intl";
 
-import { CodeSnippet } from "@/components/geo/code-snippet";
 import { McpMetricCard } from "@/components/mcp/mcp-metric-card";
 import { McpTableEmpty } from "@/components/mcp/mcp-sheet-parts";
 import {
   MCP_LOG_FILTERS,
   MCP_LOG_TABLE_HEIGHT,
-  MCP_SETUP_SNIPPET,
 } from "@/constants/mcp-analytics";
 import { TABLE_ROW_HEIGHT } from "@/constants/table";
 import { useDesktopBreakpoint } from "@/lib/hooks/use-desktop-breakpoint";
@@ -42,15 +40,6 @@ function usePairHeight() {
     sideBySide
       ? Math.max(mcpTableHeight(first), mcpTableHeight(second))
       : undefined;
-}
-
-export function McpSetupPrompt() {
-  const t = useTranslations("geo.pages.mcp.setup");
-  return (
-    <InstrumentSection eyebrow={t("title")} hint={t("hint")}>
-      <CodeSnippet code={MCP_SETUP_SNIPPET} filename="server.ts" />
-    </InstrumentSection>
-  );
 }
 
 export function McpLoadFailed({ onRetry }: McpLoadFailedProps) {

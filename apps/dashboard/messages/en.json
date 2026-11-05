@@ -4086,8 +4086,19 @@
           "hint": "The request for this page failed. Your server keeps sending events in the meantime, so nothing is lost while you retry."
         },
         "setup": {
-          "title": "Connect your MCP server",
-          "hint": "Install @usenotra/geo and wrap your server transport with your AI traffic tracking token. Every request counts toward your monthly AI traffic events."
+          "title": "No MCP activity yet",
+          "description": "Wrap your MCP server's transport to see which agents connect, which tools they call and where they fail.",
+          "tokenTitle": "Set your token",
+          "tokenDescription": "Add this as {env} wherever your MCP server runs. Every request counts toward your monthly AI traffic events.",
+          "tokenFailed": "Your token didn't load.",
+          "transportTitle": "Wrap the transport",
+          "transport": "Transport",
+          "transportDescription": {
+            "http": "Wrap it before server.connect. On serverless, pass waitUntil so events are sent before the function returns.",
+            "stdio": "Wrap it before server.connect. Events are sent when the process exits."
+          },
+          "footerTitle": "Let your agent set it up",
+          "footerDescription": "Paste the prompt into Claude Code, Cursor or Codex."
         },
         "metrics": {
           "toolCalls": "Tool calls",
@@ -4136,6 +4147,7 @@
           "latest": "Latest"
         },
         "emptyTitle": "Nothing in this period",
+        "emptyRangeDescription": "Try a longer date range or another server version.",
         "uiBadge": "UI",
         "serverRequests": {
           "elicitation": "Elicitation",

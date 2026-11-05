@@ -1,3 +1,4 @@
+import type { GeoIngestSetupResponse } from "@notra/geo-core/types/geo";
 import type {
   McpAnalyticsResponse,
   McpToolDetailResponse,
@@ -16,7 +17,10 @@ import type {
 } from "@notra/geo-core/types/mcp-analytics";
 import type { ReactNode } from "react";
 
-import type { MCP_LOG_FILTERS } from "@/constants/mcp-analytics";
+import type {
+  MCP_LOG_FILTERS,
+  MCP_SETUP_TRANSPORTS,
+} from "@/constants/mcp-analytics";
 import type { GeoRangeControl, GeoRangeQuery } from "@/types/geo";
 
 export type McpToolStats = McpAnalyticsTool;
@@ -206,4 +210,12 @@ export interface McpSessionAverages {
   requests: number;
   toolCalls: number;
   durationSeconds: number;
+}
+
+export type McpSetupTransport = (typeof MCP_SETUP_TRANSPORTS)[number];
+
+export interface McpSetupProps {
+  setup: GeoIngestSetupResponse | undefined;
+  setupFailed?: boolean;
+  onRetrySetup?: () => void;
 }

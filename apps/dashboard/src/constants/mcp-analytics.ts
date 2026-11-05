@@ -11,6 +11,7 @@ import type {
   McpOutcomeBadgeVariant,
   McpRpcErrorKey,
   McpServerRequestKey,
+  McpSetupTransport,
 } from "@/types/mcp-analytics";
 
 export const MCP_ANALYTICS_NAV_LINK = "/geo/traffic/mcp";
@@ -53,11 +54,35 @@ export const MCP_SERVER_REQUEST_KEYS: Partial<
 
 export const MCP_LOG_FILTERS = ["all", "success", "errors"] as const;
 
-export const MCP_SETUP_SNIPPET = `import { trackMcpTransport } from "@usenotra/geo/mcp";
+export const MCP_SETUP_TRANSPORTS = ["http", "stdio"] as const;
 
+export const MCP_SETUP_DEFAULT_TRANSPORT: McpSetupTransport = "http";
+
+export const MCP_SETUP_FILE = "server.ts";
+
+export const MCP_SETUP_TRANSPORT_LABELS = {
+  http: "Streamable HTTP",
+  stdio: "stdio",
+} as const satisfies Record<McpSetupTransport, string>;
+
+export const MCP_SETUP_SNIPPETS = {
+  http: `import { trackMcpTransport } from "@usenotra/geo/mcp";
+
+// The StreamableHTTPServerTransport your server already creates
 await server.connect(
-  trackMcpTransport(transport, { token: process.env.NOTRA_GEO_TOKEN ?? "" })
-);`;
+  trackMcpTransport(transport, {
+    token: process.env.NOTRA_GEO_TOKEN ?? "",
+  })
+);`,
+  stdio: `import { trackMcpTransport } from "@usenotra/geo/mcp";
+
+// The StdioServerTransport your server already creates
+await server.connect(
+  trackMcpTransport(transport, {
+    token: process.env.NOTRA_GEO_TOKEN ?? "",
+  })
+);`,
+} as const satisfies Record<McpSetupTransport, string>;
 
 export const MCP_VERSION_PARAM = "version";
 

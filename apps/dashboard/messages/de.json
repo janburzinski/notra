@@ -4086,8 +4086,19 @@
           "hint": "Die Anfrage für diese Seite ist fehlgeschlagen. Dein Server sendet weiter Events, also geht nichts verloren, während du es erneut versuchst."
         },
         "setup": {
-          "title": "Verbinde deinen MCP-Server",
-          "hint": "Installiere @usenotra/geo und umschließe den Transport deines Servers mit deinem Token für AI-Traffic-Tracking. Jede Anfrage zählt zu deinen monatlichen AI-Traffic-Events."
+          "title": "Noch keine MCP-Aktivität",
+          "description": "Umschließe den Transport deines MCP-Servers, um zu sehen, welche Agents sich verbinden, welche Tools sie aufrufen und wo sie scheitern.",
+          "tokenTitle": "Token setzen",
+          "tokenDescription": "Lege diesen Wert als {env} überall dort an, wo dein MCP-Server läuft. Jede Anfrage zählt zu deinen monatlichen AI-Traffic-Events.",
+          "tokenFailed": "Dein Token konnte nicht geladen werden.",
+          "transportTitle": "Transport umschließen",
+          "transport": "Transport",
+          "transportDescription": {
+            "http": "Umschließe ihn vor server.connect. Auf Serverless übergib waitUntil, damit Events vor dem Ende der Funktion gesendet werden.",
+            "stdio": "Umschließe ihn vor server.connect. Events werden beim Beenden des Prozesses gesendet."
+          },
+          "footerTitle": "Lass deinen Agent das einrichten",
+          "footerDescription": "Füge den Prompt in Claude Code, Cursor oder Codex ein."
         },
         "metrics": {
           "toolCalls": "Tool-Aufrufe",
@@ -4136,6 +4147,7 @@
           "latest": "Neueste"
         },
         "emptyTitle": "Nichts in diesem Zeitraum",
+        "emptyRangeDescription": "Wähle einen längeren Zeitraum oder eine andere Serverversion.",
         "uiBadge": "UI",
         "serverRequests": {
           "elicitation": "Elicitation",

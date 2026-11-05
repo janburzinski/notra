@@ -1,3 +1,4 @@
+import { GEO_INGEST_TOKEN_ENV } from "@notra/geo-core/constants/geo";
 import type {
   McpAnalyticsDay,
   McpAnalyticsRequest,
@@ -19,6 +20,10 @@ import {
   MCP_HOUR_MS,
   MCP_HOURS_PER_DAY,
   MCP_METRIC_SERIES_KEY,
+  MCP_SETUP_FILE,
+  MCP_SETUP_SNIPPETS,
+  MCP_SETUP_TRANSPORT_LABELS,
+  MCP_SETUP_TRANSPORTS,
   MCP_TABLE_EMPTY_HEIGHT,
   MCP_TABLE_MAX_ROWS,
 } from "@/constants/mcp-analytics";
@@ -28,6 +33,7 @@ import type {
   McpChartMetric,
   McpNeighborRow,
   McpSessionAverages,
+  McpSetupTransport,
   McpTrendRow,
 } from "@/types/mcp-analytics";
 
@@ -274,4 +280,27 @@ export function latestMcpVersion(
         : latest,
     undefined
   );
+}
+
+export function isMcpSetupTransport(value: string): value is McpSetupTransport {
+  return MCP_SETUP_TRANSPORTS.some((transport) => transport === value);
+}
+
+export function mcpSetupAgentPrompt(
+  transport: McpSetupTransport,
+  installCommand: string
+): string {
+  return [
+    `Set up Notra MCP server analytics in this project. The server uses the ${MCP_SETUP_TRANSPORT_LABELS[transport]} transport.`,
+    "",
+    `1. Install the package: \`${installCommand}\` (use this project's package manager if it differs).`,
+    `2. Find where the MCP server connects its transport (usually ${MCP_SETUP_FILE}) and wrap the transport with trackMcpTransport before \`server.connect\`, like this:`,
+    "",
+    "```ts",
+    MCP_SETUP_SNIPPETS[transport],
+    "```",
+    "",
+    `3. Add ${GEO_INGEST_TOKEN_ENV} to the server's environment variables (local env file and hosting provider). Ask me for the value - never hardcode or commit it.`,
+    "4. On a serverless runtime, pass `waitUntil` to trackMcpTransport or `await flushMcpEvents()` before the function returns, so events are sent.",
+  ].join("\n");
 }

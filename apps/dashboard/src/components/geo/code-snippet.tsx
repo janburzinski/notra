@@ -63,13 +63,23 @@ export function CodeSnippetTabs({
   value,
   options,
   onValueChange,
+  variant = "line",
 }: CodeSnippetTabsProps) {
+  const isLine = variant === "line";
   return (
     <Tabs className="gap-0" onValueChange={onValueChange} value={value}>
-      <TabsList aria-label={label} className="h-9 gap-3" variant="line">
+      <TabsList
+        aria-label={label}
+        className={isLine ? "h-9 gap-3" : undefined}
+        variant={variant}
+      >
         {options.map((option) => (
           <TabsTrigger
-            className="flex-none gap-1.5 px-0 text-xs [&>span:last-child]:bottom-0"
+            className={
+              isLine
+                ? "flex-none gap-1.5 px-0 text-xs [&>span:last-child]:bottom-0"
+                : "flex-none gap-1.5 px-2.5 text-xs"
+            }
             key={option.value}
             value={option.value}
           >

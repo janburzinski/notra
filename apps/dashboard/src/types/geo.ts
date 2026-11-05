@@ -1096,6 +1096,8 @@ export interface CodeSnippetTabsProps {
   value: string;
   options: readonly CodeSnippetTabOption[];
   onValueChange: (value: string) => void;
+  /** "line" sits in a snippet header; "default" is the segmented control. */
+  variant?: "line" | "default";
 }
 
 export interface CopyPromptButtonProps {
