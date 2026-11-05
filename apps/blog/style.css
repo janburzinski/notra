@@ -476,7 +476,7 @@ html.dark .notra-nav-mobile-panel {
   overflow: clip;
   width: 100%;
   border-radius: 1.5rem;
-  background: #c8b2ee40 url("/brand/dither-hero.png") center / cover no-repeat;
+  background: #c8b2ee40;
 }
 
 /* usenotra.com keeps 1.5rem around the hero on phones too, where the page padding is 1rem. */
@@ -484,7 +484,6 @@ html.dark .notra-nav-mobile-panel {
   .notra-hero {
     width: calc(100% - 1rem);
     margin: 0.5rem auto 0;
-    background-image: none;
   }
 }
 
@@ -493,6 +492,7 @@ html.dark .notra-hero {
 }
 
 .notra-hero-inner {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -566,18 +566,6 @@ html.dark .notra-hero p {
   background: #c8b2ee26;
 }
 
-.post-card-box::before {
-  content: "";
-  position: absolute;
-  inset-inline: 0;
-  bottom: -2rem;
-  z-index: -1;
-  height: 12rem;
-  background: url("/brand/dither-card.png") center / cover no-repeat;
-  mask-image: linear-gradient(to bottom, transparent 0%, black 100%);
-  pointer-events: none;
-}
-
 .post-card-box:hover {
   border-color: color-mix(in oklab, var(--primary) 40%, transparent);
   background: #c8b2ee40;
@@ -592,13 +580,17 @@ html.dark .post-card-box:hover {
   background: rgb(255 255 255 / 0.04);
 }
 
-html.dark .post-card-box::before {
-  display: none;
-}
-
 .post-card-title {
   color: var(--ink);
   text-wrap: wrap;
+}
+
+.post-card-box:hover .post-card-title {
+  color: var(--primary);
+}
+
+html.dark .post-card-box:hover .post-card-title {
+  color: var(--accent);
 }
 
 .post-card-excerpt,
@@ -608,19 +600,36 @@ html.dark .post-card-box::before {
 
 /* Post page */
 
+/* Post header spacing, measured against usenotra.com. On phones the theme's main adds 1rem. */
 .post-compact {
-  padding-top: 2rem;
+  padding-top: 1rem;
+}
+
+.post-compact #header > a:first-child + div {
+  margin-top: 1rem;
+}
+
+.post-compact #page-title {
+  margin-top: 0.75rem;
 }
 
 @media (min-width: 40rem) {
   .post-compact {
-    padding-top: 5rem;
+    padding-top: 5.5rem;
+  }
+
+  .post-compact #header > a:first-child + div {
+    margin-top: 1.375rem;
+  }
+
+  .post-compact #page-title {
+    margin-top: 1.375rem;
   }
 }
 
 @media (min-width: 48rem) {
   .post-compact {
-    padding-top: 6rem;
+    padding-top: 6.5rem;
   }
 }
 
@@ -628,9 +637,13 @@ html.dark .post-card-box::before {
 .post-compact #header .post-meta {
   font-family: var(--font-code);
   font-size: 0.875rem;
+  line-height: 1.25rem;
 }
 
+/* A block-level link, so it adds no line box above the meta row. */
 .post-compact #header > a:first-child {
+  display: flex;
+  width: fit-content;
   color: #737373;
 }
 
@@ -647,6 +660,7 @@ html.dark .post-compact #header > a:first-child:hover {
 }
 
 .post-compact #header .post-meta {
+  line-height: 1.25rem;
   color: #404040;
   letter-spacing: normal;
   text-transform: none;
@@ -664,6 +678,7 @@ html.dark .post-compact #header > a:first-child:hover {
   font-family: var(--font-code);
   font-size: 0.875rem;
   font-weight: 400;
+  line-height: 1.25rem;
 }
 
 .post-compact .page-actions .page-actions-menu-button {
@@ -684,6 +699,11 @@ html.dark
   .page-actions
   :is(.page-actions-copy-button, .page-actions-menu-button) {
   color: #a3a3a3;
+}
+
+.post-compact .page-actions .split-button,
+.post-compact .page-actions .split-button > details {
+  height: 1.25rem;
 }
 
 .post-compact .page-actions .split-button {
@@ -797,13 +817,14 @@ html.dark .mdx-content a:not(.not-prose a) {
   position: relative;
   display: flex;
   overflow: clip;
-  max-width: 87rem;
+  /* The post column on usenotra.com: max-w-7xl minus its px-8 padding. */
+  max-width: 76rem;
   margin: 4rem auto 0;
   align-items: center;
   justify-content: center;
   padding: 3rem 1.5rem;
   border-radius: 1.5625rem;
-  background: #c8b2ee40 url("/brand/dither-hero.png") center / cover no-repeat;
+  background: #c8b2ee40;
 }
 
 html.dark .notra-cta {
@@ -811,6 +832,7 @@ html.dark .notra-cta {
 }
 
 .notra-cta-inner {
+  position: relative;
   display: flex;
   max-width: 53.3125rem;
   flex-direction: column;
@@ -950,22 +972,18 @@ html.dark .notra-cta p {
   margin-top: 6rem;
   padding-top: 1.5rem;
   border-radius: 1.5rem 1.5rem 0 0;
-  background:
-    url("/brand/dither-footer.png") left 0 top 8.8125rem /
-      max(112.08%, 100.875rem) auto no-repeat,
-    linear-gradient(
-      in oklab 180deg,
-      oklab(80.3% 0.045 -0.074 / 15%) 0%,
-      oklab(71.8% 0.066 -0.109 / 50%) 100%
-    );
+  background: linear-gradient(
+    in oklab 180deg,
+    oklab(80.3% 0.045 -0.074 / 15%) 0%,
+    oklab(71.8% 0.066 -0.109 / 50%) 100%
+  );
   box-shadow:
     0 0.0625rem 0.125rem #28282814,
     0 0 0 0.0625rem #ececec;
 }
 
 html.dark .notra-footer {
-  background: #141019 url("/brand/dither-footer.png") left 0 top 8.8125rem /
-    max(112.08%, 100.875rem) auto no-repeat;
+  background: #141019;
   box-shadow: none;
 }
 
@@ -1424,4 +1442,92 @@ html.dark
 
 #body-content [data-testid="consent-widget-footer-sub-group"] {
   gap: 0.75rem;
+}
+
+/* Hosts for the Paper dither backgrounds that scripts/web-chrome.js renders, as on usenotra.com. */
+.notra-dither,
+.post-card-box > [data-notra-web="card-dither"] {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.notra-hero > .notra-dither {
+  overflow: clip;
+  border-radius: inherit;
+}
+
+.notra-footer > .notra-dither,
+.post-card-box > [data-notra-web="card-dither"] {
+  z-index: -1;
+}
+
+/* Inline code as in prose-neutral on usenotra.com: bold, no box. */
+.mdx-content :not(pre) > code:not(.not-prose *) {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ink);
+  font-size: 0.875em;
+  font-weight: 600;
+}
+
+/* The mobile "On this page" list, numbered as on usenotra.com. */
+[data-mobile-toc] > div {
+  padding: 0.5rem 0 0;
+}
+
+[data-mobile-toc] .toc-tree {
+  counter-reset: toc-section;
+}
+
+[data-mobile-toc] .toc-tree > li {
+  counter-increment: toc-section;
+}
+
+[data-mobile-toc] .toc-tree > li > .toc-link {
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  color: var(--foreground);
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.25rem;
+}
+
+[data-mobile-toc] .toc-tree > li > .toc-link:hover {
+  background: color-mix(in oklab, var(--muted) 60%, transparent);
+}
+
+[data-mobile-toc] .toc-tree > li > .toc-link::before {
+  content: counter(toc-section, decimal-leading-zero);
+  display: flex;
+  width: 2.25rem;
+  height: 2.25rem;
+  margin: 0;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 0.375rem;
+  background: var(--muted);
+  color: var(--muted-foreground);
+  font-family: var(--font-code);
+  font-size: 0.75rem;
+  font-weight: 400;
+}
+
+[data-mobile-toc] .toc-children > ol {
+  margin: 0 0 0.25rem 1.625rem;
+  padding-left: 1.25rem;
+  border-left: 1px solid var(--border);
+}
+
+[data-mobile-toc] .toc-children .toc-link {
+  padding-block: 0.375rem;
+  font-size: 0.875rem;
+}
+
+[data-mobile-toc] .toc-children .toc-link::before {
+  display: none;
 }

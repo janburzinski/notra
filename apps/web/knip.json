@@ -6,6 +6,7 @@
     "src/router.tsx",
     "src/start.ts",
     "scripts/fonts/verify.mjs",
+    "src/embed/blog-chrome/{entry,router}.tsx",
     "src/routes/**/*.{ts,tsx}"
   ],
   "ignoreDependencies": [

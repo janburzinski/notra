@@ -10,7 +10,7 @@ import {
 import type { IconSvgElement } from "@hugeicons/react";
 
 import { STATE_OF_AI_SEARCH_TITLE } from "@/constants/state-of-ai-search";
-import { listLatestSummaries } from "@/lib/state-of-ai-search/reports";
+import { listLatestSummaries } from "@/lib/state-of-ai-search/summaries";
 import type { StateOfAiSearchRankingRow } from "@/types/state-of-ai-search";
 import type { MarketingNavGroup } from "@/utils/navigation";
 import { reportCategoryPath } from "@/utils/state-of-ai-search";

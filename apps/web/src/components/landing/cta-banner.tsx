@@ -13,6 +13,21 @@ import {
 } from "@/constants/landing/cta-banner";
 import type { CtaBannerProps } from "@/types/landing/cta-banner";
 
+export function CtaBannerDither() {
+  return (
+    <DeferredDithering
+      className="absolute -top-66.25 left-[-5.368rem] h-264.5 w-403.25"
+      colorBack="#00000000"
+      colorFront="#8B5CF62D"
+      scale={0.53}
+      shape="wave"
+      size={2.9}
+      speed={0.7}
+      type="4x4"
+    />
+  );
+}
+
 export function CtaBanner({
   heading = CTA_BANNER_HEADING,
   subcopy = CTA_BANNER_SUBCOPY,
@@ -20,16 +35,7 @@ export function CtaBanner({
 }: CtaBannerProps) {
   return (
     <div className="relative mx-auto flex w-full max-w-[87rem] shrink-0 items-center justify-center overflow-clip rounded-[1.5625rem] bg-[#C8B2EE40] px-6 py-12 antialiased sm:min-h-[27.4375rem] sm:py-16 dark:bg-[#231d3a]">
-      <DeferredDithering
-        className="absolute -top-66.25 left-[-5.368rem] h-264.5 w-403.25"
-        colorBack="#00000000"
-        colorFront="#8B5CF62D"
-        scale={0.53}
-        shape="wave"
-        size={2.9}
-        speed={0.7}
-        type="4x4"
-      />
+      <CtaBannerDither />
       <div className="relative flex w-full max-w-[53.3125rem] flex-col items-center gap-8 sm:gap-10.5">
         <div className="flex flex-col items-center gap-3">
           <div className="flex flex-col items-center gap-4.5">

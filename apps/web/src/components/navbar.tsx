@@ -346,7 +346,15 @@ export function Navbar({ variant }: NavbarProps = {}) {
     function handleKey(event: globalThis.KeyboardEvent) {
       if (event.key === "Escape") {
         setKeyboardNavigation(true);
-        if (activeGroup && panelRef.current?.contains(document.activeElement)) {
+        // The panel's own root, so focus is found inside a shadow root too (the blog embeds this).
+        const root = panelRef.current?.getRootNode() as
+          | Document
+          | ShadowRoot
+          | undefined;
+        if (
+          activeGroup &&
+          panelRef.current?.contains(root?.activeElement ?? null)
+        ) {
           triggerRefs.current.get(activeGroup)?.focus();
         }
         setActiveGroup(null);

@@ -4,11 +4,15 @@ import { Menu as MenuPrimitive } from "@base-ui/react/menu";
 import { ArrowRight01Icon, Tick02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import type * as React from "react";
+import { createContext, useContext } from "react";
 import {
   DROPDOWN_ITEM_CLASS_NAME,
   DROPDOWN_POPUP_CLASS_NAME,
 } from "@notra/ui/constants/dropdown";
 import { cn } from "@notra/ui/lib/utils";
+
+// Where menus portal to. Unset means document.body; a Shadow DOM host sets an element inside it.
+const DropdownMenuPortalContainer = createContext<HTMLElement | null>(null);
 
 function DropdownMenu(props: MenuPrimitive.Root.Props) {
   return <MenuPrimitive.Root data-slot="dropdown-menu" {...props} />;
@@ -34,8 +38,9 @@ function DropdownMenuContent({
     MenuPrimitive.Positioner.Props,
     "align" | "alignOffset" | "side" | "sideOffset"
   >) {
+  const container = useContext(DropdownMenuPortalContainer);
   return (
-    <MenuPrimitive.Portal>
+    <MenuPrimitive.Portal container={container ?? undefined}>
       <MenuPrimitive.Positioner
         align={align}
         alignOffset={alignOffset}
@@ -271,6 +276,7 @@ function DropdownMenuShortcut({
 export {
   DropdownMenu,
   DropdownMenuPortal,
+  DropdownMenuPortalContainer,
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuGroup,

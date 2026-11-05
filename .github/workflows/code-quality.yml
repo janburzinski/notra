@@ -55,7 +55,8 @@ jobs:
           # menu-highlight builds both the dashboard and the web stylesheet.
           if has dashboard || has web; then checks="$checks,\"browser\""; fi
           has api && checks="$checks,\"build-api\""
-          has web && checks="$checks,\"build-web\""
+          # apps/blog is not a workspace, but its scripts/web-chrome.js is generated from web.
+          if has web || grep -qE '^apps/blog/scripts/' <<< "$files"; then checks="$checks,\"build-web\""; fi
           has dashboard && checks="$checks,\"build-dashboard\""
           has console && checks="$checks,\"build-console\""
           has ui && checks="$checks,\"build-ui\""
@@ -160,6 +161,11 @@ jobs:
       - name: Verify web build
         if: matrix.check == 'build-web'
         run: bun run build --filter=web
+
+      - name: Verify the blog's generated navbar and dither bundle
+        if: matrix.check == 'build-web'
+        working-directory: apps/web
+        run: bun run blog:chrome:check
 
       - name: Verify standalone API on Alpine Linux
         if: matrix.check == 'build-api'

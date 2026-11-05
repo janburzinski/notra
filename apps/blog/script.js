@@ -1,14 +1,4 @@
-// Navbar behaviour from usenotra.com: the floating navbar on the blog index gains its background
-// once the page scrolls, the theme button flips light and dark (stored like next-themes on the
-// main site), and D, L and S toggle the theme, sign in and sign up.
-const root = document.documentElement;
-const nav = document.querySelector('.notra-nav[data-page="index"]');
-
-if (nav) {
-  const update = () => nav.toggleAttribute("data-scrolled", window.scrollY > 8);
-  update();
-  window.addEventListener("scroll", update, { passive: true });
-}
+// The navbar, theme toggle, hotkeys and dither backgrounds come from scripts/web-chrome.js.
 
 // Diagram flow animations play once, when the diagram scrolls into view.
 const diagrams = document.querySelectorAll("[data-diagram]");
@@ -69,47 +59,5 @@ window.addEventListener("pagereveal", (event) => {
       cardTitle(pathOf(window.navigation?.activation?.from?.url)),
       "post-title"
     );
-  }
-});
-
-const toggleTheme = () => {
-  const next = root.classList.contains("dark") ? "light" : "dark";
-  root.classList.toggle("dark", next === "dark");
-  root.classList.toggle("c15t-dark", next === "dark");
-  root.dataset.themeMode = next;
-  localStorage.setItem(root.dataset.themeStorageKey || "theme", next);
-};
-
-for (const button of document.querySelectorAll("[data-theme-toggle]")) {
-  button.addEventListener("click", toggleTheme);
-}
-
-document.addEventListener("keydown", (event) => {
-  if (
-    event.defaultPrevented ||
-    event.repeat ||
-    event.metaKey ||
-    event.ctrlKey ||
-    event.altKey
-  ) {
-    return;
-  }
-  const target = event.target;
-  if (
-    target instanceof HTMLElement &&
-    (target.isContentEditable || target.closest("input, textarea, select"))
-  ) {
-    return;
-  }
-  const key = event.key.toLowerCase();
-  if (key === "d") {
-    toggleTheme();
-    return;
-  }
-  const link = document.querySelector(
-    `.notra-nav-actions [data-hotkey="${key}"]`
-  );
-  if (link instanceof HTMLAnchorElement) {
-    window.location.assign(link.href);
   }
 });

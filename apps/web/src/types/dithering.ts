@@ -63,3 +63,7 @@ interface DitherPointerState extends DitherPointerOffset {
 export interface DitherPointerResult extends DitherPointerState {
   pointerProps: DitherPointerHandlers;
 }
+
+export interface BlogCardDitherProps {
+  slug: string;
+}

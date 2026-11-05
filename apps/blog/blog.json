@@ -14,10 +14,8 @@
     "heading": {
       "family": "Satoshi",
       "source": "/fonts/satoshi.woff2",
-      "format": "woff2",
-      "weight": 500
-    },
-    "body": { "family": "Inter" }
+      "format": "woff2"
+    }
   },
   "background": { "color": { "light": "#FFFFFF", "dark": "#131316" } },
   "styling": {
@@ -41,7 +39,7 @@
       "cover": false
     }
   },
-  "metadata": { "dateFormat": "long" },
+  "metadata": { "dateFormat": "long", "timestamp": true },
   "authors": {
     "dominik": {
       "name": "Dominik Koch",
@@ -101,5 +99,6 @@
       "backendURL": "https://notra-prod-notra.inth.app",
       "crossSubdomain": true
     }
-  }
+  },
+  "security": { "allowedOrigins": ["https://app.usenotra.com"] }
 }

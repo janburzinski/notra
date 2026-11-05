@@ -6,12 +6,27 @@ The source of [usenotra.com/blog](https://www.usenotra.com/blog), hosted on Notr
 | --- | --- |
 | `blog/*.mdx` | Posts. Frontmatter: `title`, `description`, `date`, `updated`, `author`, optional `image` and `hidden` |
 | `blog.json` | Site settings: authors, colors, fonts, layout, consent banner |
-| `header.mdx`, `footer.mdx`, `style.css`, `script.js` | The usenotra.com navbar and footer |
+| `header.mdx`, `footer.mdx`, `style.css`, `script.js` | The footer, the navbar fallback, diagram animations and page transitions |
+| `scripts/web-chrome.js` | Generated: the real usenotra.com navbar and Paper dither backgrounds (see below) |
 | `slots/` | The index hero and the call to action under every post |
 | `snippets/` | React components for posts (they may only import from `react`) |
 | `public/` | Images and fonts, served from `/blog/...` |
 
 Until usenotra.com/blog is served from here, the old blog in `apps/web/src/content/blog` still exists. Add every new post to both folders (CI checks it), with `updatedAt` renamed to `updated`.
+
+## Navbar and dither backgrounds
+
+`scripts/web-chrome.js` is built from `apps/web`, so the navbar, its menus and the dither backgrounds stay identical to usenotra.com. Every element marked `data-notra-web="navbar"`, `"hero-dither"`, `"cta-dither"` or `"footer-dither"` gets the matching component, and post cards get theirs automatically. Each renders in its own Shadow DOM, so its styles and the blog's never mix. Until the script runs (or without JavaScript), the static navbar in `header.mdx` shows.
+
+After changing the navbar or a dither component in `apps/web` or `packages/ui`, regenerate the bundle and commit it. CI fails while it is out of date:
+
+```bash
+cd apps/web && bun run blog:chrome
+```
+
+The same command writes `public/licenses/web-chrome.txt`, with the licenses and NOTICE files of every package in the bundle. The bundle's header points to it.
+
+## Preview
 
 Preview locally with live reload:
 
