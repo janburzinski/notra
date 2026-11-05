@@ -86,7 +86,7 @@ function requestedWeights(
   ];
   const families = new Map<string, (number | undefined)[]>();
   for (const { spec, weights } of uses) {
-    if (spec?.family && !spec.source) {
+    if (spec?.family && !spec.source && !spec.faces) {
       families.set(spec.family, [
         ...(families.get(spec.family) ?? []),
         ...weights,

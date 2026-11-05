@@ -85,7 +85,8 @@ See [Design and CSS](/sites/customize/design).
 | `fonts.weight` | 100 to 900 | `400` | Body text weight |
 | `fonts.source` | Path | | Your own font file |
 | `fonts.format` | `"woff2" \| "woff"` | `"woff2"` | Format of `source` |
-| `fonts.heading`, `fonts.body` | `{ family, weight?, source?, format? }` | | A separate font for headings or body text, where `heading.weight` sets heading weight (default `500`) |
+| `fonts.faces` | Up to 12 `{ source, weight?, style?, format? }` | | More files of the font, such as other weights or italics, where `weight` is a number or a range like `"100 900"`. See [details](/sites/customize/design#several-files-of-one-font) |
+| `fonts.heading`, `fonts.body` | `{ family, weight?, source?, format?, faces? }` | | A separate font for headings or body text, where `heading.weight` sets heading weight (default `500`) |
 | `background.decoration` | `"none" \| "grid" \| "dots" \| "gradient"` | `"none"` | Page decoration |
 | `background.color` | `{ light?, dark? }` Colors | | Page color per mode |
 | `background.image` | Path, or `{ light, dark }` | | Page background image |

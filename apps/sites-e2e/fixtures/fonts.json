@@ -1,0 +1,13 @@
+{
+  "body": {
+    "family": "E2E Text",
+    "weight": 400,
+    "source": "/fonts/e2e-text-400.woff2",
+    "faces": [{ "weight": 600, "source": "/fonts/e2e-text-600.woff2" }]
+  },
+  "heading": {
+    "family": "E2E Display",
+    "weight": 600,
+    "faces": [{ "weight": 600, "source": "/fonts/e2e-text-600.woff2" }]
+  }
+}

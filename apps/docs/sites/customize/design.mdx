@@ -69,6 +69,31 @@ To use your own font file, put it in `public/` and point `source` at it:
 
 `weight` is a number from 100 to 900: `heading.weight` sets how bold titles and headings are (500 by default), and `weight` or `body.weight` sets the body text. Pick a weight the font has, because the browser fakes bold for a font that only comes in 400, like Instrument Serif. `format` is `woff2` (default) or `woff`, while code always uses the system's monospace font.
 
+### Several files of one font
+
+A font often comes as one file per weight, plus italics. List the other files in `faces`, which works on `fonts`, `heading` and `body`:
+
+```json blog.json
+"fonts": {
+  "heading": {
+    "family": "Acme Display",
+    "weight": 500,
+    "faces": [
+      { "source": "/fonts/acme-display-light.woff2", "weight": 300 },
+      { "source": "/fonts/acme-display-regular.woff2", "weight": 400 },
+      { "source": "/fonts/acme-display-medium.woff2", "weight": 500 },
+      { "source": "/fonts/acme-display-italic.woff2", "weight": 400, "style": "italic" }
+    ]
+  }
+}
+```
+
+Each face has a `source`, plus an optional `weight`, `style` (`normal` or `italic`) and `format`, which defaults to the font's `format`. For a variable font, give its range, like `"weight": "100 900"`, and use `weight` on the font itself for the weight your text uses. A face without a `weight` covers every weight. With `faces`, `source` on the font itself is optional, and a font with `faces` or `source` is never downloaded from Google Fonts.
+
+### Loading
+
+Notra preloads the `woff2` file your body text and headings use when it's in `public/`, so text appears in your font sooner. While a font loads, the browser shows Arial resized to take the same space as your font, so text keeps its size and line breaks when your font arrives. Notra measures your font files during the build to set this up, for your own files and downloaded Google Fonts. If a file can't be measured, the build warns and text shows in the default fallback font while yours loads.
+
 ## Background
 
 | Setting | Values |

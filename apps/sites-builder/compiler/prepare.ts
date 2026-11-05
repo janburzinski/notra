@@ -16,6 +16,7 @@ import type {
   PrepareSiteParams,
   SiteFiles,
 } from "./types/source";
+import { siteFontFallbacks } from "./utils/font-fallbacks";
 import { listFiles, writeFileEnsured } from "./utils/fs";
 import { prepareSiteFonts } from "./utils/site-fonts";
 
@@ -183,12 +184,19 @@ export async function prepareSite(
     )
   );
   const fonts = await prepareSiteFonts(validation.config, params.workDir);
-  validation.diagnostics.push(...fonts.diagnostics);
+  const fallbacks = await siteFontFallbacks(validation.config, {
+    siteRoot: params.siteRoot,
+    workDir: params.workDir,
+    publicFiles: new Set(publicFiles),
+    stylesheet: fonts.stylesheet,
+  });
+  validation.diagnostics.push(...fonts.diagnostics, ...fallbacks.diagnostics);
   return {
     validation,
     collectDiagnostics: collected.diagnostics,
     publicFiles: [...publicFiles, ...fonts.publicFiles],
     customScripts,
     fontStylesheet: fonts.stylesheet,
+    fontFallbacks: fallbacks.fallbacks,
   };
 }

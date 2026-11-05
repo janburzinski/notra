@@ -189,6 +189,7 @@ export async function buildSite(
       workDir,
       publicFiles: publicFileList,
       fontStylesheet: prepared.fontStylesheet,
+      fontFallbacks: prepared.fontFallbacks,
       mounts,
       config,
       hasReactComponents: hasReactComponents(prepared.validation.outputs),

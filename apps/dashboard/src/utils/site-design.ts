@@ -239,7 +239,11 @@ function fontFormat(font: SiteFontSpecForm): SiteFontFormat {
   return /\.woff(?:[?#]|$)/i.test(font.source) ? "woff" : "woff2";
 }
 
-function writeFontSpec(font: SiteFontSpecForm): SiteRawConfig | undefined {
+/** `faces` lists more files of the same family, so they stay while the family does. */
+function writeFontSpec(
+  font: SiteFontSpecForm,
+  previous: unknown
+): SiteRawConfig | undefined {
   const family = font.family.trim();
   if (!family) {
     return undefined;
@@ -250,6 +254,10 @@ function writeFontSpec(font: SiteFontSpecForm): SiteRawConfig | undefined {
   if (source) {
     spec.source = source;
     spec.format = fontFormat(font);
+  }
+  const kept = record(previous);
+  if (text(kept.family) === family && Array.isArray(kept.faces)) {
+    spec.faces = kept.faces;
   }
   return spec;
 }
@@ -588,7 +596,11 @@ function patchFonts(
     const weightOnly = form.font.weight
       ? { weight: Number(form.font.weight) }
       : undefined;
-    assign(config, "fonts", writeFontSpec(form.font) ?? weightOnly);
+    assign(
+      config,
+      "fonts",
+      writeFontSpec(form.font, config.fonts) ?? weightOnly
+    );
     return;
   }
   const fonts: SiteRawConfig = { ...record(config.fonts) };
@@ -597,7 +609,7 @@ function patchFonts(
       form.typographyMode !== initial.typographyMode ||
       changed(form, initial, [role])
     ) {
-      assign(fonts, role, writeFontSpec(form[role]));
+      assign(fonts, role, writeFontSpec(form[role], fonts[role]));
     }
   }
   assignObject(config, "fonts", fonts);

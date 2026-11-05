@@ -2,6 +2,8 @@ import type { SiteValidationResult } from "@notra/sites-compiler/types/validate"
 import type { SiteDiagnostic } from "@notra/sites-core/types/build";
 import type { SiteConfig } from "@notra/sites-core/types/site-config";
 
+import type { FontFallback } from "../../src/types/theme";
+
 export interface SiteSourceFile {
   path: string;
   size: number;
@@ -37,6 +39,7 @@ export interface PreparedSite {
   publicFiles: string[];
   customScripts: PreparedCustomScript[];
   fontStylesheet?: string;
+  fontFallbacks?: FontFallback[];
 }
 
 export type Inspected =

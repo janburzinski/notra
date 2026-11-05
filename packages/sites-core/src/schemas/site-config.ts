@@ -4,6 +4,8 @@ import {
   SITE_AUTHOR_ID,
   SITE_DEFAULT_APPEARANCE_STORAGE_KEY,
   SITE_DEFAULT_PRIMARY_COLOR,
+  SITE_FONT_FACES_MAX,
+  SITE_FONT_WEIGHT_RANGE,
   SITE_HEX_COLOR,
   SITE_LINK_HREF,
 } from "@notra/sites-core/constants/site-config";
@@ -61,11 +63,42 @@ const imageByModeSchema = z.object({
   dark: sitePathSchema,
 });
 
+const fontWeightSchema = z.number().int().min(100).max(900);
+const fontFormatSchema = z.enum(["woff", "woff2"]);
+
+const fontFileSchema = z.strictObject({
+  source: z.string().trim().min(1),
+  weight: z
+    .union([
+      fontWeightSchema,
+      z
+        .string()
+        .regex(
+          SITE_FONT_WEIGHT_RANGE,
+          'Use a weight like 500 or a range like "100 900"'
+        ),
+    ])
+    .optional()
+    .describe(
+      'The weight in this file, or a range like "100 900" for a variable font. Defaults to the full range.'
+    ),
+  style: z.enum(["normal", "italic"]).optional(),
+  format: fontFormatSchema.optional(),
+});
+
 const fontSpecSchema = z.object({
   family: z.string().trim().min(1).max(80),
-  weight: z.number().int().min(100).max(900).optional(),
+  weight: fontWeightSchema.optional(),
   source: z.string().trim().min(1).optional(),
-  format: z.enum(["woff", "woff2"]).optional(),
+  format: fontFormatSchema.optional(),
+  faces: z
+    .array(fontFileSchema)
+    .min(1)
+    .max(SITE_FONT_FACES_MAX)
+    .optional()
+    .describe(
+      "More files of the same family, such as other weights or italics."
+    ),
 });
 
 const appearanceSchema = z

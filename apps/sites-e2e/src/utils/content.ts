@@ -141,6 +141,50 @@ export async function assertContentFeatures(
   );
   checks.push("global style.css and script.js apply under the CSP");
 
+  // fixtures/fonts.json: two self-hosted families, one with an extra face.
+  const fonts = await page.evaluate(async () => {
+    await document.fonts.ready;
+    await document.fonts.load('600 1em "E2E Text"');
+    const faces = [...document.fonts].map((face) => ({
+      name: `${face.family.replaceAll('"', "")} ${face.weight}`,
+      status: face.status,
+      // Chromium exposes the descriptor; TypeScript's DOM types don't yet.
+      sizeAdjust: (face as FontFace & { sizeAdjust?: string }).sizeAdjust,
+    }));
+    const preloads = document.querySelectorAll<HTMLLinkElement>(
+      'link[rel="preload"][as="font"]'
+    );
+    return {
+      faces,
+      preloads: [...preloads].map(
+        (link) =>
+          `${new URL(link.href).pathname} ${link.type} ${link.crossOrigin}`
+      ),
+      body: getComputedStyle(document.body).fontFamily,
+    };
+  });
+  const faces = JSON.stringify(fonts.faces);
+  for (const name of ["E2E Text 400", "E2E Text 600", "E2E Display 600"]) {
+    const face = fonts.faces.find((item) => item.name === name);
+    assert.equal(face?.status, "loaded", `${name} loads: ${faces}`);
+  }
+  assert.deepEqual(
+    fonts.preloads,
+    ["400", "600"].map(
+      (weight) => `/blog/fonts/e2e-text-${weight}.woff2 font/woff2 anonymous`
+    )
+  );
+  for (const family of ["E2E Text Fallback", "E2E Display Fallback"]) {
+    const { sizeAdjust = "" } =
+      fonts.faces.find((item) => item.name.startsWith(family)) ?? {};
+    assert.match(sizeAdjust, /^\d+(?:\.\d+)?%$/, `${family}: ${faces}`);
+    assert.notEqual(sizeAdjust, "100%", family);
+  }
+  assert.match(fonts.body, /^"E2E Text", "E2E Text Fallback", /);
+  checks.push(
+    "self-hosted font faces load, are preloaded and get sized fallbacks"
+  );
+
   assert.deepEqual(await siteCssAsset(page), {
     path: "/blog/images/e2e-css-asset.png",
     status: 200,

@@ -68,6 +68,10 @@ async function compileWith(
     const configPath = join(source, "blog.json");
     const config = JSON.parse(await readFile(configPath, "utf8"));
     config.integrations = integrations;
+    // Self-hosted faces for both roles; the files are in fixtures/site/public.
+    config.fonts = JSON.parse(
+      await readFile(join(root, "apps/sites-e2e/fixtures/fonts.json"), "utf8")
+    );
     await writeFile(configPath, JSON.stringify(config));
     const target = siteBuildRequestSchema.parse({
       ...JSON.parse(

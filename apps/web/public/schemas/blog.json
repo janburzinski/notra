@@ -143,6 +143,45 @@
           "type": "string",
           "enum": ["woff", "woff2"]
         },
+        "faces": {
+          "description": "More files of the same family, such as other weights or italics.",
+          "minItems": 1,
+          "maxItems": 12,
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "source": {
+                "type": "string",
+                "minLength": 1
+              },
+              "weight": {
+                "description": "The weight in this file, or a range like \"100 900\" for a variable font. Defaults to the full range.",
+                "anyOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 100,
+                    "maximum": 900
+                  },
+                  {
+                    "type": "string",
+                    "pattern": "^(?:[1-8]\\d\\d|900) (?:[1-8]\\d\\d|900)$"
+                  }
+                ]
+              },
+              "style": {
+                "type": "string",
+                "enum": ["normal", "italic"]
+              },
+              "format": {
+                "type": "string",
+                "enum": ["woff", "woff2"]
+              }
+            },
+            "required": ["source"],
+            "additionalProperties": false
+          }
+        },
         "heading": {
           "type": "object",
           "properties": {
@@ -163,6 +202,45 @@
             "format": {
               "type": "string",
               "enum": ["woff", "woff2"]
+            },
+            "faces": {
+              "description": "More files of the same family, such as other weights or italics.",
+              "minItems": 1,
+              "maxItems": 12,
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "source": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "weight": {
+                    "description": "The weight in this file, or a range like \"100 900\" for a variable font. Defaults to the full range.",
+                    "anyOf": [
+                      {
+                        "type": "integer",
+                        "minimum": 100,
+                        "maximum": 900
+                      },
+                      {
+                        "type": "string",
+                        "pattern": "^(?:[1-8]\\d\\d|900) (?:[1-8]\\d\\d|900)$"
+                      }
+                    ]
+                  },
+                  "style": {
+                    "type": "string",
+                    "enum": ["normal", "italic"]
+                  },
+                  "format": {
+                    "type": "string",
+                    "enum": ["woff", "woff2"]
+                  }
+                },
+                "required": ["source"],
+                "additionalProperties": false
+              }
             }
           },
           "required": ["family"]
@@ -187,6 +265,45 @@
             "format": {
               "type": "string",
               "enum": ["woff", "woff2"]
+            },
+            "faces": {
+              "description": "More files of the same family, such as other weights or italics.",
+              "minItems": 1,
+              "maxItems": 12,
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "source": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "weight": {
+                    "description": "The weight in this file, or a range like \"100 900\" for a variable font. Defaults to the full range.",
+                    "anyOf": [
+                      {
+                        "type": "integer",
+                        "minimum": 100,
+                        "maximum": 900
+                      },
+                      {
+                        "type": "string",
+                        "pattern": "^(?:[1-8]\\d\\d|900) (?:[1-8]\\d\\d|900)$"
+                      }
+                    ]
+                  },
+                  "style": {
+                    "type": "string",
+                    "enum": ["normal", "italic"]
+                  },
+                  "format": {
+                    "type": "string",
+                    "enum": ["woff", "woff2"]
+                  }
+                },
+                "required": ["source"],
+                "additionalProperties": false
+              }
             }
           },
           "required": ["family"]

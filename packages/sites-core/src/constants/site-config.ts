@@ -7,3 +7,6 @@ export const SITE_AUTHOR_AVATAR = /^(?:\/(?!\/)|https:\/\/)/;
 export const SITE_DEFAULT_PRIMARY_COLOR = "#8B5CF6";
 export const SITE_APPEARANCE_STORAGE_KEY = /^[A-Za-z0-9._-]{1,64}$/;
 export const SITE_DEFAULT_APPEARANCE_STORAGE_KEY = "notra-theme";
+// Two CSS font weights from 100 to 900, the range a variable font file covers.
+export const SITE_FONT_WEIGHT_RANGE = /^(?:[1-8]\d\d|900) (?:[1-8]\d\d|900)$/;
+export const SITE_FONT_FACES_MAX = 12;
