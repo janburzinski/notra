@@ -31,19 +31,26 @@ export async function assertConsentVisits(options: {
   const { page, context, origin, ingest, settle } = options;
   const landing = `${origin}/blog/hello-world?utm_source=newsletter`;
   const next = `${origin}/blog`;
+  // The rejecting visitor reads other pages. A time-on-page beacon from a
+  // granted page can reach ingest after any wait, and the ingest buffer is
+  // shared with the run's other sites, so a measurement is told apart by the
+  // site and page it reports, not by when it arrives.
+  const rejectedLanding = `${origin}/blog/2026/launch?utm_source=newsletter`;
+  const rejectedNext = `${origin}/changelog`;
+  const { host } = new URL(origin);
+  const measured = (from: number, pages: string[]) =>
+    ingest.slice(from).filter((event) => {
+      if (!isEngagement(event)) {
+        return false;
+      }
+      const url = new URL(String(event.body.url));
+      return (
+        url.host === host &&
+        pages.some((pageUrl) => new URL(pageUrl).pathname === url.pathname)
+      );
+    });
   const viewBeacons: string[] = [];
-  // Every time-on-page beacon carries the random ID of the page view that sent
-  // it. Rejected pages never load the script, so their IDs cannot appear.
-  const grantedViews = new Set<string>();
   page.on("request", (request) => {
-    const body = request.postData();
-    if (
-      request.url().endsWith(`/${SITE_ANALYTICS_EVENT_FILE}`) &&
-      request.method() === "POST" &&
-      body?.includes('"v":')
-    ) {
-      grantedViews.add(String(JSON.parse(body).v));
-    }
     if (isViewBeacon(request.url(), request.method(), request.postData())) {
       viewBeacons.push(request.postData() ?? "");
     }
@@ -97,28 +104,15 @@ export async function assertConsentVisits(options: {
   // period, so wait for one from a granted page instead.
   for (
     let waited = 0;
-    waited < 15_000 &&
-    !ingest
-      .slice(from)
-      .some(
-        (event) =>
-          isEngagement(event) && grantedViews.has(String(event.body.viewId))
-      );
+    waited < 15_000 && measured(from, [landing, next]).length === 0;
     waited += 100
   ) {
     await new Promise((resolveWait) => setTimeout(resolveWait, 100));
   }
   assert.ok(
-    ingest
-      .slice(from)
-      .some(
-        (event) =>
-          isEngagement(event) && grantedViews.has(String(event.body.viewId))
-      ),
+    measured(from, [landing, next]).length > 0,
     "time on page is measured after the grant"
   );
-  // Frozen here, so a beacon from a rejected page is never excused.
-  const granted = new Set(grantedViews);
 
   await context.clearCookies();
   await page.evaluate(() => {
@@ -127,28 +121,24 @@ export async function assertConsentVisits(options: {
   });
   from = ingest.length;
   const beaconsBefore = viewBeacons.length;
-  await page.goto(landing, { referer: SEARCH_REFERRER });
+  await page.goto(rejectedLanding, { referer: SEARCH_REFERRER });
   await page
     .getByRole("button", { name: /reject/i })
     .first()
     .click();
   await page.waitForFunction(() => document.cookie.includes("c15t="));
-  await page.goto(next, { referer: landing });
+  await page.goto(rejectedNext, { referer: rejectedLanding });
   await page.evaluate(() => window.dispatchEvent(new Event("pagehide")));
   await settle();
   assert.deepEqual(views(from), [
-    [landing, false, SEARCH_REFERRER],
-    [next, false, landing],
+    [rejectedLanding, false, SEARCH_REFERRER],
+    [rejectedNext, false, rejectedLanding],
   ]);
   assert.equal(viewBeacons.length, beaconsBefore, "a rejection sends no view");
-  // Late beacons from the granted pages above may still arrive here.
+  // Late beacons from the granted pages above may still arrive here; they
+  // report the granted pages, so they are not counted against the rejection.
   assert.equal(
-    ingest
-      .slice(from)
-      .filter(
-        (event) =>
-          isEngagement(event) && !granted.has(String(event.body.viewId))
-      ).length,
+    measured(from, [rejectedLanding, rejectedNext]).length,
     0,
     "a rejection measures no time on page"
   );
