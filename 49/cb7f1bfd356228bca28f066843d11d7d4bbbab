@@ -1,0 +1,24 @@
+apps/dashboard/src/components/mcp/mcp-setup.tsx
+  s_14577166ebb65c::t_8f031def057aab 1-31,33-117,119-134
+apps/dashboard/src/constants/mcp-analytics.ts
+  s_14577166ebb65c::t_e586850ca23f5e 76-78
+apps/dashboard/src/components/mcp/mcp-empty.tsx
+  s_14577166ebb65c::t_6b832d92903452 1-17,19-33
+  s_14577166ebb65c::t_5530dd126cbef9 18
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "49cb7f1bfd356228bca28f066843d11d7d4bbbab",
+  "prompts": {},
+  "sessions": {
+    "s_14577166ebb65c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e58e1a76-a8e6-47bd-aea7-8349a51f1b21",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
