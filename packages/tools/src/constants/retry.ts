@@ -15,6 +15,27 @@ export const RETRYABLE_NETWORK_ERROR_CODES: ReadonlySet<string> = new Set([
   "ETIMEDOUT",
 ]);
 
+// Codes fetch puts on a network failure: Bun on the TypeError itself, Node's
+// undici on its cause. Other coded TypeErrors, such as ERR_INVALID_URL, are
+// bugs that a retry cannot fix.
+export const FETCH_NETWORK_ERROR_CODES: ReadonlySet<string> = new Set([
+  "ECONNABORTED",
+  "ECONNREFUSED",
+  "ECONNRESET",
+  "EAI_AGAIN",
+  "EHOSTUNREACH",
+  "ENETDOWN",
+  "ENETUNREACH",
+  "ENOTFOUND",
+  "EPIPE",
+  "ETIMEDOUT",
+  "UND_ERR_BODY_TIMEOUT",
+  "UND_ERR_CLOSED",
+  "UND_ERR_CONNECT_TIMEOUT",
+  "UND_ERR_HEADERS_TIMEOUT",
+  "UND_ERR_SOCKET",
+]);
+
 export const RETRYABLE_DATABASE_ERROR_CODES: ReadonlySet<string> = new Set([
   "08000",
   "08001",

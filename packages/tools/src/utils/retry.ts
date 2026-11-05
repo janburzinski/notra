@@ -2,6 +2,7 @@ import { parseRetryAfterMs } from "@notra/utils/retry-after";
 import { Duration, Effect, Schedule } from "effect";
 
 import {
+  FETCH_NETWORK_ERROR_CODES,
   RETRYABLE_DATABASE_ERROR_CODES,
   RETRYABLE_HTTP_STATUS_CODES,
   RETRYABLE_NETWORK_ERROR_CODES,
@@ -38,7 +39,25 @@ export function isTransientError(error: unknown): boolean {
     }
   }
 
-  return error instanceof TypeError;
+  return error instanceof TypeError && isNetworkTypeError(error);
+}
+
+function hasNetworkErrorCode(value: unknown) {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    "code" in value &&
+    typeof value.code === "string" &&
+    FETCH_NETWORK_ERROR_CODES.has(value.code)
+  );
+}
+
+// fetch reports network failures as a TypeError carrying a network code:
+// Bun on the error itself, Node on its cause. A "fetch failed" without one is
+// a permanent refusal such as a blocked port, and any other TypeError is a
+// bug, so retrying them only repeats the paid calls before it.
+function isNetworkTypeError(error: TypeError) {
+  return hasNetworkErrorCode(error) || hasNetworkErrorCode(error.cause);
 }
 
 function retryDelayMs(response: Response) {
