@@ -152,7 +152,8 @@ export function RankingTable({
     {
       key: "rank",
       header: "#",
-      width: "3rem",
+      width: "3.25rem",
+      minWidth: "3.25rem",
       cell: (row) => <MutedText>{row.rank}</MutedText>,
     },
     {
@@ -160,7 +161,7 @@ export function RankingTable({
       header: "Brand",
       width: "1fr",
       minWidth: "8rem",
-      cell: (row) => <Brand domain={row.domain} name={row.name} />,
+      cell: (row) => <Brand domain={row.domain} name={row.name} wrap />,
     },
     {
       key: "topPick",
@@ -234,8 +235,9 @@ export function EngineHeatmap({
       key: "name",
       header: "Brand",
       width: "1fr",
-      minWidth: "8rem",
-      cell: (row) => <Brand domain={row.domain} name={row.name} />,
+      // Two lines of the longest brand name; the table scrolls sideways below this.
+      minWidth: "10.5rem",
+      cell: (row) => <Brand domain={row.domain} name={row.name} wrap />,
     },
     ...engines.map((engine): TableColumn<StateOfAiSearchRankingRow> => ({
       key: engine.id,
@@ -245,7 +247,7 @@ export function EngineHeatmap({
           <span className="sr-only">{engine.label}</span>
         </span>
       ),
-      width: "4.75rem",
+      width: "4.5rem",
       align: "center",
       sortValue: (row) => row.byEngine[engine.id] ?? -1,
       cell: (row) => (

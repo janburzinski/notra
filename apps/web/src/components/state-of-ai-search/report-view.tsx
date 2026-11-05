@@ -37,6 +37,7 @@ import {
 } from "@/components/state-of-ai-search/report-ui";
 import { SourceSheet } from "@/components/state-of-ai-search/source-sheet";
 import {
+  REPORT_APP_CAPTURE_NOTE,
   REPORT_HERO_LOGO_SOURCES,
   REPORT_SURFACE_LIFT,
   STATE_OF_AI_SEARCH_CTA_HEADING,
@@ -52,6 +53,8 @@ import type {
   StateOfAiSearchSummary,
 } from "@/types/state-of-ai-search";
 import {
+  capturedFromApps,
+  engineModelLabel,
   engineNames,
   formatReportDate,
   reportPath,
@@ -291,7 +294,7 @@ export function ReportView({
         {sourcesBlock}
 
         <ReportBlock
-          description="Every prompt is asked to each assistant several times with web search on. A brand's rate is the share of answers that name it, and every assistant counts the same however many answers it gave. Google's AI Overview is checked once per prompt and only where Google showed one. Read the answers shows the first answer from each assistant."
+          description={`Every prompt is asked to each assistant several times with web search on. A brand's rate is the share of answers that name it, and every assistant counts the same however many answers it gave. Google's AI Overview is checked once per prompt and only where Google showed one. Read the answers shows the first answer from each assistant.${capturedFromApps(report) ? ` ${REPORT_APP_CAPTURE_NOTE}` : ""}`}
           title="Method"
         >
           <ReportList
@@ -306,11 +309,7 @@ export function ReportView({
                 key: "model",
                 header: "Model",
                 cell: (engine) => (
-                  <MutedText>
-                    {engine.id === "ai-overview"
-                      ? "Google Search"
-                      : engine.model}
-                  </MutedText>
+                  <MutedText>{engineModelLabel(engine)}</MutedText>
                 ),
               },
               {

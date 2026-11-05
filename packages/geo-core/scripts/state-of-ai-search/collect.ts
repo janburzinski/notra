@@ -6,6 +6,7 @@ import { searchWeb } from "@notra/ai/utils/context-dev";
 import { isRecord } from "@notra/utils/unknown-record";
 import { gateway, generateText, isStepCount, tool } from "ai";
 
+import { extractGrounding } from "../../src/geo/grounding";
 import { isGeoContextEngine } from "../../src/utils/geo-context";
 import { REPORT_CATEGORIES } from "./categories";
 import {
@@ -26,6 +27,7 @@ import {
   assertReportCapture,
   reportCollectionModel,
   reportCitedSources,
+  reportUsesApi,
 } from "./utils/collection";
 import { askReportContext } from "./utils/context";
 import { resolveGroundedSources } from "./utils/grounded-sources";
@@ -62,15 +64,72 @@ async function exists(path: string): Promise<boolean> {
   }
 }
 
-async function askModel(
-  engine: "claude",
+type ApiAnswer = Pick<
+  RawAnswer,
+  "text" | "sources" | "searchQueries" | "billing" | "providerMetadata"
+>;
+
+function askModel(
+  engine: "claude" | "perplexity",
   prompt: string
-): Promise<
-  Pick<
-    RawAnswer,
-    "text" | "sources" | "searchQueries" | "billing" | "providerMetadata"
-  >
-> {
+): Promise<ApiAnswer> {
+  return engine === "perplexity" ? askPerplexity(prompt) : askClaude(prompt);
+}
+
+/** Sonar searches on its own; its citations are the sources, as in 2026-10. */
+async function askPerplexity(prompt: string): Promise<ApiAnswer> {
+  const model = ENGINE_MODELS.perplexity;
+  const result = await generateText({
+    model: gateway(model),
+    instructions: SYSTEM,
+    prompt,
+    maxOutputTokens: MAX_OUTPUT_TOKENS,
+    maxRetries: 3,
+    abortSignal: AbortSignal.timeout(240_000),
+    providerOptions: {
+      gateway: { tags: ["state-of-ai-search"] },
+    },
+  });
+  const text = result.text.trim();
+  if (!text) {
+    throw new Error(`perplexity returned no text (${result.finishReason})`);
+  }
+  const grounding = extractGrounding(result);
+  const body = isRecord(result.response.body) ? result.response.body : {};
+  const searchResults = Array.isArray(body.search_results)
+    ? body.search_results
+    : [];
+  const sources = grounding.sources.map((source) => {
+    const match = searchResults.find(
+      (item) => isRecord(item) && item.url === source.url
+    );
+    return {
+      ...source,
+      title:
+        isRecord(match) && typeof match.title === "string"
+          ? match.title
+          : source.title,
+    };
+  });
+  const metadata = result.providerMetadata ?? {};
+  const perplexityMetadata = isRecord(metadata.perplexity)
+    ? metadata.perplexity
+    : {};
+  const perplexityCost = isRecord(perplexityMetadata.cost)
+    ? Number(perplexityMetadata.cost.totalCost)
+    : Number.NaN;
+  return {
+    text,
+    sources: await resolveGroundedSources(sources),
+    // Perplexity reports citations, not query strings; never invent queries.
+    searchQueries: grounding.queries,
+    billing: await recordBilling("perplexity", model, result, perplexityCost),
+    providerMetadata: metadata,
+  };
+}
+
+async function askClaude(prompt: string): Promise<ApiAnswer> {
+  const engine = "claude";
   const model = ENGINE_MODELS[engine];
   const candidates = new Map<string, RawAnswer["sources"][number]>();
   const contextQueries: string[] = [];
@@ -140,6 +199,30 @@ async function askModel(
   const sources = reportCitedSources([...candidates.values()], text);
   const searchQueries = [...new Set(contextQueries)];
   const stepMetadata = result.steps.map((step) => step.providerMetadata ?? {});
+  return {
+    text,
+    sources: await resolveGroundedSources(sources),
+    searchQueries,
+    billing: await recordBilling(engine, model, result),
+    providerMetadata: {
+      ...result.providerMetadata,
+      steps: stepMetadata,
+      searchProvider: "context.dev",
+    },
+  };
+}
+
+/** Gateway-reported cost (plus BYOK market cost), else a token estimate; appended to the spend ledger. */
+async function recordBilling(
+  engine: "claude" | "perplexity",
+  model: string,
+  result: {
+    steps: readonly { providerMetadata?: Record<string, unknown> }[];
+    totalUsage: { inputTokens?: number; outputTokens?: number };
+  },
+  fallbackCost = Number.NaN
+): Promise<NonNullable<RawAnswer["billing"]>> {
+  const stepMetadata = result.steps.map((step) => step.providerMetadata ?? {});
   const stepCosts = stepMetadata.map((metadata) => {
     const gatewayMetadata = isRecord(metadata.gateway) ? metadata.gateway : {};
     const reportedCost = Number(
@@ -163,20 +246,25 @@ async function askModel(
       successfulProvider.credentialType === "byok";
     return reportedCost + (byok ? Number(gatewayMetadata.marketCost ?? 0) : 0);
   });
-  const reported = stepCosts.length > 0 && stepCosts.every(Number.isFinite);
+  const gatewayReported =
+    stepCosts.length > 0 && stepCosts.every(Number.isFinite);
   const inputTokens = result.totalUsage.inputTokens ?? 0;
   const outputTokens = result.totalUsage.outputTokens ?? 0;
   const price = prices.get(model);
   const estimatedCost =
     inputTokens * Number(price?.input ?? 0) +
     outputTokens * Number(price?.output ?? 0);
+  let cost = estimatedCost;
+  if (gatewayReported) {
+    cost = stepCosts.reduce((sum, stepCost) => sum + stepCost, 0);
+  } else if (Number.isFinite(fallbackCost)) {
+    cost = fallbackCost;
+  }
   const billing = {
-    cost: reported
-      ? stepCosts.reduce((sum, cost) => sum + cost, 0)
-      : estimatedCost,
+    cost,
     inputTokens,
     outputTokens,
-    reported,
+    reported: gatewayReported || Number.isFinite(fallbackCost),
   };
   spend += billing.cost;
   await appendFile(
@@ -187,17 +275,7 @@ async function askModel(
       collectedAt: new Date().toISOString(),
     })}\n`
   );
-  return {
-    text,
-    sources: await resolveGroundedSources(sources),
-    searchQueries,
-    billing,
-    providerMetadata: {
-      ...result.providerMetadata,
-      steps: stepMetadata,
-      searchProvider: "context.dev",
-    },
-  };
+  return billing;
 }
 
 const budget = Math.min(400, Number(process.env.SOAS_BUDGET ?? 400));
@@ -358,7 +436,7 @@ async function main() {
     ...(jobs.some((job) => Object.hasOwn(OLOSTEP_REPORT_ENGINES, job.engine))
       ? ["GEO_OLOSTEP_API_KEY_ENV"]
       : []),
-    ...(jobs.some((job) => job.engine === "claude")
+    ...(jobs.some((job) => reportUsesApi(job.engine))
       ? ["AI_GATEWAY_API_KEY"]
       : []),
     ...(jobs.some(
@@ -390,6 +468,7 @@ async function main() {
       maxOlostepItems: maxItems,
       contextCaptures: contextJobs.length,
       maxContextCaptures: maxContextItems,
+      apiItems: jobs.filter((job) => reportUsesApi(job.engine)).length,
       gatewayBudget: budget,
       credentials: Object.fromEntries(
         required.map((name) => [name, Boolean(process.env[name]?.trim())])
@@ -419,7 +498,10 @@ async function main() {
     );
   }
   await mkdir(dirname(spendPath), { recursive: true });
-  if (jobs.some((job) => job.engine === "claude")) {
+  const apiEngines = new Set(
+    jobs.flatMap((job) => (reportUsesApi(job.engine) ? [job.engine] : []))
+  );
+  if (apiEngines.size > 0) {
     const response = await fetch("https://ai-gateway.vercel.sh/v1/models", {
       signal: AbortSignal.timeout(30_000),
     });
@@ -434,8 +516,10 @@ async function main() {
     for (const model of catalog.data) {
       prices.set(model.id, model.pricing);
     }
-    if (!prices.has(ENGINE_MODELS.claude)) {
-      throw new Error(`Gateway model unavailable: ${ENGINE_MODELS.claude}`);
+    for (const engine of apiEngines) {
+      if (!prices.has(ENGINE_MODELS[engine])) {
+        throw new Error(`Gateway model unavailable: ${ENGINE_MODELS[engine]}`);
+      }
     }
   }
   let done = 0;
@@ -457,7 +541,7 @@ async function main() {
   });
   let skipped = 0;
   const worker = async (job: Job) => {
-    const hold = job.engine === "claude" ? requestReserve.claude : 0;
+    const hold = reportUsesApi(job.engine) ? requestReserve[job.engine] : 0;
     if (hold && spend + reserved + hold > budget) {
       skipped += 1;
       return;
@@ -471,18 +555,17 @@ async function main() {
       const surface = reportCollectionModel(job.engine);
       const contextCapture = isGeoContextEngine(surface);
       const capture = contextCapture ? askReportContext : askReportOlostep;
-      const answer =
-        job.engine === "claude"
-          ? {
-              ...(await askModel(job.engine, job.prompt)),
-              present: true,
-              overview: null,
-            }
-          : await capture(
-              surface,
-              job.prompt,
-              `${job.path}.${contextCapture ? "context" : "olostep"}`
-            );
+      const answer = reportUsesApi(job.engine)
+        ? {
+            ...(await askModel(job.engine, job.prompt)),
+            present: true,
+            overview: null,
+          }
+        : await capture(
+            surface,
+            job.prompt,
+            `${job.path}.${contextCapture ? "context" : "olostep"}`
+          );
       const raw: RawAnswer = {
         category: job.category,
         promptIndex: job.promptIndex,
@@ -536,11 +619,11 @@ async function main() {
     console.log(`Retry round ${round + 1}: ${retry.length} failed answers`);
     await sleep(2000 * 2 ** round);
     await runPool(
-      retry.filter((job) => job.engine === "claude"),
+      retry.filter((job) => reportUsesApi(job.engine)),
       worker
     );
     // Consumer submissions are never retried automatically; review/resume their checkpoints.
-    failures.push(...retry.filter((job) => job.engine !== "claude"));
+    failures.push(...retry.filter((job) => !reportUsesApi(job.engine)));
   }
   failed = failures.length;
   console.log(

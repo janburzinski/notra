@@ -6,7 +6,11 @@ these reports.
 
 ## Providers
 
-- **ChatGPT, Perplexity:** shared Olostep consumer-app parsers.
+- **ChatGPT:** shared Olostep consumer-app parser.
+- **Perplexity:** `perplexity/sonar` through AI Gateway with its own search; its
+  citations are the sources. Olostep's Perplexity parser returned no result for
+  1,061 of 1,199 batches in 2026-11 (each ended after ~22 minutes without an
+  error), so Perplexity stays on the API until that parser is reliable.
 - **Gemini, Google AI Overview:** shared Context.dev browser/DOM capture adapters.
   All consumer captures use US location and English prompts; their underlying
   model is not reported or pinned.
@@ -46,17 +50,23 @@ the corresponding cap.
 Concurrency defaults to four (allowed: 1–16). `SOAS_ONLY`, `SOAS_ENGINES`,
 `SOAS_START`, `SOAS_LIMIT` and `SOAS_SAMPLES` can narrow a run.
 
-The current full plan is **4,920 answers: 2,400 Olostep captures, 1,320 Context
-captures and 1,200 Claude API answers** (up to 6,000 additional Context.dev search requests). After checking provider
+The current full plan is **4,920 answers: 1,200 Olostep captures, 1,320 Context
+captures and 2,400 Gateway API answers (Claude and Perplexity)** (up to 6,000
+additional Context.dev search requests for Claude). After checking provider
 credits and approving that volume, the full collection command is:
 
 ```sh
-SOAS_EDITION=2026-11 SOAS_OLOSTEP_MAX_ITEMS=2400 SOAS_CONTEXT_MAX_ITEMS=1320 \
+SOAS_EDITION=YYYY-MM SOAS_OLOSTEP_MAX_ITEMS=1200 SOAS_CONTEXT_MAX_ITEMS=1320 \
   bun packages/geo-core/scripts/state-of-ai-search/collect.ts
 ```
 
 The Gateway spend guard remains $400 by default; it is not a combined provider
-budget. The full plan was only dry-run, not submitted.
+budget. In 2026-11, Claude cost about $63 and Perplexity about $3.
+
+**2026-11 provenance:** that edition's Gemini and AI Overview answers were
+captured through Olostep's `@olostep/gemini-results` and
+`@olostep/google-ai-overview-results` parsers, not the Context.dev capture above.
+They record the same surface IDs (`google/gemini`, `google/ai-overview`).
 
 Olostep batch IDs are checkpointed alongside answers (`*.json.olostep`), and
 reruns poll those batches rather than resubmitting. A ten-minute wait deadline
@@ -76,6 +86,11 @@ After successful collection, build and validate with the **same edition/root**:
 SOAS_EDITION=2026-11 bun packages/geo-core/scripts/state-of-ai-search/build.ts
 SOAS_EDITION=2026-11 bun packages/geo-core/scripts/state-of-ai-search/validate.ts
 ```
+
+Each category is dated by its last collected answer. Set
+`SOAS_PUBLISHED_AT=YYYY-MM-DD` to give every category the same publication date
+(it may not be earlier than the last answer). 2026-11 was built with
+`SOAS_PUBLISHED_AT=2026-11-04`.
 
 Build writes website JSON; do not run it for a tiny smoke sample intended only for
 verification. It preserves collected model IDs and rejects mixed methods/models

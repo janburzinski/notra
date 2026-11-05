@@ -299,6 +299,115 @@ test("Markdown citation destinations decode entities without matching URL prefix
   ).toEqual([source]);
 });
 
+test("fallback overview keeps captured paragraphs, headings and lists", () => {
+  const text = [
+    "The best host depends on your stack.",
+    "",
+    "1. Frontend Hosting",
+    "",
+    "- Vercel: Best for Next.js.",
+    "- Netlify: All-in-one Jamstack platform.",
+    "",
+    "Tell me more:",
+    "- What is your budget?",
+    "",
+    "1. Pick a region.",
+    "2. Deploy.",
+  ].join("\n");
+  const overview = reportOverviewFallback(
+    {
+      category: "app-hosting",
+      promptIndex: 0,
+      prompt: "best host",
+      engine: "ai-overview",
+      model: "google/ai-overview",
+      sample: 0,
+      collectedAt: "2099-01-01T00:00:00Z",
+      present: true,
+      text,
+      overview: null,
+      sources: [{ url: "https://a.example/", title: "A", domain: "a.example" }],
+    },
+    text
+  );
+  expect(overview.blocks).toEqual([
+    {
+      type: "paragraph",
+      text: "The best host depends on your stack.",
+      refs: [0],
+    },
+    { type: "heading", text: "1. Frontend Hosting" },
+    {
+      type: "list",
+      items: [
+        { text: "Vercel: Best for Next.js.", refs: [] },
+        { text: "Netlify: All-in-one Jamstack platform.", refs: [] },
+      ],
+    },
+    { type: "paragraph", text: "Tell me more:", refs: [] },
+    { type: "list", items: [{ text: "What is your budget?", refs: [] }] },
+    {
+      type: "list",
+      items: [
+        { text: "1. Pick a region.", refs: [] },
+        { text: "2. Deploy.", refs: [] },
+      ],
+    },
+  ]);
+});
+
+test("fallback overview drops source labels only when every list item has one", () => {
+  const text = [
+    "- Supabase Supabase: Full-stack.",
+    "- Neon Bytebase: Serverless.",
+    "- Heroku Postgres Heroku: Beginner-friendly.",
+    "",
+    "Also:",
+    "",
+    "- Crunchy Bridge & Aiven: Managed.",
+    "- Neon: Branching.",
+    "- Railway: Simple.",
+  ].join("\n");
+  const overview = reportOverviewFallback(
+    {
+      category: "postgres",
+      promptIndex: 0,
+      prompt: "best postgres hosting",
+      engine: "ai-overview",
+      model: "google/ai-overview",
+      sample: 0,
+      collectedAt: "2099-01-01T00:00:00Z",
+      present: true,
+      text,
+      overview: null,
+      sources: [
+        {
+          url: "https://www.bytebase.com/",
+          title: null,
+          domain: "bytebase.com",
+        },
+        { url: "https://aiven.io/", title: null, domain: "aiven.io" },
+      ],
+    },
+    text
+  );
+  const lists = overview.blocks.flatMap((block) =>
+    block.type === "list" ? [block.items.map((item) => item.text)] : []
+  );
+  expect(lists).toEqual([
+    [
+      "Supabase: Full-stack.",
+      "Neon: Serverless.",
+      "Heroku Postgres: Beginner-friendly.",
+    ],
+    [
+      "Crunchy Bridge & Aiven: Managed.",
+      "Neon: Branching.",
+      "Railway: Simple.",
+    ],
+  ]);
+});
+
 test("fallback overview sources are reachable through its paragraph citation indexes", () => {
   const answer: RawAnswer = {
     category: "postgres",
@@ -394,8 +503,8 @@ test("Olostep submissions precede capture/poll phases and batch-local item ids d
         SOAS_RAW_ROOT: directory,
         SOAS_ONLY: "postgres",
         SOAS_LIMIT: "1",
-        SOAS_SAMPLES: "1",
-        SOAS_ENGINES: "chatgpt,perplexity,ai-overview",
+        SOAS_SAMPLES: "2",
+        SOAS_ENGINES: "chatgpt,ai-overview",
       },
       encoding: "utf8",
     }
@@ -412,7 +521,7 @@ test("Olostep submissions precede capture/poll phases and batch-local item ids d
   );
   const second = JSON.parse(
     await readFile(
-      join(directory, "2099-01/postgres/perplexity/00-0.json"),
+      join(directory, "2099-01/postgres/chatgpt/00-1.json"),
       "utf8"
     )
   );
@@ -449,8 +558,9 @@ test("five-answer dry run performs no network calls or output writes", async () 
   );
   expect(result.status).toBe(0);
   expect(result.stdout).toContain("5 answers to collect");
-  expect(result.stdout).toContain('"olostepItems":2');
+  expect(result.stdout).toContain('"olostepItems":1');
   expect(result.stdout).toContain('"contextCaptures":2');
+  expect(result.stdout).toContain('"apiItems":2');
   expect(result.stdout).toContain("no network requests");
   expect(await readdir(directory)).toEqual([]);
 });

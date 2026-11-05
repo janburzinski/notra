@@ -20,7 +20,12 @@ import {
   type ReportBrand,
   type ReportCategory,
 } from "./categories";
-import { RAW_ROOT, REPORT_EDITION, type RawAnswer } from "./shared";
+import {
+  RAW_ROOT,
+  REPORT_EDITION,
+  REPORT_PUBLISHED_AT,
+  type RawAnswer,
+} from "./shared";
 import { brandMatchers, firstMention } from "./utils/brand-matching";
 import { reportAnswerModel } from "./utils/collection";
 import { resolveGroundedSources } from "./utils/grounded-sources";
@@ -69,6 +74,21 @@ function cleanAnswer(text: string): string {
     .replace(MARKDOWN_CITATION, "")
     .replace(MARKDOWN_LINK, "$1")
     .replace(BARE_URL, "");
+}
+
+function publishedAt(lastCollectedAt: string | undefined): string {
+  if (REPORT_PUBLISHED_AT !== undefined) {
+    if (
+      !/^\d{4}-\d{2}-\d{2}$/.test(REPORT_PUBLISHED_AT) ||
+      (lastCollectedAt && REPORT_PUBLISHED_AT < lastCollectedAt.slice(0, 10))
+    ) {
+      throw new Error(
+        "SOAS_PUBLISHED_AT must be YYYY-MM-DD and not before the last collected answer"
+      );
+    }
+    return REPORT_PUBLISHED_AT;
+  }
+  return (lastCollectedAt ?? new Date().toISOString()).slice(0, 10);
 }
 
 function percent(part: number, whole: number): number {
@@ -676,10 +696,7 @@ async function buildReport(
     slug: category.slug,
     edition: REPORT_EDITION,
     editionLabel: editionLabel(REPORT_EDITION),
-    publishedAt: (collectedDates.at(-1) ?? new Date().toISOString()).slice(
-      0,
-      10
-    ),
+    publishedAt: publishedAt(collectedDates.at(-1)),
     subject: category.subject,
     noun: category.noun,
     engines,

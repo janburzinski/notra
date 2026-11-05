@@ -1,0 +1,132 @@
+{
+  "slug": "ai-visibility",
+  "edition": "2026-11",
+  "editionLabel": "November 2026",
+  "publishedAt": "2026-11-04",
+  "subject": "AI visibility",
+  "noun": "AI search visibility tool",
+  "engines": [
+    {
+      "id": "chatgpt",
+      "label": "ChatGPT",
+      "model": "openai/chatgpt",
+      "answers": 200,
+      "brandsPerAnswer": 3.9,
+      "sourcesPerAnswer": 4.4
+    },
+    {
+      "id": "claude",
+      "label": "Claude",
+      "model": "anthropic/claude-opus-5.5",
+      "answers": 200,
+      "brandsPerAnswer": 5,
+      "sourcesPerAnswer": 8.6
+    },
+    {
+      "id": "gemini",
+      "label": "Gemini",
+      "model": "google/gemini",
+      "answers": 200,
+      "brandsPerAnswer": 3.7,
+      "sourcesPerAnswer": 7.2
+    },
+    {
+      "id": "perplexity",
+      "label": "Perplexity",
+      "model": "perplexity/sonar",
+      "answers": 200,
+      "brandsPerAnswer": 2.6,
+      "sourcesPerAnswer": 10.5
+    },
+    {
+      "id": "ai-overview",
+      "label": "AI Overview",
+      "model": "google/ai-overview",
+      "answers": 20,
+      "brandsPerAnswer": 3.2,
+      "sourcesPerAnswer": 6.5
+    }
+  ],
+  "leaders": [
+    {
+      "name": "Peec AI",
+      "domain": "peec.ai",
+      "rank": 1,
+      "visibility": 60,
+      "topPick": 18,
+      "ownSiteCited": 11,
+      "byEngine": {
+        "chatgpt": 76,
+        "claude": 83,
+        "gemini": 49,
+        "perplexity": 57,
+        "ai-overview": 35
+      },
+      "delta": null
+    },
+    {
+      "name": "Profound",
+      "domain": "tryprofound.com",
+      "rank": 2,
+      "visibility": 58,
+      "topPick": 21,
+      "ownSiteCited": 8,
+      "byEngine": {
+        "chatgpt": 76,
+        "claude": 84,
+        "gemini": 66,
+        "perplexity": 32,
+        "ai-overview": 35
+      },
+      "delta": null
+    },
+    {
+      "name": "Otterly.AI",
+      "domain": "otterly.ai",
+      "rank": 3,
+      "visibility": 58,
+      "topPick": 13,
+      "ownSiteCited": 7,
+      "byEngine": {
+        "chatgpt": 69,
+        "claude": 76,
+        "gemini": 56,
+        "perplexity": 39,
+        "ai-overview": 50
+      },
+      "delta": null
+    },
+    {
+      "name": "Semrush",
+      "domain": "semrush.com",
+      "rank": 4,
+      "visibility": 57,
+      "topPick": 17,
+      "ownSiteCited": 17,
+      "byEngine": {
+        "chatgpt": 58,
+        "claude": 78,
+        "gemini": 63,
+        "perplexity": 40,
+        "ai-overview": 45
+      },
+      "delta": null
+    },
+    {
+      "name": "Ahrefs",
+      "domain": "ahrefs.com",
+      "rank": 5,
+      "visibility": 41,
+      "topPick": 6,
+      "ownSiteCited": 7,
+      "byEngine": {
+        "chatgpt": 40,
+        "claude": 59,
+        "gemini": 44,
+        "perplexity": 23,
+        "ai-overview": 40
+      },
+      "delta": null
+    }
+  ]
+}

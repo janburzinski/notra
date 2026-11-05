@@ -1,0 +1,132 @@
+{
+  "slug": "postgres",
+  "edition": "2026-11",
+  "editionLabel": "November 2026",
+  "publishedAt": "2026-11-04",
+  "subject": "Postgres",
+  "noun": "Postgres provider",
+  "engines": [
+    {
+      "id": "chatgpt",
+      "label": "ChatGPT",
+      "model": "openai/chatgpt",
+      "answers": 200,
+      "brandsPerAnswer": 4,
+      "sourcesPerAnswer": 3.7
+    },
+    {
+      "id": "claude",
+      "label": "Claude",
+      "model": "anthropic/claude-opus-5.5",
+      "answers": 200,
+      "brandsPerAnswer": 5.7,
+      "sourcesPerAnswer": 6.7
+    },
+    {
+      "id": "gemini",
+      "label": "Gemini",
+      "model": "google/gemini",
+      "answers": 200,
+      "brandsPerAnswer": 4.4,
+      "sourcesPerAnswer": 5.3
+    },
+    {
+      "id": "perplexity",
+      "label": "Perplexity",
+      "model": "perplexity/sonar",
+      "answers": 200,
+      "brandsPerAnswer": 2.6,
+      "sourcesPerAnswer": 10.9
+    },
+    {
+      "id": "ai-overview",
+      "label": "AI Overview",
+      "model": "google/ai-overview",
+      "answers": 18,
+      "brandsPerAnswer": 4.5,
+      "sourcesPerAnswer": 8.5
+    }
+  ],
+  "leaders": [
+    {
+      "name": "Neon",
+      "domain": "neon.com",
+      "rank": 1,
+      "visibility": 82,
+      "topPick": 43,
+      "ownSiteCited": 21,
+      "byEngine": {
+        "chatgpt": 89,
+        "claude": 94,
+        "gemini": 90,
+        "perplexity": 67,
+        "ai-overview": 72
+      },
+      "delta": null
+    },
+    {
+      "name": "Supabase",
+      "domain": "supabase.com",
+      "rank": 2,
+      "visibility": 79,
+      "topPick": 18,
+      "ownSiteCited": 16,
+      "byEngine": {
+        "chatgpt": 86,
+        "claude": 93,
+        "gemini": 88,
+        "perplexity": 59,
+        "ai-overview": 72
+      },
+      "delta": null
+    },
+    {
+      "name": "Amazon RDS",
+      "domain": "aws.amazon.com",
+      "rank": 3,
+      "visibility": 61,
+      "topPick": 21,
+      "ownSiteCited": 11,
+      "byEngine": {
+        "chatgpt": 57,
+        "claude": 76,
+        "gemini": 67,
+        "perplexity": 40,
+        "ai-overview": 67
+      },
+      "delta": null
+    },
+    {
+      "name": "Google Cloud SQL",
+      "domain": "cloud.google.com",
+      "rank": 4,
+      "visibility": 37,
+      "topPick": 1,
+      "ownSiteCited": 10,
+      "byEngine": {
+        "chatgpt": 20,
+        "claude": 56,
+        "gemini": 35,
+        "perplexity": 27,
+        "ai-overview": 50
+      },
+      "delta": null
+    },
+    {
+      "name": "DigitalOcean",
+      "domain": "digitalocean.com",
+      "rank": 5,
+      "visibility": 33,
+      "topPick": 5,
+      "ownSiteCited": 9,
+      "byEngine": {
+        "chatgpt": 22,
+        "claude": 36,
+        "gemini": 41,
+        "perplexity": 18,
+        "ai-overview": 50
+      },
+      "delta": null
+    }
+  ]
+}

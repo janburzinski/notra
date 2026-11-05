@@ -1,12 +1,27 @@
 import {
+  REPORT_APP_SURFACE_LABELS,
   REPORT_BRAND_COLORS,
   REPORT_OTHER_BRAND_COLOR,
   STATE_OF_AI_SEARCH_PATH,
 } from "@/constants/state-of-ai-search";
 import type {
+  StateOfAiSearchEngine,
   StateOfAiSearchEngineId,
   StateOfAiSearchReport,
 } from "@/types/state-of-ai-search";
+
+export function engineModelLabel(engine: StateOfAiSearchEngine): string {
+  if (engine.id === "ai-overview") {
+    return "Google Search";
+  }
+  return REPORT_APP_SURFACE_LABELS[engine.model] ?? engine.model;
+}
+
+export function capturedFromApps(report: StateOfAiSearchReport): boolean {
+  return report.engines.some((engine) =>
+    Object.hasOwn(REPORT_APP_SURFACE_LABELS, engine.model)
+  );
+}
 
 export function reportCategoryPath(slug: string): string {
   return `${STATE_OF_AI_SEARCH_PATH}/${slug}`;

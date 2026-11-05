@@ -12,6 +12,15 @@ export const PROMPTS_PAGE_SIZE = 10;
 export const REPORT_ROW_HEIGHT = 48;
 export const REPORT_LEADER_LOGOS = 3;
 
+/** Consumer apps captured through Olostep, keyed by their recorded surface ID. */
+export const REPORT_APP_SURFACE_LABELS: Record<string, string> = {
+  "openai/chatgpt": "ChatGPT app",
+  "google/gemini": "Gemini app",
+};
+
+export const REPORT_APP_CAPTURE_NOTE =
+  "ChatGPT, Gemini and Google were read from the consumer apps in the US, so their underlying models are not reported. Claude and Perplexity were asked through their APIs with web search. Earlier editions asked every assistant through its API, so changes from those editions are not like-for-like.";
+
 export const REPORT_HERO_LOGO_SOURCES: Record<string, string> = {
   "clerk.com": "/logos/brands/clerk.svg",
   "render.com": "/logos/brands/render.svg",

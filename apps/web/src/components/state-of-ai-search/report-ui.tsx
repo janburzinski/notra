@@ -28,15 +28,25 @@ export function Brand({
   name,
   domain,
   className,
+  wrap = false,
 }: {
   name: string;
   domain: string;
   className?: string;
+  /** Long names take a second line instead of an ellipsis (fits a 48px row). */
+  wrap?: boolean;
 }) {
   return (
     <span className={cn("flex min-w-0 items-center gap-2.5", className)}>
       <CompetitorLogo className={LOGO_OUTLINE} domain={domain} name={name} />
-      <span className="truncate">{name}</span>
+      <span
+        className={
+          wrap ? "line-clamp-2 leading-tight whitespace-normal" : "truncate"
+        }
+        title={name}
+      >
+        {name}
+      </span>
     </span>
   );
 }

@@ -1,0 +1,132 @@
+{
+  "slug": "auth",
+  "edition": "2026-11",
+  "editionLabel": "November 2026",
+  "publishedAt": "2026-11-04",
+  "subject": "Auth",
+  "noun": "auth provider",
+  "engines": [
+    {
+      "id": "chatgpt",
+      "label": "ChatGPT",
+      "model": "openai/chatgpt",
+      "answers": 200,
+      "brandsPerAnswer": 4.2,
+      "sourcesPerAnswer": 3.5
+    },
+    {
+      "id": "claude",
+      "label": "Claude",
+      "model": "anthropic/claude-opus-5.5",
+      "answers": 200,
+      "brandsPerAnswer": 7,
+      "sourcesPerAnswer": 6.4
+    },
+    {
+      "id": "gemini",
+      "label": "Gemini",
+      "model": "google/gemini",
+      "answers": 200,
+      "brandsPerAnswer": 4.6,
+      "sourcesPerAnswer": 7
+    },
+    {
+      "id": "perplexity",
+      "label": "Perplexity",
+      "model": "perplexity/sonar",
+      "answers": 200,
+      "brandsPerAnswer": 2.9,
+      "sourcesPerAnswer": 10.1
+    },
+    {
+      "id": "ai-overview",
+      "label": "AI Overview",
+      "model": "google/ai-overview",
+      "answers": 19,
+      "brandsPerAnswer": 4.3,
+      "sourcesPerAnswer": 7.4
+    }
+  ],
+  "leaders": [
+    {
+      "name": "Clerk",
+      "domain": "clerk.com",
+      "rank": 1,
+      "visibility": 71,
+      "topPick": 32,
+      "ownSiteCited": 36,
+      "byEngine": {
+        "chatgpt": 79,
+        "claude": 91,
+        "gemini": 63,
+        "perplexity": 59,
+        "ai-overview": 63
+      },
+      "delta": null
+    },
+    {
+      "name": "Auth0",
+      "domain": "auth0.com",
+      "rank": 2,
+      "visibility": 68,
+      "topPick": 11,
+      "ownSiteCited": 12,
+      "byEngine": {
+        "chatgpt": 66,
+        "claude": 88,
+        "gemini": 71,
+        "perplexity": 39,
+        "ai-overview": 79
+      },
+      "delta": null
+    },
+    {
+      "name": "Supabase Auth",
+      "domain": "supabase.com",
+      "rank": 3,
+      "visibility": 55,
+      "topPick": 12,
+      "ownSiteCited": 14,
+      "byEngine": {
+        "chatgpt": 65,
+        "claude": 69,
+        "gemini": 55,
+        "perplexity": 43,
+        "ai-overview": 42
+      },
+      "delta": null
+    },
+    {
+      "name": "WorkOS",
+      "domain": "workos.com",
+      "rank": 4,
+      "visibility": 50,
+      "topPick": 15,
+      "ownSiteCited": 31,
+      "byEngine": {
+        "chatgpt": 53,
+        "claude": 68,
+        "gemini": 46,
+        "perplexity": 46,
+        "ai-overview": 37
+      },
+      "delta": null
+    },
+    {
+      "name": "Firebase Authentication",
+      "domain": "firebase.google.com",
+      "rank": 5,
+      "visibility": 36,
+      "topPick": 5,
+      "ownSiteCited": 4,
+      "byEngine": {
+        "chatgpt": 32,
+        "claude": 55,
+        "gemini": 42,
+        "perplexity": 17,
+        "ai-overview": 37
+      },
+      "delta": null
+    }
+  ]
+}

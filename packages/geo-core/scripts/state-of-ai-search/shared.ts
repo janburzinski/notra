@@ -13,6 +13,8 @@ export const REPORT_EDITION =
   process.env.SOAS_EDITION ?? new Date().toISOString().slice(0, 7);
 export const REPORT_TODAY =
   process.env.SOAS_TODAY ?? new Date().toISOString().slice(0, 10);
+/** Publication date for every category; defaults to each category's last collected answer. */
+export const REPORT_PUBLISHED_AT = process.env.SOAS_PUBLISHED_AT;
 
 /** Legacy/API model IDs; new consumer captures record their surface ID instead. */
 export const ENGINE_MODELS: Record<ReportEngine, string> = {

@@ -1,6 +1,7 @@
 import { fromMarkdown } from "mdast-util-from-markdown";
 
 import {
+  API_REPORT_ENGINES,
   CONTEXT_REPORT_ENGINES,
   OLOSTEP_REPORT_ENGINES,
   REPORT_CAPTURE_METHOD,
@@ -47,6 +48,12 @@ export function reportCitedSources(
     }
   }
   return sources.filter((source) => links.has(source.url));
+}
+
+export function reportUsesApi(
+  engine: ReportEngine
+): engine is (typeof API_REPORT_ENGINES)[number] {
+  return (API_REPORT_ENGINES as readonly ReportEngine[]).includes(engine);
 }
 
 export function reportCollectionModel(engine: ReportEngine): string {

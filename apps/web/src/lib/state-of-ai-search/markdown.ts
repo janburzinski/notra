@@ -1,6 +1,7 @@
 import { AUTH_SIGNUP_URL } from "@/constants/auth";
 import { CTA_BANNER_PRIMARY_LABEL } from "@/constants/landing/cta-banner";
 import {
+  REPORT_APP_CAPTURE_NOTE,
   REPORT_LEADER_LOGOS,
   STATE_OF_AI_SEARCH_CTA_HEADING,
   STATE_OF_AI_SEARCH_CTA_SUBCOPY,
@@ -14,6 +15,8 @@ import type {
 } from "@/types/state-of-ai-search";
 import { escapeMarkdownLinkText, markdownSection } from "@/utils/markdown";
 import {
+  capturedFromApps,
+  engineModelLabel,
   engineNames,
   formatPercent,
   formatReportDate,
@@ -162,12 +165,15 @@ function assistantsMarkdown(report: StateOfAiSearchReport): string {
       ],
       report.engines.map((engine) => [
         engine.label,
-        `\`${engine.model}\``,
+        engineModelLabel(engine) === engine.model
+          ? `\`${engine.model}\``
+          : engineModelLabel(engine),
         String(engine.answers),
         String(engine.brandsPerAnswer),
         String(engine.sourcesPerAnswer),
       ])
     ),
+    ...(capturedFromApps(report) ? ["", REPORT_APP_CAPTURE_NOTE] : []),
   ]);
 }
 
