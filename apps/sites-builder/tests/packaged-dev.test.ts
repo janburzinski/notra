@@ -183,7 +183,12 @@ test.each(Object.keys(launchers) as (keyof typeof launchers)[])(
             `http://127.0.0.1:${port}/blog/${slug}`,
             { signal: AbortSignal.timeout(2000) }
           ).catch(() => null);
-          if (response?.ok && (await response.text()).includes(text)) {
+          // The timeout also covers the body, which a cold render can stream
+          // slowly, so a slow read is retried like a refused connection.
+          const body = response?.ok
+            ? await response.text().catch(() => "")
+            : "";
+          if (body.includes(text)) {
             return;
           }
           await Bun.sleep(200);
@@ -300,7 +305,7 @@ test.each(Object.keys(launchers) as (keyof typeof launchers)[])(
         const response = await fetch(url("/newsroom/hello"), {
           signal: AbortSignal.timeout(2000),
         }).catch(() => null);
-        body = response?.ok ? await response.text() : "";
+        body = response?.ok ? await response.text().catch(() => "") : "";
         await Bun.sleep(body ? 0 : 200);
       }
       expect(body).toContain("Newsroom content.");
