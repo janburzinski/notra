@@ -11,7 +11,6 @@ import {
 
 import { NewSitePageSkeleton as NewSiteLoading } from "@/app/(dashboard)/[slug]/sites/new/skeleton";
 import { SitesPageSkeleton as SitesLoading } from "@/app/(dashboard)/[slug]/sites/skeleton";
-import { SitesLiveProvider } from "@/components/providers/sites-live-provider";
 import {
   SiteSectionSkeleton as SiteSectionLoading,
   SiteDeploymentSkeleton as SiteDeploymentLoading,
@@ -25,6 +24,11 @@ import { siteHref, sitePreviewDeploymentsHref } from "@/utils/site-links";
 import { loadSite, loadSiteName } from "./-sites-loaders";
 import { createUiRoute, uiRouteSearch } from "./-ui-route";
 
+const SitesLiveProvider = lazyPage(() =>
+  import("@/components/providers/sites-live-provider").then((module) => ({
+    default: module.SitesLiveProvider,
+  }))
+);
 const SiteLayout = lazyPage(() =>
   import("@/components/sites/site-layout").then((module) => ({
     default: module.SiteLayout,
@@ -56,6 +60,7 @@ export function createSitesUiRoutes(organization: AnyRoute) {
       </SitesLiveProvider>
     );
   }
+  SitesRouteLayout.preload = SitesLiveProvider.preload;
 
   const sites = createRoute({
     getParentRoute: () => organization,

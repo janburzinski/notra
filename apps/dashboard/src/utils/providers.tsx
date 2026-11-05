@@ -26,6 +26,7 @@ import { useIsClient } from "@/lib/hooks/use-is-client";
 import { useUiLabelsTranslations } from "@/lib/i18n/ui-labels";
 import { configureZodLocale } from "@/lib/i18n/zod";
 import dynamic from "@/utils/lazy-component";
+import { isServerFailureError } from "@/utils/orpc-errors";
 
 const ReactQueryDevtools =
   process.env.NODE_ENV === "development"
@@ -76,7 +77,10 @@ function createProviderClients() {
         refetchOnWindowFocus: false,
         refetchOnMount: true,
         refetchOnReconnect: true,
-        retry: 1,
+        // A 4xx (signed out, forbidden, not found) fails the same way again;
+        // retrying it only delayed the error by a second.
+        retry: (failureCount, error) =>
+          failureCount < 1 && isServerFailureError(error),
         retryDelay: (attemptIndex: number) =>
           Math.min(1000 * 2 ** attemptIndex, 30_000),
       },

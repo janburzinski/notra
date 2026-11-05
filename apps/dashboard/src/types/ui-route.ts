@@ -95,6 +95,10 @@ export interface UiModalProviderProps {
   children: ReactNode;
 }
 
+export interface AnalyticsRouteLayoutProps {
+  slug: string;
+}
+
 export interface SiteSectionUiPage {
   section: Exclude<SiteSection, "overview">;
   page: ReturnType<typeof lazyPage>;

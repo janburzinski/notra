@@ -3,7 +3,9 @@ import { Effect } from "effect";
 import { GEO_PAID_CODING_AGENT_ENGINE_IDS } from "../constants/geo";
 import {
   GEO_MODEL_CATALOG_STATIC,
+  GEO_MODEL_FEED_RETRY_SECONDS,
   GEO_MODEL_FEED_REVALIDATE_SECONDS,
+  GEO_MODEL_FEED_TIMEOUT_MS,
   GEO_MODEL_FEED_URL,
   GEO_MODEL_NO_SEARCH_VISIBLE,
 } from "../constants/geo-model-catalog";
@@ -38,12 +40,14 @@ const cachedByCredentials = new Map<
   boolean,
   { catalog: GeoModelCatalog; expiresAt: number }
 >();
+const refreshingByCredentials = new Map<boolean, Promise<GeoModelCatalog>>();
 
 async function fetchGeoModelCatalog(
   requireCredentials: boolean
 ): Promise<GeoModelCatalog> {
   const init: NextRevalidateRequestInit = {
     next: { revalidate: GEO_MODEL_FEED_REVALIDATE_SECONDS },
+    signal: AbortSignal.timeout(GEO_MODEL_FEED_TIMEOUT_MS),
   };
   const response = await fetch(GEO_MODEL_FEED_URL, init);
   if (!response.ok) {
@@ -57,29 +61,54 @@ async function fetchGeoModelCatalog(
   return catalog;
 }
 
+/** One feed request at a time per catalog; concurrent readers share it. */
+function refreshGeoModelCatalog(
+  requireCredentials: boolean
+): Promise<GeoModelCatalog> {
+  const pending = refreshingByCredentials.get(requireCredentials);
+  if (pending) {
+    return pending;
+  }
+  const refresh = fetchGeoModelCatalog(requireCredentials)
+    .then((catalog) => {
+      cachedByCredentials.set(requireCredentials, {
+        catalog,
+        expiresAt:
+          Date.now() + GEO_MODEL_FEED_REVALIDATE_SECONDS * MS_PER_SECOND,
+      });
+      return catalog;
+    })
+    .catch((error: unknown) => {
+      const cached = cachedByCredentials.get(requireCredentials);
+      logGeoFailure(
+        "geo.model_catalog.feed_unavailable",
+        "Model feed unavailable, using seed catalog",
+        error,
+        { hasCachedCatalog: cached !== undefined }
+      );
+      const fallback =
+        cached?.catalog ?? seedGeoModelCatalog(requireCredentials);
+      cachedByCredentials.set(requireCredentials, {
+        catalog: fallback,
+        expiresAt: Date.now() + GEO_MODEL_FEED_RETRY_SECONDS * MS_PER_SECOND,
+      });
+      return fallback;
+    })
+    .finally(() => {
+      refreshingByCredentials.delete(requireCredentials);
+    });
+  refreshingByCredentials.set(requireCredentials, refresh);
+  return refresh;
+}
+
 async function loadSharedGeoModelCatalog(
   requireCredentials: boolean
 ): Promise<GeoModelCatalog> {
-  const cached = cachedByCredentials.get(requireCredentials) ?? null;
+  const cached = cachedByCredentials.get(requireCredentials);
   if (cached && cached.expiresAt > Date.now()) {
     return cached.catalog;
   }
-  try {
-    const catalog = await fetchGeoModelCatalog(requireCredentials);
-    cachedByCredentials.set(requireCredentials, {
-      catalog,
-      expiresAt: Date.now() + GEO_MODEL_FEED_REVALIDATE_SECONDS * MS_PER_SECOND,
-    });
-    return catalog;
-  } catch (error) {
-    logGeoFailure(
-      "geo.model_catalog.feed_unavailable",
-      "Model feed unavailable, using seed catalog",
-      error,
-      { hasCachedCatalog: cached !== null }
-    );
-    return cached?.catalog ?? seedGeoModelCatalog(requireCredentials);
-  }
+  return await refreshGeoModelCatalog(requireCredentials);
 }
 
 export const loadGeoModelCatalog = Effect.fn("geo.modelCatalog")(function* (

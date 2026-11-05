@@ -13,6 +13,9 @@ const findFirst =
 mock.module("@notra/db/drizzle", () => ({
   db: { query: { projects: { findFirst } } },
 }));
+mock.module("@/lib/auth/request-cache", () => ({
+  cacheAuthRequest: <T>(lookup: T) => lookup,
+}));
 mock.module("@/utils/server-cookies", () => ({
   readServerCookies: () => ({}),
 }));

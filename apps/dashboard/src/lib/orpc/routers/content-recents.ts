@@ -7,11 +7,6 @@ import { and, desc, eq, inArray } from "drizzle-orm";
 
 import { baseProcedure, withOrganizationAccess } from "@/lib/orpc/base";
 
-/**
- * Kept out of the content router: GEO and home pages prefetch the sidebar
- * recents on the server, and the full router (GitHub, Linear, S3 publishing)
- * costs far more to load on a cold instance than this query takes to run.
- */
 export const contentRecentsProcedure = baseProcedure
   .input(contentOrganizationIdInputSchema.and(contentRecentsQuerySchema))
   .use(withOrganizationAccess)

@@ -79,10 +79,10 @@ async function findProjectDomain(projectId: string): Promise<string | null> {
 export const loadGeoShelfContext = Effect.fn("geo.shelf.context")(function* (
   input: GeoScopeInput
 ) {
-  const [settingsResponse, competitorsResponse] = yield* Effect.all([
-    loadGeoSettings(input),
-    loadGeoCompetitors(input),
-  ]);
+  const [settingsResponse, competitorsResponse] = yield* Effect.all(
+    [loadGeoSettings(input), loadGeoCompetitors(input)],
+    { concurrency: "unbounded" }
+  );
   const settings = settingsResponse.settings;
   const ownDomain = settings
     ? yield* Effect.promise(() => findProjectDomain(settings.projectId))

@@ -2231,28 +2231,29 @@ export const geoMentionChecks = pgTable(
       table.organizationId,
       table.capturedAt
     ),
-    index("geoMentionChecks_projectId_capturedAt_idx").on(
-      table.projectId,
-      table.capturedAt
-    ),
     index("geoMentionChecks_projectEnginePrompt_idx").on(
       table.projectId,
       table.engine,
       table.promptId,
       table.capturedAt
     ),
-    index("geoMentionChecks_project_captured_cover_idx").on(
+    // Lets most GEO aggregates run index-only instead of reading the wide rows.
+    // `competitors` is unbounded and could exceed the B-tree entry size limit.
+    index("geoMentionChecks_project_captured_agg_idx").on(
       table.projectId,
       table.capturedAt,
       table.organizationId,
       table.language,
       table.engine,
       table.promptId,
+      table.scanId,
+      table.sequenceId,
+      table.personaId,
+      table.turn,
       table.mentioned,
       table.ownedSourceCited,
       table.position,
-      table.sentiment,
-      table.sequenceId
+      table.sentiment
     ),
     index("geoMentionChecks_project_prompt_engine_captured_idx").on(
       table.projectId,

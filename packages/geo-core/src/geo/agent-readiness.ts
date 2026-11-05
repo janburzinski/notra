@@ -271,12 +271,15 @@ export const startAgentReadinessScan = Effect.fn("geo.agentReadiness.start")(
   function* (scope: AgentReadinessScope) {
     const workflows = yield* GeoWorkflowService;
     const claim = yield* Effect.gen(function* () {
-      const [targetUrl, running] = yield* Effect.all([
-        resolveTargetUrl(scope.brandSettingsId),
-        geoDb("read running readiness", () =>
-          latestRunningRow(scope.projectId)
-        ),
-      ]);
+      const [targetUrl, running] = yield* Effect.all(
+        [
+          resolveTargetUrl(scope.brandSettingsId),
+          geoDb("read running readiness", () =>
+            latestRunningRow(scope.projectId)
+          ),
+        ],
+        { concurrency: "unbounded" }
+      );
       if (running && canReuseAgentReadinessScan(running, targetUrl)) {
         return {
           alreadyRunning: true as const,

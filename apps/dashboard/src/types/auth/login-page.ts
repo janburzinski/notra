@@ -5,6 +5,14 @@ export interface LoginPageStart {
   resumeEnrollmentFlowId?: string;
 }
 
+export interface LoginPageProps {
+  data: LoginPageStart & {
+    returnTo?: string;
+    knownErrorKey?: string;
+    initialError?: string;
+  };
+}
+
 export interface SocialEnrollmentResumeProps {
   flowId: string;
   returnTo?: string;

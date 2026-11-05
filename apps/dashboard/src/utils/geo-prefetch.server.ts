@@ -5,9 +5,7 @@ import { dehydrate } from "@tanstack/react-query";
 import { assertOrganizationAccess } from "@/lib/auth/organization";
 import { createORPCContext } from "@/lib/orpc/context";
 import { dashboardOrpc } from "@/lib/orpc/query";
-import { contentRecentsProcedure } from "@/lib/orpc/routers/content-recents";
 import { geoRouter } from "@/lib/orpc/routers/geo";
-import { prefetchRecentPostsQuery } from "@/utils/content-recents-prefetch.server";
 import {
   geoHydrationInputs,
   geoTrafficHydrationInputs,
@@ -35,7 +33,7 @@ async function dehydrateGeoOverview(
   await assertOrganizationAccess({ organizationId, headers: requestHeaders });
   const input = geoHydrationInputs(organizationId, projectId, search);
   const client = createRouterClient(
-    { content: { recents: contentRecentsProcedure }, geo: geoRouter },
+    { geo: geoRouter },
     { context: () => createORPCContext({ headers: requestHeaders }) }
   );
   const queryClient = getGeoServerQueryClient();
@@ -98,13 +96,6 @@ async function dehydrateGeoOverview(
       queryFn: () => client.geo.languageShare(input.languageShare),
     });
   }
-
-  prefetchRecentPostsQuery(
-    queryClient,
-    (recentsInput) => client.content.recents(recentsInput),
-    organizationId,
-    projectId
-  );
 
   return dehydrate(queryClient);
 }

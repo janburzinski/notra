@@ -687,31 +687,34 @@ export const planGeoContentBrief = Effect.fn("geo.writer.plan")(function* (
       ? sourceId
       : null;
 
-  const [brand, settings, gapData, sitemap, evidence] = yield* Effect.all([
-    geoDb("brand identity lookup failed", () =>
-      db.query.brandSettings.findFirst({
-        columns: {
-          name: true,
-          companyName: true,
-          companyDescription: true,
-          audience: true,
-          websiteUrl: true,
-        },
-        where: eq(brandSettings.id, brandSettingsId),
-      })
-    ),
-    geoDb("settings lookup failed", () =>
-      db.query.geoSettings.findFirst({
-        columns: { companyName: true, aliases: true },
-        where: eq(geoSettings.projectId, scope.projectId),
-      })
-    ),
-    loadPlannerGapPrompts(scope.projectId),
-    loadSitemapPages(brandSettingsId, input.sitemapId),
-    evidenceSourceId
-      ? loadPromptEvidence(scope.projectId, evidenceSourceId)
-      : Effect.succeed(null),
-  ]);
+  const [brand, settings, gapData, sitemap, evidence] = yield* Effect.all(
+    [
+      geoDb("brand identity lookup failed", () =>
+        db.query.brandSettings.findFirst({
+          columns: {
+            name: true,
+            companyName: true,
+            companyDescription: true,
+            audience: true,
+            websiteUrl: true,
+          },
+          where: eq(brandSettings.id, brandSettingsId),
+        })
+      ),
+      geoDb("settings lookup failed", () =>
+        db.query.geoSettings.findFirst({
+          columns: { companyName: true, aliases: true },
+          where: eq(geoSettings.projectId, scope.projectId),
+        })
+      ),
+      loadPlannerGapPrompts(scope.projectId),
+      loadSitemapPages(brandSettingsId, input.sitemapId),
+      evidenceSourceId
+        ? loadPromptEvidence(scope.projectId, evidenceSourceId)
+        : Effect.succeed(null),
+    ],
+    { concurrency: "unbounded" }
+  );
 
   const competitorSelection = yield* geoDb("competitors lookup failed", () =>
     selectGeoContextCompetitors(scope, {

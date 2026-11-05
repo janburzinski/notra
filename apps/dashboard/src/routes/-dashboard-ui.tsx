@@ -19,8 +19,6 @@ import FeedbackLoading from "@/app/(dashboard)/[slug]/feedback/loading";
 import DashboardLoading from "@/app/(dashboard)/[slug]/loading";
 import SkillDetailLoading from "@/app/(dashboard)/[slug]/skills/[name]/loading";
 import SkillsLoading from "@/app/(dashboard)/[slug]/skills/loading";
-import { AnalyticsProvider } from "@/components/analytics/analytics-context";
-import { AnalyticsShell } from "@/components/analytics/analytics-shell";
 import { DashboardClientWrapper } from "@/components/dashboard/dashboard-client-wrapper";
 import { GeoCompetitorSheetHost } from "@/components/geo/competitor-sheet-host";
 import { GeoCatalogWarmer } from "@/components/geo/geo-catalog-warmer";
@@ -50,6 +48,7 @@ import { createSitesUiRoutes } from "./-sites-ui";
 import { UiModalProvider } from "./-ui-modal";
 import { createUiRoute, uiRouteSearch } from "./-ui-route";
 
+const AnalyticsRouteLayout = lazyPage(() => import("./-analytics-layout"));
 const Home = lazyPage(() => import("@/app/(dashboard)/[slug]/page-client"));
 const StudioFreeHome = lazyPage(() =>
   import("@/components/dashboard/studio-free-home").then((module) => ({
@@ -142,16 +141,9 @@ export function createDashboardUiRoutes(parent: AnyRoute) {
 
   function AnalyticsLayout() {
     const { slug } = organization.useParams<Router<typeof organization>>();
-    return (
-      <AnalyticsProvider organizationSlug={slug}>
-        <AnalyticsShell>
-          <UiModalProvider>
-            <Outlet />
-          </UiModalProvider>
-        </AnalyticsShell>
-      </AnalyticsProvider>
-    );
+    return <AnalyticsRouteLayout slug={slug} />;
   }
+  AnalyticsLayout.preload = AnalyticsRouteLayout.preload;
 
   function GeoLayout() {
     const { slug } = organization.useParams<Router<typeof organization>>();

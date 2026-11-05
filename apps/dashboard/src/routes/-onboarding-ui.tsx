@@ -6,8 +6,6 @@ import {
 } from "@tanstack/react-router";
 import { Suspense } from "react";
 
-import OnboardingLayout from "@/app/onboarding/layout";
-import { OnboardingSplitLayout } from "@/components/onboarding/split-layout";
 import { OnboardingSplitLayoutContext } from "@/components/onboarding/split-layout-context";
 import { ONBOARDING_STEPS } from "@/constants/analytics-events";
 import { setOnboardingVariant } from "@/lib/analytics/onboarding-funnel";
@@ -23,6 +21,12 @@ import {
 } from "./-onboarding-loaders";
 import { createUiRoute } from "./-ui-route";
 
+const OnboardingLayout = lazyPage(() => import("@/app/onboarding/layout"));
+const OnboardingSplitLayout = lazyPage(() =>
+  import("@/components/onboarding/split-layout").then((module) => ({
+    default: module.OnboardingSplitLayout,
+  }))
+);
 const Workspace = lazyPage(() =>
   import("@/app/onboarding/workspace/workspace-form").then((module) => ({
     default: module.WorkspaceForm,
@@ -58,6 +62,12 @@ export function createOnboardingUiRoutes(parent: AnyRoute) {
       </OnboardingSplitLayoutContext>
     );
   }
+  OnboardingRouteLayout.preload = async () => {
+    await Promise.all([
+      OnboardingLayout.preload(),
+      OnboardingSplitLayout.preload(),
+    ]);
+  };
 
   const onboarding = createRoute({
     getParentRoute: () => parent,

@@ -6,8 +6,8 @@ import {
   GEO_CHECK_AGGREGATE_CACHE,
   GEO_CHECK_AGGREGATE_TAG_PREFIX,
   GEO_CHECK_GENERATION_KEY_PREFIX,
+  GEO_CHECK_GENERATION_SEED_PER_MS,
   GEO_CHECK_GENERATION_TTL_SECONDS,
-  INITIAL_GEO_CHECK_GENERATION,
 } from "../constants/geo-check-cache";
 import type { GeoCheckScope } from "../types/geo-checks";
 
@@ -35,6 +35,12 @@ function generationKey(organizationId: string): string {
   return `${GEO_CHECK_GENERATION_KEY_PREFIX}:${organizationId}`;
 }
 
+// A missing counter (new, expired or evicted) starts above every value it
+// held, so an aggregate cached under an old generation never matches again.
+function generationSeed(): number {
+  return Date.now() * GEO_CHECK_GENERATION_SEED_PER_MS;
+}
+
 const pendingReads = new Map<string, Promise<number | null>>();
 
 function readGeneration(
@@ -45,9 +51,19 @@ function readGeneration(
   if (pending) {
     return pending;
   }
+  const key = generationKey(organizationId);
   const read = redis
-    .get<number>(generationKey(organizationId))
-    .then((generation) => generation ?? INITIAL_GEO_CHECK_GENERATION)
+    .get<number>(key)
+    .then(async (generation) => {
+      if (generation !== null) {
+        return generation;
+      }
+      await redis.set(key, generationSeed(), {
+        nx: true,
+        ex: GEO_CHECK_GENERATION_TTL_SECONDS,
+      });
+      return await redis.get<number>(key);
+    })
     .catch(() => null)
     .finally(() => pendingReads.delete(organizationId));
   pendingReads.set(organizationId, read);
@@ -91,7 +107,12 @@ export async function bumpGeoCheckGeneration(
     return;
   }
   const pipeline = redis.pipeline();
+  const seed = generationSeed();
   for (const organizationId of ids) {
+    pipeline.set(generationKey(organizationId), seed, {
+      nx: true,
+      ex: GEO_CHECK_GENERATION_TTL_SECONDS,
+    });
     pipeline.incr(generationKey(organizationId));
     pipeline.expire(
       generationKey(organizationId),

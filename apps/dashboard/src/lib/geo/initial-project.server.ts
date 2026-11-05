@@ -2,13 +2,14 @@ import { db } from "@notra/db/drizzle";
 import { projects } from "@notra/db/schema";
 import { GEO_PROJECTS_OLDEST_ORDER } from "@notra/geo-core/constants/geo-projects";
 import { and, eq } from "drizzle-orm";
-import { cache } from "react";
 
+import { cacheAuthRequest } from "@/lib/auth/request-cache";
 import { retryTransientDbError } from "@/lib/db/retry";
 import { getLastVisitedProject } from "@/utils/cookies";
 import { readServerCookies as cookies } from "@/utils/server-cookies";
 
-export const resolveInitialGeoProjectId = cache(
+// Resolved by a geo page's layout, gate and loader; memoized per request.
+export const resolveInitialGeoProjectId = cacheAuthRequest(
   async (
     organizationId: string,
     organizationSlug: string,
@@ -28,7 +29,7 @@ export const resolveInitialGeoProjectId = cache(
   }
 );
 
-const resolveFallbackGeoProjectId = cache(
+const resolveFallbackGeoProjectId = cacheAuthRequest(
   async (
     organizationId: string,
     organizationSlug: string

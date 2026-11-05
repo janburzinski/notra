@@ -697,6 +697,9 @@ export const GEO_COMMERCE_AUDIENCE_ENGINE_IDS: readonly string[] = [
 
 export const GEO_MODEL_FEED_URL = "https://ai-gateway.vercel.sh/v1/models";
 export const GEO_MODEL_FEED_REVALIDATE_SECONDS = 3600;
+export const GEO_MODEL_FEED_TIMEOUT_MS = 3000;
+// After a failed fetch, the fallback catalog is served this long before retrying.
+export const GEO_MODEL_FEED_RETRY_SECONDS = 60;
 
 /** Batch is a transport mode, not a separately tracked GEO model. */
 export const GEO_MODEL_BATCH_SUFFIX = "-batch";

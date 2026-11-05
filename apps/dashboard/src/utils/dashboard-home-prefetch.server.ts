@@ -8,7 +8,6 @@ import { dashboardOrpc } from "@/lib/orpc/query";
 import { contentRouter } from "@/lib/orpc/routers/content";
 import { geoRouter } from "@/lib/orpc/routers/geo";
 import type { LoadedMembership } from "@/types/auth/organization";
-import { prefetchRecentPostsQuery } from "@/utils/content-recents-prefetch.server";
 import { getGeoServerQueryClient } from "@/utils/geo-query-client.server";
 import { seedMembership } from "@/utils/seed-membership.server";
 
@@ -35,7 +34,7 @@ function timedPrefetch<T>(query: string, run: () => Promise<T>) {
 /**
  * Loads the dashboard home data on the server. The route streams, so the
  * shell never waits for it; the home body is awaited so it is part of the
- * server HTML, while the projects and recents queries are dehydrated pending
+ * server HTML, while the other queries are dehydrated pending
  * and the browser reuses them instead of starting its own requests.
  */
 export async function dehydrateDashboardHomeQueries(
@@ -80,13 +79,6 @@ export async function dehydrateDashboardHomeQueries(
       ),
     }),
   ]);
-  prefetchRecentPostsQuery(
-    queryClient,
-    (input) =>
-      timedPrefetch("content.recents", () => client.content.recents(input))(),
-    organizationId,
-    projectId
-  );
   await homeBody;
   return dehydrate(queryClient);
 }

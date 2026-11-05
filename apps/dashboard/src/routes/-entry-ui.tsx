@@ -6,14 +6,7 @@ import {
 } from "@tanstack/react-router";
 import { Suspense } from "react";
 
-import AuthPublicLayout from "@/app/(auth-public)/layout";
-import { AuthSplitShell } from "@/components/auth/auth-split-shell";
-import { LoginErrorTracker } from "@/components/auth/login-error-tracker";
-import { LoginForm } from "@/components/auth/login-form";
 import { LoginFormSkeleton } from "@/components/auth/login-form-skeleton";
-import { SocialEnrollmentResume } from "@/components/auth/social-enrollment-resume";
-import { DemoStart } from "@/components/demo/demo-start";
-import { InvitationConfirm } from "@/components/invitation/invitation-confirm";
 import { lazyPage } from "@/utils/lazy-page";
 
 import { createDevelopmentUiRoutes } from "./-development-ui";
@@ -31,6 +24,23 @@ import { loadInvitation } from "./-invitation-loaders";
 import { loadSharedChat } from "./-share-loaders";
 import { createUiRoute, uiRouteSearch } from "./-ui-route";
 
+const AuthPublicLayout = lazyPage(() => import("@/app/(auth-public)/layout"));
+const AuthSplitShell = lazyPage(() =>
+  import("@/components/auth/auth-split-shell").then((module) => ({
+    default: module.AuthSplitShell,
+  }))
+);
+const Login = lazyPage(() => import("./-login-page"));
+const DemoStart = lazyPage(() =>
+  import("@/components/demo/demo-start").then((module) => ({
+    default: module.DemoStart,
+  }))
+);
+const InvitationConfirm = lazyPage(() =>
+  import("@/components/invitation/invitation-confirm").then((module) => ({
+    default: module.InvitationConfirm,
+  }))
+);
 const Signup = lazyPage(() => import("@/app/(auth)/signup/page"));
 const ForgotPassword = lazyPage(
   () => import("@/app/(auth)/forgot-password/page")
@@ -52,19 +62,24 @@ const SharedChat = lazyPage(() =>
 );
 
 export function createEntryUiRoutes(parent: AnyRoute) {
+  function GuestLayout() {
+    return (
+      <AuthSplitShell>
+        <Suspense fallback={<LoginFormSkeleton />}>
+          <Outlet />
+        </Suspense>
+      </AuthSplitShell>
+    );
+  }
+  GuestLayout.preload = AuthSplitShell.preload;
+
   const guest = createRoute({
     getParentRoute: () => parent,
     id: "guest",
     validateSearch: uiRouteSearch,
     beforeLoad: ({ search }) =>
       loadGuestAccess({ data: { params: {}, searchParams: search } }),
-    component: () => (
-      <AuthSplitShell>
-        <Suspense fallback={<LoginFormSkeleton />}>
-          <Outlet />
-        </Suspense>
-      </AuthSplitShell>
-    ),
+    component: GuestLayout,
   });
 
   return [
@@ -83,25 +98,8 @@ export function createEntryUiRoutes(parent: AnyRoute) {
         path: "login",
         pendingComponent: LoginFormSkeleton,
         loader: (input) => loadLogin({ data: input }),
-        component: ({ data }) => (
-          <div className="mx-auto w-full max-w-md rounded-md p-6 lg:px-8 lg:py-10">
-            {data.knownErrorKey ? (
-              <LoginErrorTracker errorCode={data.knownErrorKey} />
-            ) : null}
-            {data.resumeEnrollmentFlowId ? (
-              <SocialEnrollmentResume
-                flowId={data.resumeEnrollmentFlowId}
-                returnTo={data.returnTo}
-              />
-            ) : (
-              <LoginForm
-                initialError={data.initialError}
-                initialPending={data.pending}
-                returnTo={data.returnTo}
-              />
-            )}
-          </div>
-        ),
+        preload: Login.preload,
+        component: ({ data }) => <Login data={data} />,
       }),
       createUiRoute({
         parent: guest,
@@ -127,7 +125,8 @@ export function createEntryUiRoutes(parent: AnyRoute) {
     createUiRoute({
       parent,
       path: "reset-password",
-      preload: ResetPassword.preload,
+      preload: () =>
+        Promise.all([ResetPassword.preload(), AuthPublicLayout.preload()]),
       component: () => (
         <AuthPublicLayout>
           <Suspense fallback={<LoginFormSkeleton />}>
@@ -141,6 +140,7 @@ export function createEntryUiRoutes(parent: AnyRoute) {
       parent,
       path: "auth/demo",
       loader: (input) => loadDemoEntry({ data: input }),
+      preload: DemoStart.preload,
       component: ({ data }) => (
         <div className="flex min-h-screen items-center justify-center px-2 py-6 sm:px-6">
           <DemoStart
@@ -155,6 +155,8 @@ export function createEntryUiRoutes(parent: AnyRoute) {
       path: "invitation",
       title: { title: "Invitation" },
       loader: (input) => loadInvitation({ data: input }),
+      preload: () =>
+        Promise.all([InvitationConfirm.preload(), AuthSplitShell.preload()]),
       component: ({ data }) => (
         <AuthSplitShell>
           <InvitationConfirm data={data} />

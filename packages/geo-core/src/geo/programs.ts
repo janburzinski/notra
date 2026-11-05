@@ -248,9 +248,13 @@ export const loadGeoSettings = Effect.fn("geo.settings")(function* (
   input: GeoScopeInput
 ) {
   const scope = yield* resolveGeoScope(input);
-  const row = yield* loadScopeSettingsRow(scope.projectId);
-
-  const catalog = yield* loadGeoModelCatalog(scope.organizationId);
+  const [row, catalog] = yield* Effect.all(
+    [
+      loadScopeSettingsRow(scope.projectId),
+      loadGeoModelCatalog(scope.organizationId),
+    ],
+    { concurrency: "unbounded" }
+  );
   const response: GeoSettingsResponse = {
     configured: isTinybirdConfigured(),
     settings: row ? toGeoSettings(row, catalog) : null,
@@ -903,10 +907,12 @@ export const upsertGeoSettings = Effect.fn("geo.settingsUpsert")(function* (
   yield* Effect.promise(() =>
     invalidateGeoIngestHostsCache(input.organizationId, projectId)
   );
-  const brandNamesChanged =
+  // Cached aggregates filter on the brand names and the prompt language.
+  const aggregateInputsChanged =
     existingSettings?.companyName !== input.companyName ||
-    (existingSettings?.aliases ?? []).join("\n") !== input.aliases.join("\n");
-  if (brandNamesChanged) {
+    (existingSettings?.aliases ?? []).join("\n") !== input.aliases.join("\n") ||
+    existingSettings?.promptLanguage !== promptLanguage;
+  if (aggregateInputsChanged) {
     yield* Effect.promise(() => bumpGeoCheckGeneration([input.organizationId]));
   }
 

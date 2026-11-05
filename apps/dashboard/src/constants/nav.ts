@@ -254,8 +254,6 @@ const SIDEBAR_MODE_FADE_CLASS =
 
 export const SIDEBAR_MODE_PANEL_CLASS = `flex min-h-0 w-full flex-col ${SIDEBAR_MODE_FADE_CLASS}`;
 
-export const NAV_RECENT_LIMIT = 3;
-
 export const ORG_SWITCH_STATIC_PAGE_SECTIONS: ReadonlySet<string> = new Set([
   "geo",
   "automation",

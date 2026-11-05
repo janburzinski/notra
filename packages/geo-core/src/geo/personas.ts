@@ -183,44 +183,50 @@ const loadGenerationContext = Effect.fn("geo.personas.context")(function* (
   projectId: string,
   brandSettingsId: string
 ) {
-  const [brand, settings, competitors, prompts, sitemaps] = yield* Effect.all([
-    geoDb("brand identity lookup failed", () =>
-      db.query.brandSettings.findFirst({
-        columns: {
-          companyName: true,
-          companyDescription: true,
-          audience: true,
-          websiteUrl: true,
-        },
-        where: eq(brandSettings.id, brandSettingsId),
-      })
-    ),
-    geoDb("settings lookup failed", () =>
-      db.query.geoSettings.findFirst({
-        columns: { companyName: true, promptLanguage: true },
-        where: eq(geoSettings.projectId, projectId),
-      })
-    ),
-    geoDb("competitors lookup failed", () =>
-      selectGeoContextCompetitors({ organizationId, projectId })
-    ),
-    geoDb("prompts lookup failed", () =>
-      db
-        .select({ prompt: geoPrompts.prompt })
-        .from(geoPrompts)
-        .where(
-          and(eq(geoPrompts.projectId, projectId), eq(geoPrompts.enabled, true))
-        )
-        .orderBy(asc(geoPrompts.createdAt))
-        .limit(GEO_PERSONA_CONTEXT_PROMPT_LIMIT)
-    ),
-    geoDb("sitemaps lookup failed", () =>
-      db
-        .select({ id: brandSitemaps.id })
-        .from(brandSitemaps)
-        .where(eq(brandSitemaps.brandSettingsId, brandSettingsId))
-    ),
-  ]);
+  const [brand, settings, competitors, prompts, sitemaps] = yield* Effect.all(
+    [
+      geoDb("brand identity lookup failed", () =>
+        db.query.brandSettings.findFirst({
+          columns: {
+            companyName: true,
+            companyDescription: true,
+            audience: true,
+            websiteUrl: true,
+          },
+          where: eq(brandSettings.id, brandSettingsId),
+        })
+      ),
+      geoDb("settings lookup failed", () =>
+        db.query.geoSettings.findFirst({
+          columns: { companyName: true, promptLanguage: true },
+          where: eq(geoSettings.projectId, projectId),
+        })
+      ),
+      geoDb("competitors lookup failed", () =>
+        selectGeoContextCompetitors({ organizationId, projectId })
+      ),
+      geoDb("prompts lookup failed", () =>
+        db
+          .select({ prompt: geoPrompts.prompt })
+          .from(geoPrompts)
+          .where(
+            and(
+              eq(geoPrompts.projectId, projectId),
+              eq(geoPrompts.enabled, true)
+            )
+          )
+          .orderBy(asc(geoPrompts.createdAt))
+          .limit(GEO_PERSONA_CONTEXT_PROMPT_LIMIT)
+      ),
+      geoDb("sitemaps lookup failed", () =>
+        db
+          .select({ id: brandSitemaps.id })
+          .from(brandSitemaps)
+          .where(eq(brandSitemaps.brandSettingsId, brandSettingsId))
+      ),
+    ],
+    { concurrency: "unbounded" }
+  );
 
   const pages =
     sitemaps.length === 0

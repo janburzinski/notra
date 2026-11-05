@@ -12,6 +12,7 @@ import {
   projects,
 } from "../schema";
 import type { SeedPersonaVisibilityPersona } from "../types/seed-persona-visibility";
+import { bumpGeoCheckGeneration } from "../utils/geo-check-cache";
 import { createPersonaSnapshot } from "../utils/persona-snapshot";
 
 const ENGINES = [
@@ -643,12 +644,18 @@ async function seedPersonaVisibility() {
   const targets = await resolveTargets();
 
   for (const target of targets) {
-    const result = await seedProjectActivity(
-      target.organizationId,
-      target.projectId,
-      days,
-      reset
-    );
+    let result: Awaited<ReturnType<typeof seedProjectActivity>>;
+    try {
+      result = await seedProjectActivity(
+        target.organizationId,
+        target.projectId,
+        days,
+        reset
+      );
+    } finally {
+      // Writes aren't transactional, so invalidate even after a partial failure.
+      await bumpGeoCheckGeneration([target.organizationId]);
+    }
     console.info("Seeded persona visibility", {
       project: target.label,
       projectId: target.projectId,

@@ -3,6 +3,7 @@ import { gateway } from "@notra/ai/gateway";
 import { scrapeWebsiteForBrandAnalysis } from "@notra/ai/utils/context-dev";
 import { db } from "@notra/db/drizzle";
 import { geoSettings, projects } from "@notra/db/schema";
+import { bumpGeoCheckGeneration } from "@notra/db/utils/geo-check-cache";
 import { generateText, Output } from "ai";
 import { eq } from "drizzle-orm";
 import { Effect } from "effect";
@@ -485,6 +486,8 @@ export const generateGeoFromWebsite = Effect.fn("geo.generateFromWebsite")(
         )
       )
     );
+    // Cached aggregates group by the brand names saved above.
+    yield* Effect.promise(() => bumpGeoCheckGeneration([organizationId]));
 
     yield* startGeoScanAfterWebsiteGeneration(
       organizationId,

@@ -155,9 +155,10 @@ export async function queryGeoSentimentAnalysisSnapshot(
   scope: GeoCheckScope,
   window: GeoCheckWindow
 ) {
+  // Check rows are never updated, so their IDs identify the analyzed answers.
   const [row] = await db
     .select({
-      fingerprint: sql<string>`md5(coalesce(string_agg(md5(jsonb_build_array(${geoMentionChecks.id}, ${geoMentionChecks.answer}, ${geoMentionChecks.prompt}, ${geoMentionChecks.sentiment}, ${geoMentionChecks.engine}, ${geoMentionChecks.capturedAt})::text), '' order by ${geoMentionChecks.id}), ''))`,
+      fingerprint: sql<string>`md5(coalesce(string_agg(${geoMentionChecks.id}, ',' order by ${geoMentionChecks.id}), ''))`,
       eligible: sql<number>`count(*)::int`,
       latestCapturedAt: sql<
         string | null
