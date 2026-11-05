@@ -72,6 +72,8 @@ async function compileWith(
     config.fonts = JSON.parse(
       await readFile(join(root, "apps/sites-e2e/fixtures/fonts.json"), "utf8")
     );
+    // The only built-in script loaded on demand; content.ts checks it renders under the CSP.
+    config.blog = { ...config.blog, hero: { style: "dither" } };
     await writeFile(configPath, JSON.stringify(config));
     const target = siteBuildRequestSchema.parse({
       ...JSON.parse(

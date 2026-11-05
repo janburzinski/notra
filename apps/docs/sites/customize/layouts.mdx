@@ -41,12 +41,14 @@ The `blog` and `changelog` objects in `blog.json` set how the blog index, its po
 | `title` | The heading, up to 120 characters | `"Blog"` |
 | `description` | The line under it, up to 400 characters | The site's `description` |
 | `layout` | `grid`: cards in columns. `list`: date and title rows. `magazine`: one large card, then a grid. `cards`: two columns of bordered, tinted cards | `grid` |
-| `hero.style` | `wash`: a tinted panel. `plain`: title only. `image`: `hero.image` behind the title. `none`: no hero | `plain` |
+| `hero.style` | `wash`: a tinted panel. `dither`: a tinted panel with an animated dither pattern in your [primary color](/sites/customize/design#colors). `plain`: title only. `image`: `hero.image` behind the title. `none`: no hero | `plain` |
 | `hero.eyebrow` | A short line above the title, up to 60 characters | none |
 | `hero.image` | Background for the `image` style, like `/images/hero.jpg` | none |
 | `featured` | `"latest"`, `"none"` or up to 6 post paths like `["2026/launch"]`, pinned on top | `"none"` |
 | `categories` | `true`, `false` or up to 12 tag names. See [Category bar](#category-bar) | `false` |
 | `search` | Show a search field for post titles, summaries and tags | `false` |
+
+The `dither` hero draws [Paper's](https://shaders.paper.design) dither shader in `colors.primary`, and in `colors.light` in dark mode. It starts once the page has loaded, pauses while scrolled out of view and stays still for visitors who turn on reduced motion. Without WebGL it shows the `wash` panel. It adds about 8 KB of JavaScript, only to sites that use it.
 
 With `featured` set to `"none"`, Notra pins posts that have `featured: true` in their [frontmatter](/sites/posts#blog-posts), up to the 6 newest. `"latest"` and a list of paths ignore that field. `magazine` features the latest post when nothing else is featured, and Notra skips a featured path that doesn't match a post and shows a warning in the build log.
 

@@ -971,7 +971,7 @@
             "style": {
               "default": "plain",
               "type": "string",
-              "enum": ["wash", "plain", "image", "none"]
+              "enum": ["wash", "plain", "image", "dither", "none"]
             },
             "eyebrow": {
               "type": "string",
@@ -1146,7 +1146,7 @@
             "style": {
               "default": "plain",
               "type": "string",
-              "enum": ["wash", "plain", "image", "none"]
+              "enum": ["wash", "plain", "image", "dither", "none"]
             },
             "eyebrow": {
               "type": "string",

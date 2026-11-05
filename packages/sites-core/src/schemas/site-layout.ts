@@ -236,7 +236,9 @@ export const siteLayoutSchema = z
 
 const blogHeroSchema = z
   .object({
-    style: z.enum(["wash", "plain", "image", "none"]).default("plain"),
+    style: z
+      .enum(["wash", "plain", "image", "dither", "none"])
+      .default("plain"),
     eyebrow: z.string().trim().max(60).optional(),
     image: sitePathSchema.optional(),
   })

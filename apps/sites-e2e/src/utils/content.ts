@@ -312,6 +312,24 @@ export async function assertContentFeatures(
   });
   checks.push("absolute public-file url() in site CSS loads under each mount");
 
+  await page.goto(`${origin}/blog`, { waitUntil: "domcontentloaded" });
+  await waitForResources();
+  const dither = page.locator("[data-notra-dither]");
+  assert.equal(await dither.count(), 1);
+  assert.equal(await dither.getAttribute("aria-hidden"), "true");
+  // Without WebGL the hero keeps its tinted panel and loads no shader.
+  const webgl = await page.evaluate(() =>
+    Boolean(document.createElement("canvas").getContext("webgl2"))
+  );
+  if (webgl) {
+    await page.waitForFunction(
+      () => document.querySelector("[data-notra-dither] canvas") !== null
+    );
+  }
+  checks.push(
+    `dither hero ${webgl ? "draws its shader" : "falls back without WebGL"} under the CSP`
+  );
+
   await page.goto(`${origin}/blog/2026/launch`, {
     waitUntil: "domcontentloaded",
   });
