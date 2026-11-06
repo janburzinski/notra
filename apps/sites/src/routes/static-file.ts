@@ -4,7 +4,7 @@ import { serveFile } from "../serve-file";
 import type { ManifestRouteContext } from "../types/routes";
 import { markdownAlternatePath } from "../utils/routing";
 
-export const staticFileRoute = Effect.fn("Sites.route.staticFile")(function* ({
+export const staticFileRoute = Effect.fnUntraced(function* ({
   path,
   file,
   twin,

@@ -17,7 +17,10 @@ import {
   withServerTiming,
 } from "./utils/server-timing";
 
-const siteRequest = Effect.fn("Sites.handleRequest")(function* (
+// The request path uses Effect.fnUntraced: no tracer is configured, and a traced
+// Effect.fn captures a stack trace and records a span on every call, which was
+// about 40% of a typical request's CPU.
+const siteRequest = Effect.fnUntraced(function* (
   request: Request,
   deps: SitesDeps
 ) {

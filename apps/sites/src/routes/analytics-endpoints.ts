@@ -14,9 +14,7 @@ import { isDashboardReferer, reportTraffic } from "../traffic";
 import type { DeploymentRouteContext } from "../types/routes";
 import { analyticsScriptTag } from "../utils/analytics-tag";
 
-export const analyticsEndpointsRoute = Effect.fn(
-  "Sites.route.analyticsEndpoints"
-)(function* ({
+export const analyticsEndpointsRoute = Effect.fnUntraced(function* ({
   deps,
   request,
   url,

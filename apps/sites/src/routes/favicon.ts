@@ -81,7 +81,7 @@ async function fetchFavicon(deps: SitesDeps, host: string): Promise<Response> {
   return favicon;
 }
 
-export const faviconRoute = Effect.fn("Sites.route.favicon")(function* ({
+export const faviconRoute = Effect.fnUntraced(function* ({
   deps,
   request,
   url,

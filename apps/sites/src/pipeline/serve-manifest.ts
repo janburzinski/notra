@@ -19,7 +19,7 @@ import {
 } from "../utils/routing";
 import { runRoutes } from "../utils/run-routes";
 
-export const serveManifest = Effect.fn("Sites.serveManifest")(function* (
+export const serveManifest = Effect.fnUntraced(function* (
   context: DeploymentRouteContext
 ) {
   const { deps, request, url, resolved, loaded, visitorConsent } = context;

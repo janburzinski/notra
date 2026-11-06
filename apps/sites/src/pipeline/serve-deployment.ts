@@ -9,7 +9,7 @@ import { runRoutes } from "../utils/run-routes";
 import { visitorConsent } from "../utils/visitor-consent";
 import { serveManifest } from "./serve-manifest";
 
-export const serveDeployment = Effect.fn("Sites.serveDeployment")(function* (
+export const serveDeployment = Effect.fnUntraced(function* (
   context: SiteRequestContext,
   resolved: ResolvedDeployment
 ) {

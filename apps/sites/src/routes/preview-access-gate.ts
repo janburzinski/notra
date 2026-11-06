@@ -3,9 +3,9 @@ import { Effect, Option } from "effect";
 import { previewAccessDenied } from "../preview-auth";
 import type { PreviewRouteContext } from "../types/routes";
 
-export const previewAccessGateRoute = Effect.fn(
-  "Sites.route.previewAccessGate"
-)(function* (context: PreviewRouteContext) {
+export const previewAccessGateRoute = Effect.fnUntraced(function* (
+  context: PreviewRouteContext
+) {
   if (context.pointer.visibility !== "protected") {
     return Option.none<Response>();
   }

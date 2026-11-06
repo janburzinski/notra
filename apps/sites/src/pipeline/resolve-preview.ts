@@ -8,7 +8,7 @@ import type { ResolvedDeployment, SiteRequestContext } from "../types/serving";
 import { html } from "../utils/responses";
 import { runRoutes } from "../utils/run-routes";
 
-export const resolvePreview = Effect.fn("Sites.resolvePreview")(function* (
+export const resolvePreview = Effect.fnUntraced(function* (
   context: SiteRequestContext,
   state: SiteServingState,
   siteId: string,
