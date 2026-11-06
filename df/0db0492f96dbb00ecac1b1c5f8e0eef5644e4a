@@ -1,0 +1,19 @@
+apps/dashboard/tests/content-image-route.test.ts
+  s_0eb87d8daad6ee::t_3dd1ac4aa6d47c 8-13
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "df0db0492f96dbb00ecac1b1c5f8e0eef5644e4a",
+  "prompts": {},
+  "sessions": {
+    "s_0eb87d8daad6ee": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a1b22e-3639-7443-aa7f-4abac253f350",
+        "model": "gpt-6-sol"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
