@@ -32,8 +32,11 @@ export async function hasActivePaidPlan(
 export async function checkChatBilling(
   organizationId: string
 ): Promise<ChatBillingCheck> {
-  if (!autumn || allowUnmeteredAiInDevelopment) {
+  if (allowUnmeteredAiInDevelopment) {
     return UNMETERED_CHAT;
+  }
+  if (!autumn) {
+    throw new Error("Autumn billing is not configured");
   }
 
   const credits = await autumn.check({
