@@ -4,7 +4,10 @@ import { join } from "node:path";
 
 import { isValidSiteSlug } from "@notra/sites-core/utils/hosts";
 
-import { GENERIC_TLDS } from "../src/constants/moderation";
+import {
+  GENERIC_TLDS,
+  SITE_GENERIC_BRAND_WORDS,
+} from "../src/constants/moderation";
 
 const listId = process.argv[2] ?? "Y83KG";
 const count = Number(process.argv[3] ?? 5000);
@@ -69,17 +72,29 @@ const csv = await readFile(
   "utf8"
 );
 
-const reserved: Record<string, string> = {};
+// Every domain of a brand ranked above the last reserved brand proves
+// ownership, so vercel.com counts as well as vercel.app.
+// No prototype, so a label such as "constructor" isn't already present.
+const reserved: Record<string, string[]> = Object.create(null);
 for (const line of csv.split("\n")) {
-  if (Object.keys(reserved).length >= count) {
+  const domain = line.split(",")[1]?.trim().toLowerCase();
+  const label = domain && isCompanyDomain(domain) ? brandLabel(domain) : null;
+  if (
+    !(domain && label && isValidSiteSlug(label)) ||
+    SITE_GENERIC_BRAND_WORDS.has(label)
+  ) {
+    continue;
+  }
+  const domains = reserved[label];
+  if (!domains && Object.keys(reserved).length >= count) {
     break;
   }
-  const domain = line.split(",")[1]?.trim();
-  const label = domain && isCompanyDomain(domain) ? brandLabel(domain) : null;
-  if (domain && label && isValidSiteSlug(label) && !(label in reserved)) {
-    reserved[label] = domain;
-  }
+  // A platform suffix such as vercel.app gives subdomains to anyone.
+  reserved[label] = suffixes.has(domain)
+    ? (domains ?? [])
+    : [...(domains ?? []), domain];
 }
 
 await writeFile(output, `${JSON.stringify(reserved, null, 2)}\n`);
+await Bun.$`bunx oxfmt ${output}`.quiet();
 console.log(`${Object.keys(reserved).length} reserved addresses → ${output}`);

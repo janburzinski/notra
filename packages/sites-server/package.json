@@ -19,6 +19,7 @@
     "@notra/sites-core": "workspace:*",
     "drizzle-orm": "catalog:",
     "effect": "catalog:",
+    "free-email-domains": "1.15.20",
     "tar-stream": "3.2.0",
     "zod": "catalog:"
   },

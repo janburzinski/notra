@@ -26,7 +26,10 @@ import { hashPreviewPassword } from "@notra/sites-core/utils/preview-password";
 import { and, desc, eq, inArray, sql, or, isNull } from "drizzle-orm";
 
 import { deleteCustomHostnameQuietly } from "./cloudflare-saas";
-import { SITE_NAME_REJECTION_MESSAGES } from "./constants/moderation";
+import {
+  SITE_NAME_REJECTION_MESSAGES,
+  SITE_SLUG_BLOCKED_WORDS,
+} from "./constants/moderation";
 import {
   DEFAULT_SITE_MOUNTS,
   SITE_SLUG_ATTEMPTS,
@@ -38,7 +41,11 @@ import {
 import { deployBranchHead } from "./deploy";
 import { getSitesHostingDomain } from "./env";
 import { SiteInputError, SitePlanLimitError } from "./errors/sites";
-import { assertSiteNameAllowed } from "./moderation";
+import {
+  assertSiteNameAllowed,
+  siteOrganizationOwnership,
+  siteSlugRejection,
+} from "./moderation";
 import { assertSitePlanAllows, resolveSitePlan } from "./plan-limits";
 import { r2DeletePrefix } from "./r2";
 import { requireOrganizationRepository } from "./repositories";
@@ -64,6 +71,7 @@ import type {
 import { errorMessage } from "./utils/errors";
 import { prefixedId } from "./utils/ids";
 import { invalidateSiteIngestCaches } from "./utils/ingest-cache";
+import { slugWithoutWords } from "./utils/moderation";
 import { parseRootDirectory } from "./utils/root-directory";
 import { acquireSiteHostLock, withSiteHostLock } from "./utils/site-host-lock";
 import { siteAliasOrigin } from "./utils/urls";
@@ -80,10 +88,17 @@ function parseMounts(mounts: SiteMounts): SiteMounts {
   }
 }
 
+/**
+ * Derives an address the organization may use from the site name, so the
+ * owner never sees an error for an address they didn't type.
+ */
 async function uniqueSlug(
-  base: string,
+  name: string,
   organizationId: string
 ): Promise<string> {
+  const base =
+    slugWithoutWords(slugifySiteName(name), SITE_SLUG_BLOCKED_WORDS) || "site";
+  const ownership = await siteOrganizationOwnership(organizationId);
   const root = isAvailableSiteSlug(base)
     ? base
     : `site-${base}`.slice(0, SITE_SLUG_FALLBACK_MAX_LENGTH).replace(/-$/, "");
@@ -102,7 +117,11 @@ async function uniqueSlug(
       .from(sites)
       .where(eq(sites.slug, candidate))
       .limit(1);
-    if (!(taken || (await isSlugHeldForOther(candidate, organizationId)))) {
+    if (
+      !(
+        taken || (await siteSlugRejection(candidate, organizationId, ownership))
+      )
+    ) {
       return candidate;
     }
   }
@@ -182,17 +201,12 @@ export async function createSite(
     );
   }
   const slug =
-    requestedSlug ??
-    (await uniqueSlug(
-      slugifySiteName(input.name) || "site",
-      input.organizationId
-    ));
+    requestedSlug ?? (await uniqueSlug(input.name, input.organizationId));
   const plan = await resolveSitePlan(input.organizationId);
   const siteId = prefixedId("site");
   const aliasHost = siteAliasHostname(slug);
   await assertSiteNameAllowed({
     organizationId: input.organizationId,
-    userId: input.userId,
     name: input.name,
     address: aliasHost,
     slug,
@@ -608,7 +622,6 @@ export async function updateSiteSettings(
     }
     await assertSiteNameAllowed({
       organizationId: site.organizationId,
-      userId,
       name,
       address: siteAliasHostname(site.slug),
     });

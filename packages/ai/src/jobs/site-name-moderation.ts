@@ -20,6 +20,7 @@ export async function moderateSiteName(
     organizationId: params.organizationId,
     state: {
       organizationName: params.organizationName,
+      verifiedBrands: params.verifiedBrands.join(", "),
       siteName: params.name,
       siteAddress: params.address,
     },

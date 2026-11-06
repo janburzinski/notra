@@ -25,10 +25,14 @@ export interface SiteNameRejection {
 
 export interface SiteNameRejectionParams {
   organizationId: string;
-  userId: string;
   name: string;
   address: string;
   slug?: string;
+}
+
+export interface SiteOrganizationOwnership {
+  domains: string[];
+  grantedSlugs: string[];
 }
 
 export type SiteUpdateValues = Partial<typeof sites.$inferInsert>;

@@ -862,6 +862,7 @@
         "@notra/sites-core": "workspace:*",
         "drizzle-orm": "catalog:",
         "effect": "catalog:",
+        "free-email-domains": "1.15.20",
         "tar-stream": "3.2.0",
         "zod": "catalog:",
       },
@@ -4381,6 +4382,8 @@
     "fractional-indexing": ["fractional-indexing@3.2.0", "", {}, "sha512-PcOxmqwYCW7O2ovKRU8OoQQj2yqTfEB/yeTYk4gPid6dN5ODRfU1hXd9tTVZzax/0NkO7AxpHykvZnT1aYp/BQ=="],
 
     "framer-motion": ["framer-motion@12.43.0", "", { "dependencies": { "motion-dom": "^12.43.0", "motion-utils": "^12.39.0", "tslib": "^2.4.0" }, "peerDependencies": { "@emotion/is-prop-valid": "*", "react": "^18.0.0 || ^19.0.0", "react-dom": "^18.0.0 || ^19.0.0" }, "optionalPeers": ["@emotion/is-prop-valid", "react", "react-dom"] }, "sha512-1eaL3RvR/kAlbG7UYcpMptEyzPoENO0c6w7ZnB3/hh2vSAz/6uGAFn6fdoqTBguNstf3MsFhJHsD/0DHiclG+g=="],
+
+    "free-email-domains": ["free-email-domains@1.15.20", "", { "hasInstallScript": true }, "sha512-omBLvp1UOU3OtyL65MJe8rsKKI4ZnvBJ1E0W29ctFFpRBn+rz8UEua/jq7jG4wr6+4dzegTbpkJYLf6sA1Xjpg=="],
 
     "free-email-domains-list": ["free-email-domains-list@1.0.16", "", { "peerDependencies": { "validator": "^13.12.0" } }, "sha512-HTHSFzp1zSqRCT7HFefOsoOetHNu7s9fuLdsNb4FduGQx445dT/F5eIHwuNKkFJvIV8FrMKElWlBCFvrh/EEFw=="],
 

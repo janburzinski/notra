@@ -20,11 +20,11 @@ export const SITE_NAME_MODERATION_QUESTIONS = {
   impersonation: {
     type: "boolean",
     instructions:
-      "Does siteName or siteAddress pretend to be an organization other than organizationName, or look built for phishing? The site belongs to organizationName; naming their own company or product is fine.",
+      "Does siteName or siteAddress pretend to be an organization other than its owner, or look built for phishing? Anyone can type any organizationName, so it does not prove the owner is a well-known brand. verifiedBrands lists the domains and addresses Notra verified the owner controls; it may be empty.",
     criteria: {
-      true: "Uses a well-known brand, bank, government body, or Notra that is not organizationName, or combines a brand with words like login, verify, secure, account, wallet, support or billing",
+      true: "Uses a well-known brand, bank, government body, or Notra that verifiedBrands does not include, even when organizationName claims it, or combines a brand with words like login, verify, secure, account, wallet, support or billing",
       false:
-        "Names organizationName or its products, or a generic name that does not point to another organization",
+        "Names a brand in verifiedBrands, the owner's own lesser-known company or products, or a generic name that does not point to another organization",
     },
   },
 } as const;
