@@ -102,12 +102,22 @@ export function GeoEnginePicker({
     .map((model) => model.label)
     .join(", ");
 
+  // Which rows count as primary is decided from the selection when the pane
+  // opens or Advanced flips, not on every toggle: otherwise a provider jumps
+  // up the list as it is turned on, or vanishes as it is turned off.
+  const [pinned, setPinned] = useState(() => ({
+    advanced,
+    selected: new Set(selected),
+  }));
+  if (pinned.advanced !== advanced) {
+    setPinned({ advanced, selected: new Set(selected) });
+  }
   const providers = geoPickerProviders(catalog, selectedIds);
   const isPrimary = ({ provider, models }: (typeof providers)[number]) =>
     provider.featured ||
     recommended.has(provider.id) ||
     (audience === "technical" && isGeoCodingAgentProvider(provider.id)) ||
-    models.some((model) => selectedIds.has(model.id));
+    models.some((model) => pinned.selected.has(model.id));
   const primary = providers.filter(isPrimary);
   const more = providers.filter((entry) => !isPrimary(entry));
   const visible = advanced ? [...primary, ...more] : primary;
