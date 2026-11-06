@@ -1,0 +1,33 @@
+packages/ai/src/utils/github-mention-ingest.ts
+  s_0eb87d8daad6ee::t_ae786d173b5337 64-77
+  s_0eb87d8daad6ee::t_fe55b68b98d939 51
+apps/dashboard/src/lib/integrations/github/remove-published-content.ts
+  s_0eb87d8daad6ee::t_fc3450f082f28f 227
+apps/dashboard/src/lib/integrations/github/publish-saved-content.ts
+  s_0eb87d8daad6ee::t_fc3450f082f28f 642
+packages/ai/src/utils/content-publication-mapping.test.ts
+  s_0eb87d8daad6ee::t_86f738305e46ba 189
+  s_0eb87d8daad6ee::t_0bb1a1578899ad 120-127,384-418
+packages/ai/src/utils/github-mention-ingest.test.ts
+  s_0eb87d8daad6ee::t_7a7a9793ad3db9 58-77,105-112,114-118,121-123,127-128,130-131,133
+  s_0eb87d8daad6ee::t_54d8e16f39cb2c 113,119-120,124-126,129,132
+packages/ai/src/utils/content-publication.ts
+  s_0eb87d8daad6ee::t_c8d34413197095 349-352,360-385,390
+  s_0eb87d8daad6ee::t_5af86945a6e912 359
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "3a3810907ac25dce71d5446718918ec3d6dd5700",
+  "prompts": {},
+  "sessions": {
+    "s_0eb87d8daad6ee": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a1b22e-3639-7443-aa7f-4abac253f350",
+        "model": "gpt-6-sol"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
