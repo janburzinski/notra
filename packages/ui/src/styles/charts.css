@@ -1,0 +1,28 @@
+/* Shared ECharts tooltip morph: the surface scales to the new size while the
+   content counter-scales, so tooltip size changes animate instead of jumping. */
+@property --ec-tooltip-scale-x {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 1;
+}
+
+@property --ec-tooltip-scale-y {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 1;
+}
+
+@layer components {
+  .ec-tooltip-surface {
+    transform-origin: top left;
+    transform: scale(var(--ec-tooltip-scale-x), var(--ec-tooltip-scale-y));
+  }
+
+  .ec-tooltip-content {
+    transform-origin: top left;
+    transform: scale(
+      calc(1 / var(--ec-tooltip-scale-x)),
+      calc(1 / var(--ec-tooltip-scale-y))
+    );
+  }
+}

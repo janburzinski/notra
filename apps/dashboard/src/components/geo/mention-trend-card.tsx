@@ -7,15 +7,15 @@ import {
 import type { MentionTrendRow } from "@notra/geo-core/types/geo";
 import { todayIsoDate } from "@notra/geo-core/utils/day-label";
 import { engineFamilyLabel } from "@notra/geo-core/utils/geo-engine-family";
+import { EChartsAreaChart } from "@notra/ui/components/evilcharts/charts/echarts-area-chart";
+import type { ChartConfig } from "@notra/ui/types/charts";
 import { useState } from "react";
 import { InstrumentEmpty, InstrumentModule } from "ui/card";
 import { useLocale, useTranslations } from "use-intl";
 
 import { EmptyStateTrendPreview } from "@/components/empty-state-preview";
-import { EChartsAreaChart } from "@/components/evilcharts/charts/echarts-area-chart";
 import { MentionTrendAgentsPicker } from "@/components/geo/mention-trend-agents";
 import { CHART_MUTED_COLOR, CHART_PRIMARY_COLOR } from "@/constants/charts";
-import type { ChartConfig } from "@/types/charts";
 import type { MentionTrendCardProps, MentionTrendSeries } from "@/types/geo";
 import { formatFullDayLabel } from "@/utils/analytics-charts";
 import { accountSeriesColors, seriesColors } from "@/utils/chart-colors";

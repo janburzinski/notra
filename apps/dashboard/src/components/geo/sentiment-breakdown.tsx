@@ -1,10 +1,10 @@
 "use client";
 
 import { formatDayLabel } from "@notra/geo-core/utils/day-label";
+import { EChartsBarChart } from "@notra/ui/components/evilcharts/charts/echarts-bar-chart";
 import { InstrumentModule } from "ui/card";
 import { useFormatter, useLocale, useTranslations } from "use-intl";
 
-import { EChartsBarChart } from "@/components/evilcharts/charts/echarts-bar-chart";
 import { GeoStatDelta } from "@/components/geo/geo-stat-delta";
 import { SentimentEngineList } from "@/components/geo/sentiment-engine-list";
 import {

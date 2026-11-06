@@ -13,7 +13,12 @@ import type {
   StateOfAiSearchEngineId,
   StateOfAiSearchReport,
 } from "@/types/state-of-ai-search";
-import { escapeMarkdownLinkText, markdownSection } from "@/utils/markdown";
+import {
+  escapeMarkdownLinkText,
+  type MarkdownTableColumn as Column,
+  markdownSection,
+  markdownTable as table,
+} from "@/utils/markdown";
 import {
   capturedFromApps,
   engineModelLabel,
@@ -29,35 +34,9 @@ import { SITE_URL } from "@/utils/urls";
 
 import { listLatestSummaries } from "./reports";
 
+const LINE_BREAK_REGEX = /\s*\n\s*/g;
 const PROMPT_BRANDS_LISTED = 4;
 const QUOTED_BRANDS = 5;
-
-const BACKSLASH_REGEX = /\\/g;
-const TABLE_PIPE_REGEX = /\|/g;
-const LINE_BREAK_REGEX = /\s*\n\s*/g;
-
-interface Column {
-  header: string;
-  align?: "left" | "right";
-}
-
-function cell(value: string): string {
-  return value
-    .replace(LINE_BREAK_REGEX, " ")
-    .replace(BACKSLASH_REGEX, "\\\\")
-    .replace(TABLE_PIPE_REGEX, "\\|");
-}
-
-function table(columns: Column[], rows: string[][]): string {
-  const divider = columns.map((column) =>
-    column.align === "right" ? "---:" : "---"
-  );
-  return [
-    `| ${columns.map((column) => column.header).join(" | ")} |`,
-    `| ${divider.join(" | ")} |`,
-    ...rows.map((row) => `| ${row.map(cell).join(" | ")} |`),
-  ].join("\n");
-}
 
 function link(text: string, url: string): string {
   return `[${escapeMarkdownLinkText(text)}](${url})`;

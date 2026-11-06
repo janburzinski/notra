@@ -34,6 +34,7 @@ import { Route as ApiCronGeoContentGapsRouteImport } from './routes/api.cron.geo
 import { Route as ApiCronGeoRecapRouteImport } from './routes/api.cron.geo-recap'
 import { Route as ApiCronGeoScanRouteImport } from './routes/api.cron.geo-scan'
 import { Route as ApiCronMonitoringRouteImport } from './routes/api.cron.monitoring'
+import { Route as ApiCronPublicDataRouteImport } from './routes/api.cron.public-data'
 import { Route as ApiCronScheduledPublicationsRouteImport } from './routes/api.cron.scheduled-publications'
 import { Route as ApiCronSitesRouteImport } from './routes/api.cron.sites'
 import { Route as ApiCronSitesCleanupRouteImport } from './routes/api.cron.sites-cleanup'
@@ -89,6 +90,7 @@ import { Route as ApiInternalWorkflowsGeoScanRouteImport } from './routes/api.in
 import { Route as ApiInternalWorkflowsGeoWriterRouteImport } from './routes/api.internal.workflows.geo-writer'
 import { Route as ApiInternalWorkflowsOnDemandContentRouteImport } from './routes/api.internal.workflows.on-demand-content'
 import { Route as ApiOrganizationsOrganizationIdChatRouteImport } from './routes/api.organizations.$organizationId.chat'
+import { Route as ApiPublicDataAiTrafficRouteImport } from './routes/api.public.data.ai-traffic'
 import { Route as ApiUploadsContentImagesSplatRouteImport } from './routes/api.uploads.content-images.$'
 import { Route as ApiWebhooksGithubAppRouteImport } from './routes/api.webhooks.github.app'
 import { Route as ApiIntegrationsGithubAccountCallbackRouteImport } from './routes/api.integrations.github.account.callback'
@@ -232,6 +234,11 @@ const ApiCronGeoScanRoute = ApiCronGeoScanRouteImport.update({
 const ApiCronMonitoringRoute = ApiCronMonitoringRouteImport.update({
   id: '/api/cron/monitoring',
   path: '/api/cron/monitoring',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiCronPublicDataRoute = ApiCronPublicDataRouteImport.update({
+  id: '/api/cron/public-data',
+  path: '/api/cron/public-data',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiCronScheduledPublicationsRoute =
@@ -544,6 +551,11 @@ const ApiOrganizationsOrganizationIdChatRoute =
     path: '/api/organizations/$organizationId/chat',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicDataAiTrafficRoute = ApiPublicDataAiTrafficRouteImport.update({
+  id: '/api/public/data/ai-traffic',
+  path: '/api/public/data/ai-traffic',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiUploadsContentImagesSplatRoute =
   ApiUploadsContentImagesSplatRouteImport.update({
     id: '/api/uploads/content-images/$',
@@ -667,6 +679,7 @@ export interface FileRoutesByFullPath {
   '/api/cron/geo-recap': typeof ApiCronGeoRecapRoute
   '/api/cron/geo-scan': typeof ApiCronGeoScanRoute
   '/api/cron/monitoring': typeof ApiCronMonitoringRoute
+  '/api/cron/public-data': typeof ApiCronPublicDataRoute
   '/api/cron/scheduled-publications': typeof ApiCronScheduledPublicationsRoute
   '/api/cron/sites': typeof ApiCronSitesRoute
   '/api/cron/sites-cleanup': typeof ApiCronSitesCleanupRoute
@@ -722,6 +735,7 @@ export interface FileRoutesByFullPath {
   '/api/internal/workflows/geo-writer': typeof ApiInternalWorkflowsGeoWriterRoute
   '/api/internal/workflows/on-demand-content': typeof ApiInternalWorkflowsOnDemandContentRoute
   '/api/organizations/$organizationId/chat': typeof ApiOrganizationsOrganizationIdChatRouteWithChildren
+  '/api/public/data/ai-traffic': typeof ApiPublicDataAiTrafficRoute
   '/api/uploads/content-images/$': typeof ApiUploadsContentImagesSplatRoute
   '/api/webhooks/github/app': typeof ApiWebhooksGithubAppRoute
   '/api/integrations/github/account/callback': typeof ApiIntegrationsGithubAccountCallbackRoute
@@ -765,6 +779,7 @@ export interface FileRoutesByTo {
   '/api/cron/geo-recap': typeof ApiCronGeoRecapRoute
   '/api/cron/geo-scan': typeof ApiCronGeoScanRoute
   '/api/cron/monitoring': typeof ApiCronMonitoringRoute
+  '/api/cron/public-data': typeof ApiCronPublicDataRoute
   '/api/cron/scheduled-publications': typeof ApiCronScheduledPublicationsRoute
   '/api/cron/sites': typeof ApiCronSitesRoute
   '/api/cron/sites-cleanup': typeof ApiCronSitesCleanupRoute
@@ -820,6 +835,7 @@ export interface FileRoutesByTo {
   '/api/internal/workflows/geo-writer': typeof ApiInternalWorkflowsGeoWriterRoute
   '/api/internal/workflows/on-demand-content': typeof ApiInternalWorkflowsOnDemandContentRoute
   '/api/organizations/$organizationId/chat': typeof ApiOrganizationsOrganizationIdChatRouteWithChildren
+  '/api/public/data/ai-traffic': typeof ApiPublicDataAiTrafficRoute
   '/api/uploads/content-images/$': typeof ApiUploadsContentImagesSplatRoute
   '/api/webhooks/github/app': typeof ApiWebhooksGithubAppRoute
   '/api/integrations/github/account/callback': typeof ApiIntegrationsGithubAccountCallbackRoute
@@ -864,6 +880,7 @@ export interface FileRoutesById {
   '/api/cron/geo-recap': typeof ApiCronGeoRecapRoute
   '/api/cron/geo-scan': typeof ApiCronGeoScanRoute
   '/api/cron/monitoring': typeof ApiCronMonitoringRoute
+  '/api/cron/public-data': typeof ApiCronPublicDataRoute
   '/api/cron/scheduled-publications': typeof ApiCronScheduledPublicationsRoute
   '/api/cron/sites': typeof ApiCronSitesRoute
   '/api/cron/sites-cleanup': typeof ApiCronSitesCleanupRoute
@@ -919,6 +936,7 @@ export interface FileRoutesById {
   '/api/internal/workflows/geo-writer': typeof ApiInternalWorkflowsGeoWriterRoute
   '/api/internal/workflows/on-demand-content': typeof ApiInternalWorkflowsOnDemandContentRoute
   '/api/organizations/$organizationId/chat': typeof ApiOrganizationsOrganizationIdChatRouteWithChildren
+  '/api/public/data/ai-traffic': typeof ApiPublicDataAiTrafficRoute
   '/api/uploads/content-images/$': typeof ApiUploadsContentImagesSplatRoute
   '/api/webhooks/github/app': typeof ApiWebhooksGithubAppRoute
   '/api/integrations/github/account/callback': typeof ApiIntegrationsGithubAccountCallbackRoute
@@ -964,6 +982,7 @@ export interface FileRouteTypes {
     | '/api/cron/geo-recap'
     | '/api/cron/geo-scan'
     | '/api/cron/monitoring'
+    | '/api/cron/public-data'
     | '/api/cron/scheduled-publications'
     | '/api/cron/sites'
     | '/api/cron/sites-cleanup'
@@ -1019,6 +1038,7 @@ export interface FileRouteTypes {
     | '/api/internal/workflows/geo-writer'
     | '/api/internal/workflows/on-demand-content'
     | '/api/organizations/$organizationId/chat'
+    | '/api/public/data/ai-traffic'
     | '/api/uploads/content-images/$'
     | '/api/webhooks/github/app'
     | '/api/integrations/github/account/callback'
@@ -1062,6 +1082,7 @@ export interface FileRouteTypes {
     | '/api/cron/geo-recap'
     | '/api/cron/geo-scan'
     | '/api/cron/monitoring'
+    | '/api/cron/public-data'
     | '/api/cron/scheduled-publications'
     | '/api/cron/sites'
     | '/api/cron/sites-cleanup'
@@ -1117,6 +1138,7 @@ export interface FileRouteTypes {
     | '/api/internal/workflows/geo-writer'
     | '/api/internal/workflows/on-demand-content'
     | '/api/organizations/$organizationId/chat'
+    | '/api/public/data/ai-traffic'
     | '/api/uploads/content-images/$'
     | '/api/webhooks/github/app'
     | '/api/integrations/github/account/callback'
@@ -1160,6 +1182,7 @@ export interface FileRouteTypes {
     | '/api/cron/geo-recap'
     | '/api/cron/geo-scan'
     | '/api/cron/monitoring'
+    | '/api/cron/public-data'
     | '/api/cron/scheduled-publications'
     | '/api/cron/sites'
     | '/api/cron/sites-cleanup'
@@ -1215,6 +1238,7 @@ export interface FileRouteTypes {
     | '/api/internal/workflows/geo-writer'
     | '/api/internal/workflows/on-demand-content'
     | '/api/organizations/$organizationId/chat'
+    | '/api/public/data/ai-traffic'
     | '/api/uploads/content-images/$'
     | '/api/webhooks/github/app'
     | '/api/integrations/github/account/callback'
@@ -1259,6 +1283,7 @@ export interface RootRouteChildren {
   ApiCronGeoRecapRoute: typeof ApiCronGeoRecapRoute
   ApiCronGeoScanRoute: typeof ApiCronGeoScanRoute
   ApiCronMonitoringRoute: typeof ApiCronMonitoringRoute
+  ApiCronPublicDataRoute: typeof ApiCronPublicDataRoute
   ApiCronScheduledPublicationsRoute: typeof ApiCronScheduledPublicationsRoute
   ApiCronSitesRoute: typeof ApiCronSitesRoute
   ApiCronSitesCleanupRoute: typeof ApiCronSitesCleanupRoute
@@ -1308,6 +1333,7 @@ export interface RootRouteChildren {
   ApiInternalWorkflowsGeoWriterRoute: typeof ApiInternalWorkflowsGeoWriterRoute
   ApiInternalWorkflowsOnDemandContentRoute: typeof ApiInternalWorkflowsOnDemandContentRoute
   ApiOrganizationsOrganizationIdChatRoute: typeof ApiOrganizationsOrganizationIdChatRouteWithChildren
+  ApiPublicDataAiTrafficRoute: typeof ApiPublicDataAiTrafficRoute
   ApiUploadsContentImagesSplatRoute: typeof ApiUploadsContentImagesSplatRoute
   ApiWebhooksGithubAppRoute: typeof ApiWebhooksGithubAppRoute
   ApiIntegrationsGithubAccountCallbackRoute: typeof ApiIntegrationsGithubAccountCallbackRoute
@@ -1494,6 +1520,13 @@ declare module '@tanstack/react-router' {
       path: '/api/cron/monitoring'
       fullPath: '/api/cron/monitoring'
       preLoaderRoute: typeof ApiCronMonitoringRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/cron/public-data': {
+      id: '/api/cron/public-data'
+      path: '/api/cron/public-data'
+      fullPath: '/api/cron/public-data'
+      preLoaderRoute: typeof ApiCronPublicDataRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/cron/scheduled-publications': {
@@ -1881,6 +1914,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiOrganizationsOrganizationIdChatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/data/ai-traffic': {
+      id: '/api/public/data/ai-traffic'
+      path: '/api/public/data/ai-traffic'
+      fullPath: '/api/public/data/ai-traffic'
+      preLoaderRoute: typeof ApiPublicDataAiTrafficRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/uploads/content-images/$': {
       id: '/api/uploads/content-images/$'
       path: '/api/uploads/content-images/$'
@@ -2125,6 +2165,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiCronGeoRecapRoute: ApiCronGeoRecapRoute,
   ApiCronGeoScanRoute: ApiCronGeoScanRoute,
   ApiCronMonitoringRoute: ApiCronMonitoringRoute,
+  ApiCronPublicDataRoute: ApiCronPublicDataRoute,
   ApiCronScheduledPublicationsRoute: ApiCronScheduledPublicationsRoute,
   ApiCronSitesRoute: ApiCronSitesRoute,
   ApiCronSitesCleanupRoute: ApiCronSitesCleanupRoute,
@@ -2185,6 +2226,7 @@ const rootRouteChildren: RootRouteChildren = {
     ApiInternalWorkflowsOnDemandContentRoute,
   ApiOrganizationsOrganizationIdChatRoute:
     ApiOrganizationsOrganizationIdChatRouteWithChildren,
+  ApiPublicDataAiTrafficRoute: ApiPublicDataAiTrafficRoute,
   ApiUploadsContentImagesSplatRoute: ApiUploadsContentImagesSplatRoute,
   ApiWebhooksGithubAppRoute: ApiWebhooksGithubAppRoute,
   ApiIntegrationsGithubAccountCallbackRoute:

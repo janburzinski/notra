@@ -1,17 +1,17 @@
 "use client";
 
 import { formatDayLabel, todayIsoDate } from "@notra/geo-core/utils/day-label";
+import { EChartsAreaChart } from "@notra/ui/components/evilcharts/charts/echarts-area-chart";
 import { Skeleton } from "@notra/ui/components/ui/skeleton";
+import type { ChartConfig } from "@notra/ui/types/charts";
 import { InstrumentModule } from "ui/card";
 import { useLocale, useTranslations } from "use-intl";
 
-import { EChartsAreaChart } from "@/components/evilcharts/charts/echarts-area-chart";
 import { GeoRangePicker } from "@/components/geo/geo-range-picker";
 import { CHART_PRIMARY_COLOR } from "@/constants/charts";
 import { useAgentFeedbackActivity } from "@/lib/hooks/use-agent-feedback";
 import { useGeoRangeDemo } from "@/lib/hooks/use-geo-range-demo";
 import type { AgentFeedbackActivityCardProps } from "@/types/agent-feedback";
-import type { ChartConfig } from "@/types/charts";
 import { formatFullDayLabel } from "@/utils/analytics-charts";
 import { seriesColors } from "@/utils/chart-colors";
 import { formatChartInteger } from "@/utils/geo-charts";

@@ -4,12 +4,12 @@ import { fileURLToPath } from "node:url";
 
 import { GEO_EMPTY_TRAFFIC_RESPONSE } from "@notra/geo-core/constants/geo";
 import type { SiteAnalyticsResponse } from "@notra/geo-core/types/geo";
+import type { EChartsAreaChartProps } from "@notra/ui/components/evilcharts/charts/echarts-area-chart";
 import { Children, isValidElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { IntlProvider } from "use-intl";
 
 import messages from "../messages/en.json";
-import type { EChartsAreaChartProps } from "../src/components/evilcharts/charts/echarts-area-chart";
 
 if (!process.env.NOTRA_SITE_ANALYTICS_TEST_WORKER) {
   test("site analytics empty-state contract", () => {
@@ -57,13 +57,16 @@ if (!process.env.NOTRA_SITE_ANALYTICS_TEST_WORKER) {
   }));
   mock.module("../src/components/framework/link", () => ({ default: "a" }));
   const chartModule =
-    await import("../src/components/evilcharts/charts/echarts-area-chart");
+    await import("@notra/ui/components/evilcharts/charts/echarts-area-chart");
   const chart = mock(
     (_props: EChartsAreaChartProps<Record<string, unknown>>) => null
   );
-  mock.module("../src/components/evilcharts/charts/echarts-area-chart", () => ({
-    EChartsAreaChart: Object.assign(chart, chartModule.EChartsAreaChart),
-  }));
+  mock.module(
+    "@notra/ui/components/evilcharts/charts/echarts-area-chart",
+    () => ({
+      EChartsAreaChart: Object.assign(chart, chartModule.EChartsAreaChart),
+    })
+  );
 
   const { SiteAnalyticsPage } =
     await import("../src/components/sites/pages/site-analytics-page");

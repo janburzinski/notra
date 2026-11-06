@@ -8,9 +8,10 @@ import {
 import { trafficVisitDelta } from "@notra/geo-core/utils/ai-traffic";
 import { todayIsoDate } from "@notra/geo-core/utils/day-label";
 import { AnimatedNumber } from "@notra/ui/components/animated-number";
+import { EChartsAreaChart } from "@notra/ui/components/evilcharts/charts/echarts-area-chart";
+import type { ChartConfig } from "@notra/ui/types/charts";
 import { useLocale, useTranslations } from "use-intl";
 
-import { EChartsAreaChart } from "@/components/evilcharts/charts/echarts-area-chart";
 import { GeoStatDelta } from "@/components/geo/geo-stat-delta";
 import { CHART_PRIMARY_COLOR, CHART_REFERRAL_COLOR } from "@/constants/charts";
 import {
@@ -24,7 +25,6 @@ import {
   TRAFFIC_HERO_METRICS_SURFACE_CLASS,
 } from "@/constants/geo-traffic-hero";
 import { cn } from "@/lib/utils";
-import type { ChartConfig } from "@/types/charts";
 import type { JourneysHeroMetric, JourneysHeroProps } from "@/types/geo";
 import { formatFullDayLabel } from "@/utils/analytics-charts";
 import { seriesColors } from "@/utils/chart-colors";

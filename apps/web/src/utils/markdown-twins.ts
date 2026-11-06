@@ -6,6 +6,7 @@ import type {
 } from "@dualmark/nextjs";
 
 import { changelog } from "@/../.source/server";
+import { DATA_PATH } from "@/constants/data";
 import { FEATURE_DETAIL_SLUGS } from "@/constants/feature-pages/paths";
 import { STATE_OF_AI_SEARCH_PATH } from "@/constants/state-of-ai-search";
 import { buildAgentPageMarkdown } from "@/lib/agent/markdown";
@@ -19,6 +20,7 @@ import {
   listCompareMarkdownPages,
 } from "@/lib/compare/markdown";
 import { buildContributorsMarkdown } from "@/lib/contributors/markdown";
+import { buildDataMarkdown } from "@/lib/data/markdown";
 import { buildFeedbackMdPageMarkdown } from "@/lib/feedback-md/markdown";
 import {
   buildIntegrationMarkdown,
@@ -345,6 +347,7 @@ export function buildDualmarkStaticPages(): StaticPageConfig[] {
       pattern: STATE_OF_AI_SEARCH_PATH,
       render: () => buildStateOfAiSearchIndexMarkdown(),
     },
+    { pattern: DATA_PATH, render: () => buildDataMarkdown() },
     ...listSummaries().map((summary) => ({
       pattern: reportPath(summary.slug, summary.edition),
       render: async () => {

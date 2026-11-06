@@ -1,13 +1,13 @@
 "use client";
 
 import { formatDayLabel, todayIsoDate } from "@notra/geo-core/utils/day-label";
+import { EChartsBarChart } from "@notra/ui/components/evilcharts/charts/echarts-bar-chart";
+import type { ChartConfig } from "@notra/ui/types/charts";
 import { useMemo } from "react";
 import { useLocale } from "use-intl";
 
-import { EChartsBarChart } from "@/components/evilcharts/charts/echarts-bar-chart";
 import { CHART_PRIMARY_COLOR } from "@/constants/charts";
 import { TRAFFIC_HERO_CHART_OPTIONS } from "@/constants/geo-traffic-hero";
-import type { ChartConfig } from "@/types/charts";
 import type { DailyTrendChartProps } from "@/types/geo";
 import { seriesColors } from "@/utils/chart-colors";
 import { formatChartInteger } from "@/utils/geo-charts";

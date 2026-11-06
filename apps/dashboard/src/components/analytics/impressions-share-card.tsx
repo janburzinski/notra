@@ -1,11 +1,12 @@
 "use client";
 
+import { EChartsPieChart } from "@notra/ui/components/evilcharts/charts/echarts-pie-chart";
+import type { ChartConfig } from "@notra/ui/types/charts";
 import { useMemo } from "react";
 import { InstrumentEmpty, InstrumentModule } from "ui/card";
 import { useTranslations } from "use-intl";
 
 import { ChartColorScope } from "@/components/charts/chart-color-scope";
-import { EChartsPieChart } from "@/components/evilcharts/charts/echarts-pie-chart";
 import {
   DONUT_CORNER_RADIUS,
   DONUT_INNER_RADIUS,
@@ -18,7 +19,6 @@ import type {
   ImpressionsSharePieSlice,
   ImpressionsShareRow,
 } from "@/types/analytics";
-import type { ChartConfig } from "@/types/charts";
 import { accountSeriesKey } from "@/utils/analytics-charts";
 import { seriesColors } from "@/utils/chart-colors";
 import { chartKey } from "@/utils/chart-keys";

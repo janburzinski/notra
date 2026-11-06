@@ -1,6 +1,7 @@
 import { changelog } from "@/../.source/server";
 import { COMPARE_COMPETITORS } from "@/constants/compare/competitors";
 import { COMPARE_LAST_MODIFIED, COMPARE_PATH } from "@/constants/compare/page";
+import { DATA_URL } from "@/constants/data";
 import {
   FEATURE_DETAIL_LAST_MODIFIED,
   FEATURE_DETAIL_PATHS,
@@ -212,6 +213,10 @@ export async function buildSitemapEntries(): Promise<SitemapEntry[]> {
     {
       url: `${SITE_URL}/qr-code-generator`,
       lastModified: STATIC_PAGE_LAST_MODIFIED,
+    },
+    {
+      url: DATA_URL,
+      lastModified: new Date(new Date().toISOString().slice(0, 10)),
     },
     {
       url: STATE_OF_AI_SEARCH_URL,

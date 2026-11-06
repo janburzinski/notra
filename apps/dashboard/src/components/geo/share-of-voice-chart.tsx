@@ -11,6 +11,7 @@ import {
   GEO_MENTION_ROW_HEIGHT_REM,
   GEO_MENTION_SUMMARY_VISIBLE,
 } from "@notra/geo-core/constants/geo";
+import { EChartsPieChart } from "@notra/ui/components/evilcharts/charts/echarts-pie-chart";
 import { DetailCardContent } from "@notra/ui/components/ui/detail-card";
 import {
   Empty,
@@ -30,7 +31,6 @@ import { useLocale, useTranslations } from "use-intl";
 
 import { Button } from "@/components/button";
 import { ChartColorScope } from "@/components/charts/chart-color-scope";
-import { EChartsPieChart } from "@/components/evilcharts/charts/echarts-pie-chart";
 import { CompetitorEditDialog } from "@/components/geo/competitor-edit-dialog";
 import { CompetitorLogo } from "@/components/geo/competitor-logo";
 import { GeoStatDelta } from "@/components/geo/geo-stat-delta";

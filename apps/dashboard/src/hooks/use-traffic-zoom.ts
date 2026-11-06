@@ -1,8 +1,7 @@
 "use client";
 
+import type { ChartRangeSelection } from "@notra/ui/components/evilcharts/charts/echarts-area-chart";
 import { useCallback, useEffect, useState } from "react";
-
-import type { ChartRangeSelection } from "@/components/evilcharts/charts/echarts-area-chart";
 
 interface ZoomRange {
   from: number;

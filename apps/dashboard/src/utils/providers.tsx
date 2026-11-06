@@ -17,6 +17,7 @@ import { CardLabelsProvider } from "ui/card/labels";
 import { DataTableLabelsProvider } from "ui/table/labels";
 import { useLocale, useTranslations } from "use-intl";
 
+import { DashboardChartEnvironment } from "@/components/charts/dashboard-chart-environment";
 import Image from "@/components/framework/image";
 import Link from "@/components/framework/link";
 import { PostHogIdentity } from "@/components/providers/posthog-identity";
@@ -130,7 +131,9 @@ export function Providers({
               <CardLabelsProvider labels={uiLabels}>
                 <TooltipProvider delay={500} glide={false}>
                   <NuqsAdapter>
-                    {children}
+                    <DashboardChartEnvironment>
+                      {children}
+                    </DashboardChartEnvironment>
                     {POSTHOG_PROJECT_TOKEN && !embed ? (
                       <Suspense fallback={null}>
                         <PostHogIdentity />

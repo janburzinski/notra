@@ -16,6 +16,7 @@ import type {
 import { competitorCanonicalMap } from "@notra/geo-core/utils/geo-competitor-names";
 import { engineFamilyOf } from "@notra/geo-core/utils/geo-engine-family";
 import { sumGeoSparklinePoints } from "@notra/geo-core/utils/geo-sparkline";
+import type { ChartColorPair } from "@notra/ui/types/charts";
 
 import {
   CHART_MUTED_COLOR,
@@ -23,7 +24,6 @@ import {
   RIVAL_SWATCHES,
 } from "@/constants/charts";
 import { GEO_COMPETITOR_DETAIL_QUERY_KEY } from "@/constants/geo-competitors";
-import type { ChartColorPair } from "@/types/charts";
 import type { EngineFamilyBrandRow, EngineFamilyBrandScope } from "@/types/geo";
 import type { GeoCompetitorRowEntry } from "@/types/geo-competitors";
 

@@ -1,4 +1,5 @@
 @import "@notra/ui/globals.css";
+@import "@notra/ui/charts.css";
 @import "ui/styles/chatgpt.css";
 @import "ui/styles/claude.css";
 
@@ -6,18 +7,6 @@
 @source "../**/*.{ts,tsx}";
 @source "../../../ui/registry/notra/{card,chatgpt,claude,dropdown-menu,shimmer,table}/components";
 @source "../../../ui/registry/notra/workflow/{components,constants,lib}";
-
-@property --ec-tooltip-scale-x {
-  syntax: "<number>";
-  inherits: true;
-  initial-value: 1;
-}
-
-@property --ec-tooltip-scale-y {
-  syntax: "<number>";
-  inherits: true;
-  initial-value: 1;
-}
 
 @theme inline {
   --font-sans: var(--font-inter);
@@ -82,19 +71,6 @@
 }
 
 @layer components {
-  .ec-tooltip-surface {
-    transform-origin: top left;
-    transform: scale(var(--ec-tooltip-scale-x), var(--ec-tooltip-scale-y));
-  }
-
-  .ec-tooltip-content {
-    transform-origin: top left;
-    transform: scale(
-      calc(1 / var(--ec-tooltip-scale-x)),
-      calc(1 / var(--ec-tooltip-scale-y))
-    );
-  }
-
   .lexical-editor mark {
     color: inherit;
     background-color: color-mix(

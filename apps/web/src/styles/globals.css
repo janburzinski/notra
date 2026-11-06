@@ -1,6 +1,7 @@
 @import "tailwindcss" source("../");
 @import "./ui-sources.css";
 @import "./theme.css";
+@import "../../../../packages/ui/src/styles/charts.css";
 
 @source "../../../ui/registry/notra/table/components";
 @source "../../../../node_modules/streamdown/dist";

@@ -77,7 +77,7 @@ if (!process.env.NOTRA_SETUP_LEGEND_TEST_WORKER) {
   const { RaycastSetupGuideDialog } =
     await import("../src/components/integrations/raycast-setup-guide-dialog");
   const { LegendOverlay } =
-    await import("../src/components/evilcharts/ui/echarts-legend");
+    await import("@notra/ui/components/evilcharts/ui/echarts-legend");
 
   Object.entries({
     FramerPage,

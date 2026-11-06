@@ -1,5 +1,6 @@
 "use client";
 
+import type { ChartColorPair, ChartConfig } from "@notra/ui/types/charts";
 import {
   createContext,
   useCallback,
@@ -15,7 +16,6 @@ import type {
   AnalyticsContextValue,
   AnalyticsProviderProps,
 } from "@/types/analytics";
-import type { ChartColorPair, ChartConfig } from "@/types/charts";
 import { accountSeriesKey } from "@/utils/analytics-charts";
 import {
   accountSeriesColorPair,

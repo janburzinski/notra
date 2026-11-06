@@ -6,11 +6,12 @@ import type {
   ChartArtifact,
   PieChartArtifact,
 } from "@notra/ai/types/chart-artifact";
+import { EChartsAreaChart } from "@notra/ui/components/evilcharts/charts/echarts-area-chart";
+import { EChartsPieChart } from "@notra/ui/components/evilcharts/charts/echarts-pie-chart";
+import type { ChartConfig } from "@notra/ui/types/charts";
 import type { CSSProperties, ReactNode } from "react";
 import { useLocale, useTranslations } from "use-intl";
 
-import { EChartsAreaChart } from "@/components/evilcharts/charts/echarts-area-chart";
-import { EChartsPieChart } from "@/components/evilcharts/charts/echarts-pie-chart";
 import { EngineIcon } from "@/components/geo/engine-icon";
 import {
   CHAT_TOOL_CHART_HEIGHT_CLASS,
@@ -23,7 +24,6 @@ import {
   DONUT_PADDING_ANGLE,
 } from "@/constants/charts";
 import { cn } from "@/lib/utils";
-import type { ChartConfig } from "@/types/charts";
 import type {
   ToolOutputChartProps,
   ToolOutputRankRow,

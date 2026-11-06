@@ -1,14 +1,15 @@
 "use client";
 
+import { EChartsAreaChart } from "@notra/ui/components/evilcharts/charts/echarts-area-chart";
+import { tooltipColorSwatchHtml } from "@notra/ui/components/evilcharts/ui/echarts-tooltip";
+import type { ChartConfig } from "@notra/ui/types/charts";
 import { useMemo } from "react";
 
-import { EChartsAreaChart } from "@/components/evilcharts/charts/echarts-area-chart";
-import { tooltipColorSwatchHtml } from "@/components/evilcharts/ui/echarts-tooltip";
 import {
   SPARKLINE_CHART_OPTIONS,
   SPARKLINE_SERIES_KEY,
 } from "@/constants/charts";
-import type { ChartConfig, ChartSparklineProps } from "@/types/charts";
+import type { ChartSparklineProps } from "@/types/charts";
 import { seriesColors } from "@/utils/chart-colors";
 
 export function ChartSparkline({

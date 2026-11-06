@@ -68,6 +68,7 @@ import type {
   GeoPromptTranslationEntry,
   GeoTrafficSitesMode,
 } from "@notra/geo-core/types/geo";
+import type { ChartConfig, ChartSeriesColors } from "@notra/ui/types/charts";
 import type {
   ComponentProps,
   ComponentPropsWithoutRef,
@@ -79,7 +80,6 @@ import type { z } from "zod";
 
 import type { Button } from "@/components/button";
 import type { GeoPromptDetailSurface } from "@/types/analytics/geo-events";
-import type { ChartConfig, ChartSeriesColors } from "@/types/charts";
 import type { GeoCompetitorSuggestion } from "@/types/geo-competitors";
 import type { GeoPromptDetailState } from "@/types/geo-prompt-detail";
 import type { GeoScanModelMenuProps } from "@/types/geo-scan-activity";

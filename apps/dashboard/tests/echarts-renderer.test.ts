@@ -11,7 +11,8 @@ for (const renderer of ["default", "canvas", "svg"]) {
       [
         "--eval",
         echartsRendererWorker,
-        "components/evilcharts/charts/echarts-area-chart.tsx",
+        // The chart lives in @notra/ui; paths resolve from apps/dashboard/src.
+        "../../../packages/ui/src/components/evilcharts/charts/echarts-area-chart.tsx",
         "EChartsAreaChart",
         "renderer",
         renderer,

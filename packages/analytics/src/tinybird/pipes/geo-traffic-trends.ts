@@ -1,5 +1,10 @@
 import { defineEndpoint, node, p, t } from "@tinybirdco/sdk";
 
+import {
+  GEO_EXCLUDED_SOURCES_PARAMS,
+  GEO_EXCLUDED_SOURCES_SQL,
+} from "../../constants/geo-queries";
+
 /**
  * Cross-organization AI traffic for the Notra admin console. Unlike the
  * `geo_traffic_*` endpoints these are not scoped to one organization; the
@@ -13,6 +18,7 @@ const TRENDS_PARAMS = {
     .string()
     .optional("")
     .describe("Comma-separated project ids to leave out, empty for none"),
+  ...GEO_EXCLUDED_SOURCES_PARAMS,
 };
 
 const TRENDS_SCOPE_SQL = `
@@ -22,14 +28,26 @@ const TRENDS_SCOPE_SQL = `
           AND (
             {{String(excluded_project_ids, '')}} = ''
             OR NOT has(splitByChar(',', {{String(excluded_project_ids, '')}}), project_id)
-          )`;
+          )
+          ${GEO_EXCLUDED_SOURCES_SQL}`;
+
+/** Partition of one bot's or assistant's sites on one day. */
+const SITE_WINDOW = "OVER (PARTITION BY day, visitor_type, source)";
 
 export const geoTrafficTrendsDaily = defineEndpoint(
   "geo_traffic_trends_daily",
   {
     description:
       "Daily AI crawler and referral visits per source across all organizations, with the median project's visits. Rows with an empty source count the projects that received any AI traffic that day.",
-    params: TRENDS_PARAMS,
+    params: {
+      ...TRENDS_PARAMS,
+      site_cap_factor: p
+        .float64()
+        .optional(0)
+        .describe(
+          "Cap each site at this many times the median site's visits and at the other sites' total; 0 keeps raw counts"
+        ),
+    },
     nodes: [
       node({
         name: "per_project",
@@ -47,9 +65,41 @@ export const geoTrafficTrendsDaily = defineEndpoint(
         GROUP BY day, visitor_type, source, project_id
       `,
       }),
-      // The median keeps one site with 10× everyone's traffic from setting
-      // the per-site line. Per-project columns are prefixed so the sums'
-      // aliases don't shadow them inside the quantile.
+      // With a positive site_cap_factor, a site counts with at most that many
+      // times the median site's visits, then at most as much as all other
+      // sites together, so no single site sets or dominates a published
+      // figure. 0 keeps raw counts (the admin console).
+      node({
+        name: "site_bounds",
+        sql: `
+        SELECT
+          *,
+          if(
+            {{Float64(site_cap_factor, 0)}} > 0,
+            least(
+              toFloat64(project_visits),
+              {{Float64(site_cap_factor, 0)}} * toFloat64(quantileExact(0.5)(project_visits) ${SITE_WINDOW})
+            ),
+            toFloat64(project_visits)
+          ) AS bounded_visits
+        FROM per_project
+      `,
+      }),
+      node({
+        name: "site_capped",
+        sql: `
+        SELECT
+          *,
+          if(
+            {{Float64(site_cap_factor, 0)}} > 0,
+            least(bounded_visits, sum(bounded_visits) ${SITE_WINDOW} - bounded_visits),
+            bounded_visits
+          ) AS capped_visits
+        FROM site_bounds
+      `,
+      }),
+      // The median is over raw visits. Per-project columns are prefixed so
+      // the sums' aliases don't shadow them.
       node({
         name: "per_source",
         sql: `
@@ -58,11 +108,13 @@ export const geoTrafficTrendsDaily = defineEndpoint(
           visitor_type,
           source,
           any(project_category) AS category,
-          sum(project_visits) AS visits,
-          sum(project_markdown_visits) AS markdown_visits,
+          toUInt64(round(sum(capped_visits))) AS visits,
+          toUInt64(round(sum(
+            if(project_visits = 0, 0, project_markdown_visits * capped_visits / project_visits)
+          ))) AS markdown_visits,
           count() AS projects,
           toFloat64(quantileExact(0.5)(project_visits)) AS median_visits
-        FROM per_project
+        FROM site_capped
         GROUP BY day, visitor_type, source
       `,
       }),
@@ -141,7 +193,8 @@ export const geoTrafficTrendsProjects = defineEndpoint(
             0,
             intDiv(dateDiff('day', day, toDateOrNull({{String(recent_from, '')}})) + 6, 7)
           )) AS weeks_ago,
-          countMerge(visits_state) AS visits
+          countMerge(visits_state) AS visits,
+          countIfMerge(markdown_visits_state) AS markdown_visits
         FROM geo_traffic_daily
         WHERE ${TRENDS_SCOPE_SQL}
           AND day >= toDateOrNull({{String(baseline_from, '')}})
@@ -156,6 +209,7 @@ export const geoTrafficTrendsProjects = defineEndpoint(
       source: t.string(),
       weeks_ago: t.uint32(),
       visits: t.uint64(),
+      markdown_visits: t.uint64(),
     },
   }
 );

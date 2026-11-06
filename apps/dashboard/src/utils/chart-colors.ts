@@ -1,3 +1,4 @@
+import type { ChartColorPair, ChartSeriesColors } from "@notra/ui/types/charts";
 import Color from "color";
 
 import {
@@ -6,7 +7,6 @@ import {
   CHART_MUTED_COLOR,
   CHART_SEARCH_FILL_CLASS,
 } from "@/constants/charts";
-import type { ChartColorPair, ChartSeriesColors } from "@/types/charts";
 
 const SOFT_GRADIENT_LIGHT_TINT = 0.45;
 const SOFT_GRADIENT_DARK_TINT = 0.3;

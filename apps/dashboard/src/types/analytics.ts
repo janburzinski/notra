@@ -1,6 +1,9 @@
+import type {
+  ChartColorPair,
+  ChartConfig,
+  ChartMarker,
+} from "@notra/ui/types/charts";
 import type { ReactNode } from "react";
-
-import type { ChartColorPair, ChartConfig, ChartMarker } from "@/types/charts";
 
 export interface SocialAnalyticsSyncPayload {
   organizationId?: string;

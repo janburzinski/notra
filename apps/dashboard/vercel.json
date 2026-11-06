@@ -41,6 +41,10 @@
       "schedule": "30 3 * * *"
     },
     {
+      "path": "/api/cron/public-data",
+      "schedule": "20 0 * * *"
+    },
+    {
       "path": "/api/cron/autopilot",
       "schedule": "*/5 * * * *"
     }

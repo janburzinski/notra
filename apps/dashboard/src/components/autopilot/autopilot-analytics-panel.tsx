@@ -2,7 +2,9 @@
 
 import { HugeiconsIcon, type IconSvgElement } from "@hugeicons/react";
 import { formatDayLabel, todayIsoDate } from "@notra/geo-core/utils/day-label";
+import { EChartsAreaChart } from "@notra/ui/components/evilcharts/charts/echarts-area-chart";
 import { Skeleton } from "@notra/ui/components/ui/skeleton";
+import type { ChartConfig } from "@notra/ui/types/charts";
 import { useQuery } from "@tanstack/react-query";
 import type { CSSProperties } from "react";
 import { InstrumentEmpty, InstrumentModule } from "ui/card";
@@ -13,7 +15,6 @@ import { AutopilotRunsTable } from "@/components/autopilot/autopilot-runs-table"
 import { AutopilotStatStrip } from "@/components/autopilot/autopilot-stat-strip";
 import { AutopilotTrend } from "@/components/autopilot/autopilot-trend";
 import { Button } from "@/components/button";
-import { EChartsAreaChart } from "@/components/evilcharts/charts/echarts-area-chart";
 import { AUTOPILOT_RUN_TRIGGER_LABELS } from "@/constants/autopilot";
 import {
   AUTOPILOT_ACTIVITY_LEGEND,
@@ -34,7 +35,6 @@ import type {
   AutopilotAnalyticsSummary,
   AutopilotOutcomeKey,
 } from "@/types/autopilot-metrics";
-import type { ChartConfig } from "@/types/charts";
 import { formatFullDayLabel } from "@/utils/analytics-charts";
 import {
   formatHoursToMerge,

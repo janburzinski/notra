@@ -1,4 +1,4 @@
-import type { ChartColorPair } from "@/types/charts";
+import type { ChartColorPair } from "@notra/ui/types/charts";
 
 export const CHART_PRIMARY_COLOR: ChartColorPair = {
   light: "#8B5CF6",
@@ -41,7 +41,6 @@ export const SHARE_OF_VOICE_AGGREGATE_ID = "aggregate:other";
 export const SHARE_OF_VOICE_AGGREGATE_LABEL = "Other brands";
 export const SHARE_OF_VOICE_RANKING_LIMIT = 4;
 export const CHART_PERCENT_SCALE = 100;
-export const CHART_SCRUB_POSITION_LERP = 0.35;
 export const SPARKLINE_SERIES_KEY = "value";
 
 export const SPARKLINE_CHART_OPTIONS: Record<string, unknown> = {

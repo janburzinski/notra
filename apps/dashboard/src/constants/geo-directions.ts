@@ -4,9 +4,9 @@ import type {
   GeoTrafficPage,
 } from "@notra/geo-core/types/geo";
 import { formatDayLabel } from "@notra/geo-core/utils/day-label";
+import type { ChartConfig } from "@notra/ui/types/charts";
 
 import { CHART_PRIMARY_COLOR, CHART_SECONDARY_COLOR } from "@/constants/charts";
-import type { ChartConfig } from "@/types/charts";
 import type {
   GeoDirectionEngineRow,
   GeoDirectionKpi,

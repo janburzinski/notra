@@ -39,6 +39,7 @@
     "@notra/email": "workspace:*",
     "@notra/geo-core": "workspace:*",
     "@notra/kiwi": "workspace:*",
+    "@notra/schemas": "workspace:*",
     "@notra/ui": "workspace:*",
     "@notra/utils": "workspace:*",
     "@paper-design/shaders-react": "~0.0.81",

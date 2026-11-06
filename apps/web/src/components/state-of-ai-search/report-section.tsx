@@ -85,7 +85,7 @@ export function ReportPair({
   right: ReportPairSide;
 }) {
   return (
-    <div className="grid gap-x-6 gap-y-3 lg:grid-cols-2 lg:grid-rows-[auto_1fr]">
+    <div className="grid grid-cols-[minmax(0,1fr)] gap-x-6 gap-y-3 lg:grid-cols-2 lg:grid-rows-[auto_1fr]">
       <ReportHeading
         className="lg:col-start-1 lg:row-start-1"
         description={left.description}

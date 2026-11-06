@@ -1,11 +1,11 @@
 "use client";
 
+import { EChartsAreaChart } from "@notra/ui/components/evilcharts/charts/echarts-area-chart";
+import { EChartsBarChart } from "@notra/ui/components/evilcharts/charts/echarts-bar-chart";
+import { EChartsLineChart } from "@notra/ui/components/evilcharts/charts/echarts-line-chart";
 import { InstrumentEmpty, InstrumentModule } from "ui/card";
 
 import { ChartSeriesLegend } from "@/components/analytics/chart-legend";
-import { EChartsAreaChart } from "@/components/evilcharts/charts/echarts-area-chart";
-import { EChartsBarChart } from "@/components/evilcharts/charts/echarts-bar-chart";
-import { EChartsLineChart } from "@/components/evilcharts/charts/echarts-line-chart";
 import type { AccountSeriesChartCardProps } from "@/types/analytics";
 
 const CHART_CLASS = "h-56 w-full";

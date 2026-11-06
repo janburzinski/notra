@@ -77,6 +77,8 @@ import { Route as SiteLegalTermsRouteImport } from './routes/_site/_legal/terms'
 import { Route as SiteCompareIndexRouteImport } from './routes/_site/compare/index'
 import { Route as SiteContributorsIndexRouteImport } from './routes/_site/contributors/index'
 import { Route as SiteContributorsOpengraphImageRouteImport } from './routes/_site/contributors/opengraph-image'
+import { Route as SiteDataIndexRouteImport } from './routes/_site/data/index'
+import { Route as SiteDataIndexDotjsonRouteImport } from './routes/_site/data/index[.]json'
 import { Route as SiteFeaturesIndexRouteImport } from './routes/_site/features/index'
 import { Route as SiteFeaturesAiCrawlerLogsRouteImport } from './routes/_site/features/ai-crawler-logs'
 import { Route as SiteFeaturesConversationsRouteImport } from './routes/_site/features/conversations'
@@ -467,6 +469,16 @@ const SiteContributorsOpengraphImageRoute =
     path: '/contributors/opengraph-image',
     getParentRoute: () => SiteRoute,
   } as any)
+const SiteDataIndexRoute = SiteDataIndexRouteImport.update({
+  id: '/data/',
+  path: '/data/',
+  getParentRoute: () => SiteRoute,
+} as any)
+const SiteDataIndexDotjsonRoute = SiteDataIndexDotjsonRouteImport.update({
+  id: '/data/index.json',
+  path: '/data/index.json',
+  getParentRoute: () => SiteRoute,
+} as any)
 const SiteFeaturesIndexRoute = SiteFeaturesIndexRouteImport.update({
   id: '/features/',
   path: '/features/',
@@ -780,6 +792,7 @@ export interface FileRoutesByFullPath {
   '/subprocessors': typeof SiteLegalSubprocessorsRoute
   '/terms': typeof SiteLegalTermsRoute
   '/contributors/opengraph-image': typeof SiteContributorsOpengraphImageRoute
+  '/data/index.json': typeof SiteDataIndexDotjsonRoute
   '/features/ai-crawler-logs': typeof SiteFeaturesAiCrawlerLogsRoute
   '/features/conversations': typeof SiteFeaturesConversationsRoute
   '/features/personas': typeof SiteFeaturesPersonasRoute
@@ -803,6 +816,7 @@ export interface FileRoutesByFullPath {
   '/.well-known/mcp/': typeof DotwellKnownMcpIndexRoute
   '/compare/': typeof SiteCompareIndexRoute
   '/contributors/': typeof SiteContributorsIndexRoute
+  '/data/': typeof SiteDataIndexRoute
   '/features/': typeof SiteFeaturesIndexRoute
   '/integrations/': typeof SiteIntegrationsIndexRoute
   '/mcp/': typeof SiteMcpIndexRoute
@@ -891,6 +905,7 @@ export interface FileRoutesByTo {
   '/subprocessors': typeof SiteLegalSubprocessorsRoute
   '/terms': typeof SiteLegalTermsRoute
   '/contributors/opengraph-image': typeof SiteContributorsOpengraphImageRoute
+  '/data/index.json': typeof SiteDataIndexDotjsonRoute
   '/features/ai-crawler-logs': typeof SiteFeaturesAiCrawlerLogsRoute
   '/features/conversations': typeof SiteFeaturesConversationsRoute
   '/features/personas': typeof SiteFeaturesPersonasRoute
@@ -914,6 +929,7 @@ export interface FileRoutesByTo {
   '/.well-known/mcp': typeof DotwellKnownMcpIndexRoute
   '/compare': typeof SiteCompareIndexRoute
   '/contributors': typeof SiteContributorsIndexRoute
+  '/data': typeof SiteDataIndexRoute
   '/features': typeof SiteFeaturesIndexRoute
   '/integrations': typeof SiteIntegrationsIndexRoute
   '/mcp': typeof SiteMcpIndexRoute
@@ -1008,6 +1024,7 @@ export interface FileRoutesById {
   '/_site/_legal/subprocessors': typeof SiteLegalSubprocessorsRoute
   '/_site/_legal/terms': typeof SiteLegalTermsRoute
   '/_site/contributors/opengraph-image': typeof SiteContributorsOpengraphImageRoute
+  '/_site/data/index.json': typeof SiteDataIndexDotjsonRoute
   '/_site/features/ai-crawler-logs': typeof SiteFeaturesAiCrawlerLogsRoute
   '/_site/features/conversations': typeof SiteFeaturesConversationsRoute
   '/_site/features/personas': typeof SiteFeaturesPersonasRoute
@@ -1031,6 +1048,7 @@ export interface FileRoutesById {
   '/.well-known/mcp/': typeof DotwellKnownMcpIndexRoute
   '/_site/compare/': typeof SiteCompareIndexRoute
   '/_site/contributors/': typeof SiteContributorsIndexRoute
+  '/_site/data/': typeof SiteDataIndexRoute
   '/_site/features/': typeof SiteFeaturesIndexRoute
   '/_site/integrations/': typeof SiteIntegrationsIndexRoute
   '/_site/mcp/': typeof SiteMcpIndexRoute
@@ -1121,6 +1139,7 @@ export interface FileRouteTypes {
     | '/subprocessors'
     | '/terms'
     | '/contributors/opengraph-image'
+    | '/data/index.json'
     | '/features/ai-crawler-logs'
     | '/features/conversations'
     | '/features/personas'
@@ -1144,6 +1163,7 @@ export interface FileRouteTypes {
     | '/.well-known/mcp/'
     | '/compare/'
     | '/contributors/'
+    | '/data/'
     | '/features/'
     | '/integrations/'
     | '/mcp/'
@@ -1232,6 +1252,7 @@ export interface FileRouteTypes {
     | '/subprocessors'
     | '/terms'
     | '/contributors/opengraph-image'
+    | '/data/index.json'
     | '/features/ai-crawler-logs'
     | '/features/conversations'
     | '/features/personas'
@@ -1255,6 +1276,7 @@ export interface FileRouteTypes {
     | '/.well-known/mcp'
     | '/compare'
     | '/contributors'
+    | '/data'
     | '/features'
     | '/integrations'
     | '/mcp'
@@ -1348,6 +1370,7 @@ export interface FileRouteTypes {
     | '/_site/_legal/subprocessors'
     | '/_site/_legal/terms'
     | '/_site/contributors/opengraph-image'
+    | '/_site/data/index.json'
     | '/_site/features/ai-crawler-logs'
     | '/_site/features/conversations'
     | '/_site/features/personas'
@@ -1371,6 +1394,7 @@ export interface FileRouteTypes {
     | '/.well-known/mcp/'
     | '/_site/compare/'
     | '/_site/contributors/'
+    | '/_site/data/'
     | '/_site/features/'
     | '/_site/integrations/'
     | '/_site/mcp/'
@@ -1930,6 +1954,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SiteContributorsOpengraphImageRouteImport
       parentRoute: typeof SiteRoute
     }
+    '/_site/data/': {
+      id: '/_site/data/'
+      path: '/data'
+      fullPath: '/data/'
+      preLoaderRoute: typeof SiteDataIndexRouteImport
+      parentRoute: typeof SiteRoute
+    }
+    '/_site/data/index.json': {
+      id: '/_site/data/index.json'
+      path: '/data/index.json'
+      fullPath: '/data/index.json'
+      preLoaderRoute: typeof SiteDataIndexDotjsonRouteImport
+      parentRoute: typeof SiteRoute
+    }
     '/_site/features/': {
       id: '/_site/features/'
       path: '/features'
@@ -2353,6 +2391,7 @@ interface SiteRouteChildren {
   SiteTwitterThreadCreatorRoute: typeof SiteTwitterThreadCreatorRoute
   SiteUtmBuilderRoute: typeof SiteUtmBuilderRoute
   SiteContributorsOpengraphImageRoute: typeof SiteContributorsOpengraphImageRoute
+  SiteDataIndexDotjsonRoute: typeof SiteDataIndexDotjsonRoute
   SiteFeaturesAiCrawlerLogsRoute: typeof SiteFeaturesAiCrawlerLogsRoute
   SiteFeaturesConversationsRoute: typeof SiteFeaturesConversationsRoute
   SiteFeaturesPersonasRoute: typeof SiteFeaturesPersonasRoute
@@ -2366,6 +2405,7 @@ interface SiteRouteChildren {
   SiteOfferingReportRoute: typeof SiteOfferingReportRoute
   SiteCompareIndexRoute: typeof SiteCompareIndexRoute
   SiteContributorsIndexRoute: typeof SiteContributorsIndexRoute
+  SiteDataIndexRoute: typeof SiteDataIndexRoute
   SiteFeaturesIndexRoute: typeof SiteFeaturesIndexRoute
   SiteIntegrationsIndexRoute: typeof SiteIntegrationsIndexRoute
   SiteMcpIndexRoute: typeof SiteMcpIndexRoute
@@ -2401,6 +2441,7 @@ const SiteRouteChildren: SiteRouteChildren = {
   SiteTwitterThreadCreatorRoute: SiteTwitterThreadCreatorRoute,
   SiteUtmBuilderRoute: SiteUtmBuilderRoute,
   SiteContributorsOpengraphImageRoute: SiteContributorsOpengraphImageRoute,
+  SiteDataIndexDotjsonRoute: SiteDataIndexDotjsonRoute,
   SiteFeaturesAiCrawlerLogsRoute: SiteFeaturesAiCrawlerLogsRoute,
   SiteFeaturesConversationsRoute: SiteFeaturesConversationsRoute,
   SiteFeaturesPersonasRoute: SiteFeaturesPersonasRoute,
@@ -2415,6 +2456,7 @@ const SiteRouteChildren: SiteRouteChildren = {
   SiteOfferingReportRoute: SiteOfferingReportRoute,
   SiteCompareIndexRoute: SiteCompareIndexRoute,
   SiteContributorsIndexRoute: SiteContributorsIndexRoute,
+  SiteDataIndexRoute: SiteDataIndexRoute,
   SiteFeaturesIndexRoute: SiteFeaturesIndexRoute,
   SiteIntegrationsIndexRoute: SiteIntegrationsIndexRoute,
   SiteMcpIndexRoute: SiteMcpIndexRoute,

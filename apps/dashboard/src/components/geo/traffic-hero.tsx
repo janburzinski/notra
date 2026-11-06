@@ -10,11 +10,12 @@ import type { GeoTrafficFunnelStageKey } from "@notra/geo-core/types/geo";
 import { trafficVisitDelta } from "@notra/geo-core/utils/ai-traffic";
 import { todayIsoDate } from "@notra/geo-core/utils/day-label";
 import { AnimatedNumber } from "@notra/ui/components/animated-number";
+import { EChartsAreaChart } from "@notra/ui/components/evilcharts/charts/echarts-area-chart";
 import { Button } from "@notra/ui/components/ui/button";
+import type { ChartConfig, TooltipRowGroup } from "@notra/ui/types/charts";
 import { useState } from "react";
 import { useLocale, useTranslations } from "use-intl";
 
-import { EChartsAreaChart } from "@/components/evilcharts/charts/echarts-area-chart";
 import Link from "@/components/framework/link";
 import { GeoStatDelta } from "@/components/geo/geo-stat-delta";
 import { TrafficProviderLegend } from "@/components/geo/traffic-provider-legend";
@@ -34,7 +35,6 @@ import {
 } from "@/constants/geo-traffic-hero";
 import { useTrafficZoom } from "@/hooks/use-traffic-zoom";
 import { cn } from "@/lib/utils";
-import type { ChartConfig, TooltipRowGroup } from "@/types/charts";
 import type {
   TrafficHeroMetricProps,
   TrafficHeroProps,

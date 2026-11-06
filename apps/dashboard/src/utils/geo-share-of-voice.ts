@@ -4,6 +4,7 @@ import type {
   ShareOfVoiceRow,
 } from "@notra/geo-core/types/geo";
 import { todayIsoDate } from "@notra/geo-core/utils/day-label";
+import type { ChartConfig } from "@notra/ui/types/charts";
 
 import {
   SHARE_OF_VOICE_AGGREGATE_ID,
@@ -11,7 +12,6 @@ import {
   SHARE_OF_VOICE_RANKING_LIMIT,
   CHART_PERCENT_SCALE,
 } from "@/constants/charts";
-import type { ChartConfig } from "@/types/charts";
 import type {
   ShareOfVoiceChartProps,
   ShareOfVoiceRankingRow,

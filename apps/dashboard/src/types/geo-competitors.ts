@@ -4,8 +4,7 @@ import type {
   GeoCompetitorSharePoint,
   GeoCompetitorShareTimeseriesPoint,
 } from "@notra/geo-core/types/geo";
-
-import type { ChartColorPair } from "./charts";
+import type { ChartColorPair } from "@notra/ui/types/charts";
 
 export interface GeoCompetitorRowEntry {
   id: string;

@@ -4,39 +4,10 @@ import {
   queryGeoTrafficTrendsDaily,
   queryGeoTrafficTrendsProjects,
 } from "@notra/analytics/tinybird/client";
-import { db } from "@notra/db/drizzle";
-import { demoSandboxes, projects } from "@notra/db/schema";
 import { aiTrendsTrafficRequestSchema } from "@notra/schemas/api/ai-trends-traffic";
-import { and, eq, inArray, notInArray } from "drizzle-orm";
 
+import { realTrafficProjectIds } from "@/lib/analytics/real-traffic-projects";
 import { verifyInternalWorkflowRequest } from "@/lib/workflows/internal-auth";
-
-/**
- * Projects whose traffic counts towards the trends: they still exist, aren't
- * sample projects (those ingest generated crawler visits) and don't belong
- * to a demo sandbox.
- */
-async function realProjectIds(ids: string[]): Promise<Set<string>> {
-  if (ids.length === 0) {
-    return new Set();
-  }
-  const rows = await db
-    .select({ id: projects.id })
-    .from(projects)
-    .where(
-      and(
-        inArray(projects.id, ids),
-        eq(projects.isSample, false),
-        notInArray(
-          projects.organizationId,
-          db
-            .select({ organizationId: demoSandboxes.organizationId })
-            .from(demoSandboxes)
-        )
-      )
-    );
-  return new Set(rows.map((row) => row.id));
-}
 
 /**
  * Cross-organization AI traffic for the Notra admin console's AI Search
@@ -69,7 +40,7 @@ export async function POST(request: Request) {
         })
       )?.data ?? [];
     const projectIds = [...new Set(projectRows.map((row) => row.project_id))];
-    const real = await realProjectIds(projectIds);
+    const real = await realTrafficProjectIds(projectIds);
     const excluded = projectIds.filter((id) => !real.has(id));
     const daily =
       (

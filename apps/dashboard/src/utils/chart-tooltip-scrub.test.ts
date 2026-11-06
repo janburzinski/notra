@@ -1,7 +1,7 @@
 import { expect, test } from "bun:test";
 
-import { tooltipBaseOption } from "@/components/evilcharts/ui/echarts-tooltip";
-import { TOOLTIP_MOVE_DURATION_S } from "@/constants/chart-tooltip";
+import { tooltipBaseOption } from "@notra/ui/components/evilcharts/ui/echarts-tooltip";
+import { TOOLTIP_MOVE_DURATION_S } from "@notra/ui/constants/chart-tooltip";
 
 test.each([true, false])(
   "tooltip motion only bypasses ECharts position throttling when scrub=%s",

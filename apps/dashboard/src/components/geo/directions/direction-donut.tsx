@@ -1,7 +1,8 @@
 "use client";
 
+import { EChartsPieChart } from "@notra/ui/components/evilcharts/charts/echarts-pie-chart";
+
 import { ChartColorScope } from "@/components/charts/chart-color-scope";
-import { EChartsPieChart } from "@/components/evilcharts/charts/echarts-pie-chart";
 import {
   DONUT_CORNER_RADIUS,
   DONUT_INNER_RADIUS,

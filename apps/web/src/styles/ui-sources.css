@@ -51,6 +51,14 @@
 @source "../../../../packages/ui/src/components/data-table/pager.tsx";
 @source "../../../../packages/ui/src/components/data-table/root.tsx";
 @source "../../../../packages/ui/src/components/data-table/surfaces.tsx";
+@source "../../../../packages/ui/src/components/evilcharts/charts/echarts-area-chart.tsx";
+@source "../../../../packages/ui/src/components/evilcharts/ui/chart-environment.tsx";
+@source "../../../../packages/ui/src/components/evilcharts/ui/echarts-brush.tsx";
+@source "../../../../packages/ui/src/components/evilcharts/ui/echarts-chart.tsx";
+@source "../../../../packages/ui/src/components/evilcharts/ui/echarts-dot.tsx";
+@source "../../../../packages/ui/src/components/evilcharts/ui/echarts-legend.tsx";
+@source "../../../../packages/ui/src/components/evilcharts/ui/echarts-plot-frame.tsx";
+@source "../../../../packages/ui/src/components/evilcharts/ui/echarts-tooltip.tsx";
 @source "../../../../packages/ui/src/components/framework-provider.tsx";
 @source "../../../../packages/ui/src/components/geo/competitor-logo.tsx";
 @source "../../../../packages/ui/src/components/geo/engine-icon.tsx";
@@ -73,6 +81,7 @@
 @source "../../../../packages/ui/src/components/shared/table-pagination.tsx";
 @source "../../../../packages/ui/src/components/shared/ui-labels-provider.tsx";
 @source "../../../../packages/ui/src/components/status-badge.tsx";
+@source "../../../../packages/ui/src/components/trend-badge.tsx";
 @source "../../../../packages/ui/src/components/ui/avatar.tsx";
 @source "../../../../packages/ui/src/components/ui/badge.tsx";
 @source "../../../../packages/ui/src/components/ui/button-content.tsx";
@@ -185,6 +194,7 @@
 @source "../../../../packages/ui/src/components/ui/title-card.tsx";
 @source "../../../../packages/ui/src/components/ui/tooltip.tsx";
 @source "../../../../packages/ui/src/constants/ai-skin-primitives.ts";
+@source "../../../../packages/ui/src/constants/chart-tooltip.ts";
 @source "../../../../packages/ui/src/constants/chatgpt-models.ts";
 @source "../../../../packages/ui/src/constants/claude-chat-models.ts";
 @source "../../../../packages/ui/src/constants/codex-skin.ts";
@@ -204,6 +214,7 @@
 @source "../../../../packages/ui/src/constants/opencode-skin.ts";
 @source "../../../../packages/ui/src/constants/perplexity-models.ts";
 @source "../../../../packages/ui/src/constants/table.ts";
+@source "../../../../packages/ui/src/constants/trend-badge.ts";
 @source "../../../../packages/ui/src/constants/ui-labels.ts";
 @source "../../../../packages/ui/src/hooks/compose-refs.ts";
 @source "../../../../packages/ui/src/hooks/use-collapsible-columns.ts";
@@ -216,6 +227,15 @@
 @source "../../../../packages/ui/src/hooks/use-row-selection.ts";
 @source "../../../../packages/ui/src/hooks/use-table-paging.ts";
 @source "../../../../packages/ui/src/hooks/use-table-viewport.ts";
+@source "../../../../packages/ui/src/lib/charts/chart-locale.ts";
+@source "../../../../packages/ui/src/lib/charts/chart-tooltip-position.ts";
+@source "../../../../packages/ui/src/lib/charts/chart-tooltip-size.ts";
+@source "../../../../packages/ui/src/lib/charts/chart-zero-baseline.ts";
+@source "../../../../packages/ui/src/lib/charts/echarts-brush.ts";
+@source "../../../../packages/ui/src/lib/charts/echarts-datum.ts";
+@source "../../../../packages/ui/src/lib/charts/echarts-marker.ts";
+@source "../../../../packages/ui/src/lib/charts/echarts-resize.ts";
+@source "../../../../packages/ui/src/lib/charts/echarts-scrub.ts";
 @source "../../../../packages/ui/src/lib/chatgpt-model.ts";
 @source "../../../../packages/ui/src/lib/claude-chat-model.ts";
 @source "../../../../packages/ui/src/lib/data-table.ts";
@@ -238,6 +258,7 @@
 @source "../../../../packages/ui/src/lib/perplexity-model.ts";
 @source "../../../../packages/ui/src/lib/step-slider.ts";
 @source "../../../../packages/ui/src/lib/utils.ts";
+@source "../../../../packages/ui/src/types/charts.ts";
 @source "../../../../packages/ui/src/types/chatgpt.ts";
 @source "../../../../packages/ui/src/types/claude-chat.ts";
 @source "../../../../packages/ui/src/types/codex-skin.ts";
@@ -255,4 +276,5 @@
 @source "../../../../packages/ui/src/types/status-badge.ts";
 @source "../../../../packages/ui/src/types/step-slider.ts";
 @source "../../../../packages/ui/src/types/table-pagination.ts";
+@source "../../../../packages/ui/src/types/trend-badge.ts";
 @source "../../../../packages/ui/src/types/ui-labels.ts";

@@ -321,12 +321,12 @@ export const reactDoctorEventCases = [
   ["components/geo/competitor-edit-form.tsx", "CompetitorSynonymsField", "ime"],
   ["components/settings/settings-modal-nav.tsx", "SettingsModalNav", "ime"],
   [
-    "components/evilcharts/charts/echarts-bar-chart.tsx",
+    "../../../packages/ui/src/components/evilcharts/charts/echarts-bar-chart.tsx",
     "EChartsBarChart",
     "chart",
   ],
   [
-    "components/evilcharts/charts/echarts-line-chart.tsx",
+    "../../../packages/ui/src/components/evilcharts/charts/echarts-line-chart.tsx",
     "EChartsLineChart",
     "chart",
   ],

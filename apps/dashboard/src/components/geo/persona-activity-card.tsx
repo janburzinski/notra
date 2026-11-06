@@ -1,12 +1,13 @@
 "use client";
 
 import { formatDayLabel } from "@notra/geo-core/utils/day-label";
+import { EChartsAreaChart } from "@notra/ui/components/evilcharts/charts/echarts-area-chart";
+import type { ChartConfig } from "@notra/ui/types/charts";
 import { useState } from "react";
 import { InstrumentEmpty, InstrumentModule } from "ui/card";
 import { useLocale, useTranslations } from "use-intl";
 
 import { EmptyStateTrendPreview } from "@/components/empty-state-preview";
-import { EChartsAreaChart } from "@/components/evilcharts/charts/echarts-area-chart";
 import { GeoRangePicker } from "@/components/geo/geo-range-picker";
 import { GeoStatDelta } from "@/components/geo/geo-stat-delta";
 import { PersonaActivityBodySkeleton } from "@/components/geo/persona-activity-skeleton";
@@ -17,7 +18,6 @@ import {
 import { useIsGeoScanning } from "@/lib/hooks/use-geo";
 import { useGeoPersonaActivity } from "@/lib/hooks/use-geo-personas";
 import { useGeoRange } from "@/lib/hooks/use-geo-range";
-import type { ChartConfig } from "@/types/charts";
 import type { PersonasTableProps } from "@/types/geo-personas-ui";
 import { formatFullDayLabel } from "@/utils/analytics-charts";
 import {

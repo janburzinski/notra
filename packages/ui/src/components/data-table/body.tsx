@@ -104,7 +104,7 @@ export function DataTableBodyRow<T>({
   const tableRow = (
     <TableRow
       className={cn(
-        "group hover:bg-muted data-[selected=true]:bg-primary/5 outline-none",
+        "group scroll-my-8 hover:bg-muted data-[selected=true]:bg-primary/5 outline-none",
         TABLE_ROW_FOCUS_RING_CLASS,
         onRowClick && "cursor-pointer",
         className

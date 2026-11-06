@@ -1,8 +1,8 @@
 "use client";
 
+import { buildChartCss } from "@notra/ui/components/evilcharts/ui/echarts-chart";
 import { useId, useMemo } from "react";
 
-import { buildChartCss } from "@/components/evilcharts/ui/echarts-chart";
 import type { ChartColorScopeProps } from "@/types/charts";
 
 export function ChartColorScope({

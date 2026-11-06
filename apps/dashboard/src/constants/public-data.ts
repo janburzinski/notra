@@ -1,0 +1,79 @@
+/** Days the public AI traffic charts cover, ending with yesterday (UTC). */
+export const PUBLIC_DATA_WINDOW_DAYS = 60;
+/** Leaderboards compare the last 7 full days with the 7 before. */
+export const PUBLIC_DATA_RECENT_DAYS = 7;
+/** Crawl-to-referral ratios need a longer window; referrals are sparse. */
+export const PUBLIC_DATA_RATIO_WEEKS = 4;
+
+/**
+ * Anonymity floor: a bot, assistant or company is only published when it
+ * reached at least this many distinct sites, and a day only when this many
+ * sites had AI traffic, so no number describes a single customer.
+ */
+export const PUBLIC_DATA_MIN_SITES = 5;
+/** Below this many measured sites nothing is published at all. */
+export const PUBLIC_DATA_MIN_TOTAL_SITES = 10;
+/**
+ * A site counts with at most this many times the median site's visits for a
+ * bot or assistant, and never more than all other sites together, so one large
+ * site neither sets nor dominates a published figure. The daily pipe applies
+ * it per day (`site_cap_factor`), the builder per week.
+ */
+export const PUBLIC_DATA_SITE_CAP_FACTOR = 5;
+
+export const PUBLIC_DATA_TOP_CRAWLERS = 20;
+export const PUBLIC_DATA_TOP_REFERRERS = 12;
+/** Series charted on their own; the rest fold into "Other". */
+export const PUBLIC_DATA_CHART_CRAWLERS = 8;
+export const PUBLIC_DATA_CHART_REFERRERS = 6;
+export const PUBLIC_DATA_CHART_VENDORS = 8;
+export const PUBLIC_DATA_OTHER_KEY = "other";
+
+/** Shares are rounded so the snapshot stays small and carries no exact ratios of raw counts. */
+export const PUBLIC_DATA_SHARE_DECIMALS = 4;
+
+export const PUBLIC_DATA_CACHE_KEY_PREFIX = "public-data:ai-traffic:v1";
+/** Snapshots are keyed by day. Each key expires two days after it is written. */
+export const PUBLIC_DATA_CACHE_TTL_SECONDS = 2 * 24 * 60 * 60;
+
+/** CDN caching for the public endpoint; a snapshot only changes once a day. */
+export const PUBLIC_DATA_CACHE_CONTROL =
+  "public, max-age=300, s-maxage=3600, stale-while-revalidate=86400";
+
+/**
+ * The company behind each AI assistant that refers visitors, keyed by the
+ * referral `source` the ingest records. Crawler vendors come from the bot
+ * signatures instead.
+ */
+export const PUBLIC_DATA_REFERRER_VENDORS: Record<string, string> = {
+  chatgpt: "OpenAI",
+  openai: "OpenAI",
+  perplexity: "Perplexity",
+  gemini: "Google",
+  google: "Google",
+  claude: "Anthropic",
+  anthropic: "Anthropic",
+  copilot: "Microsoft",
+  microsoft: "Microsoft",
+  deepseek: "DeepSeek",
+  mistral: "Mistral",
+  grok: "xAI",
+  xai: "xAI",
+  meta: "Meta",
+  you: "You.com",
+  "you.com": "You.com",
+  kimi: "Moonshot AI",
+  moonshot: "Moonshot AI",
+  qwen: "Alibaba",
+  alibaba: "Alibaba",
+  duckduckgo: "DuckDuckGo",
+  kagi: "Kagi",
+};
+
+/** Crawl purposes in the order the page lists them, with public labels. */
+export const PUBLIC_DATA_PURPOSES = [
+  { purpose: "training-crawler", label: "Model training" },
+  { purpose: "search-index", label: "Search indexing" },
+  { purpose: "assistant-browse", label: "Live answers" },
+] as const;
+export const PUBLIC_DATA_TRAINING_PURPOSE = "training-crawler";

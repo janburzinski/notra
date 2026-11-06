@@ -1,9 +1,10 @@
 "use client";
 
 import { todayIsoDate } from "@notra/geo-core/utils/day-label";
+import { EChartsAreaChart } from "@notra/ui/components/evilcharts/charts/echarts-area-chart";
+import type { ChartConfig } from "@notra/ui/types/charts";
 import { useFormatter, useLocale, useTranslations } from "use-intl";
 
-import { EChartsAreaChart } from "@/components/evilcharts/charts/echarts-area-chart";
 import { GeoStatDelta } from "@/components/geo/geo-stat-delta";
 import {
   TRAFFIC_HERO_CHART_OPTIONS,
@@ -17,7 +18,6 @@ import {
   MCP_METRIC_COLOR,
   MCP_METRIC_SERIES_KEY,
 } from "@/constants/mcp-analytics";
-import type { ChartConfig } from "@/types/charts";
 import type { McpMetricCardProps } from "@/types/mcp-analytics";
 import { formatFullDayLabel } from "@/utils/analytics-charts";
 import { seriesColors } from "@/utils/chart-colors";

@@ -1,4 +1,5 @@
 import { formatDayLabel } from "@notra/geo-core/utils/day-label";
+import type { ChartMarker } from "@notra/ui/types/charts";
 import { formatCompactNumber } from "@notra/utils/format-compact-number";
 
 import {
@@ -19,7 +20,6 @@ import type {
   PostingTimeSlot,
   SocialOverviewAccount,
 } from "@/types/analytics";
-import type { ChartMarker } from "@/types/charts";
 import { chartKey } from "@/utils/chart-keys";
 
 const PERCENT = 100;

@@ -1,10 +1,11 @@
 "use client";
 
 import { todayIsoDate } from "@notra/geo-core/utils/day-label";
+import { EChartsAreaChart } from "@notra/ui/components/evilcharts/charts/echarts-area-chart";
+import type { ChartConfig } from "@notra/ui/types/charts";
 import { type CSSProperties, useState } from "react";
 import { useLocale, useTranslations } from "use-intl";
 
-import { EChartsAreaChart } from "@/components/evilcharts/charts/echarts-area-chart";
 import { CHART_PRIMARY_COLOR, CHART_SECONDARY_COLOR } from "@/constants/charts";
 import {
   TRAFFIC_HERO_CHART_OPTIONS,
@@ -15,7 +16,6 @@ import {
   WEB_TREND_AGENTS_KEY,
   WEB_TREND_PEOPLE_KEY,
 } from "@/constants/web-analytics";
-import type { ChartConfig } from "@/types/charts";
 import type { WebVisitorsSectionProps } from "@/types/geo";
 import { formatFullDayLabel } from "@/utils/analytics-charts";
 import { seriesColors } from "@/utils/chart-colors";

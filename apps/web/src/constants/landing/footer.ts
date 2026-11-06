@@ -121,7 +121,10 @@ export const FOOTER_LINK_COLUMNS: readonly FooterLinkColumn[] = [
       },
       {
         title: "Community",
-        links: [{ label: "State of AI Search", href: "/state-of-ai-search" }],
+        links: [
+          { label: "State of AI Search", href: "/state-of-ai-search" },
+          { label: "State of AI Traffic", href: "/data" },
+        ],
       },
       {
         title: "Free Tools",

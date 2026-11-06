@@ -1,5 +1,6 @@
 "use client";
 
+import { EChartsLineChart } from "@notra/ui/components/evilcharts/charts/echarts-line-chart";
 import { GeoBar } from "@notra/ui/components/geo/geo-bar";
 import { Badge } from "@notra/ui/components/ui/badge";
 import { Card, CardContent } from "@notra/ui/components/ui/card";
@@ -9,7 +10,6 @@ import { DataTable, type TableColumn } from "ui/table";
 import { useFormatter, useTranslations } from "use-intl";
 
 import { Button } from "@/components/button";
-import { EChartsLineChart } from "@/components/evilcharts/charts/echarts-line-chart";
 import { DirectionDelta } from "@/components/geo/directions/direction-delta";
 import { PromptResultsTable } from "@/components/geo/directions/prompt-results-table";
 import { EngineIcon } from "@/components/geo/engine-icon";

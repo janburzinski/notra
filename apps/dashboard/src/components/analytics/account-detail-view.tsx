@@ -2,6 +2,7 @@
 
 import { Linkedin02Icon, NewTwitterIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
+import { EChartsAreaChart } from "@notra/ui/components/evilcharts/charts/echarts-area-chart";
 import {
   Avatar,
   AvatarFallback,
@@ -13,11 +14,11 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@notra/ui/components/ui/tooltip";
+import type { ChartConfig } from "@notra/ui/types/charts";
 import { useMemo } from "react";
 import { DataTable, type TableColumn } from "ui/table";
 import { useFormatter, useLocale, useTranslations } from "use-intl";
 
-import { EChartsAreaChart } from "@/components/evilcharts/charts/echarts-area-chart";
 import { XVerificationBadge } from "@/components/icons/x-verification-badge";
 import { useOrganizationsContext } from "@/components/providers/organization-provider";
 import {
@@ -46,7 +47,6 @@ import type {
   LeaderboardDetailMetric,
   TopPostItem,
 } from "@/types/analytics";
-import type { ChartConfig } from "@/types/charts";
 import {
   buildAccountEngagementPoints,
   buildAccountIdentity,

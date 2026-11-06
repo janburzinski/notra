@@ -19,19 +19,20 @@ import type {
 } from "@notra/geo-core/types/geo";
 import { formatAiTrafficTimestamp } from "@notra/geo-core/utils/ai-traffic";
 import { POSTHOG_EVENTS } from "@notra/posthog/events";
+import { EChartsBarChart } from "@notra/ui/components/evilcharts/charts/echarts-bar-chart";
 import { Skeleton } from "@notra/ui/components/ui/skeleton";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@notra/ui/components/ui/tooltip";
+import type { ChartConfig } from "@notra/ui/types/charts";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { InstrumentModule, InstrumentSection } from "ui/card";
 import { DataTable, type TableColumn } from "ui/table";
 import { useLocale, useTranslations } from "use-intl";
 
 import { Button } from "@/components/button";
-import { EChartsBarChart } from "@/components/evilcharts/charts/echarts-bar-chart";
 import { CompetitorEditDialog } from "@/components/geo/competitor-edit-dialog";
 import { CompetitorLogo } from "@/components/geo/competitor-logo";
 import { EngineIcon } from "@/components/geo/engine-icon";
@@ -53,7 +54,6 @@ import { useGeoActiveProject } from "@/lib/hooks/use-geo-active-project";
 import { useGeoCompetitorsDb } from "@/lib/hooks/use-geo-db";
 import { useCompanyLogo } from "@/lib/hooks/use-onboarding";
 import { cn } from "@/lib/utils";
-import type { ChartConfig } from "@/types/charts";
 import type {
   CompetitorDetailViewProps,
   CompetitorPromptAppearancesProps,
