@@ -1,6 +1,7 @@
 import {
   BalanceScaleIcon,
   GitBranchIcon,
+  Link04Icon,
   RefreshIcon,
   Robot01Icon,
   Search01Icon,
@@ -31,6 +32,7 @@ export const AUTOPILOT_TEMPLATE_TONES: Record<
   refresh: "warning",
   comparisons: "info",
   rendering: "destructive",
+  links: "success",
 };
 
 export const AUTOPILOT_TEMPLATES: AutopilotTemplate[] = [
@@ -103,6 +105,20 @@ export const AUTOPILOT_TEMPLATES: AutopilotTemplate[] = [
     source: "Comparison prompts you lose",
     output: "post",
     trigger: "run",
+  },
+  {
+    id: "links",
+    kind: "links",
+    name: "Add internal links",
+    description:
+      "Links your posts to pages that rank on page one or two of Google for the words they already use, once a week.",
+    instructions:
+      "Read three months of Search Console data. For pages ranking 4 to 20, find their top queries in your other posts and open one pull request that links those words to the page, at most three new links per post.",
+    category: "content",
+    icon: Link04Icon,
+    source: "Your Search Console rankings",
+    output: "pull_request",
+    trigger: "weekly",
   },
   {
     id: "commits",

@@ -296,6 +296,7 @@ export const AUTOPILOT_DEFAULT_JOBS = {
   refresh: false,
   comparisons: false,
   rendering: false,
+  links: false,
 } as const;
 
 export const AUTOPILOT_FLAG_TIMEOUT_MS = 2000;
@@ -373,6 +374,7 @@ export const AUTOPILOT_FAILURE_LABELS: Partial<
   refresh: "Page refresh",
   comparisons: "Comparison page",
   rendering: "AI-readable pages fix",
+  links: "Internal links",
 };
 
 /** Short job names at the start of each run log line. */
@@ -385,6 +387,7 @@ export const AUTOPILOT_RUN_LOG_TAGS: Record<string, string> = {
   refresh: "refresh",
   comparisons: "comparisons",
   rendering: "ai-readable",
+  links: "links",
   run: "run",
 };
 
@@ -399,6 +402,7 @@ export const AUTOPILOT_RUN_SECTIONS: {
   { job: "refresh", label: "Refresh pages AI stopped citing" },
   { job: "comparisons", label: "Write comparison pages" },
   { job: "rendering", label: "Make pages readable for AI" },
+  { job: "links", label: "Add internal links" },
   { job: "prompts", label: "Prompt cleanup" },
   { job: "competitors", label: "Competitors" },
   { job: null, label: "Cleanup and brief" },

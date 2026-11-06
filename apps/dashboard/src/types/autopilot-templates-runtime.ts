@@ -1,6 +1,7 @@
 import type {
   AutopilotCitationDrop,
   AutopilotComparisonTarget,
+  AutopilotInternalLink,
   AutopilotPageAudit,
   AutopilotRenderingIssue,
 } from "@notra/db/types/autopilot";
@@ -115,4 +116,50 @@ export interface AutopilotFactReport {
 export interface AutopilotRenderingProblem extends AutopilotRenderingIssue {
   /** Sentences people see that the crawler does not, a few for the agent. */
   missing: string[];
+}
+
+/** A page ranking on page one or two that links from other posts could lift. */
+export interface AutopilotLinkTarget {
+  url: string;
+  /** host/path without www, query, hash or trailing slash. */
+  key: string;
+  /** Impression-weighted position over its anchors. */
+  position: number;
+  impressions: number;
+  /** Search Console queries the page ranks for, as anchors for links to it. */
+  anchors: { query: string; position: number; impressions: number }[];
+}
+
+/** One place in a post where an anchor could become a link. */
+export interface AutopilotLinkSpot {
+  id: string;
+  sourceUrl: string;
+  sourcePath: string;
+  /** Zero-based line in the file, and the phrase's offsets in that line. */
+  line: number;
+  start: number;
+  end: number;
+  /** The phrase exactly as the post writes it. */
+  text: string;
+  href: string;
+  targetUrl: string;
+  targetKey: string;
+  query: string;
+  position: number;
+  impressions: number;
+  /** The paragraph around the phrase, for the review. */
+  context: string;
+}
+
+export interface AutopilotLinksCheck {
+  baseSha: string;
+  spots: AutopilotLinkSpot[];
+}
+
+export interface AutopilotLinksFix {
+  title: string;
+  summary: string;
+  files: { path: string; contents: string }[];
+  links: AutopilotInternalLink[];
+  checks: string[];
 }

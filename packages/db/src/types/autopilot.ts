@@ -96,6 +96,20 @@ export interface AutopilotFindingEvidence {
   rendering?: AutopilotRenderingIssue | null;
   /** The competitor and prompts a comparison page answers. */
   comparison?: AutopilotComparisonTarget | null;
+  /** The internal links a links pull request adds, one row per link. */
+  links?: AutopilotInternalLink[] | null;
+}
+
+/** One link from a post to a page that ranks for the linked words. */
+export interface AutopilotInternalLink {
+  sourceUrl: string;
+  sourcePath: string;
+  anchor: string;
+  targetUrl: string;
+  /** The Search Console query the anchor matches, with the target's numbers for it. */
+  query: string;
+  position: number;
+  impressions: number;
 }
 
 export interface AutopilotCitationDrop {

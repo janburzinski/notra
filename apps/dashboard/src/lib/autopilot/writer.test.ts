@@ -85,6 +85,7 @@ if (process.env.NOTRA_AUTOPILOT_WRITER_TEST !== "1") {
         refresh: false,
         comparisons: false,
         rendering: false,
+        links: false,
       },
       maxOpenPullRequests: 3,
       stalePullRequestDays: null,

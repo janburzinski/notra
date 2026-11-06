@@ -29,4 +29,5 @@ export const AUTOPILOT_TEMPLATE_WORKFLOW_KEYS = {
   refresh: "autopilot.refresh",
   comparisons: "autopilot.comparisons",
   rendering: "autopilot.rendering",
+  links: "autopilot.links",
 } as const satisfies Record<AutopilotAutomationKind, string>;

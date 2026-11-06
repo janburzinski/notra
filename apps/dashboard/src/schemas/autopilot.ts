@@ -138,3 +138,13 @@ export const autopilotFeedbackSchema = z.object({
 });
 
 export const autopilotRuleComplianceSchema = z.object({ allowed: z.boolean() });
+
+export const linksReviewSchema = z.object({
+  decisions: z.array(
+    z.object({
+      id: z.string().describe("The candidate's id, as given"),
+      keep: z.boolean(),
+      reason: z.string().describe("A few words on why"),
+    })
+  ),
+});

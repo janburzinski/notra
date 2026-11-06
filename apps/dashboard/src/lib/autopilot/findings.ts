@@ -730,6 +730,21 @@ export async function listSettledRenderingPages(organizationId: string) {
   return rows.flatMap((row) => row.evidence.pageUrls ?? []);
 }
 
+/** Post and page pairs a settled links finding covered; they are not offered again. */
+export async function listSettledLinkPairs(organizationId: string) {
+  const rows = await db
+    .select({ evidence: autopilotFindings.evidence })
+    .from(autopilotFindings)
+    .where(
+      and(
+        eq(autopilotFindings.organizationId, organizationId),
+        eq(autopilotFindings.kind, "links"),
+        isSettledFinding()
+      )
+    );
+  return rows.flatMap((row) => row.evidence.links ?? []);
+}
+
 /** Readiness issues whose fix pull request was closed; Autopilot stops proposing them. */
 export async function listDismissedReadinessIssueIds(organizationId: string) {
   const rows = await db

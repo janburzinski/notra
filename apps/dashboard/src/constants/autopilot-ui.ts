@@ -15,6 +15,7 @@ import {
   Github01Icon,
   Idea01Icon,
   Image02Icon,
+  Link04Icon,
   MinusSignCircleIcon,
   PencilEdit02Icon,
   PlayIcon,
@@ -235,6 +236,7 @@ export const AUTOPILOT_KIND_META: Record<
   refresh: { label: "Page refresh", icon: RefreshIcon },
   comparisons: { label: "Comparisons", icon: BalanceScaleIcon },
   rendering: { label: "AI-readable pages", icon: ViewIcon },
+  links: { label: "Internal links", icon: Link04Icon },
 };
 
 /** How one automation in a run ended, as the run panel's section badge. */
@@ -335,6 +337,15 @@ export const AUTOPILOT_AUTOMATIONS: Record<
     noun: "fix",
     alsoOn: null,
   },
+  links: {
+    name: "Add internal links",
+    description:
+      "Links your posts to pages that rank on page one or two of Google for the words they already use, once a week.",
+    source: "Your Search Console rankings",
+    output: "Opens a pull request",
+    noun: "links pull request",
+    alsoOn: "At most one pull request a week",
+  },
 };
 
 /** One automation's outcome in a run, by the level it was logged at. */
@@ -360,6 +371,7 @@ export const AUTOPILOT_AUTOMATION_SLUGS: Record<
   refresh: "page-refresh",
   comparisons: "comparison-pages",
   rendering: "ai-readable-pages",
+  links: "internal-links",
 };
 
 /** GitHub's merge buttons, in GitHub's words; squash is the default. */

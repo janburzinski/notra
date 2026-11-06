@@ -24,7 +24,7 @@ import { createAutopilotSandbox } from "./utils/autopilot-sandbox";
 import { createWorkflowGraphRunner } from "./utils/workflow-graph-runner";
 
 if (process.env.NOTRA_AUTOPILOT_TEMPLATE_FLOW_TEST !== "1") {
-  test("Autopilot templates: refresh, comparisons and AI-readable pages run end to end", () => {
+  test("Autopilot templates: refresh, comparisons, AI-readable pages and internal links run end to end", () => {
     const child = spawnSync(
       process.execPath,
       ["--no-env-file", "test", fileURLToPath(import.meta.url)],
@@ -72,6 +72,19 @@ if (process.env.NOTRA_AUTOPILOT_TEMPLATE_FLOW_TEST !== "1") {
       "Install the CLI and run `ember deploy`.",
     ].join("\n"),
     "content/blog/hello.md": "---\ntitle: Hello\n---\nHello.",
+    "content/blog/serving-models.md": [
+      "---",
+      "title: Serving models on GPUs",
+      "---",
+      "",
+      "Serving models is mostly about gpu autoscaling and cost.",
+      "",
+      "## Scaling",
+      "",
+      "Turn on gpu autoscaling so idle replicas cost nothing. The H100 hourly price is easy to compare.",
+      "",
+      "Cold starts aside, the H100 hourly price dropped again last month.",
+    ].join("\n"),
     "content/compare/emberline-vs-modal.md":
       "---\ntitle: Emberline vs Modal\n---\nA comparison.",
     "app/pricing/page.tsx":
@@ -119,6 +132,33 @@ if (process.env.NOTRA_AUTOPILOT_TEMPLATE_FLOW_TEST !== "1") {
     markContentPullRequestReady: async () => undefined,
     mergeContentPullRequest: async () => undefined,
   }));
+  // Search Console, three months of query and page pairs.
+  const searchConsole = {
+    rows: [
+      ["gpu autoscaling", "/blog/gpu-autoscaling", 8, 900],
+      ["autoscale gpu inference", "/blog/gpu-autoscaling", 11, 300],
+      ["h100 hourly price", "/pricing", 6, 400],
+      ["cold starts", "/blog/cold-starts", 12, 250],
+      ["emberline pricing", "/pricing", 3, 2000],
+      ["serving models on gpus", "/blog/serving-models", 2, 80],
+    ].map(([query, page, position, impressions]) => ({
+      query: query as string,
+      page: `https://emberline.dev${page}`,
+      clicks: 1,
+      position: position as number,
+      impressions: impressions as number,
+    })),
+  };
+  const realSearchConsole =
+    await import("@notra/ai/integrations/google-search-console");
+  mock.module("@notra/ai/integrations/google-search-console", () => ({
+    ...realSearchConsole,
+    getGscIntegration: async () => ({
+      status: "connected",
+      disconnectingAt: null,
+    }),
+    queryGscQueryPages: async () => searchConsole.rows,
+  }));
   mock.module("@/lib/autopilot/flag", () => ({
     isAutopilotEnabledForOrganization: async () => true,
   }));
@@ -145,6 +185,14 @@ if (process.env.NOTRA_AUTOPILOT_TEMPLATE_FLOW_TEST !== "1") {
 
   // The model, as each template asks it.
   const MODEL_OUTPUT: Record<string, unknown> = {
+    // Keeps every candidate except "cold starts" (c4), which reads as another sense.
+    links: {
+      decisions: ["c1", "c2", "c3", "c4"].map((id) => ({
+        id,
+        keep: id !== "c4",
+        reason: "test",
+      })),
+    },
     refresh: {
       audit: {
         keep: ["Intro", "Setup"],
@@ -261,6 +309,11 @@ if (process.env.NOTRA_AUTOPILOT_TEMPLATE_FLOW_TEST !== "1") {
     }),
     findDeadLinks: async (urls: string[]) =>
       urls.filter((url) => url.includes("dead.example")),
+    // Only the serving post is live, and its page reads like its file.
+    fetchPageText: async (url: string) =>
+      url === `${SITE}/blog/serving-models`
+        ? (repository["content/blog/serving-models.md"] ?? null)
+        : null,
   }));
   const paddedRefusal: (string | null)[] = [];
   mock.module("@/lib/autopilot/repository-agent", () => ({
@@ -330,6 +383,7 @@ if (process.env.NOTRA_AUTOPILOT_TEMPLATE_FLOW_TEST !== "1") {
     organizationId: ORG,
     name: "Emberline",
     brandSettingsId: "sandbox-brand",
+    gscSiteUrl: "sc-domain:emberline.dev",
   });
   await db.insert(geoSettings).values({
     id: "sandbox-geo",
@@ -413,6 +467,7 @@ if (process.env.NOTRA_AUTOPILOT_TEMPLATE_FLOW_TEST !== "1") {
       refresh: false,
       comparisons: false,
       rendering: false,
+      links: false,
       ...jobs,
     };
     return db
@@ -512,13 +567,41 @@ if (process.env.NOTRA_AUTOPILOT_TEMPLATE_FLOW_TEST !== "1") {
     ]);
   });
 
+  test("links: posts get links to pages ranking for their words", async () => {
+    await enable({ links: true });
+    expect((await run(AUTOPILOT_TEMPLATE_WORKFLOW_KEYS.links)).status).toBe(
+      "completed"
+    );
+    expect(opened).toHaveLength(1);
+    const before = repository["content/blog/serving-models.md"] ?? "";
+    const after = opened[0]?.files[0]?.contents ?? "";
+    // The intro stays as is; one link per line; the rejected candidate is left out.
+    expect(after).toContain(
+      "Turn on [gpu autoscaling](/blog/gpu-autoscaling) so idle replicas cost nothing."
+    );
+    expect(after).toContain(
+      "Cold starts aside, the [H100 hourly price](/pricing) dropped again last month."
+    );
+    expect(after.replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")).toBe(before);
+
+    // One links pull request waits for review at a time.
+    await run(AUTOPILOT_TEMPLATE_WORKFLOW_KEYS.links);
+    expect(opened).toHaveLength(1);
+  });
+
   test("daily run: every enabled template acts once, and a bot wall reaches the brief", async () => {
-    await enable({ refresh: true, comparisons: true, rendering: true });
+    await enable({
+      refresh: true,
+      comparisons: true,
+      rendering: true,
+      links: true,
+    });
     web.homeStatus = 403;
     const result = await run(AUTOPILOT_DAILY_WORKFLOW.key);
     expect(result.status).toBe("completed");
     expect(opened.map((pull) => pull.slug.split("-")[0]).sort()).toEqual([
       "blog",
+      "links",
       "refresh",
       "rendering",
     ]);

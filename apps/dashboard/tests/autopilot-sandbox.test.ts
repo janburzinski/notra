@@ -101,6 +101,12 @@ if (process.env.NOTRA_AUTOPILOT_SANDBOX_TEST !== "1") {
   mock.module("@/lib/autopilot/comparisons", () => ({
     pickComparison: async () => ({ ready: false, reason: "Not run here" }),
   }));
+  mock.module("@/lib/autopilot/links", () => ({
+    checkLinks: async () => ({ ready: false, reason: "Not run here" }),
+    claimLinks: notRun,
+    writeLinks: notRun,
+    openLinksPullRequest: notRun,
+  }));
   mock.module("@/lib/autopilot/prompts", () => ({ runPromptsJob: emptyJob }));
   // Planning is covered by autopilot-flow; here the jobs observe nothing.
   mock.module("@/lib/autopilot/planner", () => ({

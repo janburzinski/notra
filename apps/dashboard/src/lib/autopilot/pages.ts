@@ -82,6 +82,14 @@ async function fetchAsCrawler(url: string) {
   }
 }
 
+/** A page's text as its server sends it; null when it doesn't load. */
+export async function fetchPageText(url: string) {
+  const page = await fetchAsCrawler(url);
+  return page.status && page.status < 400 && !page.challenged
+    ? page.text
+    : null;
+}
+
 /** The page's main content after a browser ran its JavaScript, via context.dev. */
 export async function fetchRendered(url: string, maxChars?: number) {
   const page = await fetchWebpage({

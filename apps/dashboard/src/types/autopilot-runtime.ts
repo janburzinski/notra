@@ -72,7 +72,12 @@ export type AutopilotProposeMode =
 export type AutopilotPostBrief = NonNullable<AutopilotFindingEvidence["brief"]>;
 
 /** Jobs that run as their own block and open their pull request directly. */
-type AutopilotDirectJob = "readiness" | "refresh" | "comparisons" | "rendering";
+type AutopilotDirectJob =
+  | "readiness"
+  | "refresh"
+  | "comparisons"
+  | "rendering"
+  | "links";
 
 export type AutopilotObservationJob = Exclude<
   AutopilotJobKind,

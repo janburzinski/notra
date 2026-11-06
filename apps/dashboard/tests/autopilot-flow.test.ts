@@ -627,6 +627,7 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
       refresh: false,
       comparisons: false,
       rendering: false,
+      links: false,
     },
   });
   afterAll(() => sandbox.postgres.close());

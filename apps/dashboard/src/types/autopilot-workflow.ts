@@ -27,6 +27,8 @@ import type {
   FindingClaim,
 } from "@/types/autopilot-runtime";
 import type {
+  AutopilotLinksCheck,
+  AutopilotLinksFix,
   AutopilotRefreshCheck,
   AutopilotRefreshFix,
 } from "@/types/autopilot-templates-runtime";
@@ -87,5 +89,13 @@ export interface RenderingState extends Record<string, unknown> {
   claim: FindingClaim;
   reservation: GitHubMentionBillingReservation;
   fix: Awaited<ReturnType<typeof writeRenderingFix>>;
+  usage: (AgentTokenUsage | null)[];
+}
+
+export interface LinksState extends Record<string, unknown> {
+  check: AutopilotLinksCheck;
+  claim: FindingClaim;
+  reservation: GitHubMentionBillingReservation;
+  fix: AutopilotLinksFix | null;
   usage: (AgentTokenUsage | null)[];
 }

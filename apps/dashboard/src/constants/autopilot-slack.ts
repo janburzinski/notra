@@ -17,4 +17,5 @@ export const AUTOPILOT_SLACK_KIND_LABELS: Record<AutopilotJobKind, string> = {
   refresh: "Page refresh",
   comparisons: "Comparison page",
   rendering: "AI-readable pages",
+  links: "Internal links",
 };

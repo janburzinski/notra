@@ -64,12 +64,16 @@ export function describeFindingReason(
   if (finding.kind === "readiness") {
     return "Fixes website issues found by the readiness scan.";
   }
-  const { citations, rendering, comparison } = finding.evidence;
+  const { citations, rendering, comparison, links } = finding.evidence;
   if (finding.kind === "refresh" && citations) {
     return `AI answers cited this page ${percent(citations.before)} of the time a month ago and ${percent(citations.now)} now.`;
   }
   if (finding.kind === "rendering" && rendering) {
     return `AI crawlers get ${rendering.rawWords} of the ${rendering.renderedWords} words a browser shows on this page.`;
+  }
+  if (finding.kind === "links" && links?.length) {
+    const pages = new Set(links.map((link) => link.targetUrl)).size;
+    return `${links.length} places in your posts mention searches that ${pages === 1 ? "a page ranks" : `${pages} pages rank`} 4 to 20 for in Google.`;
   }
   if (finding.kind === "comparisons" && comparison) {
     return `AI answers to ${comparison.prompts.length} comparison questions name ${comparison.competitor} and not you.`;

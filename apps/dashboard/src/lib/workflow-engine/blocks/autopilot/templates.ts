@@ -9,6 +9,12 @@ import type { WorkflowBlockStep } from "@notra/workflows/types/blocks";
 
 import { pickComparison } from "@/lib/autopilot/comparisons";
 import {
+  checkLinks,
+  claimLinks,
+  openLinksPullRequest,
+  writeLinks,
+} from "@/lib/autopilot/links";
+import {
   checkRefresh,
   claimRefresh,
   openRefreshPullRequest,
@@ -23,6 +29,7 @@ import {
 import { autopilotRunConfigSchema } from "@/schemas/autopilot-workflow";
 import type {
   AutopilotRunConfig,
+  LinksState,
   RefreshState,
   RenderingState,
 } from "@/types/autopilot-workflow";
@@ -36,7 +43,7 @@ import {
 } from "./shared";
 
 function creditsStep<
-  State extends RefreshState | RenderingState,
+  State extends RefreshState | RenderingState | LinksState,
 >(): WorkflowBlockStep<AutopilotRunConfig, State> {
   return {
     id: "credits",
@@ -228,6 +235,91 @@ export const templateBlocks = [
             insights: check.insights,
             ...pullRequest,
           });
+        },
+      },
+    ],
+    finally: settleClaimedDraft,
+  }),
+  defineWorkflowBlock<typeof autopilotRunConfigSchema, LinksState>({
+    type: "autopilot.links",
+    kind: "integration",
+    title: "Add internal links",
+    logo: "github",
+    configSchema: autopilotRunConfigSchema,
+    steps: [
+      {
+        id: "check",
+        title: "Find posts that mention ranking pages",
+        run: async (context) => {
+          const ctx = await loadAutopilotContext(context);
+          const result = await withRunLease(ctx, () => checkLinks(ctx));
+          if (!result) {
+            return halt("This run no longer owns its lease");
+          }
+          if (!result.ready) {
+            return halt(result.reason);
+          }
+          const { ready: _ready, ...check } = result;
+          return next({ check });
+        },
+      },
+      {
+        id: "claim",
+        title: "Claim the links",
+        run: async (context) => {
+          const { check } = requireStepState(context.state, "check");
+          const claimed = await claimLinks({
+            ctx: await loadAutopilotContext(context),
+            check,
+            claimToken: stepClaimToken(context),
+          });
+          return "claim" in claimed
+            ? next({ claim: claimed.claim })
+            : halt(claimed.reason);
+        },
+      },
+      creditsStep<LinksState>(),
+      {
+        id: "write",
+        title: "Review and place the links",
+        sideEffect: true,
+        run: async (context) => {
+          const { claim, check } = requireStepState(
+            context.state,
+            "claim",
+            "check"
+          );
+          const written = await writeLinks({
+            ctx: await loadAutopilotContext(context),
+            claim,
+            check,
+          });
+          return next({ fix: written.fix, usage: [written.usage] });
+        },
+      },
+      {
+        id: "pull-request",
+        title: "Open the pull request",
+        sideEffect: true,
+        run: async (context) => {
+          const { claim, check } = requireStepState(
+            context.state,
+            "claim",
+            "check"
+          );
+          const fix = context.state.fix ?? null;
+          if (!fix) {
+            return halt("No candidate link reads naturally where it would go", {
+              findingId: claim.finding.id,
+            });
+          }
+          const pullRequest = await openLinksPullRequest({
+            ctx: await loadAutopilotContext(context),
+            claim,
+            check,
+            fix,
+          });
+          return succeed({ findingId: claim.finding.id, ...pullRequest });
         },
       },
     ],
