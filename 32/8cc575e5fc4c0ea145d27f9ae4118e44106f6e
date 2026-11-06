@@ -1,0 +1,24 @@
+apps/dashboard/src/lib/sites/preview-revocation.ts
+  s_0eb87d8daad6ee::t_bbba39afc97012 43
+apps/dashboard/src/components/settings/delete-account-dialog.tsx
+  s_0eb87d8daad6ee::t_bbba39afc97012 28,125-129
+apps/dashboard/tests/sites-preview-revocation.test.ts
+  ai_agent 5-7,14-15
+  s_0eb87d8daad6ee::t_b034f79d53b2e8 1-4,8-13,16-20
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "328cc575e5fc4c0ea145d27f9ae4118e44106f6e",
+  "prompts": {},
+  "sessions": {
+    "s_0eb87d8daad6ee": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a1b22e-3639-7443-aa7f-4abac253f350",
+        "model": "gpt-6-sol"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
