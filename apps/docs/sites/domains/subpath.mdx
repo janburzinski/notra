@@ -67,13 +67,13 @@ Site builders like Webflow, Squarespace and Wix can't forward paths, so put [Clo
     Under **Settings → Content → Sections**, set the paths you want on your website, for example `/blog` and `/changelog`, which are the paths you forward. See [Section paths](/sites/domains/overview#section-paths).
   </Step>
   <Step title="Add the domain in Notra">
-    Open **Domains → Add domain** and enter the host and path, for example `www.acme.com/blog`. Use the host that actually serves your website, so if `acme.com` redirects to `www.acme.com`, enter `www.acme.com`. The domain shows up with the status **Needs rewrites**.
+    Open **Domains → Add domain** and enter the host and path, for example `www.acme.com/blog`. If `acme.com` redirects to `www.acme.com`, Notra notices and adds `www.acme.com/blog` instead, since that host serves your website. The domain shows up with the status **Needs rewrites**.
   </Step>
   <Step title="Add the rewrite">
     Forward each section path and everything below it to your Notra address with the path unchanged, following the guide for your platform.
   </Step>
   <Step title="Deploy your website and check">
-    Deploy the change, then click **Check** on the domain. Notra fetches a test file through your website for every section, and once it answers, the domain is **Active** and becomes the site's primary address.
+    Deploy the change. Notra checks the domain on its own, every minute at first, so it turns **Active** shortly after your deploy, or click **Check** to check right away. Notra fetches a test file through your website for every section, and once it answers, the domain is **Active** and becomes the site's primary address.
   </Step>
   <Step title="Add the sitemaps to your robots.txt">
     Your `robots.txt` stays yours, so add the section sitemaps to it:
@@ -122,7 +122,7 @@ When it passes, Notra rebuilds the site so that canonical URLs, feeds, sitemaps 
 
 <AccordionGroup>
   <Accordion title="The check says it could not reach the test file">
-    Open `https://www.acme.com/blog/_notra/probe.txt` in your browser, where you should see a short text that starts with `notra-site=`. If you see your own 404 page, the rewrite isn't live yet or doesn't cover `/blog/*`. If the browser is redirected, you entered the wrong host (`acme.com` instead of `www.acme.com`) or your host adds a trailing slash.
+    Open `https://www.acme.com/blog/_notra/probe.txt` in your browser, where you should see a short text that starts with `notra-site=`. If you see your own 404 page, the rewrite isn't live yet or doesn't cover `/blog/*`. If the browser is redirected to another host, add that host instead (Notra already switches between `acme.com` and `www.acme.com` by itself). If it adds a trailing slash, turn that off for these paths.
   </Accordion>
   <Accordion title="The page loads, but without styles">
     Your rewrite forwards only `/blog` rather than `/blog/*`, while assets live under `/blog/_notra/assets/`.

@@ -256,6 +256,7 @@ if (!process.env.SITES_TEST_DATABASE_URL) {
   const { r2Put } = await import("../../../packages/sites-server/src/r2");
   const {
     addSiteDomain,
+    recheckDueSiteDomains,
     refreshSiteDomain,
     removeSiteDomain,
     requireSiteDomain,
@@ -1535,6 +1536,18 @@ if (!process.env.SITES_TEST_DATABASE_URL) {
       });
       expect(added).toMatchObject({ hostname, status: "pending" });
       expect(added.cloudflareHostnameId).toBeTruthy();
+      // The minute cron checks a new domain without anyone pressing "check",
+      // then leaves it alone until its next slot.
+      const rechecked = (await recheckDueSiteDomains()).find(
+        ({ result }) => result.domain.id === added.id
+      );
+      expect(rechecked?.result.domain.status).toBe("verifying");
+      expect(rechecked?.result.domain.lastCheckedAt).toBeTruthy();
+      expect(
+        (await recheckDueSiteDomains()).some(
+          ({ result }) => result.domain.id === added.id
+        )
+      ).toBe(false);
       const unverified = await refreshSiteDomain(site, added.id, userId);
       expect(unverified.domain.status).toBe("verifying");
       expect(unverified.rebuildJobId).toBeNull();

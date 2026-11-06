@@ -7,7 +7,19 @@ import {
   joinMountPath,
   listMountedAreas,
 } from "@notra/sites-core/utils/mounts";
-import { and, count, eq, isNull } from "drizzle-orm";
+import {
+  and,
+  count,
+  eq,
+  gt,
+  inArray,
+  isNotNull,
+  isNull,
+  lt,
+  lte,
+  or,
+  sql,
+} from "drizzle-orm";
 
 import {
   cloudflareSaasConfig,
@@ -21,6 +33,8 @@ import {
   CLOUDFLARE_RETRYABLE_STATUSES,
   CLOUDFLARE_SAAS_MISSING_MESSAGE,
   DOMAIN_INPUT_PATH,
+  DOMAIN_RECHECK_BATCH,
+  DOMAIN_RECHECK_STATUSES,
   DOMAIN_INPUT_SCHEME,
   IP_LITERAL,
   PROBE_FILE,
@@ -30,6 +44,7 @@ import {
   PROBE_USER_AGENT,
   SITE_MAX_DOMAINS,
 } from "./constants/domains";
+import { getSite } from "./deployments";
 import { getSitesHostingDomain, siteCnameTarget } from "./env";
 import { SiteProviderRequestError } from "./errors/provider";
 import { SiteHostConflictError, SiteInputError } from "./errors/sites";
@@ -44,8 +59,10 @@ import type { SiteStorageTransaction } from "./types/deployments";
 import type {
   AddSiteDomainInput,
   DomainCheck,
+  ProxyProbe,
   RefreshSiteDomainResult,
   SiteDomain,
+  SiteDomainRecheck,
 } from "./types/domains";
 import type { Site } from "./types/sites";
 import { bindCreatedCustomHostname } from "./utils/bind-custom-hostname";
@@ -53,6 +70,7 @@ import {
   domainOwnershipRecord,
   verifyDomainOwnership,
 } from "./utils/domain-ownership";
+import { domainRecheckWindows } from "./utils/domain-recheck";
 import { errorMessage } from "./utils/errors";
 import { prefixedId } from "./utils/ids";
 import { readBodyUpTo } from "./utils/read-body";
@@ -61,6 +79,7 @@ import {
   claimVerifiedHost,
   readVerifiedHostClaim,
 } from "./utils/verified-host-claim";
+import { redirectedWwwTwin } from "./utils/www-twin";
 
 export async function requireSiteDomain(
   siteId: string,
@@ -161,15 +180,20 @@ export async function addSiteDomain(
   site: Site,
   input: AddSiteDomainInput
 ): Promise<SiteDomain> {
-  const hostname = normalizeHostname(
+  const typed = normalizeHostname(
     input.value
       .trim()
       .replace(DOMAIN_INPUT_SCHEME, "")
       .replace(DOMAIN_INPUT_PATH, "")
   );
-  if (!hostname) {
+  if (!typed) {
     throw new SiteInputError("Enter a domain like blog.acme.com");
   }
+  assertPublicHostname(typed);
+  // People type acme.com/blog when acme.com forwards to www.acme.com, which
+  // could never verify. Add the address that actually serves the website.
+  const hostname =
+    input.kind === "proxy" ? await preferredProxyHostname(site, typed) : typed;
   assertPublicHostname(hostname);
   const plan = await resolveSitePlan(site.organizationId);
   let createdId: string | null = null;
@@ -309,7 +333,8 @@ async function fetchWithTimeout(url: string): Promise<Response> {
 async function probeProxyOrigin(
   site: Site,
   origin: string
-): Promise<string | null> {
+): Promise<ProxyProbe> {
+  const failed = (problem: string): ProxyProbe => ({ problem, wwwTwin: null });
   for (const { area, mount } of listMountedAreas(site.mounts)) {
     const probeUrl = `${origin}${joinMountPath(mount, PROBE_FILE)}`;
     try {
@@ -318,41 +343,136 @@ async function probeProxyOrigin(
       if (probe.ok) {
         const result = await readBodyUpTo(probe, PROBE_MAX_BYTES);
         if (result.exceeded) {
-          return `${probeUrl} returned a probe larger than ${PROBE_MAX_BYTES} bytes. Check the ${area} rewrite.`;
+          return failed(
+            `${probeUrl} returned a probe larger than ${PROBE_MAX_BYTES} bytes. Check the ${area} rewrite.`
+          );
         }
         body = new TextDecoder().decode(result.bytes);
       } else {
         await probe.body?.cancel();
       }
       if (!body.includes(`${PROBE_SITE_MARKER}${site.id}`)) {
-        return `${probeUrl} did not return this site (HTTP ${probe.status}). Check the ${area} rewrite.`;
+        const location =
+          probe.status >= 300 && probe.status < 400
+            ? probe.headers.get("location")
+            : null;
+        return {
+          problem: location
+            ? `${probeUrl} redirects to ${location}. Add the address it redirects to, or proxy the ${area} instead of redirecting.`
+            : `${probeUrl} did not return this site (HTTP ${probe.status}). Check the ${area} rewrite.`,
+          wwwTwin: redirectedWwwTwin(probe, probeUrl, new URL(origin).hostname),
+        };
       }
       const page = await fetchWithTimeout(`${origin}${mount}`);
       await page.body?.cancel();
       if (page.status >= 300 && page.status < 400) {
-        return `${origin}${mount} redirects to ${page.headers.get("location")}; proxy it instead of redirecting.`;
+        return failed(
+          `${origin}${mount} redirects to ${page.headers.get("location")}; proxy it instead of redirecting.`
+        );
       }
       if (/noindex/i.test(page.headers.get("x-robots-tag") ?? "")) {
-        return `${origin}${mount} is served with X-Robots-Tag: noindex.`;
+        return failed(
+          `${origin}${mount} is served with X-Robots-Tag: noindex.`
+        );
       }
     } catch (error) {
-      return `Could not reach ${probeUrl}: ${errorMessage(error)}`;
+      return failed(`Could not reach ${probeUrl}: ${errorMessage(error)}`);
     }
   }
-  return null;
+  return { problem: null, wwwTwin: null };
 }
 
-async function checkProxyDomain(
+/** The www twin when a proxied hostname redirects there, otherwise the hostname. */
+async function preferredProxyHostname(
+  site: Site,
+  hostname: string
+): Promise<string> {
+  const [first] = listMountedAreas(site.mounts);
+  const url = `https://${hostname}${joinMountPath(first?.mount ?? "/", PROBE_FILE)}`;
+  try {
+    const response = await fetchWithTimeout(url);
+    await response.body?.cancel();
+    return redirectedWwwTwin(response, url, hostname) ?? hostname;
+  } catch {
+    return hostname;
+  }
+}
+
+/**
+ * Moves an unverified proxied domain to its www twin, unless the twin is
+ * already on this site or connected to another one.
+ */
+async function moveToWwwTwin(
   site: Site,
   domain: SiteDomain,
-  origin: string
-): Promise<DomainCheck> {
-  const problem = await probeProxyOrigin(site, origin);
+  hostname: string
+): Promise<SiteDomain> {
+  try {
+    assertPublicHostname(hostname);
+  } catch (error) {
+    if (error instanceof SiteInputError) {
+      return domain;
+    }
+    throw error;
+  }
+  return await withSiteHostLock(
+    hostname,
+    async (tx) => {
+      const claims = await tx
+        .select()
+        .from(siteDomains)
+        .where(eq(siteDomains.hostname, hostname));
+      if (
+        claims.some(
+          (claim) => claim.siteId === site.id || claim.status === "active"
+        )
+      ) {
+        return domain;
+      }
+      const [moved] = await tx
+        .update(siteDomains)
+        .set({ hostname, lastError: null })
+        .where(
+          and(
+            eq(siteDomains.id, domain.id),
+            eq(siteDomains.hostname, domain.hostname)
+          )
+        )
+        .returning();
+      return moved ?? domain;
+    },
+    { organizationId: site.organizationId }
+  );
+}
+
+function proxyCheck(domain: SiteDomain, probe: ProxyProbe): DomainCheck {
   return {
-    verified: problem === null,
-    lastError: problem,
+    verified: probe.problem === null,
+    lastError: probe.problem,
     records: domain.verificationRecords,
   };
+}
+
+/**
+ * Checks a proxied domain. When it redirects to its www twin (acme.com to
+ * www.acme.com), the domain moves there and that address is checked instead.
+ */
+async function checkProxyDomain(
+  site: Site,
+  domain: SiteDomain
+): Promise<{ domain: SiteDomain; check: DomainCheck }> {
+  const probe = await probeProxyOrigin(site, `https://${domain.hostname}`);
+  if (probe.wwwTwin && domain.status !== "active") {
+    const moved = await moveToWwwTwin(site, domain, probe.wwwTwin);
+    if (moved.hostname !== domain.hostname) {
+      const twinProbe = await probeProxyOrigin(
+        site,
+        `https://${moved.hostname}`
+      );
+      return { domain: moved, check: proxyCheck(moved, twinProbe) };
+    }
+  }
+  return { domain, check: proxyCheck(domain, probe) };
 }
 
 async function checkSubdomain(
@@ -438,7 +558,9 @@ function nextDomainStatus(
   if (verified) {
     return "active";
   }
-  return previous === "active" ? "failed" : "verifying";
+  return previous === "active" || previous === "failed"
+    ? "failed"
+    : "verifying";
 }
 
 export async function refreshSiteDomain(
@@ -446,10 +568,13 @@ export async function refreshSiteDomain(
   domainId: string,
   userId: string | null
 ): Promise<RefreshSiteDomainResult> {
-  const domain = await requireSiteDomain(site.id, domainId);
-  if (domain.kind === "subdomain") {
-    assertPublicHostname(domain.hostname);
+  const found = await requireSiteDomain(site.id, domainId);
+  if (found.kind === "subdomain") {
+    assertPublicHostname(found.hostname);
   }
+  const proxied =
+    found.kind === "proxy" ? await checkProxyDomain(site, found) : null;
+  const domain = proxied?.domain ?? found;
   const origin = `https://${domain.hostname}`;
   const initialRecords =
     domain.kind === "subdomain"
@@ -458,22 +583,21 @@ export async function refreshSiteDomain(
   const ownershipVerified =
     domain.kind === "subdomain" &&
     (await verifyDomainOwnership(site.id, domain.hostname));
-  const initialCheck: DomainCheck =
-    domain.kind === "proxy"
-      ? await checkProxyDomain(site, domain, origin)
-      : {
-          verified: ownershipVerified,
-          lastError: ownershipVerified
-            ? null
-            : "Add the Notra ownership TXT record to prove this site owns the domain, then retry.",
-          records: [
-            ...initialRecords,
-            ...domain.verificationRecords.filter(
-              (record) =>
-                record.type === "TXT" && record.name !== initialRecords[0]?.name
-            ),
-          ],
-        };
+  const initialCheck: DomainCheck = proxied
+    ? proxied.check
+    : {
+        verified: ownershipVerified,
+        lastError: ownershipVerified
+          ? null
+          : "Add the Notra ownership TXT record to prove this site owns the domain, then retry.",
+        records: [
+          ...initialRecords,
+          ...domain.verificationRecords.filter(
+            (record) =>
+              record.type === "TXT" && record.name !== initialRecords[0]?.name
+          ),
+        ],
+      };
 
   const {
     domain: updated,
@@ -574,4 +698,83 @@ export async function removeSiteDomain(
   return site.publicOrigin === `https://${domain.hostname}`
     ? await setSitePublicOrigin(site, aliasOrigin, userId)
     : null;
+}
+
+/**
+ * Checks domains that are not verified yet on their backoff schedule, so a
+ * domain verifies without anyone pressing "check". Run by the minute cron.
+ */
+export async function recheckDueSiteDomains(
+  now = new Date()
+): Promise<SiteDomainRecheck[]> {
+  // The schedule is in the query, so domains that aren't due can't fill the batch.
+  const due = await db
+    .select()
+    .from(siteDomains)
+    .where(
+      and(
+        inArray(siteDomains.status, [...DOMAIN_RECHECK_STATUSES]),
+        or(
+          ...domainRecheckWindows(now).map(
+            ({ createdAfter, checkedBefore }) => {
+              const notCheckedSince = or(
+                isNull(siteDomains.lastCheckedAt),
+                lte(siteDomains.lastCheckedAt, checkedBefore)
+              );
+              return createdAfter
+                ? and(
+                    isNull(siteDomains.verifiedAt),
+                    gt(siteDomains.createdAt, createdAfter),
+                    notCheckedSince
+                  )
+                : and(isNotNull(siteDomains.verifiedAt), notCheckedSince);
+            }
+          )
+        )
+      )
+    )
+    .orderBy(sql`${siteDomains.lastCheckedAt} asc nulls first`)
+    .limit(DOMAIN_RECHECK_BATCH);
+  const checks = await Promise.allSettled(
+    due.map(async (domain) => {
+      const site = await getSite(domain.siteId);
+      return site
+        ? { site, result: await refreshSiteDomain(site, domain.id, null) }
+        : null;
+    })
+  );
+  const rechecks: SiteDomainRecheck[] = [];
+  const failures: Promise<unknown>[] = [];
+  checks.forEach((check, index) => {
+    const domain = due[index];
+    if (check.status === "fulfilled") {
+      if (check.value) {
+        rechecks.push(check.value);
+      }
+      return;
+    }
+    if (!domain) {
+      return;
+    }
+    const error = errorMessage(check.reason);
+    console.warn("sites.domain_recheck_failed", { domainId: domain.id, error });
+    // Count the attempt, so a domain that keeps throwing waits for its next
+    // slot instead of taking the batch every run. A newer result stays.
+    failures.push(
+      db
+        .update(siteDomains)
+        .set({ lastCheckedAt: now, lastError: error })
+        .where(
+          and(
+            eq(siteDomains.id, domain.id),
+            or(
+              isNull(siteDomains.lastCheckedAt),
+              lt(siteDomains.lastCheckedAt, now)
+            )
+          )
+        )
+    );
+  });
+  await Promise.allSettled(failures);
+  return rechecks;
 }

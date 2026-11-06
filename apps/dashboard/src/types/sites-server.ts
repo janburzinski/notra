@@ -60,3 +60,8 @@ export type CreateSitesResult =
       deploymentQueued: boolean;
     }
   | { rootDirectory: string; error: string };
+
+export interface SiteDomainRecheckResult {
+  checked: number;
+  verified: number;
+}

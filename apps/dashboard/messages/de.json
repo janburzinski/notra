@@ -8675,6 +8675,7 @@
         "description": "Stell diese Seite unter einer eigenen Domain bereit.",
         "submit": "Domain hinzufügen",
         "added": "Domain hinzugefügt",
+        "addedAsTwin": "{typed} leitet auf {hostname} weiter, deshalb haben wir {hostname} hinzugefügt",
         "addFailed": "Domain konnte nicht hinzugefügt werden",
         "label": "Domain",
         "placeholder": "blog.acme.com",

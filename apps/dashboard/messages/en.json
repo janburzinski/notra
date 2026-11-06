@@ -8675,6 +8675,7 @@
         "description": "Serve this site on a domain you own.",
         "submit": "Add domain",
         "added": "Domain added",
+        "addedAsTwin": "{typed} forwards to {hostname}, so we added {hostname}",
         "addFailed": "Couldn't add the domain",
         "label": "Domain",
         "placeholder": "blog.acme.com",

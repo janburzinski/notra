@@ -56,8 +56,21 @@ export function SiteDomainAddForm({
         kind: domainKind,
         value: trimmed,
       }),
-    onSuccess: async () => {
-      toast.success(t("added"));
+    onSuccess: async (added) => {
+      // acme.com/blog is added as www.acme.com/blog when acme.com forwards there.
+      const typed = trimmed
+        .replace(SITE_DOMAIN_URL_SCHEME_PATTERN, "")
+        .split("/")[0]
+        ?.toLowerCase();
+      const movedToTwin =
+        typed !== undefined &&
+        (added.hostname === `www.${typed}` ||
+          typed === `www.${added.hostname}`);
+      toast.success(
+        movedToTwin
+          ? t("addedAsTwin", { typed, hostname: added.hostname })
+          : t("added")
+      );
       setValue("");
       setOverride(null);
       onAdded?.();

@@ -20,3 +20,20 @@ export const DOMAIN_OWNERSHIP_MAX_RECORDS = 32;
 export const DOMAIN_OWNERSHIP_MAX_BYTES = 8192;
 /** Every subdomain becomes a billable Cloudflare custom hostname. */
 export const SITE_MAX_DOMAINS = 20;
+/** Domains the minute cron re-checks until they verify. */
+export const DOMAIN_RECHECK_STATUSES = [
+  "pending",
+  "verifying",
+  "failed",
+] as const;
+/** Checks per cron run; each one can wait PROBE_TIMEOUT_MS per request. */
+export const DOMAIN_RECHECK_BATCH = 5;
+const MINUTE_MS = 60_000;
+/** How often a new domain is re-checked by age; after the last step it waits for a manual check. */
+export const DOMAIN_RECHECK_SCHEDULE = [
+  { untilAgeMs: 15 * MINUTE_MS, everyMs: MINUTE_MS },
+  { untilAgeMs: 24 * 60 * MINUTE_MS, everyMs: 10 * MINUTE_MS },
+  { untilAgeMs: 7 * 24 * 60 * MINUTE_MS, everyMs: 60 * MINUTE_MS },
+] as const;
+/** A domain that worked before is re-checked hourly until it works again. */
+export const DOMAIN_FAILED_RECHECK_MS = 60 * MINUTE_MS;

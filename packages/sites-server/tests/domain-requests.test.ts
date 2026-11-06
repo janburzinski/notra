@@ -48,6 +48,7 @@ if (process.env.NOTRA_SITES_DOMAIN_REQUEST_TEST_WORKER !== "1") {
     .export({ type: "pkcs8", format: "pem" })
     .toString();
   process.env.SITES_CNAME_TARGET = "cname.notra.site";
+  process.env.SITES_HOSTING_DOMAIN = "notra.site";
   const domain = {
     id: "domain1",
     siteId: "site1",
@@ -69,7 +70,12 @@ if (process.env.NOTRA_SITES_DOMAIN_REQUEST_TEST_WORKER !== "1") {
       },
     ],
   } as SiteDomain;
-  let proxyDomain = { ...domain, kind: "proxy" as const, hostname: "127.1" };
+  const initialProxyDomain = {
+    ...domain,
+    kind: "proxy" as const,
+    hostname: "127.1",
+  };
+  let proxyDomain: SiteDomain = initialProxyDomain;
   mock.module("@notra/db/drizzle", () => ({
     createDb: () => {
       throw new Error("Unexpected provider binding database");
@@ -92,15 +98,23 @@ if (process.env.NOTRA_SITES_DOMAIN_REQUEST_TEST_WORKER !== "1") {
       throw new Error("Unexpected hostname acquisition");
     },
     withSiteHostLock: async (
-      _hostname: string,
+      hostname: string,
       run: (tx: unknown) => Promise<unknown>
     ) =>
       await run({
-        select: () => ({ from: () => ({ where: async () => [proxyDomain] }) }),
+        select: () => ({
+          from: () => ({
+            where: async () =>
+              [proxyDomain].filter((claim) => claim.hostname === hostname),
+          }),
+        }),
         update: () => ({
           set: (patch: Partial<SiteDomain>) => ({
             where: () => ({
-              returning: async () => [{ ...proxyDomain, ...patch }],
+              returning: async () => {
+                proxyDomain = { ...proxyDomain, ...patch };
+                return [proxyDomain];
+              },
             }),
           }),
         }),
@@ -109,6 +123,7 @@ if (process.env.NOTRA_SITES_DOMAIN_REQUEST_TEST_WORKER !== "1") {
   const { refreshSiteDomain } = await import("../src/domains");
 
   beforeEach(() => {
+    proxyDomain = initialProxyDomain;
     discoveryHost = "provider.example";
     address = "93.184.216.34";
     requests = [];
@@ -295,5 +310,56 @@ if (process.env.NOTRA_SITES_DOMAIN_REQUEST_TEST_WORKER !== "1") {
     expect(result.domain.lastError).toContain("X-Robots-Tag: noindex");
     expect(cancelled).toBe(true);
     expect(requests).toHaveLength(2);
+  });
+
+  test("an apex that redirects to www moves the domain to www and verifies it", async () => {
+    proxyDomain = { ...proxyDomain, hostname: "acme.com" };
+    respond = (url) => {
+      const { hostname, pathname } = new URL(url);
+      if (hostname === "acme.com") {
+        return new Response(null, {
+          status: 307,
+          headers: { location: `https://www.acme.com${pathname}` },
+        });
+      }
+      return pathname.endsWith("probe.txt")
+        ? new Response("notra-site=site1\narea=blog\n")
+        : new Response("<!doctype html>");
+    };
+    const result = await refreshSiteDomain(
+      {
+        id: "site1",
+        mounts: { blog: "/blog" },
+        publicOrigin: "https://www.acme.com",
+      } as Site,
+      domain.id,
+      null
+    );
+    expect(result.domain.hostname).toBe("www.acme.com");
+    expect(result.domain.status).toBe("active");
+    expect(requests).toEqual([
+      "https://acme.com/blog/_notra/probe.txt",
+      "https://www.acme.com/blog/_notra/probe.txt",
+      "https://www.acme.com/blog",
+    ]);
+  });
+
+  test("a redirect to another host is reported and not followed", async () => {
+    proxyDomain = { ...proxyDomain, hostname: "acme.com" };
+    respond = () =>
+      new Response(null, {
+        status: 302,
+        headers: { location: "https://other.example/blog/_notra/probe.txt" },
+      });
+    const result = await refreshSiteDomain(
+      { id: "site1", mounts: { blog: "/blog" } } as Site,
+      domain.id,
+      null
+    );
+    expect(result.domain.hostname).toBe("acme.com");
+    expect(result.domain.lastError).toBe(
+      "https://acme.com/blog/_notra/probe.txt redirects to https://other.example/blog/_notra/probe.txt. Add the address it redirects to, or proxy the blog instead of redirecting."
+    );
+    expect(requests).toHaveLength(1);
   });
 }

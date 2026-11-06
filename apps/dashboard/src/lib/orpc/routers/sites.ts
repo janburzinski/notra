@@ -984,7 +984,7 @@ export const sitesRouter = {
           kind: input.kind,
           value: input.value,
         });
-        return { id: domain.id };
+        return { id: domain.id, hostname: domain.hostname };
       }),
 
     refresh: sitesProcedure
