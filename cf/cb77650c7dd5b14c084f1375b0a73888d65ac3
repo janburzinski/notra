@@ -1,0 +1,21 @@
+apps/dashboard/src/lib/auth/delete-account.ts
+  s_0eb87d8daad6ee::t_b1a708de111d4e 106-115
+apps/dashboard/tests/fixtures/account-deletion.fixture.ts
+  s_0eb87d8daad6ee::t_ed813f6df2ace6 16,36-38,129,219-224
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "cfcb77650c7dd5b14c084f1375b0a73888d65ac3",
+  "prompts": {},
+  "sessions": {
+    "s_0eb87d8daad6ee": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a1b22e-3639-7443-aa7f-4abac253f350",
+        "model": "gpt-6-sol"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
