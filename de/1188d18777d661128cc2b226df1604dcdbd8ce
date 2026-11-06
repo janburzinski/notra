@@ -1,0 +1,23 @@
+apps/dashboard/tests/constants/react-doctor-events.ts
+  s_2a641a79c946c6::t_76624ef16b2807 324,329
+apps/dashboard/tests/echarts-renderer.test.ts
+  s_2a641a79c946c6::t_c18e8e76ba6c89 14-15
+apps/blog/scripts/web-chrome.js
+  s_2a641a79c946c6::t_cb11a2116bb7a6 2
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "de1188d18777d661128cc2b226df1604dcdbd8ce",
+  "prompts": {},
+  "sessions": {
+    "s_2a641a79c946c6": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "712a2427-7f87-4390-a750-259eed0c22d3",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
