@@ -2,6 +2,7 @@ import { SITE_R2_KEYS } from "@notra/sites-core/constants/sites";
 import type { SiteManifestFile } from "@notra/sites-core/types/deployment";
 
 import { injectAnalyticsScript } from "./analytics";
+import { EDGE_READ_TIMEOUT_MS, R2_READ_TIMEOUT_MS } from "./constants/cache";
 import {
   ASSET_SEGMENT,
   EDGE_CACHE_MAX_FILE_BYTES,
@@ -13,6 +14,7 @@ import {
 import { serviceErrorPage } from "./pages";
 import type { ServeFileParams } from "./types/serving";
 import type { SitesDeps } from "./types/worker";
+import { withinDeadline } from "./utils/deadline";
 import { html } from "./utils/responses";
 import { readVerifiedBody } from "./utils/verified-body";
 
@@ -34,12 +36,20 @@ async function readFileBody(
   // Keyed by content, so files a redeploy or another area didn't change stay
   // warm. The site ID keeps tenants from probing each other's cache.
   const cacheKey = `${EDGE_CACHE_ORIGIN}/${siteId}/${file.sha256}`;
-  const cached = await deps.cache?.match(cacheKey);
+  // A stuck edge lookup counts as a miss, and a stuck R2 read as a missing body
+  // (the retry page), so neither can hang the request.
+  const cached = deps.cache
+    ? await withinDeadline(
+        deps.cache.match(cacheKey),
+        deps.edgeReadTimeoutMs ?? EDGE_READ_TIMEOUT_MS
+      )
+    : null;
   if (cached?.body) {
     return cached.body;
   }
-  const object = await deps.bucket.get(
-    SITE_R2_KEYS.file(siteId, deploymentId, file.path)
+  const object = await withinDeadline(
+    deps.bucket.get(SITE_R2_KEYS.file(siteId, deploymentId, file.path)),
+    deps.r2ReadTimeoutMs ?? R2_READ_TIMEOUT_MS
   );
   if (!(object?.body && deps.cache) || file.size > EDGE_CACHE_MAX_FILE_BYTES) {
     return object?.body ?? null;

@@ -46,4 +46,6 @@ export interface SitesDeps {
   timing?: ServerTiming;
   /** Overrides R2_READ_TIMEOUT_MS (tests). */
   r2ReadTimeoutMs?: number;
+  /** Overrides EDGE_READ_TIMEOUT_MS (tests). */
+  edgeReadTimeoutMs?: number;
 }

@@ -63,13 +63,23 @@ export interface MarkdownNotFoundParams {
   llmsPath: string;
 }
 
+export interface JsonRead {
+  value: unknown;
+  /** Whether the value came from the location's edge cache rather than R2. */
+  fromEdge: boolean;
+  /** For edge hits: when the value was read from R2. */
+  readAt?: number;
+}
+
 export type ServerTimingName = "host" | "state" | "manifest";
+
+/** The isolate's memory, the location's edge cache, or R2. */
+export type ServerTimingSource = "cache" | "edge" | "r2";
 
 export interface ServerTimingEntry {
   name: ServerTimingName;
   durationMs: number;
-  /** Where the value came from: the isolate's cache or R2. */
-  source: "cache" | "r2";
+  source: ServerTimingSource;
 }
 
 export interface ServerTiming {
@@ -77,6 +87,6 @@ export interface ServerTiming {
   record(
     name: ServerTimingName,
     durationMs: number,
-    source: "cache" | "r2"
+    source: ServerTimingSource
   ): void;
 }

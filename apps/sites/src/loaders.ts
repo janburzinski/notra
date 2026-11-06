@@ -10,6 +10,9 @@ import type {
 } from "@notra/sites-core/types/deployment";
 
 import {
+  EDGE_READ_AT_HEADER,
+  EDGE_READ_TIMEOUT_MS,
+  HOST_EDGE_CACHE_CONTROL,
   HOST_TTL_MS,
   LOOKUP_CACHE_LIMIT,
   MANIFEST_CACHE_LIMIT,
@@ -17,12 +20,18 @@ import {
   SLOW_R2_READ_MS,
   STATE_TTL_MS,
 } from "./constants/cache";
+import {
+  EDGE_CACHE_ORIGIN,
+  IMMUTABLE_CACHE_CONTROL,
+} from "./constants/responses";
 import type {
+  JsonRead,
   LoadedManifest,
   ServerTimingName,
   TimedCacheEntry,
 } from "./types/serving";
 import type { SitesDeps } from "./types/worker";
+import { withinDeadline } from "./utils/deadline";
 import { StateUnavailableError } from "./utils/errors";
 
 // Values are shared across requests, but in-flight reads are not: the Workers
@@ -44,7 +53,87 @@ export function resetCachesForTests() {
   generation += 1;
 }
 
+const edgeKey = (key: string) => `${EDGE_CACHE_ORIGIN}/r2/${key}`;
+
+// Every isolate in a location shares the edge cache, while a new isolate starts
+// with empty maps. At low traffic most requests land on a new isolate, so this
+// saves round trips to the bucket's region (130-200 ms each from US East).
+async function readEdgeJson(
+  deps: SitesDeps,
+  key: string,
+  timing: ServerTimingName
+): Promise<JsonRead | null> {
+  const started = performance.now();
+  try {
+    // A slow or stuck edge lookup counts as a miss, so the request still reaches R2.
+    const read = await withinDeadline(
+      (async (): Promise<JsonRead | null> => {
+        const hit = await deps.cache?.match(edgeKey(key));
+        if (!hit) {
+          return null;
+        }
+        const value: unknown = JSON.parse(await hit.text());
+        const readAt = Number(hit.headers.get(EDGE_READ_AT_HEADER));
+        return {
+          value,
+          fromEdge: true,
+          readAt: Number.isFinite(readAt) && readAt > 0 ? readAt : undefined,
+        };
+      })(),
+      deps.edgeReadTimeoutMs ?? EDGE_READ_TIMEOUT_MS
+    );
+    if (read) {
+      deps.timing?.record(timing, performance.now() - started, "edge");
+    }
+    return read;
+  } catch {
+    return null;
+  }
+}
+
+/** Keeps a validated value at the edge; failures only cost a later R2 read. */
+function keepAtEdge(
+  deps: SitesDeps,
+  key: string,
+  value: unknown,
+  cacheControl: string,
+  readAt: number
+) {
+  const { cache } = deps;
+  if (!cache) {
+    return;
+  }
+  deps.waitUntil(
+    cache
+      .put(
+        edgeKey(key),
+        new Response(JSON.stringify(value), {
+          headers: {
+            "Content-Type": "application/json",
+            "Cache-Control": cacheControl,
+            [EDGE_READ_AT_HEADER]: String(readAt),
+          },
+        })
+      )
+      .catch(() => undefined)
+  );
+}
+
 async function readJson(
+  deps: SitesDeps,
+  key: string,
+  timing: ServerTimingName,
+  { edge = false }: { edge?: boolean } = {}
+): Promise<JsonRead> {
+  const cached =
+    edge && deps.cache ? await readEdgeJson(deps, key, timing) : null;
+  if (cached) {
+    return cached;
+  }
+  return { value: await readR2Json(deps, key, timing), fromEdge: false };
+}
+
+async function readR2Json(
   deps: SitesDeps,
   key: string,
   timing: ServerTimingName
@@ -107,7 +196,7 @@ async function loadWithTtl<T>(
   key: string,
   ttlMs: number,
   timing: ServerTimingName,
-  load: () => Promise<T>
+  load: () => Promise<{ value: T; readAt?: number }>
 ): Promise<T> {
   const cached = cache.get(key);
   if (cached && deps.now().getTime() - cached.at < ttlMs) {
@@ -119,10 +208,15 @@ async function loadWithTtl<T>(
   const read = reads;
   // Freshness counts from when the read started, so a slow read cannot extend it.
   const startedAt = deps.now().getTime();
-  const value = await load();
+  const { value, readAt } = await load();
   const current = cache.get(key);
   if (loadedIn === generation && (!current || current.read < read)) {
-    remember(cache, LOOKUP_CACHE_LIMIT, key, { value, at: startedAt, read });
+    // An edge copy keeps its original read time, so it cannot extend ttlMs.
+    remember(cache, LOOKUP_CACHE_LIMIT, key, {
+      value,
+      at: Math.min(readAt ?? startedAt, startedAt),
+      read,
+    });
   }
   return value;
 }
@@ -138,9 +232,19 @@ export function loadHost(
     HOST_TTL_MS,
     "host",
     async () => {
-      const raw = await readJson(deps, SITE_R2_KEYS.host(hostname), "host");
-      const parsed = raw ? siteHostRecordSchema.safeParse(raw) : null;
-      return parsed?.success ? parsed.data : null;
+      const key = SITE_R2_KEYS.host(hostname);
+      const startedAt = deps.now().getTime();
+      const { value, fromEdge, readAt } = await readJson(deps, key, "host", {
+        edge: true,
+      });
+      const parsed = value ? siteHostRecordSchema.safeParse(value) : null;
+      if (!parsed?.success) {
+        return { value: null };
+      }
+      if (!fromEdge) {
+        keepAtEdge(deps, key, value, HOST_EDGE_CACHE_CONTROL, startedAt);
+      }
+      return { value: parsed.data, readAt };
     }
   );
 }
@@ -156,15 +260,19 @@ export function loadState(
     STATE_TTL_MS,
     "state",
     async () => {
-      const raw = await readJson(deps, SITE_R2_KEYS.state(siteId), "state");
+      const { value: raw } = await readJson(
+        deps,
+        SITE_R2_KEYS.state(siteId),
+        "state"
+      );
       if (raw === null) {
-        return null;
+        return { value: null };
       }
       const parsed = siteServingStateSchema.safeParse(raw);
       if (!parsed.success) {
         throw new StateUnavailableError(`Invalid serving state for ${siteId}`);
       }
-      return parsed.data;
+      return { value: parsed.data };
     }
   );
 }
@@ -181,11 +289,11 @@ export async function loadManifest(
     return cached;
   }
   const loadedIn = generation;
-  const raw = await readJson(
-    deps,
-    SITE_R2_KEYS.manifest(siteId, deploymentId),
-    "manifest"
-  );
+  const key = SITE_R2_KEYS.manifest(siteId, deploymentId);
+  // A deployment's manifest never changes, so the edge may keep it.
+  const { value: raw, fromEdge } = await readJson(deps, key, "manifest", {
+    edge: true,
+  });
   if (!raw) {
     return null;
   }
@@ -198,6 +306,9 @@ export async function loadManifest(
     throw new StateUnavailableError(
       `Manifest ${cacheKey} does not match its location`
     );
+  }
+  if (!fromEdge) {
+    keepAtEdge(deps, key, raw, IMMUTABLE_CACHE_CONTROL, deps.now().getTime());
   }
   const loaded = {
     manifest,

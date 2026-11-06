@@ -8,6 +8,10 @@ import { signSitePreviewToken } from "@notra/sites-core/utils/preview-token";
 
 import { LOOKUP_CACHE_LIMIT } from "../src/constants/cache";
 import { PREVIEW_SECURE_COOKIE } from "../src/constants/preview-auth";
+import {
+  EDGE_CACHE_ORIGIN,
+  IMMUTABLE_CACHE_CONTROL,
+} from "../src/constants/responses";
 import { handleSiteRequest } from "../src/handler";
 import {
   loadHost,
@@ -15,7 +19,7 @@ import {
   loadState,
   resetCachesForTests,
 } from "../src/loaders";
-import type { SitesDeps } from "../src/types/worker";
+import type { SiteEdgeCache, SitesDeps } from "../src/types/worker";
 
 const SECRET = "test-secret";
 const DOMAIN = "notra.site";
@@ -189,6 +193,29 @@ function consentCookie(measurement: boolean, name = "c15t"): string {
       },
     })
   )}`;
+}
+
+function edgeCache() {
+  const entries = new Map<
+    string,
+    { body: string; cacheControl: string | null; headers: Headers }
+  >();
+  const cache: SiteEdgeCache = {
+    match: async (key) => {
+      const entry = entries.get(key);
+      return entry
+        ? new Response(entry.body, { headers: entry.headers })
+        : undefined;
+    },
+    put: async (key, response) => {
+      entries.set(key, {
+        body: await response.text(),
+        cacheControl: response.headers.get("Cache-Control"),
+        headers: new Headers(response.headers),
+      });
+    },
+  };
+  return { entries, cache };
 }
 
 beforeEach(() => resetCachesForTests());
@@ -1239,6 +1266,89 @@ describe("loaders", () => {
     release();
     expect((await older)?.status).toBe("active");
     expect((await loadState(deps, SITE))?.status).toBe("suspended");
+  });
+
+  test("a new isolate gets host records and manifests from the edge, but always reads state", async () => {
+    const { deps, request, settle } = setup();
+    const { entries, cache } = edgeCache();
+    deps.cache = cache;
+    const reads: string[] = [];
+    const get = deps.bucket.get;
+    deps.bucket.get = (key) => {
+      reads.push(key);
+      return get(key);
+    };
+    expect((await request("https://acme.notra.site/blog")).status).toBe(200);
+    await settle();
+    expect(
+      entries.get(`${EDGE_CACHE_ORIGIN}/r2/hosts/acme.notra.site.json`)
+        ?.cacheControl
+    ).toBe("public, max-age=30");
+    expect(
+      entries.get(
+        `${EDGE_CACHE_ORIGIN}/r2/deployments/${SITE}/dep_live/manifest.json`
+      )?.cacheControl
+    ).toBe(IMMUTABLE_CACHE_CONTROL);
+    resetCachesForTests();
+    reads.length = 0;
+    const response = await request("https://acme.notra.site/blog");
+    expect(response.status).toBe(200);
+    expect(reads.filter((key) => !key.includes("/files/"))).toEqual([
+      `sites/${SITE}/state.json`,
+    ]);
+    expect(response.headers.get("Server-Timing")).toMatch(
+      /^host;desc="edge";dur=[\d.]+, state;desc="r2";dur=[\d.]+, manifest;desc="edge";dur=[\d.]+, total;dur=[\d.]+$/
+    );
+  });
+
+  test("a host record from the edge keeps its original 30 seconds", async () => {
+    const { deps, request, settle } = setup();
+    const { cache } = edgeCache();
+    deps.cache = cache;
+    const at = (seconds: number) => () =>
+      new Date(Date.parse("2026-10-03T12:00:00Z") + seconds * 1000);
+    expect((await request("https://acme.notra.site/blog")).status).toBe(200);
+    await settle();
+    resetCachesForTests();
+    deps.now = at(25);
+    const fromEdge = await request("https://acme.notra.site/blog");
+    expect(fromEdge.headers.get("Server-Timing")).toStartWith(
+      'host;desc="edge"'
+    );
+    deps.now = at(31);
+    const later = await request("https://acme.notra.site/blog");
+    expect(later.headers.get("Server-Timing")).not.toStartWith(
+      'host;desc="cache"'
+    );
+  });
+
+  test("a stalled edge lookup counts as a miss", async () => {
+    const { deps, request } = setup();
+    deps.cache = {
+      match: () => new Promise(() => {}),
+      put: async () => {},
+    };
+    deps.edgeReadTimeoutMs = 20;
+    const response = await request("https://acme.notra.site/blog");
+    expect(response.status).toBe(200);
+    expect(response.headers.get("Server-Timing")).toStartWith('host;desc="r2"');
+  });
+
+  test("invalid manifests and unknown hosts are not kept at the edge", async () => {
+    const { deps, request, settle, put, objects } = setup();
+    const { entries, cache } = edgeCache();
+    deps.cache = cache;
+    const key = `deployments/${SITE}/dep_live/manifest.json`;
+    const valid = objects.get(key);
+    put(key, { version: 1 });
+    expect((await request("https://acme.notra.site/blog")).status).toBe(503);
+    expect((await request("https://unknown.notra.site/blog")).status).toBe(404);
+    await settle();
+    expect(
+      [...entries.keys()].filter((entry) => entry.includes("/r2/"))
+    ).toEqual([`${EDGE_CACHE_ORIGIN}/r2/hosts/acme.notra.site.json`]);
+    put(key, valid);
+    expect((await request("https://acme.notra.site/blog")).status).toBe(200);
   });
 
   test("responses report their lookups in Server-Timing", async () => {
