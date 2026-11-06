@@ -1,0 +1,257 @@
+apps/dashboard/src/components/geo/persona-activity-card.tsx
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 4-5
+apps/web/src/lib/data/functions.ts
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 1-9
+apps/dashboard/src/lib/auth/delete-user-record.ts
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 187-196
+packages/ui/src/components/evilcharts/ui/echarts-chart.tsx
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 1-176
+apps/dashboard/src/components/geo/directions/direction-cockpit.tsx
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 3
+apps/dashboard/vercel.json
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 44-46
+packages/ui/src/lib/charts/echarts-brush.ts
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 1-203
+apps/web/package.json
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 42
+apps/dashboard/src/components/analytics/account-detail-view.tsx
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 5,17
+apps/dashboard/src/app/api/internal/ai-trends/traffic/route.ts
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 9,43
+apps/web/src/routeTree.gen.ts
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 80-81,472-481,795,819,908,932,1027,1051,1142,1166,1255,1279,1373,1397,1957-1970,2394,2408,2444,2459
+apps/dashboard/src/constants/charts.ts
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 1
+apps/web/src/components/data/data-sheet.tsx
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 1-464
+apps/web/src/lib/data/snapshot.ts
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 1-68
+packages/ui/src/components/evilcharts/charts/echarts-bar-chart.tsx
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 1-2250
+apps/dashboard/tests/site-analytics-page.test.tsx
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 7,60,64-69
+apps/dashboard/src/components/geo/directions/direction-donut.tsx
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 3-4
+apps/dashboard/src/utils/public-ai-traffic.ts
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 1-745
+apps/web/src/components/data/data-columns.tsx
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 1-236
+packages/ui/src/lib/charts/echarts-datum.ts
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 1-12
+packages/ui/src/lib/charts/echarts-scrub.ts
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 1-301
+apps/dashboard/src/components/charts/chart-sparkline.tsx
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 3-5,12
+apps/dashboard/src/utils/providers.tsx
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 20,134-136
+packages/ui/src/lib/charts/echarts-marker.ts
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 1-63
+packages/ui/src/lib/charts/chart-stack-gap.ts
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 1-34
+apps/dashboard/src/constants/public-data.ts
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 1-79
+apps/dashboard/src/styles/globals.css
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 2
+packages/ui/src/types/charts.ts
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 1-83
+apps/dashboard/src/components/geo/engine-family-sheet.tsx
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 17,28
+apps/dashboard/src/utils/chart-tooltip-scrub.test.ts
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 3-4
+packages/ui/src/lib/charts/chart-locale.ts
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 1-31
+apps/web/src/lib/state-of-ai-search/markdown.ts
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 17-21,37
+apps/dashboard/src/components/analytics/impressions-share-card.tsx
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 3-4
+apps/dashboard/src/utils/public-ai-traffic.test.ts
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 1-346
+apps/web/src/lib/sitemap/entries.ts
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 4,217-219
+packages/analytics/src/tinybird/pipes/geo-traffic-trends.ts
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 3-7,21,31-35,42-50,68-102,111-114,117,196-197,212
+apps/web/src/routes/_site/data/index[.]json.ts
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 1-24
+packages/ui/src/lib/charts/chart-tooltip-position.ts
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 1-67
+apps/dashboard/src/routes/api.cron.public-data.ts
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 1-18
+apps/dashboard/tests/echarts-renderer.test.ts
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 14-15
+apps/web/src/components/data/data-heatmap.tsx
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 1-165
+packages/ui/src/styles/charts.css
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 1-28
+packages/ui/src/components/evilcharts/ui/echarts-brush.tsx
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 1-10
+apps/dashboard/src/routes/api.public.data.ai-traffic.ts
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 1-18
+apps/dashboard/src/utils/chart-colors.ts
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 1
+apps/dashboard/src/types/public-data.ts
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 1-58
+apps/dashboard/tests/fixtures/user-organization-teardown.fixture.ts
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 150,693,704,714-716
+apps/web/src/components/data/data-trend.tsx
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 1-25
+apps/dashboard/src/components/analytics/analytics-context.tsx
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 3
+apps/web/src/utils/markdown-twins.ts
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 9,23,350
+apps/dashboard/src/components/geo/journeys-hero.tsx
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 11-12
+apps/dashboard/src/components/geo/sentiment-breakdown.tsx
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 4
+apps/dashboard/src/utils/geo-competitors.ts
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 19
+apps/web/src/components/data/data-market-share.tsx
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 1-260
+apps/web/src/components/state-of-ai-search/report-section.tsx
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 88
+packages/ui/src/components/evilcharts/charts/echarts-line-chart.tsx
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 1-1892
+apps/dashboard/src/components/mcp/mcp-metric-card.tsx
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 4-5
+apps/web/src/components/data/data-traffic-chart.tsx
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 1-201
+apps/web/src/constants/landing/footer.ts
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 124-127
+apps/web/src/components/data/data-view.tsx
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 1-216
+packages/ui/package.json
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 9,44
+packages/ui/src/components/evilcharts/charts/echarts-area-chart.tsx
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 1-2938
+packages/schemas/src/types/api/public-ai-traffic.ts
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 1-19
+apps/web/src/components/data/data-hero.tsx
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 1-70
+apps/dashboard/src/components/geo/competitor-detail-view.tsx
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 22,29
+apps/blog/scripts/web-chrome.js
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 2
+packages/ui/src/components/data-table/body.tsx
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 107
+apps/dashboard/src/components/analytics/chart-legend.tsx
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 3
+apps/web/src/components/data/data-stats.tsx
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 1-149
+packages/ui/src/lib/charts/chart-zero-baseline.ts
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 1-19
+apps/dashboard/src/components/analytics/account-series-chart-card.tsx
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 3-5
+apps/dashboard/src/components/charts/dashboard-chart-environment.tsx
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 1-45
+packages/ui/src/components/evilcharts/ui/chart-environment.tsx
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 1-28
+apps/dashboard/src/utils/analytics-charts.ts
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 2
+apps/dashboard/tests/constants/react-doctor-events.ts
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 324,329
+apps/web/src/utils/data.ts
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 1-295
+apps/web/src/components/data/data-cells.tsx
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 1-89
+apps/dashboard/src/types/geo-competitors.ts
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 7
+apps/web/src/utils/markdown.ts
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 3-5,27-51
+apps/dashboard/tests/setup-legend-accessibility.test.tsx
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 80
+apps/dashboard/src/components/autopilot/autopilot-analytics-panel.tsx
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 5,7
+apps/dashboard/src/components/geo/web-trend-chart.tsx
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 4-5
+apps/dashboard/src/constants/geo-directions.ts
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 7
+apps/web/src/lib/data/markdown.ts
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 1-141
+apps/dashboard/src/components/ai/chat-tool-block/tool-output-chart.tsx
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 9-11
+apps/dashboard/src/routeTree.gen.ts
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 37,93,239-243,554-558,682,738,782,838,883,939,985,1041,1085,1141,1185,1241,1286,1336,1525-1531,1917-1923,2168,2229
+apps/dashboard/src/components/geo/mention-trend-card.tsx
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 10-11
+apps/dashboard/tests/fixtures/account-deletion.fixture.ts
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 16,19,36-38,76-78,129,132,203-225
+apps/dashboard/src/hooks/use-traffic-zoom.ts
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 3
+apps/dashboard/src/components/geo/traffic-hero.tsx
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 13,15
+packages/ui/src/components/evilcharts/ui/echarts-tooltip.tsx
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 1-580
+apps/dashboard/src/components/agent-feedback/feedback-activity-card.tsx
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 4,6
+apps/ui/registry/notra/table/components/data-table-body.tsx
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 104
+apps/dashboard/src/types/charts.ts
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 1-6
+apps/web/src/constants/data.ts
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 1-104
+apps/dashboard/src/lib/public-data/ai-traffic.ts
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 1-187
+apps/web/src/routes/_site/data/index.tsx
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 1-91
+apps/dashboard/src/lib/analytics/real-traffic-projects.ts
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 1-32
+apps/web/src/styles/ui-sources.css
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 54-61,84,197,217,230-238,261,279
+apps/dashboard/src/components/geo/share-of-voice-chart.tsx
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 14
+apps/dashboard/src/components/geo/daily-trend-chart.tsx
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 4-5
+apps/web/src/styles/globals.css
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 4
+packages/ui/src/components/evilcharts/ui/echarts-legend.tsx
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 1-148
+packages/ui/src/constants/chart-tooltip.ts
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 1-7
+apps/dashboard/src/types/geo.ts
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 71
+apps/dashboard/src/types/analytics.ts
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 1-5
+apps/dashboard/src/utils/geo-share-of-voice.ts
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 7
+packages/ui/src/components/evilcharts/ui/echarts-plot-frame.tsx
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 1-53
+packages/ui/src/components/evilcharts/charts/echarts-pie-chart.tsx
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 1-1168
+apps/dashboard/src/app/api/cron/public-data/route.ts
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 1-20
+apps/dashboard/src/components/charts/chart-color-scope.tsx
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 3
+apps/dashboard/src/middleware/auth.ts
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 38
+packages/ui/src/lib/charts/chart-tooltip-size.ts
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 1-167
+apps/dashboard/src/app/api/public/data/ai-traffic/route.ts
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 1-37
+apps/web/src/hooks/use-coarse-pointer.ts
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 1-18
+apps/web/src/types/data.ts
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 1-126
+packages/ui/src/lib/charts/echarts-resize.ts
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 1-63
+packages/schemas/src/schemas/api/public-ai-traffic.ts
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 1-122
+packages/ui/src/components/evilcharts/ui/echarts-dot.tsx
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 1-100
+apps/dashboard/src/lib/auth/delete-account.ts
+  s_0eb87d8daad6ee::t_6ef776cc5eb133 104-123
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "13e6651fd59a2fb4fd6e9b796060f81b9a6e58cc",
+  "prompts": {},
+  "sessions": {
+    "s_0eb87d8daad6ee": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a1b22e-3639-7443-aa7f-4abac253f350",
+        "model": "gpt-6-sol"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
