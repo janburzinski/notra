@@ -62,7 +62,9 @@ function isPrivateOrReservedIpv4(ip: string): boolean {
     [0x7f_00_00_00, 0x7f_ff_ff_ff],
     [0xa9_fe_00_00, 0xa9_fe_ff_ff],
     [0xac_10_00_00, 0xac_1f_ff_ff],
+    [0xc0_00_00_00, 0xc0_00_00_ff],
     [0xc0_a8_00_00, 0xc0_a8_ff_ff],
+    [0xc6_12_00_00, 0xc6_13_ff_ff],
     [0xe0_00_00_00, 0xff_ff_ff_ff],
   ];
 
@@ -178,6 +180,28 @@ function isPrivateOrReservedIpv6(ip: string): boolean {
     h0 === 0 && h1 === 0 && h2 === 0 && h3 === 0 && h4 === 0;
   if (hasZeroPrefix && (h5 === 0xff_ff || h5 === 0)) {
     return isPrivateOrReservedIpv4(hextetsToIpv4(h6, h7));
+  }
+
+  // Translation and relay prefixes can encode a private IPv4 destination.
+  if (
+    (h0 === 0 &&
+      h1 === 0 &&
+      h2 === 0 &&
+      h3 === 0 &&
+      h4 === 0xff_ff &&
+      h5 === 0) ||
+    (h0 === 0x64 &&
+      h1 === 0xff_9b &&
+      h2 === 0 &&
+      h3 === 0 &&
+      h4 === 0 &&
+      h5 === 0) ||
+    (h0 === 0x64 && h1 === 0xff_9b && h2 === 1) ||
+    (h0 === 0x100 && h1 === 0 && h2 === 0 && h3 === 0) ||
+    (h0 === 0x2001 && (h1 === 0 || h1 === 0x0d_b8)) ||
+    h0 === 0x2002
+  ) {
+    return true;
   }
 
   // biome-ignore lint/suspicious/noBitwiseOperators: bitmask range checks
