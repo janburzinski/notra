@@ -29,4 +29,5 @@ export const AI_USER_AGENTS = [
   "Meta-ExternalAgent",
   "MistralAI-User",
   "DuckAssistBot",
+  "GrokBot",
 ];
