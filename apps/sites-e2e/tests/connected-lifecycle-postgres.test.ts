@@ -19,7 +19,9 @@ import { seedSiteProject } from "../../../packages/sites-server/tests/utils/site
 import { requireTestDatabaseUrl } from "../../../scripts/testing/dashboard/utils/database";
 import { startSitesEmulators } from "../emulators";
 import { serveFetch } from "../emulators/core/http-server";
+import { EMULATED_GOOGLE_FONT } from "../emulators/google-fonts/constants";
 import type { LifecycleWebhookDelivery } from "./types/lifecycle-webhooks";
+import { withEmulatedGoogleFont } from "./utils/google-fonts";
 import { lifecycleJournal } from "./utils/lifecycle-journal";
 
 // SITES_E2E_BOX=1 builds every deployment in a real Upstash Box from the
@@ -110,7 +112,9 @@ if (!process.env.SITES_TEST_DATABASE_URL) {
             async (file) =>
               [
                 relative(fixture, file),
-                new Uint8Array(await readFile(file)),
+                relative(fixture, file) === "blog.json"
+                  ? withEmulatedGoogleFont(await readFile(file, "utf8"))
+                  : new Uint8Array(await readFile(file)),
               ] as const
           )
         )
@@ -510,6 +514,42 @@ if (!process.env.SITES_TEST_DATABASE_URL) {
       expect(initial.status).toBe(200);
       const initialHtml = await initial.text();
       expect(initialHtml).toContain("Notes on building calm software");
+      // Builds have no network, so the Google Font in blog.json reaches the site
+      // only if the server downloaded it (here from the emulator) beforehand.
+      const fontStylesheet =
+        /href="([^"]*\/fonts\/[0-9a-f]{64}\/fonts-[0-9a-f]{16}\.css)"/.exec(
+          initialHtml
+        )?.[1];
+      assert.ok(fontStylesheet, "the site links its Google Fonts stylesheet");
+      const fontCss = await (
+        await request(new URL(fontStylesheet, site.publicOrigin).toString())
+      ).text();
+      expect(fontCss).toContain(`font-family: '${EMULATED_GOOGLE_FONT}'`);
+      const fontFile = /url\("\.\/(font-[0-9a-f]{16}\.woff2)"\)/.exec(
+        fontCss
+      )?.[1];
+      assert.ok(fontFile, "the stylesheet points at a font file on the site");
+      const servedFont = await request(
+        new URL(fontFile, new URL(fontStylesheet, site.publicOrigin)).toString()
+      );
+      expect(servedFont.status).toBe(200);
+      expect(new Uint8Array(await servedFont.arrayBuffer())).toEqual(
+        new Uint8Array(
+          await readFile(
+            resolve(
+              import.meta.dirname,
+              "../fixtures/site/public/fonts/e2e-text-400.woff2"
+            )
+          )
+        )
+      );
+      expect(emulators.googleFonts.requests.map((item) => item.path)).toEqual(
+        expect.arrayContaining([
+          "GET /css2",
+          "GET /s/:directory/v1/:file",
+          "GET /:category/:directory/:file",
+        ])
+      );
       expect(initialHtml).not.toContain("A draft idea");
       expect((await request(`${site.publicOrigin}/changelog`)).status).toBe(
         200

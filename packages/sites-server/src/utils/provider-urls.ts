@@ -1,4 +1,5 @@
 import { BOX_BASE_URL } from "@notra/ai/constants/repo-image";
+import type { SiteFontEndpoints } from "@notra/sites-core/types/fonts";
 
 import { CLOUDFLARE_API_URL } from "../constants/domains";
 import { VERCEL_API_URL } from "../constants/vercel-dns";
@@ -25,6 +26,14 @@ export function cloudflareZonesApi(): string {
 
 export function vercelApiUrl(): string {
   return override("SITES_VERCEL_API_URL") ?? VERCEL_API_URL;
+}
+
+/** Google Fonts' CSS API, font files and licenses on one emulator; undefined uses Google. */
+export function googleFontsEndpoints(): SiteFontEndpoints | undefined {
+  const base = override("SITES_GOOGLE_FONTS_URL");
+  return base
+    ? { css: `${base}/css2`, files: base, licenses: base }
+    : undefined;
 }
 
 export function boxApiUrl(): string {

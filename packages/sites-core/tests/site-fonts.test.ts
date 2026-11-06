@@ -109,6 +109,55 @@ test("an aborted download stops taking files from its queue", async () => {
   if (!plan) {
     throw new Error("Lato needs a plan");
   }
-  await expect(downloadSiteFonts(plan, controller.signal)).rejects.toThrow();
+  await expect(
+    downloadSiteFonts(plan, { signal: controller.signal })
+  ).rejects.toThrow();
   expect(fontRequests).toBeLessThan(fontUrls.length);
+});
+
+test("other endpoints serve the download while the plan and its key stay Google's", async () => {
+  const requested: string[] = [];
+  fetchMock.mockImplementation((async (input: RequestInfo | URL) => {
+    const url = new URL(String(input));
+    requested.push(`${url.origin}${url.pathname}`);
+    if (url.pathname === "/css2") {
+      return new Response(
+        "@font-face { font-family: 'Lato'; src: url(http://127.0.0.1:4567/s/lato/v1/lato.woff2); }"
+      );
+    }
+    if (url.pathname.endsWith("/OFL.txt")) {
+      return new Response("SIL Open Font License");
+    }
+    return new Response(new Uint8Array([1, 2, 3]));
+  }) as typeof fetch);
+  const plan = await planSiteFonts({ family: "Lato" });
+  if (!plan) {
+    throw new Error("Lato needs a plan");
+  }
+  const endpoints = {
+    css: "http://127.0.0.1:4567/css2",
+    files: "http://127.0.0.1:4567",
+    licenses: "http://127.0.0.1:4567",
+  };
+  const files = await downloadSiteFonts(plan, { endpoints });
+  expect(files).toHaveLength(3);
+  expect(requested).toEqual(
+    expect.arrayContaining([
+      "http://127.0.0.1:4567/css2",
+      "http://127.0.0.1:4567/s/lato/v1/lato.woff2",
+      "http://127.0.0.1:4567/ofl/lato/OFL.txt",
+    ])
+  );
+  expect(requested.some((url) => url.includes("google"))).toBe(false);
+  expect(plan.url).toStartWith("https://fonts.googleapis.com/css2?");
+  // Files from Google itself are refused once another origin is configured.
+  fetchMock.mockImplementation((async (input: RequestInfo | URL) =>
+    new URL(String(input)).pathname === "/css2"
+      ? new Response(
+          "@font-face { font-family: 'Lato'; src: url(https://fonts.gstatic.com/s/lato/v1/lato.woff2); }"
+        )
+      : new Response("OFL")) as typeof fetch);
+  await expect(downloadSiteFonts(plan, { endpoints })).rejects.toThrow(
+    "Unsupported font file URL"
+  );
 });

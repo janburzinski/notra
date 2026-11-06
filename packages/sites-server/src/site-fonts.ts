@@ -10,6 +10,7 @@ import { publishedConfig } from "./editor";
 import type { SandboxUploadFile } from "./types/build";
 import type { SiteRepositoryAccess } from "./types/github";
 import type { Site } from "./types/sites";
+import { googleFontsEndpoints } from "./utils/provider-urls";
 import { repositoryPath } from "./utils/root-directory";
 
 const decoder = new TextDecoder();
@@ -43,6 +44,12 @@ export async function prefetchSiteFonts(params: {
   }
   const plan = await planSiteFonts(parsed.data.fonts);
   return plan
-    ? { key: plan.key, files: await downloadSiteFonts(plan, params.signal) }
+    ? {
+        key: plan.key,
+        files: await downloadSiteFonts(plan, {
+          signal: params.signal,
+          endpoints: googleFontsEndpoints(),
+        }),
+      }
     : null;
 }

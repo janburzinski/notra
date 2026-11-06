@@ -13,6 +13,15 @@ export const MUTATIONS: Mutation[] = [
     caughtBy: "signed push webhook",
   },
   {
+    id: "google-fonts-prefetch",
+    bug: "Builds no longer get the Google Fonts the server downloaded",
+    file: "packages/sites-server/src/pipeline.ts",
+    find: "      fontCache,\n",
+    replace: "      fontCache: null,\n",
+    suites: ["lifecycle"],
+    caughtBy: "create site and first deploy",
+  },
+  {
     id: "webhook-redelivery",
     bug: "A redelivered webhook is processed again",
     file: "packages/sites-server/src/webhooks.ts",

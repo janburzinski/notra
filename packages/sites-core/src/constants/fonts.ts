@@ -3,6 +3,13 @@
 export const GOOGLE_FONTS_CSS_URL = "https://fonts.googleapis.com/css2";
 export const GOOGLE_FONTS_LICENSE_URL =
   "https://raw.githubusercontent.com/google/fonts/main";
+export const GOOGLE_FONTS_FILE_ORIGIN = "https://fonts.gstatic.com";
+// Where downloads go. The E2E suite points the server at an emulator instead.
+export const GOOGLE_FONTS_ENDPOINTS = {
+  css: GOOGLE_FONTS_CSS_URL,
+  files: GOOGLE_FONTS_FILE_ORIGIN,
+  licenses: GOOGLE_FONTS_LICENSE_URL,
+} as const;
 export const FONT_LICENSE_LOCATIONS = [
   ["ofl", "OFL.txt"],
   ["apache", "LICENSE.txt"],

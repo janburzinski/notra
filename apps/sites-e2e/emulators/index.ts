@@ -1,3 +1,5 @@
+import { readFile } from "node:fs/promises";
+
 import { startAutumnEmulator } from "./autumn";
 import { startBoxEmulator } from "./box";
 import { startCloudflareEmulator } from "./cloudflare";
@@ -6,6 +8,8 @@ import type { EmulatorSummary } from "./core/types";
 import { startDnsServer } from "./dns/server";
 import { DnsZone } from "./dns/zone";
 import { startGitHubEmulator } from "./github";
+import { startGoogleFontsEmulator } from "./google-fonts";
+import { EMULATED_GOOGLE_FONT } from "./google-fonts/constants";
 import { startR2Emulator } from "./r2";
 import type { SitesEmulatorsOptions } from "./types";
 import { startVercelEmulator } from "./vercel";
@@ -64,6 +68,24 @@ export async function startSitesEmulators(options: SitesEmulatorsOptions) {
     const autumn = await track(
       startAutumnEmulator({ secretKey: "emulated-autumn-secret" })
     );
+    const googleFonts = await track(
+      startGoogleFontsEmulator({
+        families: {
+          [EMULATED_GOOGLE_FONT]: {
+            file: new Uint8Array(
+              await readFile(
+                new URL(
+                  "../fixtures/site/public/fonts/e2e-text-400.woff2",
+                  import.meta.url
+                )
+              )
+            ),
+            license: `Copyright 2026 The ${EMULATED_GOOGLE_FONT} Project Authors\n\nSIL Open Font License, Version 1.1\n`,
+            weights: [100, 900],
+          },
+        },
+      })
+    );
     const box = options.box
       ? await track(
           startBoxEmulator({
@@ -72,9 +94,16 @@ export async function startSitesEmulators(options: SitesEmulatorsOptions) {
           })
         )
       : null;
-    const services = [github, r2, box, cloudflare, vercel, autumn, dns].filter(
-      (service) => service !== null
-    );
+    const services = [
+      github,
+      r2,
+      box,
+      cloudflare,
+      vercel,
+      autumn,
+      googleFonts,
+      dns,
+    ].filter((service) => service !== null);
     return {
       zone,
       dns,
@@ -83,6 +112,7 @@ export async function startSitesEmulators(options: SitesEmulatorsOptions) {
       cloudflare,
       vercel,
       autumn,
+      googleFonts,
       box,
       env: {
         ...dns.env,
@@ -91,6 +121,7 @@ export async function startSitesEmulators(options: SitesEmulatorsOptions) {
         ...cloudflare.env,
         ...vercel.env,
         ...autumn.env,
+        ...googleFonts.env,
         ...(box?.env ?? {}),
       },
       summaries: (): EmulatorSummary[] =>

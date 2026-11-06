@@ -11,9 +11,14 @@ import {
   FONT_USER_AGENT,
   FONT_WEIGHT_RANGES,
   GOOGLE_FONTS_CSS_URL,
-  GOOGLE_FONTS_LICENSE_URL,
+  GOOGLE_FONTS_ENDPOINTS,
 } from "../constants/fonts";
-import type { SiteFontFile, SiteFontPlan } from "../types/fonts";
+import type {
+  SiteFontDownloadOptions,
+  SiteFontEndpoints,
+  SiteFontFile,
+  SiteFontPlan,
+} from "../types/fonts";
 import type { SiteConfig } from "../types/site-config";
 import { sha256Hex } from "./hash";
 
@@ -104,6 +109,12 @@ function googleFontsUrl(specs: Map<string, string>): URL {
   return url;
 }
 
+function cssRequestUrl(url: URL, endpoints: SiteFontEndpoints): string {
+  const target = new URL(endpoints.css);
+  target.search = url.search;
+  return target.toString();
+}
+
 async function shortHash(data: Uint8Array<ArrayBuffer>): Promise<string> {
   return (await sha256Hex(data)).slice(0, 16);
 }
@@ -153,12 +164,13 @@ async function fetchFontAsset(
 async function firstSupportedSpec(
   family: string,
   options: string[],
+  endpoints: SiteFontEndpoints,
   signal?: AbortSignal
 ): Promise<string> {
   for (const spec of options) {
     try {
       await fetchFontAsset(
-        googleFontsUrl(new Map([[family, spec]])).toString(),
+        cssRequestUrl(googleFontsUrl(new Map([[family, spec]])), endpoints),
         FONT_CSS_MAX_BYTES,
         signal
       );
@@ -174,12 +186,16 @@ async function firstSupportedSpec(
 
 async function supportedFontsUrl(
   candidates: SiteFontPlan["candidates"],
+  endpoints: SiteFontEndpoints,
   signal?: AbortSignal
 ): Promise<URL> {
   const specs = await Promise.all(
     candidates.map(
       async ([family, options]) =>
-        [family, await firstSupportedSpec(family, options, signal)] as const
+        [
+          family,
+          await firstSupportedSpec(family, options, endpoints, signal),
+        ] as const
     )
   );
   return googleFontsUrl(new Map(specs));
@@ -187,13 +203,14 @@ async function supportedFontsUrl(
 
 async function fetchFontLicense(
   family: string,
+  endpoints: SiteFontEndpoints,
   signal?: AbortSignal
 ): Promise<Uint8Array<ArrayBuffer>> {
   const directory = family.toLowerCase().replace(/[^a-z0-9]/g, "");
   for (const [category, name] of FONT_LICENSE_LOCATIONS) {
     try {
       return await fetchFontAsset(
-        `${GOOGLE_FONTS_LICENSE_URL}/${category}/${directory}/${name}`,
+        `${endpoints.licenses}/${category}/${directory}/${name}`,
         FONT_CSS_MAX_BYTES,
         signal
       );
@@ -211,10 +228,15 @@ async function downloadFontFiles(
   url: URL,
   families: string[],
   requireEveryFamily: boolean,
+  endpoints: SiteFontEndpoints,
   signal?: AbortSignal
 ): Promise<SiteFontFile[]> {
   const css = decoder.decode(
-    await fetchFontAsset(url.toString(), FONT_CSS_MAX_BYTES, signal)
+    await fetchFontAsset(
+      cssRequestUrl(url, endpoints),
+      FONT_CSS_MAX_BYTES,
+      signal
+    )
   );
   const urls = [
     ...new Set(
@@ -240,8 +262,7 @@ async function downloadFontFiles(
   const sources = urls.map((source) => {
     const parsed = new URL(source);
     if (
-      parsed.protocol !== "https:" ||
-      parsed.host !== "fonts.gstatic.com" ||
+      parsed.origin !== new URL(endpoints.files).origin ||
       parsed.username ||
       parsed.password ||
       parsed.search ||
@@ -255,7 +276,7 @@ async function downloadFontFiles(
   const files: SiteFontFile[] = [];
   const replacements = new Map<string, string>();
   const downloads = families.map((family) => async () => {
-    const license = await fetchFontLicense(family, signal);
+    const license = await fetchFontLicense(family, endpoints, signal);
     files.push({
       name: `font-license-${await shortHash(license)}.txt`,
       data: license,
@@ -328,13 +349,14 @@ export async function planSiteFonts(
  */
 export async function downloadSiteFonts(
   plan: SiteFontPlan,
-  signal?: AbortSignal
+  { signal, endpoints = GOOGLE_FONTS_ENDPOINTS }: SiteFontDownloadOptions = {}
 ): Promise<SiteFontFile[]> {
   try {
     return await downloadFontFiles(
       new URL(plan.url),
       plan.families,
       true,
+      endpoints,
       signal
     );
   } catch (error) {
@@ -343,9 +365,10 @@ export async function downloadSiteFonts(
     }
     // A font without the full default range: retry with ranges it has.
     return await downloadFontFiles(
-      await supportedFontsUrl(plan.candidates, signal),
+      await supportedFontsUrl(plan.candidates, endpoints, signal),
       plan.families,
       false,
+      endpoints,
       signal
     );
   }
