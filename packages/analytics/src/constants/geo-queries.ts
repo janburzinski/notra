@@ -180,9 +180,20 @@ export const GEO_PATH_PARAMS = {
     .string()
     .optional("")
     .describe("Exact page path, empty for every page"),
+  page_paths: p
+    .string()
+    .optional("")
+    .describe(
+      "Comma-separated exact page paths. Replaces path when set, so callers can pass path as the fallback."
+    ),
 };
 
-export const GEO_PATH_SQL = `AND ({{String(path, '')}} = '' OR path = {{String(path, '')}})`;
+export const GEO_PATH_SQL = `AND (
+            {{String(page_paths, '')}} != ''
+            AND has(splitByChar(',', {{String(page_paths, '')}}), path)
+            OR {{String(page_paths, '')}} = ''
+            AND ({{String(path, '')}} = '' OR path = {{String(path, '')}})
+          )`;
 
 /** Host or path filters need the per-page rollup instead of the per-source one. */
-export const GEO_PAGE_FILTER_SET = `(${GEO_HOSTS_SET} OR {{String(path, '')}} != '')`;
+export const GEO_PAGE_FILTER_SET = `(${GEO_HOSTS_SET} OR {{String(path, '')}} != '' OR {{String(page_paths, '')}} != '')`;

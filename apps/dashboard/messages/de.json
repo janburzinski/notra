@@ -6982,6 +6982,15 @@
         "description": "Gib dieser Sammlung einen leicht erkennbaren Namen. Er wird nicht durch die automatische Benennung überschrieben.",
         "renamed": "Sammlung umbenannt",
         "renameFailed": "Sammlung konnte nicht umbenannt werden"
+      },
+      "agentReach": {
+        "header": "KI-Reichweite",
+        "hint": "Crawler- und Verweisbesuche von KI auf der Live-Seite in den letzten 30 Tagen. Gezählt werden nur Beiträge, die auf einer Site veröffentlicht sind.",
+        "crawler": "{count, plural, one {# Crawler-Besuch} other {# Crawler-Besuche}}",
+        "aiReferral": "{count, plural, one {# KI-Verweis} other {# KI-Verweise}}",
+        "posts": "{count, plural, one {Über # Live-Beitrag} other {Über # Live-Beiträge}}",
+        "notLive": "Nicht live auf einer Site",
+        "unavailable": "KI-Reichweite konnte nicht geladen werden. Versuche es später erneut."
       }
     },
     "list": {
@@ -7150,6 +7159,14 @@
       "hidden": {
         "label": "Nur über Link erreichbar",
         "hint": "Bleibt per direktem Link erreichbar, erscheint aber nicht in Seitenlisten, Feeds, Suchmaschinen oder AI-Verzeichnissen. Jeder mit dem Link kann den Inhalt lesen. Ausschalten stellt die vorherige Einstellung für die Suche wieder her."
+      },
+      "agentReach": {
+        "label": "KI-Reichweite",
+        "hint": "Besuche von KI-Engines auf der Live-Seite dieses Beitrags, inklusive Markdown-Version, in den letzten 30 Tagen.",
+        "more": "+{count} weitere",
+        "totals": "{crawled, number} gecrawlt · {cited, number} zitiert · {referred, number} verwiesen",
+        "emptyTitle": "Keine KI-Besuche in den letzten 30 Tagen",
+        "emptyDescription": "Crawls, Zitate und Verweise von KI-Suchmaschinen erscheinen hier, sobald sie diesen Beitrag erreichen."
       },
       "cover": {
         "label": "Cover",
@@ -7617,6 +7634,7 @@
         "schedulePost": "{state, select, running {Beitrag wird geplant} done {Beitrag geplant} approve {Planung bestätigen} other {Planung fehlgeschlagen}}",
         "cancelPostSchedule": "{state, select, running {Planung wird aufgehoben} done {Planung aufgehoben} approve {Aufheben bestätigen} other {Aufheben fehlgeschlagen}}",
         "getPostSchedule": "{state, select, running {Planung wird geprüft} done {Planung geprüft} approve {Prüfung bestätigen} other {Prüfung fehlgeschlagen}}",
+        "getPostAgentReach": "{state, select, running {KI-Reichweite wird geprüft} done {KI-Reichweite geprüft} approve {Prüfung bestätigen} other {Prüfung fehlgeschlagen}}",
         "reviseImage": "{state, select, running {Überarbeite Bild} done {Bild überarbeitet} approve {Genehmigen: Bild} other {Fehlgeschlagen: Bild}}",
         "listBrandIdentities": "{state, select, running {Lade Markenidentitäten} done {Markenidentitäten geladen} approve {Genehmigen: Markenidentitäten} other {Fehlgeschlagen: Markenidentitäten}}",
         "getBrandIdentity": "{state, select, running {Lade Markenidentität} done {Markenidentität geladen} approve {Genehmigen: Markenidentität} other {Fehlgeschlagen: Markenidentität}}",

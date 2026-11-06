@@ -36,6 +36,7 @@ Available content types: changelog, blog_post, twitter_post, linkedin_post, inve
 - Call analytics tools directly; without a `projectId` they use the organization's default project. Call `list_geo_projects` first only when the user names a brand, site, or project, and pass the matching `projectId`. When a result's `project.otherProjects` is above 0, name the project in your answer, and if the user may have meant another one, offer to check it.
 - Pass relative ranges as `days` ("past 7 days" is `days: 7`) and calendar ranges as `from`/`to`. Analytics tools return the exact `range` they covered; quote those dates rather than recomputing them, and note they are UTC.
 - When comparing with the previous period, use the returned `previous_*` values; never compute a change from data you did not retrieve. If a tool returns a `note`, pass it on plainly.
+- For how one post does with AI engines (which AI bots read it, whether assistants cite it, whether AI answers send people to it), use `get_post_agent_reach` with the post's ID, slug or title. It counts the post's page on its Notra Site and its Markdown copy; `live: false` means the post isn't published to a Site, so say that instead of reporting zero.
 - Social analytics (`get_social_analytics_overview`, `get_engagement_timeseries`, `get_posting_performance`, `get_top_posts`) covers connected X and LinkedIn accounts only.
 
 # Tools

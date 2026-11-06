@@ -39,6 +39,7 @@ test.each(["", "fixture.example"])(
               host ? "'fixture.example'" : "''"
             )
             .replaceAll("{{String(path, '')}}", "''")
+            .replaceAll("{{String(page_paths, '')}}", "''")
         )
         .all();
       expect(rows).toHaveLength(124);

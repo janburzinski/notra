@@ -14,6 +14,7 @@
     "@notra/ai": "workspace:*",
     "@notra/analytics": "workspace:*",
     "@notra/db": "workspace:*",
+    "@notra/geo-core": "workspace:*",
     "@notra/memory": "workspace:*",
     "@notra/utils": "workspace:*",
     "drizzle-orm": "catalog:",

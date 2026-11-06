@@ -36,6 +36,7 @@ import { createChatActivityTimingTracker } from "@notra/ai/utils/chat-activity-t
 import { routeUsageProperties } from "@notra/ai/utils/route-usage";
 import { logError, logInfo, logWarn } from "@notra/ai/utils/server-log";
 import { toAgentTokenUsage } from "@notra/ai/utils/token-usage";
+import { loadPostAgentReachSummary } from "@notra/geo-core/geo/post-agent-reach";
 import { POSTHOG_EVENTS } from "@notra/posthog/events";
 import { flushPostHogServer } from "@notra/posthog/server";
 import { toUIMessageStream, type UIMessageChunk } from "ai";
@@ -287,6 +288,7 @@ export async function streamChatResponseStep(
         },
         resolveContext: getGitHubToolRepositoryContextByIntegrationId,
         resolveLinearContext: getLinearToolContextByIntegrationId,
+        loadPostAgentReach: loadPostAgentReachSummary,
         onFirstChunk() {
           if (timing.firstChunkAt === null) {
             timing.firstChunkAt = Date.now();

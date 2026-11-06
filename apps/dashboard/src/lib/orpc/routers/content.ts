@@ -53,6 +53,10 @@ import {
   projectScopedCollectionIds,
   projectScopeFilter,
 } from "@notra/db/utils/projects";
+import {
+  loadPostAgentReach,
+  loadPostsAgentReachSummaries,
+} from "@notra/geo-core/geo/post-agent-reach";
 import { POSTHOG_EVENTS } from "@notra/posthog/events";
 import {
   contentListQuerySchema,
@@ -63,6 +67,7 @@ import type {
   PostsResponse,
 } from "@notra/schemas/dashboard/content";
 import {
+  contentAgentReachByCollectionInputSchema,
   contentInputSchema,
   deleteContentInputSchema,
   contentOrganizationIdInputSchema,
@@ -98,6 +103,7 @@ import {
   or,
   sql,
 } from "drizzle-orm";
+import { Effect } from "effect";
 import { marked } from "marked";
 import { nanoid } from "nanoid";
 
@@ -123,6 +129,7 @@ import {
   getActiveGenerations,
   getCompletedGenerations,
 } from "@/lib/generations/tracking";
+import { geoCoreDashboardLayer } from "@/lib/geo/configure";
 import { requestGeoRescanForPublishedPost } from "@/lib/geo/rescan";
 import { getTranslations } from "@/lib/i18n/server";
 import { assertContentPublishAllowed } from "@/lib/integrations/github/assert-content-publish";
@@ -131,6 +138,7 @@ import { getContentPullRequestState } from "@/lib/integrations/github/content-pu
 import { publishSavedContentToGitHub } from "@/lib/integrations/github/publish-saved-content";
 import { removePublishedContent } from "@/lib/integrations/github/remove-published-content";
 import { baseProcedure, withOrganizationAccess } from "@/lib/orpc/base";
+import { runOrpcEffect } from "@/lib/orpc/effect";
 import { contentAuthorsRouter } from "@/lib/orpc/routers/content-authors";
 import { contentHistoryRouter } from "@/lib/orpc/routers/content-history";
 import { contentRecentsProcedure } from "@/lib/orpc/routers/content-recents";
@@ -150,6 +158,7 @@ import type {
   ContentUpdateDataInput,
   ContentUpdatePost,
 } from "@/types/content/update";
+import { sumAgentReachByCollection } from "@/utils/content-agent-reach";
 import { getContentListPreview } from "@/utils/content-list-preview";
 import { resolveLookbackRange } from "@/utils/lookback";
 import { ratelimit } from "@/utils/ratelimit";
@@ -162,6 +171,7 @@ import {
   notFound,
   paymentRequired,
 } from "../utils/errors";
+import { toGeoOrpcError } from "../utils/geo-errors";
 
 const TITLE_REGEX = /^#\s+(.+)$/m;
 
@@ -841,6 +851,42 @@ export const contentRouter = {
         ...details,
         status: state.status === "open" && state.draft ? "draft" : state.status,
       } as const;
+    }),
+  /** AI crawler, citation and referral visits to the post's live page. */
+  agentTraffic: baseProcedure
+    .input(contentInputSchema)
+    .use(withOrganizationAccess)
+    .handler(({ input }) =>
+      runOrpcEffect(
+        loadPostAgentReach(input.organizationId, input.contentId).pipe(
+          Effect.provide(geoCoreDashboardLayer)
+        ),
+        toGeoOrpcError
+      )
+    ),
+  /** Agent reach per collection, summed over its posts that are live on a Site. */
+  agentReachByCollection: baseProcedure
+    .input(contentAgentReachByCollectionInputSchema)
+    .use(withOrganizationAccess)
+    .handler(async ({ input }) => {
+      const collectionPosts = await db
+        .select({ id: posts.id, collectionId: posts.collectionId })
+        .from(posts)
+        .where(
+          and(
+            eq(posts.organizationId, input.organizationId),
+            inArray(posts.collectionId, input.collectionIds),
+            sql`${posts.githubPublish}->>'siteId' is not null`
+          )
+        );
+      const summaries = await runOrpcEffect(
+        loadPostsAgentReachSummaries(
+          input.organizationId,
+          collectionPosts.map((post) => post.id)
+        ).pipe(Effect.provide(geoCoreDashboardLayer)),
+        toGeoOrpcError
+      );
+      return sumAgentReachByCollection(collectionPosts, summaries);
     }),
   create: baseProcedure
     .input(createPostInputSchema)

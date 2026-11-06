@@ -83,6 +83,7 @@ async function scopedEvents(
     return [];
   }
   const excluded = listParam(params.excluded_sources);
+  const pagePaths = listParam(params.page_paths);
   const events = await provider({
     organizationId: params.organization_id,
     projectId: params.project_id ?? "",
@@ -91,7 +92,9 @@ async function scopedEvents(
     (event) =>
       (!params.project_id || event.project_id === params.project_id) &&
       (!params.site_id || event.site_id === params.site_id) &&
-      (!params.path || event.path === params.path) &&
+      (pagePaths
+        ? pagePaths.has(event.path)
+        : !params.path || event.path === params.path) &&
       !excluded?.has(event.source)
   );
 }

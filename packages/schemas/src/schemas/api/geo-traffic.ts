@@ -100,7 +100,7 @@ export const journeyParamsSchema = projectParamsSchema.extend({
     .openapi({ param: { name: "journeyId", in: "path" } }),
 });
 
-const trafficSourceSchema = z.object({
+export const trafficSourceSchema = z.object({
   source: z.string(),
   visitorType: visitorTypeSchema,
   agent: z.string(),
@@ -115,14 +115,14 @@ const trafficSourceSchema = z.object({
   lastSeenAt: z.string(),
 });
 
-const trafficPointSchema = z.object({
+export const trafficPointSchema = z.object({
   day: z.string(),
   visitorType: visitorTypeSchema,
   source: z.string(),
   visits: z.number().int(),
 });
 
-const trafficConfiguredField = z.boolean().openapi({
+export const trafficConfiguredField = z.boolean().openapi({
   description:
     "False when the traffic backend is not configured for this deployment; the payload is then empty rather than an error.",
 });

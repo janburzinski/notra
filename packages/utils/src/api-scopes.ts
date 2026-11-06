@@ -236,7 +236,10 @@ export const API_SCOPE_RESOURCES = [
   {
     id: "traffic",
     paths: ["/geo/ingest"],
-    pathPatterns: ["/projects/{projectId}/geo/traffic"],
+    pathPatterns: [
+      "/projects/{projectId}/geo/traffic",
+      "/posts/{postId}/agent-reach",
+    ],
     label: "GEO AI traffic",
     description:
       "Read AI crawler and referral traffic, and manage the ingest token",

@@ -498,6 +498,7 @@
                   "GET /v1/posts/{postId}",
                   "PATCH /v1/posts/{postId}",
                   "DELETE /v1/posts/{postId}",
+                  "GET /v1/posts/{postId}/agent-reach",
                   "GET /v1/posts/authors",
                   {
                     "group": "Generation",

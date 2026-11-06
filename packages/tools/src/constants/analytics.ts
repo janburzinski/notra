@@ -13,6 +13,12 @@ export const WEB_ANALYTICS_NOT_CONFIGURED_MESSAGE =
 export const WEB_ANALYTICS_QUERY_FAILED_MESSAGE =
   "Failed to load website analytics from the analytics backend.";
 
+export const POST_AGENT_REACH_QUERY_FAILED_MESSAGE =
+  "Failed to load the post's agent reach from the analytics backend.";
+
+export const POST_IDENTIFIER_AMBIGUOUS_MESSAGE =
+  "Several posts have that title. Pass the post ID or slug instead.";
+
 export const ANALYTICS_PROJECT_NOT_FOUND_MESSAGE =
   "Project not found in this organization. Call list_geo_projects for valid project IDs.";
 

@@ -17,6 +17,7 @@ import { useTranslations } from "use-intl";
 
 import { Button } from "@/components/button";
 import { ContentDetailSourceMetadata } from "@/components/content/content-detail-source-metadata";
+import { ContentAgentReach } from "@/components/content/overview/content-agent-reach";
 import { ContentAuthorsDialog } from "@/components/content/overview/content-authors-dialog";
 import { ContentStatusBadge } from "@/components/content/overview/content-status-badge";
 import { OverviewAuthorSelect } from "@/components/content/overview/overview-author-select";
@@ -143,6 +144,11 @@ export function ContentOverview(props: ContentOverviewProps) {
       </div>
 
       <div className="bg-border h-px" />
+
+      <ContentAgentReach
+        contentId={contentId}
+        organizationId={organizationId}
+      />
 
       <OverviewField hint={t("cover.hint")} label={t("cover.label")}>
         <OverviewCoverField api={api} markdown={markdown} />

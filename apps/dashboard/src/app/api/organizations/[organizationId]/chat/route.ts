@@ -43,6 +43,7 @@ import { logError, logWarn } from "@notra/ai/utils/server-log";
 import { toAgentTokenUsage } from "@notra/ai/utils/token-usage";
 import { withChatStreamCleanup } from "@notra/ai/utils/with-chat-stream-cleanup";
 import { isProjectInOrganization } from "@notra/db/utils/projects";
+import { loadPostAgentReachSummary } from "@notra/geo-core/geo/post-agent-reach";
 import { POSTHOG_EVENTS } from "@notra/posthog/events";
 import {
   createUIMessageStreamResponse,
@@ -458,6 +459,7 @@ async function createDirectStandaloneChatResponse({
         resolveContext: getGitHubToolRepositoryContextByIntegrationId,
         resolveLinearContext: getLinearToolContextByIntegrationId,
         resolveGranolaContext: getGranolaToolContextByIntegrationId,
+        loadPostAgentReach: loadPostAgentReachSummary,
         onFirstChunk() {
           if (firstChunkAt === null) {
             firstChunkAt = Date.now();

@@ -1,3 +1,4 @@
+import { SITE_ENTRY_SLUG } from "@notra/sites-core/constants/entries";
 import {
   SITE_CHROME_FILES,
   SITE_SLOT_NAMES,
@@ -17,23 +18,18 @@ import {
 import type { SiteDiagnostic } from "@notra/sites-core/types/build";
 import type { SiteConfig } from "@notra/sites-core/types/site-config";
 import { isCustomScriptPath } from "@notra/sites-core/utils/custom-scripts";
+import { parseSiteEntryFile } from "@notra/sites-core/utils/entries";
 import { filterSiteFiles } from "@notra/sites-core/utils/site-ignore";
 import { tagSlug } from "@notra/sites-core/utils/tags";
 import { Parser } from "acorn";
 
-import {
-  ENTRY_FILE,
-  ENTRY_SLUG,
-  MDX_FILE,
-  SCRIPT_FILE,
-} from "./constants/validate";
+import { MDX_FILE, SCRIPT_FILE } from "./constants/validate";
 import { parseEntryFrontmatter } from "./frontmatter";
 import { analyzeJsxSnippet } from "./jsx";
 import { analyzeMdxFile } from "./mdx";
 import type { SiteEntry } from "./types/entries";
 import type { MdxAnalysis } from "./types/mdx";
 import type {
-  EntryCandidate,
   ParsedSiteConfig,
   SiteValidationInput,
   SiteValidationResult,
@@ -54,29 +50,9 @@ import { blockedMarkdownHtml } from "./utils/markdown-html";
 import { isTextSourceFile, offsetToLineColumn } from "./utils/paths";
 import { substituteSettingText, substituteVariables } from "./utils/variables";
 
-function entryCandidate(path: string): EntryCandidate | null {
-  const match = ENTRY_FILE.exec(path);
-  if (!match) {
-    return null;
-  }
-  const [, area, rest, format] = match;
-  if (!(area && rest && format)) {
-    return null;
-  }
-  if (rest.split("/").some((segment) => segment.startsWith("_"))) {
-    return null;
-  }
-  const slug = rest.endsWith("/index") ? rest.slice(0, -"/index".length) : rest;
-  return {
-    area: area as SiteEntry["area"],
-    slug,
-    format: format as SiteEntry["format"],
-  };
-}
-
 function takesVariables(path: string): boolean {
   return (
-    entryCandidate(path) !== null ||
+    parseSiteEntryFile(path) !== null ||
     (SITE_CHROME_FILES as readonly string[]).includes(path) ||
     (path.startsWith("snippets/") && MDX_FILE.test(path)) ||
     (path.startsWith(`${SITE_SLOTS_DIR}/`) && MDX_FILE.test(path))
@@ -373,14 +349,14 @@ export function validateSite(input: SiteValidationInput): SiteValidationResult {
     );
   };
   for (const path of mdxPaths) {
-    analyze(path, entryCandidate(path) !== null);
+    analyze(path, parseSiteEntryFile(path) !== null);
   }
 
   const importedPaths = new Set(
     [...analyses.values()].flatMap((analysis) => analysis.imports)
   );
   for (const path of mdxPaths) {
-    if (importedPaths.has(path) && entryCandidate(path) !== null) {
+    if (importedPaths.has(path) && parseSiteEntryFile(path) !== null) {
       analyze(path, false);
     }
   }
@@ -407,7 +383,7 @@ export function validateSite(input: SiteValidationInput): SiteValidationResult {
   let unreadEntries = 0;
   const blogTags = new Set<string>();
   for (const [path, content] of files) {
-    const candidate = entryCandidate(path);
+    const candidate = parseSiteEntryFile(path);
     if (!candidate || importedPaths.has(path)) {
       continue;
     }
@@ -415,7 +391,7 @@ export function validateSite(input: SiteValidationInput): SiteValidationResult {
       unreadEntries += 1;
       continue;
     }
-    if (!ENTRY_SLUG.test(candidate.slug)) {
+    if (!SITE_ENTRY_SLUG.test(candidate.slug)) {
       diagnostics.push({
         severity: "error",
         file: path,

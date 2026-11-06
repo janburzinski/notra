@@ -11,7 +11,6 @@ import {
   queryGeoTrafficPages,
   queryGeoTrafficTimeseries,
 } from "@notra/analytics/tinybird/client";
-import type { GeoTrafficOverviewRow } from "@notra/analytics/types/tinybird-endpoints";
 import { db } from "@notra/db/drizzle";
 import {
   brandSettings,
@@ -39,6 +38,7 @@ import {
   queryGeoCheckTimeseries,
   toGeoCheckWindow,
 } from "@notra/db/utils/geo-checks";
+import { siteEntryTrafficPaths } from "@notra/sites-core/utils/entries";
 import { and, asc, desc, eq, inArray, sql } from "drizzle-orm";
 import { Effect } from "effect";
 
@@ -116,7 +116,12 @@ import type {
   GeoImportResult,
   GeoPromptImportRow,
 } from "../types/geo-import";
-import { toGeoTrafficTotals, toGeoVisitorType } from "../utils/ai-traffic";
+import {
+  isAiVisitorSource,
+  toGeoTrafficSources,
+  toGeoTrafficTotals,
+  toGeoVisitorType,
+} from "../utils/ai-traffic";
 import {
   diffScanChecks,
   summarizeGeoChanges,
@@ -1325,35 +1330,6 @@ export const loadGeoCompetitorDetail = Effect.fn("geo.competitorDetail")(
   }
 );
 
-function toGeoTrafficSources(
-  rows: readonly GeoTrafficOverviewRow[] | undefined
-): GeoTrafficSource[] {
-  return (rows ?? []).map((row) => ({
-    source: row.source,
-    visitorType: toGeoVisitorType(row.visitor_type),
-    agent: row.agent,
-    category: row.category,
-    confidence: row.confidence,
-    visits: Number(row.visits),
-    ...(row.previous_visits == null
-      ? {}
-      : { previousVisits: Number(row.previous_visits) }),
-    markdownVisits: Number(row.markdown_visits),
-    ...(row.previous_markdown_visits == null
-      ? {}
-      : { previousMarkdownVisits: Number(row.previous_markdown_visits) }),
-    paths: Number(row.paths),
-    ...(row.previous_paths == null
-      ? {}
-      : { previousPaths: Number(row.previous_paths) }),
-    lastSeenAt: row.last_seen_at,
-  }));
-}
-
-function isAiVisitorSource(row: GeoTrafficSource): boolean {
-  return row.visitorType === "crawler" || row.visitorType === "ai_referral";
-}
-
 const aiTrafficParams = Effect.fn("geo.aiTrafficParams")(function* (
   input: GeoScopeInput,
   window: GeoWindowInput,
@@ -1372,6 +1348,10 @@ const aiTrafficParams = Effect.fn("geo.aiTrafficParams")(function* (
     sites: sites ?? "",
     ...(siteId
       ? { site_id: siteId, project_id: "", include_unassigned: 0 }
+      : {}),
+    // On a Site, a page is also read through its Markdown copy and index files.
+    ...(siteId && path
+      ? { page_paths: siteEntryTrafficPaths(path).join(",") }
       : {}),
   };
   return { scope, params };

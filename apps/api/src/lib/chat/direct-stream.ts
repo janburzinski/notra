@@ -13,6 +13,7 @@ import { routeUsageProperties } from "@notra/ai/utils/route-usage";
 import { logError, logWarn } from "@notra/ai/utils/server-log";
 import { toAgentTokenUsage } from "@notra/ai/utils/token-usage";
 import { withChatStreamCleanup } from "@notra/ai/utils/with-chat-stream-cleanup";
+import { loadPostAgentReachSummary } from "@notra/geo-core/geo/post-agent-reach";
 import { createUIMessageStreamResponse, toUIMessageStream } from "ai";
 import { nanoid } from "nanoid";
 
@@ -75,6 +76,7 @@ export async function createDirectStandaloneChatResponse({
         preValidatedIntegrations: validatedIntegrations,
         resolveContext: getGitHubToolRepositoryContextByIntegrationId,
         resolveLinearContext: getLinearToolContextByIntegrationId,
+        loadPostAgentReach: loadPostAgentReachSummary,
         onFirstChunk() {
           if (firstChunkAt === null) {
             firstChunkAt = Date.now();

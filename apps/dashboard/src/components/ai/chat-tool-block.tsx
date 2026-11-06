@@ -520,6 +520,9 @@ const TOOL_COPY = {
   getPost: {
     suffix: (input) => idSuffix(input, ["id", "postId", "identifier"]),
   },
+  getPostAgentReach: {
+    suffix: (input) => idSuffix(input, ["identifier"]),
+  },
   createImage: {
     subtitle: ({ isStreaming, t }) =>
       isStreaming ? t("imageGenerating") : undefined,

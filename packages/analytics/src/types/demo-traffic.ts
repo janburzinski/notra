@@ -22,6 +22,7 @@ export interface DemoTrafficParams {
   category?: string;
   host?: string;
   path?: string;
+  page_paths?: string;
   journey_id?: string;
   limit?: number;
 }

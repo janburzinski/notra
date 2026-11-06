@@ -30,7 +30,7 @@ Traffic tracking shows the AI systems fetching your pages and the people arrivin
 
 <Visibility for="agents">
 
-The results are also available under `/geo/traffic` in the API.
+The results are also available under `/geo/traffic` in the API. For a post published to a Notra Site, `GET /v1/posts/{postId}/agent-reach` returns the visits to that post's page, including its Markdown copy.
 
 </Visibility>
 
@@ -49,6 +49,8 @@ Human visitor analytics use a daily rotating, keyed visitor identifier; raw IP a
 - the path, host and country
 - whether the client asked for Markdown
 - a journey id
+
+On Notra Sites, each published post also shows its **Agent reach** in the post's **Overview** panel and in the **Content** list: the crawls, citations and referrals for that post's page and its Markdown copy.
 
 ## Supported frameworks
 

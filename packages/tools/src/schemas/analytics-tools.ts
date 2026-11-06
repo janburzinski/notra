@@ -143,3 +143,11 @@ export const createAbTestInputSchema = z.object({
     .default("twitter")
     .describe("Platform both posts belong to."),
 });
+
+export const getPostAgentReachInputSchema = z.object({
+  identifier: z
+    .string()
+    .min(1)
+    .describe("The ID, slug, or exact title of the post"),
+  ...analyticsRangeFields,
+});

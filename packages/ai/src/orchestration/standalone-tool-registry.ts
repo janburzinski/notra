@@ -35,6 +35,7 @@ import {
   createUpdatePostTool,
   createViewPostTool,
 } from "@notra/ai/tools/post";
+import { createGetPostAgentReachTool } from "@notra/ai/tools/post-agent-reach";
 import {
   createCancelPostScheduleTool,
   createGetPostScheduleTool,
@@ -162,6 +163,15 @@ export function buildStandaloneToolSet(
   });
   tools.getAvailablePosts = createGetAvailablePostsTool({ organizationId });
   tools.getPost = createGetPostTool({ organizationId });
+  if (deps?.loadPostAgentReach) {
+    tools.getPostAgentReach = createGetPostAgentReachTool({
+      organizationId,
+      loadPostAgentReach: deps.loadPostAgentReach,
+    });
+    descriptions.push(
+      "**Post Agent Reach**: Use getPostAgentReach for how one post does with AI engines: AI crawls, citations in answers and referrals to its page on its Notra Site"
+    );
+  }
   tools.listBrandIdentities = createListBrandIdentitiesTool({ organizationId });
   tools.getBrandIdentity = createGetBrandIdentityTool({ organizationId });
   tools.getAvailableIntegrations = createGetAvailableIntegrationsTool({

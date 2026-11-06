@@ -12,13 +12,18 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@notra/ui/components/ui/tooltip";
-import { useQueryClient } from "@tanstack/react-query";
+import {
+  keepPreviousData,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { formatDistanceToNowStrict } from "date-fns";
 import { useState } from "react";
 import { toast } from "sonner";
 import { DataTable, type TableColumn } from "ui/table";
 import { useNow, useTranslations } from "use-intl";
 
+import { CollectionAgentReachCell } from "@/components/content/collection-agent-reach-cell";
 import {
   CollectionActionsMenu,
   CollectionMenuItems,
@@ -151,6 +156,7 @@ export function CollectionsView({
 }: CollectionsViewProps) {
   const router = useRouter();
   const t = useTranslations("content.collections");
+  const tReach = useTranslations("content.collections.agentReach");
   const tCommon = useTranslations("common");
   const tCalendar = useTranslations("content.calendar.toasts");
   const queryClient = useQueryClient();
@@ -165,6 +171,14 @@ export function CollectionsView({
   );
   const { deleteCollection, deletePost, isDeleting } =
     usePostActions(organizationId);
+  const collectionIds = collections.map((collection) => collection.id);
+  const agentReach = useQuery({
+    ...dashboardOrpc.content.agentReachByCollection.queryOptions({
+      input: { organizationId, collectionIds },
+    }),
+    enabled: collectionIds.length > 0,
+    placeholderData: keepPreviousData,
+  });
   const menuProps = {
     organizationSlug,
     disabled: isDeleting || isOpeningSchedule,
@@ -281,6 +295,25 @@ export function CollectionsView({
       collapsePriority: 1,
       cell: (collection) => (
         <CollectionStatusBadge status={collectionStatus(collection)} />
+      ),
+    },
+    {
+      key: "agentReach",
+      header: tReach("header"),
+      hint: tReach("hint"),
+      width: "6.5rem",
+      align: "right",
+      collapsePriority: 4,
+      cell: (collection) => (
+        <CollectionAgentReachCell
+          failed={agentReach.isError && !agentReach.data}
+          loading={
+            agentReach.isPending ||
+            (agentReach.isPlaceholderData &&
+              !(collection.id in (agentReach.data ?? {})))
+          }
+          reach={agentReach.data?.[collection.id]}
+        />
       ),
     },
     {

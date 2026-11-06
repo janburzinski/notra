@@ -6982,6 +6982,15 @@
         "description": "Give this collection a name that is easy to recognize. It will not be overwritten by automatic naming.",
         "renamed": "Collection renamed",
         "renameFailed": "Failed to rename collection"
+      },
+      "agentReach": {
+        "header": "AI reach",
+        "hint": "AI crawler and referral visits to the live page in the last 30 days. Only posts published to a Site are counted.",
+        "crawler": "{count, plural, one {# crawler visit} other {# crawler visits}}",
+        "aiReferral": "{count, plural, one {# AI referral} other {# AI referrals}}",
+        "posts": "{count, plural, one {Across # live post} other {Across # live posts}}",
+        "notLive": "Not live on a Site",
+        "unavailable": "Couldn't load AI reach. Try again later."
       }
     },
     "list": {
@@ -7150,6 +7159,14 @@
       "hidden": {
         "label": "Unlisted",
         "hint": "Reachable by direct link, but excluded from site listings, feeds, search engines and AI indexes. Anyone with the link can read it. Turning this off restores your previous search visibility setting."
+      },
+      "agentReach": {
+        "label": "Agent reach",
+        "hint": "Visits from AI engines to this post's live page, including its Markdown copy, in the last 30 days.",
+        "more": "+{count} more",
+        "totals": "{crawled, number} crawled · {cited, number} cited · {referred, number} referred",
+        "emptyTitle": "No AI visits in the last 30 days",
+        "emptyDescription": "Crawls, citations and referrals from AI engines show up here once they reach this post."
       },
       "cover": {
         "label": "Cover",
@@ -7617,6 +7634,7 @@
         "schedulePost": "{state, select, running {Scheduling post} done {Scheduled post} approve {Approve schedule} other {Failed to schedule post}}",
         "cancelPostSchedule": "{state, select, running {Unscheduling post} done {Unscheduled post} approve {Approve unscheduling} other {Failed to unschedule post}}",
         "getPostSchedule": "{state, select, running {Checking schedule} done {Checked schedule} approve {Approve schedule check} other {Failed schedule check}}",
+        "getPostAgentReach": "{state, select, running {Checking agent reach} done {Checked agent reach} approve {Approve agent reach check} other {Failed agent reach check}}",
         "reviseImage": "{state, select, running {Revising image} done {Revised image} approve {Approve image} other {Failed image}}",
         "listBrandIdentities": "{state, select, running {Listing brand identities} done {Listed brand identities} approve {Approve brand identities} other {Failed brand identities}}",
         "getBrandIdentity": "{state, select, running {Loading brand identity} done {Loaded brand identity} approve {Approve brand identity} other {Failed brand identity}}",

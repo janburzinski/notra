@@ -13,6 +13,7 @@ export const STANDALONE_CODE_MODE_TOOL_NAMES = [
   "getGranolaFolders",
   "getAvailablePosts",
   "getPost",
+  "getPostAgentReach",
   "viewPost",
   "getAvailableIntegrations",
   "getAvailableBrandReferences",

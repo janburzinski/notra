@@ -15,6 +15,9 @@ export const CONTENT_COVER_WIDTH = 1200;
 export const CONTENT_COVER_HEIGHT = 630;
 
 export const TAG_SUGGESTION_COUNT = 6;
+export const CONTENT_AGENT_REACH_ENGINE_LIMIT = 5;
+/** Days per sparkline point, so sparse daily counts read as a trend. */
+export const CONTENT_AGENT_REACH_TREND_BUCKET_DAYS = 3;
 export const AUTHOR_AVATAR_STACK_MAX = 3;
 export const TAG_SUGGESTIONS_LIMIT = 50;
 

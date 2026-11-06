@@ -1,6 +1,7 @@
 import { db } from "@notra/db/drizzle";
 import { posts, siteJobs, sites } from "@notra/db/schema";
 import { postGitHubPublishSchema } from "@notra/schemas/dashboard/content";
+import { siteEntryPagePath } from "@notra/sites-core/utils/entries";
 import { postPreviewKey } from "@notra/sites-core/utils/hosts";
 import { isPreviewExpired } from "@notra/sites-core/utils/serving-state";
 import { siteRepositoryAccess } from "@notra/sites-server/github";
@@ -136,7 +137,12 @@ function postEntryLocation(
     rootDirectory,
     slug: slugify(slug) || postId,
     path,
-    pagePath: `${mount === "/" ? "" : mount}/${name}`,
+    pagePath:
+      siteEntryPagePath({
+        filePath: path,
+        rootDirectory,
+        mounts: site.mounts,
+      }) ?? `${mount === "/" ? "" : mount}/${name}`,
   };
 }
 

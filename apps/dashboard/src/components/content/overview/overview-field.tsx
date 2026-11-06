@@ -17,7 +17,7 @@ import type {
   OverviewToggleRowProps,
 } from "@/types/content/overview";
 
-function OverviewHint({ field, children }: OverviewHintProps) {
+export function OverviewHint({ field, children }: OverviewHintProps) {
   const t = useTranslations("content.overview");
   return (
     <Tooltip>

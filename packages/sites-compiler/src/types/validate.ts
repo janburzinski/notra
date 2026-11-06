@@ -16,12 +16,6 @@ export interface SiteValidationResult {
   ok: boolean;
 }
 
-export interface EntryCandidate {
-  area: SiteEntry["area"];
-  slug: string;
-  format: SiteEntry["format"];
-}
-
 export interface ParsedSiteConfig {
   config: SiteConfig | null;
   diagnostics: SiteDiagnostic[];

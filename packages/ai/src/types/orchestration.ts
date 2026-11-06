@@ -5,6 +5,7 @@ import type {
   ResolveLinearIntegrationContext,
 } from "@notra/ai/types/agents";
 import type { DiagramSpec } from "@notra/ai/types/excalidraw-diagram";
+import type { PostAgentReachLoader } from "@notra/ai/types/post-agent-reach";
 import type { PostToolsResult } from "@notra/ai/types/post-tools";
 import type { RepoImageFormat } from "@notra/ai/types/repo-image";
 import type { RouteUsageSummary } from "@notra/ai/types/router";
@@ -203,6 +204,7 @@ export interface BuildStandaloneToolSetDeps {
   resolveContext?: ResolveIntegrationContext;
   resolveLinearContext?: ResolveLinearIntegrationContext;
   resolveGranolaContext?: ResolveGranolaIntegrationContext;
+  loadPostAgentReach?: PostAgentReachLoader;
 }
 
 export interface GitHubIntegrationData {

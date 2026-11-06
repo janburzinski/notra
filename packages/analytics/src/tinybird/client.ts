@@ -593,6 +593,19 @@ async function postPipeQuery<TRow>(
   return (await response.json()) as QueryResult<TRow>;
 }
 
+/** Per-page AI traffic for a list of paths, sent in a POST body. */
+export function queryGeoTrafficPagesByPaths(
+  params: GeoTrafficPagesParams
+): Promise<QueryResult<GeoTrafficPagesRow> | null> {
+  return cachedPipeQuery(
+    "geo",
+    "geo_traffic_pages",
+    params,
+    params.organization_id,
+    () => postPipeQuery<GeoTrafficPagesRow>("geo_traffic_pages", params)
+  );
+}
+
 /** Cross-organization AI traffic for the admin console, cached globally. */
 export function queryGeoTrafficTrendsDaily(
   params: InferParams<typeof geoTrafficTrendsDaily>

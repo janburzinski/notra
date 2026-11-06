@@ -138,6 +138,7 @@ export async function orchestrateStandaloneChat(
       resolveContext: deps?.resolveContext,
       resolveLinearContext: deps?.resolveLinearContext,
       resolveGranolaContext: deps?.resolveGranolaContext,
+      loadPostAgentReach: deps?.loadPostAgentReach,
     }
   );
   const { tools, toolCallers } = withStandaloneCodeMode(

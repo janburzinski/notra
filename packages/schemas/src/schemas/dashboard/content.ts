@@ -199,6 +199,11 @@ export const contentInputSchema = contentOrganizationIdInputSchema.extend({
   contentId: z.string().min(1, "Content ID is required"),
 });
 
+export const contentAgentReachByCollectionInputSchema =
+  contentOrganizationIdInputSchema.extend({
+    collectionIds: z.array(z.string().min(1)).max(100),
+  });
+
 export const contentPreviewRequestSchema = z.object({
   repositoryIds: z.array(z.string().min(1)),
   lookbackWindow: z.enum(LOOKBACK_WINDOWS),
