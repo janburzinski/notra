@@ -1,0 +1,19 @@
+packages/utils/src/url.ts
+  s_0eb87d8daad6ee::t_aebca82b9cba73 187-198
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "11993724b8f2815b9ec4a307e78127da5093af19",
+  "prompts": {},
+  "sessions": {
+    "s_0eb87d8daad6ee": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a1b22e-3639-7443-aa7f-4abac253f350",
+        "model": "gpt-6-sol"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
