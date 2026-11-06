@@ -101,6 +101,26 @@ export const deleteAccount = Effect.fn("auth.deleteAccount")(function* ({
     () => deleteUserRows(userId),
     "Failed to delete user"
   );
+  if (chatAttachmentKeys === null) {
+    if (workosUserId) {
+      yield* tryAction(
+        () => clearAccountDeletion(workosUserId),
+        "Failed to clear account deletion marker"
+      ).pipe(
+        Effect.catch((error) =>
+          Effect.logWarning("Could not clear account deletion marker").pipe(
+            Effect.annotateLogs({ userId, workosUserId, error: error.message })
+          )
+        )
+      );
+    }
+    return yield* Effect.fail(
+      new ActionFailure({
+        message:
+          "Transfer or delete your workspaces before deleting your account.",
+      })
+    );
+  }
   yield* Effect.sync(() => finishUserDeletion({ userId, email }));
 
   yield* (workosUserId ? deleteWorkOSUser(workosUserId) : Effect.void).pipe(

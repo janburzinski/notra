@@ -147,7 +147,7 @@ const { userRouter } = await import("../../src/lib/orpc/routers/user");
 const { cleanupAutopilotNamespaces } =
   await import("../../src/lib/autopilot/namespace-deletions");
 const { GET } = await import("../../src/app/api/cron/autopilot/route");
-const { deleteUserRecord } =
+const { deleteUserRecord, deleteUserRows, ownsWorkspace } =
   await import("../../src/lib/auth/delete-user-record");
 const context = await createORPCContext({ headers: new Headers() });
 
@@ -690,9 +690,7 @@ test("keepWorkspaceOwners rechecks ownership inside the transaction and keeps a 
     CREATE TRIGGER promote_mid_deletion AFTER DELETE ON abuse_actions
       FOR EACH STATEMENT EXECUTE FUNCTION promote_mid_deletion();`);
   try {
-    expect(
-      await deleteUserRecord("next-owner", { keepWorkspaceOwners: true })
-    ).toBe(false);
+    expect(await deleteUserRows("next-owner")).toBeNull();
   } finally {
     await postgres.exec(`DROP TRIGGER promote_mid_deletion ON abuse_actions;
       DROP FUNCTION promote_mid_deletion();`);
@@ -703,6 +701,7 @@ test("keepWorkspaceOwners rechecks ownership inside the transaction and keeps a 
   expect(await db.select().from(chatAttachments)).toHaveLength(1);
   expect(deleteUserChatAttachmentObjects).not.toHaveBeenCalled();
   expect(deleteUserFiles).not.toHaveBeenCalled();
+  expect(await ownsWorkspace("next-owner")).toBe(false);
 
   expect(
     await deleteUserRecord("next-owner", { keepWorkspaceOwners: true })
@@ -710,6 +709,11 @@ test("keepWorkspaceOwners rechecks ownership inside the transaction and keeps a 
   expect(
     await db.query.users.findFirst({ where: eq(users.id, "next-owner") })
   ).toBeUndefined();
+});
+
+test("account deletion preflight detects an owned workspace", async () => {
+  expect(await ownsWorkspace("synthetic-user")).toBe(true);
+  expect(await ownsWorkspace("next-owner")).toBe(false);
 });
 
 test("a transfer whose new owner disappears keeps the previous owner", async () => {

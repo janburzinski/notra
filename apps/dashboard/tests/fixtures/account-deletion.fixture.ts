@@ -13,8 +13,10 @@ afterAll(() => postgres.close());
 const events: string[] = [];
 const markers = new Map<string, string>();
 let redisFails = false;
+let redisDeleteFails = false;
 let workosUserState: "exists" | "missing" | "stop" = "exists";
 let workosDeleteFails = false;
+let ownerKeptOnDelete = false;
 
 const redis = {
   set: async (key: string, value: string) => {
@@ -31,6 +33,9 @@ const redis = {
     return markers.get(key) ?? null;
   },
   del: async (key: string) => {
+    if (redisDeleteFails) {
+      throw new Error("Synthetic Redis cleanup outage");
+    }
     events.push(`clear:${key}`);
     markers.delete(key);
   },
@@ -68,6 +73,9 @@ const workos = {
 };
 const deleteUserRows = mock(async (userId: string) => {
   events.push(`local:${userId}`);
+  if (ownerKeptOnDelete) {
+    return null;
+  }
   return [`organization/workspace/chat/${userId}.png`];
 });
 const deleteDeletedUserFiles = mock(async (userId: string, keys: string[]) => {
@@ -118,8 +126,10 @@ beforeEach(async () => {
   events.length = 0;
   markers.clear();
   redisFails = false;
+  redisDeleteFails = false;
   workosUserState = "exists";
   workosDeleteFails = false;
+  ownerKeptOnDelete = false;
   ownerKept = false;
   deleteUserRows.mockClear();
   deleteDeletedUserFiles.mockClear();
@@ -188,6 +198,31 @@ test("does not start when Redis is configured but the marker can't be set", asyn
   );
   expect(events).toEqual([]);
   expect(deleteUserRows).not.toHaveBeenCalled();
+});
+
+test("keeps an owner when ownership changes during deletion", async () => {
+  ownerKeptOnDelete = true;
+  await expect(deleteSyntheticAccount()).rejects.toThrow(
+    "Transfer or delete your workspaces before deleting your account"
+  );
+  expect(events).toEqual([
+    `marker:${marker}`,
+    "revoke:workos-user-session-a",
+    "revoke:workos-user-session-b",
+    "local:local-user",
+    `clear:${marker}`,
+  ]);
+  expect(markers.has(marker)).toBe(false);
+  expect(finishUserDeletion).not.toHaveBeenCalled();
+});
+
+test("reports the owner guard even when marker cleanup fails", async () => {
+  ownerKeptOnDelete = true;
+  redisDeleteFails = true;
+  await expect(deleteSyntheticAccount()).rejects.toThrow(
+    "Transfer or delete your workspaces before deleting your account"
+  );
+  expect(finishUserDeletion).not.toHaveBeenCalled();
 });
 
 test("ensureLocalUser doesn't recreate an account that is being deleted", async () => {

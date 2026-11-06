@@ -13,13 +13,18 @@ import { and, eq } from "drizzle-orm";
 import { Effect } from "effect";
 
 import { DEMO_EXIT_URL, DEMO_SESSION_COOKIE } from "@/constants/demo";
-import { failDemoDisabled, tryAction } from "@/lib/actions/errors";
+import {
+  ActionFailure,
+  failDemoDisabled,
+  tryAction,
+} from "@/lib/actions/errors";
 import { runAction } from "@/lib/actions/run-action";
 import { validateActionInput } from "@/lib/actions/validate-input";
 import { runAfterResponse } from "@/lib/after-response";
 import { trackServerEvent } from "@/lib/analytics/posthog-server";
 import { readRequestHeaders } from "@/lib/analytics/request-headers";
 import { deleteAccount } from "@/lib/auth/delete-account";
+import { ownsWorkspace } from "@/lib/auth/delete-user-record";
 import { getAuthIdentity } from "@/lib/auth/server";
 import { clearAuthSessionCookie } from "@/lib/auth/session-cookie";
 import { clearSignedCookie } from "@/lib/auth/signed-cookie";
@@ -152,6 +157,19 @@ export async function deleteUser(): Promise<
         return yield* failDemoDisabled;
       }
       const session = yield* requireSession();
+
+      const ownsAnOrganization = yield* tryAction(
+        () => ownsWorkspace(session.user.id),
+        "Failed to check workspace ownership"
+      );
+      if (ownsAnOrganization) {
+        return yield* Effect.fail(
+          new ActionFailure({
+            message:
+              "Transfer or delete your workspaces before deleting your account.",
+          })
+        );
+      }
 
       // A Brew outage stops the deletion here instead of leaving the contact
       // behind; `finishUserDeletion` removes it again once the account is gone.

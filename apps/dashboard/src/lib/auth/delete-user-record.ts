@@ -184,7 +184,16 @@ async function deleteUserRowsWithRetry(
  * transaction, for `deleteDeletedUserFiles` once the account is gone.
  */
 export async function deleteUserRows(userId: string) {
-  return (await deleteUserRowsWithRetry(userId, false)) ?? [];
+  return await deleteUserRowsWithRetry(userId, true);
+}
+
+/** A fast preflight for self-service deletion; the transaction rechecks under lock. */
+export async function ownsWorkspace(userId: string) {
+  const owner = await db.query.members.findFirst({
+    columns: { id: true },
+    where: and(eq(members.userId, userId), eq(members.role, "owner")),
+  });
+  return owner !== undefined;
 }
 
 /** Skips keys a re-upload of the same file recorded again since the commit. */
