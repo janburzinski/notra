@@ -56,6 +56,7 @@
     "@toolwind/corner-shape": "^0.0.8-3",
     "@upstash/redis": "catalog:",
     "@usenotra/geo": "npm:@usenotra/geo@^0.8.0",
+    "@vercel/functions": "^3.10.1",
     "ai": "catalog:",
     "c15t": "3.2.2",
     "dompurify": "^3.4.17",

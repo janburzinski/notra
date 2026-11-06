@@ -37,7 +37,11 @@ import globalsCss from "@/styles/globals.css?url";
 const databuddyClientId = import.meta.env.NEXT_PUBLIC_DATABUDDY_WEB_WEBSITE_ID;
 
 const getConsentState = createServerFn({ method: "GET" }).handler(
-  createConsentStateHandler({ proxy: true, routePrefix: "/api/c15t" })
+  createConsentStateHandler({
+    proxy: true,
+    routePrefix: "/api/c15t",
+    shared: true,
+  })
 );
 
 export const Route = createRootRoute({

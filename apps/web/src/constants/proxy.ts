@@ -54,3 +54,5 @@ export const DOCS_PROXY_ORIGIN = "https://notra.mintlify.site";
 export const BLOG_PROXY_ORIGIN = "https://notra-blog.notra.site";
 
 export const OAUTH_ISSUER_ORIGIN = "https://oauth.usenotra.com";
+
+export const AGENT_BYPASS_PARAM = "_agent";

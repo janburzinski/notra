@@ -5,6 +5,7 @@
     "remotion.config.ts",
     "src/router.tsx",
     "src/start.ts",
+    "middleware.ts",
     "scripts/fonts/verify.mjs",
     "src/embed/blog-chrome/{entry,router}.tsx",
     "src/routes/**/*.{ts,tsx}"

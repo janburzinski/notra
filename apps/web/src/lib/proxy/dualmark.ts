@@ -45,12 +45,15 @@ export function appendHeaderValue(
   headers.set(name, existing ? `${existing}, ${value}` : value);
 }
 
-function appendNegotiationVary(headers: Headers) {
+function appendNegotiationVary(
+  headers: Headers,
+  names: string[] = ["Accept", "User-Agent"]
+) {
   const tokens = (headers.get("Vary") ?? "")
     .split(",")
     .map((token) => token.trim())
     .filter(Boolean);
-  for (const name of ["Accept", "User-Agent"]) {
+  for (const name of names) {
     if (!tokens.some((token) => token.toLowerCase() === name.toLowerCase())) {
       tokens.push(name);
     }
@@ -106,6 +109,6 @@ export async function negotiateMarkdown(
     "Link",
     `<${toMarkdownPath(pathname)}>; rel="alternate"; type="text/markdown"`
   );
-  appendNegotiationVary(response.headers);
+  appendNegotiationVary(response.headers, ["Accept"]);
   return response;
 }
