@@ -1,11 +1,12 @@
 name: Sites E2E
 
-# Runs only when production is built: production-deploy.yml calls it with the
-# selected release commit and deploys only if the lifecycle and browser jobs
-# pass (real Upstash Box builds). It does not run on pull requests or on a
-# timer; start it on a branch with `gh workflow run sites-e2e.yml --ref
-# <branch>`. The live vendor-script job runs alongside and never blocks a
-# release: vendors change their scripts on their own schedule.
+# Runs in full when production is built: production-deploy.yml calls it with
+# the selected release commit and deploys only if the lifecycle and browser
+# jobs pass (real Upstash Box builds). Pull requests that change the Sites stack
+# run only the browser job (sites-e2e-pr.yml). Start the full suite on a branch
+# with `gh workflow run sites-e2e.yml --ref <branch>`. The live vendor-script
+# job runs alongside and never blocks a release: vendors change their scripts
+# on their own schedule.
 on:
   workflow_call:
     inputs:
@@ -13,6 +14,14 @@ on:
         description: Commit to test
         type: string
         required: true
+      browser-only:
+        description: Skip the lifecycle and the live vendor scripts (pull requests)
+        type: boolean
+        default: false
+      repetitions:
+        description: Browser runs to benchmark
+        type: string
+        default: "3"
     outputs:
       lifecycle-failures:
         description: Failed lifecycle suites and checks, one per line
@@ -32,6 +41,7 @@ permissions:
 jobs:
   lifecycle:
     name: Lifecycle (PostgreSQL + Upstash Box)
+    if: ${{ !inputs.browser-only }}
     runs-on: depot-ubuntu-24.04-4
     timeout-minutes: 30
     outputs:
@@ -141,9 +151,11 @@ jobs:
           bun --no-env-file test apps/sites-e2e/tests/csp.test.ts apps/sites-e2e/tests/analytics.test.ts apps/sites-e2e/tests/compiler-isolation.test.ts
 
       - name: Run simulated-provider browser E2E
+        env:
+          REPETITIONS: ${{ inputs.repetitions || '3' }}
         run: |
           mkdir -p artifacts
-          bun --no-env-file apps/sites-e2e/src/run.ts --repetitions 3 --report "$PWD/artifacts/benchmarks.json" --screenshot "$PWD/artifacts/site.png"
+          bun --no-env-file apps/sites-e2e/src/run.ts --repetitions "$REPETITIONS" --report "$PWD/artifacts/benchmarks.json" --screenshot "$PWD/artifacts/site.png"
 
       - name: Verify cleanup and orphan isolation
         run: |
@@ -187,6 +199,7 @@ jobs:
   # alerts Slack but does not block the release.
   vendor-scripts:
     name: Vendor analytics scripts (live)
+    if: ${{ !inputs.browser-only }}
     continue-on-error: true
     runs-on: depot-ubuntu-24.04-4
     timeout-minutes: 20

@@ -48,10 +48,11 @@ Explicit requirements and this repo's conventions take precedence. Companion
   change to `apps/sites`, `apps/sites-builder`, `packages/sites-*` or the Sites
   dashboard code changes user-facing behaviour, update or extend its tests in
   the same PR; a pure visual change must not need test edits. Follow
-  `apps/sites-e2e/README.md#keeping-the-suite-green`. It runs only before a
-  production deploy (real Box builds), not on pull requests: run it locally
-  or with `gh workflow run sites-e2e.yml --ref <branch>` before merging a
-  Sites change. A new external
+  `apps/sites-e2e/README.md#keeping-the-suite-green`. Pull requests that
+  change the Sites stack run its browser part (`sites-e2e-pr.yml`); the
+  lifecycle with real Box builds runs only before a production deploy, so
+  run it locally or with `gh workflow run sites-e2e.yml --ref <branch>`
+  before merging a Sites backend change. A new external
   service the Sites backend calls gets an emulator in `apps/sites-e2e/emulators`
   and an override in `packages/sites-server/src/utils/provider-urls.ts`.
 

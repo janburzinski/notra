@@ -1,0 +1,37 @@
+name: Sites E2E (pull request)
+
+# The browser half of sites-e2e.yml on pull requests that change the Sites
+# stack: real builds of the E2E site served by the production Worker in
+# workerd, checked with Playwright. It needs no secrets, so it also runs on
+# forks. The lifecycle with real Upstash Boxes still runs before every
+# production deploy.
+on:
+  pull_request:
+    paths:
+      - "apps/sites/**"
+      - "apps/sites-builder/**"
+      - "apps/sites-e2e/**"
+      - "packages/sites-core/**"
+      - "packages/sites-compiler/**"
+      # The harness serves builds with its content-type map.
+      - "packages/sites-server/**"
+      - "packages/utils/**"
+      - "bun.lock"
+      - ".github/workflows/sites-e2e.yml"
+      - ".github/workflows/sites-e2e-pr.yml"
+
+concurrency:
+  group: sites-e2e-pr-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  browser:
+    name: Sites E2E
+    uses: ./.github/workflows/sites-e2e.yml
+    with:
+      ref: ${{ github.sha }}
+      browser-only: true
+      repetitions: "1"

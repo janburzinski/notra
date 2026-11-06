@@ -154,10 +154,13 @@ are created, so there is no cloud cleanup in this workspace.
 ## Keeping the suite green
 
 The suite gates every production deploy (`production-deploy.yml` runs it on the
-release commit with real Box builds), so a red run blocks the release. It
-does not run on pull requests; run it locally (below) or start the workflow
-on your branch (`gh workflow run sites-e2e.yml --ref <branch>`) before
-merging a Sites change. Keep it in step with the product:
+release commit with real Box builds), so a red run blocks the release. Pull
+requests that change the Worker, the builder, this harness, `sites-core`,
+`sites-compiler`, `sites-server`, `utils` or `bun.lock` run the browser part
+(`sites-e2e-pr.yml`, one repetition). The lifecycle runs only before a
+deploy: run it locally (below) or start the workflow on your branch
+(`gh workflow run sites-e2e.yml --ref <branch>`) before merging a Sites
+backend change. Keep it in step with the product:
 
 - **Behaviour changes update the tests in the same PR.** A new builtin, route,
   header, integration, setting or lifecycle step gets an assertion: content and

@@ -65,8 +65,8 @@ jobs:
           DRY_RUN: ${{ inputs.dry_run || false }}
           RELEASE_SHA: ${{ steps.release.outputs.sha }}
 
-  # The Sites E2E suite (real Upstash Box builds) gates every real release of
-  # the selected commit instead of running on each pull request.
+  # The full Sites E2E suite (real Upstash Box builds) gates every real release
+  # of the selected commit. Pull requests run only its browser part.
   sites-e2e:
     needs: release
     if: ${{ !inputs.dry_run && !inputs.skip_sites_e2e }}
