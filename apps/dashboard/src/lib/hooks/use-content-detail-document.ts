@@ -39,10 +39,17 @@ import {
 } from "@/lib/hooks/use-geo-writer";
 import { useWarnBeforeUnload } from "@/lib/hooks/use-warn-before-unload";
 import { dashboardOrpc } from "@/lib/orpc/query";
-import type { ContentDocumentSaveOptions } from "@/types/content/document-save";
+import type {
+  ContentDocumentSaveOptions,
+  ContentSaveEvent,
+  ContentSaveState,
+} from "@/types/content/document-save";
 import type { ImageExportTarget } from "@/types/content/image-export";
 import type { ContentApiResponse } from "@/types/hooks/content";
-import { isContentSaveConflict } from "@/utils/content-document-save";
+import {
+  isContentSaveConflict,
+  nextContentSaveState,
+} from "@/utils/content-document-save";
 import { createContentIdleCheckpoint } from "@/utils/content-idle-checkpoint";
 import {
   getContentArticleLoadingState,
@@ -108,13 +115,20 @@ export function useContentDetailDocument({
   const [reviewPreviousMarkdown, setReviewPreviousMarkdown] = useState<
     string | null
   >(null);
-  const [isSaving, setIsSaving] = useState(false);
-  const [saveFailed, setSaveFailed] = useState(false);
+  const saveStateRef = useRef<ContentSaveState>({
+    outcome: "saved",
+    saving: false,
+  });
+  const [saveState, setSaveState] = useState(saveStateRef.current);
+  const sendSave = useCallback((event: ContentSaveEvent) => {
+    saveStateRef.current = nextContentSaveState(saveStateRef.current, event);
+    setSaveState(saveStateRef.current);
+  }, []);
+  const isSaving = saveState.saving;
+  const saveFailed = saveState.outcome !== "saved";
+  const hasSaveConflict = saveState.outcome === "conflict";
   const [hasUnsyncedGitHubChanges, setHasUnsyncedGitHubChanges] =
     useState(false);
-  const [hasSaveConflict, setHasSaveConflict] = useState(false);
-  const saveConflictRef = useRef(false);
-  const savingRef = useRef(false);
   const mountedRef = useRef(true);
   const observedContentRef = useRef(data?.content);
   const acknowledgedRevisionRef = useRef<number | null>(null);
@@ -236,25 +250,25 @@ export function useContentDetailDocument({
 
   const setEditingTitle = useCallback(
     (nextTitle: string | null) => {
-      setSaveFailed(false);
+      sendSave("clear");
       setEditingTitleState(nextTitle);
     },
-    [setEditingTitleState]
+    [sendSave, setEditingTitleState]
   );
   const setEditingSlug = useCallback(
     (nextSlug: string | null) => {
-      setSaveFailed(false);
+      sendSave("clear");
       setEditingSlugState(nextSlug);
     },
-    [setEditingSlugState]
+    [sendSave, setEditingSlugState]
   );
   const setEditedMarkdownAndRetry = useCallback(
     (markdown: string | null) => {
-      setSaveFailed(false);
+      sendSave("clear");
       setEditedMarkdown(markdown);
       editedMarkdownRef.current = markdown ?? serverMarkdown;
     },
-    [serverMarkdown]
+    [sendSave, serverMarkdown]
   );
 
   const hasMarkdownChanges =
@@ -292,11 +306,9 @@ export function useContentDetailDocument({
       hasTitleChanges ||
       hasSlugChanges ||
       hasUnsyncedGitHubChanges;
-    if (draftDirty || savingRef.current) {
+    if (draftDirty || saveStateRef.current.saving) {
       needsNormalizationRef.current = false;
-      saveConflictRef.current = true;
-      setHasSaveConflict(true);
-      setSaveFailed(true);
+      sendSave("conflict");
       setOriginalMarkdown(originalMarkdown ?? previous.markdown ?? "");
       setEditedMarkdown((current) => current ?? previous.markdown ?? "");
       setEditingTitleState((current) => current ?? previous.title);
@@ -317,6 +329,7 @@ export function useContentDetailDocument({
     hasTitleChanges,
     hasSlugChanges,
     hasUnsyncedGitHubChanges,
+    sendSave,
     setEditingTitleState,
     setEditingSlugState,
     setPersistedTitle,
@@ -340,12 +353,11 @@ export function useContentDetailDocument({
       setEditingTitleState(null);
       setEditingSlugState(null);
       setReviewPreviousMarkdown(null);
-      saveConflictRef.current = false;
-      setHasSaveConflict(false);
-      setSaveFailed(false);
+      sendSave("resolve");
       setEditorKey((key) => key + 1);
     },
     [
+      sendSave,
       setEditingSlugState,
       setEditingTitleState,
       setPersistedSlug,
@@ -357,7 +369,7 @@ export function useContentDetailDocument({
     (content: ContentResponse) => {
       if (
         content.id !== contentId ||
-        savingRef.current ||
+        saveStateRef.current.saving ||
         hasChanges ||
         editedMarkdownRef.current !== originalMarkdownRef.current
       ) {
@@ -393,8 +405,8 @@ export function useContentDetailDocument({
       createContentIdleCheckpoint({
         checkpoint: async (revision) => {
           if (
-            savingRef.current ||
-            saveConflictRef.current ||
+            saveStateRef.current.saving ||
+            saveStateRef.current.outcome === "conflict" ||
             editedMarkdownRef.current !== originalMarkdownRef.current ||
             !mountedRef.current
           ) {
@@ -428,7 +440,7 @@ export function useContentDetailDocument({
   useEffect(() => () => idleCheckpoint.cancel(), [idleCheckpoint]);
 
   const resolveSaveConflictLoadLatest = useCallback(async () => {
-    if (savingRef.current) {
+    if (saveStateRef.current.saving) {
       return false;
     }
     try {
@@ -552,7 +564,7 @@ export function useContentDetailDocument({
   const handleSave = useCallback(
     async (options?: ContentDocumentSaveOptions) => {
       const resolveConflict = options?.resolveConflict === true;
-      if (saveConflictRef.current && !resolveConflict) {
+      if (saveStateRef.current.outcome === "conflict" && !resolveConflict) {
         return false;
       }
 
@@ -563,11 +575,10 @@ export function useContentDetailDocument({
         ? (editingSlug ?? serverSlug ?? "")
         : editingSlug;
 
-      if (savingRef.current) {
+      if (saveStateRef.current.saving) {
         return false;
       }
-      savingRef.current = true;
-      setIsSaving(true);
+      sendSave("start");
       try {
         if (!hasChanges && !resolveConflict) {
           if (!silent) {
@@ -652,15 +663,12 @@ export function useContentDetailDocument({
           return false;
         }
         if (!cacheApplied) {
-          saveConflictRef.current = true;
-          setHasSaveConflict(true);
-          setSaveFailed(true);
+          sendSave("conflict");
           return false;
         }
         if (resolveConflict) {
-          saveConflictRef.current = false;
-          setHasSaveConflict(false);
-        } else if (saveConflictRef.current) {
+          sendSave("resolve");
+        } else if (saveStateRef.current.outcome === "conflict") {
           return false;
         }
 
@@ -684,7 +692,7 @@ export function useContentDetailDocument({
         setEditingSlugState((current) =>
           current === null || current === slugToSave ? null : current
         );
-        setSaveFailed(false);
+        sendSave("clear");
 
         if (
           linkedGitHubPublish &&
@@ -743,12 +751,10 @@ export function useContentDetailDocument({
               })
             );
             if (
-              saveConflictRef.current ||
+              saveStateRef.current.outcome === "conflict" ||
               (latest?.content.revision ?? 0) > revision
             ) {
-              saveConflictRef.current = true;
-              setHasSaveConflict(true);
-              setSaveFailed(true);
+              sendSave("conflict");
               return false;
             }
             setHasUnsyncedGitHubChanges(false);
@@ -767,7 +773,7 @@ export function useContentDetailDocument({
               position: CONTENT_SAVE_TOAST_POSITION,
             });
             if (mountedRef.current) {
-              setSaveFailed(true);
+              sendSave("fail");
             }
             return false;
           }
@@ -785,8 +791,7 @@ export function useContentDetailDocument({
           return false;
         }
         if (isContentSaveConflict(error)) {
-          saveConflictRef.current = true;
-          setHasSaveConflict(true);
+          sendSave("conflict");
           setEditedMarkdown(editedMarkdownRef.current ?? markdownToSave);
           needsNormalizationRef.current = false;
           setOriginalMarkdown(resolvedOriginalMarkdown);
@@ -795,7 +800,7 @@ export function useContentDetailDocument({
           try {
             await refreshSaveConflict();
           } catch {
-            setSaveFailed(true);
+            sendSave("fail");
           }
           if (!mountedRef.current) {
             return false;
@@ -807,13 +812,10 @@ export function useContentDetailDocument({
             position: CONTENT_SAVE_TOAST_POSITION,
           }
         );
-        setSaveFailed(true);
+        sendSave("fail");
         return false;
       } finally {
-        savingRef.current = false;
-        if (mountedRef.current) {
-          setIsSaving(false);
-        }
+        sendSave("finish");
       }
     },
     [
@@ -833,6 +835,7 @@ export function useContentDetailDocument({
       organizationId,
       contentId,
       queryClient,
+      sendSave,
       setEditingSlugState,
       setEditingTitleState,
       setPersistedSlug,
@@ -914,10 +917,10 @@ export function useContentDetailDocument({
   );
 
   const handleDiscard = useCallback(() => {
-    if (savingRef.current) {
+    if (saveStateRef.current.saving) {
       return;
     }
-    if (saveConflictRef.current) {
+    if (saveStateRef.current.outcome === "conflict") {
       void resolveSaveConflictLoadLatest();
       return;
     }
@@ -930,11 +933,12 @@ export function useContentDetailDocument({
     setEditingTitleState(null);
     setEditingSlugState(null);
     setReviewPreviousMarkdown(null);
-    setSaveFailed(false);
+    sendSave("clear");
     setEditorKey((key) => key + 1);
   }, [
     resolvedOriginalMarkdown,
     resolveSaveConflictLoadLatest,
+    sendSave,
     setEditingSlugState,
     setEditingTitleState,
   ]);
@@ -958,20 +962,23 @@ export function useContentDetailDocument({
     setIsTogglingStatus(false);
   }, [data?.content?.status, organizationId, contentId, queryClient, tToast]);
 
-  const handleEditorChange = useCallback((markdown: string) => {
-    if (
-      needsNormalizationRef.current &&
-      editedMarkdownRef.current === originalMarkdownRef.current
-    ) {
+  const handleEditorChange = useCallback(
+    (markdown: string) => {
+      if (
+        needsNormalizationRef.current &&
+        editedMarkdownRef.current === originalMarkdownRef.current
+      ) {
+        needsNormalizationRef.current = false;
+        setOriginalMarkdown(markdown);
+        originalMarkdownRef.current = markdown;
+      }
       needsNormalizationRef.current = false;
-      setOriginalMarkdown(markdown);
-      originalMarkdownRef.current = markdown;
-    }
-    needsNormalizationRef.current = false;
-    setEditedMarkdown(markdown);
-    editedMarkdownRef.current = markdown;
-    setSaveFailed(false);
-  }, []);
+      setEditedMarkdown(markdown);
+      editedMarkdownRef.current = markdown;
+      sendSave("clear");
+    },
+    [sendSave]
+  );
 
   const invalidateContentQueries = useCallback(
     () =>

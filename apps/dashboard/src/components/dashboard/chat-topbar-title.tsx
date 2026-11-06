@@ -32,6 +32,10 @@ import {
 } from "@/lib/hooks/use-chat-sessions";
 import { useRouter } from "@/lib/navigation";
 import { cn } from "@/lib/utils";
+import type {
+  ChatTopbarDeleteState,
+  ChatTopbarTitleMode,
+} from "@/types/components/chat-topbar-title";
 import { displayChatTitle } from "@/utils/chat-history-groups";
 
 interface ChatTopbarTitleProps {
@@ -114,12 +118,13 @@ export function ChatTopbarTitle({ chatId }: ChatTopbarTitleProps) {
     : null;
   const isGeneratingTitle = generatingTitleChatIds.has(chatId);
 
-  const [isEditing, setIsEditing] = useState(false);
+  const [mode, setMode] = useState<ChatTopbarTitleMode>("display");
   const [draftTitle, setDraftTitle] = useState("");
-  const [isRenaming, setIsRenaming] = useState(false);
   const [isPinning, setIsPinning] = useState(false);
-  const [deleteOpen, setDeleteOpen] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteState, setDeleteState] =
+    useState<ChatTopbarDeleteState>("closed");
+  const isEditing = mode === "editing";
+  const isRenaming = mode === "renaming";
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement | null>(null);
 
@@ -135,7 +140,7 @@ export function ChatTopbarTitle({ chatId }: ChatTopbarTitleProps) {
       return;
     }
     setDraftTitle(session.title);
-    setIsEditing(true);
+    setMode("editing");
   }
 
   async function submitRename() {
@@ -148,23 +153,21 @@ export function ChatTopbarTitle({ chatId }: ChatTopbarTitleProps) {
     if (!nextTitle) {
       toast.error(t("emptyTitle"));
       setDraftTitle(session.title);
-      setIsEditing(false);
+      setMode("display");
       return;
     }
 
     if (nextTitle === session.title) {
-      setIsEditing(false);
+      setMode("display");
       return;
     }
 
-    setIsRenaming(true);
-    setIsEditing(false);
+    setMode("renaming");
     const ok = await renameChat(chatId, nextTitle);
     if (!ok) {
       setDraftTitle(session.title);
-      setIsEditing(true);
     }
-    setIsRenaming(false);
+    setMode(ok ? "display" : "editing");
   }
 
   async function handleTogglePin() {
@@ -180,11 +183,10 @@ export function ChatTopbarTitle({ chatId }: ChatTopbarTitleProps) {
     if (!session) {
       return;
     }
-    setIsDeleting(true);
+    setDeleteState("deleting");
     const ok = await deleteChat(chatId);
-    setIsDeleting(false);
+    setDeleteState(ok ? "closed" : "confirming");
     if (ok) {
-      setDeleteOpen(false);
       router.replace(`/${slug}/chat`);
     }
   }
@@ -219,7 +221,7 @@ export function ChatTopbarTitle({ chatId }: ChatTopbarTitleProps) {
                   }
                   if (event.key === "Escape") {
                     event.preventDefault();
-                    setIsEditing(false);
+                    setMode("display");
                   }
                 }}
                 ref={inputRef}
@@ -283,7 +285,7 @@ export function ChatTopbarTitle({ chatId }: ChatTopbarTitleProps) {
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     disabled={!session}
-                    onClick={() => setDeleteOpen(true)}
+                    onClick={() => setDeleteState("confirming")}
                     variant="destructive"
                   >
                     <HugeiconsIcon icon={Delete02Icon} />
@@ -308,11 +310,11 @@ export function ChatTopbarTitle({ chatId }: ChatTopbarTitleProps) {
         onConfirm={handleDelete}
         onOpenChange={(open) => {
           if (!open) {
-            setDeleteOpen(false);
+            setDeleteState("closed");
           }
         }}
-        open={deleteOpen}
-        pending={isDeleting}
+        open={deleteState !== "closed"}
+        pending={deleteState === "deleting"}
         title={t("deleteTitle")}
         variant="destructive"
       />

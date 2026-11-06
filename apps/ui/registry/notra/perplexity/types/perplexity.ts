@@ -201,3 +201,7 @@ export interface PerplexityAnswerProps extends ComponentProps<"div"> {
   citations?: readonly PerplexityThreadCitation[];
   text: string;
 }
+
+export type PerplexityPlaybackPhase =
+  | { status: "idle" }
+  | { status: "playing"; source: "script" | "send"; thinking: boolean };

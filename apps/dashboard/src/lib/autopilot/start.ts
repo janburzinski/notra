@@ -9,6 +9,7 @@ import {
 } from "@/constants/workflow-engine";
 import { isAutopilotEnabledForOrganization } from "@/lib/autopilot/flag";
 import { claimAutopilotRun } from "@/lib/autopilot/run";
+import { runTransition } from "@/lib/autopilot/transitions";
 import { startWorkflowRun } from "@/lib/workflow-engine/start";
 import type { AutopilotAutomationKind } from "@/types/autopilot-metrics";
 import type { AutopilotRunTrigger } from "@/types/autopilot-runtime";
@@ -63,7 +64,7 @@ export async function startAutopilot(
         and(
           eq(autopilotRuns.id, claim.runId),
           eq(autopilotRuns.organizationId, organizationId),
-          eq(autopilotRuns.status, "running")
+          runTransition("failed")
         )
       );
     throw error;

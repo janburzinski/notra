@@ -103,3 +103,8 @@ export interface AccountInfo {
   scopes: string[];
   createdAt: Date;
 }
+
+export type InvitationActionState = {
+  dialog: "resend" | "cancel";
+  pending: boolean;
+} | null;

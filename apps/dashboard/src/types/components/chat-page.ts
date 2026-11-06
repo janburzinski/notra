@@ -36,3 +36,22 @@ export type CreateToolContentType =
   | "investor_update"
   | "linkedin_post"
   | "twitter_post";
+
+export type ChatTurnPhase =
+  | "idle"
+  | "sending"
+  | "sendingQueued"
+  | "stoppingForQueue"
+  | "stoppedForQueue"
+  | "waitingForActiveStream";
+
+export type ChatTurnEvent =
+  | "send"
+  | "sendQueued"
+  | "streamStarted"
+  | "stopForQueue"
+  | "stopForQueueFailed"
+  | "userStopped"
+  | "settled"
+  | "streamConflict"
+  | "activeStreamEnded";

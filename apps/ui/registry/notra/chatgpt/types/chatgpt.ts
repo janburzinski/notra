@@ -200,3 +200,7 @@ export interface ChatgptSourceChipProps extends Omit<
 > {
   sources: readonly ChatgptActivitySource[];
 }
+
+export type ChatgptPlaybackPhase =
+  | { status: "idle" }
+  | { status: "playing"; source: "script" | "send"; thinking: boolean };

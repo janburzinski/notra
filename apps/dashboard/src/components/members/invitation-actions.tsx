@@ -32,7 +32,10 @@ import { useOrganizationsContext } from "@/components/providers/organization-pro
 import { authClient } from "@/lib/auth/client";
 import { isTeamMemberLimitError } from "@/lib/billing/limits";
 import { useRouter } from "@/lib/navigation";
-import type { InvitationSummary } from "@/types/organizations/actions";
+import type {
+  InvitationActionState,
+  InvitationSummary,
+} from "@/types/organizations/actions";
 
 interface InvitationActionsProps {
   invitation: InvitationSummary;
@@ -47,10 +50,9 @@ export function InvitationActions({ invitation }: InvitationActionsProps) {
   const { activeOrganization } = useOrganizationsContext();
   const router = useRouter();
 
-  const [isResending, setIsResending] = useState(false);
-  const [isCanceling, setIsCanceling] = useState(false);
-  const [showResendDialog, setShowResendDialog] = useState(false);
-  const [showCancelDialog, setShowCancelDialog] = useState(false);
+  const [action, setAction] = useState<InvitationActionState>(null);
+  const isResending = action?.dialog === "resend" && action.pending;
+  const isCanceling = action?.dialog === "cancel" && action.pending;
 
   if (!activeOrganization) {
     return null;
@@ -61,7 +63,7 @@ export function InvitationActions({ invitation }: InvitationActionsProps) {
       return;
     }
 
-    setIsResending(true);
+    setAction({ dialog: "resend", pending: true });
     try {
       const { error } = await authClient.organization.resendInvitation({
         invitationId: invitation.id,
@@ -78,12 +80,12 @@ export function InvitationActions({ invitation }: InvitationActionsProps) {
                 router.push(`/${activeOrganization.slug}/settings/billing`),
             },
           });
-          setIsResending(false);
+          setAction({ dialog: "resend", pending: false });
           return;
         }
 
         toast.error(message);
-        setIsResending(false);
+        setAction({ dialog: "resend", pending: false });
         return;
       }
 
@@ -93,12 +95,13 @@ export function InvitationActions({ invitation }: InvitationActionsProps) {
         queryKey: ["invitations", activeOrganization.id],
       });
 
-      setShowResendDialog(false);
+      setAction(null);
+      return;
     } catch (error) {
       console.error("Error resending invitation:", error);
       toast.error(t("resendFailed"));
     }
-    setIsResending(false);
+    setAction({ dialog: "resend", pending: false });
   }
 
   async function handleCancelInvitation() {
@@ -106,7 +109,7 @@ export function InvitationActions({ invitation }: InvitationActionsProps) {
       return;
     }
 
-    setIsCanceling(true);
+    setAction({ dialog: "cancel", pending: true });
     try {
       const { error } = await authClient.organization.cancelInvitation({
         invitationId: invitation.id,
@@ -118,7 +121,7 @@ export function InvitationActions({ invitation }: InvitationActionsProps) {
         } else {
           toast.error(t("cancelFailed"));
         }
-        setIsCanceling(false);
+        setAction({ dialog: "cancel", pending: false });
         return;
       }
 
@@ -128,12 +131,13 @@ export function InvitationActions({ invitation }: InvitationActionsProps) {
         queryKey: ["invitations", activeOrganization.id],
       });
 
-      setShowCancelDialog(false);
+      setAction(null);
+      return;
     } catch (error) {
       console.error("Error canceling invitation:", error);
       toast.error(t("cancelFailed"));
     }
-    setIsCanceling(false);
+    setAction({ dialog: "cancel", pending: false });
   }
 
   return (
@@ -150,14 +154,14 @@ export function InvitationActions({ invitation }: InvitationActionsProps) {
         <DropdownMenuContent align="end" className="w-44">
           <DropdownMenuItem
             disabled={isResending || isCanceling}
-            onClick={() => setShowResendDialog(true)}
+            onClick={() => setAction({ dialog: "resend", pending: false })}
           >
             <HugeiconsIcon className="mr-2 size-4" icon={MailSend01Icon} />
             {tMembersShared("resendInvitation")}
           </DropdownMenuItem>
           <DropdownMenuItem
             disabled={isResending || isCanceling}
-            onClick={() => setShowCancelDialog(true)}
+            onClick={() => setAction({ dialog: "cancel", pending: false })}
             variant="destructive"
           >
             <HugeiconsIcon className="mr-2 size-4" icon={Cancel01Icon} />
@@ -169,10 +173,10 @@ export function InvitationActions({ invitation }: InvitationActionsProps) {
       <ResponsiveDialog
         onOpenChange={(open) => {
           if (!isResending) {
-            setShowResendDialog(open);
+            setAction(open ? { dialog: "resend", pending: false } : null);
           }
         }}
-        open={showResendDialog}
+        open={action?.dialog === "resend"}
       >
         <ResponsiveDialogContent>
           <ResponsiveDialogHeader>
@@ -210,8 +214,10 @@ export function InvitationActions({ invitation }: InvitationActionsProps) {
         confirmLabel={tMembersShared("cancelInvitation")}
         description={t("cancelDescription", { email: invitation.email })}
         onConfirm={handleCancelInvitation}
-        onOpenChange={setShowCancelDialog}
-        open={showCancelDialog}
+        onOpenChange={(open) =>
+          setAction(open ? { dialog: "cancel", pending: false } : null)
+        }
+        open={action?.dialog === "cancel"}
         pending={isCanceling}
         title={t("cancelTitle")}
         variant="destructive"

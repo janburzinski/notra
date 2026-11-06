@@ -1,5 +1,18 @@
 import type { QueryClient } from "@tanstack/react-query";
 
+export interface ContentSaveState {
+  outcome: "saved" | "failed" | "conflict";
+  saving: boolean;
+}
+
+export type ContentSaveEvent =
+  | "start"
+  | "finish"
+  | "clear"
+  | "fail"
+  | "conflict"
+  | "resolve";
+
 export interface ContentDocumentSaveOptions {
   silent?: boolean;
   resolveConflict?: boolean;

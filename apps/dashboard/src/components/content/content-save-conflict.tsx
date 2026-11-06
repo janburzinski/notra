@@ -27,31 +27,36 @@ import { Button } from "@/components/button";
 import type {
   ContentSaveConflictProps,
   ContentSaveConflictResolution,
+  ContentSaveConflictState,
 } from "@/types/content/history";
 
 export function ContentSaveConflict({ document }: ContentSaveConflictProps) {
   const t = useTranslations("content.collaboration");
   const [open, setOpen] = useState(false);
-  const [confirm, setConfirm] = useState<ContentSaveConflictResolution | null>(
-    null
-  );
-  const [resolving, setResolving] = useState(false);
-  const [failed, setFailed] = useState(false);
+  const [state, setState] = useState<ContentSaveConflictState>({
+    step: "idle",
+    failed: false,
+  });
+  const confirm = state.step === "idle" ? null : state.resolution;
+  const resolving = state.step === "resolving";
+  const failed = state.step !== "resolving" && state.failed;
   const busy = resolving || document.isSaving;
 
+  const startConfirm = (resolution: ContentSaveConflictResolution) =>
+    setState({ step: "confirming", resolution, failed });
+
   const resolve = async (resolution: ContentSaveConflictResolution) => {
-    setResolving(true);
-    setFailed(false);
+    setState({ step: "resolving", resolution });
     const succeeded =
       resolution === "saveMine"
         ? await document.resolveSaveConflictSaveMine()
         : await document.resolveSaveConflictLoadLatest();
-    setFailed(!succeeded);
     if (succeeded) {
-      setConfirm(null);
+      setState({ step: "idle", failed: false });
       setOpen(false);
+      return;
     }
-    setResolving(false);
+    setState({ step: "confirming", resolution, failed: true });
   };
 
   if (!document.hasSaveConflict) {
@@ -62,7 +67,9 @@ export function ContentSaveConflict({ document }: ContentSaveConflictProps) {
     <>
       <Popover
         onOpenChange={(value) => {
-          setFailed(false);
+          if (state.step !== "resolving") {
+            setState({ ...state, failed: false });
+          }
           setOpen(value);
         }}
         open={open}
@@ -97,7 +104,7 @@ export function ContentSaveConflict({ document }: ContentSaveConflictProps) {
           <div className="flex flex-col gap-1.5">
             <Button
               disabled={busy}
-              onClick={() => setConfirm("saveMine")}
+              onClick={() => startConfirm("saveMine")}
               size="sm"
               variant="outline"
             >
@@ -105,7 +112,7 @@ export function ContentSaveConflict({ document }: ContentSaveConflictProps) {
             </Button>
             <Button
               disabled={busy}
-              onClick={() => setConfirm("loadLatest")}
+              onClick={() => startConfirm("loadLatest")}
               size="sm"
               variant="ghost"
             >
@@ -117,7 +124,7 @@ export function ContentSaveConflict({ document }: ContentSaveConflictProps) {
       <AlertDialog
         onOpenChange={(value) => {
           if (!(value || busy)) {
-            setConfirm(null);
+            setState({ step: "idle", failed });
           }
         }}
         open={confirm !== null}

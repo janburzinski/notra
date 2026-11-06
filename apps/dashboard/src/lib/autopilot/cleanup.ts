@@ -17,6 +17,7 @@ import {
   getRepositoryOctokit,
 } from "@/lib/autopilot/github";
 import { createAutopilotLogger } from "@/lib/autopilot/log";
+import { findingTransition } from "@/lib/autopilot/transitions";
 import type { AutopilotRunContext } from "@/types/autopilot";
 import type {
   AutopilotLogger,
@@ -219,7 +220,7 @@ async function reviveExpired(findingId: string) {
     .where(
       and(
         eq(autopilotFindings.id, findingId),
-        eq(autopilotFindings.status, "expired")
+        findingTransition("proposed", ["expired"])
       )
     );
 }
@@ -297,7 +298,7 @@ async function reconcileExpired(
           .where(
             and(
               eq(autopilotFindings.id, finding.id),
-              eq(autopilotFindings.status, "expired")
+              findingTransition("merged", ["expired"])
             )
           );
         continue;
@@ -418,7 +419,7 @@ export async function closeStalePullRequests(ctx: AutopilotRunContext) {
         .where(
           and(
             eq(autopilotFindings.id, finding.id),
-            eq(autopilotFindings.status, "proposed")
+            findingTransition("expired", ["proposed"])
           )
         )
         .returning({ id: autopilotFindings.id });

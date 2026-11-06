@@ -238,6 +238,7 @@ export const AUTOPILOT_WRITER_MAX_POST_PATHS = 200;
 export const AUTOPILOT_WRITER_MAX_OUTPUT_TOKENS = 12_000;
 /** One fresh rewrite for incomplete output, never an unbounded continuation. */
 export const AUTOPILOT_WRITER_MAX_ATTEMPTS = 2;
+export const AUTOPILOT_DISMISS_MAX_ATTEMPTS = 3;
 
 /**
  * Readiness checks a website pull request can't fix because they need API,

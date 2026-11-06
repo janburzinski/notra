@@ -7,19 +7,40 @@ import { and, eq, inArray, sql } from "drizzle-orm";
 import { nanoid } from "nanoid";
 
 import {
+  WORKFLOW_RUN_TRANSITIONS,
   WORKFLOW_STORED_PREVIEW_MAX_CHARS,
   WORKFLOW_STORED_VALUE_MAX_CHARS,
 } from "@/constants/workflow-engine";
+import { statusTransition } from "@/lib/db/status-transition";
+import type { StatusSources } from "@/types/status-transition";
 import type {
   WorkflowChildRunStart,
   WorkflowNodeStepInput,
   WorkflowRunFinish,
+  WorkflowRunStatus,
   WorkflowTransaction,
 } from "@/types/workflow-engine";
 import {
   clipAutopilotTraceDetail,
   redactAutopilotTraceDetail,
 } from "@/utils/autopilot-log";
+
+function workflowRunTransition<
+  To extends (typeof WORKFLOW_RUN_TRANSITIONS)[WorkflowRunStatus][number],
+>(
+  to: To,
+  from: readonly Extract<
+    StatusSources<typeof WORKFLOW_RUN_TRANSITIONS, To>,
+    string
+  >[]
+) {
+  return statusTransition(
+    workflowRuns.status,
+    WORKFLOW_RUN_TRANSITIONS,
+    to,
+    from
+  );
+}
 
 function toStoredValue(value: unknown): unknown {
   if (value === undefined) {
@@ -109,7 +130,12 @@ export async function markWorkflowRunLaunchFailed(
   await db
     .update(workflowRuns)
     .set({ status: "failed", errorMessage: error, finishedAt: new Date() })
-    .where(and(eq(workflowRuns.id, runId), eq(workflowRuns.status, "queued")));
+    .where(
+      and(
+        eq(workflowRuns.id, runId),
+        workflowRunTransition("failed", ["queued"])
+      )
+    );
 }
 
 export async function finishWorkflowRunRecord(finish: WorkflowRunFinish) {
@@ -140,7 +166,7 @@ export async function finishWorkflowRunRecord(finish: WorkflowRunFinish) {
       and(
         eq(workflowRuns.id, finish.runId),
         eq(workflowRuns.organizationId, finish.organizationId),
-        inArray(workflowRuns.status, ["queued", "running", "stopped"])
+        workflowRunTransition(finish.status, ["queued", "running", "stopped"])
       )
     );
 }
@@ -157,7 +183,7 @@ export async function stopWorkflowRun(
       and(
         eq(workflowRuns.organizationId, organizationId),
         eq(workflowRuns.rootRunId, rootRunId),
-        inArray(workflowRuns.status, ["queued", "running"])
+        workflowRunTransition("stopped", ["queued", "running"])
       )
     );
 }
@@ -177,7 +203,7 @@ export async function failWorkflowRunTrees(
       and(
         eq(workflowRuns.organizationId, organizationId),
         inArray(workflowRuns.rootRunId, rootRunIds),
-        inArray(workflowRuns.status, ["queued", "running"])
+        workflowRunTransition("failed", ["queued", "running"])
       )
     );
 }

@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import type { useSiteWorkspaceState } from "@/lib/hooks/use-site-workspace-state";
 import type { SiteEditorDocument, SiteEditorFiles } from "@/types/sites";
 
+export type SiteWorkspaceActivity = "idle" | "recovering" | "settling";
 export type SiteWorkspaceValue = ReturnType<typeof useSiteWorkspaceState>;
 export interface SiteWorkspaceLoadState {
   failed: boolean;

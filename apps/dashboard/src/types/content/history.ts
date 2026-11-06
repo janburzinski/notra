@@ -55,6 +55,15 @@ export type ContentHistoryComparisonProps = Pick<
 
 export type ContentSaveConflictResolution = "saveMine" | "loadLatest";
 
+export type ContentSaveConflictState =
+  | { step: "idle"; failed: boolean }
+  | {
+      step: "confirming";
+      resolution: ContentSaveConflictResolution;
+      failed: boolean;
+    }
+  | { step: "resolving"; resolution: ContentSaveConflictResolution };
+
 export interface ContentHistoryDay {
   key: string;
   date: Date;

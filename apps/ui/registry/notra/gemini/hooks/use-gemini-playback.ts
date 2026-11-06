@@ -6,7 +6,7 @@ import {
   GEMINI_SEARCHING_LABEL,
   GEMINI_THINKING_LABEL,
 } from "../constants/gemini";
-import type { GeminiStoryMessage } from "../types/gemini";
+import type { GeminiPlaybackPhase, GeminiStoryMessage } from "../types/gemini";
 
 const TOKEN_SPLIT = /(\s+)/;
 const REDUCED_MOTION_MAX_DELAY_MS = 70;
@@ -32,11 +32,23 @@ export const useGeminiPlayback = (
   const [completeIds, setCompleteIds] = useState<ReadonlySet<string>>(
     () => new Set(script.map((item) => item.id))
   );
-  const [thinking, setThinking] = useState(false);
+  const [phase, setPhase] = useState<GeminiPlaybackPhase>({ status: "idle" });
+  const phaseRef = useRef(phase);
+  const enter = useCallback((next: GeminiPlaybackPhase) => {
+    phaseRef.current = next;
+    setPhase(next);
+  }, []);
+  const setThinking = useCallback(
+    (thinking: boolean) => {
+      const current = phaseRef.current;
+      if (current.status === "playing") {
+        enter({ ...current, thinking });
+      }
+    },
+    [enter]
+  );
   const [thinkingLabel, setThinkingLabel] = useState(GEMINI_SEARCHING_LABEL);
-  const [playing, setPlaying] = useState(false);
   const runRef = useRef(0);
-  const sendingRef = useRef(false);
 
   const markComplete = useCallback((id: string) => {
     setCompleteIds((current) => new Set(current).add(id));
@@ -45,14 +57,12 @@ export const useGeminiPlayback = (
   const resetToScript = useCallback(() => {
     setMessages([...script]);
     setCompleteIds(new Set(script.map((item) => item.id)));
-    setThinking(false);
     setThinkingLabel(GEMINI_SEARCHING_LABEL);
-    setPlaying(false);
-  }, [script]);
+    enter({ status: "idle" });
+  }, [enter, script]);
 
   const stop = useCallback(() => {
     runRef.current += 1;
-    sendingRef.current = false;
     resetToScript();
   }, [resetToScript]);
 
@@ -106,7 +116,7 @@ export const useGeminiPlayback = (
       markComplete(message.id);
       await delay(TURN_END_DELAY_MS);
     },
-    [markComplete, reducedMotion]
+    [markComplete, reducedMotion, setThinking]
   );
 
   const play = useCallback(async () => {
@@ -114,8 +124,7 @@ export const useGeminiPlayback = (
     runRef.current = run;
     const alive = () => runRef.current === run;
 
-    setPlaying(true);
-    setThinking(false);
+    enter({ status: "playing", source: "script", thinking: false });
     setMessages([]);
     setCompleteIds(new Set());
 
@@ -128,43 +137,35 @@ export const useGeminiPlayback = (
     }
 
     if (alive()) {
-      setPlaying(false);
+      enter({ status: "idle" });
     }
-  }, [playTurn, script]);
+  }, [enter, playTurn, script]);
 
   const send = useCallback(
     async (text: string, reply: string) => {
-      if (sendingRef.current) {
+      const current = phaseRef.current;
+      if (current.status === "playing" && current.source === "send") {
         return;
       }
-      sendingRef.current = true;
       const run = runRef.current + 1;
       runRef.current = run;
       const alive = () => runRef.current === run;
       const now = Date.now();
 
-      const playExchange = async () => {
-        setPlaying(true);
-        await playTurn({ from: "user", id: `user-${now}`, text }, alive);
-        if (!alive()) {
-          return;
-        }
-        await playTurn(
-          { from: "assistant", id: `assistant-${now}`, text: reply },
-          alive
-        );
-        if (alive()) {
-          setPlaying(false);
-        }
-      };
-
-      await playExchange().finally(() => {
-        if (runRef.current === run) {
-          sendingRef.current = false;
-        }
-      });
+      enter({ status: "playing", source: "send", thinking: false });
+      await playTurn({ from: "user", id: `user-${now}`, text }, alive);
+      if (!alive()) {
+        return;
+      }
+      await playTurn(
+        { from: "assistant", id: `assistant-${now}`, text: reply },
+        alive
+      );
+      if (alive()) {
+        enter({ status: "idle" });
+      }
     },
-    [playTurn]
+    [enter, playTurn]
   );
 
   useEffect(
@@ -173,6 +174,9 @@ export const useGeminiPlayback = (
     },
     []
   );
+
+  const playing = phase.status === "playing";
+  const thinking = phase.status === "playing" && phase.thinking;
 
   return {
     completeIds,

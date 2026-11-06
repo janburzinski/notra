@@ -123,3 +123,7 @@ export interface GeminiTextSegment {
   offset: number;
   text: string;
 }
+
+export type GeminiPlaybackPhase =
+  | { status: "idle" }
+  | { status: "playing"; source: "script" | "send"; thinking: boolean };

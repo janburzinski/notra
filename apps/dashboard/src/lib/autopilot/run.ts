@@ -33,6 +33,7 @@ import {
 } from "@/lib/autopilot/leases";
 import { createAutopilotLogger } from "@/lib/autopilot/log";
 import { runPromptsJob } from "@/lib/autopilot/prompts";
+import { runTransition } from "@/lib/autopilot/transitions";
 import { failWorkflowRunTrees } from "@/lib/workflow-engine/store";
 import type {
   AutopilotJobResult,
@@ -68,7 +69,7 @@ export async function claimAutopilotRun(
     .where(
       and(
         eq(autopilotRuns.organizationId, organizationId),
-        eq(autopilotRuns.status, "running"),
+        runTransition("failed"),
         lt(
           autopilotRuns.heartbeatAt,
           new Date(Date.now() - AUTOPILOT_RUN_LEASE_MS)
@@ -408,10 +409,11 @@ export async function finishAutopilotRun(params: {
       )
     );
   const finishedAt = new Date();
+  const status = params.error ? "failed" : "completed";
   const completed = await db
     .update(autopilotRuns)
     .set({
-      status: params.error ? "failed" : "completed",
+      status,
       errorMessage: params.error ?? null,
       slackMessageTs: params.slackMessageTs ?? undefined,
       finishedAt,
@@ -426,7 +428,7 @@ export async function finishAutopilotRun(params: {
       and(
         eq(autopilotRuns.id, params.runId),
         eq(autopilotRuns.organizationId, params.organizationId),
-        eq(autopilotRuns.status, "running")
+        runTransition(status)
       )
     )
     .returning({ id: autopilotRuns.id });

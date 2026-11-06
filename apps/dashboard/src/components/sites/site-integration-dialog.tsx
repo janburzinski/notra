@@ -30,7 +30,10 @@ import { Button } from "@/components/button";
 import { SiteIntegrationLogo } from "@/components/sites/site-integration-logo";
 import { SiteIntegrationSaveStatus } from "@/components/sites/site-integration-save-status";
 import { useSiteIntegrationAutosave } from "@/lib/hooks/use-site-integration-autosave";
-import type { SiteIntegrationDialogProps } from "@/types/components/sites";
+import type {
+  SiteIntegrationDialogPhase,
+  SiteIntegrationDialogProps,
+} from "@/types/components/sites";
 import type { SiteIntegrationValues } from "@/types/site-integrations";
 import { toastCopyError } from "@/utils/copy-to-clipboard";
 import {
@@ -55,9 +58,10 @@ export function SiteIntegrationDialog({
     siteIntegrationFormValues(provider, settings)
   );
   const [showErrors, setShowErrors] = useState(false);
-  const [closing, setClosing] = useState(false);
-  const [removing, setRemoving] = useState(false);
-  const [removalFailed, setRemovalFailed] = useState(false);
+  const [phase, setPhase] = useState<SiteIntegrationDialogPhase>("editing");
+  const closing = phase === "closing";
+  const removing = phase === "removing";
+  const removalFailed = phase === "removalFailed";
   const autosave = useSiteIntegrationAutosave(
     scope,
     siteIntegrationUpdateFromValues(provider, values, settings) ?? {
@@ -85,7 +89,9 @@ export function SiteIntegrationDialog({
   const busy = closing || removing;
 
   const change = (key: string, value: string | boolean) => {
-    setRemovalFailed(false);
+    if (removalFailed) {
+      setPhase("editing");
+    }
     const changed = { ...values, [key]: value };
     setValues(changed);
     autosave.update(
@@ -101,23 +107,22 @@ export function SiteIntegrationDialog({
       setShowErrors(true);
       return;
     }
-    setClosing(true);
+    setPhase("closing");
     const saved = !autosave.state.dirty || (await autosave.flush());
-    setClosing(false);
+    setPhase("editing");
     if (saved) {
       onOpenChange(false);
     }
   };
 
   const remove = async () => {
-    setRemoving(true);
+    setPhase("removing");
     autosave.update({ provider: provider.id, settings: null });
     const removed = await autosave.flush();
     if (!removed) {
       await autosave.cancel();
     }
-    setRemovalFailed(!removed);
-    setRemoving(false);
+    setPhase(removed ? "editing" : "removalFailed");
     if (removed) {
       toast.success(t("removed"), { description: t("savedDescription") });
       onOpenChange(false);
@@ -125,7 +130,7 @@ export function SiteIntegrationDialog({
   };
 
   const discard = async () => {
-    setClosing(true);
+    setPhase("closing");
     await autosave.cancel();
     onOpenChange(false);
   };

@@ -74,3 +74,10 @@ export interface StepProgressProps {
   activeIndex: number;
   onStepSelect: (index: number) => void;
 }
+
+export type AddRepoFlowMode = "integration" | "repository";
+
+export type AddRepoFlowState =
+  | { step: "closed" }
+  | { step: "open"; mode: AddRepoFlowMode }
+  | { step: "awaitingWebhook"; open: boolean };

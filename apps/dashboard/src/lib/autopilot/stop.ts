@@ -4,6 +4,7 @@ import { and, eq, isNotNull } from "drizzle-orm";
 
 import { AUTOPILOT_RUN_STOPPED_MESSAGE } from "@/constants/autopilot";
 import { AUTOPILOT_DAILY_WORKFLOW_KEY } from "@/constants/workflow-engine";
+import { runTransition } from "@/lib/autopilot/transitions";
 import { stopWorkflowRun } from "@/lib/workflow-engine/store";
 import type { AutopilotStopRunInput } from "@/types/autopilot-runtime";
 
@@ -21,7 +22,7 @@ export async function stopAutopilotRun(params: AutopilotStopRunInput) {
         and(
           eq(autopilotRuns.id, params.runId),
           eq(autopilotRuns.organizationId, params.organizationId),
-          eq(autopilotRuns.status, "running"),
+          runTransition("stopped"),
           isNotNull(autopilotRuns.workflowKey)
         )
       )

@@ -42,6 +42,7 @@ import { LegacyAddIntegrationDialog as AddIntegrationDialog } from "@/components
 import { DEFAULT_DATA_POINTS } from "@/constants/content-preview";
 import { trackEvent } from "@/lib/analytics/posthog-client";
 import { useActiveProject } from "@/lib/hooks/use-active-project";
+import { useAddRepoFlow } from "@/lib/hooks/use-add-repo-flow";
 import { useWizardStepLabels } from "@/lib/hooks/use-wizard-step-labels";
 import { useParams, useRouter } from "@/lib/navigation";
 import { dashboardOrpc } from "@/lib/orpc/query";
@@ -331,11 +332,16 @@ export function CreateContentDialog({
   const lastInitializedParamsRef = useRef("");
   const previewWarningKeyRef = useRef("");
 
-  const [addRepoOpen, setAddRepoOpen] = useState(false);
-  const [addRepoMode, setAddRepoMode] = useState<
-    "integration" | "repository" | null
-  >(null);
-  const [waitingForWebhookSetup, setWaitingForWebhookSetup] = useState(false);
+  const reopenWizard = useCallback(() => setDialogOpen(true), [setDialogOpen]);
+  const {
+    addRepo,
+    addRepoMode,
+    addRepoOpen,
+    handleAddRepoOpenChange,
+    handleIntegrationFlowComplete,
+    handleIntegrationSuccess,
+    setAddRepo,
+  } = useAddRepoFlow(reopenWizard);
   const openingAddRepoFlowRef = useRef(false);
 
   const { data: brandResponse, isLoading: isLoadingVoices } = useQuery(
@@ -678,18 +684,16 @@ export function CreateContentDialog({
       setDialogOpen(next);
       if (!next) {
         const preserveState =
-          openingAddRepoFlowRef.current || addRepoMode !== null;
+          openingAddRepoFlowRef.current || addRepo.step !== "closed";
         openingAddRepoFlowRef.current = false;
         if (preserveState) {
           return;
         }
-        setAddRepoOpen(false);
-        setAddRepoMode(null);
-        setWaitingForWebhookSetup(false);
+        setAddRepo({ step: "closed" });
         resetWizard();
       }
     },
-    [addRepoMode, resetWizard, setDialogOpen]
+    [addRepo.step, resetWizard, setAddRepo, setDialogOpen]
   );
 
   const toggleFormat = useCallback(
@@ -959,37 +963,12 @@ export function CreateContentDialog({
 
   const handleOpenAddRepositoryFlow = useCallback(() => {
     openingAddRepoFlowRef.current = true;
-    setAddRepoMode(githubIntegrationId ? "repository" : "integration");
-    setWaitingForWebhookSetup(false);
-    setAddRepoOpen(true);
+    setAddRepo({
+      step: "open",
+      mode: githubIntegrationId ? "repository" : "integration",
+    });
     setDialogOpen(false);
-  }, [githubIntegrationId, setDialogOpen]);
-
-  const handleAddRepoOpenChange = useCallback(
-    (isOpen: boolean) => {
-      setAddRepoOpen(isOpen);
-      if (isOpen) {
-        return;
-      }
-      if (addRepoMode === "integration" && waitingForWebhookSetup) {
-        return;
-      }
-      setAddRepoMode(null);
-      setWaitingForWebhookSetup(false);
-      setDialogOpen(true);
-    },
-    [addRepoMode, setDialogOpen, waitingForWebhookSetup]
-  );
-
-  const handleIntegrationSuccess = useCallback(() => {
-    setWaitingForWebhookSetup(true);
-  }, []);
-
-  const handleIntegrationFlowComplete = useCallback(() => {
-    setAddRepoMode(null);
-    setWaitingForWebhookSetup(false);
-    setDialogOpen(true);
-  }, [setDialogOpen]);
+  }, [githubIntegrationId, setAddRepo, setDialogOpen]);
 
   const identityButtonLabel =
     selectedBrandVoiceIds.length === 0

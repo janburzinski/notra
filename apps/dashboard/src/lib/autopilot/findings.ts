@@ -27,6 +27,7 @@ import { nanoid } from "nanoid";
 
 import {
   AUTOPILOT_BRANCH_PREFIX,
+  AUTOPILOT_DISMISS_MAX_ATTEMPTS,
   AUTOPILOT_EXPIRED_COOLDOWN_MS,
   AUTOPILOT_FINDING_CLAIM_LEASE_MS,
   AUTOPILOT_FINDING_MAX_FAILURES,
@@ -37,9 +38,11 @@ import {
   AUTOPILOT_SETTLED_FINDING_STATUSES,
   AUTOPILOT_STALE_WRITER_MESSAGE,
 } from "@/constants/autopilot-findings";
+import { AUTOPILOT_FINDING_TRANSITIONS } from "@/constants/autopilot-transitions";
 import { AUTOPILOT_MERGE_METHOD_LABELS } from "@/constants/autopilot-ui";
 import { getRepositoryOctokit } from "@/lib/autopilot/github";
 import { rememberFeedback } from "@/lib/autopilot/memory";
+import { findingTransition, runTransition } from "@/lib/autopilot/transitions";
 import {
   getContentPullRequestState,
   isMergeMethodNotAllowed,
@@ -57,7 +60,7 @@ import { autopilotReactionAcknowledgment } from "@/utils/autopilot-feedback";
 /** Drafts closed as stale once their cooldown is over. */
 function isExpiredPastCooldown(now: Date) {
   return and(
-    eq(autopilotFindings.status, "expired"),
+    findingTransition("open", ["expired"]),
     lt(
       autopilotFindings.dismissedAt,
       new Date(now.getTime() - AUTOPILOT_EXPIRED_COOLDOWN_MS)
@@ -82,12 +85,12 @@ function hasGivenUp() {
 function isClaimable(now: Date) {
   return or(
     and(
-      eq(autopilotFindings.status, "failed"),
+      findingTransition("open", ["failed"]),
       lt(failureCount, AUTOPILOT_FINDING_MAX_FAILURES)
     ),
     isExpiredPastCooldown(now),
     and(
-      eq(autopilotFindings.status, "open"),
+      findingTransition("open", ["open"]),
       or(
         isNull(autopilotFindings.claimedAt),
         lt(
@@ -99,11 +102,14 @@ function isClaimable(now: Date) {
   );
 }
 
-function heldBy(claim: FindingClaim) {
+function heldBy(
+  claim: FindingClaim,
+  to: (typeof AUTOPILOT_FINDING_TRANSITIONS)["open"][number]
+) {
   return and(
     eq(autopilotFindings.id, claim.finding.id),
     eq(autopilotFindings.claimToken, claim.token),
-    eq(autopilotFindings.status, "open")
+    findingTransition(to, ["open"])
   );
 }
 
@@ -201,7 +207,7 @@ export async function claimSuggestedFinding(
       and(
         eq(autopilotFindings.organizationId, organizationId),
         eq(autopilotFindings.id, findingId),
-        or(eq(autopilotFindings.status, "suggested"), isClaimable(now))
+        or(findingTransition("open", ["suggested"]), isClaimable(now))
       )
     )
     .returning();
@@ -241,7 +247,7 @@ export async function markFindingProposed(
       errorMessage: null,
       claimToken: null,
     })
-    .where(heldBy(claim))
+    .where(heldBy(claim, "proposed"))
     .returning({ id: autopilotFindings.id });
   return rows.length > 0;
 }
@@ -250,7 +256,7 @@ export async function markFindingSuggested(claim: FindingClaim) {
   await db
     .update(autopilotFindings)
     .set({ status: "suggested", claimToken: null })
-    .where(heldBy(claim));
+    .where(heldBy(claim, "suggested"));
 }
 
 /** A failed suggestion goes back on the dashboard so it can be tried again. */
@@ -265,7 +271,7 @@ export async function returnFindingToSuggested(
       claimToken: null,
       errorMessage: error instanceof Error ? error.message : String(error),
     })
-    .where(heldBy(claim));
+    .where(heldBy(claim, "suggested"));
 }
 
 /**
@@ -286,7 +292,7 @@ export async function markFindingWithoutChange(
       errorMessage: reason,
       evidence: { ...claim.finding.evidence, issueIds: [] },
     })
-    .where(heldBy(claim));
+    .where(heldBy(claim, "dismissed"));
 }
 
 /** Settles a held finding as declined, e.g. after "@notra no". */
@@ -302,7 +308,7 @@ export async function dismissClaimedFinding(
       claimToken: null,
       errorMessage: reason,
     })
-    .where(heldBy(claim));
+    .where(heldBy(claim, "dismissed"));
 }
 
 /**
@@ -327,7 +333,7 @@ export async function markFindingFailed(
           }
         : {}),
     })
-    .where(heldBy(claim))
+    .where(heldBy(claim, "failed"))
     .returning({ evidence: autopilotFindings.evidence });
   return (row?.evidence.failures ?? 0) >= AUTOPILOT_FINDING_MAX_FAILURES;
 }
@@ -373,7 +379,7 @@ export async function dismissSuggestedFinding(
       and(
         eq(autopilotFindings.organizationId, organizationId),
         eq(autopilotFindings.id, findingId),
-        eq(autopilotFindings.status, "suggested")
+        findingTransition("dismissed", ["suggested"])
       )
     )
     .returning({ id: autopilotFindings.id });
@@ -486,7 +492,7 @@ export async function syncOfferReactionFeedback(
               .where(
                 and(
                   eq(autopilotFindings.id, finding.id),
-                  eq(autopilotFindings.status, "suggested")
+                  findingTransition("dismissed", ["suggested"])
                 )
               )
               .returning({ id: autopilotFindings.id });
@@ -789,7 +795,7 @@ export async function reserveDraftSlot(
       .set({
         evidence: sql`${autopilotFindings.evidence} || ${JSON.stringify({ draftSlot: claim.token })}::jsonb`,
       })
-      .where(heldBy(claim))
+      .where(heldBy(claim, "open"))
       .returning({ id: autopilotFindings.id });
     return held.length ? ("reserved" as const) : ("lost" as const);
   });
@@ -826,7 +832,6 @@ export async function recoverStaleFindings(
   );
   const stale = and(
     eq(autopilotFindings.organizationId, organizationId),
-    eq(autopilotFindings.status, "open"),
     or(
       isNull(autopilotFindings.claimedAt),
       lt(autopilotFindings.claimedAt, leaseCutoff)
@@ -858,7 +863,7 @@ export async function recoverStaleFindings(
         claimToken: null,
         errorMessage: AUTOPILOT_STALE_WRITER_MESSAGE,
       })
-      .where(and(stale, hasBrief))
+      .where(and(stale, findingTransition("suggested", ["open"]), hasBrief))
       .returning({ runId: autopilotFindings.runId })),
     ...(await db
       .update(autopilotFindings)
@@ -867,7 +872,13 @@ export async function recoverStaleFindings(
         claimToken: null,
         errorMessage: AUTOPILOT_STALE_WRITER_MESSAGE,
       })
-      .where(and(stale, sql`not (${hasBrief})`))
+      .where(
+        and(
+          stale,
+          findingTransition("failed", ["open"]),
+          sql`not (${hasBrief})`
+        )
+      )
       .returning({ runId: autopilotFindings.runId })),
   ];
   const runIds = [
@@ -875,7 +886,7 @@ export async function recoverStaleFindings(
   ];
   const itemRun = and(
     eq(autopilotRuns.organizationId, organizationId),
-    eq(autopilotRuns.status, "running"),
+    runTransition("failed"),
     inArray(autopilotRuns.trigger, [...AUTOPILOT_ITEM_RUN_TRIGGERS])
   );
   await db
@@ -983,19 +994,18 @@ export async function syncFindingPullRequests(organizationId: string) {
       // closing that pull request must not turn into a permanent dismissal.
       const unchanged = and(
         eq(autopilotFindings.id, finding.id),
-        eq(autopilotFindings.status, "proposed"),
         eq(autopilotFindings.pullRequestNumber, ref.pullNumber)
       );
       if (state.status === "merged") {
         await db
           .update(autopilotFindings)
           .set({ status: "merged", mergedAt: state.mergedAt ?? new Date() })
-          .where(unchanged);
+          .where(and(unchanged, findingTransition("merged", ["proposed"])));
       } else if (state.status === "closed") {
         await db
           .update(autopilotFindings)
           .set({ status: "dismissed", dismissedAt: new Date() })
-          .where(unchanged);
+          .where(and(unchanged, findingTransition("dismissed", ["proposed"])));
       }
       if (state.status !== "open") {
         await deleteAutopilotBranch(octokit, ref, finding.branch);
@@ -1049,14 +1059,21 @@ export async function mergeFinding(
   const [updated] = await db
     .update(autopilotFindings)
     .set({ status: "merged", mergedAt: new Date() })
-    .where(eq(autopilotFindings.id, finding.id))
+    .where(
+      and(
+        eq(autopilotFindings.organizationId, organizationId),
+        eq(autopilotFindings.id, finding.id),
+        findingTransition("merged", ["proposed"])
+      )
+    )
     .returning();
-  return updated ?? finding;
+  return updated ?? loadProposedFinding(organizationId, findingId);
 }
 
 export async function dismissFinding(
   organizationId: string,
-  findingId: string
+  findingId: string,
+  attempt = 1
 ): Promise<FindingRow> {
   const finding = await loadProposedFinding(organizationId, findingId);
   if (finding.status === "dismissed") {
@@ -1088,7 +1105,7 @@ export async function dismissFinding(
         eq(autopilotFindings.organizationId, organizationId),
         eq(autopilotFindings.id, finding.id),
         // If an open writer just recorded a PR, reload and close that PR too.
-        eq(autopilotFindings.status, finding.status)
+        findingTransition("dismissed", [finding.status])
       )
     )
     .returning();
@@ -1099,7 +1116,13 @@ export async function dismissFinding(
   if (current.status === "merged") {
     throw new Error("This post is already merged");
   }
-  return current.status === "dismissed"
-    ? current
-    : dismissFinding(organizationId, findingId);
+  if (current.status === "dismissed") {
+    return current;
+  }
+  if (attempt >= AUTOPILOT_DISMISS_MAX_ATTEMPTS) {
+    throw new Error(
+      "This post changed while it was being dismissed. Try again."
+    );
+  }
+  return dismissFinding(organizationId, findingId, attempt + 1);
 }

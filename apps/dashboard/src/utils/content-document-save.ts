@@ -1,5 +1,9 @@
 import { CONTENT_CHECKPOINT_RETRYABLE_CODES } from "@/constants/content-document-save";
-import type { SavedContentDocument } from "@/types/content/document-save";
+import type {
+  ContentSaveEvent,
+  ContentSaveState,
+  SavedContentDocument,
+} from "@/types/content/document-save";
 import type { ContentApiResponse } from "@/types/hooks/content";
 
 export function mergeSavedContentDetail(
@@ -56,4 +60,25 @@ export function isTransientContentCheckpointError(error: unknown): boolean {
     }
   }
   return error instanceof Error;
+}
+
+const CONTENT_SAVE_TRANSITIONS: Record<
+  ContentSaveEvent,
+  (state: ContentSaveState) => ContentSaveState
+> = {
+  start: (state) => ({ ...state, saving: true }),
+  finish: (state) => ({ ...state, saving: false }),
+  clear: (state) =>
+    state.outcome === "failed" ? { ...state, outcome: "saved" } : state,
+  fail: (state) =>
+    state.outcome === "conflict" ? state : { ...state, outcome: "failed" },
+  conflict: (state) => ({ ...state, outcome: "conflict" }),
+  resolve: (state) => ({ ...state, outcome: "saved" }),
+};
+
+export function nextContentSaveState(
+  state: ContentSaveState,
+  event: ContentSaveEvent
+): ContentSaveState {
+  return CONTENT_SAVE_TRANSITIONS[event](state);
 }

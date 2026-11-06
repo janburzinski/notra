@@ -626,6 +626,12 @@ export interface SiteConsentSectionProps {
   disabled: boolean;
 }
 
+export type SiteIntegrationDialogPhase =
+  | "editing"
+  | "closing"
+  | "removing"
+  | "removalFailed";
+
 export interface SiteIntegrationDialogProps {
   scope: SiteScope;
   provider: SiteIntegrationProvider;

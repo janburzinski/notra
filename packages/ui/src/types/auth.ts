@@ -19,7 +19,10 @@ import type { BackupCodesPanelLabels } from "./security";
 export type SocialProvider = "google" | "github";
 export type AuthMethod = "email" | SocialProvider;
 export type ChallengeMode = "totp" | "backup";
-export type EnrollmentStep = "scan" | "manual" | "code" | "backup";
+export type EnrollmentState =
+  | { step: "scan" | "manual" }
+  | { step: "code"; pending: boolean; error: string | null }
+  | { step: "backup"; backupCodes: string[] };
 
 export interface CopyValueFieldProps {
   label: string;

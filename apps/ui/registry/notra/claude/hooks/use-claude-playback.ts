@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { claudeSearchDuration, claudeWait } from "../lib/claude-search";
-import type { ClaudeDemoMessage } from "../types/claude";
+import type { ClaudeDemoMessage, ClaudePlaybackPhase } from "../types/claude";
 
 const TOKEN_SPLIT = /(\s+)/;
 
@@ -25,10 +25,22 @@ export const useClaudePlayback = (
     ...script,
   ]);
   const [completeIds, setCompleteIds] = useState(() => idsOf(script));
-  const [thinking, setThinking] = useState(false);
-  const [playing, setPlaying] = useState(false);
+  const [phase, setPhase] = useState<ClaudePlaybackPhase>({ status: "idle" });
+  const phaseRef = useRef(phase);
+  const enter = useCallback((next: ClaudePlaybackPhase) => {
+    phaseRef.current = next;
+    setPhase(next);
+  }, []);
+  const setThinking = useCallback(
+    (thinking: boolean) => {
+      const current = phaseRef.current;
+      if (current.status === "playing") {
+        enter({ ...current, thinking });
+      }
+    },
+    [enter]
+  );
   const runRef = useRef(0);
-  const sendingRef = useRef(false);
 
   const markComplete = useCallback((id: string) => {
     setCompleteIds((current) => new Set(current).add(id));
@@ -36,12 +48,10 @@ export const useClaudePlayback = (
 
   const stop = useCallback(() => {
     runRef.current += 1;
-    sendingRef.current = false;
     setMessages([...script]);
     setCompleteIds(idsOf(script));
-    setThinking(false);
-    setPlaying(false);
-  }, [script]);
+    enter({ status: "idle" });
+  }, [enter, script]);
 
   const playTurn = useCallback(
     async (message: ClaudeDemoMessage, alive: () => boolean) => {
@@ -103,7 +113,7 @@ export const useClaudePlayback = (
       markComplete(message.id);
       await delay(TURN_GAP_MS);
     },
-    [markComplete, reducedMotion]
+    [markComplete, reducedMotion, setThinking]
   );
 
   const play = useCallback(async () => {
@@ -111,8 +121,7 @@ export const useClaudePlayback = (
     runRef.current = run;
     const alive = () => runRef.current === run;
 
-    setPlaying(true);
-    setThinking(false);
+    enter({ status: "playing", source: "script", thinking: false });
     setMessages([]);
     setCompleteIds(new Set());
 
@@ -125,39 +134,35 @@ export const useClaudePlayback = (
     }
 
     if (alive()) {
-      setPlaying(false);
+      enter({ status: "idle" });
     }
-  }, [playTurn, script]);
+  }, [enter, playTurn, script]);
 
   const send = useCallback(
     async (text: string, reply: string) => {
-      if (sendingRef.current) {
+      const current = phaseRef.current;
+      if (current.status === "playing" && current.source === "send") {
         return;
       }
-      sendingRef.current = true;
       const run = runRef.current + 1;
       runRef.current = run;
       const alive = () => runRef.current === run;
       const now = Date.now();
 
-      setPlaying(true);
-      try {
-        await playTurn({ from: "user", id: `user-${now}`, text }, alive);
-        if (!alive()) {
-          return;
-        }
-        await playTurn(
-          { from: "assistant", id: `assistant-${now}`, text: reply },
-          alive
-        );
-        if (alive()) {
-          setPlaying(false);
-        }
-      } finally {
-        sendingRef.current = false;
+      enter({ status: "playing", source: "send", thinking: false });
+      await playTurn({ from: "user", id: `user-${now}`, text }, alive);
+      if (!alive()) {
+        return;
+      }
+      await playTurn(
+        { from: "assistant", id: `assistant-${now}`, text: reply },
+        alive
+      );
+      if (alive()) {
+        enter({ status: "idle" });
       }
     },
-    [playTurn]
+    [enter, playTurn]
   );
 
   useEffect(
@@ -166,6 +171,9 @@ export const useClaudePlayback = (
     },
     []
   );
+
+  const playing = phase.status === "playing";
+  const thinking = phase.status === "playing" && phase.thinking;
 
   return { completeIds, messages, play, playing, send, stop, thinking };
 };

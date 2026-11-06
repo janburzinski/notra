@@ -1,4 +1,7 @@
-import type { WORKFLOW_RUN_NODE_STATUSES } from "@notra/db/constants/workflows";
+import type {
+  WORKFLOW_RUN_NODE_STATUSES,
+  WORKFLOW_RUN_STATUSES,
+} from "@notra/db/constants/workflows";
 import type { db } from "@notra/db/drizzle";
 import type { WorkflowRunNodeStep } from "@notra/db/types/workflows";
 import type {
@@ -45,6 +48,8 @@ export interface WorkflowNodeStepInput {
   failure?: { error: string };
   call: WorkflowBlockCall;
 }
+
+export type WorkflowRunStatus = (typeof WORKFLOW_RUN_STATUSES)[number];
 
 export interface WorkflowRunFinish {
   runId: string;

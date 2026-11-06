@@ -13,7 +13,10 @@ import { readFileAsDataUrl } from "@/lib/onboarding/logo-file";
 import { dashboardOrpc } from "@/lib/orpc/query";
 import type { SiteRawConfig } from "@/types/site-design";
 import type { SiteVariableRow } from "@/types/site-variables";
-import type { SiteWorkspaceReadyProps } from "@/types/site-workspace";
+import type {
+  SiteWorkspaceActivity,
+  SiteWorkspaceReadyProps,
+} from "@/types/site-workspace";
 import { serializeSiteConfig } from "@/utils/site-design";
 import {
   parseDesignSource,
@@ -37,9 +40,10 @@ export function useSiteWorkspaceState({
   const { organizationId, organizationSlug, siteId, detail } = useSite();
   const scope = { organizationId, siteId, branch };
   const [conflicts, setConflicts] = useState<string[]>([]);
-  const [recovering, setRecovering] = useState(false);
-  // After a publish the cached document still points at the deleted draft.
-  const [settling, setSettling] = useState(false);
+  // "settling": after a publish the cached document still points at the deleted draft.
+  const [activity, setActivity] = useState<SiteWorkspaceActivity>("idle");
+  const recovering = activity === "recovering";
+  const settling = activity === "settling";
   const uploads = useRef(0);
   const [pendingUploads, setPendingUploads] = useState(0);
   const uploading = pendingUploads > 0;
@@ -236,7 +240,7 @@ export function useSiteWorkspaceState({
     if (readOnly || saves.state.status === "saving" || (keep && invalid)) {
       return;
     }
-    setRecovering(true);
+    setActivity("recovering");
     try {
       let latest = await onRefresh();
       if (keep) {
@@ -270,7 +274,7 @@ export function useSiteWorkspaceState({
     } catch {
       setConflicts([SITE_CONFIG_FILENAME]);
     }
-    setRecovering(false);
+    setActivity("idle");
   };
   const discardChanges = async () => {
     if (
@@ -280,7 +284,7 @@ export function useSiteWorkspaceState({
     ) {
       return;
     }
-    setRecovering(true);
+    setActivity("recovering");
     try {
       const paths = new Set(drafts.map((draft) => draft.path));
       if (buffer !== null || variableError !== null || saves.unsaved) {
@@ -334,10 +338,10 @@ export function useSiteWorkspaceState({
         await Promise.reject(failed.reason);
       }
     } catch (error) {
-      setRecovering(false);
+      setActivity("idle");
       throw error;
     }
-    setRecovering(false);
+    setActivity("idle");
   };
   return {
     uploading,
@@ -381,13 +385,13 @@ export function useSiteWorkspaceState({
     uploadImage,
     document,
     resetPublished: () => {
-      setSettling(true);
+      setActivity("settling");
       void onRefresh()
         .catch(() => undefined)
         .then(() => {
           saves.resetClean([SITE_CONFIG_FILENAME]);
           setBuffer(null);
-          setSettling(false);
+          setActivity("idle");
         });
     },
   };

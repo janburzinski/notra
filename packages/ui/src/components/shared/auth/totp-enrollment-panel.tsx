@@ -9,7 +9,7 @@ import { useEffect, useRef, useState } from "react";
 
 import type {
   CopyValueFieldProps,
-  EnrollmentStep,
+  EnrollmentState,
   StepActionsProps,
   TotpEnrollmentPanelProps,
   TotpVerifyResult,
@@ -109,11 +109,12 @@ export function TotpEnrollmentPanel({
   labels,
 }: TotpEnrollmentPanelProps) {
   const l = { ...DEFAULT_TOTP_ENROLLMENT_PANEL_LABELS, ...labels };
-  const [step, setStep] = useState<EnrollmentStep>("scan");
+  const [state, setState] = useState<EnrollmentState>({ step: "scan" });
   const [code, setCode] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const [isPending, setIsPending] = useState(false);
-  const [backupCodes, setBackupCodes] = useState<string[] | null>(null);
+  const isPending = state.step === "code" && state.pending;
+  const error = state.step === "code" ? state.error : null;
+  const enterCode = () =>
+    setState({ step: "code", pending: false, error: null });
   const isMountedRef = useRef(true);
   useEffect(() => {
     isMountedRef.current = true;
@@ -127,8 +128,7 @@ export function TotpEnrollmentPanel({
       return;
     }
 
-    setError(null);
-    setIsPending(true);
+    setState({ step: "code", pending: true, error: null });
 
     let result: TotpVerifyResult;
     try {
@@ -139,24 +139,26 @@ export function TotpEnrollmentPanel({
     if (!isMountedRef.current) {
       return;
     }
-    setIsPending(false);
-
     if (!result.ok) {
-      setError(result.message || l.errorFallback);
+      setState({
+        step: "code",
+        pending: false,
+        error: result.message || l.errorFallback,
+      });
       setCode("");
       return;
     }
 
     if (result.backupCodes && result.backupCodes.length > 0) {
-      setBackupCodes(result.backupCodes);
-      setStep("backup");
+      setState({ step: "backup", backupCodes: result.backupCodes });
       return;
     }
 
+    setState({ step: "code", pending: false, error: null });
     onDone?.();
   }
 
-  const isFirstStep = step === "scan";
+  const isFirstStep = state.step === "scan";
   const secondaryButton =
     isFirstStep && !onCancel ? null : (
       <Button
@@ -166,8 +168,7 @@ export function TotpEnrollmentPanel({
             onCancel?.();
             return;
           }
-          setError(null);
-          setStep("scan");
+          setState({ step: "scan" });
         }}
         type="button"
         variant="ghost"
@@ -180,17 +181,17 @@ export function TotpEnrollmentPanel({
 
   let content: React.ReactNode;
 
-  if (step === "backup" && backupCodes) {
+  if (state.step === "backup") {
     content = (
       <BackupCodesPanel
         accountLabel={accountLabel}
-        codes={backupCodes}
+        codes={state.backupCodes}
         doneLabel={doneLabel ?? l.done}
         labels={l.backupCodesPanel}
         onDone={onDone}
       />
     );
-  } else if (step === "code") {
+  } else if (state.step === "code") {
     content = (
       <form
         aria-busy={isPending}
@@ -223,7 +224,7 @@ export function TotpEnrollmentPanel({
         </StepActions>
       </form>
     );
-  } else if (step === "manual") {
+  } else if (state.step === "manual") {
     content = (
       <div className="grid gap-4">
         <p className="text-muted-foreground text-sm">
@@ -246,7 +247,7 @@ export function TotpEnrollmentPanel({
           secondary={
             <Button
               className="px-0"
-              onClick={() => setStep("scan")}
+              onClick={() => setState({ step: "scan" })}
               type="button"
               variant="link"
             >
@@ -255,7 +256,7 @@ export function TotpEnrollmentPanel({
           }
         >
           {secondaryButton}
-          <Button onClick={() => setStep("code")} type="button">
+          <Button onClick={enterCode} type="button">
             {l.continue}
           </Button>
         </StepActions>
@@ -281,7 +282,7 @@ export function TotpEnrollmentPanel({
           secondary={
             <Button
               className="px-0"
-              onClick={() => setStep("manual")}
+              onClick={() => setState({ step: "manual" })}
               type="button"
               variant="link"
             >
@@ -290,7 +291,7 @@ export function TotpEnrollmentPanel({
           }
         >
           {secondaryButton}
-          <Button onClick={() => setStep("code")} type="button">
+          <Button onClick={enterCode} type="button">
             {l.continue}
           </Button>
         </StepActions>
@@ -300,7 +301,7 @@ export function TotpEnrollmentPanel({
 
   // ph-no-capture keeps the TOTP secret and QR code out of session replays.
   return (
-    <StepTransition className="ph-no-capture" stepKey={step}>
+    <StepTransition className="ph-no-capture" stepKey={state.step}>
       {content}
     </StepTransition>
   );

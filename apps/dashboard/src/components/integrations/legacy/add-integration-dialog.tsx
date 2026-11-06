@@ -211,12 +211,12 @@ export function LegacyAddIntegrationDialog({
         });
       }
       toast.success(t("added"));
+      onSuccess?.();
       setOpen(false);
       form.reset();
       setProbeStatus("idle");
       setTokenOpen(false);
       setHasAttemptedSubmit(false);
-      onSuccess?.();
 
       setCreatedIntegration(integration);
       setShowWebhookDialog(true);

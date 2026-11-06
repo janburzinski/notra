@@ -222,3 +222,7 @@ export interface ClaudeTextSegment {
   offset: number;
   text: string;
 }
+
+export type ClaudePlaybackPhase =
+  | { status: "idle" }
+  | { status: "playing"; source: "script" | "send"; thinking: boolean };
