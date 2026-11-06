@@ -1,0 +1,37 @@
+packages/ui/src/components/evilcharts/charts/echarts-bar-chart.tsx
+  s_2a641a79c946c6::t_741ed6c719075d 2152,2163
+  s_2a641a79c946c6::t_635d3b46ff33f4 36-38,44
+  s_2a641a79c946c6::t_84770d39a44215 17
+packages/ui/src/components/evilcharts/ui/echarts-plot-frame.tsx
+  s_2a641a79c946c6::t_84770d39a44215 8,38-48
+packages/ui/src/components/evilcharts/charts/echarts-area-chart.tsx
+  s_2a641a79c946c6::t_741ed6c719075d 2877,2889
+  s_2a641a79c946c6::t_635d3b46ff33f4 38-40,46
+  s_2a641a79c946c6::t_84770d39a44215 17
+packages/ui/src/components/evilcharts/ui/echarts-legend.tsx
+  s_2a641a79c946c6::t_635d3b46ff33f4 20,28
+packages/ui/src/lib/charts/echarts-brush.ts
+  s_2a641a79c946c6::t_635d3b46ff33f4 1-203
+packages/ui/src/components/evilcharts/ui/echarts-brush.tsx
+  s_2a641a79c946c6::t_635d3b46ff33f4 9
+packages/ui/src/components/evilcharts/charts/echarts-line-chart.tsx
+  s_2a641a79c946c6::t_741ed6c719075d 1832,1843
+  s_2a641a79c946c6::t_84770d39a44215 17
+  s_2a641a79c946c6::t_635d3b46ff33f4 37-39,45
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "2db13a6a4d1239b0bc5667e05d3b999a1235e2cc",
+  "prompts": {},
+  "sessions": {
+    "s_2a641a79c946c6": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "712a2427-7f87-4390-a750-259eed0c22d3",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
