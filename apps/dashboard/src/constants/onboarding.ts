@@ -13,6 +13,7 @@ import type {
   OnboardingPreviewZoom,
 } from "@/types/onboarding";
 
+export const ONBOARDING_WEBSITE_PARAM = "website";
 export const ONBOARDING_STEP_COUNT = 3;
 export const ONBOARDING_STEP_WORKSPACE = 1;
 export const ONBOARDING_STEP_VISIBILITY = 2;

@@ -34,6 +34,7 @@ import {
   marketingAttributionServerSearchParams,
   marketingAttributionServerUrlKeys,
 } from "@/utils/marketing-attribution.server";
+import { withOnboardingWebsite } from "@/utils/onboarding-website";
 import { withTrackingParams } from "@/utils/tracking-params";
 
 export const loadAppEntry = createServerFn({ method: "GET" })
@@ -78,7 +79,7 @@ export const loadGuestAccess = createServerFn({ method: "GET" })
       href: withTrackingParams(
         organization
           ? geoDashboardPath(organization.slug, organization.projectId)
-          : "/onboarding",
+          : withOnboardingWebsite("/onboarding", searchParams),
         searchParams
       ),
     });

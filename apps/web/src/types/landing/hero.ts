@@ -39,3 +39,8 @@ export type HeroVariantCopy = HeroHeadlineLineTwo & {
   secondaryLabel: string;
   secondaryHref: string;
 };
+
+export interface HeroWebsiteFormProps {
+  cta: string;
+  onSubmit: () => void;
+}

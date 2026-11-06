@@ -1,6 +1,7 @@
 import { parseAsString, parseAsStringLiteral } from "nuqs";
 
 import { sessionStorageKeys } from "@/constants/storage";
+import { parseAsOnboardingWebsite } from "@/lib/onboarding/website-param";
 const MARKETING_ATTRIBUTION_STORAGE_KEY =
   sessionStorageKeys.marketingAttribution;
 
@@ -9,6 +10,7 @@ export const marketingAttributionSearchParams = {
   dbLandingPageH1Variant: parseAsString,
   dbSource: parseAsString,
   signupMethod: parseAsStringLiteral(["email", "google", "github"]),
+  website: parseAsOnboardingWebsite,
 };
 
 export interface MarketingAttribution {

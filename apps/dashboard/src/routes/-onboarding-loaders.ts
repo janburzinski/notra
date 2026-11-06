@@ -46,6 +46,7 @@ import {
   withGeoProject,
 } from "@/utils/geo-paths";
 import { onboardingProgressHrefs } from "@/utils/onboarding-progress";
+import { withOnboardingWebsite } from "@/utils/onboarding-website";
 
 async function onboardingContext({ searchParams }: UiRouteInput) {
   const session = await getSession();
@@ -139,7 +140,12 @@ export const loadOnboardingEntry = createServerFn({ method: "GET" })
     const { organization, projectId, replay } = await onboardingContext(data);
     await redirectIfAnyOrganizationHasPaidHistory();
     if (!organization) {
-      throw redirect({ href: geoOnboardingWorkspacePath(projectId, replay) });
+      throw redirect({
+        href: withOnboardingWebsite(
+          geoOnboardingWorkspacePath(projectId, replay),
+          data.searchParams
+        ),
+      });
     }
     await redirectIfOnboardingDismissed(
       organization.id,

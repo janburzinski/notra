@@ -525,6 +525,7 @@
         "@neoconfetti/react": "^1.0.0",
         "@notra/ai": "workspace:*",
         "@notra/email": "workspace:*",
+        "@notra/geo-core": "workspace:*",
         "@notra/kiwi": "workspace:*",
         "@notra/ui": "workspace:*",
         "@notra/utils": "workspace:*",

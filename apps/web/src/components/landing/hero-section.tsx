@@ -10,6 +10,7 @@ import { useEffect, useRef, useState } from "react";
 import { HeroDither } from "@/components/landing/hero-dither";
 import { HeroHeadline, useIsClient } from "@/components/landing/hero-headline";
 import { HeroVariantSwitcher } from "@/components/landing/hero-variant-switcher";
+import { HeroWebsiteForm } from "@/components/landing/hero-website-form";
 import { LiveDemoLink } from "@/components/landing/live-demo-link";
 import { TrackedSignupLink } from "@/components/tracked-signup-link";
 import {
@@ -129,43 +130,47 @@ export function HeroSection() {
               </p>
             </div>
 
-            <div className="flex flex-row items-center justify-center gap-4 sm:gap-7">
-              <CtaButton
-                className={CTA_BUTTON_CLASSNAME}
-                nativeButton={false}
-                render={
-                  <TrackedSignupLink
-                    onClick={trackPrimaryClick}
-                    source={HERO_SIGNUP_SOURCE}
-                  />
-                }
-                variant="primary"
-              >
-                {copy.cta}
-              </CtaButton>
-              <CtaButton
-                className={cn(CTA_BUTTON_CLASSNAME, "max-sm:hidden")}
-                nativeButton={false}
-                render={
-                  copy.secondaryHref.startsWith("https://") ? (
-                    <Link
-                      onClick={trackSecondaryClick}
-                      rel="noopener noreferrer"
-                      target="_blank"
-                      to={copy.secondaryHref}
+            {variant === HERO_CONTROL_VARIANT ? (
+              <HeroWebsiteForm cta={copy.cta} onSubmit={trackPrimaryClick} />
+            ) : (
+              <div className="flex flex-row items-center justify-center gap-4 sm:gap-7">
+                <CtaButton
+                  className={CTA_BUTTON_CLASSNAME}
+                  nativeButton={false}
+                  render={
+                    <TrackedSignupLink
+                      onClick={trackPrimaryClick}
+                      source={HERO_SIGNUP_SOURCE}
                     />
-                  ) : (
-                    <Link
-                      onClick={trackSecondaryClick}
-                      to={copy.secondaryHref}
-                    />
-                  )
-                }
-                variant="light"
-              >
-                {copy.secondaryLabel}
-              </CtaButton>
-            </div>
+                  }
+                  variant="primary"
+                >
+                  {copy.cta}
+                </CtaButton>
+                <CtaButton
+                  className={cn(CTA_BUTTON_CLASSNAME, "max-sm:hidden")}
+                  nativeButton={false}
+                  render={
+                    copy.secondaryHref.startsWith("https://") ? (
+                      <Link
+                        onClick={trackSecondaryClick}
+                        rel="noopener noreferrer"
+                        target="_blank"
+                        to={copy.secondaryHref}
+                      />
+                    ) : (
+                      <Link
+                        onClick={trackSecondaryClick}
+                        to={copy.secondaryHref}
+                      />
+                    )
+                  }
+                  variant="light"
+                >
+                  {copy.secondaryLabel}
+                </CtaButton>
+              </div>
+            )}
           </div>
 
           <div className="mt-8 flex w-full flex-1 flex-col items-center overflow-clip py-3.75 sm:mt-16.25 lg:pb-0">

@@ -21,6 +21,7 @@ import { useTranslations } from "use-intl";
 import * as z from "zod";
 
 import Link from "@/components/framework/link";
+import { ONBOARDING_WEBSITE_PARAM } from "@/constants/onboarding";
 import { trackEvent } from "@/lib/analytics/posthog-client";
 import {
   redeemBackupCodeAction,
@@ -111,6 +112,10 @@ export function SignupForm({
     }
     if (attribution.landingPageH1Copy) {
       params.set("db_landing_page_h1_copy", attribution.landingPageH1Copy);
+    }
+
+    if (attributionParams.website) {
+      params.set(ONBOARDING_WEBSITE_PARAM, attributionParams.website);
     }
 
     params.set("signup_method", signupMethod);

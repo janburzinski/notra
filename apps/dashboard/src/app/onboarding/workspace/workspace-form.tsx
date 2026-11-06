@@ -14,6 +14,7 @@ import { Input } from "@notra/ui/components/ui/input";
 import { Label } from "@notra/ui/components/ui/label";
 import { useForm, useStore } from "@tanstack/react-form";
 import { useDebouncedValue } from "@tanstack/react-pacer";
+import { useQueryState } from "nuqs";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useTranslations } from "use-intl";
@@ -28,11 +29,15 @@ import { SlugStatusIndicator } from "@/components/onboarding/slug-status-indicat
 import { OnboardingStepViewTracker } from "@/components/onboarding/step-view-tracker";
 import { ONBOARDING_STEPS } from "@/constants/analytics-events";
 import { COMPANY_LOGO_DEBOUNCE_MS } from "@/constants/company-logo";
-import { ONBOARDING_STEP_WORKSPACE } from "@/constants/onboarding";
+import {
+  ONBOARDING_STEP_WORKSPACE,
+  ONBOARDING_WEBSITE_PARAM,
+} from "@/constants/onboarding";
 import { useWorkspaceFieldError } from "@/lib/hooks/use-workspace-field-error";
 import { useWorkspaceLogo } from "@/lib/hooks/use-workspace-logo";
 import { useWorkspaceSlugStatus } from "@/lib/hooks/use-workspace-slug-status";
 import { submitWorkspaceStep } from "@/lib/onboarding/submit-workspace-form";
+import { parseAsOnboardingWebsite } from "@/lib/onboarding/website-param";
 import type {
   OnboardingExistingOrg,
   OnboardingPreviewFocus,
@@ -57,7 +62,12 @@ export function WorkspaceForm({
   const [createdOrg, setCreatedOrg] = useState<OnboardingExistingOrg>();
   const currentOrg = existingOrg ?? createdOrg;
   const isResuming = !!currentOrg;
-  const logo = useWorkspaceLogo(existingOrg);
+  const [websiteParam] = useQueryState(
+    ONBOARDING_WEBSITE_PARAM,
+    parseAsOnboardingWebsite
+  );
+  const initialWebsite = existingOrg?.websiteUrl ?? websiteParam ?? "";
+  const logo = useWorkspaceLogo(existingOrg, initialWebsite);
   const existingSource = existingOrg?.heardAboutNotraSource;
   const initialSource = isHeardAboutNotraSource(existingSource)
     ? existingSource
@@ -72,7 +82,7 @@ export function WorkspaceForm({
       heardAboutNotraSource: initialSource,
       name: existingOrg?.name ?? "",
       slug: existingOrg?.slug ?? "",
-      websiteUrl: existingOrg?.websiteUrl ?? "",
+      websiteUrl: initialWebsite,
       dailySummary: existingOrg?.dailySummary ?? true,
       marketingEmails: existingOrg?.marketingEmails ?? false,
     },

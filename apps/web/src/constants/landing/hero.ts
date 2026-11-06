@@ -136,3 +136,12 @@ export const HERO_SIGNUP_SOURCE = "hero";
 export const HERO_PREVIEW_VARIANT_PARAM = "hero_variant";
 
 export const HERO_PREVIEW_ENABLED = import.meta.env.DEV;
+
+export const HERO_WEBSITE_PARAM = "website";
+
+export const HERO_WEBSITE_PLACEHOLDER = "company.com";
+
+export const HERO_WEBSITE_MAX_LENGTH = 253;
+
+export const HERO_WEBSITE_INVALID_MESSAGE =
+  "Enter a valid website, like company.com";

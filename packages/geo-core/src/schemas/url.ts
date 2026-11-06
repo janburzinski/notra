@@ -83,3 +83,8 @@ export const optionalPublicWebsiteUrlSchema = z
   .trim()
   .transform((value) => (value ? normalizePublicWebsiteUrl(value) : undefined))
   .pipe(publicWebsiteUrlSchema.optional());
+
+export function publicWebsiteHostname(value: string): string | null {
+  const result = publicWebsiteUrlSchema.safeParse(value);
+  return result.success ? new URL(result.data).hostname : null;
+}

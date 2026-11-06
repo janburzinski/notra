@@ -17,16 +17,15 @@ import { resolveOrganizationLogo } from "@/utils/avatar";
 import { getGoogleFaviconUrl } from "@/utils/brand";
 
 export function useWorkspaceLogo(
-  existingOrg: OnboardingExistingOrg | undefined
+  existingOrg: OnboardingExistingOrg | undefined,
+  initialWebsite: string
 ) {
   const t = useTranslations("onboarding.workspace");
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [logoPreviewUrl, setLogoPreviewUrl] = useState<string | null>(
     resolveOrganizationLogo(existingOrg?.logo) ?? null
   );
-  const [websiteValue, setWebsiteValue] = useState(
-    existingOrg?.websiteUrl ?? ""
-  );
+  const [websiteValue, setWebsiteValue] = useState(initialWebsite);
   const [debouncedWebsite] = useDebouncedValue(websiteValue, {
     wait: COMPANY_LOGO_DEBOUNCE_MS,
   });
