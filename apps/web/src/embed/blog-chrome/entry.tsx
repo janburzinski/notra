@@ -55,7 +55,7 @@ function syncTheme() {
   document.documentElement.classList.toggle("c15t-dark", dark);
 }
 
-// Paths like /pricing and /notra-mark.svg belong to usenotra.com. On notra-blog.notra.site and its
+// Paths like /pricing and /notra-mark.svg belong to usenotra.com. On ntra-blog.notra.site and its
 // previews they would hit the blog instead, so point them at the main site.
 function pointAtSite(root: ParentNode) {
   for (const element of root.querySelectorAll<HTMLElement>("[href], [src]")) {

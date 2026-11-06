@@ -51,7 +51,7 @@ export const GEO_INGEST_ENDPOINT = "https://ingest.usenotra.com";
 
 export const DOCS_PROXY_ORIGIN = "https://notra.mintlify.site";
 
-export const BLOG_PROXY_ORIGIN = "https://notra-blog.notra.site";
+export const BLOG_PROXY_ORIGIN = "https://ntra-blog.notra.site";
 
 export const OAUTH_ISSUER_ORIGIN = "https://oauth.usenotra.com";
 
