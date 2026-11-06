@@ -117,6 +117,14 @@ if (process.env.NOTRA_PUBLICATION_MAPPING_SQL_WORKER !== "1") {
       on content_publications (repository_id, pull_request_number);
     create unique index "contentPublications_open_post_uidx"
       on content_publications (post_id) where status = 'open';
+    create table github_app_installations (
+      id text primary key, installation_id text not null, enabled boolean not null
+    );
+    create table github_integrations (
+      id text primary key, github_app_installation_id text,
+      github_repository_id text, enabled boolean not null,
+      repository_enabled boolean not null
+    );
   `);
 
   const {
@@ -178,7 +186,7 @@ if (process.env.NOTRA_PUBLICATION_MAPPING_SQL_WORKER !== "1") {
 
   beforeEach(async () => {
     await client.exec(
-      "truncate content_publications, posts; insert into posts values ('post', 'org')"
+      "truncate content_publications, posts, github_integrations, github_app_installations; insert into posts values ('post', 'org')"
     );
   });
   afterAll(async () => client.close());
@@ -371,6 +379,43 @@ if (process.env.NOTRA_PUBLICATION_MAPPING_SQL_WORKER !== "1") {
       ).toEqual([
         ["repository-A", "merged"],
         ["repository-B", "open"],
+      ]);
+    });
+
+    test("webhook closure uses installation and immutable repository ID", async () => {
+      await client.exec(`
+        insert into posts values ('other-post', 'other-org');
+        insert into github_app_installations values ('installation', '55', true);
+        insert into github_integrations values
+          ('repository-A', 'installation', '100', true, true),
+          ('repository-B', 'installation', '200', false, false);
+        insert into content_publications
+          (id, organization_id, post_id, repository_id, owner, repo, path, branch,
+           pull_request_number, pull_request_url, status, created_at)
+        values
+          ('same-name-A', 'org', 'post', 'repository-A', 'notra', 'shared', 'post.md', 'a', 7, 'https://example.test/a', 'open', '${at(1)}'),
+          ('same-name-B', 'other-org', 'other-post', 'repository-B', 'notra', 'shared', 'post.md', 'b', 7, 'https://example.test/b', 'open', '${at(1)}');
+      `);
+
+      expect(
+        await closeContentPublicationForPullRequest({
+          owner: "notra",
+          repo: "shared",
+          pullRequestNumber: 7,
+          merged: true,
+          installationId: "55",
+          githubRepositoryId: "200",
+        })
+      ).toBe(1);
+      expect(
+        (
+          await client.query<{ repository_id: string; status: string }>(
+            "select repository_id, status from content_publications order by repository_id"
+          )
+        ).rows.map(({ repository_id, status }) => [repository_id, status])
+      ).toEqual([
+        ["repository-A", "open"],
+        ["repository-B", "merged"],
       ]);
     });
   });

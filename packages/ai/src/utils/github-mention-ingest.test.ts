@@ -55,6 +55,26 @@ const mentionPayload = JSON.stringify({
   installation: { id: 55 },
 });
 
+const closedPullRequestPayload = JSON.stringify({
+  action: "closed",
+  pull_request: {
+    number: 42,
+    title: "Publish post",
+    html_url: "https://github.com/acme/app/pull/42",
+    merged: true,
+    head: { ref: "post", sha: "head-sha" },
+    base: { ref: "main", sha: "base-sha" },
+  },
+  repository: {
+    id: 99,
+    name: "app",
+    full_name: "acme/app",
+    default_branch: "main",
+    owner: { login: "acme" },
+  },
+  installation: { id: 55 },
+});
+
 const ingest = (
   event: string,
   rawBody: string,
@@ -80,6 +100,37 @@ describe("ingestGitHubAppMentionWebhook", () => {
       "sha256=deadbeef"
     );
     expect(result.httpStatus).toBe(401);
+  });
+
+  test("closes only the publication bound to the webhook repository identity", async () => {
+    closeContentPublicationForPullRequest.mockResolvedValue(1);
+    const result = await ingest(
+      "pull_request",
+      closedPullRequestPayload,
+      "closed-1"
+    );
+    expect(result.body).toMatchObject({ updated: 1 });
+    expect(findOpenContentPublicationByPullRequest).not.toHaveBeenCalled();
+    expect(closeContentPublicationForPullRequest).toHaveBeenCalledWith({
+      owner: "acme",
+      repo: "app",
+      pullRequestNumber: 42,
+      merged: true,
+      installationId: "55",
+      githubRepositoryId: "99",
+    });
+  });
+
+  test("ignores a close event without an installation identity", async () => {
+    const payload = JSON.parse(closedPullRequestPayload);
+    delete payload.installation;
+    const result = await ingest(
+      "pull_request",
+      JSON.stringify(payload),
+      "closed-2"
+    );
+    expect(result.body).toMatchObject({ reason: "missing_payload_fields" });
+    expect(closeContentPublicationForPullRequest).not.toHaveBeenCalled();
   });
 
   test("returns 200 without running for unauthorized mentions", async () => {

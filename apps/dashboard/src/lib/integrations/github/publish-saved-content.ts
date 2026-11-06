@@ -639,6 +639,7 @@ async function publishSavedContent(
           repo: repositoryName,
           pullRequestNumber: linkedPullRequest.number,
           merged: Boolean(old.data.merged_at),
+          repositoryId: integration.id,
         });
       }
     }

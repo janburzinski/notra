@@ -341,26 +341,64 @@ export async function syncContentPublication(
   });
 }
 
-export async function closeContentPublicationForPullRequest(params: {
-  owner: string;
-  repo: string;
-  pullRequestNumber: number;
-  merged: boolean;
-  repositoryId?: string;
-}) {
+export async function closeContentPublicationForPullRequest(
+  params: {
+    owner: string;
+    repo: string;
+    pullRequestNumber: number;
+    merged: boolean;
+  } & (
+    | {
+        repositoryId: string;
+        installationId?: never;
+        githubRepositoryId?: never;
+      }
+    | {
+        repositoryId?: never;
+        installationId: string;
+        githubRepositoryId: string;
+      }
+  )
+) {
   return await db.transaction(async (tx) => {
     await lockPullRequest(
       tx,
       `${params.owner}/${params.repo}`,
       params.pullRequestNumber
     );
+    const repositoryScope =
+      params.repositoryId !== undefined
+        ? eq(contentPublications.repositoryId, params.repositoryId)
+        : inArray(
+            contentPublications.repositoryId,
+            tx
+              .select({ id: githubIntegrations.id })
+              .from(githubIntegrations)
+              .innerJoin(
+                githubAppInstallations,
+                eq(
+                  githubIntegrations.githubAppInstallationId,
+                  githubAppInstallations.id
+                )
+              )
+              .where(
+                and(
+                  eq(
+                    githubAppInstallations.installationId,
+                    params.installationId
+                  ),
+                  eq(
+                    githubIntegrations.githubRepositoryId,
+                    params.githubRepositoryId
+                  )
+                )
+              )
+          );
     const openForPullRequest = and(
       sql`lower(${contentPublications.owner}) = ${params.owner.toLowerCase()}`,
       sql`lower(${contentPublications.repo}) = ${params.repo.toLowerCase()}`,
       eq(contentPublications.pullRequestNumber, params.pullRequestNumber),
-      params.repositoryId
-        ? eq(contentPublications.repositoryId, params.repositoryId)
-        : undefined,
+      repositoryScope,
       eq(contentPublications.status, "open")
     );
     if (params.merged) {

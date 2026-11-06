@@ -48,19 +48,7 @@ async function syncPullRequestPublication(payload: GitHubAppWebhookPayload) {
       body: { message: "ignored", event: "pull_request", ignored: true },
     };
   }
-  if (payload.action === "closed") {
-    const updated = await closeContentPublicationForPullRequest({
-      owner: repository.owner.login,
-      repo: repository.name,
-      pullRequestNumber: pullRequest.number,
-      merged: Boolean(pullRequest.merged),
-    });
-    return {
-      httpStatus: 200,
-      body: { message: "publication_synced", updated },
-    };
-  }
-  if (payload.action !== "synchronize") {
+  if (payload.action !== "closed" && payload.action !== "synchronize") {
     return {
       httpStatus: 200,
       body: { message: "ignored", event: "pull_request", ignored: true },
@@ -71,6 +59,20 @@ async function syncPullRequestPublication(payload: GitHubAppWebhookPayload) {
     return {
       httpStatus: 200,
       body: { message: "ignored", reason: "missing_payload_fields" },
+    };
+  }
+  if (payload.action === "closed") {
+    const updated = await closeContentPublicationForPullRequest({
+      owner: repository.owner.login,
+      repo: repository.name,
+      pullRequestNumber: pullRequest.number,
+      merged: Boolean(pullRequest.merged),
+      installationId: String(installation.id),
+      githubRepositoryId: String(repository.id),
+    });
+    return {
+      httpStatus: 200,
+      body: { message: "publication_synced", updated },
     };
   }
   const publication = await findOpenContentPublicationByPullRequest({

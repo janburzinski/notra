@@ -224,6 +224,7 @@ async function removeContent(organizationId: string, contentId: string) {
       repo,
       pullRequestNumber: publication.pullRequestNumber,
       merged: Boolean(pr.merged_at),
+      repositoryId: publication.repositoryId,
     });
   }
   return result;
