@@ -53,7 +53,7 @@ const blogContent = browserCollections.blog.createClientLoader({
     ]);
 
     return (
-      <div className="mx-auto flex w-full max-w-7xl flex-col items-stretch px-4 pt-8 sm:px-6 sm:pt-28 md:px-8 md:pt-32">
+      <div className="mx-auto flex w-full max-w-7xl flex-col items-stretch px-4 pt-8 sm:px-6 sm:pt-16 md:px-8">
         <script
           dangerouslySetInnerHTML={{ __html: serializeJsonLd(articleJsonLd) }}
           type="application/ld+json"
