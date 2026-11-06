@@ -24,6 +24,8 @@ if (process.env.NOTRA_PUBLICATION_MAPPING_SQL_WORKER !== "1") {
   const posts = pgTable("posts", {
     id: text("id").primaryKey(),
     organizationId: text("organization_id").notNull(),
+    status: text("status").default("draft").notNull(),
+    publishedAt: timestamp("published_at"),
   });
   const githubAppInstallations = pgTable("github_app_installations", {
     id: text("id").primaryKey(),
@@ -100,7 +102,10 @@ if (process.env.NOTRA_PUBLICATION_MAPPING_SQL_WORKER !== "1") {
   }));
 
   await client.exec(`
-    create table posts (id text primary key, organization_id text not null);
+    create table posts (
+      id text primary key, organization_id text not null,
+      status text not null default 'draft', published_at timestamp
+    );
     create table content_publications (
       id text primary key, organization_id text not null, post_id text not null,
       repository_id text not null, owner text not null, repo text not null,

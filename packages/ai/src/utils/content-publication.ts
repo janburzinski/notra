@@ -15,7 +15,7 @@ import {
   posts,
 } from "@notra/db/schema";
 import { advisoryXactLock } from "@notra/db/utils/advisory-xact-lock";
-import { and, desc, eq, gt, ne, or, sql } from "drizzle-orm";
+import { and, desc, eq, gt, inArray, ne, or, sql } from "drizzle-orm";
 import { customAlphabet } from "nanoid";
 
 const generatePublicationId = customAlphabet(
@@ -354,24 +354,57 @@ export async function closeContentPublicationForPullRequest(params: {
       `${params.owner}/${params.repo}`,
       params.pullRequestNumber
     );
+    const openForPullRequest = and(
+      sql`lower(${contentPublications.owner}) = ${params.owner.toLowerCase()}`,
+      sql`lower(${contentPublications.repo}) = ${params.repo.toLowerCase()}`,
+      eq(contentPublications.pullRequestNumber, params.pullRequestNumber),
+      params.repositoryId
+        ? eq(contentPublications.repositoryId, params.repositoryId)
+        : undefined,
+      eq(contentPublications.status, "open")
+    );
+    if (params.merged) {
+      // Lock posts before publications, in the same order as syncContentPublication.
+      const open = await tx
+        .select({ postId: contentPublications.postId })
+        .from(contentPublications)
+        .where(openForPullRequest);
+      if (open.length > 0) {
+        await tx
+          .select({ id: posts.id })
+          .from(posts)
+          .where(
+            inArray(
+              posts.id,
+              open.map((row) => row.postId)
+            )
+          )
+          .orderBy(posts.id)
+          .for("update");
+      }
+    }
     const rows = await tx
       .update(contentPublications)
       .set({
         status: params.merged ? "merged" : "closed",
         updatedAt: new Date(),
       })
-      .where(
-        and(
-          sql`lower(${contentPublications.owner}) = ${params.owner.toLowerCase()}`,
-          sql`lower(${contentPublications.repo}) = ${params.repo.toLowerCase()}`,
-          eq(contentPublications.pullRequestNumber, params.pullRequestNumber),
-          params.repositoryId
-            ? eq(contentPublications.repositoryId, params.repositoryId)
-            : undefined,
-          eq(contentPublications.status, "open")
-        )
-      )
-      .returning({ id: contentPublications.id });
+      .where(openForPullRequest)
+      .returning({ postId: contentPublications.postId });
+    if (params.merged && rows.length > 0) {
+      await tx
+        .update(posts)
+        .set({ status: "published", publishedAt: new Date() })
+        .where(
+          and(
+            inArray(
+              posts.id,
+              rows.map((row) => row.postId)
+            ),
+            eq(posts.status, "draft")
+          )
+        );
+    }
     return rows.length;
   });
 }
