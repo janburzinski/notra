@@ -207,6 +207,7 @@ if (!process.env.SITES_TEST_DATABASE_URL) {
     siteJobs,
     siteDeployments,
     siteDrafts,
+    siteWebhookDeliveries,
     sites,
   } = await import("@notra/db/schema");
   const { SiteHostConflictError, SitePlanLimitError } =
@@ -243,6 +244,8 @@ if (!process.env.SITES_TEST_DATABASE_URL) {
     await import("../../../packages/sites-server/src/editor");
   const { previewAccessUrl } =
     await import("../../../packages/sites-server/src/preview-access");
+  const { revokeOrganizationMemberPreviewAccess } =
+    await import("../../../packages/sites-server/src/preview-revocation");
   const { runSiteJob } =
     await import("../../../packages/sites-server/src/runner");
   const { handleSiteRequest } = await import("../../../apps/sites/src/handler");
@@ -708,6 +711,38 @@ if (!process.env.SITES_TEST_DATABASE_URL) {
       expect(await (await request(`${previewOrigin}/robots.txt`)).text()).toBe(
         "User-agent: *\nDisallow: /\n"
       );
+      // Removing the user from the workspace ends their member sessions and
+      // the share links they issued; a link issued afterwards works again.
+      const signIn = async (kind: "member" | "share") => {
+        const accessUrl = (
+          await previewAccessUrl({
+            site,
+            previewKey: preview.previewKey,
+            kind,
+            userId,
+            next: "/blog",
+          })
+        ).url;
+        const accepted = await request(accessUrl);
+        expect(accepted.status).toBe(302);
+        const session = accepted.headers.get("set-cookie")?.split(";")[0];
+        assert.ok(session);
+        expect(
+          (await request(`${previewOrigin}/blog`, { cookie: session })).status
+        ).toBe(200);
+        return session;
+      };
+      const memberCookie = await signIn("member");
+      await revokeOrganizationMemberPreviewAccess(organizationId, userId);
+      for (const revoked of [cookie, memberCookie]) {
+        expect(
+          (await request(`${previewOrigin}/blog`, { cookie: revoked })).status
+        ).toBe(401);
+      }
+      expect((await request(share.url)).status).toBe(401);
+      // Revocation fences tokens issued in or before its millisecond.
+      await delay(2);
+      await signIn("share");
       await phase("public preview setting");
       const settings = await updateSiteSettings(
         site,
@@ -1392,6 +1427,24 @@ if (!process.env.SITES_TEST_DATABASE_URL) {
       expect(
         await (await request(`${site.publicOrigin}/changelog`)).text()
       ).toContain("cdn.databuddy.cc/databuddy.js");
+      // A delivery whose handling throws releases its claim (webhooks.ts) and
+      // GitHub redelivers it, here after its build already finished: the
+      // site's job for that delivery is found again instead of building twice.
+      assert.ok(delivered.deliveryId);
+      await db
+        .delete(siteWebhookDeliveries)
+        .where(eq(siteWebhookDeliveries.deliveryId, delivered.deliveryId));
+      const retried = await fetch(webhookUrl, {
+        method: "POST",
+        headers: {
+          "x-github-event": "push",
+          "x-github-delivery": delivered.deliveryId,
+          "x-hub-signature-256": delivered.signature ?? "",
+        },
+        body: delivered.rawBody,
+      });
+      expect(await retried.json()).toEqual({ message: "ok", queued: 1 });
+      expect(deliveries.at(-1)?.jobIds).toEqual([integrationJob]);
       await phase("Databuddy setting published directly on main");
       // On the deployment branch Publish commits straight to main.
       const skipped = {

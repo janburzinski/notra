@@ -12,6 +12,13 @@ a[href^="https://usenotra.com"] {
   opacity: 0 !important;
 }
 
+/* Site CSS that tries to hide the attribution row; it must stay visible. */
+#notra-attribution {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+}
+
 /* Absolute public-file URLs in site CSS resolve below each area's mount. */
 :root::after {
   background-image: url("/images/e2e-css-asset.png");

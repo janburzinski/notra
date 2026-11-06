@@ -55,6 +55,7 @@ import { compileFixtures } from "./utils/compiler";
 import { assertConsentVisits, assertHostOnlyConsent } from "./utils/consent";
 import { assertContentFeatures } from "./utils/content";
 import { cspAllowsOrigin } from "./utils/csp";
+import { assertLiveIndexing } from "./utils/indexing";
 import { countByUrl, isEngagement } from "./utils/ingest";
 import { createSiteResourceWaiter } from "./utils/resources";
 import { freePort, startSitesWorker } from "./utils/sites-worker";
@@ -481,7 +482,12 @@ try {
           name: "Report abuse",
           exact: true,
         });
-        assert.equal(await report.count(), 1, "the footer links to a report");
+        // getByRole skips hidden links; site CSS tries to hide this row.
+        assert.equal(
+          await report.count(),
+          1,
+          "the footer links to a visible report under site CSS hiding #notra-attribution"
+        );
         const reportHref = (await report.getAttribute("href")) ?? "";
         assert.ok(
           reportHref.startsWith(`mailto:${SITE_ABUSE_EMAIL}?subject=`),
@@ -701,7 +707,67 @@ try {
   });
   assert.equal(notModified.status, 304);
   assert.equal(await notModified.text(), "");
+  checks.push(await assertLiveIndexing(page, origin, request, htmlResponse));
+  for (const [path, response] of [
+    ["/blog/hello-world", htmlResponse],
+    [
+      "/changelog/2026-09-28-flow.md",
+      await request("/changelog/2026-09-28-flow.md"),
+    ],
+    ["/blog/images/logo.svg", await request("/blog/images/logo.svg")],
+    [assetFile.path, await request(assetFile.path)],
+  ] as const) {
+    assert.equal(response.status, 200, path);
+    assert.equal(
+      response.headers.get("x-content-type-options"),
+      "nosniff",
+      path
+    );
+    assert.equal(
+      response.headers.get("referrer-policy"),
+      "strict-origin-when-cross-origin",
+      path
+    );
+  }
+  checks.push(
+    "customer files (HTML, Markdown, SVG, script) are served with nosniff and a strict-origin referrer policy"
+  );
+  const prefetch = await request("/blog/calm-software", {
+    headers: { "sec-purpose": "prefetch" },
+  });
+  assert.equal(prefetch.status, 200);
   await sites.settle();
+  const visitorAgent = await page.evaluate(() => navigator.userAgent);
+  const browserViews = ingest
+    .slice(0, ingestBeforeRequests)
+    .filter((event) => !isEngagement(event));
+  assert.equal(browserViews.length, livePages.length * repetitions);
+  for (const event of browserViews) {
+    assert.equal(event.body.userAgent, visitorAgent, String(event.body.url));
+    assert.deepEqual(
+      event.body.signals,
+      {
+        clientHints: true,
+        fetchMode: "navigate",
+        tracing: false,
+        prefetch: false,
+      },
+      `visitor signals of the browser view of ${event.body.url}`
+    );
+  }
+  const prefetched = ingest
+    .slice(ingestBeforeRequests)
+    .filter((event) => event.body.url === `${origin}/blog/calm-software`);
+  assert.deepEqual(
+    prefetched.map(
+      (event) => (event.body.signals as { prefetch?: unknown }).prefetch
+    ),
+    [true],
+    "a Sec-Purpose: prefetch request is reported once, as a prefetch"
+  );
+  checks.push(
+    "browser page views report the visitor's user agent, client hints and navigate fetch mode; a prefetch is flagged"
+  );
   const requested = ingest.slice(ingestBeforeRequests);
   const reported = countByUrl(requested);
   for (const [path, count, status] of [
