@@ -134,10 +134,12 @@ test("charts visits per site and blanks days with too few sites", () => {
     "ClaudeBot",
   ]);
   expect(days.get("2026-10-31")?.s1).toBeNull();
-  // 600 GPTBot visits over 12 sites.
-  expect(days.get("2026-11-01")?.s1).toBe(50);
-  // Other holds only the private bot, seen on one site, so it is dropped.
+  // Other holds only the private bot, seen on one site, so it is dropped,
+  // and that day publishes its total alone: (600 + 200 + 200) / 12 sites.
   expect(days.get("2026-11-01")).not.toHaveProperty("other");
+  expect(days.get("2026-11-01")?.total).toBe(83.33);
+  expect(days.get("2026-11-01")?.s1).toBeNull();
+  expect(days.get("2026-11-01")?.s2).toBeNull();
 });
 
 test("hides purposes fed by too few sites", () => {
@@ -273,8 +275,17 @@ test("drops Other from a chart when it is withheld on some days", () => {
 
   expect(chart.series.map((entry) => entry.label)).toEqual(["GPTBot"]);
   for (const entry of chart.days) {
-    expect(Object.keys(entry.values)).toEqual(["s1"]);
+    expect(Object.keys(entry.values)).toEqual(["total", "s1"]);
   }
+  // Where the tail bot is withheld, the day shows its total only, so the
+  // tail can't be recovered as total minus GPTBot.
+  const withheld = chart.days.find((entry) => entry.day === "2026-11-01");
+  expect(withheld?.values.total).toBe(53.33);
+  expect(withheld?.values.s1).toBeNull();
+  // Where every group clears the floor, the breakdown stays: 600 / 12 sites.
+  const complete = chart.days.find((entry) => entry.day === "2026-10-31");
+  expect(complete?.values.total).toBe(53.33);
+  expect(complete?.values.s1).toBe(50);
 });
 
 test("withholds last week's figures when too few sites fed them", () => {

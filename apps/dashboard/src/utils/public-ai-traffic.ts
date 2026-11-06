@@ -27,6 +27,7 @@ import {
   PUBLIC_DATA_SITE_CAP_FACTOR,
   PUBLIC_DATA_TOP_CRAWLERS,
   PUBLIC_DATA_TOP_REFERRERS,
+  PUBLIC_DATA_TOTAL_KEY,
   PUBLIC_DATA_TRAINING_PURPOSE,
   PUBLIC_DATA_WINDOW_DAYS,
 } from "@/constants/public-data";
@@ -449,6 +450,8 @@ function dailyVolume({
   const sitesByDay = new Map<string, number>();
   const byDay = new Map<string, Map<string, number>>();
   const groupSitesByDay = new Map<string, Map<string, number>>();
+  const kindVisits = new Map<string, number>();
+  const kindSites = new Map<string, number>();
   for (const row of daily) {
     if (row.visitor_type === "") {
       sitesByDay.set(row.day, row.projects);
@@ -461,6 +464,10 @@ function dailyVolume({
     if (!group) {
       continue;
     }
+    // The total counts every charted group; its sites are the busiest
+    // source's, a lower bound on how many sites fed it.
+    kindVisits.set(row.day, (kindVisits.get(row.day) ?? 0) + row.visits);
+    kindSites.set(row.day, Math.max(kindSites.get(row.day) ?? 0, row.projects));
     const groups = byDay.get(row.day) ?? new Map<string, number>();
     groups.set(group, (groups.get(group) ?? 0) + row.visits);
     byDay.set(row.day, groups);
@@ -474,10 +481,15 @@ function dailyVolume({
     const groups = byDay.get(day);
     const groupSites = groupSitesByDay.get(day);
     const publishable = sites >= PUBLIC_DATA_MIN_SITES && groups !== undefined;
+    const total =
+      publishable && (kindSites.get(day) ?? 0) >= PUBLIC_DATA_MIN_SITES
+        ? round((kindVisits.get(day) ?? 0) / sites, 2)
+        : null;
     return {
       day,
-      values: Object.fromEntries(
-        series.map(({ key }) => {
+      values: Object.fromEntries<number | null>([
+        [PUBLIC_DATA_TOTAL_KEY, total] as [string, number | null],
+        ...series.map(({ key }): [string, number | null] => {
           if (!publishable) {
             return [key, null];
           }
@@ -491,24 +503,44 @@ function dailyVolume({
               ? round(visits / sites, 2)
               : null,
           ];
-        })
+        }),
+      ]),
+    };
+  });
+  // A day keeps its breakdown only when every group clears the floor;
+  // otherwise the total minus the published groups would reveal the
+  // withheld ones, so that day publishes the total alone.
+  const guardedDays = chartDays.map((entry) => {
+    const complete = Object.entries(entry.values).every(
+      ([key, value]) => key === PUBLIC_DATA_TOTAL_KEY || value !== null
+    );
+    if (complete) {
+      return entry;
+    }
+    return {
+      day: entry.day,
+      values: Object.fromEntries(
+        Object.entries(entry.values).map(([key, value]) => [
+          key,
+          key === PUBLIC_DATA_TOTAL_KEY ? value : null,
+        ])
       ),
     };
   });
   // "Other" withheld on some days would make the total jump with it, so it is
   // published on every day or not at all.
-  const otherWithheld = chartDays.some(
+  const otherWithheld = guardedDays.some(
     (entry) =>
       Object.hasOwn(entry.values, PUBLIC_DATA_OTHER_KEY) &&
       entry.values[PUBLIC_DATA_OTHER_KEY] === null &&
       Object.values(entry.values).some((value) => value !== null)
   );
   if (!otherWithheld) {
-    return { series, days: chartDays };
+    return { series, days: guardedDays };
   }
   return {
     series: series.filter(({ key }) => key !== PUBLIC_DATA_OTHER_KEY),
-    days: chartDays.map((entry) => ({
+    days: guardedDays.map((entry) => ({
       day: entry.day,
       values: Object.fromEntries(
         Object.entries(entry.values).filter(

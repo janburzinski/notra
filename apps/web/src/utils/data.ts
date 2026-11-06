@@ -145,19 +145,27 @@ function trafficChart(
           }
     );
   const rows = chart.days.map((entry) => {
-    const values = Object.values(entry.values);
-    // A group withheld by the privacy floor leaves the day's total unknown;
-    // counting it as zero would read as a drop.
-    const complete =
-      values.length > 0 && values.every((value) => value !== null);
+    // The dashboard checks the day's total on its own; a group withheld by
+    // the privacy floor leaves the summed total unknown instead of reading
+    // as a drop.
+    const parts = Object.entries(entry.values)
+      .filter(([key]) => key !== TOTAL_KEY)
+      .map(([, value]) => value);
+    const summed =
+      parts.length > 0 && parts.every((value) => value !== null)
+        ? parts.reduce<number>((sum, value) => sum + (value ?? 0), 0)
+        : null;
     const row: DataTrafficRow = {
       day: formatChartDay(entry.day),
       rawDay: entry.day,
-      total: complete
-        ? values.reduce<number>((sum, value) => sum + (value ?? 0), 0)
-        : null,
+      total: Object.hasOwn(entry.values, TOTAL_KEY)
+        ? (entry.values[TOTAL_KEY] ?? null)
+        : summed,
     };
     for (const [key, value] of Object.entries(entry.values)) {
+      if (key === TOTAL_KEY) {
+        continue;
+      }
       row[`s_${key}`] = value;
     }
     return row;

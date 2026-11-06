@@ -28,6 +28,11 @@ export const PUBLIC_DATA_CHART_CRAWLERS = 8;
 export const PUBLIC_DATA_CHART_REFERRERS = 6;
 export const PUBLIC_DATA_CHART_VENDORS = 8;
 export const PUBLIC_DATA_OTHER_KEY = "other";
+/**
+ * A chart day's value for every bot or assistant of the kind together, checked
+ * on its own, so a group withheld by the floor doesn't blank the day's total.
+ */
+export const PUBLIC_DATA_TOTAL_KEY = "total";
 
 /** Shares are rounded so the snapshot stays small and carries no exact ratios of raw counts. */
 export const PUBLIC_DATA_SHARE_DECIMALS = 4;
