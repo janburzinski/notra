@@ -2,6 +2,7 @@ import { expect, test } from "bun:test";
 
 import type {
   PublicAiTrafficDailyRow,
+  PublicAiTrafficDetailRow,
   PublicAiTrafficProjectRow,
 } from "@/types/public-data";
 
@@ -354,4 +355,103 @@ test("publishes summary figures once five sites feed each part", () => {
 
   expect(snapshot.summary.crawlsPerReferral).not.toBeNull();
   expect(snapshot.summary.markdownShare).not.toBeNull();
+});
+
+test("ranks assistants over four weeks so sparse referrals reach the floor", () => {
+  const referral = (projectId: string, weeksAgo: number) => ({
+    project_id: projectId,
+    visitor_type: "ai_referral",
+    source: "chatgpt",
+    weeks_ago: weeksAgo,
+    visits: 2,
+    markdown_visits: 0,
+  });
+  const snapshot = buildPublicAiTrafficSnapshot({
+    today: TODAY,
+    generatedAt: "2026-11-02T00:20:00.000Z",
+    daily,
+    projects: [
+      ...projectRows("crawler", "GPTBot", SITES, { recent: 70, previous: 35 }),
+      // Three sites this week and three others two weeks ago: six in four weeks.
+      ...["p0", "p1", "p2"].map((site) => referral(site, 0)),
+      ...["p3", "p4", "p5"].map((site) => referral(site, 2)),
+    ],
+  });
+
+  expect(snapshot.referrers.map((row) => row.source)).toEqual(["chatgpt"]);
+  expect(snapshot.referrers[0]?.share).toBe(1);
+});
+
+function detailRow(
+  section: string,
+  visitorType: string,
+  key: string,
+  values: Partial<PublicAiTrafficDetailRow>
+): PublicAiTrafficDetailRow {
+  return {
+    section,
+    visitor_type: visitorType,
+    key,
+    share: 0,
+    previous_share: 0,
+    sites: 0,
+    previous_sites: 0,
+    subset_sites: 0,
+    ...values,
+  };
+}
+
+test("publishes hours, countries and llms.txt only above the site floor", () => {
+  const snapshot = buildPublicAiTrafficSnapshot({
+    today: TODAY,
+    generatedAt: "2026-11-02T00:20:00.000Z",
+    daily,
+    projects: [
+      ...projects,
+      ...projectRows("crawler", "OAI-SearchBot", SITES.slice(0, 6), {
+        recent: 20,
+        previous: 20,
+      }),
+    ],
+    detail: [
+      detailRow("hours", "crawler", "1:4", { share: 0.75, sites: 12 }),
+      detailRow("hours", "crawler", "7:23", { share: 0.25, sites: 12 }),
+      // Referrals from three sites only: their grid stays out.
+      detailRow("hours", "ai_referral", "3:15", { share: 1, sites: 3 }),
+      detailRow("countries", "ai_referral", "US", {
+        share: 0.6,
+        sites: 8,
+        previous_share: 0.5,
+        previous_sites: 6,
+      }),
+      detailRow("countries", "ai_referral", "DE", { share: 0.4, sites: 2 }),
+      detailRow("llms_txt", "crawler", "GPTBot", {
+        sites: 12,
+        subset_sites: 6,
+      }),
+      // Two sites fetched it: publishing that would point at them.
+      detailRow("llms_txt", "crawler", "ClaudeBot", {
+        sites: 6,
+        subset_sites: 2,
+      }),
+      // Five of six did: the one that didn't would stand out.
+      detailRow("llms_txt", "crawler", "OAI-SearchBot", {
+        sites: 6,
+        subset_sites: 5,
+      }),
+    ],
+  });
+  const crawler = (source: string) =>
+    snapshot.crawlers.find((row) => row.source === source);
+
+  expect(snapshot.hours?.crawlers?.[0]?.[4]).toBe(0.75);
+  expect(snapshot.hours?.crawlers?.[6]?.[23]).toBe(0.25);
+  expect(snapshot.hours?.referrals).toBeNull();
+  expect(snapshot.countries).toEqual([
+    { country: "US", share: 0.6, change: 0.2 },
+  ]);
+  expect(crawler("GPTBot")?.llmsTxtReach).toBe(0.5);
+  expect(crawler("ClaudeBot")?.llmsTxtReach).toBeNull();
+  expect(crawler("OAI-SearchBot")).toBeDefined();
+  expect(crawler("OAI-SearchBot")?.llmsTxtReach).toBeNull();
 });

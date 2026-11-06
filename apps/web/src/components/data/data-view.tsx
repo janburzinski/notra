@@ -91,7 +91,7 @@ function Report({ page }: { page: DataPageModel }) {
         />
       </ReportBlock>
 
-      <ReportBlock title="Top assistants · past 7 days">
+      <ReportBlock title="Top assistants · past 28 days">
         <DataTable
           columns={assistantColumns(page.assistants[0]?.share ?? 1, withDepth)}
           data={ranked(page.assistants)}
@@ -148,7 +148,7 @@ function Report({ page }: { page: DataPageModel }) {
         />
       ) : null}
 
-      {page.hours ? (
+      {page.hours?.crawlers && page.hours.referrals ? (
         <ReportPair
           left={{
             title: "When bots crawl · past 28 days",
@@ -163,6 +163,16 @@ function Report({ page }: { page: DataPageModel }) {
             ),
           }}
         />
+      ) : null}
+      {page.hours?.crawlers && !page.hours.referrals ? (
+        <ReportBlock title="When bots crawl · past 28 days">
+          <DataHeatmap grid={page.hours.crawlers} kind="crawlers" />
+        </ReportBlock>
+      ) : null}
+      {page.hours?.referrals && !page.hours.crawlers ? (
+        <ReportBlock title="When AI sends visitors · past 28 days">
+          <DataHeatmap grid={page.hours.referrals} kind="referrals" />
+        </ReportBlock>
       ) : null}
 
       <DataSheet

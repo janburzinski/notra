@@ -255,7 +255,7 @@ function AssistantBody({
                   : formatVisits(row.pagesPerVisit),
             },
             {
-              label: "vs. prior week",
+              label: "vs. prior 4 weeks",
               value: <DataTrend trend={relativeTrend(row.change)} />,
             },
           ]}

@@ -12,6 +12,7 @@ import type {
 } from "../tinybird/pipes/geo-traffic";
 import type {
   geoTrafficTrendsDaily,
+  geoTrafficTrendsDetail,
   geoTrafficTrendsProjects,
 } from "../tinybird/pipes/geo-traffic-trends";
 import type {
@@ -99,6 +100,9 @@ export type GeoTrafficTrendsDailyRow = InferOutputRow<
 >;
 export type GeoTrafficTrendsProjectsRow = InferOutputRow<
   typeof geoTrafficTrendsProjects
+>;
+export type GeoTrafficTrendsDetailRow = InferOutputRow<
+  typeof geoTrafficTrendsDetail
 >;
 export type McpOverviewRow = InferOutputRow<typeof mcpOverview>;
 export type McpTimeseriesRow = InferOutputRow<typeof mcpTimeseries>;

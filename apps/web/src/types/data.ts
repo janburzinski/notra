@@ -74,7 +74,7 @@ interface DataAgentFileRow {
   label: string;
   vendor: string | null;
   llmsTxtReach: number;
-  markdownShare: number;
+  markdownShare: number | null;
 }
 
 /** One slice of a market share bar. */
@@ -116,7 +116,8 @@ export interface DataPageModel {
   purposes: DataPurposeRow[];
   countries: DataCountryRow[];
   agentFiles: DataAgentFileRow[];
-  hours: Record<DataTrafficKind, DataHourGrid> | null;
+  /** A kind's grid is null when too few sites had that traffic. */
+  hours: Record<DataTrafficKind, DataHourGrid | null> | null;
 }
 
 /** What a side drawer shows: one bot, one assistant or one company. */

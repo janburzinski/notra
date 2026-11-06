@@ -22,12 +22,32 @@ export interface PublicAiTrafficProjectRow {
   markdown_visits: number;
 }
 
+/**
+ * `geo_traffic_trends_detail` row. `hours`: `key` is "weekday:hour" (Mon = 1,
+ * UTC) and `sites` the kind's sites. `countries`: `key` is the ISO country,
+ * with recent and previous shares and sites. `llms_txt`: `key` is the crawler,
+ * `sites` the sites it visited and `subset_sites` those where it fetched
+ * /llms.txt.
+ */
+export interface PublicAiTrafficDetailRow {
+  section: string;
+  visitor_type: string;
+  key: string;
+  share: number;
+  previous_share: number;
+  sites: number;
+  previous_sites: number;
+  subset_sites: number;
+}
+
 export interface PublicAiTrafficInput {
   /** UTC day the snapshot is published on; it covers the days before. */
   today: string;
   generatedAt: string;
   daily: PublicAiTrafficDailyRow[];
   projects: PublicAiTrafficProjectRow[];
+  /** Hours, countries and llms.txt; empty leaves those sections out. */
+  detail?: PublicAiTrafficDetailRow[];
 }
 
 export interface PublicAiTrafficWindow {

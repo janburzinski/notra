@@ -71,7 +71,7 @@ function HeatTooltip({
         UTC
       </span>
       <span className="text-foreground font-medium tabular-nums">
-        {formatShare(value)} of the week's visits
+        {formatShare(value)} of a typical site's week
       </span>
       <span className="text-muted-foreground tabular-nums">
         {ratio.toLocaleString("en", { maximumFractionDigits: 1 })}× an average

@@ -213,3 +213,175 @@ export const geoTrafficTrendsProjects = defineEndpoint(
     },
   }
 );
+
+/** The trends' raw-event filter: one window, no sample or demo projects, no hidden sources. */
+const DETAIL_SCOPE_SQL = `
+          captured_at >= toDateTime(toDateOrNull({{String(previous_from, '')}}))
+          AND captured_at < toDateTime(toDateOrNull({{String(date_to, '')}}))
+          AND visitor_type IN ('crawler', 'ai_referral')
+          AND (
+            {{String(excluded_project_ids, '')}} = ''
+            OR NOT has(splitByChar(',', {{String(excluded_project_ids, '')}}), project_id)
+          )
+          ${GEO_EXCLUDED_SOURCES_SQL}`;
+
+const RECENT_SQL =
+  "captured_at >= toDateTime(toDateOrNull({{String(date_from, '')}}))";
+
+/**
+ * Cross-organization detail for the public AI traffic snapshot, from raw
+ * events: when AI traffic arrives (UTC weekday and hour), where AI-referred
+ * visitors are (country), and which crawlers fetch /llms.txt. Hours and
+ * countries average each site's own distribution, so every site weighs the
+ * same and no large site sets the pattern; `sites` lets the caller apply its
+ * floor. Constant labels never reuse a column name, which would shadow it.
+ */
+export const geoTrafficTrendsDetail = defineEndpoint(
+  "geo_traffic_trends_detail",
+  {
+    description:
+      "Public AI traffic detail across organizations: weekday/hour shares per visitor type, AI referral shares per country (recent and previous window) and crawler sites fetching /llms.txt.",
+    params: {
+      date_from: p
+        .string()
+        .describe("First day (YYYY-MM-DD) of the recent window"),
+      date_to: p.string().describe("Exclusive last day (YYYY-MM-DD)"),
+      previous_from: p
+        .string()
+        .describe(
+          "First day (YYYY-MM-DD) of the previous window, before date_from"
+        ),
+      excluded_project_ids: p
+        .string()
+        .optional("")
+        .describe("Comma-separated project ids to leave out, empty for none"),
+      ...GEO_EXCLUDED_SOURCES_PARAMS,
+    },
+    nodes: [
+      node({
+        name: "scoped_events",
+        sql: `
+        SELECT visitor_type, project_id, source, captured_at, country, path
+        FROM geo_traffic_events
+        WHERE ${DETAIL_SCOPE_SQL}
+      `,
+      }),
+      node({
+        name: "hours_site",
+        sql: `
+        SELECT
+          visitor_type,
+          project_id,
+          toDayOfWeek(captured_at) AS weekday,
+          toHour(captured_at) AS hour,
+          count() AS visits
+        FROM scoped_events
+        WHERE ${RECENT_SQL}
+        GROUP BY visitor_type, project_id, weekday, hour
+      `,
+      }),
+      node({
+        name: "hours_norm",
+        sql: `
+        SELECT
+          *,
+          visits / sum(visits) OVER (PARTITION BY visitor_type, project_id) AS site_share,
+          uniqExact(project_id) OVER (PARTITION BY visitor_type) AS kind_sites
+        FROM hours_site
+      `,
+      }),
+      node({
+        name: "hours_rows",
+        sql: `
+        SELECT
+          'hours' AS section,
+          visitor_type,
+          concat(toString(weekday), ':', toString(hour)) AS key,
+          sum(site_share) / any(kind_sites) AS share,
+          toFloat64(0) AS previous_share,
+          toUInt64(any(kind_sites)) AS sites,
+          toUInt64(0) AS previous_sites,
+          toUInt64(0) AS subset_sites
+        FROM hours_norm
+        GROUP BY visitor_type, weekday, hour
+      `,
+      }),
+      node({
+        name: "country_site",
+        sql: `
+        SELECT
+          if(${RECENT_SQL}, 0, 1) AS period,
+          project_id,
+          country,
+          count() AS visits
+        FROM scoped_events
+        WHERE visitor_type = 'ai_referral' AND country != ''
+        GROUP BY period, project_id, country
+      `,
+      }),
+      node({
+        name: "country_norm",
+        sql: `
+        SELECT
+          *,
+          visits / sum(visits) OVER (PARTITION BY period, project_id) AS site_share,
+          uniqExact(project_id) OVER (PARTITION BY period) AS period_sites
+        FROM country_site
+      `,
+      }),
+      node({
+        name: "country_rows",
+        sql: `
+        SELECT
+          'countries' AS section,
+          'ai_referral' AS visitor_type,
+          country AS key,
+          sumIf(site_share, period = 0) / greatest(anyIf(period_sites, period = 0), 1) AS share,
+          sumIf(site_share, period = 1) / greatest(anyIf(period_sites, period = 1), 1) AS previous_share,
+          toUInt64(uniqExactIf(project_id, period = 0)) AS sites,
+          toUInt64(uniqExactIf(project_id, period = 1)) AS previous_sites,
+          toUInt64(0) AS subset_sites
+        FROM country_norm
+        GROUP BY country
+      `,
+      }),
+      node({
+        name: "llms_txt_rows",
+        sql: `
+        SELECT
+          'llms_txt' AS section,
+          visitor_type,
+          source AS key,
+          toFloat64(0) AS share,
+          toFloat64(0) AS previous_share,
+          toUInt64(uniqExact(project_id)) AS sites,
+          toUInt64(0) AS previous_sites,
+          toUInt64(uniqExactIf(project_id, path IN ('/llms.txt', '/llms-full.txt'))) AS subset_sites
+        FROM scoped_events
+        WHERE visitor_type = 'crawler' AND ${RECENT_SQL}
+        GROUP BY visitor_type, source
+      `,
+      }),
+      node({
+        name: "result",
+        sql: `
+        SELECT * FROM hours_rows
+        UNION ALL
+        SELECT * FROM country_rows
+        UNION ALL
+        SELECT * FROM llms_txt_rows
+      `,
+      }),
+    ],
+    output: {
+      section: t.string(),
+      visitor_type: t.string(),
+      key: t.string(),
+      share: t.float64(),
+      previous_share: t.float64(),
+      sites: t.uint64(),
+      previous_sites: t.uint64(),
+      subset_sites: t.uint64(),
+    },
+  }
+);

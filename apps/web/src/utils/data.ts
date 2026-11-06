@@ -46,7 +46,10 @@ export function formatVisits(value: number): string {
   if (value >= 100) {
     return Math.round(value).toLocaleString("en");
   }
-  return value.toLocaleString("en", { maximumFractionDigits: 1 });
+  // Below one visit, a single decimal would round sparse traffic to 0.
+  return value.toLocaleString("en", {
+    maximumFractionDigits: value > 0 && value < 1 ? 2 : 1,
+  });
 }
 
 /** 1234.5 → "1,235 : 1" */
@@ -285,7 +288,8 @@ export function buildDataPage(
     })),
     agentFiles: snapshot.crawlers
       .flatMap((row) =>
-        typeof row.llmsTxtReach === "number" && row.markdownShare !== null
+        // A withheld Markdown share reads "–"; the llms.txt row still counts.
+        typeof row.llmsTxtReach === "number"
           ? [
               {
                 id: row.id,

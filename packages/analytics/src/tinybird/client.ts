@@ -31,6 +31,7 @@ import type {
   GeoTrafficPagesRow,
   GeoTrafficTimeseriesRow,
   GeoTrafficTrendsDailyRow,
+  GeoTrafficTrendsDetailRow,
   GeoTrafficTrendsProjectsRow,
   NotraAdoptionRow,
   PostingPerformanceParams,
@@ -98,6 +99,7 @@ import {
 } from "./pipes/geo-traffic";
 import {
   geoTrafficTrendsDaily,
+  geoTrafficTrendsDetail,
   geoTrafficTrendsProjects,
 } from "./pipes/geo-traffic-trends";
 import {
@@ -198,6 +200,7 @@ function createTinybirdClient(fetch?: typeof globalThis.fetch) {
       geoJourneyDetail,
       geoTrafficTrendsDaily,
       geoTrafficTrendsProjects,
+      geoTrafficTrendsDetail,
       webOverview,
       webTimeseries,
       webPages,
@@ -633,6 +636,23 @@ export function queryGeoTrafficTrendsProjects(
     params,
     null,
     (client) => client.geoTrafficTrendsProjects.query(params)
+  );
+}
+
+export function queryGeoTrafficTrendsDetail(
+  params: InferParams<typeof geoTrafficTrendsDetail>
+): Promise<QueryResult<GeoTrafficTrendsDetailRow> | null> {
+  return cachedPipeQuery(
+    "geo",
+    "geo_traffic_trends_detail",
+    params,
+    null,
+    // Every sample, demo and deleted project id rides along to be excluded.
+    () =>
+      postPipeQuery<GeoTrafficTrendsDetailRow>(
+        "geo_traffic_trends_detail",
+        params
+      )
   );
 }
 

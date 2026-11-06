@@ -4,6 +4,14 @@ export const PUBLIC_DATA_WINDOW_DAYS = 60;
 export const PUBLIC_DATA_RECENT_DAYS = 7;
 /** Crawl-to-referral ratios need a longer window; referrals are sparse. */
 export const PUBLIC_DATA_RATIO_WEEKS = 4;
+/**
+ * Assistants rank over four weeks against the four before: referrals are too
+ * sparse for one assistant to reach the site floor in a single week.
+ */
+export const PUBLIC_DATA_REFERRER_WEEKS = 4;
+/** Hours, countries and llms.txt cover the last 28 full days. */
+export const PUBLIC_DATA_DETAIL_DAYS = 28;
+export const PUBLIC_DATA_TOP_COUNTRIES = 20;
 
 /**
  * Anonymity floor: a bot, assistant or company is only published when it
@@ -41,9 +49,12 @@ export const PUBLIC_DATA_CACHE_KEY_PREFIX = "public-data:ai-traffic:v1";
 /** Snapshots are keyed by day. Each key expires two days after it is written. */
 export const PUBLIC_DATA_CACHE_TTL_SECONDS = 2 * 24 * 60 * 60;
 
+/** How long an instance serves its in-memory snapshot before re-reading Redis. */
+export const PUBLIC_DATA_MEMORY_TTL_MS = 5 * 60 * 1000;
+
 /** CDN caching for the public endpoint; a snapshot only changes once a day. */
 export const PUBLIC_DATA_CACHE_CONTROL =
-  "public, max-age=300, s-maxage=3600, stale-while-revalidate=86400";
+  "public, max-age=300, s-maxage=300, stale-while-revalidate=86400";
 
 /**
  * The company behind each AI assistant that refers visitors, keyed by the

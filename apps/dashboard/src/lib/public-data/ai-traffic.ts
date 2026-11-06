@@ -3,6 +3,7 @@ import { getAnalyticsRedis } from "@notra/analytics/cache/redis";
 import {
   isTinybirdConfigured,
   queryGeoTrafficTrendsDaily,
+  queryGeoTrafficTrendsDetail,
   queryGeoTrafficTrendsProjects,
 } from "@notra/analytics/tinybird/client";
 import { shiftDay } from "@notra/analytics/utils/demo-pipe";
@@ -14,6 +15,8 @@ import type { PublicAiTrafficSnapshot } from "@notra/schemas/types/api/public-ai
 import {
   PUBLIC_DATA_CACHE_KEY_PREFIX,
   PUBLIC_DATA_CACHE_TTL_SECONDS,
+  PUBLIC_DATA_DETAIL_DAYS,
+  PUBLIC_DATA_MEMORY_TTL_MS,
   PUBLIC_DATA_SITE_CAP_FACTOR,
 } from "@/constants/public-data";
 import { realTrafficProjectIds } from "@/lib/analytics/real-traffic-projects";
@@ -26,9 +29,14 @@ import {
 const pending = new Map<string, Promise<PublicAiTrafficSnapshot | null>>();
 /**
  * The day's snapshot once built or read, so later requests skip Redis and,
- * without Redis, don't repeat the 60-day queries.
+ * without Redis, don't repeat the 60-day queries. With Redis it is re-read
+ * after `PUBLIC_DATA_MEMORY_TTL_MS`, so a rebuild on another instance shows.
  */
-let latest: { day: string; snapshot: PublicAiTrafficSnapshot } | null = null;
+let latest: {
+  day: string;
+  snapshot: PublicAiTrafficSnapshot;
+  readAt: number;
+} | null = null;
 
 function cacheKey(today: string): string {
   return `${PUBLIC_DATA_CACHE_KEY_PREFIX}:${today}`;
@@ -57,16 +65,23 @@ async function computeSnapshot(
   const projectIds = [...new Set(projectRows.map((row) => row.project_id))];
   const real = await realTrafficProjectIds(projectIds);
   const excluded = projectIds.filter((id) => !real.has(id));
-  const daily =
-    (
-      await queryGeoTrafficTrendsDaily({
-        date_from: window.from,
-        date_to: window.toExclusive,
-        excluded_project_ids: excluded.join(","),
-        site_cap_factor: PUBLIC_DATA_SITE_CAP_FACTOR,
-        ...hidden,
-      })
-    )?.data ?? [];
+  const [dailyResult, detailResult] = await Promise.all([
+    queryGeoTrafficTrendsDaily({
+      date_from: window.from,
+      date_to: window.toExclusive,
+      excluded_project_ids: excluded.join(","),
+      site_cap_factor: PUBLIC_DATA_SITE_CAP_FACTOR,
+      ...hidden,
+    }),
+    queryGeoTrafficTrendsDetail({
+      date_from: shiftDay(today, -PUBLIC_DATA_DETAIL_DAYS),
+      date_to: window.toExclusive,
+      previous_from: shiftDay(today, -PUBLIC_DATA_DETAIL_DAYS * 2),
+      excluded_project_ids: excluded.join(","),
+      ...hidden,
+    }),
+  ]);
+  const daily = dailyResult?.data ?? [];
 
   return buildPublicAiTrafficSnapshot({
     today,
@@ -90,6 +105,16 @@ async function computeSnapshot(
         visits: Number(row.visits),
         markdown_visits: Number(row.markdown_visits),
       })),
+    detail: (detailResult?.data ?? []).map((row) => ({
+      section: row.section,
+      visitor_type: row.visitor_type,
+      key: row.key,
+      share: Number(row.share),
+      previous_share: Number(row.previous_share),
+      sites: Number(row.sites),
+      previous_sites: Number(row.previous_sites),
+      subset_sites: Number(row.subset_sites),
+    })),
   });
 }
 
@@ -131,7 +156,7 @@ export async function publishPublicAiTrafficSnapshot(
 ): Promise<PublicAiTrafficSnapshot | null> {
   const snapshot = await computeSnapshot(today);
   if (snapshot) {
-    latest = { day: today, snapshot };
+    latest = { day: today, snapshot, readAt: Date.now() };
     await writeCached(snapshot, today);
   }
   return snapshot;
@@ -141,15 +166,22 @@ export async function publishPublicAiTrafficSnapshot(
 async function todaysSnapshot(
   today: string
 ): Promise<PublicAiTrafficSnapshot | null> {
-  if (latest?.day === today) {
-    return latest.snapshot;
+  const remembered = latest?.day === today ? latest : null;
+  if (
+    remembered &&
+    (Date.now() - remembered.readAt < PUBLIC_DATA_MEMORY_TTL_MS ||
+      !getAnalyticsRedis())
+  ) {
+    return remembered.snapshot;
   }
   const cached = await readCached(today);
   if (cached) {
-    latest = { day: today, snapshot: cached };
+    latest = { day: today, snapshot: cached, readAt: Date.now() };
     return cached;
   }
-  return publishPublicAiTrafficSnapshot(today);
+  // A Redis miss or failure keeps today's remembered snapshot rather than
+  // rebuilding it on a public request.
+  return remembered?.snapshot ?? publishPublicAiTrafficSnapshot(today);
 }
 
 /**

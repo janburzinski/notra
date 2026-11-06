@@ -231,6 +231,7 @@ export const AGENT_FILE_COLUMNS: TableColumn<AgentFile>[] = [
     width: "7rem",
     collapsePriority: 1,
     sortable: true,
+    sortValue: (row) => row.markdownShare ?? -1,
     cell: (row) => <MutedText>{formatShare(row.markdownShare)}</MutedText>,
   },
 ];

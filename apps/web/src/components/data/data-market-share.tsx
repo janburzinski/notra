@@ -243,7 +243,7 @@ export function DataMarketShare({
         tone="crawler"
       />
       <ShareBar
-        label="Referrals"
+        label="Referrals · 28 days"
         unit="of referrals"
         onSelect={onSelectCompany}
         segments={page.shares.referrals}

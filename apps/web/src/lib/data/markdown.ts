@@ -91,14 +91,14 @@ function buildDataMarkdownFromSnapshot(
         ])
       ),
     ]),
-    markdownSection(`Top AI referrers, ${recent}`, [
+    markdownSection("Top AI referrers, last 28 days", [
       markdownTable(
         [
           { header: "#", align: "right" },
           { header: "Assistant" },
           { header: "Company" },
           { header: "Share of referrals", align: "right" },
-          { header: "vs. prior week", align: "right" },
+          { header: "vs. prior 4 weeks", align: "right" },
           { header: "Sites reached", align: "right" },
         ],
         snapshot.referrers.map((row, index) => [
@@ -129,7 +129,7 @@ function buildDataMarkdownFromSnapshot(
       "- Visits come from sites that measure AI traffic with Notra: requests from known AI crawlers, and page views referred by AI assistants.",
       `- Aggregated and anonymized. Only shares, reach and per-site medians are published. A bot, assistant or company appears only after reaching at least ${snapshot.minSites} different sites; a chart day only when that many sites had AI traffic.`,
       "- Sample projects and demo accounts are excluded. Days are UTC; snapshots cover full days and end with yesterday.",
-      "- “vs. prior week” compares the last 7 days with the 7 before, over sites measured in both weeks.",
+      "- “vs. prior week” compares the last 7 days with the 7 before, over sites measured in both weeks. Assistants rank over the last 28 days against the 28 before, since referrals are sparse.",
       "- Published once a day. Cite as “Notra AI Traffic Data, usenotra.com/data” with the snapshot date.",
     ]),
   ];

@@ -17,9 +17,9 @@ export const publicAiTrafficSourceSchema = z.object({
   vendor: z.string().nullable(),
   /** Crawl purpose (`training-crawler`, `search-index`, `assistant-browse`); empty for referrers. */
   purpose: z.string(),
-  /** Share of this kind's visits in the last 7 days. */
+  /** Share of this kind's visits in the last 7 days (crawlers) or 28 days (assistants). */
   share: shareSchema,
-  /** Share in the 7 days before, null when the source had no visits then. */
+  /** Share in the period before, null when the source had no visits then. */
   previousShare: shareSchema.nullable(),
   /** Visit change against the 7 days before, over sites measured in both weeks. Null when new. */
   change: z.number().nullable(),
@@ -58,7 +58,7 @@ export const publicAiTrafficCountrySchema = z.object({
   /** ISO 3166-1 alpha-2. */
   country: z.string().length(2),
   share: shareSchema,
-  /** Visit change against the 28 days before; null when new. */
+  /** Change of its share against the 28 days before (0.2 = a fifth more); null when new. */
   change: z.number().nullable(),
 });
 
@@ -113,10 +113,11 @@ export const publicAiTrafficSnapshotSchema = z.object({
   /** Daily AI crawler visits per site, by company. */
   vendorVolume: publicAiTrafficChartSchema,
   countries: z.array(publicAiTrafficCountrySchema).optional(),
+  /** Each kind's grid is null when too few sites had that kind of traffic. */
   hours: z
     .object({
-      crawlers: publicAiTrafficHoursSchema,
-      referrals: publicAiTrafficHoursSchema,
+      crawlers: publicAiTrafficHoursSchema.nullable(),
+      referrals: publicAiTrafficHoursSchema.nullable(),
     })
     .optional(),
 });

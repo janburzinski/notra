@@ -23,8 +23,10 @@ import {
   PUBLIC_DATA_RATIO_WEEKS,
   PUBLIC_DATA_RECENT_DAYS,
   PUBLIC_DATA_REFERRER_VENDORS,
+  PUBLIC_DATA_REFERRER_WEEKS,
   PUBLIC_DATA_SHARE_DECIMALS,
   PUBLIC_DATA_SITE_CAP_FACTOR,
+  PUBLIC_DATA_TOP_COUNTRIES,
   PUBLIC_DATA_TOP_CRAWLERS,
   PUBLIC_DATA_TOP_REFERRERS,
   PUBLIC_DATA_TOTAL_KEY,
@@ -33,6 +35,7 @@ import {
 } from "@/constants/public-data";
 import type {
   PublicAiTrafficDailyRow,
+  PublicAiTrafficDetailRow,
   PublicAiTrafficInput,
   PublicAiTrafficKind,
   PublicAiTrafficProjectRow,
@@ -137,9 +140,24 @@ function cappedVisits(rows: PublicAiTrafficProjectRow[]): number[] {
   return capped;
 }
 
-/** Per source: visits and sites in the recent week, the week before, and the ratio window. */
+/** Which period a row's week falls in: the last `weeks` weeks, the same span before, or neither. */
+function periodOf(
+  weeksAgo: number,
+  weeks: number
+): "recent" | "previous" | null {
+  if (weeksAgo < weeks) {
+    return "recent";
+  }
+  return weeksAgo < weeks * 2 ? "previous" : null;
+}
+
+/**
+ * Per source: visits and sites in the recent period (the last `weeks` weeks),
+ * the same span before it, and the ratio window.
+ */
 function sourceTotals(
-  rows: PublicAiTrafficProjectRow[]
+  rows: PublicAiTrafficProjectRow[],
+  weeks = 1
 ): Map<string, PublicAiTrafficSourceTotals> {
   const capped = cappedVisits(rows);
   const activeRecent = new Set<string>();
@@ -148,9 +166,10 @@ function sourceTotals(
     if (row.visits <= 0) {
       continue;
     }
-    if (row.weeks_ago === 0) {
+    const period = periodOf(row.weeks_ago, weeks);
+    if (period === "recent") {
       activeRecent.add(row.project_id);
-    } else if (row.weeks_ago === 1) {
+    } else if (period === "previous") {
       activePrevious.add(row.project_id);
     }
   }
@@ -183,7 +202,8 @@ function sourceTotals(
     // installing the tracker doesn't read as a crawler surge.
     const matched =
       activeRecent.has(row.project_id) && activePrevious.has(row.project_id);
-    if (row.weeks_ago === 0) {
+    const period = periodOf(row.weeks_ago, weeks);
+    if (period === "recent") {
       entry.recent += visits;
       entry.recentSites.set(
         row.project_id,
@@ -193,7 +213,7 @@ function sourceTotals(
         entry.matchedRecent += visits;
         entry.matchedRecentSites.add(row.project_id);
       }
-    } else if (row.weeks_ago === 1) {
+    } else if (period === "previous") {
       entry.previous += visits;
       entry.previousSites.add(row.project_id);
       if (matched) {
@@ -269,6 +289,8 @@ function leaderboard({
   categories,
   markdown,
   markdownSites,
+  llmsTxt,
+  days = PUBLIC_DATA_RECENT_DAYS,
 }: {
   totals: PublicAiTrafficSourceTotals[];
   kind: PublicAiTrafficKind;
@@ -277,6 +299,9 @@ function leaderboard({
   categories: Map<string, string>;
   markdown: Map<string, { visits: number; markdown: number }>;
   markdownSites: Map<string, Set<string>>;
+  llmsTxt: Map<string, number | null>;
+  /** Days in the recent period, for per-day figures. */
+  days?: number;
 }): PublicAiTrafficSource[] {
   const recentTotal = kindTotal(totals, kind, (entry) => entry.recent);
   const previousTotal = kindTotal(totals, kind, (entry) => entry.previous);
@@ -310,7 +335,7 @@ function leaderboard({
             : null,
         reach: ratio(entry.recentSites.size, activeSites) ?? 0,
         medianDailyVisits: round(
-          median([...entry.recentSites.values()]) / PUBLIC_DATA_RECENT_DAYS,
+          median([...entry.recentSites.values()]) / days,
           1
         ),
         // Markdown requests from fewer than five sites stay unpublished.
@@ -321,10 +346,9 @@ function leaderboard({
             (markdownSites.get(entry.id)?.size ?? 0) >= PUBLIC_DATA_MIN_SITES)
             ? ratio(md.markdown, md.visits)
             : null,
-        dailyPerSite: round(
-          entry.recent / activeSites / PUBLIC_DATA_RECENT_DAYS,
-          2
-        ),
+        dailyPerSite: round(entry.recent / activeSites / days, 2),
+        llmsTxtReach:
+          kind === "crawler" ? (llmsTxt.get(entry.source) ?? null) : null,
       };
     });
 }
@@ -551,6 +575,86 @@ function dailyVolume({
   };
 }
 
+const WEEKDAYS = 7;
+const HOURS = 24;
+
+/** A kind's weekday-by-hour shares (Mon first, UTC), or null below the site floor. */
+function detailHours(
+  rows: PublicAiTrafficDetailRow[],
+  kind: PublicAiTrafficKind
+): number[][] | null {
+  const own = rows.filter(
+    (row) => row.section === "hours" && row.visitor_type === kind
+  );
+  if ((own[0]?.sites ?? 0) < PUBLIC_DATA_MIN_SITES) {
+    return null;
+  }
+  const grid = Array.from({ length: WEEKDAYS }, () =>
+    Array.from({ length: HOURS }, () => 0)
+  );
+  for (const row of own) {
+    const [weekday, hour] = row.key.split(":").map(Number);
+    const cells = grid[(weekday ?? 0) - 1];
+    if (cells && hour !== undefined && hour >= 0 && hour < HOURS) {
+      cells[hour] = round(row.share);
+    }
+  }
+  return grid;
+}
+
+/** Hours for both kinds, left out when neither clears the floor. */
+function detailSection(rows: PublicAiTrafficDetailRow[]) {
+  const crawlers = detailHours(rows, "crawler");
+  const referrals = detailHours(rows, "ai_referral");
+  return crawlers || referrals ? { hours: { crawlers, referrals } } : {};
+}
+
+/** Countries AI-referred visitors come from, each fed by at least five sites. */
+function detailCountries(rows: PublicAiTrafficDetailRow[]) {
+  return rows
+    .filter(
+      (row) =>
+        row.section === "countries" &&
+        /^[A-Z]{2}$/.test(row.key) &&
+        row.sites >= PUBLIC_DATA_MIN_SITES
+    )
+    .toSorted((a, b) => b.share - a.share)
+    .slice(0, PUBLIC_DATA_TOP_COUNTRIES)
+    .map((row) => ({
+      country: row.key,
+      share: round(row.share),
+      change:
+        row.previous_sites >= PUBLIC_DATA_MIN_SITES && row.previous_share > 0
+          ? round(row.share / row.previous_share - 1)
+          : null,
+    }));
+}
+
+/** True when a group of sites is empty or large enough to publish. */
+function clearsFloor(sites: number): boolean {
+  return sites === 0 || sites >= PUBLIC_DATA_MIN_SITES;
+}
+
+/**
+ * Per crawler, the share of its sites where it fetched /llms.txt; null when
+ * one to four sites did, or one to four didn't, which would point at them.
+ */
+function detailLlmsTxt(
+  rows: PublicAiTrafficDetailRow[]
+): Map<string, number | null> {
+  return new Map(
+    rows
+      .filter((row) => row.section === "llms_txt")
+      .map((row) => [
+        row.key,
+        clearsFloor(row.subset_sites) &&
+        clearsFloor(row.sites - row.subset_sites)
+          ? ratio(row.subset_sites, row.sites)
+          : null,
+      ])
+  );
+}
+
 function chartSeries<T>(
   rows: T[],
   limit: number,
@@ -592,8 +696,23 @@ export function buildPublicAiTrafficSnapshot(
   const projects = input.projects.filter(
     (row) => !HIDDEN_SOURCES.has(row.source)
   );
+  const detail = (input.detail ?? []).filter(
+    (row) => !HIDDEN_SOURCES.has(row.key)
+  );
   const window = publicAiTrafficWindow(today);
   const totals = [...sourceTotals(projects).values()];
+  // Assistants rank over four weeks; one week is too sparse for the floor.
+  const referralTotals = [
+    ...sourceTotals(projects, PUBLIC_DATA_REFERRER_WEEKS).values(),
+  ];
+  const referralSites = new Set(
+    projects
+      .filter(
+        (row) => row.weeks_ago < PUBLIC_DATA_REFERRER_WEEKS && row.visits > 0
+      )
+      .map((row) => row.project_id)
+  ).size;
+  const llmsTxt = detailLlmsTxt(detail);
   const activeSites = new Set(
     projects
       .filter((row) => row.weeks_ago === 0 && row.visits > 0)
@@ -669,15 +788,18 @@ export function buildPublicAiTrafficSnapshot(
     categories,
     markdown,
     markdownSites,
+    llmsTxt,
   });
   const referrers = leaderboard({
-    totals,
+    totals: referralTotals,
     kind: "ai_referral",
     limit: PUBLIC_DATA_TOP_REFERRERS,
-    activeSites,
+    activeSites: referralSites,
     categories,
     markdown,
     markdownSites,
+    llmsTxt,
+    days: PUBLIC_DATA_REFERRER_WEEKS * PUBLIC_DATA_RECENT_DAYS,
   });
   const purposes = purposeShares(totals, categories);
 
@@ -741,6 +863,8 @@ export function buildPublicAiTrafficSnapshot(
     referrers,
     purposes,
     vendors: vendorRatios(totals),
+    countries: detailCountries(detail),
+    ...detailSection(detail),
     crawlerVolume: dailyVolume({
       daily,
       days,
