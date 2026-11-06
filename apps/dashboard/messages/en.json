@@ -53,11 +53,8 @@
           "label": "Dev",
           "description": "Replay onboarding and manage test data"
         },
-        "geo-languages": {
-          "description": "Languages prompts are scanned in"
-        },
         "geo-models": {
-          "description": "Engines, schedule and scanning"
+          "description": "Assistants and schedule"
         }
       }
     },
@@ -77,8 +74,7 @@
         "webhooks": "Connect your workflows and check every delivery",
         "logs": "View integration events and their delivery status",
         "dev": "Development-only tools for testing local flows",
-        "geo-languages": "Languages your prompts are scanned in",
-        "geo-models": "Which providers run, and how often"
+        "geo-models": "Which assistants your prompts run on"
       }
     },
     "panes": {
@@ -2945,7 +2941,6 @@
       "noZdrHost": "No ZDR host",
       "toggleModel": "Toggle {model}",
       "choosePlan": "Choose a plan before adding zero data retention.",
-      "description": "Every prompt runs on each enabled model. Turn off the ones you don't need to keep scans small.",
       "enforceZdr": "Enforce ZDR",
       "zdrEnabledHint": "Only run models on zero-data-retention hosts. Models without one are marked in the list.",
       "zdrAddonHint": "Zero data retention is an add-on for any plan and adds 20% to the plan price. Models without a zero-data-retention host are marked in the list.",
@@ -2966,7 +2961,17 @@
       "legacyModelDescription": "You can keep using this model. Once you remove it and save, you cannot add it back to this project.",
       "turnOff": "Turn off",
       "toggleProvider": "Turn {provider} on or off",
-      "providerOff": "Off"
+      "providerOff": "Off",
+      "title": "AI assistants",
+      "advancedDescription": "Choose the exact models each assistant runs. Every prompt runs on each selected model.",
+      "recommended": "Recommended",
+      "modelsFor": "{provider} models",
+      "noWebSearch": "No web search",
+      "settingsTitle": "Scan settings",
+      "description": "{count, plural, =0 {Turn on the assistants you want to track.} one {# assistant on. We pick the best model for each one.} other {# assistants on. We pick the best model for each one.}}",
+      "advanced": "Advanced",
+      "options": "Options",
+      "selectedModels": "{model} +{count}"
     },
     "geoIngestSetup": {
       "tokenTitle": "Set your token",
@@ -3082,16 +3087,8 @@
         "336": "2 weeks",
         "720": "30 days"
       },
-      "setFrequency": "Set frequency",
       "frequency": "Scan frequency",
-      "default": "default",
-      "customOption": "Custom…",
-      "daysBetween": "Days between scans",
-      "every": "every",
-      "dayUnit": "day",
-      "dayPluralSuffix": "s",
-      "daysSr": "{count, plural, one {day} other {days}}",
-      "offHint": "manual only"
+      "default": "default"
     },
     "geoSettingsForm": {
       "description": "How your brand is identified and where prompts are scanned.",
@@ -3112,6 +3109,9 @@
       },
       "languages": {
         "description": "Languages your prompts are scanned in. Prompts are written in {language}, other languages are translated."
+      },
+      "website": {
+        "title": "Website"
       }
     },
     "geoSetupEmpty": {

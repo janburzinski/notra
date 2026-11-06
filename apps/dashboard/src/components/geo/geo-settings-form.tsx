@@ -21,12 +21,12 @@ import { Input } from "@notra/ui/components/ui/input";
 import { Label } from "@notra/ui/components/ui/label";
 import { TitleCard } from "@notra/ui/components/ui/title-card";
 import { useAsyncDebouncer } from "@tanstack/react-pacer";
-import { type ReactNode, useEffect, useId, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { useTranslations } from "use-intl";
 
 import { GeoEnginePicker } from "@/components/geo/geo-engine-picker";
 import { GeoLanguagePicker } from "@/components/geo/geo-language-picker";
-import { GeoScanFrequencySelect } from "@/components/geo/geo-scan-schedule";
+import { GeoScanFrequencyMenu } from "@/components/geo/geo-scan-schedule";
 import { GeoTagList } from "@/components/geo/geo-tag-list";
 import { GeoProjectBrandSection } from "@/components/geo/project-brand-section";
 import { useGeoSettingsUpsert } from "@/lib/hooks/use-geo";
@@ -40,6 +40,7 @@ import type {
   GeoSettingsAutosaveInput,
   GeoSettingsFormProps,
 } from "@/types/geo";
+import { inferGeoAudience } from "@/utils/geo-engine-recommendation";
 
 export function GeoSettingsForm({
   organizationId,
@@ -104,7 +105,6 @@ export function GeoSettingsForm({
   });
 
   const showBrand = section === undefined || section === "brand";
-  const showLanguages = section === undefined || section === "languages";
   const showModels = section === undefined || section === "models";
 
   return (
@@ -143,7 +143,7 @@ export function GeoSettingsForm({
             savedAt={savedAt}
           />
         ) : null}
-        {showLanguages ? (
+        {showBrand ? (
           <GeoLanguagesSection
             languages={languages}
             onLanguagesChange={setLanguages}
@@ -157,7 +157,6 @@ export function GeoSettingsForm({
             enabled={enabled}
             engines={engines}
             enforceZdr={enforceZdr}
-            id={id}
             nonZdrApproved={nonZdrApproved}
             onEnabledChange={setEnabled}
             onEnginesChange={setEngines}
@@ -320,27 +319,6 @@ function toGeoSettingsPayload({
   };
 }
 
-function SettingsSection({
-  title,
-  description,
-  children,
-}: {
-  title: string;
-  description: ReactNode;
-  children: ReactNode;
-}) {
-  return (
-    <TitleCard as="section" heading={title} headingAs="h2">
-      <div className="space-y-4">
-        <p className="text-muted-foreground text-sm text-pretty">
-          {description}
-        </p>
-        {children}
-      </div>
-    </TitleCard>
-  );
-}
-
 function GeoBrandSection({
   aliases,
   brandDomain,
@@ -387,51 +365,96 @@ function GeoBrandSection({
           />
         </div>
       </TitleCard>
-      <SettingsSection
-        description={t("domains.description")}
-        title={t("domains.title")}
-      >
-        {brandDomain ? (
-          <div className="flex flex-wrap items-center gap-2">
-            <Badge
-              aria-label={t("domains.brandWebsiteLabel", {
-                domain: brandDomain,
-              })}
-              className="h-7 max-w-full text-xs"
-              variant="secondary"
-            >
-              <span className="truncate">{brandDomain}</span>
-            </Badge>
-            <p className="text-muted-foreground text-xs">
-              {t("domains.brandWebsiteHint")}
-            </p>
+      <TitleCard as="section" heading={t("website.title")} headingAs="h2">
+        <div className="space-y-5">
+          <div className="space-y-2">
+            <div className="space-y-0.5">
+              <p className="text-sm font-medium">{t("domains.title")}</p>
+              <p className="text-muted-foreground text-xs text-pretty">
+                {t("domains.description")}
+              </p>
+            </div>
+            {brandDomain ? (
+              <div className="flex flex-wrap items-center gap-2">
+                <Badge
+                  aria-label={t("domains.brandWebsiteLabel", {
+                    domain: brandDomain,
+                  })}
+                  className="h-7 max-w-full text-xs"
+                  variant="secondary"
+                >
+                  <span className="truncate">{brandDomain}</span>
+                </Badge>
+                <p className="text-muted-foreground text-xs">
+                  {t("domains.brandWebsiteHint")}
+                </p>
+              </div>
+            ) : null}
+            <GeoTagList
+              id={`${id}-domains`}
+              label={t("domains.title")}
+              labeled={false}
+              max={GEO_MAX_DOMAINS}
+              onChange={onDomainsChange}
+              placeholder={GEO_PROJECT_DOMAINS_PLACEHOLDER}
+              values={domains}
+            />
           </div>
-        ) : null}
-        <GeoTagList
-          id={`${id}-domains`}
-          label={t("domains.title")}
-          labeled={false}
-          max={GEO_MAX_DOMAINS}
-          onChange={onDomainsChange}
-          placeholder={GEO_PROJECT_DOMAINS_PLACEHOLDER}
-          values={domains}
-        />
-      </SettingsSection>
-      <SettingsSection
-        description={t("conversionPaths.description")}
-        title={t("conversionPaths.title")}
-      >
-        <GeoTagList
-          id={`${id}-conversion-paths`}
-          label={t("conversionPaths.title")}
-          labeled={false}
-          max={GEO_MAX_CONVERSION_PATHS}
-          onChange={onConversionPathsChange}
-          placeholder={GEO_CONVERSION_PATHS_PLACEHOLDER}
-          values={conversionPaths}
-        />
-      </SettingsSection>
+          <GeoTagList
+            description={t("conversionPaths.description")}
+            id={`${id}-conversion-paths`}
+            label={t("conversionPaths.title")}
+            max={GEO_MAX_CONVERSION_PATHS}
+            onChange={onConversionPathsChange}
+            placeholder={GEO_CONVERSION_PATHS_PLACEHOLDER}
+            values={conversionPaths}
+          />
+        </div>
+      </TitleCard>
     </>
+  );
+}
+
+function GeoModelsSection({
+  canEnforceZdr,
+  catalog,
+  enabled,
+  engines,
+  enforceZdr,
+  nonZdrApproved,
+  onEnabledChange,
+  onEnginesChange,
+  onEnforceZdrChange,
+  onNonZdrApprovedChange,
+  onScanIntervalHoursChange,
+  planLoading,
+  scanIntervalHours,
+}: GeoModelsSectionProps) {
+  // Onboarding seeds the engines from the audience it detects on the brand's
+  // website, so the tracked engines tell us who the buyers are.
+  const [audience] = useState(() => inferGeoAudience(catalog, engines));
+
+  return (
+    <GeoEnginePicker
+      audience={audience}
+      canEnforceZdr={canEnforceZdr}
+      catalog={catalog}
+      enforceZdr={enforceZdr}
+      nonZdrApproved={nonZdrApproved}
+      onChange={onEnginesChange}
+      onEnforceZdrChange={onEnforceZdrChange}
+      onNonZdrApprovedChange={onNonZdrApprovedChange}
+      planLoading={planLoading}
+      menu={
+        <GeoScanFrequencyMenu
+          enabled={enabled}
+          intervalHours={scanIntervalHours}
+          onEnabledChange={onEnabledChange}
+          onIntervalChange={onScanIntervalHoursChange}
+        />
+      }
+      selected={engines}
+    />
   );
 }
 
@@ -444,66 +467,24 @@ function GeoLanguagesSection({
   const tCommon = useTranslations("common");
   const languageLabel = useLanguageLabel();
   return (
-    <SettingsSection
-      description={t("languages.description", {
-        language: languageLabel(promptLanguage ?? DEFAULT_LANGUAGE),
-      })}
-      title={tCommon("labels.languages")}
-    >
-      <GeoLanguagePicker
-        labeled={false}
-        lockedLanguage={promptLanguage}
-        onChange={onLanguagesChange}
-        selected={languages}
-      />
-    </SettingsSection>
-  );
-}
-
-function GeoModelsSection({
-  canEnforceZdr,
-  catalog,
-  enabled,
-  engines,
-  enforceZdr,
-  id,
-  nonZdrApproved,
-  onEnabledChange,
-  onEnginesChange,
-  onEnforceZdrChange,
-  onNonZdrApprovedChange,
-  onScanIntervalHoursChange,
-  planLoading,
-  scanIntervalHours,
-}: GeoModelsSectionProps) {
-  const tCommon = useTranslations("common");
-  return (
     <TitleCard
-      action={
-        <GeoScanFrequencySelect
-          enabled={enabled}
-          id={id}
-          intervalHours={scanIntervalHours}
-          onEnabledChange={onEnabledChange}
-          onIntervalChange={onScanIntervalHoursChange}
-        />
-      }
       as="section"
-      heading={tCommon("labels.models")}
+      heading={tCommon("labels.languages")}
       headingAs="h2"
     >
-      <GeoEnginePicker
-        canEnforceZdr={canEnforceZdr}
-        catalog={catalog}
-        enforceZdr={enforceZdr}
-        labeled={false}
-        nonZdrApproved={nonZdrApproved}
-        onChange={onEnginesChange}
-        onEnforceZdrChange={onEnforceZdrChange}
-        onNonZdrApprovedChange={onNonZdrApprovedChange}
-        planLoading={planLoading}
-        selected={engines}
-      />
+      <div className="space-y-3">
+        <p className="text-muted-foreground text-xs text-pretty">
+          {t("languages.description", {
+            language: languageLabel(promptLanguage ?? DEFAULT_LANGUAGE),
+          })}
+        </p>
+        <GeoLanguagePicker
+          labeled={false}
+          lockedLanguage={promptLanguage}
+          onChange={onLanguagesChange}
+          selected={languages}
+        />
+      </div>
     </TitleCard>
   );
 }

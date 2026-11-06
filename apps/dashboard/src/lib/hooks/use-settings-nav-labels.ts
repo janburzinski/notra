@@ -97,9 +97,9 @@ export function useSettingsNavLabels(): SettingsNavLabels {
         modalDescription: brandModalDescription,
       },
       "geo-languages": {
-        label: tLabels("languages"),
-        description: t("nav.sections.geo-languages.description"),
-        modalDescription: t("modal.descriptions.geo-languages"),
+        label: tLabels("brand"),
+        description: brandDescription,
+        modalDescription: brandModalDescription,
       },
       "geo-models": {
         label: tLabels("models"),

@@ -13,6 +13,10 @@ export function resolveSettingsSection(
   if (section === "geo") {
     return DEFAULT_GEO_SETTINGS_SECTION;
   }
+  // Languages moved into the brand pane; keep old links working.
+  if (section === "geo-languages") {
+    return "geo-brand";
+  }
   return section;
 }
 

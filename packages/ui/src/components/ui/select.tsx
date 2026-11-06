@@ -143,7 +143,7 @@ function SelectLabel({
   return (
     <SelectPrimitive.GroupLabel
       className={cn(
-        "px-2.5 py-1.5 font-medium text-muted-foreground text-xs",
+        "px-2 py-1 font-medium text-muted-foreground text-xs",
         className
       )}
       data-slot="select-label"
@@ -161,7 +161,7 @@ function SelectItem({
     <SelectPrimitive.Item
       className={cn(
         DROPDOWN_ITEM_CLASS_NAME,
-        "w-full pr-8 *:[span]:last:flex *:[span]:last:items-center *:[span]:last:gap-2",
+        "w-full pr-7 *:[span]:last:flex *:[span]:last:items-center *:[span]:last:gap-2",
         className
       )}
       data-slot="select-item"
@@ -172,7 +172,7 @@ function SelectItem({
       </SelectPrimitive.ItemText>
       <SelectPrimitive.ItemIndicator
         render={
-          <span className="pointer-events-none absolute right-2.5 flex size-4 items-center justify-center" />
+          <span className="pointer-events-none absolute right-2 flex size-3.5 items-center justify-center" />
         }
       >
         <HugeiconsIcon
@@ -191,7 +191,7 @@ function SelectSeparator({
 }: SelectPrimitive.Separator.Props) {
   return (
     <SelectPrimitive.Separator
-      className={cn("pointer-events-none mx-2 my-1 h-px bg-border", className)}
+      className={cn("pointer-events-none -mx-1 my-1 h-px bg-border", className)}
       data-slot="select-separator"
       {...props}
     />

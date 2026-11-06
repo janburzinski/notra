@@ -76,7 +76,7 @@ const STANDARD_SETTINGS_PANES = {
 const GEO_SETTINGS_PANE_SECTIONS = {
   geo: "brand",
   "geo-brand": "brand",
-  "geo-languages": "languages",
+  "geo-languages": "brand",
   "geo-models": "models",
 } as const;
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowDown01Icon } from "@hugeicons/core-free-icons";
+import { MoreHorizontalIcon, UnfoldMoreIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import type { GeoModelCatalogEntry } from "@notra/geo-core/types/geo";
 import {
@@ -8,19 +8,25 @@ import {
   isGeoWebSearchEngine,
   sortKnownEngines,
 } from "@notra/geo-core/utils/geo-engines";
-import { geoModelsForProvider } from "@notra/geo-core/utils/geo-model-catalog";
 import { isGeoOlostepEngine } from "@notra/geo-core/utils/geo-olostep";
 import { ConfirmDialog } from "@notra/ui/components/shared/confirm-dialog";
 import { Badge } from "@notra/ui/components/ui/badge";
+import { Button } from "@notra/ui/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@notra/ui/components/ui/dropdown-menu";
 import { Label } from "@notra/ui/components/ui/label";
 import { Switch } from "@notra/ui/components/ui/switch";
+import { TitleCard } from "@notra/ui/components/ui/title-card";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@notra/ui/components/ui/tooltip";
-import { TRANSITION } from "@notra/ui/lib/motion";
-import { motion, useReducedMotion } from "motion/react";
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { toast } from "sonner";
 import { useTranslations } from "use-intl";
@@ -28,18 +34,17 @@ import { useTranslations } from "use-intl";
 import { ZdrConsentDialog } from "@/components/billing/zdr-consent-dialog";
 import Link from "@/components/framework/link";
 import { EngineIcon } from "@/components/geo/engine-icon";
-import { NoWebSearchBadge } from "@/components/geo/no-web-search-badge";
-import { Checkbox } from "@/components/motion/checkbox";
 import { useOrganizationsContext } from "@/components/providers/organization-provider";
 import {
   ZDR_ADDON_ANCHOR,
   ZDR_CHECKOUT_SUCCESS_PARAM,
 } from "@/constants/billing";
 import { useBillingCustomer } from "@/lib/hooks/use-billing-customer";
+import { useGeoModelsAdvanced } from "@/lib/hooks/use-geo-models-advanced";
 import { cn } from "@/lib/utils";
 import type {
+  GeoEngineModelMenuProps,
   GeoEnginePickerProps,
-  GeoEngineProviderListProps,
   GeoEngineProviderRowProps,
   GeoPendingModelRemoval,
 } from "@/types/geo";
@@ -48,86 +53,18 @@ import {
   zdrAddonPlanId,
 } from "@/utils/billing-plans";
 import { getDatabuddyPaymentMetadata } from "@/utils/databuddy";
+import {
+  geoPickerProviders,
+  isGeoCodingAgentProvider,
+  pickGeoProviderEngines,
+  recommendedGeoProviders,
+} from "@/utils/geo-engine-recommendation";
 import { removedLegacyGeoModels } from "@/utils/geo-legacy-models";
 
-const ROW_CLASS = "flex items-center justify-between gap-3 px-3 py-2";
-const BATCH_LABEL = /\(batch\)$/i;
-const CONSUMER_APP_GATEWAYS: ReadonlySet<string> = new Set([
-  "olostep",
-  "context",
-]);
-const PROVIDER_PREFERRED_ENGINES: ReadonlySet<string> = new Set([
-  "anthropic/claude-haiku-5.5",
-]);
-const PROVIDER_COMPANION_ENGINES: ReadonlySet<string> = new Set([
-  "google/ai-overview",
-]);
-
-function GeoModelRow({
-  approved,
-  checked,
-  disabled,
-  id,
-  model,
-  onCheckedChange,
-  showZdrState,
-  webSearch,
-}: {
-  approved: boolean;
-  checked: boolean;
-  disabled: boolean;
-  id: string;
-  model: GeoModelCatalogEntry;
-  onCheckedChange: (checked: boolean) => void;
-  showZdrState: boolean;
-  webSearch: boolean;
-}) {
-  const t = useTranslations("geo.geoEnginePicker");
-  const reduceMotion = useReducedMotion();
-
-  return (
-    <motion.li
-      className="flex items-center justify-between gap-3 py-1.5 ps-14 pe-3"
-      initial={false}
-      layout={reduceMotion ? false : "position"}
-      layoutId={reduceMotion ? undefined : `geo-model-${id}`}
-      transition={reduceMotion ? { duration: 0 } : { layout: TRANSITION.enter }}
-    >
-      <Label
-        className="flex min-w-0 flex-1 flex-wrap items-center gap-2 font-normal"
-        htmlFor={id}
-      >
-        <span className="min-w-0 text-xs">{model.label}</span>
-        {webSearch ? null : <NoWebSearchBadge />}
-        {model.hidden ? (
-          <Tooltip>
-            <TooltipTrigger render={<span className="inline-flex" />}>
-              <Badge className="shrink-0" size="sm" variant="outline">
-                {t("legacyModel")}
-              </Badge>
-            </TooltipTrigger>
-            <TooltipContent>{t("legacyModelDescription")}</TooltipContent>
-          </Tooltip>
-        ) : null}
-        {showZdrState && model.zdr === "none" ? (
-          <span className="text-muted-foreground shrink-0 text-xs">
-            {approved ? t("approvedWithoutZdr") : t("noZdrHost")}
-          </span>
-        ) : null}
-      </Label>
-      <Checkbox
-        aria-label={t("toggleModel", { model: model.label })}
-        checked={checked}
-        disabled={disabled}
-        id={id}
-        onCheckedChange={onCheckedChange}
-      />
-    </motion.li>
-  );
-}
-
 export function GeoEnginePicker({
+  audience,
   catalog,
+  menu,
   selected,
   onChange,
   enforceZdr,
@@ -137,7 +74,6 @@ export function GeoEnginePicker({
   canEnforceZdr,
   planLoading = false,
   disabled = false,
-  labeled = true,
 }: GeoEnginePickerProps) {
   const t = useTranslations("geo.geoEnginePicker");
   const tCommon2 = useTranslations("common");
@@ -146,9 +82,9 @@ export function GeoEnginePicker({
   const { attach, data: customer, refetch } = useBillingCustomer();
   const [addonLoading, setAddonLoading] = useState(false);
   const [consentOpen, setConsentOpen] = useState(false);
+  const { advanced, setAdvanced } = useGeoModelsAdvanced();
   const checkoutReturnHandled = useRef(false);
   const approvedNonZdrIds = new Set(nonZdrApproved);
-  const [expanded, setExpanded] = useState<Set<string>>(() => new Set());
   const [pendingApproval, setPendingApproval] =
     useState<GeoModelCatalogEntry | null>(null);
   const [pendingDisable, setPendingDisable] =
@@ -157,6 +93,7 @@ export function GeoEnginePicker({
   const lastSelected = selected.length <= 1;
   const zdrActive = enforceZdr && canEnforceZdr;
   const selectedIds = new Set(selected);
+  const recommended = recommendedGeoProviders(catalog, audience);
   const pendingModelLabels = removedLegacyGeoModels(
     catalog.models,
     selected,
@@ -164,6 +101,16 @@ export function GeoEnginePicker({
   )
     .map((model) => model.label)
     .join(", ");
+
+  const providers = geoPickerProviders(catalog, selectedIds);
+  const isPrimary = ({ provider, models }: (typeof providers)[number]) =>
+    provider.featured ||
+    recommended.has(provider.id) ||
+    (audience === "technical" && isGeoCodingAgentProvider(provider.id)) ||
+    models.some((model) => selectedIds.has(model.id));
+  const primary = providers.filter(isPrimary);
+  const more = providers.filter((entry) => !isPrimary(entry));
+  const visible = advanced ? [...primary, ...more] : primary;
 
   const select = (ids: readonly string[]) => {
     const eligible = ids.filter((id) =>
@@ -188,18 +135,6 @@ export function GeoEnginePicker({
     deselect(ids);
   };
 
-  const toggleExpanded = (providerId: string) => {
-    setExpanded((prev) => {
-      const next = new Set(prev);
-      if (next.has(providerId)) {
-        next.delete(providerId);
-      } else {
-        next.add(providerId);
-      }
-      return next;
-    });
-  };
-
   const toggleProvider = (
     models: readonly GeoModelCatalogEntry[],
     checked: boolean
@@ -210,31 +145,20 @@ export function GeoEnginePicker({
       );
       return;
     }
-    const candidates = models.filter(
-      (model) => !model.hidden && !BATCH_LABEL.test(model.label)
-    );
     const eligible = zdrActive
-      ? candidates.filter(
+      ? models.filter(
           (model) => model.zdr !== "none" || approvedNonZdrIds.has(model.id)
         )
-      : candidates;
-    const pick =
-      eligible.find((model) => PROVIDER_PREFERRED_ENGINES.has(model.id)) ??
-      eligible.find((model) =>
-        model.gateways.some((gateway) => CONSUMER_APP_GATEWAYS.has(gateway))
-      ) ??
-      eligible.find((model) => model.default) ??
-      eligible[0];
-    if (pick) {
-      const companions = eligible
-        .filter((model) => PROVIDER_COMPANION_ENGINES.has(model.id))
-        .map((model) => model.id);
-      select([pick.id, ...companions]);
+      : models;
+    const picks = pickGeoProviderEngines(eligible, audience);
+    if (picks.length > 0) {
+      select(picks);
       return;
     }
-    const first = candidates[0];
-    if (first) {
-      setPendingApproval(first);
+    const [first] = pickGeoProviderEngines(models, audience);
+    const firstModel = models.find((model) => model.id === first);
+    if (firstModel) {
+      setPendingApproval(firstModel);
     }
   };
 
@@ -412,87 +336,124 @@ export function GeoEnginePicker({
   const billingHref = activeOrganization
     ? `/${activeOrganization.slug}/settings/billing#${ZDR_ADDON_ANCHOR}`
     : null;
+  const providerProps = {
+    catalog,
+    disabled,
+    lastSelected,
+    onToggleModel: toggleModel,
+    onToggleProvider: toggleProvider,
+    selectedCount: selected.length,
+    selectedIds,
+    approvedNonZdrIds,
+    zdrActive,
+  };
 
   return (
-    <div className="space-y-3">
-      {labeled ? (
-        <div className="space-y-1">
-          <p className="text-sm font-medium">{tCommon2("labels.models")}</p>
-          <p className="text-muted-foreground text-xs">{t("description")}</p>
-        </div>
-      ) : null}
-
-      <div className="border-border/80 bg-background overflow-hidden rounded-lg border">
-        <GeoEngineProviderList
-          catalog={catalog}
-          disabled={disabled}
-          expanded={expanded}
-          id={id}
-          lastSelected={lastSelected}
-          nonZdrApproved={nonZdrApproved}
-          onToggleExpanded={toggleExpanded}
-          onToggleModel={toggleModel}
-          onToggleProvider={toggleProvider}
-          selected={selected}
-          zdrActive={zdrActive}
-        />
-
-        <div className="divide-y border-t">
-          <div className={`${ROW_CLASS} py-2.5`}>
-            <div className="space-y-0.5">
-              <div className="flex items-center gap-1.5">
-                <Label htmlFor={`${id}-zdr`}>{t("enforceZdr")}</Label>
-                {canEnforceZdr ? null : (
-                  <Badge size="sm" variant="outline">
-                    {tCommon2("labels.addOn")}
-                  </Badge>
-                )}
-              </div>
-              <p className="text-muted-foreground text-xs">
-                {canEnforceZdr ? (
-                  t("zdrEnabledHint")
-                ) : (
-                  <>
-                    {t("zdrAddonHint")}{" "}
-                    {billingHref ? (
-                      <Link
-                        className="text-foreground underline underline-offset-4"
-                        href={billingHref}
-                      >
-                        {t("addInBilling")}
-                      </Link>
-                    ) : null}
-                  </>
-                )}
-              </p>
-            </div>
-            {canEnforceZdr ? (
-              <Switch
-                checked={enforceZdr}
-                disabled={disabled || planLoading}
-                id={`${id}-zdr`}
-                onCheckedChange={handleZdrChange}
+    <>
+      <TitleCard
+        action={
+          <DropdownMenu>
+            <DropdownMenuTrigger
+              render={
+                <Button
+                  aria-label={t("options")}
+                  size="icon-sm"
+                  variant="ghost"
+                />
+              }
+            >
+              <HugeiconsIcon
+                aria-hidden="true"
+                icon={MoreHorizontalIcon}
+                size={16}
               />
-            ) : (
-              <Tooltip>
-                <TooltipTrigger render={<span className="inline-flex" />}>
-                  <Switch
-                    aria-label={t("addZdr")}
-                    checked={false}
-                    className="cursor-pointer disabled:cursor-not-allowed"
-                    disabled={disabled || planLoading || addonLoading}
-                    id={`${id}-zdr`}
-                    onCheckedChange={() => setConsentOpen(true)}
-                  />
-                </TooltipTrigger>
-                <TooltipContent side="top">
-                  {planLoading ? t("checkingPlan") : t("addZdrTooltip")}
-                </TooltipContent>
-              </Tooltip>
-            )}
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-auto min-w-52">
+              {menu}
+              {menu ? <DropdownMenuSeparator /> : null}
+              <DropdownMenuCheckboxItem
+                checked={advanced}
+                closeOnClick={false}
+                disabled={disabled}
+                indicator="switch"
+                onCheckedChange={setAdvanced}
+              >
+                {t("advanced")}
+              </DropdownMenuCheckboxItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        }
+        as="section"
+        contentClassName="px-2 py-2"
+        heading={t("title")}
+        headingAs="h2"
+      >
+        <ul className="flex flex-col gap-0.5">
+          {visible.map((entry) => (
+            <GeoEngineProviderRow
+              advanced={advanced}
+              id={id}
+              key={entry.provider.id}
+              {...entry}
+              {...providerProps}
+            />
+          ))}
+        </ul>
+        <div className="bg-border/60 mx-3 my-1.5 h-px" />
+        <div className="flex items-center justify-between gap-4 rounded-md px-3 py-2.5">
+          <div className="space-y-0.5">
+            <div className="flex items-center gap-1.5">
+              <Label htmlFor={`${id}-zdr`}>{t("enforceZdr")}</Label>
+              {canEnforceZdr ? null : (
+                <Badge size="sm" variant="outline">
+                  {tCommon2("labels.addOn")}
+                </Badge>
+              )}
+            </div>
+            <p className="text-muted-foreground text-xs text-pretty">
+              {canEnforceZdr ? (
+                t("zdrEnabledHint")
+              ) : (
+                <>
+                  {t("zdrAddonHint")}{" "}
+                  {billingHref ? (
+                    <Link
+                      className="text-foreground underline underline-offset-4"
+                      href={billingHref}
+                    >
+                      {t("addInBilling")}
+                    </Link>
+                  ) : null}
+                </>
+              )}
+            </p>
           </div>
+          {canEnforceZdr ? (
+            <Switch
+              checked={enforceZdr}
+              disabled={disabled || planLoading}
+              id={`${id}-zdr`}
+              onCheckedChange={handleZdrChange}
+            />
+          ) : (
+            <Tooltip>
+              <TooltipTrigger render={<span className="inline-flex" />}>
+                <Switch
+                  aria-label={t("addZdr")}
+                  checked={false}
+                  className="cursor-pointer disabled:cursor-not-allowed"
+                  disabled={disabled || planLoading || addonLoading}
+                  id={`${id}-zdr`}
+                  onCheckedChange={() => setConsentOpen(true)}
+                />
+              </TooltipTrigger>
+              <TooltipContent side="top">
+                {planLoading ? t("checkingPlan") : t("addZdrTooltip")}
+              </TooltipContent>
+            </Tooltip>
+          )}
         </div>
-      </div>
+      </TitleCard>
 
       <ZdrConsentDialog
         onConfirm={handleAddZdr}
@@ -531,173 +492,147 @@ export function GeoEnginePicker({
         open={pendingDisable !== null}
         title={t("turnOffTitle", { model: pendingModelLabels })}
       />
-    </div>
+    </>
   );
-}
-
-function GeoEngineProviderList({
-  catalog,
-  disabled,
-  expanded,
-  id,
-  lastSelected,
-  nonZdrApproved,
-  onToggleExpanded,
-  onToggleModel,
-  onToggleProvider,
-  selected,
-  zdrActive,
-}: GeoEngineProviderListProps) {
-  const selectedIds = new Set(selected);
-  const approvedNonZdrIds = new Set(nonZdrApproved);
-  // Providers whose models are all legacy (no web search, superseded) would
-  // render as empty rows.
-  const providers = catalog.providers.filter(
-    (provider) =>
-      geoModelsForProvider(catalog, provider.id, selectedIds).length > 0
-  );
-
-  return (
-    <ul>
-      {providers.map((provider) => (
-        <GeoEngineProviderRow
-          approvedNonZdrIds={approvedNonZdrIds}
-          catalog={catalog}
-          disabled={disabled}
-          expanded={expanded.has(provider.id)}
-          id={id}
-          key={provider.id}
-          lastSelected={lastSelected}
-          onToggleExpanded={onToggleExpanded}
-          onToggleModel={onToggleModel}
-          onToggleProvider={onToggleProvider}
-          provider={provider}
-          selectedCount={selected.length}
-          selectedIds={selectedIds}
-          zdrActive={zdrActive}
-        />
-      ))}
-    </ul>
-  );
-}
-
-function isGeoBatchModel(model: GeoModelCatalogEntry) {
-  return BATCH_LABEL.test(model.label);
 }
 
 function GeoEngineProviderRow({
+  advanced,
+  id,
+  models,
+  provider,
+  ...props
+}: GeoEngineProviderRowProps) {
+  const t = useTranslations("geo.geoEnginePicker");
+  const selectedModels = models.filter((model) =>
+    props.selectedIds.has(model.id)
+  );
+  const enabled = selectedModels.length > 0;
+  const locked = enabled && selectedModels.length === props.selectedCount;
+  const controlId = `${id}-${provider.id}`;
+
+  return (
+    <li className="hover:bg-muted/60 flex min-w-0 items-center gap-3 rounded-md px-3 py-2 transition-colors">
+      <EngineIcon
+        className={cn(
+          "size-4 shrink-0 overflow-visible transition",
+          !enabled && "opacity-40 grayscale"
+        )}
+        engine={models[0]?.id ?? provider.id}
+      />
+      <span className="flex min-w-0 flex-1 items-baseline gap-2 text-sm">
+        <label
+          className={cn(
+            "shrink-0 cursor-pointer",
+            !enabled && "text-muted-foreground"
+          )}
+          htmlFor={controlId}
+        >
+          {provider.label}
+        </label>
+        {enabled && advanced && models.length > 1 ? (
+          <GeoEngineModelMenu models={models} provider={provider} {...props} />
+        ) : null}
+      </span>
+      <Switch
+        aria-label={t("toggleProvider", { provider: provider.label })}
+        checked={enabled}
+        disabled={props.disabled || locked}
+        id={controlId}
+        onCheckedChange={(next) => props.onToggleProvider(models, next)}
+        size="sm"
+      />
+    </li>
+  );
+}
+
+function GeoEngineModelMenu({
   approvedNonZdrIds,
   catalog,
   disabled,
-  expanded,
-  id,
   lastSelected,
-  onToggleExpanded,
+  models,
   onToggleModel,
-  onToggleProvider,
   provider,
-  selectedCount,
   selectedIds,
   zdrActive,
-}: GeoEngineProviderRowProps) {
+}: GeoEngineModelMenuProps) {
   const t = useTranslations("geo.geoEnginePicker");
-  const models = geoModelsForProvider(catalog, provider.id, selectedIds);
-  const selectedModels = models.filter((model) => selectedIds.has(model.id));
-  const unselected = models.filter((model) => !selectedIds.has(model.id));
-  // Batch variants are the same model on a slower queue; list them after the
-  // regular releases so the newest models stay on top.
-  const orderedModels = [
-    ...selectedModels,
-    ...unselected.filter((model) => !isGeoBatchModel(model)),
-    ...unselected.filter(isGeoBatchModel),
-  ];
-  const enabled = selectedModels.length > 0;
-  const providerLocked = enabled && selectedModels.length === selectedCount;
+  const [first, ...rest] = models.filter((model) => selectedIds.has(model.id));
+  const label =
+    rest.length > 0
+      ? t("selectedModels", { model: first?.label ?? "", count: rest.length })
+      : (first?.label ?? "");
 
   return (
-    <li className="border-border/60 border-b last:border-b-0">
-      <div
-        className={cn(
-          "flex items-center gap-3 py-2.5 ps-4 pe-3 transition-colors",
-          expanded ? "bg-muted/40" : "bg-background hover:bg-muted/40"
-        )}
+    <DropdownMenu>
+      <DropdownMenuTrigger
+        disabled={disabled}
+        render={
+          <button
+            aria-label={t("modelsFor", { provider: provider.label })}
+            className="text-muted-foreground hover:text-foreground focus-visible:ring-ring inline-flex max-w-full cursor-pointer items-center gap-1 rounded-md outline-none focus-visible:ring-2"
+            type="button"
+          />
+        }
       >
-        <button
-          aria-expanded={expanded}
-          className="focus-visible:ring-ring flex min-w-0 flex-1 cursor-pointer items-center gap-3 rounded-md text-left outline-none focus-visible:ring-2 disabled:cursor-not-allowed"
-          disabled={disabled}
-          onClick={() => onToggleExpanded(provider.id)}
-          type="button"
-        >
-          <span
-            className={cn(
-              "border-border/70 bg-background flex size-7 shrink-0 items-center justify-center rounded-md border transition",
-              !enabled && "opacity-60 grayscale"
-            )}
-          >
-            <EngineIcon
-              className="size-3.5 overflow-visible"
-              engine={models[0]?.id ?? provider.id}
-            />
-          </span>
-          <span className="flex min-w-0 flex-col">
-            <span className="flex items-center gap-1.5">
-              <span className="truncate text-sm font-medium">
-                {provider.label}
-              </span>
-              <HugeiconsIcon
-                className={cn(
-                  "text-muted-foreground duration-normal size-3.5 shrink-0 transition-transform",
-                  expanded && "rotate-180"
-                )}
-                icon={ArrowDown01Icon}
-              />
-            </span>
-            <span className="text-muted-foreground truncate text-xs">
-              {enabled
-                ? selectedModels.map((model) => model.label).join(", ")
-                : t("providerOff")}
-            </span>
-          </span>
-        </button>
-        <Switch
-          aria-label={t("toggleProvider", { provider: provider.label })}
-          checked={enabled}
-          disabled={disabled || providerLocked}
-          id={`${id}-${provider.id}`}
-          onCheckedChange={(next) => onToggleProvider(models, next)}
-        />
-      </div>
-      <div
-        className={cn(
-          "duration-normal ease-emphasized grid transition-[grid-template-rows] motion-reduce:transition-none",
-          expanded ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
-        )}
-      >
-        <div
-          className="bg-muted/40 min-h-0 overflow-hidden"
-          inert={expanded ? undefined : true}
-        >
-          <ul className="pb-2">
-            {orderedModels.map((model) => {
-              const checked = selectedIds.has(model.id);
-              return (
-                <GeoModelRow
-                  approved={approvedNonZdrIds.has(model.id)}
-                  checked={checked}
-                  disabled={disabled || (checked && lastSelected)}
-                  id={`${id}-${model.id}`}
-                  key={model.id}
-                  model={model}
-                  onCheckedChange={(next) => onToggleModel(model, next)}
-                  showZdrState={zdrActive}
-                  webSearch={isGeoWebSearchEngine(catalog, model.id)}
-                />
-              );
-            })}
-          </ul>
-        </div>
-      </div>
-    </li>
+        <span className="truncate">{label}</span>
+        <HugeiconsIcon className="size-3.5 shrink-0" icon={UnfoldMoreIcon} />
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="start" className="w-auto min-w-56">
+        {models.map((model) => {
+          const checked = selectedIds.has(model.id);
+          const note = modelNote({
+            approved: approvedNonZdrIds.has(model.id),
+            model,
+            t,
+            webSearch: isGeoWebSearchEngine(catalog, model.id),
+            zdrActive,
+          });
+          return (
+            <DropdownMenuCheckboxItem
+              checked={checked}
+              closeOnClick={false}
+              disabled={checked && lastSelected}
+              indicator="checkbox"
+              key={model.id}
+              onCheckedChange={(next) => onToggleModel(model, next)}
+            >
+              {model.label}
+              {note ? (
+                <span className="text-muted-foreground ms-auto ps-4 text-xs">
+                  {note}
+                </span>
+              ) : null}
+            </DropdownMenuCheckboxItem>
+          );
+        })}
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
+}
+
+function modelNote({
+  approved,
+  model,
+  t,
+  webSearch,
+  zdrActive,
+}: {
+  approved: boolean;
+  model: GeoModelCatalogEntry;
+  t: ReturnType<typeof useTranslations<"geo.geoEnginePicker">>;
+  webSearch: boolean;
+  zdrActive: boolean;
+}) {
+  if (model.hidden) {
+    return t("legacyModel");
+  }
+  if (!webSearch) {
+    return t("noWebSearch");
+  }
+  if (zdrActive && model.zdr === "none") {
+    return approved ? t("approvedWithoutZdr") : t("noZdrHost");
+  }
+  return null;
 }

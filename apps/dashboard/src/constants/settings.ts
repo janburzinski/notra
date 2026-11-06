@@ -6,7 +6,6 @@ import {
   ChartAnalysisIcon,
   CorporateIcon,
   CreditCardIcon,
-  Globe02Icon,
   Key01Icon,
   Notification01Icon,
   PaintBoardIcon,
@@ -249,18 +248,9 @@ export const SETTINGS_NAV_GROUPS: readonly SettingsNavGroupConfig[] = [
           "tracking",
           "project",
           "identity",
-        ],
-      },
-      {
-        id: "geo-languages",
-        icon: Globe02Icon,
-        keywords: [
-          "geo",
           "language",
           "locale",
           "translation",
-          "english",
-          "scan",
         ],
       },
       {

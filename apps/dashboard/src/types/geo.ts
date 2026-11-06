@@ -10,6 +10,7 @@ import type {
   WebEngagement,
   WebAnalyticsSource,
   GeoAnswerSource,
+  GeoAudienceType,
   GeoChangeEvent,
   GeoChangesSummary,
   GeoChangesSummaryGroup,
@@ -738,8 +739,7 @@ export interface GeoSetupButtonProps {
   size?: ComponentProps<typeof Button>["size"];
 }
 
-export interface GeoScanFrequencySelectProps {
-  id: string;
+export interface GeoScanFrequencyMenuProps {
   enabled: boolean;
   intervalHours: number;
   onEnabledChange: (enabled: boolean) => void;
@@ -1113,7 +1113,7 @@ export interface CopyCodeButtonProps {
   onCopy?: () => void;
 }
 
-export type GeoSettingsFormSection = "brand" | "languages" | "models";
+export type GeoSettingsFormSection = "brand" | "models";
 
 export interface GeoSettingsFormProps {
   organizationId: string;
@@ -1145,7 +1145,6 @@ export interface GeoLanguagesSectionProps {
 }
 
 export interface GeoModelsSectionProps {
-  id: string;
   catalog: GeoResolvedModelCatalog;
   engines: string[];
   onEnginesChange: (values: string[]) => void;
@@ -1197,7 +1196,11 @@ export interface GeoTagListProps {
 }
 
 export interface GeoEnginePickerProps {
+  /** Who buys from the brand; decides which model a provider runs. */
+  audience: GeoAudienceType;
   catalog: GeoResolvedModelCatalog;
+  /** Items shown above "Advanced" in the card's options menu. */
+  menu?: ReactNode;
   selected: string[];
   onChange: (values: string[]) => void;
   enforceZdr: boolean;
@@ -1209,8 +1212,6 @@ export interface GeoEnginePickerProps {
   /** True while the plan is still loading; keeps the ZDR toggle inert. */
   planLoading?: boolean;
   disabled?: boolean;
-  labeled?: boolean;
-  /** Rendered as the first row of the options group under the model list. */
 }
 
 export interface GeoPendingModelRemoval {
@@ -1218,38 +1219,35 @@ export interface GeoPendingModelRemoval {
   enforceZdr?: boolean;
 }
 
-export interface GeoEngineProviderListProps {
+interface GeoEngineProviderSharedProps {
+  approvedNonZdrIds: ReadonlySet<string>;
   catalog: GeoResolvedModelCatalog;
   disabled: boolean;
-  expanded: ReadonlySet<string>;
-  id: string;
   lastSelected: boolean;
-  nonZdrApproved: readonly string[];
-  onToggleExpanded: (providerId: string) => void;
   onToggleModel: (model: GeoModelCatalogEntry, checked: boolean) => void;
   onToggleProvider: (
     models: readonly GeoModelCatalogEntry[],
     checked: boolean
   ) => void;
-  selected: readonly string[];
-  zdrActive: boolean;
-}
-
-export interface GeoEngineProviderRowProps {
-  approvedNonZdrIds: ReadonlySet<string>;
-  catalog: GeoResolvedModelCatalog;
-  disabled: boolean;
-  expanded: boolean;
-  id: string;
-  lastSelected: boolean;
-  onToggleExpanded: (providerId: string) => void;
-  onToggleModel: (model: GeoModelCatalogEntry, checked: boolean) => void;
-  onToggleProvider: GeoEngineProviderListProps["onToggleProvider"];
-  provider: GeoModelCatalog["providers"][number];
   selectedCount: number;
   selectedIds: ReadonlySet<string>;
   zdrActive: boolean;
 }
+
+export interface GeoEngineProviderEntry {
+  models: GeoModelCatalogEntry[];
+  /** A catalog provider, or a picker-only row such as Google AI Mode. */
+  provider: { id: string; label: string; featured: boolean };
+}
+
+export interface GeoEngineProviderRowProps
+  extends GeoEngineProviderSharedProps, GeoEngineProviderEntry {
+  advanced: boolean;
+  id: string;
+}
+
+export interface GeoEngineModelMenuProps
+  extends GeoEngineProviderSharedProps, GeoEngineProviderEntry {}
 
 export type GeoFlagState = "enabled" | "disabled" | "unavailable";
 

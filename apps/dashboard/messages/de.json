@@ -53,11 +53,8 @@
           "label": "Dev",
           "description": "Onboarding wiederholen und Testdaten verwalten"
         },
-        "geo-languages": {
-          "description": "Sprachen, in denen Prompts gescannt werden"
-        },
         "geo-models": {
-          "description": "KI-Engines, Zeitplan und Scans"
+          "description": "Assistenten und Zeitplan"
         }
       }
     },
@@ -77,8 +74,7 @@
         "webhooks": "Verbinde deine Workflows und prüfe jede Zustellung",
         "logs": "Sieh dir Integrations-Events und ihren Zustellstatus an",
         "dev": "Nur in der Entwicklung verfügbare Tools zum Testen lokaler Abläufe",
-        "geo-languages": "Sprachen, in denen deine Prompts gescannt werden",
-        "geo-models": "Welche Anbieter laufen und wie oft"
+        "geo-models": "Auf welchen Assistenten deine Prompts laufen"
       }
     },
     "panes": {
@@ -2945,7 +2941,6 @@
       "noZdrHost": "Kein ZDR-Host",
       "toggleModel": "{model} umschalten",
       "choosePlan": "Wähle einen Tarif, bevor du Zero Data Retention hinzufügst.",
-      "description": "Jeder Prompt läuft auf jedem aktivierten Modell. Schalte die aus, die du nicht brauchst, damit Scans klein bleiben.",
       "enforceZdr": "ZDR erzwingen",
       "zdrEnabledHint": "Modelle nur auf Hosts mit Zero Data Retention ausführen. Modelle ohne solchen Host sind in der Liste markiert.",
       "zdrAddonHint": "Zero Data Retention ist ein Add-on für jeden Tarif und kostet 20 % zusätzlich zum Tarifpreis. Modelle ohne Host mit Zero Data Retention sind in der Liste markiert.",
@@ -2966,7 +2961,17 @@
       "legacyModelDescription": "Du kannst dieses Modell weiterhin nutzen. Sobald du es entfernst und speicherst, kannst du es diesem Projekt nicht wieder hinzufügen.",
       "turnOff": "Ausschalten",
       "toggleProvider": "{provider} ein- oder ausschalten",
-      "providerOff": "Aus"
+      "providerOff": "Aus",
+      "title": "KI-Assistenten",
+      "advancedDescription": "Wähle genau, welche Modelle jeder Assistent nutzt. Jeder Prompt läuft auf jedem ausgewählten Modell.",
+      "recommended": "Empfohlen",
+      "modelsFor": "Modelle von {provider}",
+      "noWebSearch": "Keine Websuche",
+      "settingsTitle": "Scan-Einstellungen",
+      "description": "{count, plural, =0 {Schalte die Assistenten ein, die du verfolgen willst.} one {# Assistent aktiv. Wir wählen jeweils das beste Modell.} other {# Assistenten aktiv. Wir wählen jeweils das beste Modell.}}",
+      "advanced": "Erweitert",
+      "options": "Optionen",
+      "selectedModels": "{model} +{count}"
     },
     "geoIngestSetup": {
       "tokenTitle": "Token setzen",
@@ -3082,16 +3087,8 @@
         "336": "2 Wochen",
         "720": "30 Tage"
       },
-      "setFrequency": "Häufigkeit festlegen",
       "frequency": "Scan-Häufigkeit",
-      "default": "Standard",
-      "customOption": "Benutzerdefiniert…",
-      "daysBetween": "Tage zwischen Scans",
-      "every": "alle",
-      "dayUnit": "Tag",
-      "dayPluralSuffix": "e",
-      "daysSr": "{count, plural, one {Tag} other {Tage}}",
-      "offHint": "nur manuell"
+      "default": "Standard"
     },
     "geoSettingsForm": {
       "description": "Wie deine Marke erkannt wird und wo Prompts gescannt werden.",
@@ -3112,6 +3109,9 @@
       },
       "languages": {
         "description": "Sprachen, in denen deine Prompts gescannt werden. Die Prompts sind auf {language} geschrieben, weitere Sprachen werden übersetzt."
+      },
+      "website": {
+        "title": "Website"
       }
     },
     "geoSetupEmpty": {
