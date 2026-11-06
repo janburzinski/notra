@@ -65,7 +65,7 @@ test("consent-gated Capless loads its script with the key only after a measureme
     __NOTRA_CONSENT_ANALYTICS__: {
       capless: {
         key: "cs_abcdefghijklmnop",
-        scriptUrl: "https://c.capless.sh/c.js",
+        scriptUrl: "https://configured.example/capless.js",
       },
     },
     __NOTRA_HOSTING_DOMAIN__: null,
@@ -78,7 +78,7 @@ test("consent-gated Capless loads its script with the key only after a measureme
   expect(client.scripts).toEqual([
     {
       id: "capless",
-      src: "https://c.capless.sh/c.js",
+      src: "https://configured.example/capless.js",
       category: "measurement",
       async: true,
       attributes: { "data-key": "cs_abcdefghijklmnop" },
