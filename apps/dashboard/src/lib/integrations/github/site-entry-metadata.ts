@@ -1,4 +1,5 @@
 import { postCoverImageSchema } from "@notra/ai/schemas/post-metadata";
+import { isGeneratedCoverImage } from "@notra/ai/utils/post-cover-image";
 import { logError } from "@notra/ai/utils/server-log";
 import { db } from "@notra/db/drizzle";
 import { contentAuthors } from "@notra/db/schema";
@@ -73,7 +74,8 @@ export async function prepareSiteEntryMetadata(
   const assets: GitHubContentAsset[] = [];
   const cover = postCoverImageSchema.safeParse(post.coverImage);
   let image: SiteEntryMetadata["image"] = null;
-  if (cover.success) {
+  // A generated cover is only a fallback: the site renders its own thumbnail.
+  if (cover.success && !isGeneratedCoverImage(cover.data)) {
     const prepared = await prepareEntryImage(cover.data.url, "cover", context);
     if (prepared.src) {
       image = { src: prepared.src, alt: cover.data.alt };

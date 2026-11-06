@@ -1,4 +1,9 @@
 import { supportsPostSlug } from "@notra/ai/schemas/post";
+import {
+  coverImageIfUnchanged,
+  discardUnusedCover,
+  generatedCoverImageUpdate,
+} from "@notra/ai/utils/post-cover-image";
 import { stripLeadingFrontmatter } from "@notra/ai/utils/post-markdown";
 import {
   appendContentGenerationJobEvent,
@@ -10,6 +15,7 @@ import {
   updateContentGenerationJob,
 } from "@notra/content-generation/jobs";
 import { contentAuthors, postCollections, posts } from "@notra/db/schema";
+import type { PostCoverImage } from "@notra/db/types/post-metadata";
 import { isPgUniqueViolation } from "@notra/db/utils/pg-errors";
 import { buildPostCollectionName } from "@notra/db/utils/post-collections";
 import { setPostHistoryContext } from "@notra/db/utils/post-history";
@@ -363,6 +369,18 @@ export const createPost = Effect.fn("posts.create")(function* (
   const now = new Date();
   const collectionId = nanoid();
   const postId = nanoid();
+  const coverImage = yield* Effect.promise(() =>
+    generatedCoverImageUpdate({
+      organizationId: input.organizationId,
+      postId,
+      contentType: body.contentType,
+      coverImage: null,
+      previousTitle: body.title,
+      title: body.title,
+      publishing: body.status === "published",
+      published: body.status === "published",
+    })
+  );
 
   const [createdPost] = yield* Effect.tryPromise({
     try: () =>
@@ -395,6 +413,7 @@ export const createPost = Effect.fn("posts.create")(function* (
             contentType: body.contentType,
             status: body.status,
             publishedAt: body.status === "published" ? now : null,
+            ...(coverImage ? { coverImage } : {}),
             sourceMetadata: null,
             createdAt: now,
             updatedAt: now,
@@ -402,7 +421,11 @@ export const createPost = Effect.fn("posts.create")(function* (
           .returning(postReturningColumns());
       }),
     catch: mapPostWriteError,
-  });
+  }).pipe(
+    Effect.tapError(() =>
+      Effect.promise(() => discardUnusedCover(coverImage, null))
+    )
+  );
 
   if (!createdPost) {
     return yield* new PostDatabaseError({
@@ -520,6 +543,8 @@ export const commitPatchPost = Effect.fn("posts.commitPatch")(function* (
         id: true,
         title: true,
         updatedAt: true,
+        contentType: true,
+        coverImage: true,
       },
     })
   );
@@ -546,13 +571,43 @@ export const commitPatchPost = Effect.fn("posts.commitPatch")(function* (
     }
   }
 
+  const generatedCover: PostCoverImage | null =
+    updateData.coverImage === undefined
+      ? yield* Effect.promise(() =>
+          generatedCoverImageUpdate({
+            organizationId: input.organizationId,
+            postId: input.postId,
+            contentType: freshPost.contentType,
+            coverImage: freshPost.coverImage,
+            previousTitle: freshPost.title,
+            title: updateData.title ?? freshPost.title,
+            publishing:
+              updateData.status === "published" &&
+              input.prepared.previousStatus !== "published",
+            published:
+              (updateData.status ?? input.prepared.previousStatus) ===
+              "published",
+          })
+        )
+      : null;
+
   const [updatedPost] = yield* Effect.tryPromise({
     try: () =>
       input.db.transaction(async (tx) => {
         await setPostHistoryContext(tx, { actorUserId: null, source: "api" });
         return await tx
           .update(posts)
-          .set(updateData)
+          .set(
+            generatedCover
+              ? {
+                  ...updateData,
+                  coverImage: coverImageIfUnchanged(
+                    freshPost.coverImage,
+                    generatedCover
+                  ),
+                }
+              : updateData
+          )
           .where(
             and(
               eq(posts.id, input.postId),
@@ -566,7 +621,14 @@ export const commitPatchPost = Effect.fn("posts.commitPatch")(function* (
           });
       }),
     catch: mapPostWriteError,
-  });
+  }).pipe(
+    Effect.tapError(() =>
+      Effect.promise(() => discardUnusedCover(generatedCover, null))
+    )
+  );
+  yield* Effect.promise(() =>
+    discardUnusedCover(generatedCover, updatedPost?.coverImage)
+  );
 
   if (!updatedPost) {
     return yield* new PostConcurrentModificationError();

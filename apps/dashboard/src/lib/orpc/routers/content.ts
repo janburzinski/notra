@@ -13,6 +13,11 @@ import {
   getLinearIssuePreviews,
 } from "@notra/ai/utils/linear";
 import { createOctokit } from "@notra/ai/utils/octokit";
+import {
+  coverImageIfUnchanged,
+  discardUnusedCover,
+  generatedCoverImageUpdate,
+} from "@notra/ai/utils/post-cover-image";
 import { stripLeadingFrontmatter } from "@notra/ai/utils/post-markdown";
 import {
   isPostSlugConflict,
@@ -340,6 +345,45 @@ function formatFailureMessage(error: unknown): string {
   }
 
   return "Unknown error";
+}
+
+/** Adds a generated cover to the same write, so the editor sees one revision. */
+async function applyGeneratedCoverImage(params: {
+  organizationId: string;
+  postId: string;
+  existingPost: {
+    title: string;
+    contentType: string;
+    status: string;
+    coverImage: unknown;
+  };
+  updateData: Record<string, unknown>;
+}) {
+  const { existingPost, updateData } = params;
+  if (updateData.coverImage !== undefined) {
+    return null;
+  }
+  const coverImage = await generatedCoverImageUpdate({
+    organizationId: params.organizationId,
+    postId: params.postId,
+    contentType: existingPost.contentType,
+    coverImage: existingPost.coverImage,
+    previousTitle: existingPost.title,
+    title:
+      typeof updateData.title === "string"
+        ? updateData.title
+        : existingPost.title,
+    publishing:
+      updateData.status === "published" && existingPost.status !== "published",
+    published: (updateData.status ?? existingPost.status) === "published",
+  });
+  if (coverImage) {
+    updateData.coverImage = coverImageIfUnchanged(
+      existingPost.coverImage,
+      coverImage
+    );
+  }
+  return coverImage;
 }
 
 export async function buildContentUpdateData(
@@ -891,7 +935,12 @@ export const contentRouter = {
             eq(posts.id, input.contentId),
             eq(posts.organizationId, input.organizationId)
           ),
-          columns: { title: true, contentType: true, status: true },
+          columns: {
+            title: true,
+            contentType: true,
+            status: true,
+            coverImage: true,
+          },
         }),
         getTranslations("errors.content"),
       ]);
@@ -905,6 +954,13 @@ export const contentRouter = {
         }
         updateData.slug = input.slug;
       }
+      const coverImage = await applyGeneratedCoverImage({
+        organizationId: input.organizationId,
+        postId: input.contentId,
+        existingPost,
+        updateData,
+      });
+      let savedCover: unknown = null;
       try {
         const [saved] = await db.transaction(async (tx) => {
           await setPostHistoryContext(tx, {
@@ -929,6 +985,7 @@ export const contentRouter = {
               content: posts.content,
               revision: posts.revision,
               updatedAt: posts.updatedAt,
+              coverImage: posts.coverImage,
             });
           const document = updated[0];
           if (
@@ -962,6 +1019,8 @@ export const contentRouter = {
             currentRevision: current.revision,
           });
         }
+        const { coverImage: storedCover, ...savedDocument } = saved;
+        savedCover = storedCover;
         if (
           input.markdown !== undefined &&
           saved.revision > input.expectedRevision
@@ -979,13 +1038,23 @@ export const contentRouter = {
         }
         return {
           success: true,
-          document: { ...saved, updatedAt: saved.updatedAt.toISOString() },
+          document: {
+            ...savedDocument,
+            updatedAt: saved.updatedAt.toISOString(),
+            ...(coverImage &&
+            postCoverImageSchema.safeParse(storedCover).data?.url ===
+              coverImage.url
+              ? { coverImage }
+              : {}),
+          },
         };
       } catch (error) {
         if (isPostSlugConflict(error)) {
           throw conflict(tErrors("slugTaken"));
         }
         throw error;
+      } finally {
+        await discardUnusedCover(coverImage, savedCover);
       }
     }),
   update: baseProcedure
@@ -1004,6 +1073,7 @@ export const contentRouter = {
           title: true,
           contentType: true,
           status: true,
+          coverImage: true,
         },
       });
 
@@ -1031,6 +1101,14 @@ export const contentRouter = {
         }
         updateData.slug = input.slug;
       }
+
+      const generatedCover = await applyGeneratedCoverImage({
+        organizationId: input.organizationId,
+        postId: input.contentId,
+        existingPost,
+        updateData,
+      });
+      let savedCover: unknown = null;
 
       try {
         const [updatedPost] = await db.transaction(async (tx) => {
@@ -1078,6 +1156,7 @@ export const contentRouter = {
         if (!updatedPost) {
           throw internalServerError("Failed to update content");
         }
+        savedCover = updatedPost.coverImage;
 
         if (input.markdown !== undefined) {
           trackServerEvent({
@@ -1129,6 +1208,8 @@ export const contentRouter = {
         };
       } catch (error) {
         throw await toSlugConflict(error);
+      } finally {
+        await discardUnusedCover(generatedCover, savedCover);
       }
     }),
   updateMetadata: baseProcedure

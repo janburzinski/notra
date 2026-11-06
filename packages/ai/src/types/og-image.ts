@@ -58,6 +58,8 @@ export interface GenerateOgImageParams {
   organizationId: string;
   brandIdentityId?: string;
   title: string;
+  /** Never design a new template: reuse the saved one or the plain fallback. */
+  cachedTemplateOnly?: boolean;
   onUsage?: (usage: AgentTokenUsage) => void;
   signal?: AbortSignal;
 }

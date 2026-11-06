@@ -1,4 +1,12 @@
-import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import {
+  DeleteObjectCommand,
+  PutObjectCommand,
+  S3Client,
+} from "@aws-sdk/client-s3";
+import {
+  GENERATED_COVER_KEY_SUFFIX,
+  GENERATED_COVER_URL,
+} from "@notra/ai/constants/post-metadata";
 
 import type { ExcalidrawScene } from "../types/excalidraw-diagram";
 import type { UploadIntegrationBrandingAssetParams } from "../types/integrations";
@@ -102,6 +110,7 @@ async function uploadContentAsset(params: {
   extension: string;
   body: Buffer;
   contentType: string;
+  signal?: AbortSignal;
 }) {
   const env = getR2Env();
   const key = `organization/${params.organizationId}/content/${params.postId}-${Date.now()}.${params.extension}`;
@@ -114,7 +123,8 @@ async function uploadContentAsset(params: {
       ContentLength: params.body.byteLength,
       ContentType: params.contentType,
       Key: key,
-    })
+    }),
+    { abortSignal: params.signal }
   );
 
   return `${env.publicUrl.replace(TRAILING_SLASHES_RE, "")}/${key}`;
@@ -124,6 +134,7 @@ export function uploadGeneratedImageAsset(params: {
   organizationId: string;
   pngBase64: string;
   postId: string;
+  signal?: AbortSignal;
 }) {
   return uploadContentAsset({
     organizationId: params.organizationId,
@@ -131,7 +142,35 @@ export function uploadGeneratedImageAsset(params: {
     extension: "png",
     body: Buffer.from(params.pngBase64, "base64"),
     contentType: "image/png",
+    signal: params.signal,
   });
+}
+
+export function uploadGeneratedCoverAsset(params: {
+  organizationId: string;
+  pngBase64: string;
+  postId: string;
+  signal?: AbortSignal;
+}) {
+  return uploadGeneratedImageAsset({
+    ...params,
+    postId: `${params.postId}${GENERATED_COVER_KEY_SUFFIX}-${crypto.randomUUID()}`,
+  });
+}
+
+/** Deletes a generated cover; any other URL, or another bucket's, is left alone. */
+export async function deleteGeneratedCoverAsset(url: string) {
+  const env = getR2Env();
+  const prefix = `${env.publicUrl.replace(TRAILING_SLASHES_RE, "")}/`;
+  if (!(url.startsWith(prefix) && GENERATED_COVER_URL.test(url))) {
+    return;
+  }
+  await getR2Client().send(
+    new DeleteObjectCommand({
+      Bucket: env.bucketName,
+      Key: url.slice(prefix.length),
+    })
+  );
 }
 
 export function uploadGeneratedHtmlAsset(params: {

@@ -14,6 +14,7 @@ export const OG_DESIGN_FAILURE_TTL_MS = 6 * 60 * 60 * 1000;
 export const OG_DESIGN_LEASE_MS = OG_DESIGN_TIMEOUT_MS + 60_000;
 export const OG_DESIGN_RECOVERY_MS = 60_000;
 export const OG_COST_LOOKUP_TIMEOUT_MS = 5000;
+export const OG_FALLBACK_LOGO_TIMEOUT_MS = 5000;
 export const OG_HASH_IGNORED_KEYS = new Set([
   "createdAt",
   "updatedAt",

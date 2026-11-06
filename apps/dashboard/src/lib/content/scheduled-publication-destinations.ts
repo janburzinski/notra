@@ -5,6 +5,11 @@ import type {
   ScheduledPublicationOutcome,
 } from "@notra/ai/types/scheduled-publications";
 import { createOctokit } from "@notra/ai/utils/octokit";
+import {
+  coverImageIfUnchanged,
+  discardUnusedCover,
+  generatedCoverImageUpdate,
+} from "@notra/ai/utils/post-cover-image";
 import { isGitHubScheduleContentType } from "@notra/ai/utils/schedule-destinations";
 import {
   markScheduledPublicationExternalAttempt,
@@ -100,9 +105,25 @@ async function publishInNotra(
   attempt: ScheduledPublicationAttempt,
   post: ScheduledPublicationPost
 ): Promise<ScheduledPublicationOutcome> {
+  const coverImage = await generatedCoverImageUpdate({
+    organizationId: attempt.organizationId,
+    postId: attempt.postId,
+    contentType: post.contentType,
+    coverImage: post.coverImage,
+    previousTitle: post.title,
+    title: post.title,
+    publishing: post.status !== "published",
+    published: true,
+  });
   const [published] = await db
     .update(posts)
-    .set({ status: "published", publishedAt: new Date() })
+    .set({
+      status: "published",
+      publishedAt: new Date(),
+      ...(coverImage
+        ? { coverImage: coverImageIfUnchanged(post.coverImage, coverImage) }
+        : {}),
+    })
     .where(
       and(
         eq(posts.id, attempt.postId),
@@ -110,7 +131,12 @@ async function publishInNotra(
         eq(posts.status, "draft")
       )
     )
-    .returning({ id: posts.id });
+    .returning({ id: posts.id, coverImage: posts.coverImage })
+    .catch(async (error: unknown) => {
+      await discardUnusedCover(coverImage, null);
+      throw error;
+    });
+  await discardUnusedCover(coverImage, published?.coverImage);
   if (!published) {
     return { kind: "published", result: { alreadyPublished: true } };
   }
@@ -605,6 +631,7 @@ export async function publishScheduledDestination(
       markdown: true,
       githubPublish: true,
       sourceMetadata: true,
+      status: true,
       coverImage: true,
       tags: true,
       excerpt: true,

@@ -7,6 +7,7 @@ export interface ScheduledPublicationPost {
   markdown: string | null;
   githubPublish: unknown;
   sourceMetadata: unknown;
+  status?: string;
   coverImage?: unknown;
   tags?: string[];
   excerpt?: string | null;

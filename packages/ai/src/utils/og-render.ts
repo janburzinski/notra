@@ -191,7 +191,11 @@ export async function renderOgImage(
     import("satori"),
     import("@resvg/resvg-js"),
   ]);
-  const renderAt = async (size: number, decorations: boolean) => {
+  const renderAt = async (
+    size: number,
+    decorations: boolean,
+    balance = false
+  ) => {
     let titleBounds: OgRenderBounds | undefined;
     let labelOverflow = false;
     const svg = await satori(
@@ -311,8 +315,9 @@ export async function renderOgImage(
                 lineHeight: area.lineHeight,
                 letterSpacing: area.letterSpacing,
                 textAlign: area.align,
-                textWrap: "balance",
-                wordBreak: "break-word",
+                ...(balance
+                  ? { textWrap: "balance", wordBreak: "normal" }
+                  : { wordBreak: "break-word" }),
               },
             },
             title
@@ -370,7 +375,17 @@ export async function renderOgImage(
     if (maxLines && lineCount > maxLines && size - 2 >= area.minSize) {
       continue;
     }
-    const { svg } = await renderAt(size, true);
+    // Satori's balance search can go narrower than one glyph on a very short
+    // title, and with break-word it then never returns. Balance only titles
+    // that wrap, without break-word, when no word needs breaking.
+    let balance = false;
+    if (lineCount > 1) {
+      const balanced = await renderAt(size, false, true);
+      balance =
+        balanced.titleBounds !== undefined &&
+        Math.abs(balanced.titleBounds.height - titleBounds.height) <= 1;
+    }
+    const { svg } = await renderAt(size, true, balance);
     return {
       svg,
       pngBase64: new Resvg(svg).render().asPng().toString("base64"),

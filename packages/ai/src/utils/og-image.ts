@@ -186,6 +186,24 @@ export async function generateBrandOgImage(params: GenerateOgImageParams) {
       );
     }
   }
+  const reuseSaved = async (reason: string) => {
+    if (saved) {
+      try {
+        return {
+          ...(await renderOgImage(saved, input.title, brand)),
+          brandIdentityId: brand.id,
+          templateSource: "last-good" as const,
+          warnings: [...saved.warnings, reason],
+        };
+      } catch {
+        /* A valid old document can still be too small for this title. */
+      }
+    }
+    return plain("No usable brand template is currently available.");
+  };
+  if (params.cachedTemplateOnly) {
+    return reuseSaved("Using the saved template without a paid redesign.");
+  }
   try {
     const document = await Effect.runPromise(
       designWithLease(brand, sourceHash, params),
@@ -204,21 +222,6 @@ export async function generateBrandOgImage(params: GenerateOgImageParams) {
       brandIdentityId: brand.id,
       error: error instanceof Error ? error.message : "Unknown error",
     });
-    if (saved) {
-      try {
-        return {
-          ...(await renderOgImage(saved, input.title, brand)),
-          brandIdentityId: brand.id,
-          templateSource: "last-good" as const,
-          warnings: [
-            ...saved.warnings,
-            "Brand refresh failed; using the last working template.",
-          ],
-        };
-      } catch {
-        /* A valid old document can still be too small for this title. */
-      }
-    }
-    return plain("No usable brand template is currently available.");
+    return reuseSaved("Brand refresh failed; using the last working template.");
   }
 }

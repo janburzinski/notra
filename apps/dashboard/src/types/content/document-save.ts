@@ -28,6 +28,8 @@ export interface SavedContentDocument {
   content: string;
   revision: number;
   updatedAt: string;
+  /** Set when the save regenerated the post's cover. */
+  coverImage?: { url: string; alt: string };
 }
 
 export interface CheckpointContentDetailParams {

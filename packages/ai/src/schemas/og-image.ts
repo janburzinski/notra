@@ -132,3 +132,11 @@ export const ogCallRouteSchema = z.object({
   organizationId: z.string().optional(),
   generationId: z.string().optional(),
 });
+
+/** Guideline fields the plain fallback may use: saved brand evidence only. */
+export const ogFallbackGuidelineSchema = z.object({
+  colors: z.array(z.object({ role: z.string(), lightValue: z.string() })),
+  assets: z.array(
+    z.object({ kind: z.string(), variant: z.string(), url: z.string() })
+  ),
+});

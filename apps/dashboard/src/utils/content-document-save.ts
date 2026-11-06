@@ -23,6 +23,14 @@ export function mergeSavedContentDetail(
       markdown: document.markdown,
       content: document.content,
       revision: document.revision,
+      ...(document.coverImage && current.content.metadata
+        ? {
+            metadata: {
+              ...current.content.metadata,
+              coverImage: document.coverImage,
+            },
+          }
+        : {}),
     },
   };
 }

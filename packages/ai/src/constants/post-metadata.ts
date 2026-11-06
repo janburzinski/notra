@@ -11,3 +11,11 @@ export const POST_DETAILS_TAG_SUGGESTIONS = 30;
 /** A leading YAML frontmatter block, e.g. from a pasted .mdx file. */
 export const LEADING_FRONTMATTER =
   /^﻿?\s*---\r?\n(?=[A-Za-z_][\w-]*:)[\s\S]*?\r?\n---[ \t]*(?:\r?\n|$)/;
+
+/** Object-key suffix that marks a cover Notra generated, so it can be refreshed. */
+export const GENERATED_COVER_KEY_SUFFIX = "-cover";
+/** Random per cover, so a draft or past cover URL cannot be guessed. */
+export const GENERATED_COVER_URL =
+  /\/content\/[^/]+-cover-[0-9a-f-]{36}-\d+\.png$/;
+/** Publishing never waits longer than this for an optional cover. */
+export const GENERATED_COVER_TIMEOUT_MS = 10_000;

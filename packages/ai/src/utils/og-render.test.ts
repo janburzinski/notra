@@ -1,6 +1,7 @@
 import { describe, expect, test } from "bun:test";
 
 import type { SavedOgTemplate } from "@notra/ai/types/og-image";
+import { fallbackOgTemplate } from "@notra/ai/utils/og-fallback";
 import { findInvisibleOgLogos, renderOgImage } from "@notra/ai/utils/og-render";
 import { loadRenderFont } from "@notra/ai/utils/render-font";
 import sharp from "sharp";
@@ -143,5 +144,24 @@ describe("renderOgImage alignment", () => {
     const label = await inkSpan(pngBase64, 540, 580);
     expect(Math.abs((title.left + title.right) / 2 - 600)).toBeLessThan(6);
     expect(Math.abs((label.left + label.right) / 2 - 600)).toBeLessThan(6);
+  });
+});
+
+describe("renderOgImage short titles", () => {
+  // Satori's balance + break-word looped forever on these before the fix.
+  test.each(["T", "Hi", "W", "I A"])("renders %p", async (title) => {
+    const brand = {
+      id: "",
+      name: "Acme",
+      websiteUrl: "https://acme.dev",
+      guideline: null,
+      assets: [],
+    };
+    const { lineCount } = await renderOgImage(
+      await fallbackOgTemplate(brand),
+      title,
+      brand
+    );
+    expect(lineCount).toBe(1);
   });
 });
