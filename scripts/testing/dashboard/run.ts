@@ -211,7 +211,18 @@ async function freePort() {
   return address.port;
 }
 
-function start(name: string, args: string[], cwd = root) {
+// What Vite and Bun.serve print when the port they were given is taken.
+const PORT_TAKEN = /Port \d+ is already in use|Is port \d+ in use\?|EADDRINUSE/;
+const PORT_ATTEMPTS = 3;
+
+interface PortWatch {
+  // The child's own line saying it bound its port.
+  listening: RegExp;
+  // Replaces failing the run when the child stops because its port was taken.
+  onPortTaken: () => void;
+}
+
+function start(name: string, args: string[], cwd = root, watch?: PortWatch) {
   const child = spawn(process.execPath, ["--no-env-file", ...args], {
     cwd,
     env: environment,
@@ -220,11 +231,15 @@ function start(name: string, args: string[], cwd = root) {
   });
   children.push(child);
   const log = join(logDirectory, `${name}.log`);
+  let recent = "";
+  let listening = false;
   const capture = (chunk: Buffer) => {
     const text = chunk
       .toString()
       .replaceAll(redisToken, "[redacted]")
       .replaceAll(environment.WORKOS_COOKIE_PASSWORD ?? "", "[redacted]");
+    recent = (recent + text).slice(-4000);
+    listening ||= watch?.listening.test(recent) ?? false;
     writeFileSync(log, text, { flag: "a", mode: 0o600 });
   };
   child.stdout?.on("data", capture);
@@ -232,9 +247,26 @@ function start(name: string, args: string[], cwd = root) {
   child.on("error", () => {
     childFailed = true;
   });
-  child.on("exit", () => {
+  let settled = false;
+  const settle = () => {
+    if (settled) {
+      return;
+    }
+    settled = true;
+    if (watch && PORT_TAKEN.test(recent)) {
+      watch.onPortTaken();
+      return;
+    }
     childFailed = true;
+  };
+  // `close` fires once stdout and stderr have ended, so an error printed just
+  // before exiting has been read. Descendants can hold the pipes open, so
+  // `exit` settles a moment later if `close` has not.
+  child.on("close", settle);
+  child.on("exit", () => {
+    setTimeout(settle, 1000);
   });
+  return { listening: () => listening };
 }
 
 // Long steps (snapshot build, regression suites) run in their own process
@@ -301,11 +333,20 @@ async function runOwned(
   return { status, output };
 }
 
-async function waitUntilReady(url: string, redis = false) {
+async function waitUntilReady(
+  url: string,
+  redis = false,
+  abandoned = () => false,
+  listening = () => true
+) {
   const deadline = performance.now() + 180_000;
   while (performance.now() < deadline) {
-    if (stopped || finishing || childFailed) {
+    if (stopped || finishing || childFailed || abandoned()) {
       break;
+    }
+    if (!listening()) {
+      await delay(200);
+      continue;
     }
     try {
       const response = await fetch(url, {
@@ -321,17 +362,86 @@ async function waitUntilReady(url: string, redis = false) {
           : {}),
         signal: AbortSignal.timeout(10_000),
       });
-      if (response.ok) {
+      if (response.ok && !abandoned()) {
         return;
       }
     } catch {
-      if (stopped || finishing || childFailed) {
+      if (stopped || finishing || childFailed || abandoned()) {
         break;
       }
     }
     await delay(2000);
   }
   throw new Error("Owned service readiness failed or the run was interrupted");
+}
+
+// A conflict on the last start fails the run; earlier ones ask for a retry.
+function portWatch(listening: RegExp, retry: (() => void) | null): PortWatch {
+  return {
+    listening,
+    onPortTaken: () => {
+      if (retry) {
+        retry();
+      } else {
+        childFailed = true;
+      }
+    },
+  };
+}
+
+/**
+ * freePort() only shows a port was free a moment ago: a suite running alongside
+ * can bind it before the service does. A service that stops because its port
+ * was taken starts again on another one.
+ */
+async function startOnFreePort(
+  name: string,
+  launch: (port: number) => {
+    args: string[];
+    cwd?: string;
+    ready: string;
+    redis?: boolean;
+    listening: RegExp;
+  }
+) {
+  for (let attempt = 1; ; attempt += 1) {
+    const port = await freePort();
+    // Cleanup can begin while the port is picked; a child started after it
+    // would outlive the run.
+    if (stopped || finishing) {
+      throw new Error(`Run finished before ${name} started`);
+    }
+    const service = launch(port);
+    let taken = false;
+    const child = start(
+      name,
+      service.args,
+      service.cwd,
+      portWatch(
+        service.listening,
+        attempt < PORT_ATTEMPTS
+          ? () => {
+              taken = true;
+            }
+          : null
+      )
+    );
+    try {
+      // Probing only once the child says it bound the port means a server that
+      // took the port first is never mistaken for this one.
+      await waitUntilReady(
+        service.ready,
+        service.redis,
+        () => taken,
+        child.listening
+      );
+      return;
+    } catch (error) {
+      if (!taken) {
+        throw error;
+      }
+    }
+  }
 }
 
 // When each step finished, in seconds since start.
@@ -435,39 +545,46 @@ async function startDashboard() {
     "--maxmemory",
     "64mb",
   ]);
-  const redisPort = await freePort();
-  environment.SITES_TEST_REDIS_REST_PORT = String(redisPort);
-  environment.UPSTASH_REDIS_REST_URL = `http://127.0.0.1:${redisPort}`;
   environment.UPSTASH_REDIS_REST_TOKEN = redisToken;
   if (finishing) {
     throw new Error("Run finished before the dashboard started");
   }
-  start("redis-rest", ["scripts/testing/dashboard/redis-rest.ts"]);
-  await waitUntilReady(environment.UPSTASH_REDIS_REST_URL, true);
-  const port = await freePort();
-  const origin = `http://127.0.0.1:${port}`;
-  environment.APP_URL = origin;
-  environment.NEXT_PUBLIC_APP_URL = origin;
-  environment.NEXT_PUBLIC_SITE_URL = origin;
-  environment.WORKOS_REDIRECT_URI = `${origin}/auth/callback`;
-  environment.WORKFLOW_LOCAL_BASE_URL = origin;
+  await startOnFreePort("redis-rest", (redisPort) => {
+    environment.SITES_TEST_REDIS_REST_PORT = String(redisPort);
+    environment.UPSTASH_REDIS_REST_URL = `http://127.0.0.1:${redisPort}`;
+    return {
+      args: ["scripts/testing/dashboard/redis-rest.ts"],
+      ready: environment.UPSTASH_REDIS_REST_URL,
+      redis: true,
+      listening: new RegExp(`"port":${redisPort}\\b`),
+    };
+  });
   if (finishing) {
     throw new Error("Run finished before the dashboard started");
   }
-  start(
-    "dashboard",
-    [
-      "x",
-      "vite",
-      "--host",
-      "127.0.0.1",
-      "--port",
-      String(port),
-      "--strictPort",
-    ],
-    join(root, "apps/dashboard")
-  );
-  await waitUntilReady(`${origin}/__tests/sites`);
+  let origin = "";
+  await startOnFreePort("dashboard", (port) => {
+    origin = `http://127.0.0.1:${port}`;
+    environment.APP_URL = origin;
+    environment.NEXT_PUBLIC_APP_URL = origin;
+    environment.NEXT_PUBLIC_SITE_URL = origin;
+    environment.WORKOS_REDIRECT_URI = `${origin}/auth/callback`;
+    environment.WORKFLOW_LOCAL_BASE_URL = origin;
+    return {
+      args: [
+        "x",
+        "vite",
+        "--host",
+        "127.0.0.1",
+        "--port",
+        String(port),
+        "--strictPort",
+      ],
+      cwd: join(root, "apps/dashboard"),
+      ready: `${origin}/__tests/sites`,
+      listening: new RegExp(`Local:\\s+http://127\\.0\\.0\\.1:${port}/`),
+    };
+  });
   mark("dashboard");
   return origin;
 }
