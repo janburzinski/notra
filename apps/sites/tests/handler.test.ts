@@ -1111,7 +1111,7 @@ describe("production serving", () => {
   });
 });
 
-describe("loader coalescing", () => {
+describe("loaders", () => {
   test("lookup caches retain only the bounded newest positive and negative entries", async () => {
     for (const kind of ["host", "state"]) {
       resetCachesForTests();
@@ -1146,30 +1146,31 @@ describe("loader coalescing", () => {
     }
   });
 
-  test("cold bursts share one read per host, state and manifest", async () => {
-    const { deps } = setup();
-    const reads = new Map<string, number>();
-    const get = deps.bucket.get;
-    deps.bucket.get = (key) => {
-      reads.set(key, (reads.get(key) ?? 0) + 1);
-      return get(key);
-    };
-    const hosts = await Promise.all(
-      Array.from({ length: 100 }, () => loadHost(deps, "acme.notra.site"))
-    );
-    const states = await Promise.all(
-      Array.from({ length: 100 }, () => loadState(deps, SITE))
-    );
-    const manifests = await Promise.all(
-      Array.from({ length: 100 }, () => loadManifest(deps, SITE, "dep_live"))
-    );
-    expect(hosts.every((host) => host === hosts[0])).toBe(true);
-    expect(states.every((state) => state === states[0])).toBe(true);
-    expect(manifests.every((entry) => entry === manifests[0])).toBe(true);
-    expect([...reads.values()]).toEqual([1, 1, 1]);
+  test("a read stuck in another request cannot hang later requests", async () => {
+    for (const kind of ["host", "state", "manifest"]) {
+      resetCachesForTests();
+      const { deps } = setup();
+      const get = deps.bucket.get;
+      // The Workers runtime never settles a read whose request was cancelled.
+      deps.bucket.get = () => new Promise(() => {});
+      const load = (source: SitesDeps) => {
+        if (kind === "host") {
+          return loadHost(source, "acme.notra.site");
+        }
+        return kind === "state"
+          ? loadState(source, SITE)
+          : loadManifest(source, SITE, "dep_live");
+      };
+      const abandoned = load(deps);
+      deps.bucket.get = get;
+      expect(await load(deps)).not.toBeNull();
+      expect(await Promise.race([abandoned, "still pending"])).toBe(
+        "still pending"
+      );
+    }
   });
 
-  test("failed bursts share the error but the next call retries", async () => {
+  test("failed reads are not cached, so the next call retries", async () => {
     for (const kind of ["host", "state", "manifest"]) {
       resetCachesForTests();
       const { deps } = setup();
@@ -1190,17 +1191,67 @@ describe("loader coalescing", () => {
           ? loadState(deps, SITE)
           : loadManifest(deps, SITE, "dep_live");
       };
-      const failed = await Promise.allSettled(
-        Array.from({ length: 100 }, load)
-      );
-      expect(failed.every((result) => result.status === "rejected")).toBe(true);
-      expect(reads).toBe(1);
+      await expect(load()).rejects.toThrow("bucket unavailable");
       fail = false;
       expect(await load()).not.toBeNull();
-      expect(reads).toBe(2);
       expect(await load()).not.toBeNull();
       expect(reads).toBe(2);
     }
+  });
+
+  test("a read slower than the limit answers the retry page instead of hanging", async () => {
+    const { deps, request } = setup();
+    deps.bucket.get = () => new Promise(() => {});
+    deps.r2ReadTimeoutMs = 20;
+    const response = await request("https://acme.notra.site/blog");
+    expect(response.status).toBe(503);
+    expect(response.headers.get("Retry-After")).toBe("5");
+  });
+
+  test("a body that stalls after R2 answers also hits the limit", async () => {
+    const { deps, request } = setup();
+    deps.bucket.get = async () => ({
+      body: null,
+      text: () => new Promise<string>(() => {}),
+    });
+    deps.r2ReadTimeoutMs = 20;
+    const response = await request("https://acme.notra.site/blog");
+    expect(response.status).toBe(503);
+  });
+
+  test("a slow older read cannot replace a newer cached state", async () => {
+    const { deps, put, objects } = setup();
+    const key = `sites/${SITE}/state.json`;
+    const get = deps.bucket.get;
+    let release = () => {};
+    const gate = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    deps.bucket.get = async (path) => {
+      const object = await get(path);
+      await gate;
+      return object;
+    };
+    const older = loadState(deps, SITE);
+    deps.bucket.get = get;
+    put(key, { ...JSON.parse(objects.get(key) ?? "{}"), status: "suspended" });
+    expect((await loadState(deps, SITE))?.status).toBe("suspended");
+    release();
+    expect((await older)?.status).toBe("active");
+    expect((await loadState(deps, SITE))?.status).toBe("suspended");
+  });
+
+  test("responses report their lookups in Server-Timing", async () => {
+    const { request } = setup();
+    const cold = await request("https://acme.notra.site/blog");
+    expect(cold.status).toBe(200);
+    expect(cold.headers.get("Server-Timing")).toMatch(
+      /^host;desc="r2";dur=[\d.]+, state;desc="r2";dur=[\d.]+, manifest;desc="r2";dur=[\d.]+, total;dur=[\d.]+$/
+    );
+    const warm = await request("https://acme.notra.site/blog");
+    expect(warm.headers.get("Server-Timing")).toMatch(
+      /^host;desc="cache";dur=0\.0, state;desc="cache";dur=0\.0, manifest;desc="cache";dur=0\.0, total;dur=[\d.]+$/
+    );
   });
 
   test("reset detaches pending reads so they cannot repopulate or evict new loads", async () => {
@@ -1241,7 +1292,7 @@ describe("loader coalescing", () => {
     }
   });
 
-  test("state expiry coalesces without extending the five-second takedown window", async () => {
+  test("a takedown applies once the cached state is five seconds old", async () => {
     const { deps, request, put, objects } = setup();
     const key = `sites/${SITE}/state.json`;
     let reads = 0;
@@ -1262,7 +1313,6 @@ describe("loader coalescing", () => {
       Array.from({ length: 100 }, () => request("https://acme.notra.site/blog"))
     );
     expect(responses.every((response) => response.status === 410)).toBe(true);
-    expect(reads).toBe(2);
   });
 });
 

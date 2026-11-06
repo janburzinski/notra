@@ -1,6 +1,7 @@
 import { parseSiteHost } from "@notra/sites-core/utils/hosts";
 import { Effect, Option } from "effect";
 
+import { SLOW_REQUEST_MS } from "./constants/cache";
 import { REQUEST_ROUTES } from "./constants/routes";
 import { notFoundPage, serviceErrorPage } from "./pages";
 import { resolveDeployment } from "./pipeline/resolve-deployment";
@@ -10,6 +11,11 @@ import { isStateUnavailable } from "./utils/errors";
 import { requestHost } from "./utils/request-host";
 import { html } from "./utils/responses";
 import { runRoutes } from "./utils/run-routes";
+import {
+  createServerTiming,
+  serverTimingHeader,
+  withServerTiming,
+} from "./utils/server-timing";
 
 const siteRequest = Effect.fn("Sites.handleRequest")(function* (
   request: Request,
@@ -53,9 +59,25 @@ const siteRequest = Effect.fn("Sites.handleRequest")(function* (
   );
 });
 
-export function handleSiteRequest(
+export async function handleSiteRequest(
   request: Request,
   deps: SitesDeps
 ): Promise<Response> {
-  return Effect.runPromise(siteRequest(request, deps));
+  const started = performance.now();
+  const timing = createServerTiming();
+  const response = await Effect.runPromise(
+    siteRequest(request, { ...deps, timing })
+  );
+  const totalMs = performance.now() - started;
+  if (totalMs >= SLOW_REQUEST_MS) {
+    const url = new URL(request.url);
+    console.warn("sites.slow_request", {
+      host: url.host,
+      path: url.pathname,
+      status: response.status,
+      totalMs,
+      lookups: timing.entries,
+    });
+  }
+  return withServerTiming(response, serverTimingHeader(timing, totalMs));
 }

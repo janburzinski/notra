@@ -1,3 +1,5 @@
+import type { ServerTiming } from "./serving";
+
 export interface SiteBucketObject {
   body: ReadableStream | null;
   text(): Promise<string>;
@@ -40,4 +42,8 @@ export interface SitesDeps {
   fetch: (url: string, init: RequestInit) => Promise<Response>;
   waitUntil: (promise: Promise<unknown>) => void;
   now: () => Date;
+  /** Per-request lookup timings for the Server-Timing header and slow-request logs. */
+  timing?: ServerTiming;
+  /** Overrides R2_READ_TIMEOUT_MS (tests). */
+  r2ReadTimeoutMs?: number;
 }

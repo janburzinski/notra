@@ -13,87 +13,118 @@ import {
   HOST_TTL_MS,
   LOOKUP_CACHE_LIMIT,
   MANIFEST_CACHE_LIMIT,
+  R2_READ_TIMEOUT_MS,
+  SLOW_R2_READ_MS,
   STATE_TTL_MS,
 } from "./constants/cache";
-import type { LoadedManifest, TimedCacheEntry } from "./types/serving";
-import type { SiteBucketObject, SitesDeps } from "./types/worker";
+import type {
+  LoadedManifest,
+  ServerTimingName,
+  TimedCacheEntry,
+} from "./types/serving";
+import type { SitesDeps } from "./types/worker";
 import { StateUnavailableError } from "./utils/errors";
 
+// Values are shared across requests, but in-flight reads are not: the Workers
+// runtime ties a promise to the request that created it, so a read started by a
+// request that was cancelled (a visitor closing the tab) never settles. Shared,
+// it would hang every later request for that site in the isolate.
 const hostCache = new Map<string, TimedCacheEntry<SiteHostRecord | null>>();
 const stateCache = new Map<string, TimedCacheEntry<SiteServingState | null>>();
 const manifestCache = new Map<string, LoadedManifest>();
-const hostLoads = new Map<string, Promise<SiteHostRecord | null>>();
-const stateLoads = new Map<string, Promise<SiteServingState | null>>();
-const manifestLoads = new Map<string, Promise<LoadedManifest | null>>();
+// Bumped by resets, so a read that finishes afterwards cannot repopulate a cache.
+let generation = 0;
+// Orders reads, so a slow read that started earlier cannot replace a newer value.
+let reads = 0;
 
 export function resetCachesForTests() {
   hostCache.clear();
   stateCache.clear();
   manifestCache.clear();
-  hostLoads.clear();
-  stateLoads.clear();
-  manifestLoads.clear();
+  generation += 1;
 }
 
-async function readJson(deps: SitesDeps, key: string): Promise<unknown> {
-  let object: SiteBucketObject | null;
+async function readJson(
+  deps: SitesDeps,
+  key: string,
+  timing: ServerTimingName
+): Promise<unknown> {
+  const started = performance.now();
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const timeoutMs = deps.r2ReadTimeoutMs ?? R2_READ_TIMEOUT_MS;
   try {
-    object = await deps.bucket.get(key);
+    // The body is read inside the race too: R2 can return an object whose body stalls.
+    return await Promise.race([
+      (async () => {
+        const object = await deps.bucket.get(key);
+        return object ? JSON.parse(await object.text()) : null;
+      })(),
+      new Promise<never>((_, reject) => {
+        timer = setTimeout(
+          () =>
+            reject(
+              new StateUnavailableError(
+                `R2 read for ${key} took longer than ${timeoutMs} ms`
+              )
+            ),
+          timeoutMs
+        );
+      }),
+    ]);
   } catch (error) {
+    if (
+      error instanceof StateUnavailableError ||
+      error instanceof SyntaxError
+    ) {
+      throw error;
+    }
     throw new StateUnavailableError(
       `R2 read failed for ${key}: ${String(error)}`
     );
+  } finally {
+    clearTimeout(timer);
+    const durationMs = performance.now() - started;
+    deps.timing?.record(timing, durationMs, "r2");
+    if (durationMs >= SLOW_R2_READ_MS) {
+      console.warn("sites.slow_r2_read", { key, durationMs });
+    }
   }
-  return object ? JSON.parse(await object.text()) : null;
 }
 
-function shareLoad<T>(
-  pending: Map<string, Promise<T>>,
-  key: string,
-  load: () => Promise<T>,
-  store: (value: T) => void
-): Promise<T> {
-  const existing = pending.get(key);
-  if (existing) {
-    return existing;
+function remember<K, V>(cache: Map<K, V>, limit: number, key: K, value: V) {
+  if (!cache.has(key) && cache.size >= limit) {
+    const oldest = cache.keys().next().value;
+    if (oldest !== undefined) {
+      cache.delete(oldest);
+    }
   }
-  const promise = load()
-    .then((value) => {
-      if (pending.get(key) === promise) {
-        store(value);
-      }
-      return value;
-    })
-    .finally(() => {
-      if (pending.get(key) === promise) {
-        pending.delete(key);
-      }
-    });
-  pending.set(key, promise);
-  return promise;
+  cache.set(key, value);
 }
 
 async function loadWithTtl<T>(
   deps: SitesDeps,
   cache: Map<string, TimedCacheEntry<T>>,
-  pending: Map<string, Promise<T>>,
   key: string,
   ttlMs: number,
+  timing: ServerTimingName,
   load: () => Promise<T>
 ): Promise<T> {
   const cached = cache.get(key);
   if (cached && deps.now().getTime() - cached.at < ttlMs) {
+    deps.timing?.record(timing, 0, "cache");
     return cached.value;
   }
-  return await shareLoad(pending, key, load, (value) => {
-    if (!cache.has(key) && cache.size >= LOOKUP_CACHE_LIMIT) {
-      const oldest = cache.keys().next().value;
-      if (oldest) {
-        cache.delete(oldest);
-      }
-    }
-    cache.set(key, { value, at: deps.now().getTime() });
-  });
+  const loadedIn = generation;
+  reads += 1;
+  const read = reads;
+  // Freshness counts from when the read started, so a slow read cannot extend it.
+  const startedAt = deps.now().getTime();
+  const value = await load();
+  const current = cache.get(key);
+  if (loadedIn === generation && (!current || current.read < read)) {
+    remember(cache, LOOKUP_CACHE_LIMIT, key, { value, at: startedAt, read });
+  }
+  return value;
 }
 
 export function loadHost(
@@ -103,11 +134,11 @@ export function loadHost(
   return loadWithTtl(
     deps,
     hostCache,
-    hostLoads,
     hostname,
     HOST_TTL_MS,
+    "host",
     async () => {
-      const raw = await readJson(deps, SITE_R2_KEYS.host(hostname));
+      const raw = await readJson(deps, SITE_R2_KEYS.host(hostname), "host");
       const parsed = raw ? siteHostRecordSchema.safeParse(raw) : null;
       return parsed?.success ? parsed.data : null;
     }
@@ -121,11 +152,11 @@ export function loadState(
   return loadWithTtl(
     deps,
     stateCache,
-    stateLoads,
     siteId,
     STATE_TTL_MS,
+    "state",
     async () => {
-      const raw = await readJson(deps, SITE_R2_KEYS.state(siteId));
+      const raw = await readJson(deps, SITE_R2_KEYS.state(siteId), "state");
       if (raw === null) {
         return null;
       }
@@ -146,48 +177,34 @@ export async function loadManifest(
   const cacheKey = `${siteId}/${deploymentId}`;
   const cached = manifestCache.get(cacheKey);
   if (cached) {
+    deps.timing?.record("manifest", 0, "cache");
     return cached;
   }
-  return await shareLoad(
-    manifestLoads,
-    cacheKey,
-    async () => {
-      const raw = await readJson(
-        deps,
-        SITE_R2_KEYS.manifest(siteId, deploymentId)
-      );
-      if (!raw) {
-        return null;
-      }
-      const parsed = siteManifestSchema.safeParse(raw);
-      if (!parsed.success) {
-        throw new StateUnavailableError(`Invalid manifest for ${cacheKey}`);
-      }
-      const manifest = parsed.data;
-      if (
-        manifest.siteId !== siteId ||
-        manifest.deploymentId !== deploymentId
-      ) {
-        throw new StateUnavailableError(
-          `Manifest ${cacheKey} does not match its location`
-        );
-      }
-      return {
-        manifest,
-        files: new Map(manifest.files.map((file) => [file.path, file])),
-      };
-    },
-    (loaded) => {
-      if (!loaded) {
-        return;
-      }
-      if (manifestCache.size >= MANIFEST_CACHE_LIMIT) {
-        const oldest = manifestCache.keys().next().value;
-        if (oldest) {
-          manifestCache.delete(oldest);
-        }
-      }
-      manifestCache.set(cacheKey, loaded);
-    }
+  const loadedIn = generation;
+  const raw = await readJson(
+    deps,
+    SITE_R2_KEYS.manifest(siteId, deploymentId),
+    "manifest"
   );
+  if (!raw) {
+    return null;
+  }
+  const parsed = siteManifestSchema.safeParse(raw);
+  if (!parsed.success) {
+    throw new StateUnavailableError(`Invalid manifest for ${cacheKey}`);
+  }
+  const manifest = parsed.data;
+  if (manifest.siteId !== siteId || manifest.deploymentId !== deploymentId) {
+    throw new StateUnavailableError(
+      `Manifest ${cacheKey} does not match its location`
+    );
+  }
+  const loaded = {
+    manifest,
+    files: new Map(manifest.files.map((file) => [file.path, file])),
+  };
+  if (loadedIn === generation) {
+    remember(manifestCache, MANIFEST_CACHE_LIMIT, cacheKey, loaded);
+  }
+  return loaded;
 }
