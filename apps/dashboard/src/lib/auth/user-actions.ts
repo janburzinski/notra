@@ -33,7 +33,10 @@ import { syncBrewContacts } from "@/lib/email/brew-contacts";
 import { clearLocaleCookie, writeLocaleCookie } from "@/lib/i18n/locale-cookie";
 import { failWithOrganizationMessage } from "@/lib/organizations/action-messages";
 import { requireSession } from "@/lib/organizations/guards";
-import { revokeSitePreviewSessions } from "@/lib/sites/preview-revocation";
+import {
+  revokeSitePreviewAccessForAccountDeletion,
+  revokeSitePreviewSessions,
+} from "@/lib/sites/preview-revocation";
 import type { SessionUser } from "@/types/auth/session";
 import type {
   SignOutActionOptions,
@@ -170,6 +173,11 @@ export async function deleteUser(): Promise<
           })
         );
       }
+
+      yield* tryAction(
+        () => revokeSitePreviewAccessForAccountDeletion(session.user.id),
+        "Failed to revoke Site preview access"
+      );
 
       // A Brew outage stops the deletion here instead of leaving the contact
       // behind; `finishUserDeletion` removes it again once the account is gone.

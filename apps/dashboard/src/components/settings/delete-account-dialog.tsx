@@ -25,6 +25,7 @@ import {
 } from "@notra/ui/components/ui/radio-group";
 import { Skeleton } from "@notra/ui/components/ui/skeleton";
 import { Spinner } from "@notra/ui/components/ui/spinner";
+import { ORPCError } from "@orpc/client";
 import { useQuery } from "@tanstack/react-query";
 import type { ReactElement } from "react";
 import { useState } from "react";
@@ -121,7 +122,11 @@ export function DeleteAccountDialog({
       deleteError = result.error;
     } catch (error) {
       console.error("Delete account error:", error);
-      toast.error(t("deleteFailed"));
+      toast.error(
+        error instanceof ORPCError && error.code === "UNAUTHORIZED"
+          ? error.message
+          : t("deleteFailed")
+      );
       setIsDeleting(false);
       return;
     }

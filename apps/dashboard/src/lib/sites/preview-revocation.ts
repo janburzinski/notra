@@ -1,6 +1,7 @@
 import { isSitesConfigured } from "@notra/sites-server/env";
 import {
   revokeOrganizationMemberPreviewAccess,
+  revokeUserPreviewAccess,
   revokeUserPreviewSessions,
 } from "@notra/sites-server/preview-revocation";
 
@@ -34,4 +35,10 @@ export async function revokeSitePreviewSessions(userId: string): Promise<void> {
       error: error instanceof Error ? error.message : error,
     });
   }
+}
+
+export async function revokeSitePreviewAccessForAccountDeletion(
+  userId: string
+): Promise<void> {
+  await revokeUserPreviewAccess(userId);
 }

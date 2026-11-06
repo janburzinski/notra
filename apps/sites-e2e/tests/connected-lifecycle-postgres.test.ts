@@ -197,6 +197,7 @@ if (!process.env.SITES_TEST_DATABASE_URL) {
   const { db } = await import("@notra/db/drizzle");
   const {
     abuseActions,
+    members,
     users,
     organizations,
     githubAppInstallations,
@@ -244,7 +245,7 @@ if (!process.env.SITES_TEST_DATABASE_URL) {
     await import("../../../packages/sites-server/src/editor");
   const { previewAccessUrl } =
     await import("../../../packages/sites-server/src/preview-access");
-  const { revokeOrganizationMemberPreviewAccess } =
+  const { revokeUserPreviewAccess } =
     await import("../../../packages/sites-server/src/preview-revocation");
   const { runSiteJob } =
     await import("../../../packages/sites-server/src/runner");
@@ -421,6 +422,13 @@ if (!process.env.SITES_TEST_DATABASE_URL) {
         id: organizationId,
         name: "Fixture",
         slug: organizationId,
+        createdAt: new Date(),
+      });
+      await db.insert(members).values({
+        id: `${organizationId}-member`,
+        organizationId,
+        userId,
+        role: "member",
         createdAt: new Date(),
       });
       // The journey runs on a paid plan: no workspace caps on sites or domains.
@@ -711,8 +719,8 @@ if (!process.env.SITES_TEST_DATABASE_URL) {
       expect(await (await request(`${previewOrigin}/robots.txt`)).text()).toBe(
         "User-agent: *\nDisallow: /\n"
       );
-      // Removing the user from the workspace ends their member sessions and
-      // the share links they issued; a link issued afterwards works again.
+      // Account deletion revokes member sessions and all share links the user
+      // issued; a link issued afterwards works again.
       const signIn = async (kind: "member" | "share") => {
         const accessUrl = (
           await previewAccessUrl({
@@ -733,7 +741,7 @@ if (!process.env.SITES_TEST_DATABASE_URL) {
         return session;
       };
       const memberCookie = await signIn("member");
-      await revokeOrganizationMemberPreviewAccess(organizationId, userId);
+      await revokeUserPreviewAccess(userId);
       for (const revoked of [cookie, memberCookie]) {
         expect(
           (await request(`${previewOrigin}/blog`, { cookie: revoked })).status

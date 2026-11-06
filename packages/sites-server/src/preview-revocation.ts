@@ -61,7 +61,10 @@ export async function revokeOrganizationMemberPreviewAccess(
   await revokeOnSites(rows, userId, "access_lost");
 }
 
-export async function revokeUserPreviewSessions(userId: string): Promise<void> {
+async function revokeUserOnSites(
+  userId: string,
+  scope: PreviewRevocationScope
+): Promise<void> {
   const organizations = db
     .select({ organizationId: members.organizationId })
     .from(members)
@@ -70,5 +73,14 @@ export async function revokeUserPreviewSessions(userId: string): Promise<void> {
     .select({ id: sites.id, slug: sites.slug })
     .from(sites)
     .where(inArray(sites.organizationId, organizations));
-  await revokeOnSites(rows, userId, "signed_out");
+  await revokeOnSites(rows, userId, scope);
+}
+
+export async function revokeUserPreviewSessions(userId: string): Promise<void> {
+  await revokeUserOnSites(userId, "signed_out");
+}
+
+/** Revoke both member sessions and issued share links before account deletion. */
+export async function revokeUserPreviewAccess(userId: string): Promise<void> {
+  await revokeUserOnSites(userId, "access_lost");
 }

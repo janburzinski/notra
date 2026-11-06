@@ -8,11 +8,13 @@ import { getOpenRequestLogger } from "@notra/ai/utils/evlog-request";
 import { db } from "@notra/db/drizzle";
 import {
   githubIntegrations,
+  members,
   projects,
   siteDeployments,
   siteDomains,
   sites,
 } from "@notra/db/schema";
+import { withAdvisorySessionLocks } from "@notra/db/utils/advisory-session-lock";
 import { loadSiteAnalytics } from "@notra/geo-core/geo/web-analytics";
 import { geoWindow } from "@notra/geo-core/geo/window";
 import { organizationIdInputSchema } from "@notra/schemas/dashboard/auth/organization";
@@ -63,6 +65,7 @@ import type { SiteServingState } from "@notra/sites-core/types/deployment";
 import { hashBuildTarget } from "@notra/sites-core/utils/build-target";
 import { postPreviewKey } from "@notra/sites-core/utils/hosts";
 import { isSiteImageDraftPath } from "@notra/sites-core/utils/image-drafts";
+import { previewIssuerLockKey } from "@notra/sites-core/utils/preview-issuer-lock";
 import {
   createSiteBranch,
   discardDeletedSiteBranchDrafts,
@@ -927,16 +930,31 @@ export const sitesRouter = {
     accessUrl: sitesProcedure
       .input(sitePreviewAccessInputSchema)
       .handler(async ({ context, input }) => {
-        const { site, userId } = await requireSite(context, input);
-        const next =
-          input.next ?? site.mounts.blog ?? site.mounts.changelog ?? "/";
-        return await previewAccessUrl({
-          site,
-          previewKey: input.previewKey,
-          next,
-          kind: input.kind,
-          userId,
-        });
+        return await withAdvisorySessionLocks(
+          [previewIssuerLockKey(context.user.id)],
+          async () => {
+            const currentMembership = await db.query.members.findFirst({
+              columns: { id: true },
+              where: and(
+                eq(members.userId, context.user.id),
+                eq(members.organizationId, input.organizationId)
+              ),
+            });
+            if (!currentMembership) {
+              throw forbidden("Workspace access is no longer available");
+            }
+            const { site, userId } = await requireSite(context, input);
+            const next =
+              input.next ?? site.mounts.blog ?? site.mounts.changelog ?? "/";
+            return await previewAccessUrl({
+              site,
+              previewKey: input.previewKey,
+              next,
+              kind: input.kind,
+              userId,
+            });
+          }
+        );
       }),
 
     setPassword: sitesProcedure

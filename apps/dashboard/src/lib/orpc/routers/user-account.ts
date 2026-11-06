@@ -1,9 +1,11 @@
+import { withAdvisorySessionLocks } from "@notra/db/utils/advisory-session-lock";
 import type {
   DiscardTotpEnrollmentInput,
   RegenerateBackupCodesInput,
   RemoveAuthFactorInput,
   VerifyTotpEnrollmentInput,
 } from "@notra/schemas/types/dashboard/auth";
+import { previewIssuerLockKey } from "@notra/sites-core/utils/preview-issuer-lock";
 import { type } from "@orpc/server";
 
 import {
@@ -21,7 +23,7 @@ import {
   unlinkAccount,
   updateUser,
 } from "@/lib/auth/user-actions";
-import { baseProcedure } from "@/lib/orpc/base";
+import { authorizedProcedure, baseProcedure } from "@/lib/orpc/base";
 import type {
   UnlinkAccountInput,
   UpdateUserInput,
@@ -31,7 +33,11 @@ export const userAccountRouter = {
   update: baseProcedure
     .input(type<UpdateUserInput>())
     .handler(({ input }) => updateUser(input)),
-  delete: baseProcedure.handler(() => deleteUser()),
+  delete: authorizedProcedure.handler(({ context }) =>
+    withAdvisorySessionLocks([previewIssuerLockKey(context.user.id)], () =>
+      deleteUser()
+    )
+  ),
   requestPasswordReset: baseProcedure.handler(() => requestPasswordReset()),
   listConnections: baseProcedure.handler(() => listAccounts()),
   unlinkConnection: baseProcedure
