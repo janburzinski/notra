@@ -12,8 +12,8 @@ import {
 } from "@/utils/chat-preferences";
 
 /**
- * Chat model and thinking level shared by every mounted composer. Updates merge
- * with the latest stored value so one composer never overwrites the other's field.
+ * Chat thinking level shared by every mounted composer. Updates merge with the
+ * latest stored value so one composer never overwrites another's field.
  */
 export function useStoredChatPreferences() {
   const raw = useSyncExternalStore(

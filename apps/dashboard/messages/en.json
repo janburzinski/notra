@@ -6216,23 +6216,12 @@
         "customMcp": "Custom MCP server · {count, plural, one {# tool} other {# tools}}",
         "marketplaceMcp": "Marketplace MCP server · {count, plural, one {# tool} other {# tools}}"
       },
-      "modelPicker": {
-        "searchPlaceholder": "Search models…",
-        "empty": "No models found."
-      },
-      "modelEffort": {
-        "label": "Model and effort",
-        "effort": "Effort",
-        "model": "Model"
-      },
       "attach": {
-        "imagesPdfs": "Attach images or PDFs",
-        "imagesPdfsText": "Attach images, PDFs or text"
+        "files": "Attach images, text or Markdown files"
       },
       "upload": {
         "maxAttachments": "You can attach at most {max} files per message.",
-        "unsupportedText": "{model} only supports image and PDF attachments. Remove text files or choose a Claude model.",
-        "unsupportedType": "Unsupported file type: {name}",
+        "unsupportedType": "{name} isn't supported. You can attach images, text and Markdown files.",
         "tooLarge": "{name} exceeds the {size}MB limit.",
         "failed": "Failed to upload {name}: {message}",
         "someFailed": "Some attachments failed to upload. Remove or retry them before sending.",
@@ -6359,7 +6348,6 @@
     "userMessageActions": {
       "previousVersion": "Previous version",
       "nextVersion": "Next version",
-      "retryWithSame": "Retry with same",
       "editMessage": "Edit message",
       "copyMessage": "Copy message",
       "editPlaceholder": "Edit your message…"
@@ -6387,22 +6375,6 @@
     "errors": {
       "usageLimit": "You've used all your chat messages this month. Upgrade for more.",
       "fallback": "Something went wrong while generating a response. Try again."
-    },
-    "models": {
-      "descriptions": {
-        "auto": "Picks the best model for your message",
-        "latestOpus": "Latest Opus for complex work",
-        "everyday": "Everyday work and coding",
-        "fast": "Fast responses",
-        "advancedReasoning": "Advanced reasoning and complex tasks",
-        "fastAffordable": "Fast and affordable",
-        "zdrRoute": "OpenAI model with a ZDR route",
-        "previousOpus": "Previous Opus generation",
-        "previousSonnet": "Previous Sonnet generation",
-        "previousOpenai": "Previous OpenAI model"
-      },
-      "pricing": "${input} input / ${output} output per 1M",
-      "pricingVaries": "Varies by selected model"
     },
     "quote": {
       "quoteSelection": "Quote selected text",

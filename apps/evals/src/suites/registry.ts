@@ -1,6 +1,5 @@
 import type { AnySuite } from "../types/eval";
 import { autopilotPlannerSuite } from "./autopilot-planner";
-import { chatRouterSuite } from "./chat-router";
 import { collectionTitleSuite } from "./collection-title";
 import { contentAgentSuite, contentDraftSuite } from "./content-agent";
 import { contentUnslopSuite } from "./content-unslop";
@@ -11,7 +10,6 @@ export const SUITES: readonly AnySuite[] = [
   contentUnslopSuite,
   contentAgentSuite,
   collectionTitleSuite,
-  chatRouterSuite,
   feedbackClassifierSuite,
   autopilotPlannerSuite,
 ];

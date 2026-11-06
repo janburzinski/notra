@@ -22,7 +22,6 @@ Reads the repo root `.env` (only `AI_GATEWAY_API_KEY` is needed). Runs are saved
 | `content-unslop` | background-gen unslop pass | slop removed, facts kept, grounding |
 | `content-agent` | full `runBackgroundGen` loop | everything above + tool use |
 | `collection-title` | `jobs/collection-title.ts` | format rules, brand spelling, Jev |
-| `chat-router` | `orchestration/router.ts` (Jev vs LLM) | complexity, tools, reasoning, route |
 | `feedback-classifier` | `jobs/feedback-classifier.ts` (Jev vs LLM) | kind, sentiment |
 | `autopilot-planner` | `jobs/autopilot-planner.ts` + `evaluateAutopilotGate`, multi-run | linking, action, gate, rules, stability, memory |
 

@@ -14,7 +14,6 @@ export type StandaloneChatTransportLive = {
   hasCustomizedContext: RefObject<boolean>;
   onChatCreated: RefObject<((chatId: string) => void) | undefined>;
   organizationId: RefObject<string>;
-  selectedModel: RefObject<string>;
   streamConflict: RefObject<string | null>;
   thinkingLevel: RefObject<string>;
 };
@@ -38,7 +37,6 @@ export function createStandaloneChatTransport({
         context: live.hasCustomizedContext.current
           ? live.context.current
           : undefined,
-        model: live.selectedModel.current,
         enableThinking: live.thinkingLevel.current !== "off",
         thinkingLevel: live.thinkingLevel.current,
         timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,

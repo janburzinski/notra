@@ -1,7 +1,6 @@
 import type {
   ChatAttachment,
   ChatInputHandle,
-  ChatModel,
   ContextItem,
   TextSelection,
   ThinkingLevel,
@@ -13,33 +12,6 @@ import type { ChatPostMention } from "@/types/chat-posts";
 import type { PendingChatUpload } from "@/types/hooks/chat-composer-attachments";
 import type { GitHubRepository } from "@/types/integrations";
 import type { SkillSlashOption } from "@/types/skills/slash";
-
-export type ChatModelProvider = "anthropic" | "openai" | "auto";
-
-type ChatModelDescriptionKey =
-  | "auto"
-  | "latestOpus"
-  | "everyday"
-  | "fast"
-  | "advancedReasoning"
-  | "fastAffordable"
-  | "zdrRoute"
-  | "previousOpus"
-  | "previousSonnet"
-  | "previousOpenai";
-
-interface ChatModelPricing {
-  input: string;
-  output: string;
-}
-
-export interface ChatModelOption {
-  id: ChatModel;
-  label: string;
-  description: ChatModelDescriptionKey | null;
-  pricing: ChatModelPricing | "varies" | null;
-  provider: ChatModelProvider;
-}
 
 export type ContentChatInputHandle = Pick<ChatInputHandle, "setAttachments"> & {
   /** The content page mounts a floating and a panel composer; only one shows. */
@@ -75,14 +47,11 @@ export interface ChatInputProps {
   onEditQueued?: (message: QueuedMessage) => void;
   onRemoveQueued?: (id: string) => void;
   onSteerQueued?: (message: QueuedMessage) => void;
-  modelEffort?: Omit<ChatModelEffortMenuProps, "disabled">;
+  effort?: Omit<ChatEffortMenuProps, "disabled">;
 }
 
-export interface ChatModelEffortMenuProps {
-  availableModels: readonly ChatModelOption[];
+export interface ChatEffortMenuProps {
   disabled?: boolean;
-  model: ChatModel;
-  onModelChange: (model: ChatModel) => void;
   onThinkingLevelChange: (level: ThinkingLevel) => void;
   thinkingLevel: ThinkingLevel;
 }

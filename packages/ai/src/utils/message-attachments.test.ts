@@ -32,14 +32,15 @@ beforeEach(() => {
   fetchSpy.mockClear();
 });
 
-const { replaceMissingFileAttachments } = await import("./message-attachments");
+const { prepareChatFileAttachments, replaceMissingFileAttachments } =
+  await import("./message-attachments");
 
-function file(name: string, origin = storage) {
+function file(name: string, origin = storage, mediaType = "image/png") {
   return {
     type: "file" as const,
     url: `${origin}/organization/o/chat/${name}`,
     filename: name,
-    mediaType: "image/png",
+    mediaType,
   };
 }
 
@@ -99,4 +100,77 @@ test("keeps attachments when the storage check is cancelled", async () => {
   expect(
     await replaceMissingFileAttachments("o", messages, controller.signal)
   ).toBe(messages);
+});
+
+test("keeps images, inlines uploaded text files and replaces other files with a note", async () => {
+  fetchSpy.mockImplementation(((input: string | URL | Request) =>
+    Promise.resolve(
+      String(input).endsWith("/notes.md")
+        ? new Response("# Launch notes")
+        : new Response(null, { status: 404 })
+    )) as typeof fetch);
+  const text = { type: "text" as const, text: "Summarize these" };
+
+  const image = file("diagram.png");
+  const result = await prepareChatFileAttachments(
+    userMessage([
+      file("notes.md", storage, "text/markdown"),
+      file("gone.txt", storage, "text/plain"),
+      file("remote.txt", "https://example.test", "text/plain"),
+      file("brief.pdf", storage, "application/pdf"),
+      image,
+      text,
+    ])
+  );
+
+  expect(result[0]?.parts).toEqual([
+    { type: "text", text: 'Attachment "notes.md":\n\n# Launch notes' },
+    { type: "text", text: '[Attachment "gone.txt" could not be read]' },
+    {
+      type: "text",
+      text: '[Attachment "remote.txt" (text/plain) was not sent: this chat can only read images, text and Markdown files]',
+    },
+    {
+      type: "text",
+      text: '[Attachment "brief.pdf" (application/pdf) was not sent: this chat can only read images, text and Markdown files]',
+    },
+    image,
+    text,
+  ]);
+  expect(fetchSpy.mock.calls.map(([url]) => String(url))).toEqual([
+    `${storage}/organization/o/chat/notes.md`,
+    `${storage}/organization/o/chat/gone.txt`,
+  ]);
+});
+
+test("truncates long text files and spends the text budget newest message first", async () => {
+  fetchSpy.mockImplementation((() =>
+    Promise.resolve(new Response("x".repeat(150_000)))) as typeof fetch);
+  const messages: UIMessage[] = [
+    {
+      id: "old",
+      role: "user",
+      parts: [file("old.txt", storage, "text/plain")],
+    },
+    {
+      id: "new",
+      role: "user",
+      parts: ["a", "b", "c"].map((name) =>
+        file(`${name}.txt`, storage, "text/plain")
+      ),
+    },
+  ];
+
+  const result = await prepareChatFileAttachments(messages);
+  const texts = result.map((message) =>
+    message.parts.map((part) => (part.type === "text" ? part.text : ""))
+  );
+
+  for (const text of texts[1] ?? []) {
+    expect(text.endsWith("[Attachment truncated]")).toBe(true);
+    expect(text.length).toBeLessThan(100_100);
+  }
+  expect(texts[0]).toEqual([
+    '[Attachment "old.txt" was not sent: the chat\'s attachment text limit is reached]',
+  ]);
 });

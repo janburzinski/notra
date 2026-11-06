@@ -12,7 +12,6 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { Composer } from "@notra/ui/components/ui/composer";
 import { useState } from "react";
 
-import { ModelIcon } from "@/components/chat/chat-input";
 import {
   COMPOSER_QUEUED_CHIP,
   COMPOSER_QUEUED_CHIP_LABEL,
@@ -56,7 +55,7 @@ function DemoComposer({ withNudge }: { withNudge: boolean }) {
                   icon={File02Icon}
                 />
               }
-              label="linear-sync-changelog.pdf"
+              label="linear-sync-changelog.md"
               onClick={noop}
               onRemove={noop}
             />
@@ -71,11 +70,6 @@ function DemoComposer({ withNudge }: { withNudge: boolean }) {
         value={value}
       />
       <Composer.Toolbar>
-        <Composer.ToolbarButton>
-          <ModelIcon className="size-3.5" provider="auto" />
-          Auto
-          <HugeiconsIcon className="size-3" icon={ArrowDown01Icon} />
-        </Composer.ToolbarButton>
         <Composer.ToolbarButton>
           <HugeiconsIcon className="size-3.5" icon={AiBrain01Icon} />
           Medium

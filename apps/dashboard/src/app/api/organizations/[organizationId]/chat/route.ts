@@ -18,6 +18,7 @@ import {
 import { getStandaloneChatIntegrations } from "@notra/ai/chat/integrations-cache";
 import { hydrateSavedChatPosts } from "@notra/ai/chat/posts";
 import { createChatStreamLifecycle } from "@notra/ai/chat/stream-lifecycle";
+import { CHAT_MODEL_ID } from "@notra/ai/constants/models";
 import { useLogger as getLogger, withEvlog } from "@notra/ai/evlog";
 import { getGitHubToolRepositoryContextByIntegrationId } from "@notra/ai/integrations/github";
 import { getGranolaToolContextByIntegrationId } from "@notra/ai/integrations/granola";
@@ -37,7 +38,6 @@ import {
   stampUserMessageAuthors,
 } from "@notra/ai/utils/chat";
 import { createChatActivityTimingTracker } from "@notra/ai/utils/chat-activity-timing";
-import { preserveConversationSelection } from "@notra/ai/utils/resolve-conversation-route";
 import { routeUsageProperties } from "@notra/ai/utils/route-usage";
 import { logError, logWarn } from "@notra/ai/utils/server-log";
 import { toAgentTokenUsage } from "@notra/ai/utils/token-usage";
@@ -53,10 +53,7 @@ import {
 } from "ai";
 import { nanoid } from "nanoid";
 
-import {
-  AI_CREDITS_SOURCE_STANDALONE_CHAT,
-  CHAT_MODEL_AUTO,
-} from "@/constants/studio-analytics";
+import { AI_CREDITS_SOURCE_STANDALONE_CHAT } from "@/constants/studio-analytics";
 import { trackServerEvent } from "@/lib/analytics/posthog-server";
 import {
   countMessageFileParts,
@@ -235,10 +232,7 @@ export const POST = withEvlog(async function POST(
     const validatedIntegrations = integrationsResult.value;
     const codeResearch =
       codeResearchResult.status === "fulfilled" && codeResearchResult.value;
-    messages = preserveConversationSelection(
-      hydrationResult.value,
-      existingSession?.messages ?? []
-    );
+    messages = hydrationResult.value;
 
     await clearLastResponseStopped(organizationId, chatId);
     const historySaved = await replaceChatHistory(
@@ -282,7 +276,7 @@ export const POST = withEvlog(async function POST(
       organizationId,
       properties: {
         chat_id: chatId,
-        model: parseResult.data.model ?? CHAT_MODEL_AUTO,
+        model: CHAT_MODEL_ID,
         thinking_level: parseResult.data.thinkingLevel ?? null,
         attachment_count: countMessageFileParts(latestMessage),
         context_kinds: getChatContextKinds(context),
@@ -313,7 +307,6 @@ export const POST = withEvlog(async function POST(
         codeResearch,
         requestId,
         log,
-        model: parseResult.data.model,
         enableThinking: parseResult.data.enableThinking,
         thinkingLevel: parseResult.data.thinkingLevel,
         timezone: parseResult.data.timezone,
@@ -334,7 +327,6 @@ export const POST = withEvlog(async function POST(
       userEmail: auth.context.user.email,
       context,
       useMarkup,
-      model: parseResult.data.model,
       enableThinking: parseResult.data.enableThinking,
       thinkingLevel: parseResult.data.thinkingLevel,
       timezone: parseResult.data.timezone,
@@ -394,7 +386,6 @@ async function createDirectStandaloneChatResponse({
   codeResearch,
   requestId,
   log,
-  model,
   enableThinking,
   thinkingLevel,
   timezone,
@@ -416,7 +407,6 @@ async function createDirectStandaloneChatResponse({
   codeResearch: boolean;
   requestId: string;
   log: ReturnType<typeof getLogger>;
-  model?: string;
   enableThinking?: boolean;
   thinkingLevel?: "off" | "low" | "medium" | "high";
   timezone?: string;
@@ -452,7 +442,6 @@ async function createDirectStandaloneChatResponse({
         context,
         maxSteps: 50,
         log: streamLog,
-        requestedModel: model,
         enableThinking,
         thinkingLevel,
         timezone,
@@ -560,7 +549,6 @@ async function createDirectStandaloneChatResponse({
           return {
             authorUserId: userId,
             model: routingDecision.model,
-            requestedModel: model ?? "auto",
             thinkingLevel: effectiveThinkingLevel,
             requestedThinkingLevel: thinkingLevel,
             createdAt: streamStartedAt,
@@ -576,7 +564,6 @@ async function createDirectStandaloneChatResponse({
             partUsage: part.totalUsage,
             usageSnapshot,
             model: routingDecision.model,
-            requestedModel: model ?? "auto",
             thinkingLevel: effectiveThinkingLevel,
             requestedThinkingLevel: thinkingLevel,
           });

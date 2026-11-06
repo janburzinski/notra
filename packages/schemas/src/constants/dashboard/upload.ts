@@ -13,22 +13,14 @@ export const ALLOWED_MIME_TYPES = [
   SVG_MIME_TYPE,
 ] as const;
 
+// Chat runs on GLM, which reads images and text but not PDFs.
 export const ALLOWED_CHAT_MIME_TYPES = [
   "image/jpeg",
   "image/png",
   "image/gif",
   "image/webp",
-  "application/pdf",
   "text/plain",
   "text/markdown",
-] as const;
-
-export const ALLOWED_OPENAI_CHAT_MIME_TYPES = [
-  "image/jpeg",
-  "image/png",
-  "image/gif",
-  "image/webp",
-  "application/pdf",
 ] as const;
 
 export type AllowedChatMimeType = (typeof ALLOWED_CHAT_MIME_TYPES)[number];

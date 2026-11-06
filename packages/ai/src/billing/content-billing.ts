@@ -4,6 +4,7 @@ import {
   CONTENT_QUOTA_FEATURES,
   METERED_CONTENT_QUOTA_FEATURES,
 } from "../constants/content-billing";
+import { CONTENT_AGENT_MODEL } from "../constants/models";
 import { contentTypeSchema } from "../schemas/content";
 import type {
   ConfirmContentBillingInput,
@@ -20,7 +21,7 @@ import { hasActivePaidPlan } from "./chat-billing";
 import { FEATURES, PAID_OR_LEGACY_PLAN_IDS } from "./features";
 import { shouldApplyMarkup } from "./token-pricing";
 
-const DEFAULT_FALLBACK_MODEL_ID = "anthropic/claude-sonnet-5";
+const DEFAULT_FALLBACK_MODEL_ID = CONTENT_AGENT_MODEL;
 
 const PLAN_INCLUDED_RESERVATION: ContentBillingReservation = {
   allowed: true,

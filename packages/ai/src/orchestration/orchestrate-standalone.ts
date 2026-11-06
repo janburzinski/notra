@@ -3,6 +3,7 @@ import {
   STANDALONE_CODE_MODE_TOOL_NAMES,
 } from "@notra/ai/constants/code-mode";
 import { CODE_RESEARCHER_TOOL_NAME } from "@notra/ai/constants/code-research";
+import { CHAT_MODEL_ID } from "@notra/ai/constants/models";
 import { getEnabledMcpServerCount } from "@notra/ai/integrations/mcp-tool-index";
 import { createModel } from "@notra/ai/model";
 import { getStandaloneChatPrompt } from "@notra/ai/prompts/standalone-chat";
@@ -13,6 +14,7 @@ import { createLazyMcpRuntime } from "@notra/ai/tools/mcp-lazy";
 import { UPDATE_TODOS_TOOL_NAME } from "@notra/ai/tools/todos";
 import type {
   IntegrationFetchers,
+  RoutingResult,
   ValidatedIntegration,
 } from "@notra/ai/types/orchestration";
 import type { PostToolsResult } from "@notra/ai/types/post-tools";
@@ -25,10 +27,9 @@ import type {
 import { loadChatWorkspace } from "@notra/ai/utils/chat-workspace";
 import { withStandaloneCodeMode } from "@notra/ai/utils/code-mode";
 import {
-  normalizeMarkdownFileAttachments,
+  prepareChatFileAttachments,
   replaceMissingFileAttachments,
 } from "@notra/ai/utils/message-attachments";
-import { resolveConversationRoute } from "@notra/ai/utils/resolve-conversation-route";
 import { summarizeRouteUsage } from "@notra/ai/utils/route-usage";
 import { logError, logInfo } from "@notra/ai/utils/server-log";
 import { buildTelemetryOptions } from "@notra/ai/utils/tcc";
@@ -46,11 +47,6 @@ import {
   type UIMessage,
 } from "ai";
 
-import {
-  hasEnabledGitHubIntegration,
-  hasEnabledLinearIntegration,
-} from "./integration-validator";
-import { routeAutoModel } from "./router";
 import {
   buildStandaloneToolSet,
   getLinearContextFromIntegrations,
@@ -74,7 +70,6 @@ export async function orchestrateStandaloneChat(
     context = [],
     maxSteps = 50,
     log: inputLog,
-    requestedModel,
     enableThinking = true,
     thinkingLevel = "medium",
     abortSignal,
@@ -103,26 +98,25 @@ export async function orchestrateStandaloneChat(
       loadChatWorkspace({ organizationId, projectId }),
     ]);
 
-  const hasGitHub = hasEnabledGitHubIntegration(validatedIntegrations);
-  const hasLinear = hasEnabledLinearIntegration(validatedIntegrations);
   const hasMcp = mcpServerCount > 0;
   const mcpContext = context.filter((item) => item.type === "mcp-server");
 
-  const routingDecision = await resolveConversationRoute(
-    messages,
-    requestedModel,
-    () =>
-      routeAutoModel(
-        messages,
-        hasGitHub || hasLinear || hasMcp,
-        log,
-        telemetryMetadata
-      ),
-    input.thinkingLevel
+  const messagesWithAttachments = await replaceMissingFileAttachments(
+    organizationId,
+    stripIncompleteToolParts(messages),
+    abortSignal
   );
-  routingDecision.thinkingLevel = enableThinking
-    ? (routingDecision.thinkingLevel ?? thinkingLevel)
-    : "off";
+  const messagesForModel = await prepareChatFileAttachments(
+    messagesWithAttachments,
+    abortSignal
+  );
+  const routingDecision: RoutingResult = {
+    model: CHAT_MODEL_ID,
+    thinkingLevel: enableThinking ? thinkingLevel : "off",
+    complexity: "complex",
+    requiresTools: true,
+    reasoning: "Chat always uses GLM 5.3 Flash",
+  };
 
   const model = createModel(organizationId, routingDecision.model, log);
 
@@ -216,19 +210,11 @@ export async function orchestrateStandaloneChat(
       ...getThinkingProviderOptions(
         routingDecision.model,
         enableThinking,
-        routingDecision.thinkingLevel
+        thinkingLevel
       ),
       gateway: { tags: ["standalone-chat"] },
     },
     { modelId: routingDecision.model }
-  );
-
-  const messagesForModel = normalizeMarkdownFileAttachments(
-    await replaceMissingFileAttachments(
-      organizationId,
-      stripIncompleteToolParts(messages),
-      abortSignal
-    )
   );
 
   const modelMessages = await convertToModelMessages(messagesForModel, {

@@ -1,3 +1,4 @@
+import { ROUTER_PROVIDER_OPTIONS_KEY } from "../constants/router";
 import type {
   AutoThinkingLevel,
   StreamProviderOptions,
@@ -40,6 +41,15 @@ export function getThinkingProviderOptions(
     return {
       openai: {
         reasoningEffort: thinkingLevel,
+      },
+    } satisfies StreamProviderOptions;
+  }
+
+  // GLM always reasons and only takes low, high or max effort.
+  if (modelId.startsWith("zai/")) {
+    return {
+      [ROUTER_PROVIDER_OPTIONS_KEY]: {
+        reasoning: { effort: thinkingLevel === "low" ? "low" : "high" },
       },
     } satisfies StreamProviderOptions;
   }

@@ -3,7 +3,7 @@ import { defineAgent } from "eve";
 
 import {
   IMAGE_DESIGNER_MODEL_ID,
-  SONNET_5_CONTEXT_WINDOW_TOKENS,
+  GLM_CONTEXT_WINDOW_TOKENS,
 } from "../../lib/constants/models";
 import { createSessionAgentModel } from "../../lib/utils/session-model";
 
@@ -13,7 +13,7 @@ export default defineAgent({
   model: createSessionAgentModel(
     IMAGE_DESIGNER_MODEL_ID,
     "content-image-designer",
-    SONNET_5_CONTEXT_WINDOW_TOKENS
+    GLM_CONTEXT_WINDOW_TOKENS
   ),
   outputSchema: imageDesignerResultSchema,
 });

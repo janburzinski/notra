@@ -1,4 +1,4 @@
-import { AGENT_DEFAULT_MODEL } from "@notra/ai/constants/models";
+import { CONTENT_AGENT_MODEL } from "@notra/ai/constants/models";
 import { gateway } from "@notra/ai/gateway";
 import { withRouterDefaults } from "@notra/ai/provider-options";
 import {
@@ -195,10 +195,10 @@ export async function writeBlogPost(params: {
   ].join("\n");
 
   const agent = new ToolLoopAgent({
-    model: gateway(AGENT_DEFAULT_MODEL, { organizationId: ctx.organizationId }),
+    model: gateway(CONTENT_AGENT_MODEL, { organizationId: ctx.organizationId }),
     providerOptions: withRouterDefaults(
       { gateway: { tags: ["autopilot", "blog-draft"] } },
-      { modelId: AGENT_DEFAULT_MODEL }
+      { modelId: CONTENT_AGENT_MODEL }
     ),
     instructions,
     tools,
@@ -219,7 +219,7 @@ export async function writeBlogPost(params: {
   });
 
   await log.trace("Writer prompt", {
-    model: AGENT_DEFAULT_MODEL,
+    model: CONTENT_AGENT_MODEL,
     instructions,
     prompt,
   });
@@ -276,19 +276,19 @@ export async function writeBlogPost(params: {
         }
         params.onUsage?.({
           ...toAgentTokenUsage(error.usage),
-          modelId: AGENT_DEFAULT_MODEL,
+          modelId: CONTENT_AGENT_MODEL,
         });
         return null;
       });
     if (result) {
       params.onUsage?.({
         ...toAgentTokenUsage(result.totalUsage),
-        modelId: AGENT_DEFAULT_MODEL,
+        modelId: CONTENT_AGENT_MODEL,
       });
       await log.action(
-        `Called ${AGENT_DEFAULT_MODEL} (blog-draft)`,
+        `Called ${CONTENT_AGENT_MODEL} (blog-draft)`,
         {
-          model: AGENT_DEFAULT_MODEL,
+          model: CONTENT_AGENT_MODEL,
           steps: result.steps.length,
           inputTokens: result.totalUsage.inputTokens ?? null,
           outputTokens: result.totalUsage.outputTokens ?? null,

@@ -11,11 +11,6 @@ import {
   getModelPricing,
   MODEL_PRICING,
 } from "@notra/ai/billing/token-pricing";
-import {
-  AGENT_DEFAULT_MODEL,
-  GEO_WRITER_MODEL,
-  UTILITY_MODEL_ID,
-} from "@notra/ai/constants/models";
 import { summarizeRouteUsage } from "@notra/ai/utils/route-usage";
 import { toAgentTokenUsage } from "@notra/ai/utils/token-usage";
 
@@ -113,7 +108,7 @@ test("real Vercel adapter generate and stream metadata price served aliases iden
       undefined,
     ]) {
       served = raw;
-      const model = router.model(UTILITY_MODEL_ID, { gateway: "vercel" });
+      const model = router.model("openai/gpt-6-luna", { gateway: "vercel" });
       const generated = await model.doGenerate(callOptions());
       const parts = await readStreamParts(await model.doStream(callOptions()));
       const finish = parts.find((part) => part.type === "finish");
@@ -121,8 +116,8 @@ test("real Vercel adapter generate and stream metadata price served aliases iden
       for (const result of [generated, finish]) {
         const route = router.getRouteMetadata(result.providerMetadata);
         assert.equal(typeof metadataOf(result)?.model, "string");
-        assert.equal(route?.model, raw ?? UTILITY_MODEL_ID);
-        assert.equal(route?.requestedModel, UTILITY_MODEL_ID);
+        assert.equal(route?.model, raw ?? "openai/gpt-6-luna");
+        assert.equal(route?.requestedModel, "openai/gpt-6-luna");
       }
     }
     for (const serviceTier of ["standard", "flex"]) {
@@ -134,10 +129,10 @@ test("real Vercel adapter generate and stream metadata price served aliases iden
         ["claude-sonnet-4-6", "anthropic/claude-sonnet-4.6"],
         ["claude-haiku-4-5", "anthropic/claude-haiku-4.5"],
         ["gpt-5.6-sol", "openai/gpt-5.6-sol"],
-        ["gpt-6-luna", UTILITY_MODEL_ID],
-        ["claude-sonnet-5", AGENT_DEFAULT_MODEL],
-        ["claude-opus-5-5", GEO_WRITER_MODEL],
-        ["claude-opus-5.5", GEO_WRITER_MODEL],
+        ["gpt-6-luna", "openai/gpt-6-luna"],
+        ["claude-sonnet-5", "anthropic/claude-sonnet-5"],
+        ["claude-opus-5-5", "anthropic/claude-opus-5.5"],
+        ["claude-opus-5.5", "anthropic/claude-opus-5.5"],
       ]) {
         assert.ok(raw && canonical);
         const pricingKey = Object.hasOwn(MODEL_PRICING, `vercel/${canonical}`)
@@ -157,7 +152,9 @@ test("real Vercel adapter generate and stream metadata price served aliases iden
           `vercel/${canonical}`,
         ]) {
           served = variant;
-          const model = router.model(UTILITY_MODEL_ID, { gateway: "vercel" });
+          const model = router.model("openai/gpt-6-luna", {
+            gateway: "vercel",
+          });
           const generated = await model.doGenerate(callOptions());
           const parts = await readStreamParts(
             await model.doStream(callOptions())
@@ -167,7 +164,7 @@ test("real Vercel adapter generate and stream metadata price served aliases iden
           for (const result of [generated, finish]) {
             const route = metadataOf(result);
             assert.equal(route?.model, canonical);
-            assert.equal(route?.requestedModel, UTILITY_MODEL_ID);
+            assert.equal(route?.requestedModel, "openai/gpt-6-luna");
             assert.equal(
               router.getRouteMetadata(result.providerMetadata)?.model,
               canonical
@@ -198,7 +195,7 @@ test("real Vercel adapter generate and stream metadata price served aliases iden
                 expectedCost,
                 serviceTier === "flex" ? 1.162 : 2.324
               );
-            } else if (canonical === AGENT_DEFAULT_MODEL) {
+            } else if (canonical === "anthropic/claude-sonnet-5") {
               assert.equal(expectedCost, 1.162);
             }
           }
@@ -230,9 +227,9 @@ test("current vendor aliases resolve to owned canonical pricing entries", async 
   const { createVercelAdapter } = await import("./vercel");
   const adapter = createVercelAdapter({ apiKey: "fixture" });
   for (const [raw, canonical] of [
-    ["claude-sonnet-5", AGENT_DEFAULT_MODEL],
-    ["claude-opus-5-5", GEO_WRITER_MODEL],
-    ["gpt-6-luna", UTILITY_MODEL_ID],
+    ["claude-sonnet-5", "anthropic/claude-sonnet-5"],
+    ["claude-opus-5-5", "anthropic/claude-opus-5.5"],
+    ["gpt-6-luna", "openai/gpt-6-luna"],
     ["gpt-5.6-sol", "openai/gpt-5.6-sol"],
   ]) {
     assert.ok(raw && canonical);

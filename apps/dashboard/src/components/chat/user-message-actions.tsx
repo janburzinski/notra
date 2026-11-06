@@ -9,15 +9,6 @@ import {
 import { HugeiconsIcon } from "@hugeicons/react";
 import { CopyStateIcon } from "@notra/ui/components/ui/copy-button";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@notra/ui/components/ui/dropdown-menu";
-import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
@@ -31,10 +22,6 @@ import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "use-intl";
 
 import { Button } from "@/components/button";
-import { ModelIcon } from "@/components/chat/chat-input";
-import { AVAILABLE_MODELS } from "@/constants/chat-models";
-import { useChatModelLabels } from "@/lib/hooks/use-chat-model-labels";
-import type { ChatModelOption } from "@/types/components/chat-input";
 import type {
   UserMessageEditorProps,
   UserMessageTextBubbleProps,
@@ -43,11 +30,10 @@ import type {
 const USER_MESSAGE_COPIED_MS = 1500;
 
 interface UserMessageActionsProps {
-  availableModels?: readonly ChatModelOption[];
   messageText: string;
   canInteract: boolean;
   onEdit: () => void;
-  onRetry: (model?: string) => void;
+  onRetry: () => void;
   branchIndex?: number;
   branchTotal?: number;
   onPreviousBranch?: () => void;
@@ -57,7 +43,6 @@ interface UserMessageActionsProps {
 }
 
 export function UserMessageActions({
-  availableModels = AVAILABLE_MODELS,
   messageText,
   canInteract,
   onEdit,
@@ -70,13 +55,10 @@ export function UserMessageActions({
   className,
 }: UserMessageActionsProps) {
   const t = useTranslations("chat.userMessageActions");
-  const tCommon2 = useTranslations("common");
   const tCommon = useTranslations("common.actions");
-  const modelLabels = useChatModelLabels();
   const { copied, copy } = useCopyToClipboard({
     timeout: USER_MESSAGE_COPIED_MS,
   });
-  const [retryOpen, setRetryOpen] = useState(false);
 
   const hasBranches =
     typeof branchIndex === "number" &&
@@ -89,10 +71,9 @@ export function UserMessageActions({
         "text-muted-foreground duration-fast absolute top-full right-0 flex items-center gap-1 pt-1 transition-opacity",
         isEditing
           ? "pointer-events-none invisible opacity-0"
-          : "pointer-events-none opacity-0 group-hover/message:pointer-events-auto group-hover/message:opacity-100 focus-within:pointer-events-auto focus-within:opacity-100 data-[force-visible=true]:pointer-events-auto data-[force-visible=true]:opacity-100 [@media(hover:none)]:pointer-events-auto [@media(hover:none)]:opacity-100",
+          : "pointer-events-none opacity-0 group-hover/message:pointer-events-auto group-hover/message:opacity-100 focus-within:pointer-events-auto focus-within:opacity-100 [@media(hover:none)]:pointer-events-auto [@media(hover:none)]:opacity-100",
         className
       )}
-      data-force-visible={retryOpen || undefined}
     >
       {hasBranches && (
         <div className="flex items-center text-xs tabular-nums">
@@ -126,58 +107,24 @@ export function UserMessageActions({
 
       <TooltipProvider>
         <div className="flex items-center gap-1">
-          <DropdownMenu onOpenChange={setRetryOpen} open={retryOpen}>
-            <Tooltip disableHoverablePopup>
-              <TooltipTrigger
-                render={
-                  <DropdownMenuTrigger
-                    disabled={!canInteract}
-                    render={
-                      <Button
-                        aria-label={tCommon("retry")}
-                        className="size-5"
-                        size="icon-sm"
-                        type="button"
-                        variant="ghost"
-                      />
-                    }
-                  />
-                }
-              >
-                <HugeiconsIcon icon={ArrowReloadHorizontalIcon} size={12} />
-              </TooltipTrigger>
-              <TooltipContent>{tCommon("retry")}</TooltipContent>
-            </Tooltip>
-            <DropdownMenuContent align="end" className="w-64">
-              <DropdownMenuItem onClick={() => onRetry()}>
-                <HugeiconsIcon icon={ArrowReloadHorizontalIcon} size={12} />
-                <span className="text-sm">{t("retryWithSame")}</span>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuGroup>
-                <DropdownMenuLabel>
-                  {tCommon2("labels.model")}
-                </DropdownMenuLabel>
-              </DropdownMenuGroup>
-              {availableModels.map((m) => (
-                <DropdownMenuItem key={m.id} onClick={() => onRetry(m.id)}>
-                  <ModelIcon
-                    className="size-4 shrink-0"
-                    provider={m.provider}
-                  />
-                  <div className="flex min-w-0 flex-col">
-                    <span className="text-sm">{m.label}</span>
-                    <span className="text-muted-foreground text-xs">
-                      {modelLabels.description(m)}
-                    </span>
-                    <span className="text-muted-foreground/70 text-[0.625rem]">
-                      {modelLabels.pricing(m)}
-                    </span>
-                  </div>
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <Tooltip disableHoverablePopup>
+            <TooltipTrigger
+              render={
+                <Button
+                  aria-label={tCommon("retry")}
+                  className="size-5"
+                  disabled={!canInteract}
+                  onClick={onRetry}
+                  size="icon-sm"
+                  type="button"
+                  variant="ghost"
+                />
+              }
+            >
+              <HugeiconsIcon icon={ArrowReloadHorizontalIcon} size={12} />
+            </TooltipTrigger>
+            <TooltipContent>{tCommon("retry")}</TooltipContent>
+          </Tooltip>
 
           <Tooltip disableHoverablePopup>
             <TooltipTrigger

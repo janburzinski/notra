@@ -1,3 +1,4 @@
+import { CHAT_MODEL_ID } from "@notra/ai/constants/models";
 import { createModel } from "@notra/ai/model";
 import { getContentEditorChatPrompt } from "@notra/ai/prompts/content-editor";
 import { withRouterDefaults } from "@notra/ai/provider-options";
@@ -5,12 +6,12 @@ import type {
   OrchestrateDeps,
   OrchestrateInput,
   OrchestrateResult,
+  RoutingResult,
 } from "@notra/ai/types/orchestration";
 import {
-  normalizeMarkdownFileAttachments,
+  prepareChatFileAttachments,
   replaceMissingFileAttachments,
 } from "@notra/ai/utils/message-attachments";
-import { resolveConversationRoute } from "@notra/ai/utils/resolve-conversation-route";
 import { summarizeRouteUsage } from "@notra/ai/utils/route-usage";
 import { logError } from "@notra/ai/utils/server-log";
 import { buildTelemetryOptions } from "@notra/ai/utils/tcc";
@@ -21,7 +22,6 @@ import {
   hasEnabledLinearIntegration,
   validateIntegrations,
 } from "./integration-validator";
-import { routeAutoModel } from "./router";
 import { getThinkingProviderOptions } from "./thinking";
 import {
   buildToolSet,
@@ -51,7 +51,6 @@ export async function orchestrateChat(
     timezone,
     telemetryMetadata,
     documentMode,
-    requestedModel,
     thinkingLevel = "low",
   } = input;
 
@@ -66,14 +65,22 @@ export async function orchestrateChat(
   const hasGitHub = hasEnabledGitHubIntegration(validatedIntegrations);
   const hasLinear = hasEnabledLinearIntegration(validatedIntegrations);
 
-  const routingDecision = await resolveConversationRoute(
+  const messagesWithAttachments = await replaceMissingFileAttachments(
+    organizationId,
     messages,
-    requestedModel,
-    () =>
-      routeAutoModel(messages, hasGitHub || hasLinear, log, telemetryMetadata),
-    input.thinkingLevel
+    abortSignal
   );
-  routingDecision.thinkingLevel ??= thinkingLevel;
+  const messagesForModel = await prepareChatFileAttachments(
+    messagesWithAttachments,
+    abortSignal
+  );
+  const routingDecision: RoutingResult = {
+    model: CHAT_MODEL_ID,
+    thinkingLevel,
+    complexity: "complex",
+    requiresTools: true,
+    reasoning: "Chat always uses GLM 5.3 Flash",
+  };
 
   const model = createModel(organizationId, routingDecision.model, log);
 
@@ -111,15 +118,12 @@ export async function orchestrateChat(
     timezone,
   });
 
-  const messagesForModel = normalizeMarkdownFileAttachments(
-    await replaceMissingFileAttachments(organizationId, messages, abortSignal)
-  );
   let firstChunkFired = false;
 
   const thinkingProviderOptions = getThinkingProviderOptions(
     routingDecision.model,
     true,
-    routingDecision.thinkingLevel
+    thinkingLevel
   );
   const stream = streamText({
     model,

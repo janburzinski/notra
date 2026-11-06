@@ -2,16 +2,15 @@
 
 import type { ChatAttachment } from "@notra/ai/types/chat";
 import {
+  ALLOWED_CHAT_MIME_TYPES,
   MAX_CHAT_ATTACHMENTS,
   MAX_CHAT_FILE_SIZE,
-  MIME_DISPLAY_LABELS,
 } from "@notra/schemas/constants/dashboard/upload";
 import {
   type ChangeEvent,
   type DragEvent,
   useCallback,
   useEffect,
-  useMemo,
   useRef,
   useState,
 } from "react";
@@ -25,8 +24,9 @@ import {
   uploadFile,
 } from "@/lib/upload/client";
 import {
-  getAllowedChatMimeTypes,
+  CHAT_FILE_TYPES_LABEL,
   isAllowedChatMimeType,
+  isHeicFile,
 } from "@/lib/upload/mime";
 import type {
   PendingChatUpload,
@@ -85,20 +85,6 @@ export function useChatComposerAttachments(): UseChatComposerAttachmentsResult {
     pendingUploadsRef.current = pendingUploads;
   }, [attachments, pendingUploads]);
 
-  const allowedChatMimeTypes = useMemo(() => getAllowedChatMimeTypes(), []);
-  const acceptedFileTypesLabel = useMemo(() => {
-    const seen = new Set<string>();
-    const labels: string[] = [];
-    for (const mime of allowedChatMimeTypes) {
-      const label = MIME_DISPLAY_LABELS[mime];
-      if (label && !seen.has(label)) {
-        seen.add(label);
-        labels.push(label);
-      }
-    }
-    return labels.join(", ");
-  }, [allowedChatMimeTypes]);
-
   const cleanupChatUpload = useCallback(async (key: string) => {
     try {
       await deleteChatUploadFile({ key });
@@ -153,18 +139,13 @@ export function useChatComposerAttachments(): UseChatComposerAttachmentsResult {
 
       const accepted: File[] = [];
       for (const file of files) {
-        if (
-          !isAllowedChatMimeType(file.type) &&
-          !/\.heic$/i.test(file.name) &&
-          file.type !== "image/heic"
-        ) {
+        if (!(isAllowedChatMimeType(file.type) || isHeicFile(file))) {
           toast.error(tUpload("unsupportedType", { name: file.name }));
           continue;
         }
-        const maxBytes =
-          /\.heic$/i.test(file.name) || file.type === "image/heic"
-            ? MAX_CHAT_HEIC_INPUT_BYTES
-            : MAX_CHAT_FILE_SIZE;
+        const maxBytes = isHeicFile(file)
+          ? MAX_CHAT_HEIC_INPUT_BYTES
+          : MAX_CHAT_FILE_SIZE;
         if (file.size > maxBytes) {
           toast.error(
             tUpload("tooLarge", {
@@ -404,10 +385,7 @@ export function useChatComposerAttachments(): UseChatComposerAttachmentsResult {
   const handlePasteFiles = useCallback(
     (files: File[]) => {
       const accepted = files.filter(
-        (file) =>
-          isAllowedChatMimeType(file.type) ||
-          /\.heic$/i.test(file.name) ||
-          file.type === "image/heic"
+        (file) => isAllowedChatMimeType(file.type) || isHeicFile(file)
       );
       if (accepted.length === 0) {
         return false;
@@ -420,10 +398,10 @@ export function useChatComposerAttachments(): UseChatComposerAttachmentsResult {
 
   return {
     restoreAttachments,
-    acceptedFileTypesLabel,
-    allowedChatMimeTypes,
+    acceptedFileTypesLabel: CHAT_FILE_TYPES_LABEL,
+    allowedChatMimeTypes: ALLOWED_CHAT_MIME_TYPES,
     attachments,
-    attachmentTooltipText: tAttach("imagesPdfsText"),
+    attachmentTooltipText: tAttach("files"),
     consumeAttachments,
     dragHandlers: {
       onDragEnter,

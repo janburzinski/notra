@@ -444,6 +444,18 @@ describe("RoutedLanguageModel", () => {
     assert.deepEqual(gatewayOptions.models, ["anthropic/claude-haiku-4.5"]);
   });
 
+  test("vercel calls carry the router reasoning effort unless the caller set one", async () => {
+    const { router, vercel } = createTestRouter({ plans });
+    const model = router.model(MODEL, { organizationId: PAID_ORG });
+    const options = callOptions({
+      [ROUTER_PROVIDER_OPTIONS_KEY]: { reasoning: { effort: "low" } },
+    });
+    await model.doGenerate(options);
+    await model.doGenerate({ ...options, reasoning: "high" });
+    assert.equal(vercel?.calls[0]?.options.reasoning, "low");
+    assert.equal(vercel?.calls[1]?.options.reasoning, "high");
+  });
+
   test("callers cannot downgrade privacy flags in production", async () => {
     const { router, vercel, openrouter } = createTestRouter({ plans });
     await router.model(MODEL, { organizationId: PAID_ORG }).doGenerate(

@@ -82,8 +82,9 @@ export const sendChatMessageRequestSchema = z
       }),
     model: chatModelSchema.optional().openapi({
       description:
-        "Model to respond with. Defaults to auto, which lets Notra choose.",
-      example: "auto",
+        "Deprecated and ignored. Chats always respond with GLM 5.3 Flash.",
+      deprecated: true,
+      example: "zai/glm-5.3-flash",
     }),
     enableThinking: z.boolean().optional().openapi({
       description: "Allow the model to reason before answering.",

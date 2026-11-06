@@ -60,7 +60,7 @@ export interface ContentDetailChatComposerProps {
   organizationSlug: string;
   placeholder?: string;
   editingTarget?: ChatInputEditingTarget;
-  modelEffort: ChatInputProps["modelEffort"];
+  effort: ChatInputProps["effort"];
   queuedMessages: QueuedMessage[];
   selection: TextSelection | null;
   value: string;

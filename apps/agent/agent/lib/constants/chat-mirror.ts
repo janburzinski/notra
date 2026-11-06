@@ -1,7 +1,5 @@
 export const MIRRORED_CHANNEL_KINDS = new Set(["channel:slack"]);
 
-export const MIRROR_REQUESTED_MODEL = "auto";
-
 export const MIRROR_DELTA_THROTTLE_MS = 400;
 
 export const MIRROR_DELTA_THROTTLE_MAX_ENTRIES = 200;

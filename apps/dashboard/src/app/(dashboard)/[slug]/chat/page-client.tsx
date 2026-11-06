@@ -110,10 +110,6 @@ import { CHAT_ACTIVE_STREAM_POLL_INTERVAL_MS } from "@/constants/chat-active-str
 import { ACTIVITY_STEP_SETTLE_MS } from "@/constants/chat-activity";
 import { MAX_VISIBLE_CHAT_IMAGES } from "@/constants/chat-images";
 import {
-  AVAILABLE_MODELS,
-  ZDR_AVAILABLE_MODELS,
-} from "@/constants/chat-models";
-import {
   CHAT_CREATE_TOOL_TYPES,
   CHAT_POST_EDIT_TOOL_NAMES,
   CHAT_REFERENCE_TOKEN_SPLIT_REGEX,
@@ -139,7 +135,6 @@ import {
 } from "@/lib/hooks/use-chat-sessions";
 import { useDelayedAppearance } from "@/lib/hooks/use-delayed-appearance";
 import { useElapsedSeconds } from "@/lib/hooks/use-elapsed-seconds";
-import { useHasZdrEntitlement } from "@/lib/hooks/use-plan";
 import { useSlackMirrorStream } from "@/lib/hooks/use-slack-mirror-stream";
 import { useStableValue } from "@/lib/hooks/use-stable-value";
 import { getMcpIconUrls } from "@/lib/integrations/mcp";
@@ -182,7 +177,6 @@ import { buildChatMinimapTurns } from "@/utils/chat-minimap";
 import { getChatPosts, parsePostReferenceValue } from "@/utils/chat-posts";
 import {
   DEFAULT_CHAT_PREFERENCES,
-  parseStoredChatModel,
   parseStoredThinkingLevel,
   readStoredChatPreferences,
   subscribeToStoredChatPreferences,
@@ -529,10 +523,6 @@ function StandaloneChatPageClient({
   const organizationId = organization?.id ?? "";
   const { projectId: activeProjectId, isResolved: isProjectResolved } =
     useActiveProject();
-  const { canUseNonZdr } = useHasZdrEntitlement();
-  const availableModels = canUseNonZdr
-    ? AVAILABLE_MODELS
-    : ZDR_AVAILABLE_MODELS;
   const { data: session } = authClient.useSession();
   const queryClient = useQueryClient();
   const { insertPendingChatSession, removePendingChatSession } =
@@ -620,15 +610,6 @@ function StandaloneChatPageClient({
     mediaType: string;
   } | null>(null);
   const [queuedMessages, setQueuedMessages] = useState<QueuedMessage[]>([]);
-  const [selectedModel, setSelectedModel] = useState(
-    DEFAULT_CHAT_PREFERENCES.model
-  );
-  const effectiveSelectedModel =
-    !canUseNonZdr &&
-    (selectedModel === "openai/gpt-6-sol" ||
-      selectedModel === "openai/gpt-6-luna")
-      ? "auto"
-      : selectedModel;
   const [thinkingLevel, setThinkingLevel] = useState<ThinkingLevel>(
     DEFAULT_CHAT_PREFERENCES.thinkingLevel
   );
@@ -652,7 +633,6 @@ function StandaloneChatPageClient({
   const requeueConflictedMessageRef = useRef<(messageId: string) => boolean>(
     () => false
   );
-  const selectedModelRef = useRef(selectedModel);
   const thinkingLevelRef = useRef(thinkingLevel);
 
   const handleChatCreated = useCallback(
@@ -673,7 +653,6 @@ function StandaloneChatPageClient({
   useEffect(() => {
     contextRef.current = context;
     hasCustomizedContextRef.current = hasCustomizedContext;
-    selectedModelRef.current = effectiveSelectedModel;
     thinkingLevelRef.current = thinkingLevel;
     organizationIdRef.current = organizationId;
     activeProjectIdRef.current = activeProjectId;
@@ -685,7 +664,6 @@ function StandaloneChatPageClient({
     hasCustomizedContext,
     initialChatId,
     organizationId,
-    effectiveSelectedModel,
     thinkingLevel,
   ]);
 
@@ -699,7 +677,6 @@ function StandaloneChatPageClient({
         hasCustomizedContext: hasCustomizedContextRef,
         onChatCreated: onChatCreatedRef,
         organizationId: organizationIdRef,
-        selectedModel: selectedModelRef,
         streamConflict: activeStreamConflictRef,
         thinkingLevel: thinkingLevelRef,
       },
@@ -753,12 +730,6 @@ function StandaloneChatPageClient({
               : current
         );
       }
-      const pinnedModel = getPinnedModelFromAutoMetadata(message.metadata);
-      if (pinnedModel) {
-        selectedModelRef.current = pinnedModel;
-        setSelectedModel(pinnedModel);
-      }
-
       setPendingMessageId(null);
       emitAutumnRefresh();
       queryClient.invalidateQueries({
@@ -1002,16 +973,6 @@ function StandaloneChatPageClient({
 
   const [isStopping, setIsStopping] = useState(false);
 
-  const handleModelChange = useCallback((model: string) => {
-    const nextModel = parseStoredChatModel(model);
-    if (!nextModel) {
-      return;
-    }
-
-    setSelectedModel(nextModel);
-    trackEvent(POSTHOG_EVENTS.CHAT_MODEL_CHANGED, { model: nextModel });
-  }, []);
-
   const handleThinkingLevelChange = useCallback((level: ThinkingLevel) => {
     const nextThinkingLevel = parseStoredThinkingLevel(level);
     if (!nextThinkingLevel) {
@@ -1035,7 +996,6 @@ function StandaloneChatPageClient({
         return;
       }
 
-      setSelectedModel(storedPreferences.model);
       setThinkingLevel(storedPreferences.thinkingLevel);
     }
 
@@ -1064,11 +1024,8 @@ function StandaloneChatPageClient({
       return;
     }
 
-    writeStoredChatPreferences({
-      model: selectedModel,
-      thinkingLevel,
-    });
-  }, [initialChatId, selectedModel, thinkingLevel]);
+    writeStoredChatPreferences({ thinkingLevel });
+  }, [initialChatId, thinkingLevel]);
 
   const stopActiveResponse = useCallback(async () => {
     if (isStoppingResponseRef.current) {
@@ -1241,49 +1198,15 @@ function StandaloneChatPageClient({
     if (historyMessages?.length) {
       setMessages(historyMessages);
 
-      let modelRestored = false;
-      let thinkingLevelRestored = false;
-
       for (let index = historyMessages.length - 1; index >= 0; index -= 1) {
-        if (modelRestored && thinkingLevelRestored) {
+        const thinkingLevelToRestore =
+          historyMessages[index]?.metadata?.requestedThinkingLevel;
+        const parsedThinkingLevel = thinkingLevelToRestore
+          ? parseStoredThinkingLevel(thinkingLevelToRestore)
+          : null;
+        if (parsedThinkingLevel) {
+          setThinkingLevel(parsedThinkingLevel);
           break;
-        }
-
-        const metadata = historyMessages[index]?.metadata;
-        if (!metadata) {
-          continue;
-        }
-
-        if (!modelRestored) {
-          const modelToRestore =
-            metadata.requestedModel === "auto"
-              ? metadata.model
-              : (metadata.requestedModel ?? metadata.model);
-          if (modelToRestore) {
-            const parsedModel = parseStoredChatModel(modelToRestore);
-            if (parsedModel) {
-              setSelectedModel(parsedModel);
-              modelRestored = true;
-            }
-          }
-        }
-
-        if (!thinkingLevelRestored) {
-          const thinkingLevelToRestore =
-            metadata.requestedThinkingLevel ??
-            (metadata.requestedModel && metadata.requestedModel !== "auto"
-              ? metadata.thinkingLevel
-              : undefined);
-
-          if (thinkingLevelToRestore) {
-            const parsedThinkingLevel = parseStoredThinkingLevel(
-              thinkingLevelToRestore
-            );
-            if (parsedThinkingLevel) {
-              setThinkingLevel(parsedThinkingLevel);
-              thinkingLevelRestored = true;
-            }
-          }
         }
       }
     }
@@ -1581,8 +1504,7 @@ function StandaloneChatPageClient({
     async (
       userMessageId: string,
       text: string,
-      attachments: ChatMessagePart[],
-      modelOverride?: string
+      attachments: ChatMessagePart[]
     ) => {
       if (isSlackMirrored) {
         return;
@@ -1613,14 +1535,6 @@ function StandaloneChatPageClient({
           [userMessageId]: { tails, active: tails.length - 1 },
         };
       });
-
-      if (modelOverride) {
-        const parsed = parseStoredChatModel(modelOverride);
-        if (parsed) {
-          selectedModelRef.current = parsed;
-          setSelectedModel(parsed);
-        }
-      }
 
       setMessages(truncated);
       setIsStopping(false);
@@ -1684,7 +1598,7 @@ function StandaloneChatPageClient({
   );
 
   const handleRetryMessage = useCallback(
-    async (userMessageId: string, modelOverride?: string) => {
+    async (userMessageId: string) => {
       const current = messagesRef.current;
       const message = current.find((m) => m.id === userMessageId);
       if (!message) {
@@ -1694,16 +1608,8 @@ function StandaloneChatPageClient({
       if (!text.trim() && attachments.length === 0) {
         return;
       }
-      trackEvent(POSTHOG_EVENTS.CHAT_RETRY, {
-        chat_id: stableChatId,
-        model: modelOverride ?? null,
-      });
-      await resendFromUserMessage(
-        userMessageId,
-        text,
-        attachments,
-        modelOverride
-      );
+      trackEvent(POSTHOG_EVENTS.CHAT_RETRY, { chat_id: stableChatId });
+      await resendFromUserMessage(userMessageId, text, attachments);
     },
     [extractUserMessageContent, resendFromUserMessage, stableChatId]
   );
@@ -2955,7 +2861,6 @@ function StandaloneChatPageClient({
               <ProjectScopeLoadingInput />
             ) : (
               <ChatInputAdvanced
-                availableModels={availableModels}
                 authorsById={messageAuthorsById}
                 context={context}
                 draftStorageKey={draftStorageKey}
@@ -2963,12 +2868,10 @@ function StandaloneChatPageClient({
                 initialValue={initialQuery ?? undefined}
                 isLoading={isLoading}
                 isStopping={isStopping}
-                model={effectiveSelectedModel}
                 onAddContext={handleAddContext}
                 onClearError={handleClearError}
                 onEditQueued={handleEditQueued}
                 onEmptyChange={setIsInputEmpty}
-                onModelChange={handleModelChange}
                 onRemoveContext={handleRemoveContext}
                 onRemoveQueued={handleRemoveQueued}
                 onSend={handleSend}
@@ -3188,7 +3091,6 @@ function StandaloneChatPageClient({
                             )}
                             {isUser && !isSlackMirrored && (
                               <UserMessageActions
-                                availableModels={availableModels}
                                 branchIndex={
                                   branchTotal > 1 ? branchIdx : undefined
                                 }
@@ -3210,9 +3112,7 @@ function StandaloneChatPageClient({
                                 onPreviousBranch={() =>
                                   handleSwitchBranch(message.id, "prev")
                                 }
-                                onRetry={(model) =>
-                                  handleRetryMessage(message.id, model)
-                                }
+                                onRetry={() => handleRetryMessage(message.id)}
                               />
                             )}
                             {message.role === "assistant" && !isGenerating && (
@@ -3293,7 +3193,6 @@ function StandaloneChatPageClient({
                 <ProjectScopeLoadingInput />
               ) : (
                 <ChatInputAdvanced
-                  availableModels={availableModels}
                   authorsById={messageAuthorsById}
                   context={context}
                   draftStorageKey={draftStorageKey}
@@ -3302,11 +3201,9 @@ function StandaloneChatPageClient({
                   postMentions={postMentions}
                   isLoading={isLoading}
                   isStopping={isStopping}
-                  model={effectiveSelectedModel}
                   onAddContext={handleAddContext}
                   onClearError={handleClearError}
                   onEditQueued={handleEditQueued}
-                  onModelChange={handleModelChange}
                   onRemoveContext={handleRemoveContext}
                   onRemoveQueued={handleRemoveQueued}
                   onSend={handleSend}
@@ -3351,17 +3248,6 @@ function StandaloneChatPageClient({
       ) : null}
     </>
   );
-}
-
-function getPinnedModelFromAutoMetadata(
-  metadata: ChatUIMessage["metadata"] | undefined
-) {
-  if (metadata?.requestedModel !== "auto" || !metadata.model) {
-    return null;
-  }
-
-  const parsedModel = parseStoredChatModel(metadata.model);
-  return parsedModel && parsedModel !== "auto" ? parsedModel : null;
 }
 
 export default function PageClient(props: StandaloneChatPageClientProps) {

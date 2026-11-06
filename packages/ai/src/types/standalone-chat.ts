@@ -24,7 +24,6 @@ export interface StandaloneChatInput {
   context?: StandaloneChatContextItem[];
   maxSteps?: number;
   log?: AILogTarget;
-  requestedModel?: string;
   enableThinking?: boolean;
   thinkingLevel?: "off" | "low" | "medium" | "high";
   abortSignal?: AbortSignal;

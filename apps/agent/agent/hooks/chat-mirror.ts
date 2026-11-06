@@ -27,7 +27,7 @@ export default defineHook({
           id: `eve:${ctx.session.id}:${event.data.turnId}:${event.data.stepIndex}`,
           role: "assistant",
           parts: [{ type: "text", text: messageText }],
-          metadata: mirrorAssistantMetadata(event.data.turnId),
+          metadata: mirrorAssistantMetadata(),
         })
       );
     },

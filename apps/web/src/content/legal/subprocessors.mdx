@@ -2,7 +2,7 @@
 title: Sub-processors
 ---
 
-**Last updated: November 3, 2026**
+**Last updated: November 6, 2026**
 
 A sub-processor is a third party that Notra, Inc. engages to process personal data on behalf of our customers, for example to host the Service, store data or run AI models. This page is Annex III of our [Data Processing Agreement](/dpa) and lists every sub-processor that can receive Customer Personal Data, what it does for us, which data it handles and where it is based.
 
@@ -33,7 +33,7 @@ Notra, Inc. is established in the United States, so transfers of personal data f
 
 ## AI Model Providers
 
-Notra sends prompts and context to AI models to generate content, run GEO visibility scans, classify feedback and evaluate results. Requests go through an AI gateway, which chooses the inference provider that serves each request and can fail over between providers for the same model. Some GEO engines call a provider directly. Requests through Vercel AI Gateway and OpenRouter are sent with prompt training disallowed. Neon AI Gateway does not offer that setting, so requests through it are covered by the API terms of Neon and the model provider. Workspaces with the zero data retention ("ZDR") add-on only use providers that keep no prompts.
+Notra sends prompts and context to AI models to answer chat messages, run agents, generate content, run GEO visibility scans, classify feedback and evaluate results. Requests go through an AI gateway, which chooses the inference provider that serves each request and can fail over between providers for the same model. Some GEO engines call a provider directly. Requests through Vercel AI Gateway and OpenRouter are sent with prompt training disallowed. Neon AI Gateway does not offer that setting, so requests through it are covered by the API terms of Neon and the model provider. Workspaces with the zero data retention ("ZDR") add-on only use providers that keep no prompts.
 
 | Sub-processor | Purpose | Data processed | Location |
 | --- | --- | --- | --- |
@@ -48,7 +48,7 @@ Notra sends prompts and context to AI models to generate content, run GEO visibi
 | Meta Platforms, Inc. | Muse models for GEO scans | GEO scan prompts and model output | United States |
 | Mistral AI SAS | Mistral models for content generation | Prompts, context and model output | France |
 | Cohere Inc. | Ranking brand references and workspace knowledge by relevance | Brand reference text, workspace knowledge facts and search queries | Canada |
-| Open-weight model hosts | Kimi (Moonshot AI), GLM (Z.ai) and DeepSeek models for content generation and GEO scans, served by the inference providers the gateways above select | Prompts, context and model output | Depends on the provider the gateway selects |
+| Open-weight model hosts | GLM (Z.ai) models for chat, agents, background tasks and GEO scans, and Kimi (Moonshot AI) and DeepSeek models for content generation and GEO scans, served by the inference providers the gateways above select | Prompts, context and model output | Depends on the provider the gateway selects |
 | TypeSafe AI | Jev model for feedback classification, spam screening and evaluation, through Vercel AI Gateway | Feedback text, titles, related URLs and agent context | United States |
 | Anysphere, Inc. (Cursor) | Cursor model for GEO scans | GEO scan prompts and model output | United States |
 | Olostep | Running GEO scan prompts in consumer AI assistants such as ChatGPT, Perplexity, Google AI Mode and Microsoft Copilot | GEO scan prompts about your brand, market and competitors and the answers returned | United States |

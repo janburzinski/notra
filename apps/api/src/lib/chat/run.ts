@@ -84,7 +84,6 @@ export async function runChatMessage({
   const {
     message,
     approvals,
-    model,
     enableThinking,
     thinkingLevel,
     timezone,
@@ -207,7 +206,6 @@ export async function runChatMessage({
       chargeAiCredits,
       requestId,
       log,
-      model,
       enableThinking,
       thinkingLevel,
       timezone,

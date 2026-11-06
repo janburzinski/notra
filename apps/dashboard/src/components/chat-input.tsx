@@ -39,8 +39,8 @@ import {
 } from "@/components/chat/chat-composer-attachments";
 import { ChatContextConnectSuggestions } from "@/components/chat/chat-context-connect-suggestions";
 import { ChatContextOptionContent } from "@/components/chat/chat-context-option-content";
+import { ChatEffortMenu } from "@/components/chat/chat-effort-menu";
 import { ChatInputContextRow } from "@/components/chat/chat-input-context-row";
-import { ChatModelEffortMenu } from "@/components/chat/chat-model-effort-menu";
 import { ChatQueue } from "@/components/chat/chat-queue";
 import { ChatQuotePreview, useChatQuote } from "@/components/chat/chat-quote";
 import { ChatSkillSlashMenu } from "@/components/chat/chat-skill-slash-menu";
@@ -262,11 +262,8 @@ function ContentChatInputComposer(props: ChatInputProps) {
                     toggleContextItem={toggleContextItem}
                   />
                 ) : null}
-                {props.modelEffort ? (
-                  <ChatModelEffortMenu
-                    {...props.modelEffort}
-                    disabled={isInputLocked}
-                  />
+                {props.effort ? (
+                  <ChatEffortMenu {...props.effort} disabled={isInputLocked} />
                 ) : null}
                 <Composer.Send
                   disabled={sendDisabled}

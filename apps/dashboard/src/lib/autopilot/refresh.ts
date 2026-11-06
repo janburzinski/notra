@@ -1,5 +1,5 @@
 import { createGitHubMentionUsageCollector } from "@notra/ai/billing/github-mention-billing";
-import { AGENT_DEFAULT_MODEL } from "@notra/ai/constants/models";
+import { CONTENT_AGENT_MODEL } from "@notra/ai/constants/models";
 import { db } from "@notra/db/drizzle";
 import { brandSitemapPages, brandSitemaps } from "@notra/db/schema";
 import { and, asc, eq, ne, sql } from "drizzle-orm";
@@ -378,7 +378,7 @@ export async function writeRefresh(params: {
     ].join("\n");
     const output = await generateAutopilotObject({
       organizationId: ctx.organizationId,
-      modelId: AGENT_DEFAULT_MODEL,
+      modelId: CONTENT_AGENT_MODEL,
       tag: "refresh",
       log,
       schema: refreshOutputSchema,
@@ -396,7 +396,7 @@ export async function writeRefresh(params: {
       );
       const repair = await generateAutopilotObject({
         organizationId: ctx.organizationId,
-        modelId: AGENT_DEFAULT_MODEL,
+        modelId: CONTENT_AGENT_MODEL,
         tag: "refresh-repair",
         log,
         schema: refreshRepairSchema,

@@ -1,10 +1,9 @@
 import type { ChatAttachment } from "@notra/ai/types/chat";
 
 import { CHAT_CONTENT_KEY_RE } from "@/constants/attachments";
+import { isHeicFile } from "@/lib/upload/mime";
 import type { ChatUploadCandidate } from "@/types/upload/client";
 import { sha256File } from "@/utils/sha256-file";
-
-const HEIC_FILE_RE = /\.heic$/i;
 
 export function attachedContentHashes(
   attachments: readonly ChatAttachment[],
@@ -33,7 +32,7 @@ export async function splitDuplicateChatFiles(
   const unique: ChatUploadCandidate[] = [];
   const duplicates: File[] = [];
   for (const file of files) {
-    if (HEIC_FILE_RE.test(file.name) || file.type === "image/heic") {
+    if (isHeicFile(file)) {
       unique.push({ file });
       continue;
     }

@@ -1,4 +1,4 @@
-import { AGENT_DEFAULT_MODEL } from "@notra/ai/constants/models";
+import { CONTENT_AGENT_MODEL } from "@notra/ai/constants/models";
 import type {
   SandboxRunStore,
   SandboxStream,
@@ -19,7 +19,7 @@ function isTerminal(run: BoxRunData) {
 }
 
 function reportUsage(cost: RunCost, onUsage: SandboxUsageCallbacks["onUsage"]) {
-  const usage = geoBoxTokenUsage(cost, AGENT_DEFAULT_MODEL);
+  const usage = geoBoxTokenUsage(cost, CONTENT_AGENT_MODEL);
   onUsage({
     ...toAgentTokenUsage(usage),
     modelId: usage.modelId,

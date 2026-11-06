@@ -7,7 +7,6 @@ import { checkChatBilling } from "@notra/ai/billing/chat-billing";
 import { FEATURES } from "@notra/ai/billing/features";
 import {
   listContentChatSessions,
-  loadContentChatHistory,
   replaceContentChatHistory,
 } from "@notra/ai/chat/history";
 import { useLogger as getLogger, withEvlog } from "@notra/ai/evlog";
@@ -24,7 +23,6 @@ import type { ChatUsageSnapshot } from "@notra/ai/types/chat";
 import { buildChatFinishMetadata } from "@notra/ai/utils/chat";
 import { createChatActivityTimingTracker } from "@notra/ai/utils/chat-activity-timing";
 import { getContentImageContext } from "@notra/ai/utils/content-image-context";
-import { preserveConversationSelection } from "@notra/ai/utils/resolve-conversation-route";
 import { routeUsageProperties } from "@notra/ai/utils/route-usage";
 import { logError, logWarn } from "@notra/ai/utils/server-log";
 import { toAgentTokenUsage } from "@notra/ai/utils/token-usage";
@@ -143,12 +141,11 @@ export const POST = withEvlog(async function POST(
 
     const {
       chatId,
-      messages: inputMessages,
+      messages,
       currentMarkdown,
       documentMode,
       selection,
       context,
-      model,
       thinkingLevel,
       timezone,
     } = parseResult.data;
@@ -170,10 +167,6 @@ export const POST = withEvlog(async function POST(
     }
     const contentType = post.contentType;
 
-    const messages = preserveConversationSelection(
-      inputMessages,
-      (await loadContentChatHistory(organizationId, contentId, chatId)) ?? []
-    );
     const historySaved = await replaceContentChatHistory(
       organizationId,
       contentId,
@@ -218,7 +211,6 @@ export const POST = withEvlog(async function POST(
         imageContext,
         selection,
         context,
-        requestedModel: model,
         thinkingLevel,
         maxSteps: 50,
         abortSignal: request.signal,

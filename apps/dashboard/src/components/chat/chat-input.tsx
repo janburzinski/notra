@@ -17,9 +17,9 @@ import type {
   ContextItem,
 } from "@notra/ai/types/chat";
 import {
+  ALLOWED_CHAT_MIME_TYPES,
   MAX_CHAT_ATTACHMENTS,
   MAX_CHAT_FILE_SIZE,
-  MIME_DISPLAY_LABELS,
   PASTE_TO_ATTACHMENT_THRESHOLD,
 } from "@notra/schemas/constants/dashboard/upload";
 import { Button } from "@notra/ui/components/ui/button";
@@ -46,12 +46,8 @@ import {
   PopoverTrigger,
 } from "@notra/ui/components/ui/popover";
 import { Spinner } from "@notra/ui/components/ui/spinner";
-import { ClaudeAiIcon } from "@notra/ui/components/ui/svgs/claudeAiIcon";
 import { Github } from "@notra/ui/components/ui/svgs/github";
 import { Linear } from "@notra/ui/components/ui/svgs/linear";
-import { Notra } from "@notra/ui/components/ui/svgs/notra";
-import { Openai } from "@notra/ui/components/ui/svgs/openai";
-import { OpenaiDark } from "@notra/ui/components/ui/svgs/openaiDark";
 import {
   Tooltip,
   TooltipContent,
@@ -82,12 +78,10 @@ import Image from "@/components/framework/image";
 import Link from "@/components/framework/link";
 import { McpIcon } from "@/components/integrations/mcp-icon";
 import { CHAT_COMPOSER_DRAFT_PERSIST_MS } from "@/constants/chat-composer";
-import { AVAILABLE_MODELS, LEGACY_CHAT_MODELS } from "@/constants/chat-models";
 import { COMPOSER_STOP_ICON } from "@/constants/composer";
 import { MAX_CHAT_HEIC_INPUT_BYTES } from "@/constants/content-image";
 import { useAutumnRefreshListener } from "@/lib/hooks/use-autumn-refresh-listener";
 import { useBillingCustomer } from "@/lib/hooks/use-billing-customer";
-import { useChatModelLabels } from "@/lib/hooks/use-chat-model-labels";
 import { useChatSkillSlash } from "@/lib/hooks/use-chat-skill-slash";
 import { useOutputTypeLabel } from "@/lib/hooks/use-output-type-label";
 import { dashboardOrpc } from "@/lib/orpc/query";
@@ -97,8 +91,9 @@ import {
   uploadFile,
 } from "@/lib/upload/client";
 import {
-  getAllowedChatMimeTypes,
+  CHAT_FILE_TYPES_LABEL,
   isAllowedChatMimeType,
+  isHeicFile,
   isImageMimeType,
 } from "@/lib/upload/mime";
 import type { ChatMessageAuthor } from "@/types/chat";
@@ -107,7 +102,6 @@ import type { ChatPostMention } from "@/types/chat-posts";
 import type {
   ChatContextOption,
   ChatMentionOption,
-  ChatModelOption,
 } from "@/types/components/chat-input";
 import type { GitHubRepository } from "@/types/integrations";
 import type { SkillSlashOption } from "@/types/skills/slash";
@@ -162,29 +156,6 @@ import {
 } from "./integration-reference";
 
 const GENERIC_PASTED_IMAGE_NAME_RE = /^image\.(jpe?g|png|gif|webp)$/i;
-
-type ModelProvider = ChatModelOption["provider"];
-
-export function ModelIcon({
-  provider,
-  className,
-}: {
-  provider: ModelProvider;
-  className?: string;
-}) {
-  if (provider === "openai") {
-    return (
-      <>
-        <Openai className={`${className ?? ""} block dark:hidden`} />
-        <OpenaiDark className={`${className ?? ""} hidden dark:block`} />
-      </>
-    );
-  }
-  if (provider === "auto") {
-    return <Notra className={className} />;
-  }
-  return <ClaudeAiIcon className={className} />;
-}
 
 const THINKING_LEVELS = ["off", "low", "medium", "high"] as const;
 export type ThinkingLevel = (typeof THINKING_LEVELS)[number];
@@ -795,85 +766,6 @@ function ChatComposerNudge({
   );
 }
 
-function ChatComposerModelPicker({
-  availableModels,
-  currentModel,
-  isLoading,
-  isModelPickerOpen,
-  isQueued,
-  model,
-  onModelChange,
-  setIsModelPickerOpen,
-}: {
-  availableModels: readonly ChatModelOption[];
-  currentModel: ChatModelOption;
-  isLoading: boolean;
-  isModelPickerOpen: boolean;
-  isQueued: boolean;
-  model: string;
-  onModelChange?: (model: string) => void;
-  setIsModelPickerOpen: (open: boolean) => void;
-}) {
-  const t = useTranslations("chat.input.modelPicker");
-  const modelLabels = useChatModelLabels();
-  return (
-    <Popover onOpenChange={setIsModelPickerOpen} open={isModelPickerOpen}>
-      <PopoverTrigger
-        render={<Composer.ToolbarButton disabled={isLoading || isQueued} />}
-      >
-        <ModelIcon className="size-3.5" provider={currentModel.provider} />
-        {currentModel.label}
-        <HugeiconsIcon className="size-3" icon={ArrowDown01Icon} />
-      </PopoverTrigger>
-      <PopoverContent align="start" className="w-72 p-0" sideOffset={6}>
-        <Command>
-          <CommandInput placeholder={t("searchPlaceholder")} />
-          <CommandList>
-            <CommandEmpty>{t("empty")}</CommandEmpty>
-            <CommandGroup>
-              {(availableModels.some(
-                (availableModel) => availableModel.id === model
-              )
-                ? availableModels
-                : [...availableModels, currentModel]
-              ).map((availableModel) => (
-                <CommandItem
-                  data-checked={model === availableModel.id}
-                  key={availableModel.id}
-                  keywords={[
-                    availableModel.label,
-                    availableModel.provider,
-                    modelLabels.description(availableModel),
-                  ]}
-                  onSelect={() => {
-                    onModelChange?.(availableModel.id);
-                    setIsModelPickerOpen(false);
-                  }}
-                  value={availableModel.id}
-                >
-                  <ModelIcon
-                    className="size-4 shrink-0"
-                    provider={availableModel.provider}
-                  />
-                  <div className="flex min-w-0 flex-col">
-                    <span className="text-sm">{availableModel.label}</span>
-                    <span className="text-muted-foreground text-xs">
-                      {modelLabels.description(availableModel)}
-                    </span>
-                    <span className="text-muted-foreground/70 text-[0.625rem]">
-                      {modelLabels.pricing(availableModel)}
-                    </span>
-                  </div>
-                </CommandItem>
-              ))}
-            </CommandGroup>
-          </CommandList>
-        </Command>
-      </PopoverContent>
-    </Popover>
-  );
-}
-
 function ChatComposerThinkingMenu({
   isLoading,
   isQueued,
@@ -1071,7 +963,6 @@ const EMPTY_POST_MENTIONS: readonly ChatPostMention[] = [];
 const EMPTY_ANNOTATIONS: readonly ChatAnnotation[] = [];
 
 interface ChatInputAdvancedProps {
-  availableModels?: readonly ChatModelOption[];
   onSend?: (value: string, attachments: ChatAttachment[]) => void;
   onStop?: () => void;
   initialValue?: string;
@@ -1084,8 +975,6 @@ interface ChatInputAdvancedProps {
   onRemoveContext?: (item: ContextItem) => void;
   error?: string | null;
   onClearError?: () => void;
-  model?: string;
-  onModelChange?: (model: string) => void;
   thinkingLevel?: ThinkingLevel;
   onThinkingLevelChange?: (level: ThinkingLevel) => void;
   connectedTop?: boolean;
@@ -1197,7 +1086,7 @@ function sendOrQueueComposer({
   clearError,
   customer,
   editor,
-  hasUnsupportedAttachmentsForModel,
+  hasUnsupportedAttachments,
   isLoading,
   isUploading,
   isUsageBlocked,
@@ -1223,7 +1112,7 @@ function sendOrQueueComposer({
   clearError: () => void;
   customer: unknown;
   editor: HTMLDivElement;
-  hasUnsupportedAttachmentsForModel: boolean;
+  hasUnsupportedAttachments: boolean;
   isLoading: boolean;
   isUploading: boolean;
   isUsageBlocked: boolean;
@@ -1288,7 +1177,7 @@ function sendOrQueueComposer({
     if (!hasContent) {
       return;
     }
-    if (hasUnsupportedAttachmentsForModel) {
+    if (hasUnsupportedAttachments) {
       return;
     }
     if (isUsageBlocked) {
@@ -1308,7 +1197,6 @@ function sendOrQueueComposer({
 }
 
 export function ChatInputAdvanced({
-  availableModels = AVAILABLE_MODELS,
   onSend,
   onStop,
   initialValue,
@@ -1321,8 +1209,6 @@ export function ChatInputAdvanced({
   onRemoveContext,
   error: externalError,
   onClearError,
-  model = "auto",
-  onModelChange,
   thinkingLevel = "medium",
   onThinkingLevelChange,
   connectedTop = false,
@@ -1369,18 +1255,6 @@ export function ChatInputAdvanced({
   const contextPickerId = useId();
   const slashListId = useId();
   const mentionListId = useId();
-  const currentModel =
-    [...AVAILABLE_MODELS, ...LEGACY_CHAT_MODELS].find(
-      (availableModel) => availableModel.id === model
-    ) ??
-    ({
-      id: "auto",
-      label: model,
-      description: null,
-      pricing: null,
-      provider: model.startsWith("openai/") ? "openai" : "anthropic",
-    } satisfies ChatModelOption);
-  const [isModelPickerOpen, setIsModelPickerOpen] = useState(false);
   const [isContextPickerOpen, setIsContextPickerOpen] = useState(false);
   const [isEmpty, setIsEmpty] = useState(true);
   const [internalError, setInternalError] = useState<string | null>(null);
@@ -1449,32 +1323,11 @@ export function ChatInputAdvanced({
   const isMountedRef = useRef(true);
   const submittedKeysRef = useRef<Set<string>>(new Set());
 
-  const allowedChatMimeTypes = useMemo(
-    () => getAllowedChatMimeTypes(model),
-    [model]
-  );
-  const acceptedFileTypesLabel = useMemo(() => {
-    const seen = new Set<string>();
-    const labels: string[] = [];
-    for (const mime of allowedChatMimeTypes) {
-      const label = MIME_DISPLAY_LABELS[mime];
-      if (label && !seen.has(label)) {
-        seen.add(label);
-        labels.push(label);
-      }
-    }
-    return labels.join(", ");
-  }, [allowedChatMimeTypes]);
-
   const [isDraggingFile, setIsDraggingFile] = useState(false);
   const dragCounterRef = useRef(0);
-  const hasUnsupportedAttachmentsForModel = attachments.some(
-    (attachment) => !isAllowedChatMimeType(attachment.mediaType, model)
+  const hasUnsupportedAttachments = attachments.some(
+    (attachment) => !isAllowedChatMimeType(attachment.mediaType)
   );
-  const attachmentTooltipText =
-    model === "openai/gpt-5.4"
-      ? t("attach.imagesPdfs")
-      : t("attach.imagesPdfsText");
 
   const cleanupChatUpload = useCallback(async (key: string) => {
     try {
@@ -1527,22 +1380,13 @@ export function ChatInputAdvanced({
 
       const accepted: File[] = [];
       for (const file of files) {
-        if (
-          !isAllowedChatMimeType(file.type, model) &&
-          !/\.heic$/i.test(file.name) &&
-          file.type !== "image/heic"
-        ) {
-          toast.error(
-            file.type === "text/plain" || file.type === "text/markdown"
-              ? t("upload.unsupportedText", { model: currentModel.label })
-              : t("upload.unsupportedType", { name: file.name })
-          );
+        if (!(isAllowedChatMimeType(file.type) || isHeicFile(file))) {
+          toast.error(t("upload.unsupportedType", { name: file.name }));
           continue;
         }
-        const maxBytes =
-          /\.heic$/i.test(file.name) || file.type === "image/heic"
-            ? MAX_CHAT_HEIC_INPUT_BYTES
-            : MAX_CHAT_FILE_SIZE;
+        const maxBytes = isHeicFile(file)
+          ? MAX_CHAT_HEIC_INPUT_BYTES
+          : MAX_CHAT_FILE_SIZE;
         if (file.size > maxBytes) {
           toast.error(
             t("upload.tooLarge", {
@@ -1675,14 +1519,7 @@ export function ChatInputAdvanced({
       }
       return results.every(Boolean);
     },
-    [
-      cleanupChatUpload,
-      currentModel.label,
-      model,
-      t,
-      tCommon2,
-      updatePendingUploads,
-    ]
+    [cleanupChatUpload, t, tCommon2, updatePendingUploads]
   );
 
   const onFileInputChange = useCallback(
@@ -2565,7 +2402,7 @@ export function ChatInputAdvanced({
       clearError();
       if (
         snapshotAttachments.some(
-          (attachment) => !isAllowedChatMimeType(attachment.mediaType, model)
+          (attachment) => !isAllowedChatMimeType(attachment.mediaType)
         )
       ) {
         return false;
@@ -2600,7 +2437,6 @@ export function ChatInputAdvanced({
       chatIncludedInPlan,
       isUsageBlocked,
       limitMessage,
-      model,
       onSend,
     ]
   );
@@ -2641,7 +2477,7 @@ export function ChatInputAdvanced({
       clearError,
       customer,
       editor,
-      hasUnsupportedAttachmentsForModel,
+      hasUnsupportedAttachments,
       isLoading,
       isUploading,
       isUsageBlocked,
@@ -2662,7 +2498,7 @@ export function ChatInputAdvanced({
     chatIncludedInPlan,
     isLoading,
     isUploading,
-    hasUnsupportedAttachmentsForModel,
+    hasUnsupportedAttachments,
     isUsageBlocked,
     limitMessage,
     onSend,
@@ -2722,19 +2558,22 @@ export function ChatInputAdvanced({
           });
         }
       );
-      if (pastedFiles.length > 0) {
-        event.preventDefault();
+      const text = event.clipboardData.getData("text/plain");
+      event.preventDefault();
+      // Rich clipboards can carry an image rendering next to the text; only
+      // treat the paste as files when they can be attached or there's no text.
+      if (
+        pastedFiles.length > 0 &&
+        (!text ||
+          pastedFiles.some(
+            (file) => isAllowedChatMimeType(file.type) || isHeicFile(file)
+          ))
+      ) {
         handleFilesSelected(pastedFiles).catch(() => undefined);
         return;
       }
 
-      event.preventDefault();
-      const text = event.clipboardData.getData("text/plain");
-
-      if (
-        text.length >= PASTE_TO_ATTACHMENT_THRESHOLD &&
-        isAllowedChatMimeType("text/plain", model)
-      ) {
+      if (text.length >= PASTE_TO_ATTACHMENT_THRESHOLD) {
         const selection = window.getSelection();
         const fallbackRange =
           selection && selection.rangeCount > 0
@@ -2757,7 +2596,7 @@ export function ChatInputAdvanced({
 
       insertTextAtRange(text);
     },
-    [handleFilesSelected, insertTextAtRange, model]
+    [handleFilesSelected, insertTextAtRange]
   );
 
   const handleCopy = useCallback(
@@ -2889,7 +2728,7 @@ export function ChatInputAdvanced({
     <>
       {isDraggingFile ? (
         <ChatComposerDropOverlay
-          acceptedFileTypesLabel={acceptedFileTypesLabel}
+          acceptedFileTypesLabel={CHAT_FILE_TYPES_LABEL}
         />
       ) : null}
       <div
@@ -2952,7 +2791,7 @@ export function ChatInputAdvanced({
             <ChatQuotePreview disabled={isQueued} />
             <ChatAnnotationsPreview disabled={isQueued} />
             <input
-              accept={`${allowedChatMimeTypes.join(",")},image/heic,.heic`}
+              accept={`${ALLOWED_CHAT_MIME_TYPES.join(",")},image/heic,.heic`}
               className="hidden"
               multiple
               onChange={onFileInputChange}
@@ -3009,17 +2848,6 @@ export function ChatInputAdvanced({
               </div>
             </div>
             <Composer.Toolbar>
-              <ChatComposerModelPicker
-                availableModels={availableModels}
-                currentModel={currentModel}
-                isLoading={isLoading}
-                isModelPickerOpen={isModelPickerOpen}
-                isQueued={isQueued}
-                model={model}
-                onModelChange={onModelChange}
-                setIsModelPickerOpen={setIsModelPickerOpen}
-              />
-
               <ChatComposerThinkingMenu
                 isLoading={isLoading}
                 isQueued={isQueued}
@@ -3049,12 +2877,12 @@ export function ChatInputAdvanced({
                   disabled={isQueued}
                   onAttach={() => fileInputRef.current?.click()}
                   pendingUploadCount={pendingUploads.length}
-                  tooltip={attachmentTooltipText}
+                  tooltip={t("attach.files")}
                 />
 
                 <ChatComposerSendButton
                   attachmentCount={attachments.length}
-                  hasUnsupportedAttachments={hasUnsupportedAttachmentsForModel}
+                  hasUnsupportedAttachments={hasUnsupportedAttachments}
                   isEmpty={
                     isEmpty && taggedSkills.length === 0 && !composerPrefix
                   }

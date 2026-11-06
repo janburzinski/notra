@@ -19,7 +19,6 @@ export interface DirectStandaloneChatArgs {
   chargeAiCredits: boolean;
   requestId: string;
   log: ChatLogger;
-  model?: string;
   enableThinking?: boolean;
   thinkingLevel?: ChatThinkingLevel;
   timezone?: string;

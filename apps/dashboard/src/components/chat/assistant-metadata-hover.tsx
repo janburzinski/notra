@@ -14,6 +14,7 @@ import {
 import { ClaudeAiIcon } from "@notra/ui/components/ui/svgs/claudeAiIcon";
 import { Openai } from "@notra/ui/components/ui/svgs/openai";
 import { OpenaiDark } from "@notra/ui/components/ui/svgs/openaiDark";
+import { Zai } from "@notra/ui/components/ui/svgs/zai";
 import { formatCompactNumber } from "@notra/utils/format-compact-number";
 import type { ReactNode } from "react";
 import { useLocale, useTranslations } from "use-intl";
@@ -27,6 +28,8 @@ import { formatOneDecimal } from "@/utils/format";
 
 const MODEL_LABELS = {
   auto: "Auto",
+  "zai/glm-5.3": "GLM 5.3",
+  "zai/glm-5.3-flash": "GLM 5.3 Flash",
   "anthropic/claude-opus-5.5": "Claude Opus 5.5",
   "anthropic/claude-opus-5": "Claude Opus 5",
   "anthropic/claude-opus-4.8": "Claude Opus 4.8",
@@ -42,6 +45,8 @@ const MODEL_LABELS = {
 
 const MODEL_CONTEXT_WINDOWS = {
   auto: 1_000_000,
+  "zai/glm-5.3": 1_048_576,
+  "zai/glm-5.3-flash": 1_048_576,
   "anthropic/claude-opus-5.5": 1_000_000,
   "anthropic/claude-opus-5": 1_000_000,
   "anthropic/claude-opus-4.8": 1_000_000,
@@ -64,6 +69,9 @@ function getModelLabel(model: string): string {
 }
 
 function ModelBadgeIcon({ model }: { model: string }) {
+  if (model.startsWith("zai/")) {
+    return <Zai className="size-3" />;
+  }
   if (model.startsWith("openai/")) {
     return (
       <>

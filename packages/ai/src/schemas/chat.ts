@@ -5,8 +5,12 @@ import * as z from "zod";
 import { CHAT_TITLE_MAX_LENGTH } from "../constants/chat";
 import { standaloneChatContextSchema } from "./standalone-chat";
 
+// Chat always runs on GLM. Older ids stay valid so saved messages and API
+// clients that still send `model` keep parsing; the server ignores them.
 export const chatModelSchema = z.enum([
   "auto",
+  "zai/glm-5.3",
+  "zai/glm-5.3-flash",
   "anthropic/claude-opus-5.5",
   "anthropic/claude-opus-5",
   "anthropic/claude-opus-4.8",
@@ -21,11 +25,6 @@ export const chatModelSchema = z.enum([
 ]);
 
 export const thinkingLevelSchema = z.enum(["off", "low", "medium", "high"]);
-
-export const conversationSelectionSchema = z.object({
-  model: chatModelSchema.exclude(["auto"]).or(z.literal("openai/gpt-5.4-mini")),
-  thinkingLevel: thinkingLevelSchema.optional(),
-});
 
 export const chatToolApprovalResponseSchema = z.object({
   id: z.string().min(1).max(500),
@@ -169,7 +168,6 @@ export const chatWorkflowPayloadSchema = z.object({
   userEmail: z.string().email().nullable().optional(),
   context: z.array(standaloneChatContextSchema),
   useMarkup: z.boolean(),
-  model: chatModelSchema.optional(),
   enableThinking: z.boolean().optional(),
   thinkingLevel: thinkingLevelSchema.optional(),
   timezone: z.string().min(1).max(100).optional(),
@@ -211,7 +209,6 @@ export const chatErrorPayloadSchema = z.object({
 });
 
 export const storedChatPreferencesSchema = z.object({
-  model: chatModelSchema,
   thinkingLevel: thinkingLevelSchema,
 });
 

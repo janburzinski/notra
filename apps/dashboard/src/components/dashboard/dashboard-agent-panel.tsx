@@ -40,7 +40,7 @@ import { DASHBOARD_AGENT_SUGGESTIONS } from "@/constants/chat-suggestions";
 import { localStorageKeys } from "@/constants/storage";
 import { emitAutumnRefresh } from "@/lib/billing/autumn-refresh";
 import { useActiveProject } from "@/lib/hooks/use-active-project";
-import { useChatModelEffort } from "@/lib/hooks/use-chat-model-effort";
+import { useChatEffort } from "@/lib/hooks/use-chat-effort";
 import { useDesktopBreakpoint } from "@/lib/hooks/use-desktop-breakpoint";
 import { usePathname, useRouter } from "@/lib/navigation";
 import { dashboardOrpcClient } from "@/lib/orpc/client";
@@ -85,8 +85,8 @@ function DashboardAgentChat({
   const closeAfterNavigationRef = useRef(false);
   const { projectId: activeProjectId, isResolved: isProjectResolved } =
     useActiveProject();
-  const modelEffort = useChatModelEffort();
-  const { model: effectiveModel, thinkingLevel } = modelEffort;
+  const effort = useChatEffort();
+  const { thinkingLevel } = effort;
   const [queuedMessages, setQueuedMessages] = useState<QueuedMessage[]>([]);
   const queuedMessagesRef = useRef<QueuedMessage[]>([]);
   const steerAfterStopRef = useRef<QueuedMessage | null>(null);
@@ -136,7 +136,6 @@ function DashboardAgentChat({
               isProjectResolved && activeProjectId
                 ? activeProjectId
                 : undefined,
-            model: effectiveModel,
             thinkingLevel,
             timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
             // A response stopped before its first chunk leaves an empty
@@ -170,7 +169,6 @@ function DashboardAgentChat({
     [
       activeChatId,
       activeProjectId,
-      effectiveModel,
       isProjectResolved,
       organizationId,
       thinkingLevel,
@@ -622,7 +620,7 @@ function DashboardAgentChat({
               disabled={isChatDisabled}
               error={chatError}
               isLoading={isAgentBusy}
-              modelEffort={modelEffort}
+              effort={effort}
               onClearError={() => setChatError(null)}
               onEditQueued={handleEditQueued}
               onRemoveQueued={handleRemoveQueued}

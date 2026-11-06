@@ -11,6 +11,7 @@ import {
   CHAT_LAST_STOPPED_TTL_SECONDS,
   CHAT_WORKFLOW_REQUEST_TTL_SECONDS,
 } from "../constants/chat";
+import { UTILITY_MODEL_ID } from "../constants/models";
 import { gateway } from "../gateway";
 import { withRouterDefaults } from "../provider-options";
 import { uiMessageSchema } from "../schemas/chat";
@@ -961,16 +962,17 @@ export async function generateAndSetChatTitle(
     }
 
     const { text } = await generateText({
-      model: gateway("openai/gpt-5.4-nano", {
+      model: gateway(UTILITY_MODEL_ID, {
         organizationId,
       }),
       instructions: `Generate a short, descriptive title (max 50 chars) for a chat conversation based on the user's first message. Return ONLY the title text, nothing else. No quotes, no prefix. Be specific and concise.`,
       prompt: userMessage,
-      maxOutputTokens: 30,
+      // GLM reasons before it answers, so leave room beyond the title itself.
+      maxOutputTokens: 100,
       providerOptions: withRouterDefaults(
         { gateway: { tags: ["chat-title"] } },
         {
-          modelId: "openai/gpt-5.4-nano",
+          modelId: UTILITY_MODEL_ID,
         }
       ),
       ...buildTelemetryOptions({

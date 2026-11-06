@@ -1,6 +1,6 @@
 import { createGitHubMentionUsageCollector } from "@notra/ai/billing/github-mention-billing";
 import { GITHUB_MENTION_AGENT_MAX_STEPS } from "@notra/ai/constants/github-mention";
-import { AGENT_DEFAULT_MODEL } from "@notra/ai/constants/models";
+import { CONTENT_AGENT_MODEL } from "@notra/ai/constants/models";
 import { assertRouteHasCredits } from "@notra/ai/gateway";
 import { createModel } from "@notra/ai/model";
 import {
@@ -43,7 +43,7 @@ export async function runGitHubMentionAgent(params: {
 }): Promise<GitHubMentionAgentResult> {
   await assertRouteHasCredits({
     organizationId: params.context.organizationId,
-    modelId: AGENT_DEFAULT_MODEL,
+    modelId: CONTENT_AGENT_MODEL,
   });
 
   const usage = createGitHubMentionUsageCollector();
@@ -99,7 +99,7 @@ export async function runGitHubMentionAgent(params: {
     ]);
 
   const agent = new ToolLoopAgent({
-    model: createModel(params.context.organizationId, AGENT_DEFAULT_MODEL),
+    model: createModel(params.context.organizationId, CONTENT_AGENT_MODEL),
     providerOptions: withRouterDefaults(
       {
         gateway: { tags: ["github-mention"] },
@@ -107,7 +107,7 @@ export async function runGitHubMentionAgent(params: {
           thinking: { type: "adaptive" },
         },
       },
-      { modelId: AGENT_DEFAULT_MODEL }
+      { modelId: CONTENT_AGENT_MODEL }
     ),
     tools: buildGitHubMentionTools({
       octokit: params.octokit,
@@ -160,11 +160,11 @@ export async function runGitHubMentionAgent(params: {
       onStepEnd: async (step) => {
         const routeUsage = await summarizeRouteUsage(
           [step],
-          AGENT_DEFAULT_MODEL
+          CONTENT_AGENT_MODEL
         );
         reportUsage({
           ...toAgentTokenUsage(step.usage),
-          modelId: AGENT_DEFAULT_MODEL,
+          modelId: CONTENT_AGENT_MODEL,
           maxPromptTokens: routeUsage.maxPromptTokens,
           tokenCostUsd: routeUsage.tokenCostUsd,
           route: routeUsage.route,

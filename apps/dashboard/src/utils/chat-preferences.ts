@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  chatModelSchema,
   storedChatPreferencesSchema,
   thinkingLevelSchema,
 } from "@notra/ai/schemas/chat";
@@ -15,7 +14,6 @@ const CHAT_PREFERENCES_STORAGE_KEY = localStorageKeys.chatPreferences;
 const CHAT_PREFERENCES_CHANGE_EVENT = "notra:chat-preferences-change";
 
 export const DEFAULT_CHAT_PREFERENCES: StoredChatPreferences = {
-  model: "auto",
   thinkingLevel: "medium",
 };
 
@@ -29,13 +27,6 @@ function clearStoredChatPreferences(): void {
   } catch {
     // Ignore storage access failures.
   }
-}
-
-export function parseStoredChatModel(
-  value: string
-): StoredChatPreferences["model"] | null {
-  const result = chatModelSchema.safeParse(value);
-  return result.success ? result.data : null;
 }
 
 export function parseStoredThinkingLevel(

@@ -22,16 +22,15 @@ import type { SessionContext } from "eve/context";
 import type { HookContext } from "eve/hooks";
 
 import {
-  MIRROR_REQUESTED_MODEL,
   MIRROR_DELTA_THROTTLE_MAX_ENTRIES,
   MIRROR_DELTA_THROTTLE_MS,
   MIRROR_TOOL_NAME_OVERRIDES,
   MIRROR_TOOL_OUTPUT_MAX_CHARS,
   MIRRORED_CHANNEL_KINDS,
 } from "../constants/chat-mirror";
+import { ASSISTANT_MODEL_ID } from "../constants/models";
 import { ChatMirrorError } from "../schemas/chat-mirror";
 import type { MirrorTarget, MirrorUiMessage } from "../types/chat-mirror";
-import { getSelectedAssistantModelId } from "./model";
 
 const SNAKE_SEGMENT_REGEX = /_([a-z0-9])/gu;
 
@@ -213,11 +212,8 @@ export async function mirrorSessionStatus(
   );
 }
 
-export function mirrorAssistantMetadata(turnId: string) {
-  return {
-    model: getSelectedAssistantModelId(turnId),
-    requestedModel: MIRROR_REQUESTED_MODEL,
-  };
+export function mirrorAssistantMetadata() {
+  return { model: ASSISTANT_MODEL_ID };
 }
 
 export async function mirrorAssistantDelta(
@@ -258,7 +254,7 @@ export async function mirrorAssistantDelta(
         id: messageId,
         role: "assistant",
         parts: [{ type: "text", text }],
-        metadata: mirrorAssistantMetadata(data.turnId),
+        metadata: mirrorAssistantMetadata(),
       })
     )
   );

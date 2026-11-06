@@ -1,5 +1,7 @@
+import { ROUTER_PROVIDER_OPTIONS_KEY } from "@notra/ai/constants/router";
 import { withRouterProviderOptions } from "@notra/ai/router/provider-options";
 import type { RouterProviderOptions } from "@notra/ai/types/router";
+import { isRecord } from "@notra/utils/unknown-record";
 import type { generateText } from "ai";
 
 type ProviderOptions = NonNullable<
@@ -13,8 +15,13 @@ function getGatewayFallbackModels(modelId?: string): string[] {
     return [...DEFAULT_FALLBACK_MODELS];
   }
 
-  if (modelId.startsWith("anthropic/claude-opus-")) {
-    return ["anthropic/claude-sonnet-5"];
+  // Content writing is Opus-only and chat is GLM-only, so neither may fall
+  // back to another model. The router still fails over between gateways.
+  if (
+    modelId.startsWith("anthropic/claude-opus-") ||
+    modelId.startsWith("zai/")
+  ) {
+    return [];
   }
 
   if (modelId.startsWith("anthropic/")) {
@@ -43,9 +50,19 @@ export function withRouterDefaults(
 ): ProviderOptions {
   const fallbackModels =
     options?.fallbackModels ?? getGatewayFallbackModels(options?.modelId);
+  const existingRouter = providerOptions?.[ROUTER_PROVIDER_OPTIONS_KEY];
+  // GLM reasons on every call and defaults to max effort, which is slow and
+  // can spend a small output budget on reasoning alone. Callers that want
+  // more ask for it explicitly.
+  const glmReasoning =
+    options?.modelId?.startsWith("zai/") &&
+    !(isRecord(existingRouter) && existingRouter.reasoning)
+      ? { reasoning: { effort: "low" as const } }
+      : {};
   const routerOptions: RouterProviderOptions = {
     caching: "auto",
     fallbackModels,
+    ...glmReasoning,
   };
 
   return withRouterProviderOptions(

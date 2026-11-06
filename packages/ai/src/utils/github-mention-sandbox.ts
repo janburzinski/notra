@@ -4,7 +4,7 @@ import {
   GITHUB_MENTION_SANDBOX_ALLOWED_DOMAINS,
   GITHUB_MENTION_SANDBOX_TIMEOUT_MS,
 } from "@notra/ai/constants/github-mention";
-import { AGENT_DEFAULT_MODEL } from "@notra/ai/constants/models";
+import { CONTENT_AGENT_MODEL } from "@notra/ai/constants/models";
 import { getGitHubCloneTokenForOrganization } from "@notra/ai/integrations/github";
 import type { AgentTokenUsage } from "@notra/ai/types/agents";
 import type { PublicationRepairScheduler } from "@notra/ai/types/content-publication";
@@ -27,7 +27,7 @@ const REPO_CLONE_TOKEN_PATH = "/tmp/notra-github-token";
 // Same model as the mention agent. Box routes by prefix: without `vercel/` the
 // gateway key is sent to Anthropic directly and every run fails with "invalid
 // x-api-key". The SDK's model type lags behind the gateway, hence the cast below.
-const SANDBOX_MODEL_ID = `vercel/${AGENT_DEFAULT_MODEL}`;
+const SANDBOX_MODEL_ID = `vercel/${CONTENT_AGENT_MODEL}`;
 
 const SHA_PATTERN = /^[0-9a-f]{40}$/;
 const SANDBOX_FILE_LIMIT = 25;

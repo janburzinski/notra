@@ -148,7 +148,6 @@ export const contentDraftSuite: EvalSuite<
     CONTENT_AGENT_MODEL,
     "anthropic/claude-sonnet-5",
     "openai/gpt-6-sol",
-    "anthropic/claude-opus-5.5",
   ],
   labelFields: ["decision"],
   timeoutMs: 120_000,

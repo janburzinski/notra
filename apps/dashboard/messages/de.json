@@ -6216,23 +6216,12 @@
         "customMcp": "Eigener MCP-Server · {count, plural, one {# Tool} other {# Tools}}",
         "marketplaceMcp": "Marketplace-MCP-Server · {count, plural, one {# Tool} other {# Tools}}"
       },
-      "modelPicker": {
-        "searchPlaceholder": "Modelle durchsuchen…",
-        "empty": "Keine Modelle gefunden."
-      },
-      "modelEffort": {
-        "label": "Modell und Aufwand",
-        "effort": "Aufwand",
-        "model": "Modell"
-      },
       "attach": {
-        "imagesPdfs": "Bilder oder PDFs anhängen",
-        "imagesPdfsText": "Bilder, PDFs oder Text anhängen"
+        "files": "Bilder, Text- oder Markdown-Dateien anhängen"
       },
       "upload": {
         "maxAttachments": "Du kannst höchstens {max} Dateien pro Nachricht anhängen.",
-        "unsupportedText": "{model} unterstützt nur Bild- und PDF-Anhänge. Entferne Textdateien oder wähle ein Claude-Modell.",
-        "unsupportedType": "Nicht unterstützter Dateityp: {name}",
+        "unsupportedType": "{name} wird nicht unterstützt. Du kannst Bilder, Text- und Markdown-Dateien anhängen.",
         "tooLarge": "{name} überschreitet das Limit von {size} MB.",
         "failed": "Upload von {name} fehlgeschlagen: {message}",
         "someFailed": "Einige Anhänge konnten nicht hochgeladen werden. Entferne sie oder versuche es erneut, bevor du sendest.",
@@ -6359,7 +6348,6 @@
     "userMessageActions": {
       "previousVersion": "Vorherige Version",
       "nextVersion": "Nächste Version",
-      "retryWithSame": "Mit demselben wiederholen",
       "editMessage": "Nachricht bearbeiten",
       "copyMessage": "Nachricht kopieren",
       "editPlaceholder": "Nachricht bearbeiten…"
@@ -6387,22 +6375,6 @@
     "errors": {
       "usageLimit": "Du hast diesen Monat alle Chat-Nachrichten aufgebraucht. Upgrade für mehr.",
       "fallback": "Beim Erstellen der Antwort ist etwas schiefgelaufen. Versuch es nochmal."
-    },
-    "models": {
-      "descriptions": {
-        "auto": "Wählt das beste Modell für deine Nachricht",
-        "latestOpus": "Neuestes Opus für komplexe Aufgaben",
-        "everyday": "Alltagsaufgaben und Coding",
-        "fast": "Schnelle Antworten",
-        "advancedReasoning": "Fortgeschrittenes Reasoning und komplexe Aufgaben",
-        "fastAffordable": "Schnell und günstig",
-        "zdrRoute": "OpenAI-Modell mit ZDR-Route",
-        "previousOpus": "Vorherige Opus-Generation",
-        "previousSonnet": "Vorherige Sonnet-Generation",
-        "previousOpenai": "Vorheriges OpenAI-Modell"
-      },
-      "pricing": "{input} $ Input / {output} $ Output pro 1 Mio.",
-      "pricingVaries": "Abhängig vom gewählten Modell"
     },
     "quote": {
       "quoteSelection": "Markierten Text zitieren",

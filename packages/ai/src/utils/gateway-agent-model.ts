@@ -32,10 +32,6 @@ export function withGatewayAgentOptions(
                   )
                 : []),
             ],
-            ...(model.modelId === "openai/gpt-6-sol" &&
-            (tag === "content-writer-agent" || tag === "agent-task")
-              ? { serviceTier: "flex" }
-              : {}),
           },
         }),
       }),

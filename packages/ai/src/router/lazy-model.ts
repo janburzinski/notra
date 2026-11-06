@@ -324,7 +324,14 @@ export class RoutedLanguageModel implements LanguageModelV4 {
       allowNonZdr: this.context.policy.allowNonZdr,
       relaxZdr: this.zdrRelaxed || route.decision.zdrRelaxed === true,
     });
-    return { ...options, providerOptions };
+    // Neon and OpenRouter read the effort from their provider options;
+    // Vercel's gateway reads the call-level setting and maps it per provider.
+    const reasoning =
+      route.decision.gateway === "vercel" &&
+      (options.reasoning ?? "provider-default") === "provider-default"
+        ? router.reasoning?.effort
+        : undefined;
+    return { ...options, providerOptions, ...(reasoning ? { reasoning } : {}) };
   }
 
   private async execute<T>(

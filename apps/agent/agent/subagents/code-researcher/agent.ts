@@ -2,7 +2,7 @@ import { AGENT_DEFAULT_MODEL } from "@notra/ai/constants/models";
 import { codeResearchBriefSchema } from "@notra/ai/schemas/code-research";
 import { defineAgent } from "eve";
 
-import { SONNET_5_CONTEXT_WINDOW_TOKENS } from "../../lib/constants/models";
+import { GLM_CONTEXT_WINDOW_TOKENS } from "../../lib/constants/models";
 import { createSessionAgentModel } from "../../lib/utils/session-model";
 
 export default defineAgent({
@@ -11,7 +11,7 @@ export default defineAgent({
   model: createSessionAgentModel(
     AGENT_DEFAULT_MODEL,
     "content-code-researcher",
-    SONNET_5_CONTEXT_WINDOW_TOKENS
+    GLM_CONTEXT_WINDOW_TOKENS
   ),
   outputSchema: codeResearchBriefSchema,
 });

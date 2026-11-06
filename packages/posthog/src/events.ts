@@ -148,7 +148,6 @@ export const POSTHOG_EVENTS = {
   CHAT_MESSAGE_EDITED: "chat_message_edited",
   CHAT_RETRY: "chat_retry",
   CHAT_BRANCH_SWITCHED: "chat_branch_switched",
-  CHAT_MODEL_CHANGED: "chat_model_changed",
   CHAT_THINKING_LEVEL_CHANGED: "chat_thinking_level_changed",
   CHAT_CONTEXT_ADDED: "chat_context_added",
   CHAT_CONTEXT_REMOVED: "chat_context_removed",

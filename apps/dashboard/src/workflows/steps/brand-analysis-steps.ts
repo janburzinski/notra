@@ -1,4 +1,5 @@
 import { SUPPORTED_LANGUAGES } from "@notra/ai/constants/languages";
+import { AGENT_DEFAULT_MODEL } from "@notra/ai/constants/models";
 
 import "@/workflows/runtime";
 import { gateway } from "@notra/ai/gateway";
@@ -65,7 +66,7 @@ export async function extractBrandInfo(
   try {
     const { output } = await generateText({
       model: ai.wrap(
-        gateway("anthropic/claude-sonnet-5", {
+        gateway(AGENT_DEFAULT_MODEL, {
           organizationId: input.organizationId,
           logContext: { runId: input.jobId },
         })
@@ -87,7 +88,7 @@ Extract the following information:
       providerOptions: withRouterDefaults(
         { gateway: { tags: ["brand-analysis"] } },
         {
-          modelId: "anthropic/claude-sonnet-5",
+          modelId: AGENT_DEFAULT_MODEL,
         }
       ),
       ...buildTelemetryOptions({

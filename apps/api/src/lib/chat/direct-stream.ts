@@ -28,7 +28,6 @@ export async function createDirectStandaloneChatResponse({
   chargeAiCredits,
   requestId,
   log,
-  model,
   enableThinking,
   thinkingLevel,
   timezone,
@@ -65,7 +64,6 @@ export async function createDirectStandaloneChatResponse({
         context,
         maxSteps: 50,
         log,
-        requestedModel: model,
         enableThinking,
         thinkingLevel,
         timezone,
@@ -155,7 +153,6 @@ export async function createDirectStandaloneChatResponse({
           return {
             chatId,
             model: routingDecision.model,
-            requestedModel: model ?? "auto",
             thinkingLevel: effectiveThinkingLevel,
             requestedThinkingLevel: thinkingLevel,
             createdAt: streamStartedAt,
@@ -172,7 +169,6 @@ export async function createDirectStandaloneChatResponse({
             partUsage: part.totalUsage,
             usageSnapshot,
             model: routingDecision.model,
-            requestedModel: model ?? "auto",
             thinkingLevel: effectiveThinkingLevel,
             requestedThinkingLevel: thinkingLevel,
           });

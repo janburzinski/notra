@@ -53,6 +53,18 @@ export const CONTENDER_CATALOG: readonly Contender[] = [
     label: "Opus 5.5",
   },
   {
+    key: "zai/glm-5.3",
+    modelId: "zai/glm-5.3",
+    kind: "llm",
+    label: "GLM 5.3",
+  },
+  {
+    key: "zai/glm-5.3-flash",
+    modelId: "zai/glm-5.3-flash",
+    kind: "llm",
+    label: "GLM 5.3 Flash",
+  },
+  {
     key: "google/gemini-3.5-flash-lite",
     modelId: "google/gemini-3.5-flash-lite",
     kind: "llm",

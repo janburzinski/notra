@@ -82,19 +82,7 @@ export type ContextItem =
   | LinearContextItem
   | McpServerContextItem;
 
-export interface RoutingDecision {
-  complexity: "simple" | "complex";
-  requiresTools: boolean;
-  reasoningHeavy: boolean;
-  reasoning: string;
-}
-
 export type AutoThinkingLevel = "off" | "low" | "medium" | "high";
-
-export interface AutoSelection {
-  model: string;
-  thinkingLevel: AutoThinkingLevel;
-}
 
 export interface RoutingResult {
   model: string;
@@ -145,7 +133,6 @@ export interface OrchestrateInput {
   imageContext?: ContentImageContext;
   selection?: TextSelection;
   context?: ContextItem[];
-  requestedModel?: string;
   thinkingLevel?: "off" | "low" | "medium" | "high";
   maxSteps?: number;
   abortSignal?: AbortSignal;

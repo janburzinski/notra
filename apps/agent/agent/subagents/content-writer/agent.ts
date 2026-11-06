@@ -3,7 +3,7 @@ import { defineAgent } from "eve";
 
 import {
   CONTENT_WRITER_MODEL_ID,
-  GPT_6_SOL_CONTEXT_WINDOW_TOKENS,
+  OPUS_5_5_CONTEXT_WINDOW_TOKENS,
 } from "../../lib/constants/models";
 import { createSessionAgentModel } from "../../lib/utils/session-model";
 
@@ -13,7 +13,7 @@ export default defineAgent({
   model: createSessionAgentModel(
     CONTENT_WRITER_MODEL_ID,
     "content-writer-agent",
-    GPT_6_SOL_CONTEXT_WINDOW_TOKENS
+    OPUS_5_5_CONTEXT_WINDOW_TOKENS
   ),
   outputSchema: contentWriterResultSchema,
 });

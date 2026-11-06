@@ -1,6 +1,6 @@
 import {
   ALLOWED_CHAT_MIME_TYPES,
-  ALLOWED_OPENAI_CHAT_MIME_TYPES,
+  MIME_DISPLAY_LABELS,
 } from "@notra/schemas/constants/dashboard/upload";
 import { IMAGE_MIME_EXTENSIONS } from "@notra/sites-core/constants/uploads";
 
@@ -22,16 +22,18 @@ export function getFileExtension(fileType: string) {
   return MIME_EXTENSION_MAP[normalizedMimeType] ?? "bin";
 }
 
-export function getAllowedChatMimeTypes(model?: string) {
-  return model === "openai/gpt-5.4"
-    ? ALLOWED_OPENAI_CHAT_MIME_TYPES
-    : ALLOWED_CHAT_MIME_TYPES;
+const HEIC_FILE_RE = /\.heic$/i;
+
+export const CHAT_FILE_TYPES_LABEL = [
+  ...new Set(ALLOWED_CHAT_MIME_TYPES.map((mime) => MIME_DISPLAY_LABELS[mime])),
+].join(", ");
+
+export function isAllowedChatMimeType(fileType: string) {
+  return (ALLOWED_CHAT_MIME_TYPES as readonly string[]).includes(fileType);
 }
 
-export function isAllowedChatMimeType(fileType: string, model?: string) {
-  return (getAllowedChatMimeTypes(model) as readonly string[]).includes(
-    fileType
-  );
+export function isHeicFile(file: File) {
+  return HEIC_FILE_RE.test(file.name) || file.type === "image/heic";
 }
 
 export function isImageMimeType(mediaType: string): boolean {

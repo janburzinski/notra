@@ -1,7 +1,4 @@
-import {
-  AGENT_DEFAULT_MODEL,
-  CONTENT_AGENT_MODEL,
-} from "@notra/ai/constants/models";
+import { CONTENT_AGENT_MODEL } from "@notra/ai/constants/models";
 import { assertRouteHasCredits } from "@notra/ai/gateway";
 import { createModel } from "@notra/ai/model";
 import { buildContentDispatcherInstructions } from "@notra/ai/prompts/content-dispatcher";
@@ -143,7 +140,7 @@ async function runBackgroundGenWithContext(
         },
         gateway: { tags: ["content-generation"] },
       },
-      { modelId: CONTENT_AGENT_MODEL, fallbackModels: [AGENT_DEFAULT_MODEL] }
+      { modelId: CONTENT_AGENT_MODEL }
     ),
     tools: {
       ...brandReferenceTools,

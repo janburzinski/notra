@@ -167,7 +167,6 @@ export async function streamChatResponseStep(
     userId,
     context: standaloneContext,
     useMarkup,
-    model,
     enableThinking,
     thinkingLevel,
     timezone,
@@ -262,7 +261,6 @@ export async function streamChatResponseStep(
         context: standaloneContext as StandaloneChatContextItem[],
         maxSteps: 50,
         abortSignal: lifecycle.signal,
-        requestedModel: model,
         enableThinking,
         thinkingLevel,
         timezone,
@@ -384,7 +382,6 @@ export async function streamChatResponseStep(
           return {
             authorUserId: userId,
             model: routingDecision.model,
-            requestedModel: model ?? "auto",
             thinkingLevel: effectiveThinkingLevel,
             requestedThinkingLevel: thinkingLevel,
             createdAt: streamStartedAt,
@@ -400,7 +397,6 @@ export async function streamChatResponseStep(
             partUsage: part.totalUsage,
             usageSnapshot,
             model: routingDecision.model,
-            requestedModel: model ?? "auto",
             thinkingLevel: effectiveThinkingLevel,
             requestedThinkingLevel: thinkingLevel,
           });

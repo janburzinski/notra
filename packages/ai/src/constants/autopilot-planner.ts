@@ -1,9 +1,12 @@
+import { AGENT_DEFAULT_MODEL } from "./models";
+
 /**
  * One call per run links observations into topics and picks at most one
- * action. Pinned on its own eval (`bun run evals run autopilot-planner`), not
- * tied to the agent default: Sonnet 5 passed 91% of scenarios, Luna 77%.
+ * action. Check it on its own eval (`bun run evals run autopilot-planner`)
+ * when the model changes. Over 2 repeats GLM 5.3 Flash passed 95% of
+ * scenario runs and Sonnet 5 86%; earlier runs had Sonnet 5 at 91%, Luna 77%.
  */
-export const AUTOPILOT_PLANNER_MODEL_ID = "anthropic/claude-sonnet-5";
+export const AUTOPILOT_PLANNER_MODEL_ID = AGENT_DEFAULT_MODEL;
 /**
  * Thinking takes most of it: a busy week of merges measured 6.6k to 9.5k
  * output tokens, so 8k cut real plans off.
