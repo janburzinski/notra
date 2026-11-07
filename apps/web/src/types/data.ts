@@ -19,6 +19,8 @@ export interface DataTraffic {
   rows: DataTrafficRow[];
   /** Domain is the company's, for the tooltip logo; null for "Other". */
   series: { key: string; label: string; domain: string | null }[];
+  /** Sites a chart day needs; below it the day sits on the zero line. */
+  minSites: number;
   /** Average daily visits per site over the last 7 days. */
   recent: number | null;
   /** Change of that average against the 7 days before. */

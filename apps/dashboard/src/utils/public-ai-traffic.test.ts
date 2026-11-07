@@ -473,10 +473,10 @@ test("charts a rolling week from the kind's own site count and site-days", () =>
     projects,
     rolling: [
       rollingRow(dailyRow("2026-11-01", "", "", "", 600, 8), 20),
-      // Eight sites had crawlers that week, though no bot reached five.
+      // Eight sites had crawlers that week, though no bot reached three.
       rollingRow(dailyRow("2026-11-01", "crawler", "", "", 500, 8), 20),
       rollingRow(
-        dailyRow("2026-11-01", "crawler", "GPTBot", "training-crawler", 400, 4)
+        dailyRow("2026-11-01", "crawler", "GPTBot", "training-crawler", 400, 2)
       ),
       rollingRow(
         dailyRow(
@@ -485,7 +485,7 @@ test("charts a rolling week from the kind's own site count and site-days", () =>
           "ClaudeBot",
           "training-crawler",
           100,
-          3
+          2
         )
       ),
     ],
@@ -520,7 +520,7 @@ test("folds a bot below the floor into Other instead of blanking the day", () =>
           "ClaudeBot",
           "training-crawler",
           100,
-          3
+          2
         )
       ),
       rollingRow(
@@ -542,4 +542,34 @@ test("folds a bot below the floor into Other instead of blanking the day", () =>
   expect(day?.values.s1).toBe(15);
   expect(day?.values.s2).toBeNull();
   expect(day?.values.other).toBe(10);
+});
+
+test("charts a week once three sites had traffic in it", () => {
+  const snapshot = buildPublicAiTrafficSnapshot({
+    today: TODAY,
+    generatedAt: "2026-11-02T00:20:00.000Z",
+    daily,
+    projects,
+    rolling: [
+      rollingRow(dailyRow("2026-11-01", "", "", "", 300, 3), 12),
+      rollingRow(dailyRow("2026-11-01", "crawler", "", "", 300, 3), 12),
+      rollingRow(
+        dailyRow("2026-11-01", "crawler", "GPTBot", "training-crawler", 300, 3)
+      ),
+      rollingRow(dailyRow("2026-10-31", "", "", "", 200, 2), 6),
+      rollingRow(dailyRow("2026-10-31", "crawler", "", "", 200, 2), 6),
+      rollingRow(
+        dailyRow("2026-10-31", "crawler", "GPTBot", "training-crawler", 200, 2)
+      ),
+    ],
+  });
+  const days = new Map(
+    snapshot.crawlerVolume.days.map((entry) => [entry.day, entry.values])
+  );
+
+  expect(snapshot.chartMinSites).toBe(3);
+  // 300 visits over 12 site-days.
+  expect(days.get("2026-11-01")?.total).toBe(25);
+  expect(days.get("2026-11-01")?.s1).toBe(25);
+  expect(days.get("2026-10-31")?.total).toBeNull();
 });

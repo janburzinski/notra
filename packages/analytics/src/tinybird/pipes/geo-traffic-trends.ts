@@ -209,7 +209,7 @@ export const geoTrafficTrendsRolling = defineEndpoint(
         .float64()
         .optional(0)
         .describe(
-          "Cap each site at this many times the median site's visits and at the other sites' total; 0 keeps raw counts"
+          "Cap each site at this many times the median site's visits; 0 keeps raw counts"
         ),
     },
     nodes: [
@@ -260,7 +260,8 @@ export const geoTrafficTrendsRolling = defineEndpoint(
         GROUP BY window_day, visitor_type, source, project_id
       `,
       }),
-      // The same cap as the daily pipe, per window.
+      // Each site counts with at most `site_cap_factor` times the median
+      // site's visits in the window, so one large site can't set the line.
       node({
         name: "rolling_bounds",
         sql: `
@@ -273,21 +274,8 @@ export const geoTrafficTrendsRolling = defineEndpoint(
               {{Float64(site_cap_factor, 0)}} * toFloat64(quantileExact(0.5)(project_visits) ${ROLLING_SITE_WINDOW})
             ),
             toFloat64(project_visits)
-          ) AS bounded_visits
-        FROM rolling_per_project
-      `,
-      }),
-      node({
-        name: "rolling_capped",
-        sql: `
-        SELECT
-          *,
-          if(
-            {{Float64(site_cap_factor, 0)}} > 0,
-            least(bounded_visits, sum(bounded_visits) ${ROLLING_SITE_WINDOW} - bounded_visits),
-            bounded_visits
           ) AS capped_visits
-        FROM rolling_bounds
+        FROM rolling_per_project
       `,
       }),
       node({
@@ -304,7 +292,7 @@ export const geoTrafficTrendsRolling = defineEndpoint(
           ))) AS markdown_visits,
           count() AS projects,
           toUInt64(0) AS site_days
-        FROM rolling_capped
+        FROM rolling_bounds
         GROUP BY window_day, visitor_type, source
       `,
       }),

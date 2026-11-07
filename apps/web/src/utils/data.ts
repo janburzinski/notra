@@ -155,7 +155,8 @@ function weekFigures(
 function trafficChart(
   chart: PublicAiTrafficChart,
   sources: readonly { label: string; vendor: string | null }[],
-  averageDays: number
+  averageDays: number,
+  minSites: number
 ): DataTraffic {
   const vendors = new Map(sources.map((row) => [row.label, row.vendor]));
   const series = chart.series
@@ -199,6 +200,7 @@ function trafficChart(
   return {
     rows,
     series,
+    minSites,
     recent,
     change: recent !== null && before ? recent / before - 1 : null,
   };
@@ -238,6 +240,7 @@ export function buildDataPage(
     return null;
   }
   const averageDays = snapshot.window.averageDays ?? 1;
+  const chartMinSites = snapshot.chartMinSites ?? snapshot.minSites;
   return {
     day: snapshot.day,
     generatedAt: snapshot.generatedAt,
@@ -249,12 +252,14 @@ export function buildDataPage(
       crawlers: trafficChart(
         snapshot.crawlerVolume,
         snapshot.crawlers,
-        averageDays
+        averageDays,
+        chartMinSites
       ),
       referrals: trafficChart(
         snapshot.referrerVolume,
         snapshot.referrers,
-        averageDays
+        averageDays,
+        chartMinSites
       ),
     },
     crawlers: snapshot.crawlers.map((row) => ({

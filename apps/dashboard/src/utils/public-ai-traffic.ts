@@ -16,6 +16,7 @@ import {
   PUBLIC_DATA_CHART_CRAWLERS,
   PUBLIC_DATA_CHART_REFERRERS,
   PUBLIC_DATA_CHART_VENDORS,
+  PUBLIC_DATA_CHART_MIN_SITES,
   PUBLIC_DATA_MIN_SITES,
   PUBLIC_DATA_MIN_TOTAL_SITES,
   PUBLIC_DATA_OTHER_KEY,
@@ -517,10 +518,10 @@ function dailyVolume({
     const groups = new Map(byDay.get(day));
     const groupSites = new Map(groupSitesByDay.get(day));
     const publishable =
-      sites >= PUBLIC_DATA_MIN_SITES && byDay.has(day) && siteDays > 0;
+      sites >= PUBLIC_DATA_CHART_MIN_SITES && byDay.has(day) && siteDays > 0;
     const totalSites = exactKindSites.get(day) ?? kindSites.get(day) ?? 0;
     const total =
-      publishable && totalSites >= PUBLIC_DATA_MIN_SITES
+      publishable && totalSites >= PUBLIC_DATA_CHART_MIN_SITES
         ? round((kindVisits.get(day) ?? 0) / siteDays, 2)
         : null;
     // A group below the floor joins "Other" when "Other" still clears it,
@@ -531,14 +532,14 @@ function dailyVolume({
       const small = [...groupSites].filter(
         ([key, count]) =>
           key !== PUBLIC_DATA_OTHER_KEY &&
-          count < PUBLIC_DATA_MIN_SITES &&
+          count < PUBLIC_DATA_CHART_MIN_SITES &&
           (groups.get(key) ?? 0) > 0
       );
       const otherSites = Math.max(
         groupSites.get(PUBLIC_DATA_OTHER_KEY) ?? 0,
         ...small.map(([, count]) => count)
       );
-      if (small.length > 0 && otherSites >= PUBLIC_DATA_MIN_SITES) {
+      if (small.length > 0 && otherSites >= PUBLIC_DATA_CHART_MIN_SITES) {
         for (const [key] of small) {
           groups.set(
             PUBLIC_DATA_OTHER_KEY,
@@ -565,7 +566,7 @@ function dailyVolume({
           }
           return [
             key,
-            (groupSites.get(key) ?? 0) >= PUBLIC_DATA_MIN_SITES
+            (groupSites.get(key) ?? 0) >= PUBLIC_DATA_CHART_MIN_SITES
               ? round(visits / siteDays, 2)
               : null,
           ];
@@ -776,6 +777,7 @@ export function buildPublicAiTrafficSnapshot(
       averageDays: input.rolling ? PUBLIC_DATA_ROLLING_DAYS : 1,
     },
     minSites: PUBLIC_DATA_MIN_SITES,
+    chartMinSites: PUBLIC_DATA_CHART_MIN_SITES,
   };
   if (activeSites < PUBLIC_DATA_MIN_TOTAL_SITES) {
     return {

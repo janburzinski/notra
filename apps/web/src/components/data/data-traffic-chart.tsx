@@ -17,8 +17,6 @@ import { formatDataDay, formatVisits, relativeTrend } from "@/utils/data";
 const TOTAL_KEY = "total";
 const LOGO_PX = 32;
 const STROKE_WIDTH = 2;
-// A day withheld by the privacy floor sits on the zero line; hover says why.
-const WITHHELD_LABEL = "Fewer than 5 sites, not shown";
 const NO_VISITS_LABEL = "No visits";
 const CHART_OPTIONS = {
   grid: { left: 4, right: 8, top: 8, bottom: 4, containLabel: true },
@@ -44,7 +42,13 @@ function weekTrend(
  * Puts days without a published value on the zero line, so the chart has no
  * gaps, and tells those days apart from real zeros on hover.
  */
-function zeroWithheld(rows: DataTraffic["rows"], key: string) {
+function zeroWithheld(
+  rows: DataTraffic["rows"],
+  key: string,
+  minSites: number
+) {
+  // A day withheld by the privacy floor sits on the zero line; hover says why.
+  const withheldLabel = `Fewer than ${minSites} sites, not shown`;
   const withheld = new Set<string>();
   const plotted = rows.map((row) => {
     if (typeof row[key] === "number") {
@@ -56,7 +60,7 @@ function zeroWithheld(rows: DataTraffic["rows"], key: string) {
   return {
     plotted,
     emptyLabel: (row: Record<string, unknown> | undefined) =>
-      withheld.has(String(row?.rawDay)) ? WITHHELD_LABEL : NO_VISITS_LABEL,
+      withheld.has(String(row?.rawDay)) ? withheldLabel : NO_VISITS_LABEL,
   };
 }
 
@@ -102,8 +106,8 @@ export function DataTrafficCard({
     [traffic.series]
   );
   const { plotted, emptyLabel } = useMemo(
-    () => zeroWithheld(traffic.rows, TOTAL_KEY),
-    [traffic.rows]
+    () => zeroWithheld(traffic.rows, TOTAL_KEY, traffic.minSites),
+    [traffic.rows, traffic.minSites]
   );
   const trend = weekTrend(traffic.change);
   // On touch, ECharts places a body-mounted tooltip one scroll height too low,
@@ -179,8 +183,10 @@ export function DataSeriesChart({
   label,
   domain,
   color,
+  minSites,
 }: {
   rows: DataTraffic["rows"];
+  minSites: number;
   dataKey: string;
   label: string;
   domain: string | null;
@@ -197,8 +203,8 @@ export function DataSeriesChart({
     [dataKey, label, domain, color]
   );
   const { plotted, emptyLabel } = useMemo(
-    () => zeroWithheld(rows, dataKey),
-    [rows, dataKey]
+    () => zeroWithheld(rows, dataKey, minSites),
+    [rows, dataKey, minSites]
   );
   const touch = useCoarsePointer();
   return (

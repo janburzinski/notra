@@ -97,6 +97,8 @@ export const publicAiTrafficSnapshotSchema = z.object({
   }),
   /** A source needs traffic on at least this many sites to be listed. */
   minSites: z.number().int().positive(),
+  /** A chart day needs traffic on this many sites; absent means `minSites`. */
+  chartMinSites: z.number().int().positive().optional(),
   summary: z.object({
     crawlsPerReferral: z.number().nullable(),
     markdownShare: shareSchema.nullable(),

@@ -131,6 +131,7 @@ function TrendChart({
           dataKey={series.key}
           domain={series.domain}
           label={label}
+          minSites={traffic.minSites}
           rows={traffic.rows}
         />
       </div>
