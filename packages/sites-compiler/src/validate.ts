@@ -22,12 +22,15 @@ import { parseSiteEntryFile } from "@notra/sites-core/utils/entries";
 import { filterSiteFiles } from "@notra/sites-core/utils/site-ignore";
 import { tagSlug } from "@notra/sites-core/utils/tags";
 import { Parser } from "acorn";
+import { fromMarkdown } from "mdast-util-from-markdown";
 
+import { URL_SCHEME } from "./constants/links";
 import { MDX_FILE, SCRIPT_FILE } from "./constants/validate";
-import { parseEntryFrontmatter } from "./frontmatter";
+import { frontmatterKeyLine, parseEntryFrontmatter } from "./frontmatter";
 import { analyzeJsxSnippet } from "./jsx";
 import { analyzeMdxFile } from "./mdx";
 import type { SiteEntry } from "./types/entries";
+import type { ContentLink, SiteContentLink } from "./types/links";
 import type { MdxAnalysis } from "./types/mdx";
 import type {
   ParsedSiteConfig,
@@ -44,6 +47,7 @@ import {
   unknownConfigKeyWarnings,
   unknownIconWarnings,
 } from "./utils/config-checks";
+import { contentLinks } from "./utils/content-links";
 import { collapseRepeatedWarnings, hasErrors } from "./utils/diagnostics";
 import { acornSyntaxError, errorMessage } from "./utils/errors";
 import { importCycleDiagnostics } from "./utils/import-cycles";
@@ -285,6 +289,7 @@ export function validateSite(input: SiteValidationInput): SiteValidationResult {
       ok: false,
       config: null,
       entries: [],
+      links: [],
       outputs: new Map(),
       diagnostics: [
         {
@@ -381,6 +386,7 @@ export function validateSite(input: SiteValidationInput): SiteValidationResult {
   }
 
   const entries: SiteEntry[] = [];
+  const links: SiteContentLink[] = [];
   const seenSlugs = new Map<string, string>();
   let unreadEntries = 0;
   const blogTags = new Set<string>();
@@ -429,11 +435,34 @@ export function validateSite(input: SiteValidationInput): SiteValidationResult {
         }
       }
     }
+    let bodyLinks: ContentLink[] = analyses.get(path)?.links ?? [];
     if (candidate.format === "md") {
-      diagnostics.push(...blockedMarkdownHtml(path, substituted));
+      const tree = fromMarkdown(substituted);
+      diagnostics.push(...blockedMarkdownHtml(path, substituted, tree));
+      bodyLinks = contentLinks(tree);
       if (substituted !== content) {
         outputs.set(path, substituted);
       }
+    }
+    const linkOf = { file: path, area: candidate.area, slug: candidate.slug };
+    for (const link of bodyLinks) {
+      links.push({
+        ...linkOf,
+        url: link.url,
+        kind: link.kind,
+        ...offsetToLineColumn(substituted, link.offset),
+      });
+    }
+    const image = frontmatter.data?.image;
+    if (image) {
+      links.push({
+        ...linkOf,
+        // The theme reads a cover path as relative to the site root.
+        url:
+          URL_SCHEME.test(image) || image.startsWith("/") ? image : `/${image}`,
+        kind: "image",
+        line: frontmatterKeyLine(substituted, "image"),
+      });
     }
     entries.push({
       area: candidate.area,
@@ -460,6 +489,7 @@ export function validateSite(input: SiteValidationInput): SiteValidationResult {
     diagnostics: collapseRepeatedWarnings(diagnostics),
     config,
     entries,
+    links,
     outputs,
     ok: !hasErrors(diagnostics),
   };

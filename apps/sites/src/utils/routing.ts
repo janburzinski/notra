@@ -1,56 +1,12 @@
+import { LLMS_LINKS } from "@notra/sites-core/constants/request-paths";
 import type {
   SiteManifest,
   SiteManifestFile,
 } from "@notra/sites-core/types/deployment";
 import { joinMountPath } from "@notra/sites-core/utils/mounts";
+import { resolveFile } from "@notra/sites-core/utils/request-paths";
 
-import { HTML_TYPES, LLMS_LINKS, MARKDOWN_TYPES } from "../constants/routing";
-
-export function normalizeRequestPath(pathname: string): string | null {
-  let decoded: string;
-  try {
-    decoded = decodeURIComponent(pathname);
-  } catch {
-    return null;
-  }
-  if (decoded.includes("\0") || decoded.includes("\\")) {
-    return null;
-  }
-  const segments: string[] = [];
-  for (const segment of decoded.split("/")) {
-    if (segment === "" || segment === ".") {
-      continue;
-    }
-    if (segment === "..") {
-      return null;
-    }
-    segments.push(segment);
-  }
-  const normalized = `/${segments.join("/")}`;
-  return decoded.endsWith("/") && normalized !== "/"
-    ? `${normalized}/`
-    : normalized;
-}
-
-export function resolveFile(
-  files: Map<string, SiteManifestFile>,
-  path: string
-): SiteManifestFile | null {
-  const trimmed = path.endsWith("/") ? path.slice(0, -1) : path;
-  const candidates = path.endsWith("/")
-    ? [`${trimmed}/index.html`]
-    : [path, `${path}/index.html`, `${path}.html`];
-  if (path === "/") {
-    candidates.unshift("/index.html");
-  }
-  for (const candidate of candidates) {
-    const file = files.get(candidate);
-    if (file) {
-      return file;
-    }
-  }
-  return null;
-}
+import { HTML_TYPES, MARKDOWN_TYPES } from "../constants/routing";
 
 export function trailingSlashPagePath(
   files: Map<string, SiteManifestFile>,
@@ -65,16 +21,6 @@ export function trailingSlashPagePath(
     return null;
   }
   return bare.split("/").map(encodeURIComponent).join("/");
-}
-
-export function resolveMarkdownFile(
-  files: Map<string, SiteManifestFile>,
-  path: string
-): SiteManifestFile | null {
-  if (!path.endsWith(".md")) {
-    return null;
-  }
-  return files.get(path) ?? files.get(`${path.slice(0, -3)}/index.md`) ?? null;
 }
 
 export function markdownTwin(
@@ -105,20 +51,6 @@ export function markdownAlternatePath(
     !files.has(`${pagePath}.md`)
     ? `${pagePath}.md`
     : twinPath;
-}
-
-export function wellKnownLlmsTxtTarget(
-  files: Map<string, SiteManifestFile>,
-  path: string
-): string | null {
-  const resource = LLMS_LINKS.find(({ file }) =>
-    path.endsWith(`/.well-known/${file}`)
-  );
-  if (!resource) {
-    return null;
-  }
-  const target = `${path.slice(0, -`/.well-known/${resource.file}`.length)}/${resource.file}`;
-  return files.has(target) ? target : null;
 }
 
 export function prefersMarkdown(accept: string | null): boolean {

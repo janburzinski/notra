@@ -13,6 +13,7 @@ function prepared(name = "Original"): PreparedSite {
       ok: true,
       config: createDefaultSiteConfig(name),
       entries: [],
+      links: [],
       outputs: new Map(),
       diagnostics: [],
     },

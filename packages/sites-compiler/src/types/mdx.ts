@@ -3,6 +3,7 @@ import type { ModuleDeclaration } from "estree";
 import type { RootContent } from "mdast";
 
 import type { SourceRange } from "./estree";
+import type { ContentLink } from "./links";
 
 export interface BlankedFrontmatter {
   text: string;
@@ -45,6 +46,7 @@ export interface MdxAnalysis {
   output: string | null;
   inlineModule: InlineModule | null;
   imports: string[];
+  links: ContentLink[];
 }
 
 export type EsmNode = Extract<RootContent, { type: "mdxjsEsm" }>;

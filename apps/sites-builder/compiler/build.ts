@@ -3,6 +3,7 @@ import { cp, mkdir, readFile, rm, stat, writeFile } from "node:fs/promises";
 import { createRequire } from "node:module";
 import { dirname, join, relative, resolve } from "node:path";
 
+import { brokenLinkDiagnostics } from "@notra/sites-compiler/links";
 import { hasErrors } from "@notra/sites-compiler/utils/diagnostics";
 import { SITE_CSP_MAX_SCRIPT_HASHES } from "@notra/sites-core/constants/security";
 import { siteBuildRequestSchema } from "@notra/sites-core/schemas/build";
@@ -340,6 +341,19 @@ async function buildInWorkDir(
   }
 
   const outputFiles = await listFiles(options.outDir);
+  diagnostics.push(
+    ...brokenLinkDiagnostics(prepared.validation.links, {
+      mounts,
+      publicOrigin,
+      files: new Set(
+        outputFiles.map(
+          (file) => `/${relative(options.outDir, file).split("\\").join("/")}`
+        )
+      ),
+      publicFiles,
+      redirects: config.redirects,
+    })
+  );
   const sizes = await Promise.all(
     outputFiles.map(async (file) => (await stat(file)).size)
   );

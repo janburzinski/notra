@@ -6,13 +6,13 @@ import {
   joinMountPath,
   resolveAreaForPath,
 } from "@notra/sites-core/utils/mounts";
+import { normalizeRequestPath } from "@notra/sites-core/utils/request-paths";
 
 import type {
   AnalyticsScriptTag,
   LoadedManifest,
   ResolvedDeployment,
 } from "../types/serving";
-import { normalizeRequestPath } from "./routing";
 
 function analyticsMount(
   loaded: LoadedManifest,

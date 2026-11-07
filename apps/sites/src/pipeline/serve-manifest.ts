@@ -3,6 +3,10 @@ import {
   listMountedAreas,
   resolveAreaForPath,
 } from "@notra/sites-core/utils/mounts";
+import {
+  normalizeRequestPath,
+  resolveFile,
+} from "@notra/sites-core/utils/request-paths";
 import { Effect, Option } from "effect";
 
 import { MANIFEST_ROUTES } from "../constants/routes";
@@ -13,9 +17,7 @@ import { html } from "../utils/responses";
 import {
   llmsLinkHeader,
   markdownTwin,
-  normalizeRequestPath,
   prefersMarkdown,
-  resolveFile,
 } from "../utils/routing";
 import { runRoutes } from "../utils/run-routes";
 

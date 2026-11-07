@@ -154,6 +154,7 @@ Put images in `public/` and use paths from the root of the site:
 - `imageAlt` describes the cover. Notra uses it as the image's alt text on the post, on cards and in link previews. Without it, screen readers skip the cover.
 - Posts without an `image` get a generated share image with the title, your site name and your brand color. See [Share images](/sites/customize/seo#share-images).
 - Wrap a screenshot in [`<Frame>`](/sites/components/media#frame) to give it a border and a caption.
+- When an image isn't in `public/` or a link goes to a page of your blog or changelog that doesn't exist, the build shows an `image_missing` or `link_broken` warning with the file, the line and the closest match. See [warnings](/sites/reference/limits#common-errors).
 
 ### Smaller copies for readers
 

@@ -2,6 +2,7 @@ import type { SiteDiagnostic } from "@notra/sites-core/types/build";
 import type { SiteConfig } from "@notra/sites-core/types/site-config";
 
 import type { SiteEntry } from "./entries";
+import type { SiteContentLink } from "./links";
 
 export interface SiteValidationInput {
   files: ReadonlyMap<string, string | null>;
@@ -12,6 +13,8 @@ export interface SiteValidationResult {
   diagnostics: SiteDiagnostic[];
   config: SiteConfig | null;
   entries: SiteEntry[];
+  /** Links and images in published entries, checked once the pages are built. */
+  links: SiteContentLink[];
   outputs: Map<string, string>;
   ok: boolean;
 }

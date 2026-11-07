@@ -52,6 +52,7 @@ export async function prepareSite(
         config: null,
         diagnostics: [],
         entries: [],
+        links: [],
         outputs: new Map(),
       },
       collectDiagnostics: collected.diagnostics,

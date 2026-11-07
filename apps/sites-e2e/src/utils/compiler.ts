@@ -108,6 +108,13 @@ async function compileWith(
       durationMs: performance.now() - started,
     });
     assert.equal(result.ok, true, JSON.stringify(result.diagnostics));
+    assert.deepEqual(
+      result.diagnostics.filter(
+        (item) => item.code === "link_broken" || item.code === "image_missing"
+      ),
+      [],
+      "the fixture's internal links and images all exist"
+    );
     const files = [];
     for (const file of await listFiles(outDir)) {
       const path = file.slice(outDir.length);

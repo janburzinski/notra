@@ -1,9 +1,9 @@
+import { resolveMarkdownFile } from "@notra/sites-core/utils/request-paths";
 import { Effect, Option } from "effect";
 
 import { serveFile } from "../serve-file";
 import type { ManifestRouteContext } from "../types/routes";
 import { markdownPageHeaders } from "../utils/markdown-headers";
-import { resolveMarkdownFile } from "../utils/routing";
 
 export const markdownFileRoute = Effect.fnUntraced(function* ({
   path,

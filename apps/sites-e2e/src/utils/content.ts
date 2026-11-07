@@ -104,6 +104,48 @@ export async function assertContentFeatures(
   );
   checks.push("video element, YouTube embed allowed by CSP");
 
+  // The build's link check accepts these, so each one must be served.
+  const internalLinks = await page.evaluate(
+    async (names) => {
+      const anchors = [...document.querySelectorAll<HTMLAnchorElement>("a")];
+      return await Promise.all(
+        names.map(async (name) => {
+          const anchor = anchors.find((link) => link.textContent === name);
+          if (!anchor) {
+            return { name, path: "", status: 0 };
+          }
+          const response = await fetch(anchor.href);
+          await response.arrayBuffer();
+          return {
+            name,
+            path: new URL(anchor.href).pathname,
+            status: response.status,
+          };
+        })
+      );
+    },
+    [
+      "E2E launch post",
+      "E2E relative launch",
+      "E2E changelog entry",
+      "E2E tag page",
+      "E2E encoded launch",
+      "E2E double-slash launch",
+    ]
+  );
+  assert.deepEqual(
+    internalLinks.map(({ name, path, status }) => `${name} ${path} ${status}`),
+    [
+      "E2E launch post /blog/2026/launch 200",
+      "E2E relative launch /blog/2026/launch 200",
+      "E2E changelog entry /changelog/2026-10-01-components 200",
+      "E2E tag page /blog/tags/components 200",
+      "E2E encoded launch /blog/2026%2Flaunch 200",
+      "E2E double-slash launch /blog//2026/launch 200",
+    ]
+  );
+  checks.push("internal links the build checks resolve");
+
   const sections = page.getByRole("navigation", { name: "Sections" });
   const sectionLinks = await sections
     .first()

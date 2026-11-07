@@ -30,6 +30,10 @@ function keyLine(yaml: string, key: string): number {
   return index === -1 ? 1 : index + 2;
 }
 
+export function frontmatterKeyLine(source: string, key: string): number {
+  return keyLine(FRONTMATTER_BLOCK.exec(source)?.[1] ?? "", key);
+}
+
 export function parseEntryFrontmatter(
   path: string,
   area: SiteEntry["area"],

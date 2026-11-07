@@ -1,8 +1,8 @@
+import { wellKnownLlmsTxtTarget } from "@notra/sites-core/utils/request-paths";
 import { Effect, Option } from "effect";
 
 import { manifestRedirect } from "../responses/redirects";
 import type { ManifestRouteContext } from "../types/routes";
-import { wellKnownLlmsTxtTarget } from "../utils/routing";
 
 export const wellKnownLlmsTxtRoute = ({
   path,

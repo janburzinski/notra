@@ -35,6 +35,7 @@ import type {
 } from "./types/mdx";
 import { analyzeStaticDirectives } from "./utils/client-directives";
 import { closestName } from "./utils/closest-name";
+import { contentLinks } from "./utils/content-links";
 import { hasErrors } from "./utils/diagnostics";
 import {
   errorMessage,
@@ -454,13 +455,15 @@ export function analyzeMdxFile(
     diagnostics: [],
     edits: [],
   };
+  const tree = parseMdx(pass);
+  const links = tree && context.isEntry ? contentLinks(tree) : [];
   const failed = (imports: string[]): MdxAnalysis => ({
     diagnostics: pass.diagnostics,
     output: null,
     inlineModule: null,
     imports,
+    links,
   });
-  const tree = parseMdx(pass);
   if (!tree) {
     return failed([]);
   }
@@ -494,5 +497,6 @@ export function analyzeMdxFile(
       source.slice(0, frontmatterLength) + edited.slice(frontmatterLength),
     inlineModule,
     imports: scan.imports,
+    links,
   };
 }

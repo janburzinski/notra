@@ -1,5 +1,5 @@
 import type { SiteDiagnostic } from "@notra/sites-core/types/build";
-import { fromMarkdown } from "mdast-util-from-markdown";
+import type { Root } from "mdast";
 import { visit } from "unist-util-visit";
 
 import {
@@ -11,10 +11,10 @@ import { offsetToLineColumn } from "./paths";
 
 export function blockedMarkdownHtml(
   path: string,
-  source: string
+  source: string,
+  tree: Root
 ): SiteDiagnostic[] {
   const diagnostics: SiteDiagnostic[] = [];
-  const tree = fromMarkdown(source);
   visit(tree, "html", (node) => {
     for (const match of node.value.matchAll(HTML_OPENING_TAG)) {
       const tag = match[1]?.toLowerCase() ?? "";
