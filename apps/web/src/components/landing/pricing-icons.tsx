@@ -160,15 +160,6 @@ export function SupportIcon(props: SVGProps<SVGSVGElement>) {
   );
 }
 
-export function ZdrIcon(props: SVGProps<SVGSVGElement>) {
-  return (
-    <IconBase {...props}>
-      <path d="M12 3l7 2.5v5.5c0 4.3-2.9 7.3-7 8.5-4.1-1.2-7-4.2-7-8.5V5.5z" />
-      <path d="M9 12l2 2 4-4" />
-    </IconBase>
-  );
-}
-
 export function PricingGiftIcon(props: SVGProps<SVGSVGElement>) {
   return (
     <svg

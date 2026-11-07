@@ -90,13 +90,11 @@ export const NOTRA_COMPARE_PLANS: ComparePlan[] = [
   {
     name: PRICING_PLANS.enterprise.name,
     price: "Custom",
-    detail:
-      "Unlimited answers, posts and projects, zero data retention included",
+    detail: "Unlimited answers, posts and projects",
   },
 ];
 
-export const NOTRA_PRICING_NOTE =
-  "Annual billing gets two months free. Zero data retention is a 20% add-on below Enterprise.";
+export const NOTRA_PRICING_NOTE = "Annual billing gets two months free.";
 
 export const COMPARE_ROW_GROUPS: CompareRowGroup[] = [
   {
@@ -230,7 +228,6 @@ export const COMPARE_ROW_GROUPS: CompareRowGroup[] = [
     rows: [
       { id: "api", label: "REST API", notra: true },
       { id: "mcp", label: "MCP server", notra: true },
-      { id: "zdr", label: "Zero data retention", notra: "Add-on" },
       { id: "soc2", label: "SOC 2 report", notra: false },
       { id: "startingPrice", label: "Starting price", notra: "$100/mo" },
     ],

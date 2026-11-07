@@ -104,7 +104,6 @@ export const PROMPTING_COMPANY: CompareCompetitor = {
     commerce: false,
     api: true,
     mcp: true,
-    zdr: "Not listed",
     soc2: true,
     startingPrice: "$99/mo",
   },

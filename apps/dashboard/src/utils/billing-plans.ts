@@ -11,7 +11,6 @@ import {
   PLAN_TIER_LIMITS,
   ZDR_ADDON_BY_TIER,
   ZDR_ADDON_PREFIX,
-  ZDR_ADDON_PRICE_PERCENT,
 } from "@/constants/billing";
 import type {
   BillingPlan,
@@ -20,7 +19,6 @@ import type {
   BillingTranslator,
   PlanRenewalTerms,
   BillingSubscription,
-  PlanCardAddon,
   PlanTierLimits,
 } from "@/types/billing/plan";
 import type { ProductFeature } from "@/types/hooks/billing";
@@ -125,11 +123,6 @@ function tierFeatures(
       text: limits.prioritySupport
         ? t("plans.features.prioritySupport")
         : t("plans.features.standardSupport"),
-    },
-    {
-      text: t("plans.features.zdrAvailable", {
-        percent: ZDR_ADDON_PRICE_PERCENT,
-      }),
     },
   ];
 }
@@ -377,40 +370,6 @@ export function formatUsd(amount: number, locale: string): string {
     currency: "USD",
     maximumFractionDigits: 0,
   }).format(amount);
-}
-
-export function findZdrAddonPlan(
-  plans: BillingPlan[] | undefined,
-  planId: string | undefined
-): BillingPlan | null {
-  const addonId = zdrAddonPlanId(planId);
-  if (!addonId) {
-    return null;
-  }
-  return plans?.find((plan) => plan.id === addonId) ?? null;
-}
-
-export function zdrAddonToggle(
-  addonPlan: BillingPlan | null,
-  checked: boolean,
-  onCheckedChange: (checked: boolean) => void,
-  t: BillingTranslator,
-  locale: string
-): PlanCardAddon | undefined {
-  if (!addonPlan) {
-    return undefined;
-  }
-  const price = getProductPrice(addonPlan);
-  return {
-    label: t("shared.zeroDataRetention"),
-    description: t("plans.addonPrice", {
-      price: formatUsd(price.amount, locale),
-      interval: price.interval,
-    }),
-    hint: t("zdrAddon.hint"),
-    checked,
-    onCheckedChange,
-  };
 }
 
 export function findActivePlanSubscription(

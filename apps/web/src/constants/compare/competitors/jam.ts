@@ -93,7 +93,6 @@ export const JAM: CompareCompetitor = {
     commerce: false,
     api: true,
     mcp: true,
-    zdr: "Not listed",
     soc2: "Not listed",
     startingPrice: "$29/mo",
   },

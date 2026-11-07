@@ -31,7 +31,6 @@ import { useRouter } from "@/lib/navigation";
 import type { BillingPlanGroup } from "@/types/billing/plan";
 import type { GeoUpgradeDialogProps } from "@/types/components/geo";
 import {
-  findZdrAddonPlan,
   getPricingButtonText,
   getProductFeatures,
   getProductPrice,
@@ -39,7 +38,6 @@ import {
   planGroupDescription,
   planRenewalTerms,
   selectPlanVariant,
-  zdrAddonToggle,
 } from "@/utils/billing-plans";
 
 export function GeoUpgradeDialog({
@@ -63,7 +61,6 @@ export function GeoUpgradeDialog({
   const paywall = usePaywallVariant();
   const [isYearly, setIsYearly] = useState(false);
   const [loading, setLoading] = useState<string | null>(null);
-  const [includeZdr, setIncludeZdr] = useState(false);
   const popupRef = useRef<HTMLDivElement>(null);
 
   const planGroups = groupBillingPlans(plans);
@@ -91,14 +88,6 @@ export function GeoUpgradeDialog({
     setIsYearly(yearly);
   }
 
-  function handleIncludeZdrChange(checked: boolean) {
-    trackEvent(POSTHOG_EVENTS.ZDR_ADDON_TOGGLED, {
-      enabled: checked,
-      surface,
-    });
-    setIncludeZdr(checked);
-  }
-
   async function handleSelectPlan(planId: string) {
     setLoading(planId);
     trackEvent(POSTHOG_EVENTS.PLAN_SELECTED, {
@@ -106,7 +95,7 @@ export function GeoUpgradeDialog({
         plans,
         planId,
         isYearly,
-        includeZdr,
+        includeZdr: false,
         surface,
       }),
       paywall_variant: paywall.variant,
@@ -116,7 +105,7 @@ export function GeoUpgradeDialog({
         attach,
         multiAttach,
         planId,
-        includeZdr,
+        includeZdr: false,
         analytics: { surface, paywall_variant: paywall.variant },
         successUrl: upgradeFlow
           ? `${window.location.origin}/${slug}/settings/billing/success`
@@ -159,13 +148,6 @@ export function GeoUpgradeDialog({
         action={
           featured ? <Badge>{tCommon2("labels.mostPopular")}</Badge> : undefined
         }
-        addon={zdrAddonToggle(
-          findZdrAddonPlan(plans, plan.id),
-          includeZdr,
-          handleIncludeZdrChange,
-          tBilling,
-          locale
-        )}
         button={{
           label,
           disabled: loading !== null,

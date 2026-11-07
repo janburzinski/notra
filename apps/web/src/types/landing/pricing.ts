@@ -10,8 +10,7 @@ export type PricingIconKey =
   | "projects"
   | "references"
   | "retention"
-  | "support"
-  | "zdr";
+  | "support";
 
 export type PricingIcon = ComponentType<SVGProps<SVGSVGElement>>;
 

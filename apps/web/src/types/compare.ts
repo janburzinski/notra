@@ -34,7 +34,6 @@ export type CompareRowId =
   | "commerce"
   | "api"
   | "mcp"
-  | "zdr"
   | "soc2"
   | "prompts"
   | "startingPrice";

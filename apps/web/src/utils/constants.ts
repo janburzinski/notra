@@ -70,7 +70,6 @@ export const PRICING_PLANS = {
       "1 project",
       { label: "100 references", subtitle: "then $0.05 per reference / mo" },
       "Standard support + Slack",
-      "ZDR available (+20%)",
     ],
   },
   growth: {
@@ -93,7 +92,6 @@ export const PRICING_PLANS = {
       "3 projects",
       { label: "500 references", subtitle: "then $0.04 per reference / mo" },
       "Standard support + Slack",
-      "ZDR available (+20%)",
     ],
   },
   scale: {
@@ -116,7 +114,6 @@ export const PRICING_PLANS = {
       "10 projects",
       { label: "1,000 references", subtitle: "then $0.03 per reference / mo" },
       "Priority support",
-      "ZDR available (+20%)",
     ],
   },
   enterprise: {
@@ -133,7 +130,6 @@ export const PRICING_PLANS = {
       "Unlimited projects",
       "Unlimited references",
       "Dedicated support",
-      "ZDR included",
     ],
   },
 } as const;
@@ -233,18 +229,6 @@ const FEATURES_TABLE = [
         growth: "$0.04 / ref",
         scale: "$0.03 / ref",
         enterprise: "Custom",
-      },
-    ],
-  },
-  {
-    category: "Security",
-    items: [
-      {
-        name: "Zero data retention",
-        starter: "+20%",
-        growth: "+20%",
-        scale: "+20%",
-        enterprise: "Included",
       },
     ],
   },

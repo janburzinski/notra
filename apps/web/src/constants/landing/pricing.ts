@@ -105,7 +105,6 @@ export const PRICING_PLANS: PricingPlan[] = [
         icon: "references",
       },
       { label: "Standard support + Slack", icon: "support" },
-      { label: "ZDR available (+20%)", icon: "zdr" },
     ],
   },
   {
@@ -141,7 +140,6 @@ export const PRICING_PLANS: PricingPlan[] = [
         icon: "references",
       },
       { label: "Standard support + Slack", icon: "support" },
-      { label: "ZDR available (+20%)", icon: "zdr" },
     ],
   },
   {
@@ -177,7 +175,6 @@ export const PRICING_PLANS: PricingPlan[] = [
         icon: "references",
       },
       { label: "Priority support", icon: "support" },
-      { label: "ZDR available (+20%)", icon: "zdr" },
     ],
   },
   {
@@ -203,7 +200,6 @@ export const PRICING_PLANS: PricingPlan[] = [
       { label: "Unlimited projects", icon: "projects" },
       { label: "Unlimited references", icon: "references" },
       { label: "Dedicated support", icon: "support" },
-      { label: "ZDR included", icon: "zdr" },
     ],
   },
 ];

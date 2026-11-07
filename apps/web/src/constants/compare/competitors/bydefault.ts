@@ -99,7 +99,6 @@ export const BYDEFAULT: CompareCompetitor = {
     commerce: false,
     api: "Not listed",
     mcp: "Not listed",
-    zdr: "Not listed",
     soc2: false,
     startingPrice: "$99/mo",
   },

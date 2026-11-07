@@ -40,14 +40,6 @@ export const FAQ_CONTENT: FaqContent = {
       defaultOpen: false,
     },
     {
-      id: "zdr",
-      question:
-        "Do my prompts and answers get retained by the model providers?",
-      answer:
-        "Not if you turn on zero data retention (ZDR). It costs +20% on Starter, Growth and Scale and is included on Enterprise. With ZDR enforced, scans only go to models whose provider offers zero data retention. Not every model has a ZDR host, so those stay off unless you approve them for the project.",
-      defaultOpen: false,
-    },
-    {
       id: "write",
       question: "Can Notra write the content too?",
       answer:

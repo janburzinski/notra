@@ -112,7 +112,7 @@ export function buildFeaturesMarkdown() {
       "Notra replays multi-turn chats of up to five turns on every engine with web search. Engines often make their recommendation in a follow-up answer.",
       "",
       "### Scans",
-      "Scans run daily by default, or every 48 hours, 3 days, week, 2 weeks or 30 days. Every answer is stored in full with the searches the engine ran and the pages it cited. Zero data retention is available as an add-on.",
+      "Scans run daily by default, or every 48 hours, 3 days, week, 2 weeks or 30 days. Every answer is stored in full with the searches the engine ran and the pages it cited.",
     ]),
     markdownSection("What the dashboard shows", [
       `### ${FEATURES_ENGINES_COPY.title}`,
@@ -288,7 +288,7 @@ function buildPromptCalculatorMarkdown() {
     "",
     "Params you leave out fall back to their default, and the page updates the URL as the user changes inputs, so the link always matches what they see.",
     "",
-    "Good to know: the estimate covers the prompts in the project's main language. Each extra language re-runs up to the first 5 prompts, multi-turn conversations add one answer per turn and persona conversations count two answers per turn, so leave headroom when a customer plans to use any of them. When an organization uses up its monthly AI answers, scheduled scans run on its AI credits instead and are skipped only when no credits are left either. Zero data retention adds 20% to Starter, Growth and Scale and is included on Enterprise; only add it when the customer asks for it.",
+    "Good to know: the estimate covers the prompts in the project's main language. Each extra language re-runs up to the first 5 prompts, multi-turn conversations add one answer per turn and persona conversations count two answers per turn, so leave headroom when a customer plans to use any of them. When an organization uses up its monthly AI answers, scheduled scans run on its AI credits instead and are skipped only when no credits are left either.",
     "",
     "### Models",
     "",

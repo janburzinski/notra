@@ -1,6 +1,6 @@
 ---
 title: "Billing and plans"
-description: "Starter, Growth and Scale plans, the zero data retention add-on, AI credits, invoices and usage tracking"
+description: "Starter, Growth and Scale plans, AI credits, invoices and usage tracking"
 authors:
   - handle: dominik
 
@@ -20,13 +20,12 @@ docolin:
     - invoices
     - usage limits
     - AI credits
-    - zero data retention
   prev: ./team-management.mdx
 ---
 
 ## Overview
 
-Billing is per organization, and you open **Settings > Billing & Usage** to change your plan, add the zero data retention add-on, see invoices and track usage. Manage AI credits under **Settings > Credits**.
+Billing is per organization, and you open **Settings > Billing & Usage** to change your plan, see invoices and track usage. Manage AI credits under **Settings > Credits**.
 
 ## Plans
 
@@ -45,8 +44,6 @@ References beyond the included amount cost, per reference per month, $0.05 on St
 
 Starter and Growth get standard support plus Slack, Scale gets priority support and Enterprise gets dedicated support.
 
-Zero data retention is a paid add-on on Starter, Growth and Scale, and is included on Enterprise.
-
 <Info>
   The plan cards on the billing page come from the live billing catalog, so if they ever differ from this table, the plan cards are correct.
 </Info>
@@ -64,7 +61,7 @@ Quotas reset monthly.
 
 ### Enterprise
 
-For custom limits, included zero data retention and dedicated support, contact [hello@usenotra.com](mailto:hello@usenotra.com).
+For custom limits and dedicated support, contact [hello@usenotra.com](mailto:hello@usenotra.com).
 
 ### Legacy Basic and Pro plans
 
@@ -92,10 +89,6 @@ An organization without an active plan can sign in and manage settings, but:
     Toggle between **Monthly** and **Yearly** above the plan cards.
   </Step>
 
-  <Step title="Optionally add zero data retention">
-    Each card has a toggle to include the ZDR add-on in the same checkout.
-  </Step>
-
   <Step title="Select the plan">
     Click the button on the card, which reads **Get Started**, **Upgrade** or **Downgrade** depending on your current plan, or **Start Free Trial** when the plan offers a trial you are eligible for.
   </Step>
@@ -116,19 +109,6 @@ Click **Manage Subscription** at the top of the billing page to open the custome
   Scheduled changes, such as a downgrade or cancellation that takes effect at the end of the current period, show on the plan card as **Plan Scheduled**.
 </Note>
 
-## Zero data retention add-on
-
-Zero data retention (ZDR) routes your prompts and answers only through model hosts that keep no prompt or answer data. ZDR costs 20% of your plan price and is available on Starter, Growth and Scale.
-
-Enable it from the **Add-ons** section of the billing page, or with the toggle on a plan card during checkout. Before it activates, you must acknowledge the following:
-
-* Availability is not guaranteed for every model, because ZDR exists only where the gateway Notra routes through holds a zero-data-retention agreement with that model's provider.
-* New models usually launch without ZDR, and Notra excludes them until a ZDR option exists.
-* Notra skips models without a ZDR host, which GEO settings marks, and they do not run unless you approve each one.
-* Gateway and provider terms can change, so if a provider withdraws an agreement, Notra excludes that model from your scans until an alternative is available.
-
-Removing the add-on takes effect at the end of the current billing cycle.
-
 ## AI credits
 
 AI credits are a prepaid dollar balance that Notra draws on when a plan quota runs out. When a long-form post, image generation or GEO scan would exceed your monthly quota, Notra charges credits instead, and if there are no credits either, Notra blocks the action and asks you to upgrade or add credits.
@@ -148,7 +128,7 @@ Notra pauses automations that fail because credits ran out or a plan limit was r
 The **Invoices** table on the billing page lists every invoice with:
 
 * **Date**. Click the column header to sort ascending or descending.
-* **Description**. This is the plan or add-on charged, for example Starter, Growth, Zero data retention or AI Credits Top-up.
+* **Description**. This is the plan or add-on charged, for example Starter, Growth or AI Credits Top-up.
 * **Amount**
 * **Status**
 

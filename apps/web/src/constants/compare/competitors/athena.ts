@@ -100,7 +100,6 @@ export const ATHENA: CompareCompetitor = {
     commerce: true,
     api: "Add-on",
     mcp: true,
-    zdr: "Not listed",
     soc2: true,
     startingPrice: "Free, then $295/mo",
   },

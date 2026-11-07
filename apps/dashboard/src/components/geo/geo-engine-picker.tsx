@@ -10,7 +10,6 @@ import {
 } from "@notra/geo-core/utils/geo-engines";
 import { isGeoOlostepEngine } from "@notra/geo-core/utils/geo-olostep";
 import { ConfirmDialog } from "@notra/ui/components/shared/confirm-dialog";
-import { Badge } from "@notra/ui/components/ui/badge";
 import { Button } from "@notra/ui/components/ui/button";
 import {
   DropdownMenu,
@@ -22,24 +21,12 @@ import {
 import { Label } from "@notra/ui/components/ui/label";
 import { Switch } from "@notra/ui/components/ui/switch";
 import { TitleCard } from "@notra/ui/components/ui/title-card";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@notra/ui/components/ui/tooltip";
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { toast } from "sonner";
 import { useTranslations } from "use-intl";
 
-import { ZdrConsentDialog } from "@/components/billing/zdr-consent-dialog";
-import Link from "@/components/framework/link";
 import { EngineIcon } from "@/components/geo/engine-icon";
-import { useOrganizationsContext } from "@/components/providers/organization-provider";
-import {
-  ZDR_ADDON_ANCHOR,
-  ZDR_CHECKOUT_SUCCESS_PARAM,
-} from "@/constants/billing";
-import { useBillingCustomer } from "@/lib/hooks/use-billing-customer";
+import { ZDR_CHECKOUT_SUCCESS_PARAM } from "@/constants/billing";
 import { useGeoModelsAdvanced } from "@/lib/hooks/use-geo-models-advanced";
 import { cn } from "@/lib/utils";
 import type {
@@ -48,11 +35,6 @@ import type {
   GeoEngineProviderRowProps,
   GeoPendingModelRemoval,
 } from "@/types/geo";
-import {
-  findActivePlanSubscription,
-  zdrAddonPlanId,
-} from "@/utils/billing-plans";
-import { getDatabuddyPaymentMetadata } from "@/utils/databuddy";
 import {
   geoPickerProviders,
   isGeoCodingAgentProvider,
@@ -76,12 +58,7 @@ export function GeoEnginePicker({
   disabled = false,
 }: GeoEnginePickerProps) {
   const t = useTranslations("geo.geoEnginePicker");
-  const tCommon2 = useTranslations("common");
   const id = useId();
-  const { activeOrganization } = useOrganizationsContext();
-  const { attach, data: customer, refetch } = useBillingCustomer();
-  const [addonLoading, setAddonLoading] = useState(false);
-  const [consentOpen, setConsentOpen] = useState(false);
   const { advanced, setAdvanced } = useGeoModelsAdvanced();
   const checkoutReturnHandled = useRef(false);
   const approvedNonZdrIds = new Set(nonZdrApproved);
@@ -304,48 +281,6 @@ export function GeoEnginePicker({
     window.history.replaceState(null, "", returnUrl);
   }, [canEnforceZdr, handleZdrChange]);
 
-  const handleAddZdr = async () => {
-    const activeSubscription = findActivePlanSubscription(
-      customer?.subscriptions
-    );
-    const addonPlanId = zdrAddonPlanId(activeSubscription?.planId);
-    if (!addonPlanId) {
-      toast.error(t("choosePlan"));
-      return;
-    }
-
-    setAddonLoading(true);
-    const successUrl = activeOrganization?.slug
-      ? new URL(window.location.href)
-      : undefined;
-    successUrl?.searchParams.set(ZDR_CHECKOUT_SUCCESS_PARAM, "true");
-    try {
-      const result = await attach({
-        planId: addonPlanId,
-        metadata: getDatabuddyPaymentMetadata(),
-        redirectMode: "if_required",
-        successUrl: successUrl?.toString(),
-      });
-      if (result.paymentUrl) {
-        window.location.assign(result.paymentUrl);
-        return;
-      }
-      await refetch();
-      handleZdrChange(true);
-      toast.success(tCommon2("messages.zeroDataRetentionIsNow"));
-    } catch (error) {
-      toast.error(
-        error instanceof Error
-          ? error.message
-          : tCommon2("messages.couldNotAddZeroData")
-      );
-    }
-    setAddonLoading(false);
-  };
-
-  const billingHref = activeOrganization
-    ? `/${activeOrganization.slug}/settings/billing#${ZDR_ADDON_ANCHOR}`
-    : null;
   const providerProps = {
     catalog,
     disabled,
@@ -409,67 +344,26 @@ export function GeoEnginePicker({
             />
           ))}
         </ul>
-        <div className="bg-border/60 mx-3 my-1.5 h-px" />
-        <div className="flex items-center justify-between gap-4 rounded-md px-3 py-2.5">
-          <div className="space-y-0.5">
-            <div className="flex items-center gap-1.5">
-              <Label htmlFor={`${id}-zdr`}>{t("enforceZdr")}</Label>
-              {canEnforceZdr ? null : (
-                <Badge size="sm" variant="outline">
-                  {tCommon2("labels.addOn")}
-                </Badge>
-              )}
+        {canEnforceZdr ? (
+          <>
+            <div className="bg-border/60 mx-3 my-1.5 h-px" />
+            <div className="flex items-center justify-between gap-4 rounded-md px-3 py-2.5">
+              <div className="space-y-0.5">
+                <Label htmlFor={`${id}-zdr`}>{t("enforceZdr")}</Label>
+                <p className="text-muted-foreground text-xs text-pretty">
+                  {t("zdrEnabledHint")}
+                </p>
+              </div>
+              <Switch
+                checked={enforceZdr}
+                disabled={disabled || planLoading}
+                id={`${id}-zdr`}
+                onCheckedChange={handleZdrChange}
+              />
             </div>
-            <p className="text-muted-foreground text-xs text-pretty">
-              {canEnforceZdr ? (
-                t("zdrEnabledHint")
-              ) : (
-                <>
-                  {t("zdrAddonHint")}{" "}
-                  {billingHref ? (
-                    <Link
-                      className="text-foreground underline underline-offset-4"
-                      href={billingHref}
-                    >
-                      {t("addInBilling")}
-                    </Link>
-                  ) : null}
-                </>
-              )}
-            </p>
-          </div>
-          {canEnforceZdr ? (
-            <Switch
-              checked={enforceZdr}
-              disabled={disabled || planLoading}
-              id={`${id}-zdr`}
-              onCheckedChange={handleZdrChange}
-            />
-          ) : (
-            <Tooltip>
-              <TooltipTrigger render={<span className="inline-flex" />}>
-                <Switch
-                  aria-label={t("addZdr")}
-                  checked={false}
-                  className="cursor-pointer disabled:cursor-not-allowed"
-                  disabled={disabled || planLoading || addonLoading}
-                  id={`${id}-zdr`}
-                  onCheckedChange={() => setConsentOpen(true)}
-                />
-              </TooltipTrigger>
-              <TooltipContent side="top">
-                {planLoading ? t("checkingPlan") : t("addZdrTooltip")}
-              </TooltipContent>
-            </Tooltip>
-          )}
-        </div>
+          </>
+        ) : null}
       </TitleCard>
-
-      <ZdrConsentDialog
-        onConfirm={handleAddZdr}
-        onOpenChange={setConsentOpen}
-        open={consentOpen}
-      />
 
       <ConfirmDialog
         confirmLabel={t("enableWithoutZdr")}

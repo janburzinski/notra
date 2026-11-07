@@ -24,8 +24,6 @@ export const LEGACY_PLAN_TIERS: Record<string, string> = {
   [LEGACY_PLANS.PRO_YEARLY]: PLANS.GROWTH,
 };
 
-export const ZDR_ADDON_PRICE_PERCENT = 20;
-
 export const PLAN_TIER_LIMITS: Record<string, PlanTierLimits> = {
   [PLANS.STARTER]: {
     aiAnswers: 2000,

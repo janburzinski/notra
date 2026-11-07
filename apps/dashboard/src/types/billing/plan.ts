@@ -30,7 +30,7 @@ export interface PlanCardButton {
   onClick: () => void;
 }
 
-export interface PlanCardAddon {
+interface PlanCardAddon {
   label: string;
   description: string;
   hint?: string;

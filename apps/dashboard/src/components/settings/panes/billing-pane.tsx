@@ -42,7 +42,6 @@ import { useRouter } from "@/lib/navigation";
 import type { BillingPlanGroup, PlanCardButton } from "@/types/billing/plan";
 import {
   checkoutPlanId,
-  findZdrAddonPlan,
   getPricingButtonText,
   getProductFeatures,
   getProductPrice,
@@ -53,7 +52,6 @@ import {
   planRenewalTerms,
   requestedYearly,
   selectPlanVariant,
-  zdrAddonToggle,
 } from "@/utils/billing-plans";
 
 const noop = () => undefined;
@@ -116,7 +114,6 @@ export function BillingSettingsPane() {
   const [yearlyChoice, setIsYearly] = useState(() =>
     requestedYearly(checkoutPlanParam)
   );
-  const [includeZdr, setIncludeZdr] = useState(false);
   const { hasZdr } = useHasZdrEntitlement();
   const [now] = useState(() => Date.now());
 
@@ -143,14 +140,6 @@ export function BillingSettingsPane() {
     setIsYearly(yearly);
   }
 
-  function handleIncludeZdrChange(checked: boolean) {
-    trackEvent(POSTHOG_EVENTS.ZDR_ADDON_TOGGLED, {
-      enabled: checked,
-      surface: PLAN_SURFACES.BILLING_PAGE,
-    });
-    setIncludeZdr(checked);
-  }
-
   async function checkout(planId: string, yearly: boolean) {
     trackEvent(
       POSTHOG_EVENTS.PLAN_SELECTED,
@@ -158,7 +147,7 @@ export function BillingSettingsPane() {
         plans,
         planId,
         isYearly: yearly,
-        includeZdr,
+        includeZdr: false,
         surface: PLAN_SURFACES.BILLING_PAGE,
       })
     );
@@ -170,7 +159,7 @@ export function BillingSettingsPane() {
         attach,
         multiAttach,
         planId,
-        includeZdr,
+        includeZdr: false,
         successUrl,
       });
 
@@ -294,7 +283,6 @@ export function BillingSettingsPane() {
       return null;
     }
     const isCurrent = isPlanInGroup(group, activePlanId);
-    const addonPlan = hasZdr ? null : findZdrAddonPlan(plans, plan.id);
     return (
       <PlanCard
         action={
@@ -304,13 +292,6 @@ export function BillingSettingsPane() {
             </Badge>
           ) : undefined
         }
-        addon={zdrAddonToggle(
-          addonPlan,
-          includeZdr,
-          handleIncludeZdrChange,
-          tBilling,
-          locale
-        )}
         button={planButton(group)}
         description={planGroupDescription(group, tBilling)}
         featured={group.id === FEATURED_PLAN_TIER}
@@ -371,10 +352,12 @@ export function BillingSettingsPane() {
         {isBillingLoading ? null : <FreePlanCard />}
       </div>
 
-      <div className="space-y-3">
-        <h2 className="text-lg font-semibold">{t("addons")}</h2>
-        <ZdrAddonCard />
-      </div>
+      {hasZdr ? (
+        <div className="space-y-3">
+          <h2 className="text-lg font-semibold">{t("addons")}</h2>
+          <ZdrAddonCard />
+        </div>
+      ) : null}
 
       <div className="space-y-3">
         <h2 className="text-lg font-semibold">{t("invoices")}</h2>

@@ -48,11 +48,6 @@ export const FEATURES_PAGE_TRACKING_CARDS: FeaturesPageCard[] = [
     description:
       "Daily by default, or every 48 hours, 3 days, week, 2 weeks or 30 days. Every answer is stored with the searches the engine ran and the pages it cited.",
   },
-  {
-    title: "Zero data retention",
-    description:
-      "ZDR is an add-on. With it enforced, prompts only go to models whose provider offers zero data retention. Everything else stays off unless you approve it.",
-  },
 ];
 
 export const FEATURES_PAGE_IMPROVE: FeaturesPageSectionCopy = {

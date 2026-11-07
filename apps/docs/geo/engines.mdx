@@ -1,6 +1,6 @@
 ---
 title: "Engines"
-description: "Choose which AI engines Notra scans: ChatGPT, Claude, Gemini, Perplexity, Grok, Google AI Overview and more, with an optional zero data retention mode."
+description: "Choose which AI engines Notra scans: ChatGPT, Claude, Gemini, Perplexity, Grok, Google AI Overview and more."
 authors:
   - handle: dominik
 
@@ -50,11 +50,7 @@ Notra fetches Google AI Overview from Google search results rather than a model 
   Coding-agent engines require a paid plan and configured credentials. fx uses curated AI Gateway models in Upstash Box. It is never selected by default and requires both `UPSTASH_BOX_API_KEY` and `AI_GATEWAY_API_KEY` on the server.
 </Info>
 
-## Zero data retention
-
-The **Zero data retention** toggle limits scans to models with a ZDR route, and it needs the ZDR add-on to turn on. You can approve models without ZDR one by one, including Google AI Overview and the coding agents.
-
-Meta's native web search does not support ZDR. Muse Wonder and Muse Spark need individual approval when you enforce ZDR, even though their answers without search have ZDR hosts. Notra keeps prompt training disabled for their search calls. See [Meta's ZDR restrictions](https://dev.meta.ai/help/policies-and-privacy/zero-data-retention).
+## Model limits
 
 Muse Wonder Full is available only through a Muse Code subscription and has no Model API route, so Notra does not list it as an API model. See [Meta's model availability](https://dev.meta.ai/docs/models).
 
