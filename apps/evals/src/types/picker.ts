@@ -1,5 +1,11 @@
 import type { AnySuite, CostSource } from "./eval";
 
+/** One case, averaged over repeats. */
+export interface CaseOutcome {
+  readonly pass: number;
+  readonly grounded?: number;
+}
+
 export interface MeasuredModel {
   readonly modelId: string;
   readonly label: string;
@@ -11,6 +17,8 @@ export interface MeasuredModel {
   readonly score: number;
   readonly scoreSe: number;
   readonly passRate: number;
+  /** Per case, so production comparisons can use only the cases both runs share. */
+  readonly byCase: Readonly<Record<string, CaseOutcome>>;
   readonly p50Ms: number;
   readonly costPerCall?: number;
   readonly costSource: CostSource;

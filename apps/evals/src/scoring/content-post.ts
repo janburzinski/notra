@@ -3,6 +3,8 @@ import type { ContentAgentProfile } from "@notra/ai/types/agents";
 import type { ContentScenario } from "../fixtures/content-scenarios";
 import type { HarnessOutput } from "../harness/content-harness";
 import type { CaseScore, FieldScore, ScoreContext } from "../types/eval";
+import { combineScore, gatesPassed } from "./combine";
+import { GROUNDED_QUESTION, groundedField } from "./grounding";
 import { judgeWithJev } from "./jev-judge";
 import {
   countDashes,
@@ -18,12 +20,13 @@ const REJECTED_CALL_REGEX =
   /Invalid input for tool |tried to call unavailable tool |InvalidToolInputError|NoSuchToolError/;
 const LINKEDIN_MAX_CHARS = 1600;
 
+const GROUNDED_WEIGHT = 3;
+const MIN_COVERAGE = 0.66;
+/** A tweet should lead with the main change, not fit every key fact into 280 chars. */
+const MIN_TWEET_COVERAGE = 0.33;
+
 const POST_QUESTIONS = {
-  grounded: {
-    type: "boolean",
-    instructions:
-      "Is every factual claim in post supported by sourceData? Product names, numbers, features and fixes must appear in sourceData. Style and opinions do not count as claims.",
-  },
+  grounded: GROUNDED_QUESTION,
   coverage: {
     type: "score",
     instructions:
@@ -48,26 +51,38 @@ const POST_QUESTIONS = {
 } as const;
 
 export function sourceDataFor(scenario: ContentScenario) {
+  const repositoryUrl = `https://github.com/${scenario.owner}/${scenario.repo}`;
   return {
     company: `${scenario.brand.companyName}: ${scenario.brand.companyDescription}`,
     repository: `${scenario.owner}/${scenario.repo}`,
+    repositoryUrl,
     lookback: `${scenario.lookbackStartIso} to ${scenario.lookbackEndIso}`,
     commits: scenario.commits.map(
       (commit) => `${commit.sha} ${commit.message} (${commit.authorName})`
     ),
     pullRequests: scenario.pullRequests.map((pr) => ({
       number: pr.number,
+      url: `${repositoryUrl}/pull/${pr.number}`,
       title: pr.title,
       body: pr.body,
       author: pr.authorLogin,
       labels: pr.labels,
+      additions: pr.additions,
+      deletions: pr.deletions,
+      changedFiles: pr.changedFiles,
     })),
     releases: scenario.releases.map((release) => ({
       tag: release.tagName,
+      url: `${repositoryUrl}/releases/tag/${release.tagName}`,
       name: release.name,
       body: release.body,
     })),
   };
+}
+
+/** House-style examples the writer was given; lines borrowed from them are style, not claims. */
+export function brandReferencesFor(scenario: ContentScenario): string[] {
+  return scenario.brand.references.map((reference) => reference.content);
 }
 
 function field(
@@ -76,6 +91,14 @@ function field(
   extra: Partial<FieldScore> = {}
 ): FieldScore {
   return { field: name, score: Math.max(0, Math.min(1, score)), ...extra };
+}
+
+function gate(
+  name: string,
+  ok: boolean,
+  extra: Partial<FieldScore> = {}
+): FieldScore {
+  return field(name, ok ? 1 : 0, { ...extra, gate: true });
 }
 
 export async function scoreContentOutput(
@@ -89,48 +112,31 @@ export async function scoreContentOutput(
     REJECTED_CALL_REGEX.test(error)
   );
   const fields: FieldScore[] = [
-    field("decision", output.decision === expected ? 1 : 0, {
+    gate("decision", output.decision === expected, {
       expected,
       actual: output.decision,
       note: output.reason,
     }),
-    field("valid-tool-calls", toolErrors.length === 0 ? 1 : 0, {
-      note: toolErrors[0],
-    }),
+    gate("valid-tool-calls", toolErrors.length === 0, { note: toolErrors[0] }),
   ];
 
-  if (expected === "skip") {
-    const decided = fields[0]?.score ?? 0;
-    const score =
-      fields.reduce((sum, item) => sum + item.score, 0) / fields.length;
-    return { score, pass: decided === 1, fields };
-  }
-
   const post = output.post;
-  if (!post) {
-    for (const name of [
-      "no-dashes",
-      "length",
-      "slop",
-      "language",
-      "title",
-      "no-meta",
-      "must-mention",
-      "grounded",
-      "coverage",
-      "avoids-internal",
-      "human-voice",
-    ]) {
-      fields.push(field(name, 0, { note: "no post created" }));
-    }
-    return { score: 0, pass: false, fields };
+  if (expected === "create" && !post) {
+    fields.push(gate("saved", false, { note: "no post created" }));
+  }
+  if (expected === "skip" || !post) {
+    return {
+      score: combineScore(fields),
+      pass: gatesPassed(fields) && expected === "skip",
+      fields,
+    };
   }
 
   const fullText = `${post.title}\n${post.markdown}\n${post.recommendations ?? ""}`;
   const judgedText = `${post.title}\n${post.markdown}`;
   const dashes = countDashes(fullText);
   fields.push(
-    field("no-dashes", dashes === 0 ? 1 : 0, {
+    gate("no-dashes", dashes === 0, {
       note: dashes ? `${dashes} em/en dashes` : undefined,
     })
   );
@@ -142,34 +148,22 @@ export async function scoreContentOutput(
   } else if (contentType.contentType === "linkedin_post") {
     lengthOk = length <= LINKEDIN_MAX_CHARS;
   }
-  fields.push(field("length", lengthOk ? 1 : 0, { note: `${length} chars` }));
+  fields.push(gate("length", lengthOk, { note: `${length} chars` }));
 
-  const hits = slopHits(fullText);
+  const share = germanShare(post.markdown);
+  const german = scenario.brand.language === "German";
   fields.push(
-    field("slop", 1 - hits.length * 0.34, {
-      note: hits.length ? hits.join(", ") : undefined,
+    gate("language", german ? share >= 0.6 : share < 0.4, {
+      note: german ? `${Math.round(share * 100)}% German markers` : undefined,
     })
   );
 
-  if (scenario.brand.language === "German") {
-    const share = germanShare(post.markdown);
-    fields.push(
-      field("language", share >= 0.6 ? 1 : 0, {
-        note: `${Math.round(share * 100)}% German markers`,
-      })
-    );
-  } else {
-    fields.push(field("language", germanShare(post.markdown) < 0.4 ? 1 : 0));
-  }
-
   const badTitle = titleProblem(post.title);
-  fields.push(
-    field("title", badTitle ? 0 : 1, { actual: post.title, note: badTitle })
-  );
+  fields.push(gate("title", !badTitle, { actual: post.title, note: badTitle }));
 
   const meta = metaHits(judgedText);
   fields.push(
-    field("no-meta", meta.length ? 0 : 1, {
+    gate("no-meta", meta.length === 0, {
       note: meta.length ? meta.join(", ") : undefined,
     })
   );
@@ -180,15 +174,18 @@ export async function scoreContentOutput(
       : (scenario.expected.mustMention ?? []);
   const missing = required.filter((item) => !item.pattern.test(judgedText));
   fields.push(
-    field(
-      "must-mention",
-      required.length ? 1 - missing.length / required.length : 1,
-      {
-        note: missing.length
-          ? `missing: ${missing.map((item) => item.fact).join("; ")}`
-          : undefined,
-      }
-    )
+    gate("must-mention", missing.length === 0, {
+      note: missing.length
+        ? `missing: ${missing.map((item) => item.fact).join("; ")}`
+        : undefined,
+    })
+  );
+
+  const hits = slopHits(fullText);
+  fields.push(
+    field("slop", 1 - hits.length * 0.34, {
+      note: hits.length ? hits.join(", ") : undefined,
+    })
   );
 
   const verdict = await judgeWithJev({
@@ -196,6 +193,7 @@ export async function scoreContentOutput(
     state: {
       contentType: contentType.contentLabel,
       brandVoice: `${scenario.brand.companyName}: ${scenario.brand.toneProfile}${scenario.brand.customTone ? `, ${scenario.brand.customTone}` : ""}`,
+      brandReferences: brandReferencesFor(scenario),
       sourceData: sourceDataFor(scenario),
       keyFacts: scenario.expected.keyFacts,
       internalOnly: scenario.expected.avoid,
@@ -206,25 +204,21 @@ export async function scoreContentOutput(
     demo: ctx.demo,
     demoQuality: hits.length === 0 && dashes === 0 ? 0.9 : 0.6,
   });
-  fields.push(field("grounded", verdict.values.grounded ?? 0));
-  fields.push(field("coverage", verdict.values.coverage ?? 0));
+  const grounded = groundedField(verdict.values.grounded ?? 0, GROUNDED_WEIGHT);
+  const coverage = verdict.values.coverage ?? 0;
+  fields.push(grounded);
+  fields.push(field("coverage", coverage));
   fields.push(field("avoids-internal", verdict.values.avoidsInternal ?? 0));
   fields.push(field("human-voice", verdict.values.humanVoice ?? 0));
 
-  const score =
-    fields.reduce((sum, item) => sum + item.score, 0) / fields.length;
-  const pass =
-    output.decision === "create" &&
-    dashes === 0 &&
-    lengthOk &&
-    !badTitle &&
-    meta.length === 0 &&
-    missing.length === 0 &&
-    (verdict.values.grounded ?? 0) >= 0.5 &&
-    (verdict.values.coverage ?? 0) >= 0.66;
+  const minCoverage =
+    contentType.contentType === "twitter_post"
+      ? MIN_TWEET_COVERAGE
+      : MIN_COVERAGE;
   return {
-    score,
-    pass,
+    score: combineScore(fields),
+    pass:
+      gatesPassed(fields) && grounded.score === 1 && coverage >= minCoverage,
     fields,
     judgeCostUsd: verdict.costUsd,
     judgeCostSource: verdict.costSource,

@@ -406,7 +406,8 @@ export const CONTENT_SCENARIOS: readonly ContentScenario[] = [
       mustMention: [
         {
           fact: "Docker Compose v1 is no longer supported",
-          pattern: /compose (?:v|version )?1\b/i,
+          // Requiring Compose v2 states the same fact ("needs Docker Compose v2. We dropped v1 support").
+          pattern: /\bcompose (?:v|version )?[12]\b/i,
         },
       ],
     },

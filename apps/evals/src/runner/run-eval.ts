@@ -123,6 +123,7 @@ export function startRun(options: StartRunOptions): RunHandle {
     suiteName: suite.name,
     suiteKind: suite.kind,
     createdAt: new Date().toISOString(),
+    scoringVersion: suite.scoringVersion,
     status: "running",
     tasks: buildTasks(suite, config),
   };

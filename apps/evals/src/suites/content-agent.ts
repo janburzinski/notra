@@ -2,6 +2,7 @@ import { CONTENT_AGENT_PROFILES } from "@notra/ai/constants/content-agents";
 import { CONTENT_AGENT_MODEL } from "@notra/ai/constants/models";
 import type { ContentAgentProfile } from "@notra/ai/types/agents";
 
+import { CONTENT_SCORING_VERSION } from "../constants/scoring";
 import {
   CONTENT_SCENARIOS,
   type ContentScenario,
@@ -13,6 +14,7 @@ import {
   runDraftStage,
   transcriptFor,
 } from "../harness/content-harness";
+import { combineScore } from "../scoring/combine";
 import { scoreContentOutput } from "../scoring/content-post";
 import type { CaseScore, EvalCase, EvalSuite, FieldScore } from "../types/eval";
 import { demoContentOutput } from "./content-demo";
@@ -79,11 +81,7 @@ function processFields(
 
 function mergeScores(base: CaseScore, extra: FieldScore[]): CaseScore {
   const fields = [...base.fields, ...extra];
-  return {
-    ...base,
-    fields,
-    score: fields.reduce((sum, item) => sum + item.score, 0) / fields.length,
-  };
+  return { ...base, fields, score: combineScore(fields) };
 }
 
 export const contentAgentSuite: EvalSuite<
@@ -105,6 +103,7 @@ export const contentAgentSuite: EvalSuite<
     "openai/gpt-6-sol",
   ],
   labelFields: ["decision"],
+  scoringVersion: CONTENT_SCORING_VERSION,
   timeoutMs: 240_000,
   run: (input, ctx) =>
     runContentAgent({
@@ -150,6 +149,7 @@ export const contentDraftSuite: EvalSuite<
     "openai/gpt-6-sol",
   ],
   labelFields: ["decision"],
+  scoringVersion: CONTENT_SCORING_VERSION,
   timeoutMs: 120_000,
   run: (input, ctx) =>
     runDraftStage({

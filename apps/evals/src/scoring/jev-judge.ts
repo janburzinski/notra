@@ -5,6 +5,24 @@ import { callJev } from "../models/gateway";
 import type { JudgeVerdict } from "../types/eval";
 
 type Questions = Readonly<Record<string, Experimental_EvaluationQuestion>>;
+export type ChoiceWeights = Readonly<
+  Record<string, Readonly<Record<string, number>>>
+>;
+
+function weightedChoice(
+  weights: Readonly<Record<string, number>>,
+  choice: string | undefined,
+  probabilities: Record<string, number> | undefined
+): number {
+  if (!probabilities) {
+    return weights[choice ?? ""] ?? 0;
+  }
+  let value = 0;
+  for (const [option, probability] of Object.entries(probabilities)) {
+    value += probability * (weights[option] ?? 0);
+  }
+  return value;
+}
 
 function hash(text: string): number {
   let value = 2_166_136_261;
@@ -35,6 +53,8 @@ export async function judgeWithJev(params: {
   abortSignal: AbortSignal;
   demo: boolean;
   demoQuality?: number;
+  /** Per choice question: option → value in [0, 1], averaged over the answer's probabilities. */
+  choiceWeights?: ChoiceWeights;
 }): Promise<JudgeVerdict> {
   if (params.demo) {
     return demoVerdict(
@@ -57,10 +77,19 @@ export async function judgeWithJev(params: {
   const values: Record<string, number> = {};
   for (const [id, answer] of Object.entries(result.output.answers) as [
     string,
-    { type: string; probability?: number; score?: number; choice?: string },
+    {
+      type: string;
+      probability?: number;
+      score?: number;
+      choice?: string;
+      probabilities?: Record<string, number>;
+    },
   ][]) {
     const question = params.questions[id];
-    if (answer.type === "boolean") {
+    const weights = params.choiceWeights?.[id];
+    if (answer.type === "choice" && weights) {
+      values[id] = weightedChoice(weights, answer.choice, answer.probabilities);
+    } else if (answer.type === "boolean") {
       values[id] = answer.probability ?? 0;
     } else if (answer.type === "score" && question?.type === "score") {
       values[id] =

@@ -56,6 +56,10 @@ export interface FieldScore {
   readonly expected?: string;
   readonly actual?: string;
   readonly note?: string;
+  /** Hard rule: any gate below 1 makes the case score 0. */
+  readonly gate?: boolean;
+  /** Weight in the quality mean. Defaults to 1. */
+  readonly weight?: number;
 }
 
 export interface CaseScore {
@@ -103,6 +107,8 @@ export interface EvalSuite<
   readonly defaultContenders: readonly string[];
   readonly productionModel: string;
   readonly labelFields?: readonly string[];
+  /** Bump when scoring changes so the picker stops comparing runs scored differently. Defaults to 1. */
+  readonly scoringVersion?: number;
   readonly timeoutMs: number;
   run(input: INPUT, ctx: CallContext): Promise<CallResult<OUTPUT>>;
   score(
@@ -150,6 +156,8 @@ export interface EvalRun {
   readonly suiteName: string;
   readonly suiteKind: SuiteKind;
   readonly createdAt: string;
+  /** The suite's scoringVersion when the tasks were scored. Missing means 1. */
+  scoringVersion?: number;
   finishedAt?: string;
   status: RunStatus;
   tasks: TaskResult[];

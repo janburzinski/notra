@@ -30,6 +30,27 @@ export function mean(values: readonly number[]): number {
   return sum / values.length;
 }
 
+/** Probability that a random positive scores above a random negative (ties count half). */
+export function auc(
+  positives: readonly number[],
+  negatives: readonly number[]
+): number {
+  if (!positives.length || !negatives.length) {
+    return 0;
+  }
+  let wins = 0;
+  for (const positive of positives) {
+    for (const negative of negatives) {
+      if (positive > negative) {
+        wins += 1;
+      } else if (positive === negative) {
+        wins += 0.5;
+      }
+    }
+  }
+  return wins / (positives.length * negatives.length);
+}
+
 export function summarizeContender(
   contender: Contender,
   tasks: readonly TaskResult[]

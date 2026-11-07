@@ -13,6 +13,8 @@ const HELP = `notra evals: compare models on the content harness
   bun run evals run <suite> [opts]   headless run (CI / agents)
   bun run evals box <suite> [opts]   headless run inside an Upstash Box
   bun run evals pick [--tolerance n] cheapest model per stage from saved runs
+  bun run evals rescore <run-id…>    score saved outputs again (judge calls only)
+  bun run evals judge-check          grounding judge vs labelled posts
 
 options
   --demo                 simulate models instead of calling the gateway
@@ -23,6 +25,7 @@ options
   --suite id             preselect a suite in the TUI
   --tolerance n          allowed score drop below the best model, in pts (pick)
   --json                 print the summary as JSON (headless)
+  --verbose              per-post scores (judge-check)
 `;
 
 const { values, positionals } = parseArgs({
@@ -37,6 +40,7 @@ const { values, positionals } = parseArgs({
     suite: { type: "string" },
     json: { type: "boolean", default: false },
     tolerance: { type: "string" },
+    verbose: { type: "boolean", default: false },
     help: { type: "boolean", short: "h", default: false },
   },
 });
@@ -70,6 +74,29 @@ if (values.help) {
     tolerancePts,
     json: values.json ?? false,
   });
+} else if (command === "judge-check") {
+  const { runJudgeCheck } = await import("./judge-check");
+  process.exit(
+    await runJudgeCheck({
+      repeats: Math.max(1, Number(values.repeats) || 1),
+      concurrency: Math.max(1, Number(values.concurrency) || 6),
+      verbose: values.verbose ?? false,
+      json: values.json ?? false,
+    })
+  );
+} else if (command === "rescore") {
+  const { rescoreRuns } = await import("./headless");
+  const ids = positionals.slice(1);
+  if (!ids.length) {
+    console.error("Usage: bun run evals rescore <run-id> [run-id…]");
+    process.exit(1);
+  }
+  process.exit(
+    await rescoreRuns({
+      ids,
+      concurrency: Math.max(1, Number(values.concurrency) || 6),
+    })
+  );
 } else if (command === "run" || command === "box") {
   const suiteId = positionals[1];
   if (!suiteId) {

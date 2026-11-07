@@ -2,6 +2,7 @@ import { CONTENT_AGENT_PROFILES } from "@notra/ai/constants/content-agents";
 import { CONTENT_AGENT_MODEL } from "@notra/ai/constants/models";
 import type { ContentAgentProfile } from "@notra/ai/types/agents";
 
+import { CONTENT_SCORING_VERSION } from "../constants/scoring";
 import {
   findScenario,
   type ContentScenario,
@@ -12,7 +13,9 @@ import {
   runDraftStage,
   transcriptFor,
 } from "../harness/content-harness";
-import { sourceDataFor } from "../scoring/content-post";
+import { combineScore, gatesPassed } from "../scoring/combine";
+import { brandReferencesFor, sourceDataFor } from "../scoring/content-post";
+import { GROUNDED_QUESTION, groundedField } from "../scoring/grounding";
 import { judgeWithJev } from "../scoring/jev-judge";
 import { countDashes, slopHits } from "../scoring/text-checks";
 import type { EvalCase, EvalSuite, FieldScore } from "../types/eval";
@@ -113,13 +116,8 @@ Es ist nicht nur ein Update, es ist ein Versprechen.`,
   },
 ];
 
-const QUESTIONS_BASE = {
-  grounded: {
-    type: "boolean",
-    instructions:
-      "Is every factual claim in revised supported by original or sourceData? Rewording is fine; invented numbers, features or outcomes are not.",
-  },
-} as const;
+const GROUNDED_WEIGHT = 3;
+const FACTS_WEIGHT = 2;
 
 function factQuestions(facts: readonly string[]) {
   const questions: Record<string, { type: "boolean"; instructions: string }> =
@@ -127,7 +125,7 @@ function factQuestions(facts: readonly string[]) {
   facts.forEach((fact, index) => {
     questions[`fact${index}`] = {
       type: "boolean",
-      instructions: `Does revised still communicate this fact (any wording or language): "${fact}"?`,
+      instructions: `Does post still communicate this fact (any wording or language): "${fact}"?`,
     };
   });
   return questions;
@@ -165,6 +163,7 @@ export const contentUnslopSuite: EvalSuite<
     "anthropic/claude-sonnet-5",
     "openai/gpt-6-sol",
   ],
+  scoringVersion: CONTENT_SCORING_VERSION,
   timeoutMs: 120_000,
   run: (input, ctx) =>
     runDraftStage({
@@ -191,10 +190,16 @@ export const contentUnslopSuite: EvalSuite<
         score: 0,
         pass: false,
         fields: [
-          { field: "saved", score: 0, note: `decision ${output.decision}` },
+          {
+            field: "saved",
+            score: 0,
+            gate: true,
+            note: `decision ${output.decision}`,
+          },
         ],
       };
     }
+    const scenario = testCase.input.scenario;
     const original = `${testCase.input.draftTitle}\n${testCase.input.draft}`;
     const revised = `${post.title}\n${post.markdown}`;
     const before = slopHits(original).length;
@@ -203,11 +208,12 @@ export const contentUnslopSuite: EvalSuite<
       feature: "unslop-judge",
       state: {
         original,
-        revised,
-        sourceData: sourceDataFor(testCase.input.scenario),
+        post: revised,
+        sourceData: sourceDataFor(scenario),
+        brandReferences: brandReferencesFor(scenario),
       },
       questions: {
-        ...QUESTIONS_BASE,
+        grounded: GROUNDED_QUESTION,
         ...factQuestions(testCase.expected.facts),
       },
       abortSignal: ctx.abortSignal,
@@ -221,33 +227,37 @@ export const contentUnslopSuite: EvalSuite<
       factValues.filter((value) => value >= 0.5).length /
       Math.max(1, factValues.length);
     const dashes = countDashes(revised);
+    const grounded = groundedField(
+      verdict.values.grounded ?? 0,
+      GROUNDED_WEIGHT
+    );
     const fields: FieldScore[] = [
+      {
+        field: "no-dashes",
+        score: dashes === 0 ? 1 : 0,
+        gate: true,
+        note: dashes ? `${dashes} dashes` : undefined,
+      },
       {
         field: "slop-removed",
         score: before === 0 ? 1 : Math.max(0, 1 - after.length / before),
         note: after.join(", ") || undefined,
       },
       {
-        field: "no-dashes",
-        score: dashes === 0 ? 1 : 0,
-        note: dashes ? `${dashes} dashes` : undefined,
-      },
-      {
         field: "facts-kept",
         score: factsKept,
+        weight: FACTS_WEIGHT,
         note: `${Math.round(factsKept * factValues.length)}/${factValues.length}`,
       },
-      { field: "grounded", score: verdict.values.grounded ?? 0 },
+      grounded,
     ];
-    const score =
-      fields.reduce((sum, item) => sum + item.score, 0) / fields.length;
     return {
-      score,
+      score: combineScore(fields),
       pass:
+        gatesPassed(fields) &&
         factsKept === 1 &&
-        dashes === 0 &&
         after.length === 0 &&
-        (verdict.values.grounded ?? 0) >= 0.5,
+        grounded.score === 1,
       fields,
       judgeCostUsd: verdict.costUsd,
       judgeCostSource: verdict.costSource,

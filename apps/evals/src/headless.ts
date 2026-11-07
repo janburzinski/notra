@@ -2,11 +2,12 @@ import { contenderFromId } from "./constants/contenders";
 import { allPrices } from "./models/pricing";
 import { startRun } from "./runner/run-eval";
 import { loadPickerSettings } from "./store/picker-settings";
-import { listRuns } from "./store/runs";
+import { createRunId, listRuns, loadRun, saveRun } from "./store/runs";
 import { getSuite, SUITES } from "./suites/registry";
-import type { EvalRun } from "./types/eval";
+import type { AnySuite, EvalRun, TaskResult } from "./types/eval";
 import { pad, padStart } from "./utils/charts";
 import { formatPerThousand, pickForSuite } from "./utils/picker";
+import { inPool } from "./utils/pool";
 import { formatMs, formatPct, formatUsd, summarizeRun } from "./utils/stats";
 
 export interface HeadlessArgs {
@@ -104,6 +105,77 @@ export async function runHeadless(args: HeadlessArgs): Promise<number> {
     printSummary(run);
   }
   return run.tasks.some((task) => task.status === "error") ? 2 : 0;
+}
+
+/**
+ * Copies saved runs under new ids and scores their stored outputs again, so a
+ * scoring change can be compared without paying for the model calls twice.
+ * Tasks that never produced output keep their error.
+ */
+export async function rescoreRuns(args: {
+  ids: readonly string[];
+  concurrency: number;
+}): Promise<number> {
+  const sources = await Promise.all(args.ids.map((id) => loadRun(id)));
+  let failed = false;
+  const jobs: { run: EvalRun; suite: AnySuite; task: TaskResult }[] = [];
+  const copies: { sourceId: string; run: EvalRun }[] = [];
+  sources.forEach((source, index) => {
+    const suite = source && getSuite(source.config.suiteId);
+    if (!source || !suite) {
+      console.error(`Skipping ${args.ids[index]}: run or suite not found`);
+      failed = true;
+      return;
+    }
+    const run: EvalRun = {
+      ...source,
+      id: createRunId(suite.id, source.config.demo),
+      createdAt: new Date().toISOString(),
+      scoringVersion: suite.scoringVersion,
+      tasks: source.tasks.map((task) => ({ ...task })),
+    };
+    copies.push({ sourceId: source.id, run });
+    for (const task of run.tasks) {
+      if (task.called) {
+        jobs.push({ run, suite, task });
+      }
+    }
+  });
+
+  await inPool(jobs, args.concurrency, async ({ run, suite, task }) => {
+    const testCase = suite.cases.find((item) => item.id === task.caseId);
+    if (!testCase) {
+      task.status = "error";
+      task.score = undefined;
+      task.error = "Case no longer exists in this suite.";
+      return;
+    }
+    try {
+      task.score = await suite.score(task.output, testCase, {
+        abortSignal: AbortSignal.timeout(60_000),
+        demo: run.config.demo,
+      });
+      task.status = "done";
+      task.error = undefined;
+    } catch (error) {
+      task.status = "error";
+      task.score = undefined;
+      task.error = `Scoring failed: ${error instanceof Error ? error.message : String(error)}`;
+    }
+  });
+
+  await Promise.all(
+    copies.map(({ run }) => {
+      run.finishedAt = new Date().toISOString();
+      return saveRun(run);
+    })
+  );
+  for (const { sourceId, run } of copies) {
+    console.log(`\n${sourceId}\n  → rescored as ${run.id}`);
+    printSummary(run);
+    failed ||= run.tasks.some((task) => task.status === "error");
+  }
+  return failed ? 2 : 0;
 }
 
 export function printSuites() {

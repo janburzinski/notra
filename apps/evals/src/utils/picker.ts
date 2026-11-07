@@ -2,13 +2,18 @@ import { CONTENDER_CATALOG, contenderFromId } from "../constants/contenders";
 import {
   COST_INCLUDED_IN,
   DEFAULT_VOLUME,
+  DROP_EPSILON,
   MAX_ERROR_RATE,
+  MAX_GROUNDED_DROP,
+  MAX_PASS_RATE_DROP,
   MIN_CASES,
 } from "../constants/picker";
+import { DEFAULT_SCORING_VERSION } from "../constants/scoring";
 import type { ModelPrice } from "../models/pricing";
 import type { AnySuite, EvalRun, TaskResult } from "../types/eval";
 import type {
   Candidate,
+  CaseOutcome,
   MeasuredModel,
   ModelEvidence,
   PickerSettings,
@@ -57,6 +62,17 @@ function evidenceFromTasks(
   const cost = aggregateCosts(attempted);
   const costKnown = cost.costUsd !== undefined;
   const scores = finished.map((task) => task.score?.score ?? 0);
+  const groundedOf = (task: TaskResult) =>
+    task.score?.fields.find((item) => item.field === "grounded")?.score;
+  const byCase: Record<string, CaseOutcome> = {};
+  for (const caseId of new Set(finished.map((task) => task.caseId))) {
+    const own = finished.filter((task) => task.caseId === caseId);
+    const ownGrounded = own.flatMap((task) => groundedOf(task) ?? []);
+    byCase[caseId] = {
+      pass: mean(own.map((task) => (task.score?.pass ? 1 : 0))),
+      grounded: ownGrounded.length ? mean(ownGrounded) : undefined,
+    };
+  }
   const contender = run.config.contenders.find(
     (item) => item.modelId === modelId
   );
@@ -71,6 +87,7 @@ function evidenceFromTasks(
     score: mean(scores),
     scoreSe: standardError(scores),
     passRate: mean(finished.map((task) => (task.score?.pass ? 1 : 0))),
+    byCase,
     p50Ms: percentile(
       finished.map((task) => task.durationMs ?? 0).filter((ms) => ms > 0),
       50
@@ -82,17 +99,23 @@ function evidenceFromTasks(
   };
 }
 
+/** Latest run per model, among runs scored with the suite's current scoringVersion (rescore older ones). */
 export function collectEvidence(
   runs: readonly EvalRun[],
-  suiteId: string,
+  suite: AnySuite,
   demo: boolean
 ): MeasuredModel[] {
+  const version = suite.scoringVersion ?? DEFAULT_SCORING_VERSION;
   const latest = new Map<string, MeasuredModel>();
   const ordered = [...runs].sort((a, b) =>
     b.createdAt.localeCompare(a.createdAt)
   );
   for (const run of ordered) {
-    if (run.config.suiteId !== suiteId || run.config.demo !== demo) {
+    if (
+      run.config.suiteId !== suite.id ||
+      run.config.demo !== demo ||
+      (run.scoringVersion ?? DEFAULT_SCORING_VERSION) !== version
+    ) {
       continue;
     }
     for (const contender of run.config.contenders) {
@@ -152,6 +175,43 @@ function averageTokens(
   return count ? { input: input / count, output: output / count } : undefined;
 }
 
+function sharedDrop(
+  item: MeasuredModel,
+  prod: MeasuredModel,
+  value: (outcome: CaseOutcome) => number | undefined
+): { drop: number; cases: number } {
+  const drops: number[] = [];
+  for (const [caseId, outcome] of Object.entries(item.byCase)) {
+    const baseOutcome = prod.byCase[caseId];
+    const own = value(outcome);
+    const base = baseOutcome && value(baseOutcome);
+    if (own !== undefined && base !== undefined) {
+      drops.push(base - own);
+    }
+  }
+  return { drop: mean(drops), cases: drops.length };
+}
+
+/** Compares with production on the cases both runs scored, each case weighted equally. */
+function blockerVersusProd(
+  item: MeasuredModel,
+  prod: MeasuredModel,
+  minCases: number
+): string | undefined {
+  const pass = sharedDrop(item, prod, (outcome) => outcome.pass);
+  if (pass.cases < minCases) {
+    return `only ${pass.cases} cases shared with prod`;
+  }
+  if (pass.drop > MAX_PASS_RATE_DROP + DROP_EPSILON) {
+    return `pass rate ${(pass.drop * 100).toFixed(0)} pts below prod`;
+  }
+  const grounded = sharedDrop(item, prod, (outcome) => outcome.grounded);
+  if (grounded.cases && grounded.drop > MAX_GROUNDED_DROP + DROP_EPSILON) {
+    return `grounding ${(grounded.drop * 100).toFixed(0)} pts below prod`;
+  }
+  return undefined;
+}
+
 export function pickForSuite({
   suite,
   runs,
@@ -165,13 +225,14 @@ export function pickForSuite({
   settings: PickerSettings;
   prices: Readonly<Record<string, ModelPrice>>;
 }): SuitePick {
-  const raw = collectEvidence(runs, suite.id, demo);
+  const raw = collectEvidence(runs, suite, demo);
   const minCases = Math.min(MIN_CASES, suite.cases.length);
   const trusted = raw.filter(
     (item) => item.cases >= minCases && item.errorRate <= MAX_ERROR_RATE
   );
   const bestScore = Math.max(0, ...trusted.map((item) => item.score));
   const bar = bestScore - settings.tolerancePts / 100;
+  const prod = trusted.find((item) => item.modelId === suite.productionModel);
 
   const evidence: ModelEvidence[] = raw
     .map((item) => {
@@ -184,6 +245,8 @@ export function pickForSuite({
         blocker = `${Math.round(item.errorRate * 100)}% errors`;
       } else if (item.score < bar) {
         blocker = `${((bestScore - item.score) * 100).toFixed(1)} pts below best`;
+      } else if (prod && item !== prod) {
+        blocker = blockerVersusProd(item, prod, minCases);
       }
       return {
         ...item,
