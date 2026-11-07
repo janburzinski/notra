@@ -19,6 +19,7 @@ import {
   PUBLIC_DATA_DETAIL_DAYS,
   PUBLIC_DATA_MEMORY_TTL_MS,
   PUBLIC_DATA_ROLLING_DAYS,
+  PUBLIC_DATA_INGEST_GAP,
   PUBLIC_DATA_SITE_CAP_FACTOR,
 } from "@/constants/public-data";
 import { realTrafficProjectIds } from "@/lib/analytics/real-traffic-projects";
@@ -82,7 +83,8 @@ async function computeSnapshot(
       date_to: window.toExclusive,
       window_days: PUBLIC_DATA_ROLLING_DAYS,
       excluded_project_ids: excluded.join(","),
-      site_cap_factor: PUBLIC_DATA_SITE_CAP_FACTOR,
+      skip_from: PUBLIC_DATA_INGEST_GAP.from,
+      skip_to: PUBLIC_DATA_INGEST_GAP.to,
       ...hidden,
     }),
     queryGeoTrafficTrendsDetail({

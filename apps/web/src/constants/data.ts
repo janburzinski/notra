@@ -13,6 +13,16 @@ export const DATA_CTA_HEADING = "See the AI traffic on your own site";
 export const DATA_CTA_SUBCOPY =
   "Notra shows which AI crawlers read your pages and which assistants send you visitors.";
 
+/**
+ * Days most AI traffic events were lost at ingest; the dashboard leaves them
+ * out of the chart's averages. Noted while a charted week still reaches them:
+ * the first chart day's week starts six days before the window does.
+ */
+export const DATA_INGEST_GAP = {
+  notedUntil: "2026-11-10",
+  note: "Oct 31 – Nov 4 are left out of the averages: most events from those days were lost at ingest.",
+};
+
 /** The dashboard publishes the snapshot; it holds the analytics credentials. */
 export const DATA_SNAPSHOT_PATH = "/api/public/data/ai-traffic";
 /** Refetch at most this often per server instance; snapshots change once a day. */

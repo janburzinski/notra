@@ -24,15 +24,25 @@ export const PUBLIC_DATA_TOP_COUNTRIES = 20;
  * number describes a single customer.
  */
 export const PUBLIC_DATA_MIN_SITES = 3;
+/**
+ * Trends pipes key traffic sent without a project (an organization-wide
+ * token) as `org:<organization id>`, one site per organization.
+ */
+export const TRAFFIC_ORG_SITE_PREFIX = "org:";
+/**
+ * Days most AI traffic events were lost at ingest: a retired signing secret
+ * rejected older tracking tokens. The chart's rolling windows leave them out.
+ */
+export const PUBLIC_DATA_INGEST_GAP = { from: "2026-10-31", to: "2026-11-04" };
 /** Below this many measured sites nothing is published at all. */
 export const PUBLIC_DATA_MIN_TOTAL_SITES = 10;
 /**
  * A site counts with at most this many times the median site's visits for a
  * bot or assistant, and never more than all other sites together, so one large
- * site neither sets nor dominates a published figure. The daily pipe applies
- * it per day (`site_cap_factor`), the builder per week. The rolling chart pipe
- * keeps only the median cap: its per-site average spreads one large site over
- * all the others anyway.
+ * site neither sets nor dominates a published share. The daily pipe applies
+ * it per day (`site_cap_factor`), the builder per week. The chart leaves it
+ * off: with few, uneven sites the median swings, and the cap would follow it
+ * instead of the traffic.
  */
 export const PUBLIC_DATA_SITE_CAP_FACTOR = 5;
 

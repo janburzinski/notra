@@ -6,6 +6,14 @@ import {
 } from "../../constants/geo-queries";
 
 /**
+ * The site an event belongs to: its project, or for events sent with an
+ * organization-wide token (no project) one site per organization, so those
+ * never pool into a single empty-id site across customers.
+ */
+const SITE_KEY_SQL =
+  "if(project_id = '', concat('org:', organization_id), project_id)";
+
+/**
  * Cross-organization AI traffic for the Notra admin console. Unlike the
  * `geo_traffic_*` endpoints these are not scoped to one organization; the
  * console calls them through the dashboard's internal route with an admin
@@ -17,7 +25,9 @@ const TRENDS_PARAMS = {
   excluded_project_ids: p
     .string()
     .optional("")
-    .describe("Comma-separated project ids to leave out, empty for none"),
+    .describe(
+      "Comma-separated sites to leave out: project ids, or org:<id> for traffic sent without a project; empty for none"
+    ),
   ...GEO_EXCLUDED_SOURCES_PARAMS,
 };
 
@@ -32,7 +42,7 @@ const trendsScopeSql = (fromSql: string) => `
           AND visitor_type IN ('crawler', 'ai_referral')
           AND (
             {{String(excluded_project_ids, '')}} = ''
-            OR NOT has(splitByChar(',', {{String(excluded_project_ids, '')}}), project_id)
+            OR NOT has(splitByChar(',', {{String(excluded_project_ids, '')}}), ${SITE_KEY_SQL})
           )
           ${GEO_EXCLUDED_SOURCES_SQL}`;
 
@@ -63,7 +73,7 @@ export const geoTrafficTrendsDaily = defineEndpoint(
           day,
           visitor_type,
           source,
-          project_id,
+          ${SITE_KEY_SQL} AS project_id,
           anyMerge(category_state) AS project_category,
           countMerge(visits_state) AS project_visits,
           countIfMerge(markdown_visits_state) AS project_markdown_visits
@@ -134,7 +144,7 @@ export const geoTrafficTrendsDaily = defineEndpoint(
           day,
           countMerge(visits_state) AS visits,
           countIfMerge(markdown_visits_state) AS markdown_visits,
-          uniqExact(project_id) AS projects
+          uniqExact(${SITE_KEY_SQL}) AS projects
         FROM geo_traffic_daily
         WHERE ${TRENDS_SCOPE_SQL}
         GROUP BY day
@@ -211,8 +221,20 @@ export const geoTrafficTrendsRolling = defineEndpoint(
         .describe(
           "Cap each site at this many times the median site's visits; 0 keeps raw counts"
         ),
+      skip_from: p
+        .string()
+        .optional("")
+        .describe(
+          "First day (YYYY-MM-DD) of a range to leave out, e.g. lost at ingest; empty for none"
+        ),
+      skip_to: p
+        .string()
+        .optional("")
+        .describe("Last day (YYYY-MM-DD) of that range, inclusive"),
     },
     nodes: [
+      // Skipped days drop out of every window, so its average covers the
+      // days that were measured instead of counting lost ones as zero.
       node({
         name: "rolling_project_days",
         sql: `
@@ -220,12 +242,18 @@ export const geoTrafficTrendsRolling = defineEndpoint(
           day,
           visitor_type,
           source,
-          project_id,
+          ${SITE_KEY_SQL} AS project_id,
           anyMerge(category_state) AS project_category,
           countMerge(visits_state) AS day_visits,
           countIfMerge(markdown_visits_state) AS day_markdown_visits
         FROM geo_traffic_daily
         WHERE ${trendsScopeSql(`${TRENDS_FROM_SQL} - (${ROLLING_DAYS_SQL} - 1)`)}
+          AND (
+            {{String(skip_from, '')}} = ''
+            OR {{String(skip_to, '')}} = ''
+            OR day < toDateOrNull({{String(skip_from, '')}})
+            OR day > toDateOrNull({{String(skip_to, '')}})
+          )
         GROUP BY day, visitor_type, source, project_id
       `,
       }),
@@ -396,7 +424,7 @@ export const geoTrafficTrendsProjects = defineEndpoint(
         name: "project_sources",
         sql: `
         SELECT
-          project_id,
+          ${SITE_KEY_SQL} AS project_id,
           visitor_type,
           source,
           toUInt32(greatest(
@@ -431,7 +459,7 @@ const DETAIL_SCOPE_SQL = `
           AND visitor_type IN ('crawler', 'ai_referral')
           AND (
             {{String(excluded_project_ids, '')}} = ''
-            OR NOT has(splitByChar(',', {{String(excluded_project_ids, '')}}), project_id)
+            OR NOT has(splitByChar(',', {{String(excluded_project_ids, '')}}), ${SITE_KEY_SQL})
           )
           ${GEO_EXCLUDED_SOURCES_SQL}`;
 
@@ -465,14 +493,16 @@ export const geoTrafficTrendsDetail = defineEndpoint(
       excluded_project_ids: p
         .string()
         .optional("")
-        .describe("Comma-separated project ids to leave out, empty for none"),
+        .describe(
+          "Comma-separated sites to leave out: project ids, or org:<id> for traffic sent without a project; empty for none"
+        ),
       ...GEO_EXCLUDED_SOURCES_PARAMS,
     },
     nodes: [
       node({
         name: "scoped_events",
         sql: `
-        SELECT visitor_type, project_id, source, captured_at, country, path
+        SELECT visitor_type, ${SITE_KEY_SQL} AS project_id, source, captured_at, country, path
         FROM geo_traffic_events
         WHERE ${DETAIL_SCOPE_SQL}
       `,
