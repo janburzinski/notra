@@ -1,0 +1,19 @@
+.agents/skills/weekly-changelog/SKILL.md
+  s_0df55d3d4ac7a6::t_772ebb39851ecd 1-122
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "6bb6b44c6b5ddfc2ebdab8d93313f96927952dc2",
+  "prompts": {},
+  "sessions": {
+    "s_0df55d3d4ac7a6": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9caa87e9-6b3c-47c2-8e3c-9ee4fd7ac75f",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
