@@ -53,6 +53,10 @@ export const siteAnalyticsInputSchema = siteScopeInputSchema.extend({
   path: z.string().trim().max(2048).optional(),
 });
 
+export const siteVisitorTotalsInputSchema = siteAnalyticsInputSchema.omit({
+  path: true,
+});
+
 const suggestionRef = z.string().trim().max(250).optional();
 
 export const repositorySuggestionsInputSchema = z.object({

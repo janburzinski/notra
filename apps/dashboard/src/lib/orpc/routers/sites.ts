@@ -15,7 +15,10 @@ import {
   sites,
 } from "@notra/db/schema";
 import { withAdvisorySessionLocks } from "@notra/db/utils/advisory-session-lock";
-import { loadSiteAnalytics } from "@notra/geo-core/geo/web-analytics";
+import {
+  loadSiteAnalytics,
+  loadSiteVisitorTotals,
+} from "@notra/geo-core/geo/web-analytics";
 import { geoWindow } from "@notra/geo-core/geo/window";
 import { organizationIdInputSchema } from "@notra/schemas/dashboard/auth/organization";
 import {
@@ -50,6 +53,7 @@ import {
   sitePreviewInputSchema,
   siteAnalyticsInputSchema,
   siteScopeInputSchema,
+  siteVisitorTotalsInputSchema,
   siteSetPreviewPasswordInputSchema,
   siteStarterInputSchema,
   updatePostPreviewAccessInputSchema,
@@ -602,6 +606,18 @@ export const sitesRouter = {
       const { site } = await requireSite(context, input);
       return runOrpcEffect(
         loadSiteAnalytics(site, geoWindow(input), input.path).pipe(
+          Effect.provide(geoCoreDashboardLayer)
+        ),
+        toGeoOrpcError
+      );
+    }),
+
+  visitorTotals: sitesProcedure
+    .input(siteVisitorTotalsInputSchema)
+    .handler(async ({ context, input }) => {
+      const { site } = await requireSite(context, input);
+      return runOrpcEffect(
+        loadSiteVisitorTotals(site, geoWindow(input)).pipe(
           Effect.provide(geoCoreDashboardLayer)
         ),
         toGeoOrpcError

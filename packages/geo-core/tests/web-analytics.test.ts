@@ -71,7 +71,7 @@ if (!isIsolatedTestWorker(import.meta.url)) {
     queryGeoTrafficTimeseries: query,
     queryGeoTrafficPages: query,
   }));
-  const { loadWebAnalytics, loadSiteAnalytics } =
+  const { loadWebAnalytics, loadSiteAnalytics, loadSiteVisitorTotals } =
     await import("../src/geo/web-analytics");
   const { GeoProjectNotFoundError, GeoTinybirdError } =
     await import("../src/geo/errors");
@@ -176,6 +176,33 @@ if (!isIsolatedTestWorker(import.meta.url)) {
       );
     }
   );
+
+  test("site visitor totals run only the overview query of site analytics", async () => {
+    const scope = await seedProject("site-totals");
+    const site = {
+      ...scope,
+      id: "site-test",
+      publicOrigin: "https://site.example",
+    };
+    views = 4;
+    const totals = await Effect.runPromise(
+      loadSiteVisitorTotals(site, { days: 7 })
+    );
+    expect(totals.visitors).toBe(4);
+    expect(requests).toHaveLength(1);
+    const totalsRequests = [...requests];
+    requests.length = 0;
+    await Effect.runPromise(loadSiteAnalytics(site, { days: 7 }));
+    expect(requests).toEqual(expect.arrayContaining(totalsRequests));
+
+    failedQuery = "overview";
+    const failed = await Effect.runPromise(
+      Effect.result(loadSiteVisitorTotals(site, { days: 7 }))
+    );
+    expect(failed._tag === "Failure" && failed.failure).toBeInstanceOf(
+      GeoTinybirdError
+    );
+  });
 
   test("unconfigured site analytics keeps its unavailable signal", async () => {
     const scope = await seedProject("unconfigured-site");

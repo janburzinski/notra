@@ -2090,7 +2090,7 @@ export interface WebAnalyticsScope {
   hosts: string[];
 }
 
-interface WebAnalyticsTotals {
+export interface WebAnalyticsTotals {
   views: number;
   previousViews: number;
   visitors: number;

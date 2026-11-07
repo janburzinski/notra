@@ -160,6 +160,22 @@ export function useSiteAnalytics(
   });
 }
 
+export function useSiteVisitorTotals(
+  organizationId: string,
+  siteId: string,
+  window: SiteAnalyticsWindow
+) {
+  return useQuery({
+    ...dashboardOrpc.sites.visitorTotals.queryOptions({
+      input: { organizationId, siteId, ...window },
+      enabled: organizationId.length > 0,
+      refetchInterval: SITE_ANALYTICS_POLL_INTERVAL_MS,
+      refetchIntervalInBackground: false,
+    }),
+    placeholderData: keepPreviousData,
+  });
+}
+
 export function useInvalidateSites() {
   const queryClient = useQueryClient();
   return () =>

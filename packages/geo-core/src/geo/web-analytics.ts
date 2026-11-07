@@ -12,6 +12,7 @@ import {
 import type {
   WebAudienceRow,
   WebEngagementRow,
+  WebOverviewRow,
 } from "@notra/analytics/types/tinybird-endpoints";
 import { isDemoMode } from "@notra/utils/demo-mode";
 import { Effect } from "effect";
@@ -32,6 +33,7 @@ import type {
   WebAnalyticsPart,
   WebAnalyticsResponse,
   WebAnalyticsScope,
+  WebAnalyticsTotals,
   WebEngagement,
 } from "../types/geo";
 import { webHostFilter } from "../utils/geo-project-domains";
@@ -70,12 +72,25 @@ function toEngagement(
   };
 }
 
-const loadWebAnalyticsForScope = Effect.fn("web.analytics")(function* (
+function toWebTotals(row: WebOverviewRow | undefined): WebAnalyticsTotals {
+  return {
+    views: Number(row?.views ?? 0),
+    previousViews: Number(row?.previous_views ?? 0),
+    visitors: Number(row?.visitors ?? 0),
+    previousVisitors: Number(row?.previous_visitors ?? 0),
+    sessions: Number(row?.sessions ?? 0),
+    previousSessions: Number(row?.previous_sessions ?? 0),
+    engagedSessions: Number(row?.engaged_sessions ?? 0),
+    aiVisitors: Number(row?.ai_visitors ?? 0),
+    previousAiVisitors: Number(row?.previous_ai_visitors ?? 0),
+  };
+}
+
+function webQueryParams(
   scope: WebAnalyticsScope,
   window: GeoWindowInput,
   path: string,
-  sites: GeoTrafficSitesMode | undefined = undefined,
-  part: WebAnalyticsPart = "all"
+  sites: GeoTrafficSitesMode | undefined
 ) {
   const base = {
     organization_id: scope.organizationId,
@@ -90,6 +105,27 @@ const loadWebAnalyticsForScope = Effect.fn("web.analytics")(function* (
     path,
     sites: sites ?? "",
   };
+  return { base, params };
+}
+
+function siteWebScope(site: SiteAnalyticsInput): WebAnalyticsScope {
+  return {
+    organizationId: site.organizationId,
+    projectId: null,
+    includeUnassigned: false,
+    siteId: site.id,
+    hosts: [],
+  };
+}
+
+const loadWebAnalyticsForScope = Effect.fn("web.analytics")(function* (
+  scope: WebAnalyticsScope,
+  window: GeoWindowInput,
+  path: string,
+  sites: GeoTrafficSitesMode | undefined = undefined,
+  part: WebAnalyticsPart = "all"
+) {
+  const { base, params } = webQueryParams(scope, window, path, sites);
   const configured = isTinybirdConfigured();
   const query = configured && !isDemoMode() ? geoRequiredQuery : geoQuery;
   const summary = part !== "breakdowns";
@@ -144,7 +180,6 @@ const loadWebAnalyticsForScope = Effect.fn("web.analytics")(function* (
     { concurrency: "unbounded" }
   );
 
-  const totalsRow = overview?.data[0];
   const response: WebAnalyticsResponse = {
     configured,
     hosts: (hosts?.data ?? []).map((row) => ({
@@ -152,17 +187,7 @@ const loadWebAnalyticsForScope = Effect.fn("web.analytics")(function* (
       siteId: row.site_id,
       views: Number(row.views),
     })),
-    totals: {
-      views: Number(totalsRow?.views ?? 0),
-      previousViews: Number(totalsRow?.previous_views ?? 0),
-      visitors: Number(totalsRow?.visitors ?? 0),
-      previousVisitors: Number(totalsRow?.previous_visitors ?? 0),
-      sessions: Number(totalsRow?.sessions ?? 0),
-      previousSessions: Number(totalsRow?.previous_sessions ?? 0),
-      engagedSessions: Number(totalsRow?.engaged_sessions ?? 0),
-      aiVisitors: Number(totalsRow?.ai_visitors ?? 0),
-      previousAiVisitors: Number(totalsRow?.previous_ai_visitors ?? 0),
-    },
+    totals: toWebTotals(overview?.data[0]),
     points: (timeseries?.data ?? []).map((row) => ({
       day: row.day,
       views: Number(row.views),
@@ -220,13 +245,7 @@ export const loadSiteAnalytics = Effect.fn("web.siteAnalytics")(function* (
   window: GeoWindowInput,
   path = ""
 ) {
-  const scope: WebAnalyticsScope = {
-    organizationId: site.organizationId,
-    projectId: null,
-    includeUnassigned: false,
-    siteId: site.id,
-    hosts: [],
-  };
+  const scope = siteWebScope(site);
   const query =
     isTinybirdConfigured() && !isDemoMode() ? geoRequiredQuery : geoQuery;
   const [web, traffic, engagement] = yield* Effect.all(
@@ -264,3 +283,25 @@ export const loadSiteAnalytics = Effect.fn("web.siteAnalytics")(function* (
   };
   return response;
 });
+
+/**
+ * A site's visitor totals alone, for lists that show one number per site.
+ * Uses the same overview parameters as `loadSiteAnalytics`, so both read the
+ * same cached result.
+ */
+export const loadSiteVisitorTotals = Effect.fn("web.siteVisitorTotals")(
+  function* (site: SiteAnalyticsInput, window: GeoWindowInput) {
+    const { params } = webQueryParams(
+      siteWebScope(site),
+      window,
+      "",
+      undefined
+    );
+    const query =
+      isTinybirdConfigured() && !isDemoMode() ? geoRequiredQuery : geoQuery;
+    const overview = yield* query("web overview query failed", () =>
+      queryWebOverview(params)
+    );
+    return toWebTotals(overview?.data[0]);
+  }
+);

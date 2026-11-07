@@ -39,7 +39,7 @@ import {
 } from "@/components/sites/site-status-badge";
 import { SITE_OVERVIEW_ANALYTICS_DAYS } from "@/constants/sites";
 import { useRedeployDeployment } from "@/lib/hooks/use-site-deployments";
-import { useSiteAnalytics } from "@/lib/hooks/use-sites";
+import { useSiteVisitorTotals } from "@/lib/hooks/use-sites";
 import type {
   SiteListCardProps,
   SitesListProps,
@@ -56,10 +56,9 @@ function SiteVisitorsSummary({
 }: SiteVisitorsSummaryProps) {
   const locale = useLocale();
   const t = useTranslations("sites.list");
-  const query = useSiteAnalytics(organizationId, site.id, {
+  const { data: totals } = useSiteVisitorTotals(organizationId, site.id, {
     days: SITE_OVERVIEW_ANALYTICS_DAYS,
   });
-  const totals = query.data?.web.totals;
   if (!totals) {
     return null;
   }
