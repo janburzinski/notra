@@ -7327,6 +7327,8 @@
         "x": "X",
         "linkedin": "LinkedIn",
         "github": "GitHub",
+        "bluesky": "Bluesky",
+        "mastodon": "Mastodon",
         "save": "Autor speichern",
         "saved": "Autor gespeichert",
         "deleted": "Autor gelöscht",

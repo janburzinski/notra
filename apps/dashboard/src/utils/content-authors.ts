@@ -22,6 +22,8 @@ export function serializeContentAuthor(
     x: row.x,
     linkedin: row.linkedin,
     github: row.github,
+    bluesky: row.bluesky,
+    mastodon: row.mastodon,
     userId: row.userId,
   };
 }

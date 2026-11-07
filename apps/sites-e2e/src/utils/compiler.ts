@@ -74,6 +74,14 @@ async function compileWith(
     );
     // The only built-in script loaded on demand; content.ts checks it renders under the CSP.
     config.blog = { ...config.blog, hero: { style: "dither" } };
+    // Profile links content.ts expects in the author-hero slot and JSON-LD.
+    config.authors.jan = {
+      ...config.authors.jan,
+      bluesky: "https://bsky.app/profile/janburzinski.bsky.social",
+      mastodon: "https://hachyderm.io/@janburzinski",
+      threads: "https://www.threads.net/@janburzinski",
+      instagram: "https://www.instagram.com/janburzinski",
+    };
     // Placeholder redirects; worker.ts checks the Worker fills them in.
     config.redirects = [
       ...config.redirects,

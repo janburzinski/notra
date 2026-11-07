@@ -64,6 +64,11 @@ const redirectSchema = z
     }
   });
 
+const webLinkSchema = z.url({
+  protocol: /^https?$/,
+  error: "Use a full http(s):// URL",
+});
+
 const siteAuthorSchema = z.strictObject({
   name: z.string().trim().min(1).max(80),
   title: z.string().trim().max(80).optional(),
@@ -81,6 +86,10 @@ const siteAuthorSchema = z.strictObject({
   linkedin: z.url().optional(),
   github: z.url().optional(),
   youtube: z.url().optional(),
+  bluesky: webLinkSchema.optional(),
+  mastodon: webLinkSchema.optional(),
+  threads: webLinkSchema.optional(),
+  instagram: webLinkSchema.optional(),
 });
 const imageByModeSchema = z.object({
   light: sitePathSchema,
@@ -247,11 +256,6 @@ export const siteConfigSchema = z.object({
   security: siteSecuritySchema,
 });
 
-const frontmatterLinkSchema = z.url({
-  protocol: /^https?$/,
-  error: "Use a full http(s):// URL",
-});
-
 /** An author written inline in a post. An `id` from `authors` lets blog.json fill or override the fields. */
 export const frontmatterAuthorSchema = z.object({
   id: z
@@ -273,11 +277,15 @@ export const frontmatterAuthorSchema = z.object({
       "Use a path like /images/jan.jpg or an https:// URL"
     )
     .optional(),
-  url: frontmatterLinkSchema.optional(),
-  x: frontmatterLinkSchema.optional(),
-  linkedin: frontmatterLinkSchema.optional(),
-  github: frontmatterLinkSchema.optional(),
-  youtube: frontmatterLinkSchema.optional(),
+  url: webLinkSchema.optional(),
+  x: webLinkSchema.optional(),
+  linkedin: webLinkSchema.optional(),
+  github: webLinkSchema.optional(),
+  youtube: webLinkSchema.optional(),
+  bluesky: webLinkSchema.optional(),
+  mastodon: webLinkSchema.optional(),
+  threads: webLinkSchema.optional(),
+  instagram: webLinkSchema.optional(),
 });
 
 const frontmatterDate = z.coerce.date({

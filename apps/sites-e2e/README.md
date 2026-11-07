@@ -46,7 +46,9 @@ browser profile. The dependency installation occurs only in the current worktree
   site areas, theme toggle), global `style.css`/`script.js` under the CSP,
   absolute public-file `url()`s in site CSS loading below each area's mount,
   header/footer/after-post slot with content variables, a before-post slot
-  linking back to `area.path`, authors, blog and
+  linking back to `area.path`, authors, an author-hero slot listing the
+  author's profile links (with Bluesky, Mastodon, Threads and Instagram) and
+  post count, a frontmatter author's profile links in JSON-LD, blog and
   changelog tag pages, the changelog `Update` entry and the generated OG image.
 - Mounted assets and their bytes, cache headers and ETags, root/manifest/slash
   redirects, HTML/Markdown/HEAD 404s, negotiated/direct Markdown twins, robots,

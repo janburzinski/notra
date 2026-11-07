@@ -189,6 +189,16 @@ export const MUTATIONS: Mutation[] = [
     caughtBy: "live /blog/2026/launch: the footer links to a visible report",
   },
   {
+    id: "author-mastodon",
+    bug: "An author's Mastodon link is dropped from the author page and JSON-LD",
+    file: "apps/sites-builder/src/constants/authors.ts",
+    find: '  "mastodon",\n  "threads",',
+    replace: '  "threads",',
+    suites: ["browser"],
+    caughtBy:
+      "author-hero slot replaces the profile header with author data and keeps the back link; Bluesky, Mastodon, Threads and Instagram links reach the slot and JSON-LD",
+  },
+  {
     id: "live-noindex",
     bug: "Live pages render a noindex robots tag (and previews an indexable one)",
     file: "apps/sites-builder/src/layouts/Base.astro",

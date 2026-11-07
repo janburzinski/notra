@@ -939,6 +939,22 @@
           "youtube": {
             "type": "string",
             "format": "uri"
+          },
+          "bluesky": {
+            "type": "string",
+            "format": "uri"
+          },
+          "mastodon": {
+            "type": "string",
+            "format": "uri"
+          },
+          "threads": {
+            "type": "string",
+            "format": "uri"
+          },
+          "instagram": {
+            "type": "string",
+            "format": "uri"
           }
         },
         "required": ["name"],

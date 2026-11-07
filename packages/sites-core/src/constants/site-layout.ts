@@ -40,6 +40,7 @@ export const SITE_SLOTS_DIR = "slots";
 export const SITE_SLOT_NAMES = [
   "blog-hero",
   "changelog-hero",
+  "author-hero",
   "before-post",
   "after-post",
   "sidebar",

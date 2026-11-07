@@ -92,7 +92,9 @@ Describe the people who write for you once in `blog.json`, then name them by id 
       "url": "https://jan.dev",
       "x": "https://x.com/janburzinski",
       "linkedin": "https://www.linkedin.com/in/janburzinski",
-      "github": "https://github.com/janburzinski"
+      "github": "https://github.com/janburzinski",
+      "bluesky": "https://bsky.app/profile/janburzinski.bsky.social",
+      "mastodon": "https://hachyderm.io/@janburzinski"
     }
   }
 }
@@ -105,7 +107,9 @@ Describe the people who write for you once in `blog.json`, then name them by id 
 | `title` | Up to 80 characters |
 | `avatar` | A path like `/images/team/jan.jpg` or an `https://` URL |
 | `bio` | Up to 300 characters |
-| `url`, `x`, `linkedin`, `github`, `youtube` | Full URLs |
+| `url`, `x`, `linkedin`, `github`, `youtube`, `bluesky`, `mastodon`, `threads`, `instagram` | Full URLs |
+
+The author page shows each profile link as a button with `rel="me"`, so a Mastodon profile that links back to the author page shows the link as verified.
 
 Notra lists a known author with avatar and title under "Written by", beside the post in the wide layout or under the title otherwise (in the sidebar with the [compact header](/sites/customize/layouts#compact-post-header)), and gives them an author page at `/blog/author/jan` listing their posts. Search engines and AI answers get a schema.org `Person` with the profile links, which ties the post to a real person. Notra shows any other value in `author`, like `author: Guest Writer`, as a plain name.
 
@@ -123,6 +127,7 @@ author:
   title: Engineering
   avatar: /images/team/jan.jpg
   url: https://jan.dev
+  bluesky: https://bsky.app/profile/janburzinski.bsky.social
 ---
 ```
 

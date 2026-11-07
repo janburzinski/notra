@@ -1,0 +1,7 @@
+<div className="mx-auto max-w-(--layout-index)">
+  <h1 id="page-title">{author.name}</h1>
+  <p>E2E author hero: {author.postCount} posts by {author.title}</p>
+  <ul aria-label="Profiles">
+    {author.socials.map((social) => <li><a href={social.url} rel="me noopener">{social.label}</a></li>)}
+  </ul>
+</div>

@@ -26,6 +26,8 @@ export const CONTENT_AUTHOR_LINK_FIELDS = [
   "x",
   "linkedin",
   "github",
+  "bluesky",
+  "mastodon",
 ] as const;
 
 export const CONTENT_AUTHOR_SLUG_FALLBACK = "author";

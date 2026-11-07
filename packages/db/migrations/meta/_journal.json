@@ -1037,6 +1037,13 @@
       "when": 1793958414365,
       "tag": "0147_autopilot_workflows",
       "breakpoints": true
+    },
+    {
+      "idx": 148,
+      "version": "7",
+      "when": 1794062279171,
+      "tag": "0148_content_author_profiles",
+      "breakpoints": true
     }
   ]
 }

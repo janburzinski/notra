@@ -1,5 +1,7 @@
+import { AUTHOR_PROFILE_FIELDS } from "../constants/authors";
 import type {
   AuthorFields,
+  AuthorSocial,
   EntryAuthorRef,
   ResolvedAuthor,
 } from "../types/authors";
@@ -16,22 +18,17 @@ function authorHref(id: string): string {
 }
 
 function resolved(id: string | null, author: AuthorFields): ResolvedAuthor {
+  const profiles = AUTHOR_PROFILE_FIELDS.flatMap((kind) => {
+    const url = author[kind];
+    return url ? [{ kind, url }] : [];
+  });
   const links = [
-    author.url,
-    author.x,
-    author.linkedin,
-    author.github,
-    author.youtube,
-  ].filter((link): link is string => Boolean(link));
-  const socials = (
-    [
-      ["x", author.x],
-      ["linkedin", author.linkedin],
-      ["github", author.github],
-      ["youtube", author.youtube],
-      ["website", author.url],
-    ] as const
-  ).flatMap(([kind, url]) => (url ? [{ kind, url }] : []));
+    ...(author.url ? [author.url] : []),
+    ...profiles.map((profile) => profile.url),
+  ];
+  const socials: AuthorSocial[] = author.url
+    ? [...profiles, { kind: "website", url: author.url }]
+    : profiles;
   return {
     id,
     name: author.name,

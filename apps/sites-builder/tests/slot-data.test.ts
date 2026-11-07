@@ -12,6 +12,7 @@ const slotExtras: Record<string, string> = {
   "after-post": " data-post-url={post.url}",
   sidebar: " data-post-path={post.path}",
   "after-changelog-entry": " data-entry-path={entry.path}",
+  "author-hero": " data-author-path={author.path}",
 };
 
 const slotSource = (name: string) =>
@@ -51,6 +52,11 @@ const expected: [page: string, slot: string, attrs: object][] = [
   ],
   ["blog/index.html", "blog-hero", blog],
   ["changelog/index.html", "changelog-hero", changelog],
+  [
+    "blog/author/ada/index.html",
+    "author-hero",
+    { ...blog, "data-author-path": "/blog/author/ada" },
+  ],
   ...["changelog/index.html", "changelog/release/index.html"].map(
     (page): [string, string, object] => [
       page,
@@ -78,7 +84,7 @@ test("every slot gets site and area, with root-relative paths", async () => {
         thumbnails: { enabled: false },
       }),
       "blog/issue-004.mdx":
-        '---\ntitle: "Issue 004"\ndate: 2026-10-09\n---\n\nBody.\n',
+        '---\ntitle: "Issue 004"\ndate: 2026-10-09\nauthor:\n  id: ada\n  name: Ada\n---\n\nBody.\n',
       "changelog/release.mdx":
         '---\ntitle: "Release"\ndate: 2026-10-09\nversion: "2.0"\n---\n\nShipped.\n',
       ...Object.fromEntries(

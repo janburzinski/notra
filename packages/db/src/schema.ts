@@ -2785,6 +2785,8 @@ export const contentAuthors = pgTable(
     x: text("x"),
     linkedin: text("linkedin"),
     github: text("github"),
+    bluesky: text("bluesky"),
+    mastodon: text("mastodon"),
     userId: text("user_id").references(() => users.id, {
       onDelete: "set null",
     }),

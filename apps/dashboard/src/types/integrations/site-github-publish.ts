@@ -21,6 +21,8 @@ export interface SiteEntryAuthor {
   x?: string | null;
   linkedin?: string | null;
   github?: string | null;
+  bluesky?: string | null;
+  mastodon?: string | null;
 }
 
 /** Post metadata edited in Notra. Unset values keep what the repo file has. */

@@ -347,6 +347,96 @@ export async function assertContentFeatures(
   assert.equal(new URL(page.url()).pathname, "/blog");
   checks.push("before-post slot links back to area.path");
 
+  const authorPage = await page.goto(`${origin}/blog/author/jan`, {
+    waitUntil: "domcontentloaded",
+  });
+  await waitForResources();
+  assert.equal(authorPage?.status(), 200);
+  const authorHero = page.locator('[data-slot="author-hero"]');
+  assert.equal(await page.locator(".author-profile").count(), 0);
+  assert.equal(
+    await authorHero.evaluate((slot) =>
+      [...document.querySelectorAll('#content-area a[href="/blog"]')].some(
+        (link) =>
+          !slot.contains(link) &&
+          Boolean(
+            link.compareDocumentPosition(slot) &
+            Node.DOCUMENT_POSITION_FOLLOWING
+          )
+      )
+    ),
+    true,
+    "the back link to the blog stays above the slot, outside it"
+  );
+  assert.deepEqual(
+    await page.getByRole("heading", { level: 1 }).allInnerTexts(),
+    ["Jan Burzinski"]
+  );
+  const postCount = /E2E author hero: (\d+) posts by Engineer/.exec(
+    await authorHero.innerText()
+  )?.[1];
+  assert.ok(postCount, "the slot gets the author's post count and title");
+  assert.equal(
+    (await page.locator(".author-post-count").innerText()).trim(),
+    postCount
+  );
+  assert.equal(await page.locator('[data-post-card="hello-world"]').count(), 1);
+  assert.deepEqual(
+    await authorHero
+      .getByRole("list", { name: "Profiles" })
+      .getByRole("link")
+      .evaluateAll((links) =>
+        links.map(
+          (link) =>
+            `${link.textContent} ${link.getAttribute("href")} ${link.getAttribute("rel")}`
+        )
+      ),
+    [
+      "X https://x.com/janburzinski me noopener",
+      "GitHub https://github.com/janburzinski me noopener",
+      "Bluesky https://bsky.app/profile/janburzinski.bsky.social me noopener",
+      "Mastodon https://hachyderm.io/@janburzinski me noopener",
+      "Threads https://www.threads.net/@janburzinski me noopener",
+      "Instagram https://www.instagram.com/janburzinski me noopener",
+    ]
+  );
+  const jsonLdNode = (type: string) =>
+    page.evaluate(
+      (wanted) =>
+        [...document.querySelectorAll('script[type="application/ld+json"]')]
+          .flatMap((script) => {
+            const data = JSON.parse(script.textContent ?? "{}");
+            return [data, ...(data["@graph"] ?? [])];
+          })
+          .find((item) => item["@type"] === wanted),
+      type
+    );
+  assert.deepEqual((await jsonLdNode("ProfilePage"))?.mainEntity?.sameAs, [
+    "https://x.com/janburzinski",
+    "https://github.com/janburzinski",
+    "https://bsky.app/profile/janburzinski.bsky.social",
+    "https://hachyderm.io/@janburzinski",
+    "https://www.threads.net/@janburzinski",
+    "https://www.instagram.com/janburzinski",
+  ]);
+  checks.push(
+    "author-hero slot replaces the profile header with author data and keeps the back link; Bluesky, Mastodon, Threads and Instagram links reach the slot and JSON-LD"
+  );
+
+  await page.goto(`${origin}/blog/components`, {
+    waitUntil: "domcontentloaded",
+  });
+  const guest = (await jsonLdNode("BlogPosting"))?.author?.find(
+    (person: { name?: string }) => person.name === "Grace Hopper"
+  );
+  assert.deepEqual(guest?.sameAs, [
+    "https://bsky.app/profile/grace.example.com",
+    "https://mastodon.example.com/@grace",
+  ]);
+  checks.push(
+    "a frontmatter author's Bluesky and Mastodon links reach JSON-LD"
+  );
+
   for (const [path, text] of [
     ["/blog/tags/components", "Every built-in component"],
     ["/changelog/tags/feature", "Component updates"],

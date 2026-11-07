@@ -73,6 +73,7 @@ Slots add your own content at fixed places, and each one is a file in `slots/`. 
 | --- | --- | --- |
 | `slots/blog-hero.mdx` | Replaces the top of the blog home | |
 | `slots/changelog-hero.mdx` | Replaces the top of the changelog | |
+| `slots/author-hero.mdx` | Replaces the profile header of every [author page](/sites/customize/layouts#author-pages), below the back link and above the posts | `author` |
 | `slots/before-post.mdx` | Above every post | `post` |
 | `slots/after-post.mdx` | Below every post | `post` |
 | `slots/sidebar.mdx` | Next to every post under "On this page" on wide screens, above the post on phones and below the post in the narrow layout | `post` |
@@ -85,6 +86,7 @@ Slots add your own content at fixed places, and each one is a file in `slots/`. 
 | `area` | `id` (`blog` or `changelog`), `title`, `description`, `url`, `path` |
 | `post` | `title`, `description`, `date` (formatted), `tags`, `authors` (each with `name`, `title`, `url`), `url`, `path` |
 | `entry` | `title`, `version`, `date` (formatted), `url`, `path` |
+| `author` | `id`, `name`, `title`, `bio`, `avatar` (the image address, if set), `url` (the author's website), `href` (the author page's full address), `path`, `socials` (each with `kind` like `github` or `mastodon`, `url` and `label` like `GitHub`), `postCount` |
 | `page` | `index`, `entry`, `author`, `tag` or `not-found` |
 | `path` | The page's path, like `/blog/2026/launch` |
 
@@ -109,6 +111,21 @@ The hero slots span the full content width, so wrap their content in `<div class
 {props.page === "entry" && props.area === "blog" && (
   <div className="site-container rounded-xl border border-border p-6">Get new posts by email.</div>
 )}
+```
+
+`author-hero` replaces the avatar, name, bio and profile buttons, so add your own `<h1>`. `socials` lists the profile links in the order the theme shows them, with the website last. Keep `rel="me"` on the links so a Mastodon profile can verify the page:
+
+```mdx slots/author-hero.mdx
+<header className="flex flex-col gap-3">
+  <h1 className="font-heading text-4xl">{author.name}</h1>
+  {author.bio && <p className="max-w-xl text-muted-foreground">{author.bio}</p>}
+  <ul className="flex gap-3 text-sm">
+    {author.socials.map((social) => (
+      <li><a href={social.url} rel="me noopener" className="underline">{social.label}</a></li>
+    ))}
+  </ul>
+  <p className="text-sm text-muted-foreground">{author.postCount} posts</p>
+</header>
 ```
 
 A call to action under every post, a newsletter form or a product card in the sidebar each fit in a slot. A file in `slots/` with any other name stops the build with `Unknown slot` and the list of valid names. Inline SVG in a slot, header or footer takes its attributes the HTML way, like `stroke-width`, because the React form `strokeWidth` is dropped.

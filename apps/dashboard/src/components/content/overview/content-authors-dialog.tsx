@@ -52,6 +52,8 @@ function toDraft(author: ContentAuthor | null): ContentAuthorDraft {
     x: author?.x ?? "",
     linkedin: author?.linkedin ?? "",
     github: author?.github ?? "",
+    bluesky: author?.bluesky ?? "",
+    mastodon: author?.mastodon ?? "",
   };
 }
 

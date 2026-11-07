@@ -1,11 +1,12 @@
 ---
-import type { AuthorPageProps as Props } from "../../types/authors";
+import type { AuthorPageProps as Props, ListedAuthor } from "../../types/authors";
 import AuthorAvatar from "../../components/AuthorAvatar.astro";
 import BackLink from "../../components/BackLink.astro";
 import BrandIcon from "../../components/BrandIcon.astro";
 import Dither from "../../components/Dither.astro";
 import Icon from "../../components/Icon.astro";
 import PostCard from "../../components/PostCard.astro";
+import SiteSlot from "../../components/SiteSlot.astro";
 import Base from "../../layouts/Base.astro";
 import { allAuthors, authoredBy, personNode } from "../../lib/authors";
 import { POST_CARD_CELL } from "../../constants/post-card";
@@ -14,6 +15,7 @@ import { getBlogEntries } from "../../lib/entries";
 import { blogOptions } from "../../lib/options";
 import { absoluteUrl, areaTitle, config, href, params } from "../../lib/params";
 import { breadcrumbs, pageTitle } from "../../lib/seo";
+import { slotAuthor } from "../../lib/slot-data";
 import { authorSocialLabel } from "../../utils/author-social-label";
 
 export async function getStaticPaths() {
@@ -22,7 +24,7 @@ export async function getStaticPaths() {
   }
   const entries = await getBlogEntries();
   return allAuthors(entries)
-    .filter((author) => entries.some((entry) => authoredBy(entry, author.id)))
+    .filter((author): author is ListedAuthor => author.id !== null && entries.some((entry) => authoredBy(entry, author.id)))
     .map((author) => ({ params: { author: author.id }, props: { author } }));
 }
 
@@ -38,6 +40,7 @@ const heroStyle = blogOptions.hero.style;
 const washed = heroStyle === "wash" || heroStyle === "dither";
 const [onlyPost] = posts.length === 1 ? posts : [];
 const postCount = `${posts.length} ${posts.length === 1 ? "post" : "posts"}`;
+const slotData = { author: slotAuthor(author, posts.length) };
 const jsonLd = [
   { "@type": "ProfilePage", "@id": `${url}#page`, url, name: author.name, mainEntity: { ...personNode(author), "@id": `${url}#person` } },
   breadcrumbs(author.name, url),
@@ -48,31 +51,33 @@ const jsonLd = [
   {
     stacked ? (
       <div class="author-stacked mx-auto w-full max-w-(--layout-index)">
-        <header class="flex flex-col items-start gap-5">
-          <AuthorAvatar author={author} size={80} loading="eager" />
-          <div class="flex flex-col gap-1">
-            <h1 id="page-title" class="font-heading text-4xl font-medium tracking-[-0.02em]">{author.name}</h1>
-            {author.title && <p class="author-title font-mono text-sm text-muted-foreground">{author.title}</p>}
-          </div>
-          {author.bio && <p class="max-w-xl text-lg leading-8 text-pretty text-muted-foreground">{author.bio}</p>}
-          {author.socials.length > 0 && (
-            <ul class="flex flex-wrap gap-2">
-              {author.socials.map((social) => (
-                <li>
-                  <a
-                    href={social.url}
-                    rel="me noopener"
-                    target="_blank"
-                    aria-label={authorSocialLabel(social)}
-                    class="author-social flex size-8 items-center justify-center rounded-md border border-border transition-colors duration-150 hover:bg-muted"
-                  >
-                    {social.kind === "website" ? <Icon name="globe" size={16} /> : <BrandIcon name={social.kind} size={16} />}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          )}
-        </header>
+        <SiteSlot name="author-hero" data={slotData}>
+          <header class="flex flex-col items-start gap-5">
+            <AuthorAvatar author={author} size={80} loading="eager" />
+            <div class="flex flex-col gap-1">
+              <h1 id="page-title" class="font-heading text-4xl font-medium tracking-[-0.02em]">{author.name}</h1>
+              {author.title && <p class="author-title font-mono text-sm text-muted-foreground">{author.title}</p>}
+            </div>
+            {author.bio && <p class="max-w-xl text-lg leading-8 text-pretty text-muted-foreground">{author.bio}</p>}
+            {author.socials.length > 0 && (
+              <ul class="flex flex-wrap gap-2">
+                {author.socials.map((social) => (
+                  <li>
+                    <a
+                      href={social.url}
+                      rel="me noopener"
+                      target="_blank"
+                      aria-label={authorSocialLabel(social)}
+                      class="author-social flex size-8 items-center justify-center rounded-md border border-border transition-colors duration-150 hover:bg-muted"
+                    >
+                      {social.kind === "website" ? <Icon name="globe" size={16} /> : <BrandIcon name={social.kind} size={16} />}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </header>
+        </SiteSlot>
         <div class="mt-14 border-t border-border pt-8">
           <h2 class="author-post-count font-mono text-sm text-muted-foreground">{postCount}</h2>
           <ul class:list={["mt-6 grid grid-cols-1 sm:grid-cols-2", boxed ? "gap-6" : "-mb-12 gap-x-8 lg:grid-cols-3"]}>
@@ -88,34 +93,36 @@ const jsonLd = [
       <div class="mx-auto flex w-full max-w-(--layout-index) flex-col gap-12 pt-0 sm:gap-16 sm:pt-2 lg:pt-4">
         <div>
           <BackLink href={href()} label={areaTitle("blog")} />
-          <header class:list={["author-profile mt-6 flex flex-col items-start", washed ? "hero-wash relative isolate overflow-clip rounded-2xl p-6 sm:p-10" : "sm:mt-8"]}>
-            {heroStyle === "dither" && <Dither class="absolute inset-0 -z-10" />}
-            <div class="flex flex-col gap-5 sm:flex-row sm:items-center sm:gap-6">
-              <AuthorAvatar author={author} size={80} loading="eager" />
-              <div class="flex min-w-0 flex-col gap-1">
-                <h1 id="page-title" class="font-heading text-3xl leading-tight font-(--font-heading-weight) tracking-[-0.03em] text-balance sm:text-4xl">{author.name}</h1>
-                {author.title && <p class="author-title text-base text-muted-foreground sm:text-lg">{author.title}</p>}
+          <SiteSlot name="author-hero" data={slotData} class="mt-6 sm:mt-8">
+            <header class:list={["author-profile mt-6 flex flex-col items-start", washed ? "hero-wash relative isolate overflow-clip rounded-2xl p-6 sm:p-10" : "sm:mt-8"]}>
+              {heroStyle === "dither" && <Dither class="absolute inset-0 -z-10" />}
+              <div class="flex flex-col gap-5 sm:flex-row sm:items-center sm:gap-6">
+                <AuthorAvatar author={author} size={80} loading="eager" />
+                <div class="flex min-w-0 flex-col gap-1">
+                  <h1 id="page-title" class="font-heading text-3xl leading-tight font-(--font-heading-weight) tracking-[-0.03em] text-balance sm:text-4xl">{author.name}</h1>
+                  {author.title && <p class="author-title text-base text-muted-foreground sm:text-lg">{author.title}</p>}
+                </div>
               </div>
-            </div>
-            {author.bio && <p class="author-bio mt-5 max-w-xl text-lg leading-8 text-pretty text-muted-foreground">{author.bio}</p>}
-            {author.socials.length > 0 && (
-              <ul class="mt-6 flex flex-wrap gap-2">
-                {author.socials.map((social) => (
-                  <li>
-                    <a
-                      href={social.url}
-                      rel="me noopener"
-                      target="_blank"
-                      class="author-social inline-flex h-9 items-center gap-2 rounded-full border border-border bg-(--page-background) px-3.5 text-sm font-medium text-foreground transition-colors duration-150 hover:bg-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-                    >
-                      {social.kind === "website" ? <Icon name="globe" size={15} /> : <BrandIcon name={social.kind} size={15} />}
-                      {authorSocialLabel(social)}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </header>
+              {author.bio && <p class="author-bio mt-5 max-w-xl text-lg leading-8 text-pretty text-muted-foreground">{author.bio}</p>}
+              {author.socials.length > 0 && (
+                <ul class="mt-6 flex flex-wrap gap-2">
+                  {author.socials.map((social) => (
+                    <li>
+                      <a
+                        href={social.url}
+                        rel="me noopener"
+                        target="_blank"
+                        class="author-social inline-flex h-9 items-center gap-2 rounded-full border border-border bg-(--page-background) px-3.5 text-sm font-medium text-foreground transition-colors duration-150 hover:bg-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                      >
+                        {social.kind === "website" ? <Icon name="globe" size={15} /> : <BrandIcon name={social.kind} size={15} />}
+                        {authorSocialLabel(social)}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </header>
+          </SiteSlot>
         </div>
         <section aria-labelledby="author-posts">
           <h2 id="author-posts" class="flex items-baseline gap-2.5 font-heading text-xl font-(--font-heading-weight) tracking-[-0.02em]">
