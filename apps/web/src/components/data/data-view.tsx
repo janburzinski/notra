@@ -30,7 +30,6 @@ import {
   DATA_CRAWLER_COLOR,
   DATA_CTA_HEADING,
   DATA_CTA_SUBCOPY,
-  DATA_INGEST_GAP,
   DATA_REFERRAL_COLOR,
   DATA_SIGNUP_SOURCE,
   DATA_SURFACE_CLASS,
@@ -84,11 +83,6 @@ function Report({ page }: { page: DataPageModel }) {
             unit="/ site / day"
           />
         </div>
-        {page.windowFrom <= DATA_INGEST_GAP.notedUntil ? (
-          <p className="text-muted-foreground mt-3 text-xs text-pretty">
-            {DATA_INGEST_GAP.note}
-          </p>
-        ) : null}
       </ReportBlock>
 
       <ReportBlock title="Top crawlers · past 7 days">
