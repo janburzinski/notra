@@ -3,13 +3,14 @@ export const LOCAL_BUILD_ORIGIN = "http://localhost";
 
 export const USAGE = `notra-sites <command>
 
-  validate [--source <dir>] [--target <file>] [--json]  Check settings, MDX and snippets
+  validate [--source <dir>] [--target <file>] [--mount <area>=<path>]... [--origin <url>] [--json]  Check settings, MDX, snippets and links
   build [--source <dir>] --out <dir> [--target <file>] [--mount <area>=<path>]... [--origin <url>] [--json]
   dev [--source <dir>] [--target <file>] [--mount <area>=<path>]... [--area blog|changelog] [--port 4321]
 
   dev and build serve the areas with a folder (both when neither has one) at /blog and /changelog, or those in --target.
   --mount blog=/newsroom serves only the areas listed, at those paths, and replaces the mounts of --target.
   build without --target makes a local build: noindex, no drafts, links on --origin (default ${LOCAL_BUILD_ORIGIN}).
+  validate checks links for the areas and --origin a build with the same flags would use.
   --area picks where "/" redirects in dev and, without --target or --mount, also serves that area.`;
 
 export const DEV_READY_TIMEOUT_MS = 60_000;

@@ -52,6 +52,12 @@ browser profile. The dependency installation occurs only in the current worktree
   link in `blog.json` that warns at build time and never renders, a
   frontmatter author's profile links in JSON-LD, blog and changelog tag pages, the changelog
   `Update` entry and the generated OG image.
+- Link checks: the fixture builds without `link_broken`/`image_missing`
+  warnings, and every internal link, `#fragment` (in a post and the footer)
+  and authored `srcset` candidate it accepts resolves in the browser. On the
+  real output a mistyped anchor warns with a suggestion, and
+  `notra-sites validate` reports an E2E-only post's broken links except those
+  only a build can see.
 - Mounted assets and their bytes, cache headers and ETags, root/manifest/slash
   redirects, HTML/Markdown/HEAD 404s, negotiated/direct Markdown twins, robots,
   sitemap index and area maps, feeds, LLMS files, canonical, OG and JSON-LD.

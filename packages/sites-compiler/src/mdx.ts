@@ -456,7 +456,7 @@ export function analyzeMdxFile(
     edits: [],
   };
   const tree = parseMdx(pass);
-  const links = tree && context.isEntry ? contentLinks(tree) : [];
+  const links = tree ? contentLinks(tree) : [];
   const failed = (imports: string[]): MdxAnalysis => ({
     diagnostics: pass.diagnostics,
     output: null,

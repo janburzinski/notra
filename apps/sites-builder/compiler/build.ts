@@ -36,6 +36,7 @@ import { createAstroLogFilter } from "./utils/astro-log";
 import { consentDiagnostics, siteConsent } from "./utils/consent";
 import { listFiles } from "./utils/fs";
 import { siteHeadScripts } from "./utils/head-scripts";
+import { htmlIds } from "./utils/html-ids";
 import { inlineScriptHashes } from "./utils/inline-scripts";
 import { unnestLinks } from "./utils/nested-links";
 import { hasReactComponents } from "./utils/react";
@@ -352,6 +353,10 @@ async function buildInWorkDir(
       ),
       publicFiles,
       redirects: config.redirects,
+      ids: (file) => {
+        const html = pageHtml.get(file);
+        return html === undefined ? null : htmlIds(html);
+      },
     })
   );
   const sizes = await Promise.all(

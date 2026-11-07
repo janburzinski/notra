@@ -6,6 +6,7 @@ import { consentDiagnostics, siteConsent } from "./consent";
 import { cleanDevGeneratedAssets } from "./dev-generated-assets";
 import { siteHeadScripts } from "./head-scripts";
 import { hasReactComponents } from "./react";
+import { sourceLinkWarnings } from "./source-links";
 
 export function createDevRefresh(options: DevRefreshOptions) {
   let revision = 0;
@@ -79,6 +80,12 @@ export function createDevRefresh(options: DevRefreshOptions) {
       ...prepared.validation.diagnostics,
       ...ogImages.diagnostics,
       ...consentChecks,
+      ...sourceLinkWarnings(
+        prepared.validation,
+        options.params.mounts,
+        options.params.publicOrigin,
+        [...prepared.publicFiles, ...Object.values(ogImages.manifest)]
+      ),
     ]);
     if (hasErrors(consentChecks)) {
       return;

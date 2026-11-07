@@ -10,3 +10,5 @@ This is a plain **Markdown** post. Links like [the launch](/blog/2026/launch) ke
 
 - one
 - two
+
+<!-- <a id="e2e-comment-only"></a> An ID inside a comment is not on the page. -->

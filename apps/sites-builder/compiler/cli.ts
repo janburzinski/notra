@@ -40,6 +40,7 @@ import {
   localMounts,
   parseMountFlags,
 } from "./utils/local-options";
+import { sourceLinkWarnings } from "./utils/source-links";
 import { UsageError } from "./utils/usage-error";
 
 const TOOLCHAIN_ROOT = fileURLToPath(new URL("..", import.meta.url));
@@ -88,15 +89,28 @@ async function main() {
     const target = values.target
       ? await readBuildTarget(values.target)
       : undefined;
-    if (target) {
-      normalizeSiteMounts(target.mounts);
-    }
+    // The same sections and origin a build with these flags would use.
+    const site = localBuildTarget(siteRoot, target, {
+      origin: values.origin,
+      mounts: parseMountFlags(values.mount),
+    });
     const { collected, files } = await readSiteFiles(siteRoot);
     const result = validateSite({
       files,
       defaultConfig: localDefaultConfig(siteRoot, target),
     });
-    const diagnostics = [...collected.diagnostics, ...result.diagnostics];
+    const diagnostics = [
+      ...collected.diagnostics,
+      ...result.diagnostics,
+      ...sourceLinkWarnings(
+        result,
+        normalizeSiteMounts(site.mounts),
+        site.publicOrigin,
+        collected.files
+          .filter((file) => file.path.startsWith("public/"))
+          .map((file) => file.path.slice("public".length))
+      ),
+    ];
     const ok = !hasErrors(diagnostics);
     if (values.json) {
       process.stdout.write(

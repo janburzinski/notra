@@ -13,7 +13,7 @@ export interface SiteValidationResult {
   diagnostics: SiteDiagnostic[];
   config: SiteConfig | null;
   entries: SiteEntry[];
-  /** Links and images in published entries, checked once the pages are built. */
+  /** Links and images in entries, headers, footers, slots and the snippets they import. */
   links: SiteContentLink[];
   outputs: Map<string, string>;
   ok: boolean;

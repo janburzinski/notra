@@ -340,6 +340,7 @@ describe("link sources and paths", () => {
       )
     ).toEqual([
       "link_broken: Broken link to /blog/caf%C3%A9 (/blog/café): no page, file or redirect has this path.",
+      "link_broken: Broken link to /blog/100%: Notra can't read this path and answers it with 400 Bad Request. Write % as %25 and leave out .. segments.",
       "link_broken: Broken link to /blog/feed.xml/: no page, file or redirect has this path.",
       "link_broken: Broken link to /blog/old%20launch (/blog/old launch): no page, file or redirect has this path.",
     ]);

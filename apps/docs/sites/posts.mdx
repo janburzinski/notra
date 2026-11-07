@@ -159,7 +159,7 @@ Put images in `public/` and use paths from the root of the site:
 - `imageAlt` describes the cover. Notra uses it as the image's alt text on the post, on cards and in link previews. Without it, screen readers skip the cover.
 - Posts without an `image` get a generated share image with the title, your site name and your brand color. See [Share images](/sites/customize/seo#share-images).
 - Wrap a screenshot in [`<Frame>`](/sites/components/media#frame) to give it a border and a caption.
-- When an image isn't in `public/` or a link goes to a page of your blog or changelog that doesn't exist, the build shows an `image_missing` or `link_broken` warning with the file, the line and the closest match. See [warnings](/sites/reference/limits#common-errors).
+- When an image or a `srcset` candidate isn't in `public/`, the build shows an `image_missing` warning with the file, the line and the closest file name. See [warnings](/sites/reference/limits#common-errors).
 
 ### Smaller copies for readers
 
@@ -169,6 +169,12 @@ When your site is published, JPEG, PNG and WebP images in a post or changelog en
 - GIFs, SVGs, animated images and images from other websites are left as they are, and so is any image you give your own `srcset`.
 - Images keep exactly the size they had before. Browsers pick a copy by screen width, so phones gain the most. If an image always shows smaller than the screen, like a thumbnail in a custom component, set `sizes` on it (for example `sizes="240px"`), or give a lazy image `width` and `height` so browsers can pick by its rendered size.
 - `notra dev` serves your original files; the copies are only made when the site is published.
+
+## Links
+
+Link to another post by its path, like `/blog/launch`, or relative to the post, like `./launch`. To link to a heading, add `#` and the heading in lowercase, with spaces as dashes and punctuation left out: `## Ship small!` is `/blog/launch#ship-small`, or `#ship-small` on the same page.
+
+When a link goes to a page of your blog or changelog that doesn't exist, or to a `#section` that isn't on that page, the build shows a `link_broken` warning with the file, the line and the closest page or heading. Links in your header, footer, slots and snippets are checked too. See [warnings](/sites/reference/limits#common-errors).
 
 ## Drafts
 

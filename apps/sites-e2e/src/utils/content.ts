@@ -146,6 +146,46 @@ export async function assertContentFeatures(
   );
   checks.push("internal links the build checks resolve");
 
+  // The build checks #fragments, also in the footer, against the built page.
+  const anchors = await page.evaluate(
+    async (names) => {
+      const links = [...document.querySelectorAll<HTMLAnchorElement>("a")];
+      return await Promise.all(
+        names.map(async (name) => {
+          const anchor = links.find((link) => link.textContent === name);
+          if (!anchor) {
+            return `${name} not found`;
+          }
+          const url = new URL(anchor.href);
+          // The browser drops a :~:text= directive before it looks for the ID.
+          const id = decodeURIComponent(
+            url.hash.slice(1).split(":~:")[0] ?? ""
+          );
+          const response = await fetch(url);
+          const target = new DOMParser()
+            .parseFromString(await response.text(), "text/html")
+            .getElementById(id);
+          return `${name} ${url.pathname}#${id} ${response.status} ${target !== null}`;
+        })
+      );
+    },
+    [
+      "E2E same-page anchor",
+      "E2E cross-page anchor",
+      "E2E text fragment",
+      "Why we ship small",
+    ]
+  );
+  assert.deepEqual(anchors, [
+    "E2E same-page anchor /blog/components#e2e-link-targets 200 true",
+    "E2E cross-page anchor /blog/calm-software#ship-small 200 true",
+    "E2E text fragment /blog/calm-software#ship-small 200 true",
+    "Why we ship small /blog/calm-software#ship-small 200 true",
+  ]);
+  checks.push(
+    "#fragments the build checks, in a post, a text fragment and the footer, exist"
+  );
+
   const sections = page.getByRole("navigation", { name: "Sections" });
   const sectionLinks = await sections
     .first()
@@ -293,6 +333,43 @@ export async function assertContentFeatures(
     /^\/blog\/_notra\/assets\/images\/e2e-sized-photo-[0-9a-f]{10}-\d+\.webp$/,
     `the browser shows a WebP copy, not the original: ${shown}`
   );
+
+  // The build checks each srcset candidate like an image; srcSet keeps its
+  // JSX casing in the page and still moves under the mount, and commas in a
+  // query string or a data: URL stay part of their candidate.
+  const authored = await loaded("E2E srcset photo");
+  const srcset = (await authored.getAttribute("srcset")) ?? "";
+  assert.equal(
+    srcset,
+    "/blog/images/e2e-small-photo.jpg?e2e=1,2 1x, /blog/images/e2e-css-asset.png 2x"
+  );
+  assert.deepEqual(
+    await page.evaluate(
+      async (candidates) =>
+        await Promise.all(
+          candidates.map(async (candidate) => {
+            const url = new URL(candidate, location.href);
+            const response = await fetch(url);
+            await response.arrayBuffer();
+            return `${url.pathname}${url.search} ${response.status}`;
+          })
+        ),
+      srcset.split(", ").map((candidate) => candidate.split(" ")[0] ?? "")
+    ),
+    [
+      "/blog/images/e2e-small-photo.jpg?e2e=1,2 200",
+      "/blog/images/e2e-css-asset.png 200",
+    ]
+  );
+  const dataUri = await loaded("E2E data srcset");
+  assert.equal(
+    await dataUri.evaluate((image) => (image as HTMLImageElement).naturalWidth),
+    1
+  );
+  checks.push(
+    "authored srcsets keep comma URLs and data: URIs, and their candidates load"
+  );
+
   const copy = await page.goto(`${origin}${shown}`);
   await waitForResources();
   assert.equal(copy?.status(), 200);

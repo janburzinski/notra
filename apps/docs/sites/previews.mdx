@@ -60,6 +60,16 @@ notra dev --source ./hosted-site --port 4400
 same renderer as hosted Notra Sites; it does not run your repository's app or its
 build scripts.
 
+### Check links before you push
+
+`notra dev` prints [`link_broken` and `image_missing` warnings](/sites/reference/limits#common-errors) on every reload, and `notra sites validate` prints them without starting a server:
+
+```bash
+notra sites validate
+```
+
+Without building the site, they check what they can be sure of: links to posts that don't exist, images that aren't in `public/` and paths Notra can't read. Headings (`#section`), tag and author pages, generated files and links in drafts are only checked when the site is built, by `notra sites build` or a deployment, so these commands never warn about a link the build accepts. They take your sections to be at `/blog` and `/changelog`, or where `notra dev --mount` puts them, and leave links that use your site's full address, like `https://www.example.com/blog/launch`, to the build.
+
 ### In a monorepo
 
 If your site lives inside a repository that uses Bun or pnpm catalogs, run the CLI with that package manager:

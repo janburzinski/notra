@@ -6,10 +6,12 @@ import {
   HTML_ATTRIBUTE,
   HTML_TAG,
   LINK_ATTRIBUTE,
+  SRCSET_ELEMENTS,
 } from "../constants/links";
 import type { ContentLink, ContentLinkKind } from "../types/links";
 import type { MdxJsxAttribute } from "../types/mdx";
 import { isMdxJsxElement } from "./mdast";
+import { srcsetCandidates } from "./srcset";
 
 function attributeKind(
   element: string,
@@ -21,20 +23,42 @@ function attributeKind(
   return ASSET_ATTRIBUTES[element]?.includes(attribute) ? "image" : null;
 }
 
+function isSrcset(element: string, attribute: string): boolean {
+  // srcSet in JSX, srcset in HTML.
+  return SRCSET_ELEMENTS.has(element) && attribute.toLowerCase() === "srcset";
+}
+
+function attributeLinks(
+  element: string,
+  attribute: string,
+  url: string,
+  offset: number
+): ContentLink[] {
+  if (isSrcset(element, attribute)) {
+    return srcsetCandidates(url).map((candidate) => ({
+      url: candidate.url,
+      kind: "image",
+      offset,
+    }));
+  }
+  const kind = attributeKind(element, attribute);
+  return kind ? [{ url, kind, offset }] : [];
+}
+
 function htmlLinks(html: string, start: number): ContentLink[] {
   const links: ContentLink[] = [];
   for (const tag of html.matchAll(HTML_TAG)) {
     const element = tag[1]?.toLowerCase() ?? "";
     const attributesStart = start + tag.index + 1 + element.length;
     for (const attribute of (tag[2] ?? "").matchAll(HTML_ATTRIBUTE)) {
-      const kind = attributeKind(element, attribute[1]?.toLowerCase() ?? "");
-      if (kind) {
-        links.push({
-          url: attribute[2] ?? attribute[3] ?? attribute[4] ?? "",
-          kind,
-          offset: attributesStart + attribute.index + 1,
-        });
-      }
+      links.push(
+        ...attributeLinks(
+          element,
+          attribute[1]?.toLowerCase() ?? "",
+          attribute[2] ?? attribute[3] ?? attribute[4] ?? "",
+          attributesStart + attribute.index + 1
+        )
+      );
     }
   }
   return links;
@@ -62,7 +86,7 @@ function staticAttributeValue(value: MdxJsxAttribute["value"]): string | null {
   return null;
 }
 
-/** Every link and file reference in a parsed Markdown or MDX page. */
+/** Every link and file reference in a parsed Markdown or MDX file. */
 export function contentLinks(tree: Root): ContentLink[] {
   const definitions = new Map<string, string>();
   visit(tree, "definition", (node) => {
@@ -94,14 +118,16 @@ export function contentLinks(tree: Root): ContentLink[] {
         if (attribute.type !== "mdxJsxAttribute") {
           continue;
         }
-        const kind = attributeKind(node.name, attribute.name);
-        const url = kind && staticAttributeValue(attribute.value);
-        if (kind && url !== null) {
-          links.push({
-            url,
-            kind,
-            offset: attribute.position?.start.offset ?? offset,
-          });
+        const url = staticAttributeValue(attribute.value);
+        if (url !== null) {
+          links.push(
+            ...attributeLinks(
+              node.name,
+              attribute.name,
+              url,
+              attribute.position?.start.offset ?? offset
+            )
+          );
         }
       }
     }

@@ -11,6 +11,7 @@ import { buildSite } from "../../../sites-builder/compiler/build";
 import { listFiles } from "../../../sites-builder/compiler/utils/fs";
 import { HOSTING_DOMAIN } from "../constants/fixtures";
 import type { FixtureBuild, Measurement } from "../types/harness";
+import { assertLinkChecks } from "./link-checks";
 import { fixtureToolchain } from "./toolchain";
 
 export async function compileFixtures(
@@ -124,7 +125,7 @@ async function compileWith(
         (item) => item.code === "link_broken" || item.code === "image_missing"
       ),
       [],
-      "the fixture's internal links and images all exist"
+      "the fixture's internal links, anchors and images all exist"
     );
     const schemeWarnings = result.diagnostics.filter(
       (item) => item.code === "author_link_scheme"
@@ -136,6 +137,9 @@ async function compileWith(
       schemeWarnings[0]?.message ?? "",
       /^authors\.jan\.url: .*Use an https:\/\/ URL\.$/
     );
+    if (!preview) {
+      await assertLinkChecks(builder, source, outDir, target);
+    }
     const files = [];
     for (const file of await listFiles(outDir)) {
       const path = file.slice(outDir.length);

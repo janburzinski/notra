@@ -30,7 +30,7 @@ import { frontmatterKeyLine, parseEntryFrontmatter } from "./frontmatter";
 import { analyzeJsxSnippet } from "./jsx";
 import { analyzeMdxFile } from "./mdx";
 import type { SiteEntry } from "./types/entries";
-import type { ContentLink, SiteContentLink } from "./types/links";
+import type { ContentLink, LinkPage, SiteContentLink } from "./types/links";
 import type { MdxAnalysis } from "./types/mdx";
 import type {
   ParsedSiteConfig,
@@ -52,6 +52,7 @@ import { contentLinks } from "./utils/content-links";
 import { collapseRepeatedWarnings, hasErrors } from "./utils/diagnostics";
 import { acornSyntaxError, errorMessage } from "./utils/errors";
 import { importCycleDiagnostics } from "./utils/import-cycles";
+import { sharedFilePages } from "./utils/link-pages";
 import { blockedMarkdownHtml } from "./utils/markdown-html";
 import { isTextSourceFile, offsetToLineColumn } from "./utils/paths";
 import { substituteSettingText, substituteVariables } from "./utils/variables";
@@ -389,6 +390,7 @@ export function validateSite(input: SiteValidationInput): SiteValidationResult {
 
   const entries: SiteEntry[] = [];
   const links: SiteContentLink[] = [];
+  const entryPages = new Map<string, LinkPage>();
   const seenSlugs = new Map<string, string>();
   let unreadEntries = 0;
   const blogTags = new Set<string>();
@@ -446,7 +448,13 @@ export function validateSite(input: SiteValidationInput): SiteValidationResult {
         outputs.set(path, substituted);
       }
     }
-    const linkOf = { file: path, area: candidate.area, slug: candidate.slug };
+    const page: LinkPage = {
+      area: candidate.area,
+      slug: candidate.slug,
+      draft: frontmatter.data?.draft ?? true,
+    };
+    entryPages.set(path, page);
+    const linkOf = { file: path, pages: [page], shared: false };
     for (const link of bodyLinks) {
       links.push({
         ...linkOf,
@@ -472,6 +480,26 @@ export function validateSite(input: SiteValidationInput): SiteValidationResult {
       path,
       format: candidate.format,
     });
+  }
+  for (const [path, pages] of sharedFilePages(
+    files.keys(),
+    entryPages,
+    (path) => analyses.get(path)?.imports ?? []
+  )) {
+    const source = sources.get(path) ?? "";
+    const fileLinks =
+      analyses.get(path)?.links ??
+      (path.endsWith(".md") ? contentLinks(fromMarkdown(source)) : []);
+    for (const link of fileLinks) {
+      links.push({
+        file: path,
+        pages,
+        shared: true,
+        url: link.url,
+        kind: link.kind,
+        ...offsetToLineColumn(source, link.offset),
+      });
+    }
   }
 
   if (config) {

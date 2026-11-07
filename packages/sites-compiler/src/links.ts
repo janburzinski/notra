@@ -1,6 +1,8 @@
 import type { SiteDiagnostic } from "@notra/sites-core/types/build";
+import type { SiteArea, SiteMounts } from "@notra/sites-core/types/deployment";
 import {
   joinMountPath,
+  listMountedAreas,
   resolveAreaForPath,
 } from "@notra/sites-core/utils/mounts";
 import {
@@ -15,20 +17,26 @@ import {
 } from "@notra/sites-core/utils/request-paths";
 
 import {
+  BUILT_ROUTE_SEGMENTS,
+  FRAGMENT_DIRECTIVE,
+  MEDIA_FILE,
   SUGGESTION_MAX_LENGTH_DIFFERENCE,
   URL_SCHEME,
 } from "./constants/links";
 import type {
   LinkCheckContext,
+  LinkPage,
+  LinkResolver,
   LinkTarget,
   SiteContentLink,
+  SourceLinkCheckContext,
 } from "./types/links";
 import { closestName } from "./utils/closest-name";
 
 // Follows the Sites worker's routes for a normalized path, after redirects.
 function isServed(
   files: ReadonlyMap<string, string>,
-  mounts: LinkCheckContext["mounts"],
+  mounts: SiteMounts,
   path: string
 ): boolean {
   const area = resolveAreaForPath(mounts, path);
@@ -47,19 +55,37 @@ function isServed(
   );
 }
 
+function pagePath(mounts: SiteMounts, page: LinkPage): string | null {
+  const mount = mounts[page.area];
+  return mount === undefined ? null : joinMountPath(mount, page.slug ?? "");
+}
+
+function decodeFragment(fragment: string): string {
+  try {
+    return decodeURIComponent(fragment);
+  } catch {
+    return fragment;
+  }
+}
+
+/** Where a link points, or null when it leaves the site or depends on the page it's shown on. */
 function linkTarget(
   url: string,
-  pagePath: string,
+  page: string | null,
   origin: URL
 ): LinkTarget | null {
   const written = url.trim();
-  if (!written || written.startsWith("#") || written.includes("{{")) {
+  if (!written || written.includes("{{")) {
     return null;
   }
   const absolute = written.startsWith("//") || URL_SCHEME.test(written);
+  const rootPath = !absolute && written.startsWith("/");
+  if (page === null && !absolute && !rootPath) {
+    return null;
+  }
   let resolved: URL;
   try {
-    resolved = new URL(written, new URL(pagePath, origin));
+    resolved = new URL(written, new URL(page ?? "/", origin));
   } catch {
     return null;
   }
@@ -72,81 +98,130 @@ function linkTarget(
   ) {
     return null;
   }
-  const path = normalizeRequestPath(resolved.pathname);
-  return path === null
-    ? null
-    : { path, rootPath: !absolute && written.startsWith("/") };
+  // The browser drops a fragment directive (:~:text=…) before it looks for the ID.
+  const rawFragment = resolved.hash
+    ? (resolved.hash.slice(1).split(FRAGMENT_DIRECTIVE)[0] ?? "")
+    : null;
+  return {
+    path: normalizeRequestPath(resolved.pathname),
+    pathname: resolved.pathname,
+    rootPath,
+    rawFragment,
+    fragment: rawFragment === null ? null : decodeFragment(rawFragment),
+  };
 }
 
-function hint(
-  path: string,
-  candidates: readonly string[],
-  prefix = ""
-): string {
+function hint(name: string, candidates: Iterable<string>, prefix = ""): string {
   const suggestion = closestName(
-    path,
-    candidates.filter(
+    name,
+    [...candidates].filter(
       (candidate) =>
-        Math.abs(candidate.length - path.length) <=
+        Math.abs(candidate.length - name.length) <=
         SUGGESTION_MAX_LENGTH_DIFFERENCE
     )
   );
   return suggestion ? ` Did you mean ${prefix}${suggestion}?` : "";
 }
 
-/**
- * Warns about links to pages under the site's mounts that the build didn't
- * produce, and about images that aren't in public/. Paths outside the mounts
- * may belong to another website on the same domain, so links there are skipped.
- */
-export function brokenLinkDiagnostics(
+// #top and an empty # scroll to the top, and a fragment that is only a
+// :~:text= directive highlights text.
+function checksFragment(target: LinkTarget): target is LinkTarget & {
+  fragment: string;
+  rawFragment: string;
+} {
+  return (
+    target.fragment !== null &&
+    Boolean(target.rawFragment) &&
+    target.fragment.toLowerCase() !== "top"
+  );
+}
+
+function diagnose(
   links: readonly SiteContentLink[],
-  context: LinkCheckContext
+  context: LinkCheckContext | SourceLinkCheckContext,
+  site: LinkResolver
 ): SiteDiagnostic[] {
   const origin = new URL(context.publicOrigin);
   const redirects = siteRedirectRules(context.redirects);
-  const pages = [...context.files]
-    .filter((file) => file.endsWith("/index.html"))
-    .map((file) => file.slice(0, -"/index.html".length) || "/");
-  const publicFiles = [...context.publicFiles];
-  const files = new Map([...context.files].map((file) => [file, file]));
   const diagnostics: SiteDiagnostic[] = [];
   for (const link of links) {
-    const mount = context.mounts[link.area];
-    const pagePath = mount && joinMountPath(mount, link.slug);
     // Drafts and entries of areas that aren't mounted aren't published.
-    if (!(pagePath && isServed(files, context.mounts, pagePath))) {
+    const [page] = link.pages;
+    if (!(page && link.pages.some(site.isPublished))) {
       continue;
     }
-    const target = linkTarget(link.url, pagePath, origin);
-    if (
-      !target ||
-      (target.rootPath && context.publicFiles.has(target.path)) ||
-      matchRedirect(redirects, target.path)
-    ) {
+    const target = linkTarget(
+      link.url,
+      link.shared ? null : pagePath(context.mounts, page),
+      origin
+    );
+    if (!target) {
       continue;
     }
-    const owner = resolveAreaForPath(context.mounts, target.path);
-    if (owner && isServed(files, context.mounts, target.path)) {
-      continue;
-    }
-    if (!owner && !(link.kind === "image" && target.rootPath)) {
-      continue;
-    }
-    const written = link.url.trim().split("#")[0];
-    const shown =
-      written === target.path ? target.path : `${written} (${target.path})`;
+    const written = link.url.trim();
     const location = {
       severity: "warning" as const,
       file: link.file,
       line: link.line,
       ...(link.column === undefined ? {} : { column: link.column }),
     };
+    const code = link.kind === "link" ? "link_broken" : "image_missing";
+    if (target.path === null) {
+      // The worker can't read the path and answers 400; outside the mounts
+      // another website may serve it.
+      if (resolveAreaForPath(context.mounts, target.pathname)) {
+        diagnostics.push({
+          ...location,
+          code,
+          message: `${link.kind === "link" ? "Broken link to" : "Missing image"} ${written}: Notra can't read this path and answers it with 400 Bad Request. Write % as %25 and leave out .. segments.`,
+        });
+      }
+      continue;
+    }
+    if (
+      (target.rootPath && context.publicFiles.has(target.path)) ||
+      matchRedirect(redirects, target.path)
+    ) {
+      continue;
+    }
+    const served = site.serves(target.path);
+    if (served === null) {
+      continue;
+    }
+    if (served) {
+      if (link.kind !== "link" || !checksFragment(target)) {
+        continue;
+      }
+      const ids = site.ids(target.path);
+      // A browser tries the fragment as written, then percent-decoded.
+      if (ids && !ids.has(target.rawFragment) && !ids.has(target.fragment)) {
+        const resolved = `${target.path}#${target.rawFragment}`;
+        const shown =
+          written === resolved || written.startsWith("#")
+            ? written
+            : `${written} (${resolved})`;
+        diagnostics.push({
+          ...location,
+          code,
+          message: `Broken link to ${shown}: ${target.path} has no heading or other element with id "${target.fragment}".${hint(target.fragment, ids, "#")}`,
+        });
+      }
+      continue;
+    }
+    const owner = resolveAreaForPath(context.mounts, target.path);
+    if (!owner && !(link.kind === "image" && target.rootPath)) {
+      continue;
+    }
+    const writtenPath = written.split("#")[0];
+    const shown =
+      writtenPath === target.path
+        ? target.path
+        : `${writtenPath} (${target.path})`;
     if (link.kind === "link") {
       diagnostics.push({
         ...location,
-        code: "link_broken",
-        message: `Broken link to ${shown}: no page, file or redirect has this path.${hint(target.path, pages)}`,
+        code,
+        message: `Broken link to ${shown}: no page, file or redirect has this path.${hint(target.path, site.pages)}`,
       });
       continue;
     }
@@ -157,9 +232,106 @@ export function brokenLinkDiagnostics(
     const publicPath = target.path.slice(prefix.length);
     diagnostics.push({
       ...location,
-      code: "image_missing",
-      message: `Missing image ${shown}: there is no public${publicPath} in the repository.${hint(publicPath, publicFiles, prefix)}`,
+      code,
+      message: `Missing image ${shown}: there is no public${publicPath} in the repository.${hint(publicPath, context.publicFiles, prefix)}`,
     });
   }
   return diagnostics;
+}
+
+/**
+ * Warns about links to pages under the site's mounts that the build didn't
+ * produce, #fragments that aren't on the built page, and images that aren't
+ * in public/. Paths outside the mounts may belong to another website on the
+ * same domain, so links there are skipped.
+ */
+export function brokenLinkDiagnostics(
+  links: readonly SiteContentLink[],
+  context: LinkCheckContext
+): SiteDiagnostic[] {
+  const files = new Map([...context.files].map((file) => [file, file]));
+  const ids = new Map<string, ReadonlySet<string> | null>();
+  const pages = [...context.files]
+    .filter((file) => file.endsWith("/index.html"))
+    .map((file) => file.slice(0, -"/index.html".length) || "/");
+  return diagnose(links, context, {
+    isPublished: (page) => {
+      const path = pagePath(context.mounts, page);
+      if (path === null || page.under === undefined) {
+        return path !== null && isServed(files, context.mounts, path);
+      }
+      const under = joinMountPath(path, page.under);
+      return pages.some((built) => built.startsWith(`${under}/`));
+    },
+    serves: (path) =>
+      resolveAreaForPath(context.mounts, path) !== null &&
+      isServed(files, context.mounts, path),
+    ids: (path) => {
+      const file = resolveMarkdownFile(files, path)
+        ? null
+        : resolveFile(files, path);
+      if (!file?.endsWith(".html")) {
+        return null;
+      }
+      if (!ids.has(file)) {
+        ids.set(file, context.ids?.(file) ?? null);
+      }
+      return ids.get(file) ?? null;
+    },
+    pages,
+  });
+}
+
+/**
+ * The part of brokenLinkDiagnostics the source can answer without a build,
+ * for validate and the dev server: links to entries that don't exist and
+ * images missing from public/. Anything only a build can tell (tag and author
+ * pages, the author-hero slot, generated files, #fragments, links in drafts)
+ * is skipped, so this
+ * never warns about a link a full build accepts.
+ */
+export function sourceLinkDiagnostics(
+  links: readonly SiteContentLink[],
+  context: SourceLinkCheckContext
+): SiteDiagnostic[] {
+  const slugs = new Map<SiteArea, Set<string>>();
+  for (const entry of context.entries) {
+    const area = slugs.get(entry.area) ?? new Set();
+    slugs.set(entry.area, area.add(entry.slug));
+  }
+  const publicFiles = new Map(
+    [...context.publicFiles].map((file) => [file, file])
+  );
+  const mounted = listMountedAreas(context.mounts);
+  return diagnose(links, context, {
+    isPublished: (page) =>
+      context.mounts[page.area] !== undefined &&
+      page.draft !== true &&
+      page.under === undefined,
+    serves: (path) => {
+      const area = resolveAreaForPath(context.mounts, path);
+      const rest =
+        !area || area.mount === "/" ? path : path.slice(area.mount.length);
+      const segments = rest.split("/").filter(Boolean);
+      const [first = "", last = ""] = [segments[0], segments.at(-1)];
+      if (BUILT_ROUTE_SEGMENTS.has(first)) {
+        return null;
+      }
+      if (!area || segments.length === 0) {
+        return area !== null;
+      }
+      if (
+        resolveFile(publicFiles, rest) ||
+        slugs.get(area.area)?.has(segments.join("/"))
+      ) {
+        return true;
+      }
+      return last.includes(".") && !MEDIA_FILE.test(last) ? null : false;
+    },
+    ids: () => null,
+    pages: mounted.flatMap(({ area, mount }) => [
+      mount,
+      ...[...(slugs.get(area) ?? [])].map((slug) => joinMountPath(mount, slug)),
+    ]),
+  });
 }

@@ -47,7 +47,10 @@ notra sites validate
 notra sites build --mount blog=/newsroom
 ```
 
-`validate` checks `blog.json`, MDX and snippets without building. `build` makes
+`validate` checks `blog.json`, MDX and snippets without building, and the links
+and images it can check without the built pages (`notra dev` does too, on every
+reload); `#fragments`, generated pages and links in drafts wait for `build`,
+which checks all of them against the files it wrote. `build` makes
 the same static output a hosted deployment serves, in `./.notra/out` by default
 (`--out <dir>` to change it), with each section in the folder of its path, such
 as `.notra/out/newsroom/`. Sections and `--mount` work as in `notra dev`. A local
