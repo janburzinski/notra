@@ -29,6 +29,7 @@ import {
 } from "../lib/constants/slack-post-x";
 import {
   forwardAutopilotSlackAction,
+  isLastAgentReply,
   parseAutopilotReaction,
 } from "../lib/utils/autopilot-slack";
 import {
@@ -545,5 +546,5 @@ export default slackChannel({
   onInputResponse: onSlackInputResponse,
   onInteraction: onSlackInteraction,
   onMessage: onSlackThreadReply,
-  threadContext: { since: "last-agent-reply" },
+  threadContext: { since: isLastAgentReply },
 });

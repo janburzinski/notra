@@ -1,4 +1,5 @@
 import {
+  AUTOPILOT_SLACK_BLOCK_ID,
   SLACK_API_BASE_URL,
   SLACK_REQUEST_TIMEOUT_MS,
 } from "@notra/ai/constants/slack";
@@ -75,7 +76,11 @@ const postMessage = Effect.fn("Autopilot.postSlackMessage")(function* (
     body: {
       channel: input.destination.channelId,
       text: input.text,
-      blocks: input.blocks,
+      blocks: input.blocks.map((block, index) =>
+        index === 0 && !block.block_id
+          ? { ...block, block_id: AUTOPILOT_SLACK_BLOCK_ID }
+          : block
+      ),
       ...(input.threadTs ? { thread_ts: input.threadTs } : {}),
       ...(input.clientMessageId
         ? { client_msg_id: input.clientMessageId }

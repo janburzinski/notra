@@ -57,6 +57,8 @@ function findingMessage(
 ): AutopilotFindingMessage {
   const isIdea = finding.status === "suggested";
   const title = compactSlackText(findingDisplayTitle(finding), 100);
+  const summary = compactSlackText(findingSummary(finding), 180);
+  const findingUrl = `${getAppUrl() ?? ""}/${slug}${AUTOPILOT_NAV_LINK}/findings/${finding.id}`;
   const meta = [
     isIdea ? "Idea" : "Ready to merge",
     AUTOPILOT_SLACK_KIND_LABELS[finding.kind],
@@ -70,17 +72,16 @@ function findingMessage(
   return {
     findingId: finding.id,
     status: isIdea ? "suggested" : "proposed",
-    text: title,
+    // Slack's plain text is all the agent reads of a thread, so it carries what the blocks show.
+    text: `*${title}*\n${summary}\n${meta.join(" · ")} · <${findingUrl}|Open in Notra>`,
     blocks: [
       {
         type: "section",
-        text: slackMrkdwn(
-          `*${title}*\n${compactSlackText(findingSummary(finding), 180)}`
-        ),
+        text: slackMrkdwn(`*${title}*\n${summary}`),
         accessory: {
           type: "button",
           text: { type: "plain_text", text: "Open" },
-          url: `${getAppUrl() ?? ""}/${slug}${AUTOPILOT_NAV_LINK}/findings/${finding.id}`,
+          url: findingUrl,
           action_id: `autopilot_open_${finding.id}`,
         },
       },

@@ -17,6 +17,9 @@ export const SLACK_SKIN_TONE_SUFFIX = /::skin-tone-\d$/;
 
 export const AUTOPILOT_SLACK_ACTION_TIMEOUT_MS = 60_000;
 
+/** `action_id` of the Open buttons on Autopilot briefs and items. */
+export const AUTOPILOT_LEGACY_ACTION_ID_PREFIX = "autopilot_open";
+
 /** Slack's limit for the `markdown_text` field eve uses to post replies. */
 export const SLACK_MARKDOWN_TEXT_MAX_LENGTH = 12_000;
 
