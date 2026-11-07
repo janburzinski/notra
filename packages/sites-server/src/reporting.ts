@@ -58,7 +58,9 @@ export async function openCheckRun(
   deployment: SiteDeployment
 ): Promise<SiteDeployment> {
   await reportPreviewComment(site, deployment);
-  if (deployment.checkRunId) {
+  // Notra started this rebuild, not a change to the commit, so it stays off
+  // the customer's GitHub history; the dashboard shows the result.
+  if (deployment.checkRunId || deployment.trigger === "toolchain") {
     return deployment;
   }
   const checkRunId = await safely("check_create", async () => {

@@ -13,7 +13,8 @@ const { values } = parseArgs({
   options: {
     "write-env": { type: "string" },
     // Release automation: skip the Box when this version is already live and
-    // report { version, snapshotId } as JSON instead of parsing stdout.
+    // report { version, renderFingerprint, snapshotId } as JSON instead of
+    // parsing stdout.
     "skip-version": { type: "string" },
     "result-file": { type: "string" },
     // E2E runs name their snapshot apart from release snapshots.
@@ -21,11 +22,15 @@ const { values } = parseArgs({
   },
 });
 
-function writeResult(version: string, snapshotId: string | null) {
+function writeResult(
+  version: string,
+  renderFingerprint: string,
+  snapshotId: string | null
+) {
   if (values["result-file"]) {
     writeFileSync(
       resolve(values["result-file"]),
-      `${JSON.stringify({ version, snapshotId })}\n`
+      `${JSON.stringify({ version, renderFingerprint, snapshotId })}\n`
     );
   }
 }
@@ -49,10 +54,10 @@ process.once("SIGTERM", abort);
 try {
   work = mkdtempSync(join(tmpdir(), "notra-sites-toolchain-"));
   const stage = join(work, "toolchain");
-  const version = await stageBoxToolchain(stage);
+  const { version, renderFingerprint } = await stageBoxToolchain(stage);
   if (version === values["skip-version"]) {
     console.log(`toolchain ${version} unchanged, keeping the current snapshot`);
-    writeResult(version, null);
+    writeResult(version, renderFingerprint, null);
     rmSync(work, { recursive: true, force: true });
     process.exit(0);
   }
@@ -87,7 +92,7 @@ try {
       "rm -rf toolchain && mkdir toolchain",
       "tar xzf toolchain.tgz -C toolchain && rm toolchain.tgz",
       "cd toolchain",
-      `env -i PATH="$PATH" HOME="${WORKDIR}" ASTRO_TELEMETRY_DISABLED=1 npm install --omit=dev --no-audit --no-fund --loglevel=error > npm.log 2>&1`,
+      `env -i PATH="$PATH" HOME="${WORKDIR}" ASTRO_TELEMETRY_DISABLED=1 npm ci --omit=dev --no-audit --no-fund --loglevel=error > npm.log 2>&1`,
     ].join(" && ")
   );
   const installedVersion = (
@@ -104,7 +109,7 @@ try {
   }
   const snapshot = await box.snapshot({ name });
   console.log(`SITES_BUILDER_SNAPSHOT_ID=${snapshot.id}`);
-  writeResult(version, snapshot.id);
+  writeResult(version, renderFingerprint, snapshot.id);
   if (values["write-env"]) {
     const envPath = resolve(values["write-env"]);
     const text = readFileSync(envPath, "utf8");

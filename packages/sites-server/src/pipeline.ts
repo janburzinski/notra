@@ -10,7 +10,10 @@ import { Effect, Exit, Option } from "effect";
 import { activateDeployment } from "./activation";
 import { runSandboxBuildEffect } from "./box-build";
 import { saveBuildTelemetryEffect } from "./build-telemetry";
-import { CANCELED_OUTCOME } from "./constants/deployments";
+import {
+  CANCELED_OUTCOME,
+  SAME_COMMIT_TRIGGERS,
+} from "./constants/deployments";
 import { SMART_DEPLOYMENT_SKIP_REASON } from "./constants/smart-deployments";
 import {
   getDeployment,
@@ -25,6 +28,7 @@ import {
   siteRepositoryAccess,
 } from "./github";
 import { downloadSiteSourceEffect } from "./github-source";
+import { isStaleToolchainRebuild } from "./live-build";
 import { readPostPreviewSourceEffect } from "./post-preview-source";
 import { publishDeploymentFilesEffect } from "./publish";
 import { r2PutEffect } from "./r2";
@@ -118,7 +122,7 @@ const whyNotBuild = Effect.fn("Sites.whyNotBuild")(function* (
   }
   const head = yield* currentBranchHead(access, deployment.branch);
   if (
-    deployment.trigger !== "redeploy" &&
+    !SAME_COMMIT_TRIGGERS.has(deployment.trigger) &&
     head !== deployment.commitSha &&
     !(yield* headMatchesForFolder(access, deployment, head, rootDirectory))
   ) {
@@ -133,6 +137,15 @@ const whyNotBuild = Effect.fn("Sites.whyNotBuild")(function* (
     })
   ) {
     return "A newer deployment replaces this one.";
+  }
+  if (
+    deployment.trigger === "toolchain" &&
+    (yield* Effect.tryPromise({
+      try: () => isStaleToolchainRebuild(deployment),
+      catch: (error) => error,
+    }))
+  ) {
+    return "Another build replaced the live build this theme update was for.";
   }
   return null;
 });
@@ -379,6 +392,7 @@ const buildAndPublish = Effect.fn("Sites.buildAndPublish")(function* (
               errorMessage: summary.slice(0, 4000),
               buildDurationMs: build.durationMs,
               toolchainVersion: build.toolchainVersion,
+              renderFingerprint: build.renderFingerprint ?? null,
               smartDeploymentEvaluation: smartComparison?.evaluation ?? null,
             }),
           catch: (error) => error,
@@ -397,6 +411,7 @@ const buildAndPublish = Effect.fn("Sites.buildAndPublish")(function* (
               errorMessage: skipReason,
               buildDurationMs: build.durationMs,
               toolchainVersion: build.toolchainVersion,
+              renderFingerprint: build.renderFingerprint ?? null,
               smartDeploymentEvaluation: smartComparison?.evaluation ?? null,
             }),
           catch: (error) => error,
@@ -440,6 +455,7 @@ const buildAndPublish = Effect.fn("Sites.buildAndPublish")(function* (
             totalBytes: manifest.totalBytes,
             buildDurationMs: build.durationMs,
             toolchainVersion: build.toolchainVersion,
+            renderFingerprint: build.renderFingerprint ?? null,
             diagnostics: result.diagnostics,
             finishedAt: new Date(),
             inputFingerprint:

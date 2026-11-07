@@ -8246,7 +8246,8 @@
       "pull_request": "Pull request",
       "manual": "Manual update",
       "redeploy": "Redeploy",
-      "config": "Settings change"
+      "config": "Settings change",
+      "toolchain": "Theme update"
     },
     "sections": {
       "title": "Sections",
@@ -8711,14 +8712,16 @@
         "pull_request": "Pull request by {author}",
         "manual": "Deployed by {author}",
         "redeploy": "Redeployed by {author}",
-        "config": "Settings change by {author}"
+        "config": "Settings change by {author}",
+        "toolchain": "Rebuilt for a theme update"
       },
       "bylineAnonymous": {
         "push": "Pushed",
         "pull_request": "Pull request",
         "manual": "Deployed manually",
         "redeploy": "Redeployed",
-        "config": "Settings change"
+        "config": "Settings change",
+        "toolchain": "Rebuilt for a theme update"
       }
     },
     "previewsPage": {

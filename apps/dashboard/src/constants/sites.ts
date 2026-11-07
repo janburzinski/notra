@@ -134,6 +134,7 @@ export const SITE_MANUAL_TRIGGER_ICONS: Partial<
   manual: RefreshIcon,
   redeploy: RefreshIcon,
   config: Settings01Icon,
+  toolchain: PaintBoardIcon,
 };
 
 export const SITE_STATUS_BADGES: Record<

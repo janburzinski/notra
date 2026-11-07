@@ -46,6 +46,11 @@ export function getSitesBuilderSnapshotId(): string {
   return required("SITES_BUILDER_SNAPSHOT_ID");
 }
 
+/** Set by the release with the snapshot; unset turns automatic rebuilds off. */
+export function getSitesBuilderRenderFingerprint(): string | null {
+  return process.env.SITES_BUILDER_RENDER_FINGERPRINT?.trim() || null;
+}
+
 export function getBoxApiKey(): string {
   return required("UPSTASH_BOX_API_KEY");
 }

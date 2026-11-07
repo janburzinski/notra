@@ -65,3 +65,7 @@ export interface SiteDomainRecheckResult {
   checked: number;
   verified: number;
 }
+
+export interface SiteToolchainRebuildResult {
+  queued: number;
+}

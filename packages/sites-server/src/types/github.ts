@@ -1,4 +1,5 @@
 import type { githubIntegrations } from "@notra/db/schema";
+import type { SQLWrapper } from "drizzle-orm";
 
 export interface SiteRepository {
   organizationId: string;
@@ -27,6 +28,16 @@ export interface SiteRepositoryColumns {
   githubInstallationId: string | null;
   repositoryOwner: string | null;
   repositoryName: string | null;
+}
+
+/** Each value is a string or the column holding it. */
+export interface RepositoryApprovalRefs {
+  integrationId: string | SQLWrapper;
+  organizationId: string | SQLWrapper;
+  githubRepositoryId: string | SQLWrapper;
+  installationId: string | SQLWrapper;
+  owner: string | SQLWrapper;
+  repo: string | SQLWrapper;
 }
 
 export interface SiteRepositoryPermissions {

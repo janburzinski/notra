@@ -4348,6 +4348,8 @@ export const siteDeployments = pgTable(
       .notNull()
       .default(true),
     toolchainVersion: text("toolchain_version"),
+    /** Render fingerprint of the builder snapshot that built it. */
+    renderFingerprint: text("render_fingerprint"),
     fileCount: integer("file_count"),
     totalBytes: integer("total_bytes"),
     buildDurationMs: integer("build_duration_ms"),
@@ -4398,7 +4400,7 @@ export const siteDeployments = pgTable(
     ),
     check(
       "siteDeployments_trigger_check",
-      sql`${table.trigger} IN ('push', 'pull_request', 'manual', 'redeploy', 'config')`
+      sql`${table.trigger} IN ('push', 'pull_request', 'manual', 'redeploy', 'config', 'toolchain')`
     ),
     check("siteDeployments_generation_check", sql`${table.generation} >= 0`),
     check(

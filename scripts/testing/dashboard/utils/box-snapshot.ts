@@ -54,11 +54,17 @@ export async function createTestSnapshot(
       `Box snapshot creation failed:\n${result.output.replaceAll(apiKey, "[redacted]").slice(-4000)}`
     );
   }
-  const { version, snapshotId } = JSON.parse(readFileSync(resultFile, "utf8"));
+  const { version, renderFingerprint, snapshotId } = JSON.parse(
+    readFileSync(resultFile, "utf8")
+  );
   if (typeof snapshotId !== "string" || !SNAPSHOT_ID.test(snapshotId)) {
     throw new Error("Box snapshot creation returned no snapshot ID");
   }
-  return { version: String(version), snapshotId };
+  return {
+    version: String(version),
+    renderFingerprint: String(renderFingerprint),
+    snapshotId,
+  };
 }
 
 // The Box API deletes every snapshot on the account when `ids` is missing or

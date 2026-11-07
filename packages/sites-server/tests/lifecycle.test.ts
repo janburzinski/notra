@@ -354,6 +354,7 @@ if (process.env.NOTRA_SITES_LIFECYCLE_TEST_WORKER !== "1") {
       smartDeploymentEvaluation: null,
       buildBudgetReserved: true,
       toolchainVersion: null,
+      renderFingerprint: null,
       fileCount: 1,
       totalBytes: 2,
       buildDurationMs: 1,

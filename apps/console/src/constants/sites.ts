@@ -88,6 +88,7 @@ export const SITE_TRIGGER_LABELS: Record<SiteDeploymentTrigger, string> = {
   manual: "Manual update",
   redeploy: "Redeploy",
   config: "Settings change",
+  toolchain: "Theme update",
 };
 
 export const SITE_LIST_FILTERS: { value: SiteListFilter; label: string }[] = [

@@ -5,6 +5,7 @@ import type {
   SiteDiagnostic,
 } from "@notra/sites-core/types/build";
 import type { SiteServingState } from "@notra/sites-core/types/deployment";
+import type { SQLWrapper } from "drizzle-orm";
 
 import type { Site } from "./sites";
 
@@ -34,6 +35,18 @@ export interface EnqueueDeploymentInput {
   requestedByUserId?: string | null;
   /** Rejects the build when the site no longer builds from this repository. */
   githubRepositoryId?: string | null;
+  /**
+   * Rejects the build unless this is still the live production build and no
+   * other production build is queued, building or newer.
+   */
+  liveDeploymentId?: string;
+}
+
+/** Each value is a value or the column holding it. */
+export interface LiveBuildRefs {
+  siteId: string | SQLWrapper;
+  id: string | SQLWrapper;
+  generation: number | SQLWrapper;
 }
 
 export interface EnqueuedDeployment {

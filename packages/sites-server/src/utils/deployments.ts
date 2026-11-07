@@ -1,3 +1,4 @@
+import { TOOLCHAIN_REBUILD_DEDUPE_PREFIX } from "../constants/toolchain-rebuilds";
 import type {
   SiteDeployment,
   EnqueueDeploymentInput,
@@ -19,5 +20,25 @@ export function redeploymentInput(
     pullRequestNumber: previous.pullRequestNumber,
     requestedByUserId,
     githubRepositoryId: previous.githubRepositoryId,
+  };
+}
+
+/** One automatic rebuild per site and render fingerprint, whatever its outcome. */
+function toolchainRebuildDedupeKey(
+  siteId: string,
+  renderFingerprint: string
+): string {
+  return `${TOOLCHAIN_REBUILD_DEDUPE_PREFIX}${siteId}:${renderFingerprint}`;
+}
+
+export function toolchainRebuildInput(
+  live: SiteDeployment,
+  renderFingerprint: string
+): EnqueueDeploymentInput {
+  return {
+    ...redeploymentInput(live, null),
+    trigger: "toolchain",
+    dedupeKey: toolchainRebuildDedupeKey(live.siteId, renderFingerprint),
+    liveDeploymentId: live.id,
   };
 }

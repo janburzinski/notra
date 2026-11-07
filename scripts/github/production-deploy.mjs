@@ -82,11 +82,14 @@ const unkeyServices = [
 // Site builds run the toolchain baked into an Upstash Box snapshot, not the
 // dashboard's code. The dashboard must only go live with a snapshot built from
 // the same commit, or new site settings fail validation inside the sandbox.
+// The render fingerprint goes live with that dashboard, and its Sites cron
+// rebuilds live sites built with an older one.
 const sitesToolchain = {
   project: "notra",
   directory: "apps/sites-builder",
   snapshotKey: "SITES_BUILDER_SNAPSHOT_ID",
   versionKey: "SITES_BUILDER_TOOLCHAIN_VERSION",
+  renderFingerprintKey: "SITES_BUILDER_RENDER_FINGERPRINT",
 };
 const activeStates = new Set(["QUEUED", "INITIALIZING", "BUILDING"]);
 
@@ -508,6 +511,12 @@ export async function release({
           {
             key: sitesToolchain.versionKey,
             value: toolchain.version,
+            type: "plain",
+            target: ["production"],
+          },
+          {
+            key: sitesToolchain.renderFingerprintKey,
+            value: toolchain.renderFingerprint,
             type: "plain",
             target: ["production"],
           },

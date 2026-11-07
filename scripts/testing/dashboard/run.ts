@@ -89,6 +89,7 @@ const report = {
   staleBoxSnapshotsRemoved: 0,
   boxSnapshot: null as null | {
     version: string;
+    renderFingerprint: string;
     snapshotId: string;
     deleted: boolean;
   },
@@ -477,6 +478,8 @@ async function runSuite(file: string) {
             UPSTASH_BOX_API_KEY: boxApiKey,
             SITES_BUILDER_SNAPSHOT_ID: report.boxSnapshot?.snapshotId,
             SITES_E2E_BOX_TOOLCHAIN_VERSION: report.boxSnapshot?.version,
+            SITES_BUILDER_RENDER_FINGERPRINT:
+              report.boxSnapshot?.renderFingerprint,
           }
         : {}),
     },

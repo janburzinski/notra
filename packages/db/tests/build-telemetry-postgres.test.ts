@@ -96,6 +96,7 @@ if (!databaseUrl) {
         "../migrations/0127_site_deployment_repository.sql",
         "../migrations/0134_sites_suspension_slug_retirement.sql",
         "../migrations/0143_abuse_actions.sql",
+        "../migrations/0150_site_deployment_render_fingerprint.sql",
         "fixtures/sites-tenant-integrity-seed.sql",
       ]) {
         await pool.query(

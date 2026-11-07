@@ -568,7 +568,7 @@ try {
   );
   const install = await phase("toolchainInstall", () =>
     box.exec.command(
-      `cd ${WORKDIR} && mkdir -p toolchain && tar xzf toolchain.tgz -C toolchain && rm toolchain.tgz && cd toolchain && env -i PATH="$PATH" HOME="${WORKDIR}" ASTRO_TELEMETRY_DISABLED=1 npm install --omit=dev --no-audit --no-fund --loglevel=error > npm.log 2>&1 && node --version`
+      `cd ${WORKDIR} && mkdir -p toolchain && tar xzf toolchain.tgz -C toolchain && rm toolchain.tgz && cd toolchain && env -i PATH="$PATH" HOME="${WORKDIR}" ASTRO_TELEMETRY_DISABLED=1 npm ci --omit=dev --no-audit --no-fund --loglevel=error > npm.log 2>&1 && node --version`
     )
   );
   if (install.exitCode !== 0) {

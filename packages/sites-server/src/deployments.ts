@@ -30,6 +30,7 @@ import type {
 import type { SettingsJobAttempt } from "./types/jobs";
 import type { Site } from "./types/sites";
 import { prefixedId } from "./utils/ids";
+import { supersedesLiveBuild } from "./utils/live-build";
 import { lockSiteOrganization } from "./utils/site-organization-lock";
 import { buildTargetForDeployment } from "./utils/urls";
 
@@ -191,6 +192,9 @@ export async function enqueueSiteDeployment(
         return existing;
       }
     }
+    if (input.liveDeploymentId) {
+      await assertLiveBuild(tx, input.siteId, input.liveDeploymentId);
+    }
     if (assertCurrentHead) {
       // Keep head verification and generation allocation in the same admission order.
       await tx
@@ -235,7 +239,8 @@ async function insertDeployment(
     );
   }
   const buildBudgetReserved = !(
-    site.smartDeployments && ["push", "pull_request"].includes(input.trigger)
+    input.trigger === "toolchain" ||
+    (site.smartDeployments && ["push", "pull_request"].includes(input.trigger))
   );
   if (buildBudgetReserved) {
     await assertBuildBudget(tx, site.organizationId);
@@ -303,6 +308,8 @@ async function assertBuildBudget(
       and(
         eq(siteDeployments.organizationId, organizationId),
         excludeId ? ne(siteDeployments.id, excludeId) : undefined,
+        // Notra's own rebuilds don't use up the workspace's builds.
+        ne(siteDeployments.trigger, "toolchain"),
         or(
           gt(siteDeployments.startedAt, sql`now() - interval '24 hours'`),
           and(
@@ -383,7 +390,7 @@ export async function startDeploymentBuild(
       tx,
       organizationId,
       deployment.id,
-      current.startedAt !== null
+      current.startedAt !== null || current.trigger === "toolchain"
     );
     return transitionDeployment(
       current.id,
@@ -527,6 +534,50 @@ async function recordDedupeKey(
     .insert(siteJobDedupeKeys)
     .values({ dedupeKey, jobId })
     .onConflictDoNothing();
+}
+
+/**
+ * Holds the site row, which every enqueue updates to allocate its generation,
+ * so a push admitted after the caller chose this build keeps priority.
+ */
+async function assertLiveBuild(
+  tx: SiteStorageTransaction,
+  siteId: string,
+  liveDeploymentId: string
+): Promise<void> {
+  const [site] = await tx
+    .select({ live: sites.activeProductionDeploymentId })
+    .from(sites)
+    .where(eq(sites.id, siteId))
+    .for("update");
+  const [live] = await tx
+    .select({ generation: siteDeployments.generation })
+    .from(siteDeployments)
+    .where(
+      and(
+        eq(siteDeployments.id, liveDeploymentId),
+        eq(siteDeployments.siteId, siteId)
+      )
+    )
+    .limit(1);
+  const [newer] = live
+    ? await tx
+        .select({ id: siteDeployments.id })
+        .from(siteDeployments)
+        .where(
+          supersedesLiveBuild(siteDeployments, {
+            siteId,
+            id: liveDeploymentId,
+            generation: live.generation,
+          })
+        )
+        .limit(1)
+    : [];
+  if (site?.live !== liveDeploymentId || !live || newer) {
+    throw new SiteNotBuildableError(
+      "The live build changed since this rebuild was planned"
+    );
+  }
 }
 
 export async function hasNewerDeployment(

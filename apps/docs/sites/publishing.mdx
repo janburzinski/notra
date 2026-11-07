@@ -38,6 +38,7 @@ With automatic publishing on, production builds go live as described below.
 | **Manual update** | Notra builds the latest commit of the production branch and it goes live |
 | **Redeploy** | Notra builds the same commit again |
 | **Settings change** | Changing section paths, the production branch, the site folder, branding or the primary domain rebuilds the site |
+| **Theme update** | After a Notra theme update that changes how pages look, Notra builds the live commit again with the new theme |
 
 Production builds go live automatically unless a rollback has paused publishing. While paused, new builds still finish and appear in **Deployments**, but the rolled-back version stays live until you choose **Promote** or **Undo rollback**.
 
@@ -45,7 +46,7 @@ When automatic publishing is on, the live version stays online until the new bui
 
 If the site is in a subdirectory, a push that changes nothing in its folder doesn't deploy and gets no check run, so other work in a monorepo doesn't rebuild the site. Notra still deploys when it can't tell which files changed, for example after a force push or on a new branch.
 
-Notra updates the theme from time to time, and a site picks up the new theme with its next deploy. Use **Manual update** to pick it up right away.
+Notra updates the theme from time to time. When an update changes how pages look, Notra rebuilds each live site from the commit it's serving, a few sites at a time, so the rollout can take a while. Your own builds go first: a site with a production build in progress waits, a new push replaces the rebuild, and a site paused by a rollback isn't rebuilt. If the rebuild fails, the current version stays live and Notra doesn't retry it. The failed **Theme update** shows in **Deployments**, and your next push or **Redeploy** uses the new theme. Use **Manual update** to pick up a theme update right away.
 
 ## Following a deploy
 
@@ -64,7 +65,7 @@ Open a deployment for its timeline, the live build log, diagnostics and the numb
 
 ### GitHub checks
 
-Every commit that deploys gets a check run, **Notra Sites** for production and **Notra Sites preview** for previews. Published builds link to the live site or preview; builds that aren't live link to the deployment in Notra. Failed builds add their errors and warnings as annotations on the lines in the pull request. **Re-run** on GitHub redeploys the commit.
+Every commit that deploys gets a check run, **Notra Sites** for production and **Notra Sites preview** for previews. Theme updates don't add check runs to your commits. Published builds link to the live site or preview; builds that aren't live link to the deployment in Notra. Failed builds add their errors and warnings as annotations on the lines in the pull request. **Re-run** on GitHub redeploys the commit.
 
 Successful production builds held by a rollback show **Automatic publishing paused** in their GitHub check. Promoting a build updates its check to **Live**.
 

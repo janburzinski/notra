@@ -240,6 +240,8 @@ export const SITE_DEPLOYMENT_TRIGGERS = [
   "manual",
   "redeploy",
   "config",
+  // Notra rebuilt the live commit after a builder release changed rendering.
+  "toolchain",
 ] as const;
 
 export const SITE_PREVIEW_VISIBILITIES = ["public", "protected"] as const;

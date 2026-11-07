@@ -47,6 +47,7 @@ import type {
   SiteRepositoryPermissions,
 } from "./types/github";
 import { readBodyUpToEffect } from "./utils/read-body";
+import { repositoryApproval } from "./utils/repository-approval";
 import { runSitesEffect } from "./utils/run-sites-effect";
 
 const repositoryTokens = new Map<string, RepositoryTokenCacheEntry>();
@@ -118,21 +119,14 @@ export async function siteRepositoryToken(
       eq(githubIntegrations.githubAppInstallationId, githubAppInstallations.id)
     )
     .where(
-      and(
-        eq(githubIntegrations.id, repository.integrationId),
-        eq(githubIntegrations.organizationId, repository.organizationId),
-        eq(githubAppInstallations.organizationId, repository.organizationId),
-        eq(
-          githubIntegrations.githubRepositoryId,
-          repository.githubRepositoryId
-        ),
-        eq(githubIntegrations.owner, repository.owner),
-        eq(githubIntegrations.repo, repository.repo),
-        eq(githubAppInstallations.installationId, repository.installationId),
-        eq(githubIntegrations.enabled, true),
-        eq(githubIntegrations.repositoryEnabled, true),
-        eq(githubAppInstallations.enabled, true)
-      )
+      repositoryApproval({
+        integrationId: repository.integrationId,
+        organizationId: repository.organizationId,
+        githubRepositoryId: repository.githubRepositoryId,
+        installationId: repository.installationId,
+        owner: repository.owner,
+        repo: repository.repo,
+      })
     )
     .limit(1);
   if (!approved) {

@@ -1051,6 +1051,13 @@
       "when": 1794084159516,
       "tag": "0149_content_author_more_profiles",
       "breakpoints": true
+    },
+    {
+      "idx": 150,
+      "version": "7",
+      "when": 1794084695357,
+      "tag": "0150_site_deployment_render_fingerprint",
+      "breakpoints": true
     }
   ]
 }

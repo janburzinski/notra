@@ -50,7 +50,8 @@ export async function startBoxEmulator(options: BoxEmulatorOptions) {
 
   const builder = resolve(import.meta.dirname, "../../../sites-builder");
   const snapshotDirectory = join(root, "snapshot", "toolchain");
-  const version = await stageBoxToolchain(snapshotDirectory);
+  const { version, renderFingerprint } =
+    await stageBoxToolchain(snapshotDirectory);
   // The real snapshot runs `npm install --omit=dev`; the checkout's install
   // provides the same packages.
   await symlink(
@@ -264,6 +265,7 @@ export async function startBoxEmulator(options: BoxEmulatorOptions) {
       SITES_BOX_API_URL: server.url,
       UPSTASH_BOX_API_KEY: options.apiKey,
       SITES_BUILDER_SNAPSHOT_ID: snapshotId,
+      SITES_BUILDER_RENDER_FINGERPRINT: renderFingerprint,
     },
   };
 }

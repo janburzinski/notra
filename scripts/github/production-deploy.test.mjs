@@ -419,7 +419,11 @@ test("new sites toolchain rolls the snapshot and redeploys the dashboard", async
   const { calls, run, toolchainBuilds } = fixture({
     changed: () => false,
     liveToolchain: null,
-    toolchain: { version: "toolchain-2", snapshotId: "snap-2" },
+    toolchain: {
+      version: "toolchain-2",
+      renderFingerprint: "render-2",
+      snapshotId: "snap-2",
+    },
   });
   await run();
   assert.equal(toolchainBuilds[0].liveVersion, null);
@@ -430,6 +434,7 @@ test("new sites toolchain rolls the snapshot and redeploys the dashboard", async
     [
       ["SITES_BUILDER_SNAPSHOT_ID", "snap-2", ["production"]],
       ["SITES_BUILDER_TOOLCHAIN_VERSION", "toolchain-2", ["production"]],
+      ["SITES_BUILDER_RENDER_FINGERPRINT", "render-2", ["production"]],
     ]
   );
   const started = builds(calls);

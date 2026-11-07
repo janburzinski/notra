@@ -111,6 +111,7 @@ if (process.env.NOTRA_SITES_GET_READ_ONLY_TEST_WORKER !== "1") {
     smartDeploymentEvaluation: null,
     buildBudgetReserved: true,
     toolchainVersion: null,
+    renderFingerprint: null,
     fileCount: null,
     totalBytes: null,
     buildDurationMs: null,

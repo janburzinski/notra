@@ -246,6 +246,7 @@ export const runSandboxBuildEffect = Effect.fn("Sites.Sandbox.build")(
       log: "",
       outputArchive: null,
       toolchainVersion: null,
+      renderFingerprint: null,
       durationMs: 0,
       metrics,
     };
@@ -278,30 +279,37 @@ export const runSandboxBuildEffect = Effect.fn("Sites.Sandbox.build")(
               "toolchain/VERSION",
               "exit-code",
               "build-metrics.json",
+              "toolchain/RENDER_FINGERPRINT",
             ];
-            const [resultText, logText, versionText, exitText, telemetryText] =
-              yield* Effect.forEach(
-                paths,
-                (path) =>
-                  (path === "build.log"
-                    ? readLogEffect(apiKey, currentBox)
-                    : readFileEffect(
-                        apiKey,
-                        currentBox,
-                        `${BOX_WORKDIR}/${path}`
-                      )
-                  ).pipe(
-                    Effect.catch((error) =>
-                      Effect.sync(() => {
+            const [
+              resultText,
+              logText,
+              versionText,
+              exitText,
+              telemetryText,
+              fingerprintText,
+            ] = yield* Effect.forEach(
+              paths,
+              (path) =>
+                (path === "build.log"
+                  ? readLogEffect(apiKey, currentBox)
+                  : readFileEffect(apiKey, currentBox, `${BOX_WORKDIR}/${path}`)
+                ).pipe(
+                  Effect.catch((error) =>
+                    Effect.sync(() => {
+                      // Snapshots from before render fingerprints lack the file.
+                      if (path !== "toolchain/RENDER_FINGERPRINT") {
                         appendError(`read:${path}`, error);
-                        return null;
-                      })
-                    )
-                  ),
-                { concurrency: 5 }
-              );
+                      }
+                      return null;
+                    })
+                  )
+                ),
+              { concurrency: paths.length }
+            );
             build.log = boundedLog(logText || runOutput);
             build.toolchainVersion = versionText?.trim() ?? null;
+            build.renderFingerprint = fingerprintText?.trim() || null;
             const parsed = resultText
               ? siteBuildResultSchema.safeParse(safeJson(resultText))
               : null;

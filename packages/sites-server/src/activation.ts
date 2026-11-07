@@ -15,6 +15,7 @@ import {
   getProductionDeploymentHistory,
 } from "./deployments";
 import { SiteActivationContentionError, SiteInputError } from "./errors/sites";
+import { isStaleToolchainRebuild } from "./live-build";
 import { readPostPreviewSource } from "./post-preview-source";
 import { r2GetText } from "./r2";
 import { reportOutcome } from "./reporting";
@@ -78,6 +79,14 @@ export async function activateDeployment(
         return "not_live";
       }
       if (deployment.kind === "production") {
+        // A theme rebuild never replaces a build of another commit or a
+        // build that went live, or is still on its way, after it was queued.
+        if (
+          deployment.trigger === "toolchain" &&
+          (await isStaleToolchainRebuild(deployment, tx))
+        ) {
+          return "not_live";
+        }
         const serving = await readServingState(site.id);
         const current = serving?.state.production;
         if (

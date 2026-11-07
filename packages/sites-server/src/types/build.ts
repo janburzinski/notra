@@ -12,6 +12,7 @@ export interface SandboxBuildResult {
   log: string;
   outputArchive: Uint8Array<ArrayBuffer> | null;
   toolchainVersion: string | null;
+  renderFingerprint?: string | null;
   durationMs: number;
   metrics?: SiteBuildMetrics;
 }

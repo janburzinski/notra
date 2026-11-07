@@ -138,6 +138,9 @@ if (!process.env.SITES_TEST_DATABASE_URL) {
   }));
   let afterCompile = async () => {};
   let transientBuildFailure = false;
+  // The next build compiles, then reports a failure, as if a new builder
+  // rejected the site.
+  let rejectNextBuild = false;
   let builds = 0;
   const journal = lifecycleJournal(realBox ? "upstash-box" : "emulated-box");
   const boxBuilds: SandboxBuildResult[] = [];
@@ -158,7 +161,7 @@ if (!process.env.SITES_TEST_DATABASE_URL) {
             new Error("Controlled transient Box transport failure")
           );
         }
-        return yield* runBoxBuild({
+        const build = yield* runBoxBuild({
           ...params,
           onComplete: (build) =>
             Effect.gen(function* () {
@@ -182,6 +185,16 @@ if (!process.env.SITES_TEST_DATABASE_URL) {
               }
             }),
         });
+        if (!rejectNextBuild) {
+          return build;
+        }
+        rejectNextBuild = false;
+        return {
+          ...build,
+          result: null,
+          outputArchive: null,
+          crash: "Controlled builder rejection",
+        };
       }),
   }));
   const expectNoLiveBoxes = () => {
@@ -205,13 +218,14 @@ if (!process.env.SITES_TEST_DATABASE_URL) {
     siteBranchDrafts,
     siteBuildTelemetry,
     siteDomains,
+    siteJobDedupeKeys,
     siteJobs,
     siteDeployments,
     siteDrafts,
     siteWebhookDeliveries,
     sites,
   } = await import("@notra/db/schema");
-  const { SiteHostConflictError, SitePlanLimitError } =
+  const { SiteHostConflictError, SiteNotBuildableError, SitePlanLimitError } =
     await import("../../../packages/sites-server/src/errors/sites");
   const { eq, inArray } = await import("drizzle-orm");
   const { getGitHubAppWebhookSecret } =
@@ -223,8 +237,16 @@ if (!process.env.SITES_TEST_DATABASE_URL) {
     setOrganizationSuspended,
     setSiteSuspended,
   } = await import("../../../packages/sites-server/src/sites");
-  const { getSite, getDeployment } =
-    await import("../../../packages/sites-server/src/deployments");
+  const {
+    enqueueSiteDeployment,
+    getSite,
+    getDeployment,
+    transitionDeployment,
+  } = await import("../../../packages/sites-server/src/deployments");
+  const { toolchainRebuildInput } =
+    await import("../../../packages/sites-server/src/utils/deployments");
+  const { queueToolchainRebuilds } =
+    await import("../../../packages/sites-server/src/toolchain-rebuilds");
   const {
     deployBranchHead,
     promoteLatestDeployment,
@@ -640,6 +662,91 @@ if (!process.env.SITES_TEST_DATABASE_URL) {
         expect(refusedAllocations.length - refusedBefore).toBe(outcomes.length);
         await expectProduction(site.id, first.id, initialHtml);
       }
+      await phase("builder release rebuilds the live commit once");
+      // A release whose render fingerprint differs from the live build's
+      // rebuilds the live commit, not the broken branch head, without a
+      // check run, and only after real builds already queued.
+      const renderFingerprint = process.env.SITES_BUILDER_RENDER_FINGERPRINT;
+      assert.ok(renderFingerprint, "the release sets the render fingerprint");
+      expect((await getDeployment(first.id))?.renderFingerprint).toBe(
+        renderFingerprint
+      );
+      expect(first.commitSha).not.toBe(await github.head());
+      const rebuildSweep = async () =>
+        (await queueToolchainRebuilds({ siteIds: [site.id] })).queued;
+      expect(await rebuildSweep()).toEqual([]);
+      await db
+        .update(siteDeployments)
+        .set({ renderFingerprint: "older-builder" })
+        .where(eq(siteDeployments.id, first.id));
+      const pendingJob = await redeploy(site, brokenDeployment.id, userId);
+      expect(await rebuildSweep()).toEqual([]);
+      expect(
+        await transitionDeployment(
+          (await deploymentFor(pendingJob)).id,
+          "canceled",
+          {
+            finishedAt: new Date(),
+          }
+        )
+      ).toBe(true);
+      expect(await runSiteJob(pendingJob)).toEqual({ status: "skipped" });
+      // Overlapping cron runs queue it once.
+      const sweeps = await Promise.all([rebuildSweep(), rebuildSweep()]);
+      expect(sweeps.flat()).toHaveLength(1);
+      const [automatic] = sweeps.flat();
+      assert.ok(automatic);
+      expect(await rebuildSweep()).toEqual([]);
+      expect(await getDeployment(automatic.deploymentId)).toMatchObject({
+        siteId: site.id,
+        kind: "production",
+        trigger: "toolchain",
+        status: "queued",
+        branch: first.branch,
+        commitSha: first.commitSha,
+        requestedByUserId: null,
+      });
+      expect(await runSiteJob(automatic.jobId)).toMatchObject({
+        status: "done",
+        outcome: "live",
+      });
+      expect(await getDeployment(automatic.deploymentId)).toMatchObject({
+        status: "ready",
+        renderFingerprint,
+        checkRunId: null,
+      });
+      expect(await github.checkRuns(first.commitSha)).toHaveLength(1);
+      const rebuiltHtml = await (
+        await request(`${site.publicOrigin}/blog`)
+      ).text();
+      expect(rebuiltHtml).toContain("Notes on building calm software");
+      await expectProduction(site.id, automatic.deploymentId, rebuiltHtml);
+      expect(await rebuildSweep()).toEqual([]);
+      await phase("failed builder rebuild keeps the live build, no retry");
+      process.env.SITES_BUILDER_RENDER_FINGERPRINT = "next-builder";
+      try {
+        const [failing, ...others] = await rebuildSweep();
+        expect(others).toEqual([]);
+        assert.ok(failing);
+        rejectNextBuild = true;
+        expect(await runSiteJob(failing.jobId)).toMatchObject({
+          status: "done",
+          outcome: "failed",
+        });
+        expect(await getDeployment(failing.deploymentId)).toMatchObject({
+          trigger: "toolchain",
+          status: "failed",
+          commitSha: first.commitSha,
+          errorMessage: expect.stringContaining("Controlled builder rejection"),
+        });
+        await expectProduction(site.id, automatic.deploymentId, rebuiltHtml);
+        expect(await github.checkRuns(first.commitSha)).toHaveLength(1);
+        // Still built with another fingerprint, but tried once already.
+        expect(await rebuildSweep()).toEqual([]);
+      } finally {
+        rejectNextBuild = false;
+        process.env.SITES_BUILDER_RENDER_FINGERPRINT = renderFingerprint;
+      }
       await phase("fix push with a transient retry");
       const fixed = await pushAndQueue(
         [
@@ -685,6 +792,114 @@ if (!process.env.SITES_TEST_DATABASE_URL) {
         status: "done",
         outcome: "live",
       });
+      expect(
+        await (await request(`${site.publicOrigin}/blog`)).text()
+      ).toContain("Acme recovered");
+      await phase("pushes beat a theme rebuild");
+      // Marks the live build as built by an older builder and forgets the
+      // earlier attempt, as a new builder release would, then returns it.
+      const outdatedLive = async () => {
+        const current = await getSite(site.id);
+        assert.ok(current?.activeProductionDeploymentId);
+        await db
+          .update(siteDeployments)
+          .set({ renderFingerprint: "older-builder" })
+          .where(eq(siteDeployments.id, current.activeProductionDeploymentId));
+        await db
+          .delete(siteJobDedupeKeys)
+          .where(
+            eq(
+              siteJobDedupeKeys.dedupeKey,
+              `toolchain-rebuild:${site.id}:${renderFingerprint}`
+            )
+          );
+        const live = await getDeployment(current.activeProductionDeploymentId);
+        assert.ok(live);
+        return live;
+      };
+      const expectLive = async (jobId: string) => {
+        const deployment = await deploymentFor(jobId);
+        expect(deployment).toMatchObject({
+          status: "ready",
+          renderFingerprint,
+        });
+        expect((await getSite(site.id))?.activeProductionDeploymentId).toBe(
+          deployment.id
+        );
+        expect(
+          JSON.parse(r2.text(SITE_R2_KEYS.state(site.id)) ?? "null")?.production
+            ?.deploymentId
+        ).toBe(deployment.id);
+      };
+      // A push admitted after a sweep chose the site, but before it queued
+      // the rebuild: the rebuild is refused under the site lock.
+      const chosen = await outdatedLive();
+      const admitted = await pushAndQueue(
+        [{ path: "notes/theme-race.txt", content: "admitted first" }],
+        "Push during a theme rollout"
+      );
+      await expect(
+        enqueueSiteDeployment(toolchainRebuildInput(chosen, renderFingerprint))
+      ).rejects.toBeInstanceOf(SiteNotBuildableError);
+      expect(await rebuildSweep()).toEqual([]);
+      expect(await runSiteJob(admitted.jobId)).toMatchObject({
+        status: "done",
+        outcome: "live",
+      });
+      await expectLive(admitted.jobId);
+      expect(await rebuildSweep()).toEqual([]);
+      // Even a rebuild queued past that check with a newer generation than a
+      // pending push yields to it before building.
+      const bypassed = await outdatedLive();
+      const pending = await pushAndQueue(
+        [{ path: "notes/theme-race.txt", content: "pending push" }],
+        "Push queued before a theme rebuild"
+      );
+      const forced = await enqueueSiteDeployment({
+        ...toolchainRebuildInput(bypassed, renderFingerprint),
+        liveDeploymentId: undefined,
+      });
+      expect(forced.deployment.generation).toBeGreaterThan(
+        (await deploymentFor(pending.jobId)).generation
+      );
+      const buildsBeforeForced = builds;
+      expect(await runSiteJob(forced.jobId)).toMatchObject({
+        status: "done",
+        outcome: "skipped",
+      });
+      expect(builds).toBe(buildsBeforeForced);
+      expect(await getDeployment(forced.deployment.id)).toMatchObject({
+        status: "superseded",
+      });
+      expect(await runSiteJob(pending.jobId)).toMatchObject({
+        status: "done",
+        outcome: "live",
+      });
+      await expectLive(pending.jobId);
+      // A push after the rebuild was queued gets a newer generation and wins.
+      await outdatedLive();
+      const [queuedRebuild, ...otherRebuilds] = await rebuildSweep();
+      expect(otherRebuilds).toEqual([]);
+      assert.ok(queuedRebuild);
+      const later = await pushAndQueue(
+        [{ path: "notes/theme-race.txt", content: "pushed after the rebuild" }],
+        "Push after a theme rebuild was queued"
+      );
+      const buildsBeforeQueued = builds;
+      expect(await runSiteJob(queuedRebuild.jobId)).toMatchObject({
+        status: "done",
+        outcome: "skipped",
+      });
+      expect(builds).toBe(buildsBeforeQueued);
+      expect(await getDeployment(queuedRebuild.deploymentId)).toMatchObject({
+        status: "superseded",
+      });
+      expect(await runSiteJob(later.jobId)).toMatchObject({
+        status: "done",
+        outcome: "live",
+      });
+      await expectLive(later.jobId);
+      expect(await rebuildSweep()).toEqual([]);
       expect(
         await (await request(`${site.publicOrigin}/blog`)).text()
       ).toContain("Acme recovered");
@@ -1863,7 +2078,7 @@ if (!process.env.SITES_TEST_DATABASE_URL) {
       expect(
         emulators.summaries().flatMap((summary) => summary.unhandled)
       ).toEqual([]);
-      expect(builds).toBe(15);
+      expect(builds).toBe(20);
       expect(boxBuilds).toHaveLength(builds);
       if (emulators.box) {
         expectNoLiveBoxes();
@@ -1908,7 +2123,8 @@ if (!process.env.SITES_TEST_DATABASE_URL) {
           );
         }
       }
-      expect(boxBuilds.filter((build) => build.result?.ok)).toHaveLength(13);
+      // The rejected builder rebuild compiled before it reported a failure.
+      expect(boxBuilds.filter((build) => build.result?.ok)).toHaveLength(18);
       console.log(
         JSON.stringify({
           scope: "connected-postgres-compiler-publisher-worker-lifecycle",
