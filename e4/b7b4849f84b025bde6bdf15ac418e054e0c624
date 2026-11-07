@@ -1,0 +1,37 @@
+packages/analytics/src/tinybird/pipes/geo-traffic-trends.ts
+  s_2a641a79c946c6::t_31adaaef4b7352 9-15,76,147,245,426,504
+  s_2a641a79c946c6::t_82fd848da37eb3 28-30,495
+  s_2a641a79c946c6::t_ac099bfbf38cbd 224-233,236-237,251-255
+  s_2a641a79c946c6::t_33e3163a1d1482 496-497
+  s_2a641a79c946c6::t_b88eb3c0e71215 45,461
+apps/dashboard/src/lib/public-data/ai-traffic.ts
+  s_2a641a79c946c6::t_ac099bfbf38cbd 22,86-87
+apps/web/src/components/data/data-view.tsx
+  s_2a641a79c946c6::t_6327cb32b9545b 33
+  s_2a641a79c946c6::t_d47939ba6e8758 87-91
+apps/web/src/constants/data.ts
+  s_2a641a79c946c6::t_ac099bfbf38cbd 17-18,22
+  s_2a641a79c946c6::t_d47939ba6e8758 16,19-21,23-24
+apps/dashboard/src/lib/analytics/real-traffic-projects.ts
+  s_2a641a79c946c6::t_a01ba1540895f0 5-6,8-12,17-20,23-38,47-50,52
+  s_2a641a79c946c6::t_ba1a763c465a90 21-22,39-46,51
+apps/dashboard/src/constants/public-data.ts
+  s_2a641a79c946c6::t_ba1a763c465a90 27-31,42-45
+  s_2a641a79c946c6::t_ac099bfbf38cbd 32-36
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "e4b7b4849f84b025bde6bdf15ac418e054e0c624",
+  "prompts": {},
+  "sessions": {
+    "s_2a641a79c946c6": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "712a2427-7f87-4390-a750-259eed0c22d3",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
