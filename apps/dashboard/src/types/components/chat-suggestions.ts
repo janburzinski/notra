@@ -38,3 +38,29 @@ export interface SuggestionCardProps {
   slotIndex: number;
   reduceMotion: boolean;
 }
+
+type ChatPromptSuggestionSource =
+  | "draft"
+  | "gap"
+  | "shipped"
+  | "repo"
+  | "brand"
+  | "starter";
+
+export interface ChatPromptSuggestion {
+  id: string;
+  source: ChatPromptSuggestionSource;
+  icon: IconSvgElement;
+  title: string;
+  description: string;
+  prompt: string;
+}
+
+export interface ChatHomeSuggestionsProps {
+  suggestions: ChatPromptSuggestion[];
+  heading: string;
+  isLoading: boolean;
+  disabled?: boolean;
+  hidden?: boolean;
+  onSelect: (prompt: string) => void;
+}

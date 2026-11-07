@@ -6343,6 +6343,44 @@
           "description": "Beantworte die Fragen, die Leute wirklich stellen",
           "prompt": "Hilf mir, ein FAQ zu entwerfen. Frag mich vorher nach dem Produkt und den Fragen, die Kunden wirklich stellen."
         }
+      },
+      "personalHeading": "Für {brand} ausgewählt",
+      "personalHeadingFallback": "Für dich ausgewählt",
+      "personal": {
+        "draft": {
+          "title": "„{title}“ fertigstellen",
+          "description": "Bearbeitet {ago}",
+          "prompt": "Hilf mir, meinen Entwurf \"{title}\" (Post-ID {postId}) fertigzustellen. Lies ihn zuerst, sag mir, was fehlt, und schlag Änderungen vor, bevor du etwas änderst."
+        },
+        "gap": {
+          "title": "Für „{prompt}“ zitiert werden",
+          "description": "KI-Antworten nennen stattdessen {competitor}",
+          "descriptionUnnamed": "KI-Antworten erwähnen dich noch nicht",
+          "prompt": "KI-Antworten auf \"{prompt}\" erwähnen uns noch nicht. Prüf, was sie zitieren, und hilf mir, eine Seite zu planen, die die Erwähnung verdient. Stell mir vor dem Entwurf 1-2 Fragen."
+        },
+        "shipped": {
+          "title": "„{title}“ ankündigen",
+          "description": "Von KI-Agents gewünscht, erledigt {ago}",
+          "prompt": "Wir haben ein Feature ausgeliefert, das KI-Agents gewünscht haben: \"{title}\". Hilf mir, einen kurzen Changelog-Eintrag dazu zu schreiben. Frag mich vorher, was sich geändert hat und wie man es nutzt."
+        },
+        "repo": {
+          "title": "Release Notes für {repo}",
+          "description": "Letzte 7 Tage aus {owner}/{repo}",
+          "prompt": "Entwirf Release Notes für {owner}/{repo} aus allem, was in den letzten 7 Tagen gemergt wurde. Beginne mit dem, was für Nutzer wichtig ist."
+        },
+        "socialPost": {
+          "title": "Post über {brand}",
+          "description": "Ein LinkedIn- oder X-Update in deiner Stimme",
+          "prompt": "Hilf mir, einen Social-Post für {brand} zu schreiben. Frag mich zuerst, ob er für X oder LinkedIn ist, dann nach Thema und Blickwinkel."
+        }
+      },
+      "sources": {
+        "draft": "Deine Entwürfe",
+        "gap": "KI-Suche",
+        "shipped": "Agent-Feedback",
+        "repo": "GitHub",
+        "brand": "Deine Marke",
+        "starter": "Einstieg"
       }
     },
     "userMessageActions": {

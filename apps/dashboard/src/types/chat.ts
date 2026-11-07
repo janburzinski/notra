@@ -29,3 +29,15 @@ export interface ChatHistoryGroup {
   id: ChatHistoryGroupId;
   sessions: ChatSessionSummary[];
 }
+
+export type ChatSuggestionSignal =
+  | { kind: "draft"; postId: string; title: string; updatedAt: string }
+  | { kind: "gap"; title: string; prompt: string; competitor: string | null }
+  | { kind: "repo"; owner: string; repo: string }
+  | { kind: "shipped"; feedbackId: string; title: string; resolvedAt: string };
+
+export interface ChatSuggestionSignals {
+  brandName: string | null;
+  hasGeo: boolean;
+  signals: ChatSuggestionSignal[];
+}

@@ -64,3 +64,15 @@ export const DASHBOARD_AGENT_SUGGESTIONS: ChatSuggestion[] = [
     icon: HelpCircleIcon,
   },
 ];
+
+export const CHAT_HOME_SUGGESTION_COUNT = 4;
+
+/** Fallback order when a workspace has fewer than four personal suggestions. */
+export const CHAT_HOME_STARTER_IDS = [
+  "blogPost",
+  "releaseNotes",
+  "geoStatus",
+  "socialPost",
+  "newsletter",
+  "comparison",
+] as const;

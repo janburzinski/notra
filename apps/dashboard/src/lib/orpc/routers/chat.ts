@@ -17,6 +17,7 @@ import {
 } from "@notra/db/utils/post-collections";
 import {
   chatSessionInputSchema,
+  chatSuggestionsInputSchema,
   createChatPostInputSchema,
   forkChatShareInputSchema,
   listChatSessionsInputSchema,
@@ -33,6 +34,7 @@ import {
   publishChatShare,
   revokeChatShare,
 } from "@/lib/chat/shares";
+import { loadChatSuggestionSignals } from "@/lib/chat/suggestions";
 import { afterResponse } from "@/lib/framework/after-response";
 import { authorizedProcedure, withOrganizationAccess } from "@/lib/orpc/base";
 import {
@@ -44,6 +46,16 @@ import {
 const CHAT_NOT_FOUND_MESSAGE = "Chat not found";
 
 export const chatRouter = {
+  suggestions: authorizedProcedure
+    .input(chatSuggestionsInputSchema)
+    .use(withOrganizationAccess)
+    .handler(({ context, input }) =>
+      loadChatSuggestionSignals(
+        context.auth.organizationId,
+        input.projectId ?? null
+      )
+    ),
+
   sessions: {
     list: authorizedProcedure
       .input(listChatSessionsInputSchema)

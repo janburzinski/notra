@@ -1,13 +1,10 @@
 "use client";
 
 import {
-  AiBrain01Icon,
   Alert02Icon,
-  ArrowDown01Icon,
   ArrowUp02Icon,
   AtIcon,
   File02Icon,
-  Tick02Icon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { FEATURES } from "@notra/ai/billing/features";
@@ -32,14 +29,6 @@ import {
   CommandList,
 } from "@notra/ui/components/ui/command";
 import { Composer } from "@notra/ui/components/ui/composer";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuTrigger,
-} from "@notra/ui/components/ui/dropdown-menu";
 import {
   Popover,
   PopoverContent,
@@ -766,57 +755,6 @@ function ChatComposerNudge({
   );
 }
 
-function ChatComposerThinkingMenu({
-  isLoading,
-  isQueued,
-  onThinkingLevelChange,
-  thinkingLevel,
-}: {
-  isLoading: boolean;
-  isQueued: boolean;
-  onThinkingLevelChange?: (level: ThinkingLevel) => void;
-  thinkingLevel: ThinkingLevel;
-}) {
-  const t = useTranslations("chat.input.thinking");
-  const tCommon2 = useTranslations("common");
-  return (
-    <DropdownMenu>
-      <DropdownMenuTrigger
-        render={<Composer.ToolbarButton disabled={isLoading || isQueued} />}
-      >
-        <HugeiconsIcon className="size-3.5" icon={AiBrain01Icon} />
-        {thinkingLevel === "off"
-          ? t("off")
-          : tCommon2(`labels.${thinkingLevel}`)}
-        <HugeiconsIcon className="size-3" icon={ArrowDown01Icon} />
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="start" className="w-44">
-        <DropdownMenuGroup>
-          <DropdownMenuLabel>{t("label")}</DropdownMenuLabel>
-        </DropdownMenuGroup>
-        {THINKING_LEVELS.map((level) => (
-          <DropdownMenuItem
-            key={level}
-            onClick={() => onThinkingLevelChange?.(level)}
-          >
-            <span className="text-sm">
-              {level === "off"
-                ? tCommon2("labels.off")
-                : tCommon2(`labels.${level}`)}
-            </span>
-            {thinkingLevel === level ? (
-              <HugeiconsIcon
-                className="text-primary ml-auto size-3.5"
-                icon={Tick02Icon}
-              />
-            ) : null}
-          </DropdownMenuItem>
-        ))}
-      </DropdownMenuContent>
-    </DropdownMenu>
-  );
-}
-
 function ChatComposerContextPicker({
   addContext,
   contextOptions,
@@ -975,8 +913,6 @@ interface ChatInputAdvancedProps {
   onRemoveContext?: (item: ContextItem) => void;
   error?: string | null;
   onClearError?: () => void;
-  thinkingLevel?: ThinkingLevel;
-  onThinkingLevelChange?: (level: ThinkingLevel) => void;
   connectedTop?: boolean;
   queuedMessages?: QueuedMessage[];
   onEditQueued?: (message: QueuedMessage) => void;
@@ -1209,8 +1145,6 @@ export function ChatInputAdvanced({
   onRemoveContext,
   error: externalError,
   onClearError,
-  thinkingLevel = "medium",
-  onThinkingLevelChange,
   connectedTop = false,
   queuedMessages = [],
   onEditQueued,
@@ -2848,14 +2782,15 @@ export function ChatInputAdvanced({
               </div>
             </div>
             <Composer.Toolbar>
-              <ChatComposerThinkingMenu
-                isLoading={isLoading}
-                isQueued={isQueued}
-                onThinkingLevelChange={onThinkingLevelChange}
-                thinkingLevel={thinkingLevel}
+              <ChatComposerAttachButton
+                attachmentCount={attachments.length}
+                disabled={isQueued}
+                onAttach={() => fileInputRef.current?.click()}
+                pendingUploadCount={pendingUploads.length}
+                tooltip={t("attach.files")}
               />
 
-              <div className="ml-auto flex items-center gap-1">
+              <div className="ml-auto flex min-w-0 items-center gap-1">
                 <ChatComposerContextPicker
                   addContext={addContext}
                   contextOptions={contextOptions}
@@ -2870,14 +2805,6 @@ export function ChatInputAdvanced({
                   organizationSlug={organizationSlug}
                   removeContext={removeContext}
                   setIsContextPickerOpen={setIsContextPickerOpen}
-                />
-
-                <ChatComposerAttachButton
-                  attachmentCount={attachments.length}
-                  disabled={isQueued}
-                  onAttach={() => fileInputRef.current?.click()}
-                  pendingUploadCount={pendingUploads.length}
-                  tooltip={t("attach.files")}
                 />
 
                 <ChatComposerSendButton

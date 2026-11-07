@@ -14,6 +14,8 @@ export const listChatSessionsInputSchema = chatOrganizationInputSchema.extend({
   projectId: z.string().nullish(),
 });
 
+export const chatSuggestionsInputSchema = listChatSessionsInputSchema;
+
 export const chatSessionInputSchema = chatOrganizationInputSchema.extend({
   chatId: z.string().min(1),
 });

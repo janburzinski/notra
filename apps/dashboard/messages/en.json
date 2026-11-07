@@ -6343,6 +6343,44 @@
           "description": "Answer the questions people actually ask",
           "prompt": "Help me draft an FAQ. Ask me the product and the questions customers actually ask before writing."
         }
+      },
+      "personalHeading": "Picked for {brand}",
+      "personalHeadingFallback": "Picked for you",
+      "personal": {
+        "draft": {
+          "title": "Finish “{title}”",
+          "description": "Edited {ago}",
+          "prompt": "Help me finish my draft \"{title}\" (post ID {postId}). Read it first, tell me what is missing, and suggest edits before changing anything."
+        },
+        "gap": {
+          "title": "Get cited for “{prompt}”",
+          "description": "AI answers name {competitor} instead",
+          "descriptionUnnamed": "AI answers don't mention you yet",
+          "prompt": "AI answers to \"{prompt}\" don't mention us yet. Check what they cite, then help me plan a page that would earn the mention. Ask me 1-2 questions before drafting."
+        },
+        "shipped": {
+          "title": "Announce “{title}”",
+          "description": "Requested by AI agents, resolved {ago}",
+          "prompt": "We shipped a feature that AI agents asked for: \"{title}\". Help me write a short changelog entry announcing it. Ask me what changed and how to use it before drafting."
+        },
+        "repo": {
+          "title": "Release notes for {repo}",
+          "description": "Last 7 days of {owner}/{repo}",
+          "prompt": "Draft release notes for {owner}/{repo} from what merged in the last 7 days. Lead with what matters to users."
+        },
+        "socialPost": {
+          "title": "Post about {brand}",
+          "description": "A LinkedIn or X update in your voice",
+          "prompt": "Help me write a social post for {brand}. Ask me whether it's for X or LinkedIn, then the topic and angle before drafting."
+        }
+      },
+      "sources": {
+        "draft": "Your drafts",
+        "gap": "AI search",
+        "shipped": "Agent feedback",
+        "repo": "GitHub",
+        "brand": "Your brand",
+        "starter": "Starter"
       }
     },
     "userMessageActions": {

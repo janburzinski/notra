@@ -80,6 +80,7 @@ import { AssistantMetadataHover } from "@/components/chat/assistant-metadata-hov
 import { AttachmentPreviewDialog } from "@/components/chat/attachment-preview";
 import { ChatContentPanel } from "@/components/chat/chat-content-panel";
 import { ChatFileAttachment } from "@/components/chat/chat-file-attachment";
+import { ChatHomeSuggestions } from "@/components/chat/chat-home-suggestions";
 import { ChatImageAttachment } from "@/components/chat/chat-image-attachment";
 import {
   ChatInputAdvanced,
@@ -95,7 +96,6 @@ import {
 } from "@/components/chat/chat-quote";
 import { ChatScrollOnSend } from "@/components/chat/chat-scroll-on-send";
 import { ChatSharePopover } from "@/components/chat/chat-share-popover";
-import { ChatSuggestions } from "@/components/chat/chat-suggestions";
 import { renderTextWithIntegrationReferences } from "@/components/chat/integration-reference";
 import { MessageAuthorAvatar } from "@/components/chat/message-author-avatar";
 import { SlackRelayFooterNotice } from "@/components/chat/slack-relay-footer-notice";
@@ -129,6 +129,7 @@ import {
 import { createStandaloneChatTransport } from "@/lib/chat/standalone-chat-transport";
 import { useActiveProject } from "@/lib/hooks/use-active-project";
 import { useChatActivityTimer } from "@/lib/hooks/use-chat-activity-timer";
+import { useChatPromptSuggestions } from "@/lib/hooks/use-chat-prompt-suggestions";
 import {
   reconcileCreatedChatTitle,
   useChatSessionMutations,
@@ -180,7 +181,6 @@ import {
   parseStoredThinkingLevel,
   readStoredChatPreferences,
   subscribeToStoredChatPreferences,
-  writeStoredChatPreferences,
 } from "@/utils/chat-preferences";
 import {
   markQueuedMessageSteering,
@@ -624,6 +624,11 @@ function StandaloneChatPageClient({
   const handleSuggestionSelect = useCallback((text: string) => {
     chatInputRef.current?.setText(text);
   }, []);
+  const promptSuggestions = useChatPromptSuggestions({
+    organizationId,
+    projectId: activeProjectId,
+    enabled: isProjectResolved && !initialChatId,
+  });
 
   const contextRef = useRef(context);
   const hasCustomizedContextRef = useRef(hasCustomizedContext);
@@ -973,23 +978,7 @@ function StandaloneChatPageClient({
 
   const [isStopping, setIsStopping] = useState(false);
 
-  const handleThinkingLevelChange = useCallback((level: ThinkingLevel) => {
-    const nextThinkingLevel = parseStoredThinkingLevel(level);
-    if (!nextThinkingLevel) {
-      return;
-    }
-
-    setThinkingLevel(nextThinkingLevel);
-    trackEvent(POSTHOG_EVENTS.CHAT_THINKING_LEVEL_CHANGED, {
-      level: nextThinkingLevel,
-    });
-  }, []);
-
   useEffect(() => {
-    if (initialChatId) {
-      return;
-    }
-
     function syncChatPreferencesFromStorage() {
       const storedPreferences = readStoredChatPreferences();
       if (!storedPreferences) {
@@ -997,6 +986,12 @@ function StandaloneChatPageClient({
       }
 
       setThinkingLevel(storedPreferences.thinkingLevel);
+    }
+
+    // Existing chats restore their level from history; only an explicit
+    // change in the shared effort picker (agent panel, other tab) replaces it.
+    if (initialChatId) {
+      return subscribeToStoredChatPreferences(syncChatPreferencesFromStorage);
     }
 
     syncChatPreferencesFromStorage();
@@ -1018,14 +1013,6 @@ function StandaloneChatPageClient({
       );
     };
   }, [initialChatId]);
-
-  useEffect(() => {
-    if (initialChatId) {
-      return;
-    }
-
-    writeStoredChatPreferences({ thinkingLevel });
-  }, [initialChatId, thinkingLevel]);
 
   const stopActiveResponse = useCallback(async () => {
     if (isStoppingResponseRef.current) {
@@ -2877,20 +2864,21 @@ function StandaloneChatPageClient({
                 onSend={handleSend}
                 onSteerQueued={handleSteerQueued}
                 onStop={handleStop}
-                onThinkingLevelChange={handleThinkingLevelChange}
                 organizationId={organizationId}
                 organizationSlug={organizationSlug}
                 queuedMessages={queuedMessages}
                 ref={chatInputRef}
                 showAuthorAvatars={showMessageAuthorAvatars}
-                thinkingLevel={thinkingLevel}
               />
             )}
           </div>
-          <ChatSuggestions
+          <ChatHomeSuggestions
             disabled={isLoading || isProjectScopePending}
+            heading={promptSuggestions.heading}
             hidden={!isInputEmpty}
+            isLoading={promptSuggestions.isLoading}
             onSelect={handleSuggestionSelect}
+            suggestions={promptSuggestions.suggestions}
           />
         </div>
       </div>
@@ -3209,13 +3197,11 @@ function StandaloneChatPageClient({
                   onSend={handleSend}
                   onSteerQueued={handleSteerQueued}
                   onStop={handleStop}
-                  onThinkingLevelChange={handleThinkingLevelChange}
                   organizationId={organizationId}
                   organizationSlug={organizationSlug}
                   queuedMessages={queuedMessages}
                   ref={chatInputRef}
                   showAuthorAvatars={showMessageAuthorAvatars}
-                  thinkingLevel={thinkingLevel}
                 />
               )}
             </div>
