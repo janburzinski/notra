@@ -121,10 +121,10 @@ The compact header always has a sidebar, so it ignores `post.width`.
 
 | Value | Layout |
 | --- | --- |
-| `inline` | Back link, then avatar and name (side by side on wider screens), the bio and the profile links as buttons, in a tinted panel when `hero.style` is `wash` or `dither`. Below, "Posts" with their count and the author's posts in the index's style: cards with `cards`, rows with `list`, otherwise a grid. A single post takes the full width |
+| `inline` | The avatar next to the name and title (above them on phones), then the bio and the profile links as icon buttons. Below a divider, "3 posts" and the author's posts in the index's style: cards with `cards`, rows with `list`, otherwise a grid. A single post takes the full width |
 | `stacked` | A large avatar on top, then the name, title, bio and the profile links as icon buttons. Below a divider, "3 posts" and the posts, as `cards` cards when `layout` is `cards` |
 
-To replace the profile header with your own markup in either layout, add `slots/author-hero.mdx`. The back link and the posts stay. See [Slots](/sites/match-your-website#slots).
+To replace the profile header with your own markup in either layout, add `slots/author-hero.mdx`. The posts stay. See [Slots](/sites/match-your-website#slots).
 
 ## Changelog
 

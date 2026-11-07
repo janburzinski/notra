@@ -355,18 +355,9 @@ export async function assertContentFeatures(
   const authorHero = page.locator('[data-slot="author-hero"]');
   assert.equal(await page.locator(".author-profile").count(), 0);
   assert.equal(
-    await authorHero.evaluate((slot) =>
-      [...document.querySelectorAll('#content-area a[href="/blog"]')].some(
-        (link) =>
-          !slot.contains(link) &&
-          Boolean(
-            link.compareDocumentPosition(slot) &
-            Node.DOCUMENT_POSITION_FOLLOWING
-          )
-      )
-    ),
-    true,
-    "the back link to the blog stays above the slot, outside it"
+    await page.locator('#content-area a[href="/blog"]').count(),
+    0,
+    "the author page has no back link to the blog"
   );
   assert.deepEqual(
     await page.getByRole("heading", { level: 1 }).allInnerTexts(),
@@ -378,7 +369,7 @@ export async function assertContentFeatures(
   assert.ok(postCount, "the slot gets the author's post count and title");
   assert.equal(
     (await page.locator(".author-post-count").innerText()).trim(),
-    postCount
+    `${postCount} posts`
   );
   assert.equal(await page.locator('[data-post-card="hello-world"]').count(), 1);
   assert.deepEqual(
@@ -420,7 +411,7 @@ export async function assertContentFeatures(
     "https://www.instagram.com/janburzinski",
   ]);
   checks.push(
-    "author-hero slot replaces the profile header with author data and keeps the back link; Bluesky, Mastodon, Threads and Instagram links reach the slot and JSON-LD"
+    "author-hero slot replaces the profile header with author data, with no back link; Bluesky, Mastodon, Threads and Instagram links reach the slot and JSON-LD"
   );
 
   await page.goto(`${origin}/blog/components`, {

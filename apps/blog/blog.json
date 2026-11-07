@@ -30,6 +30,7 @@
     "layout": "cards",
     "hero": { "style": "wash" },
     "card": { "image": false, "excerpt": true, "author": true, "date": true },
+    "authorPage": "stacked",
     "post": {
       "header": "compact",
       "toc": true,

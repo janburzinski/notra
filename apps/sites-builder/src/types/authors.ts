@@ -44,6 +44,11 @@ export interface AuthorAvatarProps {
   loading?: "eager" | "lazy";
 }
 
+export interface AuthorSocialsProps {
+  socials: AuthorSocial[];
+  class?: string;
+}
+
 export interface AuthorListProps {
   authors: ResolvedAuthor[];
 }

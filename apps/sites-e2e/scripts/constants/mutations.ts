@@ -196,7 +196,7 @@ export const MUTATIONS: Mutation[] = [
     replace: '  "threads",',
     suites: ["browser"],
     caughtBy:
-      "author-hero slot replaces the profile header with author data and keeps the back link; Bluesky, Mastodon, Threads and Instagram links reach the slot and JSON-LD",
+      "author-hero slot replaces the profile header with author data, with no back link; Bluesky, Mastodon, Threads and Instagram links reach the slot and JSON-LD",
   },
   {
     id: "live-noindex",

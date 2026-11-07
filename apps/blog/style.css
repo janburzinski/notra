@@ -598,48 +598,53 @@ html.dark .post-card-box:hover .post-card-title {
   color: var(--ink-muted);
 }
 
-/* Author pages: the profile sits in the same lilac panel as the index hero. */
+/* Author pages, as the author page on usenotra.com. Same distance below the navbar as posts. */
 
-.author-profile.hero-wash {
-  border-radius: 1.5rem;
-  background: #c8b2ee40;
+.author-stacked {
+  padding-top: 1rem;
 }
 
-html.dark .author-profile.hero-wash {
-  background: #2a2140;
+@media (min-width: 40rem) {
+  .author-stacked {
+    padding-top: 2.5rem;
+  }
 }
 
-.author-profile #page-title {
-  color: var(--ink);
+.author-stacked .author-title {
+  color: color-mix(in oklab, var(--foreground) 50%, transparent);
 }
 
-.author-profile .author-title,
-.author-profile .author-bio {
-  color: #1e1e1ebf;
+.author-stacked .author-post-count {
+  color: color-mix(in oklab, var(--foreground) 40%, transparent);
 }
 
-html.dark .author-profile .author-title,
-html.dark .author-profile .author-bio {
-  color: rgb(255 255 255 / 0.7);
-}
-
-.author-profile .author-social {
-  border-color: #1e1e1e1a;
+/* The outline icon button of usenotra.com. */
+.author-stacked .author-social {
+  border-color: transparent;
+  border-radius: 0.5rem;
   background: #fff;
-  color: var(--ink);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.05);
 }
 
-.author-profile .author-social:hover {
-  border-color: color-mix(in oklab, var(--primary) 40%, transparent);
+@supports (corner-shape: squircle) {
+  .author-stacked .author-social {
+    border-radius: 0.75rem;
+    corner-shape: squircle;
+  }
 }
 
-html.dark .author-profile .author-social {
-  border-color: rgb(255 255 255 / 0.1);
-  background: rgb(255 255 255 / 0.06);
+.author-stacked .author-social:hover {
+  background: var(--muted);
 }
 
-html.dark .author-profile .author-social:hover {
-  background: rgb(255 255 255 / 0.1);
+html.dark .author-stacked .author-social {
+  border-color: #313135;
+  background: rgb(49 49 53 / 0.3);
+  box-shadow: none;
+}
+
+html.dark .author-stacked .author-social:hover {
+  background: rgb(49 49 53 / 0.8);
 }
 
 /* Post page */
