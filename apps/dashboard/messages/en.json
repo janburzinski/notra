@@ -9166,9 +9166,12 @@
       "optional": "Optional",
       "recommended": "Recommended",
       "remove": "Remove",
-      "removed": "Integration removed",
-      "savedDescription": "It's a draft of blog.json until you publish it.",
-      "saveFailed": "Couldn't save the integration",
+      "save": "Save",
+      "saveFailed": "Couldn't open the pull request",
+      "pullRequestOpened": "Pull request opened",
+      "pullRequestOpenedDescription": "The change goes live once it's merged.",
+      "viewPullRequest": "View pull request",
+      "alreadySaved": "blog.json already has these settings.",
       "docs": "{provider} docs",
       "invalidTitle": "Invalid blog.json configuration",
       "invalidDescription": "Fix the integrations in blog.json on GitHub, then come back.",
@@ -9243,11 +9246,7 @@
         }
       },
       "fieldDescriptions": {
-        "capless": {
-          "key": "In Capless, copy data-key (cs_…) from your tracking code. It can only write events."
-        },
         "databuddy": {
-          "clientId": "In Databuddy, open your website and copy data-client-id from the tracking code.",
           "trackWebVitals": "Send Core Web Vitals for every page.",
           "trackErrors": "Send uncaught JavaScript errors.",
           "trackOutgoingLinks": "Send an event when visitors click links to other sites.",
@@ -9258,24 +9257,15 @@
           "server": "For self-hosted Plausible, enter its hostname and optional port (e.g. plausible.acme.com:8443), without https://. Leave empty for plausible.io."
         },
         "posthog": {
-          "apiKey": "Copy the public project API key from your PostHog project settings.",
           "apiHost": "Leave empty for US Cloud. Use https://eu.i.posthog.com for EU Cloud or your own HTTPS endpoint.",
           "sessionRecording": "Record visitor sessions when recording is enabled for this domain in PostHog."
         },
         "umami": {
-          "websiteId": "In Umami, edit your website and copy data-website-id from Tracking code.",
           "scriptUrl": "Leave empty for Umami Cloud. For self-hosting, copy the full HTTPS script URL from your tracking code.",
           "hostUrl": "Usually empty. Set an HTTPS base URL only when events should go to a different endpoint, such as a reverse proxy."
-        },
-        "ga4": {
-          "measurementId": "In Google Analytics, open Admin → Data streams → your web stream and copy the Measurement ID."
         }
       },
       "close": "Close",
-      "autosavePending": "Waiting to save…",
-      "autosaveSaving": "Saving draft…",
-      "autosaveSaved": "Draft saved. Review your changes to publish them.",
-      "removeFailedDescription": "The integration was not removed. Retry the removal or discard the unsaved changes.",
       "consent": {
         "title": "Cookie banner",
         "description": "Cookie banner and consent records, built on c15t.",
@@ -9294,9 +9284,7 @@
         "noBackend": "This project has no consent backend yet. Turn on Consent for it in Inth first.",
         "projectsFailed": "Couldn't load your Inth projects.",
         "loadFailed": "Couldn't load the consent settings.",
-        "connected": "Consent banner set up",
-        "connectedDescription": "Notra trusted this site's domains in Inth and saved the backend to blog.json. Publish the change to turn the banner on.",
-        "connectFailed": "Couldn't set up the consent banner.",
+        "originsAdded": "Domains trusted in Inth",
         "disconnectFailed": "Couldn't disconnect Inth.",
         "notConfigured": "Connecting Inth isn't available on this environment. Use a self-hosted c15t backend instead.",
         "oauthFailed": "Couldn't connect Inth",
@@ -9312,10 +9300,11 @@
         },
         "managedTab": "Managed by Inth",
         "selfHostedTab": "Self-hosted c15t",
-        "managedDescription": "Inth hosts your consent records. Connect your account and Notra trusts your site's domains and saves the backend URL to blog.json.",
+        "managedDescription": "Inth hosts your consent records. Connect your account and Notra trusts your site's domains and opens a pull request that sets the backend URL in blog.json.",
+        "managedInUse": "This site's blog.json already uses an Inth backend. Connect your Inth account to manage its trusted domains.",
         "selfHostedDescription": "Run @c15t/backend on your own server over HTTPS and allow your site's domains in its CORS settings. Then set backendURL in blog.json to your backend's URL, including any path prefix.",
         "connectTitle": "Connect your Inth account",
-        "projectDescription": "Notra trusts your site's domains in this project and saves its backend URL to blog.json.",
+        "projectDescription": "Notra trusts your site's domains in this project and opens a pull request that sets its backend URL in blog.json.",
         "activeProject": "Active project",
         "domains": "Domains",
         "domainsTrusted": "All trusted"

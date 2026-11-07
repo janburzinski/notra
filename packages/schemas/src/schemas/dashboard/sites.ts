@@ -250,14 +250,13 @@ export const publishSiteDraftsInputSchema = siteEditorScopeInputSchema.extend({
   message: z.string().trim().min(1).max(200).optional(),
 });
 
-export const saveSiteIntegrationInputSchema = siteEditorScopeInputSchema.and(
+export const saveSiteIntegrationInputSchema = siteScopeInputSchema.and(
   siteIntegrationUpdateSchema
 );
 
-export const connectSiteInthProjectInputSchema =
-  siteEditorScopeInputSchema.extend({
-    projectId: z.string().trim().min(1).max(100),
-  });
+export const connectSiteInthProjectInputSchema = siteScopeInputSchema.extend({
+  projectId: z.string().trim().min(1).max(100),
+});
 
 export const importableRepositoriesInputSchema = z.object({
   organizationId,

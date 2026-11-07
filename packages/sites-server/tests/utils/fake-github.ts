@@ -45,6 +45,7 @@ export async function startFakeGitHub(port = 0, repositoryName = "blog") {
     protectedFeatures: false,
     rejectDraft: false,
     failPR: false,
+    failAfterPR: false,
     staleCommit: false,
     commitCount: 0,
     calls: [],
@@ -460,6 +461,9 @@ export async function startFakeGitHub(port = 0, repositoryName = "blog") {
           reviewDecision: null,
         };
         state.prs.push(pr);
+        if (state.failAfterPR) {
+          return json({ message: "Synthetic timeout" }, 502);
+        }
         return json(pr, 201);
       }
       const head = url.searchParams.get("head")?.replace("synthetic:", "");
@@ -544,6 +548,9 @@ export async function startFakeGitHub(port = 0, repositoryName = "blog") {
         }
         if (body.body !== undefined) {
           pr.body = body.body;
+        }
+        if (body.title !== undefined) {
+          pr.title = body.title;
         }
       }
       return json({

@@ -17,13 +17,16 @@ import { useTranslations } from "use-intl";
 
 import { buttonVariants } from "@/components/button";
 import { InthIcon } from "@/components/icons/inth-icon";
+import { SiteConfigExample } from "@/components/sites/site-config-example";
 import { SiteInthProjectSettings } from "@/components/sites/site-inth-project-settings";
 import type { SiteInthManagedPanelProps } from "@/types/components/sites";
 import { toErrorMessage } from "@/utils/error-message";
+import { c15tConfigExample } from "@/utils/site-consent";
 
 export function SiteInthManagedPanel({
   inth,
   authorizeHref,
+  settings,
 }: SiteInthManagedPanelProps) {
   const t = useTranslations("sites.integrationsPage.consent");
   const { status } = inth;
@@ -45,21 +48,28 @@ export function SiteInthManagedPanel({
   }
   if (!status.data.connected) {
     const available = status.data.configured;
+    let description = t("notConfigured");
+    if (available) {
+      description = settings ? t("managedInUse") : t("managedDescription");
+    }
     return (
-      <div className="bg-muted/15 flex h-full flex-col items-center justify-center gap-4 rounded-lg border border-dashed px-6 py-8 text-center">
-        <EmptyMedia className="overflow-hidden" variant="icon">
-          <InthIcon className="size-full" />
-        </EmptyMedia>
-        <div className="max-w-sm">
-          <EmptyTitle>{t("connectTitle")}</EmptyTitle>
-          <EmptyDescription>
-            {available ? t("managedDescription") : t("notConfigured")}
-          </EmptyDescription>
+      <div className="flex h-full flex-col gap-4">
+        <div className="bg-muted/15 flex flex-1 flex-col items-center justify-center gap-4 rounded-lg border border-dashed px-6 py-8 text-center">
+          <EmptyMedia className="overflow-hidden" variant="icon">
+            <InthIcon className="size-full" />
+          </EmptyMedia>
+          <div className="max-w-sm">
+            <EmptyTitle>{t("connectTitle")}</EmptyTitle>
+            <EmptyDescription>{description}</EmptyDescription>
+          </div>
+          {available ? (
+            <a className={buttonVariants({ size: "sm" })} href={authorizeHref}>
+              {t("connect")}
+            </a>
+          ) : null}
         </div>
-        {available ? (
-          <a className={buttonVariants({ size: "sm" })} href={authorizeHref}>
-            {t("connect")}
-          </a>
+        {settings ? (
+          <SiteConfigExample value={c15tConfigExample(settings)} />
         ) : null}
       </div>
     );

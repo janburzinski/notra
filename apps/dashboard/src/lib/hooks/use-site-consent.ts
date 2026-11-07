@@ -4,13 +4,13 @@ import { toast } from "sonner";
 import { useTranslations } from "use-intl";
 
 import { dashboardOrpc } from "@/lib/orpc/query";
+import type { SiteIntegrationSaveResult } from "@/types/site-integrations";
 import type { SiteScope } from "@/types/sites";
-import { toErrorMessage } from "@/utils/error-message";
 
 function useInthConsentStatus(scope: SiteScope) {
   return useQuery(
     dashboardOrpc.sites.integrations.inth.status.queryOptions({
-      input: scope,
+      input: { organizationId: scope.organizationId, siteId: scope.siteId },
       enabled: scope.organizationId.length > 0,
     })
   );
@@ -30,7 +30,8 @@ function useConnectInthProject(scope: SiteScope) {
   return useMutation({
     mutationFn: (projectId: string) =>
       dashboardOrpc.sites.integrations.inth.connect.call({
-        ...scope,
+        organizationId: scope.organizationId,
+        siteId: scope.siteId,
         projectId,
       }),
     onSuccess: async () => {
@@ -67,18 +68,22 @@ export function useInthConsent(scope: SiteScope) {
   const connect = useConnectInthProject(scope);
   const disconnect = useDisconnectInth(scope);
   const [picked, setPicked] = useState<string | null>(null);
+  const [result, setResult] = useState<SiteIntegrationSaveResult | null>(null);
   const selectedId =
     picked ?? status.data?.project?.id ?? projects.data?.[0]?.id ?? null;
   const selected = projects.data?.find((project) => project.id === selectedId);
-  const applyProject = (projectId: string) =>
+  const applyProject = (projectId: string) => {
+    setResult(null);
     connect.mutate(projectId, {
-      onSuccess: () =>
-        toast.success(t("connected"), {
-          description: t("connectedDescription"),
-        }),
-      onError: (error) =>
-        toast.error(toErrorMessage(error, t("connectFailed"))),
+      onSuccess: ({ pullRequestUrl }) => {
+        if (pullRequestUrl) {
+          setResult({ action: "save", pullRequestUrl });
+        } else {
+          toast.success(t("originsAdded"));
+        }
+      },
     });
+  };
   return {
     status,
     connected,
@@ -87,7 +92,12 @@ export function useInthConsent(scope: SiteScope) {
     disconnect,
     selectedId,
     selected,
-    setPicked,
+    setPicked: (projectId: string | null) => {
+      setPicked(projectId);
+      setResult(null);
+      connect.reset();
+    },
     applyProject,
+    result,
   };
 }

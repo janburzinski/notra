@@ -27,6 +27,7 @@ import Link from "@/components/framework/link";
 import { SiteConfigExample } from "@/components/sites/site-config-example";
 import { useSite } from "@/components/sites/site-context";
 import { SiteIntegrationLogo } from "@/components/sites/site-integration-logo";
+import { SiteIntegrationPullRequestStatus } from "@/components/sites/site-integration-pull-request-status";
 import { SiteInthManagedPanel } from "@/components/sites/site-inth-managed-panel";
 import {
   C15T_DOCS_URL,
@@ -44,13 +45,13 @@ import {
   c15tConfigExample,
   inthAuthorizeHref,
   inthCallbackPath,
+  isInthBackendUrl,
 } from "@/utils/site-consent";
 
 export function SiteInthDialog({
-  branch,
   open,
   onOpenChange,
-  isSetUp,
+  settings,
   oauthError,
 }: SiteInthDialogProps) {
   const t = useTranslations("sites.integrationsPage.consent");
@@ -58,14 +59,14 @@ export function SiteInthDialog({
   const { organizationId, siteId } = useSite();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const inth = useInthConsent({ organizationId, siteId, branch });
+  const inth = useInthConsent({ organizationId, siteId });
   const { status, connected, projects, connect, disconnect, selected } = inth;
   const [pickedMode, setPickedMode] = useState<ConsentHostingMode | null>(null);
+  const backendURL =
+    typeof settings?.backendURL === "string" ? settings.backendURL : null;
+  const managedByInth = backendURL !== null && isInthBackendUrl(backendURL);
   const mode =
-    pickedMode ??
-    (isSetUp && status.data && !status.data.connected
-      ? "selfHosted"
-      : "managed");
+    pickedMode ?? (backendURL && !managedByInth ? "selfHosted" : "managed");
   const inactivePanel = connected ? "hidden" : "invisible";
   const showUseProject =
     mode === "managed" && connected && Boolean(projects.data?.length);
@@ -125,6 +126,7 @@ export function SiteInthDialog({
                       inthCallbackPath(pathname, searchParams)
                     )}
                     inth={inth}
+                    settings={managedByInth ? settings : null}
                   />
                 </div>
               </div>
@@ -140,7 +142,11 @@ export function SiteInthDialog({
                   {t("selfHostedDescription")}
                 </p>
                 <SiteConfigExample
-                  value={c15tConfigExample(C15T_SELF_HOSTED_BACKEND_URL)}
+                  value={c15tConfigExample(
+                    settings && !managedByInth
+                      ? settings
+                      : { backendURL: C15T_SELF_HOSTED_BACKEND_URL }
+                  )}
                 />
               </div>
             </div>
@@ -161,6 +167,10 @@ export function SiteInthDialog({
             </FieldDescription>
           </Tabs>
         </div>
+        <SiteIntegrationPullRequestStatus
+          error={connect.error}
+          result={inth.result}
+        />
         <ResponsiveDialogFooter className="shrink-0 sm:flex-wrap sm:justify-between">
           {mode === "managed" && status.data?.connected ? (
             <Button
@@ -188,6 +198,7 @@ export function SiteInthDialog({
                 disabled={
                   !selected?.backendUrl ||
                   connect.isPending ||
+                  inth.result !== null ||
                   selected.id === status.data?.project?.id
                 }
                 loading={connect.isPending}

@@ -106,7 +106,7 @@ test("empty optional fields are omitted and errors belong to the input field", (
   ).toBe(false);
 });
 
-test("Umami Cloud needs only a Website ID and invalid inputs cannot autosave", () => {
+test("Umami Cloud needs only a Website ID and invalid inputs report field errors", () => {
   const provider = SITE_INTEGRATION_PROVIDERS.find(
     (entry) => entry.id === "umami"
   );

@@ -14,7 +14,7 @@ import type {
 } from "@/types/site-consent";
 import type {
   SiteIntegrationProvider,
-  SiteIntegrationAutosaveState,
+  SiteIntegrationSaveResult,
 } from "@/types/site-integrations";
 import type { SiteWorkspaceValue } from "@/types/site-workspace";
 import type {
@@ -620,17 +620,11 @@ export interface SiteIntegrationRowProps {
 }
 
 export interface SiteConsentSectionProps {
-  branch?: string;
-  isSetUp: boolean;
+  /** The c15t settings committed in blog.json, or null when it isn't set up. */
+  settings: Record<string, unknown> | null;
   loading: boolean;
   disabled: boolean;
 }
-
-export type SiteIntegrationDialogPhase =
-  | "editing"
-  | "closing"
-  | "removing"
-  | "removalFailed";
 
 export interface SiteIntegrationDialogProps {
   scope: SiteScope;
@@ -640,12 +634,9 @@ export interface SiteIntegrationDialogProps {
   onOpenChange: (open: boolean) => void;
 }
 
-export interface SiteIntegrationSaveStatusProps {
-  state: SiteIntegrationAutosaveState;
-  invalid: boolean;
-  busy: boolean;
-  removalFailed: boolean;
-  onRetry: () => void;
+export interface SiteIntegrationPullRequestStatusProps {
+  result: SiteIntegrationSaveResult | null;
+  error: unknown;
 }
 
 export interface SiteImportListProps {
@@ -805,16 +796,17 @@ export interface SiteConfigExampleProps {
 }
 
 export interface SiteInthDialogProps {
-  branch?: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  isSetUp: boolean;
+  settings: Record<string, unknown> | null;
   oauthError: InthOAuthErrorCode | null;
 }
 
 export interface SiteInthManagedPanelProps {
   inth: InthConsent;
   authorizeHref: string;
+  /** The c15t settings in blog.json when they already point at Inth. */
+  settings: Record<string, unknown> | null;
 }
 
 export interface SiteInthProjectSettingsProps {

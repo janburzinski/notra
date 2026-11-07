@@ -16,8 +16,7 @@ import type { SiteConsentSectionProps } from "@/types/components/sites";
 import { inthOAuthError } from "@/utils/site-consent";
 
 export function SiteConsentSection({
-  branch,
-  isSetUp,
+  settings,
   loading,
   disabled,
 }: SiteConsentSectionProps) {
@@ -36,18 +35,17 @@ export function SiteConsentSection({
           addLabel={t("connectShort")}
           description={t("description")}
           disabled={disabled}
-          isSetUp={isSetUp}
+          isSetUp={settings !== null}
           loading={loading}
           onOpen={() => setOpen(true)}
           provider={INTH_PROVIDER}
         />
       </SiteSettingsList>
       <SiteInthDialog
-        branch={branch}
-        isSetUp={isSetUp}
         oauthError={oauthError}
         onOpenChange={setOpen}
         open={open}
+        settings={settings}
       />
     </SiteSettingsGroup>
   );

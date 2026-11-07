@@ -21,7 +21,7 @@ Notra loads the Umami tracker on every live page and allows its script and colle
     In Umami, edit the website you want to track, open **Tracking code** and copy the UUID from `data-website-id`. See [Umami's tracking setup](https://docs.umami.is/docs/collect-data).
   </Step>
   <Step title="Add it to Notra">
-    Open **Studio → Sites**, select your site, open **Integrations** and click **Add Umami**. Paste the UUID into **Website ID** and leave the URL fields empty for Umami Cloud. To configure it in your repository instead, add it to `blog.json`:
+    Open **Studio → Sites**, select your site, open **Integrations** and click **Add Umami**. Paste the UUID into **Website ID**, leave the URL fields empty for Umami Cloud and click **Save**. Notra opens a pull request with the change. To configure it in your repository instead, add it to `blog.json`:
 
     ```json blog.json
     {
@@ -35,8 +35,8 @@ Notra loads the Umami tracker on every live page and allows its script and colle
     }
     ```
   </Step>
-  <Step title="Publish and verify">
-    After you [publish the change](/sites/integrations/analytics/overview#set-up-in-the-dashboard) and the production deployment finishes, visit your live site and check that the visit appears in the matching Umami website dashboard.
+  <Step title="Merge and verify">
+    After you [merge the change](/sites/integrations/analytics/overview#set-up-in-the-dashboard) and the production deployment finishes, visit your live site and check that the visit appears in the matching Umami website dashboard.
   </Step>
 </Steps>
 

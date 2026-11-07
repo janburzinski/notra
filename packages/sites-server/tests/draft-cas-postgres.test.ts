@@ -1,12 +1,4 @@
-import {
-  afterAll,
-  afterEach,
-  beforeEach,
-  expect,
-  mock,
-  spyOn,
-  test,
-} from "bun:test";
+import { afterAll, afterEach, beforeEach, expect, mock, test } from "bun:test";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
@@ -71,7 +63,6 @@ if (!databaseUrl) {
   let beforeCommit = async () => {};
   let beforeRead = async () => {};
   let blobSha = "blob-current";
-  let publishedFiles: { path: string; contents: string }[] = [];
   const octokit = await import("@notra/ai/utils/octokit");
   mock.module("@notra/ai/utils/octokit", () => ({
     ...octokit,
@@ -106,18 +97,10 @@ if (!databaseUrl) {
         }
         throw new Error(`Unexpected synthetic GitHub request: ${route}`);
       },
-      graphql: async (
-        query: string,
-        variables: {
-          input: {
-            fileChanges: { additions: { path: string; contents: string }[] };
-          };
-        }
-      ) => {
+      graphql: async (query: string) => {
         if (query.includes("SiteBranchProtection")) {
           return { repository: { ref: { branchProtectionRule: null } } };
         }
-        publishedFiles = variables.input.fileChanges.additions;
         await beforeCommit();
         return {
           createCommitOnBranch: { commit: { oid: "published-commit" } },
@@ -146,8 +129,6 @@ if (!databaseUrl) {
     rebaseSiteDraft,
     publishSiteDrafts,
   } = editor;
-  const { readSiteIntegrations, saveSiteIntegration } =
-    await import("../src/integrations");
   const input = (
     content: string,
     draftId: string | null = null,
@@ -170,7 +151,6 @@ if (!databaseUrl) {
     beforeCommit = async () => {};
     beforeRead = async () => {};
     blobSha = "blob-current";
-    publishedFiles = [];
     organizationId = `draft-cas-${crypto.randomUUID()}`;
     userId = `${organizationId}-user`;
     await db.insert(users).values({
@@ -348,148 +328,6 @@ if (!databaseUrl) {
       message: "The site's source changed. Reload the editor before saving.",
     });
     expect(await editor.listSiteDrafts(site.id)).toEqual([]);
-  });
-
-  test("all providers round-trip through real drafts and publish the exact normalized blog.json", async () => {
-    const updates = [
-      {
-        provider: "ga4",
-        settings: { measurementId: " G-ABC123XYZ9 " },
-      },
-      {
-        provider: "umami",
-        settings: { websiteId: " 94db1cb1-74f4-4a40-ad6c-962362670409 " },
-      },
-      {
-        provider: "plausible",
-        settings: {
-          domain: " DOCS.EXAMPLE.TEST ",
-          server: " STATS.EXAMPLE.TEST ",
-        },
-      },
-      {
-        provider: "posthog",
-        settings: {
-          apiKey: "phc_abcdefghijklmnopqrstuvwxyz0123",
-          apiHost: "https://eu.i.posthog.com/",
-          sessionRecording: false,
-        },
-      },
-    ] as const;
-    for (const update of updates) {
-      expect(
-        (await saveSiteIntegration(site, { ...update, userId })).hasDraft
-      ).toBe(true);
-    }
-    const state = await readSiteIntegrations(site);
-    expect(state.invalid).toBe(false);
-    expect(state.integrations).toEqual({
-      ga4: { measurementId: "G-ABC123XYZ9" },
-      umami: { websiteId: "94db1cb1-74f4-4a40-ad6c-962362670409" },
-      plausible: { domain: "docs.example.test", server: "stats.example.test" },
-      posthog: {
-        apiKey: "phc_abcdefghijklmnopqrstuvwxyz0123",
-        apiHost: "https://eu.i.posthog.com",
-        sessionRecording: false,
-      },
-    });
-    const [draft] = await editor.listSiteDrafts(site.id);
-    expect(draft?.revision).toBe(3);
-    expect(JSON.parse(draft?.content ?? "{}").name).toBe("Published");
-    await publishSiteDrafts(site, {
-      message: "Configure analytics",
-      userId,
-    });
-    expect(publishedFiles).toHaveLength(1);
-    expect(publishedFiles[0]?.path).toBe("blog.json");
-    expect(
-      Buffer.from(publishedFiles[0]?.contents ?? "", "base64").toString()
-    ).toBe(draft?.content ?? "");
-    expect(await editor.listSiteDrafts(site.id)).toEqual([]);
-  });
-
-  test("removing an integration updates the real draft without deleting unrelated settings", async () => {
-    await saveSiteIntegration(site, {
-      provider: "umami",
-      settings: { websiteId: "94db1cb1-74f4-4a40-ad6c-962362670409" },
-      userId,
-    });
-    await saveSiteIntegration(site, {
-      provider: "posthog",
-      settings: {
-        apiKey: "phc_abcdefghijklmnopqrstuvwxyz0123",
-        sessionRecording: false,
-      },
-      userId,
-    });
-    const state = await saveSiteIntegration(site, {
-      provider: "umami",
-      settings: null,
-      userId,
-    });
-    expect(state.integrations).not.toHaveProperty("umami");
-    expect(state.integrations.posthog).toHaveProperty(
-      "sessionRecording",
-      false
-    );
-    const empty = await saveSiteIntegration(site, {
-      provider: "posthog",
-      settings: null,
-      userId,
-    });
-    expect(empty.integrations).toEqual({});
-    const [draft] = await editor.listSiteDrafts(site.id);
-    expect(JSON.parse(draft?.content ?? "{}")).toEqual({ name: "Published" });
-  });
-
-  test("racing integration merges preserve both provider settings or report an explicit conflict", async () => {
-    // Both merges must observe the same draft before either writes, so hold
-    // each read of the config draft until both have read it.
-    const original = editor.readSiteDraft;
-    const gate = deferred();
-    let reads = 0;
-    const observation = spyOn(editor, "readSiteDraft").mockImplementation(
-      async (...args) => {
-        // A failed read opens the gate, so the other merge fails fast too.
-        const draft = await original(...args).catch((error: unknown) => {
-          gate.resolve();
-          throw error;
-        });
-        reads += 1;
-        if (reads === 2) {
-          gate.resolve();
-        }
-        await gate.promise;
-        return draft;
-      }
-    );
-    try {
-      const results = await Promise.allSettled([
-        saveSiteIntegration(site, {
-          provider: "plausible",
-          settings: { domain: "synthetic.example.test" },
-          userId,
-        }),
-        saveSiteIntegration(site, {
-          provider: "umami",
-          settings: { websiteId: "94db1cb1-74f4-4a40-ad6c-962362670409" },
-          userId,
-        }),
-      ]);
-      expect(reads, "both merges read the draft through the gate").toBe(2);
-      expect(
-        results.filter((result) => result.status === "fulfilled")
-      ).toHaveLength(1);
-      const rejected = results.find((result) => result.status === "rejected");
-      expect(
-        rejected?.status === "rejected" && rejected.reason.message
-      ).toContain("another editor");
-    } finally {
-      observation.mockRestore();
-    }
-    const [stored] = await editor.listSiteDrafts(site.id);
-    const integrations = JSON.parse(stored?.content ?? "{}").integrations;
-    expect(Object.keys(integrations)).toHaveLength(1);
   });
 
   test.each(["productionBranch", "rootDirectory"] as const)(

@@ -21,7 +21,7 @@ Notra loads Google's `gtag.js`, initializes the data layer and configures your M
     In Google Analytics, open **Admin → Data streams**, select your web stream and copy its **Measurement ID**, which starts with `G-`. This is the public web stream ID, not an API secret or a Universal Analytics `UA-` ID. See [Google's Measurement ID guide](https://support.google.com/analytics/answer/9539598).
   </Step>
   <Step title="Add it to Notra">
-    Open **Studio → Sites**, select your site, open **Integrations** and click **Add Google Analytics 4**. Paste the ID into **Measurement ID**. To configure it in your repository instead, add it to `blog.json`:
+    Open **Studio → Sites**, select your site, open **Integrations** and click **Add Google Analytics 4**. Paste the ID into **Measurement ID** and click **Save**. Notra opens a pull request with the change. To configure it in your repository instead, add it to `blog.json`:
 
     ```json blog.json
     {
@@ -35,8 +35,8 @@ Notra loads Google's `gtag.js`, initializes the data layer and configures your M
     }
     ```
   </Step>
-  <Step title="Publish and verify">
-    After you [publish the change](/sites/integrations/analytics/overview#set-up-in-the-dashboard) and the production deployment finishes, check the live site with [Google Tag Assistant](https://tagassistant.google.com/) and look for incoming events in your GA4 property.
+  <Step title="Merge and verify">
+    After you [merge the change](/sites/integrations/analytics/overview#set-up-in-the-dashboard) and the production deployment finishes, check the live site with [Google Tag Assistant](https://tagassistant.google.com/) and look for incoming events in your GA4 property.
   </Step>
 </Steps>
 

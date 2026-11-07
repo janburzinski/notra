@@ -85,7 +85,7 @@ if (process.env.NOTRA_DEFAULT_EDITOR_TEST_WORKER !== "1") {
   }));
   const { sitesRouter } = await import("../src/lib/orpc/routers/sites");
   const { createORPCContext } = await import("../src/lib/orpc/context");
-  const { readSiteIntegrations, saveSiteIntegration } =
+  const { readSiteIntegrations } =
     await import("@notra/sites-server/integrations");
   const { getSite } = await import("@notra/sites-server/deployments");
   beforeEach(() => {
@@ -141,27 +141,34 @@ if (process.env.NOTRA_DEFAULT_EDITOR_TEST_WORKER !== "1") {
     }
     expect(writes).toBe(0);
   });
-  test("provider settings start from defaults and persist only as a real config draft", async () => {
+  test("integrations come from the committed config, never from a config draft", async () => {
     const actualSite = await getSite("site_demo");
     if (!actualSite) {
       throw new Error("Expected test site");
     }
-    expect(await readSiteIntegrations(actualSite)).toMatchObject({
+    expect(await readSiteIntegrations(actualSite)).toEqual({
       integrations: {},
-      hasDraft: false,
       invalid: false,
     });
-    await saveSiteIntegration(actualSite, {
-      provider: "plausible",
-      settings: { domain: "example.com" },
-      userId: "user-demo",
-    });
-    expect(writes).toBe(1);
-    expect(JSON.parse(draft?.content ?? "{}")).toMatchObject({
-      name: "Default Acme",
+    draft = {
+      path: "blog.json",
+      content: JSON.stringify({
+        name: "Draft Acme",
+        integrations: { plausible: { domain: "draft.example.com" } },
+      }),
+      baseBlobSha: null,
+      baseCommitSha: null,
+      deleted: false,
+      updatedAt: new Date(),
+    };
+    config = JSON.stringify({
+      name: "Repository Acme",
       integrations: { plausible: { domain: "example.com" } },
     });
-    expect(draft?.baseBlobSha).toBeNull();
-    expect(config).toBeNull();
+    expect(await readSiteIntegrations(actualSite)).toEqual({
+      integrations: { plausible: { domain: "example.com" } },
+      invalid: false,
+    });
+    expect(writes).toBe(0);
   });
 }

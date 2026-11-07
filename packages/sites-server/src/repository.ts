@@ -9,6 +9,7 @@ import type {
   RepositoryBranchInput,
   RepositoryCommitInput,
   RepositoryFileRef,
+  OpenRepositoryPullRequest,
   RepositoryPullRequestInput,
   SiteSourceFileContent,
 } from "./types/editor";
@@ -91,6 +92,22 @@ export async function createRepositoryBranch(
   });
 }
 
+export async function deleteRepositoryBranch(
+  repository: SiteRepository,
+  token: string,
+  branch: string
+): Promise<void> {
+  await createOctokit(token).request(
+    "DELETE /repos/{owner}/{repo}/git/refs/{ref}",
+    {
+      owner: repository.owner,
+      repo: repository.repo,
+      ref: `heads/${branch}`,
+      headers: GITHUB_API_VERSION_HEADERS,
+    }
+  );
+}
+
 export async function commitRepositoryFiles(
   repository: SiteRepository,
   token: string,
@@ -159,4 +176,51 @@ export async function openRepositoryPullRequest(
     );
     return data.html_url;
   }
+}
+
+/** The newest open pull request into `base` from a branch of this repository starting with `headPrefix`. */
+export async function findOpenRepositoryPullRequest(
+  repository: SiteRepository,
+  token: string,
+  { base, headPrefix }: { base: string; headPrefix: string }
+): Promise<OpenRepositoryPullRequest | null> {
+  const { data } = await createOctokit(token).request(
+    "GET /repos/{owner}/{repo}/pulls",
+    {
+      owner: repository.owner,
+      repo: repository.repo,
+      base,
+      state: "open",
+      sort: "created",
+      direction: "desc",
+      per_page: 100,
+      headers: GITHUB_API_VERSION_HEADERS,
+    }
+  );
+  const pr = data.find(
+    (entry) =>
+      entry.head.repo?.full_name === `${repository.owner}/${repository.repo}` &&
+      entry.head.ref.startsWith(headPrefix)
+  );
+  return pr
+    ? { number: pr.number, url: pr.html_url, branch: pr.head.ref }
+    : null;
+}
+
+export async function renameRepositoryPullRequest(
+  repository: SiteRepository,
+  token: string,
+  number: number,
+  title: string
+): Promise<void> {
+  await createOctokit(token).request(
+    "PATCH /repos/{owner}/{repo}/pulls/{pull_number}",
+    {
+      owner: repository.owner,
+      repo: repository.repo,
+      pull_number: number,
+      title,
+      headers: GITHUB_API_VERSION_HEADERS,
+    }
+  );
 }

@@ -4,36 +4,31 @@ import { dashboardOrpc } from "@/lib/orpc/query";
 import type { SaveSiteIntegrationInput } from "@/types/hooks/sites";
 import type { SiteScope } from "@/types/sites";
 
-export function useSiteIntegrations({
-  organizationId,
-  siteId,
-  branch,
-}: SiteScope) {
+export function useSiteIntegrations({ organizationId, siteId }: SiteScope) {
   return useQuery(
     dashboardOrpc.sites.integrations.get.queryOptions({
-      input: { organizationId, siteId, branch },
+      input: { organizationId, siteId },
       enabled: organizationId.length > 0,
+      // Integration pull requests are merged on GitHub, so coming back to the
+      // tab shows what is now committed.
+      refetchOnWindowFocus: true,
     })
   );
 }
 
-export function useSaveSiteIntegration({
-  organizationId,
-  siteId,
-  branch,
-}: SiteScope) {
+/** Opens a pull request with the blog.json change; nothing is active until it merges. */
+export function useSaveSiteIntegration({ organizationId, siteId }: SiteScope) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (input: SaveSiteIntegrationInput) =>
       dashboardOrpc.sites.integrations.save.call({
         organizationId,
         siteId,
-        branch,
         ...input,
       }),
     onSuccess: async () => {
       await queryClient.invalidateQueries({
-        queryKey: dashboardOrpc.sites.key(),
+        queryKey: dashboardOrpc.sites.integrations.key(),
       });
     },
   });

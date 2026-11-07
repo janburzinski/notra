@@ -23,7 +23,7 @@ With the [c15t cookie banner](/sites/integrations/consent/c15t) on, Databuddy lo
     In [Databuddy](https://www.databuddy.cc), open your website and copy the `data-client-id` value from its tracking code. It's a public ID, so no API key is needed.
   </Step>
   <Step title="Add it to Notra">
-    Open **Studio → Sites**, select your site, open **Integrations** and click **Add Databuddy**. Paste the ID into **Client ID** and switch on the tracking you want. To configure it in your repository instead, add it to `blog.json`:
+    Open **Studio → Sites**, select your site, open **Integrations** and click **Add Databuddy**. Paste the ID into **Client ID**, switch on the tracking you want and click **Save**. Notra opens a pull request with the change. To configure it in your repository instead, add it to `blog.json`:
 
     ```json blog.json
     {
@@ -41,8 +41,8 @@ With the [c15t cookie banner](/sites/integrations/consent/c15t) on, Databuddy lo
     }
     ```
   </Step>
-  <Step title="Publish and verify">
-    After you [publish the change](/sites/integrations/analytics/overview#set-up-in-the-dashboard) and the production deployment finishes, visit your live site and check the realtime view in Databuddy.
+  <Step title="Merge and verify">
+    After you [merge the change](/sites/integrations/analytics/overview#set-up-in-the-dashboard) and the production deployment finishes, visit your live site and check the realtime view in Databuddy.
   </Step>
 </Steps>
 

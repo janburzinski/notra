@@ -25,7 +25,7 @@ Notra loads the Capless tracker on every live page and allows its origin in the 
     In Capless, open your tracking code and copy the `cs_…` value from `data-key`. See [Capless's web SDK docs](https://analytics.capless.sh/docs/web-sdk).
   </Step>
   <Step title="Add it to Notra">
-    Open **Studio → Sites**, select your site, open **Integrations** and click **Add Capless**. Paste the key into **Public key**. To configure it in your repository instead, add it to `blog.json`:
+    Open **Studio → Sites**, select your site, open **Integrations** and click **Add Capless**. Paste the key into **Public key** and click **Save**. Notra opens a pull request with the change. To configure it in your repository instead, add it to `blog.json`:
 
     ```json blog.json
     {
@@ -39,8 +39,8 @@ Notra loads the Capless tracker on every live page and allows its origin in the 
     }
     ```
   </Step>
-  <Step title="Publish and verify">
-    After you [publish the change](/sites/integrations/analytics/overview#set-up-in-the-dashboard) and the production deployment finishes, visit your live site and check that the visit appears in Capless.
+  <Step title="Merge and verify">
+    After you [merge the change](/sites/integrations/analytics/overview#set-up-in-the-dashboard) and the production deployment finishes, visit your live site and check that the visit appears in Capless.
   </Step>
 </Steps>
 

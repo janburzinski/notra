@@ -12,7 +12,7 @@ import {
   AlertDescription,
   AlertTitle,
 } from "@notra/ui/components/ui/alert";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import { useTranslations } from "use-intl";
 
@@ -33,23 +33,18 @@ import {
 import { toErrorMessage } from "@/utils/error-message";
 import { siteIntegrationSettings } from "@/utils/site-integrations";
 
-/** Integrations live in blog.json, so they save as drafts on the branch the Design tab is editing. */
+/**
+ * Integrations show blog.json as committed on the production branch. Saving
+ * opens a pull request instead of a draft, so Design tab drafts stay apart.
+ */
 export function SiteDesignIntegrations() {
   const t = useTranslations("sites.integrationsPage");
-  const state = useSiteWorkspace()!;
-  const scope = state.scope;
+  const scope = useSiteWorkspace()!.scope;
   const query = useSiteIntegrations(scope);
   const save = useSaveSiteIntegration(scope);
   const [openId, setOpenId] = useState<SiteIntegrationName | null>(null);
-  const flush = state.saves.flush;
-  // Integration saves write blog.json on the server; pending design edits must land first.
-  useEffect(() => {
-    void flush().catch(() => undefined);
-  }, [flush]);
-  const busy = state.saves.unsaved || save.isPending;
-  const consentSetUp = c15tSchema.safeParse(
-    query.data?.integrations.c15t
-  ).success;
+  const busy = save.isPending;
+  const c15t = c15tSchema.safeParse(query.data?.integrations.c15t);
   const open = SITE_INTEGRATION_PROVIDERS.find(
     (provider) => provider.id === openId
   );
@@ -108,10 +103,21 @@ export function SiteDesignIntegrations() {
                 save.mutate(
                   { provider: provider.id, settings: null },
                   {
-                    onSuccess: () =>
-                      toast.success(t("removed"), {
-                        description: t("savedDescription"),
-                      }),
+                    onSuccess: ({ pullRequestUrl }) =>
+                      pullRequestUrl
+                        ? toast.success(t("pullRequestOpened"), {
+                            description: t("pullRequestOpenedDescription"),
+                            action: {
+                              label: t("viewPullRequest"),
+                              onClick: () =>
+                                window.open(
+                                  pullRequestUrl,
+                                  "_blank",
+                                  "noopener,noreferrer"
+                                ),
+                            },
+                          })
+                        : toast.info(t("alreadySaved")),
                     onError: (error) =>
                       toast.error(toErrorMessage(error, t("saveFailed"))),
                   }
@@ -124,15 +130,14 @@ export function SiteDesignIntegrations() {
       </SiteSettingsGroup>
 
       <SiteConsentSection
-        branch={scope.branch}
         disabled={query.isPending || query.isError || busy}
-        isSetUp={consentSetUp}
         loading={query.isPending}
+        settings={c15t.success ? c15t.data : null}
       />
 
       {open ? (
         <SiteIntegrationDialog
-          key={`${scope.siteId}:${scope.branch ?? ""}:${open.id}`}
+          key={`${scope.siteId}:${open.id}`}
           onOpenChange={(next) => {
             if (!next) {
               setOpenId(null);

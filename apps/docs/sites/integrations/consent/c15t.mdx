@@ -30,12 +30,12 @@ You need a c15t backend before the banner can save choices. Pick one:
     4. Click **Connect Inth account** and approve access in Inth.
     5. Pick the project under **Inth project** and click **Use project**.
 
-    Notra adds every domain your site uses, including custom domains, to the project's trusted websites and saves the project's backend URL to `blog.json` as a draft. The dialog shows that configuration, and **Create PR** at the bottom of the Integrations page publishes it. If you add a domain later, the dialog lists it under **Domains** and offers to trust it.
+    Notra adds every domain your site uses, including custom domains, to the project's trusted websites and opens a pull request that sets the project's backend URL in `blog.json`. The dialog links to the pull request; merge it to turn the banner on. If you add a domain later, the dialog lists it under **Domains** and offers to trust it.
 
     Notra keeps the Inth connection on its own servers. Your published site only contains the public backend URL.
   </Tab>
   <Tab title="Self-hosted">
-    The **Self-hosted c15t** tab in the **Inth** dialog shows the configuration to copy.
+    The **Self-hosted c15t** tab in the **Inth** dialog shows the configuration to copy. Once `blog.json` sets a backend that isn't on `inth.app`, the tab shows that configuration instead.
 
     1. Run [`@c15t/backend`](https://c15t.com/docs/self-host/quickstart) on your own server with PostgreSQL, MySQL or SQLite. You own its migrations, backups and uptime.
     2. Serve it over HTTPS and allow your site's live origin in its CORS settings.
@@ -47,7 +47,7 @@ The backend URL is public configuration, not a secret. It ends up in every page,
 
 ## Turn on the banner
 
-Connecting Inth writes the setting for you. To set it up in your repository instead, or for a self-hosted backend, add `c15t` to `integrations` in `blog.json`:
+Connecting Inth opens a pull request with the setting for you. To set it up in your repository instead, or for a self-hosted backend, add `c15t` to `integrations` in `blog.json`:
 
 ```json blog.json
 {
@@ -68,7 +68,7 @@ Connecting Inth writes the setting for you. To set it up in your repository inst
 }
 ```
 
-After you publish the change and the production deployment finishes, open your live site in a private window. The banner appears once the browser has loaded your policy from the backend, and the footer gets a **Privacy settings** link that reopens the dialog.
+After you merge the change and the production deployment finishes, open your live site in a private window. The banner appears once the browser has loaded your policy from the backend, and the footer gets a **Privacy settings** link that reopens the dialog.
 
 ## Analytics and consent
 

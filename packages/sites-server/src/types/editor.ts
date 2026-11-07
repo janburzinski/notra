@@ -114,6 +114,12 @@ export interface RepositoryCommitInput {
   deletions: string[];
 }
 
+export interface OpenRepositoryPullRequest {
+  number: number;
+  url: string;
+  branch: string;
+}
+
 export interface RepositoryPullRequestInput {
   title: string;
   head: string;

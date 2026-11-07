@@ -1,6 +1,5 @@
 import type {
   SiteIntegrationName,
-  SiteIntegrationUpdate,
   SiteIntegrations,
 } from "@notra/sites-core/types/site-integrations";
 import type { ComponentType, SVGProps } from "react";
@@ -28,15 +27,8 @@ export type SiteIntegrationProvider = {
 
 export type SiteIntegrationValues = Record<string, string | boolean>;
 
-export interface SiteIntegrationAutosaveState {
-  status: "idle" | "pending" | "saving" | "saved" | "error";
-  dirty: boolean;
-  hasIntegration: boolean;
-  error: unknown;
-}
-
-export interface SiteIntegrationAutosaveOptions {
-  initial: SiteIntegrationUpdate;
-  save: (update: SiteIntegrationUpdate) => Promise<unknown>;
-  onChange: (state: SiteIntegrationAutosaveState) => void;
+export interface SiteIntegrationSaveResult {
+  action: "save" | "remove";
+  /** Null when blog.json already held the change. */
+  pullRequestUrl: string | null;
 }

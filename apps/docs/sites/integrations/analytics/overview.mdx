@@ -55,22 +55,20 @@ To ask visitors before analytics loads, turn on the [c15t cookie banner](/sites/
 
     The dialog shows the corresponding `blog.json` configuration, which you can copy to use the same setup in your repository.
   </Step>
-  <Step title="Wait for the draft to save">
-    Valid settings save automatically, so there is no Save button. Saving creates a draft of `blog.json` and doesn't create a GitHub commit or change your live site. You can click **Close** to leave the draft for later, or continue with **Create PR** in the same dialog.
+  <Step title="Save">
+    Click **Save**. It turns on once you change something and every field is valid. Notra opens a pull request against your production branch that changes only `blog.json`, and the dialog links to it under **Pull request opened**. Saving creates no draft, so other unpublished changes stay out of the pull request.
 
-    Closing the dialog or navigating within the dashboard finishes a pending save. If saving fails, the dialog stays open so you can retry, and invalid settings show a validation error instead of saving.
+    If GitHub rejects the change or `blog.json` has errors, the dialog shows the message and opens nothing.
   </Step>
-  <Step title="Review and publish">
-    Click **Create PR** in the provider dialog or the draft bar on the Integrations page. Notra finishes any pending save and opens a preview of all saved drafts, including `blog.json`. Review the changes and commit message, click **Open pull request** and merge the PR into the production branch to deploy it.
-
-    To edit other files or commit directly, click **Open editor**, review the changes and click **Publish → Commit and deploy**. Direct commits are available only when **Settings → Publishing** allows them and the GitHub branch is not protected. Publishing includes the editor's pending changes, so review any other drafts first. See [Publishing and deployments](/sites/publishing#the-editor).
+  <Step title="Merge the pull request">
+    Review and merge the pull request on GitHub. The provider shows as **Active** on the Integrations page once the change is in your production branch, and the next production deployment turns it on.
   </Step>
   <Step title="Verify on the live site">
-    Wait for a successful production deployment, open your live site and check the provider's incoming traffic. **Draft saved** only confirms that Notra saved the configuration, not that the provider received an event, and a PR preview can't verify analytics because provider scripts are disabled there.
+    Wait for a successful production deployment, open your live site and check the provider's incoming traffic. An open pull request hasn't changed anything yet, and a PR preview can't verify analytics because provider scripts are disabled there.
   </Step>
 </Steps>
 
-To change a provider, open its options menu and choose **Edit**. **Remove** updates the draft too, and either change only reaches the live site once you publish and deploy it.
+To change a provider, open its options menu and choose **Edit**. **Remove** opens a pull request that removes the provider from `blog.json`. Either change reaches the live site only after you merge it and the production deployment finishes.
 
 ## Set up in blog.json
 
@@ -93,7 +91,7 @@ Notra validates provider settings in the dashboard, when saving and during build
 
 ## If no events arrive
 
-- Confirm that you published the draft and the production deployment succeeded. A saved draft or an unmerged PR hasn't changed the live site.
+- Confirm that you merged the pull request and the production deployment succeeded. An unmerged PR hasn't changed the live site.
 - Test the live URL, not a PR preview, branch preview or local development server.
 - Check that the ID belongs to the provider site or project whose dashboard you're viewing. For PostHog, also check the US or EU **API host**.
 - Temporarily disable your browser's analytics blocker for the test and check the Network tab for failed provider requests.

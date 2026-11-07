@@ -23,3 +23,5 @@ export const INTH_PROVIDER = {
 export const CONSENT_HOSTING_MODES = ["managed", "selfHosted"] as const;
 
 export const C15T_SELF_HOSTED_BACKEND_URL = "https://consent.acme.com/api/c15t";
+
+export const INTH_BACKEND_HOST_SUFFIX = ".inth.app";

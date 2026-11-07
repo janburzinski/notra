@@ -136,7 +136,9 @@ export function SiteInthProjectSettings({
         </dl>
       ) : null}
       {current?.backendUrl ? (
-        <SiteConfigExample value={c15tConfigExample(current.backendUrl)} />
+        <SiteConfigExample
+          value={c15tConfigExample({ backendURL: current.backendUrl })}
+        />
       ) : null}
       {current && missingOrigins.length > 0 ? (
         <Alert variant="warning">

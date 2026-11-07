@@ -15,16 +15,6 @@ export const SITE_INTEGRATION_ACTIVE_BADGE: StatusBadgeAppearance = {
   square: true,
 };
 
-export const SITE_INTEGRATION_AUTOSAVE_DELAY_MS = 600;
-
-export const SITE_INTEGRATION_AUTOSAVE_MESSAGES = {
-  idle: null,
-  pending: "autosavePending",
-  saving: "autosaveSaving",
-  saved: "autosaveSaved",
-  error: "saveFailed",
-} as const;
-
 export const SITE_INTEGRATION_PROVIDERS: readonly SiteIntegrationProvider[] = [
   {
     id: "databuddy",

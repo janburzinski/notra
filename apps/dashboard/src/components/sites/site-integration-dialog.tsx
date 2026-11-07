@@ -22,19 +22,18 @@ import {
 import { Input } from "@notra/ui/components/ui/input";
 import { Switch } from "@notra/ui/components/ui/switch";
 import { useId, useState } from "react";
-import { toast } from "sonner";
 import { highlight } from "sugar-high";
 import { useTranslations } from "use-intl";
 
 import { Button } from "@/components/button";
 import { SiteIntegrationLogo } from "@/components/sites/site-integration-logo";
-import { SiteIntegrationSaveStatus } from "@/components/sites/site-integration-save-status";
-import { useSiteIntegrationAutosave } from "@/lib/hooks/use-site-integration-autosave";
+import { SiteIntegrationPullRequestStatus } from "@/components/sites/site-integration-pull-request-status";
+import { useSaveSiteIntegration } from "@/lib/hooks/use-site-integrations";
+import type { SiteIntegrationDialogProps } from "@/types/components/sites";
 import type {
-  SiteIntegrationDialogPhase,
-  SiteIntegrationDialogProps,
-} from "@/types/components/sites";
-import type { SiteIntegrationValues } from "@/types/site-integrations";
+  SiteIntegrationSaveResult,
+  SiteIntegrationValues,
+} from "@/types/site-integrations";
 import { toastCopyError } from "@/utils/copy-to-clipboard";
 import {
   siteIntegrationExampleSettings,
@@ -54,24 +53,30 @@ export function SiteIntegrationDialog({
   const t = useTranslations("sites.integrationsPage");
   const tCommon = useTranslations("common");
   const id = useId();
+  const save = useSaveSiteIntegration(scope);
   const [values, setValues] = useState<SiteIntegrationValues>(() =>
     siteIntegrationFormValues(provider, settings)
   );
-  const [showErrors, setShowErrors] = useState(false);
-  const [phase, setPhase] = useState<SiteIntegrationDialogPhase>("editing");
-  const closing = phase === "closing";
-  const removing = phase === "removing";
-  const removalFailed = phase === "removalFailed";
-  const autosave = useSiteIntegrationAutosave(
-    scope,
-    siteIntegrationUpdateFromValues(provider, values, settings) ?? {
-      provider: provider.id,
-      settings: null,
-    }
+  // The settings the last save proposed; Save stays off until the form differs.
+  const [baseline, setBaseline] = useState(() =>
+    JSON.stringify(
+      siteIntegrationSettingsFromValues(
+        provider,
+        siteIntegrationFormValues(provider, settings),
+        settings
+      )
+    )
   );
+  const [result, setResult] = useState<SiteIntegrationSaveResult | null>(null);
+  const [showErrors, setShowErrors] = useState(false);
   const next = siteIntegrationSettingsFromValues(provider, values, settings);
   const errors = siteIntegrationFieldErrors(provider, next);
   const hasErrors = Object.keys(errors).length > 0;
+  const dirty = JSON.stringify(next) !== baseline;
+  const removing = save.isPending && save.variables?.settings === null;
+  const saving = save.isPending && !removing;
+  const removalOpened =
+    result?.action === "remove" && result.pullRequestUrl !== null;
   const parsed = siteIntegrationSchemas[provider.id].safeParse(next);
   const configExample = JSON.stringify(
     {
@@ -85,54 +90,40 @@ export function SiteIntegrationDialog({
     null,
     2
   );
-  const connected = settings !== null || autosave.state.hasIntegration;
-  const busy = closing || removing;
 
   const change = (key: string, value: string | boolean) => {
-    if (removalFailed) {
-      setPhase("editing");
-    }
-    const changed = { ...values, [key]: value };
-    setValues(changed);
-    autosave.update(
-      siteIntegrationUpdateFromValues(provider, changed, settings)
-    );
+    setValues({ ...values, [key]: value });
+    setResult(null);
+    save.reset();
   };
 
-  const close = async () => {
-    if (busy || removalFailed) {
-      return;
-    }
-    if (autosave.state.dirty && hasErrors) {
+  const submit = () => {
+    if (hasErrors) {
       setShowErrors(true);
       return;
     }
-    setPhase("closing");
-    const saved = !autosave.state.dirty || (await autosave.flush());
-    setPhase("editing");
-    if (saved) {
-      onOpenChange(false);
+    const update = siteIntegrationUpdateFromValues(provider, values, settings);
+    if (!dirty || !update || save.isPending) {
+      return;
     }
+    const proposed = JSON.stringify(next);
+    save.mutate(update, {
+      onSuccess: ({ pullRequestUrl }) => {
+        setBaseline(proposed);
+        setResult({ action: "save", pullRequestUrl });
+      },
+    });
   };
 
-  const remove = async () => {
-    setPhase("removing");
-    autosave.update({ provider: provider.id, settings: null });
-    const removed = await autosave.flush();
-    if (!removed) {
-      await autosave.cancel();
-    }
-    setPhase(removed ? "editing" : "removalFailed");
-    if (removed) {
-      toast.success(t("removed"), { description: t("savedDescription") });
-      onOpenChange(false);
-    }
-  };
-
-  const discard = async () => {
-    setPhase("closing");
-    await autosave.cancel();
-    onOpenChange(false);
+  const remove = () => {
+    setResult(null);
+    save.mutate(
+      { provider: provider.id, settings: null },
+      {
+        onSuccess: ({ pullRequestUrl }) =>
+          setResult({ action: "remove", pullRequestUrl }),
+      }
+    );
   };
 
   const textFields = provider.fields.filter(
@@ -145,14 +136,14 @@ export function SiteIntegrationDialog({
     t(`fields.${provider.id}.${key}` as Parameters<typeof t>[0]);
   const fieldError = (key: string) =>
     t(`fieldErrors.${provider.id}.${key}` as Parameters<typeof t>[0]);
-  const fieldDescription = (key: string) =>
-    t(`fieldDescriptions.${provider.id}.${key}` as Parameters<typeof t>[0]);
+  const fieldDescriptionKey = (key: string) =>
+    `fieldDescriptions.${provider.id}.${key}` as Parameters<typeof t>[0];
 
   return (
     <ResponsiveDialog
       onOpenChange={(nextOpen) => {
-        if (!nextOpen) {
-          void discard();
+        if (!(nextOpen || save.isPending)) {
+          onOpenChange(false);
         }
       }}
       open={open}
@@ -175,7 +166,7 @@ export function SiteIntegrationDialog({
           noValidate
           onSubmit={(event) => {
             event.preventDefault();
-            void close();
+            submit();
           }}
         >
           {textFields.map((field) => {
@@ -185,6 +176,15 @@ export function SiteIntegrationDialog({
                 ? fieldError(field.key)
                 : undefined;
             const value = values[field.key];
+            const description = t.has(fieldDescriptionKey(field.key))
+              ? t(fieldDescriptionKey(field.key))
+              : null;
+            const describedBy = [
+              description ? `${fieldId}-description` : null,
+              error ? `${fieldId}-error` : null,
+            ]
+              .filter(Boolean)
+              .join(" ");
             return (
               <Field data-invalid={error ? true : undefined} key={field.key}>
                 <FieldLabel htmlFor={fieldId}>
@@ -196,14 +196,14 @@ export function SiteIntegrationDialog({
                   ) : null}
                 </FieldLabel>
                 <Input
-                  aria-describedby={`${fieldId}-description${error ? ` ${fieldId}-error` : ""}`}
+                  aria-describedby={describedBy || undefined}
                   aria-invalid={error ? true : undefined}
                   autoCapitalize="none"
                   autoComplete="off"
-                  disabled={busy}
+                  disabled={save.isPending}
                   id={fieldId}
                   onBlur={() => {
-                    if (autosave.state.dirty) {
+                    if (dirty) {
                       setShowErrors(true);
                     }
                   }}
@@ -212,9 +212,11 @@ export function SiteIntegrationDialog({
                   spellCheck={false}
                   value={typeof value === "string" ? value : ""}
                 />
-                <FieldDescription id={`${fieldId}-description`}>
-                  {fieldDescription(field.key)}
-                </FieldDescription>
+                {description ? (
+                  <FieldDescription id={`${fieldId}-description`}>
+                    {description}
+                  </FieldDescription>
+                ) : null}
                 {error ? (
                   <FieldError id={`${fieldId}-error`}>{error}</FieldError>
                 ) : null}
@@ -236,14 +238,14 @@ export function SiteIntegrationDialog({
                         {fieldLabel(field.key)}
                       </FieldLabel>
                       <FieldDescription id={`${fieldId}-description`}>
-                        {fieldDescription(field.key)}
+                        {t(fieldDescriptionKey(field.key))}
                       </FieldDescription>
                     </FieldContent>
                     <Switch
                       aria-describedby={`${fieldId}-description`}
                       checked={values[field.key] === true}
                       className="cursor-pointer"
-                      disabled={busy}
+                      disabled={save.isPending}
                       id={fieldId}
                       onCheckedChange={(checked) => change(field.key, checked)}
                     />
@@ -287,44 +289,38 @@ export function SiteIntegrationDialog({
             </a>
           </FieldDescription>
         </form>
-        <SiteIntegrationSaveStatus
-          state={autosave.state}
-          invalid={hasErrors}
-          busy={busy}
-          removalFailed={removalFailed}
-          onRetry={() => {
-            if (removalFailed) {
-              void remove();
-            } else {
-              void autosave.flush();
-            }
-          }}
-        />
+        <SiteIntegrationPullRequestStatus error={save.error} result={result} />
         <ResponsiveDialogFooter className="shrink-0 sm:flex-wrap sm:justify-between">
-          {connected ? (
+          {settings === null ? (
+            <span aria-hidden="true" />
+          ) : (
             <Button
-              disabled={busy}
+              disabled={save.isPending || removalOpened}
               loading={removing}
-              onClick={() => {
-                void remove();
-              }}
+              onClick={remove}
               type="button"
               variant="destructive"
             >
               {t("remove")}
             </Button>
-          ) : (
-            <span aria-hidden="true" />
           )}
           <div className="flex min-w-0 flex-col-reverse gap-2 sm:ml-auto sm:flex-row">
             <Button
-              disabled={busy || removalFailed}
+              disabled={save.isPending}
+              onClick={() => onOpenChange(false)}
+              type="button"
+              variant="outline"
+            >
+              {t("close")}
+            </Button>
+            <Button
+              disabled={!dirty || hasErrors || save.isPending}
               form={`${id}-form`}
-              loading={closing}
+              loading={saving}
               type="submit"
               data-dialog-confirm
             >
-              {t("close")}
+              {t("save")}
             </Button>
           </div>
         </ResponsiveDialogFooter>

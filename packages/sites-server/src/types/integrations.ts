@@ -1,7 +1,4 @@
-import type {
-  SiteIntegrationUpdate,
-  SiteIntegrations,
-} from "@notra/sites-core/types/site-integrations";
+import type { SiteIntegrations } from "@notra/sites-core/types/site-integrations";
 
 export interface SiteIntegrationConfigUpdate {
   provider: keyof SiteIntegrations;
@@ -10,11 +7,10 @@ export interface SiteIntegrationConfigUpdate {
 
 export interface SiteIntegrationsState {
   integrations: Record<string, unknown>;
-  hasDraft: boolean;
   invalid: boolean;
 }
 
-export type SaveSiteIntegrationsInput = SiteIntegrationUpdate & {
-  userId: string;
-  branch?: string;
-};
+export interface SiteIntegrationPullRequest {
+  /** Null when blog.json already holds the change. */
+  pullRequestUrl: string | null;
+}

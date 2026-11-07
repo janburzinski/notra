@@ -231,7 +231,7 @@ if (!process.env.SITES_TEST_DATABASE_URL) {
     redeploy,
     rollbackToDeployment,
   } = await import("../../../packages/sites-server/src/deploy");
-  const { createSiteBranch, mergeSiteBranch, requestSiteBranchReview } =
+  const { mergeSiteBranch } =
     await import("../../../packages/sites-server/src/branches");
   const { handleSitesWebhook } =
     await import("../../../packages/sites-server/src/webhooks");
@@ -241,8 +241,14 @@ if (!process.env.SITES_TEST_DATABASE_URL) {
     await import("../../../packages/sites-server/src/previews");
   const { readSiteIntegrations, saveSiteIntegration } =
     await import("../../../packages/sites-server/src/integrations");
-  const { flushSiteDrafts, publishSiteDrafts } =
-    await import("../../../packages/sites-server/src/editor");
+  const {
+    listSiteDrafts,
+    publishSiteDrafts,
+    readSiteSourceFile,
+    saveSiteDraft,
+  } = await import("../../../packages/sites-server/src/editor");
+  const { siteSourceContext } =
+    await import("../../../packages/sites-server/src/utils/source-context");
   const { previewAccessUrl } =
     await import("../../../packages/sites-server/src/preview-access");
   const { revokeUserPreviewAccess } =
@@ -1298,69 +1304,45 @@ if (!process.env.SITES_TEST_DATABASE_URL) {
       expect(await (await request(`${site.publicOrigin}/blog`)).text()).toBe(
         initialHtml
       );
-      await phase("Databuddy on a feature branch: draft PR, review, merge");
+      await phase("Databuddy saved as a pull request, then merged");
       expect(initialHtml).not.toContain("databuddy");
-      // The editor's branch flow, as the dashboard's sites.branches routes run
-      // it: create a branch, save the integration there (feature branches
-      // commit automatically and open a draft pull request), request review,
-      // then merge and deploy the merged commit.
-      const { branch: featureBranch } = await createSiteBranch(site, {
-        title: "Add Databuddy",
-        bringChanges: false,
-        userId,
+      // The integration dialog's Save, as the dashboard's
+      // sites.integrations.save route runs it: a pull request that changes
+      // only blog.json, opened from a fresh branch off main. No draft.
+      const saved = await saveSiteIntegration(site, {
+        provider: "databuddy",
+        settings: databuddy,
       });
-      expect(await github.head(featureBranch)).toBe(await github.head());
-      expect(
-        await saveSiteIntegration(site, {
-          provider: "databuddy",
-          settings: databuddy,
-          userId,
-          branch: featureBranch,
-        })
-      ).toMatchObject({ hasDraft: true, invalid: false });
-      expect(await readSiteIntegrations(site, featureBranch)).toMatchObject({
-        integrations: { databuddy },
-        hasDraft: true,
-      });
-      expect(await readSiteIntegrations(site)).toMatchObject({
-        integrations: {},
-        hasDraft: false,
-      });
-      const saved = await flushSiteDrafts(site, {
-        branch: featureBranch,
-        message: "Update site content",
-        userId,
-      });
-      expect(saved.commitSha).toBe(await github.head(featureBranch));
-      // The branch push reaches the webhook; with previews off it deploys
-      // nothing.
-      expect(
-        await deliveryFor(saved.commitSha, `refs/heads/${featureBranch}`)
-      ).toMatchObject({ status: 200, jobIds: [] });
       const [proposal, ...otherPullRequests] = await github.pullRequests();
       expect(otherPullRequests).toHaveLength(0);
       assert.ok(proposal);
+      const integrationBranch = proposal.head.ref;
+      expect(integrationBranch).toStartWith("notra/integrations-databuddy-");
       expect(proposal).toMatchObject({
+        title: "chore(blog): add Databuddy",
         state: "open",
-        draft: true,
+        draft: false,
         base: { ref: "main" },
-        head: { ref: featureBranch, sha: saved.commitSha },
       });
       expect(saved.pullRequestUrl).toContain(`/pull/${proposal.number}`);
-      expect(await github.file("blog.json", featureBranch)).toContain(
+      expect(await listSiteDrafts(site.id)).toEqual([]);
+      // The branch push reaches the webhook; with previews off it deploys
+      // nothing.
+      expect(
+        await deliveryFor(
+          await github.head(integrationBranch),
+          `refs/heads/${integrationBranch}`
+        )
+      ).toMatchObject({ status: 200, jobIds: [] });
+      expect(await github.file("blog.json", integrationBranch)).toContain(
         databuddy.clientId
       );
       expect(await github.file("blog.json")).not.toContain("databuddy");
-      // A draft cannot be merged until review is requested.
-      await expect(mergeSiteBranch(site, featureBranch)).rejects.toThrow(
-        "GitHub has not allowed this pull request to merge"
-      );
-      await requestSiteBranchReview(site, featureBranch);
-      expect((await github.pullRequests())[0]).toMatchObject({
-        draft: false,
-        state: "open",
+      // The integration is active only once the change is in main.
+      expect(await readSiteIntegrations(site)).toMatchObject({
+        integrations: {},
       });
-      const merged = await mergeSiteBranch(site, featureBranch);
+      const merged = await mergeSiteBranch(site, integrationBranch);
       expect(merged).toMatchObject({ branch: "main" });
       expect(merged.commitSha).toBe(await github.head());
       expect((await github.pullRequests())[0]).toMatchObject({
@@ -1370,7 +1352,7 @@ if (!process.env.SITES_TEST_DATABASE_URL) {
       expect(await github.file("blog.json")).toContain(databuddy.clientId);
       expect(await readSiteIntegrations(site)).toMatchObject({
         integrations: { databuddy },
-        hasDraft: false,
+        invalid: false,
       });
       // mergeAndPublish deploys the merged commit right away.
       const integrationJob = await deployBranchHead(site, {
@@ -1460,15 +1442,24 @@ if (!process.env.SITES_TEST_DATABASE_URL) {
         ...databuddy,
         skipPatterns: ["/drafts/**", "/internal/**"],
       };
-      await saveSiteIntegration(site, {
-        provider: "databuddy",
-        settings: skipped,
+      const committedConfig = await readSiteSourceFile(site, "blog.json");
+      assert.ok(committedConfig);
+      const parsedConfig = JSON.parse(committedConfig.content);
+      parsedConfig.integrations.databuddy = skipped;
+      await saveSiteDraft(site, {
+        path: "blog.json",
+        content: `${JSON.stringify(parsedConfig, null, 2)}\n`,
+        baseBlobSha: committedConfig.sha,
+        baseCommitSha: await github.head(),
+        draftId: null,
+        draftRevision: null,
+        sourceContext: siteSourceContext(site),
         userId,
       });
       await expect(
         publishSiteDrafts(site, {
           message: "Skip internal pages",
-          branch: featureBranch,
+          branch: integrationBranch,
           userId,
         })
       ).rejects.toThrow("Feature branches save automatically");

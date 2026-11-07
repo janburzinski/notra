@@ -42,6 +42,8 @@ export interface FakeGitHubState {
   protectedFeatures: boolean;
   rejectDraft: boolean;
   failPR: boolean;
+  /** Open the pull request but answer with an error, like a timed-out response. */
+  failAfterPR: boolean;
   staleCommit: boolean;
   commitCount: number;
   calls: string[];

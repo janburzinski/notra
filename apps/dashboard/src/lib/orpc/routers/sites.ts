@@ -1298,29 +1298,26 @@ export const sitesRouter = {
 
   integrations: {
     get: sitesProcedure
-      .input(siteEditorScopeInputSchema)
+      .input(siteScopeInputSchema)
       .handler(async ({ context, input }) => {
         const { site } = await requireSite(context, input);
-        return await readSiteIntegrations(site, input.branch);
+        return await readSiteIntegrations(site);
       }),
 
     save: sitesProcedure
       .input(saveSiteIntegrationInputSchema)
       .handler(async ({ context, input }) => {
         assertNotDemo();
-        const { site, userId } = await requireSite(context, input);
-        return await saveSiteIntegration(site, {
-          ...input,
-          userId,
-        });
+        const { site } = await requireSite(context, input);
+        return await saveSiteIntegration(site, input);
       }),
 
     inth: {
       status: sitesProcedure
-        .input(siteEditorScopeInputSchema)
+        .input(siteScopeInputSchema)
         .handler(async ({ context, input }) => {
           const { site } = await requireSite(context, input);
-          return await getInthConsentStatus(site, input.branch);
+          return await getInthConsentStatus(site);
         }),
 
       projects: sitesProcedure
@@ -1334,15 +1331,10 @@ export const sitesRouter = {
         .input(connectSiteInthProjectInputSchema)
         .handler(async ({ context, input }) => {
           assertNotDemo();
-          const { site, userId } = await requireSite(context, input, {
+          const { site } = await requireSite(context, input, {
             admin: true,
           });
-          return await connectSiteToInthProject(
-            site,
-            input.projectId,
-            userId,
-            input.branch
-          );
+          return await connectSiteToInthProject(site, input.projectId);
         }),
 
       disconnect: sitesProcedure
