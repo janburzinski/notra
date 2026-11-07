@@ -14,6 +14,7 @@ import type {
   geoTrafficTrendsDaily,
   geoTrafficTrendsDetail,
   geoTrafficTrendsProjects,
+  geoTrafficTrendsRolling,
 } from "../tinybird/pipes/geo-traffic-trends";
 import type {
   mcpCatalog,
@@ -103,6 +104,9 @@ export type GeoTrafficTrendsProjectsRow = InferOutputRow<
 >;
 export type GeoTrafficTrendsDetailRow = InferOutputRow<
   typeof geoTrafficTrendsDetail
+>;
+export type GeoTrafficTrendsRollingRow = InferOutputRow<
+  typeof geoTrafficTrendsRolling
 >;
 export type McpOverviewRow = InferOutputRow<typeof mcpOverview>;
 export type McpTimeseriesRow = InferOutputRow<typeof mcpTimeseries>;

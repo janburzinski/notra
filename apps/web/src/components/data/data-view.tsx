@@ -62,7 +62,13 @@ function Report({ page }: { page: DataPageModel }) {
     <>
       <DataStats page={page} />
 
-      <ReportBlock title="AI traffic · past 60 days">
+      <ReportBlock
+        title={
+          page.averageDays > 1
+            ? `AI traffic · ${page.averageDays}-day average, past 60 days`
+            : "AI traffic · past 60 days"
+        }
+      >
         <div className="grid gap-4 lg:grid-cols-2">
           <DataTrafficCard
             color={DATA_CRAWLER_COLOR}

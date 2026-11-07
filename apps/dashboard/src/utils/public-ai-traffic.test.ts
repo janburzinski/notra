@@ -1,6 +1,7 @@
 import { expect, test } from "bun:test";
 
 import type {
+  PublicAiTrafficChartRow,
   PublicAiTrafficDailyRow,
   PublicAiTrafficDetailRow,
   PublicAiTrafficProjectRow,
@@ -116,6 +117,7 @@ test("publishes shares, reach and matched-site change, not counts", () => {
     from: "2026-09-03",
     to: "2026-11-01",
     recentFrom: "2026-10-26",
+    averageDays: 1,
   });
 });
 
@@ -454,4 +456,90 @@ test("publishes hours, countries and llms.txt only above the site floor", () => 
   expect(crawler("ClaudeBot")?.llmsTxtReach).toBeNull();
   expect(crawler("OAI-SearchBot")).toBeDefined();
   expect(crawler("OAI-SearchBot")?.llmsTxtReach).toBeNull();
+});
+
+function rollingRow(
+  row: PublicAiTrafficDailyRow,
+  siteDays = 0
+): PublicAiTrafficChartRow {
+  return { ...row, site_days: siteDays };
+}
+
+test("charts a rolling week from the kind's own site count and site-days", () => {
+  const snapshot = buildPublicAiTrafficSnapshot({
+    today: TODAY,
+    generatedAt: "2026-11-02T00:20:00.000Z",
+    daily,
+    projects,
+    rolling: [
+      rollingRow(dailyRow("2026-11-01", "", "", "", 600, 8), 20),
+      // Eight sites had crawlers that week, though no bot reached five.
+      rollingRow(dailyRow("2026-11-01", "crawler", "", "", 500, 8), 20),
+      rollingRow(
+        dailyRow("2026-11-01", "crawler", "GPTBot", "training-crawler", 400, 4)
+      ),
+      rollingRow(
+        dailyRow(
+          "2026-11-01",
+          "crawler",
+          "ClaudeBot",
+          "training-crawler",
+          100,
+          3
+        )
+      ),
+    ],
+  });
+  const day = snapshot.crawlerVolume.days.find(
+    (entry) => entry.day === "2026-11-01"
+  );
+
+  expect(snapshot.window.averageDays).toBe(7);
+  // 500 visits over 20 site-days; the bots stay withheld.
+  expect(day?.values.total).toBe(25);
+  expect(day?.values.s1).toBeNull();
+  expect(day?.values.s2).toBeNull();
+});
+
+test("folds a bot below the floor into Other instead of blanking the day", () => {
+  const snapshot = buildPublicAiTrafficSnapshot({
+    today: TODAY,
+    generatedAt: "2026-11-02T00:20:00.000Z",
+    daily,
+    projects,
+    rolling: [
+      rollingRow(dailyRow("2026-11-01", "", "", "", 1000, 12), 40),
+      rollingRow(dailyRow("2026-11-01", "crawler", "", "", 1000, 12), 40),
+      rollingRow(
+        dailyRow("2026-11-01", "crawler", "GPTBot", "training-crawler", 600)
+      ),
+      rollingRow(
+        dailyRow(
+          "2026-11-01",
+          "crawler",
+          "ClaudeBot",
+          "training-crawler",
+          100,
+          3
+        )
+      ),
+      rollingRow(
+        dailyRow("2026-11-01", "crawler", "TailBot", "search-index", 300, 6)
+      ),
+    ],
+  });
+  const chart = snapshot.crawlerVolume;
+  const day = chart.days.find((entry) => entry.day === "2026-11-01");
+
+  expect(chart.series.map((entry) => entry.label)).toEqual([
+    "GPTBot",
+    "ClaudeBot",
+    "Other",
+  ]);
+  // GPTBot keeps its line; ClaudeBot's 100 visits ride in Other, so the
+  // total minus the rest reveals only Other: (300 + 100) / 40.
+  expect(day?.values.total).toBe(25);
+  expect(day?.values.s1).toBe(15);
+  expect(day?.values.s2).toBeNull();
+  expect(day?.values.other).toBe(10);
 });

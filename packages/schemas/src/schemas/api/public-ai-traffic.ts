@@ -92,6 +92,8 @@ export const publicAiTrafficSnapshotSchema = z.object({
     from: daySchema,
     to: daySchema,
     recentFrom: daySchema,
+    /** Days each chart point averages, ending on its day; absent means one. */
+    averageDays: z.number().int().positive().optional(),
   }),
   /** A source needs traffic on at least this many sites to be listed. */
   minSites: z.number().int().positive(),

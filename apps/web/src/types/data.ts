@@ -97,6 +97,8 @@ export interface DataPageModel {
   day: string;
   generatedAt: string;
   windowFrom: string;
+  /** Days each chart point averages, ending on its day. */
+  averageDays: number;
   minSites: number;
   /** Headline figures: crawls per referral (28 days), training and Markdown shares (7 days). */
   summary: {

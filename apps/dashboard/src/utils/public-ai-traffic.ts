@@ -24,6 +24,7 @@ import {
   PUBLIC_DATA_RECENT_DAYS,
   PUBLIC_DATA_REFERRER_VENDORS,
   PUBLIC_DATA_REFERRER_WEEKS,
+  PUBLIC_DATA_ROLLING_DAYS,
   PUBLIC_DATA_SHARE_DECIMALS,
   PUBLIC_DATA_SITE_CAP_FACTOR,
   PUBLIC_DATA_TOP_COUNTRIES,
@@ -34,7 +35,7 @@ import {
   PUBLIC_DATA_WINDOW_DAYS,
 } from "@/constants/public-data";
 import type {
-  PublicAiTrafficDailyRow,
+  PublicAiTrafficChartRow,
   PublicAiTrafficDetailRow,
   PublicAiTrafficInput,
   PublicAiTrafficKind,
@@ -453,7 +454,8 @@ function vendorRatios(
 /**
  * Daily visits of one kind per measured site, per group: the bars of the
  * page's charts. Dividing by the day's sites keeps volume and growth visible
- * without publishing visit or site counts. A value stays null unless both the
+ * without publishing visit or site counts. Rolling rows cover the week
+ * ending on each day and divide by its site-days, each day's sites added up. A value stays null unless both the
  * day and that group had traffic on enough sites. A group's sites are the
  * largest per-source count inside it, a lower bound on its distinct sites,
  * so combined buckets like "Other" never pass on one customer's traffic.
@@ -465,31 +467,39 @@ function dailyVolume({
   groupOf,
   series,
 }: {
-  daily: PublicAiTrafficDailyRow[];
+  daily: PublicAiTrafficChartRow[];
   days: string[];
   kind: PublicAiTrafficKind;
-  groupOf: (row: PublicAiTrafficDailyRow) => string | null;
+  groupOf: (row: PublicAiTrafficChartRow) => string | null;
   series: { key: string; label: string }[];
 }): PublicAiTrafficChart {
   const sitesByDay = new Map<string, number>();
+  const siteDaysByDay = new Map<string, number>();
   const byDay = new Map<string, Map<string, number>>();
   const groupSitesByDay = new Map<string, Map<string, number>>();
   const kindVisits = new Map<string, number>();
   const kindSites = new Map<string, number>();
+  const exactKindSites = new Map<string, number>();
   for (const row of daily) {
     if (row.visitor_type === "") {
       sitesByDay.set(row.day, row.projects);
+      siteDaysByDay.set(row.day, row.site_days ?? row.projects);
       continue;
     }
     if (row.visitor_type !== kind) {
+      continue;
+    }
+    // The rolling pipe counts the kind's distinct sites on a row of its own.
+    if (row.source === "") {
+      exactKindSites.set(row.day, row.projects);
       continue;
     }
     const group = groupOf(row);
     if (!group) {
       continue;
     }
-    // The total counts every charted group; its sites are the busiest
-    // source's, a lower bound on how many sites fed it.
+    // Without the kind's own row, the total's sites are the busiest source's,
+    // a lower bound on how many sites fed it.
     kindVisits.set(row.day, (kindVisits.get(row.day) ?? 0) + row.visits);
     kindSites.set(row.day, Math.max(kindSites.get(row.day) ?? 0, row.projects));
     const groups = byDay.get(row.day) ?? new Map<string, number>();
@@ -500,21 +510,53 @@ function dailyVolume({
     groupSites.set(group, Math.max(groupSites.get(group) ?? 0, row.projects));
     groupSitesByDay.set(row.day, groupSites);
   }
+  const hasOther = series.some(({ key }) => key === PUBLIC_DATA_OTHER_KEY);
   const chartDays = days.map((day) => {
     const sites = sitesByDay.get(day) ?? 0;
-    const groups = byDay.get(day);
-    const groupSites = groupSitesByDay.get(day);
-    const publishable = sites >= PUBLIC_DATA_MIN_SITES && groups !== undefined;
+    const siteDays = siteDaysByDay.get(day) ?? sites;
+    const groups = new Map(byDay.get(day));
+    const groupSites = new Map(groupSitesByDay.get(day));
+    const publishable =
+      sites >= PUBLIC_DATA_MIN_SITES && byDay.has(day) && siteDays > 0;
+    const totalSites = exactKindSites.get(day) ?? kindSites.get(day) ?? 0;
     const total =
-      publishable && (kindSites.get(day) ?? 0) >= PUBLIC_DATA_MIN_SITES
-        ? round((kindVisits.get(day) ?? 0) / sites, 2)
+      publishable && totalSites >= PUBLIC_DATA_MIN_SITES
+        ? round((kindVisits.get(day) ?? 0) / siteDays, 2)
         : null;
+    // A group below the floor joins "Other" when "Other" still clears it,
+    // so one small bot doesn't cost the whole day its breakdown. It stays
+    // null on its own; the total minus the rest only reveals "Other".
+    const folded = new Set<string>();
+    if (hasOther) {
+      const small = [...groupSites].filter(
+        ([key, count]) =>
+          key !== PUBLIC_DATA_OTHER_KEY &&
+          count < PUBLIC_DATA_MIN_SITES &&
+          (groups.get(key) ?? 0) > 0
+      );
+      const otherSites = Math.max(
+        groupSites.get(PUBLIC_DATA_OTHER_KEY) ?? 0,
+        ...small.map(([, count]) => count)
+      );
+      if (small.length > 0 && otherSites >= PUBLIC_DATA_MIN_SITES) {
+        for (const [key] of small) {
+          groups.set(
+            PUBLIC_DATA_OTHER_KEY,
+            (groups.get(PUBLIC_DATA_OTHER_KEY) ?? 0) + (groups.get(key) ?? 0)
+          );
+          groups.delete(key);
+          folded.add(key);
+        }
+        groupSites.set(PUBLIC_DATA_OTHER_KEY, otherSites);
+      }
+    }
     return {
       day,
+      folded,
       values: Object.fromEntries<number | null>([
         [PUBLIC_DATA_TOTAL_KEY, total] as [string, number | null],
         ...series.map(({ key }): [string, number | null] => {
-          if (!publishable) {
+          if (!publishable || folded.has(key)) {
             return [key, null];
           }
           const visits = groups.get(key) ?? 0;
@@ -523,8 +565,8 @@ function dailyVolume({
           }
           return [
             key,
-            (groupSites?.get(key) ?? 0) >= PUBLIC_DATA_MIN_SITES
-              ? round(visits / sites, 2)
+            (groupSites.get(key) ?? 0) >= PUBLIC_DATA_MIN_SITES
+              ? round(visits / siteDays, 2)
               : null,
           ];
         }),
@@ -534,9 +576,10 @@ function dailyVolume({
   // A day keeps its breakdown only when every group clears the floor;
   // otherwise the total minus the published groups would reveal the
   // withheld ones, so that day publishes the total alone.
-  const guardedDays = chartDays.map((entry) => {
+  const guardedDays = chartDays.map(({ folded, ...entry }) => {
     const complete = Object.entries(entry.values).every(
-      ([key, value]) => key === PUBLIC_DATA_TOTAL_KEY || value !== null
+      ([key, value]) =>
+        key === PUBLIC_DATA_TOTAL_KEY || value !== null || folded.has(key)
     );
     if (complete) {
       return entry;
@@ -693,6 +736,9 @@ export function buildPublicAiTrafficSnapshot(
   // The pipes leave hidden sources out already; this keeps the snapshot
   // honest if a caller forgets the parameter.
   const daily = input.daily.filter((row) => !HIDDEN_SOURCES.has(row.source));
+  const chartRows = (input.rolling ?? input.daily).filter(
+    (row) => !HIDDEN_SOURCES.has(row.source)
+  );
   const projects = input.projects.filter(
     (row) => !HIDDEN_SOURCES.has(row.source)
   );
@@ -727,6 +773,7 @@ export function buildPublicAiTrafficSnapshot(
       from: window.from,
       to: window.to,
       recentFrom: window.recentFrom,
+      averageDays: input.rolling ? PUBLIC_DATA_ROLLING_DAYS : 1,
     },
     minSites: PUBLIC_DATA_MIN_SITES,
   };
@@ -866,21 +913,21 @@ export function buildPublicAiTrafficSnapshot(
     countries: detailCountries(detail),
     ...detailSection(detail),
     crawlerVolume: dailyVolume({
-      daily,
+      daily: chartRows,
       days,
       kind: "crawler",
       groupOf: (row) => bots.keyOf(sourceId("crawler", row.source)),
       series: bots.series,
     }),
     referrerVolume: dailyVolume({
-      daily,
+      daily: chartRows,
       days,
       kind: "ai_referral",
       groupOf: (row) => assistants.keyOf(sourceId("ai_referral", row.source)),
       series: assistants.series,
     }),
     purposeVolume: dailyVolume({
-      daily,
+      daily: chartRows,
       days,
       kind: "crawler",
       groupOf: (row) => (PURPOSES.includes(row.category) ? row.category : null),
@@ -890,7 +937,7 @@ export function buildPublicAiTrafficSnapshot(
       })),
     }),
     vendorVolume: dailyVolume({
-      daily,
+      daily: chartRows,
       days,
       kind: "crawler",
       groupOf: (row) =>

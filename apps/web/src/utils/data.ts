@@ -130,10 +130,32 @@ function average(values: number[]): number | null {
     : null;
 }
 
+/** This week's average per site and the week before's. */
+function weekFigures(
+  rows: readonly DataTrafficRow[],
+  averageDays: number
+): { recent: number | null; before: number | null } {
+  // Each day already averages the week ending on it, so the last day is
+  // this week and the day a week earlier the one before.
+  if (averageDays >= RECENT_DAYS) {
+    return {
+      recent: rows.at(-1)?.total ?? null,
+      before: rows.at(-1 - RECENT_DAYS)?.total ?? null,
+    };
+  }
+  // Single days: windows are calendar days, so a day blanked by the privacy
+  // floor leaves a gap instead of pulling older days into "this week".
+  return {
+    recent: average(windowTotals(rows.slice(-RECENT_DAYS))),
+    before: average(windowTotals(rows.slice(-RECENT_DAYS * 2, -RECENT_DAYS))),
+  };
+}
+
 /** Chart rows for one kind: the day's total plus a key per bot or assistant. */
 function trafficChart(
   chart: PublicAiTrafficChart,
-  sources: readonly { label: string; vendor: string | null }[]
+  sources: readonly { label: string; vendor: string | null }[],
+  averageDays: number
 ): DataTraffic {
   const vendors = new Map(sources.map((row) => [row.label, row.vendor]));
   const series = chart.series
@@ -173,12 +195,7 @@ function trafficChart(
     }
     return row;
   });
-  // Windows are calendar days, so a day blanked by the privacy floor leaves
-  // a gap instead of pulling older days into "this week".
-  const recent = average(windowTotals(rows.slice(-RECENT_DAYS)));
-  const before = average(
-    windowTotals(rows.slice(-RECENT_DAYS * 2, -RECENT_DAYS))
-  );
+  const { recent, before } = weekFigures(rows, averageDays);
   return {
     rows,
     series,
@@ -220,15 +237,25 @@ export function buildDataPage(
   if (!snapshot?.available) {
     return null;
   }
+  const averageDays = snapshot.window.averageDays ?? 1;
   return {
     day: snapshot.day,
     generatedAt: snapshot.generatedAt,
     windowFrom: snapshot.window.from,
+    averageDays,
     minSites: snapshot.minSites,
     summary: snapshot.summary,
     traffic: {
-      crawlers: trafficChart(snapshot.crawlerVolume, snapshot.crawlers),
-      referrals: trafficChart(snapshot.referrerVolume, snapshot.referrers),
+      crawlers: trafficChart(
+        snapshot.crawlerVolume,
+        snapshot.crawlers,
+        averageDays
+      ),
+      referrals: trafficChart(
+        snapshot.referrerVolume,
+        snapshot.referrers,
+        averageDays
+      ),
     },
     crawlers: snapshot.crawlers.map((row) => ({
       id: row.id,

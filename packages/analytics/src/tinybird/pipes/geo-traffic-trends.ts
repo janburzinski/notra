@@ -21,8 +21,13 @@ const TRENDS_PARAMS = {
   ...GEO_EXCLUDED_SOURCES_PARAMS,
 };
 
-const TRENDS_SCOPE_SQL = `
-          day >= toDateOrNull({{String(date_from, '')}})
+const TRENDS_FROM_SQL = "toDateOrNull({{String(date_from, '')}})";
+const TRENDS_TO_SQL = "toDateOrNull({{String(date_to, '')}})";
+const ROLLING_DAYS_SQL = "{{UInt8(window_days, 7)}}";
+
+/** `fromSql` is the first day read, earlier than `date_from` for rolling windows. */
+const trendsScopeSql = (fromSql: string) => `
+          day >= ${fromSql}
           AND day < toDateOrNull({{String(date_to, '')}})
           AND visitor_type IN ('crawler', 'ai_referral')
           AND (
@@ -30,6 +35,8 @@ const TRENDS_SCOPE_SQL = `
             OR NOT has(splitByChar(',', {{String(excluded_project_ids, '')}}), project_id)
           )
           ${GEO_EXCLUDED_SOURCES_SQL}`;
+
+const TRENDS_SCOPE_SQL = trendsScopeSql(TRENDS_FROM_SQL);
 
 /** Partition of one bot's or assistant's sites on one day. */
 const SITE_WINDOW = "OVER (PARTITION BY day, visitor_type, source)";
@@ -163,6 +170,221 @@ export const geoTrafficTrendsDaily = defineEndpoint(
       markdown_visits: t.uint64(),
       projects: t.uint64(),
       median_visits: t.float64(),
+    },
+  }
+);
+
+/** Partition of one bot's or assistant's sites in one rolling window. */
+const ROLLING_SITE_WINDOW =
+  "OVER (PARTITION BY window_day, visitor_type, source)";
+
+/**
+ * Spreads each row over the windows that contain its day: the window ending
+ * on `window_day` covers it and the `window_days - 1` days before.
+ */
+const ROLLING_SPREAD_SQL = `
+        ARRAY JOIN range(toUInt64(${ROLLING_DAYS_SQL})) AS window_offset
+        WHERE window_day >= ${TRENDS_FROM_SQL}
+          AND window_day < ${TRENDS_TO_SQL}`;
+
+/**
+ * The public data page's chart: each day is the window of `window_days` days
+ * ending on it, so a day clears the anonymity floor when enough sites were
+ * measured that week rather than on that one day. Rows with an empty source
+ * count the window's sites per visitor type, and with an empty visitor type
+ * across both; `site_days` adds up each day's sites, the per-site denominator.
+ */
+export const geoTrafficTrendsRolling = defineEndpoint(
+  "geo_traffic_trends_rolling",
+  {
+    description:
+      "Rolling-window AI crawler and referral visits per source across all organizations, with distinct sites and site-days per window.",
+    params: {
+      ...TRENDS_PARAMS,
+      window_days: p
+        .uint8()
+        .optional(7)
+        .describe("Days per window, ending on each output day"),
+      site_cap_factor: p
+        .float64()
+        .optional(0)
+        .describe(
+          "Cap each site at this many times the median site's visits and at the other sites' total; 0 keeps raw counts"
+        ),
+    },
+    nodes: [
+      node({
+        name: "rolling_project_days",
+        sql: `
+        SELECT
+          day,
+          visitor_type,
+          source,
+          project_id,
+          anyMerge(category_state) AS project_category,
+          countMerge(visits_state) AS day_visits,
+          countIfMerge(markdown_visits_state) AS day_markdown_visits
+        FROM geo_traffic_daily
+        WHERE ${trendsScopeSql(`${TRENDS_FROM_SQL} - (${ROLLING_DAYS_SQL} - 1)`)}
+        GROUP BY day, visitor_type, source, project_id
+      `,
+      }),
+      node({
+        name: "rolling_spread",
+        sql: `
+        SELECT
+          addDays(day, window_offset) AS window_day,
+          day AS active_day,
+          visitor_type,
+          source,
+          project_id,
+          project_category,
+          day_visits,
+          day_markdown_visits
+        FROM rolling_project_days
+        ${ROLLING_SPREAD_SQL}
+      `,
+      }),
+      node({
+        name: "rolling_per_project",
+        sql: `
+        SELECT
+          window_day,
+          visitor_type,
+          source,
+          project_id,
+          any(project_category) AS project_category,
+          sum(day_visits) AS project_visits,
+          sum(day_markdown_visits) AS project_markdown_visits
+        FROM rolling_spread
+        GROUP BY window_day, visitor_type, source, project_id
+      `,
+      }),
+      // The same cap as the daily pipe, per window.
+      node({
+        name: "rolling_bounds",
+        sql: `
+        SELECT
+          *,
+          if(
+            {{Float64(site_cap_factor, 0)}} > 0,
+            least(
+              toFloat64(project_visits),
+              {{Float64(site_cap_factor, 0)}} * toFloat64(quantileExact(0.5)(project_visits) ${ROLLING_SITE_WINDOW})
+            ),
+            toFloat64(project_visits)
+          ) AS bounded_visits
+        FROM rolling_per_project
+      `,
+      }),
+      node({
+        name: "rolling_capped",
+        sql: `
+        SELECT
+          *,
+          if(
+            {{Float64(site_cap_factor, 0)}} > 0,
+            least(bounded_visits, sum(bounded_visits) ${ROLLING_SITE_WINDOW} - bounded_visits),
+            bounded_visits
+          ) AS capped_visits
+        FROM rolling_bounds
+      `,
+      }),
+      node({
+        name: "rolling_per_source",
+        sql: `
+        SELECT
+          window_day,
+          visitor_type,
+          source,
+          any(project_category) AS category,
+          toUInt64(round(sum(capped_visits))) AS visits,
+          toUInt64(round(sum(
+            if(project_visits = 0, 0, project_markdown_visits * capped_visits / project_visits)
+          ))) AS markdown_visits,
+          count() AS projects,
+          toUInt64(0) AS site_days
+        FROM rolling_capped
+        GROUP BY window_day, visitor_type, source
+      `,
+      }),
+      node({
+        name: "rolling_per_kind",
+        sql: `
+        SELECT
+          window_day,
+          visitor_type,
+          sum(day_visits) AS visits,
+          sum(day_markdown_visits) AS markdown_visits,
+          uniqExact(project_id) AS projects,
+          uniqExact(project_id, active_day) AS site_days
+        FROM rolling_spread
+        GROUP BY window_day, visitor_type
+      `,
+      }),
+      node({
+        name: "rolling_per_window",
+        sql: `
+        SELECT
+          window_day,
+          sum(day_visits) AS visits,
+          sum(day_markdown_visits) AS markdown_visits,
+          uniqExact(project_id) AS projects,
+          uniqExact(project_id, active_day) AS site_days
+        FROM rolling_spread
+        GROUP BY window_day
+      `,
+      }),
+      node({
+        name: "rolling_result",
+        sql: `
+        SELECT * FROM (
+          SELECT
+            window_day AS day,
+            visitor_type,
+            source,
+            category,
+            visits,
+            markdown_visits,
+            projects,
+            site_days
+          FROM rolling_per_source
+          UNION ALL
+          SELECT
+            window_day AS day,
+            visitor_type,
+            '' AS source,
+            '' AS category,
+            visits,
+            markdown_visits,
+            projects,
+            site_days
+          FROM rolling_per_kind
+          UNION ALL
+          SELECT
+            window_day AS day,
+            '' AS visitor_type,
+            '' AS source,
+            '' AS category,
+            visits,
+            markdown_visits,
+            projects,
+            site_days
+          FROM rolling_per_window
+        )
+        ORDER BY day ASC, visitor_type ASC, source ASC
+      `,
+      }),
+    ],
+    output: {
+      day: t.date(),
+      visitor_type: t.string(),
+      source: t.string(),
+      category: t.string(),
+      visits: t.uint64(),
+      markdown_visits: t.uint64(),
+      projects: t.uint64(),
+      site_days: t.uint64(),
     },
   }
 );

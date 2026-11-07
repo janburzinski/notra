@@ -43,6 +43,11 @@ function buildDataMarkdownFromSnapshot(
     ].join("\n");
   }
   const recent = `${formatDataDay(snapshot.window.recentFrom)} – ${formatDataDay(snapshot.day)}`;
+  const averageDays = snapshot.window.averageDays ?? 1;
+  const chartDayNote =
+    averageDays > 1
+      ? `each chart day averages the ${averageDays} days ending on it and appears only when that many sites had AI traffic in those days.`
+      : "a chart day only when that many sites had AI traffic.";
   const sections = [
     markdownSection("Summary", [
       `- Crawls per AI referral: ${formatRatio(snapshot.summary.crawlsPerReferral)}`,
@@ -127,7 +132,7 @@ function buildDataMarkdownFromSnapshot(
     ]),
     markdownSection("Methodology", [
       "- Visits come from sites that measure AI traffic with Notra: requests from known AI crawlers, and page views referred by AI assistants.",
-      `- Aggregated and anonymized. Only shares, reach and per-site medians are published. A bot, assistant or company appears only after reaching at least ${snapshot.minSites} different sites; a chart day only when that many sites had AI traffic.`,
+      `- Aggregated and anonymized. Only shares, reach and per-site medians are published. A bot, assistant or company appears only after reaching at least ${snapshot.minSites} different sites; ${chartDayNote}`,
       "- Sample projects and demo accounts are excluded. Days are UTC; snapshots cover full days and end with yesterday.",
       "- “vs. prior week” compares the last 7 days with the 7 before, over sites measured in both weeks. Assistants rank over the last 28 days against the 28 before, since referrals are sparse.",
       "- Published once a day. Cite as “Notra AI Traffic Data, usenotra.com/data” with the snapshot date.",

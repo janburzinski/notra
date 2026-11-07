@@ -9,6 +9,11 @@ export const PUBLIC_DATA_RATIO_WEEKS = 4;
  * sparse for one assistant to reach the site floor in a single week.
  */
 export const PUBLIC_DATA_REFERRER_WEEKS = 4;
+/**
+ * Each chart day averages the week ending on it, so a day clears the site
+ * floor when enough sites were measured that week, not on that one day.
+ */
+export const PUBLIC_DATA_ROLLING_DAYS = 7;
 /** Hours, countries and llms.txt cover the last 28 full days. */
 export const PUBLIC_DATA_DETAIL_DAYS = 28;
 export const PUBLIC_DATA_TOP_COUNTRIES = 20;

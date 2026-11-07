@@ -12,6 +12,15 @@ export interface PublicAiTrafficDailyRow {
 }
 
 /** `geo_traffic_trends_projects` row; `weeks_ago` 0 is the last 7 full days. */
+/**
+ * A chart row: a daily row, or a `geo_traffic_trends_rolling` row for the
+ * week ending on `day`. Rolling rows add the kind's distinct sites as a row
+ * with an empty `source`, and `site_days`, each day's sites added up.
+ */
+export interface PublicAiTrafficChartRow extends PublicAiTrafficDailyRow {
+  site_days?: number;
+}
+
 export interface PublicAiTrafficProjectRow {
   project_id: string;
   visitor_type: string;
@@ -45,6 +54,8 @@ export interface PublicAiTrafficInput {
   today: string;
   generatedAt: string;
   daily: PublicAiTrafficDailyRow[];
+  /** Rolling rows for the charts; without them the charts use `daily`. */
+  rolling?: PublicAiTrafficChartRow[];
   projects: PublicAiTrafficProjectRow[];
   /** Hours, countries and llms.txt; empty leaves those sections out. */
   detail?: PublicAiTrafficDetailRow[];

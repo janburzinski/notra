@@ -17,6 +17,9 @@ import { formatDataDay, formatVisits, relativeTrend } from "@/utils/data";
 const TOTAL_KEY = "total";
 const LOGO_PX = 32;
 const STROKE_WIDTH = 2;
+// A day withheld by the privacy floor sits on the zero line; hover says why.
+const WITHHELD_LABEL = "Fewer than 5 sites, not shown";
+const NO_VISITS_LABEL = "No visits";
 const CHART_OPTIONS = {
   grid: { left: 4, right: 8, top: 8, bottom: 4, containLabel: true },
 };
@@ -35,6 +38,26 @@ function weekTrend(
     tone = "down";
   }
   return { tone, text: trend.signed };
+}
+
+/**
+ * Puts days without a published value on the zero line, so the chart has no
+ * gaps, and tells those days apart from real zeros on hover.
+ */
+function zeroWithheld(rows: DataTraffic["rows"], key: string) {
+  const withheld = new Set<string>();
+  const plotted = rows.map((row) => {
+    if (typeof row[key] === "number") {
+      return row;
+    }
+    withheld.add(row.rawDay);
+    return { ...row, [key]: 0 };
+  });
+  return {
+    plotted,
+    emptyLabel: (row: Record<string, unknown> | undefined) =>
+      withheld.has(String(row?.rawDay)) ? WITHHELD_LABEL : NO_VISITS_LABEL,
+  };
 }
 
 /** The company logo the tooltip shows before a bot or assistant; a blank slot keeps "Other" aligned. */
@@ -72,6 +95,16 @@ export function DataTrafficCard({
       ),
     };
   }, [title, color, traffic.series]);
+  // The total leads so days that publish it alone, without a breakdown,
+  // still show the charted value.
+  const rowKeys = useMemo(
+    () => [TOTAL_KEY, ...traffic.series.map((entry) => entry.key)],
+    [traffic.series]
+  );
+  const { plotted, emptyLabel } = useMemo(
+    () => zeroWithheld(traffic.rows, TOTAL_KEY),
+    [traffic.rows]
+  );
   const trend = weekTrend(traffic.change);
   // On touch, ECharts places a body-mounted tooltip one scroll height too low,
   // so the tooltip stays inside the chart there, with fewer rows to fit.
@@ -103,7 +136,7 @@ export function DataTrafficCard({
           className="h-56 w-full cursor-crosshair"
           config={config}
           curveType="monotone"
-          data={traffic.rows}
+          data={plotted}
           xDataKey="day"
         >
           <EChartsAreaChart.Grid variant="solid" />
@@ -111,7 +144,6 @@ export function DataTrafficCard({
           <EChartsAreaChart.YAxis />
           <EChartsAreaChart.Area
             dataKey={TOTAL_KEY}
-            gapMissing
             strokeVariant="solid"
             strokeWidth={STROKE_WIDTH}
             variant="gradient"
@@ -120,6 +152,7 @@ export function DataTrafficCard({
           </EChartsAreaChart.Area>
           <EChartsAreaChart.Tooltip
             confine={touch}
+            emptyLabel={emptyLabel}
             hideZeros
             labelFormatter={formatDataDay}
             labelKey="rawDay"
@@ -129,7 +162,7 @@ export function DataTrafficCard({
             }
             position="fixed"
             roundness="xl"
-            rowKeys={traffic.series.map((entry) => entry.key)}
+            rowKeys={rowKeys}
             scrub
             valueFormatter={formatVisits}
           />
@@ -163,6 +196,10 @@ export function DataSeriesChart({
     }),
     [dataKey, label, domain, color]
   );
+  const { plotted, emptyLabel } = useMemo(
+    () => zeroWithheld(rows, dataKey),
+    [rows, dataKey]
+  );
   const touch = useCoarsePointer();
   return (
     <EChartsAreaChart
@@ -171,7 +208,7 @@ export function DataSeriesChart({
       className="h-48 w-full cursor-crosshair"
       config={config}
       curveType="monotone"
-      data={rows}
+      data={plotted}
       xDataKey="day"
     >
       <EChartsAreaChart.Grid variant="solid" />
@@ -179,7 +216,6 @@ export function DataSeriesChart({
       <EChartsAreaChart.YAxis />
       <EChartsAreaChart.Area
         dataKey={dataKey}
-        gapMissing
         strokeVariant="solid"
         strokeWidth={STROKE_WIDTH}
         variant="gradient"
@@ -188,6 +224,8 @@ export function DataSeriesChart({
       </EChartsAreaChart.Area>
       <EChartsAreaChart.Tooltip
         confine={touch}
+        emptyLabel={emptyLabel}
+        hideZeros
         labelFormatter={formatDataDay}
         labelKey="rawDay"
         layout="activity"

@@ -5,6 +5,7 @@ import {
   queryGeoTrafficTrendsDaily,
   queryGeoTrafficTrendsDetail,
   queryGeoTrafficTrendsProjects,
+  queryGeoTrafficTrendsRolling,
 } from "@notra/analytics/tinybird/client";
 import { shiftDay } from "@notra/analytics/utils/demo-pipe";
 import { geoHiddenSourceParams } from "@notra/geo-core/geo/hidden-sources";
@@ -17,6 +18,7 @@ import {
   PUBLIC_DATA_CACHE_TTL_SECONDS,
   PUBLIC_DATA_DETAIL_DAYS,
   PUBLIC_DATA_MEMORY_TTL_MS,
+  PUBLIC_DATA_ROLLING_DAYS,
   PUBLIC_DATA_SITE_CAP_FACTOR,
 } from "@/constants/public-data";
 import { realTrafficProjectIds } from "@/lib/analytics/real-traffic-projects";
@@ -50,14 +52,16 @@ async function computeSnapshot(
   }
   const window = publicAiTrafficWindow(today);
   const hidden = geoHiddenSourceParams();
+  // The first chart day's week starts six days before the window.
+  const readFrom = shiftDay(window.from, 1 - PUBLIC_DATA_ROLLING_DAYS);
   // Weeks reach back over the whole chart window, so every project with
   // traffic in it gets checked against the sample and demo filter.
   const projectRows =
     (
       await queryGeoTrafficTrendsProjects({
-        date_from: window.from,
+        date_from: readFrom,
         date_to: window.toExclusive,
-        baseline_from: window.from,
+        baseline_from: readFrom,
         recent_from: window.recentFrom,
         ...hidden,
       })
@@ -65,10 +69,18 @@ async function computeSnapshot(
   const projectIds = [...new Set(projectRows.map((row) => row.project_id))];
   const real = await realTrafficProjectIds(projectIds);
   const excluded = projectIds.filter((id) => !real.has(id));
-  const [dailyResult, detailResult] = await Promise.all([
+  const [dailyResult, rollingResult, detailResult] = await Promise.all([
     queryGeoTrafficTrendsDaily({
       date_from: window.from,
       date_to: window.toExclusive,
+      excluded_project_ids: excluded.join(","),
+      site_cap_factor: PUBLIC_DATA_SITE_CAP_FACTOR,
+      ...hidden,
+    }),
+    queryGeoTrafficTrendsRolling({
+      date_from: window.from,
+      date_to: window.toExclusive,
+      window_days: PUBLIC_DATA_ROLLING_DAYS,
       excluded_project_ids: excluded.join(","),
       site_cap_factor: PUBLIC_DATA_SITE_CAP_FACTOR,
       ...hidden,
@@ -94,6 +106,16 @@ async function computeSnapshot(
       visits: Number(row.visits),
       markdown_visits: Number(row.markdown_visits),
       projects: Number(row.projects),
+    })),
+    rolling: (rollingResult?.data ?? []).map((row) => ({
+      day: String(row.day),
+      visitor_type: row.visitor_type,
+      source: row.source,
+      category: row.category,
+      visits: Number(row.visits),
+      markdown_visits: Number(row.markdown_visits),
+      projects: Number(row.projects),
+      site_days: Number(row.site_days),
     })),
     projects: projectRows
       .filter((row) => real.has(row.project_id))
