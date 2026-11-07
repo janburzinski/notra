@@ -136,6 +136,9 @@ When it passes, Notra rebuilds the site so that canonical URLs, feeds, sitemaps 
   <Accordion title="The blog link in the header goes to a 404">
     The header links between the blog and the changelog, so forward every section that's turned on.
   </Accordion>
+  <Accordion title="A link on my website opens my own 404 page instead of the blog">
+    Your website's client-side router opens `/blog` in the browser instead of requesting it from your server, so the rewrite never runs. Make links to your sections load the page with a plain `<a href="/blog">`. React Router's `<Link reloadDocument>` works too, but TanStack Router's typed `<Link>` only accepts your app's own routes, so use the plain `<a>` there. Opening `https://www.acme.com/blog` directly works either way.
+  </Accordion>
   <Accordion title="An old URL from my blog.json redirects shows the new page under the old URL">
     Your proxy follows redirects instead of passing them on. In a Cloudflare Worker, set `redirect: "manual"`, which the other platform guides already handle for you.
   </Accordion>
