@@ -73,6 +73,17 @@ const NAVBAR_VARIANT_SPEC: Record<NavbarVariant, NavbarVariantSpec> = {
     floatingTop: "1rem",
     expandedMaxWidth: "80rem",
   },
+  static: {
+    positionClass: "w-full",
+    overlayLayout: "hero",
+    tracksScroll: false,
+    pinnedChrome: false,
+    canFloat: false,
+    floatsShell: false,
+    floatingPadding: CHROME_PADDING,
+    floatingTop: "1rem",
+    expandedMaxWidth: "80rem",
+  },
 };
 
 export function getNavbarChromePresentation(

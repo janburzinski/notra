@@ -16,7 +16,7 @@ Publish new posts in `blog/` only: usenotra.com/blog is served from this folder,
 
 ## Navbar and dither backgrounds
 
-`scripts/web-chrome.js` is built from `apps/web`, so the navbar, its menus and the dither backgrounds stay identical to usenotra.com. Every element marked `data-notra-web="navbar"`, `"hero-dither"`, `"cta-dither"` or `"footer-dither"` gets the matching component, and post cards get theirs automatically. Each renders in its own Shadow DOM, so its styles and the blog's never mix. Until the script runs (or without JavaScript), the static navbar in `header.mdx` shows.
+`scripts/web-chrome.js` is built from `apps/web`, so the navbar, its menus and the dither backgrounds stay identical to usenotra.com. Every element marked `data-notra-web="navbar"`, `"hero-dither"`, `"cta-dither"` or `"footer-dither"` gets the matching component, and post cards get theirs automatically. Each renders in its own Shadow DOM, so its styles and the blog's never mix. The navbar's `data-page={props.page}` picks its layout: it floats over the hero on the index and sits in the page flow on every other page. Until the script runs (or without JavaScript), the static navbar in `header.mdx` shows.
 
 After changing the navbar or a dither component in `apps/web` or `packages/ui`, regenerate the bundle and commit it. CI fails while it is out of date:
 

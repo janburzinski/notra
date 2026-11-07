@@ -1,6 +1,9 @@
 // The blog chrome bundle (src/embed/blog-chrome) runs on the blog, which Notra Sites serves.
 export const BLOG_CHROME_SITE_ORIGIN = "https://www.usenotra.com";
 
+// The page kind Notra Sites passes to header.mdx (props.page) for the blog index.
+export const BLOG_CHROME_INDEX_PAGE = "index";
+
 export const BLOG_CHROME_ROOT_RELATIVE_PATH = /^\/(?!\/)/;
 
 export const BLOG_CHROME_PAPER_STYLE_SELECTOR = "style[data-paper-shader]";

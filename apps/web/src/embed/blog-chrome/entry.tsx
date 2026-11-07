@@ -14,6 +14,7 @@ import { CtaBannerDither } from "@/components/landing/cta-banner";
 import { HeroDither } from "@/components/landing/hero-dither";
 import { Navbar } from "@/components/navbar";
 import {
+  BLOG_CHROME_INDEX_PAGE,
   BLOG_CHROME_PAPER_STYLE_SELECTOR,
   BLOG_CHROME_ROOT_RELATIVE_PATH,
   BLOG_CHROME_SITE_ORIGIN,
@@ -25,7 +26,15 @@ import { documentRules, shadowSheet } from "./styles";
 declare const __WEB_CHROME_CSS__: string;
 
 const MOUNTS: Record<string, BlogChromeMount> = {
-  navbar: () => <Navbar />,
+  // The index floats the navbar over its hero. Every other page keeps it in the flow, like the
+  // header.mdx fallback, so the page starts below it.
+  navbar: (host) => (
+    <Navbar
+      variant={
+        host.dataset.page === BLOG_CHROME_INDEX_PAGE ? "landing" : "static"
+      }
+    />
+  ),
   "hero-dither": () => <HeroDither />,
   "footer-dither": () => <FooterDither />,
   "cta-dither": () => <CtaBannerDither />,
