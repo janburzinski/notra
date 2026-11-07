@@ -1,16 +1,12 @@
 import {
-  Activity01Icon,
-  AiBrain01Icon,
+  AiSearch02Icon,
   BookOpen01Icon,
   BrowserIcon,
-  BubbleChatIcon,
-  CommandLineIcon,
   FavouriteIcon,
   Megaphone01Icon,
   QuillWrite01Icon,
   Robot01Icon,
   UserGroupIcon,
-  UserMultiple02Icon,
 } from "@hugeicons/core-free-icons";
 import type { IconSvgElement } from "@hugeicons/react";
 
@@ -59,22 +55,15 @@ export const MARKETING_NAV: readonly MarketingNavEntry[] = [
     cardsHeading: "Product",
     cards: [
       {
-        href: "/features/personas",
-        label: "Personas",
-        description: "Ask every AI engine as each of your buyers would.",
-        icon: UserMultiple02Icon,
-      },
-      {
-        href: "/features/conversations",
-        label: "Conversations",
-        description:
-          "Play a full buying thread and see where you stand at every turn.",
-        icon: BubbleChatIcon,
+        href: "/features",
+        label: "AI Search",
+        description: "Your place in ChatGPT, Claude and Perplexity.",
+        icon: AiSearch02Icon,
       },
       {
         href: "/features/ai-crawler-logs",
         label: "AI Crawler Logs",
-        description: "See every AI bot that reads your site, and why it came.",
+        description: "Every AI bot that reads your site, and why.",
         icon: Robot01Icon,
       },
       {
@@ -85,25 +74,7 @@ export const MARKETING_NAV: readonly MarketingNavEntry[] = [
       },
     ],
     railHeading: "Developers",
-    rail: [
-      {
-        href: "https://www.npmjs.com/package/@usenotra/geo",
-        label: "GEO SDK",
-        icon: Activity01Icon,
-        external: true,
-      },
-      {
-        href: "/mcp",
-        label: "MCP Server",
-        icon: AiBrain01Icon,
-      },
-      {
-        href: "https://www.usenotra.com/docs/devtools/cli",
-        label: "CLI",
-        icon: CommandLineIcon,
-        external: true,
-      },
-    ],
+    rail: [],
   },
   {
     type: "group",

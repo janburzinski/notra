@@ -1,4 +1,3 @@
-import { HugeiconsIcon } from "@hugeicons/react";
 import { ctaButtonVariants } from "@notra/ui/components/shared/cta-button";
 import {
   Collapsible,
@@ -28,31 +27,28 @@ import type {
 } from "@/types/navbar";
 import {
   MARKETING_NAV,
-  type MarketingNavCard,
   type MarketingNavGroup,
   type MarketingNavRailItem,
 } from "@/utils/navigation";
 
-import { NavbarCompactPanel } from "./navbar-compact-panel";
 import { NavbarChevron } from "./navbar-glyphs";
 import { NavbarHref } from "./navbar-href";
 import { TrackedSignupLink } from "./tracked-signup-link";
 
-const CARD_CLASSNAME =
-  "flex min-w-0 items-start gap-3 rounded-2xl border border-[#1E1E1E1A] bg-[#C8B2EE40] px-3.5 py-3 shadow-[0_0_0_0.0625rem_#ECECEC,0_0.0625rem_0.125rem_#28282814] transition-[background,border-color,transform] hover:bg-[linear-gradient(180deg,#C8B2EE40_0%,#C8B2EE66_100%)] active:scale-[0.98] focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none dark:border-white/10 dark:bg-white/5 dark:shadow-none dark:hover:bg-white/10 dark:hover:bg-none";
-
-const RAIL_CLASSNAME =
-  "flex min-h-9 items-center gap-2 rounded-lg px-2 py-1.5 transition-colors hover:bg-[#C8B2EE26] focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none dark:hover:bg-white/6";
+const ROW_CLASSNAME =
+  "flex min-w-0 flex-col gap-0.5 rounded-lg py-2 transition-opacity active:opacity-60 focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none";
 
 const TRIGGER_CLASSNAME =
   "flex min-h-14 w-full cursor-pointer items-center justify-between py-3 text-left font-sans text-[1.375rem] leading-none font-medium tracking-[-0.03em] text-[#1E1E1E] focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none dark:text-white";
 
 const PANEL_CLASSNAME = "overflow-hidden";
 
-const MENU_FOOTER_BUTTON_CLASSNAME =
-  "font-display flex h-12 items-center justify-center rounded-full text-base tracking-[-0.015em]";
-const MENU_FOOTER_CTA_CLASSNAME = cn(
+const MENU_FOOTER_PRIMARY_CLASSNAME = cn(
   ctaButtonVariants({ size: "lg" }),
+  "font-display flex w-full text-base"
+);
+const MENU_FOOTER_SECONDARY_CLASSNAME = cn(
+  ctaButtonVariants({ variant: "light", size: "lg" }),
   "font-display flex w-full text-base"
 );
 
@@ -226,7 +222,7 @@ function MobileNavOverlay({
 
       <m.div
         className={cn(
-          "pointer-events-auto flex shrink-0 flex-col gap-3 border-t border-[#1E1E1E14] bg-white pt-4 pb-[max(1.5rem,env(safe-area-inset-bottom))] dark:border-white/10 dark:bg-neutral-950",
+          "pointer-events-auto flex shrink-0 gap-3 bg-white pt-4 pb-[max(1.5rem,env(safe-area-inset-bottom))] dark:bg-neutral-950",
           layout.inset
         )}
         variants={stagger}
@@ -288,96 +284,44 @@ function GroupPanel({
   stagger: Variants;
   item: Variants;
 }) {
-  if (group.layout === "compact") {
-    return (
-      <NavbarCompactPanel
-        group={group}
-        item={item}
-        onSelect={onSelect}
-        stagger={stagger}
-      />
-    );
-  }
   return (
     <m.div
       animate="visible"
-      className="flex flex-col gap-2 pt-1 pb-5"
+      className="flex flex-col gap-1 pb-6"
       initial="hidden"
       variants={stagger}
     >
-      <m.div className="flex flex-col gap-2" variants={stagger}>
-        {group.cards.map((card) => (
-          <m.div key={card.href} variants={item}>
-            <MobileNavCard card={card} onSelect={onSelect} />
-          </m.div>
-        ))}
-      </m.div>
-      {group.rail.length > 0 ? (
-        <m.div className="mt-1 flex flex-col" variants={stagger}>
-          {group.rail.map((railItem) => (
-            <m.div key={railItem.href} variants={item}>
-              <MobileRailItem item={railItem} onSelect={onSelect} />
-            </m.div>
-          ))}
+      {[...group.cards, ...group.rail].map((entry) => (
+        <m.div key={entry.href} variants={item}>
+          <MobileNavRow entry={entry} onSelect={onSelect} />
         </m.div>
-      ) : null}
+      ))}
     </m.div>
   );
 }
 
-function MobileNavCard({
-  card,
+function MobileNavRow({
+  entry,
   onSelect,
 }: {
-  card: MarketingNavCard;
+  entry: MarketingNavRailItem;
   onSelect: () => void;
 }) {
   return (
     <NavbarHref
-      className={CARD_CLASSNAME}
-      external={card.external}
-      href={card.href}
+      className={ROW_CLASSNAME}
+      external={entry.external}
+      href={entry.href}
       onClick={onSelect}
     >
-      <span className="flex size-7 shrink-0 items-center justify-center leading-none [&_svg]:block">
-        <HugeiconsIcon
-          className="size-7 text-[#1E1E1E] dark:text-white"
-          icon={card.icon}
-        />
+      <span className="font-sans text-[1.0625rem] leading-[1.375rem] font-medium tracking-[-0.015em] text-[#1E1E1E] dark:text-white">
+        {entry.label}
       </span>
-      <span className="flex min-w-0 flex-col gap-0.5">
-        <span className="font-sans text-base leading-5 font-semibold text-[#1E1E1E] dark:text-white">
-          {card.label}
+      {entry.description ? (
+        <span className="font-sans text-sm leading-5 font-medium text-pretty text-[#1E1E1EA6] dark:text-white/50">
+          {entry.description}
         </span>
-        <span className="font-sans text-sm leading-5 font-medium text-[#1E1E1EBF] dark:text-neutral-400">
-          {card.description}
-        </span>
-      </span>
-    </NavbarHref>
-  );
-}
-
-function MobileRailItem({
-  item,
-  onSelect,
-}: {
-  item: MarketingNavRailItem;
-  onSelect: () => void;
-}) {
-  return (
-    <NavbarHref
-      className={RAIL_CLASSNAME}
-      external={item.external}
-      href={item.href}
-      onClick={onSelect}
-    >
-      <HugeiconsIcon
-        className="size-5 shrink-0 text-[#1E1E1E99] dark:text-neutral-400"
-        icon={item.icon}
-      />
-      <span className="font-sans text-sm leading-5 font-medium tracking-[-0.02em] text-[#1E1E1EA6] dark:text-neutral-400">
-        {item.label}
-      </span>
+      ) : null}
     </NavbarHref>
   );
 }
@@ -394,9 +338,9 @@ function MobileAuthActions({
 
   if (isAuthenticated) {
     return (
-      <m.div variants={item}>
+      <m.div className="flex-1" variants={item}>
         <a
-          className={MENU_FOOTER_CTA_CLASSNAME}
+          className={MENU_FOOTER_PRIMARY_CLASSNAME}
           href={AUTH_DASHBOARD_URL}
           onClick={onNavigate}
         >
@@ -408,18 +352,18 @@ function MobileAuthActions({
 
   return (
     <>
-      <m.div variants={item}>
+      <m.div className="flex-1" variants={item}>
         <a
-          className={`${MENU_FOOTER_BUTTON_CLASSNAME} border border-[#1E1E1E26] text-[#1E1E1E] dark:border-white/15 dark:text-white`}
+          className={MENU_FOOTER_SECONDARY_CLASSNAME}
           href={AUTH_SIGNIN_URL}
           onClick={onNavigate}
         >
           Sign In
         </a>
       </m.div>
-      <m.div variants={item}>
+      <m.div className="flex-1" variants={item}>
         <TrackedSignupLink
-          className={MENU_FOOTER_CTA_CLASSNAME}
+          className={MENU_FOOTER_PRIMARY_CLASSNAME}
           onClick={onNavigate}
           source={NAVBAR_MOBILE_SIGNUP_SOURCE}
         >
