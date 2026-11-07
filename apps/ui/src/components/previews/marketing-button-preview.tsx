@@ -4,7 +4,7 @@ import { MarketingButton } from "../../../registry/notra/marketing-button/compon
 
 export default function MarketingButtonPreview() {
   return (
-    <div className="flex items-center gap-4 self-center pb-6">
+    <div className="flex flex-col items-center gap-4">
       <MarketingButton>
         Start for free
         <ArrowRight />

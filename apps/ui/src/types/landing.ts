@@ -1,46 +1,49 @@
 export type LandingPreview =
-  | "ai-overview"
+  | "badges"
   | "button"
   | "chat-minimap"
-  | "chatgpt"
-  | "claude"
-  | "claude-code"
-  | "codex"
   | "composer"
   | "data-table"
+  | "dropdown-menu"
   | "duotone-tooltip"
-  | "gemini"
   | "icon-tabs"
   | "listicle-outreach"
   | "marketing-button"
-  | "opencode"
-  | "perplexity"
+  | "select"
   | "shimmer"
+  | "sidebar"
   | "sonner"
   | "step-slider"
   | "tooltip"
   | "workflow-builder"
   | "workflow-node";
 
-export interface LandingComponentLink {
-  description: string;
+/** How many collage cells a tile covers: `lg` is 2×2, `wide` 2×1, `tall` 1×2. */
+export type LandingTileSize = "sm" | "wide" | "tall" | "lg";
+
+export interface LandingComponentTile {
   href: string;
-  preview?: LandingPreview;
+  preview: LandingPreview;
+  /** Shrinks a preview that is wider than its tile. */
+  scale?: number;
+  size: LandingTileSize;
   title: string;
 }
 
-export interface LandingSection {
-  description: string;
-  items: LandingComponentLink[];
-  title: string;
+/** The title card, placed in the collage like any other tile. */
+export interface LandingIntroTile {
+  preview: "intro";
+  size: LandingTileSize;
 }
+
+export type LandingTile = LandingComponentTile | LandingIntroTile;
 
 export interface LandingInstallCommand {
   items: string[];
   prefix: string;
 }
 
-export interface LandingHero {
+export interface LandingIntro {
   description: string;
   install: LandingInstallCommand;
 }

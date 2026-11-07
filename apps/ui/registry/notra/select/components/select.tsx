@@ -42,7 +42,7 @@ function SelectTrigger({
         variant: variant === "ghost" ? "ghost" : "outline",
         size: size === "sm" ? "sm" : "default",
         className: cn(
-          "data-[placeholder]:text-muted-foreground w-fit justify-between font-normal transition-[background-color,border-color,box-shadow,filter] active:scale-100 *:data-[slot=select-value]:line-clamp-1 *:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center *:data-[slot=select-value]:gap-1.5 motion-reduce:transition-none",
+          "data-[placeholder]:text-muted-foreground w-fit justify-between font-normal transition-[background-color,border-color,box-shadow,filter] *:data-[slot=select-value]:line-clamp-1 *:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center *:data-[slot=select-value]:gap-1.5 motion-reduce:transition-none",
           className
         ),
       })}

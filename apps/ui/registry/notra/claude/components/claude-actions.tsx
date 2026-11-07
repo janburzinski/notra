@@ -41,7 +41,7 @@ export const ClaudeActionButton = ({
       render={
         <Button
           aria-label={label}
-          className="text-claude-muted hover:bg-claude-hover hover:text-claude-fg focus-visible:ring-claude-fg/20 aria-expanded:bg-claude-hover dark:hover:bg-claude-hover size-7 rounded-lg focus-visible:border-transparent focus-visible:ring-2 active:not-aria-[haspopup]:translate-y-0"
+          className="text-claude-muted hover:bg-claude-hover hover:text-claude-fg focus-visible:ring-claude-fg/20 aria-expanded:bg-claude-hover dark:hover:bg-claude-hover size-7 rounded-lg focus-visible:border-transparent focus-visible:ring-2"
           data-slot="claude-action-button"
           onClick={onClick}
           size="icon-sm"

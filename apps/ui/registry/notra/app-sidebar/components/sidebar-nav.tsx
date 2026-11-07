@@ -7,7 +7,6 @@ import {
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "../../dropdown-menu/components/dropdown-menu";
 import {
@@ -51,7 +50,6 @@ function SidebarNavRow({
   collapsed: boolean;
 }) {
   const items = group.items ?? [];
-  const Icon = group.icon;
   const listsOwnPage = items.some((item) => item.href === group.href);
   const groupActive =
     group.href === activeHref || items.some((item) => item.href === activeHref);
@@ -68,21 +66,14 @@ function SidebarNavRow({
               <SidebarMenuButton
                 aria-label={group.title}
                 isActive={groupActive}
-                tooltip={group.title}
               >
-                <Icon />
+                {group.icon}
                 <SidebarLabel>{group.title}</SidebarLabel>
               </SidebarMenuButton>
             }
           />
-          <DropdownMenuContent
-            className="min-w-48"
-            side="right"
-            align="start"
-            sideOffset={8}
-          >
+          <DropdownMenuContent className="min-w-48" side="right" align="start">
             <DropdownMenuGroup>
-              <DropdownMenuLabel>{group.title}</DropdownMenuLabel>
               {flyoutItems.map((item) => (
                 <DropdownMenuItem
                   key={item.href}
@@ -107,11 +98,13 @@ function SidebarNavRow({
       <SidebarMenuButton
         isActive={ownPageActive}
         aria-current={ownPageActive ? "page" : undefined}
-        className={cn(groupActive && !ownPageActive && "font-medium")}
+        className={cn(
+          groupActive && !ownPageActive && "text-foreground font-medium"
+        )}
         render={(props) => linkRender({ ...props, href: group.href })}
         tooltip={group.title}
       >
-        <Icon />
+        {group.icon}
         <SidebarLabel>{group.title}</SidebarLabel>
         <NavBadge>
           {groupActive && items.length > 0 ? undefined : group.badge}
@@ -119,7 +112,7 @@ function SidebarNavRow({
       </SidebarMenuButton>
       {items.length > 0 ? (
         <SidebarMenuSubPanel>
-          <SidebarMenuSub className="mt-0.5">
+          <SidebarMenuSub>
             {items.map((item) => (
               <SidebarMenuSubItem key={item.href}>
                 <SidebarMenuSubButton

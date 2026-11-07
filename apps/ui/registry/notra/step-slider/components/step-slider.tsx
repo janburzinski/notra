@@ -182,7 +182,7 @@ export const StepSlider = ({
             }}
           >
             {/* The face scales on its own so Base UI keeps measuring the full thumb. */}
-            <span className="block size-full rounded-full bg-linear-to-b from-white to-[#F2F2F2] shadow-[0_0.0625rem_0.25rem_#28282840,0_0_0_0.0625rem_#1E1E1E0D] transition-[scale,box-shadow] duration-200 ease-out group-has-focus-visible/thumb:ring-[0.1875rem] group-has-focus-visible/thumb:ring-violet-500/40 group-data-dragging/thumb:scale-[0.96]" />
+            <span className="block size-full rounded-full bg-linear-to-b from-white to-[#F2F2F2] shadow-[0_0.0625rem_0.25rem_#28282840,0_0_0_0.0625rem_#1E1E1E0D] transition-[box-shadow] duration-200 ease-out group-has-focus-visible/thumb:ring-[0.1875rem] group-has-focus-visible/thumb:ring-violet-500/40" />
           </SliderPrimitive.Thumb>
         </SliderPrimitive.Control>
       </div>

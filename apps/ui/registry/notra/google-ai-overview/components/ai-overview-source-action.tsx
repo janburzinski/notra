@@ -13,7 +13,7 @@ export const AIOverviewSourceAction = ({
   <Button
     aria-label={ariaLabel}
     className={cn(
-      "text-aio-action hover:bg-aio-action/8 hover:text-aio-action dark:hover:bg-aio-action/8 focus-visible:outline-aio-focus active:bg-aio-action/22 size-9 rounded-full p-2.25 focus-visible:border-transparent focus-visible:ring-0 focus-visible:outline-2 focus-visible:outline-solid active:not-aria-[haspopup]:translate-y-0",
+      "text-aio-action hover:bg-aio-action/8 hover:text-aio-action dark:hover:bg-aio-action/8 focus-visible:outline-aio-focus active:bg-aio-action/22 size-9 rounded-full p-2.25 focus-visible:border-transparent focus-visible:ring-0 focus-visible:outline-2 focus-visible:outline-solid",
       className
     )}
     data-slot="ai-overview-source-action"

@@ -1,9 +1,20 @@
-import { LogOutIcon, PlusIcon, SettingsIcon, SparklesIcon } from "lucide-react";
+import {
+  BookOpen01Icon,
+  Calendar03Icon,
+  Logout01Icon,
+  Message01Icon,
+  PlusSignIcon,
+  Settings01Icon,
+  UserIcon,
+} from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
+import { Kbd, KbdGroup } from "@/components/ui/kbd";
 
 import {
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuSeparator,
 } from "../../dropdown-menu/components/dropdown-menu";
@@ -14,6 +25,9 @@ import {
   SidebarGroup,
   SidebarHeader,
   SidebarInset,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
   SidebarProvider,
   SidebarRail,
   SidebarTrigger,
@@ -27,17 +41,36 @@ import {
 } from "../components/sidebar-switcher";
 import { SidebarUserMenu } from "../components/sidebar-user-menu";
 import {
+  DEMO_AGENT_ICON_DOTS,
   DEMO_FOOTER_GROUPS,
   DEMO_NAV_GROUPS,
   DEMO_PAGE_TITLES,
   DEMO_PROJECTS,
 } from "../constants/app-sidebar-demo";
+import { useScrollMore } from "../hooks/use-scroll-more";
 import type { SidebarLinkRender } from "../types/app-sidebar";
 
 // The preview frame is padded, so the sidebar sits in the shell instead of
 // being fixed to the viewport as it is in an app.
 const DEMO_SHELL_CLASS_NAME =
-  "relative h-160 min-h-0 overflow-hidden [&_[data-slot=sidebar-container]]:absolute [&_[data-slot=sidebar-container]]:h-full";
+  "relative h-184 min-h-0 overflow-hidden [&_[data-slot=sidebar-container]]:absolute [&_[data-slot=sidebar-container]]:h-full";
+
+const MENU_ITEM_CLASS_NAME = "cursor-pointer py-1.5";
+
+function AgentIcon() {
+  return (
+    <svg
+      aria-hidden="true"
+      className="size-4 shrink-0"
+      fill="currentColor"
+      viewBox="0 0 24 24"
+    >
+      {DEMO_AGENT_ICON_DOTS.map(({ cx, cy, r }) => (
+        <circle cx={cx} cy={cy} key={`${cx}-${cy}`} r={r} />
+      ))}
+    </svg>
+  );
+}
 
 function MobileTrigger() {
   const { isMobile } = useSidebar();
@@ -53,6 +86,7 @@ export default function AppSidebarDemo({
 }) {
   const [project, setProject] = useState("notra");
   const [activeHref, setActiveHref] = useState(defaultHref);
+  const scroll = useScrollMore<HTMLDivElement>();
   const linkRender: SidebarLinkRender = ({ children, ...props }) => (
     <a
       {...props}
@@ -82,11 +116,11 @@ export default function AppSidebarDemo({
               actions={
                 <>
                   <DropdownMenuItem>
-                    <PlusIcon />
+                    <HugeiconsIcon icon={PlusSignIcon} />
                     New project
                   </DropdownMenuItem>
                   <DropdownMenuItem>
-                    <SettingsIcon />
+                    <HugeiconsIcon icon={Settings01Icon} />
                     Project settings
                   </DropdownMenuItem>
                 </>
@@ -97,41 +131,92 @@ export default function AppSidebarDemo({
         <div className="px-2 pt-2.5 pb-3">
           <SidebarSearch />
         </div>
-        <SidebarContent>
-          <SidebarGroup className="py-0">
+        <SidebarContent ref={scroll.ref}>
+          <SidebarGroup>
             <SidebarNav
               groups={DEMO_NAV_GROUPS}
               activeHref={activeHref}
               linkRender={linkRender}
             />
           </SidebarGroup>
-          <SidebarGroup className="mt-auto gap-2 pb-0">
+          <SidebarGroup className="mt-auto gap-1 pb-0">
             <SidebarNav
               groups={DEMO_FOOTER_GROUPS}
               activeHref={activeHref}
               linkRender={linkRender}
             />
-            <Button
-              variant="secondary"
-              className="w-full group-data-[collapsible=icon]:size-8 group-data-[collapsible=icon]:px-0"
-              aria-label="Ask agent"
-            >
-              <SparklesIcon className="hidden group-data-[collapsible=icon]:block" />
-              <span className="group-data-[collapsible=icon]:hidden">
-                Ask agent
-              </span>
-            </Button>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  render={
+                    <a
+                      href="https://docs.usenotra.com"
+                      rel="noopener noreferrer"
+                      target="_blank"
+                    />
+                  }
+                  tooltip="Docs"
+                >
+                  <HugeiconsIcon icon={BookOpen01Icon} />
+                  <span>Docs</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+            <div className="pt-2">
+              <Button
+                aria-label="Ask agent"
+                className="w-full group-data-[collapsible=icon]:size-8 group-data-[collapsible=icon]:px-0"
+                title="Ask agent"
+                variant="outline"
+              >
+                <AgentIcon />
+                <span className="group-data-[collapsible=icon]:hidden">
+                  Ask agent
+                </span>
+              </Button>
+            </div>
           </SidebarGroup>
         </SidebarContent>
-        <SidebarFooter className="pt-2">
-          <SidebarUserMenu name="Ada Lovelace" description="Notra" badge="Pro">
-            <DropdownMenuItem>
-              <SettingsIcon />
-              Settings
-            </DropdownMenuItem>
+        <div className="relative shrink-0">
+          {scroll.hasMore ? (
+            <div
+              aria-hidden="true"
+              className="from-sidebar pointer-events-none absolute inset-x-0 bottom-full z-10 h-8 bg-linear-to-t to-transparent group-data-[collapsible=icon]:hidden"
+            />
+          ) : null}
+        </div>
+        <SidebarFooter className="pt-1.75">
+          <SidebarUserMenu name="Ada Lovelace" email="ada@usenotra.com">
+            <DropdownMenuGroup>
+              <DropdownMenuItem className={MENU_ITEM_CLASS_NAME}>
+                <HugeiconsIcon icon={UserIcon} />
+                My profile
+                <KbdGroup className="ml-auto">
+                  <Kbd>⌘</Kbd>
+                  <Kbd>,</Kbd>
+                </KbdGroup>
+              </DropdownMenuItem>
+              <DropdownMenuItem className={MENU_ITEM_CLASS_NAME}>
+                <HugeiconsIcon icon={Settings01Icon} />
+                Appearance
+              </DropdownMenuItem>
+              <DropdownMenuItem className={MENU_ITEM_CLASS_NAME}>
+                <HugeiconsIcon icon={Message01Icon} />
+                Feedback
+                <Kbd className="ml-auto">F</Kbd>
+              </DropdownMenuItem>
+              <DropdownMenuItem className={MENU_ITEM_CLASS_NAME}>
+                <HugeiconsIcon icon={Calendar03Icon} />
+                Schedule demo
+                <Kbd className="ml-auto">S</Kbd>
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <LogOutIcon />
+            <DropdownMenuItem
+              className={MENU_ITEM_CLASS_NAME}
+              variant="destructive"
+            >
+              <HugeiconsIcon icon={Logout01Icon} />
               Log out
             </DropdownMenuItem>
           </SidebarUserMenu>

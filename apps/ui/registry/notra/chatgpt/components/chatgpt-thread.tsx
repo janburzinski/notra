@@ -105,7 +105,7 @@ export const ChatgptThread = ({
         {!atBottom && (
           <Button
             aria-label="Scroll to bottom"
-            className="border-chatgpt-border bg-chatgpt-bg text-chatgpt-fg hover:bg-chatgpt-hover hover:text-chatgpt-fg focus-visible:ring-chatgpt-focus/35 dark:bg-chatgpt-bg dark:hover:bg-chatgpt-hover absolute bottom-3 left-1/2 size-8 -translate-x-1/2 rounded-full shadow-sm transition-opacity duration-150 focus-visible:ring-2 active:not-aria-[haspopup]:translate-y-0 motion-reduce:transition-none starting:opacity-0"
+            className="border-chatgpt-border bg-chatgpt-bg text-chatgpt-fg hover:bg-chatgpt-hover hover:text-chatgpt-fg focus-visible:ring-chatgpt-focus/35 dark:bg-chatgpt-bg dark:hover:bg-chatgpt-hover absolute bottom-3 left-1/2 size-8 -translate-x-1/2 rounded-full shadow-sm transition-opacity duration-150 focus-visible:ring-2 motion-reduce:transition-none starting:opacity-0"
             onClick={scrollToBottom}
             size="icon"
             variant="ghost"

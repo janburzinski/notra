@@ -140,7 +140,7 @@ export const OpencodeSources = ({
           <CollapsibleTrigger
             render={
               <Button
-                className="group/sources text-opencode-muted hover:text-opencode-fg aria-expanded:text-opencode-muted focus-visible:ring-opencode-blue h-auto gap-[1ch] rounded-none p-0 text-[length:inherit] leading-[inherit] font-normal hover:bg-transparent focus-visible:border-transparent focus-visible:ring-1 active:not-aria-[haspopup]:translate-y-0 aria-expanded:bg-transparent dark:hover:bg-transparent"
+                className="group/sources text-opencode-muted hover:text-opencode-fg aria-expanded:text-opencode-muted focus-visible:ring-opencode-blue h-auto gap-[1ch] rounded-none p-0 text-[length:inherit] leading-[inherit] font-normal hover:bg-transparent focus-visible:border-transparent focus-visible:ring-1 aria-expanded:bg-transparent dark:hover:bg-transparent"
                 variant="ghost"
               />
             }

@@ -56,7 +56,7 @@ export const PerplexityModelSelector = ({
           <Button
             aria-label="Model"
             className={cn(
-              "font-pplx text-pplx-muted hover:bg-pplx-hover hover:text-pplx-fg focus-visible:ring-pplx-ring aria-expanded:bg-pplx-hover aria-expanded:text-pplx-fg dark:hover:bg-pplx-hover h-8 shrink-0 gap-1 rounded-full border-0 bg-transparent px-3 text-sm leading-5 font-medium transition-[background-color,transform] duration-150 focus-visible:border-transparent focus-visible:ring-2 active:scale-[0.96] motion-reduce:transition-none",
+              "font-pplx text-pplx-muted hover:bg-pplx-hover hover:text-pplx-fg focus-visible:ring-pplx-ring aria-expanded:bg-pplx-hover aria-expanded:text-pplx-fg dark:hover:bg-pplx-hover h-8 shrink-0 gap-1 rounded-full border-0 bg-transparent px-3 text-sm leading-5 font-medium transition-[background-color,transform] duration-150 focus-visible:border-transparent focus-visible:ring-2 motion-reduce:transition-none",
               className
             )}
             data-slot="perplexity-model-selector"

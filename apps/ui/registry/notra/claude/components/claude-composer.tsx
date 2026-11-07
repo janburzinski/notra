@@ -31,7 +31,7 @@ import { ClaudeUsageRing } from "./claude-usage-ring";
 const EASE = "ease-[cubic-bezier(0.22,1,0.36,1)]";
 
 const GHOST_CLASS =
-  "hover:bg-claude-hover focus-visible:ring-claude-fg/20 aria-expanded:bg-claude-hover dark:hover:bg-claude-hover focus-visible:border-transparent focus-visible:ring-2 active:not-aria-[haspopup]:translate-y-0";
+  "hover:bg-claude-hover focus-visible:ring-claude-fg/20 aria-expanded:bg-claude-hover dark:hover:bg-claude-hover focus-visible:border-transparent focus-visible:ring-2";
 
 const ClaudeComposerGlyph = ({
   children,

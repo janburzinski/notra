@@ -36,7 +36,7 @@ const UserActionButton = ({
       render={
         <Button
           aria-label={label}
-          className="text-pplx-muted hover:bg-pplx-hover hover:text-pplx-fg focus-visible:ring-pplx-ring dark:hover:bg-pplx-hover size-8 rounded-full transition-[color,background-color,transform] duration-150 focus-visible:border-transparent focus-visible:ring-2 active:scale-[0.96] active:not-aria-[haspopup]:translate-y-0 motion-reduce:transition-none [&_svg]:size-4"
+          className="text-pplx-muted hover:bg-pplx-hover hover:text-pplx-fg focus-visible:ring-pplx-ring dark:hover:bg-pplx-hover size-8 rounded-full transition-[color,background-color,transform] duration-150 focus-visible:border-transparent focus-visible:ring-2 motion-reduce:transition-none [&_svg]:size-4"
           size="icon"
           variant="ghost"
           {...props}

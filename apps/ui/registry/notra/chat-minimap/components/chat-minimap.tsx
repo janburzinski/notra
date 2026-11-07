@@ -109,7 +109,7 @@ export const ChatMinimapItem = ({
       render={
         <Button
           className={cn(
-            "text-muted-foreground/40 hover:text-foreground data-active:text-foreground data-popup-open:text-foreground h-2 w-8 rounded-none px-1 transition-colors hover:bg-transparent active:not-aria-[haspopup]:translate-y-0 dark:hover:bg-transparent",
+            "text-muted-foreground/40 hover:text-foreground data-active:text-foreground data-popup-open:text-foreground h-2 w-8 rounded-none px-1 transition-colors hover:bg-transparent dark:hover:bg-transparent",
             ITEM_FALLOFF_CLASS_NAME,
             side === "left" ? "justify-end" : "justify-start",
             className

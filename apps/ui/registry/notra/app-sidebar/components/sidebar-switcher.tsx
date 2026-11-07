@@ -1,6 +1,7 @@
 "use client";
 
-import { ChevronsUpDownIcon } from "lucide-react";
+import { UnfoldMoreIcon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import type { ReactNode } from "react";
 
 import {
@@ -47,7 +48,7 @@ export function SidebarSwitcher({
               <SidebarMenuButton
                 size="lg"
                 tooltip={active.label}
-                className="[--sidebar-lg-icon:1.75rem]"
+                className="data-popup-open:bg-sidebar-accent cursor-pointer [--sidebar-lg-icon:1.75rem]"
               />
             }
           >
@@ -62,7 +63,10 @@ export function SidebarSwitcher({
                 </SidebarLabel>
               ) : null}
             </div>
-            <ChevronsUpDownIcon className="text-muted-foreground ml-auto" />
+            <HugeiconsIcon
+              className="text-muted-foreground ml-auto"
+              icon={UnfoldMoreIcon}
+            />
           </DropdownMenuTrigger>
           <DropdownMenuContent className="min-w-56" align="start">
             <DropdownMenuGroup>

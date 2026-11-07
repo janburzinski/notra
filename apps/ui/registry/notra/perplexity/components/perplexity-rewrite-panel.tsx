@@ -49,7 +49,7 @@ const MODE_ICONS: Record<
 };
 
 const ROW_CLASS =
-  "text-pplx-fg hover:bg-pplx-hover hover:text-pplx-fg focus-visible:ring-pplx-ring dark:hover:bg-pplx-hover h-9 w-full justify-start gap-3 rounded-xl border-0 px-3 text-[0.9375rem] leading-5 font-normal focus-visible:ring-2 active:not-aria-[haspopup]:translate-y-0";
+  "text-pplx-fg hover:bg-pplx-hover hover:text-pplx-fg focus-visible:ring-pplx-ring dark:hover:bg-pplx-hover h-9 w-full justify-start gap-3 rounded-xl border-0 px-3 text-[0.9375rem] leading-5 font-normal focus-visible:ring-2";
 
 const ModelBadge = ({
   badge,
@@ -137,7 +137,7 @@ export const PerplexityRewritePanel = ({
       </ToggleGroup>
       <Separator className="bg-pplx-border my-1" />
       <Button
-        className="bg-pplx-promo text-pplx-fg hover:bg-pplx-promo-hover hover:text-pplx-fg focus-visible:ring-pplx-ring dark:hover:bg-pplx-promo-hover h-9 w-full justify-between gap-3 rounded-xl border-0 px-3 text-[0.9375rem] leading-5 font-normal focus-visible:ring-2 active:not-aria-[haspopup]:translate-y-0"
+        className="bg-pplx-promo text-pplx-fg hover:bg-pplx-promo-hover hover:text-pplx-fg focus-visible:ring-pplx-ring dark:hover:bg-pplx-promo-hover h-9 w-full justify-between gap-3 rounded-xl border-0 px-3 text-[0.9375rem] leading-5 font-normal focus-visible:ring-2"
         variant="ghost"
       >
         <span>{promoLabel}</span>
@@ -179,7 +179,7 @@ export const PerplexityRewritePanel = ({
         </ItemGroup>
       </ScrollArea>
       <Button
-        className="bg-pplx-send text-pplx-send-fg hover:bg-pplx-send-hover hover:text-pplx-send-fg focus-visible:ring-pplx-ring mt-1 h-10 w-full rounded-xl border-0 text-[0.9375rem] font-medium focus-visible:ring-2 active:not-aria-[haspopup]:translate-y-0"
+        className="bg-pplx-send text-pplx-send-fg hover:bg-pplx-send-hover hover:text-pplx-send-fg focus-visible:ring-pplx-ring mt-1 h-10 w-full rounded-xl border-0 text-[0.9375rem] font-medium focus-visible:ring-2"
         onClick={() => {
           onRewrite?.({ mode });
           onClose?.();

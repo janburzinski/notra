@@ -56,7 +56,7 @@ const ENTER_CLASS = cn(
 );
 
 const TRIGGER_CLASS =
-  "focus-visible:ring-claude-fg/20 h-auto min-w-0 justify-start rounded-md font-normal hover:bg-transparent focus-visible:border-transparent focus-visible:ring-2 active:not-aria-[haspopup]:translate-y-0 aria-expanded:bg-transparent dark:hover:bg-transparent";
+  "focus-visible:ring-claude-fg/20 h-auto min-w-0 justify-start rounded-md font-normal hover:bg-transparent focus-visible:border-transparent focus-visible:ring-2 aria-expanded:bg-transparent dark:hover:bg-transparent";
 
 const STEP_TEXT_CLASS: Record<ClaudeSearchStepIcon, string> = {
   check: "text-claude-muted",

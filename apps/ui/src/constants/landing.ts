@@ -1,206 +1,130 @@
-import type { LandingHero, LandingSection } from "../types/landing";
+import type { LandingIntro, LandingTile } from "../types/landing";
 
-export const LANDING_HERO: LandingHero = {
+export const LANDING_INTRO: LandingIntro = {
   description:
-    "The building blocks of the Notra dashboard, documented and rendered live with the real styles.",
+    "The building blocks of the Notra dashboard, rendered live with the real styles.",
+  // Adds the whole @notra registry to components.json, after which any
+  // component installs by name.
   install: {
-    items: [
-      "perplexity",
-      "chatgpt",
-      "claude-code",
-      "gemini",
-      "codex",
-      "claude",
-      "opencode",
-    ],
-    prefix: "bunx shadcn@latest add @notra/",
+    items: ["@notra"],
+    prefix: "bunx shadcn@latest registry add ",
   },
 };
 
-export const LANDING_SECTIONS: LandingSection[] = [
+/**
+ * Collage order. The grid packs densely, so at four columns this order fills
+ * every cell; narrower grids reflow around the big tiles.
+ */
+export const LANDING_TILES: LandingTile[] = [
   {
-    items: [
-      {
-        description:
-          "Primary, secondary, outline and destructive with a soft gradient and squircle corners.",
-        href: "/components/button",
-        preview: "button",
-        title: "Button",
-      },
-      {
-        description:
-          "The gradient marketing buttons from the Notra landing page.",
-        href: "/components/marketing-button",
-        preview: "marketing-button",
-        title: "Marketing Button",
-      },
-      {
-        description:
-          "The Depth surface of the buttons, gliding between neighbouring triggers.",
-        href: "/components/tooltip",
-        preview: "tooltip",
-        title: "Tooltip",
-      },
-      {
-        description: "A shell header with a 2px rim around the content card.",
-        href: "/components/duotone-tooltip",
-        preview: "duotone-tooltip",
-        title: "Duotone Tooltip",
-      },
-      {
-        description:
-          "A light sweep across text for thinking and loading states.",
-        href: "/components/shimmer",
-        preview: "shimmer",
-        title: "Shimmer",
-      },
-      {
-        description:
-          "Toasts with the Depth surface of the buttons and tinted status icons.",
-        href: "/components/sonner",
-        preview: "sonner",
-        title: "Sonner",
-      },
-      {
-        description:
-          "A slider that snaps to a fixed set of values, from the Notra pricing page.",
-        href: "/components/step-slider",
-        preview: "step-slider",
-        title: "Step Slider",
-      },
-      {
-        description:
-          "A segmented tab selector where only the active tab shows its icon.",
-        href: "/components/icon-tabs",
-        preview: "icon-tabs",
-        title: "Icon Tabs",
-      },
-      {
-        description:
-          "A rail of lines that maps a conversation, with a preview card per turn.",
-        href: "/components/chat-minimap",
-        preview: "chat-minimap",
-        title: "Chat Minimap",
-      },
-      {
-        description:
-          "The chat composer from the dashboard, with queued messages on the tray.",
-        href: "/components/composer",
-        preview: "composer",
-        title: "Composer",
-      },
-      {
-        description:
-          "A sortable, paged table in the grey shell, with an infinite-scroll variant.",
-        href: "/components/table",
-        preview: "data-table",
-        title: "Data Table",
-      },
-    ],
-    description: "Primitives and small pieces used across the dashboard.",
-    title: "Components",
+    href: "/components/button",
+    preview: "button",
+    size: "sm",
+    title: "Button",
+  },
+  { preview: "intro", size: "wide" },
+  {
+    href: "/components/dropdown-menu",
+    preview: "dropdown-menu",
+    size: "tall",
+    title: "Dropdown Menu",
   },
   {
-    items: [
-      {
-        description:
-          "Google's AI Overview with highlights, citation chips and a collapsible Show more.",
-        href: "/blocks/google-ai-overview",
-        preview: "ai-overview",
-        title: "Google AI Overview",
-      },
-    ],
-    description: "Search result surfaces, rebuilt pixel for pixel.",
-    title: "Search",
+    href: "/components/badges",
+    preview: "badges",
+    size: "wide",
+    title: "Status & Trend Badges",
   },
   {
-    items: [
-      {
-        description:
-          "A Perplexity answer thread with the search step, citation pills, a sources sheet and the composer.",
-        href: "/blocks/perplexity",
-        preview: "perplexity",
-        title: "Perplexity",
-      },
-      {
-        description:
-          "A ChatGPT conversation with reasoning, web search, an Activity sheet and the model picker.",
-        href: "/blocks/chatgpt",
-        preview: "chatgpt",
-        title: "ChatGPT",
-      },
-      {
-        description:
-          "The Gemini chat with its animated sparkle, streamed replies and the model picker.",
-        href: "/blocks/gemini",
-        preview: "gemini",
-        title: "Gemini",
-      },
-      {
-        description:
-          "The claude.ai chat with a live search timeline, serif replies and the effort picker.",
-        href: "/blocks/claude",
-        preview: "claude",
-        title: "Claude",
-      },
-    ],
-    description:
-      "Chat apps with replayable conversations, search steps and composers.",
-    title: "Browser Apps",
+    href: "/components/sidebar",
+    preview: "sidebar",
+    size: "tall",
+    title: "Sidebar",
   },
   {
-    items: [
-      {
-        description:
-          "A Claude Code terminal session with tool calls, todos and the prompt.",
-        href: "/blocks/claude-code",
-        preview: "claude-code",
-        title: "Claude Code",
-      },
-      {
-        description:
-          "A Codex CLI session with Ran and Explored cells and the composer.",
-        href: "/blocks/codex",
-        preview: "codex",
-        title: "Codex",
-      },
-      {
-        description:
-          "The OpenCode workspace with activity, cited sources and the sidebar.",
-        href: "/blocks/opencode",
-        preview: "opencode",
-        title: "OpenCode",
-      },
-    ],
-    description:
-      "Coding agents in the terminal, from the welcome banner to the prompt.",
-    title: "Terminal Apps",
+    href: "/components/composer",
+    preview: "composer",
+    size: "wide",
+    title: "Composer",
   },
   {
-    items: [
-      {
-        description:
-          "A playable workflow builder with a block palette, branching, a run log and a node sheet.",
-        href: "/blocks/workflow-builder",
-        preview: "workflow-builder",
-        title: "Workflow Builder",
-      },
-      {
-        description:
-          "Steps with brand logos, multi-port handles, live status and a timer per step.",
-        href: "/components/workflow/node",
-        preview: "workflow-node",
-        title: "Workflow Node",
-      },
-      {
-        description:
-          "Track the listicles AI answers cite and pitch their owners from an email modal.",
-        href: "/blocks/listicle-outreach",
-        preview: "listicle-outreach",
-        title: "Listicle Outreach",
-      },
-    ],
-    description: "Workflow and outreach building blocks for automation.",
-    title: "Workflows",
+    href: "/components/tooltip",
+    preview: "tooltip",
+    size: "sm",
+    title: "Tooltip",
+  },
+  {
+    href: "/components/shimmer",
+    preview: "shimmer",
+    size: "sm",
+    title: "Shimmer",
+  },
+  {
+    href: "/components/icon-tabs",
+    preview: "icon-tabs",
+    size: "sm",
+    title: "Icon Tabs",
+  },
+  {
+    href: "/components/sonner",
+    preview: "sonner",
+    scale: 0.85,
+    size: "sm",
+    title: "Sonner",
+  },
+  {
+    href: "/components/step-slider",
+    preview: "step-slider",
+    size: "sm",
+    title: "Step Slider",
+  },
+  {
+    href: "/components/table",
+    preview: "data-table",
+    size: "wide",
+    title: "Data Table",
+  },
+  {
+    href: "/components/select",
+    preview: "select",
+    size: "sm",
+    title: "Select",
+  },
+  {
+    href: "/components/marketing-button",
+    preview: "marketing-button",
+    size: "sm",
+    title: "Marketing Button",
+  },
+  {
+    href: "/components/chat-minimap",
+    preview: "chat-minimap",
+    size: "wide",
+    title: "Chat Minimap",
+  },
+  {
+    href: "/components/duotone-tooltip",
+    preview: "duotone-tooltip",
+    size: "wide",
+    title: "Duotone Tooltip",
+  },
+  {
+    href: "/blocks/workflow-builder",
+    preview: "workflow-builder",
+    size: "wide",
+    title: "Workflow Builder",
+  },
+  {
+    href: "/components/workflow/node",
+    preview: "workflow-node",
+    size: "sm",
+    title: "Workflow Node",
+  },
+  {
+    href: "/blocks/listicle-outreach",
+    preview: "listicle-outreach",
+    scale: 0.75,
+    size: "sm",
+    title: "Listicle Outreach",
   },
 ];

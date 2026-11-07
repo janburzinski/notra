@@ -1,6 +1,7 @@
 "use client";
 
-import { SearchIcon } from "lucide-react";
+import { SearchIcon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 
 import { Kbd } from "@/components/ui/kbd";
 
@@ -27,11 +28,11 @@ export function SidebarSearch({
         <SidebarMenuButton
           aria-label={label}
           aria-keyshortcuts={shortcut === "⌘K" ? "Meta+K" : undefined}
-          className="border-sidebar-border text-muted-foreground hover:text-sidebar-foreground group-data-[collapsible=icon]:text-sidebar-foreground h-9 rounded-lg border transition-[background-color,color,border-color,height] group-data-[collapsible=icon]:h-8 group-data-[collapsible=icon]:border-transparent"
+          className="border-sidebar-border text-muted-foreground hover:text-sidebar-foreground group-data-[collapsible=icon]:text-sidebar-foreground h-9 cursor-pointer rounded-lg border transition-[height] group-data-[collapsible=icon]:h-8 group-data-[collapsible=icon]:border-transparent"
           onClick={onClick}
           tooltip={label}
         >
-          <SearchIcon />
+          <HugeiconsIcon icon={SearchIcon} />
           <SidebarLabel>{`${label}…`}</SidebarLabel>
           {shortcut ? (
             <Kbd className="border-sidebar-border ml-auto rounded-[5px] border bg-transparent px-1.5">

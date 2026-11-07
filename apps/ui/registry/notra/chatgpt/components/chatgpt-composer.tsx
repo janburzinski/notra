@@ -24,7 +24,7 @@ import type {
 import { ChatgptModelSelector } from "./chatgpt-model-selector";
 
 const sendClassName =
-  "bg-chatgpt-send text-chatgpt-send-fg hover:bg-chatgpt-send-hover hover:text-chatgpt-send-fg focus-visible:ring-chatgpt-focus/35 dark:hover:bg-chatgpt-send-hover size-9 rounded-full border-0 transition-colors duration-150 focus-visible:ring-2 active:not-aria-[haspopup]:translate-y-0 motion-reduce:transition-none";
+  "bg-chatgpt-send text-chatgpt-send-fg hover:bg-chatgpt-send-hover hover:text-chatgpt-send-fg focus-visible:ring-chatgpt-focus/35 dark:hover:bg-chatgpt-send-hover size-9 rounded-full border-0 transition-colors duration-150 focus-visible:ring-2 motion-reduce:transition-none";
 
 export const ChatgptComposer = ({
   busy = false,
@@ -93,7 +93,7 @@ export const ChatgptComposer = ({
         >
           <InputGroupButton
             aria-label="Add"
-            className="text-chatgpt-fg/80 hover:bg-chatgpt-hover hover:text-chatgpt-fg focus-visible:ring-chatgpt-focus/35 dark:hover:bg-chatgpt-hover size-9 rounded-full border-0 transition-colors duration-150 focus-visible:ring-2 active:not-aria-[haspopup]:translate-y-0 motion-reduce:transition-none"
+            className="text-chatgpt-fg/80 hover:bg-chatgpt-hover hover:text-chatgpt-fg focus-visible:ring-chatgpt-focus/35 dark:hover:bg-chatgpt-hover size-9 rounded-full border-0 transition-colors duration-150 focus-visible:ring-2 motion-reduce:transition-none"
             size="icon-xs"
           >
             <PlusIcon className="size-5" strokeWidth={1.5} />

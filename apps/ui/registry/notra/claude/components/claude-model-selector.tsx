@@ -77,7 +77,7 @@ export const ClaudeModelSelector = ({
           <Button
             aria-label={`Model ${selectedModel.label}, effort ${selectedEffort.label}`}
             className={cn(
-              "group/claude-model font-claude text-claude-fg hover:bg-claude-hover hover:text-claude-fg focus-visible:ring-claude-fg/20 aria-expanded:bg-claude-hover aria-expanded:text-claude-fg data-popup-open:bg-claude-hover dark:hover:bg-claude-hover h-7 gap-1.5 rounded-lg px-1.5 text-xs leading-5 font-normal focus-visible:border-transparent focus-visible:ring-2 active:not-aria-[haspopup]:translate-y-0",
+              "group/claude-model font-claude text-claude-fg hover:bg-claude-hover hover:text-claude-fg focus-visible:ring-claude-fg/20 aria-expanded:bg-claude-hover aria-expanded:text-claude-fg data-popup-open:bg-claude-hover dark:hover:bg-claude-hover h-7 gap-1.5 rounded-lg px-1.5 text-xs leading-5 font-normal focus-visible:border-transparent focus-visible:ring-2",
               className
             )}
             data-slot="claude-model-selector"

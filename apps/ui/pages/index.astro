@@ -3,8 +3,8 @@ import data from "blume:data";
 import PageLayout from "blume/components/layout/PageLayout.astro";
 
 import CtaBanner from "../src/components/cta-banner.astro";
-import LandingHero from "../src/components/landing-hero.astro";
-import LandingSections from "../src/components/landing-sections.astro";
+import LandingCollage from "../src/components/landing-collage.astro";
+import NotraSidebar from "../src/components/notra-sidebar.astro";
 import ThemeHotkey from "../src/components/theme-hotkey.astro";
 
 const { config, navigation } = data;
@@ -26,10 +26,23 @@ const repoUrl = config.repoUrl ?? "https://github.com/usenotra";
   site={{ description: config.description, title: config.title }}
   themeMode={config.theme.mode}
 >
-  <LandingHero repoUrl={repoUrl} />
-  <LandingSections />
-  <div class="mx-auto max-w-6xl px-6 pb-20">
-    <CtaBanner />
+  <div class="grid grid-cols-1 items-start lg:grid-cols-[var(--notra-sidebar-width)_minmax(0,1fr)]" data-notra-home>
+    <aside
+      aria-label="Documentation"
+      class="sticky top-16 hidden h-[calc(100dvh-4rem)] overflow-y-auto [scrollbar-width:thin] lg:block"
+      data-notra-sidebar
+    >
+      <nav data-blume-nav-tree>
+        <NotraSidebar currentRoute="/" items={navigation.sidebar} />
+      </nav>
+    </aside>
+
+    <div class="min-w-0 px-2 pt-2 pb-2 lg:ps-0">
+      <LandingCollage repoUrl={repoUrl} />
+      <div class="pt-2">
+        <CtaBanner />
+      </div>
+    </div>
   </div>
   <ThemeHotkey slot="footer" />
 </PageLayout>

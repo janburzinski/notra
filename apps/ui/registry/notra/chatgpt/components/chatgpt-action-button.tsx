@@ -23,7 +23,7 @@ export const ChatgptActionButton = ({
         <Button
           aria-label={label}
           className={cn(
-            "text-chatgpt-muted hover:bg-chatgpt-hover hover:text-chatgpt-fg focus-visible:ring-chatgpt-focus/35 dark:hover:bg-chatgpt-hover size-8 rounded-lg border-0 transition-colors duration-150 focus-visible:ring-2 active:not-aria-[haspopup]:translate-y-0 motion-reduce:transition-none [&_svg:not([class*='size-'])]:size-4",
+            "text-chatgpt-muted hover:bg-chatgpt-hover hover:text-chatgpt-fg focus-visible:ring-chatgpt-focus/35 dark:hover:bg-chatgpt-hover size-8 rounded-lg border-0 transition-colors duration-150 focus-visible:ring-2 motion-reduce:transition-none [&_svg:not([class*='size-'])]:size-4",
             className
           )}
           data-slot="chatgpt-action-button"

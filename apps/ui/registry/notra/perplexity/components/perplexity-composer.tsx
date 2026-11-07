@@ -25,7 +25,7 @@ import { PerplexityModelSelector } from "./perplexity-model-selector";
 const ICON_STROKE = 1.75;
 
 const ICON_BUTTON_CLASS =
-  "text-pplx-muted hover:bg-pplx-hover hover:text-pplx-fg focus-visible:ring-pplx-ring aria-expanded:bg-pplx-hover aria-expanded:text-pplx-fg dark:hover:bg-pplx-hover dark:aria-expanded:bg-pplx-hover size-8 shrink-0 rounded-full border-0 transition-[background-color,transform] duration-150 focus-visible:border-transparent focus-visible:ring-2 active:not-aria-[haspopup]:translate-y-0 active:scale-[0.96] motion-reduce:transition-none";
+  "text-pplx-muted hover:bg-pplx-hover hover:text-pplx-fg focus-visible:ring-pplx-ring aria-expanded:bg-pplx-hover aria-expanded:text-pplx-fg dark:hover:bg-pplx-hover dark:aria-expanded:bg-pplx-hover size-8 shrink-0 rounded-full border-0 transition-[background-color,transform] duration-150 focus-visible:border-transparent focus-visible:ring-2 motion-reduce:transition-none";
 
 export const PerplexityComposer = ({
   busy = false,
@@ -139,7 +139,7 @@ export const PerplexityComposer = ({
             <InputGroupButton
               aria-label={busy ? "Stop" : "Send"}
               className={cn(
-                "focus-visible:ring-pplx-ring size-8 shrink-0 rounded-full border-0 transition-[background-color,color,opacity,transform] duration-150 focus-visible:border-transparent focus-visible:ring-2 active:scale-[0.96] active:not-aria-[haspopup]:translate-y-0 disabled:opacity-100 motion-reduce:transition-none",
+                "focus-visible:ring-pplx-ring size-8 shrink-0 rounded-full border-0 transition-[background-color,color,opacity,transform] duration-150 focus-visible:border-transparent focus-visible:ring-2 disabled:opacity-100 motion-reduce:transition-none",
                 enabled
                   ? "bg-pplx-send text-pplx-send-fg hover:bg-pplx-send-hover"
                   : "bg-pplx-send-disabled text-pplx-send-disabled-fg"

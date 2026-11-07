@@ -45,7 +45,7 @@ export const GeminiThoughts = ({
     <CollapsibleTrigger
       render={
         <Button
-          className="text-gemini-muted hover:bg-gemini-hover hover:text-gemini-fg focus-visible:ring-gemini-focus/30 aria-expanded:text-gemini-fg dark:hover:bg-gemini-hover -ms-2 h-8 gap-2 rounded-full border-0 px-2 text-[0.9375rem] leading-5 font-normal focus-visible:ring-2 active:not-aria-[haspopup]:translate-y-0 [&[data-panel-open]>svg:last-child]:rotate-180"
+          className="text-gemini-muted hover:bg-gemini-hover hover:text-gemini-fg focus-visible:ring-gemini-focus/30 aria-expanded:text-gemini-fg dark:hover:bg-gemini-hover -ms-2 h-8 gap-2 rounded-full border-0 px-2 text-[0.9375rem] leading-5 font-normal focus-visible:ring-2 [&[data-panel-open]>svg:last-child]:rotate-180"
           variant="ghost"
         />
       }

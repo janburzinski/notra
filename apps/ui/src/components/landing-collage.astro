@@ -1,0 +1,128 @@
+---
+import { marketingButtonVariants } from "../../registry/notra/marketing-button/components/marketing-button";
+import { LANDING_INTRO, LANDING_TILES } from "../constants/landing";
+import type { LandingPreview, LandingTileSize } from "../types/landing";
+import HeroDither from "./hero-dither.astro";
+import InstallCommand from "./install-command.astro";
+import BadgesPreview from "./previews/badges-preview";
+import ButtonPreview from "./previews/button-preview";
+import ChatMinimapPreview from "./previews/chat-minimap-preview";
+import ComposerPreview from "./previews/composer-preview";
+import DataTablePreview from "./previews/data-table-preview";
+import DropdownMenuPreview from "./previews/dropdown-menu-preview";
+import DuotoneTooltipPreview from "./previews/duotone-tooltip-preview.astro";
+import IconTabsPreview from "./previews/icon-tabs-preview";
+import ListicleOutreachPreview from "./previews/listicle-outreach-preview";
+import MarketingButtonPreview from "./previews/marketing-button-preview";
+import SelectPreview from "./previews/select-preview";
+import ShimmerPreview from "./previews/shimmer-preview";
+import SidebarPreview from "./previews/sidebar-preview";
+import SonnerPreview from "./previews/sonner-preview";
+import StepSliderPreview from "./previews/step-slider-preview";
+import TooltipPreview from "./previews/tooltip-preview";
+import WorkflowBuilderPreview from "./previews/workflow-builder-preview";
+import WorkflowNodePreview from "./previews/workflow-node-preview";
+
+interface Props {
+  repoUrl: string;
+}
+
+const { repoUrl } = Astro.props;
+
+const previews = {
+  badges: BadgesPreview,
+  button: ButtonPreview,
+  "chat-minimap": ChatMinimapPreview,
+  composer: ComposerPreview,
+  "data-table": DataTablePreview,
+  "dropdown-menu": DropdownMenuPreview,
+  "duotone-tooltip": DuotoneTooltipPreview,
+  "icon-tabs": IconTabsPreview,
+  "listicle-outreach": ListicleOutreachPreview,
+  "marketing-button": MarketingButtonPreview,
+  select: SelectPreview,
+  shimmer: ShimmerPreview,
+  sidebar: SidebarPreview,
+  sonner: SonnerPreview,
+  "step-slider": StepSliderPreview,
+  tooltip: TooltipPreview,
+  "workflow-builder": WorkflowBuilderPreview,
+  "workflow-node": WorkflowNodePreview,
+} satisfies Record<LandingPreview, unknown>;
+
+const sizeClass = {
+  lg: "sm:col-span-2 sm:row-span-2",
+  sm: "",
+  tall: "row-span-2",
+  wide: "sm:col-span-2",
+} satisfies Record<LandingTileSize, string>;
+
+const tileClass =
+  "relative isolate overflow-hidden rounded-2xl border border-(--notra-tile-border) bg-(--notra-tile)";
+---
+
+<div
+  class="grid auto-rows-[clamp(15rem,calc((100dvh-var(--notra-content-top)-1rem)/3),19rem)] grid-flow-dense grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-4"
+>
+  {
+    LANDING_TILES.map((tile) => {
+      if (tile.preview === "intro") {
+        return (
+          <section class:list={[tileClass, sizeClass[tile.size], "-order-1 flex flex-col justify-center max-sm:row-span-2 sm:order-none"]}>
+            <div class="absolute inset-0 opacity-60 mask-l-from-10% mask-l-to-75%">
+              <HeroDither />
+            </div>
+            <div class="relative flex flex-col items-center gap-3 p-5 text-center">
+              <div class="flex flex-col items-center gap-1.5">
+                <h1 class="font-display text-4xl leading-none font-semibold tracking-tight text-foreground">
+                  Notra <span class="text-(--notra-primary)">UI</span>
+                </h1>
+                <p class="max-w-xs text-sm text-pretty text-muted-foreground">{LANDING_INTRO.description}</p>
+              </div>
+              <div class="flex flex-wrap items-center justify-center gap-2">
+                <a class:list={[marketingButtonVariants({ size: "sm", variant: "flat" }), "no-underline"]} href="/introduction">
+                  Get started
+                </a>
+                <a
+                  class:list={[marketingButtonVariants({ size: "sm", variant: "light" }), "no-underline"]}
+                  href={repoUrl}
+                  rel="noopener noreferrer"
+                  target="_blank"
+                >
+                  <svg aria-hidden="true" class="size-4 shrink-0" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z" />
+                  </svg>
+                  GitHub
+                </a>
+              </div>
+              <InstallCommand items={LANDING_INTRO.install.items} prefix={LANDING_INTRO.install.prefix} />
+            </div>
+          </section>
+        );
+      }
+
+      const Preview = previews[tile.preview];
+      return (
+        <div class:list={[tileClass, sizeClass[tile.size], "group"]}>
+          <div class="pointer-events-none flex size-full items-center justify-center p-6" inert>
+            {tile.scale ? (
+              <div class="flex shrink-0 justify-center" style={{ scale: tile.scale }}>
+                <Preview />
+              </div>
+            ) : (
+              <Preview />
+            )}
+          </div>
+          <a
+            class="absolute inset-0 z-10 flex items-end rounded-2xl p-3 no-underline outline-none focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-(--notra-primary)"
+            href={tile.href}
+          >
+            <span class="translate-y-1 rounded-lg border border-border bg-background/90 px-2 py-1 text-xs font-medium text-foreground opacity-0 shadow-xs backdrop-blur-sm transition duration-150 ease-out group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:translate-y-0 group-focus-within:opacity-100 motion-reduce:transition-none [@media(hover:none)]:translate-y-0 [@media(hover:none)]:opacity-100">
+              {tile.title}
+            </span>
+          </a>
+        </div>
+      );
+    })
+  }
+</div>

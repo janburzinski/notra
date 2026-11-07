@@ -1,21 +1,18 @@
 "use client";
 
-import { ScrollArea } from "@base-ui/react/scroll-area";
-import { cn } from "cn";
 import { useAtom } from "jotai";
 import { atomWithStorage } from "jotai/utils";
 import { TerminalIcon, TextAlignStartIcon } from "lucide-react";
 import { useMemo } from "react";
 
 import { CopyButton } from "@/components/copy-button";
-import { IconSwap, IconSwapItem } from "@/components/icon-swap";
+
 import {
-  Tabs,
-  TabsContent,
-  TabsIndicator,
-  TabsList,
-  TabsTrigger,
-} from "@/components/tabs";
+  IconTabs,
+  IconTabsContent,
+  IconTabsList,
+  IconTabsTrigger,
+} from "../registry/notra/icon-tabs/components/icon-tabs";
 
 export type PackageManager = "prompt" | "pnpm" | "yarn" | "npm" | "bun";
 
@@ -126,47 +123,35 @@ export function CodeBlockCommand({
 
   return (
     <div className="bg-code relative overflow-hidden rounded-xl">
-      <Tabs
+      <IconTabs
         className="gap-0"
         value={packageManager}
         onValueChange={(value) => {
           setPackageManager(value as PackageManager);
         }}
       >
-        <ScrollArea.Root className="shadow-border w-full pr-10 shadow-[inset_0_-1px_0_0]">
-          <TabsList
-            className={cn(
-              "[&_svg]:text-muted-foreground h-10 max-w-full justify-start rounded-none bg-transparent p-0 pl-4 inset-ring-0 dark:bg-transparent [&_svg]:size-4 [&_svg]:shrink-0",
-              "[--scroll-area-overflow-x-end:inherit] [--scroll-area-overflow-x-start:inherit]",
-              "mask-linear-[to_right,transparent_0,black_min(2.5rem,var(--scroll-area-overflow-x-start)),black_calc(100%-min(2.5rem,var(--scroll-area-overflow-x-end,2.5rem))),transparent_100%]"
-            )}
-            render={<ScrollArea.Viewport />}
+        <div className="border-border flex items-center border-b p-1.5 pr-10">
+          <IconTabsList
+            aria-label="Package manager"
+            className="max-w-full overflow-x-auto [&_svg]:size-3.5"
+            value={packageManager}
           >
-            <IconSwap>
-              <IconSwapItem className="mr-2" key={packageManager}>
-                {getIconForPackageManager(packageManager)}
-              </IconSwapItem>
-            </IconSwap>
-
-            {tabsFiltered.map(([key]) => {
-              return (
-                <TabsTrigger
-                  key={key}
-                  className="h-7 rounded-lg p-0 px-2 font-mono"
-                  value={key}
-                >
-                  {key}
-                </TabsTrigger>
-              );
-            })}
-
-            <TabsIndicator className="bg-foreground dark:bg-foreground h-0.5 translate-y-0 rounded-none ring-0" />
-          </TabsList>
-        </ScrollArea.Root>
+            {tabsFiltered.map(([key]) => (
+              <IconTabsTrigger
+                className="font-mono"
+                icon={getIconForPackageManager(key as PackageManager)}
+                key={key}
+                value={key}
+              >
+                {key}
+              </IconTabsTrigger>
+            ))}
+          </IconTabsList>
+        </div>
 
         {tabsFiltered.map(([key, value]) => {
           return (
-            <TabsContent key={key} value={key}>
+            <IconTabsContent key={key} value={key}>
               <pre
                 data-pm={key}
                 className="group/tabs-content-pre m-0! overscroll-x-contain rounded-none! border-0! bg-transparent! p-4 leading-6 not-data-[pm=prompt]:overflow-x-auto"
@@ -182,13 +167,13 @@ export function CodeBlockCommand({
                   {value}
                 </code>
               </pre>
-            </TabsContent>
+            </IconTabsContent>
           );
         })}
-      </Tabs>
+      </IconTabs>
 
       <CopyButton
-        className="absolute top-2 right-2 z-10 size-6 rounded-md border-none [&_svg:not([class*='size-'])]:size-3.5"
+        className="absolute top-2.5 right-2.5 z-10 size-6 rounded-md border-none [&_svg:not([class*='size-'])]:size-3.5"
         variant="ghost"
         size="icon-sm"
         text={tabs[packageManager] || ""}

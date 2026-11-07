@@ -69,7 +69,7 @@ export const CodexExec = ({
                 className="col-start-2 justify-self-start"
                 render={
                   <Button
-                    className="text-codex-muted hover:text-codex-fg aria-expanded:text-codex-fg focus-visible:ring-codex-blue/60 h-auto rounded-xs p-0 text-start font-[inherit] text-[length:inherit] leading-[inherit] font-normal whitespace-normal hover:bg-transparent focus-visible:border-transparent focus-visible:ring-1 active:not-aria-[haspopup]:translate-y-0 aria-expanded:bg-transparent dark:hover:bg-transparent"
+                    className="text-codex-muted hover:text-codex-fg aria-expanded:text-codex-fg focus-visible:ring-codex-blue/60 h-auto rounded-xs p-0 text-start font-[inherit] text-[length:inherit] leading-[inherit] font-normal whitespace-normal hover:bg-transparent focus-visible:border-transparent focus-visible:ring-1 aria-expanded:bg-transparent dark:hover:bg-transparent"
                     variant="ghost"
                   />
                 }

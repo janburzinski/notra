@@ -44,7 +44,7 @@ const sliderClassName = [
   "[&_[data-slot=slider-track]]:bg-chatgpt-slider-track [&_[data-slot=slider-track]]:h-6",
   "[&_[data-slot=slider-range]]:bg-chatgpt-slider-fill [&_[data-slot=slider-range]]:before:absolute [&_[data-slot=slider-range]]:before:inset-0 [&_[data-slot=slider-range]]:before:bg-(image:--chatgpt-pro-gradient) [&_[data-slot=slider-range]]:before:bg-size-[200%_100%] [&_[data-slot=slider-range]]:before:animate-chatgpt-flow motion-reduce:[&_[data-slot=slider-range]]:before:animate-none [&_[data-slot=slider-range]]:before:opacity-0 [&_[data-slot=slider-range]]:before:transition-opacity [&_[data-slot=slider-range]]:before:duration-500 group-data-[pro=true]/slider:[&_[data-slot=slider-range]]:before:opacity-100",
   "[&_[data-slot=slider-thumb]]:transition-[inset-inline-start,left,scale] [&_[data-slot=slider-thumb]]:duration-300 [&_[data-slot=slider-thumb]]:ease-[cubic-bezier(0.22,1,0.36,1)] [&_[data-slot=slider-range]]:transition-[width,inset-inline-start] [&_[data-slot=slider-range]]:duration-300 [&_[data-slot=slider-range]]:ease-[cubic-bezier(0.22,1,0.36,1)]",
-  "group-data-[moving=true]/slider:[&_[data-slot=slider-thumb]]:transition-none group-data-[moving=true]/slider:[&_[data-slot=slider-range]]:transition-none motion-reduce:[&_[data-slot=slider-thumb]]:transition-none motion-reduce:[&_[data-slot=slider-range]]:transition-none [&_[data-slot=slider-thumb]]:active:scale-95",
+  "group-data-[moving=true]/slider:[&_[data-slot=slider-thumb]]:transition-none group-data-[moving=true]/slider:[&_[data-slot=slider-range]]:transition-none motion-reduce:[&_[data-slot=slider-thumb]]:transition-none motion-reduce:[&_[data-slot=slider-range]]:transition-none",
   "[&_[data-slot=slider-thumb]]:bg-chatgpt-slider-thumb [&_[data-slot=slider-thumb]]:size-7 [&_[data-slot=slider-thumb]]:border-0 [&_[data-slot=slider-thumb]]:shadow-[0_2px_8px_rgb(0_0_0/0.35)] [&_[data-slot=slider-thumb]]:ring-0 [&_[data-slot=slider-thumb]]:hover:ring-0 [&_[data-slot=slider-thumb]]:active:ring-0 [&_[data-slot=slider-thumb]]:focus-visible:ring-2 [&_[data-slot=slider-thumb]]:focus-visible:ring-chatgpt-focus/60",
 ].join(" ");
 
@@ -231,7 +231,7 @@ export const ChatgptModelSelector = ({
           <Button
             aria-label={`Thinking effort: ${selectedEffort.label}`}
             className={cn(
-              "group/chatgpt-model text-chatgpt-muted hover:bg-chatgpt-hover hover:text-chatgpt-fg focus-visible:ring-chatgpt-focus/35 aria-expanded:bg-chatgpt-hover aria-expanded:text-chatgpt-fg dark:hover:bg-chatgpt-hover h-9 gap-1.5 rounded-full border-0 bg-transparent px-4 text-[0.9375rem] leading-none font-normal transition-[background-color,scale] duration-150 focus-visible:ring-2 active:scale-[0.96] active:not-aria-[haspopup]:translate-y-0 motion-reduce:transition-none",
+              "group/chatgpt-model text-chatgpt-muted hover:bg-chatgpt-hover hover:text-chatgpt-fg focus-visible:ring-chatgpt-focus/35 aria-expanded:bg-chatgpt-hover aria-expanded:text-chatgpt-fg dark:hover:bg-chatgpt-hover h-9 gap-1.5 rounded-full border-0 bg-transparent px-4 text-[0.9375rem] leading-none font-normal transition-[background-color] duration-150 focus-visible:ring-2 motion-reduce:transition-none",
               className
             )}
             data-slot="chatgpt-model-selector"
@@ -298,7 +298,7 @@ export const ChatgptModelSelector = ({
           >
             <Button
               aria-label={`Model: ${selectedModel.label}. Change model`}
-              className="text-chatgpt-fg hover:bg-chatgpt-hover hover:text-chatgpt-fg focus-visible:ring-chatgpt-focus/35 dark:hover:bg-chatgpt-hover mx-auto h-8 gap-1 rounded-full border-0 px-3 text-base leading-none font-normal focus-visible:ring-2 active:not-aria-[haspopup]:translate-y-0"
+              className="text-chatgpt-fg hover:bg-chatgpt-hover hover:text-chatgpt-fg focus-visible:ring-chatgpt-focus/35 dark:hover:bg-chatgpt-hover mx-auto h-8 gap-1 rounded-full border-0 px-3 text-base leading-none font-normal focus-visible:ring-2"
               onClick={() => changeView("models")}
               variant="ghost"
             >

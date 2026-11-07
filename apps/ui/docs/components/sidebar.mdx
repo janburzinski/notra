@@ -17,11 +17,12 @@ To install only the primitives, run `bunx shadcn@latest add @notra/notra-sidebar
 
 ## Usage
 
-Describe the navigation once. A row opens its `href`, and its `items` show underneath while the row or one of them is active. Pass `linkRender` to render your router's link.
+Describe the navigation once. A row opens its `href`, and its `items` show underneath while the row or one of them is active. Pass `linkRender` to render your router's link. `icon` takes an element, so any icon set works; the dashboard uses Hugeicons.
 
 ```tsx
+import { Home01Icon, NoteIcon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import { Link } from "@tanstack/react-router";
-import { HouseIcon, NotebookPenIcon } from "lucide-react";
 
 import { SidebarNav } from "@/components/app-sidebar/components/sidebar-nav";
 import {
@@ -37,10 +38,14 @@ const groups = [
   {
     title: "Overview",
     href: "/",
-    icon: HouseIcon,
+    icon: <HugeiconsIcon icon={Home01Icon} />,
     items: [{ title: "Traffic", href: "/traffic" }],
   },
-  { title: "Content", href: "/content", icon: NotebookPenIcon },
+  {
+    title: "Content",
+    href: "/content",
+    icon: <HugeiconsIcon icon={NoteIcon} />,
+  },
 ];
 
 <SidebarProvider>
@@ -64,7 +69,7 @@ const groups = [
 
 With `collapsible="icon"` the sidebar shrinks to a 48px rail. Rows keep their width animation: everything after the leading icon fades out instead of being removed, so nothing reflows mid-transition. Wrap deeper text in `SidebarLabel` to get the same fade.
 
-On the rail, rows show their title as a tooltip, sub-rows fold away, and rows with sub-pages open them in a flyout menu once the collapse has finished.
+On the rail, rows show their title as a tooltip, sub-rows fold away, and rows with sub-pages open them in a flyout menu once the collapse has finished. The account menu opens to the right of the rail.
 
 <Component path="app-sidebar/examples/app-sidebar-collapsed" />
 
@@ -82,7 +87,7 @@ On the rail, rows show their title as a tooltip, sub-rows fold away, and rows wi
 | `SidebarHeaderRow` | Places the trigger beside the switcher, and under it on the rail. |
 | `SidebarSearch` | A search row styled like a field, with a shortcut hint. |
 | `SidebarNav` | Grouped navigation with sub-rows, badges and the rail flyout. |
-| `SidebarUserMenu` | The account row with an avatar, a plan badge and a menu. |
+| `SidebarUserMenu` | The account row with an avatar and a menu headed by the name and email. |
 | `SidebarMenuCollapsible`, `SidebarMenuSubPanel` | Build your own expandable rows on the Base UI Collapsible. |
 
 When the provider is narrower than `mobileBreakpoint` (768px by default), the sidebar opens as a sheet from its side. The width is measured on the provider rather than the viewport, so an embedded layout switches as well.

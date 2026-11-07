@@ -20,7 +20,7 @@ import { useOpencodeReducedMotion } from "../hooks/use-opencode-reduced-motion";
 import type { OpencodeActivityProps } from "../types/opencode";
 
 const TRIGGER_CLASS =
-  "focus-visible:ring-opencode-blue h-auto justify-start gap-0 rounded-none p-0 text-start text-[length:inherit] leading-[inherit] font-normal whitespace-normal text-current hover:bg-transparent hover:text-current focus-visible:border-transparent focus-visible:ring-1 active:not-aria-[haspopup]:translate-y-0 aria-expanded:bg-transparent aria-expanded:text-current dark:hover:bg-transparent";
+  "focus-visible:ring-opencode-blue h-auto justify-start gap-0 rounded-none p-0 text-start text-[length:inherit] leading-[inherit] font-normal whitespace-normal text-current hover:bg-transparent hover:text-current focus-visible:border-transparent focus-visible:ring-1 aria-expanded:bg-transparent aria-expanded:text-current dark:hover:bg-transparent";
 
 const ThinkingGlyph = ({ reducedMotion }: { reducedMotion?: boolean }) => {
   const reduced = useOpencodeReducedMotion(reducedMotion);

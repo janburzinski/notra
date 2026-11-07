@@ -67,7 +67,7 @@ export const ChatgptReasoning = ({
       <CollapsibleTrigger
         render={
           <Button
-            className="text-chatgpt-muted hover:text-chatgpt-muted aria-expanded:text-chatgpt-muted focus-visible:ring-chatgpt-focus/35 h-auto gap-1 rounded-sm border-0 bg-transparent p-0 text-start text-base leading-7 font-normal hover:bg-transparent focus-visible:ring-2 active:not-aria-[haspopup]:translate-y-0 aria-expanded:bg-transparent dark:hover:bg-transparent [&[data-panel-open]>svg]:rotate-180"
+            className="text-chatgpt-muted hover:text-chatgpt-muted aria-expanded:text-chatgpt-muted focus-visible:ring-chatgpt-focus/35 h-auto gap-1 rounded-sm border-0 bg-transparent p-0 text-start text-base leading-7 font-normal hover:bg-transparent focus-visible:ring-2 aria-expanded:bg-transparent dark:hover:bg-transparent [&[data-panel-open]>svg]:rotate-180"
             variant="ghost"
           />
         }

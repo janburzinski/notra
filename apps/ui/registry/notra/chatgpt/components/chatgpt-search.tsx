@@ -20,7 +20,7 @@ export const ChatgptSearch = ({
   return (
     <Button
       className={cn(
-        "font-chatgpt text-chatgpt-muted hover:text-chatgpt-fg focus-visible:ring-chatgpt-focus/35 aria-expanded:text-chatgpt-fg h-auto gap-1.5 rounded-sm border-0 p-0 text-sm leading-5 font-normal transition-colors hover:bg-transparent focus-visible:ring-2 active:not-aria-[haspopup]:translate-y-0 aria-expanded:bg-transparent dark:hover:bg-transparent",
+        "font-chatgpt text-chatgpt-muted hover:text-chatgpt-fg focus-visible:ring-chatgpt-focus/35 aria-expanded:text-chatgpt-fg h-auto gap-1.5 rounded-sm border-0 p-0 text-sm leading-5 font-normal transition-colors hover:bg-transparent focus-visible:ring-2 aria-expanded:bg-transparent dark:hover:bg-transparent",
         className
       )}
       data-slot="chatgpt-search"

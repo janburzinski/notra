@@ -83,7 +83,7 @@ export const GeminiModelSelector = ({
           <Button
             aria-label={`Model: ${selected.label}`}
             className={cn(
-              "group/gemini-model text-gemini-chip-fg dark:text-gemini-muted hover:bg-gemini-hover hover:text-gemini-chip-fg dark:hover:text-gemini-muted aria-expanded:bg-gemini-hover aria-expanded:text-gemini-chip-fg dark:aria-expanded:text-gemini-muted data-popup-open:bg-gemini-hover dark:hover:bg-gemini-hover focus-visible:ring-gemini-focus/30 h-9 shrink-0 gap-1 rounded-full border-0 ps-3.5 pe-2.5 text-[0.8125rem] leading-5 font-medium transition-[background-color,scale] duration-150 focus-visible:ring-2 active:scale-[0.96] motion-reduce:transition-none motion-reduce:active:scale-100",
+              "group/gemini-model text-gemini-chip-fg dark:text-gemini-muted hover:bg-gemini-hover hover:text-gemini-chip-fg dark:hover:text-gemini-muted aria-expanded:bg-gemini-hover aria-expanded:text-gemini-chip-fg dark:aria-expanded:text-gemini-muted data-popup-open:bg-gemini-hover dark:hover:bg-gemini-hover focus-visible:ring-gemini-focus/30 h-9 shrink-0 gap-1 rounded-full border-0 ps-3.5 pe-2.5 text-[0.8125rem] leading-5 font-medium transition-[background-color] duration-150 focus-visible:ring-2 motion-reduce:transition-none",
               className
             )}
             data-slot="gemini-model-selector"

@@ -13,7 +13,7 @@ import {
 import type { WorkflowRunButtonProps } from "../types/workflow";
 
 const runButtonVariants = cva(
-  "group/run focus-visible:ring-ring/50 relative inline-flex h-8 shrink-0 items-center gap-2 rounded-full pr-3.5 pl-1 text-[0.8125rem] font-medium whitespace-nowrap transition-[background-color,box-shadow,color] duration-200 outline-none select-none focus-visible:ring-3 active:translate-y-px disabled:pointer-events-none disabled:opacity-50",
+  "group/run focus-visible:ring-ring/50 relative inline-flex h-8 shrink-0 items-center gap-2 rounded-full pr-3.5 pl-1 text-[0.8125rem] font-medium whitespace-nowrap transition-[background-color,box-shadow,color] duration-200 outline-none select-none focus-visible:ring-3 disabled:pointer-events-none disabled:opacity-50",
   {
     variants: {
       phase: {

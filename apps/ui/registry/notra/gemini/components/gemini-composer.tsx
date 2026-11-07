@@ -28,7 +28,7 @@ const SUBMIT_LABELS: Record<SubmitState, string> = {
 };
 
 const ICON_BUTTON =
-  "focus-visible:ring-gemini-focus/30 size-9 shrink-0 rounded-full border-0 focus-visible:ring-2 active:not-aria-[haspopup]:translate-y-0";
+  "focus-visible:ring-gemini-focus/30 size-9 shrink-0 rounded-full border-0 focus-visible:ring-2";
 
 const ActionGlyph = ({
   children,
@@ -77,7 +77,7 @@ const GeminiComposerSubmit = ({
   return (
     <InputGroupButton
       aria-label={SUBMIT_LABELS[state]}
-      className="focus-visible:ring-gemini-focus/30 text-gemini-fg hover:bg-gemini-hover hover:text-gemini-fg dark:hover:bg-gemini-hover data-[state=busy]:bg-gemini-stop data-[state=busy]:hover:bg-gemini-stop-hover dark:data-[state=busy]:hover:bg-gemini-stop-hover data-[state=ready]:bg-gemini-send data-[state=ready]:text-gemini-send-fg data-[state=ready]:hover:bg-gemini-send-hover data-[state=ready]:hover:text-gemini-send-fg dark:data-[state=ready]:hover:bg-gemini-send-hover relative size-9 shrink-0 rounded-full border-0 transition-[background-color,color] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] focus-visible:ring-2 active:not-aria-[haspopup]:translate-y-0 motion-reduce:transition-none"
+      className="focus-visible:ring-gemini-focus/30 text-gemini-fg hover:bg-gemini-hover hover:text-gemini-fg dark:hover:bg-gemini-hover data-[state=busy]:bg-gemini-stop data-[state=busy]:hover:bg-gemini-stop-hover dark:data-[state=busy]:hover:bg-gemini-stop-hover data-[state=ready]:bg-gemini-send data-[state=ready]:text-gemini-send-fg data-[state=ready]:hover:bg-gemini-send-hover data-[state=ready]:hover:text-gemini-send-fg dark:data-[state=ready]:hover:bg-gemini-send-hover relative size-9 shrink-0 rounded-full border-0 transition-[background-color,color] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] focus-visible:ring-2 motion-reduce:transition-none"
       data-slot="gemini-composer-submit"
       data-state={state}
       onClick={handleClick}

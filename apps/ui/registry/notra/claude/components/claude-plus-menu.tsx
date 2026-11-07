@@ -94,7 +94,7 @@ export const ClaudePlusMenu = ({
         <Button
           aria-label="Add files, connectors and more"
           className={cn(
-            "text-claude-text hover:bg-claude-hover hover:text-claude-fg focus-visible:ring-claude-fg/20 aria-expanded:bg-claude-hover aria-expanded:text-claude-fg dark:hover:bg-claude-hover size-8 rounded-lg focus-visible:border-transparent focus-visible:ring-2 active:not-aria-[haspopup]:translate-y-0",
+            "text-claude-text hover:bg-claude-hover hover:text-claude-fg focus-visible:ring-claude-fg/20 aria-expanded:bg-claude-hover aria-expanded:text-claude-fg dark:hover:bg-claude-hover size-8 rounded-lg focus-visible:border-transparent focus-visible:ring-2",
             className
           )}
           data-slot="claude-plus-menu"

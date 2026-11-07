@@ -83,7 +83,6 @@ export default function DropdownMenuDemo() {
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-      <span className="text-muted-foreground py-1.5 text-sm">View: {view}</span>
     </div>
   );
 }

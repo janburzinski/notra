@@ -24,6 +24,7 @@ html {
 :root {
   --notra-primary: oklch(0.6056 0.2189 292.7172);
   --notra-card: hsl(0 0% 100%);
+  --notra-tile: hsl(240 5% 98%);
   --blume-background: hsl(0 0% 100%);
   --blume-foreground: hsl(0 0% 9%);
   --blume-muted: hsl(0 0% 96.1%);
@@ -35,12 +36,13 @@ html {
 
 :root[data-theme="dark"] {
   --notra-card: hsl(240 6% 10%);
+  --notra-tile: hsl(240 6% 10%);
   --blume-background: hsl(233 7% 8%);
   --blume-foreground: hsl(0 0% 98%);
-  --blume-muted: hsl(0 0% 14.9%);
-  --blume-muted-foreground: hsl(0 0% 63.9%);
-  --blume-border: hsl(0 1% 17%);
-  --blume-accent: hsl(0 0% 14.9%);
+  --blume-muted: oklch(0.27 0.006 270);
+  --blume-muted-foreground: oklch(0.77 0.006 270);
+  --blume-border: oklch(0.31 0.006 270);
+  --blume-accent: oklch(0.27 0.006 270);
   --blume-accent-foreground: hsl(0 0% 98%);
   --blume-code-background: hsl(240 6% 10%);
 }
@@ -132,6 +134,11 @@ html {
   --color-marketing-light-foreground: #1e1e1e;
   --tracking-marketing: -0.015em;
   --font-aio: "Google Sans", "Google Sans Flex", Roboto, Arial, sans-serif;
+}
+
+/* The frame sits in a docs preview styled like a homepage tile. */
+body {
+  background-color: var(--notra-tile);
 }
 
 body > div:has(> .w-full, > astro-island > .w-full) {

@@ -1,28 +1,86 @@
-<script>
-  import { EXAMPLE_HEIGHTS } from "../constants/example-heights";
+---
+import { EXAMPLE_HEIGHTS } from "../constants/example-heights";
+---
 
+<!-- Inline so it runs while the page parses, before the first paint: as a
+     module it ran after paint and every preview visibly resized. Astro
+     re-runs inline scripts after each client-side navigation, which covers
+     the swapped-in page the same way. -->
+<script is:inline define:vars={{ knownHeights: EXAMPLE_HEIGHTS }}>
   const FRAME_SELECTOR = "iframe[data-blume-example-frame]";
   const EXAMPLES_PREFIX = "/blume-examples/";
+  const HEIGHT_REPORT = "blume:example-height";
+  const CACHE_KEY = "notra-example-heights";
   // Blume's own floor for a preview pane (18rem).
   const PANE_MIN_PX = 288;
 
+  const readCache = () => {
+    try {
+      return JSON.parse(localStorage.getItem(CACHE_KEY) ?? "{}");
+    } catch {
+      return {};
+    }
+  };
+
+  // A preview's height depends on its width, so measurements are remembered
+  // per width.
+  const cacheKey = (frame) => {
+    const path = new URL(frame.src, location.origin).pathname.replace(EXAMPLES_PREFIX, "");
+    const width = Math.round(frame.closest("blume-tabs")?.clientWidth ?? 0);
+    return { path, key: `${path}@${width}` };
+  };
+
+  const setPanels = (frame, height) => {
+    const tabs = frame.closest("blume-tabs");
+    if (!tabs) {
+      return;
+    }
+    for (const panel of tabs.querySelectorAll("[data-blume-tab-panel]")) {
+      panel.style.transition = "none";
+      panel.style.height = `${Math.max(PANE_MIN_PX, height)}px`;
+      void panel.offsetHeight;
+      panel.style.transition = "";
+    }
+  };
+
   const applyKnownHeights = () => {
-    for (const frame of document.querySelectorAll<HTMLIFrameElement>(FRAME_SELECTOR)) {
-      const key = new URL(frame.src, window.location.origin).pathname.replace(EXAMPLES_PREFIX, "");
-      const height = EXAMPLE_HEIGHTS[key];
-      const tabs = frame.closest("blume-tabs");
-      if (!height || !tabs || frame.dataset.blumeReportedHeight) {
+    const cache = readCache();
+    for (const frame of document.querySelectorAll(FRAME_SELECTOR)) {
+      if (frame.dataset.blumeReportedHeight) {
         continue;
       }
-      for (const panel of tabs.querySelectorAll<HTMLElement>("[data-blume-tab-panel]")) {
-        panel.style.transition = "none";
-        panel.style.height = `${Math.max(PANE_MIN_PX, height)}px`;
-        void panel.offsetHeight;
-        panel.style.transition = "";
+      const { path, key } = cacheKey(frame);
+      const height = cache[key] ?? knownHeights[path];
+      if (height) {
+        setPanels(frame, height);
       }
     }
   };
 
   applyKnownHeights();
-  document.addEventListener("astro:after-swap", applyKnownHeights);
+
+  if (!window.__notraExampleHeights) {
+    window.__notraExampleHeights = true;
+    document.addEventListener("astro:after-swap", applyKnownHeights);
+    // Remember what each frame reports so a stale table entry only resizes
+    // once per browser.
+    window.addEventListener("message", (event) => {
+      if (event.origin !== location.origin || event.data?.type !== HEIGHT_REPORT) {
+        return;
+      }
+      const frame = [...document.querySelectorAll(FRAME_SELECTOR)].find(
+        (candidate) => candidate.contentWindow === event.source
+      );
+      if (!(frame && Number.isFinite(event.data.height))) {
+        return;
+      }
+      const cache = readCache();
+      cache[cacheKey(frame).key] = Math.round(event.data.height);
+      try {
+        localStorage.setItem(CACHE_KEY, JSON.stringify(cache));
+      } catch {
+        // Without storage the table still covers the first paint.
+      }
+    });
+  }
 </script>

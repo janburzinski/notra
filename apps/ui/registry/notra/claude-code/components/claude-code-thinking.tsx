@@ -28,7 +28,7 @@ export const ClaudeCodeThinking = ({
     <CollapsibleTrigger
       render={
         <Button
-          className="text-claude-code-muted hover:text-claude-code-muted aria-expanded:text-claude-code-muted focus-visible:ring-claude-code-muted/60 grid h-auto w-fit grid-cols-[2ch_auto] justify-start rounded-sm border-0 p-0 text-start text-[length:inherit] leading-[inherit] font-normal whitespace-normal italic hover:bg-transparent focus-visible:border-transparent focus-visible:ring-2 active:not-aria-[haspopup]:translate-y-0 aria-expanded:bg-transparent dark:hover:bg-transparent"
+          className="text-claude-code-muted hover:text-claude-code-muted aria-expanded:text-claude-code-muted focus-visible:ring-claude-code-muted/60 grid h-auto w-fit grid-cols-[2ch_auto] justify-start rounded-sm border-0 p-0 text-start text-[length:inherit] leading-[inherit] font-normal whitespace-normal italic hover:bg-transparent focus-visible:border-transparent focus-visible:ring-2 aria-expanded:bg-transparent dark:hover:bg-transparent"
           variant="ghost"
         />
       }

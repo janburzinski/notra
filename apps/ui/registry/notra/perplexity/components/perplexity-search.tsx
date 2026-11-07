@@ -47,7 +47,7 @@ const ENTER_CLASS = `translate-y-0 opacity-100 transition-[opacity,translate] du
 const PANEL_CLASS = `grid overflow-hidden transition-[grid-template-rows,opacity] duration-300 ${EASE} outline-none data-closed:grid-rows-[0fr] data-ending-style:grid-rows-[0fr] data-ending-style:opacity-0 data-open:grid-rows-[1fr] data-starting-style:grid-rows-[0fr] data-starting-style:opacity-0 motion-reduce:transition-none`;
 
 const TRIGGER_CLASS =
-  "focus-visible:ring-pplx-ring h-auto w-fit max-w-full justify-start gap-1.5 rounded-md border-0 p-0 text-left text-sm leading-5 font-normal whitespace-normal hover:bg-transparent focus-visible:border-transparent focus-visible:ring-2 active:not-aria-[haspopup]:translate-y-0 aria-expanded:bg-transparent dark:hover:bg-transparent dark:aria-expanded:bg-transparent";
+  "focus-visible:ring-pplx-ring h-auto w-fit max-w-full justify-start gap-1.5 rounded-md border-0 p-0 text-left text-sm leading-5 font-normal whitespace-normal hover:bg-transparent focus-visible:border-transparent focus-visible:ring-2 aria-expanded:bg-transparent dark:hover:bg-transparent dark:aria-expanded:bg-transparent";
 
 const CHEVRON_CLASS = `text-pplx-muted size-3.5 shrink-0 transition-transform duration-300 ${EASE} motion-reduce:transition-none`;
 
@@ -195,7 +195,7 @@ const SearchFooter = ({
         render={
           <Button
             className={cn(
-              "text-pplx-subtle hover:text-pplx-secondary focus-visible:ring-pplx-ring dark:hover:text-pplx-secondary mt-1.5 h-auto rounded-sm border-0 p-0 text-sm leading-5 font-normal no-underline transition-colors hover:no-underline focus-visible:border-transparent focus-visible:ring-2 active:not-aria-[haspopup]:translate-y-0",
+              "text-pplx-subtle hover:text-pplx-secondary focus-visible:ring-pplx-ring dark:hover:text-pplx-secondary mt-1.5 h-auto rounded-sm border-0 p-0 text-sm leading-5 font-normal no-underline transition-colors hover:no-underline focus-visible:border-transparent focus-visible:ring-2",
               sequential && ENTER_CLASS
             )}
             variant="link"

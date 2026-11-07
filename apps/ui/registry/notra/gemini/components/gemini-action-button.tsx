@@ -23,7 +23,7 @@ export const GeminiActionButton = ({
         <Button
           aria-label={label}
           className={cn(
-            "text-gemini-muted hover:bg-gemini-hover hover:text-gemini-muted aria-expanded:bg-gemini-hover aria-expanded:text-gemini-muted dark:hover:bg-gemini-hover focus-visible:ring-gemini-focus/30 size-7 rounded-full border-0 transition-colors duration-150 focus-visible:ring-2 active:not-aria-[haspopup]:translate-y-0 motion-reduce:transition-none [&_svg:not([class*='size-'])]:size-4",
+            "text-gemini-muted hover:bg-gemini-hover hover:text-gemini-muted aria-expanded:bg-gemini-hover aria-expanded:text-gemini-muted dark:hover:bg-gemini-hover focus-visible:ring-gemini-focus/30 size-7 rounded-full border-0 transition-colors duration-150 focus-visible:ring-2 motion-reduce:transition-none [&_svg:not([class*='size-'])]:size-4",
             className
           )}
           data-slot="gemini-action-button"

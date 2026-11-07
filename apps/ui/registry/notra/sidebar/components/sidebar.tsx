@@ -3,9 +3,13 @@
 import { Collapsible as CollapsiblePrimitive } from "@base-ui/react/collapsible";
 import { mergeProps } from "@base-ui/react/merge-props";
 import { useRender } from "@base-ui/react/use-render";
+import {
+  SidebarLeft01Icon,
+  SidebarRight01Icon,
+} from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "cn";
-import { PanelLeftCloseIcon, PanelLeftOpenIcon } from "lucide-react";
 import * as React from "react";
 
 import { Input } from "@/components/ui/input";
@@ -363,7 +367,6 @@ function SidebarTrigger({
 }: React.ComponentProps<typeof Button>) {
   const { isMobile, open, openMobile, toggleSidebar } = useSidebar();
   const isOpen = isMobile ? openMobile : open;
-  const Icon = isOpen ? PanelLeftCloseIcon : PanelLeftOpenIcon;
 
   return (
     <Button
@@ -373,14 +376,20 @@ function SidebarTrigger({
       size="icon-sm"
       aria-expanded={isOpen}
       aria-label={isOpen ? "Hide sidebar" : "Show sidebar"}
-      className={cn("text-muted-foreground hover:text-foreground", className)}
+      className={cn(
+        "text-foreground/70 hover:text-foreground aria-expanded:text-foreground/70 aria-expanded:hover:text-foreground bg-transparent! hover:bg-transparent! active:bg-transparent! aria-expanded:bg-transparent!",
+        className
+      )}
       onClick={(event) => {
         onClick?.(event);
         toggleSidebar();
       }}
       {...props}
     >
-      <Icon />
+      <HugeiconsIcon
+        icon={isOpen ? SidebarLeft01Icon : SidebarRight01Icon}
+        strokeWidth={1.8}
+      />
     </Button>
   );
 }
@@ -689,7 +698,7 @@ function SidebarGroupLabel({
     props: mergeProps<"div">(
       {
         className: cn(
-          "text-sidebar-foreground/60 ring-sidebar-ring flex h-8 shrink-0 items-center overflow-hidden rounded-md px-2 text-xs font-medium whitespace-nowrap outline-hidden transition-[margin,opacity] group-data-[collapsible=icon]:pointer-events-none group-data-[collapsible=icon]:-mt-8 group-data-[collapsible=icon]:opacity-0 focus-visible:ring-2 [&>svg]:size-4 [&>svg]:shrink-0",
+          "text-sidebar-foreground/70 ring-sidebar-ring flex h-8 shrink-0 items-center overflow-hidden rounded-md px-2 text-xs font-medium whitespace-nowrap outline-hidden transition-[margin,opacity] group-data-[collapsible=icon]:pointer-events-none group-data-[collapsible=icon]:-mt-8 group-data-[collapsible=icon]:opacity-0 focus-visible:ring-2 [&>svg]:size-4 [&>svg]:shrink-0",
           SIDEBAR_TRANSITION,
           className
         ),
@@ -741,7 +750,7 @@ function SidebarMenu({ className, ...props }: React.ComponentProps<"ul">) {
     <ul
       data-slot="sidebar-menu"
       data-sidebar="menu"
-      className={cn("flex w-full min-w-0 flex-col gap-0.5", className)}
+      className={cn("flex w-full min-w-0 flex-col gap-1", className)}
       {...props}
     />
   );
@@ -763,7 +772,7 @@ function SidebarMenuItem({ className, ...props }: React.ComponentProps<"li">) {
  * row clips to the rail and everything after the leading icon fades out.
  */
 const sidebarMenuButtonVariants = cva(
-  "peer/menu-button group/menu-button ring-sidebar-ring hover:bg-sidebar-accent hover:text-sidebar-accent-foreground active:bg-sidebar-accent data-active:bg-sidebar-accent data-active:text-foreground data-popup-open:bg-sidebar-accent flex w-full items-center gap-2 overflow-hidden rounded-lg p-2 text-left text-sm outline-hidden transition-[background-color,color] duration-75 group-has-data-[sidebar=menu-action]/menu-item:pr-8 focus-visible:ring-2 focus-visible:ring-inset disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-active:font-medium [&_svg]:size-4 [&_svg]:shrink-0 [&>*:not(:first-child)]:transition-opacity [&>*:not(:first-child)]:duration-150 [&>*:not(:first-child)]:ease-(--sidebar-ease) group-data-[collapsible=icon]:[&>*:not(:first-child)]:pointer-events-none group-data-[collapsible=icon]:[&>*:not(:first-child)]:opacity-0 [&>span:last-child]:truncate",
+  "peer/menu-button group/menu-button ring-sidebar-ring hover:bg-sidebar-accent hover:text-sidebar-accent-foreground active:bg-sidebar-accent data-active:bg-sidebar-accent data-active:text-foreground data-popup-open:bg-sidebar-accent flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left text-sm outline-hidden group-has-data-[sidebar=menu-action]/menu-item:pr-8 focus-visible:ring-2 focus-visible:ring-inset disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-active:font-medium [&_svg]:size-4 [&_svg]:shrink-0 [&>*:not(:first-child)]:transition-opacity [&>*:not(:first-child)]:duration-150 [&>*:not(:first-child)]:ease-(--sidebar-ease) group-data-[collapsible=icon]:[&>*:not(:first-child)]:pointer-events-none group-data-[collapsible=icon]:[&>*:not(:first-child)]:opacity-0 [&>span:last-child]:truncate",
   {
     variants: {
       variant: {
@@ -774,7 +783,7 @@ const sidebarMenuButtonVariants = cva(
       size: {
         default: "h-8",
         sm: "h-7 text-xs",
-        lg: "h-12 transition-[background-color,color,padding] group-data-[collapsible=icon]:p-0! group-data-[collapsible=icon]:pl-[calc((var(--sidebar-rail-content)-var(--sidebar-lg-icon,2rem))/2)]!",
+        lg: "h-12 transition-[padding] group-data-[collapsible=icon]:p-0! group-data-[collapsible=icon]:pl-[calc((var(--sidebar-rail-content)-var(--sidebar-lg-icon,2rem))/2)]!",
       },
     },
     defaultVariants: {
@@ -969,7 +978,7 @@ function SidebarMenuSub({ className, ...props }: React.ComponentProps<"ul">) {
       data-slot="sidebar-menu-sub"
       data-sidebar="menu-sub"
       className={cn(
-        "border-sidebar-border mx-3.5 flex min-w-0 translate-x-px flex-col gap-0.5 border-l px-2.5 py-0.5",
+        "border-sidebar-border mx-3.5 flex min-w-0 translate-x-px flex-col gap-1 border-l px-2.5 py-0.5",
         className
       )}
       {...props}
@@ -1007,7 +1016,7 @@ function SidebarMenuSubButton({
     props: mergeProps<"a">(
       {
         className: cn(
-          "text-sidebar-foreground/80 ring-sidebar-ring hover:bg-sidebar-accent hover:text-sidebar-accent-foreground active:bg-sidebar-accent data-active:bg-sidebar-accent data-active:text-foreground flex h-7 min-w-0 -translate-x-px items-center gap-2 overflow-hidden rounded-md px-2 outline-hidden transition-colors duration-75 focus-visible:ring-2 disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-active:font-medium data-[size=md]:text-sm data-[size=sm]:text-xs [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0",
+          "text-sidebar-foreground ring-sidebar-ring hover:bg-sidebar-accent hover:text-sidebar-accent-foreground active:bg-sidebar-accent data-active:bg-sidebar-accent data-active:text-sidebar-accent-foreground flex h-7 min-w-0 -translate-x-px items-center gap-2 overflow-hidden rounded-md px-2 outline-hidden focus-visible:ring-2 disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[size=md]:text-sm data-[size=sm]:text-xs [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0",
           className
         ),
       },

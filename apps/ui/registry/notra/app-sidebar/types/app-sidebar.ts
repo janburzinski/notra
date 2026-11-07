@@ -1,4 +1,3 @@
-import type { LucideIcon } from "lucide-react";
 import type { ComponentProps, ReactElement, ReactNode } from "react";
 
 export interface SidebarNavLink {
@@ -14,7 +13,8 @@ export interface SidebarNavLink {
  * collapsed rail a row with items opens them in a flyout instead.
  */
 export interface SidebarNavGroup extends SidebarNavLink {
-  icon: LucideIcon;
+  /** A 16px icon element, such as `<HugeiconsIcon icon={Home01Icon} />`. */
+  icon: ReactNode;
   items?: readonly SidebarNavLink[];
 }
 
@@ -59,9 +59,9 @@ export interface SidebarSearchProps {
 
 export interface SidebarUserMenuProps {
   name: string;
-  description?: string;
+  /** Shown under the name at the top of the menu. */
+  email?: string;
   avatarSrc?: string;
-  badge?: string;
   /** Menu items. */
   children: ReactNode;
 }
