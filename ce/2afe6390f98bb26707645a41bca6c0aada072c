@@ -1,0 +1,31 @@
+packages/ai/src/constants/slack.ts
+  s_bd6d91232f6e11::t_f446e034f3eef8 3-4
+apps/dashboard/src/lib/autopilot/brief.ts
+  s_bd6d91232f6e11::t_f446e034f3eef8 73-74
+apps/agent/agent/channels/slack.ts
+  s_bd6d91232f6e11::t_df1734ab7ae745 32,549
+apps/agent/agent/instructions.md
+  s_bd6d91232f6e11::t_df1734ab7ae745 50
+apps/dashboard/src/lib/autopilot/slack.ts
+  s_bd6d91232f6e11::t_f446e034f3eef8 2,79-83
+apps/agent/agent/lib/constants/slack.ts
+  s_bd6d91232f6e11::t_df1734ab7ae745 20-22
+apps/agent/agent/lib/utils/autopilot-slack.ts
+  s_bd6d91232f6e11::t_df1734ab7ae745 1-4,8-12,16,100-126
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "ce2afe6390f98bb26707645a41bca6c0aada072c",
+  "prompts": {},
+  "sessions": {
+    "s_bd6d91232f6e11": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "efa9a97b-ebc8-4e7e-a354-207f83a8760f",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
