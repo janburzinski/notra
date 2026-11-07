@@ -111,6 +111,16 @@ html {
     top: var(--notra-header-height);
     width: var(--notra-sidebar-width);
     height: calc(100dvh - var(--notra-header-height));
+    /* Scrolls without a visible scrollbar; the fade above the footer already
+       shows there is more. */
+    scrollbar-width: none;
+  }
+
+  :is(
+    [data-blume-doc-grid] > [data-blume-nav-drawer],
+    [data-notra-sidebar]
+  )::-webkit-scrollbar {
+    display: none;
   }
 
   [data-blume-toc] {
