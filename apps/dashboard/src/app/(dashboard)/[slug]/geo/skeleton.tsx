@@ -7,11 +7,8 @@ import {
   GEO_VISIBILITY_TABLE_ROWS,
 } from "@notra/geo-core/constants/geo";
 import { PageHeading } from "@notra/ui/components/shared/page-heading";
-import {
-  PermissionRow,
-  PermissionOption,
-} from "@notra/ui/components/ui/permission-selector";
 import { Skeleton } from "@notra/ui/components/ui/skeleton";
+import { Tabs, TabsList, TabsTrigger } from "@notra/ui/components/ui/tabs";
 import { InstrumentModule, InstrumentSection } from "ui/card";
 import { DataTableSkeleton } from "ui/table";
 import type { DataTableSkeletonColumn } from "ui/table/types";
@@ -56,23 +53,19 @@ export function GeoPageSkeleton() {
           </div>
         </PageHeading>
         <div className="flex min-w-0 flex-col">
-          <PermissionRow
-            className="w-fit shrink-0"
-            label={tTabs("label")}
-            layout="compact"
-            value="visibility"
-            disabled
-          >
-            <PermissionOption value="visibility">
-              {tCommon("labels.visibility")}
-            </PermissionOption>
-            <PermissionOption value="brand-sentiment">
-              {tCommon("labels.brandSentiment")}
-            </PermissionOption>
-            <PermissionOption value="journeys">
-              {tCommon("labels.journeys")}
-            </PermissionOption>
-          </PermissionRow>
+          <Tabs value="visibility">
+            <TabsList aria-label={tTabs("label")}>
+              <TabsTrigger disabled value="visibility">
+                {tCommon("labels.visibility")}
+              </TabsTrigger>
+              <TabsTrigger disabled value="brand-sentiment">
+                {tCommon("labels.brandSentiment")}
+              </TabsTrigger>
+              <TabsTrigger disabled value="journeys">
+                {tCommon("labels.journeys")}
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
           <div className="mt-6 flex flex-col gap-6">
             <div className="grid grid-cols-1 items-stretch gap-4 @min-[44rem]/main:grid-cols-12">
               <InstrumentModule

@@ -2,10 +2,7 @@
 
 import { GEO_EMPTY_COMPETITOR_SHARE_TIMESERIES } from "@notra/geo-core/constants/geo";
 import { POSTHOG_EVENTS } from "@notra/posthog/events";
-import {
-  PermissionOption,
-  PermissionRow,
-} from "@notra/ui/components/ui/permission-selector";
+import { Tabs, TabsList, TabsTrigger } from "@notra/ui/components/ui/tabs";
 import { Activity, type ReactNode } from "react";
 import { InstrumentGrid } from "ui/card/grid";
 import { useTranslations } from "use-intl";
@@ -63,10 +60,7 @@ export function GeoTabs({
 
   return (
     <div className="flex min-w-0 flex-col">
-      <PermissionRow
-        className="w-fit shrink-0"
-        label={t("label")}
-        layout="compact"
+      <Tabs
         onValueChange={(value) => {
           const tab = toGeoTab(value);
           trackEvent(POSTHOG_EVENTS.GEO_TAB_CHANGED, { tab });
@@ -74,16 +68,18 @@ export function GeoTabs({
         }}
         value={activeTab}
       >
-        <PermissionOption value="visibility">
-          {tCommon("labels.visibility")}
-        </PermissionOption>
-        <PermissionOption value="brand-sentiment">
-          {tCommon("labels.brandSentiment")}
-        </PermissionOption>
-        <PermissionOption value="journeys">
-          {tCommon("labels.journeys")}
-        </PermissionOption>
-      </PermissionRow>
+        <TabsList aria-label={t("label")}>
+          <TabsTrigger value="visibility">
+            {tCommon("labels.visibility")}
+          </TabsTrigger>
+          <TabsTrigger value="brand-sentiment">
+            {tCommon("labels.brandSentiment")}
+          </TabsTrigger>
+          <TabsTrigger value="journeys">
+            {tCommon("labels.journeys")}
+          </TabsTrigger>
+        </TabsList>
+      </Tabs>
 
       <Activity mode={activeTab === "visibility" ? "visible" : "hidden"}>
         <div className="mt-6 flex flex-col gap-6 overflow-visible">
