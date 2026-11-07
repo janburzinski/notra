@@ -129,6 +129,7 @@ export interface EmailVerificationFormProps {
   step: AuthFlowVerificationRequired;
   returnTo?: string | null;
   onResult: ApplyAuthResult;
+  onBack?: () => void;
   verifyEmailCode: VerifyEmailCode;
   labels?: Partial<EmailVerificationFormLabels>;
 }
@@ -211,6 +212,7 @@ export interface EmailVerificationFormLabels {
   description: (email?: string) => string;
   codeLabel: string;
   submit: string;
+  back: string;
   errorFallback: string;
 }
 

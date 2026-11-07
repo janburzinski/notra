@@ -22,6 +22,7 @@ export function AuthPendingStep({
       return (
         <EmailVerificationForm
           labels={labels?.emailVerification}
+          onBack={onBack}
           onResult={onResult}
           returnTo={returnTo}
           step={step}

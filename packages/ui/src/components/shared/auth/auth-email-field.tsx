@@ -1,5 +1,6 @@
 "use client";
 
+import { usePrefilledInput } from "../../../hooks/use-prefilled-input";
 import type { AuthEmailFieldProps } from "../../../types/auth";
 import { Input } from "../../ui/input";
 import { Label } from "../../ui/label";
@@ -15,6 +16,8 @@ export function AuthEmailField({
   onBlur,
   onChange,
 }: AuthEmailFieldProps) {
+  const inputRef = usePrefilledInput(value, onChange);
+
   return (
     <div className="grid gap-1.5">
       <Label htmlFor={id}>{label}</Label>
@@ -28,6 +31,7 @@ export function AuthEmailField({
         name={id}
         onBlur={onBlur}
         onChange={(event) => onChange(event.target.value)}
+        ref={inputRef}
         placeholder={placeholder}
         type="email"
         value={value}

@@ -74,6 +74,7 @@ export function useAuthPendingStepLabels(): AuthPendingStepLabels {
           : t("emailVerification.descriptionNoEmail"),
       codeLabel: t("emailVerification.codeLabel"),
       submit: t("emailVerification.submit"),
+      back: t("emailVerification.back"),
       errorFallback: t("emailVerification.errorFallback"),
     },
     mfaChallenge: {

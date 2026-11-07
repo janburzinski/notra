@@ -853,6 +853,7 @@
       "descriptionNoEmail": "We sent a 6-digit code to your email address. Enter it below to continue.",
       "codeLabel": "Verification code",
       "submit": "Verify email",
+      "back": "Use a different email",
       "errorFallback": "Verification failed. Please try again."
     },
     "mfaChallenge": {
@@ -1276,7 +1277,7 @@
       "metaTitle": "Pick your competitors",
       "startTracking": "Start tracking",
       "addBrand": "Add a brand",
-      "yourCompetitors": "Your competitors <muted>({count} of {max})</muted>",
+      "yourCompetitors": "Your competitors <muted>({count})</muted>",
       "suggestedFor": "Suggested for {domain}",
       "addAll": "Add all",
       "otherCompaniesIn": "Other companies in {field}",
@@ -1316,6 +1317,7 @@
         "unavailable": "Slug is already taken",
         "error": "Could not check slug availability"
       },
+      "slugTaken": "This URL is taken. Try a different slug.",
       "validation": {
         "checkField": "Please check this field",
         "websiteInvalid": "Please enter a valid public website URL (e.g., https://example.com)",

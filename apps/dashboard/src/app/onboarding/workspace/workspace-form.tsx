@@ -155,6 +155,10 @@ export function WorkspaceForm({
         onSubmit={(e) => {
           e.preventDefault();
           e.stopPropagation();
+          if (slugStatus === "unavailable") {
+            document.getElementById("slug")?.focus();
+            return;
+          }
           form.handleSubmit();
         }}
       >
@@ -221,7 +225,10 @@ export function WorkspaceForm({
         >
           {(field) => (
             <PrefixedInputField
-              error={fieldError(field.name, field.state.meta.errors)}
+              error={
+                fieldError(field.name, field.state.meta.errors) ||
+                (slugStatus === "unavailable" ? t("slugTaken") : null)
+              }
               id="slug"
               inputClassName="min-w-0 flex-1 py-0 pr-11 pl-3.5"
               inputProps={{

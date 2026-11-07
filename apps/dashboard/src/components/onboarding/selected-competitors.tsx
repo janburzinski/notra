@@ -2,7 +2,6 @@
 
 import { Cancel01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { GEO_MAX_COMPETITORS } from "@notra/geo-core/constants/geo";
 import { useTranslations } from "use-intl";
 
 import { CompetitorBrandLogo } from "@/components/onboarding/competitor-brand-logo";
@@ -20,7 +19,6 @@ export function SelectedCompetitors({
       <p className="text-sm font-medium">
         {t.rich("yourCompetitors", {
           count: competitors.length,
-          max: GEO_MAX_COMPETITORS,
           muted: (chunks) => (
             <span className="text-muted-foreground text-xs font-normal">
               {chunks}

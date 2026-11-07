@@ -271,7 +271,9 @@ export function MentionRateCard({
         eyebrow={tCommon("labels.visibility")}
         variant="table"
       >
-        {ranked.length === 0 || !totals ? (
+        {ranked.length === 0 ||
+        !totals ||
+        (isScanning && engines.length === 0) ? (
           <InstrumentEmpty
             busy={isScanning}
             className="min-h-[20.125rem]"

@@ -6,6 +6,7 @@ import { DEFAULT_EMAIL_VERIFICATION_FORM_LABELS } from "@notra/ui/constants/auth
 
 import { useRef, useState } from "react";
 import type { EmailVerificationFormProps } from "../../../types/auth";
+import { Button } from "../../ui/button";
 import { CtaButton } from "../cta-button";
 import { AuthFormHeader } from "./auth-form-header";
 import { TotpCodeInput } from "./totp-code-input";
@@ -14,6 +15,7 @@ export function EmailVerificationForm({
   step,
   returnTo,
   onResult,
+  onBack,
   verifyEmailCode,
   labels,
 }: EmailVerificationFormProps) {
@@ -69,6 +71,7 @@ export function EmailVerificationForm({
       >
         <TotpCodeInput
           autoFocus
+          className="[&>div:last-child]:text-center [&>label]:sr-only"
           disabled={isPending}
           error={formError}
           id="verification-code"
@@ -89,6 +92,17 @@ export function EmailVerificationForm({
           </CtaButton>
         </div>
       </form>
+      {onBack && (
+        <Button
+          className="mx-auto text-muted-foreground"
+          disabled={isPending}
+          onClick={onBack}
+          type="button"
+          variant="link"
+        >
+          {l.back}
+        </Button>
+      )}
     </div>
   );
 }

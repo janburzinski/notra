@@ -4,6 +4,7 @@ import { ViewIcon, ViewOffSlashIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { DEFAULT_AUTH_PASSWORD_FIELD_LABEL } from "@notra/ui/constants/auth-labels";
 import { useState } from "react";
+import { usePrefilledInput } from "../../../hooks/use-prefilled-input";
 import type { AuthPasswordFieldProps } from "../../../types/auth";
 import { Button } from "../../ui/button";
 import { Input } from "../../ui/input";
@@ -24,6 +25,7 @@ export function AuthPasswordField({
 }: AuthPasswordFieldProps) {
   const [showPassword, setShowPassword] = useState(false);
   const uiLabels = useUiLabels();
+  const inputRef = usePrefilledInput(value, onChange);
 
   return (
     <div className="grid gap-1.5">
@@ -39,6 +41,7 @@ export function AuthPasswordField({
           name={id}
           onBlur={onBlur}
           onChange={(event) => onChange(event.target.value)}
+          ref={inputRef}
           placeholder={placeholder}
           type={showPassword ? "text" : "password"}
           value={value}

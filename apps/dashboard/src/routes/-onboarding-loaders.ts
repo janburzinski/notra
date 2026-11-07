@@ -94,10 +94,16 @@ async function onboardingBrandContext(input: UiRouteInput) {
   if (!organization) {
     throw redirect({ href: "/onboarding/workspace" });
   }
-  const brand = await db.query.brandSettings.findFirst({
-    where: eq(brandSettings.organizationId, organization.id),
-    columns: { websiteUrl: true, companyName: true },
-  });
+  const [brand, workspace] = await Promise.all([
+    db.query.brandSettings.findFirst({
+      where: eq(brandSettings.organizationId, organization.id),
+      columns: { websiteUrl: true, companyName: true },
+    }),
+    db.query.organizations.findFirst({
+      where: eq(organizations.id, organization.id),
+      columns: { name: true },
+    }),
+  ]);
   if (!brand) {
     throw redirect({ href: "/onboarding/workspace" });
   }
@@ -107,7 +113,16 @@ async function onboardingBrandContext(input: UiRouteInput) {
     projectId,
     replay
   );
-  return { organization, projectId, replay, brand, userId };
+  // Brand analysis fills companyName in the background; until then the
+  // workspace name keeps the preview from showing its placeholder brand.
+  const companyName = brand.companyName || workspace?.name || null;
+  return {
+    organization,
+    projectId,
+    replay,
+    brand: { ...brand, companyName },
+    userId,
+  };
 }
 
 export const loadOnboardingLayout = createServerFn({ method: "GET" }).handler(

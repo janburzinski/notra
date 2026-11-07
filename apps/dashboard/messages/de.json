@@ -853,6 +853,7 @@
       "descriptionNoEmail": "Wir haben einen 6-stelligen Code an deine E-Mail-Adresse gesendet. Gib ihn unten ein, um fortzufahren.",
       "codeLabel": "Bestätigungscode",
       "submit": "E-Mail bestätigen",
+      "back": "Andere E-Mail-Adresse verwenden",
       "errorFallback": "Bestätigung fehlgeschlagen. Bitte versuch es nochmal."
     },
     "mfaChallenge": {
@@ -1276,7 +1277,7 @@
       "metaTitle": "Wettbewerber auswählen",
       "startTracking": "Tracking starten",
       "addBrand": "Marke hinzufügen",
-      "yourCompetitors": "Deine Wettbewerber <muted>({count} von {max})</muted>",
+      "yourCompetitors": "Deine Wettbewerber <muted>({count})</muted>",
       "suggestedFor": "Vorschläge für {domain}",
       "addAll": "Alle hinzufügen",
       "otherCompaniesIn": "Weitere Unternehmen aus {field}",
@@ -1316,6 +1317,7 @@
         "unavailable": "Slug ist bereits vergeben",
         "error": "Slug-Verfügbarkeit konnte nicht geprüft werden"
       },
+      "slugTaken": "Diese URL ist vergeben. Versuch einen anderen Slug.",
       "validation": {
         "checkField": "Bitte prüfe dieses Feld",
         "websiteInvalid": "Bitte gib eine gültige öffentliche Website-URL ein (z. B. https://example.com)",

@@ -20,6 +20,7 @@ export const DEFAULT_EMAIL_VERIFICATION_FORM_LABELS: EmailVerificationFormLabels
       `We sent a 6-digit code to ${email || "your email address"}. Enter it below to continue.`,
     codeLabel: DEFAULT_TOTP_CODE_INPUT_LABEL,
     submit: "Verify email",
+    back: "Use a different email",
     errorFallback: "Verification failed. Please try again.",
   };
 
