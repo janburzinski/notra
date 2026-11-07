@@ -413,6 +413,28 @@ export async function assertContentFeatures(
   checks.push(
     "author-hero slot replaces the profile header with author data, with no back link; Bluesky, Mastodon, Threads and Instagram links reach the slot and JSON-LD"
   );
+  const scriptHrefs = () =>
+    page.evaluate(
+      () =>
+        [...document.querySelectorAll<HTMLAnchorElement>("a[href]")].filter(
+          // oxlint-disable-next-line no-script-url -- Looks for the rejected fixture link.
+          (link) => link.protocol === "javascript:"
+        ).length
+    );
+  assert.equal(await scriptHrefs(), 0, "/blog/author/jan");
+  const bylinePost = await page.goto(`${origin}/blog/hello-world`, {
+    waitUntil: "domcontentloaded",
+  });
+  await waitForResources();
+  assert.equal(bylinePost?.status(), 200);
+  assert.ok(
+    (await page.locator("body").innerText()).includes("Jan Burzinski"),
+    "the post credits Jan"
+  );
+  assert.equal(await scriptHrefs(), 0, "/blog/hello-world");
+  checks.push(
+    "an author's javascript: website from blog.json warns at build time and is never rendered as a link"
+  );
 
   await page.goto(`${origin}/blog/components`, {
     waitUntil: "domcontentloaded",

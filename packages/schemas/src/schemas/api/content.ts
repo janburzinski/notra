@@ -375,6 +375,21 @@ const postCoverImageResponseSchema = z
     description: "Cover image shown on post cards and social previews.",
   });
 
+const authorProfileLinksResponseSchema = z.object({
+  url: z.string().nullable().openapi({
+    description: "Author's website.",
+    example: "https://janedoe.dev",
+  }),
+  x: z.string().nullable().openapi({ example: "https://x.com/janedoe" }),
+  linkedin: z.string().nullable(),
+  github: z.string().nullable(),
+  youtube: z.string().nullable(),
+  bluesky: z.string().nullable(),
+  mastodon: z.string().nullable(),
+  threads: z.string().nullable(),
+  instagram: z.string().nullable(),
+});
+
 const postAuthorSummarySchema = z.object({
   id: z.string().openapi({ example: "auth_8f2kq1" }),
   slug: z.string().openapi({
@@ -388,6 +403,7 @@ const postAuthorSummarySchema = z.object({
     .string()
     .nullable()
     .openapi({ example: "https://cdn.example.com/avatars/jane.png" }),
+  ...authorProfileLinksResponseSchema.shape,
 });
 
 const postMetadataResponseSchema = z
@@ -598,10 +614,7 @@ const contentAuthorResponseSchema = z.object({
   title: z.string().nullable().openapi({ example: "Head of Product" }),
   bio: z.string().nullable(),
   avatarUrl: z.string().nullable(),
-  url: z.string().nullable(),
-  x: z.string().nullable(),
-  linkedin: z.string().nullable(),
-  github: z.string().nullable(),
+  ...authorProfileLinksResponseSchema.shape,
 });
 
 export const listPostAuthorsResponseSchema = z.object({

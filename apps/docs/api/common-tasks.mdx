@@ -85,6 +85,16 @@ type Post = {
       name: string;
       title: string | null;
       avatarUrl: string | null;
+      /** Profile links: full http(s) URLs, or null when not set. */
+      url: string | null;
+      x: string | null;
+      linkedin: string | null;
+      github: string | null;
+      youtube: string | null;
+      bluesky: string | null;
+      mastodon: string | null;
+      threads: string | null;
+      instagram: string | null;
     }>;
     featured: boolean;
     noindex: boolean;
@@ -193,7 +203,12 @@ curl "https://api.usenotra.com/v1/posts/authors" \
       "url": null,
       "x": "https://x.com/janedoe",
       "linkedin": null,
-      "github": null
+      "github": null,
+      "youtube": null,
+      "bluesky": "https://bsky.app/profile/janedoe.com",
+      "mastodon": null,
+      "threads": null,
+      "instagram": null
     }
   ]
 }
@@ -234,7 +249,16 @@ The response contains the post with the stored metadata, with each author ID res
       "slug": "jane-doe",
       "name": "Jane Doe",
       "title": "Head of Product",
-      "avatarUrl": "https://cdn.example.com/avatars/jane.png"
+      "avatarUrl": "https://cdn.example.com/avatars/jane.png",
+      "url": null,
+      "x": "https://x.com/janedoe",
+      "linkedin": null,
+      "github": null,
+      "youtube": null,
+      "bluesky": "https://bsky.app/profile/janedoe.com",
+      "mastodon": null,
+      "threads": null,
+      "instagram": null
     }
   ],
   "featured": false,

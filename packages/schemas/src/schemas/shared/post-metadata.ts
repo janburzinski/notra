@@ -97,6 +97,9 @@ export const contentAuthorFieldsSchema = z.object({
   github: optionalLinkSchema,
   bluesky: optionalLinkSchema,
   mastodon: optionalLinkSchema,
+  youtube: optionalLinkSchema,
+  threads: optionalLinkSchema,
+  instagram: optionalLinkSchema,
 });
 
 const contentAuthorSchema = z.object({
@@ -112,6 +115,9 @@ const contentAuthorSchema = z.object({
   github: z.string().nullable(),
   bluesky: z.string().nullable(),
   mastodon: z.string().nullable(),
+  youtube: z.string().nullable(),
+  threads: z.string().nullable(),
+  instagram: z.string().nullable(),
   userId: z.string().nullable(),
 });
 

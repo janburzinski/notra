@@ -167,7 +167,7 @@ See [Layouts](/sites/customize/layouts#blog).
 | `title` | string, up to 80 characters | Role, like "Engineer" |
 | `avatar` | `/path` or `https://` URL | Profile picture |
 | `bio` | string, up to 300 characters | Short bio on the author page |
-| `url`, `x`, `linkedin`, `github`, `youtube` | URL | Profile links |
+| `url`, `x`, `linkedin`, `github`, `youtube`, `bluesky`, `mastodon`, `threads`, `instagram` | `http://` or `https://` URL | Profile links. Another scheme fails the build for the last four; for the others Notra leaves the link out with an [`author_link_scheme`](/sites/reference/limits#common-errors) warning |
 
 ## SEO
 

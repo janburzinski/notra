@@ -18,6 +18,17 @@ const client = new PGlite();
 const db = drizzle(client, { schema: { posts, contentAuthors } });
 const ORG = "org_a";
 const OTHER_ORG = "org_b";
+const NO_LINKS = {
+  url: null,
+  x: null,
+  linkedin: null,
+  github: null,
+  youtube: null,
+  bluesky: null,
+  mastodon: null,
+  threads: null,
+  instagram: null,
+};
 
 function run<A, E>(program: Effect.Effect<A, E>) {
   return Effect.runPromise(Effect.result(program));
@@ -41,6 +52,11 @@ beforeAll(async () => {
       x text,
       linkedin text,
       github text,
+      youtube text,
+      bluesky text,
+      mastodon text,
+      threads text,
+      instagram text,
       user_id text,
       created_at timestamp not null default now(),
       updated_at timestamp not null default now()
@@ -120,6 +136,7 @@ describe("post metadata responses", () => {
           name: "Max Mustermann",
           title: null,
           avatarUrl: null,
+          ...NO_LINKS,
         },
         {
           id: "auth_jane",
@@ -127,6 +144,7 @@ describe("post metadata responses", () => {
           name: "Jane Doe",
           title: "Head of Product",
           avatarUrl: null,
+          ...NO_LINKS,
         },
       ],
       featured: false,

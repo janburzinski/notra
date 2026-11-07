@@ -75,8 +75,11 @@ async function compileWith(
     // The only built-in script loaded on demand; content.ts checks it renders under the CSP.
     config.blog = { ...config.blog, hero: { style: "dither" } };
     // Profile links content.ts expects in the author-hero slot and JSON-LD.
+    // The javascript: website must only warn and never reach a page.
     config.authors.jan = {
       ...config.authors.jan,
+      // oxlint-disable-next-line no-script-url -- Unsafe scheme is a rejection fixture.
+      url: "javascript:alert(document.domain)",
       bluesky: "https://bsky.app/profile/janburzinski.bsky.social",
       mastodon: "https://hachyderm.io/@janburzinski",
       threads: "https://www.threads.net/@janburzinski",
@@ -122,6 +125,16 @@ async function compileWith(
       ),
       [],
       "the fixture's internal links and images all exist"
+    );
+    const schemeWarnings = result.diagnostics.filter(
+      (item) => item.code === "author_link_scheme"
+    );
+    assert.equal(schemeWarnings.length, 1, JSON.stringify(schemeWarnings));
+    assert.equal(schemeWarnings[0]?.severity, "warning");
+    assert.equal(schemeWarnings[0]?.file, "blog.json");
+    assert.match(
+      schemeWarnings[0]?.message ?? "",
+      /^authors\.jan\.url: .*Use an https:\/\/ URL\.$/
     );
     const files = [];
     for (const file of await listFiles(outDir)) {

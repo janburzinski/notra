@@ -9,6 +9,7 @@ import type {
 import type { Redis } from "@upstash/redis";
 import type { z } from "zod";
 
+import type { POST_AUTHOR_LINK_COLUMNS } from "../constants/post-authors";
 import type {
   PostConcurrentModificationError,
   PostGenerationJobNotFoundError,
@@ -48,25 +49,18 @@ export type PostRow = Pick<
   | "updatedAt"
 >;
 
+type PostAuthorLinkKey = keyof typeof POST_AUTHOR_LINK_COLUMNS;
+
 export type PostAuthorSummary = Pick<
   typeof contentAuthors.$inferSelect,
-  "id" | "slug" | "name" | "title" | "avatarUrl"
+  "id" | "slug" | "name" | "title" | "avatarUrl" | PostAuthorLinkKey
 >;
 
 export type PostAuthorsById = ReadonlyMap<string, PostAuthorSummary>;
 
 type ContentAuthorRow = Pick<
   typeof contentAuthors.$inferSelect,
-  | "id"
-  | "slug"
-  | "name"
-  | "title"
-  | "bio"
-  | "avatarUrl"
-  | "url"
-  | "x"
-  | "linkedin"
-  | "github"
+  "id" | "slug" | "name" | "title" | "bio" | "avatarUrl" | PostAuthorLinkKey
 >;
 
 export type PostDomainError =

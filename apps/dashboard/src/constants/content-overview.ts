@@ -26,8 +26,11 @@ export const CONTENT_AUTHOR_LINK_FIELDS = [
   "x",
   "linkedin",
   "github",
+  "youtube",
   "bluesky",
   "mastodon",
+  "threads",
+  "instagram",
 ] as const;
 
 export const CONTENT_AUTHOR_SLUG_FALLBACK = "author";

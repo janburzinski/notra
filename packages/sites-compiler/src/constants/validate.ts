@@ -7,3 +7,12 @@ export const COLLAPSED_WARNING_CODES: ReadonlySet<string> = new Set([
   "frontmatter_unknown_key",
 ]);
 export const COLLAPSED_WARNING_EXAMPLES = 3;
+
+/** Author links blog.json still accepts with any scheme; newer ones must be http(s). */
+export const ANY_SCHEME_AUTHOR_LINK_FIELDS = [
+  "url",
+  "x",
+  "linkedin",
+  "github",
+  "youtube",
+] as const;

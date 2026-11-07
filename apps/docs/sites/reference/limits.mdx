@@ -77,6 +77,7 @@ The most common warnings are:
 | `icon_unknown` | An icon in `blog.json` isn't one of the [bundled icons](/sites/reference/blog-json#icons), and Notra skips it |
 | `navbar_primary_button` | `navbar.primary` has `type: "button"`, and Notra reads it as `navbar.cta` |
 | `featured_unknown` | A path in `blog.featured` doesn't match a post |
+| `author_link_scheme` | An author's `url`, `x`, `linkedin`, `github` or `youtube` in `blog.json` isn't an `http://` or `https://` URL, like `javascript:` or `mailto:`, and Notra leaves the link off the site. Use an `https://` URL |
 | `link_broken` | A link in a post goes to a path in your blog or changelog, like `/blog/old-post` or `./old-post`, that has no page, file or [redirect](/sites/reference/blog-json#redirects). The message suggests the closest page. Notra checks the page, not the `#section`, and skips paths outside your sections, like `/pricing` |
 | `image_missing` | An image in a post, or the post's `image`, isn't in `public/`. The message suggests the closest file name |
 | `no_entries` | There are no posts or changelog entries yet |

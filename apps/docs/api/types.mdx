@@ -111,6 +111,16 @@ export type PostAuthor = {
   name: string;
   title: string | null;
   avatarUrl: string | null;
+  /** Profile links: full http(s) URLs, or null when not set. */
+  url: string | null;
+  x: string | null;
+  linkedin: string | null;
+  github: string | null;
+  youtube: string | null;
+  bluesky: string | null;
+  mastodon: string | null;
+  threads: string | null;
+  instagram: string | null;
 };
 
 /** Site metadata of a blog post or changelog. */
@@ -194,10 +204,6 @@ export type NotraPostUpdateRequest = {
 
 export type ContentAuthor = PostAuthor & {
   bio: string | null;
-  url: string | null;
-  x: string | null;
-  linkedin: string | null;
-  github: string | null;
 };
 
 export type NotraPostAuthorsResponse = {
@@ -268,6 +274,15 @@ export const PostAuthorSchema = z.object({
   name: z.string(),
   title: z.string().nullable(),
   avatarUrl: z.string().nullable(),
+  url: z.string().nullable(),
+  x: z.string().nullable(),
+  linkedin: z.string().nullable(),
+  github: z.string().nullable(),
+  youtube: z.string().nullable(),
+  bluesky: z.string().nullable(),
+  mastodon: z.string().nullable(),
+  threads: z.string().nullable(),
+  instagram: z.string().nullable(),
 });
 
 export const PostMetadataSchema = z.object({

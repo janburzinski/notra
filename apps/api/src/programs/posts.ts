@@ -32,6 +32,7 @@ import { and, asc, count, eq, inArray, sql } from "drizzle-orm";
 import { Effect } from "effect";
 import { nanoid } from "nanoid";
 
+import { POST_AUTHOR_LINK_COLUMNS } from "../constants/post-authors";
 import {
   PostConcurrentModificationError,
   PostGenerationJobNotFoundError,
@@ -112,6 +113,7 @@ function loadPostAuthors(
         name: contentAuthors.name,
         title: contentAuthors.title,
         avatarUrl: contentAuthors.avatarUrl,
+        ...POST_AUTHOR_LINK_COLUMNS,
       })
       .from(contentAuthors)
       .where(contentAuthorsInOrganization(input.organizationId, authorIds))
@@ -311,10 +313,7 @@ export const listPostAuthors = Effect.fn("posts.listAuthors")(function* (
         title: contentAuthors.title,
         bio: contentAuthors.bio,
         avatarUrl: contentAuthors.avatarUrl,
-        url: contentAuthors.url,
-        x: contentAuthors.x,
-        linkedin: contentAuthors.linkedin,
-        github: contentAuthors.github,
+        ...POST_AUTHOR_LINK_COLUMNS,
       })
       .from(contentAuthors)
       .where(eq(contentAuthors.organizationId, input.organizationId))

@@ -5,7 +5,9 @@ import type { SiteDiagnostic } from "@notra/sites-core/types/build";
 import type { SiteConfig } from "@notra/sites-core/types/site-config";
 import { redirectPatternIssues } from "@notra/sites-core/utils/redirect-patterns";
 import { tagSlug } from "@notra/sites-core/utils/tags";
+import { isWebLink } from "@notra/sites-core/utils/web-links";
 
+import { ANY_SCHEME_AUTHOR_LINK_FIELDS } from "../constants/validate";
 import type { SiteEntry } from "../types/entries";
 import type { IconSetting } from "../types/validate";
 import { closestName } from "./closest-name";
@@ -147,5 +149,23 @@ export function redirectPatternWarnings(config: SiteConfig): SiteDiagnostic[] {
         code: "redirect_placeholder",
         message: `redirects.${index}.${issue.path}: ${issue.message}`,
       }))
+  );
+}
+
+export function authorLinkSchemeWarnings(config: SiteConfig): SiteDiagnostic[] {
+  return Object.entries(config.authors).flatMap(([id, author]) =>
+    ANY_SCHEME_AUTHOR_LINK_FIELDS.flatMap((field) => {
+      const value = author[field];
+      return value === undefined || isWebLink(value)
+        ? []
+        : [
+            {
+              severity: "warning" as const,
+              file: SITE_CONFIG_FILENAME,
+              code: "author_link_scheme",
+              message: `authors.${id}.${field}: only http(s) links are shown, so this link is left off the site. Use an https:// URL.`,
+            },
+          ];
+    })
   );
 }

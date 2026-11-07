@@ -199,6 +199,16 @@ export const MUTATIONS: Mutation[] = [
       "author-hero slot replaces the profile header with author data, with no back link; Bluesky, Mastodon, Threads and Instagram links reach the slot and JSON-LD",
   },
   {
+    id: "author-link-scheme",
+    bug: "An author's javascript: link from blog.json is rendered as an href",
+    file: "apps/sites-builder/src/utils/web-link.ts",
+    find: '  return protocol === "http:" || protocol === "https:" ? value : undefined;',
+    replace: "  return value;",
+    suites: ["browser"],
+    caughtBy:
+      "author-hero slot replaces the profile header with author data, with no back link; Bluesky, Mastodon, Threads and Instagram links reach the slot and JSON-LD",
+  },
+  {
     id: "live-noindex",
     bug: "Live pages render a noindex robots tag (and previews an indexable one)",
     file: "apps/sites-builder/src/layouts/Base.astro",

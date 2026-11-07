@@ -7,6 +7,7 @@ import type {
 } from "../types/authors";
 import type { BlogEntry, ChangelogEntry } from "../types/entries";
 import { mergeAuthorFields } from "../utils/merge-author-fields";
+import { webLink } from "../utils/web-link";
 import { absoluteUrl, assetUrl, config, href } from "./params";
 
 function configAuthor(id: string): AuthorFields | undefined {
@@ -18,16 +19,18 @@ function authorHref(id: string): string {
 }
 
 function resolved(id: string | null, author: AuthorFields): ResolvedAuthor {
+  // blog.json takes any scheme for older link fields; the author_link_scheme warning explains the dropped ones.
+  const website = webLink(author.url);
   const profiles = AUTHOR_PROFILE_FIELDS.flatMap((kind) => {
-    const url = author[kind];
+    const url = webLink(author[kind]);
     return url ? [{ kind, url }] : [];
   });
   const links = [
-    ...(author.url ? [author.url] : []),
+    ...(website ? [website] : []),
     ...profiles.map((profile) => profile.url),
   ];
-  const socials: AuthorSocial[] = author.url
-    ? [...profiles, { kind: "website", url: author.url }]
+  const socials: AuthorSocial[] = website
+    ? [...profiles, { kind: "website", url: website }]
     : profiles;
   return {
     id,
@@ -38,7 +41,7 @@ function resolved(id: string | null, author: AuthorFields): ResolvedAuthor {
     href: id ? authorHref(id) : undefined,
     links,
     socials,
-    url: author.url ?? links[0],
+    url: website ?? links[0],
   };
 }
 

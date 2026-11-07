@@ -40,6 +40,7 @@ import type {
   SubstitutedSources,
 } from "./types/validate";
 import {
+  authorLinkSchemeWarnings,
   categoryWarnings,
   featuredSlugWarnings,
   redirectPatternWarnings,
@@ -219,6 +220,7 @@ function parseSiteConfig(raw: string | null | undefined): ParsedSiteConfig {
   }
   diagnostics.push(...unknownIconWarnings(parsed.data, raw));
   diagnostics.push(...redirectPatternWarnings(parsed.data));
+  diagnostics.push(...authorLinkSchemeWarnings(parsed.data));
   const settings = substituteSettingVariables(parsed.data);
   diagnostics.push(...settings.diagnostics);
   return {

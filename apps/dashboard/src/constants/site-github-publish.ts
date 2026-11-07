@@ -33,8 +33,11 @@ export const SITE_ENTRY_AUTHOR_FIELDS = [
   "x",
   "linkedin",
   "github",
+  "youtube",
   "bluesky",
   "mastodon",
+  "threads",
+  "instagram",
 ] as const;
 
 export const MARKDOWN_IMAGE_DESTINATION = /^!\[[^\]]*\]\((\S+?)\)$/;

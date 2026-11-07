@@ -22,8 +22,11 @@ export function serializeContentAuthor(
     x: row.x,
     linkedin: row.linkedin,
     github: row.github,
+    youtube: row.youtube,
     bluesky: row.bluesky,
     mastodon: row.mastodon,
+    threads: row.threads,
+    instagram: row.instagram,
     userId: row.userId,
   };
 }

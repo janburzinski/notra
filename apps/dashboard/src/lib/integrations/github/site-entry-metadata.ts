@@ -106,8 +106,11 @@ export async function prepareSiteEntryMetadata(
       x: row.x,
       linkedin: row.linkedin,
       github: row.github,
+      youtube: row.youtube,
       bluesky: row.bluesky,
       mastodon: row.mastodon,
+      threads: row.threads,
+      instagram: row.instagram,
     });
   }
 
