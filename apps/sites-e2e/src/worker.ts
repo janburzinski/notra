@@ -318,10 +318,12 @@ try {
         url.port === String(port)) ||
       (url.hostname === CONSENT_TLS_HOST && url.port === String(tls.port)),
   });
+  // Real vendor scripts come from their CDNs uncached (routing disables the
+  // HTTP cache), and the deferred ones hold back domcontentloaded and load.
+  const vendorBudgetMs = vendorScripts === "live" ? 20_000 : 10_000;
   // Vendors may batch; wait until every provider reported this page.
   const waitForProviders = async (from: number, pageUrl: string) => {
-    const deadline =
-      performance.now() + (vendorScripts === "live" ? 20_000 : 10_000);
+    const deadline = performance.now() + vendorBudgetMs;
     for (;;) {
       const missing = providersReported(
         network.events.slice(from),
@@ -342,6 +344,7 @@ try {
   const page = browser.pages()[0] ?? (await browser.newPage());
   activePage = page;
   page.setDefaultTimeout(10_000);
+  page.setDefaultNavigationTimeout(vendorBudgetMs);
   const pageErrors: string[] = [];
   diagnostics.pageErrors = pageErrors;
   page.on("pageerror", (error) => pageErrors.push(String(error)));

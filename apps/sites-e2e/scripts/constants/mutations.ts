@@ -245,6 +245,16 @@ export const MUTATIONS: Mutation[] = [
     caughtBy: "consent banner over HTTPS",
   },
   {
+    id: "consent-engagement",
+    bug: "Time on page is dropped on consent-banner sites even after the visitor grants measurement",
+    file: "apps/sites/src/routes/analytics-endpoints.ts",
+    find: '  if (event.kind === "engagement") {',
+    replace:
+      '  if (event.kind === "engagement") {\n    if (tag?.consent) return Option.some(analyticsAccepted());',
+    suites: ["browser"],
+    caughtBy: "consent banner: time on page is measured after the grant",
+  },
+  {
     id: "password-rate-limit",
     bug: "Preview passwords can be guessed without a rate limit",
     file: "apps/sites/src/preview-auth.ts",

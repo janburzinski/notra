@@ -120,13 +120,39 @@ export async function assertConsentVisits(options: {
     (await context.cookies(origin)).some((cookie) => cookie.name === "c15t"),
     "c15t stores the choice in a cookie"
   );
+  // c15t marks the script it activates before inserting it, so the marker
+  // alone does not mean insights.js ran and listens for pagehide yet; a
+  // script's load event fires once it has run.
+  const scriptLoads = await page.addInitScript(() => {
+    document.addEventListener(
+      "load",
+      (event) => {
+        if (event.target instanceof HTMLScriptElement) {
+          event.target.dataset.e2eLoaded = "";
+        }
+      },
+      true
+    );
+  });
   const second = await page.goto(next, { referer: landing });
   assert.equal(second?.status(), 200);
   assert.ok(!((await second?.text()) ?? "").includes(" data-view "));
-  await page.waitForSelector(`${INSIGHTS_SCRIPT}[data-c15t-activated="true"]`, {
-    state: "attached",
-  });
+  await page.waitForSelector(
+    `${INSIGHTS_SCRIPT}[data-c15t-activated="true"][data-e2e-loaded]`,
+    { state: "attached" }
+  );
+  await scriptLoads.dispose();
+  // The landing page's own beacon is sent while the browser leaves it and
+  // may be aborted, so the granted page that is still open is measured.
+  const nextEngagement = page.waitForRequest(
+    (request) =>
+      request.url().endsWith(`/${SITE_ANALYTICS_EVENT_FILE}`) &&
+      request.method() === "POST" &&
+      request.postData()?.includes(`"p":"${new URL(next).pathname}","ms":`) ===
+        true
+  );
   await page.evaluate(() => window.dispatchEvent(new Event("pagehide")));
+  assert.equal((await (await nextEngagement).response())?.status(), 204);
   await settle();
   assert.deepEqual(views(from), [
     [landing, false, SEARCH_REFERRER],
@@ -134,17 +160,13 @@ export async function assertConsentVisits(options: {
     [next, true, landing],
   ]);
   assert.equal(viewBeacons.length, 1, "the granted page is not reported twice");
-  // A beacon sent while the browser leaves a page can arrive after any quiet
-  // period, so wait for one from a granted page instead.
-  for (
-    let waited = 0;
-    waited < 15_000 && measured(from, [landing, next]).length === 0;
-    waited += 100
-  ) {
+  // The Worker reports it to ingest after answering the beacon.
+  const deadline = performance.now() + 10_000;
+  while (measured(from, [next]).length === 0 && performance.now() < deadline) {
     await new Promise((resolveWait) => setTimeout(resolveWait, 100));
   }
   assert.ok(
-    measured(from, [landing, next]).length > 0,
+    measured(from, [next]).length > 0,
     "time on page is measured after the grant"
   );
 
