@@ -34,7 +34,8 @@ export interface PublicAiTrafficProjectRow {
 /**
  * `geo_traffic_trends_detail` row. `hours`: `key` is "weekday:hour" (Mon = 1,
  * UTC) and `sites` the kind's sites. `countries`: `key` is the ISO country,
- * with recent and previous shares and sites. `llms_txt`: `key` is the crawler,
+ * with recent and previous shares and sites; `subset_sites` is every site
+ * with a known country in the recent window. `llms_txt`: `key` is the crawler,
  * `sites` the sites it visited and `subset_sites` those where it fetched
  * /llms.txt.
  */

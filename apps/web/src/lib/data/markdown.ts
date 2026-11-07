@@ -44,11 +44,10 @@ function buildDataMarkdownFromSnapshot(
   }
   const recent = `${formatDataDay(snapshot.window.recentFrom)} – ${formatDataDay(snapshot.day)}`;
   const averageDays = snapshot.window.averageDays ?? 1;
-  const chartMinSites = snapshot.chartMinSites ?? snapshot.minSites;
   const chartDayNote =
     averageDays > 1
-      ? `each chart day averages the ${averageDays} days ending on it and appears only when ${chartMinSites} sites had AI traffic in those days.`
-      : `a chart day only when ${chartMinSites} sites had AI traffic.`;
+      ? `each chart day averages the ${averageDays} days ending on it and appears only when ${snapshot.minSites} sites had AI traffic in those days.`
+      : `a chart day only when ${snapshot.minSites} sites had AI traffic.`;
   const sections = [
     markdownSection("Summary", [
       `- Crawls per AI referral: ${formatRatio(snapshot.summary.crawlsPerReferral)}`,

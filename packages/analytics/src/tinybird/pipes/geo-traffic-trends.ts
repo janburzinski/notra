@@ -444,7 +444,8 @@ const RECENT_SQL =
  * visitors are (country), and which crawlers fetch /llms.txt. Hours and
  * countries average each site's own distribution, so every site weighs the
  * same and no large site sets the pattern; `sites` lets the caller apply its
- * floor. Constant labels never reuse a column name, which would shadow it.
+ * floor, and on country rows `subset_sites` counts every site with a known
+ * visitor country in the recent window. Constant labels never reuse a column name, which would shadow it.
  */
 export const geoTrafficTrendsDetail = defineEndpoint(
   "geo_traffic_trends_detail",
@@ -525,7 +526,7 @@ export const geoTrafficTrendsDetail = defineEndpoint(
           country,
           count() AS visits
         FROM scoped_events
-        WHERE visitor_type = 'ai_referral' AND country != ''
+        WHERE visitor_type = 'ai_referral' AND match(country, '^[A-Z]{2}$')
         GROUP BY period, project_id, country
       `,
       }),
@@ -550,7 +551,7 @@ export const geoTrafficTrendsDetail = defineEndpoint(
           sumIf(site_share, period = 1) / greatest(anyIf(period_sites, period = 1), 1) AS previous_share,
           toUInt64(uniqExactIf(project_id, period = 0)) AS sites,
           toUInt64(uniqExactIf(project_id, period = 1)) AS previous_sites,
-          toUInt64(0) AS subset_sites
+          toUInt64(anyIf(period_sites, period = 0)) AS subset_sites
         FROM country_norm
         GROUP BY country
       `,

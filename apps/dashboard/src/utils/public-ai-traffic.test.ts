@@ -135,14 +135,18 @@ test("charts visits per site and blanks days with too few sites", () => {
   expect(snapshot.crawlerVolume.series.map((entry) => entry.label)).toEqual([
     "GPTBot",
     "ClaudeBot",
+    "Other",
   ]);
+  expect(days.get("2026-10-31")?.total).toBeNull();
   expect(days.get("2026-10-31")?.s1).toBeNull();
-  // Other holds only the private bot, seen on one site, so it is dropped,
-  // and that day publishes its total alone: (600 + 200 + 200) / 12 sites.
-  expect(days.get("2026-11-01")).not.toHaveProperty("other");
-  expect(days.get("2026-11-01")?.total).toBe(83.33);
-  expect(days.get("2026-11-01")?.s1).toBeNull();
-  expect(days.get("2026-11-01")?.s2).toBeNull();
+  // Every group is spread over all 12 sites; the private bot, seen on one
+  // site, only adds to "Other": (600 + 200 + 200) / 12 sites in total.
+  expect(days.get("2026-11-01")).toEqual({
+    total: 83.33,
+    s1: 50,
+    s2: 16.67,
+    other: 16.67,
+  });
 });
 
 test("hides purposes fed by too few sites", () => {
@@ -253,14 +257,13 @@ test("caps one large site so it can't dominate a share", () => {
   ).toBeGreaterThan(0.5);
 });
 
-test("drops Other from a chart when it is withheld on some days", () => {
+test("keeps a tail bot on two sites inside Other on every day", () => {
   const snapshot = buildPublicAiTrafficSnapshot({
     today: TODAY,
     generatedAt: "2026-11-02T00:20:00.000Z",
     daily: [
       dailyRow("2026-11-01", "", "", "", 1000),
       dailyRow("2026-11-01", "crawler", "GPTBot", "training-crawler", 600),
-      // A tail bot on two sites lands in "Other", below the floor.
       dailyRow("2026-11-01", "crawler", "TailBot", "search-index", 40, 2),
       dailyRow("2026-10-31", "", "", "", 1000),
       dailyRow("2026-10-31", "crawler", "GPTBot", "training-crawler", 600),
@@ -276,19 +279,15 @@ test("drops Other from a chart when it is withheld on some days", () => {
   });
   const chart = snapshot.crawlerVolume;
 
-  expect(chart.series.map((entry) => entry.label)).toEqual(["GPTBot"]);
-  for (const entry of chart.days) {
-    expect(Object.keys(entry.values)).toEqual(["total", "s1"]);
+  expect(chart.series.map((entry) => entry.label)).toEqual(["GPTBot", "Other"]);
+  expect(JSON.stringify(snapshot)).not.toContain("TailBot");
+  for (const day of ["2026-11-01", "2026-10-31"]) {
+    expect(chart.days.find((entry) => entry.day === day)?.values).toEqual({
+      total: 53.33,
+      s1: 50,
+      other: 3.33,
+    });
   }
-  // Where the tail bot is withheld, the day shows its total only, so the
-  // tail can't be recovered as total minus GPTBot.
-  const withheld = chart.days.find((entry) => entry.day === "2026-11-01");
-  expect(withheld?.values.total).toBe(53.33);
-  expect(withheld?.values.s1).toBeNull();
-  // Where every group clears the floor, the breakdown stays: 600 / 12 sites.
-  const complete = chart.days.find((entry) => entry.day === "2026-10-31");
-  expect(complete?.values.total).toBe(53.33);
-  expect(complete?.values.s1).toBe(50);
 });
 
 test("withholds last week's figures when too few sites fed them", () => {
@@ -403,7 +402,7 @@ function detailRow(
   };
 }
 
-test("publishes hours, countries and llms.txt only above the site floor", () => {
+test("publishes hours, countries and llms.txt once enough sites stand behind them", () => {
   const snapshot = buildPublicAiTrafficSnapshot({
     today: TODAY,
     generatedAt: "2026-11-02T00:20:00.000Z",
@@ -416,27 +415,36 @@ test("publishes hours, countries and llms.txt only above the site floor", () => 
       }),
     ],
     detail: [
+      // Seen only last window; listed first, it must not hide the rest.
+      detailRow("countries", "ai_referral", "FR", {
+        previous_share: 1,
+        previous_sites: 4,
+      }),
       detailRow("hours", "crawler", "1:4", { share: 0.75, sites: 12 }),
       detailRow("hours", "crawler", "7:23", { share: 0.25, sites: 12 }),
-      // Referrals from three sites only: their grid stays out.
-      detailRow("hours", "ai_referral", "3:15", { share: 1, sites: 3 }),
+      // Referrals from two sites only: their grid stays out.
+      detailRow("hours", "ai_referral", "3:15", { share: 1, sites: 2 }),
       detailRow("countries", "ai_referral", "US", {
         share: 0.6,
         sites: 8,
         previous_share: 0.5,
         previous_sites: 6,
+        subset_sites: 10,
       }),
-      detailRow("countries", "ai_referral", "DE", { share: 0.4, sites: 2 }),
+      // One site's visitors, averaged in as one vote of ten.
+      detailRow("countries", "ai_referral", "DE", {
+        share: 0.1,
+        sites: 1,
+        subset_sites: 10,
+      }),
       detailRow("llms_txt", "crawler", "GPTBot", {
         sites: 12,
         subset_sites: 6,
       }),
-      // Two sites fetched it: publishing that would point at them.
       detailRow("llms_txt", "crawler", "ClaudeBot", {
         sites: 6,
         subset_sites: 2,
       }),
-      // Five of six did: the one that didn't would stand out.
       detailRow("llms_txt", "crawler", "OAI-SearchBot", {
         sites: 6,
         subset_sites: 5,
@@ -451,11 +459,29 @@ test("publishes hours, countries and llms.txt only above the site floor", () => 
   expect(snapshot.hours?.referrals).toBeNull();
   expect(snapshot.countries).toEqual([
     { country: "US", share: 0.6, change: 0.2 },
+    { country: "DE", share: 0.1, change: null },
   ]);
   expect(crawler("GPTBot")?.llmsTxtReach).toBe(0.5);
-  expect(crawler("ClaudeBot")?.llmsTxtReach).toBeNull();
-  expect(crawler("OAI-SearchBot")).toBeDefined();
-  expect(crawler("OAI-SearchBot")?.llmsTxtReach).toBeNull();
+  expect(crawler("ClaudeBot")?.llmsTxtReach).toBe(0.3333);
+  expect(crawler("OAI-SearchBot")?.llmsTxtReach).toBe(0.8333);
+});
+
+test("leaves countries out when fewer than three sites had referrals", () => {
+  const snapshot = buildPublicAiTrafficSnapshot({
+    today: TODAY,
+    generatedAt: "2026-11-02T00:20:00.000Z",
+    daily,
+    projects,
+    detail: [
+      detailRow("countries", "ai_referral", "US", {
+        share: 1,
+        sites: 2,
+        subset_sites: 2,
+      }),
+    ],
+  });
+
+  expect(snapshot.countries).toEqual([]);
 });
 
 function rollingRow(
@@ -473,7 +499,7 @@ test("charts a rolling week from the kind's own site count and site-days", () =>
     projects,
     rolling: [
       rollingRow(dailyRow("2026-11-01", "", "", "", 600, 8), 20),
-      // Eight sites had crawlers that week, though no bot reached three.
+      // Eight sites had crawlers that week, each bot only two of them.
       rollingRow(dailyRow("2026-11-01", "crawler", "", "", 500, 8), 20),
       rollingRow(
         dailyRow("2026-11-01", "crawler", "GPTBot", "training-crawler", 400, 2)
@@ -495,53 +521,10 @@ test("charts a rolling week from the kind's own site count and site-days", () =>
   );
 
   expect(snapshot.window.averageDays).toBe(7);
-  // 500 visits over 20 site-days; the bots stay withheld.
+  // 500 visits over 20 site-days; each bot spread over all of them.
   expect(day?.values.total).toBe(25);
-  expect(day?.values.s1).toBeNull();
-  expect(day?.values.s2).toBeNull();
-});
-
-test("folds a bot below the floor into Other instead of blanking the day", () => {
-  const snapshot = buildPublicAiTrafficSnapshot({
-    today: TODAY,
-    generatedAt: "2026-11-02T00:20:00.000Z",
-    daily,
-    projects,
-    rolling: [
-      rollingRow(dailyRow("2026-11-01", "", "", "", 1000, 12), 40),
-      rollingRow(dailyRow("2026-11-01", "crawler", "", "", 1000, 12), 40),
-      rollingRow(
-        dailyRow("2026-11-01", "crawler", "GPTBot", "training-crawler", 600)
-      ),
-      rollingRow(
-        dailyRow(
-          "2026-11-01",
-          "crawler",
-          "ClaudeBot",
-          "training-crawler",
-          100,
-          2
-        )
-      ),
-      rollingRow(
-        dailyRow("2026-11-01", "crawler", "TailBot", "search-index", 300, 6)
-      ),
-    ],
-  });
-  const chart = snapshot.crawlerVolume;
-  const day = chart.days.find((entry) => entry.day === "2026-11-01");
-
-  expect(chart.series.map((entry) => entry.label)).toEqual([
-    "GPTBot",
-    "ClaudeBot",
-    "Other",
-  ]);
-  // GPTBot keeps its line; ClaudeBot's 100 visits ride in Other, so the
-  // total minus the rest reveals only Other: (300 + 100) / 40.
-  expect(day?.values.total).toBe(25);
-  expect(day?.values.s1).toBe(15);
-  expect(day?.values.s2).toBeNull();
-  expect(day?.values.other).toBe(10);
+  expect(day?.values.s1).toBe(20);
+  expect(day?.values.s2).toBe(5);
 });
 
 test("charts a week once three sites had traffic in it", () => {
@@ -567,7 +550,7 @@ test("charts a week once three sites had traffic in it", () => {
     snapshot.crawlerVolume.days.map((entry) => [entry.day, entry.values])
   );
 
-  expect(snapshot.chartMinSites).toBe(3);
+  expect(snapshot.minSites).toBe(3);
   // 300 visits over 12 site-days.
   expect(days.get("2026-11-01")?.total).toBe(25);
   expect(days.get("2026-11-01")?.s1).toBe(25);

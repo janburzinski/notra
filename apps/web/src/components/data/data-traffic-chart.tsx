@@ -99,16 +99,23 @@ export function DataTrafficCard({
       ),
     };
   }, [title, color, traffic.series]);
-  // The total leads so days that publish it alone, without a breakdown,
-  // still show the charted value.
+  // The line is the total; hover shows who sent it.
   const rowKeys = useMemo(
-    () => [TOTAL_KEY, ...traffic.series.map((entry) => entry.key)],
+    () => traffic.series.map((entry) => entry.key),
     [traffic.series]
   );
-  const { plotted, emptyLabel } = useMemo(
-    () => zeroWithheld(traffic.rows, TOTAL_KEY, traffic.minSites),
-    [traffic.rows, traffic.minSites]
-  );
+  const { plotted, emptyLabel } = useMemo(() => {
+    const zeroed = zeroWithheld(traffic.rows, TOTAL_KEY, traffic.minSites);
+    // A snapshot built before every day carried its breakdown can still
+    // publish a total alone; hover then shows that total.
+    return {
+      plotted: zeroed.plotted,
+      emptyLabel: (row: Record<string, unknown> | undefined) =>
+        typeof row?.[TOTAL_KEY] === "number" && row[TOTAL_KEY] > 0
+          ? `${title}: ${formatVisits(row[TOTAL_KEY])}`
+          : zeroed.emptyLabel(row),
+    };
+  }, [traffic.rows, traffic.minSites, title]);
   const trend = weekTrend(traffic.change);
   // On touch, ECharts places a body-mounted tooltip one scroll height too low,
   // so the tooltip stays inside the chart there, with fewer rows to fit.
@@ -131,6 +138,11 @@ export function DataTrafficCard({
             {traffic.recent === null ? "–" : formatVisits(traffic.recent)}
           </span>
           <span className="text-muted-foreground text-sm">{unit}</span>
+          {traffic.recentDay ? (
+            <span className="text-muted-foreground text-sm">
+              · week to {traffic.recentDay}
+            </span>
+          ) : null}
         </p>
       </div>
       <div className="border-table-card-border bg-table-card shadow-table-card relative -mt-5 rounded-[14px] border p-4">

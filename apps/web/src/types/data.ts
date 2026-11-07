@@ -21,8 +21,10 @@ export interface DataTraffic {
   series: { key: string; label: string; domain: string | null }[];
   /** Sites a chart day needs; below it the day sits on the zero line. */
   minSites: number;
-  /** Average daily visits per site over the last 7 days. */
+  /** Average daily visits per site over the latest published week. */
   recent: number | null;
+  /** That week's last day ("Nov 5") when it ends before the chart does. */
+  recentDay: string | null;
   /** Change of that average against the 7 days before. */
   change: number | null;
 }

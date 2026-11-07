@@ -134,13 +134,19 @@ function average(values: number[]): number | null {
 function weekFigures(
   rows: readonly DataTrafficRow[],
   averageDays: number
-): { recent: number | null; before: number | null } {
-  // Each day already averages the week ending on it, so the last day is
-  // this week and the day a week earlier the one before.
+): { recent: number | null; before: number | null; recentDay: string | null } {
+  // Each day already averages the week ending on it, so the latest published
+  // day is this week and the day a week earlier the one before. A last day
+  // below the privacy floor falls back to the newest one that cleared it.
   if (averageDays >= RECENT_DAYS) {
+    const last = rows.findLastIndex((row) => row.total !== null);
+    if (last === -1) {
+      return { recent: null, before: null, recentDay: null };
+    }
     return {
-      recent: rows.at(-1)?.total ?? null,
-      before: rows.at(-1 - RECENT_DAYS)?.total ?? null,
+      recent: rows[last]?.total ?? null,
+      before: rows[last - RECENT_DAYS]?.total ?? null,
+      recentDay: last === rows.length - 1 ? null : (rows[last]?.day ?? null),
     };
   }
   // Single days: windows are calendar days, so a day blanked by the privacy
@@ -148,6 +154,7 @@ function weekFigures(
   return {
     recent: average(windowTotals(rows.slice(-RECENT_DAYS))),
     before: average(windowTotals(rows.slice(-RECENT_DAYS * 2, -RECENT_DAYS))),
+    recentDay: null,
   };
 }
 
@@ -196,12 +203,13 @@ function trafficChart(
     }
     return row;
   });
-  const { recent, before } = weekFigures(rows, averageDays);
+  const { recent, before, recentDay } = weekFigures(rows, averageDays);
   return {
     rows,
     series,
     minSites,
     recent,
+    recentDay,
     change: recent !== null && before ? recent / before - 1 : null,
   };
 }
@@ -240,7 +248,6 @@ export function buildDataPage(
     return null;
   }
   const averageDays = snapshot.window.averageDays ?? 1;
-  const chartMinSites = snapshot.chartMinSites ?? snapshot.minSites;
   return {
     day: snapshot.day,
     generatedAt: snapshot.generatedAt,
@@ -253,13 +260,13 @@ export function buildDataPage(
         snapshot.crawlerVolume,
         snapshot.crawlers,
         averageDays,
-        chartMinSites
+        snapshot.minSites
       ),
       referrals: trafficChart(
         snapshot.referrerVolume,
         snapshot.referrers,
         averageDays,
-        chartMinSites
+        snapshot.minSites
       ),
     },
     crawlers: snapshot.crawlers.map((row) => ({

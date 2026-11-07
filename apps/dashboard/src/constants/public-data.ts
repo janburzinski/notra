@@ -19,17 +19,11 @@ export const PUBLIC_DATA_DETAIL_DAYS = 28;
 export const PUBLIC_DATA_TOP_COUNTRIES = 20;
 
 /**
- * Anonymity floor: a bot, assistant or company is only published when it
- * reached at least this many distinct sites, so no number describes a single
- * customer. Chart days use `PUBLIC_DATA_CHART_MIN_SITES`.
+ * Anonymity floor: a bot, assistant, company, country or chart day is only
+ * published when at least this many distinct sites stand behind it, so no
+ * number describes a single customer.
  */
-export const PUBLIC_DATA_MIN_SITES = 5;
-/**
- * A chart day (the week ending on it) needs this many sites. It only shows a
- * per-site average across them, not a figure for one bot on a few sites, so
- * it can sit below `PUBLIC_DATA_MIN_SITES`.
- */
-export const PUBLIC_DATA_CHART_MIN_SITES = 3;
+export const PUBLIC_DATA_MIN_SITES = 3;
 /** Below this many measured sites nothing is published at all. */
 export const PUBLIC_DATA_MIN_TOTAL_SITES = 10;
 /**
