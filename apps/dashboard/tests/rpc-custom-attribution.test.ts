@@ -185,7 +185,7 @@ if (process.env.NOTRA_RPC_CUSTOM_ATTRIBUTION_TEST !== "1") {
         },
         {
           url: "https://fixture.invalid/rpc/custom",
-          body: { json: { organizationId: "org_b", action: "leave" } },
+          body: { json: { organizationId: "org_b", action: "delete" } },
         },
       ]),
     });

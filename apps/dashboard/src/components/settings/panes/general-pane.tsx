@@ -8,7 +8,6 @@ import {
   NewTwitterIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { POSTHOG_EVENTS } from "@notra/posthog/events";
 import {
   Avatar,
   AvatarFallback,
@@ -21,8 +20,8 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@notra/ui/components/ui/tooltip";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useEffect } from "react";
 import { toast } from "sonner";
 import { useTranslations } from "use-intl";
 
@@ -32,36 +31,26 @@ import { useOrganizationsContext } from "@/components/providers/organization-pro
 import { OrganizationDetailsCard } from "@/components/settings/organization-details-card";
 import { OrganizationMembershipActionDialog } from "@/components/settings/organization-membership-action-dialog";
 import { SettingsPane } from "@/components/settings/settings-pane";
-import { trackEvent } from "@/lib/analytics/posthog-client";
-import { authClient } from "@/lib/auth/client";
 import {
   useConnectedAccounts,
   useDisconnectAccount,
   useHandleConnectSocialAccount,
   useRefreshConnectedAccount,
 } from "@/lib/hooks/use-connected-accounts";
+import { useOrganizationMembershipAction } from "@/lib/hooks/use-organization-membership-action";
 import { useSocialConnectCallbackToasts } from "@/lib/hooks/use-social-connect-callback-toasts";
-import { useRouter } from "@/lib/navigation";
-import type { OrganizationMembershipAction } from "@/lib/organizations/membership-action";
 import { dashboardOrpc } from "@/lib/orpc/query";
 import type { ConnectedAccountsGroupProps } from "@/types/settings/general";
-import { setLastVisitedOrganization } from "@/utils/cookies";
-import { QUERY_KEYS } from "@/utils/query-keys";
 import { isSquareTwitterAvatar } from "@/utils/twitter";
 
 export function GeneralSettingsPane() {
   const t = useTranslations("settings.panes.general");
-  const tSettingsShared = useTranslations("settings.shared");
-  const tCommon = useTranslations("common");
-  const router = useRouter();
-  const queryClient = useQueryClient();
   const {
     activeOrganization: organization,
     organizations,
     requestOrganizations,
   } = useOrganizationsContext();
   const slug = organization?.slug ?? "";
-  const [isRemovingOrganization, setIsRemovingOrganization] = useState(false);
 
   useEffect(() => {
     requestOrganizations();
@@ -86,73 +75,10 @@ export function GeneralSettingsPane() {
   const hasOtherMembers = (ownedOrganization?.memberCount ?? 0) > 1;
   const canDeleteOrganization =
     !!ownedOrganization && organizations.length > 1 && !!organization;
-
-  async function handleOrganizationMembershipAction(
-    action: OrganizationMembershipAction
-  ) {
-    if (!organization) {
-      return;
-    }
-
-    setIsRemovingOrganization(true);
-
-    const successMessage =
-      action === "delete"
-        ? tSettingsShared("deletedName", { name: organization.name })
-        : tSettingsShared("leftName", { name: organization.name });
-
-    try {
-      await dashboardOrpc.user.membership.applyAction.call({
-        organizationId: organization.id,
-        action,
-      });
-
-      if (action === "delete") {
-        trackEvent(POSTHOG_EVENTS.ORGANIZATION_DELETED, {
-          deleted_organization_id: organization.id,
-          had_other_members: hasOtherMembers,
-          had_paid_history: null,
-        });
-      }
-
-      await queryClient.invalidateQueries({
-        queryKey: QUERY_KEYS.AUTH.organizations,
-      });
-      await queryClient.invalidateQueries({
-        queryKey: dashboardOrpc.user.organizations.listOwned.queryKey(),
-      });
-
-      const freshOrgs = await queryClient.fetchQuery({
-        queryKey: QUERY_KEYS.AUTH.organizations,
-        queryFn: async () => {
-          const result = await authClient.organization.list();
-          return result.data ?? [];
-        },
-      });
-
-      const firstOrg = freshOrgs[0];
-      if (!firstOrg) {
-        toast.error(tCommon("messages.youMustKeepAtLeast"));
-        setIsRemovingOrganization(false);
-        return;
-      }
-
-      await authClient.organization.setActive({
-        organizationId: firstOrg.id,
-      });
-      await setLastVisitedOrganization(firstOrg.slug);
-      await queryClient.invalidateQueries({
-        queryKey: QUERY_KEYS.AUTH.activeOrganization,
-      });
-
-      toast.success(successMessage);
-      router.push(`/${firstOrg.slug}?settings=account`);
-    } catch (error) {
-      toast.error(tSettingsShared("failedToUpdateOrganizationMembership"));
-      console.error(error);
-    }
-    setIsRemovingOrganization(false);
-  }
+  const {
+    applyAction: handleOrganizationMembershipAction,
+    isPending: isRemovingOrganization,
+  } = useOrganizationMembershipAction(organization, hasOtherMembers);
 
   if (!organization) {
     return (

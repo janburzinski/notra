@@ -188,19 +188,17 @@ export const userRouter = {
             context.user.id
           );
 
-          const [membershipCountResult] = await tx
-            .select({ count: count() })
-            .from(members)
-            .where(eq(members.userId, context.user.id));
-
-          const membershipCount = membershipCountResult?.count ?? 0;
-
-          if (membershipCount <= 1) {
-            const tCommon = await getTranslations("common");
-            throw badRequest(tCommon("messages.youMustKeepAtLeast"));
-          }
-
           if (input.action === "delete") {
+            const [membershipCountResult] = await tx
+              .select({ count: count() })
+              .from(members)
+              .where(eq(members.userId, context.user.id));
+
+            if ((membershipCountResult?.count ?? 0) <= 1) {
+              const tCommon = await getTranslations("common");
+              throw badRequest(tCommon("messages.youMustKeepAtLeast"));
+            }
+
             if (membership.role !== "owner") {
               const tErrors = await getTranslations("errors.user");
               throw forbidden(tErrors("ownerOnlyDelete"));

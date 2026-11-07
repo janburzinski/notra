@@ -1,6 +1,7 @@
 "use client";
 
-import { Mail01Icon } from "@hugeicons/core-free-icons";
+import { Logout02Icon, Mail01Icon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import { Badge } from "@notra/ui/components/ui/badge";
 import { Skeleton } from "@notra/ui/components/ui/skeleton";
 import {
@@ -14,20 +15,24 @@ import { useState } from "react";
 import { DataTable } from "ui/table";
 import { useFormatter, useTranslations } from "use-intl";
 
+import { Button } from "@/components/button";
 import { useMemberColumns } from "@/components/members/columns";
 import { useInvitationColumns } from "@/components/members/invitation-columns";
 import { InviteMemberPopover } from "@/components/members/invite-member-popover";
 import { useOrganizationsContext } from "@/components/providers/organization-provider";
+import { OrganizationMembershipActionDialog } from "@/components/settings/organization-membership-action-dialog";
 import { SettingsPane } from "@/components/settings/settings-pane";
 import { SettingsTableEmpty } from "@/components/settings/settings-table-empty";
 import { SETTINGS_TABLE_EMPTY_HEIGHT } from "@/constants/settings";
 import { TABLE_ROW_HEIGHT } from "@/constants/table";
 import { authClient } from "@/lib/auth/client";
+import { useOrganizationMembershipAction } from "@/lib/hooks/use-organization-membership-action";
 import { tableHeightFor } from "@/utils/table";
 
 export function MembersSettingsPane() {
   const t = useTranslations("settings.panes.members");
   const tCommon = useTranslations("common");
+  const tAction = useTranslations("settings.membershipAction");
   const format = useFormatter();
   const memberColumns = useMemberColumns();
   const invitationColumns = useInvitationColumns();
@@ -54,6 +59,15 @@ export function MembersSettingsPane() {
   });
 
   const members = membersData?.members;
+  const { data: session } = authClient.useSession();
+  const currentMember = members?.find(
+    (member) => member.userId === session?.user?.id
+  );
+  const canLeave = !!currentMember && currentMember.role !== "owner";
+  const { applyAction, isPending: isLeaving } = useOrganizationMembershipAction(
+    organization,
+    true
+  );
 
   const { data: invitations, isLoading: invitationsLoading } = useQuery({
     queryKey: ["invitations", organization?.id],
@@ -111,7 +125,23 @@ export function MembersSettingsPane() {
               ) : null}
             </TabsTrigger>
           </TabsList>
-          <InviteMemberPopover organizationId={organization.id} />
+          <div className="flex items-center gap-2">
+            {canLeave ? (
+              <OrganizationMembershipActionDialog
+                action="leave"
+                hasOtherMembers
+                onConfirm={() => applyAction("leave")}
+                organizationName={organization.name}
+                trigger={
+                  <Button loading={isLeaving} size="sm" variant="outline">
+                    <HugeiconsIcon icon={Logout02Icon} size={16} />
+                    {tAction("confirm", { action: "leave" })}
+                  </Button>
+                }
+              />
+            ) : null}
+            <InviteMemberPopover organizationId={organization.id} />
+          </div>
         </div>
 
         <TabsContent className="mt-4" value="members">
