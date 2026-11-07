@@ -376,6 +376,7 @@ export function createDashboardUiRoutes(parent: AnyRoute) {
     createUiRoute({
       parent: organization,
       path: "api-keys",
+      title: { namespace: "common", key: "labels.apiKeys" },
       preload: ApiKeys.preload,
       component: () => <ApiKeys />,
     }),

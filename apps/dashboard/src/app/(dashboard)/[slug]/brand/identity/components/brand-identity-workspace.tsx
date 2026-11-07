@@ -47,6 +47,7 @@ export function BrandIdentityWorkspace({
   voices,
 }: BrandIdentityWorkspaceProps) {
   const t = useTranslations("brand.identity.analysisAlert");
+  const tCommon = useTranslations("common");
   const initialData = getBrandFormInitialData(selectedVoice);
   const headerLayout = useDevVariant(
     "brand-header",
@@ -105,6 +106,7 @@ export function BrandIdentityWorkspace({
   return (
     <PageContainer className="flex flex-1 flex-col gap-4 py-4 md:gap-6 md:py-6">
       <div className="w-full space-y-5 px-4 lg:px-6">
+        <h1 className="sr-only">{tCommon("labels.brandIdentity")}</h1>
         {headerLayout === "toolbar" ? null : (
           <div className="flex min-w-0 items-center justify-between gap-4">
             <div className="min-w-0 flex-1">
