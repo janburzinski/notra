@@ -1,0 +1,9 @@
+packages/analytics/src/tinybird/pipes/geo-traffic-trends.ts
+  ai_agent 253
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "f0742b7c97796a06d03dfa471e4416fc5fcacda4",
+  "prompts": {}
+}
