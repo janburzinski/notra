@@ -7,6 +7,7 @@ import type { autopilotMetricsDaysSchema } from "@notra/schemas/dashboard/autopi
 import type * as z from "zod";
 
 import type { AutopilotRunView } from "@/types/autopilot";
+import type { AutopilotWorkflowSummary } from "@/types/autopilot-workflows";
 
 export type AutopilotMetricsDays = z.infer<typeof autopilotMetricsDaysSchema>;
 
@@ -15,12 +16,17 @@ export type AutopilotRunTrigger = (typeof AUTOPILOT_RUN_TRIGGERS)[number];
 export type AutopilotAutomationKind =
   (typeof AUTOPILOT_AUTOMATION_KINDS)[number];
 
-export interface AutopilotAutomationRow {
-  kind: AutopilotAutomationKind;
-  pullRequests: number | null;
-  merged: number | null;
-  creditsPerRun: number | null;
-}
+/** A built-in automation, or a workflow the agent built for Autopilot. */
+export type AutopilotAutomationRow =
+  | {
+      type: "builtin";
+      id: string;
+      kind: AutopilotAutomationKind;
+      pullRequests: number | null;
+      merged: number | null;
+      creditsPerRun: number | null;
+    }
+  | { type: "workflow"; id: string; workflow: AutopilotWorkflowSummary };
 
 interface AutopilotAutomationMetrics {
   kind: AutopilotAutomationKind;
@@ -50,6 +56,7 @@ export interface AutopilotAutomationsOverviewProps {
   onOpenAutomation: (kind: AutopilotAutomationKind) => void;
   onAddAutomation: (kind: AutopilotAutomationKind) => void;
   onRunAutomation: (kind: AutopilotAutomationKind) => void;
+  onOpenWorkflow: (workflowId: string) => void;
   /** The automation being started right now, if any. */
   runningKind: AutopilotAutomationKind | null;
   runDisabled: boolean;
@@ -118,4 +125,9 @@ export interface AutopilotAnalyticsPanelProps {
   /** The latest runs, whatever the period. */
   runs: AutopilotRunView[];
   onSelectRun: (run: AutopilotRunView) => void;
+}
+
+export interface AutopilotAutomationNumberProps {
+  /** undefined for a workflow, which has no such number. */
+  value: number | null | undefined;
 }

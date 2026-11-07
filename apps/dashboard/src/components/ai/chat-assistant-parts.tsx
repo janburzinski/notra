@@ -11,6 +11,7 @@ import { ChatReasoningBlock } from "@/components/ai/chat-reasoning-block";
 import type { ChatAssistantPartsProps } from "@/types/components/chat-activity-group";
 import {
   getAssistantActivityStep,
+  getAssistantActivityWaitingStep,
   getActivityGroupDuration,
   groupAssistantMessageParts,
   isAssistantActivityForceOpen,
@@ -126,6 +127,11 @@ export function ChatAssistantParts({
         isLoading={isStreaming}
         isStreaming={isStreaming}
         step={getAssistantActivityStep(parts)}
+        waitingStep={
+          segmentIndex === lastActivityIndex
+            ? getAssistantActivityWaitingStep(parts)
+            : undefined
+        }
         key={`${messageId}-activity-${segment.startIndex}`}
       >
         {details}

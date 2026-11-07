@@ -44,7 +44,8 @@
     );
     pointer-events: none;
     will-change: transform;
-    animation: text-shimmer var(--text-shimmer-duration) linear infinite;
+    animation: text-shimmer var(--text-shimmer-duration) linear
+      var(--text-shimmer-phase, 0ms) infinite;
   }
 
   @media (prefers-reduced-motion: reduce) {

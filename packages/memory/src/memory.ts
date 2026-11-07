@@ -5,6 +5,7 @@ import {
   MEMORY_CONFLICT_BACKOFF_MS,
 } from "./constants/memory";
 import { createCodeStorageStore } from "./stores/code-storage";
+import { createInMemoryStore } from "./stores/in-memory";
 import type {
   MemoryActor,
   MemoryChanges,
@@ -28,6 +29,15 @@ export function getMemoryStore(): MemoryStore {
   }
   const name = process.env.CODE_STORAGE_NAME?.trim();
   const key = process.env.CODE_STORAGE_API_KEY?.trim().replace(/\\n/g, "\n");
+  if (!(name && key) && process.env.NODE_ENV === "development") {
+    // Local dev without code.storage keeps memory in this process, so
+    // Autopilot works; it resets whenever the dev server restarts.
+    console.warn(
+      "[memory] CODE_STORAGE_NAME or CODE_STORAGE_API_KEY is missing; using an in-memory store for development"
+    );
+    configured = createInMemoryStore();
+    return configured;
+  }
   if (!(name && key)) {
     throw new MemoryNotConfiguredError(
       "CODE_STORAGE_NAME and CODE_STORAGE_API_KEY are required for workspace memory"

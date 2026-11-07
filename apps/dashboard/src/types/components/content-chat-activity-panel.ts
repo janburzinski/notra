@@ -1,25 +1,47 @@
 import type { IconSvgElement } from "@hugeicons/react";
 import type { ChatSessionSummary } from "@notra/ai/types/chat";
-import type { ChatStatus, UIMessage } from "ai";
+import type { ChatStatus, DynamicToolUIPart, ToolUIPart, UIMessage } from "ai";
 import type { ReactNode } from "react";
 
-export interface ContentChatActivityPanelProps {
+/** Tools a host renders itself, such as a preview of what the agent builds. */
+interface ContentChatCustomToolContext {
+  isActive: boolean;
+  /** Set while the tool waits for the user's approval. */
+  onApprove?: () => void;
+  onDeny?: () => void;
+}
+
+export interface ContentChatCustomTools {
+  names: ReadonlySet<string>;
+  render: (
+    part: ToolUIPart | DynamicToolUIPart,
+    context: ContentChatCustomToolContext
+  ) => ReactNode;
+}
+
+export interface ContentChatActivityConversationProps {
+  messages: UIMessage[];
+  status: ChatStatus;
+  activeChatId: string | null;
+  organizationSlug?: string;
+  onApproveTool?: (approvalId: string) => void;
+  onDenyTool?: (approvalId: string) => void;
+  customTools?: ContentChatCustomTools;
+  /** Leaves out the model line under each reply. */
+  hideModel?: boolean;
+}
+
+export interface ContentChatActivityPanelProps extends ContentChatActivityConversationProps {
   title?: string;
   /** Replaces the title, e.g. with tabs when the panel hosts more than the agent. */
   titleSlot?: ReactNode;
-  messages: UIMessage[];
   sessions: ChatSessionSummary[];
-  activeChatId: string | null;
   isHistoryLoading: boolean;
-  status: ChatStatus;
-  organizationSlug?: string;
   onNewChat: () => void;
   onSelectChat: (chatId: string) => void;
   onClose: () => void;
   onOpenChat?: () => void;
   showHistory?: boolean;
-  onApproveTool?: (approvalId: string) => void;
-  onDenyTool?: (approvalId: string) => void;
   children?: ReactNode;
 }
 
@@ -30,6 +52,8 @@ export interface ContentChatActivityMessageProps {
   organizationSlug?: string;
   onApproveTool?: (approvalId: string) => void;
   onDenyTool?: (approvalId: string) => void;
+  customTools?: ContentChatCustomTools;
+  hideModel?: boolean;
 }
 
 export type ContentChatActivityHeaderProps = Pick<

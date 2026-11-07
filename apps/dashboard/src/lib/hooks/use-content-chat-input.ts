@@ -124,6 +124,11 @@ export function useContentChatInput({
     ref,
     () => ({
       setAttachments: restoreAttachments,
+      focus: () => {
+        const element = textareaRef.current;
+        element?.focus();
+        element?.setSelectionRange(element.value.length, element.value.length);
+      },
       isVisible: () => {
         const element = textareaRef.current;
         return Boolean(

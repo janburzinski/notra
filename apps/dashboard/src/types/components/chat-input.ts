@@ -5,15 +5,19 @@ import type {
   TextSelection,
   ThinkingLevel,
 } from "@notra/ai/types/chat";
-import type { Ref } from "react";
+import type { ReactNode, Ref } from "react";
 
 import type { QueuedMessage } from "@/components/chat/chat-queue";
 import type { ChatPostMention } from "@/types/chat-posts";
 import type { PendingChatUpload } from "@/types/hooks/chat-composer-attachments";
+import type { UseContentChatInputResult } from "@/types/hooks/content-chat-input";
 import type { GitHubRepository } from "@/types/integrations";
 import type { SkillSlashOption } from "@/types/skills/slash";
 
-export type ContentChatInputHandle = Pick<ChatInputHandle, "setAttachments"> & {
+export type ContentChatInputHandle = Pick<
+  ChatInputHandle,
+  "setAttachments" | "focus"
+> & {
   /** The content page mounts a floating and a panel composer; only one shows. */
   isVisible: () => boolean;
 };
@@ -40,6 +44,10 @@ export interface ChatInputProps {
   onValueChange?: (value: string) => void;
   error?: string | null;
   onClearError?: () => void;
+  /** Shown next to the error, to send the message that failed again. */
+  onRetry?: () => void;
+  /** Chips the host attaches, such as the workflow the agent talks about. */
+  chips?: ReactNode;
   connectedTop?: boolean;
   placeholder?: string;
   editingTarget?: ChatInputEditingTarget;
@@ -48,6 +56,12 @@ export interface ChatInputProps {
   onRemoveQueued?: (id: string) => void;
   onSteerQueued?: (message: QueuedMessage) => void;
   effort?: Omit<ChatEffortMenuProps, "disabled">;
+  /** `pill` is a single-line floating composer with attach and send only. */
+  layout?: "card" | "pill";
+  /** Keeps the pill on two rows, such as while a conversation sits above it. */
+  pillExpanded?: boolean;
+  /** Lifts the pill off the page with a shadow; on by default for pills. */
+  elevated?: boolean;
 }
 
 export interface ChatEffortMenuProps {
@@ -107,6 +121,8 @@ export interface ChatInputContextPickerProps {
 }
 
 export interface ChatInputComposerNudgeProps {
+  chips?: ReactNode;
+  onRetry?: () => void;
   attachments: ChatAttachment[];
   context: ContextItem[];
   editingTarget?: ChatInputEditingTarget;
@@ -152,4 +168,37 @@ export interface ChatFileAttachmentProps {
   url: string;
   filename?: string;
   mediaType?: string;
+}
+
+export interface ChatInputErrorProps {
+  message: string;
+  onRetry?: () => void;
+}
+
+export interface ChatComposerTextareaProps {
+  input: UseContentChatInputResult;
+  pill: boolean;
+  slashListId: string;
+  /** Set while editing a post, to describe what the message edits. */
+  editingTargetId?: string;
+}
+
+export interface ChatComposerSendButtonProps {
+  input: UseContentChatInputResult;
+}
+
+export interface PillComposerBodyProps {
+  /** Two rows while you write, one otherwise. */
+  open: boolean;
+  attachButton: ReactNode;
+  textarea: ReactNode;
+  sendButton: ReactNode;
+}
+
+export interface CardComposerToolbarProps {
+  input: UseContentChatInputResult;
+  onAddContext: ChatInputProps["onAddContext"];
+  effort: ChatInputProps["effort"];
+  attachButton: ReactNode;
+  sendButton: ReactNode;
 }

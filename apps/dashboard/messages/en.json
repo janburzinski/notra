@@ -6342,6 +6342,46 @@
           "title": "Draft an FAQ page",
           "description": "Answer the questions people actually ask",
           "prompt": "Help me draft an FAQ. Ask me the product and the questions customers actually ask before writing."
+        },
+        "competitorWatch": {
+          "title": "Watch competitors",
+          "description": "Alert me when one passes us in AI answers",
+          "prompt": "Build an Autopilot workflow that tells me in Slack when a competitor gets more AI answer mentions than us."
+        },
+        "visibilityDigest": {
+          "title": "Weekly visibility digest",
+          "description": "A Monday summary of how AI answers mention us",
+          "prompt": "Build an Autopilot workflow that posts a short summary of our AI visibility against competitors to Slack every Monday morning."
+        },
+        "comebackPlan": {
+          "title": "Plan a comeback",
+          "description": "Draft what to do when we fall behind",
+          "prompt": "Build an Autopilot workflow that checks every day whether a competitor is ahead of us in AI answers and, if so, drafts a plan to win the visibility back."
+        },
+        "workflowExplain": {
+          "title": "Explain this workflow",
+          "description": "What each step does and when it runs",
+          "prompt": "Explain what this workflow does, step by step, and when it runs."
+        },
+        "workflowLastRun": {
+          "title": "How did the last run go?",
+          "description": "What it found and where it stopped",
+          "prompt": "How did the last run of this workflow go? Tell me what it found and why any step stopped."
+        },
+        "workflowChange": {
+          "title": "Change it",
+          "description": "Describe what should work differently",
+          "prompt": "Change this workflow so it "
+        },
+        "automationExplain": {
+          "title": "Explain this automation",
+          "description": "What it reads, what it makes and when it runs",
+          "prompt": "Explain what this automation does, what it reads, what it makes and when it runs."
+        },
+        "automationAlongside": {
+          "title": "Build on it",
+          "description": "A workflow that works alongside it",
+          "prompt": "Build a workflow that works alongside this automation and "
         }
       },
       "personalHeading": "Picked for {brand}",
@@ -6412,7 +6452,9 @@
     },
     "errors": {
       "usageLimit": "You've used all your chat messages this month. Upgrade for more.",
-      "fallback": "Something went wrong while generating a response. Try again."
+      "fallback": "Something went wrong while generating a response. Try again.",
+      "offline": "You're offline. Check your connection.",
+      "agentFallback": "The agent couldn't respond."
     },
     "quote": {
       "quoteSelection": "Quote selected text",
@@ -7495,12 +7537,56 @@
       "openLabel": "Open agent",
       "closeLabel": "Close agent",
       "placeholder": "Ask anything… (type / for skills)",
-      "sendFailed": "Failed to send message",
       "stopFailed": "Couldn't stop the response. Try again.",
       "historyLoadFailed": "Failed to load agent chat history. Try again.",
       "description": "Chat with your dashboard agent.",
       "loadingTitle": "Loading agent",
-      "loadingDescription": "Loading the dashboard agent."
+      "loadingDescription": "Loading the dashboard agent.",
+      "promptBar": {
+        "placeholder": "Ask the agent, or tell Autopilot what to keep an eye on…",
+        "replyPlaceholder": "Reply to the agent…",
+        "workflowPlaceholder": "Ask about this workflow, or say what to change…",
+        "automationPlaceholder": "Ask about this automation…"
+      },
+      "workflowPreview": {
+        "status": {
+          "building": "Building",
+          "awaitingApproval": "Not saved yet",
+          "saved": "Saved",
+          "needsFixes": "Needs fixes",
+          "discarded": "Discarded",
+          "failed": "Not saved",
+          "changesNotSaved": "Changes not saved yet",
+          "saving": "Saving"
+        },
+        "untitled": "New workflow",
+        "open": "Open",
+        "steps": "{count, plural, one {# step} other {# steps}}",
+        "writingSteps": "The agent is writing the steps",
+        "save": "Save workflow",
+        "discard": "Discard",
+        "saveChanges": "Save changes",
+        "changes": {
+          "title": "What changes",
+          "schedule": "Runs {to} instead of {from}",
+          "name": "Renamed from “{from}”",
+          "added": "Adds “{title}”",
+          "removed": "Removes “{title}”",
+          "changed": "Changes “{title}”",
+          "none": "Nothing changes in its steps, connections or schedule.",
+          "rewired": "Reconnects “{title}”",
+          "description": "Changes its description"
+        }
+      },
+      "dock": {
+        "fullScreen": "Full screen",
+        "exitFullScreen": "Exit full screen",
+        "minimize": "Minimize",
+        "preview": "Workflow preview",
+        "previewEmptyTitle": "Your workflow shows up here",
+        "previewEmptyDescription": "Describe what Autopilot should keep an eye on. The agent asks when something is unclear, then builds it step by step.",
+        "detachWorkflow": "Take {name} off the conversation"
+      }
     },
     "brandSelector": {
       "createIdentity": "Create identity"
@@ -7714,7 +7800,13 @@
         "showRepositoryChange": "{state, select, running {Inspecting change} done {Inspected change} approve {Approve change} other {Failed change}}",
         "createPost": "{state, select, running {Saving draft} done {Saved draft} approve {Approve draft} other {Failed draft}}",
         "getPostDetails": "{state, select, running {Reading post details} done {Read post details} approve {Approve post details} other {Failed to read post details}}",
-        "updatePostDetails": "{state, select, running {Updating post details} done {Updated post details} approve {Approve post details} other {Failed to update post details}}"
+        "updatePostDetails": "{state, select, running {Updating post details} done {Updated post details} approve {Approve post details} other {Failed to update post details}}",
+        "listAutopilotWorkflowSteps": "{state, select, running {Checking workflow steps} done {Checked workflow steps} approve {Approve checking workflow steps} other {Failed to check workflow steps}}",
+        "listAutopilotWorkflows": "{state, select, running {Looking at Autopilot workflows} done {Looked at Autopilot workflows} approve {Approve looking at Autopilot workflows} other {Failed to look at Autopilot workflows}}",
+        "getAutopilotWorkflow": "{state, select, running {Reading workflow} done {Read workflow} approve {Approve reading workflow} other {Failed to read workflow}}",
+        "getAutopilotWorkflowRun": "{state, select, running {Checking workflow run} done {Checked workflow run} approve {Approve checking workflow run} other {Failed to check workflow run}}",
+        "saveAutopilotWorkflow": "{state, select, running {Saving workflow} done {Saved workflow} approve {Approve saving workflow} other {Failed to save workflow}}",
+        "runAutopilotWorkflow": "{state, select, running {Starting workflow} done {Started workflow} approve {Approve starting workflow} other {Failed to start workflow}}"
       },
       "withSuffix": "{label} {suffix}",
       "memory": {
@@ -7762,6 +7854,7 @@
       "steps": {
         "writingResponse": "Writing response",
         "waitingForApproval": "Waiting for approval",
+        "waitingForAnswer": "Waiting for your answer",
         "searchingWeb": "Searching web",
         "executingTools": "Executing tools",
         "runningTool": "Running tool",
@@ -7792,6 +7885,22 @@
       "contentRegion": "{type} content",
       "askForChanges": "Ask for changes",
       "openPreview": "Preview"
+    },
+    "agentQuestion": {
+      "title": "Question",
+      "progress": "Question {current} of {total}",
+      "questionNumber": "Question {number}",
+      "pickOne": "Pick one answer",
+      "pickMany": "Pick all that apply",
+      "customPlaceholder": "Type your own answer",
+      "dismiss": "Dismiss",
+      "back": "Back",
+      "next": "Next",
+      "submit": "Submit",
+      "dismissed": "Dismissed",
+      "unanswered": "Unanswered",
+      "asked": "{count, plural, one {Asked you a question} other {Asked you # questions}}",
+      "useOwnAnswer": "Use your own answer"
     }
   },
   "comments": {

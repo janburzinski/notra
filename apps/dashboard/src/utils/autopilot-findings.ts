@@ -1,8 +1,10 @@
 import { AUTOPILOT_ACTION_MIN_CONFIDENCE } from "@notra/ai/constants/autopilot-planner";
 
 import type {
+  AutopilotFindingLink,
   AutopilotFindingView,
   AutopilotInlineSegment,
+  AutopilotPendingFindingAction,
   AutopilotSourceBlock,
 } from "@/types/autopilot";
 import { formatAutopilotPercent as percent } from "@/utils/autopilot-events";
@@ -202,4 +204,26 @@ export function splitInlineCode(text: string): AutopilotInlineSegment[] {
     offset += part.length + 1;
     return segment;
   });
+}
+
+/**
+ * The merge or dismiss a Slack brief button links to, when the user can do
+ * it: merging needs an open pull request, dismissing also takes a suggestion.
+ */
+export function linkedFindingAction(
+  link: AutopilotFindingLink,
+  findings: AutopilotFindingView[],
+  canManage: boolean
+): AutopilotPendingFindingAction | null {
+  if (!(canManage && link.finding && link.action)) {
+    return null;
+  }
+  const finding = findings.find((row) => row.id === link.finding);
+  if (
+    finding?.status === "proposed" ||
+    (finding?.status === "suggested" && link.action === "dismiss")
+  ) {
+    return { kind: link.action, finding };
+  }
+  return null;
 }

@@ -16,7 +16,7 @@ import type { Connection, NodeChange } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { cn } from "cn";
 import { MaximizeIcon, ZoomInIcon, ZoomOutIcon } from "lucide-react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useEffectEvent, useMemo, useRef, useState } from "react";
 import type { DragEvent } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -163,6 +163,7 @@ const WorkflowControls = ({ toolbar }: WorkflowControlsProps) => {
 };
 
 const WorkflowFlow = ({
+  autoFit = false,
   background = "dots",
   className,
   controls = true,
@@ -172,6 +173,7 @@ const WorkflowFlow = ({
   gap,
   maxZoom = 1.5,
   minZoom = 0.3,
+  fitMinZoom = WORKFLOW_FIT_MIN_ZOOM,
   minimap = false,
   nodeState,
   nodes,
@@ -193,33 +195,69 @@ const WorkflowFlow = ({
   const [localSelectedId, setLocalSelectedId] = useState<string>();
   const activeId = onSelectNode ? selectedId : localSelectedId;
 
+  // Fits the whole graph, or when that would make it unreadable, keeps the
+  // zoom readable and shows its first or its last steps.
+  const fitGraph = useEffectEvent(
+    (anchor: "start" | "end", duration?: number) => {
+      const box = containerRef.current?.getBoundingClientRect();
+      const bounds = getNodesBounds(nodes.map((node) => node.id));
+      if (!box || bounds.width === 0) {
+        return;
+      }
+      const zoom = Math.min(
+        WORKFLOW_FIT_MAX_ZOOM,
+        (box.width * (1 - WORKFLOW_FIT_PADDING)) / bounds.width,
+        (box.height * (1 - WORKFLOW_FIT_PADDING)) / bounds.height
+      );
+      if (zoom >= fitMinZoom) {
+        fitView({ ...WORKFLOW_FIT_VIEW_OPTIONS, duration });
+        return;
+      }
+      const startZoom = Math.max(fitMinZoom, minZoom);
+      setViewport(
+        {
+          x:
+            anchor === "start"
+              ? WORKFLOW_FIT_EDGE_PX - bounds.x * startZoom
+              : box.width -
+                WORKFLOW_FIT_EDGE_PX -
+                (bounds.x + bounds.width) * startZoom,
+          y: box.height / 2 - (bounds.y + bounds.height / 2) * startZoom,
+          zoom: startZoom,
+        },
+        { duration }
+      );
+    }
+  );
+
   useEffect(() => {
     if (!nodesInitialized || fittedRef.current) {
       return;
     }
     fittedRef.current = true;
     containerRef.current?.setAttribute("data-fitted", "");
-    const box = containerRef.current?.getBoundingClientRect();
-    const bounds = getNodesBounds(nodes.map((node) => node.id));
-    if (!box || bounds.width === 0) {
+    fitGraph("start");
+  }, [nodesInitialized]);
+
+  // Steps that appear or move change this, so the view follows them.
+  const layoutKey = nodes
+    .map((node) => `${node.id}:${node.position.x},${node.position.y}`)
+    .join("|");
+  const fittedLayoutRef = useRef(layoutKey);
+  // A step that just arrived has no size yet; fitting before it's measured
+  // would leave it out of view.
+  const allMeasured = nodes.every((node) => measured[node.id]);
+  useEffect(() => {
+    if (
+      !(autoFit && allMeasured && fittedRef.current) ||
+      fittedLayoutRef.current === layoutKey
+    ) {
       return;
     }
-    const zoom = Math.min(
-      WORKFLOW_FIT_MAX_ZOOM,
-      (box.width * (1 - WORKFLOW_FIT_PADDING)) / bounds.width,
-      (box.height * (1 - WORKFLOW_FIT_PADDING)) / bounds.height
-    );
-    if (zoom >= WORKFLOW_FIT_MIN_ZOOM) {
-      fitView(WORKFLOW_FIT_VIEW_OPTIONS);
-      return;
-    }
-    const startZoom = Math.max(WORKFLOW_FIT_MIN_ZOOM, minZoom);
-    setViewport({
-      x: WORKFLOW_FIT_EDGE_PX - bounds.x * startZoom,
-      y: box.height / 2 - (bounds.y + bounds.height / 2) * startZoom,
-      zoom: startZoom,
-    });
-  }, [fitView, getNodesBounds, minZoom, nodes, nodesInitialized, setViewport]);
+    fittedLayoutRef.current = layoutKey;
+    // New steps land on the right, so follow them there.
+    fitGraph("end", WORKFLOW_FIT_DURATION_MS);
+  }, [allMeasured, autoFit, layoutKey]);
 
   useEffect(() => {
     if (

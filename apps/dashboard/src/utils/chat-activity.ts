@@ -38,7 +38,10 @@ export function getChatActivity(
     (part) =>
       part.type === "step-start" ||
       (includeFileParts && part.type === "file") ||
-      ((part.type === "text" || part.type === "reasoning") &&
+      // An answer that has started but has no words yet isn't anything to
+      // look at, so the status stays until the first ones arrive.
+      (part.type === "text" && Boolean(part.text.trim())) ||
+      (part.type === "reasoning" &&
         (Boolean(part.text.trim()) || part.state === "streaming")) ||
       isToolUIPart(part)
   );

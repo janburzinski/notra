@@ -28,7 +28,8 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@notra/ui/components/ui/tooltip";
-import { useId } from "react";
+import { cn } from "@notra/ui/lib/utils";
+import { useId, useRef } from "react";
 import { useTranslations } from "use-intl";
 
 import { AttachmentPreviewDialog } from "@/components/chat/attachment-preview";
@@ -48,19 +49,186 @@ import { ChatSkillTagChips } from "@/components/chat/chat-skill-tag-chips";
 import Link from "@/components/framework/link";
 import { COMPOSER_STOP_ICON } from "@/constants/composer";
 import { useContentChatInput } from "@/lib/hooks/use-content-chat-input";
+import { useFocusWithin } from "@/lib/hooks/use-focus-within";
 import type {
+  CardComposerToolbarProps,
+  ChatComposerSendButtonProps,
+  ChatComposerTextareaProps,
   ChatInputComposerNudgeProps,
   ChatInputContextPickerProps,
+  ChatInputErrorProps,
   ChatInputProps,
+  PillComposerBodyProps,
 } from "@/types/components/chat-input";
 
 const ChatInput = (props: ChatInputProps) => (
   <ContentChatInputComposer {...props} />
 );
 
-function ContentChatInputComposer(props: ChatInputProps) {
+/** The text field, which also drives the slash menu of skills. */
+function ChatComposerTextarea({
+  input,
+  pill,
+  slashListId,
+  editingTargetId,
+}: ChatComposerTextareaProps) {
   const t = useTranslations("chat.promptInput");
   const tChatShared = useTranslations("chat.shared");
+  const {
+    closeSlashMenu,
+    filteredSkills,
+    handlePaste,
+    isInputLocked,
+    isLoading,
+    isSlashMenuOpen,
+    onComposerKeyDown,
+    onComposerSelect,
+    onComposerValueChange,
+    placeholder,
+    resizeTextarea,
+    setIsFocused,
+    slashIndex,
+    slashListRef,
+    textareaRef,
+    value,
+  } = input;
+  const activeSkill = isSlashMenuOpen ? filteredSkills[slashIndex] : undefined;
+  return (
+    <Composer.Input
+      aria-activedescendant={
+        activeSkill ? `chat-skill-slash-option-${activeSkill.name}` : undefined
+      }
+      aria-autocomplete={isSlashMenuOpen ? "list" : undefined}
+      aria-controls={isSlashMenuOpen ? slashListId : undefined}
+      aria-describedby={editingTargetId}
+      aria-expanded={isSlashMenuOpen}
+      aria-haspopup={isSlashMenuOpen ? "listbox" : undefined}
+      aria-label={tChatShared("sendAMessage")}
+      className={
+        pill
+          ? "whitespace-pre-wrap"
+          : "field-sizing-fixed min-h-10 whitespace-pre-wrap"
+      }
+      disabled={isInputLocked}
+      layout={pill ? "pill" : "card"}
+      onBlur={() => {
+        setIsFocused(false);
+        window.setTimeout(() => {
+          if (!slashListRef.current?.contains(document.activeElement)) {
+            closeSlashMenu();
+          }
+        }, 150);
+      }}
+      onChange={(event) => {
+        onComposerValueChange(event.target.value, event.target.selectionStart);
+      }}
+      onFocus={() => setIsFocused(true)}
+      onInput={resizeTextarea}
+      onKeyDown={onComposerKeyDown}
+      onPaste={handlePaste}
+      onSelect={onComposerSelect}
+      placeholder={
+        isLoading
+          ? tChatShared("queueAMessage")
+          : (placeholder ?? t("placeholder"))
+      }
+      ref={textareaRef}
+      role="combobox"
+      rows={1}
+      value={value}
+    />
+  );
+}
+
+/** Sends the message, or stops the reply that's being written. */
+function ChatComposerSendButton({ input }: ChatComposerSendButtonProps) {
+  const { handleSend, onStop, sendDisabled, sendLabel, sendTooltip, showStop } =
+    input;
+  return (
+    <Composer.Send
+      disabled={sendDisabled}
+      label={sendLabel}
+      onClick={showStop ? onStop : handleSend}
+      tooltip={sendTooltip}
+    >
+      <HugeiconsIcon
+        className="size-4"
+        icon={showStop ? COMPOSER_STOP_ICON : ArrowUp02Icon}
+        strokeWidth={2}
+      />
+    </Composer.Send>
+  );
+}
+
+/**
+ * The pill: "+" and send stay in the bottom corners, and only the text's room
+ * around them changes, so opening is one smooth motion.
+ */
+function PillComposerBody({
+  open,
+  attachButton,
+  textarea,
+  sendButton,
+}: PillComposerBodyProps) {
+  return (
+    <>
+      <div className="absolute bottom-2 left-2 z-10 flex h-8 items-center">
+        {attachButton}
+      </div>
+      <div
+        className={cn(
+          "duration-normal ease-emphasized transition-all motion-reduce:transition-none",
+          // Closed: one row between the buttons. Open: the text takes the full
+          // width, starting in line with the round "+" below it, and the
+          // buttons get a row of their own.
+          open ? "-ml-1 pb-10" : "pr-10 pl-10"
+        )}
+      >
+        {textarea}
+      </div>
+      <div className="absolute right-2 bottom-2 flex h-8 items-center">
+        {sendButton}
+      </div>
+    </>
+  );
+}
+
+/** The card's toolbar: attach on the left; context, effort and send on the right. */
+function CardComposerToolbar({
+  input,
+  onAddContext,
+  effort,
+  attachButton,
+  sendButton,
+}: CardComposerToolbarProps) {
+  return (
+    <Composer.Toolbar>
+      {attachButton}
+      <div className="ml-auto flex min-w-0 items-center gap-1">
+        {onAddContext ? (
+          <ChatInputContextPicker
+            contextOptions={input.contextOptions}
+            contextPickerId={input.contextPickerId}
+            disabledReason={input.contextPickerDisabledReason}
+            isInContext={input.isInContext}
+            isOpen={input.isContextPickerOpen}
+            onOpenChange={input.setIsContextPickerOpen}
+            organizationSlug={input.organizationSlug}
+            toggleContextItem={input.toggleContextItem}
+          />
+        ) : null}
+        {effort ? (
+          <ChatEffortMenu {...effort} disabled={input.isInputLocked} />
+        ) : null}
+        {sendButton}
+      </div>
+    </Composer.Toolbar>
+  );
+}
+
+function ContentChatInputComposer(props: ChatInputProps) {
+  const tChatShared = useTranslations("chat.shared");
+  const input = useContentChatInput(props);
   const quoteContext = useChatQuote();
   const slashListId = useId();
   const editingTargetId = useId();
@@ -69,65 +237,51 @@ function ContentChatInputComposer(props: ChatInputProps) {
     allowedChatMimeTypes,
     attachments,
     attachmentTooltipText,
-    closeSlashMenu,
     connectedTop,
-    context,
-    contextOptions,
-    contextPickerDisabledReason,
-    contextPickerId,
     dragHandlers,
     fileInputRef,
     filteredSkills,
-    handlePaste,
-    handleSend,
-    hasAttachmentChips,
-    hasContextChips,
     insertSlashSkill,
-    isContextPickerOpen,
     isDraggingFile,
-    isInContext,
     isInputLocked,
-    isLoading,
     isSlashMenuOpen,
     onAttach,
-    onClearSelection,
-    onComposerKeyDown,
-    onComposerSelect,
-    onComposerValueChange,
-    onEditQueued,
     onFileInputChange,
-    onRemoveContext,
-    onRemoveQueued,
-    onSteerQueued,
-    onStop,
-    organizationSlug,
-    placeholder,
     pendingUploads,
     previewAttachment,
-    queuedMessages,
-    remainingChatCredits,
-    removeAttachment,
-    resizeTextarea,
-    selection,
-    sendDisabled,
-    sendLabel,
-    sendTooltip,
-    setIsContextPickerOpen,
-    setIsFocused,
     setPreviewAttachment,
-    shouldShowLowCredits,
     showComposerNudge,
-    showStop,
     skillCount,
     slashIndex,
     slashListRef,
-    taggedSkills,
-    textareaRef,
-    toggleContextItem,
-    untagSkill,
-    usageLimitError,
     value,
-  } = useContentChatInput(props);
+  } = input;
+  const pill = props.layout === "pill";
+  const sectionRef = useRef<HTMLElement | null>(null);
+  const focusWithin = useFocusWithin(sectionRef, pill);
+  // The pill opens to two rows while you write, then settles back to one.
+  const pillOpen =
+    pill &&
+    (props.pillExpanded === true || focusWithin || value.trim().length > 0);
+  const textarea = (
+    <ChatComposerTextarea
+      editingTargetId={props.editingTarget ? editingTargetId : undefined}
+      input={input}
+      pill={pill}
+      slashListId={slashListId}
+    />
+  );
+  const attachButton = (
+    <ChatComposerAttachButton
+      attachmentCount={attachments.length}
+      disabled={isInputLocked}
+      filled={pill}
+      onAttach={onAttach}
+      pendingUploadCount={pendingUploads.length}
+      tooltip={attachmentTooltipText}
+    />
+  );
+  const sendButton = <ChatComposerSendButton input={input} />;
 
   return (
     <>
@@ -153,35 +307,27 @@ function ContentChatInputComposer(props: ChatInputProps) {
         ) : null}
         <Composer.Frame
           connectedTop={connectedTop}
+          elevated={pill && props.elevated !== false}
+          flat={pill}
+          // The inner light is for the pill floating on its own. Inside the
+          // open dock it sits beside the conversation card and matches it.
+          highlight={pill && props.pillExpanded !== true}
           nudge={
-            showComposerNudge || props.editingTarget ? (
+            showComposerNudge || props.editingTarget || props.chips ? (
               <ChatInputComposerNudge
-                attachments={attachments}
-                context={context}
+                {...input}
+                chips={props.chips}
                 editingTarget={props.editingTarget}
-                hasAttachmentChips={hasAttachmentChips}
-                hasContextChips={hasContextChips}
-                onClearSelection={onClearSelection}
-                onEditQueued={onEditQueued}
-                onRemoveContext={onRemoveContext}
-                onRemoveQueued={onRemoveQueued}
-                onSteerQueued={onSteerQueued}
-                organizationSlug={organizationSlug}
-                pendingUploads={pendingUploads}
-                queuedMessages={queuedMessages}
-                remainingChatCredits={remainingChatCredits}
-                removeAttachment={removeAttachment}
-                selection={selection}
-                setPreviewAttachment={setPreviewAttachment}
-                shouldShowLowCredits={shouldShowLowCredits}
-                taggedSkills={taggedSkills}
-                untagSkill={untagSkill}
-                usageLimitError={usageLimitError}
+                onRetry={props.onRetry}
               />
             ) : null
           }
         >
-          <section aria-label={tChatShared("chatInputDropArea")}>
+          <section
+            aria-label={tChatShared("chatInputDropArea")}
+            ref={sectionRef}
+            className={pill ? "relative p-2" : undefined}
+          >
             {props.editingTarget ? (
               <span className="sr-only" id={editingTargetId}>
                 {props.editingTarget.description}
@@ -196,89 +342,25 @@ function ContentChatInputComposer(props: ChatInputProps) {
               ref={fileInputRef}
               type="file"
             />
-            <Composer.Input
-              aria-activedescendant={
-                isSlashMenuOpen && filteredSkills[slashIndex]
-                  ? `chat-skill-slash-option-${filteredSkills[slashIndex].name}`
-                  : undefined
-              }
-              aria-autocomplete={isSlashMenuOpen ? "list" : undefined}
-              aria-controls={isSlashMenuOpen ? slashListId : undefined}
-              aria-describedby={
-                props.editingTarget ? editingTargetId : undefined
-              }
-              aria-expanded={isSlashMenuOpen}
-              aria-haspopup={isSlashMenuOpen ? "listbox" : undefined}
-              aria-label={tChatShared("sendAMessage")}
-              className="field-sizing-fixed min-h-10 whitespace-pre-wrap"
-              disabled={isInputLocked}
-              onBlur={() => {
-                setIsFocused(false);
-                window.setTimeout(() => {
-                  if (!slashListRef.current?.contains(document.activeElement)) {
-                    closeSlashMenu();
-                  }
-                }, 150);
-              }}
-              onChange={(event) => {
-                onComposerValueChange(
-                  event.target.value,
-                  event.target.selectionStart
-                );
-              }}
-              onFocus={() => setIsFocused(true)}
-              onInput={resizeTextarea}
-              onKeyDown={onComposerKeyDown}
-              onPaste={handlePaste}
-              onSelect={onComposerSelect}
-              placeholder={
-                isLoading
-                  ? tChatShared("queueAMessage")
-                  : (placeholder ?? t("placeholder"))
-              }
-              ref={textareaRef}
-              role="combobox"
-              rows={1}
-              value={value}
-            />
-            <Composer.Toolbar>
-              <ChatComposerAttachButton
-                attachmentCount={attachments.length}
-                disabled={isInputLocked}
-                onAttach={onAttach}
-                pendingUploadCount={pendingUploads.length}
-                tooltip={attachmentTooltipText}
+            {pill ? (
+              <PillComposerBody
+                attachButton={attachButton}
+                open={pillOpen}
+                sendButton={sendButton}
+                textarea={textarea}
               />
-              <div className="ml-auto flex min-w-0 items-center gap-1">
-                {props.onAddContext ? (
-                  <ChatInputContextPicker
-                    contextOptions={contextOptions}
-                    contextPickerId={contextPickerId}
-                    disabledReason={contextPickerDisabledReason}
-                    isInContext={isInContext}
-                    isOpen={isContextPickerOpen}
-                    onOpenChange={setIsContextPickerOpen}
-                    organizationSlug={organizationSlug}
-                    toggleContextItem={toggleContextItem}
-                  />
-                ) : null}
-                {props.effort ? (
-                  <ChatEffortMenu {...props.effort} disabled={isInputLocked} />
-                ) : null}
-                <Composer.Send
-                  disabled={sendDisabled}
-                  label={sendLabel}
-                  onClick={showStop ? onStop : handleSend}
-                  tooltip={sendTooltip}
-                >
-                  <HugeiconsIcon
-                    className="size-4"
-                    icon={showStop ? COMPOSER_STOP_ICON : ArrowUp02Icon}
-                    strokeWidth={2}
-                  />
-                </Composer.Send>
-              </div>
-            </Composer.Toolbar>
+            ) : (
+              <>
+                {textarea}
+                <CardComposerToolbar
+                  attachButton={attachButton}
+                  effort={props.effort}
+                  input={input}
+                  onAddContext={props.onAddContext}
+                  sendButton={sendButton}
+                />
+              </>
+            )}
           </section>
         </Composer.Frame>
       </div>
@@ -295,47 +377,42 @@ function ContentChatInputComposer(props: ChatInputProps) {
   );
 }
 
-function ChatInputComposerNudge({
-  attachments,
-  context,
-  editingTarget,
-  hasAttachmentChips,
-  hasContextChips,
-  onClearSelection,
-  onEditQueued,
-  onRemoveContext,
-  onRemoveQueued,
-  onSteerQueued,
-  organizationSlug,
-  pendingUploads,
-  queuedMessages,
-  remainingChatCredits,
-  removeAttachment,
-  selection,
-  setPreviewAttachment,
-  shouldShowLowCredits,
-  taggedSkills,
-  untagSkill,
-  usageLimitError,
-}: ChatInputComposerNudgeProps) {
+function ChatInputComposerNudge(props: ChatInputComposerNudgeProps) {
+  const {
+    chips,
+    onRetry,
+    editingTarget,
+    hasAttachmentChips,
+    hasContextChips,
+    organizationSlug,
+    remainingChatCredits,
+    shouldShowLowCredits,
+    usageLimitError,
+  } = props;
   const tCommon = useTranslations("common");
   const tChatShared = useTranslations("chat.shared");
   const hasChips =
-    hasContextChips || hasAttachmentChips || Boolean(editingTarget);
+    hasContextChips ||
+    hasAttachmentChips ||
+    Boolean(editingTarget) ||
+    Boolean(chips);
+  const action =
+    usageLimitError && organizationSlug ? (
+      <Button
+        nativeButton={false}
+        render={<Link href={`/${organizationSlug}/settings/billing`} />}
+        size="xs"
+        variant="outline"
+      >
+        {tCommon("actions.upgrade")}
+      </Button>
+    ) : null;
+  const error = usageLimitError ? (
+    <ChatInputError message={usageLimitError} onRetry={onRetry} />
+  ) : null;
   return (
     <Composer.Nudge
-      action={
-        usageLimitError && organizationSlug ? (
-          <Button
-            nativeButton={false}
-            render={<Link href={`/${organizationSlug}/settings/billing`} />}
-            size="xs"
-            variant="outline"
-          >
-            {tCommon("actions.upgrade")}
-          </Button>
-        ) : null
-      }
+      action={action}
       title={
         shouldShowLowCredits && !hasChips && !usageLimitError
           ? tChatShared("countPluralOneChatMessage", {
@@ -346,56 +423,103 @@ function ChatInputComposerNudge({
     >
       {hasChips ? (
         <>
-          {editingTarget ? (
-            <Composer.Chip
-              icon={
-                <HugeiconsIcon
-                  aria-hidden="true"
-                  className="text-muted-foreground size-3.5"
-                  icon={File02Icon}
-                />
-              }
-              label={editingTarget.title}
-            />
-          ) : null}
-          <ChatQueue
-            messages={queuedMessages}
-            onEdit={onEditQueued}
-            onRemove={onRemoveQueued}
-            onSteer={onSteerQueued}
-          />
-          <ChatSkillTagChips onRemove={untagSkill} skills={taggedSkills} />
-          <ChatInputContextRow
-            context={context}
-            onClearSelection={onClearSelection}
-            onRemoveContext={onRemoveContext}
-            selection={selection}
-          />
-          <ChatComposerAttachmentChips
-            attachments={attachments}
-            pendingUploads={pendingUploads}
-            removeAttachment={removeAttachment}
-            setPreviewAttachment={setPreviewAttachment}
-          />
-          {shouldShowLowCredits ? (
-            <span className="text-muted-foreground text-xs">
-              {tChatShared("countPluralOneChatMessage", {
-                count: remainingChatCredits ?? 0,
-              })}
-            </span>
-          ) : null}
+          {/* With chips below, the error gets its own row, its button beside it. */}
+          {error}
+          <ChatInputNudgeChips {...props} />
         </>
+      ) : (
+        error
+      )}
+    </Composer.Nudge>
+  );
+}
+
+/** What the next message carries: the host's chips, queued messages, skills, context and files. */
+function ChatInputNudgeChips({
+  chips,
+  attachments,
+  context,
+  editingTarget,
+  onClearSelection,
+  onEditQueued,
+  onRemoveContext,
+  onRemoveQueued,
+  onSteerQueued,
+  pendingUploads,
+  queuedMessages,
+  remainingChatCredits,
+  removeAttachment,
+  selection,
+  setPreviewAttachment,
+  shouldShowLowCredits,
+  taggedSkills,
+  untagSkill,
+}: ChatInputComposerNudgeProps) {
+  const tChatShared = useTranslations("chat.shared");
+  return (
+    <>
+      {chips}
+      {editingTarget ? (
+        <Composer.Chip
+          icon={
+            <HugeiconsIcon
+              aria-hidden="true"
+              className="text-muted-foreground size-3.5"
+              icon={File02Icon}
+            />
+          }
+          label={editingTarget.title}
+        />
       ) : null}
-      {usageLimitError ? (
-        <span className="flex min-w-0 items-center gap-1.5 text-sm">
-          <HugeiconsIcon
-            className="text-warning size-4 shrink-0"
-            icon={Alert02Icon}
-          />
-          <span className="truncate">{usageLimitError}</span>
+      <ChatQueue
+        messages={queuedMessages}
+        onEdit={onEditQueued}
+        onRemove={onRemoveQueued}
+        onSteer={onSteerQueued}
+      />
+      <ChatSkillTagChips onRemove={untagSkill} skills={taggedSkills} />
+      <ChatInputContextRow
+        context={context}
+        onClearSelection={onClearSelection}
+        onRemoveContext={onRemoveContext}
+        selection={selection}
+      />
+      <ChatComposerAttachmentChips
+        attachments={attachments}
+        pendingUploads={pendingUploads}
+        removeAttachment={removeAttachment}
+        setPreviewAttachment={setPreviewAttachment}
+      />
+      {shouldShowLowCredits ? (
+        <span className="text-muted-foreground text-xs">
+          {tChatShared("countPluralOneChatMessage", {
+            count: remainingChatCredits ?? 0,
+          })}
         </span>
       ) : null}
-    </Composer.Nudge>
+    </>
+  );
+}
+
+/** What went wrong, and a way to try again when there is one. */
+function ChatInputError({ message, onRetry }: ChatInputErrorProps) {
+  const tCommon = useTranslations("common");
+  return (
+    <span className="flex w-full min-w-0 items-center gap-1.5 text-sm">
+      <HugeiconsIcon
+        aria-hidden="true"
+        className="text-warning size-4 shrink-0"
+        icon={Alert02Icon}
+      />
+      <span className="min-w-0 flex-1 truncate" role="alert">
+        {message}
+      </span>
+      {onRetry ? (
+        <Button onClick={onRetry} size="xs" variant="outline">
+          {tCommon("actions.tryAgain")}
+        </Button>
+      ) : null}
+    </span>
   );
 }
 

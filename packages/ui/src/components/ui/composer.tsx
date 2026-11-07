@@ -18,12 +18,18 @@ import {
 } from "@notra/ui/components/ui/tooltip";
 import {
   COMPOSER_CHIP_ACTION,
+  COMPOSER_ELEVATED_HIGHLIGHT,
+  COMPOSER_ELEVATED_SHADOW,
+  COMPOSER_INNER_HIGHLIGHT,
   COMPOSER_INPUT,
+  COMPOSER_INPUT_PILL,
+  COMPOSER_PILL_RADIUS,
   COMPOSER_SEND_ACTIVE,
   COMPOSER_SEND_BUTTON,
   COMPOSER_SEND_BUTTON_SM,
   COMPOSER_SEND_INERT,
   COMPOSER_TOOLBAR_BUTTON,
+  COMPOSER_TOOLBAR_BUTTON_FILLED,
   COMPOSER_TOOLBAR_BUTTON_LABEL,
   COMPOSER_TRAY_TRANSITION,
 } from "@notra/ui/constants/composer";
@@ -39,6 +45,7 @@ import {
 import type { ReactNode } from "react";
 import { useLayoutEffect, useRef, useState } from "react";
 import type {
+  ComposerCardLightOptions,
   ComposerChipProps,
   ComposerFrameProps,
   ComposerInputProps,
@@ -80,12 +87,29 @@ function ComposerNudgeShell({ children }: { children: ReactNode }) {
   );
 }
 
+function frameRadius(flat: boolean, size: ComposerFrameProps["size"]) {
+  if (!flat) {
+    return "rounded-[18px]";
+  }
+  return size === "sm" ? "rounded-[22px]" : COMPOSER_PILL_RADIUS;
+}
+
+/** The card's inner light, or its shadow when it floats on its own. */
+function cardLight({ highlight, lifted }: ComposerCardLightOptions) {
+  if (highlight) {
+    return lifted ? COMPOSER_ELEVATED_HIGHLIGHT : COMPOSER_INNER_HIGHLIGHT;
+  }
+  return lifted ? COMPOSER_ELEVATED_SHADOW : undefined;
+}
+
 function ComposerFrame({
   children,
   nudge,
   connectedTop = false,
   flat = false,
+  elevated = false,
   size = "default",
+  highlight = false,
   className,
 }: ComposerFrameProps) {
   const hasNudge = Boolean(nudge);
@@ -96,12 +120,9 @@ function ComposerFrame({
       className={cn(
         "flex w-full min-w-0 flex-col",
         COMPOSER_TRAY_TRANSITION,
+        elevated && hasNudge && COMPOSER_ELEVATED_SHADOW,
         showTray ? "bg-muted p-1" : "bg-transparent",
-        flat
-          ? size === "sm"
-            ? "rounded-[22px]"
-            : "rounded-[28px]"
-          : "rounded-[18px]",
+        frameRadius(flat, size),
         connectedTop && "rounded-t-none",
         className
       )}
@@ -125,7 +146,8 @@ function ComposerFrame({
                 size === "sm" ? "rounded-[18px]" : "rounded-3xl"
               )
             : "rounded-[14px] shadow-[inset_0_1px_0_rgba(255,255,255,0.9),inset_0_0_6px_rgba(255,255,255,0.8),0_1px_2px_rgba(0,0,0,0.04)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.07),inset_0_0_6px_rgba(255,255,255,0.03)]",
-          connectedTop && !hasNudge && "rounded-t-none border-t-0"
+          connectedTop && !hasNudge && "rounded-t-none border-t-0",
+          cardLight({ highlight, lifted: elevated && !hasNudge })
         )}
         data-slot="composer-card"
       >
@@ -256,10 +278,18 @@ function ComposerChip({
   );
 }
 
-function ComposerInput({ className, ...props }: ComposerInputProps) {
+function ComposerInput({
+  className,
+  layout = "card",
+  ...props
+}: ComposerInputProps) {
   return (
     <Textarea
-      className={cn(COMPOSER_INPUT, className)}
+      className={cn(
+        COMPOSER_INPUT,
+        layout === "pill" && COMPOSER_INPUT_PILL,
+        className
+      )}
       data-slot="composer-input"
       {...props}
     />
@@ -280,6 +310,7 @@ function ComposerToolbar({ children, className }: ComposerToolbarProps) {
 function ComposerToolbarButton({
   className,
   size = "sm",
+  filled = false,
   ...props
 }: ComposerToolbarButtonProps) {
   const isIconOnly = typeof size === "string" && size.startsWith("icon");
@@ -289,6 +320,7 @@ function ComposerToolbarButton({
       className={cn(
         COMPOSER_TOOLBAR_BUTTON,
         !isIconOnly && COMPOSER_TOOLBAR_BUTTON_LABEL,
+        filled && COMPOSER_TOOLBAR_BUTTON_FILLED,
         className
       )}
       size={size}

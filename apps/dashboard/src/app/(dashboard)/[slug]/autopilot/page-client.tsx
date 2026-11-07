@@ -15,14 +15,9 @@ import {
   IconTabsTrigger,
 } from "@notra/ui/components/ui/icon-tabs";
 import { Tabs, TabsContent } from "@notra/ui/components/ui/tabs";
-import {
-  parseAsBoolean,
-  parseAsString,
-  parseAsStringLiteral,
-  useQueryState,
-  useQueryStates,
-} from "nuqs";
-import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { parseAsBoolean, parseAsStringLiteral, useQueryState } from "nuqs";
+import { useState } from "react";
 
 import { AutopilotAnalyticsPanel } from "@/components/autopilot/autopilot-analytics-panel";
 import { AutopilotAutomationsOverview } from "@/components/autopilot/autopilot-automations-overview";
@@ -44,16 +39,22 @@ import { TabCount } from "@/components/tab-count";
 import { AUTOPILOT_NAV_LINK } from "@/constants/autopilot";
 import {
   AUTOPILOT_AUTOMATION_SLUGS,
-  AUTOPILOT_LINK_ACTIONS,
   AUTOPILOT_PAGE_TABS,
 } from "@/constants/autopilot-ui";
+import { AUTOPILOT_WORKFLOWS_PATH } from "@/constants/autopilot-workflows";
 import { useActiveProject } from "@/lib/hooks/use-active-project";
 import { useAutopilotActions } from "@/lib/hooks/use-autopilot";
+import { useAutopilotLinkedAction } from "@/lib/hooks/use-autopilot-linked-action";
 import { useRouter } from "@/lib/navigation";
+import { dashboardOrpc } from "@/lib/orpc/query";
 import type {
   AutopilotOverviewPageProps,
   AutopilotPageClientProps,
-  AutopilotPendingFindingAction,
+  AutopilotOffPageProps,
+  AutopilotOverviewTabsListProps,
+  AutopilotOverviewToolbarProps,
+  AutopilotPullRequestsTabProps,
+  AutopilotSettingsTabProps,
 } from "@/types/autopilot";
 import type { AutopilotMetricsDays } from "@/types/autopilot-metrics";
 import {
@@ -78,6 +79,160 @@ export default function PageClient({
   );
 }
 
+/** Before Autopilot is on: admins set it up, everyone else is told who can. */
+function AutopilotOffPage({
+  basePath,
+  organizationId,
+  overview,
+  projectId,
+  onTurnedOn,
+}: AutopilotOffPageProps) {
+  return (
+    <>
+      <PageHeading title="Autopilot" />
+      {overview.canManage ? (
+        <AutopilotSetupFlow
+          callbackPath={basePath}
+          onSaved={onTurnedOn}
+          organizationId={organizationId}
+          overview={overview}
+          projectId={projectId}
+          submitLabel="Turn on Autopilot"
+        />
+      ) : (
+        <EmptyState
+          description="Ask a workspace admin to turn on Autopilot."
+          title="Autopilot is off"
+        />
+      )}
+    </>
+  );
+}
+
+function AutopilotOverviewTabsList({
+  value,
+  canManage,
+  automationCount,
+  pullRequestCount,
+}: AutopilotOverviewTabsListProps) {
+  return (
+    <IconTabsList value={value}>
+      <IconTabsTrigger
+        icon={<HugeiconsIcon icon={WorkflowSquare03Icon} size={15} />}
+        value="automations"
+      >
+        Automations
+        <TabCount count={automationCount} />
+      </IconTabsTrigger>
+      <IconTabsTrigger
+        icon={<HugeiconsIcon icon={GitPullRequestIcon} size={15} />}
+        value="pull-requests"
+      >
+        Pull requests
+        <TabCount count={pullRequestCount} />
+      </IconTabsTrigger>
+      <IconTabsTrigger
+        icon={<HugeiconsIcon icon={Analytics01Icon} size={15} />}
+        value="analytics"
+      >
+        Analytics
+      </IconTabsTrigger>
+      {canManage ? (
+        <IconTabsTrigger
+          icon={<HugeiconsIcon icon={Settings01Icon} size={15} />}
+          value="settings"
+        >
+          Settings
+        </IconTabsTrigger>
+      ) : null}
+    </IconTabsList>
+  );
+}
+
+/** Autopilot's pull requests and suggestions, to merge, write or dismiss. */
+function AutopilotPullRequestsTab({
+  organizationId,
+  basePath,
+  findings,
+  canManage,
+}: AutopilotPullRequestsTabProps) {
+  const router = useRouter();
+  const { merge, writeSuggestion } = useAutopilotActions(organizationId);
+  return (
+    <AutopilotFindingTables
+      findings={findings}
+      idPrefix="autopilot"
+      mergingId={merge.isPending ? (merge.variables?.findingId ?? null) : null}
+      onMerge={(row, method) => merge.mutate({ findingId: row.id, method })}
+      onOpen={(row) => router.push(`${basePath}/findings/${row.id}`)}
+      onWrite={(row) => writeSuggestion.mutate(row.id)}
+      readOnly={!canManage}
+      writingId={
+        writeSuggestion.isPending ? (writeSuggestion.variables ?? null) : null
+      }
+    />
+  );
+}
+
+function AutopilotSettingsTab({
+  basePath,
+  organizationId,
+  overview,
+}: AutopilotSettingsTabProps) {
+  if (!overview.canManage) {
+    return (
+      <EmptyState
+        description="Ask a workspace admin to change Autopilot's settings."
+        title="Only admins can change this"
+      />
+    );
+  }
+  return (
+    <AutopilotSettingsPanel
+      callbackPath={`${basePath}?tab=settings`}
+      organizationId={organizationId}
+      overview={overview}
+    />
+  );
+}
+
+/** The period for the numbers, and starting or stopping a run. */
+function AutopilotOverviewToolbar({
+  organizationId,
+  canManage,
+  activeRun,
+  running,
+  showPeriod,
+  days,
+  onDaysChange,
+  onRunNow,
+}: AutopilotOverviewToolbarProps) {
+  return (
+    <div className="flex items-center gap-2">
+      {showPeriod ? (
+        <AutopilotPeriodSelect onChange={onDaysChange} value={days} />
+      ) : null}
+      {canManage && activeRun?.workflowKey ? (
+        <AutopilotStopButton
+          organizationId={organizationId}
+          runId={activeRun.id}
+        />
+      ) : null}
+      {canManage ? (
+        <Button
+          disabled={Boolean(activeRun)}
+          loading={running}
+          onClick={onRunNow}
+          size="sm"
+        >
+          <HugeiconsIcon icon={PlayIcon} size={16} />
+          Run now
+        </Button>
+      ) : null}
+    </div>
+  );
+}
+
 function AutopilotOverviewPage({
   organizationId,
   organizationSlug,
@@ -85,8 +240,7 @@ function AutopilotOverviewPage({
 }: AutopilotOverviewPageProps) {
   const router = useRouter();
   const { projectId } = useActiveProject();
-  const { runNow, setJob, writeSuggestion, merge } =
-    useAutopilotActions(organizationId);
+  const { runNow, setJob } = useAutopilotActions(organizationId);
   const [tab, setTab] = useQueryState(
     "tab",
     parseAsStringLiteral(AUTOPILOT_PAGE_TABS)
@@ -98,59 +252,31 @@ function AutopilotOverviewPage({
     parseAsBoolean
   );
   const [days, setDays] = useState<AutopilotMetricsDays>(30);
-  const [pending, setPending] = useState<AutopilotPendingFindingAction | null>(
-    null
-  );
-  const [link, setLink] = useQueryStates({
-    finding: parseAsString,
-    action: parseAsStringLiteral(AUTOPILOT_LINK_ACTIONS),
-  });
   const { settings, findings, runs, canManage } = overview;
+  const linkedAction = useAutopilotLinkedAction(findings, canManage);
   const basePath = `/${organizationSlug}${AUTOPILOT_NAV_LINK}`;
   const pullRequests = findings.filter(isListedPullRequest);
 
-  // Slack brief buttons link here with ?finding=…&action=merge|dismiss. The
-  // params are dropped once read, so a reload doesn't ask again.
-  useEffect(() => {
-    if (!(link.finding && link.action)) {
-      return;
-    }
-    const finding = findings.find((row) => row.id === link.finding);
-    if (
-      canManage &&
-      finding &&
-      (finding.status === "proposed" ||
-        (finding.status === "suggested" && link.action === "dismiss"))
-    ) {
-      setPending({ kind: link.action, finding });
-      void setTab("pull-requests");
-    }
-    void setLink(null);
-  }, [canManage, findings, link, setLink, setTab]);
-
+  const workflowsQuery = useQuery(
+    dashboardOrpc.autopilot.workflows.list.queryOptions({
+      input: { organizationId },
+    })
+  );
   const activeRun = findActiveAutopilotRun(runs);
   const isRunning = Boolean(activeRun);
+  // A Slack button's merge or dismiss is about a pull request, so that tab
+  // shows behind its dialog, and stays once it closes.
+  const shownTab = linkedAction.pending ? "pull-requests" : tab;
 
   if (!settings.enabled) {
     return (
-      <>
-        <PageHeading title="Autopilot" />
-        {canManage ? (
-          <AutopilotSetupFlow
-            callbackPath={basePath}
-            onSaved={() => runNow.mutate(undefined)}
-            organizationId={organizationId}
-            overview={overview}
-            projectId={projectId}
-            submitLabel="Turn on Autopilot"
-          />
-        ) : (
-          <EmptyState
-            description="Ask a workspace admin to turn on Autopilot."
-            title="Autopilot is off"
-          />
-        )}
-      </>
+      <AutopilotOffPage
+        basePath={basePath}
+        onTurnedOn={() => runNow.mutate(undefined)}
+        organizationId={organizationId}
+        overview={overview}
+        projectId={projectId}
+      />
     );
   }
 
@@ -182,69 +308,30 @@ function AutopilotOverviewPage({
           const next = AUTOPILOT_PAGE_TABS.find((option) => option === value);
           void setTab(next ?? "automations");
         }}
-        value={tab}
+        value={shownTab}
       >
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="max-w-full overflow-x-auto">
-            <IconTabsList value={tab}>
-              <IconTabsTrigger
-                icon={<HugeiconsIcon icon={WorkflowSquare03Icon} size={15} />}
-                value="automations"
-              >
-                Automations
-                <TabCount
-                  count={
-                    AUTOPILOT_AUTOMATION_KINDS.filter(
-                      (kind) => settings.jobs[kind]
-                    ).length
-                  }
-                />
-              </IconTabsTrigger>
-              <IconTabsTrigger
-                icon={<HugeiconsIcon icon={GitPullRequestIcon} size={15} />}
-                value="pull-requests"
-              >
-                Pull requests
-                <TabCount count={pullRequests.length} />
-              </IconTabsTrigger>
-              <IconTabsTrigger
-                icon={<HugeiconsIcon icon={Analytics01Icon} size={15} />}
-                value="analytics"
-              >
-                Analytics
-              </IconTabsTrigger>
-              {canManage ? (
-                <IconTabsTrigger
-                  icon={<HugeiconsIcon icon={Settings01Icon} size={15} />}
-                  value="settings"
-                >
-                  Settings
-                </IconTabsTrigger>
-              ) : null}
-            </IconTabsList>
+            <AutopilotOverviewTabsList
+              automationCount={
+                AUTOPILOT_AUTOMATION_KINDS.filter((kind) => settings.jobs[kind])
+                  .length + (workflowsQuery.data?.length ?? 0)
+              }
+              canManage={canManage}
+              pullRequestCount={pullRequests.length}
+              value={shownTab}
+            />
           </div>
-          <div className="flex items-center gap-2">
-            {tab === "automations" || tab === "analytics" ? (
-              <AutopilotPeriodSelect onChange={setDays} value={days} />
-            ) : null}
-            {canManage && activeRun?.workflowKey ? (
-              <AutopilotStopButton
-                organizationId={organizationId}
-                runId={activeRun.id}
-              />
-            ) : null}
-            {canManage ? (
-              <Button
-                disabled={isRunning}
-                loading={runNow.isPending || isRunning}
-                onClick={() => runNow.mutate(undefined)}
-                size="sm"
-              >
-                <HugeiconsIcon icon={PlayIcon} size={16} />
-                Run now
-              </Button>
-            ) : null}
-          </div>
+          <AutopilotOverviewToolbar
+            activeRun={activeRun}
+            canManage={canManage}
+            days={days}
+            onDaysChange={setDays}
+            onRunNow={() => runNow.mutate(undefined)}
+            organizationId={organizationId}
+            running={runNow.isPending || isRunning}
+            showPeriod={shownTab === "automations" || shownTab === "analytics"}
+          />
         </div>
 
         <TabsContent className="mt-4" value="automations">
@@ -261,6 +348,11 @@ function AutopilotOverviewPage({
             onAddAutomation={(kind) => setJob.mutate({ kind, enabled: true })}
             onOpenAutomation={(kind) =>
               router.push(`${basePath}/${AUTOPILOT_AUTOMATION_SLUGS[kind]}`)
+            }
+            onOpenWorkflow={(workflowId) =>
+              router.push(
+                `${basePath}${AUTOPILOT_WORKFLOWS_PATH}/${workflowId}`
+              )
             }
             onRunAutomation={(kind) => runNow.mutate(kind)}
             organizationId={organizationId}
@@ -279,27 +371,11 @@ function AutopilotOverviewPage({
           />
         </TabsContent>
         <TabsContent className="mt-4" value="pull-requests">
-          <AutopilotFindingTables
+          <AutopilotPullRequestsTab
+            basePath={basePath}
+            canManage={canManage}
             findings={findings}
-            idPrefix="autopilot"
-            mergingId={
-              merge.isPending ? (merge.variables?.findingId ?? null) : null
-            }
-            onMerge={(row, method) =>
-              merge.mutate({ findingId: row.id, method })
-            }
-            onOpen={(row) => router.push(`${basePath}/findings/${row.id}`)}
-            onWrite={
-              settings.enabled
-                ? (row) => writeSuggestion.mutate(row.id)
-                : undefined
-            }
-            readOnly={!canManage}
-            writingId={
-              writeSuggestion.isPending
-                ? (writeSuggestion.variables ?? null)
-                : null
-            }
+            organizationId={organizationId}
           />
         </TabsContent>
         <TabsContent className="mt-4" value="analytics">
@@ -311,26 +387,24 @@ function AutopilotOverviewPage({
           />
         </TabsContent>
         <TabsContent className="mt-4" value="settings">
-          {canManage ? (
-            <AutopilotSettingsPanel
-              callbackPath={`${basePath}?tab=settings`}
-              organizationId={organizationId}
-              overview={overview}
-            />
-          ) : (
-            <EmptyState
-              description="Ask a workspace admin to change Autopilot's settings."
-              title="Only admins can change this"
-            />
-          )}
+          <AutopilotSettingsTab
+            basePath={basePath}
+            organizationId={organizationId}
+            overview={overview}
+          />
         </TabsContent>
       </Tabs>
 
       <AutopilotFindingConfirmDialog
         branch={settings.repository?.branch ?? null}
-        onClose={() => setPending(null)}
+        onClose={() => {
+          if (linkedAction.pending) {
+            void setTab("pull-requests");
+          }
+          linkedAction.close();
+        }}
         organizationId={organizationId}
-        pending={pending}
+        pending={linkedAction.pending}
       />
     </>
   );

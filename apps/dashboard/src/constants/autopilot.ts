@@ -1,6 +1,5 @@
 import type {
   AutopilotCommitFilters,
-  AutopilotEventLevel,
   AutopilotFindingStatus,
   AutopilotJobKind,
   AutopilotRunStatus,
@@ -462,3 +461,9 @@ export const AUTOPILOT_IMAGE_FRONTMATTER_KEYS = [
   "featuredImage",
   "thumbnail",
 ] as const;
+
+/** Workspace roles that can change Autopilot and its workflows. */
+export const AUTOPILOT_MANAGER_ROLES: ReadonlySet<string> = new Set([
+  "owner",
+  "admin",
+]);

@@ -106,6 +106,9 @@ const AutopilotRun = lazyPage(
 const AutopilotFinding = lazyPage(
   () => import("@/app/(dashboard)/[slug]/autopilot/findings/[id]/page-client")
 );
+const AutopilotWorkflow = lazyPage(
+  () => import("@/app/(dashboard)/[slug]/autopilot/workflows/[id]/page-client")
+);
 const AutopilotAutomation = lazyPage(
   () => import("@/app/(dashboard)/[slug]/autopilot/[automation]/page-client")
 );
@@ -469,6 +472,19 @@ export function createDashboardUiRoutes(parent: AnyRoute) {
         <AutopilotFinding
           findingId={params.id}
           organizationSlug={params.slug}
+        />
+      ),
+    }),
+    createUiRoute({
+      parent: organization,
+      path: "autopilot/workflows/$id",
+      title: { title: "Autopilot" },
+      preload: AutopilotWorkflow.preload,
+      component: ({ params }) => (
+        <AutopilotWorkflow
+          key={params.id}
+          organizationSlug={params.slug}
+          workflowId={params.id}
         />
       ),
     }),

@@ -16,7 +16,10 @@ import type {
 import type { useAutopilotSetup } from "@/lib/hooks/use-autopilot-setup";
 import type { DashboardRouter } from "@/lib/orpc/router";
 import type { autopilotPullRequestEventSchema } from "@/schemas/autopilot-github";
-import type { AutopilotAutomationKind } from "@/types/autopilot-metrics";
+import type {
+  AutopilotMetricsDays,
+  AutopilotAutomationKind,
+} from "@/types/autopilot-metrics";
 import type { GitHubMergeMethod } from "@/types/integrations/github";
 import type { WorkflowRunView } from "@/types/workflow-engine";
 
@@ -138,6 +141,12 @@ export interface AutopilotRunsTableProps {
 export interface AutopilotRunResult {
   tone: "running" | "failed" | "error" | "pull-request" | "ideas" | "quiet";
   text: string;
+}
+
+/** A Slack brief button's link: ?finding=…&action=merge|dismiss. */
+export interface AutopilotFindingLink {
+  finding: string | null;
+  action: AutopilotPendingFindingAction["kind"] | null;
 }
 
 export interface AutopilotPendingFindingAction {
@@ -542,3 +551,45 @@ export interface AutopilotRulesSectionProps {
   organizationId: string;
   rules: AutopilotOverview["rules"];
 }
+
+export interface AutopilotOverviewToolbarProps {
+  organizationId: string;
+  canManage: boolean;
+  activeRun: AutopilotRunView | undefined;
+  /** A run is starting or going. */
+  running: boolean;
+  /** The period applies to the automations and analytics tabs. */
+  showPeriod: boolean;
+  days: AutopilotMetricsDays;
+  onDaysChange: (days: AutopilotMetricsDays) => void;
+  onRunNow: () => void;
+}
+
+export interface AutopilotOffPageProps {
+  basePath: string;
+  organizationId: string;
+  overview: AutopilotOverview;
+  projectId: string | null;
+  onTurnedOn: () => void;
+}
+
+type AutopilotPageTab = (typeof AUTOPILOT_PAGE_TABS)[number];
+
+export interface AutopilotOverviewTabsListProps {
+  value: AutopilotPageTab;
+  canManage: boolean;
+  automationCount: number;
+  pullRequestCount: number;
+}
+
+export interface AutopilotPullRequestsTabProps {
+  organizationId: string;
+  basePath: string;
+  findings: AutopilotFindingView[];
+  canManage: boolean;
+}
+
+export type AutopilotSettingsTabProps = Pick<
+  AutopilotOffPageProps,
+  "basePath" | "organizationId" | "overview"
+>;

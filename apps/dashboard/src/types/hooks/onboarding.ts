@@ -33,3 +33,9 @@ export interface InitialOnboardingAgentRun {
   organizationId: string;
   state: OnboardingAgentRunState;
 }
+
+export interface UseOnboardingBannerOptions {
+  organizationId: string;
+  initialRun: InitialOnboardingAgentRun;
+  initiallyDismissed: boolean;
+}

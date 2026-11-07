@@ -17,7 +17,10 @@ import type {
   SitePreviewPassword,
 } from "@notra/sites-core/types/deployment";
 import type { SmartDeploymentEvaluation } from "@notra/sites-core/types/smart-deployments";
-import type { StoredWorkflowGraph } from "@notra/workflows/types/graph";
+import type {
+  StoredWorkflowGraph,
+  WorkflowGraph,
+} from "@notra/workflows/types/graph";
 import { relations, sql } from "drizzle-orm";
 import {
   type AnyPgColumn,
@@ -122,7 +125,10 @@ import type {
   SiteDomainVerificationRecord,
   SiteJobPayload,
 } from "./types/sites";
-import type { WorkflowRunNodeStep } from "./types/workflows";
+import type {
+  AutopilotWorkflowSchedule,
+  WorkflowRunNodeStep,
+} from "./types/workflows";
 
 export const lookbackWindowEnum = pgEnum("lookback_window", [
   "current_day",
@@ -4869,6 +4875,37 @@ export const workflowRunNodes = pgTable(
     uniqueIndex("workflowRunNodes_runId_nodeId_uidx").on(
       table.runId,
       table.nodeId
+    ),
+  ]
+);
+
+export const autopilotWorkflows = pgTable(
+  "autopilot_workflows",
+  {
+    id: text("id").primaryKey(),
+    organizationId: text("organization_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "cascade" }),
+    name: text("name").notNull(),
+    description: text("description"),
+    graph: jsonb("graph").$type<WorkflowGraph>().notNull(),
+    schedule: jsonb("schedule").$type<AutopilotWorkflowSchedule>(),
+    enabled: boolean("enabled").notNull().default(false),
+    qstashScheduleId: text("qstash_schedule_id"),
+    createdByUserId: text("created_by_user_id").references(() => users.id, {
+      onDelete: "set null",
+    }),
+    lastRunAt: timestamp("last_run_at"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at")
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (table) => [
+    index("autopilotWorkflows_organizationId_updatedAt_idx").on(
+      table.organizationId,
+      table.updatedAt
     ),
   ]
 );

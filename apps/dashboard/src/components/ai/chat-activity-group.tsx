@@ -13,7 +13,7 @@ import {
 } from "@notra/ui/components/ui/collapsible";
 import { cn } from "@notra/ui/lib/utils";
 import { googleFaviconUrl } from "@notra/utils/google-favicon";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslations } from "use-intl";
 
 import { ChatActivityStatus } from "@/components/ai/chat-activity-status";
@@ -28,6 +28,8 @@ import {
 } from "@/constants/chat-activity";
 import { useSettledValue } from "@/lib/hooks/use-settled-value";
 import type {
+  ChatActivityGroupOpenOptions,
+  ChatActivityLabelOptions,
   ChatActivityGroupProps,
   ChatSearchStackProps,
 } from "@/types/components/chat-activity-group";
@@ -49,56 +51,52 @@ function useWorkedDurationSeconds(
 ): number | null {
   const fromMetadata =
     durationMs == null ? null : Math.max(1, Math.round(durationMs / 1000));
-  const startedAtRef = useRef<number | null>(null);
-  const [elapsedSeconds, setElapsedSeconds] = useState<number | null>(null);
+  // Ticks while the stream runs, and the final count once it ends. A count
+  // left from an earlier stream doesn't show while a new one runs.
+  const [measured, setMeasured] = useState<{
+    live: boolean;
+    seconds: number;
+  } | null>(null);
 
   useEffect(() => {
-    if (isStreaming) {
-      if (startedAtRef.current === null) {
-        startedAtRef.current = Date.now();
-      }
-      setElapsedSeconds(0);
-      const interval = window.setInterval(() => {
-        setElapsedSeconds(
-          Math.floor((Date.now() - (startedAtRef.current ?? Date.now())) / 1000)
-        );
-      }, 1000);
-      return () => window.clearInterval(interval);
+    if (!isStreaming) {
+      return;
     }
-
-    if (startedAtRef.current !== null) {
-      setElapsedSeconds(
-        Math.max(1, Math.ceil((Date.now() - startedAtRef.current) / 1000))
-      );
-      startedAtRef.current = null;
-    }
+    const startedAt = Date.now();
+    const interval = window.setInterval(() => {
+      setMeasured({
+        live: true,
+        seconds: Math.floor((Date.now() - startedAt) / 1000),
+      });
+    }, 1000);
+    return () => {
+      window.clearInterval(interval);
+      setMeasured({
+        live: false,
+        seconds: Math.max(1, Math.ceil((Date.now() - startedAt) / 1000)),
+      });
+    };
   }, [isStreaming]);
 
-  return isStreaming
-    ? (liveSeconds ?? elapsedSeconds ?? 0)
-    : (fromMetadata ?? elapsedSeconds);
+  if (isStreaming) {
+    return liveSeconds ?? (measured?.live ? measured.seconds : 0);
+  }
+  return fromMetadata ?? measured?.seconds ?? null;
 }
 
-export function ChatActivityGroup({
-  children,
-  defaultOpen = false,
-  durationMs,
-  elapsedSeconds,
-  forceOpen = false,
-  groupId,
-  hasDetails,
-  isLoading,
-  isStreaming,
+/**
+ * What the group says: the step it's on while it streams, held long enough
+ * to read; what it waits on when stopped for the user; otherwise how long it
+ * worked.
+ */
+function useActivityLabel({
   step,
-}: ChatActivityGroupProps) {
+  waitingStep,
+  isStreaming,
+  durationSeconds,
+}: ChatActivityLabelOptions) {
   const t = useTranslations("ai.activity");
   const tLabels = useTranslations("common.labels");
-  const measuredSeconds = useWorkedDurationSeconds(
-    isStreaming,
-    durationMs,
-    elapsedSeconds
-  );
-  const durationSeconds = measuredSeconds ?? elapsedSeconds ?? null;
   const settledStep = useSettledValue(step, {
     settleMs:
       step === "thinking"
@@ -106,12 +104,35 @@ export function ChatActivityGroup({
         : ACTIVITY_STEP_SETTLE_MS,
     minVisibleMs: ACTIVITY_STEP_MIN_VISIBLE_MS,
   });
+  // Waiting for approval shows at once and leaves at once.
   const displayedStep =
     step === "waitingForApproval" || settledStep === "waitingForApproval"
       ? step
       : settledStep;
-  // A live group starts open so streamed reasoning is readable while it
-  // happens; the auto-close below folds it once the step finishes.
+  if (waitingStep) {
+    return t(`steps.${waitingStep}`);
+  }
+  if (isStreaming) {
+    return displayedStep === "thinking"
+      ? tLabels("thinkingLabel")
+      : t(`steps.${displayedStep}`);
+  }
+  return durationSeconds
+    ? t("workedFor", { duration: formatElapsedSeconds(durationSeconds) })
+    : t("worked");
+}
+
+/**
+ * A live group starts open so streamed reasoning is readable while it
+ * happens, and folds a moment after the step finishes, unless someone opened
+ * or closed it themselves.
+ */
+function useActivityGroupOpen({
+  defaultOpen,
+  forceOpen,
+  isLoading,
+  isStreaming,
+}: ChatActivityGroupOpenOptions) {
   const [isOpen, setIsOpen] = useState(forceOpen || isStreaming || defaultOpen);
   const [hasInteracted, setHasInteracted] = useState(false);
 
@@ -129,16 +150,46 @@ export function ChatActivityGroup({
     return () => window.clearTimeout(closeTimer);
   }, [defaultOpen, forceOpen, hasInteracted, isLoading]);
 
-  const workedLabel =
-    durationSeconds && durationSeconds > 0
-      ? t("workedFor", { duration: formatElapsedSeconds(durationSeconds) })
-      : t("worked");
-  const stepLabel =
-    displayedStep === "thinking"
-      ? tLabels("thinkingLabel")
-      : t(`steps.${displayedStep}`);
-  const label = isStreaming ? stepLabel : workedLabel;
-  const active = isStreaming && step !== "waitingForApproval";
+  return {
+    isOpen,
+    onOpenChange: (open: boolean) => {
+      setHasInteracted(true);
+      setIsOpen(open);
+    },
+  };
+}
+
+export function ChatActivityGroup({
+  children,
+  defaultOpen = false,
+  durationMs,
+  elapsedSeconds,
+  forceOpen = false,
+  groupId,
+  hasDetails,
+  isLoading,
+  isStreaming,
+  step,
+  waitingStep,
+}: ChatActivityGroupProps) {
+  const measuredSeconds = useWorkedDurationSeconds(
+    isStreaming,
+    durationMs,
+    elapsedSeconds
+  );
+  const label = useActivityLabel({
+    step,
+    waitingStep,
+    isStreaming,
+    durationSeconds: measuredSeconds ?? elapsedSeconds ?? null,
+  });
+  const { isOpen, onOpenChange } = useActivityGroupOpen({
+    defaultOpen,
+    forceOpen,
+    isLoading,
+    isStreaming,
+  });
+  const active = isStreaming && !waitingStep && step !== "waitingForApproval";
 
   if (!hasDetails) {
     return (
@@ -155,10 +206,7 @@ export function ChatActivityGroup({
   return (
     <Collapsible
       data-activity-group={groupId}
-      onOpenChange={(open) => {
-        setHasInteracted(true);
-        setIsOpen(open);
-      }}
+      onOpenChange={onOpenChange}
       open={isOpen}
     >
       <CollapsibleTrigger className="text-muted-foreground hover:text-foreground group flex w-full min-w-0 items-center gap-1 text-sm transition-colors">

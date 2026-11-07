@@ -47,6 +47,7 @@ import { getChatToolIcon } from "@/utils/chat-tool-icon";
 import { isFailedToolOutput } from "@/utils/chat-tool-output";
 import { formatElapsedSeconds } from "@/utils/format-elapsed-seconds";
 import { hasOwnKey } from "@/utils/has-own-key";
+import { highlightJsonTokens } from "@/utils/json-highlight";
 import dynamic from "@/utils/lazy-component";
 
 import {
@@ -657,6 +658,14 @@ const TOOL_COPY = {
   memory: {
     subtitle: memoryToolSubtitle,
   },
+  listAutopilotWorkflowSteps: {},
+  listAutopilotWorkflows: {},
+  getAutopilotWorkflow: {},
+  getAutopilotWorkflowRun: {},
+  saveAutopilotWorkflow: {
+    suffix: (input) => quotedSuffix(input, ["name"]),
+  },
+  runAutopilotWorkflow: {},
 } satisfies Record<string, ToolCopy>;
 
 function isToolCopyName(toolName: string): toolName is keyof typeof TOOL_COPY {
@@ -733,8 +742,6 @@ function getSubtitle({
   );
 }
 
-const JSON_TOKEN_RE =
-  /"(?:\\.|[^"\\])*"(?:\s*:)?|\b(?:true|false|null)\b|-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?/g;
 const MAX_JSON_RENDER_CHARS = 20_000;
 
 function stringifyForDisplay(value: unknown): string | undefined {
@@ -760,44 +767,7 @@ function JsonView({ value }: { value: unknown }) {
     ? `${raw.slice(0, MAX_JSON_RENDER_CHARS)}\n${t("truncated", { count: raw.length - MAX_JSON_RENDER_CHARS })}`
     : raw;
 
-  const parts: Array<{ text: string; className: string; key: string }> = [];
-  let lastIndex = 0;
-  for (const match of text.matchAll(JSON_TOKEN_RE)) {
-    const start = match.index ?? 0;
-    if (start > lastIndex) {
-      parts.push({
-        text: text.slice(lastIndex, start),
-        className: "text-muted-foreground/70",
-        key: `plain-${lastIndex}-${start}`,
-      });
-    }
-    const token = match[0];
-    let className = "text-foreground";
-    if (token.startsWith('"')) {
-      className = token.endsWith(":")
-        ? "text-muted-foreground"
-        : "text-foreground";
-    } else if (token === "true" || token === "false") {
-      className = "text-foreground";
-    } else if (token === "null") {
-      className = "text-muted-foreground/60 italic";
-    } else {
-      className = "text-foreground tabular-nums";
-    }
-    parts.push({
-      text: token,
-      className,
-      key: `token-${start}-${token.length}`,
-    });
-    lastIndex = start + token.length;
-  }
-  if (lastIndex < text.length) {
-    parts.push({
-      text: text.slice(lastIndex),
-      className: "text-muted-foreground/70",
-      key: `plain-${lastIndex}-${text.length}`,
-    });
-  }
+  const parts = highlightJsonTokens(text);
 
   return (
     <pre className="border-border/50 bg-muted/30 overflow-x-auto rounded-md border p-3 font-mono text-[0.75rem] leading-relaxed break-words whitespace-pre-wrap">

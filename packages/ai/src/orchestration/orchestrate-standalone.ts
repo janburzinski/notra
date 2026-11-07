@@ -141,11 +141,15 @@ export async function orchestrateStandaloneChat(
       loadPostAgentReach: deps?.loadPostAgentReach,
     }
   );
+  Object.assign(baseToolSet.tools, deps?.extraTools?.tools);
   const { tools, toolCallers } = withStandaloneCodeMode(
     withToolErrorPayloads(baseToolSet.tools)
   );
   const notraToolNames = Object.keys(tools);
-  const approvalToolNames = getStandaloneApprovalToolNames();
+  const approvalToolNames = new Set([
+    ...getStandaloneApprovalToolNames(),
+    ...(deps?.extraTools?.approvalToolNames ?? []),
+  ]);
 
   const lazyMcpRuntime =
     !chatId || !hasMcp
@@ -176,13 +180,12 @@ export async function orchestrateStandaloneChat(
       toolName !== CODE_MODE_TOOL_NAME && !codeModeOnlyToolNames.has(toolName)
   );
   const directToolsDescription = `Call these tools directly; they are not available inside code_mode: ${directToolNames.join(", ")}.`;
-  const descriptions = lazyMcpRuntime
-    ? [
-        toolingDescription,
-        directToolsDescription,
-        ...lazyMcpRuntime.descriptions,
-      ]
-    : [toolingDescription, directToolsDescription];
+  const descriptions = [
+    toolingDescription,
+    directToolsDescription,
+    ...(deps?.extraTools?.descriptions ?? []),
+    ...(lazyMcpRuntime?.descriptions ?? []),
+  ];
 
   const hasGitHubToolsActive = notraToolNames.some(isGitHubToolName);
   const hasLinearToolsActive = notraToolNames.some(isLinearToolName);
@@ -252,11 +255,17 @@ export async function orchestrateStandaloneChat(
     prepareStep: async (options) => ({
       activeTools: await getActiveToolNames(options),
     }),
-    toolApproval: ({ toolCall }) =>
-      approvalToolNames.has(toolCall.toolName) ||
-      lazyMcpRuntime?.requiresApproval(toolCall.toolName)
+    toolApproval: async ({ toolCall }) => {
+      if (approvalToolNames.has(toolCall.toolName)) {
+        const skips = await deps?.extraTools
+          ?.skipsApproval?.(toolCall.toolName, toolCall.input)
+          .catch(() => false);
+        return skips ? undefined : "user-approval";
+      }
+      return lazyMcpRuntime?.requiresApproval(toolCall.toolName)
         ? "user-approval"
-        : undefined,
+        : undefined;
+    },
     experimental_toolApprovalSecret: approvalSecret,
     stopWhen: isStepCount(maxSteps),
     experimental_transform: smoothStream(),
@@ -327,11 +336,19 @@ export async function orchestrateStandaloneChat(
       lazyMcpRuntime?.cleanup().catch(() => undefined);
     },
     async onEnd({ usage, steps }) {
-      await deps?.onUsage?.(
-        usage,
-        routingDecision.model,
-        await summarizeRouteUsage(steps, routingDecision.model)
-      );
+      // Pricing waits on the gateway to report each step's cost, which can
+      // take seconds; the user shouldn't wait on it to send the next message.
+      const recordUsage = async () =>
+        deps?.onUsage?.(
+          usage,
+          routingDecision.model,
+          await summarizeRouteUsage(steps, routingDecision.model)
+        );
+      if (deps?.deferUsage) {
+        deps.deferUsage(recordUsage);
+      } else {
+        await recordUsage();
+      }
       await lazyMcpRuntime?.cleanup();
     },
     onError({ error }) {

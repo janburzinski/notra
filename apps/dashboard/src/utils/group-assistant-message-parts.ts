@@ -1,6 +1,7 @@
 import type { ChatMessageMetadata } from "@notra/ai/types/chat";
 import { getToolName, isToolUIPart } from "ai";
 
+import { AGENT_QUESTION_TOOL_NAME } from "@/constants/agent-questions";
 import { CHAT_CREATE_TOOL_TYPES } from "@/constants/chat-posts";
 import type {
   AssistantActivityStackItem,
@@ -9,7 +10,10 @@ import type {
   AssistantPartRef,
   GroupAssistantMessagePartsOptions,
 } from "@/types/chat-activity";
-import type { AssistantActivityStep } from "@/types/components/chat-activity-group";
+import type {
+  AssistantActivityStep,
+  AssistantActivityWaitingStep,
+} from "@/types/components/chat-activity-group";
 import {
   isSearchToolPart,
   isStackableSearchPart,
@@ -171,6 +175,14 @@ export function getAssistantActivityStep(
       if (part.state === "approval-requested") {
         return "waitingForApproval";
       }
+      // Waiting on the user shows through the waiting step instead; once
+      // answered, the agent goes straight back to thinking.
+      if (
+        part.state === "input-available" &&
+        getToolName(part) === AGENT_QUESTION_TOOL_NAME
+      ) {
+        return "thinking";
+      }
       if (
         part.state === "input-streaming" ||
         part.state === "input-available"
@@ -203,4 +215,24 @@ export function isAssistantActivityForceOpen(
     }
     return part.state === "output-available" && isFailedToolOutput(part.output);
   });
+}
+
+/** What the agent's turn waits on, once it stopped for the user. */
+export function getAssistantActivityWaitingStep(
+  parts: AssistantMessagePart[]
+): AssistantActivityWaitingStep | undefined {
+  const tools = parts.filter(isToolUIPart);
+  if (tools.some((part) => part.state === "approval-requested")) {
+    return "waitingForApproval";
+  }
+  if (
+    tools.some(
+      (part) =>
+        part.state === "input-available" &&
+        getToolName(part) === AGENT_QUESTION_TOOL_NAME
+    )
+  ) {
+    return "waitingForAnswer";
+  }
+  return undefined;
 }

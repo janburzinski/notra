@@ -45,6 +45,7 @@ import { nanoid } from "nanoid";
 import { AI_CREDITS_SOURCE_STANDALONE_CHAT } from "@/constants/studio-analytics";
 import { WORKFLOW_ANALYTICS_NAMES } from "@/constants/workflow-analytics";
 import { trackServerEventAndFlush } from "@/lib/analytics/posthog-server";
+import { buildAutopilotWorkflowTools } from "@/lib/autopilot/workflows/agent-tools";
 import { isCodeResearchEnabledForOrganization } from "@/lib/code-research/flag";
 import { buildStandaloneChatTelemetryMetadata } from "@/lib/tcc";
 import { reportStepError } from "@/lib/workflows/step-errors";
@@ -174,6 +175,8 @@ export async function streamChatResponseStep(
     streamId,
     chargeAiCredits,
     surface,
+    autopilotWorkflowId,
+    autopilotAutomation,
   } = input;
 
   const [messages, projectId, codeResearch] = await Promise.all([
@@ -288,6 +291,13 @@ export async function streamChatResponseStep(
         },
         resolveContext: getGitHubToolRepositoryContextByIntegrationId,
         resolveLinearContext: getLinearToolContextByIntegrationId,
+        extraTools: await buildAutopilotWorkflowTools({
+          organizationId,
+          userId,
+          surface,
+          focusWorkflowId: autopilotWorkflowId,
+          focusAutomation: autopilotAutomation,
+        }),
         loadPostAgentReach: loadPostAgentReachSummary,
         onFirstChunk() {
           if (timing.firstChunkAt === null) {

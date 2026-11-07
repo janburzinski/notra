@@ -14,6 +14,11 @@ export function isContentDetailPathname(pathname: string | null): boolean {
   return segments[1] === "content" && segments.length >= 3;
 }
 
+/** Autopilot and its pages, where the floating composer becomes the agent dock. */
+export function isAutopilotPathname(pathname: string | null): boolean {
+  return pathname?.split("/").filter(Boolean)[1] === "autopilot";
+}
+
 /** A standalone chat already is the agent, so it skips the topbar agent button. */
 export function isChatPathname(pathname: string | null): boolean {
   return pathname?.split("/").filter(Boolean)[1] === "chat";

@@ -32,6 +32,8 @@ const run = useWorkflowRun(graph.nodes, graph.edges);
 | `background` | `dots` | `dots`, `lines`, `grid`, `cross` or `none`. |
 | `gap` | `16` | Space between dots or lines. |
 | `focusId` | | Scrolls a step into view, like one you just added. |
+| `autoFit` | `false` | Follows new steps as they are added or move, like a workflow being written. |
+| `fitMinZoom` | `0.6` | The smallest zoom that fits the whole graph. Below it, the view keeps this zoom and shows the first or last steps. |
 | `selectedId` | | Draws the selection ring on a step. |
 | `onSelectNode` | | Called when a step is clicked. |
 | `onNodeMove` | | Makes steps draggable. |

@@ -1,6 +1,13 @@
 "use client";
 
-import { type CSSProperties, type ElementType, memo, useId } from "react";
+import {
+  type CSSProperties,
+  type ElementType,
+  memo,
+  useId,
+  useLayoutEffect,
+  useRef,
+} from "react";
 import { cn } from "@notra/ui/lib/utils";
 
 export interface TextShimmerProps {
@@ -19,10 +26,23 @@ const ShimmerComponent = ({
   spread = 4,
 }: TextShimmerProps) => {
   const textId = `text-shimmer-${useId().replaceAll(":", "")}`;
+  const ref = useRef<HTMLElement>(null);
+
+  // Every shimmer runs on one clock, so one that replaces another, or gets a
+  // new label, carries on mid-sweep instead of flashing back to the start.
+  useLayoutEffect(() => {
+    const now = document.timeline.currentTime;
+    const elapsed = typeof now === "number" ? now : performance.now();
+    ref.current?.style.setProperty(
+      "--text-shimmer-phase",
+      `${String(-(elapsed % (duration * 1000)))}ms`
+    );
+  }, [children, duration]);
 
   return (
     <Component
       className={cn("text-shimmer", className)}
+      ref={ref}
       style={
         {
           "--text-shimmer-duration": `${duration}s`,

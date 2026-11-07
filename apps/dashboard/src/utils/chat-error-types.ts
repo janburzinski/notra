@@ -7,4 +7,6 @@ export interface HandleStandaloneChatErrorOptions {
 export interface ChatErrorMessages {
   usageLimit: string;
   fallback: string;
+  /** When the browser is offline; the fallback otherwise. */
+  offline?: string;
 }

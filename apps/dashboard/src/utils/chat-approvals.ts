@@ -1,4 +1,4 @@
-import { isToolUIPart, type UIMessage } from "ai";
+import { getToolName, isToolUIPart, type UIMessage } from "ai";
 
 const TERMINAL_APPROVAL_STEP_STATES = new Set([
   "output-available",
@@ -57,4 +57,36 @@ export function shouldContinueAfterApprovalResponse({
     approvalResponses.every((part) => part.approval.approved) &&
     toolParts.every((part) => TERMINAL_APPROVAL_STEP_STATES.has(part.state))
   );
+}
+
+/**
+ * The approval the user declined for one of these tools, when the last step
+ * ended on it with nothing else still open; null otherwise.
+ */
+export function findContinuableDenial(
+  messages: UIMessage[],
+  toolNames: ReadonlySet<string>
+): string | null {
+  const message = messages.at(-1);
+  if (!message || message.role !== "assistant") {
+    return null;
+  }
+  const lastStepStartIndex = message.parts.findLastIndex(
+    (part) => part.type === "step-start"
+  );
+  const toolParts = message.parts
+    .slice(lastStepStartIndex + 1)
+    .filter(isToolUIPart);
+  if (
+    !toolParts.every((part) => TERMINAL_APPROVAL_STEP_STATES.has(part.state))
+  ) {
+    return null;
+  }
+  const denied = toolParts.find(
+    (part) =>
+      part.state === "approval-responded" &&
+      !part.approval.approved &&
+      toolNames.has(getToolName(part))
+  );
+  return denied?.state === "approval-responded" ? denied.approval.id : null;
 }

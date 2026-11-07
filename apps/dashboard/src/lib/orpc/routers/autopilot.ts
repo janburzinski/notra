@@ -37,6 +37,10 @@ import {
   AUTOPILOT_IMPACT_MAX_FINDINGS,
   AUTOPILOT_RUNS_PAGE_SIZE,
 } from "@/constants/autopilot";
+import {
+  AUTOPILOT_WORKFLOW_NOT_FOUND,
+  AUTOPILOT_WORKFLOW_UNSCHEDULE_FAILED,
+} from "@/constants/autopilot-workflows";
 import { AUTOPILOT_DAILY_WORKFLOW_KEY } from "@/constants/workflow-engine";
 import { loadAutopilotAnalytics } from "@/lib/autopilot/analytics";
 import { listRecentPullRequestAuthors } from "@/lib/autopilot/authors";
@@ -73,14 +77,33 @@ import {
 import { startAutopilot } from "@/lib/autopilot/start";
 import { stopAutopilotRun } from "@/lib/autopilot/stop";
 import { loadSuggestedPost } from "@/lib/autopilot/suggestions";
+import {
+  deleteAutopilotWorkflow,
+  getAutopilotWorkflow,
+  getAutopilotWorkflowRunViews,
+  listAutopilotWorkflows,
+  runAutopilotWorkflow,
+  setAutopilotWorkflowEnabled,
+} from "@/lib/autopilot/workflows/service";
 import { authorizedProcedure, withOrganizationAccess } from "@/lib/orpc/base";
-import { badRequest, forbidden } from "@/lib/orpc/utils/errors";
+import {
+  badRequest,
+  forbidden,
+  notFound,
+  serviceUnavailable,
+} from "@/lib/orpc/utils/errors";
 import { workflowDefinitions } from "@/lib/workflow-engine/definitions/autopilot";
 import { getWorkflowRunViews } from "@/lib/workflow-engine/run-view";
 import { startAutopilotSuggestionWorkflowRun } from "@/lib/workflows/start";
+import {
+  autopilotWorkflowEnabledInputSchema,
+  autopilotWorkflowInputSchema,
+  autopilotWorkflowRunInputSchema,
+} from "@/schemas/autopilot-workflows";
 import type { ORPCContext } from "@/types/orpc/context";
 import { toAutopilotCommitFilters } from "@/utils/autopilot-commit-filters";
 import { normalizeRepositoryDirectory } from "@/utils/autopilot-paths";
+import { canManageAutopilot } from "@/utils/autopilot-permissions";
 
 /**
  * Autopilot is behind the `autopilot` flag: every procedure but `get` refuses
@@ -96,10 +119,6 @@ const withAutopilotFlag = os
   });
 
 /** Autopilot writes to the customer's repository, so changes are limited to admins. */
-function canManageAutopilot(role: string) {
-  return role === "owner" || role === "admin";
-}
-
 function assertCanManageAutopilot(context: {
   auth: { membership: { role: string } };
 }) {
@@ -609,4 +628,88 @@ export const autopilotRouter = {
       await deleteRule(input.organizationId, input.ruleId);
       return { success: true as const };
     }),
+
+  workflows: {
+    list: authorizedProcedure
+      .input(autopilotOrganizationInputSchema)
+      .use(withOrganizationAccess)
+      .use(withAutopilotFlag)
+      .handler(({ input }) => listAutopilotWorkflows(input.organizationId)),
+
+    get: authorizedProcedure
+      .input(autopilotWorkflowInputSchema)
+      .use(withOrganizationAccess)
+      .use(withAutopilotFlag)
+      .handler(async ({ input }) => {
+        const workflow = await getAutopilotWorkflow(
+          input.organizationId,
+          input.workflowId
+        );
+        if (!workflow) {
+          throw notFound(AUTOPILOT_WORKFLOW_NOT_FOUND);
+        }
+        return workflow;
+      }),
+
+    runGraph: authorizedProcedure
+      .input(autopilotWorkflowRunInputSchema)
+      .use(withOrganizationAccess)
+      .use(withAutopilotFlag)
+      .handler(({ input }) =>
+        getAutopilotWorkflowRunViews(input.organizationId, input.runId)
+      ),
+
+    run: authorizedProcedure
+      .input(autopilotWorkflowInputSchema)
+      .use(withOrganizationAccess)
+      .use(withAutopilotFlag)
+      .handler(async ({ input, context }) => {
+        assertCanManageAutopilot(context);
+        const runId = await runAutopilotWorkflow({
+          organizationId: input.organizationId,
+          workflowId: input.workflowId,
+          trigger: "manual",
+        });
+        if (!runId) {
+          throw notFound(AUTOPILOT_WORKFLOW_NOT_FOUND);
+        }
+        return { runId };
+      }),
+
+    setEnabled: authorizedProcedure
+      .input(autopilotWorkflowEnabledInputSchema)
+      .use(withOrganizationAccess)
+      .use(withAutopilotFlag)
+      .handler(async ({ input, context }) => {
+        assertCanManageAutopilot(context);
+        const result = await setAutopilotWorkflowEnabled(
+          input.organizationId,
+          input.workflowId,
+          input.enabled
+        );
+        if (!result) {
+          throw notFound(AUTOPILOT_WORKFLOW_NOT_FOUND);
+        }
+        return result;
+      }),
+
+    delete: authorizedProcedure
+      .input(autopilotWorkflowInputSchema)
+      .use(withOrganizationAccess)
+      .use(withAutopilotFlag)
+      .handler(async ({ input, context }) => {
+        assertCanManageAutopilot(context);
+        const result = await deleteAutopilotWorkflow(
+          input.organizationId,
+          input.workflowId
+        );
+        if (result === "missing") {
+          throw notFound(AUTOPILOT_WORKFLOW_NOT_FOUND);
+        }
+        if (result === "schedule-failed") {
+          throw serviceUnavailable(AUTOPILOT_WORKFLOW_UNSCHEDULE_FAILED);
+        }
+        return { success: true as const };
+      }),
+  },
 };

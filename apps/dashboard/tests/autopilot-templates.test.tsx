@@ -25,7 +25,7 @@ describe("Autopilot templates", () => {
     const html = renderToStaticMarkup(<AutopilotTemplatesPage {...actions} />);
     expect(html.match(/<article/g)).toHaveLength(ALL);
     expect(html).not.toContain("Not yet available");
-    expect(html.match(/>Enable template<\/button>/g)).toHaveLength(ALL);
+    expect(html.match(/>Use<\/button>/g)).toHaveLength(ALL);
     expect(html).not.toContain("Dominik");
     expect(html).not.toContain("Keep pricing page in sync");
     expect(html).not.toContain("Create");

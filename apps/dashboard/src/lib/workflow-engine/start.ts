@@ -1,5 +1,9 @@
 import { compileWorkflowBundle } from "@notra/workflows/runtime/bundle";
-import type { CompiledWorkflowBundle } from "@notra/workflows/types/graph";
+import type { WorkflowBlock } from "@notra/workflows/types/blocks";
+import type {
+  CompiledWorkflowBundle,
+  WorkflowDefinition,
+} from "@notra/workflows/types/graph";
 import { errorMessage } from "@notra/workflows/utils/errors";
 
 import { workflowBlockRegistry } from "@/lib/workflow-engine/blocks";
@@ -16,14 +20,18 @@ export async function startWorkflowRun(params: {
   workflowKey: string;
   trigger: string;
   input: unknown;
+  /** Saved workflows bring their own definition and the blocks they may use. */
+  definitions?: Record<string, WorkflowDefinition>;
+  blocks?: Record<string, WorkflowBlock>;
 }) {
   const { organizationId, workflowKey, trigger, input } = params;
+  const definitions = params.definitions ?? workflowDefinitions;
   let bundle: CompiledWorkflowBundle | null = null;
   let invalid: unknown = null;
   try {
     bundle = compileWorkflowBundle(workflowKey, {
-      definitions: workflowDefinitions,
-      blocks: workflowBlockRegistry.byType(),
+      definitions,
+      blocks: params.blocks ?? workflowBlockRegistry.byType(),
     });
   } catch (error) {
     invalid = error;
@@ -33,7 +41,7 @@ export async function startWorkflowRun(params: {
     organizationId,
     workflowKey,
     graph: bundle?.workflows[workflowKey] ??
-      workflowDefinitions[workflowKey]?.graph ?? { nodes: [], edges: [] },
+      definitions[workflowKey]?.graph ?? { nodes: [], edges: [] },
     trigger,
     input,
   });

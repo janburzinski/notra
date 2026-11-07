@@ -13,6 +13,7 @@ import type {
 } from "./agents";
 import type {
   IntegrationFetchers,
+  ToolSet,
   ValidatedIntegration,
 } from "./orchestration";
 
@@ -42,12 +43,20 @@ export interface StandaloneChatDeps {
   resolveContext?: ResolveIntegrationContext;
   resolveLinearContext?: ResolveLinearIntegrationContext;
   resolveGranolaContext?: ResolveGranolaIntegrationContext;
+  /** Tools the host app adds, such as the dashboard's workflow builder. */
+  extraTools?: ToolSet;
   loadPostAgentReach?: PostAgentReachLoader;
   onUsage?: (
     usage: LanguageModelUsage,
     modelId: string,
     routeUsage?: RouteUsageSummary
   ) => void | Promise<void>;
+  /**
+   * Runs `onUsage` after the stream closes instead of before. The host keeps
+   * the request alive until the work settles; without it, usage is recorded
+   * before the stream ends.
+   */
+  deferUsage?: (work: () => Promise<void>) => void;
   onFirstChunk?: () => void;
   log?: AILogTarget;
 }

@@ -11,12 +11,10 @@ import { SidebarInset, SidebarProvider } from "@notra/ui/components/ui/sidebar";
 import { Skeleton } from "@notra/ui/components/ui/skeleton";
 import { cn } from "@notra/ui/lib/utils";
 import { isDemoModeClient } from "@notra/utils/demo-mode";
-import { useReducedMotion } from "motion/react";
-import { useEffect, useLayoutEffect, useState } from "react";
-import { toast } from "sonner";
 import { useTranslations } from "use-intl";
 
 import { SubscriptionGate } from "@/components/billing/subscription-gate";
+import { AgentPromptBar } from "@/components/dashboard/agent-prompt-bar";
 import { DashboardSidebar } from "@/components/dashboard/app-sidebar";
 import { DashboardGlobalActions } from "@/components/dashboard/dashboard-global-actions";
 import { SiteHeader } from "@/components/dashboard/header";
@@ -26,14 +24,12 @@ import { useRightPanel } from "@/components/dashboard/right-panel-context";
 import { useOrganizationsContext } from "@/components/providers/organization-provider";
 import { EVE_BANNER_HEIGHT } from "@/constants/onboarding-agent";
 import { RIGHT_PANEL_PORTAL_ID } from "@/constants/right-panel";
+import { useAgentPromptBarVisible } from "@/lib/hooks/use-agent-prompt-bar-visible";
 import { useDashboardRootMarker } from "@/lib/hooks/use-dashboard-root-marker";
 import { useDemoBannerVisible } from "@/lib/hooks/use-demo-banner-visible";
 import { useDesktopBreakpoint } from "@/lib/hooks/use-desktop-breakpoint";
-import {
-  useOnboardingAgentBannerDismissal,
-  useOnboardingAgentRun,
-  useRunOnboardingAgent,
-} from "@/lib/hooks/use-onboarding";
+import { useIsClient } from "@/lib/hooks/use-is-client";
+import { useOnboardingBanner } from "@/lib/hooks/use-onboarding-banner";
 import { useSidebarWidth } from "@/lib/hooks/use-sidebar-width";
 import { useWelcomeTour } from "@/lib/hooks/use-welcome-tour";
 import { usePathname } from "@/lib/navigation";
@@ -137,13 +133,10 @@ const DashboardAgentHost = dynamic(loadDashboardAgentHost, {
 
 function DashboardAgentSlot() {
   const { hasOpened } = useRightPanel();
-  const [slotReady, setSlotReady] = useState(false);
+  // The panel only exists in the browser; the server renders nothing here.
+  const isClient = useIsClient();
 
-  useLayoutEffect(() => {
-    setSlotReady(true);
-  }, []);
-
-  if (!slotReady) {
+  if (!isClient) {
     return null;
   }
 
@@ -203,11 +196,14 @@ function DashboardPageViewport({
   const [, , section, contentId] = pathname.split("/");
   const pageOwnsScroll =
     section === "chat" || (section === "content" && Boolean(contentId));
+  const promptBarVisible = useAgentPromptBarVisible();
 
   return (
     <div
       className={cn(
         "@container/main flex min-h-0 min-w-0 flex-1 flex-col gap-2 overscroll-contain has-[[data-site-frame]]:overflow-hidden pointer-fine:overscroll-none",
+        // Room to scroll the last row out from under the floating composer.
+        promptBarVisible && "pb-24",
         pageOwnsScroll
           ? "overflow-hidden"
           : "scrollbar-stable scrollbar-thin overflow-x-hidden overflow-y-auto"
@@ -226,34 +222,17 @@ export function DashboardShell({
   initialSidebarWidth,
   onboardingBannerDismissed,
 }: DashboardShellProps) {
-  const t = useTranslations("dashboard.onboardingBanner");
   const { activeOrganization } = useOrganizationsContext();
   const { expanded } = useRightPanel();
-  const organizationId = activeOrganization?.id ?? "";
-  const { data } = useOnboardingAgentRun(
-    organizationId,
-    initialOnboardingAgentRun
-  );
-  const runAgent = useRunOnboardingAgent();
-  const { dismiss, dismissed } = useOnboardingAgentBannerDismissal(
-    organizationId,
-    onboardingBannerDismissed
-  );
-  const running = data?.running ?? false;
-  const canStart = !!data && !data.ran && !running && !dismissed;
-  const bannerAvailable = running || canStart;
-  const [dismissingOrganizationId, setDismissingOrganizationId] = useState<
-    string | null
-  >(null);
-  const dismissing = dismissingOrganizationId === organizationId;
-  const visible = bannerAvailable && !dismissing;
-  const shouldReduceMotion = useReducedMotion();
-  const starting =
-    runAgent.isPending && runAgent.variables?.organizationId === organizationId;
+  const banner = useOnboardingBanner({
+    organizationId: activeOrganization?.id ?? "",
+    initialRun: initialOnboardingAgentRun,
+    initiallyDismissed: onboardingBannerDismissed,
+  });
   const demo = isDemoModeClient();
   const showDemoBanner = useDemoBannerVisible(demoBannerHidden);
   const welcomeTour = useWelcomeTour();
-  const shellStyle = dashboardShellStyle(showDemoBanner, visible);
+  const shellStyle = dashboardShellStyle(showDemoBanner, banner.visible);
   const {
     finishSidebarResize,
     setSidebarWidth,
@@ -262,40 +241,6 @@ export function DashboardShell({
     startSidebarResize,
   } = useSidebarWidth(initialSidebarWidth);
   useDashboardRootMarker();
-
-  useEffect(() => {
-    setDismissingOrganizationId(null);
-  }, [organizationId]);
-
-  const handleStart = () => {
-    if (!organizationId || starting) {
-      return;
-    }
-    runAgent.mutate(
-      { organizationId },
-      {
-        onError: (error) => toast.error(error.message || t("startFailed")),
-      }
-    );
-  };
-
-  const handleBannerExitComplete = () => {
-    if (!dismissing) {
-      return;
-    }
-
-    setDismissingOrganizationId(null);
-  };
-
-  const handleDismiss = () => {
-    if (shouldReduceMotion) {
-      dismiss();
-      return;
-    }
-
-    setDismissingOrganizationId(organizationId);
-    dismiss();
-  };
 
   const sidebarStyle: DashboardSidebarStyle = {
     "--sidebar-width": `${sidebarWidth}px`,
@@ -317,14 +262,14 @@ export function DashboardShell({
         </div>
       ) : null}
       <DashboardOnboardingBanner
-        available={bannerAvailable}
-        dismissing={dismissing}
-        onDismiss={handleDismiss}
-        onExitComplete={handleBannerExitComplete}
-        onStart={handleStart}
-        running={running}
-        starting={starting}
-        visible={visible}
+        available={banner.available}
+        dismissing={banner.dismissing}
+        onDismiss={banner.dismiss}
+        onExitComplete={banner.finishDismissing}
+        onStart={banner.start}
+        running={banner.running}
+        starting={banner.starting}
+        visible={banner.visible}
       />
       <SidebarProvider
         className={cn(
@@ -355,6 +300,7 @@ export function DashboardShell({
           <DashboardPageViewport>
             <SubscriptionGate>{children}</SubscriptionGate>
           </DashboardPageViewport>
+          <AgentPromptBar />
         </SidebarInset>
         <div className="contents" id={RIGHT_PANEL_PORTAL_ID} />
         <DashboardAgentSlot />

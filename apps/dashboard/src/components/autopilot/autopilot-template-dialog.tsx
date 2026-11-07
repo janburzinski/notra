@@ -240,7 +240,7 @@ function TemplateDetails({
               onClick={onEnable}
               size="sm"
             >
-              Enable template
+              Use template
             </Button>
           )}
         </div>

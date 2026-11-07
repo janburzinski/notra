@@ -31,6 +31,7 @@ export function ChatComposerAttachButton({
   onAttach,
   pendingUploadCount,
   tooltip,
+  filled = false,
 }: ChatComposerAttachButtonProps) {
   const t = useTranslations("chat.attachments");
   return (
@@ -39,6 +40,7 @@ export function ChatComposerAttachButton({
         render={
           <Composer.ToolbarButton
             aria-label={t("attachFiles")}
+            filled={filled}
             size="icon-sm"
             disabled={
               disabled ||

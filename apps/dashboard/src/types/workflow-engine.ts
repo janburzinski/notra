@@ -84,6 +84,8 @@ export interface WorkflowRunViewNode extends Omit<
   startedAt: Date | null;
   finishedAt: Date | null;
   steps: WorkflowRunViewStep[];
+  /** A saved workflow's step settings, shown before it runs. */
+  settings?: { label: string; value: string }[];
 }
 
 interface WorkflowRunViewEdge extends WorkflowEdge {

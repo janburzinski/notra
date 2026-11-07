@@ -8,8 +8,12 @@ export interface ComposerFrameProps {
   connectedTop?: boolean;
   /** Tighter radius, no shadow and no tray until there is a nudge. For inline composers like comments. */
   flat?: boolean;
+  /** Casts a shadow, for a composer floating over page content. */
+  elevated?: boolean;
   /** `sm` is a 36px single-line pill for dense inline composers. Pair it with `Composer.Send size="sm"`. Only applies with `flat`. */
   size?: "default" | "sm";
+  /** A soft inner light, for a pill floating over the page. */
+  highlight?: boolean;
   className?: string;
 }
 
@@ -34,7 +38,10 @@ export interface ComposerChipProps {
   labelClassName?: string;
 }
 
-export type ComposerInputProps = ComponentProps<"textarea">;
+export type ComposerInputProps = ComponentProps<"textarea"> & {
+  /** `pill` is the floating composer's one-line input. */
+  layout?: "card" | "pill";
+};
 
 export interface ComposerToolbarProps {
   children: ReactNode;
@@ -42,7 +49,10 @@ export interface ComposerToolbarProps {
 }
 
 /** A ghost `Button`. Use `size="icon-sm"` for icon-only actions. */
-export type ComposerToolbarButtonProps = Omit<ButtonProps, "variant">;
+export type ComposerToolbarButtonProps = Omit<ButtonProps, "variant"> & {
+  /** Round and filled, instead of a ghost button. */
+  filled?: boolean;
+};
 
 export interface ComposerSendProps {
   children: ReactNode;
@@ -53,4 +63,10 @@ export interface ComposerSendProps {
   /** `sm` is a 28px button for single-line inline composers. */
   size?: "default" | "sm";
   onClick?: () => void;
+}
+
+export interface ComposerCardLightOptions {
+  highlight: boolean;
+  /** The card floats on its own, with nothing above it. */
+  lifted: boolean;
 }

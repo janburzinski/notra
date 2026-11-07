@@ -1,5 +1,7 @@
 "use client";
 
+import { Add01Icon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import { PageHeading } from "@notra/ui/components/shared/page-heading";
 import { StatusBadge } from "@notra/ui/components/status-badge";
 import {
@@ -194,7 +196,7 @@ function AutopilotTemplateCard({
         ) : null}
         <Button
           className="relative z-10 ml-auto"
-          aria-label={`${active ? "Open automation" : "Enable template"}: ${template.name}`}
+          aria-label={`${active ? "Open automation" : "Use template"}: ${template.name}`}
           disabled={!active && (!canManage || isAdding)}
           onClick={() => {
             if (active) {
@@ -204,9 +206,10 @@ function AutopilotTemplateCard({
             }
           }}
           size="sm"
-          variant="ghost"
+          variant={active ? "ghost" : "default"}
         >
-          {active ? "Open automation" : "Enable template"}
+          {active ? null : <HugeiconsIcon icon={Add01Icon} size={14} />}
+          {active ? "Open automation" : "Use"}
         </Button>
       </div>
     </article>

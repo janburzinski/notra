@@ -96,6 +96,14 @@ export interface RoutingResult {
 export interface ToolSet {
   tools: Record<string, import("ai").Tool>;
   descriptions: string[];
+  /** Tools that pause for the user's approval before they run. */
+  approvalToolNames?: string[];
+  /**
+   * Lets one of those calls run without asking when it can't change
+   * anything, such as a workflow that fails its checks: it runs, changes
+   * nothing and reports why, so the user only approves what would work.
+   */
+  skipsApproval?: (toolName: string, input: unknown) => Promise<boolean>;
 }
 
 export interface ContentImageContextSource {

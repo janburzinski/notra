@@ -31,7 +31,10 @@ import type {
   ChatUsageSnapshot,
   ChatWorkflowPayload,
 } from "@notra/ai/types/chat";
-import type { ValidatedIntegration } from "@notra/ai/types/orchestration";
+import type {
+  ValidatedIntegration,
+  ToolSet,
+} from "@notra/ai/types/orchestration";
 import type { TccMetadata } from "@notra/ai/types/tcc";
 import {
   buildChatFinishMetadata,
@@ -45,6 +48,7 @@ import { withChatStreamCleanup } from "@notra/ai/utils/with-chat-stream-cleanup"
 import { isProjectInOrganization } from "@notra/db/utils/projects";
 import { loadPostAgentReachSummary } from "@notra/geo-core/geo/post-agent-reach";
 import { POSTHOG_EVENTS } from "@notra/posthog/events";
+import { waitUntil } from "@vercel/functions";
 import {
   createUIMessageStreamResponse,
   InvalidToolInputError,
@@ -61,6 +65,7 @@ import {
   getChatContextKinds,
 } from "@/lib/analytics/studio-events";
 import { withOrganizationAuth } from "@/lib/auth/organization";
+import { buildAutopilotWorkflowTools } from "@/lib/autopilot/workflows/agent-tools";
 import { isCodeResearchEnabledForOrganization } from "@/lib/code-research/flag";
 import { afterResponse } from "@/lib/framework/after-response";
 import { buildStandaloneChatTelemetryMetadata } from "@/lib/tcc";
@@ -217,12 +222,33 @@ export const POST = withEvlog(async function POST(
     }
     cleanupStreamId = streamId;
 
-    const [hydrationResult, integrationsResult, codeResearchResult] =
-      await Promise.allSettled([
-        hydrateSavedChatPosts(organizationId, chatId, messages),
-        getStandaloneChatIntegrations(organizationId),
-        isCodeResearchEnabledForOrganization(organizationId),
-      ]);
+    const [
+      hydrationResult,
+      integrationsResult,
+      codeResearchResult,
+      autopilotToolsResult,
+    ] = await Promise.allSettled([
+      hydrateSavedChatPosts(organizationId, chatId, messages),
+      getStandaloneChatIntegrations(organizationId),
+      isCodeResearchEnabledForOrganization(organizationId),
+      // The durable run builds these in its own step.
+      canUseChatWorkflowStreaming()
+        ? Promise.resolve(undefined)
+        : buildAutopilotWorkflowTools({
+            organizationId,
+            userId: auth.context.user.id,
+            surface: parseResult.data.surface,
+            focusWorkflowId: parseResult.data.autopilotWorkflowId,
+            focusAutomation: parseResult.data.autopilotAutomation,
+          }),
+    ]);
+    if (autopilotToolsResult.status === "rejected") {
+      logError(
+        "[Standalone Chat] Autopilot workflow tools unavailable",
+        autopilotToolsResult.reason,
+        { requestId, organizationId }
+      );
+    }
 
     if (hydrationResult.status === "rejected") {
       throw hydrationResult.reason;
@@ -316,6 +342,10 @@ export const POST = withEvlog(async function POST(
         headers: request.headers,
         projectId: projectId ?? undefined,
         surface: parseResult.data.surface,
+        extraTools:
+          autopilotToolsResult.status === "fulfilled"
+            ? autopilotToolsResult.value
+            : undefined,
       });
     }
 
@@ -333,6 +363,8 @@ export const POST = withEvlog(async function POST(
       timezone: parseResult.data.timezone,
       projectId: projectId ?? undefined,
       surface: parseResult.data.surface,
+      autopilotWorkflowId: parseResult.data.autopilotWorkflowId,
+      autopilotAutomation: parseResult.data.autopilotAutomation,
     };
 
     await startStandaloneChatRun(workflowPayload);
@@ -395,6 +427,7 @@ async function createDirectStandaloneChatResponse({
   headers,
   projectId,
   surface,
+  extraTools,
 }: {
   streamId: string;
   organizationId: string;
@@ -416,6 +449,7 @@ async function createDirectStandaloneChatResponse({
   headers: Headers;
   projectId?: string;
   surface?: ChatWorkflowPayload["surface"];
+  extraTools?: ToolSet;
 }) {
   const lifecycle = await createChatStreamLifecycle({
     organizationId,
@@ -432,6 +466,18 @@ async function createDirectStandaloneChatResponse({
 
   const responseReady = createDeferred<Response>();
   const streamDone = createDeferred<void>();
+  // Usage is recorded after the stream closes; the request stays alive for it.
+  const pendingUsage: Promise<void>[] = [];
+  const deferUsage = (work: () => Promise<void>) => {
+    const recorded = work().catch((error: unknown) => {
+      logError("[Standalone Chat] Recording usage failed", error, {
+        organizationId,
+        chatId,
+      });
+    });
+    pendingUsage.push(recorded);
+    waitUntil(recorded);
+  };
 
   const runStream = async (streamLog: ReturnType<typeof getLogger>) => {
     const { stream, routingDecision } = await orchestrateStandaloneChat(
@@ -459,6 +505,8 @@ async function createDirectStandaloneChatResponse({
         resolveContext: getGitHubToolRepositoryContextByIntegrationId,
         resolveLinearContext: getLinearToolContextByIntegrationId,
         resolveGranolaContext: getGranolaToolContextByIntegrationId,
+        extraTools,
+        deferUsage,
         loadPostAgentReach: loadPostAgentReachSummary,
         onFirstChunk() {
           if (firstChunkAt === null) {
@@ -630,6 +678,7 @@ async function createDirectStandaloneChatResponse({
         const response = await runStream(getLogger());
         responseReady.resolve(response);
         await streamDone.promise;
+        await Promise.all(pendingUsage);
       } catch (error) {
         responseReady.reject(error);
         streamDone.resolve();

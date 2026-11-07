@@ -1,22 +1,27 @@
 import {
   AiMagicIcon,
+  Alert02Icon,
   AlertCircleIcon,
   Archive02Icon,
   BalanceScaleIcon,
   BulbIcon,
   Calendar03Icon,
   Cancel01Icon,
+  ChartAnalysisIcon,
+  CheckmarkCircle02Icon,
   Clock01Icon,
   FilterIcon,
   GitBranchIcon,
+  Github01Icon,
   GitMergeIcon,
   GitPullRequestClosedIcon,
   GitPullRequestIcon,
-  Github01Icon,
   Idea01Icon,
   Image02Icon,
   Link04Icon,
+  Loading03Icon,
   MinusSignCircleIcon,
+  PauseIcon,
   PencilEdit02Icon,
   PlayIcon,
   RefreshIcon,
@@ -34,8 +39,10 @@ import type {
   AutopilotFindingStatus,
   AutopilotJobKind,
 } from "@notra/db/types/autopilot";
+import { DURATION, EASE } from "@notra/ui/lib/motion";
 import type { StatusBadgeAppearance } from "@notra/ui/types/status-badge";
 
+import { AUTOPILOT_WORKFLOW_BLOCK_TYPES } from "@/constants/autopilot-workflows";
 import { CONTENT_PULL_REQUEST_STATES } from "@/constants/content-overview";
 import type {
   AutopilotRunSectionState,
@@ -47,6 +54,7 @@ import type {
   AutopilotOutcomeKey,
   AutopilotRunTrigger,
 } from "@/types/autopilot-metrics";
+import type { AutopilotWorkflowDraftStatus } from "@/types/autopilot-workflows";
 import type { GitHubMergeMethod } from "@/types/integrations/github";
 
 /** Tabs of the Autopilot page, in order; the first is the default. */
@@ -444,3 +452,103 @@ export const AUTOPILOT_PULL_REQUEST_STATES: Partial<
 
 /** Room for an empty table's icon, title and text; a one-row table would clip them. */
 export const AUTOPILOT_EMPTY_TABLE_HEIGHT = 300;
+
+export const AUTOPILOT_WORKFLOW_STEP_ICONS = {
+  "core.trigger": Clock01Icon,
+  "core.if": GitBranchIcon,
+  "core.switch": GitBranchIcon,
+  [AUTOPILOT_WORKFLOW_BLOCK_TYPES.compareVisibility]: ChartAnalysisIcon,
+  [AUTOPILOT_WORKFLOW_BLOCK_TYPES.askAgent]: AiMagicIcon,
+  [AUTOPILOT_WORKFLOW_BLOCK_TYPES.decide]: GitBranchIcon,
+  [AUTOPILOT_WORKFLOW_BLOCK_TYPES.postToSlack]: SlackIcon,
+} as const satisfies Record<string, IconSvgElement>;
+
+/** A white card on the agent dock's grey tray, like the agent panel's body. */
+export const AUTOPILOT_AGENT_DOCK_CARD_CLASS =
+  "bg-background border-border/70 overflow-hidden rounded-lg border";
+
+/**
+ * Full screen fills the page and lays the dock out on a grid, so the chat,
+ * the input and the preview keep their place in the tree when the dock
+ * changes size.
+ */
+export const AUTOPILOT_AGENT_DOCK_FULLSCREEN_CLASS =
+  "bg-muted h-full min-h-0 grid grid-cols-1 grid-rows-[auto_minmax(0,1fr)_auto] gap-x-1 px-1 pb-1 [grid-template-areas:'header'_'chat'_'input'] lg:grid-cols-[minmax(20rem,26rem)_minmax(0,1fr)] lg:[grid-template-areas:'header_header'_'chat_aside'_'input_aside']";
+
+/** The workflow preview zooms out this far to show every step at once. */
+export const AUTOPILOT_WORKFLOW_PREVIEW_FIT_MIN_ZOOM = 0.4;
+
+/** How each state of a proposed workflow shows, as its badge. */
+export const AUTOPILOT_WORKFLOW_DRAFT_STATUS = {
+  drafting: {
+    key: "building",
+    appearance: { variant: "info", icon: Loading03Icon, spin: true },
+  },
+  "awaiting-approval": {
+    key: "awaitingApproval",
+    appearance: { variant: "warning", icon: PauseIcon },
+  },
+  saving: {
+    key: "saving",
+    appearance: { variant: "info", icon: Loading03Icon, spin: true },
+  },
+  saved: {
+    key: "saved",
+    appearance: { variant: "success", icon: CheckmarkCircle02Icon },
+  },
+  "needs-fixes": {
+    key: "needsFixes",
+    appearance: { variant: "warning", icon: Alert02Icon },
+  },
+  discarded: {
+    key: "discarded",
+    appearance: { variant: "secondary", icon: Cancel01Icon },
+  },
+  failed: {
+    key: "failed",
+    appearance: { variant: "destructive", icon: Alert02Icon },
+  },
+} as const satisfies Record<
+  AutopilotWorkflowDraftStatus,
+  { key: string; appearance: object }
+>;
+
+/** How a workflow step's state shows next to it on the workflow page. */
+export const AUTOPILOT_WORKFLOW_STEP_STATUS = {
+  success: {
+    icon: CheckmarkCircle02Icon,
+    className: "text-geo-up",
+    label: "Done",
+  },
+  running: {
+    icon: Loading03Icon,
+    className: "text-warning motion-safe:animate-spin",
+    label: "Running",
+  },
+  retrying: {
+    icon: Loading03Icon,
+    className: "text-warning motion-safe:animate-spin",
+    label: "Retrying",
+  },
+  error: { icon: Cancel01Icon, className: "text-destructive", label: "Failed" },
+  halted: {
+    icon: MinusSignCircleIcon,
+    className: "text-muted-foreground",
+    label: "Stopped",
+  },
+  skipped: {
+    icon: MinusSignCircleIcon,
+    className: "text-muted-foreground/70",
+    label: "Skipped",
+  },
+} as const;
+
+/** The dock's conversation grows out of the input, and folds back faster. */
+export const AUTOPILOT_AGENT_DOCK_ENTER = {
+  duration: 0.25,
+  ease: EASE.emphasized,
+};
+export const AUTOPILOT_AGENT_DOCK_EXIT = {
+  duration: DURATION.fast,
+  ease: EASE.out,
+};

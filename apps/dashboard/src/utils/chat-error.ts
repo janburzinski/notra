@@ -1,5 +1,6 @@
 import { chatErrorPayloadSchema } from "@notra/ai/schemas/chat";
 
+import { TECHNICAL_CHAT_ERROR } from "@/constants/chat-stream";
 import type {
   ChatErrorMessages,
   HandleStandaloneChatErrorOptions,
@@ -27,10 +28,22 @@ function getStandaloneChatErrorMessage(
     };
   }
 
+  // A request that never got through says so in words people can act on,
+  // not "fetch failed".
+  if (typeof navigator !== "undefined" && navigator.onLine === false) {
+    return {
+      message: messages.offline ?? messages.fallback,
+      shouldLog: false,
+      isUsageLimit: false,
+    };
+  }
+
   if (parsed?.success && parsed.data.error) {
     return {
-      message: parsed.data.error,
-      shouldLog: false,
+      message: TECHNICAL_CHAT_ERROR.test(parsed.data.error)
+        ? messages.fallback
+        : parsed.data.error,
+      shouldLog: TECHNICAL_CHAT_ERROR.test(parsed.data.error),
       isUsageLimit: false,
     };
   }
@@ -47,7 +60,10 @@ function getStandaloneChatErrorMessage(
   }
 
   return {
-    message: errorMessage.trim() ? errorMessage : messages.fallback,
+    message:
+      errorMessage.trim() && !TECHNICAL_CHAT_ERROR.test(errorMessage)
+        ? errorMessage
+        : messages.fallback,
     shouldLog: true,
     isUsageLimit: false,
   };

@@ -20,6 +20,8 @@ export const localStorageKeys = {
   geoUpgradeDismissed: (organizationId: string) =>
     `notra:geo-upgrade-dismissed:${organizationId}`,
   chatSuggestionsDismissed: "notra:chat-suggestions-dismissed:v1",
+  autopilotAgentSuggestionsDismissed:
+    "notra:autopilot-agent-suggestions-dismissed:v1",
   dashboardAgentSuggestionsDismissed:
     "notra:dashboard-agent-suggestions-dismissed:v2",
   commandPaletteRecents: (organizationId: string) =>

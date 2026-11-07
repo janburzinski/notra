@@ -6342,6 +6342,46 @@
           "title": "FAQ-Seite entwerfen",
           "description": "Beantworte die Fragen, die Leute wirklich stellen",
           "prompt": "Hilf mir, ein FAQ zu entwerfen. Frag mich vorher nach dem Produkt und den Fragen, die Kunden wirklich stellen."
+        },
+        "competitorWatch": {
+          "title": "Wettbewerber beobachten",
+          "description": "Benachrichtige mich, wenn uns ein Wettbewerber in KI-Antworten überholt",
+          "prompt": "Bau einen Autopilot-Workflow, der mir in Slack Bescheid gibt, wenn ein Wettbewerber in KI-Antworten öfter erwähnt wird als wir."
+        },
+        "visibilityDigest": {
+          "title": "Wöchentlicher Sichtbarkeitsbericht",
+          "description": "Jeden Montag eine Zusammenfassung, wie KI-Antworten uns erwähnen",
+          "prompt": "Bau einen Autopilot-Workflow, der jeden Montagmorgen eine kurze Zusammenfassung unserer KI-Sichtbarkeit im Vergleich zu Wettbewerbern in Slack postet."
+        },
+        "comebackPlan": {
+          "title": "Comeback planen",
+          "description": "Entwirf, was zu tun ist, wenn wir zurückfallen",
+          "prompt": "Bau einen Autopilot-Workflow, der jeden Tag prüft, ob ein Wettbewerber in KI-Antworten vor uns liegt, und falls ja, einen Plan entwirft, um die Sichtbarkeit zurückzugewinnen."
+        },
+        "workflowExplain": {
+          "title": "Workflow erklären",
+          "description": "Was jeder Schritt macht und wann er läuft",
+          "prompt": "Erklär mir Schritt für Schritt, was dieser Workflow macht und wann er läuft."
+        },
+        "workflowLastRun": {
+          "title": "Wie lief der letzte Lauf?",
+          "description": "Was er gefunden hat und wo er stoppte",
+          "prompt": "Wie lief der letzte Lauf dieses Workflows? Sag mir, was er gefunden hat und warum ein Schritt gestoppt hat."
+        },
+        "workflowChange": {
+          "title": "Ändern",
+          "description": "Beschreib, was anders laufen soll",
+          "prompt": "Ändere diesen Workflow so, dass er "
+        },
+        "automationExplain": {
+          "title": "Automation erklären",
+          "description": "Was sie liest, was sie erstellt und wann sie läuft",
+          "prompt": "Erklär mir, was diese Automation macht, was sie liest, was sie erstellt und wann sie läuft."
+        },
+        "automationAlongside": {
+          "title": "Darauf aufbauen",
+          "description": "Ein Workflow, der mit ihr zusammenarbeitet",
+          "prompt": "Bau einen Workflow, der mit dieser Automation zusammenarbeitet und "
         }
       },
       "personalHeading": "Für {brand} ausgewählt",
@@ -6412,7 +6452,9 @@
     },
     "errors": {
       "usageLimit": "Du hast diesen Monat alle Chat-Nachrichten aufgebraucht. Upgrade für mehr.",
-      "fallback": "Beim Erstellen der Antwort ist etwas schiefgelaufen. Versuch es nochmal."
+      "fallback": "Beim Erstellen der Antwort ist etwas schiefgelaufen. Versuch es nochmal.",
+      "offline": "Du bist offline. Prüf deine Verbindung.",
+      "agentFallback": "Der Agent konnte nicht antworten."
     },
     "quote": {
       "quoteSelection": "Markierten Text zitieren",
@@ -7495,12 +7537,56 @@
       "openLabel": "Agent öffnen",
       "closeLabel": "Agent schließen",
       "placeholder": "Frag irgendwas… (tippe / für Skills)",
-      "sendFailed": "Nachricht konnte nicht gesendet werden",
       "stopFailed": "Die Antwort konnte nicht gestoppt werden. Versuch es nochmal.",
       "historyLoadFailed": "Agent-Chatverlauf konnte nicht geladen werden. Versuch es nochmal.",
       "description": "Chatte mit deinem Dashboard-Agent.",
       "loadingTitle": "Agent wird geladen",
-      "loadingDescription": "Der Dashboard-Agent wird geladen."
+      "loadingDescription": "Der Dashboard-Agent wird geladen.",
+      "promptBar": {
+        "placeholder": "Frag den Agenten oder sag Autopilot, worauf er achten soll…",
+        "replyPlaceholder": "Antworte dem Agenten…",
+        "workflowPlaceholder": "Frag zu diesem Workflow oder sag, was sich ändern soll…",
+        "automationPlaceholder": "Frag zu dieser Automation…"
+      },
+      "workflowPreview": {
+        "status": {
+          "building": "Wird gebaut",
+          "awaitingApproval": "Noch nicht gespeichert",
+          "saved": "Gespeichert",
+          "needsFixes": "Braucht Korrekturen",
+          "discarded": "Verworfen",
+          "failed": "Nicht gespeichert",
+          "changesNotSaved": "Änderungen noch nicht gespeichert",
+          "saving": "Wird gespeichert"
+        },
+        "untitled": "Neuer Workflow",
+        "open": "Öffnen",
+        "steps": "{count, plural, one {# Schritt} other {# Schritte}}",
+        "writingSteps": "Der Agent schreibt die Schritte",
+        "save": "Workflow speichern",
+        "discard": "Verwerfen",
+        "saveChanges": "Änderungen speichern",
+        "changes": {
+          "title": "Was sich ändert",
+          "schedule": "Läuft {to} statt {from}",
+          "name": "Umbenannt von „{from}“",
+          "added": "Fügt „{title}“ hinzu",
+          "removed": "Entfernt „{title}“",
+          "changed": "Ändert „{title}“",
+          "none": "An Schritten, Verbindungen und Zeitplan ändert sich nichts.",
+          "rewired": "Verbindet „{title}“ neu",
+          "description": "Ändert die Beschreibung"
+        }
+      },
+      "dock": {
+        "fullScreen": "Vollbild",
+        "exitFullScreen": "Vollbild beenden",
+        "minimize": "Minimieren",
+        "preview": "Workflow-Vorschau",
+        "previewEmptyTitle": "Hier erscheint dein Workflow",
+        "previewEmptyDescription": "Beschreib, worauf Autopilot achten soll. Der Agent fragt nach, wenn etwas unklar ist, und baut ihn dann Schritt für Schritt.",
+        "detachWorkflow": "{name} aus dem Gespräch nehmen"
+      }
     },
     "brandSelector": {
       "createIdentity": "Identität erstellen"
@@ -7714,7 +7800,13 @@
         "showRepositoryChange": "{state, select, running {Prüfe Änderung} done {Änderung geprüft} approve {Genehmigen: Änderung} other {Fehlgeschlagen: Änderung}}",
         "createPost": "{state, select, running {Speichere Entwurf} done {Entwurf gespeichert} approve {Genehmigen: Entwurf} other {Fehlgeschlagen: Entwurf}}",
         "getPostDetails": "{state, select, running {Liest Post-Details} done {Post-Details gelesen} approve {Post-Details freigeben} other {Post-Details konnten nicht gelesen werden}}",
-        "updatePostDetails": "{state, select, running {Aktualisiert Post-Details} done {Post-Details aktualisiert} approve {Post-Details freigeben} other {Post-Details konnten nicht aktualisiert werden}}"
+        "updatePostDetails": "{state, select, running {Aktualisiert Post-Details} done {Post-Details aktualisiert} approve {Post-Details freigeben} other {Post-Details konnten nicht aktualisiert werden}}",
+        "listAutopilotWorkflowSteps": "{state, select, running {Workflow-Schritte werden geprüft} done {Workflow-Schritte geprüft} approve {Prüfen der Workflow-Schritte bestätigen} other {Workflow-Schritte konnten nicht geprüft werden}}",
+        "listAutopilotWorkflows": "{state, select, running {Autopilot-Workflows werden angesehen} done {Autopilot-Workflows angesehen} approve {Ansehen der Autopilot-Workflows bestätigen} other {Autopilot-Workflows konnten nicht angesehen werden}}",
+        "getAutopilotWorkflow": "{state, select, running {Workflow wird gelesen} done {Workflow gelesen} approve {Lesen des Workflows bestätigen} other {Workflow konnte nicht gelesen werden}}",
+        "getAutopilotWorkflowRun": "{state, select, running {Workflow-Lauf wird geprüft} done {Workflow-Lauf geprüft} approve {Prüfen des Workflow-Laufs bestätigen} other {Workflow-Lauf konnte nicht geprüft werden}}",
+        "saveAutopilotWorkflow": "{state, select, running {Workflow wird gespeichert} done {Workflow gespeichert} approve {Speichern des Workflows bestätigen} other {Workflow konnte nicht gespeichert werden}}",
+        "runAutopilotWorkflow": "{state, select, running {Workflow wird gestartet} done {Workflow gestartet} approve {Start des Workflows bestätigen} other {Workflow konnte nicht gestartet werden}}"
       },
       "withSuffix": "{label} {suffix}",
       "memory": {
@@ -7762,6 +7854,7 @@
       "steps": {
         "writingResponse": "Schreibe Antwort",
         "waitingForApproval": "Warte auf Genehmigung",
+        "waitingForAnswer": "Warte auf deine Antwort",
         "searchingWeb": "Suche im Web",
         "executingTools": "Führe Tools aus",
         "runningTool": "Führe Tool aus",
@@ -7792,6 +7885,22 @@
       "contentRegion": "Inhalt: {type}",
       "askForChanges": "Änderungen anfragen",
       "openPreview": "Vorschau"
+    },
+    "agentQuestion": {
+      "title": "Frage",
+      "progress": "Frage {current} von {total}",
+      "questionNumber": "Frage {number}",
+      "pickOne": "Wähle eine Antwort aus",
+      "pickMany": "Wähle alle zutreffenden aus",
+      "customPlaceholder": "Eigene Antwort schreiben",
+      "dismiss": "Verwerfen",
+      "back": "Zurück",
+      "next": "Weiter",
+      "submit": "Senden",
+      "dismissed": "Verworfen",
+      "unanswered": "Nicht beantwortet",
+      "asked": "{count, plural, one {Hat dir eine Frage gestellt} other {Hat dir # Fragen gestellt}}",
+      "useOwnAnswer": "Eigene Antwort verwenden"
     }
   },
   "comments": {

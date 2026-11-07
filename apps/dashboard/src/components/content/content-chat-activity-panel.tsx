@@ -37,10 +37,12 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@notra/ui/components/ui/tooltip";
+import { cn } from "@notra/ui/lib/utils";
 import { getToolName, isToolUIPart } from "ai";
 import { Fragment, type ReactNode, useState } from "react";
 import { useTranslations } from "use-intl";
 
+import { AgentQuestionCard } from "@/components/ai/agent-question-card";
 import { ChatActivityStatus } from "@/components/ai/chat-activity-status";
 import { ChatAssistantParts } from "@/components/ai/chat-assistant-parts";
 import { ChatEmptyDither } from "@/components/ai/chat-empty-dither";
@@ -59,11 +61,14 @@ import { useRightPanel } from "@/components/dashboard/right-panel-context";
 import { useChatActivityTimer } from "@/lib/hooks/use-chat-activity-timer";
 import { isImageMimeType } from "@/lib/upload/mime";
 import type {
+  ContentChatActivityConversationProps,
   ContentChatActivityMessageProps,
   ContentChatActivityPanelProps,
+  ContentChatCustomTools,
   ContentChatActivityHeaderProps,
   ContentChatHistoryItemsProps,
 } from "@/types/components/content-chat-activity-panel";
+import { isAgentQuestionPart } from "@/utils/agent-questions";
 import { getChatActivity, hasVisibleChatContent } from "@/utils/chat-activity";
 import { displayChatTitle } from "@/utils/chat-history-groups";
 import { getChatFilePartFields } from "@/utils/chat-message-parts";
@@ -105,11 +110,15 @@ function ContentChatActivityFeed({
 }
 
 function isAgentPanelStandaloneTool(
-  part: Parameters<typeof isContentEditorStandaloneTool>[0]
+  part: Parameters<typeof isContentEditorStandaloneTool>[0],
+  customTools?: ContentChatCustomTools
 ): boolean {
   return (
     isContentEditorStandaloneTool(part) ||
-    (isToolUIPart(part) && isChatSubagentName(getToolName(part)))
+    isAgentQuestionPart(part) ||
+    (isToolUIPart(part) &&
+      (isChatSubagentName(getToolName(part)) ||
+        Boolean(customTools?.names.has(getToolName(part)))))
   );
 }
 
@@ -169,6 +178,8 @@ function ContentChatActivityMessage({
   organizationSlug,
   onApproveTool,
   onDenyTool,
+  customTools,
+  hideModel = false,
 }: ContentChatActivityMessageProps) {
   const t = useTranslations("content.chatActivity");
   const tCommon = useTranslations("common");
@@ -216,7 +227,15 @@ function ContentChatActivityMessage({
 
   return (
     <div className={ACTIVITY_MESSAGE_CLASSNAME}>
-      <Message className="group/message relative" from={message.role}>
+      <Message
+        // Answers, cards and previews line up with the user's messages on
+        // the right instead of stopping short of them.
+        className={cn(
+          "group/message relative",
+          message.role === "assistant" && "max-w-full"
+        )}
+        from={message.role}
+      >
         {showAttachments ? (
           <div
             aria-label={t("attachedContext")}
@@ -280,7 +299,9 @@ function ContentChatActivityMessage({
                 durationMs={assistantMetadata?.generationDurationMs}
                 elapsedSeconds={elapsedSeconds}
                 isLoading={isLoading}
-                isStandaloneTool={isAgentPanelStandaloneTool}
+                isStandaloneTool={(part) =>
+                  isAgentPanelStandaloneTool(part, customTools)
+                }
                 messageId={message.id}
                 parts={message.parts}
                 renderStandalone={(part, index) => {
@@ -299,6 +320,42 @@ function ContentChatActivityMessage({
                 renderTool={(part) => {
                   if (!isToolUIPart(part)) {
                     return null;
+                  }
+                  if (isAgentQuestionPart(part)) {
+                    return (
+                      <div className="py-1" key={part.toolCallId}>
+                        <AgentQuestionCard
+                          input={part.input}
+                          output={
+                            part.state === "output-available"
+                              ? part.output
+                              : undefined
+                          }
+                          state={part.state}
+                        />
+                      </div>
+                    );
+                  }
+                  if (customTools?.names.has(getToolName(part))) {
+                    const approvalId =
+                      part.state === "approval-requested"
+                        ? part.approval?.id
+                        : undefined;
+                    return (
+                      <div className="py-1" key={part.toolCallId}>
+                        {customTools.render(part, {
+                          isActive: isLoading,
+                          onApprove:
+                            approvalId && onApproveTool
+                              ? () => onApproveTool(approvalId)
+                              : undefined,
+                          onDeny:
+                            approvalId && onDenyTool
+                              ? () => onDenyTool(approvalId)
+                              : undefined,
+                        })}
+                      </div>
+                    );
                   }
                   if (isChatSubagentName(getToolName(part))) {
                     return (
@@ -334,7 +391,7 @@ function ContentChatActivityMessage({
             )}
           </MessageContent>
         ) : null}
-        {message.role === "assistant" && !isLoading ? (
+        {message.role === "assistant" && !isLoading && !hideModel ? (
           <AssistantMetadataHover compact metadata={assistantMetadata} />
         ) : null}
       </Message>
@@ -531,16 +588,17 @@ function ContentChatActivityHeader({
   );
 }
 
-export function ContentChatActivityPanel(props: ContentChatActivityPanelProps) {
-  const {
-    children,
-    messages,
-    status,
-    activeChatId,
-    organizationSlug,
-    onApproveTool,
-    onDenyTool,
-  } = props;
+/** The messages, without a header or composer, for any container. */
+export function ContentChatActivityConversation({
+  messages,
+  status,
+  activeChatId,
+  organizationSlug,
+  onApproveTool,
+  onDenyTool,
+  customTools,
+  hideModel,
+}: ContentChatActivityConversationProps) {
   const isAgentBusy = status === "streaming" || status === "submitted";
   const lastMessage = messages.at(-1);
   const activitySeconds = useChatActivityTimer(
@@ -549,7 +607,7 @@ export function ContentChatActivityPanel(props: ContentChatActivityPanelProps) {
     lastMessage?.role === "assistant" ? lastMessage.id : undefined
   );
   const { showThinkingIndicator } = getChatActivity(messages, isAgentBusy, {
-    isStandaloneTool: isAgentPanelStandaloneTool,
+    isStandaloneTool: (part) => isAgentPanelStandaloneTool(part, customTools),
     includeFileParts: false,
   });
   const visibleMessages = messages.filter((message) =>
@@ -562,49 +620,57 @@ export function ContentChatActivityPanel(props: ContentChatActivityPanelProps) {
       : undefined;
 
   return (
+    <ContentChatActivityFeed
+      scrollKey={activeChatId ?? ""}
+      showDither={visibleMessages.length === 0 && !showThinkingIndicator}
+    >
+      <ChatScrollOnSend
+        lastUserMessageId={
+          visibleMessages.findLast((message) => message.role === "user")?.id
+        }
+      />
+      {visibleMessages.map((message) => (
+        <MessageScrollerItem key={message.id} messageId={message.id}>
+          <ContentChatActivityMessage
+            customTools={customTools}
+            hideModel={hideModel}
+            elapsedSeconds={
+              message.id === lastMessage?.id ? activitySeconds : undefined
+            }
+            // Picked up again after an answer or an approval, it shows as
+            // working from the moment the request goes out, not once the
+            // first token arrives.
+            isLoading={isAgentBusy && message.id === lastAssistantMessageId}
+            message={message}
+            onApproveTool={onApproveTool}
+            onDenyTool={onDenyTool}
+            organizationSlug={organizationSlug}
+          />
+        </MessageScrollerItem>
+      ))}
+      {showThinkingIndicator ? (
+        <MessageScrollerItem
+          className="[contain-intrinsic-size:none] [content-visibility:visible]"
+          messageId="thinking"
+          style={{ contentVisibility: "visible" }}
+        >
+          <span className="text-muted-foreground flex items-center gap-2 text-sm leading-5">
+            <ChatActivityStatus seconds={activitySeconds ?? 0} />
+          </span>
+        </MessageScrollerItem>
+      ) : null}
+    </ContentChatActivityFeed>
+  );
+}
+
+export function ContentChatActivityPanel(props: ContentChatActivityPanelProps) {
+  const { children } = props;
+  return (
     <div className="flex h-full min-h-0 flex-col">
       <ContentChatActivityHeader {...props} />
       <div className="bg-muted flex min-h-0 flex-1 flex-col overflow-hidden rounded-b-[calc(0.75rem-1px)]">
         <div className="bg-background flex min-h-0 flex-1 flex-col rounded-t-xl">
-          <ContentChatActivityFeed
-            scrollKey={activeChatId ?? ""}
-            showDither={visibleMessages.length === 0 && !showThinkingIndicator}
-          >
-            <ChatScrollOnSend
-              lastUserMessageId={
-                visibleMessages.findLast((message) => message.role === "user")
-                  ?.id
-              }
-            />
-            {visibleMessages.map((message) => (
-              <MessageScrollerItem key={message.id} messageId={message.id}>
-                <ContentChatActivityMessage
-                  isLoading={
-                    status === "streaming" &&
-                    message.id === lastAssistantMessageId
-                  }
-                  elapsedSeconds={
-                    message.id === lastMessage?.id ? activitySeconds : undefined
-                  }
-                  message={message}
-                  onApproveTool={onApproveTool}
-                  onDenyTool={onDenyTool}
-                  organizationSlug={organizationSlug}
-                />
-              </MessageScrollerItem>
-            ))}
-            {showThinkingIndicator ? (
-              <MessageScrollerItem
-                className="[contain-intrinsic-size:none] [content-visibility:visible]"
-                messageId="thinking"
-                style={{ contentVisibility: "visible" }}
-              >
-                <span className="text-muted-foreground flex items-center gap-2 text-sm leading-5">
-                  <ChatActivityStatus seconds={activitySeconds ?? 0} />
-                </span>
-              </MessageScrollerItem>
-            ) : null}
-          </ContentChatActivityFeed>
+          <ContentChatActivityConversation {...props} />
           {children}
         </div>
       </div>

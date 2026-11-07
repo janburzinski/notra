@@ -1,5 +1,7 @@
 import {
   AiBrowserIcon,
+  Alert02Icon,
+  ChartAnalysisIcon,
   AnalyticsUpIcon,
   Blockchain04Icon,
   ChartHistogramIcon,
@@ -9,6 +11,7 @@ import {
   News01Icon,
   PaintBoardIcon,
   Sent02Icon,
+  Target02Icon,
 } from "@hugeicons/core-free-icons";
 
 import type { ChatSuggestion } from "@/types/components/chat-suggestions";
@@ -62,6 +65,50 @@ export const DASHBOARD_AGENT_SUGGESTIONS: ChatSuggestion[] = [
   {
     id: "faq",
     icon: HelpCircleIcon,
+  },
+];
+
+/** What the Autopilot agent dock suggests: workflows its steps can build. */
+export const AUTOPILOT_AGENT_SUGGESTIONS: ChatSuggestion[] = [
+  {
+    id: "competitorWatch",
+    icon: Alert02Icon,
+  },
+  {
+    id: "visibilityDigest",
+    icon: ChartAnalysisIcon,
+  },
+  {
+    id: "comebackPlan",
+    icon: Target02Icon,
+  },
+];
+
+/** On a workflow's page: questions about it first, then changes. */
+export const AUTOPILOT_WORKFLOW_SUGGESTIONS: ChatSuggestion[] = [
+  {
+    id: "workflowExplain",
+    icon: HelpCircleIcon,
+  },
+  {
+    id: "workflowLastRun",
+    icon: ChartAnalysisIcon,
+  },
+  {
+    id: "workflowChange",
+    icon: Comment01Icon,
+  },
+];
+
+/** On a built-in automation's page: what it does and how it's been going. */
+export const AUTOPILOT_AUTOMATION_SUGGESTIONS: ChatSuggestion[] = [
+  {
+    id: "automationExplain",
+    icon: HelpCircleIcon,
+  },
+  {
+    id: "automationAlongside",
+    icon: Comment01Icon,
   },
 ];
 

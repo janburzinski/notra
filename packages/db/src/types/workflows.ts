@@ -8,3 +8,12 @@ export interface WorkflowRunNodeStep {
   finishedAt?: string | null;
   error?: string | null;
 }
+
+/** When an Autopilot workflow runs on its own, in UTC. */
+export interface AutopilotWorkflowSchedule {
+  frequency: "daily" | "weekly" | "monthly";
+  hour: number;
+  minute: number;
+  dayOfWeek?: number;
+  dayOfMonth?: number;
+}

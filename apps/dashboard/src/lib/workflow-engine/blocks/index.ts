@@ -1,5 +1,6 @@
 import { createWorkflowBlockRegistry } from "@notra/workflows/runtime/registry";
 
+import { customAutopilotBlocks } from "./autopilot/custom";
 import { draftBlocks } from "./autopilot/drafts";
 import { readinessBlocks } from "./autopilot/readiness";
 import { autopilotRunBlocks } from "./autopilot/run";
@@ -10,4 +11,5 @@ export const workflowBlockRegistry = createWorkflowBlockRegistry([
   ...readinessBlocks,
   ...draftBlocks,
   ...templateBlocks,
+  ...customAutopilotBlocks,
 ]);

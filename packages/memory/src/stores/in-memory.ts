@@ -8,7 +8,7 @@ import type {
 } from "../types/memory";
 import { MemoryConflictError } from "../utils/errors";
 
-/** Same semantics as code.storage, kept in a map. For tests and evals. */
+/** Same semantics as code.storage, kept in a map. For tests, evals and local development. */
 export function createInMemoryStore(): MemoryStore & {
   commits(organizationId: string): readonly MemoryCommitInfo[];
 } {

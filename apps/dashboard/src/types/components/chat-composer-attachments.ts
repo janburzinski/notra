@@ -8,6 +8,8 @@ export interface ChatComposerAttachButtonProps {
   onAttach: () => void;
   pendingUploadCount: number;
   tooltip: string;
+  /** Round and filled, as on the floating pill. */
+  filled?: boolean;
 }
 
 export interface ChatComposerDropOverlayProps {

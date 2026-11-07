@@ -1,9 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { usePathname } from "@/lib/navigation";
 import type {
+  AgentDraftTarget,
+  AgentPanelPrompt,
+  AgentPromptOptions,
   RightPanelContextValue,
   RightPanelId,
 } from "@/types/components/right-panel";
@@ -20,6 +23,14 @@ export function useRightPanelState(): RightPanelContextValue {
   const [expandRequested, setExpandRequested] = useState(false);
   const [seenPathname, setSeenPathname] = useState(pathname);
   const [hasOpened, setHasOpened] = useState(INITIAL_HAS_OPENED);
+  const [agentPrompt, setAgentPrompt] = useState<AgentPanelPrompt | null>(null);
+  // The composers showing, newest last. A draft goes to the newest one, or
+  // waits for the next to show.
+  const draftTargetsRef = useRef<AgentDraftTarget[]>([]);
+  // A draft waits only for a composer on the page it was made on.
+  const pendingDraftRef = useRef<{ text: string; pathname: string } | null>(
+    null
+  );
 
   if (seenPathname !== pathname) {
     setSeenPathname(pathname);
@@ -55,6 +66,38 @@ export function useRightPanelState(): RightPanelContextValue {
     setHasOpened((opened) => (opened[id] ? opened : { ...opened, [id]: true }));
   };
 
+  const askAgent = (text: string, options?: AgentPromptOptions) => {
+    setAgentPrompt({ id: Date.now(), text, ...options });
+    openPanel("agent");
+  };
+
+  const takeAgentPrompt = (id: number) => {
+    setAgentPrompt((current) => (current?.id === id ? null : current));
+  };
+
+  const draftAgentPrompt = (text: string) => {
+    const target = draftTargetsRef.current.at(-1);
+    if (target) {
+      target(text);
+      return;
+    }
+    pendingDraftRef.current = { text, pathname: window.location.pathname };
+  };
+
+  const registerAgentDraftTarget = useCallback((target: AgentDraftTarget) => {
+    draftTargetsRef.current = [...draftTargetsRef.current, target];
+    const pending = pendingDraftRef.current;
+    pendingDraftRef.current = null;
+    if (pending?.pathname === window.location.pathname) {
+      target(pending.text);
+    }
+    return () => {
+      draftTargetsRef.current = draftTargetsRef.current.filter(
+        (item) => item !== target
+      );
+    };
+  }, []);
+
   const toggleExpanded = () => {
     if (active === null) {
       return;
@@ -87,5 +130,10 @@ export function useRightPanelState(): RightPanelContextValue {
     closePanel,
     togglePanel,
     toggleExpanded,
+    agentPrompt,
+    askAgent,
+    takeAgentPrompt,
+    draftAgentPrompt,
+    registerAgentDraftTarget,
   };
 }

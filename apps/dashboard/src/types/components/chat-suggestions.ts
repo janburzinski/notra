@@ -10,7 +10,15 @@ type ChatSuggestionId =
   | "geoVisibility"
   | "brandVoice"
   | "thread"
-  | "faq";
+  | "faq"
+  | "competitorWatch"
+  | "visibilityDigest"
+  | "comebackPlan"
+  | "workflowExplain"
+  | "workflowLastRun"
+  | "workflowChange"
+  | "automationExplain"
+  | "automationAlongside";
 
 export interface ChatSuggestion {
   id: ChatSuggestionId;

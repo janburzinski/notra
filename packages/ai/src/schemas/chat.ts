@@ -143,6 +143,10 @@ export const standaloneChatRequestSchema = z.object({
   thinkingLevel: thinkingLevelSchema.optional(),
   timezone: z.string().min(1).max(100).optional(),
   surface: chatSurfaceSchema.default("chat"),
+  /** The Autopilot workflow whose page the user is on, so "this" means it. */
+  autopilotWorkflowId: z.string().min(1).max(64).optional(),
+  /** The built-in Autopilot automation whose page the user is on. */
+  autopilotAutomation: z.string().min(1).max(40).optional(),
 });
 
 export const updateChatSessionSchema = z
@@ -173,6 +177,8 @@ export const chatWorkflowPayloadSchema = z.object({
   timezone: z.string().min(1).max(100).optional(),
   projectId: z.string().min(1).optional(),
   surface: chatSurfaceSchema.default("chat"),
+  autopilotWorkflowId: z.string().min(1).max(64).optional(),
+  autopilotAutomation: z.string().min(1).max(40).optional(),
 });
 
 export const chatTransportRequestBodySchema = z.object({

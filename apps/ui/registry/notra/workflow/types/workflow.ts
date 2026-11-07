@@ -284,6 +284,8 @@ export interface WorkflowTemplatePreviewProps {
 
 export interface WorkflowCanvasProps {
   className?: string;
+  /** Follows new steps as they are added or move, like a workflow being written. */
+  autoFit?: boolean;
   focusId?: string;
   background?: WorkflowCanvasBackgroundVariant;
   gap?: number;
@@ -297,6 +299,8 @@ export interface WorkflowCanvasProps {
   toolbar?: ReactNode;
   minZoom?: number;
   maxZoom?: number;
+  /** The smallest zoom that fits the whole graph; below it, the view shows the first or last steps instead. */
+  fitMinZoom?: number;
   onSelectNode?: (id: string) => void;
   onNodeMove?: (id: string, position: WorkflowPoint) => void;
   onNodeRemove?: (id: string) => void;
