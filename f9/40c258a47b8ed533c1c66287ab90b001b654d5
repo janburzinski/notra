@@ -1,0 +1,19 @@
+apps/dashboard/src/components/autopilot/autopilot-templates.tsx
+  s_e23805916302be::t_b097c0137a6550 49-90
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "f940c258a47b8ed533c1c66287ab90b001b654d5",
+  "prompts": {},
+  "sessions": {
+    "s_e23805916302be": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d473e467-5f79-42fb-9903-6492b1a571f8",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
