@@ -1,0 +1,19 @@
+apps/dashboard/src/app/(dashboard)/[slug]/chat/page-client.tsx
+  s_c89d704f93bfcb::t_cf46f1ac0fd613 991-994
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "21a58c04fedecdcdc6270cb98860559e89a3c7b7",
+  "prompts": {},
+  "sessions": {
+    "s_c89d704f93bfcb": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "edf817e8-1735-4864-86bd-9092d04ff562",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
