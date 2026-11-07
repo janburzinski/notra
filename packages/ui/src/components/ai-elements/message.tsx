@@ -729,8 +729,62 @@ function MessageLink({
   );
 }
 
+function MessageUnorderedList({
+  className,
+  node: _node,
+  ...props
+}: ComponentProps<"ul"> & { node?: unknown }) {
+  return (
+    <ul
+      className={cn(
+        "list-disc whitespace-normal ps-5 marker:text-muted-foreground [li_&]:mt-1.5 [li_&]:list-[circle] [&.contains-task-list]:list-none [&.contains-task-list]:ps-0",
+        className,
+      )}
+      data-streamdown="unordered-list"
+      {...props}
+    />
+  );
+}
+
+function MessageOrderedList({
+  className,
+  node: _node,
+  ...props
+}: ComponentProps<"ol"> & { node?: unknown }) {
+  return (
+    <ol
+      className={cn(
+        "list-decimal whitespace-normal ps-6 [li_&]:mt-1.5",
+        className,
+      )}
+      data-streamdown="ordered-list"
+      {...props}
+    />
+  );
+}
+
+function MessageListItem({
+  className,
+  node: _node,
+  ...props
+}: ComponentProps<"li"> & { node?: unknown }) {
+  return (
+    <li
+      className={cn(
+        "ps-1 [&+li]:mt-1.5 [&_input]:me-1 [&>p+p]:mt-2 [&.task-list-item]:ps-0",
+        className,
+      )}
+      data-streamdown="list-item"
+      {...props}
+    />
+  );
+}
+
 const messageResponseComponents = {
   a: MessageLink,
+  ul: MessageUnorderedList,
+  ol: MessageOrderedList,
+  li: MessageListItem,
   table: MessageMarkdownTable,
   thead: MessageTableHead,
   tbody: MessageTableBody,
@@ -745,7 +799,7 @@ export const MessageResponse = memo(
   ({ className, components, rehypePlugins, ...props }: MessageResponseProps) => (
     <Streamdown
       className={cn(
-        "message-response wrap-anywhere size-full min-w-0 max-w-full overflow-hidden break-words [&>*:first-child]:mt-0 [&>*:last-child]:mb-0 [&_pre]:max-w-full [&_pre]:overflow-x-auto",
+        "message-response wrap-anywhere size-full min-w-0 max-w-full overflow-hidden break-words [&>*:first-child]:mt-0 [&>*:last-child]:mb-0 [&>p:has(+:is(ul,ol))]:mb-2 [&_pre]:max-w-full [&_pre]:overflow-x-auto [&_h1]:text-xl [&_h2]:text-lg [&_h3]:text-base [&_h4]:text-sm [&_h5]:text-sm",
         className
       )}
       components={{ ...messageResponseComponents, ...components }}
