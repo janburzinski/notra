@@ -12,9 +12,6 @@ import { fetchIntegrations } from "@/lib/integrations/fetch";
 import { getIntegrationHref } from "@/lib/integrations/helpers";
 import { listSummaries } from "@/lib/state-of-ai-search/reports";
 import type { SitemapEntry } from "@/types/sitemap";
-import { getAuthorHref } from "@/utils/author-href";
-import { filterPostsByAuthorSlug, listNotraAuthors } from "@/utils/authors";
-import { listNotraBlogPosts } from "@/utils/blog";
 import { listNotraChangelogPosts } from "@/utils/changelog";
 import { getCompareHref } from "@/utils/compare";
 import { getMcpUseCaseHref } from "@/utils/mcp-use-cases";
@@ -45,39 +42,12 @@ export async function buildSitemapEntries(): Promise<SitemapEntry[]> {
     })
   );
 
-  const notraBlogPosts = await listNotraBlogPosts();
-  const notraBlogEntries = notraBlogPosts.map((post) => ({
-    url: `${SITE_URL}/blog/${post.slug}`,
-    lastModified: new Date(post.updatedAt),
-  }));
-
   const integrationEntries = (await fetchIntegrations()).map((integration) => ({
     url: `${SITE_URL}${getIntegrationHref(integration)}`,
     lastModified: STATIC_PAGE_LAST_MODIFIED,
   }));
 
-  const notraAuthorEntries = (await listNotraAuthors()).map((author) => {
-    const lastModified = filterPostsByAuthorSlug(
-      notraBlogPosts,
-      author.slug
-    ).reduce<Date>((latest, post) => {
-      const postDate = new Date(post.updatedAt);
-      return postDate > latest ? postDate : latest;
-    }, STATIC_PAGE_LAST_MODIFIED);
-
-    return {
-      url: `${SITE_URL}${getAuthorHref(author.slug)}`,
-      lastModified,
-    };
-  });
-
   const latestNotraChangelog = notraChangelogEntries.reduce<Date>(
-    (latest, entry) =>
-      entry.lastModified > latest ? entry.lastModified : latest,
-    STATIC_PAGE_LAST_MODIFIED
-  );
-
-  const latestBlog = notraBlogEntries.reduce<Date>(
     (latest, entry) =>
       entry.lastModified > latest ? entry.lastModified : latest,
     STATIC_PAGE_LAST_MODIFIED
@@ -264,10 +234,6 @@ export async function buildSitemapEntries(): Promise<SitemapEntry[]> {
       lastModified: STATIC_PAGE_LAST_MODIFIED,
     },
     {
-      url: `${SITE_URL}/blog`,
-      lastModified: latestBlog,
-    },
-    {
       url: `${SITE_URL}/changelog`,
       lastModified: latestShowcaseAny,
     },
@@ -283,7 +249,5 @@ export async function buildSitemapEntries(): Promise<SitemapEntry[]> {
     ...integrationEntries,
     ...showcaseEntries,
     ...notraChangelogEntries,
-    ...notraBlogEntries,
-    ...notraAuthorEntries,
   ];
 }

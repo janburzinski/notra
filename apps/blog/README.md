@@ -1,6 +1,6 @@
 # Notra blog
 
-The source of [usenotra.com/blog](https://www.usenotra.com/blog), hosted on Notra Sites. It isn't a workspace package: Notra builds this folder (site root directory `apps/blog`) on every push to `main` that touches it, and serves it at `https://notra-blog.notra.site/blog`. usenotra.com forwards `/blog` and `/blog/*` there with a Vercel edge route (`apps/web/vite.config.ts`).
+The source of [usenotra.com/blog](https://www.usenotra.com/blog), hosted on Notra Sites. It isn't a workspace package: Notra builds this folder (site root directory `apps/blog`) on every push to `main` that touches it, and serves it at `https://ntra-blog.notra.site/blog`. usenotra.com forwards `/blog` and `/blog/*` there with a Vercel edge route (`apps/web/vite.config.ts`).
 
 | Path | What it is |
 | --- | --- |
@@ -12,7 +12,7 @@ The source of [usenotra.com/blog](https://www.usenotra.com/blog), hosted on Notr
 | `snippets/` | React components for posts (they may only import from `react`) |
 | `public/` | Images and fonts, served from `/blog/...` |
 
-Until usenotra.com/blog is served from here, the old blog in `apps/web/src/content/blog` still exists. Add every new post to both folders (CI checks it), with `updatedAt` renamed to `updated`.
+Publish new posts in `blog/` only: usenotra.com/blog is served from this folder, and `apps/web` no longer has a blog.
 
 ## Navbar and dither backgrounds
 

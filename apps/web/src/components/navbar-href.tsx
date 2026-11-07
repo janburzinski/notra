@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 
 import type { NavbarHrefProps } from "@/types/navbar";
+import { isProxiedPath } from "@/utils/proxied-paths";
 
 export function NavbarHref({
   href,
@@ -26,7 +27,13 @@ export function NavbarHref({
   }
 
   return (
-    <Link className={className} to={href} onClick={onClick} role={role}>
+    <Link
+      className={className}
+      to={href}
+      onClick={onClick}
+      reloadDocument={isProxiedPath(href)}
+      role={role}
+    >
       {children}
     </Link>
   );

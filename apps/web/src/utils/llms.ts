@@ -1,7 +1,6 @@
 import { changelog } from "@/../.source/server";
 import { COMPARE_COMPETITORS } from "@/constants/compare/competitors";
 import { NOTRA_CAPABILITIES } from "@/utils/agent-metadata";
-import { listNotraBlogPosts } from "@/utils/blog";
 import {
   getChangelogPostHref,
   listNotraChangelogPosts,
@@ -89,7 +88,6 @@ async function buildShowcaseEntrySections() {
 }
 
 export async function buildLlmsText() {
-  const blogPosts = await listNotraBlogPosts();
   const notraChangelogPosts = await listNotraChangelogPosts();
 
   return [
@@ -115,7 +113,7 @@ export async function buildLlmsText() {
       "/compare.md",
       "Comparisons of Notra with Profound, Peec AI, AthenaHQ, Scrunch and other GEO tools"
     ),
-    formatLink("Blog", "/blog.md", "Index of Notra blog posts"),
+    formatLink("Blog", "/blog/llms.txt", "Index of Notra blog posts"),
     formatLink(
       "Changelog",
       "/changelog.md",
@@ -190,18 +188,6 @@ export async function buildLlmsText() {
       )
     ),
     "",
-    "## Blog Posts",
-    "",
-    ...(blogPosts.length > 0
-      ? blogPosts.map((post) =>
-          formatLink(
-            post.title,
-            `/blog/${post.slug}.md`,
-            `${post.createdAt} - ${post.excerpt}`
-          )
-        )
-      : ["- None"]),
-    "",
     "## Notra Changelog Entries",
     "",
     ...(notraChangelogPosts.length > 0
@@ -244,9 +230,10 @@ export async function buildLlmsText() {
 }
 
 export async function buildLlmsFullText() {
-  const blogPosts = await listNotraBlogPosts();
-  const notraChangelogPosts = await listNotraChangelogPosts();
-  const showcaseEntrySections = await buildShowcaseEntrySections();
+  const [notraChangelogPosts, showcaseEntrySections] = await Promise.all([
+    listNotraChangelogPosts(),
+    buildShowcaseEntrySections(),
+  ]);
 
   return [
     "# Notra",
@@ -267,17 +254,8 @@ export async function buildLlmsFullText() {
     "",
     "## Blog",
     "",
-    ...(blogPosts.length > 0
-      ? blogPosts.flatMap((post) => [
-          `### ${post.title}`,
-          "",
-          `URL: ${absoluteUrl(`/blog/${post.slug}.md`)}`,
-          `Date: ${post.createdAt}`,
-          "",
-          post.markdown,
-          "",
-        ])
-      : ["No blog posts found.", ""]),
+    `Blog posts: ${absoluteUrl("/blog/llms.txt")}`,
+    "",
     "## Notra Changelog",
     "",
     ...(notraChangelogPosts.length > 0

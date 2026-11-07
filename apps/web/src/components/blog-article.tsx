@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import type { BlogArticleProps } from "~types/blog";
+import type { BlogArticleProps } from "~types/content";
 
 import { ARTICLE_CLASS_NAME } from "@/constants/content";
 import { copyToClipboard } from "@/utils/copy-to-clipboard";

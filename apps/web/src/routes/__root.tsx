@@ -130,7 +130,8 @@ function RootDocument({ children }: { children: ReactNode }) {
             clearOnRevocation={DUB_CLEAR_ON_REVOCATION}
             scripts={consentScripts}
             options={{
-              consentCategories: ["necessary", "measurement", "marketing"],
+              // Matches the blog on Notra Sites, so one choice covers both.
+              consentCategories: ["necessary", "measurement"],
               theme: consentTheme,
               components: consentComponents,
               ...(process.env.NODE_ENV !== "production"

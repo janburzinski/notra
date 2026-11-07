@@ -49,7 +49,7 @@ export const NAVBAR_RESOURCES_POSTS: readonly NavbarResourcesPost[] = [
     title: "How to build a Muse connector",
     description:
       "Turn your MCP server into a Meta Muse connector and submit it to the directory.",
-    authorSlug: "dominik",
+    author: { name: "Dominik Koch", image: "/blog/authors/dominik.png" },
     date: "Oct 7",
   },
   {
@@ -57,7 +57,7 @@ export const NAVBAR_RESOURCES_POSTS: readonly NavbarResourcesPost[] = [
       "Connect Google Search Console and track your ranking queries across AI engines",
     description:
       "Sync your ranking queries weekly and see them surface as prompt suggestions.",
-    authorSlug: "jan",
+    author: { name: "Jan Burzinski", image: "/blog/authors/jan.webp" },
     date: "Sep 16",
   },
 ];

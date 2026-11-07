@@ -2,8 +2,8 @@ import { existsSync } from "node:fs";
 import { appendFile, readdir, readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 
-const dir = "apps/web/src/content/blog";
-const publicDir = "apps/web/public";
+const dir = "apps/blog/blog";
+const publicDir = "apps/blog/public";
 const base = "https://www.usenotra.com/blog/";
 const excluded =
   /^https:\/\/(x\.com|demo\.usenotra\.com|claude\.ai|chatgpt\.com)\//;
@@ -13,7 +13,12 @@ const links = new Map();
 for (const file of await readdir(dir)) {
   const text = await readFile(join(dir, file), "utf8");
   for (const [, href] of text.matchAll(linkPattern)) {
-    if (href.startsWith("/") && existsSync(join(publicDir, href))) {
+    // Posts reference public/new.webp as /blog/new.webp, the URL it is served at.
+    const asset = href.startsWith("/blog/") ? href.slice("/blog".length) : href;
+    if (
+      href.startsWith("/") &&
+      (existsSync(join(publicDir, href)) || existsSync(join(publicDir, asset)))
+    ) {
       continue;
     }
     const url = URL.canParse(href, base) ? new URL(href, base).href : href;

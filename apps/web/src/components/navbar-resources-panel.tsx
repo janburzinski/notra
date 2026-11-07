@@ -7,7 +7,6 @@ import {
   NavbarBentoMockHeader,
   NavbarBentoWindow,
 } from "@/components/navbar-bento";
-import { BLOG_AUTHORS } from "@/constants/blog-authors";
 import { NAVBAR_BENTO_CLASSES as CLASSES } from "@/constants/navbar-bento";
 import {
   NAVBAR_RESOURCES_DOCS_PAGES,
@@ -29,38 +28,31 @@ import type {
 function BlogMock() {
   return (
     <span className="flex gap-3">
-      {NAVBAR_RESOURCES_POSTS.map((post) => {
-        const author = BLOG_AUTHORS.find(
-          (blogAuthor) => blogAuthor.slug === post.authorSlug
-        );
-        return (
-          <span className={cn(CLASSES.mockCard, "w-75")} key={post.title}>
-            <span className="flex flex-col gap-2 px-4.5 pt-4.5 pb-4">
-              <span className="font-mono text-xs/4 text-[#8A8A8A]">
-                {post.date}
-              </span>
-              <span className={CLASSES.mockTitle}>{post.title}</span>
-              <span className="font-sans text-sm/5.25 text-[#6B6B6B] dark:text-neutral-400">
-                {post.description}
-              </span>
+      {NAVBAR_RESOURCES_POSTS.map((post) => (
+        <span className={cn(CLASSES.mockCard, "w-75")} key={post.title}>
+          <span className="flex flex-col gap-2 px-4.5 pt-4.5 pb-4">
+            <span className="font-mono text-xs/4 text-[#8A8A8A]">
+              {post.date}
             </span>
-            {author ? (
-              <span className="flex items-center gap-2.5 border-t border-[#EFEFEF] bg-[#FAFAFA] px-4.5 py-3 dark:border-white/10 dark:bg-white/5">
-                <img
-                  alt=""
-                  className="size-6 shrink-0 rounded-full"
-                  height={24}
-                  src={author.image ?? undefined}
-                  width={24}
-                />
-                <span className="font-sans text-[0.8125rem]/4 font-medium text-[#1E1E1E] dark:text-white">
-                  {author.name}
-                </span>
-              </span>
-            ) : null}
+            <span className={CLASSES.mockTitle}>{post.title}</span>
+            <span className="font-sans text-sm/5.25 text-[#6B6B6B] dark:text-neutral-400">
+              {post.description}
+            </span>
           </span>
-        );
-      })}
+          <span className="flex items-center gap-2.5 border-t border-[#EFEFEF] bg-[#FAFAFA] px-4.5 py-3 dark:border-white/10 dark:bg-white/5">
+            <img
+              alt=""
+              className="size-6 shrink-0 rounded-full"
+              height={24}
+              src={post.author.image}
+              width={24}
+            />
+            <span className="font-sans text-[0.8125rem]/4 font-medium text-[#1E1E1E] dark:text-white">
+              {post.author.name}
+            </span>
+          </span>
+        </span>
+      ))}
     </span>
   );
 }

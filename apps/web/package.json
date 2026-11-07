@@ -4,10 +4,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "bun run images:generate && bun run styles:generate && vite dev --port 3001",
-    "build": "bun run images:generate && bun run styles:check && vite build",
+    "dev": "bun run styles:generate && vite dev --port 3001",
+    "build": "bun run styles:check && vite build",
     "start": "node .output/server/index.mjs",
-    "test": "node --test scripts/blog-assets.test.mjs",
     "check-types": "tsc --noEmit",
     "styles:generate": "bun scripts/generate-ui-sources.mjs",
     "styles:check": "bun scripts/generate-ui-sources.mjs --check",
@@ -16,7 +15,6 @@
     "blog:chrome:check": "bun scripts/build-blog-chrome.ts --check",
     "remotion:studio": "remotion studio src/remotion/index.ts",
     "remotion:render": "remotion render src/remotion/index.ts StarVideo out/star-video.mp4",
-    "images:generate": "bun scripts/generate-blog-image-placeholders.ts",
     "postinstall": "fumadocs-mdx"
   },
   "dependencies": {
@@ -93,7 +91,6 @@
     "@types/react-dom": "catalog:",
     "@vitejs/plugin-react": "~6.1.2",
     "babel-plugin-react-compiler": "1.0.0",
-    "blurhash": "^2.0.5",
     "knip": "^6.12.1",
     "nitro": "^3.0.260903-beta",
     "tailwindcss": "catalog:",

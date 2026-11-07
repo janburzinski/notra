@@ -125,10 +125,8 @@ export default defineConfig(({ command }) => ({
         "/**": { headers: buildSecurityHeaders(command === "serve") },
       },
       devProxy: {
-        "/blog/_notra/**": {
-          target: BLOG_DEV_PROXY_TARGET,
-          changeOrigin: true,
-        },
+        "/blog": { target: BLOG_DEV_PROXY_TARGET, changeOrigin: true },
+        "/blog/**": { target: BLOG_DEV_PROXY_TARGET, changeOrigin: true },
         "/docs": { target: DOCS_PROXY_ORIGIN, changeOrigin: true },
         "/docs/**": { target: DOCS_PROXY_ORIGIN, changeOrigin: true },
       },
@@ -136,10 +134,9 @@ export default defineConfig(({ command }) => ({
         config: {
           version: 3,
           routes: [
-            // Only the Notra Sites files (domain check, assets) until the old blog routes are removed.
             {
-              src: "^/blog/_notra/(.*)$",
-              dest: `${BLOG_PROXY_ORIGIN}/blog/_notra/$1`,
+              src: "^/blog(/.*)?$",
+              dest: `${BLOG_PROXY_ORIGIN}/blog$1`,
               headers: PROXIED_SITE_SECURITY_HEADERS,
             },
             { src: "^/docs(/.*)?$", dest: `${DOCS_PROXY_ORIGIN}/docs$1` },

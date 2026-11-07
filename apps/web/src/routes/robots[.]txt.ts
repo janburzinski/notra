@@ -7,6 +7,7 @@ Content-Signal: ai-train=no, search=yes, ai-input=yes
 Allow: /
 
 Sitemap: ${SITE_URL}/sitemap.xml
+Sitemap: ${SITE_URL}/blog/sitemap.xml
 Sitemap: ${DOCS_URL}/sitemap.xml
 schemamap: ${SITE_URL}/schema-map.xml
 `;

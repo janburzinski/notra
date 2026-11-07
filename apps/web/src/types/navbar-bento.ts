@@ -142,7 +142,7 @@ export type NavbarResourcesMock =
 export interface NavbarResourcesPost {
   title: string;
   description: string;
-  authorSlug: string;
+  author: { name: string; image: string };
   date: string;
 }
 

@@ -4,20 +4,14 @@ import type { ComponentType, SVGProps } from "react";
 
 export const NOTRA_LOGO_PATH = "/notra-mark.svg";
 
-export const RSS_FEED_PATH = "/rss.xml";
+export const RSS_FEED_PATH = "/blog/feed.xml";
 export const RSS_FEED_TITLE = "Notra Blog RSS Feed";
-export const RSS_FEED_DESCRIPTION =
-  "Insights, guides and stories from the Notra team.";
-export const RSS_FEED_LANGUAGE = "en-us";
 
-export const BLOG_INDEX_PATH = "/blog";
-export const BLOG_AUTHOR_PATH = "/blog/author";
 export const NOTRA_CHANGELOG_INDEX_PATH = "/changelog/notra";
 
 export const OG_EXCLUDED_CONTRIBUTOR = "mezotv";
 export const OG_MAX_CONTRIBUTORS = 6;
 export const OG_MAX_LOGIN_LENGTH = 12;
-export const OG_BLOG_TITLE_MAX_LENGTH = 80;
 export const OG_FALLBACK_FONTS: Record<string, string[]> = {
   "ja-JP": ["Noto Sans JP"],
   "ko-KR": ["Noto Sans KR"],
@@ -42,24 +36,7 @@ export const OG_TWEMOJI_BASE_URL =
 export const OG_GOOGLE_FONTS_USER_AGENT =
   "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_6_8; de-at) AppleWebKit/533.21.1 (KHTML, like Gecko) Version/5.0.5 Safari/533.21.1";
 
-export const BLOG_HEADING_REGEX = /<h([2-3])[^>]*>([\s\S]*?)<\/h\1>/gi;
-export const BLOG_PARAGRAPH_REGEX = /<p[^>]*>([\s\S]*?)<\/p>/gi;
-export const BLOG_TAG_REGEX = /<[^>]+>/g;
-export const BLOG_WHITESPACE_REGEX = /\s+/g;
-export const BLOG_FAQ_HEADING_REGEX =
-  /^(frequently asked questions|faqs?|q\s*&\s*a)$/i;
-export const BLOG_NUMBERED_HEADING_PREFIX_REGEX = /^\d+\.\s*/;
 export const JSON_LD_SCRIPT_CLOSE_REGEX = /<\/(script)/gi;
-export const HTML_ENTITY_REGEX = /&(amp|lt|gt|quot|#39|nbsp);/g;
-
-export const HTML_ENTITY_MAP: Record<string, string> = {
-  amp: "&",
-  lt: "<",
-  gt: ">",
-  quot: '"',
-  "#39": "'",
-  nbsp: " ",
-};
 
 export const PRICING_PLANS = {
   free: {

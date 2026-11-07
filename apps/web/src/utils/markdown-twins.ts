@@ -11,10 +11,6 @@ import { FEATURE_DETAIL_SLUGS } from "@/constants/feature-pages/paths";
 import { STATE_OF_AI_SEARCH_PATH } from "@/constants/state-of-ai-search";
 import { buildAgentPageMarkdown } from "@/lib/agent/markdown";
 import {
-  buildBlogAuthorMarkdown,
-  listBlogAuthorMarkdownPages,
-} from "@/lib/blog/author-markdown";
-import {
   buildCompareIndexMarkdown,
   buildCompareMarkdown,
   listCompareMarkdownPages,
@@ -43,13 +39,11 @@ import {
   buildStateOfAiSearchReportMarkdown,
 } from "@/lib/state-of-ai-search/markdown";
 import { listSummaries, loadReport } from "@/lib/state-of-ai-search/reports";
-import type { BlogAuthorMarkdownPage } from "@/types/blog-author";
-import { listNotraBlogPosts, listVisibleNotraBlogPosts } from "@/utils/blog";
+import type { McpUseCaseMarkdownEntry } from "@/types/mcp-use-cases";
 import {
   getChangelogPostHref,
   listNotraChangelogPosts,
 } from "@/utils/changelog";
-import { buildCtaBannerMarkdown } from "@/utils/cta-banner-markdown";
 import { stripFrontmatter } from "@/utils/markdown";
 import { readAppMarkdownSource } from "@/utils/markdown-source";
 import { MarkdownNotFoundError } from "@/utils/not-found";
@@ -149,21 +143,6 @@ function renderBodyEntry(entry: MarkdownTwinEntry) {
   return withTrailingNewline((entry.body ?? "").trim());
 }
 
-async function getBlogEntries(): Promise<MarkdownTwinEntry[]> {
-  const posts = await listNotraBlogPosts();
-
-  return posts.map((post) => ({
-    id: post.slug,
-    data: {
-      title: post.title,
-      description: post.excerpt,
-      dateLabel: post.createdAt,
-      publishedDate: new Date(post.createdAt),
-    },
-    body: `${post.markdown.trim()}\n\n${buildCtaBannerMarkdown()}`,
-  }));
-}
-
 async function getNotraChangelogEntries(): Promise<MarkdownTwinEntry[]> {
   const posts = await listNotraChangelogPosts();
 
@@ -205,7 +184,7 @@ async function getShowcaseEntries(name: string): Promise<MarkdownTwinEntry[]> {
 }
 
 function toMarkdownEntries(
-  pages: BlogAuthorMarkdownPage[],
+  pages: McpUseCaseMarkdownEntry[],
   bodies: (string | null)[]
 ): MarkdownTwinEntry[] {
   return pages.map((page, index) => ({
@@ -215,41 +194,12 @@ function toMarkdownEntries(
   }));
 }
 
-async function getBlogAuthorEntries() {
-  const pages = await listBlogAuthorMarkdownPages();
-  const bodies = await Promise.all(
-    pages.map((page) => buildBlogAuthorMarkdown(page.slug))
-  );
-  return toMarkdownEntries(pages, bodies);
-}
-
 function getMcpUseCaseEntries() {
   const pages = listMcpUseCaseMarkdownEntries();
   return toMarkdownEntries(
     pages,
     pages.map((page) => buildMcpUseCaseMarkdown(page.slug))
   );
-}
-
-async function buildBlogIndexMarkdown() {
-  const posts = await listVisibleNotraBlogPosts();
-  const list = posts
-    .map(
-      (post) =>
-        `- [${post.title}](${absoluteUrl(`/blog/${post.slug}.md`)}) (${post.createdAt})`
-    )
-    .join("\n");
-
-  return [
-    "# Notra Blog",
-    "",
-    "Insights, guides and stories from the Notra team.",
-    "",
-    "## Posts",
-    "",
-    list || "No blog posts found.",
-    "",
-  ].join("\n");
 }
 
 async function buildNotraChangelogIndexMarkdown() {
@@ -381,7 +331,6 @@ export function buildDualmarkStaticPages(): StaticPageConfig[] {
       pattern: "/features/marketing/assets",
       render: () => buildMarketingAssetsMarkdown(),
     },
-    { pattern: "/blog", render: () => buildBlogIndexMarkdown() },
     { pattern: "/changelog", render: () => buildChangelogHubMarkdown() },
     {
       pattern: "/changelog/notra",
@@ -408,23 +357,11 @@ export function buildDualmarkStaticPages(): StaticPageConfig[] {
 
 export function buildDualmarkCollections() {
   const collections: Record<string, CollectionConfig> = {
-    blogAuthors: {
-      route: "blog/author",
-      emitListing: false,
-      converter: (entry) => withTrailingNewline(entry.body ?? ""),
-      getEntries: getBlogAuthorEntries,
-    },
     mcpUseCases: {
       route: "mcp/use-cases",
       emitListing: false,
       converter: (entry) => withTrailingNewline(entry.body ?? ""),
       getEntries: getMcpUseCaseEntries,
-    },
-    blog: {
-      route: "blog",
-      emitListing: false,
-      converter: (entry) => renderDatedEntry(entry as MarkdownTwinEntry),
-      getEntries: getBlogEntries,
     },
     notraChangelog: {
       route: "changelog/notra",

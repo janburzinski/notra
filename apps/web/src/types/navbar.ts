@@ -8,8 +8,7 @@ export type NavbarVariant =
   | "island"
   | "landing"
   | "page"
-  | "pinned"
-  | "static";
+  | "pinned";
 
 export type NavbarMobileOverlayLayout = "announcement" | "compact" | "hero";
 

@@ -1,5 +1,9 @@
-import type { blog, notraChangelog } from "../.source/server";
+import type { ReactNode } from "react";
 
-export type ContentEntry =
-  | (typeof blog)[number]
-  | (typeof notraChangelog)[number];
+import type { notraChangelog } from "../.source/server";
+
+export type ContentEntry = (typeof notraChangelog)[number];
+
+export interface BlogArticleProps {
+  children: ReactNode;
+}

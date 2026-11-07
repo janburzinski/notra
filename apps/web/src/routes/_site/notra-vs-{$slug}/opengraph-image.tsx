@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-import ditherDataUrl from "@/../public/blog/og-dither.png?inline";
 import logoSvg from "@/../public/notra-mark.svg?raw";
+import ditherDataUrl from "@/../public/og/og-dither.png?inline";
 import { COMPARE_VERIFIED_LABEL } from "@/constants/compare/page";
 import { findCompareCompetitor, getCompareTitle } from "@/utils/compare";
 import { ImageResponse } from "@/utils/image-response";

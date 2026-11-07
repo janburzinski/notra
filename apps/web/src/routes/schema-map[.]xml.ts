@@ -10,7 +10,7 @@ const SCHEMA_MAP = `<?xml version="1.0" encoding="UTF-8"?>
     <name>Notra structured data feed</name>
   </url>
   <url>
-    <loc>${SITE_URL}/rss.xml</loc>
+    <loc>${SITE_URL}/blog/feed.xml</loc>
     <type>application/rss+xml</type>
     <name>Notra blog RSS feed</name>
   </url>
