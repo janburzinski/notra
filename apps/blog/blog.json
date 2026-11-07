@@ -131,99 +131,19 @@
       "destination": "/blog/upstash-content-workflow.webp"
     },
     {
-      "source": "/blog/ai-chat-is-open-to-everyone-with-images-models-and-a-public-api/opengraph-image",
-      "destination": "/blog/_notra/og/blog/ai-chat-is-open-to-everyone-with-images-models-and-a-public-api.png"
-    },
-    {
-      "source": "/blog/api-brand-identity-colors/opengraph-image",
-      "destination": "/blog/_notra/og/blog/api-brand-identity-colors.png"
-    },
-    {
-      "source": "/blog/best-ai-tools-for-developer-marketing-in-2026/opengraph-image",
-      "destination": "/blog/_notra/og/blog/best-ai-tools-for-developer-marketing-in-2026.png"
-    },
-    {
-      "source": "/blog/best-automated-changelog-tools-in-2026/opengraph-image",
-      "destination": "/blog/_notra/og/blog/best-automated-changelog-tools-in-2026.png"
-    },
-    {
-      "source": "/blog/connect-google-search-console-and-track-your-ranking-queries-across-ai-engines/opengraph-image",
-      "destination": "/blog/_notra/og/blog/connect-google-search-console-and-track-your-ranking-queries-across-ai-engines.png"
-    },
-    {
-      "source": "/blog/engineers-are-great-for-marketing/opengraph-image",
-      "destination": "/blog/_notra/og/blog/engineers-are-great-for-marketing.png"
-    },
-    {
-      "source": "/blog/how-notra-uses-upstash-to-run-an-ai-content-pipeline/opengraph-image",
-      "destination": "/blog/_notra/og/blog/how-notra-uses-upstash-to-run-an-ai-content-pipeline.png"
-    },
-    {
-      "source": "/blog/how-to-automate-social-media-posts-from-github-commits/opengraph-image",
-      "destination": "/blog/_notra/og/blog/how-to-automate-social-media-posts-from-github-commits.png"
-    },
-    {
-      "source": "/blog/how-to-automate-your-marketing-content/opengraph-image",
-      "destination": "/blog/_notra/og/blog/how-to-automate-your-marketing-content.png"
-    },
-    {
-      "source": "/blog/how-to-build-a-muse-connector/opengraph-image",
-      "destination": "/blog/_notra/og/blog/how-to-build-a-muse-connector.png"
-    },
-    {
-      "source": "/blog/how-to-create-a-grok-bot-plugin/opengraph-image",
-      "destination": "/blog/_notra/og/blog/how-to-create-a-grok-bot-plugin.png"
-    },
-    {
       "source": "/blog/how-we-built-the-notra-demo/opengraph-image",
       "destination": "/blog/og/how-we-built-the-notra-demo.png"
-    },
-    {
-      "source": "/blog/introducing-notra-sites/opengraph-image",
-      "destination": "/blog/_notra/og/blog/introducing-notra-sites.png"
-    },
-    {
-      "source": "/blog/more-control-less-waste-on-demand-content-and-brand-voice-learning/opengraph-image",
-      "destination": "/blog/_notra/og/blog/more-control-less-waste-on-demand-content-and-brand-voice-learning.png"
-    },
-    {
-      "source": "/blog/notra-is-now-a-verified-claude-connector/opengraph-image",
-      "destination": "/blog/_notra/og/blog/notra-is-now-a-verified-claude-connector.png"
-    },
-    {
-      "source": "/blog/notra-is-now-available-as-a-chatgpt-plugin/opengraph-image",
-      "destination": "/blog/_notra/og/blog/notra-is-now-available-as-a-chatgpt-plugin.png"
-    },
-    {
-      "source": "/blog/notra-is-now-available-on-composio/opengraph-image",
-      "destination": "/blog/_notra/og/blog/notra-is-now-available-on-composio.png"
-    },
-    {
-      "source": "/blog/paid-trials-goodbye-free/opengraph-image",
-      "destination": "/blog/_notra/og/blog/paid-trials-goodbye-free.png"
     },
     {
       "source": "/blog/tag-notra-on-github/opengraph-image",
       "destination": "/blog/tag-notra-on-github-og.png"
     },
     {
-      "source": "/blog/we-now-track-what-claude-code-codex-and-opencode-say-about-you/opengraph-image",
-      "destination": "/blog/_notra/og/blog/we-now-track-what-claude-code-codex-and-opencode-say-about-you.png"
+      "source": "/blog/:slug/opengraph-image",
+      "destination": "/blog/_notra/og/blog/:slug.png"
     },
     {
-      "source": "/blog/author/dominik/opengraph-image",
-      "destination": "/blog/_notra/og/blog.png"
-    },
-    {
-      "source": "/blog/author/jan/opengraph-image",
-      "destination": "/blog/_notra/og/blog.png"
-    },
-    {
-      "source": "/blog/author/josh/opengraph-image",
-      "destination": "/blog/_notra/og/blog.png"
-    },
-    {
-      "source": "/blog/author/notra/opengraph-image",
+      "source": "/blog/author/:author/opengraph-image",
       "destination": "/blog/_notra/og/blog.png"
     }
   ]
