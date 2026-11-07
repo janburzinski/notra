@@ -599,6 +599,71 @@ describe("content safety and config checks", () => {
     expect(error?.message).toContain("use navbar.cta");
   });
 
+  test("rejects redirect placeholders that source doesn't define", () => {
+    const withRedirects = (redirects: unknown) =>
+      validateSite({
+        files: new Map([
+          ["blog.json", JSON.stringify({ name: "Acme", redirects })],
+          ["blog/a.md", post("Hi")],
+        ]),
+      });
+    const valid = withRedirects([
+      {
+        source: "/blog/:slug/opengraph-image",
+        destination: "/blog/_notra/og/blog/:slug.png",
+      },
+      { source: "/old/:section/*", destination: "/new/:section/*" },
+    ]);
+    expect(valid.ok).toBe(true);
+    expect(valid.config?.redirects).toEqual([
+      {
+        source: "/blog/:slug/opengraph-image",
+        destination: "/blog/_notra/og/blog/:slug.png",
+        permanent: true,
+      },
+      {
+        source: "/old/:section/*",
+        destination: "/new/:section/*",
+        permanent: true,
+      },
+    ]);
+
+    // An undefined placeholder is kept as written, so the build warns instead of failing.
+    const undefinedPlaceholder = withRedirects([
+      { source: "/blog/old", destination: "/blog/new" },
+      { source: "/posts/:slug", destination: "/blog/:id" },
+    ]);
+    expect(undefinedPlaceholder.ok).toBe(true);
+    expect(
+      undefinedPlaceholder.diagnostics.filter(
+        (d) => d.code === "redirect_placeholder"
+      )
+    ).toEqual([
+      {
+        severity: "warning",
+        file: "blog.json",
+        code: "redirect_placeholder",
+        message:
+          "redirects.1.destination: :id is kept as written because source doesn't define it. To insert a segment, add :id to source as a whole segment, like /blog/:id",
+      },
+    ]);
+    const duplicate = withRedirects([
+      { source: "/:slug/:slug", destination: "/blog/:slug" },
+    ]);
+    expect(duplicate.ok).toBe(false);
+    expect(
+      duplicate.diagnostics.filter((d) => d.code === "config_invalid")
+    ).toEqual([
+      {
+        severity: "error",
+        file: "blog.json",
+        code: "config_invalid",
+        message:
+          "redirects.0.source: :slug is used more than once. Give each placeholder its own name",
+      },
+    ]);
+  });
+
   test("warns about featured slugs without a post", () => {
     const result = validateSite({
       files: new Map([

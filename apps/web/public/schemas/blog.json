@@ -1433,11 +1433,13 @@
           "source": {
             "type": "string",
             "format": "starts_with",
-            "pattern": "^\\/.*"
+            "pattern": "^\\/.*",
+            "description": "Full path on your domain. A segment like :slug matches any one segment, and a trailing /* matches everything below the path."
           },
           "destination": {
             "type": "string",
-            "pattern": "^(?:\\/(?!\\/)|https?:\\/\\/|mailto:)"
+            "pattern": "^(?:\\/(?!\\/)|https?:\\/\\/|mailto:)",
+            "description": "A path or https:// URL. :slug inserts the segment that the same placeholder matched in source, and a trailing /* keeps the rest of the path."
           },
           "permanent": {
             "default": true,

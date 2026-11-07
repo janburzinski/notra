@@ -64,6 +64,12 @@ function manifest(
     redirects: [
       { source: "/blog/old", destination: "/blog/new", status: 308 },
       { source: "/blog/archive/*", destination: "/blog/*", status: 301 },
+      {
+        source: "/blog/posts/:slug/opengraph-image",
+        destination: "/blog/_notra/og/blog/:slug.png",
+        status: 308,
+      },
+      { source: "/blog/go/:target", destination: "/:target", status: 307 },
     ],
   };
 }
@@ -550,6 +556,45 @@ describe("production serving", () => {
     const page = await request("https://acme.notra.site/blog/nope");
     expect([page.status, page.headers.get("Vary")]).toEqual([404, "Accept"]);
     expect(await page.text()).toBe("dep_live:/blog/404.html");
+  });
+
+  test("redirects from blog.json with placeholders keep values on this host", async () => {
+    const { request } = setup();
+    const cases: [string, number, string][] = [
+      [
+        "/blog/posts/launch/opengraph-image",
+        308,
+        "/blog/_notra/og/blog/launch.png",
+      ],
+      [
+        "/blog/posts/caf%C3%A9%20%3F/opengraph-image/",
+        308,
+        "/blog/_notra/og/blog/caf%C3%A9%20%3F.png",
+      ],
+      ["/blog/go/evil.com", 307, "/evil.com"],
+      // Empty segments are dropped before matching, so `//` stays a path.
+      ["/blog/go//evil.com", 307, "/evil.com"],
+      ["/blog/go/%2F%2Fevil.com", 307, "/evil.com"],
+      ["/blog/go/%0d%0aSet-Cookie:x", 307, "/%0D%0ASet-Cookie%3Ax"],
+    ];
+    for (const [path, status, location] of cases) {
+      const response = await request(`https://acme.notra.site${path}`);
+      expect([response.status, response.headers.get("Location")]).toEqual([
+        status,
+        location,
+      ]);
+    }
+    const backslash = await request(
+      "https://acme.notra.site/blog/go/%5Cevil.com"
+    );
+    expect([backslash.status, backslash.headers.get("Location")]).toEqual([
+      400,
+      null,
+    ]);
+    const unmatched = await request(
+      "https://acme.notra.site/blog/posts/launch"
+    );
+    expect(unmatched.headers.get("Location")).toBeNull();
   });
 
   test("redirects from blog.json, including wildcards", async () => {

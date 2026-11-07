@@ -111,15 +111,19 @@ Redirects let you move or rename a post without breaking links.
 "redirects": [
   { "source": "/blog/old-post", "destination": "/blog/new-post" },
   { "source": "/blog/2025/*", "destination": "/blog/archive/*" },
+  { "source": "/posts/:slug", "destination": "/blog/:slug" },
+  { "source": "/blog/:slug/opengraph-image", "destination": "/blog/_notra/og/blog/:slug.png" },
   { "source": "/blog/webinar", "destination": "https://acme.com/events", "permanent": false }
 ]
 ```
 
 - `source` is a full path on your domain, including the section path, like `/blog/old-post`.
 - A `source` ending in `/*` matches every path below it, and when `destination` also ends in `/*`, Notra carries the rest of the path over.
+- A segment like `:slug` in `source` matches any one segment, and `destination` can use the same `:slug` anywhere, like `/blog/:slug` or `/og/:slug.png`. Names start with a letter or underscore and contain letters, digits and underscores. A placeholder in `source` has to be a whole segment. A `:name` in `destination` that `source` doesn't define stays as written, like `Special:Search`, and the build shows a warning in case it's a typo.
+- Placeholders work together with `/*`: `{ "source": "/old/:section/*", "destination": "/new/:section/*" }` sends `/old/guides/setup` to `/new/guides/setup`.
 - `destination` is a path or an `https://` URL.
 - `permanent` is `true` by default (`308`), so set it to `false` for a temporary redirect (`307`).
-- The first matching rule wins and redirects win over existing pages. Notra doesn't carry query strings over, and a site can have up to 500 rules.
+- Rules are checked in order and the first matching rule wins, so put specific rules before placeholders and `/*`. Redirects win over existing pages. Notra doesn't carry query strings over, and a site can have up to 500 rules.
 
 ## Dates
 

@@ -29,16 +29,40 @@ import {
   siteThumbnailsSchema,
   siteVariablesSchema,
 } from "@notra/sites-core/schemas/site-layout";
+import { redirectPatternIssues } from "@notra/sites-core/utils/redirect-patterns";
 import { z } from "zod";
 
-const redirectSchema = z.object({
-  source: z.string().trim().startsWith("/"),
-  destination: z
-    .string()
-    .trim()
-    .regex(SITE_LINK_HREF, "Use an absolute https:// URL or a path"),
-  permanent: z.boolean().default(true),
-});
+const redirectSchema = z
+  .object({
+    source: z
+      .string()
+      .trim()
+      .startsWith("/")
+      .describe(
+        "Full path on your domain. A segment like :slug matches any one segment, and a trailing /* matches everything below the path."
+      ),
+    destination: z
+      .string()
+      .trim()
+      .regex(SITE_LINK_HREF, "Use an absolute https:// URL or a path")
+      .describe(
+        "A path or https:// URL. :slug inserts the segment that the same placeholder matched in source, and a trailing /* keeps the rest of the path."
+      ),
+    permanent: z.boolean().default(true),
+  })
+  .superRefine((rule, ctx) => {
+    for (const issue of redirectPatternIssues(rule.source, rule.destination)) {
+      // Warnings are build diagnostics, so existing redirects keep building.
+      if (issue.severity !== "error") {
+        continue;
+      }
+      ctx.addIssue({
+        code: "custom",
+        path: [issue.path],
+        message: issue.message,
+      });
+    }
+  });
 
 const siteAuthorSchema = z.strictObject({
   name: z.string().trim().min(1).max(80),

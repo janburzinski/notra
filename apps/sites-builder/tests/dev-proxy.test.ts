@@ -137,6 +137,12 @@ test("blog.json redirects apply before the area servers, like the worker", async
         destination: "https://docs.example.com/*",
         status: 307,
       },
+      {
+        source: "/posts/:slug",
+        destination: "/blog/:slug",
+        status: 308,
+      },
+      { source: "/old/*", destination: "/*", status: 308 },
     ]
   );
   const address = proxy.address();
@@ -161,6 +167,20 @@ test("blog.json redirects apply before the area servers, like the worker", async
     expect(wildcard.headers.get("location")).toBe(
       "https://docs.example.com/getting%20started"
     );
+    for (const [path, location] of [
+      ["/posts/hello%20world", "/blog/hello%20world"],
+      // The dev server doesn't drop empty segments; `//` still stays on this host.
+      ["/old//evil.com", "/evil.com"],
+    ] as const) {
+      const placeholder = await fetch(
+        `http://127.0.0.1:${address.port}${path}`,
+        {
+          redirect: "manual",
+        }
+      );
+      expect(placeholder.status).toBe(308);
+      expect(placeholder.headers.get("location")).toBe(location);
+    }
     expect(upstreamCalls).toBe(0);
     const page = await fetch(
       `http://127.0.0.1:${address.port}/blog/2026/launch`

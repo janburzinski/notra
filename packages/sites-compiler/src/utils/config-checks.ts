@@ -3,6 +3,7 @@ import { SITE_CONFIG_FILENAME } from "@notra/sites-core/constants/sites";
 import { siteConfigSchema } from "@notra/sites-core/schemas/site-config";
 import type { SiteDiagnostic } from "@notra/sites-core/types/build";
 import type { SiteConfig } from "@notra/sites-core/types/site-config";
+import { redirectPatternIssues } from "@notra/sites-core/utils/redirect-patterns";
 import { tagSlug } from "@notra/sites-core/utils/tags";
 
 import type { SiteEntry } from "../types/entries";
@@ -134,4 +135,17 @@ export function categoryWarnings(
       code: "category_unknown",
       message: `blog.categories: no post is tagged "${name}". It is skipped.`,
     }));
+}
+
+export function redirectPatternWarnings(config: SiteConfig): SiteDiagnostic[] {
+  return config.redirects.flatMap((rule, index) =>
+    redirectPatternIssues(rule.source, rule.destination)
+      .filter((issue) => issue.severity === "warning")
+      .map((issue) => ({
+        severity: "warning" as const,
+        file: SITE_CONFIG_FILENAME,
+        code: "redirect_placeholder",
+        message: `redirects.${index}.${issue.path}: ${issue.message}`,
+      }))
+  );
 }

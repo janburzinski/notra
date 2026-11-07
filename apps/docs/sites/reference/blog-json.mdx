@@ -194,12 +194,19 @@ See [SEO, share images and redirects](/sites/customize/seo).
 
 ## Redirects
 
-`redirects` is a list of up to 500 rules. See [Redirects](/sites/customize/seo#redirects).
+`redirects` is a list of up to 500 rules, checked in order. The first matching rule wins. See [Redirects](/sites/customize/seo#redirects).
+
+```json blog.json
+"redirects": [
+  { "source": "/posts/:slug", "destination": "/blog/:slug" },
+  { "source": "/old/:section/*", "destination": "/new/:section/*" }
+]
+```
 
 | Setting | Type | Default | Description |
 | --- | --- | --- | --- |
-| `source` | Path starting with `/` | **Required** | Full path on your domain, ending in `/*` to match everything below it |
-| `destination` | `/path` or `https://` URL | **Required** | Where to send readers, ending in `/*` to keep the rest of the path |
+| `source` | Path starting with `/` | **Required** | Full path on your domain. A segment like `:slug` matches any one segment, and a trailing `/*` matches everything below the path |
+| `destination` | `/path` or `https://` URL | **Required** | Where to send readers. `:slug` inserts the segment the same placeholder matched in `source`, and a trailing `/*` keeps the rest of the path |
 | `permanent` | boolean | `true` | `308` when true, `307` when false |
 
 ## Variables

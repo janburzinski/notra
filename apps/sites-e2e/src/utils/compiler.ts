@@ -74,6 +74,12 @@ async function compileWith(
     );
     // The only built-in script loaded on demand; content.ts checks it renders under the CSP.
     config.blog = { ...config.blog, hero: { style: "dither" } };
+    // Placeholder redirects; worker.ts checks the Worker fills them in.
+    config.redirects = [
+      ...config.redirects,
+      { source: "/blog/posts/:slug", destination: "/blog/:slug" },
+      { source: "/blog/archive/:year/*", destination: "/blog/:year/*" },
+    ];
     await writeFile(configPath, JSON.stringify(config));
     const target = siteBuildRequestSchema.parse({
       ...JSON.parse(

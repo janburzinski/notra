@@ -597,6 +597,16 @@ try {
   const redirect = await request("/blog/old-launch");
   assert.equal(redirect.status, 308);
   assert.equal(redirect.headers.get("location"), "/blog/2026/launch");
+  for (const [path, location] of [
+    ["/blog/posts/hello-world", "/blog/hello-world"],
+    ["/blog/posts/caf%C3%A9%20au%20lait", "/blog/caf%C3%A9%20au%20lait"],
+    ["/blog/archive/2026/launch", "/blog/2026/launch"],
+  ] as const) {
+    const placeholder = await request(path);
+    assert.equal(placeholder.status, 308, `redirect status of ${path}`);
+    assert.equal(placeholder.headers.get("location"), location);
+  }
+  assert.equal((await request("/blog/2026/launch")).status, 200);
   const slash = await request("/blog/hello-world/");
   assert.equal(slash.status, 308);
   assert.equal(slash.headers.get("location"), "/blog/hello-world");
@@ -780,6 +790,8 @@ try {
     ["/changelog/missing.md", 1, 404],
     ["/?source=e2e", 0, null],
     ["/blog/old-launch", 0, null],
+    ["/blog/posts/hello-world", 0, null],
+    ["/blog/archive/2026/launch", 0, null],
     ["/blog/hello-world/", 0, null],
     ["/blog/images/logo.svg", 0, null],
     ["/changelog/images/cover-flow.svg", 0, null],
@@ -794,7 +806,7 @@ try {
     }
   }
   checks.push(
-    "assets + integrity, root/manifest/slash redirects, HTML/Markdown/HEAD 404s (themed outside mounts too) and noindex meta, Markdown twins, SEO feeds/maps/canonical/OG/JSON-LD, ETag"
+    "assets + integrity, root/manifest/placeholder/slash redirects, HTML/Markdown/HEAD 404s (themed outside mounts too) and noindex meta, Markdown twins, SEO feeds/maps/canonical/OG/JSON-LD, ETag"
   );
   for (const check of await assertContentFeatures(
     page,

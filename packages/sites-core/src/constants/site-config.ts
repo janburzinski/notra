@@ -1,5 +1,12 @@
 export const SITE_HEX_COLOR = /^#(?:[0-9a-fA-F]{3}){1,2}$/;
 export const SITE_LINK_HREF = /^(?:\/(?!\/)|https?:\/\/|mailto:)/;
+// A whole source segment like `:slug`.
+export const SITE_REDIRECT_PLACEHOLDER = /^:[A-Za-z_]\w*$/;
+// The capture group makes `split` return placeholder names at odd indexes.
+export const SITE_REDIRECT_PLACEHOLDER_IN_TEXT = /:([A-Za-z_]\w*)/;
+// Scheme and host stay literal, so ports, userinfo and `mailto:` are not placeholders.
+export const SITE_REDIRECT_DESTINATION_ORIGIN =
+  /^[a-z][a-z\d+.-]*:(?:\/\/[^/?#]*)?/i;
 export const SITE_ICON_NAME = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 export const SITE_META_TAG_NAME = /^[a-z][a-z0-9:_.-]*$/i;
 export const SITE_AUTHOR_ID = /^[a-z0-9](?:[a-z0-9-]{0,38}[a-z0-9])?$/;

@@ -39,6 +39,7 @@ import type {
 import {
   categoryWarnings,
   featuredSlugWarnings,
+  redirectPatternWarnings,
   navbarPrimaryButtonWarnings,
   unknownConfigKeyWarnings,
   unknownIconWarnings,
@@ -213,6 +214,7 @@ function parseSiteConfig(raw: string | null | undefined): ParsedSiteConfig {
     return { config: null, diagnostics };
   }
   diagnostics.push(...unknownIconWarnings(parsed.data, raw));
+  diagnostics.push(...redirectPatternWarnings(parsed.data));
   const settings = substituteSettingVariables(parsed.data);
   diagnostics.push(...settings.diagnostics);
   return {
