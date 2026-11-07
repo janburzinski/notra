@@ -598,6 +598,50 @@ html.dark .post-card-box:hover .post-card-title {
   color: var(--ink-muted);
 }
 
+/* Author pages: the profile sits in the same lilac panel as the index hero. */
+
+.author-profile.hero-wash {
+  border-radius: 1.5rem;
+  background: #c8b2ee40;
+}
+
+html.dark .author-profile.hero-wash {
+  background: #2a2140;
+}
+
+.author-profile #page-title {
+  color: var(--ink);
+}
+
+.author-profile .author-title,
+.author-profile .author-bio {
+  color: #1e1e1ebf;
+}
+
+html.dark .author-profile .author-title,
+html.dark .author-profile .author-bio {
+  color: rgb(255 255 255 / 0.7);
+}
+
+.author-profile .author-social {
+  border-color: #1e1e1e1a;
+  background: #fff;
+  color: var(--ink);
+}
+
+.author-profile .author-social:hover {
+  border-color: color-mix(in oklab, var(--primary) 40%, transparent);
+}
+
+html.dark .author-profile .author-social {
+  border-color: rgb(255 255 255 / 0.1);
+  background: rgb(255 255 255 / 0.06);
+}
+
+html.dark .author-profile .author-social:hover {
+  background: rgb(255 255 255 / 0.1);
+}
+
 /* Post page */
 
 /* Post header spacing, matching usenotra.com: 2rem below the navbar on phones, 4rem from 40rem.
