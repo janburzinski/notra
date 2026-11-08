@@ -303,6 +303,7 @@
                   "sites/integrations/analytics/plausible",
                   "sites/integrations/analytics/umami",
                   "sites/integrations/analytics/rybbit",
+                  "sites/integrations/analytics/onedollarstats",
                   "sites/integrations/analytics/capless"
                 ]
               },

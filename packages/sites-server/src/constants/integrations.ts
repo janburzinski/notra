@@ -4,6 +4,7 @@ export const SITE_INTEGRATION_NAMES: Record<keyof SiteIntegrations, string> = {
   capless: "Capless",
   databuddy: "Databuddy",
   ga4: "Google Analytics 4",
+  onedollarstats: "OneDollarStats",
   plausible: "Plausible",
   posthog: "PostHog",
   rybbit: "Rybbit",

@@ -127,6 +127,7 @@ export function patchConfigValue(
     [
       "integrations.capless.key",
       "integrations.ga4.measurementId",
+      "integrations.onedollarstats.hostname",
       "integrations.plausible.domain",
       "integrations.posthog.apiKey",
       "integrations.rybbit.siteId",

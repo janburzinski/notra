@@ -24,6 +24,9 @@ import {
   HOSTNAME_WITH_PORT,
   HTTPS_BASE_URL,
   HTTPS_SCRIPT_URL,
+  ONEDOLLARSTATS_HOSTNAME_MESSAGE,
+  ONEDOLLARSTATS_PROP_NAME,
+  ONEDOLLARSTATS_PROP_VALUE,
   POSTHOG_API_KEY,
   RYBBIT_CSS_CLASS,
   RYBBIT_MAX_DELAY_MS,
@@ -317,6 +320,46 @@ const rybbitSchema = z.strictObject({
       'Global name of the tracker API (window.<namespace>) and of its opt-out key disable-<namespace> (default: "rybbit").'
     ),
   replay: rybbitReplaySchema,
+});
+
+const oneDollarStatsSchema = z.strictObject({
+  hostname: z
+    .string({ error: ONEDOLLARSTATS_HOSTNAME_MESSAGE })
+    .trim()
+    .toLowerCase()
+    .regex(HOSTNAME, ONEDOLLARSTATS_HOSTNAME_MESSAGE)
+    .describe(
+      "Domain as added in OneDollarStats, without https:// (data-hostname). Every page view is reported under this domain, so visits on your custom domain and your Notra subdomain land in the same OneDollarStats site."
+    ),
+  scriptUrl: httpsScriptUrlSchema.describe(
+    "Tracker script URL. Defaults to https://assets.onedollarstats.com/stonks.js; set it when you proxy the script through your own domain."
+  ),
+  collectorUrl: httpsBaseUrlSchema.describe(
+    "Endpoint the script sends events to (data-url). Defaults to https://collector.onedollarstats.com/events; set it when you proxy events through your own domain."
+  ),
+  autocollect: optionalBooleanSchema.describe(
+    "Report a page view on every page load and client-side navigation (default: true). Set false to send only the events you trigger with window.stonks."
+  ),
+  hashRouting: optionalBooleanSchema.describe(
+    "Treat the URL hash as the page path, e.g. /#/pricing is reported as /pricing (default: false)."
+  ),
+  props: z
+    .record(
+      z
+        .string()
+        .regex(
+          ONEDOLLARSTATS_PROP_NAME,
+          "Use a property name without spaces, ; or ="
+        ),
+      z
+        .string()
+        .trim()
+        .regex(ONEDOLLARSTATS_PROP_VALUE, "Use a value without ; or =")
+    )
+    .optional()
+    .describe(
+      'Custom properties added to every page view (data-props), e.g. {"section": "blog"}. Names have no spaces, and neither names nor values may contain ; or =.'
+    ),
 });
 
 const ga4Schema = z.strictObject({
@@ -677,6 +720,7 @@ export const siteIntegrationSchemas = {
   capless: caplessSchema,
   databuddy: databuddySchema,
   ga4: ga4Schema,
+  onedollarstats: oneDollarStatsSchema,
   plausible: plausibleSchema,
   posthog: posthogSchema,
   rybbit: rybbitSchema,
@@ -693,6 +737,10 @@ export const siteIntegrationUpdateSchema = z.discriminatedUnion("provider", [
     settings: databuddySchema.nullable(),
   }),
   z.object({ provider: z.literal("ga4"), settings: ga4Schema.nullable() }),
+  z.object({
+    provider: z.literal("onedollarstats"),
+    settings: oneDollarStatsSchema.nullable(),
+  }),
   z.object({
     provider: z.literal("umami"),
     settings: umamiSchema.nullable(),
@@ -716,6 +764,7 @@ export const siteIntegrationsSchema = z
     capless: caplessSchema.optional(),
     databuddy: databuddySchema.optional(),
     ga4: ga4Schema.optional(),
+    onedollarstats: oneDollarStatsSchema.optional(),
     plausible: plausibleSchema.optional(),
     posthog: posthogSchema.optional(),
     rybbit: rybbitSchema.optional(),

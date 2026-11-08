@@ -1,0 +1,75 @@
+---
+title: "OneDollarStats"
+description: "Send visits and events on your Notra site to OneDollarStats, with every script option available in blog.json."
+authors:
+  - handle: dominik
+
+docolin:
+  schema_version: 1
+  kind: tools/notra/sites/integrations/analytics/onedollarstats
+  type: how-to
+  applies_to:
+    - notra
+  language: en
+  status: stable
+---
+
+Notra loads the OneDollarStats script on every live page and allows the OneDollarStats hosts in the CSP. It passes every option you set in `blog.json` to the script as a `data-*` attribute, so you can add custom properties or proxy the script and events through your own domain without writing a custom script.
+
+With the [c15t cookie banner](/sites/integrations/consent/c15t) on, OneDollarStats loads through c15t instead, only after a visitor allows the measurement category, and keeps every option below.
+
+<Steps>
+  <Step title="Add your domain to OneDollarStats">
+    In [OneDollarStats](https://onedollarstats.com), add the domain your visitors use, like `blog.acme.com`. OneDollarStats has no site ID or API key and assigns events to a site by its domain.
+  </Step>
+  <Step title="Add it to Notra">
+    Open **Studio → Sites**, select your site, open **Integrations** and click **Add OneDollarStats**. Enter the same domain under **Domain** without `https://`. When you click **Save**, Notra opens a pull request with the change. To configure it in your repository instead, add it to `blog.json`:
+
+    ```json blog.json
+    {
+      "$schema": "https://usenotra.com/schemas/blog.json",
+      "name": "Acme",
+      "integrations": {
+        "onedollarstats": {
+          "hostname": "blog.acme.com",
+          "props": { "section": "blog" }
+        }
+      }
+    }
+    ```
+  </Step>
+  <Step title="Merge and verify">
+    After you [merge the change](/sites/integrations/analytics/overview#set-up-in-the-dashboard) and the production deployment finishes, visit your live site in a normal browser window and check the dashboard in OneDollarStats. The script ignores visits from headless and automated browsers, so a page loaded by a testing tool never shows up.
+  </Step>
+</Steps>
+
+## Options
+
+The dashboard covers the domain. You set every other option in `blog.json`, and editing the integration in the dashboard keeps those options as they are.
+
+| Setting | Dashboard field | Description |
+| --- | --- | --- |
+| `hostname` | **Domain** | Domain as added in OneDollarStats, without `https://`, like `blog.acme.com`. Every page view is reported under this domain, so visits on your custom domain and on your Notra subdomain land in the same OneDollarStats site |
+| `scriptUrl` | | Full HTTPS URL of the script, which is `https://assets.onedollarstats.com/stonks.js` unless you proxy it through your own domain |
+| `collectorUrl` | | HTTPS URL that receives events, which is `https://collector.onedollarstats.com/events` unless you proxy events through your own domain |
+| `autocollect` | | Boolean that defaults to `true` and reports a page view on every page load and client-side navigation. With `false`, the script only sends the [events you trigger yourself](#custom-events) |
+| `hashRouting` | | Boolean that defaults to `false`. With `true`, OneDollarStats reports the URL fragment as the page path, so `/#/pricing` counts as `/pricing` |
+| `props` | | Object of custom properties that OneDollarStats adds to every page view, like `{"section": "blog"}`. Names can't contain spaces, and neither names nor values may contain `;` or `=` |
+
+Notra adds the origin of `scriptUrl` to `script-src` and the origin of `collectorUrl` to `connect-src` in the [Content-Security-Policy](/sites/custom-scripts#content-security-policy). The script sends most events as an image request and falls back to `sendBeacon` when that fails.
+
+OneDollarStats reports the path of each page but drops the query string, except for the `utm_campaign`, `utm_source`, `utm_medium`, `utm_term` and `utm_content` parameters, which it reports as campaign data.
+
+## Custom events
+
+To track clicks in your own components and MDX, add `data-s-event` to a link or button. OneDollarStats then sends an event with that name when a visitor clicks it and reads properties from `data-s-event-props` as `name=value` pairs separated by `;`:
+
+```html
+<a href="/pricing" data-s-event="Pricing clicked" data-s-event-props="placement=changelog-footer">See pricing</a>
+```
+
+From a [custom script](/sites/custom-scripts), call `window.stonks.event("Pricing clicked", { placement: "changelog-footer" })`. To add properties to the page view of a single page, add a `data-s-view-props` attribute to any element on it.
+
+## Privacy
+
+OneDollarStats sets no cookies and stores nothing in the browser, so it has no opt-out key. It skips visits from bots, headless browsers and automation tools.

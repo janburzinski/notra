@@ -9,6 +9,7 @@ import type { SiteConfig } from "@notra/sites-core/types/site-config";
 import type { SiteIntegrations } from "@notra/sites-core/types/site-integrations";
 import {
   analyticsGatedByConsent,
+  oneDollarStatsScript,
   rybbitScript,
 } from "@notra/sites-core/utils/integrations";
 
@@ -28,6 +29,7 @@ function consentAnalytics({
   capless,
   databuddy,
   ga4,
+  onedollarstats,
   plausible,
   posthog,
   rybbit,
@@ -48,6 +50,7 @@ function consentAnalytics({
     capless: capless && { key: capless.key, scriptUrl: CAPLESS_SCRIPT_URL },
     databuddy: databuddyConfig,
     gtag: ga4 && { id: ga4.measurementId },
+    onedollarstats: onedollarstats && oneDollarStatsScript(onedollarstats),
     posthog: posthog && {
       id: posthog.apiKey,
       apiHost: posthog.apiHost ?? POSTHOG_DEFAULT_API_HOST,

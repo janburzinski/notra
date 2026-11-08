@@ -74,11 +74,15 @@ for (const provider of ANALYTICS_PROVIDERS) {
   });
 
   test(`${provider.name}: previous pages and different hosts must not pass`, () => {
-    for (const page of [
-      ANALYTICS_PAGE.replace("hello-world", "previous-page"),
-      ANALYTICS_PAGE.replace("acme.localhost", "other.localhost"),
-      `${ANALYTICS_PAGE}?different=query`,
-    ]) {
+    const pages = [ANALYTICS_PAGE.replace("hello-world", "previous-page")];
+    // OneDollarStats reports the configured hostname and drops the query.
+    if (provider.name !== "onedollarstats") {
+      pages.push(
+        ANALYTICS_PAGE.replace("acme.localhost", "other.localhost"),
+        `${ANALYTICS_PAGE}?different=query`
+      );
+    }
+    for (const page of pages) {
       expect(providersReported([event], page, "live")).toContain(provider.name);
     }
   });
@@ -135,6 +139,36 @@ test("PostHog must match ID and URL on the same batch item", () => {
   ).toContain("posthog");
 });
 
+test("OneDollarStats image requests count only as this page's page view", () => {
+  const event = LIVE_PAGE_VIEWS.find(
+    (entry) => entry.provider === "onedollarstats"
+  );
+  assert.ok(event?.body);
+  const view = JSON.parse(event.body);
+  const image = (payload: string) => ({
+    ...event,
+    method: "GET",
+    url: `${event.url}?data=${Buffer.from(payload).toString("base64")}`,
+    body: null,
+  });
+  expect(
+    providersReported([image(event.body)], ANALYTICS_PAGE, "live")
+  ).not.toContain("onedollarstats");
+  for (const payload of [
+    JSON.stringify({
+      ...view,
+      u: view.u.replace("onedollarstats-e2e.example", "other.example"),
+    }),
+    JSON.stringify({ ...view, e: [{ ...view.e[0], t: "Signup" }] }),
+    "{invalid",
+    "null",
+  ]) {
+    expect(
+      providersReported([image(payload)], ANALYTICS_PAGE, "live")
+    ).toContain("onedollarstats");
+  }
+});
+
 test("custom events cannot substitute for page views", () => {
   for (const event of LIVE_PAGE_VIEWS) {
     let body = event.body;
@@ -148,6 +182,9 @@ test("custom events cannot substitute for page views", () => {
         break;
       case "ga4":
         url = url.replace("en=page_view", "en=click");
+        break;
+      case "onedollarstats":
+        body = body?.replace('"PageView"', '"Signup"') ?? null;
         break;
       case "plausible":
         body = body?.replace("pageview", "click") ?? null;

@@ -40,6 +40,15 @@ export const RYBBIT_MAX_DELAY_MS = 60_000;
 export const RYBBIT_MIN_REPLAY_BATCH_INTERVAL_MS = 1000;
 export const RYBBIT_MAX_REPLAY_BATCH_SIZE = 1000;
 
+export const ONEDOLLARSTATS_SCRIPT_URL =
+  "https://assets.onedollarstats.com/stonks.js";
+export const ONEDOLLARSTATS_COLLECTOR_URL =
+  "https://collector.onedollarstats.com/events";
+export const ONEDOLLARSTATS_HOSTNAME_MESSAGE =
+  "Use the domain as added in OneDollarStats, e.g. acme.com";
+export const ONEDOLLARSTATS_PROP_NAME = /^[^\s;=]{1,64}$/;
+export const ONEDOLLARSTATS_PROP_VALUE = /^[^;=]{1,200}$/;
+
 export const PLAUSIBLE_SCRIPT_URL = "https://plausible.io/js/script.js";
 
 export const POSTHOG_DEFAULT_API_HOST = "https://us.i.posthog.com";

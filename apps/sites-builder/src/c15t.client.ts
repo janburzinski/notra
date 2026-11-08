@@ -83,6 +83,17 @@ export default {
           }),
         ]
       : []),
+    ...(analytics.onedollarstats
+      ? [
+          {
+            id: "onedollarstats",
+            src: analytics.onedollarstats.src,
+            category: "measurement",
+            async: true,
+            attributes: analytics.onedollarstats.attributes,
+          },
+        ]
+      : []),
     ...(analytics.plausible ? [plausibleAnalytics(analytics.plausible)] : []),
     ...(analytics.rybbit
       ? [

@@ -22,6 +22,7 @@ export interface SiteConsentAnalytics {
     options: Record<string, unknown>;
   };
   gtag?: { id: string };
+  onedollarstats?: { src: string; attributes: Record<string, string> };
   posthog?: { id: string; apiHost: string; disableSessionRecording: boolean };
   plausible?: { domain: string; scriptUrl?: string };
   rybbit?: { src: string; attributes: Record<string, string> };

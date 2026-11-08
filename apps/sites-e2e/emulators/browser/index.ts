@@ -9,6 +9,7 @@ import { answerConsentBackend, CONSENT_BACKEND_URL } from "./consent";
 import { capless } from "./providers/capless";
 import { databuddy } from "./providers/databuddy";
 import { ga4 } from "./providers/ga4";
+import { onedollarstats } from "./providers/onedollarstats";
 import { plausible } from "./providers/plausible";
 import { posthog } from "./providers/posthog";
 import { rybbit } from "./providers/rybbit";
@@ -22,6 +23,7 @@ export const ANALYTICS_PROVIDERS: AnalyticsProvider[] = [
   capless,
   databuddy,
   ga4,
+  onedollarstats,
   plausible,
   posthog,
   rybbit,

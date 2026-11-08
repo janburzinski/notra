@@ -21,6 +21,7 @@ test("every dashboard provider submits the same shape accepted by the API", () =
       trackInteractions: false,
     },
     ga4: { measurementId: "G-ABC123XYZ9" },
+    onedollarstats: { hostname: "acme.com" },
     rybbit: {
       siteId: "123",
       scriptUrl: "https://stats.acme.com/api/script.js",
@@ -142,6 +143,7 @@ test("Umami Cloud needs only a Website ID and invalid inputs report field errors
     "capless",
     "databuddy",
     "ga4",
+    "onedollarstats",
     "plausible",
     "posthog",
     "rybbit",

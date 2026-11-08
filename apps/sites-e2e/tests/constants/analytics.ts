@@ -29,6 +29,17 @@ export const LIVE_PAGE_VIEWS: CollectedEvent[] = [
     at: 0,
   },
   {
+    provider: "onedollarstats",
+    url: "https://collector.onedollarstats.com/events",
+    method: "POST",
+    body: JSON.stringify({
+      u: `https://onedollarstats-e2e.example${new URL(ANALYTICS_PAGE).pathname}`,
+      e: [{ t: "PageView", h: true }],
+      debug: false,
+    }),
+    at: 0,
+  },
+  {
     provider: "plausible",
     url: "https://plausible.io/api/event",
     method: "POST",

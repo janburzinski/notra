@@ -151,3 +151,63 @@ test("consent-gated Rybbit gets the same script URL and options as the ungated p
     },
   ]);
 });
+
+test("consent-gated OneDollarStats gets the same script URL and options as the ungated page", async () => {
+  const config = siteConfigSchema.parse({
+    name: "Acme",
+    integrations: {
+      c15t: { backendURL: "https://consent.acme.com" },
+      onedollarstats: {
+        hostname: "Blog.Acme.com",
+        scriptUrl: "https://stats.acme.com/stonks.js",
+        collectorUrl: "https://stats.acme.com/events/",
+        autocollect: false,
+        hashRouting: true,
+        props: { section: "blog", tier: " free " },
+      },
+    },
+  });
+  const analytics = siteConsent(
+    config,
+    [],
+    true,
+    false,
+    "https://blog.acme.com"
+  )?.analytics;
+  const onedollarstats = {
+    src: "https://stats.acme.com/stonks.js",
+    attributes: {
+      "data-hostname": "blog.acme.com",
+      "data-autocollect": "false",
+      "data-url": "https://stats.acme.com/events",
+      "data-props": "section=blog;tier=free",
+      "data-hash-routing": "",
+    },
+  };
+  expect(analytics?.onedollarstats).toEqual(onedollarstats);
+  expect(integrationHeadScripts(config.integrations)).toEqual([
+    {
+      kind: "external",
+      src: onedollarstats.src,
+      attributes: { ...onedollarstats.attributes, defer: true },
+    },
+  ]);
+
+  Object.assign(globals, {
+    __NOTRA_CONSENT_ANALYTICS__: { onedollarstats },
+    __NOTRA_HOSTING_DOMAIN__: null,
+    __NOTRA_CONSENT_STORAGE_KEY__: "__Host-c15t",
+    location: { hostname: "blog.acme.com" },
+    document: { cookie: "" },
+  });
+  const variant = "onedollarstats";
+  const { default: client } = await import(`../src/c15t.client.ts?${variant}`);
+  expect(client.scripts).toEqual([
+    {
+      id: "onedollarstats",
+      category: "measurement",
+      async: true,
+      ...onedollarstats,
+    },
+  ]);
+});

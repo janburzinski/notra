@@ -9819,7 +9819,8 @@
         "posthog": "Product analytics with session replay and feature flags.",
         "rybbit": "Open-source, cookieless web analytics with session replay.",
         "umami": "Open-source, cookie-free analytics.",
-        "ga4": "Web analytics from Google."
+        "ga4": "Web analytics from Google.",
+        "onedollarstats": "Simple, cookieless web analytics for $1 a month."
       },
       "fields": {
         "capless": {
@@ -9852,6 +9853,9 @@
         },
         "ga4": {
           "measurementId": "Measurement ID"
+        },
+        "onedollarstats": {
+          "hostname": "Domain"
         }
       },
       "add": "Add {provider}",
@@ -9872,6 +9876,9 @@
         },
         "ga4": {
           "measurementId": "Use the measurement ID (G-…)"
+        },
+        "onedollarstats": {
+          "hostname": "Use the domain as added in OneDollarStats, e.g. acme.com"
         },
         "plausible": {
           "domain": "Use the domain as added in Plausible, e.g. acme.com",
@@ -9913,6 +9920,9 @@
         "umami": {
           "scriptUrl": "Leave empty for Umami Cloud. For self-hosting, copy the full HTTPS script URL from your tracking code.",
           "hostUrl": "Usually empty. Set an HTTPS base URL only when events should go to a different endpoint, such as a reverse proxy."
+        },
+        "onedollarstats": {
+          "hostname": "Use the domain you added to OneDollarStats, without https://. Visits on your custom domain and your Notra subdomain are both reported under it. Custom properties, hash routing and a proxied script are available in blog.json."
         }
       },
       "close": "Close",

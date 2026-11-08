@@ -2,6 +2,7 @@ import { Tick02Icon } from "@hugeicons/core-free-icons";
 import { Capless } from "@notra/ui/components/ui/svgs/capless";
 import { Databuddy } from "@notra/ui/components/ui/svgs/databuddy";
 import { GoogleAnalytics } from "@notra/ui/components/ui/svgs/googleAnalytics";
+import { OneDollarStats } from "@notra/ui/components/ui/svgs/oneDollarStats";
 import { Plausible } from "@notra/ui/components/ui/svgs/plausible";
 import { PostHog } from "@notra/ui/components/ui/svgs/posthog";
 import { Rybbit } from "@notra/ui/components/ui/svgs/rybbit";
@@ -44,6 +45,13 @@ export const SITE_INTEGRATION_PROVIDERS: readonly SiteIntegrationProvider[] = [
     logo: GoogleAnalytics,
     docsUrl: "https://support.google.com/analytics/answer/9539598",
     fields: [{ key: "measurementId", placeholder: "G-XXXXXXXXXX" }],
+  },
+  {
+    id: "onedollarstats",
+    name: "OneDollarStats",
+    logo: OneDollarStats,
+    docsUrl: "https://docs.onedollarstats.com",
+    fields: [{ key: "hostname", placeholder: "acme.com" }],
   },
   {
     id: "plausible",

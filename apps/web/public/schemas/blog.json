@@ -1643,6 +1643,48 @@
           "required": ["measurementId"],
           "additionalProperties": false
         },
+        "onedollarstats": {
+          "type": "object",
+          "properties": {
+            "hostname": {
+              "type": "string",
+              "pattern": "^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z]{2,63}$",
+              "description": "Domain as added in OneDollarStats, without https:// (data-hostname). Every page view is reported under this domain, so visits on your custom domain and your Notra subdomain land in the same OneDollarStats site."
+            },
+            "scriptUrl": {
+              "description": "Tracker script URL. Defaults to https://assets.onedollarstats.com/stonks.js; set it when you proxy the script through your own domain.",
+              "type": "string",
+              "pattern": "^https:\\/\\/(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z]{2,63}(?::(?:\\d{1,4}|[0-5]\\d{4}|6[0-4]\\d{3}|65[0-4]\\d{2}|655[0-2]\\d|6553[0-5]))?(?:\\/(?!\\.{1,2}(?:\\/|$))[A-Za-z0-9._~-]+)+$"
+            },
+            "collectorUrl": {
+              "description": "Endpoint the script sends events to (data-url). Defaults to https://collector.onedollarstats.com/events; set it when you proxy events through your own domain.",
+              "type": "string",
+              "pattern": "^https:\\/\\/(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z]{2,63}(?::(?:\\d{1,4}|[0-5]\\d{4}|6[0-4]\\d{3}|65[0-4]\\d{2}|655[0-2]\\d|6553[0-5]))?(?:\\/[A-Za-z0-9._~-]+)*\\/*$"
+            },
+            "autocollect": {
+              "description": "Report a page view on every page load and client-side navigation (default: true). Set false to send only the events you trigger with window.stonks.",
+              "type": "boolean"
+            },
+            "hashRouting": {
+              "description": "Treat the URL hash as the page path, e.g. /#/pricing is reported as /pricing (default: false).",
+              "type": "boolean"
+            },
+            "props": {
+              "description": "Custom properties added to every page view (data-props), e.g. {\"section\": \"blog\"}. Names have no spaces, and neither names nor values may contain ; or =.",
+              "type": "object",
+              "propertyNames": {
+                "type": "string",
+                "pattern": "^[^\\s;=]{1,64}$"
+              },
+              "additionalProperties": {
+                "type": "string",
+                "pattern": "^[^;=]{1,200}$"
+              }
+            }
+          },
+          "required": ["hostname"],
+          "additionalProperties": false
+        },
         "plausible": {
           "type": "object",
           "properties": {

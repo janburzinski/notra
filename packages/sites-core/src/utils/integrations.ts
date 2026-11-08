@@ -5,6 +5,8 @@ import {
   DATABUDDY_SCRIPT_URL,
   GOOGLE_ANALYTICS_CONNECT_ORIGINS,
   GOOGLE_TAG_ORIGIN,
+  ONEDOLLARSTATS_COLLECTOR_URL,
+  ONEDOLLARSTATS_SCRIPT_URL,
   PLAUSIBLE_SCRIPT_URL,
   POSTHOG_CSP_ORIGIN,
   POSTHOG_DEFAULT_API_HOST,
@@ -17,6 +19,7 @@ import type {
   SiteCspSources,
   SiteHeadScript,
   SiteIntegrations,
+  SiteOneDollarStats,
   SiteRybbit,
 } from "@notra/sites-core/types/site-integrations";
 import { dataAttributes } from "@notra/sites-core/utils/data-attributes";
@@ -41,6 +44,30 @@ export function rybbitScript({
   };
 }
 
+export function oneDollarStatsScript({
+  scriptUrl,
+  collectorUrl,
+  hashRouting,
+  props,
+  ...options
+}: SiteOneDollarStats) {
+  return {
+    src: scriptUrl ?? ONEDOLLARSTATS_SCRIPT_URL,
+    attributes: {
+      ...dataAttributes({
+        ...options,
+        url: collectorUrl,
+        props:
+          props &&
+          Object.entries(props)
+            .map(([name, value]) => `${name}=${value}`)
+            .join(";"),
+      }),
+      ...(hashRouting ? { "data-hash-routing": "" } : {}),
+    },
+  };
+}
+
 export function inlineScriptLiteral(value: unknown): string {
   return JSON.stringify(value)
     .replaceAll("<", "\\u003c")
@@ -56,8 +83,16 @@ export function integrationHeadScripts(
   const onHostingDomain =
     hostingDomain &&
     `("."+location.hostname).endsWith(${inlineScriptLiteral(`.${hostingDomain}`)})`;
-  const { capless, databuddy, ga4, plausible, posthog, rybbit, umami } =
-    integrations;
+  const {
+    capless,
+    databuddy,
+    ga4,
+    onedollarstats,
+    plausible,
+    posthog,
+    rybbit,
+    umami,
+  } = integrations;
   if (capless) {
     scripts.push({
       kind: "external",
@@ -107,6 +142,14 @@ export function integrationHeadScripts(
         code: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag("js",new Date());gtag("config",${inlineScriptLiteral(ga4.measurementId)}${onHostingDomain ? `,${onHostingDomain}?{cookie_domain:"none"}:{}` : ""});`,
       }
     );
+  }
+  if (onedollarstats) {
+    const { src, attributes } = oneDollarStatsScript(onedollarstats);
+    scripts.push({
+      kind: "external",
+      src,
+      attributes: { ...attributes, defer: true },
+    });
   }
   if (plausible) {
     scripts.push({
@@ -160,8 +203,17 @@ export function integrationCspSources(
 ): SiteCspSources {
   const scriptSrc: string[] = [];
   const connectSrc: string[] = [];
-  const { c15t, capless, databuddy, ga4, plausible, posthog, rybbit, umami } =
-    integrations;
+  const {
+    c15t,
+    capless,
+    databuddy,
+    ga4,
+    onedollarstats,
+    plausible,
+    posthog,
+    rybbit,
+    umami,
+  } = integrations;
   if (c15t) {
     connectSrc.push(new URL(c15t.backendURL).origin);
   }
@@ -184,6 +236,15 @@ export function integrationCspSources(
   if (ga4) {
     scriptSrc.push(GOOGLE_TAG_ORIGIN);
     connectSrc.push(...GOOGLE_ANALYTICS_CONNECT_ORIGINS);
+  }
+  if (onedollarstats) {
+    scriptSrc.push(
+      new URL(onedollarstats.scriptUrl ?? ONEDOLLARSTATS_SCRIPT_URL).origin
+    );
+    connectSrc.push(
+      new URL(onedollarstats.collectorUrl ?? ONEDOLLARSTATS_COLLECTOR_URL)
+        .origin
+    );
   }
   if (plausible) {
     const origin = plausible.server
