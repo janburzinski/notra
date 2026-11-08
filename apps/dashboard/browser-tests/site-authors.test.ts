@@ -311,6 +311,31 @@ test(
 );
 
 test(
+  "dismissing the import hint sticks until another Notra author shows up",
+  async () => {
+    const page = await open();
+    const hint = page.getByText("Import from your Notra authors");
+    await browserExpect(hint).toBeVisible();
+    await browserExpect(
+      page.getByText(/^2 authors you created in Notra aren't/)
+    ).toBeVisible();
+    await page.getByRole("button", { name: "Dismiss" }).click();
+    await browserExpect(hint).toHaveCount(0);
+    await page.reload();
+    await browserExpect(
+      page.getByText("Jan Burzinski", { exact: true })
+    ).toBeVisible();
+    await browserExpect(hint).toHaveCount(0);
+    await page.goto(`${baseUrl}/?newAuthor`);
+    await browserExpect(hint).toBeVisible();
+    await browserExpect(
+      page.getByText(/^3 authors you created in Notra aren't/)
+    ).toBeVisible();
+  },
+  TIMEOUT
+);
+
+test(
   "the post editor offers the site's authors and publishing writes author: <id>",
   async () => {
     const page = await open("?editor");

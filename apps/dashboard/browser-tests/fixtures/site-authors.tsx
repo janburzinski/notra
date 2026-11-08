@@ -131,6 +131,10 @@ const contentAuthors = [
     "/api/uploads/content-images/organization/org-a/content/sam.png"
   ),
   contentAuthor("db-priya", "priya", "Priya Natarajan", "Writer", null),
+  // `?newAuthor`: someone created another author in Notra since the last visit.
+  ...(params.has("newAuthor")
+    ? [contentAuthor("db-omar", "omar", "Omar Haddad", "Editor", null)]
+    : []),
 ];
 let post: ContentResponse = {
   id: POST.contentId,

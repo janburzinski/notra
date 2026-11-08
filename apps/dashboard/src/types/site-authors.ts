@@ -136,6 +136,7 @@ export interface SiteAuthorsEmptyProps {
 export interface SiteAuthorImportRowProps {
   count: number;
   onOpen: () => void;
+  onDismiss: () => void;
 }
 
 export interface SiteAuthorPagesProps {

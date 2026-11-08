@@ -33,6 +33,8 @@ export const localStorageKeys = {
   geoModelsAdvanced: "notra:geo-models-advanced:v1",
   siteSettingsGroupCollapsed: (id: string) =>
     `notra:site-settings-group-collapsed:v1:${id}`,
+  siteAuthorImportDismissed: (siteId: string, authorIds: readonly string[]) =>
+    `notra:site-author-import-dismissed:v1:${siteId}:${[...authorIds].sort().join(",")}`,
 } as const;
 
 export const sessionStorageKeys = {

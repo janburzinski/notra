@@ -9568,6 +9568,7 @@
         "importTitle": "Aus deinen Notra-Autoren importieren",
         "importHint": "{count, plural, one {# Autor aus Notra ist} other {# Autoren aus Notra sind}} noch nicht in der blog.json. Prüfe sie, bevor sie live gehen.",
         "importButton": "Import prüfen",
+        "importDismiss": "Ausblenden",
         "importDialog": {
           "title": "Aus deinen Notra-Autoren importieren",
           "description": "Kopiert deine Notra-Autoren mit ihrer ID in die blog.json. Sie gehen live, wenn du deine Design-Änderungen veröffentlichst.",

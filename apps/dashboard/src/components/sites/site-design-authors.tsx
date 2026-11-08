@@ -3,6 +3,7 @@
 import {
   Add01Icon,
   ArrowUpRight01Icon,
+  Cancel01Icon,
   Delete02Icon,
   FileImportIcon,
   LayoutTwoColumnIcon,
@@ -34,9 +35,11 @@ import {
   SiteSettingsList,
 } from "@/components/sites/site-settings-item";
 import { useSiteWorkspace } from "@/components/sites/site-workspace-context";
+import { localStorageKeys } from "@/constants/storage";
 import { useContentAuthors } from "@/lib/hooks/use-content-authors";
 import { useSiteAuthorEditor } from "@/lib/hooks/use-site-author-editor";
 import { useSiteAuthorUsage } from "@/lib/hooks/use-site-author-usage";
+import { useStoredDismissal } from "@/lib/hooks/use-stored-dismissal";
 import { prepareSiteAuthorImport } from "@/lib/upload/site-author-import";
 import type {
   SiteAuthorDeleteDialogProps,
@@ -168,7 +171,11 @@ function SiteAuthorsEmpty({ onAdd }: SiteAuthorsEmptyProps) {
   );
 }
 
-function SiteAuthorImportRow({ count, onOpen }: SiteAuthorImportRowProps) {
+function SiteAuthorImportRow({
+  count,
+  onOpen,
+  onDismiss,
+}: SiteAuthorImportRowProps) {
   const t = useTranslations("sites.design.authors");
   return (
     <SiteSettingsList>
@@ -177,10 +184,30 @@ function SiteAuthorImportRow({ count, onOpen }: SiteAuthorImportRowProps) {
         icon={FileImportIcon}
         title={t("importTitle")}
         value={
-          <div className="flex justify-end">
+          <div className="flex items-center justify-end gap-1">
             <Button onClick={onOpen} size="sm" type="button" variant="outline">
               {t("importButton")}
             </Button>
+            <Tooltip>
+              <TooltipTrigger
+                render={
+                  <Button
+                    aria-label={t("importDismiss")}
+                    onClick={onDismiss}
+                    size="icon-sm"
+                    type="button"
+                    variant="ghost"
+                  />
+                }
+              >
+                <HugeiconsIcon
+                  aria-hidden="true"
+                  icon={Cancel01Icon}
+                  strokeWidth={1.8}
+                />
+              </TooltipTrigger>
+              <TooltipContent>{t("importDismiss")}</TooltipContent>
+            </Tooltip>
           </div>
         }
       />
@@ -269,6 +296,13 @@ function SiteDesignAuthorsBody({ state }: SiteDesignAuthorsBodyProps) {
     readSiteAuthors(state.live).map((entry) => entry.id)
   );
   const importable = contentAuthors.filter((author) => !ids.has(author.slug));
+  // Keyed on the pending authors, so a newly created Notra author brings the hint back.
+  const importDismissal = useStoredDismissal(
+    localStorageKeys.siteAuthorImportDismissed(
+      detail.site.id,
+      importable.map((author) => author.slug)
+    )
+  );
   const blogMount = detail.site.mounts.blog;
   const pageUrl = (id: string) =>
     detail.site.liveDeploymentId && blogMount && publishedIds.has(id)
@@ -326,9 +360,10 @@ function SiteDesignAuthorsBody({ state }: SiteDesignAuthorsBodyProps) {
         icon={UserMultiple02Icon}
         title={t("listTitle")}
       >
-        {importable.length > 0 ? (
+        {importable.length > 0 && !importDismissal.dismissed ? (
           <SiteAuthorImportRow
             count={importable.length}
+            onDismiss={importDismissal.dismiss}
             onOpen={() => setImportOpen(true)}
           />
         ) : null}
