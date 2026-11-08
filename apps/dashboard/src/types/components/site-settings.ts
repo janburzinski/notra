@@ -8,7 +8,18 @@ export interface SiteSettingsGroupProps {
   title: ReactNode;
   /** Control at the right of the group title, e.g. a mode switch. */
   action?: ReactNode;
+  /** Makes the group collapsible and remembers its state under this id. */
+  collapsibleId?: string;
   children: ReactNode;
+}
+
+export type SiteSettingsGroupHeadingProps = Pick<
+  SiteSettingsGroupProps,
+  "icon" | "title"
+>;
+
+export interface CollapsibleSiteSettingsGroupProps extends SiteSettingsGroupProps {
+  collapsibleId: string;
 }
 
 export interface SiteSettingsListProps {

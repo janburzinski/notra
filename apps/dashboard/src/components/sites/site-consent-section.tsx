@@ -28,25 +28,31 @@ export function SiteConsentSection({
   );
 
   return (
-    <SiteSettingsGroup icon={CookieIcon} title={t("title")}>
-      <SiteSettingsList>
-        <SiteIntegrationRow
-          addAriaLabel={t("connect")}
-          addLabel={t("connectShort")}
-          description={t("description")}
-          disabled={disabled}
-          isSetUp={settings !== null}
-          loading={loading}
-          onOpen={() => setOpen(true)}
-          provider={INTH_PROVIDER}
-        />
-      </SiteSettingsList>
+    <>
+      <SiteSettingsGroup
+        collapsibleId="integrations-consent"
+        icon={CookieIcon}
+        title={t("title")}
+      >
+        <SiteSettingsList>
+          <SiteIntegrationRow
+            addAriaLabel={t("connect")}
+            addLabel={t("connectShort")}
+            description={t("description")}
+            disabled={disabled}
+            isSetUp={settings !== null}
+            loading={loading}
+            onOpen={() => setOpen(true)}
+            provider={INTH_PROVIDER}
+          />
+        </SiteSettingsList>
+      </SiteSettingsGroup>
       <SiteInthDialog
         oauthError={oauthError}
         onOpenChange={setOpen}
         open={open}
         settings={settings}
       />
-    </SiteSettingsGroup>
+    </>
   );
 }

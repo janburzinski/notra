@@ -15,9 +15,12 @@ import { useId } from "react";
 
 import { SiteDesignError } from "@/components/sites/site-design-error";
 import { SITE_SETTINGS_PANEL_CLASSNAME } from "@/constants/sites";
+import { useSiteSettingsGroupCollapsed } from "@/lib/hooks/use-site-settings-group-collapsed";
 import { cn } from "@/lib/utils";
 import type {
+  CollapsibleSiteSettingsGroupProps,
   SiteSettingsBlockProps,
+  SiteSettingsGroupHeadingProps,
   SiteSettingsGroupProps,
   SiteSettingsHintProps,
   SiteSettingsIconTileProps,
@@ -78,28 +81,92 @@ export function SiteSettingsList({ children }: SiteSettingsListProps) {
   );
 }
 
+function GroupHeading({ icon, title }: SiteSettingsGroupHeadingProps) {
+  return (
+    <>
+      <HugeiconsIcon
+        aria-hidden="true"
+        className="text-muted-foreground size-4"
+        icon={icon}
+        strokeWidth={1.5}
+      />
+      {title}
+    </>
+  );
+}
+
 export function SiteSettingsGroup({
   icon,
   title,
   action,
+  collapsibleId,
   children,
 }: SiteSettingsGroupProps) {
+  if (collapsibleId) {
+    return (
+      <CollapsibleSiteSettingsGroup
+        action={action}
+        collapsibleId={collapsibleId}
+        icon={icon}
+        title={title}
+      >
+        {children}
+      </CollapsibleSiteSettingsGroup>
+    );
+  }
   return (
     <section className="space-y-3">
       <div className="flex min-h-8 items-center justify-between gap-3 px-1">
         <h2 className="flex items-center gap-1.5 text-sm font-medium">
-          <HugeiconsIcon
-            aria-hidden="true"
-            className="text-muted-foreground size-4"
-            icon={icon}
-            strokeWidth={1.5}
-          />
-          {title}
+          <GroupHeading icon={icon} title={title} />
         </h2>
         {action}
       </div>
       {children}
     </section>
+  );
+}
+
+function CollapsibleSiteSettingsGroup({
+  icon,
+  title,
+  action,
+  collapsibleId,
+  children,
+}: CollapsibleSiteSettingsGroupProps) {
+  const { collapsed, setCollapsed } =
+    useSiteSettingsGroupCollapsed(collapsibleId);
+  return (
+    <Collapsible
+      onOpenChange={(open) => setCollapsed(!open)}
+      open={!collapsed}
+      render={<section />}
+    >
+      <div className="flex min-h-8 items-center justify-between gap-3 px-1">
+        <h2 className="text-sm font-medium">
+          <CollapsibleTrigger
+            render={
+              <button
+                className="group/group focus-visible:ring-ring/50 -mx-1 flex items-center gap-1.5 rounded-md px-1 outline-none focus-visible:ring-[3px]"
+                type="button"
+              />
+            }
+          >
+            <GroupHeading icon={icon} title={title} />
+            <HugeiconsIcon
+              aria-hidden="true"
+              className="text-muted-foreground size-3.5 transition-transform duration-200 group-data-[panel-open]/group:rotate-90 motion-reduce:transition-none"
+              icon={ArrowRight01Icon}
+              strokeWidth={2}
+            />
+          </CollapsibleTrigger>
+        </h2>
+        {action}
+      </div>
+      <CollapsibleContent className={SITE_SETTINGS_PANEL_CLASSNAME}>
+        <div className="pt-3">{children}</div>
+      </CollapsibleContent>
+    </Collapsible>
   );
 }
 

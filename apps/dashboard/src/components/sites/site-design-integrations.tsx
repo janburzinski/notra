@@ -85,7 +85,11 @@ export function SiteDesignIntegrations() {
         </Alert>
       ) : null}
 
-      <SiteSettingsGroup icon={Analytics01Icon} title={t("analyticsTitle")}>
+      <SiteSettingsGroup
+        collapsibleId="integrations-analytics"
+        icon={Analytics01Icon}
+        title={t("analyticsTitle")}
+      >
         <SiteSettingsList>
           {SITE_INTEGRATION_PROVIDERS.map((provider) => (
             <SiteIntegrationRow
