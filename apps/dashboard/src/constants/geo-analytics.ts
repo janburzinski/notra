@@ -60,6 +60,7 @@ export const TRAFFIC_INSTALL_COPY_KINDS = {
   INSTALL_COMMAND: "install_command",
   PROXY_SNIPPET: "proxy_snippet",
   DRAIN_SETUP: "drain_setup",
+  SCRIPT_TAG: "script_tag",
 } as const;
 
 export const TRAFFIC_LOG_FILTER_KINDS = {

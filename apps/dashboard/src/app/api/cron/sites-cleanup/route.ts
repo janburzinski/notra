@@ -7,6 +7,7 @@ import { isDemoMode } from "@notra/utils/demo-mode";
 import { lt, sql } from "drizzle-orm";
 
 import { SITES_CLEANUP_CONCURRENCY } from "@/constants/sites";
+import { sweepImportUploads } from "@/lib/analytics-imports/storage";
 import { isAuthorizedCron } from "@/lib/auth/cron";
 
 export const maxDuration = 300;
@@ -49,8 +50,14 @@ export async function GET(request: Request) {
         sql`now() - make_interval(days => ${ABUSE_ACTION_RETENTION_DAYS})`
       )
     );
+  const importUploads = await sweepImportUploads().catch((error) => {
+    console.error("analytics_imports.upload_sweep_failed", {
+      error: error instanceof Error ? error.message : error,
+    });
+    return null;
+  });
   return Response.json(
-    { deleted, failed },
-    { status: failed.length > 0 ? 500 : 200 }
+    { deleted, failed, importUploads },
+    { status: failed.length > 0 || importUploads === null ? 500 : 200 }
   );
 }

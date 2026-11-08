@@ -10,6 +10,7 @@ import {
 import {
   buildTrafficGroupSeries,
   groupTrafficSources,
+  hasPreviousTraffic,
   trafficGroupCurrentMembers,
   trafficGroupPathsAreLowerBound,
   trafficGroupPathsDelta,
@@ -159,4 +160,15 @@ test("pages trend only compares single-bot groups with known previous pages", ()
     )
   ).toBeNull();
   expect(pathsDelta(withPaths("GPTBot", 10, 5, 3))).toBeNull();
+});
+
+test("comparisons need an AI visit in the previous period", () => {
+  expect(hasPreviousTraffic([])).toBe(false);
+  expect(hasPreviousTraffic([source("GPTBot", 10, 0, 1)])).toBe(false);
+  expect(
+    hasPreviousTraffic([
+      source("GPTBot", 10, 0, 1),
+      source("ClaudeBot", 0, 3, 0),
+    ])
+  ).toBe(true);
 });

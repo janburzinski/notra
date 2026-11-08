@@ -27,7 +27,7 @@ docolin:
   next: ./claude.mdx
 ---
 
-Notra runs a hosted MCP server at `https://mcp.usenotra.com/mcp` (streamable HTTP) so AI agents can work with your workspace. Connected agents can manage brand identities, generate, edit, schedule and publish content, preview and publish posts on Notra Sites, follow their builds and manage their authors, connect integrations and manage schedules, event triggers, webhooks and skills. They can also use every GEO feature: projects, prompts, competitors, scans, visibility, content briefs, agent readiness and AI traffic.
+Notra runs a hosted MCP server at `https://mcp.usenotra.com/mcp` (streamable HTTP) so AI agents can work with your workspace. Connected agents can manage brand identities, generate, edit, schedule and publish content, preview and publish posts on Notra Sites, follow their builds and manage their authors, connect integrations and manage schedules, event triggers, webhooks and skills. They can also use every GEO feature: projects, prompts, competitors, scans, visibility, content briefs, agent readiness, AI traffic and website analytics.
 
 This page covers two things:
 
@@ -405,9 +405,18 @@ Start with `get_geo_snapshot`. It returns a compact diagnosis of a project and t
 - `list_geo_traffic_journeys`
 - `get_geo_traffic_journey`
 - `list_geo_traffic_pages`
-- `get_geo_ingest_setup`
+- `get_geo_traffic_journey_stats`
+- `get_geo_ingest_setup` (includes the public notra.js web key and pinned script URLs)
 
-Issue and rotate ingest tokens in the dashboard.
+Issue and rotate ingest tokens and the web key in the dashboard.
+
+**Website analytics**
+
+- `get_geo_web_analytics`
+- `get_geo_web_analytics_breakdowns`
+- `list_geo_analytics_imports`
+
+`get_geo_web_analytics` returns views, visitors, sessions and AI-referred visitors against the previous period, and `get_geo_web_analytics_breakdowns` returns pages, sources, countries, devices, languages, outbound links, Core Web Vitals and JavaScript errors. History imports need provider credentials, so start them in the dashboard; the MCP server only reports their progress.
 
 **MCP server analytics**
 

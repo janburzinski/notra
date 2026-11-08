@@ -4,6 +4,7 @@ import { sweepOgDesignCosts } from "@notra/ai/utils/og-design-store";
 import { isDemoMode } from "@notra/utils/demo-mode";
 import { Effect, Result } from "effect";
 
+import { recoverAnalyticsImports } from "@/lib/analytics-imports/recovery";
 import { checkMissedGeoScans } from "@/lib/analytics/geo-scan-watchdog";
 import { runMonitoringSweep } from "@/lib/analytics/monitoring-sweep";
 import { isAuthorizedCron } from "@/lib/auth/cron";
@@ -35,6 +36,16 @@ export async function GET(request: Request) {
       event: "workflow.alert.failed",
       outcome: "error",
       errorName: error instanceof Error ? error.name : "UnknownError",
+    });
+  }
+  try {
+    const recovery = await recoverAnalyticsImports();
+    if (recovery.restarted > 0 || recovery.failed > 0) {
+      console.info("analytics_imports.recovery", recovery);
+    }
+  } catch (error) {
+    console.error("analytics_imports.recovery_failed", {
+      error: error instanceof Error ? error.message : error,
     });
   }
   const telemetry = getEvlogRuntime();

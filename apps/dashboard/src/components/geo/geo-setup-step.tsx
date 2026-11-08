@@ -1,3 +1,4 @@
+import { cn } from "@/lib/utils";
 import type { GeoSetupStepProps } from "@/types/geo";
 
 export function GeoSetupStep({
@@ -6,23 +7,49 @@ export function GeoSetupStep({
   description,
   action,
   children,
+  plain = false,
 }: GeoSetupStepProps) {
   return (
-    <li className="group/step relative grid grid-cols-[1.25rem_minmax(0,1fr)] gap-x-3 pb-5 last:pb-0">
-      <span
-        aria-hidden
-        className="bg-border absolute top-7 bottom-1.5 left-2.5 w-px -translate-x-1/2 group-last/step:hidden"
-      />
-      <span
-        aria-hidden
-        className="bg-muted text-muted-foreground mt-0.5 flex size-5 items-center justify-center rounded-full text-xs font-medium tabular-nums"
-      >
-        {index}
-      </span>
-      <div className="min-w-0 space-y-2">
+    <li
+      className={cn(
+        "group/step relative grid gap-x-3 last:pb-0",
+        plain
+          ? "grid-cols-[0.75rem_minmax(0,1fr)] pb-4"
+          : "grid-cols-[1.25rem_minmax(0,1fr)] pb-5"
+      )}
+    >
+      {plain ? (
+        <span
+          aria-hidden
+          className="text-muted-foreground text-sm leading-6 tabular-nums"
+        >
+          {index}
+        </span>
+      ) : (
+        <>
+          <span
+            aria-hidden
+            className="bg-border absolute top-7 bottom-1.5 left-2.5 w-px -translate-x-1/2 group-last/step:hidden"
+          />
+          <span
+            aria-hidden
+            className="bg-muted text-muted-foreground mt-0.5 flex size-5 items-center justify-center rounded-full text-xs font-medium tabular-nums"
+          >
+            {index}
+          </span>
+        </>
+      )}
+      <div className={cn("min-w-0", plain ? "space-y-2.5" : "space-y-2")}>
         <div className="flex flex-wrap items-start justify-between gap-x-3 gap-y-2">
           <div className="min-w-0 space-y-0.5">
-            <h4 className="text-sm font-medium">{title}</h4>
+            <h4
+              className={cn(
+                "text-sm",
+                plain ? "leading-6 text-pretty" : "font-medium"
+              )}
+            >
+              {title}
+            </h4>
             {description ? (
               <p className="text-muted-foreground text-xs text-pretty">
                 {description}

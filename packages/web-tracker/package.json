@@ -1,0 +1,24 @@
+{
+  "name": "@notra/web-tracker",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./release": "./src/release.ts",
+    "./response": "./src/response.ts",
+    "./script": "./src/generated/script.ts",
+    "./types/*": "./src/types/*.ts"
+  },
+  "scripts": {
+    "build": "bun scripts/build.ts",
+    "check-types": "tsc --noEmit --incremental --tsBuildInfoFile .cache/typecheck.tsbuildinfo",
+    "test": "bun test tests",
+    "bench": "bun bench/run.ts"
+  },
+  "devDependencies": {
+    "@notra/typescript-config": "workspace:*",
+    "bun-types": "catalog:",
+    "playwright-core": "1.61",
+    "typescript": "catalog:"
+  }
+}

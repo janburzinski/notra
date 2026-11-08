@@ -124,9 +124,32 @@ export function CodeSnippet({
   tabs,
   variant = "panel",
   label,
+  wrap = false,
   onCopy,
 }: CodeSnippetProps) {
   const t = useTranslations("geo.codeSnippet");
+  if (variant === "block") {
+    return (
+      <div
+        className={cn(
+          "border-border/60 bg-muted/40 relative min-w-0 rounded-lg border",
+          className
+        )}
+      >
+        <div className="absolute end-1 top-1 z-10">
+          <CopyCodeButton code={code} label={t("snippet")} onCopy={onCopy} />
+        </div>
+        <pre
+          className={cn(
+            "scrollbar-floating m-0 overflow-x-auto p-3 pe-10 font-mono text-xs leading-relaxed",
+            wrap && "wrap-anywhere whitespace-pre-wrap"
+          )}
+          // biome-ignore lint/security/noDangerouslySetInnerHtml: sugar-high escapes the source before tokenizing
+          dangerouslySetInnerHTML={{ __html: highlight(code) }}
+        />
+      </div>
+    );
+  }
   if (variant === "command") {
     return (
       <CommandSnippet
@@ -166,7 +189,10 @@ export function CodeSnippet({
           <CopyCodeButton code={code} label={t("snippet")} onCopy={onCopy} />
         </div>
         <pre
-          className="scrollbar-floating m-0 overflow-x-auto p-3 pe-10 font-mono text-xs leading-relaxed"
+          className={cn(
+            "scrollbar-floating m-0 overflow-x-auto p-3 pe-10 font-mono text-xs leading-relaxed",
+            wrap && "wrap-anywhere whitespace-pre-wrap"
+          )}
           // biome-ignore lint/security/noDangerouslySetInnerHtml: sugar-high escapes the source before tokenizing
           dangerouslySetInnerHTML={{ __html: highlight(code) }}
         />

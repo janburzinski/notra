@@ -12,6 +12,14 @@ open the local URL Bun prints on startup
 
 The dev server runs with Bun so the `fetch` export is actually served.
 
+## Environment
+
+`NEXT_PUBLIC_DATABUDDY_DASHBOARD_WEBSITE_ID` is read at runtime: it is the
+dashboard's feature flag client id and decides the `web-analytics` flag per
+organization. Without it the flag reads as off, so the web analytics routes
+answer `403` and `GET /geo/ingest/setup` omits the notra.js install. `bun run
+dev` sets `NODE_ENV=development`, which turns the flag on locally.
+
 ## Request caching
 
 The OpenAPI document is generated and serialized once per process, on its first

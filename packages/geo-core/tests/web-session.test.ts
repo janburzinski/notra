@@ -163,4 +163,44 @@ if (!isIsolatedTestWorker(import.meta.url)) {
     expect(rows[0]?.session_id).not.toBe(rows[1]?.session_id);
     expect(rows.map((row) => row?.session_page_index)).toEqual([0, 0]);
   });
+
+  test("going back to a tagged landing inside the site continues the visit", async () => {
+    const tagged = "/?utm_source=newsletter&utm_campaign=launch";
+    const landing = await buildWebPageView(
+      view(tagged, "https://news.ycombinator.com/")
+    );
+    const pricing = await buildWebPageView(
+      view("/pricing", `https://acme.com${tagged}`)
+    );
+    // The SPA's back button: the tagged URL again, referred by the site itself.
+    const back = await buildWebPageView(
+      view(tagged, "https://acme.com/pricing")
+    );
+    expect(landing?.session_page_index).toBe(1);
+    expect(pricing?.session_id).toBe(landing?.session_id);
+    expect(back?.session_id).toBe(landing?.session_id);
+    expect(back?.session_page_index).toBe(3);
+    // A tagged link opened directly (no referrer) is still a new arrival.
+    const emailed = await buildWebPageView(
+      view("/?utm_source=crm&utm_medium=email")
+    );
+    expect(emailed?.session_id).not.toBe(landing?.session_id);
+    expect(emailed?.session_page_index).toBe(1);
+  });
+
+  test("a landing keeps all five UTM parameters, minus anything that identifies someone", async () => {
+    const row = await buildWebPageView(
+      view(
+        "/?utm_source=Newsletter&utm_medium=Email&utm_campaign=Spring_2026&utm_term=running+shoes&utm_content=jane%40example.com"
+      )
+    );
+    expect(row).toMatchObject({
+      path: "/",
+      utm_source: "newsletter",
+      utm_medium: "email",
+      utm_campaign: "Spring_2026",
+      utm_term: "running shoes",
+      utm_content: ":id",
+    });
+  });
 }

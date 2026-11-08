@@ -6,6 +6,8 @@ import { assertOrganizationAccess } from "@/lib/auth/organization";
 import { createORPCContext } from "@/lib/orpc/context";
 import { dashboardOrpc } from "@/lib/orpc/query";
 import { geoRouter } from "@/lib/orpc/routers/geo";
+import { isWebAnalyticsEnabled } from "@/lib/web-analytics/flag";
+import type { GeoTrafficPageKind } from "@/types/geo-traffic-pages";
 import {
   geoHydrationInputs,
   geoTrafficHydrationInputs,
@@ -101,11 +103,12 @@ async function dehydrateGeoOverview(
 }
 
 /**
- * Prefetch for the GEO traffic page, limited to what the first paint needs:
- * settings, the AI traffic summary, the web analytics summary and the ingest
- * setup. The streamed document stays open until every dehydrated query
- * settles and hydration waits for it, so the slower tables (top pages, log,
- * per-source page counts, web breakdowns) load from the client instead.
+ * Prefetch for the AI and web analytics pages, limited to what the first
+ * paint needs: settings, the AI traffic summary, the ingest setup and, on web
+ * analytics or without the web analytics flag, the web summary. The streamed
+ * document stays open until every dehydrated query settles and hydration
+ * waits for it, so the slower tables (top pages, log, per-source page counts,
+ * web breakdowns) load from the client instead.
  */
 export function dehydrateGeoTrafficQueries(
   ...args: Parameters<typeof dehydrateGeoTraffic>
@@ -114,6 +117,7 @@ export function dehydrateGeoTrafficQueries(
 }
 
 async function dehydrateGeoTraffic(
+  page: GeoTrafficPageKind,
   organizationId: string,
   projectId: string | undefined,
   search: Record<string, string | string[] | undefined>,
@@ -137,15 +141,21 @@ async function dehydrateGeoTraffic(
     queryFn: () => client.geo.aiTraffic(input.aiTraffic),
   });
   void queryClient.prefetchQuery({
-    ...dashboardOrpc.geo.webAnalytics.queryOptions({
-      input: input.webAnalytics,
-    }),
-    queryFn: () => client.geo.webAnalytics(input.webAnalytics),
-  });
-  void queryClient.prefetchQuery({
     ...dashboardOrpc.geo.ingestSetup.queryOptions({ input: input.ingestSetup }),
     queryFn: () => client.geo.ingestSetup(input.ingestSetup),
   });
+  // Without web analytics the AI analytics page shows people too.
+  if (
+    page === "web-analytics" ||
+    !(await isWebAnalyticsEnabled(organizationId, requestHeaders))
+  ) {
+    void queryClient.prefetchQuery({
+      ...dashboardOrpc.geo.webAnalytics.queryOptions({
+        input: input.webAnalytics,
+      }),
+      queryFn: () => client.geo.webAnalytics(input.webAnalytics),
+    });
+  }
 
   return dehydrate(queryClient);
 }

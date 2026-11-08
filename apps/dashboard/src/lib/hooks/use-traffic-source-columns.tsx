@@ -46,6 +46,9 @@ export function useTrafficSourceColumns({
     const categorySize = isMobile
       ? TRAFFIC_SOURCE_COLUMN_MIN_WIDTH.categoryMobile
       : TRAFFIC_SOURCE_COLUMN_MIN_WIDTH.category;
+    const sourceSize = isMobile
+      ? TRAFFIC_SOURCE_COLUMN_MIN_WIDTH.sourceMobile
+      : TRAFFIC_SOURCE_COLUMN_MIN_WIDTH.source;
     const visitsSize =
       isMobile || seriesByKey === undefined
         ? TRAFFIC_SOURCE_COLUMN_MIN_WIDTH.visitsMobile
@@ -57,7 +60,7 @@ export function useTrafficSourceColumns({
         width: "1fr",
         minWidth: rowsAreBots
           ? TRAFFIC_SOURCE_COLUMN_MIN_WIDTH.botSource
-          : TRAFFIC_SOURCE_COLUMN_MIN_WIDTH.source,
+          : sourceSize,
         sortable: true,
         cell: (row) =>
           rowsAreBots ? (
@@ -75,7 +78,9 @@ export function useTrafficSourceColumns({
         header: tShared("purpose"),
         width: categorySize,
         minWidth: categorySize,
-        collapsePriority: rowsAreBots ? 1 : undefined,
+        // Grouped rows sit under a band that already names their purpose, so
+        // on narrow screens the badge goes last, before the visits column.
+        collapsePriority: rowsAreBots ? 1 : 3,
         sortable: true,
         cell: (row) =>
           rowsAreBots ? (

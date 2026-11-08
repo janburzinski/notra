@@ -1,0 +1,11 @@
+"date","hostname","page","visits","visitors","pageviews"
+"2026-08-01","example.com","/",80,70,150
+"2026-08-01","example.com","/pricing",30,28,60
+"2026-08-01","example.com","/blog/hello-world?utm_source=newsletter",20,18,40
+"2026-08-01","example.com","/blog/hello-world",30,25,54
+"2026-08-02","example.com","/",120,100,200
+"2026-08-02","docs.example.com","/getting-started",60,55,125
+"2026-08-03","example.com","/",117,117,233
+"2026-09-29","example.com","/",1000,900,1681
+"2026-09-29","example.com","/pricing",722,600,1000
+"2026-09-30","example.com","/",1962,1724,3075

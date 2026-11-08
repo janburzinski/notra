@@ -18,3 +18,9 @@ export interface AnalyticsProject {
   /** Other projects in the organization this result does not cover. */
   otherProjects: number;
 }
+
+export interface AiTrafficDay {
+  day: string;
+  crawler_visits: number;
+  ai_referral_visits: number;
+}

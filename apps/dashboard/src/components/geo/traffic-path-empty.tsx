@@ -14,7 +14,7 @@ import { useTrafficPathQuery } from "@/lib/hooks/use-traffic-path";
 import type { TrafficPathEmptyProps } from "@/types/geo";
 
 export function TrafficPathEmpty({ geoRange }: TrafficPathEmptyProps) {
-  const t = useTranslations("geo.pages.traffic");
+  const t = useTranslations("geo.trafficPathEmpty");
   const [path, setPath] = useTrafficPathQuery();
   const canWiden = geoRange.days <= TRAFFIC_PATH_WIDEN_MAX_DAYS;
 
@@ -22,22 +22,22 @@ export function TrafficPathEmpty({ geoRange }: TrafficPathEmptyProps) {
     <EmptyState
       action={
         <>
-          <Button onClick={() => setPath("")}>{t("emptyPathReset")}</Button>
+          <Button onClick={() => setPath("")}>{t("reset")}</Button>
           {canWiden ? (
             <Button onClick={() => geoRange.setPreset("90d")} variant="outline">
-              {t("emptyPathWiden")}
+              {t("widen")}
             </Button>
           ) : null}
         </>
       }
-      description={t("emptyPathDescription")}
+      description={t("description")}
       preview={
         <EmptyStateTablePreview
           columns={EMPTY_STATE_TABLE_COLUMNS.traffic}
           rows={EMPTY_STATE_TABLE_ROWS}
         />
       }
-      title={t("emptyPathTitle", { path })}
+      title={t("title", { path })}
     />
   );
 }

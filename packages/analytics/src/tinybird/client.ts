@@ -10,6 +10,10 @@ import {
 import { bumpAnalyticsVersions, cachedQuery } from "../cache/query-cache";
 import type { AnalyticsCacheScope } from "../types/cache";
 import type {
+  GeoImportedDailyRow,
+  WebErrorRow,
+  WebEventRow,
+  WebImportedDailyRow,
   WebPageEngagementRow,
   WebPageViewRow,
 } from "../types/tinybird-datasources";
@@ -47,9 +51,15 @@ import type {
   WebPagesRow,
   WebSourcesRow,
   WebAudienceRow,
+  WebUtmRow,
   WebHostsRow,
   WebAiOutcomesRow,
   WebEngagementRow,
+  WebNativeFirstDayRow,
+  WebOutboundLinksRow,
+  WebVitalsRow,
+  WebLanguagesRow,
+  WebErrorsTopRow,
   McpClientsRow,
   McpLogRow,
   McpOverviewRow,
@@ -70,6 +80,7 @@ import type {
 } from "../types/tinybird-endpoints";
 import {
   type GeoTrafficEventRow,
+  geoImportedDaily,
   geoTrafficEvents,
   type McpEventRow,
   mcpEvents,
@@ -83,6 +94,9 @@ import {
   socialPostSources,
   socialPostStats,
   socialPosts,
+  webErrors,
+  webEvents,
+  webImportedDaily,
   webPageEngagement,
   webPageViews,
 } from "./datasources";
@@ -138,11 +152,19 @@ import {
   webAudience,
   webEngagement,
   webHosts,
+  webNativeFirstDay,
   webOverview,
   webPages,
   webSources,
   webTimeseries,
+  webUtm,
 } from "./pipes/web";
+import {
+  webErrorsTop,
+  webOutboundLinks,
+  webLanguages,
+  webVitals,
+} from "./pipes/web-events";
 
 const TINYBIRD_REQUEST_TIMEOUT_MS = 10_000;
 
@@ -181,6 +203,10 @@ function createTinybirdClient(fetch?: typeof globalThis.fetch) {
       geoTrafficEvents,
       webPageViews,
       webPageEngagement,
+      webEvents,
+      webErrors,
+      webImportedDaily,
+      geoImportedDaily,
       mcpEvents,
     },
     pipes: {
@@ -209,9 +235,15 @@ function createTinybirdClient(fetch?: typeof globalThis.fetch) {
       webPages,
       webSources,
       webAudience,
+      webUtm,
       webHosts,
       webAiOutcomes,
       webEngagement,
+      webNativeFirstDay,
+      webOutboundLinks,
+      webVitals,
+      webLanguages,
+      webErrorsTop,
       mcpOverview,
       mcpTimeseries,
       mcpTools,
@@ -699,6 +731,28 @@ export function ingestWebPageEngagement(
   );
 }
 
+export function ingestWebEvents(
+  rows: WebEventRow[]
+): Promise<IngestResult | null> {
+  return ingestRows(
+    rows,
+    "geo",
+    rows.map((row) => row.organization_id),
+    (client, batch) => client.webEvents.ingestBatch(batch, { wait: false })
+  );
+}
+
+export function ingestWebErrors(
+  rows: WebErrorRow[]
+): Promise<IngestResult | null> {
+  return ingestRows(
+    rows,
+    "geo",
+    rows.map((row) => row.organization_id),
+    (client, batch) => client.webErrors.ingestBatch(batch, { wait: false })
+  );
+}
+
 export function queryWebEngagement(
   params: InferParams<typeof webEngagement>
 ): Promise<QueryResult<WebEngagementRow> | null> {
@@ -771,6 +825,18 @@ export function queryWebAudience(
   );
 }
 
+export function queryWebUtm(
+  params: InferParams<typeof webUtm>
+): Promise<QueryResult<WebUtmRow> | null> {
+  return cachedPipeQuery(
+    "geo",
+    "web_utm",
+    params,
+    params.organization_id,
+    (client) => client.webUtm.query(params)
+  );
+}
+
 export function queryWebHosts(
   params: InferParams<typeof webHosts>
 ): Promise<QueryResult<WebHostsRow> | null> {
@@ -793,6 +859,89 @@ export function queryWebAiOutcomes(
     params.organization_id,
     (client) => client.webAiOutcomes.query(params)
   );
+}
+
+export function queryWebOutboundLinks(
+  params: InferParams<typeof webOutboundLinks>
+): Promise<QueryResult<WebOutboundLinksRow> | null> {
+  return cachedPipeQuery(
+    "geo",
+    "web_outbound_links",
+    params,
+    params.organization_id,
+    (client) => client.webOutboundLinks.query(params)
+  );
+}
+
+export function queryWebVitals(
+  params: InferParams<typeof webVitals>
+): Promise<QueryResult<WebVitalsRow> | null> {
+  return cachedPipeQuery(
+    "geo",
+    "web_vitals",
+    params,
+    params.organization_id,
+    (client) => client.webVitals.query(params)
+  );
+}
+
+export function queryWebLanguages(
+  params: InferParams<typeof webLanguages>
+): Promise<QueryResult<WebLanguagesRow> | null> {
+  return cachedPipeQuery(
+    "geo",
+    "web_languages",
+    params,
+    params.organization_id,
+    (client) => client.webLanguages.query(params)
+  );
+}
+
+export function queryWebErrorsTop(
+  params: InferParams<typeof webErrorsTop>
+): Promise<QueryResult<WebErrorsTopRow> | null> {
+  return cachedPipeQuery(
+    "geo",
+    "web_errors_top",
+    params,
+    params.organization_id,
+    (client) => client.webErrorsTop.query(params)
+  );
+}
+
+/**
+ * Writes imported aggregates and waits until Tinybird accepted them. Imports
+ * stay hidden until completed, so no cache version is bumped here.
+ */
+export async function ingestWebImportedDaily(
+  rows: WebImportedDailyRow[]
+): Promise<IngestResult | null> {
+  const client = getTinybirdMutationClient();
+  if (!client || rows.length === 0) {
+    return null;
+  }
+  return await client.webImportedDaily.ingestBatch(rows, { wait: true });
+}
+
+export async function ingestGeoImportedDaily(
+  rows: GeoImportedDailyRow[]
+): Promise<IngestResult | null> {
+  const client = getTinybirdMutationClient();
+  if (!client || rows.length === 0) {
+    return null;
+  }
+  return await client.geoImportedDaily.ingestBatch(rows, { wait: true });
+}
+
+/** Uncached: the cut-off must see native traffic that arrived seconds ago. */
+export async function queryWebNativeFirstDay(
+  params: InferParams<typeof webNativeFirstDay>
+): Promise<QueryResult<WebNativeFirstDayRow> | null> {
+  const client = getTinybirdQueryClient();
+  if (!client || isDemoMode()) {
+    return null;
+  }
+  return await client.webNativeFirstDay.query(params);
 }
 
 export function ingestMcpEvents(

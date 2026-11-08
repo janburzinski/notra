@@ -333,6 +333,11 @@ export const webPageViews = defineDatasource("web_page_views", {
     browser: t.string().lowCardinality(),
     os: t.string().lowCardinality(),
     request_id: t.string(),
+    view_id: t.string().default(""),
+    language: t.string().lowCardinality().default(""),
+    // Read from the raw rows only; web_sources_daily keeps source, medium and campaign.
+    utm_term: t.string().default(""),
+    utm_content: t.string().default(""),
   },
   engine: engine.mergeTree({
     sortingKey: ["organization_id", "project_id", "host", "captured_at"],
@@ -355,9 +360,64 @@ export const webPageEngagement = defineDatasource("web_page_engagement", {
     view_id: t.string(),
     visible_ms: t.uint32(),
     scroll_depth: t.uint8(),
+    lcp_ms: t.uint32().nullable(),
+    fcp_ms: t.uint32().nullable(),
+    ttfb_ms: t.uint32().nullable(),
+    inp_ms: t.uint32().nullable(),
+    cls_milli: t.uint32().nullable(),
   },
   engine: engine.mergeTree({
     sortingKey: ["organization_id", "site_id", "captured_at"],
+    partitionKey: "toYYYYMM(captured_at)",
+    ttl: "captured_at + toIntervalDay(90)",
+    settings: { ttl_only_drop_parts: 1 },
+  }),
+});
+
+export const webEvents = defineDatasource("web_events", {
+  description:
+    "Outbound link clicks from notra.js, named 'Outbound', with the destination host and path (no query) as props JSON `{\"url\": ...}`. Join to web_page_views on view_id for source and session.",
+  schema: {
+    organization_id: t.string(),
+    project_id: t.string().lowCardinality(),
+    site_id: t.string().lowCardinality(),
+    captured_at: t.dateTime(),
+    host: t.string().lowCardinality(),
+    path: t.string(),
+    view_id: t.string(),
+    visitor_id: t.string(),
+    name: t.string().lowCardinality(),
+    props: t.string(),
+    country: t.string().lowCardinality(),
+    device: t.string().lowCardinality(),
+  },
+  engine: engine.mergeTree({
+    sortingKey: ["organization_id", "project_id", "name", "captured_at"],
+    partitionKey: "toYYYYMM(captured_at)",
+    ttl: "captured_at + toIntervalDay(90)",
+    settings: { ttl_only_drop_parts: 1 },
+  }),
+});
+
+export const webErrors = defineDatasource("web_errors", {
+  description:
+    "JavaScript errors reported by the opt-in notra.plus.js; messages are scrubbed of emails, long digit runs and URL queries at ingest, and no stack is stored",
+  schema: {
+    organization_id: t.string(),
+    project_id: t.string().lowCardinality(),
+    site_id: t.string().lowCardinality(),
+    captured_at: t.dateTime(),
+    host: t.string().lowCardinality(),
+    path: t.string(),
+    view_id: t.string(),
+    message: t.string(),
+    source: t.string(),
+    line: t.uint32(),
+    kind: t.string().lowCardinality(),
+    browser: t.string().lowCardinality(),
+  },
+  engine: engine.mergeTree({
+    sortingKey: ["organization_id", "project_id", "site_id", "captured_at"],
     partitionKey: "toYYYYMM(captured_at)",
     ttl: "captured_at + toIntervalDay(90)",
     settings: { ttl_only_drop_parts: 1 },
@@ -464,6 +524,90 @@ export const webAudienceDaily = defineDatasource("web_audience_daily", {
     partitionKey: "toYYYYMM(day)",
   }),
   jsonPaths: false,
+});
+
+export const webImportedDaily = defineDatasource("web_imported_daily", {
+  description:
+    "Aggregated history imported from other analytics tools; one row per import, grain, day and dimension value. Read only through endpoints that pass completed import ids.",
+  schema: {
+    organization_id: t.string(),
+    project_id: t.string().lowCardinality(),
+    site_id: t.string().lowCardinality().default(""),
+    import_id: t.string(),
+    source_provider: t.string().lowCardinality(),
+    grain: t.string().lowCardinality(),
+    day: t.date(),
+    host: t.string().lowCardinality(),
+    path: t.string(),
+    referrer_host: t.string(),
+    referrer_group: t.string().lowCardinality(),
+    referrer_source: t.string().lowCardinality(),
+    ai_product: t.string().lowCardinality(),
+    utm_source: t.string().lowCardinality(),
+    utm_medium: t.string().lowCardinality(),
+    utm_campaign: t.string(),
+    utm_term: t.string().default(""),
+    utm_content: t.string().default(""),
+    country: t.string().lowCardinality(),
+    device: t.string().lowCardinality(),
+    browser: t.string().lowCardinality(),
+    os: t.string().lowCardinality(),
+    visitors: t.uint64().nullable(),
+    visits: t.uint64().nullable(),
+    pageviews: t.uint64(),
+    bounces: t.uint64().nullable(),
+    visit_duration_s: t.uint64().nullable(),
+    entrances: t.uint64().nullable(),
+    imported_at: t.dateTime(),
+  },
+  engine: engine.mergeTree({
+    sortingKey: [
+      "organization_id",
+      "project_id",
+      "grain",
+      "host",
+      "day",
+      "import_id",
+    ],
+    partitionKey: "toYear(day)",
+  }),
+});
+
+export const geoImportedDaily = defineDatasource("geo_imported_daily", {
+  description:
+    "AI crawler and AI referral hits imported from CDN analytics (Cloudflare); sampled estimates, one row per import, day, host, path and agent",
+  schema: {
+    organization_id: t.string(),
+    project_id: t.string().lowCardinality(),
+    site_id: t.string().lowCardinality().default(""),
+    import_id: t.string(),
+    source_provider: t.string().lowCardinality(),
+    day: t.date(),
+    visitor_type: t.string().lowCardinality(),
+    source: t.string().lowCardinality(),
+    agent: t.string().lowCardinality(),
+    category: t.string().lowCardinality(),
+    confidence: t.string().lowCardinality(),
+    verified: t.uint8(),
+    host: t.string().lowCardinality(),
+    path: t.string(),
+    status: t.uint16(),
+    requests: t.uint64(),
+    sample_interval: t.float32(),
+    imported_at: t.dateTime(),
+  },
+  engine: engine.mergeTree({
+    sortingKey: [
+      "organization_id",
+      "project_id",
+      "visitor_type",
+      "source",
+      "host",
+      "day",
+      "path",
+    ],
+    partitionKey: "toYYYYMM(day)",
+  }),
 });
 
 export const mcpEvents = defineDatasource("mcp_events", {

@@ -18,6 +18,7 @@ import { Button } from "@/components/button";
 import Link from "@/components/framework/link";
 import { LogEventSummary } from "@/components/logs/log-event-summary";
 import { LogTechnicalDetails } from "@/components/logs/log-technical-details";
+import { useNavVisibility } from "@/lib/hooks/use-nav-visibility";
 import { dashboardOrpc } from "@/lib/orpc/query";
 import type { LogDetailsSheetProps } from "@/types/logs/details-sheet";
 import { copyTextToClipboard } from "@/utils/copy-to-clipboard";
@@ -33,6 +34,7 @@ export function LogDetailsSheet({
   const t = useTranslations("logs.details");
   const tLabels = useTranslations("common.labels");
   const format = useFormatter();
+  const { webAnalytics } = useNavVisibility();
   const [log, releaseLog] = useRetainedValue(logProp);
   const detail = useQuery({
     ...dashboardOrpc.logs.webhooks.get.queryOptions({
@@ -44,7 +46,7 @@ export function LogDetailsSheet({
   });
   const entry = detail.data ?? log;
   const destination = entry
-    ? getLogDestination(entry.integrationType, organizationSlug)
+    ? getLogDestination(entry.integrationType, organizationSlug, webAnalytics)
     : null;
   return (
     <Sheet

@@ -35,7 +35,7 @@ export const dashboardAuthMiddleware = createMiddleware().server(
       return new Response(null, { status: 404 });
     }
     if (
-      /^\/(?:assets(?:\/|$)|api\/image(?:\/|$)|badges(?:\/|$)|demo\/[^/]+\.png$|favicon\.ico$|apple-icon\.png$|icon0\.svg$|icon1\.png$|robots\.txt$|design\.md(?:\/|$)|embed\/|embed\.js$|api\/webhooks\/|api\/geo\/ingest(?:\/|$)|api\/c15t\/|api\/cron\/|api\/healthcheck(?:\/|$)|api\/public\/|api\/workflows\/|api\/internal\/|\.well-known\/workflow\/|ingest\/)/.test(
+      /^\/(?:assets(?:\/|$)|api\/collect$|api\/notra(?:\.plus)?(?:\.[0-9a-f]{12})?\.js$|api\/image(?:\/|$)|badges(?:\/|$)|demo\/[^/]+\.png$|favicon\.ico$|apple-icon\.png$|icon0\.svg$|icon1\.png$|robots\.txt$|design\.md(?:\/|$)|embed\/|embed\.js$|api\/webhooks\/|api\/geo\/ingest(?:\/|$)|api\/c15t\/|api\/cron\/|api\/healthcheck(?:\/|$)|api\/public\/|api\/workflows\/|api\/internal\/|\.well-known\/workflow\/|ingest\/)/.test(
         pathname
       )
     ) {

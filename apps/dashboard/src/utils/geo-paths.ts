@@ -26,6 +26,25 @@ export function withGeoProject(path: string, projectId?: string): string {
   return `${path}${separator}project=${encodeURIComponent(projectId)}`;
 }
 
+/** `/{slug}{basePath}` with every defined search param carried over. */
+export function geoPathWithSearch(
+  slug: string,
+  basePath: string,
+  search: Record<string, string | string[] | undefined>
+): string {
+  const query = new URLSearchParams();
+  for (const [key, value] of Object.entries(search)) {
+    if (value === undefined) {
+      continue;
+    }
+    for (const entry of Array.isArray(value) ? value : [value]) {
+      query.append(key, entry);
+    }
+  }
+  const suffix = query.toString();
+  return `/${encodeURIComponent(slug)}${basePath}${suffix ? `?${suffix}` : ""}`;
+}
+
 export function isGeoDashboardPath(path: string): boolean {
   return GEO_DASHBOARD_PATH_PATTERN.test(path);
 }

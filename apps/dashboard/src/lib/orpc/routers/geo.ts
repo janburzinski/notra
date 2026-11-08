@@ -45,6 +45,7 @@ import {
 import {
   issueGeoIngestSetupResponse,
   rotateGeoIngestSetupResponse,
+  rotateGeoWebKeySetupResponse,
 } from "@notra/geo-core/geo/ingest";
 import {
   loadMcpAnalytics,
@@ -156,7 +157,11 @@ import {
   listAutopilotPromptSuggestions,
   listSuggestions,
 } from "@notra/geo-core/geo/suggestions";
-import { loadWebAnalytics } from "@notra/geo-core/geo/web-analytics";
+import {
+  loadWebAnalytics,
+  loadWebUtm,
+  loadWebTrackingStatus,
+} from "@notra/geo-core/geo/web-analytics";
 import { geoWindow } from "@notra/geo-core/geo/window";
 import {
   approveAndStartGeoWriter,
@@ -217,6 +222,7 @@ import {
   geoTrafficLogInputSchema,
   geoTrafficPagesInputSchema,
   webAnalyticsInputSchema,
+  webUtmInputSchema,
   mcpAnalyticsInputSchema,
   mcpSessionInputSchema,
   mcpToolDetailInputSchema,
@@ -245,10 +251,7 @@ import type {
   AgentReadinessResponse,
   AgentReadinessScanResponse,
 } from "@notra/geo-core/types/agent-readiness";
-import type {
-  GeoIngestSetupResponse,
-  GeoTrackedPrompt,
-} from "@notra/geo-core/types/geo";
+import type { GeoTrackedPrompt } from "@notra/geo-core/types/geo";
 import type {
   GeoSearchConsoleStatus,
   GscKeywordsResponse,
@@ -257,6 +260,7 @@ import type {
 } from "@notra/geo-core/types/google-search-console";
 import { webHostFilter } from "@notra/geo-core/utils/geo-project-domains";
 import { POSTHOG_EVENTS } from "@notra/posthog/events";
+import { organizationIdInputSchema } from "@notra/schemas/dashboard/auth/organization";
 import { geoScanStartInputSchema } from "@notra/schemas/dashboard/geo-analytics";
 import {
   geoShelfCreateInputSchema,
@@ -340,9 +344,13 @@ import {
   tooManyRequests,
 } from "@/lib/orpc/utils/errors";
 import { toGeoOrpcError } from "@/lib/orpc/utils/geo-errors";
+import { assertOrganizationManager } from "@/lib/orpc/utils/organization-manager";
+import { assertWebAnalyticsEnabled } from "@/lib/web-analytics/access";
+import { isWebAnalyticsEnabled } from "@/lib/web-analytics/flag";
 import type { GeoHandlerTracker } from "@/types/analytics/geo-events";
 import type { AuthenticatedUser } from "@/types/auth/organization";
 import type {
+  DashboardGeoIngestSetup,
   GeoBrandSearchHandlerInput,
   GeoCompetitorSuggestionsHandlerInput,
   GeoProjectCreateHandlerInput,
@@ -350,6 +358,7 @@ import type {
 } from "@/types/geo";
 import type { GeoDashboardRuntime } from "@/types/geo-runtime";
 import type { GeoShelfMember, GeoShelfSource } from "@/types/geo-shelf";
+import { isOrganizationManager } from "@/utils/organization-roles";
 import { ratelimit } from "@/utils/ratelimit";
 
 interface GeoHandlerOptions<TInput> {
@@ -1205,17 +1214,24 @@ export const geoRouter = {
         )
       )
     ),
+  // Without web analytics the people section of AI analytics reads these,
+  // with no time on page and no notra.js reports.
   webAnalytics: authorizedProcedure
     .input(webAnalyticsInputSchema)
     .handler(
       geoOpenHandler((input) =>
-        loadWebAnalytics(
-          input,
-          geoWindow(input),
-          input.host,
-          input.path,
-          input.sites,
-          "summary"
+        Effect.promise(() => isWebAnalyticsEnabled(input.organizationId)).pipe(
+          Effect.flatMap((engagement) =>
+            loadWebAnalytics(
+              input,
+              geoWindow(input),
+              input.host,
+              input.path,
+              input.sites,
+              "summary",
+              { engagement }
+            )
+          )
         )
       )
     ),
@@ -1223,13 +1239,33 @@ export const geoRouter = {
     .input(webAnalyticsInputSchema)
     .handler(
       geoOpenHandler((input) =>
-        loadWebAnalytics(
+        Effect.promise(() => isWebAnalyticsEnabled(input.organizationId)).pipe(
+          Effect.flatMap((scriptReports) =>
+            loadWebAnalytics(
+              input,
+              geoWindow(input),
+              input.host,
+              input.path,
+              input.sites,
+              "breakdowns",
+              { scriptReports }
+            )
+          )
+        )
+      )
+    ),
+  /** Sessions per value of one UTM parameter, for the Referrers card's UTM tab. */
+  webUtm: authorizedProcedure
+    .input(webUtmInputSchema)
+    .handler(
+      geoOpenHandler((input) =>
+        loadWebUtm(
           input,
           geoWindow(input),
           input.host,
-          input.path,
+          input.path ?? "",
           input.sites,
-          "breakdowns"
+          input.dimension
         )
       )
     ),
@@ -1301,13 +1337,40 @@ export const geoRouter = {
         )
       )
     ),
+  /** The server's web analytics flag, so the client never evaluates it. */
+  webAnalyticsEnabled: authorizedProcedure
+    .input(organizationIdInputSchema)
+    .handler(async ({ context, input }) => {
+      await assertOrganizationAccess(accessParams({ context, input }));
+      return await isWebAnalyticsEnabled(input.organizationId, context.headers);
+    }),
+  /** Whether notra.js has counted the project yet, for the install card. */
+  webTrackingStatus: authorizedProcedure
+    .input(geoOrganizationInputSchema)
+    .handler(async ({ context, input }) => {
+      await assertOrganizationAccess(accessParams({ context, input }));
+      await assertWebAnalyticsEnabled(input.organizationId, context.headers);
+      return await runOrpcEffect(
+        loadWebTrackingStatus(input).pipe(
+          Effect.provide(geoCoreDashboardLayer)
+        ),
+        toGeoOrpcError
+      );
+    }),
   ingestSetup: authorizedProcedure
     .input(geoOrganizationInputSchema)
-    .handler(async ({ context, input }): Promise<GeoIngestSetupResponse> => {
-      await assertOrganizationAccess(accessParams({ context, input }));
+    .handler(async ({ context, input }): Promise<DashboardGeoIngestSetup> => {
+      const access = await assertOrganizationAccess(
+        accessParams({ context, input })
+      );
 
+      // notra.js comes only with web analytics.
+      const withWeb = await isWebAnalyticsEnabled(
+        input.organizationId,
+        context.headers
+      );
       const setup = await runOrpcEffect(
-        issueGeoIngestSetupResponse(input).pipe(
+        issueGeoIngestSetupResponse(input, withWeb).pipe(
           Effect.provide(geoCoreDashboardLayer)
         ),
         toGeoOrpcError
@@ -1315,15 +1378,43 @@ export const geoRouter = {
       if (!setup) {
         throw notFound("Organization not found");
       }
-      return setup;
+      return {
+        ...setup,
+        canManage: isOrganizationManager(access.membership.role),
+      };
+    }),
+  webKeyRotate: authorizedProcedure
+    .input(geoOrganizationInputSchema)
+    .handler(async ({ context, input }): Promise<DashboardGeoIngestSetup> => {
+      const access = await assertOrganizationAccess(
+        accessParams({ context, input })
+      );
+      await assertWebAnalyticsEnabled(input.organizationId, context.headers);
+      assertOrganizationManager(access.membership, "rotate the public key");
+      const setup = await runOrpcEffect(
+        rotateGeoWebKeySetupResponse(input).pipe(
+          Effect.provide(geoCoreDashboardLayer)
+        ),
+        toGeoOrpcError
+      );
+      if (!setup) {
+        throw notFound("Organization not found");
+      }
+      return { ...setup, canManage: true };
     }),
   ingestTokenRotate: authorizedProcedure
     .input(geoOrganizationInputSchema)
-    .handler(async ({ context, input }): Promise<GeoIngestSetupResponse> => {
-      await assertOrganizationAccess(accessParams({ context, input }));
+    .handler(async ({ context, input }): Promise<DashboardGeoIngestSetup> => {
+      const access = await assertOrganizationAccess(
+        accessParams({ context, input })
+      );
 
+      const withWeb = await isWebAnalyticsEnabled(
+        input.organizationId,
+        context.headers
+      );
       const setup = await runOrpcEffect(
-        rotateGeoIngestSetupResponse(input).pipe(
+        rotateGeoIngestSetupResponse(input, withWeb).pipe(
           Effect.provide(geoCoreDashboardLayer)
         ),
         toGeoOrpcError
@@ -1336,7 +1427,10 @@ export const geoRouter = {
         input,
         event: POSTHOG_EVENTS.TRAFFIC_TOKEN_ROTATED,
       });
-      return setup;
+      return {
+        ...setup,
+        canManage: isOrganizationManager(access.membership.role),
+      };
     }),
   promptsList: authorizedProcedure
     .input(geoOrganizationInputSchema)

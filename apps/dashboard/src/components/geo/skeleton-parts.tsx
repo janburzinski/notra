@@ -3,7 +3,10 @@
 import { Skeleton } from "@notra/ui/components/ui/skeleton";
 
 import { cn } from "@/lib/utils";
-import type { GeoSectionSkeletonProps } from "@/types/geo";
+import type {
+  GeoSectionSkeletonProps,
+  TrafficTrendLegendSkeletonProps,
+} from "@/types/geo";
 
 export function GeoSectionSkeleton({
   eyebrow,
@@ -53,6 +56,19 @@ export function GeoConversationSkeleton() {
           <Skeleton className="h-6 w-24 rounded-full" />
         </div>
       </div>
+    </div>
+  );
+}
+
+/** Placeholder for TrafficTrendLegend: same rule, padding and row height. */
+export function TrafficTrendLegendSkeleton({
+  items = 2,
+}: TrafficTrendLegendSkeletonProps) {
+  return (
+    <div className="border-border mt-3 flex justify-center gap-2 border-t pt-3">
+      {Array.from({ length: items }, (_, index) => (
+        <Skeleton className="h-6 w-24 rounded-md" key={index} />
+      ))}
     </div>
   );
 }

@@ -4,7 +4,12 @@ import { Upload01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import type { ReactNode } from "react";
 import { createContext, useContext, useMemo } from "react";
-import type { DropEvent, DropzoneOptions, FileRejection } from "react-dropzone";
+import type {
+  DropEvent,
+  DropzoneOptions,
+  DropzoneRootProps,
+  FileRejection,
+} from "react-dropzone";
 import { useDropzone } from "react-dropzone";
 import { useUiLabels } from "@notra/ui/components/shared/ui-labels-provider";
 import { buttonVariants } from "@notra/ui/components/ui/button";
@@ -40,6 +45,8 @@ const DropzoneContext = createContext<DropzoneContextType | undefined>(
 export type DropzoneProps = Omit<DropzoneOptions, "onDrop"> & {
   src?: File[];
   className?: string;
+  /** Extra props for the focusable root, such as `role` or `aria-*`. */
+  rootProps?: DropzoneRootProps;
   onDrop?: (
     acceptedFiles: File[],
     fileRejections: FileRejection[],
@@ -58,6 +65,7 @@ export const Dropzone = ({
   disabled,
   src,
   className,
+  rootProps,
   children,
   ...props
 }: DropzoneProps) => {
@@ -94,7 +102,7 @@ export const Dropzone = ({
           disabled && "pointer-events-none opacity-50",
           className,
         )}
-        {...getRootProps()}
+        {...getRootProps(rootProps)}
       >
         <input {...getInputProps()} disabled={disabled} />
         {children}

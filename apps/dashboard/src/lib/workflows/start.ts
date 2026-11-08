@@ -37,8 +37,13 @@ import type { BrandAnalysisPayload } from "@/types/brand-analysis";
 import type { ScheduledPublicationWorkflowInput } from "@/types/content/scheduled-publications";
 import type { SiteJobRunHandle } from "@/types/sites-server";
 import type { WorkflowGraphRunPayload } from "@/types/workflow-engine";
+import type { AnalyticsImportWorkflowPayload } from "@/types/workflows/analytics-import";
 import { autopilotPullRequestMoment } from "@/utils/autopilot-github";
 import { agentReadinessWorkflow } from "@/workflows/agent-readiness";
+import {
+  analyticsImportDeleteWorkflow,
+  analyticsImportWorkflow,
+} from "@/workflows/analytics-import";
 import { autopilotPullRequestWorkflow } from "@/workflows/autopilot-pull-request";
 import { autopilotSuggestionWorkflow } from "@/workflows/autopilot-suggestion";
 import {
@@ -334,5 +339,19 @@ export async function startOnDemandRun(
       content_type: parsed.contentType,
     },
   });
+  return { runId: run.runId };
+}
+
+export async function startAnalyticsImportRun(
+  payload: AnalyticsImportWorkflowPayload
+): Promise<{ runId: string }> {
+  const run = await start(analyticsImportWorkflow, [payload]);
+  return { runId: run.runId };
+}
+
+export async function startAnalyticsImportDeleteRun(
+  payload: AnalyticsImportWorkflowPayload
+): Promise<{ runId: string }> {
+  const run = await start(analyticsImportDeleteWorkflow, [payload]);
   return { runId: run.runId };
 }

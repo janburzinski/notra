@@ -55,6 +55,7 @@ function CloudflareSteps({
   return (
     <ol>
       <GeoSetupStep
+        plain
         action={
           <GeoExternalLinkButton
             href={GEO_DRAIN_DASHBOARD_URLS.cloudflare}
@@ -66,7 +67,7 @@ function CloudflareSteps({
         index={1}
         title={t("openTitle")}
       />
-      <GeoSetupStep index={2} title={t("destinationTitle")}>
+      <GeoSetupStep plain index={2} title={t("destinationTitle")}>
         {token ? (
           <GeoSetupCopyField
             display={withoutProtocol(
@@ -79,6 +80,7 @@ function CloudflareSteps({
         ) : null}
       </GeoSetupStep>
       <GeoSetupStep
+        plain
         description={t("fieldsDescription", {
           count: GEO_CLOUDFLARE_LOGPUSH_FIELDS.length,
         })}
@@ -87,10 +89,15 @@ function CloudflareSteps({
       >
         <LogpushFieldList label={t("fieldsTitle")} onCopy={onCopy} />
         <p className="text-muted-foreground text-xs text-pretty">
-          {t("customFieldsNote")}
+          {t.rich("customFieldsNote", {
+            code: (chunks) => (
+              <code className="text-foreground font-mono">{chunks}</code>
+            ),
+          })}
         </p>
       </GeoSetupStep>
       <GeoSetupStep
+        plain
         description={t("saveDescription")}
         index={4}
         title={t("saveTitle")}
@@ -109,6 +116,7 @@ function VercelSteps({
   return (
     <ol>
       <GeoSetupStep
+        plain
         action={
           <GeoExternalLinkButton
             href={GEO_DRAIN_DASHBOARD_URLS.vercel}
@@ -121,11 +129,13 @@ function VercelSteps({
         title={t("openTitle")}
       />
       <GeoSetupStep
+        plain
         description={t("projectsDescription")}
         index={2}
         title={t("projectsTitle")}
       />
       <GeoSetupStep
+        plain
         description={t("endpointDescription")}
         index={3}
         title={t("endpointTitle")}
@@ -139,7 +149,7 @@ function VercelSteps({
           />
         ) : null}
       </GeoSetupStep>
-      <GeoSetupStep index={4} title={t("headerTitle")}>
+      <GeoSetupStep plain index={4} title={t("headerTitle")}>
         {token ? (
           <GeoSetupCopyField
             display={geoVercelDrainHeader(GEO_SETUP_MASKED_TOKEN)}

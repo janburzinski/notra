@@ -47,6 +47,9 @@ export function createDevelopmentUiRoutes(parent: AnyRoute) {
     () => import("@/app/design-system/geo-traffic/page.dev")
   );
   const Icons = lazyPage(() => import("@/app/design-system/icons/page.dev"));
+  const ImportProgress = lazyPage(
+    () => import("@/app/design-system/import-progress/page.dev")
+  );
   const ScanFilters = lazyPage(
     () => import("@/app/design-system/scan-filters/page.dev")
   );
@@ -140,6 +143,12 @@ export function createDevelopmentUiRoutes(parent: AnyRoute) {
         path: "icons",
         preload: Icons.preload,
         component: () => <Icons />,
+      }),
+      createUiRoute({
+        parent: preview,
+        path: "import-progress",
+        preload: ImportProgress.preload,
+        component: () => <ImportProgress />,
       }),
       createUiRoute({
         parent: preview,

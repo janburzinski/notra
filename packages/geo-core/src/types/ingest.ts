@@ -1,6 +1,8 @@
 import type { GeoLogEvent } from "@notra/ai/types/evlog";
 import type { GeoTrafficEventRow } from "@notra/analytics/tinybird/datasources";
 import type {
+  WebErrorRow,
+  WebEventRow,
   WebPageEngagementRow,
   WebPageViewRow,
 } from "@notra/analytics/types/tinybird-datasources";
@@ -48,6 +50,8 @@ export interface GeoIngestBuffer {
   enqueue: (event: GeoTrafficEventRow) => boolean;
   enqueueWeb?: (row: WebPageViewRow) => boolean;
   enqueueEngagement?: (row: WebPageEngagementRow) => boolean;
+  enqueueWebEvent?: (row: WebEventRow) => boolean;
+  enqueueWebError?: (row: WebErrorRow) => boolean;
   /** Writes an organization's buffered events now, for open live views. */
   expedite: (organizationId: string) => void;
   /**
@@ -120,8 +124,14 @@ export type GeoIngestDropReason =
   | "site"
   | "not_site"
   | "web_rate_limited"
+  | "network_rate_limited"
   | "quota"
-  | "consent";
+  | "consent"
+  | "origin"
+  | "web_analytics_disabled";
+
+/** Admits one request for `key`; `now` is for tests. */
+export type LocalRateLimit = (key: string, now?: number) => boolean;
 
 export interface McpEventInput {
   identity: GeoIngestIdentity;
@@ -166,6 +176,40 @@ export interface WebPageViewInput {
   url: URL;
   capturedAt: Date;
   classification: GeoVisitorClassification;
+  /** notra.js page view id, so engagement, events and vitals join to it. */
+  viewId?: string;
+  /** From a `data-hash` install: store its path-like hash route. */
+  hashRoutes?: boolean;
+}
+
+export interface WebEventInput {
+  identity: GeoIngestIdentity;
+  /** The beacon's request envelope: IP and user agent for the visitor id. */
+  payload: GeoIngestPayload;
+  url: URL;
+  capturedAt: Date;
+  viewId: string;
+  /** Host and path of the clicked link to another host. */
+  outboundUrl: string;
+  /** From a `data-hash` install: store its path-like hash route. */
+  hashRoutes?: boolean;
+}
+
+export interface WebErrorReport {
+  message: string;
+  source: string;
+  line: number;
+}
+
+export interface WebErrorInput {
+  identity: GeoIngestIdentity;
+  payload: GeoIngestPayload;
+  url: URL;
+  capturedAt: Date;
+  viewId: string;
+  error: WebErrorReport;
+  /** From a `data-hash` install: store its path-like hash route. */
+  hashRoutes?: boolean;
 }
 
 export interface WebEngagementInput {
@@ -173,6 +217,8 @@ export interface WebEngagementInput {
   payload: WebEngagementPayload;
   url: URL;
   capturedAt: Date;
+  /** From a `data-hash` install: store its path-like hash route. */
+  hashRoutes?: boolean;
 }
 
 export interface WebReferrer {
@@ -223,4 +269,29 @@ export interface GeoDrainSummary {
   aiRequests: number;
   ingested: number;
   duplicates: number;
+}
+
+export interface WebCollectOptions {
+  /** Country for an IP when no edge header carries one (in-process GeoIP). */
+  lookupCountry?: (ip: string) => string | undefined;
+}
+
+/** Where a verified identity comes from: a write token, a Notra Site, or notra.js. */
+export type GeoIngestIdentityKind = "server" | "site" | "web";
+
+/** What an identity kind may record and how its checks are enforced. */
+export interface GeoIngestIdentityPolicy {
+  /** Records people's page views and engagement, not only AI traffic. */
+  recordsVisits: boolean;
+  /** Must match the scope's current token generation; rotation revokes it. */
+  followsRotation: boolean;
+  /**
+   * Which visitors become AI traffic events: every tracked type, or only AI
+   * referrals while no server SDK or drain already reports them.
+   */
+  aiEvents: "tracked" | "referrals-without-server";
+  /** Marks the scope as reported by server-side tracking. */
+  marksServerTraffic: boolean;
+  /** Posts on every page view, so scope checks are cached in process. */
+  cachesChecks: boolean;
 }

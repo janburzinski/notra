@@ -13,12 +13,14 @@ import type {
   GeoIngestFramework,
   GeoIngestMethod,
   GeoIngestPackageManager,
-  GeoIngestSetupResponse,
 } from "@notra/geo-core/types/geo";
+import { geoWebScriptTag } from "@notra/geo-core/utils/web-script-tag";
 import { NOTRA_AGENT_FEEDBACK_PROMPT } from "@notra/utils/constants/agent-feedback-prompt";
 
+import type { DashboardGeoIngestSetup } from "@/types/geo";
+
 export function geoIngestSnippet(
-  setup: GeoIngestSetupResponse | undefined,
+  setup: DashboardGeoIngestSetup | undefined,
   framework: GeoIngestFramework = GEO_INGEST_DEFAULT_FRAMEWORK
 ): string {
   return (
@@ -39,7 +41,7 @@ export function geoIngestInstallCommand(
 }
 
 export function geoIngestAgentPrompt(
-  setup: GeoIngestSetupResponse | undefined,
+  setup: DashboardGeoIngestSetup | undefined,
   framework: GeoIngestFramework = GEO_INGEST_DEFAULT_FRAMEWORK,
   packageManager: GeoIngestPackageManager = GEO_INGEST_DEFAULT_PACKAGE_MANAGER
 ): string {
@@ -97,7 +99,7 @@ export function geoVercelDrainHeader(token: string): string {
 }
 
 export function geoCloudflareDestination(
-  setup: GeoIngestSetupResponse | undefined,
+  setup: DashboardGeoIngestSetup | undefined,
   token: string
 ): string {
   const endpoint = setup?.drainUrls?.cloudflare ?? "";
@@ -105,7 +107,7 @@ export function geoCloudflareDestination(
 }
 
 function geoCloudflareLogpushCommand(
-  setup: GeoIngestSetupResponse | undefined
+  setup: DashboardGeoIngestSetup | undefined
 ): string {
   const filter = JSON.stringify({
     where: {
@@ -143,7 +145,7 @@ export function withoutProtocol(url: string): string {
 }
 
 export function geoCloudflareAgentPrompt(
-  setup: GeoIngestSetupResponse | undefined
+  setup: DashboardGeoIngestSetup | undefined
 ): string {
   return [
     "Connect this site's Cloudflare zone to Notra AI traffic with a Logpush job.",
@@ -160,4 +162,28 @@ export function geoCloudflareAgentPrompt(
     "",
     NOTRA_AGENT_FEEDBACK_PROMPT,
   ].join("\n");
+}
+
+/** Install methods to offer; notra.js only with web analytics. */
+export function availableGeoIngestMethods(
+  webAnalytics: boolean
+): readonly GeoIngestMethod[] {
+  const others = GEO_INGEST_METHODS.filter((method) => method !== "script");
+  // With web analytics the script tag comes first: it counts the people.
+  return webAnalytics ? ["script", ...others] : others;
+}
+
+/**
+ * The script tag to install: notra.plus.js when JavaScript errors are
+ * reported too, and pinned to one build with its integrity hash when asked.
+ * Empty without a project key.
+ */
+export function geoScriptSnippet(
+  setup: DashboardGeoIngestSetup | undefined,
+  options: { pinned: boolean; errors: boolean }
+): string {
+  const script = options.errors ? setup?.webPlusScript : setup?.webScript;
+  return setup?.webKey && script
+    ? geoWebScriptTag(setup.webKey, script, options.pinned)
+    : "";
 }

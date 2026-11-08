@@ -18,7 +18,9 @@ import { useLocale, useTranslations } from "use-intl";
 
 import Link from "@/components/framework/link";
 import { GeoStatDelta } from "@/components/geo/geo-stat-delta";
+import { TrafficHeroEmptyValue } from "@/components/geo/traffic-hero-empty-value";
 import { TrafficProviderLegend } from "@/components/geo/traffic-provider-legend";
+import { TrafficTrendLegend } from "@/components/geo/traffic-trend-legend";
 import { TrafficZoomChip } from "@/components/geo/traffic-zoom-chip";
 import { CHART_PRIMARY_COLOR, CHART_REFERRAL_COLOR } from "@/constants/charts";
 import {
@@ -69,11 +71,9 @@ function metricDelta(
 
 function TrafficHeroMetric({
   metric,
-  settingsHref,
   threeUp = false,
 }: TrafficHeroMetricProps) {
   const t = useTranslations("geo.trafficHero");
-  const tCommon = useTranslations("common");
   const tGeoShared = useTranslations("geo.shared");
   return (
     <div
@@ -87,30 +87,10 @@ function TrafficHeroMetric({
         {metric.label}
       </p>
       {metric.value === null ? (
-        <div className="flex min-w-0 flex-wrap items-center gap-2 self-start @sm/hero:gap-3">
-          <span
-            aria-hidden="true"
-            className={cn(
-              "text-muted-foreground",
-              TRAFFIC_HERO_METRIC_VALUE_CLASS
-            )}
-            title={t("notConfigured")}
-          >
-            —
-          </span>
-          <span className="sr-only">{t("notConfigured")}</span>
-          {settingsHref ? (
-            <Button
-              nativeButton={false}
-              render={<Link href={settingsHref} />}
-              size="sm"
-              title={t("setUpTitle")}
-              variant="outline"
-            >
-              {tCommon("labels.setUp")}
-            </Button>
-          ) : null}
-        </div>
+        <TrafficHeroEmptyValue
+          action={metric.emptyAction}
+          hint={metric.emptyHint ?? t("notConfigured")}
+        />
       ) : (
         <div className="flex max-w-full min-w-0 flex-wrap items-center gap-x-3 gap-y-2 self-start">
           <AnimatedNumber
@@ -135,6 +115,7 @@ export function TrafficHero({
   groups,
   points,
   settingsHref,
+  crawlerSetup,
   showMetrics = true,
   showChart = true,
 }: TrafficHeroProps) {
@@ -156,6 +137,22 @@ export function TrafficHero({
   const showTrend = showChart && days.length > 0;
   const singleDay = days.length === 1;
 
+  const crawlersUntracked =
+    crawlerSetup !== undefined && totals.crawler === 0 && totals.cited === 0;
+  const settingsAction = settingsHref ? (
+    <Button
+      nativeButton={false}
+      render={<Link href={settingsHref} />}
+      size="sm"
+      title={t("setUpTitle")}
+      variant="outline"
+    >
+      {tCommon2("labels.setUp")}
+    </Button>
+  ) : undefined;
+  const untrackedStage = (key: GeoTrafficFunnelStageKey) =>
+    crawlersUntracked && (key === "crawler" || key === "cited");
+
   // Without a settings link (public embeds) an unconfigured stage has no
   // action to offer, so it is left out instead of shown as a dash.
   const metrics: TrafficTrendMetric[] = GEO_TRAFFIC_FUNNEL_STAGES.map(
@@ -163,11 +160,17 @@ export function TrafficHero({
       key: stage.key,
       label: stageLabels[stage.key],
       description: t(`stages.${stage.key}.description`),
-      value: totals[stage.key],
+      value: untrackedStage(stage.key) ? null : totals[stage.key],
       delta: metricDelta(
         totals[stage.key],
         previousTotals === null ? null : previousTotals[stage.key]
       ),
+      ...(untrackedStage(stage.key)
+        ? {
+            emptyHint: t("crawlersUntracked"),
+            emptyAction: stage.key === "crawler" ? crawlerSetup : undefined,
+          }
+        : { emptyAction: settingsAction }),
     })
   ).filter((metric) => settingsHref !== undefined || metric.value !== null);
 
@@ -266,7 +269,6 @@ export function TrafficHero({
             <TrafficHeroMetric
               key={metric.key}
               metric={metric}
-              settingsHref={settingsHref}
               threeUp={threeUp}
             />
           ))}
@@ -359,6 +361,20 @@ export function TrafficHero({
               variant="frosted-glass"
             />
           </EChartsAreaChart>
+          <TrafficTrendLegend
+            items={[
+              {
+                key: GEO_TRAFFIC_TREND_CRAWLER_KEY,
+                label: tShared("crawlers"),
+                color: CHART_PRIMARY_COLOR,
+              },
+              {
+                key: GEO_TRAFFIC_TREND_REFERRAL_KEY,
+                label: tShared("referrals"),
+                color: CHART_REFERRAL_COLOR,
+              },
+            ]}
+          />
         </div>
       ) : null}
     </div>

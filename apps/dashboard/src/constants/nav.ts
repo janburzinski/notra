@@ -54,7 +54,7 @@ const INTEGRATIONS_NAV_LINK = "/integrations";
 const SKILLS_NAV_LINK = "/skills";
 const API_KEYS_NAV_LINK = "/api-keys";
 export const GEO_OVERVIEW_NAV_LINK = "/geo";
-const GEO_TRAFFIC_NAV_LINK = "/geo/traffic";
+export const GEO_TRAFFIC_NAV_LINK = "/geo/traffic";
 export const GEO_COMPETITORS_NAV_LINK = "/geo/competitors";
 const GEO_SHELF_SPACE_NAV_LINK = "/geo/shelf-space";
 export const GEO_SETTINGS_NAV_LINK = "/geo/settings";
@@ -234,6 +234,7 @@ export const DEFAULT_NAV_VISIBILITY: NavVisibility = {
   autopilot: false,
   analytics: true,
   sites: false,
+  webAnalytics: false,
 };
 
 const SIDEBAR_MODE_SWOOSH_IN = "ease-[cubic-bezier(0.16,1,0.3,1)]";

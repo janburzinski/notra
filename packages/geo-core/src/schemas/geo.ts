@@ -63,6 +63,11 @@ import {
 import { MAX_JUDGE_COMPETITORS } from "../constants/geo-conversations";
 import { GEO_CSV_IMPORT_MAX_ROWS } from "../constants/geo-import";
 import { GEO_AUDIENCE_TYPES } from "../constants/geo-model-catalog";
+import {
+  WEB_ERROR_MESSAGE_MAX_LENGTH,
+  WEB_UINT32_MAX,
+  WEB_UTM_DIMENSIONS,
+} from "../constants/web-analytics";
 import { normalizeProjectDomain } from "../utils/geo-project-domains";
 import { normalizePromptTags } from "../utils/geo-prompt-tags";
 import {
@@ -491,6 +496,10 @@ export const webAnalyticsInputSchema = geoOrganizationInputSchema.extend({
   sites: geoTrafficSitesField,
 });
 
+export const webUtmInputSchema = webAnalyticsInputSchema.extend({
+  dimension: enumType(WEB_UTM_DIMENSIONS),
+});
+
 export const geoTrafficLogInputSchema = geoOrganizationInputSchema.extend({
   limit: number().int().min(1).max(MAX_AI_TRAFFIC_LOG_LIMIT).optional(),
   visitorTypes: array(enumType(["crawler", "ai_referral"]))
@@ -534,6 +543,13 @@ export const geoRequestPayloadSchema = object({
   visitorConsent: boolean().optional(),
 });
 
+/**
+ * A web vital as the tracker rounds it. Out-of-range values are dropped when
+ * the row is built rather than here, so one odd reading never costs the
+ * view its visible time.
+ */
+const webVitalValue = number().int().min(0).max(WEB_UINT32_MAX);
+
 export const webEngagementPayloadSchema = object({
   type: literal("engagement"),
   timestamp: string().max(GEO_SHORT_FIELD_MAX_LENGTH).optional(),
@@ -541,6 +557,37 @@ export const webEngagementPayloadSchema = object({
   viewId: string().regex(SITE_ENGAGEMENT_VIEW_ID_PATTERN),
   visibleMs: number().int().min(0),
   scrollDepth: number().int().min(0).max(100),
+  lcpMs: webVitalValue.optional(),
+  fcpMs: webVitalValue.optional(),
+  ttfbMs: webVitalValue.optional(),
+  inpMs: webVitalValue.optional(),
+  clsMilli: webVitalValue.optional(),
+});
+
+/**
+ * What notra.js sends: a page view carries `r`; engagement carries `t` and
+ * `s` plus web vitals (`l f b i c`); an outbound link click carries `o` (the
+ * link's host and path); an error from notra.plus.js carries `x`, `xs` and
+ * `xl`.
+ */
+export const webCollectPayloadSchema = object({
+  k: string().min(1).max(GEO_SHORT_FIELD_MAX_LENGTH),
+  v: string().regex(SITE_ENGAGEMENT_VIEW_ID_PATTERN),
+  u: string().min(1).max(MAX_GEO_URL_LENGTH),
+  /** Sent by a `data-hash` install: hash routes are separate pages. */
+  h: boolean().optional(),
+  r: string().max(MAX_GEO_URL_LENGTH).optional(),
+  t: number().int().min(0).max(WEB_UINT32_MAX).optional(),
+  s: number().int().min(0).max(100).optional(),
+  l: webVitalValue.optional(),
+  f: webVitalValue.optional(),
+  b: webVitalValue.optional(),
+  i: webVitalValue.optional(),
+  c: webVitalValue.optional(),
+  o: string().min(1).max(MAX_GEO_URL_LENGTH).optional(),
+  x: string().max(WEB_ERROR_MESSAGE_MAX_LENGTH).optional(),
+  xs: string().max(MAX_GEO_URL_LENGTH).optional(),
+  xl: number().int().min(0).max(WEB_UINT32_MAX).optional(),
 });
 
 const mcpPeerSchema = object({

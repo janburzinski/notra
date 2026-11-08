@@ -30,11 +30,25 @@ The tracker captures only `GET` requests that look like pages, and it skips anyt
 
 The envelope contains the timestamp, method, URL, client IP, edge location headers when present, referer, user agent, accept and accept-language headers and a request id. The SDK does not read or send the request body, cookies or any other headers, and the POST uses `keepalive` and a 2 second timeout.
 
+## Browser script (notra.js)
+
+The [script tag](/ai-traffic/install/script-tag) counts people rather than server requests. It takes these attributes:
+
+| Attribute | Meaning |
+| --- | --- |
+| `data-key` | Required. The project's public key |
+| `data-api` | Beacon endpoint. Defaults to `/api/collect` on the script's origin |
+| `data-hash` | Count `#hash` changes as page views; `#/route` fragments are stored as pages, other fragments never |
+
+Web vitals (LCP, FCP, TTFB, CLS and INP) and outbound link clicks are always recorded. `/api/notra.plus.js` is the same script with JavaScript error reporting added.
+
+`/api/notra.js` and `/api/notra.plus.js` always serve the latest build. `/api/notra.<version>.js` and `/api/notra.plus.<version>.js` serve one build forever, cached for a year, with CORS enabled, so you can load it with `integrity` and `crossorigin="anonymous"`. A pinned tag never updates on its own; see [Pin a version with Subresource Integrity](/ai-traffic/install/script-tag#pin-a-version-with-subresource-integrity).
+
 <Visibility for="agents">
 
 ## Install snippets from the API
 
-Open **Traffic** in the GEO sidebar. Until the first event arrives, the page shows **No activity yet** with the full install panel of **Install the package**, **Set your token** and **Add the proxy**, and the token appears in the **Set your token** section. The **Copy agent prompt** button copies an instruction block you can paste into a coding agent.
+Open **Analytics** in the GEO sidebar and stay on the **AI analytics** tab. Until the first event arrives, the page shows **No activity yet** with the full install panel of **Install the package**, **Set your token** and **Add the proxy**, and the token appears in the **Set your token** section. The **Copy agent prompt** button copies an instruction block you can paste into a coding agent.
 
 From the API, reading the snippets needs `traffic.read` and issuing the token needs `traffic.write`:
 
@@ -48,7 +62,7 @@ curl -X POST "https://api.usenotra.com/v1/geo/ingest/token?projectId=$PROJECT_ID
   -H "Authorization: Bearer $NOTRA_API_KEY"
 ```
 
-Both return `ingestUrl`, `snippet` (the Next.js snippet), `snippets` with `next`, `nuxt`, `tanstack`, `astro`, `sveltekit`, `reactRouter` and `netlify` keys and `drainUrls` with the `vercel` and `cloudflare` log drain endpoints. The token endpoint also returns `token`. The ingest routes are organization-level, so pass `projectId` to bind the token to one project or omit it to track the whole organization. Issuing a token does not invalidate tokens issued earlier, so install the same project token on every domain the project tracks, and add extra hostnames under **Tracked domains** in GEO settings.
+Both return `ingestUrl`, `snippet` (the Next.js snippet), `snippets` with `next`, `nuxt`, `tanstack`, `astro`, `sveltekit`, `reactRouter` and `netlify` keys, `drainUrls` with the `vercel` and `cloudflare` log drain endpoints, and the notra.js install: `webKey`, `webSnippet` (the script tag) and `webScript` and `webPlusScript`, each with the auto-updating `url`, the `pinnedUrl` of the current build and its `integrity` value. Every web key belongs to one project: pass `projectId` for that project's key, or omit it for the organization's oldest project's key. The web key is public, so reading it only needs `traffic.read`. The token endpoint also returns `token`. The ingest routes are organization-level, so pass `projectId` to bind the token to one project or omit it to track the whole organization. Issuing a token does not invalidate tokens issued earlier, so install the same project token on every domain the project tracks, and add extra hostnames under **Tracked domains** in GEO settings.
 
 </Visibility>
 
@@ -66,3 +80,9 @@ curl -X POST "https://api.usenotra.com/v1/geo/ingest/rotate-token?projectId=$PRO
 </Visibility>
 
 Rotation invalidates every tracking token previously issued for the organization and returns a fresh one. Because Notra immediately rejects events from deployments that still send the old token, update `NOTRA_GEO_TOKEN` everywhere before you rotate.
+
+<Visibility for="agents">
+
+The public notra.js key can only be rotated in the dashboard, by an owner or admin; the API has no endpoint for it. Pages that still load the old key stop counting until they get the new snippet.
+
+</Visibility>

@@ -20,6 +20,11 @@ export const dashboardRouter = {
   analytics: lazy(() =>
     import("./routers/analytics").then((m) => ({ default: m.analyticsRouter }))
   ),
+  analyticsImports: lazy(() =>
+    import("./routers/analytics-imports").then((m) => ({
+      default: m.analyticsImportsRouter,
+    }))
+  ),
   apiKeys: lazy(() =>
     import("./routers/api-keys").then((m) => ({ default: m.apiKeysRouter }))
   ),

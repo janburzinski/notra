@@ -127,6 +127,20 @@
   }
 }
 
+/* Pixel sprites: the frame strip slides one frame per step behind its window. */
+@keyframes pixel-sprite {
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .pixel-sprite-strip {
+    animation: pixel-sprite calc(var(--sprite-step) * var(--sprite-frames))
+      steps(var(--sprite-frames)) infinite;
+  }
+}
+
 @keyframes sentiment-scan-wave {
   0%,
   100% {

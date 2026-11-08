@@ -18,6 +18,8 @@ export default defineConfig({
     ".claude/skills/**",
     "apps/dashboard/src/components/evilcharts/**",
     "packages/db/migrations/**",
+    // Archived tracker builds are served byte for byte and pinned by hash.
+    "packages/web-tracker/releases/**",
     ".temp/**",
     "**/*.astro",
     "apps/sites-builder/fixtures/**",

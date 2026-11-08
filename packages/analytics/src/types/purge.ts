@@ -9,6 +9,14 @@ export interface PurgeGeoProjectInput {
   projectId: string;
 }
 
+export interface PurgeImportedRowsInput {
+  organizationId: string;
+  importId: string;
+  /** Inclusive YYYY-MM-DD bounds; omit both to delete the whole import. */
+  fromDay?: string;
+  toDay?: string;
+}
+
 export interface PurgeOrganizationInput {
   organizationId: string;
 }

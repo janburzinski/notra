@@ -19,7 +19,7 @@ import { listMountedAreas } from "@notra/sites-core/utils/mounts";
 import { and, eq } from "drizzle-orm";
 import { Cache, Effect, Exit } from "effect";
 
-import { coalesce } from "../utils/coalesce";
+import { GeoIngestScopeCacheKey } from "../types/ingest-cache-keys";
 
 /**
  * In-process layer in front of Redis on the hot ingest path. Concurrent
@@ -43,7 +43,15 @@ export async function invalidateIngestSiteCaches(
   siteId: string,
   organizationId: string
 ): Promise<void> {
-  await Effect.runPromise(Cache.invalidate(memory, siteId));
+  await Effect.runPromise(
+    Effect.all(
+      [
+        Cache.invalidate(memory, siteId),
+        Cache.invalidate(organizationMemory, sitePrefixesKey(organizationId)),
+      ],
+      { discard: true }
+    )
+  );
   const client = redis;
   if (client) {
     await client.del(
@@ -182,7 +190,36 @@ async function readOrganizationSitePrefixes(
   }
 }
 
-export const loadOrganizationSitePrefixes = coalesce(
-  (organizationId: string) => organizationId,
-  readOrganizationSitePrefixes
+const sitePrefixesKey = (organizationId: string, recent = true) =>
+  new GeoIngestScopeCacheKey({ organizationId, projectId: null, recent });
+
+// Concurrent lookups of one organization share a call. For identities that
+// post on every page view a successful answer is also kept in process, like
+// the site and host lookups; invalidation clears it here.
+const organizationMemory = Effect.runSync(
+  Cache.makeWith(
+    // readOrganizationSitePrefixes never rejects: a failed lookup answers null.
+    (key: GeoIngestScopeCacheKey) =>
+      Effect.promise(() => readOrganizationSitePrefixes(key.organizationId)),
+    {
+      capacity: GEO_INGEST_SITE_MEMORY_MAX_ENTRIES,
+      timeToLive: (exit, key) =>
+        key.recent && Exit.isSuccess(exit) && exit.value !== null
+          ? GEO_INGEST_SITE_MEMORY_TTL_MS
+          : 0,
+    }
+  )
 );
+
+/**
+ * The organization's Sites, from Redis. With `recent`, for identities that
+ * post on every page view, a successful answer is also kept in process.
+ */
+export function loadOrganizationSitePrefixes(
+  organizationId: string,
+  recent = false
+): Promise<GeoIngestSitePrefix[] | null> {
+  return Effect.runPromise(
+    Cache.get(organizationMemory, sitePrefixesKey(organizationId, recent))
+  );
+}

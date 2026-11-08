@@ -1,298 +1,32 @@
 "use client";
 
 import { isTrafficPagePending } from "@notra/geo-core/utils/ai-traffic";
-import {
-  ingestAllowedHosts,
-  unionTrafficHosts,
-} from "@notra/geo-core/utils/geo-project-domains";
-import { POSTHOG_EVENTS } from "@notra/posthog/events";
-import { PageHeading } from "@notra/ui/components/shared/page-heading";
-import { useEffect, useRef } from "react";
 import { useTranslations } from "use-intl";
 
-import { AnalyticsSourceTabs } from "@/components/analytics/analytics-source-tabs";
-import { EmptyState } from "@/components/empty-state";
-import { EmptyStateTablePreview } from "@/components/empty-state-preview";
 import { AiTrafficCard } from "@/components/geo/ai-traffic-card";
 import { AiTrafficLogCard } from "@/components/geo/ai-traffic-log-card";
-import { GeoRangePicker } from "@/components/geo/geo-range-picker";
-import { GeoSetupButton } from "@/components/geo/geo-setup-button";
-import { TrafficDomainSelect } from "@/components/geo/traffic-domain-select";
-import { TrafficEmpty } from "@/components/geo/traffic-empty";
-import { TrafficExportMenu } from "@/components/geo/traffic-export-menu";
+import { TrafficInstallButton } from "@/components/geo/traffic-install-button";
+import { TrafficPageShell } from "@/components/geo/traffic-page-shell";
 import { TrafficPagesCard } from "@/components/geo/traffic-pages-card";
-import { TrafficPathEmpty } from "@/components/geo/traffic-path-empty";
-import { TrafficPathFilter } from "@/components/geo/traffic-path-filter";
 import { WebVisitorsSection } from "@/components/geo/web-visitors-section";
-import { PageContainer } from "@/components/layout/container";
-import { useGeoProjectScope } from "@/components/providers/geo-project-provider";
-import { useOrganizationsContext } from "@/components/providers/organization-provider";
 import { SkeletonCrossfade } from "@/components/skeleton-crossfade";
-import {
-  EMPTY_STATE_TABLE_COLUMNS,
-  EMPTY_STATE_TABLE_ROWS,
-} from "@/constants/empty-state";
-import { trackEvent } from "@/lib/analytics/posthog-client";
-import {
-  useAiTraffic,
-  useAiTrafficSources,
-  useGeoIngestSetup,
-  useGeoSettings,
-  useGeoTrafficPages,
-  useWebAnalytics,
-  useWebAnalyticsBreakdowns,
-} from "@/lib/hooks/use-geo";
-import { useGeoActiveProject } from "@/lib/hooks/use-geo-active-project";
-import { useGeoRange } from "@/lib/hooks/use-geo-range";
-import { useGeoTrafficHostQuery } from "@/lib/hooks/use-geo-traffic-host";
-import {
-  useKnownTrafficPaths,
-  useTrafficPathQuery,
-} from "@/lib/hooks/use-traffic-path";
-import { useTrafficSitesMode } from "@/lib/hooks/use-traffic-sites";
-import type {
-  TrafficPageClientProps,
-  TrafficPageLayout,
-  TrafficPageViewProps,
-} from "@/types/geo";
-import {
-  trafficHostsFromPages,
-  trafficPathOptions,
-} from "@/utils/ai-traffic-pages";
-import { setTrafficLayoutCookie } from "@/utils/cookies";
+import { useAiAnalyticsPeople } from "@/lib/hooks/use-ai-analytics-people";
+import { useAiTrafficSources, useGeoTrafficPages } from "@/lib/hooks/use-geo";
+import { useTrafficPageScope } from "@/lib/hooks/use-traffic-page-scope";
+import { useTrafficViewed } from "@/lib/hooks/use-traffic-viewed";
+import type { GeoPageClientProps } from "@/types/geo";
+import { hasPreviousTraffic } from "@/utils/ai-traffic-groups";
 import { withGeoProject } from "@/utils/geo-paths";
 import { geoSettingsPath } from "@/utils/settings-path";
-import { trafficSiteHosts } from "@/utils/traffic-sites";
-import {
-  hasWebAnalytics,
-  hasWebHosts,
-  webHostsForSelect,
-  withWebBreakdowns,
-} from "@/utils/web-analytics";
 
-import { GeoTrafficSkeleton } from "./skeleton";
+import { AiAnalyticsSkeleton } from "./skeleton";
 
-function TrafficPageView({
-  organizationId,
-  organizationSlug,
-  projectId,
-  settings,
-  isEmptyTraffic,
-  geoRange,
-  traffic,
-  isTrafficPending,
-  knownHosts,
-  knownPaths,
-  pathQuery,
-  isPagesPending,
-  trafficPages,
-  ingestSetup,
-  web,
-  sourcePaths,
-  siteHosts,
-  sitesHidden,
-  webBreakdownsPending,
-}: TrafficPageViewProps) {
-  const t = useTranslations("geo.pages.traffic");
-  const tShared = useTranslations("geo.pages.shared");
-  const tSites = useTranslations("geo.trafficSites");
-  if (!settings) {
-    return (
-      <PageContainer className="flex flex-1 flex-col gap-4 py-4 md:gap-6 md:py-6">
-        <div className="w-full min-w-0 space-y-6 px-4 lg:px-6">
-          <PageHeading description={t("description")} title={t("title")} />
-          <AnalyticsSourceTabs />
-          <EmptyState
-            action={<GeoSetupButton organizationId={organizationId} />}
-            description={t("setupDescription")}
-            preview={
-              <EmptyStateTablePreview
-                columns={EMPTY_STATE_TABLE_COLUMNS.traffic}
-                rows={EMPTY_STATE_TABLE_ROWS}
-              />
-            }
-            title={tShared("notSetUpTitle")}
-          />
-        </div>
-      </PageContainer>
-    );
-  }
-
-  const showVisitors =
-    hasWebAnalytics(web) || (pathQuery !== "" && hasWebHosts(web));
-
-  const header = (
-    <PageHeading
-      description={
-        showVisitors ? t("descriptionWithVisitors") : t("description")
-      }
-      title={t("title")}
-    >
-      <div className="flex min-h-8 max-w-full flex-wrap items-center gap-3">
-        <TrafficDomainSelect hosts={knownHosts} siteHosts={siteHosts} />
-        <GeoRangePicker control={geoRange} />
-      </div>
-    </PageHeading>
-  );
-
-  if (isEmptyTraffic) {
-    const hasPreviousTraffic =
-      traffic?.sources.some((source) => (source.previousVisits ?? 0) > 0) ||
-      (web?.totals.previousViews ?? 0) > 0;
-    return (
-      <PageContainer className="flex flex-1 flex-col gap-4 py-4 md:gap-6 md:py-6">
-        <div className="flex w-full min-w-0 flex-col gap-6 px-4 lg:px-6">
-          {header}
-          {/* Existing embeds stay reachable, since an embed picks its own
-              period. */}
-          <AnalyticsSourceTabs
-            actions={
-              <>
-                {pathQuery ? <TrafficPathFilter paths={knownPaths} /> : null}
-                <TrafficExportMenu
-                  organizationId={organizationId}
-                  path={pathQuery}
-                  range={geoRange.query}
-                  traffic={traffic}
-                  web={web}
-                />
-              </>
-            }
-          />
-          {pathQuery ? <TrafficPathEmpty geoRange={geoRange} /> : null}
-          {!pathQuery && (hasPreviousTraffic || sitesHidden) ? (
-            <EmptyState
-              description={
-                sitesHidden ? tSites("hiddenHint") : t("emptyRangeDescription")
-              }
-              title={t("emptyRangeTitle")}
-            />
-          ) : null}
-          {pathQuery || hasPreviousTraffic || sitesHidden ? null : (
-            <TrafficEmpty setup={ingestSetup} />
-          )}
-        </div>
-      </PageContainer>
-    );
-  }
-
-  return (
-    <PageContainer className="flex flex-1 flex-col gap-4 py-4 md:gap-6 md:py-6">
-      <div className="w-full min-w-0 space-y-6 px-4 lg:px-6">
-        {header}
-        <AnalyticsSourceTabs
-          actions={
-            <>
-              <TrafficPathFilter paths={knownPaths} />
-              <TrafficExportMenu
-                organizationId={organizationId}
-                path={pathQuery}
-                range={geoRange.query}
-                traffic={traffic}
-                web={web}
-              />
-            </>
-          }
-        />
-        {showVisitors && web ? (
-          <WebVisitorsSection
-            breakdownsPending={webBreakdownsPending}
-            range={geoRange.query}
-            traffic={traffic}
-            web={web}
-          />
-        ) : null}
-        <AiTrafficCard
-          isPending={isTrafficPending}
-          pages={trafficPages}
-          range={geoRange.query}
-          settingsHref={withGeoProject(
-            geoSettingsPath(organizationSlug),
-            projectId
-          )}
-          showHero={!showVisitors}
-          sourcePaths={sourcePaths}
-          traffic={traffic}
-        />
-        <TrafficPagesCard isPending={isPagesPending} pages={trafficPages} />
-        <AiTrafficLogCard organizationId={organizationId} />
-      </div>
-    </PageContainer>
-  );
-}
-
-export default function PageClient({
-  organizationSlug,
-  layout: layoutHint,
-}: TrafficPageClientProps) {
-  const { projectId } = useGeoProjectScope();
-  const { getOrganization, activeOrganization } = useOrganizationsContext();
-  const orgFromList = getOrganization(organizationSlug);
-  const organization =
-    activeOrganization?.slug === organizationSlug
-      ? activeOrganization
-      : orgFromList;
-  const organizationId = organization?.id ?? "";
-  const { domain: brandDomain } = useGeoActiveProject(organizationId);
-
-  const geoRange = useGeoRange();
-  const [hostQuery] = useGeoTrafficHostQuery();
-  const [pathQuery] = useTrafficPathQuery();
-  const sites = useTrafficSitesMode();
-  const { data: settingsData, isPending: isSettingsPending } =
-    useGeoSettings(organizationId);
-  const {
-    data: traffic,
-    isPending: isTrafficPending,
-    isPlaceholderData: isTrafficPlaceholder,
-  } = useAiTraffic(organizationId, geoRange.query, hostQuery, pathQuery, sites);
-  const {
-    data: trafficSources,
-    isError: isSourcesError,
-    isPlaceholderData: isSourcesPlaceholder,
-  } = useAiTrafficSources(
-    organizationId,
-    geoRange.query,
-    hostQuery,
-    pathQuery,
-    sites
-  );
-  const {
-    data: webSummary,
-    isPending: isWebPending,
-    isPlaceholderData: isWebPlaceholder,
-  } = useWebAnalytics(
-    organizationId,
-    geoRange.query,
-    hostQuery,
-    pathQuery,
-    sites
-  );
-  const {
-    data: webBreakdowns,
-    isPending: isBreakdownsPending,
-    isPlaceholderData: isBreakdownsPlaceholder,
-  } = useWebAnalyticsBreakdowns(
-    organizationId,
-    geoRange.query,
-    hostQuery,
-    pathQuery,
-    sites
-  );
-  // Only merge breakdowns and summary that answer the same filter.
-  const breakdownsStale = isBreakdownsPlaceholder || isWebPlaceholder;
-  const web = withWebBreakdowns(
-    webSummary,
-    breakdownsStale ? undefined : webBreakdowns
-  );
-  // Undefined keeps the page-count cells loading; an empty list after an error
-  // shows the fast counts instead.
-  const sourcePaths = isSourcesPlaceholder
-    ? undefined
-    : (trafficSources?.sources ?? (isSourcesError ? [] : undefined));
-  const { data: ingestSetup, isPending: isIngestPending } =
-    useGeoIngestSetup(organizationId);
-  const inventoryPages = useGeoTrafficPages(organizationId, geoRange.query);
+export default function PageClient({ organizationSlug }: GeoPageClientProps) {
+  const t = useTranslations("geo.pages.aiAnalytics");
+  const tTraffic = useTranslations("geo.pages.traffic");
+  const scope = useTrafficPageScope(organizationSlug);
+  const { organizationId, projectId, geoRange, traffic, settings } = scope;
+  const people = useAiAnalyticsPeople(scope);
   const {
     data: trafficPages,
     isPending: isPagesPending,
@@ -300,94 +34,108 @@ export default function PageClient({
   } = useGeoTrafficPages(
     organizationId,
     geoRange.query,
-    hostQuery,
-    pathQuery,
-    sites
+    scope.hostQuery,
+    scope.pathQuery,
+    scope.sites
   );
-  const siteHosts = trafficSiteHosts(web);
-  const knownHosts = unionTrafficHosts(
-    ingestAllowedHosts(brandDomain, settingsData?.settings?.domains),
-    [
-      ...trafficHostsFromPages(inventoryPages.data?.pages ?? []),
-      ...webHostsForSelect(web),
-    ]
+  const {
+    data: trafficSources,
+    isError: isSourcesError,
+    isPlaceholderData: isSourcesPlaceholder,
+  } = useAiTrafficSources(
+    organizationId,
+    geoRange.query,
+    scope.hostQuery,
+    scope.pathQuery,
+    scope.sites
   );
+  const pages = trafficPages?.pages ?? [];
+  // Undefined keeps the page-count cells loading; an empty list after an error
+  // shows the fast counts instead.
+  const sourcePaths = isSourcesPlaceholder
+    ? undefined
+    : (trafficSources?.sources ?? (isSourcesError ? [] : undefined));
 
-  const knownPaths = useKnownTrafficPaths(
-    trafficPathOptions(web?.pages ?? [], inventoryPages.data?.pages ?? []),
-    `${organizationId}:${projectId ?? ""}`
-  );
-
-  const settings = settingsData?.settings ?? null;
   const sources = traffic?.sources ?? [];
-  const isEmptyTraffic =
-    !isTrafficPending &&
-    !isWebPending &&
+  const hasPreviousData = hasPreviousTraffic(sources) || people.hasPreviousData;
+  const isEmpty =
+    !scope.isTrafficPending &&
     !sources.some((source) => source.visits > 0) &&
-    (web?.totals.views ?? 0) === 0;
+    !people.hasData;
   const showSkeleton = isTrafficPagePending({
-    isSettingsPending,
+    isSettingsPending: scope.isSettingsPending,
     hasSettings: settings !== null,
-    isTrafficPending: isTrafficPending || isTrafficPlaceholder || isWebPending,
-    isEmptyTraffic,
-    isIngestPending,
+    isTrafficPending: scope.isTrafficPending || people.isPending,
+    isEmptyTraffic: isEmpty,
+    isIngestPending: scope.isIngestPending,
   });
 
-  const ready = !showSkeleton;
-  const pageLayout: TrafficPageLayout =
-    hasWebAnalytics(web) || (pathQuery !== "" && hasWebHosts(web))
-      ? "visitors"
-      : "agents";
-
-  const viewedRef = useRef(false);
-  const hasSettings = settings !== null;
-  const rangePreset = geoRange.preset;
-
-  useEffect(() => {
-    if (!ready || !hasSettings || isEmptyTraffic) {
-      return;
-    }
-    setTrafficLayoutCookie(pageLayout).catch(() => {});
-  }, [hasSettings, isEmptyTraffic, pageLayout, ready]);
-
-  useEffect(() => {
-    if (viewedRef.current || !ready) {
-      return;
-    }
-    viewedRef.current = true;
-    trackEvent(POSTHOG_EVENTS.TRAFFIC_VIEWED, {
-      has_traffic: hasSettings && !isEmptyTraffic,
-      has_settings: hasSettings,
-      range: rangePreset,
-    });
-  }, [hasSettings, isEmptyTraffic, rangePreset, ready]);
+  useTrafficViewed({
+    page: "agent-analytics",
+    ready: !showSkeleton,
+    hasSettings: settings !== null,
+    hasData: !isEmpty,
+    rangePreset: geoRange.preset,
+  });
 
   return (
     <SkeletonCrossfade
       loading={showSkeleton}
-      skeleton={<GeoTrafficSkeleton geoRange={geoRange} layout={layoutHint} />}
+      skeleton={<AiAnalyticsSkeleton geoRange={geoRange} />}
     >
-      <TrafficPageView
-        geoRange={geoRange}
-        ingestSetup={ingestSetup}
-        isEmptyTraffic={isEmptyTraffic}
-        isPagesPending={isPagesPending || isPagesPlaceholder}
-        isTrafficPending={isTrafficPending || isTrafficPlaceholder}
-        knownHosts={knownHosts}
-        knownPaths={knownPaths}
-        pathQuery={pathQuery}
-        organizationId={organizationId}
-        organizationSlug={organizationSlug}
-        projectId={projectId}
-        settings={settings}
-        siteHosts={siteHosts}
-        sitesHidden={sites === "exclude"}
-        webBreakdownsPending={isBreakdownsPending || breakdownsStale}
-        sourcePaths={sourcePaths}
-        traffic={traffic}
-        trafficPages={trafficPages?.pages ?? []}
-        web={web}
-      />
+      <TrafficPageShell
+        copy={{
+          description: people.show
+            ? tTraffic("descriptionWithVisitors")
+            : t("description"),
+          setupDescription: t("setupDescription"),
+          emptyRangeTitle: t("emptyRangeTitle"),
+          emptyRangeDescription: t("emptyRangeDescription"),
+        }}
+        hasPreviousData={hasPreviousData}
+        isEmpty={isEmpty}
+        scope={scope}
+      >
+        <div className="flex flex-col gap-6">
+          {people.show && people.web ? (
+            <WebVisitorsSection
+              breakdownsPending={people.breakdownsPending}
+              range={geoRange.query}
+              traffic={traffic}
+              utm={{
+                organizationId: scope.organizationId,
+                host: scope.hostQuery,
+                path: scope.pathQuery,
+                sites: scope.sites,
+              }}
+              web={people.web}
+            />
+          ) : null}
+          <AiTrafficCard
+            crawlerSetup={
+              scope.pathQuery ? undefined : (
+                <TrafficInstallButton setup={scope.ingestSetup} />
+              )
+            }
+            isPending={scope.isTrafficPending}
+            pages={pages}
+            range={geoRange.query}
+            settingsHref={withGeoProject(
+              geoSettingsPath(organizationSlug),
+              projectId
+            )}
+            showHero={!people.show}
+            sourcePaths={sourcePaths}
+            traffic={traffic}
+          />
+          <TrafficPagesCard
+            compare={hasPreviousTraffic(sources)}
+            isPending={isPagesPending || isPagesPlaceholder}
+            pages={pages}
+          />
+          <AiTrafficLogCard organizationId={organizationId} />
+        </div>
+      </TrafficPageShell>
     </SkeletonCrossfade>
   );
 }

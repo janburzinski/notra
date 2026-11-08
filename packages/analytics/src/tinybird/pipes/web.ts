@@ -15,19 +15,32 @@ import {
   GEO_DAY_CURRENT_CONDITION,
   GEO_DAY_PREVIOUS_CONDITION,
   GEO_DAY_WINDOW_SQL,
+  GEO_HOSTS_PARAMS,
+  GEO_HOSTS_SQL,
   GEO_PATH_PARAMS,
   GEO_PATH_SQL,
   GEO_PROJECT_SCOPE_SQL,
 } from "../../constants/geo-queries";
 import {
+  WEB_AUDIENCE_VALUE_SQL,
+  WEB_IMPORTED_QUERY_PARAMS,
+  WEB_IMPORTED_SESSIONS_GRAIN_SQL,
+  WEB_IMPORTED_SESSIONS_SQL,
+  WEB_IMPORTED_VIEWS_GRAIN_SQL,
+  WEB_IMPORTED_WHERE,
   WEB_LANDING_SQL,
+  WEB_OVERVIEW_COLUMNS,
+  WEB_PAGES_WHERE,
   WEB_PATH_SET,
   WEB_QUERY_PARAMS,
-  WEB_PAGES_WHERE,
   WEB_RAW_WHERE,
   WEB_SCOPE_SQL,
-  WEB_AUDIENCE_VALUE_SQL,
+  WEB_UTM_RAW_ONLY_SQL,
+  WEB_UTM_RAW_WHERE,
+  WEB_UTM_ROLLUP_VALUE_SQL,
+  WEB_UTM_VALUE_SQL,
 } from "../../constants/web-queries";
+import { sumAcrossSources } from "../../utils/union-sql";
 import {
   webAudienceDaily,
   webPagesDaily,
@@ -129,8 +142,8 @@ export const webAudienceDailyMv = defineMaterializedView(
 
 export const webOverview = defineEndpoint("web_overview", {
   description:
-    "Views, visitors, sessions and engaged sessions for the window and the window before it",
-  params: { ...WEB_QUERY_PARAMS, ...GEO_PATH_PARAMS },
+    "Views, visitors, sessions and engaged sessions for the window and the window before it, including completed imports",
+  params: { ...WEB_IMPORTED_QUERY_PARAMS, ...GEO_PATH_PARAMS },
   nodes: [
     node({
       name: "overview",
@@ -152,6 +165,33 @@ export const webOverview = defineEndpoint("web_overview", {
           ${GEO_DAY_COMPARISON_WINDOW_SQL}
       `,
     }),
+    node({
+      name: "overview_imported",
+      sql: `
+        SELECT
+          sumIf(i.pageviews, grain = ${WEB_IMPORTED_VIEWS_GRAIN_SQL} AND (${GEO_DAY_CURRENT_CONDITION})) AS views,
+          sumIf(i.pageviews, grain = ${WEB_IMPORTED_VIEWS_GRAIN_SQL} AND (${GEO_DAY_PREVIOUS_CONDITION})) AS previous_views,
+          sumIf(ifNull(i.visitors, 0), grain = ${WEB_IMPORTED_VIEWS_GRAIN_SQL} AND (${GEO_DAY_CURRENT_CONDITION})) AS visitors,
+          sumIf(ifNull(i.visitors, 0), grain = ${WEB_IMPORTED_VIEWS_GRAIN_SQL} AND (${GEO_DAY_PREVIOUS_CONDITION})) AS previous_visitors,
+          sumIf(ifNull(i.visits, 0), grain = ${WEB_IMPORTED_SESSIONS_GRAIN_SQL} AND (${GEO_DAY_CURRENT_CONDITION})) AS sessions,
+          sumIf(ifNull(i.visits, 0), grain = ${WEB_IMPORTED_SESSIONS_GRAIN_SQL} AND (${GEO_DAY_PREVIOUS_CONDITION})) AS previous_sessions,
+          toUInt64(sumIf(ifNull(i.visits, 0) - least(ifNull(i.bounces, 0), ifNull(i.visits, 0)), grain = ${WEB_IMPORTED_SESSIONS_GRAIN_SQL} AND (${GEO_DAY_CURRENT_CONDITION}))) AS engaged_sessions,
+          sumIf(ifNull(i.visitors, 0), grain = 'source' AND referrer_group = 'ai' AND (${GEO_DAY_CURRENT_CONDITION})) AS ai_visitors,
+          sumIf(ifNull(i.visitors, 0), grain = 'source' AND referrer_group = 'ai' AND (${GEO_DAY_PREVIOUS_CONDITION})) AS previous_ai_visitors
+        FROM web_imported_daily AS i
+        ${WEB_IMPORTED_WHERE}
+          ${GEO_PATH_SQL}
+          ${GEO_DAY_COMPARISON_WINDOW_SQL}
+      `,
+    }),
+    node({
+      name: "overview_total",
+      sql: sumAcrossSources({
+        sources: ["overview", "overview_imported"],
+        keys: [],
+        sums: WEB_OVERVIEW_COLUMNS,
+      }),
+    }),
   ],
   output: {
     views: t.uint64(),
@@ -167,11 +207,11 @@ export const webOverview = defineEndpoint("web_overview", {
 });
 
 export const webTimeseries = defineEndpoint("web_timeseries", {
-  description: "Daily human views and visitors",
-  params: { ...WEB_QUERY_PARAMS, ...GEO_PATH_PARAMS },
+  description: "Daily human views and visitors, including completed imports",
+  params: { ...WEB_IMPORTED_QUERY_PARAMS, ...GEO_PATH_PARAMS },
   nodes: [
     node({
-      name: "daily",
+      name: "daily_native",
       sql: `
         SELECT
           day,
@@ -183,8 +223,31 @@ export const webTimeseries = defineEndpoint("web_timeseries", {
           ${GEO_PATH_SQL}
           ${GEO_DAY_WINDOW_SQL}
         GROUP BY day
-        ORDER BY day ASC
       `,
+    }),
+    node({
+      name: "daily_imported",
+      sql: `
+        SELECT
+          day,
+          sum(i.pageviews) AS views,
+          sum(ifNull(i.visitors, 0)) AS visitors
+        FROM web_imported_daily AS i
+        ${WEB_IMPORTED_WHERE}
+          AND grain = ${WEB_IMPORTED_VIEWS_GRAIN_SQL}
+          ${GEO_PATH_SQL}
+          ${GEO_DAY_WINDOW_SQL}
+        GROUP BY day
+      `,
+    }),
+    node({
+      name: "daily",
+      sql: sumAcrossSources({
+        sources: ["daily_native", "daily_imported"],
+        keys: ["day"],
+        sums: ["views", "visitors"],
+        tail: "ORDER BY day ASC",
+      }),
     }),
   ],
   output: {
@@ -196,9 +259,9 @@ export const webTimeseries = defineEndpoint("web_timeseries", {
 
 export const webPages = defineEndpoint("web_pages", {
   description:
-    "Top pages by human views, with visitors, sessions that started there and AI-referred visitors; status 404 lists missing pages",
+    "Top pages by human views, with visitors, sessions that started there and AI-referred visitors; status 404 lists missing pages. Completed imports add their page and entry-page rows.",
   params: {
-    ...WEB_QUERY_PARAMS,
+    ...WEB_IMPORTED_QUERY_PARAMS,
     ...GEO_PATH_PARAMS,
     not_found: p
       .int32()
@@ -208,7 +271,7 @@ export const webPages = defineEndpoint("web_pages", {
   },
   nodes: [
     node({
-      name: "top_pages",
+      name: "pages_native",
       sql: `
         SELECT
           host,
@@ -224,10 +287,44 @@ export const webPages = defineEndpoint("web_pages", {
           ${GEO_PATH_SQL}
           ${GEO_DAY_COMPARISON_WINDOW_SQL}
         GROUP BY host, path
-        HAVING views > 0
-        ORDER BY views DESC, host ASC, path ASC
-        LIMIT {{Int32(limit, 20)}}
       `,
+    }),
+    node({
+      name: "pages_imported",
+      sql: `
+        SELECT
+          host,
+          path,
+          sumIf(i.pageviews, grain = 'page' AND (${GEO_DAY_CURRENT_CONDITION})) AS views,
+          sumIf(i.pageviews, grain = 'page' AND (${GEO_DAY_PREVIOUS_CONDITION})) AS previous_views,
+          sumIf(ifNull(i.visitors, 0), grain = 'page' AND (${GEO_DAY_CURRENT_CONDITION})) AS visitors,
+          sumIf(ifNull(i.entrances, 0), grain = 'entry_page' AND (${GEO_DAY_CURRENT_CONDITION})) AS landings,
+          toUInt64(0) AS ai_visitors
+        FROM web_imported_daily AS i
+        ${WEB_IMPORTED_WHERE}
+          AND {{Int32(not_found, 0)}} = 0
+          AND grain IN ('page', 'entry_page')
+          ${GEO_PATH_SQL}
+          ${GEO_DAY_COMPARISON_WINDOW_SQL}
+        GROUP BY host, path
+      `,
+    }),
+    node({
+      name: "top_pages",
+      sql: sumAcrossSources({
+        sources: ["pages_native", "pages_imported"],
+        keys: ["host", "path"],
+        sums: [
+          "views",
+          "previous_views",
+          "visitors",
+          "landings",
+          "ai_visitors",
+        ],
+        tail: `HAVING views > 0
+        ORDER BY views DESC, host ASC, path ASC
+        LIMIT {{Int32(limit, 20)}}`,
+      }),
     }),
   ],
   output: {
@@ -243,9 +340,9 @@ export const webPages = defineEndpoint("web_pages", {
 
 export const webSources = defineEndpoint("web_sources", {
   description:
-    "Where sessions came from: referrer group and source (AI products included), counted on each session's first page; with a path, only sessions that landed on it",
+    "Where sessions came from: referrer group and source (AI products included), counted on each session's first page; with a path, only sessions that landed on it. Completed imports add their source rows when no path is set.",
   params: {
-    ...WEB_QUERY_PARAMS,
+    ...WEB_IMPORTED_QUERY_PARAMS,
     ...GEO_PATH_PARAMS,
     limit: p.int32().optional(20).describe("Max rows"),
   },
@@ -290,97 +387,136 @@ export const webSources = defineEndpoint("web_sources", {
       `,
     }),
     node({
-      name: "sources",
+      name: "sources_imported",
       sql: `
-        SELECT * FROM (
-          SELECT * FROM sources_rollup
-          UNION ALL
-          SELECT * FROM sources_path
-        )
-        ORDER BY sessions DESC, referrer_source ASC
-        LIMIT {{Int32(limit, 20)}}
+        SELECT
+          referrer_group,
+          referrer_source,
+          any(i.ai_product) AS ai_product,
+          sumIf(${WEB_IMPORTED_SESSIONS_SQL}, ${GEO_DAY_CURRENT_CONDITION}) AS sessions,
+          sumIf(${WEB_IMPORTED_SESSIONS_SQL}, ${GEO_DAY_PREVIOUS_CONDITION}) AS previous_sessions,
+          sumIf(ifNull(i.visitors, 0), ${GEO_DAY_CURRENT_CONDITION}) AS visitors
+        FROM web_imported_daily AS i
+        ${WEB_IMPORTED_WHERE}
+          AND NOT ${WEB_PATH_SET}
+          AND grain = 'source'
+          AND referrer_group != 'internal'
+          ${GEO_DAY_COMPARISON_WINDOW_SQL}
+        GROUP BY referrer_group, referrer_source
       `,
+    }),
+    node({
+      name: "sources",
+      sql: sumAcrossSources({
+        sources: ["sources_rollup", "sources_path", "sources_imported"],
+        keys: ["referrer_group", "referrer_source"],
+        sums: ["sessions", "previous_sessions", "visitors"],
+        maxes: ["ai_product"],
+        tail: `HAVING sessions > 0
+        ORDER BY sessions DESC, referrer_source ASC
+        LIMIT {{Int32(limit, 20)}}`,
+      }),
     }),
   ],
   output: {
     referrer_group: t.string(),
     referrer_source: t.string(),
+    sessions: t.uint64(),
+    previous_sessions: t.uint64(),
+    visitors: t.uint64(),
     ai_product: t.string(),
+  },
+});
+
+export const webUtm = defineEndpoint("web_utm", {
+  description:
+    "Sessions per UTM source, medium, campaign, term or content, counted on each session's first page, with the previous period. Term and content come from the raw page views (90 days). Completed imports add their rows when no path is set.",
+  params: {
+    ...WEB_IMPORTED_QUERY_PARAMS,
+    ...GEO_PATH_PARAMS,
+    dimension: p
+      .string()
+      .optional("source")
+      .describe("source, medium, campaign, term or content"),
+    limit: p.int32().optional(20).describe("Max rows"),
+  },
+  nodes: [
+    node({
+      name: "utm_rollup",
+      sql: `
+        SELECT
+          ${WEB_UTM_ROLLUP_VALUE_SQL} AS value,
+          countMergeIf(sessions_state, (${GEO_DAY_CURRENT_CONDITION})) AS sessions,
+          countMergeIf(sessions_state, (${GEO_DAY_PREVIOUS_CONDITION})) AS previous_sessions,
+          uniqMergeIf(visitors_state, (${GEO_DAY_CURRENT_CONDITION})) AS visitors
+        FROM web_sources_daily
+        ${WEB_PAGES_WHERE}
+          AND NOT ${WEB_PATH_SET}
+          AND NOT ${WEB_UTM_RAW_ONLY_SQL}
+          ${GEO_DAY_COMPARISON_WINDOW_SQL}
+        GROUP BY value
+        HAVING value != '' AND sessions > 0
+      `,
+    }),
+    node({
+      name: "utm_raw",
+      sql: `
+        SELECT
+          ${WEB_UTM_VALUE_SQL} AS value,
+          countIf(${GEO_CAPTURED_CURRENT_CONDITION}) AS sessions,
+          countIf(${GEO_CAPTURED_PREVIOUS_CONDITION}) AS previous_sessions,
+          uniqIf(visitor_id, ${GEO_CAPTURED_CURRENT_CONDITION}) AS visitors
+        FROM web_page_views
+        ${WEB_UTM_RAW_WHERE}
+          AND ${WEB_LANDING_SQL}
+          AND status < 400
+          ${GEO_CAPTURED_COMPARISON_WINDOW_SQL}
+        GROUP BY value
+        HAVING value != '' AND sessions > 0
+      `,
+    }),
+    node({
+      name: "utm_imported",
+      sql: `
+        SELECT
+          ${WEB_UTM_VALUE_SQL} AS value,
+          sumIf(${WEB_IMPORTED_SESSIONS_SQL}, ${GEO_DAY_CURRENT_CONDITION}) AS sessions,
+          sumIf(${WEB_IMPORTED_SESSIONS_SQL}, ${GEO_DAY_PREVIOUS_CONDITION}) AS previous_sessions,
+          sumIf(ifNull(i.visitors, 0), ${GEO_DAY_CURRENT_CONDITION}) AS visitors
+        FROM web_imported_daily AS i
+        ${WEB_IMPORTED_WHERE}
+          AND NOT ${WEB_PATH_SET}
+          AND grain IN ('source', 'campaign')
+          ${GEO_DAY_COMPARISON_WINDOW_SQL}
+        GROUP BY value
+        HAVING value != ''
+      `,
+    }),
+    node({
+      name: "utm",
+      sql: sumAcrossSources({
+        sources: ["utm_rollup", "utm_raw", "utm_imported"],
+        keys: ["value"],
+        sums: ["sessions", "previous_sessions", "visitors"],
+        tail: `HAVING sessions > 0
+        ORDER BY sessions DESC, value ASC
+        LIMIT {{Int32(limit, 20)}}`,
+      }),
+    }),
+  ],
+  output: {
+    value: t.string(),
     sessions: t.uint64(),
     previous_sessions: t.uint64(),
     visitors: t.uint64(),
   },
 });
 
-export const webCampaigns = defineEndpoint("web_campaigns", {
-  description: "Sessions per UTM source, medium and campaign",
-  params: {
-    ...WEB_QUERY_PARAMS,
-    ...GEO_PATH_PARAMS,
-    limit: p.int32().optional(20).describe("Max rows"),
-  },
-  nodes: [
-    node({
-      name: "campaigns_rollup",
-      sql: `
-        SELECT
-          utm_source,
-          utm_medium,
-          utm_campaign,
-          countMerge(sessions_state) AS sessions,
-          uniqMerge(visitors_state) AS visitors
-        FROM web_sources_daily
-        ${WEB_PAGES_WHERE}
-          AND NOT ${WEB_PATH_SET}
-          AND utm_source != ''
-          ${GEO_DAY_WINDOW_SQL}
-        GROUP BY utm_source, utm_medium, utm_campaign
-      `,
-    }),
-    node({
-      name: "campaigns_path",
-      sql: `
-        SELECT
-          utm_source,
-          utm_medium,
-          utm_campaign,
-          count() AS sessions,
-          uniq(visitor_id) AS visitors
-        FROM web_page_views
-        ${WEB_RAW_WHERE}
-          AND ${WEB_LANDING_SQL}
-          AND status < 400
-          AND utm_source != ''
-          AND (${GEO_CAPTURED_CURRENT_CONDITION})
-        GROUP BY utm_source, utm_medium, utm_campaign
-      `,
-    }),
-    node({
-      name: "campaigns",
-      sql: `
-        SELECT * FROM (
-          SELECT * FROM campaigns_rollup
-          UNION ALL
-          SELECT * FROM campaigns_path
-        )
-        ORDER BY sessions DESC, utm_source ASC
-        LIMIT {{Int32(limit, 20)}}
-      `,
-    }),
-  ],
-  output: {
-    utm_source: t.string(),
-    utm_medium: t.string(),
-    utm_campaign: t.string(),
-    sessions: t.uint64(),
-    visitors: t.uint64(),
-  },
-});
-
 export const webAudience = defineEndpoint("web_audience", {
-  description: "Visitors per country, device, browser or OS",
+  description:
+    "Visitors per country, device, browser or OS, including completed imports when no path is set",
   params: {
-    ...WEB_QUERY_PARAMS,
+    ...WEB_IMPORTED_QUERY_PARAMS,
     ...GEO_PATH_PARAMS,
     dimension: p
       .string()
@@ -422,16 +558,31 @@ export const webAudience = defineEndpoint("web_audience", {
       `,
     }),
     node({
-      name: "audience",
+      name: "audience_imported",
       sql: `
-        SELECT * FROM (
-          SELECT * FROM audience_rollup
-          UNION ALL
-          SELECT * FROM audience_path
-        )
-        ORDER BY visitors DESC, value ASC
-        LIMIT {{Int32(limit, 10)}}
+        SELECT
+          ${WEB_AUDIENCE_VALUE_SQL} AS value,
+          sumIf(ifNull(i.visitors, 0), ${GEO_DAY_CURRENT_CONDITION}) AS visitors,
+          sumIf(ifNull(i.visitors, 0), ${GEO_DAY_PREVIOUS_CONDITION}) AS previous_visitors,
+          sumIf(i.pageviews, ${GEO_DAY_CURRENT_CONDITION}) AS views
+        FROM web_imported_daily AS i
+        ${WEB_IMPORTED_WHERE}
+          AND NOT ${WEB_PATH_SET}
+          AND grain = {{String(dimension, 'country')}}
+          ${GEO_DAY_COMPARISON_WINDOW_SQL}
+        GROUP BY value
       `,
+    }),
+    node({
+      name: "audience",
+      sql: sumAcrossSources({
+        sources: ["audience_rollup", "audience_path", "audience_imported"],
+        keys: ["value"],
+        sums: ["visitors", "previous_visitors", "views"],
+        tail: `HAVING visitors > 0 OR views > 0
+        ORDER BY visitors DESC, views DESC, value ASC
+        LIMIT {{Int32(limit, 10)}}`,
+      }),
     }),
   ],
   output: {
@@ -444,11 +595,11 @@ export const webAudience = defineEndpoint("web_audience", {
 
 export const webHosts = defineEndpoint("web_hosts", {
   description:
-    "Hosts and sites with human views in the window, plus Sites with only AI traffic (0 views), for the domain selector",
-  params: WEB_QUERY_PARAMS,
+    "Hosts and sites with human views in the window, plus Sites with only AI traffic (0 views), for the domain selector; completed imports add their hosts",
+  params: WEB_IMPORTED_QUERY_PARAMS,
   nodes: [
     node({
-      name: "hosts",
+      name: "hosts_native",
       sql: `
         SELECT host, site_id, sum(views) AS views
         FROM (
@@ -469,14 +620,72 @@ export const webHosts = defineEndpoint("web_hosts", {
           GROUP BY host, site_id
         )
         GROUP BY host, site_id
-        ORDER BY views DESC, host ASC
       `,
+    }),
+    node({
+      name: "hosts_imported",
+      sql: `
+        SELECT
+          host,
+          site_id,
+          sum(i.pageviews) AS views
+        FROM web_imported_daily AS i
+        ${WEB_IMPORTED_WHERE}
+          AND grain = 'total'
+          ${GEO_DAY_WINDOW_SQL}
+        GROUP BY host, site_id
+      `,
+    }),
+    node({
+      name: "hosts",
+      sql: sumAcrossSources({
+        sources: ["hosts_native", "hosts_imported"],
+        keys: ["host", "site_id"],
+        sums: ["views"],
+        tail: "ORDER BY views DESC, host ASC",
+      }),
     }),
   ],
   output: {
     host: t.string(),
     site_id: t.string(),
     views: t.uint64(),
+  },
+});
+
+export const webNativeFirstDay = defineEndpoint("web_native_first_day", {
+  description:
+    "First day with native (non-imported) human or AI traffic for a project and hosts; imports stop the day before",
+  params: {
+    organization_id: p.string().describe("Organization id"),
+    project_id: p.string().describe("Project id"),
+    ...GEO_HOSTS_PARAMS,
+  },
+  nodes: [
+    node({
+      name: "first_day",
+      sql: `
+        SELECT
+          (
+            SELECT min(day)
+            FROM web_pages_daily
+            WHERE organization_id = {{String(organization_id)}}
+              AND project_id = {{String(project_id)}}
+              ${GEO_HOSTS_SQL}
+          ) AS web_first_day,
+          (
+            SELECT min(day)
+            FROM geo_traffic_pages_by_host_daily
+            WHERE organization_id = {{String(organization_id)}}
+              AND project_id = {{String(project_id)}}
+              ${GEO_HOSTS_SQL}
+          ) AS geo_first_day
+      `,
+    }),
+  ],
+  output: {
+    web_first_day: t.date(),
+    geo_first_day: t.date(),
   },
 });
 
@@ -530,7 +739,7 @@ export const webAiOutcomes = defineEndpoint("web_ai_outcomes", {
 
 export const webEngagement = defineEndpoint("web_engagement", {
   description:
-    "Average visible seconds per page view on Notra Sites, overall (empty path, with the window before) and per page",
+    "Average visible seconds per page view, overall (empty path, with the window before) and per page",
   params: {
     ...WEB_QUERY_PARAMS,
     ...GEO_PATH_PARAMS,

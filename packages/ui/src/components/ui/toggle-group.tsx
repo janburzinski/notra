@@ -54,7 +54,7 @@ function ToggleGroup({
         ...(typeof style === "function" ? style(state) : style),
       })}
       className={cn(
-        "group/toggle-group flex w-fit flex-row items-center gap-[--spacing(var(--gap))] rounded-lg data-vertical:flex-col data-vertical:items-stretch data-[size=sm]:rounded-[min(var(--radius-md),10px)]",
+        "group/toggle-group flex w-fit flex-row items-center gap-[--spacing(var(--gap))] rounded-lg data-vertical:flex-col data-vertical:items-stretch data-[size=sm]:rounded-[min(var(--radius-md),10px)] data-[variant=segmented]:bg-muted data-[variant=segmented]:w-full data-[variant=segmented]:p-0.5",
         className
       )}
       {...props}

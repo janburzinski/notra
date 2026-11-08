@@ -2,7 +2,49 @@ export const WEB_SESSION_TTL_SECONDS = 30 * 60;
 export const WEB_SESSION_KEY_PREFIX = "web:session";
 export const WEB_VISITOR_ID_LENGTH = 16;
 export const WEB_UTM_MAX_LENGTH = 100;
+/** The UTM parameters web analytics reports on, in the order the tabs show them. */
+export const WEB_UTM_DIMENSIONS = [
+  "source",
+  "medium",
+  "campaign",
+  "term",
+  "content",
+] as const;
 export const WEB_UTM_CAMPAIGN_MAX_LENGTH = 200;
+
+/**
+ * A path-like hash route (`#/pricing`, `#!/pricing`), cut before its query or
+ * anything that is not a path character, so `#access_token=…` never matches.
+ */
+export const WEB_HASH_ROUTE_PATTERN = /^#!?\/[\w\-.~%@:+,/]+/;
+export const WEB_HASH_ROUTE_MAX_LENGTH = 256;
+
+/** Primary subtag of the first Accept-Language entry, e.g. "de" from "de-DE,de;q=0.9". */
+export const WEB_LANGUAGE_PATTERN = /^\s*([a-z]{2,3})(?:[-_;,\s]|$)/i;
+
+/**
+ * Automation that runs a real browser engine, so it passes the client-hint
+ * check but is not a person. Web visits only; AI classification is separate.
+ */
+export const WEB_AUTOMATION_UA_PATTERNS: readonly string[] = [
+  "headlesschrome",
+  "phantomjs",
+  "chrome-lighthouse",
+  "pagespeed",
+  "prerender",
+];
+
+/** The `web_events` name of an outbound link click, the only event stored. */
+export const WEB_OUTBOUND_EVENT = "Outbound";
+
+/** Caps for notra.plus.js error reports; messages are scrubbed before storage. */
+export const WEB_ERROR_MESSAGE_MAX_LENGTH = 300;
+
+/** Upper bounds that drop obviously broken vitals instead of skewing p75. */
+export const WEB_VITAL_TIMING_MAX_MS = 120_000;
+export const WEB_VITAL_INP_MAX_MS = 60_000;
+export const WEB_VITAL_CLS_MAX_MILLI = 100_000;
+export const WEB_VITAL_METRICS = ["lcp", "inp", "cls", "fcp", "ttfb"] as const;
 
 export const WEB_DEFAULT_DAYS = 30;
 export const WEB_PAGES_LIMIT = 50;
@@ -25,6 +67,7 @@ export const WEB_AI_PRODUCTS: Record<string, string> = {
   you: "you",
   qwen: "alibaba",
   meta: "meta",
+  phind: "phind",
 };
 
 export const WEB_SEARCH_HOSTS: Record<string, string> = {
@@ -85,3 +128,15 @@ export const WEB_OPERATING_SYSTEMS: readonly [string, string][] = [
 ];
 
 export const ISO_DATE_LENGTH = 10;
+/** Largest value the UInt32 web columns (visible time, error line) hold. */
+export const WEB_UINT32_MAX = 4_294_967_295;
+
+/** What a path segment that looks like personal data or an id becomes. */
+export const WEB_PATH_ID_PLACEHOLDER = ":id";
+export const WEB_PATH_EMAIL_PATTERN = /[^/@]+(?:@|%40)[^/@.]+\.[a-z]{2,}/i;
+export const WEB_PATH_UUID_PATTERN =
+  /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i;
+export const WEB_PATH_DIGIT_RUN_PATTERN = /\d{4,}/;
+/** Token-like: 20+ characters of id alphabet with a long unbroken run. */
+export const WEB_PATH_TOKEN_SEGMENT_PATTERN = /^[\w.~-]{20,}$/;
+export const WEB_PATH_TOKEN_RUN_PATTERN = /[A-Za-z0-9]{16,}/g;

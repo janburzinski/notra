@@ -6,6 +6,7 @@ import {
 } from "@notra/geo-core/constants/geo";
 
 import { TRAFFIC_PATH_PARAM } from "@/constants/traffic-path";
+import { geoPathWithSearch } from "@/utils/geo-paths";
 import {
   geoHostQueryInput,
   geoOverviewQueryInput,
@@ -44,20 +45,14 @@ export function geoProjectRepairPath(
   projectId: string | undefined,
   basePath = "/geo"
 ): string {
-  const query = new URLSearchParams();
-  for (const [key, value] of Object.entries(search)) {
-    if (key === "project" || value === undefined) {
-      continue;
-    }
-    for (const entry of Array.isArray(value) ? value : [value]) {
-      query.append(key, entry);
-    }
-  }
-  if (projectId) {
-    query.set("project", projectId);
-  }
-  const suffix = query.toString();
-  return `/${encodeURIComponent(slug)}${basePath}${suffix ? `?${suffix}` : ""}`;
+  const rest = Object.fromEntries(
+    Object.entries(search).filter(([key]) => key !== "project")
+  );
+  return geoPathWithSearch(
+    slug,
+    basePath,
+    projectId ? { ...rest, project: projectId } : rest
+  );
 }
 
 const PROJECT_ID = /^[\w-]+$/;
@@ -104,9 +99,10 @@ export function geoHydrationInputs(
 }
 
 /**
- * Inputs for the `/geo/traffic` page. The host mirrors the project provider's
- * first render: the raw `?host=` param, canonicalised; the suppressed state
- * only exists after a client-side project switch, which the server never sees.
+ * Inputs for the AI and web analytics pages. The host mirrors the project
+ * provider's first render: the raw `?host=` param, canonicalised; the
+ * suppressed state only exists after a client-side project switch, which the
+ * server never sees.
  */
 export function geoTrafficHydrationInputs(
   organizationId: string,

@@ -15,6 +15,8 @@ import type { AgentReadinessResponse } from "@notra/geo-core/types/agent-readine
 import type {
   AiTrafficResponse,
   WebAnalyticsResponse,
+  WebAnalyticsUtmRow,
+  WebUtmDimension,
   GeoBrandSearchResponse,
   GeoChangesResponse,
   GeoCompetitorDetailResponse,
@@ -27,7 +29,6 @@ import type {
   GeoOnboardingBrandInput,
   GeoOnboardingBrandResult,
   GeoOverviewResponse,
-  GeoIngestSetupResponse,
   GeoPromptHistoryResponse,
   GeoPromptResultSummariesResponse,
   GeoPromptRescanInput,
@@ -81,6 +82,7 @@ import { geoDbOrgQueryKey, geoDbQueryKey } from "@/lib/db/geo-collections";
 import { usePathname, useRouter, useSearchParams } from "@/lib/navigation";
 import type { GeoScanTrigger } from "@/types/analytics/geo-events";
 import type {
+  DashboardGeoIngestSetup,
   GeoGenerateFromWebsiteInput,
   GeoPromptSuggestionsResponse,
   GeoPromptTableRow,
@@ -1112,7 +1114,8 @@ export function useWebAnalyticsBreakdowns(
   range?: GeoRangeQuery,
   host?: string,
   path?: string,
-  sites?: GeoTrafficSitesMode
+  sites?: GeoTrafficSitesMode,
+  enabled = true
 ) {
   const tToast = useTranslations("geo.toasts");
   const { projectId } = useGeoProjectScope();
@@ -1127,8 +1130,44 @@ export function useWebAnalyticsBreakdowns(
         sites
       ),
     }),
-    enabled: !!organizationId,
+    enabled: enabled && !!organizationId,
     placeholderData: useScopedPreviousData<WebAnalyticsResponse>(projectId),
+    refetchInterval: trafficPollInterval,
+    refetchIntervalInBackground: false,
+    meta: { errorMessage: tToast("loadVisitorsFailed") },
+  });
+}
+
+/**
+ * Sessions per value of one UTM parameter. No placeholder from the previous
+ * query: after switching parameter, the old values would show under the new one.
+ */
+export function useWebUtm(
+  organizationId: string,
+  dimension: WebUtmDimension,
+  range?: GeoRangeQuery,
+  host?: string,
+  path?: string,
+  sites?: GeoTrafficSitesMode,
+  enabled = true
+) {
+  const tToast = useTranslations("geo.toasts");
+  const { projectId } = useGeoProjectScope();
+  const trafficPollInterval = useGeoTrafficPollInterval();
+  return useQuery<WebAnalyticsUtmRow[]>({
+    ...dashboardOrpc.geo.webUtm.queryOptions({
+      input: {
+        ...geoHostQueryInput(
+          { organizationId, projectId },
+          range,
+          host,
+          path,
+          sites
+        ),
+        dimension,
+      },
+    }),
+    enabled: enabled && !!organizationId,
     refetchInterval: trafficPollInterval,
     refetchIntervalInBackground: false,
     meta: { errorMessage: tToast("loadVisitorsFailed") },
@@ -1271,7 +1310,7 @@ export function usePrefetchGeoJourneyDetail(organizationId: string) {
 export function useGeoIngestSetup(organizationId: string) {
   const tToast = useTranslations("geo.toasts");
   const { projectId } = useGeoProjectScope();
-  return useQuery<GeoIngestSetupResponse>({
+  return useQuery<DashboardGeoIngestSetup>({
     ...dashboardOrpc.geo.ingestSetup.queryOptions({
       input: geoSettingsQueryInput({ organizationId, projectId }),
     }),
@@ -1285,7 +1324,7 @@ export function useGeoIngestTokenRotate(organizationId: string) {
   const { projectId } = useGeoProjectScope();
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (): Promise<GeoIngestSetupResponse> =>
+    mutationFn: (): Promise<DashboardGeoIngestSetup> =>
       dashboardOrpc.geo.ingestTokenRotate.call({ organizationId, projectId }),
     onSuccess: async (setup) => {
       queryClient.setQueryData(
@@ -1303,6 +1342,28 @@ export function useGeoIngestTokenRotate(organizationId: string) {
     },
     onError: (error) => {
       toast.error(toErrorMessage(error, tToast("rotateTokenFailed")));
+    },
+  });
+}
+
+/** Revokes the public notra.js key; pages with the old snippet stop counting. */
+export function useGeoWebKeyRotate(organizationId: string) {
+  const tToast = useTranslations("geo.toasts");
+  const { projectId } = useGeoProjectScope();
+  const queryClient = useQueryClient();
+  const queryKey = dashboardOrpc.geo.ingestSetup.queryKey({
+    input: { organizationId, projectId },
+  });
+  return useMutation({
+    mutationFn: (): Promise<DashboardGeoIngestSetup> =>
+      dashboardOrpc.geo.webKeyRotate.call({ organizationId, projectId }),
+    onSuccess: async (setup) => {
+      queryClient.setQueryData(queryKey, setup);
+      await queryClient.invalidateQueries({ queryKey });
+      toast.success(tToast("webKeyRotated"));
+    },
+    onError: (error) => {
+      toast.error(toErrorMessage(error, tToast("rotateWebKeyFailed")));
     },
   });
 }

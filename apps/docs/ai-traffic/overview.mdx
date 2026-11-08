@@ -15,16 +15,16 @@ docolin:
   status: stable
 ---
 
-Traffic tracking shows the AI systems fetching your pages and the people arriving from AI answers. A small request-capture SDK on your site, or a log drain from your host, sends each request to Notra, which classifies it at ingest and shows the results on the **Traffic** page. Notra only stores AI traffic from the SDK and log drains and discards ordinary human page views on arrival. Visitor statistics for human readers are only available on sites hosted with Notra Sites.
+Traffic tracking shows the AI systems fetching your pages and the people arriving from AI answers. A small request-capture SDK on your site, or a log drain from your host, sends each request to Notra, which classifies it at ingest and shows the results on the **AI analytics** page. Notra only stores AI traffic from the SDK and log drains and discards ordinary human page views on arrival. To count human readers on any site, add the [notra.js script tag](/ai-traffic/install/script-tag); sites hosted with Notra Sites count them automatically.
 
 <img
   src="/images/ai-traffic/traffic-light.webp"
-  alt="AI Traffic page with crawler and referral activity"
+  alt="AI analytics page with crawler and referral activity"
   className="block dark:hidden rounded-lg border"
 />
 <img
   src="/images/ai-traffic/traffic-dark.webp"
-  alt="AI Traffic page with crawler and referral activity"
+  alt="AI analytics page with crawler and referral activity"
   className="hidden dark:block rounded-lg border"
 />
 
@@ -97,9 +97,9 @@ If you'd rather not change your code, Notra can read your host's request logs in
 
 Notra recognizes more than 60 AI crawlers and agents from OpenAI, Anthropic, Google, Perplexity, Meta, Apple, Amazon and others. See the full [AI crawler directory](/ai-traffic/crawlers).
 
-## The Traffic page
+## The AI analytics page
 
-Once events arrive, the page shows the sections below, and each one follows the range picker.
+Open **Analytics** in the GEO sidebar and stay on the **AI analytics** tab. Once events arrive, the page shows the sections below, and each one follows the range picker. How AI agents move through your site is on the GEO **Overview** page under the **Journeys** tab; see [Journeys](/ai-traffic/journeys). People reading your site are counted on the **Web analytics** tab.
 
 - A hero row with **Crawlers**, **Referrals** and **Total** visit counts, each compared "vs. previous period", and a daily trend chart.
 - **Sources** has three groups: **Crawlers** (training and search-index bots), **Cited** (assistant-browse fetches while an engine answered someone) and **Referrals**. Columns are **Source**, **Purpose**, **Visits**, **Pages** and **Last seen**. Open a source to see the share of its visits that asked for Markdown, and log rows that asked for Markdown carry a **Markdown** badge. Sources group by operator, for example OpenAI, Anthropic, Google, Perplexity, Microsoft, Meta, Instagram, Amazon, Apple, ByteDance and Common Crawl, with Instagram kept as its own source rather than folded into Meta.
@@ -110,11 +110,12 @@ Once events arrive, the page shows the sections below, and each one follows the 
 
 ## Reading traffic from the API
 
-All paths below are prefixed with `/v1/projects/{projectId}` and need `traffic.read`. Windowed endpoints accept `days` (1 to 365) or `from`/`to` (`YYYY-MM-DD`).
+All paths below are prefixed with `/v1/projects/{projectId}` and need `traffic.read`. Windowed endpoints accept `days` (1 to 365) or `from`/`to` (`YYYY-MM-DD`). On the overview, journey statistics and website analytics endpoints an explicit range can span at most 366 days, and a `from` without `to` runs to today.
 
 | Endpoint | Query | Returns |
 | --- | --- | --- |
-| `GET /geo/traffic/overview` | `days`, `from`, `to` | `totals` (`crawler`, `aiReferral`), `sources[]` with `source`, `visitorType`, `agent`, `category`, `confidence`, `visits`, `previousVisits`, `markdownVisits`, `previousMarkdownVisits`, `paths`, `previousPaths`, `lastSeenAt` and daily `points[]` |
+| `GET /geo/traffic/overview` | `days`, `from`, `to`, `host`, `path` (exact page path), `sites=exclude` (leave out Notra Sites) | `totals` (`crawler`, `cited`, `aiReferral`, `conversions`), `sources[]` with `source`, `visitorType`, `agent`, `category`, `confidence`, `visits`, `previousVisits`, `markdownVisits`, `previousMarkdownVisits`, `paths`, `previousPaths`, `lastSeenAt` and daily `points[]` |
+| `GET /geo/traffic/journey-stats` | window | `sources[]` and `pages[]` with exact journey counts against the previous window, `singleFetch`, `deepCrawls`, `entries` and daily counts, plus `totalPages` |
 | `GET /geo/traffic/log` | `limit` (1 to 200), `visitorTypes`, `categories`, `host` | `log[]` with `capturedAt`, `visitorType`, `source`, `agent`, `category`, `confidence`, `path`, `host`, `country`, `ua`, `journeyId`, `wantsMarkdown`, plus `total`. It takes no window. Bound it with `limit`. `host` keeps the newest matching events for that hostname and its subdomains |
 | `GET /geo/traffic/journeys` | window plus `limit` (1 to 100) | `journeys[]` with `journeyId`, `source`, `visitorType`, `pages`, `distinctPaths`, `firstSeenAt`, `lastSeenAt`, `entryPath`, `samplePaths[]` |
 | `GET /geo/traffic/journeys/{journeyId}` | window | `events[]` with `capturedAt`, `path`, `host`, `method`, `referer`, `country`, `agent`, `category` |
@@ -131,6 +132,27 @@ const { log } = await response.json();
 ```
 
 Every traffic response includes `configured`. When it is `false`, the deployment has no traffic backend configured, and the payload is empty instead of an error.
+
+## Reading website analytics from the API
+
+<Info>
+  Web analytics is in private beta. Until it is on for your workspace, these endpoints, `GET /geo/traffic/imports` and `GET /geo/traffic/journey-stats`, return `403`. To get it, email [hello@usenotra.com](mailto:hello@usenotra.com) or ask on [Discord](https://www.usenotra.com/discord) and we'll turn it on for your workspace.
+</Info>
+
+The **Web analytics** tab is available under the same prefix and scope, with the same window and `host`, `path` and `sites` filters as the overview:
+
+| Endpoint | Returns |
+| --- | --- |
+| `GET /geo/traffic/web` | `totals` (`views`, `visitors`, `sessions`, `engagedSessions`, `aiVisitors`, each with its `previous*` value), daily `points[]`, `hosts[]` and `imported` (the latest completed history import) |
+| `GET /geo/traffic/web/breakdowns` | `pages[]`, `sources[]`, `countries[]`, `devices[]`, `languages[]`, `outcomes[]` (how sessions from AI assistants behave), `outboundLinks[]` (host and path only), `vitals[]` (p75 in milliseconds, CLS x1000) and `errors[]` |
+| `GET /geo/traffic/imports` | `imports[]` with each history import's provider, status and progress. Connections and credentials are never returned; start imports in the dashboard |
+
+Error messages are scrubbed before storage.
+
+```bash
+curl "https://api.usenotra.com/v1/projects/$PROJECT_ID/geo/traffic/web/breakdowns?from=2026-10-01&to=2026-10-31&host=www.example.com" \
+  -H "Authorization: Bearer $NOTRA_API_KEY"
+```
 
 </Visibility>
 
@@ -153,7 +175,7 @@ Every traffic response includes `configured`. When it is `false`, the deployment
     Only journeys that followed a tagged `ntr` link are exact, while fingerprinted journeys group requests by heuristic and can merge or split real sessions.
   </Accordion>
   <Accordion title="Sampling reduces counts">
-    If you set `sample` below 1, every count in the Traffic page reflects the sampled fraction, and Notra doesn't scale the numbers back up.
+    If you set `sample` below 1, every count on the AI analytics page reflects the sampled fraction, and Notra doesn't scale the numbers back up.
 
     <Visibility for="agents">
 

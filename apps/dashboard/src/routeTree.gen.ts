@@ -12,8 +12,12 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
 import { Route as DotwellKnownOauthAuthorizationServerRouteImport } from './routes/[.]well-known.oauth-authorization-server'
 import { Route as Char91__testsChar93SitesRouteImport } from './routes/[__tests].sites'
+import { Route as ApiCollectRouteImport } from './routes/api.collect'
 import { Route as ApiHealthcheckRouteImport } from './routes/api.healthcheck'
 import { Route as ApiImageRouteImport } from './routes/api.image'
+import { Route as ApiNotraDotjsRouteImport } from './routes/api.notra[.]js'
+import { Route as ApiNotraDotplusDotjsRouteImport } from './routes/api.notra[.]plus[.]js'
+import { Route as ApiNotraDotChar123versionChar125DotjsRouteImport } from './routes/api.notra[.]{$version}[.]js'
 import { Route as ApiRealtimeRouteImport } from './routes/api.realtime'
 import { Route as ApiSessionRouteImport } from './routes/api.session'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
@@ -128,6 +132,11 @@ const Char91__testsChar93SitesRoute =
     path: '/__tests/sites',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiCollectRoute = ApiCollectRouteImport.update({
+  id: '/api/collect',
+  path: '/api/collect',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiHealthcheckRoute = ApiHealthcheckRouteImport.update({
   id: '/api/healthcheck',
   path: '/api/healthcheck',
@@ -138,6 +147,22 @@ const ApiImageRoute = ApiImageRouteImport.update({
   path: '/api/image',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiNotraDotjsRoute = ApiNotraDotjsRouteImport.update({
+  id: '/api/notra.js',
+  path: '/api/notra.js',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiNotraDotplusDotjsRoute = ApiNotraDotplusDotjsRouteImport.update({
+  id: '/api/notra.plus.js',
+  path: '/api/notra.plus.js',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiNotraDotChar123versionChar125DotjsRoute =
+  ApiNotraDotChar123versionChar125DotjsRouteImport.update({
+    id: '/api/notra.{$version}.js',
+    path: '/api/notra.{$version}.js',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiRealtimeRoute = ApiRealtimeRouteImport.update({
   id: '/api/realtime',
   path: '/api/realtime',
@@ -676,8 +701,12 @@ export interface FileRoutesByFullPath {
   '/robots.txt': typeof RobotsDottxtRoute
   '/.well-known/oauth-authorization-server': typeof DotwellKnownOauthAuthorizationServerRouteWithChildren
   '/__tests/sites': typeof Char91__testsChar93SitesRoute
+  '/api/collect': typeof ApiCollectRoute
   '/api/healthcheck': typeof ApiHealthcheckRoute
   '/api/image': typeof ApiImageRoute
+  '/api/notra.js': typeof ApiNotraDotjsRoute
+  '/api/notra.plus.js': typeof ApiNotraDotplusDotjsRoute
+  '/api/notra.{$version}.js': typeof ApiNotraDotChar123versionChar125DotjsRoute
   '/api/realtime': typeof ApiRealtimeRoute
   '/api/session': typeof ApiSessionRoute
   '/auth/callback': typeof AuthCallbackRoute
@@ -779,8 +808,12 @@ export interface FileRoutesByTo {
   '/robots.txt': typeof RobotsDottxtRoute
   '/.well-known/oauth-authorization-server': typeof DotwellKnownOauthAuthorizationServerRouteWithChildren
   '/__tests/sites': typeof Char91__testsChar93SitesRoute
+  '/api/collect': typeof ApiCollectRoute
   '/api/healthcheck': typeof ApiHealthcheckRoute
   '/api/image': typeof ApiImageRoute
+  '/api/notra.js': typeof ApiNotraDotjsRoute
+  '/api/notra.plus.js': typeof ApiNotraDotplusDotjsRoute
+  '/api/notra.{$version}.js': typeof ApiNotraDotChar123versionChar125DotjsRoute
   '/api/realtime': typeof ApiRealtimeRoute
   '/api/session': typeof ApiSessionRoute
   '/auth/callback': typeof AuthCallbackRoute
@@ -883,8 +916,12 @@ export interface FileRoutesById {
   '/robots.txt': typeof RobotsDottxtRoute
   '/.well-known/oauth-authorization-server': typeof DotwellKnownOauthAuthorizationServerRouteWithChildren
   '/__tests/sites': typeof Char91__testsChar93SitesRoute
+  '/api/collect': typeof ApiCollectRoute
   '/api/healthcheck': typeof ApiHealthcheckRoute
   '/api/image': typeof ApiImageRoute
+  '/api/notra.js': typeof ApiNotraDotjsRoute
+  '/api/notra.plus.js': typeof ApiNotraDotplusDotjsRoute
+  '/api/notra.{$version}.js': typeof ApiNotraDotChar123versionChar125DotjsRoute
   '/api/realtime': typeof ApiRealtimeRoute
   '/api/session': typeof ApiSessionRoute
   '/auth/callback': typeof AuthCallbackRoute
@@ -988,8 +1025,12 @@ export interface FileRouteTypes {
     | '/robots.txt'
     | '/.well-known/oauth-authorization-server'
     | '/__tests/sites'
+    | '/api/collect'
     | '/api/healthcheck'
     | '/api/image'
+    | '/api/notra.js'
+    | '/api/notra.plus.js'
+    | '/api/notra.{$version}.js'
     | '/api/realtime'
     | '/api/session'
     | '/auth/callback'
@@ -1091,8 +1132,12 @@ export interface FileRouteTypes {
     | '/robots.txt'
     | '/.well-known/oauth-authorization-server'
     | '/__tests/sites'
+    | '/api/collect'
     | '/api/healthcheck'
     | '/api/image'
+    | '/api/notra.js'
+    | '/api/notra.plus.js'
+    | '/api/notra.{$version}.js'
     | '/api/realtime'
     | '/api/session'
     | '/auth/callback'
@@ -1194,8 +1239,12 @@ export interface FileRouteTypes {
     | '/robots.txt'
     | '/.well-known/oauth-authorization-server'
     | '/__tests/sites'
+    | '/api/collect'
     | '/api/healthcheck'
     | '/api/image'
+    | '/api/notra.js'
+    | '/api/notra.plus.js'
+    | '/api/notra.{$version}.js'
     | '/api/realtime'
     | '/api/session'
     | '/auth/callback'
@@ -1298,8 +1347,12 @@ export interface RootRouteChildren {
   RobotsDottxtRoute: typeof RobotsDottxtRoute
   DotwellKnownOauthAuthorizationServerRoute: typeof DotwellKnownOauthAuthorizationServerRouteWithChildren
   Char91__testsChar93SitesRoute: typeof Char91__testsChar93SitesRoute
+  ApiCollectRoute: typeof ApiCollectRoute
   ApiHealthcheckRoute: typeof ApiHealthcheckRoute
   ApiImageRoute: typeof ApiImageRoute
+  ApiNotraDotjsRoute: typeof ApiNotraDotjsRoute
+  ApiNotraDotplusDotjsRoute: typeof ApiNotraDotplusDotjsRoute
+  ApiNotraDotChar123versionChar125DotjsRoute: typeof ApiNotraDotChar123versionChar125DotjsRoute
   ApiRealtimeRoute: typeof ApiRealtimeRoute
   ApiSessionRoute: typeof ApiSessionRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
@@ -1408,6 +1461,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof Char91__testsChar93SitesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/collect': {
+      id: '/api/collect'
+      path: '/api/collect'
+      fullPath: '/api/collect'
+      preLoaderRoute: typeof ApiCollectRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/healthcheck': {
       id: '/api/healthcheck'
       path: '/api/healthcheck'
@@ -1420,6 +1480,27 @@ declare module '@tanstack/react-router' {
       path: '/api/image'
       fullPath: '/api/image'
       preLoaderRoute: typeof ApiImageRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/notra.js': {
+      id: '/api/notra.js'
+      path: '/api/notra.js'
+      fullPath: '/api/notra.js'
+      preLoaderRoute: typeof ApiNotraDotjsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/notra.plus.js': {
+      id: '/api/notra.plus.js'
+      path: '/api/notra.plus.js'
+      fullPath: '/api/notra.plus.js'
+      preLoaderRoute: typeof ApiNotraDotplusDotjsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/notra.{$version}.js': {
+      id: '/api/notra.{$version}.js'
+      path: '/api/notra.{$version}.js'
+      fullPath: '/api/notra.{$version}.js'
+      preLoaderRoute: typeof ApiNotraDotChar123versionChar125DotjsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/realtime': {
@@ -2204,8 +2285,13 @@ const rootRouteChildren: RootRouteChildren = {
   DotwellKnownOauthAuthorizationServerRoute:
     DotwellKnownOauthAuthorizationServerRouteWithChildren,
   Char91__testsChar93SitesRoute: Char91__testsChar93SitesRoute,
+  ApiCollectRoute: ApiCollectRoute,
   ApiHealthcheckRoute: ApiHealthcheckRoute,
   ApiImageRoute: ApiImageRoute,
+  ApiNotraDotjsRoute: ApiNotraDotjsRoute,
+  ApiNotraDotplusDotjsRoute: ApiNotraDotplusDotjsRoute,
+  ApiNotraDotChar123versionChar125DotjsRoute:
+    ApiNotraDotChar123versionChar125DotjsRoute,
   ApiRealtimeRoute: ApiRealtimeRoute,
   ApiSessionRoute: ApiSessionRoute,
   AuthCallbackRoute: AuthCallbackRoute,

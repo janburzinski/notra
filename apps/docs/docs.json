@@ -342,13 +342,15 @@
               "ai-traffic/crawlers",
               "ai-traffic/journeys",
               "ai-traffic/referrals",
-              "ai-traffic/embed"
+              "ai-traffic/embed",
+              "ai-traffic/import-history"
             ]
           },
           {
             "group": "Install the tracker",
             "icon": "download",
             "pages": [
+              "ai-traffic/install/script-tag",
               "ai-traffic/install/nextjs",
               "ai-traffic/install/tanstack-start",
               "ai-traffic/install/nuxt",
@@ -751,9 +753,19 @@
                       "GET /v1/projects/{projectId}/geo/traffic/log",
                       "GET /v1/projects/{projectId}/geo/traffic/journeys",
                       "GET /v1/projects/{projectId}/geo/traffic/journeys/{journeyId}",
+                      "GET /v1/projects/{projectId}/geo/traffic/journey-stats",
                       "GET /v1/projects/{projectId}/geo/traffic/pages",
                       "GET /v1/projects/{projectId}/geo/traffic/mcp",
                       "GET /v1/projects/{projectId}/geo/traffic/mcp/tools/{toolName}"
+                    ]
+                  },
+                  {
+                    "group": "Website Analytics",
+                    "expanded": true,
+                    "pages": [
+                      "GET /v1/projects/{projectId}/geo/traffic/web",
+                      "GET /v1/projects/{projectId}/geo/traffic/web/breakdowns",
+                      "GET /v1/projects/{projectId}/geo/traffic/imports"
                     ]
                   },
                   {

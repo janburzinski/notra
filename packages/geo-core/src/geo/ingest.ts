@@ -2,6 +2,11 @@ import { createHmac, timingSafeEqual } from "node:crypto";
 
 import { db } from "@notra/db/drizzle";
 import { organizations, projects } from "@notra/db/schema";
+import {
+  TRACKER_PLUS_RELEASE,
+  TRACKER_RELEASE,
+} from "@notra/web-tracker/release";
+import type { TrackerReleaseLink } from "@notra/web-tracker/types/release";
 import { and, eq, sql } from "drizzle-orm";
 import { Effect } from "effect";
 
@@ -13,6 +18,12 @@ import {
   GEO_INGEST_SITE_TOKEN_SIGNING_DOMAIN,
   GEO_INGEST_TOKEN_ENV,
   GEO_INGEST_TOKEN_SEPARATOR,
+  GEO_WEB_KEY_PREFIX,
+  GEO_WEB_KEY_SIGNATURE_LENGTH,
+  GEO_WEB_KEY_SIGNING_DOMAIN,
+  GEO_WEB_PLUS_SCRIPT_PATH,
+  GEO_WEB_SCRIPT_PATH,
+  GEO_WEB_SCRIPT_RELEASE_DIR,
 } from "../constants/geo";
 import type {
   GeoIngestIdentity,
@@ -20,10 +31,15 @@ import type {
   GeoIngestSetupResponse,
   GeoIngestSnippets,
   GeoScopeInput,
+  GeoWebKeyScope,
+  GeoWebScript,
+  GeoWebSetupFields,
+  GeoWebSetupResponse,
 } from "../types/geo";
 import { resolveGeoIngestOrigin } from "../utils/geo-ingest-url";
+import { geoWebScriptTag } from "../utils/web-script-tag";
 import { geoDb } from "./effect";
-import { resolveGeoScope } from "./projects";
+import { requireGeoProject, resolveGeoScope } from "./projects";
 
 export {
   invalidateGeoIngestHostsCache,
@@ -99,6 +115,47 @@ async function rotateGeoIngestTokenGeneration(
       .where(eq(projects.organizationId, organizationId));
     return organization.generation;
   });
+}
+
+/**
+ * The current generation of the project's public notra.js key. Null without
+ * a project: web keys are never organization-wide.
+ */
+export async function getGeoWebKeyGeneration(
+  organizationId: string,
+  projectId: string | null
+): Promise<number | null> {
+  if (!projectId) {
+    return null;
+  }
+  const row = await db.query.projects.findFirst({
+    columns: { geoWebKeyGeneration: true },
+    where: and(
+      eq(projects.id, projectId),
+      eq(projects.organizationId, organizationId)
+    ),
+  });
+  return row?.geoWebKeyGeneration ?? null;
+}
+
+/** Revokes the project's public key and returns its new generation. */
+async function rotateGeoWebKeyGeneration(
+  organizationId: string,
+  projectId: string
+): Promise<number | null> {
+  const [row] = await db
+    .update(projects)
+    .set({
+      geoWebKeyGeneration: sql`${projects.geoWebKeyGeneration} + 1`,
+    })
+    .where(
+      and(
+        eq(projects.id, projectId),
+        eq(projects.organizationId, organizationId)
+      )
+    )
+    .returning({ generation: projects.geoWebKeyGeneration });
+  return row?.generation ?? null;
 }
 
 export function getGeoIngestSecret(): string | null {
@@ -178,6 +235,76 @@ export function verifyGeoIngestSiteToken(token: string): string | null {
   return signaturesMatch(body.slice(separatorIndex + 1), expected)
     ? siteId
     : null;
+}
+
+function signWebKey(scope: string, secret: string): string {
+  return sign(`${GEO_WEB_KEY_SIGNING_DOMAIN}${scope}`, secret).slice(
+    0,
+    GEO_WEB_KEY_SIGNATURE_LENGTH
+  );
+}
+
+/**
+ * The public key notra.js carries in page HTML. It is signed so nobody can
+ * point a script at another project, but it is not a secret: it can only
+ * record human page views on hosts the project already allows. Every key
+ * belongs to one project. It survives write-token rotation and has its own
+ * generation: generation 0 keys carry no `gN` segment, so keys issued before
+ * rotation existed keep working until the first rotation.
+ */
+export function buildGeoWebKey(
+  organizationId: string,
+  projectId: string,
+  generation = 0
+): string | null {
+  const secret = getGeoIngestSecret();
+  if (!secret) {
+    return null;
+  }
+  const segments = [organizationId, projectId];
+  if (generation > 0) {
+    segments.push(`g${generation}`);
+  }
+  const scope = segments.join(GEO_INGEST_TOKEN_SEPARATOR);
+  return `${GEO_WEB_KEY_PREFIX}${scope}${GEO_INGEST_TOKEN_SEPARATOR}${signWebKey(scope, secret)}`;
+}
+
+/**
+ * Generation 0 has no segment and a present one must be `g1` or higher, so
+ * each key has exactly one form. Null for anything else.
+ */
+function parseWebKeyGeneration(segment: string | undefined): number | null {
+  if (segment === undefined) {
+    return 0;
+  }
+  if (!GENERATION_SEGMENT_REGEX.test(segment)) {
+    return null;
+  }
+  const generation = Number.parseInt(segment.slice(1), 10);
+  return generation >= 1 ? generation : null;
+}
+
+export function verifyGeoWebKey(key: string): GeoIngestIdentity | null {
+  const secret = getGeoIngestSecret();
+  if (!(secret && key.startsWith(GEO_WEB_KEY_PREFIX))) {
+    return null;
+  }
+  const body = key.slice(GEO_WEB_KEY_PREFIX.length);
+  const separatorIndex = body.lastIndexOf(GEO_INGEST_TOKEN_SEPARATOR);
+  const scope = body.slice(0, Math.max(separatorIndex, 0));
+  const [organizationId, projectId, generationSegment, ...rest] = scope.split(
+    GEO_INGEST_TOKEN_SEPARATOR
+  );
+  const generation = parseWebKeyGeneration(generationSegment);
+  if (
+    !(organizationId && projectId) ||
+    rest.length > 0 ||
+    generation === null ||
+    !signaturesMatch(body.slice(separatorIndex + 1), signWebKey(scope, secret))
+  ) {
+    return null;
+  }
+  return { organizationId, projectId, generation, web: true };
 }
 
 export function verifyGeoIngestToken(token: string): GeoIngestIdentity | null {
@@ -371,6 +498,61 @@ export function buildGeoIngestSetupInfo(): GeoIngestSetupInfo {
   };
 }
 
+function webScript(
+  ingestUrl: string,
+  path: string,
+  release: TrackerReleaseLink
+): GeoWebScript {
+  return {
+    url: new URL(path, ingestUrl).toString(),
+    pinnedUrl: new URL(
+      `${GEO_WEB_SCRIPT_RELEASE_DIR}${release.file}`,
+      ingestUrl
+    ).toString(),
+    integrity: release.integrity,
+  };
+}
+
+/**
+ * The notra.js fields for a project's key. The web key only records page
+ * views on the project's tracked domains and ships in page HTML, so this is
+ * not a credential. Empty without a project: web keys are never
+ * organization-wide.
+ */
+function buildGeoWebSetupFields(
+  organizationId: string,
+  ingestUrl: string,
+  web: GeoWebKeyScope | null
+): Partial<GeoWebSetupFields> {
+  if (!web) {
+    return {};
+  }
+  const webKey =
+    buildGeoWebKey(organizationId, web.projectId, web.generation) ?? "";
+  const script = webScript(ingestUrl, GEO_WEB_SCRIPT_PATH, TRACKER_RELEASE);
+  return {
+    webKey,
+    webSnippet: geoWebScriptTag(webKey, script),
+    webScript: script,
+    webPlusScript: webScript(
+      ingestUrl,
+      GEO_WEB_PLUS_SCRIPT_PATH,
+      TRACKER_PLUS_RELEASE
+    ),
+  };
+}
+
+function buildGeoWebSetupResponse(
+  organizationId: string,
+  web: GeoWebKeyScope | null
+): GeoWebSetupResponse {
+  const info = buildGeoIngestSetupInfo();
+  return {
+    ...info,
+    ...buildGeoWebSetupFields(organizationId, info.ingestUrl, web),
+  };
+}
+
 /**
  * The full "how do I install tracking" payload, token included.
  *
@@ -381,10 +563,11 @@ export function buildGeoIngestSetupInfo(): GeoIngestSetupInfo {
  */
 function buildGeoIngestSetupResponse(
   input: GeoScopeInput,
-  generation: number
+  generation: number,
+  web: GeoWebKeyScope | null
 ): GeoIngestSetupResponse {
   return {
-    ...buildGeoIngestSetupInfo(),
+    ...buildGeoWebSetupResponse(input.organizationId, web),
     token:
       buildGeoIngestToken(input.organizationId, input.projectId, generation) ??
       "",
@@ -392,16 +575,48 @@ function buildGeoIngestSetupResponse(
 }
 
 /**
- * Issues a token only after proving an optional project belongs to the
- * organization. A missing organization returns `null` rather than signing a
- * generation-one token for an identity that does not exist.
+ * The project whose web key the scope uses, resolved like every read: the
+ * given project after proving it belongs to the organization, otherwise the
+ * organization's oldest. Null when the organization has no project, and
+ * without web analytics, which only proves a given project.
  */
-export const issueGeoIngestSetupResponse = Effect.fn("geo.ingest.issueSetup")(
-  function* (input: GeoScopeInput) {
+const resolveGeoWebKeyScope = Effect.fn("geo.ingest.webKeyScope")(function* (
+  input: GeoScopeInput,
+  withWeb: boolean
+) {
+  if (!withWeb) {
     if (input.projectId) {
       yield* resolveGeoScope(input);
     }
+    return null;
+  }
+  const { projectId } = yield* resolveGeoScope(input);
+  if (!projectId) {
+    return null;
+  }
+  const generation = yield* geoDb("web key generation lookup failed", () =>
+    getGeoWebKeyGeneration(input.organizationId, projectId)
+  );
+  return generation === null ? null : { projectId, generation };
+});
 
+/** The tokenless install payload for read access. */
+export const loadGeoWebSetupResponse = Effect.fn("geo.ingest.webSetup")(
+  function* (input: GeoScopeInput) {
+    const web = yield* resolveGeoWebKeyScope(input, true);
+    return buildGeoWebSetupResponse(input.organizationId, web);
+  }
+);
+
+/**
+ * Issues a token only after proving an optional project belongs to the
+ * organization. A missing organization returns `null` rather than signing a
+ * generation-one token for an identity that does not exist. `withWeb: false`
+ * leaves notra.js out for workspaces without web analytics.
+ */
+export const issueGeoIngestSetupResponse = Effect.fn("geo.ingest.issueSetup")(
+  function* (input: GeoScopeInput, withWeb = true) {
+    const web = yield* resolveGeoWebKeyScope(input, withWeb);
     const generation = yield* geoDb(
       "ingest token generation lookup failed",
       () => getGeoIngestTokenGeneration(input.organizationId, input.projectId)
@@ -409,7 +624,7 @@ export const issueGeoIngestSetupResponse = Effect.fn("geo.ingest.issueSetup")(
     if (generation === null) {
       return null;
     }
-    return buildGeoIngestSetupResponse(input, generation);
+    return buildGeoIngestSetupResponse(input, generation, web);
   }
 );
 
@@ -419,17 +634,38 @@ export const issueGeoIngestSetupResponse = Effect.fn("geo.ingest.issueSetup")(
  * supplying a project owned by somebody else.
  */
 export const rotateGeoIngestSetupResponse = Effect.fn("geo.ingest.rotateSetup")(
-  function* (input: GeoScopeInput) {
-    if (input.projectId) {
-      yield* resolveGeoScope(input);
-    }
-
+  function* (input: GeoScopeInput, withWeb = true) {
+    const web = yield* resolveGeoWebKeyScope(input, withWeb);
     const generation = yield* geoDb("ingest token rotation failed", () =>
       rotateGeoIngestTokenGeneration(input.organizationId, input.projectId)
     );
     if (generation === null) {
       return null;
     }
-    return buildGeoIngestSetupResponse(input, generation);
+    return buildGeoIngestSetupResponse(input, generation, web);
   }
 );
+
+/**
+ * Revokes the scope's public notra.js key: pages with the old key stop
+ * counting until they get the new snippet. Without a project there is no key
+ * to rotate.
+ */
+export const rotateGeoWebKeySetupResponse = Effect.fn(
+  "geo.ingest.rotateWebKeySetup"
+)(function* (input: GeoScopeInput) {
+  const { projectId } = yield* requireGeoProject(input);
+  const webGeneration = yield* geoDb("web key rotation failed", () =>
+    rotateGeoWebKeyGeneration(input.organizationId, projectId)
+  );
+  const generation = yield* geoDb("ingest token generation lookup failed", () =>
+    getGeoIngestTokenGeneration(input.organizationId, input.projectId)
+  );
+  if (generation === null || webGeneration === null) {
+    return null;
+  }
+  return buildGeoIngestSetupResponse(input, generation, {
+    projectId,
+    generation: webGeneration,
+  });
+});

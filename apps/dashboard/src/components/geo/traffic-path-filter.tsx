@@ -2,11 +2,10 @@
 
 import { Combobox as ComboboxPrimitive } from "@base-ui/react";
 import {
+  ArrowDown01Icon,
   FilterHorizontalIcon,
-  UnfoldMoreIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { GEO_FILTER_TRIGGER_CLASS } from "@notra/geo-core/constants/geo";
 import {
   Combobox,
   ComboboxContent,
@@ -17,6 +16,7 @@ import {
 } from "@notra/ui/components/ui/combobox";
 import { useTranslations } from "use-intl";
 
+import { Button } from "@/components/button";
 import {
   TRAFFIC_PATH_ALL,
   TRAFFIC_PATH_FILTER_LIMIT,
@@ -48,18 +48,17 @@ export function TrafficPathFilter({ paths }: TrafficPathFilterProps) {
     >
       <ComboboxPrimitive.Trigger
         aria-label={t("label")}
-        className={`${GEO_FILTER_TRIGGER_CLASS} max-w-56`}
+        render={<Button className="max-w-56" variant="secondary" />}
       >
         <HugeiconsIcon
-          className="text-muted-foreground shrink-0"
+          className="text-muted-foreground size-3.5 shrink-0"
           icon={FilterHorizontalIcon}
-          size={12}
         />
         <span className="truncate">{path || t("label")}</span>
         <HugeiconsIcon
-          className="text-muted-foreground shrink-0"
-          icon={UnfoldMoreIcon}
-          size={12}
+          className="text-muted-foreground pointer-events-none size-4 shrink-0"
+          icon={ArrowDown01Icon}
+          strokeWidth={2}
         />
       </ComboboxPrimitive.Trigger>
       <ComboboxContent align="end" className="w-72">

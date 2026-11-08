@@ -7,7 +7,6 @@ import {
   GEO_PURPOSE_COLUMN_WIDTH,
   GEO_TRAFFIC_FUNNEL_STAGES,
 } from "@notra/geo-core/constants/geo";
-import { PageHeading } from "@notra/ui/components/shared/page-heading";
 import { Skeleton } from "@notra/ui/components/ui/skeleton";
 import { useIsMobile } from "@notra/ui/hooks/use-mobile";
 import type { CSSProperties } from "react";
@@ -21,9 +20,8 @@ import { useCollapsibleColumns } from "ui/table/hooks/use-collapsible-columns";
 import { tableMinWidthCss } from "ui/table/lib";
 import { useTranslations } from "use-intl";
 
-import { AnalyticsSourceTabs } from "@/components/analytics/analytics-source-tabs";
-import { GeoRangePicker } from "@/components/geo/geo-range-picker";
-import { PageContainer } from "@/components/layout/container";
+import { TrafficTrendLegendSkeleton } from "@/components/geo/skeleton-parts";
+import { TrafficPageSkeletonFrame } from "@/components/geo/traffic-page-skeleton-frame";
 import {
   GEO_COUNT_COLUMN_WIDTH,
   PAGE_COLUMN_WIDTH,
@@ -42,25 +40,19 @@ import {
   TRAFFIC_SOURCE_COLUMN_MIN_WIDTH,
 } from "@/constants/geo-traffic-sources";
 import { TABLE_ROW_HEIGHT } from "@/constants/table";
-import {
-  WEB_LIST_LIMIT,
-  WEB_OUTCOMES_SKELETON_ROWS,
-  WEB_TABLE_ROW_HEIGHT,
-} from "@/constants/web-analytics";
 import { cn } from "@/lib/utils";
 import type {
-  GeoTrafficSkeletonProps,
   TrafficSourceBandSkeletonProps,
   TrafficTableSkeletonProps,
-  WebBreakdownSkeletonProps,
 } from "@/types/geo";
+import type { TrafficPageSkeletonProps } from "@/types/geo-traffic-pages";
 import { paginatedTableHeightFor } from "@/utils/table";
 
 const CRAWLER_ROW_COUNT = 4;
 const REFERRAL_ROW_COUNT = 2;
 const LOG_ROW_COUNT = 6;
 
-function TrafficTableSkeleton({
+export function TrafficTableSkeleton({
   columns,
   rows,
   rowHeight = TABLE_ROW_HEIGHT,
@@ -125,7 +117,9 @@ function TrafficSourcesSkeleton() {
       key: "source",
       header: tCommon("labels.source"),
       width: "1fr",
-      minWidth: TRAFFIC_SOURCE_COLUMN_MIN_WIDTH.source,
+      minWidth: isMobile
+        ? TRAFFIC_SOURCE_COLUMN_MIN_WIDTH.sourceMobile
+        : TRAFFIC_SOURCE_COLUMN_MIN_WIDTH.source,
     },
     {
       key: "category",
@@ -133,6 +127,7 @@ function TrafficSourcesSkeleton() {
       width: isMobile
         ? TRAFFIC_SOURCE_COLUMN_MIN_WIDTH.categoryMobile
         : TRAFFIC_SOURCE_COLUMN_MIN_WIDTH.category,
+      collapsePriority: 3,
     },
     {
       key: "visits",
@@ -257,114 +252,6 @@ function TrafficLogSkeleton() {
   );
 }
 
-function WebBreakdownSkeleton({
-  title,
-  nameHeader,
-  valueHeader,
-}: WebBreakdownSkeletonProps) {
-  const columns: TableColumn<unknown>[] = [
-    { key: "name", header: nameHeader, width: "1fr" },
-    {
-      key: "value",
-      header: valueHeader,
-      width: GEO_COUNT_COLUMN_WIDTH,
-      align: "right",
-    },
-  ];
-  return (
-    <InstrumentSection eyebrow={title}>
-      <TrafficTableSkeleton
-        columns={columns}
-        rowHeight={WEB_TABLE_ROW_HEIGHT}
-        rows={WEB_LIST_LIMIT}
-      />
-    </InstrumentSection>
-  );
-}
-
-/** Mirrors WebVisitorsSection: hero with four metrics and the trend, then the breakdowns. */
-function WebVisitorsSkeleton() {
-  const t = useTranslations("geo.webVisitors");
-  return (
-    <section className="flex flex-col gap-6">
-      <div className={TRAFFIC_HERO_FRAME_CLASS}>
-        <div
-          className={cn(
-            TRAFFIC_HERO_METRICS_GRID_CLASS,
-            TRAFFIC_HERO_METRICS_SURFACE_CLASS
-          )}
-        >
-          {[t("visitors"), t("views"), t("fromAi"), t("agents")].map(
-            (label) => (
-              <div className={TRAFFIC_HERO_METRIC_CELL_CLASS} key={label}>
-                <p className="text-foreground/75 text-sm leading-5 font-semibold tracking-tight">
-                  {label}
-                </p>
-                <div className="flex min-w-0 flex-wrap items-center gap-3">
-                  <Skeleton className="h-6 w-14 @4xl/hero:h-7.5 @4xl/hero:w-16" />
-                  <Skeleton className="h-5 w-16 rounded-full" />
-                </div>
-              </div>
-            )
-          )}
-        </div>
-        <div className={TRAFFIC_HERO_CHART_SURFACE_CLASS}>
-          <Skeleton className="h-52 w-full rounded-xl @md/hero:h-64" />
-          <div className="mt-3 flex gap-2">
-            <Skeleton className="h-6 w-28 rounded-md" />
-            <Skeleton className="h-6 w-28 rounded-md" />
-          </div>
-        </div>
-      </div>
-      <div className="grid gap-4 lg:grid-cols-2">
-        <WebBreakdownSkeleton
-          nameHeader={t("page")}
-          title={t("topPages")}
-          valueHeader={t("columnViews")}
-        />
-        <WebBreakdownSkeleton
-          nameHeader={t("columnSource")}
-          title={t("referrers")}
-          valueHeader={t("sessions")}
-        />
-      </div>
-      <div className="grid gap-4 lg:grid-cols-2">
-        <WebBreakdownSkeleton
-          nameHeader={t("columnCountry")}
-          title={t("countries")}
-          valueHeader={t("visitors")}
-        />
-        <WebBreakdownSkeleton
-          nameHeader={t("columnDevice")}
-          title={t("devices")}
-          valueHeader={t("visitors")}
-        />
-      </div>
-      <InstrumentSection eyebrow={t("outcomesTitle")}>
-        <TrafficTableSkeleton
-          columns={[
-            { key: "source", header: t("columnSource"), width: "1fr" },
-            {
-              key: "pages",
-              header: t("pagesPerSession"),
-              width: "10rem",
-              align: "right",
-            },
-            {
-              key: "engaged",
-              header: t("engagedRate"),
-              width: "8rem",
-              align: "right",
-            },
-          ]}
-          rowHeight={WEB_TABLE_ROW_HEIGHT}
-          rows={WEB_OUTCOMES_SKELETON_ROWS}
-        />
-      </InstrumentSection>
-    </section>
-  );
-}
-
 function AgentsHeroSkeleton() {
   const tHero = useTranslations("geo.trafficHero");
   return (
@@ -391,50 +278,26 @@ function AgentsHeroSkeleton() {
           <Skeleton className="h-7 w-24 rounded-lg" />
         </div>
         <Skeleton className="h-52 w-full rounded-xl @md/hero:h-72" />
+        <TrafficTrendLegendSkeleton />
       </div>
     </div>
   );
 }
 
-export function GeoTrafficSkeleton({
-  geoRange,
-  layout,
-}: GeoTrafficSkeletonProps) {
-  const t = useTranslations("geo.pages.traffic");
+export function AiAnalyticsSkeleton({ geoRange }: TrafficPageSkeletonProps) {
+  const t = useTranslations("geo.pages.aiAnalytics");
   const tCommon = useTranslations("common");
-  const withVisitors = layout === "visitors";
   return (
-    <PageContainer className="flex flex-1 flex-col gap-4 py-4 md:gap-6 md:py-6">
-      <div className="w-full min-w-0 space-y-6 px-4 lg:px-6">
-        <PageHeading
-          description={
-            withVisitors ? t("descriptionWithVisitors") : t("description")
-          }
-          title={t("title")}
-        >
-          <div className="flex min-h-8 items-center">
-            {geoRange ? (
-              <GeoRangePicker control={geoRange} />
-            ) : (
-              <Skeleton className="h-7 w-40 rounded-lg" />
-            )}
-          </div>
-        </PageHeading>
-        <AnalyticsSourceTabs
-          actions={
-            <>
-              <Skeleton className="h-7 w-20 rounded-lg" />
-              <Skeleton className="h-7 w-24 rounded-lg" />
-            </>
-          }
-        />
-        {withVisitors ? <WebVisitorsSkeleton /> : <AgentsHeroSkeleton />}
-        <InstrumentSection eyebrow={tCommon("labels.sources")}>
-          <TrafficSourcesSkeleton />
-        </InstrumentSection>
-        <TrafficPagesSkeleton />
-        <TrafficLogSkeleton />
-      </div>
-    </PageContainer>
+    <TrafficPageSkeletonFrame
+      description={t("description")}
+      geoRange={geoRange}
+    >
+      <AgentsHeroSkeleton />
+      <InstrumentSection eyebrow={tCommon("labels.sources")}>
+        <TrafficSourcesSkeleton />
+      </InstrumentSection>
+      <TrafficPagesSkeleton />
+      <TrafficLogSkeleton />
+    </TrafficPageSkeletonFrame>
   );
 }

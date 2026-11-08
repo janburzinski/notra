@@ -585,6 +585,7 @@ export const GEO_DRAIN_DASHBOARD_URLS = {
 export const GEO_INGEST_DEFAULT_METHOD: GeoIngestMethod = "sdk";
 export const GEO_INGEST_METHODS = [
   "sdk",
+  "script",
   "vercel",
   "cloudflare",
 ] as const satisfies readonly GeoIngestMethod[];
@@ -644,6 +645,15 @@ export const GEO_INGEST_SECRET_ENV = "GEO_INGEST_SECRET";
 export const GEO_INGEST_TOKEN_SEPARATOR = ".";
 export const GEO_INGEST_SITE_TOKEN_PREFIX = "nst.";
 export const GEO_INGEST_SITE_TOKEN_SIGNING_DOMAIN = "notra-sites-traffic:";
+export const GEO_WEB_KEY_PREFIX = "nwk.";
+export const GEO_WEB_KEY_SIGNING_DOMAIN = "notra-web-key:";
+export const GEO_WEB_KEY_SIGNATURE_LENGTH = 32;
+export const GEO_WEB_COLLECT_PATH = "/api/collect";
+export const GEO_WEB_SCRIPT_PATH = "/api/notra.js";
+/** notra.js plus opt-in JavaScript error reporting. */
+export const GEO_WEB_PLUS_SCRIPT_PATH = "/api/notra.plus.js";
+/** Pinned builds live next to the scripts, as `/api/notra.<version>.js`. */
+export const GEO_WEB_SCRIPT_RELEASE_DIR = "/api/";
 export const GEO_INGEST_BEARER_PREFIX = "Bearer ";
 export const GEO_MAX_STORED_UA_LENGTH = 200;
 export const AI_TRAFFIC_DEFAULT_JOURNEYS_LIMIT = 25;
@@ -681,10 +691,12 @@ export const GEO_AI_REFERRER_HOSTS: Record<string, string> = {
   "chat.openai.com": "chatgpt",
   "perplexity.ai": "perplexity",
   "www.perplexity.ai": "perplexity",
+  "pplx.ai": "perplexity",
   "gemini.google.com": "gemini",
   "bard.google.com": "gemini",
   "claude.ai": "claude",
   "copilot.microsoft.com": "copilot",
+  "copilot.com": "copilot",
   "www.bing.com/chat": "copilot",
   "you.com": "you",
   "chat.deepseek.com": "deepseek",
@@ -694,12 +706,14 @@ export const GEO_AI_REFERRER_HOSTS: Record<string, string> = {
   "chat.qwen.ai": "qwen",
   "meta.ai": "meta",
   "www.meta.ai": "meta",
+  "phind.com": "phind",
 };
 
 export const GEO_SOURCE_LABELS: Record<string, string> = {
   chatgpt: "ChatGPT",
   openai: "ChatGPT",
   perplexity: "Perplexity",
+  phind: "Phind",
   gemini: "Gemini",
   google: "Gemini",
   claude: "Claude",

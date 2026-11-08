@@ -1,3 +1,6 @@
 packages/db/migrations/** linguist-generated=true
 
 .agents/skills/**/*.py linguist-detectable=false
+
+# Archived tracker builds are pinned by hash: keep their bytes exact.
+packages/web-tracker/releases/** -text linguist-generated=true

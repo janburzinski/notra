@@ -20,11 +20,13 @@ import type { z } from "zod";
 
 import type { GEO_TRAFFIC_SITES_MODES } from "../constants/geo";
 import type { GEO_AUDIENCE_TYPES } from "../constants/geo-model-catalog";
+import type { WEB_UTM_DIMENSIONS } from "../constants/web-analytics";
 import type {
   geoCompetitorSuggestionsResponseSchema,
   geoJudgeResultSchema,
 } from "../schemas/geo";
 import type { geoGatewayModelSchema } from "../schemas/geo-model-feed";
+import type { ImportCoverage } from "./analytics-imports";
 import type { GscBuyingIntentSection } from "./google-search-console";
 import type { GeoModelTokenUsage } from "./token-usage";
 
@@ -1263,7 +1265,7 @@ export type GeoIngestPackageManager = "bun" | "pnpm" | "yarn" | "npm";
 
 export type GeoDrainProvider = "vercel" | "cloudflare";
 
-export type GeoIngestMethod = "sdk" | GeoDrainProvider;
+export type GeoIngestMethod = "sdk" | "script" | GeoDrainProvider;
 
 /** Install snippet per supported framework. */
 export type GeoIngestSnippets = Record<GeoIngestFramework, string>;
@@ -1274,6 +1276,8 @@ export interface GeoIngestIdentity {
   projectId: string | null;
   generation: number;
   site?: GeoIngestSiteScope;
+  /** Signed by a public browser key; may record human page views only. */
+  web?: boolean;
 }
 
 interface GeoIngestSiteScope {
@@ -1300,7 +1304,39 @@ export interface GeoIngestSetupInfo {
   drainUrls: Record<GeoDrainProvider, string>;
 }
 
-export interface GeoIngestSetupResponse extends GeoIngestSetupInfo {
+/** One notra.js build: its auto-updating URL and this build pinned with SRI. */
+export interface GeoWebScript {
+  url: string;
+  /** Serves exactly this build forever, so it never updates on its own. */
+  pinnedUrl: string;
+  /** Subresource Integrity value for the pinned URL, `sha384-<base64>`. */
+  integrity: string;
+}
+
+/** The project whose public notra.js key a setup payload carries. */
+export interface GeoWebKeyScope {
+  projectId: string;
+  generation: number;
+}
+
+/** The notra.js part of the install payload. */
+export interface GeoWebSetupFields {
+  /** Public browser key for the notra.js script; not a credential. */
+  webKey: string;
+  webSnippet: string;
+  webScript: GeoWebScript;
+  /** notra.plus.js: notra.js plus JavaScript error reporting. */
+  webPlusScript: GeoWebScript;
+}
+
+/**
+ * The install payload without the tracking token: safe for read access. The
+ * notra.js fields are absent when the organization has no project.
+ */
+export interface GeoWebSetupResponse
+  extends GeoIngestSetupInfo, Partial<GeoWebSetupFields> {}
+
+export interface GeoIngestSetupResponse extends GeoWebSetupResponse {
   token: string;
 }
 
@@ -2090,6 +2126,12 @@ export interface WebAnalyticsScope {
   hosts: string[];
 }
 
+/** Whether notra.js has counted anything yet, for the install card's status line. */
+export interface WebTrackingStatus {
+  /** First day with a native page view for the project; null before any. */
+  firstDay: string | null;
+}
+
 export interface WebAnalyticsTotals {
   views: number;
   previousViews: number;
@@ -2127,6 +2169,16 @@ export interface WebAnalyticsSource {
   visitors: number;
 }
 
+export type WebUtmDimension = (typeof WEB_UTM_DIMENSIONS)[number];
+
+/** Sessions that landed with one value of a UTM parameter. */
+export interface WebAnalyticsUtmRow {
+  value: string;
+  sessions: number;
+  previousSessions: number;
+  visitors: number;
+}
+
 export interface WebAnalyticsBreakdown {
   value: string;
   visitors: number;
@@ -2146,14 +2198,67 @@ interface WebAnalyticsHost {
   views: number;
 }
 
+export interface WebAnalyticsOutboundLink {
+  /** Destination host and path, no query. */
+  url: string;
+  clicks: number;
+  previousClicks: number;
+  visitors: number;
+}
+
+export type WebVitalMetric = "lcp" | "fcp" | "ttfb" | "inp" | "cls";
+
+/** Device class of a vital; mobile includes tablets. */
+export type WebVitalDevice = "mobile" | "desktop";
+
+export interface WebAnalyticsVital {
+  metric: WebVitalMetric;
+  /** Milliseconds, or layout shift score x1000 for CLS. */
+  p75: number;
+  samples: number;
+  /** Page views rated good, needing improvement and poor (Google's thresholds). */
+  good: number;
+  needsImprovement: number;
+  poor: number;
+}
+
+export interface WebAnalyticsError {
+  message: string;
+  source: string;
+  events: number;
+  views: number;
+}
+
+/**
+ * Reports only notra.js sends (outbound links, vitals, errors, languages).
+ * Project analytics only: Notra Sites leave them unset.
+ */
+export interface WebAnalyticsScriptReports {
+  outboundLinks: WebAnalyticsOutboundLink[];
+  vitals: WebAnalyticsVital[];
+  vitalsByDevice: Record<WebVitalDevice, WebAnalyticsVital[]>;
+  errors: WebAnalyticsError[];
+  languages: WebAnalyticsBreakdown[];
+}
+
 /**
  * Which queries a web analytics read runs: the summary (totals, trend, hosts)
  * gates the page, the breakdown tables fill in after it.
  */
 export type WebAnalyticsPart = "all" | "summary" | "breakdowns";
 
+/** Parts of project analytics only workspaces with web analytics get. */
+export interface WebAnalyticsExtras {
+  /** notra.js reports (outbound links, vitals, errors, languages), with breakdowns. */
+  scriptReports?: boolean;
+  /** Average time on page, with the summary. On unless turned off. */
+  engagement?: boolean;
+}
+
 export interface WebAnalyticsResponse {
   configured: boolean;
+  /** Latest completed history import; native tracking starts the day after. */
+  imported?: ImportCoverage | null;
   hosts: WebAnalyticsHost[];
   totals: WebAnalyticsTotals;
   points: WebAnalyticsPoint[];
@@ -2162,6 +2267,9 @@ export interface WebAnalyticsResponse {
   countries: WebAnalyticsBreakdown[];
   devices: WebAnalyticsBreakdown[];
   outcomes: WebAnalyticsOutcome[];
+  script?: WebAnalyticsScriptReports;
+  /** Project summaries only: average visible time per page view. */
+  engagement?: WebEngagement;
 }
 
 export interface SiteAnalyticsInput {

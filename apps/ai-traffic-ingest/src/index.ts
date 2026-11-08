@@ -3,6 +3,8 @@ import { flushGeoLog, geoLog } from "@notra/ai/evlog";
 import { logError } from "@notra/ai/utils/server-log";
 import { GEO_TRAFFIC_FLUSH_INTERVAL_MS } from "@notra/analytics/constants/cache";
 import {
+  ingestWebErrors,
+  ingestWebEvents,
   ingestWebPageEngagement,
   ingestWebPageViews,
 } from "@notra/analytics/tinybird/client";
@@ -33,6 +35,7 @@ import {
 } from "./constants/server";
 import { createIngestApp } from "./http";
 import { missingIngestEnvironment } from "./utils/config";
+import { lookupCountry } from "./utils/country";
 import { stopIngestBatchers, withDeadline } from "./utils/shutdown";
 
 const pending = new Set<Promise<void>>();
@@ -59,6 +62,14 @@ const engagementBatcher = createEventBatcher({
   intervalMs: GEO_TRAFFIC_FLUSH_INTERVAL_MS,
   write: ingestWebPageEngagement,
 });
+const webEventBatcher = createEventBatcher({
+  intervalMs: GEO_TRAFFIC_FLUSH_INTERVAL_MS,
+  write: ingestWebEvents,
+});
+const webErrorBatcher = createEventBatcher({
+  intervalMs: GEO_TRAFFIC_FLUSH_INTERVAL_MS,
+  write: ingestWebErrors,
+});
 const usageBatcher = createUsageBatcher({
   intervalMs: GEO_INGEST_USAGE_FLUSH_INTERVAL_MS,
   track: trackAiTrafficEvent,
@@ -81,8 +92,11 @@ const app = createIngestApp(
     },
     enqueueWeb: webBatcher.enqueue,
     enqueueEngagement: engagementBatcher.enqueue,
+    enqueueWebEvent: webEventBatcher.enqueue,
+    enqueueWebError: webErrorBatcher.enqueue,
     trackUsage: usageBatcher.add,
-  }
+  },
+  { lookupCountry }
 );
 
 const server = Bun.serve({
@@ -116,6 +130,8 @@ const runtimeLogTimer = setInterval(() => {
     bufferedEvents: batcher.size(),
     webBufferedEvents: webBatcher.size(),
     engagementBufferedEvents: engagementBatcher.size(),
+    webEventBufferedEvents: webEventBatcher.size(),
+    webErrorBufferedEvents: webErrorBatcher.size(),
     usageBufferedEvents: usageBatcher.size(),
     databaseConnections: databasePool?.totalCount ?? 0,
     databaseIdleConnections: databasePool?.idleCount ?? 0,
@@ -145,16 +161,24 @@ async function shutdown() {
     );
     server.stop(true);
   }
-  const [webFlushed, engagementFlushed, flushed, usageFlushed] =
-    await stopIngestBatchers(
-      [
-        () => webBatcher.stop(),
-        () => engagementBatcher.stop(),
-        () => batcher.stop(),
-        () => usageBatcher.stop(),
-      ],
-      INGEST_EVENTS_FLUSH_TIMEOUT_MS
-    );
+  const [
+    webFlushed,
+    engagementFlushed,
+    webEventFlushed,
+    webErrorFlushed,
+    flushed,
+    usageFlushed,
+  ] = await stopIngestBatchers(
+    [
+      () => webBatcher.stop(),
+      () => engagementBatcher.stop(),
+      () => webEventBatcher.stop(),
+      () => webErrorBatcher.stop(),
+      () => batcher.stop(),
+      () => usageBatcher.stop(),
+    ],
+    INGEST_EVENTS_FLUSH_TIMEOUT_MS
+  );
   if (!usageFlushed) {
     console.error(
       "[geo-ingest] Usage tracking did not finish before exit; some events may not be billed"
@@ -167,9 +191,13 @@ async function shutdown() {
   }
   const webLeft = webBatcher.size();
   const engagementLeft = engagementBatcher.size();
-  if (!webFlushed || !engagementFlushed || webLeft > 0 || engagementLeft > 0) {
+  const clicksAndErrorsLeft = webEventBatcher.size() + webErrorBatcher.size();
+  if (
+    !(webFlushed && engagementFlushed && webEventFlushed && webErrorFlushed) ||
+    webLeft + engagementLeft + clicksAndErrorsLeft > 0
+  ) {
     console.error(
-      `[geo-ingest] Web events not written before exit (${webLeft} page views, ${engagementLeft} engagement events left in buffer)`
+      `[geo-ingest] Web events not written before exit (${webLeft} page views, ${engagementLeft} engagement events, ${clicksAndErrorsLeft} outbound clicks and errors left in buffer)`
     );
   }
   if (

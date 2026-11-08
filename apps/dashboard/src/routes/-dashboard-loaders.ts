@@ -10,26 +10,27 @@ import { Effect } from "effect";
 
 import { CHECKOUT_PLAN_PARAM } from "@/constants/billing";
 import { DEMO_BANNER_COOKIE, DEMO_BANNER_OFF } from "@/constants/demo";
-import { SIDEBAR_WIDTH_COOKIE_NAME } from "@/constants/nav";
+import { WEB_ANALYTICS_NAV_LINK } from "@/constants/geo-traffic-pages";
+import {
+  GEO_TRAFFIC_NAV_LINK,
+  SIDEBAR_WIDTH_COOKIE_NAME,
+} from "@/constants/nav";
 import { validateOrganizationAccess } from "@/lib/auth/actions";
 import { takeCheckoutPlan } from "@/lib/billing/checkout-plan-cookie";
 import { resolveInitialGeoProjectId } from "@/lib/geo/initial-project.server";
 import { getTranslations } from "@/lib/i18n/server";
 import { redirectOrgRootToStoredMode } from "@/lib/nav/org-root-redirect";
-import type { TrafficPageLayout } from "@/types/geo";
+import type { GeoTrafficPageKind } from "@/types/geo-traffic-pages";
 import type { UiRouteInput } from "@/types/ui-route";
-import {
-  getTrafficLayoutFromCookies,
-  onboardingBannerDismissedCookie,
-} from "@/utils/cookies";
+import { onboardingBannerDismissedCookie } from "@/utils/cookies";
 import { getGreetingPeriod } from "@/utils/dashboard-greeting-period";
 import {
   geoProjectRepairPath,
   geoRequestedProjectId,
 } from "@/utils/geo-hydration";
+import { geoPathWithSearch } from "@/utils/geo-paths";
 import { resolveOnboardingAgentRunState } from "@/utils/onboarding-agent-run";
 import { toOrganizationSummary } from "@/utils/organization-summary";
-import { readServerCookies } from "@/utils/server-cookies";
 import { settingsPath } from "@/utils/settings-path";
 import { getSidebarWidthFromCookie } from "@/utils/sidebar-width";
 import { trackingParams } from "@/utils/tracking-params";
@@ -260,13 +261,19 @@ export const loadGeoScope = createServerFn({ method: "GET" })
     return { projectId, geoAccess };
   });
 
-type GeoPageKind = "overview" | "traffic" | "gsc";
+type GeoPageKind = "overview" | GeoTrafficPageKind | "gsc";
 
 export const gateGeoPage = createServerFn({ method: "GET" })
   .validator((data: UiRouteInput & { kind: GeoPageKind }) => data)
   .handler(async ({ data: { params, searchParams, kind } }) => {
     const slug = params.slug ?? "";
     const { organization } = await validateOrganizationAccess(slug);
+    await redirectDisabledWebAnalytics(
+      slug,
+      searchParams,
+      kind,
+      organization.id
+    );
     const requestedProjectId = geoRequestedProjectId(searchParams);
     const projectId = await resolveInitialGeoProjectId(
       organization.id,
@@ -282,6 +289,24 @@ export const gateGeoPage = createServerFn({ method: "GET" })
     );
   });
 
+/** Without the web analytics flag its tab sends people to AI analytics. */
+async function redirectDisabledWebAnalytics(
+  slug: string,
+  searchParams: UiRouteInput["searchParams"],
+  kind: GeoPageKind,
+  organizationId: string
+) {
+  if (kind !== "web-analytics") {
+    return;
+  }
+  const { isWebAnalyticsEnabled } = await import("@/lib/web-analytics/flag");
+  if (!(await isWebAnalyticsEnabled(organizationId))) {
+    throw redirect({
+      href: geoPathWithSearch(slug, GEO_TRAFFIC_NAV_LINK, searchParams),
+    });
+  }
+}
+
 function redirectStaleGeoProject(
   slug: string,
   searchParams: UiRouteInput["searchParams"],
@@ -291,8 +316,10 @@ function redirectStaleGeoProject(
 ) {
   if (requestedProjectId && requestedProjectId !== projectId) {
     let repairPath: string | undefined;
-    if (kind === "traffic") {
-      repairPath = "/geo/traffic";
+    if (kind === "agent-analytics") {
+      repairPath = GEO_TRAFFIC_NAV_LINK;
+    } else if (kind === "web-analytics") {
+      repairPath = WEB_ANALYTICS_NAV_LINK;
     } else if (kind === "gsc") {
       repairPath = "/integrations/google-search-console";
     }
@@ -317,6 +344,12 @@ export const loadGeoPage = createServerFn({
       requestedProjectId
     );
     if (!gated) {
+      await redirectDisabledWebAnalytics(
+        slug,
+        searchParams,
+        kind,
+        organization.id
+      );
       redirectStaleGeoProject(
         slug,
         searchParams,
@@ -326,7 +359,6 @@ export const loadGeoPage = createServerFn({
       );
     }
     let state: DehydratedState | undefined;
-    let trafficLayout: TrafficPageLayout | null = null;
     if (kind === "overview") {
       const { dehydrateGeoOverviewQueries } =
         await import("@/utils/geo-prefetch.server");
@@ -336,18 +368,18 @@ export const loadGeoPage = createServerFn({
         searchParams,
         getRequestHeaders()
       );
-    } else if (kind === "traffic") {
+    } else if (kind === "agent-analytics" || kind === "web-analytics") {
       const { dehydrateGeoTrafficQueries } =
         await import("@/utils/geo-prefetch.server");
       state = await dehydrateGeoTrafficQueries(
+        kind,
         organization.id,
         projectId,
         searchParams,
         getRequestHeaders()
       );
-      trafficLayout = getTrafficLayoutFromCookies(readServerCookies());
     }
-    return { projectId, state, trafficLayout };
+    return { projectId, state };
   });
 
 export const loadIntegrationConnect = createServerFn({ method: "GET" })

@@ -11,6 +11,7 @@ import {
 } from "@/constants/nav";
 import { SITES_NAV_LINK } from "@/constants/sites";
 import type {
+  FlagKeywords,
   NavGroup,
   NavGroupRowState,
   NavMainItem,
@@ -151,4 +152,15 @@ export function resolveActiveNavLink(
     }
   }
   return active;
+}
+
+/** Keywords plus those of a flag that is on, so search never offers what is off. */
+export function keywordsForFlags(
+  keywords: readonly string[],
+  flagKeywords: FlagKeywords | undefined,
+  visibility: NavVisibility
+): string[] {
+  return flagKeywords && visibility[flagKeywords.flag]
+    ? [...keywords, ...flagKeywords.keywords]
+    : [...keywords];
 }

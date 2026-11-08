@@ -14,6 +14,7 @@ if (!isIsolatedTestWorker(import.meta.url)) {
   );
 } else {
   await import("./utils/infrastructure");
+  await import("./utils/web-analytics-flag");
   const { database, initializeDatabase, seedProject } =
     await import("./utils/database");
   const client = await import("@notra/analytics/tinybird/client");
@@ -28,6 +29,7 @@ if (!isIsolatedTestWorker(import.meta.url)) {
     queryWebSources: empty,
     queryWebHosts: empty,
     queryWebAiOutcomes: empty,
+    queryWebEngagement: empty,
     queryWebAudience: async (params: { dimension: string }) => ({
       data: [
         {

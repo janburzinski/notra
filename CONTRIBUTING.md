@@ -608,6 +608,8 @@ a header the proxy overwrites with exactly one client IP (nginx:
 Never set it on a server that clients reach directly: they could then send
 any address and dodge the limits. Without a trusted header, every client
 shares one `unknown` bucket per limit, and production logs a warning once.
+The same address keys `/api/collect` visitors (with the user agent and a daily
+salt) and their country, so a self-hosted ingest without it merges visitors.
 
 ## Demo deployments on Unkey Compute
 

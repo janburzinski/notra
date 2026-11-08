@@ -7,21 +7,27 @@ import { useLocale, useTranslations } from "use-intl";
 import { GeoCountCell } from "@/components/geo/geo-count-cell";
 import { WebAnalyticsEmpty } from "@/components/geo/web-analytics-empty";
 import { WEB_TABLE_ROW_HEIGHT } from "@/constants/web-analytics";
-import type { WebBreakdownRow, WebBreakdownTableProps } from "@/types/geo";
+import type {
+  WebBreakdownGridProps,
+  WebBreakdownRow,
+  WebBreakdownTableProps,
+} from "@/types/geo";
 import { formatChartInteger } from "@/utils/geo-charts";
 import { geoCountColumnWidth } from "@/utils/geo-count-column-width";
 import { formatVisibleDuration, webTableHeight } from "@/utils/web-analytics";
 
-export function WebBreakdownTable({
-  title,
+function WebBreakdownGrid({
   nameHeader,
   valueHeader,
   rows,
   height,
   showFromAi = false,
   showAvgTime = false,
+  compare = true,
+  emptyState,
   loading = false,
-}: WebBreakdownTableProps) {
+  nameSortable = true,
+}: WebBreakdownGridProps) {
   const t = useTranslations("geo.webVisitors");
   const tCommon = useTranslations("common");
   const locale = useLocale();
@@ -31,7 +37,7 @@ export function WebBreakdownTable({
       key: "name",
       header: nameHeader,
       width: "1fr",
-      sortable: true,
+      sortable: nameSortable,
       cell: (row) => (
         <span className="flex min-w-0 items-center gap-2 text-sm">
           {row.label}
@@ -75,37 +81,53 @@ export function WebBreakdownTable({
   columns.push({
     key: "value",
     header: valueHeader,
-    width: geoCountColumnWidth(
-      rows.map((row) => ({ value: row.value, previousValue: row.previous })),
-      locale,
-      tCommon("labels.new")
-    ),
+    width: compare
+      ? geoCountColumnWidth(
+          rows.map((row) => ({
+            value: row.value,
+            previousValue: row.previous,
+          })),
+          locale,
+          tCommon("labels.new")
+        )
+      : "5.5rem",
     align: "right",
     sortable: true,
-    cell: (row) => (
-      <GeoCountCell
-        label={row.sortLabel}
-        previousValue={row.previous}
-        unavailableHint={t("comparisonUnavailable")}
-        value={row.value}
-      />
-    ),
+    cell: (row) =>
+      compare ? (
+        <GeoCountCell
+          label={row.sortLabel}
+          previousValue={row.previous}
+          unavailableHint={t("comparisonUnavailable")}
+          value={row.value}
+        />
+      ) : (
+        <span className="text-sm tabular-nums">
+          {formatChartInteger(row.value, locale)}
+        </span>
+      ),
     sortValue: (row) => row.value,
   });
   return (
+    <DataTable
+      columns={columns}
+      data={rows}
+      defaultSort={{ key: "value", direction: "desc" }}
+      emptyState={emptyState ?? <WebAnalyticsEmpty />}
+      getRowId={(row) => row.key}
+      height={tableHeight}
+      loading={loading}
+      minHeight={tableHeight}
+      rowHeight={WEB_TABLE_ROW_HEIGHT}
+      scrollFade={false}
+    />
+  );
+}
+
+export function WebBreakdownTable({ title, ...grid }: WebBreakdownTableProps) {
+  return (
     <InstrumentSection eyebrow={title}>
-      <DataTable
-        columns={columns}
-        data={rows}
-        defaultSort={{ key: "value", direction: "desc" }}
-        emptyState={<WebAnalyticsEmpty />}
-        getRowId={(row) => row.key}
-        height={tableHeight}
-        loading={loading}
-        minHeight={tableHeight}
-        rowHeight={WEB_TABLE_ROW_HEIGHT}
-        scrollFade={false}
-      />
+      <WebBreakdownGrid {...grid} />
     </InstrumentSection>
   );
 }

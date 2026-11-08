@@ -1,9 +1,11 @@
+import { WEB_ANALYTICS_NAV_LINK } from "@/constants/geo-traffic-pages";
 import type { LogDestination } from "@/types/logs/details-sheet";
 import type { IntegrationType } from "@/types/webhooks/webhooks";
 
 export function getLogDestination(
   source: IntegrationType,
-  slug: string
+  slug: string,
+  webAnalytics: boolean
 ): LogDestination | null {
   if (!slug) {
     return null;
@@ -25,7 +27,12 @@ export function getLogDestination(
     };
   }
   if (source === "search-console") {
-    return { href: `${base}/geo/traffic`, labelKey: "openTraffic" };
+    return webAnalytics
+      ? {
+          href: `${base}${WEB_ANALYTICS_NAV_LINK}`,
+          labelKey: "openWebAnalytics",
+        }
+      : { href: `${base}/geo/traffic`, labelKey: "openTraffic" };
   }
   if (source === "brand") {
     return { href: `${base}/brand/identity`, labelKey: "openBrandIdentity" };

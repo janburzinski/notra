@@ -232,6 +232,16 @@ export function trafficGroupTopPages(
     .slice(0, limit);
 }
 
+/**
+ * Whether the previous period recorded any AI visit. Without one every
+ * comparison would read "New", which says nothing.
+ */
+export function hasPreviousTraffic(
+  sources: readonly GeoTrafficSource[]
+): boolean {
+  return sources.some((source) => (source.previousVisits ?? 0) > 0);
+}
+
 export function trafficGroupPreviousVisits(
   group: GeoTrafficSourceGroup
 ): number | null {

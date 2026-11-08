@@ -27,6 +27,7 @@ import type {
 import {
   buildTrafficGroupSeries,
   groupTrafficSources,
+  hasPreviousTraffic,
   trafficGroupKey,
   trafficGroupPathsAreLowerBound,
   withSourcePaths,
@@ -41,6 +42,7 @@ export function AiTrafficCard({
   pages,
   range,
   settingsHref,
+  crawlerSetup,
   isPending = false,
   showHero = true,
 }: AiTrafficCardProps) {
@@ -59,7 +61,10 @@ export function AiTrafficCard({
   );
   const pathsPending = sourcePaths === undefined;
   const previousTotals = useMemo(
-    () => toGeoTrafficPreviousTotals(sources, previousConversions),
+    () =>
+      hasPreviousTraffic(sources)
+        ? toGeoTrafficPreviousTotals(sources, previousConversions)
+        : null,
     [sources, previousConversions]
   );
   const groups = useMemo(
@@ -162,6 +167,7 @@ export function AiTrafficCard({
     <div className="flex flex-col gap-6">
       {showHero ? (
         <MemoTrafficHero
+          crawlerSetup={crawlerSetup}
           groups={groups}
           points={points}
           previousTotals={previousTotals}

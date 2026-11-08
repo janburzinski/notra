@@ -1,5 +1,7 @@
 import { PGlite } from "@electric-sql/pglite";
 import {
+  analyticsImportConnections,
+  analyticsImports,
   brandSettings,
   brandSitemaps,
   brandSitemapPages,
@@ -40,6 +42,8 @@ import type { ScanSettingsInput } from "../types/fixtures";
 
 const schema = {
   users,
+  analyticsImportConnections,
+  analyticsImports,
   geoPrompts,
   geoPromptSuggestions,
   geoAgentReadinessReports,

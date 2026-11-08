@@ -10,6 +10,8 @@ import { isEngagement } from "./ingest";
 const SEARCH_REFERRER = "https://www.google.com/";
 const CAPLESS_ORIGIN = new URL(capless.script).origin;
 const INSIGHTS_SCRIPT = 'script[src$="/_notra/insights.js"]';
+// The script skips views shorter than 1 ms, so a test stays on a page briefly.
+const VISIBLE_BEFORE_LEAVING_MS = 50;
 
 function isViewBeacon(url: string, method: string, body: string | null) {
   return (
@@ -151,6 +153,7 @@ export async function assertConsentVisits(options: {
       request.postData()?.includes(`"p":"${new URL(next).pathname}","ms":`) ===
         true
   );
+  await page.waitForTimeout(VISIBLE_BEFORE_LEAVING_MS);
   await page.evaluate(() => window.dispatchEvent(new Event("pagehide")));
   assert.equal((await (await nextEngagement).response())?.status(), 204);
   await settle();

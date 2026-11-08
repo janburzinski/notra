@@ -30,6 +30,7 @@ interface ApiVariables {
   log: RequestLogger;
   db: GeoRequestContext["db"];
   geo: GeoRequestContext;
+  webAnalyticsEnabled?: Promise<boolean>;
 }
 
 export interface ApiEnv {

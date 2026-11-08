@@ -9,5 +9,7 @@ if [ "${VERCEL_ENV:-}" = "production" ]; then
   DATABASE_URL="${MIGRATION_DATABASE_URL:-${DATABASE_URL:-}}" bun run db:migrate
   if [ -n "${TINYBIRD_TOKEN:-}" ] && [ -n "${TINYBIRD_BASE_URL:-}" ]; then
     (cd packages/analytics && bun run tinybird:deploy)
+  else
+    echo "Skipping Tinybird deploy: TINYBIRD_TOKEN or TINYBIRD_BASE_URL is unset" >&2
   fi
 fi

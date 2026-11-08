@@ -7,6 +7,7 @@ import {
 } from "../cache/query-cache";
 import type {
   PurgeGeoProjectInput,
+  PurgeImportedRowsInput,
   PurgeOrganizationInput,
   PurgeSiteInput,
   PurgeSocialAccountInput,
@@ -26,24 +27,47 @@ const GEO_DATASOURCES = [
   "geo_traffic_events",
   "geo_traffic_daily",
   "geo_traffic_pages_by_host_daily",
+  "geo_imported_daily",
 ];
 const WEB_DATASOURCES = [
   "web_page_views",
   "web_page_engagement",
+  "web_events",
+  "web_errors",
   "web_pages_daily",
   "web_sources_daily",
   "web_audience_daily",
 ];
 const MCP_DATASOURCES = ["mcp_events", "mcp_daily"];
+// History imports are per project and never site scoped.
+const IMPORTED_DATASOURCES = ["web_imported_daily", "geo_imported_daily"];
 
 const JOB_POLL_INTERVAL_MS = 1000;
 const JOB_POLL_MAX_ATTEMPTS = 60;
 const TINYBIRD_READ_TIMEOUT_MS = 10_000;
 const TINYBIRD_MUTATION_TIMEOUT_MS = 30_000;
 
-function sanitize(value: string): string {
-  return value.replace(/['"\\]/g, "");
+const ID_PATTERN = /^[\w-]+$/;
+// Account ids come from the platforms (numbers, URNs, DIDs such as did:plc:…).
+const EXTERNAL_ID_PATTERN = /^[\w.:@+=/-]+$/;
+const DAY_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
+
+/**
+ * A value as a quoted literal for a delete condition. Only values that match
+ * their allowlist are used; anything else refuses the purge rather than
+ * altering a value and deleting a different set of rows.
+ */
+function literal(value: string, pattern: RegExp, field: string): string {
+  if (!pattern.test(value)) {
+    throw new Error(`Refusing a Tinybird delete with an invalid ${field}`);
+  }
+  return `'${value}'`;
 }
+
+const id = (value: string, field: string) => literal(value, ID_PATTERN, field);
+
+/** Every datasource once, however many groups list it. */
+const unique = (...groups: string[][]) => [...new Set(groups.flat())];
 
 function tinybirdBaseUrl(): string {
   return (
@@ -186,13 +210,13 @@ async function submitDeletes(
   }
 }
 
-export function purgeSocialAccountData(
+export async function purgeSocialAccountData(
   input: PurgeSocialAccountInput
 ): Promise<void> {
   if (!process.env.TINYBIRD_TOKEN) {
-    return Promise.resolve();
+    return;
   }
-  const condition = `organization_id = '${sanitize(input.organizationId)}' AND provider = '${sanitize(input.provider)}' AND provider_account_id = '${sanitize(input.providerAccountId)}'`;
+  const condition = `organization_id = ${id(input.organizationId, "organization id")} AND provider = ${id(input.provider, "provider")} AND provider_account_id = ${literal(input.providerAccountId, EXTERNAL_ID_PATTERN, "account id")}`;
   const program = Effect.gen(function* () {
     yield* Effect.forEach(
       ACCOUNT_SCOPED_DATASOURCES,
@@ -203,16 +227,16 @@ export function purgeSocialAccountData(
       bumpAnalyticsVersions("social", [input.organizationId])
     );
   });
-  return Effect.runPromise(program);
+  await Effect.runPromise(program);
 }
 
-export function purgeGeoProjectData(
+export async function purgeGeoProjectData(
   input: PurgeGeoProjectInput
 ): Promise<void> {
   if (!process.env.TINYBIRD_TOKEN) {
-    return Promise.resolve();
+    return;
   }
-  const condition = `organization_id = '${sanitize(input.organizationId)}' AND project_id = '${sanitize(input.projectId)}'`;
+  const condition = `organization_id = ${id(input.organizationId, "organization id")} AND project_id = ${id(input.projectId, "project id")}`;
   const program = Effect.gen(function* () {
     yield* Effect.forEach(
       GEO_DATASOURCES,
@@ -223,7 +247,7 @@ export function purgeGeoProjectData(
       advancePurgeGeneration("geo", input.organizationId)
     );
   });
-  return Effect.runPromise(program);
+  await Effect.runPromise(program);
 }
 
 /**
@@ -231,40 +255,70 @@ export function purgeGeoProjectData(
  * purge only submits the delete jobs: nothing reads a deleted project, so the
  * request does not wait for Tinybird. The delayed purge waits for them.
  */
-export function purgeDeletedProjectAnalytics(
+export async function purgeDeletedProjectAnalytics(
   input: PurgeGeoProjectInput,
   waitForJobs = false
 ): Promise<void> {
-  return submitDeletes(
-    [...GEO_DATASOURCES, ...WEB_DATASOURCES, ...MCP_DATASOURCES],
-    `organization_id = '${sanitize(input.organizationId)}' AND project_id = '${sanitize(input.projectId)}'`,
+  await submitDeletes(
+    unique(
+      GEO_DATASOURCES,
+      WEB_DATASOURCES,
+      MCP_DATASOURCES,
+      IMPORTED_DATASOURCES
+    ),
+    `organization_id = ${id(input.organizationId, "organization id")} AND project_id = ${id(input.projectId, "project id")}`,
     waitForJobs
   );
 }
 
-export function purgeDeletedOrganizationAnalytics(
+export async function purgeDeletedOrganizationAnalytics(
   input: PurgeOrganizationInput,
   waitForJobs = false
 ): Promise<void> {
-  return submitDeletes(
-    [
-      ...ACCOUNT_SCOPED_DATASOURCES,
-      ...GEO_DATASOURCES,
-      ...WEB_DATASOURCES,
-      ...MCP_DATASOURCES,
-    ],
-    `organization_id = '${sanitize(input.organizationId)}'`,
+  await submitDeletes(
+    unique(
+      ACCOUNT_SCOPED_DATASOURCES,
+      GEO_DATASOURCES,
+      WEB_DATASOURCES,
+      MCP_DATASOURCES,
+      IMPORTED_DATASOURCES
+    ),
+    `organization_id = ${id(input.organizationId, "organization id")}`,
     waitForJobs
   );
 }
 
-export function purgeDeletedSiteAnalytics(
+export async function purgeDeletedSiteAnalytics(
   input: PurgeSiteInput,
   waitForJobs = false
 ): Promise<void> {
-  return submitDeletes(
-    [...GEO_DATASOURCES, ...WEB_DATASOURCES],
-    `organization_id = '${sanitize(input.organizationId)}' AND site_id = '${sanitize(input.siteId)}'`,
+  await submitDeletes(
+    unique(GEO_DATASOURCES, WEB_DATASOURCES),
+    `organization_id = ${id(input.organizationId, "organization id")} AND site_id = ${id(input.siteId, "site id")}`,
     waitForJobs
+  );
+}
+
+/**
+ * Deletes one import's rows, optionally only the days of one chunk, and waits
+ * for Tinybird so a retried chunk never writes on top of its earlier attempt.
+ */
+export async function purgeImportedRows(
+  input: PurgeImportedRowsInput
+): Promise<void> {
+  if (!process.env.TINYBIRD_TOKEN) {
+    return;
+  }
+  const days =
+    input.fromDay && input.toDay
+      ? ` AND day >= toDate(${literal(input.fromDay, DAY_PATTERN, "day")}) AND day <= toDate(${literal(input.toDay, DAY_PATTERN, "day")})`
+      : "";
+  const condition = `organization_id = ${id(input.organizationId, "organization id")} AND import_id = ${id(input.importId, "import id")}${days}`;
+  await Effect.runPromise(
+    Effect.forEach(
+      IMPORTED_DATASOURCES,
+      (datasource) => deleteFromDatasource(datasource, condition),
+      { discard: true }
+    )
   );
 }

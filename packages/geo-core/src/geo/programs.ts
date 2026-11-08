@@ -156,6 +156,7 @@ import { toGeoPromptResult } from "../utils/geo-prompt-results";
 import { normalizePromptTags } from "../utils/geo-prompt-tags";
 import { groupGeoSparklinePoints } from "../utils/geo-sparkline";
 import { memoizeGeoRequest } from "../utils/request-memo";
+import { loadCompletedImportIds } from "./analytics-imports";
 import { competitorKey, normalizeCompetitorDomain } from "./domain";
 import { geoDb, geoQuery, geoRequiredQuery, geoSkip } from "./effect";
 import {
@@ -1382,20 +1383,30 @@ export const loadAiTraffic = Effect.fn("geo.aiTraffic")(function* (
   const settingsRow = yield* loadScopeSettingsRow(scope.projectId);
   const conversionPaths = settingsRow?.conversionPaths ?? [];
   const query = siteId && isTinybirdConfigured() ? geoRequiredQuery : geoQuery;
+  const imports = yield* loadCompletedImportIds(
+    scope.organizationId,
+    siteId ? null : scope.projectId,
+    "geo"
+  );
 
   const [overview, timeseries, conversionPages] = yield* Effect.all(
     [
       query("traffic overview query failed", () =>
-        queryGeoTrafficOverview({ ...params, with_paths: withPaths ? 1 : 0 })
+        queryGeoTrafficOverview({
+          ...params,
+          imports,
+          with_paths: withPaths ? 1 : 0,
+        })
       ),
       query("traffic timeseries query failed", () =>
-        queryGeoTrafficTimeseries(params)
+        queryGeoTrafficTimeseries({ ...params, imports })
       ),
       conversionPaths.length === 0
         ? Effect.succeed(null)
         : query("traffic conversion pages query failed", () =>
             queryGeoTrafficPages({
               ...params,
+              imports,
               limit: AI_TRAFFIC_PAGES_FETCH_LIMIT,
               visitor: "ai_referral",
             })
@@ -1443,7 +1454,7 @@ export const loadAiTrafficSources = Effect.fn("geo.aiTrafficSources")(
     path = "",
     sites: GeoTrafficSitesMode | undefined = undefined
   ) {
-    const { params } = yield* aiTrafficParams(
+    const { scope, params } = yield* aiTrafficParams(
       input,
       window,
       hosts,
@@ -1451,8 +1462,13 @@ export const loadAiTrafficSources = Effect.fn("geo.aiTrafficSources")(
       path,
       sites
     );
+    const imports = yield* loadCompletedImportIds(
+      scope.organizationId,
+      scope.projectId,
+      "geo"
+    );
     const overview = yield* geoQuery("traffic sources query failed", () =>
-      queryGeoTrafficOverview({ ...params, with_paths: 1 })
+      queryGeoTrafficOverview({ ...params, imports, with_paths: 1 })
     );
     const response: AiTrafficSourcesResponse = {
       configured: isTinybirdConfigured(),
@@ -1638,11 +1654,17 @@ export const loadGeoTrafficPages = Effect.fn("geo.trafficPages")(function* (
   sites: GeoTrafficSitesMode | undefined = undefined
 ) {
   const scope = yield* resolveGeoScope(input);
+  const imports = yield* loadCompletedImportIds(
+    scope.organizationId,
+    scope.projectId,
+    "geo"
+  );
   const pages = yield* geoQuery("traffic pages query failed", () =>
     queryGeoTrafficPages({
       ...geoScopeParams(scope),
       ...geoHiddenSourceParams(),
       ...geoTrafficWindowParams(window, AI_TRAFFIC_DEFAULT_DAYS),
+      imports,
       limit: limit ?? AI_TRAFFIC_DEFAULT_PAGES_LIMIT,
       visitor: visitorType ?? "",
       host: trafficLogHostFilter(host),

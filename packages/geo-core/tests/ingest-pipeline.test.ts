@@ -41,7 +41,10 @@ const SITE = {
 const loadSite = async (siteId: string) => (siteId === SITE.id ? SITE : null);
 const loadIngestSite = mock(loadSite);
 const loadOrganizationSitePrefixes = mock(
-  async (): Promise<{ host: string; mounts: string[] }[] | null> => []
+  async (
+    _organizationId: string,
+    _recent?: boolean
+  ): Promise<{ host: string; mounts: string[] }[] | null> => []
 );
 const resolveJourneyId = mock(() => ({ journeyId: "journey_1", path: "/" }));
 const ingestWebPageViews = mock(async (_rows: WebPageViewRow[]) => ({
@@ -69,12 +72,15 @@ mock.module("@notra/analytics/tinybird/client", () => ({
   ingestMcpEvents: ingestGeoTrafficEvents,
   ingestWebPageEngagement,
   ingestWebPageViews,
+  ingestWebEvents: ingestWebPageEngagement,
+  ingestWebErrors: ingestWebPageEngagement,
 }));
 mock.module("@notra/geo-core/geo/ingest", () => ({
   verifyGeoIngestToken,
   verifyGeoIngestSiteToken,
   isGeoIngestSiteToken: (token: string) => token.startsWith("nst."),
   getGeoIngestTokenGeneration,
+  getGeoWebKeyGeneration: async () => 0,
   geoIngestHostsCacheKey: () => "hosts:key",
   getGeoIngestSecret: () => "test-secret",
 }));
@@ -99,6 +105,9 @@ mock.module("../src/ingest/ratelimit", () => ({
   geoIngestRatelimit: { limit: ratelimitLimit },
   webIngestRatelimit: { limit: webRatelimitLimit },
   geoIngestAdmissionRatelimit: { limit: async () => ({ success: true }) },
+  webNetworkRatelimit: { limit: async () => ({ success: true }) },
+  webSharedNetworkRatelimit: { limit: async () => ({ success: true }) },
+  webAiRatelimit: { limit: async () => ({ success: true }) },
 }));
 
 const { runGeoIngest } = await import("../src/ingest/pipeline");
@@ -579,6 +588,11 @@ describe("runGeoIngest ordering", () => {
       _tag: "Success",
       success: { outcome: "dropped", reason: "site" },
     });
+    // Server tokens never keep the lookup in process; only public keys do.
+    expect(loadOrganizationSitePrefixes.mock.lastCall).toEqual([
+      expect.any(String),
+      false,
+    ]);
     const outside = await run(
       ingestRequest({
         method: "GET",

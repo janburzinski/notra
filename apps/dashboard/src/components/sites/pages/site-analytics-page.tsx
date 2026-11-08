@@ -105,7 +105,6 @@ export function SiteAnalyticsPage() {
           <WebVisitorsSection
             engagement={data.engagement}
             range={geoRange.query}
-            traffic={data.traffic}
             web={data.web}
           />
         </div>

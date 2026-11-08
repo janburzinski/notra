@@ -25,6 +25,7 @@ import { trimTrailingSlash } from "hono/trailing-slash";
 
 import { DEMO_API_URL } from "./constants/demo";
 import { API_MAX_BODY_BYTES } from "./constants/request-limits";
+import { WEB_ANALYTICS_ROUTE_PATHS } from "./constants/web-analytics";
 import { apiAnalyticsMiddleware } from "./middleware/analytics";
 import { authMiddleware } from "./middleware/auth";
 import { apiCompressionMiddleware } from "./middleware/compression";
@@ -39,6 +40,7 @@ import {
   apiObservabilityMiddleware,
 } from "./middleware/observability";
 import { subscriptionMiddleware } from "./middleware/subscription";
+import { webAnalyticsMiddleware } from "./middleware/web-analytics";
 import { agentChatsRoutes } from "./routes/agent-chats";
 import { brandColorsRoutes } from "./routes/brand-colors";
 import { brandIdentitiesRoutes } from "./routes/brand-identities";
@@ -58,6 +60,7 @@ import { geoSettingsRoutes } from "./routes/geo-settings";
 import { geoShelfRoutes } from "./routes/geo-shelf";
 import { geoTrafficRoutes } from "./routes/geo-traffic";
 import { geoVisibilityRoutes } from "./routes/geo-visibility";
+import { geoWebAnalyticsRoutes } from "./routes/geo-web-analytics";
 import { integrationsRoutes } from "./routes/integrations";
 import { legacyRedirectRoutes } from "./routes/legacy-redirects";
 import { postAgentReachRoutes } from "./routes/post-agent-reach";
@@ -308,6 +311,10 @@ app.use("/v1/geo/ingest/*", requireGeoEntitlement);
 app.use("/v1/projects/*", geoContextMiddleware());
 app.use("/v1/projects/:projectId/*", geoProjectContextMiddleware());
 app.use("/v1/geo/ingest/*", geoContextMiddleware());
+const requireWebAnalytics = webAnalyticsMiddleware();
+for (const path of WEB_ANALYTICS_ROUTE_PATHS) {
+  app.use(path, requireWebAnalytics);
+}
 
 // evlog-map-disable-next-line -- liveness probe
 app.get("/", (c) => {
@@ -389,6 +396,7 @@ app.route("/v1", geoShelfRoutes);
 app.route("/v1", geoBriefsRoutes);
 app.route("/v1", geoAgentReadinessRoutes);
 app.route("/v1", geoTrafficRoutes);
+app.route("/v1", geoWebAnalyticsRoutes);
 app.route("/v2", agentChatsRoutes);
 
 app.openAPIRegistry.registerComponent("securitySchemes", "BearerAuth", {

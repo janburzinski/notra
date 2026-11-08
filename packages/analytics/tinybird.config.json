@@ -5,6 +5,7 @@
     "src/tinybird/pipes/geo-traffic.ts",
     "src/tinybird/pipes/geo-traffic-trends.ts",
     "src/tinybird/pipes/web.ts",
+    "src/tinybird/pipes/web-events.ts",
     "src/tinybird/pipes/mcp.ts"
   ],
   "token": "${TINYBIRD_TOKEN}",

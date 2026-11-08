@@ -25,6 +25,7 @@ export interface LogDestination {
     | "openGeo"
     | "openAgentReadiness"
     | "openTraffic"
+    | "openWebAnalytics"
     | "openBrandIdentity"
     | "manageIntegration"
     | "openIntegrations";

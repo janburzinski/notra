@@ -12,3 +12,9 @@ export function sanitizeGeoReferer(value: string | undefined): string {
     return "";
   }
 }
+
+/** The referrer's origin alone, for referrers a browser reported. */
+export function sanitizeGeoRefererOrigin(value: string | undefined): string {
+  const referer = sanitizeGeoReferer(value);
+  return referer ? new URL(referer).origin : "";
+}

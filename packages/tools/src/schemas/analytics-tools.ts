@@ -113,6 +113,41 @@ export const getWebAnalyticsInputSchema = z.object({
   ...analyticsRangeFields,
 });
 
+const hostField = z
+  .string()
+  .min(1)
+  .optional()
+  .describe(
+    "Only count this domain, such as www.example.com. Subdomains match."
+  );
+
+const rowLimitField = z
+  .number()
+  .int()
+  .min(1)
+  .max(50)
+  .default(10)
+  .describe("Maximum rows per list.");
+
+export const getAiTrafficInputSchema = z.object({
+  projectId: projectIdField,
+  host: hostField,
+  limit: rowLimitField,
+  ...analyticsRangeFields,
+});
+
+export const getWebAnalyticsReportsInputSchema = z.object({
+  projectId: projectIdField,
+  host: hostField,
+  path: z
+    .string()
+    .startsWith("/")
+    .optional()
+    .describe("Only count this exact page path, such as /pricing."),
+  limit: rowLimitField,
+  ...analyticsRangeFields,
+});
+
 export const getAbTestsInputSchema = z.object({});
 
 export const createAbTestInputSchema = z.object({

@@ -1,0 +1,97 @@
+---
+title: "Import your history"
+sidebarTitle: "Import your history"
+description: "Bring daily page views, sources and AI crawler hits from Plausible, Vercel Web Analytics or Cloudflare into Notra, so your charts start on day one."
+authors:
+  - handle: dominik
+
+docolin:
+  schema_version: 1
+  kind: tools/notra/ai-traffic/import-history
+  type: how-to
+  applies_to:
+    - notra
+  language: en
+  status: stable
+---
+
+Notra starts counting when you install the tracker. To see the months before that, import the history your previous analytics tool kept. Imported days show up on the **Web analytics** tab next to what Notra tracks now, in the same charts, page lists, sources and audience breakdowns.
+
+<Info>
+  Importing history is part of the web analytics private beta. If **Import history** is missing from **Settings → Tracking**, or only lets you delete earlier imports and disconnect accounts, email [hello@usenotra.com](mailto:hello@usenotra.com) or ask on [Discord](https://www.usenotra.com/discord) and we'll turn it on for your workspace.
+</Info>
+
+Open **Settings → Tracking → Import history**, or **Import history** on the **Web analytics** tab while it has no data yet, and pick a source.
+
+## What you can import
+
+| Source | What you get | How far back | What you need |
+|---|---|---|---|
+| Plausible export (ZIP) | Pages, entry pages, sources and UTM campaigns, countries, devices, browsers, operating systems | Everything since the site started | Any Plausible plan |
+| Plausible API | The same data, fetched for you | Everything since the site started | Stats API key (Plausible Business plan) |
+| Cloudflare | AI crawler hits per page (GPTBot, ClaudeBot, PerplexityBot…) | What your plan keeps (Notra asks Cloudflare; often a week on Free, about a month on paid plans) | API token |
+| Cloudflare Web Analytics | Page views and visits per page, referrer, country, device, browser, OS | What your account keeps (about 6 months) | API token |
+| Vercel Web Analytics | Page views and visitors per page, referrer, country, device, browser, OS, UTM source | Hobby 1 month, Pro 12 months, Pro with Web Analytics Plus and Enterprise 24 months | Access token |
+
+## How imports fit with Notra's own data
+
+- **No day is counted twice.** An import stops the day before Notra recorded its first visit for that domain. If Notra already has data, only the days before it are imported.
+- **A source is never imported twice for the same day.** Importing the same site or the same export again only adds the days that are still missing.
+- **Imports appear when they finish.** A running import stays hidden, so you never see a half-imported month. Large imports run in the background in small steps, newest days first; you can close the dialog, keep working and come back. If a source asks Notra to slow down, the import waits and continues where it stopped.
+- **Visitors are daily uniques.** Like Notra and Plausible, visitors over a range are the sum of each day's unique visitors.
+- **Some sources lack some metrics.** Vercel has no sessions or bounces, and Cloudflare Web Analytics has no unique visitors. Cloudflare numbers are sampled estimates. Those metrics read as zero for imported days.
+- **Filters by page keep imported page views.** Sources, campaigns and audience breakdowns can't be filtered by page for imported days, the same limit Plausible has.
+
+## Import several sites
+
+You can import as many sites as you like, also into one domain. After **Start import**, select **Import another site** to pick the next one while the first keeps running. Charts update and a notice appears when an import finishes, wherever you are in Notra; while imports run, **Importing … sites** shows their progress on the **Web analytics** tab and in **Settings → Tracking**.
+
+- **One account, one import at a time.** Imports through the same connection run in the order you started them, so they share the provider's rate limit without slowing each other down. A queued import shows **Waiting for … to finish** and starts on its own right after.
+- **Days another source already has.** When the new import covers days another source already imported for the same domain (or its `www` alias or subdomains), **Check range** shows which days and lets you choose:
+  - **Skip those days** (preselected): the same site was tracked twice, for example in Plausible and in Vercel. Only the missing days are imported.
+  - **Add together**: two different sites should count as one, for example two Vercel projects for `acme.com`. Both sources' numbers are added for those days.
+
+Notra recognises a Plausible export by its content, so uploading the same ZIP again counts as the same source, while a different export of the same domain is another source.
+
+## Plausible export (every plan)
+
+1. In Plausible, open **Site settings → Imports & Exports** and choose **Export to CSV**. Plausible emails you a ZIP file.
+2. In Notra, open **Import history → Plausible export** and upload the ZIP as it is. Don't unzip it.
+3. Check the domain, select **Check export** and review the date range and page views, then **Start import**.
+
+Notra reads the `imported_*.csv` files in the export (up to 200 MB zipped). It skips custom events and exit pages, drops region and city columns, and strips query strings from page paths. The uploaded ZIP is stored encrypted with its own key while the import runs and deleted when it finishes, or within two days if you never start the import.
+
+## Plausible API (Business plan)
+
+1. In Plausible, open **Account settings → API Keys → New API key**, choose **Stats API** and the team that owns the site.
+2. In Notra, choose **Plausible API**, paste the key and select **Connect**.
+3. Pick the site, check the domain and select **Check range**, then **Start import**.
+
+A Stats API key is read-only. Notra uses at most 400 requests an hour of the key's 600-per-hour limit and pauses when Plausible asks it to slow down.
+
+## Cloudflare
+
+Create a [custom API token](https://dash.cloudflare.com/profile/api-tokens) with these read-only permissions:
+
+- **Zone → Analytics → Read**, for AI crawler hits
+- **Zone → Zone → Read**, to list your zones
+- **Account → Account Analytics → Read**, for Web Analytics page views
+- **Account → Account Settings → Read**, to list your Web Analytics sites
+
+Paste the token in **Import history → Cloudflare**. Zones import AI crawler hits; Web Analytics sites import page views. Notra asks Cloudflare only for requests whose user agent matches a known AI crawler. It never requests IP addresses or query strings, and it drops vulnerability-scanner paths such as `/.env` and requests outside your project's domain. Cloudflare marks bots it has verified; Notra keeps that flag but includes unverified hits, which are often spoofed.
+
+## Vercel Web Analytics
+
+1. Create an access token under **Account Settings → Tokens**, scoped to the team that owns the project, with an expiration. Vercel tokens can't be limited to read access; Notra only uses it to list projects and read Web Analytics, and you can delete the token once the import is done.
+2. Copy the team ID (`team_…`) from **Team Settings → General**. Leave it empty for personal projects.
+3. Choose **Vercel Web Analytics**, paste both, pick the project and start the import.
+
+Only production traffic is imported. Vercel returns the top 100 values per day for each breakdown, so page and referrer lists can add up to less than the daily total. UTM campaigns need Web Analytics Plus.
+
+## Delete an import or disconnect
+
+Every import is listed in **Import history** with its date range, page views and progress. If an import stops unexpectedly, Notra resumes it from the last finished step; if it can't, the import shows as failed and you can start it again. **Delete import** removes its rows right away, also while it is still running. If a key stops working, the connection shows **Reconnect needed**; **Reconnect** replaces the key and keeps the connection. **Disconnect** deletes the stored key; choose **Disconnect and delete imports** to remove the imported data as well. Deleting a project or organization deletes its imports too.
+
+## Privacy
+
+Imports contain only daily totals per page, source, country, device, browser or operating system. Notra never imports IP addresses, user agents of people, query strings, cities or regions, and it aggregates any finer data in memory before storing it. Keys are encrypted, used only to read analytics and deleted when you disconnect.

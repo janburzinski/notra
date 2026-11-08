@@ -162,6 +162,7 @@ if (!process.env.NOTRA_SITE_ANALYTICS_TEST_WORKER) {
     expect(
       props?.data.every((row) => row.people === 0 && row.agents === 0)
     ).toBe(true);
+    expect(Object.keys(props?.config ?? {})).toEqual(["people"]);
     const axis = Children.toArray(props?.children).find(
       (child) =>
         isValidElement(child) &&

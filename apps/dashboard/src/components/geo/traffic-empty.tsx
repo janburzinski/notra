@@ -6,7 +6,11 @@ import { EmptyStateTrafficPreview } from "@/components/empty-state-preview";
 import { GeoIngestSetup } from "@/components/geo/geo-ingest-setup";
 import type { TrafficEmptyProps } from "@/types/geo";
 
-export function TrafficEmpty({ setup }: TrafficEmptyProps) {
+export function TrafficEmpty({
+  setup,
+  defaultMethod,
+  description,
+}: TrafficEmptyProps) {
   const t = useTranslations("geo.trafficEmpty");
   return (
     <div className="relative w-full overflow-hidden rounded-2xl">
@@ -21,10 +25,10 @@ export function TrafficEmpty({ setup }: TrafficEmptyProps) {
       <div className="relative z-10 mx-auto flex w-full max-w-2xl flex-col items-center px-6 pt-8 pb-4 text-center">
         <h3 className="text-lg font-semibold text-balance">{t("title")}</h3>
         <p className="text-muted-foreground mt-1.5 max-w-md text-sm leading-relaxed text-pretty">
-          {t("description")}
+          {description ?? t("description")}
         </p>
         <div className="mt-6 w-full text-left">
-          <GeoIngestSetup setup={setup} />
+          <GeoIngestSetup defaultMethod={defaultMethod} setup={setup} />
         </div>
       </div>
     </div>

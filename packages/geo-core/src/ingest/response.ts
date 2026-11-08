@@ -10,6 +10,7 @@ const HTTP_TOO_MANY_REQUESTS = 429;
 const HTTP_BAD_GATEWAY = 502;
 const HTTP_ACCEPTED = 202;
 const HTTP_OK = 200;
+const HTTP_NO_CONTENT = 204;
 const HTTP_PAYLOAD_TOO_LARGE = 413;
 
 export function toGeoIngestAcceptedResponse(): Response {
@@ -17,6 +18,29 @@ export function toGeoIngestAcceptedResponse(): Response {
     { ok: true },
     { status: HTTP_ACCEPTED, headers: NO_STORE }
   );
+}
+
+const WEB_COLLECT_CORS_HEADERS = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type",
+  "Access-Control-Max-Age": "86400",
+};
+
+/** Lets any page read the answer, so beacons never surface CORS errors. */
+export function withWebCollectCors(response: Response): Response {
+  for (const [name, value] of Object.entries(WEB_COLLECT_CORS_HEADERS)) {
+    response.headers.set(name, value);
+  }
+  return response;
+}
+
+export function toWebCollectAcceptedResponse(): Response {
+  return new Response(null, { status: HTTP_NO_CONTENT, headers: NO_STORE });
+}
+
+export function webCollectPreflightResponse(): Response {
+  return withWebCollectCors(toWebCollectAcceptedResponse());
 }
 
 export function toGeoDrainAcceptedResponse(

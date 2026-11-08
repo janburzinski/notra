@@ -1,5 +1,11 @@
 import { HydrationBoundary } from "@tanstack/react-query";
-import { type AnyRoute, redirect } from "@tanstack/react-router";
+import {
+  type AnyRoute,
+  notFound,
+  redirect,
+  useParams,
+} from "@tanstack/react-router";
+import { Activity, Suspense, useState } from "react";
 
 import ReadinessLoading from "@/app/(dashboard)/[slug]/geo/agent-readiness/loading";
 import { GeoCompetitorsSkeleton as CompetitorsLoading } from "@/app/(dashboard)/[slug]/geo/competitors/skeleton";
@@ -8,21 +14,32 @@ import PersonasLoading from "@/app/(dashboard)/[slug]/geo/personas/loading";
 import PromptsLoading from "@/app/(dashboard)/[slug]/geo/prompts/loading";
 import ShelfLoading from "@/app/(dashboard)/[slug]/geo/shelf-space/loading";
 import { GeoPageSkeleton } from "@/app/(dashboard)/[slug]/geo/skeleton";
-import TrafficLoading from "@/app/(dashboard)/[slug]/geo/traffic/loading";
 import McpTrafficLoading from "@/app/(dashboard)/[slug]/geo/traffic/mcp/loading";
+import { AiAnalyticsSkeleton } from "@/app/(dashboard)/[slug]/geo/traffic/skeleton";
+import { WebAnalyticsSkeleton } from "@/app/(dashboard)/[slug]/geo/traffic/web/skeleton";
+import type { GeoTrafficTab } from "@/types/geo-traffic-pages";
+import type { UiPageProps, UiRouteTitle } from "@/types/ui-route";
 import { geoCompetitorDetailPath } from "@/utils/geo-competitors";
 import { withGeoProject } from "@/utils/geo-paths";
+import { geoTrafficTab } from "@/utils/geo-traffic-tab";
 import { lazyPage } from "@/utils/lazy-page";
 import { geoSettingsPath } from "@/utils/settings-path";
 
 import { gateGeoPage, loadGeoPage } from "./-dashboard-loaders";
+
+/** Absent on client navigations: the traffic pages fetch their own data. */
+type GeoTrafficPageData = Awaited<ReturnType<typeof loadGeoPage>> | undefined;
+
 import { createUiRoute } from "./-ui-route";
 
 const Overview = lazyPage(
   () => import("@/app/(dashboard)/[slug]/geo/page-client")
 );
-const Traffic = lazyPage(
+const AiAnalytics = lazyPage(
   () => import("@/app/(dashboard)/[slug]/geo/traffic/page-client")
+);
+const WebAnalytics = lazyPage(
+  () => import("@/app/(dashboard)/[slug]/geo/traffic/web/page-client")
 );
 const McpTraffic = lazyPage(
   () => import("@/app/(dashboard)/[slug]/geo/traffic/mcp/page-client")
@@ -49,6 +66,58 @@ const Shelf = lazyPage(
   () => import("@/app/(dashboard)/[slug]/geo/shelf-space/page-client")
 );
 
+const GEO_TRAFFIC_TAB_KINDS = {
+  agents: "agent-analytics",
+  web: "web-analytics",
+} as const;
+
+const GEO_TRAFFIC_TAB_TITLES: Record<GeoTrafficTab, UiRouteTitle> = {
+  agents: { namespace: "geo.pages.aiAnalytics", key: "metaTitle" },
+  web: { namespace: "geo.pages.webAnalytics", key: "metaTitle" },
+  mcp: { namespace: "geo.pages.traffic", key: "mcpMetaTitle" },
+};
+
+const GEO_TRAFFIC_TAB_PAGES = {
+  agents: { page: AiAnalytics, skeleton: AiAnalyticsSkeleton },
+  web: { page: WebAnalytics, skeleton: WebAnalyticsSkeleton },
+  mcp: { page: McpTraffic, skeleton: McpTrafficLoading },
+} as const;
+
+function TrafficTabPending() {
+  const { tab } = useParams({ strict: false });
+  const Skeleton =
+    GEO_TRAFFIC_TAB_PAGES[geoTrafficTab(tab) ?? "agents"].skeleton;
+  return <Skeleton />;
+}
+
+/**
+ * Every tab opened stays mounted, hidden by Activity: switching back shows it
+ * as it was, and a hidden tab's effects (its queries among them) pause.
+ */
+function TrafficTabPanels({ data, params }: UiPageProps<GeoTrafficPageData>) {
+  const tab = geoTrafficTab(params.tab);
+  const [opened, setOpened] = useState<readonly GeoTrafficTab[]>(() =>
+    tab ? [tab] : []
+  );
+  if (tab && !opened.includes(tab)) {
+    setOpened([...opened, tab]);
+  }
+  return (
+    <HydrationBoundary state={data?.state}>
+      {opened.map((name) => {
+        const { page: Page, skeleton: Skeleton } = GEO_TRAFFIC_TAB_PAGES[name];
+        return (
+          <Activity key={name} mode={name === tab ? "visible" : "hidden"}>
+            <Suspense fallback={<Skeleton />}>
+              <Page organizationSlug={params.slug} />
+            </Suspense>
+          </Activity>
+        );
+      })}
+    </HydrationBoundary>
+  );
+}
+
 export function createGeoUiRoutes(parent: AnyRoute) {
   return [
     createUiRoute({
@@ -67,31 +136,47 @@ export function createGeoUiRoutes(parent: AnyRoute) {
         </HydrationBoundary>
       ),
     }),
-    createUiRoute({
+    // One route for the Agent, Web and MCP tabs, so switching between them
+    // keeps the route's component mounted and every opened tab with it.
+    createUiRoute<GeoTrafficPageData>({
       parent,
-      path: "traffic",
-      title: { namespace: "geo.pages.traffic", key: "metaTitle" },
-      pendingComponent: TrafficLoading,
-      // The page's hooks refetch on project, range and host changes; rerunning
-      // the server prefetch as well would query Tinybird twice.
+      path: "traffic/{-$tab}",
+      title: ({ tab }) =>
+        GEO_TRAFFIC_TAB_TITLES[geoTrafficTab(tab) ?? "agents"],
+      pendingComponent: TrafficTabPending,
       loaderSearchKeys: [],
-      loader: (input) => loadGeoPage({ data: { ...input, kind: "traffic" } }),
-      gate: (input) => gateGeoPage({ data: { ...input, kind: "traffic" } }),
+      loader: (input) => {
+        const tab = geoTrafficTab(input.params.tab);
+        if (!tab) {
+          throw notFound();
+        }
+        return tab === "mcp"
+          ? Promise.resolve(undefined)
+          : loadGeoPage({
+              data: { ...input, kind: GEO_TRAFFIC_TAB_KINDS[tab] },
+            });
+      },
+      gate: async (input) => {
+        const tab = geoTrafficTab(input.params.tab);
+        if (!tab) {
+          throw notFound();
+        }
+        if (tab !== "mcp") {
+          await gateGeoPage({
+            data: { ...input, kind: GEO_TRAFFIC_TAB_KINDS[tab] },
+          });
+        }
+      },
       stream: "ssr",
-      preload: Traffic.preload,
-      component: ({ data, params }) => (
-        <HydrationBoundary state={data.state}>
-          <Traffic layout={data.trafficLayout} organizationSlug={params.slug} />
-        </HydrationBoundary>
-      ),
-    }),
-    createUiRoute({
-      parent,
-      path: "traffic/mcp",
-      title: { namespace: "geo.pages.traffic", key: "mcpMetaTitle" },
-      pendingComponent: McpTrafficLoading,
-      preload: McpTraffic.preload,
-      component: ({ params }) => <McpTraffic organizationSlug={params.slug} />,
+      // Switching between the analytics tabs never waits on the server.
+      ssrDataOnly: true,
+      preload: () =>
+        Promise.all([
+          AiAnalytics.preload(),
+          WebAnalytics.preload(),
+          McpTraffic.preload(),
+        ]),
+      component: TrafficTabPanels,
     }),
     createUiRoute({
       parent,

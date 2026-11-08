@@ -1,6 +1,8 @@
 import type { IconSvgElement } from "@hugeicons/react";
 import type { ReactNode } from "react";
 
+import type { FlagKeywords } from "@/types/components/nav";
+
 export type SettingsSectionId =
   | "account"
   | "account-api-keys"
@@ -19,11 +21,12 @@ export type SettingsSectionId =
   | "geo"
   | "geo-brand"
   | "geo-languages"
-  | "geo-models";
+  | "geo-models"
+  | "geo-tracking";
 
 export type StandardSettingsSectionId = Exclude<
   SettingsSectionId,
-  "geo" | "geo-brand" | "geo-languages" | "geo-models"
+  "geo" | "geo-brand" | "geo-languages" | "geo-models" | "geo-tracking"
 >;
 
 type SettingsNavGroupId =
@@ -59,7 +62,12 @@ export interface SettingsNavGroup {
   items: readonly SettingsNavItem[];
 }
 
-type SettingsNavItemConfig = Omit<SettingsNavItem, "label" | "description">;
+interface SettingsNavItemConfig extends Omit<
+  SettingsNavItem,
+  "label" | "description"
+> {
+  flagKeywords?: FlagKeywords;
+}
 
 export interface SettingsNavGroupConfig {
   id: SettingsNavGroupId;

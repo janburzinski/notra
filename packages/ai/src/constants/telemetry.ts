@@ -245,8 +245,12 @@ export const TELEMETRY_GEO_INGEST_REASONS = new Set([
   "site",
   "not_site",
   "web_rate_limited",
+  "network_rate_limited",
+  "payload_too_large",
   "quota",
   "consent",
+  "origin",
+  "web_analytics_disabled",
 ]);
 
 const GEO_INGEST_RUNTIMES = new Set(["unkey", "vercel", "local"]);
@@ -254,6 +258,11 @@ export const TELEMETRY_EVENT_ENUM_FIELDS: Readonly<
   Record<string, Readonly<Record<string, ReadonlySet<string>>>>
 > = {
   "geo.ingest": {
+    outcome: new Set(["ingested", "dropped", "rejected", "failed"]),
+    runtime: GEO_INGEST_RUNTIMES,
+    reason: TELEMETRY_GEO_INGEST_REASONS,
+  },
+  "geo.ingest.collect": {
     outcome: new Set(["ingested", "dropped", "rejected", "failed"]),
     runtime: GEO_INGEST_RUNTIMES,
     reason: TELEMETRY_GEO_INGEST_REASONS,

@@ -2,17 +2,16 @@ import {
   hasAiTrafficEventsQuota,
   trackAiTrafficEvent,
 } from "@notra/ai/billing/ai-traffic-events";
+import type { GeoLogEventName } from "@notra/ai/types/evlog";
 import {
   ingestGeoTrafficEvents,
   ingestMcpEvents,
+  ingestWebErrors,
+  ingestWebEvents,
   ingestWebPageEngagement,
   ingestWebPageViews,
 } from "@notra/analytics/tinybird/client";
 import type { GeoTrafficEventRow } from "@notra/analytics/tinybird/datasources";
-import type {
-  WebPageEngagementRow,
-  WebPageViewRow,
-} from "@notra/analytics/types/tinybird-datasources";
 import { GEO_INGEST_BEARER_PREFIX } from "@notra/geo-core/constants/geo";
 import {
   isGeoIngestSiteToken,
@@ -34,15 +33,25 @@ import { isServedBySite } from "@notra/geo-core/utils/ingest-sites";
 import { Effect } from "effect";
 
 import { GEO_INGEST_TINYBIRD_TIMEOUT_MS } from "../constants/ingest";
+import { ISO_DATE_LENGTH } from "../constants/web-analytics";
 import type {
   GeoIngestBuffer,
   GeoIngestDefer,
   GeoIngestDropReason,
   GeoIngestResult,
+  WebErrorInput,
+  WebEventInput,
+  WebPageViewInput,
 } from "../types/ingest";
 import { geoIngestAdmissionKey } from "../utils/geo-ingest-admission-key";
+import {
+  geoIngestIdentityKind,
+  geoIngestIdentityPolicy,
+} from "../utils/geo-ingest-identity-policy";
 import { logGeoFailure } from "../utils/geo-log";
+import { sanitizeGeoRefererOrigin } from "../utils/geo-referer";
 import { isHumanPageView } from "../utils/web-page-view";
+import { scrubWebPath } from "../utils/web-path-scrub";
 import { trackGeoIngestAnalytics } from "./analytics";
 import { classifyVisitor } from "./classify-visitor";
 import {
@@ -59,21 +68,19 @@ import { assertGeoIngestIdentityActive } from "./identity";
 import { resolveJourneyId } from "./journey";
 import { announceGeoTrafficEvent, expediteForLiveViewers } from "./live";
 import { buildMcpEventRow, isMcpEventBody } from "./mcp";
-import {
-  geoIngestAdmissionRatelimit,
-  geoIngestRatelimit,
-  webIngestRatelimit,
-} from "./ratelimit";
+import { geoIngestAdmissionRatelimit, geoIngestRatelimit } from "./ratelimit";
+import { hasServerTraffic, markServerTraffic } from "./server-traffic";
 import { loadIngestSite, loadOrganizationSitePrefixes } from "./sites";
 import {
   buildWebEngagementRow,
+  buildWebErrorRow,
+  buildWebEventRow,
   buildWebPageView,
   isWebEngagementBody,
 } from "./web";
+import { admitWebAiEvent, admitWebProject } from "./web-limits";
 
-const readSiteIdentity = Effect.fn("geoIngest.readSiteIdentity")(function* (
-  token: string
-) {
+const readSiteIdentity = Effect.fnUntraced(function* (token: string) {
   const siteId = verifyGeoIngestSiteToken(token);
   if (!siteId) {
     return yield* Effect.fail(
@@ -98,33 +105,33 @@ const readSiteIdentity = Effect.fn("geoIngest.readSiteIdentity")(function* (
   } satisfies GeoIngestIdentity;
 });
 
-export const readBearerIdentity = Effect.fn("geoIngest.readBearerIdentity")(
-  function* (request: Request) {
-    const header = request.headers.get("authorization");
-    const token = header?.startsWith(GEO_INGEST_BEARER_PREFIX)
-      ? header.slice(GEO_INGEST_BEARER_PREFIX.length).trim()
-      : "";
+export const readBearerIdentity = Effect.fnUntraced(function* (
+  request: Request
+) {
+  const header = request.headers.get("authorization");
+  const token = header?.startsWith(GEO_INGEST_BEARER_PREFIX)
+    ? header.slice(GEO_INGEST_BEARER_PREFIX.length).trim()
+    : "";
 
-    if (token.length === 0) {
-      return yield* Effect.fail(new GeoIngestMissingTokenError({}));
-    }
-
-    if (isGeoIngestSiteToken(token)) {
-      return yield* readSiteIdentity(token);
-    }
-
-    const identity = verifyGeoIngestToken(token);
-    if (!identity) {
-      return yield* Effect.fail(
-        new GeoIngestInvalidTokenError({ authReason: "invalid_signature" })
-      );
-    }
-
-    return identity;
+  if (token.length === 0) {
+    return yield* Effect.fail(new GeoIngestMissingTokenError({}));
   }
-);
 
-const enforceRateLimit = Effect.fn("geoIngest.rateLimit")(function* (
+  if (isGeoIngestSiteToken(token)) {
+    return yield* readSiteIdentity(token);
+  }
+
+  const identity = verifyGeoIngestToken(token);
+  if (!identity) {
+    return yield* Effect.fail(
+      new GeoIngestInvalidTokenError({ authReason: "invalid_signature" })
+    );
+  }
+
+  return identity;
+});
+
+const enforceRateLimit = Effect.fnUntraced(function* (
   organizationId: string,
   admissionKey?: string,
   rate = 1
@@ -151,15 +158,13 @@ const enforceRateLimit = Effect.fn("geoIngest.rateLimit")(function* (
   }
 });
 
-const readBody = Effect.fn("geoIngest.readBody")(function* (request: Request) {
+const readBody = Effect.fnUntraced(function* (request: Request) {
   return yield* Effect.promise((): Promise<unknown> =>
     request.json().catch(() => null)
   );
 });
 
-const readPayload = Effect.fn("geoIngest.readPayload")(function* (
-  body: unknown
-) {
+const readPayload = Effect.fnUntraced(function* (body: unknown) {
   const parsed = geoRequestPayloadSchema.safeParse(body);
   if (!parsed.success) {
     return yield* Effect.fail(
@@ -169,43 +174,57 @@ const readPayload = Effect.fn("geoIngest.readPayload")(function* (
   return parsed.data;
 });
 
-const parseUrl = Effect.fn("geoIngest.parseUrl")(function* (value: string) {
+const parseUrl = Effect.fnUntraced(function* (value: string) {
   return yield* Effect.try({
     try: () => new URL(value),
     catch: () => new GeoIngestUnparseableUrlError({ url: value }),
   });
 });
 
-const admitWebPageView = Effect.fn("geoIngest.admitWebPageView")(function* (
-  admissionKey: string
-) {
-  return yield* Effect.promise(() =>
-    webIngestRatelimit
-      .limit(admissionKey)
-      .then((result) => result.success)
-      .catch(() => true)
-  );
+const admitWebPageView = Effect.fnUntraced(function* (admissionKey: string) {
+  return yield* Effect.promise(() => admitWebProject(admissionKey));
 });
 
-const storeWebPageView = Effect.fn("geoIngest.storeWebPageView")(function* (
-  row: WebPageViewRow,
-  buffer: GeoIngestBuffer | undefined
-) {
-  if (buffer?.enqueueWeb?.(row)) {
-    return;
+/**
+ * Whether a page is on one of the identity's hosts. A public key cannot be
+ * trusted to name its own pages, so for it a failed lookup refuses the beacon.
+ */
+function acceptsBeaconHost(
+  identity: GeoIngestIdentity,
+  url: URL,
+  allowedHosts: readonly string[] | null
+): boolean {
+  if (allowedHosts === null && geoIngestIdentityKind(identity) === "web") {
+    return false;
   }
-  yield* Effect.promise(() =>
-    ingestWebPageViews([row]).catch((error: unknown) => {
-      logGeoFailure(
-        "geo.ingest.web_write_failed",
-        "Web page view write failed",
-        error,
-        { organizationId: row.organization_id }
-      );
+  return (
+    acceptsIngestHost(url.hostname, allowedHosts) &&
+    !isOutsideSiteMounts(identity, url)
+  );
+}
+
+/**
+ * Hands a web row to the batcher, else writes it now. A failed write is
+ * logged and never fails the beacon.
+ */
+function storeWebRow<Row extends { organization_id: string }>(
+  row: Row,
+  enqueued: boolean | undefined,
+  write: (rows: Row[]) => Promise<unknown>,
+  failure: { event: GeoLogEventName; message: string }
+) {
+  if (enqueued) {
+    return Effect.void;
+  }
+  return Effect.promise(() =>
+    write([row]).catch((error: unknown) => {
+      logGeoFailure(failure.event, failure.message, error, {
+        organizationId: row.organization_id,
+      });
       return null;
     })
   );
-});
+}
 
 const writeTinybirdRows = Effect.fn("geoIngest.ingest")(function* (
   ingest: () => ReturnType<typeof ingestGeoTrafficEvents>
@@ -245,38 +264,28 @@ const writeTinybirdRows = Effect.fn("geoIngest.ingest")(function* (
 export const writeGeoTrafficEvents = (rows: GeoTrafficEventRow[]) =>
   writeTinybirdRows(() => ingestGeoTrafficEvents(rows));
 
-const failWithAuthPrecedence = Effect.fn("geoIngest.failWithAuthPrecedence")(
-  function* (
-    identity: GeoIngestIdentity,
-    error: GeoIngestInvalidPayloadError | GeoIngestUnparseableUrlError
-  ) {
+const failWithAuthPrecedence = Effect.fnUntraced(function* (
+  identity: GeoIngestIdentity,
+  error: GeoIngestInvalidPayloadError | GeoIngestUnparseableUrlError
+) {
+  // A malformed public beacon spends the web budget, never a private one,
+  // and stops there when it is spent: no database check for it either.
+  if (identity.web) {
+    if (!(yield* admitWebPageView(geoIngestAdmissionKey(identity)))) {
+      return yield* Effect.fail(
+        new GeoIngestRateLimitedError({
+          organizationId: identity.organizationId,
+        })
+      );
+    }
+  } else {
     yield* enforceRateLimit(
       identity.organizationId,
       geoIngestAdmissionKey(identity)
     );
-    yield* assertGeoIngestIdentityActive(identity);
-    return yield* Effect.fail(error);
   }
-);
-
-const storeWebEngagement = Effect.fn("geoIngest.storeWebEngagement")(function* (
-  row: WebPageEngagementRow,
-  buffer: GeoIngestBuffer | undefined
-) {
-  if (buffer?.enqueueEngagement?.(row)) {
-    return;
-  }
-  yield* Effect.promise(() =>
-    ingestWebPageEngagement([row]).catch((error: unknown) => {
-      logGeoFailure(
-        "geo.ingest.engagement_write_failed",
-        "Web engagement write failed",
-        error,
-        { organizationId: row.organization_id }
-      );
-      return null;
-    })
-  );
+  yield* assertGeoIngestIdentityActive(identity);
+  return yield* Effect.fail(error);
 });
 
 function trackUsage(
@@ -290,7 +299,7 @@ function trackUsage(
   return trackAiTrafficEvent(organizationId, value).then(() => undefined);
 }
 
-function droppedResult(
+export function droppedResult(
   identity: GeoIngestIdentity,
   visitorType: GeoVisitorType,
   reason: GeoIngestDropReason,
@@ -328,12 +337,41 @@ function isOutsideSiteMounts(identity: GeoIngestIdentity, url: URL): boolean {
   );
 }
 
-const runWebEngagementIngest = Effect.fn("geoIngest.engagement")(function* (
+/**
+ * The checks engagement, outbound clicks and errors share: the identity records
+ * visits, the web budget admits the beacon, and the page is on a tracked
+ * host. Returns a drop result, or null to store the row.
+ */
+const admitWebBeacon = Effect.fnUntraced(function* (
+  identity: GeoIngestIdentity,
+  url: URL
+) {
+  if (!geoIngestIdentityPolicy(identity).recordsVisits) {
+    return droppedResult(identity, "human", "not_site");
+  }
+  if (!(yield* admitWebPageView(geoIngestAdmissionKey(identity)))) {
+    return droppedResult(identity, "human", "web_rate_limited");
+  }
+  const [, allowedHosts] = yield* Effect.all(
+    [
+      assertGeoIngestIdentityActive(identity),
+      Effect.promise(() => loadIngestAllowedHosts(identity)),
+    ],
+    { concurrency: "unbounded" }
+  );
+  if (!acceptsBeaconHost(identity, url, allowedHosts)) {
+    return droppedResult(identity, "human", "host", url.hostname);
+  }
+  return null;
+});
+
+export const runWebEngagementIngest = Effect.fnUntraced(function* (
   identity: GeoIngestIdentity,
   body: unknown,
-  buffer: GeoIngestBuffer | undefined
+  buffer: GeoIngestBuffer | undefined,
+  hashRoutes = false
 ) {
-  if (!identity.site) {
+  if (!geoIngestIdentityPolicy(identity).recordsVisits) {
     return droppedResult(identity, "human", "not_site");
   }
   const parsed = webEngagementPayloadSchema.safeParse(body);
@@ -349,35 +387,66 @@ const runWebEngagementIngest = Effect.fn("geoIngest.engagement")(function* (
     return yield* failWithAuthPrecedence(identity, urlResult.failure);
   }
   const url = urlResult.success;
-  if (!(yield* admitWebPageView(geoIngestAdmissionKey(identity)))) {
-    return droppedResult(identity, "human", "web_rate_limited");
+  const dropped = yield* admitWebBeacon(identity, url);
+  if (dropped) {
+    return dropped;
   }
-  const [, allowedHosts] = yield* Effect.all(
-    [
-      assertGeoIngestIdentityActive(identity),
-      Effect.promise(() => loadIngestAllowedHosts(identity)),
-    ],
-    { concurrency: "unbounded" }
-  );
-  if (
-    !acceptsIngestHost(url.hostname, allowedHosts) ||
-    isOutsideSiteMounts(identity, url)
-  ) {
-    return droppedResult(identity, "human", "host", url.hostname);
-  }
-  yield* storeWebEngagement(
-    buildWebEngagementRow({
-      identity,
-      payload,
-      url,
-      capturedAt: toCapturedDate(payload.timestamp),
-    }),
-    buffer
+  const row = buildWebEngagementRow({
+    identity,
+    payload,
+    url,
+    capturedAt: toCapturedDate(payload.timestamp),
+    hashRoutes,
+  });
+  yield* storeWebRow(
+    row,
+    buffer?.enqueueEngagement?.(row),
+    ingestWebPageEngagement,
+    {
+      event: "geo.ingest.engagement_write_failed",
+      message: "Web engagement write failed",
+    }
   );
   return webOnlyResult(identity, "human");
 });
 
-const runMcpEventIngest = Effect.fn("geoIngest.mcp")(function* (
+export const runWebEventIngest = Effect.fnUntraced(function* (
+  input: WebEventInput,
+  buffer: GeoIngestBuffer | undefined
+) {
+  const dropped = yield* admitWebBeacon(input.identity, input.url);
+  if (dropped) {
+    return dropped;
+  }
+  const row = yield* Effect.promise(() =>
+    buildWebEventRow(input).catch(() => null)
+  );
+  if (row) {
+    yield* storeWebRow(row, buffer?.enqueueWebEvent?.(row), ingestWebEvents, {
+      event: "geo.ingest.web_event_write_failed",
+      message: "Web event write failed",
+    });
+  }
+  return webOnlyResult(input.identity, "human");
+});
+
+export const runWebErrorIngest = Effect.fnUntraced(function* (
+  input: WebErrorInput,
+  buffer: GeoIngestBuffer | undefined
+) {
+  const dropped = yield* admitWebBeacon(input.identity, input.url);
+  if (dropped) {
+    return dropped;
+  }
+  const row = buildWebErrorRow(input);
+  yield* storeWebRow(row, buffer?.enqueueWebError?.(row), ingestWebErrors, {
+    event: "geo.ingest.web_error_write_failed",
+    message: "Web error write failed",
+  });
+  return webOnlyResult(input.identity, "human");
+});
+
+const runMcpEventIngest = Effect.fnUntraced(function* (
   identity: GeoIngestIdentity,
   body: unknown,
   defer: GeoIngestDefer,
@@ -426,11 +495,12 @@ const runMcpEventIngest = Effect.fn("geoIngest.mcp")(function* (
   } satisfies GeoIngestResult;
 });
 
-export const runGeoEnvelopeIngest = Effect.fn("geoIngest.envelope")(function* (
+export const runGeoEnvelopeIngest = Effect.fnUntraced(function* (
   identity: GeoIngestIdentity,
   body: unknown,
   defer: GeoIngestDefer,
-  buffer?: GeoIngestBuffer
+  buffer?: GeoIngestBuffer,
+  beacon: Pick<WebPageViewInput, "viewId" | "hashRoutes"> = {}
 ) {
   const payloadResult = yield* Effect.result(readPayload(body));
   if (payloadResult._tag === "Failure") {
@@ -449,9 +519,15 @@ export const runGeoEnvelopeIngest = Effect.fn("geoIngest.envelope")(function* (
     accept: payload.accept,
     signals: payload.signals,
   });
-  const isAi = isTrackedGeoVisitorType(classification.visitorType);
+  const policy = geoIngestIdentityPolicy(identity);
+  const isWeb = geoIngestIdentityKind(identity) === "web";
+  const isAi =
+    policy.aiEvents === "tracked"
+      ? isTrackedGeoVisitorType(classification.visitorType)
+      : classification.visitorType === "ai_referral" &&
+        !(yield* Effect.promise(() => hasServerTraffic(identity)));
   const countsVisitors =
-    identity.site !== undefined &&
+    policy.recordsVisits &&
     payload.visitorConsent !== false &&
     isHumanPageView({ classification, payload, url });
   if (!(isAi || countsVisitors)) {
@@ -464,7 +540,10 @@ export const runGeoEnvelopeIngest = Effect.fn("geoIngest.envelope")(function* (
     return droppedResult(identity, classification.visitorType, "consent");
   }
 
-  if (isAi) {
+  // A person's page view, and anything a public key sends, is admitted on the
+  // web budget; the AI budget only decides whether the extra AI event is
+  // written (see below). Public keys never touch the server SDK's budgets.
+  if (!(countsVisitors || isWeb)) {
     yield* enforceRateLimit(
       identity.organizationId,
       geoIngestAdmissionKey(identity)
@@ -483,7 +562,10 @@ export const runGeoEnvelopeIngest = Effect.fn("geoIngest.envelope")(function* (
       identity.site
         ? Effect.succeed(null)
         : Effect.promise(() =>
-            loadOrganizationSitePrefixes(identity.organizationId)
+            loadOrganizationSitePrefixes(
+              identity.organizationId,
+              policy.cachesChecks
+            )
           ),
     ],
     { concurrency: "unbounded" }
@@ -495,10 +577,7 @@ export const runGeoEnvelopeIngest = Effect.fn("geoIngest.envelope")(function* (
       })
     );
   }
-  if (
-    !acceptsIngestHost(url.hostname, allowedHosts) ||
-    isOutsideSiteMounts(identity, url)
-  ) {
+  if (!acceptsBeaconHost(identity, url, allowedHosts)) {
     return droppedResult(
       identity,
       classification.visitorType,
@@ -524,11 +603,20 @@ export const runGeoEnvelopeIngest = Effect.fn("geoIngest.envelope")(function* (
           url,
           capturedAt,
           classification,
+          ...beacon,
         }).catch(() => null)
       )
     : null;
   if (webRow) {
-    yield* storeWebPageView(webRow, buffer);
+    yield* storeWebRow(
+      webRow,
+      buffer?.enqueueWeb?.(webRow),
+      ingestWebPageViews,
+      {
+        event: "geo.ingest.web_write_failed",
+        message: "Web page view write failed",
+      }
+    );
   }
   if (!isAi) {
     return webOnlyResult(identity, classification.visitorType);
@@ -542,7 +630,7 @@ export const runGeoEnvelopeIngest = Effect.fn("geoIngest.envelope")(function* (
     );
   }
 
-  const journey = resolveJourneyId({
+  const resolved = resolveJourneyId({
     url,
     source: classification.source,
     ip: payload.ip,
@@ -550,18 +638,41 @@ export const runGeoEnvelopeIngest = Effect.fn("geoIngest.envelope")(function* (
     visitorType: classification.visitorType,
     category: classification.category,
   });
+  const journey = isWeb
+    ? { ...resolved, path: scrubWebPath(resolved.path) }
+    : resolved;
   const event = buildGeoTrafficEvent({
     organizationId: identity.organizationId,
     projectId: identity.projectId,
     siteId: identity.site?.id,
-    payload,
+    // A browser's referrer can carry anything in its path; keep the origin.
+    payload: isWeb
+      ? { ...payload, referer: sanitizeGeoRefererOrigin(payload.referer) }
+      : payload,
     url,
     capturedAt,
     classification,
     journey,
   });
 
-  yield* enforceRateLimit(identity.organizationId);
+  if (isWeb) {
+    const day = capturedAt.toISOString().slice(0, ISO_DATE_LENGTH);
+    if (!(yield* Effect.promise(() => admitWebAiEvent(identity, day)))) {
+      return webOnlyResult(identity, classification.visitorType);
+    }
+  } else if (countsVisitors) {
+    const admitted = yield* Effect.result(
+      enforceRateLimit(
+        identity.organizationId,
+        geoIngestAdmissionKey(identity)
+      ).pipe(Effect.andThen(enforceRateLimit(identity.organizationId)))
+    );
+    if (admitted._tag === "Failure") {
+      return webOnlyResult(identity, classification.visitorType);
+    }
+  } else {
+    yield* enforceRateLimit(identity.organizationId);
+  }
   const ingestStartedAt = Date.now();
   const buffered = buffer?.enqueue(event) ?? false;
   if (!buffered) {
@@ -570,6 +681,9 @@ export const runGeoEnvelopeIngest = Effect.fn("geoIngest.envelope")(function* (
   const ingestMs = Date.now() - ingestStartedAt;
   yield* Effect.sync(() =>
     defer(async () => {
+      if (policy.marksServerTraffic) {
+        await markServerTraffic(identity);
+      }
       const announced =
         buffered && buffer
           ? expediteForLiveViewers(buffer, event.organization_id)
@@ -603,6 +717,8 @@ export const runGeoEnvelopeIngest = Effect.fn("geoIngest.envelope")(function* (
   } satisfies GeoIngestResult;
 });
 
+// Only request entry points are traced: Effect.fn captures a stack and opens a
+// span on every call, which cost a quarter of the CPU per beacon in profiles.
 export const runGeoIngest = Effect.fn("geoIngest.run")(function* (
   request: Request,
   defer: GeoIngestDefer,

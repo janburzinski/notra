@@ -3,9 +3,11 @@
 import { todayIsoDate } from "@notra/geo-core/utils/day-label";
 import { EChartsAreaChart } from "@notra/ui/components/evilcharts/charts/echarts-area-chart";
 import type { ChartConfig } from "@notra/ui/types/charts";
-import { type CSSProperties, useState } from "react";
+import { useState } from "react";
 import { useLocale, useTranslations } from "use-intl";
 
+import { TrafficTrendLegend } from "@/components/geo/traffic-trend-legend";
+import { ANALYTICS_IMPORT_PROVIDER_BRANDS } from "@/constants/analytics-imports";
 import { CHART_PRIMARY_COLOR, CHART_SECONDARY_COLOR } from "@/constants/charts";
 import {
   TRAFFIC_HERO_CHART_OPTIONS,
@@ -16,21 +18,17 @@ import {
   WEB_TREND_AGENTS_KEY,
   WEB_TREND_PEOPLE_KEY,
 } from "@/constants/web-analytics";
-import type { WebVisitorsSectionProps } from "@/types/geo";
+import type { WebTrendChartProps } from "@/types/geo";
 import { formatFullDayLabel } from "@/utils/analytics-charts";
 import { seriesColors } from "@/utils/chart-colors";
 import { formatChartInteger } from "@/utils/geo-charts";
 import {
   buildWebTrendRows,
-  formatWebShare,
+  importStartMarker,
   webTrendShare,
 } from "@/utils/web-analytics";
 
-export function WebTrendChart({
-  web,
-  traffic,
-  range,
-}: WebVisitorsSectionProps) {
+export function WebTrendChart({ web, traffic, range }: WebTrendChartProps) {
   const t = useTranslations("geo.webVisitors");
   const locale = useLocale();
   const rows = buildWebTrendRows(
@@ -44,23 +42,28 @@ export function WebTrendChart({
   );
   const share = webTrendShare(rows);
   const [hiddenKeys, setHiddenKeys] = useState<readonly string[]>([]);
-  const series = [
-    {
-      key: WEB_TREND_PEOPLE_KEY,
-      label: t("people"),
-      share: share?.people,
-      color: CHART_PRIMARY_COLOR,
-    },
-    {
-      key: WEB_TREND_AGENTS_KEY,
-      label: t("agentsSeries"),
-      share: share?.agents,
-      color: CHART_SECONDARY_COLOR,
-    },
-  ];
-  const visibleSeries = series.filter(
-    (entry) => !hiddenKeys.includes(entry.key)
-  );
+  const people = {
+    key: WEB_TREND_PEOPLE_KEY,
+    label: t("people"),
+    share: traffic ? share?.people : undefined,
+    color: CHART_PRIMARY_COLOR,
+  };
+  const series = traffic
+    ? [
+        people,
+        {
+          key: WEB_TREND_AGENTS_KEY,
+          label: t("agentsSeries"),
+          share: share?.agents,
+          color: CHART_SECONDARY_COLOR,
+        },
+      ]
+    : [people];
+  const hidden = new Set(hiddenKeys);
+  const visibleSeries =
+    series.length > 1
+      ? series.filter((entry) => !hidden.has(entry.key))
+      : series;
   const toggleSeries = (key: string) => {
     setHiddenKeys((current) => {
       if (current.includes(key)) {
@@ -76,6 +79,17 @@ export function WebTrendChart({
     ])
   );
   const markIncompleteTail = rows.at(-1)?.rawDay === todayIsoDate();
+  const importMarker = importStartMarker(rows, web.imported);
+  const markers = importMarker
+    ? [
+        {
+          value: importMarker.day,
+          label: t("importMarker", {
+            provider: ANALYTICS_IMPORT_PROVIDER_BRANDS[importMarker.provider],
+          }),
+        },
+      ]
+    : undefined;
 
   return (
     <div
@@ -90,6 +104,7 @@ export function WebTrendChart({
         config={config}
         curveType="monotone"
         data={rows}
+        markers={markers}
         stackType="stacked"
         xDataKey="day"
       >
@@ -122,38 +137,11 @@ export function WebTrendChart({
           valueFormatter={(value: number) => formatChartInteger(value, locale)}
         />
       </EChartsAreaChart>
-      <ul className="border-border mt-3 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 border-t pt-3 text-xs">
-        {series.map((entry) => {
-          const isVisible = !hiddenKeys.includes(entry.key);
-          return (
-            <li key={entry.key}>
-              <button
-                aria-pressed={isVisible}
-                className="hover:bg-muted focus-visible:ring-ring flex items-center gap-1.5 rounded-md px-2 py-1 transition-opacity outline-none focus-visible:ring-2 aria-[pressed=false]:line-through aria-[pressed=false]:opacity-40"
-                onClick={() => toggleSeries(entry.key)}
-                type="button"
-              >
-                <span
-                  aria-hidden="true"
-                  className="corner-squircle size-2 rounded-xs bg-(--dot-light) dark:bg-(--dot-dark)"
-                  style={
-                    {
-                      "--dot-light": entry.color.light,
-                      "--dot-dark": entry.color.dark,
-                    } as CSSProperties
-                  }
-                />
-                <span>{entry.label}</span>
-                {entry.share === undefined ? null : (
-                  <span className="text-muted-foreground tabular-nums">
-                    {t("share", { share: formatWebShare(entry.share) })}
-                  </span>
-                )}
-              </button>
-            </li>
-          );
-        })}
-      </ul>
+      <TrafficTrendLegend
+        hiddenKeys={hiddenKeys}
+        items={series}
+        onToggle={series.length > 1 ? toggleSeries : undefined}
+      />
     </div>
   );
 }

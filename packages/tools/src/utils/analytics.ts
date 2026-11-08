@@ -9,6 +9,7 @@ import {
   DAY_MS,
 } from "../constants/analytics";
 import type {
+  AiTrafficDay,
   AnalyticsProject,
   AnalyticsRange,
   AnalyticsRangeInput,
@@ -77,6 +78,27 @@ export function resolveAnalyticsRange(
     return "Use a range of 366 days or fewer.";
   }
   return { from: input.from, to, days, timezone: "UTC" };
+}
+
+/** Per-source daily AI visits summed into one row per day, oldest first. */
+export function sumDailyAiVisits(
+  points: readonly { day: string; visitorType: string; visits: number }[]
+): AiTrafficDay[] {
+  const days = new Map<string, AiTrafficDay>();
+  for (const point of points) {
+    const day = days.get(point.day) ?? {
+      day: point.day,
+      crawler_visits: 0,
+      ai_referral_visits: 0,
+    };
+    if (point.visitorType === "crawler") {
+      day.crawler_visits += point.visits;
+    } else if (point.visitorType === "ai_referral") {
+      day.ai_referral_visits += point.visits;
+    }
+    days.set(point.day, day);
+  }
+  return [...days.values()].toSorted((a, b) => a.day.localeCompare(b.day));
 }
 
 /** Bare lowercase domain for the Tinybird hosts filter, which also matches subdomains. */

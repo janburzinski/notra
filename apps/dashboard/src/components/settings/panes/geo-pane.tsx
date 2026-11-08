@@ -2,29 +2,43 @@
 
 import { Skeleton } from "@notra/ui/components/ui/skeleton";
 
+import { ImportHistoryCard } from "@/components/analytics-import/import-history-card";
+import { GeoIngestSetup } from "@/components/geo/geo-ingest-setup";
 import { GeoSettingsForm } from "@/components/geo/geo-settings-form";
 import { GeoProjectDeleteSection } from "@/components/geo/project-delete-section";
 import { GeoProjectQueryProvider } from "@/components/providers/geo-project-provider";
 import { useOrganizationsContext } from "@/components/providers/organization-provider";
 import { SettingsPane } from "@/components/settings/settings-pane";
-import { useGeoModelCatalog, useGeoSettings } from "@/lib/hooks/use-geo";
+import {
+  useGeoIngestSetup,
+  useGeoModelCatalog,
+  useGeoSettings,
+} from "@/lib/hooks/use-geo";
 import { useGeoProjectsDb } from "@/lib/hooks/use-geo-db";
 import { useGeoProjectQueryState } from "@/lib/hooks/use-geo-project-query";
-import type { GeoSettingsFormSection } from "@/types/geo";
+import { useWebAnalyticsFlag } from "@/lib/hooks/use-web-analytics-flag";
+import type {
+  GeoSettingsFormSection,
+  GeoSettingsPaneSection,
+} from "@/types/geo";
 
 export function GeoSettingsPane({
   section,
 }: {
-  section: GeoSettingsFormSection;
+  section: GeoSettingsPaneSection;
 }) {
   const [projectParam] = useGeoProjectQueryState();
 
   return (
     <GeoProjectQueryProvider>
-      <GeoSettingsPaneContent
-        key={projectParam ?? "default"}
-        section={section}
-      />
+      {section === "tracking" ? (
+        <GeoTrackingSettingsContent key={projectParam ?? "default"} />
+      ) : (
+        <GeoSettingsPaneContent
+          key={projectParam ?? "default"}
+          section={section}
+        />
+      )}
     </GeoProjectQueryProvider>
   );
 }
@@ -78,6 +92,30 @@ function GeoSettingsPaneContent({
           replacementProjectId={replacementProjectId}
         />
       ) : null}
+    </SettingsPane>
+  );
+}
+
+/** Install tracking and import history for the active project. */
+function GeoTrackingSettingsContent() {
+  const { activeOrganization } = useOrganizationsContext();
+  const organizationId = activeOrganization?.id ?? "";
+  const { data: setup, isPending } = useGeoIngestSetup(organizationId);
+  const webFlag = useWebAnalyticsFlag();
+
+  if (isPending || !webFlag.settled) {
+    return (
+      <SettingsPane>
+        <Skeleton className="h-96 rounded-2xl" />
+        <Skeleton className="h-28 rounded-2xl" />
+      </SettingsPane>
+    );
+  }
+
+  return (
+    <SettingsPane>
+      <GeoIngestSetup defaultMethod="script" setup={setup} variant="settings" />
+      <ImportHistoryCard manageOnly={!webFlag.enabled} variant="settings" />
     </SettingsPane>
   );
 }

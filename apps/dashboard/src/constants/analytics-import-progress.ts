@@ -1,0 +1,35 @@
+import type { AnalyticsImportStatus } from "@notra/db/types/analytics-imports";
+
+import type { AnalyticsImportProgressPhase } from "@/types/analytics-imports";
+
+export const ANALYTICS_IMPORT_PROGRESS_PHASES: Record<
+  AnalyticsImportStatus,
+  AnalyticsImportProgressPhase
+> = {
+  pending: "queued",
+  running: "running",
+  waiting_rate_limit: "waiting",
+  completed: "completed",
+  failed: "failed",
+  deleting: "deleting",
+  deleted: "deleted",
+};
+
+/** Phases after which nothing runs; the progress view offers a way back. */
+export const ANALYTICS_IMPORT_ENDED_PHASES: ReadonlySet<AnalyticsImportProgressPhase> =
+  new Set(["failed", "deleting", "deleted"]);
+
+/** Phases whose imported rows are gone or going, so there is nothing to count. */
+export const ANALYTICS_IMPORT_REMOVED_PHASES: ReadonlySet<AnalyticsImportProgressPhase> =
+  new Set(["deleting", "deleted"]);
+
+/** Dialog title per phase, under `geo.analyticsImport.progress`. */
+export const ANALYTICS_IMPORT_PROGRESS_TITLES = {
+  queued: "title",
+  running: "title",
+  waiting: "title",
+  completed: "titleDone",
+  failed: "titleFailed",
+  deleting: "titleDeleting",
+  deleted: "titleDeleted",
+} as const satisfies Record<AnalyticsImportProgressPhase, string>;

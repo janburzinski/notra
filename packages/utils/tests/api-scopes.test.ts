@@ -2,6 +2,19 @@ import { describe, expect, test } from "bun:test";
 
 import { getRequiredApiScope } from "../src/api-scopes";
 
+describe("analytics API scopes", () => {
+  test.each([
+    ["GET", "/v1/projects/p1/geo/traffic/web", "traffic.read"],
+    ["GET", "/v1/projects/p1/geo/traffic/web/breakdowns", "traffic.read"],
+    ["GET", "/v1/projects/p1/geo/traffic/journey-stats", "traffic.read"],
+    ["GET", "/v1/projects/p1/geo/traffic/imports", "traffic.read"],
+    ["GET", "/v1/geo/ingest/setup", "traffic.read"],
+    ["POST", "/v1/geo/ingest/rotate-token", "traffic.write"],
+  ])("%s %s needs %s", (method, path, scope) => {
+    expect(getRequiredApiScope(path, method)).toBe(scope);
+  });
+});
+
 describe("Sites API scopes", () => {
   test("reads need sites.read and writes sites.write", () => {
     expect(getRequiredApiScope("/v1/sites", "GET")).toBe("sites.read");

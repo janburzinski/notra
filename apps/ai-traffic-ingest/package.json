@@ -3,18 +3,21 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "bun --watch src/index.ts",
+    "dev": "NODE_ENV=development bun --watch src/index.ts",
     "build": "NODE_ENV=production bun build src/index.ts --target=bun --outdir=dist",
     "start": "bun dist/index.js",
     "check-types": "tsc --noEmit",
     "test": "bun run build && bun test tests"
   },
   "dependencies": {
+    "@ip-location-db/dbip-country-mmdb": "2.3.2026060120",
     "@notra/ai": "workspace:*",
     "@notra/analytics": "workspace:*",
     "@notra/db": "workspace:*",
     "@notra/geo-core": "workspace:*",
-    "hono": "^4.13.13"
+    "@notra/web-tracker": "workspace:*",
+    "hono": "^4.13.13",
+    "mmdb-lib": "3.0.2"
   },
   "devDependencies": {
     "@notra/typescript-config": "workspace:*",

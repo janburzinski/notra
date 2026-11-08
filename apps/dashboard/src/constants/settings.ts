@@ -4,6 +4,7 @@ import {
   AnalyticsUpIcon,
   Attachment01Icon,
   ChartAnalysisIcon,
+  CodeIcon,
   CorporateIcon,
   CreditCardIcon,
   Key01Icon,
@@ -41,6 +42,7 @@ export const SETTINGS_SECTION_IDS = [
   "geo-brand",
   "geo-languages",
   "geo-models",
+  "geo-tracking",
 ] as const satisfies readonly SettingsSectionId[];
 
 export const SETTINGS_QUERY_KEY = "settings";
@@ -269,6 +271,31 @@ export const SETTINGS_NAV_GROUPS: readonly SettingsNavGroupConfig[] = [
           "anthropic",
           "muse",
         ],
+      },
+      {
+        id: "geo-tracking",
+        icon: CodeIcon,
+        keywords: [
+          "geo",
+          "tracking",
+          "install",
+          "snippet",
+          "sdk",
+          "log drain",
+          "vercel",
+          "cloudflare",
+        ],
+        flagKeywords: {
+          flag: "webAnalytics",
+          keywords: [
+            "script",
+            "notra.js",
+            "public key",
+            "import",
+            "history",
+            "plausible",
+          ],
+        },
       },
     ],
   },

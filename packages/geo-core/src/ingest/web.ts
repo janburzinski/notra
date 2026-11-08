@@ -2,6 +2,8 @@ import { createHmac } from "node:crypto";
 
 import { redis } from "@notra/ai/utils/redis";
 import type {
+  WebErrorRow,
+  WebEventRow,
   WebPageEngagementRow,
   WebPageViewRow,
 } from "@notra/analytics/types/tinybird-datasources";
@@ -10,14 +12,18 @@ import {
   ISO_DATE_LENGTH,
   WEB_AI_PRODUCTS,
   WEB_BROWSERS,
+  WEB_LANGUAGE_PATTERN,
   WEB_OPERATING_SYSTEMS,
+  WEB_OUTBOUND_EVENT,
   WEB_SEARCH_HOSTS,
   WEB_SESSION_KEY_PREFIX,
   WEB_SESSION_TTL_SECONDS,
   WEB_SOCIAL_HOSTS,
-  WEB_UTM_CAMPAIGN_MAX_LENGTH,
   WEB_UTM_MAX_LENGTH,
   WEB_VISITOR_ID_LENGTH,
+  WEB_VITAL_CLS_MAX_MILLI,
+  WEB_VITAL_INP_MAX_MS,
+  WEB_VITAL_TIMING_MAX_MS,
 } from "@notra/geo-core/constants/web-analytics";
 import { WEB_SESSION_RESOLVE_SCRIPT } from "@notra/geo-core/constants/web-session";
 import { getGeoIngestSecret } from "@notra/geo-core/geo/ingest";
@@ -26,29 +32,69 @@ import { SITE_ENGAGEMENT_MAX_VISIBLE_MS } from "@notra/sites-core/constants/site
 
 import type {
   WebEngagementInput,
+  WebErrorInput,
+  WebEventInput,
   WebPageViewInput,
   WebReferrer,
   WebSession,
 } from "../types/ingest";
-import { isHumanPageView } from "../utils/web-page-view";
+import { scrubWebErrorText, scrubWebText } from "../utils/web-error-scrub";
+import { isHumanPageView, webPagePath } from "../utils/web-page-view";
+import { scrubWebPath } from "../utils/web-path-scrub";
+import { scrubWebUtmText } from "../utils/web-utm";
+import { resolveAiReferrer } from "./classify-visitor";
+import { dailySalt } from "./daily-salt";
 
 const LEADING_WWW_REGEX = /^www\./;
+const QUERY_OR_FRAGMENT_REGEX = /[?#].*$/;
 
-export function webVisitorId(
+export async function webVisitorId(
   scope: string,
   ip: string | undefined,
   userAgent: string | undefined,
   capturedAt: Date
-): string | null {
-  const secret = getGeoIngestSecret();
-  if (!secret) {
+): Promise<string | null> {
+  if (!getGeoIngestSecret()) {
     return null;
   }
-  const day = capturedAt.toISOString().slice(0, ISO_DATE_LENGTH);
-  return createHmac("sha256", `${secret}|web|${day}`)
+  const salt = await dailySalt(
+    capturedAt.toISOString().slice(0, ISO_DATE_LENGTH)
+  );
+  return createHmac("sha256", salt)
     .update(`${scope}|${ip ?? ""}|${userAgent ?? ""}`)
     .digest("hex")
     .slice(0, WEB_VISITOR_ID_LENGTH);
+}
+
+/** The day's visitor id, per Site, else per project, else per organization. */
+function visitorIdOf({
+  identity,
+  payload,
+  capturedAt,
+}: Pick<WebPageViewInput, "identity" | "payload" | "capturedAt">) {
+  return webVisitorId(
+    identity.site?.id ?? identity.projectId ?? identity.organizationId,
+    payload.ip,
+    payload.userAgent,
+    capturedAt
+  );
+}
+
+/** The columns every web datasource row starts with. */
+function webRowBase({
+  identity,
+  url,
+  capturedAt,
+  hashRoutes,
+}: Pick<WebPageViewInput, "identity" | "url" | "capturedAt" | "hashRoutes">) {
+  return {
+    organization_id: identity.organizationId,
+    project_id: identity.projectId ?? "",
+    site_id: identity.site?.id ?? "",
+    captured_at: toClickHouseDateTime(capturedAt),
+    host: url.hostname.toLowerCase(),
+    path: webPagePath(url, hashRoutes),
+  };
 }
 
 async function resolveSession(
@@ -147,36 +193,55 @@ export function describeUserAgent(raw: string | undefined) {
   };
 }
 
+/** Primary language subtag of an Accept-Language header, lowercased; "" if none. */
+export function webLanguage(acceptLanguage: string | undefined): string {
+  return (
+    WEB_LANGUAGE_PATTERN.exec(acceptLanguage ?? "")?.[1]?.toLowerCase() ?? ""
+  );
+}
+
+/**
+ * A script URL as stored: its origin (port included) as sent, its path
+ * scrubbed like a message, and no query or fragment.
+ */
+function scrubWebErrorSource(source: string): string {
+  const url = URL.parse(source);
+  if (url && url.origin !== "null") {
+    return url.origin + scrubWebErrorText(url.pathname);
+  }
+  return scrubWebErrorText(source.replace(QUERY_OR_FRAGMENT_REGEX, ""));
+}
+
 export async function buildWebPageView(
   input: WebPageViewInput
 ): Promise<WebPageViewRow | null> {
   if (!isHumanPageView(input)) {
     return null;
   }
-  const { identity, payload, url, capturedAt, classification } = input;
-  const scope =
-    identity.site?.id ?? identity.projectId ?? identity.organizationId;
-  const visitorId = webVisitorId(
-    scope,
-    payload.ip,
-    payload.userAgent,
-    capturedAt
-  );
+  const { payload, url, classification } = input;
+  const visitorId = await visitorIdOf(input);
   if (!visitorId) {
     return null;
   }
-  const referrer = classifyWebReferrer(
-    payload.referer,
-    url.hostname.toLowerCase(),
-    classification.visitorType === "ai_referral" ? classification.source : null
-  );
   const params = url.searchParams;
   const utmSource = (params.get("utm_source") ?? "")
     .slice(0, WEB_UTM_MAX_LENGTH)
     .toLowerCase();
+  // ChatGPT's apps send no referrer but tag links with utm_source=chatgpt.com.
+  const aiSource =
+    classification.visitorType === "ai_referral"
+      ? classification.source
+      : resolveAiReferrer(utmSource ? `https://${utmSource}` : undefined);
+  const referrer = classifyWebReferrer(
+    payload.referer,
+    url.hostname.toLowerCase(),
+    aiSource
+  );
+  // Tags count only on arrival: going back to a tagged URL inside the site
+  // (an SPA's back button) continues the visit instead of opening a session.
   const fromOutside =
-    utmSource.length > 0 ||
-    (referrer.group !== "direct" && referrer.group !== "internal");
+    referrer.group !== "internal" &&
+    (utmSource.length > 0 || referrer.group !== "direct");
   const session =
     payload.status === 404
       ? { id: "", index: 0 }
@@ -188,12 +253,7 @@ export async function buildWebPageView(
         );
   const agent = describeUserAgent(payload.userAgent);
   return {
-    organization_id: identity.organizationId,
-    project_id: identity.projectId ?? "",
-    site_id: identity.site?.id ?? "",
-    captured_at: toClickHouseDateTime(capturedAt),
-    host: url.hostname.toLowerCase(),
-    path: url.pathname,
+    ...webRowBase(input),
     status: payload.status ?? 200,
     visitor_id: visitorId,
     session_id: session.id,
@@ -206,15 +266,16 @@ export async function buildWebPageView(
     utm_medium: (params.get("utm_medium") ?? "")
       .slice(0, WEB_UTM_MAX_LENGTH)
       .toLowerCase(),
-    utm_campaign: (params.get("utm_campaign") ?? "").slice(
-      0,
-      WEB_UTM_CAMPAIGN_MAX_LENGTH
-    ),
+    utm_campaign: scrubWebUtmText(params.get("utm_campaign")),
+    utm_term: scrubWebUtmText(params.get("utm_term")),
+    utm_content: scrubWebUtmText(params.get("utm_content")),
     country: payload.geo?.country ?? "",
     device: agent.device,
     browser: agent.browser,
     os: agent.os,
     request_id: payload.requestId ?? "",
+    view_id: input.viewId ?? "",
+    language: webLanguage(payload.acceptLanguage),
   };
 }
 
@@ -230,16 +291,74 @@ export function isWebEngagementBody(body: unknown): boolean {
 export function buildWebEngagementRow(
   input: WebEngagementInput
 ): WebPageEngagementRow {
-  const { identity, payload, url, capturedAt } = input;
+  const { payload } = input;
   return {
-    organization_id: identity.organizationId,
-    project_id: identity.projectId ?? "",
-    site_id: identity.site?.id ?? "",
-    captured_at: toClickHouseDateTime(capturedAt),
-    host: url.hostname.toLowerCase(),
-    path: url.pathname,
+    ...webRowBase(input),
     view_id: payload.viewId,
     visible_ms: Math.min(payload.visibleMs, SITE_ENGAGEMENT_MAX_VISIBLE_MS),
     scroll_depth: payload.scrollDepth,
+    lcp_ms: vital(payload.lcpMs, WEB_VITAL_TIMING_MAX_MS),
+    fcp_ms: vital(payload.fcpMs, WEB_VITAL_TIMING_MAX_MS),
+    ttfb_ms: vital(payload.ttfbMs, WEB_VITAL_TIMING_MAX_MS),
+    inp_ms: vital(payload.inpMs, WEB_VITAL_INP_MAX_MS),
+    // No layout shift is a real (perfect) score; the others are unset at 0.
+    cls_milli:
+      payload.clsMilli === undefined ||
+      payload.clsMilli > WEB_VITAL_CLS_MAX_MILLI
+        ? null
+        : payload.clsMilli,
+  };
+}
+
+/** Null for a vital the browser did not measure (0) or an implausible value. */
+function vital(value: number | undefined, max: number): number | null {
+  return value && value <= max ? value : null;
+}
+
+/**
+ * `host/path` of an outbound link with no query or fragment, ids in the path
+ * replaced and emails scrubbed. The path is scrubbed segment by segment
+ * first, so an email in it cannot swallow the host and the segments before it.
+ */
+function scrubOutboundUrl(url: string): string {
+  const bare = url.replace(QUERY_OR_FRAGMENT_REGEX, "");
+  const slash = bare.indexOf("/");
+  return scrubWebText(
+    slash < 0
+      ? bare
+      : `${bare.slice(0, slash)}${scrubWebPath(bare.slice(slash))}`
+  );
+}
+
+export async function buildWebEventRow(
+  input: WebEventInput
+): Promise<WebEventRow | null> {
+  const { payload, outboundUrl, viewId } = input;
+  const visitorId = await visitorIdOf(input);
+  if (!visitorId) {
+    return null;
+  }
+  return {
+    ...webRowBase(input),
+    view_id: viewId,
+    visitor_id: visitorId,
+    name: WEB_OUTBOUND_EVENT,
+    props: JSON.stringify({ url: scrubOutboundUrl(outboundUrl) }),
+    country: payload.geo?.country ?? "",
+    device: describeUserAgent(payload.userAgent).device,
+  };
+}
+
+export function buildWebErrorRow(input: WebErrorInput): WebErrorRow {
+  const { payload, viewId, error } = input;
+  return {
+    ...webRowBase(input),
+    view_id: viewId,
+    message: scrubWebErrorText(error.message),
+    source: scrubWebErrorSource(error.source),
+    line: error.line,
+    // Promise rejections carry no line; script errors from a file always do.
+    kind: error.line > 0 ? "error" : "rejection",
+    browser: describeUserAgent(payload.userAgent).browser,
   };
 }

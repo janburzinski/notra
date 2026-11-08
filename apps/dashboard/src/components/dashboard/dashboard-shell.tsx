@@ -13,6 +13,7 @@ import { cn } from "@notra/ui/lib/utils";
 import { isDemoModeClient } from "@notra/utils/demo-mode";
 import { useTranslations } from "use-intl";
 
+import { AnalyticsImportWatcher } from "@/components/analytics-import/analytics-import-watcher";
 import { SubscriptionGate } from "@/components/billing/subscription-gate";
 import { AgentPromptBar } from "@/components/dashboard/agent-prompt-bar";
 import { DashboardSidebar } from "@/components/dashboard/app-sidebar";
@@ -306,6 +307,7 @@ export function DashboardShell({
         <DashboardAgentSlot />
       </SidebarProvider>
       <DashboardGlobalActions />
+      <AnalyticsImportWatcher />
       {welcomeTour.open ? (
         <WelcomeTour
           brandName={activeOrganization?.name}

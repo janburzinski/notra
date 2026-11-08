@@ -104,6 +104,7 @@ import {
 import { truncateSnippet } from "@/utils/format";
 import { isGeoDashboardPath, withGeoProject } from "@/utils/geo-paths";
 import { nameInitials } from "@/utils/name-initials";
+import { keywordsForFlags } from "@/utils/nav";
 
 import { useCommandPalette } from "./command-palette-context";
 import {
@@ -781,6 +782,7 @@ function CommandPaletteSearchResults({
   const t = useTranslations("commandPalette");
   const tCommon = useTranslations("common");
   const visibleRoutes = useVisibleRoutes(controller.hasAiCredits);
+  const navVisibility = useNavVisibility();
   return (
     <>
       {COMMAND_SECTIONS.map((section) => {
@@ -799,7 +801,15 @@ function CommandPaletteSearchResults({
                 <CommandPaletteItem
                   icon={route.icon}
                   key={route.id}
-                  keywords={[route.label, sectionLabel, ...route.keywords]}
+                  keywords={[
+                    route.label,
+                    sectionLabel,
+                    ...keywordsForFlags(
+                      route.keywords,
+                      route.flagKeywords,
+                      navVisibility
+                    ),
+                  ]}
                   label={label}
                   meta={sectionLabel}
                   onSelect={() => controller.selectRoute(route)}

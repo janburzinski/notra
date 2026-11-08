@@ -7,6 +7,9 @@ export const toggleVariants = cva(
       variant: {
         default: "bg-transparent",
         outline: "border-input hover:bg-muted border bg-transparent",
+        /** One option of a segmented control: the pressed one is a raised tab on the group's muted track. */
+        segmented:
+          "text-muted-foreground hover:text-foreground aria-pressed:bg-background aria-pressed:text-foreground dark:aria-pressed:bg-input/60 flex-1 bg-transparent hover:bg-transparent aria-pressed:shadow-xs",
       },
       size: {
         default:

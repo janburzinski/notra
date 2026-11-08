@@ -40,6 +40,7 @@ import {
   DEFAULT_SETTINGS_SECTION,
   SETTINGS_NAV_GROUPS,
 } from "@/constants/settings";
+import { useNavVisibility } from "@/lib/hooks/use-nav-visibility";
 import { useHasAiCreditsFeature } from "@/lib/hooks/use-plan";
 import { useSettingsModal } from "@/lib/hooks/use-settings-modal";
 import { useSettingsNavLabels } from "@/lib/hooks/use-settings-nav-labels";
@@ -49,6 +50,7 @@ import type {
   SettingsSectionId,
   StandardSettingsSectionId,
 } from "@/types/settings/modal";
+import { keywordsForFlags } from "@/utils/nav";
 import { resolveSettingsSection } from "@/utils/settings-path";
 import {
   filterSettingsNavGroups,
@@ -78,6 +80,7 @@ const GEO_SETTINGS_PANE_SECTIONS = {
   "geo-brand": "brand",
   "geo-languages": "brand",
   "geo-models": "models",
+  "geo-tracking": "tracking",
 } as const;
 
 function SettingsSectionContent({ section }: { section: SettingsSectionId }) {
@@ -139,16 +142,18 @@ function SettingsModalSession({
   titleId,
 }: SettingsModalSessionProps) {
   const labels = useSettingsNavLabels();
+  const navVisibility = useNavVisibility();
   const { hasAiCredits } = useHasAiCreditsFeature();
   const [query, setQuery] = useState("");
   const searchInputId = useId();
   const navGroups = SETTINGS_NAV_GROUPS.map((group) => ({
     ...group,
     label: labels.groups[group.id],
-    items: group.items.map((item) => ({
+    items: group.items.map(({ flagKeywords, ...item }) => ({
       ...item,
       label: labels.sections[item.id].label,
       description: labels.sections[item.id].description,
+      keywords: keywordsForFlags(item.keywords, flagKeywords, navVisibility),
     })),
   }));
   const groups = filterSettingsNavGroups(navGroups, query, hasAiCredits);

@@ -19,6 +19,7 @@ import { useSiteAnalytics } from "@/lib/hooks/use-sites";
 import { cn } from "@/lib/utils";
 import { siteHref } from "@/utils/site-links";
 import { siteVisitorTrends } from "@/utils/site-visitor-trends";
+import { formatVisibleDuration } from "@/utils/web-analytics";
 
 export function SiteVisitorsCard() {
   const t = useTranslations("sites.analyticsPage");
@@ -29,7 +30,9 @@ export function SiteVisitorsCard() {
     days: SITE_OVERVIEW_ANALYTICS_DAYS,
   });
   const totals = query.data?.web.totals;
-  const agents = query.data?.traffic.totals.crawler ?? 0;
+  const engagement = query.data?.engagement;
+  const avgSeconds = engagement?.avgSeconds ?? 0;
+  const previousAvgSeconds = engagement?.previousAvgSeconds ?? 0;
   const trends = query.data
     ? siteVisitorTrends(query.data, SITE_OVERVIEW_ANALYTICS_DAYS)
     : null;
@@ -65,12 +68,15 @@ export function SiteVisitorsCard() {
       ),
     },
     {
-      key: "agents",
-      label: tWeb("agents"),
-      trend: trends?.agents,
+      key: "avgTime",
+      label: tWeb("avgTime"),
       color: CHART_SECONDARY_COLOR,
-      value: agents,
-      delta: null,
+      value: avgSeconds,
+      format: "duration",
+      delta:
+        avgSeconds > 0 && previousAvgSeconds > 0
+          ? trafficVisitDelta(avgSeconds, previousAvgSeconds)
+          : null,
     },
   ];
 
@@ -118,10 +124,16 @@ export function SiteVisitorsCard() {
               ) : null}
               <dt className="text-muted-foreground text-xs">{stat.label}</dt>
               <dd className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                <AnimatedNumber
-                  className="text-xl font-semibold tabular-nums"
-                  value={stat.value}
-                />
+                {stat.format === "duration" ? (
+                  <span className="text-xl font-semibold tabular-nums">
+                    {stat.value > 0 ? formatVisibleDuration(stat.value) : "—"}
+                  </span>
+                ) : (
+                  <AnimatedNumber
+                    className="text-xl font-semibold tabular-nums"
+                    value={stat.value}
+                  />
+                )}
                 {stat.delta === null ? null : (
                   <GeoStatDelta
                     delta={stat.delta}

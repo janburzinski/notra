@@ -128,7 +128,7 @@ Every resource has a `<resource>.read` and a `<resource>.write` scope. The API d
 | GEO visibility | `visibility.read`, `visibility.write` | `.../geo/visibility` |
 | GEO content briefs | `briefs.read`, `briefs.write` | `.../geo/gaps`, `.../geo/briefs` |
 | GEO agent readiness | `agent-readiness.read`, `agent-readiness.write` | `.../geo/agent-readiness` |
-| GEO AI traffic | `traffic.read`, `traffic.write` | `.../geo/traffic`, `/v1/geo/ingest` |
+| GEO AI traffic | `traffic.read`, `traffic.write` | `.../geo/traffic` (AI traffic, website analytics and history imports), `/v1/geo/ingest` |
 
 `GET /v1/status` and `POST /v1/feedback/{organizationSlug}` need no key at all.
 

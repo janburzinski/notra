@@ -27,6 +27,7 @@ import { useGeoTrafficHostQuery } from "@/lib/hooks/use-geo-traffic-host";
 import type {
   GeoTrafficPageGroup,
   TrafficPageColumnLabels,
+  TrafficPageColumnOptions,
   TrafficPagesCardProps,
   TrafficPagesFiltersProps,
   TrafficPagesResultsProps,
@@ -41,7 +42,8 @@ import { tableHeightFor } from "@/utils/table";
 
 function trafficPageColumns(
   labels: TrafficPageColumnLabels,
-  countColumnWidth: string
+  countColumnWidth: string,
+  { compare, showHost }: TrafficPageColumnOptions
 ): TableColumn<GeoTrafficPageGroup>[] {
   return [
     {
@@ -51,7 +53,7 @@ function trafficPageColumns(
       sortable: true,
       cell: (row) => (
         <TruncateWithTooltip className="font-mono text-xs">
-          {formatTrafficLocation(row.host, row.path)}
+          {formatTrafficLocation(showHost ? row.host : "", row.path)}
         </TruncateWithTooltip>
       ),
       sortValue: (row) => formatTrafficLocation(row.host, row.path),
@@ -76,7 +78,7 @@ function trafficPageColumns(
       cell: (row) => (
         <GeoCountCell
           label={formatTrafficLocation(row.host, row.path)}
-          previousValue={row.previousVisits}
+          previousValue={compare ? row.previousVisits : undefined}
           value={row.visits}
         />
       ),
@@ -138,6 +140,7 @@ function TrafficPagesResults({
 export function TrafficPagesCard({
   pages,
   isPending = false,
+  compare = true,
 }: TrafficPagesCardProps) {
   const locale = useLocale();
   const tGeoShared = useTranslations("geo.shared");
@@ -189,11 +192,12 @@ export function TrafficPagesCard({
           geoCountColumnWidth(
             filteredGroups.map((row) => ({
               value: row.visits,
-              previousValue: row.previousVisits,
+              previousValue: compare ? row.previousVisits : undefined,
             })),
             locale,
             tCommon("labels.new")
-          )
+          ),
+          { compare, showHost: new Set(groups.map((row) => row.host)).size > 1 }
         )}
         filteredGroups={filteredGroups}
         isPending={isPending}

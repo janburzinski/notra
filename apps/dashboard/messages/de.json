@@ -55,6 +55,10 @@
         },
         "geo-models": {
           "description": "Assistenten und Zeitplan"
+        },
+        "geo-tracking": {
+          "description": "Tracking installieren und Verlauf importieren",
+          "agentsDescription": "KI-Traffic-Tracking installieren"
         }
       }
     },
@@ -74,7 +78,9 @@
         "webhooks": "Verbinde deine Workflows und prüfe jede Zustellung",
         "logs": "Sieh dir Integrations-Events und ihren Zustellstatus an",
         "dev": "Nur in der Entwicklung verfügbare Tools zum Testen lokaler Abläufe",
-        "geo-models": "Auf welchen Assistenten deine Prompts laufen"
+        "geo-models": "Auf welchen Assistenten deine Prompts laufen",
+        "geo-tracking": "Besuche auf deiner Website zählen und frühere Analytics übernehmen",
+        "geo-tracking-agents": "Zähle KI-Crawler und -Verweise auf deiner Website"
       }
     },
     "panes": {
@@ -644,7 +650,7 @@
         },
         "traffic": {
           "label": "GEO-KI-Traffic",
-          "description": "Lies KI-Crawler- und Verweis-Traffic und verwalte das Ingest-Token"
+          "description": "Lies KI-Traffic, Website-Analytics und Verlaufsimporte und verwalte das Ingest-Token"
         }
       }
     },
@@ -1036,6 +1042,9 @@
     "analytics": {
       "unavailable": "Analytics ist für diesen Workspace noch nicht verfügbar.",
       "xAccountNotFound": "Das X-Konto @{username} wurde nicht gefunden"
+    },
+    "webAnalytics": {
+      "unavailable": "Web-Analytics ist für diesen Workspace noch nicht verfügbar."
     },
     "actions": {
       "organizations": {
@@ -2288,7 +2297,10 @@
       "allPlatforms": "Alle Plattformen",
       "contentActivity": "Inhaltsaktivität",
       "sites": "Seiten",
-      "automations": "Automationen"
+      "automations": "Automationen",
+      "aiAnalytics": "KI-Analytics",
+      "webAnalytics": "Web-Analytics",
+      "tracking": "Tracking"
     },
     "messages": {
       "yourAiCreditsHaveBeen": "Deine KI-Credits wurden aufgeladen und sind einsatzbereit.",
@@ -2986,11 +2998,11 @@
       "method": "Installationsart",
       "methods": {
         "sdk": "Paket",
-        "vercel": "Vercel Log Drain",
-        "cloudflare": "Cloudflare Logpush"
+        "vercel": "Vercel",
+        "cloudflare": "Cloudflare",
+        "script": "Script-Tag"
       },
       "drains": {
-        "docsLink": "Zur Anleitung",
         "vercel": {
           "openTitle": "Drains öffnen",
           "openDescription": "Braucht ein Pro- oder Enterprise-Team. Füge einen Drain hinzu und wähle Logs.",
@@ -3010,22 +3022,34 @@
           "fieldsDescription": "{count} Felder aus dem Dataset HTTP requests, mit RFC-3339-Zeitstempeln.",
           "saveTitle": "Job speichern",
           "saveDescription": "Traffic erscheint hier ein bis zwei Minuten später.",
-          "customFieldsNote": "Logge außerdem die Request-Header accept, sec-ch-ua und sec-fetch-mode als Logpush Custom Fields. RequestHeaders allein enthält sie nicht, und Notra braucht sie, um Markdown-Anfragen und als Browser getarnte Agents zu erkennen."
+          "customFieldsNote": "Füge außerdem die Request-Header <code>accept</code>, <code>sec-ch-ua</code> und <code>sec-fetch-mode</code> als Custom Fields hinzu."
         }
       },
-      "footer": {
-        "sdk": {
-          "title": "Lass deinen Agent das einrichten",
-          "description": "Füge den Prompt in Claude Code, Cursor oder Codex ein."
-        },
-        "cloudflare": {
-          "title": "Lass deinen Agent das einrichten",
-          "description": "Er legt den Logpush-Job über die Cloudflare-API an."
-        },
-        "vercel": {
-          "title": "Mehr Details?",
-          "description": "Die Anleitung geht die Einrichtung des Drains durch."
-        }
+      "script": {
+        "tagTitle": "Füge das in den <code>{tag}</code> jeder Seite ein",
+        "notConfigured": "Tracking ist auf diesem Server noch nicht eingerichtet.",
+        "pinLabel": "Diese Version fixieren",
+        "pinNote": "Ein festgeschriebenes Script aktualisiert sich nie selbst. Kopiere den Tag erneut, um es zu aktualisieren.",
+        "rotateKey": "Schlüssel erneuern",
+        "rotateKeyTitle": "Öffentlichen Schlüssel erneuern?",
+        "rotateKeyDescription": "Seiten mit dem aktuellen Script-Tag zählen ab sofort keine Besuche mehr. Kopiere danach den neuen Tag auf jede Seite. Tu das, wenn der Schlüssel auf einer Website verwendet wird, die du nicht kontrollierst.",
+        "rotateKeyConfirm": "Schlüssel erneuern",
+        "checkTitle": "Deployen und deine Website öffnen",
+        "errorsLabel": "JavaScript-Fehler melden",
+        "errorsNote": "Lädt <code>notra.plus.js</code>, das auch nicht abgefangene JavaScript-Fehler sendet.",
+        "awaiting": "Warte auf den ersten Seitenaufruf…",
+        "receiving": "Empfängt Seitenaufrufe seit {date}",
+        "viewAnalytics": "Analytics ansehen"
+      },
+      "methodDescriptions": {
+        "sdk": "Zählt KI-Agenten und Crawler auf deinem Server. Füge es dem Framework hinzu, auf dem deine Website läuft.",
+        "script": "Zählt Menschen, ohne Cookies. Für KI-Agenten zusätzlich das Paket oder einen Log-Drain.",
+        "vercel": "Zählt KI-Agenten aus deinen Vercel-Request-Logs. Ohne Codeänderung.",
+        "cloudflare": "Zählt KI-Agenten aus deinen Cloudflare-Request-Logs. Ohne Codeänderung."
+      },
+      "docs": {
+        "script": "Mehr über notra.js",
+        "drain": "Zur Anleitung"
       }
     },
     "promptTranslations": {
@@ -3678,6 +3702,7 @@
     },
     "trafficHero": {
       "notConfigured": "Nicht konfiguriert",
+      "crawlersUntracked": "Keine Crawler-Besuche erfasst. Crawler führen kein JavaScript aus, zum Zählen brauchst du das Paket oder einen Log-Drain.",
       "setUpTitle": "Conversion-Pfade festlegen",
       "activity": "Traffic-Aktivität",
       "tooltipMore": "+{count} weitere",
@@ -4071,21 +4096,12 @@
         "setupDescription": "Richte zuerst das GEO-Tracking ein und sieh dann, welche Seiten KI-Engines zitieren und wer dort gelistet ist."
       },
       "traffic": {
-        "metaTitle": "Website-Analytics",
-        "mcpMetaTitle": "MCP-Server-Analytics",
         "title": "Analytics",
-        "description": "KI-Crawler und Verweise, die deine Website besuchen",
-        "setupDescription": "Richte zuerst das GEO-Tracking ein und beobachte dann KI-Crawler und Verweise, sobald sie eintreffen.",
         "descriptionWithVisitors": "Menschen und AI-Agents auf deiner Website",
-        "emptyRangeTitle": "Kein Traffic in diesem Zeitraum",
-        "emptyRangeDescription": "Wähle einen anderen Zeitraum oder eine andere Domain.",
-        "emptyPathTitle": "Keine Besuche auf {path}",
-        "emptyPathDescription": "Weder Menschen noch AI-Agents haben diese Seite im gewählten Zeitraum geöffnet.",
-        "emptyPathReset": "Alle Seiten anzeigen",
-        "emptyPathWiden": "Letzte 90 Tage anzeigen"
+        "mcpMetaTitle": "MCP-Server-Analytics"
       },
       "mcp": {
-        "description": "AI-Agents und Tool-Aufrufe auf deinem MCP-Server",
+        "description": "KI-Agenten und Tool-Aufrufe auf deinem MCP-Server",
         "loadFailed": {
           "title": "MCP-Analytics konnten nicht geladen werden",
           "hint": "Die Anfrage für diese Seite ist fehlgeschlagen. Dein Server sendet weiter Events, also geht nichts verloren, während du es erneut versuchst."
@@ -4267,6 +4283,21 @@
           "user": "Nutzer",
           "intent": "Absicht"
         }
+      },
+      "aiAnalytics": {
+        "metaTitle": "KI-Analytics",
+        "description": "KI-Crawler, Zitat-Abrufe und Menschen, die über KI-Antworten kommen",
+        "setupDescription": "Richte zuerst das GEO-Tracking ein und beobachte dann KI-Crawler und Verweise, sobald sie eintreffen.",
+        "emptyRangeTitle": "Keine KI-Aktivität in diesem Zeitraum",
+        "emptyRangeDescription": "Wähle einen anderen Zeitraum oder eine andere Domain."
+      },
+      "webAnalytics": {
+        "metaTitle": "Web-Analytics",
+        "description": "Menschen auf deiner Website, woher sie kommen und was sie lesen",
+        "setupDescription": "Richte zuerst das GEO-Tracking ein und sieh dann, wer deine Website besucht und woher die Besucher kommen.",
+        "emptyRangeTitle": "Keine Besucher in diesem Zeitraum",
+        "emptyRangeDescription": "Wähle einen anderen Zeitraum oder eine andere Domain.",
+        "installDescription": "Füge das Script-Tag ein, um Besucher, Seitenaufrufe und Verweise zu zählen."
       }
     },
     "toasts": {
@@ -4307,6 +4338,8 @@
       "loadTrackingSetupFailed": "Tracking-Einrichtung konnte nicht geladen werden",
       "trackingTokenRotated": "Tracking-Token erneuert",
       "rotateTokenFailed": "Token konnte nicht erneuert werden",
+      "webKeyRotated": "Öffentlicher Schlüssel erneuert. Kopiere den neuen Script-Tag auf jede Seite.",
+      "rotateWebKeyFailed": "Öffentlicher Schlüssel konnte nicht erneuert werden",
       "runConversationFailed": "Unterhaltung konnte nicht ausgeführt werden",
       "loadConversationResultsFailed": "Ergebnisse der Unterhaltung konnten nicht geladen werden",
       "loadSearchConsoleStatusFailed": "Search-Console-Status konnte nicht geladen werden",
@@ -4401,11 +4434,11 @@
       "comparisonUnavailable": "Keine Daten für den vorherigen Zeitraum",
       "visitors": "Besucher",
       "views": "Seitenaufrufe",
-      "fromAi": "Aus AI-Antworten",
-      "agents": "AI-Agents",
+      "fromAi": "Aus KI-Antworten",
+      "agents": "KI-Agenten",
       "trendTitle": "Seitenaufrufe über Zeit",
       "people": "Menschen",
-      "agentsSeries": "AI-Agents",
+      "agentsSeries": "KI-Agenten",
       "share": "{share} %",
       "topPages": "Top-Seiten",
       "page": "Seite",
@@ -4417,20 +4450,65 @@
       "deviceDesktop": "Desktop",
       "deviceMobile": "Mobil",
       "deviceTablet": "Tablet",
-      "outcomesTitle": "Was AI-Besucher tun",
+      "outcomesTitle": "Was KI-Besucher tun",
       "outcomesAll": "Alle Besucher",
       "pagesPerSession": "Seiten pro Besuch",
       "engagedRate": "Weitergelesen",
-      "noData": "Keine Besucher in diesem Zeitraum",
-      "noDataDescription": "Hier erscheinen Besuchsdaten, sobald Traffic erfasst wird. Wähle einen längeren Zeitraum.",
+      "noData": "Nichts erfasst",
+      "noDataDescription": "Für diesen Bericht wurde im gewählten Zeitraum nichts erfasst.",
       "columnViews": "Aufrufe",
-      "columnFromAi": "Aus AI",
+      "columnFromAi": "Aus KI",
       "avgTime": "Ø Zeit auf der Seite",
       "columnAvgTime": "Ø Zeit",
       "columnSource": "Quelle",
       "columnCountry": "Land",
       "columnDevice": "Gerät",
-      "referrers": "Herkunft"
+      "referrers": "Herkunft",
+      "utmParameters": "UTM-Parameter",
+      "sourcesLabel": "Quellen",
+      "utmShort": "UTM",
+      "utm": {
+        "source": "Quelle",
+        "medium": "Medium",
+        "campaign": "Kampagne",
+        "term": "Begriff",
+        "content": "Inhalt"
+      },
+      "utmEmptyTitle": "Noch keine markierten Besuche",
+      "utmEmptyDescription": "Besuche über Links mit utm_source, utm_medium, utm_campaign, utm_term oder utm_content erscheinen hier.",
+      "importMarker": "{provider} → Notra",
+      "outboundLinks": "Ausgehende Links",
+      "columnLink": "Link",
+      "columnClicks": "Klicks",
+      "outboundEmptyTitle": "Noch keine ausgehenden Klicks",
+      "outboundEmptyDescription": "Klicks auf Links zu anderen Websites erscheinen hier automatisch. Notra speichert Host und Pfad, nie die Query.",
+      "webVitals": "Web Vitals",
+      "vitalGood": "Gut",
+      "vitalNeedsWork": "Verbesserungswürdig",
+      "vitalPoor": "Schlecht",
+      "vitalName": {
+        "lcp": "Largest Contentful Paint",
+        "inp": "Interaction to Next Paint",
+        "cls": "Cumulative Layout Shift",
+        "fcp": "First Contentful Paint",
+        "ttfb": "Time to First Byte"
+      },
+      "vitalsEmptyTitle": "Noch keine Web Vitals",
+      "vitalsEmptyDescription": "notra.js misst Ladezeit und Reaktionszeit bei jedem Seitenaufruf. Ergebnisse erscheinen, sobald Besucher eine Seite verlassen.",
+      "languages": "Sprachen",
+      "columnLanguage": "Sprache",
+      "errors": "JavaScript-Fehler",
+      "columnError": "Fehler",
+      "columnEvents": "Ereignisse",
+      "vitalsDescription": "75. Perzentil echter Seitenaufrufe, bewertet nach Googles Schwellenwerten",
+      "vitalSummary": "p75 aus {count, plural, one {# Aufruf} other {# Aufrufen}}",
+      "vitalRange": {
+        "good": "≤ {value}",
+        "needsImprovement": "{from}–{to}",
+        "poor": "> {value}"
+      },
+      "vitalsDeviceLabel": "Gerät",
+      "vitalsDeviceAll": "Alle Geräte"
     },
     "trafficPathFilter": {
       "label": "Filter",
@@ -4440,9 +4518,11 @@
     },
     "trafficExport": {
       "label": "Als CSV exportieren",
-      "menu": "Exportieren",
       "csv": "CSV herunterladen",
-      "embed": "Auf deiner Website einbetten"
+      "embed": "Auf deiner Website einbetten",
+      "more": "Weitere Aktionen",
+      "trackingSetup": "Tracking einrichten",
+      "importHistory": "Verlauf importieren"
     },
     "trafficEmbed": {
       "title": "KI-Traffic-Chart einbetten",
@@ -4514,6 +4594,241 @@
       "pauseFailed": "Prompt konnte nicht pausiert werden",
       "keepFailed": "Prompt konnte nicht behalten werden",
       "reasonNoBrands": "In {answers} Antworten der letzten {days} Tage hat keine Engine eine Marke genannt. Dieser Prompt misst deine Sichtbarkeit also nicht."
+    },
+    "trafficPathEmpty": {
+      "title": "Keine Besuche auf {path}",
+      "description": "Weder Menschen noch KI-Agenten haben diese Seite im gewählten Zeitraum geöffnet.",
+      "reset": "Alle Seiten anzeigen",
+      "widen": "Letzte 90 Tage anzeigen"
+    },
+    "analyticsImport": {
+      "title": "Verlauf importieren",
+      "description": "Übernimm die Tageswerte aus dem Tool, das du vor Notra genutzt hast.",
+      "manageDescription": "Web-Analytics ist für diesen Workspace ausgeschaltet, deshalb können keine neuen Importe starten. Du kannst Importe trotzdem löschen und Konten trennen.",
+      "privacy": "Importiert werden nur Tageswerte, nie IP-Adressen oder einzelne Besuche.",
+      "back": "Zurück",
+      "cta": {
+        "title": "Sieh deinen Verlauf ab dem ersten Tag",
+        "description": "Importiere frühere Seitenaufrufe aus Plausible, Vercel oder Cloudflare.",
+        "action": "Verlauf importieren"
+      },
+      "settings": {
+        "title": "Verlauf importieren",
+        "description": "Hole frühere Seitenaufrufe und KI-Crawler-Zugriffe aus Plausible, Vercel oder Cloudflare.",
+        "action": "Importe verwalten",
+        "manageDescription": "Web-Analytics ist für diesen Workspace ausgeschaltet. Du kannst importierte Verläufe trotzdem löschen und Konten trennen."
+      },
+      "providers": {
+        "title": "Quelle wählen",
+        "plausible_csv": {
+          "name": "Plausible-Export",
+          "description": "CSV-Export hochladen. Ganzer Verlauf, jeder Tarif."
+        },
+        "plausible": {
+          "name": "Plausible-API",
+          "description": "API-Schlüssel verbinden. Ganzer Verlauf, Business-Tarif."
+        },
+        "cloudflare": {
+          "name": "Cloudflare",
+          "description": "KI-Crawler-Zugriffe und Seitenaufrufe aus Web Analytics."
+        },
+        "vercel": {
+          "name": "Vercel Web Analytics",
+          "description": "Seitenaufrufe und Besucher, bis zu 24 Monate zurück."
+        }
+      },
+      "guide": "Das tust du in {provider}",
+      "openProvider": "{provider} öffnen",
+      "csv": {
+        "title": "Plausible-Export hochladen",
+        "description": "Funktioniert mit jedem Plausible-Tarif und deckt deinen ganzen Verlauf ab.",
+        "openTitle": "Website-Einstellungen öffnen",
+        "openDescription": "Gehe zu Imports & Exports.",
+        "exportTitle": "Als CSV exportieren",
+        "exportDescription": "Plausible schickt dir eine ZIP-Datei per E-Mail. Entpacke sie nicht.",
+        "fileLabel": "Export-ZIP",
+        "dropTitle": "Plausible-Export hierher ziehen",
+        "dropHint": "oder klicken, um eine ZIP-Datei bis {size} zu wählen",
+        "dropActive": "Loslassen, um den Export hinzuzufügen",
+        "dropReplace": "Loslassen, um diese Datei zu ersetzen",
+        "fileMeta": "ZIP · {size}",
+        "replace": "Ersetzen",
+        "remove": "{name} entfernen",
+        "rejected": "Wähle eine ZIP-Datei bis {size}.",
+        "tooManyFiles": "Wähle eine einzige ZIP-Datei. Plausible packt den ganzen Export in eine.",
+        "preview": "Export prüfen",
+        "failed": "Dieser Export konnte nicht gelesen werden"
+      },
+      "connect": {
+        "title": "{provider} verbinden",
+        "description": {
+          "plausible": "Nutzt die Stats-API, die den Business-Tarif von Plausible erfordert.",
+          "cloudflare": "KI-Crawler-Zugriffe der letzten 31 Tage und Seitenaufrufe aus Web Analytics für etwa 6 Monate.",
+          "vercel": "Hobby speichert 1 Monat, Pro 12 und Plus 24. UTM-Kampagnen erfordern Plus."
+        },
+        "existing": "Gespeicherte Verbindungen",
+        "newConnection": "Oder neu verbinden",
+        "managersOnly": "Nur Owner und Admins können ein neues Konto verbinden.",
+        "steps": {
+          "plausible": {
+            "firstTitle": "API-Schlüssel erstellen",
+            "firstDescription": "Account settings → API Keys → New API key.",
+            "secondTitle": "Stats API wählen",
+            "secondDescription": "Wähle das Team, dem die Website gehört."
+          },
+          "cloudflare": {
+            "firstTitle": "Custom Token erstellen",
+            "firstDescription": "My Profile → API Tokens → Create Token → Custom token.",
+            "secondTitle": "Diese Berechtigungen hinzufügen",
+            "secondDescription": "Beschränke das Token dann auf die Zonen und das Konto, die du importieren willst."
+          },
+          "vercel": {
+            "firstTitle": "Token erstellen",
+            "firstDescription": "Beschränke ihn auf das Team, dem das Projekt gehört, und setze ein Ablaufdatum. Vercel-Tokens lassen sich nicht auf Lesezugriff beschränken, Notra liest damit nur Web Analytics.",
+            "secondTitle": "Team-ID kopieren",
+            "secondDescription": "Team Settings → General. Bei persönlichen Projekten überspringen."
+          }
+        },
+        "secretLabel": "API-Schlüssel",
+        "tokenLabel": "API-Token",
+        "teamLabel": "Team-ID (optional)",
+        "teamPlaceholder": "team_…",
+        "submit": "Verbinden",
+        "failed": "Verbindung fehlgeschlagen",
+        "stored": "Verschlüsselt und nur zum Lesen von Analytics genutzt."
+      },
+      "source": {
+        "title": "Auswählen, was importiert wird",
+        "description": "Aus deiner {provider}-Verbindung.",
+        "sourceLabel": "Website",
+        "sourcePlaceholder": "Website wählen",
+        "hostLabel": "Domain in Notra",
+        "hostHint": "Importierte Tage werden unter dieser Domain gespeichert.",
+        "range": "Zeitraum eingrenzen",
+        "startLabel": "Von",
+        "endLabel": "Bis",
+        "preview": "Zeitraum prüfen",
+        "noneTitle": "Keine Websites gefunden",
+        "none": "Diese Verbindung sieht keine Websites. Prüfe den Zugriff des Tokens und verbinde neu.",
+        "failed": "Websites konnten nicht geladen werden",
+        "reconnect": "Neu verbinden",
+        "kinds": {
+          "web": "Web-Analytics",
+          "geo": "KI-Crawler"
+        }
+      },
+      "preview": {
+        "title": "Bereit zum Import",
+        "period": "Zeitraum",
+        "pageviewsLabel": "Seitenaufrufe",
+        "requestsLabel": "Crawler-Zugriffe",
+        "range": "{start} – {end}",
+        "months": "{count, plural, one {# Monat} other {# Monate}}",
+        "pageviews": "Etwa {count, number}",
+        "unknownPageviews": "Werden beim Import gezählt",
+        "cutoff": "Endet am Tag, bevor Notra am {date} mit dem Tracking begann.",
+        "noNative": "Notra hat diese Domain noch nicht erfasst, daher reicht der Import bis gestern.",
+        "clipped": "Lässt Tage aus, die ein früherer Import dieser Quelle schon hat.",
+        "overlap": "{host} hat {range} schon aus {source}.",
+        "overlapNamed": "{host} hat {range} schon aus {source} ({label}).",
+        "overlapChoice": "Schon importierte Tage",
+        "overlapSkip": "Tage auslassen",
+        "overlapAdd": "Zusammenzählen",
+        "overlapSkipHint": "Importiert nur die fehlenden Tage. Wähle das, wenn beide Quellen dieselbe Website erfasst haben.",
+        "overlapAddHint": "Addiert für diese Tage die Zahlen beider Quellen. Wähle das, um zwei Websites zusammenzuführen.",
+        "noNewDays": "Alle Tage sind schon importiert",
+        "emptyTitle": "Nichts Neues zu importieren",
+        "empty": "Notra oder ein anderer Import deckt diesen Zeitraum schon ab.",
+        "alreadyImportedTitle": "Schon importiert",
+        "alreadyImported": "Ein früherer Import dieser Quelle hat diese Tage schon.",
+        "start": "Import starten",
+        "failed": "Import konnte nicht gestartet werden"
+      },
+      "progress": {
+        "title": "{host} wird importiert",
+        "titleDone": "{host} importiert",
+        "titleFailed": "Import von {host} gestoppt",
+        "titleDeleting": "Import von {host} wird gelöscht",
+        "titleDeleted": "Import von {host} gelöscht",
+        "chunks": {
+          "month": "{done, number} von {total, plural, one {# Monat} other {# Monaten}}",
+          "week": "{done, number} von {total, plural, one {# Woche} other {# Wochen}}",
+          "part": "{done, number} von {total, plural, one {# Teil} other {# Teilen}}"
+        },
+        "queuedLine": "Startet gleich",
+        "queuedBehind": "Wartet, bis {source} fertig ist",
+        "waitingLine": "{provider} bittet um eine Pause. Weiter in {time}.",
+        "waitingSoon": "{provider} bittet um eine Pause. Geht gleich weiter …",
+        "completedLine": "Deine Diagramme reichen jetzt bis {date} zurück.",
+        "failedLine": "Beim Import von {period} gestoppt.",
+        "failedAny": "Vor dem Abschluss gestoppt.",
+        "deletingLine": "Was dieser Import zu deinen Diagrammen hinzugefügt hat, wird entfernt …",
+        "deletedLine": "Dieser Import wurde gelöscht. Was er hinzugefügt hat, ist nicht mehr in deinen Diagrammen.",
+        "period": "{start} – {end}",
+        "close": "Schließen",
+        "done": "Fertig",
+        "viewAnalytics": "Analytics ansehen",
+        "backToImports": "Zurück zu den Importen",
+        "importAnother": "Weitere Website importieren",
+        "importing": "{kind, select, geo {Crawler-Aufrufe} other {Seitenaufrufe}} werden importiert",
+        "importedPageviews": "{count, plural, one {# Seitenaufruf} other {# Seitenaufrufe}} importiert",
+        "importedRequests": "{count, plural, one {# Crawler-Aufruf} other {# Crawler-Aufrufe}} importiert",
+        "stopped": "Der Import wurde gestoppt"
+      },
+      "list": {
+        "title": "Importe",
+        "connections": "Verbindungen",
+        "actions": "Aktionen für {name}",
+        "open": "Fortschritt anzeigen",
+        "connectedOn": "Verbunden am {date}",
+        "disconnect": "Trennen",
+        "disconnectAndDelete": "Trennen und Importe löschen",
+        "disconnected": "Verbindung getrennt",
+        "disconnectFailed": "Verbindung konnte nicht getrennt werden",
+        "reauth": "Neu verbinden nötig",
+        "reconnect": "Neu verbinden",
+        "delete": "Import löschen",
+        "deleted": "Import gelöscht",
+        "deleteFailed": "Import konnte nicht gelöscht werden",
+        "range": "{start} – {end}",
+        "progress": "Schritt {done} von {total}",
+        "waiting": "Rate-Limit, weiter {time}",
+        "queued": "Wartet, bis {source} fertig ist",
+        "pageviews": "{count, number} Seitenaufrufe",
+        "requests": "{count, number} Crawler-Zugriffe",
+        "sampled": "Hochgerechnete Schätzung",
+        "missing": "Keine Sitzungen oder Absprünge",
+        "status": {
+          "pending": "In Warteschlange",
+          "running": "Läuft",
+          "waiting_rate_limit": "Wartet",
+          "completed": "Importiert",
+          "failed": "Fehlgeschlagen",
+          "deleting": "Wird gelöscht",
+          "deleted": "Gelöscht"
+        },
+        "errors": {
+          "flagOff": "Web-Analytics wurde für diesen Workspace ausgeschaltet.",
+          "flagUnavailable": "Wir konnten nicht prüfen, ob Web-Analytics für diesen Workspace aktiv ist. Versuch es später noch einmal.",
+          "lost": "Der Import wurde unterbrochen und konnte nicht fortgesetzt werden. Starte ihn neu.",
+          "lostUpload": "Der Import wurde unterbrochen, bevor der Export gelesen war. Lade ihn erneut hoch."
+        }
+      },
+      "indicator": {
+        "label": "{count, plural, one {# Website wird importiert} other {# Websites werden importiert}} · {percent}",
+        "open": "Importfortschritt anzeigen"
+      },
+      "toast": {
+        "completed": "{host} importiert",
+        "completedDescription": "Deine Diagramme reichen jetzt bis {date} zurück.",
+        "failed": "Import von {host} gestoppt",
+        "failedDescription": "Unter Verlauf importieren siehst du, warum."
+      }
+    },
+    "trafficInstall": {
+      "trackCrawlers": "Crawler erfassen",
+      "title": "Tracking installieren",
+      "description": "Wähle eine Methode. Du kannst sie kombinieren; nichts wird doppelt gezählt."
     }
   },
   "integrations": {
@@ -5210,6 +5525,8 @@
     "sources": {
       "label": "Analytics-Quelle",
       "website": "Website",
+      "agents": "Agent",
+      "web": "Web",
       "mcp": "MCP-Server",
       "social": "Social"
     },
@@ -6101,7 +6418,8 @@
         "openAgentReadiness": "Agent Readiness öffnen",
         "openTraffic": "Traffic-Analyse öffnen",
         "openBrandIdentity": "Markenidentität öffnen",
-        "openIntegrations": "Integrationen öffnen"
+        "openIntegrations": "Integrationen öffnen",
+        "openWebAnalytics": "Web-Analytics öffnen"
       }
     }
   },

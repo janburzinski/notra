@@ -3,26 +3,47 @@ import {
   GEO_DRAIN_PATHS,
   GEO_DRAIN_PROVIDERS,
   GEO_INGEST_PATH,
+  GEO_WEB_COLLECT_PATH,
+  GEO_WEB_PLUS_SCRIPT_PATH,
+  GEO_WEB_SCRIPT_PATH,
 } from "@notra/geo-core/constants/geo";
-import { GEO_DRAIN_MAX_BODY_BYTES } from "@notra/geo-core/constants/ingest";
+import {
+  GEO_DRAIN_MAX_BODY_BYTES,
+  GEO_WEB_COLLECT_MAX_BODY_BYTES,
+} from "@notra/geo-core/constants/ingest";
 import {
   handleGeoDrainRequest,
   handleGeoIngestRequest,
+  handleWebCollectRequest,
 } from "@notra/geo-core/ingest/handler";
+import {
+  webCollectPreflightResponse,
+  withWebCollectCors,
+} from "@notra/geo-core/ingest/response";
 import type {
   GeoIngestBuffer,
   GeoIngestDefer,
+  WebCollectOptions,
 } from "@notra/geo-core/types/ingest";
+import {
+  trackerPlusScriptResponse,
+  trackerReleaseResponse,
+  trackerScriptResponse,
+} from "@notra/web-tracker/response";
 import { Hono } from "hono";
 import { bodyLimit } from "hono/body-limit";
 
-import { INGEST_MAX_BODY_BYTES } from "./constants/server";
+import {
+  INGEST_MAX_BODY_BYTES,
+  TRACKER_RELEASE_ROUTE,
+} from "./constants/server";
 import { missingIngestEnvironment } from "./utils/config";
 import { payloadTooLarge } from "./utils/payload-too-large";
 
 export function createIngestApp(
   defer: GeoIngestDefer,
-  buffer?: GeoIngestBuffer
+  buffer?: GeoIngestBuffer,
+  collect?: WebCollectOptions
 ) {
   const app = new Hono();
 
@@ -60,6 +81,27 @@ export function createIngestApp(
     });
   };
 
+  app.get(GEO_WEB_SCRIPT_PATH, (context) =>
+    trackerScriptResponse(context.req.raw)
+  );
+  app.get(GEO_WEB_PLUS_SCRIPT_PATH, (context) =>
+    trackerPlusScriptResponse(context.req.raw)
+  );
+  app.get(TRACKER_RELEASE_ROUTE, (context) =>
+    trackerReleaseResponse(context.req.raw)
+  );
+  // notra.js posts with a CORS fetch, so every answer, including the body
+  // limit's 413, must carry CORS headers or the browser rejects it.
+  app.use(GEO_WEB_COLLECT_PATH, async (context, next) => {
+    await next();
+    context.res = withWebCollectCors(
+      new Response(context.res.body, context.res)
+    );
+  });
+  app.options(GEO_WEB_COLLECT_PATH, webCollectPreflightResponse);
+  postRoute(GEO_WEB_COLLECT_PATH, GEO_WEB_COLLECT_MAX_BODY_BYTES, (request) =>
+    handleWebCollectRequest(request, defer, buffer, collect)
+  );
   postRoute(GEO_INGEST_PATH, INGEST_MAX_BODY_BYTES, (request) =>
     handleGeoIngestRequest(request, defer, buffer)
   );

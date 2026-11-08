@@ -1,6 +1,9 @@
 # AI traffic ingestion
 
-Hono HTTP service on Bun for `POST /api/geo/ingest`, hosted on Unkey Compute.
+Hono HTTP service on Bun for `POST /api/geo/ingest`, the log drains, the
+`notra.js` browser tracker (`GET /api/notra.js`, `/api/notra.plus.js` and
+pinned `/api/notra[.plus].<version>.js`) and its beacons (`POST /api/collect`),
+hosted on Unkey Compute.
 Hono handles routing and HTTP responses. The Effect processing pipeline lives
 in `packages/geo-core/src/ingest` and is also used by the dashboard's
 compatibility handler. `Effect.runPromise` is the boundary between Hono and
@@ -193,16 +196,20 @@ the service. Use isolated equivalents for origin testing, never production data:
 | `DATABASE_URL` | Existing Notra Postgres database |
 | `UPSTASH_REDIS_REST_URL` | Existing Redis endpoint |
 | `UPSTASH_REDIS_REST_TOKEN` | Existing Redis credentials |
-| `TINYBIRD_TOKEN` | Existing token with ingestion permissions |
+| `TINYBIRD_TOKEN` | Existing token with append access to `geo_traffic_events`, `mcp_events`, `web_page_views`, `web_page_engagement`, `web_events` and `web_errors` |
 | `GEO_INGEST_SECRET` | The exact signing secret used by the dashboard |
 | `AUTUMN_SECRET_KEY` | Existing billing key; meters and limits `ai_traffic_events`. Without it, events are accepted unmetered and a warning is logged |
 | `TINYBIRD_BASE_URL` | Optional existing Tinybird endpoint, especially for a non-default region |
+| `NEXT_PUBLIC_DATABUDDY_DASHBOARD_WEBSITE_ID` | The dashboard's feature flag client id, for the `web-analytics` flag. Without it, `/api/collect` drops every notra.js beacon; write tokens and Notra Sites are unaffected |
 
 `TINYBIRD_URL` remains a supported alias for the Tinybird base URL.
 Optional telemetry variables are `NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN`,
 `NEXT_PUBLIC_POSTHOG_HOST`, `AXIOM_TOKEN`, and `AXIOM_ORG_ID`. Logs go to the
 `notra-geo-scan` dataset by default; set `AXIOM_GEO_DATASET` only to override it.
 Set `PORT=3000` on the host to match the configured public target port.
+Off Unkey and Vercel, set `TRUSTED_PROXY_HEADER` as described in
+[CONTRIBUTING.md](../../CONTRIBUTING.md#client-ip-and-rate-limits); without it
+`/api/collect` sees no visitor IP, so visitors with the same browser merge.
 
 Without required configuration, the process starts but rejects ingestion with
 `503`. `GET /healthz` checks process liveness and returns `200`.

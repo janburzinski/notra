@@ -412,6 +412,16 @@ export const ingestTokenQuerySchema = z.object({
     }),
 });
 
+export const ingestSetupQuerySchema = z.object({
+  projectId: resourceIdSchema("projectId")
+    .optional()
+    .openapi({
+      param: { name: "projectId", in: "query" },
+      description:
+        "Return the web key for one project. Omit for the oldest project's web key.",
+    }),
+});
+
 /**
  * Install instructions without the token. The snippets reference the token's
  * environment variable, not its value, so this carries no credential and is
@@ -445,9 +455,46 @@ const ingestSetupFieldsSchema = z.object({
   organization: organizationResponseSchema,
 });
 
-export const ingestSetupResponseSchema = ingestSetupFieldsSchema.openapi(
-  "GeoIngestSetupResponse"
-);
+const webScriptSchema = z.object({
+  url: z.string().openapi({
+    description: "Always serves the latest build.",
+  }),
+  pinnedUrl: z.string().openapi({
+    description: "Serves exactly this build forever; it never updates.",
+  }),
+  integrity: z.string().openapi({
+    description:
+      'Subresource Integrity value for pinnedUrl (sha384). Use it with crossorigin="anonymous".',
+  }),
+});
+
+/**
+ * The notra.js install. The web key is public by design (it ships in page
+ * HTML and only records page views on tracked domains), so read access gets it.
+ * Only workspaces with web analytics get these fields.
+ */
+const webSetupFields = {
+  webKey: z.string().optional().openapi({
+    description:
+      "Public key for the notra.js browser script, bound to one project. Safe to put in page HTML; it only records human page views on that project's tracked domains and survives token rotation. Only present when web analytics is enabled for the workspace and it has a project.",
+  }),
+  webSnippet: z.string().optional().openapi({
+    description:
+      "Script tag that installs notra.js with the public key. Only present when web analytics is enabled for the workspace.",
+  }),
+  webScript: webScriptSchema.optional().openapi({
+    description:
+      "notra.js: the auto-updating URL and the current build pinned with Subresource Integrity. Only present when web analytics is enabled for the workspace.",
+  }),
+  webPlusScript: webScriptSchema.optional().openapi({
+    description:
+      "notra.plus.js (notra.js with JavaScript error reporting), auto-updating and pinned. Only present when web analytics is enabled for the workspace.",
+  }),
+};
+
+export const ingestSetupResponseSchema = ingestSetupFieldsSchema
+  .extend(webSetupFields)
+  .openapi("GeoIngestSetupResponse");
 
 export const ingestTokenResponseSchema = ingestSetupFieldsSchema
   .extend({
@@ -455,5 +502,6 @@ export const ingestTokenResponseSchema = ingestSetupFieldsSchema
       description:
         "Tracking token. Shown once per request; rotating invalidates every previously issued token.",
     }),
+    ...webSetupFields,
   })
   .openapi("GeoIngestTokenResponse");

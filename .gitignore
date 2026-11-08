@@ -56,6 +56,7 @@ apps/onboarding-agent/logs
 .env*
 !.env.example
 !**/.env.example
+packages/web-tracker/bench/.cache
 
 # Layout-shift harness output, including a synthetic session cookie
 .hoplite/

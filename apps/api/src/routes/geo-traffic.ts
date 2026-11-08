@@ -3,6 +3,7 @@ import {
   buildGeoIngestSetupInfo,
   isGeoIngestConfigured,
   issueGeoIngestSetupResponse,
+  loadGeoWebSetupResponse,
   rotateGeoIngestSetupResponse,
 } from "@notra/geo-core/geo/ingest";
 import {
@@ -18,8 +19,10 @@ import {
 } from "@notra/geo-core/geo/programs";
 import { geoWindow } from "@notra/geo-core/geo/window";
 import type { GeoIngestSetupResponse } from "@notra/geo-core/types/geo";
+import { webHostFilter } from "@notra/geo-core/utils/geo-project-domains";
 import { projectParamsSchema } from "@notra/schemas/api/geo-params";
 import {
+  ingestSetupQuerySchema,
   ingestSetupResponseSchema,
   ingestTokenQuerySchema,
   ingestTokenResponseSchema,
@@ -37,6 +40,7 @@ import {
   trafficPagesQuerySchema,
   trafficPagesResponseSchema,
 } from "@notra/schemas/api/geo-traffic";
+import { analyticsFilterQuerySchema } from "@notra/schemas/api/geo-web-analytics";
 import type { Context } from "hono";
 
 import {
@@ -53,6 +57,7 @@ import {
 } from "../utils/geo";
 import { logError } from "../utils/logging";
 import { createOpenApiApp } from "../utils/openapi-app";
+import { isWebAnalyticsEnabledForRequest } from "../utils/web-analytics";
 
 /**
  * AI crawler and referral traffic, plus the tracking token that produces it.
@@ -74,7 +79,9 @@ import { createOpenApiApp } from "../utils/openapi-app";
  * credential — it lets its holder post events — so a read-only key must not be
  * able to obtain one. `GET /geo/ingest/setup` therefore returns the endpoint
  * and the snippets, which name the token's environment variable rather than its
- * value, and `POST /geo/ingest/token` issues the token itself.
+ * value, and `POST /geo/ingest/token` issues the token itself. The notra.js web
+ * key is public by design (it ships in page HTML), so setup includes it; it is
+ * rotated in the dashboard only, by owners and admins.
  */
 export const geoTrafficRoutes = createOpenApiApp();
 
@@ -85,8 +92,8 @@ const trafficOverviewRoute = createRoute({
   operationId: "getGeoTrafficOverview",
   summary: "Get AI traffic totals and sources",
   description:
-    "Crawler and AI-referral visit totals, a per-source breakdown and the daily timeseries behind it.",
-  request: { params: projectParamsSchema, query: trafficOverviewQuerySchema },
+    "Crawler and AI-referral visit totals, a per-source breakdown and the daily timeseries behind it. Filter by host, exact page path or Notra Sites the way the dashboard does. Explicit ranges can span at most 366 days.",
+  request: { params: projectParamsSchema, query: analyticsFilterQuerySchema },
   responses: {
     200: {
       description: "Traffic overview fetched successfully",
@@ -213,7 +220,8 @@ const ingestSetupRoute = createRoute({
   operationId: "getGeoIngestSetup",
   summary: "Get the install snippets",
   description:
-    "The endpoint and framework snippets needed to send AI traffic to Notra. The snippets read the token from an environment variable; the token itself is issued by `POST /geo/ingest/token`, which requires a write scope.",
+    "The endpoint and framework snippets needed to send AI traffic to Notra, plus, when web analytics is enabled for the workspace, the notra.js install: the public web key, the script tag and the pinned script URLs with their Subresource Integrity values. Web keys always belong to one project: pass `projectId` for that project's key, or omit it for the organization's oldest project. The snippets read the tracking token from an environment variable; the token itself is issued by `POST /geo/ingest/token`, which requires a write scope.",
+  request: { query: ingestSetupQuerySchema },
   responses: {
     200: {
       description: "Setup fetched successfully",
@@ -230,7 +238,7 @@ const issueTokenRoute = createRoute({
   operationId: "issueGeoIngestToken",
   summary: "Issue the tracking token",
   description:
-    "Returns the current tracking token together with the install snippets. Pass `projectId` for a project-specific token; without it, the legacy token only accepts the organization's oldest project's hosts. Issuing does not invalidate previously issued tokens; use rotation for that.",
+    "Returns the current tracking token together with the install snippets. Pass `projectId` for a project-specific token; without it, the legacy token only accepts the organization's oldest project's hosts. The web key in the response always belongs to one project: the given one, or the oldest. Issuing does not invalidate previously issued tokens; use rotation for that.",
   request: { query: ingestTokenQuerySchema },
   responses: {
     200: {
@@ -264,12 +272,17 @@ const rotateTokenRoute = createRoute({
 geoTrafficRoutes.openapi(trafficOverviewRoute, async (c) => {
   const base = c.get("geo");
   const { projectId } = c.req.valid("param");
+  const query = c.req.valid("query");
 
   const outcome = await runGeoEffect(
     "aiTraffic",
     loadAiTraffic(
       { organizationId: base.organizationId, projectId },
-      geoWindow(c.req.valid("query"))
+      geoWindow(query),
+      webHostFilter(query.host),
+      "",
+      query.path,
+      query.sites
     )
   );
   return geoOutcomeResponse(c, outcome, 200);
@@ -384,20 +397,24 @@ geoTrafficRoutes.openapi(mcpToolDetailRoute, async (c) => {
 });
 
 geoTrafficRoutes.openapi(ingestSetupRoute, async (c) => {
-  const base = c.get("geo");
+  const { organization, organizationId } = c.get("geo");
   if (!isGeoIngestConfigured()) {
     return c.json({ error: "Traffic ingest is not configured" }, 503);
   }
-
-  try {
-    return c.json(
-      { ...buildGeoIngestSetupInfo(), organization: base.organization },
-      200
-    );
-  } catch (error) {
-    logError("[GEO] ingestSetup", error);
-    return c.json({ error: "Internal server error" }, 500);
+  if (!(await isWebAnalyticsEnabledForRequest(c))) {
+    try {
+      return c.json({ ...buildGeoIngestSetupInfo(), organization }, 200);
+    } catch (error) {
+      logError("[GEO] ingestSetup", error);
+      return c.json({ error: "Internal server error" }, 500);
+    }
   }
+  const { projectId } = c.req.valid("query");
+  const outcome = await runGeoEffect(
+    "ingestSetup",
+    loadGeoWebSetupResponse({ organizationId, projectId })
+  );
+  return geoOutcomeResponse(c, outcome, 200);
 });
 
 function ingestTokenResponse(
@@ -422,9 +439,10 @@ function ingestTokenResponse(
 geoTrafficRoutes.openapi(issueTokenRoute, async (c) => {
   const { organizationId } = c.get("geo");
   const { projectId } = c.req.valid("query");
+  const withWeb = await isWebAnalyticsEnabledForRequest(c);
   const outcome = await runGeoEffect(
     "ingestTokenIssue",
-    issueGeoIngestSetupResponse({ organizationId, projectId })
+    issueGeoIngestSetupResponse({ organizationId, projectId }, withWeb)
   );
   return ingestTokenResponse(c, outcome);
 });
@@ -432,9 +450,10 @@ geoTrafficRoutes.openapi(issueTokenRoute, async (c) => {
 geoTrafficRoutes.openapi(rotateTokenRoute, async (c) => {
   const { organizationId } = c.get("geo");
   const { projectId } = c.req.valid("query");
+  const withWeb = await isWebAnalyticsEnabledForRequest(c);
   const outcome = await runGeoEffect(
     "ingestTokenRotate",
-    rotateGeoIngestSetupResponse({ organizationId, projectId })
+    rotateGeoIngestSetupResponse({ organizationId, projectId }, withWeb)
   );
   return ingestTokenResponse(c, outcome);
 });

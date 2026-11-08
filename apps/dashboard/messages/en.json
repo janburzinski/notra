@@ -55,6 +55,10 @@
         },
         "geo-models": {
           "description": "Assistants and schedule"
+        },
+        "geo-tracking": {
+          "description": "Install tracking and import history",
+          "agentsDescription": "Install AI traffic tracking"
         }
       }
     },
@@ -74,7 +78,9 @@
         "webhooks": "Connect your workflows and check every delivery",
         "logs": "View integration events and their delivery status",
         "dev": "Development-only tools for testing local flows",
-        "geo-models": "Which assistants your prompts run on"
+        "geo-models": "Which assistants your prompts run on",
+        "geo-tracking": "Count visits on your site and bring in past analytics",
+        "geo-tracking-agents": "Count AI crawlers and referrals on your site"
       }
     },
     "panes": {
@@ -644,7 +650,7 @@
         },
         "traffic": {
           "label": "GEO AI traffic",
-          "description": "Read AI crawler and referral traffic, and manage the ingest token"
+          "description": "Read AI traffic, website analytics and history imports, and manage the ingest token"
         }
       }
     },
@@ -1036,6 +1042,9 @@
     "analytics": {
       "unavailable": "Analytics is not available for this workspace yet.",
       "xAccountNotFound": "Could not find the X account @{username}"
+    },
+    "webAnalytics": {
+      "unavailable": "Web analytics is not available for this workspace yet."
     },
     "actions": {
       "organizations": {
@@ -2288,7 +2297,10 @@
       "allPlatforms": "All platforms",
       "contentActivity": "Content activity",
       "sites": "Sites",
-      "automations": "Automations"
+      "automations": "Automations",
+      "aiAnalytics": "AI analytics",
+      "webAnalytics": "Web analytics",
+      "tracking": "Tracking"
     },
     "messages": {
       "yourAiCreditsHaveBeen": "Your AI credits have been topped up and are ready to use.",
@@ -2986,11 +2998,11 @@
       "method": "Install method",
       "methods": {
         "sdk": "Package",
-        "vercel": "Vercel Log Drain",
-        "cloudflare": "Cloudflare Logpush"
+        "vercel": "Vercel",
+        "cloudflare": "Cloudflare",
+        "script": "Script tag"
       },
       "drains": {
-        "docsLink": "Read the guide",
         "vercel": {
           "openTitle": "Open Drains",
           "openDescription": "Needs a Pro or Enterprise team. Add a drain and choose Logs.",
@@ -3010,22 +3022,34 @@
           "fieldsDescription": "{count} fields from the HTTP requests dataset, with RFC 3339 timestamps.",
           "saveTitle": "Save the job",
           "saveDescription": "Traffic shows up here a minute or two later.",
-          "customFieldsNote": "Also log the accept, sec-ch-ua and sec-fetch-mode request headers as Logpush custom fields. RequestHeaders alone doesn't include them, and Notra needs them to spot Markdown requests and agents posing as browsers."
+          "customFieldsNote": "Also add the <code>accept</code>, <code>sec-ch-ua</code> and <code>sec-fetch-mode</code> request headers as custom fields."
         }
       },
-      "footer": {
-        "sdk": {
-          "title": "Let your agent set it up",
-          "description": "Paste the prompt into Claude Code, Cursor or Codex."
-        },
-        "cloudflare": {
-          "title": "Let your agent set it up",
-          "description": "It creates the Logpush job through the Cloudflare API."
-        },
-        "vercel": {
-          "title": "Need more detail?",
-          "description": "The guide walks through the drain setup."
-        }
+      "script": {
+        "tagTitle": "Add this to the <code>{tag}</code> of every page",
+        "notConfigured": "Tracking isn't configured on this server yet.",
+        "pinLabel": "Pin this version",
+        "pinNote": "A pinned script never updates on its own. Copy the tag again to update.",
+        "rotateKey": "Rotate key",
+        "rotateKeyTitle": "Rotate the public key?",
+        "rotateKeyDescription": "Pages that use the current script tag stop counting visits right away. Copy the new tag to every page afterwards. Do this if the key is used on a site you don't control.",
+        "rotateKeyConfirm": "Rotate key",
+        "checkTitle": "Deploy, then visit your site",
+        "errorsLabel": "Report JavaScript errors",
+        "errorsNote": "Loads <code>notra.plus.js</code>, which also sends uncaught JavaScript errors.",
+        "awaiting": "Awaiting first page view…",
+        "receiving": "Receiving page views since {date}",
+        "viewAnalytics": "View analytics"
+      },
+      "methodDescriptions": {
+        "sdk": "Counts AI agents and crawlers on your server. Add it to the framework your site runs on.",
+        "script": "Counts people, without cookies. For AI agents, add the package or a log drain too.",
+        "vercel": "Counts AI agents from your Vercel request logs. No code changes.",
+        "cloudflare": "Counts AI agents from your Cloudflare request logs. No code changes."
+      },
+      "docs": {
+        "script": "Learn more about notra.js",
+        "drain": "Read the setup guide"
       }
     },
     "promptTranslations": {
@@ -3678,6 +3702,7 @@
     },
     "trafficHero": {
       "notConfigured": "Not configured",
+      "crawlersUntracked": "No crawler visits recorded. Crawlers don't run JavaScript, so counting them needs the package or a log drain.",
       "setUpTitle": "Set conversion paths",
       "activity": "Traffic activity",
       "tooltipMore": "+{count} more",
@@ -4071,18 +4096,9 @@
         "setupDescription": "Set up GEO tracking first, then see which pages engines cite and who is listed on them."
       },
       "traffic": {
-        "metaTitle": "Website analytics",
-        "mcpMetaTitle": "MCP server analytics",
         "title": "Analytics",
-        "description": "AI crawlers and referrals visiting your site",
-        "setupDescription": "Set up GEO tracking first, then watch AI crawlers and referrals as they arrive.",
         "descriptionWithVisitors": "People and AI agents on your site",
-        "emptyRangeTitle": "No traffic in this period",
-        "emptyRangeDescription": "Try a different date range or domain.",
-        "emptyPathTitle": "No visits to {path}",
-        "emptyPathDescription": "Neither people nor AI agents opened this page in the selected period.",
-        "emptyPathReset": "Show all pages",
-        "emptyPathWiden": "Try last 90 days"
+        "mcpMetaTitle": "MCP server analytics"
       },
       "mcp": {
         "description": "AI agents and tool calls on your MCP server",
@@ -4267,6 +4283,21 @@
           "user": "User",
           "intent": "Intent"
         }
+      },
+      "aiAnalytics": {
+        "metaTitle": "AI analytics",
+        "description": "AI crawlers, citation fetches and people arriving from AI answers",
+        "setupDescription": "Set up GEO tracking first, then watch AI crawlers and referrals as they arrive.",
+        "emptyRangeTitle": "No AI activity in this period",
+        "emptyRangeDescription": "Try a different date range or domain."
+      },
+      "webAnalytics": {
+        "metaTitle": "Web analytics",
+        "description": "People visiting your site, where they come from and what they read",
+        "setupDescription": "Set up GEO tracking first, then see who visits your site and where they come from.",
+        "emptyRangeTitle": "No visitors in this period",
+        "emptyRangeDescription": "Try a different date range or domain.",
+        "installDescription": "Add the script tag to count visitors, page views and referrers."
       }
     },
     "toasts": {
@@ -4307,6 +4338,8 @@
       "loadTrackingSetupFailed": "Failed to load tracking setup",
       "trackingTokenRotated": "Tracking token rotated",
       "rotateTokenFailed": "Failed to rotate the token",
+      "webKeyRotated": "Public key rotated. Copy the new script tag to every page.",
+      "rotateWebKeyFailed": "Couldn't rotate the public key",
       "runConversationFailed": "Failed to run the conversation",
       "loadConversationResultsFailed": "Failed to load conversation results",
       "loadSearchConsoleStatusFailed": "Failed to load Search Console status",
@@ -4421,8 +4454,8 @@
       "outcomesAll": "All visitors",
       "pagesPerSession": "Pages per visit",
       "engagedRate": "Read further",
-      "noData": "No visitors in this period",
-      "noDataDescription": "Visit details appear here once traffic is recorded. Try a longer date range.",
+      "noData": "Nothing recorded",
+      "noDataDescription": "Nothing in this report was recorded in the selected period.",
       "columnViews": "Views",
       "columnFromAi": "From AI",
       "avgTime": "Avg. time on page",
@@ -4430,7 +4463,52 @@
       "columnSource": "Source",
       "columnCountry": "Country",
       "columnDevice": "Device",
-      "referrers": "Referrers"
+      "referrers": "Referrers",
+      "utmParameters": "UTM parameters",
+      "sourcesLabel": "Sources",
+      "utmShort": "UTM",
+      "utm": {
+        "source": "Source",
+        "medium": "Medium",
+        "campaign": "Campaign",
+        "term": "Term",
+        "content": "Content"
+      },
+      "utmEmptyTitle": "No tagged visits yet",
+      "utmEmptyDescription": "Visits from links with utm_source, utm_medium, utm_campaign, utm_term or utm_content show up here.",
+      "importMarker": "{provider} → Notra",
+      "outboundLinks": "Outbound links",
+      "columnLink": "Link",
+      "columnClicks": "Clicks",
+      "outboundEmptyTitle": "No outbound clicks yet",
+      "outboundEmptyDescription": "Clicks on links to other sites appear here on their own. Notra keeps the host and path, never the query.",
+      "webVitals": "Web vitals",
+      "vitalGood": "Good",
+      "vitalNeedsWork": "Needs improvement",
+      "vitalPoor": "Poor",
+      "vitalName": {
+        "lcp": "Largest Contentful Paint",
+        "inp": "Interaction to Next Paint",
+        "cls": "Cumulative Layout Shift",
+        "fcp": "First Contentful Paint",
+        "ttfb": "Time to First Byte"
+      },
+      "vitalsEmptyTitle": "No web vitals yet",
+      "vitalsEmptyDescription": "notra.js measures loading speed and responsiveness on every page view. Results appear once visitors leave a page.",
+      "languages": "Languages",
+      "columnLanguage": "Language",
+      "errors": "JavaScript errors",
+      "columnError": "Error",
+      "columnEvents": "Events",
+      "vitalsDescription": "75th percentile of real page views, rated with Google's thresholds",
+      "vitalSummary": "p75 of {count, plural, one {# view} other {# views}}",
+      "vitalRange": {
+        "good": "≤ {value}",
+        "needsImprovement": "{from}–{to}",
+        "poor": "> {value}"
+      },
+      "vitalsDeviceLabel": "Device",
+      "vitalsDeviceAll": "All devices"
     },
     "trafficPathFilter": {
       "label": "Filter",
@@ -4440,9 +4518,11 @@
     },
     "trafficExport": {
       "label": "Export to CSV",
-      "menu": "Export",
       "csv": "Download CSV",
-      "embed": "Embed on your site"
+      "embed": "Embed on your site",
+      "more": "More actions",
+      "trackingSetup": "Tracking setup",
+      "importHistory": "Import history"
     },
     "trafficEmbed": {
       "title": "Embed AI traffic chart",
@@ -4514,6 +4594,241 @@
       "pauseFailed": "Could not pause the prompt",
       "keepFailed": "Could not keep the prompt",
       "reasonNoBrands": "In {answers} answers over the last {days} days, no engine named any brand, so this prompt doesn't measure your visibility."
+    },
+    "trafficPathEmpty": {
+      "title": "No visits to {path}",
+      "description": "Neither people nor AI agents opened this page in the selected period.",
+      "reset": "Show all pages",
+      "widen": "Try last 90 days"
+    },
+    "analyticsImport": {
+      "title": "Import history",
+      "description": "Bring over daily totals from the tool you used before Notra.",
+      "manageDescription": "Web analytics is off for this workspace, so new imports can't start. You can still delete imports and disconnect accounts.",
+      "privacy": "Only daily totals are imported, never IP addresses or single visits.",
+      "back": "Back",
+      "cta": {
+        "title": "See your history from day one",
+        "description": "Import past page views from Plausible, Vercel or Cloudflare.",
+        "action": "Import history"
+      },
+      "settings": {
+        "title": "Import history",
+        "description": "Bring past page views and AI crawler hits in from Plausible, Vercel or Cloudflare.",
+        "action": "Manage imports",
+        "manageDescription": "Web analytics is off for this workspace. You can still delete imported history and disconnect accounts."
+      },
+      "providers": {
+        "title": "Choose a source",
+        "plausible_csv": {
+          "name": "Plausible export",
+          "description": "Upload the CSV export. Full history, any plan."
+        },
+        "plausible": {
+          "name": "Plausible API",
+          "description": "Connect an API key. Full history, Business plan."
+        },
+        "cloudflare": {
+          "name": "Cloudflare",
+          "description": "AI crawler hits and Web Analytics page views."
+        },
+        "vercel": {
+          "name": "Vercel Web Analytics",
+          "description": "Page views and visitors, up to 24 months back."
+        }
+      },
+      "guide": "What to do in {provider}",
+      "openProvider": "Open {provider}",
+      "csv": {
+        "title": "Upload a Plausible export",
+        "description": "Works on any Plausible plan and covers your whole history.",
+        "openTitle": "Open your site settings",
+        "openDescription": "Go to Imports & Exports.",
+        "exportTitle": "Export to CSV",
+        "exportDescription": "Plausible emails you a ZIP file. Keep it zipped.",
+        "fileLabel": "Export ZIP",
+        "dropTitle": "Drop your Plausible export here",
+        "dropHint": "or click to choose a ZIP file, up to {size}",
+        "dropActive": "Drop to add the export",
+        "dropReplace": "Drop to replace this file",
+        "fileMeta": "ZIP · {size}",
+        "replace": "Replace",
+        "remove": "Remove {name}",
+        "rejected": "Choose a ZIP file up to {size}.",
+        "tooManyFiles": "Choose one ZIP file. Plausible puts the whole export in one.",
+        "preview": "Check export",
+        "failed": "Couldn't read this export"
+      },
+      "connect": {
+        "title": "Connect {provider}",
+        "description": {
+          "plausible": "Uses the Stats API, which needs Plausible's Business plan.",
+          "cloudflare": "AI crawler hits for the last 31 days and Web Analytics page views for about 6 months.",
+          "vercel": "Hobby keeps 1 month of history, Pro 12 and Plus 24. UTM campaigns need Plus."
+        },
+        "existing": "Saved connections",
+        "newConnection": "Or add a new one",
+        "managersOnly": "Only owners and admins can connect a new account.",
+        "steps": {
+          "plausible": {
+            "firstTitle": "Create an API key",
+            "firstDescription": "Account settings → API Keys → New API key.",
+            "secondTitle": "Choose Stats API",
+            "secondDescription": "Pick the team that owns the site."
+          },
+          "cloudflare": {
+            "firstTitle": "Create a custom token",
+            "firstDescription": "My Profile → API Tokens → Create Token → Custom token.",
+            "secondTitle": "Add these permissions",
+            "secondDescription": "Then limit the token to the zones and account you want to import."
+          },
+          "vercel": {
+            "firstTitle": "Create a token",
+            "firstDescription": "Scope it to the team that owns the project and set an expiration. Vercel tokens can't be limited to read-only, so Notra only ever reads Web Analytics with it.",
+            "secondTitle": "Copy your team ID",
+            "secondDescription": "Team Settings → General. Skip this for personal projects."
+          }
+        },
+        "secretLabel": "API key",
+        "tokenLabel": "API token",
+        "teamLabel": "Team ID (optional)",
+        "teamPlaceholder": "team_…",
+        "submit": "Connect",
+        "failed": "Couldn't connect",
+        "stored": "Encrypted and only used to read analytics."
+      },
+      "source": {
+        "title": "Choose what to import",
+        "description": "From your {provider} connection.",
+        "sourceLabel": "Site",
+        "sourcePlaceholder": "Choose a site",
+        "hostLabel": "Domain in Notra",
+        "hostHint": "Imported days are stored under this domain.",
+        "range": "Limit the date range",
+        "startLabel": "From",
+        "endLabel": "Until",
+        "preview": "Check range",
+        "noneTitle": "No sites found",
+        "none": "This connection can't see any sites. Check the token's access, then reconnect.",
+        "failed": "Couldn't load sites",
+        "reconnect": "Reconnect",
+        "kinds": {
+          "web": "Web analytics",
+          "geo": "AI crawlers"
+        }
+      },
+      "preview": {
+        "title": "Ready to import",
+        "period": "Period",
+        "pageviewsLabel": "Page views",
+        "requestsLabel": "Crawler hits",
+        "range": "{start} – {end}",
+        "months": "{count, plural, one {# month} other {# months}}",
+        "pageviews": "About {count, number}",
+        "unknownPageviews": "Counted during import",
+        "cutoff": "Ends the day before Notra started tracking on {date}.",
+        "noNative": "Notra hasn't tracked this domain yet, so the import runs up to yesterday.",
+        "clipped": "Skips days an earlier import of this source already has.",
+        "overlap": "{host} already has {range} from {source}.",
+        "overlapNamed": "{host} already has {range} from {source} ({label}).",
+        "overlapChoice": "Days already imported",
+        "overlapSkip": "Skip those days",
+        "overlapAdd": "Add together",
+        "overlapSkipHint": "Imports only the missing days. Choose this when both sources tracked the same site.",
+        "overlapAddHint": "Adds both sources' numbers for those days. Choose this to merge two sites into one.",
+        "noNewDays": "Every day is already imported",
+        "emptyTitle": "Nothing new to import",
+        "empty": "Notra or another import already covers this period.",
+        "alreadyImportedTitle": "Already imported",
+        "alreadyImported": "An earlier import of this source already has these days.",
+        "start": "Start import",
+        "failed": "Couldn't start the import"
+      },
+      "progress": {
+        "title": "Importing {host}",
+        "titleDone": "Imported {host}",
+        "titleFailed": "Import of {host} stopped",
+        "titleDeleting": "Deleting the import of {host}",
+        "titleDeleted": "Import of {host} deleted",
+        "chunks": {
+          "month": "{done, number} of {total, plural, one {# month} other {# months}}",
+          "week": "{done, number} of {total, plural, one {# week} other {# weeks}}",
+          "part": "{done, number} of {total, plural, one {# part} other {# parts}}"
+        },
+        "queuedLine": "Starts in a moment",
+        "queuedBehind": "Waiting for {source} to finish",
+        "waitingLine": "{provider} asked for a pause. Resumes in {time}.",
+        "waitingSoon": "{provider} asked for a pause. Resuming…",
+        "completedLine": "Your charts now go back to {date}.",
+        "failedLine": "Stopped while importing {period}.",
+        "failedAny": "Stopped before it finished.",
+        "deletingLine": "Removing what this import added to your charts…",
+        "deletedLine": "This import was deleted. What it added is no longer in your charts.",
+        "period": "{start} – {end}",
+        "close": "Close",
+        "done": "Done",
+        "viewAnalytics": "View analytics",
+        "backToImports": "Back to imports",
+        "importAnother": "Import another site",
+        "importing": "Importing {kind, select, geo {crawler hits} other {page views}}",
+        "importedPageviews": "{count, plural, one {# page view} other {# page views}} imported",
+        "importedRequests": "{count, plural, one {# crawler hit} other {# crawler hits}} imported",
+        "stopped": "The import stopped"
+      },
+      "list": {
+        "title": "Imports",
+        "connections": "Connections",
+        "actions": "Actions for {name}",
+        "open": "Show progress",
+        "connectedOn": "Connected {date}",
+        "disconnect": "Disconnect",
+        "disconnectAndDelete": "Disconnect and delete imports",
+        "disconnected": "Disconnected",
+        "disconnectFailed": "Couldn't disconnect the account",
+        "reauth": "Reconnect needed",
+        "reconnect": "Reconnect",
+        "delete": "Delete import",
+        "deleted": "Import deleted",
+        "deleteFailed": "Couldn't delete the import",
+        "range": "{start} – {end}",
+        "progress": "Step {done} of {total}",
+        "waiting": "Rate limited, resumes {time}",
+        "queued": "Waiting for {source} to finish",
+        "pageviews": "{count, number} page views",
+        "requests": "{count, number} crawler hits",
+        "sampled": "Sampled estimate",
+        "missing": "No sessions or bounces",
+        "status": {
+          "pending": "Queued",
+          "running": "Importing",
+          "waiting_rate_limit": "Waiting",
+          "completed": "Imported",
+          "failed": "Failed",
+          "deleting": "Deleting",
+          "deleted": "Deleted"
+        },
+        "errors": {
+          "flagOff": "Web analytics was turned off for this workspace.",
+          "flagUnavailable": "Couldn't check whether web analytics is on for this workspace. Try again later.",
+          "lost": "The import stopped and couldn't be resumed. Start it again.",
+          "lostUpload": "The import stopped before it finished reading the export. Upload it again."
+        }
+      },
+      "indicator": {
+        "label": "{count, plural, one {Importing # site} other {Importing # sites}} · {percent}",
+        "open": "Show import progress"
+      },
+      "toast": {
+        "completed": "Imported {host}",
+        "completedDescription": "Your charts now go back to {date}.",
+        "failed": "Import of {host} stopped",
+        "failedDescription": "Open Import history to see why."
+      }
+    },
+    "trafficInstall": {
+      "trackCrawlers": "Track crawlers",
+      "title": "Install tracking",
+      "description": "Pick a method. You can combine them; nothing is counted twice."
     }
   },
   "integrations": {
@@ -5210,6 +5525,8 @@
     "sources": {
       "label": "Analytics source",
       "website": "Website",
+      "agents": "Agent",
+      "web": "Web",
       "mcp": "MCP server",
       "social": "Social"
     },
@@ -6101,7 +6418,8 @@
         "openAgentReadiness": "Open agent readiness",
         "openTraffic": "Open traffic analytics",
         "openBrandIdentity": "Open brand identity",
-        "openIntegrations": "Open integrations"
+        "openIntegrations": "Open integrations",
+        "openWebAnalytics": "Open web analytics"
       }
     }
   },

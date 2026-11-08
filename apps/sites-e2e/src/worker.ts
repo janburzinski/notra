@@ -9,6 +9,7 @@ import {
   SITE_ABUSE_EMAIL,
   SITE_ANALYTICS_EVENT_FILE,
   SITE_ANALYTICS_SCRIPT_FILE,
+  SITE_ENGAGEMENT_VIEW_ID_PATTERN,
   SITE_PREVIEW_AUTH_PATH,
   SITE_PREVIEW_COOKIE,
   SITE_PREVIEW_SIGN_OUT_PATH,
@@ -556,7 +557,7 @@ try {
       assert.equal(event.body.status, 200, String(event.body.url));
       continue;
     }
-    assert.match(String(event.body.viewId), /^[a-f0-9]{24}$/);
+    assert.match(String(event.body.viewId), SITE_ENGAGEMENT_VIEW_ID_PATTERN);
     assert.equal(typeof event.body.visibleMs, "number");
     assert.ok(Number(event.body.visibleMs) > 0);
     assert.ok(

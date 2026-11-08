@@ -1,0 +1,10 @@
+{
+  "extends": "@notra/typescript-config/base.json",
+  "compilerOptions": {
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "types": ["bun-types"]
+  },
+  "include": ["src", "scripts", "tests", "bench"],
+  "exclude": ["node_modules", "dist"]
+}

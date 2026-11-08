@@ -3,6 +3,7 @@ import { createLimiter } from "@notra/utils/ratelimit";
 import type { Limiter } from "@notra/utils/types/ratelimit";
 import { getRequestHeaders as headers } from "@tanstack/react-start/server";
 
+import { ANALYTICS_IMPORT_RATE_LIMIT_PER_HOUR } from "@/constants/analytics-imports";
 import { COMPANY_LOGO_RATE_LIMIT_PER_USER_PER_MINUTE } from "@/constants/company-logo";
 import {
   DEMO_SANDBOX_CREATE_LIMIT,
@@ -23,6 +24,11 @@ export const ratelimit = {
     prefix: "ratelimit:import-tweets",
     requests: 20,
     window: "1m",
+  }),
+  analyticsImport: createLimiter({
+    prefix: "ratelimit:analytics-import",
+    requests: ANALYTICS_IMPORT_RATE_LIMIT_PER_HOUR,
+    window: "1h",
   }),
   mcpConnection: createLimiter({
     prefix: "ratelimit:mcp-connection",

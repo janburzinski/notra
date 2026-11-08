@@ -2,6 +2,8 @@ export const ANALYTICS_EVENT_MAX_BYTES = 4096;
 
 export const ANALYTICS_SCRIPT_CACHE_CONTROL = "public, max-age=3600";
 
+// No layout reads until the page is hidden: reading scrollHeight at startup or
+// while scrolling forces a synchronous layout (about 10 ms on a slow phone).
 export const ANALYTICS_SCRIPT = `(() => {
   const script = document.currentScript;
   const endpoint = script && script.dataset.endpoint;
@@ -12,19 +14,13 @@ export const ANALYTICS_SCRIPT = `(() => {
       JSON.stringify({ k: "view", p: location.pathname + location.search, r: document.referrer })
     );
   }
-  const id = Array.from(crypto.getRandomValues(new Uint8Array(12)), (b) =>
-    b.toString(16).padStart(2, "0")
-  ).join("");
+  const id = (Date.now().toString(36) + Math.random().toString(36).slice(2))
+    .padEnd(16, "0")
+    .slice(0, 24);
   let total = 0;
-  let depth = 0;
+  let maxScroll = 0;
   let reported = 0;
   let shownAt = document.visibilityState === "visible" ? performance.now() : null;
-  const measureScroll = () => {
-    const root = document.documentElement;
-    const room = root.scrollHeight - window.innerHeight;
-    const reached = room > 0 ? Math.round(Math.min(1, window.scrollY / room) * 100) : 100;
-    if (reached > depth) depth = reached;
-  };
   const report = () => {
     if (shownAt !== null) {
       total += performance.now() - shownAt;
@@ -32,13 +28,16 @@ export const ANALYTICS_SCRIPT = `(() => {
     }
     if (total - reported < 1) return;
     reported = total;
+    const room = document.documentElement.scrollHeight - window.innerHeight;
+    const depth = room > 0 ? Math.round(Math.min(1, maxScroll / room) * 100) : 100;
     navigator.sendBeacon(
       endpoint,
       JSON.stringify({ v: id, p: location.pathname, ms: Math.round(total), sd: depth })
     );
   };
-  measureScroll();
-  addEventListener("scroll", measureScroll, { passive: true });
+  addEventListener("scroll", () => {
+    if (window.scrollY > maxScroll) maxScroll = window.scrollY;
+  }, { passive: true });
   document.addEventListener("visibilitychange", () => {
     if (document.visibilityState === "hidden") report();
     else if (shownAt === null) shownAt = performance.now();

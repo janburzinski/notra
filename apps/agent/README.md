@@ -88,6 +88,7 @@ Usage metering: hooks on the root agent and both subagents accumulate `step.comp
 | `DASHBOARD_VERCEL_TEAM_SLUG` / `DASHBOARD_VERCEL_PROJECT_NAME` | prod | Dashboard OIDC route auth |
 | `API_VERCEL_PROJECT_NAME` | prod | API project OIDC route auth (same team slug) |
 | `CODE_STORAGE_NAME` / `CODE_STORAGE_API_KEY` | optional | `search_company_knowledge` (onboarding facts); without them it finds nothing |
+| `NEXT_PUBLIC_DATABUDDY_DASHBOARD_WEBSITE_ID` | for web analytics | The dashboard's feature flag client id, read at runtime for the `web-analytics` flag. Without it `get_web_analytics_reports` answers that web analytics is not available |
 | `EVE_NOTRA_AGENT_PASSWORD` | fallback | Basic auth when OIDC is unavailable |
 | `SLACK_AGENT_BOT_TOKEN` / `SLACK_AGENT_SIGNING_SECRET` | Slack | Bot User OAuth Token and App Credentials signing secret for the Notra Agent Slack app |
 | `SLACK_AGENT_ORGANIZATION_ID` / `SLACK_AGENT_TEAM_ID` | Slack | Bind the signed Slack workspace to one Notra organization |

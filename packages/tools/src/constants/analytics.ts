@@ -13,6 +13,9 @@ export const WEB_ANALYTICS_NOT_CONFIGURED_MESSAGE =
 export const WEB_ANALYTICS_QUERY_FAILED_MESSAGE =
   "Failed to load website analytics from the analytics backend.";
 
+export const AI_TRAFFIC_QUERY_FAILED_MESSAGE =
+  "Failed to load AI agent traffic from the analytics backend.";
+
 export const POST_AGENT_REACH_QUERY_FAILED_MESSAGE =
   "Failed to load the post's agent reach from the analytics backend.";
 

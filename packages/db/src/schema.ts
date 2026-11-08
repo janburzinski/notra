@@ -27,6 +27,7 @@ import {
   type PgTableExtraConfigValue,
   boolean,
   check,
+  date,
   doublePrecision,
   foreignKey,
   index,
@@ -34,6 +35,7 @@ import {
   jsonb,
   pgEnum,
   pgTable,
+  primaryKey,
   real,
   text,
   timestamp,
@@ -48,6 +50,14 @@ import {
   AGENT_FEEDBACK_SOURCES,
   AGENT_FEEDBACK_STATUSES,
 } from "./constants/agent-feedback";
+import {
+  ANALYTICS_IMPORT_CHUNK_STATUSES,
+  ANALYTICS_IMPORT_CONNECTION_PROVIDERS,
+  ANALYTICS_IMPORT_CONNECTION_STATUSES,
+  ANALYTICS_IMPORT_KINDS,
+  ANALYTICS_IMPORT_PROVIDERS,
+  ANALYTICS_IMPORT_STATUSES,
+} from "./constants/analytics-imports";
 import { AUTOMATION_RUN_STATUSES } from "./constants/automation-runs";
 import {
   AUTOPILOT_EVENT_LEVELS,
@@ -86,6 +96,7 @@ import type {
   AgentReadinessIssue,
   AgentReadinessScoreBreakdown,
 } from "./types/agent-readiness";
+import type { AnalyticsImportCapabilities } from "./types/analytics-imports";
 import type {
   AutopilotCommitFilters,
   AutopilotFindingEvidence,
@@ -1682,6 +1693,8 @@ export const projects = pgTable(
     geoIngestTokenGeneration: integer("geo_ingest_token_generation")
       .notNull()
       .default(1),
+    /** Signed into the public notra.js key; rotating it revokes old keys. */
+    geoWebKeyGeneration: integer("geo_web_key_generation").notNull().default(0),
     gscSiteUrl: text("gsc_site_url"),
     gscTopQueries: jsonb("gsc_top_queries")
       .$type<GoogleSearchConsoleQuery[]>()
@@ -4256,6 +4269,138 @@ export const sites = pgTable(
       sql`${table.suspendedBy} IN ('owner', 'notra')`
     ),
   ]
+);
+
+/**
+ * Read-only credentials for importing historical analytics. Encrypted with
+ * INTEGRATION_ENCRYPTION_KEY and deleted on disconnect.
+ */
+export const analyticsImportConnections = pgTable(
+  "analytics_import_connections",
+  {
+    id: text("id").primaryKey(),
+    organizationId: text("organization_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "cascade" }),
+    provider: text("provider", {
+      enum: ANALYTICS_IMPORT_CONNECTION_PROVIDERS,
+    }).notNull(),
+    label: text("label").notNull(),
+    externalAccountId: text("external_account_id"),
+    encryptedCredentials: text("encrypted_credentials").notNull(),
+    status: text("status", { enum: ANALYTICS_IMPORT_CONNECTION_STATUSES })
+      .notNull()
+      .default("active"),
+    lastError: text("last_error"),
+    createdByUserId: text("created_by_user_id").references(() => users.id, {
+      onDelete: "set null",
+    }),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at")
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (table) => [
+    index("analyticsImportConnections_organizationId_idx").on(
+      table.organizationId
+    ),
+  ]
+);
+
+/**
+ * One historical import into Tinybird's *_imported_daily tables. Reads only
+ * include completed imports, so in-progress and deleted rows stay hidden.
+ */
+export const analyticsImports = pgTable(
+  "analytics_imports",
+  {
+    id: text("id").primaryKey(),
+    organizationId: text("organization_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "cascade" }),
+    projectId: text("project_id")
+      .notNull()
+      .references(() => projects.id, { onDelete: "cascade" }),
+    /** Notra Site the rows belong to; empty string in Tinybird when none. */
+    siteId: text("site_id"),
+    connectionId: text("connection_id").references(
+      () => analyticsImportConnections.id,
+      { onDelete: "set null" }
+    ),
+    provider: text("provider", { enum: ANALYTICS_IMPORT_PROVIDERS }).notNull(),
+    kind: text("kind", { enum: ANALYTICS_IMPORT_KINDS }).notNull(),
+    externalSiteRef: text("external_site_ref").notNull(),
+    externalSiteLabel: text("external_site_label"),
+    host: text("host").notNull(),
+    requestedStartDay: date("requested_start_day", { mode: "string" }),
+    requestedEndDay: date("requested_end_day", { mode: "string" }),
+    cutoffDay: date("cutoff_day", { mode: "string" }),
+    effectiveStartDay: date("effective_start_day", { mode: "string" }),
+    effectiveEndDay: date("effective_end_day", { mode: "string" }),
+    capabilities: jsonb("capabilities")
+      .$type<AnalyticsImportCapabilities>()
+      .notNull(),
+    status: text("status", { enum: ANALYTICS_IMPORT_STATUSES })
+      .notNull()
+      .default("pending"),
+    chunksTotal: integer("chunks_total").notNull().default(0),
+    chunksDone: integer("chunks_done").notNull().default(0),
+    rowsWritten: integer("rows_written").notNull().default(0),
+    pageviewsImported: integer("pageviews_imported").notNull().default(0),
+    lastError: text("last_error"),
+    retryAt: timestamp("retry_at"),
+    uploadObjectKey: text("upload_object_key"),
+    workflowRunId: text("workflow_run_id"),
+    /** Times the recovery job restarted a lost run; it fails the import after a few. */
+    recoveryAttempts: integer("recovery_attempts").notNull().default(0),
+    createdByUserId: text("created_by_user_id").references(() => users.id, {
+      onDelete: "set null",
+    }),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at")
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+    completedAt: timestamp("completed_at"),
+    deletedAt: timestamp("deleted_at"),
+  },
+  (table) => [
+    index("analyticsImports_organizationId_status_idx").on(
+      table.organizationId,
+      table.status
+    ),
+    index("analyticsImports_projectId_idx").on(table.projectId),
+    index("analyticsImports_connectionId_idx").on(table.connectionId),
+    uniqueIndex("analyticsImports_active_source_uidx")
+      .on(table.projectId, table.provider, table.externalSiteRef, table.host)
+      .where(
+        sql`${table.status} IN ('pending', 'running', 'waiting_rate_limit')`
+      ),
+  ]
+);
+
+export const analyticsImportChunks = pgTable(
+  "analytics_import_chunks",
+  {
+    importId: text("import_id")
+      .notNull()
+      .references(() => analyticsImports.id, { onDelete: "cascade" }),
+    chunkStart: date("chunk_start", { mode: "string" }).notNull(),
+    chunkEnd: date("chunk_end", { mode: "string" }).notNull(),
+    status: text("status", { enum: ANALYTICS_IMPORT_CHUNK_STATUSES })
+      .notNull()
+      .default("pending"),
+    attempts: integer("attempts").notNull().default(0),
+    rowsWritten: integer("rows_written").notNull().default(0),
+    pageviews: integer("pageviews").notNull().default(0),
+    lastError: text("last_error"),
+    updatedAt: timestamp("updated_at")
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (table) => [primaryKey({ columns: [table.importId, table.chunkStart] })]
 );
 
 export const siteDomains = pgTable(

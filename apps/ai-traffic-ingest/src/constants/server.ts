@@ -1,5 +1,8 @@
 export const INGEST_MAX_BODY_BYTES = 256 * 1024;
 export const INGEST_DEFAULT_PORT = 3101;
+/** Pinned tracker builds; the handler checks the exact file name again. */
+export const TRACKER_RELEASE_ROUTE =
+  "/api/:file{notra(?:\\.plus)?\\.[0-9a-f]{12}\\.js}";
 // Nominal shutdown budget: 35s drain + 12s concurrent batcher stops + 2s
 // database close + 10s log flush = 59s. Verify the host's termination grace;
 // forced exits can lose buffered events.

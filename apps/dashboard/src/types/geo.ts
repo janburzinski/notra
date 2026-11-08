@@ -7,8 +7,11 @@ import type {
   AiTrafficResponse,
   WebAnalyticsOutcome,
   WebAnalyticsResponse,
+  WebAnalyticsScriptReports,
+  WebAnalyticsVital,
   WebEngagement,
   WebAnalyticsSource,
+  WebVitalDevice,
   GeoAnswerSource,
   GeoAudienceType,
   GeoChangeEvent,
@@ -22,9 +25,10 @@ import type {
   GeoCompetitorShareTimeseriesPoint,
   GeoEngineFamily,
   GeoIngestFramework,
+  GeoIngestMethod,
   GeoIngestPackageManager,
   GeoDrainProvider,
-  GeoIngestSetupResponse,
+  GeoIngestSetupInfo,
   GeoJourney,
   GeoJourneyDailyPoint,
   GeoJourneyPageStats,
@@ -35,6 +39,8 @@ import type {
   GeoModelCatalog,
   GeoModelCatalogEntry,
   GeoOverviewEngine,
+  GeoWebSetupFields,
+  WebUtmDimension,
   GeoPresenceStatus,
   GeoProject,
   GeoPromptHistoryCheck,
@@ -69,7 +75,11 @@ import type {
   GeoPromptTranslationEntry,
   GeoTrafficSitesMode,
 } from "@notra/geo-core/types/geo";
-import type { ChartConfig, ChartSeriesColors } from "@notra/ui/types/charts";
+import type {
+  ChartColorPair,
+  ChartConfig,
+  ChartSeriesColors,
+} from "@notra/ui/types/charts";
 import type {
   ComponentProps,
   ComponentPropsWithoutRef,
@@ -80,7 +90,10 @@ import type { useTranslations } from "use-intl";
 import type { z } from "zod";
 
 import type { Button } from "@/components/button";
-import type { GeoPromptDetailSurface } from "@/types/analytics/geo-events";
+import type {
+  GeoPromptDetailSurface,
+  TrafficInstallCopyKind,
+} from "@/types/analytics/geo-events";
 import type { GeoCompetitorSuggestion } from "@/types/geo-competitors";
 import type { GeoPromptDetailState } from "@/types/geo-prompt-detail";
 import type { GeoScanModelMenuProps } from "@/types/geo-scan-activity";
@@ -173,38 +186,6 @@ export interface GeoProjectLogoProps {
 
 export interface GeoPageClientProps {
   organizationSlug: string;
-}
-
-export interface TrafficPageClientProps extends GeoPageClientProps {
-  /** Layout the last visit ended in, from a cookie; picks the skeleton. */
-  layout?: TrafficPageLayout | null;
-}
-
-export interface TrafficPageViewProps {
-  organizationId: string;
-  organizationSlug: string;
-  projectId: string | undefined;
-  settings: GeoSettings | null;
-  isEmptyTraffic: boolean;
-  geoRange: GeoRangeControl;
-  traffic: AiTrafficResponse | undefined;
-  isTrafficPending: boolean;
-  knownHosts: readonly string[];
-  knownPaths: readonly string[];
-  pathQuery: string;
-  isPagesPending: boolean;
-  trafficPages: readonly GeoTrafficPage[];
-  ingestSetup: GeoIngestSetupResponse | undefined;
-  web: WebAnalyticsResponse | undefined;
-  sourcePaths: readonly GeoTrafficSource[] | undefined;
-  siteHosts: readonly string[];
-  sitesHidden: boolean;
-  webBreakdownsPending: boolean;
-}
-
-export interface GeoTrafficSkeletonProps {
-  geoRange?: GeoRangeControl;
-  layout?: TrafficPageLayout | null;
 }
 
 export interface WebBreakdownSkeletonProps {
@@ -469,9 +450,6 @@ export type GeoProjectCreateHandlerInput = z.infer<
   typeof geoProjectCreateInputSchema
 >;
 
-/** Visitors when the site sends human page views, agents for AI traffic only. */
-export type TrafficPageLayout = "visitors" | "agents";
-
 export interface GeoTrafficLogQueryOptions {
   host?: string;
   path?: string;
@@ -694,13 +672,25 @@ export interface GeoPackageManagerIconProps {
 }
 
 export interface GeoIngestSetupPanelProps {
-  setup: GeoIngestSetupResponse | undefined;
+  setup: DashboardGeoIngestSetup | undefined;
   className?: string;
+  defaultMethod?: GeoIngestMethod;
+  /**
+   * `card` frames it on a page, `dialog` uses the dialog's own footer and
+   * `settings` is a titled settings section.
+   */
+  variant?: "card" | "dialog" | "settings";
+}
+
+export interface GeoIngestMethodPickerProps {
+  value: GeoIngestMethod;
+  methods: readonly GeoIngestMethod[];
+  onChange: (method: GeoIngestMethod) => void;
 }
 
 export interface GeoIngestDrainSetupProps {
   provider: GeoDrainProvider;
-  setup: GeoIngestSetupResponse | undefined;
+  setup: DashboardGeoIngestSetup | undefined;
   onCopy: () => void;
 }
 
@@ -729,14 +719,48 @@ export interface GeoLogpushFieldListProps {
 
 export interface GeoSetupStepProps {
   index: number;
-  title: string;
+  title: ReactNode;
   description?: string;
   action?: ReactNode;
   children?: ReactNode;
+  /** A bare number instead of the circled, connected timeline. */
+  plain?: boolean;
 }
 
 export interface TrafficEmptyProps {
-  setup: GeoIngestSetupResponse | undefined;
+  setup: DashboardGeoIngestSetup | undefined;
+  defaultMethod?: GeoIngestMethod;
+  description?: string;
+}
+
+export interface GeoIngestSdkSetupProps {
+  setup: DashboardGeoIngestSetup | undefined;
+  framework: GeoIngestFramework;
+  packageManager: GeoIngestPackageManager;
+  onFrameworkChange: (framework: GeoIngestFramework) => void;
+  onPackageManagerChange: (packageManager: GeoIngestPackageManager) => void;
+  onCopy: (kind: TrafficInstallCopyKind) => void;
+}
+
+export interface GeoIngestSetupFooterProps {
+  method: GeoIngestMethod;
+  agentPrompt: string;
+  /** Owners and admins can rotate the public notra.js key. */
+  canManage: boolean;
+  onCopy: (kind: TrafficInstallCopyKind) => void;
+}
+
+export interface GeoWebTrackingStatusProps {
+  organizationId: string;
+}
+
+export interface GeoIngestScriptSetupProps {
+  setup: DashboardGeoIngestSetup | undefined;
+  onCopy?: () => void;
+}
+
+export interface TrafficInstallButtonProps {
+  setup: DashboardGeoIngestSetup | undefined;
 }
 
 export interface GeoSetupEmptyProps {
@@ -767,6 +791,8 @@ export interface AiTrafficCardProps {
   /** Top pages across every host, for the source drawer. */
   pages: readonly GeoTrafficPage[];
   settingsHref: string;
+  /** See TrafficHeroProps.crawlerSetup. */
+  crawlerSetup?: ReactNode;
   isPending?: boolean;
   showHero?: boolean;
 }
@@ -797,6 +823,12 @@ export interface TrafficPageColumnLabels {
   visits: string;
 }
 
+export interface TrafficPageColumnOptions {
+  compare: boolean;
+  /** Only worth the room when the pages span more than one host. */
+  showHost: boolean;
+}
+
 export interface TrafficSourcePageColumnLabels {
   page: string;
   visits: string;
@@ -805,6 +837,8 @@ export interface TrafficSourcePageColumnLabels {
 export interface TrafficPagesCardProps {
   pages: readonly GeoTrafficPage[];
   isPending?: boolean;
+  /** False when the previous period has no AI visits to compare with. */
+  compare?: boolean;
 }
 
 export interface TrafficPagesResultsProps {
@@ -1092,8 +1126,11 @@ export interface CodeSnippetProps {
   headerEnd?: ReactNode;
   /** Variant switcher shown in the header (e.g. `CodeSnippetTabs`). */
   tabs?: ReactNode;
-  variant?: "command" | "panel";
+  /** `block` is one flat box with the copy button inside, no header. */
+  variant?: "block" | "command" | "panel";
   label?: string;
+  /** Wrap long lines instead of scrolling, for one-line snippets like a script tag. */
+  wrap?: boolean;
   onCopy?: () => void;
 }
 
@@ -1126,6 +1163,8 @@ export interface CopyCodeButtonProps {
 }
 
 export type GeoSettingsFormSection = "brand" | "models";
+
+export type GeoSettingsPaneSection = GeoSettingsFormSection | "tracking";
 
 export interface GeoSettingsFormProps {
   organizationId: string;
@@ -1690,6 +1729,11 @@ export interface GeoSuggestionIdInput {
   suggestionId: string;
 }
 
+export interface TrafficTrendLegendSkeletonProps {
+  /** Placeholder legend entries, one per chart series. */
+  items?: number;
+}
+
 export interface GeoSectionSkeletonProps {
   eyebrow: string;
   action?: ReactNode;
@@ -1735,6 +1779,10 @@ export interface TrafficTrendMetric {
   description: string;
   value: number | null;
   delta: number | null;
+  /** Why there is no value, read out in place of the dash. */
+  emptyHint?: string;
+  /** How to get a value, shown next to the dash. */
+  emptyAction?: ReactNode;
 }
 
 export interface TrafficHeroProps {
@@ -1745,8 +1793,33 @@ export interface TrafficHeroProps {
   points: readonly GeoTrafficPoint[];
   /** Omitted on public embeds, which have no settings to link to. */
   settingsHref?: string;
+  /**
+   * Opens crawler tracking setup. When given and the period has no crawler
+   * or citation fetch, those stages show a dash and this action instead of 0:
+   * notra.js alone can't see crawlers.
+   */
+  crawlerSetup?: ReactNode;
   showMetrics?: boolean;
   showChart?: boolean;
+}
+
+export interface TrafficHeroEmptyValueProps {
+  hint: string;
+  action?: ReactNode;
+}
+
+interface TrafficTrendLegendItem {
+  key: string;
+  label: string;
+  color: ChartColorPair;
+  /** Percent of the chart's total, shown after the label. */
+  share?: number;
+}
+
+export interface TrafficTrendLegendProps {
+  items: readonly TrafficTrendLegendItem[];
+  hiddenKeys?: readonly string[];
+  onToggle?: (key: string) => void;
 }
 
 export interface TrafficZoomChipProps {
@@ -1757,7 +1830,6 @@ export interface TrafficZoomChipProps {
 
 export interface TrafficHeroMetricProps {
   metric: TrafficTrendMetric;
-  settingsHref?: string;
   threeUp?: boolean;
 }
 
@@ -1901,12 +1973,84 @@ export interface WebTrendRow {
 
 export interface WebVisitorsSectionProps {
   web: WebAnalyticsResponse;
-  traffic: AiTrafficResponse | undefined;
+  /** AI crawler traffic: adds the AI agents metric and joins the chart. */
+  traffic?: AiTrafficResponse;
   range?: GeoRangeQuery;
-  /** Notra Sites only: visible time per view, replaces the AI-referred metric. */
+  /** Visible time per view, shown only when the caller passes it. */
   engagement?: WebEngagement;
   /** Breakdown tables still loading; the hero renders from the summary. */
   breakdownsPending?: boolean;
+  /** notra.js projects: outbound links, languages, vitals and errors. */
+  showScriptReports?: boolean;
+  /** A project's filters: the Referrers card then also offers UTM parameters. */
+  utm?: WebUtmQuery;
+}
+
+/** What the UTM tab queries: the page's project, host, path and Sites filters. */
+interface WebUtmQuery {
+  organizationId: string;
+  host?: string;
+  path?: string;
+  sites?: GeoTrafficSitesMode;
+}
+
+/** What the Sources card lists: referrers, or one UTM parameter. */
+export type WebSourcesPick = "referrers" | WebUtmDimension;
+
+export interface WebSourcesCardProps {
+  sourceRows: readonly WebBreakdownRow[];
+  utm: WebUtmQuery;
+  range?: GeoRangeQuery;
+  height?: number;
+  compare?: boolean;
+  loading?: boolean;
+}
+
+export interface WebTrendChartProps {
+  web: WebAnalyticsResponse;
+  /** Undefined leaves the AI agents series off the chart. */
+  traffic: AiTrafficResponse | undefined;
+  range?: GeoRangeQuery;
+}
+
+export interface WebScriptReportsProps {
+  reports: WebAnalyticsScriptReports | undefined;
+  loading: boolean;
+  /** False when the previous period has no page views to compare with. */
+  compare: boolean;
+}
+
+export type WebVitalRating = "good" | "needs-improvement" | "poor";
+
+export type WebVitalsDeviceFilter = "all" | WebVitalDevice;
+
+export interface WebVitalsCardProps {
+  reports: WebAnalyticsScriptReports | undefined;
+  loading: boolean;
+}
+
+export interface WebVitalRowProps {
+  vital: WebAnalyticsVital;
+}
+
+export interface WebVitalDistributionProps {
+  vital: WebAnalyticsVital;
+}
+
+export interface WebOutboundFaviconProps {
+  /** Destination host and path, as stored. */
+  url: string;
+}
+
+export interface LanguageFlagProps {
+  /** Primary language subtag, e.g. "en". */
+  language: string;
+  className?: string;
+}
+
+export interface WebScriptEmptyProps {
+  title: string;
+  description: string;
 }
 
 export interface WebMetricProps {
@@ -1915,6 +2059,9 @@ export interface WebMetricProps {
   previous: number;
   /** Durations are in seconds and skip the delta until both periods have data. */
   format?: "count" | "duration";
+  /** False when the previous period has nothing to compare with. */
+  compare: boolean;
+  threeUp: boolean;
 }
 
 export interface WebOutcomesTableProps {
@@ -1936,15 +2083,23 @@ export interface WebBreakdownRow {
   avgSeconds?: number | null;
 }
 
-export interface WebBreakdownTableProps {
+export interface WebBreakdownTableProps extends WebBreakdownGridProps {
   title: string;
-  nameHeader: string;
+}
+
+export interface WebBreakdownGridProps {
+  nameHeader: ReactNode;
+  /** False when the name header holds its own control, such as a picker. */
+  nameSortable?: boolean;
   valueHeader: string;
   rows: readonly WebBreakdownRow[];
   /** Pixel height, used as both floor and cap. Side-by-side tables share one value. */
   height?: number;
   showFromAi?: boolean;
   showAvgTime?: boolean;
+  /** False when the endpoint has no previous period to compare with. */
+  compare?: boolean;
+  emptyState?: ReactNode;
   loading?: boolean;
 }
 
@@ -1969,6 +2124,16 @@ export interface TrafficExportButtonProps {
   path: string;
 }
 
-export interface TrafficExportMenuProps extends TrafficExportButtonProps {
+export interface TrafficActionsMenuProps extends TrafficExportButtonProps {
   organizationId: string;
+}
+
+/**
+ * The install payload plus whether this member may rotate its public key.
+ * The notra.js fields are missing without web analytics.
+ */
+export interface DashboardGeoIngestSetup
+  extends GeoIngestSetupInfo, Partial<GeoWebSetupFields> {
+  token: string;
+  canManage: boolean;
 }

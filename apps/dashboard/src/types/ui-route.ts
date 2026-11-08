@@ -23,6 +23,7 @@ export interface UiPageParams extends Record<string, string> {
   integrationSlug: string;
   siteId: string;
   deploymentId: string;
+  tab: string;
 }
 
 export interface UiPageProps<T> {
@@ -48,7 +49,8 @@ interface UiRouteOptions<T> {
   component: ComponentType<UiPageProps<NoInfer<T>>>;
   loader?: (input: UiRouteInput) => Promise<T>;
   pendingComponent?: RouteComponent;
-  title?: UiRouteTitle;
+  /** The page's title, or one per params for a route that serves several pages. */
+  title?: UiRouteTitle | ((params: UiPageParams) => UiRouteTitle);
   pageTitle?: (data: T) => string;
   /** Appended to the title, e.g. the name of the site a page belongs to. */
   titleSuffix?: (matches: readonly UiRouteMatch[]) => string | null | undefined;
@@ -68,6 +70,13 @@ interface UiRouteOptions<T> {
    */
   gate?: (input: UiRouteInput) => Promise<unknown>;
   /**
+   * The loader only hydrates the first server render. Client navigations
+   * render at once with no data and the page's queries fetch it, so switching
+   * pages never waits on the server; `gate` still runs, without blocking, and
+   * its redirect is followed.
+   */
+  ssrDataOnly?: boolean;
+  /**
    * Downloads the page's code (a `lazyPage` component's `preload`). The router
    * calls it when the route is preloaded on hover or loaded, so the chunk
    * arrives with the data instead of after it.
@@ -82,9 +91,10 @@ interface UiRouteOptions<T> {
   loaderSearchKeys?: readonly string[];
 }
 
-export interface StreamedUiPageProps<T> extends Omit<UiPageProps<T>, "data"> {
+export interface UiPageWithDataProps<T> extends UiPageProps<T> {
   page: ComponentType<UiPageProps<T>>;
-  pending: Promise<T>;
+  /** Streamed data; while set, it is used instead of `data`. */
+  pending: Promise<T> | undefined;
 }
 
 export interface UiRouteFactoryOptions<T> extends UiRouteOptions<T> {

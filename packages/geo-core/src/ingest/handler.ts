@@ -5,6 +5,7 @@ import { Effect } from "effect";
 import {
   GEO_INGEST_DROPPED_LOG_SAMPLE_RATE,
   GEO_INGEST_ERROR_MESSAGE_MAX_LENGTH,
+  GEO_WEB_COLLECT_LOG_SAMPLE_RATE,
 } from "../constants/ingest";
 import type { GeoDrainProvider } from "../types/geo";
 import type {
@@ -12,11 +13,13 @@ import type {
   GeoIngestDefer,
   GeoIngestHandled,
   GeoIngestResult,
+  WebCollectOptions,
 } from "../types/ingest";
 import {
   getGeoIngestRegion,
   getGeoIngestRuntime,
 } from "../utils/ingest-runtime";
+import { runWebCollect } from "./collect";
 import { runGeoDrainIngest } from "./drain";
 import { type GeoIngestError, GeoIngestFailedError } from "./errors";
 import { runGeoIngest } from "./pipeline";
@@ -24,6 +27,8 @@ import {
   toGeoDrainAcceptedResponse,
   toGeoIngestAcceptedResponse,
   toGeoIngestErrorResponse,
+  toWebCollectAcceptedResponse,
+  withWebCollectCors,
 } from "./response";
 
 type IngestLogFields = GeoIngestHandled["fields"];
@@ -79,10 +84,15 @@ function sampleRateFor(fields: IngestLogFields): number {
     : 1;
 }
 
+function collectSampleRateFor(fields: IngestLogFields): number {
+  return fields.outcome === "failed" ? 1 : GEO_WEB_COLLECT_LOG_SAMPLE_RATE;
+}
+
 async function handleLogged<A>(
   event: GeoLogEvent["event"],
   program: Effect.Effect<A, GeoIngestError>,
-  onSuccess: (value: A) => GeoIngestHandled
+  onSuccess: (value: A) => GeoIngestHandled,
+  sampleRateOf: (fields: IngestLogFields) => number = sampleRateFor
 ): Promise<Response> {
   const startedAt = performance.now();
   let handled: GeoIngestHandled;
@@ -110,7 +120,7 @@ async function handleLogged<A>(
   }
 
   const { response, fields } = handled;
-  const sampleRate = sampleRateFor(fields);
+  const sampleRate = sampleRateOf(fields);
   if (sampleRate >= 1 || Math.random() < sampleRate) {
     geoLog.info({
       event,
@@ -160,4 +170,23 @@ export function handleGeoDrainRequest(
       fields: { ...summary, outcome: "ingested" },
     })
   );
+}
+
+/** The notra.js beacon endpoint; every answer is readable from any origin. */
+export async function handleWebCollectRequest(
+  request: Request,
+  defer: GeoIngestDefer,
+  buffer?: GeoIngestBuffer,
+  options?: WebCollectOptions
+): Promise<Response> {
+  const response = await handleLogged(
+    "geo.ingest.collect",
+    runWebCollect(request, defer, buffer, options),
+    (result) => ({
+      response: toWebCollectAcceptedResponse(),
+      fields: describeResult(result),
+    }),
+    collectSampleRateFor
+  );
+  return withWebCollectCors(response);
 }

@@ -88,6 +88,19 @@ export interface NavVisibility {
   autopilot: boolean;
   analytics: boolean;
   sites: boolean;
+  webAnalytics: boolean;
+}
+
+/** Search keywords that only apply while a feature flag is on. */
+export interface FlagKeywords {
+  flag: keyof NavVisibility;
+  keywords: readonly string[];
+}
+
+export interface WebAnalyticsFlagStatus {
+  enabled: boolean;
+  /** False until the flag has an answer for the workspace. */
+  settled: boolean;
 }
 
 export interface PendingSidebarMode {

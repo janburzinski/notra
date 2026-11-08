@@ -195,5 +195,25 @@ export const GEO_PATH_SQL = `AND (
             AND ({{String(path, '')}} = '' OR path = {{String(path, '')}})
           )`;
 
+export const IMPORTS_PARAMS = {
+  imports: p
+    .string()
+    .optional("")
+    .describe(
+      "Comma-separated completed import ids to include; empty excludes imported data"
+    ),
+};
+
+export const IMPORTS_SQL = `{{String(imports, '')}} != ''
+          AND organization_id = {{String(organization_id)}}
+          AND has(splitByChar(',', {{String(imports, '')}}), import_id)
+          ${GEO_PROJECT_SCOPE_SQL}
+          ${GEO_SITE_SCOPE_SQL}`;
+
 /** Host or path filters need the per-page rollup instead of the per-source one. */
 export const GEO_PAGE_FILTER_SET = `(${GEO_HOSTS_SET} OR {{String(path, '')}} != '' OR {{String(page_paths, '')}} != '')`;
+
+export const GEO_IMPORTED_WHERE = `WHERE ${IMPORTS_SQL}
+          ${GEO_EXCLUDED_SOURCES_SQL}
+          ${GEO_HOSTS_SQL}
+          ${GEO_PATH_SQL}`;

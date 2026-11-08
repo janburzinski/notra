@@ -255,7 +255,7 @@ export const API_SCOPE_RESOURCES = [
     ],
     label: "GEO AI traffic",
     description:
-      "Read AI crawler and referral traffic, and manage the ingest token",
+      "Read AI traffic, website analytics and history imports, and manage the ingest token",
     openApiTag: "GEO",
   },
 ] as const satisfies readonly ApiScopeResourceDefinition[];

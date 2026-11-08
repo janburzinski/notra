@@ -6,8 +6,13 @@ import {
   GEO_INGEST_ADMISSION_RATELIMIT_PREFIX,
   GEO_INGEST_RATELIMIT_TIMEOUT_MS,
   GEO_INGEST_REDIS_RETRIES,
+  WEB_AI_RATELIMIT_MAX_REQUESTS,
+  WEB_AI_RATELIMIT_PREFIX,
   WEB_INGEST_RATELIMIT_MAX_REQUESTS,
   WEB_INGEST_RATELIMIT_PREFIX,
+  WEB_NETWORK_RATELIMIT_MAX_REQUESTS,
+  WEB_NETWORK_RATELIMIT_PREFIX,
+  WEB_SHARED_NETWORK_RATELIMIT_MAX_REQUESTS,
 } from "../constants/ingest";
 
 export const geoIngestRedis = Redis.fromEnv({
@@ -37,6 +42,30 @@ export const webIngestRatelimit = createLimiter({
   redis: geoIngestRedis,
   prefix: WEB_INGEST_RATELIMIT_PREFIX,
   requests: WEB_INGEST_RATELIMIT_MAX_REQUESTS,
+  window: "1m",
+  timeout: GEO_INGEST_RATELIMIT_TIMEOUT_MS,
+});
+
+export const webNetworkRatelimit = createLimiter({
+  redis: geoIngestRedis,
+  prefix: WEB_NETWORK_RATELIMIT_PREFIX,
+  requests: WEB_NETWORK_RATELIMIT_MAX_REQUESTS,
+  window: "1m",
+  timeout: GEO_INGEST_RATELIMIT_TIMEOUT_MS,
+});
+
+export const webSharedNetworkRatelimit = createLimiter({
+  redis: geoIngestRedis,
+  prefix: `${WEB_NETWORK_RATELIMIT_PREFIX}:shared`,
+  requests: WEB_SHARED_NETWORK_RATELIMIT_MAX_REQUESTS,
+  window: "1m",
+  timeout: GEO_INGEST_RATELIMIT_TIMEOUT_MS,
+});
+
+export const webAiRatelimit = createLimiter({
+  redis: geoIngestRedis,
+  prefix: WEB_AI_RATELIMIT_PREFIX,
+  requests: WEB_AI_RATELIMIT_MAX_REQUESTS,
   window: "1m",
   timeout: GEO_INGEST_RATELIMIT_TIMEOUT_MS,
 });

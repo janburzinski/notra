@@ -10,6 +10,8 @@ export const TRAFFIC_SOURCE_COLLAPSED_BORDER_PX = 2;
 
 export const TRAFFIC_SOURCE_COLUMN_MIN_WIDTH = {
   source: "16rem",
+  /** Leaves visits beside it on a 390px screen once the other columns fold. */
+  sourceMobile: "14rem",
   botSource: "11rem",
   category: "11rem",
   categoryMobile: "11rem",

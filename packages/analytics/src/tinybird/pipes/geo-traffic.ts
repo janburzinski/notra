@@ -30,7 +30,10 @@ import {
   GEO_SITE_SCOPE_PARAMS,
   GEO_SITE_SCOPE_SQL,
   GEO_WINDOW_PARAMS,
+  GEO_IMPORTED_WHERE,
+  IMPORTS_PARAMS,
 } from "../../constants/geo-queries";
+import { sumAcrossSources } from "../../utils/union-sql";
 import { geoTrafficDaily, geoTrafficPagesByHostDaily } from "../datasources";
 
 const GEO_TRAFFIC_PAGES_BY_HOST_DAILY_SQL = `
@@ -118,6 +121,11 @@ function geoOverviewPathsSql(expression: string): string {
   return `{% if Int32(with_paths, 1) == 1 %}${expression}{% else %}toUInt64(0){% end %}`;
 }
 
+/** Native and imported rows carry path sets, so a page in both counts once. */
+function geoOverviewPathsMerge(column: string): string {
+  return geoOverviewPathsSql(`uniqExactMerge(${column})`);
+}
+
 export const geoTrafficOverview = defineEndpoint("geo_traffic_overview", {
   description:
     "Captured site visits grouped by traffic source and visitor type over the trailing window",
@@ -135,6 +143,7 @@ export const geoTrafficOverview = defineEndpoint("geo_traffic_overview", {
     ...GEO_WINDOW_PARAMS,
     ...GEO_HOSTS_PARAMS,
     ...GEO_PATH_PARAMS,
+    ...IMPORTS_PARAMS,
   },
   nodes: [
     node({
@@ -149,10 +158,10 @@ export const geoTrafficOverview = defineEndpoint("geo_traffic_overview", {
           countMergeIf(visits_state, (${GEO_DAY_CURRENT_CONDITION})) AS visits,
           countMergeIf(visits_state, (${GEO_DAY_PREVIOUS_CONDITION})) AS previous_visits,
           countIfMergeIf(markdown_visits_state, (${GEO_DAY_CURRENT_CONDITION})) AS markdown_visits,
-          ${geoOverviewPathsSql(`uniqExactMergeIf(paths_state, (${GEO_DAY_CURRENT_CONDITION}))`)} AS paths,
+          ${geoOverviewPathsSql(`uniqExactMergeStateIf(paths_state, (${GEO_DAY_CURRENT_CONDITION}))`)} AS paths,
           maxMergeIf(last_seen_state, (${GEO_DAY_CURRENT_CONDITION})) AS last_seen_at,
           countIfMergeIf(markdown_visits_state, (${GEO_DAY_PREVIOUS_CONDITION})) AS previous_markdown_visits,
-          ${geoOverviewPathsSql(`uniqExactMergeIf(paths_state, (${GEO_DAY_PREVIOUS_CONDITION}))`)} AS previous_paths
+          ${geoOverviewPathsSql(`uniqExactMergeStateIf(paths_state, (${GEO_DAY_PREVIOUS_CONDITION}))`)} AS previous_paths
         FROM geo_traffic_daily
         WHERE organization_id = {{String(organization_id)}}
           ${GEO_PROJECT_SCOPE_SQL}
@@ -184,9 +193,9 @@ export const geoTrafficOverview = defineEndpoint("geo_traffic_overview", {
             visitor_type,
             countMergeIf(visits_state, (${GEO_DAY_CURRENT_CONDITION})) AS visits,
             countMergeIf(visits_state, (${GEO_DAY_PREVIOUS_CONDITION})) AS previous_visits,
-            ${geoOverviewPathsSql(`uniqExactIf(path, (${GEO_DAY_CURRENT_CONDITION}))`)} AS paths,
+            ${geoOverviewPathsSql(`uniqExactStateIf(path, (${GEO_DAY_CURRENT_CONDITION}))`)} AS paths,
             maxMergeIf(last_seen_state, (${GEO_DAY_CURRENT_CONDITION})) AS last_seen_at,
-            ${geoOverviewPathsSql(`uniqExactIf(path, (${GEO_DAY_PREVIOUS_CONDITION}))`)} AS previous_paths
+            ${geoOverviewPathsSql(`uniqExactStateIf(path, (${GEO_DAY_PREVIOUS_CONDITION}))`)} AS previous_paths
           FROM geo_traffic_pages_by_host_daily
           WHERE ${GEO_PAGE_FILTER_SET}
             AND organization_id = {{String(organization_id)}}
@@ -204,31 +213,65 @@ export const geoTrafficOverview = defineEndpoint("geo_traffic_overview", {
       `,
     }),
     node({
-      name: "result",
+      name: "per_source_imported",
       sql: `
-        SELECT * FROM (
-          SELECT * FROM per_source WHERE NOT ${GEO_PAGE_FILTER_SET}
-          UNION ALL
-          SELECT * FROM per_source_hosts
-        )
-        WHERE visits > 0 OR previous_visits > 0
-        ORDER BY visits DESC, source ASC
+        SELECT
+          source,
+          visitor_type,
+          any(i.agent) AS agent,
+          any(i.category) AS category,
+          any(i.confidence) AS confidence,
+          sumIf(i.requests, ${GEO_DAY_CURRENT_CONDITION}) AS visits,
+          sumIf(i.requests, ${GEO_DAY_PREVIOUS_CONDITION}) AS previous_visits,
+          toUInt64(0) AS markdown_visits,
+          ${geoOverviewPathsSql(`uniqExactStateIf(i.path, ${GEO_DAY_CURRENT_CONDITION})`)} AS paths,
+          toDateTime(maxIf(i.day, ${GEO_DAY_CURRENT_CONDITION})) AS last_seen_at,
+          toUInt64(0) AS previous_markdown_visits,
+          ${geoOverviewPathsSql(`uniqExactStateIf(i.path, ${GEO_DAY_PREVIOUS_CONDITION})`)} AS previous_paths
+        FROM geo_imported_daily AS i
+        ${GEO_IMPORTED_WHERE}
+          ${GEO_DAY_COMPARISON_WINDOW_SQL}
+        GROUP BY source, visitor_type
       `,
+    }),
+    node({
+      name: "result",
+      sql: sumAcrossSources({
+        sources: [
+          `per_source WHERE NOT ${GEO_PAGE_FILTER_SET}`,
+          "per_source_hosts",
+          "per_source_imported",
+        ],
+        keys: ["source", "visitor_type"],
+        sums: [
+          "visits",
+          "previous_visits",
+          "markdown_visits",
+          "previous_markdown_visits",
+        ],
+        maxes: ["agent", "category", "confidence", "last_seen_at"],
+        merges: {
+          paths: geoOverviewPathsMerge,
+          previous_paths: geoOverviewPathsMerge,
+        },
+        tail: `HAVING visits > 0 OR previous_visits > 0
+        ORDER BY visits DESC, source ASC`,
+      }),
     }),
   ],
   output: {
     source: t.string(),
     visitor_type: t.string(),
-    agent: t.string(),
-    category: t.string(),
-    confidence: t.string(),
     visits: t.uint64(),
     previous_visits: t.uint64(),
     markdown_visits: t.uint64(),
     paths: t.uint64(),
-    last_seen_at: t.dateTime(),
     previous_markdown_visits: t.uint64(),
     previous_paths: t.uint64(),
+    agent: t.string(),
+    category: t.string(),
+    confidence: t.string(),
+    last_seen_at: t.dateTime(),
   },
 });
 
@@ -242,6 +285,7 @@ export const geoTrafficTimeseries = defineEndpoint("geo_traffic_timeseries", {
     ...GEO_WINDOW_PARAMS,
     ...GEO_HOSTS_PARAMS,
     ...GEO_PATH_PARAMS,
+    ...IMPORTS_PARAMS,
   },
   nodes: [
     node({
@@ -276,8 +320,30 @@ export const geoTrafficTimeseries = defineEndpoint("geo_traffic_timeseries", {
           ${GEO_PATH_SQL}
           ${GEO_DAY_WINDOW_SQL}
         GROUP BY day, visitor_type, source
-        ORDER BY day ASC, visitor_type ASC, source ASC
       `,
+    }),
+    node({
+      name: "daily_imported",
+      sql: `
+        SELECT
+          day,
+          visitor_type,
+          source,
+          sum(i.requests) AS visits
+        FROM geo_imported_daily AS i
+        ${GEO_IMPORTED_WHERE}
+          ${GEO_DAY_WINDOW_SQL}
+        GROUP BY day, visitor_type, source
+      `,
+    }),
+    node({
+      name: "daily_total",
+      sql: sumAcrossSources({
+        sources: ["daily", "daily_imported"],
+        keys: ["day", "visitor_type", "source"],
+        sums: ["visits"],
+        tail: "ORDER BY day ASC, visitor_type ASC, source ASC",
+      }),
     }),
   ],
   output: {
@@ -305,6 +371,7 @@ export const geoTrafficPages = defineEndpoint("geo_traffic_pages", {
     ...GEO_HOST_FILTER_PARAMS,
     ...GEO_HOSTS_PARAMS,
     ...GEO_PATH_PARAMS,
+    ...IMPORTS_PARAMS,
   },
   nodes: [
     node({
@@ -330,10 +397,38 @@ export const geoTrafficPages = defineEndpoint("geo_traffic_pages", {
           ${GEO_HOSTS_SQL}
           ${GEO_PATH_SQL}
         GROUP BY host, path, source, visitor_type
-        HAVING visits > 0
-        ORDER BY visits DESC, host ASC, path ASC
-        LIMIT {{Int32(limit, 20)}}
       `,
+    }),
+    node({
+      name: "top_pages_imported",
+      sql: `
+        SELECT
+          host,
+          path,
+          source,
+          visitor_type,
+          sumIf(i.requests, ${GEO_DAY_CURRENT_CONDITION}) AS visits,
+          sumIf(i.requests, ${GEO_DAY_PREVIOUS_CONDITION}) AS previous_visits,
+          toDateTime(maxIf(i.day, ${GEO_DAY_CURRENT_CONDITION})) AS last_seen_at
+        FROM geo_imported_daily AS i
+        ${GEO_IMPORTED_WHERE}
+          AND ({{String(visitor, '')}} = '' OR visitor_type = {{String(visitor, '')}})
+          ${GEO_HOST_FILTER_SQL}
+          ${GEO_DAY_COMPARISON_WINDOW_SQL}
+        GROUP BY host, path, source, visitor_type
+      `,
+    }),
+    node({
+      name: "pages",
+      sql: sumAcrossSources({
+        sources: ["top_pages", "top_pages_imported"],
+        keys: ["host", "path", "source", "visitor_type"],
+        sums: ["visits", "previous_visits"],
+        maxes: ["last_seen_at"],
+        tail: `HAVING visits > 0
+        ORDER BY visits DESC, host ASC, path ASC
+        LIMIT {{Int32(limit, 20)}}`,
+      }),
     }),
   ],
   output: {

@@ -171,3 +171,35 @@ test("concurrent ingest requests for an uncached site share one lookup", async (
   expect(loaded.every((site) => site?.id === "site-b")).toBe(true);
   expect(redisReads).toEqual([`${GEO_INGEST_SITE_CACHE_PREFIX}:site-b`]);
 });
+
+test("web beacons keep an organization's Sites a minute in process until invalidated", async () => {
+  await invalidateIngestSiteCaches("site-b", "org-b");
+  redisReads.length = 0;
+  const first = await loadOrganizationSitePrefixes("org-b", true);
+  expect(await loadOrganizationSitePrefixes("org-b", true)).toBe(first);
+  expect(redisReads).toEqual(["geo:ingest-organization-sites:v2:org-b"]);
+
+  await loadOrganizationSitePrefixes("org-b");
+  expect(redisReads).toHaveLength(2);
+
+  await postgres.exec(
+    "UPDATE sites SET status = 'suspended' WHERE id = 'site-b'"
+  );
+  await invalidateIngestSiteCaches("site-b", "org-b");
+  expect(await loadOrganizationSitePrefixes("org-b", true)).toEqual([]);
+  await postgres.exec("UPDATE sites SET status = 'active' WHERE id = 'site-b'");
+  await invalidateIngestSiteCaches("site-b", "org-b");
+});
+
+test("a failed Sites lookup is not kept in process", async () => {
+  await invalidateIngestSiteCaches("site-b", "org-b");
+  await postgres.exec("ALTER TABLE sites RENAME TO sites_offline");
+  try {
+    expect(await loadOrganizationSitePrefixes("org-b", true)).toBeNull();
+  } finally {
+    await postgres.exec("ALTER TABLE sites_offline RENAME TO sites");
+  }
+  expect(await loadOrganizationSitePrefixes("org-b", true)).toEqual([
+    { host: "other.com", mounts: ["/"] },
+  ]);
+});

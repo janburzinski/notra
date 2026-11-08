@@ -2,11 +2,12 @@ import { createRoute, type Router, useRouter } from "@tanstack/react-router";
 import { createElement, Suspense, use, useMemo } from "react";
 import { createTranslator } from "use-intl/core";
 
+import { SSR_DATA_ONLY_PENDING_MS } from "@/constants/ui-route";
 import { followServerRedirect } from "@/lib/framework/follow-server-redirect";
 import { getCatalog } from "@/lib/i18n/catalog";
 import type { DashboardLocale } from "@/types/i18n";
 import type {
-  StreamedUiPageProps,
+  UiPageWithDataProps,
   UiRouteFactoryOptions,
   UiRouteSearch,
   UiRouteTitle,
@@ -60,15 +61,21 @@ export function uiPageParams(
     integrationSlug: params.integrationSlug ?? "",
     siteId: params.siteId ?? "",
     deploymentId: params.deploymentId ?? "",
+    tab: params.tab ?? "",
   };
 }
 
-function StreamedUiPage<T>({
+/**
+ * The page with its data, streamed or loaded. One component for both, so a
+ * route whose data arrives either way keeps its page mounted between them.
+ */
+function UiPageWithData<T>({
   page: Page,
   pending,
+  data,
   ...props
-}: StreamedUiPageProps<T>) {
-  return <Page data={use(pending)} {...props} />;
+}: UiPageWithDataProps<T>) {
+  return <Page data={pending ? use(pending) : data} {...props} />;
 }
 
 export function createUiRoute<T = undefined>({
@@ -83,6 +90,7 @@ export function createUiRoute<T = undefined>({
   noindex,
   stream,
   gate,
+  ssrDataOnly,
   preload,
   loaderSearchKeys,
 }: UiRouteFactoryOptions<T>) {
@@ -97,11 +105,20 @@ export function createUiRoute<T = undefined>({
           )
         : search,
     }),
-    loader: async ({ params, location }) => {
+    loader: async ({ params, location, preload: preloading }) => {
       const input = {
         params,
         searchParams: uiRouteSearch(location.search as Record<string, unknown>),
       };
+      if (ssrDataOnly && !import.meta.env.SSR) {
+        if (gate && !preloading) {
+          followServerRedirect(
+            gate(input),
+            () => window.location.pathname === location.pathname
+          ).catch(() => undefined);
+        }
+        return { data: undefined, pending: undefined };
+      }
       if (
         stream &&
         loader &&
@@ -117,10 +134,12 @@ export function createUiRoute<T = undefined>({
       }
       return { data: await loader?.(input), pending: undefined };
     },
-    head: ({ loaderData, matches }) => {
-      const metadata = title
+    head: ({ loaderData, matches, params }) => {
+      const routeTitle =
+        typeof title === "function" ? title(uiPageParams(params)) : title;
+      const metadata = routeTitle
         ? translateTitle(
-            title,
+            routeTitle,
             matches[0]?.loaderData as RootLoaderData | undefined
           )
         : undefined;
@@ -149,6 +168,7 @@ export function createUiRoute<T = undefined>({
       };
     },
     pendingComponent,
+    ...(ssrDataOnly ? { pendingMs: SSR_DATA_ONLY_PENDING_MS } : {}),
   });
   function UiPage() {
     const router = useRouter();
@@ -168,29 +188,21 @@ export function createUiRoute<T = undefined>({
         ),
       [pending, router]
     );
-    if (streamed) {
-      return (
-        <Suspense
-          fallback={pendingComponent ? createElement(pendingComponent) : null}
-        >
-          <StreamedUiPage
-            page={Page}
-            params={uiPageParams(params)}
-            pending={streamed}
-            searchParams={searchParams}
-          />
-        </Suspense>
-      );
-    }
     const page = (
-      <Page
+      <UiPageWithData
         data={data as T}
+        page={Page}
         params={uiPageParams(params)}
+        pending={streamed}
         searchParams={searchParams}
       />
     );
-    return pendingComponent ? (
-      <Suspense fallback={createElement(pendingComponent)}>{page}</Suspense>
+    return stream || pendingComponent ? (
+      <Suspense
+        fallback={pendingComponent ? createElement(pendingComponent) : null}
+      >
+        {page}
+      </Suspense>
     ) : (
       page
     );

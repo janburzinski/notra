@@ -2,7 +2,7 @@
 title: Sub-processors
 ---
 
-**Last updated: November 6, 2026**
+**Last updated: November 8, 2026**
 
 A sub-processor is a third party that Notra, Inc. engages to process personal data on behalf of our customers, for example to host the Service, store data or run AI models. This page is Annex III of our [Data Processing Agreement](/dpa) and lists every sub-processor that can receive Customer Personal Data, what it does for us, which data it handles and where it is based.
 
@@ -15,7 +15,7 @@ Notra, Inc. is established in the United States, so transfers of personal data f
 | Sub-processor | Purpose | Data processed | Location |
 | --- | --- | --- | --- |
 | Vercel Inc. | Hosting of the dashboard, website and agents, scheduled jobs and workflows | Account users, content and integration data handled by the dashboard | United States |
-| Unkey Inc. | Hosting of the Notra API and the AI traffic ingest service, and API key management | AI traffic request data, with the visitor IP address held in memory only, API requests and API key metadata | United States |
+| Unkey Inc. | Hosting of the Notra API and the AI traffic and website analytics ingest service, and API key management | AI traffic and website analytics request data, with the visitor IP address held in memory only, API requests and API key metadata | United States |
 | Cloudflare, Inc. | DNS, CDN and network proxy for Notra's domains, hosting the blogs and changelogs you publish with Notra Sites, storing site assets and uploads, bot checks, custom hostnames and delivery of outbound webhooks | All requests to Notra's domains and Notra Sites in transit, including visitor IP addresses, published site content such as posts and author names, uploads and webhook payloads | United States, with a global edge network |
 | Upstash, Inc. | Caching, IP-based rate limits, visitor session state, job scheduling, isolated sandboxes that build your Notra Sites blogs and changelogs and sandboxes for running GEO engines | IP addresses used as short-lived rate limit keys, pseudonymous visitor session state, workspace and job identifiers, site source content such as posts, author names and media and GEO scan prompts | United States |
 
@@ -24,7 +24,7 @@ Notra, Inc. is established in the United States, so transfers of personal data f
 | Sub-processor | Purpose | Data processed | Location |
 | --- | --- | --- | --- |
 | Databricks, Inc. (Neon) | Primary database | Account users, workspace settings, content, brand data, encrypted integration tokens, GEO configuration and feedback | United States |
-| Tinybird, Inc. | Storage and analysis of AI traffic, Notra Sites visitor analytics, MCP server analytics and social media analytics | AI traffic events, Sites page views with pseudonymous visitor and session IDs, device, browser and referrer data, MCP server request logs with the user IDs and intents the Customer passes and, where the Customer opts in, tool arguments and responses, and public social post metrics | United States |
+| Tinybird, Inc. | Storage and analysis of AI traffic, website visitor analytics, MCP server analytics and social media analytics | AI traffic events, page views, outbound link clicks and script errors from Notra Sites and the Notra script with pseudonymous visitor and session IDs, device, browser and referrer data, MCP server request logs with the user IDs and intents the Customer passes and, where the Customer opts in, tool arguments and responses, and public social post metrics | United States |
 | Pierre (code.storage) | Storage of workspace memory used by Notra's agents | Notes and context derived from your content, which can include names of team members and contributors | United States |
 | Axiom, Inc. | Application, ingest and AI request logs | Request metadata, organisation, project and user identifiers, model and cost data and error details | United States |
 | PostHog, Inc. | Error tracking and product analytics | Internal user, workspace and project IDs, browser and device data, error details and aggregated AI traffic classification events | United States |
@@ -82,6 +82,7 @@ The services below are activated by you. When you connect one, data flows betwee
 | Your DNS provider (Domain Connect) | Configures DNS records for custom domains on Notra Sites | Domain names and DNS records |
 | skills.sh | Looks up skills from the public skills catalog | Search terms and skill names |
 | Custom MCP servers | Calls tools on MCP servers you connect | Tool arguments and results you configure |
+| Plausible, Cloudflare and Vercel (history import) | Reads your past analytics with an export file or a token you provide (read-only for Plausible and Cloudflare; Vercel tokens cannot be limited to reading, so Notra only uses them to read Web Analytics) and imports it into Notra | Daily page view, visit and visitor totals per page, referrer, campaign, country, device, browser and operating system, without visitor-level data |
 | Analytics tools on Notra Sites, such as PostHog, Plausible, Google Analytics and Databuddy | Loads the analytics script you configure on your Site, subject to your consent settings | Whatever your own analytics account collects from your Site's visitors |
 
 ## Contact

@@ -50,11 +50,19 @@ import type {
   webEngagement,
   webAudience,
   webHosts,
+  webNativeFirstDay,
   webOverview,
   webPages,
   webSources,
   webTimeseries,
+  webUtm,
 } from "../tinybird/pipes/web";
+import type {
+  webErrorsTop,
+  webOutboundLinks,
+  webLanguages,
+  webVitals,
+} from "../tinybird/pipes/web-events";
 
 export type AccountLeaderboardParams = InferParams<typeof accountLeaderboard>;
 export type AccountLeaderboardRow = InferOutputRow<typeof accountLeaderboard>;
@@ -93,9 +101,15 @@ export type WebTimeseriesRow = InferOutputRow<typeof webTimeseries>;
 export type WebPagesRow = InferOutputRow<typeof webPages>;
 export type WebSourcesRow = InferOutputRow<typeof webSources>;
 export type WebAudienceRow = InferOutputRow<typeof webAudience>;
+export type WebUtmRow = InferOutputRow<typeof webUtm>;
 export type WebHostsRow = InferOutputRow<typeof webHosts>;
 export type WebAiOutcomesRow = InferOutputRow<typeof webAiOutcomes>;
 export type WebEngagementRow = InferOutputRow<typeof webEngagement>;
+export type WebNativeFirstDayRow = InferOutputRow<typeof webNativeFirstDay>;
+export type WebOutboundLinksRow = InferOutputRow<typeof webOutboundLinks>;
+export type WebVitalsRow = InferOutputRow<typeof webVitals>;
+export type WebLanguagesRow = InferOutputRow<typeof webLanguages>;
+export type WebErrorsTopRow = InferOutputRow<typeof webErrorsTop>;
 export type GeoTrafficTrendsDailyRow = InferOutputRow<
   typeof geoTrafficTrendsDaily
 >;

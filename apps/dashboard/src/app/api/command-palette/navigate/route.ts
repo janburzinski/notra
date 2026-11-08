@@ -19,6 +19,7 @@ import { isAutopilotEnabledForOrganization } from "@/lib/autopilot/flag";
 import { hasAiCreditsGrant } from "@/lib/billing/subscription";
 import { resolveNavigationWithJev } from "@/lib/command-palette/jev-navigation";
 import { searchWorkspace } from "@/lib/search/workspace-search";
+import { isWebAnalyticsEnabled } from "@/lib/web-analytics/flag";
 import type {
   CommandPaletteEntityTarget,
   CommandPaletteNavigationEntity,
@@ -158,22 +159,25 @@ export async function POST(request: Request) {
   }
 
   const organizationId = member.organizationId;
-  const [hasAiCredits, autopilot, analytics, searchData] = await Promise.all([
-    hasAiCreditsGrant(organizationId).catch(() => false),
-    isAutopilotEnabledForOrganization(organizationId),
-    isAnalyticsEnabledForOrganization(organizationId).catch(() => false),
-    searchWorkspace({
-      organizationId,
-      projectId,
-      query,
-      limit: NAVIGATION_SEARCH_LIMIT,
-    }),
-  ]);
+  const [hasAiCredits, autopilot, analytics, webAnalytics, searchData] =
+    await Promise.all([
+      hasAiCreditsGrant(organizationId).catch(() => false),
+      isAutopilotEnabledForOrganization(organizationId),
+      isAnalyticsEnabledForOrganization(organizationId).catch(() => false),
+      isWebAnalyticsEnabled(organizationId),
+      searchWorkspace({
+        organizationId,
+        projectId,
+        query,
+        limit: NAVIGATION_SEARCH_LIMIT,
+      }),
+    ]);
   const entities = toNavigationEntities(slug, searchData);
   const routes = commandRoutesForAI(slug, hasAiCredits, {
     autopilot,
     analytics,
     sites: !isDemoMode(),
+    webAnalytics,
   });
 
   const allPaths = [

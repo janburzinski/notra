@@ -15,6 +15,15 @@ export function getGeoIngestProxyRules(
     "/api/geo/ingest": {
       proxy: new URL("/api/geo/ingest", origin.origin).toString(),
     },
+    "/api/collect": {
+      proxy: new URL("/api/collect", origin.origin).toString(),
+    },
+    "/api/notra.js": {
+      proxy: new URL("/api/notra.js", origin.origin).toString(),
+    },
+    "/api/notra.plus.js": {
+      proxy: new URL("/api/notra.plus.js", origin.origin).toString(),
+    },
     "/api/geo/drains/**": {
       proxy: new URL("/api/geo/drains/**", origin.origin).toString(),
     },

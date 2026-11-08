@@ -28,6 +28,7 @@ COPY packages/tools/package.json ./packages/tools/package.json
 COPY packages/typescript-config/package.json ./packages/typescript-config/package.json
 COPY packages/ui/package.json ./packages/ui/package.json
 COPY packages/utils/package.json ./packages/utils/package.json
+COPY packages/web-tracker/package.json ./packages/web-tracker/package.json
 COPY packages/webhooks/package.json ./packages/webhooks/package.json
 COPY packages/workflows/package.json ./packages/workflows/package.json
 RUN --mount=type=cache,target=/root/.bun/install/cache bun install --frozen-lockfile --ignore-scripts --filter ai-traffic-ingest
@@ -41,6 +42,7 @@ COPY packages/schemas ./packages/schemas
 COPY packages/sites-core ./packages/sites-core
 COPY packages/utils ./packages/utils
 COPY packages/typescript-config ./packages/typescript-config
+COPY packages/web-tracker ./packages/web-tracker
 COPY apps/ai-traffic-ingest ./apps/ai-traffic-ingest
 RUN bun run --filter=ai-traffic-ingest build
 

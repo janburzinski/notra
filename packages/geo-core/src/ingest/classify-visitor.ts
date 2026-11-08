@@ -44,7 +44,7 @@ function matchesHost(host: string, key: string): boolean {
   return host === key || host.endsWith(`.${key}`);
 }
 
-function resolveAiReferrer(referer: string | undefined): string | null {
+export function resolveAiReferrer(referer: string | undefined): string | null {
   if (!referer) {
     return null;
   }
