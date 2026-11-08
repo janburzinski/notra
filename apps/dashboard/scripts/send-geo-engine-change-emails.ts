@@ -1,6 +1,5 @@
-import { redis } from "@notra/ai/utils/redis";
 import { db } from "@notra/db/drizzle";
-import { geoSettings, organizations } from "@notra/db/schema";
+import { geoSettings, members, organizations, users } from "@notra/db/schema";
 import {
   GEO_ENGINE_DISPLAY_LABELS,
   GEO_ENGINE_POLICY_EFFECTIVE_AT,
@@ -19,23 +18,12 @@ import {
 import { and, eq, isNull, lt } from "drizzle-orm";
 
 import { sendGeoEngineChangeEmail } from "@/lib/email/send";
-import { getOrganizationOwnerContacts } from "@/lib/workflows/shared/ai-credit-notifications";
 
 const args = process.argv.slice(2);
 const send = args.includes("--send");
 const onlySlug = args.includes("--org")
   ? args[args.indexOf("--org") + 1]
   : undefined;
-
-if (args.includes("--once")) {
-  const claimed = await redis?.set("geo-engine-change-email:2026-11", "1", {
-    nx: true,
-  });
-  if (!claimed) {
-    console.log("GEO engine change emails already sent or Redis missing.");
-    process.exit(0);
-  }
-}
 
 const EFFECTIVE_DATE = "Thursday, November 12";
 const CODING_AGENT_PREFIXES = [
@@ -78,103 +66,93 @@ const labelOf = (id: string) => labels.get(id) ?? readableId(id);
 const targetLabelOf = (id: string) =>
   GEO_ENGINE_DISPLAY_LABELS[id] ?? labels.get(id) ?? readableId(id);
 
-const releaseOnce = async () => {
-  if (args.includes("--once")) {
-    await redis?.del("geo-engine-change-email:2026-11");
-  }
-};
-
 let sent = 0;
 let failed = 0;
 let organizationCount = 0;
-try {
-  const rows = await db
-    .select({
-      organizationId: geoSettings.organizationId,
-      slug: organizations.slug,
-      engines: geoSettings.engines,
-    })
-    .from(geoSettings)
-    .innerJoin(organizations, eq(organizations.id, geoSettings.organizationId))
+const rows = await db
+  .select({
+    organizationId: geoSettings.organizationId,
+    slug: organizations.slug,
+    engines: geoSettings.engines,
+  })
+  .from(geoSettings)
+  .innerJoin(organizations, eq(organizations.id, geoSettings.organizationId))
+  .where(
+    and(
+      eq(geoSettings.enabled, true),
+      isNull(organizations.suspendedAt),
+      lt(organizations.createdAt, new Date(GEO_ENGINE_POLICY_NEW_ORGS_FROM))
+    )
+  );
+
+const enginesByOrg = new Map<string, { slug: string; engines: Set<string> }>();
+for (const row of rows) {
+  if (onlySlug && row.slug !== onlySlug) {
+    continue;
+  }
+  const entry = enginesByOrg.get(row.organizationId) ?? {
+    slug: row.slug,
+    engines: new Set<string>(),
+  };
+  const engines = row.engines?.length
+    ? row.engines
+    : [...GEO_LEGACY_DEFAULT_ENGINE_IDS];
+  for (const engine of engines) {
+    entry.engines.add(engine);
+  }
+  enginesByOrg.set(row.organizationId, entry);
+}
+
+for (const [organizationId, { slug, engines }] of enginesByOrg) {
+  const changes = [...engines]
+    .filter((engine) => !isGeoSelfServeEngine(engine))
+    .map((engine) => {
+      const to = geoEnginePolicyReplacement(engine, AFTER_CUTOFF);
+      return { from: labelOf(engine), to: to ? targetLabelOf(to) : null };
+    });
+  const codingAgents = [...engines].some((engine) =>
+    CODING_AGENT_PREFIXES.some((prefix) => engine.startsWith(prefix))
+  );
+  const owners = await db
+    .select({ name: organizations.name, email: users.email })
+    .from(members)
+    .innerJoin(users, eq(users.id, members.userId))
+    .innerJoin(organizations, eq(organizations.id, members.organizationId))
     .where(
-      and(
-        eq(geoSettings.enabled, true),
-        isNull(organizations.suspendedAt),
-        lt(organizations.createdAt, new Date(GEO_ENGINE_POLICY_NEW_ORGS_FROM))
-      )
+      and(eq(members.organizationId, organizationId), eq(members.role, "owner"))
     );
+  const organizationName = owners[0]?.name ?? slug;
+  const ownerEmails = owners.map((owner) => owner.email);
 
-  const enginesByOrg = new Map<
-    string,
-    { slug: string; engines: Set<string> }
-  >();
-  for (const row of rows) {
-    if (onlySlug && row.slug !== onlySlug) {
-      continue;
-    }
-    const entry = enginesByOrg.get(row.organizationId) ?? {
-      slug: row.slug,
-      engines: new Set<string>(),
-    };
-    const engines = row.engines?.length
-      ? row.engines
-      : [...GEO_LEGACY_DEFAULT_ENGINE_IDS];
-    for (const engine of engines) {
-      entry.engines.add(engine);
-    }
-    enginesByOrg.set(row.organizationId, entry);
+  console.log(
+    `${organizationName} (${slug}) -> ${ownerEmails.join(", ") || "no owner"} [${codingAgents ? "coding agents" : "standard"}]`
+  );
+  for (const change of changes) {
+    console.log(`    ${change.from} -> ${change.to ?? "no longer tracked"}`);
   }
-
-  for (const [organizationId, { slug, engines }] of enginesByOrg) {
-    const changes = [...engines]
-      .filter((engine) => !isGeoSelfServeEngine(engine))
-      .map((engine) => {
-        const to = geoEnginePolicyReplacement(engine, AFTER_CUTOFF);
-        return { from: labelOf(engine), to: to ? targetLabelOf(to) : null };
-      });
-    const codingAgents = [...engines].some((engine) =>
-      CODING_AGENT_PREFIXES.some((prefix) => engine.startsWith(prefix))
-    );
-    const { organizationName, ownerEmails } =
-      await getOrganizationOwnerContacts(organizationId);
-
-    console.log(
-      `${organizationName} (${slug}) -> ${ownerEmails.join(", ") || "no owner"} [${codingAgents ? "coding agents" : "standard"}]`
-    );
-    for (const change of changes) {
-      console.log(`    ${change.from} -> ${change.to ?? "no longer tracked"}`);
-    }
-    if (!send) {
-      continue;
-    }
-    for (const recipientEmail of ownerEmails) {
-      const result = await sendGeoEngineChangeEmail({
-        recipientEmail,
-        organizationName,
-        organizationSlug: slug,
-        effectiveDate: EFFECTIVE_DATE,
-        changes,
-        codingAgents,
-      });
-      if (result.error) {
-        failed += 1;
-        console.error(
-          `    failed for ${recipientEmail}: ${result.error.message}`
-        );
-      } else {
-        sent += 1;
-      }
+  if (!send) {
+    continue;
+  }
+  for (const recipientEmail of ownerEmails) {
+    const result = await sendGeoEngineChangeEmail({
+      recipientEmail,
+      organizationName,
+      organizationSlug: slug,
+      effectiveDate: EFFECTIVE_DATE,
+      changes,
+      codingAgents,
+    });
+    if (result.error) {
+      failed += 1;
+      console.error(
+        `    failed for ${recipientEmail}: ${result.error.message}`
+      );
+    } else {
+      sent += 1;
     }
   }
-  organizationCount = enginesByOrg.size;
-} catch (error) {
-  await releaseOnce();
-  throw error;
 }
-
-if (failed > 0) {
-  await releaseOnce();
-}
+organizationCount = enginesByOrg.size;
 console.log(
   send
     ? `Sent ${sent}, failed ${failed}, organizations ${organizationCount}.`
