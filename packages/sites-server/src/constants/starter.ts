@@ -21,6 +21,7 @@ export const STARTER_ROOT_MARKER_PREFIX = "<!-- notra:site-starter-root ";
 export const STARTER_COMMIT_HEADLINE = "Add Notra Sites starter files";
 
 export const STARTER_SAMPLE_POST_PATH = "blog/hello-world.md";
+export const STARTER_THUMBNAILS = { layout: "article" } as const;
 
 export const STARTER_MDX_SAFE_CHAR = /[\p{L}\p{N} .,:;!?()/'’-]/u;
 export const STARTER_LINK_CLASS =

@@ -5,33 +5,35 @@ import { extname, join } from "node:path";
 import { parseEntryFrontmatter } from "@notra/sites-compiler/frontmatter";
 import { SITE_CONFIG_FILENAME } from "@notra/sites-core/constants/sites";
 import type { SiteDiagnostic } from "@notra/sites-core/types/build";
-import type { SiteArea } from "@notra/sites-core/types/deployment";
-import { Resvg } from "@resvg/resvg-js";
+import {
+  OG_BACKGROUND_MIME_TYPES,
+  OG_FONT_FILES,
+} from "@notra/sites-og/constants/og-images";
+import type { OgAuthor, SatoriFont } from "@notra/sites-og/types/og-images";
+import {
+  ogAreaCard,
+  ogDomain,
+  ogEntryCard,
+  ogLogoPath,
+  ogStyle,
+} from "@notra/sites-og/utils/og-card";
+import {
+  isOgFontPath,
+  loadOgCustomFont,
+  renderOgPng,
+} from "@notra/sites-og/utils/og-render";
 import type { ReactElement } from "react";
-import satori from "satori";
 
 import { AREA_DEFAULT_TITLES } from "../src/constants/areas";
 import { OG_MANIFEST_FILE } from "../src/constants/og";
-import { configuredAreaTitle, withSiteName } from "../src/utils/area-titles";
-import { OgArticleCard } from "./components/og-article-card";
-import { OgAuthorCard } from "./components/og-author-card";
-import { OgCard } from "./components/og-card";
-import {
-  OG_BACKGROUND_MIME_TYPES,
-  OG_FONT_SUBSETS,
-  OG_FONT_WEIGHTS,
-  OG_IMAGE_HEIGHT,
-  OG_IMAGE_WIDTH,
-  OG_IMAGES_DIR,
-} from "./constants/og-images";
+import { configuredAreaTitle } from "../src/utils/area-titles";
+import { OG_IMAGES_DIR } from "./constants/og-images";
 import type {
   FrontmatterAuthor,
-  OgAuthor,
-  OgCardStyle,
   OgBackgroundResult,
+  OgFontResult,
   OgImagesResult,
   OgManifest,
-  SatoriFont,
   WriteOgImagesParams,
 } from "./types/og-images";
 import { writeFileEnsured } from "./utils/fs";
@@ -41,18 +43,13 @@ let fontsPromise: Promise<SatoriFont[]> | null = null;
 function loadFonts(): Promise<SatoriFont[]> {
   fontsPromise ??= (async () => {
     const require = createRequire(import.meta.url);
-    const specs = OG_FONT_SUBSETS.flatMap((subset) =>
-      OG_FONT_WEIGHTS.map((weight) => ({ subset, weight }))
-    );
     return Promise.all(
-      specs.map(async ({ subset, weight }) => ({
-        name: `Inter ${subset}`,
+      OG_FONT_FILES.map(async ({ name, weight, file }) => ({
+        name,
         weight,
         style: "normal" as const,
         data: await readFile(
-          require.resolve(
-            `@fontsource/inter/files/inter-${subset}-${weight}-normal.woff`
-          )
+          require.resolve(`@fontsource/inter/files/${file}`)
         ),
       }))
     );
@@ -60,23 +57,8 @@ function loadFonts(): Promise<SatoriFont[]> {
   return fontsPromise;
 }
 
-function formatShortDate(date: Date, now: Date): string {
-  const sameYear = date.getUTCFullYear() === now.getUTCFullYear();
-  return new Intl.DateTimeFormat("en-GB", {
-    day: "numeric",
-    month: "long",
-    ...(sameYear ? {} : { year: "numeric" }),
-    timeZone: "UTC",
-  }).format(date);
-}
-
-function formatDate(date: Date): string {
-  return new Intl.DateTimeFormat("en-US", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-    timeZone: "UTC",
-  }).format(date);
+function publicPath(path: string): string {
+  return path.startsWith("/") ? path : `/${path}`;
 }
 
 async function loadBackground(
@@ -86,7 +68,7 @@ async function loadBackground(
   if (!path) {
     return {};
   }
-  const normalized = path.startsWith("/") ? path : `/${path}`;
+  const normalized = publicPath(path);
   const mimeType = OG_BACKGROUND_MIME_TYPES[extname(normalized).toLowerCase()];
   if (!(mimeType && params.publicFiles.includes(normalized))) {
     return {
@@ -111,7 +93,7 @@ async function publicImage(
   if (!path || /^https?:\/\//.test(path)) {
     return undefined;
   }
-  const normalized = path.startsWith("/") ? path : `/${path}`;
+  const normalized = publicPath(path);
   const mimeType = OG_BACKGROUND_MIME_TYPES[extname(normalized).toLowerCase()];
   if (!(mimeType && params.publicFiles.includes(normalized))) {
     return undefined;
@@ -157,65 +139,30 @@ async function resolveAuthors(
   return authors.filter((author) => author !== undefined);
 }
 
-function authorWithFallback(
-  author: OgAuthor | undefined,
-  logo: string | undefined
-): OgAuthor | undefined {
-  return author && !author.avatar && logo
-    ? { ...author, avatar: logo }
-    : author;
-}
-
-function siteLogo(config: WriteOgImagesParams["config"]): string | undefined {
-  const { logo, favicon } = config;
-  const path = typeof logo === "string" ? logo : logo?.light;
-  return path ?? (typeof favicon === "string" ? favicon : favicon?.light);
-}
-
-async function renderPng(
-  card: ReactElement,
-  fonts: SatoriFont[]
-): Promise<Buffer> {
-  const svg = await satori(card, {
-    width: OG_IMAGE_WIDTH,
-    height: OG_IMAGE_HEIGHT,
-    fonts,
-  });
-  return new Resvg(svg, {
-    fitTo: { mode: "width", value: OG_IMAGE_WIDTH },
-  })
-    .render()
-    .asPng();
-}
-
-/** The share image of a section's index, also used by its tag and author pages. */
-function areaCard(
-  params: WriteOgImagesParams,
-  area: SiteArea,
-  style: OgCardStyle
-): ReactElement {
-  const { config } = params;
-  const title = configuredAreaTitle(config, area);
-  const section = config.thumbnails.label ?? AREA_DEFAULT_TITLES[area];
-  if (config.thumbnails.layout === "article") {
-    return OgArticleCard({
-      ...style,
-      date: config.name,
-      category: section === title ? "" : section,
-      title,
-      description: config[area]?.description ?? config.description,
-      authors: [],
-    });
+/** `thumbnails.font` from public/, or a warning when it can't be used. */
+async function loadCustomFont(
+  params: WriteOgImagesParams
+): Promise<OgFontResult> {
+  const path = params.config.thumbnails.font;
+  if (!path) {
+    return {};
   }
-  if (config.thumbnails.layout === "author") {
-    return OgAuthorCard({ ...style, label: section, title });
-  }
-  return OgCard({
-    ...style,
-    eyebrow: config.name,
-    title,
-    footer: style.domain,
+  const normalized = publicPath(path);
+  const warning = (reason: string): OgFontResult => ({
+    diagnostic: {
+      severity: "warning",
+      file: SITE_CONFIG_FILENAME,
+      code: "thumbnail_font",
+      message: `thumbnails.font: ${path} ${reason}. Share images use Inter instead.`,
+    },
   });
+  if (!(isOgFontPath(normalized) && params.publicFiles.includes(normalized))) {
+    return warning("is not a TTF, OTF or WOFF file in public/");
+  }
+  const font = await loadOgCustomFont(
+    await readFile(join(params.workDir, "site", "public", normalized))
+  );
+  return font ? { font } : warning("couldn't be read as a font");
 }
 
 async function writeCard(
@@ -226,7 +173,7 @@ async function writeCard(
 ): Promise<void> {
   await writeFileEnsured(
     join(params.workDir, "site", "public", urlPath),
-    await renderPng(card, fonts)
+    await renderOgPng(card, fonts)
   );
 }
 
@@ -238,32 +185,38 @@ export async function writeOgImages(
   const diagnostics: SiteDiagnostic[] = [];
   const { config } = params;
   if (config.thumbnails.enabled) {
-    const [fonts, background] = await Promise.all([
+    const [inter, background, custom, logo] = await Promise.all([
       loadFonts(),
       loadBackground(params),
+      loadCustomFont(params),
+      publicImage(params, ogLogoPath(config)),
     ]);
-    if (background.diagnostic) {
-      diagnostics.push(background.diagnostic);
+    for (const diagnostic of [background.diagnostic, custom.diagnostic]) {
+      if (diagnostic) {
+        diagnostics.push(diagnostic);
+      }
     }
-    const appearance = config.thumbnails.appearance;
-    const style: OgCardStyle = {
-      appearance,
-      accent:
-        appearance === "dark"
-          ? (config.colors.light ?? config.colors.primary)
-          : config.colors.primary,
-      logo: await publicImage(params, siteLogo(config)),
-      domain: new URL(params.publicOrigin).hostname.replace(/^www\./, ""),
+    const fonts = custom.font ? [custom.font, ...inter] : inter;
+    const style = ogStyle(config, {
+      logo,
       background: background.dataUri,
-    };
-    const { accent, logo, domain } = style;
+      domain: ogDomain(params.publicOrigin),
+      customFont: Boolean(custom.font),
+    });
     const now = new Date();
     // seo.image replaces the generated section cards; posts keep their own.
     const areas = config.seo.image ? [] : params.areas;
     await Promise.all(
       areas.map(async (area) => {
         const urlPath = `/${OG_IMAGES_DIR}/${area}.png`;
-        await writeCard(params, areaCard(params, area, style), fonts, urlPath);
+        const card = ogAreaCard({
+          config,
+          title: configuredAreaTitle(config, area),
+          section: AREA_DEFAULT_TITLES[area],
+          description: config[area]?.description ?? config.description,
+          style,
+        });
+        await writeCard(params, card, fonts, urlPath);
         manifest[area] = urlPath;
       })
     );
@@ -282,48 +235,23 @@ export async function writeOgImages(
         if (!data || data.image || (data.draft && !params.includeDrafts)) {
           return;
         }
-        const version = "version" in data ? data.version : undefined;
-        const authors =
-          config.thumbnails.layout !== "default" && "author" in data
-            ? await resolveAuthors(params, data.author)
-            : [];
-        const areaTitle = configuredAreaTitle(config, entry.area);
-        let card: ReactElement;
-        if (config.thumbnails.layout === "article") {
-          card = OgArticleCard({
-            date: formatShortDate(data.date, now),
-            category: data.tags[0] ?? config.thumbnails.label ?? areaTitle,
+        const card = ogEntryCard({
+          config,
+          areaTitle: configuredAreaTitle(config, entry.area),
+          entry: {
             title: data.title,
             description: data.description,
-            domain,
-            appearance,
-            accent,
-            logo,
-            authors,
-            background: background.dataUri,
-          });
-        } else if (config.thumbnails.layout === "author") {
-          card = OgAuthorCard({
-            label: config.thumbnails.label ?? areaTitle,
-            title: data.title,
-            domain,
-            appearance,
-            logo,
-            author: authorWithFallback(authors[0], logo),
-            background: background.dataUri,
-          });
-        } else {
-          card = OgCard({
-            eyebrow: withSiteName(config.name, areaTitle, " · "),
-            title: data.title,
-            footer: [version, formatDate(data.date)]
-              .filter(Boolean)
-              .join(" · "),
-            appearance,
-            accent,
-            background: background.dataUri,
-          });
-        }
+            date: data.date,
+            version: "version" in data ? data.version : undefined,
+            tags: data.tags,
+            authors:
+              config.thumbnails.layout !== "default" && "author" in data
+                ? await resolveAuthors(params, data.author)
+                : [],
+          },
+          style,
+          now,
+        });
         const urlPath = `/${OG_IMAGES_DIR}/${entry.area}/${entry.slug}.png`;
         await writeCard(params, card, fonts, urlPath);
         manifest[`${entry.area}/${entry.slug}`] = urlPath;

@@ -25,7 +25,7 @@ export function OgAuthorCard(content: OgAuthorCardContent): ReactElement {
         padding: 80,
         backgroundColor: colors.background,
         color: colors.text,
-        fontFamily: OG_FONT_FAMILY,
+        fontFamily: content.fontFamily ?? OG_FONT_FAMILY,
       }}
     >
       {content.background ? (

@@ -8,6 +8,7 @@ import {
   PaintBoardIcon,
   Plug01Icon,
   SeoIcon,
+  Share08Icon,
   TextFontIcon,
   UserMultiple02Icon,
 } from "@hugeicons/core-free-icons";
@@ -23,7 +24,7 @@ export const SITE_DESIGN_SECTIONS = [
   {
     id: "branding",
     icon: Image01Icon,
-    paths: ["logo", "favicon", "seo.image", "seo.imageAlt"],
+    paths: ["logo", "favicon"],
   },
   { id: "typography", icon: TextFontIcon, paths: ["fonts"] },
   { id: "navbar", icon: LayoutTopIcon, paths: ["navbar"] },
@@ -36,6 +37,11 @@ export const SITE_DESIGN_SECTIONS = [
   },
   { id: "integrations", icon: Plug01Icon, paths: ["integrations"] },
   { id: "seo", icon: SeoIcon, paths: ["seo.metatags", "seo.indexing"] },
+  {
+    id: "shareImages",
+    icon: Share08Icon,
+    paths: ["thumbnails", "seo.image", "seo.imageAlt"],
+  },
   { id: "notFound", icon: FileNotFoundIcon, paths: ["errors.404"] },
 ] as const;
 
@@ -47,5 +53,8 @@ export const SITE_DESIGN_GROUPS = [
   },
   { id: "layout", sections: ["navbar", "banner", "footer"] },
   { id: "content", sections: ["authors"] },
-  { id: "configuration", sections: ["integrations", "seo", "notFound"] },
+  {
+    id: "configuration",
+    sections: ["integrations", "seo", "shareImages", "notFound"],
+  },
 ] as const;

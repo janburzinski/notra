@@ -22,6 +22,7 @@ COPY packages/posthog/package.json ./packages/posthog/package.json
 COPY packages/schemas/package.json ./packages/schemas/package.json
 COPY packages/sites-compiler/package.json ./packages/sites-compiler/package.json
 COPY packages/sites-core/package.json ./packages/sites-core/package.json
+COPY packages/sites-og/package.json ./packages/sites-og/package.json
 COPY packages/sites-server/package.json ./packages/sites-server/package.json
 COPY packages/tools/package.json ./packages/tools/package.json
 COPY packages/typescript-config/package.json ./packages/typescript-config/package.json

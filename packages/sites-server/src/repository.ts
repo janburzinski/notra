@@ -78,6 +78,58 @@ export async function readRepositoryBlobSha(
   }
 }
 
+/**
+ * A binary file's bytes, or null when it's missing or larger than `maxBytes`.
+ * Read as a blob because the contents API stops at 1 MB.
+ */
+export async function readRepositoryBinaryFile(
+  repository: SiteRepository,
+  token: string,
+  file: RepositoryFileRef,
+  maxBytes: number
+): Promise<Buffer | null> {
+  const octokit = createOctokit(token);
+  try {
+    const { data: entry } = await octokit.request(
+      "GET /repos/{owner}/{repo}/contents/{path}",
+      {
+        owner: repository.owner,
+        repo: repository.repo,
+        path: file.path,
+        ref: file.ref,
+        headers: {
+          ...GITHUB_API_VERSION_HEADERS,
+          accept: "application/vnd.github.object+json",
+        },
+      }
+    );
+    if (
+      Array.isArray(entry) ||
+      entry.type !== "file" ||
+      entry.size > maxBytes
+    ) {
+      return null;
+    }
+    const { data: blob } = await octokit.request(
+      "GET /repos/{owner}/{repo}/git/blobs/{file_sha}",
+      {
+        owner: repository.owner,
+        repo: repository.repo,
+        file_sha: entry.sha,
+        headers: GITHUB_API_VERSION_HEADERS,
+      }
+    );
+    return blob.encoding === "base64"
+      ? Buffer.from(blob.content, "base64")
+      : null;
+  } catch (error) {
+    if (isNotFoundError(error)) {
+      return null;
+    }
+    throw error;
+  }
+}
+
 export async function createRepositoryBranch(
   repository: SiteRepository,
   token: string,

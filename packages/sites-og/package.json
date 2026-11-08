@@ -1,0 +1,28 @@
+{
+  "name": "@notra/sites-og",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Share image cards of Notra Sites, drawn by the builder and previewed by the dashboard.",
+  "type": "module",
+  "exports": {
+    "./components/*": "./src/components/*.tsx",
+    "./constants/*": "./src/constants/*.ts",
+    "./types/*": "./src/types/*.ts",
+    "./utils/*": "./src/utils/*.ts"
+  },
+  "scripts": {
+    "check-types": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@notra/sites-core": "workspace:*",
+    "@resvg/resvg-js": "2.6.2",
+    "react": "19.3.1",
+    "satori": "catalog:"
+  },
+  "devDependencies": {
+    "@notra/typescript-config": "workspace:*",
+    "@types/react": "^19.3.0",
+    "bun-types": "catalog:",
+    "typescript": "catalog:"
+  }
+}

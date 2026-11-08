@@ -9008,12 +9008,7 @@
         "logoHrefHint": "Wohin das Logo führt. Standard ist die Startseite deiner Site.",
         "favicon": "Favicon",
         "faviconHint": "SVG, PNG oder ICO, erscheint in Browser-Tabs.",
-        "separateFavicons": "Getrennte Favicons für Hell und Dunkel",
-        "shareImage": "Vorschaubild",
-        "shareImageHint": "Für geteilte Seiten ohne eigenes Bild, etwa deine Startseite. 1200×630 als PNG oder JPEG. Ohne Bild erzeugt Notra eines.",
-        "shareImageAlt": "Beschreibung des Vorschaubilds",
-        "shareImageAltHint": "Beschreibt das Vorschaubild für Screenreader.",
-        "shareImageAltPlaceholder": "Das Acme-Logo auf dunklem Hintergrund"
+        "separateFavicons": "Getrennte Favicons für Hell und Dunkel"
       },
       "styling": {
         "primary": "Primärfarbe",
@@ -9153,6 +9148,63 @@
         "indexingModes": {
           "navigable": "Navigierbar",
           "all": "Alle Seiten"
+        }
+      },
+      "shareImages": {
+        "generate": "Vorschaubilder erzeugen",
+        "generateHint": "Beiträge und Startseiten ohne eigenes Bild bekommen eines. Ausgeschaltet zeigen sie das Startseitenbild oder dein Logo.",
+        "layout": "Layout",
+        "layoutHint": "Wie Titel, Logo und Autoren angeordnet sind.",
+        "layouts": {
+          "default": "Klassisch",
+          "author": "Autor",
+          "article": "Artikel"
+        },
+        "layoutDescriptions": {
+          "default": "Site- und Bereichsname, Titel und Datum, mit einem Balken in deiner Markenfarbe.",
+          "author": "Logo und Label oben, darunter der Titel, unten der erste Autor und deine Domain.",
+          "article": "Datum und Kategorie oben, darunter Titel und Beschreibung, unten alle Autoren."
+        },
+        "appearance": "Modus",
+        "appearanceHint": "Helle oder dunkle Bilder. Dunkle nutzen deine Akzentfarbe für den Dunkelmodus.",
+        "appearances": {
+          "light": "Hell",
+          "dark": "Dunkel"
+        },
+        "background": "Hintergrund",
+        "backgroundHint": "Füllt das ganze Bild hinter dem Text. 1200×630 als PNG, JPEG oder SVG.",
+        "backgroundHintAuthor": "Füllt die untere Hälfte des Bildes. 1200×315 als PNG, JPEG oder SVG passt genau.",
+        "label": "Label",
+        "labelHint": "Erscheint in Großbuchstaben oben in der Ecke. Standard ist der Bereichsname.",
+        "labelHintArticle": "Die Kategorie von Beiträgen ohne Tags. Standard ist der Bereichsname.",
+        "font": "Schrift",
+        "fontHint": "Eine TTF-, OTF- oder WOFF-Datei im public-Ordner deines Repositorys. WOFF2 wird nicht unterstützt. Standard ist Inter.",
+        "homeImage": "Startseitenbild",
+        "homeImageHint": "Ersetzt das erzeugte Bild der Startseiten von Blog und Changelog. Gilt auch für Beiträge ohne Bild, solange erzeugte Bilder aus sind. 1200×630 als PNG oder JPEG.",
+        "homeImageAlt": "Beschreibung des Startseitenbilds",
+        "homeImageAltHint": "Beschreibt das Startseitenbild für Screenreader.",
+        "homeImageAltPlaceholder": "Das Acme-Logo auf dunklem Hintergrund",
+        "preview": {
+          "title": "Vorschau",
+          "captionPost": "Ein Beispielbeitrag. Veröffentlichte Beiträge zeigen ihren eigenen Titel, ihre Autoren und ihr Datum.",
+          "captionHome": "Die Startseite deines Blogs oder Changelogs, auch für ihre Tag- und Autorenseiten.",
+          "captionHomeImage": "Dein Startseitenbild ersetzt hier das erzeugte.",
+          "pageLabel": "Seite für die Vorschau",
+          "pages": {
+            "post": "Beitrag",
+            "home": "Startseite"
+          },
+          "alt": "Vorschau des Vorschaubilds",
+          "enlarge": "Vorschaubild in voller Größe anzeigen",
+          "off": "Erzeugte Vorschaubilder sind aus. Beiträge ohne eigenes Bild nutzen das Startseitenbild oder dein Logo.",
+          "invalid": "Behebe die Fehler in blog.json, um die Vorschau zu sehen.",
+          "missingHome": "Das Startseitenbild wurde nicht gefunden. Prüfe den Pfad oder lade es erneut hoch.",
+          "failed": "Die Vorschau konnte nicht erstellt werden. Ändere eine Einstellung, um es erneut zu versuchen.",
+          "updating": "Vorschau wird aktualisiert",
+          "warnings": {
+            "background": "Der Hintergrund ist keine PNG-, JPEG- oder SVG-Datei in public/, daher fehlt er auf den Vorschaubildern.",
+            "font": "Die Schrift ist keine lesbare TTF-, OTF- oder WOFF-Datei in public/, daher nutzen die Vorschaubilder Inter."
+          }
         }
       },
       "notFound": {
@@ -9346,12 +9398,13 @@
           "footer": "Footer",
           "authors": "Autoren",
           "seo": "SEO",
+          "shareImages": "Vorschaubilder",
           "notFound": "404-Seite"
         },
         "hints": {
           "general": "Name und Beschreibung für deine Leser.",
           "styling": "Farben, Hintergründe und Code-Designs.",
-          "branding": "Deine Logos, dein Favicon, der Logo-Link und das Vorschaubild.",
+          "branding": "Deine Logos, dein Favicon und der Logo-Link.",
           "typography": "Schriften für Überschriften und Fließtext.",
           "navbar": "Links und Aktionen in der Seitennavigation.",
           "banner": "Eine Ankündigungsleiste oben auf jeder Seite.",
@@ -9359,6 +9412,7 @@
           "footer": "Social Links und Link-Spalten unten auf jeder Seite.",
           "authors": "Die Menschen, die für deinen Blog schreiben, und das Layout ihrer Autorenseiten.",
           "seo": "Meta-Tags und welche Seiten Suchmaschinen indexieren.",
+          "shareImages": "Das Bild, das Link-Vorschauen zeigen, wenn jemand deine Site teilt.",
           "notFound": "Was Leser sehen, wenn ein Link auf eine Seite zeigt, die es nicht gibt."
         }
       },

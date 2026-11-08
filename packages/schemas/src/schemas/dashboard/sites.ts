@@ -250,6 +250,14 @@ export const uploadSiteImageInputSchema = siteEditorScopeInputSchema.extend({
   sourceContext: siteDraftMutationInputSchema.shape.sourceContext,
 });
 
+export const siteSharePreviewInputSchema = siteEditorScopeInputSchema.extend({
+  /** The blog.json being edited, unsaved changes included. */
+  config: z.string().max(512 * 1024),
+  page: z.enum(["post", "home"]),
+  /** The source commit and asset drafts; only keys the cache, so replaced files redraw. */
+  version: z.string().max(20_000).optional(),
+});
+
 export const publishSiteDraftsInputSchema = siteEditorScopeInputSchema.extend({
   message: z.string().trim().min(1).max(200).optional(),
 });

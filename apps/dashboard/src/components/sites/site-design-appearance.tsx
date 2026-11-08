@@ -22,6 +22,8 @@ import {
   SiteSettingsItem,
   SiteSettingsList,
 } from "@/components/sites/site-settings-item";
+import { SiteShareImageFields } from "@/components/sites/site-share-image-fields";
+import { SiteShareImagePreview } from "@/components/sites/site-share-image-preview";
 import { SiteStylingFields } from "@/components/sites/site-styling-fields";
 import { SiteTypographyFields } from "@/components/sites/site-typography-fields";
 import { useSiteWorkspace } from "@/components/sites/site-workspace-context";
@@ -115,6 +117,19 @@ export function SiteDesignAppearance({ section }: SiteDesignAppearanceProps) {
       <SiteSettingsList>
         <SiteSeoFields form={form} update={update} />
       </SiteSettingsList>
+    );
+  }
+  if (section === "shareImages") {
+    return (
+      <div className="space-y-4">
+        <SiteSettingsList>
+          <SiteShareImageFields form={form} update={update} />
+        </SiteSettingsList>
+        {/* Nothing to draw when images are off and there's no home page image. */}
+        {form.thumbnailsEnabled || form.shareImage.trim() ? (
+          <SiteShareImagePreview form={form} />
+        ) : null}
+      </div>
     );
   }
   if (section === "notFound") {

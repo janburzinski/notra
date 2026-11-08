@@ -19,6 +19,8 @@ export const CONTENT_TYPES: Record<string, string> = {
   ico: "image/x-icon",
   woff: "font/woff",
   woff2: "font/woff2",
+  ttf: "font/ttf",
+  otf: "font/otf",
   mp4: "video/mp4",
   webm: "video/webm",
   pdf: "application/pdf",

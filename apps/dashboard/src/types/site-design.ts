@@ -15,6 +15,10 @@ import type {
   SITE_SEO_INDEXING_MODES,
   SITE_TYPOGRAPHY_MODES,
 } from "@/constants/site-design";
+import type {
+  SiteThumbnailAppearance,
+  SiteThumbnailLayout,
+} from "@/types/site-share-image";
 
 export type SiteAppearanceMode = (typeof SITE_APPEARANCE_MODES)[number];
 export type SiteBackgroundDecoration =
@@ -86,6 +90,12 @@ export interface SiteDesignForm {
   faviconDark: string;
   shareImage: string;
   shareImageAlt: string;
+  thumbnailsEnabled: boolean;
+  thumbnailLayout: SiteThumbnailLayout;
+  thumbnailAppearance: SiteThumbnailAppearance;
+  thumbnailBackground: string;
+  thumbnailLabel: string;
+  thumbnailFont: string;
   primary: string;
   darkModeAccent: string;
   button: string;

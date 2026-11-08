@@ -21,6 +21,12 @@ import {
   SITE_SEO_INDEXING_MODES,
   SITE_SOCIAL_LINKS,
 } from "@/constants/site-design";
+import {
+  SITE_AREA_DEFAULT_TITLES,
+  SITE_SHARE_PREVIEW_CONFIG_KEYS,
+  SITE_THUMBNAIL_APPEARANCES,
+  SITE_THUMBNAIL_LAYOUTS,
+} from "@/constants/site-share-image";
 import type { BrandGuidelinesResponse } from "@/types/hooks/brand-guidelines";
 import type {
   SiteAppearanceMode,
@@ -39,6 +45,8 @@ import type {
   SiteRawConfig,
   SiteSocialPlatform,
 } from "@/types/site-design";
+import type { SiteEditorFiles } from "@/types/sites";
+import { siteDraftVersion } from "@/utils/site-draft-version";
 
 type SiteDesignKey = keyof SiteDesignForm;
 
@@ -57,6 +65,14 @@ const FAVICON_KEYS: readonly SiteDesignKey[] = [
 const SHARE_IMAGE_KEYS: readonly SiteDesignKey[] = [
   "shareImage",
   "shareImageAlt",
+];
+const THUMBNAIL_KEYS: readonly SiteDesignKey[] = [
+  "thumbnailsEnabled",
+  "thumbnailLayout",
+  "thumbnailAppearance",
+  "thumbnailBackground",
+  "thumbnailLabel",
+  "thumbnailFont",
 ];
 const COLOR_KEYS: readonly SiteDesignKey[] = [
   "primary",
@@ -368,6 +384,7 @@ export function readDesignForm(config: SiteRawConfig): SiteDesignForm {
   const footer = record(config.footer);
   const footerColumns = readFooterColumns(footer);
   const notFound = record(record(config.errors)["404"]);
+  const thumbnails = record(config.thumbnails);
   return {
     name: text(config.name),
     description: text(config.description),
@@ -380,6 +397,17 @@ export function readDesignForm(config: SiteRawConfig): SiteDesignForm {
     faviconDark: hasSeparateModes(config.favicon) ? favicon.dark : "",
     shareImage: text(seo.image),
     shareImageAlt: text(seo.imageAlt),
+    thumbnailsEnabled: thumbnails.enabled !== false,
+    thumbnailLayout:
+      SITE_THUMBNAIL_LAYOUTS.find((item) => item === thumbnails.layout) ??
+      "default",
+    thumbnailAppearance:
+      SITE_THUMBNAIL_APPEARANCES.find(
+        (item) => item === thumbnails.appearance
+      ) ?? "light",
+    thumbnailBackground: text(thumbnails.background),
+    thumbnailLabel: text(thumbnails.label),
+    thumbnailFont: text(thumbnails.font),
     primary: text(colors.primary) || SITE_DEFAULT_PRIMARY_COLOR,
     darkModeAccent: text(colors.light),
     button: text(colors.dark),
@@ -478,6 +506,63 @@ function patchShareImage(config: SiteRawConfig, form: SiteDesignForm) {
   assign(seo, "image", image || undefined);
   assign(seo, "imageAlt", (image && form.shareImageAlt.trim()) || undefined);
   assignObject(config, "seo", seo);
+}
+
+/** Defaults are left out, so a site that never changed them keeps no `thumbnails`. */
+function patchThumbnails(config: SiteRawConfig, form: SiteDesignForm) {
+  const thumbnails: SiteRawConfig = { ...record(config.thumbnails) };
+  assign(thumbnails, "enabled", form.thumbnailsEnabled ? undefined : false);
+  assign(
+    thumbnails,
+    "layout",
+    form.thumbnailLayout === "default" ? undefined : form.thumbnailLayout
+  );
+  assign(
+    thumbnails,
+    "appearance",
+    form.thumbnailAppearance === "light" ? undefined : form.thumbnailAppearance
+  );
+  assign(
+    thumbnails,
+    "background",
+    form.thumbnailBackground.trim() || undefined
+  );
+  assign(thumbnails, "label", form.thumbnailLabel.trim() || undefined);
+  assign(thumbnails, "font", form.thumbnailFont.trim() || undefined);
+  assignObject(config, "thumbnails", thumbnails);
+}
+
+/** The parts of blog.json a share image reads, so other edits don't redraw it. */
+export function sharePreviewConfig(config: SiteRawConfig): string {
+  return JSON.stringify(
+    Object.fromEntries(
+      SITE_SHARE_PREVIEW_CONFIG_KEYS.filter((key) => key in config).map(
+        (key) => [key, config[key]]
+      )
+    )
+  );
+}
+
+/**
+ * Changes when a file a share image can read changes: the source commit or an
+ * image draft. blog.json edits already change the preview's config.
+ */
+export function sharePreviewVersion(
+  files: Pick<SiteEditorFiles, "commitSha" | "drafts">
+): string {
+  const assets = files.drafts.filter((draft) =>
+    draft.path.startsWith("public/")
+  );
+  return `${files.commitSha}|${siteDraftVersion(assets)}`;
+}
+
+/** The section title a share image label falls back to. */
+export function defaultShareLabel(
+  config: SiteRawConfig,
+  mounts: { blog?: string; changelog?: string }
+): string {
+  const area = mounts.blog === undefined ? "changelog" : "blog";
+  return text(record(config[area]).title) || SITE_AREA_DEFAULT_TITLES[area];
 }
 
 /** Lowercased names that more than one meta tag row uses. */
@@ -839,6 +924,9 @@ export function patchDesign(
   }
   if (changed(form, initial, SHARE_IMAGE_KEYS)) {
     patchShareImage(config, form);
+  }
+  if (changed(form, initial, THUMBNAIL_KEYS)) {
+    patchThumbnails(config, form);
   }
   if (changed(form, initial, COLOR_KEYS)) {
     const colors: SiteRawConfig = {

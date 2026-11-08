@@ -45,6 +45,8 @@ Every site comes with sitemaps, RSS feeds, canonical URLs, Open Graph tags and s
 
 Posts and entries without an `image` get a generated 1200×630 share image with your site name, the section, the title and your brand color. The blog and changelog home pages get one too, with the section title, and their tag and author pages reuse it.
 
+Every setting below is also in the dashboard under **Design → Share images**, with a live preview of a post and a home page drawn by the same renderer as your builds.
+
 To use your own image for those pages instead, set `seo.image`:
 
 ```json blog.json
@@ -54,7 +56,7 @@ To use your own image for those pages instead, set `seo.image`:
 - `image` is a path in `public/` or an `https://` URL. Use a 1200×630 PNG or JPEG, because not every link preview reads WebP, AVIF or SVG.
 - `imageAlt` describes it for screen readers.
 - Posts keep their own `image` or generated share image.
-- You can also set it in the dashboard under **Design → Branding → Share image**.
+- You can also set it in the dashboard under **Design → Share images → Home page image**.
 
 ```json blog.json
 "thumbnails": { "appearance": "dark", "background": "/images/og-background.png" }
@@ -63,6 +65,19 @@ To use your own image for those pages instead, set `seo.image`:
 - `appearance` is `light` (default) or `dark`.
 - `background` is a PNG, JPEG or SVG in `public/` behind the text.
 - `"enabled": false` turns them off, and pages without an image then use `seo.image`, or else your logo.
+
+### Font
+
+Share images use Inter. To use your brand font, add a TTF, OTF or WOFF file to `public/` and point `font` at it:
+
+```json blog.json
+"thumbnails": { "font": "/fonts/brand.ttf" }
+```
+
+- WOFF2 doesn't work, because the renderer can't read it. Most font sites offer a TTF download.
+- One file draws the whole image, so titles and labels share its weight. Pick the weight you want for titles.
+- Characters the font doesn't have, like other scripts, fall back to Inter.
+- A file that's missing or can't be read leaves a warning in the build log, and the images use Inter.
 
 ### Author layout
 
@@ -79,7 +94,7 @@ To use your own image for those pages instead, set `seo.image`:
 
 ### Article layout
 
-`"layout": "article"` puts the date and a category on top, the title below, and the post's description and authors at the bottom:
+Sites set up with the Notra starter begin on this layout. `"layout": "article"` puts the date and a category on top, the title below, and the post's description and authors at the bottom:
 
 ```json blog.json
 "thumbnails": { "layout": "article" }

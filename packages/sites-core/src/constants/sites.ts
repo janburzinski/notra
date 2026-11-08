@@ -180,6 +180,8 @@ export const SITE_SOURCE_EXTENSIONS = [
   ".txt",
   ".woff",
   ".woff2",
+  ".ttf",
+  ".otf",
   ".css",
   ".riv",
   ".wasm",

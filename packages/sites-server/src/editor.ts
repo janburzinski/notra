@@ -29,6 +29,8 @@ import {
   MAX_PUBLISH_BYTES,
   MAX_GENERATED_HEADLINE_FILES,
   MAX_PUBLISH_HEADLINE_LENGTH,
+  SHARE_IMAGE_ASSET_FILE,
+  SHARE_IMAGE_ASSET_MAX_BYTES,
   SITE_EDITOR_READ_CONCURRENCY,
   SITE_VALIDATE_MAX_FILE_BYTES,
   SITE_VALIDATE_MAX_FILES,
@@ -42,6 +44,7 @@ import { getBranchHead, siteRepositoryAccess } from "./github";
 import {
   commitRepositoryFiles,
   openRepositoryPullRequest,
+  readRepositoryBinaryFile,
   readRepositoryBlobSha,
   readRepositoryFile,
 } from "./repository";
@@ -245,6 +248,44 @@ export async function readPublishedFile(
     ref,
   });
   return sha ? { sha, content: null } : null;
+}
+
+/**
+ * Bytes of an image or font under public/ as the next build reads it: its
+ * pending draft, else the branch's file. Null when it doesn't exist.
+ */
+export async function readShareImageAsset(
+  site: Site,
+  path: string,
+  branch = site.productionBranch
+): Promise<Buffer | null> {
+  const safe =
+    SHARE_IMAGE_ASSET_FILE.test(path) &&
+    path
+      .split("/")
+      .every(
+        (segment) =>
+          !segment.startsWith(".") && EDITABLE_PATH_SEGMENT.test(segment)
+      );
+  if (!safe) {
+    throw new SiteInputError(`${path} is not a share image asset`);
+  }
+  const draft = await readSiteDraft(site, path, branch);
+  if (draft) {
+    // Only images have drafts, and they're stored base64.
+    return draft.deleted || !isSiteImageDraftPath(path)
+      ? null
+      : Buffer.from(draft.content, "base64");
+  }
+  assertSiteEditableBranch(site, branch);
+  await assertSiteContentBranch(site, branch);
+  const { repository, token } = await readAccess(site);
+  return await readRepositoryBinaryFile(
+    repository,
+    token,
+    { path: repositoryPath(site.rootDirectory, path), ref: branch },
+    SHARE_IMAGE_ASSET_MAX_BYTES
+  );
 }
 
 /** The draft table and filter for a site branch's pending drafts. */

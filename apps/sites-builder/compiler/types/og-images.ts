@@ -2,7 +2,7 @@ import type { SiteEntry } from "@notra/sites-compiler/types/entries";
 import type { SiteDiagnostic } from "@notra/sites-core/types/build";
 import type { SiteArea } from "@notra/sites-core/types/deployment";
 import type { SiteConfig } from "@notra/sites-core/types/site-config";
-import type satori from "satori";
+import type { SatoriFont } from "@notra/sites-og/types/og-images";
 
 export interface WriteOgImagesParams {
   workDir: string;
@@ -28,54 +28,10 @@ export interface OgBackgroundResult {
   diagnostic?: SiteDiagnostic;
 }
 
-/** What every card of a site shares. */
-export interface OgCardStyle {
-  appearance: "light" | "dark";
-  accent: string;
-  logo?: string;
-  domain: string;
-  background?: string;
+export interface OgFontResult {
+  font?: SatoriFont;
+  diagnostic?: SiteDiagnostic;
 }
-
-export interface OgCardContent {
-  eyebrow: string;
-  title: string;
-  footer: string;
-  appearance: "light" | "dark";
-  accent: string;
-  background?: string;
-}
-
-export interface OgAuthor {
-  name: string;
-  title?: string;
-  avatar?: string;
-}
-
-export interface OgAuthorCardContent {
-  label: string;
-  title: string;
-  domain: string;
-  appearance: "light" | "dark";
-  logo?: string;
-  author?: OgAuthor;
-  background?: string;
-}
-
-export interface OgArticleCardContent {
-  date: string;
-  category: string;
-  title: string;
-  description?: string;
-  domain: string;
-  appearance: "light" | "dark";
-  accent: string;
-  logo?: string;
-  authors: OgAuthor[];
-  background?: string;
-}
-
-export type SatoriFont = Parameters<typeof satori>[1]["fonts"][number];
 
 export type FrontmatterAuthor =
   | string

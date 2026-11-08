@@ -11,6 +11,7 @@ import {
   STARTER_NAME_MAX_LENGTH,
   STARTER_SAMPLE_POST_PATH,
   STARTER_SYSTEM_FONTS,
+  STARTER_THUMBNAILS,
 } from "../constants/starter";
 import type {
   SiteStarterFiles,
@@ -171,12 +172,18 @@ export function buildStarterConfig(input: StarterBrandInput) {
     title: `${truncate(name, STARTER_NAME_MAX_LENGTH - 5)} Blog`,
     ...(description ? { description } : {}),
   };
+  // New sites start on the plainest share image layout.
+  config.thumbnails = STARTER_THUMBNAILS;
 
   const parsed = siteConfigSchema.safeParse(config);
   if (parsed.success) {
     return config;
   }
-  return description ? { name, description } : { name };
+  return {
+    name,
+    ...(description ? { description } : {}),
+    thumbnails: STARTER_THUMBNAILS,
+  };
 }
 
 // The header adds `site-nav-link`, the class of the theme's own navbar links.

@@ -585,5 +585,20 @@ export async function assertContentFeatures(
   assert.equal(image?.status(), 200);
   assert.match(image?.headers()["content-type"] ?? "", /^image\//);
   checks.push("generated OG image is served");
+
+  // thumbnails.font is a TTF in public/, so TTF files are site files too.
+  // Navigating to a font downloads it, so the page fetches it instead.
+  const font = await page.evaluate(async (url) => {
+    const response = await fetch(url);
+    // Reading the body keeps navigation from aborting it.
+    const bytes = (await response.arrayBuffer()).byteLength;
+    return {
+      status: response.status,
+      type: response.headers.get("content-type"),
+      loaded: bytes > 0,
+    };
+  }, `${origin}/blog/fonts/e2e-share.ttf`);
+  assert.deepEqual(font, { status: 200, type: "font/ttf", loaded: true });
+  checks.push("TTF files in public/ are served");
   return checks;
 }

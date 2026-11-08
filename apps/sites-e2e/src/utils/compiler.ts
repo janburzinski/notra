@@ -73,6 +73,8 @@ async function compileWith(
     config.fonts = JSON.parse(
       await readFile(join(root, "apps/sites-e2e/fixtures/fonts.json"), "utf8")
     );
+    // Share images drawn with a TTF from public/, which content.ts fetches too.
+    config.thumbnails = { font: "/fonts/e2e-share.ttf" };
     // The only built-in script loaded on demand; content.ts checks it renders under the CSP.
     config.blog = { ...config.blog, hero: { style: "dither" } };
     // Profile links content.ts expects in the author-hero slot and JSON-LD.
@@ -140,6 +142,11 @@ async function compileWith(
     if (!preview) {
       await assertLinkChecks(builder, source, outDir, target);
     }
+    assert.deepEqual(
+      result.diagnostics.filter((item) => item.code?.startsWith("thumbnail_")),
+      [],
+      "share images use the fixture font and no thumbnail setting is skipped"
+    );
     const files = [];
     for (const file of await listFiles(outDir)) {
       const path = file.slice(outDir.length);

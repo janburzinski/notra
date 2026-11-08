@@ -9008,12 +9008,7 @@
         "logoHrefHint": "Where the logo points. Defaults to your site's home page.",
         "favicon": "Favicon",
         "faviconHint": "SVG, PNG or ICO, shown in browser tabs.",
-        "separateFavicons": "Separate light and dark favicons",
-        "shareImage": "Share image",
-        "shareImageHint": "For shared pages without their own image, like your home page. 1200×630 PNG or JPEG. Without one, Notra generates it.",
-        "shareImageAlt": "Share image description",
-        "shareImageAltHint": "Describes the share image for screen readers.",
-        "shareImageAltPlaceholder": "The Acme logo on a dark background"
+        "separateFavicons": "Separate light and dark favicons"
       },
       "styling": {
         "primary": "Primary color",
@@ -9153,6 +9148,63 @@
         "indexingModes": {
           "navigable": "Navigable",
           "all": "All pages"
+        }
+      },
+      "shareImages": {
+        "generate": "Generate share images",
+        "generateHint": "Posts and home pages without their own image get one. When off, they show the home page image or your logo.",
+        "layout": "Layout",
+        "layoutHint": "How the title, your logo and the authors are arranged.",
+        "layouts": {
+          "default": "Classic",
+          "author": "Author",
+          "article": "Article"
+        },
+        "layoutDescriptions": {
+          "default": "Site and section name, the title and the date, with a bar in your brand color.",
+          "author": "Your logo and a label on top, the title, then the first author and your domain.",
+          "article": "Date and category on top, the title and description, then every author."
+        },
+        "appearance": "Mode",
+        "appearanceHint": "Light or dark images. Dark ones use your dark mode accent.",
+        "appearances": {
+          "light": "Light",
+          "dark": "Dark"
+        },
+        "background": "Background",
+        "backgroundHint": "Covers the whole image, behind the text. 1200×630 PNG, JPEG or SVG.",
+        "backgroundHintAuthor": "Fills the bottom half of the image. A 1200×315 PNG, JPEG or SVG fits exactly.",
+        "label": "Label",
+        "labelHint": "Shown in capitals in the top corner. Defaults to the section name.",
+        "labelHintArticle": "The category of posts without tags. Defaults to the section name.",
+        "font": "Font",
+        "fontHint": "A TTF, OTF or WOFF file in your repository's public folder. WOFF2 isn't supported. Defaults to Inter.",
+        "homeImage": "Home page image",
+        "homeImageHint": "Replaces the generated image of your blog and changelog home pages. Also used by posts without an image while generated images are off. 1200×630 PNG or JPEG.",
+        "homeImageAlt": "Home page image description",
+        "homeImageAltHint": "Describes the home page image for screen readers.",
+        "homeImageAltPlaceholder": "The Acme logo on a dark background",
+        "preview": {
+          "title": "Preview",
+          "captionPost": "A sample post. Published posts show their own title, authors and date.",
+          "captionHome": "The home page of your blog or changelog, also used by its tag and author pages.",
+          "captionHomeImage": "Your home page image replaces the generated one here.",
+          "pageLabel": "Page to preview",
+          "pages": {
+            "post": "Post",
+            "home": "Home page"
+          },
+          "alt": "Share image preview",
+          "enlarge": "Show the share image at full size",
+          "off": "Generated share images are off. Posts without their own image use the home page image or your logo.",
+          "invalid": "Fix the errors in blog.json to see the preview.",
+          "missingHome": "Couldn't find the home page image. Check the path or upload it again.",
+          "failed": "Couldn't draw the preview. Change a setting to try again.",
+          "updating": "Updating the preview",
+          "warnings": {
+            "background": "The background isn't a PNG, JPEG or SVG file in public/, so share images are drawn without it.",
+            "font": "The font isn't a readable TTF, OTF or WOFF file in public/, so share images use Inter."
+          }
         }
       },
       "notFound": {
@@ -9346,12 +9398,13 @@
           "footer": "Footer",
           "authors": "Authors",
           "seo": "SEO",
+          "shareImages": "Share images",
           "notFound": "404 page"
         },
         "hints": {
           "general": "The name and description readers see.",
           "styling": "Colors, backgrounds and code block themes.",
-          "branding": "Your logos, favicon, logo link and share image.",
+          "branding": "Your logos, favicon and logo link.",
           "typography": "Fonts for headings and body text.",
           "navbar": "Links and actions in the site navigation.",
           "banner": "An announcement bar at the top of every page.",
@@ -9359,6 +9412,7 @@
           "footer": "Social links and link columns at the bottom of every page.",
           "authors": "The people who write for your blog, and the layout of their author pages.",
           "seo": "Meta tags and which pages search engines index.",
+          "shareImages": "The image link previews show when someone shares your site.",
           "notFound": "What readers see when a link points to a page that doesn't exist."
         }
       },

@@ -60,6 +60,7 @@
   "devDependencies": {
     "@notra/sites-compiler": "workspace:*",
     "@notra/sites-core": "workspace:*",
+    "@notra/sites-og": "workspace:*",
     "@notra/typescript-config": "workspace:*",
     "@notra/utils": "workspace:*",
     "@types/hast": "3.0.5",

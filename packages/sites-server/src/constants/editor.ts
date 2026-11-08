@@ -11,6 +11,10 @@ export const SITE_VALIDATE_MAX_FILE_BYTES = 1024 * 1024;
 export const SITE_VALIDATE_MAX_TOTAL_BYTES = 20 * 1024 * 1024;
 export const EDITABLE_TEXT_FILE = /\.(?:mdx?|jsx?|json|css)$/i;
 export const EDITABLE_PATH_SEGMENT = /^[A-Za-z0-9._@()+ -]+$/;
+/** Files under public/ share images use: images and the fonts satori reads. */
+export const SHARE_IMAGE_ASSET_FILE =
+  /^public\/.+\.(?:png|jpe?g|svg|webp|gif|avif|ttf|otf|woff)$/i;
+export const SHARE_IMAGE_ASSET_MAX_BYTES = 5 * 1024 * 1024;
 export const VALIDATED_SOURCE_FILE = /\.(?:mdx?|jsx?)$/i;
 export const VALIDATED_MARKDOWN_FILE = /\.mdx?$/i;
 export const MAX_PUBLISH_HEADLINE_LENGTH = 200;

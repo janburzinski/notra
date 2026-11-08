@@ -203,6 +203,7 @@
         "@excalidraw/excalidraw": "0.18.1",
         "@fontsource-variable/geist-mono": "5.3.0",
         "@fontsource-variable/inter": "5.3.0",
+        "@fontsource/inter": "5.3.0",
         "@hugeicons/core-free-icons": "catalog:",
         "@hugeicons/react": "catalog:",
         "@lexical/extension": "^0.39.0",
@@ -226,6 +227,7 @@
         "@notra/posthog": "workspace:*",
         "@notra/schemas": "workspace:*",
         "@notra/sites-core": "workspace:*",
+        "@notra/sites-og": "workspace:*",
         "@notra/sites-server": "workspace:*",
         "@notra/ui": "workspace:*",
         "@notra/utils": "workspace:*",
@@ -443,6 +445,7 @@
       "devDependencies": {
         "@notra/sites-compiler": "workspace:*",
         "@notra/sites-core": "workspace:*",
+        "@notra/sites-og": "workspace:*",
         "@notra/typescript-config": "workspace:*",
         "@notra/utils": "workspace:*",
         "@types/hast": "3.0.5",
@@ -846,6 +849,22 @@
       "devDependencies": {
         "@databuddy/sdk": "catalog:",
         "@notra/typescript-config": "workspace:*",
+        "bun-types": "catalog:",
+        "typescript": "catalog:",
+      },
+    },
+    "packages/sites-og": {
+      "name": "@notra/sites-og",
+      "version": "0.0.1",
+      "dependencies": {
+        "@notra/sites-core": "workspace:*",
+        "@resvg/resvg-js": "2.6.2",
+        "react": "19.3.1",
+        "satori": "catalog:",
+      },
+      "devDependencies": {
+        "@notra/typescript-config": "workspace:*",
+        "@types/react": "^19.3.0",
         "bun-types": "catalog:",
         "typescript": "catalog:",
       },
@@ -2056,6 +2075,8 @@
     "@notra/sites-core": ["@notra/sites-core@workspace:packages/sites-core"],
 
     "@notra/sites-e2e": ["@notra/sites-e2e@workspace:apps/sites-e2e"],
+
+    "@notra/sites-og": ["@notra/sites-og@workspace:packages/sites-og"],
 
     "@notra/sites-server": ["@notra/sites-server@workspace:packages/sites-server"],
 

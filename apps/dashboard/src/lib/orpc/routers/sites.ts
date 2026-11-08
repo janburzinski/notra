@@ -59,6 +59,7 @@ import {
   updateSiteInputSchema,
   uploadSiteImageInputSchema,
   connectSiteInthProjectInputSchema,
+  siteSharePreviewInputSchema,
 } from "@notra/schemas/dashboard/sites";
 import {
   SITE_CONFIG_FILENAME,
@@ -1208,6 +1209,16 @@ export const sitesRouter = {
           draftId: draft.id,
           draftRevision: draft.revision,
         };
+      }),
+
+    sharePreview: sitesProcedure
+      .input(siteSharePreviewInputSchema)
+      .handler(async ({ context, input }) => {
+        const { site } = await requireSite(context, input);
+        // satori and resvg load only when a preview is drawn.
+        const { renderSiteSharePreview } =
+          await import("@/lib/sites/share-image-preview");
+        return await renderSiteSharePreview(site, input);
       }),
 
     uploadImage: sitesProcedure

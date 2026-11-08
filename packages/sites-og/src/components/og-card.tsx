@@ -8,7 +8,7 @@ import {
   OG_THEME,
 } from "../constants/og-images";
 import type { OgCardContent } from "../types/og-images";
-import { titleSize } from "../utils/og-card";
+import { titleSize } from "../utils/og-title";
 
 export function OgCard(content: OgCardContent): ReactElement {
   const colors = OG_THEME[content.appearance];
@@ -23,7 +23,7 @@ export function OgCard(content: OgCardContent): ReactElement {
         padding: "88px 88px 72px",
         backgroundColor: colors.background,
         color: colors.text,
-        fontFamily: OG_FONT_FAMILY,
+        fontFamily: content.fontFamily ?? OG_FONT_FAMILY,
         position: "relative",
       }}
     >
