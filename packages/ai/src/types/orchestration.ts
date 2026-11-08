@@ -10,6 +10,7 @@ import type { PostToolsResult } from "@notra/ai/types/post-tools";
 import type { RepoImageFormat } from "@notra/ai/types/repo-image";
 import type { RouteUsageSummary } from "@notra/ai/types/router";
 import type { TccMetadata } from "@notra/ai/types/tcc";
+import type { ResolvePostSiteAuthors } from "@notra/ai/types/tools";
 import type { LanguageModelUsage, streamText, UIMessage } from "ai";
 
 export interface ValidatedGitHubIntegration {
@@ -166,6 +167,7 @@ export interface OrchestrateDeps {
   integrationFetchers?: IntegrationFetchers;
   resolveContext?: ResolveIntegrationContext;
   resolveLinearContext?: ResolveLinearIntegrationContext;
+  resolveSiteAuthors?: ResolvePostSiteAuthors;
   onUsage?: (
     usage: LanguageModelUsage,
     modelId: string,
@@ -192,6 +194,7 @@ export interface BuildToolSetParams {
 export interface BuildToolSetDeps {
   resolveContext?: ResolveIntegrationContext;
   resolveLinearContext?: ResolveLinearIntegrationContext;
+  resolveSiteAuthors?: ResolvePostSiteAuthors;
   skipTools?: boolean;
 }
 

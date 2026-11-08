@@ -7282,7 +7282,13 @@
         "placeholder": "Autoren wählen",
         "addMe": "Mich hinzufügen",
         "manage": "Verwalten",
-        "fallback": "Leer: Es wird die Person genommen, die veröffentlicht"
+        "fallback": "Leer: Es wird die Person genommen, die veröffentlicht",
+        "siteHint": "Die Autoren kommen aus der blog.json der Seite. Jeder bekommt einen Avatar und eine Autorenseite.",
+        "fromSite": "Aus {site}",
+        "addSiteAuthor": "Neuer Autor",
+        "missing": "Nicht in blog.json",
+        "notraAuthor": "Notra-Autor",
+        "siteEmpty": "Diese Seite hat noch keine Autoren."
       },
       "tags": {
         "label": "Tags",
@@ -9176,6 +9182,99 @@
         "addLink": "Link hinzufügen",
         "addColumn": "Spalte hinzufügen"
       },
+      "authors": {
+        "listTitle": "Autoren",
+        "add": "Autor hinzufügen",
+        "emptyTitle": "Noch keine Autoren",
+        "emptyDescription": "Füge die Menschen hinzu, die für deinen Blog schreiben. Beiträge nennen sie über ihre ID, und jeder Autor bekommt eine eigene Seite.",
+        "posts": "{count, plural, one {# Beitrag} other {# Beiträge}}",
+        "viewPage": "Autorenseite ansehen",
+        "viewPageLabel": "Autorenseite von {name} ansehen",
+        "edit": "{name} bearbeiten",
+        "delete": "{name} löschen",
+        "importTitle": "Aus deinen Notra-Autoren importieren",
+        "importHint": "{count, plural, one {# Autor aus Notra ist} other {# Autoren aus Notra sind}} noch nicht in der blog.json. Prüfe sie, bevor sie live gehen.",
+        "importButton": "Import prüfen",
+        "importDialog": {
+          "title": "Aus deinen Notra-Autoren importieren",
+          "description": "Kopiert deine Notra-Autoren mit ihrer ID in die blog.json. Sie gehen live, wenn du deine Design-Änderungen veröffentlichst.",
+          "listLabel": "Notra-Autoren",
+          "exists": "Schon als {id} in der blog.json",
+          "note": "In Notra hochgeladene Avatare werden in die Bilder der Seite kopiert. Bios mit mehr als 300 Zeichen werden gekürzt.",
+          "cancel": "Abbrechen",
+          "submit": "{count, plural, =0 {Importieren} one {# Autor importieren} other {# Autoren importieren}}",
+          "imported": "{count, plural, one {# Autor hinzugefügt} other {# Autoren hinzugefügt}}. Sie gehen live, wenn du veröffentlichst.",
+          "avatarFailed": "Der Avatar von {name} konnte nicht kopiert werden. Lade ihn im Formular des Autors erneut hoch."
+        },
+        "dialog": {
+          "newTitle": "Neuer Autor",
+          "editTitle": "{name} bearbeiten",
+          "description": "Wird in der blog.json gespeichert. Änderungen gehen live, wenn du veröffentlichst.",
+          "name": "Name",
+          "namePlaceholder": "Jan Burzinski",
+          "role": "Rolle",
+          "rolePlaceholder": "Engineer",
+          "id": "ID",
+          "idHint": "Beiträge nennen den Autor mit author: {id}, die Autorenseite ist {path}.",
+          "changeId": "ID ändern",
+          "idWarning": "{count, plural, =0 {Beiträge in deinem Repository nutzen „{id}“ vielleicht.} one {# Beitrag nutzt „{id}“.} other {# Beiträge nutzen „{id}“.}} Eine Änderung verschiebt die Autorenseite, und diese Beiträge verlieren die Verknüpfung, bis du diesen Autor wieder auswählst.",
+          "idWarningUnknown": "Eine Änderung verschiebt die Autorenseite, und Beiträge mit „{id}“ verlieren die Verknüpfung, bis du diesen Autor wieder auswählst.",
+          "avatar": "Avatar",
+          "avatarPlaceholder": "/images/jan.jpg oder https://…",
+          "avatarHint": "Oder gib einen Pfad auf deiner Website wie /images/jan.jpg oder eine https://-URL ein.",
+          "avatarUpload": "Bild hochladen",
+          "avatarReplace": "Bild ersetzen",
+          "avatarRemove": "Entfernen",
+          "avatarDrop": "PNG, JPEG, WebP oder SVG. Quadratisch passt am besten. Du kannst ein Bild auch hierher ziehen oder einfügen.",
+          "avatarPathLabel": "Avatar-Pfad oder URL",
+          "bio": "Bio",
+          "bioPlaceholder": "Ein, zwei Sätze über den Autor.",
+          "bioCount": "{count}/{max}",
+          "links": "Links",
+          "linkLabels": {
+            "url": "Website",
+            "x": "X",
+            "linkedin": "LinkedIn",
+            "github": "GitHub",
+            "youtube": "YouTube",
+            "bluesky": "Bluesky",
+            "mastodon": "Mastodon",
+            "threads": "Threads",
+            "instagram": "Instagram"
+          },
+          "cancel": "Abbrechen",
+          "add": "Autor hinzufügen",
+          "save": "Autor speichern",
+          "errors": {
+            "required": "Pflichtfeld.",
+            "tooLong": "Das ist zu lang.",
+            "idFormat": "Nutze Kleinbuchstaben, Ziffern und Bindestriche, am Anfang und Ende ein Buchstabe oder eine Ziffer.",
+            "idTaken": "Ein anderer Autor nutzt diese ID schon.",
+            "avatar": "Nutze einen Pfad wie /images/jan.jpg oder eine https://-URL.",
+            "https": "Nutze einen vollständigen https://-Link."
+          }
+        },
+        "deleteDialog": {
+          "title": "{name} löschen?",
+          "confirm": "Autor löschen",
+          "used": "{count, plural, =0 {Kein Notra-Beitrag nennt diesen Autor.} one {# Notra-Beitrag nennt diesen Autor und zeigt danach „{id}“ als einfachen Namen.} other {# Notra-Beiträge nennen diesen Autor und zeigen danach „{id}“ als einfachen Namen.}} Beiträge in deinem Repository, die „{id}“ nutzen, ändern sich genauso. Das geht live, wenn du veröffentlichst.",
+          "unknown": "Beiträge, die „{id}“ nennen, zeigen die ID danach als einfachen Namen. Das geht live, wenn du veröffentlichst."
+        },
+        "pageLayout": {
+          "title": "Autorenseiten",
+          "description": "Das Layout aller Autorenseiten unter {path}.",
+          "layouts": {
+            "inline": {
+              "title": "Nebeneinander",
+              "description": "Der Avatar neben Name und Titel, darunter Bio, Links und Beiträge."
+            },
+            "stacked": {
+              "title": "Gestapelt",
+              "description": "Ein großer Avatar oben, darunter Name, Titel, Bio, Links und Beiträge."
+            }
+          }
+        }
+      },
       "brandDialog": {
         "title": "Brand Identity übernehmen?",
         "description": "Diese Felder werden aus der Brand Identity dieses Projekts gefüllt. Gespeichert wird erst, wenn du den Entwurf speicherst.",
@@ -9230,6 +9329,7 @@
         "groups": {
           "appearance": "Darstellung",
           "layout": "Layout",
+          "content": "Inhalte",
           "configuration": "Konfiguration"
         },
         "titles": {
@@ -9241,6 +9341,7 @@
           "banner": "Banner",
           "integrations": "Integrationen",
           "footer": "Footer",
+          "authors": "Autoren",
           "seo": "SEO",
           "notFound": "404-Seite"
         },
@@ -9253,6 +9354,7 @@
           "banner": "Eine Ankündigungsleiste oben auf jeder Seite.",
           "integrations": "Analytics und Cookie-Banner für diese Seite.",
           "footer": "Social Links und Link-Spalten unten auf jeder Seite.",
+          "authors": "Die Menschen, die für deinen Blog schreiben, und das Layout ihrer Autorenseiten.",
           "seo": "Meta-Tags und welche Seiten Suchmaschinen indexieren.",
           "notFound": "Was Leser sehen, wenn ein Link auf eine Seite zeigt, die es nicht gibt."
         }

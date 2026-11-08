@@ -205,6 +205,10 @@ import {
   toSitesOrpcError,
 } from "@/lib/sites/orpc-errors";
 import {
+  countSiteAuthorUsage,
+  resolvePostAuthorSite,
+} from "@/lib/sites/post-authors";
+import {
   listPostPreviewSites,
   postPreviewStatus,
   previewPostOnSite,
@@ -1309,6 +1313,32 @@ export const sitesRouter = {
           userId
         );
         return { ...result, deployPending };
+      }),
+  },
+
+  authors: {
+    // Loaded with every blog post, so an organization without Sites gets no
+    // site instead of an error and keeps its Notra authors.
+    forPost: authorizedProcedure
+      .input(postPreviewSitesInputSchema)
+      .handler(async ({ context, input }) => {
+        await assertOrganizationAccess({
+          headers: context.headers,
+          organizationId: input.organizationId,
+        });
+        if (!isSitesConfigured() || isDemoMode()) {
+          return { site: null };
+        }
+        return {
+          site: await resolvePostAuthorSite(input.organizationId, input.postId),
+        };
+      }),
+
+    usage: sitesProcedure
+      .input(siteScopeInputSchema)
+      .handler(async ({ context, input }) => {
+        const { site } = await requireSite(context, input);
+        return { posts: await countSiteAuthorUsage(site) };
       }),
   },
 

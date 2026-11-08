@@ -16,6 +16,7 @@ export type CoverSource = "upload" | "link" | "post";
 
 export interface ContentOverviewProps {
   organizationId: string;
+  organizationSlug: string;
   contentId: string;
   content: ContentResponse;
   children?: ReactNode;

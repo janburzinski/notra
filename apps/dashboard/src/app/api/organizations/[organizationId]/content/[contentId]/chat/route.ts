@@ -38,6 +38,7 @@ import { AI_CREDITS_SOURCE_CONTENT_CHAT } from "@/constants/studio-analytics";
 import { trackServerEvent } from "@/lib/analytics/posthog-server";
 import { countMessageFileParts } from "@/lib/analytics/studio-events";
 import { withOrganizationAuth } from "@/lib/auth/organization";
+import { resolvePostSiteAuthors } from "@/lib/sites/post-authors";
 import type { RouteContext } from "@/types/api/routes";
 import { enforceChatGenerationRatelimit } from "@/utils/chat-ratelimit";
 
@@ -236,6 +237,7 @@ export const POST = withEvlog(async function POST(
         },
         resolveContext: getGitHubToolRepositoryContextByIntegrationId,
         resolveLinearContext: getLinearToolContextByIntegrationId,
+        resolveSiteAuthors: resolvePostSiteAuthors,
         onFirstChunk() {
           if (firstChunkAt === null) {
             firstChunkAt = Date.now();

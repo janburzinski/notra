@@ -162,6 +162,7 @@ import { sumAgentReachByCollection } from "@/utils/content-agent-reach";
 import { getContentListPreview } from "@/utils/content-list-preview";
 import { resolveLookbackRange } from "@/utils/lookback";
 import { ratelimit } from "@/utils/ratelimit";
+import { siteAuthorRefId } from "@/utils/site-author-refs";
 
 import {
   assertNotDemo,
@@ -1281,17 +1282,18 @@ export const contentRouter = {
       }
 
       const { metadata } = input;
-      if (metadata.authorIds && metadata.authorIds.length > 0) {
+      // Site authors (`site:<id>`) live in the site's blog.json, not in Notra.
+      const notraAuthorIds = (metadata.authorIds ?? []).filter(
+        (id) => siteAuthorRefId(id) === null
+      );
+      if (notraAuthorIds.length > 0) {
         const known = await db
           .select({ id: contentAuthors.id })
           .from(contentAuthors)
           .where(
-            contentAuthorsInOrganization(
-              input.organizationId,
-              metadata.authorIds
-            )
+            contentAuthorsInOrganization(input.organizationId, notraAuthorIds)
           );
-        if (known.length !== metadata.authorIds.length) {
+        if (known.length !== notraAuthorIds.length) {
           throw badRequest(tErrors("unknownAuthor"));
         }
       }

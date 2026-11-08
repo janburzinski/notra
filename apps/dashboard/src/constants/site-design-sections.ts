@@ -9,6 +9,7 @@ import {
   Plug01Icon,
   SeoIcon,
   TextFontIcon,
+  UserMultiple02Icon,
 } from "@hugeicons/core-free-icons";
 
 /** The Design tab's sections, in sidebar order, with the blog.json paths each one edits. */
@@ -28,6 +29,11 @@ export const SITE_DESIGN_SECTIONS = [
   { id: "navbar", icon: LayoutTopIcon, paths: ["navbar"] },
   { id: "banner", icon: Megaphone01Icon, paths: ["banner"] },
   { id: "footer", icon: LayoutBottomIcon, paths: ["footer"] },
+  {
+    id: "authors",
+    icon: UserMultiple02Icon,
+    paths: ["authors", "blog.authorPage"],
+  },
   { id: "integrations", icon: Plug01Icon, paths: ["integrations"] },
   { id: "seo", icon: SeoIcon, paths: ["seo.metatags", "seo.indexing"] },
   { id: "notFound", icon: FileNotFoundIcon, paths: ["errors.404"] },
@@ -40,5 +46,6 @@ export const SITE_DESIGN_GROUPS = [
     sections: ["general", "styling", "branding", "typography"],
   },
   { id: "layout", sections: ["navbar", "banner", "footer"] },
+  { id: "content", sections: ["authors"] },
   { id: "configuration", sections: ["integrations", "seo", "notFound"] },
 ] as const;

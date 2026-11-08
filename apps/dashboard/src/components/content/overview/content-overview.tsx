@@ -12,15 +12,13 @@ import {
 import { Textarea } from "@notra/ui/components/ui/textarea";
 import { cn } from "@notra/ui/lib/utils";
 import { slugify } from "@notra/utils/slugify";
-import { useId, useMemo, useState } from "react";
+import { useId, useMemo } from "react";
 import { useTranslations } from "use-intl";
 
-import { Button } from "@/components/button";
 import { ContentDetailSourceMetadata } from "@/components/content/content-detail-source-metadata";
 import { ContentAgentReach } from "@/components/content/overview/content-agent-reach";
-import { ContentAuthorsDialog } from "@/components/content/overview/content-authors-dialog";
 import { ContentStatusBadge } from "@/components/content/overview/content-status-badge";
-import { OverviewAuthorSelect } from "@/components/content/overview/overview-author-select";
+import { OverviewAuthorsField } from "@/components/content/overview/overview-authors-field";
 import { OverviewCoverField } from "@/components/content/overview/overview-cover-field";
 import { OverviewDateField } from "@/components/content/overview/overview-date-field";
 import {
@@ -81,10 +79,9 @@ function OverviewCreatedByRow({ sourceMetadata }: OverviewCreatedByRowProps) {
 }
 
 export function ContentOverview(props: ContentOverviewProps) {
-  const { organizationId, contentId, content } = props;
+  const { organizationId, organizationSlug, contentId, content } = props;
   const t = useTranslations("content.overview");
   const ids = { description: useId(), date: useId() };
-  const [authorsOpen, setAuthorsOpen] = useState(false);
   const api = useContentMetadata({ organizationId, contentId, content });
   const { metadata } = api;
   const isBlog = content.contentType === "blog_post";
@@ -186,31 +183,13 @@ export function ContentOverview(props: ContentOverviewProps) {
       </OverviewField>
 
       {isBlog ? (
-        <OverviewField
-          aside={
-            <Button
-              className="-my-1"
-              onClick={() => setAuthorsOpen(true)}
-              size="xs"
-              variant="ghost"
-            >
-              {t("authors.manage")}
-            </Button>
-          }
-          hint={t("authors.hint")}
-          label={t("authors.label")}
-        >
-          <OverviewAuthorSelect
-            authorIds={metadata.authorIds}
-            onChange={(authorIds) => api.update({ authorIds })}
-            organizationId={organizationId}
-          />
-          <ContentAuthorsDialog
-            onOpenChange={setAuthorsOpen}
-            open={authorsOpen}
-            organizationId={organizationId}
-          />
-        </OverviewField>
+        <OverviewAuthorsField
+          authorIds={metadata.authorIds}
+          contentId={contentId}
+          onChange={(authorIds) => api.update({ authorIds })}
+          organizationId={organizationId}
+          organizationSlug={organizationSlug}
+        />
       ) : null}
 
       <OverviewField hint={t("tags.hint")} label={t("tags.label")}>

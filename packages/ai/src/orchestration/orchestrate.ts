@@ -99,6 +99,7 @@ export async function orchestrateChat(
     {
       resolveContext: deps?.resolveContext,
       resolveLinearContext: deps?.resolveLinearContext,
+      resolveSiteAuthors: deps?.resolveSiteAuthors,
     }
   );
 

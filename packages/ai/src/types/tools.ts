@@ -111,7 +111,26 @@ export interface BuildLinearDataToolsOptions {
   resolveContext?: ResolveLinearIntegrationContext;
 }
 
+/**
+ * Authors of the Notra site a post publishes to. A post on a site credits
+ * these instead of the organization's Notra authors.
+ */
+export interface PostSiteAuthors {
+  /** The site's authors, by the id posts name them with. */
+  authors: { slug: string; name: string; title: string | null }[];
+  /** The value stored in the post's author ids for a site author. */
+  ref: (slug: string) => string;
+  /** The site author a stored author id names, or null for a Notra author. */
+  slugOf: (value: string) => string | null;
+}
+
+export type ResolvePostSiteAuthors = (target: {
+  organizationId: string;
+  postId: string;
+}) => Promise<PostSiteAuthors | null>;
+
 export interface PostDetailsToolsContext {
   organizationId: string;
   postId: string;
+  resolveSiteAuthors?: ResolvePostSiteAuthors;
 }

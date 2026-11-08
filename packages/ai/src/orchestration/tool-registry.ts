@@ -114,6 +114,7 @@ export function buildToolSet(
       const { getPostDetails, updatePostDetails } = createPostDetailsTools({
         organizationId,
         postId: currentPostId,
+        resolveSiteAuthors: deps?.resolveSiteAuthors,
       });
       tools.getPostDetails = getPostDetails;
       tools.updatePostDetails = updatePostDetails;

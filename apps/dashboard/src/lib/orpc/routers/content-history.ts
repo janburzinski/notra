@@ -27,6 +27,7 @@ import {
   contentHistoryRestoreData,
   serializeContentHistoryEntry,
 } from "@/utils/content-history-server";
+import { siteAuthorRefId } from "@/utils/site-author-refs";
 
 export const contentHistoryRouter = {
   list: baseProcedure
@@ -258,8 +259,8 @@ export const contentHistoryRouter = {
             markdown: version.markdown,
             metadata: {
               ...metadata.data,
-              authorIds: metadata.data.authorIds.filter((id) =>
-                authorIds.has(id)
+              authorIds: metadata.data.authorIds.filter(
+                (id) => authorIds.has(id) || siteAuthorRefId(id) !== null
               ),
             },
           });

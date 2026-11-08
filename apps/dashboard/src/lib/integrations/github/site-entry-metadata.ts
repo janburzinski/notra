@@ -17,6 +17,7 @@ import type {
   SiteEntryMediaContext,
   SiteEntryMetadata,
 } from "@/types/integrations/site-github-publish";
+import { siteAuthorRefId } from "@/utils/site-author-refs";
 
 async function prepareEntryImage(
   url: string,
@@ -83,9 +84,27 @@ export async function prepareSiteEntryMetadata(
     }
   }
 
-  const authors: SiteEntryAuthor[] = [];
   const authorIds = context.contentType === "blog_post" ? post.authorIds : [];
-  for (const row of await loadAuthors(context.organizationId, authorIds)) {
+  // Site authors are written as their blog.json id; the site fills in the rest.
+  const rows = new Map(
+    (
+      await loadAuthors(
+        context.organizationId,
+        authorIds.filter((id) => siteAuthorRefId(id) === null)
+      )
+    ).map((row) => [row.id, row])
+  );
+  const authors: (SiteEntryAuthor | string)[] = [];
+  for (const authorId of authorIds) {
+    const siteId = siteAuthorRefId(authorId);
+    if (siteId) {
+      authors.push(siteId);
+      continue;
+    }
+    const row = rows.get(authorId);
+    if (!row) {
+      continue;
+    }
     let avatar: string | null = null;
     if (row.avatarUrl) {
       const prepared = await prepareEntryImage(

@@ -95,6 +95,7 @@ function ContentDetailPage({
                   content={data.content}
                   contentId={contentId}
                   organizationId={organizationId}
+                  organizationSlug={organizationSlug}
                 >
                   <ContentDetailDocumentActions
                     content={data.content}

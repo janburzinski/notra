@@ -33,7 +33,8 @@ export interface SiteEntryMetadata {
   description?: string | null;
   image?: { src: string; alt: string } | null;
   tags?: string[];
-  authors?: SiteEntryAuthor[];
+  /** A string is an id from blog.json `authors`; an object is written inline. */
+  authors?: (SiteEntryAuthor | string)[];
   featured?: boolean;
   noindex?: boolean;
   hidden?: boolean;

@@ -7282,7 +7282,13 @@
         "placeholder": "Choose authors",
         "addMe": "Add me",
         "manage": "Manage",
-        "fallback": "Empty: the person who publishes is used"
+        "fallback": "Empty: the person who publishes is used",
+        "siteHint": "Authors come from the site's blog.json. Each gets an avatar and an author page on the site.",
+        "fromSite": "From {site}",
+        "addSiteAuthor": "New author",
+        "missing": "Not in blog.json",
+        "notraAuthor": "Notra author",
+        "siteEmpty": "This site has no authors yet."
       },
       "tags": {
         "label": "Tags",
@@ -9176,6 +9182,99 @@
         "addLink": "Add link",
         "addColumn": "Add column"
       },
+      "authors": {
+        "listTitle": "Authors",
+        "add": "Add author",
+        "emptyTitle": "No authors yet",
+        "emptyDescription": "Add the people who write for your blog. Posts name them by ID, and each author gets a page on your site.",
+        "posts": "{count, plural, one {# post} other {# posts}}",
+        "viewPage": "View author page",
+        "viewPageLabel": "View {name}'s author page",
+        "edit": "Edit {name}",
+        "delete": "Delete {name}",
+        "importTitle": "Import from your Notra authors",
+        "importHint": "{count, plural, one {# author you created in Notra isn't} other {# authors you created in Notra aren't}} in blog.json yet. Review them before they go live.",
+        "importButton": "Review import",
+        "importDialog": {
+          "title": "Import from your Notra authors",
+          "description": "Copies your Notra authors into blog.json, keeping their ID. They go live when you publish your Design changes.",
+          "listLabel": "Notra authors",
+          "exists": "Already in blog.json as {id}",
+          "note": "Avatars uploaded in Notra are copied into the site's images. Bios longer than 300 characters are shortened.",
+          "cancel": "Cancel",
+          "submit": "{count, plural, =0 {Import} one {Import # author} other {Import # authors}}",
+          "imported": "{count, plural, one {# author added} other {# authors added}}. They go live when you publish.",
+          "avatarFailed": "Couldn't copy {name}'s avatar. Upload it again in the author's form."
+        },
+        "dialog": {
+          "newTitle": "New author",
+          "editTitle": "Edit {name}",
+          "description": "Saved to blog.json. Changes go live when you publish.",
+          "name": "Name",
+          "namePlaceholder": "Jan Burzinski",
+          "role": "Role",
+          "rolePlaceholder": "Engineer",
+          "id": "ID",
+          "idHint": "Posts name the author with author: {id}, and their author page is {path}.",
+          "changeId": "Change ID",
+          "idWarning": "{count, plural, =0 {Posts in your repository may use “{id}”.} one {# post uses “{id}”.} other {# posts use “{id}”.}} Changing it moves the author page, and those posts lose the link until you pick this author again.",
+          "idWarningUnknown": "Changing it moves the author page, and posts that use “{id}” lose the link until you pick this author again.",
+          "avatar": "Avatar",
+          "avatarPlaceholder": "/images/jan.jpg or https://…",
+          "avatarHint": "Or enter a path in your site, like /images/jan.jpg, or an https:// URL.",
+          "avatarUpload": "Upload image",
+          "avatarReplace": "Replace image",
+          "avatarRemove": "Remove",
+          "avatarDrop": "PNG, JPEG, WebP or SVG. Square works best. You can also drop or paste an image here.",
+          "avatarPathLabel": "Avatar path or URL",
+          "bio": "Bio",
+          "bioPlaceholder": "A sentence or two about the author.",
+          "bioCount": "{count}/{max}",
+          "links": "Links",
+          "linkLabels": {
+            "url": "Website",
+            "x": "X",
+            "linkedin": "LinkedIn",
+            "github": "GitHub",
+            "youtube": "YouTube",
+            "bluesky": "Bluesky",
+            "mastodon": "Mastodon",
+            "threads": "Threads",
+            "instagram": "Instagram"
+          },
+          "cancel": "Cancel",
+          "add": "Add author",
+          "save": "Save author",
+          "errors": {
+            "required": "Required.",
+            "tooLong": "This is too long.",
+            "idFormat": "Use lowercase letters, digits and dashes, starting and ending with a letter or digit.",
+            "idTaken": "Another author already uses this ID.",
+            "avatar": "Use a path like /images/jan.jpg or an https:// URL.",
+            "https": "Use a full https:// link."
+          }
+        },
+        "deleteDialog": {
+          "title": "Delete {name}?",
+          "confirm": "Delete author",
+          "used": "{count, plural, =0 {No Notra posts name this author.} one {# Notra post names this author and will show “{id}” as a plain name.} other {# Notra posts name this author and will show “{id}” as a plain name.}} Posts in your repository that use “{id}” change the same way. This goes live when you publish.",
+          "unknown": "Posts that name “{id}” will show it as a plain name. This goes live when you publish."
+        },
+        "pageLayout": {
+          "title": "Author pages",
+          "description": "The layout of every author page under {path}.",
+          "layouts": {
+            "inline": {
+              "title": "Inline",
+              "description": "The avatar beside the name and title, then the bio, links and posts."
+            },
+            "stacked": {
+              "title": "Stacked",
+              "description": "A large avatar on top, then the name, title, bio, links and posts."
+            }
+          }
+        }
+      },
       "brandDialog": {
         "title": "Use brand identity?",
         "description": "These fields will be filled from this project's brand identity. Nothing is saved until you save the draft.",
@@ -9230,6 +9329,7 @@
         "groups": {
           "appearance": "Appearance",
           "layout": "Layout",
+          "content": "Content",
           "configuration": "Configuration"
         },
         "titles": {
@@ -9241,6 +9341,7 @@
           "banner": "Banner",
           "integrations": "Integrations",
           "footer": "Footer",
+          "authors": "Authors",
           "seo": "SEO",
           "notFound": "404 page"
         },
@@ -9253,6 +9354,7 @@
           "banner": "An announcement bar at the top of every page.",
           "integrations": "Analytics and the cookie banner for this site.",
           "footer": "Social links and link columns at the bottom of every page.",
+          "authors": "The people who write for your blog, and the layout of their author pages.",
           "seo": "Meta tags and which pages search engines index.",
           "notFound": "What readers see when a link points to a page that doesn't exist."
         }

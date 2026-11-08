@@ -113,9 +113,18 @@ The author page shows each profile link as a button with `rel="me"`, so a Mastod
 
 Notra lists a known author with avatar and title under "Written by", beside the post in the wide layout or under the title otherwise (in the sidebar with the [compact header](/sites/customize/layouts#compact-post-header)), and gives them an author page at `/blog/author/jan` listing their posts. Search engines and AI answers get a schema.org `Person` with the profile links, which ties the post to a real person. Notra shows any other value in `author`, like `author: Guest Writer`, as a plain name.
 
+### Manage authors in the dashboard
+
+Under **Design → Authors**, you can add, edit and delete the entries in `authors` without opening `blog.json`: a name, role (`title`), ID, avatar (upload an image, or enter a path in your site or an `https://` URL), bio and the profile links, which the form takes as `https://` links. Author changes join your other Design changes and go live when you publish them. The same page sets the [author page layout](/sites/customize/layouts#author-pages).
+
+- The ID of an author that's already live, or that a post in Notra names, only changes after you choose **Change ID**. That, like deleting an author, shows how many posts in Notra name them. Posts that keep the old ID show it as a plain name, and its author page moves.
+- **Import from your Notra authors** copies the authors you created in Notra into `blog.json`, keeping their ID, for you to review before you publish. Avatars uploaded to Notra are copied into the site's images, and bios longer than 300 characters are shortened.
+
+In the post editor, the **Authors** picker of a blog post that publishes to the site offers these authors, and **Manage** and **New author** open this page. Publishing writes their IDs, like `author: jan`, or a list for several authors. A Notra author the post already credits stays selected and is still written as an [author object](#authors-in-the-frontmatter).
+
 ### Authors in the frontmatter
 
-A post can also describe its author inline, which is what Notra writes when you publish from the editor:
+A post can also describe its author inline. Notra writes this when you publish a post that credits an author created in Notra rather than one from `blog.json`:
 
 ```mdx blog/2026/dark-mode.mdx
 ---
@@ -232,4 +241,4 @@ Placeholders inside JavaScript imports, exports and expressions stay unchanged. 
 
 ## Posts published from Notra
 
-When you publish a post from Notra to a site, Notra writes the frontmatter for you with the title, description, date, the cover image and its alt text, tags, the authors as [author objects](#authors-in-the-frontmatter), and `featured`, `hidden` and `noindex` when you turn them on.
+When you publish a post from Notra to a site, Notra writes the frontmatter for you with the title, description, date, the cover image and its alt text, tags, the authors (by ID for authors from `blog.json`, as [author objects](#authors-in-the-frontmatter) for authors created in Notra), and `featured`, `hidden` and `noindex` when you turn them on.

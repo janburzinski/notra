@@ -4,6 +4,10 @@ import { fromMarkdown } from "mdast-util-from-markdown";
 import { Document, isMap, parseDocument, Scalar } from "yaml";
 
 import {
+  SITE_AUTHOR_YAML_PLAIN,
+  SITE_AUTHOR_YAML_RESERVED,
+} from "@/constants/site-authors";
+import {
   FRONTMATTER_BLOCK,
   FRONTMATTER_AUTHOR_LINE,
   SITE_ENTRY_AUTHOR_FIELDS,
@@ -250,7 +254,15 @@ function plainScalar(value: string): Scalar {
   return scalar;
 }
 
-function authorNode(author: SiteEntryAuthor): Record<string, string> {
+function authorNode(
+  author: SiteEntryAuthor | string
+): Record<string, string> | Scalar {
+  if (typeof author === "string") {
+    return SITE_AUTHOR_YAML_PLAIN.test(author) &&
+      !SITE_AUTHOR_YAML_RESERVED.has(author)
+      ? plainScalar(author)
+      : new Scalar(author);
+  }
   const node: Record<string, string> = { id: author.id, name: author.name };
   for (const key of SITE_ENTRY_AUTHOR_FIELDS) {
     const value = author[key]?.trim();
