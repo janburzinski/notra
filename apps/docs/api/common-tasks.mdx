@@ -454,6 +454,47 @@ async function waitForPost(jobId: string): Promise<string> {
 
 `skipped` means the job ended without creating a post. Because Notra does not send a webhook when a job finishes, you have to poll. `POST /v1/posts/generate` allows 10 requests per minute per key and needs an active paid plan or AI credits.
 
+### Write about one pull request
+
+Pass `pullRequest` to write about exactly one pull request in a connected repository, whether it is open or merged and however old it is. The job then reads only that pull request, so `dataPoints` and `lookbackWindow` do not apply, and it cannot be combined with another source selector or `selectedItems`. Add `brief` to say what the post should cover in your own words. A brief steers the topic, angle and structure, and the facts still come from the pull request. A brief also works without `pullRequest`, on activity from the lookback window.
+
+```bash
+curl -X POST "https://api.usenotra.com/v1/posts/generate" \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "contentType": "blog_post",
+    "pullRequest": { "owner": "acme", "repo": "app", "number": 2385 },
+    "brief": "Announce mention-driven blog posts. Lead with the phone workflow."
+  }'
+```
+
+### Open a draft pull request for the post
+
+Once the job reports a `postId` for a blog post or changelog, open a draft pull request with it. Notra writes the post where the repository's content settings say, with the same site metadata and images as publishing from the dashboard. It always opens a draft pull request, even for a repository set to publish directly, and never merges it. Calling it again for the same post and repository updates that pull request instead of opening another. Name the repository with `integrationId` or `github`, or send an empty body when only one repository is connected.
+
+```bash
+curl -X POST "https://api.usenotra.com/v1/posts/POST_ID/pull-request" \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{ "github": { "owner": "acme", "repo": "site" } }'
+```
+
+```json
+{
+  "organization": { "id": "org_123", "slug": "acme", "name": "Acme", "logo": null },
+  "pullRequest": {
+    "number": 7,
+    "url": "https://github.com/acme/site/pull/7",
+    "branchName": "notra/blog-faster-exports",
+    "path": "content/blog/faster-exports.md",
+    "operation": "created"
+  }
+}
+```
+
+A `504` means the export timed out and may still finish, so retrying with the same post and repository is safe because it picks up the same pull request. To add an Open Graph image on a site that does not render its own, mention Notra on the new pull request, for example `@notra add an OG image for this post`.
+
 ## Read GEO visibility for a project
 
 Notra scopes GEO data to a project, so list projects first and then read the mention rate per engine for the last 30 days.

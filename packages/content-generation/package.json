@@ -5,6 +5,7 @@
   "type": "module",
   "exports": {
     "./constants/errors": "./src/constants/errors.ts",
+    "./constants/limits": "./src/constants/limits.ts",
     "./databuddy": "./src/databuddy.ts",
     "./jobs": "./src/jobs.ts",
     "./schemas": "./src/schemas.ts",

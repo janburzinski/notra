@@ -3,6 +3,8 @@ import { requestGeoRescanForPost } from "@notra/geo-core/geo/rescan";
 import {
   createPostGenerationRequestSchema,
   createPostGenerationResponseSchema,
+  createPostPullRequestRequestSchema,
+  createPostPullRequestResponseSchema,
   createPostRequestSchema,
   createPostResponseSchema,
   deletePostResponseSchema,
@@ -41,6 +43,7 @@ import { runGeoEffect } from "../runtime/geo";
 import { isOAuthAuth } from "../types/auth";
 import { getOrganizationId } from "../utils/auth";
 import {
+  applyPullRequestSelection,
   getContentGenerationUnavailableReason,
   resolveRequestedBrandVoiceId,
   assertContentGenerationSourcesAvailable,
@@ -53,6 +56,10 @@ import {
   getOrganizationResponse,
   resolveRequestOrganization,
 } from "../utils/organizations";
+import {
+  openPostPullRequest,
+  resolvePullRequestIntegrationId,
+} from "../utils/post-pull-request";
 import {
   loadPostSiteAuthors,
   verifyPostSiteAuthors,
@@ -283,7 +290,7 @@ const createPostGenerationRoute = createRoute({
   operationId: "createPostGeneration",
   summary: "Queue async post generation",
   description:
-    "Queues a generation job for one content type and returns 202 with the job. Select sources with integrations.github, integrations.linear, or github.repositories; when no selector is given at all, every connected GitHub integration is used. Requests with every dataPoints flag false, or with no usable source, are rejected with 400 and code NO_ACTIVITY_TYPES_SELECTED or NO_AVAILABLE_SOURCES before a job is created. Poll GET /v1/posts/generate/{jobId} until job.status is completed, failed, or skipped. Subscribe to post.generation.completed, post.generation.failed, or post.generation.skipped using /v1/webhooks for completion notifications.",
+    "Queues a generation job for one content type and returns 202 with the job. Select sources with integrations.github, integrations.linear, or github.repositories; when no selector is given at all, every connected GitHub integration is used. Pass pullRequest to write about one pull request, and brief to say what the post should cover. Requests with every dataPoints flag false, or with no usable source, are rejected with 400 and code NO_ACTIVITY_TYPES_SELECTED or NO_AVAILABLE_SOURCES before a job is created. Poll GET /v1/posts/generate/{jobId} until job.status is completed, failed, or skipped. Subscribe to post.generation.completed, post.generation.failed, or post.generation.skipped using /v1/webhooks for completion notifications.",
   request: {
     body: {
       content: {
@@ -320,6 +327,53 @@ const createPostGenerationRoute = createRoute({
         },
       },
     },
+  },
+});
+
+const createPostPullRequestRoute = createRoute({
+  method: "post",
+  path: "/posts/{postId}/pull-request",
+  tags: ["Content"],
+  operationId: "createPostPullRequest",
+  summary: "Open a draft pull request for a post",
+  description:
+    "Exports a saved blog post or changelog to a draft GitHub pull request, using the repository's configured content path, site metadata and image handling, the same as the dashboard. Always opens a pull request, even for repositories set to publish directly, and never merges it. Calling it again for the same post and repository updates its open pull request instead of opening another.",
+  request: {
+    params: getPostParamsSchema,
+    body: {
+      content: {
+        "application/json": {
+          schema: createPostPullRequestRequestSchema,
+        },
+      },
+      required: false,
+    },
+  },
+  responses: {
+    200: {
+      description: "Draft pull request opened or updated",
+      content: {
+        "application/json": {
+          schema: createPostPullRequestResponseSchema,
+        },
+      },
+    },
+    400: errorResponse(
+      "Invalid request, no matching repository, or the post is not a blog post or changelog"
+    ),
+    401: errorResponse("Missing or invalid API key"),
+    403: errorResponse("Forbidden"),
+    404: errorResponse("Post or organization not found"),
+    429: rateLimitResponse(
+      RATE_LIMITS.postUpdate.requests,
+      RATE_LIMITS.postUpdate.window,
+      "API key"
+    ),
+    502: errorResponse("GitHub could not prepare the pull request"),
+    503: errorResponse(
+      "Pull request export is unavailable or GitHub publishing is rate limited"
+    ),
+    504: errorResponse("The export timed out and may still complete"),
   },
 });
 
@@ -661,7 +715,13 @@ postsRoutes.openapi(createPostGenerationRoute, async (c) => {
     Effect.all({
       repositoryIds: resolveRequestedRepositoryIds(c.get("db"), orgId, {
         integrations: requestedIntegrations,
-        github: body.github,
+        github: body.pullRequest
+          ? {
+              repositories: [
+                { owner: body.pullRequest.owner, repo: body.pullRequest.repo },
+              ],
+            }
+          : body.github,
       }),
       linearIntegrationIds: resolveRequestedLinearIntegrationIds(
         c.get("db"),
@@ -682,10 +742,11 @@ postsRoutes.openapi(createPostGenerationRoute, async (c) => {
 
   const { repositoryIds, linearIntegrationIds, resolvedBrandVoiceId } =
     targets.success;
+  const generationBody = applyPullRequestSelection(body, repositoryIds);
 
   const sources = await runPostProgram(
     assertContentGenerationSourcesAvailable(c.get("db"), orgId, {
-      dataPoints: body.dataPoints,
+      dataPoints: generationBody.dataPoints,
       repositoryIds,
       linearIntegrationIds,
     })
@@ -707,7 +768,7 @@ postsRoutes.openapi(createPostGenerationRoute, async (c) => {
     createPostGeneration({
       db: c.get("db"),
       organizationId: orgId,
-      body,
+      body: generationBody,
       redis,
       runtimeEnv,
       repositoryIds,
@@ -730,6 +791,109 @@ postsRoutes.openapi(createPostGenerationRoute, async (c) => {
   }
 
   return c.json({ job: result.success.job, organization }, 202);
+});
+
+postsRoutes.openapi(createPostPullRequestRoute, async (c) => {
+  const scope = await resolveRequestOrganization(c);
+  if (scope.response) {
+    return scope.response;
+  }
+  const { orgId, organization } = scope;
+  const { postId } = c.req.valid("param");
+  const body = c.req.valid("json") ?? {};
+
+  if (!c.env?.WORKFLOW_BASE_URL) {
+    return c.json({ error: "Pull request export is unavailable" }, 503);
+  }
+
+  const rateLimited = await enforceRatelimit(c, ratelimit.postUpdate);
+  if (rateLimited) {
+    return rateLimited;
+  }
+
+  const target = await runPostProgram(
+    resolvePullRequestIntegrationId(c.get("db"), orgId, body)
+  );
+  if (target._tag === "Failure") {
+    if (target.failure._tag === "PostGenerationTargetUnavailableError") {
+      return c.json({ error: target.failure.message }, 400);
+    }
+    throw target.failure;
+  }
+
+  try {
+    const result = await openPostPullRequest(c.env, {
+      organizationId: orgId,
+      postId,
+      integrationId: target.success,
+    });
+    return c.json(
+      {
+        organization,
+        pullRequest: {
+          number: result.pullRequestNumber,
+          url: result.pullRequestUrl,
+          branchName: result.branchName,
+          path: result.path,
+          operation: result.operation,
+        },
+      },
+      200
+    );
+  } catch (error) {
+    if (
+      error instanceof InternalDashboardTimeoutError ||
+      (error instanceof InternalDashboardError && error.status === 504)
+    ) {
+      return c.json(
+        {
+          error:
+            "Opening the pull request timed out and may still complete. Retry with the same post and repository; it reuses the pull request instead of opening another.",
+        },
+        504
+      );
+    }
+    if (error instanceof InternalDashboardError && error.status === 429) {
+      return c.json(
+        {
+          error:
+            "GitHub publishing is rate limited for this organization. Retry in a minute.",
+        },
+        503
+      );
+    }
+    if (
+      error instanceof InternalDashboardError &&
+      (error.status === 400 || error.status === 404)
+    ) {
+      const message = await new Response(error.body)
+        .json()
+        .then((value: unknown) =>
+          typeof value === "object" &&
+          value !== null &&
+          "error" in value &&
+          typeof value.error === "string"
+            ? value.error
+            : null
+        )
+        .catch(() => null);
+      return c.json(
+        { error: message ?? "GitHub could not prepare the pull request" },
+        error.status
+      );
+    }
+    c.get("log").error(error instanceof Error ? error : String(error), {
+      errorCode: "post_pull_request_failed",
+      postId,
+    });
+    return c.json(
+      {
+        error:
+          "GitHub could not prepare the pull request. Retry with the same post and repository to recover an existing one.",
+      },
+      502
+    );
+  }
 });
 
 postsRoutes.openapi(getPostGenerationRoute, async (c) => {

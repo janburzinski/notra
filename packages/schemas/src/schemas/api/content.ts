@@ -29,6 +29,7 @@ import {
   CONTENT_GENERATION_ERROR_CODES,
   NO_ACTIVITY_TYPES_MESSAGE,
 } from "@notra/content-generation/constants/errors";
+import { CONTENT_GENERATION_BRIEF_MAX_LENGTH } from "@notra/content-generation/constants/limits";
 import { SUPPORTED_CONTENT_GENERATION_TYPES } from "@notra/content-generation/schemas";
 import { hasEnabledActivityType } from "@notra/content-generation/utils/sources";
 import { lookbackWindowEnum, postStatusEnum } from "@notra/db/schema";
@@ -1016,12 +1017,6 @@ export const createPostGenerationRequestSchema = z
         includeReleases: z.boolean().default(true),
         includeLinearData: z.boolean().default(false),
       })
-      .refine(hasEnabledActivityType, {
-        message: NO_ACTIVITY_TYPES_MESSAGE,
-        params: {
-          code: CONTENT_GENERATION_ERROR_CODES.NO_ACTIVITY_TYPES_SELECTED,
-        },
-      })
       .default({
         includePullRequests: true,
         includeCommits: true,
@@ -1030,7 +1025,7 @@ export const createPostGenerationRequestSchema = z
       })
       .openapi({
         description:
-          "Which kinds of activity to collect from the selected sources. At least one must be true.",
+          "Which kinds of activity to collect from the selected sources. At least one must be true, unless pullRequest is set, which ignores them.",
       }),
     selectedItems: z
       .object({
@@ -1081,7 +1076,60 @@ export const createPostGenerationRequestSchema = z
           "IANA timezone used for relative lookback windows such as current_day and yesterday.",
         example: "America/New_York",
       }),
+    pullRequest: z
+      .object({
+        owner: z.string().trim().min(1),
+        repo: z.string().trim().min(1),
+        number: z.number().int().positive(),
+      })
+      .optional()
+      .openapi({
+        description:
+          "Write about exactly this pull request in a connected repository, open or merged, whatever its age. Uses only its pull request data, so dataPoints and lookbackWindow do not apply. Cannot be combined with other source selectors or selectedItems.",
+        example: { owner: "usenotra", repo: "notra", number: 2385 },
+      }),
+    brief: z
+      .string()
+      .trim()
+      .min(1)
+      .max(CONTENT_GENERATION_BRIEF_MAX_LENGTH)
+      .optional()
+      .openapi({
+        description:
+          "What the post should be about and what it should cover, in your own words. Steers the topic, angle and structure; facts still come from the selected sources.",
+        example:
+          "Announce mention-driven blog posts. Lead with the phone workflow and show the comment that triggers it.",
+      }),
   })
+  // Checked here rather than on dataPoints, which pullRequest replaces.
+  .refine(
+    (value) =>
+      Boolean(value.pullRequest) || hasEnabledActivityType(value.dataPoints),
+    {
+      message: NO_ACTIVITY_TYPES_MESSAGE,
+      path: ["dataPoints"],
+      params: {
+        code: CONTENT_GENERATION_ERROR_CODES.NO_ACTIVITY_TYPES_SELECTED,
+      },
+    }
+  )
+  .refine(
+    (value) =>
+      !value.pullRequest ||
+      !(
+        value.repositoryIds?.length ||
+        value.integrations?.github?.length ||
+        value.integrations?.linear?.length ||
+        value.linearIntegrationIds?.length ||
+        value.github?.repositories?.length ||
+        value.selectedItems
+      ),
+    {
+      message:
+        "pullRequest selects its own source. Do not combine it with integrations, repositoryIds, linearIntegrationIds, github.repositories or selectedItems.",
+      path: ["pullRequest"],
+    }
+  )
   .refine(
     (value) => {
       const repositorySourceCount = [
@@ -1174,6 +1222,50 @@ const contentGenerationJobSchema = z.object({
 export const createPostGenerationResponseSchema = z.object({
   organization: organizationResponseSchema,
   job: contentGenerationJobSchema,
+});
+
+export const createPostPullRequestRequestSchema = z
+  .object({
+    integrationId: z.string().trim().min(1).optional().openapi({
+      description:
+        "GitHub integration ID from GET /v1/integrations to open the pull request in.",
+      example: "integration_1",
+    }),
+    github: z
+      .object({
+        owner: z.string().trim().min(1),
+        repo: z.string().trim().min(1),
+      })
+      .optional()
+      .openapi({
+        description:
+          "Connected repository by owner and name, instead of integrationId.",
+        example: { owner: "usenotra", repo: "notra" },
+      }),
+  })
+  .refine((value) => !(value.integrationId && value.github), {
+    message: "Provide either integrationId or github, not both",
+    path: ["github"],
+  })
+  .openapi({
+    description:
+      "Where to open the pull request. Omit both fields when the organization has exactly one connected GitHub repository.",
+  });
+
+export const createPostPullRequestResponseSchema = z.object({
+  organization: organizationResponseSchema,
+  pullRequest: z.object({
+    number: z.number().int().positive(),
+    url: z.url(),
+    branchName: z.string(),
+    path: z.string().openapi({
+      description: "Repository path of the post file on the branch.",
+    }),
+    operation: z.enum(["created", "updated"]).openapi({
+      description:
+        "created for a new draft pull request, updated when the post's open pull request was refreshed instead.",
+    }),
+  }),
 });
 
 export const getPostGenerationParamsSchema = z.object({

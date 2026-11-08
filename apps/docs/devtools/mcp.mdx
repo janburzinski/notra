@@ -232,6 +232,7 @@ Tool names match exactly what the server registers, although some clients prefix
 - `delete_post`
 - `generate_post`
 - `get_post_generation_status`
+- `create_post_pull_request`
 - `get_post_schedule`
 - `schedule_post`
 - `cancel_post_schedule`
@@ -239,6 +240,8 @@ Tool names match exactly what the server registers, although some clients prefix
 When `update_post` changes the title, slug or markdown of a blog post or changelog with a linked GitHub pull request, Notra saves the article and updates that PR using the same publishing logic as the dashboard, without creating a new PR. Status-only changes do not trigger a GitHub update.
 
 If the PR update fails, the tool returns an error stating that Notra saved the post. A rate-limited GitHub sync returns 429 with `Retry-After`, so wait before retrying the content update. A timeout returns 504 with an unknown sync outcome, and because the PR update may still finish, check the PR before retrying, as you should after any other unconfirmed sync error. If the PR is closed or merged, resolve it in the dashboard before Notra can sync it again.
+
+To turn a pull request into a post, call `generate_post` with `pullRequest` and, if you like, a `brief` in your own words. Poll `get_post_generation_status` until it reports a `postId`, then call `create_post_pull_request` to open a draft pull request with the post. Calling it again updates that pull request.
 
 **Sites**
 

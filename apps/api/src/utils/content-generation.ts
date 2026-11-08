@@ -77,6 +77,38 @@ const queryPostTargets = <A>(operation: () => Promise<A>) =>
     catch: (cause) => new PostDatabaseError({ cause }),
   });
 
+/** Only the pull request's own data, since its age and state do not matter. */
+const PULL_REQUEST_DATA_POINTS: ContentDataPointSettings = {
+  includePullRequests: true,
+  includeCommits: false,
+  includeReleases: false,
+  includeLinearData: false,
+};
+
+/**
+ * Turns `pullRequest` into the selection the workflow already understands:
+ * that one pull request in its resolved repository, and nothing else.
+ */
+export function applyPullRequestSelection<
+  T extends {
+    pullRequest?: { number: number };
+    dataPoints: ContentDataPointSettings;
+    selectedItems?: ContentGenerationWorkflowPayload["selectedItems"];
+  },
+>(body: T, repositoryIds: string[] | undefined): T {
+  const repositoryId = repositoryIds?.[0];
+  if (!(body.pullRequest && repositoryId)) {
+    return body;
+  }
+  return {
+    ...body,
+    dataPoints: PULL_REQUEST_DATA_POINTS,
+    selectedItems: {
+      pullRequestNumbers: [{ repositoryId, number: body.pullRequest.number }],
+    },
+  };
+}
+
 export const resolveRequestedRepositoryIds = Effect.fn(
   "posts.resolveRequestedRepositoryIds"
 )(function* (

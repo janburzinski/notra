@@ -2,6 +2,8 @@ import type { contentTypeSchema } from "@notra/ai/schemas/content";
 // biome-ignore lint/performance/noNamespaceImport: Zod recommended way of importing
 import * as z from "zod";
 
+import { CONTENT_GENERATION_BRIEF_MAX_LENGTH } from "./constants/limits";
+
 export const LOOKBACK_WINDOWS = [
   "current_day",
   "yesterday",
@@ -188,6 +190,7 @@ export const contentGenerationWorkflowPayloadSchema = z.object({
   dataPoints: contentDataPointSettingsSchema,
   selectedItems: selectedItemsSchema.optional(),
   linearIntegrationIds: z.array(z.string()).optional(),
+  brief: z.string().max(CONTENT_GENERATION_BRIEF_MAX_LENGTH).optional(),
   aiCreditReserved: z.boolean(),
   aiCreditMarkup: z.boolean().default(false),
   source: z.enum(["api", "dashboard"]).default("dashboard"),

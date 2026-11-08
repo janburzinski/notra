@@ -42,6 +42,7 @@ Notra keys each limit in one of three ways:
 | --- | --- | --- |
 | `POST /v1/posts/generate` | 10 requests / minute | per key |
 | `PATCH /v1/posts/{postId}` | 60 requests / minute | per key |
+| `POST /v1/posts/{postId}/pull-request` | 60 requests / minute, shared with `PATCH /v1/posts/{postId}` | per key |
 | `POST /v1/brand-identities/generate` | 5 requests / minute | per key |
 | `POST /v1/integrations/github` | 20 requests / minute | per key |
 

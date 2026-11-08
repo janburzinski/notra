@@ -7,6 +7,7 @@ import type { PostSourceMetadata } from "@notra/db/schema";
 import { flushPostHogServer } from "@notra/posthog/server";
 import { createRequestLogger } from "evlog";
 
+import { buildBriefInstructions } from "@/lib/workflows/on-demand/brief";
 import {
   buildDataPointRestrictionInstructions,
   buildSelectedItemsInstructions,
@@ -37,6 +38,7 @@ export async function runOnDemandGeneration(
     selectedItems,
     linearIntegrationIds,
     source,
+    brief,
   } = payload;
 
   const targetRepositoryIds = new Set(
@@ -72,6 +74,7 @@ export async function runOnDemandGeneration(
     guidelineInstructions,
     restrictionInstructions || "",
     selectedItemsInstructions || "",
+    buildBriefInstructions(brief) || "",
   ]
     .filter((value) => value.length > 0)
     .join("\n\n");

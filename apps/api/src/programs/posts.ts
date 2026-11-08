@@ -748,6 +748,12 @@ export const createPostGeneration = Effect.fn("posts.createGeneration")(
             lookbackWindow: body.lookbackWindow,
             repositoryCount: input.repositoryIds?.length ?? 0,
             linearIntegrationCount: input.linearIntegrationIds?.length ?? 0,
+            ...(body.pullRequest
+              ? {
+                  pullRequest: `${body.pullRequest.owner}/${body.pullRequest.repo}#${body.pullRequest.number}`,
+                }
+              : {}),
+            hasBrief: Boolean(body.brief),
           },
         }),
       catch: (cause) => cause,
@@ -776,6 +782,7 @@ export const createPostGeneration = Effect.fn("posts.createGeneration")(
           brandVoiceId: input.resolvedBrandVoiceId ?? undefined,
           dataPoints: body.dataPoints,
           selectedItems: body.selectedItems,
+          brief: body.brief,
           aiCreditReserved: false,
           aiCreditMarkup: false,
           source: "api",
