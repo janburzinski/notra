@@ -28,7 +28,7 @@ These are the size and build limits for every site, followed by the build errors
 | Files in the built site | 20,000 |
 | Size of the built site | 500 MB |
 | Builds at the same time | 2 per site |
-| Deployments per workspace | 300 per 24 hours |
+| Deployments per workspace | 300 per 24 hours, not counting [theme updates](/sites/publishing#what-triggers-a-deploy) |
 | Rollback history | The last 10 successful production builds |
 | Redirect rules | 500 |
 | Allowed origins | 32 |
@@ -77,7 +77,8 @@ The most common warnings are:
 | `icon_unknown` | An icon in `blog.json` isn't one of the [bundled icons](/sites/reference/blog-json#icons), and Notra skips it |
 | `navbar_primary_button` | `navbar.primary` has `type: "button"`, and Notra reads it as `navbar.cta` |
 | `featured_unknown` | A path in `blog.featured` doesn't match a post |
-| `author_link_scheme` | An author's `url`, `x`, `linkedin`, `github` or `youtube` in `blog.json` isn't an `http://` or `https://` URL, like `javascript:` or `mailto:`, and Notra leaves the link off the site. Use an `https://` URL |
+| `redirect_placeholder` | A redirect's `destination` uses a `:name` that its `source` doesn't define, so Notra keeps it as written, or a `:segment` in `source` isn't a valid placeholder name, so it only matches literally. See [Redirects](/sites/customize/seo#redirects) |
+| `author_link_scheme` | An author's `url`, `x`, `linkedin`, `github` or `youtube` in `blog.json` isn't an `http://` or `https://` URL, like `javascript:` or `mailto:`, and Notra leaves the link off the site. Use an `https://` URL. For `bluesky`, `mastodon`, `threads` and `instagram`, another scheme stops the build instead |
 | `link_broken` | A link goes to a path in your blog or changelog, like `/blog/old-post` or `./old-post`, that has no page, file or [redirect](/sites/reference/blog-json#redirects), to a `#section` that isn't a heading or `id` on that page, or to a path Notra can't read, like `/blog/100%` (write `%25`). The message suggests the closest page or heading. Notra skips paths outside your sections, like `/pricing` |
 | `image_missing` | An image, a `srcset` candidate or the post's `image` isn't in `public/`. The message suggests the closest file name |
 | `no_entries` | There are no posts or changelog entries yet |

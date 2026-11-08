@@ -107,7 +107,7 @@ Describe the people who write for you once in `blog.json`, then name them by id 
 | `title` | Up to 80 characters |
 | `avatar` | A path like `/images/team/jan.jpg` or an `https://` URL |
 | `bio` | Up to 300 characters |
-| `url`, `x`, `linkedin`, `github`, `youtube`, `bluesky`, `mastodon`, `threads`, `instagram` | Full URLs |
+| `url`, `x`, `linkedin`, `github`, `youtube`, `bluesky`, `mastodon`, `threads`, `instagram` | Full `http://` or `https://` URLs. See [`authors`](/sites/reference/blog-json#authors) for other schemes |
 
 The author page shows each profile link as a button with `rel="me"`, so a Mastodon profile that links back to the author page shows the link as verified.
 
@@ -147,6 +147,8 @@ An author object takes the same fields as an entry in `authors`, and only `name`
 - With an `id` that's in `authors`, the `blog.json` entry wins for every field it sets, and the frontmatter fills in the rest.
 - With an `id` that isn't in `authors`, the author still gets an author page at `/blog/author/<id>` that lists their posts. When several posts describe the same id, the newest post's details win.
 - Without an `id`, Notra shows the name and avatar, but there's no author page.
+
+An author created in Notra has a name, role (`title`), ID, avatar, bio and the website, X, LinkedIn, GitHub, YouTube, Bluesky, Mastodon, Threads and Instagram links. When Notra publishes a post that credits them, it writes all of these into the author object, with the ID as `id`, and commits an avatar uploaded to Notra along with the post.
 
 `blog.authorPage` switches author pages to a [stacked layout](/sites/customize/layouts#author-pages). Notra hides author pages from search engines unless you set `"seo": { "indexing": "all" }`.
 

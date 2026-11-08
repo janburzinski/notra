@@ -134,7 +134,7 @@ Redirects let you move or rename a post without breaking links.
 
 - `source` is a full path on your domain, including the section path, like `/blog/old-post`.
 - A `source` ending in `/*` matches every path below it, and when `destination` also ends in `/*`, Notra carries the rest of the path over.
-- A segment like `:slug` in `source` matches any one segment, and `destination` can use the same `:slug` anywhere, like `/blog/:slug` or `/og/:slug.png`. Names start with a letter or underscore and contain letters, digits and underscores. A placeholder in `source` has to be a whole segment. A `:name` in `destination` that `source` doesn't define stays as written, like `Special:Search`, and the build shows a warning in case it's a typo.
+- A segment like `:slug` in `source` matches any one segment, and `destination` can use the same `:slug` anywhere, like `/blog/:slug` or `/og/:slug.png`. Names start with a letter or underscore and contain letters, digits and underscores. A placeholder in `source` has to be a whole segment, and each name can only appear once in it, or the build stops. A `:name` in `destination` that `source` doesn't define stays as written, like `Special:Search`, and a `:segment` in `source` with an invalid name only matches literally. The build shows a [`redirect_placeholder`](/sites/reference/limits#common-errors) warning for both in case it's a typo.
 - Placeholders work together with `/*`: `{ "source": "/old/:section/*", "destination": "/new/:section/*" }` sends `/old/guides/setup` to `/new/guides/setup`.
 - `destination` is a path or an `https://` URL.
 - `permanent` is `true` by default (`308`), so set it to `false` for a temporary redirect (`307`).

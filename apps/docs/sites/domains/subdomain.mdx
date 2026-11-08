@@ -37,7 +37,7 @@ A subdomain like `blog.acme.com` points straight at Notra, which issues the TLS 
     </Warning>
   </Step>
   <Step title="Check the domain">
-    Click **Check**, and Notra looks up the ownership record first and then waits for DNS and the certificate. DNS changes usually show up within a few minutes but can take longer at some providers. Notra keeps checking on its own, every minute for the first 15 minutes, then every 10 minutes for a day and hourly for a week, so the domain turns **Active** without another click. Click **Check** to check right away.
+    Click **Check**, and Notra looks up the ownership record first and then waits for DNS and the certificate. DNS changes usually show up within a few minutes but can take longer at some providers. Notra keeps checking on its own, every minute for the first 15 minutes, then every 10 minutes for a day and hourly for a week, so the domain turns **Active** without another click. Click **Check** to check right away, or after that week.
   </Step>
 </Steps>
 
@@ -54,7 +54,7 @@ If Notra can add the records for you, a **Connect with** button with your provid
 | **Needs DNS** | The domain hasn't been checked yet |
 | **Verifying** | A check ran but didn't pass yet, because a record is missing or the certificate isn't issued |
 | **Active** | The domain serves the site |
-| **Failed** | The domain was active before and its records are gone or wrong |
+| **Failed** | The domain was active before and its records are gone or wrong. Notra checks it again every hour until it works |
 
 The domain's **Last check details** say which record is missing or wrong.
 

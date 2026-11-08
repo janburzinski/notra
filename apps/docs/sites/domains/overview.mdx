@@ -51,7 +51,7 @@ Changing a path rebuilds the site, and the current version stays live until the 
 
 When a domain passes its check, it becomes the site's **Primary** address, and Notra rebuilds the site so canonical URLs, feeds, sitemaps, `llms.txt` and social previews point to it. The previous version stays live during the rebuild.
 
-- If you verify several domains, the one you checked last becomes primary.
+- If you verify several domains, the last one to pass a check becomes primary, whether you clicked **Check** or Notra checked it on its own.
 - Your Notra address keeps working but tells search engines not to crawl it once a primary domain is set, and every page names the primary address as canonical, so a post is never indexed twice.
 - Removing the primary domain moves the site back to its Notra address and rebuilds it.
 - A domain can only be active on one site at a time.
