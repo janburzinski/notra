@@ -23,6 +23,8 @@ import {
   GEO_WEB_KEY_SIGNING_DOMAIN,
   GEO_WEB_PLUS_SCRIPT_PATH,
   GEO_WEB_SCRIPT_PATH,
+  GEO_SCRIPT_HOST_RELEASE_DIR,
+  GEO_WEB_COLLECT_PATH,
   GEO_WEB_SCRIPT_RELEASE_DIR,
 } from "../constants/geo";
 import type {
@@ -498,11 +500,35 @@ export function buildGeoIngestSetupInfo(): GeoIngestSetupInfo {
   };
 }
 
+/**
+ * Where a notra.js build loads from: the script host in `GEO_SCRIPT_URL` (the
+ * notra-script Worker on Cloudflare's edge) when one is set, with page views
+ * pointed back at the ingest, otherwise the ingest itself.
+ */
 function webScript(
   ingestUrl: string,
   path: string,
   release: TrackerReleaseLink
 ): GeoWebScript {
+  const scriptOrigin = resolveGeoIngestOrigin(
+    process.env.GEO_SCRIPT_URL,
+    undefined
+  );
+  if (scriptOrigin && scriptOrigin !== new URL(ingestUrl).origin) {
+    const file = path.slice(path.lastIndexOf("/") + 1);
+    return {
+      url: new URL(
+        `${GEO_SCRIPT_HOST_RELEASE_DIR}${file}`,
+        scriptOrigin
+      ).toString(),
+      pinnedUrl: new URL(
+        `${GEO_SCRIPT_HOST_RELEASE_DIR}${release.file}`,
+        scriptOrigin
+      ).toString(),
+      integrity: release.integrity,
+      collectUrl: new URL(GEO_WEB_COLLECT_PATH, ingestUrl).toString(),
+    };
+  }
   return {
     url: new URL(path, ingestUrl).toString(),
     pinnedUrl: new URL(

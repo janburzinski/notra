@@ -238,6 +238,24 @@ explicitly; they do not inherit the dashboard's `GEO_INGEST_URL`.
 Leave `GEO_INGEST_URL` unset until the service is ready. The existing dashboard
 endpoint continues using the shared pipeline locally.
 
+## Serving notra.js from Cloudflare
+
+The service serves `notra.js` itself, but in production the script loads from
+`https://static.usenotra.com`, the `notra-script` Worker in `apps/script-cdn`, so
+it answers from Cloudflare's edge near each visitor. The Worker bundles the same
+builds and response code (`@notra/web-tracker/response`), so ETags, pinned
+builds and their integrity match. Page views reach this service directly: tags
+loaded from the Worker carry `data-api` with this service's `/api/collect`.
+
+1. Deploy the Worker (the production release does it with the sites Worker)
+   and check `https://static.usenotra.com/notra.js`.
+2. Set `GEO_SCRIPT_URL=https://static.usenotra.com` in the dashboard and public API
+   environments and redeploy them. Snippets then load the script from that host
+   and add `data-api` with this service's `/api/collect`.
+
+Unset `GEO_SCRIPT_URL` to serve new snippets from this service again; tags
+already installed keep loading from the Worker.
+
 ### Dashboard fallback (legacy)
 
 1. Unset `GEO_INGEST_URL` and redeploy the dashboard and API. This restores the

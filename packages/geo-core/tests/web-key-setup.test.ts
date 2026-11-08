@@ -84,6 +84,28 @@ if (!isIsolatedTestWorker(import.meta.url)) {
         geoWebScriptTag(issued.webKey, issued.webScript)
       );
 
+      // With a script host, builds load from it and page views go to the ingest.
+      process.env.GEO_SCRIPT_URL = "https://js.example";
+      try {
+        const hosted = await Effect.runPromise(
+          loadGeoWebSetupResponse(organization)
+        );
+        expect(hosted.webScript).toEqual({
+          url: "https://js.example/notra.js",
+          pinnedUrl: `https://js.example/${TRACKER_RELEASE.file}`,
+          integrity: TRACKER_RELEASE.integrity,
+          collectUrl: "https://ingest.example/api/collect",
+        });
+        expect(hosted.webPlusScript?.url).toBe(
+          "https://js.example/notra.plus.js"
+        );
+        expect(hosted.webSnippet).toContain(
+          'data-api="https://ingest.example/api/collect"'
+        );
+      } finally {
+        delete process.env.GEO_SCRIPT_URL;
+      }
+
       const withoutWeb = await Effect.runPromise(
         issueGeoIngestSetupResponse(sibling, false)
       );

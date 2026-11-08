@@ -1,0 +1,24 @@
+{
+  "name": "@notra/script-cdn",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Cloudflare Worker that serves notra.js and its pinned builds from Cloudflare's edge at static.usenotra.com.",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "build": "wrangler deploy --dry-run --outdir dist",
+    "deploy": "wrangler deploy",
+    "check-types": "tsc --noEmit",
+    "test": "bun test tests"
+  },
+  "dependencies": {
+    "@notra/web-tracker": "workspace:*"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^5.20261015.1",
+    "@notra/typescript-config": "workspace:*",
+    "bun-types": "catalog:",
+    "typescript": "catalog:",
+    "wrangler": "^4.151.0"
+  }
+}

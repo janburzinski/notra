@@ -572,6 +572,37 @@ export async function release({
   }
 
   const failures = [];
+  // notra.js from Cloudflare's edge (static.usenotra.com, apps/script-cdn). A
+  // failure fails the release at the end but does not stop the other deploys:
+  // the ingest serves the same script.
+  if (env.DRY_RUN === "true") {
+    await report(`script worker: would deploy ${sha}`);
+  } else {
+    try {
+      execFile(
+        "bun",
+        [
+          "run",
+          "deploy",
+          "--keep-vars",
+          "--tag",
+          `prod-${sha.slice(0, 12)}`,
+          "--message",
+          `Production release ${sha}`,
+        ],
+        {
+          cwd: join(env.RELEASE_DIR, "apps/script-cdn"),
+          env,
+          stdio: "inherit",
+          timeout: 5 * 60_000,
+        }
+      );
+      await report(`script worker: deployed ${sha}`);
+    } catch (error) {
+      failures.push(`script worker: ${error.message}`);
+      await report(`script worker: failed, ${error.message}`);
+    }
+  }
   const builds = [];
   for (const project of plans) {
     if (!project.changed) {

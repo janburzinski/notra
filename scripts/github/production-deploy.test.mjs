@@ -18,6 +18,7 @@ function fixture({
   toolchain = { version: "toolchain-1", snapshotId: null },
   gates = async () => {},
   migrationError,
+  scriptWorkerError,
 } = {}) {
   const sha = "a".repeat(40);
   const previousSha = "b".repeat(40);
@@ -218,8 +219,15 @@ function fixture({
         preflightOnly,
         fetchImpl,
         sleep: async () => {},
-        execFile: (command, args) => {
+        execFile: (command, args, options) => {
           if (args.includes("deploy")) {
+            if (options?.cwd?.endsWith("apps/script-cdn")) {
+              events.push("script-worker");
+              if (scriptWorkerError) {
+                throw new Error(scriptWorkerError);
+              }
+              return;
+            }
             events.push("worker");
             return;
           }
@@ -266,7 +274,22 @@ function toolchainUpserts(calls) {
 test("the release prepares before the gates and changes nothing live until they pass", async () => {
   const { calls, run, events } = fixture({ demo: true });
   await run();
-  assert.deepEqual(events.slice(0, 3), ["toolchain", "gates@0", "worker"]);
+  assert.deepEqual(events.slice(0, 4), [
+    "toolchain",
+    "gates@0",
+    "worker",
+    "script-worker",
+  ]);
+  assert.equal(builds(calls).length, 10);
+});
+
+test("a failed script worker deploy fails the release without stopping the other deploys", async () => {
+  const { calls, run, events } = fixture({
+    demo: true,
+    scriptWorkerError: "wrangler exited 1",
+  });
+  await assert.rejects(run(), /script worker: wrangler exited 1/);
+  assert.ok(events.includes("script-worker"));
   assert.equal(builds(calls).length, 10);
 });
 

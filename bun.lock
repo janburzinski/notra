@@ -386,6 +386,20 @@
         "typescript": "catalog:",
       },
     },
+    "apps/script-cdn": {
+      "name": "@notra/script-cdn",
+      "version": "0.0.1",
+      "dependencies": {
+        "@notra/web-tracker": "workspace:*",
+      },
+      "devDependencies": {
+        "@cloudflare/workers-types": "^5.20261015.1",
+        "@notra/typescript-config": "workspace:*",
+        "bun-types": "catalog:",
+        "typescript": "catalog:",
+        "wrangler": "^4.151.0",
+      },
+    },
     "apps/sites": {
       "name": "@notra/sites",
       "version": "0.0.1",
@@ -2085,6 +2099,8 @@
     "@notra/posthog": ["@notra/posthog@workspace:packages/posthog"],
 
     "@notra/schemas": ["@notra/schemas@workspace:packages/schemas"],
+
+    "@notra/script-cdn": ["@notra/script-cdn@workspace:apps/script-cdn"],
 
     "@notra/sites": ["@notra/sites@workspace:apps/sites"],
 

@@ -28,7 +28,7 @@ The script cannot see AI crawlers, because crawlers do not run JavaScript. To lo
     Open **Settings → Tracking** and copy the **Script tag** from the install panel. Until the first page view arrives, the **Web analytics** tab under **Analytics** shows the same panel. The tag contains your project's public key:
 
     ```html
-    <script defer src="https://ingest.usenotra.com/api/notra.js" data-key="nwk.…"></script>
+    <script defer src="https://static.usenotra.com/notra.js" data-key="nwk.…" data-api="https://ingest.usenotra.com/api/collect"></script>
     ```
 
     The key is not a secret. It can only record page views on the domains your project tracks, so it is safe in page HTML and keeps working when you rotate your server token.
@@ -52,7 +52,7 @@ The script cannot see AI crawlers, because crawlers do not run JavaScript. To lo
 | Attribute | Default | Description |
 |---|---|---|
 | `data-key` | required | Your project's public key. |
-| `data-api` | `/api/collect` on the script's origin | Where page views are sent. Set this when you proxy the script through your own domain. |
+| `data-api` | `/api/collect` on the script's origin | Where page views are sent. The snippet from Notra sets it to `https://ingest.usenotra.com/api/collect`; keep it when the script loads from `static.usenotra.com`, which only serves the script. Change it when you proxy page views through your own domain. |
 | `data-hash` | off | Count `#hash` changes as page views, for apps that route with the hash. Routes such as `#/pricing` or `#!/pricing` are reported as pages (`/#/pricing`), without their query; any other fragment, such as `#access_token=…`, is never stored. |
 
 Single-page apps are tracked automatically: every `history.pushState` navigation, every `history.replaceState` that changes the path (such as a redirect from `/` to `/en`) and every back/forward step counts as a page view. A `replaceState` that only changes the query string, such as a filter or sort order, stays the same page view. Pages restored from the back/forward cache and pages that were prerendered count when the visitor actually sees them.
@@ -70,7 +70,7 @@ Clicks on links to another host are recorded on their own, with the left or midd
 To also record uncaught JavaScript errors and unhandled promise rejections, load `notra.plus.js` instead of `notra.js`. It is the same script with error reporting added, about 1.3 KB compressed, and takes the same attributes:
 
 ```html
-<script defer src="https://ingest.usenotra.com/api/notra.plus.js" data-key="nwk.…"></script>
+<script defer src="https://static.usenotra.com/notra.plus.js" data-key="nwk.…" data-api="https://ingest.usenotra.com/api/collect"></script>
 ```
 
 Only errors from scripts served over `http` or `https` are reported, which leaves out browser extensions and the opaque `Script error.` of other origins, and at most five per page view. The script never sends a stack trace. Before storing a message, Notra removes query strings from URLs in it, replaces email addresses with `[email]` and replaces runs of four or more digits and long hexadecimal tokens with `#`. Errors appear in the **JavaScript errors** table on the **Web analytics** tab once there are any.
@@ -80,7 +80,7 @@ Only errors from scripts served over `http` or `https` are reported, which leave
 The default tag loads `/api/notra.js`, which always serves the latest build, so fixes reach your site without any change on your side. If your security policy requires third-party scripts to be pinned, turn on **Pin this version (Subresource Integrity)** in the install panel. The tag then loads one exact build and carries its hash:
 
 ```html
-<script defer src="https://ingest.usenotra.com/api/notra.1a2b3c4d5e6f.js" data-key="nwk.…" integrity="sha384-…" crossorigin="anonymous"></script>
+<script defer src="https://static.usenotra.com/notra.1a2b3c4d5e6f.js" data-key="nwk.…" data-api="https://ingest.usenotra.com/api/collect" integrity="sha384-…" crossorigin="anonymous"></script>
 ```
 
 The browser hashes the file and refuses to run it if a single byte differs from `integrity`, so nobody can change the script on your pages without you noticing. Every pinned build stays available unchanged, so the tag keeps working after new releases. `notra.plus.js` can be pinned the same way, as `/api/notra.plus.<version>.js`.
@@ -89,7 +89,7 @@ The browser hashes the file and refuses to run it if a single byte differs from 
 - **Keep `crossorigin="anonymous"`.** Browsers only check the integrity of scripts loaded with CORS. Without the attribute the script is blocked.
 - **Proxies.** If you serve the script through your own domain, pass the file through unchanged. Minifying or rewriting it breaks the hash; compression is fine.
 - **Cloudflare Rocket Loader.** Rocket Loader rewrites script tags so it can load them itself, which can drop `integrity` and `crossorigin`. Add `data-cfasync="false"` to the tag so Rocket Loader leaves it alone.
-- **Content-Security-Policy.** Allow the ingest origin in `script-src` for the script and in `connect-src` for its beacons, for example `script-src https://ingest.usenotra.com; connect-src https://ingest.usenotra.com`. Browsers that implement CSP Level 3 also accept the pinned script's hash in `script-src`, such as `'sha384-…'`, because the tag carries the same `integrity` value. Keep the origin listed for browsers that don't.
+- **Content-Security-Policy.** Allow the script host in `script-src` and the ingest in `connect-src` for its beacons: `script-src https://static.usenotra.com; connect-src https://ingest.usenotra.com`. Browsers that implement CSP Level 3 also accept the pinned script's hash in `script-src`, such as `'sha384-…'`, because the tag carries the same `integrity` value. Keep the origin listed for browsers that don't.
 
 <Visibility for="agents">
 

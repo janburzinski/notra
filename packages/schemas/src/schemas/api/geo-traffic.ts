@@ -466,6 +466,10 @@ const webScriptSchema = z.object({
     description:
       'Subresource Integrity value for pinnedUrl (sha384). Use it with crossorigin="anonymous".',
   }),
+  collectUrl: z.string().optional().openapi({
+    description:
+      "Where page views go when the script loads from Notra's script host; set it as the tag's data-api.",
+  }),
 });
 
 /**

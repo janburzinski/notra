@@ -654,6 +654,11 @@ export const GEO_WEB_SCRIPT_PATH = "/api/notra.js";
 export const GEO_WEB_PLUS_SCRIPT_PATH = "/api/notra.plus.js";
 /** Pinned builds live next to the scripts, as `/api/notra.<version>.js`. */
 export const GEO_WEB_SCRIPT_RELEASE_DIR = "/api/";
+/**
+ * On a separate script host (`GEO_SCRIPT_URL`, the notra-script Worker) the
+ * files sit at the root: `/notra.js`, `/notra.plus.js`, `/notra.<version>.js`.
+ */
+export const GEO_SCRIPT_HOST_RELEASE_DIR = "/";
 export const GEO_INGEST_BEARER_PREFIX = "Bearer ";
 export const GEO_MAX_STORED_UA_LENGTH = 200;
 export const AI_TRAFFIC_DEFAULT_JOURNEYS_LIMIT = 25;

@@ -157,7 +157,7 @@ jobs:
         run: |
           git worktree add --detach "$RUNNER_TEMP/release" "$RELEASE_SHA"
           cd "$RUNNER_TEMP/release"
-          bun install --frozen-lockfile --filter '@notra/sites-builder...' --filter '@notra/sites...' --filter '@notra/db'
+          bun install --frozen-lockfile --filter '@notra/sites-builder...' --filter '@notra/sites...' --filter '@notra/script-cdn...' --filter '@notra/db'
 
       - name: Deploy checked main commit
         run: node scripts/github/production-deploy.mjs

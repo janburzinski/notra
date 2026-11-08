@@ -1311,6 +1311,11 @@ export interface GeoWebScript {
   pinnedUrl: string;
   /** Subresource Integrity value for the pinned URL, `sha384-<base64>`. */
   integrity: string;
+  /**
+   * Where page views go when the script loads from a separate script host:
+   * the tag's `data-api`. Absent when the ingest serves the script itself.
+   */
+  collectUrl?: string;
 }
 
 /** The project whose public notra.js key a setup payload carries. */

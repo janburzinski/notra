@@ -9,7 +9,8 @@ export function geoWebScriptTag(
   script: GeoWebScript,
   pinned = false
 ): string {
+  const api = script.collectUrl ? ` data-api="${script.collectUrl}"` : "";
   return pinned
-    ? `<script defer src="${script.pinnedUrl}" data-key="${webKey}" integrity="${script.integrity}" crossorigin="anonymous"></script>`
-    : `<script defer src="${script.url}" data-key="${webKey}"></script>`;
+    ? `<script defer src="${script.pinnedUrl}" data-key="${webKey}"${api} integrity="${script.integrity}" crossorigin="anonymous"></script>`
+    : `<script defer src="${script.url}" data-key="${webKey}"${api}></script>`;
 }
