@@ -1,5 +1,5 @@
 import { AUTOPILOT_HEARTBEAT_WARNING_MS } from "@/constants/autopilot";
-import type { AutopilotAdminRun, AutopilotAdminTrace } from "@/types/autopilot";
+import type { AutopilotAdminRun } from "@/types/autopilot";
 
 export function autopilotTimestamp(value: string) {
   return `${new Date(value).toISOString().slice(0, 19).replace("T", " ")} UTC`;
@@ -24,18 +24,6 @@ export function hasMissingAutopilotHeartbeat(
     run.status === "running" &&
     now - new Date(run.heartbeatAt).getTime() > AUTOPILOT_HEARTBEAT_WARNING_MS
   );
-}
-
-export function autopilotRecordedTokens(events: AutopilotAdminTrace["events"]) {
-  return events.reduce((sum, event) => {
-    const input = event.data?.inputTokens;
-    const output = event.data?.outputTokens;
-    return (
-      sum +
-      (typeof input === "number" ? input : 0) +
-      (typeof output === "number" ? output : 0)
-    );
-  }, 0);
 }
 
 export function autopilotGitHubUrl(value: string | null) {

@@ -1,8 +1,12 @@
+import { AUTOPILOT_AGENT_STEP_EVENT_KIND } from "@notra/db/constants/autopilot";
+import type { AutopilotRunEventData } from "@notra/db/types/autopilot";
+
 import { AUTOPILOT_TRACE_TEXT_MAX_CHARS } from "@/constants/autopilot";
 import {
   AUTOPILOT_SECRET_FIELD,
   AUTOPILOT_SECRET_VALUE,
 } from "@/constants/autopilot-observability";
+import type { AutopilotAgentStepSource } from "@/types/autopilot-runtime";
 
 /** Defense in depth, not a guarantee that arbitrary source text is public. */
 export function redactAutopilotTraceDetail(value: unknown): unknown {
@@ -44,4 +48,27 @@ export function clipAutopilotTraceDetail(value: unknown): unknown {
     );
   }
   return value;
+}
+
+/**
+ * What the admin console charts for one agent step. durationMs runs from the
+ * previous step's end, so it covers the model call and the tools it ran.
+ */
+export function autopilotAgentStepData(
+  step: AutopilotAgentStepSource,
+  stepNumber: number,
+  durationMs: number
+): AutopilotRunEventData {
+  return {
+    kind: AUTOPILOT_AGENT_STEP_EVENT_KIND,
+    step: stepNumber,
+    model: step.model.modelId,
+    finishReason: step.finishReason,
+    durationMs,
+    inputTokens: step.usage.inputTokens ?? null,
+    outputTokens: step.usage.outputTokens ?? null,
+    cachedInputTokens: step.usage.inputTokenDetails.cacheReadTokens ?? null,
+    reasoningTokens: step.usage.outputTokenDetails.reasoningTokens ?? null,
+    tools: step.toolCalls.flatMap((call) => (call ? [call.toolName] : [])),
+  };
 }

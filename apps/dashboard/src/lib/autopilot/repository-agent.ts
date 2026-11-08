@@ -37,6 +37,7 @@ import type {
   AutopilotLogger,
   AutopilotStagedFile,
 } from "@/types/autopilot-runtime";
+import { autopilotAgentStepData } from "@/utils/autopilot-log";
 import { isSafeRepositoryPath } from "@/utils/autopilot-paths";
 
 function isProtectedPath(path: string) {
@@ -293,6 +294,7 @@ export async function runRepositoryAgent<Schema extends z.ZodType>(params: {
 
   const startedAt = Date.now();
   let stepNumber = 0;
+  let stepStartedAt = startedAt;
   const prompt = params.prompt(paths);
   await log.trace(`${params.tag} prompt`, {
     model: AGENT_DEFAULT_MODEL,
@@ -304,20 +306,31 @@ export async function runRepositoryAgent<Schema extends z.ZodType>(params: {
       prompt,
       onStepEnd: async (step) => {
         stepNumber += 1;
-        await log.trace(`Agent step ${stepNumber}`, {
-          text: step.text,
-          reasoning: step.reasoningText ?? null,
-          toolCalls: step.toolCalls.map((call) => ({
-            tool: call.toolName,
-            input: call.input,
-          })),
-          toolResults: step.toolResults.map((toolResult) => ({
-            tool: toolResult.toolName,
-            output: toolResult.output,
-          })),
-          inputTokens: step.usage.inputTokens ?? null,
-          outputTokens: step.usage.outputTokens ?? null,
-        });
+        const endedAt = Date.now();
+        const data = autopilotAgentStepData(
+          step,
+          stepNumber,
+          endedAt - stepStartedAt
+        );
+        stepStartedAt = endedAt;
+        await log.trace(
+          `Agent step ${stepNumber}`,
+          {
+            text: step.text,
+            reasoning: step.reasoningText ?? null,
+            toolCalls: step.toolCalls.map((call) => ({
+              tool: call.toolName,
+              input: call.input,
+            })),
+            toolResults: step.toolResults.map((toolResult) => ({
+              tool: toolResult.toolName,
+              output: toolResult.output,
+            })),
+            inputTokens: step.usage.inputTokens ?? null,
+            outputTokens: step.usage.outputTokens ?? null,
+          },
+          data
+        );
       },
     })
     .catch((error: unknown) => {

@@ -144,8 +144,27 @@ export type AutopilotLogFn = (
 
 export type AutopilotLogger = Record<AutopilotEventLevel, AutopilotLogFn> & {
   /** Admin-only step, e.g. why one candidate was dropped. Hidden from users. */
-  trace: (message: string, detail?: AutopilotTraceDetail) => Promise<void>;
+  trace: (
+    message: string,
+    detail?: AutopilotTraceDetail,
+    /** Non-sensitive numbers kept after the detail expires. */
+    data?: AutopilotRunEventData
+  ) => Promise<void>;
 };
+
+/** The parts of an AI SDK step that agent step telemetry reads. */
+export interface AutopilotAgentStepSource {
+  model: { modelId: string };
+  finishReason: string;
+  usage: {
+    inputTokens: number | undefined;
+    outputTokens: number | undefined;
+    inputTokenDetails: { cacheReadTokens: number | undefined };
+    outputTokenDetails: { reasoningTokens: number | undefined };
+  };
+  /** Loosely typed tools can leave holes here. */
+  toolCalls: readonly ({ toolName: string } | undefined)[];
+}
 
 /** A content gap the keywords job may turn into a post or a page update. */
 export interface AutopilotKeywordCandidate {

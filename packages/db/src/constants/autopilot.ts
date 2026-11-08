@@ -71,6 +71,12 @@ export const AUTOPILOT_FINDING_STATUSES = [
  * skip: a gate stopped the job, decision: a filter or model picked something,
  * action: Autopilot changed something (LLM call, pull request), error: it failed.
  */
+/**
+ * `data.kind` of an admin-only event recording one agent loop step: its
+ * model, tokens, duration and tool names. The raw step stays in `detail`.
+ */
+export const AUTOPILOT_AGENT_STEP_EVENT_KIND = "agent-step";
+
 export const AUTOPILOT_EVENT_LEVELS = [
   "info",
   "skip",

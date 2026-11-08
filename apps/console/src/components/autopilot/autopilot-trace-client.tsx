@@ -2,15 +2,17 @@
 
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 import { AutopilotTraceEvents } from "@/components/autopilot/autopilot-trace-events";
 import { AutopilotTraceFindings } from "@/components/autopilot/autopilot-trace-findings";
 import { AutopilotTraceSummary } from "@/components/autopilot/autopilot-trace-summary";
+import { AutopilotTraceTelemetry } from "@/components/autopilot/autopilot-trace-telemetry";
 import { Button } from "@/components/button";
 import { AUTOPILOT_ADMIN_POLL_MS } from "@/constants/autopilot";
 import { consoleOrpc } from "@/lib/orpc/query";
 import type { AutopilotTracePageProps } from "@/types/autopilot";
+import { buildAutopilotTelemetry } from "@/utils/autopilot-telemetry";
 
 export function AutopilotTraceClient({ slug, runId }: AutopilotTracePageProps) {
   const [includeDetail, setIncludeDetail] = useState(false);
@@ -25,6 +27,10 @@ export function AutopilotTraceClient({ slug, runId }: AutopilotTracePageProps) {
         : false,
   });
   const trace = query.data;
+  const telemetry = useMemo(
+    () => (trace ? buildAutopilotTelemetry(trace.events) : null),
+    [trace]
+  );
   return (
     <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-6 px-4 py-6 lg:px-6">
       <Link
@@ -54,6 +60,12 @@ export function AutopilotTraceClient({ slug, runId }: AutopilotTracePageProps) {
       {trace ? (
         <>
           <AutopilotTraceSummary trace={trace} />
+          {telemetry ? (
+            <AutopilotTraceTelemetry
+              telemetry={telemetry}
+              truncated={trace.truncated}
+            />
+          ) : null}
           <AutopilotTraceFindings findings={trace.findings} />
           <section className="grid gap-3">
             <div className="flex flex-wrap items-center justify-between gap-3">

@@ -24,7 +24,7 @@ export async function generateAutopilotObject<T extends z.ZodType>(params: {
   /** Reports what the call cost, e.g. to bill an @notra request. */
   onUsage?: (usage: AgentTokenUsage) => void;
 }): Promise<z.infer<T>> {
-  const startedAt = Date.now();
+  let attemptStartedAt = Date.now();
   const generate = (reasoning?: "low" | "medium") =>
     generateText({
       model: gateway(params.modelId, { organizationId: params.organizationId }),
@@ -63,14 +63,19 @@ export async function generateAutopilotObject<T extends z.ZodType>(params: {
     }
     const reasoning =
       error.finishReason === "length" ? params.retryReasoning : undefined;
+    // Logged as a call of its own, so trace totals keep the failed attempt.
     await params.log.action(`Retrying ${params.modelId} (${params.tag})`, {
       reason:
         error.finishReason === "length"
           ? "The response ran out of tokens"
           : "The response was not valid JSON",
+      model: params.modelId,
+      inputTokens: error.usage?.inputTokens ?? null,
       outputTokens: error.usage?.outputTokens ?? null,
+      durationMs: Date.now() - attemptStartedAt,
       reasoning: reasoning ?? null,
     });
+    attemptStartedAt = Date.now();
     return generate(reasoning);
   });
   params.onUsage?.({ ...toAgentTokenUsage(usage), modelId: params.modelId });
@@ -80,7 +85,7 @@ export async function generateAutopilotObject<T extends z.ZodType>(params: {
       model: params.modelId,
       inputTokens: usage.inputTokens ?? null,
       outputTokens: usage.outputTokens ?? null,
-      durationMs: Date.now() - startedAt,
+      durationMs: Date.now() - attemptStartedAt,
     },
     {
       instructions: params.instructions,

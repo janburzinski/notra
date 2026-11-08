@@ -42,6 +42,7 @@ import type {
 import type { AutopilotFactSource } from "@/types/autopilot-templates-runtime";
 import { autopilotDraftIssue } from "@/utils/autopilot-draft";
 import { describeAutopilotToolCall } from "@/utils/autopilot-events";
+import { autopilotAgentStepData } from "@/utils/autopilot-log";
 
 /**
  * The text a tool returned. Objects keep their string fields as they are:
@@ -230,6 +231,7 @@ export async function writeBlogPost(params: {
   ) {
     const startedAt = Date.now();
     let stepNumber = 0;
+    let stepStartedAt = startedAt;
     const result = await agent
       .generate({
         prompt:
@@ -238,6 +240,13 @@ export async function writeBlogPost(params: {
             : `${prompt}\n\nThe previous draft was incomplete. Rewrite the entire file, keeping it concise enough to finish. Include the complete ending; do not continue the previous fragment.`,
         onStepEnd: async (step) => {
           stepNumber += 1;
+          const endedAt = Date.now();
+          const data = autopilotAgentStepData(
+            step,
+            stepNumber,
+            endedAt - stepStartedAt
+          );
+          stepStartedAt = endedAt;
           // Sitemap tools are typed loosely, so calls can be undefined here.
           const calls = step.toolCalls.flatMap((call) =>
             call ? [{ tool: call.toolName, input: call.input }] : []
@@ -254,17 +263,21 @@ export async function writeBlogPost(params: {
               });
             }
           }
-          await log.trace(`Writer step ${stepNumber}`, {
-            text: step.text,
-            toolCalls: calls,
-            toolResults: step.toolResults.flatMap((toolResult) =>
-              toolResult
-                ? [{ tool: toolResult.toolName, output: toolResult.output }]
-                : []
-            ),
-            inputTokens: step.usage.inputTokens ?? null,
-            outputTokens: step.usage.outputTokens ?? null,
-          });
+          await log.trace(
+            `Writer step ${stepNumber}`,
+            {
+              text: step.text,
+              toolCalls: calls,
+              toolResults: step.toolResults.flatMap((toolResult) =>
+                toolResult
+                  ? [{ tool: toolResult.toolName, output: toolResult.output }]
+                  : []
+              ),
+              inputTokens: step.usage.inputTokens ?? null,
+              outputTokens: step.usage.outputTokens ?? null,
+            },
+            data
+          );
         },
       })
       .catch((error: unknown) => {

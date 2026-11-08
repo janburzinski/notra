@@ -69,8 +69,8 @@ export function createAutopilotLogger(
     decision: write("decision"),
     action: write("action"),
     error: write("error"),
-    trace: (message, detail) =>
-      insert({ level: "info", message, detail, internal: true }),
+    trace: (message, detail, data) =>
+      insert({ level: "info", message, data, detail, internal: true }),
   };
 }
 

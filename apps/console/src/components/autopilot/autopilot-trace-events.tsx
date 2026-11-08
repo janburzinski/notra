@@ -2,6 +2,10 @@ import { Badge } from "@notra/ui/components/ui/badge";
 
 import type { AutopilotTraceEventsProps } from "@/types/autopilot";
 import { autopilotRelatedUrl, autopilotTimestamp } from "@/utils/autopilot";
+import {
+  describeAutopilotStepEvent,
+  isAutopilotStepEvent,
+} from "@/utils/autopilot-telemetry";
 
 export function AutopilotTraceEvents({
   events,
@@ -16,8 +20,13 @@ export function AutopilotTraceEvents({
     <ol className="divide-y rounded-lg border">
       {events.map((event) => {
         const relatedUrl = autopilotRelatedUrl(event.data?.url);
+        const stepSummary = describeAutopilotStepEvent(event);
         return (
-          <li key={event.id} className="grid gap-2 p-4">
+          <li
+            key={event.id}
+            id={`event-${event.id}`}
+            className="target:bg-muted/60 grid scroll-mt-4 gap-2 p-4"
+          >
             <div className="text-muted-foreground flex flex-wrap items-center gap-2 text-xs">
               <time dateTime={event.createdAt}>
                 {autopilotTimestamp(event.createdAt)}
@@ -41,7 +50,12 @@ export function AutopilotTraceEvents({
                 Open related link
               </a>
             ) : null}
-            {event.data ? (
+            {stepSummary ? (
+              <p className="text-muted-foreground text-xs tabular-nums">
+                {stepSummary}
+              </p>
+            ) : null}
+            {event.data && !isAutopilotStepEvent(event) ? (
               <pre className="bg-muted overflow-auto rounded-md p-3 text-xs">
                 {JSON.stringify(event.data, null, 2)}
               </pre>

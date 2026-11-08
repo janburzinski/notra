@@ -1,7 +1,6 @@
 import type { AutopilotTraceSummaryProps } from "@/types/autopilot";
 import {
   autopilotDuration,
-  autopilotRecordedTokens,
   autopilotTimestamp,
   hasMissingAutopilotHeartbeat,
 } from "@/utils/autopilot";
@@ -33,14 +32,6 @@ export function AutopilotTraceSummary({ trace }: AutopilotTraceSummaryProps) {
           <dt className="text-muted-foreground text-sm">Last heartbeat</dt>
           <dd className="text-sm tabular-nums">
             {autopilotTimestamp(trace.run.heartbeatAt)}
-          </dd>
-        </div>
-        <div>
-          <dt className="text-muted-foreground text-sm">
-            Recorded tokens{trace.truncated ? " (partial)" : ""}
-          </dt>
-          <dd className="tabular-nums">
-            {autopilotRecordedTokens(trace.events).toLocaleString("en-US")}
           </dd>
         </div>
         <div>
