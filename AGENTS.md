@@ -61,6 +61,10 @@ Explicit requirements and this repo's conventions take precedence. Companion
   before merging a Sites backend change. A new external
   service the Sites backend calls gets an emulator in `apps/sites-e2e/emulators`
   and an override in `packages/sites-server/src/utils/provider-urls.ts`.
+- Before adding or changing a Notra Sites analytics integration, read and apply
+  `.agents/skills/sites-analytics-integration/SKILL.md`, which covers the typed
+  `blog.json` options, c15t loading, CSP, dashboard translations, E2E emulators
+  and docs that every provider needs.
 
 <!-- BEGIN:turborepo-agent-rules -->
 
