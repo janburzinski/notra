@@ -50,9 +50,10 @@ Explicit requirements and this repo's conventions take precedence. Companion
   sub-processor and needs no notice. Only fix the maker's row if the swap makes
   its wording wrong.
 - The Sites E2E suite (`apps/sites-e2e`) gates every production deploy. When a
-  change to `apps/sites`, `apps/sites-builder`, `packages/sites-*` or the Sites
-  dashboard code changes user-facing behaviour, update or extend its tests in
-  the same PR; a pure visual change must not need test edits. Follow
+  change to `apps/sites`, `apps/sites-builder` or `packages/sites-*` changes
+  user-facing behaviour, update or extend its tests in the same PR; a pure
+  visual change must not need test edits. Sites dashboard UI changes don't
+  need E2E tests. Follow
   `apps/sites-e2e/README.md#keeping-the-suite-green`. Pull requests that
   change the Sites stack run its browser part (`sites-e2e-pr.yml`); the
   lifecycle with real Box builds runs only before a production deploy, so
