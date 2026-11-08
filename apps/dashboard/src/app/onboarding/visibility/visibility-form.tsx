@@ -9,6 +9,7 @@ import { AuthFormHeader } from "@notra/ui/components/shared/auth/auth-form-heade
 import { CtaButton } from "@notra/ui/components/shared/cta-button";
 import { Input } from "@notra/ui/components/ui/input";
 import { Label } from "@notra/ui/components/ui/label";
+import { useForm, useStore } from "@tanstack/react-form";
 import { useEffect, useId, useRef, useState } from "react";
 import { useTranslations } from "use-intl";
 
@@ -37,6 +38,7 @@ import { useRouter } from "@/lib/navigation";
 import type {
   OnboardingPreviewFocus,
   VisibilityFormProps,
+  VisibilityReviewFormValues,
   VisibilityReviewProps,
 } from "@/types/onboarding";
 import {
@@ -64,66 +66,75 @@ function VisibilityReview({
   const tCommon = useTranslations("common");
   const id = useId();
   const router = useRouter();
-  const [companyName, setCompanyName] = useState(
-    () => discovery?.companyName ?? fallbackCompanyName
-  );
-  const [attemptedSubmit, setAttemptedSubmit] = useState(false);
   const companyInputRef = useRef<HTMLInputElement>(null);
-  const [droppedKeys, setDroppedKeys] = useState(() => new Set<string>());
   const save = useGeoOnboardingBrand(organizationId);
   const [isLeaving, setIsLeaving] = useState(false);
   const busy = save.isPending || isLeaving;
-  const prompts = uniqueVisibilityPrompts(
-    discovery?.prompts ?? [],
-    buildBrandTerms({
-      companyName,
-      aliases: [...(discovery?.aliases ?? [])],
-    })
+  const promptsFor = (name: string) =>
+    uniqueVisibilityPrompts(
+      discovery?.prompts ?? [],
+      buildBrandTerms({
+        companyName: name,
+        aliases: [...(discovery?.aliases ?? [])],
+      })
+    );
+  const defaultValues: VisibilityReviewFormValues = {
+    companyName: discovery?.companyName ?? fallbackCompanyName,
+    droppedKeys: [],
+  };
+  const form = useForm({
+    defaultValues,
+    onSubmitInvalid: () => {
+      requestAnimationFrame(() => companyInputRef.current?.focus());
+    },
+    onSubmit: ({ value }) => {
+      if (busy) {
+        return;
+      }
+      const brandInput = toVisibilityBrandInput({
+        companyName: value.companyName,
+        aliases: discovery?.aliases ?? [],
+        audienceType: discovery?.audienceType,
+        prompts: selectedVisibilityPrompts(
+          promptsFor(value.companyName),
+          new Set(value.droppedKeys)
+        ),
+        languages,
+      });
+      save.mutate(brandInput, {
+        onSuccess: () => {
+          trackEvent(POSTHOG_EVENTS.ONBOARDING_BRAND_SAVED, {
+            alias_count: brandInput.aliases.length,
+            audience_type: brandInput.audienceType ?? null,
+            prompt_count: brandInput.prompts.length,
+            languages: brandInput.languages ?? [],
+          });
+          setIsLeaving(true);
+          router.push(nextHref);
+        },
+      });
+    },
+  });
+  const companyName = useStore(form.store, (state) => state.values.companyName);
+  const droppedKeys = useStore(form.store, (state) => state.values.droppedKeys);
+  const attemptedSubmit = useStore(
+    form.store,
+    (state) => state.submissionAttempts > 0
   );
-  const selectedPrompts = selectedVisibilityPrompts(prompts, droppedKeys);
+  const prompts = promptsFor(companyName);
+  const selectedPrompts = selectedVisibilityPrompts(
+    prompts,
+    new Set(droppedKeys)
+  );
   const companyNameMissing = companyName.trim().length === 0;
   const websiteHost = stripWebsitePrefix(websiteUrl);
 
   const togglePrompt = (key: string) => {
-    setDroppedKeys((current) => {
-      const next = new Set(current);
-      if (next.has(key)) {
-        next.delete(key);
-      } else {
-        next.add(key);
-      }
-      return next;
-    });
-  };
-
-  const handleSubmit = () => {
-    if (busy) {
-      return;
-    }
-    if (companyNameMissing) {
-      setAttemptedSubmit(true);
-      requestAnimationFrame(() => companyInputRef.current?.focus());
-      return;
-    }
-    const brandInput = toVisibilityBrandInput({
-      companyName,
-      aliases: discovery?.aliases ?? [],
-      audienceType: discovery?.audienceType,
-      prompts: selectedPrompts,
-      languages,
-    });
-    save.mutate(brandInput, {
-      onSuccess: () => {
-        trackEvent(POSTHOG_EVENTS.ONBOARDING_BRAND_SAVED, {
-          alias_count: brandInput.aliases.length,
-          audience_type: brandInput.audienceType ?? null,
-          prompt_count: brandInput.prompts.length,
-          languages: brandInput.languages ?? [],
-        });
-        setIsLeaving(true);
-        router.push(nextHref);
-      },
-    });
+    form.setFieldValue("droppedKeys", (current) =>
+      current.includes(key)
+        ? current.filter((dropped) => dropped !== key)
+        : [...current, key]
+    );
   };
 
   return (
@@ -132,7 +143,7 @@ function VisibilityReview({
       onSubmit={(event) => {
         event.preventDefault();
         event.stopPropagation();
-        handleSubmit();
+        form.handleSubmit();
       }}
     >
       <OnboardingDashboardPreview
@@ -142,29 +153,43 @@ function VisibilityReview({
         prompts={selectedPrompts.map((entry) => entry.prompt)}
         website={previewWebsite}
       />
-      <div className="grid gap-2" data-preview="brand">
-        <Label htmlFor={`${id}-company`}>{t("brandName")}</Label>
-        <Input
-          aria-describedby={
-            attemptedSubmit && companyNameMissing
-              ? `${id}-company-error`
-              : undefined
-          }
-          aria-invalid={attemptedSubmit && companyNameMissing}
-          className={ONBOARDING_FIELD_CLASS}
-          disabled={busy}
-          id={`${id}-company`}
-          onChange={(event) => setCompanyName(event.target.value)}
-          placeholder={t("brandNamePlaceholder")}
-          ref={companyInputRef}
-          value={companyName}
-        />
-        {attemptedSubmit && companyNameMissing ? (
-          <p className="text-destructive text-sm" id={`${id}-company-error`}>
-            {t("brandNameRequired")}
-          </p>
-        ) : null}
-      </div>
+      <form.Field
+        name="companyName"
+        validators={{
+          onChange: ({ value }) =>
+            value.trim().length === 0 ? t("brandNameRequired") : undefined,
+        }}
+      >
+        {(field) => (
+          <div className="grid gap-2" data-preview="brand">
+            <Label htmlFor={`${id}-company`}>{t("brandName")}</Label>
+            <Input
+              aria-describedby={
+                attemptedSubmit && companyNameMissing
+                  ? `${id}-company-error`
+                  : undefined
+              }
+              aria-invalid={attemptedSubmit && companyNameMissing}
+              className={ONBOARDING_FIELD_CLASS}
+              disabled={busy}
+              id={`${id}-company`}
+              onBlur={field.handleBlur}
+              onChange={(event) => field.handleChange(event.target.value)}
+              placeholder={t("brandNamePlaceholder")}
+              ref={companyInputRef}
+              value={field.state.value}
+            />
+            {attemptedSubmit && companyNameMissing ? (
+              <p
+                className="text-destructive text-sm"
+                id={`${id}-company-error`}
+              >
+                {t("brandNameRequired")}
+              </p>
+            ) : null}
+          </div>
+        )}
+      </form.Field>
 
       {prompts.length > 0 ? (
         <div className="grid gap-2" data-preview="prompts">
@@ -189,7 +214,7 @@ function VisibilityReview({
                   key={key}
                   onToggle={() => togglePrompt(key)}
                   prompt={entry.prompt}
-                  selected={!droppedKeys.has(key)}
+                  selected={!droppedKeys.includes(key)}
                 />
               );
             })}

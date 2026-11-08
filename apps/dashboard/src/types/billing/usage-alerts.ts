@@ -5,6 +5,14 @@ import type { FeatureData } from "@/types/hooks/billing";
 export type UsageAlert = UsageAlertInput;
 export type UsageAlertThresholdType = UsageAlert["thresholdType"];
 
+export interface UsageAlertFormValues {
+  featureId: string;
+  enabled: boolean;
+  name: string;
+  threshold: string;
+  thresholdType: UsageAlertThresholdType;
+}
+
 export interface UsageAlertFormProps {
   features: readonly FeatureData[];
   initialAlert?: UsageAlert;

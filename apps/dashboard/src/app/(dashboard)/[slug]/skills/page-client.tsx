@@ -34,6 +34,7 @@ import {
 import { Kbd } from "@notra/ui/components/ui/kbd";
 import { Separator } from "@notra/ui/components/ui/separator";
 import { Textarea } from "@notra/ui/components/ui/textarea";
+import { useForm } from "@tanstack/react-form";
 import { useHotkey } from "@tanstack/react-hotkeys";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
@@ -52,6 +53,8 @@ import { parseSkillFrontmatter } from "@/lib/skills/parse-frontmatter";
 import { cn } from "@/lib/utils";
 import { createSkillFormSchema } from "@/schemas/skill-form";
 import type {
+  CreateSkillFormDialogProps,
+  SkillDraftValues,
   SkillListItem,
   SkillSortKey,
   SkillSortState,
@@ -75,7 +78,6 @@ export default function PageClient({
   const tValidation = useTranslations("skills.validation");
   const queryClient = useQueryClient();
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [quickstartUrl, setQuickstartUrl] = useState("");
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState<SkillSortState>({
     key: "name",
@@ -83,14 +85,6 @@ export default function PageClient({
   });
 
   useHotkey("C", () => setDialogOpen(true), { enabled: !dialogOpen });
-
-  const [form, setForm] = useState({
-    name: "",
-    description: "",
-    content: "",
-  });
-
-  const quickstartError = skillQuickstartError(quickstartUrl);
 
   const {
     data: skills = [],
@@ -102,77 +96,6 @@ export default function PageClient({
       input: { organizationId },
     })
   );
-
-  const importMutation = useMutation({
-    mutationFn: () =>
-      dashboardOrpc.skills.importFromUrl.call({
-        url: quickstartUrl.trim(),
-      }),
-    onSuccess: (data) => {
-      setForm((f) => ({
-        name: f.name || data.name,
-        description: f.description || data.description,
-        content: f.content || data.content,
-      }));
-      toast.success(t("toasts.imported"));
-    },
-    onError: (error: Error) => {
-      toast.error(error.message);
-    },
-  });
-
-  const createMutation = useMutation({
-    mutationFn: async () => {
-      if (!organizationId) {
-        throw new Error(tCommon2("labels.organizationIdIsRequired"));
-      }
-      const parsed = createSkillFormSchema(tValidation, tCommon2).safeParse({
-        name: form.name,
-        description: form.description,
-        content: form.content,
-      });
-      if (!parsed.success) {
-        throw new Error(
-          parsed.error.issues[0]?.message ?? tValidation("invalidInput")
-        );
-      }
-      return dashboardOrpc.skills.create.call({
-        organizationId,
-        payload: parsed.data,
-      });
-    },
-    onSuccess: () => {
-      setDialogOpen(false);
-      setForm({ name: "", description: "", content: "" });
-      setQuickstartUrl("");
-      queryClient.invalidateQueries({
-        queryKey: dashboardOrpc.skills.list.queryKey({
-          input: { organizationId },
-        }),
-      });
-      toast.success(t("toasts.created"));
-    },
-    onError: (error: Error) => {
-      toast.error(error.message);
-    },
-  });
-
-  const handlePasteFrontmatter = (
-    e: React.ClipboardEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const pasted = e.clipboardData.getData("text/plain");
-    const parsed = parseSkillFrontmatter(pasted);
-    if (!parsed) {
-      return;
-    }
-
-    e.preventDefault();
-    setForm((f) => ({
-      name: f.name || (parsed.name ?? ""),
-      description: f.description || (parsed.description ?? ""),
-      content: f.content || parsed.body,
-    }));
-  };
 
   const visibleSkills = sortSkills(filterSkills(skills, search), sort);
   const searchActive = search.trim().length > 0;
@@ -212,18 +135,9 @@ export default function PageClient({
       </div>
 
       <CreateSkillFormDialog
-        createPending={createMutation.isPending}
-        form={form}
-        importPending={importMutation.isPending}
-        onFormChange={setForm}
-        onImport={() => importMutation.mutate()}
         onOpenChange={setDialogOpen}
-        onPasteFrontmatter={handlePasteFrontmatter}
-        onQuickstartUrlChange={setQuickstartUrl}
-        onSubmit={() => createMutation.mutate()}
         open={dialogOpen}
-        quickstartError={quickstartError}
-        quickstartUrl={quickstartUrl}
+        organizationId={organizationId}
       />
     </PageContainer>
   );
@@ -422,44 +336,106 @@ function SkillSortControl({
 }
 
 function CreateSkillFormDialog({
-  createPending,
-  form,
-  importPending,
-  onFormChange,
-  onImport,
   onOpenChange,
-  onPasteFrontmatter,
-  onQuickstartUrlChange,
-  onSubmit,
   open,
-  quickstartError,
-  quickstartUrl,
-}: {
-  createPending: boolean;
-  form: { name: string; description: string; content: string };
-  importPending: boolean;
-  onFormChange: React.Dispatch<
-    React.SetStateAction<{
-      name: string;
-      description: string;
-      content: string;
-    }>
-  >;
-  onImport: () => void;
-  onOpenChange: (open: boolean) => void;
-  onPasteFrontmatter: (
-    e: React.ClipboardEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => void;
-  onQuickstartUrlChange: (value: string) => void;
-  onSubmit: () => void;
-  open: boolean;
-  quickstartError: ReturnType<typeof skillQuickstartError>;
-  quickstartUrl: string;
-}) {
+  organizationId,
+}: CreateSkillFormDialogProps) {
   const t = useTranslations("skills.create");
+  const tSkills = useTranslations("skills");
   const tSkillsShared = useTranslations("skills.shared");
+  const tValidation = useTranslations("skills.validation");
   const tCommon2 = useTranslations("common");
   const tCommon = useTranslations("common.actions");
+  const queryClient = useQueryClient();
+
+  const form = useForm({
+    defaultValues: {
+      quickstartUrl: "",
+      name: "",
+      description: "",
+      content: "",
+    },
+    onSubmit: async ({ value }) => {
+      await createMutation.mutateAsync(value).catch(() => undefined);
+    },
+  });
+
+  const fillEmptyFields = (values: SkillDraftValues) => {
+    const keys: (keyof SkillDraftValues)[] = ["name", "description", "content"];
+    for (const key of keys) {
+      if (!form.getFieldValue(key)) {
+        form.setFieldValue(key, values[key]);
+      }
+    }
+  };
+
+  const importMutation = useMutation({
+    mutationFn: () =>
+      dashboardOrpc.skills.importFromUrl.call({
+        url: form.getFieldValue("quickstartUrl").trim(),
+      }),
+    onSuccess: (data) => {
+      fillEmptyFields(data);
+      toast.success(tSkills("toasts.imported"));
+    },
+    onError: (error: Error) => {
+      toast.error(error.message);
+    },
+  });
+
+  const createMutation = useMutation({
+    mutationFn: async (values: SkillDraftValues) => {
+      if (!organizationId) {
+        throw new Error(tCommon2("labels.organizationIdIsRequired"));
+      }
+      const parsed = createSkillFormSchema(tValidation, tCommon2).safeParse(
+        values
+      );
+      if (!parsed.success) {
+        throw new Error(
+          parsed.error.issues[0]?.message ?? tValidation("invalidInput")
+        );
+      }
+      return dashboardOrpc.skills.create.call({
+        organizationId,
+        payload: parsed.data,
+      });
+    },
+    onSuccess: () => {
+      onOpenChange(false);
+      form.reset();
+      queryClient.invalidateQueries({
+        queryKey: dashboardOrpc.skills.list.queryKey({
+          input: { organizationId },
+        }),
+      });
+      toast.success(tSkills("toasts.created"));
+    },
+    onError: (error: Error) => {
+      toast.error(error.message);
+    },
+  });
+
+  const onPasteFrontmatter = (
+    e: React.ClipboardEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const parsed = parseSkillFrontmatter(e.clipboardData.getData("text/plain"));
+    if (!parsed) {
+      return;
+    }
+
+    e.preventDefault();
+    fillEmptyFields({
+      name: parsed.name ?? "",
+      description: parsed.description ?? "",
+      content: parsed.body,
+    });
+  };
+
+  const createPending = createMutation.isPending;
+  const importPending = importMutation.isPending;
+  const onImport = () => importMutation.mutate();
+
   return (
     <ResponsiveDialog onOpenChange={onOpenChange} open={open}>
       <ResponsiveDialogContent className="flex max-h-[85svh] flex-col overflow-hidden sm:max-w-[32rem]">
@@ -472,60 +448,71 @@ function CreateSkillFormDialog({
           </ResponsiveDialogDescription>
         </ResponsiveDialogHeader>
         <div className="-mx-4 min-h-0 flex-1 space-y-4 overflow-y-auto px-4 py-2">
-          <Field>
-            <FieldLabel>{t("quickstart")}</FieldLabel>
-            <InputGroup className="h-9">
-              <InputGroupAddon>
-                <HugeiconsIcon
-                  className="text-muted-foreground size-4"
-                  icon={Link04Icon}
-                />
-              </InputGroupAddon>
-              <InputGroupInput
-                aria-invalid={quickstartError ? true : undefined}
-                disabled={createPending || importPending}
-                onChange={(e) => onQuickstartUrlChange(e.target.value)}
-                onKeyDown={(e) => {
-                  if (
-                    e.key === "Enter" &&
-                    !(e.metaKey || e.ctrlKey) &&
-                    !quickstartError &&
-                    quickstartUrl.trim() &&
-                    !importPending
-                  ) {
-                    e.preventDefault();
-                    onImport();
-                  }
-                }}
-                placeholder="https://skills.sh/..."
-                value={quickstartUrl}
-              />
-              <InputGroupAddon align="inline-end" className="pr-1">
-                <Button
-                  className="h-7 px-2.5"
-                  disabled={
-                    !quickstartUrl.trim() || !!quickstartError || createPending
-                  }
-                  loading={importPending}
-                  onClick={onImport}
-                  size="sm"
-                >
-                  {tCommon2("actions.import")}
-                </Button>
-              </InputGroupAddon>
-            </InputGroup>
-            <p
-              className={
-                quickstartError
-                  ? "text-destructive text-xs"
-                  : "text-muted-foreground text-xs"
-              }
-            >
-              {quickstartError
-                ? t(`quickstartErrors.${quickstartError}`)
-                : t("quickstartHint")}
-            </p>
-          </Field>
+          <form.Field name="quickstartUrl">
+            {(field) => {
+              const quickstartUrl = field.state.value;
+              const quickstartError = skillQuickstartError(quickstartUrl);
+              return (
+                <Field>
+                  <FieldLabel>{t("quickstart")}</FieldLabel>
+                  <InputGroup className="h-9">
+                    <InputGroupAddon>
+                      <HugeiconsIcon
+                        className="text-muted-foreground size-4"
+                        icon={Link04Icon}
+                      />
+                    </InputGroupAddon>
+                    <InputGroupInput
+                      aria-invalid={quickstartError ? true : undefined}
+                      disabled={createPending || importPending}
+                      onBlur={field.handleBlur}
+                      onChange={(e) => field.handleChange(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (
+                          e.key === "Enter" &&
+                          !(e.metaKey || e.ctrlKey) &&
+                          !quickstartError &&
+                          quickstartUrl.trim() &&
+                          !importPending
+                        ) {
+                          e.preventDefault();
+                          onImport();
+                        }
+                      }}
+                      placeholder="https://skills.sh/..."
+                      value={quickstartUrl}
+                    />
+                    <InputGroupAddon align="inline-end" className="pr-1">
+                      <Button
+                        className="h-7 px-2.5"
+                        disabled={
+                          !quickstartUrl.trim() ||
+                          !!quickstartError ||
+                          createPending
+                        }
+                        loading={importPending}
+                        onClick={onImport}
+                        size="sm"
+                      >
+                        {tCommon2("actions.import")}
+                      </Button>
+                    </InputGroupAddon>
+                  </InputGroup>
+                  <p
+                    className={
+                      quickstartError
+                        ? "text-destructive text-xs"
+                        : "text-muted-foreground text-xs"
+                    }
+                  >
+                    {quickstartError
+                      ? t(`quickstartErrors.${quickstartError}`)
+                      : t("quickstartHint")}
+                  </p>
+                </Field>
+              );
+            }}
+          </form.Field>
           <div className="flex items-center gap-3">
             <Separator className="flex-1" />
             <span className="text-muted-foreground text-xs tracking-wider uppercase">
@@ -533,63 +520,63 @@ function CreateSkillFormDialog({
             </span>
             <Separator className="flex-1" />
           </div>
-          <Field>
-            <FieldLabel>
-              {tCommon2("labels.name")}
-              <span className="text-destructive -ml-1">*</span>
-            </FieldLabel>
-            <Input
-              disabled={createPending}
-              onChange={(e) =>
-                onFormChange((current) => ({
-                  ...current,
-                  name: e.target.value,
-                }))
-              }
-              onPaste={onPasteFrontmatter}
-              placeholder="my-skill"
-              value={form.name}
-            />
-            <p className="text-muted-foreground text-xs">{t("nameHint")}</p>
-          </Field>
-          <Field>
-            <FieldLabel>
-              {tCommon2("labels.description")}
-              <span className="text-destructive -ml-1">*</span>
-            </FieldLabel>
-            <Textarea
-              className="max-h-[5rem] min-h-[4rem] overflow-y-auto"
-              disabled={createPending}
-              onChange={(e) =>
-                onFormChange((current) => ({
-                  ...current,
-                  description: e.target.value,
-                }))
-              }
-              onPaste={onPasteFrontmatter}
-              placeholder={t("descriptionPlaceholder")}
-              value={form.description}
-            />
-          </Field>
-          <Field>
-            <FieldLabel>
-              {tCommon2("labels.contentSingular")}
-              <span className="text-destructive -ml-1">*</span>
-            </FieldLabel>
-            <Textarea
-              className="max-h-[14rem] min-h-[10rem] overflow-y-auto font-mono text-sm"
-              disabled={createPending}
-              onChange={(e) =>
-                onFormChange((current) => ({
-                  ...current,
-                  content: e.target.value,
-                }))
-              }
-              onPaste={onPasteFrontmatter}
-              placeholder={t("contentPlaceholder")}
-              value={form.content}
-            />
-          </Field>
+          <form.Field name="name">
+            {(field) => (
+              <Field>
+                <FieldLabel>
+                  {tCommon2("labels.name")}
+                  <span className="text-destructive -ml-1">*</span>
+                </FieldLabel>
+                <Input
+                  disabled={createPending}
+                  onBlur={field.handleBlur}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                  onPaste={onPasteFrontmatter}
+                  placeholder="my-skill"
+                  value={field.state.value}
+                />
+                <p className="text-muted-foreground text-xs">{t("nameHint")}</p>
+              </Field>
+            )}
+          </form.Field>
+          <form.Field name="description">
+            {(field) => (
+              <Field>
+                <FieldLabel>
+                  {tCommon2("labels.description")}
+                  <span className="text-destructive -ml-1">*</span>
+                </FieldLabel>
+                <Textarea
+                  className="max-h-[5rem] min-h-[4rem] overflow-y-auto"
+                  disabled={createPending}
+                  onBlur={field.handleBlur}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                  onPaste={onPasteFrontmatter}
+                  placeholder={t("descriptionPlaceholder")}
+                  value={field.state.value}
+                />
+              </Field>
+            )}
+          </form.Field>
+          <form.Field name="content">
+            {(field) => (
+              <Field>
+                <FieldLabel>
+                  {tCommon2("labels.contentSingular")}
+                  <span className="text-destructive -ml-1">*</span>
+                </FieldLabel>
+                <Textarea
+                  className="max-h-[14rem] min-h-[10rem] overflow-y-auto font-mono text-sm"
+                  disabled={createPending}
+                  onBlur={field.handleBlur}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                  onPaste={onPasteFrontmatter}
+                  placeholder={t("contentPlaceholder")}
+                  value={field.state.value}
+                />
+              </Field>
+            )}
+          </form.Field>
         </div>
         <ResponsiveDialogFooter>
           <ResponsiveDialogClose
@@ -599,7 +586,7 @@ function CreateSkillFormDialog({
           <Button
             data-dialog-confirm
             disabled={createPending}
-            onClick={onSubmit}
+            onClick={() => form.handleSubmit()}
           >
             {createPending ? tCommon("creating") : tSkillsShared("createSkill")}
           </Button>

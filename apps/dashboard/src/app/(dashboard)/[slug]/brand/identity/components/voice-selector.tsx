@@ -35,6 +35,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@notra/ui/components/ui/tooltip";
+import { useForm } from "@tanstack/react-form";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useTranslations } from "use-intl";
@@ -79,29 +80,31 @@ export function VoiceSelector({
   const tCommon = useTranslations("common.actions");
   const updateMutation = useUpdateBrandSettings(organizationId);
   const [isEditDialogOpen, setEditDialogOpen] = useState(false);
-  const [identityName, setIdentityName] = useState("");
 
   const activeVoice = voices.find((v) => v.id === activeVoiceId);
 
-  const handleIdentityRename = async () => {
-    const trimmedName = identityName.trim();
+  const renameForm = useForm({
+    defaultValues: { name: "" },
+    onSubmit: async ({ value }) => {
+      const trimmedName = value.name.trim();
 
-    if (!trimmedName) {
-      toast.error(tBrandShared("enterAnIdentityName"));
-      return;
-    }
+      if (!trimmedName) {
+        toast.error(tBrandShared("enterAnIdentityName"));
+        return;
+      }
 
-    try {
-      await updateMutation.mutateAsync({
-        id: activeVoiceId,
-        name: trimmedName,
-      });
-      toast.success(t("nameUpdated"));
-      setEditDialogOpen(false);
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : t("updateFailed"));
-    }
-  };
+      try {
+        await updateMutation.mutateAsync({
+          id: activeVoiceId,
+          name: trimmedName,
+        });
+        toast.success(t("nameUpdated"));
+        setEditDialogOpen(false);
+      } catch (error) {
+        toast.error(error instanceof Error ? error.message : t("updateFailed"));
+      }
+    },
+  });
 
   const menuProps = (voice: BrandSettings) => ({
     disabled: isDeleting || isSettingDefault || isReanalyzing,
@@ -109,7 +112,7 @@ export function VoiceSelector({
     label: t("optionsLabel", { name: voice.name }),
     onEditName: () => {
       onSelect(voice.id);
-      setIdentityName(voice.name);
+      renameForm.reset({ name: voice.name }, { keepDefaultValues: true });
       setEditDialogOpen(true);
     },
     onOpen: () => {
@@ -157,7 +160,10 @@ export function VoiceSelector({
         onOpenChange={(open) => {
           setEditDialogOpen(open);
           if (!open) {
-            setIdentityName(activeVoice?.name ?? "");
+            renameForm.reset(
+              { name: activeVoice?.name ?? "" },
+              { keepDefaultValues: true }
+            );
           }
         }}
         open={isEditDialogOpen}
@@ -173,19 +179,24 @@ export function VoiceSelector({
             className="space-y-4"
             onSubmit={(event) => {
               event.preventDefault();
-              handleIdentityRename();
+              renameForm.handleSubmit();
             }}
           >
-            <div className="space-y-2">
-              <Label htmlFor="identity-name">{t("nameLabel")}</Label>
-              <Input
-                autoFocus
-                id="identity-name"
-                onChange={(event) => setIdentityName(event.target.value)}
-                placeholder={t("namePlaceholder")}
-                value={identityName}
-              />
-            </div>
+            <renameForm.Field name="name">
+              {(field) => (
+                <div className="space-y-2">
+                  <Label htmlFor="identity-name">{t("nameLabel")}</Label>
+                  <Input
+                    autoFocus
+                    id="identity-name"
+                    onBlur={field.handleBlur}
+                    onChange={(event) => field.handleChange(event.target.value)}
+                    placeholder={t("namePlaceholder")}
+                    value={field.state.value}
+                  />
+                </div>
+              )}
+            </renameForm.Field>
             <ResponsiveDialogFooter>
               <ResponsiveDialogClose
                 disabled={updateMutation.isPending}
@@ -198,14 +209,22 @@ export function VoiceSelector({
               >
                 {tCommon("cancel")}
               </ResponsiveDialogClose>
-              <Button
-                className="w-full justify-center sm:w-auto"
-                disabled={!identityName.trim() || updateMutation.isPending}
-                type="submit"
-                data-dialog-confirm
+              <renameForm.Subscribe
+                selector={(state) => Boolean(state.values.name.trim())}
               >
-                {updateMutation.isPending ? tCommon("saving") : tCommon("save")}
-              </Button>
+                {(hasName) => (
+                  <Button
+                    className="w-full justify-center sm:w-auto"
+                    disabled={!hasName || updateMutation.isPending}
+                    type="submit"
+                    data-dialog-confirm
+                  >
+                    {updateMutation.isPending
+                      ? tCommon("saving")
+                      : tCommon("save")}
+                  </Button>
+                )}
+              </renameForm.Subscribe>
             </ResponsiveDialogFooter>
           </form>
         </ResponsiveDialogContent>

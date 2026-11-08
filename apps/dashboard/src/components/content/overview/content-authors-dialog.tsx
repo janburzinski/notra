@@ -24,6 +24,7 @@ import {
 import { Input } from "@notra/ui/components/ui/input";
 import { Label } from "@notra/ui/components/ui/label";
 import { Textarea } from "@notra/ui/components/ui/textarea";
+import { useForm } from "@tanstack/react-form";
 import { useId, useRef, useState } from "react";
 import { toast } from "sonner";
 import { useTranslations } from "use-intl";
@@ -69,35 +70,33 @@ function AuthorForm({
   const id = useId();
   const fileRef = useRef<HTMLInputElement>(null);
   const { create, update } = useContentAuthors(organizationId);
-  const [draft, setDraft] = useState(() => toDraft(author));
   const slugEdited = useRef(Boolean(author));
   const [uploading, setUploading] = useState(false);
-  const set = (patch: Partial<ContentAuthorDraft>) =>
-    setDraft((current) => ({ ...current, ...patch }));
-  const pending = create.isPending || update.isPending;
-
-  const submit = async () => {
-    const parsed = contentAuthorFieldsSchema.safeParse(draft);
-    if (!parsed.success) {
-      toast.error(parsed.error.issues[0]?.message ?? t("saveFailed"));
-      return;
-    }
-    try {
-      if (author) {
-        await update.mutateAsync({
-          organizationId,
-          authorId: author.id,
-          author: parsed.data,
-        });
-      } else {
-        await create.mutateAsync({ organizationId, author: parsed.data });
+  const form = useForm({
+    defaultValues: toDraft(author),
+    onSubmit: async ({ value }) => {
+      const parsed = contentAuthorFieldsSchema.safeParse(value);
+      if (!parsed.success) {
+        toast.error(parsed.error.issues[0]?.message ?? t("saveFailed"));
+        return;
       }
-      toast.success(t("saved"));
-      onDone();
-    } catch (error) {
-      toast.error(toErrorMessage(error, t("saveFailed")));
-    }
-  };
+      try {
+        if (author) {
+          await update.mutateAsync({
+            organizationId,
+            authorId: author.id,
+            author: parsed.data,
+          });
+        } else {
+          await create.mutateAsync({ organizationId, author: parsed.data });
+        }
+        toast.success(t("saved"));
+        onDone();
+      } catch (error) {
+        toast.error(toErrorMessage(error, t("saveFailed")));
+      }
+    },
+  });
 
   const uploadAvatar = async (file: File | undefined) => {
     if (!file?.type.startsWith("image/")) {
@@ -106,7 +105,7 @@ function AuthorForm({
     setUploading(true);
     try {
       const { url } = await uploadContentMedia(file, "image", t("saveFailed"));
-      set({ avatarUrl: url });
+      form.setFieldValue("avatarUrl", url);
     } catch (error) {
       toast.error(toErrorMessage(error, t("saveFailed")));
     }
@@ -118,14 +117,23 @@ function AuthorForm({
       className="space-y-4"
       onSubmit={(event) => {
         event.preventDefault();
-        void submit();
+        void form.handleSubmit();
       }}
     >
       <div className="flex items-center gap-3">
-        <ContentAuthorAvatar
-          author={{ name: draft.name || "?", avatarUrl: draft.avatarUrl }}
-          className="size-12"
-        />
+        <form.Subscribe
+          selector={(state) => ({
+            name: state.values.name,
+            avatarUrl: state.values.avatarUrl,
+          })}
+        >
+          {({ name, avatarUrl }) => (
+            <ContentAuthorAvatar
+              author={{ name: name || "?", avatarUrl }}
+              className="size-12"
+            />
+          )}
+        </form.Subscribe>
         <input
           accept="image/*"
           aria-label={t("uploadAvatar")}
@@ -147,100 +155,135 @@ function AuthorForm({
         >
           {t("uploadAvatar")}
         </Button>
-        {draft.avatarUrl ? (
-          <Button
-            onClick={() => set({ avatarUrl: null })}
-            size="sm"
-            type="button"
-            variant="ghost"
-          >
-            {t("removeAvatar")}
-          </Button>
-        ) : null}
+        <form.Field name="avatarUrl">
+          {(field) =>
+            field.state.value ? (
+              <Button
+                onClick={() => field.handleChange(null)}
+                size="sm"
+                type="button"
+                variant="ghost"
+              >
+                {t("removeAvatar")}
+              </Button>
+            ) : null
+          }
+        </form.Field>
       </div>
       <div className="grid grid-cols-2 gap-3">
-        <div className="space-y-1.5">
-          <Label htmlFor={`${id}-name`}>{t("name")}</Label>
-          <Input
-            autoFocus
-            id={`${id}-name`}
-            maxLength={CONTENT_AUTHOR_NAME_MAX_LENGTH}
-            onChange={(event) => {
-              const name = event.target.value;
-              set(
-                slugEdited.current
-                  ? { name }
-                  : { name, slug: authorSlugBase(name) }
-              );
-            }}
-            required
-            value={draft.name}
-          />
-        </div>
-        <div className="space-y-1.5">
-          <Label htmlFor={`${id}-title`}>{t("role")}</Label>
-          <Input
-            id={`${id}-title`}
-            maxLength={CONTENT_AUTHOR_TITLE_MAX_LENGTH}
-            onChange={(event) => set({ title: event.target.value })}
-            value={draft.title}
-          />
-        </div>
-      </div>
-      <div className="space-y-1.5">
-        <Label htmlFor={`${id}-slug`}>{t("slug")}</Label>
-        <Input
-          className="font-mono text-xs"
-          id={`${id}-slug`}
-          maxLength={CONTENT_AUTHOR_SLUG_MAX_LENGTH}
-          onChange={(event) => {
-            slugEdited.current = true;
-            set({ slug: event.target.value.toLowerCase() });
+        <form.Field
+          listeners={{
+            onChange: ({ value }) => {
+              if (!slugEdited.current) {
+                form.setFieldValue("slug", authorSlugBase(value));
+              }
+            },
           }}
-          required
-          value={draft.slug}
-        />
-        <p className="text-muted-foreground text-xs">
-          {t("slugHint", { slug: draft.slug || "…" })}
-        </p>
+          name="name"
+        >
+          {(field) => (
+            <div className="space-y-1.5">
+              <Label htmlFor={`${id}-name`}>{t("name")}</Label>
+              <Input
+                autoFocus
+                id={`${id}-name`}
+                maxLength={CONTENT_AUTHOR_NAME_MAX_LENGTH}
+                onBlur={field.handleBlur}
+                onChange={(event) => field.handleChange(event.target.value)}
+                required
+                value={field.state.value}
+              />
+            </div>
+          )}
+        </form.Field>
+        <form.Field name="title">
+          {(field) => (
+            <div className="space-y-1.5">
+              <Label htmlFor={`${id}-title`}>{t("role")}</Label>
+              <Input
+                id={`${id}-title`}
+                maxLength={CONTENT_AUTHOR_TITLE_MAX_LENGTH}
+                onBlur={field.handleBlur}
+                onChange={(event) => field.handleChange(event.target.value)}
+                value={field.state.value}
+              />
+            </div>
+          )}
+        </form.Field>
       </div>
-      <div className="space-y-1.5">
-        <Label htmlFor={`${id}-bio`}>{t("bio")}</Label>
-        <Textarea
-          className="min-h-16 resize-none"
-          id={`${id}-bio`}
-          maxLength={CONTENT_AUTHOR_BIO_MAX_LENGTH}
-          onChange={(event) => set({ bio: event.target.value })}
-          value={draft.bio}
-        />
-      </div>
-      <div className="grid grid-cols-2 gap-3">
-        {CONTENT_AUTHOR_LINK_FIELDS.map((field) => (
-          <div className="space-y-1.5" key={field}>
-            <Label htmlFor={`${id}-${field}`}>
-              {t(field === "url" ? "website" : field)}
-            </Label>
+      <form.Field name="slug">
+        {(field) => (
+          <div className="space-y-1.5">
+            <Label htmlFor={`${id}-slug`}>{t("slug")}</Label>
             <Input
-              id={`${id}-${field}`}
-              inputMode="url"
-              onChange={(event) => set({ [field]: event.target.value })}
-              placeholder="https://"
-              value={draft[field]}
+              className="font-mono text-xs"
+              id={`${id}-slug`}
+              maxLength={CONTENT_AUTHOR_SLUG_MAX_LENGTH}
+              onBlur={field.handleBlur}
+              onChange={(event) => {
+                slugEdited.current = true;
+                field.handleChange(event.target.value.toLowerCase());
+              }}
+              required
+              value={field.state.value}
+            />
+            <p className="text-muted-foreground text-xs">
+              {t("slugHint", { slug: field.state.value || "…" })}
+            </p>
+          </div>
+        )}
+      </form.Field>
+      <form.Field name="bio">
+        {(field) => (
+          <div className="space-y-1.5">
+            <Label htmlFor={`${id}-bio`}>{t("bio")}</Label>
+            <Textarea
+              className="min-h-16 resize-none"
+              id={`${id}-bio`}
+              maxLength={CONTENT_AUTHOR_BIO_MAX_LENGTH}
+              onBlur={field.handleBlur}
+              onChange={(event) => field.handleChange(event.target.value)}
+              value={field.state.value}
             />
           </div>
+        )}
+      </form.Field>
+      <div className="grid grid-cols-2 gap-3">
+        {CONTENT_AUTHOR_LINK_FIELDS.map((linkField) => (
+          <form.Field key={linkField} name={linkField}>
+            {(field) => (
+              <div className="space-y-1.5">
+                <Label htmlFor={`${id}-${linkField}`}>
+                  {t(linkField === "url" ? "website" : linkField)}
+                </Label>
+                <Input
+                  id={`${id}-${linkField}`}
+                  inputMode="url"
+                  onBlur={field.handleBlur}
+                  onChange={(event) => field.handleChange(event.target.value)}
+                  placeholder="https://"
+                  value={field.state.value}
+                />
+              </div>
+            )}
+          </form.Field>
         ))}
       </div>
       <ResponsiveDialogFooter>
         <Button onClick={onDone} type="button" variant="ghost">
           {t("back")}
         </Button>
-        <Button
-          data-dialog-confirm
-          disabled={pending || uploading}
-          type="submit"
-        >
-          {t("save")}
-        </Button>
+        <form.Subscribe selector={(state) => state.isSubmitting}>
+          {(isSubmitting) => (
+            <Button
+              data-dialog-confirm
+              disabled={isSubmitting || uploading}
+              type="submit"
+            >
+              {t("save")}
+            </Button>
+          )}
+        </form.Subscribe>
       </ResponsiveDialogFooter>
     </form>
   );

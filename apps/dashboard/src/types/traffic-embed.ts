@@ -34,3 +34,7 @@ export interface PublicTrafficEmbed {
 export type TrafficEmbedOriginResult =
   | { ok: true; origin: string }
   | { ok: false; value: string };
+
+export interface TrafficEmbedCreateFormValues {
+  origins: string[];
+}

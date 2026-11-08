@@ -1,5 +1,6 @@
 "use client";
 
+import { useForm, useStore } from "@tanstack/react-form";
 import { useState } from "react";
 import { useTranslations } from "use-intl";
 
@@ -47,28 +48,30 @@ export function SiteSettingsEditor({
 }: SiteSettingsEditorProps) {
   const { site } = useSite().detail;
   const [base] = useState(site);
-  const [form, setForm] = useState<SiteSettingsForm>(() =>
-    siteSettingsFormFromSite(base)
-  );
   const save = useUpdateSiteSettings({ onSaved: onDone });
-  const patch = siteSettingsPatch(form, base);
-  const canSave =
-    Object.keys(patch).length > 0 &&
-    (isValid?.(form) ?? true) &&
+  const canSaveValues = (values: SiteSettingsForm) =>
+    Object.keys(siteSettingsPatch(values, base)).length > 0 &&
+    (isValid?.(values) ?? true) &&
     !save.isPending;
+  const form = useForm({
+    defaultValues: siteSettingsFormFromSite(base),
+    onSubmit: ({ value }) => {
+      if (canSaveValues(value)) {
+        save.mutate(siteSettingsPatch(value, base));
+      }
+    },
+  });
+  const values = useStore(form.store, (state) => state.values);
+  const canSave = canSaveValues(values);
 
   return (
-    <form
-      className="space-y-4"
-      action={() => {
-        if (canSave) {
-          save.mutate(patch);
-        }
-      }}
-    >
+    <form className="space-y-4" action={() => form.handleSubmit()}>
       <fieldset className="max-w-xl space-y-4" disabled={save.isPending}>
-        {children(form, (key, value) =>
-          setForm((current) => ({ ...current, [key]: value }))
+        {children(values, (key, value) =>
+          form.reset(
+            { ...form.state.values, [key]: value },
+            { keepDefaultValues: true }
+          )
         )}
       </fieldset>
       <SiteSettingsEditorFooter

@@ -12,6 +12,7 @@ import { Input } from "@notra/ui/components/ui/input";
 import { Spinner } from "@notra/ui/components/ui/spinner";
 import { Tabs, TabsList, TabsTrigger } from "@notra/ui/components/ui/tabs";
 import { cn } from "@notra/ui/lib/utils";
+import { useForm } from "@tanstack/react-form";
 import { useId, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { useTranslations } from "use-intl";
@@ -36,12 +37,26 @@ export function OverviewCoverField({ api, markdown }: OverviewCoverFieldProps) {
   const [source, setSource] = useState<CoverSource>("upload");
   const [dragging, setDragging] = useState(false);
   const [uploading, setUploading] = useState(false);
-  const [link, setLink] = useState("");
   const postImages = useMemo(
     () => coverCandidatesInMarkdown(markdown),
     [markdown]
   );
   const cover = api.metadata.coverImage;
+  const linkForm = useForm({
+    defaultValues: { link: "" },
+    onSubmit: ({ value, formApi }) => {
+      const parsed = postCoverImageSchema.safeParse({
+        url: value.link,
+        alt: "",
+      });
+      if (!(parsed.success && parsed.data.url.startsWith("https://"))) {
+        toast.error(t("linkInvalid"));
+        return;
+      }
+      api.update({ coverImage: parsed.data });
+      formApi.reset();
+    },
+  });
 
   const upload = async (file: File | undefined) => {
     if (!file?.type.startsWith("image/")) {
@@ -138,16 +153,6 @@ export function OverviewCoverField({ api, markdown }: OverviewCoverFieldProps) {
     );
   }
 
-  const applyLink = () => {
-    const parsed = postCoverImageSchema.safeParse({ url: link, alt: "" });
-    if (!(parsed.success && parsed.data.url.startsWith("https://"))) {
-      toast.error(t("linkInvalid"));
-      return;
-    }
-    api.update({ coverImage: parsed.data });
-    setLink("");
-  };
-
   return (
     <div className="space-y-2">
       {fileInput}
@@ -214,19 +219,30 @@ export function OverviewCoverField({ api, markdown }: OverviewCoverFieldProps) {
           className="flex gap-2"
           onSubmit={(event) => {
             event.preventDefault();
-            applyLink();
+            void linkForm.handleSubmit();
           }}
         >
-          <Input
-            aria-label={t("link")}
-            inputMode="url"
-            onChange={(event) => setLink(event.target.value)}
-            placeholder={t("linkPlaceholder")}
-            value={link}
-          />
-          <Button disabled={!link.trim()} type="submit" variant="secondary">
-            {t("linkApply")}
-          </Button>
+          <linkForm.Field name="link">
+            {(field) => (
+              <>
+                <Input
+                  aria-label={t("link")}
+                  inputMode="url"
+                  onBlur={field.handleBlur}
+                  onChange={(event) => field.handleChange(event.target.value)}
+                  placeholder={t("linkPlaceholder")}
+                  value={field.state.value}
+                />
+                <Button
+                  disabled={!field.state.value.trim()}
+                  type="submit"
+                  variant="secondary"
+                >
+                  {t("linkApply")}
+                </Button>
+              </>
+            )}
+          </linkForm.Field>
         </form>
       ) : null}
       {source === "post" ? (

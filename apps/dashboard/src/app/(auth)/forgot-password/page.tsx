@@ -2,6 +2,7 @@
 
 import { Input } from "@notra/ui/components/ui/input";
 import { Label } from "@notra/ui/components/ui/label";
+import { useForm } from "@tanstack/react-form";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useTranslations } from "use-intl";
@@ -14,28 +15,22 @@ export default function ForgotPassword() {
   const t = useTranslations("auth.forgotPassword");
   const tAuthShared = useTranslations("auth.shared");
   const tCommon = useTranslations("common");
-  const [isLoading, setIsLoading] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-    const email = formData.get("email") as string;
-
-    if (!email || isLoading) {
-      return;
-    }
-
-    setIsLoading(true);
-
-    try {
-      await forgotPasswordAction({ email });
-      setIsSubmitted(true);
-    } catch {
-      toast.error(tAuthShared("networkErrorPleaseCheckYour"));
-    }
-    setIsLoading(false);
-  }
+  const form = useForm({
+    defaultValues: { email: "" },
+    onSubmit: async ({ value }) => {
+      if (!value.email) {
+        return;
+      }
+      try {
+        await forgotPasswordAction({ email: value.email });
+        setIsSubmitted(true);
+      } catch {
+        toast.error(tAuthShared("networkErrorPleaseCheckYour"));
+      }
+    },
+  });
 
   if (isSubmitted) {
     return (
@@ -79,26 +74,48 @@ export default function ForgotPassword() {
         <p className="text-muted-foreground text-sm">{t("description")}</p>
       </div>
 
-      <form onSubmit={handleSubmit}>
-        <div className="grid gap-3">
-          <div className="grid gap-1">
-            <Label className="sr-only" htmlFor="email">
-              {tCommon("labels.email")}
-            </Label>
-            <Input
-              autoComplete="email"
-              disabled={isLoading}
-              id="email"
-              name="email"
-              placeholder={tCommon("labels.email")}
-              required
-              type="email"
-            />
-          </div>
-        </div>
-        <Button className="mt-4 w-full" disabled={isLoading} type="submit">
-          {isLoading ? tCommon("labels.sending") : t("submit")}
-        </Button>
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          form.handleSubmit();
+        }}
+      >
+        <form.Subscribe selector={(state) => state.isSubmitting}>
+          {(isLoading) => (
+            <>
+              <div className="grid gap-3">
+                <form.Field name="email">
+                  {(field) => (
+                    <div className="grid gap-1">
+                      <Label className="sr-only" htmlFor={field.name}>
+                        {tCommon("labels.email")}
+                      </Label>
+                      <Input
+                        autoComplete="email"
+                        disabled={isLoading}
+                        id={field.name}
+                        name={field.name}
+                        onBlur={field.handleBlur}
+                        onChange={(e) => field.handleChange(e.target.value)}
+                        placeholder={tCommon("labels.email")}
+                        required
+                        type="email"
+                        value={field.state.value}
+                      />
+                    </div>
+                  )}
+                </form.Field>
+              </div>
+              <Button
+                className="mt-4 w-full"
+                disabled={isLoading}
+                type="submit"
+              >
+                {isLoading ? tCommon("labels.sending") : t("submit")}
+              </Button>
+            </>
+          )}
+        </form.Subscribe>
       </form>
 
       <div className="text-muted-foreground px-8 text-center text-xs">

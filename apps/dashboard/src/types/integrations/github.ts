@@ -339,15 +339,6 @@ export interface GitHubDirectoryRootContentProps {
   rootDirectories: GitHubDirectoryEntry[];
 }
 
-export interface GitHubDirectoryNewFolderFieldProps {
-  error: string | null;
-  inputId: string;
-  name: string;
-  onNameChange: (value: string) => void;
-  onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
-  selectedDirectory: string;
-}
-
 export interface GitHubDirectoryNodeStatusProps {
   depth: number;
   exists: boolean | undefined;

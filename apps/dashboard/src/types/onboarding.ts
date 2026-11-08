@@ -409,3 +409,8 @@ export interface OnboardingConnectPreviewProps {
   client: OnboardingConnectClient;
   companyName: string;
 }
+
+export interface VisibilityReviewFormValues {
+  companyName: string;
+  droppedKeys: string[];
+}

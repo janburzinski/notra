@@ -14,7 +14,8 @@ import {
 } from "@notra/ui/components/shared/responsive-dialog";
 import { Label } from "@notra/ui/components/ui/label";
 import { Textarea } from "@notra/ui/components/ui/textarea";
-import { useId, useState } from "react";
+import { useForm } from "@tanstack/react-form";
+import { useId } from "react";
 import { useTranslations } from "use-intl";
 
 import { Button } from "@/components/button";
@@ -31,20 +32,26 @@ export function PersonaAddDialog({
   const tCommon2 = useTranslations("common");
   const tCommon = useTranslations("common.actions");
   const id = useId();
-  const [brief, setBrief] = useState("");
+  const form = useForm({
+    defaultValues: { brief: "" },
+    onSubmit: async ({ value, formApi }) => {
+      const brief = value.brief.trim();
+      if (!brief || isPending || atLimit) {
+        return;
+      }
+      if (await onSubmit(brief)) {
+        formApi.reset();
+      }
+    },
+  });
   return (
     <ResponsiveDialog open={open} onOpenChange={onOpenChange}>
       <ResponsiveDialogContent className="sm:max-w-md">
         <form
           className="flex flex-col gap-4"
-          onSubmit={async (event) => {
+          onSubmit={(event) => {
             event.preventDefault();
-            if (!brief.trim() || isPending || atLimit) {
-              return;
-            }
-            if (await onSubmit(brief.trim())) {
-              setBrief("");
-            }
+            form.handleSubmit();
           }}
         >
           <ResponsiveDialogHeader>
@@ -55,16 +62,21 @@ export function PersonaAddDialog({
           </ResponsiveDialogHeader>
           <div className="flex flex-col gap-3">
             <Label htmlFor={id}>{t("label")}</Label>
-            <Textarea
-              id={id}
-              value={brief}
-              onChange={(event) => setBrief(event.target.value)}
-              required
-              maxLength={GEO_PERSONA_BRIEF_MAX_LENGTH}
-              disabled={isPending}
-              placeholder={t("placeholder")}
-              className="max-h-80 min-h-28 resize-none overflow-y-auto"
-            />
+            <form.Field name="brief">
+              {(field) => (
+                <Textarea
+                  id={id}
+                  value={field.state.value}
+                  onBlur={field.handleBlur}
+                  onChange={(event) => field.handleChange(event.target.value)}
+                  required
+                  maxLength={GEO_PERSONA_BRIEF_MAX_LENGTH}
+                  disabled={isPending}
+                  placeholder={t("placeholder")}
+                  className="max-h-80 min-h-28 resize-none overflow-y-auto"
+                />
+              )}
+            </form.Field>
             {atLimit ? (
               <p className="text-destructive text-sm" role="alert">
                 {t("limitReached", { max: GEO_PERSONA_MAX_COUNT })}

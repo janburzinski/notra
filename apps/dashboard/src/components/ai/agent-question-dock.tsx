@@ -4,6 +4,7 @@ import { COMPOSER_ELEVATED_SHADOW } from "@notra/ui/constants/composer";
 import { useIsApplePlatform } from "@notra/ui/hooks/use-is-apple-platform";
 import { tween } from "@notra/ui/lib/motion";
 import { cn } from "@notra/ui/lib/utils";
+import { useForm, useStore } from "@tanstack/react-form";
 import { domAnimation, LazyMotion, m, useReducedMotion } from "motion/react";
 import { useEffect, useEffectEvent, useId, useRef, useState } from "react";
 import { useTranslations } from "use-intl";
@@ -18,7 +19,7 @@ import {
 } from "@/constants/agent-questions";
 import { useAnimatedSize } from "@/lib/hooks/use-animated-size";
 import type {
-  AgentQuestionAnswer,
+  AgentQuestionDockValues,
   AgentQuestionFooterProps,
   AgentQuestionProgressProps,
   AgentQuestionDockProps,
@@ -284,6 +285,14 @@ function QuestionFooter({
   );
 }
 
+function answersOf(values: AgentQuestionDockValues, index: number) {
+  const own = values.custom[index]?.trim() ?? "";
+  return [
+    ...(values.picked[index] ?? []),
+    ...(values.customOn[index] && own ? [own] : []),
+  ];
+}
+
 /**
  * The agent's questions, shown where the chat input was: pick an option or
  * write your own, step through several, then submit. Every question is laid
@@ -303,12 +312,20 @@ export function AgentQuestionDock({
   // The panel takes the height of the question on show, smoothly.
   const { ref: contentRef, size } = useAnimatedSize();
   const [tab, setTab] = useState(0);
-  const [picked, setPicked] = useState<AgentQuestionAnswer[]>(() =>
-    questions.map(() => [])
-  );
-  const [custom, setCustom] = useState<string[]>(() => questions.map(() => ""));
-  const [customOn, setCustomOn] = useState<boolean[]>(() =>
-    questions.map(() => false)
+  const defaultValues: AgentQuestionDockValues = {
+    picked: questions.map(() => []),
+    custom: questions.map(() => ""),
+    customOn: questions.map(() => false),
+  };
+  const form = useForm({
+    defaultValues,
+    onSubmit: ({ value }) => {
+      onSubmit(questions.map((_, index) => answersOf(value, index)));
+    },
+  });
+  const { picked, custom, customOn } = useStore(
+    form.store,
+    (state) => state.values
   );
   const sectionRef = useRef<HTMLElement | null>(null);
   const rowsRef = useRef<(HTMLElement | null)[]>([]);
@@ -321,11 +338,8 @@ export function AgentQuestionDock({
   const last = tab >= total - 1;
   const options = question?.options ?? [];
 
-  const answersFor = (index: number) => {
-    const own = custom[index]?.trim() ?? "";
-    return [...(picked[index] ?? []), ...(customOn[index] && own ? [own] : [])];
-  };
-  const answered = (index: number) => answersFor(index).length > 0;
+  const answered = (index: number) =>
+    answersOf({ picked, custom, customOn }, index).length > 0;
   const anyAnswered = questions.some((_, index) => answered(index));
 
   // Arriving questions take the keyboard from the input they replace, but
@@ -339,14 +353,6 @@ export function AgentQuestionDock({
   }, []);
 
   useEffect(() => () => window.clearTimeout(advanceTimerRef.current), []);
-
-  const update = <T,>(
-    setter: (updater: (current: T[]) => T[]) => void,
-    value: T
-  ) =>
-    setter((current) =>
-      current.map((item, index) => (index === tab ? value : item))
-    );
 
   // The panel keeps the keyboard (numbers, arrows, ⌘↵) without drawing a
   // focus ring on an answer nobody chose.
@@ -365,16 +371,16 @@ export function AgentQuestionDock({
   const pick = (label: string) => {
     const current = picked[tab] ?? [];
     if (multiple) {
-      update(
-        setPicked,
+      form.setFieldValue(
+        `picked[${tab}]`,
         current.includes(label)
           ? current.filter((item) => item !== label)
           : [...current, label]
       );
       return;
     }
-    update(setPicked, [label]);
-    update(setCustomOn, false);
+    form.setFieldValue(`picked[${tab}]`, [label]);
+    form.setFieldValue(`customOn[${tab}]`, false);
     // A pick-one question needs one answer, so it moves on once the pick has
     // shown. The last one waits for Submit.
     if (!last) {
@@ -390,9 +396,9 @@ export function AgentQuestionDock({
 
   const chooseOwnAnswer = () => {
     window.clearTimeout(advanceTimerRef.current);
-    update(setCustomOn, true);
+    form.setFieldValue(`customOn[${tab}]`, true);
     if (!multiple) {
-      update(setPicked, []);
+      form.setFieldValue(`picked[${tab}]`, []);
     }
     customInputRef.current?.focus();
   };
@@ -400,7 +406,7 @@ export function AgentQuestionDock({
   /** In a pick-many question, your own answer checks and unchecks like the rest. */
   const toggleOwnAnswer = () => {
     if (multiple && customOn[tab]) {
-      update(setCustomOn, false);
+      form.setFieldValue(`customOn[${tab}]`, false);
       return;
     }
     chooseOwnAnswer();
@@ -413,7 +419,7 @@ export function AgentQuestionDock({
     }
     if (anyAnswered) {
       window.clearTimeout(advanceTimerRef.current);
-      onSubmit(questions.map((_, index) => answersFor(index)));
+      void form.handleSubmit();
     }
   };
 
@@ -517,11 +523,11 @@ export function AgentQuestionDock({
                   key={item.question}
                   onChooseOwnAnswer={chooseOwnAnswer}
                   onOwnAnswerChange={(value) => {
-                    update(setCustom, value);
+                    form.setFieldValue(`custom[${tab}]`, value);
                     if (!customOn[tab]) {
-                      update(setCustomOn, true);
+                      form.setFieldValue(`customOn[${tab}]`, true);
                       if (!multiple) {
-                        update(setPicked, []);
+                        form.setFieldValue(`picked[${tab}]`, []);
                       }
                     }
                   }}

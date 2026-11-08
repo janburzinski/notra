@@ -1,10 +1,16 @@
+import type { EventTriggerFormValues } from "@notra/schemas/dashboard/automation/event-trigger-form";
+
 import type { useEventTriggerForm } from "@/lib/hooks/use-event-trigger-form";
 import type { EventTriggerPreset } from "@/types/automation/automations";
 import type { SourceOption } from "@/types/automation/source-picker";
 import type { BrandSettings } from "@/types/hooks/brand-analysis";
 import type { Trigger } from "@/types/triggers/triggers";
 
-export type { EventTriggerFormValues } from "@notra/schemas/dashboard/automation/event-trigger-form";
+export type { EventTriggerFormValues };
+
+export type EventTriggerEditorValues = EventTriggerFormValues & {
+  enabled: boolean;
+};
 
 export interface EventTriggerFormProps {
   organizationId: string;
@@ -37,7 +43,6 @@ export interface IgnoreCommitPatternsFieldProps {
 export interface UseEventTriggerFormProps {
   organizationId: string;
   editTrigger?: Trigger;
-  enabled: boolean;
   open: boolean;
   preset?: EventTriggerPreset | null;
   onSuccess?: (trigger: Trigger) => void;

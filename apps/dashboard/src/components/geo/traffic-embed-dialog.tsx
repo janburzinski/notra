@@ -21,6 +21,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@notra/ui/components/ui/select";
+import { useForm, useStore } from "@tanstack/react-form";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useId, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -41,6 +42,7 @@ import { useGeoTrafficHostQuery } from "@/lib/hooks/use-geo-traffic-host";
 import { useIsClient } from "@/lib/hooks/use-is-client";
 import { dashboardOrpc } from "@/lib/orpc/query";
 import type {
+  TrafficEmbedCreateFormValues,
   TrafficEmbedPart,
   TrafficEmbedRange,
   TrafficEmbedSummary,
@@ -346,10 +348,8 @@ function CreateEmbedForm({
   const queryClient = useQueryClient();
   const { projectId } = useGeoProjectScope();
   const [host] = useGeoTrafficHostQuery();
-  const [origins, setOrigins] = useState<string[]>([]);
-
   const create = useMutation({
-    mutationFn: () =>
+    mutationFn: (origins: string[]) =>
       dashboardOrpc.trafficEmbeds.create.call({
         organizationId,
         ...(projectId ? { projectId } : {}),
@@ -366,20 +366,28 @@ function CreateEmbedForm({
     },
     onError: (error) => toast.error(toErrorMessage(error, t("createFailed"))),
   });
+  const defaultValues: TrafficEmbedCreateFormValues = { origins: [] };
+  const form = useForm({
+    defaultValues,
+    onSubmit: ({ value }) => {
+      if (value.origins.length > 0 && !create.isPending) {
+        create.mutate(value.origins);
+      }
+    },
+  });
+  const origins = useStore(form.store, (state) => state.values.origins);
 
   return (
     <form
       className="flex flex-col gap-4"
       onSubmit={(event) => {
         event.preventDefault();
-        if (origins.length > 0 && !create.isPending) {
-          create.mutate();
-        }
+        form.handleSubmit();
       }}
     >
       <OriginsField
         disabled={create.isPending}
-        onChange={setOrigins}
+        onChange={(next) => form.setFieldValue("origins", next)}
         values={origins}
       />
       <p className="text-muted-foreground text-sm">

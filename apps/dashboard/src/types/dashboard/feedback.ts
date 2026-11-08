@@ -1,4 +1,4 @@
-export type FeedbackSentiment = "sad_crying" | "sad" | "happy" | "excited";
+type FeedbackSentiment = "sad_crying" | "sad" | "happy" | "excited";
 
 export interface FeedbackSentimentOption {
   value: FeedbackSentiment;
@@ -14,4 +14,9 @@ export interface FeedbackContextValue {
 export interface FeedbackFormProps {
   onSubmitted?: () => void;
   autoFocus?: boolean;
+}
+
+export interface FeedbackFormValues {
+  message: string;
+  sentiment: FeedbackSentiment | null;
 }

@@ -7,6 +7,15 @@ import type { ReactNode } from "react";
 
 import type { GeoAlertPreset } from "@/types/automation/automations";
 
+export interface GeoAlertFormValues {
+  signal: GeoAlertSignal;
+  threshold: number | undefined;
+  projectId: string;
+  selection: Partial<GeoAlertActions>;
+  name: string;
+  enabled: boolean;
+}
+
 export interface GeoAlertFormProps {
   organizationId: string;
   organizationSlug: string;

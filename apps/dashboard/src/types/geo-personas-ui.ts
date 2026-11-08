@@ -1,4 +1,7 @@
-import type { GeoPersonaMemoryKind } from "@notra/db/types/geo-personas";
+import type {
+  GeoPersonaMemoryKind,
+  GeoPersonaProfile,
+} from "@notra/db/types/geo-personas";
 import type {
   GeoPersona,
   GeoPersonaMemory,
@@ -90,6 +93,16 @@ export interface PersonaPromptsProps {
 export interface PersonaProfileEditorProps extends PersonaProfileProps {
   organizationId: string;
   onCancel: () => void;
+}
+
+export interface PersonaProfileFormValues {
+  name: string;
+  role: string;
+  company: string;
+  summary: string;
+  searchStyle: string;
+  sections: Record<Exclude<keyof GeoPersonaProfile, "currentStack">, string>;
+  currentStack: string[];
 }
 
 /** Memories of one kind, ready to render as a labelled group. */

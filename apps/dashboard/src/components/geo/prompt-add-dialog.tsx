@@ -32,6 +32,7 @@ import {
   TabsList,
   TabsTrigger,
 } from "@notra/ui/components/ui/tabs";
+import { useForm, useStore } from "@tanstack/react-form";
 import { type FormEvent, useId, useRef, useState } from "react";
 import { useTranslations } from "use-intl";
 
@@ -40,7 +41,11 @@ import { PromptKeywordTextarea } from "@/components/geo/prompt-keyword-textarea"
 import { useGeoGenerateFromWebsite, useGscKeywords } from "@/lib/hooks/use-geo";
 import { useGeoPromptsDb } from "@/lib/hooks/use-geo-db";
 import { cn } from "@/lib/utils";
-import type { PromptAddDialogProps, PromptAddMode } from "@/types/geo";
+import type {
+  PromptAddDialogProps,
+  PromptAddFormValues,
+  PromptAddMode,
+} from "@/types/geo";
 
 function toPromptAddMode(value: string): PromptAddMode {
   return value === "website" ? "website" : "write";
@@ -71,12 +76,37 @@ export function PromptAddDialog({
   const promptRef = useRef<HTMLTextAreaElement>(null);
   const urlRef = useRef<HTMLInputElement>(null);
   const [mode, setMode] = useState<PromptAddMode>("write");
-  const [draft, setDraft] = useState("");
-  const [url, setUrl] = useState("");
+  const defaultValues: PromptAddFormValues = { draft: "", url: "" };
   const { addPrompt } = useGeoPromptsDb(organizationId, { enabled: open });
   const generate = useGeoGenerateFromWebsite(organizationId);
   const { data: searchConsoleData } = useGscKeywords(organizationId, open);
   const searchConsoleKeywords = searchConsoleData?.keywords ?? [];
+
+  const close = () => onOpenChange(false);
+  const form = useForm({
+    defaultValues,
+    onSubmit: ({ value }) => {
+      if (mode === "website") {
+        const target = normalizeWebsiteUrl(value.url);
+        if (!target || generate.isPending) {
+          return;
+        }
+        generate.mutate({ url: target }, { onSuccess: close });
+        return;
+      }
+      const prompt = value.draft.trim();
+      if (
+        prompt.length < GEO_PROMPT_MIN_LENGTH ||
+        prompt.length > GEO_PROMPT_MAX_LENGTH
+      ) {
+        return;
+      }
+      addPrompt(prompt);
+      close();
+    },
+  });
+  const draft = useStore(form.store, (state) => state.values.draft);
+  const url = useStore(form.store, (state) => state.values.url);
 
   const trimmed = draft.trim();
   const remainingToMin = GEO_PROMPT_MIN_LENGTH - trimmed.length;
@@ -88,36 +118,14 @@ export function PromptAddDialog({
   const canGenerate = normalizedUrl !== null && !busy;
   const writeMode = mode === "write";
 
-  const close = () => onOpenChange(false);
-
   const reset = () => {
     setMode("write");
-    setDraft("");
-    setUrl("");
-  };
-
-  const handleAdd = () => {
-    if (!canAdd) {
-      return;
-    }
-    addPrompt(trimmed);
-    close();
-  };
-
-  const handleGenerate = () => {
-    if (!normalizedUrl || !canGenerate) {
-      return;
-    }
-    generate.mutate({ url: normalizedUrl }, { onSuccess: close });
+    form.reset();
   };
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (mode === "website") {
-      handleGenerate();
-      return;
-    }
-    handleAdd();
+    form.handleSubmit();
   };
 
   const handleModeChange = (value: string) => {
@@ -207,7 +215,9 @@ export function PromptAddDialog({
                     id={promptId}
                     keywords={searchConsoleKeywords}
                     maxLength={GEO_PROMPT_MAX_LENGTH}
-                    onChange={(event) => setDraft(event.target.value)}
+                    onChange={(event) =>
+                      form.setFieldValue("draft", event.target.value)
+                    }
                     className="field-sizing-fixed h-28 resize-none"
                     placeholder={t("questionPlaceholder")}
                     ref={promptRef}
@@ -250,7 +260,10 @@ export function PromptAddDialog({
                       id={urlId}
                       inputMode="url"
                       onChange={(event) =>
-                        setUrl(stripWebsiteProtocol(event.target.value))
+                        form.setFieldValue(
+                          "url",
+                          stripWebsiteProtocol(event.target.value)
+                        )
                       }
                       placeholder="yourcompany.com"
                       ref={urlRef}

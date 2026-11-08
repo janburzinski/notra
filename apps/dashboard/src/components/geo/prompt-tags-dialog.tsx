@@ -11,7 +11,8 @@ import {
   ResponsiveDialogTitle,
 } from "@notra/ui/components/shared/responsive-dialog";
 import { Badge } from "@notra/ui/components/ui/badge";
-import { type FormEvent, useId, useState } from "react";
+import { useForm, useStore } from "@tanstack/react-form";
+import { useId } from "react";
 import { useTranslations } from "use-intl";
 
 import { Button } from "@/components/button";
@@ -27,26 +28,30 @@ function PromptTagsForm({
   const t = useTranslations("geo.promptTagsDialog");
   const tGeoShared = useTranslations("geo.shared");
   const inputId = useId();
-  const [tags, setTags] = useState<string[]>(initialTags);
+  const form = useForm({
+    defaultValues: { tags: initialTags },
+    onSubmit: ({ value }) => onSubmit(normalizePromptTags(value.tags)),
+  });
+  const tags = useStore(form.store, (state) => state.values.tags);
+  const setTags = (values: string[]) =>
+    form.setFieldValue("tags", normalizePromptTags(values));
   const selectedTags = new Set(tags);
   const available = suggestions.filter((tag) => !selectedTags.has(tag));
-
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    onSubmit(normalizePromptTags(tags));
-  };
 
   return (
     <form
       className="space-y-4 px-4 md:px-0"
       id={formId}
-      onSubmit={handleSubmit}
+      onSubmit={(event) => {
+        event.preventDefault();
+        form.handleSubmit();
+      }}
     >
       <GeoTagList
         id={inputId}
         label={tGeoShared("tags")}
         max={GEO_PROMPT_MAX_TAGS}
-        onChange={(values) => setTags(normalizePromptTags(values))}
+        onChange={setTags}
         placeholder={t("placeholder")}
         values={tags}
       />
@@ -58,7 +63,7 @@ function PromptTagsForm({
               <Badge
                 className="cursor-pointer"
                 key={tag}
-                onClick={() => setTags(normalizePromptTags([...tags, tag]))}
+                onClick={() => setTags([...tags, tag])}
                 render={<button type="button" />}
                 variant="outline"
               >

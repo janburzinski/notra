@@ -25,6 +25,7 @@ import {
   DropdownMenuTrigger,
 } from "@notra/ui/components/ui/dropdown-menu";
 import { NumberField } from "@notra/ui/components/ui/number-field";
+import { useForm, useStore } from "@tanstack/react-form";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -46,7 +47,10 @@ import { useInvalidateAutomationRuns } from "@/lib/hooks/use-automation-runs";
 import { useBrandSettings } from "@/lib/hooks/use-brand-analysis";
 import { useGeoProjectsDb } from "@/lib/hooks/use-geo-db";
 import { dashboardOrpc } from "@/lib/orpc/query";
-import type { GeoAlertFormProps } from "@/types/automation/geo-alerts";
+import type {
+  GeoAlertFormProps,
+  GeoAlertFormValues,
+} from "@/types/automation/geo-alerts";
 import { getWebsiteDomain } from "@/utils/brand";
 import { resolveGeoAlertFormActions } from "@/utils/geo-alert-form";
 import { getOrpcErrorDataCode } from "@/utils/orpc-errors";
@@ -100,22 +104,30 @@ function GeoAlertEditor({
   const { data: destinations } = destinationsQuery;
   const initialSignal =
     editAlert?.sourceConfig.signal ?? preset?.signal ?? "visibility_drop";
-  const [signal, setSignal] = useState<GeoAlertSignal>(initialSignal);
-  const [threshold, setThreshold] = useState<number | undefined>(() =>
-    editAlert
+  const [defaultValues] = useState<GeoAlertFormValues>(() => ({
+    signal: initialSignal,
+    threshold: editAlert
       ? editAlert.sourceConfig.threshold
-      : GEO_ALERT_DEFAULT_THRESHOLDS[initialSignal]
-  );
-  const [projectId, setProjectId] = useState(
-    editAlert?.sourceConfig.projectId ?? ALL_PROJECTS
-  );
-  const [selection, setSelection] = useState<Partial<GeoAlertActions>>(
-    () => editAlert?.actions ?? preset?.actions ?? {}
+      : GEO_ALERT_DEFAULT_THRESHOLDS[initialSignal],
+    projectId: editAlert?.sourceConfig.projectId ?? ALL_PROJECTS,
+    selection: editAlert?.actions ?? preset?.actions ?? {},
+    name: editAlert?.name ?? "",
+    enabled: editAlert?.enabled ?? true,
+  }));
+  const [nameTouched, setNameTouched] = useState(!!editAlert);
+  const form = useForm({
+    defaultValues,
+    onSubmit: () => {
+      if (canSave) {
+        save.mutate();
+      }
+    },
+  });
+  const { signal, threshold, projectId, selection, name, enabled } = useStore(
+    form.store,
+    (state) => state.values
   );
   const actions = resolveGeoAlertFormActions(selection, destinations);
-  const [name, setName] = useState(editAlert?.name ?? "");
-  const [nameTouched, setNameTouched] = useState(!!editAlert);
-  const [enabled, setEnabled] = useState(editAlert?.enabled ?? true);
 
   const defaultName = t(`signals.${signal}.label`);
   const resolvedName = (nameTouched ? name : defaultName).trim();
@@ -188,16 +200,17 @@ function GeoAlertEditor({
   });
 
   const toggleAction = (key: keyof GeoAlertActions, value: boolean) =>
-    setSelection((current) => ({ ...current, [key]: value }));
+    form.setFieldValue("selection", (current) => ({
+      ...current,
+      [key]: value,
+    }));
 
   return (
     <form
       className="space-y-6"
       onSubmit={(event) => {
         event.preventDefault();
-        if (canSave) {
-          save.mutate();
-        }
+        form.handleSubmit();
       }}
     >
       <EditorHeader
@@ -205,10 +218,10 @@ function GeoAlertEditor({
         kind="alert"
         maxLength={MAX_SCHEDULE_NAME_LENGTH}
         name={nameTouched ? name : defaultName}
-        onEnabledChange={setEnabled}
+        onEnabledChange={(value) => form.setFieldValue("enabled", value)}
         onNameChange={(value) => {
           setNameTouched(true);
-          setName(value);
+          form.setFieldValue("name", value);
         }}
         placeholder={defaultName}
       />
@@ -220,9 +233,15 @@ function GeoAlertEditor({
               <PickerSelect
                 ariaLabel={t("dialog.signal")}
                 onChange={(value) => {
-                  const next = value as GeoAlertSignal;
-                  setSignal(next);
-                  setThreshold(GEO_ALERT_DEFAULT_THRESHOLDS[next]);
+                  const next = GEO_ALERT_SIGNALS.find((item) => item === value);
+                  if (!next) {
+                    return;
+                  }
+                  form.setFieldValue("signal", next);
+                  form.setFieldValue(
+                    "threshold",
+                    GEO_ALERT_DEFAULT_THRESHOLDS[next]
+                  );
                 }}
                 options={GEO_ALERT_SIGNALS.map((item) => ({
                   value: item,
@@ -241,7 +260,9 @@ function GeoAlertEditor({
                     incrementLabel={t("dialog.increase")}
                     max={GEO_ALERT_MAX_THRESHOLD}
                     min={1}
-                    onValueChange={(value) => setThreshold(value ?? undefined)}
+                    onValueChange={(value) =>
+                      form.setFieldValue("threshold", value ?? undefined)
+                    }
                     value={threshold ?? null}
                   />
                   {t(`signals.${signal}.unit`)}
@@ -251,7 +272,7 @@ function GeoAlertEditor({
               {projects.length > 1 ? (
                 <div className="ml-auto">
                   <ProjectScopeSelect
-                    onChange={setProjectId}
+                    onChange={(value) => form.setFieldValue("projectId", value)}
                     organizationId={organizationId}
                     projects={projects}
                     value={projectId}

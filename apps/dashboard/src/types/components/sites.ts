@@ -34,6 +34,7 @@ import type {
   SiteDetail,
   SiteDomain,
   SiteDomainChipStatus,
+  SiteDomainKind,
   SiteDomainRecord,
   SiteImportableAccount,
   SiteImportableRepository,
@@ -568,6 +569,11 @@ export interface SiteDomainAddFormProps extends SiteScope {
   autoFocus?: boolean;
   onAdded?: () => void;
   renderActions: (state: { canSubmit: boolean; pending: boolean }) => ReactNode;
+}
+
+export interface SiteDomainAddFormValues {
+  value: string;
+  override: SiteDomainKind | null;
 }
 
 export interface SiteDomainAddDialogProps extends SiteScope {

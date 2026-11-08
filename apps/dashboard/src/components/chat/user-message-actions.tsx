@@ -17,8 +17,9 @@ import {
 import { useCopyToClipboard } from "@notra/ui/hooks/use-copy-to-clipboard";
 import { TRANSITION } from "@notra/ui/lib/motion";
 import { cn } from "@notra/ui/lib/utils";
+import { useForm, useStore } from "@tanstack/react-form";
 import { AnimatePresence, m, useReducedMotion } from "motion/react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { useTranslations } from "use-intl";
 
 import { Button } from "@/components/button";
@@ -184,7 +185,21 @@ function UserMessageEditor({
   const t = useTranslations("chat.userMessageActions");
   const tCommon2 = useTranslations("common");
   const tCommon = useTranslations("common.actions");
-  const [value, setValue] = useState(initialText);
+  const form = useForm({
+    defaultValues: { text: initialText },
+    onSubmit: ({ value: { text } }) => {
+      const trimmed = text.trim();
+      if (!trimmed) {
+        return;
+      }
+      if (trimmed === initialText.trim()) {
+        onCancel();
+        return;
+      }
+      onSubmit(trimmed);
+    },
+  });
+  const value = useStore(form.store, (state) => state.values.text);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const reduceMotion = useReducedMotion();
 
@@ -211,21 +226,14 @@ function UserMessageEditor({
   const isUnchanged = trimmedValue === initialText.trim();
 
   const handleSubmit = () => {
-    if (!trimmedValue) {
-      return;
-    }
-    if (isUnchanged) {
-      onCancel();
-      return;
-    }
-    onSubmit(trimmedValue);
+    void form.handleSubmit();
   };
 
   return (
     <div className="flex flex-col gap-2">
       <textarea
         className="text-foreground placeholder:text-muted-foreground max-h-80 min-h-6 w-full resize-none bg-transparent text-sm leading-6 wrap-break-word outline-none"
-        onChange={(e) => setValue(e.target.value)}
+        onChange={(e) => form.setFieldValue("text", e.target.value)}
         onKeyDown={(e) => {
           if (e.nativeEvent.isComposing || e.nativeEvent.keyCode === 229) {
             return;

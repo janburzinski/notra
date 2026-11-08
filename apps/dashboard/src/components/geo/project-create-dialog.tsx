@@ -11,6 +11,7 @@ import {
 } from "@notra/ui/components/shared/responsive-dialog";
 import { Input } from "@notra/ui/components/ui/input";
 import { Label } from "@notra/ui/components/ui/label";
+import { useForm, useStore } from "@tanstack/react-form";
 import { useId, useState } from "react";
 import { toast } from "sonner";
 import { useTranslations } from "use-intl";
@@ -25,7 +26,10 @@ import {
   useCreateBrandVoice,
 } from "@/lib/hooks/use-brand-analysis";
 import { useGeoProjectsDb } from "@/lib/hooks/use-geo-db";
-import type { GeoProjectCreateDialogProps } from "@/types/geo";
+import type {
+  GeoProjectCreateDialogProps,
+  GeoProjectCreateFormValues,
+} from "@/types/geo";
 import {
   projectBrandIdentityName,
   projectWebsiteUrl,
@@ -50,91 +54,97 @@ export function GeoProjectCreateDialog({
   const tCommon2 = useTranslations("common");
   const tCommon = useTranslations("common.actions");
   const id = useId();
-  const [name, setName] = useState("");
-  const [website, setWebsite] = useState("");
-  const [selectedBrandSettingsId, setSelectedBrandSettingsId] = useState<
-    string | null
-  >(null);
-  const [languages, setLanguages] = useState(browserGeoLanguages);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { createProject } = useGeoProjectsDb(organizationId, { enabled: open });
   const brandQuery = useBrandSettings(organizationId, { enabled: open });
   const createIdentity = useCreateBrandVoice(organizationId);
   const { startPolling } = useBrandAnalysisProgress(organizationId);
   const analyzeIdentity = useAnalyzeBrand(organizationId, startPolling);
-  const websiteUrl = projectWebsiteUrl(website);
+  const defaultValues: GeoProjectCreateFormValues = {
+    name: "",
+    website: "",
+    selectedBrandSettingsId: null,
+    languages: browserGeoLanguages(),
+  };
+  const form = useForm({
+    defaultValues,
+    onSubmit: async ({ value }) => {
+      const websiteUrl = projectWebsiteUrl(value.website);
+      const voices = brandQuery.data?.voices ?? [];
+      const { matches, selectedIdentity } = resolveProjectBrandSelection(
+        value.website,
+        voices,
+        value.selectedBrandSettingsId,
+        createIdentity.data?.voice
+      );
+      if (!websiteUrl || !value.name.trim()) {
+        setError(t("invalidInput"));
+        return;
+      }
+      if (!brandQuery.isSuccess || (matches.length > 1 && !selectedIdentity)) {
+        setError(t("chooseIdentity"));
+        return;
+      }
+
+      setError(null);
+      try {
+        let brandSettingsId = selectedIdentity?.id;
+        if (!brandSettingsId) {
+          const { voice } = await createIdentity.mutateAsync({
+            name: projectBrandIdentityName(value.name, voices),
+            websiteUrl,
+          });
+          brandSettingsId = voice.id;
+          form.setFieldValue("selectedBrandSettingsId", voice.id);
+        }
+        const project = await createProject({
+          name: value.name.trim(),
+          brandSettingsId,
+          languages: value.languages,
+        });
+        if (
+          !selectedIdentity ||
+          createIdentity.data?.voice.id === brandSettingsId
+        ) {
+          await analyzeIdentity
+            .mutateAsync({ url: websiteUrl, voiceId: brandSettingsId })
+            .catch(() => {
+              toast.error(t("analysisFailed"));
+            });
+        }
+        reset();
+        onOpenChange(false);
+        onCreated(project.id);
+      } catch (cause) {
+        setError(
+          cause instanceof Error
+            ? cause.message
+            : tCommon2("labels.failedToCreateProject")
+        );
+      }
+    },
+  });
+  const values = useStore(form.store, (state) => state.values);
+  const isSubmitting = useStore(form.store, (state) => state.isSubmitting);
+  const websiteUrl = projectWebsiteUrl(values.website);
   const identityName = projectBrandIdentityName(
-    name,
+    values.name,
     brandQuery.data?.voices ?? []
   );
   const { matches, selectedIdentity } = resolveProjectBrandSelection(
-    website,
+    values.website,
     brandQuery.data?.voices ?? [],
-    selectedBrandSettingsId,
+    values.selectedBrandSettingsId,
     createIdentity.data?.voice
   );
 
   const reset = () => {
-    setName("");
-    setWebsite("");
-    setSelectedBrandSettingsId(null);
-    setLanguages(browserGeoLanguages());
+    form.reset(
+      { ...defaultValues, languages: browserGeoLanguages() },
+      { keepDefaultValues: true }
+    );
     setError(null);
     createIdentity.reset();
-  };
-
-  const handleCreate = async () => {
-    if (isSubmitting) {
-      return;
-    }
-    if (!websiteUrl || !name.trim()) {
-      setError(t("invalidInput"));
-      return;
-    }
-    if (!brandQuery.isSuccess || (matches.length > 1 && !selectedIdentity)) {
-      setError(t("chooseIdentity"));
-      return;
-    }
-
-    setIsSubmitting(true);
-    setError(null);
-    try {
-      let brandSettingsId = selectedIdentity?.id;
-      if (!brandSettingsId) {
-        const { voice } = await createIdentity.mutateAsync({
-          name: identityName,
-          websiteUrl,
-        });
-        brandSettingsId = voice.id;
-        setSelectedBrandSettingsId(voice.id);
-      }
-      const project = await createProject({
-        name: name.trim(),
-        brandSettingsId,
-        languages,
-      });
-      if (
-        !selectedIdentity ||
-        createIdentity.data?.voice.id === brandSettingsId
-      ) {
-        await analyzeIdentity
-          .mutateAsync({ url: websiteUrl, voiceId: brandSettingsId })
-          .catch(() => {
-            toast.error(t("analysisFailed"));
-          });
-      }
-      reset();
-      onOpenChange(false);
-      onCreated(project.id);
-    } catch (cause) {
-      setError(
-        cause instanceof Error
-          ? cause.message
-          : tCommon2("labels.failedToCreateProject")
-      );
-    }
-    setIsSubmitting(false);
   };
 
   return (
@@ -163,7 +173,9 @@ export function GeoProjectCreateDialog({
           className="space-y-4"
           onSubmit={(event) => {
             event.preventDefault();
-            void handleCreate();
+            if (!form.state.isSubmitting) {
+              void form.handleSubmit();
+            }
           }}
         >
           <div className="space-y-2">
@@ -176,13 +188,13 @@ export function GeoProjectCreateDialog({
               id={`${id}-website`}
               inputMode="url"
               onChange={(event) => {
-                setWebsite(event.target.value);
-                setSelectedBrandSettingsId(null);
+                form.setFieldValue("website", event.target.value);
+                form.setFieldValue("selectedBrandSettingsId", null);
                 setError(null);
               }}
               placeholder="example.com"
               required
-              value={website}
+              value={values.website}
             />
           </div>
           <div className="space-y-2">
@@ -190,10 +202,12 @@ export function GeoProjectCreateDialog({
             <Input
               disabled={isSubmitting}
               id={`${id}-name`}
-              onChange={(event) => setName(event.target.value)}
+              onChange={(event) =>
+                form.setFieldValue("name", event.target.value)
+              }
               placeholder="Acme"
               required
-              value={name}
+              value={values.name}
             />
           </div>
           <div className="space-y-2">
@@ -204,15 +218,17 @@ export function GeoProjectCreateDialog({
               disabled={isSubmitting}
               inputId={`${id}-languages`}
               labeled={false}
-              onChange={setLanguages}
-              selected={languages}
+              onChange={(next) => form.setFieldValue("languages", next)}
+              selected={values.languages}
             />
           </div>
           {websiteUrl && brandQuery.isSuccess ? (
             <GeoProjectBrandSelection
               disabled={isSubmitting}
               identities={matches}
-              onSelect={setSelectedBrandSettingsId}
+              onSelect={(next) =>
+                form.setFieldValue("selectedBrandSettingsId", next)
+              }
               projectName={identityName}
               selectedIdentity={selectedIdentity}
             />

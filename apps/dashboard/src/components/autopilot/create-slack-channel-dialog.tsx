@@ -16,13 +16,21 @@ import {
 } from "@notra/ui/components/ui/input-group";
 import { Label } from "@notra/ui/components/ui/label";
 import { ORPCError } from "@orpc/client";
+import { useForm } from "@tanstack/react-form";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useId, useState } from "react";
+import { useId } from "react";
 import { toast } from "sonner";
 
 import { dashboardOrpc } from "@/lib/orpc/query";
-import type { CreateAutopilotSlackChannelProps } from "@/types/slack-integration";
+import type {
+  CreateAutopilotSlackChannelProps,
+  CreateSlackChannelFormValues,
+} from "@/types/slack-integration";
 import { toErrorMessage } from "@/utils/error-message";
+
+const DEFAULT_CHANNEL_VALUES: CreateSlackChannelFormValues = {
+  name: "notra-autopilot",
+};
 
 export function CreateSlackChannelDialog({
   organizationId,
@@ -34,9 +42,8 @@ export function CreateSlackChannelDialog({
 }: CreateAutopilotSlackChannelProps) {
   const queryClient = useQueryClient();
   const id = useId();
-  const [name, setName] = useState("notra-autopilot");
   const create = useMutation({
-    mutationFn: () =>
+    mutationFn: ({ name }: CreateSlackChannelFormValues) =>
       dashboardOrpc.integrations.slack.createChannel.call({
         organizationId,
         integrationId,
@@ -60,6 +67,14 @@ export function CreateSlackChannelDialog({
       toast.success(
         `Created #${channel.name}. Join it in Slack to see your daily brief.`
       );
+    },
+  });
+  const form = useForm({
+    defaultValues: DEFAULT_CHANNEL_VALUES,
+    onSubmit: ({ value }) => {
+      if (!create.isPending) {
+        create.mutate(value);
+      }
     },
   });
   const needsReconnect =
@@ -91,31 +106,34 @@ export function CreateSlackChannelDialog({
           id={`${id}-form`}
           onSubmit={(event) => {
             event.preventDefault();
-            if (!create.isPending) {
-              create.mutate();
-            }
+            form.handleSubmit();
           }}
         >
           <Label htmlFor={`${id}-name`}>Channel name</Label>
-          <InputGroup>
-            <InputGroupAddon aria-hidden="true">#</InputGroupAddon>
-            <InputGroupInput
-              aria-describedby={`${id}-hint ${id}-error`}
-              aria-invalid={create.isError}
-              autoComplete="off"
-              disabled={create.isPending}
-              id={`${id}-name`}
-              maxLength={80}
-              name="slack-channel-name"
-              onChange={(event) => {
-                setName(event.target.value);
-                create.reset();
-              }}
-              pattern="[a-z0-9_\-]+"
-              required
-              value={name}
-            />
-          </InputGroup>
+          <form.Field name="name">
+            {(field) => (
+              <InputGroup>
+                <InputGroupAddon aria-hidden="true">#</InputGroupAddon>
+                <InputGroupInput
+                  aria-describedby={`${id}-hint ${id}-error`}
+                  aria-invalid={create.isError}
+                  autoComplete="off"
+                  disabled={create.isPending}
+                  id={`${id}-name`}
+                  maxLength={80}
+                  name="slack-channel-name"
+                  onBlur={field.handleBlur}
+                  onChange={(event) => {
+                    field.handleChange(event.target.value);
+                    create.reset();
+                  }}
+                  pattern="[a-z0-9_\-]+"
+                  required
+                  value={field.state.value}
+                />
+              </InputGroup>
+            )}
+          </form.Field>
           <p className="text-muted-foreground text-xs" id={`${id}-hint`}>
             Lowercase letters, numbers, hyphens, and underscores.
           </p>

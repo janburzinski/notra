@@ -13,15 +13,19 @@ import {
   InputGroupAddon,
   InputGroupInput,
 } from "@notra/ui/components/ui/input-group";
+import { useForm, useStore } from "@tanstack/react-form";
 import { useMutation } from "@tanstack/react-query";
-import { useId, useState } from "react";
+import { useId } from "react";
 import { toast } from "sonner";
 import { useTranslations } from "use-intl";
 
 import { SITE_DOMAIN_URL_SCHEME_PATTERN } from "@/constants/sites";
 import { useInvalidateSites } from "@/lib/hooks/use-sites";
 import { dashboardOrpc } from "@/lib/orpc/query";
-import type { SiteDomainAddFormProps } from "@/types/components/sites";
+import type {
+  SiteDomainAddFormProps,
+  SiteDomainAddFormValues,
+} from "@/types/components/sites";
 import type { SiteDomainKind } from "@/types/sites";
 import { toErrorMessage } from "@/utils/error-message";
 import { detectSiteDomainKind } from "@/utils/site-domains";
@@ -38,27 +42,17 @@ export function SiteDomainAddForm({
   const t = useTranslations("sites.domainsPage.add");
   const id = useId();
   const invalidateSites = useInvalidateSites();
-  const [value, setValue] = useState("");
-  const [override, setOverride] = useState<SiteDomainKind | null>(null);
-  const trimmed = value.trim();
-  const detected = detectSiteDomainKind(trimmed);
-  const kind = detected ? (override ?? detected) : null;
-  const hostname = trimmed.split("/")[0] ?? "";
-  const urls = mountedPaths(mounts).map((path) =>
-    path === "/" ? hostname : `${hostname}${path}`
-  );
 
   const addMutation = useMutation({
-    mutationFn: (domainKind: SiteDomainKind) =>
+    mutationFn: (input: { kind: SiteDomainKind; value: string }) =>
       dashboardOrpc.sites.domains.add.call({
         organizationId,
         siteId,
-        kind: domainKind,
-        value: trimmed,
+        ...input,
       }),
-    onSuccess: async (added) => {
+    onSuccess: async (added, input) => {
       // acme.com/blog is added as www.acme.com/blog when acme.com forwards there.
-      const typed = trimmed
+      const typed = input.value
         .replace(SITE_DOMAIN_URL_SCHEME_PATTERN, "")
         .split("/")[0]
         ?.toLowerCase();
@@ -71,8 +65,7 @@ export function SiteDomainAddForm({
           ? t("addedAsTwin", { typed, hostname: added.hostname })
           : t("added")
       );
-      setValue("");
-      setOverride(null);
+      form.reset();
       onAdded?.();
       await invalidateSites();
     },
@@ -81,14 +74,32 @@ export function SiteDomainAddForm({
     },
   });
 
+  const defaultValues: SiteDomainAddFormValues = { value: "", override: null };
+  const form = useForm({
+    defaultValues,
+    onSubmit: ({ value: values }) => {
+      const value = values.value.trim();
+      const detectedKind = detectSiteDomainKind(value);
+      if (detectedKind && !addMutation.isPending) {
+        addMutation.mutate({ kind: values.override ?? detectedKind, value });
+      }
+    },
+  });
+  const { value, override } = useStore(form.store, (state) => state.values);
+  const trimmed = value.trim();
+  const detected = detectSiteDomainKind(trimmed);
+  const kind = detected ? (override ?? detected) : null;
+  const hostname = trimmed.split("/")[0] ?? "";
+  const urls = mountedPaths(mounts).map((path) =>
+    path === "/" ? hostname : `${hostname}${path}`
+  );
+
   return (
     <form
       className="space-y-3"
       onSubmit={(event) => {
         event.preventDefault();
-        if (kind && !addMutation.isPending) {
-          addMutation.mutate(kind);
-        }
+        form.handleSubmit();
       }}
     >
       <Field>
@@ -118,9 +129,9 @@ export function SiteDomainAddForm({
                 ""
               );
               if (detectSiteDomainKind(next) !== detected) {
-                setOverride(null);
+                form.setFieldValue("override", null);
               }
-              setValue(next);
+              form.setFieldValue("value", next);
             }}
             placeholder={t("placeholder")}
             spellCheck={false}
@@ -167,7 +178,10 @@ export function SiteDomainAddForm({
               <button
                 className="text-primary focus-visible:ring-ring/50 rounded-sm font-medium underline-offset-4 outline-none hover:underline focus-visible:ring-2"
                 onClick={() =>
-                  setOverride(kind === "subdomain" ? "proxy" : "subdomain")
+                  form.setFieldValue(
+                    "override",
+                    kind === "subdomain" ? "proxy" : "subdomain"
+                  )
                 }
                 type="button"
               >

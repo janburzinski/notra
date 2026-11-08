@@ -222,11 +222,15 @@ export function SiteAuthorDialog({
   const workspace = useSiteWorkspace();
   const id = useId();
   const formRef = useRef<HTMLFormElement>(null);
-  const { form, set, setName, setId, errors, submit } = useSiteAuthorForm(
+  const { values, set, setName, setId, errors, submit } = useSiteAuthorForm(
     entry,
-    takenIds
+    takenIds,
+    (saved) => {
+      onSave(entry?.id ?? null, saved);
+      onOpenChange(false);
+    }
   );
-  const message = (key: keyof typeof form) => {
+  const message = (key: keyof typeof values) => {
     const error = errors[key];
     return error ? t(`errors.${error}`) : undefined;
   };
@@ -238,9 +242,9 @@ export function SiteAuthorDialog({
         <ResponsiveDialogHeader className="shrink-0">
           <div className="flex items-center gap-3">
             <SiteAuthorAvatar
-              avatar={form.avatar.trim() || undefined}
+              avatar={values.avatar.trim() || undefined}
               className="size-10"
-              name={form.name}
+              name={values.name}
             />
             <div className="min-w-0 space-y-0.5 text-left">
               <ResponsiveDialogTitle>
@@ -260,12 +264,7 @@ export function SiteAuthorDialog({
           noValidate
           onSubmit={(event) => {
             event.preventDefault();
-            const saved = submit();
-            if (saved) {
-              onSave(entry?.id ?? null, saved);
-              onOpenChange(false);
-              return;
-            }
+            submit();
             requestAnimationFrame(() =>
               formRef.current
                 ?.querySelector<HTMLElement>("[aria-invalid=true]")
@@ -288,7 +287,7 @@ export function SiteAuthorDialog({
                   onChange={(event) => setName(event.target.value)}
                   placeholder={t("namePlaceholder")}
                   required
-                  value={form.name}
+                  value={values.name}
                 />
               )}
             </AuthorField>
@@ -302,9 +301,9 @@ export function SiteAuthorDialog({
                   {...aria}
                   autoComplete="off"
                   maxLength={CONTENT_AUTHOR_TITLE_MAX_LENGTH}
-                  onChange={(event) => set({ title: event.target.value })}
+                  onChange={(event) => set("title", event.target.value)}
                   placeholder={t("rolePlaceholder")}
-                  value={form.title}
+                  value={values.title}
                 />
               )}
             </AuthorField>
@@ -315,7 +314,7 @@ export function SiteAuthorDialog({
             lockedId={lockedId}
             onChange={setId}
             usage={usage}
-            value={form.id}
+            value={values.id}
           />
           <AuthorField
             error={message("avatar")}
@@ -327,16 +326,16 @@ export function SiteAuthorDialog({
               <SiteAuthorAvatarField
                 aria={aria}
                 id={`${id}-avatar`}
-                name={form.name}
-                onChange={(avatar) => set({ avatar })}
-                value={form.avatar}
+                name={values.name}
+                onChange={(avatar) => set("avatar", avatar)}
+                value={values.avatar}
               />
             )}
           </AuthorField>
           <AuthorField
             error={message("bio")}
             hint={t("bioCount", {
-              count: form.bio.trim().length,
+              count: values.bio.trim().length,
               max: SITE_AUTHOR_BIO_MAX_LENGTH,
             })}
             id={`${id}-bio`}
@@ -347,17 +346,17 @@ export function SiteAuthorDialog({
                 {...aria}
                 className="min-h-20 resize-none"
                 maxLength={SITE_AUTHOR_BIO_MAX_LENGTH}
-                onChange={(event) => set({ bio: event.target.value })}
+                onChange={(event) => set("bio", event.target.value)}
                 placeholder={t("bioPlaceholder")}
-                value={form.bio}
+                value={values.bio}
               />
             )}
           </AuthorField>
           <SiteAuthorLinkFields
             errors={errors}
-            form={form}
+            form={values}
             idPrefix={id}
-            onChange={(field, value) => set({ [field]: value })}
+            onChange={set}
           />
         </form>
         <ResponsiveDialogFooter className="shrink-0">

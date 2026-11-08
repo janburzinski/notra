@@ -109,6 +109,11 @@ export interface WebhookCreateProps {
   readonly onCreated: () => void;
 }
 
+export interface WebhookCreateFormValues {
+  url: string;
+  events: WebhookEventName[];
+}
+
 export interface WebhookCreateDialogViewProps {
   readonly open: boolean;
   readonly onOpenChange: (open: boolean) => void;

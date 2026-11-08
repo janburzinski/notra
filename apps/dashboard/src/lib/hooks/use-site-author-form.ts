@@ -1,6 +1,7 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useForm, useStore } from "@tanstack/react-form";
+import { useRef } from "react";
 
 import type {
   SiteAuthorEntry,
@@ -17,32 +18,43 @@ import {
 /** The author form's values, and its errors once a save was attempted. */
 export function useSiteAuthorForm(
   entry: SiteAuthorEntry | null,
-  takenIds: ReadonlySet<string>
+  takenIds: ReadonlySet<string>,
+  onSubmit: (saved: SiteAuthorEntry) => void
 ) {
-  const [form, setForm] = useState<SiteAuthorForm>(() => siteAuthorForm(entry));
-  const [showErrors, setShowErrors] = useState(false);
+  const form = useForm({
+    defaultValues: siteAuthorForm(entry),
+    onSubmit: ({ value }) => {
+      if (Object.keys(validateSiteAuthorForm(value, takenIds)).length === 0) {
+        onSubmit(siteAuthorFromForm(value));
+      }
+    },
+  });
+  const values = useStore(form.store, (state) => state.values);
+  const showErrors = useStore(
+    form.store,
+    (state) => state.submissionAttempts > 0
+  );
   // A new author's id follows the name until it's edited by hand.
   const idEdited = useRef(Boolean(entry));
-  const errors = validateSiteAuthorForm(form, takenIds);
-  const set = (patch: Partial<SiteAuthorForm>) =>
-    setForm((current) => ({ ...current, ...patch }));
+  const set = (key: keyof SiteAuthorForm, value: string) =>
+    form.setFieldValue(key, value);
+  const errors: SiteAuthorFormErrors = showErrors
+    ? validateSiteAuthorForm(values, takenIds)
+    : {};
   return {
-    form,
+    values,
     set,
-    setName: (name: string) =>
-      set(idEdited.current ? { name } : { name, id: authorSlugBase(name) }),
+    setName: (name: string) => {
+      set("name", name);
+      if (!idEdited.current) {
+        set("id", authorSlugBase(name));
+      }
+    },
     setId: (id: string) => {
       idEdited.current = true;
-      set({ id: id.toLowerCase() });
+      set("id", id.toLowerCase());
     },
-    errors: (showErrors ? errors : {}) as SiteAuthorFormErrors,
-    /** The entry to save, or null after revealing the errors that block it. */
-    submit: (): SiteAuthorEntry | null => {
-      if (Object.keys(errors).length > 0) {
-        setShowErrors(true);
-        return null;
-      }
-      return siteAuthorFromForm(form);
-    },
+    errors,
+    submit: () => form.handleSubmit(),
   };
 }

@@ -5,12 +5,14 @@ export const reactDoctorEventWorker = String.raw`
   import { dirname, resolve } from "node:path";
   import * as react from "react";
   import { ORPCError } from "@orpc/server";
+  import { FormApi as ImportedFormApi } from "@tanstack/react-form";
   import { resolveGeoAlertFormActions } from "./src/utils/geo-alert-form";
 
   globalThis.fetch = () => { throw new Error("Unexpected network access"); };
   const [file, component, mode] = process.argv.slice(1);
   const path = resolve("src", file);
   const source = readFileSync(path, "utf8");
+  const RealFormApi = ImportedFormApi;
   const privateExports = {
     TweetUrlStep: "TweetUrlStep",
     UserMessageEditor: "UserMessageEditor",
@@ -44,7 +46,6 @@ export const reactDoctorEventWorker = String.raw`
     TweetUrlStep: ["https://x.com/fixture/status/1"],
     AddSitemapDialog: ["https://example.com/sitemap.xml", "Fixture"],
     WriteSitemapSection: ["https://example.com/sitemap.xml"],
-    UserMessageEditor: ["Changed message"],
     CompetitorSynonymsField: [true, "New synonym"],
     RenameCollectionDialog: ["Renamed collection"],
   };
@@ -116,6 +117,12 @@ export const reactDoctorEventWorker = String.raw`
     useGeoProjectsDb: () => ({ projects: [] }),
     useInvalidateAutomationRuns: () => noop,
     resolveGeoAlertFormActions,
+    useForm(options) {
+      const [api] = react.useState(() => new RealFormApi(options));
+      api.update(options);
+      return api;
+    },
+    useStore: (store, selector) => selector(store.state),
     getRegistrableHost: () => "example.com",
     isUrlWithinBrandHost: () => true,
     normalizeSitemapUrl: (url) => url,
@@ -182,8 +189,28 @@ export const reactDoctorEventWorker = String.raw`
     if (component.endsWith("Editor") && component !== "UserMessageEditor") {
       props.state = { editingTitle: "Fixture", serverTitle: "Fixture", editedMarkdown: "Fixture" };
     }
-    const handlers = find(render(props), "onKeyDown");
+    const submitted = [];
+    let cancelled = 0;
+    if (component === "UserMessageEditor") {
+      props.onSubmit = (text) => { actions++; submitted.push(text); };
+      props.onCancel = () => { actions++; cancelled++; };
+    }
+    const tree = render(props);
+    const handlers = find(tree, "onKeyDown");
     assert.equal(handlers.length, component === "AddSitemapDialog" ? 2 : 1, component);
+    if (component === "UserMessageEditor") {
+      const findTextarea = (node) => {
+        if (!node || typeof node !== "object") return undefined;
+        if (node.type === "textarea") return node;
+        for (const value of Object.values(node.props ?? node)) {
+          for (const child of Array.isArray(value) ? value : [value]) {
+            const found = findTextarea(child);
+            if (found) return found;
+          }
+        }
+      };
+      findTextarea(tree).props.onChange({ target: { value: "Changed message" } });
+    }
     for (const handler of handlers) {
       for (const nativeEvent of [{ isComposing: true, keyCode: 13 }, { isComposing: false, keyCode: 229 }]) {
         actions = 0;
@@ -196,9 +223,11 @@ export const reactDoctorEventWorker = String.raw`
       actions = 0;
       let prevented = 0;
       await handler({ key: "Enter", shiftKey: false, nativeEvent: { isComposing: false, keyCode: 13 }, preventDefault() { prevented++; }, stopPropagation: noop });
-      await Promise.resolve();
+      await new Promise((resolve) => setTimeout(resolve));
       assert.ok(actions > 0 || prevented > 0, component + " ordinary Enter remains active");
       if (component === "UserMessageEditor") {
+        assert.deepEqual(submitted, ["Changed message"], "Enter submits the edited text");
+        assert.equal(cancelled, 0, "Enter with edited text does not cancel");
         actions = 0;
         await handler({ key: "Enter", shiftKey: true, nativeEvent: {}, preventDefault: action, stopPropagation: noop });
         assert.equal(actions, 0, "Shift+Enter remains a newline");
@@ -252,11 +281,13 @@ export const reactDoctorEventWorker = String.raw`
     assert.equal(module.GeoAlertForm({ ...props, open: false }), null);
     actions = 0;
     find(rerendered, "onSubmit")[0]({ preventDefault: noop });
+    await new Promise((resolve) => setTimeout(resolve));
     assert.equal(actions, 1, "successful destination lookup allows saving");
     destinationsQuery.isSuccess = false;
     destinationsQuery.isError = true;
     actions = 0;
     find(render(refetched), "onSubmit")[0]({ preventDefault: noop });
+    await new Promise((resolve) => setTimeout(resolve));
     assert.equal(actions, 0, "failed destination lookup cannot silently overwrite saved channels");
   } else if (mode === "chart") {
     const props = { data: [], config: {}, xDataKey: "x", defaultSelectedDataKey: "initial", onSelectionChange: (value) => notifications.push(value) };
@@ -285,6 +316,7 @@ export const reactDoctorEventWorker = String.raw`
     assert.equal((await module.toKnownIntegrationError(new Error("Fixture"))).code, "BAD_REQUEST");
   }
   console.log(component + " real-source regression passed");
+  process.exit(0);
 `;
 
 export const reactDoctorEventCases = [

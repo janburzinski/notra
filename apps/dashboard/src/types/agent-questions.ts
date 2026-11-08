@@ -10,6 +10,12 @@ export type AgentQuestion = z.infer<
 /** One question's answers: the options picked, or the user's own words. */
 export type AgentQuestionAnswer = string[];
 
+export interface AgentQuestionDockValues {
+  picked: AgentQuestionAnswer[];
+  custom: string[];
+  customOn: boolean[];
+}
+
 /** A question the agent is waiting on, read from its tool call. */
 export interface PendingAgentQuestion {
   toolCallId: string;

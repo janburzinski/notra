@@ -1,16 +1,19 @@
 "use client";
 
-import type { EventTriggerFormValues } from "@notra/schemas/dashboard/automation/event-trigger-form";
 import { useForm } from "@tanstack/react-form";
 import { useMutation } from "@tanstack/react-query";
 import { useEffect, useMemo, useRef } from "react";
 import { toast } from "sonner";
 import { useTranslations } from "use-intl";
+import { z } from "zod";
 
 import { supportsAutoPublish } from "@/constants/schedule-output-types";
 import { dashboardOrpc } from "@/lib/orpc/query";
 import { createEventTriggerFormSchema } from "@/schemas/event-trigger-form";
-import type { UseEventTriggerFormProps } from "@/types/automation/event-trigger";
+import type {
+  EventTriggerEditorValues,
+  UseEventTriggerFormProps,
+} from "@/types/automation/event-trigger";
 import type { Trigger } from "@/types/triggers/triggers";
 import {
   getDefaultEventTriggerValues,
@@ -21,7 +24,6 @@ import { getOrpcErrorDataCode } from "@/utils/orpc-errors";
 export function useEventTriggerForm({
   organizationId,
   editTrigger,
-  enabled,
   open,
   preset,
   onSuccess,
@@ -31,7 +33,11 @@ export function useEventTriggerForm({
   const tAutomationShared = useTranslations("automation.shared");
   const tValidation = useTranslations("automation.events.validation");
   const eventTriggerFormSchema = useMemo(
-    () => createEventTriggerFormSchema(tValidation),
+    () =>
+      z.intersection(
+        createEventTriggerFormSchema(tValidation),
+        z.object({ enabled: z.boolean() })
+      ),
     [tValidation]
   );
   const isEditMode = !!editTrigger;
@@ -40,7 +46,7 @@ export function useEventTriggerForm({
   const mutation = useMutation<
     { trigger: Trigger },
     Error,
-    EventTriggerFormValues
+    EventTriggerEditorValues
   >({
     mutationFn: async (value) => {
       const payload = {
@@ -61,7 +67,7 @@ export function useEventTriggerForm({
           ...(value.brandVoiceId ? { brandVoiceId: value.brandVoiceId } : {}),
           notify: value.notify,
         },
-        enabled,
+        enabled: value.enabled,
         autoPublish: supportsAutoPublish(value.outputType)
           ? value.autoPublish
           : false,
@@ -101,10 +107,11 @@ export function useEventTriggerForm({
 
   // The form re-applies its default values whenever they change and nothing was
   // touched, so the preset has to be part of them or it gets undone.
-  const initialValues = useMemo<EventTriggerFormValues>(
+  const initialValues = useMemo<EventTriggerEditorValues>(
     () => ({
       ...getDefaultEventTriggerValues(editTrigger),
       ...(editTrigger ? {} : preset),
+      enabled: editTrigger?.enabled ?? true,
     }),
     [editTrigger, preset]
   );

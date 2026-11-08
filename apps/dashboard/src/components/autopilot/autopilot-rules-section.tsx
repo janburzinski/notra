@@ -11,6 +11,7 @@ import {
   InputGroupAddon,
   InputGroupInput,
 } from "@notra/ui/components/ui/input-group";
+import { useForm } from "@tanstack/react-form";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -18,9 +19,14 @@ import { toast } from "sonner";
 import { Button } from "@/components/button";
 import { AUTOPILOT_RULE_PREFIX } from "@/constants/autopilot";
 import { dashboardOrpc } from "@/lib/orpc/query";
-import type { AutopilotRulesSectionProps } from "@/types/autopilot";
+import type {
+  AutopilotRuleFormValues,
+  AutopilotRulesSectionProps,
+} from "@/types/autopilot";
 import { toAutopilotRuleText } from "@/utils/autopilot-rules";
 import { toErrorMessage } from "@/utils/error-message";
+
+const DEFAULT_RULE_VALUES: AutopilotRuleFormValues = { topic: "" };
 
 /** What the team told Autopilot to skip; every decision reads these. */
 export function AutopilotRulesSection({
@@ -29,12 +35,10 @@ export function AutopilotRulesSection({
 }: AutopilotRulesSectionProps) {
   const queryClient = useQueryClient();
   const [adding, setAdding] = useState(false);
-  const [topic, setTopic] = useState("");
   const close = () => {
-    setTopic("");
+    form.reset();
     setAdding(false);
   };
-  const ruleText = toAutopilotRuleText(topic);
   const invalidate = () =>
     queryClient.invalidateQueries({ queryKey: dashboardOrpc.autopilot.key() });
   const add = useMutation({
@@ -53,6 +57,15 @@ export function AutopilotRulesSection({
     onSuccess: invalidate,
     onError: (error) =>
       toast.error(toErrorMessage(error, "Could not remove the rule")),
+  });
+  const form = useForm({
+    defaultValues: DEFAULT_RULE_VALUES,
+    onSubmit: ({ value }) => {
+      const ruleText = toAutopilotRuleText(value.topic);
+      if (ruleText) {
+        add.mutate(ruleText);
+      }
+    },
   });
 
   return (
@@ -112,36 +125,45 @@ export function AutopilotRulesSection({
             className="flex flex-col gap-2 px-4 py-2.5 sm:flex-row"
             onSubmit={(event) => {
               event.preventDefault();
-              if (ruleText) {
-                add.mutate(ruleText);
-              }
+              form.handleSubmit();
             }}
           >
-            <InputGroup>
-              <InputGroupAddon>{AUTOPILOT_RULE_PREFIX}</InputGroupAddon>
-              <InputGroupInput
-                aria-label="Topic to skip"
-                autoFocus
-                maxLength={250}
-                onChange={(event) => setTopic(event.target.value)}
-                onKeyDown={(event) => {
-                  if (event.key === "Escape" && !add.isPending) {
-                    close();
-                  }
-                }}
-                placeholder="e.g. dependency bumps"
-                value={topic}
-              />
-            </InputGroup>
+            <form.Field name="topic">
+              {(field) => (
+                <InputGroup>
+                  <InputGroupAddon>{AUTOPILOT_RULE_PREFIX}</InputGroupAddon>
+                  <InputGroupInput
+                    aria-label="Topic to skip"
+                    autoFocus
+                    maxLength={250}
+                    onBlur={field.handleBlur}
+                    onChange={(event) => field.handleChange(event.target.value)}
+                    onKeyDown={(event) => {
+                      if (event.key === "Escape" && !add.isPending) {
+                        close();
+                      }
+                    }}
+                    placeholder="e.g. dependency bumps"
+                    value={field.state.value}
+                  />
+                </InputGroup>
+              )}
+            </form.Field>
             <div className="flex justify-end gap-2">
-              <Button
-                disabled={!ruleText}
-                loading={add.isPending}
-                size="sm"
-                type="submit"
+              <form.Subscribe
+                selector={(state) => toAutopilotRuleText(state.values.topic)}
               >
-                Add
-              </Button>
+                {(ruleText) => (
+                  <Button
+                    disabled={!ruleText}
+                    loading={add.isPending}
+                    size="sm"
+                    type="submit"
+                  >
+                    Add
+                  </Button>
+                )}
+              </form.Subscribe>
               <Button
                 disabled={add.isPending}
                 onClick={close}

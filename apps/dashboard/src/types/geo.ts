@@ -129,6 +129,18 @@ export interface GeoProjectCreateDialogProps {
   onCreated: (projectId: string) => void;
 }
 
+export interface PromptAddFormValues {
+  draft: string;
+  url: string;
+}
+
+export interface GeoProjectCreateFormValues {
+  name: string;
+  website: string;
+  selectedBrandSettingsId: string | null;
+  languages: string[];
+}
+
 export interface GeoProjectBrandSelectionProps {
   identities: GeoProjectBrandIdentity[];
   selectedIdentity: GeoProjectBrandIdentity | undefined;

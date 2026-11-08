@@ -18,6 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@notra/ui/components/ui/select";
+import { useForm, useStore } from "@tanstack/react-form";
 import { useId, useState } from "react";
 import { useTranslations } from "use-intl";
 
@@ -164,20 +165,32 @@ function SitePreviewPasswordDialog({
   const t = useTranslations("sites.previewAccess");
   const tCommon = useTranslations("common");
   const id = useId();
-  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [wasOpen, setWasOpen] = useState(open);
-  // Every close path (Cancel, Escape, a finished save) clears the old entry.
-  if (wasOpen !== open) {
-    setWasOpen(open);
-    if (!open) {
-      setPassword("");
-      setShowPassword(false);
-    }
-  }
+  const form = useForm({
+    defaultValues: { password: "" },
+    onSubmit: ({ value }) => {
+      if (
+        value.password.length >= SITE_PREVIEW_PASSWORD_MIN_LENGTH &&
+        !pending
+      ) {
+        onSubmit(value.password);
+      }
+    },
+  });
+  const password = useStore(form.store, (state) => state.values.password);
   const tooShort = password.length < SITE_PREVIEW_PASSWORD_MIN_LENGTH;
   return (
-    <ResponsiveDialog onOpenChange={onOpenChange} open={open}>
+    <ResponsiveDialog
+      onOpenChange={onOpenChange}
+      onOpenChangeComplete={(isOpen) => {
+        // Every close path (Cancel, Escape, a finished save) clears the old entry.
+        if (!isOpen) {
+          form.reset();
+          setShowPassword(false);
+        }
+      }}
+      open={open}
+    >
       <ResponsiveDialogContent>
         <ResponsiveDialogHeader>
           <ResponsiveDialogTitle>
@@ -191,15 +204,13 @@ function SitePreviewPasswordDialog({
           id={`${id}-form`}
           onSubmit={(event) => {
             event.preventDefault();
-            if (!tooShort && !pending) {
-              onSubmit(password);
-            }
+            form.handleSubmit();
           }}
         >
           <SitePreviewPasswordField
             editing
             idPrefix={id}
-            onChange={setPassword}
+            onChange={(next) => form.setFieldValue("password", next)}
             onEdit={() => undefined}
             onToggleShowPassword={() => setShowPassword((shown) => !shown)}
             passwordSetAt={passwordSetAt}

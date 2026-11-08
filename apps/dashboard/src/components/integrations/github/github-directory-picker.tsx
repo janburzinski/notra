@@ -29,8 +29,9 @@ import {
 } from "@notra/ui/components/ui/radio-group";
 import { Spinner } from "@notra/ui/components/ui/spinner";
 import { cn } from "@notra/ui/lib/utils";
+import { useForm } from "@tanstack/react-form";
 import { useQuery } from "@tanstack/react-query";
-import { type FormEvent, type ReactNode, useId, useState } from "react";
+import { type ReactNode, useId, useState } from "react";
 import { useTranslations } from "use-intl";
 
 import { Button } from "@/components/button";
@@ -38,7 +39,6 @@ import { dashboardOrpc } from "@/lib/orpc/query";
 import type {
   GitHubDirectoryChoiceProps,
   GitHubDirectoryExtraChoicesProps,
-  GitHubDirectoryNewFolderFieldProps,
   GitHubDirectoryNodeProps,
   GitHubDirectoryNodesProps,
   GitHubDirectoryNodeStatusProps,
@@ -234,52 +234,6 @@ function RootDirectoryContent({
   );
 }
 
-function GitHubDirectoryNewFolderField({
-  error,
-  inputId,
-  name,
-  onNameChange,
-  onSubmit,
-  selectedDirectory,
-}: GitHubDirectoryNewFolderFieldProps) {
-  const t = useTranslations("integrations.github.directoryPicker");
-  const tCommon = useTranslations("common");
-
-  return (
-    <form className="space-y-2" onSubmit={onSubmit}>
-      <Field data-invalid={error ? true : undefined}>
-        <FieldLabel htmlFor={inputId}>{t("newFolder")}</FieldLabel>
-        <div className="flex gap-2">
-          <Input
-            aria-invalid={Boolean(error)}
-            autoComplete="off"
-            className="w-auto min-w-0 flex-1"
-            id={inputId}
-            onChange={(event) => onNameChange(event.target.value)}
-            placeholder={
-              selectedDirectory
-                ? t("folderInside", { directory: selectedDirectory })
-                : t("folderPlaceholder")
-            }
-            value={name}
-          />
-          <Button
-            className="shrink-0"
-            disabled={!normalizeGitHubDirectorySegment(name)}
-            size="sm"
-            type="submit"
-            variant="outline"
-          >
-            <HugeiconsIcon className="size-4" icon={Add01Icon} />
-            {tCommon("actions.add")}
-          </Button>
-        </div>
-        {error ? <FieldError>{error}</FieldError> : null}
-      </Field>
-    </form>
-  );
-}
-
 function DirectoryNode({
   depth,
   excludedPath,
@@ -389,8 +343,37 @@ export function GitHubDirectoryPicker({
   const [open, setOpen] = useState(false);
   const [selectedDirectory, setSelectedDirectory] = useState(directory);
   const [customDirectories, setCustomDirectories] = useState<string[]>([]);
-  const [newFolderName, setNewFolderName] = useState("");
-  const [newFolderError, setNewFolderError] = useState<string | null>(null);
+  const newFolderForm = useForm({
+    defaultValues: { name: "" },
+    validators: {
+      onSubmit: ({ value }) => {
+        const folderName = normalizeGitHubDirectorySegment(value.name);
+        if (!folderName) {
+          return t("folderNameRequired");
+        }
+        const parsed = repositoryContentDirectorySchema.safeParse(
+          joinGitHubDirectory(selectedDirectory, folderName)
+        );
+        return parsed.success ? undefined : t("folderPathInvalid");
+      },
+    },
+    onSubmit: ({ value, formApi }) => {
+      const parsed = repositoryContentDirectorySchema.safeParse(
+        joinGitHubDirectory(
+          selectedDirectory,
+          normalizeGitHubDirectorySegment(value.name)
+        )
+      );
+      if (!parsed.success) {
+        return;
+      }
+      setSelectedDirectory(parsed.data);
+      setCustomDirectories((current) =>
+        current.includes(parsed.data) ? current : [...current, parsed.data]
+      );
+      formApi.reset();
+    },
+  });
   const rootDirectoriesQuery = useQuery(
     dashboardOrpc.integrations.repositories.directories.list.queryOptions({
       input: { organizationId, repositoryId, directory: "" },
@@ -413,8 +396,7 @@ export function GitHubDirectoryPicker({
     if (nextOpen) {
       setSelectedDirectory(directory);
       setCustomDirectories([]);
-      setNewFolderName("");
-      setNewFolderError(null);
+      newFolderForm.reset();
     }
   };
 
@@ -425,29 +407,6 @@ export function GitHubDirectoryPicker({
     } catch {
       // The parent mutation keeps the dialog open and surfaces the error.
     }
-  };
-
-  const handleCreateFolder = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const folderName = normalizeGitHubDirectorySegment(newFolderName);
-    if (!folderName) {
-      setNewFolderError(t("folderNameRequired"));
-      return;
-    }
-
-    const nextDirectory = joinGitHubDirectory(selectedDirectory, folderName);
-    const parsed = repositoryContentDirectorySchema.safeParse(nextDirectory);
-    if (!parsed.success) {
-      setNewFolderError(t("folderPathInvalid"));
-      return;
-    }
-
-    setSelectedDirectory(parsed.data);
-    setCustomDirectories((current) =>
-      current.includes(parsed.data) ? current : [...current, parsed.data]
-    );
-    setNewFolderName("");
-    setNewFolderError(null);
   };
 
   return (
@@ -494,7 +453,7 @@ export function GitHubDirectoryPicker({
           onValueChange={(value) => {
             if (typeof value === "string") {
               setSelectedDirectory(value);
-              setNewFolderError(null);
+              newFolderForm.setErrorMap({ onSubmit: undefined });
             }
           }}
           value={selectedDirectory}
@@ -543,19 +502,68 @@ export function GitHubDirectoryPicker({
           />
         </RadioGroup>
 
-        <GitHubDirectoryNewFolderField
-          error={newFolderError}
-          inputId={newFolderInputId}
-          name={newFolderName}
-          onNameChange={(value) => {
-            setNewFolderName(value);
-            if (newFolderError) {
-              setNewFolderError(null);
-            }
+        <form
+          className="space-y-2"
+          onSubmit={(event) => {
+            event.preventDefault();
+            void newFolderForm.handleSubmit();
           }}
-          onSubmit={handleCreateFolder}
-          selectedDirectory={selectedDirectory}
-        />
+        >
+          <newFolderForm.Subscribe
+            selector={(state) => state.errorMap.onSubmit}
+          >
+            {(error) => (
+              <newFolderForm.Field
+                listeners={{
+                  onChange: () =>
+                    newFolderForm.setErrorMap({ onSubmit: undefined }),
+                }}
+                name="name"
+              >
+                {(field) => (
+                  <Field data-invalid={error ? true : undefined}>
+                    <FieldLabel htmlFor={newFolderInputId}>
+                      {t("newFolder")}
+                    </FieldLabel>
+                    <div className="flex gap-2">
+                      <Input
+                        aria-invalid={Boolean(error)}
+                        autoComplete="off"
+                        className="w-auto min-w-0 flex-1"
+                        id={newFolderInputId}
+                        onBlur={field.handleBlur}
+                        onChange={(event) =>
+                          field.handleChange(event.target.value)
+                        }
+                        placeholder={
+                          selectedDirectory
+                            ? t("folderInside", {
+                                directory: selectedDirectory,
+                              })
+                            : t("folderPlaceholder")
+                        }
+                        value={field.state.value}
+                      />
+                      <Button
+                        className="shrink-0"
+                        disabled={
+                          !normalizeGitHubDirectorySegment(field.state.value)
+                        }
+                        size="sm"
+                        type="submit"
+                        variant="outline"
+                      >
+                        <HugeiconsIcon className="size-4" icon={Add01Icon} />
+                        {tCommon("actions.add")}
+                      </Button>
+                    </div>
+                    {error ? <FieldError>{error}</FieldError> : null}
+                  </Field>
+                )}
+              </newFolderForm.Field>
+            )}
+          </newFolderForm.Subscribe>
+        </form>
 
         <ResponsiveDialogFooter>
           <ResponsiveDialogClose

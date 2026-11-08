@@ -38,12 +38,10 @@ export function EventTriggerForm({
     }
   };
   const [addRepoOpen, setAddRepoOpen] = useState(false);
-  const [enabled, setEnabled] = useState(editTrigger?.enabled ?? true);
 
   const { form, isPending } = useEventTriggerForm({
     organizationId,
     editTrigger,
-    enabled,
     open,
     preset,
     onSuccess,
@@ -98,7 +96,7 @@ export function EventTriggerForm({
           return first;
         }
         if (first && typeof first === "object" && "message" in first) {
-          const message = (first as { message: unknown }).message;
+          const { message } = first;
           if (typeof message === "string") {
             return message;
           }
@@ -122,12 +120,16 @@ export function EventTriggerForm({
           form.handleSubmit();
         }}
       >
-        <EditorHeader
-          enabled={enabled}
-          kind="event"
-          onEnabledChange={setEnabled}
-          title={isEditMode ? t("editTitle") : t("newTitle")}
-        />
+        <form.Field name="enabled">
+          {(field) => (
+            <EditorHeader
+              enabled={field.state.value}
+              kind="event"
+              onEnabledChange={field.handleChange}
+              title={isEditMode ? t("editTitle") : t("newTitle")}
+            />
+          )}
+        </form.Field>
         <EventTriggerSection
           form={form}
           isLoading={isLoadingRepos}

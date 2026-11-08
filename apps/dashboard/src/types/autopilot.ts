@@ -547,6 +547,10 @@ export interface AutopilotReleaseFiltersSectionProps {
   repositories: AutopilotRepositoryOption[];
 }
 
+export interface AutopilotRuleFormValues {
+  topic: string;
+}
+
 export interface AutopilotRulesSectionProps {
   organizationId: string;
   rules: AutopilotOverview["rules"];

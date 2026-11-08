@@ -10,8 +10,9 @@ import {
 } from "@notra/ui/components/shared/responsive-dialog";
 import { CopyButton } from "@notra/ui/components/ui/copy-button";
 import { Input } from "@notra/ui/components/ui/input";
+import { useForm, useStore } from "@tanstack/react-form";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useId, useState } from "react";
+import { useId } from "react";
 import { toast } from "sonner";
 import { useTranslations } from "use-intl";
 
@@ -37,8 +38,6 @@ export function SiteDeleteDialog({
   const router = useRouter();
   const queryClient = useQueryClient();
   const invalidateSites = useInvalidateSites();
-  const [confirmation, setConfirmation] = useState("");
-  const matches = confirmation.trim() === siteName;
 
   const deleteMutation = useMutation({
     mutationFn: () =>
@@ -55,11 +54,24 @@ export function SiteDeleteDialog({
     },
   });
 
+  const form = useForm({
+    defaultValues: { confirmation: "" },
+    onSubmit: ({ value }) => {
+      if (value.confirmation.trim() === siteName && !deleteMutation.isPending) {
+        deleteMutation.mutate();
+      }
+    },
+  });
+  const matches = useStore(
+    form.store,
+    (state) => state.values.confirmation.trim() === siteName
+  );
+
   return (
     <ResponsiveDialog
       onOpenChange={(next) => {
         if (!next) {
-          setConfirmation("");
+          form.reset();
         }
         onOpenChange(next);
       }}
@@ -77,9 +89,7 @@ export function SiteDeleteDialog({
           id={`${id}-form`}
           onSubmit={(event) => {
             event.preventDefault();
-            if (matches && !deleteMutation.isPending) {
-              deleteMutation.mutate();
-            }
+            form.handleSubmit();
           }}
         >
           <div
@@ -102,17 +112,22 @@ export function SiteDeleteDialog({
               ),
             })}
           </div>
-          <Input
-            aria-label={t.markup("confirmLabel", {
-              name: siteName,
-              code: (chunks) => chunks,
-            })}
-            autoComplete="off"
-            id={`${id}-confirm`}
-            onChange={(event) => setConfirmation(event.target.value)}
-            spellCheck={false}
-            value={confirmation}
-          />
+          <form.Field name="confirmation">
+            {(field) => (
+              <Input
+                aria-label={t.markup("confirmLabel", {
+                  name: siteName,
+                  code: (chunks) => chunks,
+                })}
+                autoComplete="off"
+                id={`${id}-confirm`}
+                onBlur={field.handleBlur}
+                onChange={(event) => field.handleChange(event.target.value)}
+                spellCheck={false}
+                value={field.state.value}
+              />
+            )}
+          </form.Field>
         </form>
         <ResponsiveDialogFooter>
           <Button

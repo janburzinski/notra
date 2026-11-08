@@ -11,6 +11,7 @@ import {
 } from "@notra/ui/components/shared/responsive-dialog";
 import { Input } from "@notra/ui/components/ui/input";
 import { Label } from "@notra/ui/components/ui/label";
+import { useForm } from "@tanstack/react-form";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -21,10 +22,15 @@ import { WEBHOOK_EVENTS } from "@/constants/outbound-webhooks";
 import { dashboardOrpc } from "@/lib/orpc/query";
 import type {
   WebhookCreateDialogViewProps,
+  WebhookCreateFormValues,
   WebhookCreateProps,
-  WebhookEventName,
 } from "@/types/webhooks/outbound";
 import { copyTextToClipboard } from "@/utils/copy-to-clipboard";
+
+const DEFAULT_WEBHOOK_CREATE_VALUES: WebhookCreateFormValues = {
+  url: "",
+  events: ["post.generation.completed"],
+};
 
 export function WebhookCreateDialog({
   organizationId,
@@ -62,15 +68,10 @@ export function WebhookCreateDialogView({
 }: WebhookCreateDialogViewProps) {
   const t = useTranslations("settings.panes.webhooks.create");
   const tActions = useTranslations("common.actions");
-  const [url, setUrl] = useState("");
-  const [events, setEvents] = useState<WebhookEventName[]>([
-    "post.generation.completed",
-  ]);
-  const toggleEvent = (name: WebhookEventName, checked: boolean) => {
-    setEvents(
-      checked ? [...events, name] : events.filter((value) => value !== name)
-    );
-  };
+  const form = useForm({
+    defaultValues: DEFAULT_WEBHOOK_CREATE_VALUES,
+    onSubmit: ({ value }) => onSubmit(value.url, value.events),
+  });
   return (
     <ResponsiveDialog
       open={open}
@@ -116,42 +117,57 @@ export function WebhookCreateDialogView({
             className="space-y-5"
             onSubmit={(event) => {
               event.preventDefault();
-              onSubmit(url, events);
+              form.handleSubmit();
             }}
           >
-            <div className="space-y-2">
-              <Label htmlFor="webhook-url">{t("url")}</Label>
-              <Input
-                id="webhook-url"
-                type="url"
-                required
-                placeholder="https://your-app.com/webhooks/notra"
-                value={url}
-                onChange={(event) => setUrl(event.target.value)}
-                autoComplete="off"
-              />
-            </div>
-            <fieldset className="space-y-2">
-              <legend className="mb-2 text-sm font-medium">
-                {t("events")}
-              </legend>
-              {WEBHOOK_EVENTS.map((name) => (
-                <label
-                  key={name}
-                  className="flex cursor-pointer items-center gap-3 rounded-lg border p-3"
-                >
-                  <input
-                    type="checkbox"
-                    className="accent-primary size-4"
-                    checked={events.includes(name)}
-                    onChange={(event) =>
-                      toggleEvent(name, event.target.checked)
-                    }
+            <form.Field name="url">
+              {(field) => (
+                <div className="space-y-2">
+                  <Label htmlFor="webhook-url">{t("url")}</Label>
+                  <Input
+                    id="webhook-url"
+                    type="url"
+                    required
+                    placeholder="https://your-app.com/webhooks/notra"
+                    value={field.state.value}
+                    onBlur={field.handleBlur}
+                    onChange={(event) => field.handleChange(event.target.value)}
+                    autoComplete="off"
                   />
-                  <span className="font-mono text-xs">{name}</span>
-                </label>
-              ))}
-            </fieldset>
+                </div>
+              )}
+            </form.Field>
+            <form.Field name="events">
+              {(field) => (
+                <fieldset className="space-y-2">
+                  <legend className="mb-2 text-sm font-medium">
+                    {t("events")}
+                  </legend>
+                  {WEBHOOK_EVENTS.map((name) => (
+                    <label
+                      key={name}
+                      className="flex cursor-pointer items-center gap-3 rounded-lg border p-3"
+                    >
+                      <input
+                        type="checkbox"
+                        className="accent-primary size-4"
+                        checked={field.state.value.includes(name)}
+                        onChange={(event) =>
+                          field.handleChange(
+                            event.target.checked
+                              ? [...field.state.value, name]
+                              : field.state.value.filter(
+                                  (value) => value !== name
+                                )
+                          )
+                        }
+                      />
+                      <span className="font-mono text-xs">{name}</span>
+                    </label>
+                  ))}
+                </fieldset>
+              )}
+            </form.Field>
           </form>
         )}
         <ResponsiveDialogFooter>
@@ -168,14 +184,20 @@ export function WebhookCreateDialogView({
               >
                 {tActions("cancel")}
               </Button>
-              <Button
-                type="submit"
-                data-dialog-confirm
-                form="create-webhook"
-                disabled={pending || events.length === 0}
+              <form.Subscribe
+                selector={(state) => state.values.events.length === 0}
               >
-                {pending ? tActions("creating") : t("submit")}
-              </Button>
+                {(noEvents) => (
+                  <Button
+                    type="submit"
+                    data-dialog-confirm
+                    form="create-webhook"
+                    disabled={pending || noEvents}
+                  >
+                    {pending ? tActions("creating") : t("submit")}
+                  </Button>
+                )}
+              </form.Subscribe>
             </>
           )}
         </ResponsiveDialogFooter>

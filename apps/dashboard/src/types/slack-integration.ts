@@ -22,6 +22,10 @@ export interface SlackChannelOption {
   memberCount: number | null;
 }
 
+export interface CreateSlackChannelFormValues {
+  name: string;
+}
+
 export interface CreateAutopilotSlackChannelProps {
   organizationId: string;
   integrationId: string;

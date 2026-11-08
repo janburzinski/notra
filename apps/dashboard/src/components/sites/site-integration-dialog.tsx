@@ -21,6 +21,7 @@ import {
 } from "@notra/ui/components/ui/field";
 import { Input } from "@notra/ui/components/ui/input";
 import { Switch } from "@notra/ui/components/ui/switch";
+import { useForm, useStore } from "@tanstack/react-form";
 import { useId, useState } from "react";
 import { highlight } from "sugar-high";
 import { useTranslations } from "use-intl";
@@ -54,9 +55,6 @@ export function SiteIntegrationDialog({
   const tCommon = useTranslations("common");
   const id = useId();
   const save = useSaveSiteIntegration(scope);
-  const [values, setValues] = useState<SiteIntegrationValues>(() =>
-    siteIntegrationFormValues(provider, settings)
-  );
   // The settings the last save proposed; Save stays off until the form differs.
   const [baseline, setBaseline] = useState(() =>
     JSON.stringify(
@@ -69,6 +67,36 @@ export function SiteIntegrationDialog({
   );
   const [result, setResult] = useState<SiteIntegrationSaveResult | null>(null);
   const [showErrors, setShowErrors] = useState(false);
+  const defaultValues: SiteIntegrationValues = siteIntegrationFormValues(
+    provider,
+    settings
+  );
+  const form = useForm({
+    defaultValues,
+    onSubmit: ({ value }) => {
+      const proposed = siteIntegrationSettingsFromValues(
+        provider,
+        value,
+        settings
+      );
+      if (Object.keys(siteIntegrationFieldErrors(provider, proposed)).length) {
+        setShowErrors(true);
+        return;
+      }
+      const update = siteIntegrationUpdateFromValues(provider, value, settings);
+      const serialized = JSON.stringify(proposed);
+      if (serialized === baseline || !update || save.isPending) {
+        return;
+      }
+      save.mutate(update, {
+        onSuccess: ({ pullRequestUrl }) => {
+          setBaseline(serialized);
+          setResult({ action: "save", pullRequestUrl });
+        },
+      });
+    },
+  });
+  const values = useStore(form.store, (state) => state.values);
   const next = siteIntegrationSettingsFromValues(provider, values, settings);
   const errors = siteIntegrationFieldErrors(provider, next);
   const hasErrors = Object.keys(errors).length > 0;
@@ -92,27 +120,9 @@ export function SiteIntegrationDialog({
   );
 
   const change = (key: string, value: string | boolean) => {
-    setValues({ ...values, [key]: value });
+    form.setFieldValue(key, value);
     setResult(null);
     save.reset();
-  };
-
-  const submit = () => {
-    if (hasErrors) {
-      setShowErrors(true);
-      return;
-    }
-    const update = siteIntegrationUpdateFromValues(provider, values, settings);
-    if (!dirty || !update || save.isPending) {
-      return;
-    }
-    const proposed = JSON.stringify(next);
-    save.mutate(update, {
-      onSuccess: ({ pullRequestUrl }) => {
-        setBaseline(proposed);
-        setResult({ action: "save", pullRequestUrl });
-      },
-    });
   };
 
   const remove = () => {
@@ -166,7 +176,7 @@ export function SiteIntegrationDialog({
           noValidate
           onSubmit={(event) => {
             event.preventDefault();
-            submit();
+            form.handleSubmit();
           }}
         >
           {textFields.map((field) => {

@@ -8,6 +8,7 @@ import { hasGeoPersonaDetailsChanged } from "@notra/geo-core/utils/geo-personas"
 import { Badge } from "@notra/ui/components/ui/badge";
 import { Input } from "@notra/ui/components/ui/input";
 import { Textarea } from "@notra/ui/components/ui/textarea";
+import { useForm, useStore } from "@tanstack/react-form";
 import { useId, useRef, useState } from "react";
 import { toast } from "sonner";
 import { useTranslations } from "use-intl";
@@ -18,10 +19,13 @@ import {
   useGeoPersonasGenerate,
   useGeoPersonaUpdate,
 } from "@/lib/hooks/use-geo-personas";
-import type { PersonaProfileEditorProps } from "@/types/geo-personas-ui";
+import type {
+  PersonaProfileEditorProps,
+  PersonaProfileFormValues,
+} from "@/types/geo-personas-ui";
 import { groupPersonaMemories, personaPointsText } from "@/utils/geo-personas";
 
-function unsplitPoints(value: FormDataEntryValue | null, stored: string) {
+function unsplitPoints(value: string, stored: string) {
   return value === personaPointsText(stored) ? stored : value;
 }
 
@@ -46,72 +50,92 @@ export function PersonaProfileEditor({
     submitLabel = t("regeneratingPrompts");
   }
   const [error, setError] = useState<string | null>(null);
-  const [stack, setStack] = useState(() => [
-    ...new Set(persona.profile.currentStack),
-  ]);
   const [stackDraft, setStackDraft] = useState("");
   const stackInput = useRef<HTMLInputElement>(null);
+  const defaultValues: PersonaProfileFormValues = {
+    name: persona.name,
+    role: persona.role,
+    company: persona.company,
+    summary: personaPointsText(persona.summary),
+    searchStyle: personaPointsText(persona.searchStyle),
+    sections: {
+      goals: persona.profile.goals.join("\n"),
+      painPoints: persona.profile.painPoints.join("\n"),
+      buyingTriggers: persona.profile.buyingTriggers.join("\n"),
+      objections: persona.profile.objections.join("\n"),
+    },
+    currentStack: [...new Set(persona.profile.currentStack)],
+  };
+  const form = useForm({
+    defaultValues,
+    onSubmit: ({ value }) => {
+      const sectionText = {
+        ...value.sections,
+        currentStack: [...new Set([...value.currentStack, stackDraft.trim()])]
+          .filter(Boolean)
+          .join("\n"),
+      };
+      const profile = Object.fromEntries(
+        GEO_PERSONA_PROFILE_SECTIONS.map(({ key }) => [
+          key,
+          sectionText[key]
+            .split("\n")
+            .map((line) => line.trim())
+            .filter(Boolean),
+        ])
+      );
+      const parsed = geoPersonaEditableDetailsSchema.safeParse({
+        name: value.name,
+        role: value.role,
+        company: value.company,
+        summary: unsplitPoints(value.summary, persona.summary),
+        searchStyle: unsplitPoints(value.searchStyle, persona.searchStyle),
+        profile,
+      });
+      if (!parsed.success) {
+        setError(
+          parsed.error.issues
+            .map((issue) => `${issue.path.join(" · ")}: ${issue.message}`)
+            .join(". ")
+        );
+        return;
+      }
+      setError(null);
+      const commitStack = () => {
+        form.setFieldValue("currentStack", [
+          ...new Set(parsed.data.profile.currentStack),
+        ]);
+        setStackDraft("");
+      };
+      if (!hasGeoPersonaDetailsChanged(persona, parsed.data)) {
+        commitStack();
+        toast.success(t("saved"));
+        onCancel();
+        return;
+      }
+      update.mutate(
+        { personaId: persona.id, details: parsed.data },
+        {
+          onSuccess: () => {
+            commitStack();
+            toast.success(t("savedRegenerating"));
+            generatePersona.mutate({
+              personaId: persona.id,
+              promptsOnly: true,
+            });
+            onCancel();
+          },
+        }
+      );
+    },
+  });
+  const stack = useStore(form.store, (state) => state.values.currentStack);
   return (
     <form
       className="flex h-full min-h-0 flex-col"
       onSubmit={(event) => {
         event.preventDefault();
-        const form = new FormData(event.currentTarget);
-        form.set(
-          "currentStack",
-          [...new Set([...stack, stackDraft.trim()])].filter(Boolean).join("\n")
-        );
-        const profile = Object.fromEntries(
-          GEO_PERSONA_PROFILE_SECTIONS.map(({ key }) => [
-            key,
-            String(form.get(key) ?? "")
-              .split("\n")
-              .map((line) => line.trim())
-              .filter(Boolean),
-          ])
-        );
-        const parsed = geoPersonaEditableDetailsSchema.safeParse({
-          name: form.get("name"),
-          role: form.get("role"),
-          company: form.get("company"),
-          summary: unsplitPoints(form.get("summary"), persona.summary),
-          searchStyle: unsplitPoints(
-            form.get("searchStyle"),
-            persona.searchStyle
-          ),
-          profile,
-        });
-        if (!parsed.success) {
-          setError(
-            parsed.error.issues
-              .map((issue) => `${issue.path.join(" · ")}: ${issue.message}`)
-              .join(". ")
-          );
-          return;
-        }
-        setError(null);
-        if (!hasGeoPersonaDetailsChanged(persona, parsed.data)) {
-          setStack([...new Set(parsed.data.profile.currentStack)]);
-          setStackDraft("");
-          toast.success(t("saved"));
-          onCancel();
-          return;
-        }
-        update.mutate(
-          { personaId: persona.id, details: parsed.data },
-          {
-            onSuccess: () => {
-              setStack([...new Set(parsed.data.profile.currentStack)]);
-              setStackDraft("");
-              toast.success(t("savedRegenerating"));
-              generatePersona.mutate({
-                personaId: persona.id,
-                promptsOnly: true,
-              });
-              onCancel();
-            },
-          }
-        );
+        form.handleSubmit();
       }}
     >
       <fieldset
@@ -122,13 +146,19 @@ export function PersonaProfileEditor({
           <label className="block text-sm font-medium" htmlFor={`${id}-name`}>
             {tCommon2("labels.name")}
           </label>
-          <Input
-            id={`${id}-name`}
-            name="name"
-            defaultValue={persona.name}
-            maxLength={GEO_PERSONA_FIELD_MAX_LENGTH}
-            required
-          />
+          <form.Field name="name">
+            {(field) => (
+              <Input
+                id={`${id}-name`}
+                name={field.name}
+                value={field.state.value}
+                onBlur={field.handleBlur}
+                onChange={(event) => field.handleChange(event.target.value)}
+                maxLength={GEO_PERSONA_FIELD_MAX_LENGTH}
+                required
+              />
+            )}
+          </form.Field>
         </div>
         <section className="space-y-4 border-t pt-6">
           <h3 className="text-base font-semibold">{t("employment")}</h3>
@@ -140,13 +170,19 @@ export function PersonaProfileEditor({
               >
                 {t("jobTitle")}
               </label>
-              <Input
-                id={`${id}-role`}
-                name="role"
-                defaultValue={persona.role}
-                maxLength={200}
-                required
-              />
+              <form.Field name="role">
+                {(field) => (
+                  <Input
+                    id={`${id}-role`}
+                    name={field.name}
+                    value={field.state.value}
+                    onBlur={field.handleBlur}
+                    onChange={(event) => field.handleChange(event.target.value)}
+                    maxLength={200}
+                    required
+                  />
+                )}
+              </form.Field>
             </div>
             <div className="space-y-2">
               <label
@@ -155,15 +191,21 @@ export function PersonaProfileEditor({
               >
                 {t("companyProfile")}
               </label>
-              <Textarea
-                className="resize-none"
-                id={`${id}-company`}
-                name="company"
-                defaultValue={persona.company}
-                maxLength={200}
-                required
-                rows={2}
-              />
+              <form.Field name="company">
+                {(field) => (
+                  <Textarea
+                    className="resize-none"
+                    id={`${id}-company`}
+                    name={field.name}
+                    value={field.state.value}
+                    onBlur={field.handleBlur}
+                    onChange={(event) => field.handleChange(event.target.value)}
+                    maxLength={200}
+                    required
+                    rows={2}
+                  />
+                )}
+              </form.Field>
             </div>
           </div>
         </section>
@@ -177,15 +219,21 @@ export function PersonaProfileEditor({
               >
                 {t("motivations")}
               </label>
-              <Textarea
-                className="resize-none"
-                id={`${id}-summary`}
-                name="summary"
-                defaultValue={personaPointsText(persona.summary)}
-                maxLength={800}
-                required
-                rows={3}
-              />
+              <form.Field name="summary">
+                {(field) => (
+                  <Textarea
+                    className="resize-none"
+                    id={`${id}-summary`}
+                    name={field.name}
+                    value={field.state.value}
+                    onBlur={field.handleBlur}
+                    onChange={(event) => field.handleChange(event.target.value)}
+                    maxLength={800}
+                    required
+                    rows={3}
+                  />
+                )}
+              </form.Field>
             </div>
             <div className="space-y-2">
               <label
@@ -194,15 +242,21 @@ export function PersonaProfileEditor({
               >
                 {t("howTheySearch")}
               </label>
-              <Textarea
-                className="resize-none"
-                id={`${id}-searchStyle`}
-                name="searchStyle"
-                defaultValue={personaPointsText(persona.searchStyle)}
-                maxLength={800}
-                required
-                rows={3}
-              />
+              <form.Field name="searchStyle">
+                {(field) => (
+                  <Textarea
+                    className="resize-none"
+                    id={`${id}-searchStyle`}
+                    name={field.name}
+                    value={field.state.value}
+                    onBlur={field.handleBlur}
+                    onChange={(event) => field.handleChange(event.target.value)}
+                    maxLength={800}
+                    required
+                    rows={3}
+                  />
+                )}
+              </form.Field>
             </div>
             {GEO_PERSONA_PROFILE_SECTIONS.map((section) => (
               <div className="space-y-2" key={section.key}>
@@ -226,7 +280,7 @@ export function PersonaProfileEditor({
                           className="hover:bg-muted focus-visible:ring-ring flex size-6 shrink-0 items-center justify-center rounded-sm focus-visible:ring-2 focus-visible:outline-none"
                           aria-label={t("removeTool", { tool })}
                           onClick={() => {
-                            setStack((items) =>
+                            form.setFieldValue("currentStack", (items) =>
                               items.filter((item) => item !== tool)
                             );
                             stackInput.current?.focus();
@@ -264,20 +318,31 @@ export function PersonaProfileEditor({
                           setError(t("stackLimit"));
                           return;
                         }
-                        setStack((items) => [...items, tool]);
+                        form.setFieldValue("currentStack", (items) => [
+                          ...items,
+                          tool,
+                        ]);
                         setStackDraft("");
                         setError(null);
                       }}
                     />
                   </div>
                 ) : (
-                  <Textarea
-                    className="resize-none"
-                    id={`${id}-${section.key}`}
-                    name={section.key}
-                    defaultValue={persona.profile[section.key].join("\n")}
-                    rows={3}
-                  />
+                  <form.Field name={`sections.${section.key}`}>
+                    {(field) => (
+                      <Textarea
+                        className="resize-none"
+                        id={`${id}-${section.key}`}
+                        name={section.key}
+                        value={field.state.value}
+                        onBlur={field.handleBlur}
+                        onChange={(event) =>
+                          field.handleChange(event.target.value)
+                        }
+                        rows={3}
+                      />
+                    )}
+                  </form.Field>
                 )}
               </div>
             ))}

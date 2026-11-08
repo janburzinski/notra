@@ -8,8 +8,9 @@ import {
   ResponsiveDialogHeader,
   ResponsiveDialogTitle,
 } from "@notra/ui/components/shared/responsive-dialog";
+import { useForm, useStore } from "@tanstack/react-form";
 import { startOfDay } from "date-fns";
-import { type FormEvent, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import { useTranslations } from "use-intl";
 
@@ -20,6 +21,7 @@ import { ScheduleSlotField } from "@/components/content/schedule/schedule-slot-f
 import { ScheduleVideoSection } from "@/components/content/schedule/schedule-video-section";
 import {
   SCHEDULE_DIALOG_MODES,
+  SCHEDULE_FORM_FIELDS,
   SCHEDULE_SLOT_DATE_FORMAT,
 } from "@/constants/content-calendar";
 import {
@@ -56,12 +58,37 @@ function ScheduleContentForm({
 }: Omit<ScheduleContentDialogProps, "open">) {
   const t = useTranslations("content.calendar.schedule");
   const formatDate = useLocalDateFormat();
-  const [form, setForm] = useState(() =>
-    initialScheduleFormState({
+  const form = useForm({
+    defaultValues: initialScheduleFormState({
       schedule,
       storedRepositoryId: readStoredGitHubPublishRepositoryId(organizationId),
-    })
-  );
+    }),
+    onSubmit: () => {
+      if (!(canSubmit && scheduledAt)) {
+        return;
+      }
+      scheduleMutation.mutate(
+        {
+          contentId,
+          scheduledAt,
+          timeZone,
+          destinations: destinations.destinations,
+          expectedScheduledIds: opened.expectedScheduledIds,
+        },
+        {
+          onSuccess: () => {
+            toast.success(
+              t("scheduledToast", {
+                date: formatDate(scheduledAt, SCHEDULE_SLOT_DATE_FORMAT),
+              })
+            );
+            close();
+          },
+        }
+      );
+    },
+  });
+  const values = useStore(form.store, (state) => state.values);
   const [opened] = useState(() => ({
     at: Date.now(),
     expectedScheduledIds: summarizePostSchedule(schedule).scheduledIds,
@@ -76,7 +103,7 @@ function ScheduleContentForm({
   const destinations = useScheduleDestinations({
     organizationId,
     contentType,
-    form,
+    form: values,
   });
 
   const { socialPlatform } = scheduleDestinationsForContentType(contentType);
@@ -84,8 +111,8 @@ function ScheduleContentForm({
   const mode = getScheduleDialogMode(summary);
   const config = SCHEDULE_DIALOG_MODES[mode];
   const scheduledAt =
-    form.date && form.time
-      ? combineDateAndTime(form.date, form.time)
+    values.date && values.time
+      ? combineDateAndTime(values.date, values.time)
       : undefined;
   const inPast = scheduledAt ? scheduledAt.getTime() < opened.at : false;
   const isBusy =
@@ -101,38 +128,24 @@ function ScheduleContentForm({
     sendBlocked,
   });
 
-  const update = (patch: Partial<ScheduleFormState>) =>
-    setForm((current) => ({ ...current, ...patch }));
+  const update = (patch: Partial<ScheduleFormState>) => {
+    const next = { ...form.state.values, ...patch };
+    for (const key of SCHEDULE_FORM_FIELDS) {
+      if (key in patch) {
+        form.setFieldValue(key, next[key]);
+      }
+    }
+  };
   const close = () => onOpenChange(false);
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    if (!(canSubmit && scheduledAt)) {
-      return;
-    }
-    scheduleMutation.mutate(
-      {
-        contentId,
-        scheduledAt,
-        timeZone,
-        destinations: destinations.destinations,
-        expectedScheduledIds: opened.expectedScheduledIds,
-      },
-      {
-        onSuccess: () => {
-          toast.success(
-            t("scheduledToast", {
-              date: formatDate(scheduledAt, SCHEDULE_SLOT_DATE_FORMAT),
-            })
-          );
-          close();
-        },
-      }
-    );
-  };
-
   return (
-    <form className="contents" onSubmit={handleSubmit}>
+    <form
+      className="contents"
+      onSubmit={(event) => {
+        event.preventDefault();
+        void form.handleSubmit();
+      }}
+    >
       <ResponsiveDialogHeader>
         <ResponsiveDialogTitle>{t(config.titleKey)}</ResponsiveDialogTitle>
         <ResponsiveDialogDescription>{title}</ResponsiveDialogDescription>
@@ -151,18 +164,18 @@ function ScheduleContentForm({
         {config.editable ? (
           <>
             <ScheduleSlotField
-              date={form.date}
+              date={values.date}
               earliestDate={startOfDay(opened.at)}
               inPast={inPast}
-              onDateChange={(date) => update({ date })}
-              onTimeChange={(time) => update({ time })}
-              time={form.time}
+              onDateChange={(date) => form.setFieldValue("date", date)}
+              onTimeChange={(time) => form.setFieldValue("time", time)}
+              time={values.time}
               timeZone={timeZone}
             />
 
             <ScheduleWhereSection
               destinations={destinations}
-              form={form}
+              form={values}
               isBusy={isBusy}
               onChange={update}
               organizationSlug={organizationSlug}

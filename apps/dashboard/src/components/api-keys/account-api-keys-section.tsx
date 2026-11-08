@@ -10,7 +10,6 @@ import {
   UserCircleIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { API_KEY_DEFAULT_SCOPES } from "@notra/schemas/constants/dashboard/api-keys";
 import type {
   CreateApiKeyInput,
   UpdateApiKeyInput,
@@ -55,6 +54,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@notra/ui/components/ui/select";
+import { useForm } from "@tanstack/react-form";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -68,6 +68,8 @@ import { ApiKeyPermissionSelector } from "@/components/api-keys/permission-selec
 import { Button } from "@/components/button";
 import { SiteRelativeTime } from "@/components/sites/site-relative-time";
 import {
+  ACCOUNT_API_KEY_CREATE_DEFAULTS,
+  ACCOUNT_API_KEY_EDIT_DEFAULTS,
   API_KEY_EXPIRATION_OPTIONS,
   API_KEYS_EMPTY_TABLE_HEIGHT,
 } from "@/constants/api-keys";
@@ -76,11 +78,7 @@ import { expandLegacyApiKeyScopes } from "@/lib/api-keys/scopes";
 import { useApiKeyExpirationItems } from "@/lib/hooks/use-api-key-expiration-items";
 import { useApiKeyStatusNow } from "@/lib/hooks/use-api-key-status-now";
 import { dashboardOrpc } from "@/lib/orpc/query";
-import type {
-  ApiKeyAccessMode,
-  ApiKeyExpiration,
-  ApiKeyListItem,
-} from "@/types/api-keys";
+import type { ApiKeyListItem } from "@/types/api-keys";
 import { apiKeyStatus } from "@/utils/api-key-status";
 
 export function AccountApiKeysSection() {
@@ -92,18 +90,7 @@ export function AccountApiKeysSection() {
   const queryClient = useQueryClient();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [createdKey, setCreatedKey] = useState<string | null>(null);
-  const [createError, setCreateError] = useState<string | null>(null);
-  const [name, setName] = useState("");
-  const [accessMode, setAccessMode] = useState<ApiKeyAccessMode>("restricted");
-  const [scopes, setScopes] = useState<string[]>([...API_KEY_DEFAULT_SCOPES]);
-  const [expiration, setExpiration] = useState<ApiKeyExpiration>("30d");
   const [editingKey, setEditingKey] = useState<ApiKeyListItem | null>(null);
-  const [editValues, setEditValues] = useState({
-    name: "",
-    accessMode: "restricted" as ApiKeyAccessMode,
-    scopes: [] as string[],
-    expiration: "never" as ApiKeyExpiration,
-  });
   const [deletingKey, setDeletingKey] = useState<ApiKeyListItem | null>(null);
 
   const accountListKey = dashboardOrpc.apiKeys.account.list.queryKey();
@@ -120,7 +107,6 @@ export function AccountApiKeysSection() {
       dashboardOrpc.apiKeys.account.create.call(values),
     onSuccess: (data) => {
       setCreatedKey(data.key);
-      setCreateError(null);
       queryClient.invalidateQueries({ queryKey: accountListKey });
       toast.success(tAccount("toasts.created"));
     },
@@ -161,62 +147,60 @@ export function AccountApiKeysSection() {
     },
   });
 
-  const resetCreateForm = () => {
-    setName("");
-    setAccessMode("restricted");
-    setScopes([...API_KEY_DEFAULT_SCOPES]);
-    setExpiration("30d");
-  };
-
-  const handleCreateSubmit = () => {
-    const result = createApiKeySchema.safeParse({
-      name,
-      accessMode,
-      scopes,
-      expiration,
-    });
-    if (!result.success) {
-      const field = result.error.issues[0]?.path[0];
-      if (field === "name") {
-        setCreateError(tCommon("labels.nameIsRequired"));
-      } else if (field === "scopes") {
-        setCreateError(t("validation.selectPermission"));
-      } else {
-        setCreateError(t("validation.invalidKey"));
+  const createForm = useForm({
+    defaultValues: ACCOUNT_API_KEY_CREATE_DEFAULTS,
+    validators: {
+      onSubmit: ({ value }) => {
+        const result = createApiKeySchema.safeParse(value);
+        if (result.success) {
+          return;
+        }
+        const field = result.error.issues[0]?.path[0];
+        if (field === "name") {
+          return tCommon("labels.nameIsRequired");
+        }
+        if (field === "scopes") {
+          return t("validation.selectPermission");
+        }
+        return t("validation.invalidKey");
+      },
+    },
+    onSubmit: ({ value }) => {
+      const result = createApiKeySchema.safeParse(value);
+      if (result.success) {
+        createMutation.mutate(result.data);
       }
-      return;
-    }
-    setCreateError(null);
-    createMutation.mutate(result.data);
-  };
+    },
+  });
+
+  const editForm = useForm({
+    defaultValues: ACCOUNT_API_KEY_EDIT_DEFAULTS,
+    onSubmit: ({ value }) => {
+      const result = updateApiKeySchema.safeParse(value);
+      if (!result.success) {
+        toast.error(
+          result.error.issues[0]?.path[0] === "name"
+            ? tCommon("labels.nameIsRequired")
+            : t("validation.invalidKey")
+        );
+        return;
+      }
+      updateMutation.mutate(result.data);
+    },
+  });
 
   const openEditDialog = (key: ApiKeyListItem) => {
-    setEditValues({
-      name: key.name,
-      accessMode: key.accessMode,
-      scopes: expandLegacyApiKeyScopes(key.permissions),
-      expiration: inferApiKeyExpiration(key.createdAt, key.expires),
-    });
+    editForm.reset(
+      {
+        keyId: key.keyId,
+        name: key.name,
+        accessMode: key.accessMode,
+        scopes: expandLegacyApiKeyScopes(key.permissions),
+        expiration: inferApiKeyExpiration(key.createdAt, key.expires),
+      },
+      { keepDefaultValues: true }
+    );
     setEditingKey(key);
-  };
-
-  const handleEditSubmit = () => {
-    if (!editingKey) {
-      return;
-    }
-    const result = updateApiKeySchema.safeParse({
-      keyId: editingKey.keyId,
-      ...editValues,
-    });
-    if (!result.success) {
-      toast.error(
-        result.error.issues[0]?.path[0] === "name"
-          ? tCommon("labels.nameIsRequired")
-          : t("validation.invalidKey")
-      );
-      return;
-    }
-    updateMutation.mutate(result.data);
   };
 
   const now = useApiKeyStatusNow(keys);
@@ -430,8 +414,7 @@ export function AccountApiKeysSection() {
           setDialogOpen(open);
           if (!open) {
             setCreatedKey(null);
-            setCreateError(null);
-            resetCreateForm();
+            createForm.reset();
           }
         }}
         open={dialogOpen}
@@ -477,7 +460,7 @@ export function AccountApiKeysSection() {
             </>
           ) : (
             <form
-              action={handleCreateSubmit}
+              action={() => createForm.handleSubmit()}
               className="flex min-h-0 flex-1 flex-col"
             >
               <ResponsiveDialogHeader className="shrink-0 border-b p-4 pr-14">
@@ -489,62 +472,92 @@ export function AccountApiKeysSection() {
                 </ResponsiveDialogDescription>
               </ResponsiveDialogHeader>
               <div className="flex min-h-0 flex-1 flex-col gap-4 p-4">
-                <Field className="shrink-0">
-                  <FieldLabel>
-                    {tCommon("labels.name")}
-                    <span className="text-destructive -ml-1">*</span>
-                  </FieldLabel>
-                  <Input
-                    disabled={createMutation.isPending}
-                    onChange={(event) => {
-                      setCreateError(null);
-                      setName(event.target.value);
-                    }}
-                    placeholder={tAccount("namePlaceholder")}
-                    value={name}
-                  />
-                  {createError ? (
-                    <p className="text-destructive text-sm">{createError}</p>
-                  ) : null}
-                </Field>
-                <Field className="shrink-0">
-                  <FieldLabel>{t("form.expiration")}</FieldLabel>
-                  <Select
-                    disabled={createMutation.isPending}
-                    items={expirationItems}
-                    onValueChange={(value) =>
-                      setExpiration(value as ApiKeyExpiration)
-                    }
-                    value={expiration}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {API_KEY_EXPIRATION_OPTIONS.map((option) => (
-                        <SelectItem key={option.value} value={option.value}>
-                          {t("expirationOption", { value: option.value })}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </Field>
-                <Field className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
-                  <FieldLabel>
-                    {tCommon("labels.permissions")}
-                    <span className="text-destructive -ml-1">*</span>
-                  </FieldLabel>
-                  <ApiKeyPermissionSelector
-                    accessMode={accessMode}
-                    disabled={createMutation.isPending}
-                    onAccessModeChange={(mode, nextScopes) => {
-                      setAccessMode(mode);
-                      setScopes(nextScopes);
-                    }}
-                    onValueChange={setScopes}
-                    value={scopes}
-                  />
-                </Field>
+                <createForm.Field
+                  listeners={{
+                    onChange: () =>
+                      createForm.setErrorMap({ onSubmit: undefined }),
+                  }}
+                  name="name"
+                >
+                  {(field) => (
+                    <Field className="shrink-0">
+                      <FieldLabel>
+                        {tCommon("labels.name")}
+                        <span className="text-destructive -ml-1">*</span>
+                      </FieldLabel>
+                      <Input
+                        disabled={createMutation.isPending}
+                        onBlur={field.handleBlur}
+                        onChange={(event) =>
+                          field.handleChange(event.target.value)
+                        }
+                        placeholder={tAccount("namePlaceholder")}
+                        value={field.state.value}
+                      />
+                      <createForm.Subscribe
+                        selector={(state) => state.errorMap.onSubmit}
+                      >
+                        {(createError) =>
+                          createError ? (
+                            <p className="text-destructive text-sm">
+                              {createError}
+                            </p>
+                          ) : null
+                        }
+                      </createForm.Subscribe>
+                    </Field>
+                  )}
+                </createForm.Field>
+                <createForm.Field name="expiration">
+                  {(field) => (
+                    <Field className="shrink-0">
+                      <FieldLabel>{t("form.expiration")}</FieldLabel>
+                      <Select
+                        disabled={createMutation.isPending}
+                        items={expirationItems}
+                        onValueChange={(value) =>
+                          value && field.handleChange(value)
+                        }
+                        value={field.state.value}
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {API_KEY_EXPIRATION_OPTIONS.map((option) => (
+                            <SelectItem key={option.value} value={option.value}>
+                              {t("expirationOption", { value: option.value })}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </Field>
+                  )}
+                </createForm.Field>
+                <createForm.Field name="accessMode">
+                  {(accessModeField) => (
+                    <createForm.Field name="scopes">
+                      {(scopesField) => (
+                        <Field className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
+                          <FieldLabel>
+                            {tCommon("labels.permissions")}
+                            <span className="text-destructive -ml-1">*</span>
+                          </FieldLabel>
+                          <ApiKeyPermissionSelector
+                            accessMode={accessModeField.state.value}
+                            disabled={createMutation.isPending}
+                            onAccessModeChange={(mode, nextScopes) => {
+                              accessModeField.handleChange(mode);
+                              scopesField.handleChange(nextScopes);
+                            }}
+                            onValueChange={scopesField.handleChange}
+                            value={scopesField.state.value}
+                          />
+                        </Field>
+                      )}
+                    </createForm.Field>
+                  )}
+                </createForm.Field>
               </div>
               <ResponsiveDialogFooter className="bg-background/95 supports-backdrop-filter:bg-background/80 mx-0 mb-0 shrink-0 rounded-b-xl border-t p-4 sm:justify-between">
                 <ResponsiveDialogClose
@@ -580,7 +593,7 @@ export function AccountApiKeysSection() {
       >
         <ResponsiveDialogContent className="flex max-h-[85svh] flex-col gap-0 overflow-hidden p-0 sm:max-w-3xl">
           <form
-            action={handleEditSubmit}
+            action={() => editForm.handleSubmit()}
             className="flex min-h-0 flex-1 flex-col"
           >
             <ResponsiveDialogHeader className="shrink-0 border-b p-4 pr-14">
@@ -589,68 +602,72 @@ export function AccountApiKeysSection() {
               </ResponsiveDialogTitle>
             </ResponsiveDialogHeader>
             <div className="flex min-h-0 flex-1 flex-col gap-4 p-4">
-              <Field className="shrink-0">
-                <FieldLabel>
-                  {tCommon("labels.name")}
-                  <span className="text-destructive -ml-1">*</span>
-                </FieldLabel>
-                <Input
-                  disabled={updateMutation.isPending}
-                  onChange={(e) =>
-                    setEditValues((prev) => ({ ...prev, name: e.target.value }))
-                  }
-                  value={editValues.name}
-                />
-              </Field>
-              <Field className="shrink-0">
-                <FieldLabel>{t("form.expiration")}</FieldLabel>
-                <Select
-                  disabled={updateMutation.isPending}
-                  items={expirationItems}
-                  onValueChange={(value) =>
-                    setEditValues((prev) => ({
-                      ...prev,
-                      expiration: value as ApiKeyExpiration,
-                    }))
-                  }
-                  value={editValues.expiration}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {API_KEY_EXPIRATION_OPTIONS.map((option) => (
-                      <SelectItem key={option.value} value={option.value}>
-                        {t("expirationOption", { value: option.value })}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </Field>
-              <Field className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
-                <FieldLabel>
-                  {tCommon("labels.permissions")}
-                  <span className="text-destructive -ml-1">*</span>
-                </FieldLabel>
-                <ApiKeyPermissionSelector
-                  accessMode={editValues.accessMode}
-                  disabled={updateMutation.isPending}
-                  onAccessModeChange={(mode, nextScopes) =>
-                    setEditValues((prev) => ({
-                      ...prev,
-                      accessMode: mode,
-                      scopes: nextScopes,
-                    }))
-                  }
-                  onValueChange={(nextScopes) =>
-                    setEditValues((prev) => ({
-                      ...prev,
-                      scopes: nextScopes,
-                    }))
-                  }
-                  value={editValues.scopes}
-                />
-              </Field>
+              <editForm.Field name="name">
+                {(field) => (
+                  <Field className="shrink-0">
+                    <FieldLabel>
+                      {tCommon("labels.name")}
+                      <span className="text-destructive -ml-1">*</span>
+                    </FieldLabel>
+                    <Input
+                      disabled={updateMutation.isPending}
+                      onBlur={field.handleBlur}
+                      onChange={(e) => field.handleChange(e.target.value)}
+                      value={field.state.value}
+                    />
+                  </Field>
+                )}
+              </editForm.Field>
+              <editForm.Field name="expiration">
+                {(field) => (
+                  <Field className="shrink-0">
+                    <FieldLabel>{t("form.expiration")}</FieldLabel>
+                    <Select
+                      disabled={updateMutation.isPending}
+                      items={expirationItems}
+                      onValueChange={(value) =>
+                        value && field.handleChange(value)
+                      }
+                      value={field.state.value}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {API_KEY_EXPIRATION_OPTIONS.map((option) => (
+                          <SelectItem key={option.value} value={option.value}>
+                            {t("expirationOption", { value: option.value })}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </Field>
+                )}
+              </editForm.Field>
+              <editForm.Field name="accessMode">
+                {(accessModeField) => (
+                  <editForm.Field name="scopes">
+                    {(scopesField) => (
+                      <Field className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
+                        <FieldLabel>
+                          {tCommon("labels.permissions")}
+                          <span className="text-destructive -ml-1">*</span>
+                        </FieldLabel>
+                        <ApiKeyPermissionSelector
+                          accessMode={accessModeField.state.value}
+                          disabled={updateMutation.isPending}
+                          onAccessModeChange={(mode, nextScopes) => {
+                            accessModeField.handleChange(mode);
+                            scopesField.handleChange(nextScopes);
+                          }}
+                          onValueChange={scopesField.handleChange}
+                          value={scopesField.state.value}
+                        />
+                      </Field>
+                    )}
+                  </editForm.Field>
+                )}
+              </editForm.Field>
             </div>
             <ResponsiveDialogFooter className="bg-background/95 supports-backdrop-filter:bg-background/80 mx-0 mb-0 shrink-0 rounded-b-xl border-t p-4">
               <ResponsiveDialogClose

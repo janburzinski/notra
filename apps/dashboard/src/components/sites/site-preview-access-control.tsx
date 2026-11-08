@@ -8,6 +8,7 @@ import {
   PopoverTitle,
   PopoverTrigger,
 } from "@notra/ui/components/ui/popover";
+import { useForm, useStore } from "@tanstack/react-form";
 import { useId, useState } from "react";
 import { useTranslations } from "use-intl";
 
@@ -17,7 +18,7 @@ import { SitePreviewAccessModes } from "@/components/sites/site-preview-access-m
 import { SitePreviewPasswordField } from "@/components/sites/site-preview-password-field";
 import { useSavePreviewAccess } from "@/lib/hooks/use-save-preview-access";
 import type { SitePreviewAccessFormProps } from "@/types/components/site-preview-access";
-import type { SitePreviewAccessMode } from "@/types/site-preview-access";
+import type { SitePreviewAccessDraft } from "@/types/site-preview-access";
 import {
   sitePreviewAccessMode,
   sitePreviewAccessModeConfig,
@@ -31,27 +32,34 @@ function SitePreviewAccessForm({ onDone }: SitePreviewAccessFormProps) {
   const { organizationId, siteId, detail } = useSite();
   const { site } = detail;
 
-  const [enabled, setEnabled] = useState(site.previewsEnabled);
-  const [mode, setMode] = useState<SitePreviewAccessMode>(() =>
-    sitePreviewAccessMode(site)
-  );
-  const [password, setPassword] = useState("");
-  const [editingPassword, setEditingPassword] = useState(
-    !site.previewPasswordSetAt
-  );
   const [showPassword, setShowPassword] = useState(false);
-
-  const plan = sitePreviewAccessPlan(site, {
-    enabled,
-    mode,
-    password,
-    editingPassword,
-  });
   const saveMutation = useSavePreviewAccess({
     organizationId,
     siteId,
     onSaved: onDone,
   });
+  const defaultValues: SitePreviewAccessDraft = {
+    enabled: site.previewsEnabled,
+    mode: sitePreviewAccessMode(site),
+    password: "",
+    editingPassword: !site.previewPasswordSetAt,
+  };
+  const form = useForm({
+    defaultValues,
+    onSubmit: ({ value }) => {
+      const draftPlan = sitePreviewAccessPlan(site, value);
+      if (
+        draftPlan.isDirty &&
+        !draftPlan.passwordTooShort &&
+        !saveMutation.isPending
+      ) {
+        saveMutation.mutate(draftPlan);
+      }
+    },
+  });
+  const draft = useStore(form.store, (state) => state.values);
+  const { enabled, mode, password, editingPassword } = draft;
+  const plan = sitePreviewAccessPlan(site, draft);
   const canSave =
     plan.isDirty && !plan.passwordTooShort && !saveMutation.isPending;
 
@@ -61,18 +69,16 @@ function SitePreviewAccessForm({ onDone }: SitePreviewAccessFormProps) {
       onSubmit={(event) => {
         event.preventDefault();
         event.stopPropagation();
-        if (canSave) {
-          saveMutation.mutate(plan);
-        }
+        form.handleSubmit();
       }}
     >
       <SitePreviewAccessModes
         idPrefix={id}
         mode={enabled ? mode : "off"}
         onModeChange={(next) => {
-          setEnabled(next !== "off");
+          form.setFieldValue("enabled", next !== "off");
           if (next !== "off") {
-            setMode(next);
+            form.setFieldValue("mode", next);
           }
         }}
       />
@@ -87,8 +93,8 @@ function SitePreviewAccessForm({ onDone }: SitePreviewAccessFormProps) {
         <SitePreviewPasswordField
           editing={editingPassword}
           idPrefix={id}
-          onEdit={() => setEditingPassword(true)}
-          onChange={setPassword}
+          onEdit={() => form.setFieldValue("editingPassword", true)}
+          onChange={(next) => form.setFieldValue("password", next)}
           onToggleShowPassword={() => setShowPassword((shown) => !shown)}
           value={password}
           passwordSetAt={site.previewPasswordSetAt}

@@ -10,7 +10,8 @@ import {
 } from "@notra/ui/components/shared/responsive-dialog";
 import { Input } from "@notra/ui/components/ui/input";
 import { Label } from "@notra/ui/components/ui/label";
-import { useId, useState } from "react";
+import { useForm } from "@tanstack/react-form";
+import { useId } from "react";
 import { useTranslations } from "use-intl";
 
 import { Button } from "@/components/button";
@@ -87,8 +88,10 @@ export function SiteBranchDialog({
   const t = useTranslations("sites.branches");
   const common = useTranslations("common");
   const id = useId();
-  const [title, setTitle] = useState("");
-  const [bring, setBring] = useState(true);
+  const form = useForm({
+    defaultValues: { title: "", bring: true },
+    onSubmit: ({ value }) => onConfirm(value.title, value.bring),
+  });
   const kind = action?.kind ?? "create";
   const destructive = SITE_BRANCH_DESTRUCTIVE_DIALOG_KINDS.has(kind);
   return (
@@ -109,31 +112,36 @@ export function SiteBranchDialog({
             <SiteBranchDialogDescription action={action} />
           </ResponsiveDialogDescription>
         </ResponsiveDialogHeader>
-        <form
-          id={id}
-          action={() => onConfirm(title, bring)}
-          className="space-y-4"
-        >
+        <form id={id} action={() => form.handleSubmit()} className="space-y-4">
           {destructive ? null : (
-            <div className="space-y-2">
-              <Label htmlFor={`${id}-title`}>{t("title")}</Label>
-              <Input
-                id={`${id}-title`}
-                autoComplete="off"
-                maxLength={100}
-                value={title}
-                onChange={(event) => setTitle(event.target.value)}
-                required={kind === "rename"}
-              />
-            </div>
+            <form.Field name="title">
+              {(field) => (
+                <div className="space-y-2">
+                  <Label htmlFor={`${id}-title`}>{t("title")}</Label>
+                  <Input
+                    id={`${id}-title`}
+                    autoComplete="off"
+                    maxLength={100}
+                    value={field.state.value}
+                    onBlur={field.handleBlur}
+                    onChange={(event) => field.handleChange(event.target.value)}
+                    required={kind === "rename"}
+                  />
+                </div>
+              )}
+            </form.Field>
           )}
           {kind === "create" && draftCount > 0 ? (
-            <SiteBranchBringFields
-              name={`${id}-bring`}
-              draftCount={draftCount}
-              bring={bring}
-              onBringChange={setBring}
-            />
+            <form.Field name="bring">
+              {(field) => (
+                <SiteBranchBringFields
+                  name={`${id}-bring`}
+                  draftCount={draftCount}
+                  bring={field.state.value}
+                  onBringChange={field.handleChange}
+                />
+              )}
+            </form.Field>
           ) : null}
         </form>
         <ResponsiveDialogFooter>

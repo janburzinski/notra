@@ -4,7 +4,7 @@ import { SentIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Textarea } from "@notra/ui/components/ui/textarea";
 import { cn } from "@notra/ui/lib/utils";
-import { useState } from "react";
+import { useForm, useStore } from "@tanstack/react-form";
 import { toast } from "sonner";
 import { useTranslations } from "use-intl";
 
@@ -15,7 +15,7 @@ import { usePathname } from "@/lib/navigation";
 import { dashboardOrpcClient } from "@/lib/orpc/client";
 import type {
   FeedbackFormProps,
-  FeedbackSentiment,
+  FeedbackFormValues,
 } from "@/types/dashboard/feedback";
 import { FEEDBACK_SENTIMENT_OPTIONS } from "@/utils/feedback";
 import { getFeedbackPageUrl } from "@/utils/feedback-page-url";
@@ -29,43 +29,45 @@ export function FeedbackForm({
   const pathname = usePathname();
   const { activeOrganization } = useOrganizationsContext();
 
-  const [message, setMessage] = useState("");
-  const [sentiment, setSentiment] = useState<FeedbackSentiment | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const trimmed = message.trim();
+  const defaultValues: FeedbackFormValues = { message: "", sentiment: null };
+  const form = useForm({
+    defaultValues,
+    onSubmit: async ({ value, formApi }) => {
+      const message = value.message.trim();
+      if (!message) {
+        return;
+      }
+      try {
+        await dashboardOrpcClient.feedback.submit({
+          message,
+          sentiment: value.sentiment ?? undefined,
+          organizationId: activeOrganization?.id,
+          pageUrl: getFeedbackPageUrl(pathname),
+        });
+      } catch (error) {
+        toast.error(error instanceof Error ? error.message : t("sendFailed"));
+        return;
+      }
+      toast.success(t("thanks"));
+      formApi.reset();
+      onSubmitted?.();
+    },
+  });
+  const { isSubmitting, sentiment, trimmed } = useStore(
+    form.store,
+    (state) => ({
+      isSubmitting: state.isSubmitting,
+      sentiment: state.values.sentiment,
+      trimmed: state.values.message.trim(),
+    })
+  );
   const canSubmit = trimmed.length > 0 && !isSubmitting;
 
   async function handleSubmit() {
     if (!canSubmit) {
       return;
     }
-
-    setIsSubmitting(true);
-    const sentimentValue = sentiment ?? undefined;
-    const organizationId = activeOrganization?.id;
-    try {
-      await dashboardOrpcClient.feedback.submit({
-        message: trimmed,
-        sentiment: sentimentValue,
-        organizationId,
-        pageUrl: getFeedbackPageUrl(pathname),
-      });
-
-      toast.success(t("thanks"));
-      setMessage("");
-      setSentiment(null);
-      if (onSubmitted) {
-        onSubmitted();
-      }
-    } catch (error) {
-      const errMessage =
-        error instanceof Error ? error.message : t("sendFailed");
-      setIsSubmitting(false);
-      toast.error(errMessage);
-      return;
-    }
-    setIsSubmitting(false);
+    await form.handleSubmit();
   }
 
   async function handleKeyDown(
@@ -80,17 +82,22 @@ export function FeedbackForm({
   return (
     <>
       <div className="p-2.5 pb-0">
-        <Textarea
-          aria-label={t("label")}
-          autoFocus={autoFocus}
-          className="min-h-28 resize-none"
-          disabled={isSubmitting}
-          maxLength={FEEDBACK_MAX_MESSAGE_LENGTH}
-          onChange={(event) => setMessage(event.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder={t("placeholder")}
-          value={message}
-        />
+        <form.Field name="message">
+          {(field) => (
+            <Textarea
+              aria-label={t("label")}
+              autoFocus={autoFocus}
+              className="min-h-28 resize-none"
+              disabled={isSubmitting}
+              maxLength={FEEDBACK_MAX_MESSAGE_LENGTH}
+              onBlur={field.handleBlur}
+              onChange={(event) => field.handleChange(event.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder={t("placeholder")}
+              value={field.state.value}
+            />
+          )}
+        </form.Field>
       </div>
 
       <div className="flex items-center justify-between gap-2 p-2.5">
@@ -110,7 +117,7 @@ export function FeedbackForm({
                 disabled={isSubmitting}
                 key={option.value}
                 onClick={() =>
-                  setSentiment((current) =>
+                  form.setFieldValue("sentiment", (current) =>
                     current === option.value ? null : option.value
                   )
                 }

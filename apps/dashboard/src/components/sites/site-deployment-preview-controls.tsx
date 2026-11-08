@@ -15,6 +15,7 @@ import {
 } from "@notra/ui/components/shared/responsive-dialog";
 import { Input } from "@notra/ui/components/ui/input";
 import { Label } from "@notra/ui/components/ui/label";
+import { useForm, useStore } from "@tanstack/react-form";
 import { useMutation } from "@tanstack/react-query";
 import { useId, useState } from "react";
 import { toast } from "sonner";
@@ -38,8 +39,6 @@ function PreviewBranchDialog({
   const tCommon = useTranslations("common");
   const id = useId();
   const invalidateSites = useInvalidateSites();
-  const [branch, setBranch] = useState("");
-  const trimmedBranch = branch.trim();
 
   const createMutation = useMutation({
     mutationFn: (name: string) =>
@@ -50,7 +49,7 @@ function PreviewBranchDialog({
       }),
     onSuccess: async (result) => {
       toast.success(t("created", { key: result.previewKey }));
-      setBranch("");
+      form.reset();
       onOpenChange(false);
       await invalidateSites();
     },
@@ -58,6 +57,19 @@ function PreviewBranchDialog({
       toast.error(toErrorMessage(error, t("createFailed")));
     },
   });
+
+  const form = useForm({
+    defaultValues: { branch: "" },
+    onSubmit: ({ value }) => {
+      const branch = value.branch.trim();
+      if (branch && !createMutation.isPending) {
+        createMutation.mutate(branch);
+      }
+    },
+  });
+  const trimmedBranch = useStore(form.store, (state) =>
+    state.values.branch.trim()
+  );
 
   return (
     <ResponsiveDialog onOpenChange={onOpenChange} open={open}>
@@ -73,21 +85,24 @@ function PreviewBranchDialog({
           id={`${id}-form`}
           onSubmit={(event) => {
             event.preventDefault();
-            if (trimmedBranch && !createMutation.isPending) {
-              createMutation.mutate(trimmedBranch);
-            }
+            form.handleSubmit();
           }}
         >
           <Label htmlFor={`${id}-branch`}>{t("branchLabel")}</Label>
-          <Input
-            autoComplete="off"
-            autoFocus
-            id={`${id}-branch`}
-            onChange={(event) => setBranch(event.target.value)}
-            placeholder={t("branchPlaceholder")}
-            spellCheck={false}
-            value={branch}
-          />
+          <form.Field name="branch">
+            {(field) => (
+              <Input
+                autoComplete="off"
+                autoFocus
+                id={`${id}-branch`}
+                onBlur={field.handleBlur}
+                onChange={(event) => field.handleChange(event.target.value)}
+                placeholder={t("branchPlaceholder")}
+                spellCheck={false}
+                value={field.state.value}
+              />
+            )}
+          </form.Field>
         </form>
         <ResponsiveDialogFooter>
           <Button

@@ -96,3 +96,15 @@ export interface SkillUpdateCardProps {
   onKeep: () => void;
   onApply: () => void;
 }
+
+export interface CreateSkillFormDialogProps {
+  onOpenChange: (open: boolean) => void;
+  open: boolean;
+  organizationId: string;
+}
+
+export interface SkillDraftValues {
+  name: string;
+  description: string;
+  content: string;
+}

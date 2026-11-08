@@ -3,7 +3,8 @@
 import { Button } from "@notra/ui/components/ui/button";
 import { Textarea } from "@notra/ui/components/ui/textarea";
 import { cn } from "@notra/ui/lib/utils";
-import { useEffect, useRef, useState } from "react";
+import { useForm } from "@tanstack/react-form";
+import { useEffect, useRef } from "react";
 import { useTranslations } from "use-intl";
 
 import type { ChatAnnotationNoteFormProps } from "@/types/components/chat-annotation-note-form";
@@ -16,7 +17,10 @@ export function ChatAnnotationNoteForm({
   submitLabel,
 }: ChatAnnotationNoteFormProps) {
   const t = useTranslations("chat.annotations");
-  const [note, setNote] = useState(initialNote);
+  const form = useForm({
+    defaultValues: { note: initialNote },
+    onSubmit: ({ value }) => onSubmit(value.note.trim()),
+  });
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
@@ -33,30 +37,35 @@ export function ChatAnnotationNoteForm({
       className={cn("flex w-72 flex-col gap-1.5 p-1", className)}
       onSubmit={(event) => {
         event.preventDefault();
-        onSubmit(note.trim());
+        void form.handleSubmit();
       }}
     >
-      <Textarea
-        aria-label={t("noteLabel")}
-        ref={textareaRef}
-        className="max-h-32 min-h-14 resize-none"
-        maxLength={500}
-        onChange={(event) => setNote(event.target.value)}
-        onKeyDown={(event) => {
-          if (event.key === "Enter" && !event.shiftKey) {
-            event.preventDefault();
-            event.currentTarget.form?.requestSubmit();
-          }
-          if (event.key === "Escape") {
-            event.preventDefault();
-            event.stopPropagation();
-            onCancel();
-          }
-        }}
-        placeholder={t("notePlaceholder")}
-        rows={2}
-        value={note}
-      />
+      <form.Field name="note">
+        {(field) => (
+          <Textarea
+            aria-label={t("noteLabel")}
+            ref={textareaRef}
+            className="max-h-32 min-h-14 resize-none"
+            maxLength={500}
+            onBlur={field.handleBlur}
+            onChange={(event) => field.handleChange(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key === "Enter" && !event.shiftKey) {
+                event.preventDefault();
+                event.currentTarget.form?.requestSubmit();
+              }
+              if (event.key === "Escape") {
+                event.preventDefault();
+                event.stopPropagation();
+                onCancel();
+              }
+            }}
+            placeholder={t("notePlaceholder")}
+            rows={2}
+            value={field.state.value}
+          />
+        )}
+      </form.Field>
       <div className="flex justify-end gap-1">
         <Button onClick={onCancel} size="xs" type="button" variant="ghost">
           {t("cancel")}

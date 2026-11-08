@@ -3,6 +3,7 @@ import type { DateTimeFormatOptions } from "use-intl";
 import type {
   ScheduleDialogMode,
   ScheduleDialogModeConfig,
+  ScheduleFormState,
   SchedulePollTier,
 } from "@/types/content/schedule";
 
@@ -81,3 +82,13 @@ export const SCHEDULED_PUBLICATION_WAKE_EARLY_TOLERANCE_MS = 5 * 1000;
 
 export const SCHEDULED_PUBLICATION_ATTEMPT_ROUTE_PATH =
   "/api/internal/content/scheduled-publication-attempt";
+
+export const SCHEDULE_FORM_FIELDS = [
+  "date",
+  "time",
+  "githubEnabled",
+  "repositoryId",
+  "merge",
+  "socialEnabled",
+  "accountId",
+] as const satisfies readonly (keyof ScheduleFormState)[];
