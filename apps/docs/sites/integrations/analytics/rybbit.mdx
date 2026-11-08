@@ -1,0 +1,152 @@
+---
+title: "Rybbit"
+description: "Send visits, events and session replays on your Notra site to Rybbit, with every tracker and recorder option available in blog.json."
+authors:
+  - handle: dominik
+
+docolin:
+  schema_version: 1
+  kind: tools/notra/sites/integrations/analytics/rybbit
+  type: how-to
+  applies_to:
+    - notra
+  language: en
+  status: stable
+---
+
+Notra loads the Rybbit script on every live page and allows your Rybbit host in the CSP. It passes every option you set in `blog.json` to the tracker as a `data-*` attribute, so you can skip or mask paths, tag events and tune session replay on Rybbit Cloud or your own Rybbit instance without writing a custom script.
+
+With the [c15t cookie banner](/sites/integrations/consent/c15t) on, Rybbit loads through c15t instead, only after a visitor allows the measurement category, and keeps every option below.
+
+<Steps>
+  <Step title="Copy your Site ID">
+    In [Rybbit](https://rybbit.com), open your site's settings and find its tracking code. The Site ID is the `siteId` value in the script URL, like `123` in `https://app.rybbit.io/api/script.js?siteId=123`. It's a public ID, so you don't need an API key.
+  </Step>
+  <Step title="Add it to Notra">
+    Open **Studio → Sites**, select your site, open **Integrations** and click **Add Rybbit**. Paste the ID into **Site ID**, and if you host Rybbit yourself, enter your instance's script URL under **Script URL** as well. When you click **Save**, Notra opens a pull request with the change. To configure it in your repository instead, add it to `blog.json`:
+
+    ```json blog.json
+    {
+      "$schema": "https://usenotra.com/schemas/blog.json",
+      "name": "Acme",
+      "integrations": {
+        "rybbit": {
+          "siteId": "123",
+          "skipPatterns": ["/drafts/**"],
+          "tag": "blog"
+        }
+      }
+    }
+    ```
+  </Step>
+  <Step title="Merge and verify">
+    After you [merge the change](/sites/integrations/analytics/overview#set-up-in-the-dashboard) and the production deployment finishes, visit your live site and check the realtime view in Rybbit.
+  </Step>
+</Steps>
+
+## Options
+
+The dashboard covers the Site ID and script URL. You set every other option in `blog.json`, and editing the integration in the dashboard keeps those options as they are.
+
+| Setting | Dashboard field | Description |
+| --- | --- | --- |
+| `siteId` | **Site ID** | Public Site ID from the `siteId` in your tracking code's script URL |
+| `scriptUrl` | **Script URL** | Full HTTPS URL of the tracker, ending in `/script.js`. Leave it out for Rybbit Cloud, which uses `https://app.rybbit.io/api/script.js`, or set it for a self-hosted or proxied Rybbit like `https://stats.acme.com/api/script.js` |
+| `skipPatterns` | | Up to 50 [path patterns](#path-patterns) whose pages send no events at all, like `["/drafts/**"]` |
+| `maskPatterns` | | Up to 50 [path patterns](#path-patterns) whose pages Rybbit still tracks but reports under the pattern instead of the real path, like `["/authors/*"]`. The query string and referrer still go to Rybbit unchanged |
+| `debounce` | | Milliseconds to wait after a client-side navigation before the page view counts, from `0` to `60000` with a default of `500`, where `0` turns debouncing off |
+| `tag` | | Label added to every event, up to 256 characters, like a site section or release name |
+| `namespace` | | Global name of the tracker API, which is `"rybbit"` unless you change it. Setting `"analytics"` gives you `window.analytics` and renames the opt-out key to `disable-analytics` |
+| `replay` | | Options for the session replay recorder, described under [Session replay](#session-replay) |
+
+Notra adds the origin of `scriptUrl` to `script-src` and `connect-src` in the [Content-Security-Policy](/sites/custom-scripts#content-security-policy), because Rybbit loads its settings from that host and sends events and replays back to it.
+
+Error tracking, web vitals, outbound links, button clicks, copy and form tracking, query strings and URL fragments aren't script options. Turn them on or off in your site's settings in Rybbit, and the script picks them up on the next page load.
+
+### Path patterns
+
+`skipPatterns` and `maskPatterns` take globs that start with `/` or regular expressions that start with `re:`:
+
+| Pattern | Matches |
+| --- | --- |
+| `/drafts/*` | One path segment, like `/drafts/launch` but not `/drafts/launch/notes` |
+| `/drafts/**` | Any number of segments, like `/drafts/launch/notes` |
+| `re:^/blog/[0-9]{4}/` | Any path the regular expression matches, here `/blog/2026/…` |
+
+Both lists apply only to events and session replay still records skipped and masked pages, so hide sensitive content in recordings with the [replay options](#session-replay) instead.
+
+## Session replay
+
+Turn on session replay in your site's settings in Rybbit. Rybbit then loads its recorder from the same host as the tracker and masks every form input by default, and the options under `replay` change what the recorder captures.
+
+```json blog.json
+{
+  "integrations": {
+    "rybbit": {
+      "siteId": "123",
+      "replay": {
+        "sampleRate": 25,
+        "maskTextSelectors": [".author-email"],
+        "blockSelector": "iframe"
+      }
+    }
+  }
+}
+```
+
+| Setting | Description |
+| --- | --- |
+| `replay.sampleRate` | Percentage of sessions to record, from `0` to `100`, with a default of `100` |
+| `replay.batchSize` | Recording events per upload, from `1` to `1000`, with a default of `250` |
+| `replay.batchInterval` | Milliseconds between uploads, from `1000` to `60000`, with a default of `5000` |
+| `replay.maskAllInputs` | Masks every form input when `true`, which is the default |
+| `replay.maskInputOptions` | [Input types](#masked-input-types) to mask when `maskAllInputs` is `false`, with a default of `{ "password": true, "email": true }` |
+| `replay.maskTextSelectors` | Up to 50 CSS selectors whose text the recorder masks, like `[".author-email"]` |
+| `replay.maskTextClass` | Class that masks an element's text, with a default of `"rr-mask"` |
+| `replay.blockClass` | Class that replaces an element with an empty placeholder of the same size, with a default of `"rr-block"` |
+| `replay.blockSelector` | CSS selector for elements the recorder replaces with a placeholder, like `"iframe, .newsletter-form"` |
+| `replay.ignoreClass` | Class whose inputs the recorder skips, with a default of `"rr-ignore"` |
+| `replay.ignoreSelector` | CSS selector for inputs the recorder skips |
+| `replay.collectFonts` | Records web fonts so replays look like the live page when `true`, which is the default |
+| `replay.sampling` | How often the recorder samples visitor activity, as described under [sampling](#sampling) |
+| `replay.slimDomOptions` | Parts of the page left out of recordings, as described under [slim DOM options](#slim-dom-options) |
+
+The class options take a single class name without the dot, and CSS selectors can be up to 500 characters long.
+
+### Masked input types
+
+`replay.maskInputOptions` maps input types to `true` or `false`: `color`, `date`, `datetime-local`, `email`, `month`, `number`, `password`, `range`, `search`, `select`, `tel`, `text`, `textarea`, `time`, `url` and `week`. It replaces Rybbit's default as a whole, so list `password` and `email` again if you add other types:
+
+```json
+"maskInputOptions": { "password": true, "email": true, "tel": true }
+```
+
+### Sampling
+
+`replay.sampling` replaces Rybbit's default sampling as a whole, so set every key you care about.
+
+| Setting | Description |
+| --- | --- |
+| `mousemove` | `true`, `false` or the milliseconds between mouse movement samples, with a default of `false` |
+| `mouseInteraction` | `true`, `false` or an object with one switch per interaction: `MouseUp`, `MouseDown`, `Click`, `ContextMenu`, `DblClick`, `Focus`, `Blur`, `TouchStart`, `TouchMove_Departed`, `TouchEnd` and `TouchCancel`. By default the recorder captures only `Click`, `DblClick`, `Focus` and `Blur` |
+| `scroll` | Milliseconds between scroll samples, with a default of `500` |
+| `media` | Milliseconds between media playback samples, with a default of `800` |
+| `input` | `"last"` records only the final value of an input and `"all"` records every change, with a default of `"last"` |
+
+### Slim DOM options
+
+`replay.slimDomOptions` maps parts of the page to `true` to leave them out of recordings: `script`, `comment`, `headFavicon`, `headWhitespace`, `headMetaDescKeywords`, `headMetaSocial`, `headMetaRobots`, `headMetaHttpEquiv`, `headMetaAuthorship`, `headMetaVerification` and `headTitleMutations`. Rybbit leaves out everything except `script` and `headTitleMutations` by default, and your object replaces that default as a whole.
+
+## Custom events
+
+To track clicks in your own components and MDX, add `data-rybbit-event` to an element. Rybbit then sends a custom event with that name when a visitor clicks it and uses the element's `data-rybbit-prop-*` attributes as properties:
+
+```html
+<a href="/pricing" data-rybbit-event="pricing_clicked" data-rybbit-prop-placement="changelog-footer">See pricing</a>
+```
+
+From a [custom script](/sites/custom-scripts), call `window.rybbit.event("pricing_clicked", { placement: "changelog-footer" })`, or use your `namespace` if you set one, as [Rybbit's event docs](https://rybbit.com/docs/track-events) describe.
+
+## Privacy
+
+Rybbit sets no cookies, but it keeps an anonymous visitor ID in local storage. To stop tracking your own visits, run `localStorage.setItem("disable-rybbit", "true")` in the browser console on your live site, or use `disable-<namespace>` if you set a `namespace`.

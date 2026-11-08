@@ -84,6 +84,17 @@ export default {
         ]
       : []),
     ...(analytics.plausible ? [plausibleAnalytics(analytics.plausible)] : []),
+    ...(analytics.rybbit
+      ? [
+          {
+            id: "rybbit",
+            src: analytics.rybbit.src,
+            category: "measurement",
+            async: true,
+            attributes: analytics.rybbit.attributes,
+          },
+        ]
+      : []),
     ...(analytics.umami ? [umamiAnalytics(analytics.umami)] : []),
   ],
 } satisfies C15tClientOptionsExtension;

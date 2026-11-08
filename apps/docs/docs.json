@@ -302,6 +302,7 @@
                   "sites/integrations/analytics/posthog",
                   "sites/integrations/analytics/plausible",
                   "sites/integrations/analytics/umami",
+                  "sites/integrations/analytics/rybbit",
                   "sites/integrations/analytics/capless"
                 ]
               },

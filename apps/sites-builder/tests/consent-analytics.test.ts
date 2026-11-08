@@ -1,5 +1,10 @@
 import { afterEach, expect, test } from "bun:test";
 
+import { siteConfigSchema } from "@notra/sites-core/schemas/site-config";
+import { integrationHeadScripts } from "@notra/sites-core/utils/integrations";
+
+import { siteConsent } from "../compiler/utils/consent";
+
 const globals = globalThis as Record<string, unknown>;
 
 async function startCode(hostname: string) {
@@ -82,6 +87,67 @@ test("consent-gated Capless loads its script with the key only after a measureme
       category: "measurement",
       async: true,
       attributes: { "data-key": "cs_abcdefghijklmnop" },
+    },
+  ]);
+});
+
+test("consent-gated Rybbit gets the same script URL and options as the ungated page", async () => {
+  const config = siteConfigSchema.parse({
+    name: "Acme",
+    integrations: {
+      c15t: { backendURL: "https://consent.acme.com" },
+      rybbit: {
+        siteId: "4242",
+        scriptUrl: "https://stats.acme.com/api/script.js",
+        skipPatterns: ["/drafts/**"],
+        debounce: 0,
+        replay: {
+          maskAllInputs: false,
+          sampling: { mouseInteraction: { Click: true } },
+        },
+      },
+    },
+  });
+  const analytics = siteConsent(
+    config,
+    [],
+    true,
+    false,
+    "https://blog.acme.com"
+  )?.analytics;
+  const rybbit = {
+    src: "https://stats.acme.com/api/script.js?siteId=4242",
+    attributes: {
+      "data-skip-patterns": '["/drafts/**"]',
+      "data-debounce": "0",
+      "data-replay-mask-all-inputs": "false",
+      "data-replay-sampling": '{"mouseInteraction":{"Click":true}}',
+    },
+  };
+  expect(analytics?.rybbit).toEqual(rybbit);
+  expect(integrationHeadScripts(config.integrations)).toEqual([
+    {
+      kind: "external",
+      src: rybbit.src,
+      attributes: { ...rybbit.attributes, defer: true },
+    },
+  ]);
+
+  Object.assign(globals, {
+    __NOTRA_CONSENT_ANALYTICS__: { rybbit },
+    __NOTRA_HOSTING_DOMAIN__: null,
+    __NOTRA_CONSENT_STORAGE_KEY__: "__Host-c15t",
+    location: { hostname: "blog.acme.com" },
+    document: { cookie: "" },
+  });
+  const variant = "rybbit";
+  const { default: client } = await import(`../src/c15t.client.ts?${variant}`);
+  expect(client.scripts).toEqual([
+    {
+      id: "rybbit",
+      category: "measurement",
+      async: true,
+      ...rybbit,
     },
   ]);
 });

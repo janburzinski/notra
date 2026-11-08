@@ -155,6 +155,9 @@ test("custom events cannot substitute for page views", () => {
       case "posthog":
         body = body?.replace("$pageview", "$autocapture") ?? null;
         break;
+      case "rybbit":
+        body = body?.replace('"pageview"', '"custom_event"') ?? null;
+        break;
       case "umami":
         body = JSON.stringify({
           ...JSON.parse(body ?? "{}"),

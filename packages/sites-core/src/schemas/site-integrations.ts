@@ -25,6 +25,18 @@ import {
   HTTPS_BASE_URL,
   HTTPS_SCRIPT_URL,
   POSTHOG_API_KEY,
+  RYBBIT_CSS_CLASS,
+  RYBBIT_MAX_DELAY_MS,
+  RYBBIT_MAX_PATTERNS,
+  RYBBIT_MAX_REPLAY_BATCH_SIZE,
+  RYBBIT_MAX_SELECTOR_LENGTH,
+  RYBBIT_MAX_TAG_LENGTH,
+  RYBBIT_MIN_REPLAY_BATCH_INTERVAL_MS,
+  RYBBIT_NAMESPACE,
+  RYBBIT_PATH_PATTERN,
+  RYBBIT_SCRIPT_URL_PATTERN,
+  RYBBIT_SITE_ID,
+  RYBBIT_SITE_ID_MESSAGE,
   TRAILING_SLASHES,
 } from "@notra/sites-core/constants/integrations";
 import { SITE_CSP_MAX_ALLOWED_ORIGINS } from "@notra/sites-core/constants/security";
@@ -66,6 +78,245 @@ const caplessSchema = z.strictObject({
     .describe(
       "Public Capless ingest key (cs_…) from your tracking code (data-key). It can only write events, so it is safe in HTML."
     ),
+});
+
+const rybbitPathPatternsSchema = z
+  .array(
+    z
+      .string()
+      .trim()
+      .regex(
+        RYBBIT_PATH_PATTERN,
+        "Use a path glob starting with /, e.g. /drafts/**, or a regex starting with re:"
+      )
+  )
+  .max(RYBBIT_MAX_PATTERNS)
+  .optional();
+
+const rybbitCssClassSchema = z
+  .string()
+  .trim()
+  .regex(RYBBIT_CSS_CLASS, "Use a single CSS class name without the dot")
+  .optional();
+
+const rybbitSelectorSchema = z
+  .string()
+  .trim()
+  .min(1)
+  .max(RYBBIT_MAX_SELECTOR_LENGTH)
+  .optional();
+
+const rybbitMaskInputOptionsSchema = z
+  .strictObject({
+    color: optionalBooleanSchema,
+    date: optionalBooleanSchema,
+    "datetime-local": optionalBooleanSchema,
+    email: optionalBooleanSchema,
+    month: optionalBooleanSchema,
+    number: optionalBooleanSchema,
+    password: optionalBooleanSchema,
+    range: optionalBooleanSchema,
+    search: optionalBooleanSchema,
+    select: optionalBooleanSchema,
+    tel: optionalBooleanSchema,
+    text: optionalBooleanSchema,
+    textarea: optionalBooleanSchema,
+    time: optionalBooleanSchema,
+    url: optionalBooleanSchema,
+    week: optionalBooleanSchema,
+  })
+  .optional()
+  .describe(
+    'Input types to mask when maskAllInputs is false, e.g. {"password": true, "email": true, "tel": true}. Replaces Rybbit\'s default of {"password": true, "email": true}.'
+  );
+
+const rybbitMouseInteractionsSchema = z.strictObject({
+  MouseUp: optionalBooleanSchema,
+  MouseDown: optionalBooleanSchema,
+  Click: optionalBooleanSchema,
+  ContextMenu: optionalBooleanSchema,
+  DblClick: optionalBooleanSchema,
+  Focus: optionalBooleanSchema,
+  Blur: optionalBooleanSchema,
+  TouchStart: optionalBooleanSchema,
+  TouchMove_Departed: optionalBooleanSchema,
+  TouchEnd: optionalBooleanSchema,
+  TouchCancel: optionalBooleanSchema,
+});
+
+const rybbitReplaySamplingSchema = z
+  .strictObject({
+    mousemove: z
+      .union([z.boolean(), z.number().int().min(0).max(RYBBIT_MAX_DELAY_MS)])
+      .optional()
+      .describe(
+        "Record mouse movement: false, true or the milliseconds between samples (default: false)."
+      ),
+    mouseInteraction: z
+      .union([z.boolean(), rybbitMouseInteractionsSchema])
+      .optional()
+      .describe(
+        "Record mouse and touch interactions: true, false or one switch per interaction (default: Click, DblClick, Focus and Blur only)."
+      ),
+    scroll: z
+      .number()
+      .int()
+      .min(0)
+      .max(RYBBIT_MAX_DELAY_MS)
+      .optional()
+      .describe("Milliseconds between scroll samples (default: 500)."),
+    media: z
+      .number()
+      .int()
+      .min(0)
+      .max(RYBBIT_MAX_DELAY_MS)
+      .optional()
+      .describe("Milliseconds between media playback samples (default: 800)."),
+    input: z
+      .enum(["all", "last"])
+      .optional()
+      .describe(
+        'Record every input change ("all") or only the final value ("last", default).'
+      ),
+  })
+  .optional()
+  .describe(
+    "How often the recorder samples visitor activity. Replaces Rybbit's defaults as a whole, so set every key you care about."
+  );
+
+const rybbitSlimDomOptionsSchema = z
+  .strictObject({
+    script: optionalBooleanSchema,
+    comment: optionalBooleanSchema,
+    headFavicon: optionalBooleanSchema,
+    headWhitespace: optionalBooleanSchema,
+    headMetaDescKeywords: optionalBooleanSchema,
+    headMetaSocial: optionalBooleanSchema,
+    headMetaRobots: optionalBooleanSchema,
+    headMetaHttpEquiv: optionalBooleanSchema,
+    headMetaAuthorship: optionalBooleanSchema,
+    headMetaVerification: optionalBooleanSchema,
+    headTitleMutations: optionalBooleanSchema,
+  })
+  .optional()
+  .describe(
+    "Parts of the page left out of recordings to keep them small. Replaces Rybbit's defaults (everything but script and headTitleMutations) as a whole."
+  );
+
+const rybbitReplaySchema = z
+  .strictObject({
+    sampleRate: z
+      .number()
+      .int()
+      .min(0)
+      .max(100)
+      .optional()
+      .describe(
+        "Percentage of sessions to record, from 0 to 100 (default: 100)."
+      ),
+    batchSize: z
+      .number()
+      .int()
+      .min(1)
+      .max(RYBBIT_MAX_REPLAY_BATCH_SIZE)
+      .optional()
+      .describe("Recording events per upload (default: 250)."),
+    batchInterval: z
+      .number()
+      .int()
+      .min(RYBBIT_MIN_REPLAY_BATCH_INTERVAL_MS)
+      .max(RYBBIT_MAX_DELAY_MS)
+      .optional()
+      .describe("Milliseconds between uploads, at least 1000 (default: 5000)."),
+    maskAllInputs: optionalBooleanSchema.describe(
+      "Mask every form input in recordings (default: true)."
+    ),
+    maskInputOptions: rybbitMaskInputOptionsSchema,
+    maskTextSelectors: z
+      .array(z.string().trim().min(1).max(RYBBIT_MAX_SELECTOR_LENGTH))
+      .max(RYBBIT_MAX_PATTERNS)
+      .optional()
+      .describe(
+        'CSS selectors whose text is masked in recordings, e.g. [".author-email"].'
+      ),
+    maskTextClass: rybbitCssClassSchema.describe(
+      'Class that masks an element\'s text in recordings (default: "rr-mask").'
+    ),
+    blockClass: rybbitCssClassSchema.describe(
+      'Class that replaces an element with a placeholder in recordings (default: "rr-block").'
+    ),
+    blockSelector: rybbitSelectorSchema.describe(
+      "CSS selector for elements replaced with a placeholder in recordings."
+    ),
+    ignoreClass: rybbitCssClassSchema.describe(
+      'Class whose inputs are not recorded (default: "rr-ignore").'
+    ),
+    ignoreSelector: rybbitSelectorSchema.describe(
+      "CSS selector for inputs that are not recorded."
+    ),
+    collectFonts: optionalBooleanSchema.describe(
+      "Record web fonts so replays look like the live page (default: true)."
+    ),
+    sampling: rybbitReplaySamplingSchema,
+    slimDomOptions: rybbitSlimDomOptionsSchema,
+  })
+  .optional()
+  .describe(
+    "Session replay recorder options. Turn session replay on in your Rybbit site settings; these options only tune it."
+  );
+
+const rybbitSchema = z.strictObject({
+  siteId: z
+    .string({ error: RYBBIT_SITE_ID_MESSAGE })
+    .trim()
+    .regex(RYBBIT_SITE_ID, RYBBIT_SITE_ID_MESSAGE)
+    .describe(
+      "Public Rybbit Site ID from your tracking code (the siteId in the script URL). No API key is needed."
+    ),
+  scriptUrl: z
+    .string()
+    .trim()
+    .regex(
+      RYBBIT_SCRIPT_URL_PATTERN,
+      "Use the URL of your Rybbit instance's script.js, e.g. https://stats.acme.com/api/script.js"
+    )
+    .optional()
+    .describe(
+      "Tracker script URL ending in /script.js. Defaults to https://app.rybbit.io/api/script.js; set it for a self-hosted or proxied Rybbit. Events and replays go to the same host."
+    ),
+  skipPatterns: rybbitPathPatternsSchema.describe(
+    'Up to 50 path globs (* and **) or re: regexes that are never tracked, e.g. ["/drafts/**"]. Session replay ignores them.'
+  ),
+  maskPatterns: rybbitPathPatternsSchema.describe(
+    'Up to 50 path globs or re: regexes whose matching paths are replaced by the pattern before sending, e.g. ["/authors/*"].'
+  ),
+  debounce: z
+    .number()
+    .int()
+    .min(0)
+    .max(RYBBIT_MAX_DELAY_MS)
+    .optional()
+    .describe(
+      "Milliseconds to wait after a client-side navigation before counting the page view; 0 turns debouncing off (default: 500)."
+    ),
+  tag: z
+    .string()
+    .trim()
+    .min(1)
+    .max(RYBBIT_MAX_TAG_LENGTH)
+    .optional()
+    .describe(
+      "Label added to every event, up to 256 characters, e.g. a site section or release."
+    ),
+  namespace: z
+    .string()
+    .trim()
+    .regex(RYBBIT_NAMESPACE, "Use a JavaScript identifier, e.g. analytics")
+    .optional()
+    .describe(
+      'Global name of the tracker API (window.<namespace>) and of its opt-out key disable-<namespace> (default: "rybbit").'
+    ),
+  replay: rybbitReplaySchema,
 });
 
 const ga4Schema = z.strictObject({
@@ -428,6 +679,7 @@ export const siteIntegrationSchemas = {
   ga4: ga4Schema,
   plausible: plausibleSchema,
   posthog: posthogSchema,
+  rybbit: rybbitSchema,
   umami: umamiSchema,
 };
 
@@ -453,6 +705,10 @@ export const siteIntegrationUpdateSchema = z.discriminatedUnion("provider", [
     provider: z.literal("posthog"),
     settings: posthogSchema.nullable(),
   }),
+  z.object({
+    provider: z.literal("rybbit"),
+    settings: rybbitSchema.nullable(),
+  }),
 ]);
 
 export const siteIntegrationsSchema = z
@@ -462,6 +718,7 @@ export const siteIntegrationsSchema = z
     ga4: ga4Schema.optional(),
     plausible: plausibleSchema.optional(),
     posthog: posthogSchema.optional(),
+    rybbit: rybbitSchema.optional(),
     umami: umamiSchema.optional(),
     c15t: c15tSchema.optional(),
     indexnow: z

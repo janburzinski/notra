@@ -11,6 +11,7 @@ import { databuddy } from "./providers/databuddy";
 import { ga4 } from "./providers/ga4";
 import { plausible } from "./providers/plausible";
 import { posthog } from "./providers/posthog";
+import { rybbit } from "./providers/rybbit";
 import { umami } from "./providers/umami";
 import type { AnalyticsProvider, CollectedEvent, VendorScripts } from "./types";
 
@@ -23,6 +24,7 @@ export const ANALYTICS_PROVIDERS: AnalyticsProvider[] = [
   ga4,
   plausible,
   posthog,
+  rybbit,
   umami,
 ];
 

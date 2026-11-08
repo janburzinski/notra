@@ -24,6 +24,7 @@ export interface SiteConsentAnalytics {
   gtag?: { id: string };
   posthog?: { id: string; apiHost: string; disableSessionRecording: boolean };
   plausible?: { domain: string; scriptUrl?: string };
+  rybbit?: { src: string; attributes: Record<string, string> };
   umami?: { websiteId: string; scriptUrl?: string; hostUrl?: string };
 }
 

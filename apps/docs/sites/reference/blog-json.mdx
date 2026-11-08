@@ -230,6 +230,8 @@ For step-by-step setup in the dashboard or repository, see [Analytics integratio
 | `integrations.posthog.apiKey` | Starts with `phc_` |
 | `integrations.posthog.apiHost` | An `https://` URL, with the default `https://us.i.posthog.com` |
 | `integrations.posthog.sessionRecording` | Boolean, defaults to `true`. Set to `false` to disable recording while keeping analytics |
+| `integrations.rybbit.siteId` | Public Site ID from the `siteId` in Rybbit's tracking code |
+| `integrations.rybbit.*` | Optional tracker options such as `scriptUrl`, `skipPatterns`, `maskPatterns`, `debounce`, `tag`, `namespace` and `replay`. See [Rybbit](/sites/integrations/analytics/rybbit#options) for every option |
 | `integrations.umami.websiteId` | Public Website ID as a UUID from Umami's Tracking code |
 | `integrations.umami.scriptUrl` | Optional full HTTPS script URL. Defaults to `https://cloud.umami.is/script.js`; supports self-hosted script paths and ports |
 | `integrations.c15t.backendURL` | Your Inth project URL or self-hosted c15t backend, as an `https://` URL. Turns on the cookie banner. See [c15t cookie banner](/sites/integrations/consent/c15t) for every `c15t` option |

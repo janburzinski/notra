@@ -26,6 +26,20 @@ export const TRAILING_SLASHES = /\/+$/;
 export const CAPLESS_SCRIPT_URL = "https://c.capless.sh/c.js";
 export const CAPLESS_KEY = /^cs_[A-Za-z0-9_-]{8,128}$/;
 
+export const RYBBIT_SCRIPT_URL = "https://app.rybbit.io/api/script.js";
+export const RYBBIT_SITE_ID = /^[A-Za-z0-9]{1,32}$/;
+export const RYBBIT_SITE_ID_MESSAGE =
+  "Copy the Site ID from your Rybbit tracking code";
+export const RYBBIT_PATH_PATTERN = /^(?:\/[^\s"'<>]{0,199}|re:\S{1,200})$/;
+export const RYBBIT_NAMESPACE = /^[A-Za-z_$][\w$]{0,63}$/;
+export const RYBBIT_CSS_CLASS = /^-?[_A-Za-z][\w-]{0,99}$/;
+export const RYBBIT_MAX_PATTERNS = 50;
+export const RYBBIT_MAX_TAG_LENGTH = 256;
+export const RYBBIT_MAX_SELECTOR_LENGTH = 500;
+export const RYBBIT_MAX_DELAY_MS = 60_000;
+export const RYBBIT_MIN_REPLAY_BATCH_INTERVAL_MS = 1000;
+export const RYBBIT_MAX_REPLAY_BATCH_SIZE = 1000;
+
 export const PLAUSIBLE_SCRIPT_URL = "https://plausible.io/js/script.js";
 
 export const POSTHOG_DEFAULT_API_HOST = "https://us.i.posthog.com";
@@ -42,6 +56,9 @@ export const HTTPS_BASE_URL = new RegExp(
 );
 export const HTTPS_SCRIPT_URL = new RegExp(
   String.raw`^https:\/\/${HOST}${PORT}(?:\/(?!\.{1,2}(?:\/|$))[A-Za-z0-9._~-]+)+$`
+);
+export const RYBBIT_SCRIPT_URL_PATTERN = new RegExp(
+  String.raw`^https:\/\/${HOST}${PORT}(?:\/(?!\.{1,2}(?:\/|$))[A-Za-z0-9._~-]+)*\/script\.js$`
 );
 export const CSP_ORIGIN = new RegExp(
   String.raw`^(?:https|wss):\/\/(?:\*\.)?${HOST}${PORT}$`

@@ -1681,6 +1681,307 @@
           "required": ["apiKey"],
           "additionalProperties": false
         },
+        "rybbit": {
+          "type": "object",
+          "properties": {
+            "siteId": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9]{1,32}$",
+              "description": "Public Rybbit Site ID from your tracking code (the siteId in the script URL). No API key is needed."
+            },
+            "scriptUrl": {
+              "description": "Tracker script URL ending in /script.js. Defaults to https://app.rybbit.io/api/script.js; set it for a self-hosted or proxied Rybbit. Events and replays go to the same host.",
+              "type": "string",
+              "pattern": "^https:\\/\\/(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z]{2,63}(?::(?:\\d{1,4}|[0-5]\\d{4}|6[0-4]\\d{3}|65[0-4]\\d{2}|655[0-2]\\d|6553[0-5]))?(?:\\/(?!\\.{1,2}(?:\\/|$))[A-Za-z0-9._~-]+)*\\/script\\.js$"
+            },
+            "skipPatterns": {
+              "description": "Up to 50 path globs (* and **) or re: regexes that are never tracked, e.g. [\"/drafts/**\"]. Session replay ignores them.",
+              "maxItems": 50,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^(?:\\/[^\\s\"'<>]{0,199}|re:\\S{1,200})$"
+              }
+            },
+            "maskPatterns": {
+              "description": "Up to 50 path globs or re: regexes whose matching paths are replaced by the pattern before sending, e.g. [\"/authors/*\"].",
+              "maxItems": 50,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^(?:\\/[^\\s\"'<>]{0,199}|re:\\S{1,200})$"
+              }
+            },
+            "debounce": {
+              "description": "Milliseconds to wait after a client-side navigation before counting the page view; 0 turns debouncing off (default: 500).",
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 60000
+            },
+            "tag": {
+              "description": "Label added to every event, up to 256 characters, e.g. a site section or release.",
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256
+            },
+            "namespace": {
+              "description": "Global name of the tracker API (window.<namespace>) and of its opt-out key disable-<namespace> (default: \"rybbit\").",
+              "type": "string",
+              "pattern": "^[A-Za-z_$][\\w$]{0,63}$"
+            },
+            "replay": {
+              "description": "Session replay recorder options. Turn session replay on in your Rybbit site settings; these options only tune it.",
+              "type": "object",
+              "properties": {
+                "sampleRate": {
+                  "description": "Percentage of sessions to record, from 0 to 100 (default: 100).",
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 100
+                },
+                "batchSize": {
+                  "description": "Recording events per upload (default: 250).",
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 1000
+                },
+                "batchInterval": {
+                  "description": "Milliseconds between uploads, at least 1000 (default: 5000).",
+                  "type": "integer",
+                  "minimum": 1000,
+                  "maximum": 60000
+                },
+                "maskAllInputs": {
+                  "description": "Mask every form input in recordings (default: true).",
+                  "type": "boolean"
+                },
+                "maskInputOptions": {
+                  "description": "Input types to mask when maskAllInputs is false, e.g. {\"password\": true, \"email\": true, \"tel\": true}. Replaces Rybbit's default of {\"password\": true, \"email\": true}.",
+                  "type": "object",
+                  "properties": {
+                    "color": {
+                      "type": "boolean"
+                    },
+                    "date": {
+                      "type": "boolean"
+                    },
+                    "datetime-local": {
+                      "type": "boolean"
+                    },
+                    "email": {
+                      "type": "boolean"
+                    },
+                    "month": {
+                      "type": "boolean"
+                    },
+                    "number": {
+                      "type": "boolean"
+                    },
+                    "password": {
+                      "type": "boolean"
+                    },
+                    "range": {
+                      "type": "boolean"
+                    },
+                    "search": {
+                      "type": "boolean"
+                    },
+                    "select": {
+                      "type": "boolean"
+                    },
+                    "tel": {
+                      "type": "boolean"
+                    },
+                    "text": {
+                      "type": "boolean"
+                    },
+                    "textarea": {
+                      "type": "boolean"
+                    },
+                    "time": {
+                      "type": "boolean"
+                    },
+                    "url": {
+                      "type": "boolean"
+                    },
+                    "week": {
+                      "type": "boolean"
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "maskTextSelectors": {
+                  "description": "CSS selectors whose text is masked in recordings, e.g. [\".author-email\"].",
+                  "maxItems": 50,
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 500
+                  }
+                },
+                "maskTextClass": {
+                  "description": "Class that masks an element's text in recordings (default: \"rr-mask\").",
+                  "type": "string",
+                  "pattern": "^-?[_A-Za-z][\\w-]{0,99}$"
+                },
+                "blockClass": {
+                  "description": "Class that replaces an element with a placeholder in recordings (default: \"rr-block\").",
+                  "type": "string",
+                  "pattern": "^-?[_A-Za-z][\\w-]{0,99}$"
+                },
+                "blockSelector": {
+                  "description": "CSS selector for elements replaced with a placeholder in recordings.",
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 500
+                },
+                "ignoreClass": {
+                  "description": "Class whose inputs are not recorded (default: \"rr-ignore\").",
+                  "type": "string",
+                  "pattern": "^-?[_A-Za-z][\\w-]{0,99}$"
+                },
+                "ignoreSelector": {
+                  "description": "CSS selector for inputs that are not recorded.",
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 500
+                },
+                "collectFonts": {
+                  "description": "Record web fonts so replays look like the live page (default: true).",
+                  "type": "boolean"
+                },
+                "sampling": {
+                  "description": "How often the recorder samples visitor activity. Replaces Rybbit's defaults as a whole, so set every key you care about.",
+                  "type": "object",
+                  "properties": {
+                    "mousemove": {
+                      "description": "Record mouse movement: false, true or the milliseconds between samples (default: false).",
+                      "anyOf": [
+                        {
+                          "type": "boolean"
+                        },
+                        {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 60000
+                        }
+                      ]
+                    },
+                    "mouseInteraction": {
+                      "description": "Record mouse and touch interactions: true, false or one switch per interaction (default: Click, DblClick, Focus and Blur only).",
+                      "anyOf": [
+                        {
+                          "type": "boolean"
+                        },
+                        {
+                          "type": "object",
+                          "properties": {
+                            "MouseUp": {
+                              "type": "boolean"
+                            },
+                            "MouseDown": {
+                              "type": "boolean"
+                            },
+                            "Click": {
+                              "type": "boolean"
+                            },
+                            "ContextMenu": {
+                              "type": "boolean"
+                            },
+                            "DblClick": {
+                              "type": "boolean"
+                            },
+                            "Focus": {
+                              "type": "boolean"
+                            },
+                            "Blur": {
+                              "type": "boolean"
+                            },
+                            "TouchStart": {
+                              "type": "boolean"
+                            },
+                            "TouchMove_Departed": {
+                              "type": "boolean"
+                            },
+                            "TouchEnd": {
+                              "type": "boolean"
+                            },
+                            "TouchCancel": {
+                              "type": "boolean"
+                            }
+                          },
+                          "additionalProperties": false
+                        }
+                      ]
+                    },
+                    "scroll": {
+                      "description": "Milliseconds between scroll samples (default: 500).",
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 60000
+                    },
+                    "media": {
+                      "description": "Milliseconds between media playback samples (default: 800).",
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 60000
+                    },
+                    "input": {
+                      "description": "Record every input change (\"all\") or only the final value (\"last\", default).",
+                      "type": "string",
+                      "enum": ["all", "last"]
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "slimDomOptions": {
+                  "description": "Parts of the page left out of recordings to keep them small. Replaces Rybbit's defaults (everything but script and headTitleMutations) as a whole.",
+                  "type": "object",
+                  "properties": {
+                    "script": {
+                      "type": "boolean"
+                    },
+                    "comment": {
+                      "type": "boolean"
+                    },
+                    "headFavicon": {
+                      "type": "boolean"
+                    },
+                    "headWhitespace": {
+                      "type": "boolean"
+                    },
+                    "headMetaDescKeywords": {
+                      "type": "boolean"
+                    },
+                    "headMetaSocial": {
+                      "type": "boolean"
+                    },
+                    "headMetaRobots": {
+                      "type": "boolean"
+                    },
+                    "headMetaHttpEquiv": {
+                      "type": "boolean"
+                    },
+                    "headMetaAuthorship": {
+                      "type": "boolean"
+                    },
+                    "headMetaVerification": {
+                      "type": "boolean"
+                    },
+                    "headTitleMutations": {
+                      "type": "boolean"
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "required": ["siteId"],
+          "additionalProperties": false
+        },
         "umami": {
           "type": "object",
           "properties": {

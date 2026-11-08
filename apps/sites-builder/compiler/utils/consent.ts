@@ -7,7 +7,10 @@ import {
 import type { SiteDiagnostic } from "@notra/sites-core/types/build";
 import type { SiteConfig } from "@notra/sites-core/types/site-config";
 import type { SiteIntegrations } from "@notra/sites-core/types/site-integrations";
-import { analyticsGatedByConsent } from "@notra/sites-core/utils/integrations";
+import {
+  analyticsGatedByConsent,
+  rybbitScript,
+} from "@notra/sites-core/utils/integrations";
 
 import type {
   SiteConsentAnalytics,
@@ -27,6 +30,7 @@ function consentAnalytics({
   ga4,
   plausible,
   posthog,
+  rybbit,
   umami,
 }: SiteIntegrations): SiteConsentAnalytics {
   const databuddyConfig = databuddy && {
@@ -55,6 +59,7 @@ function consentAnalytics({
         ? `https://${plausible.server}/js/script.js`
         : undefined,
     },
+    rybbit: rybbit && rybbitScript(rybbit),
     umami: umami && {
       websiteId: umami.websiteId,
       scriptUrl: umami.scriptUrl,

@@ -11,6 +11,7 @@ export type SiteIntegrations = z.infer<typeof siteIntegrationsSchema>;
 export type SiteIntegrationName = keyof typeof siteIntegrationSchemas;
 export type SiteC15t = NonNullable<SiteIntegrations["c15t"]>;
 export type SiteDatabuddy = NonNullable<SiteIntegrations["databuddy"]>;
+export type SiteRybbit = NonNullable<SiteIntegrations["rybbit"]>;
 export type SiteIntegrationUpdate = z.infer<typeof siteIntegrationUpdateSchema>;
 type SiteSecurity = z.infer<typeof siteSecuritySchema>;
 

@@ -129,6 +129,7 @@ export function patchConfigValue(
       "integrations.ga4.measurementId",
       "integrations.plausible.domain",
       "integrations.posthog.apiKey",
+      "integrations.rybbit.siteId",
       "integrations.umami.websiteId",
     ].includes(path)
   ) {

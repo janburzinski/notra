@@ -9496,6 +9496,7 @@
         "databuddy": "Privacy-first analytics with web vitals, errors and events.",
         "plausible": "Easy to use and privacy-friendly Google Analytics alternative.",
         "posthog": "Product analytics with session replay and feature flags.",
+        "rybbit": "Open-source, cookieless web analytics with session replay.",
         "umami": "Open-source, cookie-free analytics.",
         "ga4": "Web analytics from Google."
       },
@@ -9518,6 +9519,10 @@
           "apiKey": "Project API key",
           "apiHost": "API host",
           "sessionRecording": "Session recording"
+        },
+        "rybbit": {
+          "siteId": "Site ID",
+          "scriptUrl": "Script URL"
         },
         "umami": {
           "websiteId": "Website ID",
@@ -9555,6 +9560,10 @@
           "apiKey": "Use the project API key (phc_…)",
           "apiHost": "Use an https:// URL without query or hash"
         },
+        "rybbit": {
+          "siteId": "Copy the Site ID from your Rybbit tracking code",
+          "scriptUrl": "Use the URL of your Rybbit instance's script.js, e.g. https://stats.acme.com/api/script.js"
+        },
         "umami": {
           "websiteId": "Copy the Website ID from Umami's tracking code",
           "scriptUrl": "Use the full https:// script URL including its path, without query or hash",
@@ -9575,6 +9584,10 @@
         "posthog": {
           "apiHost": "Leave empty for US Cloud. Use https://eu.i.posthog.com for EU Cloud or your own HTTPS endpoint.",
           "sessionRecording": "Record visitor sessions when recording is enabled for this domain in PostHog."
+        },
+        "rybbit": {
+          "siteId": "In Rybbit, copy the siteId from your tracking code's script URL.",
+          "scriptUrl": "Leave empty for Rybbit Cloud. For self-hosting, enter your instance's script URL ending in /script.js. Skipped paths, session replay and more are available in blog.json."
         },
         "umami": {
           "scriptUrl": "Leave empty for Umami Cloud. For self-hosting, copy the full HTTPS script URL from your tracking code.",

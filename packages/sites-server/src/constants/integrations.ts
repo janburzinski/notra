@@ -6,6 +6,7 @@ export const SITE_INTEGRATION_NAMES: Record<keyof SiteIntegrations, string> = {
   ga4: "Google Analytics 4",
   plausible: "Plausible",
   posthog: "PostHog",
+  rybbit: "Rybbit",
   umami: "Umami",
   c15t: "c15t cookie banner",
   indexnow: "IndexNow",

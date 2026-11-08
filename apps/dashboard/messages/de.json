@@ -9496,6 +9496,7 @@
         "databuddy": "Datenschutzfreundliche Analytics mit Web Vitals, Fehlern und Events.",
         "plausible": "Einfache und datenschutzfreundliche Alternative zu Google Analytics.",
         "posthog": "Product Analytics mit Session Replay und Feature Flags.",
+        "rybbit": "Open-Source-Web-Analytics ohne Cookies, mit Session Replay.",
         "umami": "Open-Source-Analytics ohne Cookies.",
         "ga4": "Web-Analytics von Google."
       },
@@ -9518,6 +9519,10 @@
           "apiKey": "Projekt-API-Key",
           "apiHost": "API-Host",
           "sessionRecording": "Session-Aufzeichnung"
+        },
+        "rybbit": {
+          "siteId": "Site-ID",
+          "scriptUrl": "Script-URL"
         },
         "umami": {
           "websiteId": "Website-ID",
@@ -9555,6 +9560,10 @@
           "apiKey": "Nutze den Projekt-API-Key (phc_…)",
           "apiHost": "Nutze eine https://-URL ohne Query oder Hash"
         },
+        "rybbit": {
+          "siteId": "Kopiere die Site-ID aus dem Tracking-Code von Rybbit",
+          "scriptUrl": "Nutze die URL zur script.js deiner Rybbit-Instanz, z. B. https://stats.acme.com/api/script.js"
+        },
         "umami": {
           "websiteId": "Kopiere die Website-ID aus dem Tracking-Code von Umami",
           "scriptUrl": "Nutze die vollständige https://-Script-URL mit Pfad, ohne Query oder Hash",
@@ -9575,6 +9584,10 @@
         "posthog": {
           "apiHost": "Leer lassen für US Cloud. Für EU Cloud nutze https://eu.i.posthog.com oder deinen eigenen HTTPS-Endpunkt.",
           "sessionRecording": "Zeichnet Besuchersitzungen auf, wenn Aufzeichnungen für diese Domain in PostHog aktiviert sind."
+        },
+        "rybbit": {
+          "siteId": "Kopiere in Rybbit die siteId aus der Script-URL deines Tracking-Codes.",
+          "scriptUrl": "Leer lassen für Rybbit Cloud. Bei Self-Hosting die Script-URL deiner Instanz mit /script.js am Ende eintragen. Ausgeschlossene Pfade, Session Replay und mehr gibt es in der blog.json."
         },
         "umami": {
           "scriptUrl": "Für Umami Cloud leer lassen. Bei Self-Hosting die vollständige HTTPS-Script-URL aus deinem Tracking-Code kopieren.",

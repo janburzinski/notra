@@ -1,0 +1,17 @@
+import type { SVGProps } from "react";
+
+const Rybbit = (props: SVGProps<SVGSVGElement>) => (
+  <svg
+    fill="currentColor"
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 152 100"
+    {...props}
+  >
+    <title>Rybbit</title>
+    <polygon points="103.92 97.99 129.95 71.22 149.19 97.99 103.92 97.99" />
+    <path d="M149.19,51.43L118.29,2.29l-18.82,10.06-19.62-4.19c1.63,3.15,2.59,6.86,2.59,10.85,0,11.35-7.63,20.55-17.03,20.55-7.74,0-14.27-6.24-16.34-14.77l-22.62,40.5L2.42,54.35l12.84,43.64h31.63l12.63-30.61v30.61h36.64l-28.31-46.56h81.33Z" />
+    <ellipse cx="61.22" cy="17.18" rx="7.31" ry="10.7" />
+  </svg>
+);
+
+export { Rybbit };

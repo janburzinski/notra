@@ -4,6 +4,7 @@ import { Databuddy } from "@notra/ui/components/ui/svgs/databuddy";
 import { GoogleAnalytics } from "@notra/ui/components/ui/svgs/googleAnalytics";
 import { Plausible } from "@notra/ui/components/ui/svgs/plausible";
 import { PostHog } from "@notra/ui/components/ui/svgs/posthog";
+import { Rybbit } from "@notra/ui/components/ui/svgs/rybbit";
 import { Umami } from "@notra/ui/components/ui/svgs/umami";
 
 import type { StatusBadgeAppearance } from "@/types/components/status-badge";
@@ -67,6 +68,20 @@ export const SITE_INTEGRATION_PROVIDERS: readonly SiteIntegrationProvider[] = [
         optional: true,
       },
       { key: "sessionRecording", type: "boolean", defaultValue: true },
+    ],
+  },
+  {
+    id: "rybbit",
+    name: "Rybbit",
+    logo: Rybbit,
+    docsUrl: "https://rybbit.com/docs/script",
+    fields: [
+      { key: "siteId", placeholder: "123" },
+      {
+        key: "scriptUrl",
+        placeholder: "https://app.rybbit.io/api/script.js",
+        optional: true,
+      },
     ],
   },
   {

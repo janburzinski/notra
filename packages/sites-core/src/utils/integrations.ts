@@ -9,6 +9,7 @@ import {
   POSTHOG_CSP_ORIGIN,
   POSTHOG_DEFAULT_API_HOST,
   POSTHOG_LOADER,
+  RYBBIT_SCRIPT_URL,
   UMAMI_CONNECT_ORIGIN,
   UMAMI_SCRIPT_URL,
 } from "@notra/sites-core/constants/integrations";
@@ -16,8 +17,29 @@ import type {
   SiteCspSources,
   SiteHeadScript,
   SiteIntegrations,
+  SiteRybbit,
 } from "@notra/sites-core/types/site-integrations";
 import { dataAttributes } from "@notra/sites-core/utils/data-attributes";
+
+export function rybbitScript({
+  siteId,
+  scriptUrl,
+  replay,
+  ...options
+}: SiteRybbit) {
+  const src = new URL(scriptUrl ?? RYBBIT_SCRIPT_URL);
+  src.searchParams.set("siteId", siteId);
+  const replayOptions = Object.fromEntries(
+    Object.entries(replay ?? {}).map(([key, value]) => [
+      `replay${key[0]?.toUpperCase()}${key.slice(1)}`,
+      value,
+    ])
+  );
+  return {
+    src: src.href,
+    attributes: dataAttributes({ ...options, ...replayOptions }),
+  };
+}
 
 export function inlineScriptLiteral(value: unknown): string {
   return JSON.stringify(value)
@@ -34,7 +56,8 @@ export function integrationHeadScripts(
   const onHostingDomain =
     hostingDomain &&
     `("."+location.hostname).endsWith(${inlineScriptLiteral(`.${hostingDomain}`)})`;
-  const { capless, databuddy, ga4, plausible, posthog, umami } = integrations;
+  const { capless, databuddy, ga4, plausible, posthog, rybbit, umami } =
+    integrations;
   if (capless) {
     scripts.push({
       kind: "external",
@@ -104,6 +127,14 @@ export function integrationHeadScripts(
       code: `${POSTHOG_LOADER}posthog.init(${inlineScriptLiteral(posthog.apiKey)},${onHostingDomain ? `Object.assign(${inlineScriptLiteral(options)},${onHostingDomain}?{cross_subdomain_cookie:false}:{})` : inlineScriptLiteral(options)});`,
     });
   }
+  if (rybbit) {
+    const { src, attributes } = rybbitScript(rybbit);
+    scripts.push({
+      kind: "external",
+      src,
+      attributes: { ...attributes, defer: true },
+    });
+  }
   if (umami) {
     scripts.push({
       kind: "external",
@@ -129,7 +160,7 @@ export function integrationCspSources(
 ): SiteCspSources {
   const scriptSrc: string[] = [];
   const connectSrc: string[] = [];
-  const { c15t, capless, databuddy, ga4, plausible, posthog, umami } =
+  const { c15t, capless, databuddy, ga4, plausible, posthog, rybbit, umami } =
     integrations;
   if (c15t) {
     connectSrc.push(new URL(c15t.backendURL).origin);
@@ -169,6 +200,11 @@ export function integrationCspSources(
       scriptSrc.push(origin);
       connectSrc.push(origin);
     }
+  }
+  if (rybbit) {
+    const origin = new URL(rybbit.scriptUrl ?? RYBBIT_SCRIPT_URL).origin;
+    scriptSrc.push(origin);
+    connectSrc.push(origin);
   }
   if (umami) {
     const scriptOrigin = new URL(umami.scriptUrl ?? UMAMI_SCRIPT_URL).origin;
