@@ -32,6 +32,7 @@
           "description": "Uploaded files"
         },
         "billing": {
+          "seatUsage": "Seats used this month across your whole workspace.",
           "description": "Plans, invoices and subscription"
         },
         "usage": {

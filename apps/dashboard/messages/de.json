@@ -32,6 +32,7 @@
           "description": "Hochgeladene Dateien"
         },
         "billing": {
+          "seatHint": "Invite teammates to share the workload with everyone.",
           "description": "Tarife, Rechnungen und Abo"
         },
         "usage": {
