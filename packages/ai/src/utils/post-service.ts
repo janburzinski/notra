@@ -11,6 +11,7 @@ import type {
   UpdatePostRecordResult,
   UpdatePostSiteMetadataParams,
 } from "@notra/ai/types/post-service";
+import { syncGeneratedCoverImage } from "@notra/ai/utils/post-cover-image";
 import { stripLeadingFrontmatter } from "@notra/ai/utils/post-markdown";
 import { sanitizeMarkdownHtml } from "@notra/ai/utils/sanitize";
 import { db } from "@notra/db/drizzle";
@@ -199,6 +200,13 @@ export async function createPostRecord(
       collectionId: params.collectionId,
       organizationId: params.organizationId,
     });
+    if (params.autoPublish) {
+      await syncGeneratedCoverImage({
+        organizationId: params.organizationId,
+        postId: id,
+        publishing: true,
+      });
+    }
   }
 
   return { postId: id, deduplicated };
@@ -258,10 +266,36 @@ export async function updatePostRecord(
 export async function updateAiPostRecord(
   params: UpdatePostRecordParams
 ): Promise<UpdatePostRecordResult> {
-  return await db.transaction(async (tx) => {
+  const { result, previousTitle } = await db.transaction(async (tx) => {
     await setPostHistoryContext(tx, { actorUserId: null, source: "ai" });
-    return await updatePostRecord(params, tx);
+    const previous =
+      params.title === undefined
+        ? undefined
+        : await tx.query.posts.findFirst({
+            columns: { title: true },
+            where: and(
+              eq(posts.id, params.postId),
+              eq(posts.organizationId, params.organizationId)
+            ),
+          });
+    return {
+      result: await updatePostRecord(params, tx),
+      previousTitle: previous?.title,
+    };
   });
+  if (
+    result.status === "updated" &&
+    previousTitle !== undefined &&
+    previousTitle !== params.title
+  ) {
+    await syncGeneratedCoverImage({
+      organizationId: params.organizationId,
+      postId: params.postId,
+      previousTitle,
+      publishing: false,
+    });
+  }
+  return result;
 }
 
 export async function ensureChatPostCollection(

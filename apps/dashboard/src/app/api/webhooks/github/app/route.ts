@@ -64,6 +64,7 @@ export const POST = withEvlog(async (request: Request) => {
     signature,
     deliveryId,
     rawBody,
+    afterCommit: (task) => afterResponse(task),
   });
 
   if (result.context) {

@@ -17,7 +17,6 @@ import {
   WHITESPACE_RUN,
   TRAILING_PUNCTUATION,
   SURROUNDING_SLASHES,
-  SITE_IMAGE_URL,
   ELLIPSIS,
   SITE_ENTRY_DESCRIPTION_MAX_LENGTH,
   SITE_ENTRY_DIRECTORIES,
@@ -203,24 +202,6 @@ export function extractMarkdownExcerpt(
   return "";
 }
 
-function findFirstImageUrl(node: SiteMarkdownNode): string | null {
-  if (node.type === "image") {
-    return node.url ?? null;
-  }
-  for (const child of node.children ?? []) {
-    const url = findFirstImageUrl(child);
-    if (url !== null) {
-      return url;
-    }
-  }
-  return null;
-}
-
-function findSiteEntryImage(markdown: string): string | null {
-  const url = findFirstImageUrl(fromMarkdown(markdown) as SiteMarkdownNode);
-  return url && SITE_IMAGE_URL.test(url) ? url : null;
-}
-
 function formatSiteEntryDate(date: Date): string {
   return date.toISOString().slice(0, "YYYY-MM-DD".length);
 }
@@ -340,9 +321,8 @@ export function buildSiteEntryMarkdown(
     write("author", isBlog ? params.author?.trim() || null : null);
   }
 
-  const image =
-    metadata.image ??
-    (autoFill ? { src: findSiteEntryImage(body), alt: "" } : null);
+  // Only a chosen cover: without one the site draws its own share image.
+  const image = metadata.image ?? null;
   write("image", image?.src || null);
   write("imageAlt", (image?.src && image.alt.trim()) || null);
 

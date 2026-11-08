@@ -74,7 +74,10 @@ if (process.env.NOTRA_CONTENT_PUBLICATION_TEST_WORKER !== "1") {
                 : [],
             "publication-lock"
           )
-        : chain(() => [{ id: state.publication.postId }], "post-lock"),
+        : chain(
+            () => [{ id: state.publication.postId, title: state.title }],
+            "post-lock"
+          ),
     update: () => ({
       set: (patch: Partial<Publication>) => ({
         where: async () => {
@@ -121,6 +124,12 @@ if (process.env.NOTRA_CONTENT_PUBLICATION_TEST_WORKER !== "1") {
     },
   }));
 
+  mock.module("@notra/ai/utils/post-cover-image", () => ({
+    syncGeneratedCoverImage: async (params: { previousTitle?: string }) => {
+      events.push(`cover-sync:${params.previousTitle}`);
+    },
+  }));
+
   const { syncContentPublication } = await import("./content-publication");
   const repair = (commitSha: string, markdown = commitSha) => ({
     organizationId: "org",
@@ -143,6 +152,7 @@ if (process.env.NOTRA_CONTENT_PUBLICATION_TEST_WORKER !== "1") {
         branch: "content",
       },
       markdown: "h0",
+      title: "Old title",
     };
     events = [];
   };
@@ -165,6 +175,30 @@ if (process.env.NOTRA_CONTENT_PUBLICATION_TEST_WORKER !== "1") {
       "post-update",
       "publication-update",
     ]);
+  });
+
+  test("a title change refreshes the generated cover after the commit", async () => {
+    reset();
+    expect(
+      await syncContentPublication(
+        { ...repair("h1"), title: "New title" },
+        async () => true
+      )
+    ).toEqual({ status: "synchronized", markdown: "h1" });
+    expect(events.slice(-2)).toEqual([
+      "publication-update",
+      "cover-sync:Old title",
+    ]);
+  });
+
+  test("an unchanged title draws no cover", async () => {
+    reset();
+    await syncContentPublication(
+      { ...repair("h1"), title: "Old title" },
+      async () => true
+    );
+    await syncContentPublication(repair("h2"), async () => true);
+    expect(events.some((event) => event.startsWith("cover-sync"))).toBe(false);
   });
 
   test("unrelated intermediary is rejected before transaction writes", async () => {

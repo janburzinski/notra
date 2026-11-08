@@ -11,7 +11,7 @@ import {
 
 const DATE = new Date("2026-10-05T21:30:00.000Z");
 
-test("adds frontmatter and drops the duplicate title heading", () => {
+test("adds frontmatter, drops the duplicate title heading and leaves body images out of the cover", () => {
   const markdown = buildSiteEntryMarkdown({
     author: "jan",
     contentType: "blog_post",
@@ -34,7 +34,6 @@ test("adds frontmatter and drops the duplicate title heading", () => {
       'description: "We now host your blog and changelog."',
       "date: 2026-10-05",
       'author: "jan"',
-      'image: "/images/blog/shipping-sites/image-abc.png"',
       "---",
       "",
       "![Cover](/images/blog/shipping-sites/image-abc.png)",

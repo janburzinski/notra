@@ -16,7 +16,8 @@ import { logWarn } from "@notra/ai/utils/server-log";
 import { db } from "@notra/db/drizzle";
 import { organizations, posts } from "@notra/db/schema";
 import type { PostCoverImage } from "@notra/db/types/post-metadata";
-import { eq, sql } from "drizzle-orm";
+import { setPostHistoryContext } from "@notra/db/utils/post-history";
+import { and, eq, sql } from "drizzle-orm";
 
 /** The brand's OG image, or an organization-name card when it has no brand. */
 export async function renderPostOgImage(params: GenerateOgImageParams) {
@@ -139,6 +140,75 @@ export function coverImageIfUnchanged(previous: unknown, next: PostCoverImage) {
   return sql`case when ${posts.coverImage} is not distinct from ${
     previous ? JSON.stringify(previous) : null
   }::jsonb then ${JSON.stringify(next)}::jsonb else ${posts.coverImage} end`;
+}
+
+/**
+ * Gives a post the cover a finished write would have added inline: for writes
+ * that do not go through the editor or the API, such as automations, AI edits
+ * and merged pull requests. Never throws.
+ */
+export async function syncGeneratedCoverImage(params: {
+  organizationId: string;
+  postId: string;
+  /** The title before the write, when the write may have changed it. */
+  previousTitle?: string;
+  /** The write published the post. */
+  publishing: boolean;
+}) {
+  const where = and(
+    eq(posts.id, params.postId),
+    eq(posts.organizationId, params.organizationId)
+  );
+  let coverImage: PostCoverImage | null = null;
+  try {
+    const post = await db.query.posts.findFirst({
+      columns: {
+        title: true,
+        contentType: true,
+        status: true,
+        coverImage: true,
+      },
+      where,
+    });
+    if (!post) {
+      return;
+    }
+    coverImage = await generatedCoverImageUpdate({
+      organizationId: params.organizationId,
+      postId: params.postId,
+      contentType: post.contentType,
+      coverImage: post.coverImage,
+      previousTitle: params.previousTitle ?? post.title,
+      title: post.title,
+      publishing: params.publishing,
+      published: post.status === "published",
+    });
+    if (!coverImage) {
+      return;
+    }
+    const generated = coverImage;
+    const [saved] = await db.transaction(async (tx) => {
+      await setPostHistoryContext(tx, { actorUserId: null, source: "system" });
+      return await tx
+        .update(posts)
+        .set({
+          coverImage: coverImageIfUnchanged(post.coverImage, generated),
+          updatedAt: new Date(),
+        })
+        // A newer write with another title draws its own cover; this one is stale.
+        .where(
+          and(where, eq(posts.title, post.title), eq(posts.status, "published"))
+        )
+        .returning({ coverImage: posts.coverImage });
+    });
+    await discardUnusedCover(generated, saved?.coverImage ?? null);
+  } catch (error) {
+    await discardUnusedCover(coverImage, null);
+    logWarn("[post-cover] Could not save a generated cover image", {
+      postId: params.postId,
+      error: error instanceof Error ? error.message : String(error),
+    });
+  }
 }
 
 /** Deletes a generated cover the saved post does not reference. */

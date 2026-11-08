@@ -39,7 +39,10 @@ export function getGitHubAppWebhookSecret() {
   return process.env[GITHUB_MENTION_APP_WEBHOOK_SECRET_ENV]?.trim() ?? "";
 }
 
-async function syncPullRequestPublication(payload: GitHubAppWebhookPayload) {
+async function syncPullRequestPublication(
+  payload: GitHubAppWebhookPayload,
+  afterCommit?: (task: () => Promise<void>) => void
+) {
   const pullRequest = payload.pull_request;
   const repository = payload.repository;
   if (!(pullRequest && repository)) {
@@ -69,6 +72,7 @@ async function syncPullRequestPublication(payload: GitHubAppWebhookPayload) {
       merged: Boolean(pullRequest.merged),
       installationId: String(installation.id),
       githubRepositoryId: String(repository.id),
+      afterCommit,
     });
     return {
       httpStatus: 200,
@@ -149,6 +153,8 @@ export async function ingestGitHubAppMentionWebhook(params: {
   deliveryId: string | null;
   rawBody: string;
   allowEditedFeedback?: boolean;
+  /** Defers work that GitHub should not wait for, such as cover renders. */
+  afterCommit?: (task: () => Promise<void>) => void;
 }): Promise<{
   httpStatus: number;
   body: Record<string, unknown>;
@@ -202,6 +208,7 @@ export async function ingestGitHubAppMentionWebhook(params: {
 
 async function finishIngest(params: {
   allowEditedFeedback?: boolean;
+  afterCommit?: (task: () => Promise<void>) => void;
   event: string;
   deliveryId: string | null;
   rawBody: string;
@@ -234,7 +241,7 @@ async function finishIngest(params: {
   }
 
   if (params.event === "pull_request") {
-    return await syncPullRequestPublication(payload.data);
+    return await syncPullRequestPublication(payload.data, params.afterCommit);
   }
 
   // GitHub sends PR conversation comments as issue_comment too. Only those

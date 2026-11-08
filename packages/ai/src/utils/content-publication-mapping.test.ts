@@ -100,6 +100,12 @@ if (process.env.NOTRA_PUBLICATION_MAPPING_SQL_WORKER !== "1") {
   mock.module("@notra/ai/utils/post-service", () => ({
     updatePostRecord: async () => null,
   }));
+  const coverSyncs: unknown[] = [];
+  mock.module("@notra/ai/utils/post-cover-image", () => ({
+    syncGeneratedCoverImage: async (params: unknown) => {
+      coverSyncs.push(params);
+    },
+  }));
 
   await client.exec(`
     create table posts (
@@ -185,6 +191,7 @@ if (process.env.NOTRA_PUBLICATION_MAPPING_SQL_WORKER !== "1") {
   };
 
   beforeEach(async () => {
+    coverSyncs.length = 0;
     await client.exec(
       "truncate content_publications, posts, github_integrations, github_app_installations; insert into posts values ('post', 'org')"
     );
@@ -380,6 +387,44 @@ if (process.env.NOTRA_PUBLICATION_MAPPING_SQL_WORKER !== "1") {
         ["repository-A", "merged"],
         ["repository-B", "open"],
       ]);
+      expect(coverSyncs).toEqual([
+        { organizationId: "org", postId: "post", publishing: true },
+      ]);
+    });
+
+    test("a webhook can defer the cover until after it responds", async () => {
+      await insert("A", at(1));
+      const deferred: (() => Promise<void>)[] = [];
+      expect(
+        await closeContentPublicationForPullRequest({
+          owner: "notra",
+          repo: "repo-A",
+          pullRequestNumber: 1,
+          merged: true,
+          repositoryId: "repository-A",
+          afterCommit: (task) => deferred.push(task),
+        })
+      ).toBe(1);
+      expect(coverSyncs).toEqual([]);
+      expect(deferred).toHaveLength(1);
+      await deferred[0]?.();
+      expect(coverSyncs).toEqual([
+        { organizationId: "org", postId: "post", publishing: true },
+      ]);
+    });
+
+    test("a closed pull request publishes nothing and draws no cover", async () => {
+      await insert("A", at(1));
+      expect(
+        await closeContentPublicationForPullRequest({
+          owner: "notra",
+          repo: "repo-A",
+          pullRequestNumber: 1,
+          merged: false,
+          repositoryId: "repository-A",
+        })
+      ).toBe(1);
+      expect(coverSyncs).toEqual([]);
     });
 
     test("webhook closure uses installation and immutable repository ID", async () => {

@@ -6,6 +6,7 @@ import type {
   ReconcileContentPublicationParams,
   RecordContentPublicationParams,
 } from "@notra/ai/types/content-publication";
+import { syncGeneratedCoverImage } from "@notra/ai/utils/post-cover-image";
 import { updatePostRecord } from "@notra/ai/utils/post-service";
 import { db } from "@notra/db/drizzle";
 import {
@@ -283,9 +284,11 @@ export async function syncContentPublication(
   ) {
     return { status: "superseded" };
   }
-  return await db.transaction(async (tx) => {
-    await tx
-      .select({ id: posts.id })
+  let previousTitle: string | undefined;
+  let titleChanged = false;
+  const result = await db.transaction(async (tx) => {
+    const [post] = await tx
+      .select({ id: posts.id, title: posts.title })
       .from(posts)
       .where(
         and(
@@ -294,6 +297,7 @@ export async function syncContentPublication(
         )
       )
       .for("update");
+    previousTitle = post?.title;
     const [publication] = await tx
       .select({
         id: contentPublications.id,
@@ -337,8 +341,19 @@ export async function syncContentPublication(
         updatedAt: new Date(),
       })
       .where(eq(contentPublications.id, repair.publicationId));
+    titleChanged = repair.title !== undefined && repair.title !== previousTitle;
     return { status: "synchronized", markdown: repair.markdown } as const;
   });
+  // After the commit, so a slow render holds no row locks.
+  if (titleChanged) {
+    await syncGeneratedCoverImage({
+      organizationId: repair.organizationId,
+      postId: repair.postId,
+      previousTitle,
+      publishing: false,
+    });
+  }
+  return result;
 }
 
 export async function closeContentPublicationForPullRequest(
@@ -358,9 +373,12 @@ export async function closeContentPublicationForPullRequest(
         installationId: string;
         githubRepositoryId: string;
       }
-  )
+  ) & {
+      /** Runs the cover refresh later, e.g. after a webhook has responded. */
+      afterCommit?: (task: () => Promise<void>) => void;
+    }
 ) {
-  return await db.transaction(async (tx) => {
+  const { closed, published } = await db.transaction(async (tx) => {
     await lockPullRequest(
       tx,
       `${params.owner}/${params.repo}`,
@@ -429,22 +447,44 @@ export async function closeContentPublicationForPullRequest(
       })
       .where(openForPullRequest)
       .returning({ postId: contentPublications.postId });
-    if (params.merged && rows.length > 0) {
-      await tx
-        .update(posts)
-        .set({ status: "published", publishedAt: new Date() })
-        .where(
-          and(
-            inArray(
-              posts.id,
-              rows.map((row) => row.postId)
-            ),
-            eq(posts.status, "draft")
-          )
-        );
-    }
-    return rows.length;
+    const publishedPosts =
+      params.merged && rows.length > 0
+        ? await tx
+            .update(posts)
+            .set({ status: "published", publishedAt: new Date() })
+            .where(
+              and(
+                inArray(
+                  posts.id,
+                  rows.map((row) => row.postId)
+                ),
+                eq(posts.status, "draft")
+              )
+            )
+            .returning({ id: posts.id, organizationId: posts.organizationId })
+        : [];
+    return { closed: rows.length, published: publishedPosts };
   });
+  // After the commit: covers render for up to seconds and must not hold locks.
+  const refreshCovers = async () => {
+    await Promise.all(
+      published.map((post) =>
+        syncGeneratedCoverImage({
+          organizationId: post.organizationId,
+          postId: post.id,
+          publishing: true,
+        })
+      )
+    );
+  };
+  if (published.length > 0) {
+    if (params.afterCommit) {
+      params.afterCommit(refreshCovers);
+    } else {
+      await refreshCovers();
+    }
+  }
+  return closed;
 }
 
 export async function findOpenContentPublicationByPullRequest(params: {

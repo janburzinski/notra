@@ -12,7 +12,32 @@ mock.module("@notra/ai/constants/post-metadata", () => ({
   GENERATED_COVER_TIMEOUT_MS: 100,
 }));
 
-mock.module("@notra/db/drizzle", () => ({ db: {} }));
+let storedPost: Record<string, unknown> | null = null;
+let writeFails = false;
+const writes: unknown[] = [];
+const fakeDb = {
+  query: { posts: { findFirst: () => Promise.resolve(storedPost) } },
+  transaction: (run: (tx: unknown) => Promise<unknown>) =>
+    run({
+      update: () => ({
+        set: (values: unknown) => ({
+          where: () => ({
+            returning: () => {
+              if (writeFails) {
+                return Promise.reject(new Error("write failed"));
+              }
+              writes.push(values);
+              return Promise.resolve([{ coverImage: uploadedCover() }]);
+            },
+          }),
+        }),
+      }),
+    }),
+};
+mock.module("@notra/db/drizzle", () => ({ db: fakeDb }));
+mock.module("@notra/db/utils/post-history", () => ({
+  setPostHistoryContext: () => Promise.resolve(),
+}));
 mock.module("@notra/ai/utils/og-image", () => ({
   generateBrandOgImage: (params: {
     title: string;
@@ -40,8 +65,19 @@ mock.module("@notra/ai/utils/image-assets", () => ({
   },
 }));
 
-const { discardUnusedCover, generatedCoverImageUpdate, isGeneratedCoverImage } =
-  await import("@notra/ai/utils/post-cover-image");
+const {
+  discardUnusedCover,
+  generatedCoverImageUpdate,
+  isGeneratedCoverImage,
+  syncGeneratedCoverImage,
+} = await import("@notra/ai/utils/post-cover-image");
+
+function uploadedCover() {
+  return {
+    url: `https://cdn.example.com/organization/org/content/${uploads.at(-1)?.postId}-cover-0b5e9d2c-4f7a-4c1e-9a7d-3e2f1b0c9d8e-1700000000000.png`,
+    alt: "Hello world",
+  };
+}
 
 const GENERATED = {
   url: "https://cdn.example.com/organization/org/content/p_1-cover-0b5e9d2c-4f7a-4c1e-9a7d-3e2f1b0c9d8e-1700000000000.png",
@@ -64,6 +100,9 @@ beforeEach(() => {
   deleted.length = 0;
   renderFails = false;
   renderDelayMs = 0;
+  storedPost = null;
+  writeFails = false;
+  writes.length = 0;
 });
 
 describe("isGeneratedCoverImage", () => {
@@ -221,5 +260,68 @@ describe("discardUnusedCover", () => {
     });
     await discardUnusedCover(generated, null);
     expect(deleted).toEqual([generated.url, generated.url]);
+  });
+});
+
+describe("syncGeneratedCoverImage", () => {
+  const published = {
+    title: "Hello world",
+    contentType: "blog_post",
+    status: "published",
+    coverImage: null,
+  };
+
+  test("saves a cover for a post published without one", async () => {
+    storedPost = published;
+    await syncGeneratedCoverImage({
+      organizationId: "org",
+      postId: "p_1",
+      publishing: true,
+    });
+    expect(renders).toHaveLength(1);
+    expect(writes).toHaveLength(1);
+    expect(deleted).toHaveLength(0);
+  });
+
+  test("refreshes a generated cover after a title edit", async () => {
+    storedPost = { ...published, coverImage: GENERATED };
+    await syncGeneratedCoverImage({
+      organizationId: "org",
+      postId: "p_1",
+      previousTitle: "Old title",
+      publishing: false,
+    });
+    expect(renders[0]?.title).toBe("Hello world");
+    expect(writes).toHaveLength(1);
+  });
+
+  test("leaves drafts and missing posts alone", async () => {
+    storedPost = { ...published, status: "draft" };
+    await syncGeneratedCoverImage({
+      organizationId: "org",
+      postId: "p_1",
+      previousTitle: "Old title",
+      publishing: false,
+    });
+    storedPost = null;
+    await syncGeneratedCoverImage({
+      organizationId: "org",
+      postId: "p_1",
+      publishing: true,
+    });
+    expect(renders).toHaveLength(0);
+    expect(writes).toHaveLength(0);
+  });
+
+  test("deletes the upload when the write fails, without throwing", async () => {
+    storedPost = published;
+    writeFails = true;
+    await syncGeneratedCoverImage({
+      organizationId: "org",
+      postId: "p_1",
+      publishing: true,
+    });
+    expect(uploads).toHaveLength(1);
+    expect(deleted).toHaveLength(1);
   });
 });

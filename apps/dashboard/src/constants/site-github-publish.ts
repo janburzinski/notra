@@ -22,7 +22,6 @@ export const LEADING_ATX_HEADING =
 export const WHITESPACE_RUN = /\s+/g;
 export const TRAILING_PUNCTUATION = /[\s,;:.\-–—]+$/;
 export const SURROUNDING_SLASHES = /^\/+|\/+$/g;
-export const SITE_IMAGE_URL = /^(?:https:\/\/|\/(?!\/))/;
 export const ELLIPSIS = "…";
 
 export const SITE_ENTRY_AUTHOR_FIELDS = [
