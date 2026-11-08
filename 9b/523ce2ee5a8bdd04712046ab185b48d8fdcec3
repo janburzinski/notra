@@ -1,0 +1,20 @@
+apps/api/tests/post-pull-request.test.ts
+  s_538ace07171c35::t_d707e6aa4f4e46 9
+  s_538ace07171c35::t_90c969432f49bf 35-44
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "9b523ce2ee5a8bdd04712046ab185b48d8fdcec3",
+  "prompts": {},
+  "sessions": {
+    "s_538ace07171c35": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c1c70e6a-e30c-40c6-aadf-5567a15ff98a",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
