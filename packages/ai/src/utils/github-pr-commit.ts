@@ -217,6 +217,107 @@ export async function getGitHubPullRequestFilePatch(params: {
   }
 }
 
+/** One page of the files a pull request changes, with each file's patch. */
+export async function listGitHubPullRequestFiles(params: {
+  octokit: CommitFilesToPullRequestParams["octokit"];
+  owner: string;
+  repo: string;
+  pullNumber: number;
+  page: number;
+  perPage: number;
+}) {
+  const { data } = await params.octokit.request(
+    "GET /repos/{owner}/{repo}/pulls/{pull_number}/files",
+    {
+      owner: params.owner,
+      repo: params.repo,
+      pull_number: params.pullNumber,
+      per_page: params.perPage,
+      page: params.page,
+      headers: GITHUB_API_VERSION_HEADERS,
+    }
+  );
+  return data.map((file) => ({
+    path: file.filename,
+    status: file.status,
+    additions: file.additions,
+    deletions: file.deletions,
+    patch: file.patch ?? null,
+  }));
+}
+
+/** Commit headlines of a pull request, oldest first. */
+export async function listGitHubPullRequestCommitHeadlines(params: {
+  octokit: CommitFilesToPullRequestParams["octokit"];
+  owner: string;
+  repo: string;
+  pullNumber: number;
+  limit: number;
+}) {
+  const { data } = await params.octokit.request(
+    "GET /repos/{owner}/{repo}/pulls/{pull_number}/commits",
+    {
+      owner: params.owner,
+      repo: params.repo,
+      pull_number: params.pullNumber,
+      per_page: params.limit,
+      headers: GITHUB_API_VERSION_HEADERS,
+    }
+  );
+  return data.map((commit) => commit.commit.message.split(/\r?\n/, 1)[0] ?? "");
+}
+
+export async function updatePullRequestTitle(params: {
+  octokit: CommitFilesToPullRequestParams["octokit"];
+  owner: string;
+  repo: string;
+  pullNumber: number;
+  title: string;
+}) {
+  await params.octokit.request(
+    "PATCH /repos/{owner}/{repo}/pulls/{pull_number}",
+    {
+      owner: params.owner,
+      repo: params.repo,
+      pull_number: params.pullNumber,
+      title: params.title,
+      headers: GITHUB_API_VERSION_HEADERS,
+    }
+  );
+}
+
+/** The paths that already exist at ref, so create-only writes never replace a file. */
+export async function findExistingRepositoryPaths(params: {
+  octokit: CommitFilesToPullRequestParams["octokit"];
+  owner: string;
+  repo: string;
+  paths: readonly string[];
+  ref: string;
+}) {
+  const found = await Promise.all(
+    [...new Set(params.paths)].map((path) =>
+      params.octokit
+        .request("GET /repos/{owner}/{repo}/contents/{path}", {
+          owner: params.owner,
+          repo: params.repo,
+          path,
+          ref: params.ref,
+          headers: GITHUB_API_VERSION_HEADERS,
+        })
+        .then(
+          () => path,
+          (error: unknown) => {
+            if (githubStatus(error) === 404) {
+              return null;
+            }
+            throw error;
+          }
+        )
+    )
+  );
+  return found.filter((path) => path !== null);
+}
+
 export function githubStatus(error: unknown) {
   if (typeof error === "object" && error !== null && "status" in error) {
     return typeof error.status === "number" ? error.status : null;

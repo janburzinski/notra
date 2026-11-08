@@ -48,6 +48,12 @@ describe("wantsSeparatePullRequest", () => {
     for (const body of [
       "@notra open a new PR for this",
       "please use a separate pull request",
+      "@NoTra write a blog post for this in a new pullrequest pls\n\nalso add ogimage",
+      "write the changelog as a separate PR",
+      "put the announcement in a new pull-request",
+      "@notra draft a post and open a PR for it",
+      "commit it on a new branch",
+      "pls do the changelog in a separate PR",
     ]) {
       expect(wantsSeparatePullRequest(body)).toBe(true);
     }
@@ -61,6 +67,16 @@ describe("wantsSeparatePullRequest", () => {
       "> please use a separate pull request",
       "`open a new PR` is an example",
       "```text\nopen a new PR\n```",
+      "@notra write a blog post for this",
+      "this PR is in a good state",
+      "don't put it in a new pullrequest",
+      "the old PR had a typo",
+      "make a PR comment summarising this",
+      "start a pull request review for the intro",
+      "@notra fix the typo here; the feature was added in a separate PR",
+      "the API docs already live in a new PR",
+      "the blog post is in a new PR already",
+      "shorten the intro, we covered pricing in a separate pull request",
     ]) {
       expect(wantsSeparatePullRequest(body)).toBe(false);
     }

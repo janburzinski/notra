@@ -9,6 +9,7 @@ import {
   createGitHubBranch,
   getGitHubBranchHeadSha,
   getPullRequestHead,
+  updatePullRequestTitle,
 } from "@notra/ai/utils/github-pr-commit";
 
 function followUpBranchName(context: GitHubMentionContext) {
@@ -107,39 +108,67 @@ export async function resolveGitHubMentionWriteTarget(params: {
   };
 }
 
+function defaultFollowUpTitle(context: GitHubMentionContext) {
+  return `docs: follow-up from @notra mention on #${context.issueNumber}`;
+}
+
 export async function ensureFollowUpPullRequest(params: {
   octokit: GitHubMentionOctokit;
   context: GitHubMentionContext;
   state: GitHubMentionWriteState;
   branch: string;
+  /** Title the agent asked for; renames the pull request if it already exists. */
+  title?: string | null;
 }) {
-  if (params.context.destination.mode !== "new_pull_request") {
+  const { context, state } = params;
+  if (context.destination.mode !== "new_pull_request") {
     return null;
   }
-  if (params.state.writePullNumber && params.state.writePullRequestUrl) {
+  const title = params.title?.trim() || null;
+  if (state.writePullNumber && state.writePullRequestUrl) {
+    if (title && title !== state.writePullRequestTitle) {
+      // The commit already landed; a missed rename only leaves the old title.
+      const renamed = await updatePullRequestTitle({
+        octokit: params.octokit,
+        owner: context.owner,
+        repo: context.repo,
+        pullNumber: state.writePullNumber,
+        title,
+      }).then(
+        () => true,
+        () => false
+      );
+      if (renamed) {
+        state.writePullRequestTitle = title;
+      }
+    }
     return {
-      number: params.state.writePullNumber,
-      htmlUrl: params.state.writePullRequestUrl,
+      number: state.writePullNumber,
+      htmlUrl: state.writePullRequestUrl,
     };
   }
 
-  const base = params.context.destination.headRef;
+  const base = context.destination.headRef;
   if (!base) {
     throw new Error(
       "Cannot open a follow-up pull request without a base branch"
     );
   }
 
+  const requestedIn = context.comment.htmlUrl
+    ? `[@${context.sender.login}'s comment](${context.comment.htmlUrl})`
+    : `a comment by @${context.sender.login}`;
   const pullRequest = await createDraftPullRequest({
     octokit: params.octokit,
-    owner: params.context.owner,
-    repo: params.context.repo,
-    title: `docs: follow-up from @notra mention on #${params.context.issueNumber}`,
-    body: `Opened from a GitHub mention that asked for a separate pull request instead of committing on #${params.context.issueNumber}.`,
+    owner: context.owner,
+    repo: context.repo,
+    title: title ?? defaultFollowUpTitle(context),
+    body: `Opened by Notra for ${requestedIn} on #${context.issueNumber}, which asked for a separate pull request.`,
     head: params.branch,
     base,
   });
-  params.state.writePullNumber = pullRequest.number;
-  params.state.writePullRequestUrl = pullRequest.htmlUrl;
+  state.writePullNumber = pullRequest.number;
+  state.writePullRequestUrl = pullRequest.htmlUrl;
+  state.writePullRequestTitle = title;
   return pullRequest;
 }

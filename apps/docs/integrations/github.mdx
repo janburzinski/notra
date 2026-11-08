@@ -106,7 +106,8 @@ After a commit, Notra replies right at the lines it edited under **Files changed
 
 * **Questions** get an answer in the thread, and Notra commits nothing.
 * **Change requests** on a pull request Notra published commit the file onto that pull request and then synchronize the Notra post, which also happens when you apply a GitHub suggestion on that file.
-* **Separate pull request**: say so in the comment ("open a separate PR") and Notra commits to a new branch and opens a draft pull request stacked on the one you commented on. The Notra post stays as it is until you merge that pull request into the published one, and then the next change picks it up.
+* **New posts** about the pull request you commented on, even one that changes code: ask for a blog post, changelog entry or announcement ("@notra write a blog post for this in a new PR, also add an OG image"). Notra reads the pull request's changed files and commit messages, writes the post in your brand voice next to the site's other posts with the same frontmatter, and adds the OG image when you ask for one. If the repository has no place for posts, Notra replies with a title and outline and asks where it should go.
+* **Separate pull request**: say so in the comment ("open a separate PR", "in a new PR") and Notra commits to a new branch and opens a draft pull request stacked on the one you commented on, titled after what it contains. A Notra post stays as it is until you merge that pull request into the published one, and then the next change picks it up.
 
 Notra only acts on comments from members of your Notra organization whose login is linked to the commenting GitHub account, and it logs other mentions as skipped. Mentions inside code, quotes or email addresses don't count.
 

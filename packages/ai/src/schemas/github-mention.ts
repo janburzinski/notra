@@ -1,4 +1,7 @@
-import { GITHUB_MENTION_REPOSITORY_READ_LIMITS } from "@notra/ai/constants/github-mention";
+import {
+  GITHUB_MENTION_PULL_REQUEST_CHANGES,
+  GITHUB_MENTION_REPOSITORY_READ_LIMITS,
+} from "@notra/ai/constants/github-mention";
 import { CONTENT_PUBLICATION_STATUSES } from "@notra/db/constants/content";
 // biome-ignore lint/performance/noNamespaceImport: Zod recommended way to import
 import * as z from "zod";
@@ -151,6 +154,22 @@ export const githubMentionFileReadSchema = z.object({
     .describe(
       "Maximum characters to return; defaults to 6000, at most 16000. Long lines can be read across pages."
     ),
+});
+
+export const githubMentionPullRequestChangesSchema = z.strictObject({
+  page: z
+    .number()
+    .int()
+    .min(1)
+    .default(1)
+    .describe("Page of changed files; use nextPage to continue"),
+  perPage: z
+    .number()
+    .int()
+    .min(1)
+    .max(GITHUB_MENTION_PULL_REQUEST_CHANGES.fileMax)
+    .default(GITHUB_MENTION_PULL_REQUEST_CHANGES.fileDefault)
+    .describe("Files per page; defaults to 30, at most 100"),
 });
 
 export const githubMentionOgImageSchema = z.strictObject({

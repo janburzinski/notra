@@ -228,6 +228,8 @@ export interface GitHubMentionWriteState {
   writePullNumber: number | null;
   writePullRequestUrl: string | null;
   commitSha?: string | null;
+  /** Title the agent chose for a separate pull request. */
+  writePullRequestTitle?: string | null;
 }
 
 export interface GitHubMentionToolState extends GitHubMentionWriteState {

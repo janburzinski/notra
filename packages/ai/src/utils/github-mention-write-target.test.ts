@@ -6,7 +6,10 @@ import type {
   GitHubMentionWriteState,
 } from "@notra/ai/types/github-mention";
 
-import { resolveGitHubMentionWriteTarget } from "./github-mention-write-target";
+import {
+  ensureFollowUpPullRequest,
+  resolveGitHubMentionWriteTarget,
+} from "./github-mention-write-target";
 
 function fakeOctokit(head: {
   ref: string;
@@ -131,5 +134,134 @@ describe("resolveGitHubMentionWriteTarget", () => {
       state: { ...emptyState(), commitSha: "this-runs-commit" },
     });
     expect(subsequent.expectedHeadOid).toBe("this-runs-commit");
+  });
+});
+
+describe("ensureFollowUpPullRequest", () => {
+  function recordingOctokit(options: { failPatch?: boolean } = {}) {
+    const calls: { route: string; params: Record<string, unknown> }[] = [];
+    const octokit = {
+      request: async (route: string, params: Record<string, unknown>) => {
+        calls.push({ route, params });
+        if (route.startsWith("PATCH") && options.failPatch) {
+          throw new Error("rename failed");
+        }
+        return {
+          data: {
+            number: 8,
+            html_url: "https://github.com/acme/app/pull/8",
+            head: { ref: "notra/mention-7-issue-1", sha: "def456" },
+          },
+        };
+      },
+    } as unknown as GitHubMentionOctokit;
+    return { octokit, calls };
+  }
+
+  function followUpContext() {
+    const value = context("new_pull_request");
+    value.destination.headRef = "feat/export";
+    value.sender = { id: 1, login: "jan", type: "User" };
+    value.comment.htmlUrl = "https://github.com/acme/app/pull/7#issuecomment-1";
+    return value;
+  }
+
+  test("opens the draft with the agent's title and links the comment", async () => {
+    const { octokit, calls } = recordingOctokit();
+    const state = emptyState();
+    await ensureFollowUpPullRequest({
+      octokit,
+      context: followUpContext(),
+      state,
+      branch: "notra/mention-7-issue-1",
+      title: "docs(blog): announce faster exports",
+    });
+    expect(calls).toHaveLength(1);
+    expect(calls[0]?.params).toMatchObject({
+      title: "docs(blog): announce faster exports",
+      base: "feat/export",
+      draft: true,
+    });
+    expect(String(calls[0]?.params.body)).toContain(
+      "[@jan's comment](https://github.com/acme/app/pull/7#issuecomment-1)"
+    );
+    expect(state.writePullNumber).toBe(8);
+    expect(state.writePullRequestTitle).toBe(
+      "docs(blog): announce faster exports"
+    );
+  });
+
+  test("falls back to the default title without one", async () => {
+    const { octokit, calls } = recordingOctokit();
+    await ensureFollowUpPullRequest({
+      octokit,
+      context: followUpContext(),
+      state: emptyState(),
+      branch: "notra/mention-7-issue-1",
+    });
+    expect(calls[0]?.params.title).toBe(
+      "docs: follow-up from @notra mention on #7"
+    );
+  });
+
+  test("renames an open draft only when the title changes", async () => {
+    const { octokit, calls } = recordingOctokit();
+    const state = {
+      ...emptyState(),
+      writePullNumber: 8,
+      writePullRequestUrl: "https://github.com/acme/app/pull/8",
+      writePullRequestTitle: "docs: follow-up from @notra mention on #7",
+    };
+    const params = {
+      octokit,
+      context: followUpContext(),
+      state,
+      branch: "notra/mention-7-issue-1",
+    };
+    await ensureFollowUpPullRequest(params);
+    expect(calls).toHaveLength(0);
+    await ensureFollowUpPullRequest({
+      ...params,
+      title: "docs(blog): exports",
+    });
+    expect(calls).toHaveLength(1);
+    expect(calls[0]?.route).toStartWith("PATCH");
+    expect(state.writePullRequestTitle).toBe("docs(blog): exports");
+    await ensureFollowUpPullRequest({
+      ...params,
+      title: "docs(blog): exports",
+    });
+    expect(calls).toHaveLength(1);
+  });
+
+  test("keeps going when the rename fails", async () => {
+    const { octokit } = recordingOctokit({ failPatch: true });
+    const state = {
+      ...emptyState(),
+      writePullNumber: 8,
+      writePullRequestUrl: "https://github.com/acme/app/pull/8",
+    };
+    const result = await ensureFollowUpPullRequest({
+      octokit,
+      context: followUpContext(),
+      state,
+      branch: "notra/mention-7-issue-1",
+      title: "docs(blog): exports",
+    });
+    expect(result?.number).toBe(8);
+    expect(state.writePullRequestTitle).toBeUndefined();
+  });
+
+  test("does nothing outside separate pull request mode", async () => {
+    const { octokit, calls } = recordingOctokit();
+    const result = await ensureFollowUpPullRequest({
+      octokit,
+      context: context("same_pull_request"),
+      state: emptyState(),
+      branch: "docs",
+      title: "ignored",
+    });
+    expect(result).toBeNull();
+    expect(calls).toHaveLength(0);
   });
 });

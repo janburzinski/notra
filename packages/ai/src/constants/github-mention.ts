@@ -5,7 +5,11 @@ export const GITHUB_MENTION_DEFAULT_APP_SLUG = "notra";
 
 export const GITHUB_MENTION_COMMENT_MAX_LENGTH = 65_536;
 
-export const GITHUB_MENTION_AGENT_MAX_STEPS = 20;
+/**
+ * Writing a new post about a pull request reads its changes, a few
+ * neighbouring posts and skills before it commits the post and an image.
+ */
+export const GITHUB_MENTION_AGENT_MAX_STEPS = 30;
 
 export const GITHUB_MENTION_ITERATE_HINT = "mention me again to keep iterating";
 
@@ -78,11 +82,46 @@ export const GITHUB_MENTION_LOG_EVENTS = {
   billingFailed: "github.mention.billing_failed",
 } as const;
 
+/**
+ * "PR", "pull request", or the run-together "pullrequest" people type on
+ * phones, but not "PR comment" or "PR review", which stay on this PR.
+ */
+const PULL_REQUEST_NOUN = String.raw`(?:pr|pull[ -]?request)(?![ -](?:comments?|reviews?|descriptions?|titles?|body|threads?)\b)`;
+const SEPARATE_ADJECTIVE = "(?:new|separate|own|different|fresh)";
+/**
+ * "in a new PR" only counts after a request in the same clause ("write it in a
+ * new PR"), not as a reference ("the feature was added in a separate PR").
+ */
+const PLACING_REQUEST_VERB =
+  "(?:write|draft|do|put|add|commit|make|push|ship|send|move|publish|land|place|save|apply|include|handle|turn|split)";
+
 export const GITHUB_MENTION_SEPARATE_PR_PATTERNS = [
-  /\b(?:open|create|start) (?:a |an )?(?:new |separate |own |different )(?:draft )?(?:pr|pull request)\b/gi,
-  /\buse (?:a |an )?(?:new|separate|own|different) (?:pr|pull request|branch)\b/gi,
-  /\b(?:put|move|send) (?:this|these|the changes?) (?:in|to|as) (?:a |an )?(?:new|separate|own|different) (?:pr|pull request|branch)\b/gi,
+  new RegExp(
+    String.raw`\b(?:open|create|start|make|raise|file|submit) (?:a |an )?(?:${SEPARATE_ADJECTIVE} )?(?:draft )?${PULL_REQUEST_NOUN}\b`,
+    "gi"
+  ),
+  new RegExp(
+    String.raw`\buse (?:a |an )?${SEPARATE_ADJECTIVE} (?:${PULL_REQUEST_NOUN}|branch)\b`,
+    "gi"
+  ),
+  new RegExp(
+    String.raw`\b${PLACING_REQUEST_VERB}\b[^.!?;\n]{0,120}?\b(?:in|as|into|on|via|with) (?:a |an )?${SEPARATE_ADJECTIVE} (?:draft )?(?:${PULL_REQUEST_NOUN}|branch)\b`,
+    "gi"
+  ),
+  new RegExp(
+    String.raw`\b(?:put|move|send) (?:this|these|the changes?) (?:in|to|as) (?:a |an )?${SEPARATE_ADJECTIVE} (?:${PULL_REQUEST_NOUN}|branch)\b`,
+    "gi"
+  ),
 ] as const;
+
+/** What getPullRequestChanges hands the agent per call. */
+export const GITHUB_MENTION_PULL_REQUEST_CHANGES = {
+  fileDefault: 30,
+  fileMax: 100,
+  patchCharactersPerFile: 3000,
+  patchCharactersTotal: 40_000,
+  commitLimit: 50,
+} as const;
 
 export const GITHUB_MENTION_REPLY_DIFF = {
   inlineLineLimit: 24,
