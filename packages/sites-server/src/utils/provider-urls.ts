@@ -2,6 +2,7 @@ import { BOX_BASE_URL } from "@notra/ai/constants/repo-image";
 import type { SiteFontEndpoints } from "@notra/sites-core/types/fonts";
 
 import { CLOUDFLARE_API_URL } from "../constants/domains";
+import { INDEXNOW_API_URL } from "../constants/indexnow";
 import { VERCEL_API_URL } from "../constants/vercel-dns";
 
 // Every external service the Sites backend calls. Each has an override the
@@ -34,6 +35,10 @@ export function googleFontsEndpoints(): SiteFontEndpoints | undefined {
   return base
     ? { css: `${base}/css2`, files: base, licenses: base }
     : undefined;
+}
+
+export function indexNowUrl(): string {
+  return override("SITES_INDEXNOW_URL") ?? INDEXNOW_API_URL;
 }
 
 export function boxApiUrl(): string {

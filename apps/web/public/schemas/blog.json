@@ -2062,6 +2062,10 @@
           "required": ["backendURL"],
           "additionalProperties": false,
           "description": "c15t cookie banner and privacy settings, backed by Inth or your self-hosted c15t backend. Live deployments only; previews and local development show the banner without saving consent."
+        },
+        "indexnow": {
+          "description": "Submit new and changed pages to IndexNow search engines such as Bing after each production deployment. It is on by default, and false turns it off.",
+          "type": "boolean"
         }
       },
       "additionalProperties": false

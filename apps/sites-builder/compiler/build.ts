@@ -371,6 +371,7 @@ async function buildInWorkDir(
     redirects: config.redirects,
     contentSecurityPolicy,
     analyticsConsent: analyticsGatedByConsent(config.integrations),
+    indexNow: config.integrations.indexnow !== false,
     consentStorageKey: consent?.options.storageConfig.storageKey,
     faviconHost,
   };

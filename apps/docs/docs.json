@@ -309,6 +309,11 @@
                 "group": "Consent",
                 "icon": "cookie-bite",
                 "pages": ["sites/integrations/consent/c15t"]
+              },
+              {
+                "group": "Search engines",
+                "icon": "magnifying-glass",
+                "pages": ["sites/integrations/search/indexnow"]
               }
             ]
           },

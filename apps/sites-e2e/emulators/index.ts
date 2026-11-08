@@ -10,6 +10,7 @@ import { DnsZone } from "./dns/zone";
 import { startGitHubEmulator } from "./github";
 import { startGoogleFontsEmulator } from "./google-fonts";
 import { EMULATED_GOOGLE_FONT } from "./google-fonts/constants";
+import { startIndexNowEmulator } from "./indexnow";
 import { startR2Emulator } from "./r2";
 import type { SitesEmulatorsOptions } from "./types";
 import { startVercelEmulator } from "./vercel";
@@ -86,6 +87,7 @@ export async function startSitesEmulators(options: SitesEmulatorsOptions) {
         },
       })
     );
+    const indexNow = await track(startIndexNowEmulator());
     const box = options.box
       ? await track(
           startBoxEmulator({
@@ -102,6 +104,7 @@ export async function startSitesEmulators(options: SitesEmulatorsOptions) {
       vercel,
       autumn,
       googleFonts,
+      indexNow,
       dns,
     ].filter((service) => service !== null);
     return {
@@ -113,6 +116,7 @@ export async function startSitesEmulators(options: SitesEmulatorsOptions) {
       vercel,
       autumn,
       googleFonts,
+      indexNow,
       box,
       env: {
         ...dns.env,
@@ -122,6 +126,7 @@ export async function startSitesEmulators(options: SitesEmulatorsOptions) {
         ...vercel.env,
         ...autumn.env,
         ...googleFonts.env,
+        ...indexNow.env,
         ...(box?.env ?? {}),
       },
       summaries: (): EmulatorSummary[] =>

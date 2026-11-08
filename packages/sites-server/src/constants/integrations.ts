@@ -8,6 +8,7 @@ export const SITE_INTEGRATION_NAMES: Record<keyof SiteIntegrations, string> = {
   posthog: "PostHog",
   umami: "Umami",
   c15t: "c15t cookie banner",
+  indexnow: "IndexNow",
 };
 
 export const SITE_INTEGRATION_BRANCH_PREFIX = "notra/integrations-";

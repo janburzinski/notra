@@ -182,6 +182,7 @@ async function compileWith(
         ? { contentSecurityPolicy: result.contentSecurityPolicy }
         : {}),
       ...(result.analyticsConsent ? { analyticsConsent: true } : {}),
+      ...(result.indexNow === false ? { indexNow: false } : {}),
       ...(result.consentStorageKey
         ? { consentStorageKey: result.consentStorageKey }
         : {}),

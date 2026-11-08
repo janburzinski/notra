@@ -464,6 +464,12 @@ export const siteIntegrationsSchema = z
     posthog: posthogSchema.optional(),
     umami: umamiSchema.optional(),
     c15t: c15tSchema.optional(),
+    indexnow: z
+      .boolean()
+      .optional()
+      .describe(
+        "Submit new and changed pages to IndexNow search engines such as Bing after each production deployment. It is on by default, and false turns it off."
+      ),
   })
   .default({})
   .describe(

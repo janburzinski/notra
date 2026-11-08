@@ -15,6 +15,7 @@ import {
   getProductionDeploymentHistory,
 } from "./deployments";
 import { SiteActivationContentionError, SiteInputError } from "./errors/sites";
+import { notifyIndexNow } from "./indexnow";
 import { isStaleToolchainRebuild } from "./live-build";
 import { readPostPreviewSource } from "./post-preview-source";
 import { r2GetText } from "./r2";
@@ -61,6 +62,7 @@ export async function activateDeployment(
   let generation = deployment.generation;
   for (let attempt = 0; attempt < 2; attempt += 1) {
     const activationGeneration = generation;
+    let previousProductionId: string | null = null;
     const outcome = await withSiteStorageLock(site.id, async (tx) => {
       const [currentSite] = await tx
         .select()
@@ -89,6 +91,7 @@ export async function activateDeployment(
         }
         const serving = await readServingState(site.id);
         const current = serving?.state.production;
+        previousProductionId = current?.deploymentId ?? null;
         if (
           !serving?.state.productionRollback &&
           current &&
@@ -148,6 +151,9 @@ export async function activateDeployment(
     }
     if (outcome === "live" && deployment.kind === "production") {
       await invalidateSiteIngestCaches(site);
+      if (previousProductionId !== deployment.id) {
+        await notifyIndexNow(site.id, previousProductionId, deployment.id);
+      }
     }
     return outcome;
   }

@@ -14,6 +14,7 @@ through the overrides in
 | `cloudflare/` | Cloudflare for SaaS custom hostnames | A hostname turns active once the shared DNS zone has its CNAME to the SaaS target and Cloudflare's ownership TXT |
 | `autumn/` | Autumn customer API | `customers.get_or_create` with the secret key checked; a new customer is on the `free` plan until the test attaches another with `setPlan`. Reached through `AUTUMN_API_URL` (the shared Autumn client in `packages/ai`) |
 | `google-fonts/` | Google Fonts CSS API, font files and license files | One origin for all three, reached through `SITES_GOOGLE_FONTS_URL`. Serves one family that doesn't exist on Google, so the lifecycle's site only gets it through the server's download before the offline build. Answers 400 for an unknown family or a weight outside its axis, as Google does |
+| `indexnow/` | IndexNow submissions | Reached through `SITES_INDEXNOW_URL`. Answers 422 for a URL outside the host or the key location's path, as the real endpoint does |
 | `vercel/` | Vercel DNS integration | OAuth code exchange (checks client, secret, redirect URI), DNS records written into the shared zone, installation removal |
 | `dns/` | UDP DNS (A, CNAME, NS, TXT) | Answers from the shared zone; reached through `SITES_DNS_SERVERS` |
 | `browser/` | Analytics scripts, embeds, c15t consent backend | Provider registry: stand-in scripts with exact payload checks, or the vendors' real scripts with `--vendor-scripts live`. The consent backend answers `/init` with c15t's EU opt-in policy and records every saved choice |

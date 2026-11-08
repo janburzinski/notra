@@ -2,6 +2,7 @@ import { analyticsEndpointsRoute } from "../routes/analytics-endpoints";
 import { faviconRoute } from "../routes/favicon";
 import { hostingApexRoute } from "../routes/hosting-apex";
 import { htmlNotFoundRoute } from "../routes/html-not-found";
+import { indexNowKeyRoute } from "../routes/indexnow-key";
 import { manifestRedirectsRoute } from "../routes/manifest-redirects";
 import { markdownFileRoute } from "../routes/markdown-file";
 import { markdownNotFoundRoute } from "../routes/markdown-not-found";
@@ -49,6 +50,7 @@ export const MANIFEST_ROUTES: readonly SiteRoute<ManifestRouteContext>[] = [
   manifestRedirectsRoute,
   sitemapIndexRoute,
   wellKnownLlmsTxtRoute,
+  indexNowKeyRoute,
   trailingSlashRedirectRoute,
   markdownFileRoute,
   markdownTwinRoute,

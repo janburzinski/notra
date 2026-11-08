@@ -1,0 +1,41 @@
+---
+title: "IndexNow"
+description: "Notra tells Bing and other IndexNow search engines about new and updated posts after every production deployment, with nothing to set up."
+
+docolin:
+  schema_version: 1
+  kind: tools/notra/sites/integrations/search/indexnow
+  type: concept
+  applies_to:
+    - notra
+  language: en
+  status: stable
+---
+
+[IndexNow](https://www.indexnow.org) lets a site tell search engines that a page changed, so they don't have to wait for their next crawl to find it. Bing, Yandex, Naver, Seznam and Yep share every submission with each other, which means one request reaches all of them. IndexNow is on by default for every site and needs no account or API key.
+
+## How it works
+
+When a production deployment goes live, Notra compares the new sitemap with the one from the previous deployment and submits every page that is new or whose content changed. A deployment that only changes your design or theme leaves your posts as they were, so Notra submits nothing for it.
+
+To prove that a submission comes from your site, Notra serves a key file at `/<key>.txt` under each area's path, for example `https://acme.com/blog/<key>.txt`, which search engines fetch to check the key. This works on your own domain too, including when your blog runs on a [subpath](/sites/domains/subpath).
+
+Notra only submits pages from your sitemap, so it never sends drafts, [hidden pages](/sites/posts#hidden-pages), posts with `noindex: true` or previews, and it sends nothing for a site that blocks search engines. See [SEO](/sites/customize/seo) for what goes into the sitemap.
+
+<Note>
+  Google doesn't support IndexNow and finds your posts through the sitemap that Notra links from `robots.txt` instead.
+</Note>
+
+## Turn it off
+
+To turn IndexNow off, set `integrations.indexnow` to `false` in `blog.json`. From the next production deployment on, Notra stops submitting pages and no longer serves the key file.
+
+```json blog.json
+{
+  "$schema": "https://usenotra.com/schemas/blog.json",
+  "name": "Acme",
+  "integrations": {
+    "indexnow": false
+  }
+}
+```

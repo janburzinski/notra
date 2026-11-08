@@ -70,6 +70,8 @@ export const siteManifestSchema = z.object({
   redirects: z.array(siteRedirectRuleSchema),
   contentSecurityPolicy: siteContentSecurityPolicySchema.optional(),
   analyticsConsent: z.boolean().optional(),
+  /** False when blog.json turns IndexNow off; missing means on. */
+  indexNow: z.literal(false).optional(),
   consentStorageKey: z.literal(C15T_HOST_STORAGE_KEY).optional(),
   /** Host the footer links a favicon for, the only one the worker serves. */
   faviconHost: z.string().regex(SITE_FAVICON_HOST).optional(),
