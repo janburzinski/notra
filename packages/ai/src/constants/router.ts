@@ -1,4 +1,8 @@
-import type { GatewayId, RouterPolicyConfig } from "@notra/ai/types/router";
+import type {
+  FallbackReason,
+  GatewayId,
+  RouterPolicyConfig,
+} from "@notra/ai/types/router";
 
 export const ROUTER_PROVIDER_OPTIONS_KEY = "notraRouter";
 export const ROUTER_METADATA_KEY = "notraRouter";
@@ -17,6 +21,13 @@ export const GATEWAY_FALLBACK_ORDER: readonly GatewayId[] = [
   "openrouter",
   "vercel",
 ];
+
+/** Reasons a gateway could never serve the request, whatever its account state. */
+export const UNSERVABLE_ROUTE_REASONS: ReadonlySet<FallbackReason> = new Set([
+  "not-configured",
+  "unsupported-model",
+  "unsupported-tool",
+]);
 
 /** Prefixes Neon/Databricks put on served ids, e.g. `global.xai.grok-4.7`. */
 export const NEON_SERVED_MODEL_PREFIX_PATTERN =

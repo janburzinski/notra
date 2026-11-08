@@ -20,6 +20,7 @@ import type { ZdrMode } from "@notra/ai/types/router";
 
 import { createOpenRouterAdapter } from "./adapters/openrouter";
 import {
+  GatewayCreditBalanceError,
   GatewayNotConfiguredError,
   GatewayUnavailableError,
   NoCompliantRouteError,
@@ -236,6 +237,37 @@ describe("resolveRoute", () => {
     await assert.rejects(
       router.resolveRoute({ modelId: "nope/model", organizationId: FREE_ORG }),
       UnsupportedModelError
+    );
+  });
+
+  test("an unfunded gateway that serves the tool outranks one that cannot", async () => {
+    const searchTool = "openai.web_search";
+    const vercel = createFakeAdapter({
+      id: "vercel",
+      balance: 0,
+      onCall: () => {
+        throw httpError(402, "insufficient_funds");
+      },
+    });
+    const openrouter = createFakeAdapter({
+      id: "openrouter",
+      supportedTools: (_modelId, toolIds) => toolIds.length === 0,
+    });
+    const { router } = createTestRouter({ plans, vercel, openrouter });
+    await assert.rejects(async () => {
+      await router.model(MODEL, { organizationId: FREE_ORG }).doGenerate({
+        ...callOptions(),
+        tools: [{ type: "provider", id: searchTool, name: "web", args: {} }],
+      });
+    });
+    await assert.rejects(
+      router.resolveRoute({
+        modelId: MODEL,
+        organizationId: FREE_ORG,
+        toolIds: [searchTool],
+      }),
+      (error) =>
+        error instanceof GatewayCreditBalanceError && error.gateway === "vercel"
     );
   });
 

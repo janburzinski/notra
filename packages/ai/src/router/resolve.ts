@@ -1,3 +1,4 @@
+import { UNSERVABLE_ROUTE_REASONS } from "@notra/ai/constants/router";
 import type {
   FallbackReason,
   GatewayCheckContext,
@@ -291,7 +292,11 @@ export async function resolveRoute(
         .join(", ")
     );
   }
-  const failure = unavailable.find(({ reason }) => reason !== "not-configured");
+  // Prefer a gateway that serves the model: its reason (no credits, auth) is
+  // what blocks the request, not another gateway lacking the model.
+  const failure =
+    unavailable.find(({ reason }) => !UNSERVABLE_ROUTE_REASONS.has(reason)) ??
+    unavailable.find(({ reason }) => reason !== "not-configured");
   if (!failure) {
     throw new GatewayNotConfiguredError("any");
   }
