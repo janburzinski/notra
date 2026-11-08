@@ -21,6 +21,7 @@ export interface SiteConsentAnalytics {
     replay?: SiteDatabuddy["replay"];
     options: Record<string, unknown>;
   };
+  datafast?: { src: string; attributes: Record<string, string> };
   gtag?: { id: string };
   onedollarstats?: { src: string; attributes: Record<string, string> };
   posthog?: { id: string; apiHost: string; disableSessionRecording: boolean };

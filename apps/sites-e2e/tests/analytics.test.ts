@@ -180,6 +180,9 @@ test("custom events cannot substitute for page views", () => {
       case "databuddy":
         body = body?.replace("screen_view", "click") ?? null;
         break;
+      case "datafast":
+        body = body?.replace('"pageview"', '"custom"') ?? null;
+        break;
       case "ga4":
         url = url.replace("en=page_view", "en=click");
         break;

@@ -9815,6 +9815,7 @@
       "providers": {
         "capless": "Cookielose Analytics mit Events und Session Replay.",
         "databuddy": "Datenschutzfreundliche Analytics mit Web Vitals, Fehlern und Events.",
+        "datafast": "Einfache, umsatzorientierte Analytics, die Besuche mit Zahlungen verknüpft.",
         "plausible": "Einfache und datenschutzfreundliche Alternative zu Google Analytics.",
         "posthog": "Product Analytics mit Session Replay und Feature Flags.",
         "rybbit": "Open-Source-Web-Analytics ohne Cookies, mit Session Replay.",
@@ -9832,6 +9833,10 @@
           "trackErrors": "Fehler",
           "trackOutgoingLinks": "Ausgehende Links",
           "trackInteractions": "Interaktionen"
+        },
+        "datafast": {
+          "websiteId": "Website-ID",
+          "domain": "Domain"
         },
         "plausible": {
           "domain": "Domain",
@@ -9874,6 +9879,10 @@
         "databuddy": {
           "clientId": "Kopiere die Client-ID aus deinen Website-Einstellungen in Databuddy"
         },
+        "datafast": {
+          "websiteId": "Kopiere die Website-ID (dfid_…) aus dem Tracking-Code von DataFast",
+          "domain": "Nutze die Domain wie in DataFast hinterlegt, z. B. acme.com"
+        },
         "ga4": {
           "measurementId": "Nutze die Mess-ID (G-…)"
         },
@@ -9904,6 +9913,10 @@
           "trackErrors": "Nicht abgefangene JavaScript-Fehler senden.",
           "trackOutgoingLinks": "Ein Event senden, wenn Besucher Links zu anderen Seiten klicken.",
           "trackInteractions": "Klicks, Rage Clicks und Dead Clicks senden. Weitere Optionen wie Sampling und ausgeschlossene Pfade gibt es in blog.json."
+        },
+        "datafast": {
+          "websiteId": "Kopiere in DataFast den Wert von data-website-id aus deinem Tracking-Code.",
+          "domain": "Die Root-Domain, die du in DataFast angelegt hast, ohne https://. Cross-Domain-Hostnamen, einen Events-Proxy und mehr gibt es in der blog.json."
         },
         "plausible": {
           "domain": "Gib die Domain ein, die du in Plausible angelegt hast, ohne https://.",

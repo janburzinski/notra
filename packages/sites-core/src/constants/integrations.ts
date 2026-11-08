@@ -40,6 +40,12 @@ export const RYBBIT_MAX_DELAY_MS = 60_000;
 export const RYBBIT_MIN_REPLAY_BATCH_INTERVAL_MS = 1000;
 export const RYBBIT_MAX_REPLAY_BATCH_SIZE = 1000;
 
+export const DATAFAST_SCRIPT_URL = "https://datafa.st/js/script.js";
+export const DATAFAST_API_URL = "https://datafa.st/api/events";
+export const DATAFAST_WEBSITE_ID = /^dfid_[A-Za-z0-9_-]{6,64}$/;
+export const DATAFAST_WEBSITE_ID_MESSAGE =
+  "Copy the website ID (dfid_…) from your DataFast tracking code";
+export const DATAFAST_MAX_ALLOWED_HOSTNAMES = 50;
 export const ONEDOLLARSTATS_SCRIPT_URL =
   "https://assets.onedollarstats.com/stonks.js";
 export const ONEDOLLARSTATS_COLLECTOR_URL =

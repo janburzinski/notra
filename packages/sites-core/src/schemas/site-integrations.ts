@@ -19,6 +19,9 @@ import {
   DATABUDDY_MAX_PATH_PATTERNS,
   DATABUDDY_MAX_RETRIES,
   DATABUDDY_PATH_PATTERN,
+  DATAFAST_MAX_ALLOWED_HOSTNAMES,
+  DATAFAST_WEBSITE_ID,
+  DATAFAST_WEBSITE_ID_MESSAGE,
   GA4_MEASUREMENT_ID,
   HOSTNAME,
   HOSTNAME_WITH_PORT,
@@ -81,6 +84,60 @@ const caplessSchema = z.strictObject({
     .describe(
       "Public Capless ingest key (cs_…) from your tracking code (data-key). It can only write events, so it is safe in HTML."
     ),
+});
+
+const datafastSchema = z.strictObject({
+  websiteId: z
+    .string({ error: DATAFAST_WEBSITE_ID_MESSAGE })
+    .trim()
+    .regex(DATAFAST_WEBSITE_ID, DATAFAST_WEBSITE_ID_MESSAGE)
+    .describe(
+      "Public DataFast website ID (dfid_…) from your tracking code (data-website-id). No API key is needed."
+    ),
+  domain: z
+    .string({ error: "Use the domain as added in DataFast, e.g. acme.com" })
+    .trim()
+    .toLowerCase()
+    .regex(HOSTNAME, "Use the domain as added in DataFast, e.g. acme.com")
+    .describe(
+      "Root domain registered in DataFast, without https:// (e.g. acme.com). DataFast sets its visitor cookies on this domain so subdomains share one visitor."
+    ),
+  allowedHostnames: z
+    .array(
+      z
+        .string()
+        .trim()
+        .toLowerCase()
+        .regex(HOSTNAME, "Use a hostname without https://, e.g. app.acme.io")
+    )
+    .max(DATAFAST_MAX_ALLOWED_HOSTNAMES)
+    .optional()
+    .describe(
+      'Up to 50 other domains for cross-domain tracking, e.g. ["app.acme.io"]. Links to them carry the visitor and session IDs so a visit counts as one journey.'
+    ),
+  apiUrl: z
+    .string()
+    .trim()
+    .regex(
+      HTTPS_SCRIPT_URL,
+      "Use the full https:// URL of your events proxy, e.g. https://stats.acme.com/api/events"
+    )
+    .optional()
+    .describe(
+      "Full HTTPS URL that receives events instead of https://datafa.st/api/events, such as a proxy on your own domain."
+    ),
+  disablePayments: optionalBooleanSchema.describe(
+    "Stop detecting Stripe, Polar and Lemon Squeezy checkout IDs in the page URL as payments (default: false)."
+  ),
+  disableConsole: optionalBooleanSchema.describe(
+    "Silence the tracker's console messages (default: false)."
+  ),
+  debug: optionalBooleanSchema.describe(
+    "Also track when the site is shown inside an iframe (default: false)."
+  ),
+  allowLocalhost: optionalBooleanSchema.describe(
+    "Also track on localhost and *.localhost hostnames, which DataFast skips by default (default: false)."
+  ),
 });
 
 const rybbitPathPatternsSchema = z
@@ -719,6 +776,7 @@ const databuddySchema = z.strictObject({
 export const siteIntegrationSchemas = {
   capless: caplessSchema,
   databuddy: databuddySchema,
+  datafast: datafastSchema,
   ga4: ga4Schema,
   onedollarstats: oneDollarStatsSchema,
   plausible: plausibleSchema,
@@ -735,6 +793,10 @@ export const siteIntegrationUpdateSchema = z.discriminatedUnion("provider", [
   z.object({
     provider: z.literal("databuddy"),
     settings: databuddySchema.nullable(),
+  }),
+  z.object({
+    provider: z.literal("datafast"),
+    settings: datafastSchema.nullable(),
   }),
   z.object({ provider: z.literal("ga4"), settings: ga4Schema.nullable() }),
   z.object({
@@ -763,6 +825,7 @@ export const siteIntegrationsSchema = z
   .strictObject({
     capless: caplessSchema.optional(),
     databuddy: databuddySchema.optional(),
+    datafast: datafastSchema.optional(),
     ga4: ga4Schema.optional(),
     onedollarstats: oneDollarStatsSchema.optional(),
     plausible: plausibleSchema.optional(),

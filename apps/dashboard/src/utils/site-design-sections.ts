@@ -126,6 +126,7 @@ export function patchConfigValue(
     value === "" &&
     [
       "integrations.capless.key",
+      "integrations.datafast.websiteId",
       "integrations.ga4.measurementId",
       "integrations.onedollarstats.hostname",
       "integrations.plausible.domain",

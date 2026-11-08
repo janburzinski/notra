@@ -20,6 +20,7 @@ test("every dashboard provider submits the same shape accepted by the API", () =
       trackOutgoingLinks: true,
       trackInteractions: false,
     },
+    datafast: { websiteId: "dfid_PvUdM8yOz073w4v9PSwnk", domain: "acme.com" },
     ga4: { measurementId: "G-ABC123XYZ9" },
     onedollarstats: { hostname: "acme.com" },
     rybbit: {
@@ -142,6 +143,7 @@ test("Umami Cloud needs only a Website ID and invalid inputs report field errors
   expect(SITE_INTEGRATION_PROVIDERS.map((entry) => entry.id).sort()).toEqual([
     "capless",
     "databuddy",
+    "datafast",
     "ga4",
     "onedollarstats",
     "plausible",

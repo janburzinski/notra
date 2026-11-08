@@ -9,6 +9,7 @@ import type { SiteConfig } from "@notra/sites-core/types/site-config";
 import type { SiteIntegrations } from "@notra/sites-core/types/site-integrations";
 import {
   analyticsGatedByConsent,
+  datafastScript,
   oneDollarStatsScript,
   rybbitScript,
 } from "@notra/sites-core/utils/integrations";
@@ -28,6 +29,7 @@ import type { PreparedCustomScript } from "../types/source";
 function consentAnalytics({
   capless,
   databuddy,
+  datafast,
   ga4,
   onedollarstats,
   plausible,
@@ -49,6 +51,7 @@ function consentAnalytics({
   return {
     capless: capless && { key: capless.key, scriptUrl: CAPLESS_SCRIPT_URL },
     databuddy: databuddyConfig,
+    datafast: datafast && datafastScript(datafast),
     gtag: ga4 && { id: ga4.measurementId },
     onedollarstats: onedollarstats && oneDollarStatsScript(onedollarstats),
     posthog: posthog && {
@@ -160,6 +163,19 @@ export function consentDiagnostics(
       file: "blog.json",
       code: "consent_cross_subdomain_ignored",
       message: `integrations.c15t.crossSubdomain only applies on your own domain. On ${hostingDomain} the consent choice stays on this site's host, so other sites there can't read or change it.`,
+    });
+  }
+  const datafastDomain = config.integrations.datafast?.domain;
+  if (
+    datafastDomain &&
+    hostingDomain &&
+    `.${hostingDomain}`.endsWith(`.${datafastDomain}`)
+  ) {
+    diagnostics.push({
+      severity: "error",
+      file: "blog.json",
+      code: "datafast_domain_hosting",
+      message: `integrations.datafast.domain can't be ${datafastDomain}, because DataFast would set its visitor cookies for every site on ${hostingDomain}. Use the domain you added in DataFast, like acme.com.`,
     });
   }
   return diagnostics;

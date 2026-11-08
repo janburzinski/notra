@@ -8,6 +8,7 @@ import type { BrowserContext, Request } from "playwright";
 import { answerConsentBackend, CONSENT_BACKEND_URL } from "./consent";
 import { capless } from "./providers/capless";
 import { databuddy } from "./providers/databuddy";
+import { datafast } from "./providers/datafast";
 import { ga4 } from "./providers/ga4";
 import { onedollarstats } from "./providers/onedollarstats";
 import { plausible } from "./providers/plausible";
@@ -22,6 +23,7 @@ import type { AnalyticsProvider, CollectedEvent, VendorScripts } from "./types";
 export const ANALYTICS_PROVIDERS: AnalyticsProvider[] = [
   capless,
   databuddy,
+  datafast,
   ga4,
   onedollarstats,
   plausible,

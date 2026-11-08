@@ -3,6 +3,7 @@ import type { SiteIntegrations } from "@notra/sites-core/types/site-integrations
 export const SITE_INTEGRATION_NAMES: Record<keyof SiteIntegrations, string> = {
   capless: "Capless",
   databuddy: "Databuddy",
+  datafast: "DataFast",
   ga4: "Google Analytics 4",
   onedollarstats: "OneDollarStats",
   plausible: "Plausible",

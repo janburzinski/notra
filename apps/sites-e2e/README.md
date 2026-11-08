@@ -81,7 +81,7 @@ browser profile. The dependency installation occurs only in the current worktree
   island chunks, to finish and remain idle for 500 ms before navigating away.
   This wait ignores analytics beacons and unrelated vendor traffic and is
   outside the navigation and beacon measurements. The analytics
-  integrations (Capless, Databuddy, GA4, OneDollarStats, Plausible,
+  integrations (Capless, Databuddy, DataFast, GA4, OneDollarStats, Plausible,
   PostHog, Rybbit, Umami) come from the provider registry in `emulators/browser/`; their
   stand-in scripts' requests are asserted against synthetic IDs, `data-*`
   options, current URLs and event payloads, and every script and endpoint

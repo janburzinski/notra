@@ -1,6 +1,7 @@
 import { Tick02Icon } from "@hugeicons/core-free-icons";
 import { Capless } from "@notra/ui/components/ui/svgs/capless";
 import { Databuddy } from "@notra/ui/components/ui/svgs/databuddy";
+import { DataFast } from "@notra/ui/components/ui/svgs/datafast";
 import { GoogleAnalytics } from "@notra/ui/components/ui/svgs/googleAnalytics";
 import { OneDollarStats } from "@notra/ui/components/ui/svgs/oneDollarStats";
 import { Plausible } from "@notra/ui/components/ui/svgs/plausible";
@@ -38,6 +39,16 @@ export const SITE_INTEGRATION_PROVIDERS: readonly SiteIntegrationProvider[] = [
     logo: Capless,
     docsUrl: "https://analytics.capless.sh/docs/web-sdk",
     fields: [{ key: "key", placeholder: "cs_…" }],
+  },
+  {
+    id: "datafast",
+    name: "DataFast",
+    logo: DataFast,
+    docsUrl: "https://datafa.st/docs/script-configuration",
+    fields: [
+      { key: "websiteId", placeholder: "dfid_…" },
+      { key: "domain", placeholder: "acme.com" },
+    ],
   },
   {
     id: "ga4",

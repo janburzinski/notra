@@ -1631,6 +1631,53 @@
           "required": ["clientId"],
           "additionalProperties": false
         },
+        "datafast": {
+          "type": "object",
+          "properties": {
+            "websiteId": {
+              "type": "string",
+              "pattern": "^dfid_[A-Za-z0-9_-]{6,64}$",
+              "description": "Public DataFast website ID (dfid_…) from your tracking code (data-website-id). No API key is needed."
+            },
+            "domain": {
+              "type": "string",
+              "pattern": "^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z]{2,63}$",
+              "description": "Root domain registered in DataFast, without https:// (e.g. acme.com). DataFast sets its visitor cookies on this domain so subdomains share one visitor."
+            },
+            "allowedHostnames": {
+              "description": "Up to 50 other domains for cross-domain tracking, e.g. [\"app.acme.io\"]. Links to them carry the visitor and session IDs so a visit counts as one journey.",
+              "maxItems": 50,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z]{2,63}$"
+              }
+            },
+            "apiUrl": {
+              "description": "Full HTTPS URL that receives events instead of https://datafa.st/api/events, such as a proxy on your own domain.",
+              "type": "string",
+              "pattern": "^https:\\/\\/(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z]{2,63}(?::(?:\\d{1,4}|[0-5]\\d{4}|6[0-4]\\d{3}|65[0-4]\\d{2}|655[0-2]\\d|6553[0-5]))?(?:\\/(?!\\.{1,2}(?:\\/|$))[A-Za-z0-9._~-]+)+$"
+            },
+            "disablePayments": {
+              "description": "Stop detecting Stripe, Polar and Lemon Squeezy checkout IDs in the page URL as payments (default: false).",
+              "type": "boolean"
+            },
+            "disableConsole": {
+              "description": "Silence the tracker's console messages (default: false).",
+              "type": "boolean"
+            },
+            "debug": {
+              "description": "Also track when the site is shown inside an iframe (default: false).",
+              "type": "boolean"
+            },
+            "allowLocalhost": {
+              "description": "Also track on localhost and *.localhost hostnames, which DataFast skips by default (default: false).",
+              "type": "boolean"
+            }
+          },
+          "required": ["websiteId", "domain"],
+          "additionalProperties": false
+        },
         "ga4": {
           "type": "object",
           "properties": {

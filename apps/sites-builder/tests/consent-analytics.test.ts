@@ -211,3 +211,64 @@ test("consent-gated OneDollarStats gets the same script URL and options as the u
     },
   ]);
 });
+
+test("consent-gated DataFast gets the same script URL and options as the ungated page", async () => {
+  const config = siteConfigSchema.parse({
+    name: "Acme",
+    integrations: {
+      c15t: { backendURL: "https://consent.acme.com" },
+      datafast: {
+        websiteId: "dfid_PvUdM8yOz073w4v9PSwnk",
+        domain: "Acme.com",
+        allowedHostnames: ["app.acme.io", "shop.acme.io"],
+        apiUrl: "https://stats.acme.com/api/events",
+        disablePayments: true,
+        debug: false,
+      },
+    },
+  });
+  const analytics = siteConsent(
+    config,
+    [],
+    true,
+    false,
+    "https://blog.acme.com"
+  )?.analytics;
+  const datafast = {
+    src: "https://datafa.st/js/script.js",
+    attributes: {
+      "data-website-id": "dfid_PvUdM8yOz073w4v9PSwnk",
+      "data-domain": "acme.com",
+      "data-allowed-hostnames": "app.acme.io,shop.acme.io",
+      "data-api-url": "https://stats.acme.com/api/events",
+      "data-disable-payments": "true",
+      "data-debug": "false",
+    },
+  };
+  expect(analytics?.datafast).toEqual(datafast);
+  expect(integrationHeadScripts(config.integrations)).toEqual([
+    {
+      kind: "external",
+      src: datafast.src,
+      attributes: { ...datafast.attributes, defer: true },
+    },
+  ]);
+
+  Object.assign(globals, {
+    __NOTRA_CONSENT_ANALYTICS__: { datafast },
+    __NOTRA_HOSTING_DOMAIN__: null,
+    __NOTRA_CONSENT_STORAGE_KEY__: "__Host-c15t",
+    location: { hostname: "blog.acme.com" },
+    document: { cookie: "" },
+  });
+  const variant = "datafast";
+  const { default: client } = await import(`../src/c15t.client.ts?${variant}`);
+  expect(client.scripts).toEqual([
+    {
+      id: "datafast",
+      category: "measurement",
+      async: true,
+      ...datafast,
+    },
+  ]);
+});

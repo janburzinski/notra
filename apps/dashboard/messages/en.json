@@ -9815,6 +9815,7 @@
       "providers": {
         "capless": "Cookieless analytics with events and session replay.",
         "databuddy": "Privacy-first analytics with web vitals, errors and events.",
+        "datafast": "Simple revenue-first analytics that ties visitors to payments.",
         "plausible": "Easy to use and privacy-friendly Google Analytics alternative.",
         "posthog": "Product analytics with session replay and feature flags.",
         "rybbit": "Open-source, cookieless web analytics with session replay.",
@@ -9832,6 +9833,10 @@
           "trackErrors": "Errors",
           "trackOutgoingLinks": "Outgoing links",
           "trackInteractions": "Interactions"
+        },
+        "datafast": {
+          "websiteId": "Website ID",
+          "domain": "Domain"
         },
         "plausible": {
           "domain": "Domain",
@@ -9874,6 +9879,10 @@
         "databuddy": {
           "clientId": "Copy the Client ID from your Databuddy website settings"
         },
+        "datafast": {
+          "websiteId": "Copy the website ID (dfid_…) from your DataFast tracking code",
+          "domain": "Use the domain as added in DataFast, e.g. acme.com"
+        },
         "ga4": {
           "measurementId": "Use the measurement ID (G-…)"
         },
@@ -9904,6 +9913,10 @@
           "trackErrors": "Send uncaught JavaScript errors.",
           "trackOutgoingLinks": "Send an event when visitors click links to other sites.",
           "trackInteractions": "Send clicks, rage clicks and dead clicks. More options like sampling and skipped paths are available in blog.json."
+        },
+        "datafast": {
+          "websiteId": "In DataFast, copy data-website-id from your tracking code.",
+          "domain": "The root domain you added in DataFast, without https://. Cross-domain hostnames, an events proxy and more are available in blog.json."
         },
         "plausible": {
           "domain": "Use the domain you added to Plausible, without https://.",

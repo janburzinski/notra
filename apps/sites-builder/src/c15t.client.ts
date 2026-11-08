@@ -58,6 +58,17 @@ export default {
           },
         ]
       : []),
+    ...(analytics.datafast
+      ? [
+          {
+            id: "datafast",
+            src: analytics.datafast.src,
+            category: "measurement",
+            async: true,
+            attributes: analytics.datafast.attributes,
+          },
+        ]
+      : []),
     ...(analytics.gtag
       ? [
           gtag({

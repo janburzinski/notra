@@ -3,6 +3,8 @@ import {
   DATABUDDY_API_URL,
   DATABUDDY_REPLAY_SCRIPT_URL,
   DATABUDDY_SCRIPT_URL,
+  DATAFAST_API_URL,
+  DATAFAST_SCRIPT_URL,
   GOOGLE_ANALYTICS_CONNECT_ORIGINS,
   GOOGLE_TAG_ORIGIN,
   ONEDOLLARSTATS_COLLECTOR_URL,
@@ -17,12 +19,23 @@ import {
 } from "@notra/sites-core/constants/integrations";
 import type {
   SiteCspSources,
+  SiteDatafast,
   SiteHeadScript,
   SiteIntegrations,
   SiteOneDollarStats,
   SiteRybbit,
 } from "@notra/sites-core/types/site-integrations";
 import { dataAttributes } from "@notra/sites-core/utils/data-attributes";
+
+export function datafastScript({ allowedHostnames, ...options }: SiteDatafast) {
+  return {
+    src: DATAFAST_SCRIPT_URL,
+    attributes: dataAttributes({
+      ...options,
+      allowedHostnames: allowedHostnames?.join(","),
+    }),
+  };
+}
 
 export function rybbitScript({
   siteId,
@@ -86,6 +99,7 @@ export function integrationHeadScripts(
   const {
     capless,
     databuddy,
+    datafast,
     ga4,
     onedollarstats,
     plausible,
@@ -170,6 +184,14 @@ export function integrationHeadScripts(
       code: `${POSTHOG_LOADER}posthog.init(${inlineScriptLiteral(posthog.apiKey)},${onHostingDomain ? `Object.assign(${inlineScriptLiteral(options)},${onHostingDomain}?{cross_subdomain_cookie:false}:{})` : inlineScriptLiteral(options)});`,
     });
   }
+  if (datafast) {
+    const { src, attributes } = datafastScript(datafast);
+    scripts.push({
+      kind: "external",
+      src,
+      attributes: { ...attributes, defer: true },
+    });
+  }
   if (rybbit) {
     const { src, attributes } = rybbitScript(rybbit);
     scripts.push({
@@ -207,6 +229,7 @@ export function integrationCspSources(
     c15t,
     capless,
     databuddy,
+    datafast,
     ga4,
     onedollarstats,
     plausible,
@@ -261,6 +284,10 @@ export function integrationCspSources(
       scriptSrc.push(origin);
       connectSrc.push(origin);
     }
+  }
+  if (datafast) {
+    scriptSrc.push(new URL(DATAFAST_SCRIPT_URL).origin);
+    connectSrc.push(new URL(datafast.apiUrl ?? DATAFAST_API_URL).origin);
   }
   if (rybbit) {
     const origin = new URL(rybbit.scriptUrl ?? RYBBIT_SCRIPT_URL).origin;

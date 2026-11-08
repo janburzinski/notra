@@ -1,0 +1,84 @@
+---
+title: "DataFast"
+description: "Send visits, goals and payments on your Notra site to DataFast, with every tracker option available in blog.json."
+authors:
+  - handle: dominik
+
+docolin:
+  schema_version: 1
+  kind: tools/notra/sites/integrations/analytics/datafast
+  type: how-to
+  applies_to:
+    - notra
+  language: en
+  status: stable
+---
+
+Notra loads the DataFast script on every live page and allows DataFast in the CSP. It passes every option you set in `blog.json` to the tracker as a `data-*` attribute, so you can track visitors across your domains, send events through your own proxy and turn off payment detection without writing a custom script.
+
+With the [c15t cookie banner](/sites/integrations/consent/c15t) on, DataFast loads through c15t instead, only after a visitor allows the measurement category, and keeps every option below.
+
+<Steps>
+  <Step title="Copy your website ID">
+    In [DataFast](https://datafa.st), open your website's settings and find its tracking code. The website ID is the `data-website-id` value that starts with `dfid_`, and the domain is the `data-domain` value. The ID is public, so you don't need an API key.
+  </Step>
+  <Step title="Add it to Notra">
+    Open **Studio → Sites**, select your site, open **Integrations** and click **Add DataFast**. Paste the ID into **Website ID** and the domain you added in DataFast into **Domain**. When you click **Save**, Notra opens a pull request with the change. To configure it in your repository instead, add it to `blog.json`:
+
+    ```json blog.json
+    {
+      "$schema": "https://usenotra.com/schemas/blog.json",
+      "name": "Acme",
+      "integrations": {
+        "datafast": {
+          "websiteId": "dfid_PvUdM8yOz073w4v9PSwnk",
+          "domain": "acme.com",
+          "allowedHostnames": ["app.acme.io"]
+        }
+      }
+    }
+    ```
+  </Step>
+  <Step title="Merge and verify">
+    After you [merge the change](/sites/integrations/analytics/overview#set-up-in-the-dashboard) and the production deployment finishes, visit your live site and check the realtime view in DataFast.
+  </Step>
+</Steps>
+
+## Options
+
+The dashboard covers the website ID and domain. You set every other option in `blog.json`, and editing the integration in the dashboard keeps those options as they are.
+
+| Setting | Dashboard field | Description |
+| --- | --- | --- |
+| `websiteId` | **Website ID** | Public website ID from `data-website-id` in your tracking code, starting with `dfid_` |
+| `domain` | **Domain** | Root domain you added in DataFast without `https://`, like `acme.com`. When your site runs on that domain or one of its subdomains, DataFast sets its cookies on the root domain so that `blog.acme.com` and `acme.com` share one visitor |
+| `allowedHostnames` | | Up to 50 other domains for [cross-domain tracking](#cross-domain-tracking), like `["app.acme.io"]` |
+| `apiUrl` | | Full HTTPS URL that receives events instead of `https://datafa.st/api/events`, like `https://stats.acme.com/api/events` for a proxy on your own domain |
+| `disablePayments` | | Stops DataFast from reading Stripe, Polar and Lemon Squeezy checkout IDs from the page URL when `true`, with a default of `false` |
+| `disableConsole` | | Silences the tracker's console messages when `true`, with a default of `false` |
+| `debug` | | Also tracks pages shown inside an iframe when `true`, with a default of `false` |
+| `allowLocalhost` | | Also tracks on `localhost` and `*.localhost` hostnames when `true`, with a default of `false`. Notra never loads analytics in local development, so you only need it for your own test setups |
+
+Notra always loads the script from `https://datafa.st/js/script.js` and adds `https://datafa.st` to `script-src` in the [Content-Security-Policy](/sites/custom-scripts#content-security-policy). It adds the origin of `apiUrl` to `connect-src`, or `https://datafa.st` when you leave it out, because the tracker sends every event there.
+
+DataFast's `data-allow-file-protocol` option isn't available, because a Notra site is never opened from a local file.
+
+### Cross-domain tracking
+
+When a visitor clicks a link to one of your `allowedHostnames`, DataFast adds the visitor and session IDs to the link as `_df_vid`, `_df_sid`, `_df_vfs` and `_df_vsn` query parameters. The DataFast script on the other domain reads them and removes them from the address bar, so the visit counts as one journey. Links to any other domain send an `external_link` event instead.
+
+## Goals and payments
+
+To track clicks in your own components and MDX, add `data-fast-goal` to an element. DataFast then sends a goal with that name when a visitor clicks it and uses the element's `data-fast-goal-*` attributes as properties:
+
+```html
+<a href="/pricing" data-fast-goal="pricing_clicked" data-fast-goal-placement="changelog-footer">See pricing</a>
+```
+
+`data-fast-scroll` works the same way and sends a goal when the element scrolls into view. `data-fast-scroll-threshold` sets how much of it has to be visible, from `0` to `1` with a default of `0.5`, and `data-fast-scroll-delay` sets how many milliseconds it has to stay visible. From a [custom script](/sites/custom-scripts), call `window.datafast("pricing_clicked", { placement: "changelog-footer" })` as [DataFast's goal docs](https://datafa.st/docs/custom-goals) describe.
+
+When a visitor lands on a page whose URL carries a Stripe `session_id`, a Polar `checkout_id` or a Lemon Squeezy `order_id`, DataFast records a payment for that visitor. Set `disablePayments` to `true` if those parameters mean something else on your site.
+
+## Privacy
+
+DataFast sets first-party cookies that keep the visitor ID, the visitor's first visit and session count for a year and the session ID for 30 minutes. To stop tracking your own visits, run `localStorage.setItem("datafast_ignore", "true")` in the browser console on your live site.
