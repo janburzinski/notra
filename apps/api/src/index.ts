@@ -90,6 +90,7 @@ import {
 } from "./utils/feedback";
 import { logError } from "./utils/logging";
 import { rateLimitResponse } from "./utils/openapi-responses";
+import { markWebAnalyticsBeta } from "./utils/openapi-web-analytics";
 import { enforceRatelimit, RATE_LIMITS, ratelimit } from "./utils/ratelimit";
 import { createApiShutdown } from "./utils/shutdown";
 
@@ -420,24 +421,26 @@ let openApiJson: string | undefined;
 // evlog-map-disable-next-line -- static OpenAPI document
 app.get("/openapi.json", (c) => {
   openApiJson ??= JSON.stringify(
-    app.getOpenAPI31Document({
-      openapi: "3.1.1",
-      info: {
-        title: "Notra API",
-        version: "1.0.0",
-        description:
-          "OpenAPI schema for Notra content endpoints. Use GET /v1/status for public reachability. Error responses include recovery guidance. Breaking changes ship under a new major path; deprecated operations send Deprecation and Sunset headers at least 90 days before removal.",
-      },
-      externalDocs: {
-        description: "Notra API versioning and deprecation policy",
-        url: "https://www.usenotra.com/docs/api/versioning",
-      },
-      servers: IS_DEMO
-        ? [DEMO_SERVER, PRODUCTION_SERVER]
-        : [PRODUCTION_SERVER, DEMO_SERVER],
-      security: [{ BearerAuth: [] }],
-      tags: [...API_OPENAPI_TAGS],
-    })
+    markWebAnalyticsBeta(
+      app.getOpenAPI31Document({
+        openapi: "3.1.1",
+        info: {
+          title: "Notra API",
+          version: "1.0.0",
+          description:
+            "OpenAPI schema for Notra content endpoints. Use GET /v1/status for public reachability. Error responses include recovery guidance. Breaking changes ship under a new major path; deprecated operations send Deprecation and Sunset headers at least 90 days before removal.",
+        },
+        externalDocs: {
+          description: "Notra API versioning and deprecation policy",
+          url: "https://www.usenotra.com/docs/api/versioning",
+        },
+        servers: IS_DEMO
+          ? [DEMO_SERVER, PRODUCTION_SERVER]
+          : [PRODUCTION_SERVER, DEMO_SERVER],
+        security: [{ BearerAuth: [] }],
+        tags: [...API_OPENAPI_TAGS],
+      })
+    )
   );
   c.header("Content-Type", "application/json");
   return c.body(openApiJson);
