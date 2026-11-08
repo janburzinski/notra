@@ -852,7 +852,7 @@ export interface SiteChangesStripStateProps {
 
 export interface SiteDiscardChangesButtonProps {
   state: SiteWorkspaceValue;
-  variant?: "secondary" | "ghost";
+  variant?: "secondary" | "outline";
 }
 
 export interface SiteHeaderMenuProps {

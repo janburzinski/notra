@@ -9356,6 +9356,7 @@
           "discardTitle": "Alle Entwurfsänderungen verwerfen?",
           "discardAction": "Änderungen verwerfen",
           "discardDescription": "Alle Entwurfsänderungen im aktuellen Branch werden gelöscht und der zuletzt in Git gespeicherte Stand wiederhergestellt. Veröffentlichte Inhalte und Git-Commits bleiben unverändert. Das kann nicht rückgängig gemacht werden.",
+          "discardUnsaved": "Deine neuesten Änderungen sind noch nicht gespeichert und werden hier nicht angezeigt. Verwerfen entfernt sie ebenfalls.",
           "discardFailed": "Nicht alle Änderungen konnten verworfen werden. Einige Entwürfe wurden möglicherweise in einem anderen Editor geändert. Lade die Seite neu und versuche es erneut.",
           "unpublishedBranch": "Änderungen an <list></list> erscheinen auf deiner Seite, sobald {branch} gemergt ist.",
           "unpublishedBranchFiles": "Deine Änderungen erscheinen auf deiner Seite, sobald {branch} gemergt ist.",
@@ -9369,7 +9370,8 @@
           "invalid": "Änderungen werden gespeichert, sobald alle Felder gültig sind.",
           "conflictTitle": "Die Seite wurde während deiner Bearbeitung geändert",
           "conflict": "Behalte deine Änderungen, um die neueste Version zu ersetzen, oder verwirf sie, um sie zu laden.",
-          "retry": "Erneut versuchen"
+          "retry": "Erneut versuchen",
+          "review": "Änderungen prüfen"
         },
         "loading": "Design wird geladen…",
         "unpublished": "Unveröffentlichte Änderungen",

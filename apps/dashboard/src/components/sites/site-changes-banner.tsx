@@ -23,6 +23,7 @@ import { useLocale, useTranslations } from "use-intl";
 import { Button } from "@/components/button";
 import Link from "@/components/framework/link";
 import { useSite } from "@/components/sites/site-context";
+import { SitePublishChange } from "@/components/sites/site-publish-change";
 import {
   useSiteWorkspace,
   useSiteWorkspaceLoad,
@@ -44,6 +45,7 @@ import type {
 import type { SiteWorkspaceValue } from "@/types/site-workspace";
 import { siteBranchLabel } from "@/utils/site-branch-label";
 import { configSectionChanged } from "@/utils/site-design-sections";
+import { siteDraftChange } from "@/utils/site-drafts";
 import { siteHref } from "@/utils/site-links";
 import {
   siteUnpublishedTitle,
@@ -241,14 +243,22 @@ function discardBusy(state: SiteWorkspaceValue) {
 }
 
 function SiteUnpublishedStrip({ state }: SiteChangesStripStateProps) {
+  const banner = useTranslations("sites.design.workspace.banner");
   const unpublished = useUnpublishedSummary(state);
   if (!unpublished) {
     return null;
   }
   return (
     <Strip tone="info" {...unpublished}>
+      <Button
+        size="sm"
+        variant="outline"
+        onClick={() => state.setPublishOpen(true)}
+      >
+        {banner("review")}
+      </Button>
       {state.files.drafts.length > 0 || state.unsaved ? (
-        <SiteDiscardChangesButton state={state} variant="ghost" />
+        <SiteDiscardChangesButton state={state} variant="outline" />
       ) : null}
     </Strip>
   );
@@ -313,6 +323,10 @@ function SiteDiscardChangesButton({
   const { discardOpen, setDiscardOpen } = state;
   const [discardError, setDiscardError] = useState(false);
   const busy = discardBusy(state);
+  const sourcePaths = useMemo(
+    () => new Set(state.files.files.map((file) => file.path)),
+    [state.files.files]
+  );
   return (
     <ResponsiveDialog
       open={discardOpen}
@@ -334,7 +348,7 @@ function SiteDiscardChangesButton({
         />
         {branches("discard")}
       </ResponsiveDialogTrigger>
-      <ResponsiveDialogContent>
+      <ResponsiveDialogContent className="flex max-h-[85svh] flex-col overflow-hidden sm:max-w-xl">
         <ResponsiveDialogHeader>
           <ResponsiveDialogTitle>
             {banner("discardTitle")}
@@ -343,8 +357,26 @@ function SiteDiscardChangesButton({
             {banner("discardDescription")}
           </ResponsiveDialogDescription>
         </ResponsiveDialogHeader>
+        {state.files.drafts.length > 0 ? (
+          <div className="divide-border min-h-0 divide-y overflow-y-auto rounded-lg border">
+            {state.files.drafts.map((draft) => (
+              <SitePublishChange
+                key={draft.path}
+                {...state.scope}
+                path={draft.path}
+                change={siteDraftChange(draft, sourcePaths)}
+                defaultOpen={false}
+              />
+            ))}
+          </div>
+        ) : null}
+        {state.unsaved ? (
+          <p className="text-muted-foreground text-sm">
+            {banner("discardUnsaved")}
+          </p>
+        ) : null}
         {discardError ? <p role="alert">{banner("discardFailed")}</p> : null}
-        <ResponsiveDialogFooter>
+        <ResponsiveDialogFooter className="shrink-0">
           <Button
             variant="outline"
             disabled={state.readOnly}

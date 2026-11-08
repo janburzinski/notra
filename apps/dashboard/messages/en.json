@@ -9356,6 +9356,7 @@
           "discardTitle": "Discard all draft changes?",
           "discardAction": "Discard changes",
           "discardDescription": "This deletes all draft changes on the current branch and restores its last saved Git version. Published content and Git commits are not affected. This cannot be undone.",
+          "discardUnsaved": "Your latest edits aren't saved yet, so they aren't shown here. Discard removes them too.",
           "discardFailed": "Couldn't discard all changes. Some drafts may have changed in another editor. Reload and try again.",
           "unpublishedBranch": "Edits to <list></list> reach your live site after {branch} is merged.",
           "unpublishedBranchFiles": "Your edits reach your live site after {branch} is merged.",
@@ -9369,7 +9370,8 @@
           "moreIssues": "{count, plural, one {and # more} other {and # more}}",
           "conflictTitle": "This site changed while you were editing",
           "conflict": "Keep your changes to replace the latest version, or discard them to load it.",
-          "retry": "Retry"
+          "retry": "Retry",
+          "review": "Review changes"
         },
         "loading": "Loading design…",
         "unpublished": "Unpublished changes",
