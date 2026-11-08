@@ -4,6 +4,7 @@ import { createHash } from "node:crypto";
 import { writeFile } from "node:fs/promises";
 import { cpus, platform, release } from "node:os";
 import { join, resolve } from "node:path";
+import { setTimeout as delay } from "node:timers/promises";
 
 import {
   SITE_ABUSE_EMAIL,
@@ -44,6 +45,7 @@ import {
   OTHER_HOST,
   PREVIEW_HOST,
   PREVIEW_PASSWORD,
+  PREVIEW_PASSWORD_LIMIT_PERIOD_SECONDS,
   PREVIEW_SECRET,
   SITE_ID,
   STALE_ALIAS_HOST,
@@ -1031,6 +1033,13 @@ try {
   assert.deepEqual(requestFailures, [], "same-origin subresources must load");
   // The real rate-limit binding (10 attempts a minute per site, preview and
   // client) locks out password guessing; earlier browser attempts count too.
+  // Its windows are aligned to the wall clock, so a burst crossing into the
+  // next minute would see the counter reset; start it in a fresh window then.
+  const windowMs = PREVIEW_PASSWORD_LIMIT_PERIOD_SECONDS * 1000;
+  const windowLeft = windowMs - (Date.now() % windowMs);
+  if (windowLeft < 10_000) {
+    await delay(windowLeft + 100);
+  }
   const attempts: number[] = [];
   for (let attempt = 0; attempt < 12; attempt += 1) {
     const response = await request(

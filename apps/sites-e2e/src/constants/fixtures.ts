@@ -7,6 +7,7 @@ export const LIVE_HOST = `acme.${HOSTING_DOMAIN}`;
 export const PREVIEW_HOST = `pr-7--acme.${HOSTING_DOMAIN}`;
 export const PREVIEW_SECRET = "synthetic-e2e-preview-secret-never-production";
 export const PREVIEW_PASSWORD = "synthetic-preview-password";
+export const PREVIEW_PASSWORD_LIMIT_PERIOD_SECONDS = 60;
 export const TRAFFIC_TOKEN = "synthetic-e2e-traffic-token";
 export const OTHER_SITE_ID = "site_e2e_globex";
 export const OTHER_SITE_SLUG = "globex";

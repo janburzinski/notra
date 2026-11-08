@@ -6,7 +6,10 @@ import { createServer } from "node:net";
 import { dirname, join } from "node:path";
 import { setTimeout as delay } from "node:timers/promises";
 
-import { HOSTING_DOMAIN } from "../constants/fixtures";
+import {
+  HOSTING_DOMAIN,
+  PREVIEW_PASSWORD_LIMIT_PERIOD_SECONDS,
+} from "../constants/fixtures";
 import type { IngestRequest } from "../types/harness";
 
 export async function freePort() {
@@ -73,12 +76,18 @@ export async function startSitesWorker(options: {
           {
             name: "PREVIEW_PASSWORD_LIMITER",
             namespace_id: "9001",
-            simple: { limit: 10, period: 60 },
+            simple: {
+              limit: 10,
+              period: PREVIEW_PASSWORD_LIMIT_PERIOD_SECONDS,
+            },
           },
           {
             name: "PREVIEW_PASSWORD_SITE_LIMITER",
             namespace_id: "9002",
-            simple: { limit: 60, period: 60 },
+            simple: {
+              limit: 60,
+              period: PREVIEW_PASSWORD_LIMIT_PERIOD_SECONDS,
+            },
           },
         ],
         vars: {
