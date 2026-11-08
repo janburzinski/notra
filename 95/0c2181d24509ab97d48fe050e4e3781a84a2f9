@@ -1,0 +1,21 @@
+apps/api/tests/post-generation-pull-request.test.ts
+  s_538ace07171c35::t_29867dba9bc84b 1-96
+apps/api/tests/post-pull-request.test.ts
+  s_538ace07171c35::t_3f3dcedf2c84e9 1-53,55-245
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "950c2181d24509ab97d48fe050e4e3781a84a2f9",
+  "prompts": {},
+  "sessions": {
+    "s_538ace07171c35": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c1c70e6a-e30c-40c6-aadf-5567a15ff98a",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
