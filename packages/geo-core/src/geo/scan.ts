@@ -284,6 +284,57 @@ function awaitBoxSettled(pending: () => Promise<unknown> | null) {
   );
 }
 
+const reservePlannedGeoAnswers = Effect.fn("geo.reservePlannedAnswers")(
+  function* (
+    gate: GeoScanProjectContext["gate"],
+    organizationId: string,
+    projectId: string,
+    runId: string,
+    plannedAnswers: number
+  ) {
+    if (
+      gate.mode !== "plan_quota" ||
+      gate.balanceRemaining == null ||
+      !gate.reserved ||
+      !Number.isFinite(plannedAnswers) ||
+      plannedAnswers <= 1
+    ) {
+      return gate;
+    }
+    const billing = yield* GeoContentBillingService;
+    const reserved = yield* billing
+      .gateContentBilling({
+        organizationId,
+        executionId: `${runId}-planned`,
+        outputType: null,
+        quotaFeatureId: FEATURES.AI_ANSWERS,
+        units: plannedAnswers,
+        lockTtlMs: GEO_SCAN_BILLING_LOCK_TTL_MS,
+      })
+      .pipe(
+        Effect.mapError(
+          (error) =>
+            new GeoScanError({
+              message: "Failed to reserve planned AI answers",
+              cause: error.cause,
+            })
+        )
+      );
+    if (!reserved.allowed || reserved.mode !== "plan_quota") {
+      if (reserved.reserved) {
+        yield* releaseGeoScanBilling(billing, reserved, projectId, runId);
+      }
+      return yield* Effect.fail(
+        new GeoScanError({
+          message: "AI answers were used up by another scan while planning",
+        })
+      );
+    }
+    yield* releaseGeoScanBilling(billing, gate, projectId, runId);
+    return reserved;
+  }
+);
+
 function releaseGeoScanBilling(
   billing: GeoContentBillingServiceShape,
   gate: GeoScanProjectContext["gate"],
@@ -1166,10 +1217,11 @@ const buildGeoScanProjectPlan = Effect.fn("geo.buildScanProjectPlan")(
       personas: personas.length,
     });
 
-    let answerBudget =
+    const startingBudget =
       gate.mode === "plan_quota" && gate.balanceRemaining != null
         ? gate.balanceRemaining
         : Number.POSITIVE_INFINITY;
+    let answerBudget = startingBudget;
     const withinAnswerBudget = <T>(items: T[], answers: (item: T) => number) =>
       items.filter((item) => {
         const cost = answers(item);
@@ -1190,6 +1242,14 @@ const buildGeoScanProjectPlan = Effect.fn("geo.buildScanProjectPlan")(
       personas,
       (persona) => persona.prompts.length * GEO_PERSONA_BILLING_MULTIPLIER
     );
+    const plannedAnswers = startingBudget - answerBudget;
+    const reservedGate = yield* reservePlannedGeoAnswers(
+      gate,
+      organizationId,
+      settingsRow.projectId,
+      runId,
+      plannedAnswers
+    );
     const plan: GeoScanProjectPlan = {
       context: {
         organizationId,
@@ -1201,7 +1261,7 @@ const buildGeoScanProjectPlan = Effect.fn("geo.buildScanProjectPlan")(
         companyDescription: brand?.companyDescription ?? null,
         websiteUrl: brand?.websiteUrl ?? null,
         domains: settings.domains,
-        gate,
+        gate: reservedGate,
         startedAtMs: Date.now(),
         scoped:
           promptIds !== undefined ||
@@ -1236,7 +1296,22 @@ const buildGeoScanProjectPlan = Effect.fn("geo.buildScanProjectPlan")(
           ),
       catch: (cause) =>
         new GeoScanError({ message: "Failed to store scan plan", cause }),
-    });
+    }).pipe(
+      Effect.tapError(() =>
+        reservedGate === gate
+          ? Effect.void
+          : GeoContentBillingService.pipe(
+              Effect.flatMap((billing) =>
+                releaseGeoScanBilling(
+                  billing,
+                  reservedGate,
+                  settingsRow.projectId,
+                  runId
+                )
+              )
+            )
+      )
+    );
     return planned;
   }
 );

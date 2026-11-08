@@ -39,3 +39,11 @@ const remoteGeoFailureSchema = z.object({
 export const remoteGeoFailureBodySchema = z.object({
   failure: remoteGeoFailureSchema,
 });
+
+export const internalGeoAnswerLimitInputSchema = z.object({
+  organizationId: z.string().min(1),
+});
+
+export const internalGeoAnswerLimitResponseSchema = z.object({
+  ok: z.boolean(),
+});

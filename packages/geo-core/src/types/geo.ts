@@ -1569,6 +1569,7 @@ export interface GeoModelCatalogEntry {
 export interface GeoModelCatalog {
   providers: GeoModelProvider[];
   models: GeoModelCatalogEntry[];
+  enginePolicyActive?: boolean;
 }
 
 /** Organization catalog after the server resolves available search routes. */

@@ -1,0 +1,1 @@
+export const GEO_ANSWER_LIMIT_NOTIFIED_TTL_SECONDS = 40 * 24 * 60 * 60;

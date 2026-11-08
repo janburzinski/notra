@@ -82,6 +82,7 @@ import { Route as ApiInternalContentDraftPullRequestRouteImport } from './routes
 import { Route as ApiInternalContentPreviewRouteImport } from './routes/api.internal.content.preview'
 import { Route as ApiInternalContentScheduledPublicationAttemptRouteImport } from './routes/api.internal.content.scheduled-publication-attempt'
 import { Route as ApiInternalContentSyncGithubRouteImport } from './routes/api.internal.content.sync-github'
+import { Route as ApiInternalGeoAnswerLimitRouteImport } from './routes/api.internal.geo.answer-limit'
 import { Route as ApiInternalGeoFreeScanRouteImport } from './routes/api.internal.geo.free-scan'
 import { Route as ApiInternalGeoPersonaGenerationRouteImport } from './routes/api.internal.geo.persona-generation'
 import { Route as ApiInternalGeoPersonaRunRouteImport } from './routes/api.internal.geo.persona-run'
@@ -509,6 +510,12 @@ const ApiInternalContentSyncGithubRoute =
     path: '/api/internal/content/sync-github',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiInternalGeoAnswerLimitRoute =
+  ApiInternalGeoAnswerLimitRouteImport.update({
+    id: '/api/internal/geo/answer-limit',
+    path: '/api/internal/geo/answer-limit',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiInternalGeoFreeScanRoute = ApiInternalGeoFreeScanRouteImport.update({
   id: '/api/internal/geo/free-scan',
   path: '/api/internal/geo/free-scan',
@@ -771,6 +778,7 @@ export interface FileRoutesByFullPath {
   '/api/internal/content/preview': typeof ApiInternalContentPreviewRoute
   '/api/internal/content/scheduled-publication-attempt': typeof ApiInternalContentScheduledPublicationAttemptRoute
   '/api/internal/content/sync-github': typeof ApiInternalContentSyncGithubRoute
+  '/api/internal/geo/answer-limit': typeof ApiInternalGeoAnswerLimitRoute
   '/api/internal/geo/free-scan': typeof ApiInternalGeoFreeScanRoute
   '/api/internal/geo/persona-generation': typeof ApiInternalGeoPersonaGenerationRoute
   '/api/internal/geo/persona-run': typeof ApiInternalGeoPersonaRunRoute
@@ -878,6 +886,7 @@ export interface FileRoutesByTo {
   '/api/internal/content/preview': typeof ApiInternalContentPreviewRoute
   '/api/internal/content/scheduled-publication-attempt': typeof ApiInternalContentScheduledPublicationAttemptRoute
   '/api/internal/content/sync-github': typeof ApiInternalContentSyncGithubRoute
+  '/api/internal/geo/answer-limit': typeof ApiInternalGeoAnswerLimitRoute
   '/api/internal/geo/free-scan': typeof ApiInternalGeoFreeScanRoute
   '/api/internal/geo/persona-generation': typeof ApiInternalGeoPersonaGenerationRoute
   '/api/internal/geo/persona-run': typeof ApiInternalGeoPersonaRunRoute
@@ -986,6 +995,7 @@ export interface FileRoutesById {
   '/api/internal/content/preview': typeof ApiInternalContentPreviewRoute
   '/api/internal/content/scheduled-publication-attempt': typeof ApiInternalContentScheduledPublicationAttemptRoute
   '/api/internal/content/sync-github': typeof ApiInternalContentSyncGithubRoute
+  '/api/internal/geo/answer-limit': typeof ApiInternalGeoAnswerLimitRoute
   '/api/internal/geo/free-scan': typeof ApiInternalGeoFreeScanRoute
   '/api/internal/geo/persona-generation': typeof ApiInternalGeoPersonaGenerationRoute
   '/api/internal/geo/persona-run': typeof ApiInternalGeoPersonaRunRoute
@@ -1095,6 +1105,7 @@ export interface FileRouteTypes {
     | '/api/internal/content/preview'
     | '/api/internal/content/scheduled-publication-attempt'
     | '/api/internal/content/sync-github'
+    | '/api/internal/geo/answer-limit'
     | '/api/internal/geo/free-scan'
     | '/api/internal/geo/persona-generation'
     | '/api/internal/geo/persona-run'
@@ -1202,6 +1213,7 @@ export interface FileRouteTypes {
     | '/api/internal/content/preview'
     | '/api/internal/content/scheduled-publication-attempt'
     | '/api/internal/content/sync-github'
+    | '/api/internal/geo/answer-limit'
     | '/api/internal/geo/free-scan'
     | '/api/internal/geo/persona-generation'
     | '/api/internal/geo/persona-run'
@@ -1309,6 +1321,7 @@ export interface FileRouteTypes {
     | '/api/internal/content/preview'
     | '/api/internal/content/scheduled-publication-attempt'
     | '/api/internal/content/sync-github'
+    | '/api/internal/geo/answer-limit'
     | '/api/internal/geo/free-scan'
     | '/api/internal/geo/persona-generation'
     | '/api/internal/geo/persona-run'
@@ -1411,6 +1424,7 @@ export interface RootRouteChildren {
   ApiInternalContentPreviewRoute: typeof ApiInternalContentPreviewRoute
   ApiInternalContentScheduledPublicationAttemptRoute: typeof ApiInternalContentScheduledPublicationAttemptRoute
   ApiInternalContentSyncGithubRoute: typeof ApiInternalContentSyncGithubRoute
+  ApiInternalGeoAnswerLimitRoute: typeof ApiInternalGeoAnswerLimitRoute
   ApiInternalGeoFreeScanRoute: typeof ApiInternalGeoFreeScanRoute
   ApiInternalGeoPersonaGenerationRoute: typeof ApiInternalGeoPersonaGenerationRoute
   ApiInternalGeoPersonaRunRoute: typeof ApiInternalGeoPersonaRunRoute
@@ -1951,6 +1965,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiInternalContentSyncGithubRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/internal/geo/answer-limit': {
+      id: '/api/internal/geo/answer-limit'
+      path: '/api/internal/geo/answer-limit'
+      fullPath: '/api/internal/geo/answer-limit'
+      preLoaderRoute: typeof ApiInternalGeoAnswerLimitRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/internal/geo/free-scan': {
       id: '/api/internal/geo/free-scan'
       path: '/api/internal/geo/free-scan'
@@ -2356,6 +2377,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiInternalContentScheduledPublicationAttemptRoute:
     ApiInternalContentScheduledPublicationAttemptRoute,
   ApiInternalContentSyncGithubRoute: ApiInternalContentSyncGithubRoute,
+  ApiInternalGeoAnswerLimitRoute: ApiInternalGeoAnswerLimitRoute,
   ApiInternalGeoFreeScanRoute: ApiInternalGeoFreeScanRoute,
   ApiInternalGeoPersonaGenerationRoute: ApiInternalGeoPersonaGenerationRoute,
   ApiInternalGeoPersonaRunRoute: ApiInternalGeoPersonaRunRoute,

@@ -118,7 +118,7 @@ export const GEO_MODEL_CATALOG_SEED: readonly GeoModelCatalogEntry[] = [
     label: "Claude Opus 5.5",
     zdr: "all",
     released: "2026-09-22",
-    default: true,
+    default: false,
     gateways: ["vercel", "openrouter"],
   },
   {
@@ -199,7 +199,7 @@ export const GEO_MODEL_CATALOG_SEED: readonly GeoModelCatalogEntry[] = [
     label: "GPT-5.6 Sol",
     zdr: "some",
     released: "2026-07-09",
-    default: true,
+    default: false,
     gateways: ["vercel", "openrouter"],
   },
   {
@@ -253,7 +253,7 @@ export const GEO_MODEL_CATALOG_SEED: readonly GeoModelCatalogEntry[] = [
     label: "Gemini 3.8 Flash",
     zdr: "some",
     released: "2026-09-02",
-    default: true,
+    default: false,
     gateways: ["vercel", "openrouter"],
   },
   {
@@ -280,6 +280,15 @@ export const GEO_MODEL_CATALOG_SEED: readonly GeoModelCatalogEntry[] = [
     label: "Gemini 3 Flash",
     zdr: "some",
     released: "2025-12-17",
+    default: false,
+    gateways: ["vercel", "openrouter"],
+  },
+  {
+    id: "moonshotai/kimi-k2",
+    provider: "moonshotai",
+    label: "Kimi K2 Instruct",
+    zdr: "some",
+    released: "2025-07-11",
     default: false,
     gateways: ["vercel", "openrouter"],
   },
@@ -329,6 +338,15 @@ export const GEO_MODEL_CATALOG_SEED: readonly GeoModelCatalogEntry[] = [
     gateways: ["vercel", "openrouter"],
   },
   {
+    id: "zai/glm-5.3-flash",
+    provider: "zai",
+    label: "GLM 5.3 Flash",
+    zdr: "some",
+    released: "2026-08-26",
+    default: false,
+    gateways: ["vercel", "openrouter"],
+  },
+  {
     id: "zai/glm-5.3",
     provider: "zai",
     label: "GLM 5.3",
@@ -356,12 +374,21 @@ export const GEO_MODEL_CATALOG_SEED: readonly GeoModelCatalogEntry[] = [
     gateways: ["vercel", "openrouter"],
   },
   {
+    id: "spacexai/grok-4.20-non-reasoning",
+    provider: "spacexai",
+    label: "Grok 4.20 Non-Reasoning",
+    zdr: "all",
+    released: "2026-03-10",
+    default: false,
+    gateways: ["vercel", "openrouter"],
+  },
+  {
     id: "spacexai/grok-4.7",
     provider: "spacexai",
     label: "Grok 4.7",
     zdr: "all",
     released: "2026-09-21",
-    default: true,
+    default: false,
     gateways: ["vercel", "openrouter"],
   },
   {
@@ -533,7 +560,7 @@ export const GEO_MODEL_CATALOG_STATIC: readonly GeoModelCatalogEntry[] = [
     label: "AI Overview",
     zdr: "none",
     released: "2026-09-05",
-    default: false,
+    default: true,
     gateways: ["context"],
   },
   {
@@ -542,7 +569,7 @@ export const GEO_MODEL_CATALOG_STATIC: readonly GeoModelCatalogEntry[] = [
     label: "ChatGPT",
     zdr: "none",
     released: "2026-10-11",
-    default: false,
+    default: true,
     gateways: ["olostep"],
   },
   {
@@ -560,7 +587,7 @@ export const GEO_MODEL_CATALOG_STATIC: readonly GeoModelCatalogEntry[] = [
     label: "Gemini",
     zdr: "none",
     released: "2026-10-11",
-    default: false,
+    default: true,
     gateways: ["context"],
   },
   {
@@ -672,16 +699,17 @@ export const GEO_STATIC_ENGINE_ENV: Readonly<
 };
 
 /** Engines scanned when a project has not picked its own set. */
-export const GEO_DEFAULT_ENGINE_IDS: readonly string[] =
-  GEO_MODEL_CATALOG_SEED.filter((entry) => entry.default).map(
-    (entry) => entry.id
-  );
+export const GEO_DEFAULT_ENGINE_IDS: readonly string[] = [
+  ...GEO_MODEL_CATALOG_SEED,
+  ...GEO_MODEL_CATALOG_STATIC,
+]
+  .filter((entry) => entry.default)
+  .map((entry) => entry.id);
 
 export const GEO_AUDIENCE_TYPES = ["technical", "general", "commerce"] as const;
 
 /** Engines seeded for a brand whose buyers never pick a model themselves. */
 export const GEO_GENERAL_AUDIENCE_ENGINE_IDS: readonly string[] = [
-  "anthropic/claude-opus-5.5",
   "openai/chatgpt",
   "google/gemini",
 ];
@@ -740,9 +768,8 @@ export const GEO_MODEL_EXCLUDED_IDS: ReadonlySet<string> = new Set([
   "meta/muse-glimmer-30b",
   "meta/muse-spark-1.1",
   "spacexai/grok-4.6",
-  // Olostep consumer apps not released yet.
+  // Olostep's Perplexity parser returns no answers yet.
   "perplexity/perplexity",
-  "microsoft/copilot",
 ]);
 /** Optional replacements for retired ids in saved selections and scans. */
 export const GEO_MODEL_REPLACED_IDS: Readonly<Record<string, string>> = {

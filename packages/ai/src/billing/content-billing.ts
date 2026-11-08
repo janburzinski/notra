@@ -115,8 +115,14 @@ export async function reserveContentBilling(
       lockTtlMs,
     });
 
-    if (quota.duplicateLock || quota.response?.allowed) {
-      const balance = quota.response?.balance;
+    const balance = quota.response?.balance;
+    const noOverage = quotaFeature === FEATURES.AI_ANSWERS;
+    const overQuota =
+      noOverage &&
+      balance != null &&
+      !balance.unlimited &&
+      balance.remaining <= 0;
+    if (!overQuota && (quota.duplicateLock || quota.response?.allowed)) {
       return {
         allowed: true,
         mode: "plan_quota",
@@ -125,8 +131,10 @@ export async function reserveContentBilling(
         lockId: quotaLockId,
         useMarkup: false,
         balanceRemaining:
-          balance && !balance.unlimited && !balance.overageAllowed
-            ? balance.remaining
+          balance &&
+          !balance.unlimited &&
+          (noOverage || !balance.overageAllowed)
+            ? Math.max(0, balance.remaining)
             : null,
       };
     }
@@ -136,6 +144,14 @@ export async function reserveContentBilling(
     if (entitled) {
       quotaExhausted = true;
       quotaRemaining = quota.response?.balance?.remaining ?? 0;
+    }
+    if (quotaExhausted && noOverage) {
+      return buildDenial({
+        organizationId: input.organizationId,
+        reason: "quota_exhausted",
+        featureId: quotaFeature,
+        balanceRemaining: Math.max(0, quotaRemaining ?? 0),
+      });
     }
   }
 

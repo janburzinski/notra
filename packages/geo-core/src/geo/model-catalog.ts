@@ -1,6 +1,13 @@
+import { db } from "@notra/db/drizzle";
+import { organizations } from "@notra/db/schema";
+import { eq } from "drizzle-orm";
 import { Effect } from "effect";
 
 import { GEO_PAID_CODING_AGENT_ENGINE_IDS } from "../constants/geo";
+import {
+  GEO_ENGINE_DISPLAY_LABELS,
+  GEO_LEGACY_DEFAULT_ENGINE_IDS,
+} from "../constants/geo-engine-policy";
 import {
   GEO_MODEL_CATALOG_STATIC,
   GEO_MODEL_FEED_RETRY_SECONDS,
@@ -16,6 +23,10 @@ import type {
   GeoModelCatalogEntry,
   GeoResolvedModelCatalog,
 } from "../types/geo";
+import {
+  isGeoEnginePolicyActiveFor,
+  isGeoSelfServeEngine,
+} from "../utils/geo-engine-policy";
 import { isGeoNativeSearchEngine } from "../utils/geo-engines";
 import { resolveGroundedEngines } from "../utils/geo-grounded-engines";
 import { logGeoFailure } from "../utils/geo-log";
@@ -30,6 +41,24 @@ const MS_PER_SECOND = 1000;
 
 interface NextRevalidateRequestInit extends RequestInit {
   next?: { revalidate?: number };
+}
+
+const organizationCreatedAt = new Map<string, Date | null>();
+
+async function loadOrganizationCreatedAt(
+  organizationId: string
+): Promise<Date | null> {
+  const cached = organizationCreatedAt.get(organizationId);
+  if (cached !== undefined) {
+    return cached;
+  }
+  const row = await db.query.organizations.findFirst({
+    where: eq(organizations.id, organizationId),
+    columns: { createdAt: true },
+  });
+  const createdAt = row?.createdAt ?? null;
+  organizationCreatedAt.set(organizationId, createdAt);
+  return createdAt;
 }
 
 const STATIC_ENGINE_IDS = new Set(
@@ -115,17 +144,28 @@ export const loadGeoModelCatalog = Effect.fn("geo.modelCatalog")(function* (
   organizationId: string
 ) {
   const requireCredentials = yield* GeoEngineCredentialsRequired;
-  const [catalog, codingAgentsAllowed] = yield* Effect.all(
+  const [catalog, codingAgentsAllowed, createdAt] = yield* Effect.all(
     [
       Effect.promise(() => loadSharedGeoModelCatalog(requireCredentials)),
       loadGeoCodingAgentAccess(organizationId),
+      Effect.promise(() =>
+        loadOrganizationCreatedAt(organizationId).catch(() => null)
+      ),
     ],
     { concurrency: "unbounded" }
   );
-  const available = withoutGeoModelCatalogEntries(
-    catalog,
-    codingAgentsAllowed ? [] : GEO_PAID_CODING_AGENT_ENGINE_IDS
-  );
+  const policyActive = isGeoEnginePolicyActiveFor(createdAt);
+  const available: GeoModelCatalog = {
+    ...withoutGeoModelCatalogEntries(catalog, [
+      ...(codingAgentsAllowed ? [] : GEO_PAID_CODING_AGENT_ENGINE_IDS),
+      ...(policyActive
+        ? catalog.models
+            .filter((model) => !isGeoSelfServeEngine(model.id))
+            .map((model) => model.id)
+        : []),
+    ]),
+    enginePolicyActive: policyActive,
+  };
   const grounded = new Set(
     available.models
       .filter(
@@ -147,9 +187,17 @@ export const loadGeoModelCatalog = Effect.fn("geo.modelCatalog")(function* (
     ...available,
     models: available.models.map((model) => ({
       ...model,
-      hidden:
-        model.hidden ||
-        (searchless.has(model.id) && !listedSearchless.has(model.id)),
+      ...(policyActive
+        ? {
+            label: GEO_ENGINE_DISPLAY_LABELS[model.id] ?? model.label,
+            hidden: false,
+          }
+        : {
+            default: GEO_LEGACY_DEFAULT_ENGINE_IDS.has(model.id),
+            hidden:
+              model.hidden ||
+              (searchless.has(model.id) && !listedSearchless.has(model.id)),
+          }),
       supportsGroundedChecks: grounded.has(model.id),
     })),
   };

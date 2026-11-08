@@ -26,7 +26,7 @@ export const LEGACY_PLAN_TIERS: Record<string, string> = {
 
 export const PLAN_TIER_LIMITS: Record<string, PlanTierLimits> = {
   [PLANS.STARTER]: {
-    aiAnswers: 2000,
+    aiAnswers: 6000,
     imageGenerations: 8,
     longFormPosts: 10,
     pullRequestCredits: 10,
@@ -36,7 +36,7 @@ export const PLAN_TIER_LIMITS: Record<string, PlanTierLimits> = {
     prioritySupport: false,
   },
   [PLANS.GROWTH]: {
-    aiAnswers: 6000,
+    aiAnswers: 16_000,
     imageGenerations: 20,
     longFormPosts: 25,
     pullRequestCredits: 15,
@@ -46,7 +46,7 @@ export const PLAN_TIER_LIMITS: Record<string, PlanTierLimits> = {
     prioritySupport: false,
   },
   [PLANS.SCALE]: {
-    aiAnswers: 12_000,
+    aiAnswers: 35_000,
     imageGenerations: 45,
     longFormPosts: 50,
     pullRequestCredits: 25,

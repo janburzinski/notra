@@ -5,6 +5,8 @@ export const GEO_SEQUENCE_RUN_INTERNAL_PATH = "/api/internal/geo/sequence-run";
 
 export const GEO_PERSONA_RUN_INTERNAL_PATH = "/api/internal/geo/persona-run";
 
+export const GEO_ANSWER_LIMIT_INTERNAL_PATH = "/api/internal/geo/answer-limit";
+
 export const GEO_PERSONA_GENERATION_INTERNAL_PATH =
   "/api/internal/geo/persona-generation";
 

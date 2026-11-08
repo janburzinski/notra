@@ -28,7 +28,7 @@ Add what each buyer knows: their role, their stack, what they tried before and w
 
 ### 3. Scan as each one
 
-Every scan asks as each persona on ChatGPT, Claude, Gemini and Perplexity. You get the full answers and a visibility line per buyer.
+Every scan asks as each persona on ChatGPT, Gemini and Copilot. You get the full answers and a visibility line per buyer.
 
 ## See what AI tells each of your buyers
 

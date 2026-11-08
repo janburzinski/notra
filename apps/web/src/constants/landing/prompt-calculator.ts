@@ -11,13 +11,9 @@ export const PROMPT_CALCULATOR_ANCHOR = "calculator";
 export const PROMPT_CALCULATOR_ENGINE_IDS = [
   "chatgpt",
   "claude",
+  "ai-overview",
   "gemini",
-  "perplexity",
-  "grok",
-  "kimi",
-  "deepseek",
-  "meta",
-  "zai",
+  "ai-mode",
 ] as const;
 
 export const PROMPT_CALCULATOR_FREQUENCIES = [
@@ -66,9 +62,9 @@ export const PROMPT_CALCULATOR_MAX_PROMPTS = 10_000;
 
 export const PROMPT_CALCULATOR_DEFAULT_PROMPTS = 10;
 export const PROMPT_CALCULATOR_DEFAULT_MODELS: string[] = [
-  "openai/gpt-5.6-sol",
-  "anthropic/claude-opus-5.5",
-  "google/gemini-3.8-flash",
+  "openai/chatgpt",
+  "google/ai-overview",
+  "google/gemini",
 ];
 export const PROMPT_CALCULATOR_DEFAULT_FREQUENCY: PromptCalculatorFrequencyId =
   "daily";

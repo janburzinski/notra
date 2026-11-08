@@ -20,6 +20,10 @@ import { isGeoBoxCodingAgent } from "./geo-coding-agents";
 import { isGeoContextEngine } from "./geo-context";
 import { engineModelOf } from "./geo-engine-family";
 import {
+  geoEnginePolicyReplacement,
+  isGeoEnginePolicyActive,
+} from "./geo-engine-policy";
+import {
   geoDefaultEngines,
   getGeoModelCatalogEntry,
   isGeoEngineZdrCapable,
@@ -38,14 +42,20 @@ export function sortKnownEngines(
 }
 
 /** Canonicalize saved batch variants and replace retired catalog ids. */
-export function remapRetiredGeoEngineIds(ids: Iterable<string>): string[] {
+export function remapRetiredGeoEngineIds(
+  ids: Iterable<string>,
+  applyPolicy = true
+): string[] {
   const seen = new Set<string>();
   const next: string[] = [];
   for (const id of ids) {
     const base = id.endsWith(GEO_MODEL_BATCH_SUFFIX)
       ? id.slice(0, -GEO_MODEL_BATCH_SUFFIX.length)
       : id;
-    const mapped = GEO_MODEL_REPLACED_IDS[base] ?? base;
+    const replaced = GEO_MODEL_REPLACED_IDS[base] ?? base;
+    const mapped = applyPolicy
+      ? (geoEnginePolicyReplacement(replaced) ?? replaced)
+      : replaced;
     if (seen.has(mapped)) {
       continue;
     }
@@ -166,9 +176,10 @@ export function resolveTrackedEngines(
   const selected = sortKnownEngines(catalog, configured);
   if (
     selected.length > 0 ||
-    configured.some((engine) =>
-      GEO_PAID_CODING_AGENT_ENGINE_IDS.includes(engine)
-    )
+    (!isGeoEnginePolicyActive() &&
+      configured.some((engine) =>
+        GEO_PAID_CODING_AGENT_ENGINE_IDS.includes(engine)
+      ))
   ) {
     return selected;
   }
@@ -260,7 +271,32 @@ export function applyGeoZdrEngineFallback(
     return sorted;
   }
 
-  return geoDefaultEngines(catalog).filter((engine) =>
+  const defaults = geoDefaultEngines(catalog).filter((engine) =>
     isGeoEngineZdrCapable(catalog, engine)
   );
+  if (defaults.length > 0) {
+    return defaults;
+  }
+  return catalog.models
+    .filter(
+      (model) => !model.hidden && isGeoEngineZdrCapable(catalog, model.id)
+    )
+    .slice(0, 1)
+    .map((model) => model.id);
+}
+
+export function zdrRunnableEngines(
+  catalog: GeoModelCatalog,
+  tracked: readonly string[],
+  policy: GeoZdrPolicy
+): string[] {
+  if (
+    !policy.enforceZdr ||
+    tracked.some(
+      (engine) => resolveGeoZdrMode(catalog, engine, policy) !== null
+    )
+  ) {
+    return [...tracked];
+  }
+  return applyGeoZdrEngineFallback(catalog, tracked, policy);
 }

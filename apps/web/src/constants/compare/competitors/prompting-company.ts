@@ -14,7 +14,7 @@ export const PROMPTING_COMPANY: CompareCompetitor = {
   headline: "Track prompts daily without a $3,000 plan.",
   headlineAccent: "daily",
   heroSubtitle:
-    "The Prompting Company tests how coding agents use your product and tracks AI visibility on credits. Notra tracks every engine on every plan and turns each gap into published content.",
+    "The Prompting Company tests how coding agents use your product and tracks AI visibility on credits. Notra tracks the major assistant apps on every plan and turns each gap into published content.",
   metaDescription:
     "Notra vs The Prompting Company compared: engines per plan, credits vs answers, crawler logs, content and pricing for AI visibility.",
   chooseNotra: [
@@ -145,7 +145,7 @@ export const PROMPTING_COMPANY: CompareCompetitor = {
     {
       question: "Does Notra track coding agents?",
       answer:
-        "Notra can scan Claude Code, Codex and OpenCode in early access. TPC goes further with scored sandbox runs on its Enterprise plan.",
+        "Not today. Notra tracks the assistant apps buyers use. TPC runs scored sandbox tests of coding agents on its Enterprise plan.",
     },
   ],
 };

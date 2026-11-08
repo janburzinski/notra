@@ -1,6 +1,6 @@
 # About Notra
 
-Notra is a GEO tool that shows how ChatGPT, Claude, Gemini and Perplexity answer the questions your buyers ask and whether your brand is in those answers.
+Notra is a GEO tool that shows how ChatGPT, Claude, Gemini, Copilot and Google AI answer the questions your buyers ask and whether your brand is in those answers.
 
 When someone asks an AI assistant which tool to buy, the answer names a few brands and links to a few pages. Notra sends the questions your buyers ask to each engine on a schedule, keeps every answer and records whether you were mentioned, in which position and which competitors the engine named instead.
 

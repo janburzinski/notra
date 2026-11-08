@@ -407,7 +407,7 @@ export const GEO_GENERATED_CONVERSATION_NAME_MAX_LENGTH = 48;
 export const GEO_CONVERSATION_GENERATION_MAX_TOKENS = 2000;
 export const GEO_CONVERSATION_CONTEXT_PROMPT_LIMIT = 12;
 export const GEO_GROUNDED_MAX_SEARCHES = 3;
-export const GEO_ANSWER_MAX_TOKENS = 4096;
+export const GEO_ANSWER_MAX_TOKENS = 2048;
 export const GEO_GROUNDED_ANSWER_MAX_TOKENS = 4096;
 export const GEO_FLEX_MODELS: ReadonlySet<string> = new Set([
   "openai/gpt-6-sol",

@@ -53,10 +53,17 @@ const workflowLayer = Layer.succeed(GeoWorkflowService, {
 const billingLayer = Layer.succeed(GeoContentBillingService, {
   gateContentBilling: Effect.fn("GeoDashboardBilling.gate")((input) =>
     Effect.tryPromise({
-      try: async () =>
-        (
+      try: async () => {
+        const gate = await (
           await import("@/workflows/steps/content-generation-steps")
-        ).gateContentBilling(input),
+        ).gateContentBilling(input);
+        await (
+          await import("@/lib/geo/answer-limit-notification")
+        )
+          .notifyGeoAnswerLimitReached(input.organizationId, gate)
+          .catch(() => undefined);
+        return gate;
+      },
       catch: (cause) => new GeoBillingError({ cause }),
     })
   ),
@@ -79,12 +86,19 @@ const entitlementLayer = Layer.succeed(GeoEntitlementService, {
   checkScanBilling: Effect.fn("GeoDashboardEntitlement.checkScanBilling")(
     (organizationId) =>
       Effect.tryPromise({
-        try: () =>
-          checkContentBilling({
+        try: async () => {
+          const gate = await checkContentBilling({
             organizationId,
             outputType: null,
             quotaFeatureId: FEATURES.AI_ANSWERS,
-          }),
+          });
+          await (
+            await import("@/lib/geo/answer-limit-notification")
+          )
+            .notifyGeoAnswerLimitReached(organizationId, gate)
+            .catch(() => undefined);
+          return gate;
+        },
         catch: (cause) => new GeoBillingError({ cause }),
       })
   ),

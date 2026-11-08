@@ -24,6 +24,7 @@ import { toGeoVisitorType } from "../utils/ai-traffic";
 import {
   remapRetiredGeoEngineIds,
   resolveTrackedEngines,
+  zdrRunnableEngines,
 } from "../utils/geo-engines";
 import { trackedGeoLanguages } from "../utils/geo-language-rows";
 import { isGeoScanRunning } from "../utils/geo-scan";
@@ -43,6 +44,13 @@ export function toGeoSettings(
 ): GeoSettings {
   const scanStartedAt = row.scanStartedAt?.toISOString() ?? null;
   const lastScanAt = row.lastScanAt?.toISOString() ?? null;
+  const zdrPolicy = {
+    enforceZdr: row.enforceZdr,
+    nonZdrApprovedEngines: remapRetiredGeoEngineIds(
+      row.nonZdrApprovedEngines,
+      false
+    ),
+  };
   return {
     id: row.id,
     organizationId: row.organizationId,
@@ -54,9 +62,13 @@ export function toGeoSettings(
     domains: row.domains,
     languages: trackedGeoLanguages(row.languages ?? []),
     promptLanguage: row.promptLanguage ?? DEFAULT_LANGUAGE,
-    engines: resolveTrackedEngines(catalog, row.engines),
+    engines: zdrRunnableEngines(
+      catalog,
+      resolveTrackedEngines(catalog, row.engines),
+      zdrPolicy
+    ),
     enforceZdr: row.enforceZdr,
-    nonZdrApprovedEngines: remapRetiredGeoEngineIds(row.nonZdrApprovedEngines),
+    nonZdrApprovedEngines: zdrPolicy.nonZdrApprovedEngines,
     trackWithoutSearch: row.trackWithoutSearch,
     pausedAutoPromptIds: row.pausedAutoPromptIds,
     removedAutoPromptIds: row.removedAutoPromptIds,

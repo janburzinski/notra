@@ -59,7 +59,9 @@ export function GeoEnginePicker({
 }: GeoEnginePickerProps) {
   const t = useTranslations("geo.geoEnginePicker");
   const id = useId();
-  const { advanced, setAdvanced } = useGeoModelsAdvanced();
+  const { advanced: advancedPreference, setAdvanced } = useGeoModelsAdvanced();
+  const legacyPicker = !catalog.enginePolicyActive;
+  const advanced = legacyPicker && advancedPreference;
   const checkoutReturnHandled = useRef(false);
   const approvedNonZdrIds = new Set(nonZdrApproved);
   const [pendingApproval, setPendingApproval] =
@@ -97,7 +99,7 @@ export function GeoEnginePicker({
     models.some((model) => pinned.selected.has(model.id));
   const primary = providers.filter(isPrimary);
   const more = providers.filter((entry) => !isPrimary(entry));
-  const visible = advanced ? [...primary, ...more] : primary;
+  const visible = advanced || !legacyPicker ? [...primary, ...more] : primary;
 
   const select = (ids: readonly string[]) => {
     const eligible = ids.filter((id) =>
@@ -297,36 +299,40 @@ export function GeoEnginePicker({
     <>
       <TitleCard
         action={
-          <DropdownMenu>
-            <DropdownMenuTrigger
-              render={
-                <Button
-                  aria-label={t("options")}
-                  size="icon-sm"
-                  variant="ghost"
-                />
-              }
-            >
-              <HugeiconsIcon
-                aria-hidden="true"
-                icon={MoreHorizontalIcon}
-                size={16}
-              />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-auto min-w-52">
-              {menu}
-              {menu ? <DropdownMenuSeparator /> : null}
-              <DropdownMenuCheckboxItem
-                checked={advanced}
-                closeOnClick={false}
-                disabled={disabled}
-                indicator="switch"
-                onCheckedChange={setAdvanced}
+          menu || legacyPicker ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger
+                render={
+                  <Button
+                    aria-label={t("options")}
+                    size="icon-sm"
+                    variant="ghost"
+                  />
+                }
               >
-                {t("advanced")}
-              </DropdownMenuCheckboxItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+                <HugeiconsIcon
+                  aria-hidden="true"
+                  icon={MoreHorizontalIcon}
+                  size={16}
+                />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-auto min-w-52">
+                {menu}
+                {menu && legacyPicker ? <DropdownMenuSeparator /> : null}
+                {legacyPicker ? (
+                  <DropdownMenuCheckboxItem
+                    checked={advanced}
+                    closeOnClick={false}
+                    disabled={disabled}
+                    indicator="switch"
+                    onCheckedChange={setAdvanced}
+                  >
+                    {t("advanced")}
+                  </DropdownMenuCheckboxItem>
+                ) : null}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : null
         }
         as="section"
         contentClassName="px-2 py-2"

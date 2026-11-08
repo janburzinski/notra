@@ -33,12 +33,12 @@ Notra has three self-serve plans plus Enterprise, and every plan is available mo
 
 | Plan        | Monthly | Annual  | AI answers tracked / mo | Long-form posts / mo | Image generations / mo | Projects | References |
 | ----------- | ------- | ------- | ----------------------- | -------------------- | ---------------------- | -------- | ---------- |
-| **Starter** | $100    | $1,000  | 2,000                   | 10                   | 8                      | 1        | 100        |
-| **Growth**  | $250    | $2,500  | 6,000                   | 25                   | 20                     | 3        | 500        |
-| **Scale**   | $550    | $5,500  | 12,000                  | 50                   | 45                     | 10       | 1,000      |
+| **Starter** | $100    | $1,000  | 6,000                   | 10                   | 8                      | 1        | 100        |
+| **Growth**  | $250    | $2,500  | 16,000                  | 25                   | 20                     | 3        | 500        |
+| **Scale**   | $550    | $5,500  | 35,000                  | 50                   | 45                     | 10       | 1,000      |
 | **Enterprise** | Custom | Custom | Unlimited             | Unlimited            | Unlimited              | Unlimited | Unlimited |
 
-All plans include unlimited social posts and unlimited tracked prompts across all major AI models.
+All plans include unlimited social posts and unlimited tracked prompts on ChatGPT, Gemini, Microsoft Copilot, Google AI Overviews, Google AI Mode, Claude, Grok, Kimi, GLM and DeepSeek.
 
 References beyond the included amount cost, per reference per month, $0.05 on Starter, $0.04 on Growth and $0.03 on Scale.
 
@@ -50,7 +50,7 @@ Starter and Growth get standard support plus Slack, Scale gets priority support 
 
 ### What the quotas mean
 
-* **AI answers tracked.** Every answer Notra collects from an AI model during a GEO scan counts as one, and persona conversations count twice per answer. When a workspace pays with AI credits instead, persona runs cost twice their model usage. This quota covers prompt tracking, competitor tracking and share of voice.
+* **AI answers tracked.** Every answer Notra collects from an assistant during a GEO scan counts as one, and persona conversations count twice per answer. Scans stop when the quota is used up, with no overage charges, and organization owners get an email. Tracking resumes when the quota resets or you upgrade, and AI credits do not extend it. Manual persona runs paid with AI credits cost twice their model usage. This quota covers prompt tracking, competitor tracking and share of voice.
 * **Long-form posts.** This quota covers changelogs and blog posts.
 * **Social posts.** LinkedIn and X posts are unlimited on every plan.
 * **Image generations.** This quota covers generated social images.
@@ -111,7 +111,7 @@ Click **Manage Subscription** at the top of the billing page to open the custome
 
 ## AI credits
 
-AI credits are a prepaid dollar balance that Notra draws on when a plan quota runs out. When a long-form post, image generation or GEO scan would exceed your monthly quota, Notra charges credits instead, and if there are no credits either, Notra blocks the action and asks you to upgrade or add credits.
+AI credits are a prepaid dollar balance that Notra draws on when a plan quota runs out. When a long-form post or image generation would exceed your monthly quota, Notra charges credits instead, and if there are no credits either, Notra blocks the action and asks you to upgrade or add credits. GEO scans are the exception: they stop at the AI answer quota and never draw on credits.
 
 ### Viewing and topping up
 
@@ -143,7 +143,7 @@ Open the **Usage** tab on the billing page to see, for the current period:
 * AI credits spent
 
 <Warning>
-  When a metered quota is used up, the affected feature falls back to AI credits, and with no credits available it stays blocked until the quota resets or you upgrade.
+  When a metered quota is used up, the affected feature falls back to AI credits, and with no credits available it stays blocked until the quota resets or you upgrade. AI answers are the exception: GEO scans stop at the quota whatever your credit balance.
 </Warning>
 
 Team member seats are also plan-limited, so when the organization is out of seats, invitations fail with a **View plans** link. See [team management](/organization/team-management).

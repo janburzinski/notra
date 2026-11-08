@@ -7,7 +7,7 @@ import type {
 } from "@/types/landing/pricing";
 
 export const TRACKED_ENGINES_CAPTION =
-  "Scan ChatGPT, Claude, Gemini and Perplexity with web search";
+  "Track the answers people actually see in ChatGPT, Claude, Gemini, Copilot and Google";
 
 const ENGINE_LOGO_BASE = "/logos/ai-engines";
 
@@ -20,13 +20,7 @@ export const TRACKED_ENGINES: TrackedEngine[] = [
   },
   { name: "Claude", src: `${ENGINE_LOGO_BASE}/claude.svg`, width: 28 },
   { name: "Gemini", src: `${ENGINE_LOGO_BASE}/gemini.svg`, width: 28 },
-  { name: "Perplexity", src: `${ENGINE_LOGO_BASE}/perplexity.svg`, width: 28 },
-  {
-    name: "Grok",
-    src: `${ENGINE_LOGO_BASE}/grok.svg`,
-    darkSrc: `${ENGINE_LOGO_BASE}/grok-dark.svg`,
-    width: 28,
-  },
+  { name: "Google", src: `${ENGINE_LOGO_BASE}/google.svg`, width: 28 },
 ];
 
 export const PRICING_ANNUAL_BADGE = "2 months free";
@@ -74,7 +68,7 @@ export function pricingCarouselDotLabel(planName: string) {
 export const PRICING_PLANS: PricingPlan[] = [
   {
     id: "starter",
-    answersPerMonth: 2_000,
+    answersPerMonth: 6_000,
     name: "Starter",
     description: "For founders tracking their first prompts.",
     price: { monthly: "$100", yearly: "$1,000" },
@@ -89,7 +83,7 @@ export const PRICING_PLANS: PricingPlan[] = [
       showArrow: true,
     },
     features: [
-      { label: "2,000 AI answers tracked / mo", icon: "tracking" },
+      { label: "6,000 AI answers tracked / mo", icon: "tracking" },
       {
         label: "5M AI traffic events / mo",
         subtitle: "includes agent feedback",
@@ -109,7 +103,7 @@ export const PRICING_PLANS: PricingPlan[] = [
   },
   {
     id: "growth",
-    answersPerMonth: 6_000,
+    answersPerMonth: 16_000,
     name: "Growth",
     description: "For teams tracking prompts across engines and languages.",
     price: { monthly: "$250", yearly: "$2,500" },
@@ -124,7 +118,7 @@ export const PRICING_PLANS: PricingPlan[] = [
       showArrow: true,
     },
     features: [
-      { label: "6,000 AI answers tracked / mo", icon: "tracking" },
+      { label: "16,000 AI answers tracked / mo", icon: "tracking" },
       {
         label: "15M AI traffic events / mo",
         subtitle: "includes agent feedback",
@@ -144,7 +138,7 @@ export const PRICING_PLANS: PricingPlan[] = [
   },
   {
     id: "scale",
-    answersPerMonth: 12_000,
+    answersPerMonth: 35_000,
     name: "Scale",
     description: "For agencies and teams running several brands.",
     price: { monthly: "$550", yearly: "$5,500" },
@@ -159,7 +153,7 @@ export const PRICING_PLANS: PricingPlan[] = [
       showArrow: true,
     },
     features: [
-      { label: "12,000 AI answers tracked / mo", icon: "tracking" },
+      { label: "35,000 AI answers tracked / mo", icon: "tracking" },
       {
         label: "30M AI traffic events / mo",
         subtitle: "includes agent feedback",

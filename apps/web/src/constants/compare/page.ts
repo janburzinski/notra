@@ -75,17 +75,17 @@ export const NOTRA_COMPARE_PLANS: ComparePlan[] = [
     name: PRICING_PLANS.starter.name,
     price: `$${PRICING_PLANS.starter.pricing.monthly}/mo`,
     detail:
-      "2,000 AI answers a month, unlimited prompts, 10 long-form posts, every engine",
+      "6,000 AI answers a month, unlimited prompts, 10 long-form posts, every assistant",
   },
   {
     name: PRICING_PLANS.growth.name,
     price: `$${PRICING_PLANS.growth.pricing.monthly}/mo`,
-    detail: "6,000 AI answers a month, 25 long-form posts, 3 projects",
+    detail: "16,000 AI answers a month, 25 long-form posts, 3 projects",
   },
   {
     name: PRICING_PLANS.scale.name,
     price: `$${PRICING_PLANS.scale.pricing.monthly}/mo`,
-    detail: "12,000 AI answers a month, 50 long-form posts, 10 projects",
+    detail: "35,000 AI answers a month, 50 long-form posts, 10 projects",
   },
   {
     name: PRICING_PLANS.enterprise.name,
@@ -104,45 +104,45 @@ export const COMPARE_ROW_GROUPS: CompareRowGroup[] = [
       {
         id: "chatgpt",
         label: "ChatGPT",
-        notra: "GPT-6, GPT-5.6, GPT-5.5, GPT-5.4",
+        notra: "The ChatGPT app",
       },
       {
         id: "claude",
         label: "Claude",
-        notra: "Opus 5.5, Fable 5.1, Sonnet 5, Haiku 4.5",
+        notra: true,
       },
       {
         id: "gemini",
         label: "Gemini",
-        notra: "Gemini 3.8 Flash, 3.5 Flash, 3.1 Pro",
+        notra: "The Gemini app",
       },
-      { id: "perplexity", label: "Perplexity", notra: "Sonar" },
+      { id: "perplexity", label: "Perplexity", notra: false },
       {
         id: "aiOverviews",
         label: "Google AI Overviews and AI Mode",
         notra: true,
       },
-      { id: "copilot", label: "Microsoft Copilot", notra: false },
+      { id: "copilot", label: "Microsoft Copilot", notra: "The Copilot app" },
       {
         id: "otherEngines",
         label: "Grok, DeepSeek or Meta AI",
-        notra: "Grok 4.7, DeepSeek V4, Muse Spark 1.3",
+        notra: "Grok and DeepSeek, plus Kimi and GLM",
       },
       {
         id: "codingAgents",
         label: "Coding agents (Claude Code, Codex, Cursor)",
-        notra: "Early access",
+        notra: false,
       },
       {
         id: "modelChoice",
         label: "Pick exact model versions",
-        notra: true,
+        notra: false,
       },
       {
         id: "entryEngines",
         label: "Engines on the cheapest plan",
         notra:
-          "ChatGPT, Claude, Gemini, Perplexity, Google AI, Grok, DeepSeek, Meta AI",
+          "ChatGPT, Claude, Gemini, Copilot, Google AI Overviews, AI Mode, Grok, Kimi, GLM, DeepSeek",
       },
       {
         id: "collection",

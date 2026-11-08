@@ -235,6 +235,24 @@ export const MODEL_PRICING: Record<string, ModelPricing> = {
     cacheReadPerMillionTokens: 0.05,
     cacheWritePerMillionTokens: 0,
   },
+  "moonshotai/kimi-k2": {
+    inputPerMillionTokens: 0.57,
+    outputPerMillionTokens: 2.3,
+    cacheReadPerMillionTokens: 0,
+    cacheWritePerMillionTokens: 0,
+  },
+  "spacexai/grok-4.20-non-reasoning": {
+    inputPerMillionTokens: 1.25,
+    outputPerMillionTokens: 2.5,
+    cacheReadPerMillionTokens: 0.2,
+    cacheWritePerMillionTokens: 0,
+  },
+  "deepseek/deepseek-v4-flash": {
+    inputPerMillionTokens: 0.13,
+    outputPerMillionTokens: 0.26,
+    cacheReadPerMillionTokens: 0,
+    cacheWritePerMillionTokens: 0,
+  },
   "zai/glm-5.3-flash": {
     inputPerMillionTokens: 0.15,
     outputPerMillionTokens: 0.5,

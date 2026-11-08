@@ -1,6 +1,6 @@
 ---
 title: "Engines"
-description: "Choose which AI engines Notra scans: ChatGPT, Claude, Gemini, Perplexity, Grok, Google AI Overview and more."
+description: "Choose which AI assistants Notra scans: ChatGPT, Gemini, Microsoft Copilot, Google AI Overviews, Google AI Mode, Claude, Grok, Kimi, GLM and DeepSeek."
 authors:
   - handle: dominik
 
@@ -18,40 +18,36 @@ Every enabled engine answers every enabled prompt on each scan, and you pick the
 
 ## Default engines
 
-New projects start with Claude Opus 5.5, GPT-5.6 Sol and Gemini 3.8 Flash. Brands that sell to consumers, such as products people buy, book or visit, also get Google AI Overview, which Notra decides from your website during onboarding.
+New projects start with ChatGPT, Google AI Overviews and Gemini. Brands that sell to consumers, such as products people buy, book or visit, get Google AI Overviews on top of ChatGPT and Gemini, which Notra decides from your website during onboarding.
 
-## Engines with web search
+## Assistants
 
-Notra runs every engine you select. Engines that can search the live web always run with search turned on, because that is how buyers see answers in ChatGPT, Claude, Gemini, Perplexity and Grok today.
+Every plan can track every assistant below, and each appears once in the picker.
 
-| Provider | Models |
+Notra captures ChatGPT, Gemini, Copilot and Google answers from the apps themselves rather than from model APIs, so you see the same answer a buyer gets when they open the app. These engines save the sources they cited. See [How scans work](/geo/how-scans-work) and [Citations](/geo/metrics/citations).
+
+| Assistant | How Notra collects it |
 | --- | --- |
-| OpenAI | GPT-6, GPT-5.6, GPT-5.5, GPT-5.4 |
-| Anthropic | Claude Opus, Fable, Sonnet, Haiku |
-| Google | Gemini Flash and Pro |
-| Perplexity | Sonar |
-| Meta | Muse Wonder and Muse Spark |
-| SpaceXAI | Grok |
-| Google AI Overview | Fetched from Google search results |
+| ChatGPT | The ChatGPT app with web search |
+| Gemini | The Gemini app |
+| Microsoft Copilot | The Copilot app |
+| Google AI Overviews | Google search results |
+| Google AI Mode | Google AI Mode results |
 
-These engines save the search queries they ran and the sources they cited. See [How scans work](/geo/how-scans-work) and [Citations](/geo/metrics/citations).
+Claude, Grok, Kimi, GLM and DeepSeek answer through their model APIs without web search, from what each model learned in training. Their answers show which brands a model already knows, have no sources and carry the **No web search** label.
 
-## Engines without web search
+| Assistant | Model |
+| --- | --- |
+| Claude | Claude Haiku 5.5 |
+| Grok | Grok 4.20 Non-Reasoning |
+| Kimi | Kimi K2 |
+| GLM | GLM 5.3 Flash |
+| DeepSeek | DeepSeek V4 Flash |
 
-Some models have no web search route in Notra: Meta's Llama, Moonshot AI (Kimi), Z.AI (GLM), DeepSeek and Cursor. Notra still runs them, but they answer from what the model learned in training, so their answers have no sources or search queries.
+## Retired models
 
-The model picker and the results label these engines **No web search**. Compare them with each other rather than with search engines, because a model without search can't see pages you published recently.
-
-## Google AI Overview and coding agents
-
-Notra fetches Google AI Overview from Google search results rather than a model API. Notra can also scan coding agents, where OpenCode, Claude Code, Codex and fx research live while Cursor answers without web search.
-
-<Info>
-  Coding-agent engines require a paid plan and configured credentials. fx uses curated AI Gateway models in Upstash Box. It is never selected by default and requires both `UPSTASH_BOX_API_KEY` and `AI_GATEWAY_API_KEY` on the server.
-</Info>
+Individual model versions such as GPT-5.6 Sol, Claude Opus, Grok 4.7 or Kimi K3 and coding agents such as Claude Code and Codex are no longer offered. Organizations created from November 8, 2026 start on the assistants above. On November 12, 2026 projects of older organizations moved to the matching assistant, so GPT models and Codex became ChatGPT, Gemini models became Gemini, every Claude model became Claude and Grok, Kimi, GLM and DeepSeek models moved to the versions above. For anything else, contact [hello@usenotra.com](mailto:hello@usenotra.com).
 
 ## Model limits
 
-Muse Wonder Full is available only through a Muse Code subscription and has no Model API route, so Notra does not list it as an API model. See [Meta's model availability](https://dev.meta.ai/docs/models).
-
-You can enable up to 64 models. Each engine multiplies the answers a scan uses, so more engines use more of your AI answer quota.
+Each assistant multiplies the answers a scan uses, so more assistants use more of your AI answer quota.

@@ -259,6 +259,10 @@ describe("planned persona snapshots", () => {
     const scope = await seedProject("persona-snapshot", {
       enabled: true,
     });
+    await testDb
+      .update(geoSettings)
+      .set({ engines: ["anthropic/claude-opus-5.5", "openai/gpt-5.6-sol"] })
+      .where(eq(geoSettings.projectId, scope.projectId));
     const original = await Effect.runPromise(
       persistGeneratedPersonas(scope.organizationId, scope.projectId, {
         personas: [generatedPersona],

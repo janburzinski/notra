@@ -10,7 +10,7 @@ Buyers narrow it down over a few messages. A brand that wins the first question 
 
 ### Every turn, every engine
 
-Each follow-up runs on ChatGPT, Claude, Gemini and Perplexity, with the sources each one searched.
+Each follow-up runs on ChatGPT, Gemini and Copilot, with the sources each one cited.
 
 ### Replay any thread
 

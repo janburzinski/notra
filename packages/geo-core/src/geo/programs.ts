@@ -839,9 +839,10 @@ export const upsertGeoSettings = Effect.fn("geo.settingsUpsert")(function* (
   const engineSet = new Set(engines);
   const nonZdrApprovedEngines = [
     ...new Set([
-      ...remapRetiredGeoEngineIds(input.nonZdrApprovedEngines),
+      ...remapRetiredGeoEngineIds(input.nonZdrApprovedEngines, false),
       ...remapRetiredGeoEngineIds(
-        existingSettings?.nonZdrApprovedEngines ?? []
+        existingSettings?.nonZdrApprovedEngines ?? [],
+        false
       ).filter((engine) => preservedEngineSet.has(engine)),
     ]),
   ].filter((engine) => engineSet.has(engine));

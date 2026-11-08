@@ -31,7 +31,7 @@ export const FEATURES_PAGE_TRACKING_CARDS: FeaturesPageCard[] = [
   {
     title: "Engines and models",
     description:
-      "ChatGPT, Claude, Gemini and Perplexity with web search, plus Google AI Overview and coding agents that research live. Models from Moonshot, Z.AI, DeepSeek, Meta and Grok run without web search. The list refreshes as new releases ship.",
+      "ChatGPT, Gemini, Microsoft Copilot, Google AI Overviews and Google AI Mode, captured from the apps themselves so you see the answers people actually get, plus Claude, Grok, Kimi, GLM and DeepSeek answering from what they learned in training.",
   },
   {
     title: "Languages",

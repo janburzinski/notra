@@ -27,12 +27,9 @@ test("Google AI Mode, AI Overview and Gemini are separate rows", () => {
   );
 });
 
-test("technical brands run the API model, not the consumer app", () => {
+test("technical brands default to the consumer app too", () => {
   expect(pickGeoProviderEngines(modelsFor("openai"), "technical")).toEqual([
-    "openai/gpt-5.6-sol",
-  ]);
-  expect(pickGeoProviderEngines(modelsFor("anthropic"), "technical")).toEqual([
-    "anthropic/claude-haiku-5.5",
+    "openai/chatgpt",
   ]);
 });
 

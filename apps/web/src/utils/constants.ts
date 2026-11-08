@@ -59,7 +59,7 @@ export const PRICING_PLANS = {
       href: "https://app.usenotra.com/signup",
     },
     features: [
-      "2,000 AI answers tracked / mo",
+      "6,000 AI answers tracked / mo",
       {
         label: "5M AI traffic events / mo",
         subtitle: "includes agent feedback",
@@ -81,7 +81,7 @@ export const PRICING_PLANS = {
       href: "https://app.usenotra.com/signup",
     },
     features: [
-      "6,000 AI answers tracked / mo",
+      "16,000 AI answers tracked / mo",
       {
         label: "15M AI traffic events / mo",
         subtitle: "includes agent feedback",
@@ -103,7 +103,7 @@ export const PRICING_PLANS = {
       href: "https://app.usenotra.com/signup",
     },
     features: [
-      "12,000 AI answers tracked / mo",
+      "35,000 AI answers tracked / mo",
       {
         label: "30M AI traffic events / mo",
         subtitle: "includes agent feedback",
@@ -140,9 +140,9 @@ const FEATURES_TABLE = [
     items: [
       {
         name: "AI answers tracked / mo",
-        starter: "2,000",
-        growth: "6,000",
-        scale: "12,000",
+        starter: "6,000",
+        growth: "16,000",
+        scale: "35,000",
         enterprise: "Custom",
       },
       {
@@ -153,11 +153,11 @@ const FEATURES_TABLE = [
         enterprise: "Unlimited",
       },
       {
-        name: "Models tracked",
-        starter: "All major",
-        growth: "All major",
-        scale: "All major",
-        enterprise: "All major",
+        name: "AI assistants tracked",
+        starter: "All 10",
+        growth: "All 10",
+        scale: "All 10",
+        enterprise: "Custom",
       },
     ],
   },

@@ -22,16 +22,19 @@ import {
   GeoWorkflowStartError,
 } from "@notra/geo-core/schemas/host-service-errors";
 import type { GeoZdrEntitlement } from "@notra/geo-core/types/geo";
+import { internalGeoAnswerLimitResponseSchema } from "@notra/schemas/api/internal-geo";
 import { Redis } from "@upstash/redis";
 import { Effect, Layer } from "effect";
 
 import {
   AGENT_READINESS_INTERNAL_WORKFLOW_PATH,
+  GEO_ANSWER_LIMIT_INTERNAL_PATH,
   GEO_SCAN_INTERNAL_WORKFLOW_PATH,
   GEO_WRITER_INTERNAL_WORKFLOW_PATH,
 } from "../../constants/geo";
 import { addActiveGeneration } from "../../utils/active-generations";
 import {
+  callDashboardInternal,
   getInternalWorkflowUrl,
   startDashboardWorkflowEffect,
 } from "../../utils/internal-workflow";
@@ -95,12 +98,25 @@ const entitlementLayer = Layer.succeed(GeoEntitlementService, {
   checkScanBilling: Effect.fn("GeoApiEntitlement.checkScanBilling")(
     (organizationId) =>
       Effect.tryPromise({
-        try: () =>
-          checkContentBilling({
+        try: async () => {
+          const gate = await checkContentBilling({
             organizationId,
             outputType: null,
             quotaFeatureId: FEATURES.AI_ANSWERS,
-          }),
+          });
+          const url = getInternalWorkflowUrl(
+            process.env,
+            GEO_ANSWER_LIMIT_INTERNAL_PATH
+          );
+          if (gate.reason === "quota_exhausted" && gate.shouldNotify && url) {
+            await callDashboardInternal(
+              url,
+              { organizationId },
+              internalGeoAnswerLimitResponseSchema
+            ).catch(() => undefined);
+          }
+          return gate;
+        },
         catch: (cause) => new GeoBillingError({ cause }),
       })
   ),

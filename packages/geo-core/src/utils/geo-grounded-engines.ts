@@ -6,6 +6,7 @@ import {
 import { GEO_META_SEARCH_MODEL_IDS } from "../constants/geo-model-catalog";
 import type { GeoGroundedEngine, GeoModelCatalog } from "../types/geo";
 import { engineModelOf } from "./geo-engine-family";
+import { isGeoEnginePolicyActive } from "./geo-engine-policy";
 
 const GATEWAY_GROUNDED_PROVIDER_IDS: ReadonlySet<string> = new Set(
   GEO_GROUNDED_PROVIDERS.filter((entry) =>
@@ -70,6 +71,9 @@ export function resolveGroundedEngines(
   selectedEngines: readonly string[],
   catalog: GeoModelCatalog
 ): GeoGroundedEngine[] {
+  if (catalog.enginePolicyActive ?? isGeoEnginePolicyActive()) {
+    return [];
+  }
   return [...new Set(selectedEngines)].flatMap((modelId) => {
     const model = catalog.models.find((entry) => entry.id === modelId);
     if (!model) {

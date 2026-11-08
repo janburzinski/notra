@@ -482,7 +482,7 @@ describe("selected grounded engines", () => {
 });
 
 describe("released consumer apps", () => {
-  const unreleased = ["perplexity/perplexity", "microsoft/copilot"];
+  const unreleased = ["perplexity/perplexity"];
 
   test("unreleased apps stay hidden, even from stale settings", () => {
     const previous = {
@@ -507,6 +507,7 @@ describe("released consumer apps", () => {
         expect(ids.filter(isGeoOlostepEngine)).toEqual([
           "openai/chatgpt",
           "google/ai-mode",
+          "microsoft/copilot",
         ]);
         expect(ids).toContain("google/gemini");
         expect(ids).toContain("google/ai-overview");
@@ -525,12 +526,10 @@ describe("released consumer apps", () => {
         "perplexity/sonar"
       );
       expect(geoEnginesForAudience(seeded, "general")).toEqual([
-        "anthropic/claude-opus-5.5",
         "openai/chatgpt",
         "google/gemini",
       ]);
       expect(geoEnginesForAudience(seeded, "commerce")).toEqual([
-        "anthropic/claude-opus-5.5",
         "openai/chatgpt",
         "google/gemini",
         "google/ai-overview",
