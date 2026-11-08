@@ -132,6 +132,7 @@ export function patchConfigValue(
       "integrations.plausible.domain",
       "integrations.posthog.apiKey",
       "integrations.rybbit.siteId",
+      "integrations.simpleAnalytics.hostname",
       "integrations.umami.websiteId",
     ].includes(path)
   ) {

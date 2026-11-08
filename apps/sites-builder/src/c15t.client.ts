@@ -117,6 +117,17 @@ export default {
           },
         ]
       : []),
+    ...(analytics.simpleAnalytics
+      ? [
+          {
+            id: "simple-analytics",
+            src: analytics.simpleAnalytics.src,
+            category: "measurement",
+            async: true,
+            attributes: analytics.simpleAnalytics.attributes,
+          },
+        ]
+      : []),
     ...(analytics.umami ? [umamiAnalytics(analytics.umami)] : []),
   ],
 } satisfies C15tClientOptionsExtension;

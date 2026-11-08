@@ -77,18 +77,22 @@ for (const provider of ANALYTICS_PROVIDERS) {
     const pages = [ANALYTICS_PAGE.replace("hello-world", "previous-page")];
     // OneDollarStats reports the configured hostname and drops the query.
     if (provider.name !== "onedollarstats") {
-      pages.push(
-        ANALYTICS_PAGE.replace("acme.localhost", "other.localhost"),
-        `${ANALYTICS_PAGE}?different=query`
-      );
+      pages.push(ANALYTICS_PAGE.replace("acme.localhost", "other.localhost"));
+    }
+    // Neither OneDollarStats nor Simple Analytics sends the query string.
+    if (
+      provider.name !== "onedollarstats" &&
+      provider.name !== "simpleAnalytics"
+    ) {
+      pages.push(`${ANALYTICS_PAGE}?different=query`);
     }
     for (const page of pages) {
       expect(providersReported([event], page, "live")).toContain(provider.name);
     }
   });
 
-  if (provider.name === "ga4") {
-    continue; // GA4's valid page view is entirely in the URL.
+  if (provider.name === "ga4" || provider.name === "simpleAnalytics") {
+    continue; // These page views are entirely in the URL.
   }
   test(`${provider.name}: malformed and missing payloads do not count as page views`, () => {
     for (const body of [null, "{invalid", "null", "[]", "{}", "[null]"]) {
@@ -197,6 +201,9 @@ test("custom events cannot substitute for page views", () => {
         break;
       case "rybbit":
         body = body?.replace('"pageview"', '"custom_event"') ?? null;
+        break;
+      case "simpleAnalytics":
+        url = url.replace("type=pageview", "type=event&event=click");
         break;
       case "umami":
         body = JSON.stringify({

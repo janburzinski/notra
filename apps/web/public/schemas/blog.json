@@ -2071,6 +2071,128 @@
           "required": ["siteId"],
           "additionalProperties": false
         },
+        "simpleAnalytics": {
+          "type": "object",
+          "properties": {
+            "hostname": {
+              "type": "string",
+              "pattern": "^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z]{2,63}$",
+              "description": "Website domain as added in Simple Analytics, without https:// (e.g. blog.acme.com). Page views from every domain your Site is served on are counted for this website."
+            },
+            "scriptUrl": {
+              "description": "Tracker script URL. Defaults to https://scripts.simpleanalyticscdn.com/latest.js; set it to the latest.js on your ad-blocker bypass subdomain, e.g. https://api.acme.com/latest.js. Events go to the same host.",
+              "type": "string",
+              "pattern": "^https:\\/\\/(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z]{2,63}(?::(?:\\d{1,4}|[0-5]\\d{4}|6[0-4]\\d{3}|65[0-4]\\d{2}|655[0-2]\\d|6553[0-5]))?(?:\\/(?!\\.{1,2}(?:\\/|$))[A-Za-z0-9._~-]+)*\\/[A-Za-z0-9._~-]+\\.js$"
+            },
+            "mode": {
+              "description": "Set to \"hash\" to count every #hash change as its own page view (default: hashes are ignored).",
+              "type": "string",
+              "enum": ["hash"]
+            },
+            "collectDnt": {
+              "description": "Count visitors who enabled Do Not Track in their browser (default: false).",
+              "type": "boolean"
+            },
+            "autoCollect": {
+              "description": "Count page views automatically. Set to false to send them yourself through the sa_pageview function (default: true).",
+              "type": "boolean"
+            },
+            "ignorePages": {
+              "description": "Up to 50 paths that are never tracked, where * matches any characters, e.g. [\"/drafts/*\", \"/search\"].",
+              "maxItems": 50,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^\\/?[^\\s\"'<>,]{1,200}$"
+              }
+            },
+            "allowParams": {
+              "description": "Up to 50 query parameters whose values are collected next to the UTM parameters, e.g. [\"page\", \"category\"].",
+              "maxItems": 50,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_.~-]{1,100}$"
+              }
+            },
+            "nonUniqueHostnames": {
+              "description": "Up to 50 referrer domains whose visitors are not counted as unique, e.g. [\"app.acme.com\"] when people arrive from your own app.",
+              "maxItems": 50,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z]{2,63}$"
+              }
+            },
+            "ignoreMetrics": {
+              "description": "Metrics the script never collects, e.g. [\"useragent\", \"timeonpage\"] (default: every metric is collected).",
+              "maxItems": 11,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "referrer",
+                  "utm",
+                  "country",
+                  "session",
+                  "timeonpage",
+                  "scrolled",
+                  "useragent",
+                  "screensize",
+                  "viewportsize",
+                  "language",
+                  "querykeys"
+                ]
+              }
+            },
+            "strictUtm": {
+              "description": "Only collect utm_-prefixed campaign parameters, so source, medium and similar plain parameters are ignored (default: false).",
+              "type": "boolean"
+            },
+            "pings": {
+              "description": "Seconds of visible time after which the time on page is sent even when no leave event fires, e.g. [5, 60] (default: no pings).",
+              "maxItems": 50,
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 86400
+              }
+            },
+            "detect404": {
+              "description": "Send a page_404 event when a page that mentions 404 really returns a 404 status (default: false).",
+              "type": "boolean"
+            },
+            "referrer": {
+              "description": "Referrer reported for every page view instead of the browser's referrer. Usually left empty.",
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 500
+            },
+            "namespace": {
+              "description": "Prefix of the global functions the script defines, such as sa_event and sa_pageview (default: \"sa\").",
+              "type": "string",
+              "pattern": "^[A-Za-z_$][\\w$]{0,63}$"
+            },
+            "saGlobal": {
+              "description": "Global name of the event function (default: \"<namespace>_event\").",
+              "type": "string",
+              "pattern": "^[A-Za-z_$][\\w$]{0,63}$"
+            },
+            "pathOverwriter": {
+              "description": "Name of a window function that receives { path } and returns the path to report, e.g. from a custom script.",
+              "type": "string",
+              "pattern": "^[A-Za-z_$][\\w$]{0,63}$"
+            },
+            "metadataCollector": {
+              "description": "Name of a window function that returns metadata to attach to every page view and event.",
+              "type": "string",
+              "pattern": "^[A-Za-z_$][\\w$]{0,63}$"
+            }
+          },
+          "required": ["hostname"],
+          "additionalProperties": false
+        },
         "umami": {
           "type": "object",
           "properties": {

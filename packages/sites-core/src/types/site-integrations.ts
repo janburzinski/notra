@@ -16,6 +16,9 @@ export type SiteOneDollarStats = NonNullable<
   SiteIntegrations["onedollarstats"]
 >;
 export type SiteRybbit = NonNullable<SiteIntegrations["rybbit"]>;
+export type SiteSimpleAnalytics = NonNullable<
+  SiteIntegrations["simpleAnalytics"]
+>;
 export type SiteIntegrationUpdate = z.infer<typeof siteIntegrationUpdateSchema>;
 type SiteSecurity = z.infer<typeof siteSecuritySchema>;
 

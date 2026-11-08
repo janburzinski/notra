@@ -272,3 +272,63 @@ test("consent-gated DataFast gets the same script URL and options as the ungated
     },
   ]);
 });
+
+test("consent-gated Simple Analytics gets the same script URL and options as the ungated page", async () => {
+  const config = siteConfigSchema.parse({
+    name: "Acme",
+    integrations: {
+      c15t: { backendURL: "https://consent.acme.com" },
+      simpleAnalytics: {
+        hostname: "Blog.Acme.com",
+        scriptUrl: "https://api.acme.com/latest.js",
+        collectDnt: false,
+        ignorePages: ["/drafts/*", "/search"],
+        ignoreMetrics: ["useragent"],
+        pings: [5, 60],
+      },
+    },
+  });
+  const analytics = siteConsent(
+    config,
+    [],
+    true,
+    false,
+    "https://blog.acme.com"
+  )?.analytics;
+  const simpleAnalytics = {
+    src: "https://api.acme.com/latest.js",
+    attributes: {
+      "data-hostname": "blog.acme.com",
+      "data-collect-dnt": "false",
+      "data-ignore-pages": "/drafts/*,/search",
+      "data-ignore-metrics": "useragent",
+      "data-pings": "5,60",
+    },
+  };
+  expect(analytics?.simpleAnalytics).toEqual(simpleAnalytics);
+  expect(integrationHeadScripts(config.integrations)).toEqual([
+    {
+      kind: "external",
+      src: simpleAnalytics.src,
+      attributes: { ...simpleAnalytics.attributes, async: true },
+    },
+  ]);
+
+  Object.assign(globals, {
+    __NOTRA_CONSENT_ANALYTICS__: { simpleAnalytics },
+    __NOTRA_HOSTING_DOMAIN__: null,
+    __NOTRA_CONSENT_STORAGE_KEY__: "__Host-c15t",
+    location: { hostname: "blog.acme.com" },
+    document: { cookie: "" },
+  });
+  const variant = "simple-analytics";
+  const { default: client } = await import(`../src/c15t.client.ts?${variant}`);
+  expect(client.scripts).toEqual([
+    {
+      id: "simple-analytics",
+      category: "measurement",
+      async: true,
+      ...simpleAnalytics,
+    },
+  ]);
+});

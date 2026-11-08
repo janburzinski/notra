@@ -14,6 +14,8 @@ import {
   POSTHOG_DEFAULT_API_HOST,
   POSTHOG_LOADER,
   RYBBIT_SCRIPT_URL,
+  SIMPLE_ANALYTICS_QUEUE_ORIGIN,
+  SIMPLE_ANALYTICS_SCRIPT_URL,
   UMAMI_CONNECT_ORIGIN,
   UMAMI_SCRIPT_URL,
 } from "@notra/sites-core/constants/integrations";
@@ -24,6 +26,7 @@ import type {
   SiteIntegrations,
   SiteOneDollarStats,
   SiteRybbit,
+  SiteSimpleAnalytics,
 } from "@notra/sites-core/types/site-integrations";
 import { dataAttributes } from "@notra/sites-core/utils/data-attributes";
 
@@ -81,6 +84,23 @@ export function oneDollarStatsScript({
   };
 }
 
+export function simpleAnalyticsScript({
+  scriptUrl,
+  ...options
+}: SiteSimpleAnalytics) {
+  return {
+    src: scriptUrl ?? SIMPLE_ANALYTICS_SCRIPT_URL,
+    attributes: dataAttributes(
+      Object.fromEntries(
+        Object.entries(options).map(([key, value]) => [
+          key,
+          Array.isArray(value) ? value.join(",") : value,
+        ])
+      )
+    ),
+  };
+}
+
 export function inlineScriptLiteral(value: unknown): string {
   return JSON.stringify(value)
     .replaceAll("<", "\\u003c")
@@ -105,6 +125,7 @@ export function integrationHeadScripts(
     plausible,
     posthog,
     rybbit,
+    simpleAnalytics,
     umami,
   } = integrations;
   if (capless) {
@@ -200,6 +221,14 @@ export function integrationHeadScripts(
       attributes: { ...attributes, defer: true },
     });
   }
+  if (simpleAnalytics) {
+    const { src, attributes } = simpleAnalyticsScript(simpleAnalytics);
+    scripts.push({
+      kind: "external",
+      src,
+      attributes: { ...attributes, async: true },
+    });
+  }
   if (umami) {
     scripts.push({
       kind: "external",
@@ -235,6 +264,7 @@ export function integrationCspSources(
     plausible,
     posthog,
     rybbit,
+    simpleAnalytics,
     umami,
   } = integrations;
   if (c15t) {
@@ -293,6 +323,14 @@ export function integrationCspSources(
     const origin = new URL(rybbit.scriptUrl ?? RYBBIT_SCRIPT_URL).origin;
     scriptSrc.push(origin);
     connectSrc.push(origin);
+  }
+  if (simpleAnalytics) {
+    const defaultOrigin = new URL(SIMPLE_ANALYTICS_SCRIPT_URL).origin;
+    const origin = new URL(simpleAnalytics.scriptUrl ?? defaultOrigin).origin;
+    scriptSrc.push(origin);
+    connectSrc.push(
+      origin === defaultOrigin ? SIMPLE_ANALYTICS_QUEUE_ORIGIN : origin
+    );
   }
   if (umami) {
     const scriptOrigin = new URL(umami.scriptUrl ?? UMAMI_SCRIPT_URL).origin;

@@ -7,6 +7,7 @@ import { OneDollarStats } from "@notra/ui/components/ui/svgs/oneDollarStats";
 import { Plausible } from "@notra/ui/components/ui/svgs/plausible";
 import { PostHog } from "@notra/ui/components/ui/svgs/posthog";
 import { Rybbit } from "@notra/ui/components/ui/svgs/rybbit";
+import { SimpleAnalytics } from "@notra/ui/components/ui/svgs/simpleAnalytics";
 import { Umami } from "@notra/ui/components/ui/svgs/umami";
 
 import type { StatusBadgeAppearance } from "@/types/components/status-badge";
@@ -101,6 +102,21 @@ export const SITE_INTEGRATION_PROVIDERS: readonly SiteIntegrationProvider[] = [
         placeholder: "https://app.rybbit.io/api/script.js",
         optional: true,
       },
+    ],
+  },
+  {
+    id: "simpleAnalytics",
+    name: "Simple Analytics",
+    logo: SimpleAnalytics,
+    docsUrl: "https://docs.simpleanalytics.com/script",
+    fields: [
+      { key: "hostname", placeholder: "blog.acme.com" },
+      {
+        key: "scriptUrl",
+        placeholder: "https://scripts.simpleanalyticscdn.com/latest.js",
+        optional: true,
+      },
+      { key: "collectDnt", type: "boolean", defaultValue: false },
     ],
   },
   {

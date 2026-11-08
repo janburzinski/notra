@@ -14,6 +14,7 @@ import { onedollarstats } from "./providers/onedollarstats";
 import { plausible } from "./providers/plausible";
 import { posthog } from "./providers/posthog";
 import { rybbit } from "./providers/rybbit";
+import { simpleAnalytics } from "./providers/simple-analytics";
 import { umami } from "./providers/umami";
 import type { AnalyticsProvider, CollectedEvent, VendorScripts } from "./types";
 
@@ -29,6 +30,7 @@ export const ANALYTICS_PROVIDERS: AnalyticsProvider[] = [
   plausible,
   posthog,
   rybbit,
+  simpleAnalytics,
   umami,
 ];
 

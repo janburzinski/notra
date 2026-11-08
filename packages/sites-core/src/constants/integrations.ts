@@ -54,6 +54,30 @@ export const ONEDOLLARSTATS_HOSTNAME_MESSAGE =
   "Use the domain as added in OneDollarStats, e.g. acme.com";
 export const ONEDOLLARSTATS_PROP_NAME = /^[^\s;=]{1,64}$/;
 export const ONEDOLLARSTATS_PROP_VALUE = /^[^;=]{1,200}$/;
+export const SIMPLE_ANALYTICS_SCRIPT_URL =
+  "https://scripts.simpleanalyticscdn.com/latest.js";
+export const SIMPLE_ANALYTICS_QUEUE_ORIGIN =
+  "https://queue.simpleanalyticscdn.com";
+export const SIMPLE_ANALYTICS_HOSTNAME_MESSAGE =
+  "Use the domain as added in Simple Analytics, e.g. acme.com";
+export const SIMPLE_ANALYTICS_PAGE_PATTERN = /^\/?[^\s"'<>,]{1,200}$/;
+export const SIMPLE_ANALYTICS_PARAM = /^[A-Za-z0-9_.~-]{1,100}$/;
+export const SIMPLE_ANALYTICS_GLOBAL = /^[A-Za-z_$][\w$]{0,63}$/;
+export const SIMPLE_ANALYTICS_METRICS = [
+  "referrer",
+  "utm",
+  "country",
+  "session",
+  "timeonpage",
+  "scrolled",
+  "useragent",
+  "screensize",
+  "viewportsize",
+  "language",
+  "querykeys",
+] as const;
+export const SIMPLE_ANALYTICS_MAX_ITEMS = 50;
+export const SIMPLE_ANALYTICS_MAX_PING_SECONDS = 86_400;
 
 export const PLAUSIBLE_SCRIPT_URL = "https://plausible.io/js/script.js";
 
@@ -74,6 +98,9 @@ export const HTTPS_SCRIPT_URL = new RegExp(
 );
 export const RYBBIT_SCRIPT_URL_PATTERN = new RegExp(
   String.raw`^https:\/\/${HOST}${PORT}(?:\/(?!\.{1,2}(?:\/|$))[A-Za-z0-9._~-]+)*\/script\.js$`
+);
+export const SIMPLE_ANALYTICS_SCRIPT_URL_PATTERN = new RegExp(
+  String.raw`^https:\/\/${HOST}${PORT}(?:\/(?!\.{1,2}(?:\/|$))[A-Za-z0-9._~-]+)*\/[A-Za-z0-9._~-]+\.js$`
 );
 export const CSP_ORIGIN = new RegExp(
   String.raw`^(?:https|wss):\/\/(?:\*\.)?${HOST}${PORT}$`

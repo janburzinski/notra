@@ -305,6 +305,7 @@
                   "sites/integrations/analytics/rybbit",
                   "sites/integrations/analytics/datafast",
                   "sites/integrations/analytics/onedollarstats",
+                  "sites/integrations/analytics/simple-analytics",
                   "sites/integrations/analytics/capless"
                 ]
               },

@@ -9819,6 +9819,7 @@
         "plausible": "Easy to use and privacy-friendly Google Analytics alternative.",
         "posthog": "Product analytics with session replay and feature flags.",
         "rybbit": "Open-source, cookieless web analytics with session replay.",
+        "simpleAnalytics": "Privacy-first web analytics without cookies.",
         "umami": "Open-source, cookie-free analytics.",
         "ga4": "Web analytics from Google.",
         "onedollarstats": "Simple, cookieless web analytics for $1 a month."
@@ -9850,6 +9851,11 @@
         "rybbit": {
           "siteId": "Site ID",
           "scriptUrl": "Script URL"
+        },
+        "simpleAnalytics": {
+          "hostname": "Domain",
+          "scriptUrl": "Script URL",
+          "collectDnt": "Count Do Not Track visits"
         },
         "umami": {
           "websiteId": "Website ID",
@@ -9901,6 +9907,10 @@
           "siteId": "Copy the Site ID from your Rybbit tracking code",
           "scriptUrl": "Use the URL of your Rybbit instance's script.js, e.g. https://stats.acme.com/api/script.js"
         },
+        "simpleAnalytics": {
+          "hostname": "Use the domain as added in Simple Analytics, e.g. acme.com",
+          "scriptUrl": "Use the https:// URL of the script on your custom domain, e.g. https://api.acme.com/latest.js"
+        },
         "umami": {
           "websiteId": "Copy the Website ID from Umami's tracking code",
           "scriptUrl": "Use the full https:// script URL including its path, without query or hash",
@@ -9929,6 +9939,11 @@
         "rybbit": {
           "siteId": "In Rybbit, copy the siteId from your tracking code's script URL.",
           "scriptUrl": "Leave empty for Rybbit Cloud. For self-hosting, enter your instance's script URL ending in /script.js. Skipped paths, session replay and more are available in blog.json."
+        },
+        "simpleAnalytics": {
+          "hostname": "The website domain exactly as you added it in Simple Analytics, without https://.",
+          "scriptUrl": "Leave empty to load the script from Simple Analytics. To bypass ad blockers, enter the latest.js on your custom subdomain. Ignored pages, allowed parameters and more are available in blog.json.",
+          "collectDnt": "Also count visitors who enabled Do Not Track in their browser."
         },
         "umami": {
           "scriptUrl": "Leave empty for Umami Cloud. For self-hosting, copy the full HTTPS script URL from your tracking code.",

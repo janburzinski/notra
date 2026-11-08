@@ -9,6 +9,7 @@ export const SITE_INTEGRATION_NAMES: Record<keyof SiteIntegrations, string> = {
   plausible: "Plausible",
   posthog: "PostHog",
   rybbit: "Rybbit",
+  simpleAnalytics: "Simple Analytics",
   umami: "Umami",
   c15t: "c15t cookie banner",
   indexnow: "IndexNow",

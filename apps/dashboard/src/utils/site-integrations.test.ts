@@ -27,6 +27,11 @@ test("every dashboard provider submits the same shape accepted by the API", () =
       siteId: "123",
       scriptUrl: "https://stats.acme.com/api/script.js",
     },
+    simpleAnalytics: {
+      hostname: "blog.acme.com",
+      scriptUrl: "https://api.acme.com/latest.js",
+      collectDnt: true,
+    },
     umami: {
       websiteId: "94db1cb1-74f4-4a40-ad6c-962362670409",
       scriptUrl: "https://stats.acme.com/script.js",
@@ -149,6 +154,7 @@ test("Umami Cloud needs only a Website ID and invalid inputs report field errors
     "plausible",
     "posthog",
     "rybbit",
+    "simpleAnalytics",
     "umami",
   ]);
 });

@@ -12,6 +12,7 @@ import {
   datafastScript,
   oneDollarStatsScript,
   rybbitScript,
+  simpleAnalyticsScript,
 } from "@notra/sites-core/utils/integrations";
 
 import type {
@@ -35,6 +36,7 @@ function consentAnalytics({
   plausible,
   posthog,
   rybbit,
+  simpleAnalytics,
   umami,
 }: SiteIntegrations): SiteConsentAnalytics {
   const databuddyConfig = databuddy && {
@@ -66,6 +68,7 @@ function consentAnalytics({
         : undefined,
     },
     rybbit: rybbit && rybbitScript(rybbit),
+    simpleAnalytics: simpleAnalytics && simpleAnalyticsScript(simpleAnalytics),
     umami: umami && {
       websiteId: umami.websiteId,
       scriptUrl: umami.scriptUrl,

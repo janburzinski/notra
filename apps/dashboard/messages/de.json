@@ -9819,6 +9819,7 @@
         "plausible": "Einfache und datenschutzfreundliche Alternative zu Google Analytics.",
         "posthog": "Product Analytics mit Session Replay und Feature Flags.",
         "rybbit": "Open-Source-Web-Analytics ohne Cookies, mit Session Replay.",
+        "simpleAnalytics": "Datenschutzfreundliche Web-Analytics ohne Cookies.",
         "umami": "Open-Source-Analytics ohne Cookies.",
         "ga4": "Web-Analytics von Google.",
         "onedollarstats": "Einfache Web-Analytics ohne Cookies für 1 $ im Monat."
@@ -9850,6 +9851,11 @@
         "rybbit": {
           "siteId": "Site-ID",
           "scriptUrl": "Script-URL"
+        },
+        "simpleAnalytics": {
+          "hostname": "Domain",
+          "scriptUrl": "Script-URL",
+          "collectDnt": "Do-Not-Track-Besuche zählen"
         },
         "umami": {
           "websiteId": "Website-ID",
@@ -9901,6 +9907,10 @@
           "siteId": "Kopiere die Site-ID aus dem Tracking-Code von Rybbit",
           "scriptUrl": "Nutze die URL zur script.js deiner Rybbit-Instanz, z. B. https://stats.acme.com/api/script.js"
         },
+        "simpleAnalytics": {
+          "hostname": "Nutze die Domain, wie du sie in Simple Analytics angelegt hast, z. B. acme.com",
+          "scriptUrl": "Nutze die https://-URL des Scripts auf deiner eigenen Domain, z. B. https://api.acme.com/latest.js"
+        },
         "umami": {
           "websiteId": "Kopiere die Website-ID aus dem Tracking-Code von Umami",
           "scriptUrl": "Nutze die vollständige https://-Script-URL mit Pfad, ohne Query oder Hash",
@@ -9929,6 +9939,11 @@
         "rybbit": {
           "siteId": "Kopiere in Rybbit die siteId aus der Script-URL deines Tracking-Codes.",
           "scriptUrl": "Leer lassen für Rybbit Cloud. Bei Self-Hosting die Script-URL deiner Instanz mit /script.js am Ende eintragen. Ausgeschlossene Pfade, Session Replay und mehr gibt es in der blog.json."
+        },
+        "simpleAnalytics": {
+          "hostname": "Die Domain der Website genau so, wie du sie in Simple Analytics angelegt hast, ohne https://.",
+          "scriptUrl": "Leer lassen, um das Script von Simple Analytics zu laden. Um Adblocker zu umgehen, trag die latest.js deiner eigenen Subdomain ein. Ignorierte Seiten, erlaubte Parameter und mehr gibt es in der blog.json.",
+          "collectDnt": "Zählt auch Besucher, die in ihrem Browser Do Not Track aktiviert haben."
         },
         "umami": {
           "scriptUrl": "Für Umami Cloud leer lassen. Bei Self-Hosting die vollständige HTTPS-Script-URL aus deinem Tracking-Code kopieren.",

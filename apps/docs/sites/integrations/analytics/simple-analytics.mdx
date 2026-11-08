@@ -1,0 +1,100 @@
+---
+title: "Simple Analytics"
+description: "Send visits and events on your Notra site to Simple Analytics, with every script option available in blog.json."
+authors:
+  - handle: dominik
+
+docolin:
+  schema_version: 1
+  kind: tools/notra/sites/integrations/analytics/simple-analytics
+  type: how-to
+  applies_to:
+    - notra
+  language: en
+  status: stable
+---
+
+Notra loads the Simple Analytics script on every live page and allows its hosts in the CSP. It passes every option you set in `blog.json` to the script as a `data-*` attribute, so you can ignore pages, collect extra query parameters and limit the metrics Simple Analytics collects without writing a custom script.
+
+With the [c15t cookie banner](/sites/integrations/consent/c15t) on, Simple Analytics loads through c15t instead, only after a visitor allows the measurement category, and keeps every option below.
+
+<Steps>
+  <Step title="Add your website in Simple Analytics">
+    In [Simple Analytics](https://www.simpleanalytics.com), add your site's domain as a website, like `blog.acme.com`. Simple Analytics identifies websites by their domain, so you don't need an ID or an API key.
+  </Step>
+  <Step title="Add it to Notra">
+    Open **Studio → Sites**, select your site, open **Integrations** and click **Add Simple Analytics**. Enter the same domain under **Domain**, and if you set up a custom subdomain to bypass ad blockers, enter its script URL under **Script URL** as well. When you click **Save**, Notra opens a pull request with the change. To configure it in your repository instead, add it to `blog.json`:
+
+    ```json blog.json
+    {
+      "$schema": "https://usenotra.com/schemas/blog.json",
+      "name": "Acme",
+      "integrations": {
+        "simpleAnalytics": {
+          "hostname": "blog.acme.com",
+          "ignorePages": ["/drafts/*"]
+        }
+      }
+    }
+    ```
+  </Step>
+  <Step title="Merge and verify">
+    After you [merge the change](/sites/integrations/analytics/overview#set-up-in-the-dashboard) and the production deployment finishes, visit your live site and check the dashboard of your website in Simple Analytics.
+  </Step>
+</Steps>
+
+## Options
+
+The dashboard covers the domain, the script URL and Do Not Track. You set every other option in `blog.json`, and editing the integration in the dashboard keeps those options as they are.
+
+| Setting | Dashboard field | Description |
+| --- | --- | --- |
+| `hostname` | **Domain** | Domain of your website in Simple Analytics without `https://`, like `blog.acme.com`. Notra always sends it, so visits on every domain your site is served on count for this website |
+| `scriptUrl` | **Script URL** | HTTPS URL of the script, which is `https://scripts.simpleanalyticscdn.com/latest.js` unless you set the `latest.js` on your [custom subdomain](#bypass-ad-blockers), like `https://api.acme.com/latest.js` |
+| `collectDnt` | **Count Do Not Track visits** | Counts visitors who turned on Do Not Track in their browser when `true`, while the default of `false` skips them |
+| `ignorePages` | | Up to 50 paths that Simple Analytics never tracks, where `*` matches any characters, like `["/drafts/*", "/search"]` |
+| `allowParams` | | Up to 50 query parameter names whose values Simple Analytics collects next to the UTM parameters, like `["page"]` |
+| `strictUtm` | | Collects only campaign parameters with the `utm_` prefix when `true`, so plain parameters like `source` and `medium` no longer count, with a default of `false` |
+| `nonUniqueHostnames` | | Up to 50 referrer domains whose visitors don't count as unique, like `["app.acme.com"]` when people arrive from your own app |
+| `ignoreMetrics` | | Metrics the script never collects, chosen from `referrer`, `utm`, `country`, `session`, `timeonpage`, `scrolled`, `useragent`, `screensize`, `viewportsize`, `language` and `querykeys` |
+| `pings` | | Up to 50 numbers of seconds of visible time after which the script already sends the time on page, so it still arrives when a browser closes the tab without telling the page, like `[5, 60]` |
+| `detect404` | | Sends a `page_404` event when a page mentions 404 and the server really returns that status, with a default of `false` |
+| `mode` | | Counts every change of the URL fragment as its own page view when set to `"hash"`, while fragments are ignored by default |
+| `autoCollect` | | Counts page views automatically when `true`, which is the default. With `false` you send them yourself by calling `sa_pageview` from a [custom script](/sites/custom-scripts) |
+| `referrer` | | Referrer that every page view reports instead of the browser's referrer, which you usually leave out |
+| `namespace` | | Prefix of the global functions the script defines, which is `"sa"` unless you change it, so `"analytics"` gives you `analytics_event` and `analytics_pageview` |
+| `saGlobal` | | Global name of the event function, which is `<namespace>_event` unless you change it |
+| `pathOverwriter` | | Name of a global function from a custom script that receives `{ path }` and returns the path Simple Analytics should report |
+| `metadataCollector` | | Name of a global function from a custom script that returns metadata for every page view and event |
+
+The function and namespace options take a JavaScript identifier, like `rewritePath`.
+
+Notra adds the origin of the script to `script-src` and the host that receives events to `connect-src` in the [Content-Security-Policy](/sites/custom-scripts#content-security-policy). That host is `https://queue.simpleanalyticscdn.com` for the default script and the origin of `scriptUrl` when you set one.
+
+## Bypass ad blockers
+
+Some ad blockers block the Simple Analytics domains. To avoid that, add a CNAME record for a subdomain like `api.acme.com` that points to `simpleanalyticsexternal.com`, save the subdomain in your website settings in Simple Analytics as its [bypass guide](https://docs.simpleanalytics.com/bypass-ad-blockers) describes and set `scriptUrl` to `https://api.acme.com/latest.js`. The script then loads from your subdomain and sends its events back to it.
+
+## Custom events
+
+To track clicks in your own components and MDX, add `data-simple-event` to an element. Simple Analytics then sends an event with that name when a visitor clicks it, or submits it if the element is a form, and uses the element's `data-simple-event-*` attributes as metadata:
+
+```html
+<a href="/pricing" data-simple-event="pricing_clicked" data-simple-event-placement="changelog-footer">See pricing</a>
+```
+
+From a [custom script](/sites/custom-scripts), call `sa_event("pricing_clicked")`, or use your `namespace` or `saGlobal` if you set one, as [the events docs of Simple Analytics](https://docs.simpleanalytics.com/events) describe. Custom scripts can run before Simple Analytics loads, and with the c15t banner on it only loads after a visitor allows measurement, so define a queue first. Simple Analytics sends the queued events once it loads and drops them if it never does:
+
+```js script.js
+window.sa_event =
+  window.sa_event ||
+  function () {
+    (window.sa_event.q = window.sa_event.q || []).push([].slice.call(arguments));
+  };
+
+sa_event("pricing_clicked");
+```
+
+## Privacy
+
+Simple Analytics sets no cookies and stores nothing in the browser's local or session storage, and it collects no personal data. It skips visitors who turned on Do Not Track unless you set `collectDnt` to `true`, so turning on Do Not Track in your own browser also stops it from counting your visits.

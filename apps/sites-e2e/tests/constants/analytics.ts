@@ -105,6 +105,13 @@ export const LIVE_PAGE_VIEWS: CollectedEvent[] = [
     at: 0,
   },
   {
+    provider: "simpleAnalytics",
+    url: `https://queue.simpleanalyticscdn.com/simple.gif?version=12&hostname=acme.example.com&https=false&timezone=Europe%2FBerlin&sri=false&type=pageview&src=https%3A%2F%2Fscripts.simpleanalyticscdn.com%2Flatest.js&k=&metadata=%7B%22type%22%3A%22pageview%22%2C%22path%22%3A%22${encodeURIComponent(new URL(ANALYTICS_PAGE).pathname)}%22%7D&path=${encodeURIComponent(new URL(ANALYTICS_PAGE).pathname)}&unique=true&hostname_original=${encodeURIComponent(new URL(ANALYTICS_PAGE).host)}&time=0`,
+    method: "GET",
+    body: null,
+    at: 0,
+  },
+  {
     provider: "umami",
     url: "https://gateway.umami.is/api/send",
     method: "POST",

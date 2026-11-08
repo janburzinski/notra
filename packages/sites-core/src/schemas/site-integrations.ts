@@ -43,6 +43,14 @@ import {
   RYBBIT_SCRIPT_URL_PATTERN,
   RYBBIT_SITE_ID,
   RYBBIT_SITE_ID_MESSAGE,
+  SIMPLE_ANALYTICS_GLOBAL,
+  SIMPLE_ANALYTICS_HOSTNAME_MESSAGE,
+  SIMPLE_ANALYTICS_MAX_ITEMS,
+  SIMPLE_ANALYTICS_MAX_PING_SECONDS,
+  SIMPLE_ANALYTICS_METRICS,
+  SIMPLE_ANALYTICS_PAGE_PATTERN,
+  SIMPLE_ANALYTICS_PARAM,
+  SIMPLE_ANALYTICS_SCRIPT_URL_PATTERN,
   TRAILING_SLASHES,
 } from "@notra/sites-core/constants/integrations";
 import { SITE_CSP_MAX_ALLOWED_ORIGINS } from "@notra/sites-core/constants/security";
@@ -419,6 +427,127 @@ const oneDollarStatsSchema = z.strictObject({
     ),
 });
 
+const simpleAnalyticsGlobalSchema = z
+  .string()
+  .trim()
+  .regex(SIMPLE_ANALYTICS_GLOBAL, "Use a JavaScript identifier, e.g. sa")
+  .optional();
+
+const simpleAnalyticsSchema = z.strictObject({
+  hostname: z
+    .string({ error: SIMPLE_ANALYTICS_HOSTNAME_MESSAGE })
+    .trim()
+    .toLowerCase()
+    .regex(HOSTNAME, SIMPLE_ANALYTICS_HOSTNAME_MESSAGE)
+    .describe(
+      "Website domain as added in Simple Analytics, without https:// (e.g. blog.acme.com). Page views from every domain your Site is served on are counted for this website."
+    ),
+  scriptUrl: z
+    .string()
+    .trim()
+    .regex(
+      SIMPLE_ANALYTICS_SCRIPT_URL_PATTERN,
+      "Use the https:// URL of the script on your custom domain, e.g. https://api.acme.com/latest.js"
+    )
+    .optional()
+    .describe(
+      "Tracker script URL. Defaults to https://scripts.simpleanalyticscdn.com/latest.js; set it to the latest.js on your ad-blocker bypass subdomain, e.g. https://api.acme.com/latest.js. Events go to the same host."
+    ),
+  mode: z
+    .enum(["hash"])
+    .optional()
+    .describe(
+      'Set to "hash" to count every #hash change as its own page view (default: hashes are ignored).'
+    ),
+  collectDnt: optionalBooleanSchema.describe(
+    "Count visitors who enabled Do Not Track in their browser (default: false)."
+  ),
+  autoCollect: optionalBooleanSchema.describe(
+    "Count page views automatically. Set to false to send them yourself through the sa_pageview function (default: true)."
+  ),
+  ignorePages: z
+    .array(
+      z
+        .string()
+        .trim()
+        .regex(
+          SIMPLE_ANALYTICS_PAGE_PATTERN,
+          "Use a path like /drafts/* without commas or spaces"
+        )
+    )
+    .max(SIMPLE_ANALYTICS_MAX_ITEMS)
+    .optional()
+    .describe(
+      'Up to 50 paths that are never tracked, where * matches any characters, e.g. ["/drafts/*", "/search"].'
+    ),
+  allowParams: z
+    .array(
+      z
+        .string()
+        .trim()
+        .regex(SIMPLE_ANALYTICS_PARAM, "Use a query parameter name, e.g. page")
+    )
+    .max(SIMPLE_ANALYTICS_MAX_ITEMS)
+    .optional()
+    .describe(
+      'Up to 50 query parameters whose values are collected next to the UTM parameters, e.g. ["page", "category"].'
+    ),
+  nonUniqueHostnames: z
+    .array(
+      z
+        .string()
+        .trim()
+        .toLowerCase()
+        .regex(HOSTNAME, "Use a domain without https://, e.g. app.acme.com")
+    )
+    .max(SIMPLE_ANALYTICS_MAX_ITEMS)
+    .optional()
+    .describe(
+      'Up to 50 referrer domains whose visitors are not counted as unique, e.g. ["app.acme.com"] when people arrive from your own app.'
+    ),
+  ignoreMetrics: z
+    .array(z.enum(SIMPLE_ANALYTICS_METRICS))
+    .max(SIMPLE_ANALYTICS_METRICS.length)
+    .optional()
+    .describe(
+      'Metrics the script never collects, e.g. ["useragent", "timeonpage"] (default: every metric is collected).'
+    ),
+  strictUtm: optionalBooleanSchema.describe(
+    "Only collect utm_-prefixed campaign parameters, so source, medium and similar plain parameters are ignored (default: false)."
+  ),
+  pings: z
+    .array(z.number().int().min(1).max(SIMPLE_ANALYTICS_MAX_PING_SECONDS))
+    .max(SIMPLE_ANALYTICS_MAX_ITEMS)
+    .optional()
+    .describe(
+      "Seconds of visible time after which the time on page is sent even when no leave event fires, e.g. [5, 60] (default: no pings)."
+    ),
+  detect404: optionalBooleanSchema.describe(
+    "Send a page_404 event when a page that mentions 404 really returns a 404 status (default: false)."
+  ),
+  referrer: z
+    .string()
+    .trim()
+    .min(1)
+    .max(500)
+    .optional()
+    .describe(
+      "Referrer reported for every page view instead of the browser's referrer. Usually left empty."
+    ),
+  namespace: simpleAnalyticsGlobalSchema.describe(
+    'Prefix of the global functions the script defines, such as sa_event and sa_pageview (default: "sa").'
+  ),
+  saGlobal: simpleAnalyticsGlobalSchema.describe(
+    'Global name of the event function (default: "<namespace>_event").'
+  ),
+  pathOverwriter: simpleAnalyticsGlobalSchema.describe(
+    "Name of a window function that receives { path } and returns the path to report, e.g. from a custom script."
+  ),
+  metadataCollector: simpleAnalyticsGlobalSchema.describe(
+    "Name of a window function that returns metadata to attach to every page view and event."
+  ),
+});
+
 const ga4Schema = z.strictObject({
   measurementId: z
     .string({ error: "Use the measurement ID (G-…)" })
@@ -782,6 +911,7 @@ export const siteIntegrationSchemas = {
   plausible: plausibleSchema,
   posthog: posthogSchema,
   rybbit: rybbitSchema,
+  simpleAnalytics: simpleAnalyticsSchema,
   umami: umamiSchema,
 };
 
@@ -819,6 +949,10 @@ export const siteIntegrationUpdateSchema = z.discriminatedUnion("provider", [
     provider: z.literal("rybbit"),
     settings: rybbitSchema.nullable(),
   }),
+  z.object({
+    provider: z.literal("simpleAnalytics"),
+    settings: simpleAnalyticsSchema.nullable(),
+  }),
 ]);
 
 export const siteIntegrationsSchema = z
@@ -831,6 +965,7 @@ export const siteIntegrationsSchema = z
     plausible: plausibleSchema.optional(),
     posthog: posthogSchema.optional(),
     rybbit: rybbitSchema.optional(),
+    simpleAnalytics: simpleAnalyticsSchema.optional(),
     umami: umamiSchema.optional(),
     c15t: c15tSchema.optional(),
     indexnow: z
