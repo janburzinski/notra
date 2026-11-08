@@ -1,4 +1,5 @@
 import {
+  GITHUB_MENTION_HISTORY,
   GITHUB_MENTION_PULL_REQUEST_CHANGES,
   GITHUB_MENTION_REPOSITORY_READ_LIMITS,
 } from "@notra/ai/constants/github-mention";
@@ -157,6 +158,14 @@ export const githubMentionFileReadSchema = z.object({
 });
 
 export const githubMentionPullRequestChangesSchema = z.strictObject({
+  pullRequestNumber: z
+    .number()
+    .int()
+    .min(1)
+    .optional()
+    .describe(
+      "Another pull request in this repository, for example one from listPullRequests. Defaults to the pull request you were mentioned on."
+    ),
   page: z
     .number()
     .int()
@@ -170,6 +179,61 @@ export const githubMentionPullRequestChangesSchema = z.strictObject({
     .max(GITHUB_MENTION_PULL_REQUEST_CHANGES.fileMax)
     .default(GITHUB_MENTION_PULL_REQUEST_CHANGES.fileDefault)
     .describe("Files per page; defaults to 30, at most 100"),
+});
+
+const historyPageSchema = {
+  page: z
+    .number()
+    .int()
+    .min(1)
+    .default(1)
+    .describe("Page to read; use nextPage to continue"),
+  perPage: z
+    .number()
+    .int()
+    .min(1)
+    .max(GITHUB_MENTION_HISTORY.perPageMax)
+    .default(GITHUB_MENTION_HISTORY.perPageDefault)
+    .describe("Entries per page; defaults to 30, at most 100"),
+};
+
+export const githubMentionCommitHistorySchema = z.strictObject({
+  ref: z
+    .string()
+    .trim()
+    .min(1)
+    .optional()
+    .describe(
+      "Branch name or commit SHA to read history from. Defaults to the repository's default branch."
+    ),
+  path: z
+    .string()
+    .trim()
+    .min(1)
+    .optional()
+    .describe("Only commits touching this file or directory, e.g. apps/blog"),
+  since: z.iso
+    .datetime({ offset: true })
+    .optional()
+    .describe("Only commits after this ISO 8601 timestamp"),
+  ...historyPageSchema,
+});
+
+export const githubMentionPullRequestListSchema = z.strictObject({
+  state: z
+    .enum(["open", "closed", "all"])
+    .default("all")
+    .describe("closed includes merged pull requests"),
+  titleContains: z
+    .string()
+    .trim()
+    .min(1)
+    .max(200)
+    .optional()
+    .describe(
+      "Case-insensitive title filter, applied within the returned page only"
+    ),
+  ...historyPageSchema,
 });
 
 export const githubMentionOgImageSchema = z.strictObject({

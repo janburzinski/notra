@@ -267,6 +267,71 @@ export async function listGitHubPullRequestCommitHeadlines(params: {
   return data.map((commit) => commit.commit.message.split(/\r?\n/, 1)[0] ?? "");
 }
 
+/** One page of a branch's commits, newest first, optionally only those touching path. */
+export async function listGitHubCommits(params: {
+  octokit: CommitFilesToPullRequestParams["octokit"];
+  owner: string;
+  repo: string;
+  ref?: string;
+  path?: string;
+  since?: string;
+  page: number;
+  perPage: number;
+  messageLimit: number;
+}) {
+  const { data } = await params.octokit.request(
+    "GET /repos/{owner}/{repo}/commits",
+    {
+      owner: params.owner,
+      repo: params.repo,
+      sha: params.ref,
+      path: params.path,
+      since: params.since,
+      per_page: params.perPage,
+      page: params.page,
+      headers: GITHUB_API_VERSION_HEADERS,
+    }
+  );
+  return data.map((commit) => ({
+    sha: commit.sha.slice(0, 12),
+    message: commit.commit.message.slice(0, params.messageLimit),
+    author: commit.author?.login ?? commit.commit.author?.name ?? null,
+    date: commit.commit.author?.date ?? null,
+  }));
+}
+
+/** One page of a repository's pull requests, most recently updated first. */
+export async function listGitHubPullRequests(params: {
+  octokit: CommitFilesToPullRequestParams["octokit"];
+  owner: string;
+  repo: string;
+  state: "open" | "closed" | "all";
+  page: number;
+  perPage: number;
+}) {
+  const { data } = await params.octokit.request(
+    "GET /repos/{owner}/{repo}/pulls",
+    {
+      owner: params.owner,
+      repo: params.repo,
+      state: params.state,
+      sort: "updated",
+      direction: "desc",
+      per_page: params.perPage,
+      page: params.page,
+      headers: GITHUB_API_VERSION_HEADERS,
+    }
+  );
+  return data.map((pullRequest) => ({
+    number: pullRequest.number,
+    title: pullRequest.title,
+    state: pullRequest.state,
+    merged: pullRequest.merged_at !== null,
+    author: pullRequest.user?.login ?? null,
+    updatedAt: pullRequest.updated_at,
+  }));
+}
+
 export async function updatePullRequestTitle(params: {
   octokit: CommitFilesToPullRequestParams["octokit"];
   owner: string;

@@ -123,6 +123,13 @@ export const GITHUB_MENTION_PULL_REQUEST_CHANGES = {
   commitLimit: 50,
 } as const;
 
+/** What listCommits and listPullRequests hand the agent per call. */
+export const GITHUB_MENTION_HISTORY = {
+  perPageDefault: 30,
+  perPageMax: 100,
+  commitMessageLimit: 500,
+} as const;
+
 export const GITHUB_MENTION_REPLY_DIFF = {
   inlineLineLimit: 24,
   totalLineLimit: 120,
