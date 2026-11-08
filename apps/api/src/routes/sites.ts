@@ -1,29 +1,49 @@
 import { createRoute } from "@hono/zod-openapi";
 import {
+  createSitePostPreviewBodySchema,
   deleteSiteAuthorQuerySchema,
+  getSiteDeploymentResponseSchema,
+  getSiteResponseSchema,
   importSiteAuthorsRequestSchema,
   importSiteAuthorsResponseSchema,
+  listSiteDeploymentsQuerySchema,
+  listSiteDeploymentsResponseSchema,
   listSitesResponseSchema,
   patchSiteAuthorPageRequestSchema,
+  publishSitePostBodySchema,
+  publishSitePostResponseSchema,
   publishSiteRequestSchema,
   publishSiteResponseSchema,
   putSiteAuthorRequestSchema,
   siteAuthorParamsSchema,
   siteAuthorsResponseSchema,
+  siteDeploymentDataSchema,
+  siteDeploymentParamsSchema,
+  siteDeploymentStartDataSchema,
+  siteDeploymentsDataSchema,
+  siteDetailDataSchema,
   siteParamsSchema,
+  sitePostParamsSchema,
+  sitePostPreviewDataSchema,
+  sitePostPreviewResponseSchema,
+  sitePostPublicationDataSchema,
+  startSiteDeploymentResponseSchema,
 } from "@notra/schemas/api/sites";
 
 import { SITES_PUBLISH_TIMEOUT_MS } from "../constants/sites";
+import { SITES_ERROR_RESPONSES } from "../constants/sites-openapi";
 import { ORGANIZATION_SCOPED_API_KEY_ERROR } from "../constants/skills";
 import { getOrganizationId } from "../utils/auth";
 import { createOpenApiApp } from "../utils/openapi-app";
 import { errorResponse, rateLimitResponse } from "../utils/openapi-responses";
+import { resolveRequestOrganization } from "../utils/organizations";
 import { enforceRatelimit, RATE_LIMITS, ratelimit } from "../utils/ratelimit";
 import { callSites, siteActorUserId, sitesErrorResponse } from "../utils/sites";
+import { callSitesApi, sitesFailureResponse } from "../utils/sites-api";
 
 export const sitesRoutes = createOpenApiApp();
 
-const SITES_TAG = "Content";
+const SITES_TAG = "Sites";
 
 const commonErrors = {
   401: errorResponse("Missing or invalid API key"),
@@ -414,4 +434,319 @@ sitesRoutes.openapi(publishSiteRoute, async (c) => {
   } catch (error) {
     return sitesErrorResponse(c, error);
   }
+});
+
+function json<T>(schema: T, description: string) {
+  return { description, content: { "application/json": { schema } } };
+}
+
+const getSiteRoute = createRoute({
+  method: "get",
+  path: "/sites/{siteId}",
+  tags: [SITES_TAG],
+  operationId: "getSite",
+  summary: "Get a Site",
+  description:
+    "Returns a Site's settings, live deployment, custom domains with their DNS records, and open previews.",
+  request: { params: siteParamsSchema },
+  responses: {
+    200: json(getSiteResponseSchema, "Site fetched successfully"),
+    ...SITES_ERROR_RESPONSES,
+  },
+});
+
+const listSiteDeploymentsRoute = createRoute({
+  method: "get",
+  path: "/sites/{siteId}/deployments",
+  tags: [SITES_TAG],
+  operationId: "listSiteDeployments",
+  summary: "List a Site's deployments",
+  description:
+    "Lists production and preview builds, newest first, with their status, commit and compiler diagnostics. Live deployments are always included.",
+  request: { params: siteParamsSchema, query: listSiteDeploymentsQuerySchema },
+  responses: {
+    200: json(
+      listSiteDeploymentsResponseSchema,
+      "Deployments fetched successfully"
+    ),
+    ...SITES_ERROR_RESPONSES,
+  },
+});
+
+const startSiteDeploymentRoute = createRoute({
+  method: "post",
+  path: "/sites/{siteId}/deployments",
+  tags: [SITES_TAG],
+  operationId: "startSiteDeployment",
+  summary: "Deploy the production branch",
+  description:
+    "Queues a production build of the newest commit on the Site's production branch. Poll GET /v1/sites/{siteId}/deployments/{deploymentId} until the status is final.",
+  request: { params: siteParamsSchema },
+  responses: {
+    202: json(startSiteDeploymentResponseSchema, "Deployment queued"),
+    ...SITES_ERROR_RESPONSES,
+  },
+});
+
+const getSiteDeploymentRoute = createRoute({
+  method: "get",
+  path: "/sites/{siteId}/deployments/{deploymentId}",
+  tags: [SITES_TAG],
+  operationId: "getSiteDeployment",
+  summary: "Get a deployment and its build log",
+  description:
+    "Returns one deployment with its compiler diagnostics and the newest build log output. Use it to follow a build or find out why one failed.",
+  request: { params: siteDeploymentParamsSchema },
+  responses: {
+    200: json(getSiteDeploymentResponseSchema, "Deployment fetched"),
+    ...SITES_ERROR_RESPONSES,
+  },
+});
+
+const redeploySiteDeploymentRoute = createRoute({
+  method: "post",
+  path: "/sites/{siteId}/deployments/{deploymentId}/redeploy",
+  tags: [SITES_TAG],
+  operationId: "redeploySiteDeployment",
+  summary: "Rebuild a deployment",
+  description:
+    "Queues a new build of the same commit, for example to retry a failed build. Rebuilding a production deployment older than the live one is a rollback and is refused; roll back in the dashboard.",
+  request: { params: siteDeploymentParamsSchema },
+  responses: {
+    202: json(startSiteDeploymentResponseSchema, "Deployment queued"),
+    ...SITES_ERROR_RESPONSES,
+  },
+});
+
+const createSitePostPreviewRoute = createRoute({
+  method: "post",
+  path: "/sites/{siteId}/post-previews",
+  tags: [SITES_TAG],
+  operationId: "createSitePostPreview",
+  summary: "Preview a post on a Site",
+  description:
+    "Builds a preview of the Site with the post added, without writing to the repository, and returns its URL. Workspace members open protected previews after signing in; set a password to share it with others. Starts a site build; poll GET /v1/sites/{siteId}/post-previews/{postId} until it is live.",
+  request: {
+    params: siteParamsSchema,
+    body: {
+      content: {
+        "application/json": { schema: createSitePostPreviewBodySchema },
+      },
+    },
+  },
+  responses: {
+    202: json(sitePostPreviewResponseSchema, "Preview queued"),
+    ...SITES_ERROR_RESPONSES,
+  },
+});
+
+const getSitePostPreviewRoute = createRoute({
+  method: "get",
+  path: "/sites/{siteId}/post-previews/{postId}",
+  tags: [SITES_TAG],
+  operationId: "getSitePostPreview",
+  summary: "Get a post preview",
+  description: "Returns the status and URL of a post's preview on a Site.",
+  request: { params: sitePostParamsSchema },
+  responses: {
+    200: json(sitePostPreviewResponseSchema, "Preview fetched"),
+    ...SITES_ERROR_RESPONSES,
+  },
+});
+
+const publishSitePostRoute = createRoute({
+  method: "post",
+  path: "/sites/{siteId}/publications",
+  tags: [SITES_TAG],
+  operationId: "publishPostToSite",
+  summary: "Publish a post to a Site",
+  description:
+    "Opens a pull request that adds a blog post or changelog to the Site's repository, with its images and frontmatter, or updates the post's open pull request. The Site goes live with the post once the pull request is merged, even when the repository publishes directly from the dashboard.",
+  request: {
+    params: siteParamsSchema,
+    body: {
+      content: { "application/json": { schema: publishSitePostBodySchema } },
+    },
+  },
+  responses: {
+    200: json(publishSitePostResponseSchema, "Pull request opened or updated"),
+    ...SITES_ERROR_RESPONSES,
+  },
+});
+
+sitesRoutes.openapi(getSiteRoute, async (c) => {
+  const scope = await resolveRequestOrganization(c);
+  if (scope.response) {
+    return scope.response;
+  }
+  const result = await callSitesApi(
+    c,
+    {
+      action: "get",
+      organizationId: scope.orgId,
+      actorUserId: siteActorUserId(c),
+      siteId: c.req.valid("param").siteId,
+    },
+    siteDetailDataSchema
+  );
+  if (!result.ok) {
+    return sitesFailureResponse(c, result);
+  }
+  return c.json({ organization: scope.organization, ...result.value }, 200);
+});
+
+sitesRoutes.openapi(listSiteDeploymentsRoute, async (c) => {
+  const scope = await resolveRequestOrganization(c);
+  if (scope.response) {
+    return scope.response;
+  }
+  const result = await callSitesApi(
+    c,
+    {
+      action: "listDeployments",
+      organizationId: scope.orgId,
+      actorUserId: siteActorUserId(c),
+      siteId: c.req.valid("param").siteId,
+      limit: c.req.valid("query").limit,
+    },
+    siteDeploymentsDataSchema
+  );
+  if (!result.ok) {
+    return sitesFailureResponse(c, result);
+  }
+  return c.json({ organization: scope.organization, ...result.value }, 200);
+});
+
+sitesRoutes.openapi(startSiteDeploymentRoute, async (c) => {
+  const scope = await resolveRequestOrganization(c);
+  if (scope.response) {
+    return scope.response;
+  }
+  const result = await callSitesApi(
+    c,
+    {
+      action: "deployLatest",
+      organizationId: scope.orgId,
+      actorUserId: siteActorUserId(c),
+      siteId: c.req.valid("param").siteId,
+    },
+    siteDeploymentStartDataSchema
+  );
+  if (!result.ok) {
+    return sitesFailureResponse(c, result);
+  }
+  return c.json({ organization: scope.organization, ...result.value }, 202);
+});
+
+sitesRoutes.openapi(getSiteDeploymentRoute, async (c) => {
+  const scope = await resolveRequestOrganization(c);
+  if (scope.response) {
+    return scope.response;
+  }
+  const { siteId, deploymentId } = c.req.valid("param");
+  const result = await callSitesApi(
+    c,
+    {
+      action: "getDeployment",
+      organizationId: scope.orgId,
+      actorUserId: siteActorUserId(c),
+      siteId,
+      deploymentId,
+    },
+    siteDeploymentDataSchema
+  );
+  if (!result.ok) {
+    return sitesFailureResponse(c, result);
+  }
+  return c.json({ organization: scope.organization, ...result.value }, 200);
+});
+
+sitesRoutes.openapi(redeploySiteDeploymentRoute, async (c) => {
+  const scope = await resolveRequestOrganization(c);
+  if (scope.response) {
+    return scope.response;
+  }
+  const { siteId, deploymentId } = c.req.valid("param");
+  const result = await callSitesApi(
+    c,
+    {
+      action: "redeploy",
+      organizationId: scope.orgId,
+      actorUserId: siteActorUserId(c),
+      siteId,
+      deploymentId,
+    },
+    siteDeploymentStartDataSchema
+  );
+  if (!result.ok) {
+    return sitesFailureResponse(c, result);
+  }
+  return c.json({ organization: scope.organization, ...result.value }, 202);
+});
+
+sitesRoutes.openapi(createSitePostPreviewRoute, async (c) => {
+  const scope = await resolveRequestOrganization(c);
+  if (scope.response) {
+    return scope.response;
+  }
+  const result = await callSitesApi(
+    c,
+    {
+      action: "previewPost",
+      organizationId: scope.orgId,
+      actorUserId: siteActorUserId(c),
+      siteId: c.req.valid("param").siteId,
+      ...c.req.valid("json"),
+    },
+    sitePostPreviewDataSchema
+  );
+  if (!result.ok) {
+    return sitesFailureResponse(c, result);
+  }
+  return c.json({ organization: scope.organization, ...result.value }, 202);
+});
+
+sitesRoutes.openapi(getSitePostPreviewRoute, async (c) => {
+  const scope = await resolveRequestOrganization(c);
+  if (scope.response) {
+    return scope.response;
+  }
+  const { siteId, postId } = c.req.valid("param");
+  const result = await callSitesApi(
+    c,
+    {
+      action: "postPreviewStatus",
+      organizationId: scope.orgId,
+      actorUserId: siteActorUserId(c),
+      siteId,
+      postId,
+    },
+    sitePostPreviewDataSchema
+  );
+  if (!result.ok) {
+    return sitesFailureResponse(c, result);
+  }
+  return c.json({ organization: scope.organization, ...result.value }, 200);
+});
+
+sitesRoutes.openapi(publishSitePostRoute, async (c) => {
+  const scope = await resolveRequestOrganization(c);
+  if (scope.response) {
+    return scope.response;
+  }
+  const result = await callSitesApi(
+    c,
+    {
+      action: "publishPost",
+      organizationId: scope.orgId,
+      actorUserId: siteActorUserId(c),
+      siteId: c.req.valid("param").siteId,
+      postId: c.req.valid("json").postId,
+    },
+    sitePostPublicationDataSchema
+  );
+  if (!result.ok) {
+    return sitesFailureResponse(c, result);
+  }
+  return c.json({ organization: scope.organization, ...result.value }, 200);
 });

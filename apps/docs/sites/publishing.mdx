@@ -27,6 +27,8 @@ Saving updates an open content pull request. In direct mode, saving updates an a
 
 Deleting a post keeps its repository files by default. Choose the removal switch to remove its recorded entry and images through the review process. Images referenced by another post's publication are kept.
 
+AI agents can open the same pull request through the [API](/api/common-tasks#publish-a-post-to-a-notra-site) and the [MCP server](/devtools/mcp#available-tools). They always open a pull request, even when the integration publishes directly.
+
 ## What triggers a deploy
 
 With automatic publishing on, production builds go live as described below.
@@ -62,6 +64,8 @@ A deployment moves through **Queued**, **Building**, **Uploading** and **Success
 | **Expired** | Notra removed the files of this old deployment, so you can't restore it |
 
 Open a deployment for its timeline, the live build log, diagnostics and the number of files it produced.
+
+AI agents can list deployments, read a build's log and diagnostics, start a production build and retry a build through the [API](/api/common-tasks#publish-a-post-to-a-notra-site) and the [MCP server](/devtools/mcp#available-tools).
 
 ### GitHub checks
 

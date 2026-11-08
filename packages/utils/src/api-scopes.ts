@@ -80,6 +80,11 @@ export const API_OPENAPI_TAGS = [
     description:
       "Manage generative engine optimization: projects, tracking settings, prompts, prompt sequences, competitors, scans, visibility reads, content gaps and briefs, agent readiness and AI traffic. Project-scoped endpoints require the GEO plan entitlement in addition to their scope; organization-level ingest endpoints require only the traffic scope.",
   },
+  {
+    name: "Sites",
+    description:
+      "Notra Sites are hosted blogs and changelogs built from a GitHub repository. Read Sites and their deployments, start builds, preview posts on a Site, open pull requests that publish posts to it, and manage blog.json authors and the author page through staged Design changes. Domains, settings, rollbacks and deletion stay in the dashboard.",
+  },
 ] as const;
 
 export type ApiOpenApiTagName = (typeof API_OPENAPI_TAGS)[number]["name"];
@@ -149,8 +154,8 @@ export const API_SCOPE_RESOURCES = [
     paths: ["/sites"],
     label: "Sites",
     description:
-      "Read and manage Notra Sites authors and publish their changes",
-    openApiTag: "Content",
+      "Read Sites, deployments and authors, build sites, and preview or publish posts and Design changes",
+    openApiTag: "Sites",
   },
   {
     id: "feedback",

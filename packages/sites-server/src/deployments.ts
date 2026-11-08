@@ -195,6 +195,9 @@ export async function enqueueSiteDeployment(
     if (input.liveDeploymentId) {
       await assertLiveBuild(tx, input.siteId, input.liveDeploymentId);
     }
+    if (input.maxLiveGeneration !== undefined) {
+      await assertLiveNotNewer(tx, input.siteId, input.maxLiveGeneration);
+    }
     if (assertCurrentHead) {
       // Keep head verification and generation allocation in the same admission order.
       await tx
@@ -576,6 +579,27 @@ async function assertLiveBuild(
   if (site?.live !== liveDeploymentId || !live || newer) {
     throw new SiteNotBuildableError(
       "The live build changed since this rebuild was planned"
+    );
+  }
+}
+
+async function assertLiveNotNewer(
+  tx: SiteStorageTransaction,
+  siteId: string,
+  maxGeneration: number
+): Promise<void> {
+  const [row] = await tx
+    .select({ generation: siteDeployments.generation })
+    .from(sites)
+    .innerJoin(
+      siteDeployments,
+      eq(siteDeployments.id, sites.activeProductionDeploymentId)
+    )
+    .where(eq(sites.id, siteId))
+    .for("update", { of: sites });
+  if (row && row.generation > maxGeneration) {
+    throw new SiteNotBuildableError(
+      "Rebuilding a production deployment older than the live one is a rollback. Roll back in the dashboard."
     );
   }
 }

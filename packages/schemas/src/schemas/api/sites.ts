@@ -5,13 +5,28 @@ import {
   SITE_AUTHOR_ID,
 } from "@notra/sites-core/constants/site-config";
 import { SITE_AUTHOR_PAGE_LAYOUTS } from "@notra/sites-core/constants/site-layout";
+import {
+  POST_PREVIEW_LIFETIMES,
+  SITE_DEPLOYMENT_KINDS,
+  SITE_DEPLOYMENT_STATUSES,
+  SITE_DEPLOYMENT_TRIGGERS,
+  SITE_DOMAIN_KINDS,
+  SITE_DOMAIN_STATUSES,
+  SITE_PREVIEW_VISIBILITIES,
+  SITE_STATUSES,
+} from "@notra/sites-core/constants/sites";
 
 import {
   CONTENT_AUTHOR_NAME_MAX_LENGTH,
   CONTENT_AUTHOR_TITLE_MAX_LENGTH,
   SITE_AUTHOR_BIO_MAX_LENGTH,
 } from "../../constants/dashboard/post-metadata";
+import {
+  SITE_API_DEPLOYMENTS_DEFAULT_LIMIT,
+  SITE_API_DEPLOYMENTS_MAX_LIMIT,
+} from "../../constants/sites-api";
 import { siteAuthorLinkSchema } from "../shared/site-authors";
+import { organizationResponseSchema } from "./content";
 import { resourceIdSchema } from "./ids";
 
 const SITE_AUTHOR_ID_MESSAGE =
@@ -308,3 +323,281 @@ export const internalPostSiteAuthorsResponseSchema = z.object({
     })
   ),
 });
+
+const POST_PREVIEW_LIFETIME_KEYS = Object.keys(POST_PREVIEW_LIFETIMES) as [
+  keyof typeof POST_PREVIEW_LIFETIMES,
+  ...(keyof typeof POST_PREVIEW_LIFETIMES)[],
+];
+
+function pathParam(name: string, example: string) {
+  return resourceIdSchema(name).openapi({
+    param: { in: "path", name },
+    example,
+  });
+}
+
+export const siteDeploymentParamsSchema = siteParamsSchema.extend({
+  deploymentId: pathParam("deploymentId", "dep_123"),
+});
+
+export const sitePostParamsSchema = siteParamsSchema.extend({
+  postId: pathParam("postId", "post_123"),
+});
+
+export const listSiteDeploymentsQuerySchema = z.object({
+  limit: z.coerce
+    .number()
+    .int()
+    .min(1)
+    .max(SITE_API_DEPLOYMENTS_MAX_LIMIT)
+    .default(SITE_API_DEPLOYMENTS_DEFAULT_LIMIT)
+    .openapi({
+      description:
+        "Newest deployments to return. Live deployments are always included.",
+    }),
+});
+
+export const createSitePostPreviewBodySchema = z.object({
+  postId: resourceIdSchema("postId").openapi({ example: "post_123" }),
+  lifetime: z.enum(POST_PREVIEW_LIFETIME_KEYS).default("1d").openapi({
+    description: "How long the preview stays open.",
+  }),
+  password: z.string().min(8).max(128).optional().openapi({
+    description:
+      "Lets people outside the workspace open the preview with this password.",
+  }),
+});
+
+export const publishSitePostBodySchema = z.object({
+  postId: resourceIdSchema("postId").openapi({ example: "post_123" }),
+});
+
+const siteRepositorySchema = z
+  .object({ id: z.string().nullable(), owner: z.string(), name: z.string() })
+  .nullable();
+
+const siteSchema = z
+  .object({
+    id: z.string(),
+    projectId: z.string(),
+    name: z.string(),
+    slug: z.string(),
+    status: z.enum(SITE_STATUSES),
+    suspendedReason: z.string().nullable(),
+    repository: siteRepositorySchema,
+    productionBranch: z.string(),
+    rootDirectory: z.string().openapi({
+      description: "Directory in the repository that holds blog.json.",
+    }),
+    liveUrl: z.string().openapi({
+      description: "Public URL of the Site's first section.",
+      example: "https://example.com/blog",
+    }),
+    publicOrigin: z.string(),
+    aliasOrigin: z.string().openapi({
+      description: "Notra-hosted address that always serves the Site.",
+    }),
+    mounts: z.object({
+      blog: z.string().optional(),
+      changelog: z.string().optional(),
+    }),
+    previewsEnabled: z.boolean(),
+    previewVisibility: z.enum(SITE_PREVIEW_VISIBILITIES),
+    smartDeployments: z.boolean(),
+    analyticsEnabled: z.boolean(),
+    liveDeploymentId: z.string().nullable(),
+    rollbackActive: z.boolean().openapi({
+      description:
+        "Production is pinned to an older build; new builds finish but don't go live until someone promotes one in the dashboard.",
+    }),
+    liveSince: z.string().nullable(),
+    createdAt: z.string(),
+  })
+  .openapi("SiteDetail");
+
+const siteDiagnosticSchema = z.object({
+  severity: z.enum(["error", "warning"]),
+  file: z.string().nullable(),
+  line: z.number().int().optional(),
+  column: z.number().int().optional(),
+  code: z.string(),
+  message: z.string(),
+});
+
+const siteDeploymentSchema = z
+  .object({
+    id: z.string(),
+    kind: z.enum(SITE_DEPLOYMENT_KINDS),
+    previewKey: z.string().nullable(),
+    trigger: z.enum(SITE_DEPLOYMENT_TRIGGERS),
+    status: z.enum(SITE_DEPLOYMENT_STATUSES).openapi({
+      description:
+        "queued, building and uploading are in progress; ready, superseded, skipped, failed, canceled and expired are final.",
+    }),
+    live: z.boolean(),
+    liveSince: z.string().nullable(),
+    branch: z.string(),
+    commitSha: z.string(),
+    commitMessage: z.string().nullable(),
+    commitAuthor: z.string().nullable(),
+    pullRequestNumber: z.number().int().nullable(),
+    url: z.string(),
+    fileCount: z.number().int().nullable(),
+    totalBytes: z.number().int().nullable(),
+    buildDurationMs: z.number().int().nullable(),
+    errorMessage: z.string().nullable(),
+    skipReason: z.string().nullable(),
+    diagnostics: z.array(siteDiagnosticSchema).openapi({
+      description: "Compiler errors and warnings with file and line.",
+    }),
+    createdAt: z.string(),
+    startedAt: z.string().nullable(),
+    finishedAt: z.string().nullable(),
+  })
+  .openapi("SiteDeployment");
+
+const siteDomainSchema = z
+  .object({
+    id: z.string(),
+    hostname: z.string(),
+    kind: z.enum(SITE_DOMAIN_KINDS),
+    status: z.enum(SITE_DOMAIN_STATUSES),
+    isPrimary: z.boolean(),
+    records: z.array(
+      z.object({
+        type: z.enum(["CNAME", "TXT", "A"]),
+        name: z.string(),
+        value: z.string(),
+        purpose: z.enum(["routing", "ownership", "certificate"]),
+      })
+    ),
+    lastError: z.string().nullable(),
+    verifiedAt: z.string().nullable(),
+  })
+  .openapi("SiteDomain");
+
+const sitePreviewSchema = z
+  .object({
+    previewKey: z.string(),
+    deploymentId: z.string(),
+    visibility: z.enum(SITE_PREVIEW_VISIBILITIES),
+    url: z.string(),
+    branch: z.string().nullable(),
+    pullRequestNumber: z.number().int().nullable(),
+    commitSha: z.string().nullable(),
+    activatedAt: z.string(),
+  })
+  .openapi("SitePreview");
+
+const sitePostPreviewSchema = z
+  .object({
+    status: z.string().openapi({
+      description: "Status of the preview's latest build.",
+    }),
+    live: z.boolean(),
+    deleting: z.boolean(),
+    errorMessage: z.string().nullable(),
+    expiresAt: z.string(),
+    hasPassword: z.boolean(),
+    url: z.string(),
+  })
+  .openapi("SitePostPreview");
+
+export const siteDetailDataSchema = z.object({
+  site: siteSchema,
+  domains: z.array(siteDomainSchema),
+  previews: z.array(sitePreviewSchema),
+});
+
+export const siteDeploymentsDataSchema = z.object({
+  deployments: z.array(siteDeploymentSchema),
+});
+
+export const siteDeploymentDataSchema = z.object({
+  deployment: siteDeploymentSchema,
+  log: z.string().nullable().openapi({
+    description: "Newest build log output, trimmed at the start when long.",
+  }),
+  logTruncated: z.boolean(),
+});
+
+export const siteDeploymentStartDataSchema = z.object({
+  deployment: siteDeploymentSchema,
+});
+
+export const sitePostPreviewDataSchema = z.object({
+  // A union keeps the registered component itself non-nullable.
+  preview: z.union([sitePostPreviewSchema, z.null()]).openapi({
+    description: "Null when the post has no preview on this Site.",
+  }),
+});
+
+export const sitePostPublicationDataSchema = z.object({
+  operation: z.enum(["created", "updated"]),
+  branchName: z.string(),
+  path: z.string(),
+  pullRequestNumber: z.number().int(),
+  pullRequestUrl: z.string(),
+});
+
+const withOrganization = <T extends z.ZodRawShape>(
+  schema: z.ZodObject<T>,
+  name: string
+) => schema.extend({ organization: organizationResponseSchema }).openapi(name);
+
+export const getSiteResponseSchema = withOrganization(
+  siteDetailDataSchema,
+  "GetSiteResponse"
+);
+export const listSiteDeploymentsResponseSchema = withOrganization(
+  siteDeploymentsDataSchema,
+  "ListSiteDeploymentsResponse"
+);
+export const getSiteDeploymentResponseSchema = withOrganization(
+  siteDeploymentDataSchema,
+  "GetSiteDeploymentResponse"
+);
+export const startSiteDeploymentResponseSchema = withOrganization(
+  siteDeploymentStartDataSchema,
+  "StartSiteDeploymentResponse"
+);
+export const sitePostPreviewResponseSchema = withOrganization(
+  sitePostPreviewDataSchema,
+  "SitePostPreviewResponse"
+);
+export const publishSitePostResponseSchema = withOrganization(
+  sitePostPublicationDataSchema,
+  "PublishSitePostResponse"
+);
+
+/** Payload the public API sends to the dashboard's internal Sites route. */
+export const internalSiteApiRequestSchema = z.discriminatedUnion("action", [
+  internalSiteScopeSchema.extend({ action: z.literal("get") }),
+  internalSiteScopeSchema.extend({
+    action: z.literal("listDeployments"),
+    limit: z.number().int().min(1).max(SITE_API_DEPLOYMENTS_MAX_LIMIT),
+  }),
+  internalSiteScopeSchema.extend({
+    action: z.literal("getDeployment"),
+    deploymentId: z.string().min(1),
+  }),
+  internalSiteScopeSchema.extend({ action: z.literal("deployLatest") }),
+  internalSiteScopeSchema.extend({
+    action: z.literal("redeploy"),
+    deploymentId: z.string().min(1),
+  }),
+  internalSiteScopeSchema.extend({
+    action: z.literal("previewPost"),
+    postId: z.string().min(1),
+    lifetime: z.enum(POST_PREVIEW_LIFETIME_KEYS),
+    password: z.string().min(8).max(128).optional(),
+  }),
+  internalSiteScopeSchema.extend({
+    action: z.literal("postPreviewStatus"),
+    postId: z.string().min(1),
+  }),
+  internalSiteScopeSchema.extend({
+    action: z.literal("publishPost"),
+    postId: z.string().min(1),
+  }),
+]);

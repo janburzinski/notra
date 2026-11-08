@@ -84,6 +84,7 @@ import { Route as ApiInternalGeoPersonaRunRouteImport } from './routes/api.inter
 import { Route as ApiInternalGeoSequenceRunRouteImport } from './routes/api.internal.geo.sequence-run'
 import { Route as ApiInternalGeoWriterPlanRouteImport } from './routes/api.internal.geo.writer-plan'
 import { Route as ApiInternalSitesAdminRouteImport } from './routes/api.internal.sites.admin'
+import { Route as ApiInternalSitesApiRouteImport } from './routes/api.internal.sites.api'
 import { Route as ApiInternalSitesAuthorsRouteImport } from './routes/api.internal.sites.authors'
 import { Route as ApiInternalWorkflowsAgentReadinessRouteImport } from './routes/api.internal.workflows.agent-readiness'
 import { Route as ApiInternalWorkflowsBrandAnalysisRouteImport } from './routes/api.internal.workflows.brand-analysis'
@@ -517,6 +518,11 @@ const ApiInternalSitesAdminRoute = ApiInternalSitesAdminRouteImport.update({
   path: '/api/internal/sites/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiInternalSitesApiRoute = ApiInternalSitesApiRouteImport.update({
+  id: '/api/internal/sites/api',
+  path: '/api/internal/sites/api',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiInternalSitesAuthorsRoute = ApiInternalSitesAuthorsRouteImport.update({
   id: '/api/internal/sites/authors',
   path: '/api/internal/sites/authors',
@@ -742,6 +748,7 @@ export interface FileRoutesByFullPath {
   '/api/internal/geo/sequence-run': typeof ApiInternalGeoSequenceRunRoute
   '/api/internal/geo/writer-plan': typeof ApiInternalGeoWriterPlanRoute
   '/api/internal/sites/admin': typeof ApiInternalSitesAdminRoute
+  '/api/internal/sites/api': typeof ApiInternalSitesApiRoute
   '/api/internal/sites/authors': typeof ApiInternalSitesAuthorsRoute
   '/api/internal/workflows/agent-readiness': typeof ApiInternalWorkflowsAgentReadinessRoute
   '/api/internal/workflows/brand-analysis': typeof ApiInternalWorkflowsBrandAnalysisRoute
@@ -844,6 +851,7 @@ export interface FileRoutesByTo {
   '/api/internal/geo/sequence-run': typeof ApiInternalGeoSequenceRunRoute
   '/api/internal/geo/writer-plan': typeof ApiInternalGeoWriterPlanRoute
   '/api/internal/sites/admin': typeof ApiInternalSitesAdminRoute
+  '/api/internal/sites/api': typeof ApiInternalSitesApiRoute
   '/api/internal/sites/authors': typeof ApiInternalSitesAuthorsRoute
   '/api/internal/workflows/agent-readiness': typeof ApiInternalWorkflowsAgentReadinessRoute
   '/api/internal/workflows/brand-analysis': typeof ApiInternalWorkflowsBrandAnalysisRoute
@@ -947,6 +955,7 @@ export interface FileRoutesById {
   '/api/internal/geo/sequence-run': typeof ApiInternalGeoSequenceRunRoute
   '/api/internal/geo/writer-plan': typeof ApiInternalGeoWriterPlanRoute
   '/api/internal/sites/admin': typeof ApiInternalSitesAdminRoute
+  '/api/internal/sites/api': typeof ApiInternalSitesApiRoute
   '/api/internal/sites/authors': typeof ApiInternalSitesAuthorsRoute
   '/api/internal/workflows/agent-readiness': typeof ApiInternalWorkflowsAgentReadinessRoute
   '/api/internal/workflows/brand-analysis': typeof ApiInternalWorkflowsBrandAnalysisRoute
@@ -1051,6 +1060,7 @@ export interface FileRouteTypes {
     | '/api/internal/geo/sequence-run'
     | '/api/internal/geo/writer-plan'
     | '/api/internal/sites/admin'
+    | '/api/internal/sites/api'
     | '/api/internal/sites/authors'
     | '/api/internal/workflows/agent-readiness'
     | '/api/internal/workflows/brand-analysis'
@@ -1153,6 +1163,7 @@ export interface FileRouteTypes {
     | '/api/internal/geo/sequence-run'
     | '/api/internal/geo/writer-plan'
     | '/api/internal/sites/admin'
+    | '/api/internal/sites/api'
     | '/api/internal/sites/authors'
     | '/api/internal/workflows/agent-readiness'
     | '/api/internal/workflows/brand-analysis'
@@ -1255,6 +1266,7 @@ export interface FileRouteTypes {
     | '/api/internal/geo/sequence-run'
     | '/api/internal/geo/writer-plan'
     | '/api/internal/sites/admin'
+    | '/api/internal/sites/api'
     | '/api/internal/sites/authors'
     | '/api/internal/workflows/agent-readiness'
     | '/api/internal/workflows/brand-analysis'
@@ -1352,6 +1364,7 @@ export interface RootRouteChildren {
   ApiInternalGeoSequenceRunRoute: typeof ApiInternalGeoSequenceRunRoute
   ApiInternalGeoWriterPlanRoute: typeof ApiInternalGeoWriterPlanRoute
   ApiInternalSitesAdminRoute: typeof ApiInternalSitesAdminRoute
+  ApiInternalSitesApiRoute: typeof ApiInternalSitesApiRoute
   ApiInternalSitesAuthorsRoute: typeof ApiInternalSitesAuthorsRoute
   ApiInternalWorkflowsAgentReadinessRoute: typeof ApiInternalWorkflowsAgentReadinessRoute
   ApiInternalWorkflowsBrandAnalysisRoute: typeof ApiInternalWorkflowsBrandAnalysisRoute
@@ -1899,6 +1912,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiInternalSitesAdminRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/internal/sites/api': {
+      id: '/api/internal/sites/api'
+      path: '/api/internal/sites/api'
+      fullPath: '/api/internal/sites/api'
+      preLoaderRoute: typeof ApiInternalSitesApiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/internal/sites/authors': {
       id: '/api/internal/sites/authors'
       path: '/api/internal/sites/authors'
@@ -2256,6 +2276,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiInternalGeoSequenceRunRoute: ApiInternalGeoSequenceRunRoute,
   ApiInternalGeoWriterPlanRoute: ApiInternalGeoWriterPlanRoute,
   ApiInternalSitesAdminRoute: ApiInternalSitesAdminRoute,
+  ApiInternalSitesApiRoute: ApiInternalSitesApiRoute,
   ApiInternalSitesAuthorsRoute: ApiInternalSitesAuthorsRoute,
   ApiInternalWorkflowsAgentReadinessRoute:
     ApiInternalWorkflowsAgentReadinessRoute,

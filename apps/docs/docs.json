@@ -524,12 +524,38 @@
                 "expanded": true,
                 "pages": [
                   "GET /v1/sites",
-                  "GET /v1/sites/{siteId}/authors",
-                  "PUT /v1/sites/{siteId}/authors/{authorId}",
-                  "DELETE /v1/sites/{siteId}/authors/{authorId}",
-                  "POST /v1/sites/{siteId}/authors/import",
-                  "PATCH /v1/sites/{siteId}/author-page",
-                  "POST /v1/sites/{siteId}/publish"
+                  "GET /v1/sites/{siteId}",
+                  {
+                    "group": "Deployments",
+                    "expanded": true,
+                    "pages": [
+                      "GET /v1/sites/{siteId}/deployments",
+                      "POST /v1/sites/{siteId}/deployments",
+                      "GET /v1/sites/{siteId}/deployments/{deploymentId}",
+                      "POST /v1/sites/{siteId}/deployments/{deploymentId}/redeploy"
+                    ]
+                  },
+                  {
+                    "group": "Posts",
+                    "expanded": true,
+                    "pages": [
+                      "POST /v1/sites/{siteId}/post-previews",
+                      "GET /v1/sites/{siteId}/post-previews/{postId}",
+                      "POST /v1/sites/{siteId}/publications"
+                    ]
+                  },
+                  {
+                    "group": "Authors and Design",
+                    "expanded": true,
+                    "pages": [
+                      "GET /v1/sites/{siteId}/authors",
+                      "PUT /v1/sites/{siteId}/authors/{authorId}",
+                      "DELETE /v1/sites/{siteId}/authors/{authorId}",
+                      "POST /v1/sites/{siteId}/authors/import",
+                      "PATCH /v1/sites/{siteId}/author-page",
+                      "POST /v1/sites/{siteId}/publish"
+                    ]
+                  }
                 ]
               },
               {

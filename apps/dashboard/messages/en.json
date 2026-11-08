@@ -605,7 +605,7 @@
           "description": "Read and manage your skills"
         },
         "sites": {
-          "description": "Read and manage Notra Sites authors and publish their changes"
+          "description": "Read Sites, deployments and authors, build sites, and preview or publish posts and Design changes"
         },
         "feedback": {
           "label": "Agent feedback",

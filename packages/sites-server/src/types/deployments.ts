@@ -40,6 +40,11 @@ export interface EnqueueDeploymentInput {
    * other production build is queued, building or newer.
    */
   liveDeploymentId?: string;
+  /**
+   * Rejects the build when the live production build is from a newer
+   * generation, so a rebuild cannot act as a rollback.
+   */
+  maxLiveGeneration?: number;
 }
 
 /** Each value is a value or the column holding it. */

@@ -316,6 +316,49 @@ curl -X PATCH "https://api.usenotra.com/v1/posts/post_abc" \
 
 The post must be a blog post that publishes to the site, and the id must be in its `blog.json` (unpublished changes count). Post responses list site authors in `metadata.authors` with ids like `site:jane-doe`.
 
+## Publish a post to a Notra Site
+
+The `/v1/sites` endpoints take a saved blog post or changelog onto a [Notra Site](/sites/publishing): preview it, open the pull request that publishes it, and follow the build. They need the `sites.read` and `sites.write` scopes. Domains, settings, rollbacks and deleting a site stay in the dashboard.
+
+Preview the post on a site without changing the repository or the live site. `lifetime` is `1h`, `1d` (the default), `3d` or `7d`. Workspace members open the preview after signing in.
+
+```bash
+curl -X POST "https://api.usenotra.com/v1/sites/site_8f2kq1/post-previews" \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{ "postId": "post_abc", "lifetime": "1d" }'
+```
+
+The response returns `202` with the preview's `url`. Poll `GET /v1/sites/site_8f2kq1/post-previews/post_abc` until `preview.live` is `true` before you share the link.
+
+Then open the pull request that adds the post to the site's repository, with its images and frontmatter:
+
+```bash
+curl -X POST "https://api.usenotra.com/v1/sites/site_8f2kq1/publications" \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{ "postId": "post_abc" }'
+```
+
+```json
+{
+  "operation": "created",
+  "branchName": "notra/blog-post-launch-3f9a1c",
+  "path": "blog/launch.md",
+  "pullRequestNumber": 42,
+  "pullRequestUrl": "https://github.com/acme/blog/pull/42"
+}
+```
+
+- The API always opens a pull request, even when the repository publishes directly from the dashboard, so the post goes live only after someone merges it. Calling it again updates the same pull request (`"operation": "updated"`).
+- A post already published to another site returns `409`. Publish it there, or move it in the dashboard.
+
+Follow the site's builds:
+
+- `GET /v1/sites/{siteId}/deployments` lists production and preview builds, newest first, with their status, commit and compiler diagnostics.
+- `GET /v1/sites/{siteId}/deployments/{deploymentId}` adds the newest part of the build log (`logTruncated` is `true` when the start was cut).
+- `POST /v1/sites/{siteId}/deployments` builds the newest commit on the production branch, and `POST /v1/sites/{siteId}/deployments/{deploymentId}/redeploy` builds a deployment's commit again. Both return `202` with the queued deployment. Rebuilding a production deployment older than the live one is a rollback and returns `403`; [roll back](/sites/publishing#roll-back-to-an-earlier-deployment) in the dashboard instead.
+
 ## Create a new post
 
 There is no `POST /v1/posts` endpoint for creating a post with arbitrary fields, because Notra creates posts through generation. Queue a job with `POST /v1/posts/generate` and then poll it until it reports a `postId`.

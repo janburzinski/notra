@@ -55,15 +55,19 @@ export async function deployBranchHead(
 export async function redeploy(
   site: Site,
   deploymentId: string,
-  userId: string
+  userId: string | null,
+  options: { refuseRollback?: boolean } = {}
 ): Promise<string> {
   const previous = await getDeployment(deploymentId);
   if (previous?.siteId !== site.id) {
     throw new SiteInputError("Deployment not found");
   }
-  const { jobId } = await enqueueSiteDeployment(
-    redeploymentInput(previous, userId)
-  );
+  const { jobId } = await enqueueSiteDeployment({
+    ...redeploymentInput(previous, userId),
+    ...(options.refuseRollback && previous.kind === "production"
+      ? { maxLiveGeneration: previous.generation }
+      : {}),
+  });
   return jobId;
 }
 

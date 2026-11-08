@@ -605,7 +605,7 @@
           "description": "Lies und verwalte deine Skills"
         },
         "sites": {
-          "description": "Lies und verwalte die Autoren deiner Notra Sites und veröffentliche ihre Änderungen"
+          "description": "Lies Sites, Deployments und Autoren, baue Sites und zeige Posts und Design-Änderungen in der Vorschau oder veröffentliche sie"
         },
         "feedback": {
           "label": "Agent-Feedback",
