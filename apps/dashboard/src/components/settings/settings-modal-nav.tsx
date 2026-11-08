@@ -195,7 +195,7 @@ export function SettingsModalNav({
       <div className="relative min-w-0 md:flex md:min-h-0 md:flex-1 md:flex-col">
         <div
           className={cn(
-            "flex min-w-0 gap-1 px-2 pb-2",
+            "scrollbar-floating flex min-w-0 gap-1 px-2 pb-2",
             isSearching
               ? "max-h-64 flex-col overflow-y-auto"
               : "flex-row overflow-x-auto overflow-y-hidden",
