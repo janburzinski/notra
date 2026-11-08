@@ -9,7 +9,10 @@ import {
   GEO_SHORT_FIELD_MAX_LENGTH,
   GEO_TRAFFIC_SITES_MODES,
 } from "@notra/geo-core/constants/geo";
-import { WEB_VITAL_METRICS } from "@notra/geo-core/constants/web-analytics";
+import {
+  WEB_UTM_DIMENSIONS,
+  WEB_VITAL_METRICS,
+} from "@notra/geo-core/constants/web-analytics";
 
 import {
   ANALYTICS_API_MAX_RANGE_DAYS,
@@ -102,12 +105,23 @@ const sitesParam = z
     description: "`exclude` leaves out traffic to sites hosted on Notra Sites.",
   });
 
+const analyticsFilterQueryBaseSchema = geoWindowQuerySchema.extend({
+  host: hostParam,
+  path: pathParam,
+  sites: sitesParam,
+});
+
 /** Window plus the host, page and Notra Sites filters the dashboard offers. */
 export const analyticsFilterQuerySchema = withAnalyticsRangeCap(
-  geoWindowQuerySchema.extend({
-    host: hostParam,
-    path: pathParam,
-    sites: sitesParam,
+  analyticsFilterQueryBaseSchema
+);
+
+export const webAnalyticsUtmQuerySchema = withAnalyticsRangeCap(
+  analyticsFilterQueryBaseSchema.extend({
+    dimension: z.enum(WEB_UTM_DIMENSIONS).openapi({
+      param: { name: "dimension", in: "query" },
+      description: "UTM parameter to group sessions by.",
+    }),
   })
 );
 
@@ -268,6 +282,24 @@ export const webAnalyticsBreakdownsResponseSchema = z
     organization: organizationResponseSchema,
   })
   .openapi("GeoWebAnalyticsBreakdownsResponse");
+
+export const webAnalyticsUtmResponseSchema = z
+  .object({
+    dimension: z.enum(WEB_UTM_DIMENSIONS),
+    rows: z.array(
+      z.object({
+        value: z.string().openapi({
+          description:
+            "Source and medium are lowercased. Campaign, term and content values that look like an email address, a UUID or a token are reported as `:id`.",
+        }),
+        sessions: z.number().int(),
+        previousSessions: z.number().int(),
+        visitors: z.number().int(),
+      })
+    ),
+    organization: organizationResponseSchema,
+  })
+  .openapi("GeoWebAnalyticsUtmResponse");
 
 const journeyDailySchema = z.array(
   z.object({ day: z.string(), journeys: z.number().int() })

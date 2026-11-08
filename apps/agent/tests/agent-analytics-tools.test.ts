@@ -78,7 +78,21 @@ mock.module("@notra/geo-core/geo/programs", () => ({
   loadAiTraffic,
   loadGeoTrafficPages: () => Effect.succeed({ configured: true, pages: [] }),
 }));
-mock.module("@notra/geo-core/geo/web-analytics", () => ({ loadWebAnalytics }));
+const loadWebUtm = mock((...args: unknown[]) =>
+  Effect.succeed(
+    args[5] === "campaign"
+      ? [
+          { value: "launch", sessions: 9, previousSessions: 3, visitors: 8 },
+          { value: ":id", sessions: 2, previousSessions: 0, visitors: 2 },
+        ]
+      : []
+  )
+);
+
+mock.module("@notra/geo-core/geo/web-analytics", () => ({
+  loadWebAnalytics,
+  loadWebUtm,
+}));
 let webAnalyticsEnabled = true;
 mock.module("@notra/ai/utils/web-analytics-access", () => ({
   isWebAnalyticsEnabledForOrganization: async () => webAnalyticsEnabled,
@@ -111,6 +125,7 @@ type Executable = {
 beforeEach(() => {
   webAnalyticsEnabled = true;
   loadWebAnalytics.mockClear();
+  loadWebUtm.mockClear();
 });
 
 describe("get_ai_traffic", () => {
@@ -180,6 +195,41 @@ describe("get_web_analytics_reports", () => {
     });
   });
 
+  test("returns sessions per UTM parameter, loading every dimension", async () => {
+    loadWebUtm.mockClear();
+    const result = (await tool.execute(
+      getWebAnalyticsReportsInputSchema.parse({
+        days: 30,
+        host: "acme.com",
+        limit: 1,
+      }),
+      ctx
+    )) as { utm: Record<string, unknown> };
+
+    expect(loadWebUtm.mock.calls.map((call) => call[5])).toEqual([
+      "source",
+      "medium",
+      "campaign",
+      "term",
+      "content",
+    ]);
+    expect(loadWebUtm.mock.calls[0]?.slice(2, 5)).toEqual([
+      "acme.com",
+      "",
+      undefined,
+    ]);
+    expect(result.utm).toMatchObject({
+      source: [],
+      medium: [],
+      campaign: [
+        { value: "launch", sessions: 9, previous_sessions: 3, visitors: 8 },
+      ],
+      term: [],
+      content: [],
+    });
+    expect(result.utm.note).toBeString();
+  });
+
   test.each([
     [
       "is unavailable without the workspace's web analytics flag",
@@ -199,5 +249,6 @@ describe("get_web_analytics_reports", () => {
       await tool.execute(getWebAnalyticsReportsInputSchema.parse(input), ctx)
     ).toBe(message);
     expect(loadWebAnalytics).not.toHaveBeenCalled();
+    expect(loadWebUtm).not.toHaveBeenCalled();
   });
 });

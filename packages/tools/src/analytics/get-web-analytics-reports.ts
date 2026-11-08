@@ -2,8 +2,15 @@ import { WEB_ANALYTICS_UNAVAILABLE_MESSAGE } from "@notra/ai/constants/web-analy
 import { logError } from "@notra/ai/utils/server-log";
 import { isWebAnalyticsEnabledForOrganization } from "@notra/ai/utils/web-analytics-access";
 import { isTinybirdConfigured } from "@notra/analytics/tinybird/client";
-import { loadWebAnalytics } from "@notra/geo-core/geo/web-analytics";
-import type { WebAnalyticsBreakdown } from "@notra/geo-core/types/geo";
+import { WEB_UTM_DIMENSIONS } from "@notra/geo-core/constants/web-analytics";
+import {
+  loadWebAnalytics,
+  loadWebUtm,
+} from "@notra/geo-core/geo/web-analytics";
+import type {
+  WebAnalyticsBreakdown,
+  WebAnalyticsUtmRow,
+} from "@notra/geo-core/types/geo";
 import { Effect } from "effect";
 import { defineTool } from "eve/tools";
 
@@ -27,10 +34,19 @@ function toRows(rows: readonly WebAnalyticsBreakdown[], limit: number) {
   }));
 }
 
+function toUtmRows(rows: readonly WebAnalyticsUtmRow[], limit: number) {
+  return rows.slice(0, limit).map((row) => ({
+    value: row.value,
+    sessions: row.sessions,
+    previous_sessions: row.previousSessions,
+    visitors: row.visitors,
+  }));
+}
+
 export function createGetWebAnalyticsReportsTool() {
   return defineTool({
     description:
-      "Get the website analytics reports beyond traffic from Notra web analytics: outbound link clicks, Core Web Vitals from real visits (p75 of LCP, INP, CLS, FCP and TTFB), JavaScript errors reported by notra.plus.js, browser languages, and how sessions from AI assistants behave compared to other sources, with the previous period of equal length for comparison. Use for questions about outbound clicks, page speed, errors or languages; use get_web_analytics for traffic, pages, referrers and countries. Scoped to a project (default: the oldest). Returns the exact UTC date range covered.",
+      "Get the website analytics reports beyond traffic from Notra web analytics: outbound link clicks, Core Web Vitals from real visits (p75 of LCP, INP, CLS, FCP and TTFB), JavaScript errors reported by notra.plus.js, browser languages, sessions per UTM source, medium, campaign, term and content, and how sessions from AI assistants behave compared to other sources, with the previous period of equal length for comparison. Use for questions about outbound clicks, page speed, errors, languages or UTM campaigns; use get_web_analytics for traffic, pages, referrers and countries. Scoped to a project (default: the oldest). Returns the exact UTC date range covered.",
     inputSchema: getWebAnalyticsReportsInputSchema,
     async execute(input, ctx) {
       const organizationId = requireOrganizationId(ctx);
@@ -53,18 +69,43 @@ export function createGetWebAnalyticsReportsTool() {
         if (!project) {
           return ANALYTICS_PROJECT_NOT_FOUND_MESSAGE;
         }
-        const web = await Effect.runPromise(
-          loadWebAnalytics(
-            { organizationId, projectId: project.id },
-            { from: range.from, to: range.to },
-            input.host,
-            input.path ?? "",
-            undefined,
-            "breakdowns",
-            { scriptReports: true }
+        const scope = { organizationId, projectId: project.id };
+        const window = { from: range.from, to: range.to };
+        const path = input.path ?? "";
+        const { limit } = input;
+        const [web, utm] = await Effect.runPromise(
+          Effect.all(
+            [
+              loadWebAnalytics(
+                scope,
+                window,
+                input.host,
+                path,
+                undefined,
+                "breakdowns",
+                { scriptReports: true }
+              ),
+              Effect.forEach(
+                WEB_UTM_DIMENSIONS,
+                (dimension) =>
+                  loadWebUtm(
+                    scope,
+                    window,
+                    input.host,
+                    path,
+                    undefined,
+                    dimension
+                  ).pipe(
+                    Effect.map(
+                      (rows) => [dimension, toUtmRows(rows, limit)] as const
+                    )
+                  ),
+                { concurrency: "unbounded" }
+              ),
+            ],
+            { concurrency: "unbounded" }
           )
         );
-        const { limit } = input;
         const script = web.script;
         const empty =
           !script ||
@@ -104,6 +145,10 @@ export function createGetWebAnalyticsReportsTool() {
             page_views_affected: error.views,
           })),
           languages: toRows(script?.languages ?? [], limit),
+          utm: {
+            note: "Sessions per UTM value, counted on each session's first page. term and content from notra.js cover at most the last 90 days. :id stands for a value that looked like an email address, a UUID or a token.",
+            ...Object.fromEntries(utm),
+          },
           ai_outcomes: web.outcomes.map((outcome) => ({
             source: outcome.source || "not from an AI assistant",
             sessions: outcome.sessions,

@@ -6,6 +6,7 @@ describe("analytics API scopes", () => {
   test.each([
     ["GET", "/v1/projects/p1/geo/traffic/web", "traffic.read"],
     ["GET", "/v1/projects/p1/geo/traffic/web/breakdowns", "traffic.read"],
+    ["GET", "/v1/projects/p1/geo/traffic/web/utm", "traffic.read"],
     ["GET", "/v1/projects/p1/geo/traffic/journey-stats", "traffic.read"],
     ["GET", "/v1/projects/p1/geo/traffic/imports", "traffic.read"],
     ["GET", "/v1/geo/ingest/setup", "traffic.read"],

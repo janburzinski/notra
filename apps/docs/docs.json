@@ -765,6 +765,7 @@
                     "pages": [
                       "GET /v1/projects/{projectId}/geo/traffic/web",
                       "GET /v1/projects/{projectId}/geo/traffic/web/breakdowns",
+                      "GET /v1/projects/{projectId}/geo/traffic/web/utm",
                       "GET /v1/projects/{projectId}/geo/traffic/imports"
                     ]
                   },

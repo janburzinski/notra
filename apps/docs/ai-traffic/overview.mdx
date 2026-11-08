@@ -145,6 +145,7 @@ The **Web analytics** tab is available under the same prefix and scope, with the
 | --- | --- |
 | `GET /geo/traffic/web` | `totals` (`views`, `visitors`, `sessions`, `engagedSessions`, `aiVisitors`, each with its `previous*` value), daily `points[]`, `hosts[]` and `imported` (the latest completed history import) |
 | `GET /geo/traffic/web/breakdowns` | `pages[]`, `sources[]`, `countries[]`, `devices[]`, `languages[]`, `outcomes[]` (how sessions from AI assistants behave), `outboundLinks[]` (host and path only), `vitals[]` (p75 in milliseconds, CLS x1000) and `errors[]` |
+| `GET /geo/traffic/web/utm` | Takes a required `dimension`: `source`, `medium`, `campaign`, `term` or `content`. `rows[]` with the top 25 values and their `sessions`, `previousSessions` and `visitors`, counted on each session's first page. Term and content cover at most the last 90 days unless a history import adds older ones. Campaign, term and content values that look like an email address, a UUID or a token show as `:id` |
 | `GET /geo/traffic/imports` | `imports[]` with each history import's provider, status and progress. Connections and credentials are never returned; start imports in the dashboard |
 
 Error messages are scrubbed before storage.

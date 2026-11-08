@@ -4,6 +4,7 @@ import type { AnalyticsImportSummary } from "@notra/geo-core/types/analytics-imp
 import type {
   GeoWebSetupResponse,
   WebAnalyticsResponse,
+  WebAnalyticsUtmRow,
 } from "@notra/geo-core/types/geo";
 import { Effect } from "effect";
 
@@ -59,6 +60,11 @@ const web: WebAnalyticsResponse = {
     languages: [],
   },
 };
+
+const utmRows: WebAnalyticsUtmRow[] = [
+  { value: "spring_launch", sessions: 12, previousSessions: 4, visitors: 10 },
+  { value: ":id", sessions: 3, previousSessions: 0, visitors: 3 },
+];
 
 const importSummary: AnalyticsImportSummary = {
   id: "imp_1",
@@ -122,6 +128,9 @@ const webSetup: GeoWebSetupResponse = {
 const loadWebAnalytics = mock((..._args: unknown[]) => Effect.succeed(web));
 const loadAiTraffic = mock((..._args: unknown[]) => Effect.succeed({}));
 const loadGeoJourneyStats = mock((..._args: unknown[]) => Effect.succeed({}));
+const loadWebUtm = mock((..._args: unknown[]) =>
+  Effect.succeed(utmRows.map((row) => ({ ...row, email: UNDOCUMENTED_SECRET })))
+);
 const listAnalyticsImportSummaries = mock((..._args: unknown[]) =>
   Effect.succeed([{ ...importSummary, credentials: CREDENTIAL }])
 );
@@ -157,6 +166,7 @@ const realWebAnalytics = await import("@notra/geo-core/geo/web-analytics");
 mock.module("@notra/geo-core/geo/web-analytics", () => ({
   ...realWebAnalytics,
   loadWebAnalytics,
+  loadWebUtm,
 }));
 const realImports = await import("@notra/geo-core/geo/analytics-imports");
 mock.module("@notra/geo-core/geo/analytics-imports", () => ({
@@ -278,6 +288,46 @@ describe("web analytics API", () => {
     expect(text).not.toContain(UNDOCUMENTED_SECRET);
   });
 
+  test("returns sessions per UTM value with only documented fields", async () => {
+    const response = await createApp().request(
+      "/v1/projects/proj_1/geo/traffic/web/utm?dimension=campaign&days=30&host=www.acme.com&sites=exclude"
+    );
+    const text = await response.text();
+    const body = JSON.parse(text);
+
+    expect(response.status).toBe(200);
+    expect(loadWebUtm).toHaveBeenCalledWith(
+      scope,
+      expect.objectContaining({ days: 30 }),
+      "www.acme.com",
+      "",
+      "exclude",
+      "campaign"
+    );
+    expect(Object.keys(body).sort()).toEqual([
+      "dimension",
+      "organization",
+      "rows",
+    ]);
+    expect(body.dimension).toBe("campaign");
+    expect(body.rows).toEqual(utmRows);
+    expect(body.organization).toEqual(organization);
+    expect(text).not.toContain(UNDOCUMENTED_SECRET);
+  });
+
+  test.each([
+    ["no dimension", ""],
+    ["an unknown dimension", "dimension=referrer"],
+    ["a range over 366 days", "dimension=source&from=2025-01-01&to=2026-06-01"],
+  ])("rejects a UTM report with %s before querying", async (_name, query) => {
+    const response = await createApp().request(
+      `/v1/projects/proj_1/geo/traffic/web/utm?${query}`
+    );
+
+    expect(response.status).toBe(400);
+    expect(loadWebUtm).not.toHaveBeenCalled();
+  });
+
   test.each([
     ["a range over 366 days", "from=2025-01-01&to=2026-06-01"],
     ["from after to", "from=2026-10-31&to=2026-10-01"],
@@ -349,6 +399,7 @@ describe("without the web analytics flag", () => {
   test.each([
     "/v1/projects/proj_1/geo/traffic/web",
     "/v1/projects/proj_1/geo/traffic/web/breakdowns",
+    "/v1/projects/proj_1/geo/traffic/web/utm?dimension=source",
     "/v1/projects/proj_1/geo/traffic/imports",
     "/v1/projects/proj_1/geo/traffic/journey-stats",
   ])("%s answers 403 before loading anything", async (path) => {
@@ -360,6 +411,7 @@ describe("without the web analytics flag", () => {
     });
     expect(isWebAnalyticsEnabledForOrganization).toHaveBeenCalledWith("org_1");
     expect(loadWebAnalytics).not.toHaveBeenCalled();
+    expect(loadWebUtm).not.toHaveBeenCalled();
     expect(loadGeoJourneyStats).not.toHaveBeenCalled();
     expect(listAnalyticsImportSummaries).not.toHaveBeenCalled();
   });

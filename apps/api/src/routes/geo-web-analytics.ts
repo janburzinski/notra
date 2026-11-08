@@ -1,7 +1,10 @@
 import { createRoute } from "@hono/zod-openapi";
 import { listAnalyticsImportSummaries } from "@notra/geo-core/geo/analytics-imports";
 import { loadGeoJourneyStats } from "@notra/geo-core/geo/programs";
-import { loadWebAnalytics } from "@notra/geo-core/geo/web-analytics";
+import {
+  loadWebAnalytics,
+  loadWebUtm,
+} from "@notra/geo-core/geo/web-analytics";
 import { geoWindow } from "@notra/geo-core/geo/window";
 import type { WebAnalyticsResponse } from "@notra/geo-core/types/geo";
 import { projectParamsSchema } from "@notra/schemas/api/geo-params";
@@ -12,6 +15,8 @@ import {
   journeyStatsResponseSchema,
   webAnalyticsBreakdownsResponseSchema,
   webAnalyticsResponseSchema,
+  webAnalyticsUtmQuerySchema,
+  webAnalyticsUtmResponseSchema,
 } from "@notra/schemas/api/geo-web-analytics";
 
 import {
@@ -69,6 +74,26 @@ const webBreakdownsRoute = createRoute({
   },
 });
 
+const webUtmRoute = createRoute({
+  method: "get",
+  path: "/projects/{projectId}/geo/traffic/web/utm",
+  tags: [GEO_OPENAPI_TAG],
+  operationId: "getGeoWebAnalyticsUtm",
+  summary: "Get website sessions by UTM parameter",
+  description:
+    "Sessions and visitors per value of one UTM parameter (source, medium, campaign, term or content), counted on each session's first page, against the previous window of the same length. Returns the top 25 values. Includes completed history imports when no path is set. Term and content from visits Notra tracked itself cover at most the last 90 days. Campaign, term and content values that look like an email address, a UUID or a token are reported as `:id`.",
+  request: { params: projectParamsSchema, query: webAnalyticsUtmQuerySchema },
+  responses: {
+    200: {
+      description: "UTM report fetched successfully",
+      content: {
+        "application/json": { schema: webAnalyticsUtmResponseSchema },
+      },
+    },
+    ...GEO_COMMON_ERROR_RESPONSES,
+  },
+});
+
 const journeyStatsRoute = createRoute({
   method: "get",
   path: "/projects/{projectId}/geo/traffic/journey-stats",
@@ -111,6 +136,9 @@ const webAnalyticsBodySchema = webAnalyticsResponseSchema.omit({
   organization: true,
 });
 const webBreakdownsBodySchema = webAnalyticsBreakdownsResponseSchema.omit({
+  organization: true,
+});
+const webUtmBodySchema = webAnalyticsUtmResponseSchema.omit({
   organization: true,
 });
 const journeyStatsBodySchema = journeyStatsResponseSchema.omit({
@@ -169,6 +197,27 @@ geoWebAnalyticsRoutes.openapi(webBreakdownsRoute, async (c) => {
     )
   );
   return geoOutcomeResponse(c, outcome, 200, toBreakdownsBody);
+});
+
+geoWebAnalyticsRoutes.openapi(webUtmRoute, async (c) => {
+  const { organizationId } = c.get("geo");
+  const { projectId } = c.req.valid("param");
+  const query = c.req.valid("query");
+
+  const outcome = await runGeoEffect(
+    "webAnalyticsUtm",
+    loadWebUtm(
+      { organizationId, projectId },
+      geoWindow(query),
+      query.host,
+      query.path ?? "",
+      query.sites,
+      query.dimension
+    )
+  );
+  return geoOutcomeResponse(c, outcome, 200, (rows) =>
+    webUtmBodySchema.parse({ dimension: query.dimension, rows })
+  );
 });
 
 geoWebAnalyticsRoutes.openapi(journeyStatsRoute, async (c) => {
