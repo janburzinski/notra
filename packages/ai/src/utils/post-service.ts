@@ -11,7 +11,7 @@ import type {
   UpdatePostRecordResult,
   UpdatePostSiteMetadataParams,
 } from "@notra/ai/types/post-service";
-import { syncGeneratedCoverImage } from "@notra/ai/utils/post-cover-image";
+import { syncGeneratedCoverImage } from "@notra/ai/utils/post-cover-image-lazy";
 import { stripLeadingFrontmatter } from "@notra/ai/utils/post-markdown";
 import { sanitizeMarkdownHtml } from "@notra/ai/utils/sanitize";
 import { db } from "@notra/db/drizzle";

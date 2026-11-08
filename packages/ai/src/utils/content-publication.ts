@@ -6,7 +6,7 @@ import type {
   ReconcileContentPublicationParams,
   RecordContentPublicationParams,
 } from "@notra/ai/types/content-publication";
-import { syncGeneratedCoverImage } from "@notra/ai/utils/post-cover-image";
+import { syncGeneratedCoverImage } from "@notra/ai/utils/post-cover-image-lazy";
 import { updatePostRecord } from "@notra/ai/utils/post-service";
 import { db } from "@notra/db/drizzle";
 import {
