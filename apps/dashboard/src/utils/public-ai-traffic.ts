@@ -339,7 +339,7 @@ function leaderboard({
           median([...entry.recentSites.values()]) / days,
           1
         ),
-        // Markdown requests from fewer than five sites stay unpublished.
+        // Markdown requests from fewer than `PUBLIC_DATA_MIN_SITES` sites stay unpublished.
         markdownShare:
           kind === "crawler" &&
           md &&
@@ -569,8 +569,8 @@ function detailSection(rows: PublicAiTrafficDetailRow[]) {
 
 /**
  * Countries AI-referred visitors come from. Each site's own visitors count
- * as one equal vote, so a country seen on one site carries at most that
- * site's slice of all of them; the floor applies to all sites together.
+ * as one equal vote, and a country is only listed once enough sites had
+ * visitors from it, so no share shows where one site's visitors came from.
  */
 function detailCountries(rows: PublicAiTrafficDetailRow[]) {
   const countries = rows.filter(
@@ -583,7 +583,7 @@ function detailCountries(rows: PublicAiTrafficDetailRow[]) {
     return [];
   }
   return countries
-    .filter((row) => row.sites > 0 && row.share > 0)
+    .filter((row) => row.sites >= PUBLIC_DATA_MIN_SITES && row.share > 0)
     .toSorted((a, b) => b.share - a.share)
     .slice(0, PUBLIC_DATA_TOP_COUNTRIES)
     .map((row) => ({
@@ -808,7 +808,7 @@ export function buildPublicAiTrafficSnapshot(
     ...base,
     available: true,
     summary: {
-      // Each summary figure needs five sites behind each of its parts.
+      // Each summary figure needs `PUBLIC_DATA_MIN_SITES` sites behind each of its parts.
       crawlsPerReferral:
         ratioReferrals > 0 &&
         kindSites(totals, "crawler") >= PUBLIC_DATA_MIN_SITES &&

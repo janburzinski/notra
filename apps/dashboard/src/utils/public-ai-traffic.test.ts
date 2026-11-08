@@ -431,8 +431,14 @@ test("publishes hours, countries and llms.txt once enough sites stand behind the
         previous_sites: 6,
         subset_sites: 10,
       }),
-      // One site's visitors, averaged in as one vote of ten.
       detailRow("countries", "ai_referral", "DE", {
+        share: 0.1,
+        sites: 3,
+        subset_sites: 10,
+      }),
+      // One site's visitors: listing them would show where that site's
+      // referrals came from.
+      detailRow("countries", "ai_referral", "NG", {
         share: 0.1,
         sites: 1,
         subset_sites: 10,

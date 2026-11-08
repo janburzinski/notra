@@ -205,12 +205,23 @@ async function todaysSnapshot(
   }
   // A Redis miss or failure keeps today's remembered snapshot rather than
   // rebuilding it on a public request.
-  return remembered?.snapshot ?? publishPublicAiTrafficSnapshot(today);
+  if (remembered) {
+    return remembered.snapshot;
+  }
+  // Before the cron publishes today's, yesterday's stands in: a public
+  // request then never runs the cross-customer queries or builds from a day
+  // whose last ingest batch hasn't landed yet. Only an empty cache builds.
+  const previous = await readCached(shiftDay(today, -1));
+  if (previous) {
+    latest = { day: today, snapshot: previous, readAt: Date.now() };
+    return previous;
+  }
+  return publishPublicAiTrafficSnapshot(today);
 }
 
 /**
  * Today's published snapshot. The daily cron publishes it shortly after
- * midnight UTC; a request before that builds it once and caches it. When
+ * midnight UTC; until then yesterday's is served. When
  * today's can't be built, yesterday's (kept for two days) stands in, so a
  * Tinybird outage doesn't blank the public page.
  */
