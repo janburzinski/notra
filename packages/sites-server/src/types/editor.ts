@@ -63,7 +63,8 @@ export interface SaveSiteDraftInput {
   baseBlobSha: string | null;
   baseCommitSha: string | null;
   deleted?: boolean;
-  userId: string;
+  /** Null for changes made with an organization API key. */
+  userId: string | null;
   draftId: string | null;
   draftRevision: number | null;
   sourceContext: SiteEditorSourceContext;
@@ -97,7 +98,12 @@ export interface PublishSiteDraftsInput {
   /** Generated from the pending drafts when omitted. */
   message?: string;
   branch?: string;
-  userId: string;
+  userId: string | null;
+  /**
+   * Runs under the branch lock with the paths of the exact drafts this publish
+   * would commit; throwing aborts it before anything is committed.
+   */
+  assertPublishable?: (paths: readonly string[]) => void;
 }
 
 export interface PublishSiteDraftsResult {

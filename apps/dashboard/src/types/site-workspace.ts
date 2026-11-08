@@ -15,6 +15,8 @@ export interface SiteWorkspaceProps {
 }
 export interface SiteWorkspaceReadyProps extends SiteWorkspaceProps {
   comparisonContent?: string;
+  /** The production blog.json as committed; null when the repository has none. */
+  liveContent: string | null;
   document: SiteEditorDocument;
   files: SiteEditorFiles;
   refreshing?: boolean;

@@ -25,6 +25,8 @@ export const RATE_LIMITS = {
   },
   integrationCreate: { requests: 20, window: "1 minute" },
   postUpdate: { requests: 60, window: "1 minute" },
+  siteUpdate: { requests: 60, window: "1 minute" },
+  sitePublish: { requests: 10, window: "10 minutes" },
   feedbackIngest: { requests: 120, window: "1 minute" },
   feedbackIngestIp: {
     requests: AGENT_FEEDBACK_RATE_LIMIT_PER_IP,
@@ -72,6 +74,16 @@ export const ratelimit = {
     prefix: "ratelimit:api:post-update",
     requests: RATE_LIMITS.postUpdate.requests,
     window: "1m",
+  }),
+  siteUpdate: createLimiter({
+    prefix: "ratelimit:api:site-update",
+    requests: RATE_LIMITS.siteUpdate.requests,
+    window: "1m",
+  }),
+  sitePublish: createLimiter({
+    prefix: "ratelimit:api:site-publish",
+    requests: RATE_LIMITS.sitePublish.requests,
+    window: "10m",
   }),
   feedbackIngest: createLimiter({
     prefix: "ratelimit:api:feedback-ingest",

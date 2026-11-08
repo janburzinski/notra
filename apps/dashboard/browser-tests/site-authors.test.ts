@@ -229,6 +229,27 @@ test(
 );
 
 test(
+  "authors only in a draft have no live page and keep an editable id while the repository has no blog.json",
+  async () => {
+    const page = await open("?unpublished");
+    await browserExpect(
+      page.getByText("Lena Park", { exact: true })
+    ).toBeVisible();
+    await browserExpect(
+      page.getByRole("link", { name: "View Lena Park's author page" })
+    ).toHaveCount(0);
+    await page.getByRole("button", { name: "Edit Lena Park" }).click();
+    const dialog = page.getByRole("dialog");
+    const id = dialog.getByRole("textbox", { name: "ID", exact: true });
+    await browserExpect(id).not.toHaveAttribute("readonly", "");
+    await browserExpect(
+      dialog.getByRole("button", { name: "Change ID" })
+    ).toHaveCount(0);
+  },
+  TIMEOUT
+);
+
+test(
   "deleting an author posts reference warns with the post count",
   async () => {
     const page = await open();

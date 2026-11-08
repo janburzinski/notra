@@ -176,7 +176,7 @@ Inside `metadata`, send only the fields you want to change:
 | `coverImage` | `{ "url": "https://…", "alt": "…" }`, or `null` to remove the cover. The URL must be https. |
 | `tags` | Replaces all tags. Up to 12 tags of 40 characters; duplicates are dropped case-insensitively. |
 | `excerpt` | Summary for post cards and meta descriptions, up to 300 characters. `null` or `""` derives it from the first paragraph. |
-| `authorIds` | Replaces the credited authors, in display order. Up to 5 IDs from `GET /v1/posts/authors`. |
+| `authorIds` | Replaces the credited authors, in display order. Up to 5 IDs from `GET /v1/posts/authors`, or on a blog post that publishes to a Notra Sites site, that site's authors as `site:<id>` (see [Manage Notra Sites authors](#manage-notra-sites-authors)). |
 | `featured` | `true` pins the post to the top of the blog index. |
 | `noindex` | `true` asks search engines not to index the post and leaves it out of the sitemap. |
 | `hidden` | `true` keeps the hosted page reachable by direct link but removes it from site listings, feeds, search engine indexing, sitemaps and generated AI indexes. It does not make the page private. |
@@ -269,6 +269,52 @@ The response contains the post with the stored metadata, with each author ID res
 ```
 
 An author ID from another organization, or one that was deleted, returns `400`. When the post has a linked GitHub pull request, a metadata update syncs it like a title or markdown update.
+
+## Manage Notra Sites authors
+
+A [Notra Sites](/sites/posts) blog keeps its authors in the site's `blog.json`. The `/v1/sites` endpoints read and change them the way the dashboard's **Design → Authors** section does: every change is saved to `blog.json` as an unpublished Design change, the same one the dashboard shows, and goes live when you publish it. They need the `sites.read` and `sites.write` scopes.
+
+List the organization's sites, then a site's authors:
+
+```bash
+curl "https://api.usenotra.com/v1/sites" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+
+curl "https://api.usenotra.com/v1/sites/site_8f2kq1/authors" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+Each author has its `blog.json` fields, whether it is `live` (in the published `blog.json`), how many Notra `posts` credit it and the `ref` to use in a post's `authorIds`. The response also has the `authorPage` layout and `hasUnpublishedChanges`.
+
+Create or replace an author with `PUT`. The id is the author's handle on the site (1 to 40 lowercase letters, digits and dashes, used as `{blogMount}/author/{id}`), links must be `https://` URLs and the avatar is a site path such as `/images/jane.png` or an `https://` URL. Fields you leave out are removed.
+
+```bash
+curl -X PUT "https://api.usenotra.com/v1/sites/site_8f2kq1/authors/jane-doe" \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Jane Doe",
+    "title": "Head of Product",
+    "avatar": "/images/jane.png",
+    "x": "https://x.com/janedoe"
+  }'
+```
+
+- Send `previousId` to rename an author. Renaming or deleting (`DELETE /v1/sites/{siteId}/authors/{authorId}`) an author that is live or credited on Notra posts returns `409` with code `SITE_AUTHOR_IN_USE`; send `"force": true` or `?force=true` once you accept that those posts show the old id as a plain name.
+- `POST /v1/sites/{siteId}/authors/import` copies Notra authors into `blog.json`, using their slug as the id.
+- `PATCH /v1/sites/{siteId}/author-page` with `{ "layout": "stacked" }` or `"inline"` sets the layout of every author page.
+- `POST /v1/sites/{siteId}/publish` commits the unpublished `blog.json` changes to the site's production branch and deploys it. It returns `409` with code `SITE_HAS_OTHER_CHANGES` while other files on the site have unpublished changes; publish those from the dashboard.
+
+To credit a site author on a blog post, send its `ref` in `metadata.authorIds`:
+
+```bash
+curl -X PATCH "https://api.usenotra.com/v1/posts/post_abc" \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{ "metadata": { "authorIds": ["site:jane-doe"] } }'
+```
+
+The post must be a blog post that publishes to the site, and the id must be in its `blog.json` (unpublished changes count). Post responses list site authors in `metadata.authors` with ids like `site:jane-doe`.
 
 ## Create a new post
 

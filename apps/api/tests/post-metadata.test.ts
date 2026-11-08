@@ -93,7 +93,8 @@ beforeAll(async () => {
     insert into posts (id, organization_id, title, content_type, author_ids, tags, cover_image, display_date, created_at) values
       ('post_blog', '${ORG}', 'Blog', 'blog_post', '{auth_max,auth_deleted,auth_jane}', '{editor}',
         '{"url":"https://cdn.example.com/c.png","alt":"Cover"}', '2026-10-01 00:00:00', '2026-10-03'),
-      ('post_social', '${ORG}', 'Social', 'linkedin_post', '{auth_jane}', '{}', null, null, '2026-10-02');
+      ('post_social', '${ORG}', 'Social', 'linkedin_post', '{auth_jane}', '{}', null, null, '2026-10-02'),
+      ('post_changelog', '${ORG}', 'Changelog', 'changelog', '{}', '{}', null, null, '2026-10-01');
   `);
 });
 
@@ -297,5 +298,99 @@ describe("PATCH metadata", () => {
         fetched.success.post &&
         serializePost(fetched.success.post, fetched.success.authors).metadata
     ).toEqual(metadata);
+  });
+
+  test("rejects site authors on changelogs and malformed site author refs", async () => {
+    const changelog = await run(
+      preparePatchPost({
+        db: db as never,
+        organizationId: ORG,
+        postId: "post_changelog",
+        body: patchBody({ metadata: { authorIds: ["site:jane-doe"] } }),
+      })
+    );
+    expect(changelog._tag === "Failure" && changelog.failure._tag).toBe(
+      "PostSiteAuthorNotSupportedError"
+    );
+
+    const malformed = await run(
+      preparePatchPost({
+        db: db as never,
+        organizationId: ORG,
+        postId: "post_blog",
+        body: patchBody({ metadata: { authorIds: ["site:Jane_Doe"] } }),
+      })
+    );
+    expect(malformed._tag === "Failure" && malformed.failure._tag).toBe(
+      "PostUnknownAuthorError"
+    );
+  });
+
+  test("stores site author refs next to Notra authors and resolves them per post", async () => {
+    const prepared = await run(
+      preparePatchPost({
+        db: db as never,
+        organizationId: ORG,
+        postId: "post_blog",
+        body: patchBody({
+          metadata: { authorIds: ["site:jane-doe", "auth_max"] },
+        }),
+      })
+    );
+    if (prepared._tag === "Failure") {
+      throw new Error(String(prepared.failure));
+    }
+    expect(prepared.success.prepared.siteAuthorIds).toEqual(["site:jane-doe"]);
+
+    const committed = await run(
+      commitPatchPost({
+        db: db as never,
+        organizationId: ORG,
+        postId: "post_blog",
+        prepared: prepared.success.prepared,
+      })
+    );
+    if (committed._tag === "Failure") {
+      throw new Error(String(committed.failure));
+    }
+    const { post, authors } = committed.success;
+    expect(post.authorIds).toEqual(["site:jane-doe", "auth_max"]);
+
+    const max = {
+      id: "auth_max",
+      slug: "max",
+      name: "Max Mustermann",
+      title: null,
+      avatarUrl: null,
+      ...NO_LINKS,
+    };
+    const resolved = {
+      id: "site:jane-doe",
+      slug: "jane-doe",
+      name: "Jane Doe",
+      title: "Head of Product",
+      avatarUrl: "https://acme.notra.site/blog/images/jane.png",
+      ...NO_LINKS,
+      x: "https://x.com/janedoe",
+    };
+    expect(
+      serializePost(
+        post,
+        authors,
+        new Map([[post.id, new Map([[resolved.id, resolved]])]])
+      ).metadata?.authors
+    ).toEqual([resolved, max]);
+    expect(serializePost(post, authors, null).metadata?.authors).toEqual([
+      {
+        ...max,
+        id: "site:jane-doe",
+        slug: "jane-doe",
+        name: "jane-doe",
+      },
+      max,
+    ]);
+    expect(serializePost(post, authors, new Map()).metadata?.authors).toEqual([
+      max,
+    ]);
   });
 });

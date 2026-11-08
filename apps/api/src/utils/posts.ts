@@ -7,12 +7,19 @@ import type {
   ALL_POST_CONTENT_TYPES,
   patchPostRequestSchema,
 } from "@notra/schemas/api/content";
+import { siteAuthorRefId } from "@notra/sites-core/utils/site-author-refs";
 import { Effect } from "effect";
 import type { Context } from "hono";
 import type { z } from "zod";
 
 import type { PostDatabaseError } from "../errors/posts";
-import type { PostAuthorsById, PostDomainError, PostRow } from "../types/posts";
+import type {
+  PostAuthorsById,
+  PostAuthorSummary,
+  PostDomainError,
+  PostRow,
+  PostSiteAuthorsByPost,
+} from "../types/posts";
 
 type PostResponseContentType = (typeof ALL_POST_CONTENT_TYPES)[number];
 
@@ -30,7 +37,47 @@ function formatDisplayDate(date: Date | null) {
   return date ? date.toISOString().slice(0, 10) : null;
 }
 
-function serializePostMetadata(post: PostRow, authors: PostAuthorsById) {
+/** A site author the dashboard couldn't resolve: its blog.json id, as the site shows it then. */
+function bareSiteAuthor(ref: string, id: string): PostAuthorSummary {
+  return {
+    id: ref,
+    slug: id,
+    name: id,
+    title: null,
+    avatarUrl: null,
+    url: null,
+    x: null,
+    linkedin: null,
+    github: null,
+    youtube: null,
+    bluesky: null,
+    mastodon: null,
+    threads: null,
+    instagram: null,
+  };
+}
+
+function findPostAuthor(
+  post: PostRow,
+  authorId: string,
+  authors: PostAuthorsById,
+  siteAuthors: PostSiteAuthorsByPost | undefined
+): PostAuthorSummary | undefined {
+  const siteId = siteAuthorRefId(authorId);
+  if (!siteId) {
+    return authors.get(authorId);
+  }
+  if (!siteAuthors) {
+    return bareSiteAuthor(authorId, siteId);
+  }
+  return siteAuthors.get(post.id)?.get(authorId);
+}
+
+function serializePostMetadata(
+  post: PostRow,
+  authors: PostAuthorsById,
+  siteAuthors: PostSiteAuthorsByPost | undefined
+) {
   if (!supportsPostSlug(post.contentType)) {
     return null;
   }
@@ -42,7 +89,7 @@ function serializePostMetadata(post: PostRow, authors: PostAuthorsById) {
     tags: post.tags,
     excerpt: post.excerpt,
     authors: post.authorIds.flatMap((authorId) => {
-      const author = authors.get(authorId);
+      const author = findPostAuthor(post, authorId, authors, siteAuthors);
       return author
         ? [
             {
@@ -78,7 +125,9 @@ export function collectPostAuthorIds(
   for (const row of rows) {
     if (supportsPostSlug(row.contentType)) {
       for (const id of row.authorIds) {
-        ids.add(id);
+        if (siteAuthorRefId(id) === null) {
+          ids.add(id);
+        }
       }
     }
   }
@@ -87,7 +136,8 @@ export function collectPostAuthorIds(
 
 export function serializePost(
   post: PostRow,
-  authors: PostAuthorsById = NO_AUTHORS
+  authors: PostAuthorsById = NO_AUTHORS,
+  siteAuthors?: PostSiteAuthorsByPost
 ) {
   const isImage = post.contentType === "image";
 
@@ -102,7 +152,7 @@ export function serializePost(
     recommendations: post.recommendations,
     contentType: post.contentType as PostResponseContentType,
     sourceMetadata: post.sourceMetadata,
-    metadata: serializePostMetadata(post, authors),
+    metadata: serializePostMetadata(post, authors, siteAuthors),
     status: post.status,
     createdAt: post.createdAt.toISOString(),
     updatedAt: post.updatedAt.toISOString(),
@@ -226,7 +276,17 @@ export function respondToPostFailure(c: Context, failure: PostDomainError) {
     return c.json(
       {
         error:
-          "metadata.authorIds contains an author that does not exist in this organization. List valid IDs with GET /v1/posts/authors.",
+          "metadata.authorIds contains an author that does not exist in this organization. List valid IDs with GET /v1/posts/authors, or site authors (site:<id>) with GET /v1/sites/{siteId}/authors.",
+      },
+      400
+    );
+  }
+
+  if (failure._tag === "PostSiteAuthorNotSupportedError") {
+    return c.json(
+      {
+        error:
+          "metadata.authorIds can only name site authors (site:<id>) on blog posts.",
       },
       400
     );

@@ -3,6 +3,10 @@
 import { Add01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { POST_AUTHORS_MAX } from "@notra/ai/constants/post-metadata";
+import {
+  siteAuthorRef,
+  siteAuthorRefId,
+} from "@notra/sites-core/utils/site-author-refs";
 import { AvatarGroup } from "@notra/ui/components/ui/avatar";
 import {
   Select,
@@ -17,7 +21,6 @@ import Link from "@/components/framework/link";
 import { AUTHOR_AVATAR_STACK_MAX } from "@/constants/content-overview";
 import { useContentAuthors } from "@/lib/hooks/use-content-authors";
 import type { OverviewSiteAuthorSelectProps } from "@/types/site-authors";
-import { siteAuthorRef, siteAuthorRefId } from "@/utils/site-author-refs";
 import { siteAuthorSelection } from "@/utils/site-authors";
 import { siteAssetUrl } from "@/utils/site-design";
 

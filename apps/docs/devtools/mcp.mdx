@@ -27,7 +27,7 @@ docolin:
   next: ./claude.mdx
 ---
 
-Notra runs a hosted MCP server at `https://mcp.usenotra.com/mcp` (streamable HTTP) so AI agents can work with your workspace. Connected agents can manage brand identities, generate, edit, schedule and publish content, connect integrations and manage schedules, event triggers, webhooks and skills. They can also use every GEO feature: projects, prompts, competitors, scans, visibility, content briefs, agent readiness and AI traffic.
+Notra runs a hosted MCP server at `https://mcp.usenotra.com/mcp` (streamable HTTP) so AI agents can work with your workspace. Connected agents can manage brand identities, generate, edit, schedule and publish content, manage Notra Sites authors, connect integrations and manage schedules, event triggers, webhooks and skills. They can also use every GEO feature: projects, prompts, competitors, scans, visibility, content briefs, agent readiness and AI traffic.
 
 This page covers two things:
 
@@ -189,7 +189,7 @@ The server exposes every tool by default. Many clients load all tool definitions
 
 | Toolset | Tools |
 | --- | --- |
-| `content` | Posts, brand identities, integrations, schedules, event triggers, webhooks, skills and the feedback inbox |
+| `content` | Posts, Sites authors, brand identities, integrations, schedules, event triggers, webhooks, skills and the feedback inbox |
 | `geo` | Projects and every GEO tool |
 
 Workspace tools and `submit_feedback` are always available. Add the `toolsets` query parameter to the hosted URL, or set `NOTRA_MCP_TOOLSETS` for the npm package. Separate several toolsets with commas.
@@ -239,6 +239,18 @@ Tool names match exactly what the server registers, although some clients prefix
 When `update_post` changes the title, slug or markdown of a blog post or changelog with a linked GitHub pull request, Notra saves the article and updates that PR using the same publishing logic as the dashboard, without creating a new PR. Status-only changes do not trigger a GitHub update.
 
 If the PR update fails, the tool returns an error stating that Notra saved the post. A rate-limited GitHub sync returns 429 with `Retry-After`, so wait before retrying the content update. A timeout returns 504 with an unknown sync outcome, and because the PR update may still finish, check the PR before retrying, as you should after any other unconfirmed sync error. If the PR is closed or merged, resolve it in the dashboard before Notra can sync it again.
+
+**Sites authors**
+
+- `list_sites`
+- `list_site_authors`
+- `upsert_site_author`
+- `delete_site_author`
+- `import_site_authors`
+- `set_site_author_page`
+- `publish_site_design`
+
+Author changes are saved to the site's `blog.json` as unpublished Design changes, the same ones the dashboard's Design tab shows, and go live when `publish_site_design` or the dashboard publishes them. `publish_site_design` refuses while other files on the site have unpublished changes, so work you staged in the dashboard is never published by accident. To credit a site author on a blog post that publishes to the site, pass its `site:<id>` ref in `authorIds` of `update_post`. The tools need the `sites.read` and `sites.write` scopes.
 
 **Brand identities**
 

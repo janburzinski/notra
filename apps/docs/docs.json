@@ -520,6 +520,19 @@
                 ]
               },
               {
+                "group": "Sites",
+                "expanded": true,
+                "pages": [
+                  "GET /v1/sites",
+                  "GET /v1/sites/{siteId}/authors",
+                  "PUT /v1/sites/{siteId}/authors/{authorId}",
+                  "DELETE /v1/sites/{siteId}/authors/{authorId}",
+                  "POST /v1/sites/{siteId}/authors/import",
+                  "PATCH /v1/sites/{siteId}/author-page",
+                  "POST /v1/sites/{siteId}/publish"
+                ]
+              },
+              {
                 "group": "Brand Identities",
                 "expanded": true,
                 "pages": [

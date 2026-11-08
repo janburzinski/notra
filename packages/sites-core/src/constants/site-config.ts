@@ -11,6 +11,11 @@ export const SITE_ICON_NAME = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 export const SITE_META_TAG_NAME = /^[a-z][a-z0-9:_.-]*$/i;
 export const SITE_AUTHOR_ID = /^[a-z0-9](?:[a-z0-9-]{0,38}[a-z0-9])?$/;
 export const SITE_AUTHOR_AVATAR = /^(?:\/(?!\/)|https:\/\/)/;
+/**
+ * Marks an entry of a post's `authorIds` as an id from the site's blog.json
+ * `authors` rather than a Notra author row, e.g. `site:jan`.
+ */
+export const SITE_AUTHOR_REF_PREFIX = "site:";
 export const SITE_DEFAULT_PRIMARY_COLOR = "#8B5CF6";
 export const SITE_APPEARANCE_STORAGE_KEY = /^[A-Za-z0-9._-]{1,64}$/;
 export const SITE_DEFAULT_APPEARANCE_STORAGE_KEY = "notra-theme";

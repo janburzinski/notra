@@ -16,4 +16,6 @@ export const site = {
   name: "Default Acme",
   productionBranch: "main",
   rootDirectory: "",
+  publicOrigin: "https://acme.example.test",
+  mounts: { blog: "/blog" },
 };

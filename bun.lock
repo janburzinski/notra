@@ -94,6 +94,7 @@
         "@notra/geo-core": "workspace:*",
         "@notra/posthog": "workspace:*",
         "@notra/schemas": "workspace:*",
+        "@notra/sites-core": "workspace:*",
         "@notra/utils": "workspace:*",
         "@notra/webhooks": "workspace:*",
         "@opentelemetry/api": "^1.9.1",

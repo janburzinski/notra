@@ -87,6 +87,7 @@ import {
 import { saveContentDocumentSchema } from "@notra/schemas/dashboard/content-history";
 import { clearCompletedGenerationSchema } from "@notra/schemas/dashboard/generations";
 import type { PostMetadata } from "@notra/schemas/shared/post-metadata";
+import { siteAuthorRefId } from "@notra/sites-core/utils/site-author-refs";
 import { primaryMountUrl } from "@notra/sites-server/utils/urls";
 import { slugify } from "@notra/utils/slugify";
 import {
@@ -162,7 +163,6 @@ import { sumAgentReachByCollection } from "@/utils/content-agent-reach";
 import { getContentListPreview } from "@/utils/content-list-preview";
 import { resolveLookbackRange } from "@/utils/lookback";
 import { ratelimit } from "@/utils/ratelimit";
-import { siteAuthorRefId } from "@/utils/site-author-refs";
 
 import {
   assertNotDemo,

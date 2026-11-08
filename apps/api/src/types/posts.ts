@@ -21,6 +21,7 @@ import type {
   PostNotFoundError,
   PostSlugDuplicateError,
   PostSlugNotSupportedError,
+  PostSiteAuthorNotSupportedError,
   PostUnknownAuthorError,
 } from "../errors/posts";
 import type { DbClient } from "./db";
@@ -58,6 +59,15 @@ export type PostAuthorSummary = Pick<
 
 export type PostAuthorsById = ReadonlyMap<string, PostAuthorSummary>;
 
+/**
+ * Site authors (`site:<id>` entries) by post id, then by entry. Null when the
+ * dashboard couldn't resolve them, so entries fall back to their bare id.
+ */
+export type PostSiteAuthorsByPost = ReadonlyMap<
+  string,
+  ReadonlyMap<string, PostAuthorSummary>
+> | null;
+
 type ContentAuthorRow = Pick<
   typeof contentAuthors.$inferSelect,
   "id" | "slug" | "name" | "title" | "bio" | "avatarUrl" | PostAuthorLinkKey
@@ -68,6 +78,7 @@ export type PostDomainError =
   | PostSlugNotSupportedError
   | PostMetadataNotSupportedError
   | PostUnknownAuthorError
+  | PostSiteAuthorNotSupportedError
   | PostInvalidMarkdownError
   | PostSlugDuplicateError
   | PostConcurrentModificationError
@@ -139,6 +150,8 @@ interface PatchPostPreparedUpdate {
   previousStatus: "draft" | "published";
   expectedUpdatedAt: Date;
   rederiveTitleFromMarkdown: boolean;
+  /** `site:<id>` entries in metadata.authorIds, which only the dashboard can check against blog.json. */
+  siteAuthorIds: string[];
 }
 
 export interface PreparePatchPostProgramSuccess {

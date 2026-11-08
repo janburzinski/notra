@@ -54,6 +54,10 @@ import {
   resolveRequestOrganization,
 } from "../utils/organizations";
 import {
+  loadPostSiteAuthors,
+  verifyPostSiteAuthors,
+} from "../utils/post-site-authors";
+import {
   postPatchLogFields,
   respondToPostFailure,
   runPostProgram,
@@ -134,7 +138,7 @@ const listPostAuthorsRoute = createRoute({
   operationId: "listPostAuthors",
   summary: "List post authors",
   description:
-    "Returns the organization's authors, sorted by name. Authors are created in the dashboard; pass their IDs in metadata.authorIds when updating a blog post or changelog.",
+    "Returns the organization's authors, sorted by name. Authors are created in the dashboard; pass their IDs in metadata.authorIds when updating a blog post or changelog. Blog posts on a Notra Sites site can also use that site's own authors from GET /v1/sites/{siteId}/authors.",
   responses: {
     200: {
       description: "Authors fetched successfully",
@@ -184,7 +188,7 @@ const patchPostRoute = createRoute({
   operationId: "updatePost",
   summary: "Update a single post",
   description:
-    "Updates any combination of title, slug, markdown, status, and metadata. Sending markdown re-renders the stored HTML, and when title is omitted it is taken from the first heading in the markdown, keeping the existing title when the markdown has no heading. Slugs and metadata are only accepted for blog posts and changelogs. Inside metadata, send only the fields you want to change; tags and authorIds replace the stored list, and authorIds must come from GET /v1/posts/authors. Title, slug, markdown, or metadata updates also sync a post linked to GitHub: an open pull request gets a new commit, and a repository set to publish directly gets a direct commit when its live branch allows one (unprotected, file unchanged on GitHub). Otherwise, including closed or merged pull requests, GitHub is left as is and no new pull request is opened; the post is still saved. GitHub sync errors occur after saving the post: 429 includes Retry-After, 502 indicates a sync error, and 504 indicates an unknown sync outcome. Check the PR before retrying an unconfirmed sync.",
+    "Updates any combination of title, slug, markdown, status, and metadata. Sending markdown re-renders the stored HTML, and when title is omitted it is taken from the first heading in the markdown, keeping the existing title when the markdown has no heading. Slugs and metadata are only accepted for blog posts and changelogs. Inside metadata, send only the fields you want to change; tags and authorIds replace the stored list, and authorIds must come from GET /v1/posts/authors. A blog post that publishes to a Notra Sites site can also credit that site's authors as site:<id>, the ref from GET /v1/sites/{siteId}/authors. Title, slug, markdown, or metadata updates also sync a post linked to GitHub: an open pull request gets a new commit, and a repository set to publish directly gets a direct commit when its live branch allows one (unprotected, file unchanged on GitHub). Otherwise, including closed or merged pull requests, GitHub is left as is and no new pull request is opened; the post is still saved. GitHub sync errors occur after saving the post: 429 includes Retry-After, 502 indicates a sync error, and 504 indicates an unknown sync outcome. Check the PR before retrying an unconfirmed sync.",
   request: {
     params: getPostParamsSchema,
     body: {
@@ -367,10 +371,13 @@ postsRoutes.openapi(getPostsRoute, async (c) => {
   }
 
   const { authors } = result.success;
+  const siteAuthors = await loadPostSiteAuthors(c, orgId, result.success.posts);
 
   return c.json(
     {
-      posts: result.success.posts.map((post) => serializePost(post, authors)),
+      posts: result.success.posts.map((post) =>
+        serializePost(post, authors, siteAuthors)
+      ),
       pagination: result.success.pagination,
       organization,
     },
@@ -415,10 +422,13 @@ postsRoutes.openapi(getPostRoute, async (c) => {
     throw result.failure;
   }
 
+  const { post } = result.success;
+  const siteAuthors = await loadPostSiteAuthors(c, orgId, post ? [post] : []);
+
   return c.json(
     {
-      post: result.success.post
-        ? serializePost(result.success.post, result.success.authors)
+      post: post
+        ? serializePost(post, result.success.authors, siteAuthors)
         : null,
       organization,
     },
@@ -472,6 +482,19 @@ postsRoutes.openapi(patchPostRoute, async (c) => {
 
   if (preparedResult._tag === "Failure") {
     return respondToPostFailure(c, preparedResult.failure);
+  }
+
+  const { siteAuthorIds } = preparedResult.success.prepared;
+  if (siteAuthorIds.length > 0) {
+    const rejected = await verifyPostSiteAuthors(
+      c,
+      orgId,
+      postId,
+      siteAuthorIds
+    );
+    if (rejected) {
+      return rejected;
+    }
   }
 
   const rateLimited = await enforceRatelimit(c, ratelimit.postUpdate);
@@ -561,7 +584,11 @@ postsRoutes.openapi(patchPostRoute, async (c) => {
     }
   }
 
-  return c.json({ post: serializePost(post, authors), organization }, 200);
+  const siteAuthors = await loadPostSiteAuthors(c, orgId, [post]);
+  return c.json(
+    { post: serializePost(post, authors, siteAuthors), organization },
+    200
+  );
 });
 
 postsRoutes.openapi(createPostRoute, async (c) => {

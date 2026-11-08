@@ -128,6 +128,11 @@ function SiteWorkspaceBranch({ children }: SiteWorkspaceProps) {
           comparisonContent={
             production.data?.published ?? production.data?.content
           }
+          liveContent={
+            production.data
+              ? production.data.published
+              : currentDocument.published
+          }
           files={currentFiles}
           refreshing={!document.data || !files.query.data || loadFailed}
           branch={branch ?? undefined}

@@ -6,6 +6,7 @@ import {
   CONTENT_AUTHOR_NAME_MAX_LENGTH,
   CONTENT_AUTHOR_SLUG_MAX_LENGTH,
   CONTENT_AUTHOR_TITLE_MAX_LENGTH,
+  SITE_AUTHOR_BIO_MAX_LENGTH,
 } from "@notra/schemas/constants/dashboard/post-metadata";
 import {
   ResponsiveDialog,
@@ -32,7 +33,6 @@ import { SiteAuthorAvatarField } from "@/components/sites/site-author-avatar-fie
 import { useSite } from "@/components/sites/site-context";
 import { useSiteWorkspace } from "@/components/sites/site-workspace-context";
 import { CONTENT_AUTHOR_LINK_FIELDS } from "@/constants/content-overview";
-import { SITE_AUTHOR_BIO_MAX_LENGTH } from "@/constants/site-authors";
 import { SITE_SOCIAL_LINKS } from "@/constants/site-design";
 import { SITE_DEFAULT_BLOG_PATH } from "@/constants/sites";
 import { useSiteAuthorForm } from "@/lib/hooks/use-site-author-form";

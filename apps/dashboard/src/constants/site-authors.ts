@@ -1,10 +1,5 @@
 import { CONTENT_AUTHOR_LINK_FIELDS } from "@/constants/content-overview";
-
-/**
- * Marks an entry of a post's `authorIds` as an id from the site's blog.json
- * `authors` rather than a Notra author row, e.g. `site:jan`.
- */
-export const SITE_AUTHOR_REF_PREFIX = "site:";
+import type { SiteAuthorFormError } from "@/types/site-authors";
 
 /** Every field of a blog.json author, in the order Notra writes them. */
 export const SITE_AUTHOR_FIELDS = [
@@ -14,11 +9,6 @@ export const SITE_AUTHOR_FIELDS = [
   "bio",
   ...CONTENT_AUTHOR_LINK_FIELDS,
 ] as const;
-
-/** blog.json allows shorter bios than Notra authors. */
-export const SITE_AUTHOR_BIO_MAX_LENGTH = 300;
-
-export const SITE_AUTHOR_PAGE_LAYOUTS = ["inline", "stacked"] as const;
 
 export const TRAILING_SLASHES = /\/+$/;
 
@@ -40,3 +30,14 @@ export const SITE_AUTHOR_YAML_RESERVED = new Set([
   "y",
   "n",
 ]);
+
+/** Why the public API refused an author, by form error. */
+export const SITE_AUTHOR_ERROR_MESSAGES: Record<SiteAuthorFormError, string> = {
+  required: "is required",
+  tooLong: "is too long",
+  idFormat:
+    "use 1 to 40 lowercase letters, digits and dashes, starting and ending with a letter or digit",
+  idTaken: "another author already uses this id",
+  avatar: "use a site path like /images/jane.png or an https:// URL",
+  https: "use a full https:// URL",
+};

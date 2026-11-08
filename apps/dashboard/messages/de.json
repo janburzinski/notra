@@ -604,6 +604,9 @@
         "skills": {
           "description": "Lies und verwalte deine Skills"
         },
+        "sites": {
+          "description": "Lies und verwalte die Autoren deiner Notra Sites und veröffentliche ihre Änderungen"
+        },
         "feedback": {
           "label": "Agent-Feedback",
           "description": "Lies und sichte Feedback von KI-Agenten"

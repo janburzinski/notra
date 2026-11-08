@@ -140,3 +140,5 @@ export const SITE_ICON_NAMES = [
   "youtube",
   "zap",
 ] as const;
+
+export const SITE_AUTHOR_PAGE_LAYOUTS = ["inline", "stacked"] as const;

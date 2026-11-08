@@ -3,19 +3,20 @@ import { logError } from "@notra/ai/utils/server-log";
 import { db } from "@notra/db/drizzle";
 import { contentAuthors, posts, sites } from "@notra/db/schema";
 import { postGitHubPublishSchema } from "@notra/schemas/dashboard/content";
-import { SITE_CONFIG_FILENAME } from "@notra/sites-core/constants/sites";
+import {
+  siteAuthorRef,
+  siteAuthorRefId,
+} from "@notra/sites-core/utils/site-author-refs";
 import { getSite } from "@notra/sites-server/deployments";
-import { readPublishedFile, readSiteDraft } from "@notra/sites-server/editor";
 import { isSitesConfigured } from "@notra/sites-server/env";
 import type { Site } from "@notra/sites-server/types/sites";
 import { primaryMountUrl } from "@notra/sites-server/utils/urls";
 import { isDemoMode } from "@notra/utils/demo-mode";
-import { and, asc, eq, sql } from "drizzle-orm";
+import { and, asc, eq, inArray, sql } from "drizzle-orm";
 
+import { readSiteAuthorsDocument } from "@/lib/sites/site-author-document";
 import type { PostAuthorSite } from "@/types/site-authors";
-import { siteAuthorRef, siteAuthorRefId } from "@/utils/site-author-refs";
 import { readSiteAuthors } from "@/utils/site-authors";
-import { parseDesignSource } from "@/utils/site-design-sections";
 
 async function listBlogSites(organizationId: string) {
   const rows = await db
@@ -73,32 +74,52 @@ function pickAuthorSite(
   return candidates.length === 1 ? (candidates[0] ?? null) : null;
 }
 
+/** The site whose blog.json authors each blog post uses, by post id; posts without one are left out. */
+export async function resolvePostAuthorSites(
+  organizationId: string,
+  postIds: string[]
+): Promise<Map<string, PostAuthorSite>> {
+  const sitesByPost = new Map<string, PostAuthorSite>();
+  if (postIds.length === 0) {
+    return sitesByPost;
+  }
+  const [rows, candidates] = await Promise.all([
+    db.query.posts.findMany({
+      where: and(
+        inArray(posts.id, postIds),
+        eq(posts.organizationId, organizationId),
+        eq(posts.contentType, "blog_post")
+      ),
+      columns: { id: true, githubPublish: true },
+      with: { collection: { columns: { projectId: true } } },
+    }),
+    listBlogSites(organizationId),
+  ]);
+  for (const post of rows) {
+    const site = pickAuthorSite(
+      {
+        githubPublish: post.githubPublish,
+        projectId: post.collection.projectId,
+      },
+      candidates
+    );
+    if (site) {
+      sitesByPost.set(post.id, {
+        id: site.id,
+        name: site.name,
+        liveUrl: primaryMountUrl(site.publicOrigin, site.mounts),
+      });
+    }
+  }
+  return sitesByPost;
+}
+
 export async function resolvePostAuthorSite(
   organizationId: string,
   postId: string
 ): Promise<PostAuthorSite | null> {
-  const post = await db.query.posts.findFirst({
-    where: and(eq(posts.id, postId), eq(posts.organizationId, organizationId)),
-    columns: { contentType: true, githubPublish: true },
-    with: { collection: { columns: { projectId: true } } },
-  });
-  if (post?.contentType !== "blog_post") {
-    return null;
-  }
-  const site = pickAuthorSite(
-    {
-      githubPublish: post.githubPublish,
-      projectId: post.collection.projectId,
-    },
-    await listBlogSites(organizationId)
-  );
-  return site
-    ? {
-        id: site.id,
-        name: site.name,
-        liveUrl: primaryMountUrl(site.publicOrigin, site.mounts),
-      }
-    : null;
+  const sitesByPost = await resolvePostAuthorSites(organizationId, [postId]);
+  return sitesByPost.get(postId) ?? null;
 }
 
 /**
@@ -121,20 +142,13 @@ export async function resolvePostSiteAuthors(target: {
     if (!site) {
       return null;
     }
-    const [file, draft] = await Promise.all([
-      readPublishedFile(site, SITE_CONFIG_FILENAME),
-      readSiteDraft(site, SITE_CONFIG_FILENAME),
-    ]);
-    const content =
-      draft && !draft.deleted ? draft.content : (file?.content ?? "");
+    const { config } = await readSiteAuthorsDocument(site);
     return {
-      authors: readSiteAuthors(parseDesignSource(content)).map(
-        ({ id, author }) => ({
-          slug: id,
-          name: author.name,
-          title: author.title ?? null,
-        })
-      ),
+      authors: readSiteAuthors(config).map(({ id, author }) => ({
+        slug: id,
+        name: author.name,
+        title: author.title ?? null,
+      })),
       ref: siteAuthorRef,
       slugOf: siteAuthorRefId,
     };

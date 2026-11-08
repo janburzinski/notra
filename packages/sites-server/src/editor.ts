@@ -851,6 +851,7 @@ export async function flushSiteDrafts(
         tx,
         () => publishedConfig(site, head.sha, access)
       );
+      input.assertPublishable?.(drafts.map((draft) => draft.path));
       if (drafts.length === 0) {
         return { commitSha: head.sha, pullRequestUrl: null };
       }

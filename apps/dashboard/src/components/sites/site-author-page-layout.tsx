@@ -1,5 +1,6 @@
 "use client";
 
+import { SITE_AUTHOR_PAGE_LAYOUTS } from "@notra/sites-core/constants/site-layout";
 import {
   RadioGroup,
   RadioGroupItem,
@@ -8,7 +9,6 @@ import { cn } from "@notra/ui/lib/utils";
 import { useId } from "react";
 import { useTranslations } from "use-intl";
 
-import { SITE_AUTHOR_PAGE_LAYOUTS } from "@/constants/site-authors";
 import type {
   SiteAuthorLayoutSketchProps,
   SiteAuthorPageLayoutProps,

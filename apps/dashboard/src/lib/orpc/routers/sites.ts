@@ -4,7 +4,6 @@ import {
   listGitHubAppRepositoriesEffect,
   setSelectedGitHubAppRepositoriesEffect,
 } from "@notra/ai/integrations/github";
-import { getOpenRequestLogger } from "@notra/ai/utils/evlog-request";
 import { db } from "@notra/db/drizzle";
 import {
   githubIntegrations,
@@ -194,6 +193,7 @@ import {
 } from "@/lib/orpc/utils/errors";
 import { toGeoOrpcError } from "@/lib/orpc/utils/geo-errors";
 import { assertSitesAccess } from "@/lib/sites/access";
+import { deployPublishedCommit } from "@/lib/sites/deploy-published-commit";
 import { dispatchSiteJobs } from "@/lib/sites/dispatch";
 import { isSitesBulkImportEnabled } from "@/lib/sites/flag";
 import {
@@ -265,24 +265,6 @@ function dispatchLater(jobIds: Array<string | null>) {
   const ids = jobIds.filter((id): id is string => Boolean(id));
   if (ids.length > 0) {
     afterResponse(() => dispatchSiteJobs(ids));
-  }
-}
-
-async function deployPublishedCommit(
-  site: Site,
-  commitSha: string,
-  userId: string
-): Promise<boolean> {
-  try {
-    dispatchLater([
-      await deployBranchHead(site, { trigger: "manual", userId, commitSha }),
-    ]);
-    return false;
-  } catch {
-    getOpenRequestLogger()?.set({
-      sitesPublish: { siteId: site.id, commitSha, deployPending: true },
-    });
-    return true;
   }
 }
 

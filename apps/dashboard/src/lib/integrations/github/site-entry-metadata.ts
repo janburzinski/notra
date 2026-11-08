@@ -4,6 +4,7 @@ import { logError } from "@notra/ai/utils/server-log";
 import { db } from "@notra/db/drizzle";
 import { contentAuthors } from "@notra/db/schema";
 import { contentAuthorsInOrganization } from "@notra/db/utils/post-metadata";
+import { siteAuthorRefId } from "@notra/sites-core/utils/site-author-refs";
 
 import { MARKDOWN_IMAGE_DESTINATION } from "@/constants/site-github-publish";
 import { prepareR2GitHubContentAssets } from "@/lib/integrations/github/content-assets";
@@ -17,7 +18,6 @@ import type {
   SiteEntryMediaContext,
   SiteEntryMetadata,
 } from "@/types/integrations/site-github-publish";
-import { siteAuthorRefId } from "@/utils/site-author-refs";
 
 async function prepareEntryImage(
   url: string,

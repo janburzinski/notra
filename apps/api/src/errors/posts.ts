@@ -20,6 +20,11 @@ export class PostUnknownAuthorError extends Schema.TaggedError<PostUnknownAuthor
   {}
 ) {}
 
+export class PostSiteAuthorNotSupportedError extends Schema.TaggedError<PostSiteAuthorNotSupportedError>()(
+  "PostSiteAuthorNotSupportedError",
+  {}
+) {}
+
 export class PostInvalidMarkdownError extends Schema.TaggedError<PostInvalidMarkdownError>()(
   "PostInvalidMarkdownError",
   {}

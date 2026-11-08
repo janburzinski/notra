@@ -145,6 +145,14 @@ export const API_SCOPE_RESOURCES = [
     openApiTag: "Skills",
   },
   {
+    id: "sites",
+    paths: ["/sites"],
+    label: "Sites",
+    description:
+      "Read and manage Notra Sites authors and publish their changes",
+    openApiTag: "Content",
+  },
+  {
     id: "feedback",
     paths: ["/feedback"],
     label: "Agent feedback",

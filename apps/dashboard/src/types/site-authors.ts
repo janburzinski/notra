@@ -1,11 +1,15 @@
+import type { internalSitesRequestSchema } from "@notra/schemas/api/sites";
 import type { ContentAuthor } from "@notra/schemas/shared/post-metadata";
+import type { SITE_AUTHOR_PAGE_LAYOUTS } from "@notra/sites-core/constants/site-layout";
+import type {
+  SiteDraft,
+  SitePublishedFile,
+} from "@notra/sites-server/types/editor";
 import type { ReactNode } from "react";
+import type { z } from "zod";
 
 import type { CONTENT_AUTHOR_LINK_FIELDS } from "@/constants/content-overview";
-import type {
-  SITE_AUTHOR_FIELDS,
-  SITE_AUTHOR_PAGE_LAYOUTS,
-} from "@/constants/site-authors";
+import type { SITE_AUTHOR_FIELDS } from "@/constants/site-authors";
 import type { SiteRawConfig } from "@/types/site-design";
 import type { SiteWorkspaceValue } from "@/types/site-workspace";
 
@@ -26,7 +30,7 @@ export interface SiteAuthorEntry {
 /** The author form: every field as a string, empty when unset. */
 export type SiteAuthorForm = { id: string } & Record<SiteAuthorField, string>;
 
-type SiteAuthorFormError =
+export type SiteAuthorFormError =
   | "required"
   | "tooLong"
   | "idFormat"
@@ -214,6 +218,20 @@ export interface SiteAuthorAvatarFieldProps {
   onChange: (avatar: string) => void;
   aria: SiteAuthorFieldAria;
 }
+
+/** blog.json as the Design tab edits it, read on the server. */
+export interface SiteAuthorsDocument {
+  file: SitePublishedFile | null;
+  draft: SiteDraft | null;
+  /** The draft when there is one, else the published file or the default config. */
+  content: string;
+  config: SiteRawConfig;
+  /** The committed blog.json, empty when the repository has none: what decides which authors are live. */
+  published: SiteRawConfig;
+}
+
+/** A Sites authors request the public API forwards to the dashboard. */
+export type SiteAuthorApiRequest = z.infer<typeof internalSitesRequestSchema>;
 
 export interface SiteDesignAuthorsBodyProps {
   state: SiteWorkspaceValue;

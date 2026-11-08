@@ -26,6 +26,10 @@ if (process.env.NOTRA_DEFAULT_EDITOR_TEST_WORKER !== "1") {
   let config: string | null = null;
   let draft: DefaultEditorDraft | null = null;
   let writes = 0;
+  // Drafts saved after the API's quick check, seen by the publisher's lock.
+  let lateDrafts: string[] = [];
+  let commits = 0;
+  let deploys = 0;
   mock.module("../src/lib/auth/organization", () => ({
     assertAuthenticated: async () => ({
       session: {},
@@ -61,6 +65,20 @@ if (process.env.NOTRA_DEFAULT_EDITOR_TEST_WORKER !== "1") {
     }),
     readSiteSourceFile: async () =>
       config === null ? null : { content: config, sha: "blob-config" },
+    readPublishedFile: async () =>
+      config === null ? null : { content: config, sha: "blob-config" },
+    publishSiteDrafts: async (
+      _site: unknown,
+      input: { assertPublishable?: (paths: readonly string[]) => void }
+    ) => {
+      input.assertPublishable?.([
+        ...(draft ? [draft.path] : []),
+        ...lateDrafts,
+      ]);
+      commits += 1;
+      draft = null;
+      return { commitSha: "c".repeat(40), pullRequestUrl: null };
+    },
     listSiteDrafts: async () => (draft ? [draft] : []),
     listSiteDraftSummaries: async () => (draft ? [draft] : []),
     readSiteDraft: async () => draft,
@@ -83,7 +101,42 @@ if (process.env.NOTRA_DEFAULT_EDITOR_TEST_WORKER !== "1") {
       draft = null;
     },
   }));
+  const imageDrafts = await import("@notra/sites-server/image-drafts");
+  mock.module("@notra/sites-server/image-drafts", () => ({
+    ...imageDrafts,
+    listPendingSiteDraftSummaries: async () => (draft ? [draft] : []),
+  }));
+  mock.module("../src/lib/sites/post-authors", () => ({
+    countSiteAuthorUsage: async () => ({}),
+    resolvePostAuthorSite: async () => null,
+    resolvePostAuthorSites: async () => new Map(),
+  }));
+  mock.module("../src/lib/sites/deploy-published-commit", () => ({
+    deployPublishedCommit: async () => {
+      deploys += 1;
+      return false;
+    },
+  }));
+  mock.module("../src/lib/workflows/internal-auth", () => ({
+    verifyInternalWorkflowRequest: async () => true,
+  }));
   const { sitesRouter } = await import("../src/lib/orpc/routers/sites");
+  const { POST: sitesAuthorsApi } =
+    await import("../src/app/api/internal/sites/authors/route");
+  const callAuthorsApi = async (body: Record<string, unknown>) => {
+    const response = await sitesAuthorsApi(
+      new Request("http://127.0.0.1/api/internal/sites/authors", {
+        method: "POST",
+        body: JSON.stringify({
+          organizationId: site.organizationId,
+          siteId: site.id,
+          actorUserId: null,
+          ...body,
+        }),
+      })
+    );
+    return { status: response.status, body: await response.json() };
+  };
   const { createORPCContext } = await import("../src/lib/orpc/context");
   const { readSiteIntegrations } =
     await import("@notra/sites-server/integrations");
@@ -92,6 +145,9 @@ if (process.env.NOTRA_DEFAULT_EDITOR_TEST_WORKER !== "1") {
     config = null;
     draft = null;
     writes = 0;
+    lateDrafts = [];
+    commits = 0;
+    deploys = 0;
   });
 
   test("missing config appears as a virtual editable file without creating a draft", async () => {
@@ -170,5 +226,69 @@ if (process.env.NOTRA_DEFAULT_EDITOR_TEST_WORKER !== "1") {
       invalid: false,
     });
     expect(writes).toBe(0);
+  });
+
+  test("authors only in a draft are not live while the repository has no blog.json", async () => {
+    draft = {
+      path: "blog.json",
+      content: JSON.stringify({
+        name: "Draft Acme",
+        authors: { jane: { name: "Jane Doe" } },
+      }),
+      baseBlobSha: null,
+      baseCommitSha: null,
+      deleted: false,
+      updatedAt: new Date(),
+    };
+    const listed = await callAuthorsApi({ action: "listAuthors" });
+    expect(listed.status).toBe(200);
+    expect(listed.body.authors).toEqual([
+      expect.objectContaining({ id: "jane", live: false }),
+    ]);
+    const deleted = await callAuthorsApi({
+      action: "deleteAuthor",
+      authorId: "jane",
+      force: false,
+    });
+    expect(deleted.status).toBe(200);
+    expect(deleted.body.authors).toEqual([]);
+    expect(writes).toBe(1);
+  });
+  test("a file staged while a Design publish runs refuses it instead of going live", async () => {
+    config = JSON.stringify({ name: "Repository Acme" });
+    draft = {
+      path: "blog.json",
+      content: JSON.stringify({
+        name: "Repository Acme",
+        authors: { jane: { name: "Jane Doe" } },
+      }),
+      baseBlobSha: "blob-config",
+      baseCommitSha: null,
+      deleted: false,
+      updatedAt: new Date(),
+    };
+    lateDrafts = ["blog/unfinished.mdx"];
+    const refused = await callAuthorsApi({ action: "publish" });
+    expect(refused).toEqual({
+      status: 409,
+      body: expect.objectContaining({ code: "SITE_HAS_OTHER_CHANGES" }),
+    });
+    expect(refused.body.error).toContain("blog/unfinished.mdx");
+    expect({ commits, deploys }).toEqual({ commits: 0, deploys: 0 });
+    lateDrafts = [];
+    const published = await callAuthorsApi({ action: "publish" });
+    expect(published).toEqual({
+      status: 200,
+      body: {
+        published: true,
+        commitSha: "c".repeat(40),
+        deploymentQueued: true,
+      },
+    });
+    expect({ commits, deploys }).toEqual({ commits: 1, deploys: 1 });
+    expect(await callAuthorsApi({ action: "publish" })).toEqual({
+      status: 200,
+      body: { published: false, commitSha: null, deploymentQueued: false },
+    });
   });
 }

@@ -55,6 +55,7 @@ export const API_KEY_TRANSLATED_RESOURCE_IDS = [
   "event-triggers",
   "chats",
   "skills",
+  "sites",
   "feedback",
   "projects",
   "geo-settings",
@@ -73,6 +74,7 @@ export const API_KEY_RESOURCE_COMMON_LABEL_KEYS = {
   integrations: "integrations",
   schedules: "schedules",
   skills: "skills",
+  sites: "sites",
   projects: "projects",
 } as const;
 

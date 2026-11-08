@@ -1,6 +1,7 @@
-import { SITE_AUTHOR_ID } from "@notra/sites-core/constants/site-config";
-
-import { SITE_AUTHOR_REF_PREFIX } from "@/constants/site-authors";
+import {
+  SITE_AUTHOR_ID,
+  SITE_AUTHOR_REF_PREFIX,
+} from "@notra/sites-core/constants/site-config";
 
 export function siteAuthorRef(id: string): string {
   return `${SITE_AUTHOR_REF_PREFIX}${id}`;

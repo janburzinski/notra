@@ -1678,6 +1678,24 @@ if (!process.env.SITES_TEST_DATABASE_URL) {
           userId,
         })
       ).rejects.toThrow("Feature branches save automatically");
+      // A caller vetting what goes live (the API's Design publish) sees the
+      // exact drafts under the branch lock; refusing commits nothing.
+      const headBeforeRefusal = await github.head();
+      await expect(
+        publishSiteDrafts(site, {
+          message: "Skip internal pages",
+          userId,
+          assertPublishable: (paths) => {
+            expect(paths).toEqual(["blog.json"]);
+            throw new Error("Refused by the caller");
+          },
+        })
+      ).rejects.toThrow("Refused by the caller");
+      expect(await github.head()).toBe(headBeforeRefusal);
+      expect(await github.file("blog.json")).not.toContain("/internal/**");
+      expect(
+        (await listSiteDrafts(site.id)).map((draft) => draft.path)
+      ).toEqual(["blog.json"]);
       const direct = await publishSiteDrafts(site, {
         message: "Skip internal pages",
         userId,

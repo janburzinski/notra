@@ -15,6 +15,7 @@ import {
   contentHistoryRestoreInputSchema,
   contentHistoryVersionInputSchema,
 } from "@notra/schemas/dashboard/content-history";
+import { siteAuthorRefId } from "@notra/sites-core/utils/site-author-refs";
 import { and, count, desc, eq, lt, sql } from "drizzle-orm";
 
 import { assertOrganizationAccess } from "@/lib/auth/organization";
@@ -27,7 +28,6 @@ import {
   contentHistoryRestoreData,
   serializeContentHistoryEntry,
 } from "@/utils/content-history-server";
-import { siteAuthorRefId } from "@/utils/site-author-refs";
 
 export const contentHistoryRouter = {
   list: baseProcedure

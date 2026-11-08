@@ -28,6 +28,8 @@ import {
   ALL_POST_CONTENT_TYPES,
   ALL_POST_STATUSES,
 } from "@notra/schemas/api/content";
+import { SITE_AUTHOR_REF_PREFIX } from "@notra/sites-core/constants/site-config";
+import { siteAuthorRefId } from "@notra/sites-core/utils/site-author-refs";
 import { and, asc, count, eq, inArray, sql } from "drizzle-orm";
 import { Effect } from "effect";
 import { nanoid } from "nanoid";
@@ -42,6 +44,7 @@ import {
   PostNotFoundError,
   PostSlugDuplicateError,
   PostSlugNotSupportedError,
+  PostSiteAuthorNotSupportedError,
   PostUnknownAuthorError,
   PostDatabaseError,
 } from "../errors/posts";
@@ -457,6 +460,7 @@ export const preparePatchPost = Effect.fn("posts.preparePatch")(function* (
   const updateData: Partial<typeof posts.$inferInsert> = {};
   const { body } = input;
   let rederiveTitleFromMarkdown = false;
+  let siteAuthorIds: string[] = [];
 
   if (body.title !== undefined) {
     updateData.title = body.title;
@@ -493,14 +497,28 @@ export const preparePatchPost = Effect.fn("posts.preparePatch")(function* (
     }
 
     const authorIds = body.metadata.authorIds ?? [];
-    if (authorIds.length > 0) {
+    siteAuthorIds = authorIds.filter((id) =>
+      id.startsWith(SITE_AUTHOR_REF_PREFIX)
+    );
+    if (siteAuthorIds.some((id) => siteAuthorRefId(id) === null)) {
+      return yield* new PostUnknownAuthorError();
+    }
+    if (siteAuthorIds.length > 0 && existingPost.contentType !== "blog_post") {
+      return yield* new PostSiteAuthorNotSupportedError();
+    }
+    const notraAuthorIds = authorIds.filter(
+      (id) => !id.startsWith(SITE_AUTHOR_REF_PREFIX)
+    );
+    if (notraAuthorIds.length > 0) {
       const knownAuthors = yield* database(() =>
         input.db
           .select({ id: contentAuthors.id })
           .from(contentAuthors)
-          .where(contentAuthorsInOrganization(input.organizationId, authorIds))
+          .where(
+            contentAuthorsInOrganization(input.organizationId, notraAuthorIds)
+          )
       );
-      if (knownAuthors.length !== authorIds.length) {
+      if (knownAuthors.length !== notraAuthorIds.length) {
         return yield* new PostUnknownAuthorError();
       }
     }
@@ -525,6 +543,7 @@ export const preparePatchPost = Effect.fn("posts.preparePatch")(function* (
       previousStatus: existingPost.status,
       expectedUpdatedAt: normalizePostUpdatedAt(existingPost.updatedAt),
       rederiveTitleFromMarkdown,
+      siteAuthorIds,
     },
   } satisfies PreparePatchPostProgramSuccess;
 });

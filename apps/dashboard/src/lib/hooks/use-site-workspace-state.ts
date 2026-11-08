@@ -30,6 +30,7 @@ import { validateVariableRows } from "@/utils/site-variables";
 export function useSiteWorkspaceState({
   document,
   comparisonContent,
+  liveContent,
   files,
   refreshing = false,
   branch,
@@ -366,6 +367,8 @@ export function useSiteWorkspaceState({
     published: parseDesignSource(
       comparisonContent ?? document.published ?? document.content
     ),
+    /** What is live: an author only counts as published once blog.json is committed. */
+    live: parseDesignSource(liveContent ?? ""),
     issues,
     brokenSource,
     repair,

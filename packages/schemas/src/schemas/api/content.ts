@@ -417,7 +417,7 @@ const postMetadataResponseSchema = z
     }),
     authors: z.array(postAuthorSummarySchema).openapi({
       description:
-        "Credited authors in display order. Authors deleted since they were assigned are omitted.",
+        "Credited authors in display order. Authors deleted since they were assigned are omitted. On blog posts that publish to a Notra Sites site, authors whose id starts with site: come from the site's blog.json, unpublished Design changes included.",
     }),
     featured: z.boolean().openapi({
       description: "Pinned to the top of the blog index on hosted sites.",
@@ -518,7 +518,7 @@ const patchPostMetadataRequestSchema = z
       example: "The editor now opens twice as fast on long posts.",
     }),
     authorIds: postAuthorIdsSchema.optional().openapi({
-      description: `Replaces the credited authors, in display order. Up to ${POST_AUTHORS_MAX} IDs from GET /v1/posts/authors. Send [] to clear.`,
+      description: `Replaces the credited authors, in display order. Up to ${POST_AUTHORS_MAX} IDs from GET /v1/posts/authors. A blog post that publishes to a Notra Sites site can also credit the site's own authors as site:<id>, the ref from GET /v1/sites/{siteId}/authors. Send [] to clear.`,
       example: ["auth_8f2kq1"],
     }),
     featured: z.boolean().optional().openapi({

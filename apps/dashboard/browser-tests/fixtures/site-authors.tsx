@@ -1,5 +1,6 @@
 import type { ContentResponse } from "@notra/schemas/dashboard/content";
 import type { ContentAuthor } from "@notra/schemas/shared/post-metadata";
+import { siteAuthorRefId } from "@notra/sites-core/utils/site-author-refs";
 import { SidebarProvider } from "@notra/ui/components/ui/sidebar";
 import { TooltipProvider } from "@notra/ui/components/ui/tooltip";
 import { createORPCClient } from "@orpc/client";
@@ -32,7 +33,6 @@ import type { SitePublishDialogProps } from "../../src/types/components/sites";
 import type { SiteBranchControlsProps } from "../../src/types/site-branches";
 import type { SiteDraftInput } from "../../src/types/site-drafts";
 import type { SiteContextValue } from "../../src/types/sites";
-import { siteAuthorRefId } from "../../src/utils/site-author-refs";
 import { buildSiteEntryMarkdown } from "../../src/utils/site-github-publish";
 import type { WorkspaceFixtureRecord } from "../types/site-workspace";
 
@@ -64,20 +64,38 @@ const published = JSON.stringify({
     },
   },
 });
+// `?unpublished`: the repository has no blog.json yet, so the authors only exist in its draft.
+const unpublished = params.has("unpublished");
 const record: WorkspaceFixtureRecord = {
   document: {
     path: "blog.json",
     encoding: "utf8",
     content: published,
-    published,
-    blobSha: "blob-1",
-    publishedBlobSha: "blob-1",
-    hasDraft: false,
-    draftId: null,
-    draftRevision: null,
+    published: unpublished ? null : published,
+    blobSha: unpublished ? null : "blob-1",
+    publishedBlobSha: unpublished ? null : "blob-1",
+    hasDraft: unpublished,
+    draftId: unpublished ? "draft-1" : null,
+    draftRevision: unpublished ? 1 : null,
     sourceContext,
   },
-  files: { commitSha: "commit-1", sourceContext, files: [], drafts: [] },
+  files: {
+    commitSha: "commit-1",
+    sourceContext,
+    files: [],
+    drafts: unpublished
+      ? [
+          {
+            path: "blog.json",
+            id: "draft-1",
+            revision: 1,
+            deleted: false,
+            baseBlobSha: null,
+            updatedAt: new Date(),
+          },
+        ]
+      : [],
+  },
 };
 const contentAuthor = (
   id: string,

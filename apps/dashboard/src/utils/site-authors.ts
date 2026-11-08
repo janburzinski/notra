@@ -1,20 +1,18 @@
 import {
   CONTENT_AUTHOR_NAME_MAX_LENGTH,
   CONTENT_AUTHOR_TITLE_MAX_LENGTH,
+  SITE_AUTHOR_BIO_MAX_LENGTH,
 } from "@notra/schemas/constants/dashboard/post-metadata";
 import type { ContentAuthor } from "@notra/schemas/shared/post-metadata";
+import { siteAuthorLinkSchema } from "@notra/schemas/shared/site-authors";
 import {
   SITE_AUTHOR_AVATAR,
   SITE_AUTHOR_ID,
 } from "@notra/sites-core/constants/site-config";
+import { siteAuthorRef } from "@notra/sites-core/utils/site-author-refs";
 
 import { CONTENT_AUTHOR_LINK_FIELDS } from "@/constants/content-overview";
-import {
-  SITE_AUTHOR_BIO_MAX_LENGTH,
-  SITE_AUTHOR_FIELDS,
-  TRAILING_SLASHES,
-} from "@/constants/site-authors";
-import { siteAuthorLinkSchema } from "@/schemas/site-authors";
+import { SITE_AUTHOR_FIELDS, TRAILING_SLASHES } from "@/constants/site-authors";
 import type {
   SiteAuthor,
   SiteAuthorEntry,
@@ -25,7 +23,6 @@ import type {
 } from "@/types/site-authors";
 import type { SiteRawConfig } from "@/types/site-design";
 import { authorSlugBase } from "@/utils/content-authors";
-import { siteAuthorRef } from "@/utils/site-author-refs";
 import { configValue, patchConfigValue } from "@/utils/site-design-sections";
 
 function isRecord(value: unknown): value is Record<string, unknown> {

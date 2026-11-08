@@ -206,9 +206,7 @@ function SiteAuthorPagesBlock({ blogMount, onChange }: SiteAuthorPagesProps) {
       >
         <SiteAuthorPageLayoutPicker
           onChange={(layout) =>
-            onChange(
-              setSiteAuthorPageLayout(state.config, state.published, layout)
-            )
+            onChange(setSiteAuthorPageLayout(state.config, state.live, layout))
           }
           value={siteAuthorPageLayout(state.config)}
         />
@@ -268,7 +266,7 @@ function SiteDesignAuthorsBody({ state }: SiteDesignAuthorsBodyProps) {
   const authors = readSiteAuthors(state.config);
   const ids = new Set(authors.map((entry) => entry.id));
   const publishedIds = new Set(
-    readSiteAuthors(state.published).map((entry) => entry.id)
+    readSiteAuthors(state.live).map((entry) => entry.id)
   );
   const importable = contentAuthors.filter((author) => !ids.has(author.slug));
   const blogMount = detail.site.mounts.blog;

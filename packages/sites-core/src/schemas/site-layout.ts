@@ -5,6 +5,7 @@ import {
   SITE_META_TAG_NAME,
 } from "@notra/sites-core/constants/site-config";
 import {
+  SITE_AUTHOR_PAGE_LAYOUTS,
   SITE_CONTEXTUAL_OPTIONS,
   SITE_NAVBAR_LINK_TYPES,
   SITE_SOCIAL_PLATFORMS,
@@ -282,7 +283,7 @@ export const siteBlogSchema = z.object({
       readingTime: false,
       style: "auto",
     }),
-  authorPage: z.enum(["inline", "stacked"]).default("inline"),
+  authorPage: z.enum(SITE_AUTHOR_PAGE_LAYOUTS).default("inline"),
   post: z
     .object({
       toc: z.boolean().default(true),
