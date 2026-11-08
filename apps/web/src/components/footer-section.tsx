@@ -15,14 +15,14 @@ import type { FooterLink } from "@/types/landing/footer";
 import { NotraMark } from "./notra-mark";
 
 const LINK_CLASS =
-  "font-medium font-sans text-[#1e1e1e99] text-base leading-6 tracking-[-0.01em] transition-colors hover:text-[#8b5cf6] dark:text-foreground/60 dark:hover:text-[#a78bfa]";
+  "font-medium font-sans text-[#1e1e1ebf] text-base leading-6 tracking-[-0.01em] transition-colors hover:text-[#5b21b6] dark:text-foreground/60 dark:hover:text-[#a78bfa]";
 
 function FooterColumnLink({ link }: { link: FooterLink }) {
   if (!link.href) {
     return (
       <span
         className={cn(
-          "dark:text-foreground/60 font-sans text-base leading-6 font-medium tracking-[-0.01em] text-[#1e1e1e99]"
+          "dark:text-foreground/60 font-sans text-base leading-6 font-medium tracking-[-0.01em] text-[#1e1e1ebf]"
         )}
       >
         {link.label}
@@ -91,7 +91,7 @@ export default function FooterSection() {
                   Notra
                 </span>
               </div>
-              <p className="dark:text-foreground/70 font-sans text-base leading-6 font-medium tracking-[-0.01em] text-[#1e1e1e99]">
+              <p className="dark:text-foreground/70 font-sans text-base leading-6 font-medium tracking-[-0.01em] text-[#1e1e1ebf]">
                 {FOOTER_TAGLINE}
               </p>
             </div>
@@ -115,7 +115,7 @@ export default function FooterSection() {
               <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
                 {FOOTER_LEGAL_LINKS.map((link) => (
                   <Link
-                    className="dark:text-foreground/50 dark:hover:text-foreground font-sans text-[0.8125rem] leading-[1.125rem] font-medium text-[#1e1e1e66] transition-colors hover:text-[#1e1e1e]"
+                    className="dark:text-foreground/50 dark:hover:text-foreground font-sans text-[0.8125rem] leading-[1.125rem] font-medium text-[#1e1e1ea6] transition-colors hover:text-[#1e1e1e]"
                     to={link.href ?? "/"}
                     key={link.label}
                   >
@@ -124,12 +124,12 @@ export default function FooterSection() {
                 ))}
                 <ConsentDialogLink
                   slotKey="trigger.text"
-                  className="dark:text-foreground/50 dark:hover:text-foreground font-sans text-[0.8125rem] leading-[1.125rem] font-medium text-[#1e1e1e66] transition-colors hover:text-[#1e1e1e]"
+                  className="dark:text-foreground/50 dark:hover:text-foreground font-sans text-[0.8125rem] leading-[1.125rem] font-medium text-[#1e1e1ea6] transition-colors hover:text-[#1e1e1e]"
                 >
                   Privacy settings
                 </ConsentDialogLink>
               </div>
-              <p className="dark:text-foreground/50 font-sans text-[0.8125rem] leading-[1.125rem] font-medium text-[#1e1e1e66]">
+              <p className="dark:text-foreground/50 font-sans text-[0.8125rem] leading-[1.125rem] font-medium text-[#1e1e1ea6]">
                 {`© ${year} Notra, Inc.`}
               </p>
             </div>
@@ -143,7 +143,7 @@ export default function FooterSection() {
               >
                 {column.groups.map((group) => (
                   <div className="flex flex-col gap-4" key={group.title}>
-                    <h3 className="font-sans text-base leading-6 font-medium tracking-[-0.01em] text-[#8b5cf6] dark:text-[#a78bfa]">
+                    <h3 className="font-sans text-base leading-6 font-medium tracking-[-0.01em] text-[#5b21b6] dark:text-[#a78bfa]">
                       {group.title}
                     </h3>
                     <ul className="flex flex-col gap-4.5">

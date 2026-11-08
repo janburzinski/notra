@@ -380,7 +380,7 @@ export const DemoCookieDiagram = () => (
       <span className="bg-card text-foreground min-w-0 flex-[1.4] truncate px-4 py-4">
         eyJhbm9ueW1vdXNJZCI6…
       </span>
-      <span className="border-border bg-muted text-muted-foreground border-x px-3 py-4">
+      <span className="border-border bg-muted text-foreground/65 border-x px-3 py-4">
         .
       </span>
       <span className="bg-primary/10 text-primary min-w-0 flex-1 truncate px-4 py-4">
@@ -532,7 +532,7 @@ export const DemoRebaseDiagram = () => (
         <span className="border-primary size-3 rounded-sm border-2" />
         scheduled post
       </span>
-      <span className="opacity-60">1 cell = 1 day</span>
+      <span>1 cell = 1 day</span>
     </Legend>
   </Diagram>
 );
