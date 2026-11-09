@@ -26,7 +26,8 @@ import { useWebAnalyticsFlag } from "@/lib/hooks/use-web-analytics-flag";
 import { cn } from "@/lib/utils";
 import type { TrafficInstallCopyKind } from "@/types/analytics/geo-events";
 import type {
-  GeoIngestSetupFooterProps,
+  GeoIngestDocsLinkProps,
+  GeoIngestSetupActionsProps,
   GeoIngestSetupPanelProps,
 } from "@/types/geo";
 import { toastCopyError } from "@/utils/copy-to-clipboard";
@@ -36,50 +37,56 @@ import {
   geoIngestAgentPrompt,
 } from "@/utils/geo-ingest";
 
-/** Docs on the left, the method's one action on the right. */
-function GeoIngestSetupFooter({
+function GeoIngestDocsLink({ method, className }: GeoIngestDocsLinkProps) {
+  const t = useTranslations("geo.geoIngestSetup");
+  const docs = GEO_INGEST_METHOD_DOCS_URLS[method];
+  if (!docs) {
+    return null;
+  }
+  return (
+    <a
+      className={cn(
+        "text-muted-foreground hover:text-foreground inline-flex items-center gap-1 text-sm",
+        className
+      )}
+      href={docs}
+      rel="noopener noreferrer"
+      target="_blank"
+    >
+      {t(`docs.${method === "script" ? "script" : "drain"}`)}
+      <HugeiconsIcon
+        aria-hidden="true"
+        className="size-3.5"
+        icon={LinkSquare02Icon}
+      />
+    </a>
+  );
+}
+
+/** The picked method's one action: rotate the web key or copy an agent prompt. */
+function GeoIngestSetupActions({
   method,
   agentPrompt,
   canManage,
   onCopy,
-}: GeoIngestSetupFooterProps) {
-  const t = useTranslations("geo.geoIngestSetup");
+  prominent = false,
+}: GeoIngestSetupActionsProps) {
   const tCommon = useTranslations("common");
-  const docs = GEO_INGEST_METHOD_DOCS_URLS[method];
-
-  return (
-    <>
-      {docs ? (
-        <a
-          className="text-muted-foreground hover:text-foreground inline-flex items-center gap-1 text-sm"
-          href={docs}
-          rel="noopener noreferrer"
-          target="_blank"
-        >
-          {t(`docs.${method === "script" ? "script" : "drain"}`)}
-          <HugeiconsIcon
-            aria-hidden="true"
-            className="size-3.5"
-            icon={LinkSquare02Icon}
-          />
-        </a>
-      ) : (
-        <span />
-      )}
-      <div className="flex shrink-0 items-center gap-2">
-        {method === "script" && canManage ? <WebKeyRotateButton /> : null}
-        {method === "sdk" || method === "cloudflare" ? (
-          <AgentPromptButton
-            copiedLabel={tCommon("labels.promptCopied")}
-            label={tCommon("labels.copyAgentPrompt")}
-            onCopy={() => onCopy(TRAFFIC_INSTALL_COPY_KINDS.AGENT_PROMPT)}
-            onCopyError={toastCopyError}
-            prompt={agentPrompt}
-          />
-        ) : null}
-      </div>
-    </>
-  );
+  if (method === "script") {
+    return canManage ? <WebKeyRotateButton prominent={prominent} /> : null;
+  }
+  if (method === "sdk" || method === "cloudflare") {
+    return (
+      <AgentPromptButton
+        copiedLabel={tCommon("labels.promptCopied")}
+        label={tCommon("labels.copyAgentPrompt")}
+        onCopy={() => onCopy(TRAFFIC_INSTALL_COPY_KINDS.AGENT_PROMPT)}
+        onCopyError={toastCopyError}
+        prompt={agentPrompt}
+      />
+    );
+  }
+  return null;
 }
 
 export function GeoIngestSetup({
@@ -160,8 +167,8 @@ export function GeoIngestSetup({
     <Skeleton aria-hidden className="h-72 rounded-lg" />
   );
 
-  const footer = (
-    <GeoIngestSetupFooter
+  const actions = (
+    <GeoIngestSetupActions
       agentPrompt={
         method === "cloudflare"
           ? geoCloudflareAgentPrompt(setup)
@@ -170,7 +177,15 @@ export function GeoIngestSetup({
       canManage={Boolean(setup?.canManage)}
       method={method}
       onCopy={trackCopied}
+      prominent={variant === "settings"}
     />
+  );
+  // Docs on the left, the method's one action on the right.
+  const footer = (
+    <>
+      <GeoIngestDocsLink method={method} />
+      <div className="ml-auto flex shrink-0 items-center gap-2">{actions}</div>
+    </>
   );
 
   if (variant === "dialog") {
@@ -184,18 +199,15 @@ export function GeoIngestSetup({
     );
   }
 
-  // A flat card: plain header in settings, then the method, then a muted footer.
-  return (
-    <section
-      aria-labelledby={variant === "settings" ? headingId : undefined}
-      className={cn(
-        "bg-background min-w-0 overflow-hidden rounded-xl border",
-        className
-      )}
-    >
-      <div className="flex min-w-0 flex-col gap-5 p-5">
-        {variant === "settings" ? (
-          <div className="flex flex-col gap-1">
+  // Settings: no card of its own. Title left, the method's action right.
+  if (variant === "settings") {
+    return (
+      <section
+        aria-labelledby={headingId}
+        className={cn("flex min-w-0 flex-col gap-5", className)}
+      >
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-6">
+          <div className="flex min-w-0 flex-col gap-1">
             <h2 className="text-base font-semibold" id={headingId}>
               {tInstall("title")}
             </h2>
@@ -203,9 +215,23 @@ export function GeoIngestSetup({
               {tInstall("description")}
             </p>
           </div>
-        ) : null}
+          <div className="flex shrink-0 items-center">{actions}</div>
+        </div>
         {panels}
-      </div>
+        <GeoIngestDocsLink className="self-start" method={method} />
+      </section>
+    );
+  }
+
+  // A flat card on a page: the method, then a muted footer.
+  return (
+    <section
+      className={cn(
+        "bg-background min-w-0 overflow-hidden rounded-xl border",
+        className
+      )}
+    >
+      <div className="flex min-w-0 flex-col gap-5 p-5">{panels}</div>
       <div className="bg-muted/40 flex min-h-12 flex-wrap items-center justify-between gap-3 border-t px-5 py-2.5">
         {footer}
       </div>

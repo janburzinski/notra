@@ -4657,7 +4657,9 @@
         "rejected": "Wähle eine ZIP-Datei bis {size}.",
         "tooManyFiles": "Wähle eine einzige ZIP-Datei. Plausible packt den ganzen Export in eine.",
         "preview": "Export prüfen",
-        "failed": "Dieser Export konnte nicht gelesen werden"
+        "failed": "Dieser Export konnte nicht gelesen werden",
+        "uploadTitle": "ZIP hochladen",
+        "domainTitle": "Domain prüfen"
       },
       "connect": {
         "title": "{provider} verbinden",
@@ -4695,7 +4697,9 @@
         "teamPlaceholder": "team_…",
         "submit": "Verbinden",
         "failed": "Verbindung fehlgeschlagen",
-        "stored": "Verschlüsselt und nur zum Lesen von Analytics genutzt."
+        "stored": "Verschlüsselt und nur zum Lesen von Analytics genutzt.",
+        "pasteKey": "API-Schlüssel einfügen",
+        "pasteToken": "Token einfügen"
       },
       "source": {
         "title": "Auswählen, was importiert wird",

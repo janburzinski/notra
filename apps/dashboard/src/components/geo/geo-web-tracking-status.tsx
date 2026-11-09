@@ -23,14 +23,14 @@ export function GeoWebTrackingStatus({
   return (
     <div
       aria-live="polite"
-      className="bg-muted/50 text-muted-foreground flex min-h-10 flex-wrap items-center justify-center gap-x-2 gap-y-1 rounded-lg px-3 py-2 text-sm"
+      className="text-muted-foreground flex flex-wrap items-center gap-x-2 gap-y-1 text-xs"
       role="status"
     >
       {firstDay ? (
         <>
           <span
             aria-hidden="true"
-            className="bg-success size-2 shrink-0 rounded-full"
+            className="bg-success size-1.5 shrink-0 rounded-full"
           />
           <span className="text-foreground">
             {t("receiving", { date: formatImportDay(format, firstDay) })}
@@ -44,7 +44,7 @@ export function GeoWebTrackingStatus({
         </>
       ) : (
         <>
-          <Spinner aria-hidden="true" className="size-4" />
+          <Spinner aria-hidden="true" className="size-3" />
           <span>{t("awaiting")}</span>
         </>
       )}

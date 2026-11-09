@@ -2,7 +2,7 @@
 
 import { MoreHorizontalIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Badge } from "@notra/ui/components/ui/badge";
+import { StatusBadge } from "@notra/ui/components/status-badge";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -38,8 +38,8 @@ import { toErrorMessage } from "@/utils/error-message";
 import { ImportFrame } from "./import-frame";
 import { ImportProviderMark } from "./import-provider-mark";
 
-const LIST_CLASS = "divide-y";
-const ROW_CLASS = "flex items-start gap-3 px-3 py-2.5";
+const LIST_CLASS = "divide-table-row-border divide-y";
+const ROW_CLASS = "group/row flex items-start gap-3 px-3 py-2.5";
 
 function ImportRowMenu({ label, disabled, children }: ImportRowMenuProps) {
   return (
@@ -153,7 +153,7 @@ function ImportRow({
           {openable ? (
             // Covers the whole row, so the row opens the import's progress.
             <button
-              className="focus-visible:after:ring-ring/50 cursor-pointer truncate text-start text-sm font-medium outline-none after:absolute after:inset-0 focus-visible:after:ring-3 focus-visible:after:ring-inset"
+              className="focus-visible:after:ring-ring/50 cursor-pointer truncate text-start text-sm font-medium outline-none after:absolute after:inset-0 group-first/row:after:rounded-t-xl group-last/row:after:rounded-b-xl focus-visible:after:ring-3 focus-visible:after:ring-inset"
               onClick={() => onOpen(item)}
               type="button"
             >
@@ -164,9 +164,10 @@ function ImportRow({
             <span className="truncate text-sm font-medium">{item.host}</span>
           )}
           {badge ? (
-            <Badge className="shrink-0" variant={badge}>
-              {t(`status.${item.status}`)}
-            </Badge>
+            <StatusBadge
+              appearance={badge}
+              label={t(`status.${item.status}`)}
+            />
           ) : null}
         </div>
         <ImportRowSummary item={item} />
@@ -233,9 +234,10 @@ function ImportConnectionRow({
       <div className="flex min-w-0 flex-1 items-center gap-2">
         <span className="shrink-0 text-sm font-medium">{connection.label}</span>
         {needsReauth ? (
-          <Badge className="shrink-0" variant="warning">
-            {t("reauth")}
-          </Badge>
+          <StatusBadge
+            appearance={{ variant: "warning" }}
+            label={t("reauth")}
+          />
         ) : null}
         <span className="text-muted-foreground min-w-0 truncate text-xs">
           {connection.label === providerName

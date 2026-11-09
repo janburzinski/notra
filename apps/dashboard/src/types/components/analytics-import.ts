@@ -18,13 +18,6 @@ export type AnalyticsImportProviderChoice =
   | "plausible_csv"
   | AnalyticsImportConnectionProvider;
 
-export type AnalyticsImportBadgeVariant =
-  | "success"
-  | "info"
-  | "warning"
-  | "destructive"
-  | "secondary";
-
 export type AnalyticsImportView =
   | { step: "home" }
   | { step: "csv" }
@@ -165,6 +158,15 @@ export interface ImportZipFieldProps {
   serverError?: ImportZipFieldError | null;
   /** `null` when the file is removed. */
   onChange: (file: File | null) => void;
+  /** Inside a numbered step whose title already names the file. */
+  hideLabel?: boolean;
+}
+
+export interface ImportSavedConnectionsProps {
+  connections: AnalyticsImportConnectionSummary[];
+  /** Shows the "or add a new one" hint below the list. */
+  canManage: boolean;
+  onSelect: (connectionId: string) => void;
 }
 
 export interface ImportConnectStepProps {
@@ -191,6 +193,8 @@ export interface ImportSourceStepProps {
 export interface ImportHostFieldProps {
   value: string;
   onChange: (value: string) => void;
+  /** Inside a numbered step: its title and description stand in for the label and hint. */
+  bare?: boolean;
 }
 
 export interface ImportPreviewProps {

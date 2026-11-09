@@ -99,7 +99,11 @@ export function ImportCsvStep({
         <ol aria-label={t("guide", { provider: "Plausible" })}>
           <GeoSetupStep
             plain
-            action={
+            description={t("csv.openDescription")}
+            index={1}
+            title={t("csv.openTitle")}
+          >
+            <div className="flex">
               <GeoExternalLinkButton
                 href={ANALYTICS_IMPORT_PROVIDER_URLS.plausible_csv}
                 icon={
@@ -110,36 +114,44 @@ export function ImportCsvStep({
                 }
                 label={t("openProvider", { provider: "Plausible" })}
               />
-            }
-            description={t("csv.openDescription")}
-            index={1}
-            title={t("csv.openTitle")}
-          />
+            </div>
+          </GeoSetupStep>
           <GeoSetupStep
             plain
             description={t("csv.exportDescription")}
             index={2}
             title={t("csv.exportTitle")}
           />
+          <GeoSetupStep plain index={3} title={t("csv.uploadTitle")}>
+            <ImportZipField
+              disabled={csv.isPending}
+              file={file}
+              hideLabel
+              onChange={(next) => {
+                setFile(next);
+                uploadKey.current = undefined;
+                setResult(null);
+                setFileError(null);
+              }}
+              serverError={fileError}
+            />
+          </GeoSetupStep>
+          <GeoSetupStep
+            plain
+            description={t("source.hostHint")}
+            index={4}
+            title={t("csv.domainTitle")}
+          >
+            <ImportHostField
+              bare
+              onChange={(value) => {
+                setHost(value);
+                setResult(null);
+              }}
+              value={host}
+            />
+          </GeoSetupStep>
         </ol>
-        <ImportZipField
-          disabled={csv.isPending}
-          file={file}
-          onChange={(next) => {
-            setFile(next);
-            uploadKey.current = undefined;
-            setResult(null);
-            setFileError(null);
-          }}
-          serverError={fileError}
-        />
-        <ImportHostField
-          onChange={(value) => {
-            setHost(value);
-            setResult(null);
-          }}
-          value={host}
-        />
         {result ? (
           <ImportPreview
             onOverlapChange={setOverlap}

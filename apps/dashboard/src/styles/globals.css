@@ -438,3 +438,15 @@ tr:has(> [data-own-mention]) > * {
     transform: translateY(34rem) rotate(200deg);
   }
 }
+
+/* Dark surface tokens carry a blue tint; the table-card panes (settings
+   modal) are neutral gray. Re-points the tokens so wells, code blocks and
+   tabs inside such a pane match it. Light tokens are already neutral. */
+@utility surface-neutral {
+  &:is(.dark *) {
+    --background: var(--table-shell);
+    --muted: oklch(0.27 0 0);
+    --border: var(--table-card-border);
+    --input: oklch(0.33 0 0);
+  }
+}

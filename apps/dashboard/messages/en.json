@@ -4657,7 +4657,9 @@
         "rejected": "Choose a ZIP file up to {size}.",
         "tooManyFiles": "Choose one ZIP file. Plausible puts the whole export in one.",
         "preview": "Check export",
-        "failed": "Couldn't read this export"
+        "failed": "Couldn't read this export",
+        "uploadTitle": "Upload the ZIP",
+        "domainTitle": "Check the domain"
       },
       "connect": {
         "title": "Connect {provider}",
@@ -4695,7 +4697,9 @@
         "teamPlaceholder": "team_…",
         "submit": "Connect",
         "failed": "Couldn't connect",
-        "stored": "Encrypted and only used to read analytics."
+        "stored": "Encrypted and only used to read analytics.",
+        "pasteKey": "Paste the API key",
+        "pasteToken": "Paste the token"
       },
       "source": {
         "title": "Choose what to import",

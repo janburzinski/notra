@@ -67,12 +67,13 @@ export function ImportDialogHeader({
   })();
 
   return (
-    <ResponsiveDialogHeader>
-      <div className="flex items-start gap-3 pe-8">
+    <ResponsiveDialogHeader className="text-start">
+      {/* One title line tall, so the row centres on the close button. */}
+      <div className="flex min-h-4 items-center gap-2 pe-8">
         {view.step === "home" ? null : (
           <Button
             aria-label={t("back")}
-            className="-ms-1.5 shrink-0"
+            className="-ms-2 shrink-0"
             onClick={onBack}
             ref={backRef}
             size="icon-sm"
@@ -82,15 +83,13 @@ export function ImportDialogHeader({
           </Button>
         )}
         {header.provider ? (
-          <ImportProviderMark className="mt-0.5" provider={header.provider} />
+          <ImportProviderMark provider={header.provider} />
         ) : null}
-        <div className="flex min-w-0 flex-col gap-1 text-start">
-          <ResponsiveDialogTitle>{header.title}</ResponsiveDialogTitle>
-          <ResponsiveDialogDescription>
-            {header.description}
-          </ResponsiveDialogDescription>
-        </div>
+        <ResponsiveDialogTitle>{header.title}</ResponsiveDialogTitle>
       </div>
+      <ResponsiveDialogDescription>
+        {header.description}
+      </ResponsiveDialogDescription>
     </ResponsiveDialogHeader>
   );
 }

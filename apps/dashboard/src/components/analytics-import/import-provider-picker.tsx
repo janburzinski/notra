@@ -14,11 +14,11 @@ export function ImportProviderPicker({ onPick }: ImportProviderPickerProps) {
   const t = useTranslations("geo.analyticsImport.providers");
   return (
     <ImportFrame title={t("title")}>
-      <ul className="divide-y">
+      <ul className="divide-table-row-border divide-y">
         {ANALYTICS_IMPORT_PROVIDER_ORDER.map((provider) => (
-          <li key={provider}>
+          <li className="group/row" key={provider}>
             <button
-              className="group/provider hover:bg-muted/50 focus-visible:bg-muted/50 focus-visible:ring-ring/50 flex w-full items-center gap-3 px-3 py-2.5 text-start transition-colors duration-150 outline-none focus-visible:ring-3 focus-visible:ring-inset"
+              className="group/provider hover:bg-muted/50 focus-visible:bg-muted/50 focus-visible:ring-ring/50 flex w-full items-center gap-3 px-3 py-2.5 text-start transition-colors duration-150 outline-none group-first/row:rounded-t-xl group-last/row:rounded-b-xl focus-visible:ring-3 focus-visible:ring-inset"
               onClick={() => onPick(provider)}
               type="button"
             >

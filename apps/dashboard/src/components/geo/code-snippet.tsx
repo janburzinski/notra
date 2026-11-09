@@ -128,28 +128,6 @@ export function CodeSnippet({
   onCopy,
 }: CodeSnippetProps) {
   const t = useTranslations("geo.codeSnippet");
-  if (variant === "block") {
-    return (
-      <div
-        className={cn(
-          "border-border/60 bg-muted/40 relative min-w-0 rounded-lg border",
-          className
-        )}
-      >
-        <div className="absolute end-1 top-1 z-10">
-          <CopyCodeButton code={code} label={t("snippet")} onCopy={onCopy} />
-        </div>
-        <pre
-          className={cn(
-            "scrollbar-floating m-0 overflow-x-auto p-3 pe-10 font-mono text-xs leading-relaxed",
-            wrap && "wrap-anywhere whitespace-pre-wrap"
-          )}
-          // biome-ignore lint/security/noDangerouslySetInnerHtml: sugar-high escapes the source before tokenizing
-          dangerouslySetInnerHTML={{ __html: highlight(code) }}
-        />
-      </div>
-    );
-  }
   if (variant === "command") {
     return (
       <CommandSnippet
@@ -162,29 +140,33 @@ export function CodeSnippet({
   }
 
   return (
-    <div className={cn("min-w-0", className)}>
-      <div className="border-border/60 bg-muted/40 overflow-hidden rounded-t-lg border border-b-0 pb-3">
-        <div className="flex h-9 min-w-0 items-center gap-3 ps-3 pe-1">
-          {tabs ? (
-            <div className="min-w-0 flex-1 [scrollbar-width:none] overflow-x-auto">
-              {tabs}
-            </div>
-          ) : null}
-          {filename ? (
-            <p
-              className={cn(
-                "text-muted-foreground truncate font-mono text-xs",
-                tabs ? "shrink-0 pe-2" : "min-w-0 flex-1"
-              )}
-            >
-              {filename}
-            </p>
-          ) : null}
-          {tabs || filename ? null : <span className="min-w-0 flex-1" />}
-          {headerEnd}
-        </div>
+    // Dualtone like tables and detail cards: header on the shell, code on the card.
+    <div
+      className={cn(
+        "border-shell-border bg-shell min-w-0 rounded-2xl border p-0.5 pt-0",
+        className
+      )}
+    >
+      <div className="flex h-9 min-w-0 items-center gap-3 ps-2.5 pe-1">
+        {tabs ? (
+          <div className="min-w-0 flex-1 [scrollbar-width:none] overflow-x-auto">
+            {tabs}
+          </div>
+        ) : null}
+        {filename ? (
+          <p
+            className={cn(
+              "text-muted-foreground truncate font-mono text-xs",
+              tabs ? "shrink-0 pe-2" : "min-w-0 flex-1"
+            )}
+          >
+            {filename}
+          </p>
+        ) : null}
+        {tabs || filename ? null : <span className="min-w-0 flex-1" />}
+        {headerEnd}
       </div>
-      <div className="border-border/60 bg-background relative -mt-3 min-w-0 rounded-lg border">
+      <div className="border-table-card-border bg-table-card shadow-table-card relative min-w-0 rounded-[14px] border">
         <div className="absolute end-1 top-1 z-10">
           <CopyCodeButton code={code} label={t("snippet")} onCopy={onCopy} />
         </div>

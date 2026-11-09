@@ -113,7 +113,7 @@ function GeoTrackingSettingsContent() {
   }
 
   return (
-    <SettingsPane>
+    <SettingsPane className="surface-neutral">
       <GeoIngestSetup defaultMethod="script" setup={setup} variant="settings" />
       <ImportHistoryCard manageOnly={!webFlag.enabled} variant="settings" />
     </SettingsPane>

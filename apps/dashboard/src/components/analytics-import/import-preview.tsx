@@ -177,7 +177,7 @@ export function ImportPreview({
       role="status"
       title={t("title")}
     >
-      <dl className="divide-y text-sm">
+      <dl className="divide-table-row-border divide-y text-sm">
         <div className={ROW_CLASS}>
           <dt className="text-muted-foreground">{t("period")}</dt>
           {range.startDay && range.endDay ? (

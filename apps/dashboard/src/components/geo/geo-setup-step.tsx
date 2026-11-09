@@ -14,7 +14,7 @@ export function GeoSetupStep({
       className={cn(
         "group/step relative grid gap-x-3 last:pb-0",
         plain
-          ? "grid-cols-[0.75rem_minmax(0,1fr)] pb-4"
+          ? "grid-cols-[0.75rem_minmax(0,1fr)] pb-7"
           : "grid-cols-[1.25rem_minmax(0,1fr)] pb-5"
       )}
     >
@@ -39,8 +39,13 @@ export function GeoSetupStep({
           </span>
         </>
       )}
-      <div className={cn("min-w-0", plain ? "space-y-2.5" : "space-y-2")}>
-        <div className="flex flex-wrap items-start justify-between gap-x-3 gap-y-2">
+      <div className="min-w-0 space-y-2">
+        <div
+          className={cn(
+            "flex flex-wrap justify-between gap-x-3 gap-y-2",
+            plain ? "items-center" : "items-start"
+          )}
+        >
           <div className="min-w-0 space-y-0.5">
             <h4
               className={cn(
@@ -56,7 +61,10 @@ export function GeoSetupStep({
               </p>
             ) : null}
           </div>
-          {action ? <div className="max-w-full">{action}</div> : null}
+          {action ? (
+            // Plain: the tabs stay inside the title's line box.
+            <div className={cn("max-w-full", plain && "-my-1")}>{action}</div>
+          ) : null}
         </div>
         {children}
       </div>

@@ -35,49 +35,53 @@ export function GeoIngestScriptSetup({
     );
   }
 
-  return (
-    <div className="flex min-w-0 flex-col gap-4">
-      <ol>
-        <GeoSetupStep
-          index={1}
-          plain
-          title={t.rich("tagTitle", { code, tag: "<head>" })}
-        >
-          <CodeSnippet code={snippet} onCopy={onCopy} variant="block" wrap />
-          <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
-            {/* biome-ignore lint/a11y/noLabelWithoutControl: the checkbox inside is the control */}
-            <label className="text-muted-foreground hover:text-foreground flex cursor-pointer items-center gap-2 text-xs">
-              <Checkbox
-                checked={pinned}
-                onCheckedChange={(next) => setPinned(next === true)}
-              />
-              {t("pinLabel")}
-            </label>
-            {/* biome-ignore lint/a11y/noLabelWithoutControl: the checkbox inside is the control */}
-            <label className="text-muted-foreground hover:text-foreground flex cursor-pointer items-center gap-2 text-xs">
-              <Checkbox
-                checked={errors}
-                onCheckedChange={(next) => setErrors(next === true)}
-              />
-              {t("errorsLabel")}
-            </label>
-          </div>
-          {pinned ? (
-            <p className="text-muted-foreground text-xs text-pretty">
-              {t("pinNote")}
-            </p>
-          ) : null}
-          {errors ? (
-            <p className="text-muted-foreground text-xs text-pretty">
-              {t.rich("errorsNote", { code })}
-            </p>
-          ) : null}
-        </GeoSetupStep>
-        <GeoSetupStep index={2} plain title={t("checkTitle")} />
-      </ol>
-      {activeOrganization ? (
-        <GeoWebTrackingStatus organizationId={activeOrganization.id} />
-      ) : null}
+  // The options sit on the panel header, like the framework tabs on the
+  // package method; the status lives in step 2 rather than a box below it.
+  const options = (
+    <div className="flex items-center gap-4 py-1 ps-0.5">
+      {/* biome-ignore lint/a11y/noLabelWithoutControl: the checkbox inside is the control */}
+      <label className="text-muted-foreground hover:text-foreground flex cursor-pointer items-center gap-2 text-xs whitespace-nowrap">
+        <Checkbox
+          checked={pinned}
+          onCheckedChange={(next) => setPinned(next === true)}
+        />
+        {t("pinLabel")}
+      </label>
+      {/* biome-ignore lint/a11y/noLabelWithoutControl: the checkbox inside is the control */}
+      <label className="text-muted-foreground hover:text-foreground flex cursor-pointer items-center gap-2 text-xs whitespace-nowrap">
+        <Checkbox
+          checked={errors}
+          onCheckedChange={(next) => setErrors(next === true)}
+        />
+        {t("errorsLabel")}
+      </label>
     </div>
+  );
+
+  return (
+    <ol>
+      <GeoSetupStep
+        index={1}
+        plain
+        title={t.rich("tagTitle", { code, tag: "<head>" })}
+      >
+        <CodeSnippet code={snippet} onCopy={onCopy} tabs={options} wrap />
+        {pinned ? (
+          <p className="text-muted-foreground text-xs text-pretty">
+            {t("pinNote")}
+          </p>
+        ) : null}
+        {errors ? (
+          <p className="text-muted-foreground text-xs text-pretty">
+            {t.rich("errorsNote", { code })}
+          </p>
+        ) : null}
+      </GeoSetupStep>
+      <GeoSetupStep index={2} plain title={t("checkTitle")}>
+        {activeOrganization ? (
+          <GeoWebTrackingStatus organizationId={activeOrganization.id} />
+        ) : null}
+      </GeoSetupStep>
+    </ol>
   );
 }

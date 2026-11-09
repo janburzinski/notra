@@ -131,6 +131,7 @@ export function ImportZipField({
   disabled,
   serverError,
   onChange,
+  hideLabel = false,
 }: ImportZipFieldProps) {
   const t = useTranslations("geo.analyticsImport.csv");
   const locale = useLocale();
@@ -149,7 +150,10 @@ export function ImportZipField({
   return (
     <div className="flex flex-col">
       <div className="flex flex-col gap-1.5">
-        <p className="text-sm font-medium" id={labelId}>
+        <p
+          className={hideLabel ? "sr-only" : "text-sm font-medium"}
+          id={labelId}
+        >
           {t("fileLabel")}
         </p>
         <Dropzone

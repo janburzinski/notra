@@ -1,12 +1,11 @@
+import { Clock01Icon, Loading03Icon } from "@hugeicons/core-free-icons";
 import type {
   AnalyticsImportProvider,
   AnalyticsImportStatus,
 } from "@notra/db/types/analytics-imports";
+import type { StatusBadgeAppearance } from "@notra/ui/types/status-badge";
 
-import type {
-  AnalyticsImportBadgeVariant,
-  AnalyticsImportProviderChoice,
-} from "@/types/components/analytics-import";
+import type { AnalyticsImportProviderChoice } from "@/types/components/analytics-import";
 
 export const ANALYTICS_IMPORT_MAX_CHUNK_ATTEMPTS = 3;
 export const ANALYTICS_IMPORT_MAX_ERROR_LENGTH = 500;
@@ -115,14 +114,15 @@ export const ANALYTICS_IMPORT_CLOUDFLARE_PERMISSIONS = [
 ] as const;
 
 /** Completed imports carry no badge; their totals say enough. */
+/** Same badges as automation runs: work in progress spins. */
 export const ANALYTICS_IMPORT_STATUS_BADGES: Partial<
-  Record<AnalyticsImportStatus, AnalyticsImportBadgeVariant>
+  Record<AnalyticsImportStatus, StatusBadgeAppearance>
 > = {
-  pending: "secondary",
-  running: "info",
-  waiting_rate_limit: "warning",
-  failed: "destructive",
-  deleting: "secondary",
+  pending: { variant: "secondary", icon: Clock01Icon },
+  running: { variant: "info", icon: Loading03Icon, spin: true },
+  waiting_rate_limit: { variant: "warning", icon: Clock01Icon },
+  failed: { variant: "destructive" },
+  deleting: { variant: "secondary", icon: Loading03Icon, spin: true },
 };
 
 export const ANALYTICS_IMPORT_ZIP_ACCEPT = {

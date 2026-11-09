@@ -7,15 +7,21 @@ import { useTranslations } from "use-intl";
 
 import type { ImportHostFieldProps } from "@/types/components/analytics-import";
 
-export function ImportHostField({ value, onChange }: ImportHostFieldProps) {
+export function ImportHostField({
+  value,
+  onChange,
+  bare = false,
+}: ImportHostFieldProps) {
   const t = useTranslations("geo.analyticsImport.source");
   const id = useId();
   const hintId = useId();
   return (
     <div className="flex flex-col gap-1.5">
-      <Label htmlFor={id}>{t("hostLabel")}</Label>
+      <Label className={bare ? "sr-only" : undefined} htmlFor={id}>
+        {t("hostLabel")}
+      </Label>
       <Input
-        aria-describedby={hintId}
+        aria-describedby={bare ? undefined : hintId}
         autoComplete="off"
         id={id}
         inputMode="url"
@@ -23,9 +29,11 @@ export function ImportHostField({ value, onChange }: ImportHostFieldProps) {
         spellCheck={false}
         value={value}
       />
-      <p className="text-muted-foreground text-xs" id={hintId}>
-        {t("hostHint")}
-      </p>
+      {bare ? null : (
+        <p className="text-muted-foreground text-xs" id={hintId}>
+          {t("hostHint")}
+        </p>
+      )}
     </div>
   );
 }

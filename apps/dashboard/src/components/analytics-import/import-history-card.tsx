@@ -74,7 +74,7 @@ export function ImportHistoryCard({
     return (
       <section
         aria-labelledby={headingId}
-        className="bg-background flex flex-col gap-4 rounded-xl border p-5 sm:flex-row sm:items-center"
+        className="flex flex-col gap-4 border-t pt-6 sm:flex-row sm:items-center"
       >
         <div className="flex min-w-0 flex-1 flex-col items-start gap-1">
           <h2 className="text-base font-semibold" id={headingId}>

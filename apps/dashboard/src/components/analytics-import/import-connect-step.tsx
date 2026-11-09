@@ -1,10 +1,7 @@
 "use client";
 
-import { ArrowRight01Icon } from "@hugeicons/core-free-icons";
-import { HugeiconsIcon } from "@hugeicons/react";
 import { ResponsiveDialogFooter } from "@notra/ui/components/shared/responsive-dialog";
 import { Input } from "@notra/ui/components/ui/input";
-import { Label } from "@notra/ui/components/ui/label";
 import { useId, useState } from "react";
 import { toast } from "sonner";
 import { useTranslations } from "use-intl";
@@ -22,8 +19,8 @@ import { useAnalyticsImportMutations } from "@/lib/hooks/use-analytics-imports";
 import type { ImportConnectStepProps } from "@/types/components/analytics-import";
 import { toErrorMessage } from "@/utils/error-message";
 
-import { ImportFrame } from "./import-frame";
-import { ImportProviderLogo, ImportProviderMark } from "./import-provider-mark";
+import { ImportProviderLogo } from "./import-provider-mark";
+import { ImportSavedConnections } from "./import-saved-connections";
 
 export function ImportConnectStep({
   organizationId,
@@ -78,36 +75,11 @@ export function ImportConnectStep({
         onSubmit={submit}
       >
         {saved.length > 0 ? (
-          <div className="flex flex-col gap-3">
-            <ImportFrame title={t("connect.existing")}>
-              <ul className="divide-y">
-                {saved.map((connection) => (
-                  <li key={connection.id}>
-                    <button
-                      className="hover:bg-muted/50 focus-visible:bg-muted/50 focus-visible:ring-ring/50 flex w-full items-center gap-3 px-3 py-2 text-start text-sm font-medium transition-colors duration-150 outline-none focus-visible:ring-3 focus-visible:ring-inset"
-                      onClick={() => onConnected(connection.id)}
-                      type="button"
-                    >
-                      <ImportProviderMark provider={connection.provider} />
-                      <span className="min-w-0 flex-1 truncate">
-                        {connection.label}
-                      </span>
-                      <HugeiconsIcon
-                        aria-hidden="true"
-                        className="text-muted-foreground size-4 shrink-0"
-                        icon={ArrowRight01Icon}
-                      />
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </ImportFrame>
-            {canManage ? (
-              <p className="text-muted-foreground mt-2 text-xs font-medium">
-                {t("connect.newConnection")}
-              </p>
-            ) : null}
-          </div>
+          <ImportSavedConnections
+            canManage={canManage}
+            connections={saved}
+            onSelect={onConnected}
+          />
         ) : null}
         {canManage ? null : (
           <p className="text-muted-foreground bg-muted/50 rounded-lg px-3 py-2.5 text-xs text-pretty">
@@ -115,64 +87,44 @@ export function ImportConnectStep({
           </p>
         )}
         {canManage ? (
-          <>
-            <ol aria-label={t("guide", { provider: name })}>
-              <GeoSetupStep
-                plain
-                action={
-                  <GeoExternalLinkButton
-                    href={ANALYTICS_IMPORT_PROVIDER_URLS[provider]}
-                    icon={
-                      <ImportProviderLogo
-                        className={
-                          provider === "vercel" ? "size-3" : "h-3 w-auto"
-                        }
-                        provider={provider}
-                      />
-                    }
-                    label={t("openProvider", { provider: name })}
-                  />
-                }
-                description={t(`connect.steps.${provider}.firstDescription`)}
-                index={1}
-                title={t(`connect.steps.${provider}.firstTitle`)}
-              />
-              <GeoSetupStep
-                plain
-                description={t(`connect.steps.${provider}.secondDescription`)}
-                index={2}
-                title={t(`connect.steps.${provider}.secondTitle`)}
-              >
-                {provider === "cloudflare" ? (
-                  <ul className="bg-muted/40 flex flex-col gap-1 rounded-lg border px-3 py-2.5 font-mono text-xs">
-                    {ANALYTICS_IMPORT_CLOUDFLARE_PERMISSIONS.map(
-                      (permission) => (
-                        <li key={permission}>{permission}</li>
-                      )
-                    )}
-                  </ul>
-                ) : null}
-              </GeoSetupStep>
-            </ol>
-            <div className="flex flex-col gap-1.5">
-              <Label htmlFor={secretId}>
-                {provider === "plausible"
-                  ? t("connect.secretLabel")
-                  : t("connect.tokenLabel")}
-              </Label>
-              <Input
-                autoComplete="off"
-                id={secretId}
-                onChange={(event) => setSecret(event.target.value)}
-                spellCheck={false}
-                type="password"
-                value={secret}
-              />
-            </div>
-            {provider === "vercel" ? (
-              <div className="flex flex-col gap-1.5">
-                <Label htmlFor={teamId}>{t("connect.teamLabel")}</Label>
+          <ol aria-label={t("guide", { provider: name })}>
+            <GeoSetupStep
+              plain
+              description={t(`connect.steps.${provider}.firstDescription`)}
+              index={1}
+              title={t(`connect.steps.${provider}.firstTitle`)}
+            >
+              <div className="flex">
+                <GeoExternalLinkButton
+                  href={ANALYTICS_IMPORT_PROVIDER_URLS[provider]}
+                  icon={
+                    <ImportProviderLogo
+                      className={
+                        provider === "vercel" ? "size-3" : "h-3 w-auto"
+                      }
+                      provider={provider}
+                    />
+                  }
+                  label={t("openProvider", { provider: name })}
+                />
+              </div>
+            </GeoSetupStep>
+            <GeoSetupStep
+              plain
+              description={t(`connect.steps.${provider}.secondDescription`)}
+              index={2}
+              title={t(`connect.steps.${provider}.secondTitle`)}
+            >
+              {provider === "cloudflare" ? (
+                <ul className="border-table-card-border bg-table-card shadow-table-card flex flex-col gap-1 rounded-xl border px-3 py-2.5 font-mono text-xs">
+                  {ANALYTICS_IMPORT_CLOUDFLARE_PERMISSIONS.map((permission) => (
+                    <li key={permission}>{permission}</li>
+                  ))}
+                </ul>
+              ) : null}
+              {provider === "vercel" ? (
                 <Input
+                  aria-label={t("connect.teamLabel")}
                   autoComplete="off"
                   id={teamId}
                   onChange={(event) => setTeam(event.target.value)}
@@ -180,9 +132,32 @@ export function ImportConnectStep({
                   spellCheck={false}
                   value={team}
                 />
-              </div>
-            ) : null}
-          </>
+              ) : null}
+            </GeoSetupStep>
+            <GeoSetupStep
+              plain
+              index={3}
+              title={
+                provider === "plausible"
+                  ? t("connect.pasteKey")
+                  : t("connect.pasteToken")
+              }
+            >
+              <Input
+                aria-label={
+                  provider === "plausible"
+                    ? t("connect.secretLabel")
+                    : t("connect.tokenLabel")
+                }
+                autoComplete="off"
+                id={secretId}
+                onChange={(event) => setSecret(event.target.value)}
+                spellCheck={false}
+                type="password"
+                value={secret}
+              />
+            </GeoSetupStep>
+          </ol>
         ) : null}
       </form>
       {canManage ? (

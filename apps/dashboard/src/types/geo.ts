@@ -682,6 +682,10 @@ export interface GeoIngestSetupPanelProps {
   variant?: "card" | "dialog" | "settings";
 }
 
+export interface GeoIngestMethodIconProps {
+  method: GeoIngestMethod;
+}
+
 export interface GeoIngestMethodPickerProps {
   value: GeoIngestMethod;
   methods: readonly GeoIngestMethod[];
@@ -742,12 +746,23 @@ export interface GeoIngestSdkSetupProps {
   onCopy: (kind: TrafficInstallCopyKind) => void;
 }
 
-export interface GeoIngestSetupFooterProps {
+export interface WebKeyRotateButtonProps {
+  /** Outlined, for the settings header; quiet ghost in a footer. */
+  prominent?: boolean;
+}
+
+export interface GeoIngestDocsLinkProps {
+  method: GeoIngestMethod;
+  className?: string;
+}
+
+export interface GeoIngestSetupActionsProps {
   method: GeoIngestMethod;
   agentPrompt: string;
   /** Owners and admins can rotate the public notra.js key. */
   canManage: boolean;
   onCopy: (kind: TrafficInstallCopyKind) => void;
+  prominent?: boolean;
 }
 
 export interface GeoWebTrackingStatusProps {
@@ -1126,8 +1141,7 @@ export interface CodeSnippetProps {
   headerEnd?: ReactNode;
   /** Variant switcher shown in the header (e.g. `CodeSnippetTabs`). */
   tabs?: ReactNode;
-  /** `block` is one flat box with the copy button inside, no header. */
-  variant?: "block" | "command" | "panel";
+  variant?: "command" | "panel";
   label?: string;
   /** Wrap long lines instead of scrolling, for one-line snippets like a script tag. */
   wrap?: boolean;
