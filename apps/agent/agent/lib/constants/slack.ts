@@ -35,6 +35,12 @@ export const SLACK_TURN_FAILED_MESSAGE =
 export const SLACK_SESSION_FAILED_MESSAGE =
   "This conversation hit an error I can't recover from. Mention me in a new thread to start over.";
 
+export const SLACK_USAGE_LIMIT_REACHED_MESSAGE =
+  "Your Notra workspace is out of AI credits. Add credits in Notra to keep using me here.";
+
+export const SLACK_RATE_LIMITED_MESSAGE =
+  "You're sending messages too quickly. Try again in a minute.";
+
 export const POST_TO_X_NOT_PENDING_MESSAGE =
   "This tweet is no longer waiting to be posted. It may have expired or already been posted. Ask me to draft it again if you still want to post it.";
 

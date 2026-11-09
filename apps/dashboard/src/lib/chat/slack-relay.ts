@@ -1,8 +1,20 @@
 import {
+  chatErrorPayloadSchema,
   chatMessageMetadataSchema,
   uiMessageSchema,
 } from "@notra/ai/schemas/chat";
 import type { ChatUIMessage } from "@notra/ai/types/chat";
+
+export class SlackRelayError extends Error {
+  readonly status: number;
+  readonly code: string | undefined;
+
+  constructor(status: number, code: string | undefined) {
+    super(`Failed to send message to Slack (${status})`);
+    this.status = status;
+    this.code = code;
+  }
+}
 
 export async function relaySlackMirrorMessage(
   organizationId: string,
@@ -18,7 +30,13 @@ export async function relaySlackMirrorMessage(
     }
   );
   if (!res.ok) {
-    throw new Error("Failed to send message to Slack");
+    const payload = chatErrorPayloadSchema.safeParse(
+      await res.json().catch(() => null)
+    );
+    throw new SlackRelayError(
+      res.status,
+      payload.success ? payload.data.code : undefined
+    );
   }
   const data = await res.json();
   const parsed = uiMessageSchema.safeParse(data?.message);

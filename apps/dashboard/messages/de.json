@@ -6762,6 +6762,7 @@
       "working": "Wird bearbeitet",
       "showMoreImages": "{count, plural, one {# weiteren Anhang} other {# weitere Anhänge}} anzeigen",
       "loadingProject": "Projekt wird geladen",
+      "slackRateLimited": "Du sendest zu schnell Nachrichten. Versuch es in einer Minute noch einmal.",
       "slackSendFailed": "Senden an Slack fehlgeschlagen. Versuch es noch einmal.",
       "draftGenerationFailed": "Entwurf konnte nicht erstellt werden. Der Assistent versucht es erneut.",
       "welcome": "Willkommen",

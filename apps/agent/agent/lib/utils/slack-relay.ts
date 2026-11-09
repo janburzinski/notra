@@ -71,6 +71,7 @@ export async function parseSlackDashboardRelay(
   return {
     channelId,
     threadTs,
+    organizationId,
     message: `${payload.data.user_name} (from the Notra dashboard): ${payload.data.text}`,
     auth: {
       attributes: {

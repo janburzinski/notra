@@ -6762,6 +6762,7 @@
       "working": "Working",
       "showMoreImages": "Show {count, plural, one {# more attachment} other {# more attachments}}",
       "loadingProject": "Loading project",
+      "slackRateLimited": "You're sending messages too quickly. Try again in a minute.",
       "slackSendFailed": "Sending to Slack failed. Try again.",
       "draftGenerationFailed": "Draft generation failed. The assistant will retry.",
       "welcome": "Welcome",

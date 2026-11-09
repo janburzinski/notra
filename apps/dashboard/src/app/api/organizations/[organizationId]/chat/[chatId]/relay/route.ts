@@ -1,9 +1,11 @@
+import { checkChatBilling } from "@notra/ai/billing/chat-billing";
 import {
   appendChatMessageIfMissing,
   getChatSession,
 } from "@notra/ai/chat/history";
 import { publishChatMirrorMessage } from "@notra/ai/chat/mirror";
 import { chatIdSchema, relayChatMessageSchema } from "@notra/ai/schemas/chat";
+import { logError } from "@notra/ai/utils/server-log";
 import type { UIMessage } from "ai";
 
 import { withOrganizationAuth } from "@/lib/auth/organization";
@@ -12,6 +14,7 @@ import {
   postSlackRelayMessage,
 } from "@/lib/slack/relay";
 import type { RouteContext } from "@/types/api/routes";
+import { enforceChatGenerationRatelimit } from "@/utils/chat-ratelimit";
 import { ratelimit } from "@/utils/ratelimit";
 
 export async function POST(
@@ -68,6 +71,36 @@ export async function POST(
     return Response.json(
       { error: "Chat has an invalid Slack thread reference" },
       { status: 409 }
+    );
+  }
+
+  // The relayed message starts a Slack agent turn, so it counts against the
+  // same generation limit and credit check as a dashboard chat message.
+  const rateLimited = await enforceChatGenerationRatelimit(
+    organizationId,
+    auth.context.user.id
+  );
+  if (rateLimited) {
+    return rateLimited;
+  }
+  let billing: Awaited<ReturnType<typeof checkChatBilling>>;
+  try {
+    billing = await checkChatBilling(organizationId);
+  } catch (error) {
+    logError("Slack relay credit check failed", error, { organizationId });
+    return Response.json(
+      { error: "Failed to check usage limits", code: "BILLING_ERROR" },
+      { status: 500 }
+    );
+  }
+  if (!billing.allowed) {
+    return Response.json(
+      {
+        error: "Usage limit reached",
+        code: "USAGE_LIMIT_REACHED",
+        balance: billing.balanceRemaining ?? 0,
+      },
+      { status: 403 }
     );
   }
 

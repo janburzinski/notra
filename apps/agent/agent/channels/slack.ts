@@ -86,6 +86,7 @@ import {
 } from "../lib/utils/slack-reply";
 import { getNotraSlackState } from "../lib/utils/slack-state";
 import { isPostToXRejection } from "../lib/utils/slack-tool-results";
+import { checkSlackUsageLimits } from "../lib/utils/slack-usage-limits";
 import { firstNonEmptyLine } from "../lib/utils/text";
 
 const onSlackMessage: NonNullable<SlackChannelConfig["onAppMention"]> = async (
@@ -129,20 +130,33 @@ const onSlackMessage: NonNullable<SlackChannelConfig["onAppMention"]> = async (
       await handleSlackControl(control, ctx);
       return null;
     }
+    const slackUserId = message.author?.userId;
+    const usage = await checkSlackUsageLimits(
+      installation.organizationId,
+      slackUserId
+        ? { teamId: installation.teamId, userId: slackUserId }
+        : undefined
+    );
+    if (!usage.allowed) {
+      await (slackUserId
+        ? ctx.thread.postEphemeral(slackUserId, usage.message)
+        : ctx.thread.post(usage.message));
+      return null;
+    }
     await ctx.thread.startTyping("On it…");
     const chatId = await Effect.runPromise(
       mirrorPublicSlackThread(ctx, message, installation.organizationId)
     );
-    if (chatId) {
-      return {
-        auth: {
-          ...auth,
-          attributes: { ...auth.attributes, chatId },
+    return {
+      auth: {
+        ...auth,
+        attributes: {
+          ...auth.attributes,
+          ...usage.attributes,
+          ...(chatId ? { chatId } : {}),
         },
-      };
-    }
-
-    return { auth };
+      },
+    };
   });
 };
 
@@ -349,12 +363,24 @@ const onSlackEvent: NonNullable<SlackChannelConfig["onEvent"]> = async (
     return;
   }
 
-  await runWithSlackTeam(ctx.envelope.team_id, () =>
-    ctx.send(relay.message, {
+  const usage = await checkSlackUsageLimits(relay.organizationId);
+  await runWithSlackTeam(ctx.envelope.team_id, async () => {
+    if (!usage.allowed) {
+      await ctx.slack.request("chat.postMessage", {
+        channel: relay.channelId,
+        thread_ts: relay.threadTs,
+        text: usage.message,
+      });
+      return;
+    }
+    await ctx.send(relay.message, {
       target: { channelId: relay.channelId, threadTs: relay.threadTs },
-      auth: relay.auth,
-    })
-  );
+      auth: {
+        ...relay.auth,
+        attributes: { ...relay.auth.attributes, ...usage.attributes },
+      },
+    });
+  });
 };
 
 const credentials = createSlackAgentCredentials();

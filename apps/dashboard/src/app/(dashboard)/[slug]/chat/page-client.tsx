@@ -125,6 +125,7 @@ import { emitAutumnRefresh } from "@/lib/billing/autumn-refresh";
 import {
   relaySlackApproval,
   relaySlackMirrorMessage,
+  SlackRelayError,
 } from "@/lib/chat/slack-relay";
 import { createStandaloneChatTransport } from "@/lib/chat/standalone-chat-transport";
 import { useActiveProject } from "@/lib/hooks/use-active-project";
@@ -1146,10 +1147,17 @@ function StandaloneChatPageClient({
         return [...withoutTemp, message];
       });
     },
-    onError: (_error, input) => {
+    onError: (error, input) => {
       setMessages((prev) => prev.filter((item) => item.id !== input.tempId));
       setIsMirrorWorking(false);
-      setChatError(t("slackSendFailed"));
+      const relayError = error instanceof SlackRelayError ? error : null;
+      if (relayError?.code === "USAGE_LIMIT_REACHED") {
+        setChatError(tChatErrors("usageLimit"));
+      } else if (relayError?.status === 429) {
+        setChatError(t("slackRateLimited"));
+      } else {
+        setChatError(t("slackSendFailed"));
+      }
     },
   });
   const relayMessage = useCallback(

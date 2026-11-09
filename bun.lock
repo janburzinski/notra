@@ -255,7 +255,6 @@
         "@tanstack/react-virtual": "^3.14.20",
         "@unkey/api": "^2.5.4",
         "@upstash/qstash": "2.9.0-rc",
-        "@upstash/ratelimit": "catalog:",
         "@upstash/realtime": "^1.0.3",
         "@upstash/redis": "catalog:",
         "@vercel/functions": "^3.10.1",

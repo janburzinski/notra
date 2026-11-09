@@ -16,9 +16,14 @@ export interface InstallationCacheEntry {
 export interface SlackDashboardRelay {
   channelId: string;
   threadTs: string;
+  organizationId: string;
   message: string;
   auth: VerifiedSessionAuth;
 }
+
+export type SlackUsageCheck =
+  | { allowed: true; attributes: Record<string, string> }
+  | { allowed: false; message: string };
 
 interface DraftCompletionState {
   count: number;
