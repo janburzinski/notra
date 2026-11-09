@@ -1,0 +1,40 @@
+name: Production deploy watchdog
+
+# Restarts a scheduled release that a GitHub Actions outage dropped or failed
+# before any job started; those runs cannot send their own Slack alert.
+on:
+  schedule:
+    - cron: "40 12,19 * * *"
+      timezone: Europe/Berlin
+  workflow_dispatch:
+
+permissions:
+  actions: write
+  contents: read
+
+concurrency:
+  group: production-deploy-watchdog
+  cancel-in-progress: false
+
+jobs:
+  watchdog:
+    if: github.ref == 'refs/heads/main' && github.repository == 'usenotra/notra'
+    runs-on: depot-ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          sparse-checkout: scripts/github
+
+      - name: Setup Node
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
+        with:
+          node-version: 24
+
+      - name: Restart a release that never started
+        run: node scripts/github/production-deploy-watchdog.mjs
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SLACK_WEBHOOK_URL: ${{ secrets.GEO_SCAN_ALERT_WEBHOOK_URL || secrets.SLACK_DEPLOY_WEBHOOK_URL }}

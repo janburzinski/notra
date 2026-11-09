@@ -13,8 +13,12 @@ import {
 const dashboardRequire = createRequire(
   new URL("../../../../apps/dashboard/package.json", import.meta.url)
 );
+// The dashboard's rate limiters come from @notra/utils/ratelimit.
+const utilsRequire = createRequire(
+  new URL("../../../../packages/utils/package.json", import.meta.url)
+);
 const { Redis } = dashboardRequire("@upstash/redis");
-const { Ratelimit } = dashboardRequire("@upstash/ratelimit");
+const { Ratelimit } = utilsRequire("@upstash/ratelimit");
 const environment = {
   PATH: process.env.PATH ?? "",
   HOME: process.env.HOME ?? "",

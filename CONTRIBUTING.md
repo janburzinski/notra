@@ -797,6 +797,13 @@ running, cancelled, or failed checks prevent all builds for that release window.
 There is no automatic deployment when CI finishes later; the next scheduled
 window checks again.
 
+The [Production deploy watchdog](.github/workflows/production-deploy-watchdog.yml)
+runs 40 minutes after each window. When a GitHub Actions outage dropped the
+scheduled run or failed it before any job started, which also stops that run's
+Slack alert, it starts the release once more on `main` and posts to the same
+Slack webhook. Runs that started are left alone: gate and deploy failures alert
+themselves, and a redeploy of an unchanged commit skips every project.
+
 The deploy job starts alongside the release gates (the Sites E2E suite and the
 agents boot check) instead of after them. Meanwhile it installs, plans every
 target and builds the sites toolchain snapshot, which only changes the
