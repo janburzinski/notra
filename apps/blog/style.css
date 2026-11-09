@@ -1570,3 +1570,8 @@ html.dark
 [data-mobile-toc] .toc-children .toc-link::before {
   display: none;
 }
+
+/* Changelog titles fill the column; balanced wrapping broke them in half. */
+#content-area article:has(> div > time) > .min-w-0 > :is(h1, h2) {
+  text-wrap: pretty;
+}

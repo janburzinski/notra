@@ -7,8 +7,6 @@ export const NOTRA_LOGO_PATH = "/notra-mark.svg";
 export const RSS_FEED_PATH = "/blog/feed.xml";
 export const RSS_FEED_TITLE = "Notra Blog RSS Feed";
 
-export const NOTRA_CHANGELOG_INDEX_PATH = "/changelog/notra";
-
 export const OG_EXCLUDED_CONTRIBUTOR = "mezotv";
 export const OG_MAX_CONTRIBUTORS = 6;
 export const OG_MAX_LOGIN_LENGTH = 12;

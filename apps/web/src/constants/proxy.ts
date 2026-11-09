@@ -55,6 +55,8 @@ export const BLOG_PROXY_ORIGIN = "https://ntra-blog.notra.site";
 
 export const BLOG_PROXY_PATH = "/blog";
 
+export const CHANGELOG_PROXY_PATH = "/changelog";
+
 export const OAUTH_ISSUER_ORIGIN = "https://oauth.usenotra.com";
 
 export const AGENT_BYPASS_PARAM = "_agent";

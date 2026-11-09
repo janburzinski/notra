@@ -40,10 +40,6 @@ import {
 } from "@/lib/state-of-ai-search/markdown";
 import { listSummaries, loadReport } from "@/lib/state-of-ai-search/reports";
 import type { McpUseCaseMarkdownEntry } from "@/types/mcp-use-cases";
-import {
-  getChangelogPostHref,
-  listNotraChangelogPosts,
-} from "@/utils/changelog";
 import { stripFrontmatter } from "@/utils/markdown";
 import { readAppMarkdownSource } from "@/utils/markdown-source";
 import { MarkdownNotFoundError } from "@/utils/not-found";
@@ -128,34 +124,8 @@ function markdownFromTitleAndBody(title: string, body: string) {
   return withTrailingNewline([`# ${title}`, "", content].join("\n"));
 }
 
-function renderDatedEntry(entry: MarkdownTwinEntry) {
-  const lines = [`# ${entry.data.title}`, ""];
-
-  if (entry.data.dateLabel) {
-    lines.push(`Date: ${entry.data.dateLabel}`, "");
-  }
-
-  lines.push((entry.body ?? "").trim(), "");
-  return lines.join("\n");
-}
-
 function renderBodyEntry(entry: MarkdownTwinEntry) {
   return withTrailingNewline((entry.body ?? "").trim());
-}
-
-async function getNotraChangelogEntries(): Promise<MarkdownTwinEntry[]> {
-  const posts = await listNotraChangelogPosts();
-
-  return posts.map((post) => ({
-    id: post.slug,
-    data: {
-      title: post.title,
-      description: post.excerpt,
-      dateLabel: post.createdAt,
-      publishedDate: new Date(post.createdAt),
-    },
-    body: post.markdown,
-  }));
 }
 
 async function getShowcaseEntries(name: string): Promise<MarkdownTwinEntry[]> {
@@ -202,38 +172,17 @@ function getMcpUseCaseEntries() {
   );
 }
 
-async function buildNotraChangelogIndexMarkdown() {
-  const posts = await listNotraChangelogPosts();
-  const list = posts
-    .map(
-      (post) =>
-        `- [${post.title}](${absoluteUrl(`${getChangelogPostHref(post.slug)}.md`)}) (${post.createdAt})`
-    )
-    .join("\n");
-
-  return [
-    "# Notra Changelog",
-    "",
-    "The latest product updates, release notes and improvements from the Notra team.",
-    "",
-    "## Entries",
-    "",
-    list || "No changelog entries found.",
-    "",
-  ].join("\n");
-}
-
 function buildChangelogHubMarkdown() {
   const list = [
-    `- [Notra](${absoluteUrl("/changelog/notra.md")})`,
+    `- [Notra](${absoluteUrl("/changelog/index.md")})`,
     ...SHOWCASE_COMPANIES.map(
       (company) =>
-        `- [${company.name}](${absoluteUrl(`/changelog/${company.slug}.md`)})`
+        `- [${company.name}](${absoluteUrl(`/showcase/${company.slug}.md`)})`
     ),
   ].join("\n");
 
   return [
-    "# Changelog",
+    "# Showcase",
     "",
     "See how Notra transforms GitHub activity into professional product updates from real open source projects.",
     "",
@@ -259,7 +208,7 @@ function buildShowcaseCompanyMarkdown(name: string) {
     )
     .map(
       (entry) =>
-        `- [${entry.title}](${absoluteUrl(`/changelog/${name}/${getShowcaseEntrySlug(entry.info.path)}.md`)}) (${entry.date})`
+        `- [${entry.title}](${absoluteUrl(`/showcase/${name}/${getShowcaseEntrySlug(entry.info.path)}.md`)}) (${entry.date})`
     )
     .join("\n");
 
@@ -331,13 +280,9 @@ export function buildDualmarkStaticPages(): StaticPageConfig[] {
       pattern: "/features/marketing/assets",
       render: () => buildMarketingAssetsMarkdown(),
     },
-    { pattern: "/changelog", render: () => buildChangelogHubMarkdown() },
-    {
-      pattern: "/changelog/notra",
-      render: () => buildNotraChangelogIndexMarkdown(),
-    },
+    { pattern: "/showcase", render: () => buildChangelogHubMarkdown() },
     ...SHOWCASE_COMPANIES.map((company) => ({
-      pattern: `/changelog/${company.slug}`,
+      pattern: `/showcase/${company.slug}`,
       render: () => buildShowcaseCompanyMarkdown(company.slug),
     })),
     ...FEATURE_DETAIL_SLUGS.map((slug) => ({
@@ -363,17 +308,11 @@ export function buildDualmarkCollections() {
       converter: (entry) => withTrailingNewline(entry.body ?? ""),
       getEntries: getMcpUseCaseEntries,
     },
-    notraChangelog: {
-      route: "changelog/notra",
-      emitListing: false,
-      converter: (entry) => renderDatedEntry(entry as MarkdownTwinEntry),
-      getEntries: getNotraChangelogEntries,
-    },
   };
 
   for (const company of SHOWCASE_COMPANIES) {
     collections[`showcase-${company.slug}`] = {
-      route: `changelog/${company.slug}`,
+      route: `showcase/${company.slug}`,
       emitListing: false,
       converter: (entry) => renderBodyEntry(entry as MarkdownTwinEntry),
       getEntries: () => getShowcaseEntries(company.slug),

@@ -8,6 +8,7 @@ Allow: /
 
 Sitemap: ${SITE_URL}/sitemap.xml
 Sitemap: ${SITE_URL}/blog/sitemap.xml
+Sitemap: ${SITE_URL}/changelog/sitemap.xml
 Sitemap: ${DOCS_URL}/sitemap.xml
 schemamap: ${SITE_URL}/schema-map.xml
 `;

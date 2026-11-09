@@ -11,6 +11,7 @@ import {
   FOOTER_TAGLINE,
 } from "@/constants/landing/footer";
 import type { FooterLink } from "@/types/landing/footer";
+import { isProxiedPath } from "@/utils/proxied-paths";
 
 import { NotraMark } from "./notra-mark";
 
@@ -34,6 +35,7 @@ function FooterColumnLink({ link }: { link: FooterLink }) {
     <Link
       className={LINK_CLASS}
       to={link.href}
+      reloadDocument={isProxiedPath(link.href)}
       rel={link.external ? "noopener noreferrer" : undefined}
       target={link.external ? "_blank" : undefined}
     >

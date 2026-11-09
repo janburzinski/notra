@@ -1,9 +1,7 @@
 ---
 title: "Async API, write-scoped keys, Framer integration"
 description: "Async content generation APIs, write-scoped keys, Framer integration, and API security improvements shipped this week."
-date: "2026-03-22T09:01:46.193Z"
-updatedAt: "2026-06-07T21:25:03.345Z"
-author: "notra"
+date: 2026-03-22
 ---
 
 Over the past week, we shipped async API endpoints for content generation, write-scoped API keys with granular permissions, and security improvements. Developers can now trigger content generation in the background, poll job status, and integrate generation directly into their workflows. This enables scheduled content jobs, batch operations, and automation pipelines. We also added Framer integration with an interactive four-step setup, improved brand voice consistency across all generated content types, and added API security headers to protect against common vulnerabilities. You can now connect public GitHub repositories without requiring personal access tokens, edit your own API tokens from settings, and manage access permissions at a granular level.
@@ -35,10 +33,10 @@ Added HTTP security headers to protect API responses against common web vulnerab
 ### Features & Enhancements
 
 - **Connect public GitHub repos without a token** - Use any public repository without needing personal access tokens.
-- **Searchable brand voice selector** - Replaced the dropdown with a searchable combobox for faster lookup when managing multiple voices. (Author: [@mezotv](https://github.com/mezotv/))
+- **Searchable brand voice selector** - Replaced the dropdown with a searchable combobox for faster lookup when managing multiple voices.
 - **Edit your own API tokens** - Rotate or update authentication tokens directly from settings.
 
 ### Infrastructure
 
-- **Extract AI logic into shared packages/ai** #207 - Refactored all AI agents, prompts, tools, and utilities into a dedicated module for code reuse across dashboard and API. (Author: [@mezotv](https://github.com/mezotv/))
+- **Extract AI logic into shared packages/ai** #207 - Refactored all AI agents, prompts, tools, and utilities into a dedicated module for code reuse across dashboard and API.
 - **Autumn SDK v2 migration** - Upgraded to Autumn v2 for improved compatibility with the latest SDK features.

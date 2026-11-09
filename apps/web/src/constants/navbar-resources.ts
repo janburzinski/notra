@@ -13,7 +13,7 @@ export const NAVBAR_RESOURCES_FEATURE_STYLES: Record<
   NavbarBentoFeatureStyle<NavbarResourcesMock>
 > = {
   "/blog": { iconClassName: NAVBAR_BENTO_TINTS.violet, mock: "blog" },
-  "/changelog/notra": {
+  "/changelog": {
     iconClassName: NAVBAR_BENTO_TINTS.indigo,
     mock: "changelog",
   },

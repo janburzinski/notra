@@ -1,0 +1,72 @@
+---
+title: "Sites for every workspace, one Analytics page and Autopilot workflows"
+description: "Notra Sites is open to everyone, website and MCP traffic live on one Analytics page, and Autopilot can now build a workflow with you."
+date: 2026-11-09
+image: /changelog/2026-11-09-analytics.webp
+imageAlt: "The new Analytics page in Notra, with crawler requests, AI referrals and a 30-day traffic chart for a demo workspace."
+---
+
+## One Analytics page
+
+Website traffic and social analytics used to live on separate pages. They're now one **Analytics** page with three tabs: Website, MCP server and Social.
+
+- **MCP server analytics:** see which agents call your MCP server, which tools they use and which server version they run. The same data is in the public API.
+- **Clearer setup:** AI traffic tracking is now a short list of numbered steps, and the MCP tab shows the same setup card when it has no data yet.
+
+## Notra Sites is open to every workspace
+
+Any workspace can now host a blog or changelog from a GitHub repository with Notra Sites. Our own blog moved over this week, and this changelog runs on it too.
+
+- **Agent reach per post:** for every post on a Notra site, Content shows how often AI crawlers read it, how often assistants cite it and how many people click through from an AI answer.
+- **Domains verify themselves**, and a domain that forwards to `www` is served on the `www` address.
+- **Builds warn about broken links, anchors and missing images** before a visitor finds them, including links in the header, footer and shared snippets. `notra-sites validate` and the dev server show them while you write.
+- **Authors:** add and edit a site's authors and pick the author page layout in Design → Authors, then credit them in the post editor. Author profiles take YouTube, Threads and Instagram links too.
+- **Share images:** a new Design → Share images section shows a live preview that matches the published image, and custom fonts now work.
+- **[IndexNow](https://www.usenotra.com/docs/sites/integrations/search/indexnow):** after a production deploy, new and changed posts are sent to Bing and other IndexNow search engines, so they show up sooner.
+- **Theme updates:** when we fix how sites render, live sites rebuild on their own. These builds show as **Theme update** in Deployments and don't count toward your daily build limit.
+- **Design:** a redesigned author page, a dither hero style, an editable 404 page and a tile style for blog cards.
+- **Faster pages:** post images are served as smaller WebP copies, and font files are preloaded with matching fallbacks so text doesn't jump.
+- **Redirects** accept `:placeholders`, and integrations are saved as a pull request you can review.
+- **Publishing:** with one Notra site, **Create GitHub PR** publishes straight to it, and each finished check names the commit it built.
+- **Review changes:** the unpublished changes banner opens a review of every draft with its diff, and **Discard** shows the diffs before anything is thrown away.
+- **Phones** get an "On this page" menu in every post layout, and compact posts show when they were last edited.
+- **[Analytics integrations](https://www.usenotra.com/docs/sites/integrations/analytics/overview):** Capless, Rybbit, OneDollarStats, DataFast and Simple Analytics join the site integrations, each with all of its script options.
+- **Robots:** the generated `robots.txt` names xAI's GrokBot next to the other AI crawlers.
+
+## Autopilot builds workflows with you
+
+Describe a goal, like "tell me when a competitor overtakes us in AI answers and plan a comeback", and the agent builds the workflow. It asks follow-up questions when something is unclear, and on Autopilot it sits in a dock that opens to a full-screen view with the live workflow.
+
+- **New templates:** refresh an old post, write a comparison page, make a page easier for AI to read, and add internal links to pages that rank 4 to 20 in Google. Click a template to see what it does before you add it.
+- **Slack:** the daily brief is one short message with each pull request or idea in its thread. React 👍 to merge a pull request or 👎 to close it.
+
+## Also new
+
+- **GEO settings:** turn AI providers on or off and Notra picks the right model for each. GEO settings now fit on two panes.
+- **Search Console:** queries with buying intent get priority, and for queries you already rank for, Notra suggests updating the page Google ranks instead of writing a new one.
+- **Personas** run in the language of the prompt, so results in different languages compare fairly.
+- **Cover images:** a blog post published without one gets a generated cover, also when an automation publishes it or its GitHub pull request is merged.
+- **Chat:** the home screen suggests prompts based on your workspace.
+- **Connect agent:** a pill in the sidebar copies a prompt that connects Claude Code, Codex, Cursor or OpenCode to Notra's MCP server.
+- **Slack agent:** ask about website traffic, like visitors, top pages, sources, countries and devices, next to your GEO questions.
+- **Reports:** the new [State of AI Traffic](https://www.usenotra.com/data) page shows anonymized AI crawler and assistant traffic across sites that use Notra, updated daily. The November [State of AI Search](https://www.usenotra.com/state-of-ai-search) reports are out too.
+- **Onboarding:** type your website into the homepage hero and onboarding starts with it filled in. Sign-up keeps what your password manager fills in, a taken workspace URL is flagged right under the field, and a status line shows progress while your questions are drafted.
+- **Faster dashboard:** GEO Overview renders in about half the time, and every page loads less JavaScript before you can use it.
+- **Members** can leave an organization from Settings → Members.
+- **Sites API:** read sites and builds, start a build, preview a post, publish it as a pull request and manage authors, with the new `sites.read` and `sites.write` scopes.
+- **Public API:** write a post about one pull request and open it as a draft PR, plus GEO personas, Linear schedule targets and partial schedule updates.
+- **GitHub mentions:** ask `@notra` on a pull request to write a blog post about it in a new PR, and it opens a draft PR with the post and its share image. It can also read commit history and other pull requests, so you can ask what changed since a release.
+- **Billing:** add your company details and tax ID at checkout.
+- **GitHub:** link an existing GitHub App installation in one click.
+
+## Fixes
+
+- Post to X no longer publishes the same post twice.
+- Posts publish when their GitHub pull request is merged.
+- Updating a post through the API keeps its video embeds.
+- Linear schedules turn off when their integration is removed.
+- GitHub org members who aren't owners can request the Notra app, and Notra shows that it's waiting for an owner's approval instead of an error.
+- In monorepos, Autopilot writes blog posts to the folder your GitHub integration publishes to instead of the repository root.
+- Asking @Notra about Autopilot in an Autopilot Slack thread gets an answer about Autopilot.
+- The whole post card on a Notra site is clickable, and site pages no longer shift while loading.
+- A Notra blog without posts shows visitors a "No posts yet" page with an RSS link instead of a setup hint meant for the owner.

@@ -1,21 +1,14 @@
 import type { SiteRedirect } from "@/types/redirects";
-import { SHOWCASE_COMPANIES } from "@/utils/showcase";
 import { SOCIAL_LINKS } from "@/utils/social-links";
 
 export const SITE_REDIRECTS: SiteRedirect[] = [
-  ...SHOWCASE_COMPANIES.map((company) => ({
-    source: `/showcase/${company.slug}`,
-    destination: `/changelog/${company.slug}`,
-    permanent: true,
-  })),
-  {
-    source: "/showcase/:name/:slug",
-    destination: "/changelog/:name/:slug",
-    permanent: true,
-  },
-  { source: "/showcase", destination: "/changelog", permanent: true },
   { source: "/rss.xml", destination: "/blog/feed.xml", permanent: true },
   { source: "/blog.md", destination: "/blog/index.md", permanent: true },
+  {
+    source: "/changelog.md",
+    destination: "/changelog/index.md",
+    permanent: true,
+  },
   {
     source: "/founder-chat",
     destination: "https://cal.com/dominikkoch",

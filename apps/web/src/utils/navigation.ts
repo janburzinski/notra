@@ -89,7 +89,7 @@ export const MARKETING_NAV: readonly MarketingNavEntry[] = [
         icon: QuillWrite01Icon,
       },
       {
-        href: "/changelog/notra",
+        href: "/changelog",
         label: "Changelog",
         description: "Overview of latest Notra changes.",
         icon: Megaphone01Icon,

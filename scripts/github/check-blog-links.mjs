@@ -2,28 +2,40 @@ import { existsSync } from "node:fs";
 import { appendFile, readdir, readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 
-const dir = "apps/blog/blog";
 const publicDir = "apps/blog/public";
-const base = "https://www.usenotra.com/blog/";
+const areas = [
+  { dir: "apps/blog/blog", mount: "/blog" },
+  { dir: "apps/blog/changelog", mount: "/changelog" },
+];
 const excluded =
   /^https:\/\/(x\.com|demo\.usenotra\.com|claude\.ai|chatgpt\.com)\//;
 const linkPattern = /(?:\]\(|href="|src=")([^)"\s]+)/g;
 
 const links = new Map();
-for (const file of await readdir(dir)) {
-  const text = await readFile(join(dir, file), "utf8");
-  for (const [, href] of text.matchAll(linkPattern)) {
-    // Posts reference public/new.webp as /blog/new.webp, the URL it is served at.
-    const asset = href.startsWith("/blog/") ? href.slice("/blog".length) : href;
-    if (
-      href.startsWith("/") &&
-      (existsSync(join(publicDir, href)) || existsSync(join(publicDir, asset)))
-    ) {
-      continue;
-    }
-    const url = URL.canParse(href, base) ? new URL(href, base).href : href;
-    if (!(href.startsWith("#") || excluded.test(url))) {
-      links.set(url, [...(links.get(url) ?? []), file]);
+for (const { dir, mount } of areas) {
+  if (!existsSync(dir)) {
+    continue;
+  }
+  const base = `https://www.usenotra.com${mount}/`;
+  for (const file of await readdir(dir)) {
+    const text = await readFile(join(dir, file), "utf8");
+    for (const [, href] of text.matchAll(linkPattern)) {
+      // Entries reference public/new.webp as <mount>/new.webp, the URL it is served at.
+      const asset = href.startsWith(`${mount}/`)
+        ? href.slice(mount.length)
+        : href;
+      if (
+        href.startsWith("/") &&
+        (existsSync(join(publicDir, href)) ||
+          existsSync(join(publicDir, asset)))
+      ) {
+        continue;
+      }
+      const url = URL.canParse(href, base) ? new URL(href, base).href : href;
+      if (!(href.startsWith("#") || excluded.test(url))) {
+        const source = join(dir, file);
+        links.set(url, [...(links.get(url) ?? []), source]);
+      }
     }
   }
 }

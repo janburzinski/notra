@@ -13,7 +13,7 @@ import {
 } from "@/utils/metadata";
 import { SITE_URL } from "@/utils/urls";
 
-export const Route = createFileRoute("/_site/_changelog/changelog/$name/")({
+export const Route = createFileRoute("/_site/_showcase/showcase/$name/")({
   loader: ({ params }) =>
     getShowcaseCompanyChangelog({ data: { name: params.name } }),
   head: ({ loaderData, params }) => {
@@ -23,7 +23,7 @@ export const Route = createFileRoute("/_site/_changelog/changelog/$name/")({
     }
     const title = { absolute: `${company.name} Changelog` };
     const description = `${company.description} See AI-generated changelogs powered by Notra.`;
-    const url = `${SITE_URL}/changelog/${params.name}`;
+    const url = `${SITE_URL}/showcase/${params.name}`;
     return buildHead({
       title,
       description,
@@ -82,7 +82,7 @@ function ShowcaseCompanyPage() {
       <div className="mx-auto mt-8 w-full max-w-220 px-4 sm:px-6 md:px-8 lg:px-0">
         <Link
           className="text-foreground/50 hover:text-foreground inline-flex items-center gap-1 font-sans text-sm transition-colors"
-          to="/changelog"
+          to="/showcase"
         >
           &larr; All changelogs
         </Link>

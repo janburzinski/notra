@@ -8,7 +8,7 @@ export function ShowcaseOverviewGrid({ companies }: ShowcaseOverviewGridProps) {
         <Link
           className="group focus-visible:outline-ring flex h-full flex-col gap-3 rounded-[1.25rem] border border-[#ECECEC] bg-white p-6 transition-colors hover:border-[#1E1E1E1A] focus-visible:outline-2 focus-visible:outline-offset-2 dark:border-white/10 dark:bg-white/[0.03]"
           params={{ name: company.slug }}
-          to="/changelog/$name"
+          to="/showcase/$name"
           key={company.slug}
         >
           <div className="flex items-center justify-between gap-3">

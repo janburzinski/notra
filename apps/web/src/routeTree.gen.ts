@@ -33,8 +33,8 @@ import { Route as DotwellKnownOauthProtectedResourceRouteImport } from './routes
 import { Route as LandingIndexRouteImport } from './routes/_landing/index'
 import { Route as LandingHomeRouteImport } from './routes/_landing/home'
 import { Route as LandingLandingRouteImport } from './routes/_landing/landing'
-import { Route as SiteChangelogRouteImport } from './routes/_site/_changelog'
 import { Route as SiteLegalRouteImport } from './routes/_site/_legal'
+import { Route as SiteShowcaseRouteImport } from './routes/_site/_showcase'
 import { Route as SiteAboutRouteImport } from './routes/_site/about'
 import { Route as SiteAgentRouteImport } from './routes/_site/agent'
 import { Route as SiteBrandRouteImport } from './routes/_site/brand'
@@ -104,17 +104,15 @@ import { Route as ApiOfferingCheckIndexRouteImport } from './routes/api/offering
 import { Route as ApiOfferingCheckPreflightRouteImport } from './routes/api/offering-check/preflight'
 import { Route as ApiStarVideoRenderRouteImport } from './routes/api/star-video/render'
 import { Route as ApiStarVideoRepoRouteImport } from './routes/api/star-video/repo'
-import { Route as SiteChangelogChangelogIndexRouteImport } from './routes/_site/_changelog/changelog/index'
+import { Route as SiteShowcaseShowcaseIndexRouteImport } from './routes/_site/_showcase/showcase/index'
 import { Route as SiteFeaturesMarketingAssetsRouteImport } from './routes/_site/features/marketing/assets'
 import { Route as SiteMcpUseCasesIndexRouteImport } from './routes/_site/mcp/use-cases/index'
 import { Route as SiteMcpUseCasesSlugRouteImport } from './routes/_site/mcp/use-cases/$slug'
 import { Route as SiteStateOfAiSearchCategoryIndexRouteImport } from './routes/_site/state-of-ai-search/$category/index'
 import { Route as ApiStarVideoGithubAuthorizeRouteImport } from './routes/api/star-video/github/authorize'
 import { Route as ApiStarVideoGithubCallbackRouteImport } from './routes/api/star-video/github/callback'
-import { Route as SiteChangelogChangelogNameIndexRouteImport } from './routes/_site/_changelog/changelog/$name/index'
-import { Route as SiteChangelogChangelogNameSlugRouteImport } from './routes/_site/_changelog/changelog/$name/$slug'
-import { Route as SiteChangelogChangelogNotraIndexRouteImport } from './routes/_site/_changelog/changelog/notra/index'
-import { Route as SiteChangelogChangelogNotraSlugRouteImport } from './routes/_site/_changelog/changelog/notra/$slug'
+import { Route as SiteShowcaseShowcaseNameIndexRouteImport } from './routes/_site/_showcase/showcase/$name/index'
+import { Route as SiteShowcaseShowcaseNameSlugRouteImport } from './routes/_site/_showcase/showcase/$name/$slug'
 import { Route as SiteStateOfAiSearchCategoryEditionIndexRouteImport } from './routes/_site/state-of-ai-search/$category/$edition/index'
 import { Route as SiteStateOfAiSearchCategoryEditionDataDotcsvRouteImport } from './routes/_site/state-of-ai-search/$category/$edition/data[.]csv'
 import { Route as SiteStateOfAiSearchCategoryEditionOpengraphImageRouteImport } from './routes/_site/state-of-ai-search/$category/$edition/opengraph-image'
@@ -242,12 +240,12 @@ const LandingLandingRoute = LandingLandingRouteImport.update({
   path: '/landing',
   getParentRoute: () => LandingRoute,
 } as any)
-const SiteChangelogRoute = SiteChangelogRouteImport.update({
-  id: '/_changelog',
-  getParentRoute: () => SiteRoute,
-} as any)
 const SiteLegalRoute = SiteLegalRouteImport.update({
   id: '/_legal',
+  getParentRoute: () => SiteRoute,
+} as any)
+const SiteShowcaseRoute = SiteShowcaseRouteImport.update({
+  id: '/_showcase',
   getParentRoute: () => SiteRoute,
 } as any)
 const SiteAboutRoute = SiteAboutRouteImport.update({
@@ -604,11 +602,11 @@ const ApiStarVideoRepoRoute = ApiStarVideoRepoRouteImport.update({
   path: '/api/star-video/repo',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SiteChangelogChangelogIndexRoute =
-  SiteChangelogChangelogIndexRouteImport.update({
-    id: '/changelog/',
-    path: '/changelog/',
-    getParentRoute: () => SiteChangelogRoute,
+const SiteShowcaseShowcaseIndexRoute =
+  SiteShowcaseShowcaseIndexRouteImport.update({
+    id: '/showcase/',
+    path: '/showcase/',
+    getParentRoute: () => SiteShowcaseRoute,
   } as any)
 const SiteFeaturesMarketingAssetsRoute =
   SiteFeaturesMarketingAssetsRouteImport.update({
@@ -644,29 +642,17 @@ const ApiStarVideoGithubCallbackRoute =
     path: '/api/star-video/github/callback',
     getParentRoute: () => rootRouteImport,
   } as any)
-const SiteChangelogChangelogNameIndexRoute =
-  SiteChangelogChangelogNameIndexRouteImport.update({
-    id: '/changelog/$name/',
-    path: '/changelog/$name/',
-    getParentRoute: () => SiteChangelogRoute,
+const SiteShowcaseShowcaseNameIndexRoute =
+  SiteShowcaseShowcaseNameIndexRouteImport.update({
+    id: '/showcase/$name/',
+    path: '/showcase/$name/',
+    getParentRoute: () => SiteShowcaseRoute,
   } as any)
-const SiteChangelogChangelogNameSlugRoute =
-  SiteChangelogChangelogNameSlugRouteImport.update({
-    id: '/changelog/$name/$slug',
-    path: '/changelog/$name/$slug',
-    getParentRoute: () => SiteChangelogRoute,
-  } as any)
-const SiteChangelogChangelogNotraIndexRoute =
-  SiteChangelogChangelogNotraIndexRouteImport.update({
-    id: '/changelog/notra/',
-    path: '/changelog/notra/',
-    getParentRoute: () => SiteChangelogRoute,
-  } as any)
-const SiteChangelogChangelogNotraSlugRoute =
-  SiteChangelogChangelogNotraSlugRouteImport.update({
-    id: '/changelog/notra/$slug',
-    path: '/changelog/notra/$slug',
-    getParentRoute: () => SiteChangelogRoute,
+const SiteShowcaseShowcaseNameSlugRoute =
+  SiteShowcaseShowcaseNameSlugRouteImport.update({
+    id: '/showcase/$name/$slug',
+    path: '/showcase/$name/$slug',
+    getParentRoute: () => SiteShowcaseRoute,
   } as any)
 const SiteStateOfAiSearchCategoryEditionIndexRoute =
   SiteStateOfAiSearchCategoryEditionIndexRouteImport.update({
@@ -783,15 +769,13 @@ export interface FileRoutesByFullPath {
   '/mcp/use-cases/$slug': typeof SiteMcpUseCasesSlugRoute
   '/api/star-video/github/authorize': typeof ApiStarVideoGithubAuthorizeRoute
   '/api/star-video/github/callback': typeof ApiStarVideoGithubCallbackRoute
-  '/changelog/': typeof SiteChangelogChangelogIndexRoute
+  '/showcase/': typeof SiteShowcaseShowcaseIndexRoute
   '/mcp/use-cases/': typeof SiteMcpUseCasesIndexRoute
   '/state-of-ai-search/$category/': typeof SiteStateOfAiSearchCategoryIndexRoute
-  '/changelog/$name/$slug': typeof SiteChangelogChangelogNameSlugRoute
-  '/changelog/notra/$slug': typeof SiteChangelogChangelogNotraSlugRoute
+  '/showcase/$name/$slug': typeof SiteShowcaseShowcaseNameSlugRoute
   '/state-of-ai-search/$category/$edition/data.csv': typeof SiteStateOfAiSearchCategoryEditionDataDotcsvRoute
   '/state-of-ai-search/$category/$edition/opengraph-image': typeof SiteStateOfAiSearchCategoryEditionOpengraphImageRoute
-  '/changelog/$name/': typeof SiteChangelogChangelogNameIndexRoute
-  '/changelog/notra/': typeof SiteChangelogChangelogNotraIndexRoute
+  '/showcase/$name/': typeof SiteShowcaseShowcaseNameIndexRoute
   '/state-of-ai-search/$category/$edition/': typeof SiteStateOfAiSearchCategoryEditionIndexRoute
 }
 export interface FileRoutesByTo {
@@ -890,15 +874,13 @@ export interface FileRoutesByTo {
   '/mcp/use-cases/$slug': typeof SiteMcpUseCasesSlugRoute
   '/api/star-video/github/authorize': typeof ApiStarVideoGithubAuthorizeRoute
   '/api/star-video/github/callback': typeof ApiStarVideoGithubCallbackRoute
-  '/changelog': typeof SiteChangelogChangelogIndexRoute
+  '/showcase': typeof SiteShowcaseShowcaseIndexRoute
   '/mcp/use-cases': typeof SiteMcpUseCasesIndexRoute
   '/state-of-ai-search/$category': typeof SiteStateOfAiSearchCategoryIndexRoute
-  '/changelog/$name/$slug': typeof SiteChangelogChangelogNameSlugRoute
-  '/changelog/notra/$slug': typeof SiteChangelogChangelogNotraSlugRoute
+  '/showcase/$name/$slug': typeof SiteShowcaseShowcaseNameSlugRoute
   '/state-of-ai-search/$category/$edition/data.csv': typeof SiteStateOfAiSearchCategoryEditionDataDotcsvRoute
   '/state-of-ai-search/$category/$edition/opengraph-image': typeof SiteStateOfAiSearchCategoryEditionOpengraphImageRoute
-  '/changelog/$name': typeof SiteChangelogChangelogNameIndexRoute
-  '/changelog/notra': typeof SiteChangelogChangelogNotraIndexRoute
+  '/showcase/$name': typeof SiteShowcaseShowcaseNameIndexRoute
   '/state-of-ai-search/$category/$edition': typeof SiteStateOfAiSearchCategoryEditionIndexRoute
 }
 export interface FileRoutesById {
@@ -926,8 +908,8 @@ export interface FileRoutesById {
   '/.well-known/oauth-protected-resource': typeof DotwellKnownOauthProtectedResourceRoute
   '/_landing/home': typeof LandingHomeRoute
   '/_landing/landing': typeof LandingLandingRoute
-  '/_site/_changelog': typeof SiteChangelogRouteWithChildren
   '/_site/_legal': typeof SiteLegalRouteWithChildren
+  '/_site/_showcase': typeof SiteShowcaseRouteWithChildren
   '/_site/about': typeof SiteAboutRoute
   '/_site/agent': typeof SiteAgentRoute
   '/_site/brand': typeof SiteBrandRoute
@@ -1002,15 +984,13 @@ export interface FileRoutesById {
   '/_site/mcp/use-cases/$slug': typeof SiteMcpUseCasesSlugRoute
   '/api/star-video/github/authorize': typeof ApiStarVideoGithubAuthorizeRoute
   '/api/star-video/github/callback': typeof ApiStarVideoGithubCallbackRoute
-  '/_site/_changelog/changelog/': typeof SiteChangelogChangelogIndexRoute
+  '/_site/_showcase/showcase/': typeof SiteShowcaseShowcaseIndexRoute
   '/_site/mcp/use-cases/': typeof SiteMcpUseCasesIndexRoute
   '/_site/state-of-ai-search/$category/': typeof SiteStateOfAiSearchCategoryIndexRoute
-  '/_site/_changelog/changelog/$name/$slug': typeof SiteChangelogChangelogNameSlugRoute
-  '/_site/_changelog/changelog/notra/$slug': typeof SiteChangelogChangelogNotraSlugRoute
+  '/_site/_showcase/showcase/$name/$slug': typeof SiteShowcaseShowcaseNameSlugRoute
   '/_site/state-of-ai-search/$category/$edition/data.csv': typeof SiteStateOfAiSearchCategoryEditionDataDotcsvRoute
   '/_site/state-of-ai-search/$category/$edition/opengraph-image': typeof SiteStateOfAiSearchCategoryEditionOpengraphImageRoute
-  '/_site/_changelog/changelog/$name/': typeof SiteChangelogChangelogNameIndexRoute
-  '/_site/_changelog/changelog/notra/': typeof SiteChangelogChangelogNotraIndexRoute
+  '/_site/_showcase/showcase/$name/': typeof SiteShowcaseShowcaseNameIndexRoute
   '/_site/state-of-ai-search/$category/$edition/': typeof SiteStateOfAiSearchCategoryEditionIndexRoute
 }
 export interface FileRouteTypes {
@@ -1111,15 +1091,13 @@ export interface FileRouteTypes {
     | '/mcp/use-cases/$slug'
     | '/api/star-video/github/authorize'
     | '/api/star-video/github/callback'
-    | '/changelog/'
+    | '/showcase/'
     | '/mcp/use-cases/'
     | '/state-of-ai-search/$category/'
-    | '/changelog/$name/$slug'
-    | '/changelog/notra/$slug'
+    | '/showcase/$name/$slug'
     | '/state-of-ai-search/$category/$edition/data.csv'
     | '/state-of-ai-search/$category/$edition/opengraph-image'
-    | '/changelog/$name/'
-    | '/changelog/notra/'
+    | '/showcase/$name/'
     | '/state-of-ai-search/$category/$edition/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -1218,15 +1196,13 @@ export interface FileRouteTypes {
     | '/mcp/use-cases/$slug'
     | '/api/star-video/github/authorize'
     | '/api/star-video/github/callback'
-    | '/changelog'
+    | '/showcase'
     | '/mcp/use-cases'
     | '/state-of-ai-search/$category'
-    | '/changelog/$name/$slug'
-    | '/changelog/notra/$slug'
+    | '/showcase/$name/$slug'
     | '/state-of-ai-search/$category/$edition/data.csv'
     | '/state-of-ai-search/$category/$edition/opengraph-image'
-    | '/changelog/$name'
-    | '/changelog/notra'
+    | '/showcase/$name'
     | '/state-of-ai-search/$category/$edition'
   id:
     | '__root__'
@@ -1253,8 +1229,8 @@ export interface FileRouteTypes {
     | '/.well-known/oauth-protected-resource'
     | '/_landing/home'
     | '/_landing/landing'
-    | '/_site/_changelog'
     | '/_site/_legal'
+    | '/_site/_showcase'
     | '/_site/about'
     | '/_site/agent'
     | '/_site/brand'
@@ -1329,15 +1305,13 @@ export interface FileRouteTypes {
     | '/_site/mcp/use-cases/$slug'
     | '/api/star-video/github/authorize'
     | '/api/star-video/github/callback'
-    | '/_site/_changelog/changelog/'
+    | '/_site/_showcase/showcase/'
     | '/_site/mcp/use-cases/'
     | '/_site/state-of-ai-search/$category/'
-    | '/_site/_changelog/changelog/$name/$slug'
-    | '/_site/_changelog/changelog/notra/$slug'
+    | '/_site/_showcase/showcase/$name/$slug'
     | '/_site/state-of-ai-search/$category/$edition/data.csv'
     | '/_site/state-of-ai-search/$category/$edition/opengraph-image'
-    | '/_site/_changelog/changelog/$name/'
-    | '/_site/_changelog/changelog/notra/'
+    | '/_site/_showcase/showcase/$name/'
     | '/_site/state-of-ai-search/$category/$edition/'
   fileRoutesById: FileRoutesById
 }
@@ -1563,18 +1537,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LandingLandingRouteImport
       parentRoute: typeof LandingRoute
     }
-    '/_site/_changelog': {
-      id: '/_site/_changelog'
-      path: ''
-      fullPath: '/'
-      preLoaderRoute: typeof SiteChangelogRouteImport
-      parentRoute: typeof SiteRoute
-    }
     '/_site/_legal': {
       id: '/_site/_legal'
       path: ''
       fullPath: '/'
       preLoaderRoute: typeof SiteLegalRouteImport
+      parentRoute: typeof SiteRoute
+    }
+    '/_site/_showcase': {
+      id: '/_site/_showcase'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof SiteShowcaseRouteImport
       parentRoute: typeof SiteRoute
     }
     '/_site/about': {
@@ -2060,12 +2034,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiStarVideoRepoRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_site/_changelog/changelog/': {
-      id: '/_site/_changelog/changelog/'
-      path: '/changelog'
-      fullPath: '/changelog/'
-      preLoaderRoute: typeof SiteChangelogChangelogIndexRouteImport
-      parentRoute: typeof SiteChangelogRoute
+    '/_site/_showcase/showcase/': {
+      id: '/_site/_showcase/showcase/'
+      path: '/showcase'
+      fullPath: '/showcase/'
+      preLoaderRoute: typeof SiteShowcaseShowcaseIndexRouteImport
+      parentRoute: typeof SiteShowcaseRoute
     }
     '/_site/features/marketing/assets': {
       id: '/_site/features/marketing/assets'
@@ -2109,33 +2083,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiStarVideoGithubCallbackRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_site/_changelog/changelog/$name/': {
-      id: '/_site/_changelog/changelog/$name/'
-      path: '/changelog/$name'
-      fullPath: '/changelog/$name/'
-      preLoaderRoute: typeof SiteChangelogChangelogNameIndexRouteImport
-      parentRoute: typeof SiteChangelogRoute
+    '/_site/_showcase/showcase/$name/': {
+      id: '/_site/_showcase/showcase/$name/'
+      path: '/showcase/$name'
+      fullPath: '/showcase/$name/'
+      preLoaderRoute: typeof SiteShowcaseShowcaseNameIndexRouteImport
+      parentRoute: typeof SiteShowcaseRoute
     }
-    '/_site/_changelog/changelog/$name/$slug': {
-      id: '/_site/_changelog/changelog/$name/$slug'
-      path: '/changelog/$name/$slug'
-      fullPath: '/changelog/$name/$slug'
-      preLoaderRoute: typeof SiteChangelogChangelogNameSlugRouteImport
-      parentRoute: typeof SiteChangelogRoute
-    }
-    '/_site/_changelog/changelog/notra/': {
-      id: '/_site/_changelog/changelog/notra/'
-      path: '/changelog/notra'
-      fullPath: '/changelog/notra/'
-      preLoaderRoute: typeof SiteChangelogChangelogNotraIndexRouteImport
-      parentRoute: typeof SiteChangelogRoute
-    }
-    '/_site/_changelog/changelog/notra/$slug': {
-      id: '/_site/_changelog/changelog/notra/$slug'
-      path: '/changelog/notra/$slug'
-      fullPath: '/changelog/notra/$slug'
-      preLoaderRoute: typeof SiteChangelogChangelogNotraSlugRouteImport
-      parentRoute: typeof SiteChangelogRoute
+    '/_site/_showcase/showcase/$name/$slug': {
+      id: '/_site/_showcase/showcase/$name/$slug'
+      path: '/showcase/$name/$slug'
+      fullPath: '/showcase/$name/$slug'
+      preLoaderRoute: typeof SiteShowcaseShowcaseNameSlugRouteImport
+      parentRoute: typeof SiteShowcaseRoute
     }
     '/_site/state-of-ai-search/$category/$edition/': {
       id: '/_site/state-of-ai-search/$category/$edition/'
@@ -2176,26 +2136,6 @@ const LandingRouteChildren: LandingRouteChildren = {
 const LandingRouteWithChildren =
   LandingRoute._addFileChildren(LandingRouteChildren)
 
-interface SiteChangelogRouteChildren {
-  SiteChangelogChangelogIndexRoute: typeof SiteChangelogChangelogIndexRoute
-  SiteChangelogChangelogNameSlugRoute: typeof SiteChangelogChangelogNameSlugRoute
-  SiteChangelogChangelogNotraSlugRoute: typeof SiteChangelogChangelogNotraSlugRoute
-  SiteChangelogChangelogNameIndexRoute: typeof SiteChangelogChangelogNameIndexRoute
-  SiteChangelogChangelogNotraIndexRoute: typeof SiteChangelogChangelogNotraIndexRoute
-}
-
-const SiteChangelogRouteChildren: SiteChangelogRouteChildren = {
-  SiteChangelogChangelogIndexRoute: SiteChangelogChangelogIndexRoute,
-  SiteChangelogChangelogNameSlugRoute: SiteChangelogChangelogNameSlugRoute,
-  SiteChangelogChangelogNotraSlugRoute: SiteChangelogChangelogNotraSlugRoute,
-  SiteChangelogChangelogNameIndexRoute: SiteChangelogChangelogNameIndexRoute,
-  SiteChangelogChangelogNotraIndexRoute: SiteChangelogChangelogNotraIndexRoute,
-}
-
-const SiteChangelogRouteWithChildren = SiteChangelogRoute._addFileChildren(
-  SiteChangelogRouteChildren,
-)
-
 interface SiteLegalRouteChildren {
   SiteLegalDpaRoute: typeof SiteLegalDpaRoute
   SiteLegalLegalRoute: typeof SiteLegalLegalRoute
@@ -2218,9 +2158,25 @@ const SiteLegalRouteWithChildren = SiteLegalRoute._addFileChildren(
   SiteLegalRouteChildren,
 )
 
+interface SiteShowcaseRouteChildren {
+  SiteShowcaseShowcaseIndexRoute: typeof SiteShowcaseShowcaseIndexRoute
+  SiteShowcaseShowcaseNameSlugRoute: typeof SiteShowcaseShowcaseNameSlugRoute
+  SiteShowcaseShowcaseNameIndexRoute: typeof SiteShowcaseShowcaseNameIndexRoute
+}
+
+const SiteShowcaseRouteChildren: SiteShowcaseRouteChildren = {
+  SiteShowcaseShowcaseIndexRoute: SiteShowcaseShowcaseIndexRoute,
+  SiteShowcaseShowcaseNameSlugRoute: SiteShowcaseShowcaseNameSlugRoute,
+  SiteShowcaseShowcaseNameIndexRoute: SiteShowcaseShowcaseNameIndexRoute,
+}
+
+const SiteShowcaseRouteWithChildren = SiteShowcaseRoute._addFileChildren(
+  SiteShowcaseRouteChildren,
+)
+
 interface SiteRouteChildren {
-  SiteChangelogRoute: typeof SiteChangelogRouteWithChildren
   SiteLegalRoute: typeof SiteLegalRouteWithChildren
+  SiteShowcaseRoute: typeof SiteShowcaseRouteWithChildren
   SiteAboutRoute: typeof SiteAboutRoute
   SiteAgentRoute: typeof SiteAgentRoute
   SiteBrandRoute: typeof SiteBrandRoute
@@ -2268,8 +2224,8 @@ interface SiteRouteChildren {
 }
 
 const SiteRouteChildren: SiteRouteChildren = {
-  SiteChangelogRoute: SiteChangelogRouteWithChildren,
   SiteLegalRoute: SiteLegalRouteWithChildren,
+  SiteShowcaseRoute: SiteShowcaseRouteWithChildren,
   SiteAboutRoute: SiteAboutRoute,
   SiteAgentRoute: SiteAgentRoute,
   SiteBrandRoute: SiteBrandRoute,

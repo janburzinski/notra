@@ -12,7 +12,6 @@ import { fetchIntegrations } from "@/lib/integrations/fetch";
 import { getIntegrationHref } from "@/lib/integrations/helpers";
 import { listSummaries } from "@/lib/state-of-ai-search/reports";
 import type { SitemapEntry } from "@/types/sitemap";
-import { listNotraChangelogPosts } from "@/utils/changelog";
 import { getCompareHref } from "@/utils/compare";
 import { getMcpUseCaseHref } from "@/utils/mcp-use-cases";
 import { getShowcaseEntrySlug, SHOWCASE_COMPANIES } from "@/utils/showcase";
@@ -27,7 +26,7 @@ export async function buildSitemapEntries(): Promise<SitemapEntry[]> {
       entry.info.path.startsWith(`${company.slug}/`)
         ? [
             {
-              url: `${SITE_URL}/changelog/${company.slug}/${getShowcaseEntrySlug(entry.info.path)}`,
+              url: `${SITE_URL}/showcase/${company.slug}/${getShowcaseEntrySlug(entry.info.path)}`,
               lastModified: new Date(entry.date),
             },
           ]
@@ -35,23 +34,10 @@ export async function buildSitemapEntries(): Promise<SitemapEntry[]> {
     )
   );
 
-  const notraChangelogEntries = (await listNotraChangelogPosts()).map(
-    (post) => ({
-      url: `${SITE_URL}/changelog/notra/${post.slug}`,
-      lastModified: new Date(post.updatedAt),
-    })
-  );
-
   const integrationEntries = (await fetchIntegrations()).map((integration) => ({
     url: `${SITE_URL}${getIntegrationHref(integration)}`,
     lastModified: STATIC_PAGE_LAST_MODIFIED,
   }));
-
-  const latestNotraChangelog = notraChangelogEntries.reduce<Date>(
-    (latest, entry) =>
-      entry.lastModified > latest ? entry.lastModified : latest,
-    STATIC_PAGE_LAST_MODIFIED
-  );
 
   const latestShowcaseByCompany = new Map<string, Date>();
   for (const company of SHOWCASE_COMPANIES) {
@@ -234,20 +220,15 @@ export async function buildSitemapEntries(): Promise<SitemapEntry[]> {
       lastModified: STATIC_PAGE_LAST_MODIFIED,
     },
     {
-      url: `${SITE_URL}/changelog`,
+      url: `${SITE_URL}/showcase`,
       lastModified: latestShowcaseAny,
     },
-    {
-      url: `${SITE_URL}/changelog/notra`,
-      lastModified: latestNotraChangelog,
-    },
     ...SHOWCASE_COMPANIES.map((company) => ({
-      url: `${SITE_URL}/changelog/${company.slug}`,
+      url: `${SITE_URL}/showcase/${company.slug}`,
       lastModified:
         latestShowcaseByCompany.get(company.slug) ?? STATIC_PAGE_LAST_MODIFIED,
     })),
     ...integrationEntries,
     ...showcaseEntries,
-    ...notraChangelogEntries,
   ];
 }

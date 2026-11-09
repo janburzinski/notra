@@ -47,7 +47,7 @@ export const FOOTER_LINK_COLUMNS: readonly FooterLinkColumn[] = [
           { label: "Sites", href: "/features/sites" },
           { label: "Pricing", href: "/pricing" },
           { label: "Compare", href: "/compare" },
-          { label: "Changelog", href: "/changelog/notra" },
+          { label: "Changelog", href: "/changelog" },
         ],
       },
       {

@@ -40,6 +40,14 @@
       "cover": false
     }
   },
+  "changelog": {
+    "title": "Notra Changelog",
+    "description": "What we shipped each week, with a look at the biggest change.",
+    "layout": "timeline",
+    "hero": { "style": "wash" },
+    "pageActions": true,
+    "minimap": true
+  },
   "metadata": { "dateFormat": "long", "timestamp": true },
   "authors": {
     "dominik": {

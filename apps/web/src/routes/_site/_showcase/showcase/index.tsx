@@ -12,21 +12,21 @@ import {
 import { SHOWCASE_COMPANY_ICONS } from "@/utils/showcase-icons";
 import { SITE_URL } from "@/utils/urls";
 
-const title = "Changelog";
+const title = "Showcase";
 const description =
   "See how Notra transforms GitHub activity into professional product updates from real open source projects.";
 
-export const Route = createFileRoute("/_site/_changelog/changelog/")({
+export const Route = createFileRoute("/_site/_showcase/showcase/")({
   loader: () => getShowcaseOverview(),
   head: () =>
     buildHead({
       title,
       description,
-      alternates: pageAlternates(`${SITE_URL}/changelog`),
+      alternates: pageAlternates(`${SITE_URL}/showcase`),
       openGraph: {
         title,
         description,
-        url: `${SITE_URL}/changelog`,
+        url: `${SITE_URL}/showcase`,
         type: "website",
         siteName: "Notra",
         images: [PAGE_SOCIAL_IMAGES.changelog],

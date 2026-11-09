@@ -25,7 +25,7 @@ const showcaseEntryContent = browserCollections.changelog.createClientLoader({
     { default: MDX, toc },
     { company, entry, name, slug }: ShowcaseEntryData
   ) => {
-    const url = `${SITE_URL}/changelog/${name}/${slug}`;
+    const url = `${SITE_URL}/showcase/${name}/${slug}`;
     const articleJsonLd = buildArticleJsonLd({
       url,
       title: entry.title,
@@ -36,8 +36,8 @@ const showcaseEntryContent = browserCollections.changelog.createClientLoader({
     });
     const breadcrumbJsonLd = buildBreadcrumbJsonLd([
       { name: "Home", url: SITE_URL },
-      { name: "Changelog", url: `${SITE_URL}/changelog` },
-      { name: company.name, url: `${SITE_URL}/changelog/${name}` },
+      { name: "Showcase", url: `${SITE_URL}/showcase` },
+      { name: company.name, url: `${SITE_URL}/showcase/${name}` },
       { name: entry.title, url },
     ]);
 
@@ -56,7 +56,7 @@ const showcaseEntryContent = browserCollections.changelog.createClientLoader({
         <Link
           className="text-foreground/50 hover:text-foreground mb-6 inline-flex items-center gap-1 font-sans text-sm transition-colors"
           params={{ name }}
-          to="/changelog/$name"
+          to="/showcase/$name"
         >
           &larr; {company.name}
         </Link>
@@ -106,48 +106,46 @@ const showcaseEntryContent = browserCollections.changelog.createClientLoader({
   },
 });
 
-export const Route = createFileRoute("/_site/_changelog/changelog/$name/$slug")(
-  {
-    loader: async ({ params }) => {
-      const data = await getShowcaseChangelogEntry({
-        data: { name: params.name, slug: params.slug },
-      });
-      await showcaseEntryContent.preload(data.path);
-      return data;
-    },
-    head: ({ loaderData, params }) => {
-      const entry = loaderData?.entry;
-      if (!entry) {
-        return {};
-      }
-      const url = `${SITE_URL}/changelog/${params.name}/${params.slug}`;
-      return buildHead({
-        title: { absolute: entry.title },
+export const Route = createFileRoute("/_site/_showcase/showcase/$name/$slug")({
+  loader: async ({ params }) => {
+    const data = await getShowcaseChangelogEntry({
+      data: { name: params.name, slug: params.slug },
+    });
+    await showcaseEntryContent.preload(data.path);
+    return data;
+  },
+  head: ({ loaderData, params }) => {
+    const entry = loaderData?.entry;
+    if (!entry) {
+      return {};
+    }
+    const url = `${SITE_URL}/showcase/${params.name}/${params.slug}`;
+    return buildHead({
+      title: { absolute: entry.title },
+      description: entry.description,
+      alternates: pageAlternates(url),
+      openGraph: {
+        title: entry.title,
         description: entry.description,
-        alternates: pageAlternates(url),
-        openGraph: {
-          title: entry.title,
-          description: entry.description,
-          url,
-          type: "article",
-          publishedTime: entry.date,
-          modifiedTime: entry.date,
-          siteName: "Notra",
-          images: [DEFAULT_SOCIAL_IMAGE],
-        },
-        twitter: {
-          card: "summary_large_image",
-          title: entry.title,
-          description: entry.description,
-          images: [DEFAULT_SOCIAL_IMAGE.url],
-          site: TWITTER_HANDLE,
-          creator: TWITTER_HANDLE,
-        },
-      });
-    },
-    component: ShowcaseEntryPage,
-  }
-);
+        url,
+        type: "article",
+        publishedTime: entry.date,
+        modifiedTime: entry.date,
+        siteName: "Notra",
+        images: [DEFAULT_SOCIAL_IMAGE],
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: entry.title,
+        description: entry.description,
+        images: [DEFAULT_SOCIAL_IMAGE.url],
+        site: TWITTER_HANDLE,
+        creator: TWITTER_HANDLE,
+      },
+    });
+  },
+  component: ShowcaseEntryPage,
+});
 
 function ShowcaseEntryPage() {
   const data = Route.useLoaderData();

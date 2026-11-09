@@ -2,7 +2,6 @@ import { defineCollections, defineConfig } from "fumadocs-mdx/config";
 import * as z from "zod";
 
 import { CODE_THEMES } from "./src/constants/content";
-import { postSchema } from "./src/schemas/content";
 
 export const changelog = defineCollections({
   type: "doc",
@@ -12,13 +11,6 @@ export const changelog = defineCollections({
     date: z.string(),
     description: z.string(),
   }),
-});
-
-export const notraChangelog = defineCollections({
-  type: "doc",
-  dir: "./src/content/notra-changelog",
-  postprocess: { includeProcessedMarkdown: { headingIds: false } },
-  schema: postSchema,
 });
 
 export default defineConfig({

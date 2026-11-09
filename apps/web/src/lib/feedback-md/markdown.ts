@@ -21,7 +21,7 @@ import { markdownSection } from "@/utils/markdown";
 import { SOCIAL_LINKS } from "@/utils/social-links";
 import { API_URL, APP_URL, DOCS_URL, MCP_URL, SITE_URL } from "@/utils/urls";
 
-const NOTRA_CHANGELOG_URL = `${SITE_URL}/changelog/notra`;
+const NOTRA_CHANGELOG_URL = `${SITE_URL}/changelog`;
 const NOTRA_FEEDBACK_ENDPOINT = `${API_URL}/v1/feedback/notra`;
 
 const NOTRA_FEEDBACK_CURL = [

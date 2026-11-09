@@ -19,6 +19,7 @@ import {
   buildSecurityHeaders,
   PROXIED_SITE_SECURITY_HEADERS,
 } from "./src/utils/security-headers";
+import { SHOWCASE_COMPANIES } from "./src/utils/showcase";
 
 const SERVER_ONLY_PACKAGES = [
   "@remotion/bundler",
@@ -32,6 +33,13 @@ const RAW_QUERY_REGEX = /\?(.*&)?raw(&|$)/;
 
 const BLOG_DEV_PROXY_TARGET =
   process.env.BLOG_DEV_PROXY_ORIGIN || BLOG_PROXY_ORIGIN;
+
+// The showcase changelogs used to live at /changelog/<company>, and the Notra
+// changelog at /changelog/notra. Vercel forwards /changelog to the blog site
+// before the app runs, so these redirects have to be Vercel routes too.
+const SHOWCASE_SLUGS = SHOWCASE_COMPANIES.map((company) => company.slug).join(
+  "|"
+);
 
 async function contentMdx(): ReturnType<typeof mdx> {
   const plugin = await mdx(sourceConfig);
@@ -127,6 +135,8 @@ export default defineConfig(({ command }) => ({
       devProxy: {
         "/blog": { target: BLOG_DEV_PROXY_TARGET, changeOrigin: true },
         "/blog/**": { target: BLOG_DEV_PROXY_TARGET, changeOrigin: true },
+        "/changelog": { target: BLOG_DEV_PROXY_TARGET, changeOrigin: true },
+        "/changelog/**": { target: BLOG_DEV_PROXY_TARGET, changeOrigin: true },
         "/docs": { target: DOCS_PROXY_ORIGIN, changeOrigin: true },
         "/docs/**": { target: DOCS_PROXY_ORIGIN, changeOrigin: true },
       },
@@ -137,6 +147,21 @@ export default defineConfig(({ command }) => ({
             {
               src: "^/blog(/.*)?$",
               dest: `${BLOG_PROXY_ORIGIN}/blog$1`,
+              headers: PROXIED_SITE_SECURITY_HEADERS,
+            },
+            {
+              src: `^/changelog/(${SHOWCASE_SLUGS})(\\.md|/.*)?$`,
+              status: 308,
+              headers: { Location: "/showcase/$1$2" },
+            },
+            {
+              src: "^/changelog/notra(\\.md|/.*)?$",
+              status: 308,
+              headers: { Location: "/changelog$1" },
+            },
+            {
+              src: "^/changelog(/.*)?$",
+              dest: `${BLOG_PROXY_ORIGIN}/changelog$1`,
               headers: PROXIED_SITE_SECURITY_HEADERS,
             },
             { src: "^/docs(/.*)?$", dest: `${DOCS_PROXY_ORIGIN}/docs$1` },

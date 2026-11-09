@@ -4,11 +4,6 @@ import { z } from "zod";
 
 import { changelog } from "@/../.source/server";
 import {
-  buildChangelogTimelineItems,
-  getNotraChangelogPostBySlug,
-  listNotraChangelogPosts,
-} from "@/utils/changelog";
-import {
   getShowcaseCompany,
   getShowcaseEntrySlug,
   SHOWCASE_COMPANIES,
@@ -43,23 +38,6 @@ export const getShowcaseOverview = createServerFn({ method: "GET" }).handler(
   }
 );
 
-export const getNotraChangelogTimeline = createServerFn({
-  method: "GET",
-}).handler(async () =>
-  buildChangelogTimelineItems(await listNotraChangelogPosts())
-);
-
-export const getNotraChangelogEntry = createServerFn({ method: "GET" })
-  .validator(z.object({ slug: z.string() }))
-  .handler(async ({ data: { slug } }) => {
-    const post = await getNotraChangelogPostBySlug(slug);
-    if (!post) {
-      throw notFound();
-    }
-
-    return { post, path: `${slug}.mdx` };
-  });
-
 export const getShowcaseCompanyChangelog = createServerFn({ method: "GET" })
   .validator(z.object({ name: z.string() }))
   .handler(({ data: { name } }) => {
@@ -79,7 +57,7 @@ export const getShowcaseCompanyChangelog = createServerFn({ method: "GET" })
         id: entry.info.path,
         title: entry.title,
         description: entry.description,
-        href: `/changelog/${name}/${getShowcaseEntrySlug(entry.info.path)}`,
+        href: `/showcase/${name}/${getShowcaseEntrySlug(entry.info.path)}`,
         date: entry.date,
       }));
 

@@ -1,10 +1,6 @@
 import { changelog } from "@/../.source/server";
 import { COMPARE_COMPETITORS } from "@/constants/compare/competitors";
 import { NOTRA_CAPABILITIES } from "@/utils/agent-metadata";
-import {
-  getChangelogPostHref,
-  listNotraChangelogPosts,
-} from "@/utils/changelog";
 import { getCompareHref, getCompareTitle } from "@/utils/compare";
 import { stripFrontmatter } from "@/utils/markdown";
 import { readAppMarkdownSource } from "@/utils/markdown-source";
@@ -77,7 +73,7 @@ async function buildShowcaseEntrySections() {
       return [
         `## ${company?.name ?? companySlug}: ${entry.title}`,
         "",
-        `URL: ${absoluteUrl(`/changelog/${companySlug}/${slug}.md`)}`,
+        `URL: ${absoluteUrl(`/showcase/${companySlug}/${slug}.md`)}`,
         `Date: ${entry.date}`,
         "",
         content,
@@ -87,9 +83,7 @@ async function buildShowcaseEntrySections() {
   );
 }
 
-export async function buildLlmsText() {
-  const notraChangelogPosts = await listNotraChangelogPosts();
-
+export function buildLlmsText() {
   return [
     "# Notra",
     "",
@@ -115,13 +109,13 @@ export async function buildLlmsText() {
     ),
     formatLink("Blog", "/blog/llms.txt", "Index of Notra blog posts"),
     formatLink(
-      "Changelog",
-      "/changelog.md",
-      "Index of Notra and showcase changelogs"
+      "Showcase",
+      "/showcase.md",
+      "Changelogs Notra wrote for open source projects"
     ),
     formatLink(
-      "Notra Changelog",
-      "/changelog/notra.md",
+      "Changelog",
+      "/changelog/llms.txt",
       "Index of Notra product updates"
     ),
     formatLink(
@@ -188,24 +182,12 @@ export async function buildLlmsText() {
       )
     ),
     "",
-    "## Notra Changelog Entries",
-    "",
-    ...(notraChangelogPosts.length > 0
-      ? notraChangelogPosts.map((post) =>
-          formatLink(
-            post.title,
-            `${getChangelogPostHref(post.slug)}.md`,
-            `${post.createdAt} - ${post.excerpt}`
-          )
-        )
-      : ["- None"]),
-    "",
     "## Example Company Changelogs",
     "",
     ...SHOWCASE_COMPANIES.map((company) =>
       formatLink(
         `${company.name} Changelog`,
-        `/changelog/${company.slug}.md`,
+        `/showcase/${company.slug}.md`,
         company.description
       )
     ),
@@ -219,7 +201,7 @@ export async function buildLlmsText() {
 
       return formatLink(
         `${company?.name ?? companySlug}: ${entry.title}`,
-        `/changelog/${companySlug}/${slug}.md`,
+        `/showcase/${companySlug}/${slug}.md`,
         `${entry.date} - ${entry.description}`
       );
     }),
@@ -230,10 +212,7 @@ export async function buildLlmsText() {
 }
 
 export async function buildLlmsFullText() {
-  const [notraChangelogPosts, showcaseEntrySections] = await Promise.all([
-    listNotraChangelogPosts(),
-    buildShowcaseEntrySections(),
-  ]);
+  const showcaseEntrySections = await buildShowcaseEntrySections();
 
   return [
     "# Notra",
@@ -258,17 +237,8 @@ export async function buildLlmsFullText() {
     "",
     "## Notra Changelog",
     "",
-    ...(notraChangelogPosts.length > 0
-      ? notraChangelogPosts.flatMap((post) => [
-          `### ${post.title}`,
-          "",
-          `URL: ${absoluteUrl(`${getChangelogPostHref(post.slug)}.md`)}`,
-          `Date: ${post.createdAt}`,
-          "",
-          post.markdown,
-          "",
-        ])
-      : ["No Notra changelog entries found.", ""]),
+    `Changelog entries: ${absoluteUrl("/changelog/llms.txt")}`,
+    "",
     "## Example Company Changelogs",
     "",
     ...showcaseEntrySections,
