@@ -92,6 +92,7 @@ const sitesToolchain = {
   renderFingerprintKey: "SITES_BUILDER_RENDER_FINGERPRINT",
 };
 const activeStates = new Set(["QUEUED", "INITIALIZING", "BUILDING"]);
+const activeBuildWaitMs = 10 * 60_000;
 
 function deploymentSha(deployment) {
   return deployment?.gitSource?.sha ?? deployment?.meta?.githubCommitSha;
@@ -267,6 +268,21 @@ export async function release({
     );
   };
 
+  // A build someone started by hand (or a re-run racing the one it replaced)
+  // usually finishes within minutes. Waiting lets the history check below see
+  // what it shipped instead of failing the whole release.
+  const waitForIdle = async (message, isActive) => {
+    const deadline = Date.now() + activeBuildWaitMs;
+    for (let attempt = 0; await isActive(); attempt += 1) {
+      const remaining = deadline - Date.now();
+      if (remaining <= 0 || attempt >= activeBuildWaitMs / 15_000) {
+        throw new Error(`${message}; no builds started`);
+      }
+      await report(`${message}; waiting for it to finish`);
+      await sleep(Math.min(15_000, remaining));
+    }
+  };
+
   await requireReleaseCI({ env, sha, fetchImpl, sleep, report });
   await report(`Release commit: \`${sha}\``);
 
@@ -344,16 +360,17 @@ export async function release({
         "unkey: disable production auto deploy before enabling real releases"
       );
     }
-    const active = await unkey("v2/deployments.listDeployments", {
-      ...target,
-      status: unkeyActiveStates,
-      limit: 1,
-    });
-    if (active.length > 0) {
-      throw new Error(
-        `unkey: ${service.name} already has an active production deployment`
-      );
-    }
+    await waitForIdle(
+      `unkey: ${service.name} already has an active production deployment`,
+      async () =>
+        (
+          await unkey("v2/deployments.listDeployments", {
+            ...target,
+            status: unkeyActiveStates,
+            limit: 1,
+          })
+        ).length > 0
+    );
     if (!app.currentDeploymentId) {
       throw new Error(
         `unkey: ${service.name} has no current production deployment`
@@ -402,13 +419,16 @@ export async function release({
 
   const plans = [];
   for (const project of projects) {
-    const active = await request(
-      "vercel",
-      `/v6/deployments?projectId=${project.name}&target=production&limit=1&state=QUEUED,INITIALIZING,BUILDING`
+    await waitForIdle(
+      `${project.name} already has an active production build`,
+      async () =>
+        (
+          await request(
+            "vercel",
+            `/v6/deployments?projectId=${project.name}&target=production&limit=1&state=QUEUED,INITIALIZING,BUILDING`
+          )
+        ).deployments.length > 0
     );
-    if (active.deployments.length > 0) {
-      throw new Error(`${project.name} already has an active production build`);
-    }
     const latest = await request("vercel", `/v9/projects/${project.name}`);
     if (latest.link?.productionBranch !== "main") {
       throw new Error(`${project.name} production branch must remain main`);
@@ -940,5 +960,16 @@ if (
   process.argv[1] &&
   import.meta.url === pathToFileURL(process.argv[1]).href
 ) {
-  await release({ preflightOnly: process.argv.includes("--preflight") });
+  try {
+    await release({ preflightOnly: process.argv.includes("--preflight") });
+  } catch (error) {
+    // The Slack alert quotes this instead of guessing from the job result.
+    if (process.env.GITHUB_OUTPUT) {
+      await appendFile(
+        process.env.GITHUB_OUTPUT,
+        `error<<RELEASE_ERROR_EOF\n${error.message}\nRELEASE_ERROR_EOF\n`
+      );
+    }
+    throw error;
+  }
 }

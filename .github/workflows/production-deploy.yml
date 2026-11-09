@@ -27,9 +27,13 @@ jobs:
   release:
     if: github.ref == 'refs/heads/main' && github.repository == 'usenotra/notra'
     runs-on: depot-ubuntu-24.04
-    timeout-minutes: 20
+    # The CI wait (up to 12 minutes) plus waiting out a production build that
+    # is already running (up to 10 minutes).
+    timeout-minutes: 30
     outputs:
       sha: ${{ steps.release.outputs.sha }}
+      preflight: ${{ steps.preflight.outcome }}
+      error: ${{ steps.preflight.outputs.error }}
     steps:
       - name: Checkout main
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -52,6 +56,7 @@ jobs:
 
       # Cheap target checks run before the Sites E2E gate and its Box builds.
       - name: Preflight production targets before builds
+        id: preflight
         run: node scripts/github/production-deploy.mjs --preflight
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
@@ -130,6 +135,8 @@ jobs:
     needs: release
     runs-on: depot-ubuntu-24.04
     timeout-minutes: 120
+    outputs:
+      error: ${{ steps.deploy.outputs.error }}
     steps:
       - name: Checkout release commit
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -160,6 +167,7 @@ jobs:
           bun install --frozen-lockfile --filter '@notra/sites-builder...' --filter '@notra/sites...' --filter '@notra/script-cdn...' --filter '@notra/db'
 
       - name: Deploy checked main commit
+        id: deploy
         run: node scripts/github/production-deploy.mjs
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
@@ -189,6 +197,8 @@ jobs:
           AGENTS: ${{ needs.agents.result }}
           LIFECYCLE_FAILURES: ${{ needs.sites-e2e.outputs.lifecycle-failures }}
           BROWSER_FAILURES: ${{ needs.sites-e2e.outputs.browser-failures }}
+          PREFLIGHT: ${{ needs.release.outputs.preflight }}
+          ERROR: ${{ needs.release.outputs.error || needs.deploy.outputs.error }}
           SHA: ${{ needs.release.outputs.sha }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
@@ -200,13 +210,15 @@ jobs:
             headline=":rotating_light: Production deploy blocked: Sites E2E failed"
           elif [ "$AGENTS" = "failure" ]; then
             headline=":rotating_light: Production deploy blocked: an agent did not build or boot"
+          elif [ "$PREFLIGHT" = "failure" ]; then
+            headline=":warning: Production deploy blocked: preflight failed"
           elif [ "$RELEASE" = "failure" ]; then
             headline=":warning: Production deploy skipped: no green release commit"
           else
             headline=":rotating_light: Production deploy failed"
           fi
           details="Commit: \`${SHA:-unknown}\`"
-          for failures in "$LIFECYCLE_FAILURES" "$BROWSER_FAILURES"; do
+          for failures in "$ERROR" "$LIFECYCLE_FAILURES" "$BROWSER_FAILURES"; do
             if [ -n "$failures" ]; then
               details="$details"$'\n'"$failures"
             fi

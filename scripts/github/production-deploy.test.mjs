@@ -688,6 +688,35 @@ test("diverged production history prevents every build", async () => {
   assert.equal(builds(calls).length, 0);
 });
 
+test("an active production build is waited out instead of failing the release", async () => {
+  let checks = 0;
+  const { run, calls } = fixture({
+    override: ({ url }) => {
+      if (
+        url.pathname === "/v6/deployments" &&
+        url.searchParams.get("projectId") === "notra"
+      ) {
+        checks += 1;
+        return { deployments: checks < 3 ? [{ uid: "manual" }] : [] };
+      }
+    },
+  });
+  await run();
+  assert.equal(checks, 3);
+  assert.equal(builds(calls).length, 6);
+});
+
+test("a production build that never finishes still prevents every build", async () => {
+  const { run, calls } = fixture({
+    override: ({ url }) =>
+      url.pathname === "/v6/deployments"
+        ? { deployments: [{ uid: "stuck" }] }
+        : undefined,
+  });
+  await assert.rejects(run(), /notra already has an active production build/);
+  assert.equal(builds(calls).length, 0);
+});
+
 test("failed CI prevents all provider requests", async () => {
   const { run, calls } = fixture({
     override: ({ url }) =>
@@ -1301,7 +1330,9 @@ for (const [name, path, data] of [
         if (
           url.pathname === path &&
           (body.app === "app_test" || body.search === "api.usenotra.com") &&
-          ++reads === 2
+          // A deployment that is still running is waited out, so it has to
+          // stay active to block the release.
+          (++reads === 2 || (name === "active deployment" && reads > 2))
         ) {
           return data;
         }
