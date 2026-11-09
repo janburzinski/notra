@@ -1,5 +1,6 @@
 import { getEvaluationClient } from "@notra/ai/evaluation/client";
 import { gateway, getRouteMetadata } from "@notra/ai/gateway";
+import { withRouterDefaults } from "@notra/ai/provider-options";
 import type { RouteMetadata, RouteUsageStep } from "@notra/ai/types/router";
 import { summarizeRouteUsage } from "@notra/ai/utils/route-usage";
 import { generateText, isStepCount, Output } from "ai";
@@ -330,7 +331,12 @@ export const geoModelLive = Layer.succeed(
             prompt: buildGscSuggestionPrompt(input),
             maxOutputTokens: GSC_SUGGESTION_MAX_TOKENS,
             abortSignal: signal,
-            providerOptions: { gateway: { tags: ["geo-discovery"] } },
+            // GLM otherwise reasons at max effort and spends the whole output
+            // budget before it writes the object.
+            providerOptions: withRouterDefaults(
+              { gateway: { tags: ["geo-discovery"] } },
+              { modelId: GSC_SUGGESTION_MODEL }
+            ),
           });
           return {
             prompts: result.output.prompts,
