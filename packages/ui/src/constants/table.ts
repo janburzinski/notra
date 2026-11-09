@@ -114,3 +114,7 @@ export const TABLE_ROW_FOCUS_RING_CLASS = [
   // Rounded ends sit inside the card's 14px corner on the first and last row.
   "focus-visible:[&>td:first-child]:rounded-l-[12px] focus-visible:[&>td:last-child]:rounded-r-[12px]",
 ].join(" ");
+
+/** Hidden element that resolves a CSS width to pixels inside a table. */
+export const COLUMN_FLOOR_PROBE_STYLE =
+  "position:absolute;visibility:hidden;pointer-events:none;height:0;overflow:hidden;";

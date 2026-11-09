@@ -133,3 +133,7 @@ export const DATA_TABLE_LABELS: DataTableLabels = {
   showRows: (count) => `Show ${count}`,
   rowsPerPage: "Rows per page",
 };
+
+/** Hidden element that resolves a CSS width to pixels inside a table. */
+export const COLUMN_FLOOR_PROBE_STYLE =
+  "position:absolute;visibility:hidden;pointer-events:none;height:0;overflow:hidden;";

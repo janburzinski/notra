@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 
 import {
+  COLUMN_FLOOR_PROBE_STYLE,
   DATA_TABLE_HEADER_HEIGHT,
   HEADER_CH_BUFFER,
   HEADER_PAD_X_PX,
@@ -382,4 +383,56 @@ export function tableLayout<T>(
       ),
     },
   };
+}
+
+/**
+ * Pixel floors per set of CSS widths, keyed by the fonts they resolve
+ * against. Tables remount with the same columns on every filter or range
+ * change; after the first measurement they only read their own width.
+ */
+const columnFloorCache = new Map<string, readonly number[]>();
+let columnFloorCacheWatchesFonts = false;
+
+/**
+ * Resolves each CSS width to pixels with hidden probes inside `container`, all
+ * in one layout, and reads the container's width in that same layout. Returns
+ * null while the container is not rendered (e.g. a tab hidden with
+ * `display: none`): its probes would measure 0 and must not be kept.
+ */
+export function measureColumnFloors(
+  container: HTMLElement,
+  widths: readonly string[]
+): { floors: readonly number[]; width: number } | null {
+  if (container.getClientRects().length === 0) {
+    return null;
+  }
+  const key = [
+    getComputedStyle(document.documentElement).fontSize,
+    getComputedStyle(container).font,
+    ...widths,
+  ].join("|");
+  const cached = columnFloorCache.get(key);
+  if (cached) {
+    return { floors: cached, width: container.clientWidth };
+  }
+  if (!columnFloorCacheWatchesFonts) {
+    columnFloorCacheWatchesFonts = true;
+    document.fonts.addEventListener("loadingdone", () =>
+      columnFloorCache.clear()
+    );
+  }
+  const probes = widths.map((width) => {
+    const probe = document.createElement("div");
+    probe.style.cssText = COLUMN_FLOOR_PROBE_STYLE;
+    probe.style.width = width;
+    return probe;
+  });
+  container.append(...probes);
+  const width = container.clientWidth;
+  const floors = probes.map((probe) => probe.offsetWidth);
+  for (const probe of probes) {
+    probe.remove();
+  }
+  columnFloorCache.set(key, floors);
+  return { floors, width };
 }

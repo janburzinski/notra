@@ -1,7 +1,10 @@
 import { useLayoutEffect, useMemo, useRef, useState } from "react";
 
 import type { TableColumn } from "@notra/ui/types/data-table";
-import { tableMinWidthCss } from "@notra/ui/lib/data-table";
+import {
+  measureColumnFloors,
+  tableMinWidthCss,
+} from "@notra/ui/lib/data-table";
 
 interface CollapsibleColumnsOptions {
   minColumnWidth: number;
@@ -22,9 +25,9 @@ function columnSignature<T>(column: TableColumn<T>): string {
 
 /**
  * Drops low-priority columns while the container is narrower than the
- * remaining column floors. Floors are CSS lengths (rem, ch, calc), so each
- * candidate set is measured once with a hidden probe; resizing afterwards only
- * compares numbers and re-renders when the hidden set actually changes.
+ * remaining column floors. Floors are CSS lengths (rem, ch, calc), so the
+ * candidate sets are measured together with hidden probes; resizing afterwards
+ * only compares numbers and re-renders when the hidden set actually changes.
  */
 export function useCollapsibleColumns<T>(
   columns: TableColumn<T>[],
@@ -62,28 +65,32 @@ export function useCollapsibleColumns<T>(
       extraFixedWidths: fixed,
     } = latest.current;
 
-    const probe = document.createElement("div");
-    probe.style.cssText =
-      "position:absolute;visibility:hidden;pointer-events:none;height:0;overflow:hidden;";
-    container.append(probe);
-    const floors = collapseOrder.map((_, count) => {
+    const floorWidths = collapseOrder.map((_, count) => {
       const hidden = new Set(collapseOrder.slice(0, count));
-      probe.style.width = tableMinWidthCss(
+      return tableMinWidthCss(
         current.filter((column) => !hidden.has(column.key)),
         minColumnWidth,
         fixed
       );
-      return probe.offsetWidth;
     });
-    probe.remove();
-
+    // A hidden container measures nothing; the observer measures it once it
+    // shows, since its size then changes.
+    let floors: readonly number[] | null = null;
     const update = () => {
-      const width = container.clientWidth;
-      const fits = floors.findIndex((floor) => floor <= width);
+      let containerWidth = container.clientWidth;
+      if (!floors) {
+        const measured = measureColumnFloors(container, floorWidths);
+        if (!measured) {
+          return;
+        }
+        floors = measured.floors;
+        containerWidth = measured.width;
+      }
+      const fits = floors.findIndex((floor) => floor <= containerWidth);
       setHiddenCount(fits === -1 ? collapseOrder.length : fits);
     };
     update();
-    const observer = new ResizeObserver(update);
+    const observer = new ResizeObserver(() => update());
     observer.observe(container);
     return () => observer.disconnect();
   }, [collapseKeys, signature, minColumnWidth, chromeSignature]);
