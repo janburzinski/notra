@@ -303,6 +303,7 @@ curl -X PUT "https://api.usenotra.com/v1/sites/site_8f2kq1/authors/jane-doe" \
 - Send `previousId` to rename an author. Renaming or deleting (`DELETE /v1/sites/{siteId}/authors/{authorId}`) an author that is live or credited on Notra posts returns `409` with code `SITE_AUTHOR_IN_USE`; send `"force": true` or `?force=true` once you accept that those posts show the old id as a plain name.
 - `POST /v1/sites/{siteId}/authors/import` copies Notra authors into `blog.json`, using their slug as the id.
 - `PATCH /v1/sites/{siteId}/author-page` with `{ "layout": "stacked" }` or `"inline"` sets the layout of every author page.
+- `PATCH /v1/sites/{siteId}/sections` with `{ "blog": "/blog", "changelog": "/changelog" }` sets [`sections`](/sites/reference/blog-json#sections) in `blog.json`. A section you leave out is turned off once the change is published and live.
 - `POST /v1/sites/{siteId}/publish` commits the unpublished `blog.json` changes to the site's production branch and deploys it. It returns `409` with code `SITE_HAS_OTHER_CHANGES` while other files on the site have unpublished changes; publish those from the dashboard.
 
 To credit a site author on a blog post, send its `ref` in `metadata.authorIds`:

@@ -11,6 +11,7 @@ import {
   localDefaultConfig,
   localMounts,
   parseMountFlags,
+  sectionsRestartNotice,
 } from "../compiler/utils/local-options";
 
 const roots: string[] = [];
@@ -180,4 +181,38 @@ test("--out can't sit in one of the site's source folders", () => {
     );
   }
   expect(() => assertOutsideSource(root, join(root, "dist"))).not.toThrow();
+});
+
+test("blog.json sections pick the paths when no --mount is passed", async () => {
+  const root = await site("blog", "changelog");
+  await writeFile(
+    join(root, "blog.json"),
+    JSON.stringify({ name: "Acme", sections: { changelog: "/Updates" } })
+  );
+  expect(localMounts(root)).toEqual({ changelog: "/updates" });
+  expect(localMounts(root, undefined, undefined, { blog: "/news" })).toEqual({
+    blog: "/news",
+  });
+  expect(() => localMounts(root, undefined, "blog")).toThrow(
+    "blog.json sections leave out blog"
+  );
+});
+
+test("notra dev reports when blog.json sections move a section", async () => {
+  const root = await site("blog");
+  const config = join(root, "blog.json");
+  await writeFile(config, JSON.stringify({ name: "Acme" }));
+  expect(sectionsRestartNotice(root, { blog: "/blog" })).toBeNull();
+  await writeFile(
+    config,
+    JSON.stringify({ name: "Acme", sections: { blog: "/blog" } })
+  );
+  expect(sectionsRestartNotice(root, { blog: "/blog" })).toBeNull();
+  await writeFile(
+    config,
+    JSON.stringify({ name: "Acme", sections: { blog: "/news" } })
+  );
+  expect(sectionsRestartNotice(root, { blog: "/blog" })).toBe(
+    "blog.json sections now serve the blog at /news. Restart notra dev to preview the new paths."
+  );
 });

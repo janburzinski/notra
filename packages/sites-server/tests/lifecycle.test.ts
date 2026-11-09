@@ -355,6 +355,7 @@ if (process.env.NOTRA_SITES_LIFECYCLE_TEST_WORKER !== "1") {
       buildBudgetReserved: true,
       toolchainVersion: null,
       renderFingerprint: null,
+      configMounts: null,
       fileCount: 1,
       totalBytes: 2,
       buildDurationMs: 1,

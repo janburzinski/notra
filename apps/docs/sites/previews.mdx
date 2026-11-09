@@ -68,7 +68,7 @@ build scripts.
 notra sites validate
 ```
 
-Without building the site, they check what they can be sure of: links to posts that don't exist, images that aren't in `public/` and paths Notra can't read. Headings (`#section`), tag and author pages, generated files and links in drafts are only checked when the site is built, by `notra sites build` or a deployment, so these commands never warn about a link the build accepts. They take your sections to be at `/blog` and `/changelog`, or where `notra dev --mount` puts them, and leave links that use your site's full address, like `https://www.example.com/blog/launch`, to the build.
+Without building the site, they check what they can be sure of: links to posts that don't exist, images that aren't in `public/` and paths Notra can't read. Headings (`#section`), tag and author pages, generated files and links in drafts are only checked when the site is built, by `notra sites build` or a deployment, so these commands never warn about a link the build accepts. They take your sections to be where [`sections`](/sites/reference/blog-json#sections) in `blog.json` or `notra dev --mount` puts them, or else at `/blog` and `/changelog`, and leave links that use your site's full address, like `https://www.example.com/blog/launch`, to the build.
 
 ### In a monorepo
 

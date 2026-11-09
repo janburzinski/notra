@@ -34,14 +34,14 @@ Pick a **subdomain** when you want the simplest setup, and a **path** when you w
 
 ## Section paths
 
-A site has up to two sections, a blog and a changelog. You set their paths when you create the site and under **Settings → Content → Sections** rather than in `blog.json`, so a commit can never move your site somewhere nobody verified.
+A site has up to two sections, a blog and a changelog. You set their paths when you create the site and under **Settings → Content → Sections**, or with [`sections`](/sites/reference/blog-json#sections) in `blog.json`, which takes over once a production build with it goes live.
 
 | Rule | Example |
 | --- | --- |
 | Up to three segments of lowercase letters, digits and dashes | `/blog`, `/updates`, `/changelog/notra` |
 | One section can live at the root | blog at `/`, changelog at `/changelog` |
 | The two paths can't be the same or nested inside each other | Notra rejects `/blog` and `/blog/changelog` |
-| At least one section must be on | Turn a section off with its switch in **Settings**, or leave its path empty when you create the site |
+| At least one section must be on | Turn a section off with its switch in **Settings**, by leaving it out of `sections`, or by leaving its path empty when you create the site |
 
 The section paths are the same on every domain, so if the blog is at `/blog`, it's at `blog.acme.com/blog` and `acme.com/blog`. For a subdomain that shows the blog at its root, set the blog path to `/`.
 

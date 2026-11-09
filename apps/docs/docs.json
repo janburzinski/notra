@@ -566,6 +566,7 @@
                       "DELETE /v1/sites/{siteId}/authors/{authorId}",
                       "POST /v1/sites/{siteId}/authors/import",
                       "PATCH /v1/sites/{siteId}/author-page",
+                      "PATCH /v1/sites/{siteId}/sections",
                       "POST /v1/sites/{siteId}/publish"
                     ]
                   }

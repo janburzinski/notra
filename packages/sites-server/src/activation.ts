@@ -10,6 +10,7 @@ import { isPostPreviewKey } from "@notra/sites-core/utils/hosts";
 import { referencedDeploymentIds } from "@notra/sites-core/utils/serving-state";
 import { eq } from "drizzle-orm";
 
+import { adoptConfigSections } from "./config-sections";
 import {
   allocateGeneration,
   getProductionDeploymentHistory,
@@ -101,7 +102,7 @@ export async function activateDeployment(
         ) {
           return "reserve_generation";
         }
-        return liveUnlessSuperseded(
+        const activated = liveUnlessSuperseded(
           await activateProductionDeployment(
             currentSite,
             {
@@ -112,6 +113,10 @@ export async function activateDeployment(
             tx
           )
         );
+        if (activated === "live") {
+          await adoptConfigSections(tx, currentSite, deployment);
+        }
+        return activated;
       }
       if (!deployment.previewKey) {
         throw new Error("Preview deployment without a preview key");
@@ -212,8 +217,11 @@ export async function selectProductionDeployment(
         "Use Promote to publish the latest successful build"
       );
     }
+    // A build whose blog.json set its sections brings its own paths.
     const currentTarget = buildTargetForDeployment({
-      site: currentSite,
+      site: target.configMounts
+        ? { ...currentSite, mounts: target.configMounts }
+        : currentSite,
       kind: "production",
       previewKey: null,
     });
@@ -242,6 +250,7 @@ export async function selectProductionDeployment(
         "Production changed while switching builds. Try again."
       );
     }
+    await adoptConfigSections(tx, currentSite, target);
     return { site: currentSite, deployment: target };
   });
   await invalidateSiteIngestCaches(site);

@@ -29,6 +29,7 @@ import {
   siteThumbnailsSchema,
   siteVariablesSchema,
 } from "@notra/sites-core/schemas/site-layout";
+import { siteSectionsSchema } from "@notra/sites-core/schemas/site-sections";
 import { redirectPatternIssues } from "@notra/sites-core/utils/redirect-patterns";
 import { z } from "zod";
 
@@ -171,6 +172,7 @@ export const siteConfigSchema = z.object({
   theme: z.enum(["notra"]).default("notra"),
   name: z.string().trim().min(1).max(80),
   description: z.string().trim().max(300).optional(),
+  sections: siteSectionsSchema.optional(),
   logo: z
     .union([
       sitePathSchema,

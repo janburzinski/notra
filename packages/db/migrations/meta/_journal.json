@@ -1065,6 +1065,13 @@
       "when": 1794119737547,
       "tag": "0151_web_analytics",
       "breakpoints": true
+    },
+    {
+      "idx": 152,
+      "version": "7",
+      "when": 1794203229181,
+      "tag": "0152_site_sections_from_config",
+      "breakpoints": true
     }
   ]
 }

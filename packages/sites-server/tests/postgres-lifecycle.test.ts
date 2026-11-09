@@ -486,6 +486,63 @@ if (!databaseUrl) {
     expect(objects.has(SITE_R2_KEYS.state(siteId))).toBe(false);
   });
 
+  test("a production build's blog.json sections become the site's when it goes live", async () => {
+    const { applyConfigSections } = await import("../src/config-sections");
+    const goLive = async (blogJson: string) => {
+      const site = await getSite(siteId);
+      if (!site) {
+        throw new Error("Expected synthetic site");
+      }
+      const queued = await enqueueSiteDeployment({
+        siteId,
+        kind: "production",
+        previewKey: null,
+        trigger: "manual",
+        branch: "main",
+        commitSha: "c".repeat(40),
+      });
+      const { deployment } = await applyConfigSections({
+        site,
+        deployment: queued.deployment,
+        access: { repository: {}, token: "synthetic" } as never,
+        overlayFiles: [
+          { path: "blog.json", data: new TextEncoder().encode(blogJson) },
+        ],
+      });
+      objects.set(SITE_R2_KEYS.manifest(siteId, deployment.id), "{}");
+      expect(await activateDeployment(site, deployment)).toBe("live");
+      return deployment;
+    };
+
+    const configured = await goLive(
+      JSON.stringify({
+        name: "Acme",
+        sections: { blog: "/news", changelog: "/changelog" },
+      })
+    );
+    expect(configured.target.mounts).toEqual({
+      blog: "/news",
+      changelog: "/changelog",
+    });
+    expect(await getSite(siteId)).toMatchObject({
+      mounts: { blog: "/news", changelog: "/changelog" },
+      mountsFromConfig: true,
+    });
+    const site = await getSite(siteId);
+    if (!site) {
+      throw new Error("Expected synthetic site");
+    }
+    await expect(
+      updateSiteSettings(site, { mounts: { blog: "/blog" } }, userId)
+    ).rejects.toThrow("sections are set in blog.json");
+
+    await goLive(JSON.stringify({ name: "Acme" }));
+    expect(await getSite(siteId)).toMatchObject({
+      mounts: { blog: "/news", changelog: "/changelog" },
+      mountsFromConfig: false,
+    });
+  });
+
   test("activation holds the site row lock through the serving-state write", async () => {
     const stale = await getSite(siteId);
     if (!stale) {

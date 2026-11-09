@@ -1,4 +1,4 @@
-import { realpathSync, statSync } from "node:fs";
+import { readFileSync, realpathSync, statSync } from "node:fs";
 import {
   basename,
   dirname,
@@ -9,11 +9,15 @@ import {
   sep,
 } from "node:path";
 
-import { SITE_SOURCE_ROOTS } from "@notra/sites-core/constants/sites";
+import {
+  SITE_CONFIG_FILENAME,
+  SITE_SOURCE_ROOTS,
+} from "@notra/sites-core/constants/sites";
 import { siteBuildRequestSchema } from "@notra/sites-core/schemas/build";
 import { siteConfigSchema } from "@notra/sites-core/schemas/site-config";
 import type { SiteBuildRequest } from "@notra/sites-core/types/build";
 import type { SiteArea, SiteMounts } from "@notra/sites-core/types/deployment";
+import { readConfigSections } from "@notra/sites-core/utils/config-sections";
 import { createDefaultSiteConfig } from "@notra/sites-core/utils/default-config";
 import { normalizeSiteMounts } from "@notra/sites-core/utils/mounts";
 
@@ -27,6 +31,18 @@ function isDirectory(path: string): boolean {
     const { code } = error as NodeJS.ErrnoException;
     if (code === "ENOENT" || code === "ENOTDIR") {
       return false;
+    }
+    throw error;
+  }
+}
+
+function readTextIfExists(path: string): string | null {
+  try {
+    return readFileSync(path, "utf8");
+  } catch (error) {
+    const { code } = error as NodeJS.ErrnoException;
+    if (code === "ENOENT" || code === "ENOTDIR" || code === "EISDIR") {
+      return null;
     }
     throw error;
   }
@@ -71,8 +87,9 @@ export function parseMountFlags(
 }
 
 // --mount lists the sections to serve and replaces a target's mounts. Without
-// either, preview the requested section and those that have a folder, or both
-// when neither does.
+// either, serve the sections blog.json sets, like a hosted build does, or
+// else the requested section and those that have a folder, or both when
+// neither does.
 export function localMounts(
   siteRoot: string,
   target?: SiteBuildRequest,
@@ -88,6 +105,17 @@ export function localMounts(
   if (target) {
     return target.mounts;
   }
+  const sections = readConfigSections(
+    readTextIfExists(join(siteRoot, SITE_CONFIG_FILENAME))
+  );
+  if (sections) {
+    if (area && !sections[area]) {
+      throw new UsageError(
+        `--area ${area}: ${SITE_CONFIG_FILENAME} sections leave out ${area}. Add it there or pass --mount ${area}=<path>`
+      );
+    }
+    return sections;
+  }
   const blog = area === "blog" || isDirectory(join(siteRoot, "blog"));
   const changelog =
     area === "changelog" || isDirectory(join(siteRoot, "changelog"));
@@ -95,6 +123,35 @@ export function localMounts(
     ...(blog || !changelog ? { blog: "/blog" } : {}),
     ...(changelog || !blog ? { changelog: "/changelog" } : {}),
   };
+}
+
+/**
+ * `notra dev` keeps the paths it started with. Returns the notice to print
+ * when blog.json `sections` now set others, or null.
+ */
+export function sectionsRestartNotice(
+  siteRoot: string,
+  mounts: SiteMounts
+): string | null {
+  let sections: SiteMounts | null;
+  try {
+    sections = readConfigSections(
+      readTextIfExists(join(siteRoot, SITE_CONFIG_FILENAME))
+    );
+  } catch {
+    return null;
+  }
+  if (
+    !sections ||
+    JSON.stringify(normalizeSiteMounts(sections)) ===
+      JSON.stringify(normalizeSiteMounts(mounts))
+  ) {
+    return null;
+  }
+  const paths = Object.entries(sections)
+    .map(([area, path]) => `${area} at ${path}`)
+    .join(" and ");
+  return `${SITE_CONFIG_FILENAME} sections now serve the ${paths}. Restart notra dev to preview the new paths.`;
 }
 
 export function localDefaultConfig(

@@ -10,6 +10,7 @@ import {
   listSiteDeploymentsResponseSchema,
   listSitesResponseSchema,
   patchSiteAuthorPageRequestSchema,
+  patchSiteSectionsRequestSchema,
   publishSitePostBodySchema,
   publishSitePostResponseSchema,
   publishSiteRequestSchema,
@@ -23,6 +24,7 @@ import {
   siteDeploymentsDataSchema,
   siteDetailDataSchema,
   siteParamsSchema,
+  siteSectionsResponseSchema,
   sitePostParamsSchema,
   sitePostPreviewDataSchema,
   sitePostPreviewResponseSchema,
@@ -198,6 +200,32 @@ const patchSiteAuthorPageRoute = createRoute({
     200: {
       description: "Layout saved as an unpublished change",
       content: { "application/json": { schema: siteAuthorsResponseSchema } },
+    },
+    ...siteErrors,
+    429: writeRateLimit,
+  },
+});
+
+const patchSiteSectionsRoute = createRoute({
+  method: "patch",
+  path: "/sites/{siteId}/sections",
+  tags: [SITES_TAG],
+  operationId: "updateSiteSections",
+  summary: "Set the blog and changelog paths",
+  description: `Sets sections in blog.json: which of the blog and changelog the Site serves, and at which paths. A section left out is turned off. Once a production build with them goes live, they replace the dashboard's Sections setting, and a section that moves or turns off stops answering at its old path, so add redirects for it. ${STAGED_NOTE}`,
+  request: {
+    params: siteParamsSchema,
+    body: {
+      required: true,
+      content: {
+        "application/json": { schema: patchSiteSectionsRequestSchema },
+      },
+    },
+  },
+  responses: {
+    200: {
+      description: "Sections saved as an unpublished change",
+      content: { "application/json": { schema: siteSectionsResponseSchema } },
     },
     ...siteErrors,
     429: writeRateLimit,
@@ -389,6 +417,35 @@ sitesRoutes.openapi(patchSiteAuthorPageRoute, async (c) => {
           layout: c.req.valid("json").layout,
         },
         siteAuthorsResponseSchema
+      ),
+      200
+    );
+  } catch (error) {
+    return sitesErrorResponse(c, error);
+  }
+});
+
+sitesRoutes.openapi(patchSiteSectionsRoute, async (c) => {
+  const organizationId = getOrganizationId(c);
+  if (!organizationId) {
+    return c.json({ error: ORGANIZATION_SCOPED_API_KEY_ERROR }, 403);
+  }
+  const rateLimited = await enforceRatelimit(c, ratelimit.siteUpdate);
+  if (rateLimited) {
+    return rateLimited;
+  }
+  try {
+    return c.json(
+      await callSites(
+        c.env ?? {},
+        {
+          action: "setSections",
+          organizationId,
+          siteId: c.req.valid("param").siteId,
+          actorUserId: siteActorUserId(c),
+          sections: c.req.valid("json"),
+        },
+        siteSectionsResponseSchema
       ),
       200
     );

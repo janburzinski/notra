@@ -206,51 +206,64 @@ function SiteSettingsContent() {
         <SiteSettingsList>
           <SiteSettingsItem
             {...row("sections")}
-            description={t("sectionsRowHint")}
+            description={
+              site.mountsFromConfig
+                ? t("sectionsFromConfigHint")
+                : t("sectionsRowHint")
+            }
             icon={Route01Icon}
             title={tSections("title")}
             value={
-              <SiteSettingsValue mono>
-                {[site.mounts.blog, site.mounts.changelog]
-                  .filter(Boolean)
-                  .join("  ·  ")}
-              </SiteSettingsValue>
+              // A read-only row stretches its value, so keep it a pill.
+              <span className="flex justify-end">
+                <SiteSettingsValue mono>
+                  {[site.mounts.blog, site.mounts.changelog]
+                    .filter(Boolean)
+                    .join("  ·  ")}
+                </SiteSettingsValue>
+              </span>
             }
           >
-            <SiteSettingsEditor
-              isValid={(form) => form.blogEnabled || form.changelogEnabled}
-              onDone={closeRow("sections")}
-            >
-              {(form, update) => (
-                <>
-                  <div className="divide-y rounded-xl border">
-                    <SiteSectionField
-                      description={tSections("blogDescription")}
-                      enabled={form.blogEnabled}
-                      onEnabledChange={(value) => update("blogEnabled", value)}
-                      onPathChange={(value) => update("blogPath", value)}
-                      path={form.blogPath}
-                      title={tSections("blog")}
-                    />
-                    <SiteSectionField
-                      description={tSections("changelogDescription")}
-                      enabled={form.changelogEnabled}
-                      onEnabledChange={(value) =>
-                        update("changelogEnabled", value)
-                      }
-                      onPathChange={(value) => update("changelogPath", value)}
-                      path={form.changelogPath}
-                      title={tSections("changelog")}
-                    />
-                  </div>
-                  {form.blogEnabled || form.changelogEnabled ? (
-                    <SiteSettingsHint>{tPage("sectionsHint")}</SiteSettingsHint>
-                  ) : (
-                    <FieldError>{tSections("atLeastOne")}</FieldError>
-                  )}
-                </>
-              )}
-            </SiteSettingsEditor>
+            {site.mountsFromConfig ? null : (
+              <SiteSettingsEditor
+                isValid={(form) => form.blogEnabled || form.changelogEnabled}
+                onDone={closeRow("sections")}
+              >
+                {(form, update) => (
+                  <>
+                    <div className="divide-y rounded-xl border">
+                      <SiteSectionField
+                        description={tSections("blogDescription")}
+                        enabled={form.blogEnabled}
+                        onEnabledChange={(value) =>
+                          update("blogEnabled", value)
+                        }
+                        onPathChange={(value) => update("blogPath", value)}
+                        path={form.blogPath}
+                        title={tSections("blog")}
+                      />
+                      <SiteSectionField
+                        description={tSections("changelogDescription")}
+                        enabled={form.changelogEnabled}
+                        onEnabledChange={(value) =>
+                          update("changelogEnabled", value)
+                        }
+                        onPathChange={(value) => update("changelogPath", value)}
+                        path={form.changelogPath}
+                        title={tSections("changelog")}
+                      />
+                    </div>
+                    {form.blogEnabled || form.changelogEnabled ? (
+                      <SiteSettingsHint>
+                        {tPage("sectionsHint")}
+                      </SiteSettingsHint>
+                    ) : (
+                      <FieldError>{tSections("atLeastOne")}</FieldError>
+                    )}
+                  </>
+                )}
+              </SiteSettingsEditor>
+            )}
           </SiteSettingsItem>
           <SiteSettingsItem
             {...row("variables")}

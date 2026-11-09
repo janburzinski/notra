@@ -11,6 +11,7 @@ import { parseArgs } from "node:util";
 
 import { hasErrors } from "@notra/sites-compiler/utils/diagnostics";
 import { validateSite } from "@notra/sites-compiler/validate";
+import { SITE_CONFIG_FILENAME } from "@notra/sites-core/constants/sites";
 import type { SiteDiagnostic } from "@notra/sites-core/types/build";
 import type { SiteRedirectRule } from "@notra/sites-core/types/deployment";
 import {
@@ -39,6 +40,7 @@ import {
   localDefaultConfig,
   localMounts,
   parseMountFlags,
+  sectionsRestartNotice,
 } from "./utils/local-options";
 import { sourceLinkWarnings } from "./utils/source-links";
 import { UsageError } from "./utils/usage-error";
@@ -305,7 +307,17 @@ async function main() {
     process.on("SIGTERM", onSignal);
     process.on("SIGHUP", onSignal);
     try {
-      watcher = watch(siteRoot, { recursive: true }, () => {
+      // Paths from --mount or --target are pinned; blog.json ones can change.
+      const followsSections = !(target || values.mount?.length);
+      let sectionsNotice: string | null = null;
+      watcher = watch(siteRoot, { recursive: true }, (_event, filename) => {
+        if (followsSections && filename === SITE_CONFIG_FILENAME) {
+          const notice = sectionsRestartNotice(siteRoot, mounts);
+          if (notice && notice !== sectionsNotice) {
+            process.stderr.write(`${notice}\n`);
+          }
+          sectionsNotice = notice;
+        }
         const requested = refresh.refresh(150);
         if (requested !== watchedRefresh) {
           watchedRefresh = requested;

@@ -10,6 +10,7 @@ import { Effect, Exit, Option } from "effect";
 import { activateDeployment } from "./activation";
 import { runSandboxBuildEffect } from "./box-build";
 import { saveBuildTelemetryEffect } from "./build-telemetry";
+import { applyConfigSections } from "./config-sections";
 import {
   CANCELED_OUTCOME,
   SAME_COMMIT_TRIGGERS,
@@ -152,8 +153,10 @@ const whyNotBuild = Effect.fn("Sites.whyNotBuild")(function* (
 
 const buildAndPublish = Effect.fn("Sites.buildAndPublish")(function* (
   site: Site,
-  deployment: SiteDeployment
+  queuedDeployment: SiteDeployment
 ) {
+  // Swapped for the row whose target uses blog.json's sections, when it sets them.
+  let deployment = queuedDeployment;
   if (site.status !== "active") {
     yield* Effect.uninterruptible(
       Effect.tryPromise({
@@ -209,7 +212,16 @@ const buildAndPublish = Effect.fn("Sites.buildAndPublish")(function* (
       : yield* readPostPreviewFiles(site, deployment);
     if (overlayFiles === null) {
       skipReason = "This preview was deleted.";
-    } else if (!skipReason && overlayFiles.length === 0) {
+    } else if (!skipReason) {
+      const sections = yield* Effect.tryPromise({
+        try: () =>
+          applyConfigSections({ site, deployment, access, overlayFiles }),
+        catch: (error) => error,
+      });
+      deployment = sections.deployment;
+      phaseLog += sections.log;
+    }
+    if (!skipReason && overlayFiles?.length === 0) {
       smartComparison = yield* Effect.tryPromise({
         try: () => compareSmartDeployment(site, deployment, access),
         catch: (error) => error,

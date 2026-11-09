@@ -12,6 +12,7 @@ import {
 } from "@notra/db/schema";
 import {
   SITE_ABUSE_EMAIL,
+  SITE_CONFIG_FILENAME,
   SITE_PREVIEW_PASSWORD_MAX_LENGTH,
   SITE_PREVIEW_PASSWORD_MIN_LENGTH,
 } from "@notra/sites-core/constants/sites";
@@ -635,6 +636,15 @@ export async function updateSiteSettings(
       .for("update");
     if (!current) {
       throw new SiteInputError("Site not found");
+    }
+    if (
+      values.mounts &&
+      current.mountsFromConfig &&
+      JSON.stringify(values.mounts) !== JSON.stringify(current.mounts)
+    ) {
+      throw new SiteInputError(
+        `This site's sections are set in ${SITE_CONFIG_FILENAME}. Change them there, or remove "sections" from it to manage them here.`
+      );
     }
     const changingBranch =
       values.productionBranch !== undefined &&

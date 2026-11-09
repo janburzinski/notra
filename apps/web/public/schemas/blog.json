@@ -19,6 +19,27 @@
       "type": "string",
       "maxLength": 300
     },
+    "sections": {
+      "type": "object",
+      "properties": {
+        "blog": {
+          "description": "Path the blog is served at, like /blog. Leave out to turn the blog off.",
+          "type": "string",
+          "maxLength": 200,
+          "format": "starts_with",
+          "pattern": "^\\/.*"
+        },
+        "changelog": {
+          "description": "Path the changelog is served at, like /changelog. Leave out to turn the changelog off.",
+          "type": "string",
+          "maxLength": 200,
+          "format": "starts_with",
+          "pattern": "^\\/.*"
+        }
+      },
+      "additionalProperties": false,
+      "description": "Turns the blog and changelog on and sets their paths. When set, these replace the Sections setting in the dashboard and apply when a production build goes live."
+    },
     "logo": {
       "anyOf": [
         {

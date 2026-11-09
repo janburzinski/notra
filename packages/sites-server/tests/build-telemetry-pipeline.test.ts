@@ -127,6 +127,12 @@ if (process.env.NOTRA_BUILD_TELEMETRY_PIPELINE_WORKER !== "1") {
     compareSmartDeployment: async () => null,
     skipUnchangedDeployment: async () => false,
   }));
+  mock.module("../src/config-sections", () => ({
+    applyConfigSections: async (params: { deployment: SiteDeployment }) => ({
+      deployment: params.deployment,
+      log: "",
+    }),
+  }));
   mock.module("../src/deployments", () => ({
     startDeploymentBuild: async (current: SiteDeployment, startedAt: Date) => {
       if (!SITE_DEPLOYMENT_TRANSITIONS.building.includes(deployment.status)) {

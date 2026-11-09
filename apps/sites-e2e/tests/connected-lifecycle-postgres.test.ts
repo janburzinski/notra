@@ -1925,6 +1925,72 @@ if (!process.env.SITES_TEST_DATABASE_URL) {
       ).origin;
       expect((await request(`${attachedOrigin}/blog`)).status).toBe(200);
       expect((await request(`https://${docsHostname}/blog`)).status).toBe(200);
+      await phase("blog.json sections move the changelog");
+      // A commit can set the paths: they apply when its build goes live.
+      const sectionsConfig = JSON.parse(
+        (await github.file("blog.json")) ?? "{}"
+      );
+      const moved = await pushAndQueue(
+        [
+          {
+            path: "blog.json",
+            content: `${JSON.stringify(
+              {
+                ...sectionsConfig,
+                sections: { blog: "/blog", changelog: "/updates" },
+              },
+              null,
+              2
+            )}\n`,
+          },
+        ],
+        "Move the changelog to /updates"
+      );
+      expect(await runSiteJob(moved.jobId)).toMatchObject({
+        status: "done",
+        outcome: "live",
+      });
+      const movedDeployment = await deploymentFor(moved.jobId);
+      expect(movedDeployment.target.mounts).toEqual({
+        blog: "/blog",
+        changelog: "/updates",
+      });
+      const movedLog = r2.objects.get(
+        SITE_R2_KEYS.buildLog(site.id, movedDeployment.id)
+      );
+      assert.ok(movedLog);
+      expect(new TextDecoder().decode(movedLog.body)).toContain(
+        "the changelog moves from /changelog to /updates"
+      );
+      expect(await getSite(site.id)).toMatchObject({
+        mounts: { blog: "/blog", changelog: "/updates" },
+        mountsFromConfig: true,
+      });
+      expect((await request(`${site.publicOrigin}/updates`)).status).toBe(200);
+      expect((await request(`${site.publicOrigin}/changelog`)).status).toBe(
+        404
+      );
+      await expect(
+        updateSiteSettings(site, { mounts: { blog: "/blog" } }, userId)
+      ).rejects.toThrow("sections are set in blog.json");
+      // Without sections the dashboard takes over again and keeps the paths.
+      const handedBack = await pushAndQueue(
+        [
+          {
+            path: "blog.json",
+            content: `${JSON.stringify(sectionsConfig, null, 2)}\n`,
+          },
+        ],
+        "Manage sections in the dashboard"
+      );
+      expect(await runSiteJob(handedBack.jobId)).toMatchObject({
+        status: "done",
+        outcome: "live",
+      });
+      expect(await getSite(site.id)).toMatchObject({
+        mounts: { blog: "/blog", changelog: "/updates" },
+        mountsFromConfig: false,
+      });
       await phase("delete site");
       await r2Put("sites/unrelated-tenant/state.json", "preserve");
       const deploymentIds = (
@@ -2096,7 +2162,7 @@ if (!process.env.SITES_TEST_DATABASE_URL) {
       expect(
         emulators.summaries().flatMap((summary) => summary.unhandled)
       ).toEqual([]);
-      expect(builds).toBe(20);
+      expect(builds).toBe(22);
       expect(boxBuilds).toHaveLength(builds);
       if (emulators.box) {
         expectNoLiveBoxes();
@@ -2142,7 +2208,7 @@ if (!process.env.SITES_TEST_DATABASE_URL) {
         }
       }
       // The rejected builder rebuild compiled before it reported a failure.
-      expect(boxBuilds.filter((build) => build.result?.ok)).toHaveLength(18);
+      expect(boxBuilds.filter((build) => build.result?.ok)).toHaveLength(20);
       console.log(
         JSON.stringify({
           scope: "connected-postgres-compiler-publisher-worker-lifecycle",

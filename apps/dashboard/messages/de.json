@@ -8875,6 +8875,7 @@
       "switchRepositoryFailed": "Repository konnte nicht gewechselt werden",
       "rootDirectoryPlaceholder": "Repository-Stammverzeichnis",
       "rootDirectoryFieldHint": "Relativ zum Repository. Leer lassen, wenn die Seite im Stammverzeichnis liegt.",
+      "sectionsFromConfigHint": "Festgelegt über sections in blog.json. Ändere sie dort, sie gelten, sobald der Build live ist.",
       "sectionsRowHint": "Wo Blog und Changelog auf deiner Seite liegen.",
       "branchFieldHint": "Jeder Push auf diesen Branch geht live. Änderungen gelten ab dem nächsten Deploy.",
       "optional": "Optional",

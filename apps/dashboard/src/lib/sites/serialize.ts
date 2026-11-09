@@ -51,6 +51,7 @@ export function serializeSite(
     aliasOrigin: siteAliasOrigin(site.slug),
     liveUrl: primaryMountUrl(site.publicOrigin, site.mounts),
     mounts: site.mounts,
+    mountsFromConfig: site.mountsFromConfig,
     previewsEnabled: site.previewsEnabled,
     smartDeployments: site.smartDeployments,
     previewCommentsEnabled: site.previewCommentsEnabled,
@@ -137,9 +138,10 @@ export function serializePreviews(
       deploymentId: pointer.deploymentId,
       visibility: pointer.visibility,
       activatedAt: pointer.activatedAt,
+      // A branch whose blog.json moves a section previews at its own paths.
       url: primaryMountUrl(
         sitePreviewOrigin(site.slug, previewKey),
-        site.mounts
+        deployment?.target.mounts ?? site.mounts
       ),
       branch: deployment?.branch ?? null,
       pullRequestNumber: deployment?.pullRequestNumber ?? null,

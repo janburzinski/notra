@@ -15,6 +15,7 @@ import {
   SITE_PREVIEW_VISIBILITIES,
   SITE_STATUSES,
 } from "@notra/sites-core/constants/sites";
+import { siteSectionsSchema } from "@notra/sites-core/schemas/site-sections";
 
 import {
   CONTENT_AUTHOR_NAME_MAX_LENGTH,
@@ -215,6 +216,51 @@ export const patchSiteAuthorPageRequestSchema = z
   })
   .openapi("PatchSiteAuthorPageRequest", { example: { layout: "stacked" } });
 
+export const patchSiteSectionsRequestSchema = z
+  .object({
+    blog: z.string().optional().openapi({
+      description: "Path of the blog, like /blog. Omit to turn the blog off.",
+      example: "/blog",
+    }),
+    changelog: z.string().optional().openapi({
+      description:
+        "Path of the changelog, like /changelog. Omit to turn the changelog off.",
+      example: "/changelog",
+    }),
+  })
+  .superRefine((sections, ctx) => {
+    const parsed = siteSectionsSchema.safeParse(sections);
+    for (const issue of parsed.error?.issues ?? []) {
+      ctx.addIssue({
+        code: "custom",
+        path: issue.path,
+        message: issue.message,
+      });
+    }
+  })
+  .openapi("PatchSiteSectionsRequest", {
+    example: { blog: "/blog", changelog: "/changelog" },
+  });
+
+const siteMountsSchema = z.object({
+  blog: z.string().optional(),
+  changelog: z.string().optional(),
+});
+
+export const siteSectionsResponseSchema = z
+  .object({
+    site: z.object({ id: z.string(), name: z.string() }),
+    sections: siteMountsSchema.openapi({
+      description:
+        "The sections blog.json sets with unpublished changes applied. They take over from the dashboard setting once a production build of them goes live.",
+    }),
+    liveSections: siteMountsSchema.openapi({
+      description: "The paths the live site serves now.",
+    }),
+    hasUnpublishedChanges: z.boolean(),
+  })
+  .openapi("SiteSectionsResponse");
+
 export const importSiteAuthorsRequestSchema = z
   .object({
     authorIds: z
@@ -297,6 +343,10 @@ export const internalSitesRequestSchema = z.discriminatedUnion("action", [
   internalSiteScopeSchema.extend({
     action: z.literal("setAuthorPage"),
     layout: z.enum(SITE_AUTHOR_PAGE_LAYOUTS),
+  }),
+  internalSiteScopeSchema.extend({
+    action: z.literal("setSections"),
+    sections: siteSectionsSchema,
   }),
   internalSiteScopeSchema.extend({
     action: z.literal("importAuthors"),
@@ -400,6 +450,10 @@ const siteSchema = z
     mounts: z.object({
       blog: z.string().optional(),
       changelog: z.string().optional(),
+    }),
+    mountsFromConfig: z.boolean().openapi({
+      description:
+        "True when the live build's blog.json sets the sections, so the dashboard can't change them. Change them with PATCH /v1/sites/{siteId}/sections or in blog.json.",
     }),
     previewsEnabled: z.boolean(),
     previewVisibility: z.enum(SITE_PREVIEW_VISIBILITIES),

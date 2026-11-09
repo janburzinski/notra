@@ -8875,6 +8875,7 @@
       "switchRepositoryFailed": "Couldn't switch the repository",
       "rootDirectoryPlaceholder": "Repository root",
       "rootDirectoryFieldHint": "Relative to the repository root. Leave empty when the site is at the root.",
+      "sectionsFromConfigHint": "Set by sections in blog.json. Change them there and they apply when the build goes live.",
       "sectionsRowHint": "Where the blog and changelog live on your site.",
       "branchFieldHint": "Every push to this branch goes live. Changes apply on the next deploy.",
       "optional": "Optional",

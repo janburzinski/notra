@@ -70,6 +70,26 @@ Notra bundles a set of Lucide icons, and a name outside it is ignored: a link sh
 | `logo` | Path, or `{ light, dark, href? }` | | Header logo, and `href` sets where it links to. See [details](/sites/customize/navigation#logo-and-favicon) |
 | `favicon` | Path, or `{ light, dark }` | | Browser tab icon |
 
+## Sections
+
+| Setting | Type | Default | Description |
+| --- | --- | --- | --- |
+| `sections` | `{ blog?, changelog? }` | The dashboard setting | Which sections the site serves and at which [paths](/sites/domains/overview#section-paths). A section left out is off |
+
+```json blog.json
+{
+  "name": "Acme",
+  "sections": { "blog": "/blog", "changelog": "/changelog" }
+}
+```
+
+- Without `sections`, the paths come from **Settings → Content → Sections**.
+- With `sections`, the site takes them over when a production build with them goes live, and the dashboard shows them read-only. A failed build changes nothing.
+- Preview builds use the `sections` of their branch, so you can check a move before you merge it.
+- The deployment log warns when a section moves or turns off. Add [redirects](#redirects) for its old URLs, and update your rewrite if you [forward paths](/sites/domains/subpath) to Notra.
+- Remove `sections` to manage the paths in the dashboard again. The site keeps its current paths.
+- `notra dev` and `notra sites build` serve the same paths unless you pass `--mount`.
+
 ## Design
 
 See [Design and CSS](/sites/customize/design).

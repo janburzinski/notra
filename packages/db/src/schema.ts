@@ -4197,6 +4197,8 @@ export const sites = pgTable(
     rootDirectory: text("root_directory").notNull().default(""),
     publicOrigin: text("public_origin").notNull(),
     mounts: jsonb("mounts").$type<SiteMounts>().notNull(),
+    /** True while a production build's blog.json `sections` set the mounts. */
+    mountsFromConfig: boolean("mounts_from_config").notNull().default(false),
     previewsEnabled: boolean("previews_enabled").notNull().default(true),
     smartDeployments: boolean("smart_deployments").notNull().default(true),
     previewCommentsEnabled: boolean("preview_comments_enabled")
@@ -4484,6 +4486,8 @@ export const siteDeployments = pgTable(
     pullRequestNumber: integer("pull_request_number"),
     target: jsonb("target").$type<SiteBuildTarget>().notNull(),
     configHash: text("config_hash").notNull(),
+    /** The `sections` blog.json set at this commit, which the target uses. */
+    configMounts: jsonb("config_mounts").$type<SiteMounts>(),
     inputFingerprint: text("input_fingerprint"),
     skipReason: text("skip_reason"),
     smartDeploymentEvaluation: jsonb(

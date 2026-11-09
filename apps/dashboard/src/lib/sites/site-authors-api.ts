@@ -3,6 +3,7 @@ import { contentAuthors, sites } from "@notra/db/schema";
 import type { ContentAuthor } from "@notra/schemas/shared/post-metadata";
 import { SITE_CONFIG_FILENAME } from "@notra/sites-core/constants/sites";
 import { isSiteImageDraftPath } from "@notra/sites-core/utils/image-drafts";
+import { normalizeSiteMounts } from "@notra/sites-core/utils/mounts";
 import { siteAuthorRef } from "@notra/sites-core/utils/site-author-refs";
 import { getSite } from "@notra/sites-server/deployments";
 import { publishSiteDrafts } from "@notra/sites-server/editor";
@@ -41,17 +42,23 @@ import {
   writeSiteAuthor,
 } from "@/utils/site-authors";
 import { siteAssetUrl } from "@/utils/site-design";
+import { configValue, patchConfigValue } from "@/utils/site-design-sections";
 
 type Request<A extends SiteAuthorApiRequest["action"]> = Extract<
   SiteAuthorApiRequest,
   { action: A }
 >;
 
-async function requireSite(organizationId: string, siteId: string) {
+async function requireOwnSite(organizationId: string, siteId: string) {
   const site = await getSite(siteId);
   if (!site || site.organizationId !== organizationId) {
     throw notFound("Site not found");
   }
+  return site;
+}
+
+async function requireSite(organizationId: string, siteId: string) {
+  const site = await requireOwnSite(organizationId, siteId);
   if (!site.mounts.blog) {
     throw conflict("This site has no blog, so it has no authors", {
       code: "SITE_HAS_NO_BLOG",
@@ -209,6 +216,35 @@ async function setAuthorPage(input: Request<"setAuthorPage">) {
   return await siteAuthorsResponse(site);
 }
 
+async function siteSectionsResponse(site: Site) {
+  const document = await readSiteAuthorsDocument(site);
+  const staged = configValue(document.config, "sections");
+  return {
+    site: { id: site.id, name: site.name },
+    sections:
+      typeof staged === "object" && staged !== null ? staged : site.mounts,
+    liveSections: site.mounts,
+    hasUnpublishedChanges: Boolean(document.draft),
+  };
+}
+
+/** Writes blog.json `sections`, which the site adopts when a production build of them goes live. */
+async function setSections(input: Request<"setSections">) {
+  const site = await requireOwnSite(input.organizationId, input.siteId);
+  const document = await readSiteAuthorsDocument(site);
+  await saveSiteAuthorsDocument(
+    site,
+    document,
+    patchConfigValue(
+      document.config,
+      "sections",
+      normalizeSiteMounts(input.sections)
+    ),
+    input.actorUserId
+  );
+  return await siteSectionsResponse(site);
+}
+
 async function importAuthors(input: Request<"importAuthors">) {
   const site = await requireSite(input.organizationId, input.siteId);
   const document = await readSiteAuthorsDocument(site);
@@ -309,7 +345,8 @@ function assertDesignOnly(paths: readonly string[]) {
  * check here still refuses it.
  */
 async function publish(input: Request<"publish">) {
-  const site = await requireSite(input.organizationId, input.siteId);
+  // Design changes publish on changelog-only sites too.
+  const site = await requireOwnSite(input.organizationId, input.siteId);
   const unchanged = {
     published: false,
     commitSha: null,
@@ -403,6 +440,8 @@ export async function handleSiteAuthorApiRequest(input: SiteAuthorApiRequest) {
       return await deleteAuthor(input);
     case "setAuthorPage":
       return await setAuthorPage(input);
+    case "setSections":
+      return await setSections(input);
     case "importAuthors":
       return await importAuthors(input);
     case "publish":
