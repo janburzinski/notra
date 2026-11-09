@@ -62,7 +62,7 @@ export function TrafficActionsMenu({
             icon={MoreHorizontalIcon}
           />
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-52">
+        <DropdownMenuContent align="end" className="w-auto min-w-36" size="sm">
           <DropdownMenuItem
             disabled={!(traffic && web)}
             onClick={() => {

@@ -31,13 +31,17 @@ function DropdownMenuContent({
   alignOffset = 0,
   side = "bottom",
   sideOffset = 4,
+  size = "default",
   className,
   ...props
 }: MenuPrimitive.Popup.Props &
   Pick<
     MenuPrimitive.Positioner.Props,
     "align" | "alignOffset" | "side" | "sideOffset"
-  >) {
+  > & {
+    /** `sm` uses smaller items, for menus next to compact toolbar buttons. */
+    size?: "default" | "sm";
+  }) {
   const container = useContext(DropdownMenuPortalContainer);
   return (
     <MenuPrimitive.Portal container={container ?? undefined}>
@@ -52,8 +56,11 @@ function DropdownMenuContent({
           className={cn(
             DROPDOWN_POPUP_CLASS_NAME,
             "w-(--anchor-width) min-w-32 p-1",
+            size === "sm" &&
+              "[&_[role^=menuitem]]:min-h-6 [&_[role^=menuitem]]:text-xs [&_[role^=menuitem]]:leading-4",
             className
           )}
+          data-size={size}
           data-slot="dropdown-menu-content"
           {...props}
         />
