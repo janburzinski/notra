@@ -1,0 +1,24 @@
+packages/geo-core/src/imports/vercel.ts
+  s_4bc87a5ab50327::t_8af4ae956c4009 23
+  s_4bc87a5ab50327::t_ef70baa6a0b707 9,28-29,117-126,149-167,170-184,196,203-205,220,254,261-263,273,275,307
+  s_4bc87a5ab50327::t_f5b32ba9923ead 168-169
+packages/geo-core/tests/analytics-import-providers.test.ts
+  s_4bc87a5ab50327::t_8af4ae956c4009 939-941,958-963
+  s_4bc87a5ab50327::t_097c79eefb2992 921-938,942-957,964-991
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "da12f59824d947c6aba8b51fcc18fcbc3dc57963",
+  "prompts": {},
+  "sessions": {
+    "s_4bc87a5ab50327": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d2e5dbfd-8a7d-4c7c-aaad-9d3656facdff",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
