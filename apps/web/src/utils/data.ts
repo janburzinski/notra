@@ -130,22 +130,21 @@ function average(values: number[]): number | null {
     : null;
 }
 
-/** This week's average per site and the week before's. */
+/** This week's average per site. */
 function weekFigures(
   rows: readonly DataTrafficRow[],
   averageDays: number
-): { recent: number | null; before: number | null; recentDay: string | null } {
+): { recent: number | null; recentDay: string | null } {
   // Each day already averages the week ending on it, so the latest published
-  // day is this week and the day a week earlier the one before. A last day
-  // below the privacy floor falls back to the newest one that cleared it.
+  // day is this week. A last day below the privacy floor falls back to the
+  // newest one that cleared it.
   if (averageDays >= RECENT_DAYS) {
     const last = rows.findLastIndex((row) => row.total !== null);
     if (last === -1) {
-      return { recent: null, before: null, recentDay: null };
+      return { recent: null, recentDay: null };
     }
     return {
       recent: rows[last]?.total ?? null,
-      before: rows[last - RECENT_DAYS]?.total ?? null,
       recentDay: last === rows.length - 1 ? null : (rows[last]?.day ?? null),
     };
   }
@@ -153,7 +152,6 @@ function weekFigures(
   // floor leaves a gap instead of pulling older days into "this week".
   return {
     recent: average(windowTotals(rows.slice(-RECENT_DAYS))),
-    before: average(windowTotals(rows.slice(-RECENT_DAYS * 2, -RECENT_DAYS))),
     recentDay: null,
   };
 }
@@ -203,14 +201,17 @@ function trafficChart(
     }
     return row;
   });
-  const { recent, before, recentDay } = weekFigures(rows, averageDays);
+  const { recent, recentDay } = weekFigures(rows, averageDays);
   return {
     rows,
     series,
     minSites,
     recent,
     recentDay,
-    change: recent !== null && before ? recent / before - 1 : null,
+    // Over sites measured in both weeks, like the tables. Older snapshots
+    // without it show no trend rather than the per-site average's, which
+    // falls whenever a new site starts measuring.
+    change: chart.change ?? null,
   };
 }
 

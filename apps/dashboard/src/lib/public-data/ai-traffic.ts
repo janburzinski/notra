@@ -64,6 +64,8 @@ async function computeSnapshot(
         date_to: window.toExclusive,
         baseline_from: readFrom,
         recent_from: window.recentFrom,
+        skip_from: PUBLIC_DATA_INGEST_GAP.from,
+        skip_to: PUBLIC_DATA_INGEST_GAP.to,
         ...hidden,
       })
     )?.data ?? [];
@@ -100,6 +102,7 @@ async function computeSnapshot(
   return buildPublicAiTrafficSnapshot({
     today,
     generatedAt: new Date().toISOString(),
+    skip: PUBLIC_DATA_INGEST_GAP,
     daily: daily.map((row) => ({
       day: String(row.day),
       visitor_type: row.visitor_type,

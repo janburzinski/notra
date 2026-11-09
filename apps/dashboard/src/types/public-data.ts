@@ -11,7 +11,6 @@ export interface PublicAiTrafficDailyRow {
   projects: number;
 }
 
-/** `geo_traffic_trends_projects` row; `weeks_ago` 0 is the last 7 full days. */
 /**
  * A chart row: a daily row, or a `geo_traffic_trends_rolling` row for the
  * week ending on `day`. Rolling rows add the kind's distinct sites as a row
@@ -21,6 +20,11 @@ export interface PublicAiTrafficChartRow extends PublicAiTrafficDailyRow {
   site_days?: number;
 }
 
+/**
+ * `geo_traffic_trends_projects` row; `weeks_ago` 0 is the last 7 full days.
+ * Skipped days arrive as `GEO_TRENDS_SKIPPED_WEEK`, outside every period,
+ * so their sites still reach the sample and demo filter.
+ */
 export interface PublicAiTrafficProjectRow {
   project_id: string;
   visitor_type: string;
@@ -60,6 +64,20 @@ export interface PublicAiTrafficInput {
   projects: PublicAiTrafficProjectRow[];
   /** Hours, countries and llms.txt; empty leaves those sections out. */
   detail?: PublicAiTrafficDetailRow[];
+  /** Days lost at ingest; `projects` leaves them out, and weekly figures count only measured days. */
+  skip?: PublicAiTrafficSkip;
+}
+
+/** An inclusive range of UTC days (YYYY-MM-DD). */
+export interface PublicAiTrafficSkip {
+  from: string;
+  to: string;
+}
+
+/** Measured days in a comparison's recent period and the one before. */
+export interface PublicAiTrafficPeriodDays {
+  recent: number;
+  previous: number;
 }
 
 export interface PublicAiTrafficWindow {

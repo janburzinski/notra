@@ -79,6 +79,11 @@ export const publicAiTrafficDaySchema = z.object({
 export const publicAiTrafficChartSchema = z.object({
   series: z.array(publicAiTrafficSeriesSchema),
   days: z.array(publicAiTrafficDaySchema),
+  /**
+   * The kind's visit change against the 7 days before, over sites measured in
+   * both weeks; null below the site floor. Only the crawler and referrer charts carry it.
+   */
+  change: z.number().nullable().optional(),
 });
 
 export const publicAiTrafficSnapshotSchema = z.object({

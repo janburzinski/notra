@@ -217,3 +217,10 @@ export const GEO_IMPORTED_WHERE = `WHERE ${IMPORTS_SQL}
           ${GEO_EXCLUDED_SOURCES_SQL}
           ${GEO_HOSTS_SQL}
           ${GEO_PATH_SQL}`;
+
+/**
+ * `weeks_ago` that `geo_traffic_trends_projects` gives rows from skipped days
+ * (lost at ingest): outside every comparison period, while the row still
+ * lists its site for the sample and demo filter.
+ */
+export const GEO_TRENDS_SKIPPED_WEEK = 9999;

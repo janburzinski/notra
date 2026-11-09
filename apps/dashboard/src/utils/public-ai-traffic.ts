@@ -39,7 +39,9 @@ import type {
   PublicAiTrafficDetailRow,
   PublicAiTrafficInput,
   PublicAiTrafficKind,
+  PublicAiTrafficPeriodDays,
   PublicAiTrafficProjectRow,
+  PublicAiTrafficSkip,
   PublicAiTrafficSourceTotals,
   PublicAiTrafficWindow,
 } from "@/types/public-data";
@@ -152,13 +154,99 @@ function periodOf(
   return weeksAgo < weeks * 2 ? "previous" : null;
 }
 
+/** Days of week `weeksAgo` (0 starts on `recentFrom`) outside the skipped range. */
+function measuredDays(
+  weeksAgo: number,
+  recentFrom: string,
+  skip: PublicAiTrafficSkip | undefined
+): number {
+  const start = shiftDay(recentFrom, -PUBLIC_DATA_RECENT_DAYS * weeksAgo);
+  let days = 0;
+  for (let offset = 0; offset < PUBLIC_DATA_RECENT_DAYS; offset += 1) {
+    const day = shiftDay(start, offset);
+    if (!skip || day < skip.from || day > skip.to) {
+      days += 1;
+    }
+  }
+  return days;
+}
+
+/** Measured days in the last `weeks` weeks and in the same span before. */
+function periodDays(
+  weeks: number,
+  recentFrom: string,
+  skip?: PublicAiTrafficSkip
+): PublicAiTrafficPeriodDays {
+  let recent = 0;
+  let previous = 0;
+  for (let week = 0; week < weeks * 2; week += 1) {
+    const days = measuredDays(week, recentFrom, skip);
+    if (week < weeks) {
+      recent += days;
+    } else {
+      previous += days;
+    }
+  }
+  return { recent, previous };
+}
+
+/**
+ * Per source, the matched sites' visits per measured day in each period. Each
+ * site is held to `PUBLIC_DATA_SITE_CAP_FACTOR` times the median matched
+ * site, one limit across both periods, then to all other matched sites
+ * together, as `cappedVisits` does. Only sites measured in both periods set
+ * either cap, so sites that start measuring can't move them, and a skipped
+ * day doesn't read as a drop.
+ */
+function matchedRates(
+  sites: Map<string, { recent: number; previous: number }>,
+  days: PublicAiTrafficPeriodDays
+) {
+  const result = {
+    recent: 0,
+    previous: 0,
+    recentSites: new Set<string>(),
+    previousSites: new Set<string>(),
+  };
+  if (days.recent === 0 || days.previous === 0) {
+    return result;
+  }
+  const rates = [...sites].map(([site, visits]) => ({
+    site,
+    recent: visits.recent / days.recent,
+    previous: visits.previous / days.previous,
+  }));
+  const limit =
+    PUBLIC_DATA_SITE_CAP_FACTOR *
+    median(
+      rates
+        .flatMap((rate) => [rate.recent, rate.previous])
+        .filter((rate) => rate > 0)
+    );
+  for (const period of ["recent", "previous"] as const) {
+    const bounded = rates.map((rate) => Math.min(rate[period], limit));
+    const total = bounded.reduce((sum, rate) => sum + rate, 0);
+    const periodSites =
+      period === "recent" ? result.recentSites : result.previousSites;
+    for (const [index, rate] of rates.entries()) {
+      const own = bounded[index] ?? 0;
+      if (rate[period] > 0) {
+        result[period] += Math.min(own, total - own);
+        periodSites.add(rate.site);
+      }
+    }
+  }
+  return result;
+}
+
 /**
  * Per source: visits and sites in the recent period (the last `weeks` weeks),
  * the same span before it, and the ratio window.
  */
 function sourceTotals(
   rows: PublicAiTrafficProjectRow[],
-  weeks = 1
+  weeks: number,
+  days: PublicAiTrafficPeriodDays
 ): Map<string, PublicAiTrafficSourceTotals> {
   const capped = cappedVisits(rows);
   const activeRecent = new Set<string>();
@@ -176,6 +264,10 @@ function sourceTotals(
   }
 
   const totals = new Map<string, PublicAiTrafficSourceTotals>();
+  const matchedVisits = new Map<
+    string,
+    Map<string, { recent: number; previous: number }>
+  >();
   for (const [index, row] of rows.entries()) {
     const kind = toKind(row.visitor_type);
     if (!kind || row.visits <= 0) {
@@ -199,10 +291,6 @@ function sourceTotals(
       matchedPreviousSites: new Set<string>(),
       ratioSites: new Set<string>(),
     };
-    // Change compares only sites measured in both weeks, so a customer
-    // installing the tracker doesn't read as a crawler surge.
-    const matched =
-      activeRecent.has(row.project_id) && activePrevious.has(row.project_id);
     const period = periodOf(row.weeks_ago, weeks);
     if (period === "recent") {
       entry.recent += visits;
@@ -210,23 +298,39 @@ function sourceTotals(
         row.project_id,
         (entry.recentSites.get(row.project_id) ?? 0) + visits
       );
-      if (matched) {
-        entry.matchedRecent += visits;
-        entry.matchedRecentSites.add(row.project_id);
-      }
     } else if (period === "previous") {
       entry.previous += visits;
       entry.previousSites.add(row.project_id);
-      if (matched) {
-        entry.matchedPrevious += visits;
-        entry.matchedPreviousSites.add(row.project_id);
-      }
+    }
+    // Change compares only sites measured in both weeks, so a customer
+    // installing the tracker doesn't read as a crawler surge or a drop.
+    if (
+      period &&
+      activeRecent.has(row.project_id) &&
+      activePrevious.has(row.project_id)
+    ) {
+      const sites = matchedVisits.get(id) ?? new Map();
+      const site = sites.get(row.project_id) ?? { recent: 0, previous: 0 };
+      site[period] += row.visits;
+      sites.set(row.project_id, site);
+      matchedVisits.set(id, sites);
     }
     if (row.weeks_ago < PUBLIC_DATA_RATIO_WEEKS) {
       entry.ratioVisits += visits;
       entry.ratioSites.add(row.project_id);
     }
     totals.set(id, entry);
+  }
+  for (const [id, sites] of matchedVisits) {
+    const entry = totals.get(id);
+    if (!entry) {
+      continue;
+    }
+    const matched = matchedRates(sites, days);
+    entry.matchedRecent = matched.recent;
+    entry.matchedPrevious = matched.previous;
+    entry.matchedRecentSites = matched.recentSites;
+    entry.matchedPreviousSites = matched.previousSites;
   }
   return totals;
 }
@@ -291,7 +395,7 @@ function leaderboard({
   markdown,
   markdownSites,
   llmsTxt,
-  days = PUBLIC_DATA_RECENT_DAYS,
+  days,
 }: {
   totals: PublicAiTrafficSourceTotals[];
   kind: PublicAiTrafficKind;
@@ -301,11 +405,12 @@ function leaderboard({
   markdown: Map<string, { visits: number; markdown: number }>;
   markdownSites: Map<string, Set<string>>;
   llmsTxt: Map<string, number | null>;
-  /** Days in the recent period, for per-day figures. */
-  days?: number;
+  /** Measured days in the recent period, for per-day figures. */
+  days: number;
 }): PublicAiTrafficSource[] {
   const recentTotal = kindTotal(totals, kind, (entry) => entry.recent);
   const previousTotal = kindTotal(totals, kind, (entry) => entry.previous);
+  const perDay = (visits: number) => (days > 0 ? visits / days : 0);
   return totals
     .filter(
       (entry) =>
@@ -336,7 +441,7 @@ function leaderboard({
             : null,
         reach: ratio(entry.recentSites.size, activeSites) ?? 0,
         medianDailyVisits: round(
-          median([...entry.recentSites.values()]) / days,
+          perDay(median([...entry.recentSites.values()])),
           1
         ),
         // Markdown requests from fewer than `PUBLIC_DATA_MIN_SITES` sites stay unpublished.
@@ -347,11 +452,36 @@ function leaderboard({
             (markdownSites.get(entry.id)?.size ?? 0) >= PUBLIC_DATA_MIN_SITES)
             ? ratio(md.markdown, md.visits)
             : null,
-        dailyPerSite: round(entry.recent / activeSites / days, 2),
+        dailyPerSite: round(perDay(entry.recent) / activeSites, 2),
         llmsTxtReach:
           kind === "crawler" ? (llmsTxt.get(entry.source) ?? null) : null,
       };
     });
+}
+
+/**
+ * A kind's visit change against the week before, over sites measured in both
+ * weeks, the way each leaderboard row's change is. The charts' per-site
+ * average falls whenever new sites start measuring, so it can't carry it.
+ */
+function kindChange(
+  totals: PublicAiTrafficSourceTotals[],
+  kind: PublicAiTrafficKind
+): number | null {
+  const own = totals.filter((entry) => entry.kind === kind);
+  const recent = own.reduce((sum, entry) => sum + entry.matchedRecent, 0);
+  const previous = own.reduce((sum, entry) => sum + entry.matchedPrevious, 0);
+  const recentSites = new Set(
+    own.flatMap((entry) => [...entry.matchedRecentSites])
+  );
+  const previousSites = new Set(
+    own.flatMap((entry) => [...entry.matchedPreviousSites])
+  );
+  return previous > 0 &&
+    recentSites.size >= PUBLIC_DATA_MIN_SITES &&
+    previousSites.size >= PUBLIC_DATA_MIN_SITES
+    ? round(recent / previous - 1)
+    : null;
 }
 
 function purposeShares(
@@ -663,10 +793,21 @@ export function buildPublicAiTrafficSnapshot(
     (row) => !HIDDEN_SOURCES.has(row.key)
   );
   const window = publicAiTrafficWindow(today);
-  const totals = [...sourceTotals(projects).values()];
+  // Weekly figures cover measured days only; days lost at ingest are skipped.
+  const weekDays = periodDays(1, window.recentFrom, input.skip);
+  const referralDays = periodDays(
+    PUBLIC_DATA_REFERRER_WEEKS,
+    window.recentFrom,
+    input.skip
+  );
+  const totals = [...sourceTotals(projects, 1, weekDays).values()];
   // Assistants rank over four weeks; one week is too sparse for the floor.
   const referralTotals = [
-    ...sourceTotals(projects, PUBLIC_DATA_REFERRER_WEEKS).values(),
+    ...sourceTotals(
+      projects,
+      PUBLIC_DATA_REFERRER_WEEKS,
+      referralDays
+    ).values(),
   ];
   const referralSites = new Set(
     projects
@@ -753,6 +894,7 @@ export function buildPublicAiTrafficSnapshot(
     markdown,
     markdownSites,
     llmsTxt,
+    days: weekDays.recent,
   });
   const referrers = leaderboard({
     totals: referralTotals,
@@ -763,7 +905,7 @@ export function buildPublicAiTrafficSnapshot(
     markdown,
     markdownSites,
     llmsTxt,
-    days: PUBLIC_DATA_REFERRER_WEEKS * PUBLIC_DATA_RECENT_DAYS,
+    days: referralDays.recent,
   });
   const purposes = purposeShares(totals, categories);
 
@@ -829,20 +971,26 @@ export function buildPublicAiTrafficSnapshot(
     vendors: vendorRatios(totals),
     countries: detailCountries(detail),
     ...detailSection(detail),
-    crawlerVolume: dailyVolume({
-      daily: chartRows,
-      days,
-      kind: "crawler",
-      groupOf: (row) => bots.keyOf(sourceId("crawler", row.source)),
-      series: bots.series,
-    }),
-    referrerVolume: dailyVolume({
-      daily: chartRows,
-      days,
-      kind: "ai_referral",
-      groupOf: (row) => assistants.keyOf(sourceId("ai_referral", row.source)),
-      series: assistants.series,
-    }),
+    crawlerVolume: {
+      ...dailyVolume({
+        daily: chartRows,
+        days,
+        kind: "crawler",
+        groupOf: (row) => bots.keyOf(sourceId("crawler", row.source)),
+        series: bots.series,
+      }),
+      change: kindChange(totals, "crawler"),
+    },
+    referrerVolume: {
+      ...dailyVolume({
+        daily: chartRows,
+        days,
+        kind: "ai_referral",
+        groupOf: (row) => assistants.keyOf(sourceId("ai_referral", row.source)),
+        series: assistants.series,
+      }),
+      change: kindChange(totals, "ai_referral"),
+    },
     purposeVolume: dailyVolume({
       daily: chartRows,
       days,

@@ -3,6 +3,7 @@ import { defineEndpoint, node, p, t } from "@tinybirdco/sdk";
 import {
   GEO_EXCLUDED_SOURCES_PARAMS,
   GEO_EXCLUDED_SOURCES_SQL,
+  GEO_TRENDS_SKIPPED_WEEK,
 } from "../../constants/geo-queries";
 
 /**
@@ -30,6 +31,28 @@ const TRENDS_PARAMS = {
     ),
   ...GEO_EXCLUDED_SOURCES_PARAMS,
 };
+
+/** A range of days to leave out, e.g. lost at ingest. */
+const SKIP_PARAMS = {
+  skip_from: p
+    .string()
+    .optional("")
+    .describe(
+      "First day (YYYY-MM-DD) of a range to leave out, e.g. lost at ingest; empty for none"
+    ),
+  skip_to: p
+    .string()
+    .optional("")
+    .describe("Last day (YYYY-MM-DD) of that range, inclusive"),
+};
+
+/** True for a day inside the skip range; a range with one end missing skips nothing. */
+const SKIPPED_DAY_SQL = `(
+            {{String(skip_from, '')}} != ''
+            AND {{String(skip_to, '')}} != ''
+            AND day >= toDateOrNull({{String(skip_from, '')}})
+            AND day <= toDateOrNull({{String(skip_to, '')}})
+          )`;
 
 const TRENDS_FROM_SQL = "toDateOrNull({{String(date_from, '')}})";
 const TRENDS_TO_SQL = "toDateOrNull({{String(date_to, '')}})";
@@ -221,16 +244,7 @@ export const geoTrafficTrendsRolling = defineEndpoint(
         .describe(
           "Cap each site at this many times the median site's visits; 0 keeps raw counts"
         ),
-      skip_from: p
-        .string()
-        .optional("")
-        .describe(
-          "First day (YYYY-MM-DD) of a range to leave out, e.g. lost at ingest; empty for none"
-        ),
-      skip_to: p
-        .string()
-        .optional("")
-        .describe("Last day (YYYY-MM-DD) of that range, inclusive"),
+      ...SKIP_PARAMS,
     },
     nodes: [
       // Skipped days drop out of every window, so its average covers the
@@ -248,12 +262,7 @@ export const geoTrafficTrendsRolling = defineEndpoint(
           countIfMerge(markdown_visits_state) AS day_markdown_visits
         FROM geo_traffic_daily
         WHERE ${trendsScopeSql(`${TRENDS_FROM_SQL} - (${ROLLING_DAYS_SQL} - 1)`)}
-          AND (
-            {{String(skip_from, '')}} = ''
-            OR {{String(skip_to, '')}} = ''
-            OR day < toDateOrNull({{String(skip_from, '')}})
-            OR day > toDateOrNull({{String(skip_to, '')}})
-          )
+          AND NOT ${SKIPPED_DAY_SQL}
         GROUP BY day, visitor_type, source, project_id
       `,
       }),
@@ -408,8 +417,7 @@ export const geoTrafficTrendsRolling = defineEndpoint(
 export const geoTrafficTrendsProjects = defineEndpoint(
   "geo_traffic_trends_projects",
   {
-    description:
-      "AI crawler and referral visits per project, source and week: week 0 starts at recent_from, weeks 1 and up count back from it to baseline_from. Lists every project with AI traffic in the window, so callers can also exclude projects from geo_traffic_trends_daily.",
+    description: `AI crawler and referral visits per project, source and week: week 0 starts at recent_from, weeks 1 and up count back from it to baseline_from, and skipped days are week ${GEO_TRENDS_SKIPPED_WEEK}. Lists every project with AI traffic in the window, so callers can also exclude projects from geo_traffic_trends_daily.`,
     params: {
       ...TRENDS_PARAMS,
       baseline_from: p
@@ -418,6 +426,7 @@ export const geoTrafficTrendsProjects = defineEndpoint(
       recent_from: p
         .string()
         .describe("First day (YYYY-MM-DD) of the recent period"),
+      ...SKIP_PARAMS,
     },
     nodes: [
       node({
@@ -427,10 +436,14 @@ export const geoTrafficTrendsProjects = defineEndpoint(
           ${SITE_KEY_SQL} AS project_id,
           visitor_type,
           source,
-          toUInt32(greatest(
-            0,
-            intDiv(dateDiff('day', day, toDateOrNull({{String(recent_from, '')}})) + 6, 7)
-          )) AS weeks_ago,
+          if(
+            ${SKIPPED_DAY_SQL},
+            toUInt32(${GEO_TRENDS_SKIPPED_WEEK}),
+            toUInt32(greatest(
+              0,
+              intDiv(dateDiff('day', day, toDateOrNull({{String(recent_from, '')}})) + 6, 7)
+            ))
+          ) AS weeks_ago,
           countMerge(visits_state) AS visits,
           countIfMerge(markdown_visits_state) AS markdown_visits
         FROM geo_traffic_daily

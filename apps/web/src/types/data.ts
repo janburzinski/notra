@@ -25,7 +25,7 @@ export interface DataTraffic {
   recent: number | null;
   /** That week's last day ("Nov 5") when it ends before the chart does. */
   recentDay: string | null;
-  /** Change of that average against the 7 days before. */
+  /** Visit change against the 7 days before, over sites measured in both weeks. */
   change: number | null;
 }
 

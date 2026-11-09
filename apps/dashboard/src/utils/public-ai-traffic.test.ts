@@ -1,5 +1,7 @@
 import { expect, test } from "bun:test";
 
+import { GEO_TRENDS_SKIPPED_WEEK } from "@notra/analytics/constants/geo-queries";
+
 import type {
   PublicAiTrafficChartRow,
   PublicAiTrafficDailyRow,
@@ -561,4 +563,106 @@ test("charts a week once three sites had traffic in it", () => {
   expect(days.get("2026-11-01")?.total).toBe(25);
   expect(days.get("2026-11-01")?.s1).toBe(25);
   expect(days.get("2026-10-31")?.total).toBeNull();
+});
+
+test("charts each kind's change over sites measured in both weeks", () => {
+  // Six sites start measuring this week: the per-site average falls, but
+  // the sites measured in both weeks saw more crawls.
+  const newSites = Array.from({ length: 6 }, (_, index) => `n${index}`);
+  const snapshot = buildPublicAiTrafficSnapshot({
+    today: TODAY,
+    generatedAt: "2026-11-02T00:20:00.000Z",
+    daily,
+    projects: [
+      ...projects,
+      ...projectRows("crawler", "GPTBot", newSites, { recent: 1, previous: 0 }),
+    ],
+  });
+
+  // (12 × 70 + 6 × 35) / (12 × 35 + 6 × 35) − 1
+  expect(snapshot.crawlerVolume.change).toBe(0.6667);
+  expect(snapshot.referrerVolume.change).toBe(0);
+  expect(snapshot.purposeVolume.change).toBeUndefined();
+});
+
+test("withholds a kind's change when too few sites were measured in both weeks", () => {
+  const snapshot = buildPublicAiTrafficSnapshot({
+    today: TODAY,
+    generatedAt: "2026-11-02T00:20:00.000Z",
+    daily,
+    projects: [
+      ...projectRows("crawler", "GPTBot", SITES, { recent: 70, previous: 0 }),
+      ...projectRows("ai_referral", "chatgpt", SITES.slice(0, 2), {
+        recent: 7,
+        previous: 7,
+      }),
+    ],
+  });
+
+  expect(snapshot.crawlerVolume.change).toBeNull();
+  expect(snapshot.referrerVolume.change).toBeNull();
+});
+
+/** One crawler's rows per site: `[weeks_ago, visits]` pairs. */
+function weekRows(
+  source: string,
+  sites: string[],
+  weeks: [number, number][]
+): PublicAiTrafficProjectRow[] {
+  return sites.flatMap((projectId) =>
+    weeks.map(([weeksAgo, visits]) => ({
+      project_id: projectId,
+      visitor_type: "crawler",
+      source,
+      weeks_ago: weeksAgo,
+      visits,
+      markdown_visits: 0,
+    }))
+  );
+}
+
+const STEADY = Array.from({ length: 10 }, (_, index) => `s${index}`);
+const JOINED = Array.from({ length: 11 }, (_, index) => `j${index}`);
+
+test("keeps a steady change flat when many small sites start measuring", () => {
+  // The joined sites pull this week's median from 70 to 1; a per-week cap
+  // would clip every steady site to 5 and read as a 93% drop.
+  const snapshot = buildPublicAiTrafficSnapshot({
+    today: "2026-11-09",
+    generatedAt: "2026-11-09T00:20:00.000Z",
+    daily,
+    projects: [
+      ...weekRows("GPTBot", STEADY, [
+        [0, 70],
+        [1, 70],
+      ]),
+      ...weekRows("GPTBot", JOINED, [[0, 1]]),
+    ],
+  });
+
+  expect(snapshot.crawlers[0]?.change).toBe(0);
+  expect(snapshot.crawlerVolume.change).toBe(0);
+});
+
+test("compares visits per measured day around days lost at ingest", () => {
+  // Published Nov 9: this week (Nov 2–8) lost 3 days, the week before
+  // (Oct 26–Nov 1) lost 2. Ten visits on every measured day is no change.
+  const snapshot = buildPublicAiTrafficSnapshot({
+    today: "2026-11-09",
+    generatedAt: "2026-11-09T00:20:00.000Z",
+    daily,
+    skip: { from: "2026-10-31", to: "2026-11-04" },
+    projects: weekRows("GPTBot", STEADY, [
+      [0, 40],
+      [1, 50],
+      // What arrived on the lost days counts in no period.
+      [GEO_TRENDS_SKIPPED_WEEK, 5000],
+    ]),
+  });
+  const gpt = snapshot.crawlers[0];
+
+  expect(gpt?.change).toBe(0);
+  expect(gpt?.dailyPerSite).toBe(10);
+  expect(gpt?.medianDailyVisits).toBe(10);
+  expect(snapshot.crawlerVolume.change).toBe(0);
 });

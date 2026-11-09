@@ -31,7 +31,8 @@ export const PUBLIC_DATA_MIN_SITES = 3;
 export const TRAFFIC_ORG_SITE_PREFIX = "org:";
 /**
  * Days most AI traffic events were lost at ingest: a retired signing secret
- * rejected older tracking tokens. The chart's rolling windows leave them out.
+ * rejected older tracking tokens. The chart's rolling windows and the weekly
+ * comparisons leave them out, and per-day figures count only measured days.
  */
 export const PUBLIC_DATA_INGEST_GAP = { from: "2026-10-31", to: "2026-11-04" };
 /** Below this many measured sites nothing is published at all. */
