@@ -22,6 +22,10 @@ test("compact posts show when they were last edited and a mobile table of conten
       join(siteRoot, "blog/first.mdx"),
       '---\ntitle: "First"\ndate: 2026-10-01\n---\n\nNever updated.\n'
     );
+    await writeFile(
+      join(siteRoot, "blog/same-day.mdx"),
+      '---\ntitle: "Same day"\ndate: 2026-10-05\nupdated: 2026-10-05\n---\n\nFixed a typo.\n'
+    );
     const target = siteBuildRequestSchema.parse({
       siteId: "compact-post-test",
       deploymentId: "test",
@@ -64,6 +68,10 @@ test("compact posts show when they were last edited and a mobile table of conten
         expect(html).not.toContain("· Updated");
         expect(
           await readFile(join(outDir, "blog/first/index.html"), "utf8")
+        ).not.toContain("Last edited");
+        // An update on the publish day is not shown, as in the default header.
+        expect(
+          await readFile(join(outDir, "blog/same-day/index.html"), "utf8")
         ).not.toContain("Last edited");
       } else {
         expect(html).not.toContain("Last edited");
