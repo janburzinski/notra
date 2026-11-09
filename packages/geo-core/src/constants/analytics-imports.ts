@@ -144,6 +144,13 @@ export const CLOUDFLARE_USER_AGENT_FILTER_SIZE = 35;
 export const CLOUDFLARE_MIN_SPLIT_MS = 60 * 60 * 1000;
 export const CLOUDFLARE_DAY_SPLIT_MS = 24 * CLOUDFLARE_MIN_SPLIT_MS;
 export const CLOUDFLARE_RATE_LIMIT_RETRY_SECONDS = 300;
+/**
+ * Cloudflare answers a malformed or unknown token with 400 and one of these
+ * error codes (invalid request headers, invalid Authorization header, invalid
+ * access token, authentication error) instead of 401 or 403.
+ */
+export const CLOUDFLARE_AUTH_ERROR_CODE_PATTERN =
+  /"code":\s*(?:6003|6111|9106|9109|10000)\b/;
 /** Waits for a 429 without timing headers, per provider. */
 export const IMPORT_RETRY_AFTER_FALLBACK_SECONDS: Readonly<
   Record<string, number>

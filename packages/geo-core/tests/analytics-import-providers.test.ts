@@ -306,7 +306,7 @@ describe("Plausible CSV export", () => {
         strToU8(VISITORS_HEADER);
     }
     const { detail } = await rejection(bytesToChunks(zipSync(files)));
-    expect(detail).toBe("more than 32 files");
+    expect(detail).toBe("This ZIP has more than 32 files");
   });
 
   test.each([
@@ -557,6 +557,26 @@ describe("rate limits", () => {
 });
 
 describe("Cloudflare", () => {
+  test("a 400 for a malformed token is an auth error, other 400s are not", async () => {
+    const answer = (code: number) =>
+      fakeFetch(
+        () =>
+          new Response(
+            JSON.stringify({
+              success: false,
+              errors: [{ code, message: "x" }],
+            }),
+            { status: 400 }
+          )
+      ).fetch;
+    await expect(
+      listCloudflareSources(CLOUDFLARE, answer(6003))
+    ).rejects.toBeInstanceOf(ImportAuthError);
+    await expect(
+      listCloudflareSources(CLOUDFLARE, answer(7003))
+    ).rejects.toBeInstanceOf(ImportProviderError);
+  });
+
   test("lists zones and Web Analytics sites", async () => {
     const { fetch } = fakeFetch((call) => ({
       success: true,

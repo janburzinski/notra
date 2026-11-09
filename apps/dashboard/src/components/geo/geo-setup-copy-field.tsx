@@ -42,8 +42,10 @@ export function GeoSetupCopyField({
       <CopyButton
         aria-label={tCommon("labels.copyLabel", { label })}
         className="text-muted-foreground"
+        copiedAriaLabel={tCommon("labels.labelCopied", { label })}
         onCopy={onCopy}
         onCopyError={toastCopyError}
+        size="icon-xs"
         value={value}
       />
     </div>

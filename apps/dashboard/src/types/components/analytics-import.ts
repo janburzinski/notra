@@ -180,6 +180,14 @@ export interface ImportConnectStepProps {
   onConnected: (connectionId: string) => void;
 }
 
+export interface ImportSecretFieldProps {
+  provider: AnalyticsImportConnectionProvider;
+  value: string;
+  /** A failed connect; `count` re-announces the same error. */
+  error: ImportZipFieldError | null;
+  onChange: (value: string) => void;
+}
+
 export interface ImportSourceStepProps {
   organizationId: string;
   projectId: string;

@@ -3,7 +3,6 @@
 import { ResponsiveDialogFooter } from "@notra/ui/components/shared/responsive-dialog";
 import { Input } from "@notra/ui/components/ui/input";
 import { useId, useState } from "react";
-import { toast } from "sonner";
 import { useTranslations } from "use-intl";
 
 import { Button } from "@/components/button";
@@ -16,11 +15,52 @@ import {
   ANALYTICS_IMPORT_PROVIDER_URLS,
 } from "@/constants/analytics-imports";
 import { useAnalyticsImportMutations } from "@/lib/hooks/use-analytics-imports";
-import type { ImportConnectStepProps } from "@/types/components/analytics-import";
+import type {
+  ImportConnectStepProps,
+  ImportSecretFieldProps,
+  ImportZipFieldError,
+} from "@/types/components/analytics-import";
 import { toErrorMessage } from "@/utils/error-message";
 
 import { ImportProviderLogo } from "./import-provider-mark";
 import { ImportSavedConnections } from "./import-saved-connections";
+
+/** The key or token input, with the last connect error under it. */
+function ImportSecretField({
+  provider,
+  value,
+  error,
+  onChange,
+}: ImportSecretFieldProps) {
+  const t = useTranslations("geo.analyticsImport.connect");
+  const id = useId();
+  const errorId = useId();
+  return (
+    <>
+      <Input
+        aria-describedby={errorId}
+        aria-invalid={error ? true : undefined}
+        aria-label={
+          provider === "plausible" ? t("secretLabel") : t("tokenLabel")
+        }
+        autoComplete="off"
+        id={id}
+        onChange={(event) => onChange(event.target.value)}
+        spellCheck={false}
+        type="password"
+        value={value}
+      />
+      {/* Always present, so each new error is announced, a repeat included. */}
+      <p
+        aria-live="assertive"
+        className="text-destructive text-xs text-pretty [&:not(:empty)]:mt-1.5"
+        id={errorId}
+      >
+        {error ? <span key={error.count}>{error.text}</span> : null}
+      </p>
+    </>
+  );
+}
 
 export function ImportConnectStep({
   organizationId,
@@ -32,9 +72,9 @@ export function ImportConnectStep({
 }: ImportConnectStepProps) {
   const t = useTranslations("geo.analyticsImport");
   const formId = useId();
-  const secretId = useId();
   const teamId = useId();
   const [secret, setSecret] = useState("");
+  const [error, setError] = useState<ImportZipFieldError | null>(null);
   const [team, setTeam] = useState("");
   const { connect } = useAnalyticsImportMutations(organizationId);
   const name = ANALYTICS_IMPORT_PROVIDER_BRANDS[provider];
@@ -61,8 +101,11 @@ export function ImportConnectStep({
           setSecret("");
           onConnected(connection.id);
         },
-        onError: (error) =>
-          toast.error(toErrorMessage(error, t("connect.failed"))),
+        onError: (cause) =>
+          setError((previous) => ({
+            text: toErrorMessage(cause, t("connect.failed")),
+            count: (previous?.count ?? 0) + 1,
+          })),
       }
     );
   };
@@ -143,17 +186,13 @@ export function ImportConnectStep({
                   : t("connect.pasteToken")
               }
             >
-              <Input
-                aria-label={
-                  provider === "plausible"
-                    ? t("connect.secretLabel")
-                    : t("connect.tokenLabel")
-                }
-                autoComplete="off"
-                id={secretId}
-                onChange={(event) => setSecret(event.target.value)}
-                spellCheck={false}
-                type="password"
+              <ImportSecretField
+                error={error}
+                onChange={(next) => {
+                  setSecret(next);
+                  setError(null);
+                }}
+                provider={provider}
                 value={secret}
               />
             </GeoSetupStep>

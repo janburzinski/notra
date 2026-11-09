@@ -136,7 +136,7 @@ export function describeImportError(error: unknown): string {
     return `${error.provider} error${error.status ? ` ${error.status}` : ""}: ${error.detail}`;
   }
   if (error instanceof ImportFileError) {
-    return `${error.file}: ${error.detail}`;
+    return error.file ? `${error.file}: ${error.detail}` : error.detail;
   }
   return error instanceof Error ? error.message : String(error);
 }

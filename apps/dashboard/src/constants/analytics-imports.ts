@@ -48,6 +48,9 @@ export const ANALYTICS_IMPORT_INLINE_MAX_BYTES = 50 * 1024 * 1024;
 /** Error data of a problem with the uploaded export, shown under the file field. */
 export const ANALYTICS_IMPORT_FILE_ERROR_DATA = { field: "file" } as const;
 export const ANALYTICS_IMPORT_POLL_MS = 3000;
+/** Shorter import periods are described in days, longer ones in months. */
+export const ANALYTICS_IMPORT_SPAN_MIN_MONTH_DAYS = 60;
+export const ANALYTICS_IMPORT_AVERAGE_MONTH_DAYS = 30.44;
 /** localStorage key of imports whose completion was already announced. */
 export const ANALYTICS_IMPORT_NOTICE_STORAGE_KEY =
   "notra:analytics-import-notices";

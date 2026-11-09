@@ -160,6 +160,8 @@ export interface ImportRangeBase {
   host: string;
   kind: ImportKind;
   cutoffDay: string;
+  /** The first day Notra tracked the host (today at the latest), or null before any traffic. */
+  nativeStartDay: string | null;
 }
 
 /** Days an import of the same project, kind and domain scope already has. */
@@ -172,7 +174,6 @@ export interface CoveredImport extends ImportDayRange {
 }
 
 export interface ImportRangePlan extends ImportRangeBase {
-  nativeStartDay: string | null;
   /** The days this import writes, for the chosen overlap mode. */
   range: ImportDayRange | null;
   /** Days another import already covers were left out. */

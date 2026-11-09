@@ -186,11 +186,20 @@ if (process.env.NOTRA_ANALYTICS_IMPORTS_SANDBOX_TEST !== "1") {
 
   const workflows = await import("../src/lib/workflows/start");
   const startedRuns: string[] = [];
+  const deleteRuns: string[] = [];
   mock.module("../src/lib/workflows/start", () => ({
     ...workflows,
     startAnalyticsImportRun: async ({ importId }: { importId: string }) => {
       startedRuns.push(importId);
       return { runId: "run-test" };
+    },
+    startAnalyticsImportDeleteRun: async ({
+      importId,
+    }: {
+      importId: string;
+    }) => {
+      deleteRuns.push(importId);
+      return { runId: "run-delete" };
     },
   }));
   const runStates = new Map<string, string>();
@@ -346,6 +355,7 @@ if (process.env.NOTRA_ANALYTICS_IMPORTS_SANDBOX_TEST !== "1") {
     webAnalyticsState = "enabled";
     flagChecks.length = 0;
     startedRuns.length = 0;
+    deleteRuns.length = 0;
     runStates.clear();
     wokenRuns.length = 0;
   });
@@ -639,7 +649,9 @@ if (process.env.NOTRA_ANALYTICS_IMPORTS_SANDBOX_TEST !== "1") {
       await runner.runAnalyticsImportInline(row.id, new Uint8Array([1, 2, 3]));
       const saved = await loadImport(row.id);
       expect(saved?.status).toBe("failed");
-      expect(saved?.lastError).toContain("no imported_*.csv files");
+      expect(saved?.lastError).toBe(
+        "This ZIP has no files from Plausible's CSV export"
+      );
       expect(purges).toEqual([{ organizationId: "org-a", importId: row.id }]);
     });
 
@@ -1147,5 +1159,24 @@ if (process.env.NOTRA_ANALYTICS_IMPORTS_SANDBOX_TEST !== "1") {
       status: "failed",
       lastError: ANALYTICS_IMPORT_LOST_UPLOAD_ERROR,
     });
+  });
+
+  test("recovery starts a lost delete again, once per stale window", async () => {
+    const row = await createCsvImport("stuck.example");
+    await imports.markImportDeleting("org-a", row.id);
+    const later = Date.now() + 60 * 60 * 1000;
+    expect(await recoverAnalyticsImports()).toMatchObject({ restarted: 0 });
+    // Two sweeps that overlap claim the row once.
+    const sweeps = await Promise.all([
+      recoverAnalyticsImports(later),
+      recoverAnalyticsImports(later),
+    ]);
+    expect(sweeps.reduce((sum, sweep) => sum + sweep.restarted, 0)).toBe(1);
+    expect(deleteRuns).toEqual([row.id]);
+    // The retry touched the row, so the next sweep waits again.
+    expect(await recoverAnalyticsImports(Date.now())).toMatchObject({
+      restarted: 0,
+    });
+    expect(deleteRuns).toEqual([row.id]);
   });
 }

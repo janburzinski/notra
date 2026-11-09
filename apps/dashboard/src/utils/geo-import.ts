@@ -30,7 +30,8 @@ export function formatCsvFileSize(bytes: number, locale: string): string {
     new Intl.NumberFormat(locale, {
       style: "unit",
       unit,
-      unitDisplay: "short",
+      // The short byte unit does not pluralize in English ("6 byte").
+      unitDisplay: unit === "byte" ? "long" : "short",
       maximumFractionDigits,
     }).format(value);
   if (bytes < 1024) {

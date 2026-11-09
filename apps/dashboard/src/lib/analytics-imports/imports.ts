@@ -25,6 +25,7 @@ import {
 import {
   importCutoffDay,
   monthChunks,
+  NATIVE_EPOCH_DAY,
   pageviewsInRange,
   resolveImportRange,
   sharedDays,
@@ -92,14 +93,15 @@ export async function projectBelongsTo(
 /**
  * The first day of native traffic for the host, read live from Tinybird.
  * Without an answer the cut-off is unknown, so nothing is imported rather
- * than risking days Notra already counted.
+ * than risking days Notra already counted. `nativeStartDay` is null only when
+ * Notra has no traffic for the host at all, including traffic from today.
  */
 async function cutoffFor(
   organizationId: string,
   projectId: string,
   host: string,
   kind: ImportKind
-): Promise<string> {
+): Promise<Pick<ImportRangeBase, "cutoffDay" | "nativeStartDay">> {
   const today = toDay(new Date());
   const result = await queryWebNativeFirstDay({
     organization_id: organizationId,
@@ -112,10 +114,13 @@ async function cutoffFor(
     );
   }
   const row = result.data[0];
-  return importCutoffDay(
-    [kind === "web" ? row?.web_first_day : row?.geo_first_day],
-    today
-  );
+  const firstDay = kind === "web" ? row?.web_first_day : row?.geo_first_day;
+  const cutoffDay = importCutoffDay([firstDay], today);
+  return {
+    cutoffDay,
+    nativeStartDay:
+      firstDay && firstDay !== NATIVE_EPOCH_DAY ? cutoffDay : null,
+  };
 }
 
 async function rangeBase(
@@ -129,12 +134,7 @@ async function rangeBase(
   return {
     host,
     kind,
-    cutoffDay: await cutoffFor(
-      input.organizationId,
-      input.projectId,
-      host,
-      kind
-    ),
+    ...(await cutoffFor(input.organizationId, input.projectId, host, kind)),
   };
 }
 
@@ -229,7 +229,6 @@ function resolvePlan(
   const range = input.overlap === "add" ? added : skipped;
   return {
     ...base,
-    nativeStartDay: base.cutoffDay < toDay(new Date()) ? base.cutoffDay : null,
     range,
     clipped: !sameRange(unclipped, range),
     skipped,

@@ -209,8 +209,8 @@ export async function parsePlausibleCsvZip(
     if (entries > IMPORT_CSV_MAX_ENTRIES) {
       fail(
         new ImportFileError({
-          file: "export.zip",
-          detail: `more than ${IMPORT_CSV_MAX_ENTRIES} files`,
+          file: "",
+          detail: `This ZIP has more than ${IMPORT_CSV_MAX_ENTRIES} files`,
         })
       );
       return;
@@ -306,12 +306,12 @@ export async function parsePlausibleCsvZip(
   await flush();
   if (summary.files.length === 0) {
     throw new ImportFileError({
-      file: "export.zip",
-      detail: "no imported_*.csv files found",
+      file: "",
+      detail: "This ZIP has no files from Plausible's CSV export",
     });
   }
   if (open > 0) {
-    throw new ImportFileError({ file: "export.zip", detail: "truncated ZIP" });
+    throw new ImportFileError({ file: "", detail: "This ZIP is incomplete" });
   }
   return summary;
 }

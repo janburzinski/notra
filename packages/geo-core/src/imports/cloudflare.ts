@@ -3,6 +3,7 @@ import type { z } from "zod";
 
 import {
   CLOUDFLARE_API_URL,
+  CLOUDFLARE_AUTH_ERROR_CODE_PATTERN,
   CLOUDFLARE_CRAWLER_DATASET,
   CLOUDFLARE_DAY_SPLIT_MS,
   CLOUDFLARE_LIST_MAX_PAGES,
@@ -71,6 +72,27 @@ function headers(credentials: CloudflareCredentials) {
   };
 }
 
+/** {@link importRequest}, with Cloudflare's 400 answers to a bad token as auth errors. */
+async function cloudflareRequest<T>(
+  url: string,
+  init: RequestInit,
+  schema: z.ZodType<T>,
+  fetchImpl?: ImportFetch
+): Promise<T> {
+  try {
+    return await importRequest(PROVIDER, url, init, schema, fetchImpl);
+  } catch (error) {
+    if (
+      error instanceof ImportProviderError &&
+      error.status === 400 &&
+      CLOUDFLARE_AUTH_ERROR_CODE_PATTERN.test(error.detail)
+    ) {
+      throw new ImportAuthError({ provider: PROVIDER, status: error.status });
+    }
+    throw error;
+  }
+}
+
 /** userAgent filters built from the AI crawler signatures we classify live. */
 export function cloudflareUserAgentFilters(): Record<string, string>[][] {
   const filters = AI_AGENT_SIGNATURES.flatMap((signature) =>
@@ -101,8 +123,7 @@ async function graphqlValue<T>(
   schema: z.ZodType<T>,
   fetchImpl?: ImportFetch
 ): Promise<T> {
-  const response = await importRequest(
-    PROVIDER,
+  const response = await cloudflareRequest(
     `${CLOUDFLARE_API_URL}/graphql`,
     {
       method: "POST",
@@ -182,8 +203,7 @@ async function listAll<TItem>(
       const url = new URL(`${CLOUDFLARE_API_URL}${path}`);
       url.searchParams.set("page", String(page));
       url.searchParams.set("per_page", String(CLOUDFLARE_LIST_PAGE_SIZE));
-      const response = await importRequest(
-        PROVIDER,
+      const response = await cloudflareRequest(
         url.toString(),
         { headers: headers(credentials) },
         schema,

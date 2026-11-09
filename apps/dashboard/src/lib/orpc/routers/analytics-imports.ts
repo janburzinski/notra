@@ -29,6 +29,7 @@ import {
 import {
   ANALYTICS_IMPORT_FILE_ERROR_DATA,
   ANALYTICS_IMPORT_INLINE_MAX_BYTES,
+  ANALYTICS_IMPORT_PROVIDER_BRANDS,
   ANALYTICS_IMPORT_PROVIDER_LABELS,
 } from "@/constants/analytics-imports";
 import { runAfterResponse } from "@/lib/after-response";
@@ -99,8 +100,15 @@ function toClientError(error: unknown): never {
     throw badRequest(error.message);
   }
   if (error instanceof ImportAuthError) {
+    const brand =
+      error.provider in ANALYTICS_IMPORT_PROVIDER_BRANDS
+        ? ANALYTICS_IMPORT_PROVIDER_BRANDS[
+            error.provider as keyof typeof ANALYTICS_IMPORT_PROVIDER_BRANDS
+          ]
+        : "The provider";
+    const secret = error.provider === "plausible" ? "key" : "token";
     throw badRequest(
-      "The provider rejected this key. Check that it is valid and has read access to analytics."
+      `${brand} rejected this ${secret}. Check that it is valid and has read access to analytics.`
     );
   }
   if (error instanceof ImportRateLimitedError) {

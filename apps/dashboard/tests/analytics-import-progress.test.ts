@@ -11,7 +11,7 @@ import {
   shownImport,
   viewImportedAnalytics,
 } from "../src/utils/analytics-import-progress";
-import { zipRejectionReason } from "../src/utils/analytics-imports";
+import { importSpan, zipRejectionReason } from "../src/utils/analytics-imports";
 
 const base: AnalyticsImportSummary = {
   id: "imp_1",
@@ -215,7 +215,7 @@ describe("View analytics", () => {
   });
 });
 
-test("small helpers: ZIP rejections, whole months and countdowns", () => {
+test("small helpers: ZIP rejections, whole months, spans and countdowns", () => {
   const rejection = (...codes: string[]) =>
     zipRejectionReason(codes.map((code) => ({ errors: [{ code }] })));
   expect(rejection("too-many-files", "too-many-files")).toBe("tooManyFiles");
@@ -223,6 +223,22 @@ test("small helpers: ZIP rejections, whole months and countdowns", () => {
   expect(rejection("file-invalid-type")).toBe("rejected");
   expect(isWholeMonth("2026-02-01", "2026-02-28")).toBe(true);
   expect(isWholeMonth("2026-07-12", "2026-07-31")).toBe(false);
+  expect(importSpan("2026-11-08", "2026-11-08")).toEqual({
+    unit: "days",
+    count: 1,
+  });
+  expect(importSpan("2026-10-09", "2026-11-08")).toEqual({
+    unit: "days",
+    count: 31,
+  });
+  expect(importSpan("2026-07-10", "2026-11-06")).toEqual({
+    unit: "months",
+    count: 4,
+  });
+  expect(importSpan("2024-11-09", "2026-11-08")).toEqual({
+    unit: "months",
+    count: 24,
+  });
   expect(secondsUntil(null, 0)).toBe(0);
   expect(secondsUntil("1970-01-01T00:00:41.200Z", 0)).toBe(42);
   expect(secondsUntil("1970-01-01T00:00:01.000Z", 5000)).toBe(0);

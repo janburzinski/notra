@@ -2,7 +2,11 @@ import { ANALYTICS_IMPORT_ACTIVE_STATUSES } from "@notra/db/constants/analytics-
 import { isRecord } from "@notra/utils/unknown-record";
 import type { useFormatter } from "use-intl";
 
-import { ANALYTICS_IMPORT_FILE_ERROR_DATA } from "@/constants/analytics-imports";
+import {
+  ANALYTICS_IMPORT_AVERAGE_MONTH_DAYS,
+  ANALYTICS_IMPORT_FILE_ERROR_DATA,
+  ANALYTICS_IMPORT_SPAN_MIN_MONTH_DAYS,
+} from "@/constants/analytics-imports";
 import type {
   AnalyticsImportAddedRange,
   AnalyticsImportOverlapMode,
@@ -60,6 +64,21 @@ export function importProgress(
     return 0;
   }
   return Math.min(100, Math.round((chunksDone / chunksTotal) * 100));
+}
+
+/** How long an import period lasts, in days or, from two months on, rounded months. */
+export function importSpan(
+  startDay: string,
+  endDay: string
+): { unit: "days" | "months"; count: number } {
+  const days = (Date.parse(endDay) - Date.parse(startDay)) / 86_400_000 + 1;
+  if (days < ANALYTICS_IMPORT_SPAN_MIN_MONTH_DAYS) {
+    return { unit: "days", count: days };
+  }
+  return {
+    unit: "months",
+    count: Math.round(days / ANALYTICS_IMPORT_AVERAGE_MONTH_DAYS),
+  };
 }
 
 /** The days a preview would import with the chosen overlap mode. */

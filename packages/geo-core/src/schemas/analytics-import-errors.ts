@@ -23,7 +23,7 @@ export class ImportProviderError extends Schema.TaggedError<ImportProviderError>
   }
 ) {}
 
-/** An uploaded export is not in the expected format. */
+/** An uploaded export is not in the expected format. `file` is empty for the ZIP as a whole. */
 export class ImportFileError extends Schema.TaggedError<ImportFileError>()(
   "ImportFileError",
   { file: Schema.String, detail: Schema.String }

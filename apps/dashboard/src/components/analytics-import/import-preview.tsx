@@ -21,7 +21,11 @@ import type {
   ImportPreviewPageviewsProps,
   ImportPreviewProps,
 } from "@/types/components/analytics-import";
-import { formatImportDay, previewRange } from "@/utils/analytics-imports";
+import {
+  formatImportDay,
+  importSpan,
+  previewRange,
+} from "@/utils/analytics-imports";
 
 import { ImportFrame } from "./import-frame";
 
@@ -147,6 +151,10 @@ export function ImportPreview({
   const format = useFormatter();
   const date = (day: string) => formatImportDay(format, day);
   const range = previewRange(preview, overlap);
+  const span =
+    range.startDay && range.endDay
+      ? importSpan(range.startDay, range.endDay)
+      : null;
 
   if (preview.overlaps.length === 0 && !(range.startDay && range.endDay)) {
     return <ImportPreviewEmpty alreadyImported={preview.alreadyImported} />;
@@ -188,7 +196,7 @@ export function ImportPreview({
               })}
               <span className="text-muted-foreground font-normal">
                 {" · "}
-                {t("months", { count: range.months })}
+                {span ? t(span.unit, { count: span.count }) : null}
               </span>
             </dd>
           ) : (

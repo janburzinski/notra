@@ -2,6 +2,7 @@
 
 import { MoreHorizontalIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
+import { ConfirmDialog } from "@notra/ui/components/shared/confirm-dialog";
 import { StatusBadge } from "@notra/ui/components/status-badge";
 import {
   DropdownMenu,
@@ -10,6 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "@notra/ui/components/ui/dropdown-menu";
 import { Progress } from "@notra/ui/components/ui/progress";
+import { useState } from "react";
 import { toast } from "sonner";
 import { useFormatter, useTranslations } from "use-intl";
 
@@ -134,6 +136,7 @@ function ImportRow({
 }: ImportRowProps) {
   const t = useTranslations("geo.analyticsImport.list");
   const { remove } = useAnalyticsImportMutations(organizationId);
+  const [confirming, setConfirming] = useState(false);
   const badge = ANALYTICS_IMPORT_STATUS_BADGES[item.status];
   const knownError = item.lastError
     ? ANALYTICS_IMPORT_KNOWN_ERRORS[item.lastError]
@@ -179,23 +182,37 @@ function ImportRow({
         ) : null}
       </div>
       {canManage ? (
-        <ImportRowMenu
-          disabled={item.status === "deleting" || remove.isPending}
-          label={t("actions", { name: item.host })}
-        >
-          <DropdownMenuItem
-            onClick={() =>
-              remove.mutate(item.id, {
-                onSuccess: () => toast.success(t("deleted")),
-                onError: (error) =>
-                  toast.error(toErrorMessage(error, t("deleteFailed"))),
-              })
-            }
-            variant="destructive"
+        <>
+          <ImportRowMenu
+            disabled={item.status === "deleting" || remove.isPending}
+            label={t("actions", { name: item.host })}
           >
-            {t("delete")}
-          </DropdownMenuItem>
-        </ImportRowMenu>
+            <DropdownMenuItem
+              onClick={() => setConfirming(true)}
+              variant="destructive"
+            >
+              {t("delete")}
+            </DropdownMenuItem>
+          </ImportRowMenu>
+          <ConfirmDialog
+            confirmLabel={t("delete")}
+            description={t("deleteDescription")}
+            onConfirm={() =>
+              remove.mutateAsync(item.id).then(
+                () => {
+                  setConfirming(false);
+                  toast.success(t("deleted"));
+                },
+                (error: unknown) =>
+                  toast.error(toErrorMessage(error, t("deleteFailed")))
+              )
+            }
+            onOpenChange={setConfirming}
+            open={confirming}
+            title={t("deleteTitle", { name: item.host })}
+            variant="destructive"
+          />
+        </>
       ) : null}
     </li>
   );
@@ -210,6 +227,7 @@ function ImportConnectionRow({
   const t = useTranslations("geo.analyticsImport.list");
   const format = useFormatter();
   const { disconnect } = useAnalyticsImportMutations(organizationId);
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
   const providerName = ANALYTICS_IMPORT_PROVIDER_LABELS[connection.provider];
   const connectedOn = t("connectedOn", {
     date: format.dateTime(new Date(connection.createdAt), {
@@ -218,13 +236,13 @@ function ImportConnectionRow({
   });
   const needsReauth = connection.status === "reauth_required";
   const remove = (deleteImports: boolean) =>
-    disconnect.mutate(
-      { connectionId: connection.id, deleteImports },
-      {
-        onSuccess: () => toast.success(t("disconnected")),
-        onError: (error) =>
-          toast.error(toErrorMessage(error, t("disconnectFailed"))),
-      }
+    disconnect.mutateAsync({ connectionId: connection.id, deleteImports }).then(
+      () => {
+        setConfirmingDelete(false);
+        toast.success(t("disconnected"));
+      },
+      (error: unknown) =>
+        toast.error(toErrorMessage(error, t("disconnectFailed")))
     );
 
   return (
@@ -246,22 +264,36 @@ function ImportConnectionRow({
         </span>
       </div>
       {canManage ? (
-        <ImportRowMenu
-          disabled={disconnect.isPending}
-          label={t("actions", { name: connection.label })}
-        >
-          {needsReauth && onReconnect ? (
-            <DropdownMenuItem onClick={() => onReconnect(connection)}>
-              {t("reconnect")}
+        <>
+          <ImportRowMenu
+            disabled={disconnect.isPending}
+            label={t("actions", { name: connection.label })}
+          >
+            {needsReauth && onReconnect ? (
+              <DropdownMenuItem onClick={() => onReconnect(connection)}>
+                {t("reconnect")}
+              </DropdownMenuItem>
+            ) : null}
+            <DropdownMenuItem onClick={() => remove(false)}>
+              {t("disconnect")}
             </DropdownMenuItem>
-          ) : null}
-          <DropdownMenuItem onClick={() => remove(false)}>
-            {t("disconnect")}
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => remove(true)} variant="destructive">
-            {t("disconnectAndDelete")}
-          </DropdownMenuItem>
-        </ImportRowMenu>
+            <DropdownMenuItem
+              onClick={() => setConfirmingDelete(true)}
+              variant="destructive"
+            >
+              {t("disconnectAndDelete")}
+            </DropdownMenuItem>
+          </ImportRowMenu>
+          <ConfirmDialog
+            confirmLabel={t("disconnectAndDelete")}
+            description={t("disconnectAndDeleteDescription")}
+            onConfirm={() => remove(true)}
+            onOpenChange={setConfirmingDelete}
+            open={confirmingDelete}
+            title={t("disconnectAndDeleteTitle", { name: connection.label })}
+            variant="destructive"
+          />
+        </>
       ) : null}
     </li>
   );
