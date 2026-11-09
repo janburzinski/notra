@@ -61,7 +61,7 @@ export function createGetGeoOverviewTool() {
             visibility: row.visibility,
             visibility_rate: row.visibilityRate,
             avg_position: row.avgPosition,
-            last_checked_at: row.lastCheckedAt,
+            last_checked_at: row.lastCheckedAt.toISOString(),
           })),
           competitor_share: competitors.map((row) => ({
             brand: row.brand,

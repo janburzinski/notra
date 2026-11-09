@@ -102,8 +102,32 @@ mock.module("@notra/ai/utils/web-analytics-access", () => ({
     Effect.sync(() => (webAnalyticsEnabled ? "enabled" : "disabled")),
 }));
 
-const { getAiTrafficInputSchema, getWebAnalyticsReportsInputSchema } =
-  await import("@notra/tools/schemas/analytics-tools");
+mock.module("@notra/db/utils/geo-checks", () => ({
+  queryGeoCheckOverview: async () => [
+    {
+      engine: "chatgpt",
+      checks: 10,
+      mentions: 4,
+      mentionRate: 0.4,
+      citations: 2,
+      visibility: 5,
+      visibilityRate: 0.5,
+      avgPosition: 2.5,
+      lastCheckedAt: new Date("2026-11-02T10:00:00.000Z"),
+    },
+  ],
+  queryGeoCheckCompetitorShare: async () => [{ brand: "Rival", mentions: 3 }],
+  queryGeoCheckTimeseries: async () => [],
+  toGeoCheckWindow: () => undefined,
+}));
+
+const {
+  getAiTrafficInputSchema,
+  getGeoOverviewInputSchema,
+  getWebAnalyticsReportsInputSchema,
+} = await import("@notra/tools/schemas/analytics-tools");
+const { createGetGeoOverviewTool } =
+  await import("@notra/tools/analytics/get-geo-overview");
 const { createGetAiTrafficTool } =
   await import("@notra/tools/analytics/get-ai-traffic");
 const { createGetWebAnalyticsReportsTool } =
@@ -167,6 +191,21 @@ describe("get_ai_traffic", () => {
     ).toBe(
       "Project not found in this organization. Call list_geo_projects for valid project IDs."
     );
+  });
+});
+
+describe("get_geo_overview", () => {
+  const tool = createGetGeoOverviewTool() as unknown as Executable;
+
+  test("returns timestamps as ISO strings so eve can serialize the result", async () => {
+    const result = await tool.execute(
+      getGeoOverviewInputSchema.parse({ days: 7 }),
+      ctx
+    );
+
+    expect(result).toMatchObject({
+      engines: [{ last_checked_at: "2026-11-02T10:00:00.000Z" }],
+    });
   });
 });
 
