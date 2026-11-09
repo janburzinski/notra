@@ -44,7 +44,7 @@ export function WebTrendChart({ web, traffic, range }: WebTrendChartProps) {
   const [hiddenKeys, setHiddenKeys] = useState<readonly string[]>([]);
   const people = {
     key: WEB_TREND_PEOPLE_KEY,
-    label: t("people"),
+    label: t("visitors"),
     share: traffic ? share?.people : undefined,
     color: CHART_PRIMARY_COLOR,
   };
@@ -100,7 +100,7 @@ export function WebTrendChart({ web, traffic, range }: WebTrendChartProps) {
       <EChartsAreaChart
         animation={false}
         chartOptions={TRAFFIC_HERO_CHART_OPTIONS}
-        className="h-52 w-full cursor-crosshair @md/hero:h-64"
+        className="h-64 w-full cursor-crosshair @md/hero:h-80"
         config={config}
         curveType="monotone"
         data={rows}

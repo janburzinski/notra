@@ -79,7 +79,7 @@ function WebVisitorsSkeleton() {
           )}
         </div>
         <div className={TRAFFIC_HERO_CHART_SURFACE_CLASS}>
-          <Skeleton className="h-52 w-full rounded-xl @md/hero:h-64" />
+          <Skeleton className="h-64 w-full rounded-xl @md/hero:h-80" />
           <TrafficTrendLegendSkeleton items={1} />
         </div>
       </div>
