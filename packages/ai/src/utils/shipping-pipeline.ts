@@ -40,7 +40,7 @@ export function createShippingPipeline(
         }
         if (!disabled) {
           disabled = true;
-          console.warn(policy.disabledMessage);
+          console.error(`${policy.disabledMessage} (${error.message})`);
         }
       }
       reportOverflow();

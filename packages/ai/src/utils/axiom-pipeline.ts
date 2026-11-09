@@ -26,7 +26,7 @@ export function createAxiomPipeline(
     {
       label: `evlog/${config.dataset}`,
       permanentErrorPattern: AXIOM_PERMANENT_ERROR_PATTERN,
-      disabledMessage: `[evlog/${config.dataset}] Axiom rejected the request, log shipping is off until the next deploy`,
+      disabledMessage: `[evlog/${config.dataset}] Axiom rejected the request, log shipping is off until the next deploy. Check that AXIOM_TOKEN can ingest into "${config.dataset}"`,
     },
     options
   );

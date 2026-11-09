@@ -146,6 +146,9 @@ test("pipeline retries transient errors, disables permanent failures and never e
       pipeline({ event: TELEMETRY_TEST_EVENT });
       await pipeline.flush();
       expect(received.length - before).toBe(1);
+      expect(String(errors.mock.calls.at(-1)?.[0])).toContain(
+        `Axiom API error: ${failure}`
+      );
     }
     expect(
       JSON.stringify([...warnings.mock.calls, ...errors.mock.calls])
