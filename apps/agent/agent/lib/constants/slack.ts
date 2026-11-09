@@ -26,6 +26,22 @@ export const SLACK_MARKDOWN_TEXT_MAX_LENGTH = 12_000;
 export const SLACK_LONG_REPLY_NOTICE =
   "That reply is too long for one Slack message, so here it is as a file.";
 
+/** Reaction left on a triggering message while the agent works on it. */
+export const SLACK_WORKING_REACTION = "eyes";
+
+/** Session auth attribute naming the Redis set of messages showing 👀. */
+export const SLACK_WORKING_REACTIONS_KEY_ATTRIBUTE = "slackWorkingReactionsKey";
+
+/** Upper bound for a thread's 👀 set if no turn ever clears it. */
+export const SLACK_WORKING_REACTIONS_TTL_SECONDS = 60 * 60 * 6;
+
+/** Reaction errors that mean there is nothing left to do. */
+export const SLACK_IGNORED_REACTION_ERRORS = new Set([
+  "already_reacted",
+  "message_not_found",
+  "no_reaction",
+]);
+
 export const SLACK_PERMISSION_ERROR_PATTERN =
   /\b(?:missing_scope|not_allowed|no_permission)\b/;
 

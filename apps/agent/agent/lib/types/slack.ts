@@ -1,3 +1,5 @@
+import type { SlackMentionResult } from "eve/channels/slack";
+
 import type { VerifiedSessionAuth } from "./auth";
 
 export interface ResolvedSlackInstallation {
@@ -46,7 +48,18 @@ export interface PostToXOutcome {
   confirmed: boolean;
 }
 
+export interface SlackMessageRef {
+  channelId: string;
+  ts: string;
+}
+
+/** The pinned session a Slack message handler can hand back to eve. */
+export type SlackSessionSender = NonNullable<
+  NonNullable<SlackMentionResult>["session"]
+>;
+
 export interface NotraSlackStateExtras {
+  notraWorkingReactionKeys?: string[];
   notraChartFailureTurnId?: string;
   notraChartFailureIsPermission?: boolean;
   notraDraftCompletion?: DraftCompletionState;

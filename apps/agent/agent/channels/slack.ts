@@ -14,6 +14,7 @@ import {
   CREATE_POST_TOOL_NAMES,
   POST_TO_X_NOT_PENDING_MESSAGE,
   POST_TO_X_NOT_REQUESTER_MESSAGE,
+  SLACK_WORKING_REACTIONS_KEY_ATTRIBUTE,
   SLACK_PERMISSION_ERROR_PATTERN,
   SLACK_SESSION_FAILED_MESSAGE,
   SLACK_TURN_FAILED_MESSAGE,
@@ -78,6 +79,12 @@ import {
   readPendingPostToXForOrganization,
   switchPendingPostToXAccount,
 } from "../lib/utils/slack-post-x";
+import {
+  addSlackWorkingReaction,
+  clearSlackWorkingReactions,
+  trackSlackWorkingReactions,
+  withWorkingReactionRelease,
+} from "../lib/utils/slack-reactions";
 import { parseSlackDashboardRelay } from "../lib/utils/slack-relay";
 import {
   getErrorId,
@@ -143,7 +150,15 @@ const onSlackMessage: NonNullable<SlackChannelConfig["onAppMention"]> = async (
         : ctx.thread.post(usage.message));
       return null;
     }
-    await ctx.thread.startTyping("On it…");
+    const [, workingReactionsKey] = await Promise.all([
+      ctx.thread.startTyping("On it…"),
+      addSlackWorkingReaction(ctx.slack, {
+        installationTeamId: installation.teamId,
+        channelId: message.channelId,
+        threadTs: message.threadTs,
+        ts: message.ts,
+      }),
+    ]);
     const chatId = await Effect.runPromise(
       mirrorPublicSlackThread(ctx, message, installation.organizationId)
     );
@@ -153,6 +168,9 @@ const onSlackMessage: NonNullable<SlackChannelConfig["onAppMention"]> = async (
         attributes: {
           ...auth.attributes,
           ...usage.attributes,
+          ...(workingReactionsKey
+            ? { [SLACK_WORKING_REACTIONS_KEY_ATTRIBUTE]: workingReactionsKey }
+            : {}),
           ...(chatId ? { chatId } : {}),
         },
       },
@@ -175,7 +193,22 @@ const onSlackThreadReply: NonNullable<SlackChannelConfig["onMessage"]> = async (
     { ...ctx, resolveSession: async () => session },
     message
   );
-  return result ? { ...result, session } : null;
+  if (!result) {
+    return null;
+  }
+  // The pinned session can end (e.g. "leave") before eve delivers the message.
+  const workingReactionsKey =
+    result.auth?.attributes?.[SLACK_WORKING_REACTIONS_KEY_ATTRIBUTE];
+  return {
+    ...result,
+    session:
+      typeof workingReactionsKey === "string"
+        ? withWorkingReactionRelease(session, ctx.slack, workingReactionsKey, {
+            channelId: message.channelId,
+            ts: message.ts,
+          })
+        : session,
+  };
 };
 
 const onSlackInteraction: NonNullable<
@@ -513,7 +546,12 @@ export default slackChannel({
           return;
         }
 
-        await mirrorSessionStatus(ctx, "idle");
+        // The answer is about to be posted, so the 👀 comes off now rather
+        // than when the turn finishes.
+        await Promise.all([
+          mirrorSessionStatus(ctx, "idle"),
+          clearSlackWorkingReactions(channel, ctx),
+        ]);
         channel.state.pendingToolCallMessage = null;
         const state = getNotraSlackState(channel.state);
         if (state.notraChartFailureTurnId === data.turnId) {
@@ -586,13 +624,25 @@ export default slackChannel({
         await channel.thread.post(
           withErrorId(SLACK_TURN_FAILED_MESSAGE, errorId)
         );
+        await clearSlackWorkingReactions(channel, ctx);
       }),
     "turn.cancelled": (_data, channel, ctx) =>
+      runWithSlackTeam(channel.state.installationTeamId, async () => {
+        await mirrorSessionStatus(ctx, "idle");
+        await clearSlackWorkingReactions(channel, ctx);
+      }),
+    "turn.completed": (_data, channel, ctx) =>
       runWithSlackTeam(channel.state.installationTeamId, () =>
-        mirrorSessionStatus(ctx, "idle")
+        clearSlackWorkingReactions(channel, ctx)
+      ),
+    // Also covers turns parked on an approval or sign-in.
+    "session.waiting": (_data, channel, ctx) =>
+      runWithSlackTeam(channel.state.installationTeamId, () =>
+        clearSlackWorkingReactions(channel, ctx)
       ),
     "session.failed": (data, channel) =>
       runWithSlackTeam(channel.state.installationTeamId, async () => {
+        await clearSlackWorkingReactions(channel);
         const errorId = getErrorId(data.details);
         logError("Slack agent session failed", data.message, {
           code: data.code,
@@ -607,6 +657,7 @@ export default slackChannel({
     "turn.started": (_data, channel, ctx) =>
       runWithSlackTeam(channel.state.installationTeamId, async () => {
         channel.state.pendingToolCallMessage = null;
+        trackSlackWorkingReactions(getNotraSlackState(channel.state), ctx);
         await mirrorSessionStatus(ctx, "working");
       }),
   },

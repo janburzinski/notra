@@ -31,12 +31,14 @@ import { createHmac } from "node:crypto";
 import { Effect } from "effect";
 const scenario = ${JSON.stringify(scenario)};
 const runtimePath = ${JSON.stringify(runtime)};
-if (scenario === "chart-failure-with-publish" || scenario === "approval-payload" || scenario === "approval-guest" || scenario === "draft-pr-completion") {
+const reactionScenario = scenario.startsWith("working-reaction");
+let currentAuth = null;
+if (scenario === "chart-failure-with-publish" || scenario === "approval-payload" || scenario === "approval-guest" || scenario === "draft-pr-completion" || reactionScenario) {
   mock.module(runtimePath + "/context/build-callback-context.js", () => ({
-    buildCallbackContext: () => ({ session: { id: "session-1", auth: { current: null, initiator: null } } }),
+    buildCallbackContext: () => ({ session: { id: "session-1", auth: { current: currentAuth, initiator: null } } }),
   }));
 }
-if (scenario === "draft-pr-completion") {
+if (scenario === "draft-pr-completion" || reactionScenario) {
   mock.module(${JSON.stringify(resolve(import.meta.dir, "../agent/lib/utils/chat-mirror.ts"))}, () => ({
     mirrorToolResult: async () => {}, mirrorSessionStatus: async () => {},
     mirrorAssistantDelta: async () => {}, mirrorToolApprovals: async () => {},
@@ -44,7 +46,7 @@ if (scenario === "draft-pr-completion") {
 }
 process.env.SLACK_AGENT_SIGNING_SECRET = "fixture-signing-secret";
 const installations = [
-  { slackTeamId: "T-install", organizationId: "org-install", enabled: true, allowedChannelIds: scenario === "owner-policy" ? ["C-other"] : null, botToken: "fixture-install" },
+  { slackTeamId: "T-install", organizationId: "org-install", enabled: true, allowedChannelIds: scenario === "owner-policy" || scenario === "working-reaction-blocked" ? ["C-other"] : null, botToken: "fixture-install" },
   { slackTeamId: "T-actor", organizationId: "org-actor", enabled: true, allowedChannelIds: null, botToken: "fixture-actor" },
 ];
 mock.module("@notra/ai/integrations/slack-workspace", () => ({
@@ -55,6 +57,7 @@ mock.module("@notra/ai/integrations/slack-workspace", () => ({
   postSlackNotification: async () => {},
 }));
 const redisStore = new Map();
+const redisSets = new Map();
 mock.module("@notra/ai/utils/redis", () => ({ redis: {
   get: async (key) => redisStore.get(key) ?? null,
   set: async (key, value, options) => {
@@ -63,6 +66,10 @@ mock.module("@notra/ai/utils/redis", () => ({ redis: {
     return "OK";
   },
   getdel: async (key) => { const value = redisStore.get(key) ?? null; redisStore.delete(key); return value; },
+  sadd: async (key, ...members) => { const set = redisSets.get(key) ?? new Set(); members.forEach((member) => set.add(member)); redisSets.set(key, set); return members.length; },
+  smembers: async (key) => [...(redisSets.get(key) ?? [])],
+  srem: async (key, ...members) => { members.forEach((member) => redisSets.get(key)?.delete(member)); return members.length; },
+  expire: async () => 1,
 } }));
 const linkedLookups = [];
 mock.module("@notra/tools/utils/social-accounts", () => ({
@@ -93,6 +100,8 @@ const ephemerals = () => outbound.filter((call) => call.url.endsWith("chat.postE
 globalThis.fetch = async (url, init) => {
   outbound.push({ url: String(url), raw: String(init.body), authorization: new Headers(init.headers).get("authorization"), body: Object.fromEntries(new URLSearchParams(String(init.body))) });
   const name = new URL(String(url)).pathname.split("/").at(-1);
+  if (scenario === "working-reaction-errors" && name === "reactions.add") return Response.json({ ok: false, error: "missing_scope" });
+  if (scenario === "working-reaction-errors" && name === "reactions.remove") throw new Error("network down");
   if (name === "conversations.info") return Response.json({ ok: true, channel: { id: "C-room", is_private: false } });
   if (name === "conversations.replies") return Response.json({ ok: true, messages: [{ ts: "1.5", user: "U-other", text: "Prior topic" }] });
   return Response.json({ ok: true, ts: "posted-message" });
@@ -100,6 +109,7 @@ globalThis.fetch = async (url, init) => {
 const { createSession } = await import(runtimePath + "/channel/session.js");
 const { createChannelAddress } = await import(runtimePath + "/channel/channel-address.js");
 let owner = "original-session";
+let rejectNextSend = false;
 let resets = 0;
 const exactSends = [];
 const created = [];
@@ -109,7 +119,7 @@ const runtime = {
   resolveContinuation: async () => owner ? { sessionId: owner } : undefined,
   dispatchSession: async ({ sessionId, command }) => {
     if (command.kind === "send") exactSends.push({ sessionId, command });
-    if (sessionId !== owner) return { status: "session_not_active" };
+    if (sessionId !== owner || (command.kind === "send" && rejectNextSend && !(rejectNextSend = false))) return { status: "session_not_active" };
     if (command.kind === "reset") { resets++; owner = undefined; return { status: "reset", previousSessionId: sessionId }; }
     return { status: "accepted", sessionId, deliveryId: "fixture-delivery" };
   },
@@ -142,10 +152,13 @@ async function request(payload, interactivity = false) {
   }), args);
   assert.equal(response.status, 200);
 }
-async function message(text, mention = false) {
+async function message(text, mention = false, extra = {}) {
   await request({ type: "event_callback", team_id: "T-install", api_app_id: "A-notra", event_id: "event-" + (++eventId), authorizations: [{ is_bot: true, team_id: "T-install", user_id: "U-notra" }],
-    event: { type: mention ? "app_mention" : "message", channel: "C-room", ...(scenario === "initial-status" ? {} : { thread_ts: "1.0" }), ts: "2." + eventId, user: "U-human", text } });
+    event: { type: mention ? "app_mention" : "message", channel: "C-room", ...(scenario === "initial-status" ? {} : { thread_ts: "1.0" }), ts: "2." + eventId, user: "U-human", text, ...extra } });
 }
+const reactionCalls = (method) => outbound.filter((call) => call.url.endsWith("/" + method)).map((call) => call.body);
+const eyes = (ts) => ({ channel: "C-room", timestamp: ts, name: "eyes" });
+const redisMembers = async () => [...redisSets.values()].flatMap((set) => [...set]);
 if (scenario === "draft-pr-completion") {
   for (const isError of [false, true]) {
    for (const order of ["draft-first", "pr-first"]) {
@@ -385,6 +398,79 @@ if (scenario === "draft-pr-completion") {
   assert(content.includes("Prior topic"));
   assert(content.includes("U-human"));
   assert.equal(exactSends[0].command.auth.attributes.organizationId, "org-install");
+} else if (scenario === "working-reaction") {
+  const eventChannel = { ...binding, state: { installationTeamId: "T-install", channelId: "C-room" } };
+  owner = undefined;
+  // Ignored senders and control messages never get the reaction.
+  await message("<@U-notra> hi from elsewhere", true, { user_team: "T-unknown" });
+  await message("<@U-notra> stop", true);
+  await Promise.all(tasks);
+  assert.deepEqual(reactionCalls("reactions.add"), []);
+  // A mention that starts a turn is reacted to and carries its ts into the turn.
+  await message("<@U-notra> draft a post", true);
+  await Promise.all(tasks);
+  assert.deepEqual(reactionCalls("reactions.add"), [eyes("2.3")]);
+  assert.equal(created.length, 1);
+  assert.equal(created[0].auth.attributes.slackWorkingReactionsKey, "slack:working-reactions:T-install:C-room:1.0");
+  currentAuth = created[0].auth;
+  await channel.adapter["turn.started"]({ turnId: "turn-1" }, eventChannel);
+  assert.deepEqual(reactionCalls("reactions.remove"), []);
+  // Tool-call steps keep the reaction; posting the answer clears it.
+  await channel.adapter["message.completed"]({ turnId: "turn-1", finishReason: "tool-calls", message: "Looking that up" }, eventChannel);
+  assert.deepEqual(reactionCalls("reactions.remove"), []);
+  await channel.adapter["message.completed"]({ turnId: "turn-1", finishReason: "stop", message: "Here's the draft." }, eventChannel);
+  assert.deepEqual(reactionCalls("reactions.remove"), [eyes("2.3")]);
+  await channel.adapter["turn.completed"]({ turnId: "turn-1" }, eventChannel);
+  assert.deepEqual(reactionCalls("reactions.remove"), [eyes("2.3")]);
+  await channel.adapter["session.waiting"]({}, eventChannel);
+  assert.equal(reactionCalls("reactions.remove").length, 1);
+  // Two replies delivered together expose only the last one's auth; both
+  // reactions still clear when that turn fails.
+  await message("follow-up");
+  await message("one more thing");
+  await Promise.all(tasks);
+  assert.deepEqual(reactionCalls("reactions.add").slice(1), [eyes("2.4"), eyes("2.5")]);
+  currentAuth = exactSends[1].command.auth;
+  await channel.adapter["turn.started"]({ turnId: "turn-2" }, eventChannel);
+  await channel.adapter["turn.failed"]({ turnId: "turn-2", code: "error", message: "boom" }, eventChannel);
+  assert.deepEqual(reactionCalls("reactions.remove").slice(1).map((call) => call.timestamp).sort(), ["2.4", "2.5"]);
+  // Stopping a turn clears its reaction; the stop message itself gets none.
+  await message("next request");
+  await message("stop");
+  await Promise.all(tasks);
+  assert.deepEqual(reactionCalls("reactions.add").slice(3), [eyes("2.6")]);
+  currentAuth = exactSends[2].command.auth;
+  await channel.adapter["turn.started"]({ turnId: "turn-3" }, eventChannel);
+  await channel.adapter["turn.cancelled"]({ turnId: "turn-3" }, eventChannel);
+  await channel.adapter["session.waiting"]({}, eventChannel);
+  assert.deepEqual(reactionCalls("reactions.remove").slice(3), [eyes("2.6")]);
+  // A reply the session refuses (e.g. after "leave") loses its 👀 right away.
+  rejectNextSend = true;
+  await message("too late");
+  await Promise.all(tasks);
+  assert.deepEqual(reactionCalls("reactions.add").at(-1), eyes("2.8"));
+  assert.deepEqual(reactionCalls("reactions.remove").at(-1), eyes("2.8"));
+  assert.deepEqual(await redisMembers(), []);
+} else if (scenario === "working-reaction-blocked") {
+  owner = undefined;
+  await message("<@U-notra> draft a post", true);
+  await Promise.all(tasks);
+  assert.equal(created.length, 0);
+  assert.deepEqual(reactionCalls("reactions.add"), []);
+} else if (scenario === "working-reaction-errors") {
+  const eventChannel = { ...binding, state: { installationTeamId: "T-install", channelId: "C-room" } };
+  owner = undefined;
+  await message("<@U-notra> draft a post", true);
+  await Promise.all(tasks);
+  assert.deepEqual(reactionCalls("reactions.add"), [eyes("2.1")]);
+  assert.equal(created.length, 1);
+  currentAuth = created[0].auth;
+  await channel.adapter["turn.started"]({ turnId: "turn-1" }, eventChannel);
+  await channel.adapter["message.completed"]({ turnId: "turn-1", finishReason: "stop", message: "Done" }, eventChannel);
+  await channel.adapter["turn.completed"]({ turnId: "turn-1" }, eventChannel);
+  assert.deepEqual(reactionCalls("reactions.remove"), [eyes("2.1")]);
+  assert.deepEqual(await redisMembers(), []);
+  assert(outbound.some((call) => call.url.endsWith("chat.postMessage") && call.raw.includes("Done")));
 } else if (scenario === "mention-after-leave") {
   await handleSlackControl("leave", { thread: binding.thread, resolveSession: async () => originalSession });
   await message("unmentioned follow-up");
@@ -438,4 +524,10 @@ describe("Slack native channel boundaries", () => {
     runSlackChannel("reply"));
   test("unmentioned replies stay ignored after Leave and a mention restarts the thread", () =>
     runSlackChannel("mention-after-leave"));
+  test("👀 marks a message while its turn runs and clears when it ends", () =>
+    runSlackChannel("working-reaction"));
+  test("messages in a disallowed channel get no 👀", () =>
+    runSlackChannel("working-reaction-blocked"));
+  test("reaction API failures don't block or break the turn", () =>
+    runSlackChannel("working-reaction-errors"));
 });
