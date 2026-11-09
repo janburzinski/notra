@@ -126,7 +126,16 @@
         "listsLabel": "Member lists",
         "noMembers": "No members found.",
         "noPending": "No pending invitations",
-        "noPendingDescription": "Invitations you send appear here until they're accepted."
+        "noPendingDescription": "Invitations you send appear here until they're accepted.",
+        "domainAutoInvite": {
+          "heading": "Join by email domain",
+          "label": "Anyone with an @{domain} email can join",
+          "description": "New sign-ups with this email are invited to {organization} and join with one click.",
+          "managersOnly": "Only owners and admins can change this.",
+          "enabled": "Colleagues on your domain will be invited",
+          "disabled": "Domain invitations turned off",
+          "updateFailed": "Could not update domain invitations"
+        }
       },
       "notifications": {
         "updated": "Notification settings updated",
@@ -916,7 +925,8 @@
       "unavailableNow": "This invitation is no longer available.",
       "declined": {
         "title": "Invitation declined",
-        "description": "You declined the invitation. Ask the team for a new one if you change your mind."
+        "description": "You declined the invitation. Ask the team for a new one if you change your mind.",
+        "continue": "Continue to Notra"
       },
       "joined": {
         "title": "You joined {organization}",
@@ -1231,6 +1241,10 @@
       "socialAlreadyPosted": "This post already went out to that account. Create a new post to post again.",
       "conflict": "The schedule changed in the meantime. Reload and try again.",
       "nothingScheduled": "Nothing is scheduled for this post."
+    },
+    "domainAutoInvite": {
+      "managersOnly": "Only owners and admins can change domain invitations",
+      "noCompanyDomain": "Domain invitations need a verified company email address"
     }
   },
   "onboarding": {

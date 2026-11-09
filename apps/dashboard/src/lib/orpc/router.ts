@@ -80,6 +80,11 @@ export const dashboardRouter = {
   logs: lazy(() =>
     import("./routers/logs").then((m) => ({ default: m.logsRouter }))
   ),
+  domainAutoInvite: lazy(() =>
+    import("./routers/domain-auto-invite").then((m) => ({
+      default: m.domainAutoInviteRouter,
+    }))
+  ),
   notifications: lazy(() =>
     import("./routers/notifications").then((m) => ({
       default: m.notificationsRouter,

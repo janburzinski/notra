@@ -206,6 +206,7 @@ function organization(
     suspendedAt: null,
     suspendedReason: null,
     suspendedCategory: null,
+    autoInviteDomain: null,
   };
 }
 

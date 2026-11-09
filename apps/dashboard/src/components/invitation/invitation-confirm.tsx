@@ -228,7 +228,11 @@ function PendingInvitationCard({ data }: { data: PendingInvitation }) {
         description={t("declined.description")}
         outcome="failure"
         title={t("declined.title")}
-      />
+      >
+        <a className={ctaButtonVariants()} href="/">
+          {t("declined.continue")}
+        </a>
+      </Message>
     );
   }
 

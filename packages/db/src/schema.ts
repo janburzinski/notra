@@ -426,6 +426,8 @@ export const organizations = pgTable(
       .notNull(),
     onboardingAgentStartedAt: timestamp("onboarding_agent_started_at"),
     workosOrgId: text("workos_org_id").unique(),
+    /** Company email domain whose new signups are invited automatically. */
+    autoInviteDomain: text("auto_invite_domain"),
     /** Set while Notra has suspended the workspace for abuse. */
     suspendedAt: timestamp("suspended_at"),
     suspendedReason: text("suspended_reason"),
@@ -434,6 +436,7 @@ export const organizations = pgTable(
     }),
   },
   (table) => [
+    index("organizations_autoInviteDomain_idx").on(table.autoInviteDomain),
     check(
       "organizations_suspendedCategory_check",
       sql`${table.suspendedCategory} IN ('phishing', 'malware', 'deceptive_redirects', 'spam', 'terms')`

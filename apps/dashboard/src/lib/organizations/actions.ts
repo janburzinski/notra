@@ -47,6 +47,7 @@ import { readRequestHeaders } from "@/lib/analytics/request-headers";
 import { readWorkOSError } from "@/lib/auth/workos-error";
 import { getTranslations } from "@/lib/i18n/server";
 import { failWithOrganizationMessage } from "@/lib/organizations/action-messages";
+import { autoInviteDomainFor } from "@/lib/organizations/domain-invites";
 import type { WorkOSSyncError } from "@/lib/organizations/errors";
 import {
   requireManagerMembership,
@@ -324,6 +325,8 @@ export async function createOrganization(
                 slug,
                 logo: input.logo ?? null,
                 createdAt: now,
+                // On by default; admins can turn it off under Members.
+                autoInviteDomain: autoInviteDomainFor(session.user),
               })
               .returning();
 

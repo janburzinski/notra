@@ -1072,6 +1072,13 @@
       "when": 1794203229181,
       "tag": "0152_site_sections_from_config",
       "breakpoints": true
+    },
+    {
+      "idx": 153,
+      "version": "7",
+      "when": 1794244383317,
+      "tag": "0153_organization_auto_invite_domain",
+      "breakpoints": true
     }
   ]
 }

@@ -27,6 +27,7 @@ import { getTranslations } from "@/lib/i18n/server";
 import { resolveIntegrationConnectDeeplink } from "@/lib/integrations/deeplink-resolution";
 import type { CallbackDestination } from "@/types/analytics/events";
 import type { LoginPageStart } from "@/types/auth/login-page";
+import type { EmailIdentity } from "@/types/organizations/domain-auto-invite";
 import type { UiRouteInput } from "@/types/ui-route";
 import { demoHomePath, safeDemoReturnTo } from "@/utils/demo-return-to";
 import { geoDashboardPath, withGeoProject } from "@/utils/geo-paths";
@@ -37,6 +38,11 @@ import {
 import { withOnboardingWebsite } from "@/utils/onboarding-website";
 import { withTrackingParams } from "@/utils/tracking-params";
 
+async function redirectToPendingInvitation(user: EmailIdentity) {
+  const domainInvites = await import("@/lib/organizations/domain-invites");
+  await domainInvites.redirectToPendingInvitation(user);
+}
+
 export const loadAppEntry = createServerFn({ method: "GET" })
   .validator((data: UiRouteInput) => data)
   .handler(async ({ data: { searchParams } }) => {
@@ -46,6 +52,7 @@ export const loadAppEntry = createServerFn({ method: "GET" })
     }
     const organization = await getLastActiveOrganization();
     if (!organization) {
+      await redirectToPendingInvitation(session.user);
       throw redirect({ href: "/onboarding" });
     }
     if (!isDemoMode()) {
@@ -75,6 +82,9 @@ export const loadGuestAccess = createServerFn({ method: "GET" })
       return null;
     }
     const organization = await getLastActiveOrganization();
+    if (!organization) {
+      await redirectToPendingInvitation(session.user);
+    }
     throw redirect({
       href: withTrackingParams(
         organization
@@ -233,6 +243,13 @@ export const loadAuthCallback = createServerFn({ method: "GET" })
     }
     const organization = await getLastActiveOrganization();
     if (!organization) {
+      const { pendingInvitationHref } =
+        await import("@/lib/organizations/domain-invites");
+      const invitationHref = await pendingInvitationHref(session.user);
+      if (invitationHref) {
+        trackRouted(CALLBACK_DESTINATIONS.INVITATION);
+        throw redirect({ href: invitationHref });
+      }
       trackRouted(CALLBACK_DESTINATIONS.ONBOARDING);
       throw redirect({
         href: withTrackingParams(

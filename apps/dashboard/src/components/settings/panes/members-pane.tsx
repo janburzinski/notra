@@ -17,6 +17,7 @@ import { useFormatter, useTranslations } from "use-intl";
 
 import { Button } from "@/components/button";
 import { useMemberColumns } from "@/components/members/columns";
+import { DomainAutoInviteCard } from "@/components/members/domain-auto-invite-card";
 import { useInvitationColumns } from "@/components/members/invitation-columns";
 import { InviteMemberPopover } from "@/components/members/invite-member-popover";
 import { useOrganizationsContext } from "@/components/providers/organization-provider";
@@ -178,6 +179,10 @@ export function MembersSettingsPane() {
           />
         </TabsContent>
       </Tabs>
+      <DomainAutoInviteCard
+        organizationId={organization.id}
+        organizationName={organization.name}
+      />
     </SettingsPane>
   );
 }

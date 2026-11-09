@@ -126,7 +126,16 @@
         "listsLabel": "Mitgliederlisten",
         "noMembers": "Keine Mitglieder gefunden.",
         "noPending": "Keine ausstehenden Einladungen",
-        "noPendingDescription": "Gesendete Einladungen erscheinen hier, bis sie angenommen werden."
+        "noPendingDescription": "Gesendete Einladungen erscheinen hier, bis sie angenommen werden.",
+        "domainAutoInvite": {
+          "heading": "Beitritt per E-Mail-Domain",
+          "label": "Alle mit einer @{domain}-E-Mail können beitreten",
+          "description": "Neue Anmeldungen mit dieser E-Mail werden zu {organization} eingeladen und treten mit einem Klick bei.",
+          "managersOnly": "Nur Owner und Admins können das ändern.",
+          "enabled": "Teammitglieder mit deiner Domain werden eingeladen",
+          "disabled": "Domain-Einladungen deaktiviert",
+          "updateFailed": "Domain-Einladungen konnten nicht aktualisiert werden"
+        }
       },
       "notifications": {
         "updated": "Benachrichtigungseinstellungen aktualisiert",
@@ -916,7 +925,8 @@
       "unavailableNow": "Diese Einladung ist nicht mehr verfügbar.",
       "declined": {
         "title": "Einladung abgelehnt",
-        "description": "Du hast die Einladung abgelehnt. Bitte das Team um eine neue, falls du es dir anders überlegst."
+        "description": "Du hast die Einladung abgelehnt. Bitte das Team um eine neue, falls du es dir anders überlegst.",
+        "continue": "Weiter zu Notra"
       },
       "joined": {
         "title": "Du bist jetzt bei {organization}",
@@ -1231,6 +1241,10 @@
       "socialAlreadyPosted": "Dieser Post ist bei dem Account schon raus. Lege einen neuen Post an, um noch einmal zu posten.",
       "conflict": "Die Planung hat sich zwischenzeitlich geändert. Lade neu und versuch es erneut.",
       "nothingScheduled": "Für diesen Beitrag ist nichts geplant."
+    },
+    "domainAutoInvite": {
+      "managersOnly": "Nur Owner und Admins können Domain-Einladungen ändern",
+      "noCompanyDomain": "Domain-Einladungen brauchen eine verifizierte Firmen-E-Mail-Adresse"
     }
   },
   "onboarding": {

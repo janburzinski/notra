@@ -58,6 +58,7 @@ export const CALLBACK_DESTINATIONS = {
   BANNED: "banned",
   LOGIN: "login",
   RETURN_TO: "return_to",
+  INVITATION: "invitation",
 } as const;
 
 export const ANALYTICS_AUTH_METHODS = {

@@ -34,6 +34,7 @@ import { resolveGeoAccessLevel } from "@/lib/geo/access-level.server";
 import { redirectIfAnyOrganizationHasPaidHistory } from "@/lib/onboarding/billing-gate";
 import { redirectIfOnboardingDismissed } from "@/lib/onboarding/dismissal";
 import { resolveOnboardingVariant } from "@/lib/onboarding/experiment";
+import { redirectToPendingInvitation } from "@/lib/organizations/domain-invites";
 import type { OnboardingLayoutContext } from "@/types/onboarding-layout";
 import type { UiRouteInput } from "@/types/ui-route";
 import {
@@ -60,7 +61,13 @@ async function onboardingContext({ searchParams }: UiRouteInput) {
       : undefined;
   const replay =
     process.env.NODE_ENV === "development" && searchParams.replay === "1";
-  return { organization, projectId, replay, userId: session.user.id };
+  return {
+    organization,
+    projectId,
+    replay,
+    userId: session.user.id,
+    sessionUser: session.user,
+  };
 }
 
 /** Only workspaces with nothing to show in GEO land on AI traffic. */
@@ -190,10 +197,11 @@ export const loadOnboardingEntry = createServerFn({ method: "GET" })
 export const loadOnboardingWorkspace = createServerFn({ method: "GET" })
   .validator((data: UiRouteInput) => data)
   .handler(async ({ data }) => {
-    const { organization, projectId, replay, userId } =
+    const { organization, projectId, replay, userId, sessionUser } =
       await onboardingContext(data);
     if (!organization) {
       await redirectIfAnyOrganizationHasPaidHistory();
+      await redirectToPendingInvitation(sessionUser);
       return { existingOrg: undefined, progressHrefs: undefined };
     }
     await redirectIfOnboardingDismissed(
