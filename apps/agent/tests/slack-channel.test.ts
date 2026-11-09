@@ -56,6 +56,9 @@ mock.module("@notra/ai/integrations/slack-workspace", () => ({
   disableSlackIntegrationByTeamId: async () => {},
   postSlackNotification: async () => {},
 }));
+mock.module("@notra/ai/billing/chat-billing", () => ({
+  checkChatBilling: async () => ({ allowed: true, mode: "ai_credits", chargeAiCredits: true, useMarkup: false, balanceRemaining: 50 }),
+}));
 const redisStore = new Map();
 const redisSets = new Map();
 mock.module("@notra/ai/utils/redis", () => ({ redis: {

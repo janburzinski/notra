@@ -57,6 +57,9 @@ export const SLACK_USAGE_LIMIT_REACHED_MESSAGE =
 export const SLACK_RATE_LIMITED_MESSAGE =
   "You're sending messages too quickly. Try again in a minute.";
 
+export const SLACK_CREDIT_CHECK_FAILED_MESSAGE =
+  "I couldn't check your workspace's AI credits just now. Try again in a minute.";
+
 export const POST_TO_X_NOT_PENDING_MESSAGE =
   "This tweet is no longer waiting to be posted. It may have expired or already been posted. Ask me to draft it again if you still want to post it.";
 

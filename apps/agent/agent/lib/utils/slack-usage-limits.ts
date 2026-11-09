@@ -3,6 +3,7 @@ import { consumeChatGenerationRateLimit } from "@notra/ai/utils/chat-generation-
 import { logError } from "@notra/ai/utils/server-log";
 
 import {
+  SLACK_CREDIT_CHECK_FAILED_MESSAGE,
   SLACK_RATE_LIMITED_MESSAGE,
   SLACK_USAGE_LIMIT_REACHED_MESSAGE,
 } from "../constants/slack";
@@ -12,8 +13,9 @@ import type { SlackUsageCheck } from "../types/slack";
  * Runs the dashboard chat's rate limit and credit check before a Slack turn.
  * Slack users have no Notra user id, so the per-user window is keyed by the
  * Slack identity while the organization window is shared with the dashboard.
- * Omit `slackUser` for turns already rate limited elsewhere. A failing check
- * is logged and lets the turn through; usage is still metered afterwards.
+ * Omit `slackUser` for turns already rate limited elsewhere. Like the
+ * dashboard, a failing credit check blocks the turn; a failing rate limiter
+ * only guards against abuse, so it is logged and lets the turn through.
  */
 export async function checkSlackUsageLimits(
   organizationId: string,
@@ -40,16 +42,17 @@ export async function checkSlackUsageLimits(
   if (rateLimit && !rateLimit.success) {
     return { allowed: false, message: SLACK_RATE_LIMITED_MESSAGE };
   }
-  if (billing && !billing.allowed) {
+  if (!billing) {
+    return { allowed: false, message: SLACK_CREDIT_CHECK_FAILED_MESSAGE };
+  }
+  if (!billing.allowed) {
     return { allowed: false, message: SLACK_USAGE_LIMIT_REACHED_MESSAGE };
   }
   return {
     allowed: true,
-    attributes: billing
-      ? {
-          useMarkup: String(billing.useMarkup),
-          chargeAiCredits: String(billing.chargeAiCredits),
-        }
-      : {},
+    attributes: {
+      useMarkup: String(billing.useMarkup),
+      chargeAiCredits: String(billing.chargeAiCredits),
+    },
   };
 }

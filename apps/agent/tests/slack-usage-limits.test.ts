@@ -49,6 +49,7 @@ const rateLimitCalls = [];
 mock.module("@notra/ai/utils/chat-generation-rate-limit", () => ({
   consumeChatGenerationRateLimit: async (organizationId, userId) => {
     rateLimitCalls.push([organizationId, userId]);
+    if (scenario === "rate-limit-error") throw new Error("Redis is down");
     const success = scenario !== "rate-limited";
     return { success, limit: 20, remaining: success ? 19 : 0, reset: Date.now() + 60000 };
   },
@@ -100,12 +101,17 @@ assert.deepEqual(billingCalls, ["org-install"]);
 assert.deepEqual(rateLimitCalls, [["org-install", "slack:T-install:U-human"]]);
 const ephemerals = outbound.filter((call) => call.name === "chat.postEphemeral");
 const turns = [...exactSends.map((command) => command.auth), ...created.map((input) => JSON.stringify(input))];
-if (scenario === "out-of-credits" || scenario === "rate-limited") {
+const notices = {
+  "out-of-credits": "out of AI credits",
+  "rate-limited": "sending messages too quickly",
+  "billing-error": "check your workspace",
+};
+if (scenario in notices) {
   assert.equal(turns.length, 0);
   assert.equal(ephemerals.length, 1);
   assert.equal(ephemerals[0].body.user, "U-human");
   const text = JSON.stringify(ephemerals[0].body);
-  assert(text.includes(scenario === "out-of-credits" ? "out of AI credits" : "sending messages too quickly"));
+  assert(text.includes(notices[scenario]));
   assert(!outbound.some((call) => call.name === "assistant.threads.setStatus" && call.body.status));
 } else if (scenario === "allowed-mention") {
   assert.equal(ephemerals.length, 0);
@@ -118,13 +124,8 @@ if (scenario === "out-of-credits" || scenario === "rate-limited") {
   assert.equal(exactSends.length, 1);
   const attributes = exactSends[0].auth.attributes;
   assert.equal(attributes.organizationId, "org-install");
-  if (scenario === "billing-error") {
-    assert.equal(attributes.useMarkup, undefined);
-    assert.equal(attributes.chargeAiCredits, undefined);
-  } else {
-    assert.equal(attributes.useMarkup, "true");
-    assert.equal(attributes.chargeAiCredits, "true");
-  }
+  assert.equal(attributes.useMarkup, "true");
+  assert.equal(attributes.chargeAiCredits, "true");
 }
 `,
     ],
@@ -145,6 +146,8 @@ describe("Slack usage limits", () => {
     runSlackUsageScenario("allowed"));
   test("an allowed mention starts a session with the dashboard's billing attributes", () =>
     runSlackUsageScenario("allowed-mention"));
-  test("a failing credit check lets the turn through", () =>
+  test("a failing credit check blocks the turn like the dashboard does", () =>
     runSlackUsageScenario("billing-error"));
+  test("a failing rate limiter still lets the turn through", () =>
+    runSlackUsageScenario("rate-limit-error"));
 });
