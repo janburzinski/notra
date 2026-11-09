@@ -656,6 +656,8 @@ body {
   --tw-prose-td-borders: var(--border);
   font-size: 1.125rem;
   line-height: 1.6;
+  /* Long URLs and inline code wrap instead of widening the page on phones. */
+  overflow-wrap: break-word;
 }
 
 /* Accordions stack into one list: a rule above the first and below every item. */
@@ -874,6 +876,19 @@ body {
 
 .prose-notra :where(p, li) {
   text-wrap: pretty;
+}
+
+/* The wrapper takes the table's margin (2em at its 0.875em size), which can't collapse through a scroll container.
+   Below the typography layer, so its spacing after headings and at the start or end of a post still wins. */
+@layer components {
+  .prose-notra .table-scroll {
+    overflow-x: auto;
+    margin-block: 1.75em;
+  }
+}
+
+.prose-notra .table-scroll > table {
+  margin-block: 0;
 }
 
 .prose-notra :where(h2, h3) > a {

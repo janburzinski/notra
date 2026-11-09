@@ -64,12 +64,31 @@ async function consentIntegrations() {
 }
 const smartQuotes = params.config.styling?.smartQuotes !== false;
 
+// A table wider than the text column scrolls in its own box instead of widening the page.
+const tableScroll = {
+  name: "notra-table-scroll",
+  element: {
+    filter: ["table"],
+    visit(node, ctx) {
+      ctx.wrapNode(node, {
+        type: "element",
+        tagName: "div",
+        // Focusable so keyboard readers can scroll it in browsers that don't focus scroll boxes, like Safari.
+        properties: { className: ["table-scroll"], tabIndex: 0 },
+        children: [],
+      });
+    },
+  },
+};
+
 const markdownFeatures = {
   name: "notra-markdown-features",
   hooks: {
     "astro:config:setup": ({ config }) => {
-      // Satteri reads its features lazily, so this covers .md and .mdx.
-      config.markdown.processor.options.features.smartPunctuation = smartQuotes;
+      // Satteri reads its options lazily, so this covers .md and .mdx.
+      const { options } = config.markdown.processor;
+      options.features.smartPunctuation = smartQuotes;
+      options.hastPlugins.push(tableScroll);
     },
   },
 };
