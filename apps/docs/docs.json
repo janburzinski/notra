@@ -499,13 +499,14 @@
               {
                 "group": "Discovery",
                 "expanded": true,
-                "pages": ["GET /v1/status"]
+                "pages": ["GET /v1/status", "GET /v1/me/workspaces"]
               },
               {
                 "group": "Posts",
                 "expanded": true,
                 "pages": [
                   "GET /v1/posts",
+                  "POST /v1/posts",
                   "GET /v1/posts/{postId}",
                   "PATCH /v1/posts/{postId}",
                   "DELETE /v1/posts/{postId}",
@@ -585,6 +586,16 @@
                       "POST /v1/brand-identities/generate",
                       "GET /v1/brand-identities/generate/{jobId}"
                     ]
+                  },
+                  {
+                    "group": "Colors",
+                    "expanded": true,
+                    "pages": [
+                      "GET /v1/brand-identities/{brandIdentityId}/colors",
+                      "POST /v1/brand-identities/{brandIdentityId}/colors",
+                      "PATCH /v1/brand-identities/{brandIdentityId}/colors/{colorId}",
+                      "DELETE /v1/brand-identities/{brandIdentityId}/colors/{colorId}"
+                    ]
                   }
                 ]
               },
@@ -594,6 +605,7 @@
                 "pages": [
                   "GET /v1/integrations",
                   "POST /v1/integrations/github",
+                  "GET /v1/integrations/github/{integrationId}/activity",
                   "DELETE /v1/integrations/{integrationId}"
                 ]
               },
@@ -604,7 +616,9 @@
                   "GET /v1/schedules",
                   "POST /v1/schedules",
                   "PATCH /v1/schedules/{scheduleId}",
-                  "DELETE /v1/schedules/{scheduleId}"
+                  "DELETE /v1/schedules/{scheduleId}",
+                  "POST /v1/schedules/{scheduleId}/run",
+                  "GET /v1/schedules/{scheduleId}/runs"
                 ]
               },
               {
@@ -616,6 +630,24 @@
                   "GET /v1/event-triggers/{triggerId}",
                   "PATCH /v1/event-triggers/{triggerId}",
                   "DELETE /v1/event-triggers/{triggerId}"
+                ]
+              },
+              {
+                "group": "Webhooks",
+                "expanded": true,
+                "pages": [
+                  "GET /v1/webhooks",
+                  "POST /v1/webhooks",
+                  "DELETE /v1/webhooks/{endpointId}",
+                  {
+                    "group": "Deliveries",
+                    "expanded": true,
+                    "pages": [
+                      "GET /v1/webhooks/deliveries",
+                      "GET /v1/webhooks/deliveries/{deliveryId}",
+                      "POST /v1/webhooks/deliveries/{deliveryId}/retry"
+                    ]
+                  }
                 ]
               },
               {
@@ -683,7 +715,11 @@
                       "POST /v1/projects/{projectId}/geo/prompts",
                       "PATCH /v1/projects/{projectId}/geo/prompts/{promptId}",
                       "DELETE /v1/projects/{projectId}/geo/prompts/{promptId}",
-                      "POST /v1/projects/{projectId}/geo/prompts/import"
+                      "POST /v1/projects/{projectId}/geo/prompts/import",
+                      "GET /v1/projects/{projectId}/geo/prompts/{promptId}/history",
+                      "GET /v1/projects/{projectId}/geo/prompts/suggestions",
+                      "POST /v1/projects/{projectId}/geo/prompts/suggestions/{suggestionId}/accept",
+                      "POST /v1/projects/{projectId}/geo/prompts/suggestions/{suggestionId}/dismiss"
                     ]
                   },
                   {
@@ -695,6 +731,21 @@
                       "PATCH /v1/projects/{projectId}/geo/sequences/{sequenceId}",
                       "DELETE /v1/projects/{projectId}/geo/sequences/{sequenceId}",
                       "POST /v1/projects/{projectId}/geo/sequences/{sequenceId}/run"
+                    ]
+                  },
+                  {
+                    "group": "Personas",
+                    "expanded": true,
+                    "pages": [
+                      "GET /v1/projects/{projectId}/geo/personas",
+                      "POST /v1/projects/{projectId}/geo/personas/generate",
+                      "GET /v1/projects/{projectId}/geo/personas/generation",
+                      "GET /v1/projects/{projectId}/geo/personas/activity",
+                      "PATCH /v1/projects/{projectId}/geo/personas/{personaId}",
+                      "DELETE /v1/projects/{projectId}/geo/personas/{personaId}",
+                      "POST /v1/projects/{projectId}/geo/personas/{personaId}/restore",
+                      "POST /v1/projects/{projectId}/geo/personas/{personaId}/run",
+                      "GET /v1/projects/{projectId}/geo/personas/{personaId}/results"
                     ]
                   },
                   {
@@ -714,7 +765,9 @@
                     "pages": [
                       "POST /v1/projects/{projectId}/geo/scans",
                       "GET /v1/projects/{projectId}/geo/scans",
-                      "GET /v1/projects/{projectId}/geo/scans/{scanId}"
+                      "GET /v1/projects/{projectId}/geo/scans/{scanId}",
+                      "POST /v1/projects/{projectId}/geo/scans/prompts/{promptId}",
+                      "GET /v1/projects/{projectId}/geo/changes"
                     ]
                   },
                   {
@@ -724,9 +777,21 @@
                       "GET /v1/projects/{projectId}/geo/visibility/overview",
                       "GET /v1/projects/{projectId}/geo/visibility/timeseries",
                       "GET /v1/projects/{projectId}/geo/visibility/prompt-results",
+                      "GET /v1/projects/{projectId}/geo/visibility/prompt-results/summaries",
+                      "GET /v1/projects/{projectId}/geo/visibility/prompt-results/{checkId}",
                       "GET /v1/projects/{projectId}/geo/visibility/competitor-share",
                       "GET /v1/projects/{projectId}/geo/visibility/language-share",
-                      "GET /v1/projects/{projectId}/geo/visibility/competitors/{brand}"
+                      "GET /v1/projects/{projectId}/geo/visibility/competitors/{brand}",
+                      "GET /v1/projects/{projectId}/geo/shelf-sources"
+                    ]
+                  },
+                  {
+                    "group": "Sentiment",
+                    "expanded": true,
+                    "pages": [
+                      "GET /v1/projects/{projectId}/geo/sentiment",
+                      "GET /v1/projects/{projectId}/geo/sentiment/analysis",
+                      "GET /v1/projects/{projectId}/geo/sentiment/evidence"
                     ]
                   },
                   {
@@ -734,9 +799,11 @@
                     "expanded": true,
                     "pages": [
                       "GET /v1/projects/{projectId}/geo/gaps",
+                      "PATCH /v1/projects/{projectId}/geo/gaps/{promptId}",
                       "GET /v1/projects/{projectId}/geo/briefs",
                       "POST /v1/projects/{projectId}/geo/briefs",
                       "GET /v1/projects/{projectId}/geo/briefs/{briefId}",
+                      "PATCH /v1/projects/{projectId}/geo/briefs/{briefId}",
                       "POST /v1/projects/{projectId}/geo/briefs/{briefId}/approve"
                     ]
                   },
