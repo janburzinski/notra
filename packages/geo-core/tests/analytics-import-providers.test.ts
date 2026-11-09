@@ -918,6 +918,77 @@ describe("Vercel Web Analytics", () => {
     expect(calls[0]?.url.searchParams.getAll("by")).toEqual(["month"]);
   });
 
+  test("a Hobby project's preview starts at the oldest day the plan keeps", async () => {
+    const today = toDay(new Date());
+    const oldest = addDays(today, -30);
+    const { fetch, calls } = fakeFetch((call) => {
+      const since = call.url.searchParams.get("since") ?? "";
+      if (since < `${oldest}T00:00:00.000Z`) {
+        return Response.json(
+          {
+            error: {
+              code: "bad_request",
+              message:
+                "Invalid request: the hobby plan only grants access to the latest 31 days of data.",
+            },
+          },
+          { status: 400 }
+        );
+      }
+      return {
+        data: [
+          { timestamp: `${oldest.slice(0, 7)}-01T00:00:00.000Z`, total: 9 },
+        ],
+      };
+    });
+    expect(
+      await previewVercelProject(
+        VERCEL,
+        "prj_1",
+        { start: addDays(today, -729), end: today },
+        fetch
+      )
+    ).toMatchObject({ earliestDay: oldest, pageviews: 9 });
+    expect(calls).toHaveLength(2);
+  });
+
+  test("a chunk older than the plan keeps is skipped, other 400s still fail", async () => {
+    const hobby = fakeFetch(() =>
+      Response.json(
+        {
+          error: {
+            message:
+              "the hobby plan only grants access to the latest 31 days of data.",
+          },
+        },
+        { status: 400 }
+      )
+    );
+    expect(
+      await fetchVercelChunk(
+        VERCEL,
+        "prj_1",
+        "example.com",
+        { start: "2024-01-01", end: "2024-01-07" },
+        hobby.fetch
+      )
+    ).toEqual([]);
+    expect(hobby.calls).toHaveLength(1);
+
+    const broken = fakeFetch(() =>
+      Response.json({ error: { message: "bad filter" } }, { status: 400 })
+    );
+    await expect(
+      fetchVercelChunk(
+        VERCEL,
+        "prj_1",
+        "example.com",
+        { start: "2024-01-01", end: "2024-01-07" },
+        broken.fetch
+      )
+    ).rejects.toBeInstanceOf(ImportProviderError);
+  });
+
   test("reads exact daily totals and top-100 breakdowns for production only", async () => {
     const { fetch, calls } = fakeFetch((call) => {
       const by = call.url.searchParams.getAll("by");

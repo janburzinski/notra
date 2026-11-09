@@ -6,6 +6,7 @@ import {
   VERCEL_PROJECTS_PAGE_LIMIT,
   VERCEL_RESULT_LIMIT,
 } from "../constants/analytics-imports";
+import { ImportProviderError } from "../schemas/analytics-import-errors";
 import {
   vercelAggregateResponseSchema,
   vercelProjectsResponseSchema,
@@ -19,11 +20,13 @@ import type {
   VercelCredentials,
   WebImportRecord,
 } from "../types/analytics-imports";
-import { daysInRange } from "../utils/analytics-import-range";
+import { addDays, daysInRange, toDay } from "../utils/analytics-import-range";
 import { collectPages, importRequest } from "./http";
 
 const PROVIDER = "vercel";
 const PRODUCTION_FILTER = "environment eq 'production'";
+/** Hobby (and other plans) answer older ranges with "...only grants access to the latest 31 days of data." */
+const RETENTION_ERROR = /latest (\d+) days/i;
 
 /** Breakdowns per day; totals come from a separate by=day query so they stay exact. */
 const VERCEL_BREAKDOWNS: readonly VercelBreakdown[] = [
@@ -111,7 +114,16 @@ export async function listVercelProjects(
   );
 }
 
-async function aggregate(
+/** Days the plan keeps when Vercel rejected the range for its age, else null. */
+function retentionDays(error: unknown): number | null {
+  if (!(error instanceof ImportProviderError) || error.status !== 400) {
+    return null;
+  }
+  const days = Number(RETENTION_ERROR.exec(error.detail)?.[1]);
+  return Number.isInteger(days) && days > 0 ? days : null;
+}
+
+async function aggregateOnce(
   credentials: VercelCredentials,
   projectId: string,
   by: string[],
@@ -135,6 +147,42 @@ async function aggregate(
 }
 
 /**
+ * Rows plus the range they cover. When the plan keeps less history than asked
+ * for, the start moves up to the oldest day it still serves and the query
+ * runs again; a range entirely outside it comes back empty with no range.
+ */
+async function aggregate(
+  credentials: VercelCredentials,
+  projectId: string,
+  by: string[],
+  range: ImportDayRange,
+  fetchImpl?: ImportFetch
+): Promise<{ rows: Record<string, unknown>[]; range: ImportDayRange | null }> {
+  try {
+    return {
+      rows: await aggregateOnce(credentials, projectId, by, range, fetchImpl),
+      range,
+    };
+  } catch (error) {
+    const days = retentionDays(error);
+    // Midnight of the (days - 1)th day back is less than `days` × 24 h ago at
+    // any time of day, so the retry always lands inside the window.
+    const start = days ? addDays(toDay(new Date()), -(days - 1)) : null;
+    if (!start || start <= range.start) {
+      throw error;
+    }
+    if (start > range.end) {
+      return { rows: [], range: null };
+    }
+    const clamped = { start, end: range.end };
+    return {
+      rows: await aggregateOnce(credentials, projectId, by, clamped, fetchImpl),
+      range: clamped,
+    };
+  }
+}
+
+/**
  * First month with page views and the total in one by=month query. Hobby and
  * Pro keep less than the longest retention, so months before the data starts
  * are never planned as chunks.
@@ -145,13 +193,16 @@ export async function previewVercelProject(
   range: ImportDayRange,
   fetchImpl?: ImportFetch
 ): Promise<ImportPreview> {
-  const months = await aggregate(
+  const { rows: months, range: served } = await aggregate(
     credentials,
     projectId,
     ["month"],
     range,
     fetchImpl
   );
+  if (!served) {
+    return { earliestDay: null, pageviews: 0, pageviewsByMonth: {} };
+  }
   let earliestDay: string | null = null;
   let pageviews = 0;
   const pageviewsByMonth: Record<string, number> = {};
@@ -166,7 +217,7 @@ export async function previewVercelProject(
       pageviewsByMonth[key] = (pageviewsByMonth[key] ?? 0) + views;
     }
     if (!earliestDay && views > 0 && month) {
-      earliestDay = month < range.start ? range.start : month;
+      earliestDay = month < served.start ? served.start : month;
     }
   }
   return { earliestDay, pageviews, pageviewsByMonth };
@@ -200,13 +251,16 @@ export async function fetchVercelChunk(
   fetchImpl?: ImportFetch
 ): Promise<WebImportRecord[]> {
   const records: WebImportRecord[] = [];
-  const totals = await aggregate(
+  const { rows: totals, range: served } = await aggregate(
     credentials,
     projectId,
     ["day"],
     range,
     fetchImpl
   );
+  if (!served) {
+    return records;
+  }
   for (const row of totals) {
     records.push({
       grain: "total",
@@ -216,9 +270,9 @@ export async function fetchVercelChunk(
       visitors: metric(row, "visitors", "devices"),
     });
   }
-  const tasks = daysInRange(range).flatMap((day) =>
+  const tasks = daysInRange(served).flatMap((day) =>
     VERCEL_BREAKDOWNS.map((breakdown) => async () => {
-      const rows = await aggregate(
+      const { rows } = await aggregate(
         credentials,
         projectId,
         [breakdown.dimension],
@@ -250,6 +304,6 @@ export async function fetchVercelChunk(
     records.push(...rows);
   }
   return records.filter(
-    (record) => record.day >= range.start && record.day <= range.end
+    (record) => record.day >= served.start && record.day <= served.end
   );
 }
