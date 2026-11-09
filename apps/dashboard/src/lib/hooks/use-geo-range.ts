@@ -4,7 +4,7 @@ import { GEO_DEFAULT_RANGE } from "@notra/geo-core/constants/geo";
 import type { GeoRangePreset } from "@notra/geo-core/types/geo";
 import { POSTHOG_EVENTS } from "@notra/posthog/events";
 import { parseAsString, useQueryState } from "nuqs";
-import { useMemo } from "react";
+import { startTransition, useMemo } from "react";
 
 import { trackEvent } from "@/lib/analytics/posthog-client";
 import type { GeoDateRange, GeoRangeControl } from "@/types/geo";
@@ -22,6 +22,13 @@ export function useGeoRange(): GeoRangeControl {
   );
 
   return useMemo(() => {
+    // A new range re-renders every chart and table on the page; as a
+    // transition that render yields, so the picker closes at once.
+    const changeRange = (value: string | null) => {
+      startTransition(() => {
+        setRaw(value);
+      });
+    };
     const state = parseGeoRangeParam(raw);
     return {
       ...state,
@@ -33,7 +40,7 @@ export function useGeoRange(): GeoRangeControl {
           range_preset: preset,
           is_custom: false,
         });
-        setRaw(preset === GEO_DEFAULT_RANGE ? null : preset);
+        changeRange(preset === GEO_DEFAULT_RANGE ? null : preset);
       },
       setCustom: (range: GeoDateRange) => {
         trackEvent(POSTHOG_EVENTS.GEO_RANGE_CHANGED, {
@@ -41,7 +48,7 @@ export function useGeoRange(): GeoRangeControl {
           is_custom: true,
           days: geoRangeSpanDays(range),
         });
-        setRaw(serializeGeoCustomRange(range));
+        changeRange(serializeGeoCustomRange(range));
       },
     };
   }, [raw, setRaw]);

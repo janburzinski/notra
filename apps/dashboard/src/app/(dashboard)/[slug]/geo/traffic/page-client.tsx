@@ -11,7 +11,11 @@ import { TrafficPagesCard } from "@/components/geo/traffic-pages-card";
 import { WebVisitorsSection } from "@/components/geo/web-visitors-section";
 import { SkeletonCrossfade } from "@/components/skeleton-crossfade";
 import { useAiAnalyticsPeople } from "@/lib/hooks/use-ai-analytics-people";
-import { useAiTrafficSources, useGeoTrafficPages } from "@/lib/hooks/use-geo";
+import {
+  useAiTrafficSources,
+  useGeoTrafficPages,
+  usePrefetchGeoTrafficLog,
+} from "@/lib/hooks/use-geo";
 import { useTrafficPageScope } from "@/lib/hooks/use-traffic-page-scope";
 import { useTrafficViewed } from "@/lib/hooks/use-traffic-viewed";
 import type { GeoPageClientProps } from "@/types/geo";
@@ -48,6 +52,11 @@ export default function PageClient({ organizationSlug }: GeoPageClientProps) {
     scope.hostQuery,
     scope.pathQuery,
     scope.sites
+  );
+  usePrefetchGeoTrafficLog(
+    organizationId,
+    { host: scope.hostQuery, path: scope.pathQuery, sites: scope.sites },
+    settings !== null
   );
   const pages = trafficPages?.pages ?? [];
   // Undefined keeps the page-count cells loading; an empty list after an error

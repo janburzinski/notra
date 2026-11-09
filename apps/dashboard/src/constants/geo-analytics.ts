@@ -1,4 +1,7 @@
-import type { GeoRangePreset } from "@notra/geo-core/types/geo";
+import type {
+  GeoRangePreset,
+  GeoTrafficLogFilters,
+} from "@notra/geo-core/types/geo";
 
 export const GEO_DEFAULT_SCAN_TRIGGER = "manual" as const;
 
@@ -67,6 +70,12 @@ export const TRAFFIC_LOG_FILTER_KINDS = {
   VISITOR_TYPE: "visitor_type",
   PURPOSE: "purpose",
 } as const;
+
+/** The request log's filters before anyone picks one. */
+export const TRAFFIC_LOG_DEFAULT_FILTERS: GeoTrafficLogFilters = {
+  visitorTypes: [],
+  categories: [],
+};
 export const GEO_RANGE_PRESET_LABEL_KEYS = {
   today: "today",
   yesterday: "yesterday",

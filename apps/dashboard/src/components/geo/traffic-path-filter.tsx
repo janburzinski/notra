@@ -14,6 +14,7 @@ import {
   ComboboxItem,
   ComboboxList,
 } from "@notra/ui/components/ui/combobox";
+import { startTransition } from "react";
 import { useTranslations } from "use-intl";
 
 import { Button } from "@/components/button";
@@ -42,7 +43,9 @@ export function TrafficPathFilter({ paths }: TrafficPathFilterProps) {
       items={options}
       limit={TRAFFIC_PATH_FILTER_LIMIT}
       onValueChange={(next) => {
-        void setPath(!next || next === TRAFFIC_PATH_ALL ? "" : next);
+        startTransition(() => {
+          void setPath(!next || next === TRAFFIC_PATH_ALL ? "" : next);
+        });
       }}
       value={path || TRAFFIC_PATH_ALL}
     >

@@ -71,6 +71,7 @@ import { useTranslations } from "use-intl";
 
 import { useGeoLive } from "@/components/providers/geo-live-provider";
 import { useGeoProjectScope } from "@/components/providers/geo-project-provider";
+import { TRAFFIC_LOG_DEFAULT_FILTERS } from "@/constants/geo-analytics";
 import { GEO_COMPETITOR_DETAIL_QUERY_KEY } from "@/constants/geo-competitors";
 import {
   trackFirstScanCompleted,
@@ -1198,6 +1199,38 @@ export function useGeoTrafficLog(
     refetchIntervalInBackground: false,
     meta: { errorMessage: tToast("loadAITrackingLogFailed") },
   });
+}
+
+/**
+ * Starts the request log with the page's other queries; its card only mounts
+ * once the page leaves its skeleton, which put the log a round trip behind.
+ */
+export function usePrefetchGeoTrafficLog(
+  organizationId: string,
+  options: GeoTrafficLogQueryOptions,
+  enabled: boolean
+) {
+  const queryClient = useQueryClient();
+  const { projectId } = useGeoProjectScope();
+  const { host, path, sites } = options;
+  useEffect(() => {
+    if (!(enabled && organizationId)) {
+      return;
+    }
+    const queryOptions = dashboardOrpc.geo.trafficLog.queryOptions({
+      input: geoTrafficLogQueryInput(
+        { organizationId, projectId },
+        TRAFFIC_LOG_DEFAULT_FILTERS,
+        host,
+        path,
+        sites
+      ),
+    });
+    if (queryClient.getQueryState(queryOptions.queryKey)) {
+      return;
+    }
+    queryClient.prefetchQuery(queryOptions).catch(() => undefined);
+  }, [enabled, host, organizationId, path, projectId, queryClient, sites]);
 }
 
 export function useGeoTrafficPages(

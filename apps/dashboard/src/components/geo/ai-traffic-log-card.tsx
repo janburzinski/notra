@@ -27,7 +27,10 @@ import { useTranslations } from "use-intl";
 
 import { CitationsTable } from "@/components/geo/citations-table";
 import { AI_TRAFFIC_PURPOSE_LABEL_KEYS } from "@/constants/ai-traffic-purposes";
-import { TRAFFIC_LOG_FILTER_KINDS } from "@/constants/geo-analytics";
+import {
+  TRAFFIC_LOG_DEFAULT_FILTERS,
+  TRAFFIC_LOG_FILTER_KINDS,
+} from "@/constants/geo-analytics";
 import { trackEvent } from "@/lib/analytics/posthog-client";
 import { useGeoTrafficLog } from "@/lib/hooks/use-geo";
 import { useGeoTrafficHostQuery } from "@/lib/hooks/use-geo-traffic-host";
@@ -42,10 +45,9 @@ export function AiTrafficLogCard({ organizationId }: AiTrafficLogCardProps) {
   const t = useTranslations("geo.aiTrafficLogCard");
   const tCommon = useTranslations("common");
   const tGeoShared = useTranslations("geo.shared");
-  const [filters, setFilters] = useState<GeoTrafficLogFilters>({
-    visitorTypes: [],
-    categories: [],
-  });
+  const [filters, setFilters] = useState<GeoTrafficLogFilters>(
+    TRAFFIC_LOG_DEFAULT_FILTERS
+  );
   const [hostQuery] = useGeoTrafficHostQuery();
   const [pathQuery] = useTrafficPathQuery();
   const sites = useTrafficSitesMode();

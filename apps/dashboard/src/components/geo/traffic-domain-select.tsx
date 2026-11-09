@@ -11,6 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@notra/ui/components/ui/select";
+import { startTransition } from "react";
 import { useTranslations } from "use-intl";
 
 import { TRAFFIC_SITES_EXCLUDE_OPTION } from "@/constants/traffic-sites";
@@ -73,13 +74,17 @@ export function TrafficDomainSelect({
         if (!next) {
           return;
         }
-        if (next === TRAFFIC_SITES_EXCLUDE_OPTION) {
-          setHostQuery("");
-          setSitesQuery("exclude");
-          return;
-        }
-        setSitesQuery(null);
-        setHostQuery(next === GEO_TRAFFIC_HOST_ALL ? "" : next);
+        // The whole page re-renders for a new filter; a transition keeps the
+        // menu responsive while it does.
+        startTransition(() => {
+          if (next === TRAFFIC_SITES_EXCLUDE_OPTION) {
+            setHostQuery("");
+            setSitesQuery("exclude");
+            return;
+          }
+          setSitesQuery(null);
+          setHostQuery(next === GEO_TRAFFIC_HOST_ALL ? "" : next);
+        });
       }}
       value={value}
     >
