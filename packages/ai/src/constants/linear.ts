@@ -46,3 +46,10 @@ export const LINEAR_ISSUE_PREVIEWS_QUERY = `
     }
   }
 `;
+
+export const LINEAR_TOOL_ERROR_MESSAGES = {
+  auth: "Linear rejected Notra's access. Tell the user to reconnect Linear in Notra's integration settings.",
+  rateLimited:
+    "Linear is rate limiting requests right now. Try again in a minute.",
+  failed: "Couldn't load data from Linear.",
+};

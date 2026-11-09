@@ -3,6 +3,7 @@ import { createLinearClient, getLinearIssues } from "@notra/ai/utils/linear";
 import { defineTool } from "eve/tools";
 
 import { getLinearIssuesInputSchema } from "../schemas/assistant-tools";
+import { runLinearTool } from "../utils/linear";
 import { requireOrganizationId } from "../utils/organization";
 
 export function createGetLinearIssuesTool() {
@@ -10,41 +11,44 @@ export function createGetLinearIssuesTool() {
     description:
       "Get Linear issues for a team (title, state, priority, assignee, labels). Supports since/until ISO timestamps and cursor pagination. Requires a connected Linear integration; use get_available_integrations to discover integrationIds.",
     inputSchema: getLinearIssuesInputSchema,
-    async execute(
-      { integrationId, since, until, cursor, includeCompleted },
-      ctx
-    ) {
+    execute({ integrationId, since, until, cursor, includeCompleted }, ctx) {
       const organizationId = requireOrganizationId(ctx);
-      const resolved = await getLinearToolContextByIntegrationId(
-        integrationId,
-        { organizationId }
+      return runLinearTool(
+        "get_linear_issues",
+        { organizationId, integrationId },
+        async () => {
+          const resolved = await getLinearToolContextByIntegrationId(
+            integrationId,
+            { organizationId }
+          );
+          const client = createLinearClient(resolved.accessToken);
+
+          const filter: Record<string, unknown> = {};
+          if (resolved.linearTeamId) {
+            filter.team = { id: { eq: resolved.linearTeamId } };
+          }
+          if (since || until) {
+            const updatedAt: Record<string, string> = {};
+            if (since) {
+              updatedAt.gte = since;
+            }
+            if (until) {
+              updatedAt.lte = until;
+            }
+            filter.updatedAt = updatedAt;
+          }
+          if (!includeCompleted) {
+            filter.completedAt = { null: true };
+          }
+
+          return getLinearIssues(client, {
+            filter,
+            first: 50,
+            after: cursor,
+            orderBy: "updatedAt" as never,
+          });
+        }
       );
-      const client = createLinearClient(resolved.accessToken);
-
-      const filter: Record<string, unknown> = {};
-      if (resolved.linearTeamId) {
-        filter.team = { id: { eq: resolved.linearTeamId } };
-      }
-      if (since || until) {
-        const updatedAt: Record<string, string> = {};
-        if (since) {
-          updatedAt.gte = since;
-        }
-        if (until) {
-          updatedAt.lte = until;
-        }
-        filter.updatedAt = updatedAt;
-      }
-      if (!includeCompleted) {
-        filter.completedAt = { null: true };
-      }
-
-      return getLinearIssues(client, {
-        filter,
-        first: 50,
-        after: cursor,
-        orderBy: "updatedAt" as never,
-      });
     },
   });
 }

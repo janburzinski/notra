@@ -1,7 +1,13 @@
-import { LinearClient, parseLinearError } from "@linear/sdk";
+import {
+  LinearClient,
+  LinearError,
+  LinearErrorType,
+  parseLinearError,
+} from "@linear/sdk";
 import {
   LINEAR_ISSUE_PREVIEWS_QUERY,
   LINEAR_ISSUES_WITH_RELATIONS_QUERY,
+  LINEAR_TOOL_ERROR_MESSAGES,
 } from "@notra/ai/constants/linear";
 import type {
   LinearIssuePreviewsQueryResult,
@@ -39,9 +45,9 @@ export async function getLinearIssues(
       priorityLabel: issue.priorityLabel,
       assignee: issue.assignee?.name ?? issue.assignee?.displayName ?? null,
       labels: issue.labels.nodes.map((label) => label.name),
-      createdAt: new Date(issue.createdAt),
-      updatedAt: new Date(issue.updatedAt),
-      completedAt: issue.completedAt ? new Date(issue.completedAt) : null,
+      createdAt: issue.createdAt,
+      updatedAt: issue.updatedAt,
+      completedAt: issue.completedAt,
       url: issue.url,
     })),
     pagination: {
@@ -49,6 +55,24 @@ export async function getLinearIssues(
       endCursor: issues.pageInfo.endCursor ?? null,
     },
   };
+}
+
+/** A tool result the model can act on, e.g. telling the user to reconnect Linear. */
+export function describeLinearToolError(error: unknown): string {
+  if (error instanceof LinearError) {
+    if (
+      error.type === LinearErrorType.AuthenticationError ||
+      error.type === LinearErrorType.Forbidden
+    ) {
+      return LINEAR_TOOL_ERROR_MESSAGES.auth;
+    }
+    if (error.type === LinearErrorType.Ratelimited) {
+      return LINEAR_TOOL_ERROR_MESSAGES.rateLimited;
+    }
+  }
+  return `${LINEAR_TOOL_ERROR_MESSAGES.failed} ${
+    error instanceof Error ? error.message : String(error)
+  }`;
 }
 
 export async function getLinearIssuePreviews(

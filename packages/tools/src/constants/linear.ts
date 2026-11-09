@@ -1,0 +1,2 @@
+export const LINEAR_RECENT_CYCLES_LIMIT = 5;
+export const LINEAR_CYCLE_LOOKBACK_MS = 180 * 86_400_000;
