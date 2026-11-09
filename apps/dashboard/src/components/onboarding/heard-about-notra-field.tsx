@@ -62,7 +62,7 @@ export function HeardAboutNotraField({
               sourceError ? "heard-about-notra-error" : undefined
             }
             aria-invalid={Boolean(sourceError)}
-            className="w-full rounded-xl px-3.5 data-[size=default]:h-11"
+            className="h-9 w-full px-3.5"
             disabled={disabled}
             id="heard-about-notra"
             size="default"
