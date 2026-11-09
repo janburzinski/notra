@@ -31,7 +31,7 @@ import { createHmac } from "node:crypto";
 import { Effect } from "effect";
 const scenario = ${JSON.stringify(scenario)};
 const runtimePath = ${JSON.stringify(runtime)};
-if (scenario === "chart-failure-with-publish" || scenario === "approval-payload" || scenario === "draft-pr-completion") {
+if (scenario === "chart-failure-with-publish" || scenario === "approval-payload" || scenario === "approval-guest" || scenario === "draft-pr-completion") {
   mock.module(runtimePath + "/context/build-callback-context.js", () => ({
     buildCallbackContext: () => ({ session: { id: "session-1", auth: { current: null, initiator: null } } }),
   }));
@@ -89,6 +89,7 @@ mock.module(${JSON.stringify(mirrorPath)}, () => ({ mirrorPublicSlackThread: () 
   return null;
 }) }));
 const outbound = [];
+const ephemerals = () => outbound.filter((call) => call.url.endsWith("chat.postEphemeral")).map((call) => call.body.markdown_text);
 globalThis.fetch = async (url, init) => {
   outbound.push({ url: String(url), raw: String(init.body), authorization: new Headers(init.headers).get("authorization"), body: Object.fromEntries(new URLSearchParams(String(init.body))) });
   const name = new URL(String(url)).pathname.split("/").at(-1);
@@ -188,7 +189,7 @@ if (scenario === "draft-pr-completion") {
     assert.equal(result.postId, "saved-post");
     assert.equal(result.status, "created");
   }
-} else if (scenario === "approval-payload") {
+} else if (scenario === "approval-payload" || scenario === "approval-guest") {
   const { handleSlackInputRequested } = await import(${JSON.stringify(resolve(import.meta.dir, "../agent/lib/utils/slack-input-request.ts"))});
   const { defaultInputRequestedHandler } = await import(runtimePath + "/public/channels/slack/defaults.js");
   const details = "Large blog draft & Unicode ü\\n".repeat(3000);
@@ -211,32 +212,54 @@ if (scenario === "draft-pr-completion") {
   const buttons = blocks.flatMap((block) => block.elements ?? block.actions ?? []).filter((element) => element.type === "button");
   assert.equal(buttons.length, 2);
   for (const button of buttons) {
-    await request({ type: "block_actions", app_installed_team_id: "T-install", team: { id: "T-install" }, user: { id: "U-human", team_id: "T-install" },
+    await request({ type: "block_actions", app_installed_team_id: "T-install", team: { id: "T-install" }, user: { id: "U-human", team_id: scenario === "approval-guest" ? "T-actor" : "T-install" },
       channel: { id: "C-room" }, message: { ts: "card-1", thread_ts: "1.0", blocks }, actions: [button] }, true);
   }
   await Promise.all(tasks);
+  if (scenario === "approval-guest") {
+    assert.equal(continuationSends.length, 0);
+    assert.equal(ephemerals().length, 2);
+    assert(ephemerals().every((text) => text.includes("Only members of this workspace")));
+  } else {
   assert.equal(continuationSends.length, 2);
   assert(continuationSends.every((command) => JSON.stringify(command).includes("req-1")));
   assert(JSON.stringify(continuationSends[0]).includes("approve"));
   assert(JSON.stringify(continuationSends[1]).includes("deny"));
+  assert.equal(ephemerals().length, 0);
+  }
 } else if (scenario === "saved-tweet-publish") {
   const { buildPostToXConfirmCard } = await import(${JSON.stringify(postToXPath)});
   const { offerSavedTweetPublishing } = await import(${JSON.stringify(resolve(import.meta.dir, "../agent/lib/utils/slack-input-request.ts"))});
-  await offerSavedTweetPublishing({ ...binding, state: { installationTeamId: "T-install" } }, "org-install", "saved-post", "saved-call");
+  await offerSavedTweetPublishing({ ...binding, state: { installationTeamId: "T-install" } }, "org-install", "saved-post", "saved-call", "U-human");
+  assert.equal(JSON.parse(redisStore.get("slack:post-x:saved-call")).requestedBy, "U-human");
   const draftPosts = outbound.filter((call) => call.url.endsWith("chat.postMessage"));
   assert.equal(draftPosts.length, 2);
   assert(JSON.stringify(draftPosts[0].body).includes("Saved tweet"));
   assert(!draftPosts[1].body.blocks.includes("Saved tweet"));
   assert(draftPosts[1].body.blocks.includes("notra_post_x_confirm:"));
   assert(!draftPosts[1].body.blocks.includes("eve_input:"));
-  const click = (action) => request({ type: "block_actions", app_installed_team_id: "T-install", team: { id: "T-install" }, user: { id: "U-human", team_id: "T-actor" },
+  const click = (action, userId = "U-human") => request({ type: "block_actions", app_installed_team_id: "T-install", team: { id: "T-install" }, user: { id: userId, team_id: "T-install" },
     channel: { id: "C-room" }, message: { ts: "card-1", thread_ts: "1.0" }, actions: [action] }, true);
-  await click({ action_id: "notra_post_x_confirm:saved-call", value: JSON.stringify({ callId: "saved-call", username: "notra" }) });
+  const confirm = { action_id: "notra_post_x_confirm:saved-call", value: JSON.stringify({ callId: "saved-call", username: "notra" }) };
+  await click(confirm, "U-other");
+  await click(confirm);
+  await click({
+    action_id: "notra_post_x_account:saved-call",
+    type: "static_select",
+    selected_option: { value: JSON.stringify({ callId: "saved-call", accountId: "acct-other", username: "other" }) },
+  }, "U-other");
   await Promise.all(tasks);
   assert.equal(published.length, 0);
+  assert.notEqual(JSON.parse(redisStore.get("slack:post-x:saved-call")).accountId, "acct-other");
   const card = buildPostToXConfirmCard({ callId: "saved-call", username: "notra", accounts: [] });
   const button = card.blocks.at(-1).elements[0];
   assert(button.action_id.startsWith("notra_post_x_publish:"));
+  // Teammates can see the card, but only the person who asked can post it.
+  await click(button, "U-other");
+  await Promise.all(tasks);
+  assert.equal(published.length, 0);
+  assert.equal(ephemerals().length, 3);
+  assert(ephemerals().every((text) => text.includes("Only the person who asked")));
   await click(button);
   await Promise.all(tasks);
   await click(button);
@@ -280,20 +303,42 @@ if (scenario === "draft-pr-completion") {
     assert.equal(state.notraPostToXTurnId, undefined);
     assert.equal(state.notraDraftCompletion, undefined);
   }
-} else if (scenario === "owner-policy" || scenario === "external-actor") {
-  await request({ type: "block_actions", app_installed_team_id: "T-install", team: { id: "T-install" }, user: { id: "U-human", team_id: scenario === "external-actor" ? "T-unknown" : "T-actor" },
-    channel: { id: "C-room" }, message: { ts: "card-1", thread_ts: "1.0" }, actions: [{ action_id: "notra_leave_thread", value: JSON.stringify({ sessionId: "original-session", turnId: "turn-0" }) }] }, true);
-  await Promise.all(tasks);
-  assert.equal(resets, scenario === "owner-policy" ? 0 : 1);
-  if (scenario === "external-actor") {
-    assert.equal(outbound.length, 1);
-    assert(outbound.every((call) => call.authorization === "Bearer fixture-install"));
+} else if (scenario === "owner-policy" || scenario === "external-actor" || scenario === "member-actor") {
+  const actorTeamId = { "owner-policy": "T-actor", "external-actor": "T-unknown", "member-actor": "T-install" }[scenario];
+  for (const actionId of ["notra_stop_turn", "notra_leave_thread"]) {
+    await request({ type: "block_actions", app_installed_team_id: "T-install", team: { id: "T-install" }, user: { id: "U-human", team_id: actorTeamId },
+      channel: { id: "C-room" }, message: { ts: "card-1", thread_ts: "1.0" }, actions: [{ action_id: actionId, value: JSON.stringify({ sessionId: "original-session", turnId: "turn-0" }) }] }, true);
   }
+  await Promise.all(tasks);
+  assert.equal(resets, scenario === "member-actor" ? 1 : 0);
+  assert(outbound.every((call) => call.authorization === "Bearer fixture-install"));
+  if (scenario === "external-actor") {
+    assert.equal(outbound.length, 2);
+    assert.equal(ephemerals().length, 2);
+    assert(ephemerals().every((text) => text.includes("Only members of this workspace")));
+  } else {
+    assert.equal(ephemerals().length, 0);
+  }
+} else if (scenario === "post-x-guest") {
+  redisStore.set("slack:post-x:call-install", JSON.stringify({ organizationId: "org-install", accountId: "acct-org-install", username: "org-install-x", text: "Hello" }));
+  const click = (action) => request({ type: "block_actions", app_installed_team_id: "T-install", team: { id: "T-install" }, user: { id: "U-guest", team_id: "T-actor" },
+    channel: { id: "C-room" }, message: { ts: "card-1", thread_ts: "1.0" }, actions: [action] }, true);
+  await click({ action_id: "notra_post_x_confirm:req-1", value: JSON.stringify({ callId: "call-install", username: "x" }) });
+  await click({ action_id: "notra_post_x_account:call-install", selected_option: { value: JSON.stringify({ callId: "call-install", accountId: "alt-org-install", username: "org-install-alt" }) } });
+  await click({ action_id: "notra_post_x_publish:call-install", value: "call-install" });
+  await click({ action_id: "notra_post_x_cancel:call-install", value: "call-install" });
+  await Promise.all(tasks);
+  assert.deepEqual(linkedLookups, []);
+  assert.equal(published.length, 0);
+  assert.equal(JSON.parse(redisStore.get("slack:post-x:call-install")).accountId, "acct-org-install");
+  assert.equal(outbound.filter((call) => !call.url.endsWith("chat.postEphemeral")).length, 0);
+  assert.equal(ephemerals().length, 4);
+  assert(ephemerals().every((text) => text.includes("Only members of this workspace")));
 } else if (scenario === "post-x-slack-connect") {
   const pending = (organizationId) => JSON.stringify({ organizationId, accountId: "acct-" + organizationId, username: organizationId + "-x", text: "Hello" });
   redisStore.set("slack:post-x:call-install", pending("org-install"));
   redisStore.set("slack:post-x:call-actor", pending("org-actor"));
-  const click = (action) => request({ type: "block_actions", app_installed_team_id: "T-install", team: { id: "T-install" }, user: { id: "U-human", team_id: "T-actor" },
+  const click = (action) => request({ type: "block_actions", app_installed_team_id: "T-install", team: { id: "T-install" }, user: { id: "U-human", team_id: "T-install" },
     channel: { id: "C-room" }, message: { ts: "card-1", thread_ts: "1.0" }, actions: [action] }, true);
   for (const callId of ["call-install", "call-actor"]) {
     await click({ action_id: "notra_post_x_confirm:req-1", value: JSON.stringify({ requestId: "req-1", callId, username: "x" }) });
@@ -367,7 +412,9 @@ describe("Slack native channel boundaries", () => {
     runSlackChannel("draft-approval"));
   test("large approval details stay outside button callbacks and both decisions are delivered", () =>
     runSlackChannel("approval-payload"));
-  test("saved tweets only publish after explicit confirmation, at most once", () =>
+  test("Slack Connect guests cannot answer approvals", () =>
+    runSlackChannel("approval-guest"));
+  test("saved tweets only publish after the requester confirms, at most once", () =>
     runSlackChannel("saved-tweet-publish"));
   test("the first top-level mention sets native status before preparing the session", () =>
     runSlackChannel("initial-status"));
@@ -375,10 +422,14 @@ describe("Slack native channel boundaries", () => {
     runSlackChannel("chart-failure-with-publish"));
   test("Slack Connect checks the installation policy, not the actor policy", () =>
     runSlackChannel("owner-policy"));
-  test("a valid installation's controls work for an external actor", () =>
+  test("Slack Connect guests cannot use the thread controls", () =>
     runSlackChannel("external-actor"));
+  test("installing workspace members can use the thread controls", () =>
+    runSlackChannel("member-actor"));
   test("Post to X in Slack Connect only uses the installing organization", () =>
     runSlackChannel("post-x-slack-connect"));
+  test("Slack Connect guests cannot confirm, switch, publish or cancel Post to X", () =>
+    runSlackChannel("post-x-guest"));
   test("a pending Post to X publishes at most once", () =>
     runSlackChannel("post-x-once"));
   test("an in-flight ordinary reply cannot recreate a thread after Leave", () =>

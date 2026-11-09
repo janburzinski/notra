@@ -13,6 +13,7 @@ import {
 import {
   CREATE_POST_TOOL_NAMES,
   POST_TO_X_NOT_PENDING_MESSAGE,
+  POST_TO_X_NOT_REQUESTER_MESSAGE,
   SLACK_PERMISSION_ERROR_PATTERN,
   SLACK_SESSION_FAILED_MESSAGE,
   SLACK_TURN_FAILED_MESSAGE,
@@ -38,7 +39,11 @@ import {
   mirrorToolApprovals,
   mirrorToolResult,
 } from "../lib/utils/chat-mirror";
-import { buildNotraSlackAuth } from "../lib/utils/slack-auth";
+import {
+  buildNotraSlackAuth,
+  getSlackAuthUserId,
+  resolveSlackActionInstallation,
+} from "../lib/utils/slack-auth";
 import { uploadSlackChart } from "../lib/utils/slack-chart";
 import { mirrorPublicSlackThread } from "../lib/utils/slack-chat-mirror";
 import {
@@ -67,6 +72,7 @@ import {
   buildPostToXConfirmCard,
   dismissPostToXConfirmCard,
   getPostToXCompletionMessage,
+  isPendingPostToXRequester,
   parsePostToXConfirmValue,
   publishPendingPostToX,
   readPendingPostToXForOrganization,
@@ -165,10 +171,11 @@ const onSlackInteraction: NonNullable<
     action.actionId === SLACK_STOP_ACTION_ID ||
     action.actionId === SLACK_LEAVE_ACTION_ID
   ) {
-    const installation = ctx.slack.installationTeamId
-      ? await resolveSlackInstallation(ctx.slack.installationTeamId)
-      : null;
-    if (!installation || !isChannelAllowed(installation, ctx.slack.channelId)) {
+    const installation = await resolveSlackActionInstallation(
+      ctx,
+      action.user.id
+    );
+    if (!installation) {
       return;
     }
     await runWithSlackInstallation(installation, () =>
@@ -178,12 +185,14 @@ const onSlackInteraction: NonNullable<
   }
   if (action.actionId.startsWith(POST_TO_X_CONFIRM_ACTION_PREFIX)) {
     const parsed = parsePostToXConfirmValue(action.value);
-    const teamId = ctx.slack.installationTeamId;
-    if (!(parsed && teamId)) {
+    if (!parsed) {
       return;
     }
-    const installation = await resolveSlackInstallation(teamId);
-    if (!installation || !isChannelAllowed(installation, ctx.slack.channelId)) {
+    const installation = await resolveSlackActionInstallation(
+      ctx,
+      action.user.id
+    );
+    if (!installation) {
       return;
     }
     await runWithSlackInstallation(installation, async () => {
@@ -195,6 +204,13 @@ const onSlackInteraction: NonNullable<
         await ctx.thread.postEphemeral(
           action.user.id,
           POST_TO_X_NOT_PENDING_MESSAGE
+        );
+        return;
+      }
+      if (!isPendingPostToXRequester(pending, action.user.id)) {
+        await ctx.thread.postEphemeral(
+          action.user.id,
+          POST_TO_X_NOT_REQUESTER_MESSAGE
         );
         return;
       }
@@ -225,14 +241,14 @@ const onSlackInteraction: NonNullable<
 
   if (action.actionId.startsWith(`${POST_TO_X_PUBLISH_ACTION_PREFIX}:`)) {
     const callId = action.value;
-    const installation = ctx.slack.installationTeamId
-      ? await resolveSlackInstallation(ctx.slack.installationTeamId)
-      : null;
-    if (
-      !callId ||
-      !installation ||
-      !isChannelAllowed(installation, ctx.slack.channelId)
-    ) {
+    if (!callId) {
+      return;
+    }
+    const installation = await resolveSlackActionInstallation(
+      ctx,
+      action.user.id
+    );
+    if (!installation) {
       return;
     }
     await runWithSlackInstallation(installation, async () => {
@@ -240,6 +256,13 @@ const onSlackInteraction: NonNullable<
         callId,
         installation.organizationId
       );
+      if (pending && !isPendingPostToXRequester(pending, action.user.id)) {
+        await ctx.thread.postEphemeral(
+          action.user.id,
+          POST_TO_X_NOT_REQUESTER_MESSAGE
+        );
+        return;
+      }
       const outcome = pending
         ? await publishPendingPostToX(callId, callId)
         : undefined;
@@ -255,21 +278,38 @@ const onSlackInteraction: NonNullable<
   }
 
   if (action.actionId.startsWith(POST_TO_X_ACCOUNT_ACTION_PREFIX)) {
-    const installation = ctx.slack.installationTeamId
-      ? await resolveSlackInstallation(ctx.slack.installationTeamId)
-      : null;
-    if (!installation || !isChannelAllowed(installation, ctx.slack.channelId)) {
+    const installation = await resolveSlackActionInstallation(
+      ctx,
+      action.user.id
+    );
+    if (!installation) {
       return;
     }
-    await switchPendingPostToXAccount(
+    const switched = await switchPendingPostToXAccount(
       action.selectedOptionValue,
-      installation.organizationId
+      installation.organizationId,
+      action.user.id
     );
+    if (!switched) {
+      await runWithSlackInstallation(installation, () =>
+        ctx.thread.postEphemeral(
+          action.user.id,
+          POST_TO_X_NOT_REQUESTER_MESSAGE
+        )
+      );
+    }
     return;
   }
 
   if (action.actionId.startsWith(POST_TO_X_CANCEL_ACTION_PREFIX)) {
-    await runWithSlackTeam(ctx.slack.installationTeamId, () =>
+    const installation = await resolveSlackActionInstallation(
+      ctx,
+      action.user.id
+    );
+    if (!installation) {
+      return;
+    }
+    await runWithSlackInstallation(installation, () =>
       dismissPostToXConfirmCard(ctx, action.messageTs)
     );
   }
@@ -277,14 +317,12 @@ const onSlackInteraction: NonNullable<
 
 const onSlackInputResponse: NonNullable<
   SlackChannelConfig["onInputResponse"]
-> = async (ctx) => {
-  const installation = ctx.slack.installationTeamId
-    ? await resolveSlackInstallation(ctx.slack.installationTeamId)
-    : null;
-  if (!installation || !isChannelAllowed(installation, ctx.slack.channelId)) {
-    return null;
-  }
-  return { auth: ctx.defaultAuth };
+> = async (ctx, submission) => {
+  const installation = await resolveSlackActionInstallation(
+    ctx,
+    submission.user.id
+  );
+  return installation ? { auth: ctx.defaultAuth } : null;
 };
 
 const onSlackEvent: NonNullable<SlackChannelConfig["onEvent"]> = async (
@@ -419,7 +457,8 @@ export default slackChannel({
               channel,
               organizationId,
               postId,
-              result.callId
+              result.callId,
+              getSlackAuthUserId(ctx.session.auth.current)
             )
           );
         }
@@ -430,7 +469,12 @@ export default slackChannel({
     },
     "input.requested": (data, channel, ctx, defaultDeliver) =>
       runWithSlackTeam(channel.state.installationTeamId, async () => {
-        await handleSlackInputRequested(data, channel, defaultDeliver);
+        await handleSlackInputRequested(
+          data,
+          channel,
+          defaultDeliver,
+          getSlackAuthUserId(ctx.session.auth.current)
+        );
         await mirrorToolApprovals(ctx, data);
         await mirrorSessionStatus(ctx, "idle");
       }),

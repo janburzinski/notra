@@ -30,6 +30,8 @@ export interface PendingPostToX {
   accountId: string;
   username: string;
   text: string;
+  /** Slack user who asked for the tweet; unset when it came from elsewhere. */
+  requestedBy?: string;
 }
 
 export interface PostToXOutcome {

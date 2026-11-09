@@ -38,5 +38,14 @@ export const SLACK_SESSION_FAILED_MESSAGE =
 export const POST_TO_X_NOT_PENDING_MESSAGE =
   "This tweet is no longer waiting to be posted. It may have expired or already been posted. Ask me to draft it again if you still want to post it.";
 
+export const POST_TO_X_NOT_REQUESTER_MESSAGE =
+  "Only the person who asked for this tweet can post it to X.";
+
+export const SLACK_ACTION_OUTSIDER_MESSAGE =
+  "Only members of this workspace can use these buttons.";
+
+/** `authenticator` eve sets on auth derived from a Slack user. */
+export const SLACK_WEBHOOK_AUTHENTICATOR = "slack-webhook";
+
 export const CHANNEL_NOT_ENABLED_MESSAGE =
   "The Notra agent is not enabled in this channel. An admin can enable it from the Slack integration settings in the Notra dashboard.";

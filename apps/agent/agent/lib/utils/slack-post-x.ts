@@ -80,6 +80,13 @@ export async function readPendingPostToXForOrganization(
   return pending?.organizationId === organizationId ? pending : null;
 }
 
+export function isPendingPostToXRequester(
+  pending: PendingPostToX,
+  userId: string
+): boolean {
+  return !pending.requestedBy || pending.requestedBy === userId;
+}
+
 export function buildPostToXConfirmCard(input: {
   requestId?: string;
   callId: string;
@@ -158,18 +165,20 @@ export function buildPostToXConfirmCard(input: {
   };
 }
 
+/** Returns `false` when someone other than the requester tried to switch. */
 export async function switchPendingPostToXAccount(
   selectedValue: string | undefined,
-  organizationId: string
-): Promise<void> {
+  organizationId: string,
+  userId: string
+): Promise<boolean> {
   if (!selectedValue) {
-    return;
+    return true;
   }
   let parsed: unknown;
   try {
     parsed = JSON.parse(selectedValue);
   } catch {
-    return;
+    return true;
   }
   if (
     !(
@@ -183,7 +192,7 @@ export async function switchPendingPostToXAccount(
       typeof parsed.username === "string"
     )
   ) {
-    return;
+    return true;
   }
 
   const pending = await readPendingPostToXForOrganization(
@@ -191,7 +200,10 @@ export async function switchPendingPostToXAccount(
     organizationId
   );
   if (!pending) {
-    return;
+    return true;
+  }
+  if (!isPendingPostToXRequester(pending, userId)) {
+    return false;
   }
   // Only update a post that is still pending: once publishing has claimed
   // it, a late account switch must not bring it back for a second publish.
@@ -200,6 +212,7 @@ export async function switchPendingPostToXAccount(
     { ...pending, accountId: parsed.accountId, username: parsed.username },
     { onlyIfExists: true }
   );
+  return true;
 }
 
 export async function dismissPostToXConfirmCard(

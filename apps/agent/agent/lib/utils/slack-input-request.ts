@@ -21,12 +21,14 @@ async function createTwitterDraftPost(
   markdown: string,
   callId: string,
   channel: SlackEventContext,
+  requestedBy: string | undefined,
   request?: InputRequest
 ): Promise<SlackPostInput> {
   const linkedAccount = await resolveLinkedTwitterAccount(
     channel,
     markdown,
-    callId
+    callId,
+    requestedBy
   );
   const text = (value: string) => ({
     type: "plain_text" as const,
@@ -82,7 +84,8 @@ async function createTwitterDraftPost(
 async function resolveLinkedTwitterAccount(
   channel: SlackEventContext,
   markdown: string,
-  callId: string
+  callId: string,
+  requestedBy: string | undefined
 ) {
   if (!isTwitterPublishConfigured()) {
     return null;
@@ -108,6 +111,7 @@ async function resolveLinkedTwitterAccount(
       accountId: account.id,
       username: account.username,
       text: markdown,
+      requestedBy,
     });
     return stored ? account : null;
   } catch (error) {
@@ -123,7 +127,8 @@ export async function offerSavedTweetPublishing(
   channel: SlackEventContext,
   organizationId: string,
   postId: string,
-  callId: string
+  callId: string,
+  requestedBy: string | undefined
 ) {
   const post = await db.query.posts.findFirst({
     where: and(eq(posts.id, postId), eq(posts.organizationId, organizationId)),
@@ -134,14 +139,15 @@ export async function offerSavedTweetPublishing(
   }
   await channel.thread.post(post.markdown);
   await channel.thread.post(
-    await createTwitterDraftPost(post.markdown, callId, channel)
+    await createTwitterDraftPost(post.markdown, callId, channel, requestedBy)
   );
 }
 
 export async function handleSlackInputRequested(
   data: InputRequestedStreamEvent["data"],
   channel: SlackEventContext,
-  defaultDeliver: SlackInputRequestedDefaultDeliver
+  defaultDeliver: SlackInputRequestedDefaultDeliver,
+  requestedBy?: string
 ) {
   for (const request of data.requests) {
     const markdown = request.action.input.markdown;
@@ -158,6 +164,7 @@ export async function handleSlackInputRequested(
           markdown,
           request.action.callId,
           channel,
+          requestedBy,
           request
         )
       );
