@@ -822,6 +822,8 @@
       "show": "Show testimonial from {name}"
     },
     "signup": {
+      "freeScanTitle": "Free AI visibility scan with a work email",
+      "freeScanDescription": "Sign up with your company email and we check how AI answers mention your brand. No card needed.",
       "title": "Create your account",
       "description": "Start turning what you ship into what you publish.",
       "failed": "Failed to sign up. Please try again.",
@@ -4339,6 +4341,10 @@
       "importCompetitorsFailed": "Failed to import competitors",
       "saveBrandFailed": "Failed to save your brand",
       "startScanFailed": "Failed to start scan",
+      "freeScanStarted": "Your free first scan is running",
+      "freeScanStartedDescription": "We are asking AI assistants {count, plural, one {# prompt} other {# prompts}} about your space. Results show up on your dashboard in a few minutes.",
+      "firstScanCompleted": "Your first scan is done",
+      "firstScanCompletedDescription": "See where AI answers mention you and your competitors.",
       "startRescanFailed": "Failed to start rescan",
       "loadAgentReadinessFailed": "Failed to load agent readiness",
       "loadVisitorsFailed": "Failed to load visitors",

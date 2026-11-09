@@ -71,6 +71,7 @@ import { useTranslations } from "use-intl";
 
 import { useGeoLive } from "@/components/providers/geo-live-provider";
 import { useGeoProjectScope } from "@/components/providers/geo-project-provider";
+import { FIRST_SCAN_COMPLETED_TOAST_ID } from "@/constants/free-scan";
 import { TRAFFIC_LOG_DEFAULT_FILTERS } from "@/constants/geo-analytics";
 import { GEO_COMPETITOR_DETAIL_QUERY_KEY } from "@/constants/geo-competitors";
 import {
@@ -232,10 +233,21 @@ export function useGeoSettings(organizationId: string) {
       }).catch(() => undefined);
       if (firstScanRunningRef.current && lastScanAt !== null) {
         trackFirstScanCompleted(projectId ?? organizationId);
+        dashboardOrpc.geo.scanRuns
+          .call({ organizationId, projectId })
+          .then(({ runs }) => {
+            if (runs[0]?.status === "completed") {
+              toast.success(tToast("firstScanCompleted"), {
+                id: FIRST_SCAN_COMPLETED_TOAST_ID,
+                description: tToast("firstScanCompletedDescription"),
+              });
+            }
+          })
+          .catch(() => undefined);
       }
       firstScanRunningRef.current = false;
     }
-  }, [isScanning, lastScanAt, organizationId, projectId, queryClient]);
+  }, [isScanning, lastScanAt, organizationId, projectId, queryClient, tToast]);
 
   return query;
 }
@@ -904,6 +916,7 @@ export function useGeoStartScan(organizationId: string) {
 }
 
 export function useGeoStartFreeScan(organizationId: string) {
+  const tToast = useTranslations("geo.toasts");
   const { projectId } = useGeoProjectScope();
   const queryClient = useQueryClient();
   return useMutation({
@@ -915,6 +928,11 @@ export function useGeoStartFreeScan(organizationId: string) {
         return;
       }
       trackFirstScanStarted("onboarding");
+      toast.success(tToast("freeScanStarted"), {
+        description: tToast("freeScanStartedDescription", {
+          count: result.promptCount,
+        }),
+      });
       emitAutumnRefresh();
       await refreshSettingsAfterScanStart(
         queryClient,

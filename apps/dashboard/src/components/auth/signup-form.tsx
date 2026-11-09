@@ -20,6 +20,7 @@ import { flushSync } from "react-dom";
 import { useTranslations } from "use-intl";
 import * as z from "zod";
 
+import { SignupFreeScanBanner } from "@/components/auth/signup-free-scan-banner";
 import Link from "@/components/framework/link";
 import { ONBOARDING_WEBSITE_PARAM } from "@/constants/onboarding";
 import { trackEvent } from "@/lib/analytics/posthog-client";
@@ -235,6 +236,8 @@ export function SignupForm({
         description={description ?? t("description")}
         title={title ?? t("title")}
       />
+
+      <SignupFreeScanBanner />
 
       <div className="grid gap-4">
         <AuthSocialButtons
