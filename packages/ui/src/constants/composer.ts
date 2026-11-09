@@ -9,7 +9,7 @@ export const COMPOSER_INPUT_PILL =
   "field-sizing-content max-h-40 min-h-8 w-full px-1.5 py-1";
 
 /** The pill's corners, which an open dock around it repeats. */
-export const COMPOSER_PILL_RADIUS = "rounded-[28px]";
+export const COMPOSER_PILL_RADIUS = "rounded-[29px]";
 
 export const COMPOSER_TOOLBAR_BUTTON = "rounded-md text-muted-foreground";
 
@@ -46,6 +46,10 @@ export const COMPOSER_INNER_HIGHLIGHT =
 export const COMPOSER_ELEVATED_HIGHLIGHT =
   "shadow-[0_1px_2px_hsl(0_0%_0%/0.04),0_8px_24px_-6px_hsl(0_0%_0%/0.14)] dark:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.04),inset_0_1px_10px_rgba(255,255,255,0.04)]";
 
-/** A round, filled toolbar button, like the attach button on the pill. */
+/**
+ * A round, filled toolbar button, like the attach button on the pill. Round,
+ * not the buttons' squircle, so it matches the send button and both sit
+ * concentric in the pill's corners.
+ */
 export const COMPOSER_TOOLBAR_BUTTON_FILLED =
-  "size-8 rounded-full bg-muted text-foreground hover:bg-accent dark:bg-accent/60 dark:hover:bg-accent";
+  "corner-round size-8 rounded-full bg-muted text-foreground hover:bg-accent dark:bg-accent/60 dark:hover:bg-accent";

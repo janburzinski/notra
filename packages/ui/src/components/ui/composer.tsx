@@ -143,7 +143,7 @@ function ComposerFrame({
               // single-line height so wrapped lines keep the button concentric
               cn(
                 "**:data-[slot=composer-send]:[corner-shape:round] **:data-[slot=composer-send]:rounded-full **:data-[slot=composer-send]:supports-[corner-shape:squircle]:rounded-full",
-                size === "sm" ? "rounded-[18px]" : "rounded-3xl"
+                size === "sm" ? "rounded-[18px]" : "rounded-[25px]"
               )
             : "rounded-[14px] shadow-[inset_0_1px_0_rgba(255,255,255,0.9),inset_0_0_6px_rgba(255,255,255,0.8),0_1px_2px_rgba(0,0,0,0.04)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.07),inset_0_0_6px_rgba(255,255,255,0.03)]",
           connectedTop && !hasNudge && "rounded-t-none border-t-0",
