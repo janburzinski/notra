@@ -5,8 +5,10 @@ import {
   Outlet,
   redirect,
   type Router,
+  useMatches,
+  useRouter,
 } from "@tanstack/react-router";
-import { Suspense, useEffect } from "react";
+import { type ComponentType, Suspense, useEffect } from "react";
 
 import AutomationsLoading from "@/app/(dashboard)/[slug]/automation/loading";
 import BrandLoading from "@/app/(dashboard)/[slug]/brand/identity/loading";
@@ -16,6 +18,7 @@ import CollectionLoading from "@/app/(dashboard)/[slug]/collection/[id]/loading"
 import ContentDetailLoading from "@/app/(dashboard)/[slug]/content/[id]/loading";
 import ContentLoading from "@/app/(dashboard)/[slug]/content/loading";
 import FeedbackLoading from "@/app/(dashboard)/[slug]/feedback/loading";
+import { GeoPageSkeleton } from "@/app/(dashboard)/[slug]/geo/skeleton";
 import DashboardLoading from "@/app/(dashboard)/[slug]/loading";
 import SkillDetailLoading from "@/app/(dashboard)/[slug]/skills/[name]/loading";
 import SkillsLoading from "@/app/(dashboard)/[slug]/skills/loading";
@@ -118,6 +121,26 @@ const BillingSuccess = lazyPage(
 
 type OrganizationShell = Awaited<ReturnType<typeof loadOrganizationShell>>;
 
+/**
+ * Entering GEO waits for its scope (project, access) from the server. The
+ * router only presents a pending state for a route with a pending component,
+ * so this shows the opened page's own skeleton during that round trip instead
+ * of leaving the previous page frozen.
+ */
+function GeoLayoutPending() {
+  const router = useRouter();
+  // The router presents the whole pending lane, the opened page included.
+  const routeId = useMatches({
+    select: (matches) => matches.at(-1)?.routeId as string | undefined,
+  });
+  const route: AnyRoute | undefined =
+    routeId && routeId in router.routesById
+      ? router.routesById[routeId as keyof typeof router.routesById]
+      : undefined;
+  const Pending = route?.options.pendingComponent as ComponentType | undefined;
+  return Pending ? <Pending /> : <GeoPageSkeleton />;
+}
+
 let clientShellCache: { slug: string; shell: OrganizationShell } | undefined;
 
 export function createDashboardUiRoutes(parent: AnyRoute) {
@@ -207,6 +230,7 @@ export function createDashboardUiRoutes(parent: AnyRoute) {
     path: "geo",
     loader: ({ params }) =>
       loadGeoScope({ data: { params, searchParams: {} } }),
+    pendingComponent: GeoLayoutPending,
     component: GeoLayout,
   });
 
