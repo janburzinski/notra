@@ -30,14 +30,6 @@ export function useTableViewport<T>({
   const [horizontalScrollbarHeight, setHorizontalScrollbarHeight] = useState(0);
   const [overflowsX, setOverflowsX] = useState(false);
 
-  const virtualizer = useVirtualizer({
-    enabled: rowSizing === "fixed",
-    count: rows.length,
-    getScrollElement: () => scrollRef.current,
-    estimateSize: () => rowHeight,
-    initialRect: { height, width: 0 },
-    overscan,
-  });
   const layout = getTableViewportLayout({
     rowCount: rows.length,
     rowHeight,
@@ -47,6 +39,16 @@ export function useTableViewport<T>({
     minHeight,
     autoHeight,
     horizontalScrollbarHeight,
+  });
+  const virtualizer = useVirtualizer({
+    // A table that shows all its rows has nothing to virtualize, and the
+    // virtualizer would measure its scroll element on every mount.
+    enabled: layout.scrolls,
+    count: rows.length,
+    getScrollElement: () => scrollRef.current,
+    estimateSize: () => rowHeight,
+    initialRect: { height, width: 0 },
+    overscan,
   });
   const virtualItems = virtualizer.getVirtualItems();
   const totalSize = virtualizer.getTotalSize();
@@ -116,7 +118,8 @@ export function useTableViewport<T>({
       setAtStart(element.scrollTop <= 1);
       requestMoreIfNearEnd(element);
     };
-    measure();
+    // A new observer reports the current size once, after the browser's own
+    // layout, so mounting (or showing a hidden Activity) forces no layout.
     const observer = new ResizeObserver(measure);
     observer.observe(element);
     return () => observer.disconnect();
@@ -138,7 +141,6 @@ export function useTableViewport<T>({
         )
       );
     };
-    measure();
     const observer = new ResizeObserver(measure);
     observer.observe(element);
     return () => observer.disconnect();
@@ -156,7 +158,6 @@ export function useTableViewport<T>({
           HORIZONTAL_OVERFLOW_TOLERANCE_PX
       );
     };
-    measure();
     const observer = new ResizeObserver(measure);
     observer.observe(element);
     observer.observe(table);

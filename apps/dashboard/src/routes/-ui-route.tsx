@@ -1,5 +1,5 @@
 import { createRoute, type Router, useRouter } from "@tanstack/react-router";
-import { createElement, Suspense, use, useMemo } from "react";
+import { createElement, Suspense, use } from "react";
 import { createTranslator } from "use-intl/core";
 
 import { SSR_DATA_ONLY_PENDING_MS } from "@/constants/ui-route";
@@ -63,6 +63,36 @@ export function uiPageParams(
     deploymentId: params.deploymentId ?? "",
     tab: params.tab ?? "",
   };
+}
+
+const followedLoaderPromises = new WeakMap<
+  Promise<unknown>,
+  Promise<unknown>
+>();
+
+/**
+ * One redirect-following wrapper per loader promise. `use()` suspends on any
+ * promise it hasn't seen settle, so wrapping a cached match's promise afresh
+ * each time its page is shown again (a tab switched back to) would suspend
+ * the whole page into its pending component.
+ */
+function followLoaderPromise<T>(
+  pending: Promise<T>,
+  router: ReturnType<typeof useRouter>
+): Promise<T> {
+  let followed = followedLoaderPromises.get(pending) as Promise<T> | undefined;
+  if (!followed) {
+    followed = followServerRedirect(pending, () =>
+      router.state.matches.some(
+        (match) =>
+          match.pathname === router.state.location.pathname &&
+          (match.loaderData as { pending?: Promise<T> } | undefined)
+            ?.pending === pending
+      )
+    );
+    followedLoaderPromises.set(pending, followed);
+  }
+  return followed;
 }
 
 /**
@@ -175,19 +205,9 @@ export function createUiRoute<T = undefined>({
     const { data, pending } = route.useLoaderData<Router<typeof route>>();
     const params = route.useParams<Router<typeof route>>();
     const searchParams = route.useSearch<Router<typeof route>>();
-    const streamed = useMemo(
-      () =>
-        pending &&
-        followServerRedirect(pending as Promise<T>, () =>
-          router.state.matches.some(
-            (match) =>
-              match.pathname === router.state.location.pathname &&
-              (match.loaderData as { pending?: Promise<T> } | undefined)
-                ?.pending === pending
-          )
-        ),
-      [pending, router]
-    );
+    const streamed = pending
+      ? followLoaderPromise(pending as Promise<T>, router)
+      : undefined;
     const page = (
       <UiPageWithData
         data={data as T}
