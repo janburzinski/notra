@@ -1,6 +1,17 @@
 export const LOCAL_SITE_ID = "local";
 export const LOCAL_BUILD_ORIGIN = "http://localhost";
 
+export const SOURCE_READ_CHUNK_BYTES = 64 * 1024;
+/** Open errors for a source file that is missing, a symlink, or not a file. */
+export const UNREADABLE_SOURCE_CODES = new Set([
+  "ENOENT",
+  "ENOTDIR",
+  "EISDIR",
+  "ELOOP",
+  "EMLINK",
+  "ENXIO",
+]);
+
 export const USAGE = `notra-sites <command>
 
   validate [--source <dir>] [--target <file>] [--mount <area>=<path>]... [--origin <url>] [--json]  Check settings, MDX, snippets and links

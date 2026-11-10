@@ -1,4 +1,12 @@
-import { readFileSync, realpathSync, statSync } from "node:fs";
+import {
+  closeSync,
+  constants,
+  fstatSync,
+  openSync,
+  readSync,
+  realpathSync,
+  statSync,
+} from "node:fs";
 import {
   basename,
   dirname,
@@ -10,6 +18,7 @@ import {
 } from "node:path";
 
 import {
+  SITE_BUILD_LIMITS,
   SITE_CONFIG_FILENAME,
   SITE_SOURCE_ROOTS,
 } from "@notra/sites-core/constants/sites";
@@ -21,7 +30,12 @@ import { readConfigSections } from "@notra/sites-core/utils/config-sections";
 import { createDefaultSiteConfig } from "@notra/sites-core/utils/default-config";
 import { normalizeSiteMounts } from "@notra/sites-core/utils/mounts";
 
-import { LOCAL_BUILD_ORIGIN, LOCAL_SITE_ID } from "../constants/cli";
+import {
+  LOCAL_BUILD_ORIGIN,
+  LOCAL_SITE_ID,
+  SOURCE_READ_CHUNK_BYTES,
+  UNREADABLE_SOURCE_CODES,
+} from "../constants/cli";
 import { UsageError } from "./usage-error";
 
 function isDirectory(path: string): boolean {
@@ -36,15 +50,45 @@ function isDirectory(path: string): boolean {
   }
 }
 
-function readTextIfExists(path: string): string | null {
+// blog.json is read before source collection, so it gets the same guards:
+// symlinks are not followed, only regular files are read, and the read stops
+// at the single-file limit. O_NONBLOCK keeps a FIFO from blocking the open.
+// Anything else counts as missing; collection then reports it.
+function readSourceTextIfExists(path: string): string | null {
+  let fd: number;
   try {
-    return readFileSync(path, "utf8");
+    fd = openSync(
+      path,
+      constants.O_RDONLY | constants.O_NOFOLLOW | constants.O_NONBLOCK
+    );
   } catch (error) {
     const { code } = error as NodeJS.ErrnoException;
-    if (code === "ENOENT" || code === "ENOTDIR" || code === "EISDIR") {
+    if (code && UNREADABLE_SOURCE_CODES.has(code)) {
       return null;
     }
     throw error;
+  }
+  try {
+    if (!fstatSync(fd).isFile()) {
+      return null;
+    }
+    const limit = SITE_BUILD_LIMITS.maxSingleFileBytes;
+    const chunks: Buffer[] = [];
+    let total = 0;
+    for (;;) {
+      const chunk = Buffer.allocUnsafe(SOURCE_READ_CHUNK_BYTES);
+      const read = readSync(fd, chunk, 0, chunk.length, null);
+      if (read === 0) {
+        return Buffer.concat(chunks, total).toString("utf8");
+      }
+      total += read;
+      if (total > limit) {
+        return null;
+      }
+      chunks.push(chunk.subarray(0, read));
+    }
+  } finally {
+    closeSync(fd);
   }
 }
 
@@ -106,7 +150,7 @@ export function localMounts(
     return target.mounts;
   }
   const sections = readConfigSections(
-    readTextIfExists(join(siteRoot, SITE_CONFIG_FILENAME))
+    readSourceTextIfExists(join(siteRoot, SITE_CONFIG_FILENAME))
   );
   if (sections) {
     if (area && !sections[area]) {
@@ -136,7 +180,7 @@ export function sectionsRestartNotice(
   let sections: SiteMounts | null;
   try {
     sections = readConfigSections(
-      readTextIfExists(join(siteRoot, SITE_CONFIG_FILENAME))
+      readSourceTextIfExists(join(siteRoot, SITE_CONFIG_FILENAME))
     );
   } catch {
     return null;

@@ -1,7 +1,7 @@
 import { afterEach, expect, test } from "bun:test";
 import { mkdir, mkdtemp, rm, symlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { basename, join } from "node:path";
 
 import type { SiteBuildRequest } from "@notra/sites-core/types/build";
 
@@ -215,4 +215,37 @@ test("notra dev reports when blog.json sections move a section", async () => {
   expect(sectionsRestartNotice(root, { blog: "/blog" })).toBe(
     "blog.json sections now serve the blog at /news. Restart notra dev to preview the new paths."
   );
+});
+
+async function sectionsConfig(root: string) {
+  const outside = join(root, "..", `${basename(root)}-outside.json`);
+  roots.push(outside);
+  await writeFile(
+    outside,
+    JSON.stringify({ name: "Acme", sections: { changelog: "/updates" } })
+  );
+  return outside;
+}
+
+test("a symlinked blog.json is not followed before collection", async () => {
+  const root = await site("blog");
+  await symlink(await sectionsConfig(root), join(root, "blog.json"));
+  expect(localMounts(root)).toEqual({ blog: "/blog" });
+  expect(sectionsRestartNotice(root, { blog: "/blog" })).toBeNull();
+});
+
+test.skipIf(process.platform === "win32")(
+  "a blog.json FIFO does not block the pre-read",
+  async () => {
+    const root = await site("blog");
+    const fifo = Bun.spawnSync(["mkfifo", join(root, "blog.json")]);
+    expect(fifo.exitCode).toBe(0);
+    expect(localMounts(root)).toEqual({ blog: "/blog" });
+    expect(sectionsRestartNotice(root, { blog: "/blog" })).toBeNull();
+  }
+);
+
+test("a blog.json folder counts as no blog.json", async () => {
+  const root = await site("changelog", "blog.json");
+  expect(localMounts(root)).toEqual({ changelog: "/changelog" });
 });
