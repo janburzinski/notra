@@ -1,0 +1,114 @@
+apps/dashboard/src/schemas/autopilot-slack.ts
+  s_fd6ab57014372a::t_cd0189c4ffc903 17-31
+packages/ai/src/utils/github-mention-auth.ts
+  s_fd6ab57014372a::t_bb98419c365090 9
+  s_fd6ab57014372a::t_ecdaef2a55c708 55-58
+apps/dashboard/src/lib/autopilot/slack-actions.ts
+  s_fd6ab57014372a::t_b5fddc6182d896 1-5,12,14,29,70-85,87-119,132-134,211-223
+  s_fd6ab57014372a::t_4606ebf57d1573 86
+apps/dashboard/src/app/api/webhooks/github/app/route.ts
+  s_fd6ab57014372a::t_4208f65dc9e196 6,62-75
+apps/dashboard/src/lib/orpc/routers/autopilot.ts
+  s_fd6ab57014372a::t_59a761c1c0c49a 144-165,211-231,233-237,240-252,287,289,293-303,308-309,311-329,331,335,340,343,348-350,355-356
+  s_fd6ab57014372a::t_88313d2facf02f 304-307,310
+  s_fd6ab57014372a::t_55bf8d656a4369 42-43,83,90,95,99,727-748,755-768
+apps/dashboard/src/app/(dashboard)/[slug]/autopilot/runs/[id]/page-client.tsx
+  s_fd6ab57014372a::t_59149845ca8b00 27,35,49,52-56,72,75-81,89-115,256,259
+  s_fd6ab57014372a::t_7cae9157af680b 50,88
+apps/dashboard/src/lib/autopilot/llm.ts
+  s_fd6ab57014372a::t_8ddb52b79f5fc9 9,20,37-39
+apps/dashboard/src/lib/workflow-engine/store.ts
+  s_fd6ab57014372a::t_13fcaebc2ed89b 191-209
+apps/dashboard/src/lib/autopilot/findings.ts
+  s_fd6ab57014372a::t_daf46fd1790559 4,46-49,1061-1080
+  s_fd6ab57014372a::t_f72a07bd0843e5 17,36
+  s_fd6ab57014372a::t_340818df38fd94 786-790
+  s_fd6ab57014372a::t_66509fabb8d13c 261-283
+apps/dashboard/src/utils/autopilot-events.ts
+  s_fd6ab57014372a::t_d0269316a9a0ef 14-16
+  s_fd6ab57014372a::t_6d1bc83dedcad8 136-140
+  s_fd6ab57014372a::t_940768f63875e2 329-335,342-350
+packages/ai/src/schemas/autopilot-slack-action.ts
+  s_fd6ab57014372a::t_bca2bf195d8740 8
+apps/dashboard/src/lib/autopilot/pull-request-events.ts
+  s_fd6ab57014372a::t_ecdaef2a55c708 134-141,144-157,161-166
+  s_fd6ab57014372a::t_671b971bb156b4 192-194
+apps/dashboard/src/lib/autopilot/repository-agent.ts
+  s_fd6ab57014372a::t_e31fcd6348a256 171-173
+apps/dashboard/src/utils/autopilot-schedule.ts
+  s_fd6ab57014372a::t_d08725c9d34f7c 9-10,21-22,45-51
+apps/dashboard/src/lib/autopilot/blog.ts
+  s_fd6ab57014372a::t_26cfd14697d2b8 1189-1190,1196-1198
+  s_fd6ab57014372a::t_49e6f121ecf5b1 35-37,301,303,306-338,348-349,360,368-371,375-385,470,478-485,496-500
+  s_fd6ab57014372a::t_b008cfa1ae165f 29,414-417,595-597,1565-1567
+  s_fd6ab57014372a::t_f0e5e3bce3e67b 112
+  s_fd6ab57014372a::t_b97db62add8355 22-23,25,31,161,302,304-305
+  s_fd6ab57014372a::t_e31fcd6348a256 372-374
+apps/dashboard/src/lib/autopilot/writer.ts
+  s_fd6ab57014372a::t_e31fcd6348a256 106-108,150
+  s_fd6ab57014372a::t_d13d4ba4323253 22-23,109-110,245
+apps/dashboard/src/lib/autopilot/run.ts
+  s_fd6ab57014372a::t_f56990cf6a26b0 29,37-40,181-185,445-450
+apps/dashboard/src/lib/autopilot/billing.ts
+  s_fd6ab57014372a::t_638555776aa820 9,48-53
+apps/dashboard/src/lib/hooks/use-autopilot-workflows.ts
+  s_fd6ab57014372a::t_190752723ce7c1 34-44,85
+apps/dashboard/src/types/autopilot-workflows.ts
+  s_fd6ab57014372a::t_190752723ce7c1 312-313
+apps/dashboard/src/types/autopilot-runtime.ts
+  s_fd6ab57014372a::t_b008cfa1ae165f 88
+apps/dashboard/src/workflows/steps/github-mention-step.ts
+  s_fd6ab57014372a::t_66509fabb8d13c 18,48-69
+apps/dashboard/src/types/autopilot.ts
+  s_fd6ab57014372a::t_26cfd14697d2b8 82-83
+  s_fd6ab57014372a::t_9d55268433c1c9 351,354-356
+  s_fd6ab57014372a::t_2e6821674902d6 224-228
+apps/dashboard/src/constants/autopilot-workflows.ts
+  s_fd6ab57014372a::t_e6a0e1842b1cbd 76-88
+apps/dashboard/src/app/(dashboard)/[slug]/autopilot/page-client.tsx
+  s_fd6ab57014372a::t_59149845ca8b00 64-70
+apps/dashboard/src/constants/autopilot-ui.ts
+  s_fd6ab57014372a::t_7653f9981e353e 61-62
+apps/dashboard/src/workflows/autopilot-items.test.ts
+  s_fd6ab57014372a::t_cde8e51b34437a 49-57,59
+apps/dashboard/src/lib/autopilot/schedule.ts
+  s_fd6ab57014372a::t_4281dd8c17d06b 79-92
+  s_fd6ab57014372a::t_1fd35b45fc2a04 1,3,5,9-10,12,18-62,67,97-99,104,106-108
+apps/dashboard/src/app/(dashboard)/[slug]/autopilot/workflows/[id]/page-client.tsx
+  s_fd6ab57014372a::t_7cae9157af680b 268
+  s_fd6ab57014372a::t_190752723ce7c1 9,147-148,153-174,209,267,271
+apps/dashboard/src/constants/autopilot.ts
+  s_fd6ab57014372a::t_e31fcd6348a256 45,258-260
+  s_fd6ab57014372a::t_462f1c419bbd4d 80-81
+  s_fd6ab57014372a::t_49e6f121ecf5b1 248-257,261-262
+  s_fd6ab57014372a::t_19d1120591a1b2 244-247,263
+  s_fd6ab57014372a::t_2ba6e66d58a013 295-318
+  s_fd6ab57014372a::t_4be6479a39292e 178-180
+apps/dashboard/src/lib/autopilot/workflows/agent-tools.ts
+  s_fd6ab57014372a::t_6973f2d5254794 22
+  s_fd6ab57014372a::t_b5bd61e333a51d 270-282
+apps/dashboard/src/lib/autopilot/github.ts
+  s_fd6ab57014372a::t_671b971bb156b4 60-61,74
+apps/dashboard/src/app/(dashboard)/[slug]/autopilot/findings/[id]/page-client.tsx
+  s_fd6ab57014372a::t_2e6821674902d6 38,50,69-74,81-107,126-129
+apps/agent/agent/lib/utils/autopilot-slack.ts
+  s_fd6ab57014372a::t_49143cf2845b7f 40-44
+  s_fd6ab57014372a::t_9ee5909dec3c3c 55-56
+  s_fd6ab57014372a::t_2d2291fd36f9ce 70
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "c90a63b5d0fdcf041e6e1ac432de3139b5f67b03",
+  "prompts": {},
+  "sessions": {
+    "s_fd6ab57014372a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "eb44c9e3-b834-4d73-9c87-a1ced06752c7",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
