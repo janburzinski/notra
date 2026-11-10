@@ -151,6 +151,8 @@ export function engineFamilyPromptHits(
       mentioned: mentioned !== null,
       ownedSourceCited: group.some((result) => result.ownedSourceCited),
       position: mentioned?.position ?? null,
+      answers: group.length,
+      mentionedInstead: promptMentionedInstead(group),
     });
   }
 

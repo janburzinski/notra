@@ -941,6 +941,10 @@ export interface EngineFamilyPromptHit {
   mentioned: boolean;
   ownedSourceCited?: boolean;
   position: number | null;
+  /** Answers on this engine family for the prompt (one per model). */
+  answers: number;
+  /** Brands those answers named, most named first. */
+  mentionedInstead: GeoPromptBrandCount[];
 }
 
 export interface EngineFamilySheetProps extends EngineFamilyBrandScope {

@@ -17,17 +17,17 @@ import { todayIsoDate } from "@notra/geo-core/utils/day-label";
 import { EChartsAreaChart } from "@notra/ui/components/evilcharts/charts/echarts-area-chart";
 import { GeoBar } from "@notra/ui/components/geo/geo-bar";
 import { TruncateWithTooltip } from "@notra/ui/components/shared/truncate-with-tooltip";
+import { DetailSheetContent } from "@notra/ui/components/ui/detail-sheet";
 import {
   Sheet,
-  SheetContent,
   SheetDescription,
   SheetHeader,
   SheetTitle,
 } from "@notra/ui/components/ui/sheet";
 import { useRetainedValue } from "@notra/ui/hooks/use-retained-value";
 import type { ChartConfig } from "@notra/ui/types/charts";
-import { InstrumentSection } from "ui/card";
 import { DataTable, type TableColumn } from "ui/table";
+import { TABLE_BODY_CLASS, TABLE_FRAME_CLASS } from "ui/table/constants";
 import { useLocale, useTranslations } from "use-intl";
 
 import { Button } from "@/components/button";
@@ -36,7 +36,9 @@ import { EngineIcon } from "@/components/geo/engine-icon";
 import { GeoStatDelta } from "@/components/geo/geo-stat-delta";
 import { ProjectLogo } from "@/components/geo/project-logo";
 import { PromptDetailDialog } from "@/components/geo/prompt-detail-dialog";
+import { PromptMentionedInsteadCell } from "@/components/geo/prompt-mentioned-instead-cell";
 import { PromptOutcomeIcon } from "@/components/geo/prompt-outcome-icon";
+import { ReceiptSection } from "@/components/geo/prompt-receipt-analysis";
 import { WriteDialog } from "@/components/geo/writer/write-dialog";
 import { CHART_PERCENT_SCALE, CHART_PRIMARY_COLOR } from "@/constants/charts";
 import {
@@ -68,11 +70,9 @@ import {
 import { tableHeightFor } from "@/utils/table";
 
 const FAMILY_TOTAL_STROKE_WIDTH = 2;
-const FAMILY_CHART_HEIGHT_CLASS = "h-52 w-full cursor-crosshair";
-const FAMILY_SHEET_CONTENT_CLASS =
-  "gap-0 overflow-hidden rounded-xl data-[side=right]:inset-y-2 data-[side=right]:right-2 data-[side=right]:h-auto data-[side=right]:w-[calc(100%-1rem)] data-[side=right]:border data-[side=right]:sm:max-w-2xl";
+const FAMILY_CHART_HEIGHT_CLASS = "h-48 w-full cursor-crosshair";
 const BRAND_ROW_CLASS =
-  "grid h-11 grid-cols-[1rem_minmax(0,1fr)_minmax(4rem,7.5rem)_2.75rem] items-center gap-3 border-b text-sm last:border-b-0";
+  "grid h-10 grid-cols-[1.25rem_minmax(0,1fr)_minmax(3rem,8rem)_2.5rem] items-center gap-3 border-b border-border/60 px-3.5 text-sm last:border-b-0";
 const RIVAL_BAR_FILL_CLASS = "bg-foreground/25";
 
 function Stat({
@@ -88,21 +88,19 @@ function Stat({
 }) {
   const tGeoShared2 = useTranslations("geo.shared");
   return (
-    <div className="flex min-w-0 flex-col gap-2">
-      <p className="text-muted-foreground text-xs">{label}</p>
-      <div className="flex items-end gap-2">
-        <p className="text-2xl leading-none font-semibold tracking-tight tabular-nums">
+    <div className="flex min-w-0 flex-col gap-1 px-4 py-3">
+      <dt className="text-muted-foreground truncate text-xs">{label}</dt>
+      <dd className="flex min-w-0 items-center gap-2">
+        <span className="text-lg leading-6 font-medium tabular-nums">
           {value}
-        </p>
-        <span className="mb-0.5 inline-flex">
-          <GeoStatDelta
-            delta={delta}
-            hint={tGeoShared2("vsFirstHalfOfThis")}
-            kind={kind}
-            label={label}
-          />
         </span>
-      </div>
+        <GeoStatDelta
+          delta={delta}
+          hint={tGeoShared2("vsFirstHalfOfThis")}
+          kind={kind}
+          label={label}
+        />
+      </dd>
     </div>
   );
 }
@@ -123,8 +121,16 @@ function FamilyStats({
   const tGeoShared = useTranslations("geo.shared");
 
   return (
-    <div className="@container/stats">
-      <div className="grid grid-cols-1 items-start gap-x-6 gap-y-4 @min-[22rem]/stats:grid-cols-3">
+    <section
+      aria-label={tGeoShared("outcome")}
+      className={cn(TABLE_FRAME_CLASS, "@container/stats min-w-0")}
+    >
+      <dl
+        className={cn(
+          TABLE_BODY_CLASS,
+          "divide-border/60 grid grid-cols-1 divide-y @min-[30rem]/stats:grid-cols-3 @min-[30rem]/stats:divide-x @min-[30rem]/stats:divide-y-0"
+        )}
+      >
         <Stat
           delta={trends.ratePts}
           kind="rate"
@@ -147,8 +153,8 @@ function FamilyStats({
           label={tGeoShared("avgPosition")}
           value={position === null ? "—" : `#${position}`}
         />
-      </div>
-    </div>
+      </dl>
+    </section>
   );
 }
 
@@ -167,7 +173,9 @@ function FamilySheetDescription({ family }: { family: GeoEngineFamily }) {
   }
 
   return (
-    <SheetDescription className="tabular-nums">{description}</SheetDescription>
+    <SheetDescription className="text-xs tabular-nums">
+      {description}
+    </SheetDescription>
   );
 }
 
@@ -197,46 +205,48 @@ function FamilyTrend({
   }
 
   return (
-    <InstrumentSection eyebrow={t("trend")}>
-      <EChartsAreaChart
-        animation={false}
-        className={FAMILY_CHART_HEIGHT_CLASS}
-        config={config}
-        curveType="monotone"
-        data={rows}
-        xDataKey="day"
-      >
-        <EChartsAreaChart.Grid variant="solid" />
-        <EChartsAreaChart.XAxis dataKey="day" />
-        <EChartsAreaChart.YAxis scale tickFormatter={formatChartPercent} />
-        <EChartsAreaChart.Area
-          connectNulls
-          dataKey="all"
-          enableBufferLine={markIncompleteTail}
-          gapMissing
-          strokeVariant="solid"
-          strokeWidth={FAMILY_TOTAL_STROKE_WIDTH}
-          variant="gradient"
+    <ReceiptSection title={t("trend")}>
+      <div className="px-2 pt-3 pb-1">
+        <EChartsAreaChart
+          animation={false}
+          className={FAMILY_CHART_HEIGHT_CLASS}
+          config={config}
+          curveType="monotone"
+          data={rows}
+          xDataKey="day"
         >
-          <EChartsAreaChart.ActiveDot variant="border" />
-        </EChartsAreaChart.Area>
-        <EChartsAreaChart.Tooltip
-          barMax={CHART_PERCENT_SCALE}
-          confine={false}
-          emptyLabel={(row) =>
-            tGeoShared(mentionTrendEmptyState(row, TREND_SERIES_KEYS))
-          }
-          labelFormatter={(day: string) => formatFullDayLabel(day, locale)}
-          labelKey="rawDay"
-          layout="activity"
-          position="fixed"
-          roundness="xl"
-          rowKeys={TREND_SERIES_KEYS}
-          scrub
-          valueFormatter={formatChartPercent}
-        />
-      </EChartsAreaChart>
-    </InstrumentSection>
+          <EChartsAreaChart.Grid variant="solid" />
+          <EChartsAreaChart.XAxis dataKey="day" />
+          <EChartsAreaChart.YAxis scale tickFormatter={formatChartPercent} />
+          <EChartsAreaChart.Area
+            connectNulls
+            dataKey="all"
+            enableBufferLine={markIncompleteTail}
+            gapMissing
+            strokeVariant="solid"
+            strokeWidth={FAMILY_TOTAL_STROKE_WIDTH}
+            variant="gradient"
+          >
+            <EChartsAreaChart.ActiveDot variant="border" />
+          </EChartsAreaChart.Area>
+          <EChartsAreaChart.Tooltip
+            barMax={CHART_PERCENT_SCALE}
+            confine={false}
+            emptyLabel={(row) =>
+              tGeoShared(mentionTrendEmptyState(row, TREND_SERIES_KEYS))
+            }
+            labelFormatter={(day: string) => formatFullDayLabel(day, locale)}
+            labelKey="rawDay"
+            layout="activity"
+            position="fixed"
+            roundness="xl"
+            rowKeys={TREND_SERIES_KEYS}
+            scrub
+            valueFormatter={formatChartPercent}
+          />
+        </EChartsAreaChart>
+      </div>
+    </ReceiptSection>
   );
 }
 
@@ -254,23 +264,23 @@ function BrandRow({
   const tGeoShared = useTranslations("geo.shared");
   const muted = row.mentions === 0;
   return (
-    <li className={BRAND_ROW_CLASS}>
+    <li className={cn(BRAND_ROW_CLASS, row.own && "bg-muted/50")}>
       <span className="text-muted-foreground text-xs tabular-nums">{rank}</span>
-      <span className="flex min-w-0 items-center gap-2">
+      <span className="flex min-w-0 items-center gap-2.5">
         {row.own ? (
           <ProjectLogo
-            className="size-5 shrink-0 rounded-sm"
+            className="size-5 shrink-0 rounded-md"
             domain={scope.ownDomain ?? null}
             name={row.name}
           />
         ) : (
           <CompetitorLogo
-            className="size-5 shrink-0"
+            className="size-5 shrink-0 rounded-md"
             competitors={scope.competitors}
             name={row.name}
           />
         )}
-        <span className="truncate font-medium">{row.name}</span>
+        <span className="truncate">{row.name}</span>
         {row.own ? (
           <span className="text-muted-foreground shrink-0 text-xs">
             {tGeoShared("you")}
@@ -297,27 +307,19 @@ function BrandRow({
 
 function FamilyBrands({
   rows,
-  answers,
   scope,
 }: {
   rows: readonly EngineFamilyBrandRow[];
-  answers: number;
   scope: EngineFamilyBrandScope;
 }) {
-  const t = useTranslations("geo.engineFamilySheet");
   const tGeoShared = useTranslations("geo.shared");
   if (rows.length === 0) {
     return null;
   }
   const max = rows.reduce((peak, row) => Math.max(peak, row.share), 0);
-  const readout = tGeoShared("countPluralOneAnswerOther", { count: answers });
 
   return (
-    <InstrumentSection
-      eyebrow={tGeoShared("brandRanking")}
-      hint={t("brandsHint")}
-      readout={readout}
-    >
+    <ReceiptSection title={tGeoShared("brandRanking")}>
       <ol>
         {rows.map((row, index) => (
           <BrandRow
@@ -329,16 +331,18 @@ function FamilyBrands({
           />
         ))}
       </ol>
-    </InstrumentSection>
+    </ReceiptSection>
   );
 }
 
 function PromptHits({
   hits,
+  competitors,
   onOpen,
   onWrite,
 }: {
   hits: readonly EngineFamilyPromptHit[];
+  competitors: EngineFamilyBrandScope["competitors"];
   onOpen: (promptId: string) => void;
   onWrite?: (hit: EngineFamilyPromptHit) => void;
 }) {
@@ -371,12 +375,26 @@ function PromptHits({
   });
   const missedColumns: TableColumn<EngineFamilyPromptHit>[] = [
     promptColumn(t("missedTitle", { count: missed.length })),
+    {
+      key: "mentionedInstead",
+      header: t("mentionedInsteadHeader"),
+      width: "minmax(8rem,14rem)",
+      cell: (row) => (
+        <span className="flex min-w-0 text-sm">
+          <PromptMentionedInsteadCell
+            answers={row.answers}
+            brands={row.mentionedInstead}
+            competitors={competitors}
+          />
+        </span>
+      ),
+    },
   ];
   if (onWrite) {
     missedColumns.push({
       key: "write",
       header: "",
-      width: "6.5rem",
+      width: "5.75rem",
       align: "right",
       cell: (row) => (
         <Button onClick={() => onWrite(row)} size="sm" variant="outline">
@@ -391,7 +409,7 @@ function PromptHits({
     {
       key: "result",
       header: t("resultHeader"),
-      width: "13rem",
+      width: "9rem",
       sortable: true,
       cell: (row) => {
         const label = promptResultLabel(row);
@@ -491,35 +509,32 @@ function EngineFamilySheetSession({
         onOpenChangeComplete={onOpenChangeComplete}
         open={open}
       >
-        <SheetContent className={FAMILY_SHEET_CONTENT_CLASS}>
-          <SheetHeader className="flex-row items-center gap-3 pr-14">
-            <span className="bg-shell border-shell-border flex size-10 shrink-0 items-center justify-center rounded-xl border">
-              <EngineIcon className="size-5" engine={family.family} />
+        <DetailSheetContent size="md">
+          <SheetHeader className="shrink-0 flex-row items-center gap-3 pr-14">
+            <span className="bg-shell border-shell-border flex size-9 shrink-0 items-center justify-center rounded-lg border">
+              <EngineIcon className="size-[18px]" engine={family.family} />
             </span>
-            <div className="min-w-0 space-y-0.5">
+            <div className="min-w-0">
               <SheetTitle>{name}</SheetTitle>
               <FamilySheetDescription family={family} />
             </div>
           </SheetHeader>
-          <div className="min-h-0 flex-1 space-y-8 overflow-y-auto px-4 pt-2 pb-6">
+          <div className="bg-muted/20 flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto overscroll-contain p-4">
             <FamilyStats
               family={family}
               points={points}
               promptCoverage={promptCoverage}
             />
             <FamilyTrend family={family} points={points} />
-            <FamilyBrands
-              answers={promptHits.length}
-              rows={brandRows}
-              scope={brandScope}
-            />
+            <FamilyBrands rows={brandRows} scope={brandScope} />
             <PromptHits
+              competitors={competitors}
               hits={promptHits}
               onOpen={setSelectedPromptId}
               onWrite={canWrite ? handleWrite : undefined}
             />
           </div>
-        </SheetContent>
+        </DetailSheetContent>
         <PromptDetailDialog
           onOpenChange={(nextOpen) => {
             if (!nextOpen) {

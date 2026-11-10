@@ -2943,14 +2943,14 @@
       }
     },
     "engineFamilySheet": {
-      "missedTitle": "{count, plural, one {# prompt misses you} other {# prompts miss you}}",
-      "foundTitle": "{count, plural, one {# prompt shows you} other {# prompts show you}}",
+      "missedTitle": "Not mentioned in {count, plural, one {# prompt} other {# prompts}}",
+      "foundTitle": "Visible in {count, plural, one {# prompt} other {# prompts}}",
       "trend": "Visibility over time",
       "descriptionModels": "How visible your brand is in each model",
       "descriptionEngine": "How visible your brand is in this engine",
       "lastChecked": "Last checked {time}",
       "seriesLabel": "Brand visibility",
-      "brandsHint": "How often each brand shows up in this engine's answers to your prompts",
+      "mentionedInsteadHeader": "Mentioned instead",
       "resultHeader": "Result",
       "emptyPrompts": "No prompts scanned yet",
       "visiblePrompts": "Visible in prompts"

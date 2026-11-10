@@ -2943,14 +2943,14 @@
       }
     },
     "engineFamilySheet": {
-      "missedTitle": "{count, plural, one {# Prompt erwähnt dich nicht} other {# Prompts erwähnen dich nicht}}",
-      "foundTitle": "{count, plural, one {# Prompt zeigt dich} other {# Prompts zeigen dich}}",
+      "missedTitle": "In {count, plural, one {# Prompt} other {# Prompts}} nicht erwähnt",
+      "foundTitle": "In {count, plural, one {# Prompt} other {# Prompts}} sichtbar",
       "trend": "Sichtbarkeit im Verlauf",
       "descriptionModels": "Wie sichtbar deine Marke in jedem Modell ist",
       "descriptionEngine": "Wie sichtbar deine Marke in dieser KI-Engine ist",
       "lastChecked": "Zuletzt geprüft {time}",
       "seriesLabel": "Markensichtbarkeit",
-      "brandsHint": "Wie oft jede Marke in den Antworten dieser KI-Engine auf deine Prompts auftaucht",
+      "mentionedInsteadHeader": "Stattdessen erwähnt",
       "resultHeader": "Ergebnis",
       "emptyPrompts": "Noch keine Prompts gescannt",
       "visiblePrompts": "Sichtbar in Prompts"
