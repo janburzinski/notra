@@ -30,6 +30,11 @@ import {
   POST_TO_X_PUBLISH_ACTION_PREFIX,
 } from "../lib/constants/slack-post-x";
 import {
+  SLACK_VOICE_FAILED_MESSAGE,
+  SLACK_VOICE_TRANSCRIBING_STATUS,
+} from "../lib/constants/slack-voice";
+import type { SlackVoiceTranscription } from "../lib/types/slack-voice";
+import {
   forwardAutopilotSlackAction,
   isLastAgentReply,
   parseAutopilotReaction,
@@ -94,6 +99,12 @@ import {
 import { getNotraSlackState } from "../lib/utils/slack-state";
 import { isPostToXRejection } from "../lib/utils/slack-tool-results";
 import { checkSlackUsageLimits } from "../lib/utils/slack-usage-limits";
+import {
+  formatSlackVoiceContext,
+  getSlackVoiceClips,
+  transcribeSlackVoiceClips,
+  withSlackVoiceTranscript,
+} from "../lib/utils/slack-voice";
 import { firstNonEmptyLine } from "../lib/utils/text";
 
 const onSlackMessage: NonNullable<SlackChannelConfig["onAppMention"]> = async (
@@ -150,6 +161,23 @@ const onSlackMessage: NonNullable<SlackChannelConfig["onAppMention"]> = async (
         : ctx.thread.post(usage.message));
       return null;
     }
+    const voiceClips = getSlackVoiceClips(message);
+    let voice: SlackVoiceTranscription | null = null;
+    if (voiceClips.length > 0) {
+      await ctx.thread.startTyping(SLACK_VOICE_TRANSCRIBING_STATUS);
+      voice = await transcribeSlackVoiceClips(voiceClips, {
+        botToken: installation.botToken,
+        organizationId: installation.organizationId,
+        billing: {
+          chargeAiCredits: usage.attributes.chargeAiCredits === "true",
+          useMarkup: usage.attributes.useMarkup === "true",
+        },
+      });
+      if (!(voice.transcript || message.text.trim())) {
+        await ctx.thread.post(SLACK_VOICE_FAILED_MESSAGE);
+        return null;
+      }
+    }
     const [, workingReactionsKey] = await Promise.all([
       ctx.thread.startTyping("On it…"),
       addSlackWorkingReaction(ctx.slack, {
@@ -160,9 +188,16 @@ const onSlackMessage: NonNullable<SlackChannelConfig["onAppMention"]> = async (
       }),
     ]);
     const chatId = await Effect.runPromise(
-      mirrorPublicSlackThread(ctx, message, installation.organizationId)
+      mirrorPublicSlackThread(
+        ctx,
+        voice?.transcript
+          ? withSlackVoiceTranscript(message, voice.transcript)
+          : message,
+        installation.organizationId
+      )
     );
     return {
+      ...(voice ? { context: [formatSlackVoiceContext(voice)] } : {}),
       auth: {
         ...auth,
         attributes: {

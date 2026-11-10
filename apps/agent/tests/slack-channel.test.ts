@@ -74,6 +74,22 @@ mock.module("@notra/ai/utils/redis", () => ({ redis: {
   srem: async (key, ...members) => { members.forEach((member) => redisSets.get(key)?.delete(member)); return members.length; },
   expire: async () => 1,
 } }));
+const transcribed = [];
+const charged = [];
+let failTranscription = () => false;
+if (scenario === "voice-reply") {
+  mock.module("@notra/ai/billing/zdr", () => ({ resolveOrganizationZdrMode: async () => "required" }));
+  const autumnModule = await import("@notra/ai/billing/autumn");
+  mock.module("@notra/ai/billing/autumn", () => ({ ...autumnModule, allowUnmeteredAiInDevelopment: false, autumn: { track: async (input) => { charged.push(input); } } }));
+  const posthog = await import("@notra/posthog/server");
+  mock.module("@notra/posthog/server", () => ({ ...posthog, captureServerEvent: () => {}, flushPostHogServer: async () => {} }));
+  const ai = await import("ai");
+  mock.module("ai", () => ({ ...ai, experimental_transcribe: async (input) => {
+    transcribed.push(input);
+    if (failTranscription(transcribed.length)) throw new Error("gateway down");
+    return { text: " Draft a LinkedIn post about the launch ", durationInSeconds: 30 };
+  } }));
+}
 const linkedLookups = [];
 mock.module("@notra/tools/utils/social-accounts", () => ({
   isTwitterPublishConfigured: () => true,
@@ -103,6 +119,7 @@ const ephemerals = () => outbound.filter((call) => call.url.endsWith("chat.postE
 globalThis.fetch = async (url, init) => {
   outbound.push({ url: String(url), raw: String(init.body), authorization: new Headers(init.headers).get("authorization"), body: Object.fromEntries(new URLSearchParams(String(init.body))) });
   const name = new URL(String(url)).pathname.split("/").at(-1);
+  if (new URL(String(url)).hostname === "files.slack.com") return new Response(new Uint8Array([1, 2, 3]), { headers: { "content-type": "audio/webm" } });
   if (scenario === "working-reaction-errors" && name === "reactions.add") return Response.json({ ok: false, error: "missing_scope" });
   if (scenario === "working-reaction-errors" && name === "reactions.remove") throw new Error("network down");
   if (name === "conversations.info") return Response.json({ ok: true, channel: { id: "C-room", is_private: false } });
@@ -474,6 +491,32 @@ if (scenario === "draft-pr-completion") {
   assert.deepEqual(reactionCalls("reactions.remove"), [eyes("2.1")]);
   assert.deepEqual(await redisMembers(), []);
   assert(outbound.some((call) => call.url.endsWith("chat.postMessage") && call.raw.includes("Done")));
+} else if (scenario === "voice-reply") {
+  const clip = { subtype: "file_share", files: [{ id: "F-clip", subtype: "slack_audio", name: "audio_message.webm", mimetype: "audio/webm", size: 3, url_private: "https://files.slack.com/files-pri/T-install-F-clip/audio_message.webm" }] };
+  await message("", false, clip);
+  await Promise.all(tasks);
+  assert.equal(transcribed.length, 1);
+  assert.equal(transcribed[0].providerOptions.gateway.zeroDataRetention, true);
+  assert.equal(outbound.find((call) => call.url.includes("files.slack.com")).authorization, "Bearer fixture-install");
+  assert.equal(exactSends.length, 1);
+  const content = JSON.stringify(exactSends[0].command);
+  assert(content.includes("Transcript:\\\\n\\\\nDraft a LinkedIn post about the launch"));
+  assert.deepEqual(charged.map((call) => [call.customerId, call.featureId, call.value, call.properties.audio_seconds]), [["org-install", "ai_credits", 1, 30]]);
+  // When one of two clips fails the agent is told part of the message is missing.
+  failTranscription = (call) => call === 3;
+  const second = { ...clip.files[0], id: "F-clip-2" };
+  await message("", false, { ...clip, files: [clip.files[0], second] });
+  await Promise.all(tasks);
+  assert.equal(exactSends.length, 2);
+  assert(JSON.stringify(exactSends[1].command).includes("1 more voice clip in that message could not be transcribed"));
+  assert.equal(charged.length, 2);
+  // A voice-only message nobody could transcribe never starts a turn or a charge.
+  failTranscription = () => true;
+  await message("", false, clip);
+  await Promise.all(tasks);
+  assert.equal(exactSends.length, 2);
+  assert.equal(charged.length, 2);
+  assert(outbound.some((call) => call.url.endsWith("chat.postMessage") && decodeURIComponent(call.raw.replaceAll("+", " ")).includes("transcribe that voice message")));
 } else if (scenario === "mention-after-leave") {
   await handleSlackControl("leave", { thread: binding.thread, resolveSession: async () => originalSession });
   await message("unmentioned follow-up");
@@ -525,6 +568,8 @@ describe("Slack native channel boundaries", () => {
     runSlackChannel("leave-race"));
   test("pinned replies preserve speaker attribution and thread context", () =>
     runSlackChannel("reply"));
+  test("voice messages reach the agent as a transcript", () =>
+    runSlackChannel("voice-reply"));
   test("unmentioned replies stay ignored after Leave and a mention restarts the thread", () =>
     runSlackChannel("mention-after-leave"));
   test("👀 marks a message while its turn runs and clears when it ends", () =>
