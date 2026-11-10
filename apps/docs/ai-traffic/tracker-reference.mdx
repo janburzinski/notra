@@ -42,7 +42,7 @@ The [script tag](/ai-traffic/install/script-tag) counts people rather than serve
 
 Web vitals (LCP, FCP, TTFB, CLS and INP) and outbound link clicks are always recorded. `/api/notra.plus.js` is the same script with JavaScript error reporting added.
 
-`/api/notra.js` and `/api/notra.plus.js` always serve the latest build. `/api/notra.<version>.js` and `/api/notra.plus.<version>.js` serve one build forever, cached for a year, with CORS enabled, so you can load it with `integrity` and `crossorigin="anonymous"`. A pinned tag never updates on its own; see [Pin a version with Subresource Integrity](/ai-traffic/install/script-tag#pin-a-version-with-subresource-integrity).
+`/api/notra.js` and `/api/notra.plus.js` always serve the latest build. `/api/notra.<version>.js` and `/api/notra.plus.<version>.js` serve one build forever, cached for a year, with CORS enabled, so you can load it with `integrity` and `crossorigin="anonymous"`. The install panel and `webSnippet` hand out the pinned tag; it never updates on its own. See [Pinned builds and Subresource Integrity](/ai-traffic/install/script-tag#pinned-builds-and-subresource-integrity).
 
 <Visibility for="agents">
 
@@ -62,7 +62,7 @@ curl -X POST "https://api.usenotra.com/v1/geo/ingest/token?projectId=$PROJECT_ID
   -H "Authorization: Bearer $NOTRA_API_KEY"
 ```
 
-Both return `ingestUrl`, `snippet` (the Next.js snippet), `snippets` with `next`, `nuxt`, `tanstack`, `astro`, `sveltekit`, `reactRouter` and `netlify` keys, `drainUrls` with the `vercel` and `cloudflare` log drain endpoints, and the notra.js install: `webKey`, `webSnippet` (the script tag) and `webScript` and `webPlusScript`, each with the auto-updating `url`, the `pinnedUrl` of the current build and its `integrity` value. Every web key belongs to one project: pass `projectId` for that project's key, or omit it for the organization's oldest project's key. The web key is public, so reading it only needs `traffic.read`. The token endpoint also returns `token`. The ingest routes are organization-level, so pass `projectId` to bind the token to one project or omit it to track the whole organization. Issuing a token does not invalidate tokens issued earlier, so install the same project token on every domain the project tracks, and add extra hostnames under **Tracked domains** in GEO settings.
+Both return `ingestUrl`, `snippet` (the Next.js snippet), `snippets` with `next`, `nuxt`, `tanstack`, `astro`, `sveltekit`, `reactRouter` and `netlify` keys, `drainUrls` with the `vercel` and `cloudflare` log drain endpoints, and the notra.js install: `webKey`, `webSnippet` (the script tag, pinned to the current build with its `integrity`) and `webScript` and `webPlusScript`, each with the auto-updating `url`, the `pinnedUrl` of the current build and its `integrity` value. Every web key belongs to one project: pass `projectId` for that project's key, or omit it for the organization's oldest project's key. The web key is public, so reading it only needs `traffic.read`. The token endpoint also returns `token`. The ingest routes are organization-level, so pass `projectId` to bind the token to one project or omit it to track the whole organization. Issuing a token does not invalidate tokens issued earlier, so install the same project token on every domain the project tracks, and add extra hostnames under **Tracked domains** in GEO settings.
 
 </Visibility>
 

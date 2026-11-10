@@ -1,13 +1,14 @@
 import type { GeoWebScript } from "../types/geo";
 
 /**
- * The install tag. Pinned, it loads one build checked against its integrity
- * hash; that needs `crossorigin` and never picks up a newer build.
+ * The install tag. Pinned by default, it loads one build checked against its
+ * integrity hash, so a changed file on the script host never runs on the
+ * customer's pages; that needs `crossorigin` and never picks up a newer build.
  */
 export function geoWebScriptTag(
   webKey: string,
   script: GeoWebScript,
-  pinned = false
+  pinned = true
 ): string {
   const api = script.collectUrl ? ` data-api="${script.collectUrl}"` : "";
   return pinned

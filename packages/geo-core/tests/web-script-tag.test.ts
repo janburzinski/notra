@@ -8,12 +8,12 @@ const SCRIPT = {
   integrity: "sha384-abc",
 };
 
-test("the default tag auto-updates; the pinned one checks its integrity", () => {
+test("the default tag is pinned with its integrity; opting out auto-updates", () => {
   expect(geoWebScriptTag("nwk.key", SCRIPT)).toBe(
-    '<script defer src="https://ingest.example/api/notra.js" data-key="nwk.key"></script>'
-  );
-  expect(geoWebScriptTag("nwk.key", SCRIPT, true)).toBe(
     '<script defer src="https://ingest.example/api/notra.0123456789ab.js" data-key="nwk.key" integrity="sha384-abc" crossorigin="anonymous"></script>'
+  );
+  expect(geoWebScriptTag("nwk.key", SCRIPT, false)).toBe(
+    '<script defer src="https://ingest.example/api/notra.js" data-key="nwk.key"></script>'
   );
   // Loaded from a separate script host, the tag names where page views go.
   expect(
@@ -24,6 +24,6 @@ test("the default tag auto-updates; the pinned one checks its integrity", () => 
       collectUrl: "https://ingest.example/api/collect",
     })
   ).toBe(
-    '<script defer src="https://js.example/notra.js" data-key="nwk.key" data-api="https://ingest.example/api/collect"></script>'
+    '<script defer src="https://js.example/notra.0123456789ab.js" data-key="nwk.key" data-api="https://ingest.example/api/collect" integrity="sha384-abc" crossorigin="anonymous"></script>'
   );
 });

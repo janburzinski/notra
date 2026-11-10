@@ -185,7 +185,8 @@ function formatScriptTag(tag: string): string {
 
 /**
  * The script tag to install: notra.plus.js when JavaScript errors are
- * reported too, and pinned to one build with its integrity hash when asked.
+ * reported too, and pinned to one build with its integrity hash unless the
+ * auto-updating build is asked for.
  * Empty without a project key.
  */
 export function geoScriptSnippet(

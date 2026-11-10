@@ -23,7 +23,7 @@ export function GeoIngestScriptSetup({
 }: GeoIngestScriptSetupProps) {
   const t = useTranslations("geo.geoIngestSetup.script");
   const { activeOrganization } = useOrganizationsContext();
-  const [pinned, setPinned] = useState(false);
+  const [pinned, setPinned] = useState(true);
   const [errors, setErrors] = useState(false);
   const snippet = geoScriptSnippet(setup, { pinned, errors });
 
@@ -66,11 +66,9 @@ export function GeoIngestScriptSetup({
         title={t.rich("tagTitle", { code, tag: "<head>" })}
       >
         <CodeSnippet code={snippet} onCopy={onCopy} tabs={options} wrap />
-        {pinned ? (
-          <p className="text-muted-foreground text-xs text-pretty">
-            {t("pinNote")}
-          </p>
-        ) : null}
+        <p className="text-muted-foreground text-xs text-pretty">
+          {t(pinned ? "pinNote" : "autoUpdateNote")}
+        </p>
         {errors ? (
           <p className="text-muted-foreground text-xs text-pretty">
             {t.rich("errorsNote", { code })}

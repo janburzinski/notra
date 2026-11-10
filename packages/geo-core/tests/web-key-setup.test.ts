@@ -80,8 +80,15 @@ if (!isIsolatedTestWorker(import.meta.url)) {
         pinnedUrl: `https://ingest.example/api/${TRACKER_PLUS_RELEASE.file}`,
         integrity: TRACKER_PLUS_RELEASE.integrity,
       });
+      // The returned tag is the pinned build with its integrity hash.
       expect(issued.webSnippet).toBe(
         geoWebScriptTag(issued.webKey, issued.webScript)
+      );
+      expect(issued.webSnippet).toContain(
+        `src="https://ingest.example/api/${TRACKER_RELEASE.file}"`
+      );
+      expect(issued.webSnippet).toContain(
+        `integrity="${TRACKER_RELEASE.integrity}" crossorigin="anonymous"`
       );
 
       // With a script host, builds load from it and page views go to the ingest.

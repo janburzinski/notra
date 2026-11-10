@@ -40,6 +40,7 @@
     "@notra/schemas": "workspace:*",
     "@notra/ui": "workspace:*",
     "@notra/utils": "workspace:*",
+    "@notra/web-tracker": "workspace:*",
     "@paper-design/shaders-react": "~0.0.81",
     "@remotion/bundler": "4.0.533",
     "@remotion/fonts": "4.0.533",

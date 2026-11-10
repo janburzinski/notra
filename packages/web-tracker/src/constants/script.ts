@@ -17,3 +17,13 @@ export const TRACKER_VERSION_LENGTH = 12;
 /** `notra.<version>.js` or `notra.plus.<version>.js`, nothing else. */
 export const TRACKER_RELEASE_FILE_PATTERN =
   /^notra(\.plus)?\.([0-9a-f]{12})\.js$/;
+
+/**
+ * A pinned build named in the docs, with the `integrity` that follows it on
+ * the same tag, so the build can rewrite both to the current release.
+ */
+/** A CSP source for the notra.js hash in the docs, `'sha384-…'`. */
+export const DOCS_CSP_HASH_PATTERN = /'sha384-[^']*'/g;
+
+export const DOCS_PINNED_BUILD_PATTERN =
+  /notra(\.plus)?\.[0-9a-f]{12}\.js([^\n]*?integrity=")?(sha384-[^"]*)?/g;

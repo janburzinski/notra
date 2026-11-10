@@ -9,6 +9,8 @@ import {
 import { brotliCompressSync, gzipSync } from "node:zlib";
 
 import {
+  DOCS_CSP_HASH_PATTERN,
+  DOCS_PINNED_BUILD_PATTERN,
   TRACKER_RELEASE_FILE_PATTERN,
   TRACKER_VERSION_LENGTH,
 } from "../src/constants/script";
@@ -16,6 +18,8 @@ import { trackerReleaseFile } from "../src/utils/release";
 
 const root = new URL("..", import.meta.url).pathname;
 export const RELEASES_DIR = `${root}releases/`;
+/** The install docs, whose example tags show the current pinned builds. */
+export const DOCS_FILE = `${root}../../apps/docs/ai-traffic/install/script-tag.mdx`;
 
 /** notra.js, or with `plus` the superset notra.plus.js that adds errors. */
 export async function buildTracker(plus = false): Promise<string> {
@@ -61,6 +65,37 @@ export function renderModule(script: string, plusScript: string): string {
     `export const TRACKER_PLUS_SCRIPT = ${JSON.stringify(plusScript)};`,
     "",
   ].join("\n");
+}
+
+/**
+ * The docs with every pinned tag pointing at the current builds, so a tag
+ * copied from the docs carries the real file name and integrity, not a
+ * placeholder.
+ */
+export function renderDocs(
+  docs: string,
+  script: string,
+  plusScript: string
+): string {
+  const current = {
+    file: trackerReleaseFile(trackerVersion(script), false),
+    integrity: trackerIntegrity(script),
+  };
+  const plus = {
+    file: trackerReleaseFile(trackerVersion(plusScript), true),
+    integrity: trackerIntegrity(plusScript),
+  };
+  return docs
+    .replaceAll(
+      DOCS_PINNED_BUILD_PATTERN,
+      (_match, isPlus?: string, beforeIntegrity?: string) => {
+        const release = isPlus ? plus : current;
+        return beforeIntegrity === undefined
+          ? release.file
+          : `${release.file}${beforeIntegrity}${release.integrity}`;
+      }
+    )
+    .replaceAll(DOCS_CSP_HASH_PATTERN, `'${current.integrity}'`);
 }
 
 /** Every archived build, by file name, in a stable order. */
@@ -130,6 +165,13 @@ if (import.meta.main) {
     `${root}src/generated/releases.ts`,
     renderReleases(readReleases())
   );
+  // Docker images leave out apps/docs; there is nothing to update then.
+  if (existsSync(DOCS_FILE)) {
+    await Bun.write(
+      DOCS_FILE,
+      renderDocs(readFileSync(DOCS_FILE, "utf8"), script, plusScript)
+    );
+  }
   console.log(describe("notra.js", script));
   console.log(describe("notra.plus.js", plusScript));
 }

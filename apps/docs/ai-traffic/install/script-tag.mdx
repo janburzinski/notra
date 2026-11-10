@@ -25,17 +25,17 @@ The script cannot see AI crawlers, because crawlers do not run JavaScript. To lo
 
 <Steps>
   <Step title="Copy the script tag">
-    Open **Settings → Tracking** and copy the **Script tag** from the install panel. Until the first page view arrives, the **Web analytics** tab under **Analytics** shows the same panel. The tag contains your project's public key:
+    Open **Settings → Tracking** and copy the **Script tag** from the install panel. Until the first page view arrives, the **Web analytics** tab under **Analytics** shows the same panel. The tag contains your project's public key and loads the current build of the script, checked against its hash. You never look up or set the hash yourself: the install panel fills in the current build and its `integrity`. With your key in place of `nwk.…`, today's tag is:
 
     ```html
-    <script defer src="https://static.usenotra.com/notra.js" data-key="nwk.…" data-api="https://ingest.usenotra.com/api/collect"></script>
+    <script defer src="https://static.usenotra.com/notra.ce3c872ef9c9.js" data-key="nwk.…" data-api="https://ingest.usenotra.com/api/collect" integrity="sha384-LuUp5Hj+rSQ4/mZp1sWBOrJDHIHKGqflwF1GYIreqmWdCaI1otOQealWJGRj6Toj" crossorigin="anonymous"></script>
     ```
 
-    The key is not a secret. It can only record page views on the domains your project tracks, so it is safe in page HTML and keeps working when you rotate your server token.
+    The key is not a secret. It can only record page views on the domains your project tracks, so it is safe in page HTML and keeps working when you rotate your server token. See [Pinned builds](#pinned-builds-and-subresource-integrity) for what `integrity` does and how to update.
 
     <Visibility for="agents">
 
-    `POST /v1/geo/ingest/token` returns the key as `webKey` and the full tag as `webSnippet`.
+    `POST /v1/geo/ingest/token` returns the key as `webKey` and the full pinned tag as `webSnippet`.
 
     </Visibility>
   </Step>
@@ -67,29 +67,27 @@ Clicks on links to another host are recorded on their own, with the left or midd
 
 ## JavaScript errors (opt-in)
 
-To also record uncaught JavaScript errors and unhandled promise rejections, load `notra.plus.js` instead of `notra.js`. It is the same script with error reporting added, about 1.3 KB compressed, and takes the same attributes:
+To also record uncaught JavaScript errors and unhandled promise rejections, turn on **Report JavaScript errors** in the install panel. The tag then loads `notra.plus.js` instead of `notra.js`. It is the same script with error reporting added, about 1.3 KB compressed, takes the same attributes and is pinned the same way:
 
 ```html
-<script defer src="https://static.usenotra.com/notra.plus.js" data-key="nwk.…" data-api="https://ingest.usenotra.com/api/collect"></script>
+<script defer src="https://static.usenotra.com/notra.plus.d703b9cc5508.js" data-key="nwk.…" data-api="https://ingest.usenotra.com/api/collect" integrity="sha384-MgLdHKufD0WdkO4pxtkT/bbNCKxl6PxOyUJe+M/qwFGfjOdZ5rEnljxTlOVQIzF+" crossorigin="anonymous"></script>
 ```
 
 Only errors from scripts served over `http` or `https` are reported, which leaves out browser extensions and the opaque `Script error.` of other origins, and at most five per page view. The script never sends a stack trace. Before storing a message, Notra removes query strings from URLs in it, replaces email addresses with `[email]` and replaces runs of four or more digits and long hexadecimal tokens with `#`. Errors appear in the **JavaScript errors** table on the **Web analytics** tab once there are any.
 
-## Pin a version with Subresource Integrity
+## Pinned builds and Subresource Integrity
 
-The default tag loads `/api/notra.js`, which always serves the latest build, so fixes reach your site without any change on your side. If your security policy requires third-party scripts to be pinned, turn on **Pin this version (Subresource Integrity)** in the install panel. The tag then loads one exact build and carries its hash:
+The tag from the install panel loads one exact build, such as `notra.ce3c872ef9c9.js`, and carries its hash in `integrity`. The browser hashes the file and refuses to run it if a single byte differs, so nobody, Notra included, can change the script on your pages without you replacing the tag. Every pinned build stays available unchanged, so the tag keeps working after new releases.
 
-```html
-<script defer src="https://static.usenotra.com/notra.1a2b3c4d5e6f.js" data-key="nwk.…" data-api="https://ingest.usenotra.com/api/collect" integrity="sha384-…" crossorigin="anonymous"></script>
-```
+<Warning>
+  **Keep `integrity` on the tag.** Removing it only turns off the hash check: the tag still loads the same pinned build, so you lose the protection and get no updates. For automatic updates, turn off **Pin this version** in the install panel and copy the new tag. It loads `/notra.js` (or `/notra.plus.js`): whatever build the script host serves at that moment, without a hash check. If the script host or Notra's release process were ever compromised, the changed script would run on your pages right away. We don't recommend it; use it only if you accept that risk in exchange for getting new builds without changing the tag.
+</Warning>
 
-The browser hashes the file and refuses to run it if a single byte differs from `integrity`, so nobody can change the script on your pages without you noticing. Every pinned build stays available unchanged, so the tag keeps working after new releases. `notra.plus.js` can be pinned the same way, as `/api/notra.plus.<version>.js`.
-
-- **Updating.** A pinned script never updates on its own. To move to a newer build, copy the tag from the install panel again and replace both `src` and `integrity`.
+- **Updating.** A pinned script never updates on its own. To move to a newer build, copy the tag from the install panel again and replace both `src` and `integrity`. The tags on this page always show the current build.
 - **Keep `crossorigin="anonymous"`.** Browsers only check the integrity of scripts loaded with CORS. Without the attribute the script is blocked.
 - **Proxies.** If you serve the script through your own domain, pass the file through unchanged. Minifying or rewriting it breaks the hash; compression is fine.
 - **Cloudflare Rocket Loader.** Rocket Loader rewrites script tags so it can load them itself, which can drop `integrity` and `crossorigin`. Add `data-cfasync="false"` to the tag so Rocket Loader leaves it alone.
-- **Content-Security-Policy.** Allow the script host in `script-src` and the ingest in `connect-src` for its beacons: `script-src https://static.usenotra.com; connect-src https://ingest.usenotra.com`. Browsers that implement CSP Level 3 also accept the pinned script's hash in `script-src`, such as `'sha384-…'`, because the tag carries the same `integrity` value. Keep the origin listed for browsers that don't.
+- **Content-Security-Policy.** Allow the script host in `script-src` and the ingest in `connect-src` for its beacons: `script-src https://static.usenotra.com; connect-src https://ingest.usenotra.com`. Browsers that implement CSP Level 3 also accept the pinned script's hash in `script-src`, because the tag carries the same `integrity` value: `'sha384-LuUp5Hj+rSQ4/mZp1sWBOrJDHIHKGqflwF1GYIreqmWdCaI1otOQealWJGRj6Toj'` for today's `notra.js`, or the value from your tag. Keep the origin listed for browsers that don't.
 
 <Visibility for="agents">
 

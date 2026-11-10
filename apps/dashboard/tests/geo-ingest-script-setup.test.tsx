@@ -84,15 +84,19 @@ if (!process.env.NOTRA_SCRIPT_SETUP_TEST_WORKER) {
       .replaceAll("&gt;", ">");
   const copy = messages.geo.geoIngestSetup;
 
-  test("the auto-updating notra.js tag is the default, without integrity", () => {
+  test("the pinned notra.js tag with its integrity hash is the default", () => {
     const html = text(render(setup));
     expect(html).toContain(
-      '<script\n  defer\n  src="https://ingest.example/api/notra.js"\n  data-key="nwk.key"\n></script>'
+      '<script\n  defer\n  src="https://ingest.example/api/notra.0123456789ab.js"\n  data-key="nwk.key"\n  integrity="sha384-abc"\n  crossorigin="anonymous"\n></script>'
     );
-    expect(html).not.toContain("integrity=");
+    expect(html).toContain(copy.script.pinNote);
+    expect(html).not.toContain('src="https://ingest.example/api/notra.js"');
   });
 
-  test("error reporting loads notra.plus.js, and pinning adds the integrity hash", () => {
+  test("unpinned loads the auto-updating build, and error reporting loads notra.plus.js", () => {
+    expect(geoScriptSnippet(setup, { pinned: false, errors: false })).toBe(
+      '<script\n  defer\n  src="https://ingest.example/api/notra.js"\n  data-key="nwk.key"\n></script>'
+    );
     expect(geoScriptSnippet(setup, { pinned: false, errors: true })).toBe(
       '<script\n  defer\n  src="https://ingest.example/api/notra.plus.js"\n  data-key="nwk.key"\n></script>'
     );

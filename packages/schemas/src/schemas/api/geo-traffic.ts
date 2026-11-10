@@ -484,7 +484,7 @@ const webSetupFields = {
   }),
   webSnippet: z.string().optional().openapi({
     description:
-      "Script tag that installs notra.js with the public key. Only present when web analytics is enabled for the workspace.",
+      'Script tag that installs notra.js with the public key, pinned to the current build with its Subresource Integrity hash and crossorigin="anonymous". Build an auto-updating tag from webScript.url instead if you want new builds without copying the tag again. Only present when web analytics is enabled for the workspace.',
   }),
   webScript: webScriptSchema.optional().openapi({
     description:
