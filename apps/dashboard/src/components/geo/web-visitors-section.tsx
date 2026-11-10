@@ -136,23 +136,22 @@ export function WebVisitorsSection({
         fromAi: page.aiVisitors,
       };
     });
-  const sourceRows: WebBreakdownRow[] = web.sources
-    .slice(0, WEB_LIST_LIMIT)
-    .map((source) => {
-      const name = webSourceName(source, t("direct"));
-      return {
-        key: `${source.group}:${source.source}`,
-        label: (
-          <>
-            <WebReferrerIcon source={source} />
-            <span className="truncate">{name}</span>
-          </>
-        ),
-        sortLabel: name,
-        value: source.sessions,
-        previous: source.previousSessions,
-      };
-    });
+  // Every source the API returns; the table scrolls past WEB_LIST_LIMIT rows.
+  const sourceRows: WebBreakdownRow[] = web.sources.map((source) => {
+    const name = webSourceName(source, t("direct"));
+    return {
+      key: `${source.group}:${source.source}`,
+      label: (
+        <>
+          <WebReferrerIcon source={source} />
+          <span className="truncate">{name}</span>
+        </>
+      ),
+      sortLabel: name,
+      value: source.sessions,
+      previous: source.previousSessions,
+    };
+  });
   const countryRows: WebBreakdownRow[] = web.countries.map((row) => {
     const name = row.value
       ? countryName(row.value, locale)
@@ -205,7 +204,7 @@ export function WebVisitorsSection({
       return webTableHeight(WEB_LIST_LIMIT);
     }
     return sideBySide
-      ? Math.max(webTableHeight(first), webTableHeight(second))
+      ? webTableHeight(Math.min(Math.max(first, second), WEB_LIST_LIMIT))
       : undefined;
   };
   const topHeight = pairHeight(pageRows.length, sourceRows.length);

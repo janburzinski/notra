@@ -47,3 +47,18 @@ test("direct, unknown, and inherited-object source names get a safe UI icon", ()
     expect(html).not.toContain("<title>Google</title>");
   }
 });
+
+test("referrers without a bundled logo show their site's favicon", () => {
+  for (const [group, name, domain] of [
+    ["search", "yahoo", "yahoo.com"],
+    ["social", "product-hunt", "producthunt.com"],
+    ["other", "app.usenotra.com", "app.usenotra.com"],
+    ["other", "dominikkoch.dev", "dominikkoch.dev"],
+  ] as const) {
+    const html = renderToStaticMarkup(
+      <WebReferrerIcon source={source(group, name)} />
+    );
+    expect(html).toContain("<img");
+    expect(html).toContain(`domain=${domain}`);
+  }
+});

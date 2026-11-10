@@ -36,6 +36,29 @@ export const WEB_REFERRER_LOGOS: Partial<
   youtube: Youtube,
 };
 
+/** Site whose favicon stands in for a known referrer without a bundled logo. */
+export const WEB_SOURCE_DOMAINS: Readonly<Record<string, string>> = {
+  bing: "bing.com",
+  yahoo: "yahoo.com",
+  ecosia: "ecosia.org",
+  brave: "search.brave.com",
+  yandex: "yandex.com",
+  baidu: "baidu.com",
+  startpage: "startpage.com",
+  qwant: "qwant.com",
+  facebook: "facebook.com",
+  "hacker-news": "news.ycombinator.com",
+  threads: "threads.net",
+  bluesky: "bsky.app",
+  mastodon: "joinmastodon.org",
+  "product-hunt": "producthunt.com",
+  medium: "medium.com",
+  substack: "substack.com",
+};
+
+/** A referrer stored as its host (`dominikkoch.dev`), not a display name. */
+export const WEB_SOURCE_HOST_PATTERN = /^[a-z0-9-]+(?:\.[a-z0-9-]+)+$/i;
+
 export const WEB_DEVICE_ICONS: Record<string, typeof ComputerIcon> = {
   desktop: ComputerIcon,
   mobile: SmartPhone01Icon,

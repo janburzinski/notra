@@ -2054,6 +2054,8 @@ export interface WebVitalDistributionProps {
 export interface WebOutboundFaviconProps {
   /** Destination host and path, as stored. */
   url: string;
+  /** Shown when the site has no favicon; a link icon by default. */
+  fallbackIcon?: IconSvgElement;
 }
 
 export interface LanguageFlagProps {

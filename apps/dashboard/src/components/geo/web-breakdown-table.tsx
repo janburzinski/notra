@@ -6,7 +6,10 @@ import { useLocale, useTranslations } from "use-intl";
 
 import { GeoCountCell } from "@/components/geo/geo-count-cell";
 import { WebAnalyticsEmpty } from "@/components/geo/web-analytics-empty";
-import { WEB_TABLE_ROW_HEIGHT } from "@/constants/web-analytics";
+import {
+  WEB_LIST_LIMIT,
+  WEB_TABLE_ROW_HEIGHT,
+} from "@/constants/web-analytics";
 import type {
   WebBreakdownGridProps,
   WebBreakdownRow,
@@ -31,7 +34,8 @@ function WebBreakdownGrid({
   const t = useTranslations("geo.webVisitors");
   const tCommon = useTranslations("common");
   const locale = useLocale();
-  const tableHeight = height ?? webTableHeight(rows.length);
+  const tableHeight =
+    height ?? webTableHeight(Math.min(rows.length, WEB_LIST_LIMIT));
   const columns: TableColumn<WebBreakdownRow>[] = [
     {
       key: "name",

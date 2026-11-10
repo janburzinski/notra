@@ -17,7 +17,6 @@ import { useTranslations } from "use-intl";
 
 import { WebBreakdownTable } from "@/components/geo/web-breakdown-table";
 import { WebScriptEmpty } from "@/components/geo/web-script-empty";
-import { WEB_LIST_LIMIT } from "@/constants/web-analytics";
 import { useWebUtm } from "@/lib/hooks/use-geo";
 import type {
   WebBreakdownRow,
@@ -49,15 +48,13 @@ export function WebSourcesCard({
     utm.sites,
     dimension !== null
   );
-  const utmRows: WebBreakdownRow[] = (utmQuery.data ?? [])
-    .slice(0, WEB_LIST_LIMIT)
-    .map((row) => ({
-      key: row.value,
-      label: <TruncateWithTooltip>{row.value}</TruncateWithTooltip>,
-      sortLabel: row.value,
-      value: row.sessions,
-      previous: row.previousSessions,
-    }));
+  const utmRows: WebBreakdownRow[] = (utmQuery.data ?? []).map((row) => ({
+    key: row.value,
+    label: <TruncateWithTooltip>{row.value}</TruncateWithTooltip>,
+    sortLabel: row.value,
+    value: row.sessions,
+    previous: row.previousSessions,
+  }));
 
   const picker = (
     <Select

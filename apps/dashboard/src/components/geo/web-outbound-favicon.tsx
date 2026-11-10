@@ -9,8 +9,11 @@ import Image from "@/components/framework/image";
 import { WEB_OUTBOUND_FAVICON_SIZE } from "@/constants/web-analytics";
 import type { WebOutboundFaviconProps } from "@/types/geo";
 
-/** Favicon of an outbound link's destination, or a link icon if it has none. */
-export function WebOutboundFavicon({ url }: WebOutboundFaviconProps) {
+/** Favicon of a link's site, or a fallback icon if it has none. */
+export function WebOutboundFavicon({
+  url,
+  fallbackIcon = Link04Icon,
+}: WebOutboundFaviconProps) {
   const [failed, setFailed] = useState(false);
   const src = googleFaviconUrl(
     url.split("/")[0] ?? "",
@@ -21,7 +24,7 @@ export function WebOutboundFavicon({ url }: WebOutboundFaviconProps) {
       <HugeiconsIcon
         aria-hidden="true"
         className="text-muted-foreground size-3.5 shrink-0"
-        icon={Link04Icon}
+        icon={fallbackIcon}
       />
     );
   }
