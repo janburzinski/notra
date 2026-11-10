@@ -1,0 +1,24 @@
+apps/web/src/lib/mcp-battle/engine.ts
+  s_985e9d8eeca486::t_3daf6423f2f785 67,657-658,662-667,670-675,1265,1405,1466-1471
+packages/ui/src/components/ui/command-tabs.tsx
+  s_985e9d8eeca486::t_2bdcd2c4b35414 398-399,405-406,444,449,453
+apps/web/src/constants/mcp-battle.ts
+  s_985e9d8eeca486::t_55e2d17dcbfc87 9
+  s_985e9d8eeca486::t_3daf6423f2f785 92-93
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "e1d5c321e93c89574d6f05b2394193a16dba2551",
+  "prompts": {},
+  "sessions": {
+    "s_985e9d8eeca486": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "4bfd388d-bc5e-4b7b-9feb-e01cd6c4542e",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
