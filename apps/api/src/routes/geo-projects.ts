@@ -17,10 +17,12 @@ import {
 } from "@notra/schemas/api/geo-projects";
 import { Effect } from "effect";
 
+import { START_SCAN_SCOPES } from "../constants/geo";
 import {
   GEO_COMMON_ERROR_RESPONSES,
   GEO_OPENAPI_TAG,
 } from "../constants/geo-openapi";
+import { hasAdditionalScopes } from "../middleware/auth";
 import { runGeoEffect } from "../runtime/geo";
 import { geoErrorResponse, geoOutcomeResponse } from "../utils/geo";
 import { createOpenApiApp } from "../utils/openapi-app";
@@ -135,6 +137,14 @@ geoProjectsRoutes.openapi(listProjectsRoute, async (c) => {
 geoProjectsRoutes.openapi(createProjectRoute, async (c) => {
   const base = c.get("geo");
   const { name, brandSettingsId, startScan = false } = c.req.valid("json");
+  if (startScan && !hasAdditionalScopes(c, START_SCAN_SCOPES)) {
+    return c.json(
+      {
+        error: `startScan also needs the ${START_SCAN_SCOPES.join(" and ")} scopes. Create the project without startScan, or use a credential with Full access.`,
+      },
+      403
+    );
+  }
   const outcome = await runGeoEffect(
     "projectCreate",
     resolveBrandIdentity(base.organizationId, brandSettingsId).pipe(

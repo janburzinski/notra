@@ -1,3 +1,5 @@
+import { getApiScopeId } from "@notra/utils/api-scopes";
+
 export const GEO_SCAN_INTERNAL_WORKFLOW_PATH =
   "/api/internal/workflows/geo-scan";
 
@@ -22,3 +24,9 @@ export const GEO_PLAN_REQUIRED_MESSAGE =
   "GEO requires a Starter, Growth, or Scale plan";
 
 export const GEO_PROJECT_NOT_FOUND_ERROR = "Project not found";
+
+/** `startScan` on project create also enables tracking and starts a billed scan. */
+export const START_SCAN_SCOPES = [
+  getApiScopeId("scans", "write"),
+  getApiScopeId("geo-settings", "write"),
+] as const;

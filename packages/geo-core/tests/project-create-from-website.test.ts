@@ -9,7 +9,11 @@ import {
 import { eq } from "drizzle-orm";
 import { Effect } from "effect";
 
-import { GeoEntitlementService, GeoWorkflowService } from "../src/deps";
+import {
+  GeoCodingAgentAccessService,
+  GeoEntitlementService,
+  GeoWorkflowService,
+} from "../src/deps";
 import type {
   GeoEntitlementServiceShape,
   GeoWorkflowServiceShape,
@@ -90,7 +94,10 @@ const create = (startScan: boolean) =>
       startScan
     ).pipe(
       Effect.provideService(GeoWorkflowService, workflows),
-      Effect.provideService(GeoEntitlementService, entitlements)
+      Effect.provideService(GeoEntitlementService, entitlements),
+      Effect.provideService(GeoCodingAgentAccessService, {
+        hasPaidPlanForOrganization: () => Effect.succeed(true),
+      })
     )
   );
 

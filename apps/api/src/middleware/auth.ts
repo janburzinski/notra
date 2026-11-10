@@ -27,7 +27,11 @@ import {
 
 import { API_AUTH_KINDS } from "../constants/analytics";
 import type { ApiAuthKind } from "../types/analytics";
-import type { AccountApiKeyAuthData, AuthData } from "../types/auth";
+import {
+  type AccountApiKeyAuthData,
+  type AuthData,
+  isIngestAuth,
+} from "../types/auth";
 import { accountStandingFailure } from "../utils/account-standing";
 import {
   API_URL,
@@ -708,6 +712,21 @@ async function verifyAuthAndStanding(
       kind,
     };
   }
+}
+
+/**
+ * Whether the already verified credential also grants scopes beyond its
+ * route's own, for options that reach other resources. Unkey returns every
+ * permission on a key once a verification checked permissions, so this needs
+ * no second verification. A credential without that list is refused.
+ */
+export function hasAdditionalScopes(c: Context, scopes: readonly string[]) {
+  const auth: AuthData | undefined = c.get("auth");
+  if (!auth || isIngestAuth(auth)) {
+    return false;
+  }
+  const granted = "scopes" in auth ? auth.scopes : (auth.permissions ?? []);
+  return scopes.every((scope) => hasRequiredScope(granted, scope));
 }
 
 export function authMiddleware(options: AuthOptions = {}) {
