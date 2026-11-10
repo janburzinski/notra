@@ -1,0 +1,68 @@
+apps/dashboard/src/constants/traffic-embed.ts
+  s_a4ba0f693267ad::t_c4d0b52c02b79e 40
+  s_a4ba0f693267ad::t_f66565e5614309 51-59
+apps/dashboard/messages/de.json
+  s_a4ba0f693267ad::t_6942078daa0f2f 4713-4715
+  s_a4ba0f693267ad::t_74a5c0bb75589f 4679-4680,4684-4690,4724-4727,4731-4732
+apps/dashboard/src/lib/geo/traffic-embeds.ts
+  s_a4ba0f693267ad::t_c4d0b52c02b79e 6,28,130,140,174,220,300,316-321,323-324,326-339,345-354,362-363,394-395,397
+  s_a4ba0f693267ad::t_a37c90a1d87b65 340-344,356-360
+  s_a4ba0f693267ad::t_43248f9b496efa 322,325,355,361,393
+apps/dashboard/src/types/geo.ts
+  s_a4ba0f693267ad::t_58d9475af5dc8e 2027,2029-2032,2034,2038-2049
+  ai_agent 2028
+apps/dashboard/src/components/geo/web-visitors-section.tsx
+  s_a4ba0f693267ad::t_37b7518eed1678 15,18,139-144
+apps/dashboard/messages/en.json
+  s_a4ba0f693267ad::t_70a91215dd35cb 4713-4715
+  s_a4ba0f693267ad::t_74a5c0bb75589f 4679-4680,4684-4690,4724-4727,4731-4732
+apps/dashboard/src/components/geo/traffic-embed-dialog.tsx
+  s_a4ba0f693267ad::t_f66565e5614309 26-27,30,42-43,48,124-129,131-132,134,145,151-154,167-182,220,259-267,269-276,278-285,287-312,314,316,318-319,328,451-452,557-567,569,595,622-624
+  s_a4ba0f693267ad::t_6942078daa0f2f 31,570-594,596-621
+  s_a4ba0f693267ad::t_e84597110afb00 25,51,57,155-166,183,214-216,236-238,334,336-337,339-340,342,344-345,347-348,354,361,384-389,394,400-410,420-430,434-435,440-443,447,449-450,455-457,462,468,471-476,479-525,527-528,530-537,539-550,625-639
+  s_a4ba0f693267ad::t_3ad679625dc8b4 12,37,61,193,321-327,529
+  s_a4ba0f693267ad::t_37cd27ebb37033 526
+apps/dashboard/src/lib/orpc/routers/traffic-embeds.ts
+  s_a4ba0f693267ad::t_1d51adb5537219 60
+apps/dashboard/src/components/geo/ai-traffic-embed.tsx
+  s_a4ba0f693267ad::t_dc66a78698d3c0 4,14,16-19,51-63,65-68,96,108-143,150
+apps/dashboard/src/utils/web-analytics.ts
+  s_a4ba0f693267ad::t_58d9475af5dc8e 151
+packages/schemas/src/schemas/dashboard/traffic-embed.ts
+  s_a4ba0f693267ad::t_1d51adb5537219 31
+apps/dashboard/src/components/geo/web-traffic-hero.tsx
+  s_a4ba0f693267ad::t_8b088a09302ce9 1-162
+apps/dashboard/src/components/geo/traffic-actions-menu.tsx
+  s_a4ba0f693267ad::t_5eb0d322115ed1 19,24,37,39,59,95-97,101
+packages/db/src/schema.ts
+  s_a4ba0f693267ad::t_6ff55fea58e278 1854-1858,1875-1878
+apps/docs/ai-traffic/embed.mdx
+  s_a4ba0f693267ad::t_f547f5937d849a 28
+packages/db/migrations/meta/0154_snapshot.json
+  ai_agent 1-17415
+apps/dashboard/src/types/traffic-embed.ts
+  s_a4ba0f693267ad::t_1d51adb5537219 1-4,12-14,20,31,35,37-41,47-51
+  ai_agent 36
+packages/db/migrations/0154_traffic_embed_source.sql
+  ai_agent 1
+packages/db/migrations/meta/_journal.json
+  ai_agent 1082-1088
+apps/dashboard/src/components/geo/web-trend-chart.tsx
+  s_a4ba0f693267ad::t_58d9475af5dc8e 5,32-37,103
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "8fd6122b4085b361ba56e4c4452261c18619d10b",
+  "prompts": {},
+  "sessions": {
+    "s_a4ba0f693267ad": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "04602935-1e5f-4280-b3cb-88ff509d9f9f",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
