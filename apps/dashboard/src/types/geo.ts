@@ -921,6 +921,8 @@ export interface EngineRateTableProps extends EngineFamilyBrandScope {
   promptResults?: readonly GeoPromptResultSummary[];
   isScanning?: boolean;
   organizationSlug?: string;
+  /** Public embeds: rows don't open the engine sheet. */
+  readOnly?: boolean;
 }
 
 export interface EngineFamilyBrandRow {

@@ -1,3 +1,4 @@
+import { TRAFFIC_EMBED_DEFAULT_CHARTS } from "@notra/schemas/constants/dashboard/traffic-embed";
 import {
   createTrafficEmbedInputSchema,
   listTrafficEmbedsInputSchema,
@@ -59,6 +60,7 @@ export const trafficEmbedsRouter = {
         host: input.host || null,
         source: input.source,
         allowedOrigins: normalizeOrigins(input.allowedOrigins),
+        charts: input.charts ?? TRAFFIC_EMBED_DEFAULT_CHARTS,
       });
       if (embed === "limit") {
         throw conflict("Embed limit reached. Remove an embed to add another.");
@@ -79,6 +81,7 @@ export const trafficEmbedsRouter = {
         embedId: input.embedId,
         name: input.name,
         allowedOrigins: normalizeOrigins(input.allowedOrigins),
+        ...(input.charts ? { charts: input.charts } : {}),
       });
       if (!embed) {
         throw notFound(EMBED_NOT_FOUND_MESSAGE);

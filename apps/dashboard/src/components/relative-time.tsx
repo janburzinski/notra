@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import { useLocale } from "use-intl";
 
 import { useFormatRelative } from "@/lib/hooks/use-format-relative";
+import { useMinuteTick } from "@/lib/hooks/use-minute-tick";
 import type { RelativeTimeProps } from "@/types/relative-time";
 
 const ABSOLUTE_TIME_OPTIONS: Intl.DateTimeFormatOptions = {
@@ -25,6 +26,8 @@ export function RelativeTime({ iso, className }: RelativeTimeProps) {
   const [absolute, setAbsolute] = useState(iso);
   const locale = useLocale();
   const formatRelative = useFormatRelative();
+  // Keeps the label current on pages left open, such as embeds on displays.
+  useMinuteTick();
 
   useEffect(() => {
     // react-doctor-disable-next-line react-hooks-js/set-state-in-effect

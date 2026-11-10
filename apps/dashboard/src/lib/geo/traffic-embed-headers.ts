@@ -34,9 +34,12 @@ export async function resolveTrafficEmbedHeaders(url: URL): Promise<{
     ),
     cache: {
       "Vercel-CDN-Cache-Control": `max-age=${TRAFFIC_EMBED_CDN_TTL_SECONDS}`,
-      ...(isDashboardLocale(url.searchParams.get("locale"))
-        ? {}
-        : { Vary: "Accept-Language" }),
+      // Whether the page renders at all depends on how it was requested
+      // (framed or opened directly, and by which site), so cached copies are
+      // kept apart by those headers.
+      Vary: isDashboardLocale(url.searchParams.get("locale"))
+        ? "Sec-Fetch-Dest, Referer"
+        : "Sec-Fetch-Dest, Referer, Accept-Language",
     },
   };
 }

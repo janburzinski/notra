@@ -4672,8 +4672,8 @@
       "importHistory": "Import history"
     },
     "trafficEmbed": {
-      "title": "Embed traffic chart",
-      "description": "Show your traffic on your own site. Only the domains you allow can display it.",
+      "title": "Embed charts on your site",
+      "description": "Show charts from this project on your own site. Only the domains you list here can display them.",
       "embedLabel": "Embed",
       "new": "New embed",
       "cancelNew": "Back to embeds",
@@ -4685,13 +4685,23 @@
         "web": "Website visitors"
       },
       "domainsLabel": "Allowed domains",
-      "domainsHint": "Press Enter after each domain. *.example.com allows all subdomains.",
+      "domainsHint": "*.example.com allows all subdomains.",
       "domainsRequired": "Keep at least one domain. To take the chart down, delete the embed.",
+      "chartsLabel": "Charts",
+      "chartsHint": "Share of voice shows the names of your competitors.",
+      "chartsRequired": "Keep at least one chart. To take the embed down, delete it.",
+      "charts": {
+        "visibility": "Visibility over time",
+        "engines": "Visibility by engine",
+        "share-of-voice": "Share of voice",
+        "languages": "Visibility by language",
+        "countries": "Visitors by country"
+      },
       "create": "Create embed",
       "created": "Embed created",
       "createFailed": "Couldn't create the embed",
-      "saved": "Domains saved. Changes apply within a minute.",
-      "saveFailed": "Couldn't save the domains",
+      "saved": "Saved. Changes apply within a minute.",
+      "saveFailed": "Couldn't save the embed",
       "revoke": "Delete embed",
       "revoked": "Embed deleted. Pages using it now show nothing.",
       "revokeFailed": "Couldn't delete the embed",
@@ -4717,14 +4727,20 @@
         "metrics": "Numbers only"
       },
       "previewTitle": "Embed preview",
+      "frameTitle": "AI analytics",
       "frameTitles": {
         "agents": "AI traffic",
         "web": "Website visitors"
       },
       "empty": "No AI traffic in this period yet.",
+      "unavailable": "This chart couldn't load right now. It tries again in a few minutes.",
+      "blocked": "This embed only shows on the websites it was added to.",
+      "emptyVisibility": "No AI visibility data in this period yet.",
+      "emptyCountries": "No visitors in this period yet.",
       "snippetLabel": "Embed code",
       "done": "Done",
-      "poweredBy": "AI traffic by Notra",
+      "updatedAt": "Updated {time}",
+      "poweredBy": "AI analytics by Notra",
       "poweredByWeb": "Analytics by Notra"
     },
     "competitorLostPrompts": {

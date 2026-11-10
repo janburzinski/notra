@@ -1,7 +1,7 @@
 ---
-title: "Embed the AI traffic chart"
+title: "Embed AI analytics charts"
 sidebarTitle: "Embed on your site"
-description: "Show your AI traffic chart on your own site with an iframe. Only the domains you allow can display it."
+description: "Show AI traffic, AI visibility, share of voice and visitor countries on your own site with an iframe. The charts only show on the domains you allow, and keep themselves up to date."
 authors:
   - handle: jan
 
@@ -19,7 +19,18 @@ docolin:
     - public traffic chart
 ---
 
-An embed puts the AI traffic chart from the [AI analytics](/ai-traffic/overview) tab on your own site, for example a stats page or a blog post. It shows crawler requests, citations in AI answers and AI referrals, and updates by itself.
+An embed puts charts from Notra on your own site, for example a stats page or a blog post. It can show:
+
+| Chart | What it shows |
+| --- | --- |
+| **AI traffic** | Crawler requests, citations in AI answers and AI referrals, from the [AI analytics](/ai-traffic/overview) tab |
+| **Visibility over time** | How often AI assistants mention you, per day |
+| **Visibility by engine** | Visibility, citations and average position per AI engine |
+| **Share of voice** | Your share of mentions next to your top competitors |
+| **Visibility by language** | Visibility per language your prompts run in |
+| **Visitors by country** | Visitors per country, compared with the previous period |
+
+Charts update by themselves while the page is open, so an embed also works on a wall display or a TV that runs for days.
 
 ## Create an embed
 
@@ -29,15 +40,15 @@ An embed puts the AI traffic chart from the [AI analytics](/ai-traffic/overview)
   </Step>
 
   <Step title="Allow your domains">
-    Under **Allowed domains**, type each domain that will show the chart and press Enter, for example `example.com`. The chart only displays on these domains.
+    Under **Allowed domains**, type each domain that will show the charts and press Enter, for example `example.com`. The charts only display on these domains.
   </Step>
 
   <Step title="Create and configure">
-    Click **Create embed**, then pick the **Period**, **Theme** and what to **Show**. The preview updates as you change them.
+    Click **Create embed**. New embeds show AI traffic only. To add charts, click the **Charts** row to open it and tick every chart the embed may show; it saves right away. Then pick the **Period**, **Theme** and, for AI traffic, what to **Show**. The preview updates as you change them.
   </Step>
 
   <Step title="Add it to your site">
-    Copy the code under **Embed code** and paste it where the chart should appear. Or click **Copy agent prompt** and hand it to your coding agent, which adds the chart for you.
+    Copy the code under **Embed code** and paste it where the charts should appear. Or click **Copy agent prompt** and hand it to your coding agent, which adds them for you.
   </Step>
 </Steps>
 
@@ -57,7 +68,7 @@ The embed code looks like this:
 <script src="https://app.usenotra.com/embed.js" async></script>
 ```
 
-The script keeps the iframe's height in sync with the chart. Load it once per page, even with several embeds. Without it, the iframe stays 420 px high.
+The script keeps the iframe's height in sync with the charts. Load it once per page, even with several embeds. Without it, the iframe stays 420 px high.
 
 ### React and other JSX
 
@@ -93,12 +104,15 @@ The dialog writes the options into the iframe URL. You can also change them ther
 | --- | --- | --- |
 | `range` | `7d`, `14d`, `30d`, `90d` | `30d` |
 | `theme` | `light`, `dark`, `auto` (follows the visitor's system) | `auto` |
-| `parts` | `metrics`, `chart`, or `metrics,chart` | both |
+| `charts` | a comma-separated list of `traffic`, `visibility`, `engines`, `share-of-voice`, `languages`, `countries` | every chart the embed allows |
+| `parts` | `metrics`, `chart`, or `metrics,chart` (AI traffic only) | both |
 | `locale` | a dashboard language such as `en` or `de` | the visitor's browser language |
 
-For example, `.../embed/ai-traffic/<embed-id>?range=7d&theme=dark&parts=chart` shows only the chart for the last 7 days in dark mode.
+For example, `.../embed/ai-traffic/<embed-id>?range=7d&theme=dark&parts=chart` shows only the traffic chart for the last 7 days in dark mode, and `?charts=visibility,share-of-voice` shows just those two charts.
 
-The background is transparent, so the chart sits on your page's background. If you set `theme=dark` on a page that does not declare `color-scheme: dark`, some browsers paint a solid backdrop behind the iframe.
+`charts` can only pick from the charts ticked in the dialog. Charts the embed doesn't allow are ignored, so editing the URL never shows more than you chose to publish. Use one embed with several iframes to put different charts in different places.
+
+The background is transparent, so the charts sit on your page's background. If you set `theme=dark` on a page that does not declare `color-scheme: dark`, some browsers paint a solid backdrop behind the iframe.
 
 ## Allowed domains
 
@@ -107,26 +121,36 @@ The background is transparent, so the chart sits on your page's background. If y
 - `http://` only works for `localhost` and `127.0.0.1`, for local development.
 - Enter domains only, without paths. An embed allows up to 10 domains.
 
-Every added or removed domain saves right away and applies within a minute. On any other domain the browser refuses to show the chart, and the frame stays empty.
+Every added or removed domain saves right away and applies within a minute.
 
-If your site sends a `Content-Security-Policy` header, allow `https://app.usenotra.com` in `frame-src` and `script-src`.
+The charts only load inside an iframe on one of these domains:
+
+- **Another site** that embeds the code gets an empty frame, and no numbers are sent to it.
+- **Opening the embed link directly**, in a new tab or by pasting it into the address bar, shows "This embed only shows on the websites it was added to" instead of the charts. To check an embed, open the page it's on, or use the preview in the dialog.
+- **The numbers behind the charts** are only sent to the embed itself, not to other sites or to a browser that requests them directly.
+
+This works with your page's `Referrer-Policy`, including `no-referrer`. If your site sends a `Content-Security-Policy` header, allow `https://app.usenotra.com` in `frame-src` and `script-src`.
 
 ## Manage embeds
 
 Open **… > Embed on your site** on the **AI analytics** tab again to switch between embeds, edit their domains or create another one. An organization can have up to 50 embeds.
 
-Click **Delete embed** to take the chart down. Pages that use it show nothing after at most a minute.
+Click **Delete embed** to take the charts down. Pages that use it show nothing after at most a minute.
 
 ## What visitors see
 
-- The numbers are cached and refresh every 10 minutes.
+- An open embed checks for new numbers every 30 seconds, without reloading. Scan results appear within about a minute of a scan finishing. AI traffic and visitors arrive in five-minute batches, so they can take up to about six minutes.
+- **Updated** under the charts shows when the numbers on screen were loaded.
+- Adding or removing a chart or domain reloads open embeds within a minute. After a delete, open embeds go blank on their next check.
+- While the browser tab or screen is hidden, the embed stops checking and catches up as soon as it shows again. If the network drops, the last numbers stay on screen.
+- Flags and brand icons are drawn locally, so visitors' browsers only contact Notra.
 - The embed runs no analytics and shows no consent banner.
-- A small **AI traffic by Notra** link sits under the chart.
+- A small **AI analytics by Notra** link sits under the charts.
 
 <Warning>
-  Allowed domains control where the chart can be **embedded**. They don't make it private: anyone with the embed URL can still open it directly in a browser. Only use embeds for numbers you are happy to publish, and delete the embed to revoke access.
+  An embed isn't a login. Everyone who can open a page with the embed sees its charts, so put it on pages whose visitors may see the numbers, and only tick charts you're happy to show there. **Share of voice** shows your competitors' names. Delete the embed to take the charts down everywhere.
 </Warning>
 
 ## Build your own chart
 
-To draw the numbers in your own chart instead, call `GET /v1/projects/{projectId}/geo/traffic/overview` from your server with an API key that has the `traffic.read` scope. Never put the API key in client-side code. [Authentication](/api/authentication#scopes) explains keys and scopes.
+To draw the traffic numbers in your own chart instead, call `GET /v1/projects/{projectId}/geo/traffic/overview` from your server with an API key that has the `traffic.read` scope. Never put the API key in client-side code. [Authentication](/api/authentication#scopes) explains keys and scopes.

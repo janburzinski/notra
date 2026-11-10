@@ -1,4 +1,5 @@
 import "zod/compile";
+import { TRAFFIC_EMBED_CHARTS } from "@notra/schemas/constants/dashboard/traffic-embed";
 import { organizationIdSchema } from "@notra/schemas/dashboard/auth/organization";
 // biome-ignore lint/performance/noNamespaceImport: Zod recommended way of importing
 import * as z from "zod";
@@ -12,6 +13,15 @@ const embedOriginsSchema = z
   .array(z.string().trim().min(1).max(TRAFFIC_EMBED_ORIGIN_MAX_LENGTH))
   .min(1)
   .max(TRAFFIC_EMBED_MAX_ORIGINS);
+
+/** At least one chart, each named once. */
+const embedChartsSchema = z
+  .array(z.enum(TRAFFIC_EMBED_CHARTS))
+  .min(1)
+  .max(TRAFFIC_EMBED_CHARTS.length)
+  .refine((charts) => new Set(charts).size === charts.length, {
+    message: "Each chart can only be listed once",
+  });
 
 const embedNameSchema = z
   .string()
@@ -30,6 +40,7 @@ export const createTrafficEmbedInputSchema =
     host: z.string().trim().max(TRAFFIC_EMBED_HOST_MAX_LENGTH).optional(),
     source: z.enum(["agents", "web"]).default("agents"),
     allowedOrigins: embedOriginsSchema,
+    charts: embedChartsSchema.optional(),
   });
 
 export const trafficEmbedInputSchema = z.object({
@@ -40,4 +51,6 @@ export const trafficEmbedInputSchema = z.object({
 export const updateTrafficEmbedInputSchema = trafficEmbedInputSchema.extend({
   name: embedNameSchema,
   allowedOrigins: embedOriginsSchema,
+  /** Omitted keeps the stored charts. */
+  charts: embedChartsSchema.optional(),
 });

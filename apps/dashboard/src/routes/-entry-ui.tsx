@@ -179,16 +179,26 @@ export function createEntryUiRoutes(parent: AnyRoute) {
       noindex: true,
       preload: TrafficEmbed.preload,
       loader: (input) => loadTrafficEmbed({ data: input }),
-      loaderSearchKeys: ["range"],
+      loaderSearchKeys: ["range", "charts"],
       component: ({ data, params, searchParams }) => (
         <TrafficEmbed
-          embed={data}
+          charts={
+            typeof searchParams.charts === "string"
+              ? searchParams.charts
+              : undefined
+          }
           embedId={params.id}
           parts={
             typeof searchParams.parts === "string"
               ? searchParams.parts
               : undefined
           }
+          range={
+            typeof searchParams.range === "string"
+              ? searchParams.range
+              : undefined
+          }
+          result={data}
         />
       ),
     }),

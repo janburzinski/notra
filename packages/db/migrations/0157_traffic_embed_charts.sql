@@ -1,0 +1,1 @@
+ALTER TABLE "geo_traffic_embeds" ADD COLUMN "charts" text[] DEFAULT ARRAY['traffic']::text[] NOT NULL;

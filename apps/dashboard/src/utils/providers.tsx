@@ -20,6 +20,7 @@ import { useLocale, useTranslations } from "use-intl";
 import { DashboardChartEnvironment } from "@/components/charts/dashboard-chart-environment";
 import Image from "@/components/framework/image";
 import Link from "@/components/framework/link";
+import { EmbedModeProvider } from "@/components/providers/embed-mode-provider";
 import { PostHogIdentity } from "@/components/providers/posthog-identity";
 import { UiSounds } from "@/components/providers/ui-sounds";
 import { POSTHOG_PROJECT_TOKEN } from "@/constants/posthog";
@@ -142,7 +143,9 @@ export function Providers({
                 <TooltipProvider delay={500} glide={false}>
                   <NuqsAdapter>
                     <DashboardChartEnvironment>
-                      {children}
+                      <EmbedModeProvider embed={embed}>
+                        {children}
+                      </EmbedModeProvider>
                     </DashboardChartEnvironment>
                     {POSTHOG_PROJECT_TOKEN && !embed ? (
                       <Suspense fallback={null}>

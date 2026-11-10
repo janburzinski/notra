@@ -18,7 +18,6 @@ import { DataTable, type TableColumn } from "ui/table";
 import { useLocale, useTranslations } from "use-intl";
 
 import { EmptyStateTablePreview } from "@/components/empty-state-preview";
-import { EngineFamilySheet } from "@/components/geo/engine-family-sheet";
 import { EngineIcon } from "@/components/geo/engine-icon";
 import { GeoRateSparkline } from "@/components/geo/geo-rate-sparkline";
 import { GeoStatDelta } from "@/components/geo/geo-stat-delta";
@@ -39,7 +38,20 @@ import {
   keepTrackedFamilies,
   mentionRateSparkline,
 } from "@/utils/geo-charts";
-import { GEO_VISIBILITY_TABLE_HEIGHT } from "@/utils/table";
+import dynamic from "@/utils/lazy-component";
+import {
+  contentTableHeightFor,
+  GEO_VISIBILITY_TABLE_HEIGHT,
+} from "@/utils/table";
+
+// Only opens on a row click, and read-only tables never render it.
+const EngineFamilySheet = dynamic(
+  () =>
+    import("@/components/geo/engine-family-sheet").then(
+      (module) => module.EngineFamilySheet
+    ),
+  { ssr: false }
+);
 
 const NOT_SCANNED_RATE = -1;
 
@@ -109,6 +121,7 @@ export function EngineRateTable({
   companyName,
   aliases,
   competitors,
+  readOnly = false,
 }: EngineRateTableProps) {
   const families = useMemo(
     () => keepTrackedFamilies(groupEngineFamilies(engines), trackedEngines),
@@ -243,11 +256,16 @@ export function EngineRateTable({
     ? t("readoutScanning")
     : tGeoShared("noScansYet");
   const readout = families.length > 0 ? undefined : emptyReadout;
+  // Read-only tables sit in embeds that nobody scrolls, so they show every
+  // engine and drop the filter.
+  const tableHeight = readOnly
+    ? contentTableHeightFor(families.length)
+    : GEO_VISIBILITY_TABLE_HEIGHT;
 
   return (
     <InstrumentSection
       action={
-        families.length > 0 ? (
+        families.length > 0 && !readOnly ? (
           <div className="relative w-full sm:w-56">
             <HugeiconsIcon
               className="text-muted-foreground absolute top-1/2 left-2.5 -translate-y-1/2"
@@ -270,7 +288,7 @@ export function EngineRateTable({
       readout={readout}
     >
       <div
-        style={{ minHeight: GEO_VISIBILITY_TABLE_HEIGHT }}
+        style={{ minHeight: tableHeight }}
         className="flex flex-col [&>*]:flex-1"
       >
         {families.length === 0 ? (
@@ -296,30 +314,32 @@ export function EngineRateTable({
               defaultSort={{ key: "rate", direction: "desc" }}
               emptyState={t("noMatches")}
               getRowId={(row) => row.family}
-              height={GEO_VISIBILITY_TABLE_HEIGHT}
-              minHeight={GEO_VISIBILITY_TABLE_HEIGHT}
-              onRowClick={setSelected}
+              height={tableHeight}
+              minHeight={tableHeight}
+              onRowClick={readOnly ? undefined : setSelected}
               resizable
               rowHeight={TABLE_ROW_HEIGHT}
             />
           </div>
         )}
       </div>
-      <EngineFamilySheet
-        aliases={aliases}
-        companyName={companyName}
-        competitors={competitors}
-        family={selected}
-        onOpenChange={(open) => {
-          if (!open) {
-            setSelected(null);
-          }
-        }}
-        open={selected !== null}
-        organizationSlug={organizationSlug}
-        promptResults={promptResults}
-        timeseriesPoints={timeseriesPoints}
-      />
+      {readOnly ? null : (
+        <EngineFamilySheet
+          aliases={aliases}
+          companyName={companyName}
+          competitors={competitors}
+          family={selected}
+          onOpenChange={(open) => {
+            if (!open) {
+              setSelected(null);
+            }
+          }}
+          open={selected !== null}
+          organizationSlug={organizationSlug}
+          promptResults={promptResults}
+          timeseriesPoints={timeseriesPoints}
+        />
+      )}
     </InstrumentSection>
   );
 }

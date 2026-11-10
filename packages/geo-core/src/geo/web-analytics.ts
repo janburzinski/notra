@@ -422,6 +422,41 @@ export const loadWebUtm = Effect.fn("web.utm")(function* (
   }));
 });
 
+/**
+ * Visitors per country in a project, compared with the previous period;
+ * completed imports add theirs. One query, for surfaces that only show the
+ * countries list.
+ */
+export const loadWebCountries = Effect.fn("web.countries")(function* (
+  input: GeoScopeInput,
+  window: GeoWindowInput,
+  host: string | undefined
+) {
+  const scope: WebAnalyticsScope = {
+    ...(yield* resolveGeoScope(input)),
+    siteId: "",
+    hosts: webHostFilter(host),
+  };
+  const { params } = webQueryParams(scope, window, "", undefined);
+  const query =
+    isTinybirdConfigured() && !isDemoMode() ? geoRequiredQuery : geoQuery;
+  const completed = yield* loadCompletedImports(
+    scope.organizationId,
+    scope.projectId,
+    "web",
+    scope.hosts
+  );
+  const result = yield* query("web countries query failed", () =>
+    queryWebAudience({
+      ...params,
+      imports: completed.ids,
+      dimension: "country",
+      limit: WEB_BREAKDOWN_LIMIT,
+    })
+  );
+  return toBreakdown(result?.data);
+});
+
 export const loadSiteAnalytics = Effect.fn("web.siteAnalytics")(function* (
   site: SiteAnalyticsInput,
   window: GeoWindowInput,

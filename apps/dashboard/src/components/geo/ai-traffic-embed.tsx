@@ -1,23 +1,16 @@
 "use client";
 
-import { GEO_TRAFFIC_OTHER_GROUP } from "@notra/geo-core/constants/geo";
-import type { AiTrafficResponse } from "@notra/geo-core/types/geo";
-import {
-  toGeoTrafficPreviousTotals,
-  trafficSparklineDays,
-} from "@notra/geo-core/utils/ai-traffic";
 import { useEffect, useMemo, useRef } from "react";
-import { InstrumentEmpty } from "ui/card";
-import { useTranslations } from "use-intl";
+import { useLocale, useTranslations } from "use-intl";
 
-import { TrafficHero } from "@/components/geo/traffic-hero";
-import { WebTrafficHero } from "@/components/geo/web-traffic-hero";
+import { TrafficEmbedChartView } from "@/components/geo/traffic-embed-charts";
 import { TRAFFIC_EMBED_RESIZE_MESSAGE } from "@/constants/traffic-embed";
+import { useIsClient } from "@/lib/hooks/use-is-client";
+import { useLiveTrafficEmbed } from "@/lib/hooks/use-live-traffic-embed";
 import type {
   PublicTrafficEmbed,
-  TrafficEmbedPart,
+  TrafficEmbedLoadResult,
 } from "@/types/traffic-embed";
-import { groupTrafficSources } from "@/utils/ai-traffic-groups";
 import { trafficEmbedParts } from "@/utils/traffic-embed";
 
 /**
@@ -48,107 +41,121 @@ function useReportHeight(embedId: string) {
   return ref;
 }
 
-function EmbedEmpty({ message }: { message: string }) {
-  return (
-    <div className="border-shell-border bg-shell rounded-2xl border">
-      <InstrumentEmpty message={message} seed="geo-traffic-embed" />
-    </div>
+/** Website numbers only, so the credit doesn't promise AI analytics. */
+function webOnly(embed: PublicTrafficEmbed): boolean {
+  return embed.charts.every(
+    (chart) =>
+      chart === "countries" ||
+      (chart === "traffic" && embed.data.traffic?.source === "web")
   );
 }
 
-function AgentsEmbedBody({
-  traffic,
-  from,
-  to,
-  parts,
-}: {
-  traffic: AiTrafficResponse;
-  from: string;
-  to: string;
-  parts: TrafficEmbedPart[];
-}) {
-  const tCommon = useTranslations("common");
-  const t = useTranslations("geo.trafficEmbed");
-  const groups = useMemo(
-    () =>
-      groupTrafficSources(traffic.sources).map((group) =>
-        group.key === GEO_TRAFFIC_OTHER_GROUP.key
-          ? { ...group, label: tCommon("labels.other") }
-          : group
-      ),
-    [traffic.sources, tCommon]
-  );
-  const previousTotals = useMemo(
-    () =>
-      toGeoTrafficPreviousTotals(traffic.sources, traffic.previousConversions),
-    [traffic.sources, traffic.previousConversions]
-  );
-  const days = useMemo(
-    () => trafficSparklineDays(traffic.points, from, to),
-    [traffic.points, from, to]
-  );
-  const showMetrics = parts.includes("metrics");
-  // Without points there is no series to draw, so the chart part says so
-  // instead of collapsing to an empty frame.
-  const showEmpty = parts.includes("chart") && days.length === 0;
+const timeFormats = new Map<string, Intl.DateTimeFormat>();
 
+function formatTime(iso: string, locale: string): string {
+  let format = timeFormats.get(locale);
+  if (!format) {
+    format = new Intl.DateTimeFormat(locale, {
+      hour: "numeric",
+      minute: "2-digit",
+    });
+    timeFormats.set(locale, format);
+  }
+  return format.format(new Date(iso));
+}
+
+/**
+ * Shown in the visitor's own time zone, so it is only formatted on the
+ * client, never in the server render.
+ */
+function UpdatedAt({ iso }: { iso: string }) {
+  const t = useTranslations("geo.trafficEmbed");
+  const locale = useLocale();
+  const isClient = useIsClient();
+  if (!isClient) {
+    return null;
+  }
   return (
     <>
-      {showMetrics || !showEmpty ? (
-        <TrafficHero
-          days={days}
-          groups={groups}
-          points={traffic.points}
-          previousTotals={previousTotals}
-          showChart={parts.includes("chart")}
-          showMetrics={showMetrics}
-          totals={traffic.totals}
-        />
-      ) : null}
-      {showEmpty ? <EmbedEmpty message={t("empty")} /> : null}
+      <time dateTime={iso}>
+        {t("updatedAt", { time: formatTime(iso, locale) })}
+      </time>
+      <span aria-hidden="true">·</span>
     </>
   );
 }
 
-/** Public traffic chart: AI agents or web visitors, as the embed was made. */
-export function AiTrafficEmbed({
-  embedId,
-  embed,
-  parts: partsParam,
-}: {
+interface LiveEmbedProps {
   embedId: string;
   embed: PublicTrafficEmbed;
   parts: string | undefined;
-}) {
+  range: string | undefined;
+  charts: string | undefined;
+}
+
+/**
+ * Shown when the link is opened directly or framed by a site that isn't
+ * allowed; no numbers are sent in that case.
+ */
+function BlockedEmbed() {
+  const t = useTranslations("geo.trafficEmbed");
+  return (
+    <main className="text-muted-foreground flex min-h-svh items-center justify-center p-6 text-center text-sm text-balance">
+      {t("blocked")}
+    </main>
+  );
+}
+
+export function AiTrafficEmbed({
+  result,
+  ...props
+}: Omit<LiveEmbedProps, "embed"> & { result: TrafficEmbedLoadResult }) {
+  return result.status === "blocked" ? (
+    <BlockedEmbed />
+  ) : (
+    <LiveEmbed embed={result.embed} {...props} />
+  );
+}
+
+function LiveEmbed({
+  embedId,
+  embed: initial,
+  parts: partsParam,
+  range,
+  charts,
+}: LiveEmbedProps) {
   const t = useTranslations("geo.trafficEmbed");
   const ref = useReportHeight(embedId);
-  const parts = trafficEmbedParts(partsParam);
+  const parts = useMemo(() => trafficEmbedParts(partsParam), [partsParam]);
+  const embed = useLiveTrafficEmbed(embedId, initial, { range, charts });
 
   return (
-    <div className="flex flex-col gap-2" ref={ref}>
-      {embed.source === "web" ? (
-        <WebTrafficHero
-          range={{ from: embed.from, to: embed.to }}
-          showChart={parts.includes("chart")}
-          showMetrics={parts.includes("metrics")}
-          web={embed.web}
-        />
-      ) : (
-        <AgentsEmbedBody
-          from={embed.from}
-          parts={parts}
-          to={embed.to}
-          traffic={embed.traffic}
-        />
-      )}
-      <a
-        className="text-muted-foreground hover:text-foreground self-end px-1 text-xs transition-colors"
-        href="https://www.usenotra.com"
-        rel="noopener"
-        target="_blank"
-      >
-        {embed.source === "web" ? t("poweredByWeb") : t("poweredBy")}
-      </a>
+    <div className="flex flex-col gap-4" ref={ref}>
+      {embed ? (
+        <>
+          {embed.charts.map((chart) => (
+            <TrafficEmbedChartView
+              chart={chart}
+              data={embed.data}
+              from={embed.from}
+              key={chart}
+              parts={parts}
+              to={embed.to}
+            />
+          ))}
+          <div className="text-muted-foreground -mt-2 flex items-center justify-end gap-2 px-1 text-xs">
+            <UpdatedAt iso={embed.updatedAt} />
+            <a
+              className="hover:text-foreground transition-colors"
+              href="https://www.usenotra.com"
+              rel="noopener"
+              target="_blank"
+            >
+              {webOnly(embed) ? t("poweredByWeb") : t("poweredBy")}
+            </a>
+          </div>
+        </>
+      ) : null}
     </div>
   );
 }

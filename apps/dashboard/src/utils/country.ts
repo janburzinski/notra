@@ -15,6 +15,13 @@ export function countryFlagCodePoints(code: string): string | null {
     .join("-");
 }
 
+/** The emoji for `countryFlagCodePoints` output, e.g. "1f1e9-1f1ea" → 🇩🇪. */
+export function flagEmoji(codePoints: string): string {
+  return String.fromCodePoint(
+    ...codePoints.split("-").map((point) => Number.parseInt(point, 16))
+  );
+}
+
 export function countryName(code: string, locale: string): string {
   const upper = code.trim().toUpperCase();
   if (upper.length !== COUNTRY_CODE_LENGTH) {

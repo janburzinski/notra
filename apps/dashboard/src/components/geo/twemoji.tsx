@@ -3,6 +3,7 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { useLocale } from "use-intl";
 
 import Image from "@/components/framework/image";
+import { useIsEmbed } from "@/components/providers/embed-mode-provider";
 import { TWEMOJI_FLAG_BASE, TWEMOJI_FLAG_SIZE } from "@/constants/country";
 import { cn } from "@/lib/utils";
 import type {
@@ -14,13 +15,46 @@ import {
   countryFlagCodePoints,
   countryName,
   emojiCodePoints,
+  flagEmoji,
 } from "@/utils/country";
 import { languageFlagCountry } from "@/utils/web-analytics";
 
+/**
+ * Embeds draw the system's own emoji instead of loading Twemoji from a CDN,
+ * so visitors on a customer's site make no third-party requests.
+ */
+function NativeEmoji({
+  emoji,
+  label,
+  className,
+}: {
+  emoji: string;
+  label: string;
+  className?: string;
+}) {
+  return (
+    <span
+      aria-hidden={label ? undefined : true}
+      aria-label={label || undefined}
+      className={cn(
+        "inline-flex items-center justify-center leading-none",
+        className
+      )}
+      role={label ? "img" : undefined}
+    >
+      {emoji}
+    </span>
+  );
+}
+
 export function Twemoji({ emoji, label, className }: TwemojiProps) {
+  const embed = useIsEmbed();
   const codePoints = emojiCodePoints(emoji);
   if (!codePoints) {
     return null;
+  }
+  if (embed) {
+    return <NativeEmoji className={className} emoji={emoji} label={label} />;
   }
 
   return (
@@ -37,9 +71,19 @@ export function Twemoji({ emoji, label, className }: TwemojiProps) {
 
 export function CountryFlag({ code, className }: CountryFlagProps) {
   const locale = useLocale();
+  const embed = useIsEmbed();
   const codePoints = countryFlagCodePoints(code);
   if (!codePoints) {
     return null;
+  }
+  if (embed) {
+    return (
+      <NativeEmoji
+        className={className}
+        emoji={flagEmoji(codePoints)}
+        label={countryName(code, locale)}
+      />
+    );
   }
 
   return (
@@ -56,6 +100,7 @@ export function CountryFlag({ code, className }: CountryFlagProps) {
 
 /** The flag of a language's country of origin, or a globe when none is listed. */
 export function LanguageFlag({ language, className }: LanguageFlagProps) {
+  const embed = useIsEmbed();
   const country = languageFlagCountry(language);
   const codePoints = country ? countryFlagCodePoints(country) : null;
   if (!codePoints) {
@@ -64,6 +109,15 @@ export function LanguageFlag({ language, className }: LanguageFlagProps) {
         aria-hidden="true"
         className={cn("text-muted-foreground", className)}
         icon={Globe02Icon}
+      />
+    );
+  }
+  if (embed) {
+    return (
+      <NativeEmoji
+        className={className}
+        emoji={flagEmoji(codePoints)}
+        label=""
       />
     );
   }

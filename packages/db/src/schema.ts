@@ -1931,6 +1931,11 @@ export const geoTrafficEmbeds = pgTable(
       .notNull()
       .default("agents"),
     allowedOrigins: text("allowed_origins").array().notNull(),
+    /** Charts the owner made public; the page URL can only narrow these. */
+    charts: text("charts")
+      .array()
+      .notNull()
+      .default(sql`ARRAY['traffic']::text[]`),
     revokedAt: timestamp("revoked_at"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at")

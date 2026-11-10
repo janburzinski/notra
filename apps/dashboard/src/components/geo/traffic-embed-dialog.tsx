@@ -1,5 +1,8 @@
 "use client";
 
+import { ArrowDown01Icon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { TRAFFIC_EMBED_CHARTS } from "@notra/schemas/constants/dashboard/traffic-embed";
 import { ConfirmDialog } from "@notra/ui/components/shared/confirm-dialog";
 import {
   ResponsiveDialog,
@@ -10,6 +13,12 @@ import {
   ResponsiveDialogTitle,
 } from "@notra/ui/components/shared/responsive-dialog";
 import { AgentPromptButton } from "@notra/ui/components/ui/agent-prompt-button";
+import { Checkbox } from "@notra/ui/components/ui/checkbox";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@notra/ui/components/ui/collapsible";
 import {
   Field,
   FieldDescription,
@@ -27,7 +36,7 @@ import { tween } from "@notra/ui/lib/motion";
 import { cn } from "@notra/ui/lib/utils";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { domAnimation, LazyMotion, m, useReducedMotion } from "motion/react";
-import { type CSSProperties, useEffect, useId, useState } from "react";
+import { type CSSProperties, useEffect, useId, useRef, useState } from "react";
 import { toast } from "sonner";
 import { useLocale, useTranslations } from "use-intl";
 
@@ -51,6 +60,7 @@ import { useIsClient } from "@/lib/hooks/use-is-client";
 import { useWebAnalyticsFlag } from "@/lib/hooks/use-web-analytics-flag";
 import { dashboardOrpc } from "@/lib/orpc/query";
 import type {
+  TrafficEmbedChart,
   TrafficEmbedPart,
   TrafficEmbedRange,
   TrafficEmbedSource,
@@ -117,6 +127,75 @@ function OriginsField({
       />
       <FieldDescription>{t("domainsHint")}</FieldDescription>
     </Field>
+  );
+}
+
+/**
+ * Collapsed to one line by default: most embeds keep their charts, so the
+ * picker only opens when someone wants to change them.
+ */
+function ChartsField({
+  values,
+  source,
+  onChange,
+}: {
+  values: readonly TrafficEmbedChart[];
+  /** Names the traffic chart: AI traffic or website visitors. */
+  source: TrafficEmbedSource;
+  onChange: (values: TrafficEmbedChart[]) => void;
+}) {
+  const t = useTranslations("geo.trafficEmbed");
+  const id = useId();
+  const selected = new Set(values);
+  return (
+    <Collapsible className="group/charts">
+      <CollapsibleTrigger className="flex w-full min-w-0 items-center text-left">
+        <span className="flex min-w-0 flex-1 items-center gap-2 text-sm">
+          <span className="flex-1 font-medium" id={id}>
+            {t("chartsLabel")}
+          </span>
+          <HugeiconsIcon
+            aria-hidden
+            className="text-muted-foreground size-4 shrink-0 transition-transform group-data-[open]/charts:rotate-180"
+            icon={ArrowDown01Icon}
+          />
+        </span>
+      </CollapsibleTrigger>
+      <CollapsibleContent>
+        <div
+          aria-labelledby={id}
+          className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2"
+          role="group"
+        >
+          {TRAFFIC_EMBED_CHARTS.map((chart) => (
+            // biome-ignore lint/a11y/noLabelWithoutControl: the checkbox inside is the control
+            <label
+              className="flex cursor-pointer items-center gap-2 text-sm"
+              key={chart}
+            >
+              <Checkbox
+                checked={selected.has(chart)}
+                onCheckedChange={(next) =>
+                  onChange(
+                    TRAFFIC_EMBED_CHARTS.filter((value) =>
+                      value === chart ? next === true : selected.has(value)
+                    )
+                  )
+                }
+              />
+              {chart === "traffic"
+                ? t(`frameTitles.${source}`)
+                : t(`charts.${chart}`)}
+            </label>
+          ))}
+        </div>
+        {selected.has("share-of-voice") ? (
+          <p className="text-muted-foreground mt-2 text-sm">
+            {t("chartsHint")}
+          </p>
+        ) : null}
+      </CollapsibleContent>
+    </Collapsible>
   );
 }
 
@@ -213,25 +292,35 @@ function EmbedDetails({
   const locale = useLocale();
   const queryClient = useQueryClient();
   const [origins, setOrigins] = useState(embed.allowedOrigins);
-  // The last list the server confirmed, which a failed save restores.
-  const [savedOrigins, setSavedOrigins] = useState(embed.allowedOrigins);
+  const [charts, setCharts] = useState(embed.charts);
+  // What the server last confirmed, which a failed save restores.
+  const [saved, setSaved] = useState({
+    origins: embed.allowedOrigins,
+    charts: embed.charts,
+  });
+  // A save that finishes while a newer one is queued leaves the controls
+  // alone: the newer save carries the full lists and settles them. Refs,
+  // since a queued save runs with the callbacks of the render it came from.
+  const savedRef = useRef(saved);
+  const latestSave = useRef<object | null>(null);
   const [range, setRange] = useState<TrafficEmbedRange>(
     TRAFFIC_EMBED_DEFAULT_RANGE
   );
   const [theme, setTheme] = useState<TrafficEmbedTheme>("auto");
   const [layout, setLayout] = useState<EmbedLayout>("full");
   const origin = useIsClient() ? window.location.origin : "";
-  const src = origin
-    ? trafficEmbedUrl(origin, embed.id, {
-        range,
-        theme,
-        parts: LAYOUT_PARTS[layout],
-        locale,
-      })
+  const urlOptions = { range, theme, parts: LAYOUT_PARTS[layout], locale };
+  const src = origin ? trafficEmbedUrl(origin, embed.id, urlOptions) : "";
+  // Naming the saved charts gives the preview a new URL after each change,
+  // so it never shows a copy the CDN kept from before the save.
+  const previewSrc = origin
+    ? trafficEmbedUrl(origin, embed.id, { ...urlOptions, charts: saved.charts })
     : "";
-  const snippet = src
-    ? trafficEmbedSnippet(origin, src, t(`frameTitles.${embed.source}`))
-    : "";
+  const onlyTraffic = charts.length === 1 && charts[0] === "traffic";
+  const frameTitle = onlyTraffic
+    ? t(`frameTitles.${embed.source}`)
+    : t("frameTitle");
+  const snippet = src ? trafficEmbedSnippet(origin, src, frameTitle) : "";
   const prompt = snippet
     ? trafficEmbedAgentPrompt(origin, snippet, origins)
     : "";
@@ -240,31 +329,50 @@ function EmbedDetails({
     ready: previewReady,
     frameRef,
     onLoad: onPreviewLoad,
-  } = useEmbedPreviewHeight(src);
+  } = useEmbedPreviewHeight(previewSrc);
 
-  // Each added or removed domain saves right away. The shared scope runs the
-  // saves one after another, so an older list can't land after a newer one.
+  // Each change to the domains or charts saves right away. The shared scope
+  // runs the saves one after another, so an older list can't land after a
+  // newer one.
   const save = useMutation({
     scope: { id: `traffic-embed-origins:${embed.id}` },
-    mutationFn: (allowedOrigins: string[]) =>
+    mutationFn: (next: {
+      allowedOrigins: string[];
+      charts: TrafficEmbedChart[];
+    }) =>
       dashboardOrpc.trafficEmbeds.update.call({
         organizationId,
         embedId: embed.id,
         name: embed.name,
-        allowedOrigins,
+        ...next,
       }),
     onSuccess: async ({ embed: updated }) => {
-      setSavedOrigins(updated.allowedOrigins);
+      savedRef.current = {
+        origins: updated.allowedOrigins,
+        charts: updated.charts,
+      };
+      setSaved(savedRef.current);
       toast.success(t("saved"));
       await queryClient.invalidateQueries({
         queryKey: dashboardOrpc.trafficEmbeds.list.key(),
       });
     },
-    onError: (error) => {
-      setOrigins(savedOrigins);
+    onError: (error, variables) => {
+      if (latestSave.current === variables) {
+        setOrigins(savedRef.current.origins);
+        setCharts(savedRef.current.charts);
+      }
       toast.error(toErrorMessage(error, t("saveFailed")));
     },
   });
+
+  const persist = (next: {
+    allowedOrigins: string[];
+    charts: TrafficEmbedChart[];
+  }) => {
+    latestSave.current = next;
+    save.mutate(next);
+  };
 
   return (
     <div className="flex min-w-0 flex-col gap-4">
@@ -275,12 +383,29 @@ function EmbedDetails({
             return;
           }
           setOrigins(next);
-          save.mutate(next);
+          persist({ allowedOrigins: next, charts });
         }}
         values={origins}
       />
+      <ChartsField
+        onChange={(next) => {
+          if (next.length === 0) {
+            toast.error(t("chartsRequired"));
+            return;
+          }
+          setCharts(next);
+          persist({ allowedOrigins: origins, charts: next });
+        }}
+        source={embed.source}
+        values={charts}
+      />
       <div className="flex flex-col gap-2">
-        <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+        <div
+          className={cn(
+            "grid grid-cols-1 gap-2",
+            charts.includes("traffic") ? "sm:grid-cols-3" : "sm:grid-cols-2"
+          )}
+        >
           <OptionSelect
             items={TRAFFIC_EMBED_RANGES.map((value) => ({
               value,
@@ -299,15 +424,17 @@ function EmbedDetails({
             onChange={setTheme}
             value={theme}
           />
-          <OptionSelect
-            items={(["full", "chart", "metrics"] as const).map((value) => ({
-              value,
-              label: t(`layouts.${value}`),
-            }))}
-            label={t("layoutLabel")}
-            onChange={setLayout}
-            value={layout}
-          />
+          {charts.includes("traffic") ? (
+            <OptionSelect
+              items={(["full", "chart", "metrics"] as const).map((value) => ({
+                value,
+                label: t(`layouts.${value}`),
+              }))}
+              label={t("layoutLabel")}
+              onChange={setLayout}
+              value={layout}
+            />
+          ) : null}
         </div>
         <div
           className="h-(--embed-preview-height) overflow-hidden"
@@ -317,7 +444,7 @@ function EmbedDetails({
             } as CSSProperties
           }
         >
-          {src ? (
+          {previewSrc ? (
             <iframe
               className={cn(
                 TRAFFIC_EMBED_PREVIEW_FRAME_CLASS,
@@ -328,7 +455,7 @@ function EmbedDetails({
               onLoad={onPreviewLoad}
               ref={frameRef}
               sandbox={TRAFFIC_EMBED_SANDBOX}
-              src={src}
+              src={previewSrc}
               tabIndex={-1}
               title={t("previewTitle")}
             />

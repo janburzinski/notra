@@ -24,6 +24,17 @@ export function paginatedTableHeightFor(
   return (Math.max(rowCount, TABLE_MIN_ROWS) + 1) * rowHeight;
 }
 
+/**
+ * Exactly the header plus every row, for surfaces nobody scrolls inside,
+ * such as an embed on a wall display.
+ */
+export function contentTableHeightFor(
+  rowCount: number,
+  rowHeight = TABLE_ROW_HEIGHT
+): number {
+  return (Math.max(rowCount, 1) + 1) * rowHeight;
+}
+
 export const GEO_VISIBILITY_TABLE_HEIGHT = tableHeightFor(
   GEO_VISIBILITY_TABLE_ROWS
 );

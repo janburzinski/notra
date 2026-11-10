@@ -31,7 +31,11 @@ function getRedis(): Redis | null {
   return client;
 }
 
-function generationKey(organizationId: string): string {
+/**
+ * Where the organization's check generation lives. Readers that only compare
+ * generations (public embeds) read it directly instead of seeding it.
+ */
+export function geoCheckGenerationKey(organizationId: string): string {
   return `${GEO_CHECK_GENERATION_KEY_PREFIX}:${organizationId}`;
 }
 
@@ -51,7 +55,7 @@ function readGeneration(
   if (pending) {
     return pending;
   }
-  const key = generationKey(organizationId);
+  const key = geoCheckGenerationKey(organizationId);
   const read = redis
     .get<number>(key)
     .then(async (generation) => {
@@ -109,13 +113,13 @@ export async function bumpGeoCheckGeneration(
   const pipeline = redis.pipeline();
   const seed = generationSeed();
   for (const organizationId of ids) {
-    pipeline.set(generationKey(organizationId), seed, {
+    pipeline.set(geoCheckGenerationKey(organizationId), seed, {
       nx: true,
       ex: GEO_CHECK_GENERATION_TTL_SECONDS,
     });
-    pipeline.incr(generationKey(organizationId));
+    pipeline.incr(geoCheckGenerationKey(organizationId));
     pipeline.expire(
-      generationKey(organizationId),
+      geoCheckGenerationKey(organizationId),
       GEO_CHECK_GENERATION_TTL_SECONDS
     );
   }

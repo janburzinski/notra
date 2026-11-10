@@ -1,4 +1,10 @@
 import {
+  TRAFFIC_EMBED_CHARTS,
+  TRAFFIC_EMBED_DEFAULT_CHARTS,
+} from "@notra/schemas/constants/dashboard/traffic-embed";
+
+import {
+  TRAFFIC_EMBED_DATA_PATH_PREFIX,
   TRAFFIC_EMBED_DEFAULT_HEIGHT,
   TRAFFIC_EMBED_DEFAULT_RANGE,
   TRAFFIC_EMBED_ID_LENGTH,
@@ -7,7 +13,9 @@ import {
   TRAFFIC_EMBED_SANDBOX,
 } from "../constants/traffic-embed";
 import type {
+  TrafficEmbedChart,
   TrafficEmbedOriginResult,
+  TrafficEmbedRequestContext,
   TrafficEmbedPart,
   TrafficEmbedRange,
   TrafficEmbedTheme,
@@ -94,6 +102,96 @@ export function normalizeTrafficEmbedOrigin(
   return { ok: true, origin: `${url.protocol}//${host}` };
 }
 
+/**
+ * Whether an origin ("https://blog.example.com") matches an allowed entry,
+ * with the same rules as frame-ancestors: exact scheme and host, a
+ * "*." prefix for subdomains only, and the port only where one is listed.
+ */
+export function trafficEmbedOriginAllowed(
+  origin: string,
+  allowedOrigins: readonly string[]
+): boolean {
+  return allowedOrigins.some((allowed) => {
+    const schemeEnd = allowed.indexOf("://") + "://".length;
+    if (!allowed.slice(schemeEnd).startsWith(WILDCARD_PREFIX)) {
+      return allowed === origin;
+    }
+    const scheme = allowed.slice(0, schemeEnd);
+    const suffix = `.${allowed.slice(schemeEnd + WILDCARD_PREFIX.length)}`;
+    if (!origin.startsWith(scheme)) {
+      return false;
+    }
+    const host = origin.slice(scheme.length);
+    return host.endsWith(suffix) && host.length > suffix.length;
+  });
+}
+
+function originOf(url: string | null): string | null {
+  if (!url) {
+    return null;
+  }
+  try {
+    return new URL(url).origin;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Whether a request may see an embed. Browsers set these headers themselves,
+ * so a page can't fake them.
+ *
+ * - The embed page only loads inside a frame (`Sec-Fetch-Dest: iframe`),
+ *   never when the link is opened directly or in a new tab. When the browser
+ *   says who framed it (Referer), that site must be allowed (or the
+ *   dashboard's own preview). frame-ancestors then stops any other site from
+ *   showing it.
+ * - Its data only answers the embed page's own polls: same-origin fetches.
+ *
+ * Browsers without Fetch Metadata fall back to the Referer; with neither,
+ * the request is refused.
+ */
+export function trafficEmbedRequestAllowed(
+  request: TrafficEmbedRequestContext,
+  allowedOrigins: readonly string[]
+): boolean {
+  const refererOrigin = originOf(request.referer);
+  if (request.kind === "data") {
+    if (request.site !== null) {
+      return (
+        request.site === "same-origin" &&
+        (request.dest === null || request.dest === "empty")
+      );
+    }
+    return refererOrigin === request.selfOrigin;
+  }
+  if (request.dest !== null && request.dest !== "iframe") {
+    return false;
+  }
+  if (refererOrigin !== null) {
+    return (
+      refererOrigin === request.selfOrigin ||
+      trafficEmbedOriginAllowed(refererOrigin, allowedOrigins)
+    );
+  }
+  return request.dest === "iframe";
+}
+
+/** The request facts `trafficEmbedRequestAllowed` needs. */
+export function trafficEmbedRequestContext(
+  kind: TrafficEmbedRequestContext["kind"],
+  url: string,
+  headers: { get(name: string): string | null }
+): TrafficEmbedRequestContext {
+  return {
+    kind,
+    dest: headers.get("sec-fetch-dest"),
+    site: headers.get("sec-fetch-site"),
+    referer: headers.get("referer"),
+    selfOrigin: new URL(url).origin,
+  };
+}
+
 /** `'self'` keeps the preview in the dashboard's embed dialog working. */
 export function trafficEmbedFrameAncestors(origins: readonly string[]): string {
   return ["'self'", ...origins].join(" ");
@@ -127,6 +225,34 @@ export function trafficEmbedParts(value: unknown): TrafficEmbedPart[] {
   return parts.length === 0 ? [...EMBED_PARTS] : parts;
 }
 
+/**
+ * Stored charts in page order. Values this build doesn't know are dropped,
+ * so a newer or hand-edited row can't put an unknown chart on the page.
+ */
+export function storedTrafficEmbedCharts(
+  values: readonly string[] | null | undefined
+): TrafficEmbedChart[] {
+  const stored = new Set(values ?? []);
+  const charts = TRAFFIC_EMBED_CHARTS.filter((chart) => stored.has(chart));
+  return charts.length === 0 ? [...TRAFFIC_EMBED_DEFAULT_CHARTS] : charts;
+}
+
+/**
+ * The URL's `charts`, limited to the ones the embed allows. A missing, empty
+ * or unknown list shows every allowed chart; the URL can never add one.
+ */
+export function trafficEmbedCharts(
+  value: unknown,
+  allowed: readonly TrafficEmbedChart[]
+): TrafficEmbedChart[] {
+  if (typeof value !== "string") {
+    return [...allowed];
+  }
+  const requested = new Set(value.split(",").map((chart) => chart.trim()));
+  const charts = allowed.filter((chart) => requested.has(chart));
+  return charts.length === 0 ? [...allowed] : charts;
+}
+
 export function trafficEmbedUrl(
   origin: string,
   id: string,
@@ -134,6 +260,8 @@ export function trafficEmbedUrl(
     range: TrafficEmbedRange;
     theme: TrafficEmbedTheme;
     parts: readonly TrafficEmbedPart[];
+    /** Omit to show every chart the embed allows. */
+    charts?: readonly TrafficEmbedChart[];
     locale?: string;
   }
 ): string {
@@ -147,10 +275,33 @@ export function trafficEmbedUrl(
   if (options.parts.length < EMBED_PARTS.length) {
     url.searchParams.set("parts", options.parts.join(","));
   }
+  if (options.charts && options.charts.length > 0) {
+    url.searchParams.set("charts", options.charts.join(","));
+  }
   if (options.locale) {
     url.searchParams.set("locale", options.locale);
   }
   return url.toString();
+}
+
+/**
+ * The JSON a live embed polls. Only range and charts change the numbers, so
+ * theme and locale stay out and every display of an embed shares one CDN
+ * entry.
+ */
+export function trafficEmbedDataUrl(
+  id: string,
+  search: { range?: string; charts?: string }
+): string {
+  const params = new URLSearchParams();
+  if (search.range) {
+    params.set("range", search.range);
+  }
+  if (search.charts) {
+    params.set("charts", search.charts);
+  }
+  const query = params.toString();
+  return `${TRAFFIC_EMBED_DATA_PATH_PREFIX}${id}${query ? `?${query}` : ""}`;
 }
 
 /**
