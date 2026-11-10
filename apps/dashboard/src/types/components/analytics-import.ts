@@ -66,6 +66,8 @@ export interface ImportHomeStepProps extends ImportListProps {
 
 export interface ImportHistoryCardProps {
   variant?: "cta" | "settings";
+  /** Opens a dialog the page already holds instead of the card's own. */
+  onOpen?: () => void;
   /** Without web analytics: shown only to remove what was imported. */
   manageOnly?: boolean;
 }

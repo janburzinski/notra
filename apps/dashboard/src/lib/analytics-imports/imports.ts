@@ -21,6 +21,7 @@ import type {
 import {
   importHostScope,
   importHostScopesOverlap,
+  providerHostScope,
 } from "@notra/geo-core/utils/analytics-import-host";
 import {
   importCutoffDay,
@@ -45,6 +46,7 @@ import type {
   AnalyticsImportSourcePageviews,
   AnalyticsImportSummary,
   CoveredImport,
+  CoveredImportSource,
   CreateAnalyticsImportInput,
   ImportRangeBase,
   ImportRangePlan,
@@ -139,15 +141,18 @@ async function rangeBase(
 }
 
 /**
- * Days other imports already wrote for any host this import can write: the
- * writer keeps the host, its www alias and its subdomains.
+ * Days imports already wrote that this one could repeat: every import of the
+ * same source, whatever its domain, and other sources' imports for any host
+ * this one can write (its host and www alias, plus subdomains for providers
+ * that report hostnames).
  */
 async function coveredImports(
   executor: AnalyticsImportReader,
   projectId: string,
-  host: string,
+  source: CoveredImportSource,
   kind: ImportKind
 ): Promise<CoveredImport[]> {
+  const scope = providerHostScope(source.provider, source.host);
   const rows = await executor.query.analyticsImports.findMany({
     columns: {
       id: true,
@@ -171,7 +176,9 @@ async function coveredImports(
   return rows.flatMap((row) =>
     row.effectiveStartDay &&
     row.effectiveEndDay &&
-    importHostScopesOverlap(row.host, host)
+    ((row.provider === source.provider &&
+      row.externalSiteRef === source.sourceRef) ||
+      importHostScopesOverlap(providerHostScope(row.provider, row.host), scope))
       ? [
           {
             id: row.id,
@@ -251,7 +258,7 @@ export async function planImportRange(
   const covered = await coveredImports(
     db,
     input.projectId,
-    base.host,
+    { provider: input.provider, sourceRef: input.sourceRef, host: base.host },
     base.kind
   );
   return resolvePlan(input, base, covered);
@@ -271,7 +278,7 @@ export function toPreview(
       return 0;
     }
     return pageviews.counts
-      ? pageviewsInRange(pageviews.counts, range)
+      ? pageviewsInRange(pageviews.counts, range, toDay(new Date()))
       : pageviews.total;
   };
   return {
@@ -315,7 +322,11 @@ export async function createAnalyticsImport(
       const covered = await coveredImports(
         tx,
         input.projectId,
-        base.host,
+        {
+          provider: input.provider,
+          sourceRef: input.sourceRef,
+          host: base.host,
+        },
         base.kind
       );
       const plan = resolvePlan(input, base, covered);

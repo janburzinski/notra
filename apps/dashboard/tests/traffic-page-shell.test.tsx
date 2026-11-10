@@ -68,7 +68,7 @@ if (!process.env.NOTRA_TRAFFIC_PAGE_SHELL_TEST_WORKER) {
             emptyRangeTitle: "No visits in this period",
             emptyRangeDescription: "Pick another period",
           }}
-          emptyFooter={<aside>import history</aside>}
+          emptyFooter={() => <aside>import history</aside>}
           hasPreviousData={hasPreviousData}
           isEmpty={isEmpty}
           scope={scope}

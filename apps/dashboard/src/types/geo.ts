@@ -2162,6 +2162,8 @@ export interface TrafficExportButtonProps {
 
 export interface TrafficActionsMenuProps extends TrafficExportButtonProps {
   organizationId: string;
+  importOpen: boolean;
+  onImportOpenChange: (open: boolean) => void;
 }
 
 /**

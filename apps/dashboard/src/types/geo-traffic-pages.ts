@@ -69,8 +69,11 @@ export interface TrafficPageEmptyProps {
 
 export interface TrafficPageShellProps extends TrafficPageEmptyProps {
   isEmpty: boolean;
-  /** Shown under the empty state when no page filter is set. */
-  emptyFooter?: ReactNode;
+  /**
+   * Shown under the empty state when no page filter is set. Gets the opener
+   * of the page's import dialog, which outlives the switch to the data view.
+   */
+  emptyFooter?: (openImport: () => void) => ReactNode;
   children: ReactNode;
 }
 

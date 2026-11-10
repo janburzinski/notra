@@ -1,6 +1,7 @@
 "use client";
 
 import { PageHeading } from "@notra/ui/components/shared/page-heading";
+import { useState } from "react";
 import { useTranslations } from "use-intl";
 
 import { AnalyticsSourceTabs } from "@/components/analytics/analytics-source-tabs";
@@ -72,6 +73,7 @@ export function TrafficPageShell({
   const t = useTranslations("geo.pages.traffic");
   const tShared = useTranslations("geo.pages.shared");
   const { geoRange, pathQuery, knownPaths } = scope;
+  const [importOpen, setImportOpen] = useState(false);
 
   if (!scope.settings) {
     return (
@@ -98,6 +100,8 @@ export function TrafficPageShell({
   // Embeds, tracking setup and imports stay reachable on empty pages.
   const actionsMenu = (
     <TrafficActionsMenu
+      importOpen={importOpen}
+      onImportOpenChange={setImportOpen}
       organizationId={scope.organizationId}
       path={pathQuery}
       range={geoRange.query}
@@ -135,7 +139,7 @@ export function TrafficPageShell({
               installMethod={installMethod}
               scope={scope}
             />
-            {pathQuery ? null : emptyFooter}
+            {pathQuery ? null : emptyFooter?.(() => setImportOpen(true))}
           </>
         ) : (
           <>

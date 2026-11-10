@@ -174,6 +174,13 @@ export interface ImportRangeBase {
   nativeStartDay: string | null;
 }
 
+/** The import being planned, as `coveredImports` matches it against others. */
+export interface CoveredImportSource {
+  provider: AnalyticsImportProvider;
+  sourceRef: string;
+  host: string;
+}
+
 /** Days an import of the same project, kind and domain scope already has. */
 export interface CoveredImport extends ImportDayRange {
   id: string;

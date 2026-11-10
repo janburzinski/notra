@@ -609,12 +609,12 @@ if (process.env.NOTRA_ANALYTICS_IMPORTS_SANDBOX_TEST !== "1") {
           imports.AnalyticsImportInputError
         );
       }
-      const plan = (host: string) =>
+      const plan = (host: string, sourceRef = "plausible-export") =>
         imports.planImportRange({
           organizationId: "org-a",
           projectId: "project-a",
           provider: "plausible_csv",
-          sourceRef: "plausible-export",
+          sourceRef,
           host,
           requestedStart: "2026-01-01",
           requestedEnd: "2026-09-30",
@@ -624,7 +624,12 @@ if (process.env.NOTRA_ANALYTICS_IMPORTS_SANDBOX_TEST !== "1") {
         range: { start: "2026-01-01", end: "2026-07-31" },
         clipped: true,
       });
-      expect((await plan("notexample.com")).range).toEqual({
+      // The same export never imports its days twice, under any domain.
+      expect(await plan("notexample.com")).toMatchObject({
+        range: { start: "2026-01-01", end: "2026-07-31" },
+        alreadyImported: true,
+      });
+      expect((await plan("notexample.com", "other-export")).range).toEqual({
         start: "2026-01-01",
         end: "2026-09-30",
       });
@@ -773,7 +778,9 @@ if (process.env.NOTRA_ANALYTICS_IMPORTS_SANDBOX_TEST !== "1") {
     const docs = await createCsvImport("example.com");
     await runner.runAnalyticsImportInline(docs.id, zip);
     nativeFirstDay = "2026-11-01";
-    const other = await createCsvImport("other.example");
+    const other = await createCsvImport("other.example", {
+      sourceRef: "export-other",
+    });
     await runner.runAnalyticsImportInline(other.id, zip);
     const { forgetCompletedImportIds, loadCompletedImports } =
       await import("@notra/geo-core/geo/analytics-imports");
@@ -793,7 +800,9 @@ if (process.env.NOTRA_ANALYTICS_IMPORTS_SANDBOX_TEST !== "1") {
     expect(await coverage(["unrelated.example"])).toBeNull();
 
     nativeFirstDay = "1970-01-01";
-    const beforeTracking = await createCsvImport("new.example");
+    const beforeTracking = await createCsvImport("new.example", {
+      sourceRef: "export-new",
+    });
     await runner.runAnalyticsImportInline(beforeTracking.id, zip);
     forgetCompletedImportIds("org-a");
     expect((await coverage(["new.example"]))?.nativeStart).toBeNull();

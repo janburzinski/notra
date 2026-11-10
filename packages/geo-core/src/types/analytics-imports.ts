@@ -40,7 +40,19 @@ export interface ImportProviderInfo {
   lookbackDays: number | null;
   /** Splits month chunks so one chunk fits the provider's request budget. */
   maxChunkDays?: number;
+  /**
+   * Whether rows can land on subdomains of the import's host, because the
+   * provider reports a hostname per row. Vercel scopes a project to one
+   * domain, so its rows only ever carry the import's host.
+   */
+  writesSubdomains: boolean;
   capabilities: AnalyticsImportCapabilities;
+}
+
+/** The hosts an import writes: its host and www alias, and maybe subdomains. */
+export interface ImportHostScope {
+  host: string;
+  subdomains: boolean;
 }
 
 export interface ImportReferrerName {

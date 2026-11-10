@@ -78,7 +78,7 @@ export default function PageClient({ organizationSlug }: GeoPageClientProps) {
           emptyRangeTitle: t("emptyRangeTitle"),
           emptyRangeDescription: t("emptyRangeDescription"),
         }}
-        emptyFooter={<ImportHistoryCard />}
+        emptyFooter={(openImport) => <ImportHistoryCard onOpen={openImport} />}
         hasPreviousData={hasPreviousWebPeriod(web)}
         installDescription={t("installDescription")}
         installMethod="script"

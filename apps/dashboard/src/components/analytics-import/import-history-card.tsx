@@ -44,6 +44,7 @@ function ImportProviderMarks() {
 export function ImportHistoryCard({
   variant = "cta",
   manageOnly = false,
+  onOpen,
 }: ImportHistoryCardProps) {
   const t = useTranslations("geo.analyticsImport");
   const { activeOrganization } = useOrganizationsContext();
@@ -64,7 +65,16 @@ export function ImportHistoryCard({
   const actionLabel = settings
     ? t(storedCount > 0 ? "settings.action" : "settings.start")
     : t("cta.action");
-  const dialog = (
+  const button = (
+    <Button className="shrink-0" onClick={onOpen} size="sm" variant="outline">
+      {actionLabel}
+    </Button>
+  );
+  // A page that holds its own import dialog gets just the button, so the
+  // dialog stays open when this card leaves with the page's empty state.
+  const dialog = onOpen ? (
+    button
+  ) : (
     <AnalyticsImportDialog
       defaultHost={domain ?? ""}
       manageOnly={manageOnly}
@@ -72,11 +82,7 @@ export function ImportHistoryCard({
       open={open}
       organizationId={organizationId}
       projectId={projectId}
-      trigger={
-        <Button className="shrink-0" size="sm" variant="outline">
-          {actionLabel}
-        </Button>
-      }
+      trigger={button}
     />
   );
   const card = (

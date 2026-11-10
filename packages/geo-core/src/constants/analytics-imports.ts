@@ -89,6 +89,7 @@ export const IMPORT_PROVIDERS: Record<
     connection: null,
     kind: "web",
     lookbackDays: null,
+    writesSubdomains: true,
     capabilities: {
       visitors: true,
       visits: true,
@@ -102,6 +103,7 @@ export const IMPORT_PROVIDERS: Record<
     connection: "plausible",
     kind: "web",
     lookbackDays: null,
+    writesSubdomains: true,
     capabilities: {
       visitors: true,
       visits: true,
@@ -115,6 +117,7 @@ export const IMPORT_PROVIDERS: Record<
     connection: "vercel",
     kind: "web",
     lookbackDays: 730,
+    writesSubdomains: false,
     maxChunkDays: VERCEL_CHUNK_DAYS,
     capabilities: {
       visitors: true,
@@ -129,6 +132,7 @@ export const IMPORT_PROVIDERS: Record<
     connection: "cloudflare",
     kind: "geo",
     lookbackDays: null,
+    writesSubdomains: true,
     capabilities: {
       visitors: false,
       visits: true,
@@ -142,6 +146,7 @@ export const IMPORT_PROVIDERS: Record<
     connection: "cloudflare",
     kind: "web",
     lookbackDays: null,
+    writesSubdomains: true,
     maxChunkDays: CLOUDFLARE_RUM_CHUNK_DAYS,
     capabilities: {
       visitors: false,
@@ -156,6 +161,7 @@ export const IMPORT_PROVIDERS: Record<
     connection: "rybbit",
     kind: "web",
     lookbackDays: null,
+    writesSubdomains: false,
     maxChunkDays: RYBBIT_CHUNK_DAYS,
     capabilities: {
       visitors: true,
@@ -170,6 +176,7 @@ export const IMPORT_PROVIDERS: Record<
     connection: "databuddy",
     kind: "web",
     lookbackDays: null,
+    writesSubdomains: false,
     maxChunkDays: DATABUDDY_CHUNK_DAYS,
     capabilities: {
       visitors: true,

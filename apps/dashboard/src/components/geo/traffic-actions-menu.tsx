@@ -25,19 +25,24 @@ import { usePathname } from "@/lib/navigation";
 import type { TrafficActionsMenuProps } from "@/types/geo";
 import { downloadTrafficCsv } from "@/utils/traffic-export";
 
-/** Export, embed, tracking setup and history imports behind one trigger. */
+/**
+ * Export, embed, tracking setup and history imports behind one trigger. It
+ * holds the page's only import dialog: it keeps its place when the empty
+ * page fills with a first import's days, so the progress stays open.
+ */
 export function TrafficActionsMenu({
   organizationId,
   traffic,
   web,
   range,
   path,
+  importOpen,
+  onImportOpenChange,
 }: TrafficActionsMenuProps) {
   const t = useTranslations("geo.trafficExport");
   const [menuOpen, setMenuOpen] = useState(false);
   const [embedOpen, setEmbedOpen] = useState(false);
   const pathname = usePathname();
-  const [importOpen, setImportOpen] = useState(false);
   const { openSettings } = useSettingsModal();
   const webFlag = useWebAnalyticsFlag();
   const { project, domain } = useGeoActiveProject(organizationId);
@@ -53,7 +58,7 @@ export function TrafficActionsMenu({
       {webFlag.enabled ? (
         <ImportActivityPill
           imports={importData?.imports ?? []}
-          onOpen={() => setImportOpen(true)}
+          onOpen={() => onImportOpenChange(true)}
         />
       ) : null}
       <DropdownMenu onOpenChange={setMenuOpen} open={menuOpen}>
@@ -85,7 +90,7 @@ export function TrafficActionsMenu({
             {t("trackingSetup")}
           </DropdownMenuItem>
           {webFlag.enabled ? (
-            <DropdownMenuItem onClick={() => setImportOpen(true)}>
+            <DropdownMenuItem onClick={() => onImportOpenChange(true)}>
               {t("importHistory")}
             </DropdownMenuItem>
           ) : null}
@@ -103,7 +108,7 @@ export function TrafficActionsMenu({
       {webFlag.enabled ? (
         <AnalyticsImportDialog
           defaultHost={domain ?? ""}
-          onOpenChange={setImportOpen}
+          onOpenChange={onImportOpenChange}
           open={importOpen}
           organizationId={organizationId}
           projectId={projectId}

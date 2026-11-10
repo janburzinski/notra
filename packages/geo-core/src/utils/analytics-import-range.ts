@@ -151,11 +151,13 @@ function dayNumber(day: string): number {
 
 /**
  * Page views inside a range, from counts per day ("2026-08-01") or per month
- * ("2026-08"). A month only partly inside the range counts pro rata.
+ * ("2026-08"). A month only partly inside the range counts pro rata, over
+ * the days it has had so far: the current month's count ends today.
  */
 export function pageviewsInRange(
   counts: Readonly<Record<string, number>>,
-  range: ImportDayRange
+  range: ImportDayRange,
+  today: string
 ): number {
   const from = dayNumber(range.start);
   const to = dayNumber(range.end);
@@ -164,7 +166,11 @@ export function pageviewsInRange(
     const month = key.length === 7;
     const first = dayNumber(month ? `${key}-01` : key);
     const last = month
-      ? Date.UTC(Number(key.slice(0, 4)), Number(key.slice(5, 7)), 0) / DAY_MS
+      ? Math.min(
+          Date.UTC(Number(key.slice(0, 4)), Number(key.slice(5, 7)), 0) /
+            DAY_MS,
+          Math.max(dayNumber(today), first)
+        )
       : first;
     const shared = Math.min(last, to) - Math.max(first, from) + 1;
     if (shared > 0) {

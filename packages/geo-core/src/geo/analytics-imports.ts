@@ -14,7 +14,10 @@ import type {
   ImportKind,
 } from "../types/analytics-imports";
 import { CompletedImportsCacheKey } from "../types/ingest-cache-keys";
-import { importHostScopesOverlap } from "../utils/analytics-import-host";
+import {
+  importHostScopesOverlap,
+  providerHostScope,
+} from "../utils/analytics-import-host";
 import { toDay } from "../utils/analytics-import-range";
 import { logGeoFailure } from "../utils/geo-log";
 import { geoDb } from "./effect";
@@ -82,7 +85,13 @@ function toCompletedImports(
   for (const row of rows) {
     const relevant =
       hosts.length === 0 ||
-      hosts.some((host) => importHostScopesOverlap(row.host, host));
+      // A host filter also reads its subdomains (GEO_HOSTS_SQL).
+      hosts.some((host) =>
+        importHostScopesOverlap(providerHostScope(row.provider, row.host), {
+          host,
+          subdomains: true,
+        })
+      );
     if (relevant && row.until && (!coverage || row.until > coverage.until)) {
       coverage = {
         provider: row.provider,
