@@ -1,0 +1,19 @@
+apps/dashboard/src/components/geo/engine-family-sheet.tsx
+  s_76523c7d05e2d3::t_03f9f5c7b0e675 513
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "961ec0b50222f20e239aef351a71767e7577551b",
+  "prompts": {},
+  "sessions": {
+    "s_76523c7d05e2d3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8eb4a2e6-caa1-4eb3-91a2-33a96d86aa5f",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
