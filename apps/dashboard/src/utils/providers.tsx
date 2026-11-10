@@ -51,9 +51,18 @@ function createProviderClients() {
         const message = query.meta?.errorMessage;
         if (typeof message === "string") {
           const showRetryAction = query.meta?.showRetryAction === true;
+          // A failed background refetch (polling, reconnect) leaves the last
+          // data on screen, so there is nothing for the user to act on. A
+          // failed next page of an infinite list still needs the toast.
+          const isBackgroundRefetch =
+            query.state.data !== undefined && !query.state.fetchMeta?.fetchMore;
+          if (!showRetryAction && isBackgroundRefetch) {
+            return;
+          }
 
           toast.error(message, {
-            id: showRetryAction ? query.queryHash : undefined,
+            // Queries sharing a message fail together; show one toast.
+            id: showRetryAction ? query.queryHash : message,
             duration: showRetryAction ? Number.POSITIVE_INFINITY : undefined,
             action: showRetryAction
               ? {

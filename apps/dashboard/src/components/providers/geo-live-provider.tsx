@@ -1,6 +1,9 @@
 "use client";
 
-import { GEO_LIVE_INVALIDATE_THROTTLE_MS } from "@notra/geo-core/constants/geo";
+import {
+  GEO_LIVE_INVALIDATE_THROTTLE_MS,
+  GEO_TRAFFIC_LIVE_MIN_INTERVAL_MS,
+} from "@notra/geo-core/constants/geo";
 import { geoLiveChannel } from "@notra/geo-core/utils/geo-live";
 import { useThrottledCallback } from "@tanstack/react-pacer";
 import { useQueryClient } from "@tanstack/react-query";
@@ -29,12 +32,17 @@ export function GeoLiveProvider({
     leading: true,
     trailing: true,
   };
-  const refreshTraffic = useThrottledCallback(() => {
-    invalidateGeoTrafficQueries(queryClient, {
-      organizationId,
-      projectId,
-    }).catch(() => undefined);
-  }, throttle);
+  // Every ingest instance throttles its announcements on its own, so several
+  // can arrive within one window; refetch at most once per window.
+  const refreshTraffic = useThrottledCallback(
+    () => {
+      invalidateGeoTrafficQueries(queryClient, {
+        organizationId,
+        projectId,
+      }).catch(() => undefined);
+    },
+    { ...throttle, wait: GEO_TRAFFIC_LIVE_MIN_INTERVAL_MS }
+  );
   const refreshVisibility = useThrottledCallback(() => {
     const input = { organizationId, projectId };
     Promise.all([
