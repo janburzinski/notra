@@ -7,6 +7,8 @@ import {
   experimental_slackActivityRenderer,
   experimental_slackActivityStatus,
   type SlackChannelConfig,
+  type SlackMentionResult,
+  type SlackMessage,
   slackChannel,
 } from "eve/channels/slack";
 
@@ -33,6 +35,7 @@ import {
   SLACK_VOICE_FAILED_MESSAGE,
   SLACK_VOICE_TRANSCRIBING_STATUS,
 } from "../lib/constants/slack-voice";
+import type { SlackRequestTrigger } from "../lib/types/slack";
 import type { SlackVoiceTranscription } from "../lib/types/slack-voice";
 import {
   forwardAutopilotSlackAction,
@@ -71,6 +74,14 @@ import {
   runWithSlackTeam,
 } from "../lib/utils/slack-installation";
 import {
+  anonymizeSlackRequests,
+  finishSlackTurnMetrics,
+  markSlackTurnResponded,
+  recordSlackRequest,
+  recordSlackTurnTool,
+  startSlackTurnMetrics,
+} from "../lib/utils/slack-metrics";
+import {
   getChannelNotEnabledMessage,
   notifySlackDraftCreated,
 } from "../lib/utils/slack-notifications";
@@ -107,16 +118,16 @@ import {
 } from "../lib/utils/slack-voice";
 import { firstNonEmptyLine } from "../lib/utils/text";
 
-const onSlackMessage: NonNullable<SlackChannelConfig["onAppMention"]> = async (
-  ctx,
-  message
-) => {
-  if (!ctx.slack.installationTeamId || message.author?.isBot) {
+const onSlackMessage = async (
+  ctx: Parameters<NonNullable<SlackChannelConfig["onAppMention"]>>[0],
+  message: SlackMessage,
+  trigger: SlackRequestTrigger
+): Promise<SlackMentionResult> => {
+  const teamId = ctx.slack.installationTeamId;
+  if (!teamId || message.author?.isBot) {
     return null;
   }
-  const installation = await resolveSlackInstallation(
-    ctx.slack.installationTeamId
-  );
+  const installation = await resolveSlackInstallation(teamId);
   if (!installation) {
     return null;
   }
@@ -124,6 +135,13 @@ const onSlackMessage: NonNullable<SlackChannelConfig["onAppMention"]> = async (
   if (!isChannelAllowed(installation, message.channelId)) {
     const userId = message.author?.userId;
     if (ctx.isBotMentioned() && userId) {
+      await recordSlackRequest({
+        organizationId: installation.organizationId,
+        teamId,
+        message,
+        trigger,
+        blocked: true,
+      });
       await runWithSlackInstallation(installation, () =>
         ctx.thread.postEphemeral(
           userId,
@@ -187,15 +205,23 @@ const onSlackMessage: NonNullable<SlackChannelConfig["onAppMention"]> = async (
         ts: message.ts,
       }),
     ]);
-    const chatId = await Effect.runPromise(
-      mirrorPublicSlackThread(
-        ctx,
-        voice?.transcript
-          ? withSlackVoiceTranscript(message, voice.transcript)
-          : message,
-        installation.organizationId
-      )
-    );
+    const [chatId] = await Promise.all([
+      Effect.runPromise(
+        mirrorPublicSlackThread(
+          ctx,
+          voice?.transcript
+            ? withSlackVoiceTranscript(message, voice.transcript)
+            : message,
+          installation.organizationId
+        )
+      ),
+      recordSlackRequest({
+        organizationId: installation.organizationId,
+        teamId,
+        message,
+        trigger,
+      }),
+    ]);
     return {
       ...(voice ? { context: [formatSlackVoiceContext(voice)] } : {}),
       auth: {
@@ -226,7 +252,8 @@ const onSlackThreadReply: NonNullable<SlackChannelConfig["onMessage"]> = async (
   }
   const result = await onSlackMessage(
     { ...ctx, resolveSession: async () => session },
-    message
+    message,
+    "thread_reply"
   );
   if (!result) {
     return null;
@@ -417,6 +444,7 @@ const onSlackEvent: NonNullable<SlackChannelConfig["onEvent"]> = async (
   ) {
     await disableSlackIntegrationByTeamId(ctx.envelope.team_id);
     evictSlackInstallation(ctx.envelope.team_id);
+    await anonymizeSlackRequests(ctx.envelope.team_id);
     return;
   }
 
@@ -468,6 +496,9 @@ export default slackChannel({
       await mirrorToolResult(ctx, data);
       const result = data.result;
       const state = getNotraSlackState(channel.state);
+      if (result.kind === "tool-result") {
+        recordSlackTurnTool(channel.state, result.toolName);
+      }
 
       if (
         result.kind === "tool-result" &&
@@ -515,6 +546,7 @@ export default slackChannel({
             result.output,
             JSON.stringify([ctx.session.id, data.turnId])
           );
+          await markSlackTurnResponded(channel.state);
         } catch (error) {
           logError("Slack chart delivery failed", error, {
             sessionId: ctx.session.id,
@@ -546,15 +578,20 @@ export default slackChannel({
         const organizationId = getSessionAttribute(ctx, "organizationId");
         const postId = result.output.postId;
         if (organizationId) {
-          await runWithSlackTeam(channel.state.installationTeamId, () =>
-            offerSavedTweetPublishing(
-              channel,
-              organizationId,
-              postId,
-              result.callId,
-              getSlackAuthUserId(ctx.session.auth.current)
-            )
+          const posted = await runWithSlackTeam(
+            channel.state.installationTeamId,
+            () =>
+              offerSavedTweetPublishing(
+                channel,
+                organizationId,
+                postId,
+                result.callId,
+                getSlackAuthUserId(ctx.session.auth.current)
+              )
           );
+          if (posted) {
+            await markSlackTurnResponded(channel.state);
+          }
         }
       }
     },
@@ -563,6 +600,7 @@ export default slackChannel({
     },
     "input.requested": (data, channel, ctx, defaultDeliver) =>
       runWithSlackTeam(channel.state.installationTeamId, async () => {
+        await markSlackTurnResponded(channel.state);
         await handleSlackInputRequested(
           data,
           channel,
@@ -581,6 +619,7 @@ export default slackChannel({
           return;
         }
 
+        await markSlackTurnResponded(channel.state);
         // The answer is about to be posted, so the 👀 comes off now rather
         // than when the turn finishes.
         await Promise.all([
@@ -655,6 +694,12 @@ export default slackChannel({
           code: data.code,
           errorId,
         });
+        await finishSlackTurnMetrics(
+          channel.state,
+          ctx.session.id,
+          "failed",
+          data.code
+        );
         await mirrorSessionStatus(ctx, "idle");
         await channel.thread.post(
           withErrorId(SLACK_TURN_FAILED_MESSAGE, errorId)
@@ -663,13 +708,23 @@ export default slackChannel({
       }),
     "turn.cancelled": (_data, channel, ctx) =>
       runWithSlackTeam(channel.state.installationTeamId, async () => {
+        await finishSlackTurnMetrics(
+          channel.state,
+          ctx.session.id,
+          "cancelled"
+        );
         await mirrorSessionStatus(ctx, "idle");
         await clearSlackWorkingReactions(channel, ctx);
       }),
     "turn.completed": (_data, channel, ctx) =>
-      runWithSlackTeam(channel.state.installationTeamId, () =>
-        clearSlackWorkingReactions(channel, ctx)
-      ),
+      runWithSlackTeam(channel.state.installationTeamId, async () => {
+        await finishSlackTurnMetrics(
+          channel.state,
+          ctx.session.id,
+          "completed"
+        );
+        await clearSlackWorkingReactions(channel, ctx);
+      }),
     // Also covers turns parked on an approval or sign-in.
     "session.waiting": (_data, channel, ctx) =>
       runWithSlackTeam(channel.state.installationTeamId, () =>
@@ -689,15 +744,17 @@ export default slackChannel({
         );
       }),
     "reasoning.appended": () => undefined,
-    "turn.started": (_data, channel, ctx) =>
+    "turn.started": (data, channel, ctx) =>
       runWithSlackTeam(channel.state.installationTeamId, async () => {
+        startSlackTurnMetrics(channel.state, data.turnId);
         channel.state.pendingToolCallMessage = null;
         trackSlackWorkingReactions(getNotraSlackState(channel.state), ctx);
         await mirrorSessionStatus(ctx, "working");
       }),
   },
-  onAppMention: onSlackMessage,
-  onDirectMessage: onSlackMessage,
+  onAppMention: (ctx, message) => onSlackMessage(ctx, message, "mention"),
+  onDirectMessage: (ctx, message) =>
+    onSlackMessage(ctx, message, "direct_message"),
   onEvent: onSlackEvent,
   onInputResponse: onSlackInputResponse,
   onInteraction: onSlackInteraction,

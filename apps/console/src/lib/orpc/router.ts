@@ -6,6 +6,7 @@ import { moderationRouter } from "./routers/moderation";
 import { reviewRouter } from "./routers/review";
 import { sitesRouter } from "./routers/sites";
 import { skillsRouter } from "./routers/skills";
+import { slackBotRouter } from "./routers/slack-bot";
 
 export const consoleRouter = {
   aiTrends: aiTrendsRouter,
@@ -16,6 +17,7 @@ export const consoleRouter = {
   review: reviewRouter,
   sites: sitesRouter,
   skills: skillsRouter,
+  slackBot: slackBotRouter,
 };
 
 export type ConsoleRouter = typeof consoleRouter;

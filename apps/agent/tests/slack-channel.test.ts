@@ -33,7 +33,7 @@ const scenario = ${JSON.stringify(scenario)};
 const runtimePath = ${JSON.stringify(runtime)};
 const reactionScenario = scenario.startsWith("working-reaction");
 let currentAuth = null;
-if (scenario === "chart-failure-with-publish" || scenario === "approval-payload" || scenario === "approval-guest" || scenario === "draft-pr-completion" || reactionScenario) {
+if (scenario === "chart-failure-with-publish" || scenario === "approval-payload" || scenario === "approval-guest" || scenario === "draft-pr-completion" || reactionScenario || scenario === "metrics-turns" || scenario === "metrics-db-down") {
   mock.module(runtimePath + "/context/build-callback-context.js", () => ({
     buildCallbackContext: () => ({ session: { id: "session-1", auth: { current: currentAuth, initiator: null } } }),
   }));
@@ -46,7 +46,7 @@ if (scenario === "draft-pr-completion" || reactionScenario) {
 }
 process.env.SLACK_AGENT_SIGNING_SECRET = "fixture-signing-secret";
 const installations = [
-  { slackTeamId: "T-install", organizationId: "org-install", enabled: true, allowedChannelIds: scenario === "owner-policy" || scenario === "working-reaction-blocked" ? ["C-other"] : null, botToken: "fixture-install" },
+  { slackTeamId: "T-install", organizationId: "org-install", enabled: true, allowedChannelIds: scenario === "owner-policy" || scenario === "working-reaction-blocked" || scenario === "metrics-blocked" ? ["C-other"] : null, botToken: "fixture-install" },
   { slackTeamId: "T-actor", organizationId: "org-actor", enabled: true, allowedChannelIds: null, botToken: "fixture-actor" },
 ];
 mock.module("@notra/ai/integrations/slack-workspace", () => ({
@@ -102,9 +102,22 @@ const published = [];
 mock.module("@notra/tools/utils/social-publish", () => ({
   publishTwitterPost: (params) => Effect.sync(() => { published.push(params); return { postUrl: "https://x.com/example/status/1", confirmed: true }; }),
 }));
+const metricInserts = [];
+const metricUpdates = [];
+let failMetricWrites = false;
+const { PgDialect } = await import("drizzle-orm/pg-core");
+const dialect = new PgDialect();
 mock.module("@notra/db/drizzle", () => ({ db: {
   select: () => ({ from: () => ({ where: () => ({ limit: async () => [{ slug: "example" }] }) }) }),
   query: { posts: { findFirst: async () => ({ markdown: "Saved tweet" }) } },
+  insert: () => ({ values: (row) => ({ onConflictDoNothing: async () => {
+    if (failMetricWrites) throw new Error("metrics database unavailable");
+    metricInserts.push(row);
+  } }) }),
+  update: () => ({ set: (values) => ({ where: async (condition) => {
+    if (failMetricWrites) throw new Error("metrics database unavailable");
+    metricUpdates.push({ values, params: dialect.sqlToQuery(condition).params });
+  } }) }),
 } }));
 let enterMirror;
 let releaseMirror;
@@ -517,6 +530,164 @@ if (scenario === "draft-pr-completion") {
   assert.equal(exactSends.length, 2);
   assert.equal(charged.length, 2);
   assert(outbound.some((call) => call.url.endsWith("chat.postMessage") && decodeURIComponent(call.raw.replaceAll("+", " ")).includes("transcribe that voice message")));
+} else if (scenario === "metrics-triggers") {
+  await message("<@U-notra> how did the launch go?", true);
+  await message("and last week?");
+  await message("<@U-notra> stop", true);
+  await request({ type: "event_callback", team_id: "T-install", api_app_id: "A-notra", event_id: "event-dm", authorizations: [{ is_bot: true, team_id: "T-install", user_id: "U-notra" }],
+    event: { type: "message", channel: "D-dm", channel_type: "im", ts: "3.1", user: "U-human", text: "draft a tweet" } });
+  await request({ type: "event_callback", team_id: "T-install", api_app_id: "A-notra", event_id: "event-bot", authorizations: [{ is_bot: true, team_id: "T-install", user_id: "U-notra" }],
+    event: { type: "message", channel: "C-room", thread_ts: "1.0", ts: "2.9", user: "U-notra", bot_id: "B-notra", app_id: "A-notra", text: "my own reply" } });
+  await Promise.all(tasks);
+  assert.deepEqual(metricInserts.map((row) => [row.trigger, row.status, row.channelId, row.messageTs, row.threadTs]), [
+    ["mention", "pending", "C-room", "2.1", "1.0"],
+    ["thread_reply", "pending", "C-room", "2.2", "1.0"],
+    ["direct_message", "pending", "D-dm", "3.1", "3.1"],
+  ]);
+  for (const row of metricInserts) {
+    assert.equal(row.organizationId, "org-install");
+    assert.equal(row.slackTeamId, "T-install");
+    assert.equal(row.slackUserId, "U-human");
+    assert.equal(row.sentAt.getTime(), Number(row.messageTs) * 1000);
+    assert.equal(typeof row.id, "string");
+  }
+  assert.equal(metricUpdates.length, 0);
+  // Uninstalling keeps the counts but drops who asked.
+  await request({ type: "event_callback", team_id: "T-install", api_app_id: "A-notra", event_id: "event-uninstall", event: { type: "app_uninstalled" } });
+  await Promise.all(tasks);
+  assert.deepEqual(metricUpdates, [{ values: { slackUserId: null }, params: ["T-install"] }]);
+} else if (scenario === "metrics-blocked") {
+  await message("<@U-notra> are you here?", true);
+  await message("not for the bot");
+  await Promise.all(tasks);
+  assert.equal(metricInserts.length, 1);
+  assert.equal(metricInserts[0].status, "blocked");
+  assert.equal(metricInserts[0].trigger, "mention");
+  assert.equal(metricInserts[0].organizationId, "org-install");
+  assert.equal(outbound.filter((call) => call.url.endsWith("chat.postEphemeral")).length, 1);
+  assert.equal(created.length + exactSends.length + addressSends, 0);
+} else if (scenario === "metrics-turns") {
+  const posts = [];
+  const state = { installationTeamId: "T-install", teamId: "T-install", channelId: "C-room", threadTs: "1.0" };
+  const slackCtx = { state, thread: { post: async (text) => posts.push(text), startTyping: async () => {} }, slack: { threadTs: "1.0" } };
+  const sessionCtx = { session: { id: "session-1", auth: { current: null, initiator: null } }, channel: { kind: "channel:slack" } };
+  const events = channel.adapter;
+  const toolResult = (turnId, toolName, isError = false) => ({ turnId, stepIndex: 0, sequence: 2, status: "completed",
+    result: { kind: "tool-result", toolName, callId: "call-" + toolName, isError, output: {} } });
+  const finishes = () => metricUpdates.filter((update) => "toolNames" in update.values);
+  const threadCloses = () => metricUpdates.filter((update) => "status" in update.values && !("toolNames" in update.values));
+  const firstReplies = () => metricUpdates.filter((update) => !("status" in update.values));
+  const lastUpdate = () => finishes().at(-1);
+
+  // Answered turn with tools; the pre-tool narration is not a reply.
+  state.triggeringMessageTs = "2.5";
+  await events["turn.started"]({ turnId: "turn-1", sequence: 1 }, slackCtx, sessionCtx);
+  await events["action.result"](toolResult("turn-1", "search_web"), slackCtx, sessionCtx);
+  await events["action.result"](toolResult("turn-1", "get_web_analytics", true), slackCtx, sessionCtx);
+  await events["message.completed"]({ turnId: "turn-1", finishReason: "tool-calls", message: "Let me check." }, slackCtx, sessionCtx);
+  assert.equal(state.notraTurnMetrics.firstResponseAt, undefined);
+  assert.equal(firstReplies().length, 0);
+  await events["message.completed"]({ turnId: "turn-1", finishReason: "stop", message: "Here you go." }, slackCtx, sessionCtx);
+  // The reply time is saved as soon as the answer is posted, once per turn.
+  assert.equal(firstReplies().length, 1);
+  assert.deepEqual(firstReplies()[0].params, ["T-install", "C-room", "2.5"]);
+  assert(firstReplies()[0].values.firstResponseAt instanceof Date);
+  await events["turn.completed"]({ turnId: "turn-1", sequence: 9 }, slackCtx, sessionCtx);
+  let update = lastUpdate();
+  assert.deepEqual(update.params, ["T-install", "C-room", "2.5"]);
+  assert.equal(update.values.status, "completed");
+  assert.equal(update.values.sessionId, "session-1");
+  assert.equal(update.values.turnId, "turn-1");
+  assert.deepEqual(update.values.toolNames, ["search_web", "get_web_analytics"]);
+  assert.equal(update.values.errorCode, null);
+  assert(update.values.startedAt <= update.values.firstResponseAt);
+  assert(update.values.firstResponseAt <= update.values.finishedAt);
+  assert.equal(update.values.firstResponseAt.getTime(), firstReplies()[0].values.firstResponseAt.getTime());
+  assert.equal(state.notraTurnMetrics, undefined);
+  assert.deepEqual(posts, ["Here you go."]);
+
+  // Failed turn: recorded with its code, no reply time.
+  state.triggeringMessageTs = "2.6";
+  await events["turn.started"]({ turnId: "turn-2", sequence: 1 }, slackCtx, sessionCtx);
+  await events["turn.failed"]({ turnId: "turn-2", sequence: 3, code: "model_error", message: "boom", details: { errorId: "err-1" } }, slackCtx, sessionCtx);
+  update = lastUpdate();
+  assert.deepEqual(update.params, ["T-install", "C-room", "2.6"]);
+  assert.equal(update.values.status, "failed");
+  assert.equal(update.values.errorCode, "model_error");
+  assert.equal(update.values.firstResponseAt, undefined);
+  assert(posts.at(-1).includes("err-1"));
+
+  // Stopped turn.
+  state.triggeringMessageTs = "2.7";
+  await events["turn.started"]({ turnId: "turn-3", sequence: 1 }, slackCtx, sessionCtx);
+  await events["turn.cancelled"]({ turnId: "turn-3", sequence: 2 }, slackCtx, sessionCtx);
+  assert.equal(lastUpdate().values.status, "cancelled");
+
+  // A turn parked on an approval card already answered the person, before the turn ends.
+  state.triggeringMessageTs = "2.8";
+  await events["turn.started"]({ turnId: "turn-4", sequence: 1 }, slackCtx, sessionCtx);
+  await events["input.requested"]({ turnId: "turn-4", sequence: 2, requests: [] }, slackCtx, sessionCtx);
+  assert.deepEqual(firstReplies().at(-1).params, ["T-install", "C-room", "2.8"]);
+  assert.equal(lastUpdate().params[2], "2.7");
+  await events["turn.completed"]({ turnId: "turn-4", sequence: 3 }, slackCtx, sessionCtx);
+  assert(lastUpdate().values.firstResponseAt instanceof Date);
+
+  // A saved tweet card posted mid-turn is the first reply, not the later summary.
+  currentAuth = { attributes: { organizationId: "org-install" } };
+  state.triggeringMessageTs = "2.10";
+  await events["turn.started"]({ turnId: "turn-6", sequence: 1 }, slackCtx, sessionCtx);
+  await events["action.result"]({ ...toolResult("turn-6", "create_twitter_post"), result: { ...toolResult("turn-6", "create_twitter_post").result, output: { postId: "post-1" } } }, slackCtx, sessionCtx);
+  assert(posts.includes("Saved tweet"));
+  assert.deepEqual(firstReplies().at(-1).params, ["T-install", "C-room", "2.10"]);
+  const tweetReplyAt = state.notraTurnMetrics.firstResponseAt;
+  await events["message.completed"]({ turnId: "turn-6", finishReason: "stop", message: "Done." }, slackCtx, sessionCtx);
+  assert.equal(state.notraTurnMetrics.firstResponseAt, tweetReplyAt);
+  assert.equal(firstReplies().filter((update) => update.params[2] === "2.10").length, 1);
+  await events["turn.completed"]({ turnId: "turn-6", sequence: 4 }, slackCtx, sessionCtx);
+  assert.equal(lastUpdate().values.firstResponseAt.getTime(), tweetReplyAt);
+  currentAuth = null;
+
+  // A message arriving mid-turn does not take the running turn's result.
+  state.triggeringMessageTs = "3.1";
+  await events["turn.started"]({ turnId: "turn-7", sequence: 1 }, slackCtx, sessionCtx);
+  state.triggeringMessageTs = "3.9";
+  await events["message.completed"]({ turnId: "turn-7", finishReason: "stop", message: "First." }, slackCtx, sessionCtx);
+  assert.deepEqual(firstReplies().at(-1).params, ["T-install", "C-room", "3.1"]);
+  await events["turn.completed"]({ turnId: "turn-7", sequence: 2 }, slackCtx, sessionCtx);
+  assert.deepEqual(lastUpdate().params, ["T-install", "C-room", "3.1"]);
+
+  // Earlier messages in the thread that never got their own turn are answered by this one.
+  const close = threadCloses().at(-1);
+  assert.deepEqual(close.params.slice(0, 4), ["T-install", "C-room", "1.0", "pending"]);
+  assert.equal(new Date(close.params[4]).getTime(), 3100);
+  assert.equal(close.values.status, "completed");
+  assert.equal(close.values.turnId, "turn-7");
+  assert(close.values.firstResponseAt instanceof Date);
+  assert.equal(threadCloses().length, finishes().length);
+
+  // A turn whose start was not seen still records its outcome.
+  state.triggeringMessageTs = "2.9";
+  await events["turn.completed"]({ turnId: "turn-5", sequence: 3 }, slackCtx, sessionCtx);
+  assert.equal(lastUpdate().values.status, "completed");
+  assert.deepEqual(lastUpdate().values.toolNames, []);
+  assert.deepEqual(lastUpdate().params, ["T-install", "C-room", "2.9"]);
+  assert.equal(finishes().length, 7);
+} else if (scenario === "metrics-db-down") {
+  failMetricWrites = true;
+  await message("<@U-notra> still answer me", true);
+  await Promise.all(tasks);
+  assert.equal(created.length + exactSends.length + addressSends, 1);
+  const posts = [];
+  const state = { installationTeamId: "T-install", teamId: "T-install", channelId: "C-room", threadTs: "1.0", triggeringMessageTs: "2.1" };
+  const slackCtx = { state, thread: { post: async (text) => posts.push(text), startTyping: async () => {} }, slack: { threadTs: "1.0" } };
+  const sessionCtx = { session: { id: "session-1", auth: { current: null, initiator: null } }, channel: { kind: "channel:slack" } };
+  await channel.adapter["turn.started"]({ turnId: "turn-1", sequence: 1 }, slackCtx, sessionCtx);
+  await channel.adapter["message.completed"]({ turnId: "turn-1", finishReason: "stop", message: "Answered anyway." }, slackCtx, sessionCtx);
+  await channel.adapter["turn.completed"]({ turnId: "turn-1", sequence: 2 }, slackCtx, sessionCtx);
+  await channel.adapter["turn.failed"]({ turnId: "turn-1", sequence: 3, code: "x", message: "boom" }, slackCtx, sessionCtx);
+  assert.equal(posts[0], "Answered anyway.");
+  assert.equal(posts.length, 2);
+  assert.equal(metricInserts.length + metricUpdates.length, 0);
 } else if (scenario === "mention-after-leave") {
   await handleSlackControl("leave", { thread: binding.thread, resolveSession: async () => originalSession });
   await message("unmentioned follow-up");
@@ -578,4 +749,15 @@ describe("Slack native channel boundaries", () => {
     runSlackChannel("working-reaction-blocked"));
   test("reaction API failures don't block or break the turn", () =>
     runSlackChannel("working-reaction-errors"));
+});
+
+describe("Slack bot metrics", () => {
+  test("records mentions, thread replies and DMs, but not controls or bot messages", () =>
+    runSlackChannel("metrics-triggers"));
+  test("records mentions in channels the workspace has not enabled as blocked", () =>
+    runSlackChannel("metrics-blocked"));
+  test("records each turn's outcome, tools and first reply time", () =>
+    runSlackChannel("metrics-turns"));
+  test("keeps answering when the metrics database is down", () =>
+    runSlackChannel("metrics-db-down"));
 });

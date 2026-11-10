@@ -1,3 +1,4 @@
+import type { SLACK_AGENT_REQUEST_TRIGGERS } from "@notra/db/constants/slack-agent";
 import type { SlackMentionResult } from "eve/channels/slack";
 
 import type { VerifiedSessionAuth } from "./auth";
@@ -58,7 +59,20 @@ export type SlackSessionSender = NonNullable<
   NonNullable<SlackMentionResult>["session"]
 >;
 
+export type SlackRequestTrigger = (typeof SLACK_AGENT_REQUEST_TRIGGERS)[number];
+
+export type SlackTurnOutcome = "completed" | "failed" | "cancelled";
+
+export interface SlackTurnMetrics {
+  turnId: string;
+  messageTs: string | null;
+  startedAt: number;
+  firstResponseAt?: number;
+  toolNames: string[];
+}
+
 export interface NotraSlackStateExtras {
+  notraTurnMetrics?: SlackTurnMetrics;
   notraWorkingReactionKeys?: string[];
   notraChartFailureTurnId?: string;
   notraChartFailureIsPermission?: boolean;

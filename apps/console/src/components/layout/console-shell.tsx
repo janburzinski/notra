@@ -11,6 +11,7 @@ import {
   Robot01Icon,
   SecurityCheckIcon,
   Shield01Icon,
+  SlackIcon,
   Tick02Icon,
   UnfoldMoreIcon,
   UserSwitchIcon,
@@ -210,6 +211,11 @@ function ConsoleNavigation({
             icon: Shield01Icon,
           },
           { href: `/${slug}/autopilot`, label: "Autopilot", icon: Robot01Icon },
+          {
+            href: `/${slug}/slack-bot`,
+            label: "Slack Bot",
+            icon: SlackIcon,
+          },
           {
             href: `/${slug}/free-scans`,
             label: "Free Scans",

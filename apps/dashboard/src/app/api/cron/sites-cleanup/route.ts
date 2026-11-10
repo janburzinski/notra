@@ -1,6 +1,12 @@
 import { ABUSE_ACTION_RETENTION_DAYS } from "@notra/db/constants/abuse";
+import { SLACK_AGENT_REQUEST_RETENTION_DAYS } from "@notra/db/constants/slack-agent";
 import { db } from "@notra/db/drizzle";
-import { abuseActions, sites, siteWebhookDeliveries } from "@notra/db/schema";
+import {
+  abuseActions,
+  sites,
+  siteWebhookDeliveries,
+  slackAgentRequests,
+} from "@notra/db/schema";
 import { cleanupSiteDeployments } from "@notra/sites-server/cleanup";
 import { mapWithConcurrency } from "@notra/sites-server/utils/concurrency";
 import { isDemoMode } from "@notra/utils/demo-mode";
@@ -48,6 +54,14 @@ export async function GET(request: Request) {
       lt(
         abuseActions.createdAt,
         sql`now() - make_interval(days => ${ABUSE_ACTION_RETENTION_DAYS})`
+      )
+    );
+  await db
+    .delete(slackAgentRequests)
+    .where(
+      lt(
+        slackAgentRequests.createdAt,
+        sql`now() - make_interval(days => ${SLACK_AGENT_REQUEST_RETENTION_DAYS})`
       )
     );
   const importUploads = await sweepImportUploads().catch((error) => {

@@ -129,18 +129,19 @@ export async function offerSavedTweetPublishing(
   postId: string,
   callId: string,
   requestedBy: string | undefined
-) {
+): Promise<boolean> {
   const post = await db.query.posts.findFirst({
     where: and(eq(posts.id, postId), eq(posts.organizationId, organizationId)),
     columns: { markdown: true },
   });
   if (!post?.markdown) {
-    return;
+    return false;
   }
   await channel.thread.post(post.markdown);
   await channel.thread.post(
     await createTwitterDraftPost(post.markdown, callId, channel, requestedBy)
   );
+  return true;
 }
 
 export async function handleSlackInputRequested(

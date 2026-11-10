@@ -88,6 +88,10 @@ import {
 } from "./constants/scheduled-publications";
 import { SITE_JOB_KINDS, SITE_JOB_STATUSES } from "./constants/sites";
 import {
+  SLACK_AGENT_REQUEST_STATUSES,
+  SLACK_AGENT_REQUEST_TRIGGERS,
+} from "./constants/slack-agent";
+import {
   WORKFLOW_RUN_NODE_STATUSES,
   WORKFLOW_RUN_STATUSES,
 } from "./constants/workflows";
@@ -677,6 +681,58 @@ export const slackIntegrations = pgTable(
     index("slackIntegrations_organizationId_idx").on(table.organizationId),
     index("slackIntegrations_createdByUserId_idx").on(table.createdByUserId),
     uniqueIndex("slackIntegrations_teamId_uidx").on(table.slackTeamId),
+  ]
+);
+
+/** One row per Slack message the Notra agent was asked to handle. */
+export const slackAgentRequests = pgTable(
+  "slack_agent_requests",
+  {
+    id: text("id").primaryKey(),
+    organizationId: text("organization_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "cascade" }),
+    slackTeamId: text("slack_team_id").notNull(),
+    channelId: text("channel_id").notNull(),
+    threadTs: text("thread_ts").notNull(),
+    messageTs: text("message_ts").notNull(),
+    slackUserId: text("slack_user_id"),
+    trigger: text("trigger", { enum: SLACK_AGENT_REQUEST_TRIGGERS }).notNull(),
+    status: text("status", { enum: SLACK_AGENT_REQUEST_STATUSES })
+      .notNull()
+      .default("pending"),
+    sessionId: text("session_id"),
+    turnId: text("turn_id"),
+    toolNames: text("tool_names")
+      .array()
+      .default(sql`'{}'::text[]`)
+      .notNull(),
+    errorCode: text("error_code"),
+    sentAt: timestamp("sent_at").notNull(),
+    startedAt: timestamp("started_at"),
+    firstResponseAt: timestamp("first_response_at"),
+    finishedAt: timestamp("finished_at"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    uniqueIndex("slackAgentRequests_team_channel_message_uidx").on(
+      table.slackTeamId,
+      table.channelId,
+      table.messageTs
+    ),
+    index("slackAgentRequests_createdAt_idx").on(table.createdAt),
+    index("slackAgentRequests_org_createdAt_idx").on(
+      table.organizationId,
+      table.createdAt
+    ),
+    check(
+      "slack_agent_requests_trigger_check",
+      sql`${table.trigger} IN ('mention', 'direct_message', 'thread_reply')`
+    ),
+    check(
+      "slack_agent_requests_status_check",
+      sql`${table.status} IN ('blocked', 'pending', 'completed', 'failed', 'cancelled')`
+    ),
   ]
 );
 
