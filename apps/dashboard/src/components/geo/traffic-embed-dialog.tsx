@@ -435,65 +435,67 @@ export function TrafficEmbedDialog({
 
   return (
     <ResponsiveDialog onOpenChange={onOpenChange} open={open}>
-      <ResponsiveDialogContent className="sm:max-w-3xl">
-        <ResponsiveDialogHeader>
+      <ResponsiveDialogContent className="flex max-h-[85svh] flex-col overflow-hidden sm:max-w-2xl">
+        <ResponsiveDialogHeader className="shrink-0">
           <ResponsiveDialogTitle>{t("title")}</ResponsiveDialogTitle>
           <ResponsiveDialogDescription>
             {t("description")}
           </ResponsiveDialogDescription>
         </ResponsiveDialogHeader>
-        {embeds.length > 0 ? (
-          <div className="flex items-center gap-2">
-            {creating ? null : (
-              <Select
-                items={embedItems}
-                onValueChange={(next) => setSelectedId(next as string)}
-                value={selected?.id ?? null}
-              >
-                <SelectTrigger
-                  aria-label={t("embedLabel")}
-                  className="min-w-0 flex-1"
+        <div className="scrollbar-floating -mx-3 flex min-h-0 min-w-0 flex-col gap-4 overflow-y-auto px-3">
+          {embeds.length > 0 ? (
+            <div className="flex items-center gap-2">
+              {creating ? null : (
+                <Select
+                  items={embedItems}
+                  onValueChange={(next) => setSelectedId(next as string)}
+                  value={selected?.id ?? null}
                 >
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {embedItems.map((item) => (
-                    <SelectItem key={item.value} value={item.value}>
-                      {item.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            )}
-            <Button
-              className={creating ? "ml-auto" : undefined}
-              onClick={() => setCreating((current) => !current)}
-              size="sm"
-              type="button"
-              variant="outline"
-            >
-              {creating ? t("cancelNew") : t("new")}
-            </Button>
-          </div>
-        ) : null}
-        {showCreate ? (
-          <CreateEmbedForm
-            onCreated={(embed) => {
-              setSelectedId(embed.id);
-              setCreating(false);
-            }}
-            organizationId={organizationId}
-          />
-        ) : null}
-        {!showCreate && selected ? (
-          <EmbedDetails
-            embed={selected}
-            key={selected.id}
-            onRevoked={() => setSelectedId(null)}
-            organizationId={organizationId}
-          />
-        ) : null}
-        <ResponsiveDialogFooter>
+                  <SelectTrigger
+                    aria-label={t("embedLabel")}
+                    className="min-w-0 flex-1"
+                  >
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {embedItems.map((item) => (
+                      <SelectItem key={item.value} value={item.value}>
+                        {item.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+              <Button
+                className={creating ? "ml-auto" : undefined}
+                onClick={() => setCreating((current) => !current)}
+                size="sm"
+                type="button"
+                variant="outline"
+              >
+                {creating ? t("cancelNew") : t("new")}
+              </Button>
+            </div>
+          ) : null}
+          {showCreate ? (
+            <CreateEmbedForm
+              onCreated={(embed) => {
+                setSelectedId(embed.id);
+                setCreating(false);
+              }}
+              organizationId={organizationId}
+            />
+          ) : null}
+          {!showCreate && selected ? (
+            <EmbedDetails
+              embed={selected}
+              key={selected.id}
+              onRevoked={() => setSelectedId(null)}
+              organizationId={organizationId}
+            />
+          ) : null}
+        </div>
+        <ResponsiveDialogFooter className="shrink-0">
           <Button
             onClick={() => onOpenChange(false)}
             type="button"
