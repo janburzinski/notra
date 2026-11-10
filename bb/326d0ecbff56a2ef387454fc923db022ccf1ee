@@ -1,0 +1,28 @@
+apps/dashboard/src/types/geo.ts
+  ai_agent 944-947
+apps/dashboard/src/components/geo/engine-family-sheet.tsx
+  s_76523c7d05e2d3::t_b5a86226ebe5fd 20,39,41,73,75,91-94,97-103,124-133,156-157,176-178,208-216,218-249,267,269,272,278,283,322,334,340,345,378-391,397,412,512-515,517,522,529,531,537
+  s_76523c7d05e2d3::t_f019290d785b05 30
+apps/dashboard/messages/de.json
+  s_76523c7d05e2d3::t_b5a86226ebe5fd 2946-2947,2953
+apps/dashboard/messages/en.json
+  s_76523c7d05e2d3::t_b5a86226ebe5fd 2946-2947,2953
+apps/dashboard/src/utils/geo-prompts.ts
+  ai_agent 154-155
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "bb326d0ecbff56a2ef387454fc923db022ccf1ee",
+  "prompts": {},
+  "sessions": {
+    "s_76523c7d05e2d3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8eb4a2e6-caa1-4eb3-91a2-33a96d86aa5f",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
