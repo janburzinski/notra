@@ -223,6 +223,7 @@ function ImportConnectionRow({
   organizationId,
   canManage,
   onReconnect,
+  onUse,
 }: ImportConnectionRowProps) {
   const t = useTranslations("geo.analyticsImport.list");
   const format = useFormatter();
@@ -235,6 +236,7 @@ function ImportConnectionRow({
     }),
   });
   const needsReauth = connection.status === "reauth_required";
+  const usable = !needsReauth && onUse;
   const remove = (deleteImports: boolean) =>
     disconnect.mutateAsync({ connectionId: connection.id, deleteImports }).then(
       () => {
@@ -247,10 +249,29 @@ function ImportConnectionRow({
 
   return (
     // One line: accounts are upkeep, the imports above are the point.
-    <li className="flex items-center gap-3 px-3 py-2">
+    <li
+      className={cn(
+        "group/row flex items-center gap-3 px-3 py-2",
+        usable && "hover:bg-muted/50 relative transition-colors duration-150"
+      )}
+    >
       <ImportProviderMark provider={connection.provider} />
       <div className="flex min-w-0 flex-1 items-center gap-2">
-        <span className="shrink-0 text-sm font-medium">{connection.label}</span>
+        {usable ? (
+          // Covers the whole row, so the row starts an import with this account.
+          <button
+            className="focus-visible:after:ring-ring/50 shrink-0 cursor-pointer text-start text-sm font-medium outline-none after:absolute after:inset-0 group-first/row:after:rounded-t-xl group-last/row:after:rounded-b-xl focus-visible:after:ring-3 focus-visible:after:ring-inset"
+            onClick={() => onUse(connection)}
+            type="button"
+          >
+            {connection.label}
+            <span className="sr-only"> · {t("use")}</span>
+          </button>
+        ) : (
+          <span className="shrink-0 text-sm font-medium">
+            {connection.label}
+          </span>
+        )}
         {needsReauth ? (
           <StatusBadge
             appearance={{ variant: "warning" }}
@@ -269,6 +290,11 @@ function ImportConnectionRow({
             disabled={disconnect.isPending}
             label={t("actions", { name: connection.label })}
           >
+            {usable ? (
+              <DropdownMenuItem onClick={() => onUse(connection)}>
+                {t("use")}
+              </DropdownMenuItem>
+            ) : null}
             {needsReauth && onReconnect ? (
               <DropdownMenuItem onClick={() => onReconnect(connection)}>
                 {t("reconnect")}
@@ -306,6 +332,7 @@ export function ImportList({
   connections,
   onReconnect,
   onOpen,
+  onUse,
 }: ImportListProps) {
   const t = useTranslations("geo.analyticsImport.list");
 
@@ -335,6 +362,7 @@ export function ImportList({
                 connection={connection}
                 key={connection.id}
                 onReconnect={onReconnect}
+                onUse={onUse}
                 organizationId={organizationId}
               />
             ))}

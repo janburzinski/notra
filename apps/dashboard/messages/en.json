@@ -4756,7 +4756,6 @@
       "title": "Import history",
       "description": "Bring over daily totals from the tool you used before Notra.",
       "manageDescription": "Web analytics is off for this workspace, so new imports can't start. You can still delete imports and disconnect accounts.",
-      "privacy": "Only daily totals are imported, never IP addresses or single visits.",
       "back": "Back",
       "cta": {
         "title": "See your history from day one",
@@ -4937,6 +4936,7 @@
         "actions": "Actions for {name}",
         "open": "Show progress",
         "connectedOn": "Connected {date}",
+        "use": "Import with this account",
         "disconnect": "Disconnect",
         "disconnectAndDelete": "Disconnect and delete imports",
         "disconnected": "Disconnected",

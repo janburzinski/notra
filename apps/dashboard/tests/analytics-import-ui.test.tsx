@@ -185,6 +185,21 @@ if (!process.env.NOTRA_ANALYTICS_IMPORT_UI_TEST_WORKER) {
     expect(connect).not.toContain("Zone → Analytics → Read");
   });
 
+  test("a saved account starts a new import unless it needs a reconnect", () => {
+    const list = (status: "active" | "reauth_required") =>
+      render(
+        <ImportList
+          canManage
+          connections={[{ ...connection, status }]}
+          imports={[]}
+          onUse={() => undefined}
+          organizationId="org"
+        />
+      );
+    expect(list("active")).toContain("Import with this account");
+    expect(list("reauth_required")).not.toContain("Import with this account");
+  });
+
   test("the connect step lists Cloudflare's read permissions and reconnecting hides saved accounts", () => {
     const cloudflare = render(
       <ImportConnectStep

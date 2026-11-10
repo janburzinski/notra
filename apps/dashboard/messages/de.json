@@ -4756,7 +4756,6 @@
       "title": "Verlauf importieren",
       "description": "Übernimm die Tageswerte aus dem Tool, das du vor Notra genutzt hast.",
       "manageDescription": "Web-Analytics ist für diesen Workspace ausgeschaltet, deshalb können keine neuen Importe starten. Du kannst Importe trotzdem löschen und Konten trennen.",
-      "privacy": "Importiert werden nur Tageswerte, nie IP-Adressen oder einzelne Besuche.",
       "back": "Zurück",
       "cta": {
         "title": "Sieh deinen Verlauf ab dem ersten Tag",
@@ -4937,6 +4936,7 @@
         "actions": "Aktionen für {name}",
         "open": "Fortschritt anzeigen",
         "connectedOn": "Verbunden am {date}",
+        "use": "Mit diesem Konto importieren",
         "disconnect": "Trennen",
         "disconnectAndDelete": "Trennen und Importe löschen",
         "disconnected": "Verbindung getrennt",

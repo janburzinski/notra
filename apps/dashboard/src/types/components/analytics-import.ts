@@ -89,6 +89,8 @@ export interface ImportListProps {
   onReconnect?: (connection: AnalyticsImportConnectionSummary) => void;
   /** Opens a running import's progress. */
   onOpen?: (item: AnalyticsImportSummary) => void;
+  /** Starts a new import with a saved connection; omitted when imports can't start. */
+  onUse?: (connection: AnalyticsImportConnectionSummary) => void;
 }
 
 export interface ImportRowPartProps {
@@ -107,6 +109,7 @@ export interface ImportConnectionRowProps {
   organizationId: string;
   canManage: boolean;
   onReconnect?: (connection: AnalyticsImportConnectionSummary) => void;
+  onUse?: (connection: AnalyticsImportConnectionSummary) => void;
 }
 
 export interface ImportRowMenuProps {

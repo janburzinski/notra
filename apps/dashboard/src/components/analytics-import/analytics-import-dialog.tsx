@@ -106,6 +106,16 @@ export function AnalyticsImportDialog({
                         connectionId: connection.id,
                       })
               }
+              onUse={
+                manageOnly || !projectId
+                  ? undefined
+                  : (connection) =>
+                      setView({
+                        step: "source",
+                        provider: connection.provider,
+                        connectionId: connection.id,
+                      })
+              }
               organizationId={organizationId}
             />
           ) : null}
