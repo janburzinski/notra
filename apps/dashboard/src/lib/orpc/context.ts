@@ -32,7 +32,6 @@ export async function createORPCContext({
   return {
     headers,
     requestMemo,
-    session: null,
     user: null,
   };
 }

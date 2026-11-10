@@ -1,12 +1,10 @@
-import type { getServerSession } from "@/lib/auth/session";
+import type { getServerIdentity } from "@/lib/auth/session";
 
-export type AuthSession = Awaited<ReturnType<typeof getServerSession>>;
+export type AuthIdentity = Awaited<ReturnType<typeof getServerIdentity>>;
 
-export type User = NonNullable<
-  Awaited<ReturnType<typeof getServerSession>>["user"]
->;
+export type User = NonNullable<AuthIdentity["user"]>;
 
-export type AuthenticatedUser = NonNullable<AuthSession["user"]>;
+export type AuthenticatedUser = User;
 
 export interface OrganizationMembership {
   id: string;
@@ -17,7 +15,7 @@ export interface OrganizationMembership {
 export type LoadedMembership = OrganizationMembership & { userId: string };
 
 export interface OrganizationAuthDependencies {
-  getServerSession: typeof getServerSession;
+  getServerIdentity: typeof getServerIdentity;
   findMembership: (params: {
     organizationId: string;
     userId: string;

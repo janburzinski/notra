@@ -49,7 +49,6 @@ export const authorizedProcedure = baseProcedure.use(
     return next({
       context: {
         ...context,
-        session: auth.session,
         user: auth.user,
       },
     });

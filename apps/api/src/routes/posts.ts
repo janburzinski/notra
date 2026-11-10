@@ -712,27 +712,46 @@ postsRoutes.openapi(createPostGenerationRoute, async (c) => {
   };
 
   const targets = await runPostProgram(
-    Effect.all({
-      repositoryIds: resolveRequestedRepositoryIds(c.get("db"), orgId, {
-        integrations: requestedIntegrations,
-        github: body.pullRequest
-          ? {
-              repositories: [
-                { owner: body.pullRequest.owner, repo: body.pullRequest.repo },
-              ],
-            }
-          : body.github,
-      }),
-      linearIntegrationIds: resolveRequestedLinearIntegrationIds(
-        c.get("db"),
-        orgId,
-        { integrations: requestedIntegrations }
-      ),
-      resolvedBrandVoiceId: resolveRequestedBrandVoiceId(
-        c.get("db"),
-        orgId,
-        body.brandIdentityId ?? body.brandVoiceId
-      ),
+    Effect.gen(function* () {
+      const results = yield* Effect.all(
+        {
+          repositoryIds: resolveRequestedRepositoryIds(c.get("db"), orgId, {
+            integrations: requestedIntegrations,
+            github: body.pullRequest
+              ? {
+                  repositories: [
+                    {
+                      owner: body.pullRequest.owner,
+                      repo: body.pullRequest.repo,
+                    },
+                  ],
+                }
+              : body.github,
+          }),
+          linearIntegrationIds: resolveRequestedLinearIntegrationIds(
+            c.get("db"),
+            orgId,
+            { integrations: requestedIntegrations }
+          ),
+          resolvedBrandVoiceId: resolveRequestedBrandVoiceId(
+            c.get("db"),
+            orgId,
+            body.brandIdentityId ?? body.brandVoiceId
+          ),
+        },
+        { concurrency: "unbounded", mode: "result" }
+      );
+      // The lookups run together; report failures in this order so the
+      // error matches the one the serial lookups returned.
+      return {
+        repositoryIds: yield* Effect.fromResult(results.repositoryIds),
+        linearIntegrationIds: yield* Effect.fromResult(
+          results.linearIntegrationIds
+        ),
+        resolvedBrandVoiceId: yield* Effect.fromResult(
+          results.resolvedBrandVoiceId
+        ),
+      };
     })
   );
 

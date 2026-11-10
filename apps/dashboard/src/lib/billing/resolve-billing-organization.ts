@@ -5,7 +5,8 @@ import { eq } from "drizzle-orm";
 import { Effect } from "effect";
 
 import { AUTUMN_ORGANIZATION_HEADER } from "@/constants/billing";
-import type { AuthSessionData } from "@/types/auth/session";
+import { getAuthSession } from "@/lib/auth/server";
+import type { AuthIdentityData } from "@/types/auth/session";
 
 const findMemberOrganizationIdBySlug = Effect.fn(
   "billing.resolveOrganization.bySlug"
@@ -32,12 +33,14 @@ const findMemberOrganizationIdBySlug = Effect.fn(
 
 export async function resolveBillingOrganizationId(
   request: Request,
-  session: AuthSessionData
+  identity: AuthIdentityData
 ): Promise<string | null> {
   const requestedSlugHeader = request.headers.get(AUTUMN_ORGANIZATION_HEADER);
 
   if (requestedSlugHeader === null) {
-    return session.session.activeOrganizationId ?? null;
+    // Only requests without the header need the cookie-based active org.
+    const session = await getAuthSession();
+    return session?.session.activeOrganizationId ?? null;
   }
 
   const requestedSlug =
@@ -48,7 +51,7 @@ export async function resolveBillingOrganizationId(
   }
 
   return await Effect.runPromise(
-    findMemberOrganizationIdBySlug(requestedSlug.data, session.user.id).pipe(
+    findMemberOrganizationIdBySlug(requestedSlug.data, identity.user.id).pipe(
       Effect.catch(() => Effect.succeed(null))
     )
   );

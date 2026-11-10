@@ -223,30 +223,33 @@ export const deleteGeoProject = Effect.fn("geo.projectDelete")(function* (
   organizationId: string,
   projectId: string
 ) {
-  const [existingRows, projectCount] = yield* Effect.all([
-    geoDb("project lookup failed", () =>
-      db
-        .select({ websiteUrl: brandSettings.websiteUrl })
-        .from(projects)
-        .innerJoin(
-          brandSettings,
-          eq(projects.brandSettingsId, brandSettings.id)
-        )
-        .where(
-          and(
-            eq(projects.id, projectId),
-            eq(projects.organizationId, organizationId)
+  const [existingRows, projectCount] = yield* Effect.all(
+    [
+      geoDb("project lookup failed", () =>
+        db
+          .select({ websiteUrl: brandSettings.websiteUrl })
+          .from(projects)
+          .innerJoin(
+            brandSettings,
+            eq(projects.brandSettingsId, brandSettings.id)
           )
-        )
-        .limit(1)
-    ),
-    geoDb("projects count failed", () =>
-      db
-        .select({ count: count() })
-        .from(projects)
-        .where(eq(projects.organizationId, organizationId))
-    ),
-  ]);
+          .where(
+            and(
+              eq(projects.id, projectId),
+              eq(projects.organizationId, organizationId)
+            )
+          )
+          .limit(1)
+      ),
+      geoDb("projects count failed", () =>
+        db
+          .select({ count: count() })
+          .from(projects)
+          .where(eq(projects.organizationId, organizationId))
+      ),
+    ],
+    { concurrency: "unbounded" }
+  );
 
   const existing = existingRows.at(0);
   if (!existing) {

@@ -9,16 +9,16 @@ import { getTranslations } from "@/lib/i18n/server";
 import { getORPCRequestMemo } from "@/lib/orpc/context";
 import type {
   AuthenticatedUser,
-  AuthSession,
+  AuthIdentity,
   OrganizationAuth,
   OrganizationAuthDependencies,
 } from "@/types/auth/organization";
 import { recordAuthorizedOrganization } from "@/utils/rpc-telemetry";
 
-import { getServerSession } from "./session";
+import { getServerIdentity } from "./session";
 
 const organizationAuthDependencies: OrganizationAuthDependencies = {
-  getServerSession,
+  getServerIdentity,
   findMembership: async ({ organizationId, userId }) =>
     retryTransientDbError(() =>
       db.query.members.findFirst({
@@ -39,23 +39,23 @@ export async function assertAuthenticated(
   { headers }: { headers: Headers },
   deps: Pick<
     OrganizationAuthDependencies,
-    "getServerSession"
+    "getServerIdentity"
   > = organizationAuthDependencies
 ) {
   const memo = getORPCRequestMemo(headers);
-  let lookup = memo?.sessionLookup;
+  let lookup = memo?.identityLookup;
   if (!lookup) {
-    lookup = deps.getServerSession({ headers });
+    lookup = deps.getServerIdentity({ headers });
     if (memo) {
-      memo.sessionLookup = lookup;
+      memo.identityLookup = lookup;
       lookup.catch(() => {
-        memo.sessionLookup = undefined;
+        memo.identityLookup = undefined;
       });
     }
   }
-  const { session, user } = (await lookup) as AuthSession;
+  const { user } = (await lookup) as AuthIdentity;
 
-  if (!(session && user)) {
+  if (!user) {
     const tErrors = await getTranslations("errors.actions.organizations");
     throw new ORPCError("UNAUTHORIZED", {
       message: tErrors("signedOut"),
@@ -65,7 +65,7 @@ export async function assertAuthenticated(
   if (memo) {
     memo.authenticatedUserId = user.id;
   }
-  return { session, user };
+  return { user };
 }
 
 async function findMembershipMemoized(

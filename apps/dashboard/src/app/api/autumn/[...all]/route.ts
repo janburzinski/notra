@@ -1,6 +1,6 @@
 import { autumnHandler } from "autumn-js/fetch";
 
-import { getAuthSession } from "@/lib/auth/server";
+import { getAuthIdentity } from "@/lib/auth/server";
 import { prepareAutumnRequest } from "@/lib/billing/autumn-request";
 import { resolveBillingOrganizationId } from "@/lib/billing/resolve-billing-organization";
 import { createDevelopmentAutumnHandler } from "@/utils/development-autumn";
@@ -8,11 +8,11 @@ import { createDevelopmentAutumnHandler } from "@/utils/development-autumn";
 type RouteHandler = (request: Request) => Response | Promise<Response>;
 
 async function resolveCustomerId(request: Request) {
-  const session = await getAuthSession();
-  if (!session?.user) {
+  const identity = await getAuthIdentity();
+  if (!identity?.user) {
     return null;
   }
-  return resolveBillingOrganizationId(request, session);
+  return resolveBillingOrganizationId(request, identity);
 }
 
 const developmentHandler = createDevelopmentAutumnHandler(
@@ -23,13 +23,13 @@ const developmentHandler = createDevelopmentAutumnHandler(
 
 const autumnRouteHandler = autumnHandler({
   identify: async (request) => {
-    const session = await getAuthSession();
+    const identity = await getAuthIdentity();
 
-    if (!session?.user) {
+    if (!identity?.user) {
       return null;
     }
 
-    const customerId = await resolveBillingOrganizationId(request, session);
+    const customerId = await resolveBillingOrganizationId(request, identity);
 
     if (!customerId) {
       return null;
@@ -38,8 +38,8 @@ const autumnRouteHandler = autumnHandler({
     return {
       customerId,
       customerData: {
-        name: session.user.name,
-        email: session.user.email,
+        name: identity.user.name,
+        email: identity.user.email,
       },
     };
   },

@@ -844,17 +844,22 @@ export const createPostGeneration = Effect.fn("posts.createGeneration")(
 export const getPostGeneration = Effect.fn("posts.getGeneration")(function* (
   input: GetPostGenerationProgramInput
 ) {
-  const job = yield* database(() =>
-    getContentGenerationJob(input.redis, input.jobId)
+  // Read both together; the events only count once the job is this org's.
+  const [job, eventsResult] = yield* Effect.all(
+    [
+      database(() => getContentGenerationJob(input.redis, input.jobId)),
+      Effect.result(
+        database(() => listContentGenerationJobEvents(input.redis, input.jobId))
+      ),
+    ],
+    { concurrency: "unbounded" }
   );
 
   if (!job || job.organizationId !== input.organizationId) {
     return yield* new PostGenerationJobNotFoundError();
   }
 
-  const events = yield* database(() =>
-    listContentGenerationJobEvents(input.redis, input.jobId)
-  );
+  const events = yield* Effect.fromResult(eventsResult);
 
   return {
     job,

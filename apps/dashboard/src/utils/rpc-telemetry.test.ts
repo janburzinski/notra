@@ -47,8 +47,7 @@ const user: AuthenticatedUser = {
   marketingOptInPolicyVersion: null,
 };
 const deps: OrganizationAuthDependencies = {
-  getServerSession: () =>
-    Promise.resolve({ session: undefined, user: undefined }),
+  getServerIdentity: () => Promise.resolve({ user: undefined }),
   hasDatabaseUrl: () => true,
   findMembership: ({ organizationId }) =>
     Promise.resolve(

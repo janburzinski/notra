@@ -23,6 +23,7 @@ import {
 } from "@/constants/company-logo";
 import { trackServerEvent } from "@/lib/analytics/posthog-server";
 import { getChatAttachmentSizeBucket } from "@/lib/analytics/studio-events";
+import { getActiveOrganizationId } from "@/lib/auth/session";
 import { getTranslations } from "@/lib/i18n/server";
 import { authorizedProcedure } from "@/lib/orpc/base";
 import { getFileExtension } from "@/lib/upload/mime";
@@ -47,10 +48,9 @@ const TRAILING_SLASH_REGEX = /\/$/;
 
 async function requireActiveOrganizationMember(context: {
   headers: Headers;
-  session: { activeOrganizationId?: string | null } | null;
   user: { id: string };
 }): Promise<string> {
-  const orgId = context.session?.activeOrganizationId;
+  const orgId = await getActiveOrganizationId();
 
   if (!orgId) {
     throw unauthorized(
@@ -122,7 +122,7 @@ export const uploadRouter = {
         event: POSTHOG_EVENTS.CHAT_ATTACHMENT_UPLOADED,
         headers: context.headers,
         userId: context.user.id,
-        organizationId: context.session?.activeOrganizationId ?? null,
+        organizationId: await getActiveOrganizationId(),
         properties: {
           mime: input.mediaType,
           size_bucket: getChatAttachmentSizeBucket(input.size),

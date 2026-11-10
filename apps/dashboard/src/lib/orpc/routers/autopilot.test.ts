@@ -67,7 +67,6 @@ if (process.env.NOTRA_AUTOPILOT_ROUTER_TEST !== "1") {
   }));
   mock.module("@/lib/auth/organization", () => ({
     assertAuthenticated: async () => ({
-      session: {},
       user: { id: "user_fixture" },
     }),
     assertOrganizationAccess: async () => ({

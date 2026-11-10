@@ -27,6 +27,7 @@ import {
 } from "@/constants/attachments";
 import { GITHUB_CONTENT_MAX_SINGLE_ASSET_BYTES } from "@/constants/github";
 import { assertAuthenticated } from "@/lib/auth/organization";
+import { getActiveOrganizationId } from "@/lib/auth/session";
 import { getTranslations } from "@/lib/i18n/server";
 import type {
   UploadPresignedResponse,
@@ -61,8 +62,8 @@ async function assertUploadAccess({
   headers: Headers;
   type: UploadType;
 }) {
-  const { session, user } = await assertAuthenticated({ headers });
-  const organizationId = session.activeOrganizationId;
+  const { user } = await assertAuthenticated({ headers });
+  const organizationId = await getActiveOrganizationId();
 
   const requiresOrganization =
     type === "logo" ||

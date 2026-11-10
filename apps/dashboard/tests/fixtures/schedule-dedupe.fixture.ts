@@ -53,7 +53,6 @@ const body = createScheduleRequestSchema.parse({
 });
 const context: ORPCContext = {
   headers: new Headers(),
-  session: null,
   user: null,
   requestMemo: {
     authorizedOrganizationIds: new Set(),

@@ -1,8 +1,8 @@
-import type { getServerSession } from "@/lib/auth/session";
-import type { OrganizationMembership } from "@/types/auth/organization";
+import type {
+  AuthIdentity,
+  OrganizationMembership,
+} from "@/types/auth/organization";
 import type { GeoShelfMember } from "@/types/geo-shelf";
-
-type SessionData = Awaited<ReturnType<typeof getServerSession>>;
 
 export interface ORPCRequestMemo {
   authenticatedUserId?: string;
@@ -22,15 +22,14 @@ export interface ORPCRequestMemo {
   >;
   /**
    * React `cache()` does not memoize inside route handlers, so without this
-   * every procedure in a batch re-ran the WorkOS session read, the `users`
-   * lookup and the active-organization lookup.
+   * every procedure in a batch re-ran the WorkOS session read and the `users`
+   * lookup.
    */
-  sessionLookup?: Promise<SessionData>;
+  identityLookup?: Promise<AuthIdentity>;
 }
 
 export interface ORPCContext {
   headers: Headers;
   requestMemo: ORPCRequestMemo;
-  session: SessionData["session"] | null;
-  user: SessionData["user"] | null;
+  user: AuthIdentity["user"] | null;
 }

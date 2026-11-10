@@ -491,7 +491,11 @@ async function fetchReleasesPreview(params: {
       break;
     }
 
-    if (releases.length < GITHUB_API_PAGE_SIZE) {
+    // Later pages would only add results past the cap.
+    if (
+      releases.length < GITHUB_API_PAGE_SIZE ||
+      results.length >= GITHUB_API_MAX_RESULTS
+    ) {
       break;
     }
 
@@ -621,7 +625,11 @@ async function fetchCommitsPreview(params: {
       });
     }
 
-    if (commits.length < GITHUB_API_PAGE_SIZE) {
+    // Later pages would only add results past the cap.
+    if (
+      commits.length < GITHUB_API_PAGE_SIZE ||
+      results.length >= GITHUB_API_MAX_RESULTS
+    ) {
       break;
     }
 
@@ -1780,7 +1788,7 @@ export const contentRouter = {
         }
       );
 
-      const repositoryResults = await Promise.all(
+      const repositoryResultsPromise = Promise.all(
         validRepos.map(async (repository) => {
           let token: string | null = null;
 
@@ -1858,18 +1866,14 @@ export const contentRouter = {
         })
       );
 
-      const results = repositoryResults
-        .map((result) => {
-          failures.push(...result.failures);
-          return result.repository;
-        })
-        .filter(
-          (repository): repository is RepositoryPreview => repository !== null
-        );
-
-      let linearIntegrationPreviews: LinearIntegrationPreviewItem[] = [];
-
-      if (input.linearIntegrationIds && input.linearIntegrationIds.length > 0) {
+      const loadLinearPreviews = async (): Promise<
+        LinearIntegrationPreviewItem[]
+      > => {
+        if (
+          !(input.linearIntegrationIds && input.linearIntegrationIds.length > 0)
+        ) {
+          return [];
+        }
         const linearIntegrations = await getLinearIntegrationsByOrganization(
           input.organizationId
         );
@@ -1878,7 +1882,7 @@ export const contentRouter = {
           (i) => i.enabled && requestedIds.has(i.id)
         );
 
-        linearIntegrationPreviews = await Promise.all(
+        return await Promise.all(
           enabledIntegrations.map(async (integration) => {
             const empty = {
               integrationId: integration.id,
@@ -1922,7 +1926,22 @@ export const contentRouter = {
             }
           })
         );
-      }
+      };
+
+      // Linear needs nothing from GitHub, so both sources load together.
+      const [repositoryResults, linearIntegrationPreviews] = await Promise.all([
+        repositoryResultsPromise,
+        loadLinearPreviews(),
+      ]);
+
+      const results = repositoryResults
+        .map((result) => {
+          failures.push(...result.failures);
+          return result.repository;
+        })
+        .filter(
+          (repository): repository is RepositoryPreview => repository !== null
+        );
 
       return {
         repositories: results,

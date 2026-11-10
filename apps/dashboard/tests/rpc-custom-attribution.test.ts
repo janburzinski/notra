@@ -97,6 +97,7 @@ if (process.env.NOTRA_RPC_CUSTOM_ATTRIBUTION_TEST !== "1") {
     assertOrganizationAccessWithDeps,
   }));
   mock.module("@/lib/auth/server", () => ({
+    getAuthIdentity: async () => session,
     getAuthSession: async () => session,
   }));
   mock.module("@/lib/orpc/routers/user-account", () => ({
@@ -159,10 +160,7 @@ if (process.env.NOTRA_RPC_CUSTOM_ATTRIBUTION_TEST !== "1") {
           },
           {
             hasDatabaseUrl: () => true,
-            getServerSession: async () => ({
-              session: undefined,
-              user: undefined,
-            }),
+            getServerIdentity: async () => ({ user: undefined }),
             findMembership: membership,
           }
         );
@@ -238,10 +236,7 @@ if (process.env.NOTRA_RPC_CUSTOM_ATTRIBUTION_TEST !== "1") {
         },
         {
           hasDatabaseUrl: () => true,
-          getServerSession: async () => ({
-            session: undefined,
-            user: undefined,
-          }),
+          getServerIdentity: async () => ({ user: undefined }),
           findMembership: membership,
         }
       )
