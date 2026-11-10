@@ -1,4 +1,7 @@
-import type { AiTrafficResponse } from "@notra/geo-core/types/geo";
+import type {
+  AiTrafficResponse,
+  WebAnalyticsResponse,
+} from "@notra/geo-core/types/geo";
 
 export type TrafficEmbedRange = "7d" | "14d" | "30d" | "90d";
 
@@ -6,11 +9,15 @@ export type TrafficEmbedTheme = "light" | "dark" | "auto";
 
 export type TrafficEmbedPart = "metrics" | "chart";
 
+/** AI agent traffic or web visitors, matching the Analytics source tabs. */
+export type TrafficEmbedSource = "agents" | "web";
+
 export interface TrafficEmbedSummary {
   id: string;
   name: string;
   projectId: string | null;
   host: string | null;
+  source: TrafficEmbedSource;
   allowedOrigins: string[];
   createdAt: string;
 }
@@ -21,20 +28,28 @@ export interface TrafficEmbedConfig {
   organizationId: string;
   projectId: string | null;
   host: string | null;
+  source: TrafficEmbedSource;
   allowedOrigins: string[];
 }
 
-export interface PublicTrafficEmbed {
+/** The web summary an embed shows; no pages, sources or hosts leave Notra. */
+type PublicWebTraffic = Pick<
+  WebAnalyticsResponse,
+  "totals" | "points" | "imported"
+>;
+
+interface PublicTrafficEmbedBase {
   range: TrafficEmbedRange;
   from: string;
   to: string;
-  traffic: AiTrafficResponse;
 }
+
+export type PublicTrafficEmbed = PublicTrafficEmbedBase &
+  (
+    | { source: "agents"; traffic: AiTrafficResponse }
+    | { source: "web"; web: PublicWebTraffic }
+  );
 
 export type TrafficEmbedOriginResult =
   | { ok: true; origin: string }
   | { ok: false; value: string };
-
-export interface TrafficEmbedCreateFormValues {
-  origins: string[];
-}

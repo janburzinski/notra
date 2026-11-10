@@ -1,6 +1,7 @@
 "use client";
 
 import { GEO_TRAFFIC_OTHER_GROUP } from "@notra/geo-core/constants/geo";
+import type { AiTrafficResponse } from "@notra/geo-core/types/geo";
 import {
   toGeoTrafficPreviousTotals,
   trafficSparklineDays,
@@ -10,8 +11,12 @@ import { InstrumentEmpty } from "ui/card";
 import { useTranslations } from "use-intl";
 
 import { TrafficHero } from "@/components/geo/traffic-hero";
+import { WebTrafficHero } from "@/components/geo/web-traffic-hero";
 import { TRAFFIC_EMBED_RESIZE_MESSAGE } from "@/constants/traffic-embed";
-import type { PublicTrafficEmbed } from "@/types/traffic-embed";
+import type {
+  PublicTrafficEmbed,
+  TrafficEmbedPart,
+} from "@/types/traffic-embed";
 import { groupTrafficSources } from "@/utils/ai-traffic-groups";
 import { trafficEmbedParts } from "@/utils/traffic-embed";
 
@@ -43,20 +48,27 @@ function useReportHeight(embedId: string) {
   return ref;
 }
 
-export function AiTrafficEmbed({
-  embedId,
-  embed,
-  parts: partsParam,
+function EmbedEmpty({ message }: { message: string }) {
+  return (
+    <div className="border-shell-border bg-shell rounded-2xl border">
+      <InstrumentEmpty message={message} seed="geo-traffic-embed" />
+    </div>
+  );
+}
+
+function AgentsEmbedBody({
+  traffic,
+  from,
+  to,
+  parts,
 }: {
-  embedId: string;
-  embed: PublicTrafficEmbed;
-  parts: string | undefined;
+  traffic: AiTrafficResponse;
+  from: string;
+  to: string;
+  parts: TrafficEmbedPart[];
 }) {
   const tCommon = useTranslations("common");
   const t = useTranslations("geo.trafficEmbed");
-  const ref = useReportHeight(embedId);
-  const { traffic, from, to } = embed;
-  const parts = trafficEmbedParts(partsParam);
   const groups = useMemo(
     () =>
       groupTrafficSources(traffic.sources).map((group) =>
@@ -81,7 +93,7 @@ export function AiTrafficEmbed({
   const showEmpty = parts.includes("chart") && days.length === 0;
 
   return (
-    <div className="flex flex-col gap-2" ref={ref}>
+    <>
       {showMetrics || !showEmpty ? (
         <TrafficHero
           days={days}
@@ -93,18 +105,49 @@ export function AiTrafficEmbed({
           totals={traffic.totals}
         />
       ) : null}
-      {showEmpty ? (
-        <div className="border-shell-border bg-shell rounded-2xl border">
-          <InstrumentEmpty message={t("empty")} seed="geo-traffic-embed" />
-        </div>
-      ) : null}
+      {showEmpty ? <EmbedEmpty message={t("empty")} /> : null}
+    </>
+  );
+}
+
+/** Public traffic chart: AI agents or web visitors, as the embed was made. */
+export function AiTrafficEmbed({
+  embedId,
+  embed,
+  parts: partsParam,
+}: {
+  embedId: string;
+  embed: PublicTrafficEmbed;
+  parts: string | undefined;
+}) {
+  const t = useTranslations("geo.trafficEmbed");
+  const ref = useReportHeight(embedId);
+  const parts = trafficEmbedParts(partsParam);
+
+  return (
+    <div className="flex flex-col gap-2" ref={ref}>
+      {embed.source === "web" ? (
+        <WebTrafficHero
+          range={{ from: embed.from, to: embed.to }}
+          showChart={parts.includes("chart")}
+          showMetrics={parts.includes("metrics")}
+          web={embed.web}
+        />
+      ) : (
+        <AgentsEmbedBody
+          from={embed.from}
+          parts={parts}
+          to={embed.to}
+          traffic={embed.traffic}
+        />
+      )}
       <a
         className="text-muted-foreground hover:text-foreground self-end px-1 text-xs transition-colors"
         href="https://www.usenotra.com"
         rel="noopener"
         target="_blank"
       >
-        {t("poweredBy")}
+        {embed.source === "web" ? t("poweredByWeb") : t("poweredBy")}
       </a>
     </div>
   );

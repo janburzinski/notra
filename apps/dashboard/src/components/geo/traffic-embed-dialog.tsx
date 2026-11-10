@@ -9,6 +9,7 @@ import {
   ResponsiveDialogHeader,
   ResponsiveDialogTitle,
 } from "@notra/ui/components/shared/responsive-dialog";
+import { AgentPromptButton } from "@notra/ui/components/ui/agent-prompt-button";
 import {
   Field,
   FieldDescription,
@@ -21,33 +22,42 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@notra/ui/components/ui/select";
-import { useForm, useStore } from "@tanstack/react-form";
+import { Skeleton } from "@notra/ui/components/ui/skeleton";
+import { tween } from "@notra/ui/lib/motion";
+import { cn } from "@notra/ui/lib/utils";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useId, useRef, useState } from "react";
+import { domAnimation, LazyMotion, m, useReducedMotion } from "motion/react";
+import { type CSSProperties, useEffect, useId, useState } from "react";
 import { toast } from "sonner";
 import { useLocale, useTranslations } from "use-intl";
 
 import { AutopilotTagInput } from "@/components/autopilot/autopilot-tag-input";
 import { Button } from "@/components/button";
-import { CodeSnippet, CopyPromptButton } from "@/components/geo/code-snippet";
+import { CodeSnippet } from "@/components/geo/code-snippet";
 import { useGeoProjectScope } from "@/components/providers/geo-project-provider";
 import {
   TRAFFIC_EMBED_DEFAULT_HEIGHT,
   TRAFFIC_EMBED_DEFAULT_RANGE,
+  TRAFFIC_EMBED_PREVIEW_FRAME_CLASS,
+  TRAFFIC_EMBED_PREVIEW_REVEAL_FALLBACK_MS,
+  TRAFFIC_EMBED_PREVIEW_SCALE,
   TRAFFIC_EMBED_RANGES,
   TRAFFIC_EMBED_RESIZE_MESSAGE,
   TRAFFIC_EMBED_SANDBOX,
 } from "@/constants/traffic-embed";
+import { useAnimatedSize } from "@/lib/hooks/use-animated-size";
 import { useGeoTrafficHostQuery } from "@/lib/hooks/use-geo-traffic-host";
 import { useIsClient } from "@/lib/hooks/use-is-client";
+import { useWebAnalyticsFlag } from "@/lib/hooks/use-web-analytics-flag";
 import { dashboardOrpc } from "@/lib/orpc/query";
 import type {
-  TrafficEmbedCreateFormValues,
   TrafficEmbedPart,
   TrafficEmbedRange,
+  TrafficEmbedSource,
   TrafficEmbedSummary,
   TrafficEmbedTheme,
 } from "@/types/traffic-embed";
+import { toastCopyError } from "@/utils/copy-to-clipboard";
 import { toErrorMessage } from "@/utils/error-message";
 import {
   normalizeTrafficEmbedOrigin,
@@ -110,50 +120,106 @@ function OriginsField({
   );
 }
 
-/** The preview does what embed.js does on customer pages: fit the content. */
-function useEmbedPreviewHeight() {
-  const ref = useRef<HTMLIFrameElement>(null);
+/**
+ * The preview does what embed.js does on customer pages: fit the content.
+ * `ready` turns true once the current `src` has reported its height, so the
+ * frame can fade in instead of flashing a blank page. A page that never
+ * reports one, such as an error page, still shows shortly after it loads.
+ */
+function useEmbedPreviewHeight(src: string) {
+  const [frame, setFrame] = useState<HTMLIFrameElement | null>(null);
   const [height, setHeight] = useState(TRAFFIC_EMBED_DEFAULT_HEIGHT);
+  const [readySrc, setReadySrc] = useState<string | null>(null);
+  const [loadedSrc, setLoadedSrc] = useState<string | null>(null);
+  const ready = readySrc === src;
   useEffect(() => {
+    if (!frame) {
+      return;
+    }
     const onMessage = (event: MessageEvent) => {
       const data = event.data as { type?: unknown; height?: unknown } | null;
       if (
-        event.source === ref.current?.contentWindow &&
+        event.source === frame.contentWindow &&
         event.origin === window.location.origin &&
         data?.type === TRAFFIC_EMBED_RESIZE_MESSAGE &&
         typeof data.height === "number"
       ) {
         setHeight(Math.ceil(data.height));
+        setReadySrc(src);
       }
     };
     window.addEventListener("message", onMessage);
     return () => window.removeEventListener("message", onMessage);
-  }, []);
-  return { ref, height };
+  }, [frame, src]);
+  useEffect(() => {
+    if (ready || loadedSrc !== src) {
+      return;
+    }
+    const timer = window.setTimeout(
+      () => setReadySrc(src),
+      TRAFFIC_EMBED_PREVIEW_REVEAL_FALLBACK_MS
+    );
+    return () => window.clearTimeout(timer);
+  }, [ready, loadedSrc, src]);
+  return {
+    height,
+    ready,
+    frameRef: setFrame,
+    onLoad: () => setLoadedSrc(src),
+  };
+}
+
+/** One select in the preview options row; the values name themselves. */
+function OptionSelect<T extends string>({
+  label,
+  value,
+  items,
+  onChange,
+}: {
+  label: string;
+  value: T;
+  items: { value: T; label: string }[];
+  onChange: (value: T) => void;
+}) {
+  return (
+    <Select
+      items={items}
+      onValueChange={(next) => onChange(next as T)}
+      value={value}
+    >
+      <SelectTrigger aria-label={label} className="w-full">
+        <SelectValue />
+      </SelectTrigger>
+      <SelectContent>
+        {items.map((item) => (
+          <SelectItem key={item.value} value={item.value}>
+            {item.label}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+  );
 }
 
 function EmbedDetails({
   organizationId,
   embed,
-  onRevoked,
 }: {
   organizationId: string;
   embed: TrafficEmbedSummary;
-  onRevoked: () => void;
 }) {
+  const tCommon = useTranslations("common");
   const t = useTranslations("geo.trafficEmbed");
   const locale = useLocale();
   const queryClient = useQueryClient();
   const [origins, setOrigins] = useState(embed.allowedOrigins);
   // The last list the server confirmed, which a failed save restores.
   const [savedOrigins, setSavedOrigins] = useState(embed.allowedOrigins);
-  const [confirmRevoke, setConfirmRevoke] = useState(false);
   const [range, setRange] = useState<TrafficEmbedRange>(
     TRAFFIC_EMBED_DEFAULT_RANGE
   );
   const [theme, setTheme] = useState<TrafficEmbedTheme>("auto");
   const [layout, setLayout] = useState<EmbedLayout>("full");
-  const { ref: previewRef, height: previewHeight } = useEmbedPreviewHeight();
   const origin = useIsClient() ? window.location.origin : "";
   const src = origin
     ? trafficEmbedUrl(origin, embed.id, {
@@ -163,15 +229,18 @@ function EmbedDetails({
         locale,
       })
     : "";
-  const snippet = src ? trafficEmbedSnippet(origin, src, t("frameTitle")) : "";
+  const snippet = src
+    ? trafficEmbedSnippet(origin, src, t(`frameTitles.${embed.source}`))
+    : "";
   const prompt = snippet
     ? trafficEmbedAgentPrompt(origin, snippet, origins)
     : "";
-
-  const invalidate = () =>
-    queryClient.invalidateQueries({
-      queryKey: dashboardOrpc.trafficEmbeds.list.key(),
-    });
+  const {
+    height: previewHeight,
+    ready: previewReady,
+    frameRef,
+    onLoad: onPreviewLoad,
+  } = useEmbedPreviewHeight(src);
 
   // Each added or removed domain saves right away. The shared scope runs the
   // saves one after another, so an older list can't land after a newer one.
@@ -187,41 +256,15 @@ function EmbedDetails({
     onSuccess: async ({ embed: updated }) => {
       setSavedOrigins(updated.allowedOrigins);
       toast.success(t("saved"));
-      await invalidate();
+      await queryClient.invalidateQueries({
+        queryKey: dashboardOrpc.trafficEmbeds.list.key(),
+      });
     },
     onError: (error) => {
       setOrigins(savedOrigins);
       toast.error(toErrorMessage(error, t("saveFailed")));
     },
   });
-
-  const revoke = useMutation({
-    mutationFn: () =>
-      dashboardOrpc.trafficEmbeds.revoke.call({
-        organizationId,
-        embedId: embed.id,
-      }),
-    onSuccess: async () => {
-      setConfirmRevoke(false);
-      toast.success(t("revoked"));
-      onRevoked();
-      await invalidate();
-    },
-    onError: (error) => toast.error(toErrorMessage(error, t("revokeFailed"))),
-  });
-
-  const rangeItems = TRAFFIC_EMBED_RANGES.map((value) => ({
-    value,
-    label: t(`ranges.${value}`),
-  }));
-  const themeItems = (["auto", "light", "dark"] as const).map((value) => ({
-    value,
-    label: t(`themes.${value}`),
-  }));
-  const layoutItems = (["full", "chart", "metrics"] as const).map((value) => ({
-    value,
-    label: t(`layouts.${value}`),
-  }));
 
   return (
     <div className="flex min-w-0 flex-col gap-4">
@@ -236,274 +279,392 @@ function EmbedDetails({
         }}
         values={origins}
       />
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-        <Field>
-          <FieldLabel>{t("rangeLabel")}</FieldLabel>
-          <Select
-            items={rangeItems}
-            onValueChange={(next) => setRange(next as TrafficEmbedRange)}
+      <div className="flex flex-col gap-2">
+        <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+          <OptionSelect
+            items={TRAFFIC_EMBED_RANGES.map((value) => ({
+              value,
+              label: t(`ranges.${value}`),
+            }))}
+            label={t("rangeLabel")}
+            onChange={setRange}
             value={range}
-          >
-            <SelectTrigger aria-label={t("rangeLabel")}>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {rangeItems.map((item) => (
-                <SelectItem key={item.value} value={item.value}>
-                  {item.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </Field>
-        <Field>
-          <FieldLabel>{t("themeLabel")}</FieldLabel>
-          <Select
-            items={themeItems}
-            onValueChange={(next) => setTheme(next as TrafficEmbedTheme)}
+          />
+          <OptionSelect
+            items={(["auto", "light", "dark"] as const).map((value) => ({
+              value,
+              label: t(`themes.${value}`),
+            }))}
+            label={t("themeLabel")}
+            onChange={setTheme}
             value={theme}
-          >
-            <SelectTrigger aria-label={t("themeLabel")}>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {themeItems.map((item) => (
-                <SelectItem key={item.value} value={item.value}>
-                  {item.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </Field>
-        <Field>
-          <FieldLabel>{t("layoutLabel")}</FieldLabel>
-          <Select
-            items={layoutItems}
-            onValueChange={(next) => setLayout(next as EmbedLayout)}
+          />
+          <OptionSelect
+            items={(["full", "chart", "metrics"] as const).map((value) => ({
+              value,
+              label: t(`layouts.${value}`),
+            }))}
+            label={t("layoutLabel")}
+            onChange={setLayout}
             value={layout}
-          >
-            <SelectTrigger aria-label={t("layoutLabel")}>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {layoutItems.map((item) => (
-                <SelectItem key={item.value} value={item.value}>
-                  {item.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </Field>
+          />
+        </div>
+        <div
+          className="h-(--embed-preview-height) overflow-hidden"
+          style={
+            {
+              "--embed-preview-height": `${Math.ceil(previewHeight * TRAFFIC_EMBED_PREVIEW_SCALE)}px`,
+            } as CSSProperties
+          }
+        >
+          {src ? (
+            <iframe
+              className={cn(
+                TRAFFIC_EMBED_PREVIEW_FRAME_CLASS,
+                "duration-normal transition-opacity ease-out motion-reduce:transition-none",
+                previewReady ? "opacity-100" : "opacity-0"
+              )}
+              height={previewHeight}
+              onLoad={onPreviewLoad}
+              ref={frameRef}
+              sandbox={TRAFFIC_EMBED_SANDBOX}
+              src={src}
+              tabIndex={-1}
+              title={t("previewTitle")}
+            />
+          ) : null}
+        </div>
       </div>
-      {src ? (
-        <iframe
-          className="w-full"
-          height={previewHeight}
-          loading="lazy"
-          ref={previewRef}
-          sandbox={TRAFFIC_EMBED_SANDBOX}
-          src={src}
-          title={t("previewTitle")}
-        />
-      ) : null}
-      <section className="space-y-2">
-        <h3 className="text-sm font-medium">{t("snippetLabel")}</h3>
+      <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-center">
         <CodeSnippet
+          className="min-w-0 flex-1"
           code={snippet}
-          filename="HTML"
-          headerEnd={<CopyPromptButton disabled={!prompt} prompt={prompt} />}
+          label={t("snippetLabel")}
+          variant="command"
         />
-      </section>
-      <Button
-        className="self-start"
-        onClick={() => setConfirmRevoke(true)}
-        size="sm"
-        type="button"
-        variant="outline"
-      >
-        {t("revoke")}
-      </Button>
-      <ConfirmDialog
-        confirmLabel={t("revoke")}
-        description={t("revokeDescription")}
-        onConfirm={() => revoke.mutate()}
-        onOpenChange={setConfirmRevoke}
-        open={confirmRevoke}
-        pending={revoke.isPending}
-        title={t("revokeTitle")}
-        variant="destructive"
-      />
+        <AgentPromptButton
+          copiedLabel={tCommon("labels.promptCopied")}
+          disabled={!prompt}
+          label={tCommon("labels.copyAgentPrompt")}
+          onCopyError={toastCopyError}
+          prompt={prompt}
+        />
+      </div>
     </div>
   );
 }
 
+/** The create step; the dialog owns its state because its footer submits. */
 function CreateEmbedForm({
-  organizationId,
-  onCreated,
+  formId,
+  source,
+  origins,
+  showSource,
+  pending,
+  onSourceChange,
+  onOriginsChange,
+  onSubmit,
 }: {
-  organizationId: string;
-  onCreated: (embed: TrafficEmbedSummary) => void;
+  formId: string;
+  source: TrafficEmbedSource;
+  origins: string[];
+  showSource: boolean;
+  pending: boolean;
+  onSourceChange: (source: TrafficEmbedSource) => void;
+  onOriginsChange: (origins: string[]) => void;
+  onSubmit: () => void;
 }) {
   const t = useTranslations("geo.trafficEmbed");
-  const queryClient = useQueryClient();
-  const { projectId } = useGeoProjectScope();
-  const [host] = useGeoTrafficHostQuery();
-  const create = useMutation({
-    mutationFn: (origins: string[]) =>
-      dashboardOrpc.trafficEmbeds.create.call({
-        organizationId,
-        ...(projectId ? { projectId } : {}),
-        ...(host ? { host } : {}),
-        name: trafficEmbedName(origins),
-        allowedOrigins: origins,
-      }),
-    onSuccess: async ({ embed }) => {
-      toast.success(t("created"));
-      onCreated(embed);
-      await queryClient.invalidateQueries({
-        queryKey: dashboardOrpc.trafficEmbeds.list.key(),
-      });
-    },
-    onError: (error) => toast.error(toErrorMessage(error, t("createFailed"))),
-  });
-  const defaultValues: TrafficEmbedCreateFormValues = { origins: [] };
-  const form = useForm({
-    defaultValues,
-    onSubmit: ({ value }) => {
-      if (value.origins.length > 0 && !create.isPending) {
-        create.mutate(value.origins);
-      }
-    },
-  });
-  const origins = useStore(form.store, (state) => state.values.origins);
-
   return (
     <form
       className="flex flex-col gap-4"
+      id={formId}
       onSubmit={(event) => {
         event.preventDefault();
-        form.handleSubmit();
+        onSubmit();
       }}
     >
+      {showSource ? (
+        <OptionSelect
+          items={(["agents", "web"] as const).map((value) => ({
+            value,
+            label: t(`sources.${value}`),
+          }))}
+          label={t("sourceLabel")}
+          onChange={onSourceChange}
+          value={source}
+        />
+      ) : null}
       <OriginsField
-        disabled={create.isPending}
-        onChange={(next) => form.setFieldValue("origins", next)}
+        disabled={pending}
+        onChange={onOriginsChange}
         values={origins}
       />
-      <p className="text-muted-foreground text-sm">
-        {host ? t("scopeHost", { host }) : t("scopeAll")}
-      </p>
-      <Button
-        className="self-end"
-        disabled={origins.length === 0}
-        loading={create.isPending}
-        type="submit"
-      >
-        {t("create")}
-      </Button>
     </form>
+  );
+}
+
+/** Stands in for the create form while the embed list loads. */
+function EmbedDialogSkeleton() {
+  return (
+    <div aria-hidden className="flex flex-col gap-2">
+      <Skeleton className="h-5 w-32" />
+      <Skeleton className="h-9 w-full" />
+      <Skeleton className="h-4 w-3/4" />
+    </div>
   );
 }
 
 export function TrafficEmbedDialog({
   organizationId,
   open,
+  prefetch = false,
+  defaultSource,
   onOpenChange,
 }: {
   organizationId: string;
   open: boolean;
+  /** Loads the list before the dialog opens, so it opens at its final size. */
+  prefetch?: boolean;
+  /** The Analytics tab the dialog opened from. */
+  defaultSource: TrafficEmbedSource;
   onOpenChange: (open: boolean) => void;
 }) {
   const t = useTranslations("geo.trafficEmbed");
+  const queryClient = useQueryClient();
   const { projectId } = useGeoProjectScope();
+  const webFlag = useWebAnalyticsFlag();
+  const formId = useId();
+  const reduceMotion = useReducedMotion();
+  const { ref: bodyRef, size: bodySize } = useAnimatedSize();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [creating, setCreating] = useState(false);
+  const [draftOrigins, setDraftOrigins] = useState<string[]>([]);
+  // Null until picked, so it follows the tab the dialog opened from.
+  const [draftSource, setDraftSource] = useState<TrafficEmbedSource | null>(
+    null
+  );
+  const [confirmRevoke, setConfirmRevoke] = useState(false);
+  const [host] = useGeoTrafficHostQuery();
   const { data, isPending } = useQuery({
     ...dashboardOrpc.trafficEmbeds.list.queryOptions({
       input: { organizationId, ...(projectId ? { projectId } : {}) },
     }),
-    enabled: open && Boolean(organizationId),
+    enabled: (open || prefetch) && Boolean(organizationId),
   });
   const embeds = data?.embeds ?? [];
   const selected =
     embeds.find((embed) => embed.id === selectedId) ?? embeds[0] ?? null;
   const showCreate = !isPending && (creating || selected === null);
+  const showSource = webFlag.enabled;
   const embedItems = embeds.map((embed) => ({
     value: embed.id,
-    label: embed.name,
+    label: showSource
+      ? t("embedOption", {
+          name: embed.name,
+          source: t(`sources.${embed.source}`),
+        })
+      : embed.name,
   }));
+  const source = draftSource ?? (showSource ? defaultSource : "agents");
+
+  const resetDraft = () => {
+    setDraftOrigins([]);
+    setDraftSource(null);
+  };
+
+  const create = useMutation({
+    mutationFn: (origins: string[]) =>
+      dashboardOrpc.trafficEmbeds.create.call({
+        organizationId,
+        ...(projectId ? { projectId } : {}),
+        ...(host ? { host } : {}),
+        source,
+        name: trafficEmbedName(origins),
+        allowedOrigins: origins,
+      }),
+    onSuccess: async ({ embed }) => {
+      toast.success(t("created"));
+      setSelectedId(embed.id);
+      setCreating(false);
+      resetDraft();
+      await queryClient.invalidateQueries({
+        queryKey: dashboardOrpc.trafficEmbeds.list.key(),
+      });
+    },
+    onError: (error) => toast.error(toErrorMessage(error, t("createFailed"))),
+  });
+
+  const revoke = useMutation({
+    mutationFn: (embedId: string) =>
+      dashboardOrpc.trafficEmbeds.revoke.call({ organizationId, embedId }),
+    onSuccess: async () => {
+      setConfirmRevoke(false);
+      setSelectedId(null);
+      toast.success(t("revoked"));
+      await queryClient.invalidateQueries({
+        queryKey: dashboardOrpc.trafficEmbeds.list.key(),
+      });
+    },
+    onError: (error) => toast.error(toErrorMessage(error, t("revokeFailed"))),
+  });
+
+  const cancelCreate = () => {
+    resetDraft();
+    if (embeds.length > 0) {
+      setCreating(false);
+    } else {
+      onOpenChange(false);
+    }
+  };
+
+  let footer = (
+    <Button onClick={() => onOpenChange(false)} type="button" variant="outline">
+      {t("done")}
+    </Button>
+  );
+  if (showCreate) {
+    footer = (
+      <>
+        <Button onClick={cancelCreate} type="button" variant="outline">
+          {embeds.length > 0 ? t("cancelNew") : t("cancel")}
+        </Button>
+        <Button
+          disabled={draftOrigins.length === 0}
+          form={formId}
+          loading={create.isPending}
+          type="submit"
+        >
+          {t("create")}
+        </Button>
+      </>
+    );
+  } else if (selected) {
+    footer = (
+      <>
+        <Button
+          className="sm:mr-auto"
+          onClick={() => setConfirmRevoke(true)}
+          type="button"
+          variant="destructive"
+        >
+          {t("revoke")}
+        </Button>
+        {footer}
+      </>
+    );
+  }
 
   return (
-    <ResponsiveDialog onOpenChange={onOpenChange} open={open}>
-      <ResponsiveDialogContent className="flex max-h-[85svh] flex-col overflow-hidden sm:max-w-2xl">
+    <ResponsiveDialog
+      onOpenChange={(next) => {
+        if (!next) {
+          setCreating(false);
+          resetDraft();
+        }
+        onOpenChange(next);
+      }}
+      open={open}
+    >
+      {/* Anchored to the top, so a taller step grows down instead of moving
+          the whole dialog. On short screens only the body scrolls, so the
+          header and footer stay in view. */}
+      <ResponsiveDialogContent className="flex max-h-[85svh] flex-col overflow-hidden sm:top-[8svh] sm:max-h-[calc(92svh-1rem)] sm:max-w-2xl sm:translate-y-0">
         <ResponsiveDialogHeader className="shrink-0">
           <ResponsiveDialogTitle>{t("title")}</ResponsiveDialogTitle>
           <ResponsiveDialogDescription>
             {t("description")}
           </ResponsiveDialogDescription>
         </ResponsiveDialogHeader>
-        <div className="scrollbar-floating -mx-3 flex min-h-0 min-w-0 flex-col gap-4 overflow-y-auto px-3">
-          {embeds.length > 0 ? (
-            <div className="flex items-center gap-2">
-              {creating ? null : (
-                <Select
-                  items={embedItems}
-                  onValueChange={(next) => setSelectedId(next as string)}
-                  value={selected?.id ?? null}
-                >
-                  <SelectTrigger
-                    aria-label={t("embedLabel")}
-                    className="min-w-0 flex-1"
-                  >
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {embedItems.map((item) => (
-                      <SelectItem key={item.value} value={item.value}>
-                        {item.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              )}
-              <Button
-                className={creating ? "ml-auto" : undefined}
-                onClick={() => setCreating((current) => !current)}
-                size="sm"
-                type="button"
-                variant="outline"
-              >
-                {creating ? t("cancelNew") : t("new")}
-              </Button>
-            </div>
-          ) : null}
-          {showCreate ? (
-            <CreateEmbedForm
-              onCreated={(embed) => {
-                setSelectedId(embed.id);
-                setCreating(false);
-              }}
-              organizationId={organizationId}
-            />
-          ) : null}
-          {!showCreate && selected ? (
-            <EmbedDetails
-              embed={selected}
-              key={selected.id}
-              onRevoked={() => setSelectedId(null)}
-              organizationId={organizationId}
-            />
-          ) : null}
+        {/* Steps and the preview change height; the body eases between
+            them instead of jumping. */}
+        <div className="scrollbar-floating -mx-3 -my-1 flex min-h-0 min-w-0 flex-col overflow-y-auto px-3">
+          <LazyMotion features={domAnimation} strict>
+            <m.div
+              // react-doctor-disable-next-line react-doctor/no-layout-property-animation -- the body eases between two steps' heights, a short bounded change; a transform would squash the form
+              animate={{ height: bodySize?.height ?? "auto" }}
+              className="-mx-1 shrink-0 overflow-hidden"
+              initial={false}
+              transition={
+                reduceMotion ? { duration: 0 } : tween("normal", "emphasized")
+              }
+            >
+              <div className="flex flex-col gap-4 p-1" ref={bodyRef}>
+                {!showCreate && selected ? (
+                  <div className="flex items-center gap-2">
+                    <Select
+                      items={embedItems}
+                      onValueChange={(next) => setSelectedId(next as string)}
+                      value={selected.id}
+                    >
+                      <SelectTrigger
+                        aria-label={t("embedLabel")}
+                        className="min-w-0 flex-1"
+                      >
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {embedItems.map((item) => (
+                          <SelectItem key={item.value} value={item.value}>
+                            {item.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Button
+                      onClick={() => setCreating(true)}
+                      type="button"
+                      variant="outline"
+                    >
+                      {t("new")}
+                    </Button>
+                  </div>
+                ) : null}
+                {isPending ? <EmbedDialogSkeleton /> : null}
+                {showCreate ? (
+                  <CreateEmbedForm
+                    formId={formId}
+                    onOriginsChange={setDraftOrigins}
+                    onSourceChange={setDraftSource}
+                    onSubmit={() => {
+                      if (draftOrigins.length > 0 && !create.isPending) {
+                        create.mutate(draftOrigins);
+                      }
+                    }}
+                    origins={draftOrigins}
+                    pending={create.isPending}
+                    showSource={showSource}
+                    source={source}
+                  />
+                ) : null}
+                {!showCreate && selected ? (
+                  <EmbedDetails
+                    embed={selected}
+                    key={selected.id}
+                    organizationId={organizationId}
+                  />
+                ) : null}
+              </div>
+            </m.div>
+          </LazyMotion>
         </div>
         <ResponsiveDialogFooter className="shrink-0">
-          <Button
-            onClick={() => onOpenChange(false)}
-            type="button"
-            variant="outline"
-          >
-            {t("done")}
-          </Button>
+          {footer}
         </ResponsiveDialogFooter>
+        <ConfirmDialog
+          confirmLabel={t("revoke")}
+          description={t("revokeDescription")}
+          onConfirm={() => {
+            if (selected) {
+              revoke.mutate(selected.id);
+            }
+          }}
+          onOpenChange={setConfirmRevoke}
+          open={confirmRevoke}
+          pending={revoke.isPending}
+          title={t("revokeTitle")}
+          variant="destructive"
+        />
       </ResponsiveDialogContent>
     </ResponsiveDialog>
   );

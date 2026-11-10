@@ -2,6 +2,7 @@
 
 import { todayIsoDate } from "@notra/geo-core/utils/day-label";
 import { EChartsAreaChart } from "@notra/ui/components/evilcharts/charts/echarts-area-chart";
+import { cn } from "@notra/ui/lib/utils";
 import type { ChartConfig } from "@notra/ui/types/charts";
 import { useState } from "react";
 import { useLocale, useTranslations } from "use-intl";
@@ -28,7 +29,12 @@ import {
   webTrendShare,
 } from "@/utils/web-analytics";
 
-export function WebTrendChart({ web, traffic, range }: WebTrendChartProps) {
+export function WebTrendChart({
+  web,
+  traffic,
+  range,
+  className,
+}: WebTrendChartProps) {
   const t = useTranslations("geo.webVisitors");
   const locale = useLocale();
   const rows = buildWebTrendRows(
@@ -94,7 +100,7 @@ export function WebTrendChart({ web, traffic, range }: WebTrendChartProps) {
   return (
     <div
       aria-label={t("trendTitle")}
-      className={TRAFFIC_HERO_CHART_SURFACE_CLASS}
+      className={cn(TRAFFIC_HERO_CHART_SURFACE_CLASS, className)}
       role="group"
     >
       <EChartsAreaChart

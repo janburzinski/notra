@@ -57,6 +57,7 @@ export const trafficEmbedsRouter = {
         userId: context.user.id,
         name: input.name,
         host: input.host || null,
+        source: input.source,
         allowedOrigins: normalizeOrigins(input.allowedOrigins),
       });
       if (embed === "limit") {

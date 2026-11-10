@@ -4672,16 +4672,21 @@
       "importHistory": "Verlauf importieren"
     },
     "trafficEmbed": {
-      "title": "KI-Traffic-Chart einbetten",
-      "description": "Zeig diesen Chart auf deiner eigenen Website. Nur die Domains, die du hier einträgst, können ihn anzeigen.",
+      "title": "Traffic-Chart einbetten",
+      "description": "Zeig deinen Traffic auf deiner eigenen Website. Nur die Domains, die du erlaubst, können ihn anzeigen.",
       "embedLabel": "Embed",
       "new": "Neues Embed",
       "cancelNew": "Zurück zu den Embeds",
+      "cancel": "Abbrechen",
+      "embedOption": "{name} · {source}",
+      "sourceLabel": "Traffic",
+      "sources": {
+        "agents": "KI-Agenten",
+        "web": "Website-Besucher"
+      },
       "domainsLabel": "Erlaubte Domains",
       "domainsHint": "Drück nach jeder Domain Enter. Mit *.example.com sind alle Subdomains erlaubt.",
       "domainsRequired": "Mindestens eine Domain muss bleiben. Lösch das Embed, um den Chart zu entfernen.",
-      "scopeHost": "Zeigt den KI-Traffic von {host} in diesem Projekt.",
-      "scopeAll": "Zeigt den KI-Traffic aller Websites in diesem Projekt.",
       "create": "Embed erstellen",
       "created": "Embed erstellt",
       "createFailed": "Embed konnte nicht erstellt werden",
@@ -4701,9 +4706,9 @@
       },
       "themeLabel": "Design",
       "themes": {
-        "auto": "Wie System",
-        "light": "Hell",
-        "dark": "Dunkel"
+        "auto": "Systemdesign",
+        "light": "Helles Design",
+        "dark": "Dunkles Design"
       },
       "layoutLabel": "Anzeigen",
       "layouts": {
@@ -4712,11 +4717,15 @@
         "metrics": "Nur Zahlen"
       },
       "previewTitle": "Embed-Vorschau",
-      "frameTitle": "KI-Traffic",
+      "frameTitles": {
+        "agents": "KI-Traffic",
+        "web": "Website-Besucher"
+      },
       "empty": "In diesem Zeitraum gab es noch keinen KI-Traffic.",
       "snippetLabel": "Embed-Code",
       "done": "Fertig",
-      "poweredBy": "KI-Traffic von Notra"
+      "poweredBy": "KI-Traffic von Notra",
+      "poweredByWeb": "Analytics von Notra"
     },
     "competitorLostPrompts": {
       "title": "Wo du verlierst",

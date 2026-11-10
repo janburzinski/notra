@@ -4672,16 +4672,21 @@
       "importHistory": "Import history"
     },
     "trafficEmbed": {
-      "title": "Embed AI traffic chart",
-      "description": "Show this chart on your own site. Only the domains you list here can display it.",
+      "title": "Embed traffic chart",
+      "description": "Show your traffic on your own site. Only the domains you allow can display it.",
       "embedLabel": "Embed",
       "new": "New embed",
       "cancelNew": "Back to embeds",
+      "cancel": "Cancel",
+      "embedOption": "{name} · {source}",
+      "sourceLabel": "Traffic",
+      "sources": {
+        "agents": "AI agents",
+        "web": "Website visitors"
+      },
       "domainsLabel": "Allowed domains",
       "domainsHint": "Press Enter after each domain. *.example.com allows all subdomains.",
       "domainsRequired": "Keep at least one domain. To take the chart down, delete the embed.",
-      "scopeHost": "Shows AI traffic for {host} in this project.",
-      "scopeAll": "Shows AI traffic for all sites in this project.",
       "create": "Create embed",
       "created": "Embed created",
       "createFailed": "Couldn't create the embed",
@@ -4701,9 +4706,9 @@
       },
       "themeLabel": "Theme",
       "themes": {
-        "auto": "Match system",
-        "light": "Light",
-        "dark": "Dark"
+        "auto": "System theme",
+        "light": "Light theme",
+        "dark": "Dark theme"
       },
       "layoutLabel": "Show",
       "layouts": {
@@ -4712,11 +4717,15 @@
         "metrics": "Numbers only"
       },
       "previewTitle": "Embed preview",
-      "frameTitle": "AI traffic",
+      "frameTitles": {
+        "agents": "AI traffic",
+        "web": "Website visitors"
+      },
       "empty": "No AI traffic in this period yet.",
       "snippetLabel": "Embed code",
       "done": "Done",
-      "poweredBy": "AI traffic by Notra"
+      "poweredBy": "AI traffic by Notra",
+      "poweredByWeb": "Analytics by Notra"
     },
     "competitorLostPrompts": {
       "title": "Where you lose",

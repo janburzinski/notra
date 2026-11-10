@@ -148,7 +148,7 @@ export function hasWebAnalytics(
  * comparison would read "New", which says nothing.
  */
 export function hasPreviousWebPeriod(
-  web: WebAnalyticsResponse | undefined
+  web: Pick<WebAnalyticsResponse, "totals"> | undefined
 ): boolean {
   return (web?.totals.previousViews ?? 0) > 0;
 }

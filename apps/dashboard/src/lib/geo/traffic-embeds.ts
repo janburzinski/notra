@@ -3,6 +3,7 @@ import { db } from "@notra/db/drizzle";
 import { geoTrafficEmbeds, projects } from "@notra/db/schema";
 import { advisoryXactLock } from "@notra/db/utils/advisory-xact-lock";
 import { loadAiTraffic } from "@notra/geo-core/geo/programs";
+import { loadWebAnalytics } from "@notra/geo-core/geo/web-analytics";
 import { webHostFilter } from "@notra/geo-core/utils/geo-project-domains";
 import { Redis } from "@upstash/redis";
 import { and, count, desc, eq, isNull } from "drizzle-orm";
@@ -24,6 +25,7 @@ import type {
   PublicTrafficEmbed,
   TrafficEmbedConfig,
   TrafficEmbedRange,
+  TrafficEmbedSource,
   TrafficEmbedSummary,
 } from "@/types/traffic-embed";
 import { geoPresetRange } from "@/utils/geo-range";
@@ -125,6 +127,7 @@ const summaryColumns = {
   name: geoTrafficEmbeds.name,
   projectId: geoTrafficEmbeds.projectId,
   host: geoTrafficEmbeds.host,
+  source: geoTrafficEmbeds.source,
   allowedOrigins: geoTrafficEmbeds.allowedOrigins,
   createdAt: geoTrafficEmbeds.createdAt,
 };
@@ -134,6 +137,7 @@ function toSummary(row: {
   name: string;
   projectId: string | null;
   host: string | null;
+  source: TrafficEmbedSource;
   allowedOrigins: string[];
   createdAt: Date;
 }): TrafficEmbedSummary {
@@ -167,6 +171,7 @@ export async function createTrafficEmbed(input: {
   userId: string;
   name: string;
   host: string | null;
+  source: TrafficEmbedSource;
   allowedOrigins: string[];
 }): Promise<TrafficEmbedSummary | "limit" | null> {
   // The org lock serializes count + insert, so concurrent creates can't pass
@@ -212,6 +217,7 @@ export async function createTrafficEmbed(input: {
         createdByUserId: input.userId,
         name: input.name,
         host: input.host,
+        source: input.source,
         allowedOrigins: input.allowedOrigins,
       })
       .returning(summaryColumns);
@@ -291,6 +297,7 @@ async function lookupTrafficEmbedConfig(
       organizationId: geoTrafficEmbeds.organizationId,
       projectId: geoTrafficEmbeds.projectId,
       host: geoTrafficEmbeds.host,
+      source: geoTrafficEmbeds.source,
       allowedOrigins: geoTrafficEmbeds.allowedOrigins,
     })
     .from(geoTrafficEmbeds)
@@ -304,6 +311,54 @@ async function lookupTrafficEmbedConfig(
     TRAFFIC_EMBED_CONFIG_TTL_SECONDS
   );
   return row ?? null;
+}
+
+/**
+ * The series an embed shows. Web embeds keep only totals and the daily
+ * series, so pages, referrers and hosts never reach the public page.
+ */
+function loadEmbedData(
+  config: TrafficEmbedConfig,
+  range: TrafficEmbedRange,
+  window: { from: string; to: string }
+) {
+  const base = { range, ...window };
+  const scope = {
+    organizationId: config.organizationId,
+    ...(config.projectId ? { projectId: config.projectId } : {}),
+  };
+  if (config.source === "web") {
+    return loadWebAnalytics(
+      scope,
+      window,
+      config.host ?? undefined,
+      "",
+      undefined,
+      "summary",
+      { engagement: false }
+    ).pipe(
+      Effect.map(({ totals, points, imported }): PublicTrafficEmbed => ({
+        ...base,
+        source: "web",
+        web: { totals, points, imported: imported ?? null },
+      }))
+    );
+  }
+  return loadAiTraffic(
+    scope,
+    window,
+    webHostFilter(config.host ?? undefined),
+    "",
+    "",
+    undefined,
+    false
+  ).pipe(
+    Effect.map((traffic): PublicTrafficEmbed => ({
+      ...base,
+      source: "agents",
+      traffic,
+    }))
+  );
 }
 
 /** Null for unknown or revoked embeds. */
@@ -335,21 +390,11 @@ export async function loadPublicTrafficEmbed(
     return pending;
   }
   const load = Effect.runPromise(
-    loadAiTraffic(
-      {
-        organizationId: config.organizationId,
-        ...(config.projectId ? { projectId: config.projectId } : {}),
-      },
-      { from, to },
-      webHostFilter(config.host ?? undefined),
-      "",
-      "",
-      undefined,
-      false
-    ).pipe(Effect.provide(geoCoreDashboardLayer))
+    loadEmbedData(config, range, { from, to }).pipe(
+      Effect.provide(geoCoreDashboardLayer)
+    )
   )
-    .then(async (traffic) => {
-      const embed: PublicTrafficEmbed = { range, from, to, traffic };
+    .then(async (embed) => {
       await writeCache(key, embed, TRAFFIC_EMBED_DATA_TTL_SECONDS);
       return embed;
     })

@@ -37,7 +37,7 @@ export const TRAFFIC_EMBED_CONFIG_TTL_SECONDS = 30;
  */
 export const TRAFFIC_EMBED_CDN_TTL_SECONDS = 30;
 
-export const TRAFFIC_EMBED_CACHE_PREFIX = "cache:geo-traffic-embed:v1";
+export const TRAFFIC_EMBED_CACHE_PREFIX = "cache:geo-traffic-embed:v2";
 
 export const TRAFFIC_EMBED_REDIS_READ_TIMEOUT_MS = 300;
 
@@ -46,6 +46,19 @@ export const TRAFFIC_EMBED_REDIS_WRITE_TIMEOUT_MS = 1000;
 export const TRAFFIC_EMBED_RESIZE_MESSAGE = "notra:embed:resize";
 
 export const TRAFFIC_EMBED_DEFAULT_HEIGHT = 420;
+
+/**
+ * The dialog preview renders the embed at desktop width and shrinks it, so
+ * it shows the real layout without taking the whole dialog. Keep in step
+ * with `TRAFFIC_EMBED_PREVIEW_FRAME_CLASS`.
+ */
+export const TRAFFIC_EMBED_PREVIEW_SCALE = 0.6;
+
+export const TRAFFIC_EMBED_PREVIEW_FRAME_CLASS =
+  "block w-[calc(100%/0.6)] origin-top-left scale-[0.6]";
+
+/** Shows a preview that loaded without reporting its height, e.g. an error. */
+export const TRAFFIC_EMBED_PREVIEW_REVEAL_FALLBACK_MS = 800;
 
 /**
  * The page needs its own origin to hydrate; popups let the attribution link

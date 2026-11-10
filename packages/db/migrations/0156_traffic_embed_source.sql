@@ -1,0 +1,1 @@
+ALTER TABLE "geo_traffic_embeds" ADD COLUMN "source" text DEFAULT 'agents' NOT NULL;

@@ -16,10 +16,12 @@ import { AnalyticsImportDialog } from "@/components/analytics-import/analytics-i
 import { ImportActivityPill } from "@/components/analytics-import/import-activity-pill";
 import { Button } from "@/components/button";
 import { TrafficEmbedDialog } from "@/components/geo/traffic-embed-dialog";
+import { WEB_ANALYTICS_NAV_LINK } from "@/constants/geo-traffic-pages";
 import { useAnalyticsImports } from "@/lib/hooks/use-analytics-imports";
 import { useGeoActiveProject } from "@/lib/hooks/use-geo-active-project";
 import { useSettingsModal } from "@/lib/hooks/use-settings-modal";
 import { useWebAnalyticsFlag } from "@/lib/hooks/use-web-analytics-flag";
+import { usePathname } from "@/lib/navigation";
 import type { TrafficActionsMenuProps } from "@/types/geo";
 import { downloadTrafficCsv } from "@/utils/traffic-export";
 
@@ -32,7 +34,9 @@ export function TrafficActionsMenu({
   path,
 }: TrafficActionsMenuProps) {
   const t = useTranslations("geo.trafficExport");
+  const [menuOpen, setMenuOpen] = useState(false);
   const [embedOpen, setEmbedOpen] = useState(false);
+  const pathname = usePathname();
   const [importOpen, setImportOpen] = useState(false);
   const { openSettings } = useSettingsModal();
   const webFlag = useWebAnalyticsFlag();
@@ -52,7 +56,7 @@ export function TrafficActionsMenu({
           onOpen={() => setImportOpen(true)}
         />
       ) : null}
-      <DropdownMenu>
+      <DropdownMenu onOpenChange={setMenuOpen} open={menuOpen}>
         <DropdownMenuTrigger
           aria-label={t("more")}
           render={<Button size="icon" variant="secondary" />}
@@ -88,9 +92,13 @@ export function TrafficActionsMenu({
         </DropdownMenuContent>
       </DropdownMenu>
       <TrafficEmbedDialog
+        defaultSource={
+          pathname.includes(WEB_ANALYTICS_NAV_LINK) ? "web" : "agents"
+        }
         onOpenChange={setEmbedOpen}
         open={embedOpen}
         organizationId={organizationId}
+        prefetch={menuOpen}
       />
       {webFlag.enabled ? (
         <AnalyticsImportDialog

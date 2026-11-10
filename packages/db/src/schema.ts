@@ -1905,9 +1905,11 @@ export const geoSettings = pgTable(
 );
 
 /**
- * Public, read-only AI traffic charts that customers embed in an iframe. The
- * id is the publishable key in the embed URL; `allowedOrigins` become the
- * page's `frame-ancestors`, so only those sites can frame it.
+ * Public, read-only traffic charts that customers embed in an iframe. The id
+ * is the publishable key in the embed URL; `allowedOrigins` become the page's
+ * `frame-ancestors`, so only those sites can frame it. `source` picks AI
+ * agent traffic or web visitors; it is stored so the URL can't widen what an
+ * embed shows.
  */
 export const geoTrafficEmbeds = pgTable(
   "geo_traffic_embeds",
@@ -1924,6 +1926,10 @@ export const geoTrafficEmbeds = pgTable(
     }),
     name: text("name").notNull(),
     host: text("host"),
+    source: text("source")
+      .$type<"agents" | "web">()
+      .notNull()
+      .default("agents"),
     allowedOrigins: text("allowed_origins").array().notNull(),
     revokedAt: timestamp("revoked_at"),
     createdAt: timestamp("created_at").defaultNow().notNull(),

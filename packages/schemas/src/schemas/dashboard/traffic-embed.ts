@@ -28,6 +28,7 @@ export const createTrafficEmbedInputSchema =
   listTrafficEmbedsInputSchema.extend({
     name: embedNameSchema,
     host: z.string().trim().max(TRAFFIC_EMBED_HOST_MAX_LENGTH).optional(),
+    source: z.enum(["agents", "web"]).default("agents"),
     allowedOrigins: embedOriginsSchema,
   });
 

@@ -2020,11 +2020,29 @@ export interface WebSourcesCardProps {
   loading?: boolean;
 }
 
+/** What the visitors hero draws: totals and the daily series. */
+type WebTrafficSummary = Pick<
+  WebAnalyticsResponse,
+  "totals" | "points" | "imported"
+>;
+
 export interface WebTrendChartProps {
-  web: WebAnalyticsResponse;
+  web: WebTrafficSummary;
   /** Undefined leaves the AI agents series off the chart. */
   traffic: AiTrafficResponse | undefined;
   range?: GeoRangeQuery;
+  className?: string;
+}
+
+export interface WebTrafficHeroProps {
+  web: WebTrafficSummary;
+  /** AI crawler traffic: adds the AI agents metric and joins the chart. */
+  traffic?: AiTrafficResponse;
+  range?: GeoRangeQuery;
+  /** Visible time per view, shown only when the caller passes it. */
+  engagement?: WebEngagement;
+  showMetrics?: boolean;
+  showChart?: boolean;
 }
 
 export interface WebScriptReportsProps {
