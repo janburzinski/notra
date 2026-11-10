@@ -4791,6 +4791,14 @@
         "vercel": {
           "name": "Vercel Web Analytics",
           "description": "Seitenaufrufe und Besucher, bis zu 24 Monate zurück."
+        },
+        "rybbit": {
+          "name": "Rybbit",
+          "description": "Mit einem API-Schlüssel verbinden. Ab dem Standard-Tarif."
+        },
+        "databuddy": {
+          "name": "Databuddy",
+          "description": "Mit einem API-Schlüssel verbinden. Gesamte Historie, in jedem Tarif."
         }
       },
       "guide": "Das tust du in {provider}",
@@ -4822,7 +4830,9 @@
         "description": {
           "plausible": "Nutzt die Stats-API, die den Business-Tarif von Plausible erfordert.",
           "cloudflare": "KI-Crawler-Zugriffe der letzten 31 Tage und Seitenaufrufe aus Web Analytics für etwa 6 Monate.",
-          "vercel": "Hobby speichert 1 Monat, Pro 12 und Plus 24. UTM-Kampagnen erfordern Plus."
+          "vercel": "Hobby speichert 1 Monat, Pro 12 und Plus 24. UTM-Kampagnen erfordern Plus.",
+          "rybbit": "Nutzt die Rybbit-API, die ab dem Standard-Tarif verfügbar ist. Ein Import kann je nach Umfang mehr als einen Tag dauern.",
+          "databuddy": "Nutzt die Databuddy-API mit einem Schlüssel, der nur Daten lesen darf."
         },
         "existing": "Gespeicherte Verbindungen",
         "newConnection": "Oder neu verbinden",
@@ -4845,6 +4855,18 @@
             "firstDescription": "Beschränke ihn auf das Team, dem das Projekt gehört, und setze ein Ablaufdatum. Vercel-Tokens lassen sich nicht auf Lesezugriff beschränken, Notra liest damit nur Web Analytics.",
             "secondTitle": "Team-ID kopieren",
             "secondDescription": "Team Settings → General. Bei persönlichen Projekten überspringen."
+          },
+          "rybbit": {
+            "firstTitle": "Organisations-API-Schlüssel erstellen",
+            "firstDescription": "Einstellungen → Organisation → Organisations-API-Schlüssel.",
+            "secondTitle": "Nur auf Lesen beschränken",
+            "secondDescription": "Beschränke den Schlüssel auf den Bereich analytics:read."
+          },
+          "databuddy": {
+            "firstTitle": "API-Schlüssel erstellen",
+            "firstDescription": "Organisationseinstellungen → API keys → Create API key.",
+            "secondTitle": "Nur auf Lesen beschränken",
+            "secondDescription": "Wähle die Vorlage Analytics, die nur den Bereich read:data vergibt."
           }
         },
         "secretLabel": "API-Schlüssel",
@@ -4914,6 +4936,7 @@
         "chunks": {
           "month": "{done, number} von {total, plural, one {# Monat} other {# Monaten}}",
           "week": "{done, number} von {total, plural, one {# Woche} other {# Wochen}}",
+          "batch": "{done, number} von {total, plural, one {# Abschnitt} other {# Abschnitten}}",
           "part": "{done, number} von {total, plural, one {# Teil} other {# Teilen}}"
         },
         "queuedLine": "Startet gleich",

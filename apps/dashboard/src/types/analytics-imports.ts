@@ -12,10 +12,12 @@ import type {
 import type { Database } from "@notra/db/types/database";
 import type {
   CloudflareCredentials,
+  DatabuddyCredentials,
   GeoImportRecord,
   ImportDayRange,
   ImportKind,
   PlausibleCredentials,
+  RybbitCredentials,
   VercelCredentials,
   WebImportRecord,
 } from "@notra/geo-core/types/analytics-imports";
@@ -34,7 +36,15 @@ export type AnalyticsImportConnectionRow =
 export type AnalyticsImportCredentials =
   | ({ provider: "plausible" } & PlausibleCredentials)
   | ({ provider: "cloudflare" } & CloudflareCredentials)
-  | ({ provider: "vercel" } & VercelCredentials);
+  | ({ provider: "vercel" } & VercelCredentials)
+  | ({ provider: "rybbit" } & RybbitCredentials)
+  | ({ provider: "databuddy" } & DatabuddyCredentials);
+
+/** One request budget of a provider connection. */
+export interface ImportRateWindow {
+  requests: number;
+  windowSeconds: number;
+}
 
 export type AnalyticsImportChunkOutcome =
   | { status: "done" }
@@ -250,7 +260,7 @@ export type AnalyticsImportProgressPhase =
   | "deleted";
 
 /** What one chunk covers: a calendar month, a week (Vercel) or part of an export. */
-export type AnalyticsImportChunkUnit = "month" | "week" | "part";
+export type AnalyticsImportChunkUnit = "month" | "week" | "batch" | "part";
 
 export type AnalyticsImportChunkState =
   | "done"
@@ -295,6 +305,7 @@ export interface AnalyticsImportProgressMessage {
     | "stopped"
     | "chunks.month"
     | "chunks.week"
+    | "chunks.batch"
     | "chunks.part"
     | "period"
     | "queuedBehind"

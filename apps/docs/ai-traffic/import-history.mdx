@@ -1,7 +1,7 @@
 ---
 title: "Import your history"
 sidebarTitle: "Import your history"
-description: "Bring daily page views, sources and AI crawler hits from Plausible, Vercel Web Analytics or Cloudflare into Notra, so your charts start on day one."
+description: "Bring daily page views, sources and AI crawler hits from Plausible, Vercel Web Analytics, Cloudflare, Rybbit or Databuddy into Notra, so your charts start on day one."
 authors:
   - handle: dominik
 
@@ -32,6 +32,8 @@ Open **Settings → Tracking → Import history**, or **Import history** on the 
 | Cloudflare | AI crawler hits per page (GPTBot, ClaudeBot, PerplexityBot…) | What your plan keeps (Notra asks Cloudflare; often a week on Free, about a month on paid plans) | API token |
 | Cloudflare Web Analytics | Page views and visits per page, referrer, country, device, browser, OS | What your account keeps (about 6 months) | API token |
 | Vercel Web Analytics | Page views and visitors per page, referrer, country, device, browser, OS, UTM source | Hobby 1 month, Pro 12 months, Pro with Web Analytics Plus and Enterprise 24 months | Access token |
+| Rybbit | Daily visitors, visits, bounces and time on site; visits and page views per page, entry page, referrer, UTM source, country, device, browser, OS | Everything since the site started | Organization API key (Rybbit Standard plan or higher) |
+| Databuddy | Daily visitors, visits, bounces and time on site; page views and visitors per page, entry page, referrer, UTM source, country, device, browser, OS | Everything since the site started | API key (any Databuddy plan) |
 
 ## How imports fit with Notra's own data
 
@@ -39,7 +41,7 @@ Open **Settings → Tracking → Import history**, or **Import history** on the 
 - **A source is never imported twice for the same day.** Importing the same site or the same export again only adds the days that are still missing.
 - **Imports appear when they finish.** A running import stays hidden, so you never see a half-imported month. Large imports run in the background in small steps, newest days first; you can close the dialog, keep working and come back. If a source asks Notra to slow down, the import waits and continues where it stopped.
 - **Visitors are daily uniques.** Like Notra and Plausible, visitors over a range are the sum of each day's unique visitors.
-- **Some sources lack some metrics.** Vercel has no sessions or bounces, and Cloudflare Web Analytics has no unique visitors. Cloudflare numbers are sampled estimates. Those metrics read as zero for imported days.
+- **Some sources lack some metrics.** Vercel has no sessions or bounces, and Cloudflare Web Analytics has no unique visitors. Rybbit counts only visits per page, source, country, device, browser and OS, and Databuddy only visitors, so a breakdown shows whichever of the two the source has. Cloudflare numbers are sampled estimates. Other missing metrics read as zero for imported days.
 - **Filters by page keep imported page views.** Sources, campaigns and audience breakdowns can't be filtered by page for imported days, the same limit Plausible has.
 
 ## Import several sites
@@ -87,6 +89,22 @@ Paste the token in **Import history → Cloudflare**. Zones import AI crawler hi
 3. Choose **Vercel Web Analytics**, paste both, pick the project and start the import.
 
 Only production traffic is imported. Vercel returns the top 100 values per day for each breakdown, so page and referrer lists can add up to less than the daily total. UTM campaigns need Web Analytics Plus.
+
+## Rybbit
+
+1. In Rybbit, open **Settings → Organization → Organization API Keys** and create a key restricted to the `analytics:read` scope. Rybbit offers API keys on the Standard plan and higher.
+2. In Notra, choose **Rybbit**, paste the key and select **Connect**. Notra checks that the key can read analytics before saving it.
+3. Pick the site, check the domain and select **Check range**, then **Start import**.
+
+Notra reads three days per step: the daily totals plus the top 200 values per day for each breakdown. Rybbit allows 5,000 API requests a day on Standard (25,000 on Pro), shared by every key in your organization; Notra uses at most 4,000 of them, which covers about 16 months of history a day, and continues the next day where it stopped. Only Rybbit Cloud is supported.
+
+## Databuddy
+
+1. In Databuddy, open **[Organization settings → API keys](https://app.databuddy.cc/organizations/settings#api-keys)**, select **Create API key** and choose the **Analytics** preset, which only grants `read:data`. You can limit the key to the websites you want to import.
+2. In Notra, choose **Databuddy**, paste the key and select **Connect**.
+3. Pick the website, check the domain and select **Check range**, then **Start import**.
+
+Notra reads a week per request: the daily totals plus the top 200 values per day for each breakdown, using at most half of the 120 queries a minute Databuddy allows per key. Databuddy reports the median visit duration, so imported time on site is that median times the day's visits.
 
 ## Delete an import or disconnect
 

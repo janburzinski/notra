@@ -4,7 +4,9 @@ import {
 } from "@notra/db/utils/integration-encryption";
 import {
   cloudflareCredentialsSchema,
+  databuddyCredentialsSchema,
   plausibleCredentialsSchema,
+  rybbitCredentialsSchema,
   vercelCredentialsSchema,
 } from "@notra/geo-core/schemas/analytics-imports";
 
@@ -35,6 +37,10 @@ export function decryptImportCredentials(
       return { provider, ...cloudflareCredentialsSchema.parse(value) };
     case "vercel":
       return { provider, ...vercelCredentialsSchema.parse(value) };
+    case "rybbit":
+      return { provider, ...rybbitCredentialsSchema.parse(value) };
+    case "databuddy":
+      return { provider, ...databuddyCredentialsSchema.parse(value) };
     default:
       throw new Error("Unknown analytics import credentials");
   }
@@ -53,6 +59,16 @@ export function toImportCredentials(
       return {
         provider: "cloudflare",
         ...cloudflareCredentialsSchema.parse({ apiToken: input.secret }),
+      };
+    case "rybbit":
+      return {
+        provider: "rybbit",
+        ...rybbitCredentialsSchema.parse({ apiKey: input.secret }),
+      };
+    case "databuddy":
+      return {
+        provider: "databuddy",
+        ...databuddyCredentialsSchema.parse({ apiKey: input.secret }),
       };
     default:
       return {

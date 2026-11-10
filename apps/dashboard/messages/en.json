@@ -4791,6 +4791,14 @@
         "vercel": {
           "name": "Vercel Web Analytics",
           "description": "Page views and visitors, up to 24 months back."
+        },
+        "rybbit": {
+          "name": "Rybbit",
+          "description": "Connect an API key. Full history, Standard plan or higher."
+        },
+        "databuddy": {
+          "name": "Databuddy",
+          "description": "Connect an API key. Full history, every plan."
         }
       },
       "guide": "What to do in {provider}",
@@ -4822,7 +4830,9 @@
         "description": {
           "plausible": "Uses the Stats API, which needs Plausible's Business plan.",
           "cloudflare": "AI crawler hits for the last 31 days and Web Analytics page views for about 6 months.",
-          "vercel": "Hobby keeps 1 month of history, Pro 12 and Plus 24. UTM campaigns need Plus."
+          "vercel": "Hobby keeps 1 month of history, Pro 12 and Plus 24. UTM campaigns need Plus.",
+          "rybbit": "Uses the Rybbit API, which needs the Standard plan or higher. A long history can take more than a day to import.",
+          "databuddy": "Uses the Databuddy API with a key that can only read data."
         },
         "existing": "Saved connections",
         "newConnection": "Or add a new one",
@@ -4845,6 +4855,18 @@
             "firstDescription": "Scope it to the team that owns the project and set an expiration. Vercel tokens can't be limited to read-only, so Notra only ever reads Web Analytics with it.",
             "secondTitle": "Copy your team ID",
             "secondDescription": "Team Settings → General. Skip this for personal projects."
+          },
+          "rybbit": {
+            "firstTitle": "Create an organization API key",
+            "firstDescription": "Settings → Organization → Organization API Keys.",
+            "secondTitle": "Limit it to reading",
+            "secondDescription": "Restrict the key to the analytics:read scope."
+          },
+          "databuddy": {
+            "firstTitle": "Create an API key",
+            "firstDescription": "Organization settings → API keys → Create API key.",
+            "secondTitle": "Limit it to reading",
+            "secondDescription": "Choose the Analytics preset, which grants only the read:data scope."
           }
         },
         "secretLabel": "API key",
@@ -4914,6 +4936,7 @@
         "chunks": {
           "month": "{done, number} of {total, plural, one {# month} other {# months}}",
           "week": "{done, number} of {total, plural, one {# week} other {# weeks}}",
+          "batch": "{done, number} of {total, plural, one {# batch} other {# batches}}",
           "part": "{done, number} of {total, plural, one {# part} other {# parts}}"
         },
         "queuedLine": "Starts in a moment",

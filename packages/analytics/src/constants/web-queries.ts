@@ -55,6 +55,13 @@ export const WEB_IMPORTED_SESSIONS_GRAIN_SQL = `if({{String(path, '')}} = '', 't
 export const WEB_IMPORTED_SESSIONS_SQL =
   "ifNull(i.visits, ifNull(i.visitors, 0))";
 
+/**
+ * Imported visitors in a breakdown; providers that only count sessions per
+ * value (Rybbit, Cloudflare) fall back to visits so the row isn't zero.
+ */
+export const WEB_IMPORTED_BREAKDOWN_VISITORS_SQL =
+  "ifNull(i.visitors, ifNull(i.visits, 0))";
+
 export const WEB_OVERVIEW_COLUMNS = [
   "views",
   "previous_views",

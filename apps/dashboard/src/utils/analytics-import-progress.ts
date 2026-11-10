@@ -47,7 +47,11 @@ function importChunkUnit(
   if (provider === "plausible_csv") {
     return "part";
   }
-  return IMPORT_PROVIDERS[provider].maxChunkDays ? "week" : "month";
+  const { maxChunkDays } = IMPORT_PROVIDERS[provider];
+  if (!maxChunkDays) {
+    return "month";
+  }
+  return maxChunkDays === 7 ? "week" : "batch";
 }
 
 /**

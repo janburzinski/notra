@@ -4,12 +4,16 @@ export const ANALYTICS_IMPORT_PROVIDERS = [
   "vercel",
   "cloudflare",
   "cloudflare_rum",
+  "rybbit",
+  "databuddy",
 ] as const;
 
 export const ANALYTICS_IMPORT_CONNECTION_PROVIDERS = [
   "plausible",
   "vercel",
   "cloudflare",
+  "rybbit",
+  "databuddy",
 ] as const;
 
 export const ANALYTICS_IMPORT_CONNECTION_STATUSES = [

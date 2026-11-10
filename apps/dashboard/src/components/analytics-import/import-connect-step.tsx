@@ -41,7 +41,11 @@ function ImportSecretField({
         aria-describedby={errorId}
         aria-invalid={error ? true : undefined}
         aria-label={
-          provider === "plausible" ? t("secretLabel") : t("tokenLabel")
+          provider === "plausible" ||
+          provider === "rybbit" ||
+          provider === "databuddy"
+            ? t("secretLabel")
+            : t("tokenLabel")
         }
         autoComplete="off"
         id={id}
@@ -181,7 +185,9 @@ export function ImportConnectStep({
               plain
               index={3}
               title={
-                provider === "plausible"
+                provider === "plausible" ||
+                provider === "rybbit" ||
+                provider === "databuddy"
                   ? t("connect.pasteKey")
                   : t("connect.pasteToken")
               }

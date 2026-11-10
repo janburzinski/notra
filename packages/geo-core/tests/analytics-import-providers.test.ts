@@ -9,6 +9,8 @@ import {
   IMPORT_PROVIDERS,
   IMPORT_RATE_LIMITS,
   CLOUDFLARE_RUM_CHUNK_DAYS,
+  DATABUDDY_CHUNK_DAYS,
+  RYBBIT_CHUNK_DAYS,
   VERCEL_CHUNK_DAYS,
 } from "../src/constants/analytics-imports";
 import {
@@ -19,6 +21,11 @@ import {
   listCloudflareSources,
   previewCloudflareSource,
 } from "../src/imports/cloudflare";
+import {
+  fetchDatabuddyChunk,
+  listDatabuddyWebsites,
+  previewDatabuddyWebsite,
+} from "../src/imports/databuddy";
 import { rateLimitWaitSeconds, retryAfterSeconds } from "../src/imports/http";
 import {
   fetchPlausibleChunk,
@@ -35,6 +42,11 @@ import {
   toGeoImportedRow,
   toWebImportedRow,
 } from "../src/imports/rows";
+import {
+  fetchRybbitChunk,
+  listRybbitSites,
+  previewRybbitSite,
+} from "../src/imports/rybbit";
 import {
   fetchVercelChunk,
   listVercelProjects,
@@ -69,6 +81,8 @@ const CONTEXT: ImportRowContext = {
 const PLAUSIBLE = { apiKey: "key-1234567890" };
 const CLOUDFLARE = { apiToken: "token-12345678901234567890" };
 const VERCEL = { token: "vercel-token-1", teamId: "team_abc" };
+const RYBBIT = { apiKey: "rb_org_1234567890" };
+const DATABUDDY = { apiKey: "dbdy_1234567890abcdef" };
 const DAY = 86_400;
 
 interface Call {
@@ -1095,5 +1109,424 @@ describe("Vercel Web Analytics", () => {
       IMPORT_RATE_LIMITS.vercel.requests
     );
     expect(IMPORT_PROVIDERS.vercel.maxChunkDays).toBe(VERCEL_CHUNK_DAYS);
+  });
+});
+
+describe("Rybbit", () => {
+  test("lists the sites of every organization the key can read", async () => {
+    const { fetch, calls } = fakeFetch((call) =>
+      call.url.pathname === "/api/organizations"
+        ? Response.json([
+            {
+              id: "org_1",
+              name: "Acme",
+              sites: [{ id: "456", name: "Marketing", domain: "acme.com" }],
+            },
+            {
+              id: "org_2",
+              name: "Side",
+              sites: [{ siteId: 7, domain: "side.dev" }],
+            },
+          ])
+        : { data: [] }
+    );
+    expect(await listRybbitSites(RYBBIT, fetch)).toEqual([
+      expect.objectContaining({
+        ref: "456",
+        label: "Acme / Marketing",
+        host: "acme.com",
+        provider: "rybbit",
+      }),
+      expect.objectContaining({
+        ref: "7",
+        label: "Side / side.dev",
+        host: "side.dev",
+      }),
+    ]);
+    expect(calls[0]?.url.pathname).toBe("/api/organizations");
+    expect(calls[0]?.headers.get("authorization")).toBe(
+      "Bearer rb_org_1234567890"
+    );
+    expect(calls[1]?.url.pathname).toBe("/api/sites/456/overview/time-series");
+  });
+
+  test("a key without analytics:read fails at connect", async () => {
+    const { fetch } = fakeFetch((call) =>
+      call.url.pathname === "/api/organizations"
+        ? Response.json([
+            { id: "org_1", sites: [{ id: "456", domain: "acme.com" }] },
+          ])
+        : Response.json({ error: "Insufficient scope" }, { status: 403 })
+    );
+    await expect(listRybbitSites(RYBBIT, fetch)).rejects.toBeInstanceOf(
+      ImportAuthError
+    );
+  });
+
+  test("a changed response shape fails instead of importing zeros", async () => {
+    const { fetch } = fakeFetch(() => ({
+      data: [{ time: "2026-09-01 00:00:00", pageviews: "many" }],
+    }));
+    await expect(
+      fetchRybbitChunk(
+        RYBBIT,
+        "456",
+        "example.com",
+        { start: "2026-09-01", end: "2026-09-01" },
+        fetch
+      )
+    ).rejects.toThrow();
+  });
+
+  test("a rejected key asks for a reconnect", async () => {
+    const { fetch } = fakeFetch(() =>
+      Response.json({ error: "Unauthorized" }, { status: 401 })
+    );
+    await expect(listRybbitSites(RYBBIT, fetch)).rejects.toBeInstanceOf(
+      ImportAuthError
+    );
+  });
+
+  test("a preview finds the first month with page views in one call", async () => {
+    const { fetch, calls } = fakeFetch(() => ({
+      data: [
+        { time: "2026-07-01 00:00:00", pageviews: 12, sessions: 4, users: 3 },
+        { time: "2026-05-01 00:00:00", pageviews: 0, sessions: 0, users: 0 },
+        { time: "2026-06-01 00:00:00", pageviews: 5, sessions: 2, users: 2 },
+      ],
+    }));
+    expect(await previewRybbitSite(RYBBIT, "456", "2026-11-05", fetch)).toEqual(
+      {
+        earliestDay: "2026-06-01",
+        pageviews: 17,
+        pageviewsByMonth: { "2026-05": 0, "2026-06": 5, "2026-07": 12 },
+      }
+    );
+    expect(calls).toHaveLength(1);
+    expect(calls[0]?.url.pathname).toBe("/api/sites/456/overview/time-series");
+    expect(calls[0]?.url.searchParams.get("bucket")).toBe("month");
+    expect(calls[0]?.url.searchParams.get("end_date")).toBe("2026-11-05");
+  });
+
+  test("reads daily totals in UTC and the top values per breakdown and day", async () => {
+    const { fetch, calls } = fakeFetch((call) => {
+      if (call.url.pathname.endsWith("/overview/time-series")) {
+        return {
+          data: [
+            {
+              time: "2026-09-01 00:00:00",
+              sessions: 40,
+              pageviews: 100,
+              users: 30,
+              bounce_rate: 25,
+              session_duration: 60,
+            },
+            {
+              time: "2026-09-02 00:00:00",
+              sessions: 0,
+              pageviews: 0,
+              users: 0,
+              bounce_rate: 0,
+              session_duration: 0,
+            },
+          ],
+        };
+      }
+      const parameter = call.url.searchParams.get("parameter");
+      let value = "/pricing";
+      if (parameter === "referrer") {
+        value = "chatgpt.com";
+      } else if (parameter === "utm_source") {
+        value = "";
+      }
+      return {
+        data: {
+          data: [{ value, count: 10, pageviews: 20, bounce_rate: 50 }],
+          totalCount: 1,
+        },
+      };
+    });
+    const records = await fetchRybbitChunk(
+      RYBBIT,
+      "456",
+      "example.com",
+      { start: "2026-09-01", end: "2026-09-02" },
+      fetch
+    );
+    expect(calls).toHaveLength(1 + 2 * 8);
+    for (const call of calls) {
+      expect(call.url.origin).toBe("https://app.rybbit.io");
+      expect(call.url.searchParams.get("time_zone")).toBe("UTC");
+    }
+    expect(
+      calls
+        .filter((call) => call.url.pathname.endsWith("/metric"))
+        .every((call) => call.url.searchParams.get("limit") === "200")
+    ).toBe(true);
+    expect(records.filter((record) => record.grain === "total")).toEqual([
+      {
+        grain: "total",
+        day: "2026-09-01",
+        host: "example.com",
+        pageviews: 100,
+        visitors: 30,
+        visits: 40,
+        bounces: 10,
+        visitDurationS: 2400,
+      },
+    ]);
+    expect(records.some((record) => record.grain === "campaign")).toBe(false);
+    expect(
+      records.find((record) => record.grain === "entry_page")
+    ).toMatchObject({
+      path: "/pricing",
+      visits: 10,
+      entrances: 10,
+      bounces: 5,
+    });
+    const source = records.find((record) => record.grain === "source");
+    expect(source).toBeDefined();
+    expect(
+      toWebImportedRow(source as WebImportRecord, {
+        ...CONTEXT,
+        provider: "rybbit",
+      })
+    ).toMatchObject({
+      referrer_group: "ai",
+      referrer_source: "chatgpt",
+      visits: 10,
+      pageviews: 20,
+    });
+  });
+
+  test("one chunk never needs more requests than one rate-limit window allows", async () => {
+    const { fetch, calls } = fakeFetch((call) =>
+      call.url.pathname.endsWith("/metric")
+        ? { data: { data: [] } }
+        : { data: [] }
+    );
+    await fetchRybbitChunk(
+      RYBBIT,
+      "456",
+      "example.com",
+      {
+        start: "2026-09-01",
+        end: addDays("2026-09-01", RYBBIT_CHUNK_DAYS - 1),
+      },
+      fetch
+    );
+    expect(calls.length).toBeLessThanOrEqual(
+      IMPORT_RATE_LIMITS.rybbit.requests
+    );
+    expect(IMPORT_PROVIDERS.rybbit.maxChunkDays).toBe(RYBBIT_CHUNK_DAYS);
+  });
+});
+
+/** Databuddy's batch answer: one result per query id, failures sorted last. */
+function databuddyAnswer(
+  call: Call,
+  rows: (name: string, day: string) => Record<string, unknown>[]
+) {
+  const parameters = (call.body as { parameters: { id: string }[] }).parameters;
+  return {
+    success: true,
+    data: parameters
+      .map(({ id }) => {
+        const [name = "", day = ""] = id.split(":");
+        return { parameter: id, success: true, data: rows(name, day) };
+      })
+      .reverse(),
+  };
+}
+
+describe("Databuddy", () => {
+  test("lists the websites the key can read and sends it as x-api-key", async () => {
+    const { fetch, calls } = fakeFetch(() => ({
+      success: true,
+      websites: [
+        {
+          id: "site_main",
+          name: "Marketing",
+          domain: "acme.com",
+          organizationName: "Acme",
+        },
+        {
+          id: "site_side",
+          name: null,
+          domain: "www.side.dev",
+          organizationName: "Side",
+        },
+      ],
+    }));
+    expect(await listDatabuddyWebsites(DATABUDDY, fetch)).toEqual([
+      expect.objectContaining({
+        ref: "site_main",
+        label: "Acme / Marketing",
+        host: "acme.com",
+        provider: "databuddy",
+      }),
+      expect.objectContaining({
+        ref: "site_side",
+        label: "Side / www.side.dev",
+      }),
+    ]);
+    expect(calls[0]?.url.href).toBe(
+      "https://api.databuddy.cc/v1/query/websites"
+    );
+    expect(calls[0]?.headers.get("x-api-key")).toBe(DATABUDDY.apiKey);
+  });
+
+  test("a key without read:data asks for a reconnect", async () => {
+    const { fetch } = fakeFetch(() =>
+      Response.json({ code: "AUTH_REQUIRED" }, { status: 401 })
+    );
+    await expect(
+      listDatabuddyWebsites(DATABUDDY, fetch)
+    ).rejects.toBeInstanceOf(ImportAuthError);
+  });
+
+  test("a preview finds the first day with page views in one call", async () => {
+    const { fetch, calls } = fakeFetch((call) =>
+      databuddyAnswer(call, () => [
+        { date: "2026-07-03", pageviews: 12, visitors: 4, sessions: 5 },
+        { date: "2026-06-14", pageviews: 5, visitors: 2, sessions: 2 },
+      ])
+    );
+    expect(
+      await previewDatabuddyWebsite(DATABUDDY, "site_main", "2026-11-05", fetch)
+    ).toEqual({
+      earliestDay: "2026-06-14",
+      pageviews: 17,
+      pageviewsByMonth: { "2026-06": 5, "2026-07": 12 },
+    });
+    expect(calls).toHaveLength(1);
+    expect(calls[0]?.url.searchParams.get("website_id")).toBe("site_main");
+    expect(calls[0]?.url.searchParams.get("timezone")).toBe("UTC");
+    expect(calls[0]?.body).toMatchObject({
+      startDate: "2015-01-01",
+      endDate: "2026-11-05",
+      parameters: [{ name: "events_by_date" }],
+    });
+  });
+
+  test("reads daily totals and every breakdown per day in one request", async () => {
+    const { fetch, calls } = fakeFetch((call) =>
+      databuddyAnswer(call, (name, day) => {
+        switch (name) {
+          case "totals":
+            return [
+              {
+                date: "2026-09-01",
+                pageviews: 100,
+                visitors: 30,
+                sessions: 40,
+                bounce_rate: 25,
+                median_session_duration: 60,
+              },
+            ];
+          case "entry_pages":
+            return [{ name: "/caf%C3%A9", pageviews: 8, visitors: 7 }];
+          case "top_referrers":
+            return [
+              {
+                name: "ChatGPT",
+                domain: "chatgpt.com",
+                pageviews: 6,
+                visitors: 3,
+              },
+            ];
+          case "country":
+            return [
+              { name: "DE", country_code: "DE", pageviews: 9, visitors: 4 },
+            ];
+          default:
+            return day === "2026-09-01"
+              ? [{ name: "/pricing", pageviews: 20, visitors: 10 }]
+              : [];
+        }
+      })
+    );
+    const records = await fetchDatabuddyChunk(
+      DATABUDDY,
+      "site_main",
+      "example.com",
+      { start: "2026-09-01", end: "2026-09-02" },
+      fetch
+    );
+    expect(calls).toHaveLength(1);
+    expect(calls[0]?.method).toBe("POST");
+    const body = calls[0]?.body as { parameters: unknown[] } | undefined;
+    expect(body?.parameters).toHaveLength(1 + 2 * 8);
+    expect(records.filter((record) => record.grain === "total")).toEqual([
+      {
+        grain: "total",
+        day: "2026-09-01",
+        host: "example.com",
+        pageviews: 100,
+        visitors: 30,
+        visits: 40,
+        bounces: 10,
+        visitDurationS: 2400,
+      },
+    ]);
+    expect(
+      records.find((record) => record.grain === "entry_page")
+    ).toMatchObject({ path: "/café", visits: 8, entrances: 8, visitors: 7 });
+    const source = records.find((record) => record.grain === "source");
+    expect(
+      toWebImportedRow(source as WebImportRecord, {
+        ...CONTEXT,
+        provider: "databuddy",
+      })
+    ).toMatchObject({
+      referrer_group: "ai",
+      referrer_source: "chatgpt",
+      visitors: 3,
+    });
+    expect(records.find((record) => record.grain === "page")).toMatchObject({
+      day: "2026-09-01",
+      path: "/pricing",
+      pageviews: 20,
+      visitors: 10,
+    });
+  });
+
+  test("a query Databuddy failed to run fails the chunk instead of importing nothing", async () => {
+    const { fetch } = fakeFetch((call) => {
+      const answer = databuddyAnswer(call, () => []);
+      const last = answer.data.at(-1);
+      if (last) {
+        last.success = false;
+      }
+      return answer;
+    });
+    await expect(
+      fetchDatabuddyChunk(
+        DATABUDDY,
+        "site_main",
+        "example.com",
+        { start: "2026-09-01", end: "2026-09-01" },
+        fetch
+      )
+    ).rejects.toBeInstanceOf(ImportProviderError);
+  });
+
+  test("a week is one request, well inside its rate-limit window", async () => {
+    const { fetch, calls } = fakeFetch((call) =>
+      databuddyAnswer(call, () => [])
+    );
+    await fetchDatabuddyChunk(
+      DATABUDDY,
+      "site_main",
+      "example.com",
+      {
+        start: "2026-09-01",
+        end: addDays("2026-09-01", DATABUDDY_CHUNK_DAYS - 1),
+      },
+      fetch
+    );
+    expect(calls).toHaveLength(1);
+    expect(IMPORT_RATE_LIMITS.databuddy.requests).toBeGreaterThan(1);
+    expect(IMPORT_PROVIDERS.databuddy.maxChunkDays).toBe(DATABUDDY_CHUNK_DAYS);
   });
 });

@@ -142,6 +142,20 @@ export interface VercelBreakdown {
   field: keyof WebImportRecord;
 }
 
+/** One Rybbit metric parameter and the record field its value fills. */
+export interface RybbitBreakdown {
+  grain: ImportWebGrain;
+  parameter: string;
+  field: keyof WebImportRecord;
+}
+
+/** One Databuddy query type and the record field its row name fills. */
+export interface DatabuddyBreakdown {
+  grain: ImportWebGrain;
+  query: string;
+  field: keyof WebImportRecord;
+}
+
 /** One Cloudflare Web Analytics query: its dimensions and the grains it feeds. */
 export interface CloudflareRumQuery {
   dimensions: Readonly<Partial<Record<string, WebImportDimension>>>;
@@ -231,6 +245,14 @@ export interface CloudflareCredentials {
 export interface VercelCredentials {
   token: string;
   teamId?: string;
+}
+
+export interface RybbitCredentials {
+  apiKey: string;
+}
+
+export interface DatabuddyCredentials {
+  apiKey: string;
 }
 
 export interface PlausibleCsvSummary {

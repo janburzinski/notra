@@ -23,6 +23,7 @@ import {
 } from "../../constants/geo-queries";
 import {
   WEB_AUDIENCE_VALUE_SQL,
+  WEB_IMPORTED_BREAKDOWN_VISITORS_SQL,
   WEB_IMPORTED_QUERY_PARAMS,
   WEB_IMPORTED_SESSIONS_GRAIN_SQL,
   WEB_IMPORTED_SESSIONS_SQL,
@@ -176,8 +177,8 @@ export const webOverview = defineEndpoint("web_overview", {
           sumIf(ifNull(i.visits, 0), grain = ${WEB_IMPORTED_SESSIONS_GRAIN_SQL} AND (${GEO_DAY_CURRENT_CONDITION})) AS sessions,
           sumIf(ifNull(i.visits, 0), grain = ${WEB_IMPORTED_SESSIONS_GRAIN_SQL} AND (${GEO_DAY_PREVIOUS_CONDITION})) AS previous_sessions,
           toUInt64(sumIf(ifNull(i.visits, 0) - least(ifNull(i.bounces, 0), ifNull(i.visits, 0)), grain = ${WEB_IMPORTED_SESSIONS_GRAIN_SQL} AND (${GEO_DAY_CURRENT_CONDITION}))) AS engaged_sessions,
-          sumIf(ifNull(i.visitors, 0), grain = 'source' AND referrer_group = 'ai' AND (${GEO_DAY_CURRENT_CONDITION})) AS ai_visitors,
-          sumIf(ifNull(i.visitors, 0), grain = 'source' AND referrer_group = 'ai' AND (${GEO_DAY_PREVIOUS_CONDITION})) AS previous_ai_visitors
+          sumIf(${WEB_IMPORTED_BREAKDOWN_VISITORS_SQL}, grain = 'source' AND referrer_group = 'ai' AND (${GEO_DAY_CURRENT_CONDITION})) AS ai_visitors,
+          sumIf(${WEB_IMPORTED_BREAKDOWN_VISITORS_SQL}, grain = 'source' AND referrer_group = 'ai' AND (${GEO_DAY_PREVIOUS_CONDITION})) AS previous_ai_visitors
         FROM web_imported_daily AS i
         ${WEB_IMPORTED_WHERE}
           ${GEO_PATH_SQL}
@@ -297,7 +298,7 @@ export const webPages = defineEndpoint("web_pages", {
           path,
           sumIf(i.pageviews, grain = 'page' AND (${GEO_DAY_CURRENT_CONDITION})) AS views,
           sumIf(i.pageviews, grain = 'page' AND (${GEO_DAY_PREVIOUS_CONDITION})) AS previous_views,
-          sumIf(ifNull(i.visitors, 0), grain = 'page' AND (${GEO_DAY_CURRENT_CONDITION})) AS visitors,
+          sumIf(${WEB_IMPORTED_BREAKDOWN_VISITORS_SQL}, grain = 'page' AND (${GEO_DAY_CURRENT_CONDITION})) AS visitors,
           sumIf(ifNull(i.entrances, 0), grain = 'entry_page' AND (${GEO_DAY_CURRENT_CONDITION})) AS landings,
           toUInt64(0) AS ai_visitors
         FROM web_imported_daily AS i
@@ -395,7 +396,7 @@ export const webSources = defineEndpoint("web_sources", {
           any(i.ai_product) AS ai_product,
           sumIf(${WEB_IMPORTED_SESSIONS_SQL}, ${GEO_DAY_CURRENT_CONDITION}) AS sessions,
           sumIf(${WEB_IMPORTED_SESSIONS_SQL}, ${GEO_DAY_PREVIOUS_CONDITION}) AS previous_sessions,
-          sumIf(ifNull(i.visitors, 0), ${GEO_DAY_CURRENT_CONDITION}) AS visitors
+          sumIf(${WEB_IMPORTED_BREAKDOWN_VISITORS_SQL}, ${GEO_DAY_CURRENT_CONDITION}) AS visitors
         FROM web_imported_daily AS i
         ${WEB_IMPORTED_WHERE}
           AND NOT ${WEB_PATH_SET}
@@ -482,7 +483,7 @@ export const webUtm = defineEndpoint("web_utm", {
           ${WEB_UTM_VALUE_SQL} AS value,
           sumIf(${WEB_IMPORTED_SESSIONS_SQL}, ${GEO_DAY_CURRENT_CONDITION}) AS sessions,
           sumIf(${WEB_IMPORTED_SESSIONS_SQL}, ${GEO_DAY_PREVIOUS_CONDITION}) AS previous_sessions,
-          sumIf(ifNull(i.visitors, 0), ${GEO_DAY_CURRENT_CONDITION}) AS visitors
+          sumIf(${WEB_IMPORTED_BREAKDOWN_VISITORS_SQL}, ${GEO_DAY_CURRENT_CONDITION}) AS visitors
         FROM web_imported_daily AS i
         ${WEB_IMPORTED_WHERE}
           AND NOT ${WEB_PATH_SET}
@@ -562,8 +563,8 @@ export const webAudience = defineEndpoint("web_audience", {
       sql: `
         SELECT
           ${WEB_AUDIENCE_VALUE_SQL} AS value,
-          sumIf(ifNull(i.visitors, 0), ${GEO_DAY_CURRENT_CONDITION}) AS visitors,
-          sumIf(ifNull(i.visitors, 0), ${GEO_DAY_PREVIOUS_CONDITION}) AS previous_visitors,
+          sumIf(${WEB_IMPORTED_BREAKDOWN_VISITORS_SQL}, ${GEO_DAY_CURRENT_CONDITION}) AS visitors,
+          sumIf(${WEB_IMPORTED_BREAKDOWN_VISITORS_SQL}, ${GEO_DAY_PREVIOUS_CONDITION}) AS previous_visitors,
           sumIf(i.pageviews, ${GEO_DAY_CURRENT_CONDITION}) AS views
         FROM web_imported_daily AS i
         ${WEB_IMPORTED_WHERE}

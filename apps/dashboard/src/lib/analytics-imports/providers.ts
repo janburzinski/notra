@@ -6,10 +6,20 @@ import {
   previewCloudflareSource,
 } from "@notra/geo-core/imports/cloudflare";
 import {
+  fetchDatabuddyChunk,
+  listDatabuddyWebsites,
+  previewDatabuddyWebsite,
+} from "@notra/geo-core/imports/databuddy";
+import {
   fetchPlausibleChunk,
   listPlausibleSites,
   previewPlausibleSite,
 } from "@notra/geo-core/imports/plausible-api";
+import {
+  fetchRybbitChunk,
+  listRybbitSites,
+  previewRybbitSite,
+} from "@notra/geo-core/imports/rybbit";
 import {
   fetchVercelChunk,
   listVercelProjects,
@@ -43,6 +53,10 @@ export async function listImportSources(
       return await listPlausibleSites(credentials, fetchImpl);
     case "vercel":
       return await listVercelProjects(credentials, fetchImpl);
+    case "rybbit":
+      return await listRybbitSites(credentials, fetchImpl);
+    case "databuddy":
+      return await listDatabuddyWebsites(credentials, fetchImpl);
     default:
       return await listCloudflareSources(credentials, fetchImpl);
   }
@@ -50,8 +64,8 @@ export async function listImportSources(
 
 /**
  * One cheap call that tells where the source's history starts: Plausible's
- * first month, Vercel's first month within its longest retention, or what
- * Cloudflare's plan still keeps.
+ * or Rybbit's first month, Databuddy's first day, Vercel's first month within its longest
+ * retention, or what Cloudflare's plan still keeps.
  */
 export async function previewImportSource(
   credentials: AnalyticsImportCredentials,
@@ -63,6 +77,20 @@ export async function previewImportSource(
   switch (credentials.provider) {
     case "plausible":
       return await previewPlausibleSite(credentials, ref, fetchImpl);
+    case "rybbit":
+      return await previewRybbitSite(
+        credentials,
+        ref,
+        toDay(new Date()),
+        fetchImpl
+      );
+    case "databuddy":
+      return await previewDatabuddyWebsite(
+        credentials,
+        ref,
+        toDay(new Date()),
+        fetchImpl
+      );
     case "vercel": {
       const today = toDay(new Date());
       return await previewVercelProject(
@@ -103,6 +131,28 @@ export async function fetchImportChunk({
       return {
         kind: "web",
         records: await fetchPlausibleChunk(credentials, ref, range, fetchImpl),
+      };
+    case "rybbit":
+      return {
+        kind: "web",
+        records: await fetchRybbitChunk(
+          credentials,
+          ref,
+          host,
+          range,
+          fetchImpl
+        ),
+      };
+    case "databuddy":
+      return {
+        kind: "web",
+        records: await fetchDatabuddyChunk(
+          credentials,
+          ref,
+          host,
+          range,
+          fetchImpl
+        ),
       };
     case "vercel":
       return {

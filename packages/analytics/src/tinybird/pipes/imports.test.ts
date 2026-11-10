@@ -102,6 +102,8 @@ beforeAll(() => {
       ('org','project','imp1','country','2026-10-02','DE','',70,30),
       ('org','project','imp1','country','2026-10-02','US','',30,10),
       ('org','project','imp1','device','2026-10-02','','desktop',100,40);
+    INSERT INTO web_imported_daily (organization_id, project_id, import_id, grain, day, browser, pageviews, visitors, visits) VALUES
+      ('org','project','imp1','browser','2026-10-02','Firefox',12,NULL,9);
     INSERT INTO geo_imported_daily (organization_id, project_id, import_id, day, visitor_type, source, agent, category, confidence, path, requests) VALUES
       ('org','project','imp-geo','2026-10-03','crawler','GPTBot','GPTBot','training-crawler','verified','/',20),
       ('org','project','imp-geo','2026-10-03','crawler','GPTBot','GPTBot','training-crawler','verified','/docs',10),
@@ -282,6 +284,17 @@ describe("web endpoints add completed imports", () => {
     expect(pipe.run(webAudience, { ...WEB, dimension: "device" })).toEqual([
       { value: "desktop", visitors: 43, previous_visitors: 1, views: 105 },
     ]);
+  });
+
+  test("audience counts sessions as visitors when an import has no visitors", () => {
+    expect(
+      pipe.run(webAudience, { ...WEB, dimension: "browser" })
+    ).toContainEqual({
+      value: "Firefox",
+      visitors: 9,
+      previous_visitors: 0,
+      views: 12,
+    });
   });
 
   test("hosts add imported totals", () => {

@@ -31,6 +31,8 @@ if (!process.env.NOTRA_ANALYTICS_IMPORT_UI_TEST_WORKER) {
     await import("../src/components/analytics-import/import-preview");
   const { ImportConnectStep } =
     await import("../src/components/analytics-import/import-connect-step");
+  const { ImportProviderPicker } =
+    await import("../src/components/analytics-import/import-provider-picker");
   const { ImportZipField } =
     await import("../src/components/analytics-import/import-zip-field");
   const { ImportProgressView } =
@@ -183,6 +185,24 @@ if (!process.env.NOTRA_ANALYTICS_IMPORT_UI_TEST_WORKER) {
     );
     expect(connect).toContain("Only owners and admins can connect");
     expect(connect).not.toContain("Zone → Analytics → Read");
+  });
+
+  test("Rybbit and Databuddy are in the source list and ask for read-only keys", () => {
+    const picker = render(<ImportProviderPicker onPick={() => undefined} />);
+    expect(picker).toContain("Rybbit");
+    expect(picker).toContain("Databuddy");
+    const connect = (provider: "rybbit" | "databuddy") =>
+      render(
+        <ImportConnectStep
+          canManage
+          connections={[]}
+          onConnected={() => undefined}
+          organizationId="org"
+          provider={provider}
+        />
+      );
+    expect(connect("rybbit")).toContain("analytics:read");
+    expect(connect("databuddy")).toContain("read:data");
   });
 
   test("a saved account starts a new import unless it needs a reconnect", () => {

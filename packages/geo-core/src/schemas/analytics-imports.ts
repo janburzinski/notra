@@ -122,6 +122,121 @@ export const vercelProjectsResponseSchema = z.object({
     .optional(),
 });
 
+const rybbitCount = z.number();
+/** Rybbit's rates are null for a group without sessions. */
+const rybbitRate = z
+  .number()
+  .nullish()
+  .transform((value) => value ?? 0);
+
+export const rybbitOrganizationsResponseSchema = z.array(
+  z
+    .object({
+      id: z.string(),
+      name: z.string().nullish(),
+      sites: z
+        .array(
+          z
+            .object({
+              id: z.union([z.string(), z.number()]).optional(),
+              siteId: z.union([z.string(), z.number()]).optional(),
+              name: z.string().nullish(),
+              domain: z.string().nullish(),
+            })
+            .passthrough()
+        )
+        .default([]),
+    })
+    .passthrough()
+);
+
+export const rybbitTimeSeriesResponseSchema = z.object({
+  data: z.array(
+    z
+      .object({
+        time: z.string(),
+        sessions: rybbitCount,
+        pageviews: rybbitCount,
+        users: rybbitCount,
+        bounce_rate: rybbitRate,
+        session_duration: rybbitRate,
+      })
+      .passthrough()
+  ),
+});
+
+export const rybbitMetricResponseSchema = z.object({
+  data: z.object({
+    data: z.array(
+      z
+        .object({
+          value: z.union([z.string(), z.number()]).nullish(),
+          count: rybbitCount,
+          pageviews: rybbitCount,
+          bounce_rate: rybbitRate,
+        })
+        .passthrough()
+    ),
+  }),
+});
+
+export const databuddyWebsitesResponseSchema = z.object({
+  websites: z.array(
+    z
+      .object({
+        id: z.string(),
+        name: z.string().nullish(),
+        domain: z.string().nullish(),
+        organizationName: z.string().nullish(),
+      })
+      .passthrough()
+  ),
+});
+
+/** Rates and medians are null on a day without sessions. */
+const databuddyRate = z
+  .number()
+  .nullish()
+  .transform((value) => value ?? 0);
+
+export const databuddyDaySchema = z
+  .object({
+    date: z.string(),
+    pageviews: z.number(),
+    visitors: z.number(),
+    sessions: z.number(),
+    bounce_rate: databuddyRate,
+    median_session_duration: databuddyRate,
+  })
+  .passthrough();
+
+export const databuddyBreakdownRowSchema = z
+  .object({
+    name: z.union([z.string(), z.number()]).nullish(),
+    pageviews: z.number(),
+    visitors: z.number(),
+    domain: z.string().nullish(),
+    country_code: z.string().nullish(),
+  })
+  .passthrough();
+
+/**
+ * One result per query id. A query that failed on Databuddy's side comes
+ * back with `success: false` inside an HTTP 200, sorted last.
+ */
+export const databuddyQueryResponseSchema = z.object({
+  data: z.array(
+    z
+      .object({
+        parameter: z.string(),
+        success: z.boolean(),
+        error: z.string().nullish(),
+        data: z.array(z.unknown()).default([]),
+      })
+      .passthrough()
+  ),
+});
+
 export const plausibleCredentialsSchema = z.object({
   apiKey: z.string().trim().min(10).max(500),
 });
@@ -137,4 +252,12 @@ export const vercelCredentialsSchema = z.object({
     .trim()
     .regex(/^team_[A-Za-z0-9]+$/)
     .optional(),
+});
+
+export const databuddyCredentialsSchema = z.object({
+  apiKey: z.string().trim().min(10).max(200),
+});
+
+export const rybbitCredentialsSchema = z.object({
+  apiKey: z.string().trim().min(10).max(500),
 });

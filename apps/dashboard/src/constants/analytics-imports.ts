@@ -75,6 +75,8 @@ export const ANALYTICS_IMPORT_PROVIDER_ORDER = [
   "plausible",
   "cloudflare",
   "vercel",
+  "rybbit",
+  "databuddy",
 ] as const;
 
 export const ANALYTICS_IMPORT_PROVIDER_LABELS: Record<
@@ -86,6 +88,8 @@ export const ANALYTICS_IMPORT_PROVIDER_LABELS: Record<
   vercel: "Vercel Web Analytics",
   cloudflare: "Cloudflare",
   cloudflare_rum: "Cloudflare Web Analytics",
+  rybbit: "Rybbit",
+  databuddy: "Databuddy",
 };
 
 /** Brand names for "Connect …", "Open …" and the chart's import marker. */
@@ -98,6 +102,8 @@ export const ANALYTICS_IMPORT_PROVIDER_BRANDS: Record<
   vercel: "Vercel",
   cloudflare: "Cloudflare",
   cloudflare_rum: "Cloudflare",
+  rybbit: "Rybbit",
+  databuddy: "Databuddy",
 };
 
 /** Where the first guide step sends people to export or create a key. */
@@ -106,6 +112,8 @@ export const ANALYTICS_IMPORT_PROVIDER_URLS = {
   plausible: "https://plausible.io/settings/api-keys",
   cloudflare: "https://dash.cloudflare.com/profile/api-tokens",
   vercel: "https://vercel.com/account/settings/tokens",
+  rybbit: "https://app.rybbit.io",
+  databuddy: "https://app.databuddy.cc/organizations/settings#api-keys",
 } as const satisfies Record<AnalyticsImportProviderChoice, string>;
 
 /** Labels exactly as Cloudflare's custom token form shows them. */

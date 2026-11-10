@@ -44,6 +44,14 @@ export const IMPORT_RATE_LIMITS = {
   plausible: { requests: 400, windowSeconds: 3600 },
   cloudflare: { requests: 250, windowSeconds: 300 },
   vercel: { requests: 60, windowSeconds: 60 },
+  /**
+   * Rybbit refills a 50-request bucket at 5 a second, so 25 per 10 s never
+   * empties it, even across a window edge. The daily cap leaves a fifth of
+   * the Standard plan's 5,000 requests for the customer's own API use.
+   */
+  rybbit: { requests: 25, windowSeconds: 10, dailyRequests: 4000 },
+  /** Databuddy allows 120 queries a minute per key; half stays with the customer. */
+  databuddy: { requests: 60, windowSeconds: 60 },
 } as const;
 
 /**
@@ -59,6 +67,19 @@ export const VERCEL_CHUNK_DAYS = 7;
  * split busy days, so a chunk retried after a limit completes.
  */
 export const CLOUDFLARE_RUM_CHUNK_DAYS = 7;
+
+/**
+ * A Rybbit chunk makes one time-series request plus one per breakdown and
+ * day: 3 days take 25 requests, one window of its budget.
+ */
+export const RYBBIT_CHUNK_DAYS = 3;
+
+/**
+ * A Databuddy chunk is one request: daily totals plus one query per
+ * breakdown and day, batched. A week keeps that batch small enough for a
+ * busy site's analytics database to answer within the request timeout.
+ */
+export const DATABUDDY_CHUNK_DAYS = 7;
 
 export const IMPORT_PROVIDERS: Record<
   AnalyticsImportProvider,
@@ -131,6 +152,34 @@ export const IMPORT_PROVIDERS: Record<
       sampled: true,
     },
   },
+  rybbit: {
+    connection: "rybbit",
+    kind: "web",
+    lookbackDays: null,
+    maxChunkDays: RYBBIT_CHUNK_DAYS,
+    capabilities: {
+      visitors: true,
+      visits: true,
+      bounces: true,
+      utm: true,
+      entryPages: true,
+      sampled: false,
+    },
+  },
+  databuddy: {
+    connection: "databuddy",
+    kind: "web",
+    lookbackDays: null,
+    maxChunkDays: DATABUDDY_CHUNK_DAYS,
+    capabilities: {
+      visitors: true,
+      visits: true,
+      bounces: true,
+      utm: true,
+      entryPages: true,
+      sampled: false,
+    },
+  },
 };
 
 export const PLAUSIBLE_API_URL = "https://plausible.io";
@@ -187,6 +236,22 @@ export const VERCEL_OTHERS_GROUP = "Others";
 export const VERCEL_CONCURRENCY = 4;
 export const VERCEL_PROJECTS_PAGE_LIMIT = 100;
 export const VERCEL_PROJECTS_MAX_PAGES = 10;
+
+export const DATABUDDY_API_URL = "https://api.databuddy.cc";
+/** Top values per breakdown and day, as for Rybbit. */
+export const DATABUDDY_RESULT_LIMIT = 200;
+/** Days a preview can return: everything since 2015, one row per day. */
+export const DATABUDDY_PREVIEW_LIMIT = 10_000;
+export const DATABUDDY_HISTORY_START = "2015-01-01";
+export const RYBBIT_API_URL = "https://app.rybbit.io";
+/** Rows per breakdown and day; smaller values are dropped. */
+export const RYBBIT_RESULT_LIMIT = 200;
+export const RYBBIT_CONCURRENCY = 4;
+/**
+ * Where a preview starts looking. Rybbit imports Plausible and Umami
+ * history, so a site's data can predate Rybbit itself.
+ */
+export const RYBBIT_HISTORY_START = "2015-01-01";
 
 /** Request paths that only vulnerability scanners ask for. */
 export const IMPORT_SCANNER_PATH_PATTERN =
