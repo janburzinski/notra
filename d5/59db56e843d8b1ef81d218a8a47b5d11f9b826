@@ -1,0 +1,104 @@
+apps/dashboard/src/utils/log-details.ts
+  s_bd8b53104b7c58::t_4c7b2e9d898943 7,29-32
+apps/dashboard/src/components/geo/traffic-actions-menu.tsx
+  s_bd8b53104b7c58::t_4c77f97b100005 51,56-59,88-90,102-107
+apps/dashboard/src/components/settings/panes/geo-pane.tsx
+  s_bd8b53104b7c58::t_9ad348efddc5a6 116
+  s_bd8b53104b7c58::t_4b29006da385d9 104
+apps/dashboard/src/types/settings/modal.ts
+  s_bd8b53104b7c58::t_fd07fc7388f279 63
+apps/dashboard/src/components/analytics-import/analytics-import-watcher.tsx
+  s_bd8b53104b7c58::t_4c77f97b100005 14
+apps/dashboard/src/app/api/command-palette/navigate/route.ts
+  s_bd8b53104b7c58::t_36425db068a0b6 161-171
+packages/geo-core/src/geo/analytics-imports.ts
+  s_bd8b53104b7c58::t_9ad36a1261a519 28
+packages/geo-core/src/geo/ingest.ts
+  s_bd8b53104b7c58::t_d17b049ec058cb 488
+  s_bd8b53104b7c58::t_9ad36a1261a519 606,609,624,632,635-636,654-655
+apps/dashboard/src/constants/command-palette.ts
+  s_bd8b53104b7c58::t_fd07fc7388f279 269-281
+apps/dashboard/src/utils/organization-shell-prefetch.server.ts
+  s_bd8b53104b7c58::t_884e051f4de6f1 18,26
+apps/dashboard/tests/analytics-import-ui.test.tsx
+  s_bd8b53104b7c58::t_5851c87db8eac0 57-60
+  s_bd8b53104b7c58::t_93502bba77b8ab 54,133,136,151,161
+apps/api/src/routes/geo-traffic.ts
+  s_bd8b53104b7c58::t_54be93af697b3e 397,433,443
+apps/dashboard/src/lib/orpc/routers/geo.ts
+  s_bd8b53104b7c58::t_48b5a01e7c64ae 1219-1225,1233-1240,1346,1384
+packages/geo-core/src/constants/geo.ts
+  s_bd8b53104b7c58::t_486188aa60731f 586,589
+packages/geo-core/src/types/ingest.ts
+  s_bd8b53104b7c58::t_9ad36a1261a519 130
+apps/dashboard/src/components/geo/traffic-embed-dialog.tsx
+  s_bd8b53104b7c58::t_4c77f97b100005 511-519,582-585,587
+apps/agent/tests/agent-analytics-tools.test.ts
+  s_bd8b53104b7c58::t_4c1e9c4304ff35 263,265-272
+apps/dashboard/src/components/analytics-import/import-dialog-header.tsx
+  s_bd8b53104b7c58::t_f65f8f509223a2 63
+apps/dashboard/src/components/geo/ai-traffic-card.tsx
+  s_bd8b53104b7c58::t_0e90077e47b2f9 167-175
+apps/dashboard/src/components/analytics-import/import-home-step.tsx
+  s_bd8b53104b7c58::t_f65f8f509223a2 23
+apps/dashboard/src/components/analytics-import/analytics-import-dialog.tsx
+  s_bd8b53104b7c58::t_f65f8f509223a2 96-101,104,161
+  s_bd8b53104b7c58::t_907246bcaf3a6e 105,111
+apps/api/tests/geo-web-analytics.test.ts
+  s_bd8b53104b7c58::t_d07fb395502245 163-164,315-318,320-329
+packages/geo-core/tests/web-collect.test.ts
+  s_bd8b53104b7c58::t_36425db068a0b6 1
+apps/api/src/index.ts
+  s_bd8b53104b7c58::t_30dc5b1b9d483c 417-434
+apps/dashboard/src/types/components/command-palette.ts
+  s_bd8b53104b7c58::t_fd07fc7388f279 5
+apps/dashboard/src/components/analytics-import/import-history-card.tsx
+  s_bd8b53104b7c58::t_f65f8f509223a2 41,57,87,89
+apps/dashboard/src/constants/settings.ts
+  s_bd8b53104b7c58::t_fd07fc7388f279 292-297
+apps/dashboard/src/lib/hooks/use-settings-nav-labels.ts
+  s_bd8b53104b7c58::t_4c7b2e9d898943 111-112
+apps/dashboard/src/utils/geo-prefetch.server.ts
+  s_bd8b53104b7c58::t_c84f616696cec6 107,146
+apps/dashboard/src/utils/command-palette.ts
+  s_bd8b53104b7c58::t_fd07fc7388f279 40,57
+apps/dashboard/src/app/(dashboard)/[slug]/geo/traffic/page-client.tsx
+  s_bd8b53104b7c58::t_0e90077e47b2f9 65,67,71,91
+apps/dashboard/messages/de.json
+  s_bd8b53104b7c58::t_bf3cc73409bd7e 60,81,4783
+apps/dashboard/src/components/logs/log-details-sheet.tsx
+  s_bd8b53104b7c58::t_4c7b2e9d898943 47
+apps/dashboard/src/components/command-palette/command-palette.tsx
+  s_bd8b53104b7c58::t_36425db068a0b6 802
+apps/dashboard/messages/en.json
+  s_bd8b53104b7c58::t_bf3cc73409bd7e 60,81,4783
+packages/geo-core/tests/web-analytics.test.ts
+  s_bd8b53104b7c58::t_dba67cd51aac48 262
+apps/dashboard/src/constants/analytics-imports.ts
+  s_bd8b53104b7c58::t_93502bba77b8ab 23
+apps/dashboard/src/components/geo/geo-ingest-setup.tsx
+  s_bd8b53104b7c58::t_b7f838741ab7d2 9
+  s_bd8b53104b7c58::t_486188aa60731f 99,129,132
+apps/dashboard/src/components/analytics/analytics-source-tabs.tsx
+  s_bd8b53104b7c58::t_015e1dd92c566d 69-98,101-102,104-105,107-109
+apps/dashboard/src/components/settings/settings-modal.tsx
+  s_bd8b53104b7c58::t_fd07fc7388f279 149
+apps/dashboard/src/types/geo.ts
+  s_bd8b53104b7c58::t_6c00bedcc54248 2170
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "d559db56e843d8b1ef81d218a8a47b5d11f9b826",
+  "prompts": {},
+  "sessions": {
+    "s_bd8b53104b7c58": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "33a1674a-4f9b-4811-b5e3-60abbac63453",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
