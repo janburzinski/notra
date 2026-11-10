@@ -68,3 +68,26 @@ export interface GeoAlertEmailProps {
   remainingCount: number;
   dashboardLink: string;
 }
+
+/** A brand or assistant with its share of one scan's answers. */
+export interface GeoRecapShareRow {
+  name: string;
+  shareLabel: string;
+  iconSrc?: string;
+  isOwnBrand?: boolean;
+}
+
+export interface FirstScanResultsEmailProps {
+  organizationName: string;
+  organizationSlug: string;
+  brandName: string;
+  visibilityLabel: string;
+  answersChecked: number;
+  promptCount: number;
+  engines: readonly GeoRecapShareRow[];
+  mentionedIn: readonly GeoRecapItem[];
+  mentionedRemaining: number;
+  competitors: readonly GeoRecapShareRow[];
+  action?: GeoRecapAction;
+  dashboardLink: string;
+}

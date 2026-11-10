@@ -46,6 +46,9 @@ import type {
   GeoCheckScanComparison,
   GeoCheckScanComparisonInput,
   GeoCheckScanComparisonRow,
+  GeoCheckScanCompetitorRow,
+  GeoCheckScanPromptRow,
+  GeoCheckScanScope,
   GeoCheckScope,
   GeoCheckSequenceResultRow,
   GeoCheckTimeseriesRow,
@@ -1556,6 +1559,71 @@ export async function queryGeoCheckPeriodCompetitors(
     promptId: row.promptId,
     engine: row.engine,
     brandKey: row.brandKey,
+    brand: row.brand,
+    checks: toNumber(row.checks),
+  }));
+}
+
+function scanFilters(scope: GeoCheckScanScope): SQL {
+  return and(
+    eq(geoMentionChecks.organizationId, scope.organizationId),
+    eq(geoMentionChecks.projectId, scope.projectId),
+    eq(geoMentionChecks.scanId, scope.scanId),
+    ...mentionOptionFilters(PROMPT_LEVEL_FILTERS, scope.projectId)
+  ) as SQL;
+}
+
+/** Per tracked prompt and engine, whether one scan's answers named the brand. */
+export async function queryGeoScanPrompts(
+  scope: GeoCheckScanScope
+): Promise<GeoCheckScanPromptRow[]> {
+  const rows = await db
+    .select({
+      promptId: geoMentionChecks.promptId,
+      engine: geoMentionChecks.engine,
+      prompt: sql<string>`max(${geoMentionChecks.prompt})`,
+      checks: countChecks,
+      mentions: countChecksWhere(isMentioned),
+      visible: countChecksWhere(isVisible),
+      bestPosition: sql<
+        number | null
+      >`min(${geoMentionChecks.position}) filter (where ${geoMentionChecks.mentioned})`,
+    })
+    .from(geoMentionChecks)
+    .where(scanFilters(scope))
+    .groupBy(geoMentionChecks.promptId, geoMentionChecks.engine);
+
+  return rows.map((row) => ({
+    promptId: row.promptId,
+    engine: row.engine,
+    prompt: row.prompt,
+    checks: toNumber(row.checks),
+    mentions: toNumber(row.mentions),
+    visible: toNumber(row.visible),
+    bestPosition: toNullableNumber(row.bestPosition),
+  }));
+}
+
+/**
+ * How many of one scan's tracked-prompt checks named each competitor. Brands
+ * are keyed trimmed and lowercased so "Acme" and "acme " count as one.
+ */
+export async function queryGeoScanCompetitors(
+  scope: GeoCheckScanScope,
+  limit: number
+): Promise<GeoCheckScanCompetitorRow[]> {
+  const brandKey = sql<string>`lower(trim(brand))`;
+  const checks = countChecks;
+  const rows = await db
+    .select({ brand: sql<string>`min(trim(brand))`, checks })
+    .from(geoMentionChecks)
+    .crossJoinLateral(unnestedCompetitorBrand)
+    .where(and(scanFilters(scope), sql`trim(brand) <> ''`))
+    .groupBy(brandKey)
+    .orderBy(desc(checks))
+    .limit(limit);
+
+  return rows.map((row) => ({
     brand: row.brand,
     checks: toNumber(row.checks),
   }));

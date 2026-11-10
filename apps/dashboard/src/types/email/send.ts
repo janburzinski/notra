@@ -1,6 +1,7 @@
 import type { FeedbackSentiment } from "@notra/email/types/feedback";
 import type { GeoEngineChangeEmailProps } from "@notra/email/types/geo-engine-change";
 import type {
+  FirstScanResultsEmailProps,
   GeoAlertEmailProps,
   VisibilityDropEmailProps,
   WeeklySummaryEmailProps,
@@ -94,6 +95,11 @@ export interface SendWeeklySummaryEmailProps extends WeeklySummaryEmailProps {
 export interface SendVisibilityDropEmailProps extends VisibilityDropEmailProps {
   recipientEmail: string;
   dateKey: string;
+}
+
+export interface SendFirstScanResultsEmailProps extends FirstScanResultsEmailProps {
+  recipientEmail: string;
+  projectId: string;
 }
 
 export interface SendGeoAlertEmailProps extends GeoAlertEmailProps {

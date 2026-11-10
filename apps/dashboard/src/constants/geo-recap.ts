@@ -26,3 +26,6 @@ export const GEO_ALERT_BASELINE_DAYS = 7;
 export const GEO_ALERT_MIN_DROP_POINTS = 15;
 export const GEO_ALERT_MIN_RECENT_CHECKS = 20;
 export const GEO_ALERT_COOLDOWN_SECONDS = 7 * 24 * 60 * 60;
+
+export const GEO_FIRST_SCAN_MAX_PROMPTS = 3;
+export const GEO_FIRST_SCAN_MAX_COMPETITORS = 3;

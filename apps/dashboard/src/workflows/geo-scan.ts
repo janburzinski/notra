@@ -65,6 +65,7 @@ import {
   trackGeoScanRetryScheduledStep,
 } from "./steps/geo-scan-steps";
 import { refreshGeoContentGapsStep } from "./steps/refresh-geo-content-gaps";
+import { sendGeoFirstScanEmailStep } from "./steps/send-geo-first-scan-email";
 import { startGeoSentimentStep } from "./steps/start-geo-sentiment";
 import { syncGeoShelfCitationsStep } from "./steps/sync-geo-shelf-citations";
 
@@ -349,6 +350,17 @@ async function finalizeProjectRun(
         error,
         { scanId: context.scanId }
       );
+    }
+    if (!context.scoped) {
+      try {
+        await sendGeoFirstScanEmailStep({ ...scope, scanId: context.scanId });
+      } catch (error) {
+        await logFollowUpFailure(
+          `First GEO results email could not be sent for ${context.companyName}`,
+          error,
+          { scanId: context.scanId }
+        );
+      }
     }
   }
   try {

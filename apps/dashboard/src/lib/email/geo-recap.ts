@@ -144,7 +144,7 @@ async function runRecapForOrganizations(
   return result;
 }
 
-async function loadRecipients(
+export async function loadRecipients(
   organizationId: string
 ): Promise<RecapRecipients | null> {
   const [org, ownerMemberships] = await Promise.all([
@@ -228,7 +228,7 @@ function toRecapItem(
   };
 }
 
-async function sendToRecipients(
+export async function sendToRecipients(
   emails: readonly string[],
   sendOne: (email: string) => Promise<{ error: { message: string } | null }>,
   onSent?: (email: string) => Promise<void>
@@ -378,20 +378,24 @@ function buildCompetitorRows({
     }));
 }
 
-async function pickAction(
-  organizationSlug: string,
-  pairs: readonly GeoRecapPair[],
-  changes: readonly GeoRecapPairChange[]
-): Promise<GeoRecapAction | undefined> {
+/** The project's largest unanswered content gap, as an email call to action. */
+export async function loadTopGapAction({
+  organizationSlug,
+  projectIds,
+  eyebrow,
+}: {
+  organizationSlug: string;
+  projectIds: readonly string[];
+  eyebrow: string;
+}): Promise<GeoRecapAction | undefined> {
   const appUrl = EMAIL_CONFIG.getAppUrl();
-  const projectIds = [...new Set(pairs.map((pair) => pair.projectId))];
   const snapshots = await db
     .select({
       projectId: geoContentGapSnapshots.projectId,
       snapshot: geoContentGapSnapshots.snapshot,
     })
     .from(geoContentGapSnapshots)
-    .where(inArray(geoContentGapSnapshots.projectId, projectIds));
+    .where(inArray(geoContentGapSnapshots.projectId, [...projectIds]));
 
   const gap = snapshots
     .flatMap(({ projectId, snapshot }) =>
@@ -402,20 +406,37 @@ async function pickAction(
     .toSorted((left, right) => right.row.opportunity - left.row.opportunity)
     .at(0);
 
-  if (gap) {
-    const named = gap.row.competitors.slice(0, 2);
-    const instead =
-      named.length > 0 ? ` ${named.join(" and ")} are named instead.` : "";
-    return {
-      eyebrow: "Biggest open gap",
-      title: truncatePrompt(
-        gap.row.title ?? gap.row.prompt,
-        GEO_RECAP_PROMPT_MAX_LENGTH
-      ),
-      body: `You show up in ${formatRate(gap.row.ownMentionRate)} of these answers.${instead}`,
-      href: `${appUrl}/${organizationSlug}/geo/gaps?project=${encodeURIComponent(gap.projectId)}`,
-      label: "Write a post for it",
-    };
+  if (!gap) {
+    return;
+  }
+  const named = gap.row.competitors.slice(0, 2);
+  const instead =
+    named.length > 0 ? ` ${named.join(" and ")} are named instead.` : "";
+  return {
+    eyebrow,
+    title: truncatePrompt(
+      gap.row.title ?? gap.row.prompt,
+      GEO_RECAP_PROMPT_MAX_LENGTH
+    ),
+    body: `You show up in ${formatRate(gap.row.ownMentionRate)} of these answers.${instead}`,
+    href: `${appUrl}/${organizationSlug}/geo/gaps?project=${encodeURIComponent(gap.projectId)}`,
+    label: "Write a post for it",
+  };
+}
+
+async function pickAction(
+  organizationSlug: string,
+  pairs: readonly GeoRecapPair[],
+  changes: readonly GeoRecapPairChange[]
+): Promise<GeoRecapAction | undefined> {
+  const appUrl = EMAIL_CONFIG.getAppUrl();
+  const gapAction = await loadTopGapAction({
+    organizationSlug,
+    projectIds: [...new Set(pairs.map((pair) => pair.projectId))],
+    eyebrow: "Biggest open gap",
+  });
+  if (gapAction) {
+    return gapAction;
   }
 
   const lost = changes.find((change) => change.kind === "lost");

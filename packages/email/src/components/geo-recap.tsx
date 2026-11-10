@@ -5,6 +5,7 @@ import type {
   GeoRecapAction,
   GeoRecapCompetitor,
   GeoRecapItem,
+  GeoRecapShareRow,
   GeoRecapTone,
 } from "../types/geo-recap";
 import { toneFromDelta } from "../utils/geo-recap";
@@ -246,6 +247,77 @@ export function GeoCompetitorTable({
               >
                 {competitor.shareLabel}{" "}
                 <GeoPill tone={tone}>{competitor.deltaLabel}</GeoPill>
+              </Text>
+            </Column>
+          </Row>
+        );
+      })}
+    </>
+  );
+}
+
+/** Name and share per row, for a single scan with nothing to compare against. */
+export function GeoShareTable({ rows }: { rows: readonly GeoRecapShareRow[] }) {
+  return (
+    <>
+      {rows.map((row, index) => {
+        const last = index === rows.length - 1;
+        const padding = `${index === 0 ? 0 : "8px"} 0 ${last ? 0 : "8px"}`;
+        return (
+          <Row
+            key={row.name}
+            style={{
+              borderBottom: last
+                ? undefined
+                : `1px solid ${EMAIL_THEME.border}`,
+            }}
+          >
+            <Column style={{ padding }}>
+              <Text
+                style={{
+                  color: EMAIL_THEME.foreground,
+                  fontSize: "14px",
+                  fontWeight: row.isOwnBrand ? 600 : 400,
+                  margin: 0,
+                }}
+              >
+                {row.iconSrc ? (
+                  <Img
+                    alt=""
+                    height="14"
+                    src={row.iconSrc}
+                    style={{
+                      display: "inline-block",
+                      margin: "0 6px 0 0",
+                      verticalAlign: "middle",
+                    }}
+                    width="14"
+                  />
+                ) : null}
+                {row.name}
+                {row.isOwnBrand ? (
+                  <span
+                    style={{
+                      color: EMAIL_THEME.subtleForeground,
+                      fontWeight: 400,
+                    }}
+                  >
+                    {" "}
+                    (you)
+                  </span>
+                ) : null}
+              </Text>
+            </Column>
+            <Column align="right" style={{ padding, whiteSpace: "nowrap" }}>
+              <Text
+                style={{
+                  color: EMAIL_THEME.foreground,
+                  fontSize: "14px",
+                  fontVariantNumeric: "tabular-nums",
+                  margin: 0,
+                }}
+              >
+                {row.shareLabel}
               </Text>
             </Column>
           </Row>

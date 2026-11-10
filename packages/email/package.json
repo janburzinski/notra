@@ -14,6 +14,7 @@
     "./emails/weekly-summary": "./src/emails/weekly-summary.tsx",
     "./emails/visibility-drop": "./src/emails/visibility-drop.tsx",
     "./emails/geo-alert": "./src/emails/geo-alert.tsx",
+    "./emails/first-scan-results": "./src/emails/first-scan-results.tsx",
     "./emails/scheduled-publication-failed": "./src/emails/scheduled-publication-failed.tsx",
     "./emails/site-suspended": "./src/emails/site-suspended.tsx",
     "./emails/geo-engine-change": "./src/emails/geo-engine-change.tsx",

@@ -1,5 +1,6 @@
 import { AiCreditsDepletedEmail } from "@notra/email/emails/ai-credits-depleted";
 import { FeedbackEmail } from "@notra/email/emails/feedback";
+import { FirstScanResultsEmail } from "@notra/email/emails/first-scan-results";
 import { GeoAlertEmail } from "@notra/email/emails/geo-alert";
 import { GeoEngineChangeEmail } from "@notra/email/emails/geo-engine-change";
 import { ScheduledContentCreatedEmail } from "@notra/email/emails/schedule-content-created";
@@ -20,6 +21,7 @@ import type {
   SendVisibilityDropEmailProps,
   SendWeeklySummaryEmailProps,
   SendFeedbackEmailProps,
+  SendFirstScanResultsEmailProps,
   SendGeoAlertEmailProps,
   SendGeoEngineChangeEmailProps,
   SendScheduledContentCreatedEmailProps,
@@ -266,6 +268,20 @@ export async function sendVisibilityDropEmail({
     subject: `AI visibility dropped for ${props.organizationName}`,
     react: VisibilityDropEmail(props),
     idempotencyKey: `${recipientEmail}:${props.organizationSlug}:drop:${dateKey}`,
+  });
+}
+
+export async function sendFirstScanResultsEmail({
+  recipientEmail,
+  projectId,
+  ...props
+}: SendFirstScanResultsEmailProps) {
+  return sendBrewEmail({
+    category: "daily-summary",
+    to: recipientEmail,
+    subject: `Your first AI visibility results for ${props.brandName} are in`,
+    react: FirstScanResultsEmail(props),
+    idempotencyKey: `${recipientEmail}:first-scan:${projectId}`,
   });
 }
 

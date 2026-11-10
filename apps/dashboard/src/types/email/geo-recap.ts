@@ -1,4 +1,8 @@
 import type { GeoCheckPeriodInput } from "@notra/db/types/geo-checks";
+import type {
+  GeoRecapItem,
+  GeoRecapShareRow,
+} from "@notra/email/types/geo-recap";
 
 export type GeoRecapWindow = Omit<GeoCheckPeriodInput, "organizationId">;
 
@@ -55,4 +59,14 @@ export interface GeoRecapCronResult {
   emailsSent: number;
   skippedQuiet: number;
   failed: number;
+}
+
+export interface GeoFirstScanSummary {
+  visibilityLabel: string;
+  answersChecked: number;
+  promptCount: number;
+  engines: GeoRecapShareRow[];
+  mentionedIn: GeoRecapItem[];
+  mentionedRemaining: number;
+  competitors: GeoRecapShareRow[];
 }

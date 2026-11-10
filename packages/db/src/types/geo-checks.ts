@@ -361,3 +361,27 @@ export interface GeoCheckPeriodCompetitorRow {
   brand: string;
   checks: number;
 }
+
+export interface GeoCheckScanScope {
+  organizationId: string;
+  projectId: string;
+  scanId: string;
+}
+
+/** One tracked prompt on one engine in a single scan. */
+export interface GeoCheckScanPromptRow {
+  promptId: string;
+  engine: string;
+  prompt: string;
+  checks: number;
+  mentions: number;
+  /** Checks that named the brand or cited its own site, as the overview counts visibility. */
+  visible: number;
+  /** Best rank the brand reached when it was named. */
+  bestPosition: number | null;
+}
+
+export interface GeoCheckScanCompetitorRow {
+  brand: string;
+  checks: number;
+}
