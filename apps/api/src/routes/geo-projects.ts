@@ -1,9 +1,10 @@
 import { createRoute } from "@hono/zod-openapi";
+import { createGeoProjectFromWebsite } from "@notra/geo-core/geo/discover";
 import {
-  createGeoProject,
   deleteGeoProject,
   getGeoProject,
   listGeoProjects,
+  resolveBrandIdentity,
   updateGeoProject,
 } from "@notra/geo-core/geo/projects";
 import { projectParamsSchema } from "@notra/schemas/api/geo-params";
@@ -47,6 +48,8 @@ const createProjectRoute = createRoute({
   tags: [GEO_OPENAPI_TAG],
   operationId: "createProject",
   summary: "Create a GEO project",
+  description:
+    "Analyzes the linked brand identity's website and seeds the project with tracked prompts, competitors, conversations and settings, like creating a project in the dashboard. This can take up to a minute. Set startScan to also start scanning, which uses AI credits.",
   request: {
     body: {
       required: true,
@@ -131,10 +134,21 @@ geoProjectsRoutes.openapi(listProjectsRoute, async (c) => {
 
 geoProjectsRoutes.openapi(createProjectRoute, async (c) => {
   const base = c.get("geo");
-  const { name, brandSettingsId } = c.req.valid("json");
+  const { name, brandSettingsId, startScan = false } = c.req.valid("json");
   const outcome = await runGeoEffect(
     "projectCreate",
-    createGeoProject(base.organizationId, name, brandSettingsId).pipe(
+    resolveBrandIdentity(base.organizationId, brandSettingsId).pipe(
+      Effect.flatMap((identity) =>
+        createGeoProjectFromWebsite(
+          base.organizationId,
+          name,
+          identity.id,
+          identity.websiteUrl,
+          startScan,
+          undefined,
+          startScan
+        )
+      ),
       Effect.map((project) => ({ project }))
     )
   );

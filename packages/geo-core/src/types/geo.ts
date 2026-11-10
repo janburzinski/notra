@@ -2122,6 +2122,8 @@ export interface GeoWebsiteGenerationWrite {
   seedEngines: string[] | null;
   /** Null for projects created before prompt languages; first = prompt language. */
   seedLanguages: readonly string[] | null;
+  /** Only applies to new settings rows. The scan sweep scans enabled rows. */
+  trackingEnabled: boolean;
 }
 
 export interface WebAnalyticsScope {

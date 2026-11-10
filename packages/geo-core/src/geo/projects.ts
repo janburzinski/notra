@@ -96,7 +96,7 @@ const resolveDefaultBrandIdentity = Effect.fn(
 )(function* (organizationId: string) {
   const identity = yield* geoDb("brand identity lookup failed", () =>
     db.query.brandSettings.findFirst({
-      columns: { id: true },
+      columns: { id: true, websiteUrl: true },
       where: eq(brandSettings.organizationId, organizationId),
       orderBy: [desc(brandSettings.isDefault), asc(brandSettings.createdAt)],
     })
@@ -108,17 +108,27 @@ const resolveDefaultBrandIdentity = Effect.fn(
     );
   }
 
-  return identity.id;
+  return identity;
 });
+
+/** The given brand identity, or the organization's default one. */
+export const resolveBrandIdentity = Effect.fn("geo.resolveBrandIdentity")(
+  function* (organizationId: string, brandSettingsId?: string) {
+    return brandSettingsId
+      ? yield* requireBrandIdentity(organizationId, brandSettingsId)
+      : yield* resolveDefaultBrandIdentity(organizationId);
+  }
+);
 
 export const createGeoProject = Effect.fn("geo.projectCreate")(function* (
   organizationId: string,
   name: string,
   brandSettingsId?: string
 ) {
-  const linkedBrandSettingsId = brandSettingsId
-    ? (yield* requireBrandIdentity(organizationId, brandSettingsId)).id
-    : yield* resolveDefaultBrandIdentity(organizationId);
+  const linkedBrandSettingsId = (yield* resolveBrandIdentity(
+    organizationId,
+    brandSettingsId
+  )).id;
 
   const rows = yield* geoDb("project create failed", () =>
     db

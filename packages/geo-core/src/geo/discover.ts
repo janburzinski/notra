@@ -277,6 +277,7 @@ const persistGeoWebsiteGeneration = Effect.fn(
     discoveredCompetitors,
     seedEngines,
     seedLanguages,
+    trackingEnabled,
   } = input;
   yield* Effect.tryPromise({
     try: () =>
@@ -292,7 +293,7 @@ const persistGeoWebsiteGeneration = Effect.fn(
           engines: seedEngines,
           languages: seedLanguages ? [...seedLanguages] : null,
           promptLanguage: seedLanguages?.at(0) ?? null,
-          enabled: true,
+          enabled: trackingEnabled,
         })
         .onConflictDoUpdate({
           target: geoSettings.projectId,
@@ -475,6 +476,7 @@ export const generateGeoFromWebsite = Effect.fn("geo.generateFromWebsite")(
         discoveredCompetitors: discovery.competitors,
         seedEngines,
         seedLanguages: null,
+        trackingEnabled: true,
       })
     ).pipe(
       Effect.catchTag("GeoDatabaseError", (cause) =>
@@ -507,7 +509,8 @@ export const createGeoProjectFromWebsite = Effect.fn(
   brandSettingsId: string,
   url: string,
   scanEnabled: boolean,
-  languages?: readonly string[]
+  languages?: readonly string[],
+  trackingEnabled = true
 ) {
   const seedLanguages = languages?.length
     ? trackedGeoLanguages(languages)
@@ -555,6 +558,7 @@ export const createGeoProjectFromWebsite = Effect.fn(
         discoveredCompetitors: discovery.competitors,
         seedEngines,
         seedLanguages,
+        trackingEnabled,
       });
       return toGeoProject(row);
     })

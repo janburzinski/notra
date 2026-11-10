@@ -35,6 +35,10 @@ export const createProjectRequestSchema = z
       description:
         "Brand identity to link. Defaults to the organization's default identity.",
     }),
+    startScan: z.boolean().optional().openapi({
+      description:
+        "Turn on recurring scans and start the first one now. Scans use AI credits. Defaults to false, which saves tracking as disabled; enable it later with the settings endpoint.",
+    }),
   })
   .openapi("CreateGeoProjectRequest");
 
