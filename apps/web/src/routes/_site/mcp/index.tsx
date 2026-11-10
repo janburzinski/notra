@@ -1,15 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-import { McpCommandTabs } from "@/components/mcp/mcp-command-tabs";
 import { McpHero } from "@/components/mcp/mcp-hero";
 import { McpTerminalDemo } from "@/components/mcp/mcp-terminal-demo";
 import { McpToolsGrid } from "@/components/mcp/mcp-tools-grid";
 import { McpUseCasesCallout } from "@/components/mcp/mcp-use-cases-callout";
+import { MCP_HERO_SUBHEAD } from "@/constants/mcp";
 import { getMcpTools } from "@/lib/mcp/functions";
 import type { Metadata } from "@/types/metadata";
 import { buildHead } from "@/utils/head";
 import { buildBreadcrumbJsonLd, serializeJsonLd } from "@/utils/jsonld";
-import { formatMcpHeroSubhead } from "@/utils/mcp";
 import {
   PAGE_SOCIAL_IMAGES,
   TWITTER_HANDLE,
@@ -19,7 +18,7 @@ import { SITE_URL } from "@/utils/urls";
 
 const title = "Notra MCP Server";
 const description =
-  "Connect your agent to Notra over MCP to draft changelogs, launch posts and social updates from the editor it already lives in.";
+  "Connect your agent to Notra over MCP to track what ChatGPT, Claude and Gemini say about you, find the prompts you're missing and write the content that fixes it.";
 const url = `${SITE_URL}/mcp`;
 
 const metadata: Metadata = {
@@ -64,15 +63,9 @@ function McpPage() {
         dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbJsonLd) }}
         type="application/ld+json"
       />
-      <McpHero subhead={formatMcpHeroSubhead(tools.length)} />
-      <div className="flex w-[min(100%-3rem,62.5rem)] flex-col gap-14 pt-6">
+      <McpHero subhead={MCP_HERO_SUBHEAD} />
+      <div className="flex w-[min(100%-3rem,62.5rem)] flex-col gap-16 pt-8">
         <McpTerminalDemo toolCount={tools.length} />
-        <section className="flex w-full flex-col items-center gap-4">
-          <h2 className="font-sans text-[1.0625rem] leading-[1.29] font-semibold tracking-[-0.01em] text-[#1E1E1E] dark:text-white">
-            Connect from any client
-          </h2>
-          <McpCommandTabs className="max-w-[45rem]" />
-        </section>
         <McpToolsGrid tools={tools} />
         <McpUseCasesCallout />
       </div>

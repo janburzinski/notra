@@ -1,3 +1,5 @@
+import type { RefObject } from "react";
+
 export interface McpClient {
   id: "claude-code" | "codex" | "cursor" | "hermes" | "openclaw" | "other";
   label: string;
@@ -23,6 +25,23 @@ export interface McpCommandTabsProps {
 
 export interface McpHeroProps {
   subhead: string;
+}
+
+export interface McpHeroBattleProps {
+  avoidRef: RefObject<HTMLElement | null>;
+  areaRef: RefObject<HTMLElement | null>;
+}
+
+export interface McpToolCategory {
+  id: string;
+  label: string;
+  match: RegExp;
+}
+
+export interface McpToolGroup {
+  id: string;
+  label: string;
+  tools: McpToolCard[];
 }
 
 export interface McpTerminalDemoProps {

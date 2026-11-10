@@ -395,12 +395,15 @@ export function CommandTabs({
   const [internalValue, setInternalValue] = useState(
     defaultValue ?? items[0]?.value
   );
-  const [copied, setCopied] = useState(false);
+  // the command that was copied, so switching to another one drops the "Copied" state
+  const [copiedCommand, setCopiedCommand] = useState<string | null>(null);
   const copyTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   const reduceMotion = useReducedMotion();
 
   const activeValue = value ?? internalValue;
   const activeItem = items.find((item) => item.value === activeValue);
+  const copied =
+    copiedCommand !== null && copiedCommand === activeItem?.command;
   const { menuRef, pill } = useActivePill(
     tabsPosition === "none" ? undefined : activeValue
   );
@@ -438,16 +441,16 @@ export function CommandTabs({
     try {
       await navigator.clipboard.writeText(activeItem.command);
       onCopy?.(activeItem.command);
-      setCopied(true);
+      setCopiedCommand(activeItem.command);
       if (copyTimeout.current) {
         clearTimeout(copyTimeout.current);
       }
       copyTimeout.current = setTimeout(
-        () => setCopied(false),
+        () => setCopiedCommand(null),
         COPY_FEEDBACK_MS
       );
     } catch {
-      setCopied(false);
+      setCopiedCommand(null);
     }
   };
 

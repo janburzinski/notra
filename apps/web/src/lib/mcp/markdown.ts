@@ -1,10 +1,11 @@
 import {
   MCP_CLIENTS,
-  MCP_FALLBACK_TOOL_CARDS,
+  MCP_HERO_SUBHEAD,
   MCP_TERMINAL_RESULT_MESSAGE,
   MCP_TERMINAL_TOOL_CALLS,
   MCP_TERMINAL_USER_MESSAGE,
 } from "@/constants/mcp";
+import { MCP_FALLBACK_TOOL_CARDS } from "@/constants/mcp-tools";
 import {
   MCP_USE_CASE_CATEGORIES,
   MCP_USE_CASE_TOOL_LABELS,
@@ -22,10 +23,7 @@ import type {
   McpUseCaseMarkdownEntry,
 } from "@/types/mcp-use-cases";
 import { markdownSection } from "@/utils/markdown";
-import {
-  formatMcpHeroSubhead,
-  formatMcpUseCasesCalloutLabel,
-} from "@/utils/mcp";
+import { formatMcpUseCasesCalloutLabel } from "@/utils/mcp";
 import {
   findMcpUseCase,
   getMcpUseCaseCategory,
@@ -77,7 +75,7 @@ export async function buildMcpMarkdown(): Promise<string> {
   return [
     "# Notra, for your agent",
     "",
-    formatMcpHeroSubhead(tools.length),
+    MCP_HERO_SUBHEAD,
     "",
     `MCP server URL: ${MCP_URL}`,
     "",
