@@ -1,0 +1,21 @@
+apps/web/src/content/legal/subprocessors.mdx
+  s_5d3dce3174f3f6::t_07e9101fb70852 5,85
+apps/web/src/content/legal/dpa.mdx
+  s_5d3dce3174f3f6::t_471f75013b735a 5,198
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "be954a0706ca56fd0cbcf4a52d95ebe1639bbfba",
+  "prompts": {},
+  "sessions": {
+    "s_5d3dce3174f3f6": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ae417539-fd7c-495b-83a7-87fda7e68580",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
