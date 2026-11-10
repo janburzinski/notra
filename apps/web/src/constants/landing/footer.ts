@@ -10,6 +10,7 @@ import type {
   FooterLink,
   FooterLinkColumn,
   FooterSocialLink,
+  GlitterTheme,
 } from "@/types/landing/footer";
 import { SOCIAL_LINKS } from "@/utils/social-links";
 
@@ -145,3 +146,47 @@ export const FOOTER_LEGAL_LINKS: readonly FooterLink[] = [
   { label: "Legal", href: "/legal" },
   { label: "Terms", href: "/terms" },
 ];
+
+export const GLITTER_EGG_CLICKS = 5;
+export const GLITTER_EGG_HINT_CLICK = 3;
+export const GLITTER_EGG_CLICK_WINDOW_MS = 1200;
+
+export const GLITTER_WORDMARK = {
+  text: "NOTRA",
+  fontFamily: "NotraGlitter",
+  fontUrl: "/fonts/inter-800.woff2",
+  columns: 200,
+  rows: 48,
+  revealMs: 1400,
+  maxStars: 24,
+  starChance: 0.18,
+  hoverStarChance: 0.55,
+  starLifeS: 0.7,
+  sheenPeriodS: 5,
+  sheenWidth: 0.07,
+  hoverRadius: 16,
+  hoverPush: 1.4,
+} as const;
+
+// Gradient stops sampled left to right across the word; the last stop wraps to the first.
+export const GLITTER_GRADIENT_DARK: GlitterTheme = {
+  stops: [
+    [200, 178, 238],
+    [167, 139, 250],
+    [240, 171, 252],
+    [165, 180, 252],
+  ],
+  highlight: [255, 255, 255],
+  floor: 0.55,
+};
+
+export const GLITTER_GRADIENT_LIGHT: GlitterTheme = {
+  stops: [
+    [124, 58, 237],
+    [139, 92, 246],
+    [192, 38, 211],
+    [79, 70, 229],
+  ],
+  highlight: [255, 246, 252],
+  floor: 0.7,
+};

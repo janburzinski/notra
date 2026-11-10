@@ -3,6 +3,7 @@ import { Link } from "@tanstack/react-router";
 import { ConsentDialogLink } from "c15t/tanstack-start/components/consent-dialog-link";
 
 import { DeferredDithering } from "@/components/deferred-dithering";
+import { GlitterWordmark } from "@/components/landing/glitter-wordmark";
 import {
   FOOTER_DITHERING,
   FOOTER_LEGAL_LINKS,
@@ -10,6 +11,7 @@ import {
   FOOTER_SOCIAL_LINKS,
   FOOTER_TAGLINE,
 } from "@/constants/landing/footer";
+import { useGlitterEgg } from "@/hooks/use-glitter-egg";
 import type { FooterLink } from "@/types/landing/footer";
 import { isProxiedPath } from "@/utils/proxied-paths";
 
@@ -63,6 +65,7 @@ export function FooterDither() {
 
 export default function FooterSection() {
   const year = new Date().getFullYear();
+  const glitter = useGlitterEgg();
 
   return (
     <footer className="relative isolate overflow-hidden rounded-t-3xl bg-[linear-gradient(in_oklab_180deg,oklab(80.3%_0.045_-0.074/15%)_0%,oklab(71.8%_0.066_-0.109/50%)_100%)] pt-6 shadow-[0_0.0625rem_0.125rem_#28282814,0_0_0_0.0625rem_#ececec] dark:bg-[#141019] dark:bg-none dark:shadow-none">
@@ -74,11 +77,20 @@ export default function FooterSection() {
           loading="lazy"
           alt=""
           aria-hidden="true"
-          className="h-auto w-[121.4%] max-w-[126rem] min-w-[60rem] translate-y-[23%] dark:opacity-40"
+          className={cn(
+            "h-auto w-[121.4%] max-w-[126rem] min-w-[60rem] translate-y-[23%] transition-[opacity,filter] duration-500 ease-out motion-reduce:transition-none dark:opacity-40",
+            glitter.active &&
+              "opacity-0 blur-md motion-reduce:blur-none dark:opacity-0"
+          )}
           height={536}
           src="/marketing/landing/footer-wordmark.svg"
           width={1748}
         />
+        {glitter.active ? (
+          <div className="absolute inset-x-0 bottom-0 mx-auto w-full max-w-[87rem] px-6 md:px-8">
+            <GlitterWordmark active />
+          </div>
+        ) : null}
       </div>
 
       <div className="relative mx-auto flex w-full max-w-[87rem] flex-col px-6 pb-64 md:px-8 md:pb-[30rem]">
@@ -86,9 +98,14 @@ export default function FooterSection() {
           <div className="flex w-full max-w-[18.5rem] flex-col gap-7">
             <div className="flex flex-col gap-2.5">
               <div className="flex items-center gap-2">
-                <span className="flex size-10 items-center justify-center rounded-lg dark:bg-[#F6F3F1] dark:shadow-sm dark:ring-1 dark:inset-shadow-sm dark:shadow-black/40 dark:ring-white/10 dark:inset-shadow-white/8">
-                  <NotraMark className="size-7 shrink-0" />
-                </span>
+                <button
+                  type="button"
+                  aria-label="Notra"
+                  onClick={glitter.onMarkClick}
+                  className="flex size-10 items-center justify-center rounded-lg select-none dark:bg-[#F6F3F1] dark:shadow-sm dark:ring-1 dark:inset-shadow-sm dark:shadow-black/40 dark:ring-white/10 dark:inset-shadow-white/8"
+                >
+                  <NotraMark className="pointer-events-none size-7 shrink-0" />
+                </button>
                 <span className="font-display text-foreground text-lg leading-[1.14] font-semibold tracking-[-0.015em]">
                   Notra
                 </span>

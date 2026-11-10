@@ -30,3 +30,15 @@ export interface FooterDitheringConfig {
   colorBack: string;
   colorFront: string;
 }
+
+export type GlitterRgb = readonly [number, number, number];
+
+export interface GlitterTheme {
+  stops: readonly GlitterRgb[];
+  highlight: GlitterRgb;
+  floor: number;
+}
+
+export interface GlitterWordmarkProps {
+  active: boolean;
+}
