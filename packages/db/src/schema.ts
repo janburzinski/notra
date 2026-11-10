@@ -1296,8 +1296,6 @@ export const brandGuidelineScreenshotKindEnum = pgEnum(
   ["desktop_hero", "desktop_full_page", "mobile_hero"]
 );
 
-// The physical supermemory_* columns are intentionally undeclared; a later
-// migration drops them.
 export const brandReferences = pgTable(
   "brand_references",
   {
@@ -4229,7 +4227,6 @@ export const webhookAttempts = pgTable(
   ]
 );
 
-// The physical publish_mode column is dropped in a follow-up migration.
 export const sites = pgTable(
   "sites",
   {
