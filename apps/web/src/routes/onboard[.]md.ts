@@ -28,7 +28,7 @@ In ChatGPT, Claude.ai or Claude Desktop you can't run commands. Ask the user to 
 
 ## 2. Sign in
 
-Notra signs in with OAuth in the browser. Ask the user to pick the organization named in their prompt and Full access, so you can create projects. If they don't have an account yet, they can sign up at ${APP_URL} first.
+Notra signs in with OAuth in the browser. Ask the user to pick the organization named in their prompt and Full access. Read only can't create anything and Write only can't list projects. If they don't have an account yet, they can sign up at ${APP_URL} first.
 
 - Claude Code: ask the user to restart Claude Code, run \`/mcp\`, select notra and choose Authenticate.
 - Codex: run \`codex mcp login notra\`.
@@ -42,22 +42,24 @@ Without a browser, for example in CI or on a remote machine, use an API key: the
 
 ## 3. Check the connection
 
-Call \`whoami\`. If the prompt named an organization, the workspace must match it: compare the slug in parentheses after the name, or the name if there is no slug. If it doesn't match, stop and ask the user to sign in again with that organization, because everything you create goes into the connected workspace. On a 401, go back to step 2.
+Call \`whoami\`. If the prompt named an organization, the connected workspace must match it: compare \`workspace.slug\` with the slug in parentheses after the name in the prompt, or compare \`workspace.name\` if the prompt has no slug. If it doesn't match, stop and ask the user to sign in again with that organization, because everything you create goes into the connected workspace. On a 401, go back to step 2.
 
-Then call \`list_projects\`. If it says the plan doesn't include GEO, tell the user and offer to draft content in their brand voice instead, with \`list_brand_identities\` and \`generate_post\`.
+Then call \`list_projects\`. If it fails because GEO needs a Starter, Growth or Scale plan, tell the user. You can still draft content in their brand voice: find it with \`list_brand_identities\`, check \`list_integrations\` for a connected GitHub or Linear source, then use \`generate_post\`.
 
 ## 4. Show something useful
 
-- A project exists: summarize \`get_geo_visibility_overview\`: how often the brand shows up in AI answers, where it's missing and which competitors show up instead. Then suggest what to write next from \`list_geo_content_gaps\`.
-- No project yet: ask for the user's website and find its brand identity with \`list_brand_identities\`. If none matches, create one with \`generate_brand_identity\` and wait for \`get_brand_identity_generation_status\`. Create the project with \`create_project\`, passing that identity's ID as \`brandSettingsId\`. Then propose competitors with \`suggest_geo_competitors\` and add the ones the user picks with \`upsert_geo_competitor\`. A new project has no visibility data until its first scan.
+- A project exists: summarize \`get_geo_snapshot\`: how often the brand shows up in AI answers, which competitors show up instead and the recommended next actions. Then suggest what to write next from \`list_geo_content_gaps\`.
+- No project yet: ask for the user's website and look for a brand identity whose \`websiteUrl\` matches it with \`list_brand_identities\`. If none matches, create one with \`generate_brand_identity\` and wait until \`get_brand_identity_generation_status\` reports it completed. Create the project with \`create_project\`, passing a name and that identity's ID as \`brandSettingsId\`. Propose competitors with \`suggest_geo_competitors\`, passing the user's domain, and add the ones the user picks with \`upsert_geo_competitor\`. Choose answer engines from \`list_geo_engines\` with the user.
 
-\`create_geo_scan\`, \`run_geo_sequence\` and \`plan_geo_content_brief\` use AI credits and can take minutes. Always ask before running them.
+A new project can't be scanned until its GEO settings are saved with \`update_geo_settings\`. The first save must set every required field, and the tool lists any you missed. With \`enabled\` set to true, the first scan starts within minutes and repeats every \`scanIntervalHours\`, so ask before turning it on. Until then the project has no visibility data.
+
+Scans, sequences, persona runs and generation, content briefs and post generation use AI credits and can take minutes. This includes \`create_geo_scan\`, \`rescan_geo_prompt\`, \`run_geo_sequence\`, \`plan_geo_content_brief\` and \`generate_post\`. Always ask before running them.
 
 ## 5. Wrap up
 
 In a few lines, tell the user that Notra is connected, what you found and two or three things you can do next, such as checking every week how AI engines answer questions about them and their competitors, or drafting a post for their biggest content gap.
 
-If any step didn't work, report it with the \`submit_feedback\` tool. It needs no credentials.
+If a step didn't work, tell the user what failed. Only send it to the Notra team with \`submit_feedback\` if the user agrees, and only with content they approve.
 `;
 
 function GET() {
