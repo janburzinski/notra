@@ -89,6 +89,11 @@ export const SETTINGS_NAV_GROUPS: readonly SettingsNavGroupConfig[] = [
           "dark",
           "system",
           "color scheme",
+          "sound",
+          "sounds",
+          "audio",
+          "volume",
+          "click sounds",
         ],
       },
       {

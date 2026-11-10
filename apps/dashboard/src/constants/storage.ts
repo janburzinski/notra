@@ -31,6 +31,7 @@ export const localStorageKeys = {
   welcomeTourSeen: "notra:welcome-tour-seen",
   connectAgentDismissed: "notra:connect-agent-dismissed:v1",
   geoModelsAdvanced: "notra:geo-models-advanced:v1",
+  uiSounds: "notra:ui-sounds:v1",
   siteSettingsGroupCollapsed: (id: string) =>
     `notra:site-settings-group-collapsed:v1:${id}`,
   siteAuthorImportDismissed: (siteId: string, authorIds: readonly string[]) =>

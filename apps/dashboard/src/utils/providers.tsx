@@ -21,6 +21,7 @@ import { DashboardChartEnvironment } from "@/components/charts/dashboard-chart-e
 import Image from "@/components/framework/image";
 import Link from "@/components/framework/link";
 import { PostHogIdentity } from "@/components/providers/posthog-identity";
+import { UiSounds } from "@/components/providers/ui-sounds";
 import { POSTHOG_PROJECT_TOKEN } from "@/constants/posthog";
 import { TRAFFIC_EMBED_THEME_STORAGE_KEY } from "@/constants/traffic-embed";
 import { useIsClient } from "@/lib/hooks/use-is-client";
@@ -141,6 +142,7 @@ export function Providers({
                     ) : null}
                   </NuqsAdapter>
                   <Toaster position="bottom-right" />
+                  {embed ? null : <UiSounds />}
                 </TooltipProvider>
               </CardLabelsProvider>
             </DataTableLabelsProvider>

@@ -23,6 +23,7 @@ import { useBillingCustomer } from "@/lib/hooks/use-billing-customer";
 import { useChatComposerAttachments } from "@/lib/hooks/use-chat-composer-attachments";
 import { useChatSkillSlash } from "@/lib/hooks/use-chat-skill-slash";
 import { dashboardOrpc } from "@/lib/orpc/query";
+import { playUiSound } from "@/lib/ui-sounds/player";
 import type {
   ChatInputProps,
   EnabledLinear,
@@ -374,6 +375,7 @@ export function useContentChatInput({
     }
 
     const nextAttachments = consumeAttachments();
+    playUiSound("send");
     onSend?.(prependChatQuote(trimmed, quoteContext?.quote), nextAttachments);
     quoteContext?.setQuote(null);
     onClearSelection?.();

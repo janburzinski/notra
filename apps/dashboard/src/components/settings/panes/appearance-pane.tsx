@@ -9,6 +9,7 @@ import { ChatSection } from "@/components/settings/chat-section";
 import { LanguageSection } from "@/components/settings/language-section";
 import { PrivacySection } from "@/components/settings/privacy-section";
 import { SettingsPane } from "@/components/settings/settings-pane";
+import { SoundsSection } from "@/components/settings/sounds-section";
 import {
   APPEARANCE_OPTIONS,
   APPEARANCE_PREVIEW_STYLES,
@@ -114,6 +115,7 @@ export function AppearanceSettingsPane() {
       </fieldset>
       <LanguageSection />
       <ChatSection />
+      <SoundsSection />
       <PrivacySection />
     </SettingsPane>
   );

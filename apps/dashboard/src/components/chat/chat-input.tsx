@@ -74,6 +74,7 @@ import { useBillingCustomer } from "@/lib/hooks/use-billing-customer";
 import { useChatSkillSlash } from "@/lib/hooks/use-chat-skill-slash";
 import { useOutputTypeLabel } from "@/lib/hooks/use-output-type-label";
 import { dashboardOrpc } from "@/lib/orpc/query";
+import { playUiSound } from "@/lib/ui-sounds/player";
 import { dragEventHasFiles } from "@/lib/upload/chat";
 import {
   deleteChatUpload as deleteChatUploadFile,
@@ -1096,6 +1097,7 @@ function sendOrQueueComposer({
         return;
       }
     }
+    playUiSound("send");
     onSend?.(prependComposerPrefix(outbound, quote), []);
     clearComposer();
     return;
@@ -2359,6 +2361,7 @@ export function ChatInputAdvanced({
       for (const attachment of snapshotAttachments) {
         submittedKeysRef.current.add(attachment.key);
       }
+      playUiSound("send");
       onSend?.(value, snapshotAttachments);
       clearComposer(sentAnnotationIds);
       return true;
