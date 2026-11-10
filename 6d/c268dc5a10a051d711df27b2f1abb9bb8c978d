@@ -1,0 +1,92 @@
+packages/email/src/types/geo-recap.ts
+  s_eacb6af6af8b76::t_4f01079cb608fa 71-93
+apps/dashboard/src/utils/web-analytics.ts
+  s_eacb6af6af8b76::t_4f01079cb608fa 151
+apps/dashboard/src/constants/traffic-embed.ts
+  ai_agent 4,92-104,120,126
+apps/dashboard/src/components/geo/web-trend-chart.tsx
+  s_eacb6af6af8b76::t_4f01079cb608fa 5,32-37,103
+apps/dashboard/src/workflows/geo-scan.ts
+  s_eacb6af6af8b76::t_4f01079cb608fa 68,354-363
+packages/db/src/types/geo-checks.ts
+  s_eacb6af6af8b76::t_4f01079cb608fa 364-387
+apps/dashboard/src/utils/geo-first-scan.ts
+  s_eacb6af6af8b76::t_4f01079cb608fa 1-167
+apps/dashboard/src/lib/geo/traffic-embeds.ts
+  ai_agent 19-22,54,94,166,177,216,263,355,409,419-440,450-452,493,520,698
+packages/db/migrations/meta/0156_snapshot.json
+  ai_agent 2,9134-9140
+packages/email/package.json
+  s_eacb6af6af8b76::t_4f01079cb608fa 17
+apps/dashboard/tests/geo-scan-workflow.test.ts
+  s_eacb6af6af8b76::t_4f01079cb608fa 67-69
+apps/dashboard/src/components/geo/web-traffic-hero.tsx
+  s_eacb6af6af8b76::t_4f01079cb608fa 1-162
+packages/db/migrations/0156_traffic_embed_source.sql
+  ai_agent 1
+packages/db/src/schema.ts
+  s_eacb6af6af8b76::t_4f01079cb608fa 1908-1912,1929-1932
+apps/dashboard/src/types/geo.ts
+  s_eacb6af6af8b76::t_4f01079cb608fa 2025-2030,2032,2036-2047
+apps/dashboard/src/components/geo/web-visitors-section.tsx
+  s_eacb6af6af8b76::t_4f01079cb608fa 15,18,139-144
+apps/dashboard/src/types/email/send.ts
+  s_eacb6af6af8b76::t_4f01079cb608fa 4,100-102
+apps/docs/ai-traffic/embed.mdx
+  s_eacb6af6af8b76::t_4f01079cb608fa 39
+apps/dashboard/src/lib/email/geo-first-scan.ts
+  s_eacb6af6af8b76::t_4f01079cb608fa 1-105
+apps/sites-builder/compiler/constants/cli.ts
+  s_eacb6af6af8b76::t_4f01079cb608fa 4-14
+packages/schemas/src/schemas/dashboard/traffic-embed.ts
+  s_eacb6af6af8b76::t_4f01079cb608fa 41
+apps/dashboard/src/lib/orpc/routers/traffic-embeds.ts
+  s_eacb6af6af8b76::t_4f01079cb608fa 61
+apps/dashboard/src/workflows/steps/send-geo-first-scan-email.ts
+  s_eacb6af6af8b76::t_4f01079cb608fa 1-13
+apps/dashboard/src/components/geo/traffic-embed-charts.tsx
+  s_eacb6af6af8b76::t_eec8d0ca5648ed 7-10
+  s_eacb6af6af8b76::t_c7e1e5b06e33cf 49-53,75,83,410-421,425,427
+packages/db/migrations/meta/_journal.json
+  ai_agent 1100-1108
+apps/sites-builder/tests/local-mounts.test.ts
+  s_eacb6af6af8b76::t_4f01079cb608fa 4,219-250
+apps/dashboard/src/lib/email/send.ts
+  s_eacb6af6af8b76::t_4f01079cb608fa 3,24,274-284
+packages/email/src/emails/first-scan-results.tsx
+  s_eacb6af6af8b76::t_4f01079cb608fa 1-219
+apps/sites-builder/compiler/utils/local-options.ts
+  s_eacb6af6af8b76::t_4f01079cb608fa 2-9,21,33-38,53-58,60-63,66,71-92,153,183
+apps/dashboard/src/types/email/geo-recap.ts
+  s_eacb6af6af8b76::t_4f01079cb608fa 2-5,63-71
+apps/dashboard/src/lib/email/geo-recap.ts
+  s_eacb6af6af8b76::t_4f01079cb608fa 147,231,381-390,398,409-439
+packages/email/src/components/geo-recap.tsx
+  s_eacb6af6af8b76::t_4f01079cb608fa 8,259-320
+packages/db/src/utils/geo-checks.ts
+  s_eacb6af6af8b76::t_4f01079cb608fa 49-51,1566-1626
+apps/dashboard/src/types/traffic-embed.ts
+  s_eacb6af6af8b76::t_cf9406b8b84a80 65
+apps/dashboard/src/components/geo/traffic-actions-menu.tsx
+  s_eacb6af6af8b76::t_4f01079cb608fa 19,24,37,39,59,95-97,101
+apps/dashboard/src/constants/geo-recap.ts
+  s_eacb6af6af8b76::t_4f01079cb608fa 29-31
+packages/db/migrations/meta/0157_snapshot.json
+  ai_agent 1-17598
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "6dc268dc5a10a051d711df27b2f1abb9bb8c978d",
+  "prompts": {},
+  "sessions": {
+    "s_eacb6af6af8b76": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "2edb034b-eaba-4f3a-919f-85a761fafa20",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
