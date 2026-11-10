@@ -1,0 +1,61 @@
+apps/dashboard/src/constants/analytics-imports.ts
+  s_5d3dce3174f3f6::t_50ac4090b81ee8 78,81-87,97,110,119
+apps/dashboard/src/lib/analytics-imports/providers.ts
+  s_5d3dce3174f3f6::t_50ac4090b81ee8 14-17,51-52,60-61,73-79,121-130
+packages/geo-core/src/constants/analytics-imports.ts
+  s_5d3dce3174f3f6::t_5a4aa5ac4d0a81 47-52,69-74,146-159,217-225
+apps/dashboard/src/types/analytics-imports.ts
+  s_5d3dce3174f3f6::t_50ac4090b81ee8 19,38-39
+  s_5d3dce3174f3f6::t_49c2fbef8ae05f 41-45
+apps/dashboard/src/utils/analytics-imports.ts
+  s_5d3dce3174f3f6::t_29561a1b8e341c 9,23-29
+packages/db/src/constants/analytics-imports.ts
+  s_5d3dce3174f3f6::t_5a4aa5ac4d0a81 7,14
+apps/dashboard/src/lib/analytics-imports/rate-limit.ts
+  s_5d3dce3174f3f6::t_b77bc927118217 11-15,17-24,26,36,41-55
+  s_5d3dce3174f3f6::t_49c2fbef8ae05f 9-10,16
+apps/dashboard/src/lib/orpc/routers/analytics-imports.ts
+  s_5d3dce3174f3f6::t_914bad924ab757 94
+  s_5d3dce3174f3f6::t_29561a1b8e341c 296-298
+apps/dashboard/src/lib/analytics-imports/credentials.ts
+  s_5d3dce3174f3f6::t_50ac4090b81ee8 8,39-40,60-63
+apps/dashboard/src/components/analytics-import/import-provider-mark.tsx
+  s_5d3dce3174f3f6::t_50ac4090b81ee8 3
+  s_5d3dce3174f3f6::t_b77bc927118217 15
+apps/dashboard/src/components/analytics-import/import-provider-picker.tsx
+  s_5d3dce3174f3f6::t_29561a1b8e341c 9,19-20,43-44
+  s_5d3dce3174f3f6::t_69759e4b91fd85 21-34,36-42
+apps/dashboard/messages/en.json
+  s_5d3dce3174f3f6::t_914bad924ab757 4789-4792,4824-4825,4848-4853
+apps/dashboard/src/components/analytics-import/import-connect-step.tsx
+  s_5d3dce3174f3f6::t_914bad924ab757 44-46,186
+apps/dashboard/tests/analytics-import-ui.test.tsx
+  s_5d3dce3174f3f6::t_db355c575e3bc3 34-35,190-203
+packages/geo-core/src/types/analytics-imports.ts
+  s_5d3dce3174f3f6::t_5a4aa5ac4d0a81 145-151,243-244
+apps/dashboard/messages/de.json
+  s_5d3dce3174f3f6::t_914bad924ab757 4789-4792,4824-4825,4848-4853
+packages/geo-core/src/imports/rybbit.ts
+  s_5d3dce3174f3f6::t_b97730702031f1 1-246
+packages/geo-core/src/schemas/analytics-imports.ts
+  s_5d3dce3174f3f6::t_5a4aa5ac4d0a81 125-177,194-196
+packages/geo-core/tests/analytics-import-providers.test.ts
+  s_5d3dce3174f3f6::t_69759e4b91fd85 1243-1248
+  s_5d3dce3174f3f6::t_254c534fec055a 12,39-43,78,1107-1242,1249-1283
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "05da57702af782061f6bb83867cd8fa433a33933",
+  "prompts": {},
+  "sessions": {
+    "s_5d3dce3174f3f6": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ae417539-fd7c-495b-83a7-87fda7e68580",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
