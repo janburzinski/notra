@@ -1,0 +1,21 @@
+apps/dashboard/src/components/geo/ai-traffic-embed.tsx
+  s_eacb6af6af8b76::t_aa75e01319c77f 3,8,68-69,74-75,80-82
+apps/dashboard/src/lib/hooks/use-live-traffic-embed.ts
+  s_eacb6af6af8b76::t_aa75e01319c77f 93-95
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "d9f204576d6deda007c8e71d0e84cc75974cc433",
+  "prompts": {},
+  "sessions": {
+    "s_eacb6af6af8b76": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "2edb034b-eaba-4f3a-919f-85a761fafa20",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
