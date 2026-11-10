@@ -7,24 +7,30 @@ import { Button } from "@/components/button";
 import { useOrganizationsContext } from "@/components/providers/organization-provider";
 import { useAnalyticsImports } from "@/lib/hooks/use-analytics-imports";
 import { useGeoActiveProject } from "@/lib/hooks/use-geo-active-project";
+import { cn } from "@/lib/utils";
 import type { ImportHistoryCardProps } from "@/types/components/analytics-import";
 
 import { AnalyticsImportDialog } from "./analytics-import-dialog";
 import { ImportActivityPill } from "./import-activity-pill";
-import { ImportProviderMark } from "./import-provider-mark";
+import { ImportProviderLogo } from "./import-provider-mark";
 
-const CARD_PROVIDERS = ["plausible", "vercel", "cloudflare"] as const;
+// Vercel stands in front; Plausible and Cloudflare stand behind it, a little
+// smaller and turned outwards.
+const TILE_CLASSNAME =
+  "bg-background flex shrink-0 items-center justify-center rounded-lg border";
 
 function ImportProviderMarks() {
   return (
-    <div aria-hidden="true" className="flex shrink-0 -space-x-2">
-      {CARD_PROVIDERS.map((provider) => (
-        <ImportProviderMark
-          className="bg-background ring-background size-8 rounded-lg border ring-2"
-          key={provider}
-          provider={provider}
-        />
-      ))}
+    <div aria-hidden="true" className="flex shrink-0 items-center">
+      <span className={cn(TILE_CLASSNAME, "-me-1.5 size-9 -rotate-8")}>
+        <ImportProviderLogo className="h-4 w-auto" provider="plausible" />
+      </span>
+      <span className={cn(TILE_CLASSNAME, "relative z-10 size-11 shadow-sm")}>
+        <ImportProviderLogo className="size-4.5" provider="vercel" />
+      </span>
+      <span className={cn(TILE_CLASSNAME, "-ms-1.5 size-9 rotate-8")}>
+        <ImportProviderLogo className="h-auto w-5" provider="cloudflare" />
+      </span>
     </div>
   );
 }
@@ -54,6 +60,10 @@ export function ImportHistoryCard({
   if (hidden) {
     return null;
   }
+  const settings = variant === "settings";
+  const actionLabel = settings
+    ? t(storedCount > 0 ? "settings.action" : "settings.start")
+    : t("cta.action");
   const dialog = (
     <AnalyticsImportDialog
       defaultHost={domain ?? ""}
@@ -64,47 +74,49 @@ export function ImportHistoryCard({
       projectId={projectId}
       trigger={
         <Button className="shrink-0" size="sm" variant="outline">
-          {t(`${variant}.action`)}
+          {actionLabel}
         </Button>
       }
     />
   );
-
-  if (variant === "settings") {
-    return (
-      <section
-        aria-labelledby={headingId}
-        className="flex flex-col gap-4 border-t pt-6 sm:flex-row sm:items-center"
-      >
-        <div className="flex min-w-0 flex-1 flex-col items-start gap-1">
-          <h2 className="text-base font-semibold" id={headingId}>
-            {t("settings.title")}
-          </h2>
-          <p className="text-muted-foreground text-sm text-pretty">
-            {manageOnly
-              ? t("settings.manageDescription")
-              : t("settings.description")}
-          </p>
-          <ImportActivityPill
-            imports={data?.imports ?? []}
-            onOpen={() => setOpen(true)}
-          />
-        </div>
-        <div className="self-start sm:self-auto">{dialog}</div>
-      </section>
-    );
-  }
-
-  return (
+  const card = (
     <div className="flex flex-col gap-3 rounded-xl border p-4 sm:flex-row sm:items-center sm:gap-4">
       <ImportProviderMarks />
       <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-        <p className="text-sm font-medium">{t("cta.title")}</p>
+        {manageOnly ? null : (
+          <p className="text-sm font-medium">{t("cta.title")}</p>
+        )}
         <p className="text-muted-foreground text-sm text-pretty">
-          {t("cta.description")}
+          {settings
+            ? t(
+                manageOnly
+                  ? "settings.manageDescription"
+                  : "settings.description"
+              )
+            : t("cta.description")}
         </p>
       </div>
       <div className="self-start sm:self-auto">{dialog}</div>
     </div>
+  );
+
+  if (!settings) {
+    return card;
+  }
+
+  return (
+    <section
+      aria-labelledby={headingId}
+      className="flex flex-col items-start gap-4 border-t pt-6"
+    >
+      <h2 className="text-base font-semibold" id={headingId}>
+        {t("settings.title")}
+      </h2>
+      <div className="w-full">{card}</div>
+      <ImportActivityPill
+        imports={data?.imports ?? []}
+        onOpen={() => setOpen(true)}
+      />
+    </section>
   );
 }

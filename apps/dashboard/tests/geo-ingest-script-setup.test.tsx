@@ -87,17 +87,17 @@ if (!process.env.NOTRA_SCRIPT_SETUP_TEST_WORKER) {
   test("the auto-updating notra.js tag is the default, without integrity", () => {
     const html = text(render(setup));
     expect(html).toContain(
-      '<script defer src="https://ingest.example/api/notra.js" data-key="nwk.key"></script>'
+      '<script\n  defer\n  src="https://ingest.example/api/notra.js"\n  data-key="nwk.key"\n></script>'
     );
     expect(html).not.toContain("integrity=");
   });
 
   test("error reporting loads notra.plus.js, and pinning adds the integrity hash", () => {
     expect(geoScriptSnippet(setup, { pinned: false, errors: true })).toBe(
-      '<script defer src="https://ingest.example/api/notra.plus.js" data-key="nwk.key"></script>'
+      '<script\n  defer\n  src="https://ingest.example/api/notra.plus.js"\n  data-key="nwk.key"\n></script>'
     );
     expect(geoScriptSnippet(setup, { pinned: true, errors: true })).toBe(
-      '<script defer src="https://ingest.example/api/notra.plus.0123456789ab.js" data-key="nwk.key" integrity="sha384-def" crossorigin="anonymous"></script>'
+      '<script\n  defer\n  src="https://ingest.example/api/notra.plus.0123456789ab.js"\n  data-key="nwk.key"\n  integrity="sha384-def"\n  crossorigin="anonymous"\n></script>'
     );
     expect(geoScriptSnippet(undefined, { pinned: true, errors: false })).toBe(
       ""

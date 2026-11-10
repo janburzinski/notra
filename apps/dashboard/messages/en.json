@@ -3139,6 +3139,7 @@
       "selectedModels": "{model} +{count}"
     },
     "geoIngestSetup": {
+      "agentPrompt": "Agent prompt",
       "tokenTitle": "Set your token",
       "tokenDescription": "Add this as {env} on every domain this project tracks.",
       "proxyTitle": "Add the proxy",
@@ -3188,12 +3189,6 @@
         "awaiting": "Awaiting first page view…",
         "receiving": "Receiving page views since {date}",
         "viewAnalytics": "View analytics"
-      },
-      "methodDescriptions": {
-        "sdk": "Counts AI agents and crawlers on your server. Add it to the framework your site runs on.",
-        "script": "Counts people, without cookies. For AI agents, add the package or a log drain too.",
-        "vercel": "Counts AI agents from your Vercel request logs. No code changes.",
-        "cloudflare": "Counts AI agents from your Cloudflare request logs. No code changes."
       },
       "docs": {
         "script": "Learn more about notra.js",
@@ -4766,6 +4761,7 @@
         "title": "Import history",
         "description": "Bring past page views and AI crawler hits in from Plausible, Vercel or Cloudflare.",
         "action": "Manage imports",
+        "start": "Import",
         "manageDescription": "Web analytics is off for this workspace. You can still delete imported history and disconnect accounts."
       },
       "providers": {

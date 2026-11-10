@@ -746,11 +746,6 @@ export interface GeoIngestSdkSetupProps {
   onCopy: (kind: TrafficInstallCopyKind) => void;
 }
 
-export interface WebKeyRotateButtonProps {
-  /** Outlined, for the settings header; quiet ghost in a footer. */
-  prominent?: boolean;
-}
-
 export interface GeoIngestDocsLinkProps {
   method: GeoIngestMethod;
   className?: string;
@@ -762,7 +757,8 @@ export interface GeoIngestSetupActionsProps {
   /** Owners and admins can rotate the public notra.js key. */
   canManage: boolean;
   onCopy: (kind: TrafficInstallCopyKind) => void;
-  prominent?: boolean;
+  /** The small agent prompt pill, for the settings header. */
+  compact?: boolean;
 }
 
 export interface GeoWebTrackingStatusProps {

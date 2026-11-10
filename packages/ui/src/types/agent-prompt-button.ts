@@ -12,6 +12,14 @@ export interface AgentPromptButtonProps
   onCopy?: () => void;
   onCopyError?: UseCopyToClipboardOptions["onError"];
   variant?: "default" | "sidebar";
+  /** `sm` is a compact pill for section headers. */
+  size?: AgentPromptButtonSize;
+}
+
+export type AgentPromptButtonSize = "default" | "sm";
+
+export interface AgentLogoStackProps {
+  size: AgentPromptButtonSize;
 }
 
 export interface AgentPromptSwapLabelProps {

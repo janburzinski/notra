@@ -3139,6 +3139,7 @@
       "selectedModels": "{model} +{count}"
     },
     "geoIngestSetup": {
+      "agentPrompt": "Agent-Prompt",
       "tokenTitle": "Token setzen",
       "tokenDescription": "Füge dies als {env} auf jeder Domain hinzu, die dieses Projekt trackt.",
       "proxyTitle": "Proxy hinzufügen",
@@ -3188,12 +3189,6 @@
         "awaiting": "Warte auf den ersten Seitenaufruf…",
         "receiving": "Empfängt Seitenaufrufe seit {date}",
         "viewAnalytics": "Analytics ansehen"
-      },
-      "methodDescriptions": {
-        "sdk": "Zählt KI-Agenten und Crawler auf deinem Server. Füge es dem Framework hinzu, auf dem deine Website läuft.",
-        "script": "Zählt Menschen, ohne Cookies. Für KI-Agenten zusätzlich das Paket oder einen Log-Drain.",
-        "vercel": "Zählt KI-Agenten aus deinen Vercel-Request-Logs. Ohne Codeänderung.",
-        "cloudflare": "Zählt KI-Agenten aus deinen Cloudflare-Request-Logs. Ohne Codeänderung."
       },
       "docs": {
         "script": "Mehr über notra.js",
@@ -4766,6 +4761,7 @@
         "title": "Verlauf importieren",
         "description": "Hole frühere Seitenaufrufe und KI-Crawler-Zugriffe aus Plausible, Vercel oder Cloudflare.",
         "action": "Importe verwalten",
+        "start": "Importieren",
         "manageDescription": "Web-Analytics ist für diesen Workspace ausgeschaltet. Du kannst importierte Verläufe trotzdem löschen und Konten trennen."
       },
       "providers": {

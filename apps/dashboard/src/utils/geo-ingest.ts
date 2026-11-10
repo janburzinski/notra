@@ -173,6 +173,16 @@ export function availableGeoIngestMethods(
   return webAnalytics ? ["script", ...others] : others;
 }
 
+/** One attribute per line, so the long key and URLs never break mid-word. */
+function formatScriptTag(tag: string): string {
+  const attributes = tag
+    .slice("<script ".length, -"></script>".length)
+    .match(/[\w-]+(?:="[^"]*")?/g);
+  return attributes
+    ? `<script\n${attributes.map((attribute) => `  ${attribute}`).join("\n")}\n></script>`
+    : tag;
+}
+
 /**
  * The script tag to install: notra.plus.js when JavaScript errors are
  * reported too, and pinned to one build with its integrity hash when asked.
@@ -184,6 +194,6 @@ export function geoScriptSnippet(
 ): string {
   const script = options.errors ? setup?.webPlusScript : setup?.webScript;
   return setup?.webKey && script
-    ? geoWebScriptTag(setup.webKey, script, options.pinned)
+    ? formatScriptTag(geoWebScriptTag(setup.webKey, script, options.pinned))
     : "";
 }

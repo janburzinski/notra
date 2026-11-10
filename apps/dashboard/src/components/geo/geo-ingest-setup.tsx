@@ -69,20 +69,22 @@ function GeoIngestSetupActions({
   agentPrompt,
   canManage,
   onCopy,
-  prominent = false,
+  compact = false,
 }: GeoIngestSetupActionsProps) {
+  const t = useTranslations("geo.geoIngestSetup");
   const tCommon = useTranslations("common");
   if (method === "script") {
-    return canManage ? <WebKeyRotateButton prominent={prominent} /> : null;
+    return canManage ? <WebKeyRotateButton /> : null;
   }
   if (method === "sdk" || method === "cloudflare") {
     return (
       <AgentPromptButton
         copiedLabel={tCommon("labels.promptCopied")}
-        label={tCommon("labels.copyAgentPrompt")}
+        label={compact ? t("agentPrompt") : tCommon("labels.copyAgentPrompt")}
         onCopy={() => onCopy(TRAFFIC_INSTALL_COPY_KINDS.AGENT_PROMPT)}
         onCopyError={toastCopyError}
         prompt={agentPrompt}
+        size={compact ? "sm" : "default"}
       />
     );
   }
@@ -174,10 +176,10 @@ export function GeoIngestSetup({
           ? geoCloudflareAgentPrompt(setup)
           : geoIngestAgentPrompt(setup, framework, packageManager)
       }
-      canManage={Boolean(setup?.canManage)}
+      canManage={Boolean(setup?.canManage && setup.webKey)}
       method={method}
       onCopy={trackCopied}
-      prominent={variant === "settings"}
+      compact={variant === "settings"}
     />
   );
   // Docs on the left, the method's one action on the right.
@@ -199,7 +201,9 @@ export function GeoIngestSetup({
     );
   }
 
-  // Settings: no card of its own. Title left, the method's action right.
+  // Settings: no card of its own. A compact agent prompt sits in line with
+  // the title; rotating the key is a destructive action, so it stays down
+  // by the docs, away from the copy buttons.
   if (variant === "settings") {
     return (
       <section
@@ -215,10 +219,22 @@ export function GeoIngestSetup({
               {tInstall("description")}
             </p>
           </div>
-          <div className="flex shrink-0 items-center">{actions}</div>
+          {method === "script" ? null : (
+            <div className="flex shrink-0 items-center">{actions}</div>
+          )}
         </div>
         {panels}
-        <GeoIngestDocsLink className="self-start" method={method} />
+        {/* The package method has neither docs nor a footer action. */}
+        {method === "sdk" ? null : (
+          <div className="flex min-h-8 flex-wrap items-center gap-3">
+            <GeoIngestDocsLink method={method} />
+            {method === "script" ? (
+              <div className="ml-auto flex shrink-0 items-center">
+                {actions}
+              </div>
+            ) : null}
+          </div>
+        )}
       </section>
     );
   }
