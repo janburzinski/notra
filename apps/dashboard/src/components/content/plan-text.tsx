@@ -26,7 +26,7 @@ export function PlanText({
       className={cn(
         "caret-foreground field-sizing-content w-full min-w-0 resize-none bg-transparent",
         "-mx-1 rounded-sm px-1 py-0.5",
-        "placeholder:text-muted-foreground/70",
+        "placeholder:text-subtle-foreground",
         "hover:bg-muted/40 focus:bg-muted/40",
         "ring-0 outline-none focus-visible:ring-0",
         "read-only:hover:bg-transparent read-only:focus:bg-transparent",

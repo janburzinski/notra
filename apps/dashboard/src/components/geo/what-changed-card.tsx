@@ -222,7 +222,7 @@ function PositionCell({ event }: GeoChangeCellProps) {
       <span className="text-muted-foreground">{stateLabel(detail.before)}</span>
       <HugeiconsIcon
         aria-hidden="true"
-        className="text-muted-foreground/60 shrink-0"
+        className="text-subtle-foreground shrink-0"
         icon={ArrowRight01Icon}
         size={POSITION_ARROW_SIZE}
       />

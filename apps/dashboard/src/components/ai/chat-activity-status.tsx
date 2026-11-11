@@ -32,7 +32,7 @@ export function ChatActivityStatus({
           active={active}
           className={cn(
             "size-3.5 transition-colors duration-300",
-            active ? "text-foreground/75" : "text-muted-foreground/50"
+            active ? "text-foreground/75" : "text-subtle-foreground"
           )}
         />
         <span className="relative inline-flex h-5 items-center overflow-hidden">

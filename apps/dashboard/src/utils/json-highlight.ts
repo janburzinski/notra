@@ -8,7 +8,7 @@ function tokenClass(token: string) {
     return token.endsWith(":") ? "text-muted-foreground" : "text-foreground";
   }
   if (token === "null") {
-    return "text-muted-foreground/60 italic";
+    return "text-subtle-foreground italic";
   }
   if (token === "true" || token === "false") {
     return "text-foreground";

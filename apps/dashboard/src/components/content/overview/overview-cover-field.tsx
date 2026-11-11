@@ -137,7 +137,7 @@ export function OverviewCoverField({ api, markdown }: OverviewCoverFieldProps) {
             {t("altLabel")}
           </label>
           <input
-            className="placeholder:text-muted-foreground/70 hover:bg-muted/60 focus-visible:bg-muted/60 min-w-0 flex-1 rounded-md bg-transparent px-1.5 py-1 text-xs outline-none"
+            className="placeholder:text-subtle-foreground hover:bg-muted/60 focus-visible:bg-muted/60 min-w-0 flex-1 rounded-md bg-transparent px-1.5 py-1 text-xs outline-none"
             id={altId}
             maxLength={POST_COVER_ALT_MAX_LENGTH}
             onChange={(event) =>

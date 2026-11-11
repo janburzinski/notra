@@ -102,7 +102,7 @@ function HistoryRow({
       {onSelect ? (
         <HugeiconsIcon
           aria-hidden="true"
-          className="text-muted-foreground/60 group-hover:text-foreground size-3.5 shrink-0 transition-colors"
+          className="text-subtle-foreground group-hover:text-foreground size-3.5 shrink-0 transition-colors"
           icon={ArrowRight01Icon}
           strokeWidth={2}
         />

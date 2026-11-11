@@ -30,7 +30,7 @@ export function PromptOutcomeIcon({
   return (
     <svg
       aria-hidden="true"
-      className={cn(ICON_CLASS, "text-muted-foreground/60", className)}
+      className={cn(ICON_CLASS, "text-subtle-foreground", className)}
       fill="none"
       viewBox="0 0 16 16"
     >

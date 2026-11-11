@@ -131,7 +131,7 @@ export function PostingPerformanceCard({
                           className="flex items-center gap-2"
                           key={WEEKDAY_LABELS[dayIndex]}
                         >
-                          <span className="text-muted-foreground w-7 shrink-0 font-mono text-[0.625rem]">
+                          <span className="text-muted-foreground text-3xs w-7 shrink-0 font-mono">
                             {weekdayLabel(dayIndex)}
                           </span>
                           <div className="flex min-w-0 flex-1 gap-0.5">
@@ -158,7 +158,7 @@ export function PostingPerformanceCard({
                         </div>
                       ))}
                     </div>
-                    <div className="text-muted-foreground mt-1.5 ml-9 flex justify-between font-mono text-[0.6875rem] tabular-nums">
+                    <div className="text-muted-foreground text-2xs mt-1.5 ml-9 flex justify-between font-mono tabular-nums">
                       <span>0:00</span>
                       <span>12:00</span>
                       <span>24:00</span>
@@ -238,7 +238,7 @@ export function PostingPerformanceCard({
                         );
                       })}
                     </div>
-                    <div className="text-muted-foreground mt-1.5 flex justify-between font-mono text-[0.6875rem] tabular-nums">
+                    <div className="text-muted-foreground text-2xs mt-1.5 flex justify-between font-mono tabular-nums">
                       <span>0:00</span>
                       <span>12:00</span>
                       <span>24:00</span>

@@ -181,7 +181,7 @@ function NoteInput({
   return (
     <textarea
       aria-label={t("noteLabel")}
-      className="placeholder:text-muted-foreground/60 focus-visible:outline-ring field-sizing-content min-h-7 w-full min-w-0 resize-y rounded-sm border-none bg-transparent px-1 py-1 text-xs shadow-none focus-visible:outline-2"
+      className="placeholder:text-subtle-foreground focus-visible:outline-ring field-sizing-content min-h-7 w-full min-w-0 resize-y rounded-sm border-none bg-transparent px-1 py-1 text-xs shadow-none focus-visible:outline-2"
       onBlur={handleNoteBlur}
       onChange={(e) => setNoteValue(e.target.value)}
       onKeyDown={handleNoteKeyDown}
@@ -435,12 +435,10 @@ function TwitterReferenceCard({
                 {createdAtLabel && (
                   <>
                     {showHandle && (
-                      <span className="text-muted-foreground/50 text-xs">
-                        ·
-                      </span>
+                      <span className="text-subtle-foreground text-xs">·</span>
                     )}
                     <span
-                      className="text-muted-foreground/70 shrink-0 text-xs"
+                      className="text-subtle-foreground shrink-0 text-xs"
                       suppressHydrationWarning
                     >
                       {createdAtLabel}
@@ -537,9 +535,7 @@ function BlogReferenceCard({
                 {showDomainLine && (
                   <>
                     {authorName && (
-                      <span className="text-muted-foreground/50 text-xs">
-                        ·
-                      </span>
+                      <span className="text-subtle-foreground text-xs">·</span>
                     )}
                     <span className="text-muted-foreground truncate text-xs">
                       {domain}
@@ -549,12 +545,10 @@ function BlogReferenceCard({
                 {publishedAtLabel && (
                   <>
                     {(authorName || showDomainLine) && (
-                      <span className="text-muted-foreground/50 text-xs">
-                        ·
-                      </span>
+                      <span className="text-subtle-foreground text-xs">·</span>
                     )}
                     <span
-                      className="text-muted-foreground/70 shrink-0 text-xs"
+                      className="text-subtle-foreground shrink-0 text-xs"
                       suppressHydrationWarning
                     >
                       {publishedAtLabel}
@@ -622,7 +616,7 @@ function CustomReferenceCard({
                 {t("customReference")}
               </span>
               <p
-                className="text-muted-foreground/70 text-xs"
+                className="text-subtle-foreground text-xs"
                 suppressHydrationWarning
               >
                 {formatRelativeDate(reference.createdAt, t, tCommon2, locale)}

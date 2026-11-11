@@ -23,7 +23,7 @@ function CompetitorLogoFallback({
   return (
     <span
       aria-hidden="true"
-      className={cn(className, "bg-muted text-[0.625rem] leading-none")}
+      className={cn(className, "bg-muted text-3xs leading-none")}
     >
       {name.trim().charAt(0).toUpperCase()}
     </span>

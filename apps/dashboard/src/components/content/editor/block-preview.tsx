@@ -54,7 +54,7 @@ function PreviewBody({ kind }: BlockPreviewProps) {
               {kind === "bulletedList" ? (
                 <span className="bg-muted-foreground/40 size-1.5 shrink-0 rounded-full" />
               ) : (
-                <span className="text-muted-foreground/70 w-2.5 shrink-0 text-xs leading-none font-semibold tabular-nums">
+                <span className="text-subtle-foreground w-2.5 shrink-0 text-xs leading-none font-semibold tabular-nums">
                   {index + 1}.
                 </span>
               )}
@@ -105,7 +105,7 @@ function PreviewBody({ kind }: BlockPreviewProps) {
     case "image":
     case "video": {
       return (
-        <span className="bg-muted-foreground/10 text-muted-foreground/60 flex h-12 items-center justify-center rounded-md">
+        <span className="bg-muted-foreground/10 text-subtle-foreground flex h-12 items-center justify-center rounded-md">
           <HugeiconsIcon
             className="size-4"
             icon={kind === "image" ? Image01Icon : PlayIcon}

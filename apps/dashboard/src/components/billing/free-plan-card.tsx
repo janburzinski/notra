@@ -80,7 +80,7 @@ export function FreePlanCard() {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="max-w-xl space-y-1">
           <p className="text-muted-foreground text-sm">{t("description")}</p>
-          <p className="text-muted-foreground/70 text-sm">{renderStatus()}</p>
+          <p className="text-subtle-foreground text-sm">{renderStatus()}</p>
         </div>
         {scheduled ? null : (
           <Button

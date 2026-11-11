@@ -83,7 +83,7 @@ export function AutopilotRunTimeline({
                 >
                   {formatDuration(phase.durationMs)}
                 </div>
-                <div className="text-muted-foreground/70 min-h-4 font-mono text-xs tabular-nums">
+                <div className="text-subtle-foreground min-h-4 font-mono text-xs tabular-nums">
                   <time dateTime={new Date(phase.startedAt).toISOString()}>
                     {format.dateTime(phase.startedAt, {
                       hour: "2-digit",

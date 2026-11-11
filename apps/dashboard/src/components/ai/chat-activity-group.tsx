@@ -218,7 +218,7 @@ export function ChatActivityGroup({
           <HugeiconsIcon
             aria-hidden
             className={cn(
-              "text-muted-foreground/60 animate-in fade-in size-3.5 shrink-0 transition-transform duration-300 motion-reduce:animate-none motion-reduce:transition-none",
+              "text-subtle-foreground animate-in fade-in size-3.5 shrink-0 transition-transform duration-300 motion-reduce:animate-none motion-reduce:transition-none",
               isOpen ? "rotate-180" : "rotate-0"
             )}
             icon={ArrowDown01Icon}
@@ -294,7 +294,7 @@ export function ChatSearchStack({ items }: ChatSearchStackProps) {
         <HugeiconsIcon
           aria-hidden
           className={cn(
-            "text-muted-foreground/60 size-3.5 shrink-0 transition-transform motion-reduce:transition-none",
+            "text-subtle-foreground size-3.5 shrink-0 transition-transform motion-reduce:transition-none",
             isOpen ? "rotate-180" : "rotate-0"
           )}
           icon={ArrowDown01Icon}
@@ -336,7 +336,7 @@ export function ChatSearchStack({ items }: ChatSearchStackProps) {
                   {source.title}
                 </span>
                 {source.domain ? (
-                  <span className="text-muted-foreground/70 max-w-[45%] shrink-0 truncate">
+                  <span className="text-subtle-foreground max-w-[45%] shrink-0 truncate">
                     {source.domain}
                   </span>
                 ) : null}

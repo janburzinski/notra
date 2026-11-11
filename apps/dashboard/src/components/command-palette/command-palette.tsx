@@ -480,7 +480,7 @@ function CommandPaletteBody({
           <CommandPrimitive.Input
             className={cn(
               "text-foreground flex-1 bg-transparent text-sm outline-none",
-              "placeholder:text-muted-foreground/70",
+              "placeholder:text-subtle-foreground",
               isLoading && "text-muted-foreground"
             )}
             onValueChange={controller.changeQuery}
@@ -1031,7 +1031,7 @@ function CommandPaletteWorkspacesPage({
             leading={
               <Avatar className="size-5 rounded-md after:rounded-md">
                 <AvatarImage src={resolveOrganizationLogo(org.logo)} />
-                <AvatarFallback className="rounded-md text-[10px]">
+                <AvatarFallback className="text-3xs rounded-md">
                   {nameInitials(org.name)}
                 </AvatarFallback>
               </Avatar>

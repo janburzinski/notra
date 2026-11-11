@@ -239,7 +239,7 @@ export function OrganizationsSection() {
                       </p>
                       {isActive && (
                         <Badge
-                          className="bg-success/10 text-success hover:bg-success/20 px-1.5 py-0 text-[10px] font-semibold"
+                          className="bg-success/10 text-success hover:bg-success/20 text-3xs px-1.5 py-0 font-semibold"
                           variant="secondary"
                         >
                           {tCommon("states.active")}

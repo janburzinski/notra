@@ -35,7 +35,7 @@ export function ChartSeriesLegend({
           <button
             aria-pressed={!hidden}
             className={cn(
-              "flex max-w-full min-w-0 cursor-pointer items-center gap-1.5 font-mono text-[0.6875rem] transition-opacity",
+              "text-2xs flex max-w-full min-w-0 cursor-pointer items-center gap-1.5 font-mono transition-opacity",
               hidden
                 ? "opacity-40 hover:opacity-70"
                 : "text-muted-foreground hover:text-foreground"

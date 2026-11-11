@@ -101,7 +101,7 @@ function PromptCell({ prompt, turn, repeated }: GeoScanPromptCellProps) {
   return (
     <span className="flex min-w-0 items-center gap-2">
       <TruncateWithTooltip
-        className={repeated ? "text-muted-foreground/60" : "font-medium"}
+        className={repeated ? "text-subtle-foreground" : "font-medium"}
       >
         {prompt}
       </TruncateWithTooltip>
@@ -635,7 +635,7 @@ export function ScanRunFilters({
 
 function ViewCount({ count, locale }: GeoScanViewCountProps) {
   return (
-    <span className="text-muted-foreground/70 text-xs font-normal tabular-nums">
+    <span className="text-subtle-foreground text-xs font-normal tabular-nums">
       {count.toLocaleString(locale)}
     </span>
   );

@@ -82,7 +82,7 @@ function PlanField({
 }) {
   return (
     <div className="space-y-1.5">
-      <p className="text-muted-foreground text-[0.6875rem] font-medium tracking-wide uppercase">
+      <p className="text-muted-foreground text-2xs font-medium tracking-wide uppercase">
         {label}
       </p>
       <div className="text-sm leading-relaxed">{children}</div>
@@ -614,7 +614,7 @@ export function ContentPlanView({
         </section>
 
         <section className="space-y-5">
-          <h2 className="text-muted-foreground text-[0.6875rem] font-medium tracking-wide uppercase">
+          <h2 className="text-muted-foreground text-2xs font-medium tracking-wide uppercase">
             {t("outline.title")}
           </h2>
           <div className="space-y-8">
@@ -724,7 +724,7 @@ export function ContentPlanView({
         </section>
 
         <section className="space-y-3">
-          <h2 className="text-muted-foreground text-[0.6875rem] font-medium tracking-wide uppercase">
+          <h2 className="text-muted-foreground text-2xs font-medium tracking-wide uppercase">
             {tContentShared("faq")}
           </h2>
           <PlanLineList
@@ -743,7 +743,7 @@ export function ContentPlanView({
         </section>
 
         <section className="space-y-3">
-          <h2 className="text-muted-foreground text-[0.6875rem] font-medium tracking-wide uppercase">
+          <h2 className="text-muted-foreground text-2xs font-medium tracking-wide uppercase">
             {tCommon("labels.links")}
           </h2>
           <PlanLinkList
@@ -757,7 +757,7 @@ export function ContentPlanView({
         </section>
 
         <section className="space-y-3">
-          <h2 className="text-muted-foreground text-[0.6875rem] font-medium tracking-wide uppercase">
+          <h2 className="text-muted-foreground text-2xs font-medium tracking-wide uppercase">
             {t("checks.title")}
           </h2>
           <PlanLineList

@@ -164,7 +164,7 @@ export function BrandTopbarIdentitySelector({ slug }: { slug: string }) {
               <span className="min-w-0 flex-1 truncate">{voice.name}</span>
               {voice.isDefault ? (
                 <Badge
-                  className="shrink-0 px-1.5 py-0 text-[10px] font-medium"
+                  className="text-3xs shrink-0 px-1.5 py-0 font-medium"
                   variant="secondary"
                 >
                   {tCommon("labels.default")}

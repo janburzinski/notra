@@ -167,7 +167,7 @@ function SharedTools({ names }: { names: string[] }) {
         <li>
           <button
             aria-expanded={expanded}
-            className="text-muted-foreground/70 hover:text-foreground flex items-center gap-2 text-sm leading-5 transition-colors"
+            className="text-subtle-foreground hover:text-foreground flex items-center gap-2 text-sm leading-5 transition-colors"
             onClick={() => setExpanded((value) => !value)}
             type="button"
           >
@@ -293,7 +293,7 @@ export function SharedChatPage({ share }: { share: PublicChatShare }) {
           >
             <HugeiconsIcon
               aria-hidden="true"
-              className="text-muted-foreground/60 size-3.5 shrink-0"
+              className="text-subtle-foreground size-3.5 shrink-0"
               icon={ArrowRight01Icon}
             />
             <span className="min-w-0 truncate font-medium">{share.title}</span>

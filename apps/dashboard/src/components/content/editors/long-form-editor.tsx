@@ -67,7 +67,7 @@ export function LongFormEditor({
       <div className="flex items-start gap-2 text-2xl leading-tight md:text-3xl">
         <textarea
           aria-label={tCommon("labels.postTitle")}
-          className="placeholder:text-muted-foreground/40 block h-auto min-h-0 min-w-0 flex-1 resize-none overflow-hidden bg-transparent p-0 font-semibold tracking-tight outline-none"
+          className="placeholder:text-subtle-foreground block h-auto min-h-0 min-w-0 flex-1 resize-none overflow-hidden bg-transparent p-0 font-semibold tracking-tight outline-none"
           onChange={(e) => actions.setEditingTitle(e.target.value)}
           onFocus={(e) => {
             if (state.editingTitle === null) {
@@ -103,7 +103,7 @@ export function LongFormEditor({
               <span className="shrink-0 leading-5">/</span>
               <textarea
                 aria-label={t("postSlug")}
-                className="placeholder:text-muted-foreground/50 focus:text-foreground min-h-0 min-w-0 flex-1 resize-none overflow-hidden bg-transparent p-0 text-base leading-5 break-all outline-none sm:text-sm"
+                className="placeholder:text-subtle-foreground focus:text-foreground min-h-0 min-w-0 flex-1 resize-none overflow-hidden bg-transparent p-0 text-base leading-5 break-all outline-none sm:text-sm"
                 onBlur={() => {
                   if (state.editingSlug !== null) {
                     actions.setEditingSlug(

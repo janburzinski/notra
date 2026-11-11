@@ -357,7 +357,7 @@ function SetupExamplesPreview() {
             <span className="truncate">{t(`${example.key}.query`)}</span>
           </span>
           <HugeiconsIcon
-            className="text-muted-foreground/60"
+            className="text-subtle-foreground"
             icon={ArrowRight02Icon}
             size={14}
           />

@@ -37,7 +37,7 @@ function TodoStatusIcon({
       <HugeiconsIcon
         className={cn(
           ICON_LAYER_CLASSNAME,
-          "text-muted-foreground/50",
+          "text-subtle-foreground",
           isOpen ? "scale-100 opacity-100" : "scale-75 opacity-0"
         )}
         icon={CircleIcon}

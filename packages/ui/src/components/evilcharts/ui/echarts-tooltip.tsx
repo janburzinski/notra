@@ -381,7 +381,7 @@ export function tooltipShell({
   const isRows = layout === "rows";
   const header =
     label.length > 0
-      ? `<div class="text-[11px] font-medium text-muted-foreground">${escapeHtml(label)}</div>`
+      ? `<div class="text-2xs font-medium text-muted-foreground">${escapeHtml(label)}</div>`
       : "";
   const surface = isRows
     ? "gap-1.5 px-2.5 py-2"
@@ -510,7 +510,7 @@ export function composeTooltipSectionedRows(
           ${tooltipIndicatorSlot(indicatorHtml)}
           <div class="flex flex-1 items-center justify-between gap-4 leading-none">
             <span class="text-muted-foreground">${escapeHtml(item.labelText)}</span>
-            <span class="text-foreground/80 font-mono text-[11px] tabular-nums">${escapeHtml(item.valueText)}</span>
+            <span class="text-foreground/80 font-mono text-2xs tabular-nums">${escapeHtml(item.valueText)}</span>
           </div>
         </div>`;
         })
@@ -522,7 +522,7 @@ export function composeTooltipSectionedRows(
       return `${separator}<div class="grid gap-1.5">
           <div class="flex items-center justify-between gap-4 leading-none">
             <span class="flex items-center gap-2 font-medium text-foreground">${tooltipIndicatorSlot(tooltipColorSwatchHtml(fill))}${escapeHtml(group.heading.labelText)}</span>
-            <span class="font-mono text-[11px] font-medium text-foreground tabular-nums">${escapeHtml(group.heading.valueText)}</span>
+            <span class="font-mono text-2xs font-medium text-foreground tabular-nums">${escapeHtml(group.heading.valueText)}</span>
           </div>
           ${rowsHtml}
         </div>`;

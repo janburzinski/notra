@@ -202,7 +202,7 @@ export function LanguagePerformanceCard({
         cell: (row) =>
           row.kind === "suggested" ? (
             <span className="flex items-center justify-between gap-2">
-              <span className="text-muted-foreground/50 text-xs">
+              <span className="text-subtle-foreground text-xs">
                 {t("notTracked")}
               </span>
               <LanguageAddButton

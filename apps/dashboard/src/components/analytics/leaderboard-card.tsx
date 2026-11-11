@@ -145,7 +145,7 @@ export function LeaderboardCard({
                   src={row.profileImageUrl}
                 />
               )}
-              <AvatarFallback className="text-[0.625rem]">
+              <AvatarFallback className="text-3xs">
                 {row.username.slice(0, 2).toUpperCase()}
               </AvatarFallback>
             </Avatar>
@@ -163,7 +163,7 @@ export function LeaderboardCard({
                         verifiedType={row.verifiedType}
                       />
                     </span>
-                    <span className="text-muted-foreground truncate font-mono text-[0.6875rem]">
+                    <span className="text-muted-foreground text-2xs truncate font-mono">
                       @{row.username}
                     </span>
                   </span>

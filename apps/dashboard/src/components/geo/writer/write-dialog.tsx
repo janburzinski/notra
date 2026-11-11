@@ -242,7 +242,7 @@ function WriteDialogForm({
         aria-label={t("sectionsAriaLabel")}
         className="hidden w-56 shrink-0 flex-col gap-1 p-2 pt-3 md:flex"
       >
-        <p className="text-muted-foreground px-2 pt-1 text-[11px] font-medium uppercase">
+        <p className="text-muted-foreground text-2xs px-2 pt-1 font-medium uppercase">
           {tLabels("overview")}
         </p>
         {GEO_WRITE_DIALOG_SECTIONS.map((item) => {

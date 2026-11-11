@@ -25,7 +25,7 @@ export function ChatMessageAnnotations({
             }
             type="button"
           >
-            <span className="bg-background text-muted-foreground mt-0.5 flex size-4 shrink-0 items-center justify-center rounded text-[10px] font-medium tabular-nums">
+            <span className="bg-background text-muted-foreground text-3xs mt-0.5 flex size-4 shrink-0 items-center justify-center rounded font-medium tabular-nums">
               {index + 1}
             </span>
             <span className="min-w-0 flex-1">

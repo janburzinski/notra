@@ -60,7 +60,7 @@ export function useWebhookColumns(): TableColumn<OutboundDelivery>[] {
           {row.attemptCount > 1 ? (
             <span
               title={t("attemptCount", { count: row.attemptCount })}
-              className="text-muted-foreground/70"
+              className="text-subtle-foreground"
             >
               ×{row.attemptCount}
             </span>

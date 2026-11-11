@@ -179,9 +179,7 @@ export function ScheduleTriggerRow({
             date: nextRunDate(nextRun),
             relative: relative(nextRun, now),
           })}{" "}
-          <span className="text-muted-foreground/70">
-            · {getLocalTimezone()}
-          </span>
+          <span className="text-subtle-foreground">· {getLocalTimezone()}</span>
         </p>
       ) : null}
       {skipNote ? (

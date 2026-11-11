@@ -114,7 +114,7 @@ function LogLine({ line, offset, query }: SiteBuildLogLineProps) {
       data-line={line.number}
     >
       <span
-        className="text-muted-foreground/60 text-right tabular-nums select-none group-data-[timestamps=false]/log:hidden"
+        className="text-subtle-foreground text-right tabular-nums select-none group-data-[timestamps=false]/log:hidden"
         title={line.timestamp ?? undefined}
       >
         {offset}

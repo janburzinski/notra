@@ -32,6 +32,10 @@
   --secondary-foreground: hsl(0 0% 9%);
   --muted: hsl(0 0% 96.1%);
   --muted-foreground: hsl(240 4% 40%);
+  /* Tertiary text (timestamps, hints, placeholders, done items). Lighter than
+     muted-foreground but still 4.5:1 on background, muted and the table shell.
+     Use it instead of fading muted-foreground with an opacity modifier. */
+  --subtle-foreground: hsl(240 4% 45%);
   --accent: hsl(0 0% 96.1%);
   --accent-foreground: hsl(0 0% 9%);
   --destructive: oklch(0.577 0.245 27.325);
@@ -50,7 +54,8 @@
   --surface-lift:
     0 1px 2px hsl(240 10% 10% / 0.06), 0 2px 8px -2px hsl(240 10% 10% / 0.06);
   --ring: oklch(0.56 0.22 292.7172);
-  --chart-1: oklch(0.709 0.1592 293.5412);
+  /* 3:1 on white and the table shell, so a single-series chart stays visible. */
+  --chart-1: oklch(0.6 0.19 293.5);
   --chart-2: oklch(0.8112 0.1013 293.5712);
   --chart-3: oklch(0.8943 0.0549 293.2829);
   --chart-4: oklch(0.9514 0.025 236.8242);
@@ -114,9 +119,12 @@
   --secondary-foreground: hsl(0 0% 98%);
   --muted: oklch(0.27 0.006 270);
   --muted-foreground: oklch(0.77 0.006 270);
+  --subtle-foreground: oklch(0.66 0.006 270);
   --accent: oklch(0.27 0.006 270);
   --accent-foreground: hsl(0 0% 98%);
-  --destructive: hsl(358 100% 50%);
+  /* Same hue as the light value. Tuned as a text colour (5:1 on background);
+     solid fills dim it (see the destructive button) so white text stays 4.5:1. */
+  --destructive: oklch(0.65 0.21 25);
   --destructive-foreground: hsl(0 0% 99%);
   --border: oklch(0.31 0.006 270);
   --input: oklch(0.33 0.006 270);
@@ -194,6 +202,7 @@
   --color-secondary-foreground: var(--secondary-foreground);
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
+  --color-subtle-foreground: var(--subtle-foreground);
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
@@ -228,6 +237,11 @@
   --font-mono: var(--font-mono);
   --font-serif: var(--font-serif);
 
+  /* Below text-xs: 11px for captions and chart labels, 10px for counters and
+     tiny badges. Font size only, like the arbitrary values they replace. */
+  --text-2xs: 0.6875rem;
+  --text-3xs: 0.625rem;
+
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -256,12 +270,12 @@
   }
 
   ::selection {
-    background-color: oklch(0.6056 0.2189 292.7172 / 0.3);
+    background-color: color-mix(in oklab, var(--primary) 30%, transparent);
     color: inherit;
   }
 
   [contenteditable]::selection {
-    background-color: oklch(0.6056 0.2189 292.7172 / 0.4);
+    background-color: color-mix(in oklab, var(--primary) 40%, transparent);
   }
 }
 

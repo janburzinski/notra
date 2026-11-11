@@ -32,7 +32,7 @@ function PostAvatar({ post }: { post: TopPostItem }) {
       {post.profileImageUrl && (
         <AvatarImage alt={name} src={post.profileImageUrl} />
       )}
-      <AvatarFallback className="text-[0.625rem]">
+      <AvatarFallback className="text-3xs">
         {name.slice(0, 2).toUpperCase()}
       </AvatarFallback>
     </Avatar>
@@ -108,7 +108,7 @@ export function TopPostsCard({
         width: "7.5rem",
         sortable: true,
         cell: (row) => (
-          <span className="text-muted-foreground font-mono text-[0.6875rem] whitespace-nowrap tabular-nums">
+          <span className="text-muted-foreground text-2xs font-mono whitespace-nowrap tabular-nums">
             {formatDayLabel(row.postedAt.slice(0, 10))}
           </span>
         ),

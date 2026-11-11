@@ -126,7 +126,7 @@ export function GuidelinesAssetsSection({
               <p className="text-muted-foreground truncate text-sm font-medium">
                 {t(`assets.slots.${slot.kind}.${slot.variant}`)}
               </p>
-              <p className="text-muted-foreground/70 truncate text-xs">
+              <p className="text-subtle-foreground truncate text-xs">
                 {tBrandShared("addAsset")}
               </p>
             </div>

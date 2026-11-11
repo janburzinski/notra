@@ -212,7 +212,7 @@ function SourceText({ text }: AutopilotSourceTextProps) {
         if (block.type === "list") {
           return (
             <ul
-              className="text-muted-foreground marker:text-muted-foreground/60 list-disc space-y-1 pl-5"
+              className="text-muted-foreground marker:text-subtle-foreground list-disc space-y-1 pl-5"
               key={key}
             >
               {block.items.map((item) => (

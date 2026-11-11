@@ -56,7 +56,7 @@ function OrgAvatar({ organization }: { organization: Organization }) {
   return (
     <Avatar className="size-5 rounded-md after:rounded-md">
       <AvatarImage src={resolveOrganizationLogo(organization.logo)} />
-      <AvatarFallback className="rounded-md text-[10px]">
+      <AvatarFallback className="text-3xs rounded-md">
         {nameInitials(organization.name, 1)}
       </AvatarFallback>
     </Avatar>

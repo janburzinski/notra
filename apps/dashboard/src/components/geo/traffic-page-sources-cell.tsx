@@ -60,7 +60,7 @@ export function TrafficPageSourcesCell({ group }: TrafficPageSourcesCellProps) {
             </span>
           ))}
           {overflow > 0 ? (
-            <span className="bg-muted border-border text-muted-foreground ml-1 flex h-6 min-w-6 items-center justify-center rounded-full border px-1.5 text-[0.625rem] font-medium tabular-nums">
+            <span className="bg-muted border-border text-muted-foreground text-3xs ml-1 flex h-6 min-w-6 items-center justify-center rounded-full border px-1.5 font-medium tabular-nums">
               +{overflow}
             </span>
           ) : null}
@@ -82,7 +82,7 @@ export function TrafficPageSourcesCell({ group }: TrafficPageSourcesCellProps) {
                 <span className="truncate text-xs font-medium">
                   {formatGeoSource(source.source)}
                 </span>
-                <span className="text-muted-foreground flex gap-2 text-[0.6875rem]">
+                <span className="text-muted-foreground text-2xs flex gap-2">
                   <span className="truncate">
                     {source.visitorType === "human"
                       ? source.visitorType
@@ -97,7 +97,7 @@ export function TrafficPageSourcesCell({ group }: TrafficPageSourcesCellProps) {
                 <span className="text-xs font-medium tabular-nums">
                   {source.visits.toLocaleString(locale)}
                 </span>
-                <span className="text-muted-foreground text-[0.6875rem] tabular-nums">
+                <span className="text-muted-foreground text-2xs tabular-nums">
                   {trafficVisitShare(source.visits, group.visits)}
                 </span>
               </span>

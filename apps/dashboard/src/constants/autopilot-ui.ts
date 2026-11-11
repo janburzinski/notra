@@ -538,7 +538,7 @@ export const AUTOPILOT_WORKFLOW_STEP_STATUS = {
   },
   skipped: {
     icon: MinusSignCircleIcon,
-    className: "text-muted-foreground/70",
+    className: "text-subtle-foreground",
     label: "Skipped",
   },
 } as const;

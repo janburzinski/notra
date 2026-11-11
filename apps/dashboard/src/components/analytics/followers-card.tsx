@@ -41,7 +41,7 @@ function DeltaBadge({ series }: { series: number[] }) {
   const last = series.at(-1);
   if (first === undefined || last === undefined || series.length < 2) {
     return (
-      <span className="text-muted-foreground font-mono text-[0.6875rem] whitespace-nowrap">
+      <span className="text-muted-foreground text-2xs font-mono whitespace-nowrap">
         {t("trackingStarted")}
       </span>
     );
@@ -109,12 +109,12 @@ export function FollowersCard({
                       src={account.profileImageUrl}
                     />
                   )}
-                  <AvatarFallback className="text-[0.625rem]">
+                  <AvatarFallback className="text-3xs">
                     {account.username.slice(0, 2).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
                 <div className="min-w-0">
-                  <p className="text-muted-foreground truncate font-mono text-[0.6875rem]">
+                  <p className="text-muted-foreground text-2xs truncate font-mono">
                     @{account.username}
                   </p>
                   <div className="flex items-baseline gap-2">

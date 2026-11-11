@@ -85,7 +85,7 @@ export function ChatComposerDropOverlay({
             {t("dropDescription")}
           </p>
           {acceptedFileTypesLabel ? (
-            <p className="text-muted-foreground/70 text-xs">
+            <p className="text-subtle-foreground text-xs">
               {t("acceptedTypes", { types: acceptedFileTypesLabel })}
             </p>
           ) : null}

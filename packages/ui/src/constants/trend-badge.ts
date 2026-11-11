@@ -23,7 +23,7 @@ export const TREND_BADGE_APPEARANCES = {
 } as const;
 
 export const TREND_BADGE_PLAIN_SIZE_CLASSES = {
-  sm: "gap-0.5 text-[0.625rem] [&>svg]:size-2.5",
+  sm: "gap-0.5 text-3xs [&>svg]:size-2.5",
   default: "gap-1 text-xs [&>svg]:size-3",
   md: "gap-1.5 text-sm [&>svg]:size-3.5",
 } as const;

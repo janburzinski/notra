@@ -289,6 +289,7 @@ const colorGroups = [
       { name: "accent-foreground", label: "Accent Foreground" },
       { name: "muted", label: "Muted" },
       { name: "muted-foreground", label: "Muted Foreground" },
+      { name: "subtle-foreground", label: "Subtle Foreground" },
       { name: "destructive", label: "Destructive" },
       { name: "destructive-foreground", label: "Destructive Foreground" },
       { name: "border", label: "Border" },

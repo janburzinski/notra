@@ -112,7 +112,7 @@ export function AutomationRunsTable({
             )}
           </time>
           {run.manual ? (
-            <div className="text-muted-foreground/70">{t("manual")}</div>
+            <div className="text-subtle-foreground">{t("manual")}</div>
           ) : null}
         </div>
       ),

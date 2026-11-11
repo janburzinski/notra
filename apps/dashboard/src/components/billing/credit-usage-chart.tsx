@@ -111,7 +111,7 @@ export function CreditUsageChart({
             />
             <XAxis
               axisLine={false}
-              className="text-muted-foreground/60 text-xs"
+              className="text-subtle-foreground text-xs"
               dataKey="date"
               minTickGap={32}
               tickFormatter={(value: number) => formatShortDate(value)}
@@ -120,7 +120,7 @@ export function CreditUsageChart({
             />
             <YAxis
               axisLine={false}
-              className="text-muted-foreground/60 text-xs"
+              className="text-subtle-foreground text-xs"
               tickFormatter={(value: number) => formatDollars(value, locale)}
               tickLine={false}
               tickMargin={8}

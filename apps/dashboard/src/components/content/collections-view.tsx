@@ -81,7 +81,7 @@ function CollectionStatusBadge({ status }: { status: CollectionStatus }) {
   const t = useTranslations("content.collections");
   return (
     <Badge
-      className="inline-flex items-center gap-1.5 rounded-sm text-[0.6875rem] whitespace-nowrap"
+      className="text-2xs inline-flex items-center gap-1.5 rounded-sm whitespace-nowrap"
       variant={statusVariant(status)}
     >
       {status === "generating" ? <Spinner /> : null}

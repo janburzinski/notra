@@ -71,7 +71,7 @@ function Chevron({ open }: { open: boolean }) {
     <HugeiconsIcon
       aria-hidden="true"
       className={cn(
-        "text-muted-foreground/60 size-3.5 shrink-0 transition-transform motion-reduce:transition-none",
+        "text-subtle-foreground size-3.5 shrink-0 transition-transform motion-reduce:transition-none",
         open ? "rotate-180" : "rotate-0"
       )}
       icon={ArrowDown01Icon}

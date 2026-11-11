@@ -154,7 +154,7 @@ export function SiteDeploymentTimeline({
                 >
                   {duration ?? "–"}
                 </div>
-                <div className="text-muted-foreground/70 min-h-4 font-mono text-xs tabular-nums">
+                <div className="text-subtle-foreground min-h-4 font-mono text-xs tabular-nums">
                   {phase.startIso !== null ? (
                     <time
                       dateTime={phase.startIso}

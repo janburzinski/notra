@@ -19,7 +19,7 @@ const buttonVariants = cva(
         ghost:
           "bg-clip-padding hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground",
         destructive:
-          "[corner-shape:squircle] supports-[corner-shape:squircle]:rounded-[0.75rem] bg-destructive bg-clip-padding text-destructive-foreground hover:brightness-90 aria-expanded:bg-destructive aria-expanded:text-destructive-foreground",
+          "[corner-shape:squircle] supports-[corner-shape:squircle]:rounded-[0.75rem] bg-destructive bg-clip-padding text-destructive-foreground hover:brightness-90 aria-expanded:bg-destructive aria-expanded:text-destructive-foreground dark:bg-destructive/80 dark:aria-expanded:bg-destructive/80",
         link: "text-primary underline-offset-4 hover:underline",
       },
       size: {

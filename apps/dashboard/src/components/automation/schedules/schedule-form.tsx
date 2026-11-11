@@ -446,7 +446,7 @@ export function ScheduleForm({
                   <div className="space-y-2">
                     <textarea
                       aria-label={t("dialog.instructions")}
-                      className="placeholder:text-muted-foreground/70 max-h-80 min-h-16 w-full resize-none overflow-y-auto bg-transparent text-sm outline-none"
+                      className="placeholder:text-subtle-foreground max-h-80 min-h-16 w-full resize-none overflow-y-auto bg-transparent text-sm outline-none"
                       id={field.name}
                       maxLength={MAX_SCHEDULE_INSTRUCTIONS_LENGTH}
                       onBlur={field.handleBlur}

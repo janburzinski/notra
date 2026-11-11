@@ -91,7 +91,7 @@ function useTopPostColumns(): TableColumn<TopPostItem>[] {
         width: "7.5rem",
         sortable: true,
         cell: (row) => (
-          <span className="text-muted-foreground font-mono text-[0.6875rem] whitespace-nowrap tabular-nums">
+          <span className="text-muted-foreground text-2xs font-mono whitespace-nowrap tabular-nums">
             {formatDayLabel(row.postedAt.slice(0, 10))}
           </span>
         ),

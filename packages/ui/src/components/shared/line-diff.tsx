@@ -42,7 +42,7 @@ export function LineDiff({
       {rows.map((row) =>
         row.type === "collapsed" ? (
           <div
-            className="text-muted-foreground bg-muted/50 my-1 px-3 py-0.5 font-sans text-[11px] first:mt-0 last:mb-0"
+            className="text-muted-foreground bg-muted/50 my-1 px-3 py-0.5 font-sans text-2xs first:mt-0 last:mb-0"
             key={row.key}
           >
             {collapsedLabel(row.count)}

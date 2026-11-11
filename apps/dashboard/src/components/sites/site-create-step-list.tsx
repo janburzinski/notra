@@ -43,7 +43,7 @@ export function SiteCreateStepList<Id extends string>({
                     "flex items-center gap-2.5 px-2 py-1 text-sm transition-colors duration-300",
                     step.state === "active"
                       ? "text-foreground font-medium"
-                      : "text-muted-foreground/60"
+                      : "text-subtle-foreground"
                   )}
                 >
                   {dot}

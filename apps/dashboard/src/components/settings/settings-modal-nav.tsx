@@ -221,7 +221,7 @@ export function SettingsModalNav({
               >
                 <p
                   className={cn(
-                    "text-muted-foreground px-2 pt-1 text-[11px] font-medium uppercase",
+                    "text-muted-foreground text-2xs px-2 pt-1 font-medium uppercase",
                     !isSearching && "max-md:sr-only"
                   )}
                 >
@@ -307,7 +307,7 @@ function SettingsNavButton({
           <HighlightedLabel query={query} text={item.label} />
         </span>
         {isSearching ? (
-          <span className="text-muted-foreground mt-0.5 block truncate text-[11px] leading-tight">
+          <span className="text-muted-foreground text-2xs mt-0.5 block truncate leading-tight">
             {item.description}
           </span>
         ) : null}

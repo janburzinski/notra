@@ -124,7 +124,7 @@ function RankScene({ brandName }: Pick<WelcomeTourSceneProps, "brandName">) {
             </span>
             <span
               className={cn(
-                "flex size-5 shrink-0 items-center justify-center rounded-md text-[10px] font-semibold uppercase",
+                "text-3xs flex size-5 shrink-0 items-center justify-center rounded-md font-semibold uppercase",
                 isYou
                   ? "bg-primary text-primary-foreground"
                   : "bg-muted text-muted-foreground"
@@ -187,7 +187,7 @@ function GapsScene() {
             <HugeiconsIcon className="size-3.5" icon={NoteIcon} />
             {t("draft")}
           </span>
-          <span className="bg-success/10 text-success flex items-center gap-1 rounded-full px-1.5 py-0.5 text-[10px] font-medium">
+          <span className="bg-success/10 text-success text-3xs flex items-center gap-1 rounded-full px-1.5 py-0.5 font-medium">
             <HugeiconsIcon className="size-3" icon={Tick02Icon} />
             {t("ready")}
           </span>

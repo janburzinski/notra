@@ -126,7 +126,7 @@ export function ImpressionsShareCard({
             </ChartColorScope>
           </div>
           {caption && (
-            <p className="text-muted-foreground mt-2 truncate text-[0.6875rem]">
+            <p className="text-muted-foreground text-2xs mt-2 truncate">
               {caption}
             </p>
           )}

@@ -68,7 +68,7 @@ function StageIcon({ status }: { status: CodeResearchStage["status"] }) {
     return (
       <HugeiconsIcon
         aria-hidden
-        className="text-muted-foreground/50 size-4 shrink-0"
+        className="text-subtle-foreground size-4 shrink-0"
         icon={MinusSignCircleIcon}
       />
     );
@@ -89,7 +89,7 @@ function Fact({ label, value }: { label: string; value: string | null }) {
       <dd
         className={cn(
           "min-w-0 truncate text-right font-mono text-xs",
-          !value && "text-muted-foreground/60"
+          !value && "text-subtle-foreground"
         )}
         title={value ?? undefined}
       >

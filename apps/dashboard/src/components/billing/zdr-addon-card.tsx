@@ -179,7 +179,7 @@ export function ZdrAddonCard() {
             {addonPlanId || hasZdr || isLoading
               ? t("description")
               : t("unavailable")}
-            <span className="text-muted-foreground/70"> {t("hint")}</span>
+            <span className="text-subtle-foreground"> {t("hint")}</span>
           </p>
         </div>
         {renderAction()}

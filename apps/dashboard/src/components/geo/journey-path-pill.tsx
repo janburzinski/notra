@@ -24,7 +24,7 @@ export function JourneyPathPill({ node, className }: JourneyPathPillProps) {
   return (
     <span
       className={cn(
-        "inline-flex max-w-full items-center gap-1 rounded-full border px-1.5 py-0.5 font-mono text-[0.6875rem] leading-none",
+        "text-2xs inline-flex max-w-full items-center gap-1 rounded-full border px-1.5 py-0.5 font-mono leading-none",
         GEO_JOURNEY_PATH_KIND_CLASS[node.kind],
         className
       )}

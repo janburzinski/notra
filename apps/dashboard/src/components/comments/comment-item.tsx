@@ -109,7 +109,7 @@ export function CommentItem(props: CommentItemProps) {
             ) : null}
             <Avatar className="size-8 shrink-0">
               <AvatarImage src={comment.image ?? undefined} />
-              <AvatarFallback className="text-muted-foreground text-[11px]">
+              <AvatarFallback className="text-muted-foreground text-2xs">
                 {comment.name.slice(0, 2).toUpperCase()}
               </AvatarFallback>
             </Avatar>

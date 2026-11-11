@@ -98,7 +98,7 @@ export function PlanCard({
               <p className="text-muted-foreground text-xs">
                 {addon.description}
                 {addon.hint ? (
-                  <span className="text-muted-foreground/70">
+                  <span className="text-subtle-foreground">
                     {" "}
                     · {addon.hint}
                   </span>

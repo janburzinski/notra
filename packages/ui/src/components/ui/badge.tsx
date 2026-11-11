@@ -30,7 +30,7 @@ const badgeVariants = cva(
       size: {
         default: "h-5 px-2 py-0.5 text-xs [&>svg]:size-3!",
         md: "h-6 gap-1.5 px-2 py-0.5 text-sm [&>svg]:size-3.5!",
-        sm: "h-4 gap-0.5 px-1.5 text-[0.625rem] [&>svg]:size-2.5!",
+        sm: "h-4 gap-0.5 px-1.5 text-3xs [&>svg]:size-2.5!",
       },
       shape: {
         pill: "rounded-full",

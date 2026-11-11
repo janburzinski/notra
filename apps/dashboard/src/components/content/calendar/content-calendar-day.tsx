@@ -108,7 +108,7 @@ export function ContentCalendarDay({
         />
       ))}
       {hidden > 0 ? (
-        <span className="text-muted-foreground px-1 text-xs max-sm:px-0 max-sm:text-[0.625rem]">
+        <span className="text-muted-foreground max-sm:text-3xs px-1 text-xs max-sm:px-0">
           {t("more", { count: hidden })}
         </span>
       ) : null}

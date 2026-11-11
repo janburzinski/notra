@@ -89,7 +89,7 @@ export function UserMessageActions({
           >
             <HugeiconsIcon icon={ArrowLeft01Icon} size={12} />
           </Button>
-          <span className="px-0.5 text-[11px]">
+          <span className="text-2xs px-0.5">
             {(branchIndex ?? 0) + 1}/{branchTotal}
           </span>
           <Button

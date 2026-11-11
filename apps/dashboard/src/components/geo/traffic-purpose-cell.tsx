@@ -96,7 +96,7 @@ export function TrafficPurposeCell({ group }: TrafficPurposeCellProps) {
                   <span className="truncate text-xs font-medium">
                     {purposeLabel(total.category)}
                   </span>
-                  <span className="text-muted-foreground truncate text-[0.6875rem]">
+                  <span className="text-muted-foreground text-2xs truncate">
                     {total.members
                       .map((member) => formatGeoSource(member))
                       .join(", ")}
@@ -106,7 +106,7 @@ export function TrafficPurposeCell({ group }: TrafficPurposeCellProps) {
                   <span className="text-xs font-medium tabular-nums">
                     {total.visits.toLocaleString(locale)}
                   </span>
-                  <span className="text-muted-foreground text-[0.6875rem] tabular-nums">
+                  <span className="text-muted-foreground text-2xs tabular-nums">
                     {trafficVisitShare(total.visits, group.visits)}
                   </span>
                 </span>

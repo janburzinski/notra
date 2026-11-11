@@ -55,7 +55,7 @@ function NavBadge({ item }: { item: NavMainItem }) {
   }
   return (
     <Badge
-      className="text-muted-foreground ml-auto h-[1.125rem] px-[0.375rem] text-[0.625rem] group-data-[collapsible=icon]:hidden"
+      className="text-muted-foreground text-3xs ml-auto h-[1.125rem] px-[0.375rem] group-data-[collapsible=icon]:hidden"
       variant="secondary"
     >
       {t(`badges.${item.badge}`)}

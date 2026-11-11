@@ -314,9 +314,9 @@ export function DeleteAccountDialog({
             {tCommon("cancel")}
           </ResponsiveAlertDialogCancel>
           <ResponsiveAlertDialogAction
-            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             disabled={isDeleting || isLoadingOrgs || !canProceed}
             onClick={handleDeleteAccount}
+            variant="destructive"
           >
             {isDeleting ? (
               <>

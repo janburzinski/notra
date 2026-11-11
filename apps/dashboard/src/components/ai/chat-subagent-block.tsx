@@ -116,7 +116,7 @@ function SubagentProgress({
     label = t("steps", { count: stepCount });
   }
   return (
-    <span className="text-muted-foreground/60 shrink-0 text-xs tabular-nums">
+    <span className="text-subtle-foreground shrink-0 text-xs tabular-nums">
       {label}
     </span>
   );
@@ -127,7 +127,7 @@ function SubagentChevron({ isOpen }: { isOpen: boolean }) {
     <HugeiconsIcon
       aria-hidden
       className={cn(
-        "text-muted-foreground/60 size-3.5 shrink-0 transition-transform motion-reduce:transition-none",
+        "text-subtle-foreground size-3.5 shrink-0 transition-transform motion-reduce:transition-none",
         isOpen ? "rotate-180" : "rotate-0 opacity-0 group-hover:opacity-100"
       )}
       icon={ArrowDown01Icon}
@@ -193,7 +193,7 @@ export function ChatSubagentBlock({
           <span className="text-foreground">
             {t(`names.${config.labelKey}`)}
           </span>
-          <span aria-hidden className="text-muted-foreground/50">
+          <span aria-hidden className="text-subtle-foreground">
             {" · "}
           </span>
           {isStreaming ? <Shimmer as="span">{activity}</Shimmer> : activity}

@@ -1198,7 +1198,7 @@ function StepProgress({ activeIndex, onStepSelect }: StepProgressProps) {
           <>
             <div
               className={cn(
-                "flex size-5 shrink-0 items-center justify-center rounded-full text-[10px] font-medium transition-colors",
+                "text-3xs flex size-5 shrink-0 items-center justify-center rounded-full font-medium transition-colors",
                 isActive && "bg-foreground text-background",
                 isCompleted && "bg-foreground/80 text-background",
                 !(isActive || isCompleted) && "bg-muted text-muted-foreground"

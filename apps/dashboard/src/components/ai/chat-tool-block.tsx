@@ -783,7 +783,7 @@ function JsonView({ value }: { value: unknown }) {
 function ToolDataSection({ label, value }: { label: string; value: unknown }) {
   return (
     <div>
-      <div className="text-muted-foreground/70 mb-2 text-[0.65rem] font-medium tracking-wider uppercase">
+      <div className="text-subtle-foreground mb-2 text-[0.65rem] font-medium tracking-wider uppercase">
         {label}
       </div>
       <JsonView value={value} />
@@ -987,7 +987,7 @@ function ChatToolTrigger({
         {isStreaming ? <Shimmer as="span">{subtitle}</Shimmer> : subtitle}
       </span>
       {showElapsedTimer && (
-        <span className="text-muted-foreground/60 shrink-0 text-xs tabular-nums">
+        <span className="text-subtle-foreground shrink-0 text-xs tabular-nums">
           {formatElapsedSeconds(elapsedSeconds)}
         </span>
       )}
@@ -995,7 +995,7 @@ function ChatToolTrigger({
         <HugeiconsIcon
           aria-hidden
           className={cn(
-            "text-muted-foreground/60 size-3.5 shrink-0 transition-transform",
+            "text-subtle-foreground size-3.5 shrink-0 transition-transform",
             isOpen ? "rotate-180" : "rotate-0 opacity-0 group-hover:opacity-100"
           )}
           icon={ArrowDown01Icon}

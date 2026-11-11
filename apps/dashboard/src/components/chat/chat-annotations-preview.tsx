@@ -57,7 +57,7 @@ export function ChatAnnotationsPreview({
                 >
                   <button
                     aria-label={t("show", { index: index + 1 })}
-                    className="bg-muted text-muted-foreground hover:bg-foreground/10 hover:text-foreground focus-visible:ring-ring mt-0.5 flex size-4 shrink-0 cursor-pointer items-center justify-center rounded text-[10px] font-medium tabular-nums outline-none focus-visible:ring-2"
+                    className="bg-muted text-muted-foreground hover:bg-foreground/10 hover:text-foreground focus-visible:ring-ring text-3xs mt-0.5 flex size-4 shrink-0 cursor-pointer items-center justify-center rounded font-medium tabular-nums outline-none focus-visible:ring-2"
                     onClick={() =>
                       context?.focusAnnotation({
                         postId: annotation.postId,
@@ -105,7 +105,7 @@ export function ChatAnnotationsPreview({
                           "block truncate text-xs",
                           annotation.note
                             ? "text-foreground"
-                            : "text-muted-foreground/70"
+                            : "text-subtle-foreground"
                         )}
                       >
                         {annotation.note ?? t("addNote")}

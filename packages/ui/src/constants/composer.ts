@@ -25,7 +25,7 @@ export const COMPOSER_SEND_BUTTON_SM =
 export const COMPOSER_SEND_ACTIVE = "";
 
 export const COMPOSER_SEND_INERT =
-  "text-muted-foreground/70 hover:brightness-100 data-disabled:not-aria-busy:cursor-default";
+  "text-subtle-foreground hover:brightness-100 data-disabled:not-aria-busy:cursor-default";
 
 export const COMPOSER_CHIP_ACTION =
   "size-4 rounded text-muted-foreground hover:bg-accent";

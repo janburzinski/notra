@@ -135,7 +135,7 @@ export function GuidelinesColorsSection({
               <p className="text-muted-foreground truncate text-sm font-medium">
                 {colorRoleLabels[role]}
               </p>
-              <p className="text-muted-foreground/70 truncate text-xs">
+              <p className="text-subtle-foreground truncate text-xs">
                 {tBrandShared("addColor")}
               </p>
             </div>

@@ -167,7 +167,7 @@ export function IgnoreCommitPatternsField({
           <span className="text-foreground flex-1 font-medium">
             {t("custom")}
             {customCount > 0 ? (
-              <span className="text-muted-foreground/70 ml-1.5 tabular-nums">
+              <span className="text-subtle-foreground ml-1.5 tabular-nums">
                 {customCount}
               </span>
             ) : null}

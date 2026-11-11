@@ -107,7 +107,7 @@ export function EditorHeader({
       {onNameChange ? (
         <input
           aria-label={t("name")}
-          className="placeholder:text-muted-foreground/60 w-full bg-transparent px-1 text-2xl font-bold tracking-tight outline-none @min-[40rem]/main:text-3xl"
+          className="placeholder:text-subtle-foreground w-full bg-transparent px-1 text-2xl font-bold tracking-tight outline-none @min-[40rem]/main:text-3xl"
           maxLength={maxLength}
           onChange={(event) => onNameChange(event.target.value)}
           placeholder={placeholder}

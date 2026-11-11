@@ -79,7 +79,7 @@ function WebhookActiveState({
   }
   if (value === 0) {
     return (
-      <p className="text-muted-foreground/70 mt-auto flex h-6 items-end text-xs">
+      <p className="text-subtle-foreground mt-auto flex h-6 items-end text-xs">
         {t("idle")}
       </p>
     );
@@ -143,7 +143,7 @@ export function WebhookMetrics({ stats, activity }: WebhookMetricsProps) {
                 {t(`metrics.${metric.key}`)}
               </span>
               {stats ? (
-                <span className="text-muted-foreground/70 shrink-0 tabular-nums">
+                <span className="text-subtle-foreground shrink-0 tabular-nums">
                   {hint(metric, value)}
                 </span>
               ) : null}

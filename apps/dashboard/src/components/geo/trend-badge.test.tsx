@@ -4,7 +4,7 @@ import { TrendBadge } from "@notra/ui/components/trend-badge";
 import { renderToStaticMarkup } from "react-dom/server";
 
 test.each([
-  ["sm", "text-[0.625rem]", "[&amp;&gt;svg]:size-2.5"],
+  ["sm", "text-3xs", "[&amp;&gt;svg]:size-2.5"],
   ["default", "text-xs", "[&amp;&gt;svg]:size-3"],
   ["md", "text-sm", "[&amp;&gt;svg]:size-3.5"],
 ] as const)("plain trends honor the %s size", (size, textClass, iconClass) => {

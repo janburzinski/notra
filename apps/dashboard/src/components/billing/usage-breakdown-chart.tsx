@@ -125,7 +125,7 @@ function UsageBreakdownChartBody({
         />
         <XAxis
           axisLine={false}
-          className="text-muted-foreground/60 text-xs"
+          className="text-subtle-foreground text-xs"
           dataKey="date"
           minTickGap={32}
           tickFormatter={(value: number) => formatShortDate(value)}
@@ -134,7 +134,7 @@ function UsageBreakdownChartBody({
         />
         <YAxis
           axisLine={false}
-          className="text-muted-foreground/60 text-xs"
+          className="text-subtle-foreground text-xs"
           tickFormatter={(value: number) => formatCount(value, locale)}
           tickLine={false}
           tickMargin={8}

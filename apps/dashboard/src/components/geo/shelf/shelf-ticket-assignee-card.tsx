@@ -32,7 +32,7 @@ export function ShelfTicketAssigneeCard({
             alt={name}
             src={getUserAvatarUrl(member.image, member.email)}
           />
-          <AvatarFallback className="text-[0.625rem]">
+          <AvatarFallback className="text-3xs">
             {shelfMemberInitial(member)}
           </AvatarFallback>
         </Avatar>

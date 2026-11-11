@@ -153,7 +153,7 @@ function JourneysTable() {
       header: tGeoShared("span"),
       width: "9.5rem",
       cell: (row) => (
-        <span className="text-muted-foreground text-[0.6875rem] whitespace-nowrap tabular-nums">
+        <span className="text-muted-foreground text-2xs whitespace-nowrap tabular-nums">
           {formatGeoJourneySpan(
             row.firstSeenAt,
             row.lastSeenAt,
@@ -169,7 +169,7 @@ function JourneysTable() {
       width: "9.375rem",
       sortable: true,
       cell: (row) => (
-        <span className="text-muted-foreground text-[0.6875rem] whitespace-nowrap tabular-nums">
+        <span className="text-muted-foreground text-2xs whitespace-nowrap tabular-nums">
           {formatAiTrafficTimestamp(row.lastSeenAt, locale)}
         </span>
       ),

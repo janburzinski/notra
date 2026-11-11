@@ -63,7 +63,7 @@ export function AutopilotAutomationFacts({
               {index > 0 ? (
                 <HugeiconsIcon
                   aria-hidden="true"
-                  className="text-muted-foreground/60 hidden size-4 shrink-0 self-center md:block"
+                  className="text-subtle-foreground hidden size-4 shrink-0 self-center md:block"
                   icon={ArrowRight02Icon}
                 />
               ) : null}

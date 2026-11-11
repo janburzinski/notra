@@ -128,7 +128,7 @@ function ReferenceUsageInfo({ afterCount }: { afterCount: number }) {
     <p className="text-muted-foreground text-xs">
       {t("remaining", { remaining, afterRemaining })}
       {overageAllowed && included !== null && (
-        <span className="text-muted-foreground/70">
+        <span className="text-subtle-foreground">
           {" "}
           {t("included", {
             included,

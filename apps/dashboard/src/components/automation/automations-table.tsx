@@ -193,7 +193,7 @@ export function AutomationsTable({
             {format.relativeTime(new Date(lastRun), latest(now, lastRun))}
           </span>
         ) : (
-          <span className="text-muted-foreground/60 text-sm">—</span>
+          <span className="text-subtle-foreground text-sm">—</span>
         );
       },
     },

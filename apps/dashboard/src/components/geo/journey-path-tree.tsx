@@ -13,13 +13,13 @@ function JourneyTreeRow({ node }: { node: GeoJourneyTreeNode }) {
       <JourneyPathPill className="h-6 px-2" node={node} />
       {node.hits > 1 ? (
         <span
-          className="text-muted-foreground text-[0.6875rem] tabular-nums"
+          className="text-muted-foreground text-2xs tabular-nums"
           title={t("fetchedTimes", { count: node.hits })}
         >
           ×{node.hits}
         </span>
       ) : null}
-      <span className="text-muted-foreground/70 text-[0.6875rem] tabular-nums">
+      <span className="text-subtle-foreground text-2xs tabular-nums">
         {formatGeoJourneyClock(node.firstSeenAt, locale)}
       </span>
     </div>

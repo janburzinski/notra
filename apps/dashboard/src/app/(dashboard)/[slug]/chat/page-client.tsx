@@ -255,7 +255,7 @@ function CreateToolPendingIndicator({
     <div className="text-muted-foreground flex items-center gap-2 text-xs">
       <span>{t("working")}</span>
       {elapsedSeconds >= TOOL_TIMER_THRESHOLD_SECONDS && (
-        <span className="text-muted-foreground/60 shrink-0 text-xs tabular-nums">
+        <span className="text-subtle-foreground shrink-0 text-xs tabular-nums">
           {formatElapsedSeconds(elapsedSeconds)}
         </span>
       )}

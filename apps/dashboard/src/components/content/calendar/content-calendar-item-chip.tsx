@@ -197,10 +197,7 @@ export function ContentCalendarItemChip({
           }
           inCell={inCell}
           time={time}
-          timeClassName={cn(
-            "text-[0.6875rem] font-medium",
-            STATE_STYLES[state].time
-          )}
+          timeClassName={cn("text-2xs font-medium", STATE_STYLES[state].time)}
           title={entry.post.title}
           titleClassName="font-medium"
         />
