@@ -58,3 +58,13 @@ export interface SlackSettingRowProps {
   description: string;
   children: React.ReactNode;
 }
+
+export type SlackMemberResolution =
+  | { status: "member"; userId: string; email: string; role: string }
+  | { status: "missing_scope" }
+  | { status: "unknown" };
+
+export type SlackMemberIdentity =
+  | { status: "verified"; email: string }
+  | { status: "missing_scope" }
+  | { status: "unknown" };

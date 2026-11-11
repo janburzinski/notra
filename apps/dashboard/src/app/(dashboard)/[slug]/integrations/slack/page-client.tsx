@@ -460,6 +460,7 @@ function SlackIntegrationCard({
   const tIntegrationsShared = useTranslations("integrations.shared");
   const tCommon = useTranslations("common");
   const locale = useLocale();
+  const pathname = usePathname();
   const queryClient = useQueryClient();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
@@ -526,6 +527,17 @@ function SlackIntegrationCard({
                     })
                   : t("connectedOn", { date: connectedOn })}
               </p>
+              {integration.needsReconnect ? (
+                <p className="text-sm">
+                  {t("reconnectForPermissions")}{" "}
+                  <a
+                    className="font-medium underline underline-offset-4"
+                    href={`/api/integrations/slack/authorize?organizationId=${organizationId}&callbackPath=${encodeURIComponent(pathname)}`}
+                  >
+                    {t("reconnect")}
+                  </a>
+                </p>
+              ) : null}
             </div>
           </div>
           <div className="flex shrink-0 items-center gap-2">

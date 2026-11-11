@@ -25,6 +25,7 @@ if (process.env.NOTRA_AUTOPILOT_ROUTER_TEST !== "1") {
   const state = {
     role: "admin",
     flag: true,
+    settingsExist: true,
   };
   const writes: { insert?: Record<string, unknown>; update?: unknown }[] = [];
   const findFirstProject = mock(async () => undefined as unknown);
@@ -56,6 +57,18 @@ if (process.env.NOTRA_AUTOPILOT_ROUTER_TEST !== "1") {
         projects: { findFirst: findFirstProject },
         slackIntegrations: { findFirst: async () => undefined },
       },
+      update: () => ({
+        set: (set: Record<string, unknown>) => ({
+          where: () => ({
+            returning: async () => {
+              writes.push({ update: set });
+              return state.settingsExist
+                ? [{ organizationId: "org_fixture" }]
+                : [];
+            },
+          }),
+        }),
+      }),
       insert: () => ({
         values: (insert: Record<string, unknown>) => ({
           onConflictDoUpdate: async ({ set }: { set: unknown }) => {
@@ -143,6 +156,27 @@ if (process.env.NOTRA_AUTOPILOT_ROUTER_TEST !== "1") {
     await call(autopilotRouter.save, saveInput, { context });
     expect(findFirstProject).not.toHaveBeenCalled();
     expect(writes.at(-1)?.update).not.toHaveProperty("projectId");
+  });
+
+  test("setJob merges one job and needs saved settings", async () => {
+    writes.length = 0;
+    state.role = "admin";
+    state.flag = true;
+    state.settingsExist = true;
+    const input = {
+      organizationId: "org_fixture",
+      kind: "links" as const,
+      enabled: true,
+    };
+    expect(await call(autopilotRouter.setJob, input, { context })).toEqual({
+      success: true,
+    });
+    expect(Object.keys(writes.at(-1)?.update as object)).toEqual(["jobs"]);
+    state.settingsExist = false;
+    await expect(
+      call(autopilotRouter.setJob, input, { context })
+    ).rejects.toMatchObject({ code: "BAD_REQUEST" });
+    state.settingsExist = true;
   });
 
   test("sync needs an admin and the Autopilot flag", async () => {

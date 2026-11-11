@@ -1,33 +1,23 @@
-import {
-  SLACK_API_BASE_URL,
-  SLACK_REQUEST_TIMEOUT_MS,
-} from "@notra/ai/constants/slack";
-import { getSlackIntegrationBotToken } from "@notra/ai/integrations/slack-workspace";
 import type { autopilotSlackActionRequestSchema } from "@notra/ai/schemas/autopilot-slack-action";
 import { logError } from "@notra/ai/utils/server-log";
 import { db } from "@notra/db/drizzle";
 import {
   autopilotFindings,
   autopilotSettings,
-  members,
   slackIntegrations,
-  users,
 } from "@notra/db/schema";
 import { and, eq, sql } from "drizzle-orm";
 import type * as z from "zod";
 
 import { AUTOPILOT_SLACK_ACTION_STALE_SECONDS } from "@/constants/autopilot-slack";
+import { writeSuggestedFinding } from "@/lib/autopilot/finding-actions";
 import { dismissFinding, mergeFinding } from "@/lib/autopilot/findings";
 import { isAutopilotEnabledForOrganization } from "@/lib/autopilot/flag";
 import { rememberFeedback } from "@/lib/autopilot/memory";
-import {
-  createItemAutopilotRun,
-  finishAutopilotRun,
-} from "@/lib/autopilot/run";
 import { postAutopilotSlackMessage } from "@/lib/autopilot/slack";
-import { loadSuggestedPost } from "@/lib/autopilot/suggestions";
-import { slackUserInfoResponseSchema } from "@/schemas/autopilot-slack";
+import { resolveSlackMember } from "@/lib/integrations/slack/member";
 import type { AutopilotFindingRow } from "@/types/autopilot-runtime";
+import { canManageAutopilot } from "@/utils/autopilot-permissions";
 import { compactSlackText, slackMrkdwn } from "@/utils/autopilot-slack";
 import { toErrorMessage } from "@/utils/error-message";
 
@@ -67,54 +57,19 @@ async function loadDestination(vote: SlackVote) {
   return destination;
 }
 
-async function isSlackUserWorkspaceAdmin(params: {
-  organizationId: string;
-  encryptedBotToken: string;
-  teamId: string;
-  slackUserId: string;
-}) {
-  try {
-    const response = await fetch(
-      `${SLACK_API_BASE_URL}/users.info?user=${encodeURIComponent(params.slackUserId)}`,
-      {
-        headers: {
-          authorization: `Bearer ${getSlackIntegrationBotToken(params)}`,
-        },
-        signal: AbortSignal.timeout(SLACK_REQUEST_TIMEOUT_MS),
-      }
-    );
-    const parsed = slackUserInfoResponseSchema.safeParse(await response.json());
-    const user = parsed.success && parsed.data.ok ? parsed.data.user : null;
-    const email = user?.profile?.email?.trim().toLowerCase();
-    if (
-      !(user && email) ||
-      user.team_id !== params.teamId ||
-      user.deleted ||
-      user.is_bot ||
-      user.is_restricted ||
-      user.is_ultra_restricted
-    ) {
-      return false;
-    }
-    const [member] = await db
-      .select({ role: members.role })
-      .from(members)
-      .innerJoin(users, eq(users.id, members.userId))
-      .where(
-        and(
-          eq(members.organizationId, params.organizationId),
-          sql`lower(${users.email}) = ${email}`,
-          eq(users.emailVerified, true)
-        )
-      )
-      .limit(1);
-    return member?.role === "owner" || member?.role === "admin";
-  } catch (error) {
-    logError("Autopilot Slack user lookup failed", error, {
-      organizationId: params.organizationId,
-    });
-    return false;
+async function authorizeVote(organizationId: string, vote: SlackVote) {
+  const member = await resolveSlackMember(
+    organizationId,
+    vote.teamId,
+    vote.userId
+  );
+  if (member.status === "member" && canManageAutopilot(member.role)) {
+    return { allowed: true as const, email: member.email };
   }
+  return {
+    allowed: false as const,
+    missingScope: member.status === "missing_scope",
+  };
 }
 
 function pullRequestLabel(finding: AutopilotFindingRow) {
@@ -162,6 +117,16 @@ export async function handleAutopilotSlackAction(vote: SlackVote) {
       blocks: [{ type: "section", text: slackMrkdwn(text) }],
     });
 
+  const access = await authorizeVote(organizationId, vote);
+  if (!access.allowed) {
+    await reply(
+      access.missingScope
+        ? `${user}, Notra can't check who reacted yet. A workspace admin needs to reconnect Slack in Notra under Integrations > Slack.`
+        : `${user}, only Notra workspace admins can act on Autopilot from Slack. Use the same verified email in Slack and Notra, or open ${finding.status === "proposed" ? pullRequestLabel(finding) : "Autopilot in Notra"}.`
+    );
+    return;
+  }
+
   if (vote.vote === "down") {
     await dismissFinding(organizationId, finding.id);
     await rememberFeedback({
@@ -169,7 +134,7 @@ export async function handleAutopilotSlackAction(vote: SlackVote) {
       id: `autopilot-slack-dismiss-${finding.id}`,
       text: `The workspace dismissed this specific suggestion: ${finding.title}. Reason: none given (thumbs down in Slack), not a standing topic ban.`,
       sourceUrl: null,
-      createdBy: "a Slack user",
+      createdBy: access.email,
       origin: "slack",
       sentiment: "negative",
     }).catch((error) =>
@@ -209,19 +174,6 @@ export async function handleAutopilotSlackAction(vote: SlackVote) {
       .where(eq(autopilotFindings.id, finding.id));
 
   if (finding.status === "proposed") {
-    const canMerge = await isSlackUserWorkspaceAdmin({
-      organizationId,
-      encryptedBotToken: destination.encryptedBotToken,
-      teamId: vote.teamId,
-      slackUserId: vote.userId,
-    });
-    if (!canMerge) {
-      await release();
-      await reply(
-        `${user}, only Notra workspace admins can merge from Slack. Merge ${pullRequestLabel(finding)} on GitHub or in Notra.`
-      );
-      return;
-    }
     try {
       await mergeFinding(organizationId, finding.id);
     } catch (error) {
@@ -236,27 +188,7 @@ export async function handleAutopilotSlackAction(vote: SlackVote) {
   }
 
   try {
-    await loadSuggestedPost(organizationId, finding.id);
-    const runId = await createItemAutopilotRun(organizationId, "suggestion");
-    try {
-      const { startAutopilotSuggestionWorkflowRun } =
-        await import("@/lib/workflows/start");
-      await startAutopilotSuggestionWorkflowRun({
-        organizationId,
-        findingId: finding.id,
-        runId,
-      });
-    } catch (startFailure) {
-      await finishAutopilotRun({
-        organizationId,
-        runId,
-        results: [],
-        slackMessageTs: null,
-        scheduled: false,
-        error: toErrorMessage(startFailure, "Could not start the writer"),
-      });
-      throw startFailure;
-    }
+    await writeSuggestedFinding(organizationId, finding.id);
   } catch (error) {
     await release();
     await reply(`Couldn't start writing: ${failure(error)}`);

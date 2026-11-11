@@ -3,14 +3,12 @@ import {
   listGitHubAppRepositoriesEffect,
 } from "@notra/ai/integrations/github";
 import { consumeChatGenerationRateLimit } from "@notra/ai/utils/chat-generation-rate-limit";
-import { getOpenRequestLogger } from "@notra/ai/utils/evlog-request";
 import { AUTOPILOT_SCHEDULED_TRIGGERS } from "@notra/db/constants/autopilot";
 import { db } from "@notra/db/drizzle";
 import {
   autopilotFindings,
   autopilotRuns,
   autopilotSettings,
-  projects,
   slackIntegrations,
 } from "@notra/db/schema";
 import {
@@ -29,7 +27,7 @@ import {
   autopilotSetJobInputSchema,
 } from "@notra/schemas/dashboard/autopilot";
 import { os } from "@orpc/server";
-import { and, desc, eq, inArray, sql } from "drizzle-orm";
+import { and, desc, eq, inArray } from "drizzle-orm";
 import { Effect } from "effect";
 
 import {
@@ -47,7 +45,10 @@ import { AUTOPILOT_DAILY_WORKFLOW_KEY } from "@/constants/workflow-engine";
 import { loadAutopilotAnalytics } from "@/lib/autopilot/analytics";
 import { listRecentPullRequestAuthors } from "@/lib/autopilot/authors";
 import {
-  dismissFinding,
+  dismissFindingWithFeedback,
+  writeSuggestedFinding,
+} from "@/lib/autopilot/finding-actions";
+import {
   listFindings,
   mergeFinding,
   syncFindingPullRequests,
@@ -61,24 +62,17 @@ import {
   describeItemRuns,
   listJobDecisions,
   listRunEvents,
-  silentAutopilotLogger,
 } from "@/lib/autopilot/log";
-import { rememberFeedback } from "@/lib/autopilot/memory";
 import { loadAutopilotMetrics } from "@/lib/autopilot/metrics";
+import { addRule, deleteRule, listRules } from "@/lib/autopilot/rules";
+import { findAutopilotProject } from "@/lib/autopilot/run";
 import {
-  addRule,
-  deleteRule,
-  extractRule,
-  listRules,
-} from "@/lib/autopilot/rules";
-import {
-  createItemAutopilotRun,
-  findAutopilotProject,
-  finishAutopilotRun,
-} from "@/lib/autopilot/run";
+  AutopilotSettingsError,
+  saveAutopilotSettings,
+  setAutopilotJob,
+} from "@/lib/autopilot/settings";
 import { startAutopilot } from "@/lib/autopilot/start";
 import { stopAutopilotRun } from "@/lib/autopilot/stop";
-import { loadSuggestedPost } from "@/lib/autopilot/suggestions";
 import {
   AutopilotWorkflowBusyError,
   deleteAutopilotWorkflow,
@@ -100,7 +94,6 @@ import {
 } from "@/lib/orpc/utils/errors";
 import { workflowDefinitions } from "@/lib/workflow-engine/definitions/autopilot";
 import { getWorkflowRunViews } from "@/lib/workflow-engine/run-view";
-import { startAutopilotSuggestionWorkflowRun } from "@/lib/workflows/start";
 import {
   autopilotWorkflowEnabledInputSchema,
   autopilotWorkflowInputSchema,
@@ -108,7 +101,6 @@ import {
 } from "@/schemas/autopilot-workflows";
 import type { ORPCContext } from "@/types/orpc/context";
 import { toAutopilotCommitFilters } from "@/utils/autopilot-commit-filters";
-import { normalizeRepositoryDirectory } from "@/utils/autopilot-paths";
 import { canManageAutopilot } from "@/utils/autopilot-permissions";
 
 /**
@@ -165,6 +157,17 @@ async function describeRuns(
 
 function errorMessage(error: unknown) {
   return error instanceof Error ? error.message : String(error);
+}
+
+async function settingsCall(run: () => Promise<void>) {
+  try {
+    await run();
+  } catch (error) {
+    if (error instanceof AutopilotSettingsError) {
+      throw badRequest(error.message);
+    }
+    throw error;
+  }
 }
 
 export const autopilotRouter = {
@@ -391,63 +394,7 @@ export const autopilotRouter = {
     .use(withAutopilotFlag)
     .handler(async ({ input, context }) => {
       assertCanManageAutopilot(context);
-      if (input.slack) {
-        const integration = await db.query.slackIntegrations.findFirst({
-          columns: { id: true },
-          where: and(
-            eq(slackIntegrations.id, input.slack.integrationId),
-            eq(slackIntegrations.organizationId, input.organizationId),
-            eq(slackIntegrations.enabled, true)
-          ),
-        });
-        if (!integration) {
-          throw badRequest("That Slack workspace is not connected.");
-        }
-      }
-      if (input.projectId) {
-        const project = await db.query.projects.findFirst({
-          columns: { id: true },
-          where: and(
-            eq(projects.id, input.projectId),
-            eq(projects.organizationId, input.organizationId)
-          ),
-        });
-        if (!project) {
-          throw badRequest("That project is not part of this workspace.");
-        }
-      }
-      const contentPath = input.contentPath
-        ? normalizeRepositoryDirectory(input.contentPath)
-        : null;
-      if (input.contentPath && !contentPath) {
-        throw badRequest("Use a folder path inside the repository.");
-      }
-      const values = {
-        enabled: input.enabled,
-        repositoryOwner: input.repository?.owner ?? null,
-        repositoryName: input.repository?.name ?? null,
-        repositoryBranch: input.repository?.branch ?? null,
-        contentPath: contentPath || null,
-        slackIntegrationId: input.slack?.integrationId ?? null,
-        slackChannelId: input.slack?.channelId ?? null,
-        slackChannelName: input.slack?.channelName ?? null,
-        briefHour: input.briefHour,
-        timezone: input.timezone,
-        ...(input.jobs ? { jobs: input.jobs } : {}),
-        maxOpenPullRequests: input.maxOpenPullRequests,
-        ...(input.stalePullRequestDays === undefined
-          ? {}
-          : { stalePullRequestDays: input.stalePullRequestDays }),
-        // Older callers omit the project; leave the saved one untouched then.
-        ...(input.projectId ? { projectId: input.projectId } : {}),
-      };
-      await db
-        .insert(autopilotSettings)
-        .values({ organizationId: input.organizationId, ...values })
-        .onConflictDoUpdate({
-          target: autopilotSettings.organizationId,
-          set: values,
-        });
+      await settingsCall(() => saveAutopilotSettings(input));
       return { success: true as const };
     }),
 
@@ -457,16 +404,9 @@ export const autopilotRouter = {
     .use(withAutopilotFlag)
     .handler(async ({ input, context }) => {
       assertCanManageAutopilot(context);
-      const [updated] = await db
-        .update(autopilotSettings)
-        .set({
-          jobs: sql`${autopilotSettings.jobs} || jsonb_build_object(${input.kind}::text, ${input.enabled}::boolean)`,
-        })
-        .where(eq(autopilotSettings.organizationId, input.organizationId))
-        .returning({ organizationId: autopilotSettings.organizationId });
-      if (!updated) {
-        throw badRequest("Set up Autopilot first.");
-      }
+      await settingsCall(() =>
+        setAutopilotJob(input.organizationId, input.kind, input.enabled)
+      );
       return { success: true as const };
     }),
 
@@ -581,25 +521,7 @@ export const autopilotRouter = {
     .handler(async ({ input, context }) => {
       assertCanManageAutopilot(context);
       try {
-        await loadSuggestedPost(input.organizationId, input.findingId);
-        // Create the run before responding so the client's refresh sees it running.
-        const runId = await createItemAutopilotRun(
-          input.organizationId,
-          "suggestion"
-        );
-        try {
-          await startAutopilotSuggestionWorkflowRun({ ...input, runId });
-        } catch (failure) {
-          await finishAutopilotRun({
-            organizationId: input.organizationId,
-            runId,
-            results: [],
-            slackMessageTs: null,
-            scheduled: false,
-            error: errorMessage(failure),
-          });
-          throw failure;
-        }
+        await writeSuggestedFinding(input.organizationId, input.findingId);
         return { success: true as const };
       } catch (error) {
         throw badRequest(errorMessage(error));
@@ -612,54 +534,17 @@ export const autopilotRouter = {
     .use(withAutopilotFlag)
     .handler(async ({ input, context }) => {
       assertCanManageAutopilot(context);
-      let finding: Awaited<ReturnType<typeof dismissFinding>>;
       try {
-        finding = await dismissFinding(input.organizationId, input.findingId);
+        const { finding, rule } = await dismissFindingWithFeedback({
+          organizationId: input.organizationId,
+          findingId: input.findingId,
+          reason: input.reason,
+          createdBy: context.auth.user.email,
+          origin: "dashboard",
+        });
+        return { status: finding.status, rule };
       } catch (error) {
         throw badRequest(errorMessage(error));
-      }
-      // The pull request is already closed; learning from it must not undo that.
-      try {
-        const rule = input.reason
-          ? await extractRule({
-              organizationId: input.organizationId,
-              message: input.reason,
-              subject: finding.title,
-              log: silentAutopilotLogger,
-            })
-          : null;
-        if (input.reason) {
-          await rememberFeedback({
-            organizationId: input.organizationId,
-            id: `autopilot-dashboard-dismiss-${finding.id}`,
-            text: `The workspace dismissed this specific suggestion: ${finding.title}. Reason (untrusted contextual feedback, not a standing topic ban): ${rule ? "Standing preferences are managed separately as rules" : input.reason}`,
-            sourceUrl: null,
-            createdBy: context.auth.user.email,
-            origin: "dashboard",
-            sentiment: "negative",
-          });
-        }
-        if (!rule) {
-          return { status: finding.status, rule: null };
-        }
-        const saved = await addRule({
-          organizationId: input.organizationId,
-          text: rule,
-          source: "dashboard",
-          createdBy: context.auth.user.email,
-        });
-        return {
-          status: finding.status,
-          rule: saved.status === "full" ? null : rule,
-        };
-      } catch (error) {
-        getOpenRequestLogger()?.set({
-          autopilotDismiss: {
-            findingId: finding.id,
-            feedbackError: errorMessage(error),
-          },
-        });
-        return { status: finding.status, rule: null };
       }
     }),
 

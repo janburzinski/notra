@@ -77,6 +77,7 @@ import { Route as ApiIntegrationsSlackCallbackRouteImport } from './routes/api.i
 import { Route as ApiInternalAiTrendsTrafficRouteImport } from './routes/api.internal.ai-trends.traffic'
 import { Route as ApiInternalAutomationScheduleRunRouteImport } from './routes/api.internal.automation.schedule-run'
 import { Route as ApiInternalAutopilotAdminRouteImport } from './routes/api.internal.autopilot.admin'
+import { Route as ApiInternalAutopilotAgentRouteImport } from './routes/api.internal.autopilot.agent'
 import { Route as ApiInternalAutopilotSlackRouteImport } from './routes/api.internal.autopilot.slack'
 import { Route as ApiInternalContentDraftPullRequestRouteImport } from './routes/api.internal.content.draft-pull-request'
 import { Route as ApiInternalContentPreviewRouteImport } from './routes/api.internal.content.preview'
@@ -481,6 +482,12 @@ const ApiInternalAutopilotAdminRoute =
     path: '/api/internal/autopilot/admin',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiInternalAutopilotAgentRoute =
+  ApiInternalAutopilotAgentRouteImport.update({
+    id: '/api/internal/autopilot/agent',
+    path: '/api/internal/autopilot/agent',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiInternalAutopilotSlackRoute =
   ApiInternalAutopilotSlackRouteImport.update({
     id: '/api/internal/autopilot/slack',
@@ -780,6 +787,7 @@ export interface FileRoutesByFullPath {
   '/api/internal/ai-trends/traffic': typeof ApiInternalAiTrendsTrafficRoute
   '/api/internal/automation/schedule-run': typeof ApiInternalAutomationScheduleRunRoute
   '/api/internal/autopilot/admin': typeof ApiInternalAutopilotAdminRoute
+  '/api/internal/autopilot/agent': typeof ApiInternalAutopilotAgentRoute
   '/api/internal/autopilot/slack': typeof ApiInternalAutopilotSlackRoute
   '/api/internal/content/draft-pull-request': typeof ApiInternalContentDraftPullRequestRoute
   '/api/internal/content/preview': typeof ApiInternalContentPreviewRoute
@@ -889,6 +897,7 @@ export interface FileRoutesByTo {
   '/api/internal/ai-trends/traffic': typeof ApiInternalAiTrendsTrafficRoute
   '/api/internal/automation/schedule-run': typeof ApiInternalAutomationScheduleRunRoute
   '/api/internal/autopilot/admin': typeof ApiInternalAutopilotAdminRoute
+  '/api/internal/autopilot/agent': typeof ApiInternalAutopilotAgentRoute
   '/api/internal/autopilot/slack': typeof ApiInternalAutopilotSlackRoute
   '/api/internal/content/draft-pull-request': typeof ApiInternalContentDraftPullRequestRoute
   '/api/internal/content/preview': typeof ApiInternalContentPreviewRoute
@@ -999,6 +1008,7 @@ export interface FileRoutesById {
   '/api/internal/ai-trends/traffic': typeof ApiInternalAiTrendsTrafficRoute
   '/api/internal/automation/schedule-run': typeof ApiInternalAutomationScheduleRunRoute
   '/api/internal/autopilot/admin': typeof ApiInternalAutopilotAdminRoute
+  '/api/internal/autopilot/agent': typeof ApiInternalAutopilotAgentRoute
   '/api/internal/autopilot/slack': typeof ApiInternalAutopilotSlackRoute
   '/api/internal/content/draft-pull-request': typeof ApiInternalContentDraftPullRequestRoute
   '/api/internal/content/preview': typeof ApiInternalContentPreviewRoute
@@ -1110,6 +1120,7 @@ export interface FileRouteTypes {
     | '/api/internal/ai-trends/traffic'
     | '/api/internal/automation/schedule-run'
     | '/api/internal/autopilot/admin'
+    | '/api/internal/autopilot/agent'
     | '/api/internal/autopilot/slack'
     | '/api/internal/content/draft-pull-request'
     | '/api/internal/content/preview'
@@ -1219,6 +1230,7 @@ export interface FileRouteTypes {
     | '/api/internal/ai-trends/traffic'
     | '/api/internal/automation/schedule-run'
     | '/api/internal/autopilot/admin'
+    | '/api/internal/autopilot/agent'
     | '/api/internal/autopilot/slack'
     | '/api/internal/content/draft-pull-request'
     | '/api/internal/content/preview'
@@ -1328,6 +1340,7 @@ export interface FileRouteTypes {
     | '/api/internal/ai-trends/traffic'
     | '/api/internal/automation/schedule-run'
     | '/api/internal/autopilot/admin'
+    | '/api/internal/autopilot/agent'
     | '/api/internal/autopilot/slack'
     | '/api/internal/content/draft-pull-request'
     | '/api/internal/content/preview'
@@ -1432,6 +1445,7 @@ export interface RootRouteChildren {
   ApiInternalAiTrendsTrafficRoute: typeof ApiInternalAiTrendsTrafficRoute
   ApiInternalAutomationScheduleRunRoute: typeof ApiInternalAutomationScheduleRunRoute
   ApiInternalAutopilotAdminRoute: typeof ApiInternalAutopilotAdminRoute
+  ApiInternalAutopilotAgentRoute: typeof ApiInternalAutopilotAgentRoute
   ApiInternalAutopilotSlackRoute: typeof ApiInternalAutopilotSlackRoute
   ApiInternalContentDraftPullRequestRoute: typeof ApiInternalContentDraftPullRequestRoute
   ApiInternalContentPreviewRoute: typeof ApiInternalContentPreviewRoute
@@ -1944,6 +1958,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiInternalAutopilotAdminRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/internal/autopilot/agent': {
+      id: '/api/internal/autopilot/agent'
+      path: '/api/internal/autopilot/agent'
+      fullPath: '/api/internal/autopilot/agent'
+      preLoaderRoute: typeof ApiInternalAutopilotAgentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/internal/autopilot/slack': {
       id: '/api/internal/autopilot/slack'
       path: '/api/internal/autopilot/slack'
@@ -2391,6 +2412,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiInternalAiTrendsTrafficRoute: ApiInternalAiTrendsTrafficRoute,
   ApiInternalAutomationScheduleRunRoute: ApiInternalAutomationScheduleRunRoute,
   ApiInternalAutopilotAdminRoute: ApiInternalAutopilotAdminRoute,
+  ApiInternalAutopilotAgentRoute: ApiInternalAutopilotAgentRoute,
   ApiInternalAutopilotSlackRoute: ApiInternalAutopilotSlackRoute,
   ApiInternalContentDraftPullRequestRoute:
     ApiInternalContentDraftPullRequestRoute,

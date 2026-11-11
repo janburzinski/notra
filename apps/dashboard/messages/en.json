@@ -5650,6 +5650,8 @@
       "noChannels": "No channels match.",
       "connectedBy": "Connected by {name} on {date}",
       "connectedOn": "Connected on {date}",
+      "reconnectForPermissions": "Reconnect Slack so admins can control Autopilot from Slack.",
+      "reconnect": "Reconnect",
       "notificationsTitle": "Notifications channel",
       "notificationsDescription": "The agent posts activity updates here, like new drafts and completed work."
     },

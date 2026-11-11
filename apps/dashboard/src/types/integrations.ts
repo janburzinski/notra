@@ -47,6 +47,7 @@ export interface SlackIntegration {
   slackTeamName?: string | null;
   allowedChannelIds: string[] | null;
   notificationChannelId: string | null;
+  needsReconnect?: boolean;
   createdByUser?: {
     id: string;
     name: string;

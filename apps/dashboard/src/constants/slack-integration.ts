@@ -14,6 +14,8 @@ export const SLACK_BOT_SCOPES = [
   "files:write",
   "reactions:read",
   "reactions:write",
+  "users:read",
+  "users:read.email",
 ].join(",");
 
 export const SLACK_CHANNEL_CACHE_TTL_SECONDS = 60 * 60;
@@ -21,3 +23,11 @@ export const SLACK_CHANNEL_CACHE_TTL_SECONDS = 60 * 60;
 export const NOTRA_CONSOLE_DEFAULT_URL = "https://console.usenotra.com";
 
 export const SLACK_INFO_CHANNEL_TIMEOUT_MS = 5000;
+
+export const SLACK_MEMBER_CACHE_TTL_MS = 60_000;
+
+export const SLACK_MEMBER_CACHE_MAX_ENTRIES = 500;
+
+export const SLACK_MISSING_SCOPE_KEY_PREFIX = "slack:missing-scope:";
+
+export const SLACK_MISSING_SCOPE_TTL_SECONDS = 60 * 60 * 24 * 30;

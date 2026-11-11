@@ -6,8 +6,8 @@ import { verifyInternalWorkflowRequest } from "@/lib/workflows/internal-auth";
 
 /**
  * 👍/👎 reactions on Autopilot's Slack messages, forwarded
- * by the agent, which receives Slack's events. Anyone in the Autopilot
- * channel may act; the channel is the access boundary.
+ * by the agent, which receives Slack's events. Only Slack users mapped to a
+ * Notra owner or admin of the workspace may act.
  */
 export async function POST(request: Request) {
   if (!(await verifyInternalWorkflowRequest(request))) {

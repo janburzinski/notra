@@ -159,6 +159,7 @@ import {
   setCachedSlackChannels,
 } from "@/lib/integrations/slack/channel-cache";
 import { createSlackChannel } from "@/lib/integrations/slack/create-channel";
+import { listSlackIntegrationsMissingScopes } from "@/lib/integrations/slack/member";
 import { baseProcedure, withOrganizationAccess } from "@/lib/orpc/base";
 import { getIntegrationsByOrganization } from "@/lib/services/integrations";
 import type {
@@ -1490,6 +1491,9 @@ export const integrationsRouter = {
         const integrations = await getSlackIntegrationsByOrganization(
           input.organizationId
         );
+        const missingScopes = await listSlackIntegrationsMissingScopes(
+          integrations.map((integration) => integration.id)
+        );
 
         return {
           integrations: integrations.map((integration) => ({
@@ -1501,6 +1505,7 @@ export const integrationsRouter = {
             slackTeamName: integration.slackTeamName,
             allowedChannelIds: integration.allowedChannelIds ?? null,
             notificationChannelId: integration.notificationChannelId ?? null,
+            needsReconnect: missingScopes.has(integration.id),
             createdByUser: serializeCreatedByUser(integration.createdByUser),
           })),
         };

@@ -21,6 +21,10 @@ import {
   trackIntegrationConnected,
   trackIntegrationConnectFailed,
 } from "@/lib/integrations/connect-events";
+import {
+  clearSlackIntegrationMissingScopes,
+  clearSlackMemberCache,
+} from "@/lib/integrations/slack/member";
 import { slackOAuthErrorParam } from "@/lib/integrations/slack/oauth-errors";
 import type { SlackOAuthState } from "@/types/slack-integration";
 
@@ -184,7 +188,7 @@ export async function GET(request: Request) {
       );
     }
 
-    await createSlackIntegration({
+    const integration = await createSlackIntegration({
       organizationId: oauthState.organizationId,
       userId: oauthState.userId,
       displayName: team.name ?? "Slack workspace",
@@ -193,6 +197,8 @@ export async function GET(request: Request) {
       slackTeamName: team.name,
       slackBotUserId: bot_user_id,
     });
+    await clearSlackIntegrationMissingScopes(integration.id);
+    clearSlackMemberCache();
 
     trackIntegrationConnected({
       headers: request.headers,
