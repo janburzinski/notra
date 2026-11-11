@@ -1,0 +1,36 @@
+apps/dashboard/src/types/autopilot-slack.ts
+  s_3428b476267439::t_4564a00a4d61e1 54-55
+apps/dashboard/src/app/api/internal/autopilot/slack/route.ts
+  s_3428b476267439::t_4564a00a4d61e1 9-10
+apps/dashboard/src/schemas/autopilot-slack.ts
+  s_3428b476267439::t_4564a00a4d61e1 8-17
+apps/dashboard/src/lib/autopilot/slack.ts
+  s_3428b476267439::t_4564a00a4d61e1 13,42-44,46-53,122-144
+apps/docs/integrations/slack.mdx
+  s_3428b476267439::t_e245523bf21dd2 86,108
+apps/dashboard/src/lib/autopilot/slack.test.ts
+  s_3428b476267439::t_ebd961de04b2e6 25-26,33-37,107-136
+apps/agent/README.md
+  s_3428b476267439::t_e245523bf21dd2 104
+apps/dashboard/src/constants/slack-integration.ts
+  s_3428b476267439::t_4564a00a4d61e1 17-18
+apps/dashboard/src/lib/autopilot/slack-actions.ts
+  s_3428b476267439::t_c16b12b7efcfd2 7,9,22-26,29,69-103,135-151,153-159
+  s_3428b476267439::t_e245523bf21dd2 152
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "d84e24c6787ccd9b9cfcf588b81c8ba47c826bc5",
+  "prompts": {},
+  "sessions": {
+    "s_3428b476267439": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c6d39551-e687-4036-a65c-3bd92bb74947",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
