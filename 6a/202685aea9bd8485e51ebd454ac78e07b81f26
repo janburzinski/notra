@@ -1,0 +1,212 @@
+apps/dashboard/src/components/content/collections-view.tsx
+  s_4b92d5bc2d3cfb::t_abe37f6bc9cfe4 84
+apps/dashboard/src/components/dashboard/welcome-tour.tsx
+  s_4b92d5bc2d3cfb::t_abe37f6bc9cfe4 127,190
+packages/ui/src/constants/trend-badge.ts
+  s_4b92d5bc2d3cfb::t_d6af64992505f6 26
+apps/dashboard/src/components/chat/shared-chat-page.tsx
+  s_4b92d5bc2d3cfb::t_df3f48166d93bb 170,296
+apps/dashboard/src/components/command-palette/command-palette.tsx
+  s_4b92d5bc2d3cfb::t_df3f48166d93bb 483
+  s_4b92d5bc2d3cfb::t_abe37f6bc9cfe4 1034
+apps/dashboard/src/components/geo/what-changed-card.tsx
+  s_4b92d5bc2d3cfb::t_df3f48166d93bb 225
+apps/dashboard/src/components/geo/shelf/shelf-member-avatar.tsx
+  s_4b92d5bc2d3cfb::t_d6af64992505f6 49
+apps/dashboard/src/constants/autopilot-ui.ts
+  s_4b92d5bc2d3cfb::t_df3f48166d93bb 541
+packages/ui/src/constants/composer.ts
+  s_4b92d5bc2d3cfb::t_df3f48166d93bb 28
+apps/dashboard/src/components/settings/delete-account-dialog.tsx
+  s_4b92d5bc2d3cfb::t_6a710349afee94 319
+apps/dashboard/src/components/billing/plan-card.tsx
+  s_4b92d5bc2d3cfb::t_df3f48166d93bb 101
+apps/dashboard/src/components/content/create-content-dialog.tsx
+  s_4b92d5bc2d3cfb::t_abe37f6bc9cfe4 1201
+apps/dashboard/src/components/chat/user-message-actions.tsx
+  s_4b92d5bc2d3cfb::t_abe37f6bc9cfe4 92
+apps/dashboard/src/components/content/calendar/content-calendar-day.tsx
+  s_4b92d5bc2d3cfb::t_abe37f6bc9cfe4 111
+apps/dashboard/src/components/billing/zdr-addon-card.tsx
+  s_4b92d5bc2d3cfb::t_df3f48166d93bb 182
+apps/dashboard/src/components/geo/search-console-card.tsx
+  s_4b92d5bc2d3cfb::t_df3f48166d93bb 360
+apps/dashboard/src/components/webhooks/overview.tsx
+  s_4b92d5bc2d3cfb::t_df3f48166d93bb 82,146
+apps/dashboard/src/components/sites/site-create-step-list.tsx
+  s_4b92d5bc2d3cfb::t_df3f48166d93bb 46
+apps/dashboard/src/components/analytics/chart-legend.tsx
+  s_4b92d5bc2d3cfb::t_abe37f6bc9cfe4 38
+apps/dashboard/src/components/dashboard/sidebar-org-menu.tsx
+  s_4b92d5bc2d3cfb::t_abe37f6bc9cfe4 59
+apps/dashboard/src/components/content/overview/overview-cover-field.tsx
+  s_4b92d5bc2d3cfb::t_df3f48166d93bb 140
+apps/dashboard/src/components/dashboard/brand-topbar-identity-selector.tsx
+  s_4b92d5bc2d3cfb::t_abe37f6bc9cfe4 167
+apps/dashboard/src/components/dashboard/nav-group-list.tsx
+  s_4b92d5bc2d3cfb::t_abe37f6bc9cfe4 58
+apps/dashboard/src/components/automation/automations-table.tsx
+  s_4b92d5bc2d3cfb::t_df3f48166d93bb 196
+apps/dashboard/src/components/content/plan-text.tsx
+  s_4b92d5bc2d3cfb::t_df3f48166d93bb 29
+apps/dashboard/src/components/automation/editor/editor-parts.tsx
+  s_4b92d5bc2d3cfb::t_df3f48166d93bb 110
+apps/dashboard/src/components/analytics/posting-performance-card.tsx
+  s_4b92d5bc2d3cfb::t_abe37f6bc9cfe4 134,161,241
+apps/dashboard/src/components/autopilot/autopilot-automation-facts.tsx
+  s_4b92d5bc2d3cfb::t_df3f48166d93bb 66
+apps/dashboard/src/components/content/editor/nodes/kibo-code-block-component.tsx
+  s_4b92d5bc2d3cfb::t_df3f48166d93bb 209
+apps/dashboard/src/components/analytics/followers-card.tsx
+  s_4b92d5bc2d3cfb::t_d6af64992505f6 112
+  s_4b92d5bc2d3cfb::t_abe37f6bc9cfe4 44,117
+apps/dashboard/src/app/(dashboard)/[slug]/brand/identity/components/reference-card.tsx
+  s_4b92d5bc2d3cfb::t_df3f48166d93bb 184,441,551,619
+  s_4b92d5bc2d3cfb::t_abe37f6bc9cfe4 438,538,548
+apps/dashboard/src/components/analytics/account-detail-view.tsx
+  s_4b92d5bc2d3cfb::t_abe37f6bc9cfe4 94
+apps/dashboard/src/utils/json-highlight.ts
+  s_4b92d5bc2d3cfb::t_df3f48166d93bb 11
+apps/dashboard/src/components/sites/site-build-log-rows.tsx
+  s_4b92d5bc2d3cfb::t_df3f48166d93bb 117
+apps/dashboard/src/components/ai/chat-todo-list.tsx
+  s_4b92d5bc2d3cfb::t_df3f48166d93bb 40
+apps/dashboard/src/components/chat/chat-composer-attachments.tsx
+  s_4b92d5bc2d3cfb::t_df3f48166d93bb 88
+apps/dashboard/src/components/content/calendar/content-calendar-item-chip.tsx
+  s_4b92d5bc2d3cfb::t_abe37f6bc9cfe4 200
+apps/dashboard/src/components/geo/traffic-page-sources-cell.tsx
+  s_4b92d5bc2d3cfb::t_abe37f6bc9cfe4 63,85
+  s_4b92d5bc2d3cfb::t_d6af64992505f6 100
+apps/dashboard/src/components/autopilot/autopilot-run-timeline.tsx
+  s_4b92d5bc2d3cfb::t_df3f48166d93bb 86
+apps/dashboard/src/components/geo/journey-path-tree.tsx
+  s_4b92d5bc2d3cfb::t_d6af64992505f6 16,22
+apps/dashboard/src/components/billing/usage-breakdown-chart.tsx
+  s_4b92d5bc2d3cfb::t_df3f48166d93bb 128,137
+apps/dashboard/src/components/geo/trend-badge.test.tsx
+  s_4b92d5bc2d3cfb::t_d6af64992505f6 7
+apps/dashboard/src/app/(dashboard)/[slug]/brand/identity/components/add-reference-dialog.tsx
+  s_4b92d5bc2d3cfb::t_df3f48166d93bb 131
+apps/dashboard/src/components/automation/schedules/schedule-form.tsx
+  s_4b92d5bc2d3cfb::t_df3f48166d93bb 449
+apps/dashboard/src/components/content/content-plan-view.tsx
+  s_4b92d5bc2d3cfb::t_d6af64992505f6 85,617,727,746,760
+apps/dashboard/src/components/billing/free-plan-card.tsx
+  s_4b92d5bc2d3cfb::t_df3f48166d93bb 83
+apps/dashboard/src/components/design-system/code-research-sandbox-panel.tsx
+  s_4b92d5bc2d3cfb::t_df3f48166d93bb 71,92
+apps/dashboard/src/components/settings/settings-modal-nav.tsx
+  s_4b92d5bc2d3cfb::t_abe37f6bc9cfe4 224,310
+packages/ui/src/components/ui/button.tsx
+  s_4b92d5bc2d3cfb::t_dfd80e5e7c61db 22
+apps/dashboard/src/app/(dashboard)/[slug]/brand/identity/components/guidelines-colors-section.tsx
+  s_4b92d5bc2d3cfb::t_df3f48166d93bb 138
+apps/dashboard/src/app/(dashboard)/[slug]/chat/page-client.tsx
+  s_4b92d5bc2d3cfb::t_df3f48166d93bb 258
+packages/ui/src/styles/globals.css
+  s_4b92d5bc2d3cfb::t_fdb4506875fb61 35-38
+  s_4b92d5bc2d3cfb::t_93263088903169 205
+  s_4b92d5bc2d3cfb::t_69551fdd546b0a 122,125-127
+  s_4b92d5bc2d3cfb::t_5ec73cc0e91ebc 57-58
+  s_4b92d5bc2d3cfb::t_dd8f6c411b68f5 273,278
+  s_4b92d5bc2d3cfb::t_a193d4c6b4745f 240-244
+apps/dashboard/src/components/billing/credit-usage-chart.tsx
+  s_4b92d5bc2d3cfb::t_df3f48166d93bb 114,123
+apps/dashboard/src/components/ai/chat-activity-group.tsx
+  s_4b92d5bc2d3cfb::t_df3f48166d93bb 221,297,339
+apps/dashboard/src/components/settings/organizations-section.tsx
+  s_4b92d5bc2d3cfb::t_abe37f6bc9cfe4 242
+apps/dashboard/src/components/chat/chat-annotations-preview.tsx
+  s_4b92d5bc2d3cfb::t_df3f48166d93bb 108
+  s_4b92d5bc2d3cfb::t_abe37f6bc9cfe4 60
+apps/dashboard/src/components/webhooks/columns.tsx
+  s_4b92d5bc2d3cfb::t_df3f48166d93bb 63
+apps/dashboard/src/app/design-system/page-client.tsx
+  s_4b92d5bc2d3cfb::t_9380e584aab4e9 292
+apps/dashboard/src/components/autopilot/autopilot-run-panel.tsx
+  s_4b92d5bc2d3cfb::t_df3f48166d93bb 74
+apps/dashboard/src/components/geo/agent-readiness/readiness-changes-card.tsx
+  s_4b92d5bc2d3cfb::t_df3f48166d93bb 73
+apps/dashboard/src/components/content/editor/block-preview.tsx
+  s_4b92d5bc2d3cfb::t_df3f48166d93bb 57,108
+apps/dashboard/src/components/autopilot/autopilot-finding-source.tsx
+  s_4b92d5bc2d3cfb::t_df3f48166d93bb 215
+apps/dashboard/src/components/ai/chat-tool-block.tsx
+  s_4b92d5bc2d3cfb::t_df3f48166d93bb 786,990,998
+apps/dashboard/src/components/geo/language-performance-card.tsx
+  s_4b92d5bc2d3cfb::t_df3f48166d93bb 205
+apps/dashboard/src/components/geo/competitor-logo.tsx
+  s_4b92d5bc2d3cfb::t_d6af64992505f6 26
+apps/dashboard/src/app/(dashboard)/[slug]/brand/identity/components/guidelines-assets-section.tsx
+  s_4b92d5bc2d3cfb::t_df3f48166d93bb 129
+apps/dashboard/src/components/geo/writer/write-dialog.tsx
+  s_4b92d5bc2d3cfb::t_abe37f6bc9cfe4 245
+apps/dashboard/src/constants/chat-tool-json.ts
+  s_4b92d5bc2d3cfb::t_df3f48166d93bb 6
+apps/dashboard/src/components/ai/chat-activity-status.tsx
+  s_4b92d5bc2d3cfb::t_df3f48166d93bb 35
+apps/dashboard/src/components/automation/events/ignore-commit-patterns-field.tsx
+  s_4b92d5bc2d3cfb::t_df3f48166d93bb 170
+apps/dashboard/src/components/automation/runs/automation-runs-table.tsx
+  s_4b92d5bc2d3cfb::t_df3f48166d93bb 115
+apps/dashboard/src/components/geo/prompt-receipt-history.tsx
+  s_4b92d5bc2d3cfb::t_df3f48166d93bb 105
+apps/dashboard/src/components/analytics/leaderboard-card.tsx
+  s_4b92d5bc2d3cfb::t_abe37f6bc9cfe4 166
+  s_4b92d5bc2d3cfb::t_d6af64992505f6 148
+apps/dashboard/src/components/chat/chat-message-annotations.tsx
+  s_4b92d5bc2d3cfb::t_abe37f6bc9cfe4 28
+apps/dashboard/src/components/comments/comment-item.tsx
+  s_4b92d5bc2d3cfb::t_d6af64992505f6 112
+apps/dashboard/src/components/geo/journey-path-pill.tsx
+  s_4b92d5bc2d3cfb::t_abe37f6bc9cfe4 27
+apps/dashboard/src/components/geo/traffic-purpose-cell.tsx
+  s_4b92d5bc2d3cfb::t_d6af64992505f6 109
+  s_4b92d5bc2d3cfb::t_abe37f6bc9cfe4 99
+packages/ui/src/components/evilcharts/ui/echarts-tooltip.tsx
+  s_4b92d5bc2d3cfb::t_d6af64992505f6 384,513,525
+packages/ui/src/components/geo/competitor-logo.tsx
+  s_4b92d5bc2d3cfb::t_d6af64992505f6 20
+packages/ui/src/components/shared/line-diff.tsx
+  s_4b92d5bc2d3cfb::t_d6af64992505f6 45
+packages/ui/src/components/ui/badge.tsx
+  s_4b92d5bc2d3cfb::t_d6af64992505f6 33
+apps/dashboard/src/components/analytics/impressions-share-card.tsx
+  s_4b92d5bc2d3cfb::t_abe37f6bc9cfe4 129
+apps/dashboard/src/components/content/editors/long-form-editor.tsx
+  s_4b92d5bc2d3cfb::t_df3f48166d93bb 70,106
+apps/dashboard/src/components/sites/site-deployment-timeline.tsx
+  s_4b92d5bc2d3cfb::t_df3f48166d93bb 157
+packages/ui/src/components/geo/prompt-outcome-icon.tsx
+  s_4b92d5bc2d3cfb::t_df3f48166d93bb 33
+apps/dashboard/src/components/automation/schedules/schedule-trigger-row.tsx
+  s_4b92d5bc2d3cfb::t_abe37f6bc9cfe4 182
+apps/dashboard/src/components/geo/directions/direction-leaderboard.tsx
+  s_4b92d5bc2d3cfb::t_d6af64992505f6 156,172
+apps/dashboard/src/components/geo/scan-run-detail.tsx
+  s_4b92d5bc2d3cfb::t_df3f48166d93bb 104,638
+apps/dashboard/src/components/ai/chat-subagent-block.tsx
+  s_4b92d5bc2d3cfb::t_df3f48166d93bb 119,130,196
+apps/dashboard/src/components/geo/shelf/shelf-ticket-assignee-card.tsx
+  s_4b92d5bc2d3cfb::t_d6af64992505f6 35
+apps/dashboard/src/components/analytics/top-posts-card.tsx
+  s_4b92d5bc2d3cfb::t_d6af64992505f6 35
+  s_4b92d5bc2d3cfb::t_abe37f6bc9cfe4 111
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "6a202685aea9bd8485e51ebd454ac78e07b81f26",
+  "prompts": {},
+  "sessions": {
+    "s_4b92d5bc2d3cfb": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8b0b62c4-18ab-44d3-95ba-380838c01345",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
