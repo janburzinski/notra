@@ -53,7 +53,10 @@ export const createEventTriggerRequestSchema = z.object({
   outputType: z.enum(SUPPORTED_CONTENT_GENERATION_TYPES),
   outputConfig: eventTriggerOutputConfigSchema,
   enabled: z.boolean(),
-  autoPublish: z.boolean().default(false),
+  autoPublish: z.boolean().default(false).openapi({
+    description:
+      "Publish generated changelogs and blog posts automatically instead of saving them as drafts. LinkedIn, X and image posts always stay drafts.",
+  }),
 });
 
 export const patchEventTriggerRequestSchema =

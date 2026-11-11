@@ -1,7 +1,10 @@
 import type { ScheduleOutputType } from "@notra/schemas/dashboard/integrations";
 
-const AUTO_PUBLISH_SUPPORTED: ScheduleOutputType[] = ["changelog", "blog_post"];
+const AUTO_PUBLISH_SUPPORTED = new Set<string>([
+  "changelog",
+  "blog_post",
+] satisfies ScheduleOutputType[]);
 
-export function supportsAutoPublish(outputType: ScheduleOutputType): boolean {
-  return AUTO_PUBLISH_SUPPORTED.includes(outputType);
+export function supportsAutoPublish(outputType: string): boolean {
+  return AUTO_PUBLISH_SUPPORTED.has(outputType);
 }

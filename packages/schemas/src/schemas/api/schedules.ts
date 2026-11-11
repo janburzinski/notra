@@ -218,7 +218,7 @@ export const createScheduleRequestSchema = z.object({
   }),
   autoPublish: z.boolean().default(false).openapi({
     description:
-      "Publish generated posts automatically instead of saving them as drafts.",
+      "Publish generated changelogs and blog posts automatically instead of saving them as drafts. LinkedIn, X and image posts always stay drafts.",
     example: false,
   }),
   lookbackWindow: z
@@ -273,7 +273,7 @@ export const patchScheduleRequestSchema = z
     enabled: createScheduleFields.enabled.optional(),
     autoPublish: z.boolean().optional().openapi({
       description:
-        "Publish generated posts automatically instead of saving them as drafts.",
+        "Publish generated changelogs and blog posts automatically instead of saving them as drafts. LinkedIn, X and image posts always stay drafts.",
     }),
     lookbackWindow: z.enum(lookbackWindowEnum.enumValues).optional().openapi({
       description: "How far back each run collects source activity.",

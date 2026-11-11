@@ -5,6 +5,7 @@ import { generateLinkedInPost } from "@notra/ai/agents/linkedin";
 import { generateTwitterPost } from "@notra/ai/agents/twitter";
 
 import { AGENT_CONTENT_TASK_TYPES } from "@/constants/agent-content";
+import { supportsAutoPublish } from "@/constants/schedule-output-types";
 import { generateContentViaAgentTask } from "@/lib/agent/content-task";
 import { isAgentContentGenerationEnabled } from "@/lib/agent/flag";
 import type {
@@ -25,6 +26,8 @@ export async function generateEventBasedContent(
   ctx: EventGenerationContext
 ): Promise<EventGenerationResult> {
   const { outputType } = ctx;
+  const autoPublish =
+    ctx.autoPublish === true && supportsAutoPublish(outputType);
 
   const generateFn = generateFnMap[outputType];
   if (!generateFn) {
@@ -56,7 +59,7 @@ export async function generateEventBasedContent(
       repositories,
       promptInput: buildEventPromptInput(ctx),
       sourceMetadata: ctx.sourceMetadata,
-      autoPublish: ctx.autoPublish,
+      autoPublish,
       chargeAiCredits: ctx.chargeAiCredits,
     });
     if (agentResult.status === "rate_limited") {
@@ -76,7 +79,7 @@ export async function generateEventBasedContent(
       tone: ctx.tone,
       promptInput: buildEventPromptInput(ctx),
       sourceMetadata: ctx.sourceMetadata,
-      autoPublish: ctx.autoPublish,
+      autoPublish,
       resolveContext: ctx.resolveContext,
       telemetryMetadata: ctx.telemetryMetadata,
     });

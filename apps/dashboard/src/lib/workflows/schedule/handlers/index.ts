@@ -8,6 +8,7 @@ import { logInfo } from "@notra/ai/utils/server-log";
 import type { ScheduleOutputType } from "@notra/schemas/dashboard/integrations";
 
 import { AGENT_CONTENT_TASK_TYPES } from "@/constants/agent-content";
+import { supportsAutoPublish } from "@/constants/schedule-output-types";
 import { generateContentViaAgentTask } from "@/lib/agent/content-task";
 import { isAgentContentGenerationEnabled } from "@/lib/agent/flag";
 
@@ -73,8 +74,13 @@ const handlers: Record<ScheduleOutputType, ContentHandler> = {
 
 export async function generateScheduledContent(
   outputType: string,
-  ctx: ContentGenerationContext
+  input: ContentGenerationContext
 ): Promise<ContentGenerationResult> {
+  // API-created triggers can store autoPublish for types the editor hides it for.
+  const ctx = {
+    ...input,
+    autoPublish: input.autoPublish === true && supportsAutoPublish(outputType),
+  };
   if (isAgentContentGenerationEnabled() && isScheduleOutputType(outputType)) {
     const taskType = AGENT_CONTENT_TASK_TYPES[outputType];
     if (taskType) {
