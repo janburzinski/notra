@@ -1,6 +1,7 @@
 import type { z } from "zod";
 
 import {
+  IMPORT_AUTH_DETAIL_MAX_LENGTH,
   IMPORT_DEFAULT_RETRY_AFTER_SECONDS,
   IMPORT_MAX_RETRY_AFTER_SECONDS,
   IMPORT_REQUEST_TIMEOUT_MS,
@@ -12,6 +13,7 @@ import {
   ImportProviderError,
   ImportRateLimitedError,
 } from "../schemas/analytics-import-errors";
+import { authErrorBodySchema } from "../schemas/analytics-imports";
 import type { ImportFetch, ImportPage } from "../types/analytics-imports";
 
 function clampWait(seconds: number, fallback: number): number {
@@ -58,6 +60,40 @@ export function rateLimitWaitSeconds(
 }
 
 /**
+ * Why a provider rejected the credentials, from its error body. Vercel flags
+ * the cause (`invalidToken`, `missingToken`, `scope`); other providers get
+ * their message, kept short.
+ */
+export function authErrorDetail(body: string): string | undefined {
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(body);
+  } catch {
+    return undefined;
+  }
+  const result = authErrorBodySchema.safeParse(parsed);
+  if (!result.success) {
+    return undefined;
+  }
+  const error =
+    typeof result.data.error === "object" ? result.data.error : undefined;
+  if (error?.invalidToken) {
+    return "the token was deleted or has expired";
+  }
+  if (error?.missingToken) {
+    return "no token was sent";
+  }
+  if (error?.scope) {
+    return `the token has no access to the team "${error.scope}"`;
+  }
+  const message =
+    error?.message ??
+    (typeof result.data.error === "string" ? result.data.error : undefined) ??
+    result.data.message;
+  return message?.slice(0, IMPORT_AUTH_DETAIL_MAX_LENGTH);
+}
+
+/**
  * JSON request to an analytics provider. 429 becomes a rate-limit error the
  * job sleeps on, 401/403 a reauth error, anything else a provider error.
  */
@@ -79,7 +115,11 @@ export async function importRequest<T>(
     });
   }
   if (response.status === 401 || response.status === 403) {
-    throw new ImportAuthError({ provider, status: response.status });
+    throw new ImportAuthError({
+      provider,
+      status: response.status,
+      detail: authErrorDetail(await response.text().catch(() => "")),
+    });
   }
   if (!response.ok) {
     const detail = (await response.text().catch(() => "")).slice(0, 300);
@@ -133,7 +173,7 @@ export function describeImportError(error: unknown): string {
     return `${error.provider} ${limit}; retrying in ${error.retryAfterSeconds}s`;
   }
   if (error instanceof ImportAuthError) {
-    return `${error.provider} rejected the credentials${error.status ? ` (${error.status})` : ""}`;
+    return `${error.provider} rejected the credentials${error.status ? ` (${error.status})` : ""}${error.detail ? `: ${error.detail}` : ""}`;
   }
   if (error instanceof ImportProviderError) {
     return `${error.provider} error${error.status ? ` ${error.status}` : ""}: ${error.detail}`;

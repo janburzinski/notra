@@ -14,10 +14,18 @@ export class ImportRateLimitedError extends Schema.TaggedError<ImportRateLimited
   }
 ) {}
 
-/** The stored credentials were rejected; the user must reconnect. */
+/**
+ * The stored credentials were rejected; the user must reconnect. `detail` is
+ * the provider's reason when it gives one (a deleted or expired token, no
+ * access to the team).
+ */
 export class ImportAuthError extends Schema.TaggedError<ImportAuthError>()(
   "ImportAuthError",
-  { provider: Schema.String, status: Schema.optional(Schema.Number) }
+  {
+    provider: Schema.String,
+    status: Schema.optional(Schema.Number),
+    detail: Schema.optional(Schema.String),
+  }
 ) {}
 
 /** The provider answered with something we cannot import. */

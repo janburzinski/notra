@@ -32,7 +32,6 @@ import { and, eq, inArray, ne, sql } from "drizzle-orm";
 
 import {
   ANALYTICS_IMPORT_BUDGET_WAIT,
-  ANALYTICS_IMPORT_FORBIDDEN_RETRY_SECONDS,
   ANALYTICS_IMPORT_MAX_CHUNK_ATTEMPTS,
   ANALYTICS_IMPORT_MAX_ERROR_LENGTH,
   ANALYTICS_IMPORT_STORAGE_RETRY_SECONDS,
@@ -191,31 +190,15 @@ async function abandonChunk(
 
 /**
  * Seconds a chunk waits before its retry, or null when it doesn't wait. A
- * 403 after this import's earlier chunks went through with the same token is
- * treated as throttling (Vercel answered one right after a 429) and retried a
- * few times before the connection is marked for reauth. A Tinybird delete
- * queue that stays full waits too, however often it happens.
+ * Tinybird delete queue that stays full waits too, however often it happens.
+ * A 401/403 is never waited out: the provider rejected the token itself.
  */
-function retryWaitSeconds(
-  row: AnalyticsImportRow,
-  attempts: number,
-  error: unknown,
-  inline: boolean
-): number | null {
+function retryWaitSeconds(error: unknown, inline: boolean): number | null {
   if (error instanceof ImportRateLimitedError) {
     return error.retryAfterSeconds;
   }
-  if (error instanceof TinybirdDeleteBusyError && !inline) {
-    return ANALYTICS_IMPORT_STORAGE_RETRY_SECONDS;
-  }
-  const refusedMidImport =
-    error instanceof ImportAuthError &&
-    error.status === 403 &&
-    row.chunksDone > 0;
-  return refusedMidImport &&
-    !inline &&
-    attempts < ANALYTICS_IMPORT_MAX_CHUNK_ATTEMPTS
-    ? ANALYTICS_IMPORT_FORBIDDEN_RETRY_SECONDS
+  return error instanceof TinybirdDeleteBusyError && !inline
+    ? ANALYTICS_IMPORT_STORAGE_RETRY_SECONDS
     : null;
 }
 
@@ -247,7 +230,7 @@ async function recordChunkFailure(
   const message = describeImportError(error);
   const rateLimited = error instanceof ImportRateLimitedError;
   const storageBusy = error instanceof TinybirdDeleteBusyError;
-  const waitSeconds = retryWaitSeconds(row, attempts, error, inline);
+  const waitSeconds = retryWaitSeconds(error, inline);
   const reauth = error instanceof ImportAuthError && waitSeconds === null;
   const retry =
     !(error instanceof ImportAuthError) &&

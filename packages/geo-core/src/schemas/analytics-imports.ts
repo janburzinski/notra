@@ -261,3 +261,23 @@ export const databuddyCredentialsSchema = z.object({
 export const rybbitCredentialsSchema = z.object({
   apiKey: z.string().trim().min(10).max(500),
 });
+
+/**
+ * An error body as analytics providers send it: Vercel's
+ * `{ error: { message, invalidToken, missingToken, scope } }`, or a plain
+ * `{ error }` / `{ message }` string.
+ */
+export const authErrorBodySchema = z.object({
+  error: z
+    .union([
+      z.string(),
+      z.object({
+        message: z.string().optional(),
+        invalidToken: z.boolean().optional(),
+        missingToken: z.boolean().optional(),
+        scope: z.string().optional(),
+      }),
+    ])
+    .optional(),
+  message: z.string().optional(),
+});

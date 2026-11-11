@@ -26,7 +26,12 @@ import {
   listDatabuddyWebsites,
   previewDatabuddyWebsite,
 } from "../src/imports/databuddy";
-import { rateLimitWaitSeconds, retryAfterSeconds } from "../src/imports/http";
+import {
+  authErrorDetail,
+  describeImportError,
+  rateLimitWaitSeconds,
+  retryAfterSeconds,
+} from "../src/imports/http";
 import {
   fetchPlausibleChunk,
   listPlausibleSites,
@@ -507,6 +512,78 @@ describe("Plausible Stats API", () => {
     await expect(
       listPlausibleSites(PLAUSIBLE, denied.fetch)
     ).rejects.toBeInstanceOf(ImportAuthError);
+  });
+});
+
+describe("rejected credentials", () => {
+  // Bodies as Vercel's API answered on 2026-11-11.
+  test.each([
+    [
+      "a deleted or expired token",
+      {
+        error: {
+          code: "forbidden",
+          message: "Not authorized",
+          invalidToken: true,
+        },
+      },
+      "the token was deleted or has expired",
+    ],
+    [
+      "a missing token",
+      {
+        error: {
+          code: "forbidden",
+          message: "The request is missing an authentication token",
+          missingToken: true,
+        },
+      },
+      "no token was sent",
+    ],
+    [
+      "a token without access to the team",
+      {
+        error: {
+          code: "forbidden",
+          message:
+            'Not authorized: Trying to access resource under scope "acme".',
+          saml: true,
+          teamId: null,
+          scope: "acme",
+          enforced: false,
+        },
+      },
+      'the token has no access to the team "acme"',
+    ],
+    [
+      "another provider's message",
+      { error: "Insufficient scope" },
+      "Insufficient scope",
+    ],
+    ["a top-level message", { message: "Invalid API key" }, "Invalid API key"],
+  ])("%s says why", (_name, body, detail) => {
+    expect(authErrorDetail(JSON.stringify(body))).toBe(detail);
+  });
+
+  test("a body without a reason, or no JSON, adds nothing", () => {
+    expect(authErrorDetail("no")).toBeUndefined();
+    expect(authErrorDetail("[1]")).toBeUndefined();
+    expect(authErrorDetail("{}")).toBeUndefined();
+  });
+
+  test("the reason reaches the import's error", async () => {
+    const { fetch } = fakeFetch(() =>
+      Response.json(
+        { error: { code: "forbidden", invalidToken: true } },
+        { status: 403 }
+      )
+    );
+    const error = await listVercelProjects(VERCEL, fetch).catch(
+      (caught: unknown) => caught
+    );
+    expect(describeImportError(error)).toBe(
+      "vercel rejected the credentials (403): the token was deleted or has expired"
+    );
   });
 });
 

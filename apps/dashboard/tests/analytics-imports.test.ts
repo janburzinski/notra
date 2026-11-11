@@ -931,7 +931,7 @@ if (process.env.NOTRA_ANALYTICS_IMPORTS_SANDBOX_TEST !== "1") {
       expect(await connectionStatus(row.id)).toBe("reauth_required");
     });
 
-    test("a 403 after earlier chunks waits and retries before asking for reauth", async () => {
+    test("a 403 after earlier chunks asks for reauth at once, with the provider's reason", async () => {
       nativeFirstDay = "2026-10-03";
       const row = await apiImport();
       await runner.planAnalyticsImport(row.id);
@@ -941,18 +941,25 @@ if (process.env.NOTRA_ANALYTICS_IMPORTS_SANDBOX_TEST !== "1") {
       expect(
         await runner.runAnalyticsImportChunk(row.id, "2026-10-01")
       ).toEqual({ status: "done" });
-      fetchMock.mockImplementation(forbidden);
-      for (let attempt = 1; attempt < 3; attempt++) {
-        // react-doctor-disable-next-line react-doctor/async-await-in-loop -- attempts run one after another
-        expect(
-          await runner.runAnalyticsImportChunk(row.id, "2026-09-01")
-        ).toEqual({ status: "rate_limited", retryAfterSeconds: 300 });
-      }
-      expect((await loadImport(row.id))?.status).toBe("waiting_rate_limit");
-      expect(await connectionStatus(row.id)).toBe("active");
+      fetchMock.mockImplementation(async () =>
+        Response.json(
+          {
+            error: {
+              code: "forbidden",
+              message: "Not authorized",
+              invalidToken: true,
+            },
+          },
+          { status: 403 }
+        )
+      );
       expect(
         await runner.runAnalyticsImportChunk(row.id, "2026-09-01")
-      ).toMatchObject({ status: "failed" });
+      ).toEqual({
+        status: "failed",
+        error:
+          "plausible rejected the credentials (403): the token was deleted or has expired",
+      });
       expect(await connectionStatus(row.id)).toBe("reauth_required");
     });
 

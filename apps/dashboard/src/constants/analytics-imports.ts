@@ -8,8 +8,6 @@ import type { StatusBadgeAppearance } from "@notra/ui/types/status-badge";
 import type { AnalyticsImportProviderChoice } from "@/types/components/analytics-import";
 
 export const ANALYTICS_IMPORT_MAX_CHUNK_ATTEMPTS = 3;
-/** Wait before retrying a chunk the provider refused (403) after earlier chunks went through. */
-export const ANALYTICS_IMPORT_FORBIDDEN_RETRY_SECONDS = 300;
 export const ANALYTICS_IMPORT_MAX_ERROR_LENGTH = 500;
 /** Shortest key or token the connect form submits; the server checks each provider's own. */
 export const ANALYTICS_IMPORT_MIN_SECRET_LENGTH = 10;

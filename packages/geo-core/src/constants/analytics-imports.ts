@@ -19,6 +19,8 @@ export const IMPORT_COMPLETED_IDS_CACHE_MAX_ENTRIES = 1000;
 export const IMPORT_DEFAULT_RETRY_AFTER_SECONDS = 60;
 export const IMPORT_MAX_RETRY_AFTER_SECONDS = 3600;
 export const IMPORT_REQUEST_TIMEOUT_MS = 30_000;
+/** Longest provider reason kept on a rejected-credentials error. */
+export const IMPORT_AUTH_DETAIL_MAX_LENGTH = 200;
 export const IMPORT_MAX_PATH_LENGTH = 1024;
 export const IMPORT_CSV_MAX_ZIP_BYTES = 200 * 1024 * 1024;
 /** All CSV files of one export together, and any one of them. */
