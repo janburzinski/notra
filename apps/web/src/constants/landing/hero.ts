@@ -133,6 +133,9 @@ export const HERO_VARIANTS: Record<string, HeroVariantCopy> = {
 
 export const HERO_SIGNUP_SOURCE = "hero";
 
+export const HERO_TAP_PRESS_CLASSNAME =
+  "motion-safe:[animation:heroTapPress_2.4s_cubic-bezier(0.32,0.72,0,1)_1.5s_2]";
+
 export const HERO_PREVIEW_VARIANT_PARAM = "hero_variant";
 
 export const HERO_PREVIEW_ENABLED = import.meta.env.DEV;

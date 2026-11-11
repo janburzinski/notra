@@ -9,6 +9,7 @@ import { useEffect, useRef, useState } from "react";
 
 import { HeroDither } from "@/components/landing/hero-dither";
 import { HeroHeadline, useIsClient } from "@/components/landing/hero-headline";
+import { HeroTapHand } from "@/components/landing/hero-tap-hand";
 import { HeroVariantSwitcher } from "@/components/landing/hero-variant-switcher";
 import { HeroWebsiteForm } from "@/components/landing/hero-website-form";
 import { LiveDemoLink } from "@/components/landing/live-demo-link";
@@ -22,6 +23,7 @@ import {
   HERO_PREVIEW_ENABLED,
   HERO_PREVIEW_VARIANT_PARAM,
   HERO_SIGNUP_SOURCE,
+  HERO_TAP_PRESS_CLASSNAME,
   HERO_VARIANTS,
 } from "@/constants/landing/hero";
 import {
@@ -134,19 +136,25 @@ export function HeroSection() {
               <HeroWebsiteForm cta={copy.cta} onSubmit={trackPrimaryClick} />
             ) : (
               <div className="flex flex-row items-center justify-center gap-4 sm:gap-7">
-                <CtaButton
-                  className={CTA_BUTTON_CLASSNAME}
-                  nativeButton={false}
-                  render={
-                    <TrackedSignupLink
-                      onClick={trackPrimaryClick}
-                      source={HERO_SIGNUP_SOURCE}
-                    />
-                  }
-                  variant="primary"
-                >
-                  {copy.cta}
-                </CtaButton>
+                <span className="relative flex">
+                  <CtaButton
+                    className={cn(
+                      CTA_BUTTON_CLASSNAME,
+                      HERO_TAP_PRESS_CLASSNAME
+                    )}
+                    nativeButton={false}
+                    render={
+                      <TrackedSignupLink
+                        onClick={trackPrimaryClick}
+                        source={HERO_SIGNUP_SOURCE}
+                      />
+                    }
+                    variant="primary"
+                  >
+                    {copy.cta}
+                  </CtaButton>
+                  <HeroTapHand />
+                </span>
                 <CtaButton
                   className={cn(CTA_BUTTON_CLASSNAME, "max-sm:hidden")}
                   nativeButton={false}

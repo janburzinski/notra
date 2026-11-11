@@ -6,9 +6,11 @@ import { cn } from "@notra/ui/lib/utils";
 import { parseAsString, useQueryState } from "nuqs";
 import { type FormEvent, useState } from "react";
 
+import { HeroTapHand } from "@/components/landing/hero-tap-hand";
 import { AUTH_SIGNUP_URL } from "@/constants/auth";
 import {
   HERO_SIGNUP_SOURCE,
+  HERO_TAP_PRESS_CLASSNAME,
   HERO_WEBSITE_INVALID_MESSAGE,
   HERO_WEBSITE_MAX_LENGTH,
   HERO_WEBSITE_PARAM,
@@ -75,13 +77,19 @@ export function HeroWebsiteForm({ cta, onSubmit }: HeroWebsiteFormProps) {
           type="text"
           value={website}
         />
-        <CtaButton
-          className="font-display h-auto rounded-full px-4 py-2.5 text-base leading-[1.14] font-medium tracking-[-0.015em] sm:px-5"
-          type="submit"
-          variant="primary"
-        >
-          {cta}
-        </CtaButton>
+        <span className="relative flex shrink-0">
+          <CtaButton
+            className={cn(
+              "font-display h-auto rounded-full px-4 py-2.5 text-base leading-[1.14] font-medium tracking-[-0.015em] sm:px-5",
+              HERO_TAP_PRESS_CLASSNAME
+            )}
+            type="submit"
+            variant="primary"
+          >
+            {cta}
+          </CtaButton>
+          <HeroTapHand />
+        </span>
       </div>
       {invalid ? (
         <p
