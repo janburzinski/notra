@@ -5,6 +5,7 @@ export const autopilotSlackActionRequestSchema = z.object({
   teamId: z.string().trim().min(1),
   channelId: z.string().trim().min(1),
   userId: z.string().trim().min(1),
+  userTeamId: z.string().trim().min(1).optional(),
   messageTs: z.string().trim().min(1),
   vote: z.enum(["up", "down"]),
 });

@@ -11,6 +11,9 @@ import type {
 import {
   AUTOPILOT_EVENT_DATA_LABELS,
   AUTOPILOT_RUN_EVENTS_LIVE_REFETCH_MS,
+  AUTOPILOT_RUN_EVENTS_SLOW_AFTER_MS,
+  AUTOPILOT_RUN_EVENTS_SLOW_REFETCH_MS,
+  AUTOPILOT_RUN_LEASE_MS,
 } from "@/constants/autopilot";
 import { AUTOPILOT_TEMPLATE_WORKFLOW_KEYS } from "@/constants/workflow-engine";
 import type {
@@ -130,8 +133,11 @@ export function sumEventTokens(
   events: { data: AutopilotRunEventData | null }[]
 ) {
   return events.reduce((total, event) => {
-    const input = event.data?.inputTokens;
-    const output = event.data?.outputTokens;
+    if (typeof event.data?.model !== "string") {
+      return total;
+    }
+    const input = event.data.inputTokens;
+    const output = event.data.outputTokens;
     return (
       total +
       (typeof input === "number" ? input : 0) +
@@ -320,14 +326,28 @@ export function shortReadTarget(target: string) {
  * finished, so the last steps (pull request, credits) are never missed.
  */
 export function runEventsRefetchInterval(
-  run: { status: string; finishedAt: Date | string | null } | undefined
+  run:
+    | {
+        status: string;
+        finishedAt: Date | string | null;
+        startedAt?: Date | string | null;
+      }
+    | undefined
 ) {
   return (query: { state: { dataUpdatedAt: number } }) => {
     if (!run) {
       return false;
     }
     if (run.status === "running" || !run.finishedAt) {
-      return AUTOPILOT_RUN_EVENTS_LIVE_REFETCH_MS;
+      const elapsed = run.startedAt
+        ? Date.now() - new Date(run.startedAt).getTime()
+        : 0;
+      if (elapsed > AUTOPILOT_RUN_LEASE_MS) {
+        return false;
+      }
+      return elapsed > AUTOPILOT_RUN_EVENTS_SLOW_AFTER_MS
+        ? AUTOPILOT_RUN_EVENTS_SLOW_REFETCH_MS
+        : AUTOPILOT_RUN_EVENTS_LIVE_REFETCH_MS;
     }
     const settledAt =
       new Date(run.finishedAt).getTime() +

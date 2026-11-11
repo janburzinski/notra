@@ -6,7 +6,7 @@ import {
   members,
   socialConnections,
 } from "@notra/db/schema";
-import { and, eq, sql } from "drizzle-orm";
+import { and, asc, eq, sql } from "drizzle-orm";
 
 const MENTION_INTEGRATION_COLUMNS = {
   id: true,
@@ -52,6 +52,10 @@ export async function listOrganizationsForGitHubInstallation(
         eq(githubAppInstallations.installationId, installationId),
         eq(githubAppInstallations.enabled, true)
       )
+    )
+    .orderBy(
+      asc(githubAppInstallations.createdAt),
+      asc(githubAppInstallations.id)
     );
 }
 

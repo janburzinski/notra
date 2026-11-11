@@ -31,6 +31,17 @@ export function useAutopilotWorkflowActions(organizationId: string) {
       toast.error(toErrorMessage(error, "Could not start the workflow")),
   });
 
+  const stop = useMutation({
+    mutationFn: (runId: string) =>
+      dashboardOrpc.autopilot.workflows.stop.call({ organizationId, runId }),
+    onSuccess: () => {
+      toast.success("Stopped. Steps already underway finish first.");
+      invalidate();
+    },
+    onError: (error) =>
+      toast.error(toErrorMessage(error, "Could not stop the run")),
+  });
+
   const setEnabled = useMutation({
     mutationFn: (input: AutopilotWorkflowEnabledInput) =>
       dashboardOrpc.autopilot.workflows.setEnabled.call({
@@ -71,7 +82,7 @@ export function useAutopilotWorkflowActions(organizationId: string) {
       toast.error(toErrorMessage(error, "Could not delete the workflow")),
   });
 
-  return { run, setEnabled, remove };
+  return { run, stop, setEnabled, remove };
 }
 
 /**

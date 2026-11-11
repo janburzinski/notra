@@ -19,7 +19,6 @@ import { useQuery } from "@tanstack/react-query";
 import { parseAsBoolean, parseAsStringLiteral, useQueryState } from "nuqs";
 import { useState } from "react";
 
-import { AutopilotAnalyticsPanel } from "@/components/autopilot/autopilot-analytics-panel";
 import { AutopilotAutomationsOverview } from "@/components/autopilot/autopilot-automations-overview";
 import { AutopilotFindingConfirmDialog } from "@/components/autopilot/autopilot-finding-confirm-dialog";
 import { AutopilotFindingTables } from "@/components/autopilot/autopilot-finding-tables";
@@ -62,6 +61,13 @@ import {
   findActiveAutopilotRun,
 } from "@/utils/autopilot-events";
 import { isListedPullRequest } from "@/utils/autopilot-findings";
+import dynamic from "@/utils/lazy-component";
+
+const AutopilotAnalyticsPanel = dynamic(() =>
+  import("@/components/autopilot/autopilot-analytics-panel").then(
+    (module) => module.AutopilotAnalyticsPanel
+  )
+);
 
 export default function PageClient({
   organizationSlug,

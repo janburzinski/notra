@@ -14,6 +14,13 @@ export const AUTOPILOT_FACT_REMOVAL_INSTRUCTIONS =
 /** A comparison claim must quote its source; shorter quotes prove nothing. */
 export const AUTOPILOT_FACT_MIN_QUOTE_CHARS = 12;
 export const AUTOPILOT_FACT_MAX_OUTPUT_TOKENS = 16_000;
+export const AUTOPILOT_FIGURE_PARTS = /^([$€£]?)\s?([\d,.]+)\s?(.*)$/;
+export const AUTOPILOT_FIGURE_UNIT_ALIASES: Record<string, string> = {
+  percent: "%",
+  hours: "hour",
+  seconds: "second",
+  minutes: "minute",
+};
 /** Low thinking effort: quoting sources needs care, not long deliberation. */
 export const AUTOPILOT_FACT_CHECK_PROVIDER_OPTIONS = {
   anthropic: { thinking: { type: "adaptive" }, effort: "low" },

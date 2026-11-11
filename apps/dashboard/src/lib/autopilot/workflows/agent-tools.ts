@@ -19,6 +19,7 @@ import {
 } from "@/constants/autopilot-workflows";
 import { isAutopilotEnabledForOrganization } from "@/lib/autopilot/flag";
 import {
+  AutopilotWorkflowBusyError,
   describeAutopilotWorkflowSteps,
   getAutopilotWorkflow,
   getAutopilotWorkflowDefinition,
@@ -266,11 +267,19 @@ function manageTools(organizationId: string, userId?: string) {
       }),
       inputSchema: workflowIdToolInputSchema,
       execute: async ({ workflowId }) => {
-        const runId = await runAutopilotWorkflow({
-          organizationId,
-          workflowId,
-          trigger: "manual",
-        });
+        let runId: string | null;
+        try {
+          runId = await runAutopilotWorkflow({
+            organizationId,
+            workflowId,
+            trigger: "manual",
+          });
+        } catch (error) {
+          if (error instanceof AutopilotWorkflowBusyError) {
+            return { error: error.message };
+          }
+          throw error;
+        }
         return runId
           ? { runId, path: await workflowPath(organizationId, workflowId) }
           : { error: `No Autopilot workflow "${workflowId}" exists` };

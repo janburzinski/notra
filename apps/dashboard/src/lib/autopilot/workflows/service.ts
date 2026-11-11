@@ -27,6 +27,7 @@ import {
   inArray,
   isNotNull,
   isNull,
+  lt,
   ne,
   or,
   sql,
@@ -35,12 +36,15 @@ import { nanoid } from "nanoid";
 import * as z from "zod";
 
 import {
+  AUTOPILOT_WORKFLOW_ALREADY_RUNNING,
   AUTOPILOT_WORKFLOW_BLOCK_TYPES,
   AUTOPILOT_WORKFLOW_CUSTOM_BLOCK_TYPES,
   AUTOPILOT_WORKFLOW_KEY_PREFIX,
   AUTOPILOT_WORKFLOW_LIMIT,
   AUTOPILOT_WORKFLOW_QSTASH_TIMEOUT_MS,
   AUTOPILOT_WORKFLOW_RUN_PATH,
+  AUTOPILOT_WORKFLOW_RUN_TIMED_OUT,
+  AUTOPILOT_WORKFLOW_RUN_TIMEOUT_MS,
   AUTOPILOT_WORKFLOW_RUNS_LIMIT,
   AUTOPILOT_WORKFLOW_SCHEDULE_FAILED,
   AUTOPILOT_WORKFLOW_SCHEDULE_LOCK_TIMEOUT_MS,
@@ -49,6 +53,10 @@ import {
 import { workflowBlockRegistry } from "@/lib/workflow-engine/blocks";
 import { getWorkflowRunViews } from "@/lib/workflow-engine/run-view";
 import { startWorkflowRun } from "@/lib/workflow-engine/start";
+import {
+  failWorkflowRunTrees,
+  stopWorkflowRun,
+} from "@/lib/workflow-engine/store";
 import type { saveAutopilotWorkflowInputSchema } from "@/schemas/autopilot-workflows";
 import type {
   AutopilotWorkflowDetail,
@@ -379,6 +387,62 @@ function runsOf(organizationId: string, workflowId: string) {
   );
 }
 
+const ACTIVE_RUN_STATUSES = ["queued", "running"] as const;
+
+export class AutopilotWorkflowBusyError extends Error {
+  constructor() {
+    super(AUTOPILOT_WORKFLOW_ALREADY_RUNNING);
+    this.name = "AutopilotWorkflowBusyError";
+  }
+}
+
+async function expireStaleRuns(organizationId: string, workflowId: string) {
+  const stale = await db
+    .select({ id: workflowRuns.id })
+    .from(workflowRuns)
+    .where(
+      and(
+        runsOf(organizationId, workflowId),
+        inArray(workflowRuns.status, ACTIVE_RUN_STATUSES),
+        lt(
+          workflowRuns.createdAt,
+          new Date(Date.now() - AUTOPILOT_WORKFLOW_RUN_TIMEOUT_MS)
+        )
+      )
+    );
+  await failWorkflowRunTrees(
+    organizationId,
+    stale.map((run) => run.id),
+    AUTOPILOT_WORKFLOW_RUN_TIMED_OUT
+  );
+}
+
+async function hasActiveRun(organizationId: string, workflowId: string) {
+  const [row] = await db
+    .select({ id: workflowRuns.id })
+    .from(workflowRuns)
+    .where(
+      and(
+        runsOf(organizationId, workflowId),
+        inArray(workflowRuns.status, ACTIVE_RUN_STATUSES)
+      )
+    )
+    .limit(1);
+  return Boolean(row);
+}
+
+function withManualRunLock<T>(workflowId: string, work: () => Promise<T>) {
+  return db.transaction(async (tx) => {
+    const result = await tx.execute<{ locked: boolean }>(
+      sql`select pg_try_advisory_xact_lock(hashtext(${`autopilot-workflow-run:${workflowId}`})) as locked`
+    );
+    if (!result.rows[0]?.locked) {
+      throw new AutopilotWorkflowBusyError();
+    }
+    return work();
+  });
+}
+
 async function countRuns(organizationId: string, workflowId: string) {
   const [total] = await db
     .select({ value: count() })
@@ -415,6 +479,7 @@ export async function getAutopilotWorkflow(
   if (!row) {
     return null;
   }
+  await expireStaleRuns(organizationId, workflowId);
   const [runs, runCount] = await Promise.all([
     listRuns(organizationId, workflowId),
     countRuns(organizationId, workflowId),
@@ -615,20 +680,58 @@ export async function runAutopilotWorkflow(params: {
     return null;
   }
   const { key, definitions } = toDefinition(row);
-  const runId = await startWorkflowRun({
-    runId: params.runId ?? nanoid(),
-    organizationId: params.organizationId,
-    workflowKey: key,
-    trigger: params.trigger,
-    input: { startedAt: new Date().toISOString(), trigger: params.trigger },
-    definitions,
-    blocks: customBlocks(),
-  });
+  const start = () =>
+    startWorkflowRun({
+      runId: params.runId ?? nanoid(),
+      organizationId: params.organizationId,
+      workflowKey: key,
+      trigger: params.trigger,
+      input: { startedAt: new Date().toISOString(), trigger: params.trigger },
+      definitions,
+      blocks: customBlocks(),
+    });
+  const runId =
+    params.trigger === "manual"
+      ? await withManualRunLock(row.id, async () => {
+          await expireStaleRuns(params.organizationId, params.workflowId);
+          if (await hasActiveRun(params.organizationId, params.workflowId)) {
+            throw new AutopilotWorkflowBusyError();
+          }
+          return start();
+        })
+      : await start();
   await db
     .update(autopilotWorkflows)
     .set({ lastRunAt: new Date(), updatedAt: row.updatedAt })
     .where(byWorkflow(row));
   return runId;
+}
+
+export async function stopAutopilotWorkflowRun(
+  organizationId: string,
+  runId: string
+) {
+  return await db.transaction(async (tx) => {
+    const [run] = await tx
+      .select({ id: workflowRuns.id })
+      .from(workflowRuns)
+      .where(
+        and(
+          eq(workflowRuns.id, runId),
+          eq(workflowRuns.organizationId, organizationId),
+          isNull(workflowRuns.parentRunId),
+          sql`${workflowRuns.workflowKey} like ${`${AUTOPILOT_WORKFLOW_KEY_PREFIX}%`}`,
+          inArray(workflowRuns.status, ACTIVE_RUN_STATUSES)
+        )
+      )
+      .limit(1)
+      .for("update");
+    if (!run) {
+      return false;
+    }
+    await stopWorkflowRun(tx, organizationId, run.id);
+    return true;
+  });
 }
 
 /**

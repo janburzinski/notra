@@ -57,7 +57,8 @@ export async function getRepositoryOctokit(
 
 export async function getInstallationOctokit(
   organizationId: string,
-  accountLogin: string
+  accountLogin: string,
+  repositories?: string[]
 ): Promise<AutopilotOctokit | null> {
   const installations =
     await listGitHubAppInstallationsByOrganization(organizationId);
@@ -70,6 +71,7 @@ export async function getInstallationOctokit(
   const token = await createScopedGitHubAppInstallationToken(
     installation.installationId,
     {
+      ...(repositories?.length ? { repositories } : {}),
       permissions: {
         contents: "read",
         pull_requests: "read",

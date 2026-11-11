@@ -87,6 +87,7 @@ export const customAutopilotBlocks = [
     description:
       "Runs the agent with GEO data and web search on the instructions, which can embed earlier outputs. Output: text.",
     configSchema: askAgentConfigSchema,
+    sideEffect: true,
     run: async ({ organizationId, config, node }) => {
       const text = await runAutopilotAgentText({
         organizationId,
@@ -113,6 +114,7 @@ export const customAutopilotBlocks = [
       "Has the agent answer a yes or no question, then follows the yes or no branch. Output: answer, reason.",
     outputs: AUTOPILOT_WORKFLOW_DECIDE_PORTS,
     configSchema: decideConfigSchema,
+    sideEffect: true,
     run: async ({ organizationId, config, node }) => {
       const decision = await runAutopilotAgentDecision({
         organizationId,

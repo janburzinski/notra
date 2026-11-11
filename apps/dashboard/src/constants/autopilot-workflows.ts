@@ -73,6 +73,19 @@ export const AUTOPILOT_WORKFLOW_BUILD_PROMPT =
 
 export const AUTOPILOT_WORKFLOW_NOT_FOUND = "Autopilot workflow not found";
 
+export const AUTOPILOT_WORKFLOW_ALREADY_RUNNING =
+  "This workflow is already running. Wait for it to finish or stop it first.";
+
+export const AUTOPILOT_WORKFLOW_NOT_RUNNING = "This run isn't running anymore.";
+
+export const AUTOPILOT_WORKFLOW_RUN_TIMEOUT_MS = 2 * 60 * 60 * 1000;
+
+export const AUTOPILOT_WORKFLOW_RUN_TIMED_OUT =
+  "This run stopped responding and was ended after 2 hours.";
+
+export const AUTOPILOT_WORKFLOW_RATE_LIMITED =
+  "Too many workflow runs in the last minute. Try again shortly.";
+
 /**
  * How long one QStash call may hold a workflow's schedule lock, and how long
  * a second change waits for it. A slow QStash then can't block the workflow

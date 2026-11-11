@@ -85,6 +85,7 @@ export type AutopilotObservationJob = Exclude<
 >;
 
 export type AutopilotBlogDraft =
+  | { kind: "dropped" }
   | { kind: "update"; baseSha: string; post: BlogFile; existingPath: string }
   | {
       kind: "new";

@@ -9,7 +9,7 @@ import { FatalError, getStepMetadata } from "workflow";
 import { WORKFLOW_RUN_STOPPED_MESSAGE } from "@/constants/workflow-engine";
 import { workflowBlockRegistry } from "@/lib/workflow-engine/blocks";
 import {
-  isWorkflowRunStopped,
+  isWorkflowRunHalted,
   markWorkflowNodeStep,
 } from "@/lib/workflow-engine/store";
 import type { WorkflowNodeStepInput } from "@/types/workflow-engine";
@@ -69,7 +69,7 @@ export async function executeWorkflowNode(
       error: `"${node.title}" changed since this run started`,
     };
   }
-  if (await isWorkflowRunStopped(input.runId)) {
+  if (await isWorkflowRunHalted(input.runId)) {
     return { status: "halted", reason: WORKFLOW_RUN_STOPPED_MESSAGE };
   }
   const progress = (update: Parameters<typeof markWorkflowNodeStep>[2]) =>

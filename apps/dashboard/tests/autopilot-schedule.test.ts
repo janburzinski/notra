@@ -1,4 +1,4 @@
-import { expect, mock, test } from "bun:test";
+import { expect, mock, setSystemTime, test } from "bun:test";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
@@ -16,8 +16,15 @@ if (process.env.NOTRA_SCHEDULE_TEST !== "1") {
   });
 } else {
   const start = mock(async () => ({ alreadyRunning: false }));
+  const attempts: { total: number; latest: Date | null } = {
+    total: 0,
+    latest: null,
+  };
   mock.module("@notra/db/drizzle", () => ({
     db: {
+      select: () => ({
+        from: () => ({ where: async () => [attempts] }),
+      }),
       query: {
         autopilotSettings: {
           findMany: async () => [{ organizationId: "org-a" }],
@@ -38,16 +45,35 @@ if (process.env.NOTRA_SCHEDULE_TEST !== "1") {
   }));
   mock.module("@/utils/autopilot-schedule", () => ({
     isAutopilotDue: () => true,
+    autopilotLocalDayStart: () => new Date(0),
   }));
   mock.module("@/lib/autopilot/start", () => ({ startAutopilot: start }));
   const { runDueAutopilots } = await import("../src/lib/autopilot/schedule");
 
   test("reports failed feedback while starting a due run", async () => {
-    expect(await runDueAutopilots()).toEqual({
-      checked: 1,
-      started: 1,
-      failed: 1,
-    });
+    setSystemTime(new Date("2026-11-10T10:01:00Z"));
+    try {
+      expect(await runDueAutopilots()).toEqual({
+        checked: 1,
+        started: 1,
+        failed: 1,
+      });
+    } finally {
+      setSystemTime();
+    }
     expect(start).toHaveBeenCalledWith("org-a", "cron");
+  });
+
+  test("backs off after a failed attempt today and stops at the cap", async () => {
+    start.mockClear();
+    attempts.total = 1;
+    attempts.latest = new Date();
+    expect((await runDueAutopilots()).started).toBe(0);
+    attempts.latest = new Date(Date.now() - 31 * 60 * 1000);
+    expect((await runDueAutopilots()).started).toBe(1);
+    attempts.total = 3;
+    attempts.latest = new Date(Date.now() - 24 * 60 * 60 * 1000);
+    expect((await runDueAutopilots()).started).toBe(0);
+    expect(start).toHaveBeenCalledTimes(1);
   });
 }

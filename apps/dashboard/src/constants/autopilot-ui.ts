@@ -58,6 +58,8 @@ import type { AutopilotWorkflowDraftStatus } from "@/types/autopilot-workflows";
 import type { GitHubMergeMethod } from "@/types/integrations/github";
 
 /** Tabs of the Autopilot page, in order; the first is the default. */
+export const AUTOPILOT_SYNC_STALE_MS = 5 * 60 * 1000;
+
 export const AUTOPILOT_PAGE_TABS = [
   "automations",
   "pull-requests",

@@ -1,10 +1,17 @@
+import {
+  SLACK_API_BASE_URL,
+  SLACK_REQUEST_TIMEOUT_MS,
+} from "@notra/ai/constants/slack";
+import { getSlackIntegrationBotToken } from "@notra/ai/integrations/slack-workspace";
 import type { autopilotSlackActionRequestSchema } from "@notra/ai/schemas/autopilot-slack-action";
 import { logError } from "@notra/ai/utils/server-log";
 import { db } from "@notra/db/drizzle";
 import {
   autopilotFindings,
   autopilotSettings,
+  members,
   slackIntegrations,
+  users,
 } from "@notra/db/schema";
 import { and, eq, sql } from "drizzle-orm";
 import type * as z from "zod";
@@ -19,6 +26,7 @@ import {
 } from "@/lib/autopilot/run";
 import { postAutopilotSlackMessage } from "@/lib/autopilot/slack";
 import { loadSuggestedPost } from "@/lib/autopilot/suggestions";
+import { slackUserInfoResponseSchema } from "@/schemas/autopilot-slack";
 import type { AutopilotFindingRow } from "@/types/autopilot-runtime";
 import { compactSlackText, slackMrkdwn } from "@/utils/autopilot-slack";
 import { toErrorMessage } from "@/utils/error-message";
@@ -59,6 +67,56 @@ async function loadDestination(vote: SlackVote) {
   return destination;
 }
 
+async function isSlackUserWorkspaceAdmin(params: {
+  organizationId: string;
+  encryptedBotToken: string;
+  teamId: string;
+  slackUserId: string;
+}) {
+  try {
+    const response = await fetch(
+      `${SLACK_API_BASE_URL}/users.info?user=${encodeURIComponent(params.slackUserId)}`,
+      {
+        headers: {
+          authorization: `Bearer ${getSlackIntegrationBotToken(params)}`,
+        },
+        signal: AbortSignal.timeout(SLACK_REQUEST_TIMEOUT_MS),
+      }
+    );
+    const parsed = slackUserInfoResponseSchema.safeParse(await response.json());
+    const user = parsed.success && parsed.data.ok ? parsed.data.user : null;
+    const email = user?.profile?.email?.trim().toLowerCase();
+    if (
+      !(user && email) ||
+      user.team_id !== params.teamId ||
+      user.deleted ||
+      user.is_bot ||
+      user.is_restricted ||
+      user.is_ultra_restricted
+    ) {
+      return false;
+    }
+    const [member] = await db
+      .select({ role: members.role })
+      .from(members)
+      .innerJoin(users, eq(users.id, members.userId))
+      .where(
+        and(
+          eq(members.organizationId, params.organizationId),
+          sql`lower(${users.email}) = ${email}`,
+          eq(users.emailVerified, true)
+        )
+      )
+      .limit(1);
+    return member?.role === "owner" || member?.role === "admin";
+  } catch (error) {
+    logError("Autopilot Slack user lookup failed", error, {
+      organizationId: params.organizationId,
+    });
+    return false;
+  }
+}
+
 function pullRequestLabel(finding: AutopilotFindingRow) {
   return finding.pullRequestUrl
     ? `<${finding.pullRequestUrl}|PR #${finding.pullRequestNumber}>`
@@ -71,6 +129,9 @@ function failure(error: unknown) {
 
 /** Acts on a 👍/👎 on an Autopilot item in the Autopilot Slack channel. */
 export async function handleAutopilotSlackAction(vote: SlackVote) {
+  if (vote.userTeamId && vote.userTeamId !== vote.teamId) {
+    return;
+  }
   const destination = await loadDestination(vote);
   if (!destination) {
     return;
@@ -147,6 +208,19 @@ export async function handleAutopilotSlackAction(vote: SlackVote) {
       .where(eq(autopilotFindings.id, finding.id));
 
   if (finding.status === "proposed") {
+    const canMerge = await isSlackUserWorkspaceAdmin({
+      organizationId,
+      encryptedBotToken: destination.encryptedBotToken,
+      teamId: vote.teamId,
+      slackUserId: vote.userId,
+    });
+    if (!canMerge) {
+      await release();
+      await reply(
+        `${user}, only Notra workspace admins can merge from Slack. Merge ${pullRequestLabel(finding)} on GitHub or in Notra.`
+      );
+      return;
+    }
     try {
       await mergeFinding(organizationId, finding.id);
     } catch (error) {

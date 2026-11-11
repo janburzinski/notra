@@ -6,6 +6,7 @@ import { toAgentTokenUsage } from "@notra/ai/utils/token-usage";
 import { generateText, NoObjectGeneratedError, Output } from "ai";
 import type * as z from "zod";
 
+import { AUTOPILOT_LLM_CALL_TIMEOUT_MS } from "@/constants/autopilot";
 import type { AutopilotLogger } from "@/types/autopilot-runtime";
 
 export async function generateAutopilotObject<T extends z.ZodType>(params: {
@@ -16,6 +17,7 @@ export async function generateAutopilotObject<T extends z.ZodType>(params: {
   instructions: string;
   prompt: string;
   maxOutputTokens?: number;
+  timeoutMs?: number;
   /** Reasoning for the retry when the first answer ran out of tokens. */
   retryReasoning?: "low" | "medium";
   /** Vendor options, e.g. Anthropic thinking effort; thinking counts against maxOutputTokens. */
@@ -32,6 +34,9 @@ export async function generateAutopilotObject<T extends z.ZodType>(params: {
       instructions: params.instructions,
       prompt: params.prompt,
       maxOutputTokens: params.maxOutputTokens,
+      abortSignal: AbortSignal.timeout(
+        params.timeoutMs ?? AUTOPILOT_LLM_CALL_TIMEOUT_MS
+      ),
       reasoning,
       providerOptions: withRouterDefaults(
         {

@@ -79,6 +79,8 @@ export interface MergedPullRequest {
   body: string;
   /** GitHub login of who opened it. */
   author: string | null;
+  /** The repository is private, so its names and links stay out of public posts. */
+  private?: boolean;
 }
 
 export interface AutopilotJobResult {
@@ -219,6 +221,11 @@ export interface AutopilotFindingPageProps {
   finding: AutopilotFindingView;
 }
 
+export type AutopilotFindingByIdLoaderProps = Omit<
+  AutopilotFindingPageProps,
+  "finding"
+> & { findingId: string };
+
 export interface AutopilotFindingSourceProps {
   finding: AutopilotFindingView;
 }
@@ -341,7 +348,12 @@ export interface AutopilotRunPageProps {
   organizationId: string;
   organizationSlug: string;
   run: AutopilotRunView;
+  workflowGraph: boolean;
 }
+
+export type AutopilotRunByIdLoaderProps = Omit<AutopilotRunPageProps, "run"> & {
+  runId: string;
+};
 
 export interface AutopilotFactProps {
   label: string;

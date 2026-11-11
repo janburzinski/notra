@@ -37,6 +37,11 @@ export function parseAutopilotReaction(
   const botUserIds = new Set(
     (envelope.authorizations ?? []).map((auth) => auth.user_id)
   );
+  const userTeamId =
+    typeof event.user_team === "string" ? event.user_team : undefined;
+  const sharedExternally =
+    (envelope as { is_ext_shared_channel?: unknown }).is_ext_shared_channel ===
+    true;
   const vote =
     typeof event.reaction === "string"
       ? AUTOPILOT_VOTE_REACTIONS[
@@ -47,6 +52,8 @@ export function parseAutopilotReaction(
     event.type !== "reaction_added" ||
     !vote ||
     !envelope.team_id ||
+    (userTeamId && userTeamId !== envelope.team_id) ||
+    (sharedExternally && userTeamId !== envelope.team_id) ||
     typeof event.user !== "string" ||
     botUserIds.has(event.user) ||
     !botUserIds.has(event.item_user as string) ||
@@ -60,6 +67,7 @@ export function parseAutopilotReaction(
     teamId: envelope.team_id,
     channelId: item.channel,
     userId: event.user,
+    ...(userTeamId ? { userTeamId } : {}),
     messageTs: item.ts,
     vote,
   };

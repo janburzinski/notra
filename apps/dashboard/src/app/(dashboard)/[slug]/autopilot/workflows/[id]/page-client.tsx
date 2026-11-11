@@ -6,6 +6,7 @@ import {
   Delete02Icon,
   MoreHorizontalIcon,
   PlayIcon,
+  StopIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { PageHeading } from "@notra/ui/components/shared/page-heading";
@@ -143,20 +144,34 @@ function WorkflowActions({
   running,
   onRun,
   onDelete,
+  onStop,
+  stopping,
 }: AutopilotWorkflowActionsProps) {
   const { draftAgentPrompt } = useRightPanel();
   return (
     <>
-      <Button
-        disabled={!canRun}
-        loading={running}
-        onClick={onRun}
-        size="sm"
-        variant="outline"
-      >
-        <HugeiconsIcon icon={PlayIcon} size={16} />
-        Run now
-      </Button>
+      {onStop ? (
+        <Button
+          disabled={stopping}
+          onClick={onStop}
+          size="sm"
+          variant="outline"
+        >
+          <HugeiconsIcon icon={StopIcon} size={16} />
+          Stop
+        </Button>
+      ) : (
+        <Button
+          disabled={!canRun}
+          loading={running}
+          onClick={onRun}
+          size="sm"
+          variant="outline"
+        >
+          <HugeiconsIcon icon={PlayIcon} size={16} />
+          Run now
+        </Button>
+      )}
       <DropdownMenu>
         <DropdownMenuTrigger
           render={
@@ -191,7 +206,7 @@ function WorkflowPage({
 }: AutopilotWorkflowPageProps) {
   const router = useRouter();
   const formatRelative = useFormatRelative();
-  const { run, setEnabled, remove } =
+  const { run, stop, setEnabled, remove } =
     useAutopilotWorkflowActions(organizationId);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const {
@@ -249,7 +264,11 @@ function WorkflowPage({
                     onSuccess: () => setPickedRunId(null),
                   })
                 }
+                onStop={
+                  running && latestRun ? () => stop.mutate(latestRun.id) : null
+                }
                 running={run.isPending || running}
+                stopping={stop.isPending}
               />
             ) : null}
           </div>

@@ -1,11 +1,13 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect } from "react";
 import { toast } from "sonner";
 
 import { AUTOPILOT_POLL_INTERVAL_MS } from "@/constants/autopilot";
-import { AUTOPILOT_AUTOMATIONS } from "@/constants/autopilot-ui";
+import {
+  AUTOPILOT_AUTOMATIONS,
+  AUTOPILOT_SYNC_STALE_MS,
+} from "@/constants/autopilot-ui";
 import { dashboardOrpc } from "@/lib/orpc/query";
 import type { AutopilotAutomationKind } from "@/types/autopilot-metrics";
 import type { GitHubMergeMethod } from "@/types/integrations/github";
@@ -13,8 +15,8 @@ import { toErrorMessage } from "@/utils/error-message";
 
 /**
  * The workspace's Autopilot state, polled while a run or a write is in
- * flight. Admins sync GitHub once per page visit so merges and closes made
- * there show up.
+ * flight. Admins sync GitHub at most every few minutes so merges and closes
+ * made there show up.
  */
 export function useAutopilotOverview(organizationId: string) {
   const queryClient = useQueryClient();
@@ -30,19 +32,23 @@ export function useAutopilotOverview(organizationId: string) {
     })
   );
   const canSync = Boolean(query.data?.available && query.data.canManage);
-  useEffect(() => {
-    if (!(organizationId && canSync)) {
-      return;
-    }
-    dashboardOrpc.autopilot.sync
-      .call({ organizationId })
-      .then(() =>
-        queryClient.invalidateQueries({
-          queryKey: dashboardOrpc.autopilot.key(),
-        })
-      )
-      .catch(() => undefined);
-  }, [canSync, organizationId, queryClient]);
+  useQuery({
+    queryKey: [...dashboardOrpc.autopilot.sync.key(), organizationId],
+    queryFn: async () => {
+      await dashboardOrpc.autopilot.sync.call({ organizationId });
+      await queryClient.invalidateQueries({
+        queryKey: dashboardOrpc.autopilot.get.key({
+          input: { organizationId },
+        }),
+      });
+      return true;
+    },
+    enabled: Boolean(organizationId && canSync),
+    staleTime: AUTOPILOT_SYNC_STALE_MS,
+    gcTime: AUTOPILOT_SYNC_STALE_MS,
+    retry: false,
+    refetchOnWindowFocus: false,
+  });
   return query;
 }
 

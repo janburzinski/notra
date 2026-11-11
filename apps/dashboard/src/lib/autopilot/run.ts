@@ -26,7 +26,7 @@ import {
 } from "@/lib/autopilot/blog";
 import { buildAutopilotBrief, postAutopilotBrief } from "@/lib/autopilot/brief";
 import { syncFindingPullRequests } from "@/lib/autopilot/findings";
-import { isAutopilotEnabledForOrganization } from "@/lib/autopilot/flag";
+import { autopilotFlagState } from "@/lib/autopilot/flag";
 import {
   withAutopilotRunLease,
   renewAutopilotRunLease,
@@ -34,7 +34,10 @@ import {
 import { createAutopilotLogger } from "@/lib/autopilot/log";
 import { runPromptsJob } from "@/lib/autopilot/prompts";
 import { runTransition } from "@/lib/autopilot/transitions";
-import { failWorkflowRunTrees } from "@/lib/workflow-engine/store";
+import {
+  failWorkflowRunTrees,
+  workflowRunTreeHasErrors,
+} from "@/lib/workflow-engine/store";
 import type {
   AutopilotJobResult,
   AutopilotRunContext,
@@ -175,7 +178,11 @@ export async function buildAutopilotRunContext(
   organizationId: string,
   runId: string
 ): Promise<AutopilotRunContext> {
-  if (!(await isAutopilotEnabledForOrganization(organizationId))) {
+  const flag = await autopilotFlagState(organizationId);
+  if (flag === "unavailable") {
+    throw new Error("Could not check whether Autopilot is available");
+  }
+  if (flag === "disabled") {
     throw new AutopilotUnavailableError(
       "Autopilot is not available for this workspace."
     );
@@ -433,6 +440,14 @@ export async function finishAutopilotRun(params: {
     )
     .returning({ id: autopilotRuns.id });
   if (params.scheduled === false || completed.length === 0) {
+    return;
+  }
+  const madeNoProgress =
+    findings.every((row) => row.status === "failed") &&
+    !params.slackMessageTs &&
+    (status === "failed" ||
+      (await workflowRunTreeHasErrors(params.organizationId, params.runId)));
+  if (madeNoProgress) {
     return;
   }
   await db

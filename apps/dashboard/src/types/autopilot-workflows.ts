@@ -309,6 +309,8 @@ export interface AutopilotWorkflowActionsProps {
   running: boolean;
   onRun: () => void;
   onDelete: () => void;
+  onStop: (() => void) | null;
+  stopping: boolean;
 }
 
 export interface AutopilotAgentDockFocusChipProps {

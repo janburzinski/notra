@@ -14,6 +14,8 @@ import {
 } from "@notra/ai/utils/github-mention-log";
 import { processGitHubMention } from "@notra/ai/utils/github-mention-process";
 
+import { AUTOPILOT_BRANCH_PREFIX } from "@/constants/autopilot";
+import { advanceFindingHeadSha } from "@/lib/autopilot/findings";
 import { handleAutopilotMention } from "@/lib/autopilot/mentions";
 import { writeMentionWebhookLog } from "@/lib/webhooks/github-mention-log";
 import { startContentPublicationSyncRepair } from "@/lib/workflows/start";
@@ -43,7 +45,28 @@ export async function processGitHubMentionStep(context: GitHubMentionContext) {
   if (context.comment.edited) {
     return { status: "ignored" as const, reason: "edited_feedback_only" };
   }
-  return await processGitHubMention(context, startContentPublicationSyncRepair);
+  const result = await processGitHubMention(
+    context,
+    startContentPublicationSyncRepair
+  );
+  const pull = context.pullRequest;
+  if (
+    result.status === "committed" &&
+    result.commitSha &&
+    pull &&
+    context.destination.mode === "same_pull_request" &&
+    pull.headRef.startsWith(AUTOPILOT_BRANCH_PREFIX)
+  ) {
+    await advanceFindingHeadSha({
+      organizationId: context.organizationId,
+      repository: `${context.owner}/${context.repo}`,
+      pullRequestNumber: pull.number,
+      branch: pull.headRef,
+      fromSha: context.destination.headSha ?? pull.headSha,
+      toSha: result.commitSha,
+    }).catch(() => undefined);
+  }
+  return result;
 }
 
 processGitHubMentionStep.maxRetries = 0;

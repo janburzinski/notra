@@ -24,7 +24,7 @@ import {
   AutopilotUnavailableError,
   buildAutopilotRunContext,
 } from "@/lib/autopilot/run";
-import { isWorkflowRunStopped } from "@/lib/workflow-engine/store";
+import { isWorkflowRunHalted } from "@/lib/workflow-engine/store";
 import type { AutopilotRunContext } from "@/types/autopilot";
 import type {
   AutopilotPlanActed,
@@ -156,7 +156,7 @@ export async function settleClaimedDraft(
   if (outcome.status === "success") {
     return;
   }
-  if (await isWorkflowRunStopped(context.runId)) {
+  if (await isWorkflowRunHalted(context.runId)) {
     await markFindingFailed(claim, WORKFLOW_RUN_STOPPED_MESSAGE, {
       count: false,
     });

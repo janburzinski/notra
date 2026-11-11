@@ -20,6 +20,9 @@ import {
   AUTOPILOT_READINESS_AGENT_WRAP_UP_SHARE,
   AUTOPILOT_READINESS_AGENT_WRAP_UP_STEPS,
   AUTOPILOT_READINESS_FIND_MAX_PATHS,
+  AUTOPILOT_REPOSITORY_AGENT_MAX_OUTPUT_TOKENS,
+  AUTOPILOT_REPOSITORY_AGENT_TIMEOUT_MS,
+  AUTOPILOT_SECRET_PATH_PATTERNS,
   AUTOPILOT_TREE_MAX_PATHS,
 } from "@/constants/autopilot";
 import {
@@ -165,6 +168,11 @@ export async function runRepositoryAgent<Schema extends z.ZodType>(params: {
         ) {
           return "File does not exist.";
         }
+        if (
+          AUTOPILOT_SECRET_PATH_PATTERNS.some((pattern) => pattern.test(path))
+        ) {
+          return "This file can't be read.";
+        }
         const content = await readRepositoryFile(
           octokit,
           repository,
@@ -259,6 +267,7 @@ export async function runRepositoryAgent<Schema extends z.ZodType>(params: {
     instructions: params.instructions,
     tools,
     output: Output.object({ schema: params.outputSchema }),
+    maxOutputTokens: AUTOPILOT_REPOSITORY_AGENT_MAX_OUTPUT_TOKENS,
     stopWhen: isStepCount(params.maxSteps),
     prepareStep: async ({ steps, stepNumber }) => {
       const { phase, spent } = agentPhase(steps, stepNumber, limits);
@@ -303,6 +312,7 @@ export async function runRepositoryAgent<Schema extends z.ZodType>(params: {
   });
   const result = await agent
     .generate({
+      abortSignal: AbortSignal.timeout(AUTOPILOT_REPOSITORY_AGENT_TIMEOUT_MS),
       prompt,
       onStepEnd: async (step) => {
         stepNumber += 1;

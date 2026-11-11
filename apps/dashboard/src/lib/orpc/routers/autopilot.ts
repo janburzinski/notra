@@ -2,6 +2,7 @@ import {
   listGitHubAppInstallationsByOrganization,
   listGitHubAppRepositoriesEffect,
 } from "@notra/ai/integrations/github";
+import { consumeChatGenerationRateLimit } from "@notra/ai/utils/chat-generation-rate-limit";
 import { getOpenRequestLogger } from "@notra/ai/utils/evlog-request";
 import { AUTOPILOT_SCHEDULED_TRIGGERS } from "@notra/db/constants/autopilot";
 import { db } from "@notra/db/drizzle";
@@ -34,11 +35,12 @@ import { Effect } from "effect";
 import {
   AUTOPILOT_DEFAULT_JOBS,
   AUTOPILOT_DEFAULT_STALE_PULL_REQUEST_DAYS,
-  AUTOPILOT_IMPACT_MAX_FINDINGS,
   AUTOPILOT_RUNS_PAGE_SIZE,
 } from "@/constants/autopilot";
 import {
   AUTOPILOT_WORKFLOW_NOT_FOUND,
+  AUTOPILOT_WORKFLOW_NOT_RUNNING,
+  AUTOPILOT_WORKFLOW_RATE_LIMITED,
   AUTOPILOT_WORKFLOW_UNSCHEDULE_FAILED,
 } from "@/constants/autopilot-workflows";
 import { AUTOPILOT_DAILY_WORKFLOW_KEY } from "@/constants/workflow-engine";
@@ -78,19 +80,23 @@ import { startAutopilot } from "@/lib/autopilot/start";
 import { stopAutopilotRun } from "@/lib/autopilot/stop";
 import { loadSuggestedPost } from "@/lib/autopilot/suggestions";
 import {
+  AutopilotWorkflowBusyError,
   deleteAutopilotWorkflow,
   getAutopilotWorkflow,
   getAutopilotWorkflowRunViews,
   listAutopilotWorkflows,
   runAutopilotWorkflow,
   setAutopilotWorkflowEnabled,
+  stopAutopilotWorkflowRun,
 } from "@/lib/autopilot/workflows/service";
 import { authorizedProcedure, withOrganizationAccess } from "@/lib/orpc/base";
 import {
   badRequest,
+  conflict,
   forbidden,
   notFound,
   serviceUnavailable,
+  tooManyRequests,
 } from "@/lib/orpc/utils/errors";
 import { workflowDefinitions } from "@/lib/workflow-engine/definitions/autopilot";
 import { getWorkflowRunViews } from "@/lib/workflow-engine/run-view";
@@ -133,6 +139,28 @@ function templateTitle(workflowKey: string | null) {
     Object.hasOwn(workflowDefinitions, workflowKey)
     ? (workflowDefinitions[workflowKey]?.title ?? null)
     : null;
+}
+
+async function describeRuns(
+  organizationId: string,
+  runs: (typeof autopilotRuns.$inferSelect)[]
+) {
+  const described = await describeItemRuns(
+    organizationId,
+    runs
+      .filter(
+        (run) =>
+          !(AUTOPILOT_SCHEDULED_TRIGGERS as readonly string[]).includes(
+            run.trigger
+          )
+      )
+      .map((run) => run.id)
+  );
+  return runs.map((run) => ({
+    ...run,
+    headline: described.get(run.id)?.headline ?? templateTitle(run.workflowKey),
+    outcome: described.get(run.id)?.outcome ?? null,
+  }));
 }
 
 function errorMessage(error: unknown) {
@@ -180,54 +208,48 @@ export const autopilotRouter = {
       const { organizationId } = input;
       // Without the flag nothing about Autopilot leaves the server.
       const enabled = await isAutopilotEnabledForOrganization(organizationId);
-      const [settings, installations, slackRows, findings, runs, rules] =
-        await Promise.all([
-          enabled
-            ? db.query.autopilotSettings.findFirst({
-                where: eq(autopilotSettings.organizationId, organizationId),
+      const [
+        settings,
+        installations,
+        slackRows,
+        findings,
+        runs,
+        rules,
+        workflowGraph,
+      ] = await Promise.all([
+        enabled
+          ? db.query.autopilotSettings.findFirst({
+              where: eq(autopilotSettings.organizationId, organizationId),
+            })
+          : undefined,
+        enabled ? listGitHubAppInstallationsByOrganization(organizationId) : [],
+        enabled
+          ? db
+              .select({
+                id: slackIntegrations.id,
+                teamName: slackIntegrations.slackTeamName,
+                notificationChannelId: slackIntegrations.notificationChannelId,
               })
-            : undefined,
-          enabled
-            ? listGitHubAppInstallationsByOrganization(organizationId)
-            : [],
-          enabled
-            ? db
-                .select({
-                  id: slackIntegrations.id,
-                  teamName: slackIntegrations.slackTeamName,
-                  notificationChannelId:
-                    slackIntegrations.notificationChannelId,
-                })
-                .from(slackIntegrations)
-                .where(
-                  and(
-                    eq(slackIntegrations.organizationId, organizationId),
-                    eq(slackIntegrations.enabled, true)
-                  )
+              .from(slackIntegrations)
+              .where(
+                and(
+                  eq(slackIntegrations.organizationId, organizationId),
+                  eq(slackIntegrations.enabled, true)
                 )
-            : [],
-          enabled ? listFindings(organizationId) : [],
-          enabled
-            ? db.query.autopilotRuns.findMany({
-                where: eq(autopilotRuns.organizationId, organizationId),
-                orderBy: [desc(autopilotRuns.startedAt)],
-                limit: AUTOPILOT_RUNS_PAGE_SIZE,
-              })
-            : [],
-          enabled ? listRules(organizationId) : [],
-        ]);
-      // Scheduled runs are told apart by their summary; item runs by their log.
-      const described = await describeItemRuns(
-        organizationId,
-        runs
-          .filter(
-            (run) =>
-              !(AUTOPILOT_SCHEDULED_TRIGGERS as readonly string[]).includes(
-                run.trigger
               )
-          )
-          .map((run) => run.id)
-      );
+          : [],
+        enabled ? listFindings(organizationId) : [],
+        enabled
+          ? db.query.autopilotRuns.findMany({
+              where: eq(autopilotRuns.organizationId, organizationId),
+              orderBy: [desc(autopilotRuns.startedAt)],
+              limit: AUTOPILOT_RUNS_PAGE_SIZE,
+            })
+          : [],
+        enabled ? listRules(organizationId) : [],
+        enabled ? isAutopilotWorkflowGraphEnabled(organizationId) : false,
+      ]);
+      const describedRuns = await describeRuns(organizationId, runs);
       return {
         available: enabled,
         canManage: canManageAutopilot(context.auth.membership.role),
@@ -262,47 +284,84 @@ export const autopilotRouter = {
         },
         slack: { integrations: slackRows },
         findings,
-        runs: runs.map((run) => ({
-          ...run,
-          headline:
-            described.get(run.id)?.headline ?? templateTitle(run.workflowKey),
-          outcome: described.get(run.id)?.outcome ?? null,
-        })),
+        runs: describedRuns,
         rules,
+        workflowGraph,
       };
     }),
 
-  impact: authorizedProcedure
-    .input(autopilotOrganizationInputSchema)
+  run: authorizedProcedure
+    .input(autopilotRunInputSchema)
     .use(withOrganizationAccess)
     .use(withAutopilotFlag)
     .handler(async ({ input }) => {
-      const [settings, findings] = await Promise.all([
+      const run = await db.query.autopilotRuns.findFirst({
+        where: and(
+          eq(autopilotRuns.organizationId, input.organizationId),
+          eq(autopilotRuns.id, input.runId)
+        ),
+      });
+      const [described] = run
+        ? await describeRuns(input.organizationId, [run])
+        : [];
+      if (!described) {
+        throw notFound("Autopilot run not found");
+      }
+      return described;
+    }),
+
+  finding: authorizedProcedure
+    .input(autopilotFindingInputSchema)
+    .use(withOrganizationAccess)
+    .use(withAutopilotFlag)
+    .handler(async ({ input }) => {
+      const finding = await db.query.autopilotFindings.findFirst({
+        where: and(
+          eq(autopilotFindings.organizationId, input.organizationId),
+          eq(autopilotFindings.id, input.findingId)
+        ),
+      });
+      if (!finding) {
+        throw notFound("Autopilot finding not found");
+      }
+      return finding;
+    }),
+
+  impact: authorizedProcedure
+    .input(autopilotFindingInputSchema)
+    .use(withOrganizationAccess)
+    .use(withAutopilotFlag)
+    .handler(async ({ input }) => {
+      const [settings, finding] = await Promise.all([
         db.query.autopilotSettings.findFirst({
           columns: { projectId: true },
           where: eq(autopilotSettings.organizationId, input.organizationId),
         }),
-        db.query.autopilotFindings.findMany({
+        db.query.autopilotFindings.findFirst({
           where: and(
             eq(autopilotFindings.organizationId, input.organizationId),
+            eq(autopilotFindings.id, input.findingId),
             inArray(autopilotFindings.status, ["proposed", "merged"])
           ),
-          orderBy: [desc(autopilotFindings.updatedAt)],
-          limit: AUTOPILOT_IMPACT_MAX_FINDINGS,
         }),
       ]);
+      if (!finding) {
+        return null;
+      }
       const project = await findAutopilotProject(
         input.organizationId,
         settings?.projectId ?? null
       );
-      return loadFindingImpacts(project ?? null, findings);
+      const impacts = await loadFindingImpacts(project ?? null, [finding]);
+      return impacts[finding.id] ?? null;
     }),
 
   repositories: authorizedProcedure
     .input(autopilotOrganizationInputSchema)
     .use(withOrganizationAccess)
     .use(withAutopilotFlag)
-    .handler(async ({ input }) => {
+    .handler(async ({ input, context }) => {
+      assertCanManageAutopilot(context);
       const repositories = await Effect.runPromise(
         listGitHubAppRepositoriesEffect(input.organizationId)
       ).catch(() => []);
@@ -665,15 +724,48 @@ export const autopilotRouter = {
       .use(withAutopilotFlag)
       .handler(async ({ input, context }) => {
         assertCanManageAutopilot(context);
-        const runId = await runAutopilotWorkflow({
-          organizationId: input.organizationId,
-          workflowId: input.workflowId,
-          trigger: "manual",
-        });
+        const limit = await consumeChatGenerationRateLimit(
+          input.organizationId,
+          context.auth.user.id
+        );
+        if (!limit.success) {
+          throw tooManyRequests(AUTOPILOT_WORKFLOW_RATE_LIMITED, {
+            reset: limit.reset,
+          });
+        }
+        let runId: string | null;
+        try {
+          runId = await runAutopilotWorkflow({
+            organizationId: input.organizationId,
+            workflowId: input.workflowId,
+            trigger: "manual",
+          });
+        } catch (error) {
+          if (error instanceof AutopilotWorkflowBusyError) {
+            throw conflict(error.message);
+          }
+          throw error;
+        }
         if (!runId) {
           throw notFound(AUTOPILOT_WORKFLOW_NOT_FOUND);
         }
         return { runId };
+      }),
+
+    stop: authorizedProcedure
+      .input(autopilotWorkflowRunInputSchema)
+      .use(withOrganizationAccess)
+      .use(withAutopilotFlag)
+      .handler(async ({ input, context }) => {
+        assertCanManageAutopilot(context);
+        const stopped = await stopAutopilotWorkflowRun(
+          input.organizationId,
+          input.runId
+        );
+        if (!stopped) {
+          throw badRequest(AUTOPILOT_WORKFLOW_NOT_RUNNING);
+        }
+        return { success: true as const };
       }),
 
     setEnabled: authorizedProcedure

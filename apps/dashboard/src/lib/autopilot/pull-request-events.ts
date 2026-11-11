@@ -124,12 +124,6 @@ export async function handleAutopilotPullRequestEvent(rawBody: string) {
     owner: event.repository.owner.login,
     repo: event.repository.name,
   });
-  // One look per pull request even when several workspaces share the install.
-  const eligible = organizations[0];
-  if (!eligible) {
-    return;
-  }
-  const { organizationId } = eligible;
   const pull = toMergedPullRequest(event.repository.full_name, {
     number: pr.number,
     title: pr.title,
@@ -137,25 +131,39 @@ export async function handleAutopilotPullRequestEvent(rawBody: string) {
     body: pr.body ?? null,
     author: pr.user?.login ?? null,
   });
-  const existing = await findFindingByFingerprint(
-    organizationId,
-    commitFingerprint(pull)
+  const candidates = await Promise.all(
+    organizations.map(async (organization) => ({
+      ...organization,
+      existing: await findFindingByFingerprint(
+        organization.organizationId,
+        commitFingerprint(pull)
+      ),
+    }))
   );
   if (moment === "closed") {
-    if (
-      existing &&
-      ["proposed", "suggested", "open", "failed"].includes(existing.status)
-    ) {
-      // The feature is gone, so is its post.
-      await dismissFinding(organizationId, existing.id).catch(() => undefined);
-      logInfo("autopilot.pull_request_closed", {
-        organizationId,
-        pullRequest: `${pull.repository}#${pull.number}`,
-        finding: existing.id,
-      });
+    for (const { organizationId, existing } of candidates) {
+      if (
+        existing &&
+        ["proposed", "suggested", "open", "failed"].includes(existing.status)
+      ) {
+        await dismissFinding(organizationId, existing.id).catch(
+          () => undefined
+        );
+        logInfo("autopilot.pull_request_closed", {
+          organizationId,
+          pullRequest: `${pull.repository}#${pull.number}`,
+          finding: existing.id,
+        });
+      }
     }
     return;
   }
+  const eligible =
+    candidates.find((candidate) => candidate.existing) ?? candidates[0];
+  if (!eligible) {
+    return;
+  }
+  const { organizationId, existing } = eligible;
   if (
     existing &&
     !(
@@ -181,7 +189,9 @@ export async function handleAutopilotPullRequestEvent(rawBody: string) {
     },
     pull,
     getOctokit: () =>
-      getInstallationOctokit(organizationId, event.repository.owner.login),
+      getInstallationOctokit(organizationId, event.repository.owner.login, [
+        event.repository.name,
+      ]),
   });
   if (skipped) {
     // Like a chore title: a filtered pull request never becomes a run.

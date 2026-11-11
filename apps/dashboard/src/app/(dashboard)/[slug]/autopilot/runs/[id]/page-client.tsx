@@ -1,6 +1,5 @@
 "use client";
 
-import { useFlag } from "@databuddy/sdk/react";
 import { GitPullRequestIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { PageHeading } from "@notra/ui/components/shared/page-heading";
@@ -18,7 +17,6 @@ import {
 } from "@/components/autopilot/autopilot-run-panel";
 import { AutopilotRunTimeline } from "@/components/autopilot/autopilot-run-timeline";
 import { AutopilotStopButton } from "@/components/autopilot/autopilot-stop-button";
-import { AutopilotWorkflowGraph } from "@/components/autopilot/autopilot-workflow-graph";
 import { EmptyState } from "@/components/empty-state";
 import { SiteBuildLogs } from "@/components/sites/site-build-logs";
 import {
@@ -26,14 +24,15 @@ import {
   AUTOPILOT_RUN_LOG_TAGS,
   AUTOPILOT_RUN_SECTIONS,
   AUTOPILOT_RUN_STATUS_BADGES,
+  AUTOPILOT_POLL_INTERVAL_MS,
   AUTOPILOT_RUN_TRIGGER_LABELS,
-  AUTOPILOT_WORKFLOW_GRAPH_FLAG_KEY,
 } from "@/constants/autopilot";
 import { AUTOPILOT_RUN_RESULT_CLASS } from "@/constants/autopilot-ui";
 import { SITE_DEPLOYMENT_LOG_SURFACE_CLASS } from "@/constants/sites";
 import { dashboardOrpc } from "@/lib/orpc/query";
 import { cn } from "@/lib/utils";
 import type {
+  AutopilotRunByIdLoaderProps,
   AutopilotRunEndNoticeProps,
   AutopilotRunLogProps,
   AutopilotRunPageClientProps,
@@ -47,6 +46,14 @@ import {
   runEventsRefetchInterval,
   sumEventTokens,
 } from "@/utils/autopilot-events";
+import dynamic from "@/utils/lazy-component";
+import { isNotFoundError } from "@/utils/orpc-errors";
+
+const AutopilotWorkflowGraph = dynamic(() =>
+  import("@/components/autopilot/autopilot-workflow-graph").then(
+    (module) => module.AutopilotWorkflowGraph
+  )
+);
 
 export default function PageClient({
   organizationSlug,
@@ -62,19 +69,48 @@ export default function PageClient({
             organizationId={organizationId}
             organizationSlug={organizationSlug}
             run={run}
+            workflowGraph={overview.workflowGraph}
           />
         ) : (
-          <>
-            <AutopilotBackLink slug={organizationSlug} tab="analytics" />
-            <EmptyState
-              description="This run is older than the runs Autopilot keeps on the page."
-              title="Run not found"
-            />
-          </>
+          <RunByIdLoader
+            canManage={overview.canManage}
+            organizationId={organizationId}
+            organizationSlug={organizationSlug}
+            runId={runId}
+            workflowGraph={overview.workflowGraph}
+          />
         );
       }}
     </AutopilotPageShell>
   );
+}
+
+function RunByIdLoader({ runId, ...props }: AutopilotRunByIdLoaderProps) {
+  const query = useQuery({
+    ...dashboardOrpc.autopilot.run.queryOptions({
+      input: { organizationId: props.organizationId, runId },
+      refetchInterval: (current) =>
+        current.state.data?.status === "running"
+          ? AUTOPILOT_POLL_INTERVAL_MS
+          : false,
+    }),
+    retry: (failures, error) => !isNotFoundError(error) && failures < 1,
+  });
+  if (query.isPending) {
+    return <Skeleton className="h-32 rounded-2xl" />;
+  }
+  if (!query.data) {
+    return (
+      <>
+        <AutopilotBackLink slug={props.organizationSlug} tab="analytics" />
+        <EmptyState
+          description="There is no run at this address."
+          title="Run not found"
+        />
+      </>
+    );
+  }
+  return <RunPage {...props} run={query.data} />;
 }
 
 function RunSummary({ events, run }: AutopilotRunSummaryProps) {
@@ -217,12 +253,10 @@ function RunPage({
   organizationId,
   organizationSlug,
   run,
+  workflowGraph,
 }: AutopilotRunPageProps) {
   const format = useFormatter();
-  const graphFlag = useFlag(AUTOPILOT_WORKFLOW_GRAPH_FLAG_KEY);
-  const showGraph =
-    Boolean(run.workflowKey) &&
-    (graphFlag.on || process.env.NODE_ENV === "development");
+  const showGraph = Boolean(run.workflowKey) && workflowGraph;
   const running = run.status === "running";
   const query = useQuery(
     dashboardOrpc.autopilot.runEvents.queryOptions({

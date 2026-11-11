@@ -188,6 +188,25 @@ export async function stopWorkflowRun(
     );
 }
 
+export async function workflowRunTreeHasErrors(
+  organizationId: string,
+  rootRunId: string
+) {
+  const [row] = await db
+    .select({ id: workflowRunNodes.id })
+    .from(workflowRunNodes)
+    .innerJoin(workflowRuns, eq(workflowRuns.id, workflowRunNodes.runId))
+    .where(
+      and(
+        eq(workflowRuns.organizationId, organizationId),
+        sql`(${workflowRuns.id} = ${rootRunId} or ${workflowRuns.rootRunId} = ${rootRunId})`,
+        sql`(${workflowRunNodes.status} = 'error' or exists (select 1 from jsonb_each(${workflowRunNodes.steps}) as step where step.value->>'status' = 'error'))`
+      )
+    )
+    .limit(1);
+  return row !== undefined;
+}
+
 export async function failWorkflowRunTrees(
   organizationId: string,
   rootRunIds: string[],
@@ -208,13 +227,13 @@ export async function failWorkflowRunTrees(
     );
 }
 
-export async function isWorkflowRunStopped(runId: string) {
+export async function isWorkflowRunHalted(runId: string) {
   const rows = await db
     .select({ id: workflowRuns.id })
     .from(workflowRuns)
     .where(
       and(
-        eq(workflowRuns.status, "stopped"),
+        inArray(workflowRuns.status, ["stopped", "failed"]),
         sql`${workflowRuns.id} = (select coalesce(run.root_run_id, run.id) from workflow_runs as run where run.id = ${runId})`
       )
     )

@@ -1,3 +1,5 @@
+import { DateTime, Option } from "effect";
+
 import type { AutopilotSchedule } from "@/types/autopilot-runtime";
 
 function localParts(date: Date, formatter: Intl.DateTimeFormat) {
@@ -6,6 +8,8 @@ function localParts(date: Date, formatter: Intl.DateTimeFormat) {
   return {
     day: `${get("year")}-${get("month")}-${get("day")}`,
     hour: Number(get("hour")),
+    minute: Number(get("minute")),
+    second: Number(get("second")),
   };
 }
 
@@ -16,6 +20,8 @@ function localFormatter(timezone: string) {
     month: "2-digit",
     day: "2-digit",
     hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
     hourCycle: "h23",
   } as const;
   try {
@@ -37,4 +43,12 @@ export function isAutopilotDue(settings: AutopilotSchedule, now: Date) {
   }
   const last = localParts(settings.lastRunAt, formatter);
   return last.day !== current.day || last.hour < settings.briefHour;
+}
+
+export function autopilotLocalDayStart(timezone: string, now: Date) {
+  const zone = Option.getOrElse(DateTime.zoneMakeNamed(timezone), () =>
+    DateTime.zoneMakeOffset(0)
+  );
+  const zoned = DateTime.setZone(DateTime.makeUnsafe(now), zone);
+  return new Date(DateTime.toEpochMillis(DateTime.startOf(zoned, "day")));
 }

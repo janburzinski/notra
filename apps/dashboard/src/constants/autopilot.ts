@@ -42,6 +42,7 @@ export const AUTOPILOT_PULL_REQUEST_FOOTER =
 export const AUTOPILOT_READINESS_MAX_AGE_MS = 20 * 60 * 60 * 1000;
 export const AUTOPILOT_READINESS_SCAN_WAIT_MS = 4 * 60 * 1000;
 export const AUTOPILOT_READINESS_SCAN_POLL_MS = 5000;
+export const AUTOPILOT_READINESS_DISMISS_COOLDOWN_MS = 30 * 24 * 60 * 60 * 1000;
 
 /**
  * A draft Autopilot closed as stale may come back once this has passed; until
@@ -64,8 +65,6 @@ export const AUTOPILOT_DEFAULT_STALE_PULL_REQUEST_DAYS = 14;
 
 /** "Now" in a pull request's impact is measured over at most this many days after the merge. */
 export const AUTOPILOT_IMPACT_WINDOW_MS = 14 * 24 * 60 * 60 * 1000;
-/** Matches what the overview lists, so every row it shows can get a value. */
-export const AUTOPILOT_IMPACT_MAX_FINDINGS = 100;
 
 /** An open finding whose writer stopped this long ago may be taken over. */
 export const AUTOPILOT_FINDING_CLAIM_LEASE_MS = 30 * 60 * 1000;
@@ -78,6 +77,8 @@ export const AUTOPILOT_LEASE_RENEW_INTERVAL_MS = 60_000;
 export const AUTOPILOT_TRACE_DETAIL_RETENTION_MS = 7 * 24 * 60 * 60 * 1000;
 /** How often a page polls the steps of a run that is still going, so they read as live. */
 export const AUTOPILOT_RUN_EVENTS_LIVE_REFETCH_MS = 1500;
+export const AUTOPILOT_RUN_EVENTS_SLOW_AFTER_MS = 2 * 60_000;
+export const AUTOPILOT_RUN_EVENTS_SLOW_REFETCH_MS = 5000;
 
 export const AUTOPILOT_COMMITS_LOOKBACK_DAYS = 7;
 export const AUTOPILOT_COMMITS_MAX_LOOKBACK_DAYS = 30;
@@ -174,6 +175,9 @@ export const AUTOPILOT_FEEDBACK_INTRO =
 /** Recent offers checked for reactions every five minutes; pending deliveries retry beyond this window. */
 export const AUTOPILOT_REACTION_LOOKBACK_DAYS = 7;
 export const AUTOPILOT_CRON_CONCURRENCY = 8;
+export const AUTOPILOT_CRON_INTERVAL_MINUTES = 5;
+export const AUTOPILOT_DAILY_RUN_MAX_ATTEMPTS = 3;
+export const AUTOPILOT_RUN_RETRY_BACKOFF_MS = 30 * 60 * 1000;
 /** Observations per job handed to the planner each run. */
 export const AUTOPILOT_MAX_OBSERVATIONS = 8;
 /** Dropped candidates listed in the run log; the admin trace keeps all of them. */
@@ -237,6 +241,27 @@ export const AUTOPILOT_WRITER_MAX_POST_PATHS = 200;
 export const AUTOPILOT_WRITER_MAX_OUTPUT_TOKENS = 12_000;
 /** One fresh rewrite for incomplete output, never an unbounded continuation. */
 export const AUTOPILOT_WRITER_MAX_ATTEMPTS = 2;
+export const AUTOPILOT_WRITER_ATTEMPT_TIMEOUT_MS = 6 * 60_000;
+export const AUTOPILOT_REPOSITORY_AGENT_TIMEOUT_MS = 10 * 60_000;
+export const AUTOPILOT_REPOSITORY_AGENT_MAX_OUTPUT_TOKENS = 32_000;
+export const AUTOPILOT_LLM_CALL_TIMEOUT_MS = 3 * 60_000;
+export const AUTOPILOT_UPDATE_MIN_BODY_SHARE = 0.7;
+export const AUTOPILOT_UPDATE_FIXED_FIELDS = [
+  "slug",
+  "permalink",
+  "url",
+  "canonical",
+  "lang",
+  "locale",
+];
+export const AUTOPILOT_RISKY_FIGURE = /^[$€£]|%$|percent$/i;
+export const AUTOPILOT_FRONTMATTER_BLOCK = /^---\r?\n([\s\S]*?)\r?\n---\r?\n?/;
+export const AUTOPILOT_FRONTMATTER_FIELD = /^([\w-]+):\s*(.*)$/;
+export const AUTOPILOT_FRONTMATTER_QUOTED_VALUE = /^(["'])(.*)\1$/;
+export const AUTOPILOT_LINE_BREAK = /\r?\n/;
+export const AUTOPILOT_INTERNAL_REFERENCE =
+  /https?:\/\/\S+|\b[\w.-]+\/[\w.-]+#\d+\b|(?<![\w&])#\d+\b/g;
+export const AUTOPILOT_PLANNER_SLUG_LIMIT = 1000;
 export const AUTOPILOT_DISMISS_MAX_ATTEMPTS = 3;
 
 /**
@@ -268,6 +293,30 @@ export const AUTOPILOT_PROTECTED_PATH_PATTERNS = [
   /(^|\/)\.env/,
   /(^|\/)\.github\//,
   /(^|\/)node_modules\//,
+  /(^|\/)(next|vite|vitest|astro|nuxt|svelte|remix|tsup|tsdown|webpack|rollup|rspack|turbo|gatsby|docusaurus|vue|quasar|eleventy|tailwind|postcss|babel)\.config\.[cm]?[jt]sx?$/,
+  /(^|\/)\.eleventy\.[cm]?js$/,
+  /(^|\/)(vercel|netlify|now|firebase|railway|render|app|fly|turbo)\.(json|toml|ya?ml)$/,
+  /(^|\/)netlify\//,
+  /(^|\/)wrangler\.(json|jsonc|toml)$/,
+  /(^|\/)middleware\.[cm]?[jt]s$/,
+  /(^|\/)\.(husky|circleci|buildkite|devcontainer)\//,
+  /(^|\/)\.gitlab-ci\.ya?ml$/,
+  /(^|\/)(Makefile|Procfile|Justfile)$/,
+  /(^|\/)(Dockerfile|Containerfile)[^/]*$/,
+  /(^|\/)docker-compose[^/]*\.ya?ml$/,
+  /(^|\/)\.(npmrc|yarnrc(\.yml)?|bunfig\.toml|nvmrc|tool-versions)$/,
+  /(^|\/)bunfig\.toml$/,
+];
+
+/** Files no Autopilot agent may read: secrets and credentials that could end up in a draft. */
+export const AUTOPILOT_SECRET_PATH_PATTERNS = [
+  /(^|\/)\.env/,
+  /(^|\/)\.(npmrc|yarnrc(\.yml)?|netrc|pypirc|htpasswd)$/,
+  /(^|\/)\.(ssh|aws|gnupg|docker)\//,
+  /(^|\/)[^/]*(secret|credential|password|private[-_]?key)[^/]*$/i,
+  /\.(pem|key|p12|pfx|jks|keystore|crt|cer|der|asc|gpg)$/i,
+  /(^|\/)id_(rsa|dsa|ecdsa|ed25519)[^/]*$/,
+  /(^|\/)(service[-_]?account|gcloud|firebase-adminsdk)[^/]*\.json$/i,
 ];
 
 export const AUTOPILOT_BLOG_DIRECTORY_HINTS = [

@@ -60,6 +60,7 @@ if (process.env.NOTRA_AUTOPILOT_SANDBOX_TEST !== "1") {
   mock.module("@notra/db/drizzle", () => ({ db }));
   mock.module("@/lib/autopilot/flag", () => ({
     isAutopilotEnabledForOrganization: async () => startup.flag,
+    autopilotFlagState: async () => (startup.flag ? "enabled" : "disabled"),
   }));
   const emptyJob = async () => ({ findingIds: [], insights: [] });
   const notRun = async () => {
@@ -593,6 +594,27 @@ if (process.env.NOTRA_AUTOPILOT_SANDBOX_TEST !== "1") {
         })
       )?.status
     ).toBe("failed");
+    expect(
+      (await db.query.autopilotSettings.findFirst())?.lastRunAt?.getTime()
+    ).toBe(old.getTime());
+  });
+
+  test("a run whose only drafts failed leaves the daily schedule to retry", async () => {
+    await db
+      .insert(autopilotSettings)
+      .values({ organizationId: "sandbox-org", lastRunAt: old });
+    const claim = await claimFinding("sandbox-org", "item-run", proposal);
+    if (!claim) {
+      throw new Error("Expected a claim");
+    }
+    await markFindingFailed(claim, "Writer timed out");
+    await finishAutopilotRun({
+      organizationId: "sandbox-org",
+      runId: "item-run",
+      results: [],
+      slackMessageTs: null,
+      error: "Writer timed out",
+    });
     expect(
       (await db.query.autopilotSettings.findFirst())?.lastRunAt?.getTime()
     ).toBe(old.getTime());

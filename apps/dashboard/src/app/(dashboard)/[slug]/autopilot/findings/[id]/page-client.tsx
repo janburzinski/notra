@@ -35,6 +35,7 @@ import { useAutopilotActions } from "@/lib/hooks/use-autopilot";
 import { dashboardOrpc } from "@/lib/orpc/query";
 import { cn } from "@/lib/utils";
 import type {
+  AutopilotFindingByIdLoaderProps,
   AutopilotFindingCandidate,
   AutopilotFindingPageClientProps,
   AutopilotFindingPageProps,
@@ -46,6 +47,7 @@ import {
 } from "@/utils/autopilot-events";
 import { describeFindingReason } from "@/utils/autopilot-findings";
 import { describeImpact } from "@/utils/autopilot-impact";
+import { isNotFoundError } from "@/utils/orpc-errors";
 import { tableHeightFor } from "@/utils/table";
 
 export default function PageClient({
@@ -64,17 +66,43 @@ export default function PageClient({
             overview={overview}
           />
         ) : (
-          <>
-            <AutopilotBackLink slug={organizationSlug} tab="pull-requests" />
-            <EmptyState
-              description="It is older than what Autopilot keeps on the page."
-              title="Not found"
-            />
-          </>
+          <FindingByIdLoader
+            findingId={findingId}
+            organizationId={organizationId}
+            organizationSlug={organizationSlug}
+            overview={overview}
+          />
         );
       }}
     </AutopilotPageShell>
   );
+}
+
+function FindingByIdLoader({
+  findingId,
+  ...props
+}: AutopilotFindingByIdLoaderProps) {
+  const query = useQuery({
+    ...dashboardOrpc.autopilot.finding.queryOptions({
+      input: { organizationId: props.organizationId, findingId },
+    }),
+    retry: (failures, error) => !isNotFoundError(error) && failures < 1,
+  });
+  if (query.isPending) {
+    return <Skeleton className="h-32 rounded-2xl" />;
+  }
+  if (!query.data) {
+    return (
+      <>
+        <AutopilotBackLink slug={props.organizationSlug} tab="pull-requests" />
+        <EmptyState
+          description="There is nothing at this address."
+          title="Not found"
+        />
+      </>
+    );
+  }
+  return <FindingPage {...props} finding={query.data} />;
 }
 
 /**
@@ -95,8 +123,10 @@ function FindingPage({
     null
   );
   const impact = useQuery(
-    dashboardOrpc.autopilot.impact.queryOptions({ input: { organizationId } })
-  ).data?.[finding.id];
+    dashboardOrpc.autopilot.impact.queryOptions({
+      input: { organizationId, findingId: finding.id },
+    })
+  ).data;
   const events = useQuery({
     ...dashboardOrpc.autopilot.runEvents.queryOptions({
       input: { organizationId, runId: finding.runId ?? "" },

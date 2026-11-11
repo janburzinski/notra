@@ -1,4 +1,8 @@
-import { AUTOPILOT_FACT_MIN_QUOTE_CHARS } from "@/constants/autopilot-style";
+import {
+  AUTOPILOT_FACT_MIN_QUOTE_CHARS,
+  AUTOPILOT_FIGURE_PARTS,
+  AUTOPILOT_FIGURE_UNIT_ALIASES,
+} from "@/constants/autopilot-style";
 import type {
   AutopilotFactClaim,
   AutopilotFactSource,
@@ -54,14 +58,26 @@ export function quoteIsInSource(
   });
 }
 
+function figureValue(figure: string) {
+  const [, currency = "", digits = "", unit = ""] =
+    AUTOPILOT_FIGURE_PARTS.exec(figure.trim().toLowerCase()) ?? [];
+  const value = Number(digits.replaceAll(",", ""));
+  return `${currency}${Number.isFinite(value) ? value : digits}${AUTOPILOT_FIGURE_UNIT_ALIASES[unit] ?? unit}`;
+}
+
 /** Figures on the page that no source contains, for a person to check. */
 export function unsourcedFigures(
   content: string,
   sources: readonly AutopilotFactSource[]
 ) {
-  const all = squash(sources.map((source) => source.text).join(" "));
+  const text = sources.map((source) => source.text).join(" ");
+  const all = squash(text);
+  const values = new Set((text.match(FIGURE) ?? []).map(figureValue));
   const figures = new Set(
     (content.match(FIGURE) ?? []).map((figure) => figure.trim())
   );
-  return [...figures].filter((figure) => !all.includes(squash(figure)));
+  return [...figures].filter(
+    (figure) =>
+      !(all.includes(squash(figure)) || values.has(figureValue(figure)))
+  );
 }

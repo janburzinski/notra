@@ -19,14 +19,23 @@ import {
   AUTOPILOT_CONTEXT_FILE_MAX_CHARS,
   AUTOPILOT_FAILURE_LABELS,
   AUTOPILOT_FINDING_MAX_FAILURES,
+  AUTOPILOT_FRONTMATTER_BLOCK,
+  AUTOPILOT_FRONTMATTER_FIELD,
+  AUTOPILOT_FRONTMATTER_QUOTED_VALUE,
   AUTOPILOT_MAX_OBSERVATIONS,
+  AUTOPILOT_PLANNER_SLUG_LIMIT,
   AUTOPILOT_JEV_MODEL_ID,
   AUTOPILOT_JEV_NONE_CHOICE,
   AUTOPILOT_JEV_WORTH_CHOICE,
+  AUTOPILOT_INTERNAL_REFERENCE,
   AUTOPILOT_MARKDOWN_FILE as MARKDOWN_FILE,
+  AUTOPILOT_LINE_BREAK,
   AUTOPILOT_LOG_DROPPED_MAX,
   AUTOPILOT_REACTION_LOOKBACK_DAYS,
   AUTOPILOT_PULL_REQUEST_CREATED_EVENT,
+  AUTOPILOT_RISKY_FIGURE,
+  AUTOPILOT_UPDATE_FIXED_FIELDS,
+  AUTOPILOT_UPDATE_MIN_BODY_SHARE,
 } from "@/constants/autopilot";
 import { commitFilterSkipReason } from "@/lib/autopilot/commit-filters";
 import {
@@ -101,6 +110,7 @@ import {
 } from "@/utils/autopilot-blog";
 import { autopilotDraftBranchSlug } from "@/utils/autopilot-branches";
 import { excludedAuthorReason } from "@/utils/autopilot-commit-filters";
+import { unsourcedFigures } from "@/utils/autopilot-facts";
 import {
   heroImageLocation,
   imageFrontmatterFields,
@@ -149,7 +159,7 @@ export async function listBlogPostPaths(ctx: AutopilotRunContext) {
       (path) => path.startsWith(`${directory}/`) && MARKDOWN_FILE.test(path)
     )
     .map((path) => path.slice(directory.length + 1).replace(MARKDOWN_FILE, ""))
-    .slice(-60);
+    .slice(-AUTOPILOT_PLANNER_SLUG_LIMIT);
 }
 
 /**
@@ -289,6 +299,48 @@ async function openPageUpdate(params: {
   return pullRequest;
 }
 
+function frontmatterFields(content: string) {
+  const match = AUTOPILOT_FRONTMATTER_BLOCK.exec(content);
+  const fields = new Map<string, string>();
+  for (const line of (match?.[1] ?? "").split(AUTOPILOT_LINE_BREAK)) {
+    const field = AUTOPILOT_FRONTMATTER_FIELD.exec(line);
+    if (field?.[1]) {
+      const value = (field[2] ?? "").trim();
+      fields.set(
+        field[1],
+        AUTOPILOT_FRONTMATTER_QUOTED_VALUE.exec(value)?.[2] ?? value
+      );
+    }
+  }
+  return { fields, body: match ? content.slice(match[0].length) : content };
+}
+
+function pageUpdateProblem(original: string, next: string) {
+  const before = frontmatterFields(original);
+  const after = frontmatterFields(next);
+  const dropped = [...before.fields.keys()].filter(
+    (field) => !after.fields.has(field)
+  );
+  if (dropped.length > 0) {
+    return `The update removed frontmatter fields: ${dropped.join(", ")}`;
+  }
+  const moved = AUTOPILOT_UPDATE_FIXED_FIELDS.filter(
+    (field) =>
+      before.fields.has(field) &&
+      before.fields.get(field) !== after.fields.get(field)
+  );
+  if (moved.length > 0) {
+    return `The update changed the page address: ${moved.join(", ")}`;
+  }
+  if (
+    after.body.trim().length <
+    before.body.trim().length * AUTOPILOT_UPDATE_MIN_BODY_SHARE
+  ) {
+    return "The update dropped too much of the page";
+  }
+  return null;
+}
+
 /**
  * The writer's draft, made publishable: no em or en dashes in what it wrote,
  * and for a comparison page every claim checked against its sources.
@@ -298,7 +350,8 @@ async function finishPost(params: {
   log: AutopilotLogger;
   post: BlogFile;
   previous: string | null;
-  factCheck: { competitor: string; sources: AutopilotFactSource[] } | null;
+  sources: AutopilotFactSource[];
+  factCheck: { competitor: string } | null;
   onUsage?: (usage: AgentTokenUsage) => void;
 }): Promise<BlogFile> {
   const { ctx, log } = params;
@@ -309,13 +362,31 @@ async function finishPost(params: {
       organizationId: ctx.organizationId,
       log,
       content,
-      sources: params.factCheck.sources,
+      sources: params.sources,
       brand: ctx.brand?.name ?? "the brand",
       competitor: params.factCheck.competitor,
       onUsage: params.onUsage,
     });
     content = checked.content;
     pullRequestBody = `${pullRequestBody.trim()}\n\n${factCheckSection(checked.report)}`;
+  }
+  const invented = unsourcedFigures(content, [
+    ...params.sources,
+    ...(params.previous ? [{ label: "page", text: params.previous }] : []),
+  ]);
+  const risky = invented.filter((figure) =>
+    AUTOPILOT_RISKY_FIGURE.test(figure)
+  );
+  if (risky.length > 0) {
+    await log.error("The draft has prices or percentages no source contains", {
+      reason: risky,
+    });
+    throw new Error(
+      `The draft states figures no source contains: ${risky.join(", ")}`
+    );
+  }
+  if (!params.factCheck && invented.length > 0) {
+    pullRequestBody = `${pullRequestBody.trim()}\n\n**Figures no source contains, please check**\n${invented.map((figure) => `\`${figure}\``).join(" · ")}`;
   }
   content = await removeNewDashes({
     organizationId: ctx.organizationId,
@@ -344,6 +415,10 @@ export async function writeBlogDraft(params: {
   const findingId = claim.finding.id;
   if (!ctx.repository) {
     throw new Error("No website repository connected");
+  }
+  if (!(await sourcePullRequestAllowsPost(claim))) {
+    await log.skip("The feature pull request was closed without merging");
+    return { kind: "dropped" };
   }
   const octokit = await getRepositoryOctokit(
     ctx.organizationId,
@@ -397,7 +472,7 @@ export async function writeBlogDraft(params: {
     brief,
     existing,
     writingRules: await loadWritingRules(ctx.organizationId),
-    onSource: comparison ? (source) => sources.push(source) : undefined,
+    onSource: (source) => sources.push(source),
     onUsage: params.onUsage,
   });
   const post = await finishPost({
@@ -405,24 +480,29 @@ export async function writeBlogDraft(params: {
     log,
     post: written,
     previous: existing?.content ?? null,
+    sources: [
+      {
+        label: "brand description",
+        text: `${ctx.brand?.name ?? ""}: ${ctx.brand?.description ?? ""}`,
+      },
+      { label: "brief", text: brief.evidence },
+      ...sources,
+    ],
     factCheck: comparison
       ? {
           competitor:
             claim.finding.evidence.comparison?.competitor ?? "the competitor",
-          sources: [
-            {
-              label: "brand description",
-              text: `${ctx.brand?.name ?? ""}: ${ctx.brand?.description ?? ""}`,
-            },
-            { label: "brief", text: brief.evidence },
-            ...sources,
-          ],
         }
       : null,
     onUsage: params.onUsage,
   });
   if (existing) {
     assertNoActiveContent(existing.path, existing.content, post.content);
+    const problem = pageUpdateProblem(existing.content, post.content);
+    if (problem) {
+      await log.error("Rejected the page update", { reason: problem });
+      throw new Error(problem);
+    }
     return { kind: "update", baseSha, post, existingPath: existing.path };
   }
 
@@ -512,6 +592,9 @@ export async function openBlogDraftPullRequest(params: {
   const { ctx, claim, draft, hero, log } = params;
   if (!ctx.repository) {
     throw new Error("No website repository connected");
+  }
+  if (draft.kind === "dropped") {
+    return null;
   }
   const octokit = await getRepositoryOctokit(
     ctx.organizationId,
@@ -1108,14 +1191,16 @@ async function listRecentMergedPullRequests(
         ) ||
         excludedAuthorReason(ctx.commitFilters, pull.user?.login ?? null) !==
           null;
-      const toPull = (pull: (typeof candidates)[number]) =>
-        toMergedPullRequest(repository.fullName, {
+      const toPull = (pull: (typeof candidates)[number]) => ({
+        ...toMergedPullRequest(repository.fullName, {
           number: pull.number,
           title: pull.title,
           url: pull.html_url,
           body: pull.body ?? null,
           author: pull.user?.login ?? null,
-        });
+        }),
+        private: repository.private,
+      });
       const eligible = candidates
         .filter((pull) => !isOut(pull))
         .map((pull, index) => ({
@@ -1482,7 +1567,9 @@ function commitProposal(pull: MergedPullRequest) {
       topic: pull.title,
       angle:
         "Explain what changed for users, why it matters and how to use it.",
-      evidence: `Based on ${pull.repository}#${pull.number}: ${pull.title}\n\n${pull.body}`,
+      evidence: pull.private
+        ? `Based on an internal pull request: ${pull.title}\n\n${pull.body.replace(AUTOPILOT_INTERNAL_REFERENCE, "")}`
+        : `Based on ${pull.repository}#${pull.number}: ${pull.title}\n\n${pull.body}`,
     },
   };
 }

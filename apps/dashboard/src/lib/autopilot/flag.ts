@@ -6,20 +6,28 @@ import {
   AUTOPILOT_WORKFLOW_GRAPH_FLAG_KEY,
 } from "@/constants/autopilot";
 import { resolveGeoFlagState } from "@/lib/geo/flag";
+import type { GeoFlagState } from "@/types/geo";
 
-function isFlagEnabled(
+function flagState(
   flagKey: string,
   organizationId: string
-): Promise<boolean> {
+): Promise<GeoFlagState> {
   if (process.env.NODE_ENV === "development") {
-    return Promise.resolve(true);
+    return Promise.resolve("enabled");
   }
   return Effect.runPromise(
     resolveGeoFlagState(flagKey, organizationId).pipe(
-      Effect.timeout(AUTOPILOT_FLAG_TIMEOUT_MS),
-      Effect.map((state) => state === "enabled")
+      Effect.timeout(AUTOPILOT_FLAG_TIMEOUT_MS)
     )
-  ).catch(() => false);
+  ).catch((): GeoFlagState => "unavailable");
+}
+
+async function isFlagEnabled(flagKey: string, organizationId: string) {
+  return (await flagState(flagKey, organizationId)) === "enabled";
+}
+
+export function autopilotFlagState(organizationId: string) {
+  return flagState(AUTOPILOT_FLAG_KEY, organizationId);
 }
 
 export function isAutopilotEnabledForOrganization(organizationId: string) {

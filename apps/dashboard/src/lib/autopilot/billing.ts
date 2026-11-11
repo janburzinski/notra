@@ -6,6 +6,7 @@ import {
 } from "@notra/ai/billing/github-mention-billing";
 import type { AgentTokenUsage } from "@notra/ai/types/agents";
 import type { GitHubMentionBillingReservation } from "@notra/ai/types/billing";
+import { logError } from "@notra/ai/utils/server-log";
 
 import { AUTOPILOT_CREDITS_CHARGED_EVENT } from "@/constants/autopilot";
 import {
@@ -44,7 +45,12 @@ export async function settleAutopilotBilling(params: {
       });
     }
     return credits;
-  } catch {
+  } catch (error) {
+    logError("[Autopilot] Credit settlement failed", error, {
+      charge: params.charge,
+      lockId: params.reservation.lockId,
+      ...params.properties,
+    });
     return 0;
   }
 }

@@ -3,6 +3,7 @@ import {
   getGitHubAppWebhookSecret,
   ingestGitHubAppMentionWebhook,
 } from "@notra/ai/utils/github-mention-ingest";
+import { verifyGitHubWebhookSignature } from "@notra/ai/utils/github-webhook-signature";
 
 import { SITES_ONLY_GITHUB_EVENTS } from "@/constants/sites";
 import { afterResponse } from "@/lib/framework/after-response";
@@ -58,6 +59,20 @@ export const POST = withEvlog(async (request: Request) => {
     }
   }
 
+  if (
+    event === "pull_request" &&
+    secret &&
+    verifyGitHubWebhookSignature(rawBody, signature, secret)
+  ) {
+    if (!deliveryId) {
+      return Response.json(
+        { error: "GitHub delivery ID is required" },
+        { status: 400 }
+      );
+    }
+    await startAutopilotPullRequestWorkflowRun({ rawBody, deliveryId });
+  }
+
   const result = await ingestGitHubAppMentionWebhook({
     allowEditedFeedback: true,
     event,
@@ -69,18 +84,6 @@ export const POST = withEvlog(async (request: Request) => {
 
   if (result.context) {
     await startGitHubMentionRun(result.context);
-  }
-
-  // Signature checked by the ingest above; ready, merged and closed PRs get Autopilot's look.
-  if (event === "pull_request" && result.httpStatus < 400) {
-    if (!deliveryId) {
-      return Response.json(
-        { error: "GitHub delivery ID is required" },
-        { status: 400 }
-      );
-    }
-    // Await durable enqueue: a queue failure must remain retryable by GitHub.
-    await startAutopilotPullRequestWorkflowRun({ rawBody, deliveryId });
   }
 
   if (result.log && !result.context) {

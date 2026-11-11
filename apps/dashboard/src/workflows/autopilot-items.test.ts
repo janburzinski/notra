@@ -46,8 +46,17 @@ if (process.env.NOTRA_AUTOPILOT_ITEM_WORKFLOW_TEST !== "1") {
   mock.module("@notra/ai/evlog", () => ({
     withEvlog: (handler: unknown) => handler,
   }));
+  mock.module("@notra/sites-server/webhooks", () => ({
+    handleSitesWebhook: async () => null,
+  }));
+  mock.module("@/lib/sites/dispatch", () => ({
+    dispatchSiteJobs: async () => undefined,
+  }));
+  mock.module("@notra/ai/utils/github-webhook-signature", () => ({
+    verifyGitHubWebhookSignature: () => httpStatus !== 401,
+  }));
   mock.module("@notra/ai/utils/github-mention-ingest", () => ({
-    getGitHubAppWebhookSecret: () => null,
+    getGitHubAppWebhookSecret: () => "secret",
     ingestGitHubAppMentionWebhook: async () => ({
       httpStatus,
       body: { accepted: httpStatus < 400 },

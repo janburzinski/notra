@@ -11,6 +11,7 @@ export const AUTOPILOT_PLANNER_MODEL_ID = AGENT_DEFAULT_MODEL;
  * Thinking takes most of it: a busy week of merges measured 6.6k to 9.5k
  * output tokens, so 8k cut real plans off.
  */
+export const AUTOPILOT_PLANNER_TIMEOUT_MS = 8 * 60_000;
 export const AUTOPILOT_PLANNER_MAX_OUTPUT_TOKENS = 16_000;
 /**
  * A plan that still runs out of tokens is asked again with less thinking.

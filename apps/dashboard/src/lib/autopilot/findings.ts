@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
 
 import { resolveGitHubMentionAuth } from "@notra/ai/utils/github-mention-auth";
+import { githubStatus } from "@notra/ai/utils/github-pr-commit";
 import { AUTOPILOT_SCHEDULED_TRIGGERS } from "@notra/db/constants/autopilot";
 import { db } from "@notra/db/drizzle";
 import {
@@ -13,6 +14,7 @@ import {
   asc,
   desc,
   eq,
+  gt,
   gte,
   inArray,
   isNotNull,
@@ -31,6 +33,7 @@ import {
   AUTOPILOT_EXPIRED_COOLDOWN_MS,
   AUTOPILOT_FINDING_CLAIM_LEASE_MS,
   AUTOPILOT_FINDING_MAX_FAILURES,
+  AUTOPILOT_READINESS_DISMISS_COOLDOWN_MS,
   AUTOPILOT_RUN_LEASE_MS,
 } from "@/constants/autopilot";
 import {
@@ -40,7 +43,10 @@ import {
 } from "@/constants/autopilot-findings";
 import { AUTOPILOT_FINDING_TRANSITIONS } from "@/constants/autopilot-transitions";
 import { AUTOPILOT_MERGE_METHOD_LABELS } from "@/constants/autopilot-ui";
-import { getRepositoryOctokit } from "@/lib/autopilot/github";
+import {
+  AutopilotRepositoryAccessError,
+  getRepositoryOctokit,
+} from "@/lib/autopilot/github";
 import { rememberFeedback } from "@/lib/autopilot/memory";
 import { findingTransition, runTransition } from "@/lib/autopilot/transitions";
 import {
@@ -250,6 +256,29 @@ export async function markFindingProposed(
     .where(heldBy(claim, "proposed"))
     .returning({ id: autopilotFindings.id });
   return rows.length > 0;
+}
+
+export async function advanceFindingHeadSha(params: {
+  organizationId: string;
+  repository: string;
+  pullRequestNumber: number;
+  branch: string;
+  fromSha: string;
+  toSha: string;
+}) {
+  await db
+    .update(autopilotFindings)
+    .set({ headSha: params.toSha })
+    .where(
+      and(
+        eq(autopilotFindings.organizationId, params.organizationId),
+        eq(autopilotFindings.status, "proposed"),
+        eq(autopilotFindings.repository, params.repository),
+        eq(autopilotFindings.pullRequestNumber, params.pullRequestNumber),
+        eq(autopilotFindings.branch, params.branch),
+        eq(autopilotFindings.headSha, params.fromSha)
+      )
+    );
 }
 
 export async function markFindingSuggested(claim: FindingClaim) {
@@ -754,7 +783,11 @@ export async function listDismissedReadinessIssueIds(organizationId: string) {
       and(
         eq(autopilotFindings.organizationId, organizationId),
         eq(autopilotFindings.kind, "readiness"),
-        eq(autopilotFindings.status, "dismissed")
+        eq(autopilotFindings.status, "dismissed"),
+        gt(
+          autopilotFindings.dismissedAt,
+          new Date(Date.now() - AUTOPILOT_READINESS_DISMISS_COOLDOWN_MS)
+        )
       )
     );
   return new Set(rows.flatMap((row) => row.evidence.issueIds ?? []));
@@ -1025,8 +1058,26 @@ export async function syncFindingPullRequests(organizationId: string) {
       if (state.status !== "open") {
         await deleteAutopilotBranch(octokit, ref, finding.branch);
       }
-    } catch {
-      // GitHub access can lapse; the next sync retries.
+    } catch (error) {
+      if (
+        error instanceof AutopilotRepositoryAccessError ||
+        [404, 422].includes(githubStatus(error) ?? 0)
+      ) {
+        await db
+          .update(autopilotFindings)
+          .set({
+            status: "expired",
+            dismissedAt: new Date(),
+            claimToken: null,
+          })
+          .where(
+            and(
+              eq(autopilotFindings.id, finding.id),
+              eq(autopilotFindings.pullRequestNumber, ref.pullNumber),
+              findingTransition("expired", ["proposed"])
+            )
+          );
+      }
     }
   }
 }
