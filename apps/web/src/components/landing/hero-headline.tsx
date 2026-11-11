@@ -22,9 +22,17 @@ import type {
 const ICON_SLOT_CLASS =
   "relative ml-[0.22em] inline-flex size-[1cap] shrink-0 items-center justify-center overflow-visible align-baseline";
 
-const ICON_SWAP = tween("slower", "emphasizedInOut");
-const ICON_HIDDEN = { opacity: 0, transform: "scale(0.94)" } as const;
-const ICON_SHOWN = { opacity: 1, transform: "scale(1)" } as const;
+const ICON_SWAP = tween("slower", "emphasized");
+const ICON_HIDDEN = {
+  opacity: 0,
+  transform: "scale(0.94)",
+  filter: "blur(2px)",
+} as const;
+const ICON_SHOWN = {
+  opacity: 1,
+  transform: "scale(1)",
+  filter: "blur(0px)",
+} as const;
 
 function subscribeIsClient() {
   return () => {};
@@ -67,7 +75,7 @@ function EngineMark({
   animated,
 }: Pick<HeroCycleWord, "engine"> & { animated: boolean }) {
   return (
-    <CycleMark animated={animated} markKey={engine}>
+    <CycleMark animated={animated} className="ml-0" markKey={engine}>
       <LandingEngineIcon className="size-full" engine={engine} />
     </CycleMark>
   );
