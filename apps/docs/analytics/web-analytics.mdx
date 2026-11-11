@@ -1,13 +1,13 @@
 ---
 title: "Web analytics"
-sidebarTitle: "Web analytics"
+sidebarTitle: "Overview"
 description: "See the people visiting your site: visitors, page views, top pages, referrers and UTM campaigns, countries, devices, outbound links and Core Web Vitals, next to your AI traffic."
 authors:
   - handle: jan
 
 docolin:
   schema_version: 1
-  kind: tools/notra/ai-traffic/web-analytics
+  kind: tools/notra/analytics/web-analytics
   type: how-to
   applies_to:
     - notra
@@ -17,7 +17,7 @@ docolin:
 
 Web analytics counts the people who read your site: how many came, which pages they opened, where they came from and how fast your pages loaded for them. Because Notra also tracks AI traffic, it shows how many of those people arrived from an AI answer such as ChatGPT or Perplexity, and what they did next.
 
-Web analytics is included in every workspace. The script sets no cookies and stores nothing in the browser.
+Web analytics is included in every workspace, and the script sets no cookies and stores nothing in the browser.
 
 <img
   src="/images/ai-traffic/web-analytics-light.webp"
@@ -34,27 +34,27 @@ Web analytics is included in every workspace. The script sets no cookies and sto
 
 <Steps>
   <Step title="Add notra.js to your site">
-    Visitors are counted by the `notra.js` script tag, or by `@usenotra/sdk` in React, Next.js and Astro. Follow [Script tag](/ai-traffic/install/script-tag). Sites hosted with [Notra Sites](/sites/overview) already load `notra.js`, so you can skip this step for them.
+    The `notra.js` script tag counts visitors, as does `@usenotra/sdk` in React, Next.js and Astro, and [Script tag](/analytics/install/script-tag) walks you through adding it. Sites hosted with [Notra Sites](/sites/overview) already load `notra.js`, so you can skip this step for them.
   </Step>
   <Step title="Visit your site">
-    Until the first page view arrives, the **Web** tab shows the install panel with **Awaiting first page view…**. It switches to **Receiving page views since …** once your first visit arrives.
+    Until the first page view arrives, the **Web** tab shows the install panel with **Awaiting first page view…** and switches to **Receiving page views since …** once your first visit arrives.
   </Step>
   <Step title="Import your history (optional)">
-    To fill in the months before you installed the script, import them from Plausible, Vercel Web Analytics, Cloudflare, Rybbit or Databuddy. See [Import your history](/ai-traffic/import-history).
+    To fill in the months before you installed the script, import them from Plausible, Vercel Web Analytics, Cloudflare, Rybbit or Databuddy. See [Import your history](/analytics/import-history).
   </Step>
 </Steps>
 
-The server tracker and log drains only record AI traffic, because they can't tell a person from a bot that sends a browser user agent. To see both, install `notra.js` for people and a [server tracker](/ai-traffic/overview#supported-frameworks) or [log drain](/ai-traffic/overview#log-drains) for AI crawlers. Notra doesn't count anything twice.
+The server tracker and log drains only record AI traffic, because they can't tell a person from a bot that sends a browser user agent. To see both, install `notra.js` for people and a [server tracker](/analytics/overview#supported-frameworks) or [log drain](/analytics/overview#log-drains) for AI crawlers, and Notra doesn't count anything twice.
 
 ## Open web analytics
 
-Open **Analytics** in the sidebar, then the **Web** tab. The **Agent** tab next to it shows [AI crawlers and referrals](/ai-traffic/overview).
+Open **Analytics** in the sidebar, then the **Web** tab. The **Agent** tab next to it shows [AI crawlers and referrals](/analytics/overview).
 
 At the top of the page you can narrow everything below:
 
-- **Date range**: **Today**, **Yesterday**, **Last 7 days**, **Last 14 days**, **Last 30 days** (the default), **Last 90 days**, **Year to date**, or a custom range of up to 366 days.
+- **Date range**: **Today**, **Yesterday**, **Last 7 days**, **Last 14 days**, **Last 30 days** (the default), **Last 90 days**, **Year to date** or a custom range of up to 366 days.
 - **Domain**: shown when the project tracks more than one domain or has Notra Sites traffic. Pick one domain, or choose **Without Notra Sites** to leave your Sites out.
-- **Filter**: pick a page to see only its visits. The filter matches the exact path.
+- **Filter**: pick a page to see only its visits, matched on the exact path.
 
 The **…** menu next to **Filter** has **Download CSV**, **Embed on your site**, **Tracking setup** and **Import history**.
 
@@ -69,7 +69,7 @@ The four numbers at the top compare the selected range with the previous period 
 | **From AI answers** | Visitors who arrived from an AI assistant such as ChatGPT, Perplexity, Claude or Gemini |
 | **Avg. time on page** | How long a page stayed visible on screen, on average |
 
-The chart below shows page views per day. Today is drawn as unfinished until the day ends. If you imported history, a marker such as **Plausible → Notra** shows the first day Notra counted on its own.
+The chart below shows page views per day and draws today as unfinished until the day ends. If you imported history, a marker such as **Plausible → Notra** shows the first day Notra counted on its own.
 
 ## Top pages and sources
 
@@ -77,7 +77,7 @@ The chart below shows page views per day. Today is drawn as unfinished until the
 
 **Sources** shows where sessions started. Switch it between:
 
-- **Referrers**: the sites that linked to you, grouped into names such as Google, X, LinkedIn, ChatGPT or Perplexity. Visits without a referrer count as **Direct**. Visits between your own pages don't count as a source.
+- **Referrers**: the sites that linked to you, grouped into names such as Google, X, LinkedIn, ChatGPT or Perplexity. Visits without a referrer count as **Direct**, and visits between your own pages don't count as a source.
 - **UTM parameters**: the **Source**, **Medium**, **Campaign**, **Term** or **Content** of links tagged with `utm_` parameters. Campaign, term and content values that look like an email address, an ID or a token show as `:id`.
 
 ## Countries, devices and AI visitors
@@ -93,7 +93,7 @@ The chart below shows page views per day. Today is drawn as unfinished until the
   className="hidden dark:block rounded-lg border"
 />
 
-- **Countries** counts visitors per country. Notra looks the country up on its own servers. **Unknown** means the country couldn't be determined.
+- **Countries** counts visitors per country, which Notra looks up on its own servers, and **Unknown** means the country couldn't be determined.
 - **Devices** splits visitors into **Desktop**, **Mobile** and **Tablet**. **Unknown** appears for imported days whose source didn't record a device.
 - **What AI visitors do** compares people who came from each AI assistant with **All visitors**. **Pages per visit** is the average number of pages in a session, and **Read further** is the share of sessions that opened at least two pages.
 
@@ -101,10 +101,10 @@ The chart below shows page views per day. Today is drawn as unfinished until the
 
 `notra.js` also reports a few things a server can't see:
 
-- **Outbound links**: clicks on links to other sites, by host and path. Query strings are never kept.
+- **Outbound links**: clicks on links to other sites, by host and path, without query strings.
 - **Languages**: visitors by their browser's main language.
 - **Web vitals**: how fast your pages load and respond for real visitors.
-- **JavaScript errors**: uncaught errors, if you turned on **Report JavaScript errors** when you copied the script tag. This card only appears when there are errors.
+- **JavaScript errors**: uncaught errors, if you turned on **Report JavaScript errors** when you copied the script tag, and this card only appears when there are errors.
 
 <img
   src="/images/ai-traffic/web-analytics-vitals-light.webp"
@@ -132,7 +132,7 @@ When both mobile and desktop visits have data, switch between **All devices**, *
 ## Export and share
 
 - **Download CSV** saves one row per day with human page views, human visitors, AI crawler visits and AI referral visits for the selected range and page.
-- **Embed on your site** puts live visitor charts on your own website. See [Embed analytics](/ai-traffic/embed).
+- **Embed on your site** puts live visitor charts on your own website. See [Embed analytics](/analytics/embed).
 
 ## How Notra counts
 
@@ -142,11 +142,11 @@ When both mobile and desktop visits have data, switch between **All devices**, *
 - **Paths** are stored with any segment that looks like an email address, a UUID, a number of four or more digits or a token replaced by `:id`.
 - **Numbers refresh on their own** while the tab is open. Page views arrive in batches, so a new visit can take a few minutes to show up.
 
-For everything the script sends and stores, see [What is sent](/ai-traffic/install/script-tag#what-is-sent).
+For everything the script sends and stores, see [What is sent](/analytics/install/script-tag#what-is-sent).
 
 ## Notra Sites
 
-Every Notra Site counts its visitors with `notra.js`, served from the site itself. Its traffic appears on the **Web** tab together with your other domains. A Site's own **Analytics** page shows the same numbers for that Site alone.
+Every Notra Site counts its visitors with `notra.js`, served from the site itself, and its traffic appears on the **Web** tab together with your other domains. A Site's own **Analytics** page shows the same numbers for that Site alone.
 
 The same person on a Site and on your main domain counts as two visitors, because Notra recognizes visitors per Site.
 
@@ -154,6 +154,6 @@ The same person on a Site and on your main domain counts as two visitors, becaus
 
 ## Reading web analytics from the API
 
-`GET /v1/projects/{projectId}/geo/traffic/web`, `/geo/traffic/web/breakdowns` and `/geo/traffic/web/utm` return the data on this tab, including `sessions` and `engagedSessions`, which the dashboard doesn't show. They need `traffic.read`. See [Reading website analytics from the API](/ai-traffic/overview#reading-website-analytics-from-the-api).
+`GET /v1/projects/{projectId}/geo/traffic/web`, `/geo/traffic/web/breakdowns` and `/geo/traffic/web/utm` return the data on this tab, including `sessions` and `engagedSessions`, which the dashboard doesn't show. They need `traffic.read`. See [Reading website analytics from the API](/analytics/overview#reading-website-analytics-from-the-api).
 
 </Visibility>

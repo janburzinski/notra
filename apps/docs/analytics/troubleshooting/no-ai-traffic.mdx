@@ -7,7 +7,7 @@ authors:
 
 docolin:
   schema_version: 1
-  kind: tools/notra/ai-traffic/troubleshooting/no-ai-traffic
+  kind: tools/notra/analytics/troubleshooting/no-ai-traffic
   type: how-to
   applies_to:
     - notra
@@ -23,10 +23,10 @@ docolin:
     Rotating the token invalidates every earlier token right away, so update the variable and redeploy.
   </Accordion>
   <Accordion title="Pages are served statically">
-    The tracker runs in middleware, so it never sees pages that a CDN serves without hitting your app. On Astro, use a server adapter.
+    The tracker runs in middleware, so it never sees pages that a CDN serves without hitting your app, so on Astro you need a server adapter.
   </Accordion>
   <Accordion title="The path is excluded">
-    The tracker skips `/api`, framework asset paths and static files by default. See [Tracker reference](/ai-traffic/tracker-reference).
+    The tracker skips `/api`, framework asset paths and static files by default. See [Tracker reference](/analytics/tracker-reference).
   </Accordion>
   <Accordion title="No AI agent has visited yet">
     Crawlers visit on their own schedule, so AI activity on a new or quiet site can take days. To trigger an assistant fetch, ask ChatGPT or Claude to read one of your pages.

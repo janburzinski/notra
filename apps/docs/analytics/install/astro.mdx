@@ -1,13 +1,13 @@
 ---
-title: "Track AI crawlers on Next.js"
-sidebarTitle: "Next.js"
-description: "Install the @usenotra/sdk tracker in a Next.js app to log AI crawlers, AI-cited fetches and AI referrals in Notra."
+title: "Track AI crawlers on Astro"
+sidebarTitle: "Astro"
+description: "Install the @usenotra/sdk tracker in an Astro app to log AI crawlers, AI-cited fetches and AI referrals in Notra."
 authors:
   - handle: dominik
 
 docolin:
   schema_version: 1
-  kind: tools/notra/ai-traffic/install/nextjs
+  kind: tools/notra/analytics/install/astro
   type: how-to
   applies_to:
     - notra
@@ -15,15 +15,15 @@ docolin:
   status: stable
 ---
 
-This guide adds the Notra tracker to a Next.js app, which takes about five minutes and one file, `proxy.ts`.
+This guide adds the Notra tracker to an Astro app in about five minutes and touches one file, `src/middleware.ts`.
 
 <Tip>
-  The **Agent** tab has a **Copy agent prompt** button. Paste it into Claude Code, Cursor or Codex and the agent will do these steps for you.
+  The **Agent** tab has a **Copy agent prompt** button, and when you paste its prompt into Claude Code, Cursor or Codex, the agent does these steps for you.
 </Tip>
 
 <Steps>
   <Step title="Get your token">
-    Open **Analytics** in the GEO sidebar and stay on the **Agent** tab. Until the first event arrives, the page shows **No activity yet** along with the full install panel, which has **Install the package**, **Set your token** and **Add the proxy** sections. Your token appears in the **Set your token** section, and the panel also has a **Copy agent prompt** button that copies an instruction block you can paste into a coding agent.
+    Open **Analytics** in the GEO sidebar and stay on the **Agent** tab. Until the first event arrives, the page shows **No activity yet** with the full install panel, which has **Install the package**, **Set your token** and **Add the proxy** sections. Your token appears in the **Set your token** section, and the panel's **Copy agent prompt** button copies an instruction block you can paste into a coding agent.
 
     <Visibility for="agents">
 
@@ -63,42 +63,34 @@ This guide adds the Notra tracker to a Next.js app, which takes about five minut
     bun add @usenotra/sdk
     ```
     </CodeGroup>
-
-    The package has zero dependencies and no Node APIs in the core, so it runs on edge runtimes.
   </Step>
   <Step title="Set the environment variable">
     Add the token as `NOTRA_GEO_TOKEN` in your site's environment variables, both locally and at your hosting provider, and never hardcode or commit it.
   </Step>
   <Step title="Add the tracker">
-    ```typescript proxy.ts
-    import { createGeoProxy } from "@usenotra/sdk/next";
-    import { after, NextResponse } from "next/server";
+    ```typescript src/middleware.ts
+    import { createGeoMiddleware } from "@usenotra/sdk/astro";
 
-    const geo = createGeoProxy({
-      token: process.env.NOTRA_GEO_TOKEN!,
+    export const onRequest = createGeoMiddleware({
+      token: import.meta.env.NOTRA_GEO_TOKEN!,
       endpoint: "https://ingest.usenotra.com",
     });
-
-    export function proxy(request: Request) {
-      after(() => geo(request));
-      return NextResponse.next();
-    }
     ```
 
-    Use `proxy.ts` on Next.js 16 and `middleware.ts` on earlier versions. `geo(request)` never throws and never blocks the response.
+    The middleware captures requests alongside your route handler and waits for the event to send before returning. If `src/middleware.ts` already exists, compose with `sequence` from `astro:middleware`. Astro must serve pages from a server adapter (`output: "server"` or hybrid) so the middleware runs on each request at runtime.
   </Step>
   <Step title="Deploy and verify">
-    After you deploy your site, the **Agent** tab switches from the install panel to the dashboard as soon as Notra stores the first AI crawler or referral. Crawlers visit on their own schedule, so the first event can take a while on a quiet site.
+    After you deploy your site, the **Agent** tab switches from the install panel to the dashboard as soon as Notra stores the first AI crawler visit or referral. Crawlers visit on their own schedule, so the first event can take a while on a quiet site.
   </Step>
 </Steps>
 
 ## Next steps
 
 <Columns cols={2}>
-  <Card title="Tracker reference" icon="sliders" href="/ai-traffic/tracker-reference">
+  <Card title="Tracker reference" icon="sliders" href="/analytics/tracker-reference">
     Options, excluded paths, privacy and token rotation.
   </Card>
-  <Card title="Journey tagging" icon="route" href="/ai-traffic/journeys">
+  <Card title="Journey tagging" icon="route" href="/analytics/journeys">
     Follow one agent across the pages it reads.
   </Card>
 </Columns>

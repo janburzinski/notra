@@ -574,8 +574,8 @@ export const GEO_DRAIN_PATHS = {
   cloudflare: "/api/geo/drains/cloudflare",
 } as const satisfies Record<GeoDrainProvider, string>;
 export const GEO_DRAIN_DOCS_URLS = {
-  vercel: "https://docs.usenotra.com/ai-traffic/install/vercel-log-drain",
-  cloudflare: "https://docs.usenotra.com/ai-traffic/install/cloudflare-logpush",
+  vercel: "https://docs.usenotra.com/analytics/install/vercel-log-drain",
+  cloudflare: "https://docs.usenotra.com/analytics/install/cloudflare-logpush",
 } as const satisfies Record<GeoDrainProvider, string>;
 export const GEO_DRAIN_DASHBOARD_URLS = {
   vercel:

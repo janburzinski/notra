@@ -1,5 +1,8 @@
 {
   "$schema": "https://mintlify.com/docs.json",
+  "appearance": {
+    "default": "light"
+  },
   "theme": "mint",
   "name": "Notra Documentation",
   "description": "Documentation for Notra: track your brand across AI answer engines and turn your team's work into content.",
@@ -73,11 +76,21 @@
     },
     {
       "source": "/geo/traffic",
-      "destination": "/ai-traffic/overview"
+      "destination": "/analytics/overview"
     },
     {
       "source": "/geo/ai-traffic/:slug*",
-      "destination": "/ai-traffic/:slug*"
+      "destination": "/analytics/:slug*"
+    },
+    {
+      "source": "/ai-traffic",
+      "destination": "/analytics/overview",
+      "permanent": true
+    },
+    {
+      "source": "/ai-traffic/:slug*",
+      "destination": "/analytics/:slug*",
+      "permanent": true
     },
     {
       "source": "/api/agent-feedback",
@@ -89,7 +102,7 @@
     },
     {
       "source": "/geo/troubleshooting/no-ai-traffic",
-      "destination": "/ai-traffic/troubleshooting/no-ai-traffic"
+      "destination": "/analytics/troubleshooting/no-ai-traffic"
     },
     {
       "source": "/geo/dashboard",
@@ -334,47 +347,55 @@
         ]
       },
       {
-        "tab": "AI Traffic",
+        "tab": "Analytics",
         "icon": "robot",
         "groups": [
           {
-            "group": "AI traffic",
+            "group": "AI Traffic",
             "icon": "robot",
             "pages": [
-              "ai-traffic/overview",
-              "ai-traffic/web-analytics",
-              "ai-traffic/crawlers",
-              "ai-traffic/journeys",
-              "ai-traffic/referrals",
-              "ai-traffic/embed",
-              "ai-traffic/import-history"
+              "analytics/overview",
+              "analytics/crawlers",
+              "analytics/journeys",
+              "analytics/referrals",
+              "analytics/embed",
+              "analytics/import-history",
+              {
+                "group": "Install the Tracker",
+                "icon": "download",
+                "pages": [
+                  "analytics/install/nextjs",
+                  "analytics/install/tanstack-start",
+                  "analytics/install/nuxt",
+                  "analytics/install/astro",
+                  "analytics/install/sveltekit",
+                  "analytics/install/react-router",
+                  "analytics/install/netlify",
+                  "analytics/install/vercel-log-drain",
+                  "analytics/install/cloudflare-logpush"
+                ]
+              }
             ]
           },
           {
-            "group": "Install the tracker",
-            "icon": "download",
-            "pages": [
-              "ai-traffic/install/script-tag",
-              "ai-traffic/install/nextjs",
-              "ai-traffic/install/tanstack-start",
-              "ai-traffic/install/nuxt",
-              "ai-traffic/install/astro",
-              "ai-traffic/install/sveltekit",
-              "ai-traffic/install/react-router",
-              "ai-traffic/install/netlify",
-              "ai-traffic/install/vercel-log-drain",
-              "ai-traffic/install/cloudflare-logpush"
-            ]
+            "group": "Web Analytics",
+            "icon": "chart-line",
+            "pages": ["analytics/web-analytics", "analytics/install/script-tag"]
+          },
+          {
+            "group": "MCP Analytics",
+            "icon": "server",
+            "pages": ["analytics/mcp-analytics"]
           },
           {
             "group": "Reference",
             "icon": "book",
-            "pages": ["ai-traffic/tracker-reference"]
+            "pages": ["analytics/tracker-reference"]
           },
           {
             "group": "Troubleshooting",
             "icon": "wrench",
-            "pages": ["ai-traffic/troubleshooting/no-ai-traffic"]
+            "pages": ["analytics/troubleshooting/no-ai-traffic"]
           }
         ]
       },

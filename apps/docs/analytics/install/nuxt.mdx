@@ -7,7 +7,7 @@ authors:
 
 docolin:
   schema_version: 1
-  kind: tools/notra/ai-traffic/install/nuxt
+  kind: tools/notra/analytics/install/nuxt
   type: how-to
   applies_to:
     - notra
@@ -15,19 +15,19 @@ docolin:
   status: stable
 ---
 
-This guide adds the Notra tracker to a Nuxt app, which takes about five minutes and touches one file, `server/middleware/geo.ts`.
+This guide adds the Notra tracker to a Nuxt app in about five minutes and touches one file, `server/middleware/geo.ts`.
 
 <Tip>
-  The **Agent** tab has a **Copy agent prompt** button. Paste it into Claude Code, Cursor or Codex and the agent does these steps for you.
+  The **Agent** tab has a **Copy agent prompt** button, and when you paste its prompt into Claude Code, Cursor or Codex, the agent does these steps for you.
 </Tip>
 
 <Steps>
   <Step title="Get your token">
-    Open **Analytics** in the GEO sidebar and stay on the **Agent** tab. Until the first event arrives, the page shows **No activity yet** with the full install panel: **Install the package**, **Set your token** and **Add the proxy**. Your token is in the **Set your token** section, and the panel also has a **Copy agent prompt** button that copies an instruction block for a coding agent.
+    Open **Analytics** in the GEO sidebar and stay on the **Agent** tab. Until the first event arrives, the page shows **No activity yet** with the full install panel, which has **Install the package**, **Set your token** and **Add the proxy** sections. Your token appears in the **Set your token** section, and the panel's **Copy agent prompt** button copies an instruction block you can paste into a coding agent.
 
     <Visibility for="agents">
 
-    From the API, you need `traffic.read` to read the snippets and `traffic.write` to issue the token:
+    From the API, reading the snippets needs `traffic.read` and issuing the token needs `traffic.write`:
 
     ```bash
     curl https://api.usenotra.com/v1/geo/ingest/setup \
@@ -39,11 +39,11 @@ This guide adds the Notra tracker to a Nuxt app, which takes about five minutes 
       -H "Authorization: Bearer $NOTRA_API_KEY"
     ```
 
-    Both return `ingestUrl`, `snippet` (the Next.js snippet) and `snippets` with `next`, `nuxt`, `tanstack`, `astro`, `sveltekit`, `reactRouter` and `netlify` keys. The token endpoint also returns `token`.
+    Both return `ingestUrl`, `snippet` (the Next.js snippet) and `snippets` with `next`, `nuxt`, `tanstack`, `astro`, `sveltekit`, `reactRouter` and `netlify` keys, and the token endpoint adds `token`.
 
     </Visibility>
 
-    The ingest routes are organization-level, so pass `projectId` to bind the token to one project or omit it to track the whole organization. Issuing a token does not invalidate earlier tokens. Install the same project token on every domain the project tracks, and add extra hostnames under **Tracked domains** in GEO settings.
+    The ingest routes are organization-level, so pass `projectId` to bind the token to one project or omit it to track the whole organization. Issuing a token does not invalidate tokens issued earlier. Install the same project token on every domain the project tracks, and add extra hostnames under **Tracked domains** in GEO settings.
   </Step>
   <Step title="Install the package">
     <CodeGroup>
@@ -63,8 +63,6 @@ This guide adds the Notra tracker to a Nuxt app, which takes about five minutes 
     bun add @usenotra/sdk
     ```
     </CodeGroup>
-
-    The package has zero dependencies and no Node APIs in the core, so it runs on edge runtimes. You can also install it with npm, pnpm or yarn.
   </Step>
   <Step title="Set the environment variable">
     Add the token as `NOTRA_GEO_TOKEN` in your site's environment variables, both locally and at your hosting provider, and never hardcode or commit it.
@@ -86,17 +84,17 @@ This guide adds the Notra tracker to a Nuxt app, which takes about five minutes 
     Nitro usually does not pass geo headers, so location fields stay undefined and ingest falls back to an IP-based lookup.
   </Step>
   <Step title="Deploy and verify">
-    Deploy your site, and the **Agent** tab switches from the install panel to the dashboard once Notra stores the first AI crawler visit or referral. Crawlers visit on their own schedule, so the first event can take a while on a quiet site.
+    After you deploy your site, the **Agent** tab switches from the install panel to the dashboard as soon as Notra stores the first AI crawler visit or referral. Crawlers visit on their own schedule, so the first event can take a while on a quiet site.
   </Step>
 </Steps>
 
 ## Next steps
 
 <Columns cols={2}>
-  <Card title="Tracker reference" icon="sliders" href="/ai-traffic/tracker-reference">
+  <Card title="Tracker reference" icon="sliders" href="/analytics/tracker-reference">
     Options, excluded paths, privacy and token rotation.
   </Card>
-  <Card title="Journey tagging" icon="route" href="/ai-traffic/journeys">
+  <Card title="Journey tagging" icon="route" href="/analytics/journeys">
     Follow one agent across the pages it reads.
   </Card>
 </Columns>

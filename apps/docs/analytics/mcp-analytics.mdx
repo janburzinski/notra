@@ -1,0 +1,131 @@
+---
+title: "Track your MCP server"
+sidebarTitle: "Overview"
+description: "Wrap your MCP server's transport with @usenotra/sdk to see which agents connect, which tools they call, where they fail and what they were trying to do."
+authors:
+  - handle: dominik
+
+docolin:
+  schema_version: 1
+  kind: tools/notra/analytics/mcp-analytics
+  type: how-to
+  applies_to:
+    - notra
+  language: en
+  status: stable
+---
+
+MCP analytics records every JSON-RPC request your MCP server answers, so you can see which agents and clients connect, which tools they call, how long each call takes and where calls fail. The results appear on the **MCP server** tab under **Analytics** in the GEO sidebar.
+
+<img
+  src="/images/ai-traffic/mcp-light.webp"
+  alt="MCP server tab with tool calls, sessions, error rate and p95 latency charts above the tools table"
+  className="block dark:hidden rounded-lg border"
+/>
+<img
+  src="/images/ai-traffic/mcp-dark.webp"
+  alt="MCP server tab with tool calls, sessions, error rate and p95 latency charts above the tools table"
+  className="hidden dark:block rounded-lg border"
+/>
+
+## Set it up
+
+<Tip>
+  Until the first event arrives, the **MCP server** tab shows the install steps and a **Copy agent prompt** button. Paste the prompt into Claude Code, Cursor or Codex and the agent will do these steps for you.
+</Tip>
+
+<Steps>
+  <Step title="Install the package">
+    <CodeGroup>
+    ```bash npm
+    npm install @usenotra/sdk
+    ```
+
+    ```bash yarn
+    yarn add @usenotra/sdk
+    ```
+
+    ```bash pnpm
+    pnpm add @usenotra/sdk
+    ```
+
+    ```bash bun
+    bun add @usenotra/sdk
+    ```
+    </CodeGroup>
+  </Step>
+  <Step title="Set your token">
+    MCP analytics uses the same project token as the [AI traffic tracker](/analytics/install/nextjs). Copy it from the **Set your token** step on the **MCP server** tab and add it as `NOTRA_GEO_TOKEN` wherever your MCP server runs, and never hardcode or commit it.
+  </Step>
+  <Step title="Wrap the transport">
+    Wrap the transport your server already creates before you pass it to `server.connect`. This works with stdio, Streamable HTTP, SSE and any other transport that exposes `send` and `onmessage`.
+
+    ```typescript server.ts
+    import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+    import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+    import { trackMcpTransport } from "@usenotra/sdk/mcp";
+
+    const server = new McpServer({ name: "acme", version: "1.0.0" });
+
+    await server.connect(
+      trackMcpTransport(new StdioServerTransport(), {
+        token: process.env.NOTRA_GEO_TOKEN ?? "",
+      })
+    );
+    ```
+
+    The tracker buffers events for up to a second and sends them in batches, and on stdio it sends the remaining events when the transport closes. On a serverless runtime, pass `waitUntil` to `trackMcpTransport` or `await flushMcpEvents()` before the function returns, otherwise the last events can be lost.
+  </Step>
+  <Step title="Check the dashboard">
+    Connect an agent to your server and call a tool. The **MCP server** tab switches from the install steps to the dashboard once Notra stores the first request.
+  </Step>
+</Steps>
+
+## What gets recorded
+
+Every event carries the JSON-RPC method, the tool, resource or prompt name, a status, the latency and the response size. The status is `ok`, `tool_error` when a tool returns `isError`, or `rpc_error` with the JSON-RPC error code and message. Events also record the `Mcp-Session-Id` (or a per-connection id on stdio) and the client name, server name, versions and protocol version from `initialize`.
+
+Each `tools/list` answer stores the tool names and descriptions your server advertised, which is how the dashboard finds tools that no agent calls. Reads of `ui://` resources count as renders of an MCP Apps interface. Requests your server sends to the client, such as `elicitation/create` and `sampling/createMessage`, are tied to the tool call that triggered them, and elicitations record whether the user accepted, declined or cancelled. Pass `relatedRequestId` when you call `elicitInput` so the event knows its tool.
+
+The tracker skips `ping` by default, and you can pass `excludeMethods` to choose which methods it skips.
+
+## Record more context
+
+Tool arguments and results never leave your server unless you opt in. These options add detail to the dashboard:
+
+```typescript server.ts
+trackMcpTransport(transport, {
+  token: process.env.NOTRA_GEO_TOKEN ?? "",
+  contextParameters: true,
+  captureArguments: true,
+  captureResponses: true,
+  identify: ({ authInfo }) => authInfo?.clientId,
+  beforeSend: (event) => (event.target === "internal_tool" ? null : event),
+});
+```
+
+| Option | What it adds |
+| --- | --- |
+| `contextParameters` | Adds optional `_intent` and `_model` parameters to every tool and strips them before your handler runs. Agents use them to say what they are trying to do and which model they run as, which fills the **Models** and **What agents are trying to do** sections. |
+| `captureArguments` | Records tool arguments. Keys such as `token` or `password` are redacted and long strings are clipped. |
+| `captureResponses` | Records tool results, redacted and clipped the same way. |
+| `identify` | Returns the user behind a request, for example the OAuth client id, so the **Users** section shows who the agents act for. |
+| `beforeSend` | Edits an event before it is sent, or drops it when you return `null`. |
+
+## Read the dashboard
+
+The top of the tab charts tool calls, sessions, error rate and p95 latency for the selected range against the range before it. Use the **Server version** picker to compare releases of your server.
+
+- **Tools** lists each tool with its calls, users, errors, p95 latency and average response size. Click a tool to see which tools agents call before and after it, how they recover from failures and what they wanted.
+- **Never called** lists tools your latest `tools/list` answer advertised that no agent called in the range. Rename them, improve the description or remove them.
+- **Asking the user** groups elicitation and sampling requests by the tool that sent them, with how users answered.
+- **Interactive UI** shows the MCP Apps interfaces hosts loaded and the tools that declare them.
+- **Clients**, **Models**, **Sessions** and **Users** break traffic down by who connected. Click a session to see its full timeline.
+- **What agents are trying to do** lists the most frequent intents and the tool each one routed to.
+- **Recent requests** shows the last 100 requests your server answered. Click one to see its arguments, response and error.
+
+## Usage and retention
+
+Every recorded request counts toward the same monthly AI traffic events quota as page tracking. Notra keeps individual requests for 90 days.
+
+To let the agents that use your server send bug reports and praise to your Notra inbox, add the [feedback tool](/feedback/send-feedback) next to the tracker.

@@ -1,13 +1,13 @@
 ---
-title: "Track AI crawlers on TanStack Start"
-sidebarTitle: "TanStack Start"
-description: "Install the @usenotra/sdk tracker in a TanStack Start app to log AI crawlers, AI-cited fetches and AI referrals in Notra."
+title: "Track AI crawlers on SvelteKit"
+sidebarTitle: "SvelteKit"
+description: "Install the @usenotra/sdk tracker in a SvelteKit app to log AI crawlers, AI-cited fetches and AI referrals in Notra."
 authors:
   - handle: dominik
 
 docolin:
   schema_version: 1
-  kind: tools/notra/ai-traffic/install/tanstack-start
+  kind: tools/notra/analytics/install/sveltekit
   type: how-to
   applies_to:
     - notra
@@ -15,15 +15,15 @@ docolin:
   status: stable
 ---
 
-This guide adds the Notra tracker to a TanStack Start app in about five minutes, and the only file you touch is `src/start.ts`.
+This guide adds the Notra tracker to a SvelteKit app in about five minutes and touches one file, `src/hooks.server.ts`.
 
 <Tip>
-  The **Agent** tab has a **Copy agent prompt** button, and if you paste its prompt into Claude Code, Cursor or Codex the agent will do these steps for you.
+  The **Agent** tab has a **Copy agent prompt** button, and when you paste its prompt into Claude Code, Cursor or Codex, the agent does these steps for you.
 </Tip>
 
 <Steps>
   <Step title="Get your token">
-    Open **Analytics** in the GEO sidebar and stay on the **Agent** tab. Until the first event arrives, the page shows **No activity yet** with the full install panel, which has **Install the package**, **Set your token** and **Add the proxy** sections. Your token appears in the **Set your token** section, and the panel also has a **Copy agent prompt** button that copies an instruction block you can paste into a coding agent.
+    Open **Analytics** in the GEO sidebar and stay on the **Agent** tab. Until the first event arrives, the page shows **No activity yet** with the full install panel, which has **Install the package**, **Set your token** and **Add the proxy** sections. Your token appears in the **Set your token** section, and the panel's **Copy agent prompt** button copies an instruction block you can paste into a coding agent.
 
     <Visibility for="agents">
 
@@ -63,28 +63,22 @@ This guide adds the Notra tracker to a TanStack Start app in about five minutes,
     bun add @usenotra/sdk
     ```
     </CodeGroup>
-
-    The package has zero dependencies and no Node APIs in the core, so it runs on edge runtimes. npm, pnpm and yarn work too.
   </Step>
   <Step title="Set the environment variable">
     Add the token as `NOTRA_GEO_TOKEN` in your site's environment variables, both locally and at your hosting provider, and never hardcode or commit it.
   </Step>
   <Step title="Add the tracker">
-    ```typescript src/start.ts
-    import { createMiddleware, createStart } from "@tanstack/react-start";
-    import { createGeoMiddleware } from "@usenotra/sdk/tanstack";
+    ```typescript src/hooks.server.ts
+    import { env } from "$env/dynamic/private";
+    import { createGeoHandle } from "@usenotra/sdk/sveltekit";
 
-    const geo = createMiddleware().server(createGeoMiddleware({
-      token: process.env.NOTRA_GEO_TOKEN!,
+    export const handle = createGeoHandle({
+      token: env.NOTRA_GEO_TOKEN!,
       endpoint: "https://ingest.usenotra.com",
-    }));
-
-    export const startInstance = createStart(() => ({
-      requestMiddleware: [geo],
-    }));
+    });
     ```
 
-    The middleware captures requests alongside your route handler and waits for the event to send before returning, so tracking completes on serverless hosts. It passes the downstream response and errors through unchanged. If `src/start.ts` already exists, add `geo` to its existing `requestMiddleware` array.
+    The handle captures requests alongside `resolve` and waits for the event to send before returning. If `src/hooks.server.ts` already has a `handle`, compose with `sequence` from `@sveltejs/kit/hooks`.
   </Step>
   <Step title="Deploy and verify">
     After you deploy your site, the **Agent** tab switches from the install panel to the dashboard as soon as Notra stores the first AI crawler visit or referral. Crawlers visit on their own schedule, so the first event can take a while on a quiet site.
@@ -94,10 +88,10 @@ This guide adds the Notra tracker to a TanStack Start app in about five minutes,
 ## Next steps
 
 <Columns cols={2}>
-  <Card title="Tracker reference" icon="sliders" href="/ai-traffic/tracker-reference">
+  <Card title="Tracker reference" icon="sliders" href="/analytics/tracker-reference">
     Options, excluded paths, privacy and token rotation.
   </Card>
-  <Card title="Journey tagging" icon="route" href="/ai-traffic/journeys">
+  <Card title="Journey tagging" icon="route" href="/analytics/journeys">
     Follow one agent across the pages it reads.
   </Card>
 </Columns>

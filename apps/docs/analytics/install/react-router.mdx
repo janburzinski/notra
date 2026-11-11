@@ -7,7 +7,7 @@ authors:
 
 docolin:
   schema_version: 1
-  kind: tools/notra/ai-traffic/install/react-router
+  kind: tools/notra/analytics/install/react-router
   type: how-to
   applies_to:
     - notra
@@ -63,8 +63,6 @@ This guide adds the Notra tracker to a React Router app in framework mode in abo
     bun add @usenotra/sdk
     ```
     </CodeGroup>
-
-    The package has zero dependencies and no Node APIs in the core, so it runs on edge runtimes. You can also install it with npm, pnpm or yarn.
   </Step>
   <Step title="Set the environment variable">
     Add the token as `NOTRA_GEO_TOKEN` in your site's environment variables, both locally and at your hosting provider, and never hardcode or commit it.
@@ -84,7 +82,7 @@ This guide adds the Notra tracker to a React Router app in framework mode in abo
 
     Root middleware runs on every server request. The tracker sends the event after your loaders and render have produced the response, so the visitor never waits for it, and it passes the response and errors through unchanged. If `app/root.tsx` already exports `middleware`, add `geo` to that array.
 
-    React Router 8 always runs middleware. On React Router 7, upgrade to 7.9 or later and turn middleware on:
+    React Router 8 always runs middleware, but on React Router 7 you need to upgrade to 7.9 or later and turn middleware on:
 
     ```typescript react-router.config.ts
     import type { Config } from "@react-router/dev/config";
@@ -129,10 +127,10 @@ This guide adds the Notra tracker to a React Router app in framework mode in abo
 ## Next steps
 
 <Columns cols={2}>
-  <Card title="Tracker reference" icon="sliders" href="/ai-traffic/tracker-reference">
+  <Card title="Tracker reference" icon="sliders" href="/analytics/tracker-reference">
     Options, excluded paths, privacy and token rotation.
   </Card>
-  <Card title="Journey tagging" icon="route" href="/ai-traffic/journeys">
+  <Card title="Journey tagging" icon="route" href="/analytics/journeys">
     Follow one agent across the pages it reads.
   </Card>
 </Columns>

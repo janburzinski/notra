@@ -1,0 +1,117 @@
+---
+title: "Track AI crawlers on Next.js"
+sidebarTitle: "Next.js"
+description: "Install the @usenotra/sdk tracker in a Next.js app to log AI crawlers, AI-cited fetches and AI referrals in Notra."
+authors:
+  - handle: dominik
+
+docolin:
+  schema_version: 1
+  kind: tools/notra/analytics/install/nextjs
+  type: how-to
+  applies_to:
+    - notra
+  language: en
+  status: stable
+---
+
+This guide adds the Notra tracker to a Next.js app in about five minutes and touches one file, `proxy.ts`.
+
+<Tip>
+  The **Agent** tab has a **Copy agent prompt** button, and when you paste its prompt into Claude Code, Cursor or Codex, the agent does these steps for you.
+</Tip>
+
+<Steps>
+  <Step title="Get your token">
+    Open **Analytics** in the GEO sidebar and stay on the **Agent** tab. Until the first event arrives, the page shows **No activity yet** with the full install panel, which has **Install the package**, **Set your token** and **Add the proxy** sections. Your token appears in the **Set your token** section, and the panel's **Copy agent prompt** button copies an instruction block you can paste into a coding agent.
+
+    <Visibility for="agents">
+
+    From the API, reading the snippets needs `traffic.read` and issuing the token needs `traffic.write`:
+
+    ```bash
+    curl https://api.usenotra.com/v1/geo/ingest/setup \
+      -H "Authorization: Bearer $NOTRA_API_KEY"
+    ```
+
+    ```bash
+    curl -X POST "https://api.usenotra.com/v1/geo/ingest/token?projectId=$PROJECT_ID" \
+      -H "Authorization: Bearer $NOTRA_API_KEY"
+    ```
+
+    Both return `ingestUrl`, `snippet` (the Next.js snippet) and `snippets` with `next`, `nuxt`, `tanstack`, `astro`, `sveltekit`, `reactRouter` and `netlify` keys, and the token endpoint adds `token`. The ingest routes are organization-level, so pass `projectId` to bind the token to one project or omit it to track the whole organization. Issuing a token does not invalidate tokens issued earlier.
+
+    </Visibility>
+
+    Install the same project token on every domain the project tracks, and add extra hostnames under **Tracked domains** in GEO settings.
+  </Step>
+  <Step title="Install the package">
+    <CodeGroup>
+    ```bash npm
+    npm install @usenotra/sdk
+    ```
+
+    ```bash yarn
+    yarn add @usenotra/sdk
+    ```
+
+    ```bash pnpm
+    pnpm add @usenotra/sdk
+    ```
+
+    ```bash bun
+    bun add @usenotra/sdk
+    ```
+    </CodeGroup>
+  </Step>
+  <Step title="Set the environment variable">
+    Add the token as `NOTRA_GEO_TOKEN` in your site's environment variables, both locally and at your hosting provider, and never hardcode or commit it.
+  </Step>
+  <Step title="Add the tracker">
+    ```typescript proxy.ts
+    import { createGeoProxy } from "@usenotra/sdk/next";
+    import { after, NextResponse } from "next/server";
+
+    const geo = createGeoProxy({
+      token: process.env.NOTRA_GEO_TOKEN!,
+      endpoint: "https://ingest.usenotra.com",
+    });
+
+    export function proxy(request: Request) {
+      after(() => geo(request));
+      return NextResponse.next();
+    }
+
+    export const config = {
+      matcher: [
+        {
+          source:
+            "/((?!_next/|_vercel/|api/|(?!(?:.*/)?llms(?:-full)?\\.txt$).*\\.(?:avif|css|eot|gif|ico|jpeg|jpg|js|json|map|mjs|mp3|mp4|otf|pdf|png|svg|ttf|txt|wasm|webm|webmanifest|webp|woff|woff2|xml|zip)$).*)",
+          missing: [
+            { type: "header", key: "rsc" },
+            { type: "header", key: "next-router-prefetch" },
+          ],
+        },
+      ],
+    };
+    ```
+
+    Use `proxy.ts` on Next.js 16 and `middleware.ts` on earlier versions. `geo(request)` never throws and never blocks the response.
+
+    The `matcher` keeps the proxy off requests Notra would drop anyway, which cuts function invocations and Fluid compute on Vercel. The tracker already ignores assets, `/api` routes, non-GET requests and most `.txt` files, but it can only do that after the proxy has run and been billed. Client-side navigations send an `rsc` or `next-router-prefetch` header and always come from people, whose visits Notra drops at ingest. Pages, Markdown twins, `llms.txt` and `llms-full.txt` still go through the proxy. Thanks to [François Best](https://francoisbest.com/) for [finding this fix](https://github.com/47ng/nuqs/pull/1627) on the nuqs docs, where adding the proxy without a matcher had raised daily invocations from about 700 to about 33,000 for the same traffic.
+  </Step>
+  <Step title="Deploy and verify">
+    After you deploy your site, the **Agent** tab switches from the install panel to the dashboard as soon as Notra stores the first AI crawler visit or referral. Crawlers visit on their own schedule, so the first event can take a while on a quiet site.
+  </Step>
+</Steps>
+
+## Next steps
+
+<Columns cols={2}>
+  <Card title="Tracker reference" icon="sliders" href="/analytics/tracker-reference">
+    Options, excluded paths, privacy and token rotation.
+  </Card>
+  <Card title="Journey tagging" icon="route" href="/analytics/journeys">
+    Follow one agent across the pages it reads.
+  </Card>
+</Columns>

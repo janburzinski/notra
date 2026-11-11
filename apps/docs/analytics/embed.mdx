@@ -7,7 +7,7 @@ authors:
 
 docolin:
   schema_version: 1
-  kind: tools/notra/ai-traffic/embed
+  kind: tools/notra/analytics/embed
   type: how-to
   applies_to:
     - notra
@@ -23,7 +23,7 @@ An embed puts charts from Notra on your own site, for example a stats page or a 
 
 | Chart | What it shows |
 | --- | --- |
-| **AI traffic** | Crawler requests, citations in AI answers and AI referrals, from the [AI analytics](/ai-traffic/overview) tab |
+| **AI traffic** | Crawler requests, citations in AI answers and AI referrals, from the [AI analytics](/analytics/overview) tab |
 | **Visibility over time** | How often AI assistants mention you, per day |
 | **Visibility by engine** | Visibility, citations and average position per AI engine |
 | **Share of voice** | Your share of mentions next to your top competitors |
@@ -36,19 +36,19 @@ Charts update by themselves while the page is open, so an embed also works on a 
 
 <Steps>
   <Step title="Open the embed dialog">
-    In **Analytics**, on the **Agent** tab, open the **…** menu at the end of the tab row, then **Embed on your site**. The embed shows the current project, and only the domain selected in the domain filter if you picked one. The same menu on the **Web** tab embeds your website visitors instead; switch between the two under **Traffic**.
+    In **Analytics**, on the **Agent** tab, open the **…** menu at the end of the tab row, then **Embed on your site**. The embed shows the current project, and only the domain selected in the domain filter if you picked one. The same menu on the **Web** tab embeds your website visitors instead, and you can switch between the two under **Traffic**.
   </Step>
 
   <Step title="Allow your domains">
-    Under **Allowed domains**, type each domain that will show the charts and press Enter, for example `example.com`. The charts only display on these domains.
+    Under **Allowed domains**, type each domain that will show the charts and press Enter, for example `example.com`, since the charts only display on these domains.
   </Step>
 
   <Step title="Create and configure">
-    Click **Create embed**. New embeds show AI traffic only. To add charts, click the **Charts** row to open it and tick every chart the embed may show; it saves right away. Then pick the **Period**, **Theme** and, for AI traffic, what to **Show**. The preview updates as you change them.
+    Click **Create embed**. New embeds show AI traffic only. To add charts, click the **Charts** row to open it and tick every chart the embed may show, which saves right away. Then pick the **Period**, **Theme** and, for AI traffic, what to **Show**, and the preview updates as you change them.
   </Step>
 
   <Step title="Add it to your site">
-    Copy the code under **Embed code** and paste it where the charts should appear. Or click **Copy agent prompt** and hand it to your coding agent, which adds them for you.
+    Copy the code under **Embed code** and paste it where the charts should appear, or click **Copy agent prompt** and hand it to your coding agent, which adds them for you.
   </Step>
 </Steps>
 
@@ -68,7 +68,7 @@ The embed code looks like this:
 <script src="https://app.usenotra.com/embed.js" async></script>
 ```
 
-The script keeps the iframe's height in sync with the charts. Load it once per page, even with several embeds. Without it, the iframe stays 420 px high.
+The script keeps the iframe's height in sync with the charts, and without it the iframe stays 420 px high. Load it once per page, even with several embeds.
 
 ### React and other JSX
 
@@ -98,14 +98,14 @@ export function AiTrafficChart() {
 
 ## Options
 
-The dialog writes the options into the iframe URL. You can also change them there:
+The dialog writes the options into the iframe URL, where you can also change them:
 
 | Parameter | Values | Default |
 | --- | --- | --- |
 | `range` | `7d`, `14d`, `30d`, `90d` | `30d` |
 | `theme` | `light`, `dark`, `auto` (follows the visitor's system) | `auto` |
 | `charts` | a comma-separated list of `traffic`, `visibility`, `engines`, `share-of-voice`, `languages`, `countries` | every chart the embed allows |
-| `parts` | `metrics`, `chart`, or `metrics,chart` (AI traffic only) | both |
+| `parts` | `metrics`, `chart` or `metrics,chart` (AI traffic only) | both |
 | `locale` | a dashboard language such as `en` or `de` | the visitor's browser language |
 
 For example, `.../embed/ai-traffic/<embed-id>?range=7d&theme=dark&parts=chart` shows only the traffic chart for the last 7 days in dark mode, and `?charts=visibility,share-of-voice` shows just those two charts.
@@ -119,7 +119,7 @@ The background is transparent, so the charts sit on your page's background. If y
 - `example.com` allows `https://example.com` only. Add `www.example.com` separately if your site uses it.
 - `*.example.com` allows every subdomain, but not `example.com` itself.
 - `http://` only works for `localhost` and `127.0.0.1`, for local development.
-- Enter domains only, without paths. An embed allows up to 10 domains.
+- Enter domains without paths, up to 10 per embed.
 
 Every added or removed domain saves right away and applies within a minute.
 
@@ -135,20 +135,20 @@ This works with your page's `Referrer-Policy`, including `no-referrer`. If your 
 
 Open **… > Embed on your site** on the **Agent** tab again to switch between embeds, edit their domains or create another one. An organization can have up to 50 embeds.
 
-Click **Delete embed** to take the charts down. Pages that use it show nothing after at most a minute.
+Click **Delete embed** to take the charts down, and pages that use it show nothing after at most a minute.
 
 ## What visitors see
 
-- An open embed checks for new numbers every 30 seconds, without reloading. Scan results appear within about a minute of a scan finishing. AI traffic and visitors arrive in five-minute batches, so they can take up to about six minutes.
+- An open embed checks for new numbers every 30 seconds without reloading, and scan results appear within about a minute of a scan finishing. AI traffic and visitors arrive in five-minute batches, so they can take up to about six minutes.
 - **Updated** under the charts shows when the numbers on screen were loaded.
-- Adding or removing a chart or domain reloads open embeds within a minute. After a delete, open embeds go blank on their next check.
+- Adding or removing a chart or domain reloads open embeds within a minute, and after a delete, open embeds go blank on their next check.
 - While the browser tab or screen is hidden, the embed stops checking and catches up as soon as it shows again. If the network drops, the last numbers stay on screen.
-- Flags and brand icons are drawn locally, so visitors' browsers only contact Notra.
+- The embed draws flags and brand icons locally, so visitors' browsers only contact Notra.
 - The embed runs no analytics and shows no consent banner.
 - A small **AI analytics by Notra** link sits under the charts, or **Analytics by Notra** when the embed only shows website visitors.
 
 <Warning>
-  An embed isn't a login. Everyone who can open a page with the embed sees its charts, so put it on pages whose visitors may see the numbers, and only tick charts you're happy to show there. **Share of voice** shows your competitors' names. Delete the embed to take the charts down everywhere.
+  An embed isn't a login, so everyone who can open a page with the embed sees its charts. Put it on pages whose visitors may see the numbers, and only tick charts you're happy to show there, since **Share of voice** shows your competitors' names. Delete the embed to take the charts down everywhere.
 </Warning>
 
 ## Build your own chart

@@ -1,0 +1,4 @@
+[role="menu"]:has([data-component-part="theme-preference-menu-item"]) {
+  opacity: 0;
+  pointer-events: none;
+}

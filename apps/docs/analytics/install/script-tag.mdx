@@ -1,13 +1,13 @@
 ---
 title: "Count visitors with the notra.js script"
-sidebarTitle: "Script tag (any site)"
+sidebarTitle: "notra.js"
 description: "Add one script tag to any website to count page views, visitors, sources, AI referrals, engagement, outbound links and Core Web Vitals in Notra, without cookies."
 authors:
   - handle: dominik
 
 docolin:
   schema_version: 1
-  kind: tools/notra/ai-traffic/install/script-tag
+  kind: tools/notra/analytics/install/script-tag
   type: how-to
   applies_to:
     - notra
@@ -17,11 +17,11 @@ docolin:
 
 `notra.js` counts the people who read your site: page views, visitors, sessions, where they came from (including ChatGPT, Perplexity, Claude and other AI answers), how long they stayed and how far they scrolled. It also records clicks on links to other sites and Core Web Vitals. It works on any site, including static sites and single-page apps, and is about 1.2 KB compressed.
 
-The script cannot see AI crawlers, because crawlers do not run JavaScript. To log crawlers as well, install the [server tracker](/ai-traffic/install/nextjs) or a [log drain](/ai-traffic/install/vercel-log-drain) alongside it. Notra does not double count: page views come from the script, and AI crawler events come from the server tracker.
+The script cannot see AI crawlers, because crawlers do not run JavaScript. To log crawlers as well, install the [server tracker](/analytics/install/nextjs) or a [log drain](/analytics/install/vercel-log-drain) alongside it. Notra does not double count, because page views come from the script and AI crawler events come from the server tracker.
 
 <Steps>
   <Step title="Copy the script tag">
-    Open **Settings → Tracking** and copy the **Script tag** from the install panel. Until the first page view arrives, the **Web** tab under **Analytics** shows the same panel. The tag contains your project's public key and loads the current build of the script, checked against its hash. You never look up or set the hash yourself: the install panel fills in the current build and its `integrity`. With your key in place of `nwk.…`, today's tag is:
+    Open **Settings → Tracking** and copy the **Script tag** from the install panel. Until the first page view arrives, the **Web** tab under **Analytics** shows the same panel. The tag contains your project's public key and loads the current build of the script, checked against its hash. You never look up or set the hash yourself, because the install panel fills in the current build and its `integrity`. With your key in place of `nwk.…`, today's tag is:
 
     ```html
     <script defer src="https://static.usenotra.com/notra.ce3c872ef9c9.js" data-key="nwk.…" data-api="https://ingest.usenotra.com/api/collect" integrity="sha384-LuUp5Hj+rSQ4/mZp1sWBOrJDHIHKGqflwF1GYIreqmWdCaI1otOQealWJGRj6Toj" crossorigin="anonymous"></script>
@@ -84,25 +84,25 @@ const notra = notraScriptTag({ webKey: "nwk.…" });
 
 </CodeGroup>
 
-`NotraAnalytics` needs no `"use client"` and works in Server Components. Both take the same options as the tag: `errors` loads `notra.plus.js`, `hash` sets `data-hash`, and `api` changes where page views go. The same package also holds the [server tracker](/ai-traffic/install/nextjs) for AI crawlers, so one install covers both.
+`NotraAnalytics` needs no `"use client"` and works in Server Components. Both take the same options as the tag: `errors` loads `notra.plus.js`, `hash` sets `data-hash` and `api` changes where page views go. The same package also holds the [server tracker](/analytics/install/nextjs) for AI crawlers, so one install covers both.
 
 ## Options
 
 | Attribute | Default | Description |
 |---|---|---|
 | `data-key` | required | Your project's public key. |
-| `data-api` | `/api/collect` on the script's origin | Where page views are sent. The snippet from Notra sets it to `https://ingest.usenotra.com/api/collect`; keep it when the script loads from `static.usenotra.com`, which only serves the script. Change it when you proxy page views through your own domain. |
-| `data-hash` | off | Count `#hash` changes as page views, for apps that route with the hash. Routes such as `#/pricing` or `#!/pricing` are reported as pages (`/#/pricing`), without their query; any other fragment, such as `#access_token=…`, is never stored. |
+| `data-api` | `/api/collect` on the script's origin | Where page views are sent. The snippet from Notra sets it to `https://ingest.usenotra.com/api/collect`. Keep it when the script loads from `static.usenotra.com`, which only serves the script. Change it when you proxy page views through your own domain. |
+| `data-hash` | off | Count `#hash` changes as page views, for apps that route with the hash. Routes such as `#/pricing` or `#!/pricing` are reported as pages (`/#/pricing`), without their query, and any other fragment, such as `#access_token=…`, is never stored. |
 
 Single-page apps are tracked automatically: every `history.pushState` navigation, every `history.replaceState` that changes the path (such as a redirect from `/` to `/en`) and every back/forward step counts as a page view. A `replaceState` that only changes the query string, such as a filter or sort order, stays the same page view. Pages restored from the back/forward cache and pages that were prerendered count when the visitor actually sees them.
 
 ## Outbound links
 
-Clicks on links to another host are recorded on their own, with the left or middle mouse button, as an `Outbound` event. Notra keeps only the destination's host and path, never its query string, fragment or link text. They appear in the **Outbound links** table.
+The script records left and middle clicks on links to another host on its own, as an `Outbound` event. Notra keeps only the destination's host and path, never its query string, fragment or link text, and shows the clicks in the **Outbound links** table.
 
 ## Core Web Vitals
 
-`notra.js` measures Largest Contentful Paint (LCP), First Contentful Paint (FCP), Time to First Byte (TTFB), Cumulative Layout Shift (CLS) and Interaction to Next Paint (INP) with the browser's own performance APIs, without the `web-vitals` library. The values travel on the beacon the script already sends when the page is hidden, so measuring them adds no requests. LCP, FCP and TTFB describe the page load and are reported once per loaded page; CLS and INP are measured again for every single-page-app view. The **Web vitals** table shows the 75th percentile of each, rated against Google's thresholds. Browsers without these APIs, such as older Safari versions, report only what they support.
+`notra.js` measures Largest Contentful Paint (LCP), First Contentful Paint (FCP), Time to First Byte (TTFB), Cumulative Layout Shift (CLS) and Interaction to Next Paint (INP) with the browser's own performance APIs, without the `web-vitals` library. The values travel on the beacon the script already sends when the page is hidden, so measuring them adds no requests. LCP, FCP and TTFB describe the page load and are reported once per loaded page, while CLS and INP are measured again for every single-page-app view. The **Web vitals** table shows the 75th percentile of each, rated against Google's thresholds. Browsers without these APIs, such as older Safari versions, report only what they support.
 
 ## JavaScript errors (opt-in)
 
@@ -119,12 +119,12 @@ Only errors from scripts served over `http` or `https` are reported, which leave
 The tag from the install panel loads one exact build, such as `notra.ce3c872ef9c9.js`, and carries its hash in `integrity`. The browser hashes the file and refuses to run it if a single byte differs, so nobody, Notra included, can change the script on your pages without you replacing the tag. Every pinned build stays available unchanged, so the tag keeps working after new releases.
 
 <Warning>
-  **Keep `integrity` on the tag.** Removing it only turns off the hash check: the tag still loads the same pinned build, so you lose the protection and get no updates. For automatic updates, turn off **Pin this version** in the install panel and copy the new tag. It loads `/notra.js` (or `/notra.plus.js`): whatever build the script host serves at that moment, without a hash check. If the script host or Notra's release process were ever compromised, the changed script would run on your pages right away. We don't recommend it; use it only if you accept that risk in exchange for getting new builds without changing the tag.
+  **Keep `integrity` on the tag.** Removing it only turns off the hash check, because the tag still loads the same pinned build, so you lose the protection and get no updates. For automatic updates, turn off **Pin this version** in the install panel and copy the new tag. That tag loads whatever build of `/notra.js` (or `/notra.plus.js`) the script host serves at that moment, without a hash check. If the script host or Notra's release process were ever compromised, the changed script would run on your pages right away. We don't recommend it, so use it only if you accept that risk in exchange for getting new builds without changing the tag.
 </Warning>
 
 - **Updating.** A pinned script never updates on its own. To move to a newer build, copy the tag from the install panel again and replace both `src` and `integrity`. The tags on this page always show the current build.
 - **Keep `crossorigin="anonymous"`.** Browsers only check the integrity of scripts loaded with CORS. Without the attribute the script is blocked.
-- **Proxies.** If you serve the script through your own domain, pass the file through unchanged. Minifying or rewriting it breaks the hash; compression is fine.
+- **Proxies.** If you serve the script through your own domain, pass the file through unchanged. Minifying or rewriting it breaks the hash, but compression is fine.
 - **Cloudflare Rocket Loader.** Rocket Loader rewrites script tags so it can load them itself, which can drop `integrity` and `crossorigin`. Add `data-cfasync="false"` to the tag so Rocket Loader leaves it alone.
 - **Content-Security-Policy.** Allow the script host in `script-src` and the ingest in `connect-src` for its beacons: `script-src https://static.usenotra.com; connect-src https://ingest.usenotra.com`. Browsers that implement CSP Level 3 also accept the pinned script's hash in `script-src`, because the tag carries the same `integrity` value: `'sha384-LuUp5Hj+rSQ4/mZp1sWBOrJDHIHKGqflwF1GYIreqmWdCaI1otOQealWJGRj6Toj'` for today's `notra.js`, or the value from your tag. Keep the origin listed for browsers that don't.
 
@@ -138,8 +138,8 @@ The token response also returns `webScript` and `webPlusScript`, each with the a
 
 Each page view sends the page URL, the referrer and a random ID for that view. Each time the page is hidden, the script sends the visible time, the scroll depth and the web vitals for that view. A click on a link to another site sends the link's host and path with the view's ID, and `notra.plus.js` sends an error's message, script URL and line number. The script sets no cookies, writes nothing to storage and does not fingerprint the browser.
 
-Notra stores the path, with any segment that looks like an email address, a UUID, a number of four or more digits or a token replaced by `:id`, the referrer's host, the `utm_source`, `utm_medium`, `utm_campaign`, `utm_term` and `utm_content` parameters, country, the browser's primary language (such as `de`), device, browser and operating system. Visitors are counted with a hash of the IP address and user agent, salted with a random value that changes every day and is deleted after 48 hours, so nobody, Notra included, can link a visitor to an IP address afterwards or follow them from one day to the next. The IP address itself is never stored.
+Notra stores the path, the referrer's host, the `utm_source`, `utm_medium`, `utm_campaign`, `utm_term` and `utm_content` parameters, country, the browser's primary language (such as `de`), device, browser and operating system. In the path, it replaces any segment that looks like an email address, a UUID, a number of four or more digits or a token with `:id`. Visitors are counted with a hash of the IP address and user agent, salted with a random value that changes every day and is deleted after 48 hours, so nobody, Notra included, can link a visitor to an IP address afterwards or follow them from one day to the next. The IP address itself is never stored.
 
 The country is looked up inside Notra's own servers, so the IP address is not sent to any other service. Country data: [IP Geolocation by DB-IP](https://db-ip.com), licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
 
-The script does not run inside iframes, on `localhost`, or in automated browsers, and Notra drops page views, clicks and errors from headless browsers and page-speed tools such as Lighthouse.
+The script does not run inside iframes, on `localhost` or in automated browsers, and Notra drops page views, clicks and errors from headless browsers and page-speed tools such as Lighthouse.

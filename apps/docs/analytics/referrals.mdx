@@ -7,7 +7,7 @@ authors:
 
 docolin:
   schema_version: 1
-  kind: tools/notra/ai-traffic/referrals
+  kind: tools/notra/analytics/referrals
   type: how-to
   applies_to:
     - notra
@@ -31,7 +31,7 @@ An AI referral is a person who clicked a link in an AI answer and landed on your
 | Qwen | chat.qwen.ai |
 | Meta AI | meta.ai |
 
-Subdomains of these hosts also count. The server tracker and log drains go by the referrer alone. In [Web analytics](/ai-traffic/web-analytics), a page view also counts as coming from AI when its link carries one of these hosts as `utm_source`, such as `utm_source=chatgpt.com`, which ChatGPT's apps add because they send no referrer.
+Subdomains of these hosts also count, and the server tracker and log drains go by the referrer alone. In [Web analytics](/analytics/web-analytics), a page view also counts as coming from AI when its link carries one of these hosts as `utm_source`, such as `utm_source=chatgpt.com`, which ChatGPT's apps add because they send no referrer.
 
 ## Conversions
 
@@ -39,7 +39,7 @@ Add **Conversion paths** in [Brand and domains](/geo/brand-and-domains), for exa
 
 A conversion is an AI referral that lands on one of those paths. Paths match by prefix, so `/pricing` also counts `/pricing/teams`, while `/` only matches the home page.
 
-Conversions show up as the **Conversions** stage in the hero of the [AI analytics](/ai-traffic/overview) page, for the selected date range.
+Conversions show up as the **Conversions** stage in the hero of the [AI analytics](/analytics/overview) page, for the selected date range.
 
 <Visibility for="agents">
 
@@ -50,4 +50,4 @@ Conversions show up as the **Conversions** stage in the hero of the [AI analytic
 ## Limits
 
 - Notra only counts the page the referral landed on, so a visitor who lands on a blog post and signs up later is not a conversion.
-- Apps that strip the referrer header, and AI engines not in the table, are not counted as referrals.
+- Notra doesn't count visits from apps that strip the referrer header or from AI engines missing from the table as referrals.

@@ -7,7 +7,7 @@ authors:
 
 docolin:
   schema_version: 1
-  kind: tools/notra/ai-traffic/overview
+  kind: tools/notra/analytics/overview
   type: how-to
   applies_to:
     - notra
@@ -15,7 +15,7 @@ docolin:
   status: stable
 ---
 
-Traffic tracking shows the AI systems fetching your pages and the people arriving from AI answers. A small request-capture SDK on your site, or a log drain from your host, sends each request to Notra, which classifies it at ingest and shows the results on the **Agent** tab of **Analytics**. Notra only stores AI traffic from the SDK and log drains and discards ordinary human page views on arrival. To count human readers on any site, add the [notra.js script tag](/ai-traffic/install/script-tag) and see them in [Web analytics](/ai-traffic/web-analytics); sites hosted with Notra Sites count them automatically.
+Traffic tracking shows the AI systems fetching your pages and the people arriving from AI answers. A small request-capture SDK on your site, or a log drain from your host, sends each request to Notra, which classifies it at ingest and shows the results on the **Agent** tab of **Analytics**. Notra only stores AI traffic from the SDK and log drains and discards ordinary human page views on arrival. To count human readers on any site, add the [notra.js script tag](/analytics/install/script-tag) and see them in [Web analytics](/analytics/web-analytics), while sites hosted with Notra Sites count them automatically.
 
 <img
   src="/images/ai-traffic/traffic-light.webp"
@@ -40,7 +40,7 @@ Notra classifies captured requests into these visitor types:
 
 - **AI crawler**: bots fetching your pages to train models or build a search index. Each crawler carries a **Purpose**: **Model training** (collects pages for training corpora), **Search index** (builds the index an AI answer engine searches) or **Cited in answer** (fetched while an assistant was answering someone).
 - **AI referral**: a person who clicked through to your site from an AI answer. Notra detects referrals by referrer host, for example chatgpt.com, perplexity.ai, gemini.google.com, claude.ai, copilot.microsoft.com, you.com, chat.deepseek.com, chat.mistral.ai, grok.com and chat.qwen.ai.
-- **Human visitor**: an ordinary person opening a page. Notra discards these requests from the SDK and log drains, and counts people only through `notra.js`, which Notra Sites load automatically. See [Web analytics](/ai-traffic/web-analytics).
+- **Human visitor**: an ordinary person opening a page. Notra discards these requests from the SDK and log drains, and counts people only through `notra.js`, which Notra Sites load automatically. See [Web analytics](/analytics/web-analytics).
 
 AI traffic collection from the SDK and log drains needs no browser script or cookies. Each AI event carries:
 
@@ -50,32 +50,32 @@ AI traffic collection from the SDK and log drains needs no browser script or coo
 - whether the client asked for Markdown
 - a journey id
 
-On Notra Sites, each published post also shows its **Agent reach** in the post's **Overview** panel and in the **Content** list: the crawls, citations and referrals for that post's page and its Markdown copy.
+On Notra Sites, each published post also shows its **Agent reach** in the post's **Overview** panel and in the **Content** list, which counts the crawls, citations and referrals for that post's page and its Markdown copy.
 
 ## Supported frameworks
 
 The `@usenotra/sdk` tracker runs inside your app's request pipeline. Pick your framework:
 
 <Columns cols={3}>
-  <Card title="Next.js" icon="react" href="/ai-traffic/install/nextjs">
+  <Card title="Next.js" icon="react" href="/analytics/install/nextjs">
     `proxy.ts`
   </Card>
-  <Card title="TanStack Start" icon="layer-group" href="/ai-traffic/install/tanstack-start">
+  <Card title="TanStack Start" icon="layer-group" href="/analytics/install/tanstack-start">
     `src/start.ts`
   </Card>
-  <Card title="Nuxt" icon="vuejs" href="/ai-traffic/install/nuxt">
+  <Card title="Nuxt" icon="vuejs" href="/analytics/install/nuxt">
     `server/middleware/geo.ts`
   </Card>
-  <Card title="Astro" icon="rocket" href="/ai-traffic/install/astro">
+  <Card title="Astro" icon="rocket" href="/analytics/install/astro">
     `src/middleware.ts`
   </Card>
-  <Card title="SvelteKit" icon="fire" href="/ai-traffic/install/sveltekit">
+  <Card title="SvelteKit" icon="fire" href="/analytics/install/sveltekit">
     `src/hooks.server.ts`
   </Card>
-  <Card title="React Router" icon="route" href="/ai-traffic/install/react-router">
+  <Card title="React Router" icon="route" href="/analytics/install/react-router">
     `app/root.tsx`
   </Card>
-  <Card title="Netlify Edge Functions" icon="cloud" href="/ai-traffic/install/netlify">
+  <Card title="Netlify Edge Functions" icon="cloud" href="/analytics/install/netlify">
     `netlify/edge-functions/geo.ts`
   </Card>
 </Columns>
@@ -85,21 +85,21 @@ The `@usenotra/sdk` tracker runs inside your app's request pipeline. Pick your f
 If you'd rather not change your code, Notra can read your host's request logs instead. A log drain sees the method, URL, user agent, referer and IP of every request, which is enough to track declared AI crawlers and AI referrals. It can't tag Markdown links for journeys, and without extra request headers it misses agents that ask for Markdown or pose as a browser.
 
 <Columns cols={2}>
-  <Card title="Vercel log drain" icon="triangle" href="/ai-traffic/install/vercel-log-drain">
+  <Card title="Vercel log drain" icon="triangle" href="/analytics/install/vercel-log-drain">
     Vercel Pro and Enterprise teams
   </Card>
-  <Card title="Cloudflare Logpush" icon="cloud" href="/ai-traffic/install/cloudflare-logpush">
+  <Card title="Cloudflare Logpush" icon="cloud" href="/analytics/install/cloudflare-logpush">
     Any site proxied through Cloudflare
   </Card>
 </Columns>
 
 ## Recognized AI agents
 
-Notra recognizes more than 60 AI crawlers and agents from OpenAI, Anthropic, Google, Perplexity, Meta, Apple, Amazon and others. See the full [AI crawler directory](/ai-traffic/crawlers).
+Notra recognizes more than 60 AI crawlers and agents from OpenAI, Anthropic, Google, Perplexity, Meta, Apple, Amazon and others. See the full [AI crawler directory](/analytics/crawlers).
 
 ## The Agent tab
 
-Open **Analytics** in the GEO sidebar and stay on the **Agent** tab. Once events arrive, the page shows the sections below, and each one follows the range picker. How AI agents move through your site is on the GEO **Overview** page under the **Journeys** tab; see [Journeys](/ai-traffic/journeys). People reading your site are counted on the **Web** tab; see [Web analytics](/ai-traffic/web-analytics).
+Open **Analytics** in the GEO sidebar and stay on the **Agent** tab. Once events arrive, the page shows the sections below, and each one follows the range picker. The **Journeys** tab on the GEO **Overview** page shows how AI agents move through your site, as described in [Journeys](/analytics/journeys), and the **Web** tab counts the people reading your site, as described in [Web analytics](/analytics/web-analytics).
 
 - A hero row with **Crawlers**, **Referrals** and **Total** visit counts, each compared "vs. previous period", and a daily trend chart.
 - **Sources** has three groups: **Crawlers** (training and search-index bots), **Cited** (assistant-browse fetches while an engine answered someone) and **Referrals**. Columns are **Source**, **Purpose**, **Visits**, **Pages** and **Last seen**. Open a source to see the share of its visits that asked for Markdown, and log rows that asked for Markdown carry a **Markdown** badge. Sources group by operator, for example OpenAI, Anthropic, Google, Perplexity, Microsoft, Meta, Instagram, Amazon, Apple, ByteDance and Common Crawl, with Instagram kept as its own source rather than folded into Meta.
@@ -116,7 +116,7 @@ All paths below are prefixed with `/v1/projects/{projectId}` and need `traffic.r
 | --- | --- | --- |
 | `GET /geo/traffic/overview` | `days`, `from`, `to`, `host`, `path` (exact page path), `sites=exclude` (leave out Notra Sites) | `totals` (`crawler`, `cited`, `aiReferral`, `conversions`), `sources[]` with `source`, `visitorType`, `agent`, `category`, `confidence`, `visits`, `previousVisits`, `markdownVisits`, `previousMarkdownVisits`, `paths`, `previousPaths`, `lastSeenAt` and daily `points[]` |
 | `GET /geo/traffic/journey-stats` | window | `sources[]` and `pages[]` with exact journey counts against the previous window, `singleFetch`, `deepCrawls`, `entries` and daily counts, plus `totalPages` |
-| `GET /geo/traffic/log` | `limit` (1 to 200), `visitorTypes`, `categories`, `host` | `log[]` with `capturedAt`, `visitorType`, `source`, `agent`, `category`, `confidence`, `path`, `host`, `country`, `ua`, `journeyId`, `wantsMarkdown`, plus `total`. It takes no window. Bound it with `limit`. `host` keeps the newest matching events for that hostname and its subdomains |
+| `GET /geo/traffic/log` | `limit` (1 to 200), `visitorTypes`, `categories`, `host` | `log[]` with `capturedAt`, `visitorType`, `source`, `agent`, `category`, `confidence`, `path`, `host`, `country`, `ua`, `journeyId`, `wantsMarkdown`, plus `total`. It takes no window, so bound it with `limit`, and `host` keeps the newest matching events for that hostname and its subdomains |
 | `GET /geo/traffic/journeys` | window plus `limit` (1 to 100) | `journeys[]` with `journeyId`, `source`, `visitorType`, `pages`, `distinctPaths`, `firstSeenAt`, `lastSeenAt`, `entryPath`, `samplePaths[]` |
 | `GET /geo/traffic/journeys/{journeyId}` | window | `events[]` with `capturedAt`, `path`, `host`, `method`, `referer`, `country`, `agent`, `category` |
 | `GET /geo/traffic/pages` | window plus `limit` (1 to 500), `visitorType` (`crawler` or `ai_referral`), `host` | `pages[]` with `host`, `path`, `source`, `visitorType`, `visits`, `previousVisits`, `lastSeenAt`. `host` ranks pages for that hostname and its subdomains before applying `limit` |
@@ -135,16 +135,16 @@ Every traffic response includes `configured`. When it is `false`, the deployment
 
 ## Reading website analytics from the API
 
-The data on the **Web** tab ([Web analytics](/ai-traffic/web-analytics)) is available under the same prefix and scope, with the same window and `host`, `path` and `sites` filters as the overview:
+The data on the **Web** tab ([Web analytics](/analytics/web-analytics)) is available under the same prefix and scope, with the same window and `host`, `path` and `sites` filters as the overview:
 
 | Endpoint | Returns |
 | --- | --- |
 | `GET /geo/traffic/web` | `totals` (`views`, `visitors`, `sessions`, `engagedSessions`, `aiVisitors`, each with its `previous*` value), daily `points[]`, `hosts[]` and `imported` (the latest completed history import) |
 | `GET /geo/traffic/web/breakdowns` | `pages[]`, `sources[]`, `countries[]`, `devices[]`, `languages[]`, `outcomes[]` (how sessions from AI assistants behave), `outboundLinks[]` (host and path only), `vitals[]` (p75 in milliseconds, CLS x1000) and `errors[]` |
 | `GET /geo/traffic/web/utm` | Takes a required `dimension`: `source`, `medium`, `campaign`, `term` or `content`. `rows[]` with the top 25 values and their `sessions`, `previousSessions` and `visitors`, counted on each session's first page. Term and content cover at most the last 90 days unless a history import adds older ones. Campaign, term and content values that look like an email address, a UUID or a token show as `:id` |
-| `GET /geo/traffic/imports` | `imports[]` with each history import's provider, status and progress. Connections and credentials are never returned; start imports in the dashboard |
+| `GET /geo/traffic/imports` | `imports[]` with each history import's provider, status and progress. Connections and credentials are never returned, so start imports in the dashboard |
 
-Error messages are scrubbed before storage.
+Notra scrubs error messages before storing them.
 
 ```bash
 curl "https://api.usenotra.com/v1/projects/$PROJECT_ID/geo/traffic/web/breakdowns?from=2026-10-01&to=2026-10-31&host=www.example.com" \
@@ -163,7 +163,7 @@ curl "https://api.usenotra.com/v1/projects/$PROJECT_ID/geo/traffic/web/breakdown
     The **Cited in answer** purpose means an assistant fetched the page while answering someone, but it doesn't prove the answer quoted or linked the page.
   </Accordion>
   <Accordion title="Some agents cannot be detected">
-    The signature table leaves out agents that a user agent can't honestly identify, including Pi, ChatGPT Atlas, `Google-Extended` and `Applebot-Extended`. Notra cannot reliably attribute their traffic to a specific AI agent, so those requests are treated like human visits and are not stored.
+    The signature table leaves out agents that a user agent can't honestly identify, including Pi, ChatGPT Atlas, `Google-Extended` and `Applebot-Extended`. Notra cannot reliably attribute their traffic to a specific AI agent, so it treats those requests like human visits and doesn't store them.
   </Accordion>
   <Accordion title="Referrals depend on the referrer header">
     Notra recognizes AI referrals by referrer host, so it doesn't count clicks from apps that strip the referrer or from hosts that aren't in the list.

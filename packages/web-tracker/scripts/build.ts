@@ -19,7 +19,7 @@ import { trackerReleaseFile } from "../src/utils/release";
 const root = new URL("..", import.meta.url).pathname;
 export const RELEASES_DIR = `${root}releases/`;
 /** The install docs, whose example tags show the current pinned builds. */
-export const DOCS_FILE = `${root}../../apps/docs/ai-traffic/install/script-tag.mdx`;
+export const DOCS_FILE = `${root}../../apps/docs/analytics/install/script-tag.mdx`;
 
 /** notra.js, or with `plus` the superset notra.plus.js that adds errors. */
 export async function buildTracker(plus = false): Promise<string> {
