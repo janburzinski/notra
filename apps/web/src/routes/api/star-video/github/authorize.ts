@@ -47,7 +47,12 @@ function GET(request: Request) {
     maxAge: GITHUB_STATE_MAX_AGE_SECONDS,
   });
   return Response.redirect(
-    buildGithubAuthorizeUrl(config.clientId, redirectUri, state),
+    buildGithubAuthorizeUrl(
+      config.clientId,
+      redirectUri,
+      state,
+      requestUrl.searchParams.get("private") === "1"
+    ),
     307
   );
 }

@@ -5,13 +5,20 @@ import type { RepoStarData } from "@/types/star-video";
 import { fingerprintGithubToken } from "./github-oauth";
 import { fetchRepoStarData } from "./stargazers";
 
+type LoadRepoFailureKind =
+  | "not-found"
+  | "private-access-needed"
+  | "unavailable"
+  | "unauthorized";
+
 export type LoadRepoResult =
   | { ok: true; data: RepoStarData }
-  | { ok: false; kind: "not-found" | "unavailable" | "unauthorized" };
+  | { ok: false; kind: LoadRepoFailureKind };
 
-function failureKind(
-  tag: string
-): "not-found" | "unavailable" | "unauthorized" {
+function failureKind(tag: string): LoadRepoFailureKind {
+  if (tag === "RepoPrivateAccessNeeded") {
+    return "private-access-needed";
+  }
   if (tag === "RepoUnavailable") {
     return "unavailable";
   }

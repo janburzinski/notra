@@ -102,7 +102,6 @@ import { Route as AgentAuthTokenRouteImport } from './routes/agent/auth/token'
 import { Route as ApiC15tSplatRouteImport } from './routes/api/c15t/$'
 import { Route as ApiOfferingCheckIndexRouteImport } from './routes/api/offering-check/index'
 import { Route as ApiOfferingCheckPreflightRouteImport } from './routes/api/offering-check/preflight'
-import { Route as ApiStarVideoRenderRouteImport } from './routes/api/star-video/render'
 import { Route as ApiStarVideoRepoRouteImport } from './routes/api/star-video/repo'
 import { Route as SiteShowcaseShowcaseIndexRouteImport } from './routes/_site/_showcase/showcase/index'
 import { Route as SiteFeaturesMarketingAssetsRouteImport } from './routes/_site/features/marketing/assets'
@@ -592,11 +591,6 @@ const ApiOfferingCheckPreflightRoute =
     path: '/api/offering-check/preflight',
     getParentRoute: () => rootRouteImport,
   } as any)
-const ApiStarVideoRenderRoute = ApiStarVideoRenderRouteImport.update({
-  id: '/api/star-video/render',
-  path: '/api/star-video/render',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ApiStarVideoRepoRoute = ApiStarVideoRepoRouteImport.update({
   id: '/api/star-video/repo',
   path: '/api/star-video/repo',
@@ -752,7 +746,6 @@ export interface FileRoutesByFullPath {
   '/agent/auth/token': typeof AgentAuthTokenRoute
   '/api/c15t/$': typeof ApiC15tSplatRoute
   '/api/offering-check/preflight': typeof ApiOfferingCheckPreflightRoute
-  '/api/star-video/render': typeof ApiStarVideoRenderRoute
   '/api/star-video/repo': typeof ApiStarVideoRepoRoute
   '/.well-known/mcp/': typeof DotwellKnownMcpIndexRoute
   '/compare/': typeof SiteCompareIndexRoute
@@ -857,7 +850,6 @@ export interface FileRoutesByTo {
   '/agent/auth/token': typeof AgentAuthTokenRoute
   '/api/c15t/$': typeof ApiC15tSplatRoute
   '/api/offering-check/preflight': typeof ApiOfferingCheckPreflightRoute
-  '/api/star-video/render': typeof ApiStarVideoRenderRoute
   '/api/star-video/repo': typeof ApiStarVideoRepoRoute
   '/.well-known/mcp': typeof DotwellKnownMcpIndexRoute
   '/compare': typeof SiteCompareIndexRoute
@@ -967,7 +959,6 @@ export interface FileRoutesById {
   '/agent/auth/token': typeof AgentAuthTokenRoute
   '/api/c15t/$': typeof ApiC15tSplatRoute
   '/api/offering-check/preflight': typeof ApiOfferingCheckPreflightRoute
-  '/api/star-video/render': typeof ApiStarVideoRenderRoute
   '/api/star-video/repo': typeof ApiStarVideoRepoRoute
   '/.well-known/mcp/': typeof DotwellKnownMcpIndexRoute
   '/_site/compare/': typeof SiteCompareIndexRoute
@@ -1074,7 +1065,6 @@ export interface FileRouteTypes {
     | '/agent/auth/token'
     | '/api/c15t/$'
     | '/api/offering-check/preflight'
-    | '/api/star-video/render'
     | '/api/star-video/repo'
     | '/.well-known/mcp/'
     | '/compare/'
@@ -1179,7 +1169,6 @@ export interface FileRouteTypes {
     | '/agent/auth/token'
     | '/api/c15t/$'
     | '/api/offering-check/preflight'
-    | '/api/star-video/render'
     | '/api/star-video/repo'
     | '/.well-known/mcp'
     | '/compare'
@@ -1288,7 +1277,6 @@ export interface FileRouteTypes {
     | '/agent/auth/token'
     | '/api/c15t/$'
     | '/api/offering-check/preflight'
-    | '/api/star-video/render'
     | '/api/star-video/repo'
     | '/.well-known/mcp/'
     | '/_site/compare/'
@@ -1359,7 +1347,6 @@ export interface RootRouteChildren {
   AgentAuthTokenRoute: typeof AgentAuthTokenRoute
   ApiC15tSplatRoute: typeof ApiC15tSplatRoute
   ApiOfferingCheckPreflightRoute: typeof ApiOfferingCheckPreflightRoute
-  ApiStarVideoRenderRoute: typeof ApiStarVideoRenderRoute
   ApiStarVideoRepoRoute: typeof ApiStarVideoRepoRoute
   DotwellKnownMcpIndexRoute: typeof DotwellKnownMcpIndexRoute
   ApiOfferingCheckIndexRoute: typeof ApiOfferingCheckIndexRoute
@@ -2020,13 +2007,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiOfferingCheckPreflightRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/star-video/render': {
-      id: '/api/star-video/render'
-      path: '/api/star-video/render'
-      fullPath: '/api/star-video/render'
-      preLoaderRoute: typeof ApiStarVideoRenderRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/api/star-video/repo': {
       id: '/api/star-video/repo'
       path: '/api/star-video/repo'
@@ -2325,7 +2305,6 @@ const rootRouteChildren: RootRouteChildren = {
   AgentAuthTokenRoute: AgentAuthTokenRoute,
   ApiC15tSplatRoute: ApiC15tSplatRoute,
   ApiOfferingCheckPreflightRoute: ApiOfferingCheckPreflightRoute,
-  ApiStarVideoRenderRoute: ApiStarVideoRenderRoute,
   ApiStarVideoRepoRoute: ApiStarVideoRepoRoute,
   DotwellKnownMcpIndexRoute: DotwellKnownMcpIndexRoute,
   ApiOfferingCheckIndexRoute: ApiOfferingCheckIndexRoute,

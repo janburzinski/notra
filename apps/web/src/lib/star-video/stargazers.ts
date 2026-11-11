@@ -11,6 +11,13 @@ class RepoNotFound extends Data.TaggedError("RepoNotFound")<{
   readonly repo: string;
 }> {}
 
+class RepoPrivateAccessNeeded extends Data.TaggedError(
+  "RepoPrivateAccessNeeded"
+)<{
+  readonly owner: string;
+  readonly repo: string;
+}> {}
+
 class RepoUnavailable extends Data.TaggedError("RepoUnavailable")<{
   readonly owner: string;
   readonly repo: string;
@@ -35,6 +42,13 @@ function buildFetchOptions(token: string): RequestInit {
 
 const HTTP_NOT_FOUND = 404;
 const HTTP_UNAUTHORIZED = 401;
+const PRIVATE_REPO_SCOPE = "repo";
+
+function hasPrivateRepoScope(response: Response): boolean {
+  return (response.headers.get("x-oauth-scopes") ?? "")
+    .split(",")
+    .some((scope) => scope.trim() === PRIVATE_REPO_SCOPE);
+}
 
 class GitHubRequestFailed extends Data.TaggedError("GitHubRequestFailed")<{
   readonly cause: unknown;
@@ -140,7 +154,11 @@ export const fetchRepoStarData = Effect.fn("fetchRepoStarData")(function* (
   );
 
   if (metaResponse.status === HTTP_NOT_FOUND) {
-    return yield* Effect.fail(new RepoNotFound({ owner, repo }));
+    return yield* Effect.fail(
+      hasPrivateRepoScope(metaResponse)
+        ? new RepoNotFound({ owner, repo })
+        : new RepoPrivateAccessNeeded({ owner, repo })
+    );
   }
 
   if (metaResponse.status === HTTP_UNAUTHORIZED) {
@@ -154,10 +172,6 @@ export const fetchRepoStarData = Effect.fn("fetchRepoStarData")(function* (
   const repoData = yield* readGitHubJson<GitHubRepo>(metaResponse).pipe(
     Effect.mapError(() => new RepoUnavailable({ owner, repo }))
   );
-
-  if (repoData.private) {
-    return yield* Effect.fail(new RepoNotFound({ owner, repo }));
-  }
 
   const avatars = yield* fetchAvatars(base, token, owner, repo);
   const resolvedOwner = repoData.full_name.split("/")[0] ?? owner;

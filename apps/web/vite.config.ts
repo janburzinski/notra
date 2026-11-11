@@ -21,13 +21,7 @@ import {
 } from "./src/utils/security-headers";
 import { SHOWCASE_COMPANIES } from "./src/utils/showcase";
 
-const SERVER_ONLY_PACKAGES = [
-  "@remotion/bundler",
-  "@remotion/renderer",
-  "@resvg/resvg-js",
-  "satori",
-  "sharp",
-];
+const SERVER_ONLY_PACKAGES = ["@resvg/resvg-js", "satori", "sharp"];
 
 const RAW_QUERY_REGEX = /\?(.*&)?raw(&|$)/;
 
@@ -126,9 +120,6 @@ export default defineConfig(({ command }) => ({
         "react",
         "react-dom",
       ],
-      rolldownConfig: {
-        external: ["@remotion/bundler", "@remotion/renderer"],
-      },
       routeRules: {
         "/**": { headers: buildSecurityHeaders(command === "serve") },
       },

@@ -11,19 +11,22 @@ export async function fetchRepoStarData(
       { signal }
     );
     if (!response.ok) {
-      const json: { error?: string } = await response.json().catch(() => ({}));
+      const json: { error?: string; needsPrivateAccess?: boolean } =
+        await response.json().catch(() => ({}));
       return {
         data: null,
         error: json.error ?? "Could not load that repository.",
+        needsPrivateAccess: json.needsPrivateAccess === true,
       };
     }
 
     const data: RepoStarData = await response.json();
-    return { data, error: null };
+    return { data, error: null, needsPrivateAccess: false };
   } catch {
     return {
       data: null,
       error: "Something went wrong loading that repository.",
+      needsPrivateAccess: false,
     };
   }
 }

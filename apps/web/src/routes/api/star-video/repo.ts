@@ -48,6 +48,16 @@ async function GET(request: Request) {
         { status: 503 }
       );
     }
+    if (result.kind === "private-access-needed") {
+      return Response.json(
+        {
+          error:
+            "Repository not found. If it is private, allow access to your private repositories.",
+          needsPrivateAccess: true,
+        },
+        { status: 404 }
+      );
+    }
     return Response.json({ error: "Repository not found." }, { status: 404 });
   }
 

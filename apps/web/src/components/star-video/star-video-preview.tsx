@@ -30,6 +30,7 @@ import { toast } from "sonner";
 import { normalizeHex } from "@/lib/star-video/color";
 import { fetchRepoStarData } from "@/lib/star-video/fetch-repo";
 import {
+  buildGithubConnectHref,
   getGithubLogin,
   getServerGithubLogin,
   subscribeToGithubConnection,
@@ -102,7 +103,23 @@ export function StarVideoPreview() {
         }
         setData(result.data);
         if (result.error) {
-          toast.error(result.error);
+          toast.error(
+            result.error,
+            result.needsPrivateAccess
+              ? {
+                  action: {
+                    label: "Allow access",
+                    onClick: () =>
+                      window.location.assign(
+                        buildGithubConnectHref(
+                          `${parsed.owner}/${parsed.repo}`.toLowerCase(),
+                          true
+                        )
+                      ),
+                  },
+                }
+              : undefined
+          );
         }
       })
       .catch(() => {
@@ -154,34 +171,41 @@ export function StarVideoPreview() {
       return;
     }
     setIsRendering(true);
-    const pending = toast.loading(
-      "Rendering your video. This can take a minute."
-    );
+    const pending = toast.loading("Rendering your video.");
     try {
-      const response = await fetch("/api/star-video/render", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(inputProps),
+      const { renderMediaOnWeb } = await import("@remotion/web-renderer");
+      const { getBlob } = await renderMediaOnWeb({
+        composition: {
+          id: "StarVideo",
+          component: StarVideo,
+          durationInFrames: VIDEO_DURATION_IN_FRAMES,
+          fps: VIDEO_FPS,
+          width: VIDEO_WIDTH,
+          height: VIDEO_HEIGHT,
+          defaultProps: inputProps,
+        },
+        inputProps,
+        muted: true,
+        onProgress: ({ progress }) => {
+          toast.loading(
+            `Rendering your video. ${Math.round(progress * 100)}%`,
+            { id: pending }
+          );
+        },
       });
-      if (response.ok) {
-        const blob = await response.blob();
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement("a");
-        link.href = url;
-        link.download = `${inputProps.owner}-${inputProps.repo}-stars.mp4`;
-        link.click();
-        URL.revokeObjectURL(url);
-        toast.success("Video ready.", { id: pending });
-      } else {
-        const json: { error?: string } = await response
-          .json()
-          .catch(() => ({}));
-        toast.error(json.error ?? "Could not render the video.", {
-          id: pending,
-        });
-      }
-    } catch {
-      toast.error("Something went wrong rendering the video.", { id: pending });
+      const url = URL.createObjectURL(await getBlob());
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `${inputProps.owner}-${inputProps.repo}-stars.mp4`;
+      link.click();
+      URL.revokeObjectURL(url);
+      toast.success("Video ready.", { id: pending });
+    } catch (error) {
+      console.error("Failed to render star video", error);
+      toast.error(
+        "Could not render the video in this browser. Try the latest Chrome, Edge, Firefox or Safari.",
+        { id: pending }
+      );
     }
     setIsRendering(false);
   };

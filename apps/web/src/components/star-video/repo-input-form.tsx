@@ -12,7 +12,7 @@ import {
 } from "@/lib/star-video/github-connection";
 import { parseRepoInput } from "@/lib/star-video/parse-repo";
 
-const DEFAULT_INPUT = "usenotra/notra";
+const DEFAULT_INPUT = "torvalds/linux";
 const AVATAR_SIZE_PX = 40;
 
 export function RepoInputForm() {

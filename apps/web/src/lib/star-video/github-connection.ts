@@ -25,9 +25,17 @@ export function getServerGithubLogin(): string | null {
   return null;
 }
 
-export function buildGithubConnectHref(repoParam: string | null): string {
-  if (!repoParam) {
-    return "/api/star-video/github/authorize";
+export function buildGithubConnectHref(
+  repoParam: string | null,
+  privateAccess = false
+): string {
+  const params = new URLSearchParams();
+  if (repoParam) {
+    params.set("repo", repoParam);
   }
-  return `/api/star-video/github/authorize?repo=${encodeURIComponent(repoParam)}`;
+  if (privateAccess) {
+    params.set("private", "1");
+  }
+  const query = params.toString();
+  return `/api/star-video/github/authorize${query ? `?${query}` : ""}`;
 }

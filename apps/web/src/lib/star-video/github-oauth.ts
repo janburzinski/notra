@@ -31,6 +31,7 @@ const IV_LENGTH = 12;
 const AUTH_TAG_LENGTH = 16;
 const STATE_LENGTH = 16;
 const CALLBACK_PATH = "/api/star-video/github/callback";
+const PRIVATE_REPO_SCOPE = "repo";
 
 export function getGithubOAuthConfig(): GithubOAuthConfig | null {
   const clientId = process.env.GITHUB_CLIENT_ID;
@@ -86,12 +87,16 @@ export function createOAuthState(): string {
 export function buildGithubAuthorizeUrl(
   clientId: string,
   redirectUri: string,
-  state: string
+  state: string,
+  privateAccess: boolean
 ): string {
   const url = new URL(AUTHORIZE_URL);
   url.searchParams.set("client_id", clientId);
   url.searchParams.set("redirect_uri", redirectUri);
   url.searchParams.set("state", state);
+  if (privateAccess) {
+    url.searchParams.set("scope", PRIVATE_REPO_SCOPE);
+  }
   return url.toString();
 }
 
