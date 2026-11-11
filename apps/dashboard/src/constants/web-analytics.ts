@@ -1,6 +1,7 @@
 import {
   ComputerIcon,
-  SmartPhone01Icon,
+  HelpCircleIcon,
+  SmartPhone02Icon,
   Tablet01Icon,
 } from "@hugeicons/core-free-icons";
 import { DuckDuckGo } from "@notra/ui/components/ui/svgs/duckDuckGo";
@@ -58,9 +59,11 @@ export const WEB_SOURCE_HOST_PATTERN = /^[a-z0-9-]+(?:\.[a-z0-9-]+)+$/i;
 
 export const WEB_DEVICE_ICONS: Record<string, typeof ComputerIcon> = {
   desktop: ComputerIcon,
-  mobile: SmartPhone01Icon,
+  mobile: SmartPhone02Icon,
   tablet: Tablet01Icon,
 };
+/** Imports store a device type they can't map as "". */
+export const WEB_UNKNOWN_DEVICE_ICON = HelpCircleIcon;
 
 export const WEB_LIST_LIMIT = 8;
 /** Requested favicon size: twice the 14px icon for sharp HiDPI rendering. */

@@ -4591,6 +4591,7 @@
       "deviceDesktop": "Desktop",
       "deviceMobile": "Mobil",
       "deviceTablet": "Tablet",
+      "deviceUnknown": "Unbekannt",
       "outcomesTitle": "Was KI-Besucher tun",
       "outcomesAll": "Alle Besucher",
       "pagesPerSession": "Seiten pro Besuch",

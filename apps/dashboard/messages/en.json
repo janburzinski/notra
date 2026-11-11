@@ -4591,6 +4591,7 @@
       "deviceDesktop": "Desktop",
       "deviceMobile": "Mobile",
       "deviceTablet": "Tablet",
+      "deviceUnknown": "Unknown",
       "outcomesTitle": "What AI visitors do",
       "outcomesAll": "All visitors",
       "pagesPerSession": "Pages per visit",

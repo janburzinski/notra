@@ -1,6 +1,5 @@
 "use client";
 
-import { DeviceAccessIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { trafficLogHostFilter } from "@notra/geo-core/utils/geo-project-domains";
 import { TruncateWithTooltip } from "@notra/ui/components/shared/truncate-with-tooltip";
@@ -13,7 +12,11 @@ import { WebReferrerIcon } from "@/components/geo/web-referrer-icon";
 import { WebScriptReports } from "@/components/geo/web-script-reports";
 import { WebSourcesCard } from "@/components/geo/web-sources-card";
 import { WebTrafficHero } from "@/components/geo/web-traffic-hero";
-import { WEB_DEVICE_ICONS, WEB_LIST_LIMIT } from "@/constants/web-analytics";
+import {
+  WEB_DEVICE_ICONS,
+  WEB_LIST_LIMIT,
+  WEB_UNKNOWN_DEVICE_ICON,
+} from "@/constants/web-analytics";
 import { useDesktopBreakpoint } from "@/lib/hooks/use-desktop-breakpoint";
 import type { WebBreakdownRow, WebVisitorsSectionProps } from "@/types/geo";
 import { countryName } from "@/utils/country";
@@ -101,12 +104,12 @@ export function WebVisitorsSection({
     tablet: t("deviceTablet"),
   };
   const deviceRows: WebBreakdownRow[] = web.devices.map((row) => {
-    const name = deviceLabels[row.value] ?? row.value;
-    const icon = Object.hasOwn(WEB_DEVICE_ICONS, row.value)
-      ? (WEB_DEVICE_ICONS[row.value] ?? DeviceAccessIcon)
-      : DeviceAccessIcon;
+    const known = Object.hasOwn(deviceLabels, row.value);
+    const name = (known && deviceLabels[row.value]) || t("deviceUnknown");
+    const icon =
+      (known && WEB_DEVICE_ICONS[row.value]) || WEB_UNKNOWN_DEVICE_ICON;
     return {
-      key: row.value,
+      key: row.value || "unknown",
       label: (
         <>
           <HugeiconsIcon
