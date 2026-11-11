@@ -154,3 +154,43 @@ test("imported rows and platform account ids keep their exact values", async () 
     "provider_account_id = 'did:plc:z72i7hdynmk6r22z27h6tvur'"
   );
 });
+
+test("a full Tinybird delete queue waits for a free slot", async () => {
+  let refused = 1;
+  globalThis.fetch = mock(async (input: string | URL | Request) => {
+    const url = String(input);
+    if (url.includes("/jobs/")) {
+      return Response.json({ status: "done" });
+    }
+    if (url.includes("/web_imported_daily/") && refused > 0) {
+      refused -= 1;
+      return new Response("maximum number of concurrent delete jobs", {
+        status: 429,
+      });
+    }
+    deletes.push({ datasource: url, condition: "" });
+    return Response.json({ job_id: "job" });
+  }) as unknown as typeof fetch;
+  await purgeImportedRows({ organizationId: "org", importId: "imp_1" });
+  expect(refused).toBe(0);
+  expect(deletes).toHaveLength(2);
+}, 20_000);
+
+test("a failed delete still waits for the other datasource's job", async () => {
+  let polls = 0;
+  globalThis.fetch = mock(async (input: string | URL | Request) => {
+    const url = String(input);
+    if (url.includes("/jobs/")) {
+      polls += 1;
+      return Response.json({ status: polls > 1 ? "done" : "working" });
+    }
+    if (url.includes("/web_imported_daily/")) {
+      return new Response("broken", { status: 500 });
+    }
+    return Response.json({ job_id: "job" });
+  }) as unknown as typeof fetch;
+  await expect(
+    purgeImportedRows({ organizationId: "org", importId: "imp_1" })
+  ).rejects.toThrow("web_imported_daily failed (500)");
+  expect(polls).toBe(2);
+}, 20_000);

@@ -42,8 +42,12 @@ const MCP_DATASOURCES = ["mcp_events", "mcp_daily"];
 // History imports are per project and never site scoped.
 const IMPORTED_DATASOURCES = ["web_imported_daily", "geo_imported_daily"];
 
-const JOB_POLL_INTERVAL_MS = 1000;
-const JOB_POLL_MAX_ATTEMPTS = 60;
+const JOB_POLL_INTERVAL_MS = 2000;
+// Delete jobs queue behind each other, so one can take minutes to finish.
+const JOB_POLL_MAX_ATTEMPTS = 90;
+// Tinybird allows 3 delete jobs per workspace, queued ones included.
+const QUEUE_FULL_RETRY_MS = 10_000;
+const QUEUE_FULL_MAX_RETRIES = 6;
 const TINYBIRD_READ_TIMEOUT_MS = 10_000;
 const TINYBIRD_MUTATION_TIMEOUT_MS = 30_000;
 
@@ -86,6 +90,11 @@ function isRetryableJobPollError(error: unknown): boolean {
 }
 
 type TinybirdJobPoll = "done" | "pending";
+
+/** Tinybird refused a delete because its job queue is full (429). */
+class TinybirdDeleteQueueFullError extends Error {
+  override name = "TinybirdDeleteQueueFullError";
+}
 
 function toError(cause: unknown): Error {
   return cause instanceof Error ? cause : new Error(String(cause));
@@ -159,9 +168,10 @@ async function submitDelete(
   );
   if (!response.ok) {
     const detail = await response.text();
-    throw new Error(
-      `Tinybird delete on ${datasource} failed (${response.status}): ${detail}`
-    );
+    const message = `Tinybird delete on ${datasource} failed (${response.status}): ${detail}`;
+    throw response.status === 429
+      ? new TinybirdDeleteQueueFullError(message)
+      : new Error(message);
   }
   const payload: { job_id?: string; id?: string } = await response.json();
   return payload.job_id ?? payload.id;
@@ -174,7 +184,14 @@ function deleteFromDatasource(
   return Effect.tryPromise({
     try: () => submitDelete(datasource, condition),
     catch: toError,
-  }).pipe(Effect.flatMap((jobId) => (jobId ? waitForJob(jobId) : Effect.void)));
+  }).pipe(
+    Effect.retry({
+      schedule: Schedule.spaced(Duration.millis(QUEUE_FULL_RETRY_MS)),
+      times: QUEUE_FULL_MAX_RETRIES,
+      while: (error) => error instanceof TinybirdDeleteQueueFullError,
+    }),
+    Effect.flatMap((jobId) => (jobId ? waitForJob(jobId) : Effect.void))
+  );
 }
 
 /**
@@ -302,6 +319,7 @@ export async function purgeDeletedSiteAnalytics(
 /**
  * Deletes one import's rows, optionally only the days of one chunk, and waits
  * for Tinybird so a retried chunk never writes on top of its earlier attempt.
+ * Both datasources delete at once, so the wait is one job long.
  */
 export async function purgeImportedRows(
   input: PurgeImportedRowsInput
@@ -314,11 +332,15 @@ export async function purgeImportedRows(
       ? ` AND day >= toDate(${literal(input.fromDay, DAY_PATTERN, "day")}) AND day <= toDate(${literal(input.toDay, DAY_PATTERN, "day")})`
       : "";
   const condition = `organization_id = ${id(input.organizationId, "organization id")} AND import_id = ${id(input.importId, "import id")}${days}`;
-  await Effect.runPromise(
-    Effect.forEach(
-      IMPORTED_DATASOURCES,
-      (datasource) => deleteFromDatasource(datasource, condition),
-      { discard: true }
+  // Both waits run to the end even when one fails: an interrupted wait
+  // leaves its job in Tinybird's queue while the caller retries.
+  const results = await Promise.allSettled(
+    IMPORTED_DATASOURCES.map((datasource) =>
+      Effect.runPromise(deleteFromDatasource(datasource, condition))
     )
   );
+  const failure = results.find((result) => result.status === "rejected");
+  if (failure) {
+    throw failure.reason;
+  }
 }

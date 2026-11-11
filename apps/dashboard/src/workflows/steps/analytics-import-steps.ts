@@ -1,4 +1,5 @@
 import "@/workflows/runtime";
+import { reportAnalyticsImportFailure } from "@/lib/analytics-imports/alerts";
 import { importQueueTurn } from "@/lib/analytics-imports/queue";
 import {
   deleteAnalyticsImportData,
@@ -48,4 +49,12 @@ export async function failAnalyticsImportStep(importId: string, error: string) {
 export async function deleteAnalyticsImportDataStep(importId: string) {
   "use step";
   await deleteAnalyticsImportData(importId);
+}
+
+export async function reportAnalyticsImportFailureStep(
+  importId: string,
+  reason: string
+) {
+  "use step";
+  await reportAnalyticsImportFailure(importId, reason);
 }

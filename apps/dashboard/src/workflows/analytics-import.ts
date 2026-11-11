@@ -8,6 +8,7 @@ import {
   failAnalyticsImportStep,
   finalizeAnalyticsImportStep,
   planAnalyticsImportStep,
+  reportAnalyticsImportFailureStep,
   runAnalyticsImportChunkStep,
 } from "./steps/analytics-import-steps";
 
@@ -17,14 +18,19 @@ import {
  * (which wakes them). Each chunk is its own step, so a crash resumes at the
  * first unfinished one; rate limits sleep durably instead of holding
  * compute. An error that outlasts a step's retries fails the import, so it
- * never stays "running" and holds up its account's queue.
+ * never stays "running" and holds up its account's queue. Every failure
+ * alerts with the import's organization, also when the cleanup fails.
  */
+function errorMessage(error: unknown): string {
+  return error instanceof Error ? error.message : String(error);
+}
+
 export async function analyticsImportWorkflow(
   payload: AnalyticsImportWorkflowPayload
 ) {
   "use workflow";
 
-  let failed = false;
+  let reason: string | undefined;
   try {
     let turn = await analyticsImportTurnStep(payload.importId);
     while (turn.status === "waiting") {
@@ -56,20 +62,27 @@ export async function analyticsImportWorkflow(
         return { status: "cancelled" as const };
       }
       if (outcome.status === "failed") {
-        await failAnalyticsImportStep(payload.importId, outcome.error);
-        failed = true;
-        throw new FatalError(outcome.error);
+        reason = outcome.error;
+        await failAnalyticsImportStep(payload.importId, reason);
+        throw new FatalError(reason);
       }
     }
     await finalizeAnalyticsImportStep(payload.importId);
     return { status: "completed" as const, chunks: plan.chunks.length };
   } catch (error) {
-    if (failed) {
-      throw error;
+    const message = errorMessage(error);
+    if (reason === undefined) {
+      reason = message;
+      try {
+        await failAnalyticsImportStep(payload.importId, reason);
+      } catch (cleanupError) {
+        reason = `${reason}; cleanup failed: ${errorMessage(cleanupError)}`;
+      }
+    } else if (message !== reason) {
+      reason = `${reason}; cleanup failed: ${message}`;
     }
-    const message = error instanceof Error ? error.message : String(error);
-    await failAnalyticsImportStep(payload.importId, message);
-    throw new FatalError(message);
+    await reportAnalyticsImportFailureStep(payload.importId, reason);
+    throw new FatalError(reason);
   }
 }
 

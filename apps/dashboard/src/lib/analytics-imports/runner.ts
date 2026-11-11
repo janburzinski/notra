@@ -30,6 +30,7 @@ import {
 import { and, eq, inArray, ne, sql } from "drizzle-orm";
 
 import {
+  ANALYTICS_IMPORT_FORBIDDEN_RETRY_SECONDS,
   ANALYTICS_IMPORT_MAX_CHUNK_ATTEMPTS,
   ANALYTICS_IMPORT_MAX_ERROR_LENGTH,
 } from "@/constants/analytics-imports";
@@ -185,6 +186,32 @@ async function abandonChunk(
 }
 
 /**
+ * Seconds a chunk waits before its retry, or null when it doesn't wait. A
+ * 403 after this import's earlier chunks went through with the same token is
+ * treated as throttling (Vercel answered one right after a 429) and retried a
+ * few times before the connection is marked for reauth.
+ */
+function retryWaitSeconds(
+  row: AnalyticsImportRow,
+  attempts: number,
+  error: unknown,
+  inline: boolean
+): number | null {
+  if (error instanceof ImportRateLimitedError) {
+    return error.retryAfterSeconds;
+  }
+  const refusedMidImport =
+    error instanceof ImportAuthError &&
+    error.status === 403 &&
+    row.chunksDone > 0;
+  return refusedMidImport &&
+    !inline &&
+    attempts < ANALYTICS_IMPORT_MAX_CHUNK_ATTEMPTS
+    ? ANALYTICS_IMPORT_FORBIDDEN_RETRY_SECONDS
+    : null;
+}
+
+/**
  * Records a chunk that did not finish. Rate limits and transient failures
  * leave it pending for the workflow to retry; anything else fails it.
  */
@@ -201,6 +228,8 @@ async function recordChunkFailure(
   }
   const message = describeImportError(error);
   const rateLimited = error instanceof ImportRateLimitedError;
+  const waitSeconds = retryWaitSeconds(row, attempts, error, inline);
+  const reauth = error instanceof ImportAuthError && waitSeconds === null;
   const retry =
     !(error instanceof ImportAuthError) &&
     !inline &&
@@ -209,31 +238,33 @@ async function recordChunkFailure(
     await tx
       .update(analyticsImportChunks)
       .set({
-        status: rateLimited || retry ? "pending" : "failed",
+        status: waitSeconds !== null || retry ? "pending" : "failed",
         lastError: message,
+        // A rate limit stops the fetch before anything is written, so it is
+        // not an attempt: the retry then has no rows to delete first.
+        ...(rateLimited && {
+          attempts: sql`${analyticsImportChunks.attempts} - 1`,
+        }),
       })
       .where(chunkWhere(row.id, chunkStart));
-    if (rateLimited) {
+    if (waitSeconds !== null) {
       await tx
         .update(analyticsImports)
         .set({
           status: "waiting_rate_limit",
-          retryAt: new Date(Date.now() + error.retryAfterSeconds * 1000),
+          retryAt: new Date(Date.now() + waitSeconds * 1000),
         })
         .where(activeImportWhere(row.id));
     }
-    if (error instanceof ImportAuthError && row.connectionId) {
+    if (reauth && row.connectionId) {
       await tx
         .update(analyticsImportConnections)
         .set({ status: "reauth_required", lastError: message })
         .where(eq(analyticsImportConnections.id, row.connectionId));
     }
   });
-  if (rateLimited) {
-    return {
-      status: "rate_limited",
-      retryAfterSeconds: error.retryAfterSeconds,
-    };
+  if (waitSeconds !== null) {
+    return { status: "rate_limited", retryAfterSeconds: waitSeconds };
   }
   if (retry) {
     throw error;

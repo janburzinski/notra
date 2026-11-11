@@ -756,15 +756,8 @@ if (process.env.NOTRA_ANALYTICS_IMPORTS_SANDBOX_TEST !== "1") {
           "authorization"
         )
       ).toBe("Bearer plausible-test-key-123");
-      // The retry first removes what the failed attempt may have written.
-      expect(purges).toEqual([
-        {
-          organizationId: "org-a",
-          importId: row.id,
-          fromDay: "2026-10-01",
-          toDay: "2026-10-02",
-        },
-      ]);
+      // A rate-limited attempt wrote nothing, so the retry deletes nothing.
+      expect(purges).toEqual([]);
       expect(
         webRows.map((item) => [item.day, item.pageviews, item.bounces])
       ).toEqual([
@@ -776,6 +769,51 @@ if (process.env.NOTRA_ANALYTICS_IMPORTS_SANDBOX_TEST !== "1") {
         "2026-09-01",
         "2026-08-15",
       ]);
+    });
+
+    const forbidden = async () => new Response("no", { status: 403 });
+    const connectionStatus = async (importId: string) =>
+      (
+        await imports.findConnection(
+          "org-a",
+          (await loadImport(importId))?.connectionId ?? ""
+        )
+      )?.status;
+
+    test("a 403 on the first chunk fails the chunk and asks for reauth", async () => {
+      nativeFirstDay = "2026-10-03";
+      const row = await apiImport();
+      await runner.planAnalyticsImport(row.id);
+      fetchMock.mockImplementation(forbidden);
+      expect(
+        await runner.runAnalyticsImportChunk(row.id, "2026-10-01")
+      ).toMatchObject({ status: "failed" });
+      expect(await connectionStatus(row.id)).toBe("reauth_required");
+    });
+
+    test("a 403 after earlier chunks waits and retries before asking for reauth", async () => {
+      nativeFirstDay = "2026-10-03";
+      const row = await apiImport();
+      await runner.planAnalyticsImport(row.id);
+      fetchMock.mockImplementation(
+        dailyResults(["2026-10-01", [5, 6, 9, 50, 10]])
+      );
+      expect(
+        await runner.runAnalyticsImportChunk(row.id, "2026-10-01")
+      ).toEqual({ status: "done" });
+      fetchMock.mockImplementation(forbidden);
+      for (let attempt = 1; attempt < 3; attempt++) {
+        // react-doctor-disable-next-line react-doctor/async-await-in-loop -- attempts run one after another
+        expect(
+          await runner.runAnalyticsImportChunk(row.id, "2026-09-01")
+        ).toEqual({ status: "rate_limited", retryAfterSeconds: 300 });
+      }
+      expect((await loadImport(row.id))?.status).toBe("waiting_rate_limit");
+      expect(await connectionStatus(row.id)).toBe("active");
+      expect(
+        await runner.runAnalyticsImportChunk(row.id, "2026-09-01")
+      ).toMatchObject({ status: "failed" });
+      expect(await connectionStatus(row.id)).toBe("reauth_required");
     });
 
     test.each([
