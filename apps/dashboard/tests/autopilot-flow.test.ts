@@ -1272,6 +1272,42 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
     });
   }
 
+  test("a renewed idea is briefed again; a retried failure is not", async () => {
+    await db.insert(autopilotRuns).values({
+      id: "renew-run",
+      organizationId: "sandbox-org",
+      trigger: "manual",
+    });
+    const proposal = {
+      kind: "keywords" as const,
+      fingerprint: "keywords:renewed idea",
+      title: "Renewed",
+      summary: "Renewed",
+      evidence: {},
+    };
+    const first = await claimFinding("sandbox-org", "renew-run", proposal);
+    if (!first) {
+      throw new Error("Expected a claim");
+    }
+    const reclaim = async (status: "expired" | "failed") => {
+      await db
+        .update(autopilotFindings)
+        .set({
+          status,
+          claimToken: null,
+          evidence: { briefed: ["suggested"] },
+        })
+        .where(eq(autopilotFindings.id, first.finding.id));
+      const claim = await claimFinding("sandbox-org", "renew-run", proposal);
+      if (!claim) {
+        throw new Error("Expected a renewed claim");
+      }
+      return claim.finding.evidence.briefed;
+    };
+    expect(await reclaim("failed")).toEqual(["suggested"]);
+    expect(await reclaim("expired")).toBeUndefined();
+  });
+
   test("dismissal reloads a draft recorded while it was reading the open claim", async () => {
     await db.insert(autopilotRuns).values({
       id: "cancel-run",

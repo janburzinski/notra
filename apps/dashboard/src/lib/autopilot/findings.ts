@@ -204,7 +204,7 @@ export async function claimFinding(
       runId,
       title: proposal.title,
       summary: proposal.summary,
-      evidence: sql`${JSON.stringify(proposal.evidence)}::jsonb || jsonb_strip_nulls(jsonb_build_object('failures', ${autopilotFindings.evidence}->'failures', 'briefed', ${autopilotFindings.evidence}->'briefed'))`,
+      evidence: sql`${JSON.stringify(proposal.evidence)}::jsonb || jsonb_strip_nulls(jsonb_build_object('failures', ${autopilotFindings.evidence}->'failures', 'briefed', case when ${autopilotFindings.status} in ('failed', 'open') then ${autopilotFindings.evidence}->'briefed' end))`,
       status: "open",
       errorMessage: null,
       ...AUTOPILOT_FINDING_PULL_REQUEST_RESET,
