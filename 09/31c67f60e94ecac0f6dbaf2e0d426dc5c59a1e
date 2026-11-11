@@ -1,0 +1,150 @@
+apps/dashboard/src/app/(dashboard)/[slug]/geo/directions/page-client.tsx
+  s_b86f76ae7bb7db::t_4e409e28f6702f 3,6-10,24,28,34-41,43-44,46
+apps/dashboard/src/app/(dashboard)/[slug]/brand/identity/components/voice-selector.tsx
+  s_501557a3236e8b::t_1b66f51dffd7c8 155
+apps/dashboard/src/app/(dashboard)/[slug]/geo/skeleton.tsx
+  s_b86f76ae7bb7db::t_f213a5db7f01ad 3-9,16-19,21,57,67-72,74-79,81-86,88-89
+apps/dashboard/src/app/(dashboard)/[slug]/integrations/github/page-client.tsx
+  s_b86f76ae7bb7db::t_a41ccd9dbca9be 54,66
+apps/dashboard/src/components/content/create-content-button-group.tsx
+  s_b86f76ae7bb7db::t_6ac3a33da9cc13 33,49,66
+apps/dashboard/src/app/(dashboard)/[slug]/api-keys/page.tsx
+  s_b86f76ae7bb7db::t_a41ccd9dbca9be 244,262
+apps/dashboard/src/app/(dashboard)/[slug]/integrations/mcp/page-client.tsx
+  s_b86f76ae7bb7db::t_194cb93f0eea11 135
+apps/dashboard/src/app/(dashboard)/[slug]/integrations/google-search-console/page-client.tsx
+  s_b86f76ae7bb7db::t_194cb93f0eea11 773
+apps/dashboard/src/app/(dashboard)/[slug]/integrations/linear/[id]/page-client.tsx
+  s_b86f76ae7bb7db::t_194cb93f0eea11 174-178
+apps/dashboard/src/components/sites/sites-empty-state.tsx
+  s_501557a3236e8b::t_0b0f5b5456a520 40-99,101
+  s_501557a3236e8b::t_045ba4cb8ec100 39
+  s_b86f76ae7bb7db::t_cea2980f1cfebc 3,5-11,32-38,102-103
+apps/dashboard/src/app/(dashboard)/[slug]/content/page-client.tsx
+  s_b86f76ae7bb7db::t_e6432f1c64f7e5 6-10,85-89,91-95,97-98
+apps/dashboard/src/app/(dashboard)/[slug]/skills/page-client.tsx
+  s_b86f76ae7bb7db::t_a63c0096537713 111
+  s_b86f76ae7bb7db::t_a41ccd9dbca9be 110,112-114
+apps/dashboard/src/components/sites/pages/site-overview-page.tsx
+  s_b86f76ae7bb7db::t_dd956e83aec0fc 70,86
+apps/dashboard/src/components/skills/skill-detail-header.tsx
+  s_b86f76ae7bb7db::t_dd956e83aec0fc 70
+apps/dashboard/src/app/(dashboard)/[slug]/brand/identity/components/brand-identity-workspace.tsx
+  s_501557a3236e8b::t_1b66f51dffd7c8 114-116
+  s_b86f76ae7bb7db::t_933784eb2d118b 3,52,111-113
+packages/ui/src/constants/dialog.ts
+  s_2a6849deabaa94::t_06f9a486947bdf 1-10
+apps/dashboard/src/components/command-palette/command-palette.tsx
+  s_2a6849deabaa94::t_cc3e1b1a605141 392
+apps/dashboard/src/app/(dashboard)/[slug]/automation/loading.tsx
+  s_b86f76ae7bb7db::t_194cb93f0eea11 18
+apps/dashboard/src/app/(dashboard)/[slug]/brand/identity/skeleton.tsx
+  s_b86f76ae7bb7db::t_89164964bc72f8 3-9,11-15,19,36,50-69,71-101
+apps/dashboard/src/app/(dashboard)/[slug]/brand/identity/components/brand-identity-actions.tsx
+  s_501557a3236e8b::t_1b66f51dffd7c8 57,65
+apps/dashboard/src/components/geo/traffic-empty.tsx
+  s_501557a3236e8b::t_50a331b2c1ffa6 3-12,25-32,34-36
+  s_501557a3236e8b::t_045ba4cb8ec100 33
+apps/dashboard/src/app/(dashboard)/[slug]/geo/components/geo-tabs.tsx
+  s_b86f76ae7bb7db::t_c159756ab9c36d 4,7-11,77-81,83-87,89-93,95-96
+apps/dashboard/src/components/sites/pages/site-domains-page.tsx
+  s_b86f76ae7bb7db::t_dd956e83aec0fc 95
+apps/dashboard/src/app/(dashboard)/[slug]/integrations/granola/page-client.tsx
+  s_b86f76ae7bb7db::t_194cb93f0eea11 231
+packages/ui/src/components/ui/dialog.tsx
+  s_2a6849deabaa94::t_06f9a486947bdf 8-11,40,56,63-64,74-75
+  s_2a6849deabaa94::t_cc3e1b1a605141 34,36,41,71
+apps/dashboard/src/components/agent-feedback/feedback-empty.tsx
+  s_501557a3236e8b::t_09903e42539ea3 3-12,27-34,47-49,52-53
+apps/dashboard/src/components/command-palette/command-palette-item.tsx
+  s_2a6849deabaa94::t_cc3e1b1a605141 42,55
+  s_2a6849deabaa94::t_44f6863e9c0de3 70
+packages/ui/src/components/ui/sidebar.tsx
+  s_2a6849deabaa94::t_99a04633075c27 35,42-43,78,89-90,120-125,127-128,171,175,473
+  ai_agent 126
+packages/ui/src/components/ui/alert-dialog.tsx
+  s_2a6849deabaa94::t_06f9a486947bdf 35-36,57-58
+  s_2a6849deabaa94::t_cc3e1b1a605141 5-8
+apps/dashboard/src/app/(dashboard)/[slug]/brand/identity/components/brand-identity-tabs.tsx
+  s_b86f76ae7bb7db::t_c606cf35465e75 4-14,48-52,54-64,66-70,72-73
+apps/dashboard/src/app/(dashboard)/[slug]/brand/identity/components/guidelines-pdf-upload-button.tsx
+  s_501557a3236e8b::t_1b66f51dffd7c8 38-43
+apps/dashboard/src/app/(dashboard)/[slug]/integrations/page-client.tsx
+  s_b86f76ae7bb7db::t_e6432f1c64f7e5 8-11,222-236
+apps/dashboard/src/constants/geo-directions.ts
+  s_b86f76ae7bb7db::t_4e409e28f6702f 1-6,38-41
+apps/dashboard/src/app/(dashboard)/[slug]/automation/page-client.tsx
+  s_b86f76ae7bb7db::t_a41ccd9dbca9be 114,126
+apps/dashboard/src/lib/integrations/constants.ts
+  s_b86f76ae7bb7db::t_c75c4999af9d22 1-7,16-19
+apps/dashboard/src/components/analytics/analytics-nav.tsx
+  s_b86f76ae7bb7db::t_2e90cfaf2dc256 3-9,26-28,34-36,42-43
+apps/dashboard/src/components/analytics/analytics-source-tabs.tsx
+  s_b86f76ae7bb7db::t_2e90cfaf2dc256 10-14,77-79,85-87,93-95,101,103-104,110,112
+apps/dashboard/src/app/(dashboard)/[slug]/integrations/slack/page-client.tsx
+  s_b86f76ae7bb7db::t_194cb93f0eea11 655
+apps/dashboard/src/app/(dashboard)/[slug]/integrations/linear/page-client.tsx
+  s_b86f76ae7bb7db::t_194cb93f0eea11 273
+apps/dashboard/src/types/geo-directions.ts
+  s_b86f76ae7bb7db::t_4e409e28f6702f 1,6
+apps/web/src/styles/ui-sources.css
+  s_b86f76ae7bb7db::t_ad91d24047dbdb 203
+apps/dashboard/src/app/(dashboard)/[slug]/integrations/github/loading.tsx
+  s_b86f76ae7bb7db::t_194cb93f0eea11 25
+packages/ui/src/components/ui/button-content.tsx
+  s_501557a3236e8b::t_021d0c424e3457 9-11,14-27,98-99,106-108,161-164,168-178,186
+apps/dashboard/src/app/(dashboard)/[slug]/geo/competitors/skeleton.tsx
+  s_b86f76ae7bb7db::t_1edd9b7f392221 61
+apps/dashboard/src/components/mcp/mcp-empty.tsx
+  s_501557a3236e8b::t_045ba4cb8ec100 30
+  s_501557a3236e8b::t_dba85b244bbd0e 3-12,18,22-29,31-37
+packages/ui/src/components/ui/button.tsx
+  s_501557a3236e8b::t_021d0c424e3457 9
+apps/dashboard/src/components/empty-state.tsx
+  s_501557a3236e8b::t_50556a723968d1 1-8,15-18,36,43-47,56,59-66,69-71
+  s_501557a3236e8b::t_210c5dab09656f 9-10,42
+  s_501557a3236e8b::t_045ba4cb8ec100 50,54
+apps/dashboard/src/components/geo/geo-setup-empty.tsx
+  s_501557a3236e8b::t_e289ed6931afbb 7,26-28,31-35
+apps/dashboard/src/app/(dashboard)/[slug]/skills/loading.tsx
+  s_b86f76ae7bb7db::t_194cb93f0eea11 19
+apps/dashboard/src/app/(dashboard)/[slug]/geo/personas/page-client.tsx
+  s_b86f76ae7bb7db::t_cea2980f1cfebc 250-251,257-261
+packages/ui/src/styles/motion.css
+  s_2a6849deabaa94::t_99a04633075c27 19
+  s_501557a3236e8b::t_021d0c424e3457 120,122-123,125-126
+apps/dashboard/src/app/(dashboard)/[slug]/integrations/google-search-console/loading.tsx
+  s_b86f76ae7bb7db::t_194cb93f0eea11 20
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "0931c67f60e94ecac0f6dbaf2e0d426dc5c59a1e",
+  "prompts": {},
+  "sessions": {
+    "s_2a6849deabaa94": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d00dbf8b-bdc8-4d2d-b472-cedc7f0a2598",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    },
+    "s_501557a3236e8b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "dec8c457-eb0c-41b8-bed9-4f7968ea9875",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    },
+    "s_b86f76ae7bb7db": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "2f109900-7372-4001-b177-d674105bc2a9",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
