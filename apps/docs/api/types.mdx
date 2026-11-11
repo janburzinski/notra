@@ -26,21 +26,20 @@ docolin:
 
 ## Using the SDK
 
-The `@usenotra/sdk` package includes its types, so you can import them directly:
+The `@usenotra/sdk` package includes its types, so you can import them directly. Every method has `<Method>Params` and `<Method>Result` types, and every schema in the OpenAPI document is exported by name:
 
 ```typescript
-import type {
-  GetPostPost,
-  ListPostsPost,
-  Pagination,
-} from "@usenotra/sdk/models/operations";
+import type { GetPostResult, ListPostsParams, ListPostsResult } from "@usenotra/sdk";
+
+type Post = NonNullable<GetPostResult["post"]>;
+type Pagination = ListPostsResult["pagination"];
 ```
 
 <Tip>
   The SDK ships with full type definitions, so you do not need to maintain your own, and you only need the types below if you call the API with raw `fetch`.
 </Tip>
 
-For any endpoint, including the GEO group that the SDK does not cover yet, the [OpenAPI document](https://api.usenotra.com/openapi.json) is the source of truth, and tools such as `openapi-typescript` can turn it into a complete set of types.
+The SDK covers every endpoint, including GEO. Without it, the [OpenAPI document](https://api.usenotra.com/openapi.json) is the source of truth, and tools such as `openapi-typescript` can turn it into a complete set of types.
 
 ---
 

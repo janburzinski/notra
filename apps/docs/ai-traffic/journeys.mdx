@@ -24,6 +24,6 @@ Journeys appear on the GEO **Overview** page under the **Journeys** tab and in t
 
 ## Journey tagging
 
-`@usenotra/geo/markdown` exports `mintJourneyId`, `getJourneyId` and `tagMarkdownLinks`. Use them to add an `ntr` id to the links you hand an agent in Markdown, so every follow-up request lands in the same journey.
+`@usenotra/sdk/markdown` exports `mintJourneyId`, `getJourneyId` and `tagMarkdownLinks`. Use them to add an `ntr` id to the links you hand an agent in Markdown, so every follow-up request lands in the same journey.
 
 On Next.js you can pass `tagLinks: true` to `createGeoProxy` instead, and the proxy then tags Markdown responses (`.md`, `llms.txt`, `llms-full.txt`) as it serves them to known AI agents. Add `html: true` to also tag the anchors in HTML pages. Human visitors and search crawlers always get the untouched origin response, and tagging needs no token.

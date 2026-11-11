@@ -9,6 +9,7 @@ import {
 } from "@notra/ai/utils/agent-proxy";
 import {
   agentSessionParamsSchema,
+  agentSessionStreamQuerySchema,
   createAgentSessionRequestSchema,
   createAgentSessionResponseSchema,
   listAgentChatsQuerySchema,
@@ -280,7 +281,10 @@ agentChatsRoutes.openAPIRegistry.registerPath(
     summary: "Stream an agent session's events",
     description:
       "Durable, replayable eve session event stream (newline-delimited JSON). Pass startIndex to resume from a known position. Includes input.requested events for tool approvals.",
-    request: { params: agentSessionParamsSchema },
+    request: {
+      params: agentSessionParamsSchema,
+      query: agentSessionStreamQuerySchema,
+    },
     responses: {
       200: {
         description: "NDJSON event stream",

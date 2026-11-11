@@ -97,7 +97,7 @@ export const FEATURES_PAGE_DEVELOPER_CARDS: FeaturesPageCard[] = [
       "Connect Notra to Claude Code, Cursor, Codex or any MCP client and work with your content and brand voice from the editor.",
   },
   {
-    title: "@usenotra/geo",
+    title: "@usenotra/sdk",
     description:
       "One package for Next.js, Nuxt, TanStack Start, Astro and SvelteKit. Server-side capture, 66 agent signatures, journey tagging and an MCP feedback tool.",
   },

@@ -32,7 +32,7 @@ The Notra API is a REST API served from `https://api.usenotra.com`. Everything t
     Call endpoints directly with `curl` or `fetch`, which works for every endpoint group.
   </Card>
   <Card title="TypeScript SDK" icon="code">
-    Use `@usenotra/sdk` for typed requests and responses across the Content, Schedules, Event Triggers, Chats, Skills, Feedback and Agent endpoints.
+    Use `@usenotra/sdk` for typed requests and responses on every endpoint, with retries, streaming and typed errors. The same package holds the AI traffic and web analytics tracking.
   </Card>
 </CardGroup>
 
@@ -88,9 +88,7 @@ console.log(data.posts);
 ```typescript SDK
 import { Notra } from "@usenotra/sdk";
 
-const notra = new Notra({
-  bearerAuth: process.env.NOTRA_API_KEY ?? "",
-});
+const notra = new Notra(); // reads NOTRA_API_KEY
 
 const result = await notra.content.listPosts();
 
@@ -157,23 +155,23 @@ bun add @usenotra/sdk
 
 </CodeGroup>
 
-Initialize the client with your API key:
+Create the client. It reads your key from `NOTRA_API_KEY`, or pass it as `apiKey`:
 
 ```typescript
 import { Notra } from "@usenotra/sdk";
 
 const notra = new Notra({
-  bearerAuth: process.env.NOTRA_API_KEY ?? "",
+  apiKey: process.env.NOTRA_API_KEY,
+  organization: "acme", // only needed for account keys in several workspaces
 });
 
 const post = await notra.content.getPost({ postId: "post_abc" });
+const { projects } = await notra.geo.listProjects();
 ```
 
-The SDK exposes one namespace per endpoint group: `notra.content`, `notra.schedules`, `notra.eventTriggers`, `notra.chats`, `notra.skills`, `notra.feedback` and `notra.agent`. Notra generates it from the OpenAPI document and publishes it at [github.com/usenotra/typescript-sdk](https://github.com/usenotra/typescript-sdk).
+The SDK has one namespace per endpoint group: `notra.discovery`, `notra.content`, `notra.webhooks`, `notra.schedules`, `notra.eventTriggers`, `notra.chats`, `notra.skills`, `notra.sites`, `notra.feedback`, `notra.geo` and `notra.agent`. Each method is named after its operation's `operationId` in this reference and takes one object: path and query parameters by name and the JSON body as `body`. Failed requests throw `NotraAPIError` with the status, `code` and `recovery`; rate limits and server errors are retried for you. Set `environment: "sandbox"` to use the [sandbox](https://demo.usenotra.com) with sample data.
 
-<Note>
-  GEO endpoints (projects, prompts, competitors, scans, visibility, gaps, briefs, agent readiness, traffic) are not in the SDK yet. Call them with `fetch` or generate a client from the [OpenAPI document](https://api.usenotra.com/openapi.json).
-</Note>
+The source and the full guide are at [github.com/usenotra/typescript-sdk](https://github.com/usenotra/typescript-sdk).
 
 ## API groups
 

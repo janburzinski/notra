@@ -43,6 +43,49 @@ The script cannot see AI crawlers, because crawlers do not run JavaScript. To lo
   </Step>
 </Steps>
 
+## Install with the SDK
+
+In a React, Next.js or Astro app, let [`@usenotra/sdk`](https://www.npmjs.com/package/@usenotra/sdk) write the tag. It loads the build pinned in your SDK version with its `integrity`, so you only pass your public key, and updating the package (for example through Dependabot or Renovate) moves you to the newest build.
+
+```bash
+npm install @usenotra/sdk
+```
+
+<CodeGroup>
+
+```tsx app/layout.tsx
+import { NotraAnalytics } from "@usenotra/sdk/react";
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en">
+      <body>
+        {children}
+        <NotraAnalytics webKey="nwk.…" disabled={process.env.NODE_ENV !== "production"} />
+      </body>
+    </html>
+  );
+}
+```
+
+```astro src/layouts/Base.astro
+---
+import { notraScriptTag } from "@usenotra/sdk/script";
+
+const notra = notraScriptTag({ webKey: "nwk.…" });
+---
+<html>
+  <head>
+    <Fragment set:html={notra} />
+  </head>
+  <body><slot /></body>
+</html>
+```
+
+</CodeGroup>
+
+`NotraAnalytics` needs no `"use client"` and works in Server Components. Both take the same options as the tag: `errors` loads `notra.plus.js`, `hash` sets `data-hash`, and `api` changes where page views go. The same package also holds the [server tracker](/ai-traffic/install/nextjs) for AI crawlers, so one install covers both.
+
 ## Options
 
 | Attribute | Default | Description |

@@ -12,7 +12,7 @@ import {
 } from "@notra/geo-core/constants/geo";
 import { ISO_DATE_LENGTH } from "@notra/geo-core/constants/web-analytics";
 import { getGeoIngestSecret } from "@notra/geo-core/geo/ingest";
-import { getJourneyId } from "@usenotra/geo/markdown";
+import { getJourneyId } from "@usenotra/sdk/markdown";
 
 import type {
   GeoJourneyInput,

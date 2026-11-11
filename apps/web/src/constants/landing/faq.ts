@@ -29,7 +29,7 @@ export const FAQ_CONTENT: FaqContent = {
       id: "traffic",
       question: "How does traffic tracking work? Do I need a script tag?",
       answer:
-        "You don't need one. Add @usenotra/geo as a proxy or middleware in your Next.js, Nuxt, TanStack Start, Astro or SvelteKit site. It posts a small request envelope to Notra, we do the matching on our side and anything human is dropped before it is stored.",
+        "You don't need one. Add @usenotra/sdk as a proxy or middleware in your Next.js, Nuxt, TanStack Start, Astro or SvelteKit site. It posts a small request envelope to Notra, we do the matching on our side and anything human is dropped before it is stored.",
       defaultOpen: false,
     },
     {

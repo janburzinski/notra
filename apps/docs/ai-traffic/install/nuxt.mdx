@@ -1,7 +1,7 @@
 ---
 title: "Track AI crawlers on Nuxt"
 sidebarTitle: "Nuxt"
-description: "Install the @usenotra/geo tracker in a Nuxt app to log AI crawlers, AI-cited fetches and AI referrals in Notra."
+description: "Install the @usenotra/sdk tracker in a Nuxt app to log AI crawlers, AI-cited fetches and AI referrals in Notra."
 authors:
   - handle: dominik
 
@@ -48,19 +48,19 @@ This guide adds the Notra tracker to a Nuxt app, which takes about five minutes 
   <Step title="Install the package">
     <CodeGroup>
     ```bash npm
-    npm install @usenotra/geo
+    npm install @usenotra/sdk
     ```
 
     ```bash yarn
-    yarn add @usenotra/geo
+    yarn add @usenotra/sdk
     ```
 
     ```bash pnpm
-    pnpm add @usenotra/geo
+    pnpm add @usenotra/sdk
     ```
 
     ```bash bun
-    bun add @usenotra/geo
+    bun add @usenotra/sdk
     ```
     </CodeGroup>
 
@@ -71,7 +71,7 @@ This guide adds the Notra tracker to a Nuxt app, which takes about five minutes 
   </Step>
   <Step title="Add the tracker">
     ```typescript server/middleware/geo.ts
-    import { createGeoHandler } from "@usenotra/geo/nuxt";
+    import { createGeoHandler } from "@usenotra/sdk/nuxt";
 
     const geo = createGeoHandler({
       token: process.env.NOTRA_GEO_TOKEN!,

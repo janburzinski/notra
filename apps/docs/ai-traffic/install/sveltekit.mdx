@@ -1,7 +1,7 @@
 ---
 title: "Track AI crawlers on SvelteKit"
 sidebarTitle: "SvelteKit"
-description: "Install the @usenotra/geo tracker in a SvelteKit app to log AI crawlers, AI-cited fetches and AI referrals in Notra."
+description: "Install the @usenotra/sdk tracker in a SvelteKit app to log AI crawlers, AI-cited fetches and AI referrals in Notra."
 authors:
   - handle: dominik
 
@@ -48,19 +48,19 @@ This guide adds the Notra tracker to a SvelteKit app in about five minutes, and 
   <Step title="Install the package">
     <CodeGroup>
     ```bash npm
-    npm install @usenotra/geo
+    npm install @usenotra/sdk
     ```
 
     ```bash yarn
-    yarn add @usenotra/geo
+    yarn add @usenotra/sdk
     ```
 
     ```bash pnpm
-    pnpm add @usenotra/geo
+    pnpm add @usenotra/sdk
     ```
 
     ```bash bun
-    bun add @usenotra/geo
+    bun add @usenotra/sdk
     ```
     </CodeGroup>
 
@@ -72,7 +72,7 @@ This guide adds the Notra tracker to a SvelteKit app in about five minutes, and 
   <Step title="Add the tracker">
     ```typescript src/hooks.server.ts
     import { env } from "$env/dynamic/private";
-    import { createGeoHandle } from "@usenotra/geo/sveltekit";
+    import { createGeoHandle } from "@usenotra/sdk/sveltekit";
 
     export const handle = createGeoHandle({
       token: env.NOTRA_GEO_TOKEN!,

@@ -15,7 +15,7 @@ import {
   GEO_MARKDOWN_NEGOTIATION_CATEGORY,
   GEO_MARKDOWN_NEGOTIATION_CONFIDENCE,
 } from "@notra/geo-core/constants/geo-accept";
-import { classifyUserAgent } from "@usenotra/geo/classify";
+import { classifyUserAgent } from "@usenotra/sdk/classify";
 
 import type {
   GeoVisitorClassification,

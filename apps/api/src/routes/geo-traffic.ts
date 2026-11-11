@@ -181,7 +181,7 @@ const mcpAnalyticsRoute = createRoute({
   operationId: "getGeoMcpAnalytics",
   summary: "Get MCP server analytics",
   description:
-    "Usage of your own MCP server, as reported by the `@usenotra/geo` SDK: request and error totals against the previous window, per-tool latency and errors, clients, models, intents, recent failures and tools that were never called. Captured arguments, responses and end-user IDs are not returned.",
+    "Usage of your own MCP server, as reported by `@usenotra/sdk/mcp`: request and error totals against the previous window, per-tool latency and errors, clients, models, intents, recent failures and tools that were never called. Captured arguments, responses and end-user IDs are not returned.",
   request: { params: projectParamsSchema, query: trafficOverviewQuerySchema },
   responses: {
     200: {

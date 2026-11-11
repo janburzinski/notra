@@ -66,7 +66,7 @@ export const MCP_SETUP_TRANSPORT_LABELS = {
 } as const satisfies Record<McpSetupTransport, string>;
 
 export const MCP_SETUP_SNIPPETS = {
-  http: `import { trackMcpTransport } from "@usenotra/geo/mcp";
+  http: `import { trackMcpTransport } from "@usenotra/sdk/mcp";
 
 // The StreamableHTTPServerTransport your server already creates
 await server.connect(
@@ -74,7 +74,7 @@ await server.connect(
     token: process.env.NOTRA_GEO_TOKEN ?? "",
   })
 );`,
-  stdio: `import { trackMcpTransport } from "@usenotra/geo/mcp";
+  stdio: `import { trackMcpTransport } from "@usenotra/sdk/mcp";
 
 // The StdioServerTransport your server already creates
 await server.connect(

@@ -5,7 +5,7 @@ How AI traffic flows from a customer's site into the journeys you see on the GEO
 ## The pipeline
 
 ```
-customer middleware (@usenotra/geo)          ai-traffic-ingest service (Bun)
+customer middleware (@usenotra/sdk)          ai-traffic-ingest service (Bun)
   every GET page request                       POST /api/geo/ingest
   -> request envelope ------------------------> token auth (orgId.hmac bearer)
      url, ip, geo headers, referer,            allowlist host (brand + extras)
@@ -26,7 +26,7 @@ The SDK is deliberately dumb: it forwards a neutral envelope and never classifie
 
 Per event, in order:
 
-1. User agent matches an AI signature (`@usenotra/geo/classify`) -> `crawler`, with the signature's agent, category (`training-crawler` | `search-index` | `assistant-browse`), and confidence.
+1. User agent matches an AI signature (`@usenotra/sdk/classify`) -> `crawler`, with the signature's agent, category (`training-crawler` | `search-index` | `assistant-browse`), and confidence.
 2. Referer host matches an AI assistant domain (chatgpt.com, perplexity.ai, claude.ai, ...) -> `ai_referral`, source = that assistant. This is a human who clicked out of an AI answer.
 3. Otherwise -> `human` (normal browser) or `unknown`.
 
@@ -36,7 +36,7 @@ A journey id groups requests belonging to one agent session. Two kinds, distingu
 
 ### `n_<id>` — explicit tag (precise)
 
-Customers serving Markdown to agents rewrite internal links with `?ntr=<id>` (`tagMarkdownLinks` in `@usenotra/geo/markdown`). An agent arriving without a tag gets a fresh random id minted into the links it is served; every link it follows carries that id back to us. Properties:
+Customers serving Markdown to agents rewrite internal links with `?ntr=<id>` (`tagMarkdownLinks` in `@usenotra/sdk/markdown`). An agent arriving without a tag gets a fresh random id minted into the links it is served; every link it follows carries that id back to us. Properties:
 
 - Exact per-operator journeys: five parallel Claude Code instances get five ids, even behind one NAT or a shared provider pool.
 - Survives citation: when an assistant later cites a tagged URL to a human, the click carries the id, linking the human visit to the crawl that caused it. This is also the planned conversion-attribution hook.

@@ -6,7 +6,7 @@ import type {
   WebPageEngagementRow,
   WebPageViewRow,
 } from "@notra/analytics/types/tinybird-datasources";
-import type { GeoRequestPayload } from "@usenotra/geo";
+import type { GeoRequestPayload } from "@usenotra/sdk/geo";
 import type { z } from "zod";
 
 import type {

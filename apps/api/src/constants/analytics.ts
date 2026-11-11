@@ -1,6 +1,7 @@
 import type { ApiSdkPattern } from "../types/analytics";
 
 export const API_SDK_BUCKETS = {
+  SDK: "@usenotra/sdk",
   GEO: "@usenotra/geo",
   FRAMER: "framer",
   RAYCAST: "raycast",
@@ -16,6 +17,7 @@ export const API_AUTH_KINDS = {
 } as const;
 
 export const API_SDK_USER_AGENT_PATTERNS: readonly ApiSdkPattern[] = [
+  { sdk: API_SDK_BUCKETS.SDK, pattern: /usenotra\/sdk/i },
   { sdk: API_SDK_BUCKETS.GEO, pattern: /usenotra\/geo/i },
   { sdk: API_SDK_BUCKETS.FRAMER, pattern: /framer/i },
   { sdk: API_SDK_BUCKETS.RAYCAST, pattern: /raycast/i },

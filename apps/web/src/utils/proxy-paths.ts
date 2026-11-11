@@ -1,5 +1,5 @@
 import { detectAIBot, negotiateFormat } from "@dualmark/core";
-import { classifyUserAgent } from "@usenotra/geo/classify";
+import { classifyUserAgent } from "@usenotra/sdk/classify";
 
 import { PROXY_EXCLUDED_PATH_PREFIXES } from "../constants/proxy";
 

@@ -1,4 +1,4 @@
-import { AI_AGENT_SIGNATURES } from "@usenotra/geo/signatures";
+import { AI_AGENT_SIGNATURES } from "@usenotra/sdk/signatures";
 import type { z } from "zod";
 
 import {

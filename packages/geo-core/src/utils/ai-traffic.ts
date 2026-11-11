@@ -1,6 +1,6 @@
 import type { GeoTrafficOverviewRow } from "@notra/analytics/types/tinybird-endpoints";
 import { parseClickHouseDateTime } from "@notra/analytics/utils/datetime";
-import { AI_AGENT_SIGNATURES } from "@usenotra/geo/signatures";
+import { AI_AGENT_SIGNATURES } from "@usenotra/sdk/signatures";
 
 import {
   GEO_SOURCE_LABELS,

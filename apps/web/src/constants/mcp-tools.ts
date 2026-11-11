@@ -614,7 +614,7 @@ export const MCP_FALLBACK_TOOL_CARDS: McpToolCard[] = [
   {
     name: "get_geo_mcp_analytics",
     description:
-      "Get usage analytics for the user's own MCP server, reported by the @usenotra/geo SDK (not Notra's server): requests, tool calls, errors and p95 latency against the previous window, per-tool calls/errors/latency, clients, models, caller intents, recent failed requests and listed tools nobody called. configured is false when analytics are off for this deployment; empty totals mean the server has not sent events yet.",
+      "Get usage analytics for the user's own MCP server, reported by @usenotra/sdk/mcp (not Notra's server): requests, tool calls, errors and p95 latency against the previous window, per-tool calls/errors/latency, clients, models, caller intents, recent failed requests and listed tools nobody called. configured is false when analytics are off for this deployment; empty totals mean the server has not sent events yet.",
   },
   {
     name: "get_geo_mcp_tool_analytics",

@@ -61,9 +61,7 @@ console.log(data);
 ```typescript SDK
 import { Notra } from "@usenotra/sdk";
 
-const notra = new Notra({
-  bearerAuth: process.env.NOTRA_API_KEY ?? "",
-});
+const notra = new Notra({ apiKey: process.env.NOTRA_API_KEY });
 
 const result = await notra.content.listPosts();
 console.log(result);
@@ -73,7 +71,7 @@ console.log(result);
 The header format is `Authorization: Bearer <credential>`, and the scheme name is case-insensitive. Keys created in the dashboard start with `ntra_`, and OAuth access tokens go in the same header, as described in [OAuth](#oauth).
 
 <Note>
-  The SDK reads the key from the `bearerAuth` option. Its generated README refers to a `NOTRA_BEARER_AUTH` environment variable, but any variable name works as long as you pass the value in.
+  The SDK reads the key from the `apiKey` option and falls back to the `NOTRA_API_KEY` environment variable. For an OAuth access token that rotates, pass a function, `apiKey: () => getAccessToken()`; the SDK calls it before every request. With an account key in several workspaces, set `organization` to the workspace id or slug to send `X-Notra-Organization-Id`.
 </Note>
 
 ## Create an API key
@@ -328,21 +326,17 @@ if (!response.ok) {
 ```
 
 ```typescript SDK
-import { Notra } from "@usenotra/sdk";
-import * as errors from "@usenotra/sdk/models/errors";
+import { Notra, NotraAPIError } from "@usenotra/sdk";
 
-const notra = new Notra({
-  bearerAuth: process.env.NOTRA_API_KEY ?? "",
-});
+const notra = new Notra({ apiKey: process.env.NOTRA_API_KEY });
 
 try {
   const result = await notra.content.listPosts();
   console.log(result);
 } catch (error) {
-  if (error instanceof errors.NotraError) {
-    console.log(error.message);
-    console.log(error.statusCode);
-    console.log(error.body);
+  if (error instanceof NotraAPIError) {
+    console.log(error.status, error.code, error.message);
+    console.log(error.recovery, error.requestId);
   }
 }
 ```

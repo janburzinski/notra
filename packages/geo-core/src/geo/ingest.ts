@@ -364,7 +364,7 @@ const SVELTEKIT_TOKEN_EXPR = `env.${GEO_INGEST_TOKEN_ENV}!`;
 
 function buildNextSnippet(appUrl: string): string {
   return [
-    'import { createGeoProxy } from "@usenotra/geo/next";',
+    'import { createGeoProxy } from "@usenotra/sdk/next";',
     'import { after, NextResponse } from "next/server";',
     "",
     "const geo = createGeoProxy({",
@@ -381,7 +381,7 @@ function buildNextSnippet(appUrl: string): string {
 
 function buildNuxtSnippet(appUrl: string): string {
   return [
-    'import { createGeoHandler } from "@usenotra/geo/nuxt";',
+    'import { createGeoHandler } from "@usenotra/sdk/nuxt";',
     "",
     "const geo = createGeoHandler({",
     `  token: ${PROCESS_TOKEN_EXPR},`,
@@ -396,7 +396,7 @@ function buildNuxtSnippet(appUrl: string): string {
 
 function buildNetlifySnippet(appUrl: string): string {
   return [
-    'import { createGeoHandler } from "@usenotra/geo/netlify";',
+    'import { createGeoHandler } from "@usenotra/sdk/netlify";',
     'import type { Context } from "@netlify/edge-functions";',
     "",
     "const geo = createGeoHandler({",
@@ -415,7 +415,7 @@ function buildNetlifySnippet(appUrl: string): string {
 function buildTanStackSnippet(appUrl: string): string {
   return [
     'import { createMiddleware, createStart } from "@tanstack/react-start";',
-    'import { createGeoMiddleware } from "@usenotra/geo/tanstack";',
+    'import { createGeoMiddleware } from "@usenotra/sdk/tanstack";',
     "",
     "const geo = createMiddleware().server(createGeoMiddleware({",
     `  token: ${PROCESS_TOKEN_EXPR},`,
@@ -430,7 +430,7 @@ function buildTanStackSnippet(appUrl: string): string {
 
 function buildAstroSnippet(appUrl: string): string {
   return [
-    'import { createGeoMiddleware } from "@usenotra/geo/astro";',
+    'import { createGeoMiddleware } from "@usenotra/sdk/astro";',
     "",
     "export const onRequest = createGeoMiddleware({",
     `  token: ${IMPORT_META_TOKEN_EXPR},`,
@@ -442,7 +442,7 @@ function buildAstroSnippet(appUrl: string): string {
 function buildSvelteKitSnippet(appUrl: string): string {
   return [
     'import { env } from "$env/dynamic/private";',
-    'import { createGeoHandle } from "@usenotra/geo/sveltekit";',
+    'import { createGeoHandle } from "@usenotra/sdk/sveltekit";',
     "",
     "export const handle = createGeoHandle({",
     `  token: ${SVELTEKIT_TOKEN_EXPR},`,
@@ -453,7 +453,7 @@ function buildSvelteKitSnippet(appUrl: string): string {
 
 function buildReactRouterSnippet(appUrl: string): string {
   return [
-    'import { createGeoMiddleware } from "@usenotra/geo/react-router";',
+    'import { createGeoMiddleware } from "@usenotra/sdk/react-router";',
     'import type { Route } from "./+types/root";',
     "",
     "const geo = createGeoMiddleware({",

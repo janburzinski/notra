@@ -28,7 +28,7 @@
 - **Understand your visibility.** Compare mention rates, recommendation positions, and share of voice by engine, prompt, and language. Read the stored answers and cited sources behind the numbers.
 - **See who comes up instead.** Track competitors and the questions where they appear ahead of you or your brand is missing entirely.
 - **Turn content gaps into drafts.** Pick an opportunity, review a brief, and generate a guide, listicle, or comparison grounded in your brand, sitemap, and competitors.
-- **Attribute AI traffic.** Use the `@usenotra/geo` SDK to distinguish training crawlers, search indexing, assistant browsing, and human referrals from AI answers. A page fetch alone is not evidence of a citation.
+- **Attribute AI traffic.** Use the `@usenotra/sdk` tracking middleware to distinguish training crawlers, search indexing, assistant browsing, and human referrals from AI answers. A page fetch alone is not evidence of a citation.
 - **Improve agent readiness.** Audit how easily AI agents can discover and use your site, work through actionable fixes, and collect agent feedback in an inbox.
 
 Notra also includes **Studio**, its original content automation workspace. Connect GitHub, Linear, and Slack to draft changelogs, launch posts, and social updates in your brand voice.
@@ -39,7 +39,7 @@ Use Notra from your own applications and agents:
 
 - **REST API:** projects, prompts, scans, visibility, content gaps, briefs, readiness, and traffic. See the [OpenAPI specification](https://api.usenotra.com/openapi.json).
 - **MCP server:** connect AI clients at [`https://mcp.usenotra.com/mcp`](https://mcp.usenotra.com/mcp).
-- **Traffic SDK:** [`@usenotra/geo`](https://github.com/usenotra/geo-sdk), with Next.js, Nuxt, TanStack Start, Astro, SvelteKit, React Router, and Netlify integrations.
+- **SDK:** [`@usenotra/sdk`](https://github.com/usenotra/typescript-sdk): the API client, AI traffic middleware for Next.js, Nuxt, TanStack Start, Astro, SvelteKit, React Router and Netlify, and the notra.js web analytics script.
 
 See the [product documentation](https://www.usenotra.com/docs) for setup and authentication.
 

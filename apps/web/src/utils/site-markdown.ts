@@ -133,7 +133,7 @@ export function buildFeaturesMarkdown() {
     markdownSection("AI traffic, attributed", [
       FEATURES_TRAFFIC_COPY.description,
       "",
-      "You don't need a script tag. Add the @usenotra/geo package as a proxy or middleware in your Next.js, Nuxt, TanStack Start, Astro or SvelteKit site. It sends a small request envelope to Notra, matching happens on our side and anything human is dropped before it is stored.",
+      "You don't need a script tag. Add the @usenotra/sdk package as a proxy or middleware in your Next.js, Nuxt, TanStack Start, Astro or SvelteKit site. It sends a small request envelope to Notra, matching happens on our side and anything human is dropped before it is stored.",
       "",
       "Every hit is labelled by purpose: model training, search index, cited in answer (an assistant read the page while answering someone) or referral (a person clicked through from an AI answer).",
     ]),
@@ -154,7 +154,7 @@ export function buildFeaturesMarkdown() {
       "- REST API with OpenAPI at https://api.usenotra.com/openapi.json, covering projects, prompts, scans, visibility, gaps, briefs, agent readiness and traffic.",
       "- OAuth 2.1 through oauth.usenotra.com or scoped API keys.",
       "- MCP server at https://mcp.usenotra.com/mcp.",
-      "- @usenotra/geo on npm for traffic capture, agent classification and link tagging.",
+      "- @usenotra/sdk on npm for traffic capture, agent classification and link tagging.",
       "- Docs at https://www.usenotra.com/docs.",
     ]),
     markdownSection("Studio", [

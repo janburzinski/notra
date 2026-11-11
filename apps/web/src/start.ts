@@ -1,5 +1,5 @@
 import { createMiddleware, createStart } from "@tanstack/react-start";
-import { resolveTagLinksConfig, tagMarkdownResponse } from "@usenotra/geo";
+import { resolveTagLinksConfig, tagMarkdownResponse } from "@usenotra/sdk/geo";
 
 import {
   AGENT_BYPASS_PARAM,

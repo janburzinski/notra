@@ -1,4 +1,4 @@
-import { Tracker } from "@usenotra/geo";
+import { Tracker } from "@usenotra/sdk/geo";
 import { waitUntil } from "@vercel/functions";
 import { rewrite } from "@vercel/functions/middleware";
 

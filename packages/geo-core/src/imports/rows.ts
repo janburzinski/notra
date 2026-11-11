@@ -2,7 +2,7 @@ import type {
   GeoImportedDailyRow,
   WebImportedDailyRow,
 } from "@notra/analytics/types/tinybird-datasources";
-import { classifyUserAgent } from "@usenotra/geo/classify";
+import { classifyUserAgent } from "@usenotra/sdk/classify";
 
 import { IMPORT_SCANNER_PATH_PATTERN } from "../constants/analytics-imports";
 import type {

@@ -1,7 +1,7 @@
 ---
 title: "Track AI crawlers on Netlify Edge Functions"
 sidebarTitle: "Netlify Edge Functions"
-description: "Install the @usenotra/geo tracker in a Netlify Edge Functions app to log AI crawlers, AI-cited fetches and AI referrals in Notra."
+description: "Install the @usenotra/sdk tracker in a Netlify Edge Functions app to log AI crawlers, AI-cited fetches and AI referrals in Notra."
 authors:
   - handle: dominik
 
@@ -48,19 +48,19 @@ This guide adds the Notra tracker to a Netlify Edge Functions app, which takes a
   <Step title="Install the package">
     <CodeGroup>
     ```bash npm
-    npm install @usenotra/geo
+    npm install @usenotra/sdk
     ```
 
     ```bash yarn
-    yarn add @usenotra/geo
+    yarn add @usenotra/sdk
     ```
 
     ```bash pnpm
-    pnpm add @usenotra/geo
+    pnpm add @usenotra/sdk
     ```
 
     ```bash bun
-    bun add @usenotra/geo
+    bun add @usenotra/sdk
     ```
     </CodeGroup>
 
@@ -71,7 +71,7 @@ This guide adds the Notra tracker to a Netlify Edge Functions app, which takes a
   </Step>
   <Step title="Add the tracker">
     ```typescript netlify/edge-functions/geo.ts
-    import { createGeoHandler } from "@usenotra/geo/netlify";
+    import { createGeoHandler } from "@usenotra/sdk/netlify";
     import type { Context } from "@netlify/edge-functions";
 
     const geo = createGeoHandler({

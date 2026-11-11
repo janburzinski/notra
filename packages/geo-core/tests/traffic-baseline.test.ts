@@ -1,7 +1,7 @@
 import { afterAll, beforeAll, beforeEach, expect, mock, test } from "bun:test";
 
 import type { GeoTrafficOverviewRow } from "@notra/analytics/types/tinybird-endpoints";
-import { AI_AGENT_SIGNATURES } from "@usenotra/geo/signatures";
+import { AI_AGENT_SIGNATURES } from "@usenotra/sdk/signatures";
 import { Effect } from "effect";
 
 import {

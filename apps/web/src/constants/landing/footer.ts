@@ -76,7 +76,7 @@ export const FOOTER_LINK_COLUMNS: readonly FooterLinkColumn[] = [
         links: [
           {
             label: "GEO SDK",
-            href: "https://www.npmjs.com/package/@usenotra/geo",
+            href: "https://www.npmjs.com/package/@usenotra/sdk",
             external: true,
           },
           {

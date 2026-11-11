@@ -54,6 +54,13 @@ export const agentSessionParamsSchema = z.object({
     .openapi({ param: { name: "sessionId" } }),
 });
 
+export const agentSessionStreamQuerySchema = z.object({
+  startIndex: z.coerce.number().int().min(0).optional().openapi({
+    description:
+      "Index of the first event to send, to resume a stream after the last event you received.",
+  }),
+});
+
 export const listAgentChatsQuerySchema = z.object({
   limit: z.coerce
     .number()

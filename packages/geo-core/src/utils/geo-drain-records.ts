@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 
-import { shouldTrackRequest } from "@usenotra/geo";
+import { shouldTrackRequest } from "@usenotra/sdk/geo";
 
 import { GEO_DRAIN_PROVIDERS } from "../constants/geo";
 import {

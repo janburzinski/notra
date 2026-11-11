@@ -1,7 +1,7 @@
 ---
 title: "Track AI crawlers on Next.js"
 sidebarTitle: "Next.js"
-description: "Install the @usenotra/geo tracker in a Next.js app to log AI crawlers, AI-cited fetches and AI referrals in Notra."
+description: "Install the @usenotra/sdk tracker in a Next.js app to log AI crawlers, AI-cited fetches and AI referrals in Notra."
 authors:
   - handle: dominik
 
@@ -48,19 +48,19 @@ This guide adds the Notra tracker to a Next.js app, which takes about five minut
   <Step title="Install the package">
     <CodeGroup>
     ```bash npm
-    npm install @usenotra/geo
+    npm install @usenotra/sdk
     ```
 
     ```bash yarn
-    yarn add @usenotra/geo
+    yarn add @usenotra/sdk
     ```
 
     ```bash pnpm
-    pnpm add @usenotra/geo
+    pnpm add @usenotra/sdk
     ```
 
     ```bash bun
-    bun add @usenotra/geo
+    bun add @usenotra/sdk
     ```
     </CodeGroup>
 
@@ -71,7 +71,7 @@ This guide adds the Notra tracker to a Next.js app, which takes about five minut
   </Step>
   <Step title="Add the tracker">
     ```typescript proxy.ts
-    import { createGeoProxy } from "@usenotra/geo/next";
+    import { createGeoProxy } from "@usenotra/sdk/next";
     import { after, NextResponse } from "next/server";
 
     const geo = createGeoProxy({

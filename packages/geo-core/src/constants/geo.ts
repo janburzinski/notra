@@ -608,7 +608,7 @@ export const GEO_CLOUDFLARE_LOGPUSH_FIELDS = [
 ] as const;
 export const GEO_INGEST_SNIPPET_FALLBACK =
   "// Set GEO_INGEST_SECRET to generate your install snippet";
-const GEO_INGEST_PACKAGE = "@usenotra/geo";
+const GEO_INGEST_PACKAGE = "@usenotra/sdk";
 export const GEO_INGEST_PACKAGE_MANAGER_OPTIONS = [
   { value: "bun", label: "bun", command: `bun add ${GEO_INGEST_PACKAGE}` },
   { value: "pnpm", label: "pnpm", command: `pnpm add ${GEO_INGEST_PACKAGE}` },

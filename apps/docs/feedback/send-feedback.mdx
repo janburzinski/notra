@@ -22,7 +22,7 @@ docolin:
     - feedback URL
     - feedback inbox
     - submit_feedback
-    - "@usenotra/geo/feedback"
+    - "@usenotra/sdk/feedback"
   prev: ./types.mdx
 ---
 
@@ -31,7 +31,7 @@ AI agents such as Claude Code, Cursor and ChatGPT now use your product through y
 ## How it works
 
 1. Copy your **feedback URL** from the **Feedback** page in your dashboard (in the GEO sidebar under Visibility).
-2. Register the feedback tool in your MCP server with `@usenotra/geo/feedback`, or POST to the URL from your own tool implementation.
+2. Register the feedback tool in your MCP server with `@usenotra/sdk/feedback`, or POST to the URL from your own tool implementation.
 3. Feedback shows up in the Feedback inbox, where you can filter by status and kind and mark items as triaged, resolved or archived.
 
 ## Your feedback URL
@@ -50,25 +50,25 @@ Reading and triaging feedback through the API requires an API key with `feedback
 
 <CodeGroup>
 ```bash npm
-npm install @usenotra/geo
+npm install @usenotra/sdk
 ```
 
 ```bash yarn
-yarn add @usenotra/geo
+yarn add @usenotra/sdk
 ```
 
 ```bash pnpm
-pnpm add @usenotra/geo
+pnpm add @usenotra/sdk
 ```
 
 ```bash bun
-bun add @usenotra/geo
+bun add @usenotra/sdk
 ```
 </CodeGroup>
 
 ```ts server.ts
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { registerFeedbackTool } from "@usenotra/geo/feedback";
+import { registerFeedbackTool } from "@usenotra/sdk/feedback";
 
 const server = new McpServer({ name: "acme", version: "1.0.0" });
 
