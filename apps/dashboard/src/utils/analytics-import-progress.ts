@@ -9,8 +9,8 @@ import {
 import {
   ANALYTICS_IMPORT_PROGRESS_PHASES,
   ANALYTICS_IMPORT_REMOVED_PHASES,
+  ANALYTICS_IMPORT_WAIT_REASONS,
 } from "@/constants/analytics-import-progress";
-import { ANALYTICS_IMPORT_BUDGET_WAIT } from "@/constants/analytics-imports";
 import { WEB_ANALYTICS_NAV_LINK } from "@/constants/geo-traffic-pages";
 import { GEO_TRAFFIC_NAV_LINK } from "@/constants/nav";
 import type {
@@ -296,18 +296,16 @@ export function importProgressView(
           : { key: "queuedLine", values: {} },
       ]);
     case "waiting": {
-      // Notra's own per-connection budget, not the provider, may be the cause.
-      const budget = item.lastError === ANALYTICS_IMPORT_BUDGET_WAIT;
+      // Notra's own budget or its storage, not the provider, may be the cause.
+      const reason =
+        ANALYTICS_IMPORT_WAIT_REASONS[item.lastError ?? ""] ?? "waiting";
       return view([
         seconds > 0
           ? {
-              key: budget ? "waitingBudgetLine" : "waitingLine",
+              key: `${reason}Line`,
               values: { provider, time: formatElapsedSeconds(seconds) },
             }
-          : {
-              key: budget ? "waitingBudgetSoon" : "waitingSoon",
-              values: { provider },
-            },
+          : { key: `${reason}Soon`, values: { provider } },
       ]);
     }
     case "running": {

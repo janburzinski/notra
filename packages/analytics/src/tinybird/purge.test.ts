@@ -176,21 +176,20 @@ test("a full Tinybird delete queue waits for a free slot", async () => {
   expect(deletes).toHaveLength(2);
 }, 20_000);
 
-test("a failed delete still waits for the other datasource's job", async () => {
-  let polls = 0;
+test("an import purge deletes one datasource at a time and stops at a failure", async () => {
+  const submitted: string[] = [];
   globalThis.fetch = mock(async (input: string | URL | Request) => {
     const url = String(input);
     if (url.includes("/jobs/")) {
-      polls += 1;
-      return Response.json({ status: polls > 1 ? "done" : "working" });
+      return Response.json({ status: "done" });
     }
-    if (url.includes("/web_imported_daily/")) {
-      return new Response("broken", { status: 500 });
-    }
-    return Response.json({ job_id: "job" });
+    submitted.push(url.split("/datasources/")[1]?.split("/")[0] ?? "");
+    return url.includes("/web_imported_daily/")
+      ? new Response("broken", { status: 500 })
+      : Response.json({ job_id: "job" });
   }) as unknown as typeof fetch;
   await expect(
     purgeImportedRows({ organizationId: "org", importId: "imp_1" })
   ).rejects.toThrow("web_imported_daily failed (500)");
-  expect(polls).toBe(2);
-}, 20_000);
+  expect(submitted).toEqual(["web_imported_daily"]);
+});

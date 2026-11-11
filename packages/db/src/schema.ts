@@ -4424,6 +4424,8 @@ export const analyticsImports = pgTable(
     workflowRunId: text("workflow_run_id"),
     /** Times the recovery job restarted a lost run; it fails the import after a few. */
     recoveryAttempts: integer("recovery_attempts").notNull().default(0),
+    /** A failed import's rows still to delete; the recovery job retries it. */
+    purgePending: boolean("purge_pending").notNull().default(false),
     createdByUserId: text("created_by_user_id").references(() => users.id, {
       onDelete: "set null",
     }),
@@ -4464,6 +4466,8 @@ export const analyticsImportChunks = pgTable(
     attempts: integer("attempts").notNull().default(0),
     rowsWritten: integer("rows_written").notNull().default(0),
     pageviews: integer("pageviews").notNull().default(0),
+    /** Set when an attempt starts writing, so only its retry deletes first. */
+    writeStartedAt: timestamp("write_started_at"),
     lastError: text("last_error"),
     updatedAt: timestamp("updated_at")
       .defaultNow()

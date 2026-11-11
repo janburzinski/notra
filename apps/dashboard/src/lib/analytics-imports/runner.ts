@@ -1,4 +1,5 @@
 import { bumpAnalyticsVersions } from "@notra/analytics/cache/query-cache";
+import { TinybirdDeleteBusyError } from "@notra/analytics/errors/tinybird";
 import { purgeImportedRows } from "@notra/analytics/tinybird/purge";
 import { ANALYTICS_IMPORT_ACTIVE_STATUSES } from "@notra/db/constants/analytics-imports";
 import { db } from "@notra/db/drizzle";
@@ -34,6 +35,8 @@ import {
   ANALYTICS_IMPORT_FORBIDDEN_RETRY_SECONDS,
   ANALYTICS_IMPORT_MAX_CHUNK_ATTEMPTS,
   ANALYTICS_IMPORT_MAX_ERROR_LENGTH,
+  ANALYTICS_IMPORT_STORAGE_RETRY_SECONDS,
+  ANALYTICS_IMPORT_STORAGE_WAIT,
 } from "@/constants/analytics-imports";
 import type {
   AnalyticsImportChunkOutcome,
@@ -190,7 +193,8 @@ async function abandonChunk(
  * Seconds a chunk waits before its retry, or null when it doesn't wait. A
  * 403 after this import's earlier chunks went through with the same token is
  * treated as throttling (Vercel answered one right after a 429) and retried a
- * few times before the connection is marked for reauth.
+ * few times before the connection is marked for reauth. A Tinybird delete
+ * queue that stays full waits too, however often it happens.
  */
 function retryWaitSeconds(
   row: AnalyticsImportRow,
@@ -201,6 +205,9 @@ function retryWaitSeconds(
   if (error instanceof ImportRateLimitedError) {
     return error.retryAfterSeconds;
   }
+  if (error instanceof TinybirdDeleteBusyError && !inline) {
+    return ANALYTICS_IMPORT_STORAGE_RETRY_SECONDS;
+  }
   const refusedMidImport =
     error instanceof ImportAuthError &&
     error.status === 403 &&
@@ -209,6 +216,16 @@ function retryWaitSeconds(
     !inline &&
     attempts < ANALYTICS_IMPORT_MAX_CHUNK_ATTEMPTS
     ? ANALYTICS_IMPORT_FORBIDDEN_RETRY_SECONDS
+    : null;
+}
+
+/** What a waiting import shows instead of "the provider asked for a pause". */
+function waitReason(error: unknown): string | null {
+  if (error instanceof TinybirdDeleteBusyError) {
+    return ANALYTICS_IMPORT_STORAGE_WAIT;
+  }
+  return error instanceof ImportRateLimitedError && error.budget
+    ? ANALYTICS_IMPORT_BUDGET_WAIT
     : null;
 }
 
@@ -229,6 +246,7 @@ async function recordChunkFailure(
   }
   const message = describeImportError(error);
   const rateLimited = error instanceof ImportRateLimitedError;
+  const storageBusy = error instanceof TinybirdDeleteBusyError;
   const waitSeconds = retryWaitSeconds(row, attempts, error, inline);
   const reauth = error instanceof ImportAuthError && waitSeconds === null;
   const retry =
@@ -241,9 +259,9 @@ async function recordChunkFailure(
       .set({
         status: waitSeconds !== null || retry ? "pending" : "failed",
         lastError: message,
-        // A rate limit stops the fetch before anything is written, so it is
-        // not an attempt: the retry then has no rows to delete first.
-        ...(rateLimited && {
+        // A rate limit or a busy delete queue is not the chunk failing, so
+        // it never counts toward the attempts that fail the import.
+        ...((rateLimited || storageBusy) && {
           attempts: sql`${analyticsImportChunks.attempts} - 1`,
         }),
       })
@@ -254,10 +272,7 @@ async function recordChunkFailure(
         .set({
           status: "waiting_rate_limit",
           retryAt: new Date(Date.now() + waitSeconds * 1000),
-          lastError:
-            error instanceof ImportRateLimitedError && error.budget
-              ? ANALYTICS_IMPORT_BUDGET_WAIT
-              : null,
+          lastError: waitReason(error),
         })
         .where(activeImportWhere(row.id));
     }
@@ -288,8 +303,10 @@ function runFenceWhere(generation?: number, runId?: string) {
 }
 
 /**
- * Imports one chunk. A retried chunk first deletes what an earlier attempt
- * wrote, so re-runs never double count. Rate limits and transient failures
+ * Imports one chunk. A retried chunk whose earlier attempt started writing
+ * first deletes those days, so re-runs never double count; an attempt that
+ * failed before writing (a fetch error, a rate limit) leaves nothing to
+ * delete and its retry skips the delete. Rate limits and transient failures
  * leave the chunk pending for the workflow to retry. Every import write is
  * conditional on the import still running, so a delete that lands while a
  * request is in flight is never undone. A run started for an earlier
@@ -349,15 +366,29 @@ export async function runAnalyticsImportChunk(
   };
   let written: AnalyticsImportWritten;
   try {
-    if (chunk.attempts > 1) {
+    if (chunk.writeStartedAt) {
       await purgeImportedRows({
         organizationId: row.organizationId,
         importId,
         fromDay: window.start,
         toDay: window.end,
       });
+      // The days are empty again: a retry that fails before writing (a rate
+      // limit) has nothing to delete. beforeWrite sets it again.
+      await db
+        .update(analyticsImportChunks)
+        .set({ writeStartedAt: null })
+        .where(chunkWhere(importId, chunkStart));
     }
-    written = await writeImportWindow(row, window, csv);
+    written = await writeImportWindow(row, window, {
+      csv,
+      beforeWrite: async () => {
+        await db
+          .update(analyticsImportChunks)
+          .set({ writeStartedAt: new Date() })
+          .where(chunkWhere(importId, chunkStart));
+      },
+    });
   } catch (error) {
     return await recordChunkFailure(
       row,
@@ -426,36 +457,61 @@ export async function finalizeAnalyticsImport(importId: string) {
 }
 
 /**
- * Removes the rows an active import wrote (they were never visible), then
- * marks it failed. Deleting first keeps cleanup retryable: when the delete
- * fails the import stays active, so the step's retry or recovery runs this
- * again. A chunk that writes after the delete finds the import stopped and
+ * Marks an active import failed, then deletes the rows it wrote. Reads only
+ * include completed imports, so those rows were never visible and the delete
+ * is cleanup: when Tinybird is busy the import still fails at once and keeps
+ * `purgePending` for the recovery job, instead of staying active and being
+ * restarted. A chunk that writes after this finds the import stopped and
  * purges its own window.
  */
 export async function failAnalyticsImport(importId: string, error: string) {
-  const current = await loadImport(importId);
-  if (
-    !current ||
-    !ANALYTICS_IMPORT_ACTIVE_STATUSES.some(
-      (status) => status === current.status
-    )
-  ) {
-    return;
-  }
-  await purgeImportedRows({ organizationId: current.organizationId, importId });
   const [row] = await db
     .update(analyticsImports)
     .set({
       status: "failed",
       lastError: error.slice(0, ANALYTICS_IMPORT_MAX_ERROR_LENGTH),
       retryAt: null,
+      purgePending: true,
     })
     .where(activeImportWhere(importId))
     .returning();
-  if (row) {
-    await dropUpload(row);
-    await wakeQueuedImport(row.connectionId);
+  if (!row) {
+    return;
   }
+  await dropUpload(row);
+  await wakeQueuedImport(row.connectionId);
+  await purgeFailedImportRows(row);
+}
+
+/**
+ * Deletes a failed import's rows and clears `purgePending`. Never throws: a
+ * delete that fails stays pending for the next recovery pass.
+ */
+export async function purgeFailedImportRows(
+  row: Pick<AnalyticsImportRow, "id" | "organizationId">
+): Promise<boolean> {
+  try {
+    await purgeImportedRows({
+      organizationId: row.organizationId,
+      importId: row.id,
+    });
+  } catch (error) {
+    console.error("analytics_imports.purge_deferred", {
+      importId: row.id,
+      error: error instanceof Error ? error.message : error,
+    });
+    return false;
+  }
+  await db
+    .update(analyticsImports)
+    .set({ purgePending: false })
+    .where(
+      and(
+        eq(analyticsImports.id, row.id),
+        eq(analyticsImports.status, "failed")
+      )
+    );
+  return true;
 }
 
 /** Deletes an import's Tinybird rows, then the import itself stays as "deleted". */

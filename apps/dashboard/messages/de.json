@@ -4953,6 +4953,8 @@
         "waitingSoon": "{provider} bittet um eine Pause. Geht gleich weiter …",
         "waitingBudgetLine": "Notra pausiert, damit dir ein Teil deines {provider}-Kontingents bleibt. Weiter in {time}.",
         "waitingBudgetSoon": "Notra pausiert, damit dir ein Teil deines {provider}-Kontingents bleibt. Geht gleich weiter …",
+        "waitingStorageLine": "Ein früherer Versuch wird aufgeräumt. Weiter in {time}.",
+        "waitingStorageSoon": "Ein früherer Versuch wird aufgeräumt. Geht gleich weiter …",
         "completedLine": "Deine Diagramme reichen jetzt bis {date} zurück.",
         "failedLine": "Beim Import von {period} gestoppt.",
         "failedAny": "Vor dem Abschluss gestoppt.",

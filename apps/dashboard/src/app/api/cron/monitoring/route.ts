@@ -40,7 +40,7 @@ export async function GET(request: Request) {
   }
   try {
     const recovery = await recoverAnalyticsImports();
-    if (recovery.restarted > 0 || recovery.failed > 0) {
+    if (recovery.restarted > 0 || recovery.failed > 0 || recovery.purged > 0) {
       console.info("analytics_imports.recovery", recovery);
     }
   } catch (error) {

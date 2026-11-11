@@ -18,6 +18,7 @@ import {
   ListObjectsV2Command,
   S3Client,
 } from "@aws-sdk/client-s3";
+import { TinybirdDeleteBusyError } from "@notra/analytics/errors/tinybird";
 import {
   analyticsImportChunks,
   analyticsImports,
@@ -28,7 +29,7 @@ import {
 } from "@notra/db/schema";
 import { ImportRateLimitedError } from "@notra/geo-core/schemas/analytics-import-errors";
 import { call } from "@orpc/server";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { Effect } from "effect";
 import { zipSync } from "fflate";
 
@@ -57,6 +58,8 @@ if (process.env.NOTRA_ANALYTICS_IMPORTS_SANDBOX_TEST !== "1") {
   const webRows: Record<string, unknown>[] = [];
   const purges: Record<string, unknown>[] = [];
   let purgeFailures = 0;
+  let purgeBusy = 0;
+  let ingestFailures = 0;
   const bumps: string[] = [];
   let nativeFirstDay = "1970-01-01";
   mock.module("@notra/db/drizzle", () => ({ db }));
@@ -66,6 +69,11 @@ if (process.env.NOTRA_ANALYTICS_IMPORTS_SANDBOX_TEST !== "1") {
   mock.module("@notra/analytics/tinybird/client", () => ({
     ...client,
     ingestWebImportedDaily: async (rows: Record<string, unknown>[]) => {
+      if (ingestFailures > 0) {
+        ingestFailures -= 1;
+        webRows.push(...rows.slice(0, 1));
+        throw new Error("Tinybird ingest failed");
+      }
       webRows.push(...rows);
       return null;
     },
@@ -80,6 +88,10 @@ if (process.env.NOTRA_ANALYTICS_IMPORTS_SANDBOX_TEST !== "1") {
       if (purgeFailures > 0) {
         purgeFailures -= 1;
         throw new Error("Tinybird delete failed");
+      }
+      if (purgeBusy > 0) {
+        purgeBusy -= 1;
+        throw new TinybirdDeleteBusyError("Tinybird delete job timed out");
       }
       purges.push(input);
     },
@@ -227,6 +239,8 @@ if (process.env.NOTRA_ANALYTICS_IMPORTS_SANDBOX_TEST !== "1") {
     ANALYTICS_IMPORT_LOST_UPLOAD_ERROR,
     ANALYTICS_IMPORT_MAX_RECOVERY_ATTEMPTS,
     ANALYTICS_IMPORT_QUEUE_POLL_SECONDS,
+    ANALYTICS_IMPORT_STORAGE_RETRY_SECONDS,
+    ANALYTICS_IMPORT_STORAGE_WAIT,
   } = await import("../src/constants/analytics-imports");
 
   const fixtures = fileURLToPath(
@@ -343,6 +357,8 @@ if (process.env.NOTRA_ANALYTICS_IMPORTS_SANDBOX_TEST !== "1") {
     webRows.length = 0;
     purges.length = 0;
     purgeFailures = 0;
+    purgeBusy = 0;
+    ingestFailures = 0;
     bumps.length = 0;
     nativeFirstDay = "1970-01-01";
     fetchMock.mockReset();
@@ -568,17 +584,24 @@ if (process.env.NOTRA_ANALYTICS_IMPORTS_SANDBOX_TEST !== "1") {
       expect(purges).toEqual([{ organizationId: "org-a", importId: row.id }]);
     });
 
-    test("a failed cleanup leaves the import active so a retry removes its rows", async () => {
+    test("a failed cleanup still fails the import; recovery deletes its rows later", async () => {
       const row = await createCsvImport();
       purgeFailures = 1;
-      await expect(
-        runner.failAnalyticsImport(row.id, "bad export")
-      ).rejects.toThrow("Tinybird delete failed");
-      expect((await loadImport(row.id))?.status).toBe("pending");
       await runner.failAnalyticsImport(row.id, "bad export");
       expect(await loadImport(row.id)).toMatchObject({
         status: "failed",
         lastError: "bad export",
+        purgePending: true,
+      });
+      expect(purges).toEqual([]);
+      // A fresh failure waits a stale window before the sweep retries it.
+      expect((await recoverAnalyticsImports()).purged).toBe(0);
+      expect(
+        (await recoverAnalyticsImports(Date.now() + 20 * 60 * 1000)).purged
+      ).toBe(1);
+      expect(await loadImport(row.id)).toMatchObject({
+        status: "failed",
+        purgePending: false,
       });
       expect(purges).toEqual([{ organizationId: "org-a", importId: row.id }]);
     });
@@ -795,6 +818,107 @@ if (process.env.NOTRA_ANALYTICS_IMPORTS_SANDBOX_TEST !== "1") {
           (await loadImport(importId))?.connectionId ?? ""
         )
       )?.status;
+
+    const chunkRow = (importId: string, chunkStart: string) =>
+      db.query.analyticsImportChunks.findFirst({
+        where: and(
+          eq(analyticsImportChunks.importId, importId),
+          eq(analyticsImportChunks.chunkStart, chunkStart)
+        ),
+      });
+
+    test("only a retry after a started write deletes the chunk's days first", async () => {
+      nativeFirstDay = "2026-10-03";
+      const row = await apiImport();
+      await runner.planAnalyticsImport(row.id);
+      const october = dailyResults(["2026-10-01", [5, 6, 9, 50, 10]]);
+
+      // The fetch fails: nothing was written, so the retry deletes nothing.
+      fetchMock.mockImplementation(
+        async () => new Response("down", { status: 502 })
+      );
+      await expect(
+        runner.runAnalyticsImportChunk(row.id, "2026-10-01")
+      ).rejects.toThrow();
+      expect((await chunkRow(row.id, "2026-10-01"))?.writeStartedAt).toBeNull();
+      fetchMock.mockImplementation(october);
+      expect(
+        await runner.runAnalyticsImportChunk(row.id, "2026-10-01")
+      ).toEqual({ status: "done" });
+      expect(purges).toEqual([]);
+
+      // A write fails halfway: the retry deletes the chunk's days first.
+      fetchMock.mockImplementation(
+        dailyResults(["2026-09-10", [5, 6, 9, 50, 10]])
+      );
+      ingestFailures = 1;
+      await expect(
+        runner.runAnalyticsImportChunk(row.id, "2026-09-01")
+      ).rejects.toThrow("Tinybird ingest failed");
+      expect(
+        (await chunkRow(row.id, "2026-09-01"))?.writeStartedAt
+      ).toBeInstanceOf(Date);
+      // The retry deletes, then hits a rate limit before writing: the days
+      // are empty, so the next retry doesn't delete again.
+      const september = fetchMock.getMockImplementation();
+      fetchMock.mockImplementationOnce(
+        async () =>
+          new Response("slow", {
+            status: 429,
+            headers: { "Retry-After": "60" },
+          })
+      );
+      expect(
+        await runner.runAnalyticsImportChunk(row.id, "2026-09-01")
+      ).toEqual({ status: "rate_limited", retryAfterSeconds: 60 });
+      expect((await chunkRow(row.id, "2026-09-01"))?.writeStartedAt).toBeNull();
+      if (september) {
+        fetchMock.mockImplementation(september);
+      }
+      expect(
+        await runner.runAnalyticsImportChunk(row.id, "2026-09-01")
+      ).toEqual({ status: "done" });
+      expect(purges).toEqual([
+        {
+          organizationId: "org-a",
+          importId: row.id,
+          fromDay: "2026-09-01",
+          toDay: "2026-09-30",
+        },
+      ]);
+    });
+
+    test("a busy Tinybird delete waits without spending an attempt", async () => {
+      nativeFirstDay = "2026-10-03";
+      const row = await apiImport();
+      await runner.planAnalyticsImport(row.id);
+      await db
+        .update(analyticsImportChunks)
+        .set({ writeStartedAt: new Date() })
+        .where(eq(analyticsImportChunks.importId, row.id));
+      purgeBusy = 5;
+      for (let attempt = 0; attempt < 5; attempt++) {
+        // react-doctor-disable-next-line react-doctor/async-await-in-loop -- attempts run one after another
+        expect(
+          await runner.runAnalyticsImportChunk(row.id, "2026-10-01")
+        ).toEqual({
+          status: "rate_limited",
+          retryAfterSeconds: ANALYTICS_IMPORT_STORAGE_RETRY_SECONDS,
+        });
+      }
+      expect(await loadImport(row.id)).toMatchObject({
+        status: "waiting_rate_limit",
+        lastError: ANALYTICS_IMPORT_STORAGE_WAIT,
+      });
+      expect((await chunkRow(row.id, "2026-10-01"))?.attempts).toBe(0);
+      fetchMock.mockImplementation(
+        dailyResults(["2026-10-01", [5, 6, 9, 50, 10]])
+      );
+      expect(
+        await runner.runAnalyticsImportChunk(row.id, "2026-10-01")
+      ).toEqual({ status: "done" });
+      expect(purges).toHaveLength(1);
+    });
 
     test("a 403 on the first chunk fails the chunk and asks for reauth", async () => {
       nativeFirstDay = "2026-10-03";
@@ -1089,11 +1213,13 @@ if (process.env.NOTRA_ANALYTICS_IMPORTS_SANDBOX_TEST !== "1") {
       checked: 0,
       restarted: 0,
       failed: 0,
+      purged: 0,
     });
     expect(await recoverAnalyticsImports(Date.now() + 60 * 60 * 1000)).toEqual({
       checked: 4,
       restarted: 1,
       failed: 2,
+      purged: 0,
     });
     expect(await loadImport(alive.id)).toMatchObject({
       status: "pending",
@@ -1147,6 +1273,7 @@ if (process.env.NOTRA_ANALYTICS_IMPORTS_SANDBOX_TEST !== "1") {
       checked: 2,
       restarted: 1,
       failed: 0,
+      purged: 0,
     });
     expect(startedRuns).toEqual([sleepy.id]);
     expect(startedGenerations).toEqual([1]);

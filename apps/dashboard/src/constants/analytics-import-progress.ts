@@ -1,6 +1,13 @@
 import type { AnalyticsImportStatus } from "@notra/db/types/analytics-imports";
 
-import type { AnalyticsImportProgressPhase } from "@/types/analytics-imports";
+import {
+  ANALYTICS_IMPORT_BUDGET_WAIT,
+  ANALYTICS_IMPORT_STORAGE_WAIT,
+} from "@/constants/analytics-imports";
+import type {
+  AnalyticsImportProgressPhase,
+  AnalyticsImportWaitReason,
+} from "@/types/analytics-imports";
 
 export const ANALYTICS_IMPORT_PROGRESS_PHASES: Record<
   AnalyticsImportStatus,
@@ -33,3 +40,14 @@ export const ANALYTICS_IMPORT_PROGRESS_TITLES = {
   deleting: "titleDeleting",
   deleted: "titleDeleted",
 } as const satisfies Record<AnalyticsImportProgressPhase, string>;
+
+/**
+ * A waiting import's `lastError` names what it waits for when that is Notra
+ * (its request budget or its storage), not the provider.
+ */
+export const ANALYTICS_IMPORT_WAIT_REASONS: Readonly<
+  Record<string, AnalyticsImportWaitReason>
+> = {
+  [ANALYTICS_IMPORT_BUDGET_WAIT]: "waitingBudget",
+  [ANALYTICS_IMPORT_STORAGE_WAIT]: "waitingStorage",
+};

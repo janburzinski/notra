@@ -71,6 +71,7 @@ export interface AnalyticsImportRecoveryResult {
   checked: number;
   restarted: number;
   failed: number;
+  purged: number;
 }
 
 /** How days another source already has for the domain are handled. */
@@ -321,6 +322,8 @@ export interface AnalyticsImportProgressMessage {
     | "waitingSoon"
     | "waitingBudgetLine"
     | "waitingBudgetSoon"
+    | "waitingStorageLine"
+    | "waitingStorageSoon"
     | "completedLine"
     | "failedLine"
     | "failedAny"
@@ -328,6 +331,12 @@ export interface AnalyticsImportProgressMessage {
     | "deletedLine";
   values: Record<string, string | number>;
 }
+
+/** Message key prefix of a waiting import, by what it waits for. */
+export type AnalyticsImportWaitReason =
+  | "waiting"
+  | "waitingBudget"
+  | "waitingStorage";
 
 /** One part of the subtext: a message, or text that is already formatted. */
 export type AnalyticsImportProgressPart =

@@ -26,6 +26,14 @@ export const ANALYTICS_IMPORT_LOST_UPLOAD_ERROR =
  */
 export const ANALYTICS_IMPORT_BUDGET_WAIT =
   "Waiting for the connection's request budget";
+/**
+ * Written to `lastError` while a chunk waits for Tinybird to finish earlier
+ * deletes, so the pause doesn't blame the provider.
+ */
+export const ANALYTICS_IMPORT_STORAGE_WAIT =
+  "Waiting for earlier imported rows to be removed";
+/** Wait before retrying a chunk whose delete found Tinybird's queue busy. */
+export const ANALYTICS_IMPORT_STORAGE_RETRY_SECONDS = 120;
 /** Translation keys for errors the runner itself writes. */
 export const ANALYTICS_IMPORT_KNOWN_ERRORS: Readonly<
   Record<string, "lost" | "lostUpload">
@@ -46,6 +54,8 @@ export const ANALYTICS_IMPORT_LOST_WAIT_MS = 15 * 60 * 1000;
 export const ANALYTICS_IMPORT_MAX_RECOVERY_ATTEMPTS = 3;
 /** Stale imports one recovery pass looks at. */
 export const ANALYTICS_IMPORT_RECOVERY_BATCH = 50;
+/** Failed imports whose rows one recovery pass deletes; each holds a Tinybird delete slot. */
+export const ANALYTICS_IMPORT_PURGE_BATCH = 2;
 /** Per organization and action (connect, start, upload). */
 export const ANALYTICS_IMPORT_RATE_LIMIT_PER_HOUR = 20;
 export const ANALYTICS_IMPORT_UPLOAD_URL_TTL_SECONDS = 15 * 60;

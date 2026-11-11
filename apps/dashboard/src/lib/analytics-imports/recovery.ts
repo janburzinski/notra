@@ -8,6 +8,7 @@ import {
   ANALYTICS_IMPORT_LOST_UPLOAD_ERROR,
   ANALYTICS_IMPORT_LOST_WAIT_MS,
   ANALYTICS_IMPORT_MAX_RECOVERY_ATTEMPTS,
+  ANALYTICS_IMPORT_PURGE_BATCH,
   ANALYTICS_IMPORT_RECOVERY_BATCH,
   ANALYTICS_IMPORT_STALE_MS,
 } from "@/constants/analytics-imports";
@@ -21,7 +22,7 @@ import type {
 } from "@/types/analytics-imports";
 
 import { setImportWorkflowRun } from "./imports";
-import { failAnalyticsImport } from "./runner";
+import { failAnalyticsImport, purgeFailedImportRows } from "./runner";
 import { cancelImportRun, readImportRunState } from "./runs";
 
 /** A run that ended or vanished while its import still reads as active. */
@@ -195,6 +196,46 @@ async function retryStaleDeletes(now: number): Promise<number> {
  * (no object storage) can't be read again, so that import fails. Stale
  * deletes start again and count as restarted.
  */
+/**
+ * Deletes the rows of failed imports whose cleanup found Tinybird busy. The
+ * rows are invisible to reads, so this only frees storage and can wait.
+ * Touching a row claims it, like a stale delete, so two sweeps never purge
+ * the same import at once.
+ */
+async function retryPendingPurges(now: number): Promise<number> {
+  const staleBefore = new Date(now - ANALYTICS_IMPORT_STALE_MS);
+  const rows = await db.query.analyticsImports.findMany({
+    columns: { id: true, organizationId: true },
+    where: and(
+      eq(analyticsImports.status, "failed"),
+      eq(analyticsImports.purgePending, true),
+      lt(analyticsImports.updatedAt, staleBefore)
+    ),
+    orderBy: [asc(analyticsImports.updatedAt)],
+    limit: ANALYTICS_IMPORT_PURGE_BATCH,
+  });
+  let purged = 0;
+  for (const row of rows) {
+    // react-doctor-disable-next-line react-doctor/async-await-in-loop -- one purge at a time holds one Tinybird delete slot
+    const [claimed] = await db
+      .update(analyticsImports)
+      .set({ updatedAt: new Date(now) })
+      .where(
+        and(
+          eq(analyticsImports.id, row.id),
+          eq(analyticsImports.purgePending, true),
+          lt(analyticsImports.updatedAt, staleBefore)
+        )
+      )
+      .returning({ id: analyticsImports.id });
+    // react-doctor-disable-next-line react-doctor/async-await-in-loop -- see above
+    if (claimed && (await purgeFailedImportRows(row))) {
+      purged += 1;
+    }
+  }
+  return purged;
+}
+
 export async function recoverAnalyticsImports(
   now = Date.now()
 ): Promise<AnalyticsImportRecoveryResult> {
@@ -212,6 +253,7 @@ export async function recoverAnalyticsImports(
     checked: rows.length,
     restarted: 0,
     failed: 0,
+    purged: 0,
   };
   for (const row of rows) {
     try {
@@ -261,5 +303,6 @@ export async function recoverAnalyticsImports(
     }
   }
   result.restarted += await retryStaleDeletes(now);
+  result.purged = await retryPendingPurges(now);
   return result;
 }

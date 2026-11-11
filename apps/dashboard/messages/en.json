@@ -4953,6 +4953,8 @@
         "waitingSoon": "{provider} asked for a pause. Resuming…",
         "waitingBudgetLine": "Notra is pausing to leave part of your {provider} quota free. Resumes in {time}.",
         "waitingBudgetSoon": "Notra is pausing to leave part of your {provider} quota free. Resuming…",
+        "waitingStorageLine": "Cleaning up an earlier attempt. Resumes in {time}.",
+        "waitingStorageSoon": "Cleaning up an earlier attempt. Resuming…",
         "completedLine": "Your charts now go back to {date}.",
         "failedLine": "Stopped while importing {period}.",
         "failedAny": "Stopped before it finished.",

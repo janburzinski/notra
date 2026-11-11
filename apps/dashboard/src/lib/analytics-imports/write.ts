@@ -94,11 +94,17 @@ async function writeGeoRecords(
 async function writeCsvExport(
   row: AnalyticsImportRow,
   window: ImportDayRange,
-  csv: AsyncIterable<Uint8Array> | undefined
+  csv: AsyncIterable<Uint8Array> | undefined,
+  beforeWrite: () => Promise<void>
 ): Promise<AnalyticsImportWritten> {
   const source = csv ?? readImportRowUpload(row);
   const totals = { rows: 0, pageviews: 0 };
+  let writing = false;
   await parsePlausibleCsvZip(source, async (records) => {
+    if (!writing) {
+      writing = true;
+      await beforeWrite();
+    }
     const written = await writeWebRecords(row, records, window);
     totals.rows += written.rows;
     totals.pageviews += written.pageviews;
@@ -108,15 +114,22 @@ async function writeCsvExport(
 
 /**
  * Reads one window of history from the import's source (the uploaded export
- * or the provider API) and writes it to Tinybird.
+ * or the provider API) and writes it to Tinybird. `beforeWrite` runs once,
+ * right before the first row is written; a failure before it left nothing.
  */
 export async function writeImportWindow(
   row: AnalyticsImportRow,
   window: ImportDayRange,
-  csv?: AsyncIterable<Uint8Array>
+  {
+    csv,
+    beforeWrite,
+  }: {
+    csv?: AsyncIterable<Uint8Array>;
+    beforeWrite: () => Promise<void>;
+  }
 ): Promise<AnalyticsImportWritten> {
   if (row.provider === "plausible_csv") {
-    return await writeCsvExport(row, window, csv);
+    return await writeCsvExport(row, window, csv, beforeWrite);
   }
   const connection = row.connectionId
     ? await db.query.analyticsImportConnections.findFirst({
@@ -134,6 +147,7 @@ export async function writeImportWindow(
     host: row.host,
     range: window,
   });
+  await beforeWrite();
   return fetched.kind === "geo"
     ? await writeGeoRecords(row, fetched.records, window)
     : await writeWebRecords(row, fetched.records, window);
