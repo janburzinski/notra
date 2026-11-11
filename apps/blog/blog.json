@@ -93,11 +93,12 @@
       "legalName": "Notra, Inc.",
       "url": "https://www.usenotra.com",
       "logo": "/brand/notra-mark.svg"
-    }
+    },
+    "image": "/brand/share-card.png",
+    "imageAlt": "What we ship, and how we build it. The Notra blog and changelog."
   },
   "thumbnails": {
     "layout": "author",
-    "label": "BLOG",
     "background": "/brand/og-background.svg"
   },
   "markdown": {
