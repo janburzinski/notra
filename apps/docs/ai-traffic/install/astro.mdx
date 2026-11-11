@@ -18,12 +18,12 @@ docolin:
 This guide adds the Notra tracker to an Astro app, which takes about five minutes and one file, `src/middleware.ts`.
 
 <Tip>
-  The AI analytics page has a **Copy agent prompt** button. When you paste the prompt into Claude Code, Cursor or Codex, the agent does these steps for you.
+  The **Agent** tab has a **Copy agent prompt** button. When you paste the prompt into Claude Code, Cursor or Codex, the agent does these steps for you.
 </Tip>
 
 <Steps>
   <Step title="Get your token">
-    Open **Analytics** in the GEO sidebar and stay on the **AI analytics** tab. Until the first event arrives, the page shows **No activity yet** with the full install panel: **Install the package**, **Set your token** and **Add the proxy**, and the **Set your token** section shows the token. The panel also has a **Copy agent prompt** button that copies an instruction block you can paste into a coding agent.
+    Open **Analytics** in the GEO sidebar and stay on the **Agent** tab. Until the first event arrives, the page shows **No activity yet** with the full install panel: **Install the package**, **Set your token** and **Add the proxy**, and the **Set your token** section shows the token. The panel also has a **Copy agent prompt** button that copies an instruction block you can paste into a coding agent.
 
     <Visibility for="agents">
 
@@ -82,7 +82,7 @@ This guide adds the Notra tracker to an Astro app, which takes about five minute
     The middleware captures requests alongside your route handler and waits for the send before returning. If `src/middleware.ts` already exists, compose with `sequence` from `astro:middleware`. Astro must serve pages from a server adapter (`output: "server"` or hybrid) so requests exist at runtime.
   </Step>
   <Step title="Deploy and verify">
-    Deploy your site, and the AI analytics page switches from the install panel to the dashboard as soon as Notra stores the first AI crawler or referral. Crawlers visit on their own schedule, so the first event can take a while on a quiet site.
+    Deploy your site, and the **Agent** tab switches from the install panel to the dashboard as soon as Notra stores the first AI crawler or referral. Crawlers visit on their own schedule, so the first event can take a while on a quiet site.
   </Step>
 </Steps>
 

@@ -31,7 +31,7 @@ An AI referral is a person who clicked a link in an AI answer and landed on your
 | Qwen | chat.qwen.ai |
 | Meta AI | meta.ai |
 
-Subdomains of these hosts also count, but Notra does not read `utm_source` parameters.
+Subdomains of these hosts also count. The server tracker and log drains go by the referrer alone. In [Web analytics](/ai-traffic/web-analytics), a page view also counts as coming from AI when its link carries one of these hosts as `utm_source`, such as `utm_source=chatgpt.com`, which ChatGPT's apps add because they send no referrer.
 
 ## Conversions
 

@@ -18,12 +18,12 @@ docolin:
 This guide adds the Notra tracker to a Nuxt app, which takes about five minutes and touches one file, `server/middleware/geo.ts`.
 
 <Tip>
-  The AI analytics page has a **Copy agent prompt** button. Paste it into Claude Code, Cursor or Codex and the agent does these steps for you.
+  The **Agent** tab has a **Copy agent prompt** button. Paste it into Claude Code, Cursor or Codex and the agent does these steps for you.
 </Tip>
 
 <Steps>
   <Step title="Get your token">
-    Open **Analytics** in the GEO sidebar and stay on the **AI analytics** tab. Until the first event arrives, the page shows **No activity yet** with the full install panel: **Install the package**, **Set your token** and **Add the proxy**. Your token is in the **Set your token** section, and the panel also has a **Copy agent prompt** button that copies an instruction block for a coding agent.
+    Open **Analytics** in the GEO sidebar and stay on the **Agent** tab. Until the first event arrives, the page shows **No activity yet** with the full install panel: **Install the package**, **Set your token** and **Add the proxy**. Your token is in the **Set your token** section, and the panel also has a **Copy agent prompt** button that copies an instruction block for a coding agent.
 
     <Visibility for="agents">
 
@@ -86,7 +86,7 @@ This guide adds the Notra tracker to a Nuxt app, which takes about five minutes 
     Nitro usually does not pass geo headers, so location fields stay undefined and ingest falls back to an IP-based lookup.
   </Step>
   <Step title="Deploy and verify">
-    Deploy your site, and the AI analytics page switches from the install panel to the dashboard once Notra stores the first AI crawler visit or referral. Crawlers visit on their own schedule, so the first event can take a while on a quiet site.
+    Deploy your site, and the **Agent** tab switches from the install panel to the dashboard once Notra stores the first AI crawler visit or referral. Crawlers visit on their own schedule, so the first event can take a while on a quiet site.
   </Step>
 </Steps>
 

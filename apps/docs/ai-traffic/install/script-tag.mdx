@@ -21,7 +21,7 @@ The script cannot see AI crawlers, because crawlers do not run JavaScript. To lo
 
 <Steps>
   <Step title="Copy the script tag">
-    Open **Settings → Tracking** and copy the **Script tag** from the install panel. Until the first page view arrives, the **Web analytics** tab under **Analytics** shows the same panel. The tag contains your project's public key and loads the current build of the script, checked against its hash. You never look up or set the hash yourself: the install panel fills in the current build and its `integrity`. With your key in place of `nwk.…`, today's tag is:
+    Open **Settings → Tracking** and copy the **Script tag** from the install panel. Until the first page view arrives, the **Web** tab under **Analytics** shows the same panel. The tag contains your project's public key and loads the current build of the script, checked against its hash. You never look up or set the hash yourself: the install panel fills in the current build and its `integrity`. With your key in place of `nwk.…`, today's tag is:
 
     ```html
     <script defer src="https://static.usenotra.com/notra.ce3c872ef9c9.js" data-key="nwk.…" data-api="https://ingest.usenotra.com/api/collect" integrity="sha384-LuUp5Hj+rSQ4/mZp1sWBOrJDHIHKGqflwF1GYIreqmWdCaI1otOQealWJGRj6Toj" crossorigin="anonymous"></script>
@@ -112,7 +112,7 @@ To also record uncaught JavaScript errors and unhandled promise rejections, turn
 <script defer src="https://static.usenotra.com/notra.plus.d703b9cc5508.js" data-key="nwk.…" data-api="https://ingest.usenotra.com/api/collect" integrity="sha384-MgLdHKufD0WdkO4pxtkT/bbNCKxl6PxOyUJe+M/qwFGfjOdZ5rEnljxTlOVQIzF+" crossorigin="anonymous"></script>
 ```
 
-Only errors from scripts served over `http` or `https` are reported, which leaves out browser extensions and the opaque `Script error.` of other origins, and at most five per page view. The script never sends a stack trace. Before storing a message, Notra removes query strings from URLs in it, replaces email addresses with `[email]` and replaces runs of four or more digits and long hexadecimal tokens with `#`. Errors appear in the **JavaScript errors** table on the **Web analytics** tab once there are any.
+Only errors from scripts served over `http` or `https` are reported, which leaves out browser extensions and the opaque `Script error.` of other origins, and at most five per page view. The script never sends a stack trace. Before storing a message, Notra removes query strings from URLs in it, replaces email addresses with `[email]` and replaces runs of four or more digits and long hexadecimal tokens with `#`. Errors appear in the **JavaScript errors** table on the **Web** tab once there are any.
 
 ## Pinned builds and Subresource Integrity
 
@@ -138,7 +138,7 @@ The token response also returns `webScript` and `webPlusScript`, each with the a
 
 Each page view sends the page URL, the referrer and a random ID for that view. Each time the page is hidden, the script sends the visible time, the scroll depth and the web vitals for that view. A click on a link to another site sends the link's host and path with the view's ID, and `notra.plus.js` sends an error's message, script URL and line number. The script sets no cookies, writes nothing to storage and does not fingerprint the browser.
 
-Notra stores the path, with any segment that looks like an email address, a UUID, a number of four or more digits or a token replaced by `:id`, the referrer's host, the `utm_source`, `utm_medium` and `utm_campaign` parameters, country, the browser's primary language (such as `de`), device, browser and operating system. Visitors are counted with a hash of the IP address and user agent, salted with a random value that changes every day and is deleted after 48 hours, so nobody, Notra included, can link a visitor to an IP address afterwards or follow them from one day to the next. The IP address itself is never stored.
+Notra stores the path, with any segment that looks like an email address, a UUID, a number of four or more digits or a token replaced by `:id`, the referrer's host, the `utm_source`, `utm_medium`, `utm_campaign`, `utm_term` and `utm_content` parameters, country, the browser's primary language (such as `de`), device, browser and operating system. Visitors are counted with a hash of the IP address and user agent, salted with a random value that changes every day and is deleted after 48 hours, so nobody, Notra included, can link a visitor to an IP address afterwards or follow them from one day to the next. The IP address itself is never stored.
 
 The country is looked up inside Notra's own servers, so the IP address is not sent to any other service. Country data: [IP Geolocation by DB-IP](https://db-ip.com), licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
 

@@ -342,6 +342,7 @@
             "icon": "robot",
             "pages": [
               "ai-traffic/overview",
+              "ai-traffic/web-analytics",
               "ai-traffic/crawlers",
               "ai-traffic/journeys",
               "ai-traffic/referrals",
