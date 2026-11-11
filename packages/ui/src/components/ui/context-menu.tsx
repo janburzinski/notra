@@ -159,7 +159,7 @@ function ContextMenuSubTrigger({
     <ContextMenuPrimitive.SubmenuTrigger
       className={cn(
         DROPDOWN_ITEM_CLASS_NAME,
-        "data-popup-open:bg-menu-highlight",
+        "data-popup-open:bg-menu-highlight dark:data-popup-open:shadow-menu-highlight",
         className
       )}
       data-inset={inset || undefined}
