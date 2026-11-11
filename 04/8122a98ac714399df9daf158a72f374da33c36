@@ -1,0 +1,19 @@
+apps/blog/scripts/web-chrome.js
+  s_b86f76ae7bb7db::t_a23cdba59c028b 2
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "048122a98ac714399df9daf158a72f374da33c36",
+  "prompts": {},
+  "sessions": {
+    "s_b86f76ae7bb7db": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "2f109900-7372-4001-b177-d674105bc2a9",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
