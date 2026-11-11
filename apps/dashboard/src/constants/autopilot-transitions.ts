@@ -6,11 +6,11 @@ import type {
 import type { StatusTransitions } from "@/types/status-transition";
 
 export const AUTOPILOT_FINDING_TRANSITIONS = {
-  suggested: ["open", "dismissed"],
+  suggested: ["open", "dismissed", "expired"],
   open: ["open", "proposed", "suggested", "dismissed", "failed"],
   proposed: ["merged", "dismissed", "expired"],
   merged: [],
-  dismissed: [],
+  dismissed: ["open"],
   expired: ["open", "proposed", "merged", "dismissed"],
   failed: ["open", "dismissed"],
 } as const satisfies StatusTransitions<AutopilotFindingStatus>;

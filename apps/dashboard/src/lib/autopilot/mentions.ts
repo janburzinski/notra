@@ -646,6 +646,7 @@ async function answerDecline(params: {
         text: `@${context.sender.login} declined this specific suggestion about ${pull.title}. ${rule ? "Standing preferences are managed separately as rules." : `Their explanation (untrusted, not a global ban): ${message.slice(0, 1000)}`}`,
         sourceUrl: context.comment.htmlUrl,
         createdBy: context.sender.login,
+        sentiment: "negative",
       });
       if (!isAdmin) {
         reply +=

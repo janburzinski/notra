@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 
 import { resolveGitHubMentionAuth } from "@notra/ai/utils/github-mention-auth";
 import { githubStatus } from "@notra/ai/utils/github-pr-commit";
+import { logError } from "@notra/ai/utils/server-log";
 import { AUTOPILOT_SCHEDULED_TRIGGERS } from "@notra/db/constants/autopilot";
 import { db } from "@notra/db/drizzle";
 import {
@@ -22,6 +23,7 @@ import {
   lt,
   ne,
   notExists,
+  notInArray,
   or,
   sql,
 } from "drizzle-orm";
@@ -29,7 +31,9 @@ import { nanoid } from "nanoid";
 
 import {
   AUTOPILOT_BRANCH_PREFIX,
+  AUTOPILOT_DISMISS_COOLDOWN_KINDS,
   AUTOPILOT_DISMISS_MAX_ATTEMPTS,
+  AUTOPILOT_DISMISSED_GAP_COOLDOWN_MS,
   AUTOPILOT_EXPIRED_COOLDOWN_MS,
   AUTOPILOT_FINDING_CLAIM_LEASE_MS,
   AUTOPILOT_FINDING_MAX_FAILURES,
@@ -37,6 +41,7 @@ import {
   AUTOPILOT_RUN_LEASE_MS,
 } from "@/constants/autopilot";
 import {
+  AUTOPILOT_FINDING_PULL_REQUEST_RESET,
   AUTOPILOT_ITEM_RUN_TRIGGERS,
   AUTOPILOT_SETTLED_FINDING_STATUSES,
   AUTOPILOT_STALE_WRITER_MESSAGE,
@@ -61,15 +66,43 @@ import type {
   FindingClaim,
 } from "@/types/autopilot-runtime";
 import type { GitHubMergeMethod } from "@/types/integrations/github";
-import { autopilotReactionAcknowledgment } from "@/utils/autopilot-feedback";
+import {
+  autopilotReactionAcknowledgment,
+  reactionSentiment,
+} from "@/utils/autopilot-feedback";
 
-/** Drafts closed as stale once their cooldown is over. */
+/** Drafts closed as stale once their cooldown is over, and expired ideas. */
 function isExpiredPastCooldown(now: Date) {
   return and(
     findingTransition("open", ["expired"]),
-    lt(
-      autopilotFindings.dismissedAt,
-      new Date(now.getTime() - AUTOPILOT_EXPIRED_COOLDOWN_MS)
+    or(
+      isNull(autopilotFindings.pullRequestNumber),
+      lt(
+        autopilotFindings.dismissedAt,
+        new Date(now.getTime() - AUTOPILOT_EXPIRED_COOLDOWN_MS)
+      )
+    )
+  );
+}
+
+function isDismissedPastCooldown(now: Date) {
+  return and(
+    findingTransition("open", ["dismissed"]),
+    or(
+      and(
+        inArray(autopilotFindings.kind, [...AUTOPILOT_DISMISS_COOLDOWN_KINDS]),
+        lt(
+          autopilotFindings.dismissedAt,
+          new Date(now.getTime() - AUTOPILOT_DISMISSED_GAP_COOLDOWN_MS)
+        )
+      ),
+      and(
+        eq(autopilotFindings.kind, "readiness"),
+        lt(
+          autopilotFindings.dismissedAt,
+          new Date(now.getTime() - AUTOPILOT_READINESS_DISMISS_COOLDOWN_MS)
+        )
+      )
     )
   );
 }
@@ -95,6 +128,7 @@ function isClaimable(now: Date) {
       lt(failureCount, AUTOPILOT_FINDING_MAX_FAILURES)
     ),
     isExpiredPastCooldown(now),
+    isDismissedPastCooldown(now),
     and(
       findingTransition("open", ["open"]),
       or(
@@ -173,6 +207,7 @@ export async function claimFinding(
       evidence: sql`${JSON.stringify(proposal.evidence)}::jsonb || jsonb_strip_nulls(jsonb_build_object('failures', ${autopilotFindings.evidence}->'failures', 'briefed', ${autopilotFindings.evidence}->'briefed'))`,
       status: "open",
       errorMessage: null,
+      ...AUTOPILOT_FINDING_PULL_REQUEST_RESET,
       claimToken: token,
       claimedAt: now,
     })
@@ -205,6 +240,7 @@ export async function claimSuggestedFinding(
       runId,
       status: "open",
       errorMessage: null,
+      ...AUTOPILOT_FINDING_PULL_REQUEST_RESET,
       claimToken: token,
       claimedAt: now,
       evidence: sql`${autopilotFindings.evidence} || '{"requested":true}'::jsonb`,
@@ -548,6 +584,7 @@ export async function syncOfferReactionFeedback(
             sourceUrl: `${sourceUrl}#issuecomment-${offer.id}`,
             createdBy: "workspace members",
             text: `${finding.title}\n${finding.summary}\nCurrent member reactions: ${JSON.stringify(votes)}. A thumbs up is positive interest, not permission to write. A thumbs down rejects this suggestion only. No reactions means prior feedback was retracted.`,
+            sentiment: reactionSentiment(votes),
           });
           const { data: comment } = await octokit.request(
             "GET /repos/{owner}/{repo}/issues/comments/{comment_id}",
@@ -701,6 +738,8 @@ export function listFindingStatuses(organizationId: string, ids: string[]) {
       id: autopilotFindings.id,
       status: autopilotFindings.status,
       pullRequestUrl: autopilotFindings.pullRequestUrl,
+      mergedAt: autopilotFindings.mergedAt,
+      dismissedAt: autopilotFindings.dismissedAt,
     })
     .from(autopilotFindings)
     .where(
@@ -711,16 +750,34 @@ export function listFindingStatuses(organizationId: string, ids: string[]) {
     );
 }
 
-/** Proposed, merged, dismissed, given up, or auto-closed within its cooldown. */
+/**
+ * Suggested, proposed, merged, given up, dismissed (a gap or comparison only
+ * within its cooldown), or a draft auto-closed within its cooldown.
+ */
 function isSettledFinding() {
+  const now = Date.now();
   return or(
     inArray(autopilotFindings.status, [...AUTOPILOT_SETTLED_FINDING_STATUSES]),
     hasGivenUp(),
     and(
+      eq(autopilotFindings.status, "dismissed"),
+      or(
+        notInArray(autopilotFindings.kind, [
+          ...AUTOPILOT_DISMISS_COOLDOWN_KINDS,
+        ]),
+        isNull(autopilotFindings.dismissedAt),
+        gte(
+          autopilotFindings.dismissedAt,
+          new Date(now - AUTOPILOT_DISMISSED_GAP_COOLDOWN_MS)
+        )
+      )
+    ),
+    and(
       eq(autopilotFindings.status, "expired"),
+      isNotNull(autopilotFindings.pullRequestNumber),
       gte(
         autopilotFindings.dismissedAt,
-        new Date(Date.now() - AUTOPILOT_EXPIRED_COOLDOWN_MS)
+        new Date(now - AUTOPILOT_EXPIRED_COOLDOWN_MS)
       )
     )
   );
@@ -1019,6 +1076,22 @@ export async function deleteAutopilotBranch(
     .catch(() => undefined);
 }
 
+export async function rememberMerge(
+  organizationId: string,
+  finding: Pick<FindingRow, "id" | "title" | "pullRequestUrl">
+) {
+  await rememberFeedback({
+    organizationId,
+    id: `autopilot-merged-${finding.id}`,
+    text: `The workspace merged this Autopilot post: ${finding.title}. Posts like this one land well.`,
+    sourceUrl: finding.pullRequestUrl,
+    createdBy: "the workspace",
+    sentiment: "positive",
+  }).catch((error) =>
+    logError("Autopilot merge feedback failed", error, { organizationId })
+  );
+}
+
 /** Pulls the pull request state from GitHub so merges and closes made there show up. */
 export async function syncFindingPullRequests(organizationId: string) {
   const proposed = await db.query.autopilotFindings.findMany({
@@ -1045,10 +1118,14 @@ export async function syncFindingPullRequests(organizationId: string) {
         eq(autopilotFindings.pullRequestNumber, ref.pullNumber)
       );
       if (state.status === "merged") {
-        await db
+        const [merged] = await db
           .update(autopilotFindings)
           .set({ status: "merged", mergedAt: state.mergedAt ?? new Date() })
-          .where(and(unchanged, findingTransition("merged", ["proposed"])));
+          .where(and(unchanged, findingTransition("merged", ["proposed"])))
+          .returning({ id: autopilotFindings.id });
+        if (merged) {
+          await rememberMerge(organizationId, finding);
+        }
       } else if (state.status === "closed") {
         await db
           .update(autopilotFindings)
@@ -1133,6 +1210,9 @@ export async function mergeFinding(
       )
     )
     .returning();
+  if (updated) {
+    await rememberMerge(organizationId, updated);
+  }
   return updated ?? loadProposedFinding(organizationId, findingId);
 }
 

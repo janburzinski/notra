@@ -206,7 +206,8 @@ export function markTopicActed(
 
 /**
  * Keeps planner.md under its limit: first shorter signal details, then the
- * oldest closed topics, then the oldest topics nothing was opened for.
+ * oldest closed topics, then the oldest saved ideas, then the oldest topics
+ * nothing was opened for.
  */
 export function fitPlannerState(
   state: AutopilotPlannerState
@@ -228,19 +229,15 @@ export function fitPlannerState(
   };
   const byAge = (a: AutopilotTopic, b: AutopilotTopic) =>
     a.updatedAt.localeCompare(b.updatedAt);
+  const closed = (topic: AutopilotTopic) =>
+    topic.status === "done" || topic.status === "dismissed";
   const removable = [
+    ...fitted.topics.filter(closed).sort(byAge),
     ...fitted.topics
-      .filter(
-        (topic) => topic.status === "done" || topic.status === "dismissed"
-      )
+      .filter((topic) => topic.status === "ready" && topic.findingId !== null)
       .sort(byAge),
     ...fitted.topics
-      .filter(
-        (topic) =>
-          topic.findingId === null &&
-          topic.status !== "done" &&
-          topic.status !== "dismissed"
-      )
+      .filter((topic) => topic.findingId === null && !closed(topic))
       .sort(byAge),
   ];
   for (const topic of removable) {
@@ -428,7 +425,8 @@ export function applyPlannerOutput(params: {
 
 /**
  * Whether Autopilot may open a pull request on its own. Every check must
- * pass; when only capacity blocks it, the action is kept as an idea.
+ * pass; when only capacity or an unavailable Jev blocks it, the action is
+ * kept as an idea.
  */
 export function evaluateAutopilotGate(params: {
   action: AutopilotPlannedAction;
@@ -494,11 +492,17 @@ export function evaluateAutopilotGate(params: {
     },
   ];
   const failed = checks.filter((check) => !check.ok).map((check) => check.name);
+  const jevUnavailable = params.actionConfidence === null;
   return {
     open: failed.length === 0,
     suggest:
       failed.length > 0 &&
-      failed.every((name) => name === "budget" || name === "draft_limit"),
+      failed.every(
+        (name) =>
+          name === "budget" ||
+          name === "draft_limit" ||
+          (name === "confidence" && jevUnavailable)
+      ),
     checks,
   };
 }

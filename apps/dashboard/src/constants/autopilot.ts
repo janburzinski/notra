@@ -49,6 +49,12 @@ export const AUTOPILOT_READINESS_DISMISS_COOLDOWN_MS = 30 * 24 * 60 * 60 * 1000;
  * then it counts as settled so the next run doesn't reopen the same thing.
  */
 export const AUTOPILOT_EXPIRED_COOLDOWN_MS = 30 * 24 * 60 * 60 * 1000;
+export const AUTOPILOT_IDEA_MAX_AGE_MS = 21 * 24 * 60 * 60 * 1000;
+export const AUTOPILOT_DISMISSED_GAP_COOLDOWN_MS = 90 * 24 * 60 * 60 * 1000;
+export const AUTOPILOT_DISMISS_COOLDOWN_KINDS = [
+  "keywords",
+  "comparisons",
+] as const satisfies readonly AutopilotJobKind[];
 /**
  * Pages of 100 read from a pull request's events, reviews, comments or
  * commits. Past it the draft counts as closed once and as worked on.
@@ -164,6 +170,8 @@ export const AUTOPILOT_PR_OFFER_CONFIDENCE = 0.85;
 export const AUTOPILOT_RULES_MAX = 50;
 export const AUTOPILOT_RULE_MAX_CHARS = 300;
 export const AUTOPILOT_FEEDBACK_TITLE_MAX_CHARS = 120;
+export const AUTOPILOT_FEEDBACK_MAX_NEGATIVE_SHARE = 0.6;
+export const AUTOPILOT_DISMISS_FEEDBACK_ID_MARKER = "-dismiss-";
 export const AUTOPILOT_RULE_TRAILING_PUNCTUATION = /[.\s]+$/;
 /** What a topic typed in the settings is saved under. */
 export const AUTOPILOT_RULE_PREFIX = "Never suggest posts about";

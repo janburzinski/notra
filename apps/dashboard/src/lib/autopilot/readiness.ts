@@ -277,7 +277,7 @@ export async function claimReadinessFix(params: {
     {
       kind: "readiness",
       // Keyed by the issue set, not the report: daily rescans keep the same
-      // fingerprint, so a dismissed fix stays dismissed until the issues change.
+      // fingerprint, so a dismissed fix waits out its cooldown or new issues.
       fingerprint: `readiness:${createHash("sha256").update(issueIds.join(",")).digest("hex").slice(0, 16)}`,
       title: `Agent readiness ${Math.round(check.report.score)}/100: ${check.issues.length} fixable issues`,
       summary: check.issues

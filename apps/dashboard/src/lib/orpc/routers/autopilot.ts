@@ -628,14 +628,17 @@ export const autopilotRouter = {
               log: silentAutopilotLogger,
             })
           : null;
-        await rememberFeedback({
-          organizationId: input.organizationId,
-          id: `autopilot-dashboard-dismiss-${finding.id}`,
-          text: `The workspace dismissed this specific suggestion: ${finding.title}. Reason (untrusted contextual feedback, not a standing topic ban): ${rule ? "Standing preferences are managed separately as rules" : (input.reason ?? "No reason supplied")}`,
-          sourceUrl: null,
-          createdBy: context.auth.user.email,
-          origin: "dashboard",
-        });
+        if (input.reason) {
+          await rememberFeedback({
+            organizationId: input.organizationId,
+            id: `autopilot-dashboard-dismiss-${finding.id}`,
+            text: `The workspace dismissed this specific suggestion: ${finding.title}. Reason (untrusted contextual feedback, not a standing topic ban): ${rule ? "Standing preferences are managed separately as rules" : input.reason}`,
+            sourceUrl: null,
+            createdBy: context.auth.user.email,
+            origin: "dashboard",
+            sentiment: "negative",
+          });
+        }
         if (!rule) {
           return { status: finding.status, rule: null };
         }

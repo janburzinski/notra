@@ -171,6 +171,7 @@ export async function handleAutopilotSlackAction(vote: SlackVote) {
       sourceUrl: null,
       createdBy: "a Slack user",
       origin: "slack",
+      sentiment: "negative",
     }).catch((error) =>
       logError("Autopilot Slack feedback failed", error, { organizationId })
     );
@@ -261,6 +262,17 @@ export async function handleAutopilotSlackAction(vote: SlackVote) {
     await reply(`Couldn't start writing: ${failure(error)}`);
     return;
   }
+  await rememberFeedback({
+    organizationId,
+    id: `autopilot-slack-approve-${finding.id}`,
+    text: `The workspace asked Autopilot to write this suggestion: ${finding.title}. Ideas like this one are welcome.`,
+    sourceUrl: null,
+    createdBy: "a Slack user",
+    origin: "slack",
+    sentiment: "positive",
+  }).catch((error) =>
+    logError("Autopilot Slack feedback failed", error, { organizationId })
+  );
   // Outside the try: once the writer runs, a failed Slack post must not free the claim.
   await reply(
     `${user} asked for this one. Autopilot queued it and will post the pull request, or why it couldn't write it, here.`

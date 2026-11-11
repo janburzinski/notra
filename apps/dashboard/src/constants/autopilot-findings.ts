@@ -12,14 +12,18 @@ export const AUTOPILOT_ITEM_RUN_TRIGGERS = [
   (typeof AUTOPILOT_SCHEDULED_TRIGGERS)[number]
 >[];
 
+export const AUTOPILOT_FINDING_PULL_REQUEST_RESET = {
+  repository: null,
+  pullRequestNumber: null,
+  pullRequestUrl: null,
+  branch: null,
+  headSha: null,
+  openedAt: null,
+} as const;
+
 /** Statuses that block re-proposing the same fingerprint. */
 export const AUTOPILOT_SETTLED_FINDING_STATUSES =
-  new Set<AutopilotFindingStatus>([
-    "suggested",
-    "proposed",
-    "merged",
-    "dismissed",
-  ]);
+  new Set<AutopilotFindingStatus>(["suggested", "proposed", "merged"]);
 
 export const AUTOPILOT_STALE_WRITER_MESSAGE =
   "The writer stopped before finishing";

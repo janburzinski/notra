@@ -13,7 +13,9 @@ import { byteLength } from "@notra/memory/utils/access";
 import { parseRecords, renderRecords } from "@notra/memory/utils/records";
 
 import {
+  AUTOPILOT_DISMISS_FEEDBACK_ID_MARKER,
   AUTOPILOT_FEEDBACK_INTRO,
+  AUTOPILOT_FEEDBACK_MAX_NEGATIVE_SHARE,
   AUTOPILOT_FEEDBACK_TITLE_MAX_CHARS,
 } from "@/constants/autopilot";
 import type { AutopilotFeedbackInput } from "@/types/autopilot-memory";
@@ -26,9 +28,17 @@ function renderFeedback(records: readonly MemoryRecord[]) {
   });
 }
 
+function isNegativeFeedback(record: MemoryRecord) {
+  return (
+    record.meta.sentiment === "negative" ||
+    record.id.includes(AUTOPILOT_DISMISS_FEEDBACK_ID_MARKER)
+  );
+}
+
 /**
  * Feedback is preloaded into every decision, so it stays under the soft limit:
- * the oldest notes go first. Git history keeps what was dropped.
+ * the oldest notes go first, the oldest negative one while negatives make up
+ * more than their share. Git history keeps what was dropped.
  */
 function compactFeedback(records: MemoryRecord[]) {
   const sorted = [...records].sort((a, b) =>
@@ -38,7 +48,12 @@ function compactFeedback(records: MemoryRecord[]) {
     sorted.length > 1 &&
     byteLength(renderFeedback(sorted)) > MEMORY_PRELOADED_SOFT_LIMIT_BYTES
   ) {
-    sorted.shift();
+    const negatives = sorted.filter(isNegativeFeedback).length;
+    const index =
+      negatives > sorted.length * AUTOPILOT_FEEDBACK_MAX_NEGATIVE_SHARE
+        ? sorted.findIndex(isNegativeFeedback)
+        : 0;
+    sorted.splice(index, 1);
   }
   return sorted;
 }
@@ -64,6 +79,7 @@ export async function rememberFeedback(params: AutopilotFeedbackInput) {
           sourceUrl: params.sourceUrl,
           createdBy: params.createdBy,
           createdAt: new Date().toISOString(),
+          ...(params.sentiment ? { sentiment: params.sentiment } : {}),
         },
       });
       return {

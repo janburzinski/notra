@@ -12,6 +12,7 @@ export interface AutopilotFeedbackInput {
   sourceUrl: string | null;
   createdBy: string;
   origin?: "github" | "dashboard" | "slack";
+  sentiment?: "positive" | "negative";
 }
 
 export interface AutopilotFeedbackUpdate {

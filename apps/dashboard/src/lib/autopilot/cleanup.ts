@@ -5,12 +5,14 @@ import { and, eq, gt, isNull, lt, or } from "drizzle-orm";
 
 import {
   AUTOPILOT_EXPIRED_COOLDOWN_MS,
+  AUTOPILOT_IDEA_MAX_AGE_MS,
   AUTOPILOT_PERSON_PULL_REQUEST_EVENTS,
   AUTOPILOT_PULL_REQUEST_LIST_PAGES,
 } from "@/constants/autopilot";
 import {
   deleteAutopilotBranch,
   pullRequestRef,
+  rememberMerge,
 } from "@/lib/autopilot/findings";
 import {
   AutopilotRepositoryAccessError,
@@ -292,7 +294,7 @@ async function reconcileExpired(
         { owner: ref.owner, repo: ref.repo, pull_number: ref.pullNumber }
       );
       if (pull.merged_at) {
-        await db
+        const [merged] = await db
           .update(autopilotFindings)
           .set({ status: "merged", mergedAt: new Date(pull.merged_at) })
           .where(
@@ -300,7 +302,11 @@ async function reconcileExpired(
               eq(autopilotFindings.id, finding.id),
               findingTransition("merged", ["expired"])
             )
-          );
+          )
+          .returning({ id: autopilotFindings.id });
+        if (merged) {
+          await rememberMerge(ctx.organizationId, finding);
+        }
         continue;
       }
       if (pull.state !== "open") {
@@ -339,6 +345,35 @@ async function reconcileExpired(
   }
 }
 
+async function expireStaleIdeas(
+  ctx: AutopilotRunContext,
+  log: AutopilotLogger
+) {
+  const cutoff = new Date(Date.now() - AUTOPILOT_IDEA_MAX_AGE_MS);
+  const expired = await db
+    .update(autopilotFindings)
+    .set({ status: "expired", dismissedAt: new Date(), claimToken: null })
+    .where(
+      and(
+        eq(autopilotFindings.organizationId, ctx.organizationId),
+        findingTransition("expired", ["suggested"]),
+        or(
+          lt(autopilotFindings.claimedAt, cutoff),
+          and(
+            isNull(autopilotFindings.claimedAt),
+            lt(autopilotFindings.createdAt, cutoff)
+          )
+        )
+      )
+    )
+    .returning({ title: autopilotFindings.title });
+  if (expired.length > 0) {
+    await log.action(`Expired ${expired.length} ideas nobody picked up`, {
+      titles: expired.map((row) => row.title),
+    });
+  }
+}
+
 /**
  * Closes Autopilot drafts nobody worked on for the configured number of days,
  * so they stop counting against the open pull request limit. The finding
@@ -348,6 +383,7 @@ async function reconcileExpired(
 export async function closeStalePullRequests(ctx: AutopilotRunContext) {
   const days = ctx.stalePullRequestDays;
   const log = createAutopilotLogger(ctx, null);
+  await expireStaleIdeas(ctx, log);
   await reconcileExpired(ctx, log, days);
   if (!days) {
     return 0;

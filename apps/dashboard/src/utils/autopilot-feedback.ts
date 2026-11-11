@@ -1,6 +1,8 @@
 import type { GitHubMentionContext } from "@notra/ai/types/github-mention";
 import type { AutopilotFindingStatus } from "@notra/db/types/autopilot";
 
+import type { AutopilotFeedbackInput } from "@/types/autopilot-memory";
+
 export function autopilotDiscussionId(
   context: GitHubMentionContext,
   findingId: string
@@ -9,6 +11,15 @@ export function autopilotDiscussionId(
     ? `review-${context.comment.review.rootCommentId}`
     : "issue";
   return `autopilot-discussion-${findingId}-${context.sender.id}-${thread}`;
+}
+
+export function reactionSentiment(
+  votes: ReadonlyArray<{ content: string }>
+): AutopilotFeedbackInput["sentiment"] {
+  if (votes.some((vote) => vote.content === "-1")) {
+    return "negative";
+  }
+  return votes.length > 0 ? "positive" : undefined;
 }
 
 /**

@@ -86,6 +86,32 @@ test("feedback stays under the preload limit by dropping the oldest notes", asyn
   expect(feedback.at(-1)).toStartWith("Note 59:");
 });
 
+test("compaction keeps positive notes when dismissals pile up", async () => {
+  const note = (index: number, sentiment: "positive" | "negative") =>
+    rememberFeedback({
+      organizationId: "org-a",
+      id: `${sentiment}-${index}`,
+      sourceUrl: null,
+      createdBy: "jan",
+      text: `${sentiment} ${index}: ${"detail ".repeat(30)}`,
+      sentiment,
+    });
+  for (let index = 0; index < 20; index += 1) {
+    await note(index, "positive");
+  }
+  for (let index = 0; index < 40; index += 1) {
+    await note(index, "negative");
+  }
+  const { feedback } = await loadDecisionMemory("org-a");
+  const negatives = feedback.filter((text) => text.startsWith("negative"));
+  expect(feedback.length).toBeLessThan(60);
+  expect(negatives.length).toBeLessThanOrEqual(
+    Math.ceil(feedback.length * 0.6)
+  );
+  expect(feedback.some((text) => text.startsWith("positive"))).toBe(true);
+  expect(feedback.at(-1)).toStartWith("negative 39:");
+});
+
 test("an outage fails the load instead of returning no rules", async () => {
   const broken: MemoryStore = {
     ...store,

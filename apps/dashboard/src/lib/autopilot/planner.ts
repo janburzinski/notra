@@ -2,6 +2,8 @@ import {
   AUTOPILOT_ACTION_JEV_MODEL_ID,
   AUTOPILOT_AUTONOMOUS_PR_BUDGET,
   AUTOPILOT_DAY_MS,
+  AUTOPILOT_DISMISSED_TOPIC_REOPEN_DAYS,
+  AUTOPILOT_DONE_TOPIC_REOPEN_DAYS,
   AUTOPILOT_PLANNER_MAX_OUTPUT_TOKENS,
   AUTOPILOT_PLANNER_MODEL_ID,
   AUTOPILOT_PLANNER_RETRY_REASONING,
@@ -58,7 +60,26 @@ function describeChecks(checks: AutopilotGateResult["checks"]) {
   );
 }
 
-/** Topics follow their finding once Autopilot acted on them. */
+function closedBefore(at: Date | null, fallback: string, days: number) {
+  return (
+    (at ?? new Date(fallback)).getTime() < Date.now() - days * AUTOPILOT_DAY_MS
+  );
+}
+
+function reopenTopic(topic: AutopilotTopic): AutopilotTopic {
+  return {
+    ...topic,
+    status: "watching",
+    findingId: null,
+    pullRequestUrl: null,
+    nextStep: "",
+  };
+}
+
+/**
+ * Topics follow their finding once Autopilot acted on them. A dismissed or
+ * merged one watches again once its window has passed.
+ */
 async function syncTopicsWithFindings(
   organizationId: string,
   state: AutopilotPlannerState
@@ -84,9 +105,21 @@ async function syncTopicsWithFindings(
       const pullRequestUrl = finding.pullRequestUrl ?? topic.pullRequestUrl;
       switch (finding.status) {
         case "merged":
-          return followFinding(topic, { status: "done", pullRequestUrl });
+          return closedBefore(
+            finding.mergedAt,
+            topic.updatedAt,
+            AUTOPILOT_DONE_TOPIC_REOPEN_DAYS
+          )
+            ? reopenTopic(topic)
+            : followFinding(topic, { status: "done", pullRequestUrl });
         case "dismissed":
-          return followFinding(topic, { status: "dismissed", pullRequestUrl });
+          return closedBefore(
+            finding.dismissedAt,
+            topic.updatedAt,
+            AUTOPILOT_DISMISSED_TOPIC_REOPEN_DAYS
+          )
+            ? reopenTopic(topic)
+            : followFinding(topic, { status: "dismissed", pullRequestUrl });
         case "suggested":
           return followFinding(topic, { status: "ready", pullRequestUrl });
         case "open":
@@ -318,7 +351,7 @@ export async function decideAutopilotPlan(
   await log.decision(
     outcome === "open"
       ? `Writing "${action.brief?.topic ?? topic.title}"`
-      : `Saved "${action.brief?.topic ?? topic.title}" as an idea: no room for an automatic pull request`,
+      : `Saved "${action.brief?.topic ?? topic.title}" as an idea: ${plan.actionConfidence === null ? "Jev was unavailable" : "no room for an automatic pull request"}`,
     {
       reason: action.reason,
       confidence: plan.actionConfidence,

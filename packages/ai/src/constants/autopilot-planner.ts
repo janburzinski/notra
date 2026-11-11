@@ -37,6 +37,8 @@ export const AUTOPILOT_PLANNER_FILE_MAX_BYTES = 14 * 1024;
 export const AUTOPILOT_TRIMMED_SIGNAL_DETAIL_CHARS = 80;
 /** Topics nobody saw again in this long are forgotten, unless something was opened for them. */
 export const AUTOPILOT_TOPIC_STALE_DAYS = 30;
+export const AUTOPILOT_DISMISSED_TOPIC_REOPEN_DAYS = 45;
+export const AUTOPILOT_DONE_TOPIC_REOPEN_DAYS = 90;
 export const AUTOPILOT_PLANNER_STATE_FENCE = "notra-planner-state";
 export const AUTOPILOT_PLANNER_STATE_BLOCK = new RegExp(
   `\`\`\`json ${AUTOPILOT_PLANNER_STATE_FENCE}\\n([\\s\\S]*?)\\n\`\`\``
