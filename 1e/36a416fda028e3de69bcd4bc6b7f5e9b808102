@@ -1,0 +1,20 @@
+apps/dashboard/src/components/autopilot/autopilot-settings-panel.tsx
+  s_fd6ab57014372a::t_ea39fc32456a5b 105-108,110-111,114,116-118
+  s_fd6ab57014372a::t_67920590540005 413,415,418
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "1e36a416fda028e3de69bcd4bc6b7f5e9b808102",
+  "prompts": {},
+  "sessions": {
+    "s_fd6ab57014372a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "eb44c9e3-b834-4d73-9c87-a1ced06752c7",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
