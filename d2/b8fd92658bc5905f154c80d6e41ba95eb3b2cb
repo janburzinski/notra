@@ -1,0 +1,21 @@
+packages/analytics/src/tinybird/purge.ts
+  s_a43f2c0eab8f5c::t_2de1dc7b166e10 335-339,342-345
+packages/analytics/src/tinybird/purge.test.ts
+  s_a43f2c0eab8f5c::t_4af762a71369f2 178-196
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "d2b8fd92658bc5905f154c80d6e41ba95eb3b2cb",
+  "prompts": {},
+  "sessions": {
+    "s_a43f2c0eab8f5c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "dc5f5631-f27c-40ea-bc31-6e9e493180c4",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
