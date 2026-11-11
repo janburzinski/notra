@@ -12,6 +12,9 @@ import {
   GEO_CHROMIUM_UA_PATTERNS,
   GEO_CLI_CLIENT_PATTERNS,
   GEO_CLI_EXACT_USER_AGENTS,
+  GEO_HEADLESS_UA_PATTERNS,
+  GEO_MARKDOWN_FETCH_AGENT,
+  GEO_MARKDOWN_FETCH_CONFIDENCE,
   GEO_MARKDOWN_NEGOTIATION_AGENT,
   GEO_MARKDOWN_NEGOTIATION_CATEGORY,
   GEO_MARKDOWN_NEGOTIATION_CONFIDENCE,
@@ -24,7 +27,11 @@ import type {
   GeoVisitorSignals,
 } from "../types/ingest";
 import { androidAppPackage } from "../utils/android-app-referrer";
-import { normalizeAccept, prefersMarkdown } from "../utils/geo-accept";
+import {
+  isMachineReadablePath,
+  normalizeAccept,
+  prefersMarkdown,
+} from "../utils/geo-accept";
 
 const UNKNOWN_CLASSIFICATION: GeoVisitorClassification = {
   visitorType: "unknown",
@@ -112,6 +119,21 @@ function classifyByAccept(
   return null;
 }
 
+function classifyByPath(
+  path: string | undefined
+): GeoVisitorClassification | null {
+  if (!isMachineReadablePath(path)) {
+    return null;
+  }
+  return {
+    visitorType: "crawler",
+    source: GEO_MARKDOWN_FETCH_AGENT,
+    agent: GEO_MARKDOWN_FETCH_AGENT,
+    category: GEO_MARKDOWN_NEGOTIATION_CATEGORY,
+    confidence: GEO_MARKDOWN_FETCH_CONFIDENCE,
+  };
+}
+
 function looksLikeBrowser(haystack: string): boolean {
   return GEO_BROWSER_UA_PATTERNS.some((pattern) => haystack.includes(pattern));
 }
@@ -120,19 +142,26 @@ function classifyBySignals(
   userAgent: string,
   signals: GeoVisitorSignals | undefined
 ): GeoVisitorClassification | null {
-  if (!signals) {
-    return null;
-  }
   const haystack = userAgent.toLowerCase();
-  if (!looksLikeBrowser(haystack)) {
+  const headless = GEO_HEADLESS_UA_PATTERNS.some((pattern) =>
+    haystack.includes(pattern)
+  );
+  if (!(headless || (signals && looksLikeBrowser(haystack)))) {
     return null;
   }
   const claimsChromium = GEO_CHROMIUM_UA_PATTERNS.some((pattern) =>
     haystack.includes(pattern)
   );
-  const missingClientHints = claimsChromium && !signals.clientHints;
-  const missingFetchMetadata = signals.fetchMode === null;
-  if (!(missingClientHints || missingFetchMetadata || signals.tracing)) {
+  const missingClientHints = claimsChromium && signals?.clientHints === false;
+  const missingFetchMetadata = signals?.fetchMode === null;
+  if (
+    !(
+      headless ||
+      missingClientHints ||
+      missingFetchMetadata ||
+      signals?.tracing === true
+    )
+  ) {
     return null;
   }
   return {
@@ -184,6 +213,11 @@ export function classifyVisitor(
   const byAccept = classifyByAccept(userAgent, input.accept);
   if (byAccept) {
     return byAccept;
+  }
+
+  const byPath = classifyByPath(input.path);
+  if (byPath) {
+    return byPath;
   }
 
   const bySignals = classifyBySignals(userAgent, input.signals);

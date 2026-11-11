@@ -2,6 +2,7 @@ import type { GeoTrafficEventRow } from "@notra/analytics/tinybird/datasources";
 import { toClickHouseDateTime } from "@notra/analytics/utils/datetime";
 import { GEO_MAX_STORED_UA_LENGTH } from "@notra/geo-core/constants/geo";
 import { GEO_MARKDOWN_ACCEPT_MATCHERS } from "@notra/geo-core/constants/geo-accept";
+import { isMachineReadablePath } from "@notra/geo-core/utils/geo-accept";
 
 import {
   GEO_INGEST_MAX_CLOCK_SKEW_FUTURE_MS,
@@ -70,6 +71,7 @@ export function buildGeoTrafficEvent(
     language: toLanguage(payload.acceptLanguage),
     request_id: payload.requestId ?? "",
     journey_id: journey.journeyId,
-    wants_markdown: wantsMarkdown(payload.accept),
+    wants_markdown:
+      wantsMarkdown(payload.accept) || isMachineReadablePath(url.pathname),
   };
 }

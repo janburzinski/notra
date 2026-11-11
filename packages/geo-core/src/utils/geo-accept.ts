@@ -1,4 +1,7 @@
-import { GEO_MARKDOWN_ACCEPT_MATCHERS } from "@notra/geo-core/constants/geo-accept";
+import {
+  GEO_MACHINE_READABLE_PATH,
+  GEO_MARKDOWN_ACCEPT_MATCHERS,
+} from "@notra/geo-core/constants/geo-accept";
 
 const HTML_TYPES = new Set(["text/html", "application/xhtml+xml"]);
 const DEFAULT_QUALITY = 1;
@@ -35,4 +38,8 @@ export function prefersMarkdown(accept: string | undefined): boolean {
 
 export function normalizeAccept(accept: string | undefined): string {
   return (accept ?? "").replaceAll(/\s+/g, "").toLowerCase();
+}
+
+export function isMachineReadablePath(path: string | undefined): boolean {
+  return path !== undefined && GEO_MACHINE_READABLE_PATH.test(path);
 }

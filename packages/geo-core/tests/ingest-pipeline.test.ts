@@ -592,7 +592,6 @@ describe("runGeoIngest ordering", () => {
         prefetch: true,
       },
     },
-    { url: "https://acme.com/llms.txt" },
     { method: "POST" },
     { status: 302 },
   ])("site visitor counting filters non-page traffic %j", async (override) => {
@@ -605,6 +604,25 @@ describe("runGeoIngest ordering", () => {
     expect(ingestWebPageViews).not.toHaveBeenCalled();
     expect(getGeoIngestTokenGeneration).not.toHaveBeenCalled();
     expect(loadIngestAllowedHosts).not.toHaveBeenCalled();
+  });
+
+  test("a browser fetching llms.txt is an agent read, not a site visitor", async () => {
+    expect(
+      await run(
+        ingestRequest(
+          { ...SITE_PAGE, url: "https://acme.com/llms.txt" },
+          SITE_TOKEN
+        )
+      )
+    ).toMatchObject({
+      _tag: "Success",
+      success: {
+        outcome: "ingested",
+        visitorType: "crawler",
+        agent: "Markdown-fetching agent",
+      },
+    });
+    expect(ingestWebPageViews).not.toHaveBeenCalled();
   });
 
   test("site visitor counting retains the independent web admission limit", async () => {

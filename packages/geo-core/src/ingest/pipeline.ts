@@ -563,6 +563,7 @@ export const runGeoEnvelopeIngest = Effect.fnUntraced(function* (
     userAgent: payload.userAgent,
     referer: payload.referer,
     accept: payload.accept,
+    path: url.pathname,
     signals: payload.signals,
   });
   const policy = geoIngestIdentityPolicy(identity);

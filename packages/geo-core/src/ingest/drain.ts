@@ -92,6 +92,7 @@ function isAiRecord({ payload }: GeoDrainRecord): boolean {
     userAgent: payload.userAgent,
     referer: payload.referer,
     accept: payload.accept,
+    path: URL.parse(payload.url)?.pathname,
     signals: payload.signals,
   });
   return isTrackedGeoVisitorType(visitorType);

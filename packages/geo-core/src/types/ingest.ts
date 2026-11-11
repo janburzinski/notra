@@ -78,6 +78,7 @@ export interface GeoVisitorInput {
   userAgent: string | undefined;
   referer: string | undefined;
   accept: string | undefined;
+  path?: string;
   signals?: GeoVisitorSignals;
 }
 

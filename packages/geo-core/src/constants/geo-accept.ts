@@ -5,6 +5,10 @@ export const GEO_MARKDOWN_ACCEPT_MATCHERS: readonly string[] = [
   "text/x-markdown",
 ];
 export const GEO_MARKDOWN_NEGOTIATION_AGENT = "Markdown-negotiating agent";
+export const GEO_MARKDOWN_FETCH_AGENT = "Markdown-fetching agent";
+export const GEO_MARKDOWN_FETCH_CONFIDENCE = "reported";
+export const GEO_MACHINE_READABLE_PATH =
+  /(^|\/)(llms(-full)?\.txt|[^/]+\.md)$/i;
 export const GEO_MARKDOWN_NEGOTIATION_CATEGORY = "assistant-browse";
 export const GEO_MARKDOWN_NEGOTIATION_CONFIDENCE = "heuristic";
 export const GEO_ACCEPT_FINGERPRINT_CONFIDENCE = "reported";
@@ -37,6 +41,10 @@ export const GEO_ACCEPT_FINGERPRINTS: readonly GeoAcceptFingerprint[] = [
 export const GEO_BROWSER_IMITATION_AGENT = "Browser-imitating agent";
 export const GEO_BROWSER_IMITATION_CONFIDENCE = "heuristic";
 export const GEO_CHROMIUM_UA_PATTERNS: readonly string[] = ["chrome/", "edg/"];
+export const GEO_HEADLESS_UA_PATTERNS: readonly string[] = [
+  "headlesschrome",
+  "phantomjs",
+];
 
 export const GEO_CLI_CLIENT_PATTERNS: readonly GeoCliClientPattern[] = [
   { pattern: "curl/", agent: "curl" },

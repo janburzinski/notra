@@ -63,7 +63,7 @@ const ENGINE_ICON_RULES: readonly EngineIconRule[] = [
   },
   {
     key: "amazon",
-    patterns: ["amazonbot", "amzn-"],
+    patterns: ["amazonbot", "amzn-", "amazon-bedrock"],
   },
   {
     key: "duckduckgo",
@@ -75,7 +75,7 @@ const ENGINE_ICON_RULES: readonly EngineIconRule[] = [
   },
   {
     key: "tiktok",
-    patterns: ["tiktok", "bytespider", "bytedance", "trae"],
+    patterns: ["tiktok", "bytespider", "bytedance", "doubao", "trae"],
   },
   {
     key: "mozilla",
@@ -210,8 +210,11 @@ const ENGINE_ICON_RULES: readonly EngineIconRule[] = [
       "omgili",
       "yiyanbot",
       "baidu",
+      "erniebot",
+      "warpbot",
       "browser-imitating",
       "markdown-negotiating",
+      "markdown-fetching",
     ],
   },
 ];
