@@ -198,4 +198,9 @@ export const WEB_SOURCE_LABELS: Record<string, string> = {
   "product-hunt": "Product Hunt",
   medium: "Medium",
   substack: "Substack",
+  gmail: "Gmail",
+  slack: "Slack",
+  discord: "Discord",
+  telegram: "Telegram",
+  whatsapp: "WhatsApp",
 };

@@ -1,3 +1,5 @@
+import type { WebAndroidAppReferrer } from "../types/ingest";
+
 export const WEB_SESSION_TTL_SECONDS = 30 * 60;
 export const WEB_SESSION_KEY_PREFIX = "web:session";
 export const WEB_VISITOR_ID_LENGTH = 16;
@@ -70,6 +72,15 @@ export const WEB_AI_PRODUCTS: Record<string, string> = {
   phind: "phind",
 };
 
+/**
+ * Webmail, checked before search so `google.` does not catch Gmail. There is
+ * no email group, so these stay under other with a readable source.
+ */
+export const WEB_MAIL_HOSTS: Record<string, string> = {
+  "mail.google.com": "gmail",
+  "inbox.google.com": "gmail",
+};
+
 export const WEB_SEARCH_HOSTS: Record<string, string> = {
   "google.": "google",
   "bing.com": "bing",
@@ -104,7 +115,48 @@ export const WEB_SOCIAL_HOSTS: Record<string, string> = {
   "producthunt.com": "product-hunt",
   "medium.com": "medium",
   "substack.com": "substack",
+  "slack.com": "slack",
+  "slack-redir.net": "slack",
+  "discord.com": "discord",
+  "discord.gg": "discord",
+  "telegram.org": "telegram",
+  "t.me": "telegram",
+  "whatsapp.com": "whatsapp",
+  "wa.me": "whatsapp",
 };
+
+/** Chrome reports a link opened from an Android app as `android-app://<package>/`. */
+export const WEB_ANDROID_APP_PROTOCOL = "android-app:";
+export const WEB_ANDROID_PACKAGE_PATTERN = /^[a-z]\w*(?:\.[a-z]\w*)+$/;
+
+/**
+ * Android apps by package name, lowercased; AI apps are in GEO_AI_ANDROID_APPS.
+ * Sources and groups match the apps' websites above.
+ */
+export const WEB_ANDROID_APP_REFERRERS: Record<string, WebAndroidAppReferrer> =
+  {
+    "com.google.android.googlequicksearchbox": {
+      group: "search",
+      source: "google",
+    },
+    "com.google.android.gm": { group: "other", source: "gmail" },
+    "com.twitter.android": { group: "social", source: "x" },
+    "com.linkedin.android": { group: "social", source: "linkedin" },
+    "com.facebook.katana": { group: "social", source: "facebook" },
+    "com.facebook.lite": { group: "social", source: "facebook" },
+    "com.instagram.android": { group: "social", source: "instagram" },
+    "com.instagram.barcelona": { group: "social", source: "threads" },
+    "com.reddit.frontpage": { group: "social", source: "reddit" },
+    "com.google.android.youtube": { group: "social", source: "youtube" },
+    "xyz.blueskyweb.app": { group: "social", source: "bluesky" },
+    "org.joinmastodon.android": { group: "social", source: "mastodon" },
+    "com.github.android": { group: "social", source: "github" },
+    "com.medium.reader": { group: "social", source: "medium" },
+    "com.slack": { group: "social", source: "slack" },
+    "com.discord": { group: "social", source: "discord" },
+    "org.telegram.messenger": { group: "social", source: "telegram" },
+    "com.whatsapp": { group: "social", source: "whatsapp" },
+  };
 
 export const WEB_BROWSERS: readonly [string, string][] = [
   ["edg/", "Edge"],

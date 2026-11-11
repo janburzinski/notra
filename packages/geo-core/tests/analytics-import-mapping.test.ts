@@ -31,6 +31,9 @@ describe("referrers", () => {
     ["Direct / None", "direct", "", ""],
     ["", "direct", "", ""],
     ["Newsletter", "other", "newsletter", ""],
+    ["Gmail", "other", "gmail", ""],
+    ["Slack", "social", "slack", ""],
+    ["WhatsApp", "social", "whatsapp", ""],
   ])("Plausible source %j maps to %s/%s", (sourceName, group, source, ai) => {
     expect(mapImportReferrer({ sourceName, pageHost: PAGE_HOST })).toEqual({
       host: "",
@@ -49,6 +52,12 @@ describe("referrers", () => {
     ["news.ycombinator.com/item?id=1", "social", "hacker-news", ""],
     ["www.someblog.dev", "other", "someblog.dev", ""],
     ["www.example.com", "internal", "", ""],
+    ["mail.google.com", "other", "gmail", ""],
+    ["app.slack.com", "social", "slack", ""],
+    ["android-app://com.google.android.gm/", "other", "gmail", ""],
+    ["android-app://com.linkedin.android", "social", "linkedin", ""],
+    ["android-app://com.example.reader/", "other", "com.example.reader", ""],
+    ["android-app://com.openai.chatgpt/", "ai", "chatgpt", "openai"],
   ])("referrer host %j maps to %s/%s", (referrer, group, source, ai) => {
     expect(mapImportReferrer({ referrer, pageHost: PAGE_HOST })).toMatchObject({
       group,
@@ -71,6 +80,12 @@ describe("referrers", () => {
       "chatgpt",
     ],
     ["a named campaign source", { utmSource: "Twitter" }, "social", "x"],
+    [
+      "a source name that is an Android app",
+      { sourceName: "android-app://com.google.android.gm" },
+      "other",
+      "gmail",
+    ],
     [
       "another campaign source, lowercased",
       { utmSource: "Spring-Launch" },

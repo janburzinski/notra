@@ -233,6 +233,11 @@ export interface WebReferrer {
   aiProduct: string;
 }
 
+export interface WebAndroidAppReferrer {
+  group: "search" | "social" | "other";
+  source: string;
+}
+
 export interface WebSession {
   id: string;
   index: number;

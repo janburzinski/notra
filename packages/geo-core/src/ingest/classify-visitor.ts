@@ -1,4 +1,5 @@
 import {
+  GEO_AI_ANDROID_APPS,
   GEO_AI_REFERRER_HOSTS,
   GEO_BROWSER_UA_PATTERNS,
   GEO_NON_AI_BOT_PATTERNS,
@@ -22,6 +23,7 @@ import type {
   GeoVisitorInput,
   GeoVisitorSignals,
 } from "../types/ingest";
+import { androidAppPackage } from "../utils/android-app-referrer";
 import { normalizeAccept, prefersMarkdown } from "../utils/geo-accept";
 
 const UNKNOWN_CLASSIFICATION: GeoVisitorClassification = {
@@ -47,6 +49,10 @@ function matchesHost(host: string, key: string): boolean {
 export function resolveAiReferrer(referer: string | undefined): string | null {
   if (!referer) {
     return null;
+  }
+  const app = androidAppPackage(referer);
+  if (app) {
+    return GEO_AI_ANDROID_APPS[app] ?? null;
   }
 
   let parsed: URL;

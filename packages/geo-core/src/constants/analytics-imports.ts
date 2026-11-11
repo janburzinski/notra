@@ -463,6 +463,10 @@ export const IMPORT_REFERRER_NAMES: Record<string, ImportReferrerName> = {
   threads: { group: "social", source: "threads" },
   medium: { group: "social", source: "medium" },
   substack: { group: "social", source: "substack" },
+  slack: { group: "social", source: "slack" },
+  discord: { group: "social", source: "discord" },
+  telegram: { group: "social", source: "telegram" },
+  whatsapp: { group: "social", source: "whatsapp" },
 };
 
 export const IMPORT_DIRECT_NAMES = new Set([

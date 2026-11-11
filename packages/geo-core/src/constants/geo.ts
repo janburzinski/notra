@@ -715,6 +715,17 @@ export const GEO_AI_REFERRER_HOSTS: Record<string, string> = {
   "phind.com": "phind",
 };
 
+/** AI assistants' Android apps, by the package an `android-app://` referrer names. */
+export const GEO_AI_ANDROID_APPS: Record<string, string> = {
+  "com.openai.chatgpt": "chatgpt",
+  "ai.perplexity.app.android": "perplexity",
+  "com.anthropic.claude": "claude",
+  "com.google.android.apps.bard": "gemini",
+  "ai.x.grok": "grok",
+  "com.deepseek.chat": "deepseek",
+  "ai.mistral.chat": "mistral",
+};
+
 export const GEO_SOURCE_LABELS: Record<string, string> = {
   chatgpt: "ChatGPT",
   openai: "ChatGPT",

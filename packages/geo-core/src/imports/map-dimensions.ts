@@ -117,8 +117,9 @@ export function mapImportReferrer(input: ImportReferrerInput): ImportReferrer {
   const aiSource = aiFromUrl(referrerUrl) ?? aiFromUrl(utmUrl);
   const host = referrerUrl?.hostname.toLowerCase() ?? "";
   if (aiSource || host) {
+    // The scheme stays: `android-app://<package>` names an app, not a host.
     const classified = classifyWebReferrer(
-      host ? `https://${host}` : undefined,
+      referrerUrl && host ? `${referrerUrl.protocol}//${host}` : undefined,
       pageHost,
       aiSource
     );

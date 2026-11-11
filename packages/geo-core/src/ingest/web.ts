@@ -11,8 +11,10 @@ import { toClickHouseDateTime } from "@notra/analytics/utils/datetime";
 import {
   ISO_DATE_LENGTH,
   WEB_AI_PRODUCTS,
+  WEB_ANDROID_APP_REFERRERS,
   WEB_BROWSERS,
   WEB_LANGUAGE_PATTERN,
+  WEB_MAIL_HOSTS,
   WEB_OPERATING_SYSTEMS,
   WEB_OUTBOUND_EVENT,
   WEB_SEARCH_HOSTS,
@@ -38,6 +40,7 @@ import type {
   WebReferrer,
   WebSession,
 } from "../types/ingest";
+import { androidAppPackage } from "../utils/android-app-referrer";
 import { scrubWebErrorText, scrubWebText } from "../utils/web-error-scrub";
 import { isHumanPageView, webPagePath } from "../utils/web-page-view";
 import { scrubWebPath } from "../utils/web-path-scrub";
@@ -150,9 +153,23 @@ export function classifyWebReferrer(
   if (!host) {
     return { host: "", group: "direct", source: "", aiProduct: "" };
   }
+  const app = androidAppPackage(referer);
+  if (app) {
+    const known = WEB_ANDROID_APP_REFERRERS[app];
+    return {
+      host,
+      group: known?.group ?? "other",
+      source: known?.source ?? app,
+      aiProduct: "",
+    };
+  }
   const bare = host.replace(LEADING_WWW_REGEX, "");
   if (bare === pageHost.replace(LEADING_WWW_REGEX, "")) {
     return { host, group: "internal", source: "", aiProduct: "" };
+  }
+  const mail = matchHost(bare, WEB_MAIL_HOSTS);
+  if (mail) {
+    return { host, group: "other", source: mail, aiProduct: "" };
   }
   const search = matchHost(bare, WEB_SEARCH_HOSTS);
   if (search) {

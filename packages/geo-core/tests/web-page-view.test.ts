@@ -5,6 +5,7 @@ mock.module("@notra/ai/utils/redis", () => ({ redis: null }));
 
 const { classifyWebReferrer, describeUserAgent, webLanguage, webVisitorId } =
   await import("../src/ingest/web");
+import { resolveAiReferrer } from "../src/ingest/classify-visitor";
 import type { WebPageViewInput } from "../src/types/ingest";
 import { scrubWebErrorText } from "../src/utils/web-error-scrub";
 import { isHumanPageView, webPagePath } from "../src/utils/web-page-view";
@@ -105,6 +106,72 @@ describe("referrers", () => {
     expect(
       classifyWebReferrer("https://chatgpt.com/", "acme.com", "chatgpt")
     ).toMatchObject({ group: "ai", source: "chatgpt", aiProduct: "openai" });
+  });
+
+  test.each([
+    ["https://mail.google.com/", "other", "gmail"],
+    ["https://inbox.google.com/", "other", "gmail"],
+    ["https://www.google.com/", "search", "google"],
+    ["https://google.de/", "search", "google"],
+    ["https://www.google.co.uk/", "search", "google"],
+    ["https://news.google.com/", "search", "google"],
+    ["https://docs.google.com/", "search", "google"],
+    ["https://slack.com/", "social", "slack"],
+    ["https://app.slack.com/", "social", "slack"],
+    ["https://slack-redir.net/", "social", "slack"],
+    ["https://discord.com/", "social", "discord"],
+    ["https://discord.gg/", "social", "discord"],
+    ["https://web.telegram.org/", "social", "telegram"],
+    ["https://t.me/", "social", "telegram"],
+    ["https://web.whatsapp.com/", "social", "whatsapp"],
+    ["https://wa.me/", "social", "whatsapp"],
+    ["https://t.co/", "social", "x"],
+  ])("web referrer %j maps to %s/%s", (referer, group, source) => {
+    expect(classifyWebReferrer(referer, "acme.com", null)).toMatchObject({
+      group,
+      source,
+    });
+  });
+
+  test.each([
+    ["android-app://com.google.android.gm/", "other", "gmail"],
+    [
+      "android-app://com.google.android.googlequicksearchbox/",
+      "search",
+      "google",
+    ],
+    ["android-app://com.linkedin.android/", "social", "linkedin"],
+    ["android-app://com.twitter.android/", "social", "x"],
+    ["android-app://com.facebook.katana/", "social", "facebook"],
+    ["android-app://com.Slack/", "social", "slack"],
+    ["android-app://org.telegram.messenger/", "social", "telegram"],
+    ["android-app://com.whatsapp/", "social", "whatsapp"],
+    ["android-app://com.discord/", "social", "discord"],
+    ["android-app://com.example.reader/", "other", "com.example.reader"],
+  ])("Android app %j maps to %s/%s", (referer, group, source) => {
+    const aiSource = resolveAiReferrer(referer);
+    expect(aiSource).toBeNull();
+    expect(classifyWebReferrer(referer, "acme.com", aiSource)).toMatchObject({
+      group,
+      source,
+      aiProduct: "",
+    });
+  });
+
+  test.each([
+    ["android-app://com.openai.chatgpt/", "chatgpt", "openai"],
+    ["android-app://ai.perplexity.app.android/", "perplexity", "perplexity"],
+    ["android-app://com.anthropic.claude/", "claude", "anthropic"],
+    ["android-app://com.google.android.apps.bard/", "gemini", "google"],
+  ])("AI app %j is an AI referral from %s", (referer, source, aiProduct) => {
+    const aiSource = resolveAiReferrer(referer);
+    expect(aiSource).toBe(source);
+    expect(classifyWebReferrer(referer, "acme.com", aiSource)).toEqual({
+      host: new URL(referer).hostname,
+      group: "ai",
+      source,
+      aiProduct,
+    });
   });
 });
 
