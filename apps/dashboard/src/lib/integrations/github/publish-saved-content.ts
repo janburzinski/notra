@@ -40,6 +40,7 @@ import {
   DEFAULT_GITHUB_CONTENT_DIRECTORIES,
   DEFAULT_GITHUB_CONTENT_OUTPUT_ENABLED,
 } from "@/constants/github";
+import { SITE_ENTRY_DIRECTORIES } from "@/constants/site-github-publish";
 import { getTranslations } from "@/lib/i18n/server";
 import {
   prepareR2GitHubContentAssets,
@@ -347,6 +348,17 @@ async function publishSavedContent(
       openPullRequestBase = linked.base.ref;
     }
   }
+  const existingPublication =
+    recordedPublication?.repositoryId === integration.id
+      ? {
+          siteId: storedPublish.data?.siteId,
+          baseBranch: previousBase,
+          path: recordedPublication.path,
+        }
+      : storedPublish.success &&
+          storedPublish.data.repositoryId === integration.id
+        ? { ...storedPublish.data, baseBranch: previousBase }
+        : undefined;
   const siteTarget = await findSiteGitHubPublishTarget({
     organizationId: input.organizationId,
     contentType: input.contentType,
@@ -359,17 +371,7 @@ async function publishSavedContent(
         : outputConfig.success
           ? outputConfig.data.siteId
           : null),
-    existingPublication:
-      recordedPublication?.repositoryId === integration.id
-        ? {
-            siteId: storedPublish.data?.siteId,
-            baseBranch: previousBase,
-            path: recordedPublication.path,
-          }
-        : storedPublish.success &&
-            storedPublish.data.repositoryId === integration.id
-          ? { ...storedPublish.data, baseBranch: previousBase }
-          : undefined,
+    existingPublication,
     repository: {
       id: integration.id,
       githubRepositoryId: integration.githubRepositoryId,
@@ -377,6 +379,16 @@ async function publishSavedContent(
       repo: repositoryName,
     },
   });
+  // The site never builds an unmounted section, so a new entry would merge
+  // but never appear. Existing entries keep saving.
+  if (siteTarget && !siteTarget.sectionMounted && !existingPublication) {
+    const tErrors = await getTranslations("errors.content");
+    throw badRequest(
+      tErrors("siteSectionMissing", {
+        section: SITE_ENTRY_DIRECTORIES[input.contentType],
+      })
+    );
+  }
   const publicationBranch =
     openPullRequestBase ?? siteTarget?.productionBranch ?? defaultBranch;
   const configuredDirectory = outputConfig.success

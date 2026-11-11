@@ -1336,7 +1336,8 @@
       "historyNotSupported": "Der Versionsverlauf ist für Artikel und Changelogs verfügbar.",
       "historyUnavailable": "Diese Version kann nicht wiederhergestellt werden, weil ihr bearbeitbarer Inhalt oder ihre Metadaten nicht verfügbar sind.",
       "choosePublishingSite": "Wähle vor der Veröffentlichung eine Website für dieses Repository aus.",
-      "publishingSiteUnavailable": "Die ausgewählte Website ist nicht mit diesem Repository und Projekt verbunden."
+      "publishingSiteUnavailable": "Die ausgewählte Website ist nicht mit diesem Repository und Projekt verbunden.",
+      "siteSectionMissing": "Diese Website hat keinen Bereich „{section}“. Aktiviere ihn in den Website-Einstellungen unter Bereiche und veröffentliche dann erneut."
     },
     "notifications": {
       "ownerOnly": "Nur der Organisationsinhaber kann die Benachrichtigungseinstellungen ändern"

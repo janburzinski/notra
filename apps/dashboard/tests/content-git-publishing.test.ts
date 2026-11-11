@@ -315,6 +315,50 @@ if (!databaseUrl) {
       "Synthetic story"
     );
   });
+  test("a site without the post's section refuses a new post before writing to GitHub", async () => {
+    await createSite();
+    await db
+      .update(posts)
+      .set({ contentType: "changelog" })
+      .where(eq(posts.id, input.contentId));
+    const changelog = { ...input, contentType: "changelog" as const };
+    const callsBefore = fake.state.calls.length;
+    await expect(publishSavedContentToGitHub(changelog)).rejects.toThrow(
+      "siteSectionMissing"
+    );
+    expect(fake.state.prs).toHaveLength(0);
+    expect(
+      fake.state.calls
+        .slice(callsBefore)
+        .filter((request) => !request.startsWith("GET "))
+    ).toEqual([]);
+    await db
+      .update(sites)
+      .set({ mounts: { blog: "/blog", changelog: "/changelog" } })
+      .where(eq(sites.organizationId, org));
+    const published = await publishSavedContentToGitHub(changelog);
+    expect(published.path).toBe("changelog/synthetic-story.md");
+  });
+  test("a published post keeps saving after its site section is turned off", async () => {
+    await createSite();
+    const first = await publishSavedContentToGitHub(input);
+    await db
+      .update(sites)
+      .set({ mounts: { changelog: "/changelog" } })
+      .where(eq(sites.organizationId, org));
+    await db
+      .update(posts)
+      .set({ markdown: "Edited after the blog was turned off." })
+      .where(eq(posts.id, input.contentId));
+    const saved = await publishSavedContentToGitHub({
+      ...input,
+      linkedOnly: true,
+    });
+    expect(saved.pullRequestNumber).toBe(first.pullRequestNumber);
+    expect(fake.state.commits.get(saved.headSha)?.get(first.path)).toContain(
+      "Edited after the blog was turned off."
+    );
+  });
   test("several sites require an explicit choice", async () => {
     await createSite();
     const selected = await createSite(`${org}-other`, "other");

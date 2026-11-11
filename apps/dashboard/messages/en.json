@@ -1336,7 +1336,8 @@
       "historyNotSupported": "Version history is available for articles and changelogs.",
       "historyUnavailable": "This version cannot be restored because its editable content or metadata is unavailable.",
       "choosePublishingSite": "Choose a site for this repository before publishing.",
-      "publishingSiteUnavailable": "The selected site is not connected to this repository and project."
+      "publishingSiteUnavailable": "The selected site is not connected to this repository and project.",
+      "siteSectionMissing": "This site has no {section} section. Turn it on in the site settings under Sections, then publish again."
     },
     "notifications": {
       "ownerOnly": "Only the organization owner can update notification settings"
