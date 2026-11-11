@@ -57,8 +57,7 @@
           "description": "Assistenten und Zeitplan"
         },
         "geo-tracking": {
-          "description": "Tracking installieren und Verlauf importieren",
-          "agentsDescription": "KI-Traffic-Tracking installieren"
+          "description": "Tracking installieren und Verlauf importieren"
         }
       }
     },
@@ -79,8 +78,7 @@
         "logs": "Sieh dir Integrations-Events und ihren Zustellstatus an",
         "dev": "Nur in der Entwicklung verfügbare Tools zum Testen lokaler Abläufe",
         "geo-models": "Auf welchen Assistenten deine Prompts laufen",
-        "geo-tracking": "Besuche auf deiner Website zählen und frühere Analytics übernehmen",
-        "geo-tracking-agents": "Zähle KI-Crawler und -Verweise auf deiner Website"
+        "geo-tracking": "Besuche auf deiner Website zählen und frühere Analytics übernehmen"
       }
     },
     "panes": {
@@ -1186,9 +1184,6 @@
     "analytics": {
       "unavailable": "Analytics ist für diesen Workspace noch nicht verfügbar.",
       "xAccountNotFound": "Das X-Konto @{username} wurde nicht gefunden"
-    },
-    "webAnalytics": {
-      "unavailable": "Web-Analytics ist für diesen Workspace noch nicht verfügbar."
     },
     "actions": {
       "organizations": {
@@ -4241,7 +4236,6 @@
       },
       "traffic": {
         "title": "Analytics",
-        "descriptionWithVisitors": "Menschen und AI-Agents auf deiner Website",
         "mcpMetaTitle": "MCP-Server-Analytics"
       },
       "mcp": {
@@ -4776,7 +4770,6 @@
     "analyticsImport": {
       "title": "Verlauf importieren",
       "description": "Übernimm die Tageswerte aus dem Tool, das du vor Notra genutzt hast.",
-      "manageDescription": "Web-Analytics ist für diesen Workspace ausgeschaltet, deshalb können keine neuen Importe starten. Du kannst Importe trotzdem löschen und Konten trennen.",
       "back": "Zurück",
       "cta": {
         "title": "Sieh deinen Verlauf ab dem ersten Tag",
@@ -4787,8 +4780,7 @@
         "title": "Verlauf importieren",
         "description": "Hole frühere Seitenaufrufe und KI-Crawler-Zugriffe aus Plausible, Vercel oder Cloudflare.",
         "action": "Importe verwalten",
-        "start": "Importieren",
-        "manageDescription": "Web-Analytics ist für diesen Workspace ausgeschaltet. Du kannst importierte Verläufe trotzdem löschen und Konten trennen."
+        "start": "Importieren"
       },
       "providers": {
         "title": "Quelle wählen",
@@ -5013,8 +5005,6 @@
           "deleted": "Gelöscht"
         },
         "errors": {
-          "flagOff": "Web-Analytics wurde für diesen Workspace ausgeschaltet.",
-          "flagUnavailable": "Wir konnten nicht prüfen, ob Web-Analytics für diesen Workspace aktiv ist. Versuch es später noch einmal.",
           "lost": "Der Import wurde unterbrochen und konnte nicht fortgesetzt werden. Starte ihn neu.",
           "lostUpload": "Der Import wurde unterbrochen, bevor der Export gelesen war. Lade ihn erneut hoch."
         }
@@ -5729,7 +5719,6 @@
   "analytics": {
     "sources": {
       "label": "Analytics-Quelle",
-      "website": "Website",
       "agents": "Agent",
       "web": "Web",
       "mcp": "MCP-Server",
@@ -6621,7 +6610,6 @@
         "openEventTriggers": "Event-Trigger öffnen",
         "openGeo": "GEO öffnen",
         "openAgentReadiness": "Agent Readiness öffnen",
-        "openTraffic": "Traffic-Analyse öffnen",
         "openBrandIdentity": "Markenidentität öffnen",
         "openIntegrations": "Integrationen öffnen",
         "openWebAnalytics": "Web-Analytics öffnen"

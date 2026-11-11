@@ -13,7 +13,6 @@ import type {
 } from "@/types/components/command-palette";
 import type { NavVisibility } from "@/types/components/nav";
 import { geoCompetitorDetailPath } from "@/utils/geo-competitors";
-import { keywordsForFlags } from "@/utils/nav";
 
 export function isCommandPaletteSearchPending(
   query: string,
@@ -38,10 +37,7 @@ export function isCommandRouteVisible(
   route: CommandRoute,
   visibility: NavVisibility
 ): boolean {
-  return (
-    (!route.flag || visibility[route.flag]) &&
-    !(route.hiddenWithFlag && visibility[route.hiddenWithFlag])
-  );
+  return !route.flag || visibility[route.flag];
 }
 
 export function commandRoutesForAI(
@@ -58,7 +54,7 @@ export function commandRoutesForAI(
     label: r.label,
     section: r.section,
     path: r.path(slug),
-    keywords: keywordsForFlags(r.keywords, r.flagKeywords, visibility),
+    keywords: r.keywords,
   }));
 }
 

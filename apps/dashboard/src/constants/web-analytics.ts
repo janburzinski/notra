@@ -16,9 +16,6 @@ import type { ComponentType, SVGProps } from "react";
 
 import type { WebVitalRating, WebVitalsDeviceFilter } from "@/types/geo";
 
-/** How long the client trusts the server's flag answer before asking again. */
-export const WEB_ANALYTICS_FLAG_STALE_MS = 60_000;
-
 export const WEB_TREND_PEOPLE_KEY = "people";
 export const WEB_TREND_AGENTS_KEY = "agents";
 
@@ -202,9 +199,3 @@ export const WEB_SOURCE_LABELS: Record<string, string> = {
   medium: "Medium",
   substack: "Substack",
 };
-
-/**
- * How long a server render waits for the web analytics flag before leaving
- * it to the browser, so a slow flag service never delays every page.
- */
-export const WEB_ANALYTICS_SSR_FLAG_BUDGET_MS = 400;

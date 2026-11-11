@@ -6,11 +6,11 @@ import {
   GEO_INGEST_DEFAULT_FRAMEWORK,
   GEO_INGEST_DEFAULT_METHOD,
   GEO_INGEST_DEFAULT_PACKAGE_MANAGER,
+  GEO_INGEST_METHODS,
 } from "@notra/geo-core/constants/geo";
 import { POSTHOG_EVENTS } from "@notra/posthog/events";
 import { ResponsiveDialogFooter } from "@notra/ui/components/shared/responsive-dialog";
 import { AgentPromptButton } from "@notra/ui/components/ui/agent-prompt-button";
-import { Skeleton } from "@notra/ui/components/ui/skeleton";
 import { useEffect, useId, useRef, useState } from "react";
 import { useTranslations } from "use-intl";
 
@@ -22,7 +22,6 @@ import { WebKeyRotateButton } from "@/components/geo/web-key-rotate-button";
 import { TRAFFIC_INSTALL_COPY_KINDS } from "@/constants/geo-analytics";
 import { GEO_INGEST_METHOD_DOCS_URLS } from "@/constants/geo-ingest-script";
 import { trackEvent } from "@/lib/analytics/posthog-client";
-import { useWebAnalyticsFlag } from "@/lib/hooks/use-web-analytics-flag";
 import { cn } from "@/lib/utils";
 import type { TrafficInstallCopyKind } from "@/types/analytics/geo-events";
 import type {
@@ -32,7 +31,6 @@ import type {
 } from "@/types/geo";
 import { toastCopyError } from "@/utils/copy-to-clipboard";
 import {
-  availableGeoIngestMethods,
   geoCloudflareAgentPrompt,
   geoIngestAgentPrompt,
 } from "@/utils/geo-ingest";
@@ -98,12 +96,7 @@ export function GeoIngestSetup({
   variant = "card",
 }: GeoIngestSetupPanelProps) {
   const tInstall = useTranslations("geo.trafficInstall");
-  const webFlag = useWebAnalyticsFlag();
-  const methods = availableGeoIngestMethods(webFlag.enabled);
-  const [selectedMethod, setMethod] = useState(defaultMethod);
-  const method = methods.includes(selectedMethod)
-    ? selectedMethod
-    : GEO_INGEST_DEFAULT_METHOD;
+  const [method, setMethod] = useState(defaultMethod);
   const [framework, setFramework] = useState(GEO_INGEST_DEFAULT_FRAMEWORK);
   const [packageManager, setPackageManager] = useState(
     GEO_INGEST_DEFAULT_PACKAGE_MANAGER
@@ -133,11 +126,10 @@ export function GeoIngestSetup({
     });
   };
 
-  // The method list depends on the flag, so it waits for the server's answer.
-  const panels = webFlag.settled ? (
+  const panels = (
     <div className="flex min-w-0 flex-col gap-6">
       <GeoIngestMethodPicker
-        methods={methods}
+        methods={GEO_INGEST_METHODS}
         onChange={setMethod}
         value={method}
       />
@@ -165,8 +157,6 @@ export function GeoIngestSetup({
         />
       ) : null}
     </div>
-  ) : (
-    <Skeleton aria-hidden className="h-72 rounded-lg" />
   );
 
   const actions = (

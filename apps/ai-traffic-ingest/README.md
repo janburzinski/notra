@@ -200,7 +200,6 @@ the service. Use isolated equivalents for origin testing, never production data:
 | `GEO_INGEST_SECRET` | The exact signing secret used by the dashboard |
 | `AUTUMN_SECRET_KEY` | Existing billing key; meters and limits `ai_traffic_events`. Without it, events are accepted unmetered and a warning is logged |
 | `TINYBIRD_BASE_URL` | Optional existing Tinybird endpoint, especially for a non-default region |
-| `NEXT_PUBLIC_DATABUDDY_DASHBOARD_WEBSITE_ID` | The dashboard's feature flag client id, for the `web-analytics` flag. Without it, `/api/collect` drops every notra.js beacon; write tokens and Notra Sites are unaffected |
 
 `TINYBIRD_URL` remains a supported alias for the Tinybird base URL.
 Optional telemetry variables are `NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN`,

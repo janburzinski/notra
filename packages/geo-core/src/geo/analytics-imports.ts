@@ -21,23 +21,17 @@ import {
 import { toDay } from "../utils/analytics-import-range";
 import { logGeoFailure } from "../utils/geo-log";
 import { geoDb } from "./effect";
-import { readWebAnalyticsFlag } from "./web-analytics-flag";
 
 /**
  * Completed imports. An import made before any native traffic gets the day
  * it was created as its cut-off; that is not when Notra started tracking,
- * so its native start is unknown. Imports stay out of every read while the
- * organization's web analytics flag is off; when the flag service cannot
- * answer, its last answer holds, like ingest's.
+ * so its native start is unknown.
  */
 const queryCompletedImports = Effect.fnUntraced(function* ({
   organizationId,
   projectId,
   kind,
 }: CompletedImportsCacheKey) {
-  if (!(yield* readWebAnalyticsFlag(organizationId))) {
-    return [];
-  }
   const rows = yield* Effect.tryPromise(() =>
     db
       .select({

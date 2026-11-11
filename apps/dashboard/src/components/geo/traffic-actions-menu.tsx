@@ -20,7 +20,6 @@ import { WEB_ANALYTICS_NAV_LINK } from "@/constants/geo-traffic-pages";
 import { useAnalyticsImports } from "@/lib/hooks/use-analytics-imports";
 import { useGeoActiveProject } from "@/lib/hooks/use-geo-active-project";
 import { useSettingsModal } from "@/lib/hooks/use-settings-modal";
-import { useWebAnalyticsFlag } from "@/lib/hooks/use-web-analytics-flag";
 import { usePathname } from "@/lib/navigation";
 import type { TrafficActionsMenuProps } from "@/types/geo";
 import { downloadTrafficCsv } from "@/utils/traffic-export";
@@ -44,23 +43,20 @@ export function TrafficActionsMenu({
   const [embedOpen, setEmbedOpen] = useState(false);
   const pathname = usePathname();
   const { openSettings } = useSettingsModal();
-  const webFlag = useWebAnalyticsFlag();
   const { project, domain } = useGeoActiveProject(organizationId);
   const projectId = project?.id ?? null;
   const { data: importData } = useAnalyticsImports(
     organizationId,
     projectId,
-    webFlag.enabled && projectId !== null
+    projectId !== null
   );
 
   return (
     <>
-      {webFlag.enabled ? (
-        <ImportActivityPill
-          imports={importData?.imports ?? []}
-          onOpen={() => onImportOpenChange(true)}
-        />
-      ) : null}
+      <ImportActivityPill
+        imports={importData?.imports ?? []}
+        onOpen={() => onImportOpenChange(true)}
+      />
       <DropdownMenu onOpenChange={setMenuOpen} open={menuOpen}>
         <DropdownMenuTrigger
           aria-label={t("more")}
@@ -89,11 +85,9 @@ export function TrafficActionsMenu({
           <DropdownMenuItem onClick={() => openSettings("geo-tracking")}>
             {t("trackingSetup")}
           </DropdownMenuItem>
-          {webFlag.enabled ? (
-            <DropdownMenuItem onClick={() => onImportOpenChange(true)}>
-              {t("importHistory")}
-            </DropdownMenuItem>
-          ) : null}
+          <DropdownMenuItem onClick={() => onImportOpenChange(true)}>
+            {t("importHistory")}
+          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
       <TrafficEmbedDialog
@@ -105,15 +99,13 @@ export function TrafficActionsMenu({
         organizationId={organizationId}
         prefetch={menuOpen}
       />
-      {webFlag.enabled ? (
-        <AnalyticsImportDialog
-          defaultHost={domain ?? ""}
-          onOpenChange={onImportOpenChange}
-          open={importOpen}
-          organizationId={organizationId}
-          projectId={projectId}
-        />
-      ) : null}
+      <AnalyticsImportDialog
+        defaultHost={domain ?? ""}
+        onOpenChange={onImportOpenChange}
+        open={importOpen}
+        organizationId={organizationId}
+        projectId={projectId}
+      />
     </>
   );
 }

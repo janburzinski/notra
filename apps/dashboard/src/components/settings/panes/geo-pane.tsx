@@ -16,7 +16,6 @@ import {
 } from "@/lib/hooks/use-geo";
 import { useGeoProjectsDb } from "@/lib/hooks/use-geo-db";
 import { useGeoProjectQueryState } from "@/lib/hooks/use-geo-project-query";
-import { useWebAnalyticsFlag } from "@/lib/hooks/use-web-analytics-flag";
 import type {
   GeoSettingsFormSection,
   GeoSettingsPaneSection,
@@ -101,9 +100,8 @@ function GeoTrackingSettingsContent() {
   const { activeOrganization } = useOrganizationsContext();
   const organizationId = activeOrganization?.id ?? "";
   const { data: setup, isPending } = useGeoIngestSetup(organizationId);
-  const webFlag = useWebAnalyticsFlag();
 
-  if (isPending || !webFlag.settled) {
+  if (isPending) {
     return (
       <SettingsPane>
         <Skeleton className="h-96 rounded-2xl" />
@@ -115,7 +113,7 @@ function GeoTrackingSettingsContent() {
   return (
     <SettingsPane className="surface-neutral">
       <GeoIngestSetup defaultMethod="script" setup={setup} variant="settings" />
-      <ImportHistoryCard manageOnly={!webFlag.enabled} variant="settings" />
+      <ImportHistoryCard variant="settings" />
     </SettingsPane>
   );
 }

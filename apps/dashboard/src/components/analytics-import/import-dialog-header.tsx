@@ -21,7 +21,6 @@ import { ImportProviderMark } from "./import-provider-mark";
 
 export function ImportDialogHeader({
   view,
-  manageOnly,
   onBack,
   backRef,
 }: ImportDialogHeaderProps) {
@@ -61,7 +60,7 @@ export function ImportDialogHeader({
         return {
           provider: null,
           title: t("title"),
-          description: manageOnly ? t("manageDescription") : t("description"),
+          description: t("description"),
         };
     }
   })();

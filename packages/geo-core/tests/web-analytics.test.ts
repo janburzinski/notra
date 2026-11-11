@@ -14,7 +14,6 @@ if (!isIsolatedTestWorker(import.meta.url)) {
   );
 } else {
   await import("./utils/infrastructure");
-  const { webAnalyticsFlag } = await import("./utils/web-analytics-flag");
   const { database, initializeDatabase, resetDatabase, seedProject, testDb } =
     await import("./utils/database");
   const requests: Record<string, unknown>[] = [];
@@ -260,13 +259,7 @@ if (!isIsolatedTestWorker(import.meta.url)) {
       loadGeoTrafficPages(scope, { days: 7 }, 20, undefined, undefined)
     );
     expect(requests[0]).toMatchObject({ imports: "imp-geo" });
-    webAnalyticsFlag.state = "disabled";
-    try {
-      expect(new Set(await webImports())).toEqual(new Set([""]));
-    } finally {
-      webAnalyticsFlag.state = "enabled";
-      forgetCompletedImportIds(scope.organizationId);
-    }
+    forgetCompletedImportIds(scope.organizationId);
   });
 
   test("a foreign project is rejected before any analytics query", async () => {

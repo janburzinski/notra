@@ -234,7 +234,6 @@ export const DEFAULT_NAV_VISIBILITY: NavVisibility = {
   autopilot: false,
   analytics: true,
   sites: false,
-  webAnalytics: false,
 };
 
 const SIDEBAR_MODE_SWOOSH_IN = "ease-[cubic-bezier(0.16,1,0.3,1)]";

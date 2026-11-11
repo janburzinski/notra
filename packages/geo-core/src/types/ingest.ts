@@ -128,8 +128,7 @@ export type GeoIngestDropReason =
   | "network_rate_limited"
   | "quota"
   | "consent"
-  | "origin"
-  | "web_analytics_disabled";
+  | "origin";
 
 /** Admits one request for `key`; `now` is for tests. */
 export type LocalRateLimit = (key: string, now?: number) => boolean;

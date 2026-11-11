@@ -38,12 +38,10 @@ function ImportProviderMarks() {
 /**
  * Import history from Plausible, Vercel or Cloudflare: a call to action in
  * the empty web analytics page until the project has an import, and a
- * section of the GEO tracking settings. Without web analytics it only shows
- * up when something was imported or connected, so it can be removed.
+ * section of the GEO tracking settings.
  */
 export function ImportHistoryCard({
   variant = "cta",
-  manageOnly = false,
   onOpen,
 }: ImportHistoryCardProps) {
   const t = useTranslations("geo.analyticsImport");
@@ -56,9 +54,7 @@ export function ImportHistoryCard({
   const headingId = useId();
   const importCount = data?.imports.length ?? 0;
   const storedCount = importCount + (data?.connections.length ?? 0);
-  const hidden =
-    variant === "cta" ? importCount > 0 : manageOnly && storedCount === 0;
-  if (hidden) {
+  if (variant === "cta" && importCount > 0) {
     return null;
   }
   const settings = variant === "settings";
@@ -77,7 +73,6 @@ export function ImportHistoryCard({
   ) : (
     <AnalyticsImportDialog
       defaultHost={domain ?? ""}
-      manageOnly={manageOnly}
       onOpenChange={setOpen}
       open={open}
       organizationId={organizationId}
@@ -89,17 +84,9 @@ export function ImportHistoryCard({
     <div className="flex flex-col gap-3 rounded-xl border p-4 sm:flex-row sm:items-center sm:gap-4">
       <ImportProviderMarks />
       <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-        {manageOnly ? null : (
-          <p className="text-sm font-medium">{t("cta.title")}</p>
-        )}
+        <p className="text-sm font-medium">{t("cta.title")}</p>
         <p className="text-muted-foreground text-sm text-pretty">
-          {settings
-            ? t(
-                manageOnly
-                  ? "settings.manageDescription"
-                  : "settings.description"
-              )
-            : t("cta.description")}
+          {settings ? t("settings.description") : t("cta.description")}
         </p>
       </div>
       <div className="self-start sm:self-auto">{dialog}</div>

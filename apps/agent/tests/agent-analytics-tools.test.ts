@@ -93,14 +93,6 @@ mock.module("@notra/geo-core/geo/web-analytics", () => ({
   loadWebAnalytics,
   loadWebUtm,
 }));
-let webAnalyticsEnabled = true;
-mock.module("@notra/ai/utils/web-analytics-access", () => ({
-  isWebAnalyticsEnabledForOrganization: async () => webAnalyticsEnabled,
-  resolveWebAnalyticsFlagState: async () =>
-    webAnalyticsEnabled ? "enabled" : "disabled",
-  webAnalyticsFlagState: () =>
-    Effect.sync(() => (webAnalyticsEnabled ? "enabled" : "disabled")),
-}));
 
 mock.module("@notra/db/utils/geo-checks", () => ({
   queryGeoCheckOverview: async () => [
@@ -147,7 +139,6 @@ type Executable = {
 };
 
 beforeEach(() => {
-  webAnalyticsEnabled = true;
   loadWebAnalytics.mockClear();
   loadWebUtm.mockClear();
 });
@@ -269,24 +260,16 @@ describe("get_web_analytics_reports", () => {
     expect(result.utm.note).toBeString();
   });
 
-  test.each([
-    [
-      "is unavailable without the workspace's web analytics flag",
-      false,
-      { days: 7 },
-      "Web analytics is not available for this workspace yet.",
-    ],
-    [
-      "validates ranges before querying",
-      true,
-      { from: "2024-01-01", to: "2026-01-01" },
-      "Use a range of 366 days or fewer.",
-    ],
-  ])("%s", async (_name, enabled, input, message) => {
-    webAnalyticsEnabled = enabled;
+  test("validates ranges before querying", async () => {
     expect(
-      await tool.execute(getWebAnalyticsReportsInputSchema.parse(input), ctx)
-    ).toBe(message);
+      await tool.execute(
+        getWebAnalyticsReportsInputSchema.parse({
+          from: "2024-01-01",
+          to: "2026-01-01",
+        }),
+        ctx
+      )
+    ).toBe("Use a range of 366 days or fewer.");
     expect(loadWebAnalytics).not.toHaveBeenCalled();
     expect(loadWebUtm).not.toHaveBeenCalled();
   });

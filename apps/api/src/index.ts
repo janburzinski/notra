@@ -25,7 +25,6 @@ import { trimTrailingSlash } from "hono/trailing-slash";
 
 import { DEMO_API_URL } from "./constants/demo";
 import { API_MAX_BODY_BYTES } from "./constants/request-limits";
-import { WEB_ANALYTICS_ROUTE_PATHS } from "./constants/web-analytics";
 import { apiAnalyticsMiddleware } from "./middleware/analytics";
 import { authMiddleware } from "./middleware/auth";
 import { apiCompressionMiddleware } from "./middleware/compression";
@@ -40,7 +39,6 @@ import {
   apiObservabilityMiddleware,
 } from "./middleware/observability";
 import { subscriptionMiddleware } from "./middleware/subscription";
-import { webAnalyticsMiddleware } from "./middleware/web-analytics";
 import { agentChatsRoutes } from "./routes/agent-chats";
 import { brandColorsRoutes } from "./routes/brand-colors";
 import { brandIdentitiesRoutes } from "./routes/brand-identities";
@@ -90,7 +88,6 @@ import {
 } from "./utils/feedback";
 import { logError } from "./utils/logging";
 import { rateLimitResponse } from "./utils/openapi-responses";
-import { markWebAnalyticsBeta } from "./utils/openapi-web-analytics";
 import { enforceRatelimit, RATE_LIMITS, ratelimit } from "./utils/ratelimit";
 import { createApiShutdown } from "./utils/shutdown";
 
@@ -312,10 +309,6 @@ app.use("/v1/geo/ingest/*", requireGeoEntitlement);
 app.use("/v1/projects/*", geoContextMiddleware());
 app.use("/v1/projects/:projectId/*", geoProjectContextMiddleware());
 app.use("/v1/geo/ingest/*", geoContextMiddleware());
-const requireWebAnalytics = webAnalyticsMiddleware();
-for (const path of WEB_ANALYTICS_ROUTE_PATHS) {
-  app.use(path, requireWebAnalytics);
-}
 
 // evlog-map-disable-next-line -- liveness probe
 app.get("/", (c) => {
@@ -421,26 +414,24 @@ let openApiJson: string | undefined;
 // evlog-map-disable-next-line -- static OpenAPI document
 app.get("/openapi.json", (c) => {
   openApiJson ??= JSON.stringify(
-    markWebAnalyticsBeta(
-      app.getOpenAPI31Document({
-        openapi: "3.1.1",
-        info: {
-          title: "Notra API",
-          version: "1.0.0",
-          description:
-            "OpenAPI schema for Notra content endpoints. Use GET /v1/status for public reachability. Error responses include recovery guidance. Breaking changes ship under a new major path; deprecated operations send Deprecation and Sunset headers at least 90 days before removal.",
-        },
-        externalDocs: {
-          description: "Notra API versioning and deprecation policy",
-          url: "https://www.usenotra.com/docs/api/versioning",
-        },
-        servers: IS_DEMO
-          ? [DEMO_SERVER, PRODUCTION_SERVER]
-          : [PRODUCTION_SERVER, DEMO_SERVER],
-        security: [{ BearerAuth: [] }],
-        tags: [...API_OPENAPI_TAGS],
-      })
-    )
+    app.getOpenAPI31Document({
+      openapi: "3.1.1",
+      info: {
+        title: "Notra API",
+        version: "1.0.0",
+        description:
+          "OpenAPI schema for Notra content endpoints. Use GET /v1/status for public reachability. Error responses include recovery guidance. Breaking changes ship under a new major path; deprecated operations send Deprecation and Sunset headers at least 90 days before removal.",
+      },
+      externalDocs: {
+        description: "Notra API versioning and deprecation policy",
+        url: "https://www.usenotra.com/docs/api/versioning",
+      },
+      servers: IS_DEMO
+        ? [DEMO_SERVER, PRODUCTION_SERVER]
+        : [PRODUCTION_SERVER, DEMO_SERVER],
+      security: [{ BearerAuth: [] }],
+      tags: [...API_OPENAPI_TAGS],
+    })
   );
   c.header("Content-Type", "application/json");
   return c.body(openApiJson);

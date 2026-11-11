@@ -8,9 +8,7 @@ import { AiTrafficLogCard } from "@/components/geo/ai-traffic-log-card";
 import { TrafficInstallButton } from "@/components/geo/traffic-install-button";
 import { TrafficPageShell } from "@/components/geo/traffic-page-shell";
 import { TrafficPagesCard } from "@/components/geo/traffic-pages-card";
-import { WebVisitorsSection } from "@/components/geo/web-visitors-section";
 import { SkeletonCrossfade } from "@/components/skeleton-crossfade";
-import { useAiAnalyticsPeople } from "@/lib/hooks/use-ai-analytics-people";
 import {
   useAiTrafficSources,
   useGeoTrafficPages,
@@ -27,10 +25,8 @@ import { AiAnalyticsSkeleton } from "./skeleton";
 
 export default function PageClient({ organizationSlug }: GeoPageClientProps) {
   const t = useTranslations("geo.pages.aiAnalytics");
-  const tTraffic = useTranslations("geo.pages.traffic");
   const scope = useTrafficPageScope(organizationSlug);
   const { organizationId, projectId, geoRange, traffic, settings } = scope;
-  const people = useAiAnalyticsPeople(scope);
   const {
     data: trafficPages,
     isPending: isPagesPending,
@@ -66,15 +62,13 @@ export default function PageClient({ organizationSlug }: GeoPageClientProps) {
     : (trafficSources?.sources ?? (isSourcesError ? [] : undefined));
 
   const sources = traffic?.sources ?? [];
-  const hasPreviousData = hasPreviousTraffic(sources) || people.hasPreviousData;
+  const hasPreviousData = hasPreviousTraffic(sources);
   const isEmpty =
-    !scope.isTrafficPending &&
-    !sources.some((source) => source.visits > 0) &&
-    !people.hasData;
+    !scope.isTrafficPending && !sources.some((source) => source.visits > 0);
   const showSkeleton = isTrafficPagePending({
     isSettingsPending: scope.isSettingsPending,
     hasSettings: settings !== null,
-    isTrafficPending: scope.isTrafficPending || people.isPending,
+    isTrafficPending: scope.isTrafficPending,
     isEmptyTraffic: isEmpty,
     isIngestPending: scope.isIngestPending,
   });
@@ -94,9 +88,7 @@ export default function PageClient({ organizationSlug }: GeoPageClientProps) {
     >
       <TrafficPageShell
         copy={{
-          description: people.show
-            ? tTraffic("descriptionWithVisitors")
-            : t("description"),
+          description: t("description"),
           setupDescription: t("setupDescription"),
           emptyRangeTitle: t("emptyRangeTitle"),
           emptyRangeDescription: t("emptyRangeDescription"),
@@ -106,20 +98,6 @@ export default function PageClient({ organizationSlug }: GeoPageClientProps) {
         scope={scope}
       >
         <div className="flex flex-col gap-6">
-          {people.show && people.web ? (
-            <WebVisitorsSection
-              breakdownsPending={people.breakdownsPending}
-              range={geoRange.query}
-              traffic={traffic}
-              utm={{
-                organizationId: scope.organizationId,
-                host: scope.hostQuery,
-                path: scope.pathQuery,
-                sites: scope.sites,
-              }}
-              web={people.web}
-            />
-          ) : null}
           <AiTrafficCard
             crawlerSetup={
               scope.pathQuery ? undefined : (
@@ -133,7 +111,6 @@ export default function PageClient({ organizationSlug }: GeoPageClientProps) {
               geoSettingsPath(organizationSlug),
               projectId
             )}
-            showHero={!people.show}
             sourcePaths={sourcePaths}
             traffic={traffic}
           />

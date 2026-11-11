@@ -1,12 +1,4 @@
-import {
-  afterAll,
-  beforeEach,
-  describe,
-  expect,
-  mock,
-  setSystemTime,
-  test,
-} from "bun:test";
+import { afterAll, beforeEach, describe, expect, mock, test } from "bun:test";
 
 import type {
   WebErrorRow,
@@ -111,10 +103,7 @@ afterAll(() => {
   process.env.VERCEL = previousVercel;
 });
 
-const { resolveWebAnalyticsFlagState, webAnalyticsFlag } =
-  await import("./utils/web-analytics-flag");
 const { runWebCollect } = await import("../src/ingest/collect");
-const { isWebAnalyticsAdmitted } = await import("../src/ingest/identity");
 const { handleWebCollectRequest } = await import("../src/ingest/handler");
 
 const CHROME =
@@ -511,81 +500,6 @@ describe("runWebCollect", () => {
     ],
   ])("rejects %s", async (_label, body, tag) => {
     expect(await run(beacon(body))).toMatchObject({ failure: { _tag: tag } });
-  });
-});
-
-describe("web analytics flag", () => {
-  const sendFor = (organizationId: string) =>
-    send({ k: `nwk.${organizationId}.proj_1.good` });
-
-  beforeEach(() => {
-    webAnalyticsFlag.state = "enabled";
-    resolveWebAnalyticsFlagState.mockClear();
-    ingestWebPageViews.mockClear();
-    networkLimit.mockClear();
-    getGeoWebKeyGeneration.mockClear();
-  });
-  afterAll(() => {
-    webAnalyticsFlag.state = "enabled";
-    setSystemTime();
-  });
-
-  test("drops beacons for an organization without the flag before any write or check", async () => {
-    webAnalyticsFlag.state = "disabled";
-    expect(await sendFor("org_flag_off")).toMatchObject({
-      _tag: "Success",
-      success: { outcome: "dropped", reason: "web_analytics_disabled" },
-    });
-    expect(ingestWebPageViews).not.toHaveBeenCalled();
-    expect(networkLimit).not.toHaveBeenCalled();
-    expect(getGeoWebKeyGeneration).not.toHaveBeenCalled();
-    const response = await handleWebCollectRequest(
-      beacon({
-        k: "nwk.org_flag_off.proj_1.good",
-        v: VIEW,
-        u: "https://acme.com/",
-      }),
-      () => undefined
-    );
-    expect(response.status).toBe(204);
-  });
-
-  test("asks the flag service once per organization, not per beacon", async () => {
-    await sendFor("org_flag_cached");
-    await sendFor("org_flag_cached");
-    expect(resolveWebAnalyticsFlagState).toHaveBeenCalledTimes(1);
-    expect(ingestWebPageViews).toHaveBeenCalledTimes(2);
-  });
-
-  test("keeps the last answer while the flag service is unavailable, else fails closed", async () => {
-    await sendFor("org_flag_known");
-    webAnalyticsFlag.state = "unavailable";
-    setSystemTime(new Date(Date.now() + 61_000));
-    expect(await sendFor("org_flag_known")).toMatchObject({
-      success: { outcome: "ingested" },
-    });
-    expect(await sendFor("org_flag_unknown")).toMatchObject({
-      success: { outcome: "dropped", reason: "web_analytics_disabled" },
-    });
-    setSystemTime();
-  });
-
-  test("never gates write tokens or Notra Sites", async () => {
-    webAnalyticsFlag.state = "disabled";
-    for (const identity of [
-      { organizationId: "org_server", projectId: null, generation: 1 },
-      {
-        organizationId: "org_site",
-        projectId: null,
-        generation: 0,
-        site: { id: "site_1", hosts: ["acme.com"], mounts: [] },
-      },
-    ]) {
-      expect(await Effect.runPromise(isWebAnalyticsAdmitted(identity))).toBe(
-        true
-      );
-    }
-    expect(resolveWebAnalyticsFlagState).not.toHaveBeenCalled();
   });
 });
 

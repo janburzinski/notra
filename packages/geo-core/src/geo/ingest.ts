@@ -485,7 +485,7 @@ function buildGeoSnippets(appUrl: string): GeoIngestSnippets {
  * only costs `traffic.read`, while the token is a write credential (it lets the
  * holder post events), so the read path builds this and never the token.
  */
-export function buildGeoIngestSetupInfo(): GeoIngestSetupInfo {
+function buildGeoIngestSetupInfo(): GeoIngestSetupInfo {
   const ingestUrl = buildGeoIngestUrl();
   const { origin } = new URL(ingestUrl);
   const snippets = buildGeoSnippets(origin);
@@ -603,19 +603,11 @@ function buildGeoIngestSetupResponse(
 /**
  * The project whose web key the scope uses, resolved like every read: the
  * given project after proving it belongs to the organization, otherwise the
- * organization's oldest. Null when the organization has no project, and
- * without web analytics, which only proves a given project.
+ * organization's oldest. Null when the organization has no project.
  */
 const resolveGeoWebKeyScope = Effect.fn("geo.ingest.webKeyScope")(function* (
-  input: GeoScopeInput,
-  withWeb: boolean
+  input: GeoScopeInput
 ) {
-  if (!withWeb) {
-    if (input.projectId) {
-      yield* resolveGeoScope(input);
-    }
-    return null;
-  }
   const { projectId } = yield* resolveGeoScope(input);
   if (!projectId) {
     return null;
@@ -629,7 +621,7 @@ const resolveGeoWebKeyScope = Effect.fn("geo.ingest.webKeyScope")(function* (
 /** The tokenless install payload for read access. */
 export const loadGeoWebSetupResponse = Effect.fn("geo.ingest.webSetup")(
   function* (input: GeoScopeInput) {
-    const web = yield* resolveGeoWebKeyScope(input, true);
+    const web = yield* resolveGeoWebKeyScope(input);
     return buildGeoWebSetupResponse(input.organizationId, web);
   }
 );
@@ -637,12 +629,11 @@ export const loadGeoWebSetupResponse = Effect.fn("geo.ingest.webSetup")(
 /**
  * Issues a token only after proving an optional project belongs to the
  * organization. A missing organization returns `null` rather than signing a
- * generation-one token for an identity that does not exist. `withWeb: false`
- * leaves notra.js out for workspaces without web analytics.
+ * generation-one token for an identity that does not exist.
  */
 export const issueGeoIngestSetupResponse = Effect.fn("geo.ingest.issueSetup")(
-  function* (input: GeoScopeInput, withWeb = true) {
-    const web = yield* resolveGeoWebKeyScope(input, withWeb);
+  function* (input: GeoScopeInput) {
+    const web = yield* resolveGeoWebKeyScope(input);
     const generation = yield* geoDb(
       "ingest token generation lookup failed",
       () => getGeoIngestTokenGeneration(input.organizationId, input.projectId)
@@ -660,8 +651,8 @@ export const issueGeoIngestSetupResponse = Effect.fn("geo.ingest.issueSetup")(
  * supplying a project owned by somebody else.
  */
 export const rotateGeoIngestSetupResponse = Effect.fn("geo.ingest.rotateSetup")(
-  function* (input: GeoScopeInput, withWeb = true) {
-    const web = yield* resolveGeoWebKeyScope(input, withWeb);
+  function* (input: GeoScopeInput) {
+    const web = yield* resolveGeoWebKeyScope(input);
     const generation = yield* geoDb("ingest token rotation failed", () =>
       rotateGeoIngestTokenGeneration(input.organizationId, input.projectId)
     );

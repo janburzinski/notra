@@ -32,7 +32,6 @@ import { createOpenApiApp } from "../utils/openapi-app";
  * statistics and history import status. The same loaders as the dashboard's
  * Analytics tab answer them, so numbers match. Response bodies are parsed
  * through their schemas: fields the API does not document never leak out.
- * Workspaces without the web analytics flag get 403 from every route here.
  */
 export const geoWebAnalyticsRoutes = createOpenApiApp();
 

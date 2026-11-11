@@ -47,18 +47,6 @@ interface TrafficPageCopy {
   emptyRangeDescription: string;
 }
 
-/** The people section the AI analytics page shows without web analytics. */
-export interface AiAnalyticsPeople {
-  show: boolean;
-  /** Summary with the breakdown tables merged in once they answer the same filter. */
-  web: WebAnalyticsResponse | undefined;
-  breakdownsPending: boolean;
-  hasPreviousData: boolean;
-  /** People count as data, or may once the summary loads. */
-  hasData: boolean;
-  isPending: boolean;
-}
-
 export interface TrafficPageEmptyProps {
   scope: TrafficPageScope;
   copy: TrafficPageCopy;

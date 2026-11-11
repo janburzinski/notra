@@ -268,12 +268,6 @@ export const gateGeoPage = createServerFn({ method: "GET" })
   .handler(async ({ data: { params, searchParams, kind } }) => {
     const slug = params.slug ?? "";
     const { organization } = await validateOrganizationAccess(slug);
-    await redirectDisabledWebAnalytics(
-      slug,
-      searchParams,
-      kind,
-      organization.id
-    );
     const requestedProjectId = geoRequestedProjectId(searchParams);
     const projectId = await resolveInitialGeoProjectId(
       organization.id,
@@ -288,24 +282,6 @@ export const gateGeoPage = createServerFn({ method: "GET" })
       projectId
     );
   });
-
-/** Without the web analytics flag its tab sends people to AI analytics. */
-async function redirectDisabledWebAnalytics(
-  slug: string,
-  searchParams: UiRouteInput["searchParams"],
-  kind: GeoPageKind,
-  organizationId: string
-) {
-  if (kind !== "web-analytics") {
-    return;
-  }
-  const { isWebAnalyticsEnabled } = await import("@/lib/web-analytics/flag");
-  if (!(await isWebAnalyticsEnabled(organizationId))) {
-    throw redirect({
-      href: geoPathWithSearch(slug, GEO_TRAFFIC_NAV_LINK, searchParams),
-    });
-  }
-}
 
 function redirectStaleGeoProject(
   slug: string,
@@ -344,12 +320,6 @@ export const loadGeoPage = createServerFn({
       requestedProjectId
     );
     if (!gated) {
-      await redirectDisabledWebAnalytics(
-        slug,
-        searchParams,
-        kind,
-        organization.id
-      );
       redirectStaleGeoProject(
         slug,
         searchParams,

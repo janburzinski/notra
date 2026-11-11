@@ -57,7 +57,6 @@ import {
 import { useAnimatedSize } from "@/lib/hooks/use-animated-size";
 import { useGeoTrafficHostQuery } from "@/lib/hooks/use-geo-traffic-host";
 import { useIsClient } from "@/lib/hooks/use-is-client";
-import { useWebAnalyticsFlag } from "@/lib/hooks/use-web-analytics-flag";
 import { dashboardOrpc } from "@/lib/orpc/query";
 import type {
   TrafficEmbedChart,
@@ -486,7 +485,6 @@ function CreateEmbedForm({
   formId,
   source,
   origins,
-  showSource,
   pending,
   onSourceChange,
   onOriginsChange,
@@ -495,7 +493,6 @@ function CreateEmbedForm({
   formId: string;
   source: TrafficEmbedSource;
   origins: string[];
-  showSource: boolean;
   pending: boolean;
   onSourceChange: (source: TrafficEmbedSource) => void;
   onOriginsChange: (origins: string[]) => void;
@@ -511,17 +508,15 @@ function CreateEmbedForm({
         onSubmit();
       }}
     >
-      {showSource ? (
-        <OptionSelect
-          items={(["agents", "web"] as const).map((value) => ({
-            value,
-            label: t(`sources.${value}`),
-          }))}
-          label={t("sourceLabel")}
-          onChange={onSourceChange}
-          value={source}
-        />
-      ) : null}
+      <OptionSelect
+        items={(["agents", "web"] as const).map((value) => ({
+          value,
+          label: t(`sources.${value}`),
+        }))}
+        label={t("sourceLabel")}
+        onChange={onSourceChange}
+        value={source}
+      />
       <OriginsField
         disabled={pending}
         onChange={onOriginsChange}
@@ -560,7 +555,6 @@ export function TrafficEmbedDialog({
   const t = useTranslations("geo.trafficEmbed");
   const queryClient = useQueryClient();
   const { projectId } = useGeoProjectScope();
-  const webFlag = useWebAnalyticsFlag();
   const formId = useId();
   const reduceMotion = useReducedMotion();
   const { ref: bodyRef, size: bodySize } = useAnimatedSize();
@@ -583,17 +577,14 @@ export function TrafficEmbedDialog({
   const selected =
     embeds.find((embed) => embed.id === selectedId) ?? embeds[0] ?? null;
   const showCreate = !isPending && (creating || selected === null);
-  const showSource = webFlag.enabled;
   const embedItems = embeds.map((embed) => ({
     value: embed.id,
-    label: showSource
-      ? t("embedOption", {
-          name: embed.name,
-          source: t(`sources.${embed.source}`),
-        })
-      : embed.name,
+    label: t("embedOption", {
+      name: embed.name,
+      source: t(`sources.${embed.source}`),
+    }),
   }));
-  const source = draftSource ?? (showSource ? defaultSource : "agents");
+  const source = draftSource ?? defaultSource;
 
   const resetDraft = () => {
     setDraftOrigins([]);
@@ -760,7 +751,6 @@ export function TrafficEmbedDialog({
                     }}
                     origins={draftOrigins}
                     pending={create.isPending}
-                    showSource={showSource}
                     source={source}
                   />
                 ) : null}

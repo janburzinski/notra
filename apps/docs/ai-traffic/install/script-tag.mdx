@@ -17,10 +17,6 @@ docolin:
 
 `notra.js` counts the people who read your site: page views, visitors, sessions, where they came from (including ChatGPT, Perplexity, Claude and other AI answers), how long they stayed and how far they scrolled. It also records clicks on links to other sites and Core Web Vitals. It works on any site, including static sites and single-page apps, and is about 1.2 KB compressed.
 
-<Info>
-  Web analytics is in private beta. If the **Web analytics** tab is missing under **Analytics**, email [hello@usenotra.com](mailto:hello@usenotra.com) or ask on [Discord](https://www.usenotra.com/discord) and we'll turn it on for your workspace. Until then, the script's page views are not counted.
-</Info>
-
 The script cannot see AI crawlers, because crawlers do not run JavaScript. To log crawlers as well, install the [server tracker](/ai-traffic/install/nextjs) or a [log drain](/ai-traffic/install/vercel-log-drain) alongside it. Notra does not double count: page views come from the script, and AI crawler events come from the server tracker.
 
 <Steps>

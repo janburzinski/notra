@@ -6,7 +6,6 @@ import { assertOrganizationAccess } from "@/lib/auth/organization";
 import { createORPCContext } from "@/lib/orpc/context";
 import { dashboardOrpc } from "@/lib/orpc/query";
 import { geoRouter } from "@/lib/orpc/routers/geo";
-import { isWebAnalyticsEnabled } from "@/lib/web-analytics/flag";
 import type { GeoTrafficPageKind } from "@/types/geo-traffic-pages";
 import {
   geoHydrationInputs,
@@ -105,7 +104,7 @@ async function dehydrateGeoOverview(
 /**
  * Prefetch for the AI and web analytics pages, limited to what the first
  * paint needs: settings, the AI traffic summary, the ingest setup and, on web
- * analytics or without the web analytics flag, the web summary. The streamed
+ * analytics, the web summary. The streamed
  * document stays open until every dehydrated query settles and hydration
  * waits for it, so the slower tables (top pages, log, per-source page counts,
  * web breakdowns) load from the client instead.
@@ -144,11 +143,7 @@ async function dehydrateGeoTraffic(
     ...dashboardOrpc.geo.ingestSetup.queryOptions({ input: input.ingestSetup }),
     queryFn: () => client.geo.ingestSetup(input.ingestSetup),
   });
-  // Without web analytics the AI analytics page shows people too.
-  if (
-    page === "web-analytics" ||
-    !(await isWebAnalyticsEnabled(organizationId, requestHeaders))
-  ) {
+  if (page === "web-analytics") {
     void queryClient.prefetchQuery({
       ...dashboardOrpc.geo.webAnalytics.queryOptions({
         input: input.webAnalytics,

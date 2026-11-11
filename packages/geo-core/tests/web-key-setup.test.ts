@@ -113,13 +113,6 @@ if (!isIsolatedTestWorker(import.meta.url)) {
         delete process.env.GEO_SCRIPT_URL;
       }
 
-      const withoutWeb = await Effect.runPromise(
-        issueGeoIngestSetupResponse(sibling, false)
-      );
-      expect(withoutWeb?.token).toBeTruthy();
-      expect(withoutWeb).not.toHaveProperty("webKey");
-      expect(withoutWeb).not.toHaveProperty("webScript");
-
       const siblingKey = (
         await Effect.runPromise(loadGeoWebSetupResponse(sibling))
       ).webKey;

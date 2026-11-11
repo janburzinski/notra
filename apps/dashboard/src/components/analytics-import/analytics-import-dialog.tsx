@@ -31,7 +31,6 @@ export function AnalyticsImportDialog({
   trigger,
   open: controlledOpen,
   onOpenChange,
-  manageOnly = false,
 }: AnalyticsImportDialogProps) {
   const [uncontrolledOpen, setUncontrolledOpen] = useState(false);
   const open = controlledOpen ?? uncontrolledOpen;
@@ -83,7 +82,6 @@ export function AnalyticsImportDialog({
         >
           <ImportDialogHeader
             backRef={backRef}
-            manageOnly={manageOnly}
             onBack={home}
             view={shownView}
           />
@@ -93,28 +91,24 @@ export function AnalyticsImportDialog({
               connections={connections}
               imports={data?.imports ?? []}
               isPending={isPending}
-              manageOnly={manageOnly}
               onOpen={showProgress}
               onPick={(provider) => setView(importStepFor(provider))}
-              onReconnect={
-                manageOnly
-                  ? undefined
-                  : (connection) =>
-                      setView({
-                        step: "connect",
-                        provider: connection.provider,
-                        connectionId: connection.id,
-                      })
+              onReconnect={(connection) =>
+                setView({
+                  step: "connect",
+                  provider: connection.provider,
+                  connectionId: connection.id,
+                })
               }
               onUse={
-                manageOnly || !projectId
-                  ? undefined
-                  : (connection) =>
+                projectId
+                  ? (connection) =>
                       setView({
                         step: "source",
                         provider: connection.provider,
                         connectionId: connection.id,
                       })
+                  : undefined
               }
               organizationId={organizationId}
             />
@@ -164,7 +158,7 @@ export function AnalyticsImportDialog({
               item={shownView.item}
               onBack={home}
               onClose={() => setOpen(false)}
-              onImportAnother={manageOnly ? undefined : home}
+              onImportAnother={home}
             />
           ) : null}
         </div>

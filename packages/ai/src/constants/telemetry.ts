@@ -250,7 +250,6 @@ export const TELEMETRY_GEO_INGEST_REASONS = new Set([
   "quota",
   "consent",
   "origin",
-  "web_analytics_disabled",
 ]);
 
 const GEO_INGEST_RUNTIMES = new Set(["unkey", "vercel", "local"]);

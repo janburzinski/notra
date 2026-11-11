@@ -9,7 +9,6 @@ import {
   GEO_INGEST_MEMO_MAX_ENTRIES,
   GEO_WEB_IDENTITY_MEMO_MS,
 } from "../constants/ingest";
-import { isWebAnalyticsFlagOn } from "../geo/web-analytics-flag";
 import { GeoIngestGenerationKey } from "../types/ingest-cache-keys";
 import {
   geoIngestIdentityKind,
@@ -44,19 +43,6 @@ const generations = Effect.runSync(
     }
   )
 );
-
-/**
- * notra.js beacons only count for organizations with the web analytics flag;
- * write tokens and Notra Sites are not behind it.
- */
-export const isWebAnalyticsAdmitted = Effect.fnUntraced(function* (
-  identity: GeoIngestIdentity
-) {
-  if (geoIngestIdentityKind(identity) !== "web") {
-    return true;
-  }
-  return yield* isWebAnalyticsFlagOn(identity.organizationId);
-});
 
 /**
  * A valid signature is not enough: the token's generation must match the

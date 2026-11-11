@@ -132,11 +132,6 @@ export function withWebBreakdowns(
   };
 }
 
-/** Whether any tracked host had page views, even outside the page filter. */
-export function hasWebHosts(web: WebAnalyticsResponse | undefined): boolean {
-  return (web?.hosts ?? []).some((row) => row.views > 0);
-}
-
 export function hasWebAnalytics(
   web: WebAnalyticsResponse | undefined
 ): boolean {

@@ -1,6 +1,4 @@
-import { WEB_ANALYTICS_UNAVAILABLE_MESSAGE } from "@notra/ai/constants/web-analytics-access";
 import { logError } from "@notra/ai/utils/server-log";
-import { isWebAnalyticsEnabledForOrganization } from "@notra/ai/utils/web-analytics-access";
 import { isTinybirdConfigured } from "@notra/analytics/tinybird/client";
 import { WEB_UTM_DIMENSIONS } from "@notra/geo-core/constants/web-analytics";
 import {
@@ -50,9 +48,6 @@ export function createGetWebAnalyticsReportsTool() {
     inputSchema: getWebAnalyticsReportsInputSchema,
     async execute(input, ctx) {
       const organizationId = requireOrganizationId(ctx);
-      if (!(await isWebAnalyticsEnabledForOrganization(organizationId))) {
-        return WEB_ANALYTICS_UNAVAILABLE_MESSAGE;
-      }
       if (!isTinybirdConfigured()) {
         return WEB_ANALYTICS_NOT_CONFIGURED_MESSAGE;
       }

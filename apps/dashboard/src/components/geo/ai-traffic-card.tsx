@@ -44,7 +44,6 @@ export function AiTrafficCard({
   settingsHref,
   crawlerSetup,
   isPending = false,
-  showHero = true,
 }: AiTrafficCardProps) {
   const tCommon = useTranslations("common");
   const tShared = useTranslations("geo.shared");
@@ -165,17 +164,15 @@ export function AiTrafficCard({
 
   return (
     <div className="flex flex-col gap-6">
-      {showHero ? (
-        <MemoTrafficHero
-          crawlerSetup={crawlerSetup}
-          groups={groups}
-          points={points}
-          previousTotals={previousTotals}
-          days={sparklineDays}
-          settingsHref={settingsHref}
-          totals={totals}
-        />
-      ) : null}
+      <MemoTrafficHero
+        crawlerSetup={crawlerSetup}
+        groups={groups}
+        points={points}
+        previousTotals={previousTotals}
+        days={sparklineDays}
+        settingsHref={settingsHref}
+        totals={totals}
+      />
       <InstrumentSection eyebrow={tCommon("labels.sources")}>
         <MemoTrafficSourcesStack
           collapsed={collapsed}

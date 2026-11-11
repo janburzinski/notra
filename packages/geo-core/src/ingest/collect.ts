@@ -19,7 +19,6 @@ import {
   GeoIngestPayloadTooLargeError,
   GeoIngestUnparseableUrlError,
 } from "./errors";
-import { isWebAnalyticsAdmitted } from "./identity";
 import { droppedResult, runWebBeacon } from "./pipeline";
 import { admitWebNetwork } from "./web-limits";
 
@@ -62,9 +61,6 @@ export const runWebCollect = Effect.fn("geoIngest.collect")(function* (
     return yield* Effect.fail(
       new GeoIngestInvalidTokenError({ authReason: "invalid_signature" })
     );
-  }
-  if (!(yield* isWebAnalyticsAdmitted(identity))) {
-    return droppedResult(identity, "human", "web_analytics_disabled");
   }
   const url = URL.parse(payload.u);
   if (!url) {

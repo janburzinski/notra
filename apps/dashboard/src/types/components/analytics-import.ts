@@ -46,13 +46,10 @@ export interface AnalyticsImportDialogProps {
   trigger?: React.ReactElement;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
-  /** Without web analytics: list, delete and disconnect, but no new import. */
-  manageOnly?: boolean;
 }
 
 export interface ImportDialogHeaderProps {
   view: AnalyticsImportView;
-  manageOnly: boolean;
   onBack: () => void;
   /** Focused when a step opens, so keyboard users land on "Back". */
   backRef: React.Ref<HTMLButtonElement>;
@@ -60,7 +57,6 @@ export interface ImportDialogHeaderProps {
 
 export interface ImportHomeStepProps extends ImportListProps {
   isPending: boolean;
-  manageOnly: boolean;
   onPick: (provider: AnalyticsImportProviderChoice) => void;
 }
 
@@ -68,8 +64,6 @@ export interface ImportHistoryCardProps {
   variant?: "cta" | "settings";
   /** Opens a dialog the page already holds instead of the card's own. */
   onOpen?: () => void;
-  /** Without web analytics: shown only to remove what was imported. */
-  manageOnly?: boolean;
 }
 
 export interface ImportProviderMarkProps {

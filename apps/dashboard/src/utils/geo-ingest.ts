@@ -164,15 +164,6 @@ export function geoCloudflareAgentPrompt(
   ].join("\n");
 }
 
-/** Install methods to offer; notra.js only with web analytics. */
-export function availableGeoIngestMethods(
-  webAnalytics: boolean
-): readonly GeoIngestMethod[] {
-  const others = GEO_INGEST_METHODS.filter((method) => method !== "script");
-  // With web analytics the script tag comes first: it counts the people.
-  return webAnalytics ? ["script", ...others] : others;
-}
-
 /** One attribute per line, so the long key and URLs never break mid-word. */
 function formatScriptTag(tag: string): string {
   const attributes = tag

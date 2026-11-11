@@ -805,7 +805,6 @@ export interface AiTrafficCardProps {
   /** See TrafficHeroProps.crawlerSetup. */
   crawlerSetup?: ReactNode;
   isPending?: boolean;
-  showHero?: boolean;
 }
 
 export interface GeoTrafficPageSource {
@@ -2168,7 +2167,7 @@ export interface TrafficActionsMenuProps extends TrafficExportButtonProps {
 
 /**
  * The install payload plus whether this member may rotate its public key.
- * The notra.js fields are missing without web analytics.
+ * The notra.js fields are missing while the workspace has no project.
  */
 export interface DashboardGeoIngestSetup
   extends GeoIngestSetupInfo, Partial<GeoWebSetupFields> {

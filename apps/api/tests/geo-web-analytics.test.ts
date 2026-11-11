@@ -138,24 +138,6 @@ const loadGeoWebSetupResponse = mock((..._args: unknown[]) =>
   Effect.succeed(webSetup)
 );
 
-let webAnalyticsEnabled = true;
-const isWebAnalyticsEnabledForOrganization = mock(
-  async (_organizationId: string) => webAnalyticsEnabled
-);
-mock.module("@notra/ai/utils/web-analytics-access", () => ({
-  isWebAnalyticsEnabledForOrganization,
-  resolveWebAnalyticsFlagState: async (organizationId: string) =>
-    (await isWebAnalyticsEnabledForOrganization(organizationId))
-      ? "enabled"
-      : "disabled",
-  webAnalyticsFlagState: (organizationId: string) =>
-    Effect.promise(async () =>
-      (await isWebAnalyticsEnabledForOrganization(organizationId))
-        ? "enabled"
-        : "disabled"
-    ),
-}));
-
 const realPrograms = await import("@notra/geo-core/geo/programs");
 mock.module("@notra/geo-core/geo/programs", () => ({
   ...realPrograms,
@@ -178,11 +160,8 @@ mock.module("@notra/geo-core/geo/ingest", () => ({
   ...realIngest,
   isGeoIngestConfigured: () => true,
   loadGeoWebSetupResponse,
-  issueGeoIngestSetupResponse: (_input: unknown, withWeb = true) =>
-    Effect.succeed({
-      ...(withWeb ? webSetup : serverSetup),
-      token: "ntt_secret",
-    }),
+  issueGeoIngestSetupResponse: () =>
+    Effect.succeed({ ...webSetup, token: "ntt_secret" }),
 }));
 mock.module("../src/runtime/geo", () => ({
   runGeoEffect: async (_label: string, effect: Effect.Effect<unknown>) => ({
@@ -195,10 +174,6 @@ const { geoTrafficRoutes } = await import("../src/routes/geo-traffic");
 const { geoWebAnalyticsRoutes } =
   await import("../src/routes/geo-web-analytics");
 const { createOpenApiApp } = await import("../src/utils/openapi-app");
-const { webAnalyticsMiddleware } =
-  await import("../src/middleware/web-analytics");
-const { WEB_ANALYTICS_ROUTE_PATHS } =
-  await import("../src/constants/web-analytics");
 
 const organization = { id: "org_1", slug: "acme", name: "Acme", logo: null };
 const organizationKey = {
@@ -219,10 +194,6 @@ function createApp() {
     });
     await next();
   });
-  const requireWebAnalytics = webAnalyticsMiddleware();
-  for (const path of WEB_ANALYTICS_ROUTE_PATHS) {
-    app.use(path, requireWebAnalytics);
-  }
   app.route("/v1", geoTrafficRoutes);
   app.route("/v1", geoWebAnalyticsRoutes);
   return app;
@@ -231,7 +202,6 @@ function createApp() {
 const scope = { organizationId: "org_1", projectId: "proj_1" };
 
 beforeEach(() => {
-  webAnalyticsEnabled = true;
   mock.clearAllMocks();
 });
 
@@ -342,25 +312,21 @@ describe("web analytics API", () => {
     expect(loadWebAnalytics).not.toHaveBeenCalled();
   });
 
-  test.each([true, false])(
-    "filters the AI traffic overview like the dashboard (flag %p)",
-    async (enabled) => {
-      webAnalyticsEnabled = enabled;
-      const response = await createApp().request(
-        "/v1/projects/proj_1/geo/traffic/overview?days=30&host=https://www.Acme.com/x&path=/docs"
-      );
+  test("filters the AI traffic overview like the dashboard", async () => {
+    const response = await createApp().request(
+      "/v1/projects/proj_1/geo/traffic/overview?days=30&host=https://www.Acme.com/x&path=/docs"
+    );
 
-      expect(response.status).toBe(200);
-      expect(loadAiTraffic).toHaveBeenCalledWith(
-        scope,
-        expect.objectContaining({ days: 30 }),
-        ["acme.com"],
-        "",
-        "/docs",
-        undefined
-      );
-    }
-  );
+    expect(response.status).toBe(200);
+    expect(loadAiTraffic).toHaveBeenCalledWith(
+      scope,
+      expect.objectContaining({ days: 30 }),
+      ["acme.com"],
+      "",
+      "/docs",
+      undefined
+    );
+  });
 
   test("lists imports without connection credentials", async () => {
     const response = await createApp().request(
@@ -388,51 +354,5 @@ describe("web analytics API", () => {
     expect(body.webKey).toBe("nwk_public");
     expect(body.webScript.integrity).toBe("sha384-abc");
     expect(body.token).toBeUndefined();
-  });
-});
-
-describe("without the web analytics flag", () => {
-  beforeEach(() => {
-    webAnalyticsEnabled = false;
-  });
-
-  test.each([
-    "/v1/projects/proj_1/geo/traffic/web",
-    "/v1/projects/proj_1/geo/traffic/web/breakdowns",
-    "/v1/projects/proj_1/geo/traffic/web/utm?dimension=source",
-    "/v1/projects/proj_1/geo/traffic/imports",
-    "/v1/projects/proj_1/geo/traffic/journey-stats",
-  ])("%s answers 403 before loading anything", async (path) => {
-    const response = await createApp().request(path);
-
-    expect(response.status).toBe(403);
-    expect(await response.json()).toEqual({
-      error: "Web analytics is not available for this workspace yet.",
-    });
-    expect(isWebAnalyticsEnabledForOrganization).toHaveBeenCalledWith("org_1");
-    expect(loadWebAnalytics).not.toHaveBeenCalled();
-    expect(loadWebUtm).not.toHaveBeenCalled();
-    expect(loadGeoJourneyStats).not.toHaveBeenCalled();
-    expect(listAnalyticsImportSummaries).not.toHaveBeenCalled();
-  });
-
-  test.each([
-    ["setup", "/v1/geo/ingest/setup?projectId=proj_1", "GET"],
-    ["an issued token", "/v1/geo/ingest/token", "POST"],
-  ])("%s comes without notra.js", async (_name, path, method) => {
-    const response = await createApp().request(path, { method });
-    const body = await response.json();
-
-    expect(response.status).toBe(200);
-    expect(loadGeoWebSetupResponse).not.toHaveBeenCalled();
-    expect(body.ingestUrl).toBeString();
-    for (const field of [
-      "webKey",
-      "webSnippet",
-      "webScript",
-      "webPlusScript",
-    ]) {
-      expect(body[field]).toBeUndefined();
-    }
   });
 });

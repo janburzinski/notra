@@ -12,11 +12,6 @@ export const ANALYTICS_IMPORT_MAX_ERROR_LENGTH = 500;
 /** Shortest key or token the connect form submits; the server checks each provider's own. */
 export const ANALYTICS_IMPORT_MIN_SECRET_LENGTH = 10;
 export const ANALYTICS_IMPORT_MIN_HOST_LENGTH = 3;
-/** Stored as an import's error; the import list shows it translated. */
-export const ANALYTICS_IMPORT_FLAG_OFF_ERROR =
-  "Web analytics was turned off for this workspace";
-export const ANALYTICS_IMPORT_FLAG_UNAVAILABLE_ERROR =
-  "Could not check whether web analytics is available for this workspace";
 /** Written by the recovery job when an import's run was lost too often. */
 export const ANALYTICS_IMPORT_LOST_ERROR =
   "The import stopped and could not be resumed";
@@ -25,10 +20,8 @@ export const ANALYTICS_IMPORT_LOST_UPLOAD_ERROR =
   "The import stopped before it finished reading the export";
 /** Translation keys for errors the runner itself writes. */
 export const ANALYTICS_IMPORT_KNOWN_ERRORS: Readonly<
-  Record<string, "flagOff" | "flagUnavailable" | "lost" | "lostUpload">
+  Record<string, "lost" | "lostUpload">
 > = {
-  [ANALYTICS_IMPORT_FLAG_OFF_ERROR]: "flagOff",
-  [ANALYTICS_IMPORT_FLAG_UNAVAILABLE_ERROR]: "flagUnavailable",
   [ANALYTICS_IMPORT_LOST_ERROR]: "lost",
   [ANALYTICS_IMPORT_LOST_UPLOAD_ERROR]: "lostUpload",
 };

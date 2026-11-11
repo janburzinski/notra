@@ -4,8 +4,7 @@ import type { IntegrationType } from "@/types/webhooks/webhooks";
 
 export function getLogDestination(
   source: IntegrationType,
-  slug: string,
-  webAnalytics: boolean
+  slug: string
 ): LogDestination | null {
   if (!slug) {
     return null;
@@ -27,12 +26,10 @@ export function getLogDestination(
     };
   }
   if (source === "search-console") {
-    return webAnalytics
-      ? {
-          href: `${base}${WEB_ANALYTICS_NAV_LINK}`,
-          labelKey: "openWebAnalytics",
-        }
-      : { href: `${base}/geo/traffic`, labelKey: "openTraffic" };
+    return {
+      href: `${base}${WEB_ANALYTICS_NAV_LINK}`,
+      labelKey: "openWebAnalytics",
+    };
   }
   if (source === "brand") {
     return { href: `${base}/brand/identity`, labelKey: "openBrandIdentity" };

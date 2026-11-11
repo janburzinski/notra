@@ -9,7 +9,6 @@ import { ImportProviderPicker } from "./import-provider-picker";
 
 export function ImportHomeStep({
   isPending,
-  manageOnly,
   onPick,
   ...list
 }: ImportHomeStepProps) {
@@ -21,7 +20,7 @@ export function ImportHomeStep({
       ) : (
         <ImportList {...list} connections={[]} />
       )}
-      {manageOnly ? null : <ImportProviderPicker onPick={onPick} />}
+      <ImportProviderPicker onPick={onPick} />
       {isPending ? null : <ImportList {...list} imports={[]} />}
     </div>
   );

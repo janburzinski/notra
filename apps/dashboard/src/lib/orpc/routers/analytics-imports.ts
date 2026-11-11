@@ -81,7 +81,6 @@ import {
 } from "@/lib/orpc/utils/errors";
 import { assertOrganizationManager } from "@/lib/orpc/utils/organization-manager";
 import { isR2StorageConfigured } from "@/lib/upload/r2";
-import { withWebAnalyticsFlag } from "@/lib/web-analytics/access";
 import {
   startAnalyticsImportDeleteRun,
   startAnalyticsImportRun,
@@ -286,7 +285,6 @@ export const analyticsImportsRouter = {
   connect: authorizedProcedure
     .input(connectAnalyticsImportInputSchema)
     .use(withOrganizationAccess)
-    .use(withWebAnalyticsFlag)
     .handler(async ({ context, input }) => {
       assertNotDemo();
       const { organizationId } = context.auth;
@@ -325,7 +323,6 @@ export const analyticsImportsRouter = {
   sources: authorizedProcedure
     .input(analyticsImportConnectionInputSchema)
     .use(withOrganizationAccess)
-    .use(withWebAnalyticsFlag)
     .handler(async ({ context, input }) => {
       const connection = await requireConnection(
         context.auth.organizationId,
@@ -340,7 +337,6 @@ export const analyticsImportsRouter = {
   preview: authorizedProcedure
     .input(analyticsImportSourceInputSchema)
     .use(withOrganizationAccess)
-    .use(withWebAnalyticsFlag)
     .handler(async ({ context, input }) => {
       const { organizationId } = context.auth;
       await assertProject(organizationId, input.projectId);
@@ -370,7 +366,6 @@ export const analyticsImportsRouter = {
   create: authorizedProcedure
     .input(analyticsImportSourceInputSchema)
     .use(withOrganizationAccess)
-    .use(withWebAnalyticsFlag)
     .handler(async ({ context, input }) => {
       assertNotDemo();
       const { organizationId } = context.auth;
@@ -406,7 +401,6 @@ export const analyticsImportsRouter = {
   uploadTarget: authorizedProcedure
     .input(analyticsImportUploadInputSchema)
     .use(withOrganizationAccess)
-    .use(withWebAnalyticsFlag)
     .handler(async ({ context, input }) => {
       assertNotDemo();
       if (input.fileSize > IMPORT_CSV_MAX_ZIP_BYTES) {
@@ -424,7 +418,6 @@ export const analyticsImportsRouter = {
   csv: authorizedProcedure
     .input(analyticsImportCsvInputSchema)
     .use(withOrganizationAccess)
-    .use(withWebAnalyticsFlag)
     .handler(async ({ context, input }) => {
       assertNotDemo();
       const { organizationId } = context.auth;

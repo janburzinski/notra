@@ -57,8 +57,7 @@
           "description": "Assistants and schedule"
         },
         "geo-tracking": {
-          "description": "Install tracking and import history",
-          "agentsDescription": "Install AI traffic tracking"
+          "description": "Install tracking and import history"
         }
       }
     },
@@ -79,8 +78,7 @@
         "logs": "View integration events and their delivery status",
         "dev": "Development-only tools for testing local flows",
         "geo-models": "Which assistants your prompts run on",
-        "geo-tracking": "Count visits on your site and bring in past analytics",
-        "geo-tracking-agents": "Count AI crawlers and referrals on your site"
+        "geo-tracking": "Count visits on your site and bring in past analytics"
       }
     },
     "panes": {
@@ -1186,9 +1184,6 @@
     "analytics": {
       "unavailable": "Analytics is not available for this workspace yet.",
       "xAccountNotFound": "Could not find the X account @{username}"
-    },
-    "webAnalytics": {
-      "unavailable": "Web analytics is not available for this workspace yet."
     },
     "actions": {
       "organizations": {
@@ -4241,7 +4236,6 @@
       },
       "traffic": {
         "title": "Analytics",
-        "descriptionWithVisitors": "People and AI agents on your site",
         "mcpMetaTitle": "MCP server analytics"
       },
       "mcp": {
@@ -4776,7 +4770,6 @@
     "analyticsImport": {
       "title": "Import history",
       "description": "Bring over daily totals from the tool you used before Notra.",
-      "manageDescription": "Web analytics is off for this workspace, so new imports can't start. You can still delete imports and disconnect accounts.",
       "back": "Back",
       "cta": {
         "title": "See your history from day one",
@@ -4787,8 +4780,7 @@
         "title": "Import history",
         "description": "Bring past page views and AI crawler hits in from Plausible, Vercel or Cloudflare.",
         "action": "Manage imports",
-        "start": "Import",
-        "manageDescription": "Web analytics is off for this workspace. You can still delete imported history and disconnect accounts."
+        "start": "Import"
       },
       "providers": {
         "title": "Choose a source",
@@ -5013,8 +5005,6 @@
           "deleted": "Deleted"
         },
         "errors": {
-          "flagOff": "Web analytics was turned off for this workspace.",
-          "flagUnavailable": "Couldn't check whether web analytics is on for this workspace. Try again later.",
           "lost": "The import stopped and couldn't be resumed. Start it again.",
           "lostUpload": "The import stopped before it finished reading the export. Upload it again."
         }
@@ -5729,7 +5719,6 @@
   "analytics": {
     "sources": {
       "label": "Analytics source",
-      "website": "Website",
       "agents": "Agent",
       "web": "Web",
       "mcp": "MCP server",
@@ -6621,7 +6610,6 @@
         "openEventTriggers": "Open event triggers",
         "openGeo": "Open GEO",
         "openAgentReadiness": "Open agent readiness",
-        "openTraffic": "Open traffic analytics",
         "openBrandIdentity": "Open brand identity",
         "openIntegrations": "Open integrations",
         "openWebAnalytics": "Open web analytics"

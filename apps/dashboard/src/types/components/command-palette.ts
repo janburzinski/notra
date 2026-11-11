@@ -2,7 +2,7 @@ import type { IconSvgElement } from "@hugeicons/react";
 import type { ReactNode } from "react";
 import type { useTranslations } from "use-intl";
 
-import type { FlagKeywords, NavVisibility } from "@/types/components/nav";
+import type { NavVisibility } from "@/types/components/nav";
 import type { SettingsSectionId } from "@/types/settings/modal";
 
 export type CommandSection =
@@ -19,7 +19,6 @@ export type CommandRouteId =
   | "analytics"
   | "autopilot"
   | "geo"
-  | "geo-traffic"
   | "geo-agent-analytics"
   | "geo-web-analytics"
   | "geo-prompts"
@@ -60,9 +59,6 @@ export interface CommandRoute {
   settingsSection?: SettingsSectionId;
   /** Hidden unless this feature flag is on for the workspace. */
   flag?: keyof NavVisibility;
-  /** Hidden while this feature flag is on: the flag-off form of an entry. */
-  hiddenWithFlag?: keyof NavVisibility;
-  flagKeywords?: FlagKeywords;
 }
 
 export type AiResult =

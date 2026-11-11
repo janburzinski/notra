@@ -21,7 +21,6 @@ import {
 } from "@notra/db/schema";
 import { call } from "@orpc/server";
 import { eq } from "drizzle-orm";
-import { Effect } from "effect";
 import { FatalError } from "workflow";
 
 import { createAutopilotSandbox } from "./utils/autopilot-sandbox";
@@ -68,11 +67,6 @@ if (process.env.NOTRA_ANALYTICS_IMPORTS_E2E !== "1") {
   let nativeFirstDay = "1970-01-01";
   let importsAllowed = true;
   mock.module("@notra/db/drizzle", () => ({ db }));
-  mock.module("@notra/ai/utils/web-analytics-access", () => ({
-    isWebAnalyticsEnabledForOrganization: async () => true,
-    resolveWebAnalyticsFlagState: async () => "enabled" as const,
-    webAnalyticsFlagState: () => Effect.succeed("enabled" as const),
-  }));
   const client = await import("@notra/analytics/tinybird/client");
   const purge = await import("@notra/analytics/tinybird/purge");
   const queryCache = await import("@notra/analytics/cache/query-cache");

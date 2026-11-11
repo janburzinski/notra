@@ -583,9 +583,10 @@ export const GEO_DRAIN_DASHBOARD_URLS = {
   cloudflare: "https://dash.cloudflare.com/?to=/:account/:zone/analytics/logs",
 } as const satisfies Record<GeoDrainProvider, string>;
 export const GEO_INGEST_DEFAULT_METHOD: GeoIngestMethod = "sdk";
+// The script tag comes first: it is the only method that counts people.
 export const GEO_INGEST_METHODS = [
-  "sdk",
   "script",
+  "sdk",
   "vercel",
   "cloudflare",
 ] as const satisfies readonly GeoIngestMethod[];

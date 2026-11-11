@@ -1,8 +1,6 @@
 import type { IconSvgElement } from "@hugeicons/react";
 import type { ReactNode } from "react";
 
-import type { FlagKeywords } from "@/types/components/nav";
-
 export type SettingsSectionId =
   | "account"
   | "account-api-keys"
@@ -62,12 +60,7 @@ export interface SettingsNavGroup {
   items: readonly SettingsNavItem[];
 }
 
-interface SettingsNavItemConfig extends Omit<
-  SettingsNavItem,
-  "label" | "description"
-> {
-  flagKeywords?: FlagKeywords;
-}
+type SettingsNavItemConfig = Omit<SettingsNavItem, "label" | "description">;
 
 export interface SettingsNavGroupConfig {
   id: SettingsNavGroupId;

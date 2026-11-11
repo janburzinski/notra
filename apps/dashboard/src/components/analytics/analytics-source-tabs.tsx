@@ -7,7 +7,6 @@ import {
   McpServerIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Skeleton } from "@notra/ui/components/ui/skeleton";
 import { Tabs, TabsList, TabsTrigger } from "@notra/ui/components/ui/tabs";
 import { useEffect, useState } from "react";
 import { useTranslations } from "use-intl";
@@ -19,7 +18,6 @@ import { MCP_ANALYTICS_NAV_LINK } from "@/constants/mcp-analytics";
 import { ANALYTICS_NAV_LINK } from "@/constants/nav";
 import { useGeoProjectQueryState } from "@/lib/hooks/use-geo-project-query";
 import { useNavVisibility } from "@/lib/hooks/use-nav-visibility";
-import { useWebAnalyticsFlag } from "@/lib/hooks/use-web-analytics-flag";
 import { useParams, usePathname } from "@/lib/navigation";
 import type { AnalyticsSourceTabsProps } from "@/types/analytics";
 import { geoTrafficPath, withGeoProject } from "@/utils/geo-paths";
@@ -43,8 +41,6 @@ export function AnalyticsSourceTabs({ actions }: AnalyticsSourceTabsProps) {
   const [projectParam] = useGeoProjectQueryState();
   const projectId = scopedProjectId ?? projectParam ?? undefined;
   const { analytics: showSocial } = useNavVisibility();
-  const webFlag = useWebAnalyticsFlag();
-  const webAnalytics = webFlag.enabled;
   const webPath = `/${slug}${WEB_ANALYTICS_NAV_LINK}`;
   const mcpPath = `/${slug}${MCP_ANALYTICS_NAV_LINK}`;
   const socialPath = `/${slug}${ANALYTICS_NAV_LINK}`;
@@ -70,57 +66,47 @@ export function AnalyticsSourceTabs({ actions }: AnalyticsSourceTabsProps) {
   return (
     <div className="flex min-h-8 flex-wrap items-center justify-between gap-2">
       {/* Narrow screens scroll the tabs instead of clipping the last ones. */}
-      {/* Until the flag answers, the tab set is unknown, so nothing flashes. */}
-      {webFlag.settled ? (
-        <Tabs
-          className="max-w-full min-w-0 scrollbar-none overflow-x-auto"
-          value={shownValue}
-        >
-          <TabsList aria-label={t("label")}>
+      <Tabs
+        className="max-w-full min-w-0 scrollbar-none overflow-x-auto"
+        value={shownValue}
+      >
+        <TabsList aria-label={t("label")}>
+          <TabsTrigger
+            nativeButton={false}
+            render={<Link href={geoTrafficPath(slug, projectId)} />}
+            value="agents"
+          >
+            <HugeiconsIcon aria-hidden="true" icon={BotIcon} />
+            {t("agents")}
+          </TabsTrigger>
+          <TabsTrigger
+            nativeButton={false}
+            render={<Link href={withGeoProject(webPath, projectId)} />}
+            value="web"
+          >
+            <HugeiconsIcon aria-hidden="true" icon={Globe02Icon} />
+            {t("web")}
+          </TabsTrigger>
+          <TabsTrigger
+            nativeButton={false}
+            render={<Link href={withGeoProject(mcpPath, projectId)} />}
+            value="mcp"
+          >
+            <HugeiconsIcon aria-hidden="true" icon={McpServerIcon} />
+            {t("mcp")}
+          </TabsTrigger>
+          {showSocial || value === "social" ? (
             <TabsTrigger
               nativeButton={false}
-              render={<Link href={geoTrafficPath(slug, projectId)} />}
-              value="agents"
+              render={<Link href={withGeoProject(socialPath, projectId)} />}
+              value="social"
             >
-              <HugeiconsIcon
-                aria-hidden="true"
-                icon={webAnalytics ? BotIcon : Globe02Icon}
-              />
-              {webAnalytics ? t("agents") : t("website")}
+              <HugeiconsIcon aria-hidden="true" icon={AtIcon} />
+              {t("social")}
             </TabsTrigger>
-            {webAnalytics ? (
-              <TabsTrigger
-                nativeButton={false}
-                render={<Link href={withGeoProject(webPath, projectId)} />}
-                value="web"
-              >
-                <HugeiconsIcon aria-hidden="true" icon={Globe02Icon} />
-                {t("web")}
-              </TabsTrigger>
-            ) : null}
-            <TabsTrigger
-              nativeButton={false}
-              render={<Link href={withGeoProject(mcpPath, projectId)} />}
-              value="mcp"
-            >
-              <HugeiconsIcon aria-hidden="true" icon={McpServerIcon} />
-              {t("mcp")}
-            </TabsTrigger>
-            {showSocial || value === "social" ? (
-              <TabsTrigger
-                nativeButton={false}
-                render={<Link href={withGeoProject(socialPath, projectId)} />}
-                value="social"
-              >
-                <HugeiconsIcon aria-hidden="true" icon={AtIcon} />
-                {t("social")}
-              </TabsTrigger>
-            ) : null}
-          </TabsList>
-        </Tabs>
-      ) : (
-        <Skeleton aria-hidden className="h-8 w-72 max-w-full rounded-lg" />
-      )}
+          ) : null}
+        </TabsList>
+      </Tabs>
       {actions ? (
         <div className="flex min-h-7 flex-wrap items-center justify-end gap-2">
           {actions}

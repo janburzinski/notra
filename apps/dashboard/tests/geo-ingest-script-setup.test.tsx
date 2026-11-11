@@ -32,9 +32,6 @@ if (!process.env.NOTRA_SCRIPT_SETUP_TEST_WORKER) {
   mock.module("../src/lib/hooks/use-web-tracking-status", () => ({
     useWebTrackingStatus: () => ({ data: { firstDay } }),
   }));
-  mock.module("../src/lib/hooks/use-web-analytics-flag", () => ({
-    useWebAnalyticsFlag: () => ({ enabled: true, settled: true }),
-  }));
   mock.module("../src/components/framework/link", () => ({ default: "a" }));
   mock.module("../src/lib/navigation", () => ({
     useParams: () => ({ slug: "acme" }),

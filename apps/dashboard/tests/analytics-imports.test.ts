@@ -18,7 +18,6 @@ import {
   ListObjectsV2Command,
   S3Client,
 } from "@aws-sdk/client-s3";
-import type { WebAnalyticsFlagState } from "@notra/ai/types/web-analytics-access";
 import {
   analyticsImportChunks,
   analyticsImports,
@@ -60,19 +59,6 @@ if (process.env.NOTRA_ANALYTICS_IMPORTS_SANDBOX_TEST !== "1") {
   const bumps: string[] = [];
   let nativeFirstDay = "1970-01-01";
   mock.module("@notra/db/drizzle", () => ({ db }));
-  let webAnalyticsState: WebAnalyticsFlagState = "enabled";
-  const flagChecks: string[] = [];
-  const resolveWebAnalyticsFlagState = async (organizationId: string) => {
-    flagChecks.push(organizationId);
-    return webAnalyticsState;
-  };
-  mock.module("@notra/ai/utils/web-analytics-access", () => ({
-    resolveWebAnalyticsFlagState,
-    isWebAnalyticsEnabledForOrganization: async (organizationId: string) =>
-      (await resolveWebAnalyticsFlagState(organizationId)) === "enabled",
-    webAnalyticsFlagState: (organizationId: string) =>
-      Effect.promise(() => resolveWebAnalyticsFlagState(organizationId)),
-  }));
   const client = await import("@notra/analytics/tinybird/client");
   const purge = await import("@notra/analytics/tinybird/purge");
   const queryCache = await import("@notra/analytics/cache/query-cache");
@@ -223,8 +209,6 @@ if (process.env.NOTRA_ANALYTICS_IMPORTS_SANDBOX_TEST !== "1") {
   const { geoRouter } = await import("../src/lib/orpc/routers/geo");
   const { createORPCContext } = await import("../src/lib/orpc/context");
   const {
-    ANALYTICS_IMPORT_FLAG_OFF_ERROR,
-    ANALYTICS_IMPORT_FLAG_UNAVAILABLE_ERROR,
     ANALYTICS_IMPORT_LOST_ERROR,
     ANALYTICS_IMPORT_LOST_UPLOAD_ERROR,
     ANALYTICS_IMPORT_MAX_RECOVERY_ATTEMPTS,
@@ -352,8 +336,6 @@ if (process.env.NOTRA_ANALYTICS_IMPORTS_SANDBOX_TEST !== "1") {
     r2Objects.clear();
     r2Reads.length = 0;
     role = "owner";
-    webAnalyticsState = "enabled";
-    flagChecks.length = 0;
     startedRuns.length = 0;
     deleteRuns.length = 0;
     runStates.clear();
@@ -447,37 +429,6 @@ if (process.env.NOTRA_ANALYTICS_IMPORTS_SANDBOX_TEST !== "1") {
       }
     };
 
-    test("with the web analytics flag off, starting, previewing and rotating are forbidden; managing stays open", async () => {
-      webAnalyticsState = "disabled";
-      const { connection, row, calls } = await procedures();
-      await expectDenied(
-        calls,
-        [
-          "connect",
-          "sources",
-          "preview",
-          "create",
-          "uploadTarget",
-          "csv",
-          "rotate",
-        ],
-        {
-          code: "FORBIDDEN",
-          message: "Web analytics is not available for this workspace yet.",
-        }
-      );
-      // One evaluation per organization and request.
-      expect(flagChecks).toEqual(["org-a"]);
-      expect(fetchMock).not.toHaveBeenCalled();
-
-      expect((await calls.list()).imports.map((item) => item.id)).toEqual([
-        row.id,
-      ]);
-      expect(await calls.delete()).toEqual({ ok: true });
-      expect(await calls.disconnect()).toEqual({ ok: true });
-      expect(await imports.findConnection("org-a", connection.id)).toBeNull();
-    });
-
     test("members cannot connect, disconnect, delete imports or rotate the public key", async () => {
       role = "member";
       const { connection, row, calls } = await procedures();
@@ -489,65 +440,6 @@ if (process.env.NOTRA_ANALYTICS_IMPORTS_SANDBOX_TEST !== "1") {
       ).not.toBeNull();
       expect((await loadImport(row.id))?.status).toBe("pending");
       expect((await calls.list()).canManage).toBe(false);
-    });
-  });
-
-  describe("web analytics flag", () => {
-    test("turning it off fails a running import and frees its range and upload", async () => {
-      r2Configured = true;
-      const key = uploadKey("flag-off");
-      r2Objects.set(key, { body: zip, modified: new Date() });
-      const row = await createImport({ uploadKey: key });
-      const plan = await runner.planAnalyticsImport(row.id);
-      expect(
-        await runner.runAnalyticsImportChunk(row.id, plan?.chunks[0] ?? "")
-      ).toEqual({ status: "done" });
-
-      webAnalyticsState = "disabled";
-      const outcome = await runner.runAnalyticsImportChunk(
-        row.id,
-        plan?.chunks[1] ?? ""
-      );
-      expect(outcome).toEqual({
-        status: "failed",
-        error: ANALYTICS_IMPORT_FLAG_OFF_ERROR,
-      });
-      // The workflow ends a failed chunk through the shared failure path.
-      await runner.failAnalyticsImport(row.id, ANALYTICS_IMPORT_FLAG_OFF_ERROR);
-      expect(await loadImport(row.id)).toMatchObject({
-        status: "failed",
-        lastError: ANALYTICS_IMPORT_FLAG_OFF_ERROR,
-        uploadObjectKey: null,
-      });
-      expect(purges).toEqual([{ organizationId: "org-a", importId: row.id }]);
-      expect(r2Objects.has(key)).toBe(false);
-      // Its days are free again for a later import.
-      webAnalyticsState = "enabled";
-      expect((await createCsvImport()).status).toBe("pending");
-    });
-
-    test("an unanswered flag throws so the step retries; an off flag fails the import before it writes", async () => {
-      const row = await createCsvImport();
-      const plan = await runner.planAnalyticsImport(row.id, zip);
-      webAnalyticsState = "unavailable";
-      await expect(runner.planAnalyticsImport(row.id, zip)).rejects.toThrow(
-        ANALYTICS_IMPORT_FLAG_UNAVAILABLE_ERROR
-      );
-      await expect(
-        runner.runAnalyticsImportChunk(row.id, plan?.chunks[0] ?? "")
-      ).rejects.toThrow(ANALYTICS_IMPORT_FLAG_UNAVAILABLE_ERROR);
-      expect(await loadImport(row.id)).toMatchObject({
-        status: "running",
-        chunksDone: 0,
-      });
-
-      webAnalyticsState = "disabled";
-      await runner.runAnalyticsImportInline(row.id, zip);
-      expect(await loadImport(row.id)).toMatchObject({
-        status: "failed",
-        lastError: ANALYTICS_IMPORT_FLAG_OFF_ERROR,
-      });
-      expect(webRows).toEqual([]);
     });
   });
 

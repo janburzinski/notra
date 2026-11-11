@@ -1,6 +1,5 @@
 import { createRoute } from "@hono/zod-openapi";
 import {
-  buildGeoIngestSetupInfo,
   isGeoIngestConfigured,
   issueGeoIngestSetupResponse,
   loadGeoWebSetupResponse,
@@ -55,9 +54,7 @@ import {
   geoErrorResponse,
   geoOutcomeResponse,
 } from "../utils/geo";
-import { logError } from "../utils/logging";
 import { createOpenApiApp } from "../utils/openapi-app";
-import { isWebAnalyticsEnabledForRequest } from "../utils/web-analytics";
 
 /**
  * AI crawler and referral traffic, plus the tracking token that produces it.
@@ -397,17 +394,9 @@ geoTrafficRoutes.openapi(mcpToolDetailRoute, async (c) => {
 });
 
 geoTrafficRoutes.openapi(ingestSetupRoute, async (c) => {
-  const { organization, organizationId } = c.get("geo");
+  const { organizationId } = c.get("geo");
   if (!isGeoIngestConfigured()) {
     return c.json({ error: "Traffic ingest is not configured" }, 503);
-  }
-  if (!(await isWebAnalyticsEnabledForRequest(c))) {
-    try {
-      return c.json({ ...buildGeoIngestSetupInfo(), organization }, 200);
-    } catch (error) {
-      logError("[GEO] ingestSetup", error);
-      return c.json({ error: "Internal server error" }, 500);
-    }
   }
   const { projectId } = c.req.valid("query");
   const outcome = await runGeoEffect(
@@ -439,10 +428,9 @@ function ingestTokenResponse(
 geoTrafficRoutes.openapi(issueTokenRoute, async (c) => {
   const { organizationId } = c.get("geo");
   const { projectId } = c.req.valid("query");
-  const withWeb = await isWebAnalyticsEnabledForRequest(c);
   const outcome = await runGeoEffect(
     "ingestTokenIssue",
-    issueGeoIngestSetupResponse({ organizationId, projectId }, withWeb)
+    issueGeoIngestSetupResponse({ organizationId, projectId })
   );
   return ingestTokenResponse(c, outcome);
 });
@@ -450,10 +438,9 @@ geoTrafficRoutes.openapi(issueTokenRoute, async (c) => {
 geoTrafficRoutes.openapi(rotateTokenRoute, async (c) => {
   const { organizationId } = c.get("geo");
   const { projectId } = c.req.valid("query");
-  const withWeb = await isWebAnalyticsEnabledForRequest(c);
   const outcome = await runGeoEffect(
     "ingestTokenRotate",
-    rotateGeoIngestSetupResponse({ organizationId, projectId }, withWeb)
+    rotateGeoIngestSetupResponse({ organizationId, projectId })
   );
   return ingestTokenResponse(c, outcome);
 });

@@ -81,11 +81,6 @@ export const WEB_DAILY_SALT_TTL_SECONDS = 48 * 60 * 60;
 export const WEB_DAILY_SALT_SWEEP_MS = 60 * 60 * 1000;
 export const WEB_DAILY_SALT_BYTES = 32;
 export const GEO_WEB_IDENTITY_MEMO_MS = 60 * 1000;
-/**
- * While the flag service cannot answer, the web analytics flag keeps its last
- * answer this long before beacons fail closed.
- */
-export const GEO_WEB_FLAG_LAST_KNOWN_MS = 24 * 60 * 60 * 1000;
 export const GEO_INGEST_MEMO_MAX_ENTRIES = 10_000;
 /**
  * notra.js beacons arrive at page-view volume, and anyone can send rejected

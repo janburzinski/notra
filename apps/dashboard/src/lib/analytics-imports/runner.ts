@@ -1,4 +1,3 @@
-import { resolveWebAnalyticsFlagState } from "@notra/ai/utils/web-analytics-access";
 import { bumpAnalyticsVersions } from "@notra/analytics/cache/query-cache";
 import { purgeImportedRows } from "@notra/analytics/tinybird/purge";
 import { ANALYTICS_IMPORT_ACTIVE_STATUSES } from "@notra/db/constants/analytics-imports";
@@ -31,8 +30,6 @@ import {
 import { and, eq, inArray, ne, sql } from "drizzle-orm";
 
 import {
-  ANALYTICS_IMPORT_FLAG_OFF_ERROR,
-  ANALYTICS_IMPORT_FLAG_UNAVAILABLE_ERROR,
   ANALYTICS_IMPORT_MAX_CHUNK_ATTEMPTS,
   ANALYTICS_IMPORT_MAX_ERROR_LENGTH,
 } from "@/constants/analytics-imports";
@@ -68,18 +65,6 @@ function chunkWhere(importId: string, chunkStart: string) {
     eq(analyticsImportChunks.importId, importId),
     eq(analyticsImportChunks.chunkStart, chunkStart)
   );
-}
-
-/**
- * Whether the workspace still has web analytics. An unanswered flag throws,
- * so the workflow step retries instead of deciding on no answer.
- */
-async function hasWebAnalytics(organizationId: string): Promise<boolean> {
-  const state = await resolveWebAnalyticsFlagState(organizationId);
-  if (state === "unavailable") {
-    throw new Error(ANALYTICS_IMPORT_FLAG_UNAVAILABLE_ERROR);
-  }
-  return state === "enabled";
 }
 
 /** Matches an import still in flight, so a late step never revives a stopped or finished one. */
@@ -132,10 +117,6 @@ export async function planAnalyticsImport(
 ): Promise<AnalyticsImportPlan | null> {
   const row = await loadImport(importId);
   if (!row || isStopped(row) || row.status === "completed") {
-    return null;
-  }
-  if (!(await hasWebAnalytics(row.organizationId))) {
-    await failAnalyticsImport(importId, ANALYTICS_IMPORT_FLAG_OFF_ERROR);
     return null;
   }
   const range = effectiveRange(row);
@@ -275,11 +256,6 @@ export async function runAnalyticsImportChunk(
   const row = await loadImport(importId);
   if (!row || isStopped(row)) {
     return { status: "cancelled" };
-  }
-  // A workspace whose web analytics flag was turned off ends the import the
-  // way any failure does, which frees its connection and date range.
-  if (!(await hasWebAnalytics(row.organizationId))) {
-    return { status: "failed", error: ANALYTICS_IMPORT_FLAG_OFF_ERROR };
   }
   const range = effectiveRange(row);
   if (!range) {

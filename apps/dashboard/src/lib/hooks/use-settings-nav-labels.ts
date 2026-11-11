@@ -1,6 +1,5 @@
 import { useTranslations } from "use-intl";
 
-import { useNavVisibility } from "@/lib/hooks/use-nav-visibility";
 import type { SettingsNavLabels } from "@/types/settings/modal";
 
 export function useSettingsNavLabels(): SettingsNavLabels {
@@ -8,7 +7,6 @@ export function useSettingsNavLabels(): SettingsNavLabels {
   const tLabels = useTranslations("common.labels");
   const brandDescription = t("shared.nameAliasesAndConversionPaths");
   const brandModalDescription = t("shared.howYourBrandIsIdentified");
-  const { webAnalytics } = useNavVisibility();
   return {
     groups: {
       account: tLabels("account"),
@@ -110,12 +108,8 @@ export function useSettingsNavLabels(): SettingsNavLabels {
       },
       "geo-tracking": {
         label: tLabels("tracking"),
-        description: webAnalytics
-          ? t("nav.sections.geo-tracking.description")
-          : t("nav.sections.geo-tracking.agentsDescription"),
-        modalDescription: webAnalytics
-          ? t("modal.descriptions.geo-tracking")
-          : t("modal.descriptions.geo-tracking-agents"),
+        description: t("nav.sections.geo-tracking.description"),
+        modalDescription: t("modal.descriptions.geo-tracking"),
       },
     },
   };

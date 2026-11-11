@@ -51,10 +51,13 @@ if (!process.env.NOTRA_ANALYTICS_IMPORT_UI_TEST_WORKER) {
   }));
   const { ImportHistoryCard } =
     await import("../src/components/analytics-import/import-history-card");
-  const { ANALYTICS_IMPORT_FLAG_OFF_ERROR } =
+  const { ANALYTICS_IMPORT_LOST_ERROR } =
     await import("../src/constants/analytics-imports");
   const { dashboardOrpc } = await import("../src/lib/orpc/query");
-  const flagOff = messages.geo.analyticsImport.list.errors.flagOff;
+  const lostError = messages.geo.analyticsImport.list.errors.lost.replace(
+    "'",
+    "&#x27;"
+  );
 
   const render = (node: React.ReactNode, queryClient = new QueryClient()) =>
     renderToStaticMarkup(
@@ -127,10 +130,10 @@ if (!process.env.NOTRA_ANALYTICS_IMPORT_UI_TEST_WORKER) {
     expect(done).toContain("Your charts now go back to Oct 1, 2025.");
     const stopped = progress({
       status: "failed",
-      lastError: ANALYTICS_IMPORT_FLAG_OFF_ERROR,
+      lastError: ANALYTICS_IMPORT_LOST_ERROR,
     });
     expect(stopped).toContain("The import stopped");
-    expect(stopped).toContain(flagOff);
+    expect(stopped).toContain(lostError);
   });
 
   test("the list shows progress, the queue and translated errors", () => {
@@ -145,7 +148,7 @@ if (!process.env.NOTRA_ANALYTICS_IMPORT_UI_TEST_WORKER) {
             ...running,
             id: "imp_failed",
             status: "failed",
-            lastError: ANALYTICS_IMPORT_FLAG_OFF_ERROR,
+            lastError: ANALYTICS_IMPORT_LOST_ERROR,
           },
         ]}
         onOpen={() => undefined}
@@ -155,7 +158,7 @@ if (!process.env.NOTRA_ANALYTICS_IMPORT_UI_TEST_WORKER) {
     expect(html).toContain("Step 4 of 12");
     expect(html).toContain("26,270 page views");
     expect(html).toContain("Waiting for marketing to finish");
-    expect(html).toContain(flagOff);
+    expect(html).toContain(lostError);
     // Active imports open their progress; a stopped one does not.
     expect(html.match(/Show progress/g)).toHaveLength(2);
   });
@@ -244,28 +247,6 @@ if (!process.env.NOTRA_ANALYTICS_IMPORT_UI_TEST_WORKER) {
     );
     expect(reconnect).not.toContain("Old team");
     expect(reconnect).toContain("can&#x27;t be limited to read-only");
-  });
-
-  test("without web analytics, import history only manages what is stored", () => {
-    const card = (imports: AnalyticsImportSummary[]) => {
-      const queryClient = new QueryClient();
-      queryClient.setQueryData(
-        dashboardOrpc.analyticsImports.list.queryKey({
-          input: { organizationId: "", projectId: "project" },
-        }),
-        { imports, connections: [], canManage: true }
-      );
-      return render(
-        <ImportHistoryCard manageOnly variant="settings" />,
-        queryClient
-      );
-    };
-    expect(card([])).toBe("");
-    const stored = card([running]);
-    expect(stored).toContain(
-      messages.geo.analyticsImport.settings.manageDescription
-    );
-    expect(stored).toContain(messages.geo.analyticsImport.settings.action);
   });
 
   const basePreview: AnalyticsImportPreview = {

@@ -345,8 +345,6 @@ import {
 } from "@/lib/orpc/utils/errors";
 import { toGeoOrpcError } from "@/lib/orpc/utils/geo-errors";
 import { assertOrganizationManager } from "@/lib/orpc/utils/organization-manager";
-import { assertWebAnalyticsEnabled } from "@/lib/web-analytics/access";
-import { isWebAnalyticsEnabled } from "@/lib/web-analytics/flag";
 import type { GeoHandlerTracker } from "@/types/analytics/geo-events";
 import type { AuthenticatedUser } from "@/types/auth/organization";
 import type {
@@ -1214,24 +1212,17 @@ export const geoRouter = {
         )
       )
     ),
-  // Without web analytics the people section of AI analytics reads these,
-  // with no time on page and no notra.js reports.
   webAnalytics: authorizedProcedure
     .input(webAnalyticsInputSchema)
     .handler(
       geoOpenHandler((input) =>
-        Effect.promise(() => isWebAnalyticsEnabled(input.organizationId)).pipe(
-          Effect.flatMap((engagement) =>
-            loadWebAnalytics(
-              input,
-              geoWindow(input),
-              input.host,
-              input.path,
-              input.sites,
-              "summary",
-              { engagement }
-            )
-          )
+        loadWebAnalytics(
+          input,
+          geoWindow(input),
+          input.host,
+          input.path,
+          input.sites,
+          "summary"
         )
       )
     ),
@@ -1239,18 +1230,14 @@ export const geoRouter = {
     .input(webAnalyticsInputSchema)
     .handler(
       geoOpenHandler((input) =>
-        Effect.promise(() => isWebAnalyticsEnabled(input.organizationId)).pipe(
-          Effect.flatMap((scriptReports) =>
-            loadWebAnalytics(
-              input,
-              geoWindow(input),
-              input.host,
-              input.path,
-              input.sites,
-              "breakdowns",
-              { scriptReports }
-            )
-          )
+        loadWebAnalytics(
+          input,
+          geoWindow(input),
+          input.host,
+          input.path,
+          input.sites,
+          "breakdowns",
+          { scriptReports: true }
         )
       )
     ),
@@ -1337,19 +1324,11 @@ export const geoRouter = {
         )
       )
     ),
-  /** The server's web analytics flag, so the client never evaluates it. */
-  webAnalyticsEnabled: authorizedProcedure
-    .input(organizationIdInputSchema)
-    .handler(async ({ context, input }) => {
-      await assertOrganizationAccess(accessParams({ context, input }));
-      return await isWebAnalyticsEnabled(input.organizationId, context.headers);
-    }),
   /** Whether notra.js has counted the project yet, for the install card. */
   webTrackingStatus: authorizedProcedure
     .input(geoOrganizationInputSchema)
     .handler(async ({ context, input }) => {
       await assertOrganizationAccess(accessParams({ context, input }));
-      await assertWebAnalyticsEnabled(input.organizationId, context.headers);
       return await runOrpcEffect(
         loadWebTrackingStatus(input).pipe(
           Effect.provide(geoCoreDashboardLayer)
@@ -1363,14 +1342,8 @@ export const geoRouter = {
       const access = await assertOrganizationAccess(
         accessParams({ context, input })
       );
-
-      // notra.js comes only with web analytics.
-      const withWeb = await isWebAnalyticsEnabled(
-        input.organizationId,
-        context.headers
-      );
       const setup = await runOrpcEffect(
-        issueGeoIngestSetupResponse(input, withWeb).pipe(
+        issueGeoIngestSetupResponse(input).pipe(
           Effect.provide(geoCoreDashboardLayer)
         ),
         toGeoOrpcError
@@ -1389,7 +1362,6 @@ export const geoRouter = {
       const access = await assertOrganizationAccess(
         accessParams({ context, input })
       );
-      await assertWebAnalyticsEnabled(input.organizationId, context.headers);
       assertOrganizationManager(access.membership, "rotate the public key");
       const setup = await runOrpcEffect(
         rotateGeoWebKeySetupResponse(input).pipe(
@@ -1408,13 +1380,8 @@ export const geoRouter = {
       const access = await assertOrganizationAccess(
         accessParams({ context, input })
       );
-
-      const withWeb = await isWebAnalyticsEnabled(
-        input.organizationId,
-        context.headers
-      );
       const setup = await runOrpcEffect(
-        rotateGeoIngestSetupResponse(input, withWeb).pipe(
+        rotateGeoIngestSetupResponse(input).pipe(
           Effect.provide(geoCoreDashboardLayer)
         ),
         toGeoOrpcError
