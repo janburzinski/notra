@@ -1,0 +1,31 @@
+.agents/skills/writing-pr/prBase/benchmark.md
+  s_fc788a2443134e::t_5837111afad127 1-36
+.agents/skills/writing-pr/SKILL.md
+  s_fc788a2443134e::t_5837111afad127 1-23
+.agents/skills/writing-pr/prBase/README.md
+  s_fc788a2443134e::t_5837111afad127 1-26
+.agents/skills/writing-pr/prBase/blog.md
+  s_fc788a2443134e::t_5837111afad127 1-63
+.claude/skills/writing-pr
+  ai_agent 1
+.agents/skills/writing-pr/prBase/default.md
+  s_fc788a2443134e::t_5837111afad127 1-33
+.agents/skills/writing-pr/prBase/visual.md
+  s_fc788a2443134e::t_5837111afad127 1-80
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "2ea650176d0d4592a4f8234f9799f1b88e650b62",
+  "prompts": {},
+  "sessions": {
+    "s_fc788a2443134e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "2b7c6077-1824-48bd-96e2-5f60302f87ae",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
