@@ -1,6 +1,11 @@
 import { AbsoluteFill, Easing, interpolate, useCurrentFrame } from "remotion";
 
-import { COUNT_DURATION_IN_FRAMES, COUNT_START_FRAME } from "./constants";
+import {
+  COUNT_DURATION_IN_FRAMES,
+  COUNT_START_FRAME,
+  TABULAR_FONT_FAMILY,
+  TABULAR_FONT_WEIGHT,
+} from "./constants";
 
 const OUTLINE = [
   "3px 0 #fff",
@@ -57,14 +62,13 @@ export function StarCounter({
     >
       <div
         style={{
-          fontFamily,
-          fontWeight: 800,
+          fontFamily: TABULAR_FONT_FAMILY,
+          fontWeight: TABULAR_FONT_WEIGHT,
           fontSize,
           lineHeight: 1,
           color: "#0f172a",
           letterSpacing: "-0.04em",
           opacity: appear,
-          fontVariantNumeric: "tabular-nums",
           textShadow: OUTLINE,
         }}
       >

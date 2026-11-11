@@ -4,6 +4,9 @@ import type { AvatarSlot, ConfettiPiece } from "../../types/star-video";
 
 export const FONT_FAMILY =
   'Inter, "Helvetica Neue", Arial, system-ui, sans-serif';
+export const TABULAR_FONT_NAME = "Inter Tabular";
+export const TABULAR_FONT_WEIGHT = "800";
+export const TABULAR_FONT_FAMILY = `"${TABULAR_FONT_NAME}", ${FONT_FAMILY}`;
 
 export const VIDEO_WIDTH = 1280;
 export const VIDEO_HEIGHT = 720;
