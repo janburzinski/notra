@@ -5,6 +5,15 @@ import { Menu as MenuPrimitive } from "@base-ui/react/menu";
 import { ArrowRight01Icon, Tick02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import type * as React from "react";
+import {
+  DROPDOWN_DESTRUCTIVE_ITEM_CLASS_NAME,
+  DROPDOWN_INDICATOR_CLASS_NAME,
+  DROPDOWN_ITEM_CLASS_NAME,
+  DROPDOWN_LABEL_CLASS_NAME,
+  DROPDOWN_POPUP_CLASS_NAME,
+  DROPDOWN_SEPARATOR_CLASS_NAME,
+  DROPDOWN_SHORTCUT_CLASS_NAME,
+} from "@notra/ui/constants/dropdown";
 import { cn } from "@notra/ui/lib/utils";
 
 function ContextMenu({ ...props }: ContextMenuPrimitive.Root.Props) {
@@ -68,10 +77,7 @@ function ContextMenuContent({
         sideOffset={sideOffset}
       >
         <ContextMenuPrimitive.Popup
-          className={cn(
-            "data-closed:fade-out-0 data-open:fade-in-0 data-closed:zoom-out-95 data-open:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 max-h-(--available-height) min-w-40 origin-(--transform-origin) overflow-y-auto overflow-x-hidden rounded-lg bg-popover p-1 text-popover-foreground shadow-lg outline-none ring-1 ring-black/5 duration-instant data-closed:animate-out data-open:animate-in data-closed:overflow-hidden dark:bg-popover dark:ring-white/10",
-            className
-          )}
+          className={cn(DROPDOWN_POPUP_CLASS_NAME, "min-w-40 p-1", className)}
           data-slot="context-menu-content"
           {...props}
         />
@@ -95,11 +101,8 @@ function ContextMenuLabel({
 }) {
   return (
     <ContextMenuPrimitive.GroupLabel
-      className={cn(
-        "px-1.5 py-1 font-medium text-muted-foreground text-xs data-[inset]:pl-8",
-        className
-      )}
-      data-inset={inset}
+      className={cn(DROPDOWN_LABEL_CLASS_NAME, className)}
+      data-inset={inset || undefined}
       data-slot="context-menu-label"
       {...props}
     />
@@ -121,10 +124,12 @@ function ContextMenuItem({
   return (
     <ContextMenuPrimitive.Item
       className={cn(
-        "group/context-menu-item relative flex cursor-pointer select-none items-center gap-1.5 rounded-md px-1.5 py-1 text-sm outline-hidden dark:focus:bg-menu-highlight dark:focus:shadow-menu-highlight focus:bg-accent focus:text-accent-foreground not-data-[variant=destructive]:focus:**:text-accent-foreground data-disabled:pointer-events-none data-disabled:cursor-not-allowed data-[inset]:pl-8 data-[variant=destructive]:text-destructive data-disabled:opacity-50 data-[variant=destructive]:focus:bg-destructive/10 data-[variant=destructive]:focus:text-destructive dark:data-[variant=destructive]:focus:bg-destructive/10 [&_svg:not([class*='size-'])]:size-4 [&_svg]:pointer-events-none [&_svg]:shrink-0 data-[variant=destructive]:*:[svg]:text-destructive",
+        DROPDOWN_ITEM_CLASS_NAME,
+        DROPDOWN_DESTRUCTIVE_ITEM_CLASS_NAME,
+        "group/context-menu-item",
         className
       )}
-      data-inset={inset}
+      data-inset={inset || undefined}
       data-slot="context-menu-item"
       data-variant={variant}
       onClick={onClick}
@@ -153,17 +158,18 @@ function ContextMenuSubTrigger({
   return (
     <ContextMenuPrimitive.SubmenuTrigger
       className={cn(
-        "flex cursor-pointer select-none items-center gap-1.5 rounded-md px-1.5 py-1 text-sm outline-hidden dark:focus:bg-menu-highlight dark:focus:shadow-menu-highlight focus:bg-accent focus:text-accent-foreground not-data-[variant=destructive]:focus:**:text-accent-foreground data-popup-open:bg-accent dark:data-popup-open:bg-menu-highlight dark:data-popup-open:shadow-menu-highlight data-[inset]:pl-8 data-popup-open:text-accent-foreground [&_svg:not([class*='size-'])]:size-4 [&_svg]:pointer-events-none [&_svg]:shrink-0",
+        DROPDOWN_ITEM_CLASS_NAME,
+        "data-popup-open:bg-menu-highlight",
         className
       )}
-      data-inset={inset}
+      data-inset={inset || undefined}
       data-slot="context-menu-sub-trigger"
       {...props}
       closeDelay={closeDelay}
     >
       {children}
       <HugeiconsIcon
-        className="ml-auto"
+        className="-mr-0.5 ml-auto"
         icon={ArrowRight01Icon}
         strokeWidth={2}
       />
@@ -202,14 +208,15 @@ function ContextMenuCheckboxItem({
     <ContextMenuPrimitive.CheckboxItem
       checked={checked}
       className={cn(
-        "relative flex cursor-default select-none items-center gap-1.5 rounded-md py-1 pr-8 pl-1.5 text-sm outline-hidden dark:focus:bg-menu-highlight dark:focus:shadow-menu-highlight focus:bg-accent focus:text-accent-foreground focus:**:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg:not([class*='size-'])]:size-4 [&_svg]:pointer-events-none [&_svg]:shrink-0",
+        DROPDOWN_ITEM_CLASS_NAME,
+        "pr-(--menu-indent)",
         className
       )}
       data-slot="context-menu-checkbox-item"
       {...props}
     >
       <span
-        className="pointer-events-none absolute right-2 flex items-center justify-center"
+        className={DROPDOWN_INDICATOR_CLASS_NAME}
         data-slot="context-menu-checkbox-item-indicator"
       >
         <ContextMenuPrimitive.CheckboxItemIndicator>
@@ -238,14 +245,15 @@ function ContextMenuRadioItem({
   return (
     <ContextMenuPrimitive.RadioItem
       className={cn(
-        "relative flex cursor-default select-none items-center gap-1.5 rounded-md py-1 pr-8 pl-1.5 text-sm outline-hidden dark:focus:bg-menu-highlight dark:focus:shadow-menu-highlight focus:bg-accent focus:text-accent-foreground focus:**:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg:not([class*='size-'])]:size-4 [&_svg]:pointer-events-none [&_svg]:shrink-0",
+        DROPDOWN_ITEM_CLASS_NAME,
+        "pr-(--menu-indent)",
         className
       )}
       data-slot="context-menu-radio-item"
       {...props}
     >
       <span
-        className="pointer-events-none absolute right-2 flex items-center justify-center"
+        className={DROPDOWN_INDICATOR_CLASS_NAME}
         data-slot="context-menu-radio-item-indicator"
       >
         <ContextMenuPrimitive.RadioItemIndicator>
@@ -263,7 +271,7 @@ function ContextMenuSeparator({
 }: MenuPrimitive.Separator.Props) {
   return (
     <ContextMenuPrimitive.Separator
-      className={cn("-mx-1 my-1 h-px bg-border", className)}
+      className={cn(DROPDOWN_SEPARATOR_CLASS_NAME, className)}
       data-slot="context-menu-separator"
       {...props}
     />
@@ -276,10 +284,7 @@ function ContextMenuShortcut({
 }: React.ComponentProps<"span">) {
   return (
     <span
-      className={cn(
-        "ml-auto text-muted-foreground text-xs tracking-widest group-focus/context-menu-item:text-accent-foreground",
-        className
-      )}
+      className={cn(DROPDOWN_SHORTCUT_CLASS_NAME, className)}
       data-slot="context-menu-shortcut"
       {...props}
     />

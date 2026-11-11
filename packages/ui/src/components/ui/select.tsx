@@ -11,8 +11,11 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import type * as React from "react";
 import { buttonVariants } from "@notra/ui/components/ui/button";
 import {
+  DROPDOWN_INDICATOR_CLASS_NAME,
   DROPDOWN_ITEM_CLASS_NAME,
+  DROPDOWN_LABEL_CLASS_NAME,
   DROPDOWN_POPUP_CLASS_NAME,
+  DROPDOWN_SEPARATOR_CLASS_NAME,
   SELECT_COLLISION_AVOIDANCE,
 } from "@notra/ui/constants/dropdown";
 import { cn } from "@notra/ui/lib/utils";
@@ -142,10 +145,7 @@ function SelectLabel({
 }: SelectPrimitive.GroupLabel.Props) {
   return (
     <SelectPrimitive.GroupLabel
-      className={cn(
-        "px-2 py-1 font-medium text-muted-foreground text-xs",
-        className
-      )}
+      className={cn(DROPDOWN_LABEL_CLASS_NAME, className)}
       data-slot="select-label"
       {...props}
     />
@@ -161,7 +161,7 @@ function SelectItem({
     <SelectPrimitive.Item
       className={cn(
         DROPDOWN_ITEM_CLASS_NAME,
-        "w-full pr-7 *:[span]:last:flex *:[span]:last:items-center *:[span]:last:gap-2",
+        "w-full pr-(--menu-indent) *:[span]:last:flex *:[span]:last:items-center *:[span]:last:gap-2",
         className
       )}
       data-slot="select-item"
@@ -172,7 +172,7 @@ function SelectItem({
       </SelectPrimitive.ItemText>
       <SelectPrimitive.ItemIndicator
         render={
-          <span className="pointer-events-none absolute right-2 flex size-3.5 items-center justify-center" />
+          <span className={DROPDOWN_INDICATOR_CLASS_NAME} />
         }
       >
         <HugeiconsIcon
@@ -191,7 +191,11 @@ function SelectSeparator({
 }: SelectPrimitive.Separator.Props) {
   return (
     <SelectPrimitive.Separator
-      className={cn("pointer-events-none -mx-1 my-1 h-px bg-border", className)}
+      className={cn(
+        "pointer-events-none",
+        DROPDOWN_SEPARATOR_CLASS_NAME,
+        className
+      )}
       data-slot="select-separator"
       {...props}
     />

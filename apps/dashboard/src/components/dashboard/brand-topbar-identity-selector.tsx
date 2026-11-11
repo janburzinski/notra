@@ -142,11 +142,7 @@ export function BrandTopbarIdentitySelector({ slug }: { slug: string }) {
           </button>
         }
       />
-      <DropdownMenuContent
-        align="start"
-        className="min-w-52 rounded-lg"
-        sideOffset={8}
-      >
+      <DropdownMenuContent align="start" className="min-w-52" sideOffset={8}>
         <DropdownMenuGroup>
           <DropdownMenuLabel>
             {tCommon("labels.brandIdentities")}

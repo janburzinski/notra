@@ -390,7 +390,7 @@ function ProjectScopeSelect({
           icon={UnfoldMoreIcon}
         />
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="min-w-56 rounded-lg">
+      <DropdownMenuContent align="end" className="min-w-56">
         <DropdownMenuGroup>
           <DropdownMenuLabel>{tCommon("labels.projects")}</DropdownMenuLabel>
           <DropdownMenuItem
