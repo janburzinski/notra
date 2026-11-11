@@ -1,5 +1,4 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Effect } from "effect";
 
 import { GITHUB_CONNECTION_REQUIRED_MESSAGE } from "@/lib/star-video/github-cookies";
 import {
@@ -7,7 +6,6 @@ import {
   readGithubToken,
 } from "@/lib/star-video/github-oauth";
 import { loadRepoStarData } from "@/lib/star-video/load-repo";
-import { enforceStarVideoRateLimit } from "@/lib/star-video/ratelimit";
 import { repoQuerySchema } from "@/schemas/star-video";
 
 async function GET(request: Request) {
@@ -21,18 +19,6 @@ async function GET(request: Request) {
     return Response.json(
       { error: parsed.error.issues[0]?.message ?? "Invalid repository" },
       { status: 400 }
-    );
-  }
-
-  const rateLimited = await Effect.runPromise(
-    enforceStarVideoRateLimit(request, "lookup").pipe(
-      Effect.match({ onSuccess: () => false, onFailure: () => true })
-    )
-  );
-  if (rateLimited) {
-    return Response.json(
-      { error: "Too many requests. Please try again shortly." },
-      { status: 429 }
     );
   }
 

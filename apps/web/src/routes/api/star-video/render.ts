@@ -4,10 +4,6 @@ import { Effect } from "effect";
 import { GITHUB_CONNECTION_REQUIRED_MESSAGE } from "@/lib/star-video/github-cookies";
 import { readGithubToken } from "@/lib/star-video/github-oauth";
 import {
-  enforceGlobalRenderLimit,
-  enforceStarVideoRateLimit,
-} from "@/lib/star-video/ratelimit";
-import {
   RenderBusy,
   renderStarVideo,
   StarVideoRenderFailed,
@@ -41,9 +37,6 @@ async function POST(request: Request) {
 
   return Effect.runPromise(
     Effect.gen(function* () {
-      yield* enforceStarVideoRateLimit(request, "render");
-      yield* enforceGlobalRenderLimit();
-
       const video = yield* Effect.tryPromise({
         try: () => renderStarVideo(parsed.data),
         catch: (cause) =>
@@ -62,7 +55,6 @@ async function POST(request: Request) {
       Effect.match({
         onFailure: (error) => {
           switch (error._tag) {
-            case "StarVideoRateLimitExceeded":
             case "RenderBusy":
               return Response.json(
                 {
