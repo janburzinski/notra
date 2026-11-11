@@ -31,6 +31,7 @@ import { WEB_SESSION_RESOLVE_SCRIPT } from "@notra/geo-core/constants/web-sessio
 import { getGeoIngestSecret } from "@notra/geo-core/geo/ingest";
 import { urlHost } from "@notra/geo-core/utils/url-host";
 import { SITE_ENGAGEMENT_MAX_VISIBLE_MS } from "@notra/sites-core/constants/sites";
+import type { Redis } from "@upstash/redis";
 
 import type {
   WebEngagementInput,
@@ -100,6 +101,10 @@ function webRowBase({
   };
 }
 
+const createSessionScript = (client: Redis) =>
+  client.createScript<[string, number]>(WEB_SESSION_RESOLVE_SCRIPT);
+let sessionScript: ReturnType<typeof createSessionScript> | undefined;
+
 async function resolveSession(
   visitorId: string,
   origin: string | null
@@ -113,12 +118,10 @@ async function resolveSession(
     return { id, index: 0 };
   }
   const key = `${WEB_SESSION_KEY_PREFIX}:${visitorId}`;
-  const session = await client
-    .eval<[string, string, number], [string, number]>(
-      WEB_SESSION_RESOLVE_SCRIPT,
-      [key],
-      [id, origin ?? "", WEB_SESSION_TTL_SECONDS]
-    )
+  // `EVALSHA`, then `EVAL` once when Redis does not have the script yet.
+  sessionScript ??= createSessionScript(client);
+  const session = await sessionScript
+    .exec([key], [id, origin ?? "", String(WEB_SESSION_TTL_SECONDS)])
     .catch(() => null);
   return session ? { id: session[0], index: session[1] } : { id, index: 0 };
 }

@@ -133,6 +133,31 @@ export type GeoIngestDropReason =
 /** Admits one request for `key`; `now` is for tests. */
 export type LocalRateLimit = (key: string, now?: number) => boolean;
 
+/** One sliding-window budget, and the local bucket used when Redis is out. */
+export interface WebBudget {
+  /** The `@upstash/ratelimit` key: prefix and identifier. */
+  key: string;
+  identifier: string;
+  requests: number;
+  fallback: LocalRateLimit;
+}
+
+export type WebBudgetRefusal = Extract<
+  GeoIngestDropReason,
+  "network_rate_limited" | "web_rate_limited"
+>;
+
+/** A notra.js beacon's network budget, then its project budget. */
+export interface WebBeaconAdmission {
+  /** Spends the network budget once; later calls get the same answer. */
+  network: () => Promise<boolean>;
+  /**
+   * The project budget, and the network budget first when it is not spent
+   * yet, in one round trip. Null when both admit the beacon.
+   */
+  project: (admissionKey: string) => Promise<WebBudgetRefusal | null>;
+}
+
 export interface McpEventInput {
   identity: GeoIngestIdentity;
   payload: McpEventPayload;

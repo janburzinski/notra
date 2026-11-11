@@ -9,6 +9,14 @@ import type {
 import type { GeoIngestIdentity } from "@notra/geo-core/types/geo";
 import { Effect } from "effect";
 
+import {
+  WEB_AI_RATELIMIT_PREFIX,
+  WEB_INGEST_RATELIMIT_PREFIX,
+  WEB_NETWORK_RATELIMIT_PREFIX,
+  WEB_SHARED_NETWORK_RATELIMIT_PREFIX,
+} from "../src/constants/ingest";
+import { fakeWebLimitScript } from "./utils/web-limit-script";
+
 const STORED = { successful_rows: 1, quarantined_rows: 0 };
 const ingestGeoTrafficEvents = mock(async (_rows: unknown[]) => STORED);
 const ingestWebPageViews = mock(async (_rows: WebPageViewRow[]) => STORED);
@@ -83,11 +91,15 @@ mock.module("../src/ingest/analytics", () => ({
 }));
 mock.module("../src/ingest/ratelimit", () => ({
   geoIngestRatelimit: { limit: (_key: string) => aiRatelimit() },
-  webIngestRatelimit: { limit: projectLimit },
   geoIngestAdmissionRatelimit: { limit: admissionLimit },
-  webNetworkRatelimit: { limit: networkLimit },
-  webSharedNetworkRatelimit: { limit: networkLimit },
-  webAiRatelimit: { limit: webAiLimit },
+  webLimitScript: {
+    exec: fakeWebLimitScript({
+      [WEB_INGEST_RATELIMIT_PREFIX]: projectLimit,
+      [WEB_NETWORK_RATELIMIT_PREFIX]: networkLimit,
+      [WEB_SHARED_NETWORK_RATELIMIT_PREFIX]: networkLimit,
+      [WEB_AI_RATELIMIT_PREFIX]: webAiLimit,
+    }),
+  },
   geoIngestRedis: null,
 }));
 mock.module("@notra/ai/utils/redis", () => ({ redis: null }));
@@ -392,12 +404,16 @@ describe("runWebCollect", () => {
     ).toMatchObject({ success: { outcome: "dropped", reason: "origin" } });
     expect(networkLimit).not.toHaveBeenCalled();
 
+    // A refused budget stays refused for the rest of its window in this
+    // process, so this test spends its own network's.
     networkLimit.mockImplementation(async () => ({ success: false }));
-    expect(await send()).toMatchObject({
+    expect(
+      await send({}, { "x-vercel-forwarded-for": "198.51.100.20" })
+    ).toMatchObject({
       success: { outcome: "dropped", reason: "network_rate_limited" },
     });
     expect(networkLimit.mock.calls[0]?.[0]).toBe(
-      JSON.stringify(["org_1", "proj_1", "203.0.113.9"])
+      JSON.stringify(["org_1", "proj_1", "198.51.100.20"])
     );
     expect(projectLimit).not.toHaveBeenCalled();
     expect(ingestWebPageViews).not.toHaveBeenCalled();
@@ -406,7 +422,10 @@ describe("runWebCollect", () => {
   test("a malformed beacon spends the public web budget and stops before any database check", async () => {
     projectLimit.mockImplementation(async () => ({ success: false }));
     expect(
-      await send({}, { "user-agent": `${CHROME} ${"x".repeat(5000)}` })
+      await send(
+        { k: "nwk.org_1.proj_refused.good" },
+        { "user-agent": `${CHROME} ${"x".repeat(5000)}` }
+      )
     ).toMatchObject({
       _tag: "Failure",
       failure: { _tag: "GeoIngestRateLimited" },

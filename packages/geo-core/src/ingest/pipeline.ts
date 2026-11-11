@@ -42,6 +42,7 @@ import type {
   GeoIngestDropReason,
   GeoIngestPayload,
   GeoIngestResult,
+  WebBeaconAdmission,
   WebBeaconFields,
   WebErrorInput,
   WebEventInput,
@@ -84,8 +85,8 @@ import {
 } from "./web";
 import {
   admitWebAiEvent,
-  admitWebNetwork,
   admitWebProject,
+  createWebBeaconAdmission,
 } from "./web-limits";
 
 const readSiteIdentity = Effect.fnUntraced(function* (token: string) {
@@ -189,8 +190,21 @@ const parseUrl = Effect.fnUntraced(function* (value: string) {
   });
 });
 
-const admitWebPageView = Effect.fnUntraced(function* (admissionKey: string) {
-  return yield* Effect.promise(() => admitWebProject(admissionKey));
+/**
+ * The web budget, and for a notra.js beacon its network's budget first, in
+ * the same round trip. Null when the beacon is admitted.
+ */
+const admitWebPageView = Effect.fnUntraced(function* (
+  identity: GeoIngestIdentity,
+  admission?: WebBeaconAdmission
+) {
+  const admissionKey = geoIngestAdmissionKey(identity);
+  return yield* Effect.promise(async () => {
+    if (admission) {
+      return await admission.project(admissionKey);
+    }
+    return (await admitWebProject(admissionKey)) ? null : "web_rate_limited";
+  });
 });
 
 /**
@@ -274,12 +288,17 @@ export const writeGeoTrafficEvents = (rows: GeoTrafficEventRow[]) =>
 
 const failWithAuthPrecedence = Effect.fnUntraced(function* (
   identity: GeoIngestIdentity,
-  error: GeoIngestInvalidPayloadError | GeoIngestUnparseableUrlError
+  error: GeoIngestInvalidPayloadError | GeoIngestUnparseableUrlError,
+  admission?: WebBeaconAdmission
 ) {
   // A malformed public beacon spends the web budget, never a private one,
   // and stops there when it is spent: no database check for it either.
   if (identity.web) {
-    if (!(yield* admitWebPageView(geoIngestAdmissionKey(identity)))) {
+    const refused = yield* admitWebPageView(identity, admission);
+    if (refused === "network_rate_limited") {
+      return droppedResult(identity, "human", refused);
+    }
+    if (refused) {
       return yield* Effect.fail(
         new GeoIngestRateLimitedError({
           organizationId: identity.organizationId,
@@ -352,13 +371,15 @@ function isOutsideSiteMounts(identity: GeoIngestIdentity, url: URL): boolean {
  */
 const admitWebBeacon = Effect.fnUntraced(function* (
   identity: GeoIngestIdentity,
-  url: URL
+  url: URL,
+  admission?: WebBeaconAdmission
 ) {
   if (!geoIngestIdentityPolicy(identity).recordsVisits) {
     return droppedResult(identity, "human", "not_site");
   }
-  if (!(yield* admitWebPageView(geoIngestAdmissionKey(identity)))) {
-    return droppedResult(identity, "human", "web_rate_limited");
+  const refused = yield* admitWebPageView(identity, admission);
+  if (refused) {
+    return droppedResult(identity, "human", refused);
   }
   const [, allowedHosts] = yield* Effect.all(
     [
@@ -377,7 +398,8 @@ const runWebEngagementIngest = Effect.fnUntraced(function* (
   identity: GeoIngestIdentity,
   body: unknown,
   buffer: GeoIngestBuffer | undefined,
-  hashRoutes = false
+  hashRoutes = false,
+  admission?: WebBeaconAdmission
 ) {
   if (!geoIngestIdentityPolicy(identity).recordsVisits) {
     return droppedResult(identity, "human", "not_site");
@@ -386,16 +408,21 @@ const runWebEngagementIngest = Effect.fnUntraced(function* (
   if (!parsed.success) {
     return yield* failWithAuthPrecedence(
       identity,
-      new GeoIngestInvalidPayloadError({ issues: parsed.error.issues })
+      new GeoIngestInvalidPayloadError({ issues: parsed.error.issues }),
+      admission
     );
   }
   const payload = parsed.data;
   const urlResult = yield* Effect.result(parseUrl(payload.url));
   if (urlResult._tag === "Failure") {
-    return yield* failWithAuthPrecedence(identity, urlResult.failure);
+    return yield* failWithAuthPrecedence(
+      identity,
+      urlResult.failure,
+      admission
+    );
   }
   const url = urlResult.success;
-  const dropped = yield* admitWebBeacon(identity, url);
+  const dropped = yield* admitWebBeacon(identity, url, admission);
   if (dropped) {
     return dropped;
   }
@@ -420,9 +447,10 @@ const runWebEngagementIngest = Effect.fnUntraced(function* (
 
 const runWebEventIngest = Effect.fnUntraced(function* (
   input: WebEventInput,
-  buffer: GeoIngestBuffer | undefined
+  buffer: GeoIngestBuffer | undefined,
+  admission?: WebBeaconAdmission
 ) {
-  const dropped = yield* admitWebBeacon(input.identity, input.url);
+  const dropped = yield* admitWebBeacon(input.identity, input.url, admission);
   if (dropped) {
     return dropped;
   }
@@ -440,9 +468,10 @@ const runWebEventIngest = Effect.fnUntraced(function* (
 
 const runWebErrorIngest = Effect.fnUntraced(function* (
   input: WebErrorInput,
-  buffer: GeoIngestBuffer | undefined
+  buffer: GeoIngestBuffer | undefined,
+  admission?: WebBeaconAdmission
 ) {
-  const dropped = yield* admitWebBeacon(input.identity, input.url);
+  const dropped = yield* admitWebBeacon(input.identity, input.url, admission);
   if (dropped) {
     return dropped;
   }
@@ -508,17 +537,26 @@ export const runGeoEnvelopeIngest = Effect.fnUntraced(function* (
   body: unknown,
   defer: GeoIngestDefer,
   buffer?: GeoIngestBuffer,
-  beacon: Pick<WebPageViewInput, "viewId" | "hashRoutes"> = {}
+  beacon: Pick<WebPageViewInput, "viewId" | "hashRoutes"> = {},
+  admission?: WebBeaconAdmission
 ) {
   const payloadResult = yield* Effect.result(readPayload(body));
   if (payloadResult._tag === "Failure") {
-    return yield* failWithAuthPrecedence(identity, payloadResult.failure);
+    return yield* failWithAuthPrecedence(
+      identity,
+      payloadResult.failure,
+      admission
+    );
   }
   const payload = payloadResult.success;
 
   const urlResult = yield* Effect.result(parseUrl(payload.url));
   if (urlResult._tag === "Failure") {
-    return yield* failWithAuthPrecedence(identity, urlResult.failure);
+    return yield* failWithAuthPrecedence(
+      identity,
+      urlResult.failure,
+      admission
+    );
   }
   const url = urlResult.success;
   const classification = classifyVisitor({
@@ -529,22 +567,37 @@ export const runGeoEnvelopeIngest = Effect.fnUntraced(function* (
   });
   const policy = geoIngestIdentityPolicy(identity);
   const isWeb = geoIngestIdentityKind(identity) === "web";
-  let isAi = false;
-  if (policy.aiEvents === "tracked") {
-    isAi = isTrackedGeoVisitorType(classification.visitorType);
-  } else if (policy.aiEvents === "referrals-without-server") {
-    isAi =
-      classification.visitorType === "ai_referral" &&
-      !(yield* Effect.promise(() => hasServerTraffic(identity)));
-  } else {
-    isAi =
-      classification.visitorType === "ai_referral" &&
-      payload.visitorConsent === true;
-  }
   const countsVisitors =
     policy.recordsVisits &&
     payload.visitorConsent !== false &&
     isHumanPageView({ classification, payload, url });
+  // A browser's AI referral is only an AI event without a server SDK. For a
+  // counted visit that lookup waits until the budgets below admit it, so a
+  // beacon's network and project budgets still share one round trip.
+  const readsServerTraffic =
+    policy.aiEvents === "referrals-without-server" &&
+    classification.visitorType === "ai_referral";
+  let isAi = false;
+  if (policy.aiEvents === "tracked") {
+    isAi = isTrackedGeoVisitorType(classification.visitorType);
+  } else if (policy.aiEvents === "consented-referrals") {
+    isAi =
+      classification.visitorType === "ai_referral" &&
+      payload.visitorConsent === true;
+  }
+  // A beacon that is not a counted visit may skip the web budget below, so
+  // its network budget is spent before any other I/O.
+  if (
+    admission &&
+    !countsVisitors &&
+    (readsServerTraffic || isAi) &&
+    !(yield* Effect.promise(() => admission.network()))
+  ) {
+    return droppedResult(identity, "human", "network_rate_limited");
+  }
+  if (readsServerTraffic && !countsVisitors) {
+    isAi = !(yield* Effect.promise(() => hasServerTraffic(identity)));
+  }
   if (!(isAi || countsVisitors)) {
     return droppedResult(identity, classification.visitorType, "visitor_type");
   }
@@ -564,17 +617,22 @@ export const runGeoEnvelopeIngest = Effect.fnUntraced(function* (
   // A person's page view, and anything a public key sends, is admitted on the
   // web budget; the AI budget only decides whether the extra AI event is
   // written (see below). Public keys never touch the server SDK's budgets.
-  if (!(countsVisitors || isWeb)) {
+  if (countsVisitors || isWeb) {
+    const refused = yield* admitWebPageView(identity, admission);
+    if (refused === "network_rate_limited") {
+      return droppedResult(identity, "human", refused);
+    }
+    if (refused) {
+      return droppedResult(identity, classification.visitorType, refused);
+    }
+  } else {
     yield* enforceRateLimit(
       identity.organizationId,
       geoIngestAdmissionKey(identity)
     );
-  } else if (!(yield* admitWebPageView(geoIngestAdmissionKey(identity)))) {
-    return droppedResult(
-      identity,
-      classification.visitorType,
-      "web_rate_limited"
-    );
+  }
+  if (readsServerTraffic && countsVisitors) {
+    isAi = !(yield* Effect.promise(() => hasServerTraffic(identity)));
   }
   const [, allowedHosts, sitePrefixes] = yield* Effect.all(
     [
@@ -743,12 +801,46 @@ export const runGeoEnvelopeIngest = Effect.fnUntraced(function* (
  * or a Notra Site that relays it. `envelope` is the page view's request,
  * rebuilt from the beacon. A beacon is an outbound link click (`o`), else an
  * error (`x`), else engagement with web vitals (`t`), else a page view.
+ *
+ * `network` keys the sender's network budget (null without a trusted IP). It
+ * is spent on every beacon: with the project budget in one round trip when
+ * the beacon reaches it, else here once the beacon is dropped.
  */
 export const runWebBeacon = Effect.fnUntraced(function* (
   identity: GeoIngestIdentity,
   beacon: WebBeaconFields,
   envelope: GeoIngestPayload,
   url: URL,
+  network: string | null,
+  defer: GeoIngestDefer,
+  buffer?: GeoIngestBuffer
+) {
+  const admission = createWebBeaconAdmission(identity, network);
+  const result = yield* routeWebBeacon(
+    identity,
+    beacon,
+    envelope,
+    url,
+    admission,
+    defer,
+    buffer
+  );
+  if (!(yield* Effect.promise(() => admission.network()))) {
+    return droppedResult(identity, "human", "network_rate_limited");
+  }
+  return result;
+});
+
+/**
+ * Every path spends the web budgets before any other I/O, or drops the
+ * beacon without them.
+ */
+const routeWebBeacon = Effect.fnUntraced(function* (
+  identity: GeoIngestIdentity,
+  beacon: WebBeaconFields,
+  envelope: GeoIngestPayload,
+  url: URL,
+  admission: WebBeaconAdmission,
   defer: GeoIngestDefer,
   buffer?: GeoIngestBuffer
 ) {
@@ -758,10 +850,14 @@ export const runWebBeacon = Effect.fnUntraced(function* (
     beacon.x === undefined &&
     beacon.t === undefined
   ) {
-    return yield* runGeoEnvelopeIngest(identity, envelope, defer, buffer, {
-      viewId: beacon.v,
-      hashRoutes,
-    });
+    return yield* runGeoEnvelopeIngest(
+      identity,
+      envelope,
+      defer,
+      buffer,
+      { viewId: beacon.v, hashRoutes },
+      admission
+    );
   }
 
   // Outbound clicks, errors and engagement skip the page view's classification;
@@ -787,7 +883,8 @@ export const runWebBeacon = Effect.fnUntraced(function* (
         outboundUrl: beacon.o,
         hashRoutes,
       },
-      buffer
+      buffer,
+      admission
     );
   }
   if (beacon.x !== undefined) {
@@ -805,7 +902,8 @@ export const runWebBeacon = Effect.fnUntraced(function* (
         },
         hashRoutes,
       },
-      buffer
+      buffer,
+      admission
     );
   }
   return yield* runWebEngagementIngest(
@@ -823,7 +921,8 @@ export const runWebBeacon = Effect.fnUntraced(function* (
       clsMilli: beacon.c,
     },
     buffer,
-    hashRoutes
+    hashRoutes,
+    admission
   );
 });
 
@@ -857,18 +956,12 @@ const runSiteBeaconRelay = Effect.fnUntraced(function* (
   // Behind the customer's proxy the IP comes from X-Forwarded-For (or is
   // the proxy's own), so it can't key a per-network limit.
   const ip = request.ip && !proxied ? parseIp(request.ip) : null;
-  if (
-    !(yield* Effect.promise(() =>
-      admitWebNetwork(beaconIdentity, ip ? ipNetworkKey(ip) : null)
-    ))
-  ) {
-    return droppedResult(beaconIdentity, "human", "network_rate_limited");
-  }
   return yield* runWebBeacon(
     beaconIdentity,
     beacon,
     request,
     urlResult.success,
+    ip ? ipNetworkKey(ip) : null,
     defer,
     buffer
   );

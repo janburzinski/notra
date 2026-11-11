@@ -1,9 +1,24 @@
-import { beforeEach, describe, expect, mock, test } from "bun:test";
+import {
+  beforeEach,
+  describe,
+  expect,
+  mock,
+  setSystemTime,
+  test,
+} from "bun:test";
 
 import type { WebPageViewRow } from "@notra/analytics/types/tinybird-datasources";
 import type { GeoIngestIdentity } from "@notra/geo-core/types/geo";
 import type { Ratelimit } from "@upstash/ratelimit";
 import { Effect } from "effect";
+
+import {
+  WEB_AI_RATELIMIT_PREFIX,
+  WEB_INGEST_RATELIMIT_PREFIX,
+  WEB_NETWORK_RATELIMIT_PREFIX,
+  WEB_SHARED_NETWORK_RATELIMIT_PREFIX,
+} from "../src/constants/ingest";
+import { fakeWebLimitScript } from "./utils/web-limit-script";
 
 const STORED = { successful_rows: 1, quarantined_rows: 0 };
 const ingestGeoTrafficEvents = mock(
@@ -116,11 +131,15 @@ mock.module("../src/ingest/journey", () => ({
 }));
 mock.module("../src/ingest/ratelimit", () => ({
   geoIngestRatelimit: { limit: ratelimitLimit },
-  webIngestRatelimit: { limit: webRatelimitLimit },
   geoIngestAdmissionRatelimit: { limit: async () => ({ success: true }) },
-  webNetworkRatelimit: { limit: webNetworkLimit },
-  webSharedNetworkRatelimit: { limit: async () => ({ success: true }) },
-  webAiRatelimit: { limit: async () => ({ success: true }) },
+  webLimitScript: {
+    exec: fakeWebLimitScript({
+      [WEB_INGEST_RATELIMIT_PREFIX]: webRatelimitLimit,
+      [WEB_NETWORK_RATELIMIT_PREFIX]: webNetworkLimit,
+      [WEB_SHARED_NETWORK_RATELIMIT_PREFIX]: async () => ({ success: true }),
+      [WEB_AI_RATELIMIT_PREFIX]: async () => ({ success: true }),
+    }),
+  },
 }));
 
 const { runGeoIngest } = await import("../src/ingest/pipeline");
@@ -590,7 +609,12 @@ describe("runGeoIngest ordering", () => {
 
   test("site visitor counting retains the independent web admission limit", async () => {
     webRatelimitLimit.mockImplementation(async () => ({ success: false }));
-    expect(await run(ingestRequest(relayed(), SITE_TOKEN))).toMatchObject({
+    // A refused budget stays refused until its window ends: refuse it in a
+    // window long past, so the tests after this one are not refused.
+    setSystemTime(new Date("2026-01-01T00:00:00Z"));
+    const result = await run(ingestRequest(relayed(), SITE_TOKEN));
+    setSystemTime();
+    expect(result).toMatchObject({
       _tag: "Success",
       success: { outcome: "dropped", reason: "web_rate_limited" },
     });

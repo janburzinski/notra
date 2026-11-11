@@ -26,6 +26,7 @@ export const WEB_NETWORK_RATELIMIT_PREFIX = "ratelimit:web-network";
 export const WEB_NETWORK_RATELIMIT_MAX_REQUESTS = 120;
 /** Without a trusted client IP every visitor shares one, larger, bucket. */
 export const WEB_SHARED_NETWORK_KEY = "shared";
+export const WEB_SHARED_NETWORK_RATELIMIT_PREFIX = `${WEB_NETWORK_RATELIMIT_PREFIX}:shared`;
 export const WEB_SHARED_NETWORK_RATELIMIT_MAX_REQUESTS = 1000;
 /** AI referrals from public keys: their own budget, never the server's. */
 export const WEB_AI_RATELIMIT_PREFIX = "ratelimit:web-ai";
@@ -36,6 +37,44 @@ export const WEB_AI_DAILY_CAP = 5000;
 export const WEB_DAILY_COUNTER_TTL_SECONDS = 2 * 24 * 60 * 60;
 export const WEB_LOCAL_LIMITER_MAX_KEYS = 10_000;
 export const WEB_RATELIMIT_WINDOW_MS = 60_000;
+/**
+ * Spends sliding-window budgets in order in one round trip, with the
+ * algorithm, keys and expiry of `@upstash/ratelimit`'s `slidingWindow`, so
+ * counts carry over between the two. A budget that refuses ends the check and
+ * later ones are not spent. When all admit, an optional daily counter is
+ * incremented and given its TTL in the same script, so it never lives on
+ * without one. Upstash locks only the declared keys (`allow-key-locking`).
+ *
+ * KEYS: each budget's current and previous window, then the counter if any.
+ * ARGV: now (ms), window (ms), counter TTL (s), then each budget's limit.
+ * Returns how many budgets admitted the request and the counter's value.
+ */
+export const WEB_LIMIT_SCRIPT = `#!lua flags=allow-key-locking
+local now = tonumber(ARGV[1])
+local window = tonumber(ARGV[2])
+local budgets = math.floor(#KEYS / 2)
+local previousWeight = 1 - (now % window) / window
+for index = 1, budgets do
+  local current = KEYS[index * 2 - 1]
+  local used = tonumber(redis.call("GET", current) or 0)
+  local previous = tonumber(redis.call("GET", KEYS[index * 2]) or 0)
+  if math.floor(previousWeight * previous) + used >= tonumber(ARGV[index + 3]) then
+    return {index - 1, 0}
+  end
+  if redis.call("INCR", current) == 1 then
+    redis.call("PEXPIRE", current, window * 2 + 1000)
+  end
+end
+local counter = KEYS[budgets * 2 + 1]
+if not counter then
+  return {budgets, 0}
+end
+local count = redis.call("INCR", counter)
+if redis.call("TTL", counter) < 0 then
+  redis.call("EXPIRE", counter, ARGV[3])
+end
+return {budgets, count}
+`;
 /** notra.js beacons are small; anything larger is not one of them. */
 export const GEO_WEB_COLLECT_MAX_BODY_BYTES = 4 * 1024;
 /** Cloudflare ray ids, the only request ids a beacon's headers may carry. */

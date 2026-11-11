@@ -1,4 +1,13 @@
-export const WEB_SESSION_RESOLVE_SCRIPT = `
+/**
+ * Continues the visitor's session, or opens one when there is none or the
+ * view arrives from another source. It touches only `KEYS[1]`, so Upstash
+ * locks just that key (`allow-key-locking`).
+ *
+ * KEYS: the visitor's session key.
+ * ARGV: a new session id, the arrival origin ("" inside a visit), TTL (s).
+ * Returns the session id and the view's page index.
+ */
+export const WEB_SESSION_RESOLVE_SCRIPT = `#!lua flags=allow-key-locking
 local stored = redis.call('GET', KEYS[1])
 local next = { id = ARGV[1], index = 1, origin = ARGV[2] }
 if stored then

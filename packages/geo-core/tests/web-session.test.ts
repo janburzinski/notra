@@ -46,25 +46,23 @@ if (!isIsolatedTestWorker(import.meta.url)) {
   let gate = Promise.resolve();
   mock.module("@notra/ai/utils/redis", () => ({
     redis: {
-      eval: async (
-        script: string,
-        keys: [string],
-        args: [string, string, number]
-      ) => {
-        await gate;
-        if (fail) {
-          throw new Error("Redis unavailable");
-        }
-        expect(script).toBe(WEB_SESSION_RESOLVE_SCRIPT);
-        expect(args[2]).toBe(WEB_SESSION_TTL_SECONDS);
-        const current = store.get(keys[0]);
-        const next =
-          current && (!args[1] || current.origin === args[1])
-            ? { ...current, index: current.index + 1 }
-            : { id: args[0], index: 1, origin: args[1] };
-        store.set(keys[0], next);
-        return [next.id, next.index];
-      },
+      createScript: (script: string) => ({
+        exec: async (keys: [string], args: [string, string, string]) => {
+          await gate;
+          if (fail) {
+            throw new Error("Redis unavailable");
+          }
+          expect(script).toBe(WEB_SESSION_RESOLVE_SCRIPT);
+          expect(args[2]).toBe(String(WEB_SESSION_TTL_SECONDS));
+          const current = store.get(keys[0]);
+          const next =
+            current && (!args[1] || current.origin === args[1])
+              ? { ...current, index: current.index + 1 }
+              : { id: args[0], index: 1, origin: args[1] };
+          store.set(keys[0], next);
+          return [next.id, next.index];
+        },
+      }),
     },
   }));
 

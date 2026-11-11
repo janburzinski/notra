@@ -20,7 +20,6 @@ import {
   GeoIngestUnparseableUrlError,
 } from "./errors";
 import { droppedResult, runWebBeacon } from "./pipeline";
-import { admitWebNetwork } from "./web-limits";
 
 function parseJson(text: string): unknown {
   try {
@@ -73,18 +72,12 @@ export const runWebCollect = Effect.fn("geoIngest.collect")(function* (
   if (origin && URL.parse(origin)?.host !== url.host) {
     return droppedResult(identity, "human", "origin", url.hostname);
   }
-  if (
-    !(yield* Effect.promise(() =>
-      admitWebNetwork(identity, getClientNetworkKey(request.headers))
-    ))
-  ) {
-    return droppedResult(identity, "human", "network_rate_limited");
-  }
   return yield* runWebBeacon(
     identity,
     payload,
     webCollectEnvelope(request.headers, payload.u, payload.r, options),
     url,
+    getClientNetworkKey(request.headers),
     defer,
     buffer
   );
