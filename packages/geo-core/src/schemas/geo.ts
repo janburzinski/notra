@@ -590,6 +590,21 @@ export const webCollectPayloadSchema = object({
   xl: number().int().min(0).max(WEB_UINT32_MAX).optional(),
 });
 
+/**
+ * A notra.js beacon a Notra Site relays from its own origin, with the Site's
+ * token. The Site rebuilds the page view's request (public page URL, client
+ * IP, country, user agent, status, and the visitor's consent behind a cookie
+ * banner) in `request`, since the browser never talks to ingest; `beacon`
+ * keeps the rest of what notra.js sent.
+ */
+export const webBeaconRelayPayloadSchema = object({
+  type: literal("beacon"),
+  request: geoRequestPayloadSchema,
+  /** The Site is served through the customer's reverse proxy. */
+  proxied: boolean().optional(),
+  beacon: webCollectPayloadSchema.omit({ k: true, u: true, r: true }),
+});
+
 const mcpPeerSchema = object({
   name: string().max(GEO_SHORT_FIELD_MAX_LENGTH).optional(),
   version: string().max(GEO_SHORT_FIELD_MAX_LENGTH).optional(),

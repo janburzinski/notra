@@ -13,8 +13,6 @@ import {
   readLimitedText,
   webCollectEnvelope,
 } from "../utils/web-collect-request";
-import { isHumanPageView } from "../utils/web-page-view";
-import { classifyVisitor } from "./classify-visitor";
 import {
   GeoIngestInvalidPayloadError,
   GeoIngestInvalidTokenError,
@@ -22,13 +20,7 @@ import {
   GeoIngestUnparseableUrlError,
 } from "./errors";
 import { isWebAnalyticsAdmitted } from "./identity";
-import {
-  droppedResult,
-  runGeoEnvelopeIngest,
-  runWebEngagementIngest,
-  runWebErrorIngest,
-  runWebEventIngest,
-} from "./pipeline";
+import { droppedResult, runWebBeacon } from "./pipeline";
 import { admitWebNetwork } from "./web-limits";
 
 function parseJson(text: string): unknown {
@@ -43,10 +35,8 @@ function parseJson(text: string): unknown {
  * Ingests one beacon from notra.js. The body is text/plain so browsers never
  * send a CORS preflight; the public key inside it picks the project, and the
  * shared pipeline applies the same host allowlist, bot filtering, sessions and
- * rate limits as server-side page views.
- *
- * A beacon is an outbound link click (`o`), else an error (`x`), else
- * engagement with web vitals (`t`), else a page view.
+ * rate limits as server-side page views. Notra Sites relay the same beacons
+ * with their token instead (`runGeoIngest`).
  */
 export const runWebCollect = Effect.fn("geoIngest.collect")(function* (
   request: Request,
@@ -82,7 +72,6 @@ export const runWebCollect = Effect.fn("geoIngest.collect")(function* (
       new GeoIngestUnparseableUrlError({ url: payload.u })
     );
   }
-  const hashRoutes = payload.h === true;
   // Checked before any I/O: a key copied to another site costs no Redis call.
   const origin = request.headers.get("origin");
   if (origin && URL.parse(origin)?.host !== url.host) {
@@ -95,85 +84,12 @@ export const runWebCollect = Effect.fn("geoIngest.collect")(function* (
   ) {
     return droppedResult(identity, "human", "network_rate_limited");
   }
-  if (
-    payload.o === undefined &&
-    payload.x === undefined &&
-    payload.t === undefined
-  ) {
-    return yield* runGeoEnvelopeIngest(
-      identity,
-      webCollectEnvelope(request.headers, payload.u, payload.r, options),
-      defer,
-      buffer,
-      { viewId: payload.v, hashRoutes }
-    );
-  }
-
-  // Outbound clicks, errors and engagement skip the page view's classification;
-  // apply its user-agent checks here so automation cannot add them on its own.
-  const envelope = webCollectEnvelope(
-    request.headers,
-    payload.u,
-    undefined,
-    options
-  );
-  const classification = classifyVisitor({
-    userAgent: envelope.userAgent,
-    referer: undefined,
-    accept: envelope.accept,
-    signals: envelope.signals,
-  });
-  if (!isHumanPageView({ classification, payload: envelope, url })) {
-    return droppedResult(identity, classification.visitorType, "visitor_type");
-  }
-  const capturedAt = new Date();
-  if (payload.o !== undefined) {
-    return yield* runWebEventIngest(
-      {
-        identity,
-        payload: envelope,
-        url,
-        capturedAt,
-        viewId: payload.v,
-        outboundUrl: payload.o,
-        hashRoutes,
-      },
-      buffer
-    );
-  }
-  if (payload.x !== undefined) {
-    return yield* runWebErrorIngest(
-      {
-        identity,
-        payload: envelope,
-        url,
-        capturedAt,
-        viewId: payload.v,
-        error: {
-          message: payload.x,
-          source: payload.xs ?? "",
-          line: payload.xl ?? 0,
-        },
-        hashRoutes,
-      },
-      buffer
-    );
-  }
-  return yield* runWebEngagementIngest(
+  return yield* runWebBeacon(
     identity,
-    {
-      type: "engagement",
-      url: payload.u,
-      viewId: payload.v,
-      visibleMs: payload.t,
-      scrollDepth: payload.s ?? 0,
-      lcpMs: payload.l,
-      fcpMs: payload.f,
-      ttfbMs: payload.b,
-      inpMs: payload.i,
-      clsMilli: payload.c,
-    },
-    buffer,
-    hashRoutes
+    payload,
+    webCollectEnvelope(request.headers, payload.u, payload.r, options),
+    url,
+    defer,
+    buffer
   );
 });

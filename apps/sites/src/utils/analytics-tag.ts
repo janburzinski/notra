@@ -14,6 +14,10 @@ import type {
   ResolvedDeployment,
 } from "../types/serving";
 
+/**
+ * The mounted area a page belongs to. Pages outside every area (their themed
+ * 404) get no script: ingest only counts pages below the site's mounts.
+ */
 function analyticsMount(
   loaded: LoadedManifest,
   pathname: string
@@ -22,7 +26,7 @@ function analyticsMount(
   if (path === null) {
     return null;
   }
-  return resolveAreaForPath(loaded.manifest.target.mounts, path)?.mount ?? "/";
+  return resolveAreaForPath(loaded.manifest.target.mounts, path)?.mount ?? null;
 }
 
 export function analyticsScriptTag(
@@ -38,6 +42,5 @@ export function analyticsScriptTag(
         scriptSrc: joinMountPath(mount, SITE_ANALYTICS_SCRIPT_FILE),
         eventPath: joinMountPath(mount, SITE_ANALYTICS_EVENT_FILE),
         consent: visitorConsent !== undefined,
-        reportsView: visitorConsent === false,
       };
 }

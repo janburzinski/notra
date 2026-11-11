@@ -20,7 +20,8 @@ import { GeoIngestFailedError, GeoIngestInvalidTokenError } from "./errors";
 // Concurrent checks of one key share a lookup. A passed check of an identity
 // that posts on every page view is kept a minute so it skips Postgres; the
 // generation is part of the key, so a rotated-out key is never admitted on the
-// strength of the new key's check. Failed lookups are never kept.
+// strength of the new key's check. An identity that ignores rotation (a Site)
+// passes while its scope exists. Failed lookups are never kept.
 const generations = Effect.runSync(
   Cache.makeWith(
     (key: GeoIngestGenerationKey) =>
@@ -35,7 +36,9 @@ const generations = Effect.runSync(
       timeToLive: (exit, key) =>
         key.cachesChecks &&
         Exit.isSuccess(exit) &&
-        exit.value === key.generation
+        (key.followsRotation
+          ? exit.value === key.generation
+          : exit.value !== null)
           ? GEO_WEB_IDENTITY_MEMO_MS
           : 0,
     }
@@ -80,6 +83,7 @@ export const assertGeoIngestIdentityActive = Effect.fnUntraced(function* (
       projectId: identity.projectId,
       generation: identity.generation,
       cachesChecks: policy.cachesChecks,
+      followsRotation: policy.followsRotation,
     })
   ).pipe(
     Effect.mapError(

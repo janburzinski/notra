@@ -9037,7 +9037,7 @@
         "done": "Analytics ist aus",
         "enable": "Einschalten",
         "enableConfirmTitle": "Analytics für diese Seite einschalten?",
-        "enableConfirmDescription": "Notra zählt Seitenaufrufe beim Ausliefern, ohne Cookies, und bindet ein kleines Script ein, das misst, wie lange jede Seite sichtbar ist. AI-Agents werden ebenfalls erfasst. Gezählt wird ab jetzt, die Zeit, in der Analytics aus war, bleibt leer.",
+        "enableConfirmDescription": "Notra bindet notra.js auf jeder Seite ein, direkt von der Site und ohne Cookies, und zählt damit Besucher, Verweildauer und Web Vitals. AI-Agents werden ebenfalls erfasst. Gezählt wird ab jetzt, die Zeit, in der Analytics aus war, bleibt leer.",
         "enabled": "Analytics ist an",
         "failed": "Analytics konnte nicht geändert werden"
       },

@@ -49,7 +49,6 @@ export interface AnalyticsScriptTag {
   scriptSrc: string;
   eventPath: string;
   consent: boolean;
-  reportsView: boolean;
 }
 
 export interface RedirectMatch {

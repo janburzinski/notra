@@ -3,16 +3,22 @@ import {
   SITE_ANALYTICS_EVENT_FILE,
   SITE_ENGAGEMENT_VIEW_ID_PATTERN,
 } from "@notra/sites-core/constants/sites";
+import {
+  TRACKER_SCRIPT,
+  TRACKER_SCRIPT_VERSION,
+} from "@notra/web-tracker/script";
 
 import {
+  ANALYTICS_BEACON_PAGE_FIELDS,
   ANALYTICS_EVENT_MAX_BYTES,
-  ANALYTICS_SCRIPT,
   ANALYTICS_SCRIPT_CACHE_CONTROL,
+  ANALYTICS_SCRIPT_IMMUTABLE_CACHE_CONTROL,
+  ANALYTICS_SCRIPT_KEY,
+  ANALYTICS_STATUS_PARAM,
 } from "./constants/analytics";
 import type { AnalyticsScriptTag } from "./types/serving";
-import type { AnalyticsEvent, EngagementReport } from "./types/traffic";
+import type { AnalyticsBeacon } from "./types/traffic";
 import { escapeHtml } from "./utils/html";
-import { postToIngest } from "./utils/ingest";
 
 export function isAnalyticsEventPath(pathname: string): boolean {
   return pathname.endsWith(`/${SITE_ANALYTICS_EVENT_FILE}`);
@@ -36,11 +42,15 @@ export function isForeignAnalyticsPost(
   return origin !== null && !origins.includes(origin);
 }
 
-export function analyticsScriptResponse(): Response {
-  return new Response(ANALYTICS_SCRIPT, {
+/** notra.js, the same build static.usenotra.com serves, from the Site itself. */
+export function analyticsScriptResponse(url: URL): Response {
+  return new Response(TRACKER_SCRIPT, {
     headers: {
       "Content-Type": "text/javascript; charset=utf-8",
-      "Cache-Control": ANALYTICS_SCRIPT_CACHE_CONTROL,
+      "Cache-Control":
+        url.searchParams.get("v") === TRACKER_SCRIPT_VERSION
+          ? ANALYTICS_SCRIPT_IMMUTABLE_CACHE_CONTROL
+          : ANALYTICS_SCRIPT_CACHE_CONTROL,
       "X-Content-Type-Options": "nosniff",
     },
   });
@@ -53,8 +63,12 @@ export function injectAnalyticsScript(
   const consent = analytics.consent
     ? ` type="text/plain" data-c15t-category="${C15T_ANALYTICS_CATEGORY}"`
     : "";
-  const view = analytics.reportsView ? " data-view" : "";
-  const tag = `<script${consent} src="${escapeHtml(analytics.scriptSrc)}" data-endpoint="${escapeHtml(analytics.eventPath)}"${view} defer></script>`;
+  const src = `${analytics.scriptSrc}?v=${TRACKER_SCRIPT_VERSION}`;
+  const api =
+    response.status === 404
+      ? `${analytics.eventPath}?${ANALYTICS_STATUS_PARAM}=404`
+      : analytics.eventPath;
+  const tag = `<script${consent} src="${escapeHtml(src)}" data-key="${ANALYTICS_SCRIPT_KEY}" data-api="${escapeHtml(api)}" defer></script>`;
   return new HTMLRewriter()
     .on("body", {
       element(element) {
@@ -64,48 +78,47 @@ export function injectAnalyticsScript(
     .transform(response);
 }
 
-function parseAnalyticsEvent(text: string): AnalyticsEvent | null {
+/**
+ * The page and the fields ingest checks itself. Only what the Site replaces
+ * (page URL and referrer) is validated here; ingest validates the rest.
+ */
+function parseBeacon(text: string): AnalyticsBeacon | null {
   let body: unknown;
   try {
     body = JSON.parse(text);
   } catch {
     return null;
   }
-  if (typeof body !== "object" || body === null) {
+  if (typeof body !== "object" || body === null || Array.isArray(body)) {
     return null;
   }
-  const { k, r, v, p, ms, sd } = body as Record<string, unknown>;
-  if (typeof p !== "string" || !p.startsWith("/")) {
-    return null;
-  }
-  if (k === "view") {
-    return typeof r === "string"
-      ? { kind: "view", path: p, referrer: r }
-      : null;
-  }
+  const { u, r, v } = body as Record<string, unknown>;
+  const page = typeof u === "string" ? URL.parse(u) : null;
   if (
+    !page ||
     typeof v !== "string" ||
     !SITE_ENGAGEMENT_VIEW_ID_PATTERN.test(v) ||
-    typeof ms !== "number" ||
-    !Number.isFinite(ms) ||
-    ms < 0 ||
-    typeof sd !== "number" ||
-    !Number.isFinite(sd)
+    (r !== undefined && typeof r !== "string")
   ) {
     return null;
   }
+  const fields: Record<string, unknown> = {};
+  for (const [name, value] of Object.entries(body)) {
+    if (!ANALYTICS_BEACON_PAGE_FIELDS.has(name)) {
+      fields[name] = value;
+    }
+  }
   return {
-    kind: "engagement",
-    viewId: v,
-    path: p,
-    visibleMs: Math.round(ms),
-    scrollDepth: Math.min(100, Math.max(0, Math.round(sd))),
+    page: `${page.pathname}${page.search}${page.hash}`,
+    referrer: r ?? null,
+    isPageView: !("o" in body || "x" in body || "t" in body),
+    fields,
   };
 }
 
-export async function readAnalyticsEvent(
+export async function readAnalyticsBeacon(
   request: Request
-): Promise<AnalyticsEvent | null> {
+): Promise<AnalyticsBeacon | null> {
   const length = Number(request.headers.get("content-length") ?? 0);
   if (length > ANALYTICS_EVENT_MAX_BYTES) {
     return null;
@@ -114,25 +127,5 @@ export async function readAnalyticsEvent(
   if (text.length === 0 || text.length > ANALYTICS_EVENT_MAX_BYTES) {
     return null;
   }
-  return parseAnalyticsEvent(text);
-}
-
-export async function reportEngagement(
-  report: EngagementReport
-): Promise<void> {
-  const { event, publicOrigin } = report;
-  await postToIngest({
-    fetch: report.fetch,
-    ingestUrl: report.ingestUrl,
-    token: report.token,
-    kind: "engagement",
-    buildBody: () => ({
-      type: "engagement",
-      timestamp: new Date().toISOString(),
-      url: new URL(event.path, publicOrigin).href,
-      viewId: event.viewId,
-      visibleMs: event.visibleMs,
-      scrollDepth: event.scrollDepth,
-    }),
-  });
+  return parseBeacon(text);
 }

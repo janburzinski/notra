@@ -5,6 +5,7 @@ import { loadManifest } from "../loaders";
 import { isReportablePageView, reportTraffic } from "../traffic";
 import type { ResolvedDeployment, SiteRequestContext } from "../types/serving";
 import { StateUnavailableError } from "../utils/errors";
+import { publicPageUrl } from "../utils/public-url";
 import { runRoutes } from "../utils/run-routes";
 import { visitorConsent } from "../utils/visitor-consent";
 import { serveManifest } from "./serve-manifest";
@@ -56,7 +57,7 @@ export const serveDeployment = Effect.fnUntraced(function* (
         request,
         method: request.method,
         referer: request.headers.get("referer"),
-        publicUrl: new URL(`${url.pathname}${url.search}`, publicOrigin).href,
+        publicUrl: publicPageUrl(`${url.pathname}${url.search}`, publicOrigin),
         proxied: new URL(publicOrigin).hostname !== host,
         status: response.status,
         visitorConsent: consent,

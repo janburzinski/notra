@@ -21,6 +21,7 @@ import {
 import {
   geoRequestPayloadSchema,
   mcpEventBatchSchema,
+  webBeaconRelayPayloadSchema,
   webEngagementPayloadSchema,
 } from "@notra/geo-core/schemas/geo";
 import type {
@@ -30,6 +31,7 @@ import type {
 import { isTrackedGeoVisitorType } from "@notra/geo-core/utils/ai-traffic";
 import { acceptsIngestHost } from "@notra/geo-core/utils/geo-project-domains";
 import { isServedBySite } from "@notra/geo-core/utils/ingest-sites";
+import { ipNetworkKey, parseIp } from "@notra/utils/client-ip";
 import { Effect } from "effect";
 
 import { GEO_INGEST_TINYBIRD_TIMEOUT_MS } from "../constants/ingest";
@@ -38,7 +40,9 @@ import type {
   GeoIngestBuffer,
   GeoIngestDefer,
   GeoIngestDropReason,
+  GeoIngestPayload,
   GeoIngestResult,
+  WebBeaconFields,
   WebErrorInput,
   WebEventInput,
   WebPageViewInput,
@@ -76,9 +80,13 @@ import {
   buildWebErrorRow,
   buildWebEventRow,
   buildWebPageView,
-  isWebEngagementBody,
+  isWebBeaconRelayBody,
 } from "./web";
-import { admitWebAiEvent, admitWebProject } from "./web-limits";
+import {
+  admitWebAiEvent,
+  admitWebNetwork,
+  admitWebProject,
+} from "./web-limits";
 
 const readSiteIdentity = Effect.fnUntraced(function* (token: string) {
   const siteId = verifyGeoIngestSiteToken(token);
@@ -365,7 +373,7 @@ const admitWebBeacon = Effect.fnUntraced(function* (
   return null;
 });
 
-export const runWebEngagementIngest = Effect.fnUntraced(function* (
+const runWebEngagementIngest = Effect.fnUntraced(function* (
   identity: GeoIngestIdentity,
   body: unknown,
   buffer: GeoIngestBuffer | undefined,
@@ -410,7 +418,7 @@ export const runWebEngagementIngest = Effect.fnUntraced(function* (
   return webOnlyResult(identity, "human");
 });
 
-export const runWebEventIngest = Effect.fnUntraced(function* (
+const runWebEventIngest = Effect.fnUntraced(function* (
   input: WebEventInput,
   buffer: GeoIngestBuffer | undefined
 ) {
@@ -430,7 +438,7 @@ export const runWebEventIngest = Effect.fnUntraced(function* (
   return webOnlyResult(input.identity, "human");
 });
 
-export const runWebErrorIngest = Effect.fnUntraced(function* (
+const runWebErrorIngest = Effect.fnUntraced(function* (
   input: WebErrorInput,
   buffer: GeoIngestBuffer | undefined
 ) {
@@ -521,11 +529,18 @@ export const runGeoEnvelopeIngest = Effect.fnUntraced(function* (
   });
   const policy = geoIngestIdentityPolicy(identity);
   const isWeb = geoIngestIdentityKind(identity) === "web";
-  const isAi =
-    policy.aiEvents === "tracked"
-      ? isTrackedGeoVisitorType(classification.visitorType)
-      : classification.visitorType === "ai_referral" &&
-        !(yield* Effect.promise(() => hasServerTraffic(identity)));
+  let isAi = false;
+  if (policy.aiEvents === "tracked") {
+    isAi = isTrackedGeoVisitorType(classification.visitorType);
+  } else if (policy.aiEvents === "referrals-without-server") {
+    isAi =
+      classification.visitorType === "ai_referral" &&
+      !(yield* Effect.promise(() => hasServerTraffic(identity)));
+  } else {
+    isAi =
+      classification.visitorType === "ai_referral" &&
+      payload.visitorConsent === true;
+  }
   const countsVisitors =
     policy.recordsVisits &&
     payload.visitorConsent !== false &&
@@ -533,9 +548,15 @@ export const runGeoEnvelopeIngest = Effect.fnUntraced(function* (
   if (!(isAi || countsVisitors)) {
     return droppedResult(identity, classification.visitorType, "visitor_type");
   }
+  // Behind a cookie banner a Site's reports carry the stored choice, but a
+  // visitor who allows measurement on the landing page has none yet. Their
+  // AI referral comes from the notra.js page view the grant lets run, so the
+  // server report leaves every referral to it and each counts once.
   if (
     classification.visitorType === "ai_referral" &&
-    payload.visitorConsent === false
+    (payload.visitorConsent === false ||
+      (payload.visitorConsent !== undefined &&
+        geoIngestIdentityKind(identity) === "site"))
   ) {
     return droppedResult(identity, classification.visitorType, "consent");
   }
@@ -717,6 +738,142 @@ export const runGeoEnvelopeIngest = Effect.fnUntraced(function* (
   } satisfies GeoIngestResult;
 });
 
+/**
+ * One notra.js beacon once its sender is known: a public key (`runWebCollect`)
+ * or a Notra Site that relays it. `envelope` is the page view's request,
+ * rebuilt from the beacon. A beacon is an outbound link click (`o`), else an
+ * error (`x`), else engagement with web vitals (`t`), else a page view.
+ */
+export const runWebBeacon = Effect.fnUntraced(function* (
+  identity: GeoIngestIdentity,
+  beacon: WebBeaconFields,
+  envelope: GeoIngestPayload,
+  url: URL,
+  defer: GeoIngestDefer,
+  buffer?: GeoIngestBuffer
+) {
+  const hashRoutes = beacon.h === true;
+  if (
+    beacon.o === undefined &&
+    beacon.x === undefined &&
+    beacon.t === undefined
+  ) {
+    return yield* runGeoEnvelopeIngest(identity, envelope, defer, buffer, {
+      viewId: beacon.v,
+      hashRoutes,
+    });
+  }
+
+  // Outbound clicks, errors and engagement skip the page view's classification;
+  // apply its user-agent checks here so automation cannot add them on its own.
+  const classification = classifyVisitor({
+    userAgent: envelope.userAgent,
+    referer: undefined,
+    accept: envelope.accept,
+    signals: envelope.signals,
+  });
+  if (!isHumanPageView({ classification, payload: envelope, url })) {
+    return droppedResult(identity, classification.visitorType, "visitor_type");
+  }
+  const capturedAt = new Date();
+  if (beacon.o !== undefined) {
+    return yield* runWebEventIngest(
+      {
+        identity,
+        payload: envelope,
+        url,
+        capturedAt,
+        viewId: beacon.v,
+        outboundUrl: beacon.o,
+        hashRoutes,
+      },
+      buffer
+    );
+  }
+  if (beacon.x !== undefined) {
+    return yield* runWebErrorIngest(
+      {
+        identity,
+        payload: envelope,
+        url,
+        capturedAt,
+        viewId: beacon.v,
+        error: {
+          message: beacon.x,
+          source: beacon.xs ?? "",
+          line: beacon.xl ?? 0,
+        },
+        hashRoutes,
+      },
+      buffer
+    );
+  }
+  return yield* runWebEngagementIngest(
+    identity,
+    {
+      type: "engagement",
+      url: envelope.url,
+      viewId: beacon.v,
+      visibleMs: beacon.t,
+      scrollDepth: beacon.s ?? 0,
+      lcpMs: beacon.l,
+      fcpMs: beacon.f,
+      ttfbMs: beacon.b,
+      inpMs: beacon.i,
+      clsMilli: beacon.c,
+    },
+    buffer,
+    hashRoutes
+  );
+});
+
+/**
+ * A notra.js beacon a Notra Site relays from its own origin. Only a Site's
+ * token may relay one: the Site vouches for the client IP and country in the
+ * rebuilt request, which a public key could forge.
+ */
+const runSiteBeaconRelay = Effect.fnUntraced(function* (
+  identity: GeoIngestIdentity,
+  body: unknown,
+  defer: GeoIngestDefer,
+  buffer: GeoIngestBuffer | undefined
+) {
+  if (!identity.site || identity.web) {
+    return droppedResult(identity, "human", "not_site");
+  }
+  const beaconIdentity: GeoIngestIdentity = { ...identity, web: true };
+  const parsed = webBeaconRelayPayloadSchema.safeParse(body);
+  if (!parsed.success) {
+    return yield* failWithAuthPrecedence(
+      beaconIdentity,
+      new GeoIngestInvalidPayloadError({ issues: parsed.error.issues })
+    );
+  }
+  const { request, beacon, proxied } = parsed.data;
+  const urlResult = yield* Effect.result(parseUrl(request.url));
+  if (urlResult._tag === "Failure") {
+    return yield* failWithAuthPrecedence(beaconIdentity, urlResult.failure);
+  }
+  // Behind the customer's proxy the IP comes from X-Forwarded-For (or is
+  // the proxy's own), so it can't key a per-network limit.
+  const ip = request.ip && !proxied ? parseIp(request.ip) : null;
+  if (
+    !(yield* Effect.promise(() =>
+      admitWebNetwork(beaconIdentity, ip ? ipNetworkKey(ip) : null)
+    ))
+  ) {
+    return droppedResult(beaconIdentity, "human", "network_rate_limited");
+  }
+  return yield* runWebBeacon(
+    beaconIdentity,
+    beacon,
+    request,
+    urlResult.success,
+    defer,
+    buffer
+  );
+});
+
 // Only request entry points are traced: Effect.fn captures a stack and opens a
 // span on every call, which cost a quarter of the CPU per beacon in profiles.
 export const runGeoIngest = Effect.fn("geoIngest.run")(function* (
@@ -726,8 +883,8 @@ export const runGeoIngest = Effect.fn("geoIngest.run")(function* (
 ) {
   const identity = yield* readBearerIdentity(request);
   const body = yield* readBody(request);
-  if (isWebEngagementBody(body)) {
-    return yield* runWebEngagementIngest(identity, body, buffer);
+  if (isWebBeaconRelayBody(body)) {
+    return yield* runSiteBeaconRelay(identity, body, defer, buffer);
   }
   if (isMcpEventBody(body)) {
     return yield* runMcpEventIngest(identity, body, defer, buffer);

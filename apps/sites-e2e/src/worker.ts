@@ -18,6 +18,7 @@ import {
 import { siteServingStateSchema } from "@notra/sites-core/schemas/deployment";
 import { hashPreviewPassword } from "@notra/sites-core/utils/preview-password";
 import { signSitePreviewToken } from "@notra/sites-core/utils/preview-token";
+import { TRACKER_SCRIPT_VERSION } from "@notra/web-tracker/script";
 import {
   chromium,
   type Page,
@@ -59,7 +60,14 @@ import { assertConsentVisits, assertHostOnlyConsent } from "./utils/consent";
 import { assertContentFeatures } from "./utils/content";
 import { cspAllowsOrigin } from "./utils/csp";
 import { assertLiveIndexing } from "./utils/indexing";
-import { countByUrl, isEngagement } from "./utils/ingest";
+import {
+  beaconFields,
+  countByUrl,
+  isBeacon,
+  isEngagement,
+  isPageViewBeacon,
+  reportedRequest,
+} from "./utils/ingest";
 import { createSiteResourceWaiter } from "./utils/resources";
 import { freePort, startSitesWorker } from "./utils/sites-worker";
 import { seedOtherTenant, seedSuspendedTenant } from "./utils/tenants";
@@ -297,11 +305,9 @@ try {
       // Keep parity (crypto.randomUUID, cookies) for both site origins.
       `--unsafely-treat-insecure-origin-as-secure=${origin},${previewOrigin},${consentOrigin}`,
       "--disable-background-networking",
-      // Real vendor scripts drop events from automated browsers
-      // (navigator.webdriver, HeadlessChrome); live mode looks like a visitor.
-      ...(vendorScripts === "live"
-        ? ["--disable-blink-features=AutomationControlled"]
-        : []),
+      // notra.js and real vendor scripts drop events from automated browsers
+      // (navigator.webdriver); live mode also drops the HeadlessChrome agent.
+      "--disable-blink-features=AutomationControlled",
     ],
     ...(vendorScripts === "live"
       ? { userAgent: await visitorUserAgent() }
@@ -506,15 +512,18 @@ try {
         await page.screenshot({ path: join(temp, "live.png"), fullPage: true });
       }
       const beaconStarted = performance.now();
+      // notra.js posts the page view on load; the hide beacon carries `t`.
       const beacon = page.waitForResponse(
         (response) =>
           response.url().endsWith(`/${SITE_ANALYTICS_EVENT_FILE}`) &&
-          response.request().method() === "POST"
+          response.request().method() === "POST" &&
+          response.request().postData()?.includes('"t":') === true
       );
       await page.evaluate(() => window.dispatchEvent(new Event("pagehide")));
       const accepted = await beacon;
+      // notra.js posts with a keepalive fetch, whose response Playwright
+      // never reports finished; the 204 is the Worker's whole answer.
       assert.equal(accepted.status(), 204);
-      assert.equal(await accepted.finished(), null);
       measurements.push({
         name: `notra.synthetic_pagehide_to_beacon${path}`,
         repetition,
@@ -544,9 +553,14 @@ try {
       .sort(([a], [b]) => a.localeCompare(b))
   );
   assert.deepEqual(
-    countByUrl(ingest.filter((event) => !isEngagement(event))),
+    countByUrl(ingest.filter((event) => !isBeacon(event))),
     expectedPerPage,
-    "one traffic event per live page view"
+    "one server-side traffic report per live page view"
+  );
+  assert.deepEqual(
+    countByUrl(ingest.filter(isPageViewBeacon)),
+    expectedPerPage,
+    "one notra.js page view per live page view"
   );
   assert.deepEqual(
     countByUrl(ingest.filter(isEngagement)),
@@ -554,21 +568,23 @@ try {
     "one engagement event per live page view, reported against that page"
   );
   for (const event of ingest) {
-    if (!isEngagement(event)) {
-      assert.equal(event.body.method, "GET");
-      assert.equal(event.body.status, 200, String(event.body.url));
+    const reported = reportedRequest(event);
+    assert.equal(reported.method, "GET");
+    assert.equal(reported.status, 200, String(reported.url));
+    if (!isBeacon(event)) {
       continue;
     }
-    assert.match(String(event.body.viewId), SITE_ENGAGEMENT_VIEW_ID_PATTERN);
-    assert.equal(typeof event.body.visibleMs, "number");
-    assert.ok(Number(event.body.visibleMs) > 0);
-    assert.ok(
-      Number(event.body.scrollDepth) >= 0 &&
-        Number(event.body.scrollDepth) <= 100
-    );
+    const fields = beaconFields(event);
+    assert.equal(fields.k, undefined, "the relay drops the notra.js key");
+    assert.match(String(fields.v), SITE_ENGAGEMENT_VIEW_ID_PATTERN);
+    if (isEngagement(event)) {
+      assert.ok(Number(fields.t) > 0);
+      assert.ok(Number(fields.s) >= 0 && Number(fields.s) <= 100);
+    }
   }
   assert.equal(
-    new Set(ingest.filter(isEngagement).map((event) => event.body.viewId)).size,
+    new Set(ingest.filter(isEngagement).map((event) => beaconFields(event).v))
+      .size,
     livePages.length * repetitions,
     "every page view has its own view ID"
   );
@@ -576,7 +592,7 @@ try {
     ingest.every((event) => event.authorization === `Bearer ${TRAFFIC_TOKEN}`)
   );
   checks.push(
-    "actual Notra browser beacon and traffic handler → simulated ingest payloads"
+    "actual notra.js beacons relayed by the Worker and its traffic handler → simulated ingest payloads"
   );
 
   const request = async (
@@ -681,11 +697,16 @@ try {
     headers: { accept: "text/html" },
   });
   assert.equal(outside.status, 404);
+  const inside = await (
+    await request("/blog/also-missing", { headers: { accept: "text/html" } })
+  ).text();
+  // A missing page in the blog counts as a 404 view; one outside every mount
+  // is not part of the site, so it gets the same page without notra.js.
+  const notraTag = `<script src="/blog/_notra/notra.js?v=${TRACKER_SCRIPT_VERSION}" data-key="site" data-api="/blog/_notra/e?s=404" defer></script>`;
+  assert.ok(inside.includes(notraTag), "a missing blog page carries notra.js");
   assert.equal(
     await outside.text(),
-    await (
-      await request("/blog/also-missing", { headers: { accept: "text/html" } })
-    ).text(),
+    inside.replace(notraTag, ""),
     "paths outside every mount get the blog's themed 404"
   );
   const robots = await request("/robots.txt");
@@ -756,7 +777,7 @@ try {
   const visitorAgent = await page.evaluate(() => navigator.userAgent);
   const browserViews = ingest
     .slice(0, ingestBeforeRequests)
-    .filter((event) => !isEngagement(event));
+    .filter((event) => !isBeacon(event));
   assert.equal(browserViews.length, livePages.length * repetitions);
   for (const event of browserViews) {
     assert.equal(event.body.userAgent, visitorAgent, String(event.body.url));
@@ -773,7 +794,10 @@ try {
   }
   const prefetched = ingest
     .slice(ingestBeforeRequests)
-    .filter((event) => event.body.url === `${origin}/blog/calm-software`);
+    .filter(
+      (event) =>
+        !isBeacon(event) && event.body.url === `${origin}/blog/calm-software`
+    );
   assert.deepEqual(
     prefetched.map(
       (event) => (event.body.signals as { prefetch?: unknown }).prefetch
@@ -784,7 +808,9 @@ try {
   checks.push(
     "browser page views report the visitor's user agent, client hints and navigate fetch mode; a prefetch is flagged"
   );
-  const requested = ingest.slice(ingestBeforeRequests);
+  const requested = ingest
+    .slice(ingestBeforeRequests)
+    .filter((event) => !isBeacon(event));
   const reported = countByUrl(requested);
   for (const [path, count, status] of [
     ["/blog/hello-world", 3, 200],
@@ -956,7 +982,7 @@ try {
     assert.match(preview?.headers()["cache-control"] ?? "", /no-store/);
     assert.equal(
       await page
-        .locator(`script[src$="${SITE_ANALYTICS_SCRIPT_FILE}"]`)
+        .locator(`script[src*="/${SITE_ANALYTICS_SCRIPT_FILE}"]`)
         .count(),
       0
     );
@@ -1190,10 +1216,8 @@ try {
     vendorScripts,
     providerRequests: network.events,
     internalIngestCounts: {
-      traffic: ingest.filter((event) => event.body.type !== "engagement")
-        .length,
-      engagement: ingest.filter((event) => event.body.type === "engagement")
-        .length,
+      traffic: ingest.filter((event) => !isEngagement(event)).length,
+      engagement: ingest.filter(isEngagement).length,
     },
     measurements,
     summary: Object.fromEntries(

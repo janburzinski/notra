@@ -9037,7 +9037,7 @@
         "done": "Analytics is off",
         "enable": "Turn on",
         "enableConfirmTitle": "Turn on analytics for this site?",
-        "enableConfirmDescription": "Notra counts page views as they are served, without cookies, and adds a small script that measures how long each page stays visible. AI agents are recorded too. Counting starts now; the time analytics was off stays empty.",
+        "enableConfirmDescription": "Notra adds notra.js to every page, served from the site itself and without cookies, to count visitors, time on page and web vitals. AI agents are recorded too. Counting starts now; the time analytics was off stays empty.",
         "enabled": "Analytics is on",
         "failed": "Couldn't change analytics"
       },

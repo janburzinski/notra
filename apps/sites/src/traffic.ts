@@ -3,7 +3,11 @@ import {
   TRAFFIC_CONTENT_TYPES,
   TRAFFIC_TRACING_HEADERS,
 } from "./constants/traffic";
-import type { TrafficPayload, TrafficReport } from "./types/traffic";
+import type {
+  BeaconReport,
+  TrafficPayload,
+  TrafficReport,
+} from "./types/traffic";
 import { forwardedClientIp } from "./utils/client-ip";
 import { postToIngest } from "./utils/ingest";
 
@@ -127,5 +131,34 @@ export async function reportTraffic(report: TrafficReport): Promise<void> {
     token: report.token,
     kind: "traffic",
     buildBody: () => buildPayload(report),
+  });
+}
+
+/**
+ * Relays a notra.js beacon with the Site's token. The browser only talks to
+ * the Site, so the Site rebuilds the page view's request for ingest: public
+ * page URL, client IP and country, user agent and language. The beacon's own
+ * `Accept` header says nothing about the page, and tracing headers on it come
+ * from fetch instrumentation in the page's scripts, so both are left out.
+ */
+export async function reportBeacon(report: BeaconReport): Promise<void> {
+  await postToIngest({
+    fetch: report.fetch,
+    ingestUrl: report.ingestUrl,
+    token: report.token,
+    kind: "beacon",
+    buildBody: () => {
+      const request = buildPayload(report);
+      return {
+        type: "beacon",
+        request: {
+          ...request,
+          accept: undefined,
+          signals: { ...request.signals, tracing: false },
+        },
+        proxied: report.proxied || undefined,
+        beacon: report.beacon,
+      };
+    },
   });
 }

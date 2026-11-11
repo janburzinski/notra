@@ -58,15 +58,15 @@ If you forward paths from your own website, `/llms.txt` belongs to your website,
 
 ## AI traffic analytics
 
-Every site counts its own visits with nothing to install. Notra counts page views as the site serves them, without cookies, and adds a small script from the site's own address (`/blog/_notra/insights.js`) that measures how long each page stays visible.
+Every site counts its own visits with nothing to install. The site serves [notra.js](/ai-traffic/install/script-tag) from its own address (`/blog/_notra/notra.js`) without cookies, so it counts people, time on page, web vitals and clicks on links to other sites the same way as on the rest of your website. The site itself reports AI crawlers and AI agents, which never run scripts.
 
 - The site's **Analytics** page shows people, time on page and AI agents on that site, and visits show up about a minute after they happen.
-- **Settings → Danger zone → Turn off analytics** stops counting and removes the script from every page. Data collected so far stays, and **Turn on analytics** starts counting again.
+- **Settings → Danger zone → Turn off analytics** stops counting and removes notra.js from every page. Data collected so far stays, and **Turn on analytics** starts counting again.
 - AI crawlers, AI agents and visitors arriving from ChatGPT, Claude, Perplexity and other assistants also show up on the GEO [AI analytics](/ai-traffic/overview) page, under the project the site belongs to.
 - Notra reports visits under the site's primary address, so a page forwarded from `acme.com/blog` counts as `acme.com/blog`.
 - If your website also runs the [Notra tracker](/ai-traffic/overview) and forwards paths to the site, the site's report is the one that counts, so Notra never counts the same page view twice.
 - Notra never counts previews and views from the Notra dashboard.
-- With the [c15t cookie banner](/sites/integrations/consent/c15t) on, a visitor counts only after allowing measurement, and the page they landed on counts then too. The time-on-page script waits for the same choice. AI agents are always counted.
+- With the [c15t cookie banner](/sites/integrations/consent/c15t) on, notra.js loads only after a visitor allows measurement, and the page they landed on counts then too. AI agents are always counted.
 
 A site counts toward the project that was active when it was created.
 

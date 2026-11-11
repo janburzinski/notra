@@ -101,12 +101,23 @@ export const GEO_INGEST_IDENTITY_POLICIES = {
     marksServerTraffic: true,
     cachesChecks: false,
   },
+  // A Site reports every request server-side for AI traffic; people's page
+  // views and engagement come from the notra.js beacons it relays. Behind a
+  // cookie banner, AI referrals come from those beacons too (see pipeline).
   site: {
-    recordsVisits: true,
+    recordsVisits: false,
     followsRotation: false,
     aiEvents: "tracked",
     marksServerTraffic: false,
     cachesChecks: false,
+  },
+  // Up to three beacons per page view (view, engagement, outbound click).
+  "site-beacon": {
+    recordsVisits: true,
+    followsRotation: false,
+    aiEvents: "consented-referrals",
+    marksServerTraffic: false,
+    cachesChecks: true,
   },
   web: {
     recordsVisits: true,

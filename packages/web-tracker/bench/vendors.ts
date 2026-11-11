@@ -23,13 +23,6 @@ export const VENDORS: Vendor[] = [
     url: "https://ingest.usenotra.com/api/notra.plus.js",
     tag: '<script defer src="https://ingest.usenotra.com/api/notra.plus.js" data-key="nwk.bench.bench.0000"></script>',
   },
-  // Engagement only: Notra Sites count page views on the server.
-  {
-    id: "notra-sites",
-    name: "Notra Sites insights.js (current)",
-    url: "https://bench.test/_notra/insights.js",
-    tag: '<script defer src="https://bench.test/_notra/insights.js" data-endpoint="/_notra/e"></script>',
-  },
   {
     id: "plausible",
     name: "Plausible",

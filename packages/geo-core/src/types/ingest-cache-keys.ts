@@ -9,6 +9,7 @@ export class GeoIngestGenerationKey extends Data.Class<{
   readonly projectId: string | null;
   readonly generation: number;
   readonly cachesChecks: boolean;
+  readonly followsRotation: boolean;
 }> {}
 
 /**

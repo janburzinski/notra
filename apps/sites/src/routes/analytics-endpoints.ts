@@ -4,15 +4,16 @@ import {
   analyticsScriptResponse,
   isAnalyticsEventPath,
   isForeignAnalyticsPost,
-  readAnalyticsEvent,
-  reportEngagement,
+  readAnalyticsBeacon,
 } from "../analytics";
+import { ANALYTICS_STATUS_PARAM } from "../constants/analytics";
 import { analyticsAccepted } from "../responses/analytics-accepted";
 import { analyticsRejected } from "../responses/analytics-rejected";
 import { methodNotAllowed } from "../responses/method-not-allowed";
-import { isDashboardReferer, reportTraffic } from "../traffic";
+import { isDashboardReferer, reportBeacon } from "../traffic";
 import type { DeploymentRouteContext } from "../types/routes";
 import { analyticsScriptTag } from "../utils/analytics-tag";
+import { publicPageUrl } from "../utils/public-url";
 
 export const analyticsEndpointsRoute = Effect.fnUntraced(function* ({
   deps,
@@ -39,7 +40,7 @@ export const analyticsEndpointsRoute = Effect.fnUntraced(function* ({
     return Option.some(
       request.method === "POST"
         ? methodNotAllowed("GET, HEAD")
-        : analyticsScriptResponse()
+        : analyticsScriptResponse(url)
     );
   }
   if (request.method !== "POST") {
@@ -55,41 +56,36 @@ export const analyticsEndpointsRoute = Effect.fnUntraced(function* ({
   ) {
     return Option.some(analyticsRejected());
   }
-  const event =
+  const beacon =
     tag !== null && url.pathname === tag.eventPath
-      ? yield* Effect.promise(() => readAnalyticsEvent(request))
+      ? yield* Effect.promise(() => readAnalyticsBeacon(request))
       : null;
-  if (!(event && resolved.trafficToken && deps.trafficIngestUrl)) {
+  if (
+    !(tag && beacon && resolved.trafficToken && deps.trafficIngestUrl) ||
+    // Opening the site from the dashboard is not a visit.
+    (beacon.isPageView &&
+      isDashboardReferer(beacon.referrer, deps.dashboardUrl))
+  ) {
     return Option.some(analyticsAccepted());
   }
-  if (event.kind === "engagement") {
-    deps.waitUntil(
-      reportEngagement({
-        fetch: deps.fetch,
-        ingestUrl: deps.trafficIngestUrl,
-        token: resolved.trafficToken,
-        publicOrigin,
-        event,
-      })
-    );
-  } else if (
-    tag?.consent &&
-    !isDashboardReferer(event.referrer, deps.dashboardUrl)
-  ) {
-    deps.waitUntil(
-      reportTraffic({
-        fetch: deps.fetch,
-        ingestUrl: deps.trafficIngestUrl,
-        token: resolved.trafficToken,
-        request,
-        method: "GET",
-        referer: event.referrer || null,
-        publicUrl: new URL(event.path, publicOrigin).href,
-        proxied: new URL(publicOrigin).hostname !== host,
-        status: 200,
-        visitorConsent: true,
-      })
-    );
-  }
+  deps.waitUntil(
+    reportBeacon({
+      fetch: deps.fetch,
+      ingestUrl: deps.trafficIngestUrl,
+      token: resolved.trafficToken,
+      request,
+      method: "GET",
+      referer: beacon.referrer || null,
+      publicUrl: publicPageUrl(beacon.page, publicOrigin),
+      proxied: new URL(publicOrigin).hostname !== host,
+      // 404 pages post with `?s=404`, so missing pages keep their status.
+      status:
+        url.searchParams.get(ANALYTICS_STATUS_PARAM) === "404" ? 404 : 200,
+      // Behind a cookie banner notra.js only runs once the visitor allowed
+      // measurement.
+      visitorConsent: tag.consent ? true : undefined,
+      beacon: beacon.fields,
+    })
+  );
   return Option.some(analyticsAccepted());
 });

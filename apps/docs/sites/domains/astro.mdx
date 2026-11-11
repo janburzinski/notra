@@ -77,5 +77,5 @@ export const ALL = proxyToNotra;
 ## Limits to keep in mind
 
 - **Trailing slashes.** `trailingSlash: "always"` redirects `/blog` to `/blog/`, which fails the domain check, so keep the default `"ignore"`.
-- **Origin check.** Site analytics posts time on page to `/blog/_notra/e`, and `security.checkOrigin` can reject it behind a proxy that rewrites the host. Turn it off if the proxy routes are your only on-demand routes, or check that the endpoint answers.
+- **Origin check.** Site analytics posts page views and time on page to `/blog/_notra/e`, and `security.checkOrigin` can reject it behind a proxy that rewrites the host. Turn it off if the proxy routes are your only on-demand routes, or check that the endpoint answers.
 - **Your own middleware.** `src/middleware.ts` runs for the section paths too, so make sure it doesn't redirect them or ask for a login.

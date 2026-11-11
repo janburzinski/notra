@@ -76,9 +76,8 @@ With the banner on, Databuddy, Google Analytics, Plausible, PostHog and Umami lo
 
 Notra's own analytics follow the same choice:
 
-- The script that measures time on page waits until the measurement category is allowed.
-- A page view counts only when the visitor allowed measurement, in every region and whatever your policy says. Visitors who reject or never answer the banner aren't counted.
-- The page a visitor lands on still counts once they allow measurement: the time-on-page script reports it with the address they came from, so the first page of a visit keeps its source. This also works behind a proxy that removes cookies.
+- notra.js waits until the measurement category is allowed, so a page view counts only when the visitor allowed measurement, in every region and whatever your policy says. Visitors who reject or never answer the banner aren't counted.
+- The page a visitor lands on still counts once they allow measurement: notra.js reports it with the address they came from, so the first page of a visit keeps its source. This also works behind a proxy that removes cookies.
 - AI crawlers and AI agents are always counted, because that tracking never touches the visitor's device. Visitors arriving from AI assistants are people, so they follow their choice like everyone else.
 
 ## Custom scripts

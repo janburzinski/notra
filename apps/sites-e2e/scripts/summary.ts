@@ -208,7 +208,7 @@ if (kind === "lifecycle") {
   if (report.providerRequests) {
     lines.push(
       "",
-      `Provider requests (${report.vendorScripts ?? "emulated"} scripts): ${report.providerRequests.length}; Notra ingest: ${report.internalIngestCounts?.traffic ?? 0} page views, ${report.internalIngestCounts?.engagement ?? 0} engagement events.`
+      `Provider requests (${report.vendorScripts ?? "emulated"} scripts): ${report.providerRequests.length}; Notra ingest: ${report.internalIngestCounts?.traffic ?? 0} traffic reports and page views, ${report.internalIngestCounts?.engagement ?? 0} engagement events.`
     );
   }
   if (report.cleanup) {

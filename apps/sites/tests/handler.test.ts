@@ -5,6 +5,10 @@ import type {
   SiteServingState,
 } from "@notra/sites-core/types/deployment";
 import { signSitePreviewToken } from "@notra/sites-core/utils/preview-token";
+import {
+  TRACKER_SCRIPT,
+  TRACKER_SCRIPT_VERSION,
+} from "@notra/web-tracker/script";
 
 import { LOOKUP_CACHE_LIMIT } from "../src/constants/cache";
 import { PREVIEW_SECURE_COOKIE } from "../src/constants/preview-auth";
@@ -347,6 +351,8 @@ describe("AI resource discovery", () => {
     expect(missing.headers.get("Location")).toBeNull();
   });
 });
+
+const VIEW_ID = "a1b2c3d4e5f6a7b8c9d0e1f2";
 
 describe("production serving", () => {
   test("generated Markdown 404s stay errors for negotiation, direct paths and HEAD", async () => {
@@ -846,7 +852,7 @@ describe("production serving", () => {
     expect(reports).toHaveLength(0);
   });
 
-  test("analytics on: pages carry the script, its beacon reaches ingest", async () => {
+  test("analytics on: pages carry notra.js, its beacons reach ingest with the site token", async () => {
     const { deps, put, request, reports, settle } = setup({
       trafficToken: "nst.site_a.sig",
     });
@@ -857,56 +863,73 @@ describe("production serving", () => {
     const page = await request("https://blog.acme.com/blog/post");
     const html = await page.text();
     expect(html).toContain(
-      '<script src="/blog/_notra/insights.js" data-endpoint="/blog/_notra/e" defer></script>'
+      `<script src="/blog/_notra/notra.js?v=${TRACKER_SCRIPT_VERSION}" data-key="site" data-api="/blog/_notra/e" defer></script>`
     );
-    expect(page.headers.get("etag")).toEndWith('-a"');
+    expect(page.headers.get("etag")).toEndWith(`-n${TRACKER_SCRIPT_VERSION}"`);
     const script = await request(
-      "https://blog.acme.com/blog/_notra/insights.js"
+      `https://blog.acme.com/blog/_notra/notra.js?v=${TRACKER_SCRIPT_VERSION}`
     );
     expect(script.headers.get("content-type")).toStartWith("text/javascript");
-    expect(await script.text()).toContain("sendBeacon");
+    expect(script.headers.get("cache-control")).toContain("immutable");
+    expect(await script.text()).toBe(TRACKER_SCRIPT);
+    // An older build's URL gets today's script, but only for an hour.
+    const stale = await request(
+      "https://blog.acme.com/blog/_notra/notra.js?v=older"
+    );
+    expect(await stale.text()).toBe(TRACKER_SCRIPT);
+    expect(stale.headers.get("cache-control")).toBe("public, max-age=3600");
 
     const beacon = await handleSiteRequest(
       new Request("https://blog.acme.com/blog/_notra/e", {
         method: "POST",
         body: JSON.stringify({
-          v: "a1b2c3d4e5f6a7b8c9d0e1f2",
-          p: "/blog/post",
-          ms: 12_345.6,
-          sd: 140,
+          k: "site",
+          v: VIEW_ID,
+          u: "https://blog.acme.com/blog/post#intro",
+          h: false,
+          t: 12_346,
+          s: 100,
         }),
       }),
       deps
     );
     expect(beacon.status).toBe(204);
     await settle();
-    const engagement = reports
-      .map((report) => JSON.parse(String(report.init.body)))
-      .find((body) => body.type === "engagement");
-    expect(engagement).toMatchObject({
-      url: "https://acme.com/blog/post",
-      viewId: "a1b2c3d4e5f6a7b8c9d0e1f2",
-      visibleMs: 12_346,
-      scrollDepth: 100,
+    const relayed = reports
+      .filter((report) => report.init.headers)
+      .map((report) => ({
+        auth: new Headers(report.init.headers).get("authorization"),
+        body: JSON.parse(String(report.init.body)),
+      }))
+      .find(({ body }) => body.type === "beacon");
+    expect(relayed?.auth).toBe("Bearer nst.site_a.sig");
+    expect(relayed?.body.request).toMatchObject({
+      method: "GET",
+      url: "https://acme.com/blog/post#intro",
+      status: 200,
+    });
+    expect(relayed?.body.beacon).toEqual({
+      v: VIEW_ID,
+      h: false,
+      t: 12_346,
+      s: 100,
     });
   });
 
   test("analytics off: no script, beacons are swallowed", async () => {
     const { deps, request, reports, settle } = setup();
     const page = await request("https://blog.acme.com/blog/post");
-    expect(await page.text()).not.toContain("insights.js");
-    const script = await request(
-      "https://blog.acme.com/blog/_notra/insights.js"
-    );
+    expect(await page.text()).not.toContain("_notra/notra.js");
+    const script = await request("https://blog.acme.com/blog/_notra/notra.js");
     expect(script.status).toBe(404);
     const beacon = await handleSiteRequest(
       new Request("https://blog.acme.com/blog/_notra/e", {
         method: "POST",
         body: JSON.stringify({
-          v: "a1b2c3d4e5f6a7b8",
-          p: "/blog/",
-          ms: 5,
-          sd: 0,
+          k: "site",
+          v: VIEW_ID,
+          u: "https://blog.acme.com/blog/",
+          r: "",
         }),
       }),
       deps
@@ -929,7 +952,12 @@ describe("production serving", () => {
       (
         await post(
           "https://blog.acme.com/blog/_notra/e",
-          JSON.stringify({ v: "short", p: "/blog/", ms: 5, sd: 0 })
+          JSON.stringify({
+            k: "site",
+            v: "short",
+            u: "https://blog.acme.com/blog/",
+            t: 5,
+          })
         )
       ).status
     ).toBe(204);
@@ -950,10 +978,11 @@ describe("production serving", () => {
           method: "POST",
           headers,
           body: JSON.stringify({
-            v: "a1b2c3d4e5f6a7b8c9d0e1f2",
-            p: "/blog/post",
-            ms: 5,
-            sd: 0,
+            k: "site",
+            v: VIEW_ID,
+            u: "https://blog.acme.com/blog/post",
+            t: 5,
+            s: 0,
           }),
         }),
         deps
@@ -978,23 +1007,22 @@ describe("production serving", () => {
     expect(reports).toHaveLength(2);
   });
 
-  test("consent banner: the server counts only a stored grant, other visits are left to the page", async () => {
+  test("consent banner: notra.js waits for the grant, server reports carry it", async () => {
     const { objects, put, request, reports, settle } = setup({
       trafficToken: "nst.site_a.sig",
     });
     withConsentBanner(objects, put);
-    const views = [
-      [consentCookie(true), false, '-a"'],
-      [consentCookie(false), true, '-av"'],
-      [null, true, '-av"'],
-    ] as const;
-    for (const [cookie, reportsView, etag] of views) {
+    for (const cookie of [consentCookie(true), consentCookie(false), null]) {
       const page = await request(
         "https://blog.acme.com/blog/post",
         cookie ? { cookie } : {}
       );
-      expect(page.headers.get("etag")).toEndWith(etag);
-      expect((await page.text()).includes(" data-view ")).toBe(reportsView);
+      expect(page.headers.get("etag")).toEndWith(
+        `-n${TRACKER_SCRIPT_VERSION}"`
+      );
+      expect(await page.text()).toContain(
+        `<script type="text/plain" data-c15t-category="measurement" src="/blog/_notra/notra.js?v=${TRACKER_SCRIPT_VERSION}" data-key="site" data-api="/blog/_notra/e" defer></script>`
+      );
     }
     await settle();
     expect(
@@ -1043,11 +1071,10 @@ describe("production serving", () => {
     ).toEqual([true, false]);
   });
 
-  test("consent banner: the page's view beacon counts with its landing referrer", async () => {
-    const { objects, put, deps, reports, settle } = setup({
+  test("a page view beacon is relayed with its landing referrer, never one opened from the dashboard", async () => {
+    const { deps, reports, settle } = setup({
       trafficToken: "nst.site_a.sig",
     });
-    withConsentBanner(objects, put);
     const view = (referrer: string) =>
       handleSiteRequest(
         new Request("https://blog.acme.com/blog/_notra/e", {
@@ -1059,8 +1086,10 @@ describe("production serving", () => {
             referer: "https://blog.acme.com/blog/post?utm_source=news",
           },
           body: JSON.stringify({
-            k: "view",
-            p: "/blog/post?utm_source=news",
+            k: "site",
+            v: VIEW_ID,
+            u: "https://blog.acme.com/blog/post?utm_source=news",
+            h: false,
             r: referrer,
           }),
         }),
@@ -1078,45 +1107,115 @@ describe("production serving", () => {
     const payloads = reports.map((report) =>
       JSON.parse(String(report.init.body))
     );
-    expect(payloads.map((payload) => payload.referer)).toEqual([
+    expect(payloads.map((payload) => payload.request.referer)).toEqual([
       "https://www.google.com/",
       "https://acme.com/blog/",
       undefined,
     ]);
     for (const payload of payloads) {
-      expect(payload).toMatchObject({
+      expect(payload.type).toBe("beacon");
+      expect(payload.beacon).toEqual({ v: VIEW_ID, h: false });
+      expect(payload.request).toMatchObject({
         method: "GET",
         url: "https://acme.com/blog/post?utm_source=news",
         status: 200,
         ip: "203.0.113.9",
-        visitorConsent: true,
       });
+      expect(payload.request).not.toHaveProperty("accept");
+      expect(payload.request).not.toHaveProperty("visitorConsent");
     }
   });
 
-  test("view beacons are ignored without a consent banner", async () => {
-    const { deps, request, reports, settle } = setup({
+  test("404 pages carry notra.js and their page views keep the status", async () => {
+    const { deps, put, request, reports, settle } = setup({
       trafficToken: "nst.site_a.sig",
     });
-    const page = await request("https://blog.acme.com/blog/post");
-    expect(await page.text()).not.toContain("data-view");
-    const post = (body: unknown) =>
-      handleSiteRequest(
-        new Request("https://blog.acme.com/blog/_notra/e", {
-          method: "POST",
-          body: JSON.stringify(body),
-        }),
-        deps
-      );
-    expect((await post({ k: "view", p: "/blog/", r: "" })).status).toBe(204);
-    await settle();
-    expect(reports).toHaveLength(1);
-    expect(JSON.parse(String(reports[0]?.init.body)).visitorConsent).toBe(
-      undefined
+    put(
+      `deployments/${SITE}/dep_live/files/blog/404.html`,
+      "<html><body><p>Missing</p></body></html>"
     );
+    const missing = await request("https://blog.acme.com/blog/gone");
+    expect(missing.status).toBe(404);
+    expect(await missing.text()).toContain('data-api="/blog/_notra/e?s=404"');
+    await settle();
+    reports.length = 0;
+    const view = await handleSiteRequest(
+      new Request("https://blog.acme.com/blog/_notra/e?s=404", {
+        method: "POST",
+        body: JSON.stringify({
+          k: "site",
+          v: VIEW_ID,
+          u: "https://blog.acme.com/blog/gone",
+          r: "",
+        }),
+      }),
+      deps
+    );
+    expect(view.status).toBe(204);
+    await settle();
+    expect(JSON.parse(String(reports[0]?.init.body)).request).toMatchObject({
+      url: "https://acme.com/blog/gone",
+      status: 404,
+    });
   });
 
-  test("a page revalidated from the browser cache still counts as a view", async () => {
+  test("relays mark a cookie banner's consent, a proxy, and drop beacon-only signals", async () => {
+    const { objects, put, deps, reports, settle } = setup({
+      trafficToken: "nst.site_a.sig",
+    });
+    withConsentBanner(objects, put);
+    const response = await handleSiteRequest(
+      new Request("https://blog.acme.com/blog/_notra/e", {
+        method: "POST",
+        headers: { traceparent: "00-abc-def-01", accept: "*/*" },
+        body: JSON.stringify({
+          k: "site",
+          v: VIEW_ID,
+          u: "https://blog.acme.com//evil.example/x",
+          r: "https://chatgpt.com/",
+        }),
+      }),
+      deps
+    );
+    expect(response.status).toBe(204);
+    await settle();
+    const body = JSON.parse(String(reports[0]?.init.body));
+    expect(body.proxied).toBe(true);
+    expect(body.request).toMatchObject({
+      url: "https://acme.com//evil.example/x",
+      referer: "https://chatgpt.com/",
+      visitorConsent: true,
+      signals: { tracing: false },
+    });
+    expect(body.request).not.toHaveProperty("accept");
+  });
+
+  test("outbound clicks are relayed as notra.js sent them", async () => {
+    const { deps, reports, settle } = setup({
+      trafficToken: "nst.site_a.sig",
+    });
+    const response = await handleSiteRequest(
+      new Request("https://blog.acme.com/blog/_notra/e", {
+        method: "POST",
+        body: JSON.stringify({
+          k: "site",
+          v: VIEW_ID,
+          u: "https://blog.acme.com/blog/post",
+          o: "github.com/acme",
+        }),
+      }),
+      deps
+    );
+    expect(response.status).toBe(204);
+    await settle();
+    expect(reports).toHaveLength(1);
+    expect(JSON.parse(String(reports[0]?.init.body)).beacon).toEqual({
+      v: VIEW_ID,
+      o: "github.com/acme",
+    });
+  });
+
+  test("a page revalidated from the browser cache is still reported", async () => {
     const { request, reports, settle } = setup({
       trafficToken: "nst.site_a.sig",
     });

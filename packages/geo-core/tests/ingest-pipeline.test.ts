@@ -52,6 +52,7 @@ const ingestWebPageViews = mock(async (_rows: WebPageViewRow[]) => ({
   quarantined_rows: 0,
 }));
 const webRatelimitLimit = mock(async () => ({ success: true }));
+const webNetworkLimit = mock(async () => ({ success: true }));
 const hasAiTrafficEventsQuota = mock(() => Effect.succeed(true));
 const trackAiTrafficEvent = mock(async (_organizationId: string) => true);
 const ingestWebPageEngagement = mock(async (_rows: unknown[]) => ({
@@ -66,6 +67,18 @@ const SITE_PAGE = {
   url: "https://acme.com/blog/a",
   userAgent: HUMAN_USER_AGENT,
 };
+const VIEW_ID = "a1b2c3d4e5f6a7b8c9d0e1f2";
+/** A notra.js beacon as a Notra Site relays it, around its rebuilt request. */
+function relayed(
+  beacon: Record<string, unknown> = {},
+  request: Record<string, unknown> = {}
+) {
+  return {
+    type: "beacon",
+    request: { ...SITE_PAGE, ...request },
+    beacon: { v: VIEW_ID, ...beacon },
+  };
+}
 
 mock.module("@notra/analytics/tinybird/client", () => ({
   ingestGeoTrafficEvents,
@@ -105,7 +118,7 @@ mock.module("../src/ingest/ratelimit", () => ({
   geoIngestRatelimit: { limit: ratelimitLimit },
   webIngestRatelimit: { limit: webRatelimitLimit },
   geoIngestAdmissionRatelimit: { limit: async () => ({ success: true }) },
-  webNetworkRatelimit: { limit: async () => ({ success: true }) },
+  webNetworkRatelimit: { limit: webNetworkLimit },
   webSharedNetworkRatelimit: { limit: async () => ({ success: true }) },
   webAiRatelimit: { limit: async () => ({ success: true }) },
 }));
@@ -160,6 +173,7 @@ describe("runGeoIngest ordering", () => {
     }
     hasAiTrafficEventsQuota.mockImplementation(() => Effect.succeed(true));
     webRatelimitLimit.mockImplementation(async () => ({ success: true }));
+    webNetworkLimit.mockImplementation(async () => ({ success: true }));
     verifyGeoIngestToken.mockImplementation(() => ({
       organizationId: "org_1",
       projectId: "proj_1",
@@ -354,19 +368,20 @@ describe("runGeoIngest ordering", () => {
     expect(ingestGeoTrafficEvents).not.toHaveBeenCalled();
   });
 
-  test("a site counts its human visitors in web_page_views only", async () => {
-    const outcome = await run(
-      ingestRequest(
-        {
-          method: "GET",
-          url: "https://acme.com/blog/a",
-          userAgent:
-            "Mozilla/5.0 (Macintosh) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Safari/537.36",
-          referer: "https://www.google.com/",
-        },
-        "nst.site_1.good"
-      )
-    );
+  test("a site counts its people from relayed notra.js page views only", async () => {
+    const page = {
+      ...SITE_PAGE,
+      userAgent:
+        "Mozilla/5.0 (Macintosh) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Safari/537.36",
+      referer: "https://www.google.com/",
+    };
+    expect(await run(ingestRequest(page, SITE_TOKEN))).toMatchObject({
+      _tag: "Success",
+      success: { outcome: "dropped", reason: "visitor_type" },
+    });
+    expect(ingestWebPageViews).not.toHaveBeenCalled();
+
+    const outcome = await run(ingestRequest(relayed({}, page), SITE_TOKEN));
     expect(outcome).toMatchObject({
       _tag: "Success",
       success: { outcome: "ingested", visitorType: "human" },
@@ -380,66 +395,132 @@ describe("runGeoIngest ordering", () => {
       site_id: "site_1",
       host: "acme.com",
       path: "/blog/a",
+      view_id: VIEW_ID,
       referrer_group: "search",
       referrer_source: "google",
       browser: "Chrome",
     });
   });
 
-  test("a site visitor counts only with measurement consent, AI crawlers always", async () => {
-    const declined = { ...SITE_PAGE, visitorConsent: false };
-    expect(await run(ingestRequest(declined, SITE_TOKEN))).toMatchObject({
+  test("without a cookie banner a site reports AI traffic server-side, never from relayed beacons", async () => {
+    const referral = { ...SITE_PAGE, referer: "https://chatgpt.com/" };
+    expect(await run(ingestRequest(referral, SITE_TOKEN))).toMatchObject({
       _tag: "Success",
-      success: { outcome: "dropped", reason: "visitor_type" },
+      success: { outcome: "ingested", visitorType: "ai_referral" },
     });
     expect(
       await run(
+        ingestRequest({ ...SITE_PAGE, userAgent: "GPTBot" }, SITE_TOKEN)
+      )
+    ).toMatchObject({
+      _tag: "Success",
+      success: { outcome: "ingested", visitorType: "crawler" },
+    });
+    expect(ingestGeoTrafficEvents).toHaveBeenCalledTimes(2);
+    expect(ingestWebPageViews).not.toHaveBeenCalled();
+
+    ingestGeoTrafficEvents.mockClear();
+    expect(
+      await run(
         ingestRequest(
-          { ...declined, referer: "https://chatgpt.com/" },
+          relayed({}, { referer: "https://chatgpt.com/" }),
           SITE_TOKEN
         )
       )
     ).toMatchObject({
       _tag: "Success",
-      success: { outcome: "dropped", reason: "consent" },
+      success: { outcome: "ingested", visitorType: "ai_referral" },
     });
-    expect(ingestWebPageViews).not.toHaveBeenCalled();
+    expect(ingestWebPageViews).toHaveBeenCalledTimes(1);
     expect(ingestGeoTrafficEvents).not.toHaveBeenCalled();
+  });
 
+  test("behind a cookie banner an AI referral counts once, from the page view its grant lets run", async () => {
+    const referral = { ...SITE_PAGE, referer: "https://chatgpt.com/" };
+    for (const visitorConsent of [false, true]) {
+      expect(
+        await run(ingestRequest({ ...referral, visitorConsent }, SITE_TOKEN))
+      ).toMatchObject({
+        _tag: "Success",
+        success: { outcome: "dropped", reason: "consent" },
+      });
+    }
     expect(
-      await run(ingestRequest({ ...declined, userAgent: "GPTBot" }, SITE_TOKEN))
+      await run(
+        ingestRequest(
+          { ...SITE_PAGE, userAgent: "GPTBot", visitorConsent: false },
+          SITE_TOKEN
+        )
+      )
     ).toMatchObject({
       _tag: "Success",
       success: { outcome: "ingested", visitorType: "crawler" },
     });
-    expect(ingestWebPageViews).not.toHaveBeenCalled();
+    expect(ingestGeoTrafficEvents).toHaveBeenCalledTimes(1);
 
-    const consentedBeacon = {
-      ...SITE_PAGE,
-      accept: "*/*",
-      referer: "https://www.google.com/",
-      signals: {
-        clientHints: true,
-        fetchMode: "no-cors",
-        tracing: false,
-        prefetch: false,
-      },
-      visitorConsent: true,
-    };
-    expect(await run(ingestRequest(consentedBeacon, SITE_TOKEN))).toMatchObject(
-      {
-        _tag: "Success",
-        success: { outcome: "ingested", visitorType: "human" },
-      }
-    );
-    const [rows] = ingestWebPageViews.mock.calls[0] as unknown as [
-      Record<string, unknown>[],
-    ];
-    expect(rows[0]).toMatchObject({
-      path: "/blog/a",
-      referrer_group: "search",
-      referrer_source: "google",
+    ingestGeoTrafficEvents.mockClear();
+    expect(
+      await run(
+        ingestRequest(
+          relayed(
+            {},
+            { referer: "https://chatgpt.com/", visitorConsent: true }
+          ),
+          SITE_TOKEN
+        )
+      )
+    ).toMatchObject({
+      _tag: "Success",
+      success: { outcome: "ingested", visitorType: "ai_referral" },
     });
+    expect(ingestWebPageViews).toHaveBeenCalledTimes(1);
+    expect(ingestGeoTrafficEvents).toHaveBeenCalledWith([
+      expect.objectContaining({
+        site_id: "site_1",
+        visitor_type: "ai_referral",
+      }),
+    ]);
+  });
+
+  test("a proxied site's relays share one network bucket, since its IPs come from the proxy", async () => {
+    webNetworkLimit.mockImplementation(async () => ({ success: false }));
+    const page = { ip: "203.0.113.9" };
+    expect(
+      await run(ingestRequest(relayed({}, page), SITE_TOKEN))
+    ).toMatchObject({
+      _tag: "Success",
+      success: { outcome: "dropped", reason: "network_rate_limited" },
+    });
+    expect(
+      await run(
+        ingestRequest({ ...relayed({}, page), proxied: true }, SITE_TOKEN)
+      )
+    ).toMatchObject({
+      _tag: "Success",
+      success: { outcome: "ingested", visitorType: "human" },
+    });
+  });
+
+  test("relayed beacons check the site's project once a minute, not per beacon", async () => {
+    loadIngestSite.mockImplementation(async () => ({
+      ...SITE,
+      projectId: "proj_memo",
+    }));
+    getGeoIngestTokenGeneration.mockClear();
+    for (const beacon of [{}, { t: 1000, s: 50 }, { o: "github.com/acme" }]) {
+      expect(
+        await run(ingestRequest(relayed(beacon), SITE_TOKEN))
+      ).toMatchObject({ _tag: "Success", success: { outcome: "ingested" } });
+    }
+    expect(getGeoIngestTokenGeneration).toHaveBeenCalledTimes(1);
+  });
+
+  test("only a site token may relay a beacon", async () => {
+    expect(await run(ingestRequest(relayed()))).toMatchObject({
+      _tag: "Success",
+      success: { outcome: "dropped", reason: "not_site" },
+    });
+    expect(ingestWebPageViews).not.toHaveBeenCalled();
   });
 
   test("the SDK never counts people, only AI traffic", async () => {
@@ -459,8 +540,13 @@ describe("runGeoIngest ordering", () => {
   });
 
   test("site visitor counting still rejects revoked tokens and ignores wrong hosts", async () => {
+    // A passed check is kept a minute per project, so use one no test passed.
+    loadIngestSite.mockImplementation(async () => ({
+      ...SITE,
+      projectId: "proj_deleted",
+    }));
     getGeoIngestTokenGeneration.mockImplementation(async () => null);
-    const revoked = await run(ingestRequest(SITE_PAGE, SITE_TOKEN));
+    const revoked = await run(ingestRequest(relayed(), SITE_TOKEN));
     expect(revoked._tag === "Failure" && revoked.failure).toBeInstanceOf(
       GeoIngestInvalidTokenError
     );
@@ -468,7 +554,7 @@ describe("runGeoIngest ordering", () => {
     getGeoIngestTokenGeneration.mockImplementation(async () => 1);
     expect(
       await run(
-        ingestRequest({ ...SITE_PAGE, url: "https://example.com/" }, SITE_TOKEN)
+        ingestRequest(relayed({}, { url: "https://example.com/" }), SITE_TOKEN)
       )
     ).toMatchObject({
       _tag: "Success",
@@ -492,7 +578,7 @@ describe("runGeoIngest ordering", () => {
     { status: 302 },
   ])("site visitor counting filters non-page traffic %j", async (override) => {
     expect(
-      await run(ingestRequest({ ...SITE_PAGE, ...override }, SITE_TOKEN))
+      await run(ingestRequest(relayed({}, override), SITE_TOKEN))
     ).toMatchObject({
       _tag: "Success",
       success: { outcome: "dropped", reason: "visitor_type" },
@@ -504,7 +590,7 @@ describe("runGeoIngest ordering", () => {
 
   test("site visitor counting retains the independent web admission limit", async () => {
     webRatelimitLimit.mockImplementation(async () => ({ success: false }));
-    expect(await run(ingestRequest(SITE_PAGE, SITE_TOKEN))).toMatchObject({
+    expect(await run(ingestRequest(relayed(), SITE_TOKEN))).toMatchObject({
       _tag: "Success",
       success: { outcome: "dropped", reason: "web_rate_limited" },
     });
@@ -514,13 +600,7 @@ describe("runGeoIngest ordering", () => {
   });
 
   test("a site reports visible time per view, capped and scoped to its pages", async () => {
-    const engagement = {
-      type: "engagement",
-      url: "https://acme.com/blog/a",
-      viewId: "a1b2c3d4e5f6a7b8c9d0e1f2",
-      visibleMs: 5 * 60 * 60 * 1000,
-      scrollDepth: 80,
-    };
+    const engagement = relayed({ t: 5 * 60 * 60 * 1000, s: 80 });
     expect(await run(ingestRequest(engagement, SITE_TOKEN))).toMatchObject({
       _tag: "Success",
       success: { outcome: "ingested", visitorType: "human" },
@@ -532,7 +612,7 @@ describe("runGeoIngest ordering", () => {
         site_id: "site_1",
         host: "acme.com",
         path: "/blog/a",
-        view_id: "a1b2c3d4e5f6a7b8c9d0e1f2",
+        view_id: VIEW_ID,
         visible_ms: 30 * 60 * 1000,
         scroll_depth: 80,
       },
@@ -542,7 +622,7 @@ describe("runGeoIngest ordering", () => {
     expect(
       await run(
         ingestRequest(
-          { ...engagement, url: "https://example.com/blog/a" },
+          relayed({ t: 1000, s: 80 }, { url: "https://example.com/blog/a" }),
           SITE_TOKEN
         )
       )
@@ -550,12 +630,8 @@ describe("runGeoIngest ordering", () => {
       _tag: "Success",
       success: { outcome: "dropped", reason: "host" },
     });
-    expect(await run(ingestRequest(engagement))).toMatchObject({
-      _tag: "Success",
-      success: { outcome: "dropped", reason: "not_site" },
-    });
     const malformed = await run(
-      ingestRequest({ ...engagement, viewId: "x" }, SITE_TOKEN)
+      ingestRequest(relayed({ t: 1000, v: "x" }), SITE_TOKEN)
     );
     expect(malformed._tag).toBe("Failure");
     expect(ingestWebPageEngagement).not.toHaveBeenCalled();

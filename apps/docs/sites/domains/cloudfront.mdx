@@ -60,7 +60,7 @@ If your domain already points at a CloudFront distribution, skip the first step 
 
     - Don't use a single `/blog*` pattern, because it also matches paths like `/blogroll` on your website.
     - CloudFront uses the first behavior whose path pattern matches, in the order the behaviors are listed. If the distribution already has a behavior that matches `/blog` or `/blog/*`, such as `/blog*` or `/*`, move the Notra behaviors above it, or that behavior keeps serving the section paths from your old origin and the check fails.
-    - **Allowed HTTP methods** has to include `POST`, because site analytics sends events to `/blog/_notra/e`. CloudFront only allows `GET` and `HEAD` by default, which leaves your pages working but your analytics empty.
+    - **Allowed HTTP methods** has to include `POST`, because site analytics sends events to `/blog/_notra/e`. CloudFront only allows `GET` and `HEAD` by default, which leaves your pages working but counts no visitors.
     - `CachingDisabled` leaves caching to Notra, which already sends the right `Cache-Control` for every file. A CloudFront cache would also ignore the `Accept` header and could hand Markdown to browsers or HTML to AI agents.
   </Step>
   <Step title="Add your domain to the distribution">

@@ -1,5 +1,6 @@
 import { SITE_R2_KEYS } from "@notra/sites-core/constants/sites";
 import type { SiteManifestFile } from "@notra/sites-core/types/deployment";
+import { TRACKER_SCRIPT_VERSION } from "@notra/web-tracker/script";
 
 import { injectAnalyticsScript } from "./analytics";
 import { EDGE_READ_TIMEOUT_MS, R2_READ_TIMEOUT_MS } from "./constants/cache";
@@ -78,12 +79,16 @@ async function readFileBody(
 export async function serveFile(params: ServeFileParams): Promise<Response> {
   const { deps, request, siteId, deploymentId, file, status, isPreview } =
     params;
+  // 404 pages carry notra.js too, so visits to missing pages are counted.
   const analytics =
-    status === 200 && file.contentType.startsWith("text/html")
+    (status === 200 || status === 404) &&
+    file.contentType.startsWith("text/html")
       ? (params.analytics ?? null)
       : null;
+  // The suffix names the injected notra.js build, so a page cached with an
+  // older tag (or the retired insights.js) is not revalidated as unchanged.
   const etag = analytics
-    ? `"${file.sha256}-a${analytics.reportsView ? "v" : ""}"`
+    ? `"${file.sha256}-n${TRACKER_SCRIPT_VERSION}"`
     : `"${file.sha256}"`;
   const headers = new Headers({
     "Content-Type": file.contentType,

@@ -16,6 +16,8 @@ on:
       # The harness serves builds with its content-type map.
       - "packages/sites-server/**"
       - "packages/utils/**"
+      # The Worker serves notra.js and relays its beacons.
+      - "packages/web-tracker/**"
       - "bun.lock"
       - ".github/workflows/sites-e2e.yml"
       - ".github/workflows/sites-e2e-pr.yml"

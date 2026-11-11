@@ -298,8 +298,11 @@ export const SITE_R2_KEYS = {
     `previews/${siteId}/${previewKey}/source.json`,
 } as const;
 
-/** Files below each mount that the worker answers for the analytics script. */
-export const SITE_ANALYTICS_SCRIPT_FILE = "_notra/insights.js";
+/**
+ * Files below each mount that the worker answers for analytics: notra.js, and
+ * the endpoint that relays its beacons to ingest with the Site's token.
+ */
+export const SITE_ANALYTICS_SCRIPT_FILE = "_notra/notra.js";
 export const SITE_ANALYTICS_EVENT_FILE = "_notra/e";
 /** Below each mount, `<dir>/<host>` answers with that host's favicon. */
 export const SITE_FAVICON_DIR = "_notra/favicon";

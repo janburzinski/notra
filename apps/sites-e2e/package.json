@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@notra/sites-core": "workspace:*",
+    "@notra/web-tracker": "workspace:*",
     "emulate": "0.12.1",
     "playwright": "1.61.1"
   },

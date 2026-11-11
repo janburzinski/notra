@@ -1276,7 +1276,10 @@ export interface GeoIngestIdentity {
   projectId: string | null;
   generation: number;
   site?: GeoIngestSiteScope;
-  /** Signed by a public browser key; may record human page views only. */
+  /**
+   * A notra.js beacon: signed by a public browser key, or relayed by a Notra
+   * Site. May record human page views only.
+   */
   web?: boolean;
 }
 

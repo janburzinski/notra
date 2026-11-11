@@ -71,9 +71,10 @@ browser profile. The dependency installation occurs only in the current worktree
   a slug change) shares Acme's paths and one Acme content hash with its own
   bytes: each host serves only its own files, the edge cache never crosses
   sites, and stale/unknown hosts get the 404 page.
-- Actual Notra traffic and engagement code (with an explicitly dispatched
-  synthetic `pagehide` trigger) sends to a strict in-process ingest
-  simulation: exactly one traffic and one engagement event per page view,
+- The Worker's traffic reports and the actual notra.js it serves, relayed
+  through the Worker (with an explicitly dispatched synthetic `pagehide`
+  trigger), send to a strict in-process ingest simulation: exactly one
+  traffic report, one notra.js page view and one engagement event per page view,
   for that page's URL; 404s are reported with their status, while assets,
   redirects, 304s and HEAD requests are not. Same-origin subresources must
   load (only the beacon aborted by the next navigation is allowed). The harness

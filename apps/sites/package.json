@@ -15,6 +15,7 @@
     "@c15t/core": "3.2.2",
     "@notra/sites-core": "workspace:*",
     "@notra/utils": "workspace:*",
+    "@notra/web-tracker": "workspace:*",
     "effect": "catalog:"
   },
   "devDependencies": {

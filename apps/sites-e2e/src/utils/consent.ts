@@ -1,30 +1,39 @@
 import assert from "node:assert/strict";
 
 import { SITE_ANALYTICS_EVENT_FILE } from "@notra/sites-core/constants/sites";
+import { TRACKER_SCRIPT_VERSION } from "@notra/web-tracker/script";
 import type { BrowserContext, Page } from "playwright";
 
 import { capless } from "../../emulators/browser/providers/capless";
 import type { IngestRequest } from "../types/harness";
-import { isEngagement } from "./ingest";
+import {
+  isBeacon,
+  isEngagement,
+  isPageViewBeacon,
+  reportedRequest,
+} from "./ingest";
 
 const SEARCH_REFERRER = "https://www.google.com/";
 const CAPLESS_ORIGIN = new URL(capless.script).origin;
-const INSIGHTS_SCRIPT = 'script[src$="/_notra/insights.js"]';
-// The script skips views shorter than 1 ms, so a test stays on a page briefly.
+const NOTRA_SCRIPT = `script[src="/blog/_notra/notra.js?v=${TRACKER_SCRIPT_VERSION}"]`;
+const GATED_NOTRA_TAG = `<script type="text/plain" data-c15t-category="measurement" src="/blog/_notra/notra.js?v=${TRACKER_SCRIPT_VERSION}" data-key="site" data-api="/blog/_notra/e" defer></script>`;
+// notra.js skips views shorter than 1 ms, so a test stays on a page briefly.
 const VISIBLE_BEFORE_LEAVING_MS = 50;
 
+/** notra.js page views carry the referrer `r`; other beacons do not. */
 function isViewBeacon(url: string, method: string, body: string | null) {
   return (
     url.endsWith(`/${SITE_ANALYTICS_EVENT_FILE}`) &&
     method === "POST" &&
-    body?.includes('"k":"view"') === true
+    body?.includes('"r":') === true
   );
 }
 
 // A site with the c15t banner, visited by a browser that accepts and one that
-// rejects. Only a stored measurement grant lets the Worker count a request;
-// otherwise the page's own script reports the view once the banner grants it,
-// with the referrer the landing request carried.
+// rejects. notra.js is gated by the banner, so people are counted only once
+// it grants measurement, from the page's own beacon with the referrer the
+// landing request carried. The Worker still reports every request for AI
+// traffic, with the stored consent it read.
 export async function assertConsentVisits(options: {
   page: Page;
   context: BrowserContext;
@@ -47,7 +56,7 @@ export async function assertConsentVisits(options: {
       if (!isEngagement(event)) {
         return false;
       }
-      const url = new URL(String(event.body.url));
+      const url = new URL(String(reportedRequest(event).url));
       return (
         url.host === host &&
         pages.some((pageUrl) => new URL(pageUrl).pathname === url.pathname)
@@ -66,12 +75,20 @@ export async function assertConsentVisits(options: {
   const views = (from: number) =>
     ingest
       .slice(from)
-      .filter((event) => !isEngagement(event))
+      .filter((event) => !isBeacon(event))
       .map((event) => [
         event.body.url,
         event.body.visitorConsent,
         event.body.referer,
       ]);
+  const pageViews = (from: number) =>
+    ingest
+      .slice(from)
+      .filter(isPageViewBeacon)
+      .map((event) => {
+        const request = reportedRequest(event);
+        return [request.url, request.referer];
+      });
 
   let from = ingest.length;
   const accepted = page.waitForRequest((request) =>
@@ -79,10 +96,9 @@ export async function assertConsentVisits(options: {
   );
   const first = await page.goto(landing, { referer: SEARCH_REFERRER });
   assert.equal(first?.status(), 200);
-  assert.match(
-    (await first?.text()) ?? "",
-    /<script type="text\/plain" data-c15t-category="measurement" src="\/blog\/_notra\/insights\.js" data-endpoint="\/blog\/_notra\/e" data-view defer><\/script>/,
-    "a visitor without a stored grant gets the gated view reporter"
+  assert.ok(
+    ((await first?.text()) ?? "").includes(GATED_NOTRA_TAG),
+    "the banner gates notra.js"
   );
   assert.ok(
     !((await first?.text()) ?? "").includes(capless.script),
@@ -123,7 +139,7 @@ export async function assertConsentVisits(options: {
     "c15t stores the choice in a cookie"
   );
   // c15t marks the script it activates before inserting it, so the marker
-  // alone does not mean insights.js ran and listens for pagehide yet; a
+  // alone does not mean notra.js ran and listens for pagehide yet; a
   // script's load event fires once it has run.
   const scriptLoads = await page.addInitScript(() => {
     document.addEventListener(
@@ -138,9 +154,9 @@ export async function assertConsentVisits(options: {
   });
   const second = await page.goto(next, { referer: landing });
   assert.equal(second?.status(), 200);
-  assert.ok(!((await second?.text()) ?? "").includes(" data-view "));
+  assert.ok(((await second?.text()) ?? "").includes(GATED_NOTRA_TAG));
   await page.waitForSelector(
-    `${INSIGHTS_SCRIPT}[data-c15t-activated="true"][data-e2e-loaded]`,
+    `${NOTRA_SCRIPT}[data-c15t-activated="true"][data-e2e-loaded]`,
     { state: "attached" }
   );
   await scriptLoads.dispose();
@@ -150,8 +166,8 @@ export async function assertConsentVisits(options: {
     (request) =>
       request.url().endsWith(`/${SITE_ANALYTICS_EVENT_FILE}`) &&
       request.method() === "POST" &&
-      request.postData()?.includes(`"p":"${new URL(next).pathname}","ms":`) ===
-        true
+      request.postData()?.includes(`"u":"${next}"`) === true &&
+      request.postData()?.includes('"t":') === true
   );
   await page.waitForTimeout(VISIBLE_BEFORE_LEAVING_MS);
   await page.evaluate(() => window.dispatchEvent(new Event("pagehide")));
@@ -159,10 +175,17 @@ export async function assertConsentVisits(options: {
   await settle();
   assert.deepEqual(views(from), [
     [landing, false, SEARCH_REFERRER],
-    [landing, true, SEARCH_REFERRER],
     [next, true, landing],
   ]);
-  assert.equal(viewBeacons.length, 1, "the granted page is not reported twice");
+  assert.deepEqual(
+    pageViews(from),
+    [
+      [landing, SEARCH_REFERRER],
+      [next, landing],
+    ],
+    "notra.js counts the landing page once granted, then every granted page"
+  );
+  assert.equal(viewBeacons.length, 2, "each page is reported once");
   // The Worker reports it to ingest after answering the beacon.
   const deadline = performance.now() + 10_000;
   while (measured(from, [next]).length === 0 && performance.now() < deadline) {
@@ -207,11 +230,12 @@ export async function assertConsentVisits(options: {
     0,
     "a rejection measures no time on page"
   );
+  assert.deepEqual(pageViews(from), [], "a rejection counts no page view");
   assert.equal(
-    await page.locator(`${INSIGHTS_SCRIPT}[data-c15t-activated]`).count(),
+    await page.locator(`${NOTRA_SCRIPT}[data-c15t-activated]`).count(),
     0
   );
-  return "consent banner: Capless stays out of the HTML and loads only after accept, with its key, and never after reject; without a stored grant the page reports its own view; accept counts the landing view once with its search referrer and later pages server-side; reject sends no view or engagement and every server report carries no consent";
+  return "consent banner: Capless and notra.js load only after accept, Capless with its key, and never after reject; accept counts the landing view once with its search referrer, then each granted page; reject sends no view or engagement and every server report carries no consent";
 }
 
 // The same banner served over HTTPS, as in production: the choice lives in a
@@ -232,7 +256,7 @@ export async function assertHostOnlyConsent(options: {
   const views = (from: number) =>
     ingest
       .slice(from)
-      .filter((event) => !isEngagement(event))
+      .filter((event) => !isBeacon(event))
       .map((event) => [event.body.url, event.body.visitorConsent]);
 
   await context.clearCookies();
@@ -251,8 +275,7 @@ export async function assertHostOnlyConsent(options: {
   assert.ok(!cookies.some((cookie) => cookie.name === "c15t"));
 
   let from = ingest.length;
-  const granted = await page.goto(next);
-  assert.ok(!((await granted?.text()) ?? "").includes(" data-view "));
+  await page.goto(next);
   await settle();
   assert.deepEqual(
     views(from).filter(([url]) => url === next),
@@ -276,12 +299,8 @@ export async function assertHostOnlyConsent(options: {
     { name: "c15t", value: stored.value, domain: parentDomain, path: "/" },
   ]);
   from = ingest.length;
-  const forged = await page.goto(next);
-  assert.match(
-    (await forged?.text()) ?? "",
-    / data-view /,
-    "a grant another site set on the shared domain is not the visitor's"
-  );
+  await page.goto(next);
+  // The banner asks again: the grant another site set is not the visitor's.
   await page
     .getByRole("button", { name: /accept/i })
     .first()
@@ -335,9 +354,7 @@ export async function assertHostOnlyConsent(options: {
   ]);
   assert.equal(beacons, 0, "a carried-over refusal sends no view");
   assert.equal(
-    await page
-      .locator(`${INSIGHTS_SCRIPT}[data-c15t-activated="true"]`)
-      .count(),
+    await page.locator(`${NOTRA_SCRIPT}[data-c15t-activated="true"]`).count(),
     0
   );
   await context.clearCookies();

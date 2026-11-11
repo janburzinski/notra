@@ -9,7 +9,7 @@ export function geoIngestIdentityKind(
   identity: GeoIngestIdentity
 ): GeoIngestIdentityKind {
   if (identity.site) {
-    return "site";
+    return identity.web ? "site-beacon" : "site";
   }
   return identity.web ? "web" : "server";
 }

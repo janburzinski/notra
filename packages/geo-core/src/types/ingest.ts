@@ -12,6 +12,7 @@ import type { z } from "zod";
 import type {
   geoRequestPayloadSchema,
   mcpEventSchema,
+  webBeaconRelayPayloadSchema,
   webEngagementPayloadSchema,
 } from "../schemas/geo";
 import type {
@@ -170,6 +171,11 @@ export type McpEventPayload = z.infer<typeof mcpEventSchema>;
 
 type WebEngagementPayload = z.infer<typeof webEngagementPayloadSchema>;
 
+/** A notra.js beacon without its key, page URL and referrer. */
+export type WebBeaconFields = z.infer<
+  typeof webBeaconRelayPayloadSchema
+>["beacon"];
+
 export interface WebPageViewInput {
   identity: GeoIngestIdentity;
   payload: GeoIngestPayload;
@@ -276,8 +282,12 @@ export interface WebCollectOptions {
   lookupCountry?: (ip: string) => string | undefined;
 }
 
-/** Where a verified identity comes from: a write token, a Notra Site, or notra.js. */
-export type GeoIngestIdentityKind = "server" | "site" | "web";
+/**
+ * Where a verified identity comes from: a write token, a Notra Site's
+ * server-side report, notra.js on a Notra Site (relayed by the Site), or
+ * notra.js with a public key.
+ */
+export type GeoIngestIdentityKind = "server" | "site" | "site-beacon" | "web";
 
 /** What an identity kind may record and how its checks are enforced. */
 export interface GeoIngestIdentityPolicy {
@@ -286,10 +296,11 @@ export interface GeoIngestIdentityPolicy {
   /** Must match the scope's current token generation; rotation revokes it. */
   followsRotation: boolean;
   /**
-   * Which visitors become AI traffic events: every tracked type, or only AI
-   * referrals while no server SDK or drain already reports them.
+   * Which visitors become AI traffic events: every tracked type, only AI
+   * referrals while no server SDK or drain already reports them, or only AI
+   * referrals the visitor allowed measuring (a Site behind a cookie banner).
    */
-  aiEvents: "tracked" | "referrals-without-server";
+  aiEvents: "tracked" | "referrals-without-server" | "consented-referrals";
   /** Marks the scope as reported by server-side tracking. */
   marksServerTraffic: boolean;
   /** Posts on every page view, so scope checks are cached in process. */

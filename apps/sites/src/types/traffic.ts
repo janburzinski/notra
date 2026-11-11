@@ -32,34 +32,25 @@ export interface TrafficReport {
   visitorConsent?: boolean;
 }
 
-export interface EngagementEvent {
-  kind: "engagement";
-  viewId: string;
-  path: string;
-  visibleMs: number;
-  scrollDepth: number;
+export interface BeaconReport extends TrafficReport {
+  /** What notra.js sent, without its key, page URL and referrer. */
+  beacon: Record<string, unknown>;
 }
 
-export interface PageViewEvent {
-  kind: "view";
-  path: string;
-  referrer: string;
-}
-
-export type AnalyticsEvent = EngagementEvent | PageViewEvent;
-
-export interface EngagementReport {
-  fetch: (url: string, init: RequestInit) => Promise<Response>;
-  ingestUrl: string;
-  token: string;
-  publicOrigin: string;
-  event: EngagementEvent;
+/** A notra.js beacon posted to the Site's own event endpoint. */
+export interface AnalyticsBeacon {
+  /** Path, query and hash of the page notra.js reported. */
+  page: string;
+  /** The page's referrer, sent with page views only. */
+  referrer: string | null;
+  isPageView: boolean;
+  fields: Record<string, unknown>;
 }
 
 export interface IngestPost {
   fetch: (url: string, init: RequestInit) => Promise<Response>;
   ingestUrl: string;
   token: string;
-  kind: "traffic" | "engagement";
-  buildBody: () => TrafficPayload | Record<string, unknown>;
+  kind: "traffic" | "beacon";
+  buildBody: () => unknown;
 }

@@ -279,12 +279,12 @@ export async function buildWebPageView(
   };
 }
 
-export function isWebEngagementBody(body: unknown): boolean {
+export function isWebBeaconRelayBody(body: unknown): boolean {
   return (
     typeof body === "object" &&
     body !== null &&
     "type" in body &&
-    body.type === "engagement"
+    body.type === "beacon"
   );
 }
 

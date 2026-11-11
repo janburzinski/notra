@@ -3,7 +3,6 @@ import { brotliCompressSync, gzipSync } from "node:zlib";
 
 import type { Browser, BrowserContext, Page, Request } from "playwright-core";
 
-import { ANALYTICS_SCRIPT as SITES_SCRIPT } from "../../../apps/sites/src/constants/analytics";
 import { TRACKER_PLUS_SCRIPT, TRACKER_SCRIPT } from "../src/generated/script";
 import {
   DESKTOP_CHROME_USER_AGENT,
@@ -58,7 +57,6 @@ async function loadScripts(): Promise<Map<string, string>> {
   const scripts = new Map<string, string>([
     ["notra", TRACKER_SCRIPT],
     ["notra-plus", TRACKER_PLUS_SCRIPT],
-    ["notra-sites", SITES_SCRIPT],
   ]);
   for (const vendor of VENDORS) {
     if (!vendor.url || scripts.has(vendor.id)) {
