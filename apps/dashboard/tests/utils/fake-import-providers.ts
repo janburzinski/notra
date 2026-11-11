@@ -1,9 +1,11 @@
 /**
  * In-process stand-ins for the analytics APIs history imports read:
- * Plausible (Sites API v1 list + Stats API v2 query) and Cloudflare (zones,
- * GraphQL settings / httpRequestsAdaptiveGroups). Shapes, auth and rate-limit
- * answers follow the providers' public docs. Every answer is computed from one synthetic
- * session log, so a test can check imported totals against the source.
+ * Plausible (Sites API v1 list + Stats API v2 query), Cloudflare (zones,
+ * GraphQL settings / httpRequestsAdaptiveGroups) and Vercel (projects v9, Web
+ * Analytics aggregate). Shapes, auth and rate-limit answers follow the
+ * providers' public docs; Vercel's follow answers captured from its live
+ * API. Every answer is computed from one synthetic session log, so a test
+ * can check imported totals against the source.
  *
  * Tests reach them by routing fetch (`routeProviderFetch`); the importers'
  * fixed provider hosts never become configurable.
@@ -63,9 +65,14 @@ interface FakeProviderOptions {
   cloudflareSampleInterval: number;
   /** How far back the plan keeps crawler data, in seconds. */
   crawlerNotOlderThan: number;
+  vercelToken: string;
+  vercelTeamId: string;
+  vercelProjectId: string;
+  /** Days of Web Analytics history the Vercel plan keeps (Pro: 366). */
+  vercelRetentionDays: number;
 }
 
-type FakeProviderName = "plausible" | "cloudflare";
+type FakeProviderName = "plausible" | "cloudflare" | "vercel";
 
 type Row = Record<string, string | number>;
 
@@ -334,6 +341,146 @@ function matchesAgent(userAgent: string, filters: Row[]): boolean {
   );
 }
 
+const VERCEL_DIMENSIONS: Record<string, (session: FakeSession) => string> = {
+  country: (session) => session.country,
+  deviceType: (session) => session.device.toLowerCase(),
+  browserName: (session) => session.browser,
+  osName: (session) => session.os,
+  referrerHostname: (session) => session.referrer.replace(/^www\./, ""),
+  utmSource: (session) => session.utmSource,
+};
+const VERCEL_TIME_GRAINS = new Set(["day", "month"]);
+const VERCEL_OTHERS = "Others";
+
+function vercelError(code: string, message: string, status: number) {
+  return json({ error: { code, message } }, status);
+}
+
+type FakeEvent = ReturnType<typeof pageviewEvents>[number];
+
+/** Bucket keys of a time grain from `from` through `until`, empty ones included. */
+function vercelBuckets(grain: string, from: string, until: string): string[] {
+  const buckets: string[] = [];
+  for (let day = from; day <= until; day = addDays(day, 1)) {
+    if (grain === "day" || day.endsWith("-01") || day === from) {
+      buckets.push(`${day}T00:00:00.000Z`);
+    }
+  }
+  return buckets;
+}
+
+/**
+ * Vercel's Web Analytics aggregate over the session log, as the live API
+ * answers: buckets snap to the grain, time buckets include empty ones,
+ * visitors are unique per day and summed, and values past `limit` fold into
+ * one "Others" row. `by=day&by=<dimension>` ranks values over the whole
+ * range and answers every day of each of the top `limit` values, zeros
+ * included; how it folds the rest was never seen live (the capture had fewer
+ * values than the limit), so here they become an "Others" row per day.
+ */
+function vercelAggregate(
+  sessions: readonly FakeSession[],
+  url: URL,
+  retentionDays: number
+): Response {
+  const by = url.searchParams.getAll("by");
+  const limit = Number(url.searchParams.get("limit") ?? 100);
+  if (by.length === 0) {
+    return vercelError(
+      "bad_request",
+      "Invalid request: missing required property `by`.",
+      400
+    );
+  }
+  const grains = by.filter((name) => VERCEL_TIME_GRAINS.has(name));
+  const dimensions = by.filter((name) => !VERCEL_TIME_GRAINS.has(name));
+  const [grain] = grains;
+  const [dimension] = dimensions;
+  if (grains.length > 1 || dimensions.length > 1) {
+    return vercelError("bad_request", "Invalid request: `by`.", 400);
+  }
+  if (limit > 100) {
+    return vercelError(
+      "bad_request",
+      "Invalid request: `limit` should be <= 100.",
+      400
+    );
+  }
+  if (dimension?.startsWith("utm")) {
+    return vercelError(
+      "payment_required",
+      "UTM dimensions require an Enterprise plan or the Web Analytics Plus add-on.",
+      402
+    );
+  }
+  const today = new Date().toISOString().slice(0, 10);
+  const since = String(url.searchParams.get("since")).slice(0, 10);
+  const until = String(url.searchParams.get("until")).slice(0, 10);
+  if (since < addDays(today, -(retentionDays - 1))) {
+    return vercelError(
+      "bad_request",
+      `Invalid request: the pro plan only grants access to the latest ${retentionDays} days of data.`,
+      400
+    );
+  }
+  const from = grain === "month" ? `${since.slice(0, 7)}-01` : since;
+  const events = pageviewEvents(
+    sessions.filter((session) => session.day >= from && session.day <= until)
+  );
+  const bucketOf = (event: FakeEvent) => {
+    const day = event.session.day;
+    return `${grain === "month" ? `${day.slice(0, 7)}-01` : day}T00:00:00.000Z`;
+  };
+  const valueOf = (event: FakeEvent) => {
+    if (dimension === "requestPath") {
+      return event.page.split("?")[0] ?? "/";
+    }
+    return VERCEL_DIMENSIONS[dimension ?? ""]?.(event.session) ?? "";
+  };
+  const measure = (group: readonly FakeEvent[]) => ({
+    pageviews: group.length,
+    visitors: [...groupBy(group, (event) => event.session.day).values()].reduce(
+      (sum, day) =>
+        sum + new Set(day.map((event) => event.session.visitor)).size,
+      0
+    ),
+  });
+  const ranked = [...groupBy(events, valueOf).entries()].toSorted(
+    (a, b) => b[1].length - a[1].length
+  );
+  const top = ranked.slice(0, limit);
+  const rest = ranked.slice(limit).flatMap(([, group]) => group);
+  if (!grain) {
+    const data = top.map(([value, group]) => ({
+      [dimension ?? ""]: value,
+      ...measure(group),
+    }));
+    if (rest.length > 0) {
+      data.push({ [dimension ?? ""]: VERCEL_OTHERS, ...measure(rest) });
+    }
+    return json({ version: 1, data });
+  }
+  const buckets = vercelBuckets(grain, from, until);
+  const series = (group: readonly FakeEvent[]) => {
+    const byBucket = groupBy(group, bucketOf);
+    return buckets.map((timestamp) => ({
+      timestamp,
+      ...measure(byBucket.get(timestamp) ?? []),
+    }));
+  };
+  if (!dimension) {
+    return json({ version: 1, data: series(events) });
+  }
+  const groups: [string, FakeEvent[]][] =
+    rest.length > 0 ? [...top, [VERCEL_OTHERS, rest]] : top;
+  return json({
+    version: 1,
+    data: groups.flatMap(([value, group]) =>
+      series(group).map((row) => ({ ...row, [dimension]: value }))
+    ),
+  });
+}
+
 function cloudflareGraphqlError(message: string, status = 200) {
   return json({ data: null, errors: [{ message, path: null }] }, status);
 }
@@ -344,6 +491,8 @@ interface FakeProviders {
   faults: {
     /** Queued 429 answers for the next Plausible requests. */
     plausible429: number;
+    /** Queued 429 answers for the next Vercel requests. */
+    vercel429: number;
     /** Runs before each provider request, for example to revoke a key. */
     beforeRequest?: () => void;
   };
@@ -353,7 +502,7 @@ interface FakeProviders {
 export async function startFakeProviders(
   options: FakeProviderOptions
 ): Promise<FakeProviders> {
-  const faults: FakeProviders["faults"] = { plausible429: 0 };
+  const faults: FakeProviders["faults"] = { plausible429: 0, vercel429: 0 };
   const { dataset } = options;
 
   async function plausible(request: Request, path: string) {
@@ -493,16 +642,80 @@ export async function startFakeProviders(
     });
   }
 
+  /** Vercel's REST API: a user token scoped to a team with ?teamId. */
+  function vercel(request: Request, path: string, url: URL) {
+    if (bearer(request) !== options.vercelToken) {
+      return vercelError("forbidden", "Not authorized", 403);
+    }
+    if (url.searchParams.get("teamId") !== options.vercelTeamId) {
+      return vercelError(
+        "forbidden",
+        "You don't have permission to access this team.",
+        403
+      );
+    }
+    const limits = {
+      "x-ratelimit-limit": "400",
+      "x-ratelimit-reset": String(Math.floor(Date.now() / 1000) + 3600),
+    };
+    if (faults.vercel429 > 0) {
+      faults.vercel429 -= 1;
+      return new Response(
+        JSON.stringify({
+          error: { code: "too_many_requests", message: "Rate limit exceeded" },
+        }),
+        { status: 429, headers: { ...limits, "x-ratelimit-remaining": "0" } }
+      );
+    }
+    if (path === "/v9/projects") {
+      return json({
+        projects: [
+          {
+            id: options.vercelProjectId,
+            name: "site",
+            targets: {
+              production: {
+                alias: [options.host, "site-team.vercel.app"],
+              },
+            },
+          },
+        ],
+        pagination: { count: 1, next: null, prev: null },
+      });
+    }
+    if (path !== "/v1/query/web-analytics/visits/aggregate") {
+      return vercelError("not_found", "Not found", 404);
+    }
+    if (url.searchParams.get("projectId") !== options.vercelProjectId) {
+      return vercelError("not_found", "Project not found", 404);
+    }
+    if (url.searchParams.get("filter") !== "environment eq 'production'") {
+      return vercelError("bad_request", "Expected the production filter", 400);
+    }
+    const response = vercelAggregate(
+      dataset.sessions,
+      url,
+      options.vercelRetentionDays
+    );
+    for (const [name, value] of Object.entries(limits)) {
+      response.headers.set(name, value);
+    }
+    return response;
+  }
+
   async function handle(request: Request): Promise<Response> {
     const url = new URL(request.url);
     const [, provider = "", ...rest] = url.pathname.split("/");
     const path = `/${rest.join("/")}`;
-    if (!["plausible", "cloudflare"].includes(provider)) {
+    if (!["plausible", "cloudflare", "vercel"].includes(provider)) {
       return json({ error: "unknown provider" }, 404);
     }
     faults.beforeRequest?.();
     if (provider === "plausible") {
       return await plausible(request, path);
+    }
+    if (provider === "vercel") {
+      return vercel(request, path, url);
     }
     return await cloudflare(request, path);
   }
@@ -537,6 +750,7 @@ export async function startFakeProviders(
 const PROVIDER_ORIGINS: Record<string, FakeProviderName> = {
   "https://plausible.io": "plausible",
   "https://api.cloudflare.com": "cloudflare",
+  "https://api.vercel.com": "vercel",
 };
 
 /** fetch that sends the real provider hosts to the fakes and anything else through. */

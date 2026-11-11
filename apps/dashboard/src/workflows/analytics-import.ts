@@ -47,7 +47,8 @@ export async function analyticsImportWorkflow(
       // react-doctor-disable-next-line react-doctor/async-await-in-loop -- chunks run in order against one rate-limited account
       let outcome = await runAnalyticsImportChunkStep(
         payload.importId,
-        chunkStart
+        chunkStart,
+        payload.generation
       );
       while (outcome.status === "rate_limited") {
         // react-doctor-disable-next-line react-doctor/async-await-in-loop -- durable wait for the provider's window
@@ -55,7 +56,8 @@ export async function analyticsImportWorkflow(
         // react-doctor-disable-next-line react-doctor/async-await-in-loop -- retry the same chunk after the wait
         outcome = await runAnalyticsImportChunkStep(
           payload.importId,
-          chunkStart
+          chunkStart,
+          payload.generation
         );
       }
       if (outcome.status === "cancelled") {

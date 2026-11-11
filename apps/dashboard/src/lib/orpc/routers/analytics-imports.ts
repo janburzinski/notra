@@ -225,7 +225,7 @@ async function scheduleImportDelete(importId: string) {
 
 async function startImport(importId: string) {
   try {
-    const run = await startAnalyticsImportRun({ importId });
+    const run = await startAnalyticsImportRun({ importId, generation: 0 });
     await setImportWorkflowRun(importId, run.runId);
   } catch (error) {
     await deleteAnalyticsImportData(importId);

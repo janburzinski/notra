@@ -20,7 +20,7 @@ import type {
   VercelCredentials,
   WebImportRecord,
 } from "../types/analytics-imports";
-import { addDays, daysInRange, toDay } from "../utils/analytics-import-range";
+import { addDays, toDay } from "../utils/analytics-import-range";
 import { collectPages, importRequest } from "./http";
 
 const PROVIDER = "vercel";
@@ -28,7 +28,7 @@ const PRODUCTION_FILTER = "environment eq 'production'";
 /** Hobby (and other plans) answer older ranges with "...only grants access to the latest 31 days of data." */
 const RETENTION_ERROR = /latest (\d+) days/i;
 
-/** Breakdowns per day; totals come from a separate by=day query so they stay exact. */
+/** One request each per chunk; totals come from their own by=day query, so they stay exact. */
 const VERCEL_BREAKDOWNS: readonly VercelBreakdown[] = [
   { grain: "page", dimension: "requestPath", field: "path" },
   { grain: "source", dimension: "referrerHostname", field: "referrer" },
@@ -239,9 +239,69 @@ async function inBatches<T>(
   return results;
 }
 
+/** Vercel answers UTM dimensions with 402 below Enterprise or Web Analytics Plus. */
+function isPlanRestricted(error: unknown): boolean {
+  return error instanceof ImportProviderError && error.status === 402;
+}
+
 /**
- * Daily totals plus top-100 breakdowns per day (production only). Values
- * Vercel folds into "Others" are dropped, so breakdowns can sum below totals.
+ * One breakdown over the whole chunk, split by day: `by=day&by=<dimension>`
+ * answers with a row per day for each of the chunk's top 100 values (empty
+ * days included). Plans without UTM dimensions answer 402, which skips UTM.
+ */
+async function breakdownRecords(
+  credentials: VercelCredentials,
+  projectId: string,
+  host: string,
+  breakdown: VercelBreakdown,
+  range: ImportDayRange,
+  fetchImpl?: ImportFetch
+): Promise<WebImportRecord[]> {
+  let rows: Record<string, unknown>[];
+  try {
+    ({ rows } = await aggregate(
+      credentials,
+      projectId,
+      ["day", breakdown.dimension],
+      range,
+      fetchImpl
+    ));
+  } catch (error) {
+    if (breakdown.grain === "campaign" && isPlanRestricted(error)) {
+      return [];
+    }
+    throw error;
+  }
+  return rows.flatMap((row): WebImportRecord[] => {
+    const value = String(row[breakdown.dimension] ?? "");
+    const pageviews = metric(row, "pageviews", "total");
+    const visitors = metric(row, "visitors", "devices");
+    if (
+      value === VERCEL_OTHERS_GROUP ||
+      (breakdown.grain === "campaign" && !value) ||
+      (pageviews === 0 && visitors === 0)
+    ) {
+      return [];
+    }
+    return [
+      {
+        grain: breakdown.grain,
+        day: String(row.timestamp ?? "").slice(0, 10),
+        host,
+        [breakdown.field]: value,
+        pageviews,
+        visitors,
+      },
+    ];
+  });
+}
+
+/**
+ * Exact daily totals plus breakdowns (production only), one request each, so
+ * a chunk makes 8 requests whatever its length. Breakdowns cover the chunk's
+ * top 100 values of each dimension rather than each day's: a value that never
+ * reaches the chunk's top 100 is dropped, as is the "Others" row, so
+ * breakdowns can sum below totals.
  */
 export async function fetchVercelChunk(
   credentials: VercelCredentials,
@@ -270,35 +330,16 @@ export async function fetchVercelChunk(
       visitors: metric(row, "visitors", "devices"),
     });
   }
-  const tasks = daysInRange(served).flatMap((day) =>
-    VERCEL_BREAKDOWNS.map((breakdown) => async () => {
-      const { rows } = await aggregate(
+  const tasks = VERCEL_BREAKDOWNS.map(
+    (breakdown) => async () =>
+      await breakdownRecords(
         credentials,
         projectId,
-        [breakdown.dimension],
-        { start: day, end: day },
+        host,
+        breakdown,
+        served,
         fetchImpl
-      );
-      return rows.flatMap((row): WebImportRecord[] => {
-        const value = String(row[breakdown.dimension] ?? "");
-        if (
-          value === VERCEL_OTHERS_GROUP ||
-          (breakdown.grain === "campaign" && !value)
-        ) {
-          return [];
-        }
-        return [
-          {
-            grain: breakdown.grain,
-            day,
-            host,
-            [breakdown.field]: value,
-            pageviews: metric(row, "pageviews", "total"),
-            visitors: metric(row, "visitors", "devices"),
-          },
-        ];
-      });
-    })
+      )
   );
   for (const rows of await inBatches(tasks, VERCEL_CONCURRENCY)) {
     records.push(...rows);

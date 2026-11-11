@@ -26,6 +26,7 @@ import {
   projects,
   users,
 } from "@notra/db/schema";
+import { ImportRateLimitedError } from "@notra/geo-core/schemas/analytics-import-errors";
 import { call } from "@orpc/server";
 import { eq } from "drizzle-orm";
 import { Effect } from "effect";
@@ -172,11 +173,19 @@ if (process.env.NOTRA_ANALYTICS_IMPORTS_SANDBOX_TEST !== "1") {
 
   const workflows = await import("../src/lib/workflows/start");
   const startedRuns: string[] = [];
+  const startedGenerations: (number | undefined)[] = [];
   const deleteRuns: string[] = [];
   mock.module("../src/lib/workflows/start", () => ({
     ...workflows,
-    startAnalyticsImportRun: async ({ importId }: { importId: string }) => {
+    startAnalyticsImportRun: async ({
+      importId,
+      generation,
+    }: {
+      importId: string;
+      generation?: number;
+    }) => {
       startedRuns.push(importId);
+      startedGenerations.push(generation);
       return { runId: "run-test" };
     },
     startAnalyticsImportDeleteRun: async ({
@@ -190,11 +199,15 @@ if (process.env.NOTRA_ANALYTICS_IMPORTS_SANDBOX_TEST !== "1") {
   }));
   const runStates = new Map<string, string>();
   const wokenRuns: string[] = [];
+  const cancelledRuns: string[] = [];
   mock.module("../src/lib/analytics-imports/runs", () => ({
     readImportRunState: async (runId: string) =>
       runStates.get(runId) ?? "missing",
     wakeImportRun: async (runId: string) => {
       wokenRuns.push(runId);
+    },
+    cancelImportRun: async (runId: string) => {
+      cancelledRuns.push(runId);
     },
   }));
 
@@ -209,6 +222,7 @@ if (process.env.NOTRA_ANALYTICS_IMPORTS_SANDBOX_TEST !== "1") {
   const { geoRouter } = await import("../src/lib/orpc/routers/geo");
   const { createORPCContext } = await import("../src/lib/orpc/context");
   const {
+    ANALYTICS_IMPORT_BUDGET_WAIT,
     ANALYTICS_IMPORT_LOST_ERROR,
     ANALYTICS_IMPORT_LOST_UPLOAD_ERROR,
     ANALYTICS_IMPORT_MAX_RECOVERY_ATTEMPTS,
@@ -340,6 +354,8 @@ if (process.env.NOTRA_ANALYTICS_IMPORTS_SANDBOX_TEST !== "1") {
     deleteRuns.length = 0;
     runStates.clear();
     wokenRuns.length = 0;
+    cancelledRuns.length = 0;
+    startedGenerations.length = 0;
   });
 
   describe("access", () => {
@@ -1097,6 +1113,175 @@ if (process.env.NOTRA_ANALYTICS_IMPORTS_SANDBOX_TEST !== "1") {
     expect(await loadImport(inline.id)).toMatchObject({
       status: "failed",
       lastError: ANALYTICS_IMPORT_LOST_UPLOAD_ERROR,
+    });
+  });
+
+  test("recovery restarts a rate-limit wait that never woke, and the old run never imports again", async () => {
+    nativeFirstDay = "2026-10-01";
+    const connection = await saveConnection("vercel");
+    const sleepy = await createVercelImport(connection.id, "sleepy");
+    const [chunk = ""] =
+      (await runner.planAnalyticsImport(sleepy.id))?.chunks ?? [];
+    await imports.setImportWorkflowRun(sleepy.id, "run-sleepy");
+    runStates.set("run-sleepy", "running");
+    fetchMock.mockResolvedValueOnce(
+      new Response("slow", { status: 429, headers: { "Retry-After": "60" } })
+    );
+    expect(
+      await runner.runAnalyticsImportChunk(sleepy.id, chunk, { generation: 0 })
+    ).toEqual({ status: "rate_limited", retryAfterSeconds: 60 });
+    // Vercel's hourly window: a long wait that is still due is left alone.
+    const patient = await createVercelImport(connection.id, "patient");
+    await imports.setImportWorkflowRun(patient.id, "run-patient");
+    runStates.set("run-patient", "running");
+    await db
+      .update(analyticsImports)
+      .set({
+        status: "waiting_rate_limit",
+        retryAt: new Date(Date.now() + 60 * 60 * 1000),
+      })
+      .where(eq(analyticsImports.id, patient.id));
+
+    const later = Date.now() + 20 * 60 * 1000;
+    expect(await recoverAnalyticsImports(later)).toEqual({
+      checked: 2,
+      restarted: 1,
+      failed: 0,
+    });
+    expect(startedRuns).toEqual([sleepy.id]);
+    expect(startedGenerations).toEqual([1]);
+    expect(cancelledRuns).toEqual(["run-sleepy"]);
+    expect(await loadImport(sleepy.id)).toMatchObject({
+      status: "pending",
+      retryAt: null,
+      workflowRunId: "run-test",
+      recoveryAttempts: 1,
+    });
+    expect(await loadImport(patient.id)).toMatchObject({
+      status: "waiting_rate_limit",
+      workflowRunId: "run-patient",
+      recoveryAttempts: 0,
+    });
+
+    // If the old run wakes after all, it stops before claiming the chunk.
+    fetchMock.mockImplementation(async () => Response.json({ data: [] }));
+    const requests = fetchMock.mock.calls.length;
+    expect(
+      await runner.runAnalyticsImportChunk(sleepy.id, chunk, { generation: 0 })
+    ).toEqual({ status: "cancelled" });
+    expect(fetchMock.mock.calls.length).toBe(requests);
+    // A run started before generations existed is fenced by its run id.
+    expect(
+      await runner.runAnalyticsImportChunk(sleepy.id, chunk, {
+        runId: "run-sleepy",
+      })
+    ).toEqual({ status: "cancelled" });
+    expect(fetchMock.mock.calls.length).toBe(requests);
+    expect(
+      await runner.runAnalyticsImportChunk(sleepy.id, chunk, { generation: 1 })
+    ).toEqual({ status: "done" });
+  });
+
+  test("a run without a generation goes on while it is still the import's current run", async () => {
+    nativeFirstDay = "2026-10-01";
+    const connection = await saveConnection("vercel");
+    // Recovery before generations restarted it without passing one.
+    const older = await createVercelImport(connection.id, "older");
+    const [chunk = ""] =
+      (await runner.planAnalyticsImport(older.id))?.chunks ?? [];
+    await imports.setImportWorkflowRun(older.id, "run-older");
+    await db
+      .update(analyticsImports)
+      .set({ recoveryAttempts: 2 })
+      .where(eq(analyticsImports.id, older.id));
+    fetchMock.mockImplementation(async () => Response.json({ data: [] }));
+
+    expect(
+      await runner.runAnalyticsImportChunk(older.id, chunk, {
+        runId: "run-older",
+      })
+    ).toEqual({ status: "done" });
+  });
+
+  test("at the last attempt an overdue wait is claimed before it fails; a resumed import is kept", async () => {
+    nativeFirstDay = "2026-10-01";
+    const connection = await saveConnection("vercel");
+    const overdue = await createVercelImport(connection.id, "overdue");
+    const resumed = await createVercelImport(connection.id, "resumed");
+    const [chunk = ""] =
+      (await runner.planAnalyticsImport(overdue.id))?.chunks ?? [];
+    for (const [row, runId, status] of [
+      [overdue, "run-overdue", "waiting_rate_limit"],
+      [resumed, "run-resumed", "running"],
+    ] as const) {
+      await imports.setImportWorkflowRun(row.id, runId);
+      runStates.set(runId, "running");
+      await db
+        .update(analyticsImports)
+        .set({
+          status,
+          retryAt: new Date(Date.now() - 60 * 60 * 1000),
+          recoveryAttempts: ANALYTICS_IMPORT_MAX_RECOVERY_ATTEMPTS,
+        })
+        .where(eq(analyticsImports.id, row.id));
+    }
+
+    // Recovery only looks at imports left untouched for a while.
+    const result = await recoverAnalyticsImports(Date.now() + 20 * 60 * 1000);
+    expect(result.failed).toBe(1);
+    expect(await loadImport(overdue.id)).toMatchObject({
+      status: "failed",
+      lastError: ANALYTICS_IMPORT_LOST_ERROR,
+      recoveryAttempts: ANALYTICS_IMPORT_MAX_RECOVERY_ATTEMPTS + 1,
+    });
+    expect(cancelledRuns).toEqual(["run-overdue"]);
+    // The old run is fenced by the claim and imports nothing if it wakes,
+    // with or without a generation.
+    for (const fence of [
+      { generation: ANALYTICS_IMPORT_MAX_RECOVERY_ATTEMPTS },
+      { runId: "run-overdue" },
+    ]) {
+      expect(
+        await runner.runAnalyticsImportChunk(overdue.id, chunk, fence)
+      ).toEqual({ status: "cancelled" });
+    }
+    // An import whose run picked up again is alive: never failed.
+    expect(await loadImport(resumed.id)).toMatchObject({ status: "running" });
+  });
+
+  test("a wait on Notra's own request budget is stored apart from a provider's", async () => {
+    nativeFirstDay = "2026-10-01";
+    const connection = await saveConnection("vercel");
+    const row = await createVercelImport(connection.id, "budget");
+    const [chunk = ""] =
+      (await runner.planAnalyticsImport(row.id))?.chunks ?? [];
+    fetchMock.mockRejectedValueOnce(
+      new ImportRateLimitedError({
+        provider: "vercel",
+        retryAfterSeconds: 1800,
+        budget: true,
+      })
+    );
+    expect(await runner.runAnalyticsImportChunk(row.id, chunk)).toEqual({
+      status: "rate_limited",
+      retryAfterSeconds: 1800,
+    });
+    const listed = async () =>
+      (await imports.listAnalyticsImports("org-a", "project-a")).find(
+        (item) => item.id === row.id
+      );
+    expect(await listed()).toMatchObject({
+      status: "waiting_rate_limit",
+      lastError: ANALYTICS_IMPORT_BUDGET_WAIT,
+    });
+
+    fetchMock.mockResolvedValueOnce(
+      new Response("slow", { status: 429, headers: { "Retry-After": "60" } })
+    );
+    await runner.runAnalyticsImportChunk(row.id, chunk);
+    expect(await listed()).toMatchObject({
+      status: "waiting_rate_limit",
+      lastError: null,
     });
   });
 

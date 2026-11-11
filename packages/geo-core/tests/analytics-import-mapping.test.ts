@@ -212,6 +212,22 @@ describe("rows", () => {
     ).toMatchObject({ utm_term: "", utm_content: "" });
   });
 
+  test("page paths hide ids and personal data like native views", () => {
+    for (const grain of ["page", "entry_page"] as const) {
+      expect(
+        toWebImportedRow(
+          {
+            grain,
+            day: DAY,
+            path: "/invite/550e8400-e29b-41d4-a716-446655440000/jane@example.com?ref=x",
+            pageviews: 1,
+          },
+          CONTEXT
+        ).path
+      ).toBe("/invite/:id/:id");
+    }
+  });
+
   test("rows that collapse after mapping are summed", () => {
     const rows = aggregateWebRows(
       ["/a?x=1", "/a?x=2"].map((path) =>

@@ -20,6 +20,12 @@ export const ANALYTICS_IMPORT_LOST_ERROR =
 /** Written by the recovery job when an export held in memory was lost with its process. */
 export const ANALYTICS_IMPORT_LOST_UPLOAD_ERROR =
   "The import stopped before it finished reading the export";
+/**
+ * Stored as the error of an import that waits on Notra's own request budget
+ * for its connection rather than on the provider, so the pause names Notra.
+ */
+export const ANALYTICS_IMPORT_BUDGET_WAIT =
+  "Waiting for the connection's request budget";
 /** Translation keys for errors the runner itself writes. */
 export const ANALYTICS_IMPORT_KNOWN_ERRORS: Readonly<
   Record<string, "lost" | "lostUpload">
@@ -31,6 +37,11 @@ export const ANALYTICS_IMPORT_KNOWN_ERRORS: Readonly<
 export const ANALYTICS_IMPORT_QUEUE_POLL_SECONDS = 300;
 /** An active import untouched this long gets its workflow run checked. */
 export const ANALYTICS_IMPORT_STALE_MS = 15 * 60 * 1000;
+/**
+ * A rate-limit wait this far past its resume time was lost, even when the
+ * workflow still reports the run as running: its sleep never woke it.
+ */
+export const ANALYTICS_IMPORT_LOST_WAIT_MS = 15 * 60 * 1000;
 /** Restarts of a lost run before the import fails. */
 export const ANALYTICS_IMPORT_MAX_RECOVERY_ATTEMPTS = 3;
 /** Stale imports one recovery pass looks at. */

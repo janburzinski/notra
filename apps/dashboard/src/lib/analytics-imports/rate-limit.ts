@@ -51,6 +51,7 @@ export function rateLimitedImportFetch(
           throw new ImportRateLimitedError({
             provider,
             retryAfterSeconds: (window + 1) * windowSeconds - now + 1,
+            budget: true,
           });
         }
       }

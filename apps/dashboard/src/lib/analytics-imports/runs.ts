@@ -20,3 +20,9 @@ export async function wakeImportRun(runId: string): Promise<void> {
   const { getRun } = await import("workflow/api");
   await getRun(runId).wakeUp();
 }
+
+/** Stops a run recovery replaced; the new run's generation fences it anyway. */
+export async function cancelImportRun(runId: string): Promise<void> {
+  const { getRun } = await import("workflow/api");
+  await getRun(runId).cancel();
+}

@@ -11,6 +11,7 @@ import type {
   WebImportRecord,
 } from "../types/analytics-imports";
 import { isInImportHostScope } from "../utils/analytics-import-host";
+import { scrubWebPath } from "../utils/web-path-scrub";
 import {
   mapImportBrowser,
   mapImportCountry,
@@ -77,7 +78,7 @@ export function toWebImportedRow(
     grain: record.grain,
     day: record.day,
     host,
-    path: usesPath ? sanitizeImportPath(record.path) : "",
+    path: usesPath ? scrubWebPath(sanitizeImportPath(record.path)) : "",
     referrer_host: referrer?.host ?? "",
     referrer_group: referrer?.group ?? "",
     referrer_source: referrer?.source ?? "",

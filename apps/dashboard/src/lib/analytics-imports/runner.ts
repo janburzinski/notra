@@ -30,6 +30,7 @@ import {
 import { and, eq, inArray, ne, sql } from "drizzle-orm";
 
 import {
+  ANALYTICS_IMPORT_BUDGET_WAIT,
   ANALYTICS_IMPORT_FORBIDDEN_RETRY_SECONDS,
   ANALYTICS_IMPORT_MAX_CHUNK_ATTEMPTS,
   ANALYTICS_IMPORT_MAX_ERROR_LENGTH,
@@ -253,6 +254,10 @@ async function recordChunkFailure(
         .set({
           status: "waiting_rate_limit",
           retryAt: new Date(Date.now() + waitSeconds * 1000),
+          lastError:
+            error instanceof ImportRateLimitedError && error.budget
+              ? ANALYTICS_IMPORT_BUDGET_WAIT
+              : null,
         })
         .where(activeImportWhere(row.id));
     }
@@ -272,17 +277,39 @@ async function recordChunkFailure(
   return { status: "failed", error: message };
 }
 
+function runFenceWhere(generation?: number, runId?: string) {
+  if (generation !== undefined) {
+    return eq(analyticsImports.recoveryAttempts, generation);
+  }
+  if (runId !== undefined) {
+    return eq(analyticsImports.workflowRunId, runId);
+  }
+  return undefined;
+}
+
 /**
  * Imports one chunk. A retried chunk first deletes what an earlier attempt
  * wrote, so re-runs never double count. Rate limits and transient failures
  * leave the chunk pending for the workflow to retry. Every import write is
  * conditional on the import still running, so a delete that lands while a
- * request is in flight is never undone.
+ * request is in flight is never undone. A run started for an earlier
+ * `generation` (recovery has replaced it since) is cancelled before it
+ * claims the chunk, so two runs never import at once. A run without a
+ * generation passes its `runId` instead and goes on only while it is still
+ * the import's current run.
  */
 export async function runAnalyticsImportChunk(
   importId: string,
   chunkStart: string,
-  csv?: AsyncIterable<Uint8Array>
+  {
+    csv,
+    generation,
+    runId,
+  }: {
+    csv?: AsyncIterable<Uint8Array>;
+    generation?: number;
+    runId?: string;
+  } = {}
 ): Promise<AnalyticsImportChunkOutcome> {
   const row = await loadImport(importId);
   if (!row || isStopped(row)) {
@@ -294,8 +321,8 @@ export async function runAnalyticsImportChunk(
   }
   const [running] = await db
     .update(analyticsImports)
-    .set({ status: "running", retryAt: null })
-    .where(activeImportWhere(importId))
+    .set({ status: "running", retryAt: null, lastError: null })
+    .where(and(activeImportWhere(importId), runFenceWhere(generation, runId)))
     .returning({ id: analyticsImports.id });
   if (!running) {
     return { status: "cancelled" };
@@ -469,11 +496,9 @@ export async function runAnalyticsImportInline(
     let outcome: AnalyticsImportChunkOutcome;
     try {
       // react-doctor-disable-next-line react-doctor/async-await-in-loop -- one chunk per export
-      outcome = await runAnalyticsImportChunk(
-        importId,
-        chunkStart,
-        bytesToChunks(csv, IMPORT_CSV_ZIP_SLICE_BYTES)
-      );
+      outcome = await runAnalyticsImportChunk(importId, chunkStart, {
+        csv: bytesToChunks(csv, IMPORT_CSV_ZIP_SLICE_BYTES),
+      });
     } catch (error) {
       // Nothing retries an inline import, so an error ends it.
       await failAnalyticsImport(importId, describeImportError(error));

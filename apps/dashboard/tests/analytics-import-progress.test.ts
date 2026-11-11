@@ -1,5 +1,6 @@
 import { describe, expect, test } from "bun:test";
 
+import { ANALYTICS_IMPORT_BUDGET_WAIT } from "../src/constants/analytics-imports";
 import type { AnalyticsImportSummary } from "../src/types/analytics-imports";
 import {
   importedAnalyticsTarget,
@@ -293,6 +294,25 @@ describe("importProgressView", () => {
       importProgressView(item, model("waiting"), { ...ctx, seconds: 75 }).detail
     ).toEqual([
       { key: "waitingLine", values: { provider: "Vercel", time: "1m 15s" } },
+    ]);
+  });
+
+  test("a pause for Notra's own request budget never blames the provider", () => {
+    const budget = { ...item, lastError: ANALYTICS_IMPORT_BUDGET_WAIT };
+    expect(
+      importProgressView(budget, model("waiting"), { ...ctx, seconds: 75 })
+        .detail
+    ).toEqual([
+      {
+        key: "waitingBudgetLine",
+        values: { provider: "Vercel", time: "1m 15s" },
+      },
+    ]);
+    expect(importProgressView(budget, model("waiting"), ctx).detail).toEqual([
+      { key: "waitingBudgetSoon", values: { provider: "Vercel" } },
+    ]);
+    expect(importProgressView(item, model("waiting"), ctx).detail).toEqual([
+      { key: "waitingSoon", values: { provider: "Vercel" } },
     ]);
   });
 

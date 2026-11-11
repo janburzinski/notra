@@ -1023,10 +1023,10 @@ describe("Vercel Web Analytics", () => {
     ).rejects.toBeInstanceOf(ImportProviderError);
   });
 
-  test("reads exact daily totals and top-100 breakdowns for production only", async () => {
+  test("reads exact daily totals and each breakdown in one by=day request per chunk", async () => {
     const { fetch, calls } = fakeFetch((call) => {
-      const by = call.url.searchParams.getAll("by");
-      if (by.includes("day")) {
+      const [, dimension] = call.url.searchParams.getAll("by");
+      if (!dimension) {
         return {
           data: [
             { timestamp: "2026-09-01T00:00:00Z", pageviews: 100, visitors: 40 },
@@ -1034,16 +1034,28 @@ describe("Vercel Web Analytics", () => {
           ],
         };
       }
-      const dimension = by[0] ?? "";
+      // As Vercel answers: every day of each of the range's top values.
+      const value = dimension === "referrerHostname" ? "chatgpt.com" : "/x";
       return {
         data: [
           {
-            [dimension]:
-              dimension === "referrerHostname" ? "chatgpt.com" : "/x",
+            timestamp: "2026-09-01T00:00:00Z",
+            [dimension]: value,
             pageviews: 10,
             visitors: 5,
           },
-          { [dimension]: "Others", pageviews: 3, visitors: 2 },
+          {
+            timestamp: "2026-09-02T00:00:00Z",
+            [dimension]: value,
+            pageviews: 0,
+            visitors: 0,
+          },
+          {
+            timestamp: "2026-09-02T00:00:00Z",
+            [dimension]: "Others",
+            pageviews: 3,
+            visitors: 2,
+          },
         ],
       };
     });
@@ -1054,7 +1066,16 @@ describe("Vercel Web Analytics", () => {
       { start: "2026-09-01", end: "2026-09-02" },
       fetch
     );
-    expect(calls).toHaveLength(1 + 2 * 7);
+    expect(calls.map((call) => call.url.searchParams.getAll("by"))).toEqual([
+      ["day"],
+      ["day", "requestPath"],
+      ["day", "referrerHostname"],
+      ["day", "utmSource"],
+      ["day", "country"],
+      ["day", "deviceType"],
+      ["day", "browserName"],
+      ["day", "osName"],
+    ]);
     for (const call of calls) {
       expect(call.url.pathname).toBe(
         "/v1/query/web-analytics/visits/aggregate"
@@ -1064,6 +1085,12 @@ describe("Vercel Web Analytics", () => {
       );
       expect(call.url.searchParams.get("limit")).toBe("100");
       expect(call.url.searchParams.get("teamId")).toBe("team_abc");
+      expect(call.url.searchParams.get("since")).toBe(
+        "2026-09-01T00:00:00.000Z"
+      );
+      expect(call.url.searchParams.get("until")).toBe(
+        "2026-09-02T23:59:59.999Z"
+      );
     }
     expect(records.filter((record) => record.grain === "total")).toEqual([
       expect.objectContaining({
@@ -1077,23 +1104,88 @@ describe("Vercel Web Analytics", () => {
         visitors: 30,
       }),
     ]);
+    // Empty days and "Others" are dropped; each value keeps its own day.
     expect(
       records.some((record) => Object.values(record).includes("Others"))
     ).toBe(false);
+    expect(
+      records
+        .filter((record) => record.grain === "page")
+        .map((record) => [record.day, record.path, record.pageviews])
+    ).toEqual([["2026-09-01", "/x", 10]]);
     const sources = records
       .filter((record) => record.grain === "source")
       .map((record) =>
         toWebImportedRow(record, { ...CONTEXT, provider: "vercel" })
       );
-    expect(sources[0]).toMatchObject({
-      referrer_group: "ai",
-      referrer_source: "chatgpt",
-      visits: null,
-      visitors: 5,
-    });
+    expect(sources).toEqual([
+      expect.objectContaining({
+        day: "2026-09-01",
+        referrer_group: "ai",
+        referrer_source: "chatgpt",
+        visits: null,
+        visitors: 5,
+      }),
+    ]);
   });
 
-  test("one chunk never needs more requests than one rate-limit window allows", async () => {
+  test("a plan without UTM dimensions imports everything else", async () => {
+    const { fetch, calls } = fakeFetch((call) => {
+      const [, dimension] = call.url.searchParams.getAll("by");
+      if (dimension === "utmSource") {
+        return Response.json(
+          {
+            error: {
+              code: "payment_required",
+              message:
+                "UTM dimensions require an Enterprise plan or the Web Analytics Plus add-on.",
+            },
+          },
+          { status: 402 }
+        );
+      }
+      if (!dimension) {
+        return {
+          data: [
+            {
+              timestamp: "2026-03-09T00:00:00.000Z",
+              visitors: 151,
+              pageviews: 240,
+            },
+            {
+              timestamp: "2026-03-10T00:00:00.000Z",
+              visitors: 92,
+              pageviews: 129,
+            },
+          ],
+        };
+      }
+      return {
+        data: [
+          {
+            timestamp: "2026-03-09T00:00:00.000Z",
+            [dimension]: "US",
+            pageviews: 71,
+            visitors: 43,
+          },
+        ],
+      };
+    });
+    const records = await fetchVercelChunk(
+      VERCEL,
+      "prj_1",
+      "example.com",
+      { start: "2026-03-09", end: "2026-03-10" },
+      fetch
+    );
+    const grains = new Set(records.map((record) => record.grain));
+    expect(grains).toEqual(
+      new Set(["total", "page", "source", "country", "device", "browser", "os"])
+    );
+    expect(calls).toHaveLength(8);
+  });
+
+  test("a week's chunk makes 8 requests, well inside one rate-limit window", async () => {
     const { fetch, calls } = fakeFetch(() => ({ data: [] }));
     await fetchVercelChunk(
       { token: "vercel-token-1" },
@@ -1105,6 +1197,7 @@ describe("Vercel Web Analytics", () => {
       },
       fetch
     );
+    expect(calls).toHaveLength(8);
     expect(calls.length).toBeLessThanOrEqual(
       IMPORT_RATE_LIMITS.vercel.requests
     );

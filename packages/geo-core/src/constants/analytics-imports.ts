@@ -39,11 +39,15 @@ export const IMPORT_CSV_MAX_ROW_CELLS = 64;
 export const IMPORT_CSV_MAX_ROW_LENGTH = 16 * 1024;
 export const IMPORT_RATE_LIMIT_KEY_PREFIX = "import:rl";
 
-/** Per-connection request budgets, kept below each provider's published limit. */
+/**
+ * Per-connection request budgets, kept below each provider's limit. Vercel
+ * allows Web Analytics queries 400 requests an hour (x-ratelimit-limit), so
+ * Notra leaves the token room for the customer's own use.
+ */
 export const IMPORT_RATE_LIMITS = {
   plausible: { requests: 400, windowSeconds: 3600 },
   cloudflare: { requests: 250, windowSeconds: 300 },
-  vercel: { requests: 60, windowSeconds: 60 },
+  vercel: { requests: 350, windowSeconds: 3600 },
   /**
    * Rybbit refills a 50-request bucket at 5 a second, so 25 per 10 s never
    * empties it, even across a window edge. The daily cap leaves a fifth of
@@ -55,8 +59,10 @@ export const IMPORT_RATE_LIMITS = {
 } as const;
 
 /**
- * A Vercel chunk makes 1 + 7 requests per day; 7 days (50 requests) fit one
- * window of its budget, so a chunk retried after a limit always completes.
+ * A Vercel chunk makes 8 requests (daily totals, then one by=day&by=<dimension>
+ * request per breakdown) whatever its length, so a chunk retried after a limit
+ * always completes and a year takes 53 chunks, about 424 requests. A week
+ * keeps breakdowns close to daily: each covers the week's top 100 values.
  */
 export const VERCEL_CHUNK_DAYS = 7;
 

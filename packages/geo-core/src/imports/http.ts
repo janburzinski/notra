@@ -127,7 +127,10 @@ export async function collectPages<TCursor, TItem>(
 /** Human-readable reason for logs and the imports list. */
 export function describeImportError(error: unknown): string {
   if (error instanceof ImportRateLimitedError) {
-    return `${error.provider} rate limit reached; retrying in ${error.retryAfterSeconds}s`;
+    const limit = error.budget
+      ? "request budget used up"
+      : "rate limit reached";
+    return `${error.provider} ${limit}; retrying in ${error.retryAfterSeconds}s`;
   }
   if (error instanceof ImportAuthError) {
     return `${error.provider} rejected the credentials${error.status ? ` (${error.status})` : ""}`;

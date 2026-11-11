@@ -10,6 +10,7 @@ import {
   ANALYTICS_IMPORT_PROGRESS_PHASES,
   ANALYTICS_IMPORT_REMOVED_PHASES,
 } from "@/constants/analytics-import-progress";
+import { ANALYTICS_IMPORT_BUDGET_WAIT } from "@/constants/analytics-imports";
 import { WEB_ANALYTICS_NAV_LINK } from "@/constants/geo-traffic-pages";
 import { GEO_TRAFFIC_NAV_LINK } from "@/constants/nav";
 import type {
@@ -294,15 +295,21 @@ export function importProgressView(
           ? { key: "queuedBehind", values: { source: item.waitingFor } }
           : { key: "queuedLine", values: {} },
       ]);
-    case "waiting":
+    case "waiting": {
+      // Notra's own per-connection budget, not the provider, may be the cause.
+      const budget = item.lastError === ANALYTICS_IMPORT_BUDGET_WAIT;
       return view([
         seconds > 0
           ? {
-              key: "waitingLine",
+              key: budget ? "waitingBudgetLine" : "waitingLine",
               values: { provider, time: formatElapsedSeconds(seconds) },
             }
-          : { key: "waitingSoon", values: { provider } },
+          : {
+              key: budget ? "waitingBudgetSoon" : "waitingSoon",
+              values: { provider },
+            },
       ]);
+    }
     case "running": {
       // An export is one file: its days say enough.
       if (model.unit === "part") {

@@ -146,20 +146,24 @@ if (process.env.NOTRA_ANALYTICS_IMPORTS_E2E !== "1") {
   mock.module("../src/lib/analytics-imports/runs", () => ({
     readImportRunState: async () => "running",
     wakeImportRun: async () => undefined,
+    cancelImportRun: async () => undefined,
   }));
   mock.module("../src/workflows/runtime", () => ({}));
   // Started runs wait until the test lets them go, so faults set up after
   // the preview and create calls reach the workflow and nothing earlier.
   const runs = new Map<string, () => Promise<unknown>>();
   mock.module("../src/lib/workflows/start", () => ({
-    startAnalyticsImportRun: async ({ importId }: { importId: string }) => {
+    startAnalyticsImportRun: async (payload: {
+      importId: string;
+      generation?: number;
+    }) => {
       const workflows = await import("../src/workflows/analytics-import");
-      runs.set(importId, () =>
+      runs.set(payload.importId, () =>
         workflows
-          .analyticsImportWorkflow({ importId })
+          .analyticsImportWorkflow(payload)
           .catch((error: unknown) => error)
       );
-      return { runId: `run_${importId}` };
+      return { runId: `run_${payload.importId}` };
     },
     startAnalyticsImportDeleteRun: async () => ({ runId: "delete" }),
   }));
@@ -177,6 +181,10 @@ if (process.env.NOTRA_ANALYTICS_IMPORTS_E2E !== "1") {
     zoneId: "zone123",
     cloudflareSampleInterval: 2,
     crawlerNotOlderThan: 8 * 86_400,
+    vercelToken: "vercel-token-123",
+    vercelTeamId: "team_acme",
+    vercelProjectId: "prj_site",
+    vercelRetentionDays: 60,
   });
   globalThis.fetch = routeProviderFetch(fakes, fetch);
 
@@ -192,9 +200,9 @@ if (process.env.NOTRA_ANALYTICS_IMPORTS_E2E !== "1") {
     });
 
   const connect = async (
-    provider: "plausible" | "cloudflare",
+    provider: "plausible" | "cloudflare" | "vercel",
     secret: string,
-    extra: { connectionId?: string } = {}
+    extra: { connectionId?: string; teamId?: string } = {}
   ) =>
     await call(
       analyticsImportsRouter.connect,
@@ -206,7 +214,7 @@ if (process.env.NOTRA_ANALYTICS_IMPORTS_E2E !== "1") {
 
   const startImport = async (input: {
     connectionId: string;
-    provider: "plausible" | "cloudflare";
+    provider: "plausible" | "cloudflare" | "vercel";
     sourceRef: string;
   }) => {
     const source = {
@@ -286,6 +294,7 @@ if (process.env.NOTRA_ANALYTICS_IMPORTS_E2E !== "1") {
     nativeFirstDay = "1970-01-01";
     importsAllowed = true;
     fakes.faults.plausible429 = 0;
+    fakes.faults.vercel429 = 0;
     fakes.faults.beforeRequest = undefined;
     fakes.options.plausibleKey = "plausible-stats-key-1";
   });
@@ -447,5 +456,59 @@ if (process.env.NOTRA_ANALYTICS_IMPORTS_E2E !== "1") {
     expect(written.every((item) => item.sample_interval === 2)).toBe(true);
     expect(JSON.stringify(written)).not.toContain("Mozilla");
     expect(row?.capabilities.sampled).toBe(true);
+  }, 60_000);
+
+  test("Vercel imports the days its plan keeps with exact daily totals, skipping UTM the plan lacks", async () => {
+    const { connection, sources } = await connect(
+      "vercel",
+      "vercel-token-123",
+      {
+        teamId: "team_acme",
+      }
+    );
+    expect(sources).toEqual([
+      expect.objectContaining({ ref: "prj_site", host: HOST, kind: "web" }),
+    ]);
+    const { preview, importId } = await startImport({
+      connectionId: connection.id,
+      provider: "vercel",
+      sourceRef: "prj_site",
+    });
+    expect(preview).toMatchObject({ startDay: day(-59), endDay: day(-1) });
+
+    fakes.faults.vercel429 = 1;
+    let requests = 0;
+    fakes.faults.beforeRequest = () => {
+      requests += 1;
+    };
+    const { outcome, row } = await finish(importId);
+    expect(outcome).toMatchObject({ status: "completed" });
+    expect(sleeps).toHaveLength(1);
+    expect(row?.status).toBe("completed");
+    expect(row?.chunksDone).toBe(row?.chunksTotal);
+    // Each week is daily totals plus one request per breakdown (UTM's 402
+    // included), after the one request the rate limit turned away.
+    expect(requests).toBe(1 + 8 * (row?.chunksTotal ?? 0));
+
+    const expected = expectedWebTotals(dataset, {
+      start: day(-59),
+      end: day(-1),
+    });
+    expect(writtenTotals(importId)).toMatchObject({
+      pageviews: expected.pageviews,
+      visitors: expected.visitors,
+      days: expected.days,
+      firstDay: day(-59),
+      lastDay: day(-1),
+    });
+    const written = webRows.filter((item) => item.import_id === importId);
+    for (const grain of ["page", "country", "device", "browser", "os"]) {
+      expect(
+        written
+          .filter((item) => item.grain === grain)
+          .reduce((sum, item) => sum + Number(item.pageviews), 0)
+      ).toBe(expected.pageviews);
+    }
+    expect(written.some((item) => item.grain === "campaign")).toBe(false);
   }, 60_000);
 }

@@ -319,6 +319,8 @@ export interface AnalyticsImportProgressMessage {
     | "queuedLine"
     | "waitingLine"
     | "waitingSoon"
+    | "waitingBudgetLine"
+    | "waitingBudgetSoon"
     | "completedLine"
     | "failedLine"
     | "failedAny"

@@ -1,3 +1,5 @@
+import { getWorkflowMetadata } from "workflow";
+
 import "@/workflows/runtime";
 import { reportAnalyticsImportFailure } from "@/lib/analytics-imports/alerts";
 import { importQueueTurn } from "@/lib/analytics-imports/queue";
@@ -30,10 +32,19 @@ export async function planAnalyticsImportStep(
 
 export async function runAnalyticsImportChunkStep(
   importId: string,
-  chunkStart: string
+  chunkStart: string,
+  generation?: number
 ): Promise<AnalyticsImportChunkOutcome> {
   "use step";
-  return await runAnalyticsImportChunk(importId, chunkStart);
+  // A run started before generations existed has none; recovery may have
+  // restarted its import before, so it is fenced by its run id instead.
+  return await runAnalyticsImportChunk(
+    importId,
+    chunkStart,
+    generation === undefined
+      ? { runId: getWorkflowMetadata().workflowRunId }
+      : { generation }
+  );
 }
 
 export async function finalizeAnalyticsImportStep(importId: string) {
