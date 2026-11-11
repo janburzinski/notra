@@ -169,7 +169,9 @@ export const scheduleOutputConfigSchema = z
       .enum(["webflow", "framer", "custom"])
       .optional()
       .openapi({
-        description: "Where auto-published posts are sent.",
+        description:
+          "Deprecated and ignored. Auto-published posts are only marked as published in Notra; publish to GitHub or a Notra site from the post instead.",
+        deprecated: true,
       }),
     brandVoiceId: z.string().trim().min(1).optional().openapi({
       description:
