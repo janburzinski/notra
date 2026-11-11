@@ -50,7 +50,7 @@ export function WebTrendChart({
   const [hiddenKeys, setHiddenKeys] = useState<readonly string[]>([]);
   const people = {
     key: WEB_TREND_PEOPLE_KEY,
-    label: t("visitors"),
+    label: t("views"),
     share: traffic ? share?.people : undefined,
     color: CHART_PRIMARY_COLOR,
   };

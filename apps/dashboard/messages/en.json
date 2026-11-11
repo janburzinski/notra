@@ -4774,12 +4774,12 @@
       "back": "Back",
       "cta": {
         "title": "See your history from day one",
-        "description": "Import past page views from Plausible, Vercel or Cloudflare.",
+        "description": "Import past page views from Plausible, Vercel, Cloudflare, Rybbit or Databuddy.",
         "action": "Import history"
       },
       "settings": {
         "title": "Import history",
-        "description": "Bring past page views and AI crawler hits in from Plausible, Vercel or Cloudflare.",
+        "description": "Bring past page views and AI crawler hits in from Plausible, Vercel, Cloudflare, Rybbit or Databuddy.",
         "action": "Manage imports",
         "start": "Import"
       },

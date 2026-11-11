@@ -4774,12 +4774,12 @@
       "back": "Zurück",
       "cta": {
         "title": "Sieh deinen Verlauf ab dem ersten Tag",
-        "description": "Importiere frühere Seitenaufrufe aus Plausible, Vercel oder Cloudflare.",
+        "description": "Importiere frühere Seitenaufrufe aus Plausible, Vercel, Cloudflare, Rybbit oder Databuddy.",
         "action": "Verlauf importieren"
       },
       "settings": {
         "title": "Verlauf importieren",
-        "description": "Hole frühere Seitenaufrufe und KI-Crawler-Zugriffe aus Plausible, Vercel oder Cloudflare.",
+        "description": "Hole frühere Seitenaufrufe und KI-Crawler-Zugriffe aus Plausible, Vercel, Cloudflare, Rybbit oder Databuddy.",
         "action": "Importe verwalten",
         "start": "Importieren"
       },
