@@ -606,24 +606,25 @@ describe("runGeoIngest ordering", () => {
     expect(loadIngestAllowedHosts).not.toHaveBeenCalled();
   });
 
-  test("a browser fetching llms.txt is an agent read, not a site visitor", async () => {
-    expect(
-      await run(
-        ingestRequest(
-          { ...SITE_PAGE, url: "https://acme.com/llms.txt" },
-          SITE_TOKEN
-        )
-      )
-    ).toMatchObject({
-      _tag: "Success",
-      success: {
-        outcome: "ingested",
-        visitorType: "crawler",
-        agent: "Markdown-fetching agent",
-      },
-    });
-    expect(ingestWebPageViews).not.toHaveBeenCalled();
-  });
+  test.each([
+    { url: "https://acme.com/llms.txt" },
+    { url: "https://acme.com/guide.md", accept: "text/markdown" },
+  ])(
+    "a machine-readable fetch is an agent read, not a site visitor %j",
+    async (override) => {
+      expect(
+        await run(ingestRequest({ ...SITE_PAGE, ...override }, SITE_TOKEN))
+      ).toMatchObject({
+        _tag: "Success",
+        success: {
+          outcome: "ingested",
+          visitorType: "crawler",
+          agent: "Markdown-fetching agent",
+        },
+      });
+      expect(ingestWebPageViews).not.toHaveBeenCalled();
+    }
+  );
 
   test("site visitor counting retains the independent web admission limit", async () => {
     webRatelimitLimit.mockImplementation(async () => ({ success: false }));

@@ -87,7 +87,7 @@ export function resolveAiReferrer(referer: string | undefined): string | null {
   return null;
 }
 
-function classifyByAccept(
+function classifyByFingerprint(
   userAgent: string,
   accept: string | undefined
 ): GeoVisitorClassification | null {
@@ -107,6 +107,12 @@ function classifyByAccept(
       };
     }
   }
+  return null;
+}
+
+function classifyByNegotiation(
+  accept: string | undefined
+): GeoVisitorClassification | null {
   if (prefersMarkdown(accept)) {
     return {
       visitorType: "crawler",
@@ -210,14 +216,19 @@ export function classifyVisitor(
     }
   }
 
-  const byAccept = classifyByAccept(userAgent, input.accept);
-  if (byAccept) {
-    return byAccept;
+  const byFingerprint = classifyByFingerprint(userAgent, input.accept);
+  if (byFingerprint) {
+    return byFingerprint;
   }
 
   const byPath = classifyByPath(input.path);
   if (byPath) {
     return byPath;
+  }
+
+  const byNegotiation = classifyByNegotiation(input.accept);
+  if (byNegotiation) {
+    return byNegotiation;
   }
 
   const bySignals = classifyBySignals(userAgent, input.signals);
