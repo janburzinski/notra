@@ -1,0 +1,95 @@
+apps/dashboard/messages/en.json
+  s_bd8b53104b7c58::t_58506bef32d948 9028
+apps/sites/src/constants/analytics.ts
+  s_bd8b53104b7c58::t_58506bef32d948 1,4-8,10-11,13-23
+apps/sites/src/utils/analytics-tag.ts
+  s_bd8b53104b7c58::t_58506bef32d948 17-20,29
+apps/sites-e2e/src/utils/ingest.ts
+  s_bd8b53104b7c58::t_58506bef32d948 3-19,21-31,37
+packages/geo-core/src/utils/geo-ingest-identity-policy.ts
+  s_bd8b53104b7c58::t_58506bef32d948 12
+packages/geo-core/src/ingest/pipeline.ts
+  s_bd8b53104b7c58::t_58506bef32d948 24,34,43,45,83,85-89,376,421,441,532-543,551-554,557-559,741-876,886-887
+apps/sites/tests/handler.test.ts
+  s_bd8b53104b7c58::t_58506bef32d948 8-11,355-356,855,866,868,870,873-880,886-891,898-915,922-923,929-932,955-960,981-985,1010,1015,1020-1025,1074-1075,1089-1092,1110,1116-1118,1124-1125,1129-1130,1133-1149,1151-1154,1156-1207,1209-1215,1218
+apps/sites/src/analytics.ts
+  s_bd8b53104b7c58::t_58506bef32d948 6-9,12,15-17,20,45-47,50-53,66-71,81-85,92,95-96,98,101,105-110,112-115,119,121,130
+apps/docs/sites/domains/cloudfront.mdx
+  s_bd8b53104b7c58::t_58506bef32d948 63
+packages/geo-core/src/ingest/README.md
+  s_bd8b53104b7c58::t_58506bef32d948 63,65
+apps/sites/src/serve-file.ts
+  s_bd8b53104b7c58::t_58506bef32d948 3,82,84-85,88-89,91
+packages/geo-core/src/constants/ingest.ts
+  s_bd8b53104b7c58::t_58506bef32d948 99-101,103,109-115
+apps/sites/src/utils/public-url.ts
+  s_bd8b53104b7c58::t_58506bef32d948 1-8
+apps/sites-e2e/package.json
+  s_bd8b53104b7c58::t_58506bef32d948 12
+packages/geo-core/src/ingest/web.ts
+  s_bd8b53104b7c58::t_58506bef32d948 282,287
+packages/geo-core/src/types/ingest.ts
+  s_bd8b53104b7c58::t_58506bef32d948 15,173-177,284-289,298-300,302
+apps/docs/sites/domains/subpath.mdx
+  s_bd8b53104b7c58::t_58506bef32d948 98
+apps/sites/src/routes/analytics-endpoints.ts
+  s_bd8b53104b7c58::t_58506bef32d948 7,9,13,16,43,59,61,63-67,69,71-89
+packages/geo-core/src/ingest/identity.ts
+  s_bd8b53104b7c58::t_58506bef32d948 22-23,38-40,72
+apps/sites-e2e/README.md
+  s_bd8b53104b7c58::t_58506bef32d948 74-77
+apps/docs/sites/agents.mdx
+  s_bd8b53104b7c58::t_58506bef32d948 61,64,69
+apps/sites-e2e/src/worker.ts
+  s_bd8b53104b7c58::t_58506bef32d948 21,63-70,308-310,515,519-520,524-525,556,558-563,571-574,577-583,586-587,595,700-706,709,780,797-800,811-813,985,1219-1220
+packages/geo-core/src/types/ingest-cache-keys.ts
+  s_bd8b53104b7c58::t_58506bef32d948 12
+packages/geo-core/src/ingest/collect.ts
+  ai_agent 22,37-38,83,85-89
+apps/sites/src/traffic.ts
+  s_bd8b53104b7c58::t_58506bef32d948 6-10,136-162
+apps/sites/package.json
+  s_bd8b53104b7c58::t_58506bef32d948 18
+bun.lock
+  ai_agent 409,482
+apps/sites-e2e/src/utils/consent.ts
+  s_bd8b53104b7c58::t_58506bef32d948 4,9-14,18-20,23,28,33-36,59,78,84-91,99-101,142,157,159,169-170,180-188,233,235,238,259,278,302-303,357
+packages/geo-core/src/types/geo.ts
+  s_bd8b53104b7c58::t_58506bef32d948 1279-1282
+apps/sites-e2e/scripts/summary.ts
+  s_bd8b53104b7c58::t_58506bef32d948 211
+.github/workflows/sites-e2e-pr.yml
+  s_bd8b53104b7c58::t_58506bef32d948 19-20
+apps/docs/sites/domains/astro.mdx
+  s_bd8b53104b7c58::t_58506bef32d948 80
+apps/dashboard/messages/de.json
+  s_bd8b53104b7c58::t_58506bef32d948 9028
+packages/geo-core/tests/ingest-pipeline.test.ts
+  s_bd8b53104b7c58::t_58506bef32d948 55,70-81,121,176,371-384,398,405-407,409-417,419-422,426,432,434,436,438-447,449-454,459,461-474,476-523,543-547,549,557,581,593,603,615,625,634
+apps/sites/src/types/traffic.ts
+  s_bd8b53104b7c58::t_58506bef32d948 35-37,40-47,54-55
+apps/docs/sites/integrations/consent/c15t.mdx
+  s_bd8b53104b7c58::t_58506bef32d948 79-80
+packages/geo-core/src/schemas/geo.ts
+  s_bd8b53104b7c58::t_58506bef32d948 593-607
+apps/sites/src/pipeline/serve-deployment.ts
+  s_bd8b53104b7c58::t_58506bef32d948 8,60
+packages/sites-core/src/constants/sites.ts
+  s_bd8b53104b7c58::t_58506bef32d948 301-305
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "ca8ba41d89a4ae04dd731a3fe971b14d5601defa",
+  "prompts": {},
+  "sessions": {
+    "s_bd8b53104b7c58": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "33a1674a-4f9b-4811-b5e3-60abbac63453",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
