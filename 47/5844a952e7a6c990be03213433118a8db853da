@@ -1,0 +1,54 @@
+apps/minigame/src/constants/server.ts
+  s_673745a4f2f52f::t_e620621793a3a0 49,64
+apps/minigame/src/types/anti-cheat.ts
+  s_673745a4f2f52f::t_e620621793a3a0 38-40
+apps/minigame/src/lib/server/store.test.ts
+  s_673745a4f2f52f::t_a0648fb0d73e3f 31-38,61,113-117,125-129
+  s_673745a4f2f52f::t_07cc897f8a6b0d 130
+  s_673745a4f2f52f::t_68d8288cd48eeb 44-49,54-56
+apps/minigame/src/routes/api/runs/$runId.ts
+  s_673745a4f2f52f::t_a0648fb0d73e3f 79-103
+apps/minigame/src/lib/server/store.ts
+  s_673745a4f2f52f::t_a0648fb0d73e3f 29
+  s_673745a4f2f52f::t_e620621793a3a0 90-98,106-112,266-271,281-282,292,295,446-453,469-472
+apps/minigame/src/components/game-screen.tsx
+  s_673745a4f2f52f::t_2b99b130a7ae0b 53-55,233-237
+  s_673745a4f2f52f::t_4c4ed11ebacde7 216-217
+apps/minigame/src/lib/server/x-oauth.ts
+  s_673745a4f2f52f::t_a7d46ea03a336b 48-65,67-68,91-93,97,106-108,110,116-117
+apps/minigame/README.md
+  s_673745a4f2f52f::t_68d8288cd48eeb 100-105
+apps/minigame/src/constants/anti-cheat.ts
+  s_673745a4f2f52f::t_e6dc003aca3fcc 8-9
+apps/minigame/src/lib/game/verify-run.test.ts
+  s_673745a4f2f52f::t_631997bb0b3f73 145-149
+apps/minigame/src/components/leaderboard.tsx
+  s_673745a4f2f52f::t_4c4ed11ebacde7 177,180
+apps/minigame/src/components/account.tsx
+  s_673745a4f2f52f::t_20cb4c22d91ab4 36,143-154,160-164
+  s_673745a4f2f52f::t_731716a1e74142 49
+apps/minigame/src/lib/game/renderer.ts
+  s_673745a4f2f52f::t_f1cc33b099f5d8 737,739
+apps/minigame/src/lib/game/verify-run.ts
+  s_673745a4f2f52f::t_e6dc003aca3fcc 4,102-106
+apps/minigame/src/utils/api-client.ts
+  s_673745a4f2f52f::t_745a6396dedbd9 108
+apps/minigame/src/utils/return-path.ts
+  s_673745a4f2f52f::t_745a6396dedbd9 1-6,8-17,23
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "475844a952e7a6c990be03213433118a8db853da",
+  "prompts": {},
+  "sessions": {
+    "s_673745a4f2f52f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "41c3de73-071e-4473-b094-b0db24729964",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
