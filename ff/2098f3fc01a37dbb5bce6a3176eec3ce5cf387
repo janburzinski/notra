@@ -1,0 +1,24 @@
+packages/db/migrations/0159_analytics_import_write_tracking.sql
+  ai_agent 3-14
+apps/dashboard/src/lib/analytics-imports/runner.ts
+  s_a43f2c0eab8f5c::t_4d180010fcefdb 376-381,386-389
+apps/dashboard/tests/analytics-imports.test.ts
+  s_a43f2c0eab8f5c::t_70f8cbf3615aa9 866-869
+  s_a43f2c0eab8f5c::t_4d180010fcefdb 861-865,870-877
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "ff2098f3fc01a37dbb5bce6a3176eec3ce5cf387",
+  "prompts": {},
+  "sessions": {
+    "s_a43f2c0eab8f5c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "dc5f5631-f27c-40ea-bc31-6e9e493180c4",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
