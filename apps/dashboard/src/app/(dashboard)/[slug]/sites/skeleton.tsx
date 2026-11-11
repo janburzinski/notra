@@ -2,12 +2,26 @@
 
 import { PageHeading } from "@notra/ui/components/shared/page-heading";
 import { Skeleton } from "@notra/ui/components/ui/skeleton";
+import { useLocation } from "@tanstack/react-router";
 import { useTranslations } from "use-intl";
 
+import { SitePageSkeleton } from "@/components/sites/site-route-skeleton";
 import { SitesPageShell } from "@/components/sites/sites-page-shell";
 import { SITES_PAGE_SKELETON_ROWS } from "@/constants/sites";
 
+/**
+ * Most workspaces have one site, and the list redirects straight into it, so
+ * the site frame is what lands. Only `?view=all` keeps the list placeholder.
+ */
 export function SitesPageSkeleton() {
+  const showAll = useLocation({
+    select: (location) =>
+      (location.search as Record<string, unknown>).view === "all",
+  });
+  return showAll ? <SitesListSkeleton /> : <SitePageSkeleton />;
+}
+
+function SitesListSkeleton() {
   const t = useTranslations("sites");
   return (
     <SitesPageShell>
