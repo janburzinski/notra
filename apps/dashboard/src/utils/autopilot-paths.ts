@@ -21,6 +21,11 @@ export function normalizeRepositoryDirectory(directory: string) {
   return isSafeRepositoryPath(trimmed) ? trimmed : null;
 }
 
+export function repositoryParentDirectory(path: string) {
+  const index = path.lastIndexOf("/");
+  return index > 0 ? path.slice(0, index) : "";
+}
+
 /** Root files plus directories two levels deep with file counts, so an agent can orient without the full tree. */
 export function summarizeRepositoryTree(paths: string[], maxLines: number) {
   const rootFiles: string[] = [];

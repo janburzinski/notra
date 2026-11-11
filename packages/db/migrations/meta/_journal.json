@@ -1114,6 +1114,13 @@
       "when": 1794377583385,
       "tag": "0158_rerun_broken_analytics_imports",
       "breakpoints": true
+    },
+    {
+      "idx": 159,
+      "version": "7",
+      "when": 1794381228838,
+      "tag": "0159_autopilot_auto_publish",
+      "breakpoints": true
     }
   ]
 }

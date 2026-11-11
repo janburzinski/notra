@@ -84,3 +84,7 @@ export const AUTOPILOT_EVENT_LEVELS = [
   "action",
   "error",
 ] as const;
+
+export const AUTOPILOT_APPROVAL_GROUPS = ["posts", "updates", "fixes"] as const;
+
+export const AUTOPILOT_APPROVAL_MODES = ["ask", "auto"] as const;

@@ -6,6 +6,7 @@ import {
 import { verifyGitHubWebhookSignature } from "@notra/ai/utils/github-webhook-signature";
 
 import { SITES_ONLY_GITHUB_EVENTS } from "@/constants/sites";
+import { cancelHoldsForPullRequestWebhook } from "@/lib/autopilot/publish";
 import { afterResponse } from "@/lib/framework/after-response";
 import { writeMentionWebhookLog } from "@/lib/webhooks/github-mention-log";
 import {
@@ -70,6 +71,7 @@ export const POST = withEvlog(async (request: Request) => {
         { status: 400 }
       );
     }
+    await cancelHoldsForPullRequestWebhook(rawBody);
     await startAutopilotPullRequestWorkflowRun({ rawBody, deliveryId });
   }
 

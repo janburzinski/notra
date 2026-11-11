@@ -47,6 +47,7 @@ import {
 import { generateAutopilotObject } from "@/lib/autopilot/llm";
 import { createAutopilotLogger } from "@/lib/autopilot/log";
 import { fetchRendered, findDeadLinks } from "@/lib/autopilot/pages";
+import { scheduleAutopilotPublish } from "@/lib/autopilot/publish";
 import { loadDecisionMemory } from "@/lib/autopilot/rules";
 import { loadWritingRules, removeNewDashes } from "@/lib/autopilot/style";
 import { refreshOutputSchema, refreshRepairSchema } from "@/schemas/autopilot";
@@ -614,6 +615,15 @@ export async function openRefreshPullRequest(params: {
     event: AUTOPILOT_PULL_REQUEST_CREATED_EVENT,
     url: pullRequest.url,
     files: [check.path],
+  });
+  await scheduleAutopilotPublish({
+    ctx,
+    log,
+    octokit,
+    finding: claim.finding,
+    pullRequestNumber: pullRequest.number,
+    body: refreshPullRequestBody(check, fix),
+    paths: [check.path],
   });
   return { opened: true as const, url: pullRequest.url };
 }

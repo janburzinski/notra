@@ -200,6 +200,7 @@ function AutomationPage({
             : undefined
         }
         readOnly={!overview.canManage}
+        timezone={overview.settings.timezone}
         showAutomation={false}
         writingId={
           writeSuggestion.isPending ? (writeSuggestion.variables ?? null) : null

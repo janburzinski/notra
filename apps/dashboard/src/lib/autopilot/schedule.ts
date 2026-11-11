@@ -11,9 +11,11 @@ import {
   AUTOPILOT_REACTION_LOOKBACK_DAYS,
   AUTOPILOT_RUN_RETRY_BACKOFF_MS,
 } from "@/constants/autopilot";
+import { AUTOPILOT_DEFAULT_APPROVALS } from "@/constants/autopilot-publish";
 import { syncOfferReactionFeedback } from "@/lib/autopilot/findings";
 import { isAutopilotEnabledForOrganization } from "@/lib/autopilot/flag";
 import { purgeExpiredAutopilotTraceDetails } from "@/lib/autopilot/log";
+import { publishDueFindings } from "@/lib/autopilot/publish";
 import { startAutopilot } from "@/lib/autopilot/start";
 import type { AutopilotSchedule } from "@/types/autopilot-runtime";
 import {
@@ -90,6 +92,19 @@ export async function runDueAutopilots() {
             organizationId: row.organizationId,
           });
         }
+      }
+      try {
+        await publishDueFindings(
+          row.organizationId,
+          { ...AUTOPILOT_DEFAULT_APPROVALS, ...row.approvals },
+          now,
+          { siteId: row.siteId, repositoryBranch: row.repositoryBranch }
+        );
+      } catch (error) {
+        failed += 1;
+        logError("[Autopilot] Scheduled publish failed", error, {
+          organizationId: row.organizationId,
+        });
       }
       if (!isAutopilotDue(row, now)) {
         return;

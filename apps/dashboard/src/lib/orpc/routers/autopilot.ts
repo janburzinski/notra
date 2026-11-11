@@ -35,6 +35,7 @@ import {
   AUTOPILOT_DEFAULT_STALE_PULL_REQUEST_DAYS,
   AUTOPILOT_RUNS_PAGE_SIZE,
 } from "@/constants/autopilot";
+import { AUTOPILOT_DEFAULT_APPROVALS } from "@/constants/autopilot-publish";
 import {
   AUTOPILOT_WORKFLOW_NOT_FOUND,
   AUTOPILOT_WORKFLOW_NOT_RUNNING,
@@ -64,6 +65,10 @@ import {
   listRunEvents,
 } from "@/lib/autopilot/log";
 import { loadAutopilotMetrics } from "@/lib/autopilot/metrics";
+import {
+  cancelHoldsAfterSettingsChange,
+  holdFinding,
+} from "@/lib/autopilot/publish";
 import { addRule, deleteRule, listRules } from "@/lib/autopilot/rules";
 import { findAutopilotProject } from "@/lib/autopilot/run";
 import {
@@ -71,6 +76,7 @@ import {
   saveAutopilotSettings,
   setAutopilotJob,
 } from "@/lib/autopilot/settings";
+import { attachSitePreviews, listAutopilotSites } from "@/lib/autopilot/sites";
 import { startAutopilot } from "@/lib/autopilot/start";
 import { stopAutopilotRun } from "@/lib/autopilot/stop";
 import {
@@ -219,6 +225,7 @@ export const autopilotRouter = {
         runs,
         rules,
         workflowGraph,
+        siteRows,
       ] = await Promise.all([
         enabled
           ? db.query.autopilotSettings.findFirst({
@@ -241,7 +248,11 @@ export const autopilotRouter = {
                 )
               )
           : [],
-        enabled ? listFindings(organizationId) : [],
+        enabled
+          ? listFindings(organizationId).then((rows) =>
+              attachSitePreviews(organizationId, rows)
+            )
+          : [],
         enabled
           ? db.query.autopilotRuns.findMany({
               where: eq(autopilotRuns.organizationId, organizationId),
@@ -251,6 +262,7 @@ export const autopilotRouter = {
           : [],
         enabled ? listRules(organizationId) : [],
         enabled ? isAutopilotWorkflowGraphEnabled(organizationId) : false,
+        enabled ? listAutopilotSites(organizationId) : [],
       ]);
       const describedRuns = await describeRuns(organizationId, runs);
       return {
@@ -277,6 +289,11 @@ export const autopilotRouter = {
           jobs: { ...AUTOPILOT_DEFAULT_JOBS, ...settings?.jobs },
           commitFilters: toAutopilotCommitFilters(settings?.commitFilters),
           maxOpenPullRequests: settings?.maxOpenPullRequests ?? 3,
+          approvals: {
+            ...AUTOPILOT_DEFAULT_APPROVALS,
+            ...settings?.approvals,
+          },
+          siteId: settings?.siteId ?? null,
           stalePullRequestDays: settings
             ? settings.stalePullRequestDays
             : AUTOPILOT_DEFAULT_STALE_PULL_REQUEST_DAYS,
@@ -286,6 +303,7 @@ export const autopilotRouter = {
           accounts: installations.map((row) => row.accountLogin),
         },
         slack: { integrations: slackRows },
+        sites: siteRows,
         findings,
         runs: describedRuns,
         rules,
@@ -327,7 +345,11 @@ export const autopilotRouter = {
       if (!finding) {
         throw notFound("Autopilot finding not found");
       }
-      return finding;
+      const [withPreview = finding] = await attachSitePreviews(
+        input.organizationId,
+        [finding]
+      );
+      return withPreview;
     }),
 
   impact: authorizedProcedure
@@ -509,6 +531,20 @@ export const autopilotRouter = {
           input.method
         );
         return { status: finding.status };
+      } catch (error) {
+        throw badRequest(errorMessage(error));
+      }
+    }),
+
+  hold: authorizedProcedure
+    .input(autopilotFindingInputSchema)
+    .use(withOrganizationAccess)
+    .use(withAutopilotFlag)
+    .handler(async ({ input, context }) => {
+      assertCanManageAutopilot(context);
+      try {
+        await holdFinding(input.organizationId, input.findingId);
+        return { success: true as const };
       } catch (error) {
         throw badRequest(errorMessage(error));
       }

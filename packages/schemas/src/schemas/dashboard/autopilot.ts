@@ -1,5 +1,6 @@
 import "zod/compile";
 import {
+  AUTOPILOT_APPROVAL_MODES,
   AUTOPILOT_AUTOMATION_KINDS,
   AUTOPILOT_JOB_KINDS,
 } from "@notra/db/constants/autopilot";
@@ -87,6 +88,14 @@ export const autopilotJobsSchema = z.object({
   links: z.boolean().default(false),
 });
 
+const autopilotApprovalModeSchema = z.enum(AUTOPILOT_APPROVAL_MODES);
+
+export const autopilotApprovalsSchema = z.object({
+  posts: autopilotApprovalModeSchema,
+  updates: autopilotApprovalModeSchema,
+  fixes: autopilotApprovalModeSchema,
+});
+
 export const autopilotSaveInputSchema = autopilotOrganizationInputSchema.extend(
   {
     enabled: z.boolean(),
@@ -122,6 +131,8 @@ export const autopilotSaveInputSchema = autopilotOrganizationInputSchema.extend(
       .union([z.literal(7), z.literal(14), z.literal(30)])
       .nullable()
       .optional(),
+    approvals: autopilotApprovalsSchema.optional(),
+    siteId: z.string().trim().min(1).max(64).nullable().optional(),
   }
 );
 

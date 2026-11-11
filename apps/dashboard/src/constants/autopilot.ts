@@ -26,6 +26,8 @@ export const AUTOPILOT_OUTCOME_BY_STATUS = {
 } as const satisfies Record<AutopilotFindingStatus, AutopilotOutcomeKey>;
 
 export const AUTOPILOT_BRANCH_PREFIX = "notra/autopilot";
+
+export const AUTOPILOT_DEFAULT_BRANCH = "main";
 /** Source pull request authors asked to review a draft. */
 export const AUTOPILOT_MAX_REVIEWERS = 5;
 export const AUTOPILOT_MARKDOWN_FILE = /\.mdx?$/;
@@ -184,6 +186,7 @@ export const AUTOPILOT_FEEDBACK_INTRO =
 export const AUTOPILOT_REACTION_LOOKBACK_DAYS = 7;
 export const AUTOPILOT_CRON_CONCURRENCY = 8;
 export const AUTOPILOT_CRON_INTERVAL_MINUTES = 5;
+export const AUTOPILOT_DEFAULT_TIMEZONE = "Europe/Berlin";
 export const AUTOPILOT_DAILY_RUN_MAX_ATTEMPTS = 3;
 export const AUTOPILOT_RUN_RETRY_BACKOFF_MS = 30 * 60 * 1000;
 /** Observations per job handed to the planner each run. */

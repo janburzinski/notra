@@ -3,6 +3,7 @@ import {
   listGitHubAppInstallationsByOrganization,
 } from "@notra/ai/integrations/github";
 import type { GitHubMentionFileChange } from "@notra/ai/types/github-mention";
+import type { GitHubInstallationTokenScope } from "@notra/ai/types/github-operations";
 import {
   commitFilesToPullRequest,
   createDraftPullRequest,
@@ -27,7 +28,8 @@ export class AutopilotRepositoryAccessError extends Error {
 
 export async function getRepositoryOctokit(
   organizationId: string,
-  repository: Pick<AutopilotRepository, "owner" | "name">
+  repository: Pick<AutopilotRepository, "owner" | "name">,
+  extraPermissions?: GitHubInstallationTokenScope["permissions"]
 ): Promise<AutopilotOctokit> {
   const installations =
     await listGitHubAppInstallationsByOrganization(organizationId);
@@ -48,6 +50,7 @@ export async function getRepositoryOctokit(
         pull_requests: "write",
         issues: "write",
         metadata: "read",
+        ...extraPermissions,
       },
     }
   );

@@ -10209,7 +10209,17 @@
     "settings": {
       "blogFolder": "Blog folder",
       "blogFolderDescription": "Where new posts go. Leave it empty to use your GitHub publishing path or find the folder automatically.",
-      "blogFolderPlaceholder": "Find automatically"
+      "blogFolderPlaceholder": "Find automatically",
+      "site": "Site",
+      "siteNone": "None",
+      "siteWithoutBlog": "Selected site (no blog)",
+      "approvals": "Approvals",
+      "approvalsDescription": "Auto marks the pull request ready and publishes it the next weekday at 9:00 unless someone steps in.",
+      "approvalPosts": "New posts",
+      "approvalUpdates": "Page updates",
+      "approvalFixes": "Readiness fixes",
+      "approvalAsk": "Ask",
+      "approvalAuto": "Auto"
     }
   }
 }

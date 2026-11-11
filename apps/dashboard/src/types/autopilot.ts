@@ -1,6 +1,7 @@
 import type { IconSvgElement } from "@hugeicons/react";
 import type { AutopilotObservation } from "@notra/ai/types/autopilot-planner";
 import type {
+  AutopilotApprovals,
   AutopilotCommitFilters,
   AutopilotFindingEvidence,
   AutopilotJobKind,
@@ -40,6 +41,9 @@ export interface AutopilotRunContext {
   integrationContentPath: string | null;
   jobs: Record<AutopilotJobKind, boolean>;
   maxOpenPullRequests: number;
+  timezone: string;
+  approvals: AutopilotApprovals;
+  siteId: string | null;
   /** Untouched drafts are closed after this many days; null keeps them. */
   stalePullRequestDays: number | null;
   /** Which product pull requests the commits job reads. */
@@ -490,6 +494,7 @@ export interface AutopilotPageShellProps {
 
 export interface AutopilotPullRequestsTableProps {
   findings: AutopilotFindingView[];
+  timezone: string;
   /** Ideas show that they wait for someone instead of the pull request status. */
   view?: "pull-requests" | "ideas";
   readOnly: boolean;
@@ -603,6 +608,7 @@ export interface AutopilotPullRequestsTabProps {
   basePath: string;
   findings: AutopilotFindingView[];
   canManage: boolean;
+  timezone: string;
 }
 
 export type AutopilotSettingsTabProps = Pick<

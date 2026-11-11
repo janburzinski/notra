@@ -554,3 +554,10 @@ export const AUTOPILOT_AGENT_DOCK_EXIT = {
   duration: DURATION.fast,
   ease: EASE.out,
 };
+
+export const AUTOPILOT_PUBLISH_AT_FORMAT = {
+  weekday: "short",
+  hour: "2-digit",
+  minute: "2-digit",
+  hourCycle: "h23",
+} as const;

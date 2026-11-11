@@ -55,6 +55,7 @@ import {
 import { generateAutopilotObject } from "@/lib/autopilot/llm";
 import { createAutopilotLogger } from "@/lib/autopilot/log";
 import { fetchPageText, findDeadLinks } from "@/lib/autopilot/pages";
+import { scheduleAutopilotPublish } from "@/lib/autopilot/publish";
 import { linksReviewSchema } from "@/schemas/autopilot";
 import type { AutopilotRunContext } from "@/types/autopilot";
 import type { FindingClaim } from "@/types/autopilot-runtime";
@@ -592,6 +593,15 @@ export async function openLinksPullRequest(params: {
     event: AUTOPILOT_PULL_REQUEST_CREATED_EVENT,
     url: pullRequest.url,
     files: fix.files.map((file) => file.path),
+  });
+  await scheduleAutopilotPublish({
+    ctx,
+    log,
+    octokit,
+    finding: claim.finding,
+    pullRequestNumber: pullRequest.number,
+    body: linksPullRequestBody(fix),
+    paths: fix.files.map((file) => file.path),
   });
   return { opened: true as const, url: pullRequest.url };
 }

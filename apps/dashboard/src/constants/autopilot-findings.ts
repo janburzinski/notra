@@ -19,6 +19,8 @@ export const AUTOPILOT_FINDING_PULL_REQUEST_RESET = {
   branch: null,
   headSha: null,
   openedAt: null,
+  publishAt: null,
+  publishHoldReason: null,
 } as const;
 
 /** Statuses that block re-proposing the same fingerprint. */

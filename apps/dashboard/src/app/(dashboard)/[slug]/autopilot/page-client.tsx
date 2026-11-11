@@ -161,6 +161,7 @@ function AutopilotPullRequestsTab({
   basePath,
   findings,
   canManage,
+  timezone,
 }: AutopilotPullRequestsTabProps) {
   const router = useRouter();
   const { merge, writeSuggestion } = useAutopilotActions(organizationId);
@@ -173,6 +174,7 @@ function AutopilotPullRequestsTab({
       onOpen={(row) => router.push(`${basePath}/findings/${row.id}`)}
       onWrite={(row) => writeSuggestion.mutate(row.id)}
       readOnly={!canManage}
+      timezone={timezone}
       writingId={
         writeSuggestion.isPending ? (writeSuggestion.variables ?? null) : null
       }
@@ -382,6 +384,7 @@ function AutopilotOverviewPage({
             canManage={canManage}
             findings={findings}
             organizationId={organizationId}
+            timezone={settings.timezone}
           />
         </TabsContent>
         <TabsContent className="mt-4" value="analytics">

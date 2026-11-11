@@ -2,7 +2,10 @@ import { DateTime, Option } from "effect";
 
 import type { AutopilotSchedule } from "@/types/autopilot-runtime";
 
-function localParts(date: Date, formatter: Intl.DateTimeFormat) {
+export function autopilotLocalParts(
+  date: Date,
+  formatter: Intl.DateTimeFormat
+) {
   const parts = formatter.formatToParts(date);
   const get = (type: string) => parts.find((part) => part.type === type)?.value;
   return {
@@ -13,7 +16,7 @@ function localParts(date: Date, formatter: Intl.DateTimeFormat) {
   };
 }
 
-function localFormatter(timezone: string) {
+export function autopilotLocalFormatter(timezone: string) {
   const options = {
     timeZone: timezone,
     year: "numeric",
@@ -33,15 +36,15 @@ function localFormatter(timezone: string) {
 
 /** Earlier manual or onboarding runs don't replace today's scheduled brief. */
 export function isAutopilotDue(settings: AutopilotSchedule, now: Date) {
-  const formatter = localFormatter(settings.timezone);
-  const current = localParts(now, formatter);
+  const formatter = autopilotLocalFormatter(settings.timezone);
+  const current = autopilotLocalParts(now, formatter);
   if (current.hour < settings.briefHour) {
     return false;
   }
   if (!settings.lastRunAt) {
     return true;
   }
-  const last = localParts(settings.lastRunAt, formatter);
+  const last = autopilotLocalParts(settings.lastRunAt, formatter);
   return last.day !== current.day || last.hour < settings.briefHour;
 }
 

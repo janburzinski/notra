@@ -41,5 +41,7 @@ export function toAutopilotSaveInput(
     timezone: settings.timezone,
     maxOpenPullRequests: settings.maxOpenPullRequests,
     stalePullRequestDays: toStaleDays(settings.stalePullRequestDays),
+    approvals: settings.approvals,
+    siteId: settings.siteId,
   };
 }

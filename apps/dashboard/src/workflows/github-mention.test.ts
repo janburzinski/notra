@@ -54,6 +54,9 @@ if (process.env.NOTRA_MENTION_WORKFLOW_TEST !== "1") {
   mock.module("@/lib/autopilot/pull-request-events", () => ({
     handleAutopilotPullRequestEvent: async () => undefined,
   }));
+  mock.module("@/lib/autopilot/publish", () => ({
+    cancelHoldsForPullRequestWebhook: async () => undefined,
+  }));
   mock.module("@/lib/webhooks/github-mention-log", () => ({
     writeMentionWebhookLog: writeLog,
   }));

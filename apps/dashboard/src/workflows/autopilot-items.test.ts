@@ -28,6 +28,7 @@ if (process.env.NOTRA_AUTOPILOT_ITEM_WORKFLOW_TEST !== "1") {
     }
   );
   const enqueue = mock(async (_input: unknown) => ({ runId: "workflow-1" }));
+  const cancelHolds = mock(async (_rawBody: string) => undefined);
   let httpStatus = 202;
   mock.module("@/workflows/runtime", () => ({}));
   mock.module("workflow", () => ({
@@ -66,6 +67,9 @@ if (process.env.NOTRA_AUTOPILOT_ITEM_WORKFLOW_TEST !== "1") {
     startAutopilotPullRequestWorkflowRun: enqueue,
     startGitHubMentionRun: async () => undefined,
   }));
+  mock.module("@/lib/autopilot/publish", () => ({
+    cancelHoldsForPullRequestWebhook: cancelHolds,
+  }));
   mock.module("@/lib/webhooks/github-mention-log", () => ({
     writeMentionWebhookLog: async () => undefined,
   }));
@@ -86,7 +90,15 @@ if (process.env.NOTRA_AUTOPILOT_ITEM_WORKFLOW_TEST !== "1") {
       body: "{}",
     });
   beforeEach(() => {
-    for (const fn of [claim, complete, processEvent, write, prepare, enqueue]) {
+    for (const fn of [
+      claim,
+      complete,
+      processEvent,
+      write,
+      prepare,
+      enqueue,
+      cancelHolds,
+    ]) {
       fn.mockClear();
     }
     claim.mockResolvedValue(true);
@@ -143,11 +155,13 @@ if (process.env.NOTRA_AUTOPILOT_ITEM_WORKFLOW_TEST !== "1") {
       rawBody: "{}",
       deliveryId: "delivery-1",
     });
+    expect(cancelHolds).toHaveBeenCalledWith("{}");
   });
   test("invalid signatures and missing delivery IDs never enqueue work", async () => {
     httpStatus = 401;
     expect((await POST(request() as never)).status).toBe(401);
     expect(enqueue).not.toHaveBeenCalled();
+    expect(cancelHolds).not.toHaveBeenCalled();
     httpStatus = 202;
     expect((await POST(request("") as never)).status).toBe(400);
     expect(enqueue).not.toHaveBeenCalled();

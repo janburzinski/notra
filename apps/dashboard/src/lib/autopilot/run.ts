@@ -15,10 +15,12 @@ import { and, asc, eq, gte, inArray, lt, or, sql } from "drizzle-orm";
 import { nanoid } from "nanoid";
 
 import {
+  AUTOPILOT_DEFAULT_BRANCH,
   AUTOPILOT_DEFAULT_JOBS,
   AUTOPILOT_RUN_EXPIRED_MESSAGE,
   AUTOPILOT_RUN_LEASE_MS,
 } from "@/constants/autopilot";
+import { AUTOPILOT_DEFAULT_APPROVALS } from "@/constants/autopilot-publish";
 import {
   runCommitsJob,
   runCompetitorsJob,
@@ -33,6 +35,10 @@ import {
 } from "@/lib/autopilot/leases";
 import { createAutopilotLogger } from "@/lib/autopilot/log";
 import { runPromptsJob } from "@/lib/autopilot/prompts";
+import {
+  attachSitePreviews,
+  loadAutopilotSiteTarget,
+} from "@/lib/autopilot/sites";
 import { runTransition } from "@/lib/autopilot/transitions";
 import {
   failWorkflowRunTrees,
@@ -214,14 +220,19 @@ export async function buildAutopilotRunContext(
       })
     : null;
 
-  const repository =
+  const site = settings.siteId
+    ? await loadAutopilotSiteTarget(organizationId, settings.siteId)
+    : null;
+  const manualRepository =
     settings.repositoryOwner && settings.repositoryName
       ? {
           owner: settings.repositoryOwner,
           name: settings.repositoryName,
-          branch: settings.repositoryBranch ?? "main",
+          branch: settings.repositoryBranch ?? AUTOPILOT_DEFAULT_BRANCH,
         }
       : null;
+  const siteRepository = site?.contentPath ? site.repository : null;
+  const repository = settings.siteId ? siteRepository : manualRepository;
 
   return {
     organizationId,
@@ -229,12 +240,17 @@ export async function buildAutopilotRunContext(
     runId,
     projectId: project?.id ?? null,
     repository,
-    contentPath: settings.contentPath,
+    contentPath: settings.siteId
+      ? (site?.contentPath ?? null)
+      : settings.contentPath,
     integrationContentPath: repository
       ? await findIntegrationContentPath(organizationId, repository)
       : null,
     jobs: { ...AUTOPILOT_DEFAULT_JOBS, ...settings.jobs },
     maxOpenPullRequests: settings.maxOpenPullRequests,
+    timezone: settings.timezone,
+    approvals: { ...AUTOPILOT_DEFAULT_APPROVALS, ...settings.approvals },
+    siteId: site ? settings.siteId : null,
     stalePullRequestDays: settings.stalePullRequestDays,
     commitFilters: toAutopilotCommitFilters(settings.commitFilters),
     brand: brand
@@ -321,9 +337,14 @@ export async function deliverAutopilotBrief(params: {
         ),
       })
     : [];
+  const proposed = await attachSitePreviews(
+    ctx.organizationId,
+    findings.filter((finding) => finding.status === "proposed")
+  );
   const brief = buildAutopilotBrief({
     organizationSlug: ctx.organizationSlug,
-    proposed: findings.filter((finding) => finding.status === "proposed"),
+    timezone: ctx.timezone,
+    proposed,
     suggested: findings.filter((finding) => finding.status === "suggested"),
     merged,
     insights: params.insights,

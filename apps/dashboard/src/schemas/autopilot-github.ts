@@ -11,6 +11,8 @@ export const autopilotPullRequestEventSchema = z.object({
     private: z.boolean().optional(),
     owner: z.object({ login: z.string() }),
   }),
+  sender: z.object({ type: z.string() }).nullable().optional(),
+  changes: z.object({ base: z.unknown().optional() }).optional(),
   pull_request: z.object({
     number: z.number(),
     title: z.string(),

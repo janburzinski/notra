@@ -3,10 +3,14 @@
 import {
   AiChat01Icon,
   Archive02Icon,
+  CheckmarkCircle02Icon,
   Clock01Icon,
   Folder01Icon,
   Github01Icon,
+  Globe02Icon,
+  NewsIcon,
   PowerIcon,
+  RefreshIcon,
   SlackIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
@@ -31,6 +35,7 @@ import {
   AUTOPILOT_HOUR_OPTIONS,
   AUTOPILOT_STALE_OPTIONS,
 } from "@/constants/autopilot";
+import { AUTOPILOT_NO_SITE } from "@/constants/autopilot-publish";
 import { AUTOPILOT_SLACK_CHANNEL_HINT } from "@/constants/autopilot-slack";
 import { useAutopilotConnections } from "@/lib/hooks/use-autopilot-connections";
 import { dashboardOrpc } from "@/lib/orpc/query";
@@ -97,14 +102,20 @@ export function AutopilotSettingsPanel({
   // quick second change never resends the value the first one replaced.
   const save = useMutation({
     scope: { id: `autopilot-settings:${organizationId}` },
-    mutationFn: (patch: Partial<ReturnType<typeof toAutopilotSaveInput>>) =>
-      dashboardOrpc.autopilot.save.call({
-        ...toAutopilotSaveInput(
-          organizationId,
-          queryClient.getQueryData(overviewKey)?.settings ?? settings
-        ),
-        ...patch,
-      }),
+    mutationFn: (
+      patch:
+        | Partial<ReturnType<typeof toAutopilotSaveInput>>
+        | ((
+            current: typeof settings
+          ) => Partial<ReturnType<typeof toAutopilotSaveInput>>)
+    ) => {
+      const current =
+        queryClient.getQueryData(overviewKey)?.settings ?? settings;
+      return dashboardOrpc.autopilot.save.call({
+        ...toAutopilotSaveInput(organizationId, current),
+        ...(typeof patch === "function" ? patch(current) : patch),
+      });
+    },
     // Refetched even when nobody shows the page anymore: a queued save
     // builds on these settings after a quick navigation.
     onSuccess: () =>
@@ -136,69 +147,118 @@ export function AutopilotSettingsPanel({
   const repositoryKey = settings.repository
     ? `${settings.repository.owner}/${settings.repository.name}`
     : null;
+  const siteOptions = [
+    { value: AUTOPILOT_NO_SITE, label: t("siteNone") },
+    ...overview.sites.map((site) => ({ value: site.id, label: site.name })),
+    ...(settings.siteId &&
+    !overview.sites.some((site) => site.id === settings.siteId)
+      ? [{ value: settings.siteId, label: t("siteWithoutBlog") }]
+      : []),
+  ];
+  const modeOptions = [
+    { value: "ask", label: t("approvalAsk") },
+    { value: "auto", label: t("approvalAuto") },
+  ] as const;
+  const approvalRows = [
+    { group: "posts", icon: NewsIcon, label: t("approvalPosts") },
+    { group: "updates", icon: RefreshIcon, label: t("approvalUpdates") },
+    { group: "fixes", icon: CheckmarkCircle02Icon, label: t("approvalFixes") },
+  ] as const;
 
   return (
     <div className="flex w-full flex-col gap-8">
       <div className="border-shell-border bg-shell rounded-2xl border p-0.5">
         <div className="divide-table-row-border shadow-table-card bg-table-card border-table-card-border divide-y overflow-hidden rounded-[14px] border">
-          <SettingsRow
-            htmlFor="autopilot-repository"
-            icon={Github01Icon}
-            label="Repository"
-          >
-            {githubConnected ? (
-              <AutopilotRepositoryPicker
-                className="w-64"
-                id="autopilot-repository"
-                onChange={(repository) =>
+          {overview.sites.length > 0 || settings.siteId ? (
+            <SettingsRow
+              htmlFor="autopilot-site"
+              icon={Globe02Icon}
+              label={t("site")}
+            >
+              <Select
+                items={siteOptions}
+                onValueChange={(value) =>
                   save.mutate({
-                    repository: {
-                      owner: repository.owner,
-                      name: repository.name,
-                      branch: repository.defaultBranch,
-                    },
+                    siteId: value === AUTOPILOT_NO_SITE ? null : value,
                   })
                 }
-                repositories={repositories}
-                value={repositoryKey}
-              />
-            ) : (
-              <Button
-                loading={installing}
-                onClick={installGitHub}
-                size="sm"
-                variant="outline"
+                value={settings.siteId ?? AUTOPILOT_NO_SITE}
               >
-                Connect
-              </Button>
-            )}
-          </SettingsRow>
-          <SettingsRow
-            description={t("blogFolderDescription")}
-            htmlFor="autopilot-blog-folder"
-            icon={Folder01Icon}
-            label={t("blogFolder")}
-          >
-            <Input
-              className="w-64"
-              defaultValue={settings.contentPath ?? ""}
-              id="autopilot-blog-folder"
-              // Remounts with the saved, normalized value after each save.
-              key={settings.contentPath ?? ""}
-              onBlur={(event) => {
-                const contentPath = event.currentTarget.value.trim();
-                if (contentPath !== (settings.contentPath ?? "")) {
-                  save.mutate({ contentPath: contentPath || null });
-                }
-              }}
-              onKeyDown={(event) => {
-                if (event.key === "Enter") {
-                  event.currentTarget.blur();
-                }
-              }}
-              placeholder={t("blogFolderPlaceholder")}
-            />
-          </SettingsRow>
+                <SelectTrigger className="w-64" id="autopilot-site">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent align="end">
+                  {siteOptions.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </SettingsRow>
+          ) : null}
+          {settings.siteId ? null : (
+            <>
+              <SettingsRow
+                htmlFor="autopilot-repository"
+                icon={Github01Icon}
+                label="Repository"
+              >
+                {githubConnected ? (
+                  <AutopilotRepositoryPicker
+                    className="w-64"
+                    id="autopilot-repository"
+                    onChange={(repository) =>
+                      save.mutate({
+                        repository: {
+                          owner: repository.owner,
+                          name: repository.name,
+                          branch: repository.defaultBranch,
+                        },
+                      })
+                    }
+                    repositories={repositories}
+                    value={repositoryKey}
+                  />
+                ) : (
+                  <Button
+                    loading={installing}
+                    onClick={installGitHub}
+                    size="sm"
+                    variant="outline"
+                  >
+                    Connect
+                  </Button>
+                )}
+              </SettingsRow>
+              <SettingsRow
+                description={t("blogFolderDescription")}
+                htmlFor="autopilot-blog-folder"
+                icon={Folder01Icon}
+                label={t("blogFolder")}
+              >
+                <Input
+                  className="w-64"
+                  defaultValue={settings.contentPath ?? ""}
+                  id="autopilot-blog-folder"
+                  // Remounts with the saved, normalized value after each save.
+                  key={settings.contentPath ?? ""}
+                  onBlur={(event) => {
+                    const contentPath = event.currentTarget.value.trim();
+                    if (contentPath !== (settings.contentPath ?? "")) {
+                      save.mutate({ contentPath: contentPath || null });
+                    }
+                  }}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter") {
+                      event.currentTarget.blur();
+                    }
+                  }}
+                  placeholder={t("blogFolderPlaceholder")}
+                />
+              </SettingsRow>
+            </>
+          )}
           <SettingsRow
             description={
               slackIntegration ? AUTOPILOT_SLACK_CHANNEL_HINT : undefined
@@ -330,6 +390,58 @@ export function AutopilotSettingsPanel({
           </SettingsRow>
         </div>
       </div>
+      <section
+        aria-labelledby="autopilot-approvals"
+        className="flex flex-col gap-3"
+      >
+        <div className="flex flex-col gap-0.5 px-1">
+          <h3 className="text-sm font-medium" id="autopilot-approvals">
+            {t("approvals")}
+          </h3>
+          <p className="text-muted-foreground text-xs text-pretty">
+            {t("approvalsDescription")}
+          </p>
+        </div>
+        <div className="border-shell-border bg-shell rounded-2xl border p-0.5">
+          <div className="divide-table-row-border shadow-table-card bg-table-card border-table-card-border divide-y overflow-hidden rounded-[14px] border">
+            {approvalRows.map((row) => (
+              <SettingsRow
+                htmlFor={`autopilot-approval-${row.group}`}
+                icon={row.icon}
+                key={row.group}
+                label={row.label}
+              >
+                <Select
+                  items={modeOptions}
+                  onValueChange={(value) =>
+                    save.mutate((current) => ({
+                      approvals: {
+                        ...current.approvals,
+                        [row.group]: value === "auto" ? "auto" : "ask",
+                      },
+                    }))
+                  }
+                  value={settings.approvals[row.group]}
+                >
+                  <SelectTrigger
+                    className="w-28"
+                    id={`autopilot-approval-${row.group}`}
+                  >
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent align="end">
+                    {modeOptions.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </SettingsRow>
+            ))}
+          </div>
+        </div>
+      </section>
       <section
         aria-labelledby="autopilot-ignores"
         className="flex flex-col gap-3"

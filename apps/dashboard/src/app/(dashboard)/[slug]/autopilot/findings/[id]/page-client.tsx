@@ -29,6 +29,7 @@ import {
 import {
   AUTOPILOT_KIND_META,
   AUTOPILOT_PLANNED_KINDS,
+  AUTOPILOT_PUBLISH_AT_FORMAT,
 } from "@/constants/autopilot-ui";
 import { TABLE_ROW_HEIGHT } from "@/constants/table";
 import { useAutopilotActions } from "@/lib/hooks/use-autopilot";
@@ -118,7 +119,7 @@ function FindingPage({
 }: AutopilotFindingPageProps) {
   const format = useFormatter();
   const [from] = useQueryState(AUTOPILOT_FROM_PARAM);
-  const { writeSuggestion, merge } = useAutopilotActions(organizationId);
+  const { writeSuggestion, merge, hold } = useAutopilotActions(organizationId);
   const [pending, setPending] = useState<AutopilotPendingFindingAction | null>(
     null
   );
@@ -146,11 +147,16 @@ function FindingPage({
     evidence.decision?.considered ?? []
   ).map((row, index) => ({ ...row, picked: index === 0 }));
   const idea = finding.status === "suggested";
+  const publishAt =
+    finding.status === "proposed" && finding.publishAt
+      ? new Date(finding.publishAt)
+      : null;
   // Status, then Confidence for planned kinds and Before → now with an impact.
   const factCount =
     1 +
     Number(AUTOPILOT_PLANNED_KINDS.includes(finding.kind)) +
-    Number(Boolean(impact));
+    Number(Boolean(impact)) +
+    Number(Boolean(evidence.previewUrl));
   const canAct =
     overview.canManage &&
     !(writeSuggestion.isPending && writeSuggestion.variables === finding.id);
@@ -228,7 +234,26 @@ function FindingPage({
               >
                 Close
               </Button>
-              {finding.status === "proposed" ? (
+              {publishAt ? (
+                <>
+                  <Button
+                    loading={hold.isPending}
+                    onClick={() => hold.mutate(finding.id)}
+                    size="sm"
+                    variant="outline"
+                  >
+                    Hold
+                  </Button>
+                  <Button
+                    loading={merge.isPending}
+                    onClick={() => merge.mutate({ findingId: finding.id })}
+                    size="sm"
+                  >
+                    Publish now
+                  </Button>
+                </>
+              ) : null}
+              {finding.status === "proposed" && !publishAt ? (
                 <AutopilotMergeMenu
                   loading={merge.isPending}
                   onMerge={(method) =>
@@ -236,7 +261,8 @@ function FindingPage({
                   }
                   size="sm"
                 />
-              ) : (
+              ) : null}
+              {finding.status === "suggested" ? (
                 <Button
                   disabled={!overview.settings.enabled}
                   loading={writeSuggestion.isPending}
@@ -245,7 +271,7 @@ function FindingPage({
                 >
                   Write now
                 </Button>
-              )}
+              ) : null}
             </div>
           ) : null}
         </PageHeading>
@@ -261,7 +287,29 @@ function FindingPage({
         >
           <AutopilotFact label="Status">
             <AutopilotFindingStatus finding={finding} />
+            {publishAt ? (
+              <span className="text-muted-foreground">
+                {" "}
+                Publishes{" "}
+                {format.dateTime(publishAt, {
+                  ...AUTOPILOT_PUBLISH_AT_FORMAT,
+                  timeZone: overview.settings.timezone,
+                })}
+              </span>
+            ) : null}
           </AutopilotFact>
+          {evidence.previewUrl ? (
+            <AutopilotFact label="Preview">
+              <a
+                className="underline-offset-4 hover:underline"
+                href={evidence.previewUrl}
+                rel="noreferrer"
+                target="_blank"
+              >
+                Open
+              </a>
+            </AutopilotFact>
+          ) : null}
           {AUTOPILOT_PLANNED_KINDS.includes(finding.kind) ? (
             <AutopilotFact label="Confidence">
               {typeof evidence.confidence === "number"

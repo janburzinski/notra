@@ -43,6 +43,7 @@ import {
 } from "@/lib/autopilot/leases";
 import { createAutopilotLogger } from "@/lib/autopilot/log";
 import { fetchPageForCrawlers } from "@/lib/autopilot/pages";
+import { scheduleAutopilotPublish } from "@/lib/autopilot/publish";
 import { runRepositoryAgent } from "@/lib/autopilot/repository-agent";
 import { renderingAgentOutputSchema } from "@/schemas/autopilot";
 import type { AutopilotRunContext } from "@/types/autopilot";
@@ -484,6 +485,15 @@ export async function openRenderingPullRequest(params: {
     event: AUTOPILOT_PULL_REQUEST_CREATED_EVENT,
     url: pullRequest.url,
     files: fix.files.map((file) => file.path),
+  });
+  await scheduleAutopilotPublish({
+    ctx,
+    log,
+    octokit,
+    finding: claim.finding,
+    pullRequestNumber: pullRequest.number,
+    body,
+    paths: fix.files.map((file) => file.path),
   });
   return { opened: true as const, url: pullRequest.url };
 }

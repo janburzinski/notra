@@ -10209,7 +10209,17 @@
     "settings": {
       "blogFolder": "Blog-Ordner",
       "blogFolderDescription": "Hier landen neue Beiträge. Lass das Feld leer, um deinen GitHub-Veröffentlichungspfad zu nutzen oder den Ordner automatisch zu finden.",
-      "blogFolderPlaceholder": "Automatisch finden"
+      "blogFolderPlaceholder": "Automatisch finden",
+      "site": "Site",
+      "siteNone": "Keine",
+      "siteWithoutBlog": "Gewählte Site (kein Blog)",
+      "approvals": "Freigaben",
+      "approvalsDescription": "Bei Auto wird der Pull Request zur Prüfung freigegeben und am nächsten Werktag um 9:00 veröffentlicht, wenn niemand eingreift.",
+      "approvalPosts": "Neue Beiträge",
+      "approvalUpdates": "Seiten-Updates",
+      "approvalFixes": "Readiness-Fixes",
+      "approvalAsk": "Fragen",
+      "approvalAuto": "Auto"
     }
   }
 }

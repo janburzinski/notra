@@ -37,6 +37,7 @@ import {
   AUTOPILOT_UPDATE_FIXED_FIELDS,
   AUTOPILOT_UPDATE_MIN_BODY_SHARE,
 } from "@/constants/autopilot";
+import { AUTOPILOT_FACT_FLAG_HEADINGS } from "@/constants/autopilot-publish";
 import { commitFilterSkipReason } from "@/lib/autopilot/commit-filters";
 import {
   factCheckComparison,
@@ -73,6 +74,7 @@ import {
 import { generateAutopilotObject } from "@/lib/autopilot/llm";
 import { createAutopilotLogger } from "@/lib/autopilot/log";
 import { listReadyTopicObservationIds } from "@/lib/autopilot/memory";
+import { scheduleAutopilotPublish } from "@/lib/autopilot/publish";
 import { loadDecisionMemory } from "@/lib/autopilot/rules";
 import { loadWritingRules, removeNewDashes } from "@/lib/autopilot/style";
 import { writeBlogPost } from "@/lib/autopilot/writer";
@@ -127,7 +129,11 @@ import {
   parseCommitFingerprint,
   toMergedPullRequest,
 } from "@/utils/autopilot-github";
-import { findPagePath, isSafeRepositoryPath } from "@/utils/autopilot-paths";
+import {
+  findPagePath,
+  isSafeRepositoryPath,
+  repositoryParentDirectory,
+} from "@/utils/autopilot-paths";
 import { forceNoDashes } from "@/utils/autopilot-style";
 import { toErrorMessage } from "@/utils/error-message";
 
@@ -296,6 +302,17 @@ async function openPageUpdate(params: {
     repository: ctx.repository,
     pullNumber: pullRequest.number,
   });
+  await scheduleAutopilotPublish({
+    ctx,
+    log,
+    octokit,
+    finding: claim.finding,
+    updatesExistingPage: true,
+    pullRequestNumber: pullRequest.number,
+    body: post.pullRequestBody,
+    paths: [path],
+    contentFolders: [repositoryParentDirectory(path)],
+  });
   return pullRequest;
 }
 
@@ -386,7 +403,7 @@ async function finishPost(params: {
     );
   }
   if (!params.factCheck && invented.length > 0) {
-    pullRequestBody = `${pullRequestBody.trim()}\n\n**Figures no source contains, please check**\n${invented.map((figure) => `\`${figure}\``).join(" · ")}`;
+    pullRequestBody = `${pullRequestBody.trim()}\n\n**${AUTOPILOT_FACT_FLAG_HEADINGS.figures}, please check**\n${invented.map((figure) => `\`${figure}\``).join(" · ")}`;
   }
   content = await removeNewDashes({
     organizationId: ctx.organizationId,
@@ -428,7 +445,7 @@ export async function writeBlogDraft(params: {
   const paths = await listRepositoryPaths(octokit, ctx.repository, baseSha);
   // Comparison pages go where the site keeps them; most sites have none and use the blog.
   const directory =
-    (claim.finding.kind === "comparisons"
+    (claim.finding.kind === "comparisons" && !ctx.siteId
       ? detectComparisonDirectory(paths)
       : null) ??
     detectBlogDirectory(paths, {
@@ -652,6 +669,18 @@ export async function openBlogDraftPullRequest(params: {
     octokit,
     repository: ctx.repository,
     pullNumber: pullRequest.number,
+  });
+  await scheduleAutopilotPublish({
+    ctx,
+    log,
+    octokit,
+    finding: claim.finding,
+    pullRequestNumber: pullRequest.number,
+    body: draft.post.pullRequestBody,
+    paths: [draft.path, ...(hero ? [hero.file.path] : [])],
+    contentFolders: [draft.path, ...(hero ? [hero.file.path] : [])].map(
+      repositoryParentDirectory
+    ),
   });
   return pullRequest;
 }

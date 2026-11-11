@@ -20,6 +20,7 @@ import {
   AUTOPILOT_EMPTY_TABLE_HEIGHT,
   AUTOPILOT_FINDING_ICONS,
   AUTOPILOT_KIND_META,
+  AUTOPILOT_PUBLISH_AT_FORMAT,
 } from "@/constants/autopilot-ui";
 import { TABLE_ROW_HEIGHT } from "@/constants/table";
 import { cn } from "@/lib/utils";
@@ -43,6 +44,7 @@ export function AutopilotPullRequestsTable({
   view = "pull-requests",
   readOnly,
   showAutomation = true,
+  timezone,
   writingId,
   onOpen,
   mergingId,
@@ -86,6 +88,15 @@ export function AutopilotPullRequestsTable({
                 <TruncateWithTooltip className="text-destructive text-xs">
                   {finding.errorMessage}
                 </TruncateWithTooltip>
+              ) : null}
+              {finding.status === "proposed" && finding.publishAt ? (
+                <span className="text-muted-foreground text-xs">
+                  Publishes{" "}
+                  {format.dateTime(new Date(finding.publishAt), {
+                    ...AUTOPILOT_PUBLISH_AT_FORMAT,
+                    timeZone: timezone,
+                  })}
+                </span>
               ) : null}
             </span>
           </span>

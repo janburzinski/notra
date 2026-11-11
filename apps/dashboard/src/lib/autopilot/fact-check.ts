@@ -1,6 +1,7 @@
 import { AGENT_DEFAULT_MODEL } from "@notra/ai/constants/models";
 import type { AgentTokenUsage } from "@notra/ai/types/agents";
 
+import { AUTOPILOT_FACT_FLAG_HEADINGS } from "@/constants/autopilot-publish";
 import {
   AUTOPILOT_FACT_CHECK_CONCURRENCY,
   AUTOPILOT_FACT_CHECK_INSTRUCTIONS,
@@ -221,14 +222,14 @@ export function factCheckSection(report: AutopilotFactReport) {
     ...(report.unconfirmed.length
       ? [
           "",
-          "**Please confirm, about your product with no source**",
+          `**${AUTOPILOT_FACT_FLAG_HEADINGS.unconfirmed}**`,
           ...report.unconfirmed.map((claim) => `- ${claim}`),
         ]
       : []),
     ...(report.figures.length
       ? [
           "",
-          "**Figures no source contains**",
+          `**${AUTOPILOT_FACT_FLAG_HEADINGS.figures}**`,
           report.figures.map((figure) => `\`${figure}\``).join(" · "),
         ]
       : []),

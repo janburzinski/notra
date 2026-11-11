@@ -1,4 +1,6 @@
 import type {
+  AUTOPILOT_APPROVAL_GROUPS,
+  AUTOPILOT_APPROVAL_MODES,
   AUTOPILOT_EVENT_LEVELS,
   AUTOPILOT_FINDING_STATUSES,
   AUTOPILOT_JOB_KINDS,
@@ -13,6 +15,15 @@ export type AutopilotFindingStatus =
 export type AutopilotRunStatus = (typeof AUTOPILOT_RUN_STATUSES)[number];
 
 export type AutopilotJobs = Record<AutopilotJobKind, boolean>;
+
+export type AutopilotApprovalGroup = (typeof AUTOPILOT_APPROVAL_GROUPS)[number];
+
+export type AutopilotApprovalMode = (typeof AUTOPILOT_APPROVAL_MODES)[number];
+
+export type AutopilotApprovals = Record<
+  AutopilotApprovalGroup,
+  AutopilotApprovalMode
+>;
 
 /** Which product pull requests "Write about releases" looks at. */
 export interface AutopilotCommitFilters {
@@ -84,6 +95,8 @@ export interface AutopilotFindingEvidence {
   } | null;
   /** When a 👍 action started; another 👍 waits until it settles or goes stale. */
   slackActingAt?: string;
+  previewUrl?: string | null;
+  publishGroup?: AutopilotApprovalGroup;
   /** The page a refresh or rendering fix is about. */
   pageUrl?: string | null;
   /** Every page a rendering finding covers; kept when it settles without a change. */

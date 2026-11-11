@@ -9,10 +9,14 @@ import {
 } from "@notra/db/schema";
 import { and, eq, sql } from "drizzle-orm";
 
-import { AUTOPILOT_NAV_LINK } from "@/constants/autopilot";
+import {
+  AUTOPILOT_DEFAULT_TIMEZONE,
+  AUTOPILOT_NAV_LINK,
+} from "@/constants/autopilot";
 import { AUTOPILOT_SLACK_KIND_LABELS } from "@/constants/autopilot-slack";
 import { isAutopilotEnabledForOrganization } from "@/lib/autopilot/flag";
 import { createAutopilotLogger } from "@/lib/autopilot/log";
+import { attachSitePreviews } from "@/lib/autopilot/sites";
 import {
   callAutopilotSlack,
   postAutopilotSlackMessage,
@@ -26,6 +30,7 @@ import type {
 } from "@/types/autopilot-slack";
 import { autopilotSlackMessageId } from "@/utils/autopilot-delivery";
 import { findingDisplayTitle } from "@/utils/autopilot-findings";
+import { formatAutopilotPublishAt } from "@/utils/autopilot-publish";
 import { compactSlackText, slackMrkdwn } from "@/utils/autopilot-slack";
 
 function bulletList(title: string, items: string[]) {
@@ -53,20 +58,28 @@ function findingSummary(finding: FindingRow) {
 
 function findingMessage(
   slug: string,
-  finding: FindingRow
+  finding: FindingRow,
+  timezone: string
 ): AutopilotFindingMessage {
   const isIdea = finding.status === "suggested";
   const title = compactSlackText(findingDisplayTitle(finding), 100);
   const summary = compactSlackText(findingSummary(finding), 180);
   const findingUrl = `${getAppUrl() ?? ""}/${slug}${AUTOPILOT_NAV_LINK}/findings/${finding.id}`;
+  const publishAt =
+    !isIdea && finding.publishAt
+      ? `Publishes ${formatAutopilotPublishAt(finding.publishAt, timezone)}`
+      : null;
   const meta = [
-    isIdea ? "Idea" : "Ready to merge",
+    isIdea ? "Idea" : (publishAt ?? "Ready to merge"),
     AUTOPILOT_SLACK_KIND_LABELS[finding.kind],
     finding.pullRequestUrl
       ? `<${finding.pullRequestUrl}|PR #${finding.pullRequestNumber}>`
       : null,
     finding.pullRequestUrl
       ? `<${finding.pullRequestUrl}/files|View diff>`
+      : null,
+    finding.evidence.previewUrl
+      ? `<${finding.evidence.previewUrl}|Preview>`
       : null,
   ].filter(Boolean);
   return {
@@ -92,7 +105,7 @@ function findingMessage(
           slackMrkdwn(
             isIdea
               ? "React 👍 to write it or 👎 if you don't want it"
-              : "React 👍 to merge or 👎 to close it"
+              : `React 👍 to merge${publishAt ? " now" : ""} or 👎 to close it`
           ),
         ],
       },
@@ -102,6 +115,7 @@ function findingMessage(
 
 export function buildAutopilotBrief(params: {
   organizationSlug: string;
+  timezone: string;
   proposed: FindingRow[];
   suggested?: FindingRow[];
   merged: FindingRow[];
@@ -176,7 +190,9 @@ export function buildAutopilotBrief(params: {
   return {
     text: `Autopilot: ${summary}`,
     blocks,
-    items: visible.map((finding) => findingMessage(organizationSlug, finding)),
+    items: visible.map((finding) =>
+      findingMessage(organizationSlug, finding, params.timezone)
+    ),
   };
 }
 
@@ -353,14 +369,27 @@ export async function reportAutopilotWriteInSlack(
     return;
   }
   if (finding.status === "proposed") {
-    const organization = await db.query.organizations.findFirst({
-      columns: { slug: true },
-      where: eq(organizations.id, organizationId),
-    });
+    const [organization, settings] = await Promise.all([
+      db.query.organizations.findFirst({
+        columns: { slug: true },
+        where: eq(organizations.id, organizationId),
+      }),
+      db.query.autopilotSettings.findFirst({
+        columns: { timezone: true },
+        where: eq(autopilotSettings.organizationId, organizationId),
+      }),
+    ]);
     if (organization) {
+      const [withPreview = finding] = await attachSitePreviews(organizationId, [
+        finding,
+      ]);
       await postFindingReply(
         send,
-        findingMessage(organization.slug, finding),
+        findingMessage(
+          organization.slug,
+          withPreview,
+          settings?.timezone ?? AUTOPILOT_DEFAULT_TIMEZONE
+        ),
         thread.threadTs
       );
       // Announced here, so the next brief does not post the same PR again.

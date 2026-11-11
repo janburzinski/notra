@@ -115,7 +115,7 @@ export function useAutopilotActions(organizationId: string) {
   });
 
   const merge = useMutation({
-    mutationFn: (input: { findingId: string; method: GitHubMergeMethod }) =>
+    mutationFn: (input: { findingId: string; method?: GitHubMergeMethod }) =>
       dashboardOrpc.autopilot.merge.call({ organizationId, ...input }),
     onSuccess: () => {
       toast.success("Merged");
@@ -124,5 +124,15 @@ export function useAutopilotActions(organizationId: string) {
     onError: (error) => toast.error(toErrorMessage(error, "Could not merge")),
   });
 
-  return { runNow, stop, writeSuggestion, setJob, merge };
+  const hold = useMutation({
+    mutationFn: (findingId: string) =>
+      dashboardOrpc.autopilot.hold.call({ organizationId, findingId }),
+    onSuccess: () => {
+      toast.success("Held");
+      invalidate();
+    },
+    onError: (error) => toast.error(toErrorMessage(error, "Could not hold")),
+  });
+
+  return { runNow, stop, writeSuggestion, setJob, merge, hold };
 }

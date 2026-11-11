@@ -102,6 +102,7 @@ import type {
 } from "./types/agent-readiness";
 import type { AnalyticsImportCapabilities } from "./types/analytics-imports";
 import type {
+  AutopilotApprovals,
   AutopilotCommitFilters,
   AutopilotFindingEvidence,
   AutopilotJobs,
@@ -4860,6 +4861,7 @@ export const autopilotSettings = pgTable("autopilot_settings", {
   repositoryName: text("repository_name"),
   repositoryBranch: text("repository_branch"),
   contentPath: text("content_path"),
+  siteId: text("site_id").references(() => sites.id, { onDelete: "set null" }),
   slackIntegrationId: text("slack_integration_id").references(
     () => slackIntegrations.id,
     { onDelete: "set null" }
@@ -4885,6 +4887,10 @@ export const autopilotSettings = pgTable("autopilot_settings", {
       sql`'{"excludedAuthors":["dependabot[bot]","renovate[bot]","github-actions[bot]"],"paths":{}}'::jsonb`
     ),
   maxOpenPullRequests: integer("max_open_pull_requests").notNull().default(3),
+  approvals: jsonb("approvals")
+    .$type<AutopilotApprovals>()
+    .notNull()
+    .default(sql`'{"posts":"ask","updates":"ask","fixes":"ask"}'::jsonb`),
   /** Drafts nobody touched for this many days are closed; null keeps them open. */
   stalePullRequestDays: integer("stale_pull_request_days").default(14),
   lastRunAt: timestamp("last_run_at"),
@@ -4966,6 +4972,8 @@ export const autopilotFindings = pgTable(
     dismissedAt: timestamp("dismissed_at"),
     /** When its pull request was opened; an idea can wait days before that. */
     openedAt: timestamp("opened_at"),
+    publishAt: timestamp("publish_at"),
+    publishHoldReason: text("publish_hold_reason"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at")
       .defaultNow()

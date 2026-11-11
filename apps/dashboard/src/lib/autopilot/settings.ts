@@ -9,6 +9,9 @@ import type { autopilotSaveInputSchema } from "@notra/schemas/dashboard/autopilo
 import { and, eq, sql } from "drizzle-orm";
 import type * as z from "zod";
 
+import { AUTOPILOT_DEFAULT_APPROVALS } from "@/constants/autopilot-publish";
+import { cancelHoldsAfterSettingsChange } from "@/lib/autopilot/publish";
+import { loadAutopilotSiteTarget } from "@/lib/autopilot/sites";
 import { normalizeRepositoryDirectory } from "@/utils/autopilot-paths";
 
 export class AutopilotSettingsError extends Error {
@@ -60,12 +63,34 @@ export async function saveAutopilotSettings(
       "Use a folder path inside the repository."
     );
   }
+  const site = input.siteId
+    ? await loadAutopilotSiteTarget(input.organizationId, input.siteId)
+    : null;
+  if (input.siteId && !site) {
+    throw new AutopilotSettingsError(
+      "That site is not part of this workspace."
+    );
+  }
+  if (site && !site.contentPath) {
+    const current = await db.query.autopilotSettings.findFirst({
+      columns: { siteId: true },
+      where: eq(autopilotSettings.organizationId, input.organizationId),
+    });
+    if (current?.siteId !== input.siteId) {
+      throw new AutopilotSettingsError(
+        "That site has no blog. Turn on its blog first."
+      );
+    }
+  }
   const values = {
     enabled: input.enabled,
-    repositoryOwner: input.repository?.owner ?? null,
-    repositoryName: input.repository?.name ?? null,
-    repositoryBranch: input.repository?.branch ?? null,
-    contentPath: contentPath || null,
+    repositoryOwner: site?.repository.owner ?? input.repository?.owner ?? null,
+    repositoryName: site?.repository.name ?? input.repository?.name ?? null,
+    repositoryBranch:
+      site?.repository.branch ?? input.repository?.branch ?? null,
+    contentPath: site ? site.contentPath : contentPath || null,
+    ...(input.siteId === undefined ? {} : { siteId: input.siteId }),
+    ...(input.approvals ? { approvals: input.approvals } : {}),
     slackIntegrationId: input.slack?.integrationId ?? null,
     slackChannelId: input.slack?.channelId ?? null,
     slackChannelName: input.slack?.channelName ?? null,
@@ -85,6 +110,12 @@ export async function saveAutopilotSettings(
       target: autopilotSettings.organizationId,
       set: values,
     });
+  if (input.approvals || !input.enabled) {
+    await cancelHoldsAfterSettingsChange(input.organizationId, {
+      enabled: input.enabled,
+      approvals: input.approvals ?? AUTOPILOT_DEFAULT_APPROVALS,
+    });
+  }
 }
 
 export async function setAutopilotJob(
@@ -125,8 +156,18 @@ export async function updateAutopilotSettings(
     .update(autopilotSettings)
     .set(values)
     .where(eq(autopilotSettings.organizationId, organizationId))
-    .returning({ organizationId: autopilotSettings.organizationId });
+    .returning({
+      organizationId: autopilotSettings.organizationId,
+      enabled: autopilotSettings.enabled,
+      approvals: autopilotSettings.approvals,
+    });
   if (!updated) {
     throw new AutopilotSettingsError(SET_UP_FIRST);
+  }
+  if (patch.enabled === false) {
+    await cancelHoldsAfterSettingsChange(organizationId, {
+      enabled: false,
+      approvals: updated.approvals,
+    });
   }
 }

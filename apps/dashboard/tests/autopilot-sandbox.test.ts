@@ -147,6 +147,12 @@ if (process.env.NOTRA_AUTOPILOT_SANDBOX_TEST !== "1") {
     await import("../src/lib/autopilot/brief");
   const { startAutopilot } = await import("../src/lib/autopilot/start");
   const {
+    cancelHoldsAfterSettingsChange,
+    cancelHoldsForPullRequestEvent,
+    holdFinding,
+    publishDueFindings,
+  } = await import("../src/lib/autopilot/publish");
+  const {
     renewAutopilotFindingLease,
     renewAutopilotRunLease,
     withAutopilotFindingLease,
@@ -233,6 +239,7 @@ if (process.env.NOTRA_AUTOPILOT_SANDBOX_TEST !== "1") {
     };
     const brief = buildAutopilotBrief({
       organizationSlug: "sandbox",
+      timezone: "Europe/Berlin",
       proposed: Array.from({ length: 20 }, () => finding),
       merged: Array.from({ length: 20 }, () => finding),
       insights: Array.from({ length: 20 }, () => `<!here> ${"x".repeat(500)}`),
@@ -262,6 +269,152 @@ if (process.env.NOTRA_AUTOPILOT_SANDBOX_TEST !== "1") {
         }
       }
     }
+  });
+
+  const heldFinding = async (publishAt: Date) => {
+    const claim = await claimFinding("sandbox-org", "item-run", proposal);
+    if (!claim) {
+      throw new Error("Expected a claim");
+    }
+    await markFindingProposed(claim, {
+      repository: "Sandbox/Site",
+      number: 7,
+      url: "https://github.com/Sandbox/Site/pull/7",
+      branch: "notra/autopilot/sandbox",
+      headSha: "abc",
+    });
+    await db
+      .update(autopilotFindings)
+      .set({ publishAt })
+      .where(eq(autopilotFindings.id, claim.finding.id));
+    return claim.finding.id;
+  };
+
+  const readFinding = async (id: string) => {
+    const [row] = await db
+      .select()
+      .from(autopilotFindings)
+      .where(eq(autopilotFindings.id, id));
+    if (!row) {
+      throw new Error("Expected the finding");
+    }
+    return row;
+  };
+
+  test("held findings say when they publish and link the Sites preview", async () => {
+    const id = await heldFinding(new Date("2026-11-10T08:00:00Z"));
+    const finding = {
+      ...(await readFinding(id)),
+      evidence: { previewUrl: "https://pr-7--site.example.com" },
+    };
+    const brief = buildAutopilotBrief({
+      organizationSlug: "sandbox",
+      timezone: "Europe/Berlin",
+      proposed: [finding],
+      merged: [],
+      insights: [],
+    });
+    const text = brief?.items[0]?.text ?? "";
+    expect(text).toContain("Publishes Tue 09:00");
+    expect(text).toContain("<https://pr-7--site.example.com|Preview>");
+    expect(text).not.toContain("Ready to merge");
+  });
+
+  test("a planned update written as a new post keeps the Posts approval it was scheduled under", async () => {
+    const id = await heldFinding(new Date(now.getTime() + 86_400_000));
+    const row = await readFinding(id);
+    await db
+      .update(autopilotFindings)
+      .set({
+        evidence: {
+          ...row.evidence,
+          updatePage: { url: "https://example.com/blog/gone", title: "Gone" },
+          publishGroup: "posts",
+        },
+      })
+      .where(eq(autopilotFindings.id, id));
+    await cancelHoldsAfterSettingsChange("sandbox-org", {
+      enabled: true,
+      approvals: { posts: "auto", updates: "ask", fixes: "ask" },
+    });
+    expect((await readFinding(id)).publishAt).not.toBeNull();
+  });
+
+  test("a due hold falls back to ask when approvals no longer allow it", async () => {
+    const id = await heldFinding(new Date(now.getTime() - 60_000));
+    const outcome = await publishDueFindings(
+      "sandbox-org",
+      { posts: "ask", updates: "ask", fixes: "ask" },
+      now
+    );
+    expect(outcome).toEqual({ published: 0, waiting: 0, cancelled: 1 });
+    const row = await readFinding(id);
+    expect(row.publishAt).toBeNull();
+    expect(row.publishHoldReason).toBe("Approvals were set to ask");
+    expect(row.status).toBe("proposed");
+    const events = await db
+      .select()
+      .from(autopilotRunEvents)
+      .where(eq(autopilotRunEvents.runId, "item-run"));
+    expect(events.map((event) => event.message)).toContain(
+      "Waits for you: Approvals were set to ask"
+    );
+  });
+
+  test("a due hold retries later when GitHub cannot be checked", async () => {
+    const id = await heldFinding(new Date(now.getTime() - 60_000));
+    const outcome = await publishDueFindings(
+      "sandbox-org",
+      { posts: "auto", updates: "ask", fixes: "ask" },
+      now
+    );
+    expect(outcome).toEqual({ published: 0, waiting: 1, cancelled: 0 });
+    const row = await readFinding(id);
+    expect(row.publishAt?.getTime()).toBeGreaterThan(now.getTime());
+    expect(row.publishHoldReason).toBeNull();
+    expect(
+      await publishDueFindings(
+        "sandbox-org",
+        { posts: "auto", updates: "ask", fixes: "ask" },
+        now
+      )
+    ).toEqual({ published: 0, waiting: 0, cancelled: 0 });
+  });
+
+  test("pushes by people and the Hold button cancel the hold, bot pushes do not", async () => {
+    const id = await heldFinding(new Date(now.getTime() + 86_400_000));
+    const event = (action: string, sender: string) => ({
+      action,
+      installation: { id: 1 },
+      repository: {
+        id: 1,
+        name: "site",
+        full_name: "sandbox/site",
+        owner: { login: "sandbox" },
+      },
+      sender: { type: sender },
+      pull_request: {
+        number: 7,
+        title: "Blog: Exports",
+        html_url: "https://github.com/Sandbox/Site/pull/7",
+        head: { ref: "notra/autopilot/sandbox" },
+      },
+    });
+    await cancelHoldsForPullRequestEvent(event("synchronize", "Bot"));
+    expect((await readFinding(id)).publishAt).not.toBeNull();
+    await cancelHoldsForPullRequestEvent(event("synchronize", "User"));
+    const pushed = await readFinding(id);
+    expect(pushed.publishAt).toBeNull();
+    expect(pushed.publishHoldReason).toBe("Someone else pushed commits");
+
+    await db
+      .update(autopilotFindings)
+      .set({ publishAt: new Date(now.getTime() + 86_400_000) })
+      .where(eq(autopilotFindings.id, id));
+    await holdFinding("sandbox-org", id);
+    const held = await readFinding(id);
+    expect(held.publishAt).toBeNull();
+    expect(held.publishHoldReason).toBe("Held from the dashboard");
   });
 
   test("migrated unique constraints allow exactly one full run per workspace", async () => {

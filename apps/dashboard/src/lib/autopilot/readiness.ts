@@ -52,6 +52,7 @@ import {
   withAutopilotFindingLease,
 } from "@/lib/autopilot/leases";
 import { createAutopilotLogger } from "@/lib/autopilot/log";
+import { scheduleAutopilotPublish } from "@/lib/autopilot/publish";
 import { runRepositoryAgent } from "@/lib/autopilot/repository-agent";
 import { geoCoreDashboardLayer } from "@/lib/geo/configure";
 import { readinessAgentOutputSchema } from "@/schemas/autopilot";
@@ -417,6 +418,15 @@ export async function openReadinessPullRequest(params: {
     event: AUTOPILOT_PULL_REQUEST_CREATED_EVENT,
     url: pullRequest.url,
     files: fix.files.map((file) => file.path),
+  });
+  await scheduleAutopilotPublish({
+    ctx,
+    log,
+    octokit,
+    finding: claim.finding,
+    pullRequestNumber: pullRequest.number,
+    body,
+    paths: fix.files.map((file) => file.path),
   });
   return { opened: true as const, url: pullRequest.url };
 }

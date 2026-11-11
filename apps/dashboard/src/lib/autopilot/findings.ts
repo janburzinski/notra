@@ -1162,7 +1162,8 @@ export async function syncFindingPullRequests(organizationId: string) {
 export async function mergeFinding(
   organizationId: string,
   findingId: string,
-  method?: GitHubMergeMethod
+  method?: GitHubMergeMethod,
+  beforeMerge?: () => Promise<void>
 ) {
   const finding = await loadProposedFinding(organizationId, findingId);
   if (finding.status === "merged") {
@@ -1178,6 +1179,7 @@ export async function mergeFinding(
   });
   const state = await getContentPullRequestState(octokit, ref);
   if (state.status === "open") {
+    await beforeMerge?.();
     // Pinned to the commit Autopilot pushed: anything pushed after the review is never merged.
     try {
       await mergeContentPullRequest(
