@@ -87,7 +87,18 @@ function billingLayer(secretKey: string) {
                   customerId: organizationId,
                   featureId: FEATURES.AI_ANSWERS,
                 });
-                return data.balance != null;
+                if (data.balance != null) {
+                  return true;
+                }
+                const customer = await autumn.customers.getOrCreate({
+                  customerId: organizationId,
+                });
+                return customer.subscriptions.some(
+                  (subscription) =>
+                    !subscription.addOn &&
+                    subscription.status === "active" &&
+                    PAID_OR_LEGACY_PLAN_IDS.has(subscription.planId)
+                );
               },
               catch: (cause) => new GeoBillingError({ cause }),
             })

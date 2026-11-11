@@ -3,6 +3,7 @@ import { Effect } from "effect";
 import type { Context, Next } from "hono";
 
 import { API_PAYWALL_FEATURES } from "../constants/analytics";
+import { RESTRICTED_BILLING_METHODS } from "../constants/billing";
 import { GEO_PLAN_REQUIRED_MESSAGE } from "../constants/geo";
 import { ORGANIZATION_SCOPED_API_KEY_ERROR } from "../constants/skills";
 import { getBillingLayer } from "../lib/billing";
@@ -11,28 +12,12 @@ import { trackApiPaywalled } from "../utils/analytics";
 import { getOrganizationId } from "../utils/auth";
 import { logError } from "../utils/logging";
 
-/**
- * Requires the GEO plan entitlement on every GEO endpoint, reads included.
- *
- * Mirrors the dashboard's `assertGeoEntitlement`: a customer is entitled when
- * it has an `ai_answers` balance *at all* (`balance != null`), which is a plan
- * check rather than a quota check — a caller that has burned through its
- * allowance still gets 200s here, same as in the product.
- *
- * Reads are gated too. The dashboard gates them through `geoHandler`, and GEO
- * data is the paid deliverable, so a read-only API key on a lapsed plan must
- * not keep draining the dataset. This is deliberately stricter than
- * `subscriptionMiddleware`, which leaves GET and DELETE open for data
- * portability; that middleware still applies unchanged on top of this one.
- *
- * Positive checks are reused for at most 30 seconds, including during an outage.
- * Denials and failures are not cached. Once a grant expires, an Autumn outage
- * fails closed with 503. Plan revocations can therefore take up to 30 seconds.
- * Credit consumption is not cached. Subscription checks share the same
- * 30 second positive cache.
- */
 export function geoEntitlementMiddleware() {
   return async (c: Context, next: Next) => {
+    if (!RESTRICTED_BILLING_METHODS.has(c.req.method)) {
+      return next();
+    }
+
     const secretKey = c.env.AUTUMN_SECRET_KEY as string | undefined;
     if (!secretKey) {
       if (shouldBypassAutumnInDevelopment(process.env.NODE_ENV, secretKey)) {
