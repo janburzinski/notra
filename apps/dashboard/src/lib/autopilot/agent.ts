@@ -16,6 +16,7 @@ import {
   AUTOPILOT_WORKFLOW_NOT_FOUND,
   AUTOPILOT_WORKFLOW_RATE_LIMITED,
 } from "@/constants/autopilot-workflows";
+import { loadRecentDailyNotes } from "@/lib/autopilot/daily-notes";
 import {
   dismissFindingWithFeedback,
   writeSuggestedFinding,
@@ -90,46 +91,54 @@ async function loadStatus(
   slack: AgentRequest["slack"],
   role: string
 ) {
-  const [settings, runs, workflows, workflowRunRows, openFindings, rules] =
-    await Promise.all([
-      db.query.autopilotSettings.findFirst({
-        where: eq(autopilotSettings.organizationId, organizationId),
-      }),
-      db.query.autopilotRuns.findMany({
-        where: and(
-          eq(autopilotRuns.organizationId, organizationId),
-          eq(autopilotRuns.status, "running")
-        ),
-        orderBy: [desc(autopilotRuns.startedAt)],
-        limit: 5,
-      }),
-      listAutopilotWorkflows(organizationId),
-      db
-        .select({
-          id: workflowRuns.id,
-          workflowKey: workflowRuns.workflowKey,
-          status: workflowRuns.status,
-        })
-        .from(workflowRuns)
-        .where(
-          and(
-            eq(workflowRuns.organizationId, organizationId),
-            isNull(workflowRuns.parentRunId),
-            sql`${workflowRuns.workflowKey} like ${`${AUTOPILOT_WORKFLOW_KEY_PREFIX}%`}`,
-            inArray(workflowRuns.status, ACTIVE_WORKFLOW_RUN_STATUSES)
-          )
+  const [
+    settings,
+    runs,
+    workflows,
+    workflowRunRows,
+    openFindings,
+    rules,
+    recentDays,
+  ] = await Promise.all([
+    db.query.autopilotSettings.findFirst({
+      where: eq(autopilotSettings.organizationId, organizationId),
+    }),
+    db.query.autopilotRuns.findMany({
+      where: and(
+        eq(autopilotRuns.organizationId, organizationId),
+        eq(autopilotRuns.status, "running")
+      ),
+      orderBy: [desc(autopilotRuns.startedAt)],
+      limit: 5,
+    }),
+    listAutopilotWorkflows(organizationId),
+    db
+      .select({
+        id: workflowRuns.id,
+        workflowKey: workflowRuns.workflowKey,
+        status: workflowRuns.status,
+      })
+      .from(workflowRuns)
+      .where(
+        and(
+          eq(workflowRuns.organizationId, organizationId),
+          isNull(workflowRuns.parentRunId),
+          sql`${workflowRuns.workflowKey} like ${`${AUTOPILOT_WORKFLOW_KEY_PREFIX}%`}`,
+          inArray(workflowRuns.status, ACTIVE_WORKFLOW_RUN_STATUSES)
         )
-        .limit(10),
-      db.query.autopilotFindings.findMany({
-        where: and(
-          eq(autopilotFindings.organizationId, organizationId),
-          inArray(autopilotFindings.status, OPEN_FINDING_STATUSES)
-        ),
-        orderBy: [desc(autopilotFindings.updatedAt)],
-        limit: 15,
-      }),
-      listRules(organizationId),
-    ]);
+      )
+      .limit(10),
+    db.query.autopilotFindings.findMany({
+      where: and(
+        eq(autopilotFindings.organizationId, organizationId),
+        inArray(autopilotFindings.status, OPEN_FINDING_STATUSES)
+      ),
+      orderBy: [desc(autopilotFindings.updatedAt)],
+      limit: 15,
+    }),
+    listRules(organizationId),
+    loadRecentDailyNotes(organizationId),
+  ]);
   const threadFindings =
     slack.channelId && slack.threadTs
       ? await db.query.autopilotFindings.findMany({
@@ -184,6 +193,7 @@ async function loadStatus(
     threadFindings: threadFindings.map(summarizeFinding),
     openFindings: openFindings.map(summarizeFinding),
     rules: rules.map((rule) => ({ id: rule.id, text: rule.text })),
+    recentDays,
   };
 }
 

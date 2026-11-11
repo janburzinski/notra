@@ -26,6 +26,10 @@ import {
   AUTOPILOT_TREE_MAX_PATHS,
 } from "@/constants/autopilot";
 import {
+  conventionsInstruction,
+  loadRepositoryConventions,
+} from "@/lib/autopilot/conventions";
+import {
   getBaseBranchSha,
   getRepositoryOctokit,
   listRepositoryPaths,
@@ -108,6 +112,12 @@ export async function runRepositoryAgent<Schema extends z.ZodType>(params: {
   }) => string | null;
 }) {
   const { ctx, repository, log } = params;
+  const conventions = conventionsInstruction(
+    await loadRepositoryConventions(ctx.organizationId, repository)
+  );
+  const instructions = [params.instructions, conventions]
+    .filter(Boolean)
+    .join(" ");
   const octokit = await getRepositoryOctokit(ctx.organizationId, repository);
   const baseSha = await getBaseBranchSha(octokit, repository);
   const paths = await listRepositoryPaths(octokit, repository, baseSha);
@@ -264,7 +274,7 @@ export async function runRepositoryAgent<Schema extends z.ZodType>(params: {
       { gateway: { tags: ["autopilot", params.tag] } },
       { modelId: AGENT_DEFAULT_MODEL }
     ),
-    instructions: params.instructions,
+    instructions,
     tools,
     output: Output.object({ schema: params.outputSchema }),
     maxOutputTokens: AUTOPILOT_REPOSITORY_AGENT_MAX_OUTPUT_TOKENS,
@@ -283,13 +293,13 @@ export async function runRepositoryAgent<Schema extends z.ZodType>(params: {
       if (phase === "answer") {
         return {
           activeTools: [],
-          instructions: `${params.instructions} ${params.finalNote}`,
+          instructions: `${instructions} ${params.finalNote}`,
         };
       }
       if (phase === "wrap-up") {
         return {
           activeTools: ["writeFile", "skipIssue"],
-          instructions: `${params.instructions} ${params.wrapUpNote}`,
+          instructions: `${instructions} ${params.wrapUpNote}`,
         };
       }
       return undefined;
@@ -307,7 +317,7 @@ export async function runRepositoryAgent<Schema extends z.ZodType>(params: {
   const prompt = params.prompt(paths);
   await log.trace(`${params.tag} prompt`, {
     model: AGENT_DEFAULT_MODEL,
-    instructions: params.instructions,
+    instructions,
     prompt,
   });
   const result = await agent

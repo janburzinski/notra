@@ -186,6 +186,16 @@ export function followFinding(
   };
 }
 
+export function reopenTopic(topic: AutopilotTopic): AutopilotTopic {
+  return {
+    ...topic,
+    status: "watching",
+    findingId: null,
+    pullRequestUrl: null,
+    nextStep: "",
+  };
+}
+
 /** Points the topic at what the run opened for it. */
 export function markTopicActed(
   state: AutopilotPlannerState,

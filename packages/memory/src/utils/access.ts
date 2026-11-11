@@ -1,5 +1,6 @@
 import {
   MEMORY_ON_DEMAND_LIMIT_BYTES,
+  MEMORY_PATHS,
   MEMORY_PRELOADED_HARD_LIMIT_BYTES,
   MEMORY_PRELOADED_PATTERN,
   MEMORY_PRELOADED_SOFT_LIMIT_BYTES,
@@ -10,6 +11,12 @@ import { MemoryAccessError, MemoryLimitError } from "./errors";
 
 const WRITABLE: Record<MemoryActor, (path: string) => boolean> = {
   "autopilot-run": (path) => path === "planner.md",
+  "autopilot-dream": (path) =>
+    path === "planner.md" ||
+    path === "rules.md" ||
+    path === MEMORY_PATHS.dreamState ||
+    path.startsWith("conventions/") ||
+    path.startsWith("daily/"),
   user: (path) =>
     path === "rules.md" || path === "feedback.md" || path === "planner.md",
   knowledge: (path) => path.startsWith("knowledge/"),
@@ -26,7 +33,10 @@ export function byteLength(content: string) {
 /** Refuses writes outside the actor's paths and files past their hard limit. */
 export function assertWritable(actor: MemoryActor, changes: MemoryChanges) {
   for (const [path, content] of Object.entries(changes)) {
-    if (!(MEMORY_SAFE_PATH.test(path) && !path.includes(".."))) {
+    const safe =
+      path === MEMORY_PATHS.dreamState ||
+      (MEMORY_SAFE_PATH.test(path) && !path.includes(".."));
+    if (!safe) {
       throw new MemoryAccessError(`Not a memory path: ${path}`);
     }
     if (!WRITABLE[actor](path)) {

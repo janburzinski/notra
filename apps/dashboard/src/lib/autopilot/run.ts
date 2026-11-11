@@ -27,6 +27,7 @@ import {
   runKeywordsJob,
 } from "@/lib/autopilot/blog";
 import { buildAutopilotBrief, postAutopilotBrief } from "@/lib/autopilot/brief";
+import { loadRecentDailyNotes } from "@/lib/autopilot/daily-notes";
 import { syncFindingPullRequests } from "@/lib/autopilot/findings";
 import { autopilotFlagState } from "@/lib/autopilot/flag";
 import {
@@ -348,6 +349,7 @@ export async function deliverAutopilotBrief(params: {
     suggested: findings.filter((finding) => finding.status === "suggested"),
     merged,
     insights: params.insights,
+    recentDays: await loadRecentDailyNotes(ctx.organizationId),
   });
   const log = createAutopilotLogger(ctx, null);
   if (!brief) {

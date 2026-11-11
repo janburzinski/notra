@@ -122,6 +122,8 @@ if (process.env.NOTRA_AUTOPILOT_SANDBOX_TEST !== "1") {
     getRepositoryOctokit: async () => {
       throw new Error("Network is forbidden in the sandbox");
     },
+    listRepositoryPaths: notRun,
+    repositoryPathExists: notRun,
   }));
   mock.module("@/lib/integrations/github/content-pull-request", () => ({
     isMergeMethodNotAllowed: () => false,

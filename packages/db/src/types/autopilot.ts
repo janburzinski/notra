@@ -43,6 +43,7 @@ export interface AutopilotFindingEvidence {
   /** Readiness issues this finding addresses; dismissing it stops retrying them. */
   issueIds?: string[];
   keyword?: string | null;
+  projectId?: string | null;
   competitors?: string[];
   pullRequests?: {
     number: number;
@@ -111,6 +112,7 @@ export interface AutopilotFindingEvidence {
   comparison?: AutopilotComparisonTarget | null;
   /** The internal links a links pull request adds, one row per link. */
   links?: AutopilotInternalLink[] | null;
+  allowedAgainAt?: string;
 }
 
 /** One link from a post to a page that ranks for the linked words. */

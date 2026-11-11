@@ -120,6 +120,7 @@ export function buildAutopilotBrief(params: {
   suggested?: FindingRow[];
   merged: FindingRow[];
   insights: string[];
+  recentDays?: { date: string; note: string }[];
 }): AutopilotBrief | null {
   const {
     organizationSlug,
@@ -187,8 +188,11 @@ export function buildAutopilotBrief(params: {
   if (notes.length > 0) {
     blocks.push({ type: "section", text: slackMrkdwn(notes.join("\n\n")) });
   }
+  const recentDays = (params.recentDays ?? [])
+    .map((day) => compactSlackText(day.note, 600))
+    .join("\n\n");
   return {
-    text: `Autopilot: ${summary}`,
+    text: `Autopilot: ${summary}${recentDays ? `\n\nRecent days:\n${recentDays}` : ""}`,
     blocks,
     items: visible.map((finding) =>
       findingMessage(organizationSlug, finding, params.timezone)

@@ -22,6 +22,7 @@ import {
   isNull,
   lt,
   ne,
+  not,
   notExists,
   notInArray,
   or,
@@ -85,15 +86,20 @@ function isExpiredPastCooldown(now: Date) {
   );
 }
 
+const allowedAgain = sql<boolean>`${autopilotFindings.evidence} ? 'allowedAgainAt'`;
+
 function isDismissedPastCooldown(now: Date) {
   return and(
     findingTransition("open", ["dismissed"]),
     or(
       and(
         inArray(autopilotFindings.kind, [...AUTOPILOT_DISMISS_COOLDOWN_KINDS]),
-        lt(
-          autopilotFindings.dismissedAt,
-          new Date(now.getTime() - AUTOPILOT_DISMISSED_GAP_COOLDOWN_MS)
+        or(
+          allowedAgain,
+          lt(
+            autopilotFindings.dismissedAt,
+            new Date(now.getTime() - AUTOPILOT_DISMISSED_GAP_COOLDOWN_MS)
+          )
         )
       ),
       and(
@@ -765,10 +771,15 @@ function isSettledFinding() {
         notInArray(autopilotFindings.kind, [
           ...AUTOPILOT_DISMISS_COOLDOWN_KINDS,
         ]),
-        isNull(autopilotFindings.dismissedAt),
-        gte(
-          autopilotFindings.dismissedAt,
-          new Date(now - AUTOPILOT_DISMISSED_GAP_COOLDOWN_MS)
+        and(
+          not(allowedAgain),
+          or(
+            isNull(autopilotFindings.dismissedAt),
+            gte(
+              autopilotFindings.dismissedAt,
+              new Date(now - AUTOPILOT_DISMISSED_GAP_COOLDOWN_MS)
+            )
+          )
         )
       )
     ),

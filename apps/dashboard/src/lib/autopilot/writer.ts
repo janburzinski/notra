@@ -28,6 +28,7 @@ import {
   AUTOPILOT_WRITER_MAX_STEPS,
   AUTOPILOT_WRITER_RESEARCH_STEPS,
 } from "@/constants/autopilot";
+import { conventionsInstruction } from "@/lib/autopilot/conventions";
 import { readRepositoryFile } from "@/lib/autopilot/github";
 import { blogFileSchema } from "@/schemas/autopilot";
 import type {
@@ -84,6 +85,7 @@ export async function writeBlogPost(params: {
   existing?: { path: string; content: string } | null;
   /** The workspace's writing rules (its "unslop" skill). */
   writingRules?: string | null;
+  conventions?: readonly string[];
   /** Gets every page and file the writer read, e.g. for a fact check. */
   onSource?: (source: AutopilotFactSource) => void;
   onUsage?: (usage: AgentTokenUsage) => void;
@@ -169,6 +171,7 @@ export async function writeBlogPost(params: {
     ctx.brand?.customInstructions
       ? `House rules from the brand, follow them: ${ctx.brand.customInstructions}`
       : "",
+    conventionsInstruction(params.conventions ?? []),
     params.writingRules
       ? `Writing rules, apply them to the title, description and every sentence. Never use em dashes or en dashes.\n${params.writingRules}`
       : "Never use em dashes or en dashes.",

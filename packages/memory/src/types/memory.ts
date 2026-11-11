@@ -1,8 +1,13 @@
 /**
  * Who writes. Autonomous runs may only touch their own notes; rules and
- * feedback change only when a person explicitly asks.
+ * feedback change only when a person explicitly asks. The dream tidies
+ * Autopilot's notes, dedupes rules and keeps conventions and daily notes.
  */
-export type MemoryActor = "autopilot-run" | "user" | "knowledge";
+export type MemoryActor =
+  | "autopilot-run"
+  | "autopilot-dream"
+  | "user"
+  | "knowledge";
 
 export interface MemoryCommitInput {
   expectedHeadSha: string | null;

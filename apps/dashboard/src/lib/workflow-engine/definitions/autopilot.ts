@@ -170,32 +170,33 @@ export const AUTOPILOT_DAILY_WORKFLOW: WorkflowDefinition = {
         description: "At the workspace's brief hour, or Run now",
         position: at(0, 1),
       },
-      step("close-stale", "autopilot.close-stale", at(1, 1), {
+      step("dream", "autopilot.dream", at(1, 1), { onError: "continue" }),
+      step("close-stale", "autopilot.close-stale", at(2, 1), {
         onError: "continue",
       }),
-      step("gather", "autopilot.gather", at(2, 1), { onError: "continue" }),
-      step("readiness", "autopilot.readiness", at(2, 0), {
+      step("gather", "autopilot.gather", at(3, 1), { onError: "continue" }),
+      step("readiness", "autopilot.readiness", at(3, 0), {
         onError: "continue",
       }),
-      step("refresh", "autopilot.refresh", at(2, 2), { onError: "continue" }),
-      step("rendering", "autopilot.rendering", at(2, 3), {
+      step("refresh", "autopilot.refresh", at(3, 2), { onError: "continue" }),
+      step("rendering", "autopilot.rendering", at(3, 3), {
         onError: "continue",
       }),
-      step("comparisons", "autopilot.comparisons", at(2, 4), {
+      step("comparisons", "autopilot.comparisons", at(3, 4), {
         onError: "continue",
       }),
-      comparisonPage(at(3, 4)),
-      step("links", "autopilot.links", at(2, 5), { onError: "continue" }),
-      // Column 3 of the brief's row stays empty: edges into the brief bend
+      comparisonPage(at(4, 4)),
+      step("links", "autopilot.links", at(3, 5), { onError: "continue" }),
+      // Column 4 of the brief's row stays empty: edges into the brief bend
       // there, and a node in that spot looks like where they lead.
       contentCall(
         [
           out("gather", "keywords.observations"),
           out("gather", "commits.observations"),
         ],
-        at(3, 0)
+        at(4, 0)
       ),
-      step("brief", "autopilot.brief", at(4, 1), {
+      step("brief", "autopilot.brief", at(5, 1), {
         config: {
           ...ACTED,
           previousRunAt: "{{trigger.previousRunAt}}",
@@ -204,7 +205,8 @@ export const AUTOPILOT_DAILY_WORKFLOW: WorkflowDefinition = {
       }),
     ],
     edges: [
-      edge("start", "close-stale"),
+      edge("start", "dream"),
+      edge("dream", "close-stale"),
       edge("close-stale", "gather"),
       edge("close-stale", "readiness"),
       edge("close-stale", "refresh"),

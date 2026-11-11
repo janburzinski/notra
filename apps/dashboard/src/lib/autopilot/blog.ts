@@ -39,6 +39,7 @@ import {
 } from "@/constants/autopilot";
 import { AUTOPILOT_FACT_FLAG_HEADINGS } from "@/constants/autopilot-publish";
 import { commitFilterSkipReason } from "@/lib/autopilot/commit-filters";
+import { loadRepositoryConventions } from "@/lib/autopilot/conventions";
 import {
   factCheckComparison,
   factCheckSection,
@@ -489,6 +490,10 @@ export async function writeBlogDraft(params: {
     brief,
     existing,
     writingRules: await loadWritingRules(ctx.organizationId),
+    conventions: await loadRepositoryConventions(
+      ctx.organizationId,
+      ctx.repository
+    ),
     onSource: (source) => sources.push(source),
     onUsage: params.onUsage,
   });
@@ -1082,6 +1087,7 @@ export async function runKeywordsJob(
         summary: candidate.evidence,
         evidence: {
           keyword: candidate.key,
+          projectId: ctx.projectId,
           competitors: candidate.competitors.slice(0, 5),
           detail: candidate.evidence,
           target: candidate.target,

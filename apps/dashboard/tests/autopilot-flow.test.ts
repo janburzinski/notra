@@ -1710,13 +1710,16 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
     // One signal per observation: the pull request seen on three days is one.
     expect(acted.topics[0]?.signals).toHaveLength(2);
     // Autonomous runs only ever write their own notes, one commit per run.
-    expect(memoryCommits.map((commit) => commit.message)).toEqual([
+    const planned = memoryCommits.filter(
+      (commit) => !commit.message.startsWith("Dream:")
+    );
+    expect(planned.map((commit) => commit.message)).toEqual([
       "Autopilot run planner-day-1",
       "Autopilot run planner-day-2",
       "Autopilot run planner-day-3",
     ]);
     expect(
-      memoryCommits.every((commit) => commit.paths.join() === "planner.md")
+      planned.every((commit) => commit.paths.join() === "planner.md")
     ).toBe(true);
   });
 

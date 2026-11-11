@@ -25,6 +25,7 @@ import {
   markTopicActed,
   parsePlannerState,
   renderPlannerState,
+  reopenTopic,
   resolveAutopilotOutcome,
   topicHasActiveWork,
 } from "@notra/ai/utils/autopilot-planner";
@@ -64,16 +65,6 @@ function closedBefore(at: Date | null, fallback: string, days: number) {
   return (
     (at ?? new Date(fallback)).getTime() < Date.now() - days * AUTOPILOT_DAY_MS
   );
-}
-
-function reopenTopic(topic: AutopilotTopic): AutopilotTopic {
-  return {
-    ...topic,
-    status: "watching",
-    findingId: null,
-    pullRequestUrl: null,
-    nextStep: "",
-  };
 }
 
 /**

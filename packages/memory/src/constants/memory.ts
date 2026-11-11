@@ -36,7 +36,15 @@ export const MEMORY_PATHS = {
   feedback: "feedback.md",
   planner: "planner.md",
   knowledge: (slug: string) => `knowledge/${slug}.md`,
+  daily: (date: string) => `daily/${date}.md`,
+  dreamState: ".dream/state.json",
 } as const;
+
+export const MEMORY_DAILY_PATH = /^daily\/(\d{4}-\d{2}-\d{2})\.md$/;
+export const MEMORY_SEGMENT_UNSAFE = /[^a-z0-9_.-]+/g;
+export const MEMORY_SEGMENT_DOTS = /\.{2,}/g;
+export const MEMORY_SEGMENT_EDGE = /^[^a-z0-9]+|[^a-z0-9]+$/g;
+export const MEMORY_SEGMENT_HASH_CHARS = 8;
 
 export const MEMORY_PRELOADED_PATTERN = /^(?:rules|feedback|planner)\.md$/;
 export const MEMORY_SAFE_PATH =
