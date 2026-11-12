@@ -13,6 +13,8 @@ export default defineMeta({
     "sonner",
     "step-slider",
     "icon-tabs",
+    "package-command",
+    "code-block",
     "tooltip",
     "duotone-tooltip",
     "chat-minimap",

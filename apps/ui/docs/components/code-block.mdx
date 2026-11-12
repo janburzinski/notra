@@ -1,0 +1,52 @@
+---
+title: Code Block
+description: The code block from the Notra dashboard, with a filename or tabs in the header, highlighted code and a copy button.
+---
+
+Every setup snippet in the Notra dashboard sits in this block. The filename or a tab switcher sits on the grey shell and the code sits on the lifted card, the same frame as the [Table](/components/table) and [Card](/components/card). Code is highlighted with [sugar-high](https://github.com/huozhi/sugar-high).
+
+<Component path="code-block/examples/code-block-demo" />
+
+## Installation
+
+<RegistryInstall name="code-block" />
+
+This installs the block into `components/code-block/` and adds the `--sh-*` highlight colors for light and dark mode.
+
+## Usage
+
+```tsx
+import { CodeBlock, CodeBlockTabs } from "@/components/code-block/components/code-block";
+
+<CodeBlock code={source} filename="proxy.ts" />;
+
+<CodeBlock
+  code={source}
+  tabs={
+    <CodeBlockTabs
+      label="Framework"
+      onValueChange={setFramework}
+      options={[
+        { value: "next", label: "Next.js" },
+        { value: "astro", label: "Astro" },
+      ]}
+      value={framework}
+    />
+  }
+/>;
+
+<CodeBlock code="NOTRA_GEO_TOKEN=..." variant="command" />;
+```
+
+| Prop | Default | Description |
+| --- | --- | --- |
+| `code` | | The source to show and copy. |
+| `filename` | | Shown on the left of the header, or on the right when there are tabs. |
+| `tabs` | | A `CodeBlockTabs` switcher for the header. |
+| `headerEnd` | | Extra content at the end of the header. |
+| `variant` | `"panel"` | `"panel"` for a highlighted block, `"command"` for a one-line field. |
+| `label` | `"Snippet"` | Names the block for the copy button and screen readers. The command variant defaults to `"Command"`. |
+| `wrap` | `false` | Wraps long lines instead of scrolling. |
+| `onCopy` | | Called after the code is copied. |
+
+Long lines scroll sideways inside the card and the copy button stays in the corner. On narrow screens the header tabs scroll too, so the block fits any width.

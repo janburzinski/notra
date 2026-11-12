@@ -8,6 +8,7 @@ export default defineComponents({
   layout: { Footer: SiteFooter, Sidebar: NotraSidebar },
   mdx: {
     DuotoneTooltip,
+    table: "./src/components/mdx-table.astro",
     RegistryInstall: {
       client: "load",
       component: "./src/components/registry-install.tsx",

@@ -1,0 +1,37 @@
+---
+title: Package Command
+description: A copyable install command with tabs for bun, pnpm, yarn and npm.
+---
+
+Every install command in the Notra docs uses this block. Pass the command in its npm form and it rewrites it for bun, pnpm and yarn. The package manager you pick is saved in `localStorage` and every command on the page switches with it.
+
+<Component path="package-command/examples/package-command-demo" />
+
+## Installation
+
+<RegistryInstall name="package-command" />
+
+This installs the block into `components/package-command/`. It uses the same shell and card surfaces as the [Card](/components/card) and [Table](/components/table).
+
+## Usage
+
+```tsx
+import { PackageCommand } from "@/components/package-command/components/package-command";
+
+<PackageCommand command="npx shadcn@latest add @notra/card" />;
+```
+
+| Prop | Default | Description |
+| --- | --- | --- |
+| `command` | | The npm form of the command. |
+| `className` | | Classes for the outer shell. |
+
+| npm form | bun | pnpm | yarn |
+| --- | --- | --- | --- |
+| `npm install <pkg>` | `bun add` | `pnpm add` | `yarn add` |
+| `npx create-<name>` | `bun create` | `pnpm create` | `yarn create` |
+| `npm create <name>` | `bun create` | `pnpm create` | `yarn create` |
+| `npx <command>` | `bunx --bun` | `pnpm dlx` | `yarn dlx` |
+| `npm run <script>` | `bun run` | `pnpm` | `yarn` |
+
+Any other command is shown as is for every package manager. Long commands scroll sideways inside the card while the copy button stays in place, so the block fits any width.

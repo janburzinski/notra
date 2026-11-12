@@ -37,21 +37,19 @@
     "@hugeicons/react": "catalog:",
     "@notra/ui": "workspace:*",
     "@paper-design/shaders": "0.0.81",
-    "@rexa-developer/tiks": "^0.3.0",
     "@tanstack/hotkeys": "^0.8.0",
     "@tanstack/react-virtual": "~3.14.20",
     "@xyflow/react": "^12.12.0",
     "blume": "2.0.3",
     "class-variance-authority": "^0.7.1",
     "cn": "~0.3.3",
-    "jotai": "~3.0.1",
     "lucide-react": "catalog:",
     "motion": "~13.4.6",
     "next-themes": "catalog:",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
     "sonner": "catalog:",
-    "web-haptics": "^0.0.6"
+    "sugar-high": "^1.3.0"
   },
   "devDependencies": {
     "@types/react": "^19.3.0",

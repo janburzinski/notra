@@ -1,0 +1,21 @@
+---
+import { cn } from "cn";
+
+import {
+  TABLE_CARD_CELLS_CLASS,
+  TABLE_FRAME_CLASS,
+} from "../../registry/notra/table/constants/data-table";
+---
+
+<div class={cn("w-full min-w-0", TABLE_FRAME_CLASS)} data-slot="docs-table">
+  <div class="overflow-x-auto rounded-[14px]">
+    <table
+      class={cn(
+        "w-full border-separate border-spacing-0 tabular-nums",
+        TABLE_CARD_CELLS_CLASS
+      )}
+    >
+      <slot />
+    </table>
+  </div>
+</div>
