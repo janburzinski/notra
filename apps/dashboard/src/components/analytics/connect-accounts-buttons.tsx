@@ -38,12 +38,13 @@ export function ConnectAccountsButtons({
           });
           void twitter.handleConnect();
         }}
+        size="sm"
       >
         <HugeiconsIcon className="size-4" icon={NewTwitterIcon} />
         {t("connectX")}
       </Button>
       <DropdownMenu>
-        <SplitButtonTrigger label={t("another")} />
+        <SplitButtonTrigger label={t("another")} size="sm" />
         <DropdownMenuContent align="end" className="min-w-52">
           <DropdownMenuItem
             disabled={linkedin.isPending}

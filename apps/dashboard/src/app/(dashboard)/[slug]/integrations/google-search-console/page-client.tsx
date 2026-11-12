@@ -770,7 +770,7 @@ export default function PageClient({
       <div className="w-full space-y-6 px-4 lg:px-6">
         <PageHeading description={t("description")} title={t("title")}>
           {canConnect ? (
-            <Button onClick={() => setDialogOpen(true)}>
+            <Button onClick={() => setDialogOpen(true)} size="sm">
               <HugeiconsIcon className="size-4" icon={PlusSignIcon} />
               {needsReconnect
                 ? tIntegrationsShared("reconnect")

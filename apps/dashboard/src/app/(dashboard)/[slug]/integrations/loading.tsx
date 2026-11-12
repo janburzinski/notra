@@ -18,10 +18,7 @@ export default function Loading() {
           title={tCommon("labels.integrations")}
         />
         <div>
-          <div className="flex gap-6 border-b pb-3">
-            <Skeleton className="h-5 w-8" />
-            <Skeleton className="h-5 w-20" />
-          </div>
+          <Skeleton className="h-8 w-80 max-w-full rounded-lg" />
           <div className="pt-4">
             <IntegrationsPageSkeleton />
           </div>

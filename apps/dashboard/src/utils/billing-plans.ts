@@ -315,9 +315,9 @@ export function planCardClassName(
     return "ring-2 ring-primary";
   }
   if (featured) {
-    return "ring-2 ring-primary/50 transition-all hover:ring-primary/80";
+    return "ring-2 ring-primary/50 transition-shadow hover:ring-primary/80";
   }
-  return "transition-all hover:ring-2 hover:ring-muted-foreground/20";
+  return "transition-shadow hover:ring-2 hover:ring-muted-foreground/20";
 }
 
 function formatInvoiceProductName(

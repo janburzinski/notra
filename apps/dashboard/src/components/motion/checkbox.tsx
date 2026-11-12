@@ -1,11 +1,11 @@
 "use client";
 
-import { TRANSITION } from "@notra/ui/lib/motion";
+import { EASE, TRANSITION } from "@notra/ui/lib/motion";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { useId } from "react";
 import { useTranslations } from "use-intl";
 
-import { EASE_OUT, SPRING_PRESS } from "@/lib/ease";
+import { SPRING_PRESS } from "@/lib/ease";
 import { cn } from "@/lib/utils";
 
 const CHECK_PATH = "M5 13l4 4L19 7";
@@ -111,7 +111,7 @@ export function Checkbox({
                     ? { duration: 0 }
                     : {
                         duration: indeterminate ? 0.2 : 0.3,
-                        ease: EASE_OUT,
+                        ease: EASE.out,
                         delay: 0.04,
                       }
                 }

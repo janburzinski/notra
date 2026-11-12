@@ -54,6 +54,7 @@ export function BrandIdentityActions({
           <Button
             loading={isRefreshingGuidelines}
             onClick={onRefreshGuidelines}
+            size="sm"
           >
             <HugeiconsIcon className="size-4" icon={Refresh03Icon} />
             {tBrandShared("refreshGuidelines")}
@@ -61,7 +62,7 @@ export function BrandIdentityActions({
         </>
       ) : null}
       {action ? (
-        <Button onClick={action.onClick}>
+        <Button onClick={action.onClick} size="sm">
           <HugeiconsIcon className="size-4" icon={Add01Icon} />
           {action.label}
           <Kbd className="ml-1 hidden sm:inline-flex">C</Kbd>

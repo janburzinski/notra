@@ -4,7 +4,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@notra/ui/components/ui/collapsible";
-import { TRANSITION, tween } from "@notra/ui/lib/motion";
+import { tween } from "@notra/ui/lib/motion";
 import { cn } from "@notra/ui/lib/utils";
 import { Link } from "@tanstack/react-router";
 import {
@@ -68,7 +68,7 @@ const overlayVariants: Variants = {
   exit: {
     opacity: 0,
     transition: {
-      ...TRANSITION.exit,
+      ...tween("fast"),
       staggerChildren: STAGGER_OUT,
       staggerDirection: -1,
     },
@@ -95,7 +95,7 @@ const itemVariants: Variants = {
   exit: {
     opacity: 0,
     y: 4,
-    transition: TRANSITION.exit,
+    transition: tween("fast"),
   },
 };
 

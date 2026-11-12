@@ -51,6 +51,7 @@ export default function PageClient({
               onClick={
                 isConnected ? () => handleOpenRepositories() : handleOpenConnect
               }
+              size="sm"
             >
               <HugeiconsIcon className="size-4" icon={PlusSignIcon} />
               {isConnected
@@ -62,6 +63,7 @@ export default function PageClient({
               <Button
                 disabled={actionsDisabled}
                 onClick={() => settings.setLegacyOpen(true)}
+                size="sm"
                 variant="outline"
               >
                 {tApp("connectWithToken")}

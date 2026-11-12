@@ -4,6 +4,7 @@ import { Add01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { PageHeading } from "@notra/ui/components/shared/page-heading";
 import { StatusBadge } from "@notra/ui/components/status-badge";
+import { EASE } from "@notra/ui/lib/motion";
 import {
   AnimatePresence,
   LazyMotion,
@@ -42,7 +43,7 @@ export function AutopilotTemplatesSection({
   );
   const transition = {
     duration: reduceMotion ? 0 : 0.25,
-    ease: [0.23, 1, 0.32, 1] as const,
+    ease: EASE.out,
   };
   // The dialog stays mounted when the last template is enabled, so it can
   // show the Active state instead of vanishing with the section.

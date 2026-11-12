@@ -1,11 +1,22 @@
 "use client";
 
-import { Add01Icon } from "@hugeicons/core-free-icons";
+import {
+  Add01Icon,
+  Bookmark02Icon,
+  Building03Icon,
+  HierarchyFilesIcon,
+  PaintBoardIcon,
+} from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
+import { PageHeading } from "@notra/ui/components/shared/page-heading";
+import {
+  IconTabsList,
+  IconTabsTrigger,
+} from "@notra/ui/components/ui/icon-tabs";
 import { Kbd } from "@notra/ui/components/ui/kbd";
 import { Label } from "@notra/ui/components/ui/label";
 import { Skeleton } from "@notra/ui/components/ui/skeleton";
-import { Tabs, TabsList, TabsTrigger } from "@notra/ui/components/ui/tabs";
+import { Tabs } from "@notra/ui/components/ui/tabs";
 import { TitleCard } from "@notra/ui/components/ui/title-card";
 import { useQueryState } from "nuqs";
 import { useTranslations } from "use-intl";
@@ -22,6 +33,7 @@ export function BrandIdentityPageSkeleton() {
   const tTabs = useTranslations("brand.identity.tabs");
   const tCommon = useTranslations("common");
   const tBrandShared = useTranslations("brand.shared");
+  const tHeader = useTranslations("brand.identity.header.tabs");
   const [view] = useQueryState(
     "view",
     brandIdentityViewParser.withDefault("identity")
@@ -35,39 +47,58 @@ export function BrandIdentityPageSkeleton() {
   return (
     <PageContainer className="flex flex-1 flex-col gap-4 py-4 md:gap-6 md:py-6">
       <div className="w-full space-y-5 px-4 lg:px-6">
+        <PageHeading
+          description={tHeader(`${view}.description`)}
+          title={tCommon("labels.brandIdentity")}
+        >
+          <div className="flex min-w-0 flex-wrap items-center gap-2">
+            {actionLabel ? (
+              <Button disabled size="sm">
+                <HugeiconsIcon className="size-4" icon={Add01Icon} />
+                {actionLabel}
+                <Kbd className="ml-1 hidden sm:inline-flex">C</Kbd>
+              </Button>
+            ) : (
+              <>
+                <Skeleton className="h-7 w-32 rounded-lg" />
+                <Skeleton className="h-7 w-40 rounded-lg" />
+              </>
+            )}
+            <Skeleton className="size-7 rounded-lg" />
+          </div>
+        </PageHeading>
         <Tabs value={view}>
-          <div className="flex min-w-0 flex-wrap items-center justify-between gap-x-4">
-            <div className="max-w-full min-w-0 overflow-x-auto pb-2">
-              <TabsList aria-label={tTabs("label")}>
-                <TabsTrigger disabled value="identity">
-                  {tCommon("labels.companyInfo")}
-                </TabsTrigger>
-                <TabsTrigger disabled value="guidelines">
-                  {tTabs("guidelines")}
-                </TabsTrigger>
-                <TabsTrigger disabled value="references">
-                  {tCommon("labels.references")}
-                </TabsTrigger>
-                <TabsTrigger disabled value="sitemap">
-                  {tCommon("labels.sitemap")}
-                </TabsTrigger>
-              </TabsList>
-            </div>
-            <div className="flex min-w-0 flex-wrap items-center gap-2 pb-2">
-              {actionLabel ? (
-                <Button disabled>
-                  <HugeiconsIcon className="size-4" icon={Add01Icon} />
-                  {actionLabel}
-                  <Kbd className="ml-1 hidden sm:inline-flex">C</Kbd>
-                </Button>
-              ) : (
-                <>
-                  <Skeleton className="h-8 w-32 rounded-md" />
-                  <Skeleton className="h-8 w-40 rounded-md" />
-                </>
-              )}
-              <Skeleton className="size-8 rounded-md" />
-            </div>
+          <div className="max-w-full min-w-0 overflow-x-auto pb-2">
+            <IconTabsList aria-label={tTabs("label")} value={view}>
+              <IconTabsTrigger
+                disabled
+                icon={<HugeiconsIcon icon={Building03Icon} size={15} />}
+                value="identity"
+              >
+                {tCommon("labels.companyInfo")}
+              </IconTabsTrigger>
+              <IconTabsTrigger
+                disabled
+                icon={<HugeiconsIcon icon={PaintBoardIcon} size={15} />}
+                value="guidelines"
+              >
+                {tTabs("guidelines")}
+              </IconTabsTrigger>
+              <IconTabsTrigger
+                disabled
+                icon={<HugeiconsIcon icon={Bookmark02Icon} size={15} />}
+                value="references"
+              >
+                {tCommon("labels.references")}
+              </IconTabsTrigger>
+              <IconTabsTrigger
+                disabled
+                icon={<HugeiconsIcon icon={HierarchyFilesIcon} size={15} />}
+                value="sitemap"
+              >
+                {tCommon("labels.sitemap")}
+              </IconTabsTrigger>
+            </IconTabsList>
           </div>
           {view === "identity" ? (
             <div className="mt-6 grid gap-6 lg:grid-cols-2">

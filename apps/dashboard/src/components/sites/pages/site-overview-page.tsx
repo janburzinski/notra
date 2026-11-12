@@ -67,7 +67,7 @@ export function SiteOverviewPage() {
         <div className="flex shrink-0 flex-wrap items-center gap-2">
           {liveDeployment ? (
             <a
-              className={buttonVariants({ variant: "secondary" })}
+              className={buttonVariants({ size: "sm", variant: "secondary" })}
               href={site.liveUrl}
               rel="noopener noreferrer"
               target="_blank"
@@ -83,7 +83,7 @@ export function SiteOverviewPage() {
           ) : null}
           {siteLimitReached ? null : (
             <Link
-              className={buttonVariants()}
+              className={buttonVariants({ size: "sm" })}
               href={`/${organizationSlug}/sites/new?project=${encodeURIComponent(site.projectId)}`}
             >
               <HugeiconsIcon

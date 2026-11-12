@@ -16,7 +16,7 @@ export default function Loading() {
           description={t("description")}
           title={tCommon("labels.skills")}
         >
-          <Skeleton className="h-9 w-36 rounded-md" />
+          <Skeleton className="h-7 w-32 rounded-lg" />
         </PageHeading>
         <SkillsPageSkeleton />
       </div>

@@ -120,7 +120,7 @@ function mentionCell(
 ): ReactNode {
   // Fades in when a live row fills.
   return (
-    <span className="motion-safe:animate-in motion-safe:fade-in motion-safe:duration-500">
+    <span className="motion-safe:animate-in motion-safe:fade-in motion-safe:duration-fast">
       <StatusBadge
         appearance={
           row.mentioned
@@ -135,7 +135,7 @@ function mentionCell(
 
 function positionCell(row: GeoScanResultSummary): ReactNode {
   return (
-    <span className="text-muted-foreground motion-safe:animate-in motion-safe:fade-in tabular-nums motion-safe:duration-500">
+    <span className="text-muted-foreground motion-safe:animate-in motion-safe:fade-in motion-safe:duration-fast tabular-nums">
       {row.position === null ? "–" : `#${row.position}`}
     </span>
   );
@@ -143,7 +143,7 @@ function positionCell(row: GeoScanResultSummary): ReactNode {
 
 function sourcesCell(row: GeoScanResultSummary, locale: string): ReactNode {
   return (
-    <span className="text-muted-foreground motion-safe:animate-in motion-safe:fade-in tabular-nums motion-safe:duration-500">
+    <span className="text-muted-foreground motion-safe:animate-in motion-safe:fade-in motion-safe:duration-fast tabular-nums">
       {row.sources.toLocaleString(locale)}
     </span>
   );

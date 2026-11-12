@@ -1,5 +1,5 @@
 export const COMPOSER_TRAY_TRANSITION =
-  "transition-[background-color,padding] duration-slow ease-emphasized-in-out motion-reduce:transition-none";
+  "transition-[background-color] duration-normal ease-out motion-reduce:transition-none";
 
 export const COMPOSER_INPUT =
   "block max-h-50 min-h-12 min-w-0 resize-none overflow-y-auto rounded-none border-0 bg-transparent px-3 py-2 text-foreground text-sm leading-6 caret-foreground shadow-none focus-visible:border-transparent focus-visible:ring-0 disabled:bg-transparent md:text-sm dark:bg-transparent dark:disabled:bg-transparent";

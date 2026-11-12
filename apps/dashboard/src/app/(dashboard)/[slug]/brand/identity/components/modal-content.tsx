@@ -34,7 +34,7 @@ export function ModalContent({
     <div className="space-y-4">
       <div className="flex gap-3">
         <div
-          className={`bg-background focus-within:ring-ring/20 flex w-full flex-row items-center overflow-hidden rounded-lg border transition-all focus-within:ring-2 ${progress.status === "failed" ? "border-destructive" : "border-input"}`}
+          className={`bg-background focus-within:ring-ring/20 flex w-full flex-row items-center overflow-hidden rounded-lg border transition-[box-shadow,border-color] focus-within:ring-2 ${progress.status === "failed" ? "border-destructive" : "border-input"}`}
         >
           <span className="border-input bg-muted/50 text-muted-foreground flex h-10 items-center border-r px-3 text-sm">
             https://

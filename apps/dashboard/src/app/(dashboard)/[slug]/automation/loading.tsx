@@ -15,7 +15,7 @@ export default function Loading() {
     <PageContainer className="flex flex-1 flex-col gap-4 py-4 md:gap-6 md:py-6">
       <div className="w-full space-y-10 px-4 lg:px-6">
         <PageHeading description={t("description")} title={t("title")}>
-          <Button className="gap-1.5">
+          <Button className="gap-1.5" size="sm">
             <HugeiconsIcon className="size-4" icon={Add01Icon} />
             {t("create")}
             <Kbd className="ml-1 hidden sm:inline-flex">C</Kbd>

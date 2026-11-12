@@ -107,7 +107,11 @@ export default function PageClient({
           description={t("description")}
           title={tCommon2("labels.skills")}
         >
-          <Button className="w-fit gap-2" onClick={() => setDialogOpen(true)}>
+          <Button
+            className="w-fit"
+            onClick={() => setDialogOpen(true)}
+            size="sm"
+          >
             <span className="inline-flex items-center gap-1.5">
               <HugeiconsIcon className="size-4" icon={PlusSignIcon} />
               {t("createSkill")}

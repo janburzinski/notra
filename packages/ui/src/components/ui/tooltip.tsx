@@ -43,13 +43,16 @@ interface SharedTooltipItem {
 }
 
 const tooltipContentClassName =
-  "border-foreground/60 to-foreground text-background z-50 block w-fit max-w-xs origin-(--transform-origin) rounded-[0.625rem] border bg-linear-to-b from-[color-mix(in_oklab,var(--color-foreground),var(--color-background)_10%)] px-2.5 py-1 text-xs shadow-[inset_0_1px_0_rgba(255,255,255,0.22),0_1px_2px_rgba(0,0,0,0.16),0_6px_16px_-4px_rgba(0,0,0,0.24)] transition-[opacity,scale,translate] duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] [corner-shape:squircle] has-[[data-slot=kbd]]:pr-1 data-ending-style:scale-[0.97] data-ending-style:opacity-0 data-ending-style:duration-100 data-starting-style:scale-[0.97] data-starting-style:opacity-0 data-[side=bottom]:data-starting-style:-translate-y-0.5 data-[side=left]:data-starting-style:translate-x-0.5 data-[side=right]:data-starting-style:-translate-x-0.5 data-[side=top]:data-starting-style:translate-y-0.5 **:data-[slot=kbd]:relative **:data-[slot=kbd]:isolate **:data-[slot=kbd]:z-50 **:data-[slot=kbd]:rounded-sm **:data-[slot=kbd]:align-middle **:data-[slot=kbd-group]:ms-1.5 **:data-[slot=kbd-group]:align-middle *:data-[slot=kbd]:ms-1.5 [--tooltip-arrow:var(--color-foreground)] **:[--color-border:color-mix(in_oklab,var(--color-background)_18%,transparent)] **:[--color-foreground:var(--color-background)] **:[--color-muted-foreground:color-mix(in_oklab,var(--color-background)_65%,transparent)] motion-reduce:transition-opacity"
+  "border-foreground/60 to-foreground text-background z-50 block w-fit max-w-xs origin-(--transform-origin) rounded-[0.625rem] border bg-linear-to-b from-[color-mix(in_oklab,var(--color-foreground),var(--color-background)_10%)] px-2.5 py-1 text-xs shadow-[inset_0_1px_0_rgba(255,255,255,0.22),0_1px_2px_rgba(0,0,0,0.16),0_6px_16px_-4px_rgba(0,0,0,0.24)] transition-[opacity,scale,translate] duration-150 ease-out [corner-shape:squircle] has-[[data-slot=kbd]]:pr-1 data-ending-style:scale-[0.97] data-ending-style:opacity-0 data-ending-style:duration-100 data-starting-style:scale-[0.97] data-starting-style:opacity-0 data-[side=bottom]:data-starting-style:-translate-y-0.5 data-[side=left]:data-starting-style:translate-x-0.5 data-[side=right]:data-starting-style:-translate-x-0.5 data-[side=top]:data-starting-style:translate-y-0.5 **:data-[slot=kbd]:relative **:data-[slot=kbd]:isolate **:data-[slot=kbd]:z-50 **:data-[slot=kbd]:rounded-sm **:data-[slot=kbd]:align-middle **:data-[slot=kbd-group]:ms-1.5 **:data-[slot=kbd-group]:align-middle *:data-[slot=kbd]:ms-1.5 [--tooltip-arrow:var(--color-foreground)] **:[--color-border:color-mix(in_oklab,var(--color-background)_18%,transparent)] **:[--color-foreground:var(--color-background)] **:[--color-muted-foreground:color-mix(in_oklab,var(--color-background)_65%,transparent)] motion-reduce:transition-opacity"
+
+/** Hover delay before a tooltip opens, with or without a provider. */
+const TOOLTIP_DELAY_MS = 500
 
 const TOOLTIP_ARROW_CLASS_NAME =
   "bg-(--tooltip-arrow) fill-(--tooltip-arrow) -z-10 size-2.5 translate-y-[calc(-50%-2px)] rotate-45 rounded-[2px] data-[side=bottom]:top-1 data-[side=inline-end]:top-1/2! data-[side=inline-end]:-left-1 data-[side=inline-end]:-translate-y-1/2 data-[side=inline-start]:top-1/2! data-[side=inline-start]:-right-1 data-[side=inline-start]:-translate-y-1/2 data-[side=left]:top-1/2! data-[side=left]:-right-1 data-[side=left]:-translate-y-1/2 data-[side=right]:top-1/2! data-[side=right]:-left-1 data-[side=right]:-translate-y-1/2 data-[side=top]:-bottom-2.5"
 
 const SHARED_POSITIONER_CLASS_NAME =
-  "h-(--positioner-height) w-(--positioner-width) transition-[top,left,right,bottom] duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] motion-reduce:transition-none"
+  "h-(--positioner-height) w-(--positioner-width) transition-[top,left,right,bottom] duration-200 ease-out motion-reduce:transition-none"
 const SHARED_POPUP_CLASS_NAME =
   "h-(--popup-height) w-(--popup-width) max-w-none p-0 has-[[data-slot=kbd]]:pr-0 transition-[opacity,scale,translate,width,height] motion-reduce:transition-opacity"
 const SHARED_VIEWPORT_CLASS_NAME =
@@ -57,7 +60,7 @@ const SHARED_VIEWPORT_CLASS_NAME =
 const SHARED_CONTENT_CLASS_NAME =
   "w-max max-w-xs px-2.5 py-1 has-[[data-slot=kbd]]:pr-1"
 const SHARED_ARROW_CLASS_NAME =
-  "transition-[left,top] duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] motion-reduce:transition-none"
+  "transition-[left,top] duration-200 ease-out motion-reduce:transition-none"
 
 const SharedTooltipContext =
   createContext<TooltipPrimitive.Handle<SharedTooltipPayload> | null>(null)
@@ -123,11 +126,14 @@ function TooltipFrame({
 
 function TooltipProvider({
   children,
-  delay = 0,
-  glide = true,
+  delay = TOOLTIP_DELAY_MS,
+  glide = false,
   ...props
 }: TooltipPrimitive.Provider.Props & {
-  /** Share one popup between the tooltips inside, so it glides between them. */
+  /**
+   * Share one popup between the tooltips inside, so it glides between them.
+   * Off by default: once one tooltip is open, the next opens instantly.
+   */
   glide?: boolean
 }) {
   const [handle] = useState(() =>
@@ -197,7 +203,10 @@ function Tooltip({ ...props }: TooltipPrimitive.Root.Props) {
   }
 
   return (
-    <TooltipPrimitive.Provider data-slot="tooltip-provider" delay={0}>
+    <TooltipPrimitive.Provider
+      data-slot="tooltip-provider"
+      delay={TOOLTIP_DELAY_MS}
+    >
       {root}
     </TooltipPrimitive.Provider>
   )

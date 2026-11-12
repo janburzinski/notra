@@ -118,14 +118,9 @@ export function ContentDocumentTabs({
                     <span
                       aria-hidden="true"
                       className={cn(
-                        "bg-popover ring-border text-muted-foreground pointer-events-none absolute top-full left-1/2 mt-1.5 inline-flex h-6 origin-top -translate-x-1/2 items-center rounded-md px-1.5 text-xs font-medium shadow-sm ring-1 transition select-none motion-reduce:transition-opacity",
-                        // Stagger the reveal left to right; hide all at once.
-                        isModifierHeld
-                          ? cn(
-                              "ease-emphasized duration-normal opacity-100",
-                              index > 0 && "delay-30"
-                            )
-                          : "ease-emphasized-in duration-instant -translate-y-1 scale-95 opacity-0 motion-reduce:translate-y-0 motion-reduce:scale-100"
+                        "bg-popover ring-border text-muted-foreground pointer-events-none absolute top-full left-1/2 mt-1.5 inline-flex h-6 origin-top -translate-x-1/2 items-center rounded-md px-1.5 text-xs font-medium shadow-sm ring-1 select-none",
+                        // Keyboard-driven: show and hide instantly.
+                        isModifierHeld ? "opacity-100" : "opacity-0"
                       )}
                     >
                       {modifier}

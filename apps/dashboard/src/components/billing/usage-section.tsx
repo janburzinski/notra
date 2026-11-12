@@ -76,10 +76,10 @@ function RemainingBar({
     >
       <div
         className={cn(
-          "duration-slower transition-width h-full w-(--remaining) rounded-full",
+          "duration-slow h-full w-full origin-left scale-x-(--remaining) rounded-full transition-transform ease-out motion-reduce:transition-none",
           remaining < 30 ? remainingBarColor(remaining) : "bg-foreground/80"
         )}
-        style={{ "--remaining": `${remaining}%` } as CSSProperties}
+        style={{ "--remaining": remaining / 100 } as CSSProperties}
       />
     </div>
   );

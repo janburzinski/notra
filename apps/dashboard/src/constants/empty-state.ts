@@ -65,8 +65,6 @@ export const EMPTY_STATE_STAT_KEYS = [
   "stat-d",
 ] as const;
 
-export const EMPTY_STATE_TRAFFIC_STAT_COUNT = 3;
-
 export const EMPTY_STATE_CHART_BARS = [
   28, 44, 36, 52, 40, 48, 32, 56, 42, 38, 50, 34,
 ] as const;

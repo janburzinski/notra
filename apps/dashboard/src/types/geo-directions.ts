@@ -1,7 +1,9 @@
+import type { IconSvgElement } from "@hugeicons/react";
 type GeoDirectionKey = "instrument" | "leaderboard" | "cockpit" | "report";
 
 export interface GeoDirectionTab {
   key: GeoDirectionKey;
+  icon: IconSvgElement;
 }
 
 export type GeoDirectionTone = "up" | "flat" | "down";

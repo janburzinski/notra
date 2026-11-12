@@ -4,6 +4,7 @@ import { POSTHOG_EVENTS } from "@notra/posthog/events";
 import { useEffect, useRef } from "react";
 import { useTranslations } from "use-intl";
 
+import { EmptyState } from "@/components/empty-state";
 import { EmptyStateAnalyticsPreview } from "@/components/empty-state-preview";
 import { GeoSetupButton } from "@/components/geo/geo-setup-button";
 import { trackEvent } from "@/lib/analytics/posthog-client";
@@ -22,28 +23,15 @@ export function GeoSetupEmpty({ organizationId, page }: GeoSetupEmptyProps) {
   }, [page]);
 
   return (
-    <div className="relative w-full overflow-hidden rounded-2xl">
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-0 px-3 pt-3 select-none sm:px-4 sm:pt-4"
-      >
-        <div className="mask-[linear-gradient(to_bottom,black_0%,transparent_100%)] opacity-[0.38]">
-          <EmptyStateAnalyticsPreview />
-        </div>
-      </div>
-      <div className="relative z-10 mx-auto flex w-full max-w-2xl flex-col items-center px-6 pt-16 pb-8 text-center">
-        <h3 className="text-lg font-semibold text-balance">{t("title")}</h3>
-        <p className="text-muted-foreground mt-1.5 max-w-md text-sm leading-relaxed text-pretty">
-          {t("description")}
-        </p>
-        <GeoSetupButton
-          className="mt-6"
-          organizationId={organizationId}
-          size="sm"
-        >
+    <EmptyState
+      action={
+        <GeoSetupButton organizationId={organizationId} size="sm">
           {t("action")}
         </GeoSetupButton>
-      </div>
-    </div>
+      }
+      description={t("description")}
+      preview={<EmptyStateAnalyticsPreview />}
+      title={t("title")}
+    />
   );
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { Progress as ProgressPrimitive } from "@base-ui/react/progress";
+import type { ComponentProps } from "react";
 
 import { cn } from "@notra/ui/lib/utils";
 
@@ -38,14 +39,33 @@ function ProgressTrack({ className, ...props }: ProgressPrimitive.Track.Props) {
   );
 }
 
+/**
+ * Base UI sizes the indicator with a percentage width; animate a full-width
+ * bar's horizontal scale instead so the fill stays on the compositor.
+ */
+function renderScaledIndicator(props: ComponentProps<"div">) {
+  const width = props.style?.width;
+  if (typeof width !== "string") {
+    return <div {...props} />;
+  }
+  const fraction = Number.parseFloat(width) / 100;
+  return (
+    <div {...props} style={{ ...props.style, width: "100%", scale: `${fraction} 1` }} />
+  );
+}
+
 function ProgressIndicator({
   className,
   ...props
 }: ProgressPrimitive.Indicator.Props) {
   return (
     <ProgressPrimitive.Indicator
-      className={cn("bg-primary h-full transition-all", className)}
+      className={cn(
+        "bg-primary h-full origin-left transition-[scale] duration-slow ease-out rtl:origin-right",
+        className
+      )}
       data-slot="progress-indicator"
+      render={renderScaledIndicator}
       {...props}
     />
   );

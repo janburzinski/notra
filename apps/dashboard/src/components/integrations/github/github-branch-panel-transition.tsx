@@ -1,5 +1,6 @@
 "use client";
 
+import { EASE } from "@notra/ui/lib/motion";
 import {
   AnimatePresence,
   domAnimation,
@@ -47,7 +48,7 @@ export function GitHubBranchPanelTransition({
           key={creating ? "create" : "branches"}
           transition={{
             duration: reduceMotion ? 0.12 : 0.2,
-            ease: [0.23, 1, 0.32, 1],
+            ease: EASE.out,
           }}
         >
           {creating ? createForm : branchList}

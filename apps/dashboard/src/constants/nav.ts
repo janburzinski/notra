@@ -236,21 +236,19 @@ export const DEFAULT_NAV_VISIBILITY: NavVisibility = {
   sites: false,
 };
 
-const SIDEBAR_MODE_SWOOSH_IN = "ease-[cubic-bezier(0.16,1,0.3,1)]";
-const SIDEBAR_MODE_SWOOSH_OUT = "ease-emphasized";
-const SIDEBAR_MODE_ENTER_TIMING = `duration-slow ${SIDEBAR_MODE_SWOOSH_IN}`;
-const SIDEBAR_MODE_EXIT_TIMING = `duration-fast ${SIDEBAR_MODE_SWOOSH_OUT}`;
+const SIDEBAR_MODE_ENTER_TIMING = "duration-normal ease-out";
+const SIDEBAR_MODE_EXIT_TIMING = "duration-fast ease-out";
 
 export const SIDEBAR_MODE_EXIT_MS = DURATION.fast * 1000;
 
-export const SIDEBAR_MODE_ENTER_CLASS = `z-10 translate-x-0 opacity-100 blur-[0px] ${SIDEBAR_MODE_ENTER_TIMING}`;
+export const SIDEBAR_MODE_ENTER_CLASS = `z-10 translate-x-0 opacity-100 ${SIDEBAR_MODE_ENTER_TIMING}`;
 
-export const SIDEBAR_MODE_EXIT_LEFT_CLASS = `pointer-events-none z-0 -translate-x-5 opacity-0 blur-[8px] ${SIDEBAR_MODE_EXIT_TIMING}`;
+export const SIDEBAR_MODE_EXIT_LEFT_CLASS = `pointer-events-none z-0 -translate-x-5 opacity-0 ${SIDEBAR_MODE_EXIT_TIMING}`;
 
-export const SIDEBAR_MODE_EXIT_RIGHT_CLASS = `pointer-events-none z-0 translate-x-5 opacity-0 blur-[8px] ${SIDEBAR_MODE_EXIT_TIMING}`;
+export const SIDEBAR_MODE_EXIT_RIGHT_CLASS = `pointer-events-none z-0 translate-x-5 opacity-0 ${SIDEBAR_MODE_EXIT_TIMING}`;
 
 const SIDEBAR_MODE_FADE_CLASS =
-  "transition-[opacity,translate,filter] will-change-[opacity,translate,filter] motion-reduce:translate-x-0 motion-reduce:blur-none motion-reduce:transition-opacity";
+  "transition-[opacity,translate] will-change-[opacity,translate] motion-reduce:translate-x-0 motion-reduce:transition-opacity";
 
 export const SIDEBAR_MODE_PANEL_CLASS = `flex min-h-0 w-full flex-col ${SIDEBAR_MODE_FADE_CLASS}`;
 

@@ -32,14 +32,16 @@ import { useIsMobile } from "@notra/ui/hooks/use-mobile";
 import { cn } from "@notra/ui/lib/utils";
 import { cva, type VariantProps } from "class-variance-authority";
 import * as React from "react";
+import { flushSync } from "react-dom";
 
 const SIDEBAR_WIDTH = "16rem";
 const SIDEBAR_WIDTH_MOBILE = "18rem";
 const SIDEBAR_WIDTH_ICON = "3rem";
 const SIDEBAR_RAIL_CONTENT = "calc(var(--sidebar-width-icon) - 1rem)";
 const SIDEBAR_KEYBOARD_SHORTCUT = "b";
-const SIDEBAR_DURATION = "var(--transition-duration-slow)";
-const SIDEBAR_EASE = "var(--ease-emphasized)";
+const SIDEBAR_INSTANT_ATTRIBUTE = "data-sidebar-instant";
+const SIDEBAR_DURATION = "var(--transition-duration-normal)";
+const SIDEBAR_EASE = "var(--ease-out)";
 const SIDEBAR_WIDTH_TRANSITION =
 	"duration-(--sidebar-duration) ease-(--sidebar-ease) motion-reduce:duration-0";
 
@@ -74,6 +76,7 @@ function SidebarProvider({
 	className,
 	style,
 	children,
+	ref,
 	...props
 }: React.ComponentProps<"div"> & {
 	defaultOpen?: boolean;
@@ -84,6 +87,8 @@ function SidebarProvider({
 	const isMobile = useIsMobile();
 	const [openMobile, setOpenMobile] = React.useState(false);
 	const { contentRef, proxyWheelToContent } = useSidebarScroll();
+	const wrapperRef = React.useRef<HTMLDivElement>(null);
+	const composedWrapperRef = useComposedRefs<HTMLDivElement>(wrapperRef, ref);
 
 	const [_open, _setOpen] = React.useState(defaultOpen);
 	const open = openProp ?? _open;
@@ -113,7 +118,23 @@ function SidebarProvider({
 			(event.metaKey || event.ctrlKey)
 		) {
 			event.preventDefault();
-			toggleSidebar();
+			// Keyboard toggles snap: transitions are off while the new state
+			// commits and styles recalculate, then back on for pointer toggles.
+			if (isMobile) {
+				// The mobile sheet renders in a portal outside the wrapper and
+				// Base UI starts its transition a frame later, so the flag sits on
+				// the root until the sheet reports the change as complete.
+				document.documentElement.setAttribute(SIDEBAR_INSTANT_ATTRIBUTE, "");
+				toggleSidebar();
+				return;
+			}
+			const wrapper = wrapperRef.current;
+			wrapper?.setAttribute(SIDEBAR_INSTANT_ATTRIBUTE, "");
+			flushSync(toggleSidebar);
+			if (wrapper) {
+				wrapper.getBoundingClientRect();
+				wrapper.removeAttribute(SIDEBAR_INSTANT_ATTRIBUTE);
+			}
 		}
 	});
 
@@ -156,10 +177,11 @@ function SidebarProvider({
 		<SidebarContext.Provider value={contextValue}>
 			<div
 				className={cn(
-					"group/sidebar-wrapper flex min-h-svh w-full min-w-0 max-w-full has-data-[variant=inset]:bg-sidebar",
+					"group/sidebar-wrapper flex min-h-svh w-full min-w-0 max-w-full has-data-[variant=inset]:bg-sidebar data-sidebar-instant:transition-none! data-sidebar-instant:**:transition-none!",
 					className,
 				)}
 				data-slot="sidebar-wrapper"
+				ref={composedWrapperRef}
 				style={
 					{
 						"--sidebar-width": SIDEBAR_WIDTH,
@@ -210,7 +232,14 @@ function Sidebar({
 
 	if (isMobile) {
 		return (
-			<Sheet onOpenChange={setOpenMobile} open={openMobile} {...props}>
+			<Sheet
+				onOpenChange={setOpenMobile}
+				onOpenChangeComplete={() =>
+					document.documentElement.removeAttribute(SIDEBAR_INSTANT_ATTRIBUTE)
+				}
+				open={openMobile}
+				{...props}
+			>
 				<SheetContent
 					className="w-(--sidebar-width) bg-sidebar p-0 text-sidebar-foreground [&>button]:hidden"
 					data-mobile="true"
@@ -314,7 +343,7 @@ function SidebarRail({ className, ...props }: React.ComponentProps<"button">) {
 		<button
 			aria-label={labels.toggleSidebar}
 			className={cn(
-				"absolute inset-y-0 z-20 hidden w-4 -translate-x-1/2 transition-all ease-linear after:absolute after:inset-y-0 after:left-1/2 after:w-[2px] hover:after:bg-sidebar-border group-data-[side=left]:-right-4 group-data-[side=right]:left-0 sm:flex",
+				"absolute inset-y-0 z-20 hidden w-4 -translate-x-1/2 transition-[background-color,translate] duration-fast ease-out after:absolute after:inset-y-0 after:left-1/2 after:w-[2px] hover:after:bg-sidebar-border group-data-[side=left]:-right-4 group-data-[side=right]:left-0 sm:flex",
 				"in-data-[side=left]:cursor-w-resize in-data-[side=right]:cursor-e-resize",
 				"[[data-side=left][data-state=collapsed]_&]:cursor-e-resize [[data-side=right][data-state=collapsed]_&]:cursor-w-resize",
 				"group-data-[collapsible=offExamples]:translate-x-0 hover:group-data-[collapsible=offExamples]:bg-sidebar group-data-[collapsible=offExamples]:after:left-full",
@@ -457,7 +486,7 @@ function SidebarGroupLabel({
 		props: mergeProps<"div">(
 			{
 				className: cn(
-					"flex h-8 shrink-0 items-center overflow-hidden whitespace-nowrap rounded-md px-2 font-medium text-sidebar-foreground/70 text-xs outline-hidden ring-sidebar-ring transition-[margin] duration-slow ease-(--sidebar-ease) group-data-[collapsible=icon]:-mt-8 group-data-[collapsible=icon]:pointer-events-none group-data-[collapsible=icon]:delay-150 group-data-[state=expanded]:delay-0 motion-reduce:transition-none focus-visible:ring-2 [&>svg]:size-4 [&>svg]:shrink-0 group-data-[collapsible=icon]:[&_svg]:opacity-0",
+					"flex h-8 shrink-0 items-center overflow-hidden whitespace-nowrap rounded-md px-2 font-medium text-sidebar-foreground/70 text-xs outline-hidden ring-sidebar-ring transition-[margin] duration-(--sidebar-duration) ease-(--sidebar-ease) group-data-[collapsible=icon]:-mt-8 group-data-[collapsible=icon]:pointer-events-none group-data-[collapsible=icon]:delay-150 group-data-[state=expanded]:delay-0 motion-reduce:transition-none focus-visible:ring-2 [&>svg]:size-4 [&>svg]:shrink-0 group-data-[collapsible=icon]:[&_svg]:opacity-0",
 					className,
 				),
 			},

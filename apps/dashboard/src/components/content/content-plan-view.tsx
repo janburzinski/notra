@@ -19,6 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@notra/ui/components/ui/select";
+import { EASE } from "@notra/ui/lib/motion";
 import { AnimatePresence, LazyMotion, m, useReducedMotion } from "motion/react";
 import {
   type MouseEvent,
@@ -59,16 +60,14 @@ import { isBlogPostSubtype } from "@/utils/content-subtype";
 const loadMotionFeatures = () =>
   import("@/lib/motion-features").then((mod) => mod.default);
 
-const EASE_OUT = [0.23, 1, 0.32, 1] as const;
-
 const ITEM_TRANSITION = {
   duration: 0.15,
-  ease: EASE_OUT,
+  ease: EASE.out,
 } as const;
 
 const ITEM_EXIT_TRANSITION = {
   duration: 0.1,
-  ease: EASE_OUT,
+  ease: EASE.out,
 } as const;
 
 const INSTANT_TRANSITION = { duration: 0 } as const;

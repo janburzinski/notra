@@ -5,6 +5,7 @@ import {
   InputGroup,
   InputGroupInput,
 } from "@notra/ui/components/ui/input-group";
+import { POPUP_MOTION_CLASS_NAME } from "@notra/ui/constants/dropdown";
 import { cn } from "@notra/ui/lib/utils";
 
 /** Free text with suggestions: unlike Combobox, any typed value is valid. */
@@ -48,7 +49,8 @@ function AutocompleteContent({
       >
         <AutocompletePrimitive.Popup
           className={cn(
-            "data-closed:fade-out-0 data-open:fade-in-0 data-closed:zoom-out-95 data-open:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=top]:slide-in-from-bottom-2 group/autocomplete-content relative max-h-72 w-(--anchor-width) max-w-(--available-width) origin-(--transform-origin) overflow-hidden rounded-lg bg-popover text-popover-foreground shadow-md ring-1 ring-foreground/10 duration-instant data-closed:animate-out data-open:animate-in",
+            "group/autocomplete-content relative max-h-72 w-(--anchor-width) max-w-(--available-width) origin-(--transform-origin) overflow-hidden rounded-lg bg-popover text-popover-foreground shadow-md ring-1 ring-foreground/10",
+            POPUP_MOTION_CLASS_NAME,
             className
           )}
           data-slot="autocomplete-content"

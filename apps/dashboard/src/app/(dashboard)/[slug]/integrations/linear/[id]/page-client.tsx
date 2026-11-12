@@ -171,7 +171,11 @@ function LinearIntegrationLoaded({
             </span>
           }
         >
-          <Button onClick={() => onEditOpenChange(true)} variant="outline">
+          <Button
+            onClick={() => onEditOpenChange(true)}
+            size="sm"
+            variant="outline"
+          >
             <HugeiconsIcon className="size-4" icon={Edit02Icon} />
             {tCommon("actions.edit")}
           </Button>

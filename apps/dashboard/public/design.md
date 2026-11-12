@@ -164,7 +164,7 @@ Use the shared scale. The CSS utilities and `DURATION`, `EASE`, and `SPRING` in 
 | `slow` | 300ms | Sidebar, accordion, drawer |
 | `slower` | 500ms | A deliberate reveal |
 
-`ease-out` is for small feedback. `ease-emphasized` (`cubic-bezier(0.22, 1, 0.36, 1)`) is for entrances. `ease-emphasized-in` is for exits. Springs: `indicator` for tab pills, `indicatorFlat` for dense controls (no bounce), `snappy` for list reorder, `gentle` for large surfaces.
+`ease-out` (`cubic-bezier(0.23, 1, 0.32, 1)`) is the one curve for entrances, exits and moves; `ease-emphasized` is an alias. Never ease-in on UI: exits use `ease-out` at a shorter duration. `ease-emphasized-in-out` is only for symmetric morphs. Springs: `indicator` for tab pills, `indicatorFlat` for dense controls (no bounce), `snappy` for list reorder, `gentle` for large surfaces.
 
 Buttons press to `scale(0.97)`. Disabled controls stay still. Honor `prefers-reduced-motion`: drop the transition and keep the end state.
 

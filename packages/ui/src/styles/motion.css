@@ -6,8 +6,9 @@
   --transition-duration-slow: 300ms;
   --transition-duration-slower: 500ms;
 
-  --ease-emphasized: cubic-bezier(0.22, 1, 0.36, 1);
-  --ease-emphasized-in: cubic-bezier(0.7, 0, 0.84, 0);
+  /* One strong ease-out for every UI entrance, exit and move. */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-emphasized: var(--ease-out);
   --ease-emphasized-in-out: cubic-bezier(0.65, 0, 0.35, 1);
 }
 
@@ -16,7 +17,14 @@
 }
 
 :root {
-  --sidebar-ease: var(--ease-emphasized);
+  --sidebar-ease: var(--ease-out);
+}
+
+/* ⌘B on narrow screens opens the sidebar as a sheet in a portal; the
+   keyboard toggle snaps it, like the desktop sidebar. */
+:root[data-sidebar-instant] [data-slot="sheet-overlay"],
+:root[data-sidebar-instant] [data-slot="sidebar"][data-mobile="true"] {
+  transition: none !important;
 }
 
 @utility panel-motion {
@@ -117,12 +125,11 @@
 }
 
 @theme {
-  --animate-button-swap-in: button-swap-in 280ms cubic-bezier(0.23, 1, 0.32, 1)
-    both;
-  --animate-button-swap-out: button-swap-out 360ms
-    cubic-bezier(0.45, 0, 0.25, 1) both;
+  --animate-button-swap-in: button-swap-in 200ms var(--ease-out) both;
+  --animate-button-swap-out: button-swap-out 150ms var(--ease-out) both;
   --animate-button-dot: button-dot 1s ease-in-out infinite;
-  --animate-button-progress-out: button-progress-out 600ms ease-out both;
+  --animate-button-progress-out: button-progress-out 300ms var(--ease-out)
+    both;
 }
 
 @keyframes button-swap-in {
@@ -178,7 +185,10 @@
   }
 }
 
-
+/*
+ * Reduced motion drops movement, not feedback: keyframes and transforms stop,
+ * while opacity and color changes keep a short fade.
+ */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -186,8 +196,10 @@
     animation-delay: 0ms !important;
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
+    transition-property: opacity, color, background-color, border-color,
+      fill, stroke !important;
     transition-delay: 0ms !important;
-    transition-duration: 0.01ms !important;
+    transition-duration: 150ms !important;
     scroll-behavior: auto !important;
   }
 

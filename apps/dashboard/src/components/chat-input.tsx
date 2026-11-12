@@ -162,7 +162,7 @@ function ChatComposerSendButton({ input }: ChatComposerSendButtonProps) {
 
 /**
  * The pill: "+" and send stay in the bottom corners, and only the text's room
- * around them changes, so opening is one smooth motion.
+ * around them changes. The layout snaps; padding is never animated.
  */
 function PillComposerBody({
   open,
@@ -177,7 +177,6 @@ function PillComposerBody({
       </div>
       <div
         className={cn(
-          "duration-normal ease-emphasized transition-all motion-reduce:transition-none",
           // Closed: one row between the buttons. Open: the text takes the full
           // width, starting in line with the round "+" below it, and the
           // buttons get a row of their own.

@@ -92,7 +92,7 @@ export function SiteDomainsPage() {
     <div className="space-y-6">
       <PageHeading description={t("description")} title={t("title")}>
         {domains.length > 0 && !domainLimitReached ? (
-          <Button onClick={() => setAddOpen(true)}>
+          <Button onClick={() => setAddOpen(true)} size="sm">
             <HugeiconsIcon
               aria-hidden="true"
               data-icon="inline-start"

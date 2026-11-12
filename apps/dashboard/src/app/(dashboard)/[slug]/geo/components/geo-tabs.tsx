@@ -1,8 +1,14 @@
 "use client";
 
+import { Route01Icon, SmileIcon, ViewIcon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import { GEO_EMPTY_COMPETITOR_SHARE_TIMESERIES } from "@notra/geo-core/constants/geo";
 import { POSTHOG_EVENTS } from "@notra/posthog/events";
-import { Tabs, TabsList, TabsTrigger } from "@notra/ui/components/ui/tabs";
+import {
+  IconTabsList,
+  IconTabsTrigger,
+} from "@notra/ui/components/ui/icon-tabs";
+import { Tabs } from "@notra/ui/components/ui/tabs";
 import { Activity, type ReactNode } from "react";
 import { InstrumentGrid } from "ui/card/grid";
 import { useTranslations } from "use-intl";
@@ -68,17 +74,26 @@ export function GeoTabs({
         }}
         value={activeTab}
       >
-        <TabsList aria-label={t("label")}>
-          <TabsTrigger value="visibility">
+        <IconTabsList aria-label={t("label")} value={activeTab}>
+          <IconTabsTrigger
+            icon={<HugeiconsIcon icon={ViewIcon} size={15} />}
+            value="visibility"
+          >
             {tCommon("labels.visibility")}
-          </TabsTrigger>
-          <TabsTrigger value="brand-sentiment">
+          </IconTabsTrigger>
+          <IconTabsTrigger
+            icon={<HugeiconsIcon icon={SmileIcon} size={15} />}
+            value="brand-sentiment"
+          >
             {tCommon("labels.brandSentiment")}
-          </TabsTrigger>
-          <TabsTrigger value="journeys">
+          </IconTabsTrigger>
+          <IconTabsTrigger
+            icon={<HugeiconsIcon icon={Route01Icon} size={15} />}
+            value="journeys"
+          >
             {tCommon("labels.journeys")}
-          </TabsTrigger>
-        </TabsList>
+          </IconTabsTrigger>
+        </IconTabsList>
       </Tabs>
 
       <Activity mode={activeTab === "visibility" ? "visible" : "hidden"}>

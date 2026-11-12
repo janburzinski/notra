@@ -241,6 +241,7 @@ function ApiKeysHeader({
           className="gap-1.5"
           disabled={createDisabled}
           onClick={onCreate}
+          size="sm"
         >
           <HugeiconsIcon className="size-4" icon={Add01Icon} />
           {t("createKey")}
@@ -258,7 +259,7 @@ function ApiKeysHeader({
                       "noopener,noreferrer"
                     )
                   }
-                  size="icon"
+                  size="icon-sm"
                   variant="outline"
                 />
               }

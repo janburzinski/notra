@@ -3,6 +3,7 @@
 import * as React from "react"
 import { Popover as PopoverPrimitive } from "@base-ui/react/popover"
 
+import { POPUP_MOTION_CLASS_NAME } from "@notra/ui/constants/dropdown"
 import { cn } from "@notra/ui/lib/utils"
 
 function Popover({ ...props }: PopoverPrimitive.Root.Props) {
@@ -41,7 +42,7 @@ function PopoverContent({
     <PopoverPrimitive.Portal>
       {showBackdrop ? (
         <PopoverPrimitive.Backdrop
-          className="data-closed:fade-out-0 data-open:fade-in-0 fixed inset-0 z-40 bg-black/8 duration-instant data-closed:animate-out data-open:animate-in dark:bg-black/30"
+          className="fixed inset-0 z-40 bg-black/8 transition-opacity duration-150 ease-out data-ending-style:opacity-0 data-ending-style:duration-100 data-starting-style:opacity-0 dark:bg-black/30"
           data-slot="popover-backdrop"
         />
       ) : null}
@@ -58,7 +59,8 @@ function PopoverContent({
         <PopoverPrimitive.Popup
           data-slot="popover-content"
           className={cn(
-            "bg-popover text-popover-foreground data-open:animate-in data-closed:animate-out data-closed:fade-out-0 data-open:fade-in-0 data-closed:zoom-out-95 data-open:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 ring-foreground/10 flex flex-col gap-2.5 rounded-lg p-2.5 text-sm shadow-md ring-1 duration-instant z-50 w-72 origin-(--transform-origin) outline-hidden",
+            "bg-popover text-popover-foreground ring-foreground/10 flex flex-col gap-2.5 rounded-lg p-2.5 text-sm shadow-md ring-1 z-50 w-72 origin-(--transform-origin) outline-hidden",
+            POPUP_MOTION_CLASS_NAME,
             className
           )}
           {...props}

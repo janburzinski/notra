@@ -1,3 +1,9 @@
+import {
+  DashboardSpeed01Icon,
+  DashboardSquare01Icon,
+  File01Icon,
+  RankingIcon,
+} from "@hugeicons/core-free-icons";
 import type {
   GeoCompetitorSharePoint,
   GeoJourney,
@@ -29,10 +35,10 @@ import {
 } from "@/utils/geo-directions";
 
 export const GEO_DIRECTION_TABS: readonly GeoDirectionTab[] = [
-  { key: "instrument" },
-  { key: "leaderboard" },
-  { key: "cockpit" },
-  { key: "report" },
+  { key: "instrument", icon: DashboardSpeed01Icon },
+  { key: "leaderboard", icon: RankingIcon },
+  { key: "cockpit", icon: DashboardSquare01Icon },
+  { key: "report", icon: File01Icon },
 ];
 
 export const GEO_DIRECTIONS_COMPANY = "Notra";

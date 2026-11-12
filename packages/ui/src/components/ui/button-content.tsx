@@ -3,13 +3,28 @@
 import { Progress as ProgressPrimitive } from "@base-ui/react/progress";
 import { useState } from "react";
 
+import { hasRunningTransition } from "@notra/ui/lib/motion";
 import { cn } from "@notra/ui/lib/utils";
 
 const LOADING_DOTS = [
-  { bounce: "[animation-delay:0ms]", enter: "[animation-delay:70ms]" },
-  { bounce: "[animation-delay:140ms]", enter: "[animation-delay:110ms]" },
-  { bounce: "[animation-delay:280ms]", enter: "[animation-delay:150ms]" },
+  { bounce: "[animation-delay:0ms]", enter: "delay-0" },
+  { bounce: "[animation-delay:140ms]", enter: "delay-40" },
+  { bounce: "[animation-delay:280ms]", enter: "delay-80" },
 ] as const;
+
+/**
+ * The label and the dots swap with transitions rather than keyframes, so a
+ * swap that reverses halfway picks up from where it is instead of restarting.
+ * 200ms in, 150ms out.
+ */
+const SWAP_TRANSITION_CLASS_NAME =
+  "transition-[opacity,translate,filter] duration-200 ease-out";
+const SWAP_HIDDEN_CLASS_NAME =
+  "opacity-0 blur-[4px] duration-150 motion-safe:-translate-y-[0.45em]";
+const SWAP_FROM_BELOW_CLASS_NAME =
+  "starting:opacity-0 starting:blur-[4px] motion-safe:starting:translate-y-[0.45em]";
+const SWAP_FROM_SHOWN_CLASS_NAME =
+  "starting:opacity-100 starting:blur-none motion-safe:starting:translate-y-0";
 
 function useLoadingSwap(loading: boolean) {
   const [previousLoading, setPreviousLoading] = useState(loading);
@@ -72,31 +87,26 @@ function ButtonProgress({
 function ButtonLoader({
   entering,
   loading,
-  onSwappedOut,
 }: {
   entering: boolean;
   loading: boolean;
-  onSwappedOut: () => void;
 }) {
   return (
     <span
       aria-hidden
       className={cn(
         "pointer-events-none absolute inset-0 flex items-center justify-center gap-[0.2em]",
-        !loading && "animate-button-swap-out opacity-0 motion-reduce:animate-none"
+        SWAP_TRANSITION_CLASS_NAME,
+        !loading && SWAP_HIDDEN_CLASS_NAME
       )}
       data-slot="button-loader"
-      onAnimationEnd={(event) => {
-        if (!loading && event.target === event.currentTarget) {
-          onSwappedOut();
-        }
-      }}
     >
       {LOADING_DOTS.map(({ bounce, enter }) => (
         <span
           className={cn(
-            "motion-reduce:animate-none",
-            loading && entering && `animate-button-swap-in ${enter}`
+            "block",
+            SWAP_TRANSITION_CLASS_NAME,
+            loading && entering && `${SWAP_FROM_BELOW_CLASS_NAME} ${enter}`
           )}
           key={enter}
         >
@@ -149,15 +159,38 @@ function ButtonContent({
       {showLoader || showProgress ? (
         <span
           className={cn(
-            "relative inline-flex min-w-0 flex-1 items-center [gap:inherit] [justify-content:inherit] motion-reduce:animate-none",
-            loading && "opacity-0",
-            isSwapping &&
-              (loading
-                ? "animate-button-swap-out"
-                : "animate-button-swap-in [animation-delay:70ms]")
+            "relative inline-flex min-w-0 flex-1 items-center [gap:inherit] [justify-content:inherit]",
+            SWAP_TRANSITION_CLASS_NAME,
+            loading && SWAP_HIDDEN_CLASS_NAME,
+            loading && isSwapping && SWAP_FROM_SHOWN_CLASS_NAME
           )}
           data-clip=""
           data-slot="button-label"
+          onTransitionCancel={(event) => {
+            // A canceled return (e.g. an ancestor switching transitions off)
+            // never fires transitionend, so finish the swap here too. A
+            // reversed fade also cancels, but its replacement is already
+            // running and fires transitionend itself.
+            if (
+              !loading &&
+              event.target === event.currentTarget &&
+              event.propertyName === "opacity" &&
+              !hasRunningTransition(event.currentTarget, "opacity")
+            ) {
+              finishSwap();
+            }
+          }}
+          onTransitionEnd={(event) => {
+            // The label's return is the longest leg of the swap; once it is
+            // back, the wrapper and the dots can go.
+            if (
+              !loading &&
+              event.target === event.currentTarget &&
+              event.propertyName === "opacity"
+            ) {
+              finishSwap();
+            }
+          }}
         >
           {children}
         </span>
@@ -165,11 +198,7 @@ function ButtonContent({
         children
       )}
       {showLoader && (
-        <ButtonLoader
-          entering={isSwapping}
-          loading={loading}
-          onSwappedOut={finishSwap}
-        />
+        <ButtonLoader entering={isSwapping} loading={loading} />
       )}
     </>
   );

@@ -10,11 +10,12 @@ export const DURATION = {
   slower: 0.5,
 } as const;
 
+const STRONG_EASE_OUT = [0.23, 1, 0.32, 1] as const;
+
 /** Cubic-bezier control points. Mirrors `--ease-*`. */
 export const EASE = {
-  out: [0, 0, 0.2, 1],
-  emphasized: [0.22, 1, 0.36, 1],
-  emphasizedIn: [0.7, 0, 0.84, 0],
+  out: STRONG_EASE_OUT,
+  emphasized: STRONG_EASE_OUT,
   emphasizedInOut: [0.65, 0, 0.35, 1],
 } as const;
 
@@ -37,7 +38,6 @@ export const TRANSITION = {
   /** Text/content swapping in place, error messages, status changes. */
   fade: tween("fast"),
   enter: tween("normal", "emphasized"),
-  exit: tween("fast", "emphasizedIn"),
   resize: tween("slow", "emphasizedInOut"),
 } as const satisfies Record<string, Transition>;
 
@@ -58,3 +58,15 @@ export const fade = {
   exit: { opacity: 0 },
   transition: TRANSITION.fade,
 } as const;
+
+/** Whether a CSS transition on `property` is currently running on `element`. */
+export function hasRunningTransition(element: Element, property: string) {
+  return element
+    .getAnimations?.()
+    .some(
+      (animation) =>
+        "transitionProperty" in animation &&
+        animation.transitionProperty === property &&
+        animation.playState === "running"
+    ) ?? false;
+}

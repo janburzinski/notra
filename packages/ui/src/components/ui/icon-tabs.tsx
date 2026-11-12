@@ -19,24 +19,23 @@ import { useLayoutEffect, useRef } from "react";
 import { TabsList, TabsTrigger } from "./tabs";
 
 /**
- * Icon that only shows on the active tab: it widens and fades in beside the
- * label, so inactive tabs stay text-only. `IconTabsIndicator` follows the
- * resize frame by frame. `pinned` keeps it visible anyway,
- * e.g. for a live scan spinner.
+ * Icon that only shows on the active tab: its slot snaps open beside the
+ * label while the glyph fades and scales in, so inactive tabs stay text-only.
+ * `pinned` keeps it visible anyway, e.g. for a live scan spinner.
  */
 function SlideInTabIcon({ children, pinned = false }: SlideInTabIconProps) {
   return (
     <span
       aria-hidden="true"
       className={cn(
-        "duration-normal ease-emphasized -me-1.5 flex w-0 shrink-0 items-center justify-center overflow-hidden opacity-0 transition-all group-data-active/tab:me-0 group-data-active/tab:w-4 group-data-active/tab:opacity-100 motion-reduce:transition-none",
-        pinned && "me-0 w-4 opacity-100"
+        "-me-1.5 flex w-0 shrink-0 items-center justify-center overflow-hidden group-data-active/tab:me-0 group-data-active/tab:w-4",
+        pinned && "me-0 w-4"
       )}
     >
       <span
         className={cn(
-          "duration-normal ease-emphasized flex scale-50 items-center transition-transform group-data-active/tab:scale-100 motion-reduce:transition-none",
-          pinned && "scale-100"
+          "flex scale-90 items-center opacity-0 transition-[opacity,scale] duration-normal ease-out group-data-active/tab:scale-100 group-data-active/tab:opacity-100",
+          pinned && "scale-100 opacity-100"
         )}
       >
         {children}
@@ -133,7 +132,7 @@ function IconTabsList({ value, children, ...props }: IconTabsListProps) {
   );
 }
 
-/** `TabsTrigger` whose icon only shows, and slides in, while it is active. */
+/** `TabsTrigger` whose icon only shows, and fades in, while it is active. */
 function IconTabsTrigger({
   icon,
   iconPinned,

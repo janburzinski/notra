@@ -172,22 +172,20 @@
 
   .sentiment-scan-fill {
     transform-origin: left;
-    animation: sentiment-scan-fill 2.6s cubic-bezier(0.23, 1, 0.32, 1) infinite
-      backwards;
+    animation: sentiment-scan-fill 2.6s var(--ease-out) infinite backwards;
     animation-delay: calc(var(--scan-index) * 320ms);
   }
 
   .sentiment-analysis-progress {
-    animation: sentiment-analysis-progress 24s cubic-bezier(0.23, 1, 0.32, 1)
-      forwards;
+    animation: sentiment-analysis-progress 24s var(--ease-out) forwards;
   }
 
   .sentiment-results-table[data-ready="true"] tbody tr {
-    transition: opacity 180ms cubic-bezier(0.23, 1, 0.32, 1);
+    transition: opacity 180ms var(--ease-out);
   }
 
   .sentiment-state-copy {
-    transition: opacity 180ms cubic-bezier(0.23, 1, 0.32, 1);
+    transition: opacity 180ms var(--ease-out);
   }
 
   @starting-style {
@@ -278,7 +276,7 @@
 }
 
 .chat-input-slide-down {
-  animation: chat-input-slide-down 480ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: chat-input-slide-down 300ms cubic-bezier(0.32, 0.72, 0, 1) both;
 }
 
 @keyframes chat-branch-fade-in {
@@ -324,20 +322,6 @@
   --diffs-token-dark-bg: transparent;
 }
 
-@keyframes geo-log-row-open {
-  from {
-    height: 0;
-  }
-}
-
-@keyframes geo-log-row-content {
-  from {
-    opacity: 0;
-    filter: blur(6px);
-    transform: translateY(-4px);
-  }
-}
-
 @keyframes geo-log-row-glow {
   from {
     background-color: color-mix(in oklab, var(--primary) 10%, transparent);
@@ -348,20 +332,20 @@
 }
 
 .geo-log-row-arrive {
-  animation:
-    geo-log-row-open 520ms var(--ease-emphasized-in-out) backwards,
-    geo-log-row-glow 2.4s ease-out backwards;
+  animation: geo-log-row-glow 2.4s ease-out backwards;
   animation-delay: var(--geo-log-arrive-delay, 0ms);
 }
 
 .geo-log-row-arrive > td > div {
-  animation:
-    geo-log-row-open 520ms var(--ease-emphasized-in-out) backwards,
-    geo-log-row-content var(--transition-duration-slower) var(--ease-emphasized)
-      backwards;
-  animation-delay:
-    var(--geo-log-arrive-delay, 0ms),
-    calc(var(--geo-log-arrive-delay, 0ms) + 160ms);
+  transition-property: opacity, translate;
+  transition-duration: var(--transition-duration-normal);
+  transition-timing-function: var(--ease-out);
+  transition-delay: var(--geo-log-arrive-delay, 0ms);
+
+  @starting-style {
+    opacity: 0;
+    translate: 0 -4px;
+  }
 }
 
 .geo-log-arrive-1 {
@@ -385,9 +369,12 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .geo-log-row-arrive,
-  .geo-log-row-arrive > td > div {
+  .geo-log-row-arrive {
     animation: none;
+  }
+
+  .geo-log-row-arrive > td > div {
+    transition: none;
   }
 }
 

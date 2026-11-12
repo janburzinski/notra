@@ -9,6 +9,7 @@ import {
   QueryClient,
   QueryClientProvider,
 } from "@tanstack/react-query";
+import { MotionConfig } from "motion/react";
 import { ThemeProvider } from "next-themes";
 import { NuqsAdapter } from "nuqs/adapters/tanstack-router";
 import { Suspense, useState } from "react";
@@ -121,46 +122,48 @@ export function Providers({
   const isClient = useIsClient();
 
   return (
-    <FrameworkProvider Image={Image} Link={Link}>
-      <QueryClientProvider client={queryClient}>
-        <Suspense fallback={null}>
-          {isClient && ReactQueryDevtools ? (
-            <ReactQueryDevtools initialIsOpen={false} />
-          ) : null}
-        </Suspense>
-        <ThemeProvider
-          attribute="class"
-          disableTransitionOnChange
-          enableSystem
-          forcedTheme={forcedTheme}
-          // Embeds never read the visitor's dashboard theme, so "auto"
-          // follows their system.
-          storageKey={embed ? TRAFFIC_EMBED_THEME_STORAGE_KEY : undefined}
-        >
-          <UiLabelsProvider labels={uiLabels}>
-            <DataTableLabelsProvider labels={uiLabels}>
-              <CardLabelsProvider labels={uiLabels}>
-                <TooltipProvider delay={500} glide={false}>
-                  <NuqsAdapter>
-                    <DashboardChartEnvironment>
-                      <EmbedModeProvider embed={embed}>
-                        {children}
-                      </EmbedModeProvider>
-                    </DashboardChartEnvironment>
-                    {POSTHOG_PROJECT_TOKEN && !embed ? (
-                      <Suspense fallback={null}>
-                        <PostHogIdentity />
-                      </Suspense>
-                    ) : null}
-                  </NuqsAdapter>
-                  <Toaster position="bottom-right" />
-                  {embed ? null : <UiSounds />}
-                </TooltipProvider>
-              </CardLabelsProvider>
-            </DataTableLabelsProvider>
-          </UiLabelsProvider>
-        </ThemeProvider>
-      </QueryClientProvider>
-    </FrameworkProvider>
+    <MotionConfig reducedMotion="user">
+      <FrameworkProvider Image={Image} Link={Link}>
+        <QueryClientProvider client={queryClient}>
+          <Suspense fallback={null}>
+            {isClient && ReactQueryDevtools ? (
+              <ReactQueryDevtools initialIsOpen={false} />
+            ) : null}
+          </Suspense>
+          <ThemeProvider
+            attribute="class"
+            disableTransitionOnChange
+            enableSystem
+            forcedTheme={forcedTheme}
+            // Embeds never read the visitor's dashboard theme, so "auto"
+            // follows their system.
+            storageKey={embed ? TRAFFIC_EMBED_THEME_STORAGE_KEY : undefined}
+          >
+            <UiLabelsProvider labels={uiLabels}>
+              <DataTableLabelsProvider labels={uiLabels}>
+                <CardLabelsProvider labels={uiLabels}>
+                  <TooltipProvider delay={500} glide={false}>
+                    <NuqsAdapter>
+                      <DashboardChartEnvironment>
+                        <EmbedModeProvider embed={embed}>
+                          {children}
+                        </EmbedModeProvider>
+                      </DashboardChartEnvironment>
+                      {POSTHOG_PROJECT_TOKEN && !embed ? (
+                        <Suspense fallback={null}>
+                          <PostHogIdentity />
+                        </Suspense>
+                      ) : null}
+                    </NuqsAdapter>
+                    <Toaster position="bottom-right" />
+                    {embed ? null : <UiSounds />}
+                  </TooltipProvider>
+                </CardLabelsProvider>
+              </DataTableLabelsProvider>
+            </UiLabelsProvider>
+          </ThemeProvider>
+        </QueryClientProvider>
+      </FrameworkProvider>
+    </MotionConfig>
   );
 }

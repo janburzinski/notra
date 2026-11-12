@@ -1,6 +1,6 @@
 import type { IconTabsIndicatorBox } from "@notra/ui/types/icon-tabs";
 
-/** Strong deceleration, close to the `ease-emphasized` CSS curve. */
+/** Strong deceleration, close to the `ease-out` CSS curve. */
 export function easeOutQuint(progress: number): number {
   return 1 - (1 - progress) ** 5;
 }

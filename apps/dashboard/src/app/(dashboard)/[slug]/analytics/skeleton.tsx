@@ -25,7 +25,7 @@ export function AnalyticsPageSkeleton() {
           description={t("description")}
           title={tCommon("labels.analytics")}
         >
-          <Skeleton className="h-8 w-36 rounded-lg" />
+          <Skeleton className="h-7 w-36 rounded-lg" />
         </PageHeading>
         <AnalyticsSourceTabs
           actions={<Skeleton className="h-7 w-72 rounded-lg" />}

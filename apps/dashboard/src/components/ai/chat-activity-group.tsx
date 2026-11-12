@@ -218,7 +218,7 @@ export function ChatActivityGroup({
           <HugeiconsIcon
             aria-hidden
             className={cn(
-              "text-subtle-foreground animate-in fade-in size-3.5 shrink-0 transition-transform duration-300 motion-reduce:animate-none motion-reduce:transition-none",
+              "text-subtle-foreground duration-normal size-3.5 shrink-0 transition-transform ease-out motion-reduce:transition-none",
               isOpen ? "rotate-180" : "rotate-0"
             )}
             icon={ArrowDown01Icon}
@@ -294,7 +294,7 @@ export function ChatSearchStack({ items }: ChatSearchStackProps) {
         <HugeiconsIcon
           aria-hidden
           className={cn(
-            "text-subtle-foreground size-3.5 shrink-0 transition-transform motion-reduce:transition-none",
+            "text-subtle-foreground duration-normal size-3.5 shrink-0 transition-transform ease-out motion-reduce:transition-none",
             isOpen ? "rotate-180" : "rotate-0"
           )}
           icon={ArrowDown01Icon}

@@ -35,7 +35,7 @@ export function DemoBanner() {
   };
 
   return (
-    <div className="bg-background text-foreground animate-in fade-in slide-in-from-top-4 flex h-(--demo-banner-height) shrink-0 items-center gap-3 border-b px-4 text-sm duration-700 ease-out motion-reduce:animate-none">
+    <div className="bg-background text-foreground animate-in fade-in duration-normal flex h-(--demo-banner-height) shrink-0 items-center gap-3 border-b px-4 text-sm ease-out motion-reduce:animate-none">
       <span
         aria-hidden="true"
         className="dark:bg-foreground flex size-7 shrink-0 items-center justify-center rounded-lg"

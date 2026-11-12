@@ -88,10 +88,10 @@ function TierRow({ label, tier }: AgentReadinessTierRowProps) {
       >
         <div
           className={cn(
-            "duration-slower transition-width h-full w-(--passing) rounded-full ease-out",
+            "duration-slow h-full w-full origin-left scale-x-(--passing) rounded-full transition-transform ease-out motion-reduce:transition-none",
             AGENT_READINESS_BAND_BG_CLASS[band.key]
           )}
-          style={{ "--passing": `${percent}%` } as CSSProperties}
+          style={{ "--passing": percent / 100 } as CSSProperties}
         />
       </div>
     </div>

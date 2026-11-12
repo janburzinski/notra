@@ -30,6 +30,7 @@ export function CreateContentButtonGroup({
         onClick={onCreatePost}
         onFocus={onPrefetchCreatePost}
         onMouseEnter={onPrefetchCreatePost}
+        size="sm"
         variant="outline"
       >
         <HugeiconsIcon
@@ -45,6 +46,7 @@ export function CreateContentButtonGroup({
           onClick={onCreateArticle}
           onFocus={onPrefetchCreateArticle}
           onMouseEnter={onPrefetchCreateArticle}
+          size="sm"
           variant="outline"
         >
           <HugeiconsIcon
@@ -61,6 +63,7 @@ export function CreateContentButtonGroup({
         onClick={onCreateContent}
         onFocus={onPrefetchCreateContent}
         onMouseEnter={onPrefetchCreateContent}
+        size="sm"
       >
         <HugeiconsIcon
           aria-hidden="true"

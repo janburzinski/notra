@@ -43,6 +43,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@notra/ui/components/ui/tooltip";
+import { EASE } from "@notra/ui/lib/motion";
 import { cn } from "@notra/ui/lib/utils";
 import {
   type CSSProperties,
@@ -75,7 +76,7 @@ import { OutputTypeIcon } from "@/utils/output-types";
 
 const TAB_DROP_ANIMATION = {
   duration: 180,
-  easing: "cubic-bezier(0.23, 1, 0.32, 1)",
+  easing: `cubic-bezier(${EASE.out.join(", ")})`,
 };
 
 function noop() {}

@@ -127,7 +127,7 @@ function SubagentChevron({ isOpen }: { isOpen: boolean }) {
     <HugeiconsIcon
       aria-hidden
       className={cn(
-        "text-subtle-foreground size-3.5 shrink-0 transition-transform motion-reduce:transition-none",
+        "text-subtle-foreground duration-normal size-3.5 shrink-0 transition-transform ease-out motion-reduce:transition-none",
         isOpen ? "rotate-180" : "rotate-0 opacity-0 group-hover:opacity-100"
       )}
       icon={ArrowDown01Icon}

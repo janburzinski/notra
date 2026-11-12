@@ -152,7 +152,7 @@ export function VoiceSelector({
       {layout === "menu" && activeVoice ? (
         <VoiceActionsMenu
           {...menuProps(activeVoice)}
-          render={<Button size="icon" variant="outline" />}
+          render={<Button size="icon-sm" variant="outline" />}
         />
       ) : null}
 

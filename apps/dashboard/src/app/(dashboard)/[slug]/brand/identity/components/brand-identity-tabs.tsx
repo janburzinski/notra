@@ -1,11 +1,17 @@
 "use client";
 
 import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@notra/ui/components/ui/tabs";
+  Bookmark02Icon,
+  Building03Icon,
+  HierarchyFilesIcon,
+  PaintBoardIcon,
+} from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
+import {
+  IconTabsList,
+  IconTabsTrigger,
+} from "@notra/ui/components/ui/icon-tabs";
+import { Tabs, TabsContent } from "@notra/ui/components/ui/tabs";
 import { useTranslations } from "use-intl";
 
 import type { BrandIdentityTabsProps, BrandTab } from "@/types/brand-identity";
@@ -17,7 +23,6 @@ import { SitemapList } from "./sitemap-list";
 
 export function BrandIdentityTabs({
   activeTab,
-  toolbar,
   addReferenceOpen,
   addSitemapOpen,
   initialData,
@@ -40,18 +45,32 @@ export function BrandIdentityTabs({
     >
       <div className="flex min-w-0 flex-wrap items-center justify-between gap-x-4">
         <div className="max-w-full min-w-0 overflow-x-auto pb-2">
-          <TabsList aria-label={t("label")}>
-            <TabsTrigger value="identity">
+          <IconTabsList aria-label={t("label")} value={activeTab}>
+            <IconTabsTrigger
+              icon={<HugeiconsIcon icon={Building03Icon} size={15} />}
+              value="identity"
+            >
               {tCommon("labels.companyInfo")}
-            </TabsTrigger>
-            <TabsTrigger value="guidelines">{t("guidelines")}</TabsTrigger>
-            <TabsTrigger value="references">
+            </IconTabsTrigger>
+            <IconTabsTrigger
+              icon={<HugeiconsIcon icon={PaintBoardIcon} size={15} />}
+              value="guidelines"
+            >
+              {t("guidelines")}
+            </IconTabsTrigger>
+            <IconTabsTrigger
+              icon={<HugeiconsIcon icon={Bookmark02Icon} size={15} />}
+              value="references"
+            >
               {tCommon("labels.references")}
-            </TabsTrigger>
-            <TabsTrigger value="sitemap">
+            </IconTabsTrigger>
+            <IconTabsTrigger
+              icon={<HugeiconsIcon icon={HierarchyFilesIcon} size={15} />}
+              value="sitemap"
+            >
               {tCommon("labels.sitemap")}
-            </TabsTrigger>
-          </TabsList>
+            </IconTabsTrigger>
+          </IconTabsList>
         </div>
         <div className="flex min-w-0 flex-wrap items-center gap-3 pb-2">
           {activeTab === "identity" && isSaving ? (
@@ -63,7 +82,6 @@ export function BrandIdentityTabs({
               {tStates("saving")}
             </span>
           ) : null}
-          {toolbar}
         </div>
       </div>
 

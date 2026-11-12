@@ -2,10 +2,13 @@
 
 import { Tabs as TabsPrimitive } from "@base-ui/react/tabs";
 import { cva, type VariantProps } from "class-variance-authority";
-import { domMax, LazyMotion, m } from "motion/react";
+import { domMax, LazyMotion, m, useReducedMotion } from "motion/react";
 import { createContext, useContext, useEffect, useId, useRef, useState } from "react";
 
-import { SPRING } from "@notra/ui/lib/motion";
+import {
+  INSTANT_TRANSITION,
+  LINE_INDICATOR_TRANSITION,
+} from "@notra/ui/constants/tabs";
 import { cn } from "@notra/ui/lib/utils";
 
 const TabsLayoutIdContext = createContext<string | null>(null);
@@ -66,7 +69,7 @@ function TabsList({
       >
         {children}
         {variant === "default" && indicator ? (
-          <TabsPrimitive.Indicator className="pointer-events-none absolute top-0 left-0 z-0 h-(--active-tab-height) w-(--active-tab-width) translate-x-(--active-tab-left) translate-y-(--active-tab-top) rounded-md bg-background shadow-[0_1px_2px_rgba(0,0,0,0.08)] transition-[width,height,translate] duration-slow ease-emphasized dark:bg-foreground/10" />
+          <TabsPrimitive.Indicator className="pointer-events-none absolute top-0 left-0 z-0 h-(--active-tab-height) w-(--active-tab-width) translate-x-(--active-tab-left) translate-y-(--active-tab-top) rounded-md bg-background shadow-[0_1px_2px_rgba(0,0,0,0.08)] transition-[width,height,translate] duration-normal ease-out dark:bg-foreground/10" />
         ) : null}
       </TabsPrimitive.List>
     </TabsLayoutIdContext.Provider>
@@ -79,6 +82,7 @@ function TabsTrigger({
   ...props
 }: TabsPrimitive.Tab.Props) {
   const layoutId = useContext(TabsLayoutIdContext);
+  const reduceMotion = useReducedMotion();
   const ref = useRef<HTMLButtonElement>(null);
   const [isSelected, setIsSelected] = useState(false);
 
@@ -118,7 +122,9 @@ function TabsTrigger({
           <m.span
             className="absolute inset-x-0 bottom-[-5px] h-0.5 bg-foreground group-data-[orientation=vertical]/tabs:inset-x-auto group-data-[orientation=vertical]/tabs:inset-y-0 group-data-[orientation=vertical]/tabs:-right-1 group-data-[orientation=vertical]/tabs:w-0.5"
             layoutId={layoutId}
-            transition={SPRING.indicator}
+            transition={
+              reduceMotion ? INSTANT_TRANSITION : LINE_INDICATOR_TRANSITION
+            }
           />
         </LazyMotion>
       )}

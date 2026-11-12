@@ -7,7 +7,11 @@ import {
   McpServerIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Tabs, TabsList, TabsTrigger } from "@notra/ui/components/ui/tabs";
+import {
+  IconTabsList,
+  IconTabsTrigger,
+} from "@notra/ui/components/ui/icon-tabs";
+import { Tabs } from "@notra/ui/components/ui/tabs";
 import { useEffect, useState } from "react";
 import { useTranslations } from "use-intl";
 
@@ -70,42 +74,42 @@ export function AnalyticsSourceTabs({ actions }: AnalyticsSourceTabsProps) {
         className="max-w-full min-w-0 scrollbar-none overflow-x-auto"
         value={shownValue}
       >
-        <TabsList aria-label={t("label")}>
-          <TabsTrigger
+        <IconTabsList aria-label={t("label")} value={shownValue}>
+          <IconTabsTrigger
+            icon={<HugeiconsIcon icon={BotIcon} size={15} />}
             nativeButton={false}
             render={<Link href={geoTrafficPath(slug, projectId)} />}
             value="agents"
           >
-            <HugeiconsIcon aria-hidden="true" icon={BotIcon} />
             {t("agents")}
-          </TabsTrigger>
-          <TabsTrigger
+          </IconTabsTrigger>
+          <IconTabsTrigger
+            icon={<HugeiconsIcon icon={Globe02Icon} size={15} />}
             nativeButton={false}
             render={<Link href={withGeoProject(webPath, projectId)} />}
             value="web"
           >
-            <HugeiconsIcon aria-hidden="true" icon={Globe02Icon} />
             {t("web")}
-          </TabsTrigger>
-          <TabsTrigger
+          </IconTabsTrigger>
+          <IconTabsTrigger
+            icon={<HugeiconsIcon icon={McpServerIcon} size={15} />}
             nativeButton={false}
             render={<Link href={withGeoProject(mcpPath, projectId)} />}
             value="mcp"
           >
-            <HugeiconsIcon aria-hidden="true" icon={McpServerIcon} />
             {t("mcp")}
-          </TabsTrigger>
+          </IconTabsTrigger>
           {showSocial || value === "social" ? (
-            <TabsTrigger
+            <IconTabsTrigger
+              icon={<HugeiconsIcon icon={AtIcon} size={15} />}
               nativeButton={false}
               render={<Link href={withGeoProject(socialPath, projectId)} />}
               value="social"
             >
-              <HugeiconsIcon aria-hidden="true" icon={AtIcon} />
               {t("social")}
-            </TabsTrigger>
+            </IconTabsTrigger>
           ) : null}
-        </TabsList>
+        </IconTabsList>
       </Tabs>
       {actions ? (
         <div className="flex min-h-7 flex-wrap items-center justify-end gap-2">

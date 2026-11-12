@@ -33,6 +33,7 @@ import {
   MessageScrollerViewport,
 } from "@notra/ui/components/ui/message-scroller";
 import { Skeleton } from "@notra/ui/components/ui/skeleton";
+import { EASE } from "@notra/ui/lib/motion";
 import { ORPCError } from "@orpc/client";
 import {
   useMutation,
@@ -393,9 +394,7 @@ function UserImageGrid({ children }: UserImageGridProps) {
       layout={!reduceMotion}
       ref={gridRef}
       transition={
-        reduceMotion
-          ? { duration: 0 }
-          : { duration: 0.3, ease: [0.22, 1, 0.36, 1] }
+        reduceMotion ? { duration: 0 } : { duration: 0.3, ease: EASE.out }
       }
     >
       {imageItems.slice(0, visibleImageCount).map((imageItem, index) => {
@@ -418,9 +417,7 @@ function UserImageGrid({ children }: UserImageGridProps) {
             key={imageItem.key}
             layout={!reduceMotion}
             transition={
-              reduceMotion
-                ? { duration: 0 }
-                : { duration: 0.3, ease: [0.22, 1, 0.36, 1] }
+              reduceMotion ? { duration: 0 } : { duration: 0.3, ease: EASE.out }
             }
           >
             {imageItem}
@@ -3004,7 +3001,7 @@ function StandaloneChatPageClient({
                                 layout={!reduceMotion}
                                 transition={{
                                   duration: 0.22,
-                                  ease: [0.22, 1, 0.36, 1],
+                                  ease: EASE.out,
                                 }}
                               >
                                 <div className="flex w-full min-w-0 flex-col items-end gap-2">

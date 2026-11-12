@@ -35,7 +35,12 @@ export function GuidelinesPdfUploadButton({
   return (
     <>
       <input {...inputProps} />
-      <Button loading={isUploading} onClick={openPicker} variant="outline">
+      <Button
+        loading={isUploading}
+        onClick={openPicker}
+        size="sm"
+        variant="outline"
+      >
         <HugeiconsIcon className="size-4" icon={FileUploadIcon} />
         {tPdf("upload")}
       </Button>

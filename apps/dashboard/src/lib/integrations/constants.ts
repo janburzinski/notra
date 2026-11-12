@@ -1,3 +1,10 @@
+import {
+  Download04Icon,
+  GridViewIcon,
+  PuzzleIcon,
+  Upload04Icon,
+} from "@hugeicons/core-free-icons";
+
 export const INTEGRATION_TAB_VALUES = [
   "all",
   "input",
@@ -6,10 +13,10 @@ export const INTEGRATION_TAB_VALUES = [
 ] as const;
 
 export const INTEGRATION_CATEGORY_TABS = [
-  { value: "all" },
-  { value: "input" },
-  { value: "output" },
-  { value: "extension" },
+  { value: "all", icon: GridViewIcon },
+  { value: "input", icon: Download04Icon },
+  { value: "output", icon: Upload04Icon },
+  { value: "extension", icon: PuzzleIcon },
 ] as const;
 
 export const INTEGRATION_CARD_DITHER_HEX_COLOR_PATTERN = /^#[\da-f]{6}$/i;

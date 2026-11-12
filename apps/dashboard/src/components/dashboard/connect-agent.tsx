@@ -9,6 +9,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@notra/ui/components/ui/tooltip";
+import { EASE } from "@notra/ui/lib/motion";
 import {
   AnimatePresence,
   domAnimation,
@@ -33,7 +34,7 @@ const PILL_SHOWN = { opacity: 1, height: "auto", paddingBottom: 6, scale: 1 };
 
 const PILL_TRANSITION = {
   duration: 0.2,
-  ease: [0.22, 1, 0.36, 1],
+  ease: EASE.out,
   opacity: { duration: 0.12 },
 } as const;
 

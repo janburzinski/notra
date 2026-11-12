@@ -3,7 +3,11 @@
 import { Calendar03Icon, ListViewIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { PageHeading } from "@notra/ui/components/shared/page-heading";
-import { Tabs, TabsList, TabsTrigger } from "@notra/ui/components/ui/tabs";
+import {
+  IconTabsList,
+  IconTabsTrigger,
+} from "@notra/ui/components/ui/icon-tabs";
+import { Tabs } from "@notra/ui/components/ui/tabs";
 import { parseAsStringLiteral, useQueryState } from "nuqs";
 import { useState } from "react";
 import { useTranslations } from "use-intl";
@@ -78,16 +82,20 @@ export default function PageClient({
             value={view}
           >
             <div className="flex min-h-8 flex-wrap items-center justify-between gap-3">
-              <TabsList>
-                <TabsTrigger value="list">
-                  <HugeiconsIcon aria-hidden="true" icon={ListViewIcon} />
+              <IconTabsList value={view}>
+                <IconTabsTrigger
+                  icon={<HugeiconsIcon icon={ListViewIcon} size={15} />}
+                  value="list"
+                >
                   {t("allContent")}
-                </TabsTrigger>
-                <TabsTrigger value="calendar">
-                  <HugeiconsIcon aria-hidden="true" icon={Calendar03Icon} />
+                </IconTabsTrigger>
+                <IconTabsTrigger
+                  icon={<HugeiconsIcon icon={Calendar03Icon} size={15} />}
+                  value="calendar"
+                >
                   {t("viewCalendar")}
-                </TabsTrigger>
-              </TabsList>
+                </IconTabsTrigger>
+              </IconTabsList>
               <div className="flex items-center" ref={setTabRowEnd} />
             </div>
           </Tabs>

@@ -389,6 +389,7 @@ export function CommandPalette() {
     >
       <DialogContent
         className="border-shell-border bg-shell top-[18%] w-[calc(100%-2rem)] max-w-[45rem]! translate-y-0 gap-0 overflow-hidden rounded-2xl! border p-0! shadow-2xl ring-0 sm:max-w-[45rem]!"
+        instant
         showCloseButton={false}
       >
         <DialogHeader className="sr-only">

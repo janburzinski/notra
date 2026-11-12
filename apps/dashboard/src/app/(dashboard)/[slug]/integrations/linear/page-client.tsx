@@ -270,7 +270,7 @@ export default function PageClient({ organizationSlug }: PageClientProps) {
     <PageContainer className="flex flex-1 flex-col gap-4 py-4 md:gap-6 md:py-6">
       <div className="w-full space-y-6 px-4 lg:px-6">
         <PageHeading description={t("description")} title="Linear">
-          <Button onClick={() => setDialogOpen(true)}>
+          <Button onClick={() => setDialogOpen(true)} size="sm">
             <HugeiconsIcon className="size-4" icon={PlusSignIcon} />
             {t("connect")}
             <Kbd className="ml-1 hidden sm:inline-flex">C</Kbd>

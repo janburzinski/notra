@@ -123,7 +123,6 @@ export interface BrandIdentityActionsProps {
 export interface BrandIdentityTabsProps {
   activeTab: BrandTab;
   /** Rendered at the end of the tab row. */
-  toolbar?: ReactNode;
   addReferenceOpen: boolean;
   addSitemapOpen: boolean;
   initialData: BrandFormInitialData;

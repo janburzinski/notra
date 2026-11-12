@@ -58,7 +58,7 @@ export function GeoCompetitorsSkeleton() {
           title={tCommon("labels.competitors")}
         >
           <div className="flex flex-wrap items-center gap-2">
-            <Skeleton className="h-8 w-[8.625rem] rounded-md" />
+            <Skeleton className="h-7 w-[8.625rem] rounded-lg" />
             <Button disabled size="sm">
               <HugeiconsIcon className="size-4" icon={PlusSignIcon} />
               {t("newCompetitor")}

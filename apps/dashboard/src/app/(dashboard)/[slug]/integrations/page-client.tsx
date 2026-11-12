@@ -1,14 +1,14 @@
 "use client";
 
+import { HugeiconsIcon } from "@hugeicons/react";
 import type { IntegrationType } from "@notra/schemas/dashboard/integrations";
 import { PageHeading } from "@notra/ui/components/shared/page-heading";
 import { Badge } from "@notra/ui/components/ui/badge";
 import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@notra/ui/components/ui/tabs";
+  IconTabsList,
+  IconTabsTrigger,
+} from "@notra/ui/components/ui/icon-tabs";
+import { Tabs, TabsContent } from "@notra/ui/components/ui/tabs";
 import { TitleCard } from "@notra/ui/components/ui/title-card";
 import { useQuery } from "@tanstack/react-query";
 import { parseAsStringLiteral, useQueryState } from "nuqs";
@@ -219,15 +219,21 @@ export default function PageClient({
         />
 
         <Tabs onValueChange={(value) => setActiveTab(value)} value={activeTab}>
-          <TabsList variant="line">
-            {INTEGRATION_CATEGORY_TABS.map((tab) => (
-              <TabsTrigger key={tab.value} value={tab.value}>
-                {tab.value === "extension"
-                  ? t("tabs.extension")
-                  : tCommon2(`labels.${tab.value}`)}
-              </TabsTrigger>
-            ))}
-          </TabsList>
+          <div className="max-w-full overflow-x-auto">
+            <IconTabsList value={activeTab}>
+              {INTEGRATION_CATEGORY_TABS.map((tab) => (
+                <IconTabsTrigger
+                  icon={<HugeiconsIcon icon={tab.icon} size={15} />}
+                  key={tab.value}
+                  value={tab.value}
+                >
+                  {tab.value === "extension"
+                    ? t("tabs.extension")
+                    : tCommon2(`labels.${tab.value}`)}
+                </IconTabsTrigger>
+              ))}
+            </IconTabsList>
+          </div>
 
           {INTEGRATION_CATEGORY_TABS.map((tab) => {
             const items =

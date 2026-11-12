@@ -4,6 +4,7 @@ import { FEATURES } from "@notra/ai/billing/features";
 import { Skeleton } from "@notra/ui/components/ui/skeleton";
 import { TitleCard } from "@notra/ui/components/ui/title-card";
 import { cn } from "@notra/ui/lib/utils";
+import type { CSSProperties } from "react";
 import { useLocale, useTranslations } from "use-intl";
 
 import type { CreditSummaryCardsProps } from "@/types/billing/credits";
@@ -87,12 +88,12 @@ export function CreditSummaryCards({
           <div className="bg-muted mt-3 h-2 w-full overflow-hidden rounded-full">
             <div
               className={cn(
-                "duration-slower h-full rounded-full transition-all",
+                "duration-slow h-full w-full origin-left scale-x-(--usage) rounded-full transition-[scale,background-color] ease-out motion-reduce:transition-none",
                 usagePercent > 90
                   ? "bg-destructive"
                   : usageBarColor(usagePercent)
               )}
-              style={{ width: `${usagePercent}%` }}
+              style={{ "--usage": usagePercent / 100 } as CSSProperties}
             />
           </div>
         </div>

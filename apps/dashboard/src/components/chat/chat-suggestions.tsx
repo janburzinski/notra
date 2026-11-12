@@ -3,7 +3,7 @@
 import { Cancel01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Button } from "@notra/ui/components/ui/button";
-import { tween } from "@notra/ui/lib/motion";
+import { EASE, tween } from "@notra/ui/lib/motion";
 import { cn } from "@notra/ui/lib/utils";
 import {
   AnimatePresence,
@@ -216,7 +216,7 @@ export function ChatSuggestions({
           isPointerInside.current = false;
         }}
         style={{ pointerEvents: hidden ? "none" : undefined }}
-        transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+        transition={{ duration: 0.25, ease: EASE.out }}
       >
         <div className="flex items-center justify-between gap-3">
           <p className="text-muted-foreground text-sm">{t("heading")}</p>
@@ -269,7 +269,7 @@ export function ChatSuggestions({
                   transition={{
                     duration: 0.35,
                     delay: 0.05 + index * 0.05,
-                    ease: [0.22, 1, 0.36, 1],
+                    ease: EASE.out,
                   }}
                 >
                   <SuggestionCard

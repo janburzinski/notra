@@ -67,6 +67,7 @@ export function SkillDetailHeader({
           <Button
             disabled={deleteDisabled}
             onClick={onDelete}
+            size="sm"
             variant="destructive"
           >
             <HugeiconsIcon className="size-4" icon={Delete02Icon} />

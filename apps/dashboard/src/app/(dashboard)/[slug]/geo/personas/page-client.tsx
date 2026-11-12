@@ -10,14 +10,6 @@ import { GEO_PERSONA_MAX_COUNT } from "@notra/geo-core/constants/geo-personas";
 import { Shimmer } from "@notra/ui/components/ai-elements/shimmer";
 import Counter from "@notra/ui/components/shared/counter";
 import { PageHeading } from "@notra/ui/components/shared/page-heading";
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@notra/ui/components/ui/empty";
 import { Skeleton } from "@notra/ui/components/ui/skeleton";
 import { useReducedMotion } from "motion/react";
 import type { ReactNode } from "react";
@@ -255,22 +247,18 @@ function GeoPersonasPageContent({ organizationSlug }: GeoPageClientProps) {
         ) : null}
 
         {showEmptyState ? (
-          <Empty>
-            <EmptyHeader>
-              <EmptyMedia variant="icon">
-                <HugeiconsIcon icon={UserGroupIcon} />
-              </EmptyMedia>
-              <EmptyTitle>{t("emptyTitle")}</EmptyTitle>
-              <EmptyDescription>{t("emptyDescription")}</EmptyDescription>
-            </EmptyHeader>
-            <EmptyContent>
+          <EmptyState
+            action={
               <GeneratePersonasButton
                 hasPersonas={false}
                 onClick={onGenerateClick}
                 progress={progress}
               />
-            </EmptyContent>
-          </Empty>
+            }
+            description={t("emptyDescription")}
+            title={t("emptyTitle")}
+            titleIcon={<HugeiconsIcon icon={UserGroupIcon} />}
+          />
         ) : null}
       </div>
       <PersonaAddDialog

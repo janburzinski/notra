@@ -22,13 +22,13 @@ const OFFSET_EM = 0.5;
 const VARIANTS = {
   enter: (direction: number) => ({
     opacity: 0,
-    y: `${direction * OFFSET_EM}em`,
+    transform: `translateY(${direction * OFFSET_EM}em)`,
     filter: BLUR,
   }),
-  center: { opacity: 1, y: 0, filter: SHARP },
+  center: { opacity: 1, transform: "translateY(0em)", filter: SHARP },
   exit: (direction: number) => ({
     opacity: 0,
-    y: `${-direction * OFFSET_EM}em`,
+    transform: `translateY(${-direction * OFFSET_EM}em)`,
     filter: BLUR,
   }),
 };

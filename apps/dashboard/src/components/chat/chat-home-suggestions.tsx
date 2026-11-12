@@ -4,6 +4,7 @@ import { Cancel01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Button } from "@notra/ui/components/ui/button";
 import { Skeleton } from "@notra/ui/components/ui/skeleton";
+import { EASE } from "@notra/ui/lib/motion";
 import { LazyMotion, m, useReducedMotion } from "motion/react";
 import { useTranslations } from "use-intl";
 
@@ -18,7 +19,6 @@ import type {
 const loadMotionFeatures = () =>
   import("@/lib/motion-features").then((module) => module.default);
 
-const EASE = [0.22, 1, 0.36, 1] as const;
 const SKELETON_KEYS = Array.from(
   { length: CHAT_HOME_SUGGESTION_COUNT },
   (_, index) => `skeleton-${index}`
@@ -94,7 +94,7 @@ export function ChatHomeSuggestions({
         className="w-full"
         inert={hidden}
         initial={false}
-        transition={{ duration: 0.25, ease: EASE }}
+        transition={{ duration: 0.25, ease: EASE.out }}
       >
         <div className="mb-2 flex items-center justify-between gap-3">
           {isLoading ? (
@@ -131,7 +131,11 @@ export function ChatHomeSuggestions({
                 className="min-w-0"
                 initial={reduceMotion ? undefined : { opacity: 0, y: 4 }}
                 key={suggestion.id}
-                transition={{ duration: 0.3, delay: index * 0.04, ease: EASE }}
+                transition={{
+                  duration: 0.3,
+                  delay: index * 0.04,
+                  ease: EASE.out,
+                }}
               >
                 <SuggestionCard
                   disabled={itemDisabled}

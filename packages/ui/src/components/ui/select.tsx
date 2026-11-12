@@ -130,7 +130,7 @@ function SelectContent({
         </SelectPrimitive.Popup>
         {aside ? (
           // Enters and leaves with the popup instead of popping in ahead of it.
-          <div className="origin-top-right group-data-[side=top]/select-positioner:origin-bottom-right transition-[opacity,scale] duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] starting:opacity-0 group-data-closed/select-positioner:opacity-0 group-data-closed/select-positioner:duration-100 motion-safe:starting:scale-[0.97] motion-safe:group-data-closed/select-positioner:scale-[0.97] motion-reduce:transition-none">
+          <div className="origin-top-right group-data-[side=top]/select-positioner:origin-bottom-right transition-[opacity,scale] duration-150 ease-out starting:opacity-0 group-data-closed/select-positioner:opacity-0 group-data-closed/select-positioner:duration-100 motion-safe:starting:scale-[0.97] motion-safe:group-data-closed/select-positioner:scale-[0.97] motion-reduce:transition-none">
             {aside}
           </div>
         ) : null}

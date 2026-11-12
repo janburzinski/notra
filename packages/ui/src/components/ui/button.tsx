@@ -6,7 +6,7 @@ import { cn } from "@notra/ui/lib/utils";
 import { ButtonContent } from "@notra/ui/components/ui/button-content";
 
 const buttonVariants = cva(
-  "group/button relative inline-flex shrink-0 cursor-pointer select-none items-center justify-center whitespace-nowrap rounded-lg border border-transparent font-medium text-sm outline-none transition-all duration-fast ease-out focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 active:scale-[0.97] data-disabled:not-aria-busy:cursor-not-allowed data-disabled:not-aria-busy:opacity-50 data-disabled:active:scale-100 disabled:pointer-events-none has-data-[disabled]:cursor-not-allowed aria-invalid:border-destructive aria-invalid:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg:not([class*='size-'])]:size-4 [&_svg]:pointer-events-none [&_svg]:shrink-0",
+  "group/button relative inline-flex shrink-0 cursor-pointer select-none items-center justify-center whitespace-nowrap rounded-lg border border-transparent font-medium text-sm outline-none transition-[scale,transform,background-color,color,border-color,box-shadow,filter] duration-fast ease-out focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 active:scale-[0.96] data-disabled:not-aria-busy:cursor-not-allowed data-disabled:not-aria-busy:opacity-50 data-disabled:active:scale-100 disabled:pointer-events-none has-data-[disabled]:cursor-not-allowed aria-invalid:border-destructive aria-invalid:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg:not([class*='size-'])]:size-4 [&_svg]:pointer-events-none [&_svg]:shrink-0",
   {
     variants: {
       variant: {

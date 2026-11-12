@@ -70,7 +70,7 @@ import type {
 import { resolveChatToolBlockVisuals } from "./chat-tool-block/visuals";
 
 const TOOL_DETAILS_PANEL_CLASSNAME =
-  "h-[var(--collapsible-panel-height)] overflow-hidden outline-none transition-[height,opacity] duration-normal ease-emphasized data-[ending-style]:h-0 data-[starting-style]:h-0 data-[ending-style]:opacity-0 data-[starting-style]:opacity-0 motion-reduce:transition-none";
+  "h-[var(--collapsible-panel-height)] overflow-hidden outline-none transition-[height,opacity] duration-normal ease-out data-[ending-style]:h-0 data-[starting-style]:h-0 data-[ending-style]:opacity-0 data-[starting-style]:opacity-0 motion-reduce:transition-none";
 
 const ToolOutputChart = dynamic(
   () =>
@@ -995,7 +995,7 @@ function ChatToolTrigger({
         <HugeiconsIcon
           aria-hidden
           className={cn(
-            "text-subtle-foreground size-3.5 shrink-0 transition-transform",
+            "text-subtle-foreground duration-normal size-3.5 shrink-0 transition-transform ease-out motion-reduce:transition-none",
             isOpen ? "rotate-180" : "rotate-0 opacity-0 group-hover:opacity-100"
           )}
           icon={ArrowDown01Icon}

@@ -277,7 +277,7 @@ export function PromptInputAttachment({
         render={
           <div
             className={cn(
-              "group relative flex h-8 cursor-pointer select-none items-center gap-1.5 rounded-md border border-border px-1.5 font-medium text-sm transition-all hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
+              "group relative flex h-8 cursor-pointer select-none items-center gap-1.5 rounded-md border border-border px-1.5 font-medium text-sm transition-[color,background-color] hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
               className,
             )}
             key={data.id}
@@ -1139,7 +1139,7 @@ export const PromptInputSpeechButton = ({
   return (
     <PromptInputButton
       className={cn(
-        "relative transition-all duration-normal",
+        "relative transition-[color,background-color] duration-normal",
         isListening && "animate-pulse bg-accent text-accent-foreground",
         className,
       )}

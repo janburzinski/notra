@@ -1,14 +1,24 @@
 "use client";
 
-import { ArrowDown01Icon, PlayIcon } from "@hugeicons/core-free-icons";
+import {
+  ArrowDown01Icon,
+  PlayIcon,
+  Route01Icon,
+  SmileIcon,
+  ViewIcon,
+} from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   GEO_CHANGES_SKELETON_ROWS,
   GEO_VISIBILITY_TABLE_ROWS,
 } from "@notra/geo-core/constants/geo";
 import { PageHeading } from "@notra/ui/components/shared/page-heading";
+import {
+  IconTabsList,
+  IconTabsTrigger,
+} from "@notra/ui/components/ui/icon-tabs";
 import { Skeleton } from "@notra/ui/components/ui/skeleton";
-import { Tabs, TabsList, TabsTrigger } from "@notra/ui/components/ui/tabs";
+import { Tabs } from "@notra/ui/components/ui/tabs";
 import { InstrumentModule, InstrumentSection } from "ui/card";
 import { DataTableSkeleton } from "ui/table";
 import type { DataTableSkeletonColumn } from "ui/table/types";
@@ -44,7 +54,7 @@ export function GeoPageSkeleton() {
       <div className="w-full space-y-6 px-4 lg:px-6">
         <PageHeading description={t("descriptionFallback")} title="GEO">
           <div className="flex min-w-0 flex-wrap items-center gap-2">
-            <Skeleton className="h-8 w-[8.625rem] rounded-md" />
+            <Skeleton className="h-7 w-[8.625rem] rounded-lg" />
             <Button className="w-fit gap-2" disabled size="sm">
               <HugeiconsIcon icon={PlayIcon} size={14} />
               {tGeoShared("runScan")}
@@ -54,17 +64,29 @@ export function GeoPageSkeleton() {
         </PageHeading>
         <div className="flex min-w-0 flex-col">
           <Tabs value="visibility">
-            <TabsList aria-label={tTabs("label")}>
-              <TabsTrigger disabled value="visibility">
+            <IconTabsList aria-label={tTabs("label")} value="visibility">
+              <IconTabsTrigger
+                disabled
+                icon={<HugeiconsIcon icon={ViewIcon} size={15} />}
+                value="visibility"
+              >
                 {tCommon("labels.visibility")}
-              </TabsTrigger>
-              <TabsTrigger disabled value="brand-sentiment">
+              </IconTabsTrigger>
+              <IconTabsTrigger
+                disabled
+                icon={<HugeiconsIcon icon={SmileIcon} size={15} />}
+                value="brand-sentiment"
+              >
                 {tCommon("labels.brandSentiment")}
-              </TabsTrigger>
-              <TabsTrigger disabled value="journeys">
+              </IconTabsTrigger>
+              <IconTabsTrigger
+                disabled
+                icon={<HugeiconsIcon icon={Route01Icon} size={15} />}
+                value="journeys"
+              >
                 {tCommon("labels.journeys")}
-              </TabsTrigger>
-            </TabsList>
+              </IconTabsTrigger>
+            </IconTabsList>
           </Tabs>
           <div className="mt-6 flex flex-col gap-6">
             <div className="grid grid-cols-1 items-stretch gap-4 @min-[44rem]/main:grid-cols-12">

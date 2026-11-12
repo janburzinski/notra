@@ -447,11 +447,6 @@ const MOTION_EASINGS = [
     className: "duration-slower ease-emphasized",
   },
   {
-    token: "ease-emphasized-in",
-    meta: "exits",
-    className: "duration-slower ease-emphasized-in",
-  },
-  {
     token: "ease-emphasized-in-out",
     meta: "symmetric morphs",
     className: "duration-slower ease-emphasized-in-out",

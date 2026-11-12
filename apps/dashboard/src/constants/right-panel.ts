@@ -1,8 +1,8 @@
 export const RIGHT_PANEL_PORTAL_ID = "dashboard-right-panel";
 export const RIGHT_PANEL_CLASSNAME =
   "hidden min-h-0 min-w-0 shrink-0 overflow-hidden lg:block";
-export const RIGHT_PANEL_SLOT_MOTION_CLASSNAME =
-  "panel-motion transition-[width]";
+export const RIGHT_PANEL_FRAME_MOTION_CLASSNAME =
+  "transition-[translate,opacity] duration-normal ease-out motion-reduce:transition-none starting:translate-x-4 starting:opacity-0";
 export const RIGHT_PANEL_OPEN_WIDTH_CLASSNAME = "w-[calc(24rem+0.5rem+1px)]";
 export const RIGHT_PANEL_WIDE_OPEN_WIDTH_CLASSNAME =
   "w-[calc(min(40rem,45vw)+0.5rem+1px)]";
@@ -14,3 +14,10 @@ export const RIGHT_PANEL_FRAME_WIDE_DOCKED_WIDTH_CLASSNAME =
   "w-[min(40rem,45vw)]";
 export const RIGHT_PANEL_FRAME_EXPANDED_WIDTH_CLASSNAME =
   "min-w-0 w-[calc(100%-0.5rem-1px)]";
+/**
+ * On close the slot keeps its width until the frame has faded out (200ms),
+ * then snaps to 0: a zero-length width transition with a delay, so the
+ * width never animates through in-between values.
+ */
+export const RIGHT_PANEL_SLOT_CLOSE_CLASSNAME =
+  "transition-[width] duration-0 delay-200 motion-reduce:delay-0";

@@ -36,7 +36,7 @@ export function OnboardingProgress({
           <span
             aria-current={step === current ? "step" : undefined}
             className={cn(
-              "block h-1.5 rounded-full transition-all",
+              "block h-1.5 rounded-full transition-colors",
               getStepClasses(step, current)
             )}
           />

@@ -111,7 +111,7 @@ export default function PageClient({ organizationSlug }: PageClientProps) {
         <PageHeading description={t("description")} title={t("title")}>
           <div className="flex shrink-0 flex-wrap items-center gap-2">
             <Link
-              className={buttonVariants({ variant: "outline" })}
+              className={buttonVariants({ size: "sm", variant: "outline" })}
               href={`${basePath}/runs`}
             >
               <HugeiconsIcon className="size-4" icon={Task01Icon} />
@@ -123,7 +123,7 @@ export default function PageClient({ organizationSlug }: PageClientProps) {
             >
               <DropdownMenuTrigger
                 render={
-                  <Button className="gap-1.5">
+                  <Button className="gap-1.5" size="sm">
                     <HugeiconsIcon className="size-4" icon={Add01Icon} />
                     {t("create")}
                     <Kbd className="ml-1 hidden sm:inline-flex">C</Kbd>

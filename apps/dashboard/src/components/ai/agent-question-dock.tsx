@@ -115,7 +115,7 @@ function QuestionPane({
         // the flow and fades as the next fades in, a beat later.
         active
           ? "duration-normal relative opacity-100 blur-none delay-75 ease-out"
-          : "duration-fast pointer-events-none absolute inset-x-0 top-0 opacity-0 blur-xs ease-in"
+          : "duration-fast pointer-events-none absolute inset-x-0 top-0 opacity-0 blur-xs ease-out"
       )}
       inert={!active}
     >

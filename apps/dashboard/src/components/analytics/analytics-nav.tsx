@@ -1,6 +1,12 @@
 "use client";
 
-import { Tabs, TabsList, TabsTrigger } from "@notra/ui/components/ui/tabs";
+import { ChartLineData01Icon, RankingIcon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
+import {
+  IconTabsList,
+  IconTabsTrigger,
+} from "@notra/ui/components/ui/icon-tabs";
+import { Tabs } from "@notra/ui/components/ui/tabs";
 import { useTranslations } from "use-intl";
 
 import Link from "@/components/framework/link";
@@ -17,22 +23,24 @@ export function AnalyticsNav({ slug }: AnalyticsNavProps) {
 
   return (
     <Tabs value={value}>
-      <TabsList variant="line">
-        <TabsTrigger
+      <IconTabsList value={value}>
+        <IconTabsTrigger
+          icon={<HugeiconsIcon icon={ChartLineData01Icon} size={15} />}
           nativeButton={false}
           render={<Link href={base} />}
           value="overview"
         >
           {tCommon("labels.overview")}
-        </TabsTrigger>
-        <TabsTrigger
+        </IconTabsTrigger>
+        <IconTabsTrigger
+          icon={<HugeiconsIcon icon={RankingIcon} size={15} />}
           nativeButton={false}
           render={<Link href={`${base}/leaderboard`} />}
           value="leaderboard"
         >
           {tCommon("labels.leaderboard")}
-        </TabsTrigger>
-      </TabsList>
+        </IconTabsTrigger>
+      </IconTabsList>
     </Tabs>
   );
 }
