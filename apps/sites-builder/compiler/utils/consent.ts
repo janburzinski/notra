@@ -7,6 +7,7 @@ import {
 import type { SiteDiagnostic } from "@notra/sites-core/types/build";
 import type { SiteConfig } from "@notra/sites-core/types/site-config";
 import type { SiteIntegrations } from "@notra/sites-core/types/site-integrations";
+import { parseSiteHost } from "@notra/sites-core/utils/hosts";
 import {
   analyticsGatedByConsent,
   datafastScript,
@@ -157,9 +158,12 @@ export function consentDiagnostics(
       code: "consent_script_missing",
       message: `integrations.c15t.scripts lists ${path}, but there is no custom script at that path.`,
     }));
+  // Previews always run on the hosting domain, even when production uses the site's own domain.
   if (
     config.integrations.c15t?.crossSubdomain &&
-    onHostingDomain(publicOrigin, hostingDomain)
+    hostingDomain &&
+    parseSiteHost(new URL(publicOrigin).hostname, hostingDomain)?.kind ===
+      "alias"
   ) {
     diagnostics.push({
       severity: "warning",

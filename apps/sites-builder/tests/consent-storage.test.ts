@@ -44,12 +44,26 @@ test("crossSubdomain is ignored on the hosting domain, where every other site co
       defaultDomain: undefined,
       storageKey: "__Host-c15t",
     });
-    expect(
-      consentDiagnostics(config(true), [], origin, "notra.site")
-    ).toMatchObject([
-      { severity: "warning", code: "consent_cross_subdomain_ignored" },
-    ]);
   }
+  expect(
+    consentDiagnostics(
+      config(true),
+      [],
+      "https://acme.notra.site",
+      "notra.site"
+    )
+  ).toMatchObject([
+    { severity: "warning", code: "consent_cross_subdomain_ignored" },
+  ]);
+  // Previews always run on notra.site, so the warning would show on every preview of a custom-domain site.
+  expect(
+    consentDiagnostics(
+      config(true),
+      [],
+      "https://pr-1--acme.notra.site",
+      "notra.site"
+    )
+  ).toEqual([]);
   expect(
     storageConfig(true, "https://blog.acme.com", "notra.site")
   ).toMatchObject({ defaultDomain: ".acme.com", storageKey: undefined });
