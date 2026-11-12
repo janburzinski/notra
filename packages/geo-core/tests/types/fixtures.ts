@@ -12,5 +12,7 @@ export type ScanSettingsInput = Partial<
     | "lastScanAt"
     | "languages"
     | "promptLanguage"
+    | "engines"
+    | "enforceZdr"
   >
 >;
