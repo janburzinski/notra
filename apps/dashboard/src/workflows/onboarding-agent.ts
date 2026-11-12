@@ -58,6 +58,12 @@ export async function onboardingAgentWorkflow(
         poll,
         softLimitPolls: AGENT_RUN_SOFT_LIMIT_POLLS,
       });
+      if (state.organizationDeleted) {
+        console.info(
+          `[Onboarding Agent] Organization ${organizationId} was deleted, stopping the run`
+        );
+        return { status: "organization_deleted", polls: poll };
+      }
       if (state.ran) {
         await trackWorkflowOutcome({
           workflow: WORKFLOW_ANALYTICS_NAMES.ONBOARDING_AGENT,

@@ -159,7 +159,10 @@ export const onboardingRouter = {
     .use(withOrganizationAccess)
     .handler(async ({ input }) => {
       return resolveOnboardingAgentRunState(
-        await getOnboardingAgentState(input.organizationId)
+        (await getOnboardingAgentState(input.organizationId)) ?? {
+          ran: false,
+          startedAt: null,
+        }
       );
     }),
   runAgent: authorizedProcedure

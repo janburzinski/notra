@@ -20,15 +20,18 @@ export async function getOnboardingAgentStateStep(input: {
   organizationId: string;
   poll: number;
   softLimitPolls: number;
-}): Promise<{ ran: boolean }> {
+}): Promise<{ ran: boolean; organizationDeleted: boolean }> {
   "use step";
   const state = await getOnboardingAgentState(input.organizationId);
+  if (!state) {
+    return { ran: false, organizationDeleted: true };
+  }
   if (!state.ran && input.poll === input.softLimitPolls) {
     logError("[Onboarding Agent] Run exceeded the soft time limit", undefined, {
       organizationId: input.organizationId,
     });
   }
-  return state;
+  return { ran: state.ran, organizationDeleted: false };
 }
 
 export async function releaseOnboardingAgentReservationStep(input: {

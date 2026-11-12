@@ -327,8 +327,11 @@ export async function getOnboardingAgentState(organizationId: string) {
     columns: { onboardingAgentRan: true, onboardingAgentStartedAt: true },
     where: eq(organizations.id, organizationId),
   });
+  if (!organization) {
+    return null;
+  }
   return {
-    ran: organization?.onboardingAgentRan ?? false,
-    startedAt: organization?.onboardingAgentStartedAt ?? null,
+    ran: organization.onboardingAgentRan,
+    startedAt: organization.onboardingAgentStartedAt,
   };
 }
