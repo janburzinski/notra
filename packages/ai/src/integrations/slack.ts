@@ -4,6 +4,7 @@ import {
   SLACK_API_BASE_URL,
   SLACK_CHANNEL_NAME_MAX_LENGTH,
   SLACK_CONNECT_DOMAIN_PURPOSE_PREFIX,
+  SLACK_TOKEN_WIDE_ERROR_CODES,
   SLACK_REQUEST_TIMEOUT_MS,
 } from "../constants/slack";
 import {
@@ -432,14 +433,31 @@ const setSlackChannelPurposeEffect = Effect.fn("setSlackChannelPurpose")(
   }
 );
 
+const isSlackTokenWideError = (error: { _tag: string; code?: string }) =>
+  error._tag === "SlackApiError" &&
+  SLACK_TOKEN_WIDE_ERROR_CODES.has(error.code ?? "");
+
 const channelHasDomainMemberEffect = Effect.fn("channelHasDomainMember")(
   function* (channelId: string, domain: string, supportMemberIds: string[]) {
     const memberIds = yield* listSlackChannelMemberIdsEffect(channelId);
     const others = memberIds.filter((id) => !supportMemberIds.includes(id));
-    const users = yield* Effect.forEach(others, getSlackUserEffect, {
-      concurrency: 5,
-    });
-    return users.some((user) => user.email?.endsWith(`@${domain}`));
+    const emails = yield* Effect.forEach(
+      others,
+      (userId) =>
+        getSlackUserEffect(userId).pipe(
+          Effect.map((user) => user.email),
+          Effect.catchIf(
+            (error) => !isSlackTokenWideError(error),
+            (error) =>
+              Effect.logWarning("Slack user lookup failed").pipe(
+                Effect.annotateLogs({ channelId, userId, error }),
+                Effect.as(undefined)
+              )
+          )
+        ),
+      { concurrency: 5 }
+    );
+    return emails.some((email) => email?.endsWith(`@${domain}`));
   }
 );
 
@@ -452,7 +470,6 @@ const hasSlackConnectChannelForDomainEffect = Effect.fn(
   if (channels.some((channel) => channel.purpose?.value === purpose)) {
     return true;
   }
-  let lookupError: unknown;
   for (const channel of channels) {
     if (!channel.is_ext_shared) {
       continue;
@@ -461,15 +478,23 @@ const hasSlackConnectChannelForDomainEffect = Effect.fn(
       channel.id,
       domain,
       supportMemberIds
-    ).pipe(Effect.retry({ times: 2 }), Effect.result);
+    ).pipe(
+      Effect.retry({
+        times: 2,
+        while: (error) => !isSlackTokenWideError(error),
+      }),
+      Effect.result
+    );
     if (Result.isFailure(lookup)) {
-      lookupError = lookup.failure;
+      yield* Effect.logWarning("Slack channel domain lookup failed").pipe(
+        Effect.annotateLogs({ channelId: channel.id, error: lookup.failure })
+      );
+      if (isSlackTokenWideError(lookup.failure)) {
+        return false;
+      }
     } else if (lookup.success) {
       return true;
     }
-  }
-  if (lookupError) {
-    return yield* Effect.fail(lookupError);
   }
   return false;
 });

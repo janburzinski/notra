@@ -11,3 +11,11 @@ export const SLACK_CONNECT_DOMAIN_PURPOSE_PREFIX = "Notra onboarding for ";
 export const SLACK_INVALID_CHANNEL_CHARS_REGEX = /[^a-z0-9_-]+/g;
 export const SLACK_HYPHEN_RUNS_REGEX = /-{2,}/g;
 export const SLACK_EDGE_HYPHENS_REGEX = /^-+|-+$/g;
+export const SLACK_TOKEN_WIDE_ERROR_CODES = new Set([
+  "missing_scope",
+  "invalid_auth",
+  "not_authed",
+  "token_revoked",
+  "token_expired",
+  "account_inactive",
+]);

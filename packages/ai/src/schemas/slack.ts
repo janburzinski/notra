@@ -34,7 +34,11 @@ export class SlackApiError extends Schema.TaggedError<SlackApiError>()(
     code: Schema.String,
     operation: Schema.String,
   }
-) {}
+) {
+  override get message() {
+    return `${this.operation}: ${this.code}`;
+  }
+}
 
 export class SlackSetupError extends Schema.TaggedError<SlackSetupError>()(
   "SlackSetupError",
