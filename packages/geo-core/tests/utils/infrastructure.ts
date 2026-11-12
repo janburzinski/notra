@@ -23,7 +23,7 @@ mock.module("@notra/ai/utils/geo-opencode-box", () => ({
 }));
 
 mock.module("../../src/geo/model-catalog", () => ({
-  loadGeoModelCatalog: () => Effect.succeed(seedGeoModelCatalog()),
+  loadGeoModelCatalog: () => Effect.succeed(seedGeoModelCatalog(false)),
 }));
 export const mockAskGeoOpenCode = mock<typeof askGeoOpenCode>(() => {
   throw new Error("Unexpected OpenCode request");

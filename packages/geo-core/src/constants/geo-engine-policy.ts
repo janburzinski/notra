@@ -1,18 +1,3 @@
-export const GEO_ENGINE_POLICY_EFFECTIVE_AT = Date.parse(
-  "2026-11-12T00:00:00Z"
-);
-
-export const GEO_ENGINE_POLICY_NEW_ORGS_FROM = Date.parse(
-  "2026-11-08T00:00:00Z"
-);
-
-export const GEO_LEGACY_DEFAULT_ENGINE_IDS: ReadonlySet<string> = new Set([
-  "anthropic/claude-opus-5.5",
-  "openai/gpt-5.6-sol",
-  "google/gemini-3.8-flash",
-  "spacexai/grok-4.7",
-]);
-
 const GEO_CLAUDE_ENGINE_ID = "anthropic/claude-haiku-5.5";
 const GEO_KIMI_ENGINE_ID = "moonshotai/kimi-k2";
 const GEO_GLM_ENGINE_ID = "zai/glm-5.3-flash";

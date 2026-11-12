@@ -3098,8 +3098,6 @@
       "overLimitHint": "Dein Projekt trackt {current} von {limit} Wettbewerbern. Entferne zuerst welche, um den Rest zu importieren."
     },
     "geoEnginePicker": {
-      "approvedWithoutZdr": "Ohne ZDR freigegeben",
-      "noZdrHost": "Kein ZDR-Host",
       "toggleModel": "{model} umschalten",
       "choosePlan": "Wähle einen Tarif, bevor du Zero Data Retention hinzufügst.",
       "enforceZdr": "ZDR erzwingen",
@@ -3118,21 +3116,14 @@
       "enableWithoutZdr": "Ohne ZDR aktivieren",
       "turnOffTitle": "{model} ausschalten?",
       "turnOffDescription": "Die folgenden bisherigen Modelle werden entfernt: {model}. Sobald du diese Änderung speicherst, kannst du sie diesem Projekt nicht wieder hinzufügen.",
-      "legacyModel": "Bisheriges Modell",
-      "legacyModelDescription": "Du kannst dieses Modell weiterhin nutzen. Sobald du es entfernst und speicherst, kannst du es diesem Projekt nicht wieder hinzufügen.",
       "turnOff": "Ausschalten",
       "toggleProvider": "{provider} ein- oder ausschalten",
       "providerOff": "Aus",
       "title": "KI-Assistenten",
-      "advancedDescription": "Wähle genau, welche Modelle jeder Assistent nutzt. Jeder Prompt läuft auf jedem ausgewählten Modell.",
       "recommended": "Empfohlen",
-      "modelsFor": "Modelle von {provider}",
-      "noWebSearch": "Keine Websuche",
       "settingsTitle": "Scan-Einstellungen",
       "description": "{count, plural, =0 {Schalte die Assistenten ein, die du verfolgen willst.} one {# Assistent aktiv. Wir wählen jeweils das beste Modell.} other {# Assistenten aktiv. Wir wählen jeweils das beste Modell.}}",
-      "advanced": "Erweitert",
-      "options": "Optionen",
-      "selectedModels": "{model} +{count}"
+      "options": "Optionen"
     },
     "geoIngestSetup": {
       "agentPrompt": "Agent-Prompt",

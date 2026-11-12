@@ -1,69 +1,28 @@
-import { db } from "@notra/db/drizzle";
-import { organizations } from "@notra/db/schema";
-import { eq } from "drizzle-orm";
 import { Effect } from "effect";
 
-import { GEO_PAID_CODING_AGENT_ENGINE_IDS } from "../constants/geo";
+import { GEO_ENGINE_DISPLAY_LABELS } from "../constants/geo-engine-policy";
 import {
-  GEO_ENGINE_DISPLAY_LABELS,
-  GEO_LEGACY_DEFAULT_ENGINE_IDS,
-} from "../constants/geo-engine-policy";
-import {
-  GEO_MODEL_CATALOG_STATIC,
   GEO_MODEL_FEED_RETRY_SECONDS,
   GEO_MODEL_FEED_REVALIDATE_SECONDS,
   GEO_MODEL_FEED_TIMEOUT_MS,
   GEO_MODEL_FEED_URL,
-  GEO_MODEL_NO_SEARCH_VISIBLE,
 } from "../constants/geo-model-catalog";
 import { GeoEngineCredentialsRequired } from "../deps";
 import { geoModelFeedSchema } from "../schemas/geo-model-feed";
-import type {
-  GeoModelCatalog,
-  GeoModelCatalogEntry,
-  GeoResolvedModelCatalog,
-} from "../types/geo";
-import {
-  isGeoEnginePolicyActiveFor,
-  isGeoSelfServeEngine,
-} from "../utils/geo-engine-policy";
-import { isGeoNativeSearchEngine } from "../utils/geo-engines";
-import { resolveGroundedEngines } from "../utils/geo-grounded-engines";
+import type { GeoModelCatalog, GeoResolvedModelCatalog } from "../types/geo";
+import { isGeoSelfServeEngine } from "../utils/geo-engine-policy";
 import { logGeoFailure } from "../utils/geo-log";
 import {
   buildGeoModelCatalogFromFeed,
   seedGeoModelCatalog,
   withoutGeoModelCatalogEntries,
 } from "../utils/geo-model-catalog";
-import { loadGeoCodingAgentAccess } from "./coding-agent-access";
 
 const MS_PER_SECOND = 1000;
 
 interface NextRevalidateRequestInit extends RequestInit {
   next?: { revalidate?: number };
 }
-
-const organizationCreatedAt = new Map<string, Date | null>();
-
-async function loadOrganizationCreatedAt(
-  organizationId: string
-): Promise<Date | null> {
-  const cached = organizationCreatedAt.get(organizationId);
-  if (cached !== undefined) {
-    return cached;
-  }
-  const row = await db.query.organizations.findFirst({
-    where: eq(organizations.id, organizationId),
-    columns: { createdAt: true },
-  });
-  const createdAt = row?.createdAt ?? null;
-  organizationCreatedAt.set(organizationId, createdAt);
-  return createdAt;
-}
-
-const STATIC_ENGINE_IDS = new Set(
-  GEO_MODEL_CATALOG_STATIC.map((entry) => entry.id)
-);
 
 const cachedByCredentials = new Map<
   boolean,
@@ -141,104 +100,26 @@ async function loadSharedGeoModelCatalog(
 }
 
 export const loadGeoModelCatalog = Effect.fn("geo.modelCatalog")(function* (
-  organizationId: string
+  _organizationId: string
 ) {
   const requireCredentials = yield* GeoEngineCredentialsRequired;
-  const [catalog, codingAgentsAllowed, createdAt] = yield* Effect.all(
-    [
-      Effect.promise(() => loadSharedGeoModelCatalog(requireCredentials)),
-      loadGeoCodingAgentAccess(organizationId),
-      Effect.promise(() =>
-        loadOrganizationCreatedAt(organizationId).catch(() => null)
-      ),
-    ],
-    { concurrency: "unbounded" }
+  const catalog = yield* Effect.promise(() =>
+    loadSharedGeoModelCatalog(requireCredentials)
   );
-  const policyActive = isGeoEnginePolicyActiveFor(createdAt);
-  const available: GeoModelCatalog = {
-    ...withoutGeoModelCatalogEntries(catalog, [
-      ...(codingAgentsAllowed ? [] : GEO_PAID_CODING_AGENT_ENGINE_IDS),
-      ...(policyActive
-        ? catalog.models
-            .filter((model) => !isGeoSelfServeEngine(model.id))
-            .map((model) => model.id)
-        : []),
-    ]),
-    enginePolicyActive: policyActive,
-  };
-  const grounded = new Set(
-    available.models
-      .filter(
-        (model) => resolveGroundedEngines([model.id], available).length > 0
-      )
+  const available = withoutGeoModelCatalogEntries(
+    catalog,
+    catalog.models
+      .filter((model) => !isGeoSelfServeEngine(model.id))
       .map((model) => model.id)
   );
-  const searchless = new Set(
-    available.models
-      .filter(
-        (model) =>
-          !grounded.has(model.id) &&
-          !isGeoNativeSearchEngine(available, model.id)
-      )
-      .map((model) => model.id)
-  );
-  const listedSearchless = newestSearchlessModels(available, searchless);
   const resolved: GeoResolvedModelCatalog = {
     ...available,
     models: available.models.map((model) => ({
       ...model,
-      ...(policyActive
-        ? {
-            label: GEO_ENGINE_DISPLAY_LABELS[model.id] ?? model.label,
-            hidden: false,
-          }
-        : {
-            default: GEO_LEGACY_DEFAULT_ENGINE_IDS.has(model.id),
-            hidden:
-              model.hidden ||
-              (searchless.has(model.id) && !listedSearchless.has(model.id)),
-          }),
-      supportsGroundedChecks: grounded.has(model.id),
+      label: GEO_ENGINE_DISPLAY_LABELS[model.id] ?? model.label,
+      hidden: false,
+      supportsGroundedChecks: false,
     })),
   };
   return resolved;
 });
-
-/**
- * Gateway models without web search stay listed only as each provider's
- * newest few; the rest are legacy-only. Static engines without search
- * (Cursor) stay legacy-only.
- */
-function newestSearchlessModels(
-  catalog: GeoModelCatalog,
-  searchless: ReadonlySet<string>
-): Set<string> {
-  const byProvider = new Map<string, GeoModelCatalogEntry[]>();
-  for (const model of catalog.models) {
-    if (
-      model.hidden ||
-      !searchless.has(model.id) ||
-      STATIC_ENGINE_IDS.has(model.id)
-    ) {
-      continue;
-    }
-    byProvider.set(model.provider, [
-      ...(byProvider.get(model.provider) ?? []),
-      model,
-    ]);
-  }
-  // Undated models can't be ranked, so they never count against the limit.
-  return new Set(
-    [...byProvider.values()]
-      .flatMap((models) => [
-        ...models
-          .filter((model) => model.released)
-          .toSorted((left, right) =>
-            right.released.localeCompare(left.released)
-          )
-          .slice(0, GEO_MODEL_NO_SEARCH_VISIBLE),
-        ...models.filter((model) => !model.released),
-      ])
-      .map((model) => model.id)
-  );
-}

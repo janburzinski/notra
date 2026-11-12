@@ -2,7 +2,6 @@ import { AiCreditsDepletedEmail } from "@notra/email/emails/ai-credits-depleted"
 import { FeedbackEmail } from "@notra/email/emails/feedback";
 import { FirstScanResultsEmail } from "@notra/email/emails/first-scan-results";
 import { GeoAlertEmail } from "@notra/email/emails/geo-alert";
-import { GeoEngineChangeEmail } from "@notra/email/emails/geo-engine-change";
 import { ScheduledContentCreatedEmail } from "@notra/email/emails/schedule-content-created";
 import { ScheduledContentFailedEmail } from "@notra/email/emails/schedule-content-failed";
 import { ScheduledContentSkippedEmail } from "@notra/email/emails/schedule-content-skipped";
@@ -23,7 +22,6 @@ import type {
   SendFeedbackEmailProps,
   SendFirstScanResultsEmailProps,
   SendGeoAlertEmailProps,
-  SendGeoEngineChangeEmailProps,
   SendScheduledContentCreatedEmailProps,
   SendScheduledContentFailedEmailProps,
   SendScheduledContentSkippedEmailProps,
@@ -296,21 +294,6 @@ export async function sendGeoAlertEmail({
     subject: props.headline,
     react: GeoAlertEmail(props),
     idempotencyKey: `${recipientEmail}:${props.organizationSlug}:alert:${alertKey}`,
-  });
-}
-
-export async function sendGeoEngineChangeEmail({
-  recipientEmail,
-  ...props
-}: SendGeoEngineChangeEmailProps) {
-  return sendBrewEmail({
-    category: "workflow-paused",
-    to: recipientEmail,
-    subject: props.codingAgents
-      ? `Coding agent tracking stops on ${props.effectiveDate}`
-      : `Notra tracks each AI assistant as one line from ${props.effectiveDate}`,
-    react: GeoEngineChangeEmail(props),
-    idempotencyKey: `geo-engine-change-2026-11:${props.organizationSlug}:${recipientEmail}`,
   });
 }
 

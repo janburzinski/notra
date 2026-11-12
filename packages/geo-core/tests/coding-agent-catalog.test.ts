@@ -76,20 +76,6 @@ describe("coding-agent catalog and paid-plan boundaries", () => {
     }
   );
 
-  test("migrates retired coding-agent selections to available successors", () => {
-    expect(
-      resolveTrackedEngines(seedGeoModelCatalog(), [
-        "opencode/gpt-5.6-sol-medium",
-        "claude-code/claude-opus-5",
-        "codex/gpt-5.6-sol-rei",
-      ])
-    ).toEqual([
-      "opencode/gpt-6.1-sol-medium",
-      "claude-code/claude-opus-5.5",
-      "codex/gpt-6.1-sol",
-    ]);
-  });
-
   test.each([
     "opencode/gpt-5.6-sol-medium",
     "claude-code/claude-opus-5",
@@ -104,48 +90,6 @@ describe("coding-agent catalog and paid-plan boundaries", () => {
     "%s is not classified as historical web search",
     (engine) => {
       expect(geoEngineUsedWebSearch(engine)).toBe(false);
-    }
-  );
-
-  test.each([false, true])(
-    "paid=%s gates every coding engine without rollout flags",
-    async (paid) => {
-      const catalog = await Effect.runPromise(
-        loadGeoModelCatalog(`paid-${paid}`).pipe(
-          Effect.provideService(GeoCodingAgentAccessService, {
-            hasPaidPlanForOrganization: () => Effect.succeed(paid),
-          })
-        )
-      );
-      expect(
-        catalog.models.some((model) => model.id === GEO_CURSOR_ENGINE_ID)
-      ).toBe(paid);
-      for (const [engine] of CODING_AGENT_TARGETS) {
-        expect(catalog.models.some((model) => model.id === engine)).toBe(paid);
-      }
-      expect(
-        catalog.models.some((model) => model.id === "openai/gpt-5.4-mini")
-      ).toBe(true);
-      if (!paid) {
-        expect(resolveTrackedEngines(catalog, ["codex/gpt-6-astra"])).toEqual(
-          []
-        );
-        expect(geoScanEmptyEngineSkipReason([], 0)).toBe(
-          "scoped_engines_missing"
-        );
-        expect(
-          catalog.providers.some((provider) =>
-            ["cursor", "opencode", "claude-code", "codex"].includes(provider.id)
-          )
-        ).toBe(false);
-        expect(
-          scopeGeoScanEngines(
-            catalog,
-            [],
-            CODING_AGENT_TARGETS.map(([engine]) => engine)
-          )
-        ).toEqual([]);
-      }
     }
   );
 

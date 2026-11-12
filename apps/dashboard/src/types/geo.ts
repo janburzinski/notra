@@ -1308,12 +1308,8 @@ export interface GeoEngineProviderEntry {
 
 export interface GeoEngineProviderRowProps
   extends GeoEngineProviderSharedProps, GeoEngineProviderEntry {
-  advanced: boolean;
   id: string;
 }
-
-export interface GeoEngineModelMenuProps
-  extends GeoEngineProviderSharedProps, GeoEngineProviderEntry {}
 
 export type GeoFlagState = "enabled" | "disabled" | "unavailable";
 

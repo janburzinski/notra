@@ -30,7 +30,6 @@ export const localStorageKeys = {
     `notra:github-publish-repository:v1:${organizationId}`,
   welcomeTourSeen: "notra:welcome-tour-seen",
   connectAgentDismissed: "notra:connect-agent-dismissed:v1",
-  geoModelsAdvanced: "notra:geo-models-advanced:v1",
   uiSounds: "notra:ui-sounds:v1",
   siteSettingsGroupCollapsed: (id: string) =>
     `notra:site-settings-group-collapsed:v1:${id}`,

@@ -6,7 +6,6 @@ import {
 import { GEO_META_SEARCH_MODEL_IDS } from "../constants/geo-model-catalog";
 import type { GeoGroundedEngine, GeoModelCatalog } from "../types/geo";
 import { engineModelOf } from "./geo-engine-family";
-import { isGeoEnginePolicyActive } from "./geo-engine-policy";
 
 const GATEWAY_GROUNDED_PROVIDER_IDS: ReadonlySet<string> = new Set(
   GEO_GROUNDED_PROVIDERS.filter((entry) =>
@@ -66,28 +65,10 @@ export function resolveGroundedEngineByKey(
   };
 }
 
-/** Web-search variants of explicitly selected models; never add other models. */
+/** Web-search variants are retired; scans run only the offered engines. */
 export function resolveGroundedEngines(
-  selectedEngines: readonly string[],
-  catalog: GeoModelCatalog
+  _selectedEngines: readonly string[],
+  _catalog: GeoModelCatalog
 ): GeoGroundedEngine[] {
-  if (catalog.enginePolicyActive ?? isGeoEnginePolicyActive()) {
-    return [];
-  }
-  return [...new Set(selectedEngines)].flatMap((modelId) => {
-    const model = catalog.models.find((entry) => entry.id === modelId);
-    if (!model) {
-      return [];
-    }
-    const direct =
-      model.provider === "perplexity"
-        ? null
-        : resolveGroundedEngineByKey(`${modelId}-direct-grounded`);
-    const engine =
-      direct ??
-      (model.gateways.includes("vercel")
-        ? resolveGroundedEngineByKey(`${modelId}-grounded`)
-        : null);
-    return engine ? [{ ...engine, label: model.label }] : [];
-  });
+  return [];
 }

@@ -1,5 +1,4 @@
 import type { FeedbackSentiment } from "@notra/email/types/feedback";
-import type { GeoEngineChangeEmailProps } from "@notra/email/types/geo-engine-change";
 import type {
   FirstScanResultsEmailProps,
   GeoAlertEmailProps,
@@ -111,10 +110,6 @@ export interface SendGeoAlertEmailProps extends GeoAlertEmailProps {
 export interface SendWelcomeEmailProps {
   userEmail: string;
   slackInvited: boolean;
-}
-
-export interface SendGeoEngineChangeEmailProps extends GeoEngineChangeEmailProps {
-  recipientEmail: string;
 }
 
 export interface SendSiteSuspendedEmailProps extends SiteSuspendedEmailProps {

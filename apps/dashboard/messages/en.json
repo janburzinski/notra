@@ -3098,8 +3098,6 @@
       "overLimitHint": "Your project tracks {current} of {limit} competitors. Remove some first to import the rest."
     },
     "geoEnginePicker": {
-      "approvedWithoutZdr": "Approved without ZDR",
-      "noZdrHost": "No ZDR host",
       "toggleModel": "Toggle {model}",
       "choosePlan": "Choose a plan before adding zero data retention.",
       "enforceZdr": "Enforce ZDR",
@@ -3118,21 +3116,14 @@
       "enableWithoutZdr": "Enable without ZDR",
       "turnOffTitle": "Turn off {model}?",
       "turnOffDescription": "The following legacy models will be removed: {model}. Once you save this change, you cannot add them back to this project.",
-      "legacyModel": "Legacy",
-      "legacyModelDescription": "You can keep using this model. Once you remove it and save, you cannot add it back to this project.",
       "turnOff": "Turn off",
       "toggleProvider": "Turn {provider} on or off",
       "providerOff": "Off",
       "title": "AI assistants",
-      "advancedDescription": "Choose the exact models each assistant runs. Every prompt runs on each selected model.",
       "recommended": "Recommended",
-      "modelsFor": "{provider} models",
-      "noWebSearch": "No web search",
       "settingsTitle": "Scan settings",
       "description": "{count, plural, =0 {Turn on the assistants you want to track.} one {# assistant on. We pick the best model for each one.} other {# assistants on. We pick the best model for each one.}}",
-      "advanced": "Advanced",
-      "options": "Options",
-      "selectedModels": "{model} +{count}"
+      "options": "Options"
     },
     "geoIngestSetup": {
       "agentPrompt": "Agent prompt",

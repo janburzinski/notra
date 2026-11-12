@@ -1,7 +1,6 @@
 import {
   GEO_DIRECT_GROUNDED_PROVIDERS,
   GEO_OPENCODE_ENGINE_ID,
-  GEO_PAID_CODING_AGENT_ENGINE_IDS,
 } from "../constants/geo";
 import {
   GEO_MODEL_BATCH_SUFFIX,
@@ -19,10 +18,7 @@ import type {
 import { isGeoBoxCodingAgent } from "./geo-coding-agents";
 import { isGeoContextEngine } from "./geo-context";
 import { engineModelOf } from "./geo-engine-family";
-import {
-  geoEnginePolicyReplacement,
-  isGeoEnginePolicyActive,
-} from "./geo-engine-policy";
+import { geoEnginePolicyReplacement } from "./geo-engine-policy";
 import {
   geoDefaultEngines,
   getGeoModelCatalogEntry,
@@ -174,16 +170,7 @@ export function resolveTrackedEngines(
 ): string[] {
   const configured = remapRetiredGeoEngineIds(stored ?? []);
   const selected = sortKnownEngines(catalog, configured);
-  if (
-    selected.length > 0 ||
-    (!isGeoEnginePolicyActive() &&
-      configured.some((engine) =>
-        GEO_PAID_CODING_AGENT_ENGINE_IDS.includes(engine)
-      ))
-  ) {
-    return selected;
-  }
-  return geoDefaultEngines(catalog);
+  return selected.length > 0 ? selected : geoDefaultEngines(catalog);
 }
 
 /**

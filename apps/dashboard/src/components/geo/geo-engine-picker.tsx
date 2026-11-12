@@ -1,11 +1,10 @@
 "use client";
 
-import { MoreHorizontalIcon, UnfoldMoreIcon } from "@hugeicons/core-free-icons";
+import { MoreHorizontalIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import type { GeoModelCatalogEntry } from "@notra/geo-core/types/geo";
 import {
   applyGeoZdrEngineFallback,
-  isGeoWebSearchEngine,
   sortKnownEngines,
 } from "@notra/geo-core/utils/geo-engines";
 import { isGeoOlostepEngine } from "@notra/geo-core/utils/geo-olostep";
@@ -13,9 +12,7 @@ import { ConfirmDialog } from "@notra/ui/components/shared/confirm-dialog";
 import { Button } from "@notra/ui/components/ui/button";
 import {
   DropdownMenu,
-  DropdownMenuCheckboxItem,
   DropdownMenuContent,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@notra/ui/components/ui/dropdown-menu";
 import { Label } from "@notra/ui/components/ui/label";
@@ -27,10 +24,8 @@ import { useTranslations } from "use-intl";
 
 import { EngineIcon } from "@/components/geo/engine-icon";
 import { ZDR_CHECKOUT_SUCCESS_PARAM } from "@/constants/billing";
-import { useGeoModelsAdvanced } from "@/lib/hooks/use-geo-models-advanced";
 import { cn } from "@/lib/utils";
 import type {
-  GeoEngineModelMenuProps,
   GeoEnginePickerProps,
   GeoEngineProviderRowProps,
   GeoPendingModelRemoval,
@@ -59,9 +54,6 @@ export function GeoEnginePicker({
 }: GeoEnginePickerProps) {
   const t = useTranslations("geo.geoEnginePicker");
   const id = useId();
-  const { advanced: advancedPreference, setAdvanced } = useGeoModelsAdvanced();
-  const legacyPicker = !catalog.enginePolicyActive;
-  const advanced = legacyPicker && advancedPreference;
   const checkoutReturnHandled = useRef(false);
   const approvedNonZdrIds = new Set(nonZdrApproved);
   const [pendingApproval, setPendingApproval] =
@@ -82,24 +74,19 @@ export function GeoEnginePicker({
     .join(", ");
 
   // Which rows count as primary is decided from the selection when the pane
-  // opens or Advanced flips, not on every toggle: otherwise a provider jumps
-  // up the list as it is turned on, or vanishes as it is turned off.
-  const [pinned, setPinned] = useState(() => ({
-    advanced,
-    selected: new Set(selected),
-  }));
-  if (pinned.advanced !== advanced) {
-    setPinned({ advanced, selected: new Set(selected) });
-  }
+  // opens, not on every toggle: otherwise a provider jumps up the list as it
+  // is turned on.
+  const [pinnedSelected] = useState(() => new Set(selected));
   const providers = geoPickerProviders(catalog, selectedIds);
   const isPrimary = ({ provider, models }: (typeof providers)[number]) =>
     provider.featured ||
     recommended.has(provider.id) ||
     (audience === "technical" && isGeoCodingAgentProvider(provider.id)) ||
-    models.some((model) => pinned.selected.has(model.id));
-  const primary = providers.filter(isPrimary);
-  const more = providers.filter((entry) => !isPrimary(entry));
-  const visible = advanced || !legacyPicker ? [...primary, ...more] : primary;
+    models.some((model) => pinnedSelected.has(model.id));
+  const visible = [
+    ...providers.filter(isPrimary),
+    ...providers.filter((entry) => !isPrimary(entry)),
+  ];
 
   const select = (ids: readonly string[]) => {
     const eligible = ids.filter((id) =>
@@ -299,7 +286,7 @@ export function GeoEnginePicker({
     <>
       <TitleCard
         action={
-          menu || legacyPicker ? (
+          menu ? (
             <DropdownMenu>
               <DropdownMenuTrigger
                 render={
@@ -318,18 +305,6 @@ export function GeoEnginePicker({
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-auto min-w-52">
                 {menu}
-                {menu && legacyPicker ? <DropdownMenuSeparator /> : null}
-                {legacyPicker ? (
-                  <DropdownMenuCheckboxItem
-                    checked={advanced}
-                    closeOnClick={false}
-                    disabled={disabled}
-                    indicator="switch"
-                    onCheckedChange={setAdvanced}
-                  >
-                    {t("advanced")}
-                  </DropdownMenuCheckboxItem>
-                ) : null}
               </DropdownMenuContent>
             </DropdownMenu>
           ) : null
@@ -342,7 +317,6 @@ export function GeoEnginePicker({
         <ul className="flex flex-col gap-0.5">
           {visible.map((entry) => (
             <GeoEngineProviderRow
-              advanced={advanced}
               id={id}
               key={entry.provider.id}
               {...entry}
@@ -407,7 +381,6 @@ export function GeoEnginePicker({
 }
 
 function GeoEngineProviderRow({
-  advanced,
   id,
   models,
   provider,
@@ -440,9 +413,6 @@ function GeoEngineProviderRow({
         >
           {provider.label}
         </label>
-        {enabled && advanced && models.length > 1 ? (
-          <GeoEngineModelMenu models={models} provider={provider} {...props} />
-        ) : null}
       </span>
       <Switch
         aria-label={t("toggleProvider", { provider: provider.label })}
@@ -454,95 +424,4 @@ function GeoEngineProviderRow({
       />
     </li>
   );
-}
-
-function GeoEngineModelMenu({
-  approvedNonZdrIds,
-  catalog,
-  disabled,
-  lastSelected,
-  models,
-  onToggleModel,
-  provider,
-  selectedIds,
-  zdrActive,
-}: GeoEngineModelMenuProps) {
-  const t = useTranslations("geo.geoEnginePicker");
-  const [first, ...rest] = models.filter((model) => selectedIds.has(model.id));
-  const label =
-    rest.length > 0
-      ? t("selectedModels", { model: first?.label ?? "", count: rest.length })
-      : (first?.label ?? "");
-
-  return (
-    <DropdownMenu>
-      <DropdownMenuTrigger
-        disabled={disabled}
-        render={
-          <button
-            aria-label={t("modelsFor", { provider: provider.label })}
-            className="text-muted-foreground hover:text-foreground focus-visible:ring-ring inline-flex max-w-full cursor-pointer items-center gap-1 rounded-md outline-none focus-visible:ring-2"
-            type="button"
-          />
-        }
-      >
-        <span className="truncate">{label}</span>
-        <HugeiconsIcon className="size-3.5 shrink-0" icon={UnfoldMoreIcon} />
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="start" className="w-auto min-w-56">
-        {models.map((model) => {
-          const checked = selectedIds.has(model.id);
-          const note = modelNote({
-            approved: approvedNonZdrIds.has(model.id),
-            model,
-            t,
-            webSearch: isGeoWebSearchEngine(catalog, model.id),
-            zdrActive,
-          });
-          return (
-            <DropdownMenuCheckboxItem
-              checked={checked}
-              closeOnClick={false}
-              disabled={checked && lastSelected}
-              indicator="checkbox"
-              key={model.id}
-              onCheckedChange={(next) => onToggleModel(model, next)}
-            >
-              {model.label}
-              {note ? (
-                <span className="text-muted-foreground ms-auto ps-4 text-xs">
-                  {note}
-                </span>
-              ) : null}
-            </DropdownMenuCheckboxItem>
-          );
-        })}
-      </DropdownMenuContent>
-    </DropdownMenu>
-  );
-}
-
-function modelNote({
-  approved,
-  model,
-  t,
-  webSearch,
-  zdrActive,
-}: {
-  approved: boolean;
-  model: GeoModelCatalogEntry;
-  t: ReturnType<typeof useTranslations<"geo.geoEnginePicker">>;
-  webSearch: boolean;
-  zdrActive: boolean;
-}) {
-  if (model.hidden) {
-    return t("legacyModel");
-  }
-  if (!webSearch) {
-    return t("noWebSearch");
-  }
-  if (zdrActive && model.zdr === "none") {
-    return approved ? t("approvedWithoutZdr") : t("noZdrHost");
-  }
-  return null;
 }
