@@ -89,6 +89,7 @@ import { Route as SiteIntegrationsGranolaRouteImport } from './routes/_site/inte
 import { Route as SiteIntegrationsLinearRouteImport } from './routes/_site/integrations/linear'
 import { Route as SiteIntegrationsSlackRouteImport } from './routes/_site/integrations/slack'
 import { Route as SiteMcpIndexRouteImport } from './routes/_site/mcp/index'
+import { Route as SiteMcpPlatformRouteImport } from './routes/_site/mcp/$platform'
 import { Route as SiteNotraVsChar123slugChar125IndexRouteImport } from './routes/_site/notra-vs-{$slug}/index'
 import { Route as SiteNotraVsChar123slugChar125OpengraphImageRouteImport } from './routes/_site/notra-vs-{$slug}/opengraph-image'
 import { Route as SiteOfferingIndexRouteImport } from './routes/_site/offering/index'
@@ -522,6 +523,11 @@ const SiteMcpIndexRoute = SiteMcpIndexRouteImport.update({
   path: '/mcp/',
   getParentRoute: () => SiteRoute,
 } as any)
+const SiteMcpPlatformRoute = SiteMcpPlatformRouteImport.update({
+  id: '/mcp/$platform',
+  path: '/mcp/$platform',
+  getParentRoute: () => SiteRoute,
+} as any)
 const SiteNotraVsChar123slugChar125IndexRoute =
   SiteNotraVsChar123slugChar125IndexRouteImport.update({
     id: '/notra-vs-{$slug}/',
@@ -737,6 +743,7 @@ export interface FileRoutesByFullPath {
   '/integrations/granola': typeof SiteIntegrationsGranolaRoute
   '/integrations/linear': typeof SiteIntegrationsLinearRoute
   '/integrations/slack': typeof SiteIntegrationsSlackRoute
+  '/mcp/$platform': typeof SiteMcpPlatformRoute
   '/notra-vs-{$slug}/opengraph-image': typeof SiteNotraVsChar123slugChar125OpengraphImageRoute
   '/offering/report': typeof SiteOfferingReportRoute
   '/agent/auth/authorize': typeof AgentAuthAuthorizeRoute
@@ -841,6 +848,7 @@ export interface FileRoutesByTo {
   '/integrations/granola': typeof SiteIntegrationsGranolaRoute
   '/integrations/linear': typeof SiteIntegrationsLinearRoute
   '/integrations/slack': typeof SiteIntegrationsSlackRoute
+  '/mcp/$platform': typeof SiteMcpPlatformRoute
   '/notra-vs-{$slug}/opengraph-image': typeof SiteNotraVsChar123slugChar125OpengraphImageRoute
   '/offering/report': typeof SiteOfferingReportRoute
   '/agent/auth/authorize': typeof AgentAuthAuthorizeRoute
@@ -950,6 +958,7 @@ export interface FileRoutesById {
   '/_site/integrations/granola': typeof SiteIntegrationsGranolaRoute
   '/_site/integrations/linear': typeof SiteIntegrationsLinearRoute
   '/_site/integrations/slack': typeof SiteIntegrationsSlackRoute
+  '/_site/mcp/$platform': typeof SiteMcpPlatformRoute
   '/_site/notra-vs-{$slug}/opengraph-image': typeof SiteNotraVsChar123slugChar125OpengraphImageRoute
   '/_site/offering/report': typeof SiteOfferingReportRoute
   '/agent/auth/authorize': typeof AgentAuthAuthorizeRoute
@@ -1056,6 +1065,7 @@ export interface FileRouteTypes {
     | '/integrations/granola'
     | '/integrations/linear'
     | '/integrations/slack'
+    | '/mcp/$platform'
     | '/notra-vs-{$slug}/opengraph-image'
     | '/offering/report'
     | '/agent/auth/authorize'
@@ -1160,6 +1170,7 @@ export interface FileRouteTypes {
     | '/integrations/granola'
     | '/integrations/linear'
     | '/integrations/slack'
+    | '/mcp/$platform'
     | '/notra-vs-{$slug}/opengraph-image'
     | '/offering/report'
     | '/agent/auth/authorize'
@@ -1268,6 +1279,7 @@ export interface FileRouteTypes {
     | '/_site/integrations/granola'
     | '/_site/integrations/linear'
     | '/_site/integrations/slack'
+    | '/_site/mcp/$platform'
     | '/_site/notra-vs-{$slug}/opengraph-image'
     | '/_site/offering/report'
     | '/agent/auth/authorize'
@@ -1916,6 +1928,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SiteMcpIndexRouteImport
       parentRoute: typeof SiteRoute
     }
+    '/_site/mcp/$platform': {
+      id: '/_site/mcp/$platform'
+      path: '/mcp/$platform'
+      fullPath: '/mcp/$platform'
+      preLoaderRoute: typeof SiteMcpPlatformRouteImport
+      parentRoute: typeof SiteRoute
+    }
     '/_site/notra-vs-{$slug}/': {
       id: '/_site/notra-vs-{$slug}/'
       path: '/notra-vs-{$slug}'
@@ -2183,6 +2202,7 @@ interface SiteRouteChildren {
   SiteIntegrationsGranolaRoute: typeof SiteIntegrationsGranolaRoute
   SiteIntegrationsLinearRoute: typeof SiteIntegrationsLinearRoute
   SiteIntegrationsSlackRoute: typeof SiteIntegrationsSlackRoute
+  SiteMcpPlatformRoute: typeof SiteMcpPlatformRoute
   SiteNotraVsChar123slugChar125OpengraphImageRoute: typeof SiteNotraVsChar123slugChar125OpengraphImageRoute
   SiteOfferingReportRoute: typeof SiteOfferingReportRoute
   SiteCompareIndexRoute: typeof SiteCompareIndexRoute
@@ -2232,6 +2252,7 @@ const SiteRouteChildren: SiteRouteChildren = {
   SiteIntegrationsGranolaRoute: SiteIntegrationsGranolaRoute,
   SiteIntegrationsLinearRoute: SiteIntegrationsLinearRoute,
   SiteIntegrationsSlackRoute: SiteIntegrationsSlackRoute,
+  SiteMcpPlatformRoute: SiteMcpPlatformRoute,
   SiteNotraVsChar123slugChar125OpengraphImageRoute:
     SiteNotraVsChar123slugChar125OpengraphImageRoute,
   SiteOfferingReportRoute: SiteOfferingReportRoute,

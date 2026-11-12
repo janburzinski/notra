@@ -5,6 +5,11 @@ import {
   MCP_TERMINAL_TOOL_CALLS,
   MCP_TERMINAL_USER_MESSAGE,
 } from "@/constants/mcp";
+import {
+  MCP_PLATFORM_CONTROL_VARIANT,
+  MCP_PLATFORM_VARIANTS,
+  MCP_PLATFORMS,
+} from "@/constants/mcp-platforms";
 import { MCP_FALLBACK_TOOL_CARDS } from "@/constants/mcp-tools";
 import {
   MCP_USE_CASE_CATEGORIES,
@@ -18,12 +23,17 @@ import {
   MCP_USE_CASES_SUBHEAD,
 } from "@/constants/mcp-use-cases";
 import { fetchMcpTools } from "@/lib/mcp/tools";
+import type { McpPlatform } from "@/types/mcp-platforms";
 import type {
   McpUseCase,
   McpUseCaseMarkdownEntry,
 } from "@/types/mcp-use-cases";
 import { markdownSection } from "@/utils/markdown";
 import { formatMcpUseCasesCalloutLabel } from "@/utils/mcp";
+import {
+  getMcpPlatformCommands,
+  getMcpPlatformHref,
+} from "@/utils/mcp-platforms";
 import {
   findMcpUseCase,
   getMcpUseCaseCategory,
@@ -179,5 +189,56 @@ export function buildMcpUseCaseMarkdown(slug: string): string | null {
           ]),
         ]
       : []),
+  ].join("\n");
+}
+
+export function buildMcpPlatformMarkdown(platform: McpPlatform): string {
+  const control = MCP_PLATFORM_VARIANTS[MCP_PLATFORM_CONTROL_VARIANT];
+  const steps = platform.steps.flatMap((step, index) => [
+    `### Step ${index + 1}: ${step.title}`,
+    "",
+    step.body,
+    "",
+    ...(step.code ? ["```bash", step.code, "```", ""] : []),
+    ...(step.screenshot
+      ? [`![${step.screenshot.alt}](${SITE_URL}${step.screenshot.light})`, ""]
+      : []),
+  ]);
+  const commands = getMcpPlatformCommands(platform).flatMap((command) => [
+    `- ${command.label}: \`${command.command}\``,
+  ]);
+  const prompts = Object.values(MCP_PLATFORM_VARIANTS).map(
+    (variant) =>
+      `- As your ${variant.role}: "${variant.prompts[platform.kind]}"`
+  );
+
+  return [
+    `# Turn ${platform.name} into your ${control.role}`,
+    "",
+    control.subhead,
+    "",
+    ...(platform.listing
+      ? [`[${platform.listing.label}](${platform.listing.href})`, ""]
+      : []),
+    ...commands,
+    "",
+    markdownSection(`How to connect Notra to ${platform.name}`, [
+      platform.description,
+      "",
+      `- Server URL: ${MCP_URL}`,
+      "- Sign-in: OAuth through Notra, no API key needed",
+      `- You need: ${platform.requirements}`,
+      `- Steps: ${platform.steps.length}, about 2 minutes`,
+      "",
+      ...steps,
+    ]),
+    markdownSection("Prompts to try", prompts),
+    markdownSection("Use Notra in another app", [
+      ...MCP_PLATFORMS.filter((entry) => entry.id !== platform.id).map(
+        (entry) =>
+          `- [${entry.name}](${SITE_URL}${getMcpPlatformHref(entry.id)}.md)`
+      ),
+      `- [All MCP clients](${MCP_PAGE_MARKDOWN_URL})`,
+    ]),
   ].join("\n");
 }

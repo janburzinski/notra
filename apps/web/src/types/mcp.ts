@@ -1,8 +1,9 @@
 import type { RefObject } from "react";
 
 export interface McpClient {
-  id: "claude-code" | "codex" | "cursor" | "hermes" | "openclaw" | "other";
+  id: string;
   label: string;
+  copyLabel?: string;
   iconSrc?: string;
   invertInDark: boolean;
   command: string;
@@ -21,6 +22,7 @@ export interface McpTerminalToolCall {
 
 export interface McpCommandTabsProps {
   className?: string;
+  clients?: McpClient[];
 }
 
 export interface McpHeroProps {

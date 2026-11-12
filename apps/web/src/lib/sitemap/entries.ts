@@ -6,6 +6,7 @@ import {
   FEATURE_DETAIL_LAST_MODIFIED,
   FEATURE_DETAIL_PATHS,
 } from "@/constants/feature-pages/paths";
+import { MCP_PLATFORMS } from "@/constants/mcp-platforms";
 import { MCP_USE_CASES, MCP_USE_CASES_PATH } from "@/constants/mcp-use-cases";
 import { STATE_OF_AI_SEARCH_URL } from "@/constants/state-of-ai-search";
 import { fetchIntegrations } from "@/lib/integrations/fetch";
@@ -13,6 +14,7 @@ import { getIntegrationHref } from "@/lib/integrations/helpers";
 import { listSummaries } from "@/lib/state-of-ai-search/reports";
 import type { SitemapEntry } from "@/types/sitemap";
 import { getCompareHref } from "@/utils/compare";
+import { getMcpPlatformHref } from "@/utils/mcp-platforms";
 import { getMcpUseCaseHref } from "@/utils/mcp-use-cases";
 import { getShowcaseEntrySlug, SHOWCASE_COMPANIES } from "@/utils/showcase";
 import { reportPath } from "@/utils/state-of-ai-search";
@@ -94,6 +96,10 @@ export async function buildSitemapEntries(): Promise<SitemapEntry[]> {
       url: `${SITE_URL}${MCP_USE_CASES_PATH}`,
       lastModified: STATIC_PAGE_LAST_MODIFIED,
     },
+    ...MCP_PLATFORMS.map((platform) => ({
+      url: `${SITE_URL}${getMcpPlatformHref(platform.id)}`,
+      lastModified: STATIC_PAGE_LAST_MODIFIED,
+    })),
     ...MCP_USE_CASES.map((entry) => ({
       url: `${SITE_URL}${getMcpUseCaseHref(entry)}`,
       lastModified: STATIC_PAGE_LAST_MODIFIED,

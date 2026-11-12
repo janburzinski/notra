@@ -8,6 +8,7 @@ import type {
 import { changelog } from "@/../.source/server";
 import { DATA_PATH } from "@/constants/data";
 import { FEATURE_DETAIL_SLUGS } from "@/constants/feature-pages/paths";
+import { MCP_PLATFORMS } from "@/constants/mcp-platforms";
 import { STATE_OF_AI_SEARCH_PATH } from "@/constants/state-of-ai-search";
 import { buildAgentPageMarkdown } from "@/lib/agent/markdown";
 import {
@@ -30,6 +31,7 @@ import {
 import { buildMarketingAssetsMarkdown } from "@/lib/marketing-assets/markdown";
 import {
   buildMcpMarkdown,
+  buildMcpPlatformMarkdown,
   buildMcpUseCaseMarkdown,
   buildMcpUseCasesMarkdown,
   listMcpUseCaseMarkdownEntries,
@@ -42,6 +44,7 @@ import { listSummaries, loadReport } from "@/lib/state-of-ai-search/reports";
 import type { McpUseCaseMarkdownEntry } from "@/types/mcp-use-cases";
 import { stripFrontmatter } from "@/utils/markdown";
 import { readAppMarkdownSource } from "@/utils/markdown-source";
+import { getMcpPlatformHref } from "@/utils/mcp-platforms";
 import { MarkdownNotFoundError } from "@/utils/not-found";
 import {
   getShowcaseCompany,
@@ -241,6 +244,10 @@ export function buildDualmarkStaticPages(): StaticPageConfig[] {
     { pattern: "/agent", render: () => buildAgentPageMarkdown() },
     { pattern: "/mcp", render: () => buildMcpMarkdown() },
     { pattern: "/mcp/use-cases", render: () => buildMcpUseCasesMarkdown() },
+    ...MCP_PLATFORMS.map((platform) => ({
+      pattern: getMcpPlatformHref(platform.id),
+      render: () => buildMcpPlatformMarkdown(platform),
+    })),
     { pattern: "/compare", render: () => buildCompareIndexMarkdown() },
     {
       pattern: STATE_OF_AI_SEARCH_PATH,

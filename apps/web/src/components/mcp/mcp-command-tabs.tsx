@@ -43,31 +43,36 @@ const COMMAND_CLASSNAME = cn(
   "[&_[data-slot=button]]:border-transparent [&_[data-slot=button]]:bg-[#1E1E1E] [&_[data-slot=button]]:text-white [&_[data-slot=button]]:shadow-none dark:[&_[data-slot=button]]:bg-white dark:[&_[data-slot=button]]:text-[#1E1E1E] [&_[data-slot=button]:hover]:bg-[#1E1E1E]/85 dark:[&_[data-slot=button]:hover]:bg-white/85"
 );
 
-const CLIENT_ITEMS = MCP_CLIENTS.map((client) => ({
-  value: client.id,
-  label: client.label,
-  command: client.command,
-  icon: clientIcon(client),
-}));
-
-export function McpCommandTabs({ className }: McpCommandTabsProps) {
+export function McpCommandTabs({
+  className,
+  clients = MCP_CLIENTS,
+}: McpCommandTabsProps) {
   const [activeClientId, setActiveClientId] = useState<string | undefined>(
-    MCP_CLIENTS[0]?.id
+    clients[0]?.id
   );
+  const items = clients.map((client) => ({
+    value: client.id,
+    label: client.label,
+    command: client.command,
+    icon: clientIcon(client),
+  }));
+  const activeClient =
+    clients.find((client) => client.id === activeClientId) ?? clients[0];
 
   return (
     <div className={cn("flex w-full flex-col", className)}>
       <CommandTabs
         className={COMMAND_CLASSNAME}
+        copyLabel={activeClient?.copyLabel}
         highlight
-        items={CLIENT_ITEMS}
+        items={items}
         onValueChange={setActiveClientId}
         tabsPosition="none"
         value={activeClientId}
       />
       <ExpandableTabs
         className={cn("-mt-px rounded-t-none border-t-0", SURFACE_CLASSNAME)}
-        items={CLIENT_ITEMS}
+        items={items}
         label="Choose an MCP client"
         onValueChange={setActiveClientId}
         value={activeClientId}
