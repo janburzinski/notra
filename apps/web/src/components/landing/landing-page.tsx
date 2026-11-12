@@ -8,9 +8,9 @@ import { FeaturesSection } from "@/components/landing/features-section";
 import { HeroSection } from "@/components/landing/hero-section";
 import { LogoMarquee } from "@/components/landing/logo-marquee";
 import { LandingPricingSection } from "@/components/landing/pricing-section";
-import { TestimonialsGate } from "@/components/landing/testimonials-gate";
 import { TestimonialsSection } from "@/components/landing/testimonials-section";
 import { FAQ_CONTENT } from "@/constants/landing/faq";
+import type { LandingPageProps } from "@/types/landing/flags";
 import {
   NOTRA_CONTACT_EMAIL,
   NOTRA_SAME_AS,
@@ -145,13 +145,16 @@ function LandingPageJsonLd() {
   );
 }
 
-export function LandingPage() {
+export function LandingPage({ flags }: LandingPageProps) {
   return (
     <div className="dark:bg-background flex w-full flex-col items-stretch justify-start overflow-x-clip bg-white">
       <LandingPageJsonLd />
       <AnnouncementBanner />
       <main className="landing-tables flex w-full flex-col items-stretch justify-start">
-        <HeroSection />
+        <HeroSection
+          enrolled={flags.enrolled}
+          flagVariant={flags.heroVariant}
+        />
         <p className="sr-only" id="agent-readable-summary">
           {SITE_DESCRIPTION}
         </p>
@@ -162,14 +165,14 @@ export function LandingPage() {
         <section className={DEFERRED_SECTION_CLASS.answers} id="answers">
           <AnswerExampleSection />
         </section>
-        <TestimonialsGate>
+        {flags.testimonials ? (
           <section
             className={DEFERRED_SECTION_CLASS.testimonials}
             id="testimonials"
           >
             <TestimonialsSection />
           </section>
-        </TestimonialsGate>
+        ) : null}
         <div className={DEFERRED_SECTION_CLASS.pricing}>
           <LandingPricingSection />
         </div>

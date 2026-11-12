@@ -1,4 +1,3 @@
-import { FlagsProvider } from "@databuddy/sdk/react";
 import { Toaster } from "@notra/ui/components/ui/sonner";
 import {
   createRootRoute,
@@ -33,8 +32,6 @@ import { RSS_FEED_PATH, RSS_FEED_TITLE } from "@/utils/constants";
 import { buildNavbarSessionScript } from "@/utils/navbar-session";
 
 import globalsCss from "@/styles/globals.css?url";
-
-const databuddyClientId = import.meta.env.NEXT_PUBLIC_DATABUDDY_WEB_WEBSITE_ID;
 
 const getConsentState = createServerFn({ method: "GET" }).handler(
   createConsentStateHandler({
@@ -146,12 +143,7 @@ function RootDocument({ children }: { children: ReactNode }) {
             />
             <ConsentDialog />
             {process.env.NODE_ENV !== "production" && <DevTools />}
-            <FlagsProvider
-              clientId={databuddyClientId ?? ""}
-              disabled={!databuddyClientId}
-            >
-              <NuqsAdapter>{children}</NuqsAdapter>
-            </FlagsProvider>
+            <NuqsAdapter>{children}</NuqsAdapter>
           </ConsentRoot>
           <AppLinkTracking />
           <Toaster position="bottom-right" />

@@ -1,4 +1,4 @@
-import { track, useFlag } from "@databuddy/sdk/react";
+import { track } from "@databuddy/sdk/react";
 import { CtaButton } from "@notra/ui/components/shared/cta-button";
 import { useIsMobile } from "@notra/ui/hooks/use-mobile";
 import { cn } from "@notra/ui/lib/utils";
@@ -8,7 +8,7 @@ import { parseAsString, useQueryState } from "nuqs";
 import { useEffect, useRef, useState } from "react";
 
 import { HeroDither } from "@/components/landing/hero-dither";
-import { HeroHeadline, useIsClient } from "@/components/landing/hero-headline";
+import { HeroHeadline } from "@/components/landing/hero-headline";
 import { HeroTapHand } from "@/components/landing/hero-tap-hand";
 import { HeroVariantSwitcher } from "@/components/landing/hero-variant-switcher";
 import { HeroWebsiteForm } from "@/components/landing/hero-website-form";
@@ -26,6 +26,7 @@ import {
   HERO_TAP_PRESS_CLASSNAME,
   HERO_VARIANTS,
 } from "@/constants/landing/hero";
+import type { HeroSectionProps } from "@/types/landing/flags";
 import {
   DATABUDDY_EXPERIMENT_EXPOSED_EVENT,
   DATABUDDY_HERO_CTA_CLICKED_EVENT,
@@ -35,33 +36,22 @@ import { rememberLandingExperimentVariant } from "@/utils/signup";
 const CTA_BUTTON_CLASSNAME =
   "h-auto rounded-[2.5625rem] px-4 py-3 font-display font-medium text-[1.125rem] leading-[1.14] tracking-[-0.015em] sm:px-6";
 
-export function HeroSection() {
+export function HeroSection({ enrolled, flagVariant }: HeroSectionProps) {
   const reduceMotion = useReducedMotion();
   const cycle = useIsMobile()
     ? HERO_HEADLINE_CYCLE_MOBILE
     : HERO_HEADLINE_CYCLE;
   const [index, setIndex] = useState(0);
   const word = cycle[index % cycle.length] ?? cycle[0];
-  const experiment = useFlag(HERO_EXPERIMENT_FLAG);
-  const isClient = useIsClient();
   const [preview] = useQueryState(HERO_PREVIEW_VARIANT_PARAM, parseAsString);
   const previewVariant =
     HERO_PREVIEW_ENABLED && preview && HERO_VARIANTS[preview] ? preview : null;
-  const flagVariant =
-    isClient && experiment.variant && HERO_VARIANTS[experiment.variant]
-      ? experiment.variant
-      : HERO_CONTROL_VARIANT;
   const variant = previewVariant ?? flagVariant;
   const copy = HERO_VARIANTS[variant] ?? HERO_VARIANTS[HERO_CONTROL_VARIANT];
   const exposureTracked = useRef(false);
 
   useEffect(() => {
-    if (
-      !isClient ||
-      previewVariant ||
-      experiment.loading ||
-      exposureTracked.current
-    ) {
+    if (!enrolled || previewVariant || exposureTracked.current) {
       return;
     }
     exposureTracked.current = true;
@@ -70,7 +60,7 @@ export function HeroSection() {
       flag_key: HERO_EXPERIMENT_FLAG,
       variant,
     });
-  }, [experiment.loading, isClient, previewVariant, variant]);
+  }, [enrolled, previewVariant, variant]);
 
   useEffect(() => {
     if (reduceMotion !== false) {
@@ -88,7 +78,7 @@ export function HeroSection() {
     }
     track(DATABUDDY_HERO_CTA_CLICKED_EVENT, {
       flag_key: HERO_EXPERIMENT_FLAG,
-      variant: experiment.loading ? null : variant,
+      variant: enrolled ? variant : null,
       cta: "primary",
       label: copy.cta,
     });
