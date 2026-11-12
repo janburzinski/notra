@@ -60,6 +60,7 @@ function DataPage() {
     url: DATA_URL,
     creator: { "@type": "Organization", name: "Notra", url: SITE_URL },
     isAccessibleForFree: true,
+    license: "https://creativecommons.org/licenses/by/4.0/",
     ...(page
       ? {
           dateModified: page.generatedAt,
