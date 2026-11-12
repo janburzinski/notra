@@ -1,0 +1,23 @@
+apps/dashboard/src/lib/billing/plan-badge-renderer.ts
+  s_85194c15eb6ddc::t_f7fd0529adf378 45-48
+  s_85194c15eb6ddc::t_3d061139352102 72-73,75-79,82,84
+  s_85194c15eb6ddc::t_38f1ec86b2c363 1-44,49-71,74,80-81,83,85-131
+apps/dashboard/src/components/billing/plan-badge.tsx
+  s_85194c15eb6ddc::t_571f50e1f54125 5,31-35,37,39-47,51-52
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "9eaf8ce69c3c99b696f4cf35a1b3f83f94355bbb",
+  "prompts": {},
+  "sessions": {
+    "s_85194c15eb6ddc": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "11043b66-1334-4a8c-ae9e-33da28177c8f",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
