@@ -45,7 +45,10 @@ without touching production, stale-build fencing, the Databuddy integration
 flow (save → draft → pull request that leaves main alone → direct publish
 refused until enabled → commit → signed push webhook, with a bad signature
 rejected and a duplicate delivery ignored → build held by the rollback pin →
-promote → tracker tag and CSP on the live site), the stored build log and Box
+promote → tracker tag and CSP on the live site), smart deployments for pull
+requests (one that changes no site files is not queued, one whose site matches
+production is skipped with the live site linked and its preview address closed,
+one that changes a post builds its preview), the stored build log and Box
 telemetry, and namespace-safe deletion.
 
 Every external provider is an emulator from

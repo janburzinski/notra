@@ -124,7 +124,7 @@ export async function reportOutcome(
           currentOutcome = { kind: "not_live" };
         }
       }
-      const check = deploymentCheckReport(deployment, currentOutcome);
+      const check = deploymentCheckReport(site, deployment, currentOutcome);
       await completeCheckRun(repository, token, {
         checkRunId,
         conclusion: check.conclusion,

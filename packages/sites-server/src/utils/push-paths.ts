@@ -1,3 +1,6 @@
+import { SITE_IGNORE_FILENAME } from "@notra/sites-core/constants/source";
+import { isCollectedSiteSourcePath } from "@notra/sites-core/utils/source-files";
+
 import { PUSH_PAYLOAD_COMMIT_LIMIT } from "../constants/webhooks";
 import type { PushPayload } from "../types/webhooks";
 
@@ -42,4 +45,29 @@ export function pathsTouchRootDirectory(
 ): boolean {
   const prefix = `${rootDirectory}/`;
   return paths.some((path) => path.startsWith(prefix));
+}
+
+/**
+ * Whether any path is a file the compiler reads for a site rooted at
+ * `rootDirectory`, using the same selection as the input fingerprint. Archive
+ * attribute files count anywhere because they can transform site files.
+ */
+export function pathsTouchSiteInputs(
+  paths: readonly string[],
+  rootDirectory: string
+): boolean {
+  const prefix = rootDirectory ? `${rootDirectory}/` : "";
+  return paths.some((path) => {
+    const name = path.split("/").at(-1) ?? "";
+    if (name === ".gitattributes" || name === ".lfsconfig") {
+      return true;
+    }
+    if (!path.startsWith(prefix)) {
+      return false;
+    }
+    const relative = path.slice(prefix.length);
+    return (
+      relative === SITE_IGNORE_FILENAME || isCollectedSiteSourcePath(relative)
+    );
+  });
 }

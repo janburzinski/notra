@@ -6,12 +6,15 @@ import { createDefaultSiteConfig } from "@notra/sites-core/utils/default-config"
 import { siteAliasHost, sitePreviewHost } from "@notra/sites-core/utils/hosts";
 import { listMountedAreas } from "@notra/sites-core/utils/mounts";
 
+import { SMART_DEPLOYMENT_BRANCH_SKIP_REASON } from "../constants/smart-deployments";
 import {
   getDashboardUrl,
   getSitesHostingDomain,
   getSitesHostingPortSuffix,
   getSitesHostingProtocol,
 } from "../env";
+import type { SiteDeployment } from "../types/deployments";
+import type { Site } from "../types/sites";
 import type {
   BuildTargetForDeploymentParams,
   DeploymentDashboardUrlParams,
@@ -34,6 +37,16 @@ export function sitePreviewOrigin(slug: string, previewKey: string): string {
 export function primaryMountUrl(origin: string, mounts: SiteMounts): string {
   const first = listMountedAreas(mounts)[0];
   return `${origin}${first && first.mount !== "/" ? first.mount : "/"}`;
+}
+
+/** A skipped branch has no preview; its unchanged content is the live site. */
+export function unchangedDeploymentUrl(
+  site: Site,
+  deployment: SiteDeployment
+): string {
+  return deployment.skipReason === SMART_DEPLOYMENT_BRANCH_SKIP_REASON
+    ? primaryMountUrl(site.publicOrigin, site.mounts)
+    : primaryMountUrl(deployment.target.publicOrigin, deployment.target.mounts);
 }
 
 export function buildTargetForDeployment({

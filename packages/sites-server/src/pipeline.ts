@@ -15,7 +15,10 @@ import {
   CANCELED_OUTCOME,
   SAME_COMMIT_TRIGGERS,
 } from "./constants/deployments";
-import { SMART_DEPLOYMENT_SKIP_REASON } from "./constants/smart-deployments";
+import {
+  SMART_DEPLOYMENT_BRANCH_SKIP_REASON,
+  SMART_DEPLOYMENT_SKIP_REASON,
+} from "./constants/smart-deployments";
 import {
   getDeployment,
   hasNewerDeployment,
@@ -249,9 +252,13 @@ const buildAndPublish = Effect.fn("Sites.buildAndPublish")(function* (
         })
       )
     ) {
-      phaseLog += `[deployment:skipped] ${SMART_DEPLOYMENT_SKIP_REASON}\n`;
+      const reason =
+        smartComparison?.baseline?.kind === deployment.kind
+          ? SMART_DEPLOYMENT_SKIP_REASON
+          : SMART_DEPLOYMENT_BRANCH_SKIP_REASON;
+      phaseLog += `[deployment:skipped] ${reason}\n`;
       yield* writeBuildLog(site.id, deployment.id, phaseLog);
-      return { kind: "skipped" as const, reason: SMART_DEPLOYMENT_SKIP_REASON };
+      return { kind: "skipped" as const, reason };
     }
     if (
       !(yield* Effect.uninterruptible(

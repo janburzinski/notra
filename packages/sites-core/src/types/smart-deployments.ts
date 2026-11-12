@@ -10,6 +10,8 @@ export interface SiteGitTreeEntry {
 
 export interface SiteInputFingerprintParams {
   ignoreContent?: string | null;
+  /** Contents of every `.gitattributes` in the tree, keyed by path. */
+  gitAttributes?: Readonly<Record<string, string>>;
   tree: readonly SiteGitTreeEntry[];
   truncated: boolean;
   rootDirectory: string;

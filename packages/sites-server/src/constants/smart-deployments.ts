@@ -1,5 +1,7 @@
 export const SMART_DEPLOYMENT_SKIP_REASON =
   "Site inputs are unchanged from the published version.";
+export const SMART_DEPLOYMENT_BRANCH_SKIP_REASON =
+  "This branch doesn't change the site, so no preview was built.";
 export const SMART_DEPLOYMENT_QUESTIONS = {
   inputs_changed: {
     type: "boolean" as const,

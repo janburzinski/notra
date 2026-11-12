@@ -257,9 +257,20 @@ cd apps/sites-builder && bun compiler/cli.ts dev --source <site repo>   # theme 
 `sites.smartDeployments` defaults to `true`, including existing Sites after migration
 `0114_site_smart_deployments`. Changing the setting alone does not rebuild the Site.
 
+A pull request without an open preview is not queued at all when none of its
+changed files is a site input (the fingerprint's path selection under the root
+directory, `.notraignore`, or archive attribute files anywhere). This uses the PR's
+own changes, so branches behind the production branch are covered too. An
+incomplete or failed file list counts as a change.
+
 Automatic push and pull-request deployments compare a complete Git tree against
 the fingerprint of the deployment currently referenced by serving state. Preview
-keys have separate baselines. The fingerprint includes collected file paths and
+keys have separate baselines. A preview without a live baseline of its own is
+compared with live production instead, fingerprinted for the production target:
+a branch that does not change the site is skipped without building or publishing
+a preview, and its check and PR comment link to the live Site. The skip records a
+removed-preview tombstone at its generation so an older build of the branch cannot
+publish afterwards. The fingerprint includes collected file paths and
 Git blob IDs, repository/root identity, the complete build target, draft visibility,
 builder snapshot ID and UTC year. Path selection is shared with the compiler.
 
@@ -272,7 +283,7 @@ generation, preventing an older concurrent build from replacing the current Site
 The comparison is fenced again under the existing storage lock and R2 CAS before
 the skip is persisted. Retries can finish persistence after a serving-state write.
 
-First deployments, manual builds, redeploys, configuration-triggered builds and
+First production deployments, manual builds, redeploys, configuration-triggered builds and
 unknown comparisons build normally. Truncated trees, missing fingerprints,
 unsupported archive transformations (`.gitattributes` / `.lfsconfig`), and source
 limits also require a build. Existing published deployments establish their first

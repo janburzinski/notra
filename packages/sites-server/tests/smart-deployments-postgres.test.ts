@@ -57,6 +57,7 @@ if (!databaseUrl) {
   const { R2PreconditionFailedError } = await import("../src/errors/sites");
   const objects = new Map<string, { text: string; etag: string }>();
   let sourceFiles: SiteGitTreeEntry[] = [];
+  const blobs = new Map<string, string>();
   let truncated = false;
   let treeFails = false;
   let treeCalls = 0;
@@ -81,7 +82,17 @@ if (!databaseUrl) {
   mock.module("@notra/ai/utils/octokit", () => ({
     ...octokit,
     createOctokit: () => ({
-      request: async () => {
+      request: async (route: string, params: { file_sha?: string }) => {
+        if (route.includes("/git/blobs/")) {
+          return {
+            data: {
+              encoding: "base64",
+              content: Buffer.from(
+                blobs.get(params.file_sha ?? "") ?? ""
+              ).toString("base64"),
+            },
+          };
+        }
         treeCalls++;
         if (treeFails) {
           throw new Error("Synthetic tree failure");
@@ -267,6 +278,11 @@ if (!databaseUrl) {
   const { updateSiteSettings } = await import("../src/sites");
   const { runSiteJob } = await import("../src/runner");
   const { claimSiteJob } = await import("../src/jobs");
+  const { SMART_DEPLOYMENT_BRANCH_SKIP_REASON } =
+    await import("../src/constants/smart-deployments");
+  const { deploymentCheckReport } =
+    await import("../src/utils/deployment-check-report");
+  const { previewCommentBody } = await import("../src/utils/preview-comment");
   const queue = async (
     trigger: SiteDeployment["trigger"] = "push",
     previewKey: string | null = null
@@ -343,6 +359,7 @@ if (!databaseUrl) {
     beforeStateWriteHook = async () => {};
     reported.length = 0;
     objects.clear();
+    blobs.clear();
   });
   afterEach(async () => {
     await db.delete(organizations).where(eq(organizations.id, organizationId));
@@ -752,6 +769,7 @@ if (!databaseUrl) {
   });
   test("preview baselines are scoped to each preview", async () => {
     await publish();
+    sourceFiles[0] = { ...sourceFiles[0], sha: "c".repeat(40) };
     await publish("pull_request", "pr-1");
     expect(buildCalls).toBe(2);
     expect(
@@ -760,6 +778,177 @@ if (!databaseUrl) {
     ).toBe("skipped");
     await publish("pull_request", "pr-2");
     expect(buildCalls).toBe(3);
+  });
+  test("a new branch without site changes skips against production and links the live site", async () => {
+    const production = await publish();
+    const candidate = await queue("pull_request", "pr-1");
+    const outcome = await runDeploymentPipeline(site, candidate);
+    expect(outcome).toEqual({
+      kind: "skipped",
+      reason: SMART_DEPLOYMENT_BRANCH_SKIP_REASON,
+    });
+    expect(buildCalls).toBe(1);
+    expect(downloadCalls).toBe(1);
+    const saved = await getDeployment(candidate.id);
+    if (!saved) {
+      throw new Error("Missing skipped preview");
+    }
+    expect(saved.status).toBe("skipped");
+    expect(saved.skipReason).toBe(SMART_DEPLOYMENT_BRANCH_SKIP_REASON);
+    expect(saved.smartDeploymentEvaluation).toMatchObject({
+      comparedDeploymentId: production.id,
+      inputsChanged: false,
+    });
+    const state = (await readServingState(site.id))?.state;
+    expect(state?.production?.deploymentId).toBe(production.id);
+    expect(state?.previews["pr-1"]).toBeUndefined();
+    expect(state?.removedPreviews["pr-1"]).toBe(candidate.generation);
+    const check = deploymentCheckReport(site, saved, outcome);
+    expect(check.liveUrl).toBe("https://synthetic.notra.site/blog");
+    expect(check.summary).toContain("Published: https://synthetic.notra.site");
+    const comment = previewCommentBody(site, saved, "https://build", outcome);
+    expect(comment).toContain(
+      "[Open live site](<https://synthetic.notra.site/blog>)"
+    );
+    expect(comment).not.toContain(saved.target.publicOrigin);
+    expect(comment).not.toContain("protected");
+    const next = await queue("push", "pr-1");
+    expect((await runDeploymentPipeline(site, next)).kind).toBe("skipped");
+    expect(
+      (await readServingState(site.id))?.state.removedPreviews["pr-1"]
+    ).toBe(next.generation);
+    expect(buildCalls).toBe(1);
+  });
+  test.each([
+    ["metadata-only attributes skip", "* linguist-generated=true\n", true],
+    ["transforming attributes build", "* text=auto\n", false],
+  ] as const)("%s", async (_, attributes, skips) => {
+    blobs.set("f".repeat(40), attributes);
+    sourceFiles.push({
+      path: ".gitattributes",
+      sha: "f".repeat(40),
+      type: "blob",
+      mode: "100644",
+      size: attributes.length,
+    });
+    await publish();
+    expect(
+      (await runDeploymentPipeline(site, await queue("pull_request", "pr-1")))
+        .kind
+    ).toBe(skips ? "skipped" : "live");
+    expect(buildCalls).toBe(skips ? 1 : 2);
+  });
+  test("a new branch that changes the site builds its preview", async () => {
+    await publish();
+    sourceFiles.push({
+      path: "blog/new-post.mdx",
+      sha: "e".repeat(40),
+      type: "blob",
+      mode: "100644",
+      size: 10,
+    });
+    const preview = await publish("pull_request", "pr-1");
+    expect(buildCalls).toBe(2);
+    expect(modelCalls).toBe(1);
+    expect(
+      (await getDeployment(preview.id))?.smartDeploymentEvaluation
+    ).toMatchObject({ inputsChanged: true });
+    expect(
+      (await readServingState(site.id))?.state.previews["pr-1"]?.deploymentId
+    ).toBe(preview.id);
+  });
+  test("files outside the site do not count as branch changes", async () => {
+    await publish();
+    sourceFiles.push({
+      path: "apps/web/page.tsx",
+      sha: "e".repeat(40),
+      type: "blob",
+      mode: "100644",
+      size: 10,
+    });
+    expect(
+      (await runDeploymentPipeline(site, await queue("pull_request", "pr-1")))
+        .kind
+    ).toBe("skipped");
+    expect(buildCalls).toBe(1);
+  });
+  test("a branch skip falls back to building without a live production", async () => {
+    await publish("pull_request", "pr-1");
+    await publish("pull_request", "pr-2");
+    expect(buildCalls).toBe(2);
+    expect(modelCalls).toBe(0);
+  });
+  test("a production rollback makes a new branch build", async () => {
+    const production = await publish();
+    await mutateServingState(site, (state) => ({
+      write: { ...state, productionRollback: true },
+      result: undefined,
+    }));
+    await publish("pull_request", "pr-1");
+    expect(buildCalls).toBe(2);
+    expect(
+      (await readServingState(site.id))?.state.production?.deploymentId
+    ).toBe(production.id);
+  });
+  test("a preview published during evaluation prevents the branch skip", async () => {
+    const production = await publish();
+    const candidate = await queue("pull_request", "pr-1");
+    modelHook = async () => {
+      await mutateServingState(site, (state) => ({
+        write: {
+          ...state,
+          previews: {
+            ...state.previews,
+            "pr-1": {
+              deploymentId: production.id,
+              visibility: "public",
+              sequence: candidate.generation + 1,
+              activatedAt: new Date().toISOString(),
+              expiresAt: null,
+            },
+          },
+        },
+        result: undefined,
+      }));
+    };
+    expect((await runDeploymentPipeline(site, candidate)).kind).toBe(
+      "not_live"
+    );
+    expect((await getDeployment(candidate.id))?.status).toBe("ready");
+    expect(buildCalls).toBe(2);
+  });
+  test("an older build of a skipped branch cannot publish its preview", async () => {
+    await publish();
+    const older = await queue("pull_request", "pr-1");
+    await db
+      .update(siteDeployments)
+      .set({ status: "ready" })
+      .where(eq(siteDeployments.id, older.id));
+    objects.set(SITE_R2_KEYS.manifest(site.id, older.id), {
+      text: "{}",
+      etag: String(++version),
+    });
+    const candidate = await queue("pull_request", "pr-1");
+    expect((await runDeploymentPipeline(site, candidate)).kind).toBe("skipped");
+    expect(await activateDeployment(site, older)).toBe("not_live");
+    expect(
+      (await readServingState(site.id))?.state.previews["pr-1"]
+    ).toBeUndefined();
+  });
+  test("an ambiguous tombstone write retries a branch skip without building", async () => {
+    await publish();
+    const candidate = await queue("pull_request", "pr-1");
+    stateWriteHook = async () => {
+      stateWriteHook = async () => {};
+      throw new Error("Synthetic lost write acknowledgement");
+    };
+    await expect(runDeploymentPipeline(site, candidate)).rejects.toThrow(
+      "Synthetic lost write acknowledgement"
+    );
+    expect((await getDeployment(candidate.id))?.status).toBe("queued");
+    expect((await runDeploymentPipeline(site, candidate)).kind).toBe("skipped");
+    expect((await getDeployment(candidate.id))?.status).toBe("skipped");
+    expect(buildCalls).toBe(1);
   });
   test("an expired preview builds instead of skipping against an unavailable version", async () => {
     await publish("pull_request", "pr-1");

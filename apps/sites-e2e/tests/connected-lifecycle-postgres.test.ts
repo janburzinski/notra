@@ -2157,12 +2157,176 @@ if (!process.env.SITES_TEST_DATABASE_URL) {
       ).text();
       expect(unbrandedHtml).not.toContain("data-notra-badge");
       expect(unbrandedHtml).toContain(">Report abuse<");
+      await phase(
+        "smart deployments: pull requests that don't change the site"
+      );
+      // Smart deployments are on by default, and this is now the only site on
+      // the repository, so each webhook can queue a job for it alone.
+      const smartSite = await getSite(freeSite.id);
+      assert.ok(smartSite);
+      expect(smartSite.smartDeployments).toBe(true);
+      const encode = (text: string) => new TextEncoder().encode(text);
+      const pullRequestDelivery = async (number: number) => {
+        const deadline = Date.now() + 15_000;
+        for (;;) {
+          const delivery = deliveries.find(
+            (entry) =>
+              entry.event === "pull_request" &&
+              (JSON.parse(entry.rawBody) as { number?: number }).number ===
+                number
+          );
+          if (delivery) {
+            return delivery;
+          }
+          assert.ok(Date.now() < deadline, `no webhook for #${number}`);
+          await delay(100);
+        }
+      };
+      // Only files the site isn't built from: nothing is queued.
+      await github.createBranch("feature/notes-only");
+      const notesSha = await github.push(
+        [{ path: "notes/roadmap.txt", content: encode("Next quarter") }],
+        "Plan the roadmap",
+        "feature/notes-only"
+      );
+      expect(
+        await deliveryFor(notesSha, "refs/heads/feature/notes-only")
+      ).toMatchObject({ status: 200, jobIds: [] });
+      const notesOnly = await github.openPullRequest(
+        "feature/notes-only",
+        "Plan the roadmap"
+      );
+      expect(await pullRequestDelivery(notesOnly)).toMatchObject({
+        status: 200,
+        jobIds: [],
+      });
+      // A post that reached main through another commit, like a squash merge
+      // or cherry-pick: the pull request still lists it, but the branch
+      // builds exactly what is live, so no preview is built.
+      await github.createBranch("feature/same-post");
+      const post = (title: string) =>
+        `---\ntitle: ${title}\ndescription: A post for smart deployments.\ndate: 2026-09-01\nauthor: jan\n---\n\nThe same words on every branch.\n`;
+      const onMain = await pushAndQueue(
+        [{ path: "blog/shipped-twice.md", content: post("Shipped twice") }],
+        "Add a post"
+      );
+      expect(await runSiteJob(onMain.jobId)).toMatchObject({
+        status: "done",
+        outcome: "live",
+      });
+      const live = await deploymentFor(onMain.jobId);
+      const buildsBeforeBranches = builds;
+      const samePostSha = await github.push(
+        [
+          {
+            path: "blog/shipped-twice.md",
+            content: encode(post("Shipped twice")),
+          },
+        ],
+        "Add the same post on a branch",
+        "feature/same-post"
+      );
+      expect(
+        await deliveryFor(samePostSha, "refs/heads/feature/same-post")
+      ).toMatchObject({ status: 200, jobIds: [] });
+      const samePost = await github.openPullRequest(
+        "feature/same-post",
+        "Add the same post"
+      );
+      const samePostDelivery = await pullRequestDelivery(samePost);
+      expect(samePostDelivery.jobIds).toHaveLength(1);
+      const samePostJob = samePostDelivery.jobIds[0] as string;
+      expect(await runSiteJob(samePostJob)).toMatchObject({
+        status: "done",
+        outcome: "skipped",
+      });
+      expect(builds).toBe(buildsBeforeBranches);
+      const skippedPreview = await deploymentFor(samePostJob);
+      expect(skippedPreview).toMatchObject({
+        kind: "preview",
+        status: "skipped",
+        skipReason:
+          "This branch doesn't change the site, so no preview was built.",
+        startedAt: null,
+      });
+      expect(skippedPreview.smartDeploymentEvaluation).toMatchObject({
+        comparedDeploymentId: live.id,
+        inputsChanged: false,
+      });
+      expect(await checkRun(samePostSha)).toMatchObject({
+        status: "completed",
+        conclusion: "skipped",
+      });
+      const [skippedComment, ...otherSkippedComments] =
+        await github.pullRequestComments(samePost);
+      expect(otherSkippedComments).toEqual([]);
+      expect(skippedComment).toContain("Skipped – no site changes");
+      expect(skippedComment).toContain(
+        `[Open live site](<${smartSite.publicOrigin}/blog>)`
+      );
+      expect(skippedComment).not.toContain(skippedPreview.target.publicOrigin);
+      // The skip reserves the preview address so an older build can't take it.
+      const smartState = JSON.parse(
+        r2.text(SITE_R2_KEYS.state(smartSite.id)) ?? "null"
+      );
+      assert.ok(skippedPreview.previewKey);
+      expect(smartState.production.deploymentId).toBe(live.id);
+      expect(smartState.previews[skippedPreview.previewKey]).toBeUndefined();
+      expect(smartState.removedPreviews[skippedPreview.previewKey]).toBe(
+        skippedPreview.generation
+      );
+      expect(
+        (await request(`${skippedPreview.target.publicOrigin}/blog`)).status
+      ).toBe(410);
+      expect(
+        (await request(`${smartSite.publicOrigin}/blog/shipped-twice`)).status
+      ).toBe(200);
+      // A pull request that changes a post builds its preview.
+      await github.createBranch("feature/new-post");
+      const newPostSha = await github.push(
+        [
+          {
+            path: "blog/branch-only.md",
+            content: encode(post("Only on a branch")),
+          },
+        ],
+        "Add a branch post",
+        "feature/new-post"
+      );
+      const newPost = await github.openPullRequest(
+        "feature/new-post",
+        "Add a branch post"
+      );
+      const newPostDelivery = await pullRequestDelivery(newPost);
+      expect(newPostDelivery.jobIds).toHaveLength(1);
+      const newPostJob = newPostDelivery.jobIds[0] as string;
+      expect(await runSiteJob(newPostJob)).toMatchObject({
+        status: "done",
+        outcome: "live",
+      });
+      expect(builds).toBe(buildsBeforeBranches + 1);
+      const built = await deploymentFor(newPostJob);
+      expect(built.smartDeploymentEvaluation).toMatchObject({
+        comparedDeploymentId: live.id,
+        inputsChanged: true,
+      });
+      assert.ok(built.previewKey);
+      expect(
+        JSON.parse(r2.text(SITE_R2_KEYS.state(smartSite.id)) ?? "null")
+          .previews[built.previewKey]
+      ).toMatchObject({ deploymentId: built.id });
+      expect(await checkRun(newPostSha)).toMatchObject({
+        conclusion: "success",
+      });
+      expect((await github.pullRequestComments(newPost))[0]).toContain(
+        `[Open preview](<${built.target.publicOrigin}/blog>)`
+      );
       await phase("build and emulator accounting");
       // Every outbound call hit an emulated route.
       expect(
         emulators.summaries().flatMap((summary) => summary.unhandled)
       ).toEqual([]);
-      expect(builds).toBe(22);
+      expect(builds).toBe(24);
       expect(boxBuilds).toHaveLength(builds);
       if (emulators.box) {
         expectNoLiveBoxes();
@@ -2208,7 +2372,7 @@ if (!process.env.SITES_TEST_DATABASE_URL) {
         }
       }
       // The rejected builder rebuild compiled before it reported a failure.
-      expect(boxBuilds.filter((build) => build.result?.ok)).toHaveLength(20);
+      expect(boxBuilds.filter((build) => build.result?.ok)).toHaveLength(22);
       console.log(
         JSON.stringify({
           scope: "connected-postgres-compiler-publisher-worker-lifecycle",

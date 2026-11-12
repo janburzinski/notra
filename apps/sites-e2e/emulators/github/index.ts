@@ -35,11 +35,31 @@ export async function startGitHubEmulator(options: GitHubEmulatorOptions) {
       const headers = new Headers(request.headers);
       headers.delete("host");
       headers.delete("content-length");
+      // emulate uses Date.now() as the delivery ID, so two webhooks in one
+      // millisecond collide and Sites drops the second as a redelivery.
+      // GitHub sends a GUID per delivery.
+      headers.set("x-github-delivery", randomUUID());
       const payload = JSON.parse(body.toString("utf8")) as {
         after?: string;
         deleted?: boolean;
         head_commit?: unknown;
+        number?: number;
+        pull_request?: { number: number };
       };
+      // GitHub puts the pull request number at the top; emulate doesn't.
+      if (
+        headers.get("x-github-event") === "pull_request" &&
+        payload.number === undefined &&
+        payload.pull_request
+      ) {
+        body = Buffer.from(
+          JSON.stringify({ ...payload, number: payload.pull_request.number })
+        );
+        headers.set(
+          "x-hub-signature-256",
+          `sha256=${createHmac("sha256", options.webhookSecret).update(body).digest("hex")}`
+        );
+      }
       if (
         headers.get("x-github-event") === "push" &&
         payload.head_commit === undefined &&
@@ -563,6 +583,75 @@ export async function startGitHubEmulator(options: GitHubEmulatorOptions) {
           }),
         },
         {
+          // emulate lists placeholder names here; GitHub lists the pull
+          // request's changes from the merge base, as compare does.
+          method: "GET",
+          path: `${repoPath}/pulls/:number/files`,
+          handle: guarded(async (request, params, authorization) => {
+            const pull = await api<EmulatedPull>(
+              "GET",
+              `${repoPath}/pulls/${params.number}`,
+              undefined,
+              authorization
+            );
+            const { files = [] } = await api<{
+              files?: {
+                filename: string;
+                previous_filename?: string;
+                status: string;
+              }[];
+            }>(
+              "GET",
+              `${repoPath}/compare/${pull.base.ref}...${pull.head.sha}`,
+              undefined,
+              authorization
+            );
+            const url = new URL(request.url);
+            const perPage = Number(url.searchParams.get("per_page") ?? 30);
+            const page = Number(url.searchParams.get("page") ?? 1);
+            return Response.json(
+              files
+                .slice((page - 1) * perPage, page * perPage)
+                .map(({ filename, previous_filename, status }) => ({
+                  filename,
+                  previous_filename,
+                  status,
+                }))
+            );
+          }),
+        },
+        {
+          // GitHub marks comments an App writes with an installation token
+          // as the App's; emulate leaves performed_via_github_app null.
+          method: "GET",
+          path: `${repoPath}/issues/:number/comments`,
+          handle: guarded(async (request) => {
+            const response = await forward(request);
+            if (!response.ok) {
+              return response;
+            }
+            const comments = (await response.json()) as {
+              user?: { login?: string; type?: string } | null;
+              performed_via_github_app?: unknown;
+            }[];
+            return Response.json(
+              comments.map((comment) =>
+                comment.user?.login === "notra-sites-e2e[bot]"
+                  ? {
+                      ...comment,
+                      user: { ...comment.user, type: "Bot" },
+                      performed_via_github_app: {
+                        id: options.appId,
+                        slug: "notra-sites-e2e",
+                      },
+                    }
+                  : comment
+              ),
+              { headers: response.headers }
+            );
+          }),
+        },
+        {
           method: "GET",
           path: `${repoPath}/rules/branches/:branch+`,
           handle: () => Response.json(options.branchRules ?? []),
@@ -646,6 +735,22 @@ export async function startGitHubEmulator(options: GitHubEmulatorOptions) {
             base: { ref: string };
           }[]
         >("GET", `${repoPath}/pulls?state=all`),
+      // emulate delivers pull_request.opened like GitHub does.
+      openPullRequest: async (head: string, title: string) =>
+        (
+          await api<{ number: number }>("POST", `${repoPath}/pulls`, {
+            head,
+            base: "main",
+            title,
+          })
+        ).number,
+      pullRequestComments: async (number: number) =>
+        (
+          await api<{ body: string }[]>(
+            "GET",
+            `${repoPath}/issues/${number}/comments`
+          )
+        ).map((comment) => comment.body),
       file: async (path: string, ref = "main") => {
         try {
           const file = await api<{ content: string }>(

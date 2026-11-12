@@ -40,7 +40,7 @@ import type {
 } from "./types/webhooks";
 import { redeploymentInput } from "./utils/deployments";
 import {
-  pathsTouchRootDirectory,
+  pathsTouchSiteInputs,
   pushTouchesRootDirectory,
 } from "./utils/push-paths";
 
@@ -216,8 +216,9 @@ async function handlePush(
 }
 
 /**
- * Whether a pull request changes a site's folder. Sites sharing a repository
- * share one lookup per pull request, and any failure counts as a change.
+ * Whether a pull request changes a file the site is built from. Sites sharing
+ * a repository share one lookup per pull request, and any failure counts as a
+ * change.
  */
 function pullRequestPathsLookup() {
   const cache = new Map<number, Promise<string[] | null>>();
@@ -233,7 +234,7 @@ function pullRequestPathsLookup() {
     }
     return paths.then(
       (changed) =>
-        changed === null || pathsTouchRootDirectory(changed, rootDirectory)
+        changed === null || pathsTouchSiteInputs(changed, rootDirectory)
     );
   };
 }
@@ -265,7 +266,6 @@ async function handlePullRequest(
       return null;
     }
     if (
-      site.rootDirectory &&
       !(await isPreviewOpen(site.id, previewKey).catch(() => true)) &&
       !(await pullRequestTouchesRootDirectory(
         site,

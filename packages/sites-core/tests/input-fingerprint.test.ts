@@ -168,3 +168,56 @@ test("archive transformations require a build even outside the site root", async
     ).toBeNull();
   }
 });
+const attributesEntry = (path: string, content: string) => ({
+  path,
+  sha: "b".repeat(40),
+  type: "blob",
+  mode: "100644",
+  size: new TextEncoder().encode(content).length,
+});
+test("byte-preserving attributes keep the fingerprint", async () => {
+  const content = [
+    "packages/db/migrations/** linguist-generated=true",
+    "",
+    ".agents/skills/**/*.py linguist-detectable=false",
+    "# Archived tracker builds are pinned by hash: keep their bytes exact.",
+    "packages/web-tracker/releases/** -text linguist-generated=true",
+    "*.png binary",
+    "*.lock -diff merge=ours",
+    "",
+  ].join("\n");
+  const fingerprint = await fingerprintSiteInputs({
+    ...input,
+    tree: [...input.tree, attributesEntry(".gitattributes", content)],
+    gitAttributes: { ".gitattributes": content },
+  });
+  expect(fingerprint).toBe(await fingerprintSiteInputs(input));
+});
+test.each([
+  "* text=auto",
+  "*.mdx text eol=crlf",
+  "*.png filter=lfs diff=lfs merge=lfs -text",
+  "version.txt export-subst",
+  "drafts/** export-ignore",
+  "*.js ident",
+  "*.txt working-tree-encoding=UTF-16",
+  "[attr]safe -text",
+  '"with space.md" -text',
+])("transforming attribute rule %s requires a build", async (rule) => {
+  expect(
+    await fingerprintSiteInputs({
+      ...input,
+      tree: [...input.tree, attributesEntry("docs/.gitattributes", rule)],
+      gitAttributes: { "docs/.gitattributes": rule },
+    })
+  ).toBeNull();
+});
+test("attribute contents must match the tree entry", async () => {
+  expect(
+    await fingerprintSiteInputs({
+      ...input,
+      tree: [...input.tree, attributesEntry(".gitattributes", "* -text")],
+      gitAttributes: { ".gitattributes": "* -text\n" },
+    })
+  ).toBeNull();
+});

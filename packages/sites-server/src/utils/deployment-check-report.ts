@@ -1,9 +1,12 @@
 import { UNCHANGED_BUILD_TITLE } from "../constants/github";
+import { SMART_DEPLOYMENT_BRANCH_SKIP_REASON } from "../constants/smart-deployments";
 import type { DeploymentOutcome, SiteDeployment } from "../types/deployments";
 import type { CheckReport } from "../types/reporting";
-import { primaryMountUrl } from "./urls";
+import type { Site } from "../types/sites";
+import { primaryMountUrl, unchangedDeploymentUrl } from "./urls";
 
 export function deploymentCheckReport(
+  site: Site,
   deployment: SiteDeployment,
   outcome: DeploymentOutcome
 ): CheckReport {
@@ -43,17 +46,17 @@ export function deploymentCheckReport(
       };
     case "skipped": {
       const unchanged = deployment.status === "skipped";
-      const url = unchanged
-        ? primaryMountUrl(
-            deployment.target.publicOrigin,
-            deployment.target.mounts
-          )
-        : null;
+      const url = unchanged ? unchangedDeploymentUrl(site, deployment) : null;
+      const label =
+        deployment.kind === "production" ||
+        deployment.skipReason === SMART_DEPLOYMENT_BRANCH_SKIP_REASON
+          ? "Published"
+          : "Preview";
       return {
         conclusion: "skipped",
         title: unchanged ? UNCHANGED_BUILD_TITLE : "Skipped",
         summary: url
-          ? `${outcome.reason}\n\n${deployment.kind === "production" ? "Published" : "Preview"}: ${url}\n\nThe existing version is still being served.`
+          ? `${outcome.reason}\n\n${label}: ${url}\n\nThe existing version is still being served.`
           : outcome.reason,
         liveUrl: url,
       };

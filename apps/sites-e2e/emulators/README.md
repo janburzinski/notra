@@ -8,7 +8,7 @@ through the overrides in
 
 | Emulator | Serves | State and behaviour |
 | --- | --- | --- |
-| `github/` | REST, GraphQL, App auth, webhooks | [vercel-labs/emulate](https://github.com/vercel-labs/emulate) plus a proxy for tarballs (a 302 to a one-time codeload-style URL, as GitHub does), `createCommitOnBranch`, branch rules and full branch commits |
+| `github/` | REST, GraphQL, App auth, webhooks | [vercel-labs/emulate](https://github.com/vercel-labs/emulate) plus a proxy for tarballs (a 302 to a one-time codeload-style URL, as GitHub does), `createCommitOnBranch`, branch rules and full branch commits. It also fills in what emulate leaves out: a pull request's changed files from the merge base, the App identity on its own comments, the top-level `number` in `pull_request` webhooks and a unique delivery ID per webhook |
 | `r2/` | R2's S3 API (path style) | Conditional writes (412), ListObjectsV2 pages (25 per page to exercise pagination), DeleteObjects, `aws-chunked` bodies; `binding()` is the Worker's R2 view of the same objects |
 | `box/` | Upstash Box API | The snapshot is this checkout's staged builder toolchain; a box is a local directory for `/workspace/home`; `exec` runs the guest build there. `boxes` keeps every box with its `deleted` flag; `failNext` makes the next creations answer an error status (503 by default). Network isolation is not emulated |
 | `cloudflare/` | Cloudflare for SaaS custom hostnames | A hostname turns active once the shared DNS zone has its CNAME to the SaaS target and Cloudflare's ownership TXT |

@@ -1,9 +1,13 @@
 import { SITE_BUILD_LIMITS } from "../constants/sites";
 import {
+  SITE_GIT_ATTRIBUTES_FILENAME,
+  SITE_GIT_ATTRIBUTES_MAX_BYTES,
+  SITE_GIT_ATTRIBUTES_MAX_FILES,
   SITE_IGNORE_FILENAME,
   SITE_IGNORE_MAX_BYTES,
 } from "../constants/source";
 import type { SiteInputFingerprintParams } from "../types/smart-deployments";
+import { isByteSafeGitAttributes } from "./git-attributes";
 import { sha256Hex } from "./hash";
 import { createSiteIgnore } from "./site-ignore";
 import { isCollectedSiteSourcePath } from "./source-files";
@@ -15,13 +19,25 @@ export async function fingerprintSiteInputs(
 ): Promise<string | null> {
   const { tree, truncated, rootDirectory } = params;
   // Archive attributes and LFS may transform Git blobs before compilation.
-  // Until those transformations are verified, these repositories always build.
+  // Only attribute files proven not to change bytes are allowed.
+  const attributeFiles = tree.filter(
+    (entry) => entry.path?.split("/").at(-1) === SITE_GIT_ATTRIBUTES_FILENAME
+  );
   if (
-    tree.some((entry) =>
-      [".gitattributes", ".lfsconfig"].includes(
-        entry.path?.split("/").at(-1) ?? ""
-      )
-    )
+    tree.some((entry) => entry.path?.split("/").at(-1) === ".lfsconfig") ||
+    attributeFiles.length > SITE_GIT_ATTRIBUTES_MAX_FILES ||
+    attributeFiles.some((entry) => {
+      const content = entry.path ? params.gitAttributes?.[entry.path] : null;
+      return (
+        entry.type !== "blob" ||
+        !["100644", "100755"].includes(entry.mode ?? "") ||
+        entry.size === undefined ||
+        entry.size > SITE_GIT_ATTRIBUTES_MAX_BYTES ||
+        content == null ||
+        new TextEncoder().encode(content).length !== entry.size ||
+        !isByteSafeGitAttributes(content)
+      );
+    })
   ) {
     return null;
   }
