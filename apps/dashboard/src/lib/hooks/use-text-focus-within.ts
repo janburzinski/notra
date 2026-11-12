@@ -2,12 +2,19 @@
 
 import { type RefObject, useEffect, useRef, useState } from "react";
 
+function isTextField(target: EventTarget | null) {
+  return (
+    target instanceof HTMLTextAreaElement || target instanceof HTMLInputElement
+  );
+}
+
 /**
- * Whether focus is anywhere inside the element, kept true while a press
- * inside lasts: shrinking under the pointer would move a button before the
- * click lands.
+ * Whether you're writing inside the element: it turns on when a text field
+ * inside takes focus, not a button such as "+", and stays on while focus
+ * moves to the buttons beside it or a press inside lasts, so nothing shrinks
+ * under the pointer before the click lands.
  */
-export function useFocusWithin(
+export function useTextFocusWithin(
   ref: RefObject<HTMLElement | null>,
   enabled: boolean
 ) {
@@ -20,14 +27,20 @@ export function useFocusWithin(
     }
     const settle = () => {
       pressedRef.current = false;
-      setFocusWithin(element.contains(document.activeElement));
+      if (!element.contains(document.activeElement)) {
+        setFocusWithin(false);
+      }
     };
     const press = () => {
       pressedRef.current = true;
       window.addEventListener("pointerup", settle, { once: true });
       window.addEventListener("pointercancel", settle, { once: true });
     };
-    const focus = () => setFocusWithin(true);
+    const focus = (event: FocusEvent) => {
+      if (isTextField(event.target)) {
+        setFocusWithin(true);
+      }
+    };
     const blur = (event: FocusEvent) => {
       if (
         !(

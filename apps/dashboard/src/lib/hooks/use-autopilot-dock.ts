@@ -50,8 +50,9 @@ export function useAutopilotDockFocus(
 
 /**
  * Escape steps the dock back one size. Reaching the input of a conversation
- * that is already going, by keyboard or pointer, brings it back. Returns the
- * flag that keeps it folded while minimizing hands focus to the input.
+ * that is already going, by keyboard or pointer, brings it back; its buttons,
+ * such as "+", don't. Returns the flag that keeps it folded while minimizing
+ * hands focus to the input.
  */
 export function useAutopilotDockKeys({
   dockRef,
@@ -81,7 +82,13 @@ export function useAutopilotDockKeys({
         setMode("collapsed");
       }
     };
-    const reopen = () => {
+    const reopen = (event: Event) => {
+      if (
+        event.target instanceof Element &&
+        event.target.closest("button, [role='button']")
+      ) {
+        return;
+      }
       if (keepCollapsedRef.current) {
         keepCollapsedRef.current = false;
         return;

@@ -49,7 +49,7 @@ import { ChatSkillTagChips } from "@/components/chat/chat-skill-tag-chips";
 import Link from "@/components/framework/link";
 import { COMPOSER_STOP_ICON } from "@/constants/composer";
 import { useContentChatInput } from "@/lib/hooks/use-content-chat-input";
-import { useFocusWithin } from "@/lib/hooks/use-focus-within";
+import { useTextFocusWithin } from "@/lib/hooks/use-text-focus-within";
 import type {
   CardComposerToolbarProps,
   ChatComposerSendButtonProps,
@@ -181,7 +181,7 @@ function PillComposerBody({
           // Closed: one row between the buttons. Open: the text takes the full
           // width, starting in line with the round "+" below it, and the
           // buttons get a row of their own.
-          open ? "-ml-1 pb-10" : "pr-10 pl-10"
+          open ? "-ml-1.25 pb-10" : "pr-10 pl-10"
         )}
       >
         {textarea}
@@ -258,7 +258,7 @@ function ContentChatInputComposer(props: ChatInputProps) {
   } = input;
   const pill = props.layout === "pill";
   const sectionRef = useRef<HTMLElement | null>(null);
-  const focusWithin = useFocusWithin(sectionRef, pill);
+  const focusWithin = useTextFocusWithin(sectionRef, pill);
   // The pill opens to two rows while you write, then settles back to one.
   const pillOpen =
     pill &&
