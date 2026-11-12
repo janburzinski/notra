@@ -19,6 +19,7 @@ export function AutopilotAutomationStatus({
   overview,
   merging,
   onMerge,
+  onClosePullRequest,
 }: AutopilotAutomationStatusProps) {
   const { settings, findings } = overview;
   if (!(settings.enabled && settings.jobs[kind])) {
@@ -88,6 +89,11 @@ export function AutopilotAutomationStatus({
             </Button>
             <AutopilotMergeMenu
               loading={merging}
+              onClosePullRequest={
+                onClosePullRequest
+                  ? () => onClosePullRequest(waiting)
+                  : undefined
+              }
               onMerge={(method) => onMerge(waiting, method)}
               size="sm"
             />

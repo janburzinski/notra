@@ -4,7 +4,6 @@ import { Badge } from "@notra/ui/components/ui/badge";
 
 import { AUTOPILOT_FINDING_STATUS_BADGES } from "@/constants/autopilot";
 import { AUTOPILOT_PULL_REQUEST_STATES } from "@/constants/autopilot-ui";
-import { cn } from "@/lib/utils";
 import type { AutopilotFindingStatusProps } from "@/types/autopilot";
 
 /**
@@ -14,6 +13,7 @@ import type { AutopilotFindingStatusProps } from "@/types/autopilot";
  */
 export function AutopilotFindingStatus({
   finding,
+  linked = true,
 }: AutopilotFindingStatusProps) {
   const state = AUTOPILOT_PULL_REQUEST_STATES[finding.status];
   if (!(state && finding.pullRequestUrl)) {
@@ -23,21 +23,22 @@ export function AutopilotFindingStatus({
   return (
     <Badge
       aria-label={`${state.label}: pull request #${finding.pullRequestNumber}`}
-      className={cn("tabular-nums", state.className)}
       render={
-        <a
-          href={finding.pullRequestUrl}
-          rel="noreferrer"
-          target="_blank"
-          title={state.label}
-        />
+        linked ? (
+          <a
+            href={finding.pullRequestUrl}
+            rel="noreferrer"
+            target="_blank"
+            title={state.label}
+          />
+        ) : undefined
       }
       shape="rounded"
       size="md"
       variant={state.variant}
     >
-      <HugeiconsIcon aria-hidden="true" icon={state.icon} strokeWidth={1.5} />#
-      {finding.pullRequestNumber}
+      <HugeiconsIcon aria-hidden="true" icon={state.icon} strokeWidth={1.5} />
+      <span className="tabular-nums">#{finding.pullRequestNumber}</span>
     </Badge>
   );
 }

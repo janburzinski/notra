@@ -26,7 +26,17 @@ import {
   runCompetitorsJob,
   runKeywordsJob,
 } from "@/lib/autopilot/blog";
-import { buildAutopilotBrief, postAutopilotBrief } from "@/lib/autopilot/brief";
+import {
+  buildAutopilotBrief,
+  loadSlackDestination,
+  postAutopilotBrief,
+} from "@/lib/autopilot/brief";
+import {
+  autopilotBriefUrl,
+  loadBriefFindings,
+  recordAutopilotBriefDelivery,
+  writeAutopilotBriefPage,
+} from "@/lib/autopilot/brief-page";
 import { loadRecentDailyNotes } from "@/lib/autopilot/daily-notes";
 import { syncFindingPullRequests } from "@/lib/autopilot/findings";
 import { autopilotFlagState } from "@/lib/autopilot/flag";
@@ -338,25 +348,68 @@ export async function deliverAutopilotBrief(params: {
         ),
       })
     : [];
-  const proposed = await attachSitePreviews(
-    ctx.organizationId,
-    findings.filter((finding) => finding.status === "proposed")
+  const proposed = findings.filter((finding) => finding.status === "proposed");
+  const suggested = findings.filter(
+    (finding) => finding.status === "suggested"
   );
-  const brief = buildAutopilotBrief({
-    organizationSlug: ctx.organizationSlug,
-    timezone: ctx.timezone,
-    proposed,
-    suggested: findings.filter((finding) => finding.status === "suggested"),
-    merged,
-    insights: params.insights,
-    recentDays: await loadRecentDailyNotes(ctx.organizationId),
-  });
   const log = createAutopilotLogger(ctx, null);
-  if (!brief) {
+  if (
+    findings.length === 0 &&
+    merged.length === 0 &&
+    params.insights.length === 0
+  ) {
     await log.skip("No brief: nothing proposed, merged or worth knowing");
     return null;
   }
+  // The page is reached from the Slack message, so without Slack there is
+  // nothing to write (and no model call to pay for).
+  if (!(await loadSlackDestination(ctx.organizationId))) {
+    await log.skip("No brief sent: Slack is not connected");
+    return null;
+  }
   try {
+    const page = await writeAutopilotBriefPage({
+      ctx,
+      pending: [...proposed, ...suggested],
+      merged,
+      insights: params.insights,
+    });
+    const pageUrl = autopilotBriefUrl(page.id);
+    await log.action("Wrote the daily brief", { url: pageUrl });
+    // Slack lists exactly what the page lists, also when a retry reuses the
+    // page an earlier attempt saved.
+    const rows = new Map(
+      (await loadBriefFindings(ctx.organizationId, page.content)).map((row) => [
+        row.id,
+        row,
+      ])
+    );
+    const listed = (ids: string[]) =>
+      ids.flatMap((id) => {
+        const row = rows.get(id);
+        return row ? [row] : [];
+      });
+    const listedPending = listed(page.content.findingIds);
+    const brief = buildAutopilotBrief({
+      organizationSlug: ctx.organizationSlug,
+      timezone: ctx.timezone,
+      proposed: await attachSitePreviews(
+        ctx.organizationId,
+        listedPending.filter((row) => row.status === "proposed")
+      ),
+      suggested: listedPending.filter((row) => row.status === "suggested"),
+      merged: listed(page.content.mergedIds).filter(
+        (row) => row.status === "merged"
+      ),
+      insights: page.content.insights,
+      recentDays: await loadRecentDailyNotes(ctx.organizationId),
+      page: { url: pageUrl, headline: page.content.headline },
+    });
+    if (!brief) {
+      // Only on a retry whose items were all decided in the meantime.
+      await log.skip("No brief: everything on it was already decided");
+      return null;
+    }
     if (!(await renewAutopilotRunLease(ctx))) {
       throw new Error("The run no longer owns its delivery lease");
     }
@@ -366,6 +419,11 @@ export async function deliverAutopilotBrief(params: {
       ctx.runId
     );
     if (delivery) {
+      await recordAutopilotBriefDelivery(ctx.organizationId, page.id, {
+        teamId: delivery.teamId,
+        channel: delivery.channel,
+        ts: delivery.ts,
+      });
       await db.transaction(async (tx) => {
         const recorded = await tx
           .update(autopilotRuns)
@@ -403,7 +461,9 @@ export async function deliverAutopilotBrief(params: {
       });
       await log.action("Posted the brief to Slack");
     } else {
-      await log.skip("No brief sent: Slack is not connected");
+      await log.skip(
+        "Slack is not connected, so the brief is only on its page"
+      );
     }
     return delivery?.ts ?? null;
   } catch (error) {

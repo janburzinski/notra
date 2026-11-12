@@ -54,6 +54,11 @@ export const autopilotRunInputSchema = autopilotOrganizationInputSchema.extend({
   runId: z.string().trim().min(1).max(64),
 });
 
+export const autopilotBriefInputSchema =
+  autopilotOrganizationInputSchema.extend({
+    briefId: z.string().trim().min(1).max(64),
+  });
+
 /** GitHub's three ways to merge a pull request. */
 export const autopilotMergeMethodSchema = z.enum(["squash", "merge", "rebase"]);
 

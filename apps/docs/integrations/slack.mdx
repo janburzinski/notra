@@ -83,7 +83,7 @@ Each brief is one short summary message. Every pull request and idea is a reply 
 | Pull request | Merges the pull request right away | Dismisses the item and closes the pull request |
 | Idea | Autopilot writes it (charging credits as usual) and posts the pull request in the same thread, ready for 👍 | Dismisses the idea |
 
-Anyone in the Autopilot channel can react, so pick a channel only your team can join. Slack connections made before reactions were supported need to reconnect to grant `reactions:read` and `reactions:write`.
+Only owners and admins of your Notra workspace can act this way. Notra matches the person who reacted by their Slack email, so they need the same verified email in Notra. Anyone else gets a reply in the thread saying so, and nothing happens. Slack connections made before this check need to reconnect once to grant `users:read` and `users:read.email` (and `reactions:read` and `reactions:write` if they predate reactions).
 
 ### Enable, disable, delete
 
@@ -105,6 +105,7 @@ The Slack app requests these bot scopes:
 | `files:write`                      | Upload chart images to the conversation                                        |
 | `assistant:write`                  | Enable Slack's assistant experience for the app                                |
 | `reactions:read`, `reactions:write` | Act on 👍 and 👎 on Autopilot items, add those reactions for one-tap voting, and mark messages with 👀 while the agent works on them |
+| `users:read`, `users:read.email`  | Match whoever reacts to an Autopilot item to a Notra owner or admin by email |
 
 The agent only reads a thread once it is mentioned or messaged in it. It does not scan channels for keywords, and it does not read other threads. The only reactions it acts on are 👍 and 👎 on its own Autopilot items. Notra does not mirror private-channel or DM conversations into the dashboard.
 

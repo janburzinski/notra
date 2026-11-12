@@ -10,6 +10,7 @@ export const RESERVED_ORGANIZATION_SLUGS = [
   "reset-password",
   "invitation",
   "share",
+  "brief",
   "callback",
   "onboarding",
   "dashboard",

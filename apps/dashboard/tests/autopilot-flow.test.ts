@@ -13,6 +13,7 @@ import {
   renderPlannerState,
 } from "@notra/ai/utils/autopilot-planner";
 import {
+  autopilotBriefs,
   autopilotFindings,
   autopilotRuns,
   autopilotSettings,
@@ -247,6 +248,25 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
           throw new Error("No planner output in this test");
         }
         return state.plan;
+      }
+      if (input.tag === "brief") {
+        // The writer of the brief page: leads with the first pending item and
+        // also names one id it was never given, which must be dropped.
+        const ids = [...input.prompt.matchAll(/- id: (\S+)/g)].map(
+          (match) => match[1] ?? ""
+        );
+        return {
+          headline: "Two calls to make today",
+          summary: "One pull request and one idea are waiting.",
+          lead: ids[0] ? { findingId: ids[0], why: "It is ready now." } : null,
+          sections: [
+            {
+              title: "Everything else",
+              body: "The rest of the day.",
+              findingIds: [...ids, "not-in-the-input"],
+            },
+          ],
+        };
       }
       state.feedbackPrompt = input.prompt;
       return input.tag === "write-rules"
@@ -1362,6 +1382,8 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
     expect(
       (await db.query.autopilotFindings.findFirst())?.evidence.briefed ?? []
     ).toHaveLength(0);
+    // Without Slack nothing links to a page, so none is written.
+    expect(await db.query.autopilotBriefs.findMany()).toHaveLength(0);
     await db
       .update(autopilotRuns)
       .set({ status: "completed" })
@@ -1372,6 +1394,23 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
       .where(eq(autopilotSettings.organizationId, "sandbox-org"));
     expect(await daily("brief-one")).not.toBeNull();
     expect(slackMessages[0]).toContain("1 ready to merge · 1 idea");
+    const page = await db.query.autopilotBriefs.findFirst({
+      where: eq(autopilotBriefs.runId, "brief-one"),
+    });
+    if (!page?.content.lead) {
+      throw new Error("Expected a brief page with a lead item");
+    }
+    expect(slackMessages[0]).toContain(`/brief/${page.id}`);
+    expect(slackMessages[0]).toContain("Two calls to make today");
+    expect(page.content.writtenBy).toBe("agent");
+    expect(page.content.findingIds).toHaveLength(2);
+    // The lead is not repeated in a section, and unknown ids are dropped.
+    expect(page.content.sections[0]?.findingIds).toEqual(
+      page.content.findingIds.filter(
+        (id) => id !== page.content.lead?.findingId
+      )
+    );
+    expect(page.slackMessageTs).toBe("1234567890.000001");
     expect(slackReplies).toHaveLength(2);
     expect(slackReplies.join()).toContain("React 👍 to merge");
     expect(slackReplies.join()).toContain("React 👍 to write it");
@@ -2270,6 +2309,12 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
     expect(
       await deliverAutopilotBrief({ ctx, insights: [], previousRunAt: null })
     ).not.toBeNull();
+    // The retry reuses the page the failed attempt wrote.
+    expect(
+      await db.query.autopilotBriefs.findMany({
+        where: eq(autopilotBriefs.runId, ctx.runId),
+      })
+    ).toHaveLength(1);
     expect(
       (await db.query.autopilotFindings.findFirst())?.evidence.briefed
     ).toEqual(["proposed"]);

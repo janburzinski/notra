@@ -190,6 +190,7 @@ export interface AutopilotAutomationStatusProps {
   overview: AutopilotOverview;
   merging: boolean;
   onMerge: (finding: AutopilotFindingView, method: GitHubMergeMethod) => void;
+  onClosePullRequest?: (finding: AutopilotFindingView) => void;
 }
 
 export interface AutopilotTrendProps {
@@ -223,6 +224,15 @@ export interface AutopilotFindingPageProps {
   organizationSlug: string;
   overview: AutopilotOverview;
   finding: AutopilotFindingView;
+}
+
+export interface AutopilotFindingHeaderActionsProps {
+  organizationId: string;
+  finding: AutopilotFindingView;
+  /** When a scheduled publish is pending; it swaps the merge menu for Hold and Publish now. */
+  publishAt: Date | null;
+  canWrite: boolean;
+  onClose: () => void;
 }
 
 export type AutopilotFindingByIdLoaderProps = Omit<
@@ -464,10 +474,14 @@ export interface AutopilotMergeMenuProps {
   size?: "xs" | "sm";
   loading?: boolean;
   onMerge: (method: GitHubMergeMethod) => void;
+  /** Adds "Close pull request" under the merge options, as GitHub does. */
+  onClosePullRequest?: () => void;
 }
 
 export interface AutopilotFindingStatusProps {
   finding: AutopilotFindingView;
+  /** Off where the row already has its own actions, so the badge isn't a second click target. */
+  linked?: boolean;
 }
 
 export interface AutopilotStatStripProps {
@@ -506,6 +520,8 @@ export interface AutopilotPullRequestsTableProps {
   /** The pull request a merge is running for, shown loading. */
   mergingId: string | null;
   onMerge: (finding: AutopilotFindingView, method: GitHubMergeMethod) => void;
+  /** Offered in the merge menu; the caller confirms before closing. */
+  onClosePullRequest?: (finding: AutopilotFindingView) => void;
   onWrite?: (finding: AutopilotFindingView) => void;
 }
 
@@ -608,6 +624,7 @@ export interface AutopilotPullRequestsTabProps {
   basePath: string;
   findings: AutopilotFindingView[];
   canManage: boolean;
+  onClosePullRequest: (finding: AutopilotFindingView) => void;
   timezone: string;
 }
 
@@ -615,3 +632,89 @@ export type AutopilotSettingsTabProps = Pick<
   AutopilotOffPageProps,
   "basePath" | "organizationId" | "overview"
 >;
+
+/** What the /brief/:id loader resolves before the page asks for the brief. */
+export type AutopilotBriefView =
+  InferRouterOutputs<DashboardRouter>["autopilot"]["brief"];
+
+/** A brief's items in reading order, as `groupBriefFindings` places them. */
+export interface AutopilotBriefGroups {
+  lead: AutopilotFindingView | null;
+  sections: {
+    key: string;
+    title: string;
+    body?: string;
+    rows: AutopilotFindingView[];
+  }[];
+  rest: AutopilotFindingView[];
+  merged: AutopilotFindingView[];
+  /** Everything the brief asks about, decided or not. */
+  asked: AutopilotFindingView[];
+}
+
+export interface AutopilotBriefHeroProps {
+  brief: AutopilotBriefView;
+  /** Items the brief asks about, and how many of them still wait. */
+  asked: number;
+  waiting: number;
+  autopilotHref: string;
+}
+
+export interface AutopilotBriefItemsProps {
+  brief: AutopilotBriefView;
+  groups: AutopilotBriefGroups;
+  organizationId: string;
+  organizationSlug: string;
+  autopilotHref: string;
+  onDismiss: (finding: AutopilotFindingView) => void;
+}
+
+export interface AutopilotBriefHeadingProps {
+  id: string;
+  title: string;
+  description?: string;
+}
+
+export interface AutopilotBriefPageProps {
+  briefId: string;
+  organizationId: string;
+  organizationSlug: string;
+  organizationName: string;
+}
+
+export interface AutopilotBriefFindingCardProps {
+  finding: AutopilotFindingView;
+  organizationSlug: string;
+  canManage: boolean;
+  /** Writing an idea needs Autopilot switched on. */
+  canWrite: boolean;
+  /** The workspace's time zone, for when a scheduled item publishes. */
+  timeZone: string;
+  merging: boolean;
+  writing: boolean;
+  onMerge: (method: GitHubMergeMethod) => void;
+  onWrite: () => void;
+  onDismiss: () => void;
+}
+
+/** One piece of evidence behind a brief item: a pull request, search, page or AI answers. */
+export interface AutopilotBriefSource {
+  kind: "pull-request" | "search" | "answers" | "page";
+  title: string;
+  detail: string | null;
+  href: string | null;
+}
+
+export type AutopilotBriefFindingActionsProps = Omit<
+  AutopilotBriefFindingCardProps,
+  "organizationSlug" | "timeZone"
+> & { title: string };
+
+export interface AutopilotBriefSceneSwitcherProps {
+  index: number;
+  onChange: (index: number) => void;
+}
+
+export interface AutopilotBriefFindingListProps {
+  children: ReactNode;
+}

@@ -9,6 +9,7 @@ import { Suspense } from "react";
 import { LoginFormSkeleton } from "@/components/auth/login-form-skeleton";
 import { lazyPage } from "@/utils/lazy-page";
 
+import { loadAutopilotBriefPage } from "./-brief-loaders";
 import { createDevelopmentUiRoutes } from "./-development-ui";
 import { loadTrafficEmbed } from "./-embed-loaders";
 import {
@@ -53,6 +54,11 @@ const Linkedin = lazyPage(() => import("@/app/connect/linkedin/page"));
 const TrafficEmbed = lazyPage(() =>
   import("@/components/geo/ai-traffic-embed").then((module) => ({
     default: module.AiTrafficEmbed,
+  }))
+);
+const AutopilotBrief = lazyPage(() =>
+  import("@/components/autopilot/autopilot-brief-page").then((module) => ({
+    default: module.AutopilotBriefPage,
   }))
 );
 const SharedChat = lazyPage(() =>
@@ -162,6 +168,16 @@ export function createEntryUiRoutes(parent: AnyRoute) {
           <InvitationConfirm data={data} />
         </AuthSplitShell>
       ),
+    }),
+    createUiRoute({
+      parent,
+      path: "brief/$id",
+      noindex: true,
+      title: { title: "Daily brief" },
+      pendingComponent: () => <div className="bg-background min-h-svh" />,
+      preload: AutopilotBrief.preload,
+      loader: (input) => loadAutopilotBriefPage({ data: input }),
+      component: ({ data }) => <AutopilotBrief {...data} />,
     }),
     createUiRoute({
       parent,

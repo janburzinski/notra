@@ -3,6 +3,7 @@ export const NON_ORGANIZATION_ROUTE_SEGMENTS: ReadonlySet<string> = new Set([
   "api",
   "api-keys",
   "auth",
+  "brief",
   "callback",
   "connect",
   "design-system",

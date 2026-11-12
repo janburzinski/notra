@@ -38,6 +38,7 @@ import { cn } from "@/lib/utils";
 import type {
   AutopilotFindingByIdLoaderProps,
   AutopilotFindingCandidate,
+  AutopilotFindingHeaderActionsProps,
   AutopilotFindingPageClientProps,
   AutopilotFindingPageProps,
   AutopilotPendingFindingAction,
@@ -111,6 +112,71 @@ function FindingByIdLoader({
  * from, how sure Jev was against the bar, what else was on the table, and the
  * steps it took.
  */
+/** Close, hold, merge or write, for an item still waiting on a decision. */
+function FindingHeaderActions({
+  organizationId,
+  finding,
+  publishAt,
+  canWrite,
+  onClose,
+}: AutopilotFindingHeaderActionsProps) {
+  const { writeSuggestion, merge, hold } = useAutopilotActions(organizationId);
+  const writing =
+    writeSuggestion.isPending && writeSuggestion.variables === finding.id;
+  if (
+    writing ||
+    (finding.status !== "proposed" && finding.status !== "suggested")
+  ) {
+    return null;
+  }
+  return (
+    <div className="flex items-center gap-2">
+      {finding.status === "proposed" && !publishAt ? null : (
+        <Button onClick={onClose} size="sm" variant="outline">
+          Close
+        </Button>
+      )}
+      {publishAt ? (
+        <>
+          <Button
+            loading={hold.isPending}
+            onClick={() => hold.mutate(finding.id)}
+            size="sm"
+            variant="outline"
+          >
+            Hold
+          </Button>
+          <Button
+            loading={merge.isPending}
+            onClick={() => merge.mutate({ findingId: finding.id })}
+            size="sm"
+          >
+            Publish now
+          </Button>
+        </>
+      ) : null}
+      {finding.status === "proposed" && !publishAt ? (
+        <AutopilotMergeMenu
+          loading={merge.isPending}
+          onClosePullRequest={onClose}
+          onMerge={(method) => merge.mutate({ findingId: finding.id, method })}
+          size="sm"
+        />
+      ) : null}
+      {finding.status === "suggested" ? (
+        <Button
+          disabled={!canWrite}
+          loading={writeSuggestion.isPending}
+          onClick={() => writeSuggestion.mutate(finding.id)}
+          size="sm"
+        >
+          Write now
+        </Button>
+      ) : null}
+    </div>
+  );
+}
+
 function FindingPage({
   organizationId,
   organizationSlug,
@@ -119,7 +185,6 @@ function FindingPage({
 }: AutopilotFindingPageProps) {
   const format = useFormatter();
   const [from] = useQueryState(AUTOPILOT_FROM_PARAM);
-  const { writeSuggestion, merge, hold } = useAutopilotActions(organizationId);
   const [pending, setPending] = useState<AutopilotPendingFindingAction | null>(
     null
   );
@@ -157,9 +222,6 @@ function FindingPage({
     Number(AUTOPILOT_PLANNED_KINDS.includes(finding.kind)) +
     Number(Boolean(impact)) +
     Number(Boolean(evidence.previewUrl));
-  const canAct =
-    overview.canManage &&
-    !(writeSuggestion.isPending && writeSuggestion.variables === finding.id);
   const columns: TableColumn<AutopilotFindingCandidate>[] = [
     {
       key: "title",
@@ -224,55 +286,14 @@ function FindingPage({
           description={`${AUTOPILOT_KIND_META[finding.kind].label} · ${formatDate(new Date(finding.createdAt))}`}
           title={evidence.brief?.topic ?? finding.title}
         >
-          {canAct &&
-          (finding.status === "proposed" || finding.status === "suggested") ? (
-            <div className="flex items-center gap-2">
-              <Button
-                onClick={() => setPending({ kind: "dismiss", finding })}
-                size="sm"
-                variant="outline"
-              >
-                Close
-              </Button>
-              {publishAt ? (
-                <>
-                  <Button
-                    loading={hold.isPending}
-                    onClick={() => hold.mutate(finding.id)}
-                    size="sm"
-                    variant="outline"
-                  >
-                    Hold
-                  </Button>
-                  <Button
-                    loading={merge.isPending}
-                    onClick={() => merge.mutate({ findingId: finding.id })}
-                    size="sm"
-                  >
-                    Publish now
-                  </Button>
-                </>
-              ) : null}
-              {finding.status === "proposed" && !publishAt ? (
-                <AutopilotMergeMenu
-                  loading={merge.isPending}
-                  onMerge={(method) =>
-                    merge.mutate({ findingId: finding.id, method })
-                  }
-                  size="sm"
-                />
-              ) : null}
-              {finding.status === "suggested" ? (
-                <Button
-                  disabled={!overview.settings.enabled}
-                  loading={writeSuggestion.isPending}
-                  onClick={() => writeSuggestion.mutate(finding.id)}
-                  size="sm"
-                >
-                  Write now
-                </Button>
-              ) : null}
-            </div>
+          {overview.canManage ? (
+            <FindingHeaderActions
+              canWrite={overview.settings.enabled}
+              finding={finding}
+              onClose={() => setPending({ kind: "dismiss", finding })}
+              organizationId={organizationId}
+              publishAt={publishAt}
+            />
           ) : null}
         </PageHeading>
       </div>

@@ -1,11 +1,16 @@
 "use client";
 
-import { ArrowDown01Icon } from "@hugeicons/core-free-icons";
+import {
+  ArrowDown01Icon,
+  GitMergeIcon,
+  GitPullRequestClosedIcon,
+} from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@notra/ui/components/ui/dropdown-menu";
 
@@ -21,6 +26,7 @@ export function AutopilotMergeMenu({
   size = "xs",
   loading,
   onMerge,
+  onClosePullRequest,
 }: AutopilotMergeMenuProps) {
   return (
     <DropdownMenu>
@@ -31,9 +37,26 @@ export function AutopilotMergeMenu({
       <DropdownMenuContent align="end" className="w-52">
         {AUTOPILOT_MERGE_METHODS.map((method) => (
           <DropdownMenuItem key={method} onClick={() => onMerge(method)}>
+            <HugeiconsIcon aria-hidden="true" icon={GitMergeIcon} size={15} />
             {AUTOPILOT_MERGE_METHOD_LABELS[method]}
           </DropdownMenuItem>
         ))}
+        {onClosePullRequest ? (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              onClick={onClosePullRequest}
+              variant="destructive"
+            >
+              <HugeiconsIcon
+                aria-hidden="true"
+                icon={GitPullRequestClosedIcon}
+                size={15}
+              />
+              Close pull request
+            </DropdownMenuItem>
+          </>
+        ) : null}
       </DropdownMenuContent>
     </DropdownMenu>
   );

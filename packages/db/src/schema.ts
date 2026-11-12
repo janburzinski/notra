@@ -103,6 +103,7 @@ import type {
 import type { AnalyticsImportCapabilities } from "./types/analytics-imports";
 import type {
   AutopilotApprovals,
+  AutopilotBriefContent,
   AutopilotCommitFilters,
   AutopilotFindingEvidence,
   AutopilotJobs,
@@ -4996,6 +4997,32 @@ export const autopilotFindings = pgTable(
     index("autopilotFindings_organizationId_updatedAt_idx").on(
       table.organizationId,
       table.updatedAt
+    ),
+  ]
+);
+
+/** The daily brief page each run writes; Slack links to it. */
+export const autopilotBriefs = pgTable(
+  "autopilot_briefs",
+  {
+    id: text("id").primaryKey(),
+    organizationId: text("organization_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "cascade" }),
+    runId: text("run_id").references(() => autopilotRuns.id, {
+      onDelete: "set null",
+    }),
+    content: jsonb("content").$type<AutopilotBriefContent>().notNull(),
+    slackTeamId: text("slack_team_id"),
+    slackChannelId: text("slack_channel_id"),
+    slackMessageTs: text("slack_message_ts"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    uniqueIndex("autopilotBriefs_runId_uidx").on(table.runId),
+    index("autopilotBriefs_organizationId_createdAt_idx").on(
+      table.organizationId,
+      table.createdAt
     ),
   ]
 );

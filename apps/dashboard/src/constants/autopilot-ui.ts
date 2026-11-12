@@ -1,4 +1,5 @@
 import {
+  AiChat02Icon,
   AiMagicIcon,
   Alert02Icon,
   AlertCircleIcon,
@@ -16,6 +17,7 @@ import {
   GitMergeIcon,
   GitPullRequestClosedIcon,
   GitPullRequestIcon,
+  Globe02Icon,
   Idea01Icon,
   Image02Icon,
   Link04Icon,
@@ -422,8 +424,6 @@ export const AUTOPILOT_PULL_REQUEST_STATES: Partial<
     {
       icon: IconSvgElement;
       variant: StatusBadgeAppearance["variant"];
-      /** Merged has no soft badge colour of its own; GitHub shows it purple. */
-      className?: string;
       label: string;
     }
   >
@@ -435,9 +435,7 @@ export const AUTOPILOT_PULL_REQUEST_STATES: Partial<
   },
   merged: {
     icon: CONTENT_PULL_REQUEST_STATES.merged.icon,
-    variant: "secondary",
-    className:
-      "bg-primary/10 text-primary dark:bg-primary/20 [a]:hover:bg-primary/20",
+    variant: "merged",
     label: "Merged",
   },
   dismissed: {
@@ -554,6 +552,14 @@ export const AUTOPILOT_AGENT_DOCK_EXIT = {
   duration: DURATION.fast,
   ease: EASE.out,
 };
+
+/** Icon for each kind of evidence row under a brief item. */
+export const AUTOPILOT_BRIEF_SOURCE_ICONS = {
+  "pull-request": GitPullRequestIcon,
+  search: Search01Icon,
+  answers: AiChat02Icon,
+  page: Globe02Icon,
+} as const;
 
 export const AUTOPILOT_PUBLISH_AT_FORMAT = {
   weekday: "short",

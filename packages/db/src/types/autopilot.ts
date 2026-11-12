@@ -190,6 +190,33 @@ export interface AutopilotRunSummary {
   insights?: string[];
 }
 
+/** One themed part of a daily brief, in plain text. */
+export interface AutopilotBriefSection {
+  title: string;
+  body: string;
+  /** Findings this part talks about; shown as cards under it. */
+  findingIds: string[];
+}
+
+/**
+ * What a daily brief page shows. The agent writes the words; everything that
+ * can be acted on comes from the findings, so their status is always current.
+ */
+export interface AutopilotBriefContent {
+  headline: string;
+  summary: string;
+  /** The one pending item to decide first, and why today. Older briefs lack it. */
+  lead?: { findingId: string; why: string } | null;
+  sections: AutopilotBriefSection[];
+  /** Pull requests and ideas waiting for a decision, in the Slack thread's order. */
+  findingIds: string[];
+  /** Merged since the previous brief. */
+  mergedIds: string[];
+  insights: string[];
+  /** "fallback" when the model failed and the words were assembled from the counts. */
+  writtenBy: "agent" | "fallback";
+}
+
 export type AutopilotEventLevel = (typeof AUTOPILOT_EVENT_LEVELS)[number];
 
 export type AutopilotRunEventData = Record<

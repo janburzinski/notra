@@ -12,6 +12,7 @@ import {
   slackIntegrations,
 } from "@notra/db/schema";
 import {
+  autopilotBriefInputSchema,
   autopilotDismissInputSchema,
   autopilotFindingInputSchema,
   autopilotJobDecisionsInputSchema,
@@ -45,6 +46,7 @@ import {
 import { AUTOPILOT_DAILY_WORKFLOW_KEY } from "@/constants/workflow-engine";
 import { loadAutopilotAnalytics } from "@/lib/autopilot/analytics";
 import { listRecentPullRequestAuthors } from "@/lib/autopilot/authors";
+import { loadAutopilotBrief } from "@/lib/autopilot/brief-page";
 import {
   dismissFindingWithFeedback,
   writeSuggestedFinding,
@@ -106,6 +108,7 @@ import {
   autopilotWorkflowRunInputSchema,
 } from "@/schemas/autopilot-workflows";
 import type { ORPCContext } from "@/types/orpc/context";
+import { slackThreadUrl } from "@/utils/autopilot-brief";
 import { toAutopilotCommitFilters } from "@/utils/autopilot-commit-filters";
 import { canManageAutopilot } from "@/utils/autopilot-permissions";
 
@@ -505,6 +508,44 @@ export const autopilotRouter = {
         );
       }
       return await getWorkflowRunViews(input.organizationId, input.runId);
+    }),
+
+  brief: authorizedProcedure
+    .input(autopilotBriefInputSchema)
+    .use(withOrganizationAccess)
+    .use(withAutopilotFlag)
+    .handler(async ({ input, context }) => {
+      const [loaded, settings] = await Promise.all([
+        loadAutopilotBrief(input.organizationId, input.briefId),
+        db.query.autopilotSettings.findFirst({
+          columns: { enabled: true, repositoryBranch: true, timezone: true },
+          where: eq(autopilotSettings.organizationId, input.organizationId),
+        }),
+      ]);
+      if (!loaded) {
+        throw notFound("Brief not found");
+      }
+      const { brief, findings } = loaded;
+      return {
+        canManage: canManageAutopilot(context.auth.membership.role),
+        // Writing an idea needs Autopilot switched on.
+        canWrite: settings?.enabled ?? false,
+        branch: settings?.repositoryBranch ?? null,
+        // The brief's date in the workspace's time, not the viewer's UTC default.
+        timeZone: settings?.timezone ?? "UTC",
+        id: brief.id,
+        createdAt: brief.createdAt,
+        content: brief.content,
+        slackUrl:
+          brief.slackTeamId && brief.slackChannelId && brief.slackMessageTs
+            ? slackThreadUrl(
+                brief.slackTeamId,
+                brief.slackChannelId,
+                brief.slackMessageTs
+              )
+            : null,
+        findings,
+      };
     }),
 
   sync: authorizedProcedure

@@ -28,8 +28,12 @@ import type {
   AutopilotFindingMessage,
   SlackBlock,
 } from "@/types/autopilot-slack";
+import { describeBriefCounts, slackThreadUrl } from "@/utils/autopilot-brief";
 import { autopilotSlackMessageId } from "@/utils/autopilot-delivery";
-import { findingDisplayTitle } from "@/utils/autopilot-findings";
+import {
+  findingDisplayTitle,
+  findingSummary,
+} from "@/utils/autopilot-findings";
 import { formatAutopilotPublishAt } from "@/utils/autopilot-publish";
 import { compactSlackText, slackMrkdwn } from "@/utils/autopilot-slack";
 
@@ -42,18 +46,6 @@ function bulletList(title: string, items: string[]) {
     .slice(0, 3)
     .map((item) => `• ${item}`)
     .join("\n")}${more}`;
-}
-
-function findingSummary(finding: FindingRow) {
-  const target = finding.evidence.target;
-  if (target?.kind === "prompt") {
-    const competitors = finding.evidence.competitors?.slice(0, 3) ?? [];
-    return `Your brand appears in ${Math.round(target.before * 100)}% of AI answers for this question.${competitors.length ? ` Competing with ${competitors.join(", ")}.` : ""}`;
-  }
-  if (finding.kind === "commits") {
-    return "A blog post based on your recently shipped changes.";
-  }
-  return finding.summary;
 }
 
 function findingMessage(
@@ -82,32 +74,24 @@ function findingMessage(
       ? `<${finding.evidence.previewUrl}|Preview>`
       : null,
   ].filter(Boolean);
+  const hint = isIdea
+    ? "React 👍 to write it or 👎 if you don't want it"
+    : `React 👍 to merge${publishAt ? " now" : ""} or 👎 to close it`;
+  const pullRequest = finding.pullRequestUrl
+    ? `  ·  <${finding.pullRequestUrl}|PR #${finding.pullRequestNumber}>`
+    : "";
   return {
     findingId: finding.id,
     status: isIdea ? "suggested" : "proposed",
-    // Slack's plain text is all the agent reads of a thread, so it carries what the blocks show.
-    text: `*${title}*\n${summary}\n${meta.join(" · ")} · <${findingUrl}|Open in Notra>`,
+    // Slack's plain text is all the agent reads of a thread, so it keeps the
+    // whole item; people see one line, and the pre-filled 👍/👎 under it.
+    text: `*${title}*\n${summary}\n${meta.join(" · ")} · <${findingUrl}|Open in Notra>\n${hint}`,
     blocks: [
       {
         type: "section",
-        text: slackMrkdwn(`*${title}*\n${summary}`),
-        accessory: {
-          type: "button",
-          text: { type: "plain_text", text: "Open" },
-          url: findingUrl,
-          action_id: `autopilot_open_${finding.id}`,
-        },
-      },
-      { type: "context", elements: [slackMrkdwn(meta.join("  ·  "))] },
-      {
-        type: "context",
-        elements: [
-          slackMrkdwn(
-            isIdea
-              ? "React 👍 to write it or 👎 if you don't want it"
-              : `React 👍 to merge${publishAt ? " now" : ""} or 👎 to close it`
-          ),
-        ],
+        text: slackMrkdwn(
+          `${isIdea ? "Idea: " : ""}*<${findingUrl}|${title}>*${pullRequest}${publishAt ? `  ·  ${publishAt}` : ""}`
+        ),
       },
     ],
   };
@@ -120,6 +104,8 @@ export function buildAutopilotBrief(params: {
   suggested?: FindingRow[];
   merged: FindingRow[];
   insights: string[];
+  /** The day's brief page; the message leads with its headline and links to it. */
+  page?: { url: string; headline: string };
   recentDays?: { date: string; note: string }[];
 }): AutopilotBrief | null {
   const {
@@ -127,6 +113,7 @@ export function buildAutopilotBrief(params: {
     proposed,
     merged,
     insights,
+    page,
     suggested = [],
   } = params;
   if (
@@ -138,23 +125,55 @@ export function buildAutopilotBrief(params: {
     return null;
   }
   const autopilotUrl = `${getAppUrl() ?? ""}/${organizationSlug}${AUTOPILOT_NAV_LINK}`;
-  const summary =
-    [
-      proposed.length > 0 ? `${proposed.length} ready to merge` : null,
-      suggested.length > 0
-        ? `${suggested.length} ${suggested.length === 1 ? "idea" : "ideas"}`
-        : null,
-      merged.length > 0 ? `${merged.length} merged` : null,
-    ]
-      .filter(Boolean)
-      .join(" · ") || "Nothing to review today";
-  // Keep the digest short; the dashboard lists the rest.
+  const summary = describeBriefCounts({
+    proposed: proposed.length,
+    suggested: suggested.length,
+    merged: merged.length,
+  });
+  // Keep the digest short; the brief page lists the rest.
   const visible = [...proposed, ...suggested].slice(0, 5);
+  const items = visible.map((finding) =>
+    findingMessage(organizationSlug, finding, params.timezone)
+  );
   const remaining = proposed.length + suggested.length - visible.length;
+  const headline =
+    page && page.headline !== summary
+      ? compactSlackText(page.headline, 150)
+      : null;
+  const title = headline ?? "Autopilot daily brief";
+  // The agent reads only plain text, so recent days ride along for context.
+  const recentDays = (params.recentDays ?? [])
+    .map((day) => compactSlackText(day.note, 600))
+    .join("\n\n");
+  const text = `Autopilot: ${headline ? `${headline} · ` : ""}${summary}${page ? ` · ${page.url}` : ""}${recentDays ? `\n\nRecent days:\n${recentDays}` : ""}`;
+
+  if (page) {
+    // The page carries the detail; Slack is the headline and the way in.
+    const more =
+      remaining > 0 ? `  ·  <${page.url}|+${remaining} more on the brief>` : "";
+    return {
+      text,
+      blocks: [
+        {
+          type: "section",
+          text: slackMrkdwn(`*${title}*\n${summary}${more}`),
+          accessory: {
+            type: "button",
+            text: { type: "plain_text", text: "Open brief" },
+            url: page.url,
+            action_id: "autopilot_open_brief",
+            style: "primary",
+          },
+        },
+      ],
+      items,
+    };
+  }
+
   const blocks: SlackBlock[] = [
     {
       type: "section",
-      text: slackMrkdwn(`*Autopilot daily brief*\n${summary}`),
+      text: slackMrkdwn(`*${title}*\n${summary}`),
       accessory: {
         type: "button",
         text: { type: "plain_text", text: "Open Autopilot" },
@@ -188,20 +207,11 @@ export function buildAutopilotBrief(params: {
   if (notes.length > 0) {
     blocks.push({ type: "section", text: slackMrkdwn(notes.join("\n\n")) });
   }
-  const recentDays = (params.recentDays ?? [])
-    .map((day) => compactSlackText(day.note, 600))
-    .join("\n\n");
-  return {
-    text: `Autopilot: ${summary}${recentDays ? `\n\nRecent days:\n${recentDays}` : ""}`,
-    blocks,
-    items: visible.map((finding) =>
-      findingMessage(organizationSlug, finding, params.timezone)
-    ),
-  };
+  return { text, blocks, items };
 }
 
 /** The Autopilot channel and bot token, or null when Slack is off for Autopilot. */
-async function loadSlackDestination(organizationId: string) {
+export async function loadSlackDestination(organizationId: string) {
   if (!(await isAutopilotEnabledForOrganization(organizationId))) {
     return null;
   }
@@ -341,11 +351,16 @@ export async function postAutopilotBrief(
     await createAutopilotLogger({ organizationId, runId }, null).action(
       "Delivered the Slack message",
       {
-        url: `https://app.slack.com/client/${encodeURIComponent(delivered.teamId)}/${encodeURIComponent(delivered.channel)}/thread/${encodeURIComponent(delivered.channel)}-${encodeURIComponent(delivered.ts)}`,
+        url: slackThreadUrl(delivered.teamId, delivered.channel, delivered.ts),
       }
     );
   }
-  return { channel: delivered.channel, ts: delivered.ts, items };
+  return {
+    teamId: delivered.teamId,
+    channel: delivered.channel,
+    ts: delivered.ts,
+    items,
+  };
 }
 
 /**

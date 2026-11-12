@@ -48,6 +48,7 @@ import { useRouter } from "@/lib/navigation";
 import { dashboardOrpc } from "@/lib/orpc/query";
 import type {
   AutopilotOverviewPageProps,
+  AutopilotFindingView,
   AutopilotPageClientProps,
   AutopilotOffPageProps,
   AutopilotOverviewTabsListProps,
@@ -161,6 +162,7 @@ function AutopilotPullRequestsTab({
   basePath,
   findings,
   canManage,
+  onClosePullRequest,
   timezone,
 }: AutopilotPullRequestsTabProps) {
   const router = useRouter();
@@ -170,6 +172,7 @@ function AutopilotPullRequestsTab({
       findings={findings}
       idPrefix="autopilot"
       mergingId={merge.isPending ? (merge.variables?.findingId ?? null) : null}
+      onClosePullRequest={onClosePullRequest}
       onMerge={(row, method) => merge.mutate({ findingId: row.id, method })}
       onOpen={(row) => router.push(`${basePath}/findings/${row.id}`)}
       onWrite={(row) => writeSuggestion.mutate(row.id)}
@@ -262,6 +265,7 @@ function AutopilotOverviewPage({
   const [days, setDays] = useState<AutopilotMetricsDays>(30);
   const { settings, findings, runs, canManage } = overview;
   const linkedAction = useAutopilotLinkedAction(findings, canManage);
+  const [closing, setClosing] = useState<AutopilotFindingView | null>(null);
   const basePath = `/${organizationSlug}${AUTOPILOT_NAV_LINK}`;
   const pullRequests = findings.filter(isListedPullRequest);
 
@@ -383,6 +387,7 @@ function AutopilotOverviewPage({
             basePath={basePath}
             canManage={canManage}
             findings={findings}
+            onClosePullRequest={setClosing}
             organizationId={organizationId}
             timezone={settings.timezone}
           />
@@ -411,9 +416,13 @@ function AutopilotOverviewPage({
             void setTab("pull-requests");
           }
           linkedAction.close();
+          setClosing(null);
         }}
         organizationId={organizationId}
-        pending={linkedAction.pending}
+        pending={
+          linkedAction.pending ??
+          (closing ? { kind: "dismiss", finding: closing } : null)
+        }
       />
     </>
   );

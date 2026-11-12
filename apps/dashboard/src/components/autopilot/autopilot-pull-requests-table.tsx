@@ -49,6 +49,7 @@ export function AutopilotPullRequestsTable({
   onOpen,
   mergingId,
   onMerge,
+  onClosePullRequest,
   onWrite,
 }: AutopilotPullRequestsTableProps) {
   const format = useFormatter();
@@ -163,12 +164,16 @@ export function AutopilotPullRequestsTable({
         if (!actionable) {
           return null;
         }
-        // Closing lives on the row's page, where there is room for a why.
         return (
           <span className="flex items-center justify-end">
             {finding.status === "proposed" ? (
               <AutopilotMergeMenu
                 loading={mergingId === finding.id}
+                onClosePullRequest={
+                  onClosePullRequest
+                    ? () => onClosePullRequest(finding)
+                    : undefined
+                }
                 onMerge={(method) => onMerge(finding, method)}
               />
             ) : onWrite ? (

@@ -26,6 +26,7 @@ export interface AutopilotBrief extends AutopilotSlackMessage {
 }
 
 export interface AutopilotBriefDelivery {
+  teamId: string;
   channel: string;
   ts: string;
   /** Only the replies Slack confirmed; the others are announced again next time. */

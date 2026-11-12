@@ -168,6 +168,9 @@ function AutomationPage({
       <AutopilotAutomationStatus
         kind={kind}
         merging={merge.isPending}
+        onClosePullRequest={(finding) =>
+          setPending({ kind: "dismiss", finding })
+        }
         onMerge={(finding, method) =>
           merge.mutate({ findingId: finding.id, method })
         }
@@ -187,6 +190,9 @@ function AutomationPage({
         idPrefix="automation"
         mergingId={
           merge.isPending ? (merge.variables?.findingId ?? null) : null
+        }
+        onClosePullRequest={(row) =>
+          setPending({ kind: "dismiss", finding: row })
         }
         onMerge={(row, method) => merge.mutate({ findingId: row.id, method })}
         onOpen={(row) =>

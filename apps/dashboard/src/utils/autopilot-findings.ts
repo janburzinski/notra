@@ -227,3 +227,18 @@ export function linkedFindingAction(
   }
   return null;
 }
+
+/** One line on what a finding would change, shared by Slack and the brief page. */
+export function findingSummary(
+  finding: Pick<AutopilotFindingView, "kind" | "summary" | "evidence">
+) {
+  const target = finding.evidence.target;
+  if (target?.kind === "prompt") {
+    const competitors = finding.evidence.competitors?.slice(0, 3) ?? [];
+    return `Your brand appears in ${Math.round(target.before * 100)}% of AI answers for this question.${competitors.length ? ` Competing with ${competitors.join(", ")}.` : ""}`;
+  }
+  if (finding.kind === "commits") {
+    return "A blog post based on your recently shipped changes.";
+  }
+  return finding.summary;
+}
