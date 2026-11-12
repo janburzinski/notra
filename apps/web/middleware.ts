@@ -11,7 +11,6 @@ const geoTracker = new Tracker({
 });
 
 export const config = {
-  runtime: "nodejs",
   matcher: [
     "/((?!assets/|_serverFn/|api/|docs$|docs/|blog/_notra/|\\.well-known/oauth-authorization-server$|\\.well-known/openid-configuration$).*)",
   ],
