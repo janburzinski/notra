@@ -237,6 +237,33 @@ export const databuddyQueryResponseSchema = z.object({
   ),
 });
 
+export const posthogOrganizationsResponseSchema = z.object({
+  results: z.array(
+    z
+      .object({
+        id: z.string(),
+        name: z.string().nullish(),
+        teams: z
+          .array(
+            z
+              .object({
+                id: z.number().int(),
+                name: z.string().nullish(),
+                is_demo: z.boolean().nullish(),
+              })
+              .passthrough()
+          )
+          .default([]),
+      })
+      .passthrough()
+  ),
+});
+
+/** A HogQL query's rows, positional in the order the SELECT names them. */
+export const posthogQueryResponseSchema = z.object({
+  results: z.array(z.array(z.unknown())),
+});
+
 export const plausibleCredentialsSchema = z.object({
   apiKey: z.string().trim().min(10).max(500),
 });
@@ -256,6 +283,11 @@ export const vercelCredentialsSchema = z.object({
 
 export const databuddyCredentialsSchema = z.object({
   apiKey: z.string().trim().min(10).max(200),
+});
+
+export const posthogCredentialsSchema = z.object({
+  apiKey: z.string().trim().min(10).max(500),
+  region: z.enum(["us", "eu"]).optional(),
 });
 
 export const rybbitCredentialsSchema = z.object({

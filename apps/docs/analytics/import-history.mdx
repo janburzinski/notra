@@ -1,7 +1,7 @@
 ---
 title: "Import your history"
 sidebarTitle: "Import your history"
-description: "Bring daily page views, sources and AI crawler hits from Plausible, Vercel Web Analytics, Cloudflare, Rybbit or Databuddy into Notra, so your charts start on day one."
+description: "Bring daily page views, sources and AI crawler hits from Plausible, Vercel Web Analytics, Cloudflare, PostHog, Rybbit or Databuddy into Notra, so your charts start on day one."
 authors:
   - handle: dominik
 
@@ -28,6 +28,7 @@ Open **Settings → Tracking → Import history**, or **Import history** on the 
 | Cloudflare | AI crawler hits per page (GPTBot, ClaudeBot, PerplexityBot…) | What your plan keeps, which Notra asks Cloudflare for, often a week on Free and about a month on paid plans | API token |
 | Cloudflare Web Analytics | Page views and visits per page, referrer, country, device, browser, OS | What your account keeps (about 6 months) | API token |
 | Vercel Web Analytics | Page views and visitors per page, referrer, country, device, browser, OS, UTM source | Hobby 1 month, Pro 12 months, Pro with Web Analytics Plus and Enterprise 24 months | Access token |
+| PostHog | Daily visitors, visits, bounces and time on site, plus page views and visitors per page, entry page, referrer, UTM campaign, country, device, browser, OS | Everything your project kept | Personal API key (US or EU Cloud) |
 | Rybbit | Daily visitors, visits, bounces and time on site, plus visits and page views per page, entry page, referrer, UTM source, country, device, browser, OS | Everything since the site started | Organization API key (Rybbit Standard plan or higher) |
 | Databuddy | Daily visitors, visits, bounces and time on site, plus page views and visitors per page, entry page, referrer, UTM source, country, device, browser, OS | Everything since the site started | API key (any Databuddy plan) |
 
@@ -101,6 +102,16 @@ Notra reads three days per step: the daily totals plus the top 200 values per da
 3. Pick the website, check the domain and select **Check range**, then **Start import**.
 
 Notra reads a week per request: the daily totals plus the top 200 values per day for each breakdown, using at most half of the 120 queries a minute Databuddy allows per key. Databuddy reports the median visit duration, so imported time on site is that median times the day's visits.
+
+## PostHog
+
+1. In PostHog, open **[Settings → User → Personal API keys](https://app.posthog.com/settings/user-api-keys)** and select **Create personal API key**. Give it access to the organization or the projects you want to import, and only these scopes, all as **Read**: `organization:read`, `project:read` and `query:read`.
+2. In Notra, choose **PostHog**, paste the key and select **Connect**. Notra finds out whether the key belongs to US or EU Cloud.
+3. Pick the project and site, check the domain and select **Check range**, then **Start import**.
+
+A PostHog project often tracks more than one site, for example a marketing site and an app, so Notra lists each project once per host it saw page views on in the last 30 days, counting a host and its `www` version as one. A project without recent page views, or beyond the first 20, is listed once without a host: type the domain to import. Notra imports only `$pageview` events on that host and its `www` version. Visits, bounces and time on site come from PostHog's sessions, counted the way PostHog's own web analytics counts them, and a visit that runs past midnight counts on the day it started. Visitors are unique persons per day.
+
+Notra reads a week per step with one query per breakdown, nine queries in all, keeping the top 200 values per day for each breakdown. PostHog allows a project 2,400 queries an hour, shared with your own dashboards and API use, so Notra runs at most 600 an hour and two at a time, which covers about a year of history an hour. Projects still on PostHog's older limit of 120 queries an hour import more slowly, and Notra waits whenever PostHog asks it to. The queries appear in your project's query log as **Notra history import**. Only PostHog Cloud is supported, not self-hosted instances.
 
 ## Delete an import or disconnect
 

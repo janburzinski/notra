@@ -6,6 +6,7 @@ export const ANALYTICS_IMPORT_PROVIDERS = [
   "cloudflare_rum",
   "rybbit",
   "databuddy",
+  "posthog",
 ] as const;
 
 export const ANALYTICS_IMPORT_CONNECTION_PROVIDERS = [
@@ -14,6 +15,7 @@ export const ANALYTICS_IMPORT_CONNECTION_PROVIDERS = [
   "cloudflare",
   "rybbit",
   "databuddy",
+  "posthog",
 ] as const;
 
 export const ANALYTICS_IMPORT_CONNECTION_STATUSES = [

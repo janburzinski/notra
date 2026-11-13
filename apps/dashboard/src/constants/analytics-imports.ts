@@ -89,9 +89,18 @@ export const ANALYTICS_IMPORT_PROVIDER_ORDER = [
   "plausible",
   "cloudflare",
   "vercel",
+  "posthog",
   "rybbit",
   "databuddy",
 ] as const;
+
+/** Providers that call their secret an API key rather than a token. */
+export const ANALYTICS_IMPORT_KEY_PROVIDERS: ReadonlySet<string> = new Set([
+  "plausible",
+  "rybbit",
+  "databuddy",
+  "posthog",
+]);
 
 export const ANALYTICS_IMPORT_PROVIDER_LABELS: Record<
   AnalyticsImportProvider,
@@ -104,6 +113,7 @@ export const ANALYTICS_IMPORT_PROVIDER_LABELS: Record<
   cloudflare_rum: "Cloudflare Web Analytics",
   rybbit: "Rybbit",
   databuddy: "Databuddy",
+  posthog: "PostHog",
 };
 
 /** Brand names for "Connect …", "Open …" and the chart's import marker. */
@@ -118,6 +128,7 @@ export const ANALYTICS_IMPORT_PROVIDER_BRANDS: Record<
   cloudflare_rum: "Cloudflare",
   rybbit: "Rybbit",
   databuddy: "Databuddy",
+  posthog: "PostHog",
 };
 
 /** Where the first guide step sends people to export or create a key. */
@@ -128,15 +139,31 @@ export const ANALYTICS_IMPORT_PROVIDER_URLS = {
   vercel: "https://vercel.com/account/settings/tokens",
   rybbit: "https://app.rybbit.io",
   databuddy: "https://app.databuddy.cc/organizations/settings#api-keys",
+  posthog: "https://app.posthog.com/settings/user-api-keys",
 } as const satisfies Record<AnalyticsImportProviderChoice, string>;
 
 /** Labels exactly as Cloudflare's custom token form shows them. */
-export const ANALYTICS_IMPORT_CLOUDFLARE_PERMISSIONS = [
+const ANALYTICS_IMPORT_CLOUDFLARE_PERMISSIONS = [
   "Zone → Analytics → Read",
   "Zone → Zone → Read",
   "Account → Account Analytics → Read",
   "Account → Account Settings → Read",
 ] as const;
+
+/** Scopes exactly as PostHog's personal API key form names them. */
+const ANALYTICS_IMPORT_POSTHOG_SCOPES = [
+  "organization:read",
+  "project:read",
+  "query:read",
+] as const;
+
+/** Permissions a provider's key or token needs, listed in the connect guide. */
+export const ANALYTICS_IMPORT_REQUIRED_PERMISSIONS: Partial<
+  Record<AnalyticsImportProvider, readonly string[]>
+> = {
+  cloudflare: ANALYTICS_IMPORT_CLOUDFLARE_PERMISSIONS,
+  posthog: ANALYTICS_IMPORT_POSTHOG_SCOPES,
+};
 
 /** Completed imports carry no badge; their totals say enough. */
 /** Same badges as automation runs: work in progress spins. */

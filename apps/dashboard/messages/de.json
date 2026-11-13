@@ -4766,12 +4766,12 @@
       "back": "Zurück",
       "cta": {
         "title": "Sieh deinen Verlauf ab dem ersten Tag",
-        "description": "Importiere frühere Seitenaufrufe aus Plausible, Vercel, Cloudflare, Rybbit oder Databuddy.",
+        "description": "Importiere frühere Seitenaufrufe aus Plausible, Vercel, Cloudflare, PostHog, Rybbit oder Databuddy.",
         "action": "Verlauf importieren"
       },
       "settings": {
         "title": "Verlauf importieren",
-        "description": "Hole frühere Seitenaufrufe und KI-Crawler-Zugriffe aus Plausible, Vercel, Cloudflare, Rybbit oder Databuddy.",
+        "description": "Hole frühere Seitenaufrufe und KI-Crawler-Zugriffe aus Plausible, Vercel, Cloudflare, PostHog, Rybbit oder Databuddy.",
         "action": "Importe verwalten",
         "start": "Importieren"
       },
@@ -4800,6 +4800,10 @@
         "databuddy": {
           "name": "Databuddy",
           "description": "Mit einem API-Schlüssel verbinden. Gesamte Historie, in jedem Tarif."
+        },
+        "posthog": {
+          "name": "PostHog",
+          "description": "Mit einem persönlichen API-Schlüssel verbinden. Gesamte Historie, US- oder EU-Cloud."
         }
       },
       "guide": "Das tust du in {provider}",
@@ -4833,7 +4837,8 @@
           "cloudflare": "KI-Crawler-Zugriffe der letzten 31 Tage und Seitenaufrufe aus Web Analytics für etwa 6 Monate.",
           "vercel": "Hobby speichert 1 Monat, Pro 12 und Plus 24. UTM-Kampagnen erfordern Plus.",
           "rybbit": "Nutzt die Rybbit-API, die ab dem Standard-Tarif verfügbar ist. Ein Import kann je nach Umfang mehr als einen Tag dauern.",
-          "databuddy": "Nutzt die Databuddy-API mit einem Schlüssel, der nur Daten lesen darf."
+          "databuddy": "Nutzt die Databuddy-API mit einem Schlüssel, der nur Daten lesen darf.",
+          "posthog": "Liest Seitenaufrufe über die Query-API von PostHog. Importe zählen zu den Abfragelimits des Projekts, Notra lässt dir den Großteil davon."
         },
         "existing": "Gespeicherte Verbindungen",
         "newConnection": "Oder neu verbinden",
@@ -4868,6 +4873,12 @@
             "firstDescription": "Organisationseinstellungen → API keys → Create API key.",
             "secondTitle": "Nur auf Lesen beschränken",
             "secondDescription": "Wähle die Vorlage Analytics, die nur den Bereich read:data vergibt."
+          },
+          "posthog": {
+            "firstTitle": "Persönlichen API-Schlüssel erstellen",
+            "firstDescription": "Settings → User → Personal API keys → Create personal API key. Gib ihm Zugriff auf die Organisation oder die Projekte, die du importieren willst.",
+            "secondTitle": "Diese Bereiche hinzufügen",
+            "secondDescription": "Alle drei mit Lesezugriff, sonst nichts."
           }
         },
         "secretLabel": "API-Schlüssel",

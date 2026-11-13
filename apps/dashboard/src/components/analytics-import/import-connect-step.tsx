@@ -9,10 +9,11 @@ import { Button } from "@/components/button";
 import { GeoExternalLinkButton } from "@/components/geo/geo-external-link-button";
 import { GeoSetupStep } from "@/components/geo/geo-setup-step";
 import {
-  ANALYTICS_IMPORT_CLOUDFLARE_PERMISSIONS,
+  ANALYTICS_IMPORT_KEY_PROVIDERS,
   ANALYTICS_IMPORT_MIN_SECRET_LENGTH,
   ANALYTICS_IMPORT_PROVIDER_BRANDS,
   ANALYTICS_IMPORT_PROVIDER_URLS,
+  ANALYTICS_IMPORT_REQUIRED_PERMISSIONS,
 } from "@/constants/analytics-imports";
 import { useAnalyticsImportMutations } from "@/lib/hooks/use-analytics-imports";
 import type {
@@ -41,9 +42,7 @@ function ImportSecretField({
         aria-describedby={errorId}
         aria-invalid={error ? true : undefined}
         aria-label={
-          provider === "plausible" ||
-          provider === "rybbit" ||
-          provider === "databuddy"
+          ANALYTICS_IMPORT_KEY_PROVIDERS.has(provider)
             ? t("secretLabel")
             : t("tokenLabel")
         }
@@ -82,6 +81,10 @@ export function ImportConnectStep({
   const [team, setTeam] = useState("");
   const { connect } = useAnalyticsImportMutations(organizationId);
   const name = ANALYTICS_IMPORT_PROVIDER_BRANDS[provider];
+  const permissions = ANALYTICS_IMPORT_REQUIRED_PERMISSIONS[provider];
+  const pasteTitle = ANALYTICS_IMPORT_KEY_PROVIDERS.has(provider)
+    ? t("connect.pasteKey")
+    : t("connect.pasteToken");
   const saved = reconnectId
     ? []
     : connections.filter(
@@ -162,9 +165,9 @@ export function ImportConnectStep({
               index={2}
               title={t(`connect.steps.${provider}.secondTitle`)}
             >
-              {provider === "cloudflare" ? (
+              {permissions ? (
                 <ul className="border-table-card-border bg-table-card shadow-table-card flex flex-col gap-1 rounded-xl border px-3 py-2.5 font-mono text-xs">
-                  {ANALYTICS_IMPORT_CLOUDFLARE_PERMISSIONS.map((permission) => (
+                  {permissions.map((permission) => (
                     <li key={permission}>{permission}</li>
                   ))}
                 </ul>
@@ -181,17 +184,7 @@ export function ImportConnectStep({
                 />
               ) : null}
             </GeoSetupStep>
-            <GeoSetupStep
-              plain
-              index={3}
-              title={
-                provider === "plausible" ||
-                provider === "rybbit" ||
-                provider === "databuddy"
-                  ? t("connect.pasteKey")
-                  : t("connect.pasteToken")
-              }
-            >
+            <GeoSetupStep plain index={3} title={pasteTitle}>
               <ImportSecretField
                 error={error}
                 onChange={(next) => {

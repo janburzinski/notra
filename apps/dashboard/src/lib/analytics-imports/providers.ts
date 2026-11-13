@@ -16,6 +16,13 @@ import {
   previewPlausibleSite,
 } from "@notra/geo-core/imports/plausible-api";
 import {
+  canonicalPostHogSourceRef,
+  fetchPostHogChunk,
+  listPostHogSources,
+  previewPostHogSource,
+  resolvePostHogCredentials,
+} from "@notra/geo-core/imports/posthog";
+import {
   fetchRybbitChunk,
   listRybbitSites,
   previewRybbitSite,
@@ -43,6 +50,39 @@ import type {
 
 import { rateLimitedImportFetch } from "./rate-limit";
 
+/**
+ * Fills in what a key alone doesn't say before it is saved: the PostHog
+ * region it belongs to. Other providers' keys are stored as entered.
+ */
+export async function resolveImportCredentials(
+  credentials: AnalyticsImportCredentials,
+  connectionId: string
+): Promise<AnalyticsImportCredentials> {
+  if (credentials.provider !== "posthog") {
+    return credentials;
+  }
+  return {
+    provider: "posthog",
+    ...(await resolvePostHogCredentials(
+      credentials,
+      rateLimitedImportFetch(credentials.provider, connectionId)
+    )),
+  };
+}
+
+/**
+ * The ref an import is planned, stored and deduplicated under. PostHog's
+ * names the host it reads, so a listed host and a typed one share it;
+ * other providers' refs already name one site.
+ */
+export function canonicalImportSourceRef(
+  provider: ImportSourceProvider,
+  ref: string,
+  host: string
+): string {
+  return provider === "posthog" ? canonicalPostHogSourceRef(ref, host) : ref;
+}
+
 export async function listImportSources(
   credentials: AnalyticsImportCredentials,
   connectionId: string
@@ -57,6 +97,8 @@ export async function listImportSources(
       return await listRybbitSites(credentials, fetchImpl);
     case "databuddy":
       return await listDatabuddyWebsites(credentials, fetchImpl);
+    case "posthog":
+      return await listPostHogSources(credentials, fetchImpl);
     default:
       return await listCloudflareSources(credentials, fetchImpl);
   }
@@ -64,8 +106,8 @@ export async function listImportSources(
 
 /**
  * One cheap call that tells where the source's history starts: Plausible's
- * or Rybbit's first month, Databuddy's first day, Vercel's first month within its longest
- * retention, or what Cloudflare's plan still keeps.
+ * or Rybbit's first month, Databuddy's or PostHog's first day, Vercel's first
+ * month within its longest retention, or what Cloudflare's plan still keeps.
  */
 export async function previewImportSource(
   credentials: AnalyticsImportCredentials,
@@ -91,6 +133,8 @@ export async function previewImportSource(
         toDay(new Date()),
         fetchImpl
       );
+    case "posthog":
+      return await previewPostHogSource(credentials, ref, fetchImpl);
     case "vercel": {
       const today = toDay(new Date());
       return await previewVercelProject(
@@ -147,6 +191,17 @@ export async function fetchImportChunk({
       return {
         kind: "web",
         records: await fetchDatabuddyChunk(
+          credentials,
+          ref,
+          host,
+          range,
+          fetchImpl
+        ),
+      };
+    case "posthog":
+      return {
+        kind: "web",
+        records: await fetchPostHogChunk(
           credentials,
           ref,
           host,

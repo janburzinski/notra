@@ -58,6 +58,13 @@ export const IMPORT_RATE_LIMITS = {
   rybbit: { requests: 25, windowSeconds: 10, dailyRequests: 4000 },
   /** Databuddy allows 120 queries a minute per key; half stays with the customer. */
   databuddy: { requests: 60, windowSeconds: 60 },
+  /**
+   * PostHog allows a project 2,400 queries an hour and 240 a minute,
+   * shared with its own dashboards and older projects still get 120 an
+   * hour. A quarter of the new limit leaves the customer the rest; on the
+   * legacy limit, PostHog's 429s pace the import.
+   */
+  posthog: { requests: 600, windowSeconds: 3600 },
 } as const;
 
 /**
@@ -88,6 +95,13 @@ export const RYBBIT_CHUNK_DAYS = 3;
  * busy site's analytics database to answer within the request timeout.
  */
 export const DATABUDDY_CHUNK_DAYS = 7;
+
+/**
+ * A PostHog chunk runs one HogQL query per grain, 9 in all, whatever its
+ * length, so a year takes 53 chunks and about 480 queries. A week keeps
+ * each query inside PostHog's 10 seconds of execution on a busy project.
+ */
+export const POSTHOG_CHUNK_DAYS = 7;
 
 export const IMPORT_PROVIDERS: Record<
   AnalyticsImportProvider,
@@ -195,6 +209,21 @@ export const IMPORT_PROVIDERS: Record<
       sampled: false,
     },
   },
+  posthog: {
+    connection: "posthog",
+    kind: "web",
+    lookbackDays: null,
+    writesSubdomains: false,
+    maxChunkDays: POSTHOG_CHUNK_DAYS,
+    capabilities: {
+      visitors: true,
+      visits: true,
+      bounces: true,
+      utm: true,
+      entryPages: true,
+      sampled: false,
+    },
+  },
 };
 
 export const PLAUSIBLE_API_URL = "https://plausible.io";
@@ -258,6 +287,35 @@ export const DATABUDDY_RESULT_LIMIT = 200;
 /** Days a preview can return: everything since 2015, one row per day. */
 export const DATABUDDY_PREVIEW_LIMIT = 10_000;
 export const DATABUDDY_HISTORY_START = "2015-01-01";
+/** PostHog Cloud's private API, per region; a personal API key lives in one. */
+export const POSTHOG_API_URLS = {
+  us: "https://us.posthog.com",
+  eu: "https://eu.posthog.com",
+} as const;
+/** Regions tried in turn when a key is connected; most keys are on US Cloud. */
+export const POSTHOG_REGIONS = ["us", "eu"] as const;
+/** Top values per breakdown and day, as for Rybbit and Databuddy. */
+export const POSTHOG_RESULT_LIMIT = 200;
+/** Rows one query may return; PostHog applies 100 when a query sets none. */
+export const POSTHOG_MAX_ROWS = 10_000;
+/** Queries in flight per chunk; PostHog runs 3 per project at once. */
+export const POSTHOG_CONCURRENCY = 2;
+/** Projects whose hosts a listing looks up, one query each; later ones are listed without a host. */
+export const POSTHOG_MAX_PROJECTS = 20;
+/** Hosts listed per project, busiest first. */
+export const POSTHOG_HOSTS_PER_PROJECT = 5;
+/** Days of page views a listing reads to find a project's hosts. */
+export const POSTHOG_HOST_LOOKBACK_DAYS = 30;
+export const POSTHOG_ORGANIZATIONS_LIMIT = 100;
+/** Shown in the project's query log, so the customer can tell our queries apart. */
+export const POSTHOG_QUERY_NAME = "Notra history import";
+/** Joins a project id and the host it was listed with into one source ref. */
+export const POSTHOG_REF_SEPARATOR = "/";
+/** PostHog's referring domain for a visit without a referrer. */
+export const POSTHOG_DIRECT_REFERRER = "$direct";
+/** Hosts that are never a production site. */
+export const POSTHOG_LOCAL_HOST_PATTERN =
+  /^(?:localhost|\d+\.\d+\.\d+\.\d+)(?::\d+)?$|\.(?:local|localhost|test|internal)(?::\d+)?$/;
 export const RYBBIT_API_URL = "https://app.rybbit.io";
 /** Rows per breakdown and day; smaller values are dropped. */
 export const RYBBIT_RESULT_LIMIT = 200;

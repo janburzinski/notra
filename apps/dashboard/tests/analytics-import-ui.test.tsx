@@ -208,6 +208,25 @@ if (!process.env.NOTRA_ANALYTICS_IMPORT_UI_TEST_WORKER) {
     expect(connect("databuddy")).toContain("read:data");
   });
 
+  test("PostHog is in the source list and asks for a key with read scopes only", () => {
+    expect(render(<ImportProviderPicker onPick={() => undefined} />)).toContain(
+      "PostHog"
+    );
+    const connect = render(
+      <ImportConnectStep
+        canManage
+        connections={[]}
+        onConnected={() => undefined}
+        organizationId="org"
+        provider="posthog"
+      />
+    );
+    for (const scope of ["organization:read", "project:read", "query:read"]) {
+      expect(connect).toContain(scope);
+    }
+    expect(connect).toContain("Paste the API key");
+  });
+
   test("a saved account starts a new import unless it needs a reconnect", () => {
     const list = (status: "active" | "reauth_required") =>
       render(

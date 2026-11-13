@@ -649,7 +649,7 @@ export const MCP_FALLBACK_TOOL_CARDS: McpToolCard[] = [
   {
     name: "list_geo_analytics_imports",
     description:
-      "List a project's history imports from Plausible, Cloudflare or Vercel with their status and progress, newest first.",
+      "List a project's history imports from Plausible, Cloudflare, Vercel, PostHog, Rybbit or Databuddy with their status and progress, newest first.",
   },
   {
     name: "whoami",

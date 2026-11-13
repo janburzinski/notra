@@ -6,6 +6,7 @@ import {
   cloudflareCredentialsSchema,
   databuddyCredentialsSchema,
   plausibleCredentialsSchema,
+  posthogCredentialsSchema,
   rybbitCredentialsSchema,
   vercelCredentialsSchema,
 } from "@notra/geo-core/schemas/analytics-imports";
@@ -41,6 +42,8 @@ export function decryptImportCredentials(
       return { provider, ...rybbitCredentialsSchema.parse(value) };
     case "databuddy":
       return { provider, ...databuddyCredentialsSchema.parse(value) };
+    case "posthog":
+      return { provider, ...posthogCredentialsSchema.parse(value) };
     default:
       throw new Error("Unknown analytics import credentials");
   }
@@ -69,6 +72,11 @@ export function toImportCredentials(
       return {
         provider: "databuddy",
         ...databuddyCredentialsSchema.parse({ apiKey: input.secret }),
+      };
+    case "posthog":
+      return {
+        provider: "posthog",
+        ...posthogCredentialsSchema.parse({ apiKey: input.secret }),
       };
     default:
       return {

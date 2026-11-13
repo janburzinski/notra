@@ -1,6 +1,7 @@
 import { Cloudflare } from "@notra/ui/components/ui/svgs/cloudflare";
 import { Databuddy } from "@notra/ui/components/ui/svgs/databuddy";
 import { Plausible } from "@notra/ui/components/ui/svgs/plausible";
+import { PostHog } from "@notra/ui/components/ui/svgs/posthog";
 import { Rybbit } from "@notra/ui/components/ui/svgs/rybbit";
 import { Vercel } from "@notra/ui/components/ui/svgs/vercel";
 
@@ -15,6 +16,7 @@ const LOGOS = {
   vercel: { Logo: Vercel, size: "size-3.5" },
   rybbit: { Logo: Rybbit, size: "h-auto w-5" },
   databuddy: { Logo: Databuddy, size: "size-4" },
+  posthog: { Logo: PostHog, size: "h-auto w-5" },
 };
 
 /** The provider's logo alone; `className` replaces its default size. */

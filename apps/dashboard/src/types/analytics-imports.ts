@@ -17,6 +17,7 @@ import type {
   ImportDayRange,
   ImportKind,
   PlausibleCredentials,
+  PostHogCredentials,
   RybbitCredentials,
   VercelCredentials,
   WebImportRecord,
@@ -38,7 +39,8 @@ export type AnalyticsImportCredentials =
   | ({ provider: "cloudflare" } & CloudflareCredentials)
   | ({ provider: "vercel" } & VercelCredentials)
   | ({ provider: "rybbit" } & RybbitCredentials)
-  | ({ provider: "databuddy" } & DatabuddyCredentials);
+  | ({ provider: "databuddy" } & DatabuddyCredentials)
+  | ({ provider: "posthog" } & PostHogCredentials);
 
 /** One request budget of a provider connection. */
 export interface ImportRateWindow {

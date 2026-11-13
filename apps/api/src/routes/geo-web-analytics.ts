@@ -118,7 +118,7 @@ const importsRoute = createRoute({
   operationId: "listGeoAnalyticsImports",
   summary: "List history imports",
   description:
-    "Imports of earlier analytics from Plausible, Cloudflare or Vercel and their progress, newest first. Connections and their credentials are never returned; start imports in the dashboard.",
+    "Imports of earlier analytics from Plausible, Cloudflare, Vercel, PostHog, Rybbit or Databuddy and their progress, newest first. Connections and their credentials are never returned; start imports in the dashboard.",
   request: { params: projectParamsSchema },
   responses: {
     200: {

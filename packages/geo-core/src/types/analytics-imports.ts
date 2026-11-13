@@ -168,6 +168,25 @@ export interface DatabuddyBreakdown {
   field: keyof WebImportRecord;
 }
 
+/**
+ * One PostHog breakdown: the HogQL expressions it groups by and the record
+ * fields they fill. Session breakdowns group each session first, so they
+ * count visits, bounces and duration per value.
+ */
+export interface PostHogBreakdown {
+  grain: ImportWebGrain;
+  scope: "events" | "sessions";
+  /**
+   * Which values a row needs before it may take one of the day's top
+   * slots: every dimension, at least one, or none.
+   */
+  requires: "all" | "any" | "none";
+  dimensions: readonly {
+    expression: string;
+    field: keyof WebImportRecord;
+  }[];
+}
+
 /** One Cloudflare Web Analytics query: its dimensions and the grains it feeds. */
 export interface CloudflareRumQuery {
   dimensions: Readonly<Partial<Record<string, WebImportDimension>>>;
@@ -242,7 +261,10 @@ export interface CloudflareDatasetLimits {
 export interface ImportPreview {
   earliestDay: string | null;
   pageviews: number | null;
-  /** Page views per month ("2026-08"), to count the days an import takes; null when unknown. */
+  /**
+   * Page views per month ("2026-08") or per day ("2026-08-14"), to count the
+   * days an import takes; null when unknown.
+   */
   pageviewsByMonth: Record<string, number> | null;
 }
 
@@ -265,6 +287,20 @@ export interface RybbitCredentials {
 
 export interface DatabuddyCredentials {
   apiKey: string;
+}
+
+export type PostHogRegion = "us" | "eu";
+
+export interface PostHogCredentials {
+  apiKey: string;
+  /** Set when the key is connected; absent until then. */
+  region?: PostHogRegion;
+}
+
+/** One PostHog project and the host its page views are filtered to. */
+export interface PostHogSourceRef {
+  projectId: string;
+  host: string | null;
 }
 
 export interface PlausibleCsvSummary {

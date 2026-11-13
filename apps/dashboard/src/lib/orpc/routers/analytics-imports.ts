@@ -29,6 +29,7 @@ import {
 import {
   ANALYTICS_IMPORT_FILE_ERROR_DATA,
   ANALYTICS_IMPORT_INLINE_MAX_BYTES,
+  ANALYTICS_IMPORT_KEY_PROVIDERS,
   ANALYTICS_IMPORT_PROVIDER_BRANDS,
   ANALYTICS_IMPORT_PROVIDER_LABELS,
 } from "@/constants/analytics-imports";
@@ -58,7 +59,9 @@ import {
   toPreview,
 } from "@/lib/analytics-imports/imports";
 import {
+  canonicalImportSourceRef,
   listImportSources,
+  resolveImportCredentials,
   previewImportSource,
 } from "@/lib/analytics-imports/providers";
 import {
@@ -105,7 +108,9 @@ function toClientError(error: unknown): never {
             error.provider as keyof typeof ANALYTICS_IMPORT_PROVIDER_BRANDS
           ]
         : "The provider";
-    const secret = error.provider === "plausible" ? "key" : "token";
+    const secret = ANALYTICS_IMPORT_KEY_PROVIDERS.has(error.provider)
+      ? "key"
+      : "token";
     throw badRequest(
       `${brand} rejected this ${secret}. Check that it is valid and has read access to analytics.`
     );
@@ -185,8 +190,9 @@ async function readWithConnection<T>(
 }
 
 /**
- * The connection plus what the provider reports about the chosen source. A
- * source is only read through a connection of its own provider.
+ * The connection plus what the provider reports about the chosen source,
+ * under the ref the import is stored with. A source is only read through a
+ * connection of its own provider.
  */
 async function loadImportSource(
   organizationId: string,
@@ -194,6 +200,7 @@ async function loadImportSource(
     connectionId: string;
     provider: ImportSourceProvider;
     sourceRef: string;
+    host: string;
   }
 ) {
   const connection = await requireConnection(
@@ -203,15 +210,15 @@ async function loadImportSource(
   if (IMPORT_PROVIDERS[input.provider].connection !== connection.provider) {
     throw badRequest("This source isn't available on that connection");
   }
-  const source = await readWithConnection(connection, (credentials) =>
-    previewImportSource(
-      credentials,
-      connection.id,
-      input.provider,
-      input.sourceRef
-    )
+  const sourceRef = canonicalImportSourceRef(
+    input.provider,
+    input.sourceRef,
+    input.host
   );
-  return { connection, source };
+  const source = await readWithConnection(connection, (credentials) =>
+    previewImportSource(credentials, connection.id, input.provider, sourceRef)
+  );
+  return { connection, source, sourceRef };
 }
 
 /** Purges in a durable run, or after the response when workflows are unavailable. */
@@ -291,14 +298,18 @@ export const analyticsImportsRouter = {
       assertOrganizationManager(context.auth.membership, "connect accounts");
       await assertGeoEntitlement(organizationId, context.headers);
       await assertImportRateLimit("connect", organizationId);
-      const credentials = parseImportCredentials(input);
+      const parsed = parseImportCredentials(input);
       if (input.connectionId) {
         await requireConnection(organizationId, input.connectionId);
       }
-      const sources = await listImportSources(
-        credentials,
-        `connect:${organizationId}`
+      const budgetKey = `connect:${organizationId}`;
+      const credentials = await resolveImportCredentials(
+        parsed,
+        budgetKey
       ).catch(toClientError);
+      const sources = await listImportSources(credentials, budgetKey).catch(
+        toClientError
+      );
       const connection = input.connectionId
         ? await replaceConnectionCredentials(
             organizationId,
@@ -341,12 +352,15 @@ export const analyticsImportsRouter = {
       const { organizationId } = context.auth;
       await assertProject(organizationId, input.projectId);
       try {
-        const { source } = await loadImportSource(organizationId, input);
+        const { source, sourceRef } = await loadImportSource(
+          organizationId,
+          input
+        );
         const plan = await planImportRange({
           organizationId,
           projectId: input.projectId,
           provider: input.provider,
-          sourceRef: input.sourceRef,
+          sourceRef,
           host: input.host,
           requestedStart: input.startDay ?? null,
           requestedEnd: input.endDay ?? null,
@@ -373,7 +387,7 @@ export const analyticsImportsRouter = {
       await assertProject(organizationId, input.projectId);
       await assertImportRateLimit("create", organizationId);
       try {
-        const { connection, source } = await loadImportSource(
+        const { connection, source, sourceRef } = await loadImportSource(
           organizationId,
           input
         );
@@ -383,7 +397,7 @@ export const analyticsImportsRouter = {
           userId: context.user.id,
           provider: input.provider,
           connectionId: connection.id,
-          sourceRef: input.sourceRef,
+          sourceRef,
           sourceLabel: input.sourceLabel,
           host: input.host,
           requestedStart: input.startDay ?? null,

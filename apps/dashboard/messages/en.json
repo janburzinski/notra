@@ -4766,12 +4766,12 @@
       "back": "Back",
       "cta": {
         "title": "See your history from day one",
-        "description": "Import past page views from Plausible, Vercel, Cloudflare, Rybbit or Databuddy.",
+        "description": "Import past page views from Plausible, Vercel, Cloudflare, PostHog, Rybbit or Databuddy.",
         "action": "Import history"
       },
       "settings": {
         "title": "Import history",
-        "description": "Bring past page views and AI crawler hits in from Plausible, Vercel, Cloudflare, Rybbit or Databuddy.",
+        "description": "Bring past page views and AI crawler hits in from Plausible, Vercel, Cloudflare, PostHog, Rybbit or Databuddy.",
         "action": "Manage imports",
         "start": "Import"
       },
@@ -4800,6 +4800,10 @@
         "databuddy": {
           "name": "Databuddy",
           "description": "Connect an API key. Full history, every plan."
+        },
+        "posthog": {
+          "name": "PostHog",
+          "description": "Connect a personal API key. Full history, US or EU Cloud."
         }
       },
       "guide": "What to do in {provider}",
@@ -4833,7 +4837,8 @@
           "cloudflare": "AI crawler hits for the last 31 days and Web Analytics page views for about 6 months.",
           "vercel": "Hobby keeps 1 month of history, Pro 12 and Plus 24. UTM campaigns need Plus.",
           "rybbit": "Uses the Rybbit API, which needs the Standard plan or higher. A long history can take more than a day to import.",
-          "databuddy": "Uses the Databuddy API with a key that can only read data."
+          "databuddy": "Uses the Databuddy API with a key that can only read data.",
+          "posthog": "Reads page views with PostHog's query API. Imports count toward the project's query limits, so Notra leaves most of them for you."
         },
         "existing": "Saved connections",
         "newConnection": "Or add a new one",
@@ -4868,6 +4873,12 @@
             "firstDescription": "Organization settings → API keys → Create API key.",
             "secondTitle": "Limit it to reading",
             "secondDescription": "Choose the Analytics preset, which grants only the read:data scope."
+          },
+          "posthog": {
+            "firstTitle": "Create a personal API key",
+            "firstDescription": "Settings → User → Personal API keys → Create personal API key. Give it access to the organization or projects you want to import.",
+            "secondTitle": "Add these scopes",
+            "secondDescription": "All three as Read, nothing else."
           }
         },
         "secretLabel": "API key",
