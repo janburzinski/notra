@@ -1,0 +1,19 @@
+apps/dashboard/src/components/artifacts/chat-artifact-card.tsx
+  s_3428b476267439::t_464dabc284379f 38-39,41-48,50,52
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "2897ae5d2e805040a6dbf6616e3eb2a0421368c9",
+  "prompts": {},
+  "sessions": {
+    "s_3428b476267439": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c6d39551-e687-4036-a65c-3bd92bb74947",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
