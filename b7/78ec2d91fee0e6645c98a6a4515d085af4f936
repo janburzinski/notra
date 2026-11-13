@@ -1,0 +1,95 @@
+apps/dashboard/src/components/artifacts/artifact-document.tsx
+  s_3428b476267439::t_8955fdefb5f087 1-352
+packages/ai/src/orchestration/standalone-tool-registry.ts
+  s_3428b476267439::t_8955fdefb5f087 3,214-221
+apps/dashboard/src/lib/artifacts/view.ts
+  s_3428b476267439::t_8955fdefb5f087 1-129
+apps/dashboard/src/routes/-entry-ui.tsx
+  s_3428b476267439::t_8955fdefb5f087 12,65-74,193-211
+apps/dashboard/messages/de.json
+  s_3428b476267439::t_8955fdefb5f087 6998,8346-8349,10232-10272
+apps/dashboard/src/components/artifacts/artifact-member-body.tsx
+  s_3428b476267439::t_8955fdefb5f087 1-121
+packages/ai/src/types/artifact.ts
+  s_3428b476267439::t_8955fdefb5f087 1-34
+packages/tools/src/assistant/artifacts.ts
+  s_3428b476267439::t_8955fdefb5f087 1-80
+apps/dashboard/src/components/ai/chat-tool-block/tool-output-chart.tsx
+  s_3428b476267439::t_8955fdefb5f087 25,29,76-82,105-110,231-235,244,255
+packages/db/migrations/0164_agent_artifacts.sql
+  ai_agent 1-30
+apps/dashboard/src/utils/chat-artifact.ts
+  s_3428b476267439::t_8955fdefb5f087 1-45
+apps/dashboard/src/lib/artifacts/manage.ts
+  s_3428b476267439::t_8955fdefb5f087 1-54
+apps/dashboard/src/types/components/chat-tool-chart.ts
+  s_3428b476267439::t_8955fdefb5f087 7-11
+packages/db/migrations/meta/0164_snapshot.json
+  ai_agent 1-18039
+apps/dashboard/src/routes/-artifact-loaders.ts
+  s_3428b476267439::t_8955fdefb5f087 1-76
+packages/db/src/types/artifacts.ts
+  s_3428b476267439::t_8955fdefb5f087 1-10
+apps/dashboard/src/components/chat/chat-content-panel.tsx
+  s_3428b476267439::t_8955fdefb5f087 20,51,61,63,67,76,127-131,133-139,146-150,194-197,199-221,226-248,255,259,287,320,323,332,346,363,365,372-390,393-395,397-407,414,433,495,508,511,513-517,527,529-530,547,562,564-565,567,569,572-574,582,585,587,591-601,603-604,612
+packages/ai/src/schemas/artifact.ts
+  s_3428b476267439::t_8955fdefb5f087 1-151
+apps/dashboard/src/constants/charts.ts
+  s_3428b476267439::t_8955fdefb5f087 54-57
+apps/dashboard/src/utils/group-assistant-message-parts.ts
+  s_3428b476267439::t_8955fdefb5f087 17,45-46,49-50
+apps/dashboard/src/lib/hooks/use-artifact.ts
+  s_3428b476267439::t_8955fdefb5f087 1-56
+apps/dashboard/src/lib/orpc/router.ts
+  s_3428b476267439::t_8955fdefb5f087 31-35
+packages/db/src/schema.ts
+  s_3428b476267439::t_8955fdefb5f087 104,5025-5028,5187-5236
+apps/dashboard/src/components/artifacts/artifact-page.tsx
+  s_3428b476267439::t_8955fdefb5f087 1-82
+apps/dashboard/src/constants/artifacts.ts
+  s_3428b476267439::t_8955fdefb5f087 1-21
+packages/db/migrations/meta/_journal.json
+  ai_agent 1152-1158
+apps/dashboard/messages/en.json
+  s_3428b476267439::t_8955fdefb5f087 6998,8346-8349,10232-10272
+apps/dashboard/src/components/artifacts/artifact-autopilot-block.tsx
+  s_3428b476267439::t_8955fdefb5f087 1-143
+packages/ai/src/chat/artifacts.ts
+  s_3428b476267439::t_8955fdefb5f087 1-328
+apps/dashboard/src/lib/orpc/routers/artifacts.ts
+  s_3428b476267439::t_8955fdefb5f087 1-56
+apps/dashboard/src/components/artifacts/shared-artifact-page.tsx
+  s_3428b476267439::t_8955fdefb5f087 1-59
+apps/dashboard/src/components/artifacts/chat-artifact-card.tsx
+  s_3428b476267439::t_8955fdefb5f087 1-96
+apps/dashboard/src/types/components/chat-content-panel.ts
+  s_3428b476267439::t_8955fdefb5f087 3,21,23,26-35,40
+apps/dashboard/src/types/artifacts.ts
+  s_3428b476267439::t_8955fdefb5f087 1-90
+apps/dashboard/src/components/artifacts/artifact-actions.tsx
+  s_3428b476267439::t_8955fdefb5f087 1-370
+packages/ai/src/constants/artifacts.ts
+  s_3428b476267439::t_8955fdefb5f087 1-47
+packages/schemas/src/schemas/dashboard/artifacts.ts
+  s_3428b476267439::t_8955fdefb5f087 1-19
+apps/dashboard/src/components/artifacts/chat-artifact-document.tsx
+  s_3428b476267439::t_8955fdefb5f087 1-107
+packages/ai/src/tools/artifacts.ts
+  s_3428b476267439::t_8955fdefb5f087 1-99
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "b778ec2d91fee0e6645c98a6a4515d085af4f936",
+  "prompts": {},
+  "sessions": {
+    "s_3428b476267439": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c6d39551-e687-4036-a65c-3bd92bb74947",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
