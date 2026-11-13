@@ -1,0 +1,27 @@
+packages/ui/src/components/ui/icon-tabs.tsx
+  s_6ce0707589403e::t_3670f442c2bf51 4-6,94-99,103-109,113,117,141
+  s_6ce0707589403e::t_f11cb33b0bff4e 56,71,83-85,87-89,135,149,165,177-182,185
+  s_6ce0707589403e::t_99445280902e47 50-55,57-70,82,86,157-163
+packages/ui/src/types/icon-tabs.ts
+  s_6ce0707589403e::t_f11cb33b0bff4e 7-8,27-32
+apps/dashboard/src/components/analytics/analytics-source-tabs.tsx
+  s_6ce0707589403e::t_f481b1f77f7629 60,62-68
+packages/ui/src/constants/icon-tabs.ts
+  s_6ce0707589403e::t_3670f442c2bf51 3-8
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "0494e116c6deb92385a42aaceec0711b66967312",
+  "prompts": {},
+  "sessions": {
+    "s_6ce0707589403e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "80f89827-1e4f-4c9f-9b29-7cf4f623b8fc",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
