@@ -4,6 +4,8 @@ import type { ReactNode } from "react";
 export interface IconTabsIndicatorProps {
   /** Active tab value; a change starts the slide. */
   value: string;
+  /** See `IconTabsListProps.indicatorId`. */
+  indicatorId?: string;
 }
 
 export interface IconTabsIndicatorBox {
@@ -22,6 +24,12 @@ export interface SlideInTabIconProps {
 export type IconTabsListProps = Omit<TabsPrimitive.List.Props, "children"> & {
   /** Active tab value. Must match the `value` of the surrounding `Tabs`. */
   value: string;
+  /**
+   * Shares the indicator position between every list with this id, so a list
+   * that mounts or is revealed (one copy per route, or kept under Activity)
+   * slides from where the previous one stopped instead of appearing in place.
+   */
+  indicatorId?: string;
   children: ReactNode;
 };
 

@@ -1,6 +1,9 @@
 "use client";
 
-import { ICON_TABS_INDICATOR_MS } from "@notra/ui/constants/icon-tabs";
+import {
+  ICON_TABS_INDICATOR_MS,
+  ICON_TABS_MAX_FRAME_STEP_MS,
+} from "@notra/ui/constants/icon-tabs";
 import {
   applyIndicatorBox,
   easeOutQuint,
@@ -44,7 +47,28 @@ function SlideInTabIcon({ children, pinned = false }: SlideInTabIconProps) {
   );
 }
 
-function IconTabsIndicator({ value }: IconTabsIndicatorProps) {
+// Last painted box per `indicatorId`, and when its list stopped painting
+// (null while it still does), shared across list instances.
+const sharedIndicatorBoxes = new Map<
+  string,
+  { box: IconTabsIndicatorBox; releasedAt: number | null }
+>();
+
+/** The box a newly shown list slides from, if another just handed it over. */
+function takeSharedBox(indicatorId: string | undefined) {
+  const shared = indicatorId ? sharedIndicatorBoxes.get(indicatorId) : null;
+  if (!shared) {
+    return null;
+  }
+  // Coming back to the page later starts in place rather than sliding from
+  // wherever the indicator was last time.
+  const fresh =
+    shared.releasedAt === null ||
+    performance.now() - shared.releasedAt < ICON_TABS_INDICATOR_MS;
+  return fresh ? shared.box : null;
+}
+
+function IconTabsIndicator({ value, indicatorId }: IconTabsIndicatorProps) {
   const ref = useRef<HTMLSpanElement>(null);
   const boxRef = useRef<IconTabsIndicatorBox | null>(null);
 
@@ -55,33 +79,46 @@ function IconTabsIndicator({ value }: IconTabsIndicatorProps) {
       return;
     }
 
-    const from = boxRef.current;
+    const from = takeSharedBox(indicatorId) ?? boxRef.current;
+    const paint = (box: IconTabsIndicatorBox) => {
+      boxRef.current = box;
+      if (indicatorId) {
+        sharedIndicatorBoxes.set(indicatorId, { box, releasedAt: null });
+      }
+      applyIndicatorBox(element, box);
+    };
     const animate =
       from !== null &&
       !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const effectStart = performance.now();
-    // The slide counts from its first painted frame, so a long render right
-    // after the click delays it instead of skipping it.
-    let start: number | null = null;
+    // Time is counted per painted frame with a capped step, using
+    // performance.now() rather than the rAF timestamp: the first frame after
+    // the long task that mounts a page carries a timestamp from before it,
+    // which used to land the slide in one jump.
+    let elapsed = 0;
+    let lastFrame: number | null = null;
     let frame = 0;
 
     const nextFrame = () => {
-      frame = requestAnimationFrame((now) => {
-        start ??= now;
-        tick(now);
+      frame = requestAnimationFrame(() => {
+        const now = performance.now();
+        if (lastFrame !== null) {
+          elapsed += Math.min(now - lastFrame, ICON_TABS_MAX_FRAME_STEP_MS);
+        }
+        lastFrame = now;
+        tick();
       });
     };
 
-    const tick = (now: number) => {
+    const tick = () => {
       frame = 0;
       const target = measureActiveTab(list);
       if (!target) {
-        if (now - effectStart < ICON_TABS_INDICATOR_MS) {
+        if (performance.now() - effectStart < ICON_TABS_INDICATOR_MS) {
           frame = requestAnimationFrame(tick);
         }
         return;
       }
-      const elapsed = start === null ? 0 : Math.max(0, now - start);
       const progress = animate
         ? Math.min(1, elapsed / ICON_TABS_INDICATOR_MS)
         : 1;
@@ -95,14 +132,13 @@ function IconTabsIndicator({ value }: IconTabsIndicatorProps) {
               height: target.height,
             }
           : target;
-      boxRef.current = box;
-      applyIndicatorBox(element, box);
+      paint(box);
       element.dataset.ready = "";
       if (progress < 1) {
         nextFrame();
       }
     };
-    tick(effectStart);
+    tick();
 
     const observer = new ResizeObserver(() => {
       if (frame !== 0) {
@@ -110,8 +146,7 @@ function IconTabsIndicator({ value }: IconTabsIndicatorProps) {
       }
       const target = measureActiveTab(list);
       if (target) {
-        boxRef.current = target;
-        applyIndicatorBox(element, target);
+        paint(target);
       }
     });
     observer.observe(list);
@@ -119,8 +154,15 @@ function IconTabsIndicator({ value }: IconTabsIndicatorProps) {
     return () => {
       cancelAnimationFrame(frame);
       observer.disconnect();
+      const box = boxRef.current;
+      if (indicatorId && box) {
+        sharedIndicatorBoxes.set(indicatorId, {
+          box,
+          releasedAt: performance.now(),
+        });
+      }
     };
-  }, [value]);
+  }, [value, indicatorId]);
 
   return (
     <span
@@ -132,10 +174,15 @@ function IconTabsIndicator({ value }: IconTabsIndicatorProps) {
 }
 
 /** `TabsList` with the sliding indicator. Pair with `IconTabsTrigger`. */
-function IconTabsList({ value, children, ...props }: IconTabsListProps) {
+function IconTabsList({
+  value,
+  indicatorId,
+  children,
+  ...props
+}: IconTabsListProps) {
   return (
     <TabsList indicator={false} {...props}>
-      <IconTabsIndicator value={value} />
+      <IconTabsIndicator indicatorId={indicatorId} value={value} />
       {children}
     </TabsList>
   );
