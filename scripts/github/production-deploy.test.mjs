@@ -353,7 +353,8 @@ test("a demo app rolled back after planning stops the demo migration and both de
       if (
         url.pathname === "/v2/apps.getApp" &&
         body.app === "app_demo-dashboard" &&
-        ++dashboardReads > 1
+        // planning reads the app before and after waiting; the refresh is the third read
+        ++dashboardReads > 2
       ) {
         return {
           id: body.app,
@@ -1331,8 +1332,10 @@ for (const [name, path, data] of [
           url.pathname === path &&
           (body.app === "app_test" || body.search === "api.usenotra.com") &&
           // A deployment that is still running is waited out, so it has to
-          // stay active to block the release.
-          (++reads === 2 || (name === "active deployment" && reads > 2))
+          // stay active to block the release. Planning reads the app twice
+          // (before and after that wait), so its first refreshed read is the third.
+          (++reads === (path === "/v2/apps.getApp" ? 3 : 2) ||
+            (name === "active deployment" && reads > 2))
         ) {
           return data;
         }
@@ -1489,3 +1492,137 @@ for (const [name, update] of [
     );
   });
 }
+
+test("Unkey deployment the app serves counts as current when isCurrent stays false", async () => {
+  let created = false;
+  let currentReads = 0;
+  const { run, calls } = fixture({
+    api: true,
+    override: ({ url, body }) => {
+      if (
+        url.pathname === "/v3/deployments.createDeployment" &&
+        body.app === "app_test"
+      ) {
+        created = true;
+        return;
+      }
+      if (url.pathname === "/v2/apps.getApp" && body.app === "app_test") {
+        return {
+          id: "app_test",
+          slug: "api",
+          git: { repository: "usenotra/notra", defaultBranch: "main" },
+          isRolledBack: false,
+          currentDeploymentId:
+            created && ++currentReads > 1 ? "new-api" : "live-api",
+        };
+      }
+      if (
+        url.pathname === "/v2/deployments.getDeployment" &&
+        ["live-api", "new-api"].includes(body.deploymentId)
+      ) {
+        const fresh = body.deploymentId === "new-api";
+        return {
+          id: body.deploymentId,
+          status: "ready",
+          isCurrent: false,
+          project: "notra",
+          app: "api",
+          environment: "production",
+          git: { commitSha: (fresh ? "a" : "b").repeat(40) },
+        };
+      }
+    },
+  });
+  await run();
+  assert.equal(currentReads, 2);
+  assert.equal(
+    calls.filter(
+      ({ url, body }) =>
+        url.pathname === "/v3/deployments.createDeployment" &&
+        body.app === "app_test"
+    ).length,
+    1
+  );
+});
+
+for (const [field, update, message] of [
+  ["id", { id: "other" }, "id other is not live-api"],
+  ["status", { status: "stopped" }, "status stopped"],
+  ["app", { app: "other" }, "app other is not api"],
+  [
+    "environment",
+    { environment: "preview" },
+    "environment preview is not production",
+  ],
+  ["commit", { git: {} }, "no git commit"],
+]) {
+  test(`Unkey live deployment with wrong ${field} names the field`, async () => {
+    const { run, calls } = fixture({
+      api: true,
+      override: ({ url, body }) =>
+        url.pathname === "/v2/deployments.getDeployment" &&
+        body.deploymentId === "live-api"
+          ? {
+              id: "live-api",
+              status: "ready",
+              isCurrent: false,
+              project: "notra",
+              app: "api",
+              environment: "production",
+              git: { commitSha: "b".repeat(40) },
+              ...update,
+            }
+          : undefined,
+    });
+    await assert.rejects(run(), (error) => {
+      assert.equal(
+        error.message,
+        `unkey: cannot identify API's live production commit (${message})`
+      );
+      return true;
+    });
+    assert.equal(builds(calls).length, 0);
+  });
+}
+
+test("Unkey plan reads the app again after waiting, so a hotfix that lands meanwhile counts", async () => {
+  let appReads = 0;
+  const { run, calls } = fixture({
+    api: true,
+    override: ({ url, body }) => {
+      if (url.pathname === "/v2/apps.getApp" && body.app === "app_test") {
+        appReads += 1;
+        return {
+          id: "app_test",
+          slug: "api",
+          git: { repository: "usenotra/notra", defaultBranch: "main" },
+          isRolledBack: false,
+          // the first read is from before the wait; a hotfix of the release commit lands during it
+          currentDeploymentId: appReads === 1 ? "live-api" : "hotfix-api",
+        };
+      }
+      if (
+        url.pathname === "/v2/deployments.getDeployment" &&
+        body.deploymentId === "hotfix-api"
+      ) {
+        return {
+          id: "hotfix-api",
+          status: "ready",
+          isCurrent: true,
+          project: "notra",
+          app: "api",
+          environment: "production",
+          git: { commitSha: "a".repeat(40) },
+        };
+      }
+    },
+  });
+  await run();
+  assert.ok(
+    calls.every(
+      ({ url, body }) =>
+        url.pathname !== "/v3/deployments.createDeployment" ||
+        body.app !== "app_test"
+    )
+  );
+});

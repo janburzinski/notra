@@ -140,6 +140,28 @@ export function buildSitesToolchain(directory, liveVersion) {
   return JSON.parse(readFileSync(resultFile, "utf8"));
 }
 
+function unkeyLiveMismatches(live, expected) {
+  const mismatches = [];
+  if (live.id !== expected.id) {
+    mismatches.push(`id ${live.id} is not ${expected.id}`);
+  }
+  if (live.status !== "ready") {
+    mismatches.push(`status ${live.status}`);
+  }
+  if (live.app !== expected.app) {
+    mismatches.push(`app ${live.app} is not ${expected.app}`);
+  }
+  if (live.environment !== expected.environment) {
+    mismatches.push(
+      `environment ${live.environment} is not ${expected.environment}`
+    );
+  }
+  if (!live.git?.commitSha) {
+    mismatches.push("no git commit");
+  }
+  return mismatches;
+}
+
 export async function release({
   env = process.env,
   fetchImpl = fetch,
@@ -371,24 +393,39 @@ export async function release({
           })
         ).length > 0
     );
-    if (!app.currentDeploymentId) {
+    // A deployment that finished during the wait (a hotfix) moves the app's pointer, so read it
+    // again rather than trust the one from before the wait.
+    const settled = await unkey("v2/apps.getApp", {
+      project: target.project,
+      app: target.app,
+    });
+    if (settled.id !== target.app || settled.isRolledBack) {
+      throw new Error(
+        `unkey: ${service.name} must track this repository's main in production without rollback`
+      );
+    }
+    if (!settled.currentDeploymentId) {
       throw new Error(
         `unkey: ${service.name} has no current production deployment`
       );
     }
     const live = await unkey("v2/deployments.getDeployment", {
-      deploymentId: app.currentDeploymentId,
+      deploymentId: settled.currentDeploymentId,
     });
-    if (
-      live.id !== app.currentDeploymentId ||
-      live.status !== "ready" ||
-      live.isCurrent !== true ||
-      live.app !== app.slug ||
-      live.environment !== environment.slug ||
-      !live.git?.commitSha
-    ) {
+    // Trust the app's currentDeploymentId when the deployment's isCurrent flag lags.
+    const mismatches = unkeyLiveMismatches(live, {
+      id: settled.currentDeploymentId,
+      app: settled.slug,
+      environment: environment.slug,
+    });
+    if (mismatches.length > 0) {
       throw new Error(
-        `unkey: cannot identify ${service.name}'s live production commit`
+        `unkey: cannot identify ${service.name}'s live production commit (${mismatches.join(", ")})`
+      );
+    }
+    if (live.isCurrent !== true) {
+      await report(
+        `unkey: ${service.name} live deployment ${live.id} reports isCurrent=${live.isCurrent}; using the app's currentDeploymentId`
       );
     }
     const history = await productionHistory(
@@ -817,6 +854,7 @@ export async function release({
       );
       const deadline = Date.now() + 20 * 60_000;
       let completed = false;
+      let lastStatus;
       for (
         let attempt = 0;
         attempt < 240 && Date.now() < deadline;
@@ -833,11 +871,21 @@ export async function release({
         ) {
           throw new Error(`unkey: ${service.name} deployment target changed`);
         }
+        lastStatus = status;
         if (status.status === "ready") {
           if (status.git?.commitSha !== sha) {
             throw new Error(`unkey: ${service.name} built a different commit`);
           }
-          if (status.isCurrent === true) {
+          // The app pointer can update before the deployment's isCurrent flag.
+          const current =
+            status.isCurrent === true ||
+            (
+              await unkey("v2/apps.getApp", {
+                project: plan.target.project,
+                app: plan.target.app,
+              })
+            ).currentDeploymentId === deployment.deploymentId;
+          if (current) {
             await report(`unkey: ${service.name} ready and current at ${sha}`);
             unkeyDeployed.add(service.name);
             completed = true;
@@ -855,7 +903,7 @@ export async function release({
       }
       if (!completed) {
         throw new Error(
-          `unkey: ${service.name} deployment did not become current in 20 minutes`
+          `unkey: ${service.name} deployment did not become current in 20 minutes (last seen: status=${lastStatus?.status}, isCurrent=${lastStatus?.isCurrent})`
         );
       }
     }
