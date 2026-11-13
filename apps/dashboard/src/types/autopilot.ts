@@ -198,6 +198,8 @@ export interface AutopilotTrendProps {
   previous: number | undefined;
   /** Credits cost more when they rise, so a rise reads as worse. */
   higherIsBetter?: boolean;
+  /** Show the change in grey, for numbers that are neither good nor bad. */
+  neutral?: boolean;
 }
 
 export interface AutopilotAutomationFactsProps {

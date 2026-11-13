@@ -7,16 +7,19 @@ export function AutopilotTrend({
   current,
   previous,
   higherIsBetter = true,
+  neutral = false,
 }: AutopilotTrendProps) {
   if (previous === undefined || (current === 0 && previous === 0)) {
     return null;
   }
   const change = Math.round((current - previous) * 10) / 10;
   let tone: "up" | "down" | "flat" = "flat";
-  if (change !== 0) {
+  if (change !== 0 && !neutral) {
     tone = change > 0 === higherIsBetter ? "up" : "down";
   }
   return (
-    <TrendBadge tone={tone}>{change > 0 ? `+${change}` : change}</TrendBadge>
+    <TrendBadge showIcon={!neutral} tone={tone}>
+      {change > 0 ? `+${change}` : change}
+    </TrendBadge>
   );
 }

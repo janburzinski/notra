@@ -21,6 +21,7 @@ import { DataTable, type TableColumn } from "ui/table";
 
 import { AutopilotStatStrip } from "@/components/autopilot/autopilot-stat-strip";
 import { AutopilotTableEmpty } from "@/components/autopilot/autopilot-table-empty";
+import { AutopilotTrend } from "@/components/autopilot/autopilot-trend";
 import { Button } from "@/components/button";
 import { useRightPanel } from "@/components/dashboard/right-panel-context";
 import { AUTOPILOT_POLL_INTERVAL_MS } from "@/constants/autopilot";
@@ -104,11 +105,47 @@ export function AutopilotAutomationsOverview({
       workflow,
     })),
   ];
+  const previous = metrics?.previous;
   const stats = [
-    { label: "PRs generated", value: metrics?.pullRequests },
-    { label: "PRs merged", value: metrics?.merged },
-    { label: "Avg credits per run", value: metrics?.averageCreditsPerRun },
-    { label: "Total credits", value: metrics?.totalCredits },
+    {
+      label: "PRs generated",
+      value: metrics?.pullRequests,
+      trend: metrics ? (
+        <AutopilotTrend
+          current={metrics.pullRequests}
+          previous={previous?.pullRequests}
+        />
+      ) : null,
+    },
+    {
+      label: "PRs merged",
+      value: metrics?.merged,
+      trend: metrics ? (
+        <AutopilotTrend current={metrics.merged} previous={previous?.merged} />
+      ) : null,
+    },
+    {
+      label: "Avg credits per run",
+      value: metrics?.averageCreditsPerRun,
+      trend: metrics ? (
+        <AutopilotTrend
+          current={metrics.averageCreditsPerRun}
+          higherIsBetter={false}
+          previous={previous?.averageCreditsPerRun}
+        />
+      ) : null,
+    },
+    {
+      label: "Total credits",
+      value: metrics?.totalCredits,
+      trend: metrics ? (
+        <AutopilotTrend
+          current={metrics.totalCredits}
+          neutral
+          previous={previous?.totalCredits}
+        />
+      ) : null,
+    },
   ];
 
   const columns: TableColumn<AutopilotAutomationRow>[] = [
