@@ -1,0 +1,48 @@
+apps/console/src/components/overview/overview-client.tsx
+  s_dbf54ebf98af8f::t_f878ab76287d53 1-143,145-302,305,307-317,319-355,357-468
+  s_dbf54ebf98af8f::t_e7d4ad70fb7435 303-304,306
+  s_dbf54ebf98af8f::t_bdecc441e9af72 318,356
+  s_dbf54ebf98af8f::t_5f69b9ea5eb813 144
+apps/console/src/lib/overview/queries.ts
+  s_dbf54ebf98af8f::t_2547dc63a8ce84 175-176,226-227,268,270,272-273,275-276
+  s_dbf54ebf98af8f::t_0aa36305092967 159-163
+  s_dbf54ebf98af8f::t_5cdfb26e3db9f8 1-158,164-174,177-225,228-267,269,271,274,277-455
+apps/console/src/components/overview/overview-charts.tsx
+  s_dbf54ebf98af8f::t_0aa36305092967 11-19
+  s_dbf54ebf98af8f::t_d3aaa645d8a1f6 1-10,20-130
+apps/console/src/constants/overview.ts
+  s_dbf54ebf98af8f::t_fcfc83bd964ee1 16,21-34
+  s_dbf54ebf98af8f::t_d6ac58c31da898 43
+  s_dbf54ebf98af8f::t_62e9634c8d5b94 1-15,17-20,35-42,44-55
+apps/console/src/schemas/overview.ts
+  s_dbf54ebf98af8f::t_2547dc63a8ce84 1-13
+apps/console/src/app/(console)/[slug]/page.tsx
+  s_dbf54ebf98af8f::t_2547dc63a8ce84 1,4-11,18-24
+apps/console/src/lib/orpc/routers/overview.ts
+  s_dbf54ebf98af8f::t_2547dc63a8ce84 1-13
+apps/console/src/components/layout/console-shell.tsx
+  s_dbf54ebf98af8f::t_201359c16a9aa4 6,97,245,248-249
+  s_dbf54ebf98af8f::t_52dccc5cc706bf 181,183-185,246-247
+apps/console/src/lib/orpc/router.ts
+  s_dbf54ebf98af8f::t_2547dc63a8ce84 6,18
+apps/console/src/app/dashboard/page.tsx
+  s_dbf54ebf98af8f::t_201359c16a9aa4 14
+apps/console/src/types/overview.ts
+  s_dbf54ebf98af8f::t_2e9391640c0979 1-101
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "7f50c9e328b291fdbcc63117a7fb3257168cd8dc",
+  "prompts": {},
+  "sessions": {
+    "s_dbf54ebf98af8f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "136e800b-75e4-4e44-a5ee-7cc73212fa4f",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
