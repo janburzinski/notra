@@ -1,4 +1,5 @@
 import type { MCP_STORE_CATEGORIES } from "../constants/mcp-store-categories";
+import type { LinearOAuthTokens } from "./linear-oauth";
 
 export type McpStoreCategory = (typeof MCP_STORE_CATEGORIES)[number];
 
@@ -72,15 +73,12 @@ export interface WebhookConfig {
   repo: string;
 }
 
-export interface CreateLinearIntegrationParams {
+export interface ConnectLinearIntegrationParams {
   organizationId: string;
   userId: string;
-  displayName: string;
-  accessToken: string;
   linearOrganizationId: string;
-  linearOrganizationName?: string;
-  linearTeamId?: string;
-  linearTeamName?: string;
+  linearOrganizationName: string;
+  tokens: LinearOAuthTokens;
 }
 
 export interface CreateSlackIntegrationParams {

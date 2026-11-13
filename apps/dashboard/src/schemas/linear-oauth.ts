@@ -21,10 +21,6 @@ export const linearOAuthStateSchema = z.union([
     .pipe(linearOAuthStateObjectSchema),
 ]);
 
-export const linearTokenResponseSchema = z.object({
-  access_token: z.string().min(1),
-});
-
 export const linearOrganizationQuerySchema = z.object({
   data: z.object({
     organization: z.object({

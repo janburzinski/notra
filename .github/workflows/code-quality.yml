@@ -61,7 +61,7 @@ jobs:
           has console && checks="$checks,\"build-console\""
           has ui && checks="$checks,\"build-ui\""
           echo "checks=$checks]" >> "$GITHUB_OUTPUT"
-          if grep -qE '^(packages/db|packages/sites-server|packages/schemas)/|^(bun\.lock|package\.json)$' <<< "$files"; then
+          if grep -qE '^(packages/db|packages/sites-server|packages/schemas)/|^packages/ai/src/integrations/linear|^(bun\.lock|package\.json)$' <<< "$files"; then
             echo infrastructure=true >> "$GITHUB_OUTPUT"
           else
             echo infrastructure=false >> "$GITHUB_OUTPUT"
@@ -268,6 +268,11 @@ jobs:
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/notra_migrations
         run: bun test ./tests/post-history.test.ts
+
+      - name: Test Linear OAuth token refresh on migrated schema
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/notra_migrations
+        run: bun --no-env-file test packages/ai/src/integrations/linear-oauth.postgres.test.ts
 
       - name: Test Sites branch workflow and migration 0128 rolling compatibility
         env:

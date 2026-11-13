@@ -1357,6 +1357,7 @@ export const integrationsRouter = {
             createdAt: integration.createdAt.toISOString(),
             linearOrganizationName: integration.linearOrganizationName,
             linearTeamName: integration.linearTeamName,
+            needsReconnect: !integration.encryptedRefreshToken,
             createdByUser: serializeCreatedByUser(integration.createdByUser),
           })),
         };

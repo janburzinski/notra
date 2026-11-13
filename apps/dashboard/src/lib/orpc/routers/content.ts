@@ -1,10 +1,8 @@
 import { checkContentBilling } from "@notra/ai/billing/content-billing";
 import { GITHUB_API_VERSION_HEADERS } from "@notra/ai/constants/github";
 import { getTokenForIntegrationId } from "@notra/ai/integrations/github";
-import {
-  getDecryptedLinearToken,
-  getLinearIntegrationsByOrganization,
-} from "@notra/ai/integrations/linear";
+import { getLinearIntegrationsByOrganization } from "@notra/ai/integrations/linear";
+import { resolveLinearAccessToken } from "@notra/ai/integrations/linear-oauth";
 import { type ContentType, contentTypeSchema } from "@notra/ai/schemas/content";
 import { supportsPostSlug } from "@notra/ai/schemas/post";
 import { postCoverImageSchema } from "@notra/ai/schemas/post-metadata";
@@ -1890,12 +1888,9 @@ export const contentRouter = {
               issues: [],
             };
             try {
-              const token = await getDecryptedLinearToken(integration.id);
-              if (!token) {
-                return empty;
-              }
-
-              const client = createLinearClient(token);
+              const client = createLinearClient(
+                await resolveLinearAccessToken(integration)
+              );
               const filter: Record<string, unknown> = {
                 completedAt: {
                   gte: lookback.start.toISOString(),

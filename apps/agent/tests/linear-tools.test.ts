@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, mock, test } from "bun:test";
 
 import { LinearError, LinearErrorType } from "@linear/sdk";
+import { LinearReconnectRequiredError } from "@notra/ai/integrations/linear-oauth-errors";
 
 let resolveContext = mock(async () => ({
   accessToken: "token",
@@ -189,6 +190,17 @@ describe("Linear tool failures", () => {
       )
     );
     const tool = createGetLinearProjectsTool() as unknown as Executable;
+
+    expect(await tool.execute(input, ctx)).toBe(
+      "Linear rejected Notra's access. Tell the user to reconnect Linear in Notra's integration settings."
+    );
+  });
+
+  test("an authorization that can no longer be refreshed asks the user to reconnect", async () => {
+    resolveContext = mock(() =>
+      Promise.reject(new LinearReconnectRequiredError("linear-1"))
+    );
+    const tool = createGetLinearIssuesTool() as unknown as Executable;
 
     expect(await tool.execute(input, ctx)).toBe(
       "Linear rejected Notra's access. Tell the user to reconnect Linear in Notra's integration settings."

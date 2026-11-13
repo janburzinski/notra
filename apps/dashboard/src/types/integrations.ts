@@ -65,6 +65,7 @@ export interface LinearIntegration {
   linearOrganizationName?: string | null;
   linearTeamId?: string | null;
   linearTeamName?: string | null;
+  needsReconnect?: boolean;
   createdByUser?: {
     id: string;
     name: string;

@@ -5583,7 +5583,7 @@
     },
     "connectionToasts": {
       "linearConnected": "Linear workspace connected successfully",
-      "linearAlreadyConnected": "This Linear workspace is already connected",
+      "linearReconnected": "Linear workspace reconnected",
       "slackConnected": "Slack workspace connected successfully",
       "slackAlreadyConnected": "This Slack workspace is already connected",
       "slackConnectedElsewhere": "This Slack workspace is already connected to another organization",
@@ -5614,7 +5614,9 @@
       "description": "Manage your Linear integrations for automated content",
       "connect": "Connect Linear",
       "emptyDescription": "Connect Linear to start syncing issues and updates.",
-      "workspaceConnected": "Linear workspace connected"
+      "workspaceConnected": "Linear workspace connected",
+      "reconnect": "Reconnect",
+      "reconnectRequired": "Reconnect required"
     },
     "detailPage": {
       "metaTitle": "{name} Integration",

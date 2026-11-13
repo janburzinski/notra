@@ -9,6 +9,7 @@ import {
   LINEAR_ISSUES_WITH_RELATIONS_QUERY,
   LINEAR_TOOL_ERROR_MESSAGES,
 } from "@notra/ai/constants/linear";
+import { LinearReconnectRequiredError } from "@notra/ai/integrations/linear-oauth-errors";
 import type {
   LinearIssuePreviewsQueryResult,
   LinearIssuesQueryResult,
@@ -59,6 +60,9 @@ export async function getLinearIssues(
 
 /** A tool result the model can act on, e.g. telling the user to reconnect Linear. */
 export function describeLinearToolError(error: unknown): string {
+  if (error instanceof LinearReconnectRequiredError) {
+    return LINEAR_TOOL_ERROR_MESSAGES.auth;
+  }
   if (error instanceof LinearError) {
     if (
       error.type === LinearErrorType.AuthenticationError ||

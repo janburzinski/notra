@@ -3,7 +3,6 @@ import { describe, expect, test } from "bun:test";
 import {
   linearOAuthStateSchema,
   linearOrganizationQuerySchema,
-  linearTokenResponseSchema,
 } from "@/schemas/linear-oauth";
 
 const state = {
@@ -23,25 +22,6 @@ describe("linearOAuthStateSchema", () => {
     expect(
       linearOAuthStateSchema.safeParse({ ...state, userId: "" }).success
     ).toBe(false);
-  });
-});
-
-describe("linearTokenResponseSchema", () => {
-  test("accepts both documented scope shapes", () => {
-    for (const scope of ["read write", ["read", "write"]]) {
-      expect(
-        linearTokenResponseSchema.parse({
-          access_token: "token",
-          token_type: "Bearer",
-          scope,
-        })
-      ).toEqual({ access_token: "token" });
-    }
-  });
-
-  test("rejects a response without an access token", () => {
-    expect(linearTokenResponseSchema.safeParse({}).success).toBe(false);
-    expect(linearTokenResponseSchema.safeParse(null).success).toBe(false);
   });
 });
 

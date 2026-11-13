@@ -1,58 +1,16 @@
 import { db } from "@notra/db/drizzle";
 import { linearIntegrations } from "@notra/db/schema";
-import {
-  decryptToken,
-  encryptToken,
-} from "@notra/db/utils/integration-encryption";
+import { decryptToken } from "@notra/db/utils/integration-encryption";
 import { and, eq } from "drizzle-orm";
-import { customAlphabet } from "nanoid";
 
-import type { CreateLinearIntegrationParams } from "../types/integrations";
 import type { LinearToolContext } from "../types/tools";
-import { hasOrganizationAccess } from "../utils/organization-access";
+import { resolveLinearAccessToken } from "./linear-oauth";
 
-const nanoid = customAlphabet("abcdefghijklmnopqrstuvwxyz0123456789", 16);
 const createdByUserRelation = {
   createdByUser: {
     columns: { id: true, name: true, email: true, image: true },
   },
 } as const;
-
-export async function createLinearIntegration(
-  params: CreateLinearIntegrationParams
-) {
-  const {
-    organizationId,
-    userId,
-    displayName,
-    accessToken,
-    linearOrganizationId,
-    linearOrganizationName,
-    linearTeamId,
-    linearTeamName,
-  } = params;
-
-  if (!(await hasOrganizationAccess(userId, organizationId))) {
-    throw new Error("User does not have access to this organization.");
-  }
-
-  const [integration] = await db
-    .insert(linearIntegrations)
-    .values({
-      id: `lin_${nanoid()}`,
-      organizationId,
-      createdByUserId: userId,
-      displayName,
-      encryptedAccessToken: encryptToken(accessToken),
-      linearOrganizationId,
-      linearOrganizationName: linearOrganizationName ?? null,
-      linearTeamId: linearTeamId ?? null,
-      linearTeamName: linearTeamName ?? null,
-    })
-    .returning();
-
-  return integration;
-}
 
 export async function getLinearIntegrationById(integrationId: string) {
   const integration = await db.query.linearIntegrations.findFirst({
@@ -97,24 +55,6 @@ export async function deleteLinearIntegration(integrationId: string) {
     .where(eq(linearIntegrations.id, integrationId));
 }
 
-export async function getDecryptedLinearToken(
-  integrationId: string
-): Promise<string | undefined> {
-  const [integration] = await db
-    .select({
-      encryptedAccessToken: linearIntegrations.encryptedAccessToken,
-    })
-    .from(linearIntegrations)
-    .where(eq(linearIntegrations.id, integrationId))
-    .limit(1);
-
-  if (!integration?.encryptedAccessToken) {
-    return undefined;
-  }
-
-  return decryptToken(integration.encryptedAccessToken);
-}
-
 export async function getDecryptedLinearWebhookSecret(
   integrationId: string
 ): Promise<string | undefined> {
@@ -142,6 +82,7 @@ export async function getLinearToolContextByIntegrationId(
       id: linearIntegrations.id,
       organizationId: linearIntegrations.organizationId,
       encryptedAccessToken: linearIntegrations.encryptedAccessToken,
+      accessTokenExpiresAt: linearIntegrations.accessTokenExpiresAt,
       linearTeamId: linearIntegrations.linearTeamId,
       enabled: linearIntegrations.enabled,
     })
@@ -168,16 +109,10 @@ export async function getLinearToolContextByIntegrationId(
     );
   }
 
-  if (!integration.encryptedAccessToken) {
-    throw new Error(
-      `Linear integration has no access token for integrationId ${integrationId}.`
-    );
-  }
-
   return {
     integrationId: integration.id,
     organizationId: integration.organizationId,
-    accessToken: decryptToken(integration.encryptedAccessToken),
+    accessToken: await resolveLinearAccessToken(integration),
     linearTeamId: integration.linearTeamId,
   };
 }

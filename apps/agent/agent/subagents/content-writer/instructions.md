@@ -29,6 +29,7 @@ The brief comes from reading the product's code, so it is more reliable than pul
 
 - Finish with `final_output` status `skipped` when source lookup succeeds but there is no meaningful source material: no commits, no PRs, no releases, no Linear issues, or only low-signal or internal changes in the requested lookback window. Give a concise reason.
 - Finish with `final_output` status `failed` only for actual errors, impossible requests, invalid inputs, or tool/API failures.
+- When one connected source fails (for example Linear rejects access) but another returns usable material, write from the sources that worked instead of failing. Fail only when no selected source could be read.
 - Never skip or fail because a repository, Linear team, integration, owner, or source label differs from the brand identity. Apply the requested brand voice to whatever connected source the task selected.
 
 # Rules

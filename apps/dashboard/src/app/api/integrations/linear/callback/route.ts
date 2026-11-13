@@ -1,8 +1,10 @@
 import { invalidateStandaloneChatIntegrations } from "@notra/ai/chat/integrations-cache";
 import {
-  createLinearIntegration,
-  getLinearIntegrationsByOrganization,
-} from "@notra/ai/integrations/linear";
+  connectLinearIntegration,
+  exchangeLinearAuthorizationCode,
+  getLinearOAuthCredentials,
+} from "@notra/ai/integrations/linear-oauth";
+import type { LinearOAuthTokens } from "@notra/ai/types/linear-oauth";
 import { redis } from "@notra/ai/utils/redis";
 import { logError } from "@notra/ai/utils/server-log";
 import { getAppUrl } from "@notra/ai/utils/url";
@@ -25,7 +27,6 @@ import { linearOAuthErrorParam } from "@/lib/integrations/linear/oauth-errors";
 import {
   linearOAuthStateSchema,
   linearOrganizationQuerySchema,
-  linearTokenResponseSchema,
 } from "@/schemas/linear-oauth";
 import type { LinearOAuthState } from "@/types/linear-oauth";
 
@@ -120,53 +121,31 @@ export async function GET(request: Request) {
       throw error;
     }
 
-    const clientId = process.env.LINEAR_CLIENT_ID;
-    const clientSecret = process.env.LINEAR_CLIENT_SECRET;
-    if (!clientId || !clientSecret) {
+    const credentials = getLinearOAuthCredentials();
+    if (!credentials) {
       await restoreOAuthState();
       return redirectResponse(`${baseUrl}/?error=linear_not_configured`);
     }
 
-    const redirectUri = `${baseUrl}/api/integrations/linear/callback`;
-
-    const tokenRes = await fetch("https://api.linear.app/oauth/token", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-      body: new URLSearchParams({
-        grant_type: "authorization_code",
-        client_id: clientId,
-        client_secret: clientSecret,
-        redirect_uri: redirectUri,
+    let tokens: LinearOAuthTokens;
+    try {
+      tokens = await exchangeLinearAuthorizationCode({
         code,
-      }),
-    });
-
-    if (!tokenRes.ok) {
-      const tokenError = await tokenRes.text();
-      logError("Linear token exchange failed", tokenError);
+        redirectUri: `${baseUrl}/api/integrations/linear/callback`,
+        credentials,
+      });
+    } catch (exchangeError) {
+      logError("Linear token exchange failed", exchangeError);
       await restoreOAuthState();
       trackFailed("token_exchange_failed", oauthState);
       return redirectResponse(`${baseUrl}/?error=token_exchange_failed`);
     }
-
-    const parsedTokens = linearTokenResponseSchema.safeParse(
-      await tokenRes.json().catch(() => null)
-    );
-    if (!parsedTokens.success) {
-      logError("Linear token response was malformed", parsedTokens.error);
-      await restoreOAuthState();
-      trackFailed("token_exchange_failed", oauthState);
-      return redirectResponse(`${baseUrl}/?error=token_exchange_failed`);
-    }
-    const tokens = parsedTokens.data;
 
     const orgRes = await fetch("https://api.linear.app/graphql", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${tokens.access_token}`,
+        Authorization: `Bearer ${tokens.accessToken}`,
       },
       body: JSON.stringify({
         query: `{
@@ -197,29 +176,12 @@ export async function GET(request: Request) {
     }
     const linearOrg = orgData.data.data.organization;
 
-    const existingIntegrations = await getLinearIntegrationsByOrganization(
-      oauthState.organizationId
-    );
-    const alreadyConnected = existingIntegrations.some(
-      (i) => i.linearOrganizationId === linearOrg.id
-    );
-
-    if (alreadyConnected) {
-      trackFailed("workspace_already_connected", oauthState);
-      return redirectResponse(
-        buildCallbackUrl(baseUrl, oauthState.callbackPath, {
-          error: "workspace_already_connected",
-        })
-      );
-    }
-
-    await createLinearIntegration({
+    const { reconnected } = await connectLinearIntegration({
       organizationId: oauthState.organizationId,
       userId: oauthState.userId,
-      displayName: linearOrg.name,
-      accessToken: tokens.access_token,
       linearOrganizationId: linearOrg.id,
       linearOrganizationName: linearOrg.name,
+      tokens,
     });
 
     await invalidateStandaloneChatIntegrations(oauthState.organizationId);
@@ -233,9 +195,13 @@ export async function GET(request: Request) {
     });
 
     return redirectResponse(
-      buildCallbackUrl(baseUrl, oauthState.callbackPath, {
-        linearConnected: "true",
-      })
+      buildCallbackUrl(
+        baseUrl,
+        oauthState.callbackPath,
+        reconnected
+          ? { linearReconnected: "true" }
+          : { linearConnected: "true" }
+      )
     );
   } catch (error) {
     logError("Error in Linear OAuth callback", error);

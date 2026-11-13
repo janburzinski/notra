@@ -48,11 +48,13 @@ function LinearIntegrationCard({
   integration,
   organizationId,
   organizationSlug,
+  authorizeUrl,
   onUpdate,
 }: {
   integration: LinearIntegration;
   organizationId: string;
   organizationSlug: string;
+  authorizeUrl: string;
   onUpdate?: () => void;
 }) {
   const t = useTranslations("integrations.linearPage");
@@ -162,6 +164,9 @@ function LinearIntegrationCard({
               role="presentation"
               tabIndex={-1}
             >
+              {integration.needsReconnect ? (
+                <Badge variant="warning">{t("reconnectRequired")}</Badge>
+              ) : null}
               <Badge variant={integration.enabled ? "default" : "secondary"}>
                 {integration.enabled
                   ? tCommon("states.enabled")
@@ -184,6 +189,15 @@ function LinearIntegrationCard({
                   }
                 />
                 <DropdownMenuContent align="end">
+                  <DropdownMenuItem
+                    className="cursor-pointer"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      window.location.href = authorizeUrl;
+                    }}
+                  >
+                    {t("reconnect")}
+                  </DropdownMenuItem>
                   <DropdownMenuItem
                     className="cursor-pointer"
                     onClick={(event) => {
@@ -300,6 +314,7 @@ export default function PageClient({ organizationSlug }: PageClientProps) {
             <div className="grid gap-4">
               {integrations.map((integration) => (
                 <LinearIntegrationCard
+                  authorizeUrl={authorizeUrl}
                   integration={integration}
                   key={integration.id}
                   onUpdate={() => refetch()}

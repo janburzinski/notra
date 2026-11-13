@@ -631,6 +631,8 @@ export const linearIntegrations = pgTable(
       .references(() => users.id, { onDelete: "cascade" }),
     displayName: text("display_name").notNull(),
     encryptedAccessToken: text("encrypted_access_token"),
+    encryptedRefreshToken: text("encrypted_refresh_token"),
+    accessTokenExpiresAt: timestamp("access_token_expires_at"),
     linearOrganizationId: text("linear_organization_id").notNull(),
     linearOrganizationName: text("linear_organization_name"),
     linearTeamId: text("linear_team_id"),

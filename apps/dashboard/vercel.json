@@ -47,6 +47,10 @@
     {
       "path": "/api/cron/autopilot",
       "schedule": "*/5 * * * *"
+    },
+    {
+      "path": "/api/cron/linear-tokens",
+      "schedule": "*/15 * * * *"
     }
   ]
 }

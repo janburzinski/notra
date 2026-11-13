@@ -37,6 +37,7 @@ import { Route as ApiCronBrewContactsRouteImport } from './routes/api.cron.brew-
 import { Route as ApiCronGeoContentGapsRouteImport } from './routes/api.cron.geo-content-gaps'
 import { Route as ApiCronGeoRecapRouteImport } from './routes/api.cron.geo-recap'
 import { Route as ApiCronGeoScanRouteImport } from './routes/api.cron.geo-scan'
+import { Route as ApiCronLinearTokensRouteImport } from './routes/api.cron.linear-tokens'
 import { Route as ApiCronMonitoringRouteImport } from './routes/api.cron.monitoring'
 import { Route as ApiCronPublicDataRouteImport } from './routes/api.cron.public-data'
 import { Route as ApiCronScheduledPublicationsRouteImport } from './routes/api.cron.scheduled-publications'
@@ -260,6 +261,11 @@ const ApiCronGeoRecapRoute = ApiCronGeoRecapRouteImport.update({
 const ApiCronGeoScanRoute = ApiCronGeoScanRouteImport.update({
   id: '/api/cron/geo-scan',
   path: '/api/cron/geo-scan',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiCronLinearTokensRoute = ApiCronLinearTokensRouteImport.update({
+  id: '/api/cron/linear-tokens',
+  path: '/api/cron/linear-tokens',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiCronMonitoringRoute = ApiCronMonitoringRouteImport.update({
@@ -747,6 +753,7 @@ export interface FileRoutesByFullPath {
   '/api/cron/geo-content-gaps': typeof ApiCronGeoContentGapsRoute
   '/api/cron/geo-recap': typeof ApiCronGeoRecapRoute
   '/api/cron/geo-scan': typeof ApiCronGeoScanRoute
+  '/api/cron/linear-tokens': typeof ApiCronLinearTokensRoute
   '/api/cron/monitoring': typeof ApiCronMonitoringRoute
   '/api/cron/public-data': typeof ApiCronPublicDataRoute
   '/api/cron/scheduled-publications': typeof ApiCronScheduledPublicationsRoute
@@ -857,6 +864,7 @@ export interface FileRoutesByTo {
   '/api/cron/geo-content-gaps': typeof ApiCronGeoContentGapsRoute
   '/api/cron/geo-recap': typeof ApiCronGeoRecapRoute
   '/api/cron/geo-scan': typeof ApiCronGeoScanRoute
+  '/api/cron/linear-tokens': typeof ApiCronLinearTokensRoute
   '/api/cron/monitoring': typeof ApiCronMonitoringRoute
   '/api/cron/public-data': typeof ApiCronPublicDataRoute
   '/api/cron/scheduled-publications': typeof ApiCronScheduledPublicationsRoute
@@ -968,6 +976,7 @@ export interface FileRoutesById {
   '/api/cron/geo-content-gaps': typeof ApiCronGeoContentGapsRoute
   '/api/cron/geo-recap': typeof ApiCronGeoRecapRoute
   '/api/cron/geo-scan': typeof ApiCronGeoScanRoute
+  '/api/cron/linear-tokens': typeof ApiCronLinearTokensRoute
   '/api/cron/monitoring': typeof ApiCronMonitoringRoute
   '/api/cron/public-data': typeof ApiCronPublicDataRoute
   '/api/cron/scheduled-publications': typeof ApiCronScheduledPublicationsRoute
@@ -1080,6 +1089,7 @@ export interface FileRouteTypes {
     | '/api/cron/geo-content-gaps'
     | '/api/cron/geo-recap'
     | '/api/cron/geo-scan'
+    | '/api/cron/linear-tokens'
     | '/api/cron/monitoring'
     | '/api/cron/public-data'
     | '/api/cron/scheduled-publications'
@@ -1190,6 +1200,7 @@ export interface FileRouteTypes {
     | '/api/cron/geo-content-gaps'
     | '/api/cron/geo-recap'
     | '/api/cron/geo-scan'
+    | '/api/cron/linear-tokens'
     | '/api/cron/monitoring'
     | '/api/cron/public-data'
     | '/api/cron/scheduled-publications'
@@ -1300,6 +1311,7 @@ export interface FileRouteTypes {
     | '/api/cron/geo-content-gaps'
     | '/api/cron/geo-recap'
     | '/api/cron/geo-scan'
+    | '/api/cron/linear-tokens'
     | '/api/cron/monitoring'
     | '/api/cron/public-data'
     | '/api/cron/scheduled-publications'
@@ -1411,6 +1423,7 @@ export interface RootRouteChildren {
   ApiCronGeoContentGapsRoute: typeof ApiCronGeoContentGapsRoute
   ApiCronGeoRecapRoute: typeof ApiCronGeoRecapRoute
   ApiCronGeoScanRoute: typeof ApiCronGeoScanRoute
+  ApiCronLinearTokensRoute: typeof ApiCronLinearTokensRoute
   ApiCronMonitoringRoute: typeof ApiCronMonitoringRoute
   ApiCronPublicDataRoute: typeof ApiCronPublicDataRoute
   ApiCronScheduledPublicationsRoute: typeof ApiCronScheduledPublicationsRoute
@@ -1676,6 +1689,13 @@ declare module '@tanstack/react-router' {
       path: '/api/cron/geo-scan'
       fullPath: '/api/cron/geo-scan'
       preLoaderRoute: typeof ApiCronGeoScanRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/cron/linear-tokens': {
+      id: '/api/cron/linear-tokens'
+      path: '/api/cron/linear-tokens'
+      fullPath: '/api/cron/linear-tokens'
+      preLoaderRoute: typeof ApiCronLinearTokensRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/cron/monitoring': {
@@ -2374,6 +2394,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiCronGeoContentGapsRoute: ApiCronGeoContentGapsRoute,
   ApiCronGeoRecapRoute: ApiCronGeoRecapRoute,
   ApiCronGeoScanRoute: ApiCronGeoScanRoute,
+  ApiCronLinearTokensRoute: ApiCronLinearTokensRoute,
   ApiCronMonitoringRoute: ApiCronMonitoringRoute,
   ApiCronPublicDataRoute: ApiCronPublicDataRoute,
   ApiCronScheduledPublicationsRoute: ApiCronScheduledPublicationsRoute,

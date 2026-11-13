@@ -5583,7 +5583,7 @@
     },
     "connectionToasts": {
       "linearConnected": "Linear-Workspace erfolgreich verbunden",
-      "linearAlreadyConnected": "Dieser Linear-Workspace ist bereits verbunden",
+      "linearReconnected": "Linear-Workspace erneut verbunden",
       "slackConnected": "Slack-Workspace erfolgreich verbunden",
       "slackAlreadyConnected": "Dieser Slack-Workspace ist bereits verbunden",
       "slackConnectedElsewhere": "Dieser Slack-Workspace ist bereits mit einer anderen Organisation verbunden",
@@ -5614,7 +5614,9 @@
       "description": "Verwalte deine Linear-Integrationen für automatisierte Inhalte",
       "connect": "Linear verbinden",
       "emptyDescription": "Verbinde Linear, um Issues und Updates zu synchronisieren.",
-      "workspaceConnected": "Linear-Workspace verbunden"
+      "workspaceConnected": "Linear-Workspace verbunden",
+      "reconnect": "Erneut verbinden",
+      "reconnectRequired": "Erneute Verbindung nötig"
     },
     "detailPage": {
       "metaTitle": "Integration {name}",
