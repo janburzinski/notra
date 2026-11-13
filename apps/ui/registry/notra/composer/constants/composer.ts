@@ -1,5 +1,5 @@
 export const COMPOSER_TRAY_TRANSITION =
-  "transition-[background-color,padding] duration-300 ease-[cubic-bezier(0.65,0,0.35,1)] motion-reduce:transition-none";
+  "transition-[background-color,padding,border-radius] duration-300 ease-[cubic-bezier(0.65,0,0.35,1)] motion-reduce:transition-none";
 
 export const COMPOSER_NUDGE_TRANSITION = {
   duration: 0.3,

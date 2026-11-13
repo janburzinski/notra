@@ -123,6 +123,9 @@ function ComposerFrame({
         elevated && hasNudge && COMPOSER_ELEVATED_SHADOW,
         showTray ? "bg-muted p-1" : "bg-transparent",
         frameRadius(flat, size),
+        // Chips above the pill sit near the top edge, where the pill's wide
+        // corners would crowd them, so the tray's top matches the card's.
+        flat && hasNudge && "rounded-t-[18px]",
         connectedTop && "rounded-t-none",
         className
       )}

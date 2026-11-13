@@ -99,6 +99,9 @@ export function ComposerFrame({
             ? "rounded-[22px]"
             : "rounded-[29px]"
           : "rounded-[18px]",
+        // Chips above the pill sit near the top edge, where the pill's wide
+        // corners would crowd them, so the tray's top matches the card's.
+        flat && hasNudge && "rounded-t-[18px]",
         connectedTop && "rounded-t-none",
         className
       )}
