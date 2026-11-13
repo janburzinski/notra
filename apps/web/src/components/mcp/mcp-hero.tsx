@@ -3,6 +3,7 @@ import { useRef } from "react";
 import { HeroDither } from "@/components/landing/hero-dither";
 import { McpCommandTabs } from "@/components/mcp/mcp-command-tabs";
 import { McpHeroBattle } from "@/components/mcp/mcp-hero-battle";
+import { MCP_GAME_URL } from "@/constants/mcp";
 import type { McpHeroProps } from "@/types/mcp";
 
 export function McpHero({ subhead }: McpHeroProps) {
@@ -34,6 +35,12 @@ export function McpHero({ subhead }: McpHeroProps) {
               </p>
             </div>
             <McpCommandTabs />
+            <a
+              className="font-sans text-sm font-medium text-[#1E1E1E99] underline-offset-4 hover:text-[#1E1E1E] hover:underline dark:text-white/55 dark:hover:text-white"
+              href={MCP_GAME_URL}
+            >
+              Want to fly one yourself? Play Notra Dogfight
+            </a>
           </div>
         </div>
       </div>

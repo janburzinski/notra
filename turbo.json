@@ -78,6 +78,13 @@
     "INTH_CLIENT_SECRET",
     "INTEGRATION_ENCRYPTION_KEY",
     "OPENROUTER_API_KEY",
+    "MINIGAME_URL",
+    "MINIGAME_X_CLIENT_ID",
+    "MINIGAME_X_CLIENT_SECRET",
+    "MINIGAME_SESSION_SECRET",
+    "MINIGAME_DEV_PLAYER",
+    "MINIGAME_MEMORY_STORE",
+    "MINIGAME_ADMIN_IDS",
     "NEXT_PUBLIC_POSTHOG_HOST",
     "NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN",
     "QSTASH_CURRENT_SIGNING_KEY",
@@ -218,6 +225,11 @@
         "NEXT_PUBLIC_TURNSTILE_SITE_KEY"
       ],
       "outputs": [".output/**", ".vercel/output/**", ".source/**"]
+    },
+    "minigame#build": {
+      "dependsOn": ["transit"],
+      "inputs": ["$TURBO_DEFAULT$", ".env*"],
+      "outputs": [".output/**", ".vercel/output/**"]
     },
     "@notra/onboarding-agent#build": {
       "dependsOn": ["transit"],

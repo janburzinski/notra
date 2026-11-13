@@ -166,3 +166,6 @@ export const MCP_TERMINAL_TURN_SUMMARY = {
 
 export const MCP_TERMINAL_PROMPT_PLACEHOLDER =
   'Try "what changed in our AI visibility this week?"';
+
+/** The playable version of the hero's space battle. */
+export const MCP_GAME_URL = "https://play.usenotra.com";

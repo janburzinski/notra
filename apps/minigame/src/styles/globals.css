@@ -1,0 +1,198 @@
+@import "tailwindcss" source("../");
+@import "@fontsource/silkscreen/latin-400.css";
+@import "@fontsource/tiny5/latin-400.css";
+@import "@fontsource/tiny5/latin-ext-400.css";
+
+@theme {
+  --font-display: "Silkscreen", ui-monospace, monospace;
+  --font-sans: "Tiny5", ui-monospace, monospace;
+
+  /* Both fonts draw on an 8-pixel em, so every size below is a whole number of screen pixels per
+     font pixel (see --type-* on :root); any other size rounds some font pixels up and others down. */
+  --text-3xs: var(--type-s);
+  --text-3xs--line-height: 1.5;
+  --text-2xs: var(--type-s);
+  --text-2xs--line-height: 1.5;
+  --text-xs: var(--type-s);
+  --text-xs--line-height: 1.5;
+  --text-sm: var(--type-m);
+  --text-sm--line-height: 1.5;
+  --text-base: var(--type-m);
+  --text-base--line-height: 1.5;
+  --text-lg: var(--type-m);
+  --text-lg--line-height: 1.5;
+  --text-2xl: var(--type-l);
+  --text-2xl--line-height: 1.25;
+  --text-4xl: var(--type-xl);
+  --text-4xl--line-height: 1;
+
+  --color-space: #100b1e;
+  --color-space-2: #1a1330;
+  --color-space-3: #261c45;
+  --color-line: #3b2f66;
+  --color-ink: #f4f0ff;
+  --color-ink-2: #c4b8e8;
+  --color-ink-3: #8e81b8;
+  --color-violet: #a78bfa;
+  --color-violet-deep: #7c3aed;
+  --color-gold: #fde047;
+  --color-danger: #f87171;
+}
+
+:root {
+  color-scheme: dark;
+  /* one art pixel of the UI chrome */
+  --px: 3px;
+  /* Font sizes for 1 device pixel per CSS pixel: 1, 2, 3 and 4 screen pixels per font pixel. */
+  --type-s: 8px;
+  --type-m: 16px;
+  --type-l: 24px;
+  --type-xl: 32px;
+}
+
+/* Denser screens get the sizes that land on whole device pixels there, close to the ones above. */
+@media (min-resolution: 1.25dppx) {
+  :root {
+    --type-s: 12.8px;
+    --type-m: 19.2px;
+    --type-l: 25.6px;
+    --type-xl: 32px;
+  }
+}
+
+@media (min-resolution: 1.5dppx) {
+  :root {
+    --type-s: calc(32px / 3);
+    --type-m: 16px;
+    --type-l: calc(80px / 3);
+    --type-xl: 32px;
+  }
+}
+
+@media (min-resolution: 2dppx) {
+  :root {
+    --type-s: 12px;
+    --type-m: 16px;
+    --type-l: 24px;
+    --type-xl: 32px;
+  }
+}
+
+/* Android's 2.625× */
+@media (min-resolution: 2.5dppx) {
+  :root {
+    --type-s: calc(32px / 2.625);
+    --type-m: calc(40px / 2.625);
+    --type-l: calc(64px / 2.625);
+    --type-xl: calc(80px / 2.625);
+  }
+}
+
+@media (min-resolution: 3dppx) {
+  :root {
+    --type-s: calc(32px / 3);
+    --type-m: 16px;
+    --type-l: 24px;
+    --type-xl: 32px;
+  }
+}
+
+@media (min-resolution: 4dppx) {
+  :root {
+    --type-s: 12px;
+    --type-m: 16px;
+    --type-l: 24px;
+    --type-xl: 32px;
+  }
+}
+
+html,
+body {
+  background: var(--color-space);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-variant-ligatures: none;
+  /* the fonts have one weight; a faked bold or italic would smear the pixels */
+  font-synthesis: none;
+  -webkit-font-smoothing: none;
+  -moz-osx-font-smoothing: grayscale;
+  overscroll-behavior: none;
+}
+
+/* Panels and buttons get notched pixel corners from four hard shadows instead of a border radius. */
+.px-panel {
+  background: var(--color-space-2);
+  box-shadow:
+    0 calc(var(--px) * -1) 0 0 var(--color-line),
+    0 var(--px) 0 0 var(--color-line),
+    calc(var(--px) * -1) 0 0 0 var(--color-line),
+    var(--px) 0 0 0 var(--color-line),
+    0 0 0 calc(var(--px) * 2) var(--color-space);
+}
+
+.px-button {
+  --edge: var(--color-line);
+  --face: var(--color-space-3);
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: var(--face);
+  color: var(--color-ink);
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  box-shadow:
+    0 calc(var(--px) * -1) 0 0 var(--edge),
+    0 var(--px) 0 0 var(--edge),
+    calc(var(--px) * -1) 0 0 0 var(--edge),
+    var(--px) 0 0 0 var(--edge),
+    inset 0 calc(var(--px) * -1) 0 0 rgb(0 0 0 / 0.35);
+  transition: filter 80ms steps(1);
+  user-select: none;
+}
+
+.px-button:hover {
+  filter: brightness(1.15);
+}
+
+.px-button:focus-visible {
+  outline: var(--px) solid var(--color-gold);
+  outline-offset: calc(var(--px) * 2);
+}
+
+.px-button[data-variant="primary"] {
+  --edge: #c4b5fd;
+  --face: var(--color-violet-deep);
+}
+
+/* X's own black, with a dim edge so it sits with the other buttons instead of glaring */
+.px-button[data-variant="x"] {
+  --edge: #3f3f46;
+  --face: #000;
+}
+
+.px-button:disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.pixelated {
+  image-rendering: pixelated;
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+.animate-blink {
+  animation: blink 1s steps(1) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-blink {
+    animation: none;
+  }
+}
