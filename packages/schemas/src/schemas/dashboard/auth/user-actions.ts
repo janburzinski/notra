@@ -23,7 +23,6 @@ export const updateUserInputSchema = z.object({
     .nullable()
     .optional(),
   hidePersonalData: z.boolean().optional(),
-  showAgentStats: z.boolean().optional(),
   locale: z.enum(DASHBOARD_LOCALES).nullable().optional(),
 });
 

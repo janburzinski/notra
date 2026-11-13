@@ -26,7 +26,6 @@ export interface ClientSessionData {
     | "image"
     | "role"
     | "hidePersonalData"
-    | "showAgentStats"
   > & { createdAt: string };
 }
 

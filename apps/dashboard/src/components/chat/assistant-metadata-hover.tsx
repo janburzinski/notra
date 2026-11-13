@@ -11,37 +11,15 @@ import {
   HoverCard,
   HoverCardTrigger,
 } from "@notra/ui/components/ui/hover-card";
-import { ClaudeAiIcon } from "@notra/ui/components/ui/svgs/claudeAiIcon";
-import { Openai } from "@notra/ui/components/ui/svgs/openai";
-import { OpenaiDark } from "@notra/ui/components/ui/svgs/openaiDark";
-import { Zai } from "@notra/ui/components/ui/svgs/zai";
 import { formatCompactNumber } from "@notra/utils/format-compact-number";
 import type { ReactNode } from "react";
 import { useLocale, useTranslations } from "use-intl";
 
-import { useShowAgentStats } from "@/lib/hooks/use-privacy-preferences";
 import type {
   AssistantMetadataHoverProps,
   AssistantTokenUsageProps,
 } from "@/types/components/assistant-metadata";
 import { formatOneDecimal } from "@/utils/format";
-
-const MODEL_LABELS = {
-  auto: "Auto",
-  "zai/glm-5.3": "GLM 5.3",
-  "zai/glm-5.3-flash": "GLM 5.3 Flash",
-  "anthropic/claude-opus-5.5": "Claude Opus 5.5",
-  "anthropic/claude-opus-5": "Claude Opus 5",
-  "anthropic/claude-opus-4.8": "Claude Opus 4.8",
-  "anthropic/claude-sonnet-5": "Claude Sonnet 5",
-  "anthropic/claude-sonnet-4.6": "Claude Sonnet 4.6",
-  "anthropic/claude-haiku-4.5": "Claude Haiku 4.5",
-  "openai/gpt-5.4": "GPT-5.4",
-  "openai/gpt-5.5": "GPT-5.5",
-  "openai/gpt-6-sol": "GPT-6 Sol",
-  "openai/gpt-6-luna": "GPT-6 Luna",
-  "openai/gpt-5.6-sol": "GPT-5.6 Sol",
-} satisfies Record<ChatModel, string>;
 
 const MODEL_CONTEXT_WINDOWS = {
   auto: 1_000_000,
@@ -62,25 +40,6 @@ const MODEL_CONTEXT_WINDOWS = {
 
 function getModelContextWindow(model: string): number | null {
   return MODEL_CONTEXT_WINDOWS[model as ChatModel] ?? null;
-}
-
-function getModelLabel(model: string): string {
-  return MODEL_LABELS[model as ChatModel] ?? model;
-}
-
-function ModelBadgeIcon({ model }: { model: string }) {
-  if (model.startsWith("zai/")) {
-    return <Zai className="size-3" />;
-  }
-  if (model.startsWith("openai/")) {
-    return (
-      <>
-        <Openai className="block size-3 dark:hidden" />
-        <OpenaiDark className="hidden size-3 dark:block" />
-      </>
-    );
-  }
-  return <ClaudeAiIcon className="size-3" />;
 }
 
 function AssistantTokenUsage({
@@ -109,12 +68,7 @@ function AssistantTokenUsage({
           </div>
         }
       />
-      <DetailCardContent
-        icon={
-          metadata.model ? <ModelBadgeIcon model={metadata.model} /> : undefined
-        }
-        title={metadata.model ? getModelLabel(metadata.model) : tokensLabel}
-      >
+      <DetailCardContent title={tokensLabel}>
         <dl className="flex flex-col">
           {typeof metadata.inputTokens === "number" ? (
             <DetailCardRow label={tCommon("labels.input")}>
@@ -137,13 +91,9 @@ function AssistantTokenUsage({
 
 export function AssistantMetadataHover({
   metadata,
-  compact = false,
 }: AssistantMetadataHoverProps) {
   const t = useTranslations("chat.metadata");
-  const tCommon = useTranslations("common");
   const locale = useLocale();
-  const { showAgentStats } = useShowAgentStats();
-  const showStats = showAgentStats && !compact;
 
   if (!metadata) {
     return null;
@@ -151,29 +101,7 @@ export function AssistantMetadataHover({
 
   const items: ReactNode[] = [];
 
-  if (metadata.model) {
-    const modelLabel = getModelLabel(metadata.model);
-    const thinkingLabel =
-      !compact && metadata.thinkingLevel && metadata.thinkingLevel !== "off"
-        ? tCommon(`labels.${metadata.thinkingLevel}`)
-        : null;
-
-    items.push(
-      <div className="flex items-center gap-1.5" key="model">
-        <ModelBadgeIcon model={metadata.model} />
-        <span>
-          {thinkingLabel
-            ? t("modelWithThinking", {
-                model: modelLabel,
-                thinking: thinkingLabel,
-              })
-            : modelLabel}
-        </span>
-      </div>
-    );
-  }
-
-  if (showStats && typeof metadata.tokensPerSecond === "number") {
+  if (typeof metadata.tokensPerSecond === "number") {
     items.push(
       <div className="flex items-center gap-1" key="tps">
         <HugeiconsIcon className="size-3" icon={FlashIcon} />
@@ -188,7 +116,7 @@ export function AssistantMetadataHover({
     );
   }
 
-  if (showStats && typeof metadata.outputTokens === "number") {
+  if (typeof metadata.outputTokens === "number") {
     items.push(
       <AssistantTokenUsage
         key="tokens"
@@ -198,7 +126,7 @@ export function AssistantMetadataHover({
     );
   }
 
-  if (showStats && typeof metadata.ttftMs === "number") {
+  if (typeof metadata.ttftMs === "number") {
     const ttftSeconds = metadata.ttftMs / 1000;
     let duration = t("durationSec", { value: Math.round(ttftSeconds) });
     if (metadata.ttftMs < 1000) {

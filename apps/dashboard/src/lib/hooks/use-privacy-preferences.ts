@@ -6,7 +6,7 @@ import { useTranslations } from "use-intl";
 
 import { authClient } from "@/lib/auth/client";
 
-type PrivacyField = "hidePersonalData" | "showAgentStats";
+type PrivacyField = "hidePersonalData";
 
 function usePrivacyField(field: PrivacyField): {
   value: boolean;
@@ -62,21 +62,5 @@ export function useHidePersonalData(): {
     hasHydrated,
     isUpdating,
     setHidePersonalData: setValue,
-  };
-}
-
-export function useShowAgentStats(): {
-  showAgentStats: boolean;
-  hasHydrated: boolean;
-  isUpdating: boolean;
-  setShowAgentStats: (value: boolean) => void;
-} {
-  const { value, hasHydrated, isUpdating, setValue } =
-    usePrivacyField("showAgentStats");
-  return {
-    showAgentStats: value,
-    hasHydrated,
-    isUpdating,
-    setShowAgentStats: setValue,
   };
 }

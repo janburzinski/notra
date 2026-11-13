@@ -33,7 +33,6 @@ export interface ClientSessionData {
     | "image"
     | "role"
     | "hidePersonalData"
-    | "showAgentStats"
     | "locale"
     | "createdAt"
   >;

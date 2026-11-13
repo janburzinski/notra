@@ -49,7 +49,6 @@ import { ChatEmptyDither } from "@/components/ai/chat-empty-dither";
 import { ChatSubagentToolPart } from "@/components/ai/chat-subagent-tool-part";
 import { ChatToolBlock } from "@/components/ai/chat-tool-block";
 import { isMcpToolName } from "@/components/ai/chat-tool-block/mcp/utils";
-import { AssistantMetadataHover } from "@/components/chat/assistant-metadata-hover";
 import { AttachmentPreviewDialog } from "@/components/chat/attachment-preview";
 import { ChatFileAttachment } from "@/components/chat/chat-file-attachment";
 import { ChatImageAttachment } from "@/components/chat/chat-image-attachment";
@@ -179,7 +178,6 @@ function ContentChatActivityMessage({
   onApproveTool,
   onDenyTool,
   customTools,
-  hideModel = false,
 }: ContentChatActivityMessageProps) {
   const t = useTranslations("content.chatActivity");
   const tCommon = useTranslations("common");
@@ -391,9 +389,6 @@ function ContentChatActivityMessage({
             )}
           </MessageContent>
         ) : null}
-        {message.role === "assistant" && !isLoading && !hideModel ? (
-          <AssistantMetadataHover compact metadata={assistantMetadata} />
-        ) : null}
       </Message>
       <AttachmentPreviewDialog
         attachment={previewAttachment}
@@ -597,7 +592,6 @@ export function ContentChatActivityConversation({
   onApproveTool,
   onDenyTool,
   customTools,
-  hideModel,
 }: ContentChatActivityConversationProps) {
   const isAgentBusy = status === "streaming" || status === "submitted";
   const lastMessage = messages.at(-1);
@@ -633,7 +627,6 @@ export function ContentChatActivityConversation({
         <MessageScrollerItem key={message.id} messageId={message.id}>
           <ContentChatActivityMessage
             customTools={customTools}
-            hideModel={hideModel}
             elapsedSeconds={
               message.id === lastMessage?.id ? activitySeconds : undefined
             }

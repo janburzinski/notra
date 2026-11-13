@@ -19,7 +19,6 @@ export function toClientSessionData(
       image: user.image,
       role: user.role,
       hidePersonalData: user.hidePersonalData,
-      showAgentStats: user.showAgentStats,
       locale: user.locale,
       createdAt: user.createdAt,
     },

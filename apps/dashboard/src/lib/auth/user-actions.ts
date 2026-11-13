@@ -78,7 +78,6 @@ export async function updateUser(
         name: string;
         image: string | null;
         hidePersonalData: boolean;
-        showAgentStats: boolean;
         locale: string | null;
       }> = {};
 
@@ -90,9 +89,6 @@ export async function updateUser(
       }
       if (input.hidePersonalData !== undefined) {
         updates.hidePersonalData = input.hidePersonalData;
-      }
-      if (input.showAgentStats !== undefined) {
-        updates.showAgentStats = input.showAgentStats;
       }
       if (input.locale !== undefined) {
         updates.locale = input.locale;

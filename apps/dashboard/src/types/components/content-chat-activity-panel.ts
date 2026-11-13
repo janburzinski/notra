@@ -27,8 +27,6 @@ export interface ContentChatActivityConversationProps {
   onApproveTool?: (approvalId: string) => void;
   onDenyTool?: (approvalId: string) => void;
   customTools?: ContentChatCustomTools;
-  /** Leaves out the model line under each reply. */
-  hideModel?: boolean;
 }
 
 export interface ContentChatActivityPanelProps extends ContentChatActivityConversationProps {
@@ -53,7 +51,6 @@ export interface ContentChatActivityMessageProps {
   onApproveTool?: (approvalId: string) => void;
   onDenyTool?: (approvalId: string) => void;
   customTools?: ContentChatCustomTools;
-  hideModel?: boolean;
 }
 
 export type ContentChatActivityHeaderProps = Pick<

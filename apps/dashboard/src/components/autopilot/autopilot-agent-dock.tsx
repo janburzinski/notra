@@ -505,7 +505,6 @@ export function AutopilotAgentDock({
                     <ContentChatActivityConversation
                       activeChatId={agent.activeChatId}
                       customTools={customTools}
-                      hideModel
                       messages={messages}
                       onApproveTool={agent.handleApproveTool}
                       onDenyTool={agent.handleDenyTool}

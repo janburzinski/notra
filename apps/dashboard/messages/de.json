@@ -360,10 +360,6 @@
         "codePlaceholder": "123456 oder xxxx-xxxx"
       }
     },
-    "chat": {
-      "agentStats": "Agent-Statistiken",
-      "agentStatsDescription": "Zeigt Tokens pro Sekunde, Gesamt-Tokens und Zeit bis zum ersten Token unter Antworten des Assistenten an. Inspiriert von <link>t3.chat</link>."
-    },
     "sounds": {
       "heading": "Töne",
       "enable": "Oberflächentöne",
@@ -6811,7 +6807,6 @@
       "selectionRange": "Von Zeile {startLine}, Zeichen {startChar} bis Zeile {endLine}, Zeichen {endChar}"
     },
     "metadata": {
-      "modelWithThinking": "{model} ({thinking})",
       "tokensPerSecond": "{value} Tok./Sek.",
       "tokens": "{value} Tokens",
       "timeToFirstToken": "Zeit bis zum ersten Token: {duration}",

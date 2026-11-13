@@ -20,7 +20,6 @@ export async function GET() {
       image: data.user.image,
       role: data.user.role,
       hidePersonalData: data.user.hidePersonalData,
-      showAgentStats: data.user.showAgentStats,
       createdAt: data.user.createdAt.toISOString(),
     },
   };
