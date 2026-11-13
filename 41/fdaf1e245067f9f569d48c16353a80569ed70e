@@ -1,0 +1,23 @@
+packages/ui/src/components/ai-elements/message.tsx
+  s_3428b476267439::t_8955fdefb5f087 113-115,487
+apps/dashboard/src/components/ai/chat-activity-status.tsx
+  s_3428b476267439::t_8955fdefb5f087 42-44,52,60
+apps/dashboard/src/components/chat/user-message-actions.tsx
+  s_3428b476267439::t_8955fdefb5f087 294-296,317-318
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "41fdaf1e245067f9f569d48c16353a80569ed70e",
+  "prompts": {},
+  "sessions": {
+    "s_3428b476267439": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c6d39551-e687-4036-a65c-3bd92bb74947",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
