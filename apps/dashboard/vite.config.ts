@@ -2,6 +2,7 @@ import { fileURLToPath } from "node:url";
 
 import tailwindcss from "@tailwindcss/vite";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
+import { wgslVitePlugin } from "@vgpu/wgsl/loader-vite";
 import react from "@vitejs/plugin-react";
 import { consentManifest } from "c15t/tanstack-start/build";
 import { nitro } from "nitro/vite";
@@ -79,6 +80,7 @@ export default defineConfig(({ mode }) => {
     plugins: [
       dashboardWorkflow(),
       tailwindcss(),
+      wgslVitePlugin(),
       consentManifest({
         backendURL: "https://notra-prod-notra.inth.app",
       }),

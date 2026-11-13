@@ -14,7 +14,6 @@ import {
   AvatarFallback,
   AvatarImage,
 } from "@notra/ui/components/ui/avatar";
-import { Badge } from "@notra/ui/components/ui/badge";
 import {
   DropdownMenuGroup,
   DropdownMenuItem,
@@ -29,13 +28,14 @@ import { useTranslations } from "use-intl";
 
 import { CreditBalanceMenuItem } from "@/components/billing/credit-balance-button";
 import { CreditTopupModal } from "@/components/billing/credit-topup-modal";
+import { PlanBadge } from "@/components/billing/plan-badge";
 import { useBillingCustomer } from "@/lib/hooks/use-billing-customer";
 import { useIsClient } from "@/lib/hooks/use-is-client";
 import { useSettingsModal } from "@/lib/hooks/use-settings-modal";
 import { useSwitchOrganization } from "@/lib/hooks/use-switch-organization";
 import { cn } from "@/lib/utils";
 import { resolveOrganizationLogo } from "@/utils/avatar";
-import { planDisplayName } from "@/utils/billing-plans";
+import { planBadgeTier, planDisplayName } from "@/utils/billing-plans";
 import dynamic from "@/utils/lazy-component";
 import { nameInitials } from "@/utils/name-initials";
 
@@ -79,6 +79,7 @@ function useActivePlan() {
     planBadge: hasActivePaidPlan
       ? planDisplayName(activeSubscription?.plan?.name)
       : null,
+    planTier: planBadgeTier(activePlanId),
   };
 }
 
@@ -107,7 +108,7 @@ export function OrgSwitcherSubmenu({ onCreate }: { onCreate: () => void }) {
     useOrganizationsContext();
   const { switchOrganization, isSwitching } = useSwitchOrganization();
   const { openSettings } = useSettingsModal();
-  const { hasActivePaidPlan, planBadge } = useActivePlan();
+  const { hasActivePaidPlan, planBadge, planTier } = useActivePlan();
 
   if (!activeOrganization) {
     return null;
@@ -147,12 +148,7 @@ export function OrgSwitcherSubmenu({ onCreate }: { onCreate: () => void }) {
             {activeOrganization.name}
           </span>
           {planBadge ? (
-            <Badge
-              className="bg-primary/10 text-primary shrink-0 font-semibold uppercase"
-              size="sm"
-            >
-              {planBadge}
-            </Badge>
+            <PlanBadge tier={planTier}>{planBadge}</PlanBadge>
           ) : null}
         </DropdownMenuSubTrigger>
         <DropdownMenuSubContent className="w-56" sideOffset={6}>

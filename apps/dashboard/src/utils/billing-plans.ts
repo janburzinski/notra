@@ -21,6 +21,7 @@ import type {
   BillingSubscription,
   PlanTierLimits,
 } from "@/types/billing/plan";
+import type { PlanBadgeTier } from "@/types/billing/plan-badge";
 import type { ProductFeature } from "@/types/hooks/billing";
 import { formatDollars } from "@/utils/format";
 
@@ -58,6 +59,11 @@ export function planTierId(planId: string | undefined): string | null {
     }
   }
   return planId;
+}
+
+export function planBadgeTier(planId: string | undefined): PlanBadgeTier {
+  const tier = planTierId(planId);
+  return tier === "growth" || tier === "scale" ? tier : "starter";
 }
 
 export function planDisplayName(
