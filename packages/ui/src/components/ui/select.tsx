@@ -35,7 +35,11 @@ function SelectGroup({ className, ...props }: SelectPrimitive.Group.Props) {
 function SelectValue({ className, ...props }: SelectPrimitive.Value.Props) {
   return (
     <SelectPrimitive.Value
-      className={cn("flex flex-1 text-left", className)}
+      className={cn(
+        // Plain text truncates with an ellipsis; icon + label content lays out as a row.
+        "block min-w-0 flex-1 truncate text-left has-[>*]:flex has-[>*]:items-center has-[>*]:gap-1.5",
+        className
+      )}
       data-slot="select-value"
       {...props}
     />
@@ -60,7 +64,7 @@ function SelectTrigger({
           variant: variant === "ghost" ? "ghost" : "secondary",
           size: size === "sm" ? "sm" : "default",
         }),
-        "w-fit justify-between font-normal transition-[background-color,border-color,box-shadow,filter] active:scale-100 data-[placeholder]:text-muted-foreground *:data-[slot=select-value]:line-clamp-1 *:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center *:data-[slot=select-value]:gap-1.5 motion-reduce:transition-none",
+        "w-fit justify-between font-normal transition-[background-color,border-color,box-shadow,filter] active:scale-100 data-[placeholder]:text-muted-foreground motion-reduce:transition-none",
         className
       )}
       data-size={size}
@@ -167,7 +171,7 @@ function SelectItem({
       data-slot="select-item"
       {...props}
     >
-      <SelectPrimitive.ItemText className="flex flex-1 shrink-0 gap-2 whitespace-nowrap">
+      <SelectPrimitive.ItemText className="flex min-w-0 flex-1 gap-2">
         {children}
       </SelectPrimitive.ItemText>
       <SelectPrimitive.ItemIndicator
