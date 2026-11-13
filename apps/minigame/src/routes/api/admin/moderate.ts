@@ -8,7 +8,8 @@ import { getStore } from "@/lib/server/store";
 import { moderationSchema } from "@/schemas/api";
 
 /**
- * A moderator's call on a player. `approve` takes their best off the review list; `ban` removes their
+ * A moderator's call on a player. `approve` takes them off the review list if their best is still the
+ * run the moderator watched (by seed), so a newer best stays flagged; `ban` removes their
  * scores, profile and replay from every board and stops them posting again. Only for the X accounts in
  * MINIGAME_ADMIN_IDS.
  */
@@ -29,7 +30,9 @@ async function POST(request: Request) {
   }
   const { playerId, action } = body.data;
   if (action === "approve") {
-    await store.clearReview(playerId);
+    if (!(await store.clearReview(playerId, body.data.seed))) {
+      return jsonError("That run is no longer their best", 409);
+    }
   } else {
     await store.ban(playerId);
     await store.deletePlayer(playerId);

@@ -38,6 +38,9 @@ export class GameSession {
   private deathTimer = 0;
   private finished = false;
   private paused = false;
+  /** Wall time this run spent paused before the current pause, and when that one began, in ms. */
+  private pausedMs = 0;
+  private pausedAt = 0;
   /** Seconds of live play since the last heartbeat. */
   private beatClock = 0;
   /** Inputs of a run being watched, and how far it has got. */
@@ -145,6 +148,7 @@ export class GameSession {
     this.deathTimer = 0;
     this.acc = 0;
     this.paused = false;
+    this.pausedMs = 0;
     this.renderer.reset();
     this.callbacks.onPause(false);
     // a heartbeat at tick 0 tells the server play began, so a pause in the first seconds is just a pause
@@ -174,12 +178,27 @@ export class GameSession {
     }
     this.paused = paused;
     this.input.clearPresses();
-    if (!paused) {
+    if (paused) {
+      this.pausedAt = performance.now();
+    } else {
+      this.pausedMs += performance.now() - this.pausedAt;
       this.sfx.unlock();
       this.last = performance.now();
       this.acc = 0;
     }
     this.callbacks.onPause(paused);
+  }
+
+  /**
+   * Seconds the current run has spent paused, the one in progress included, which the server caps at
+   * MAX_PAUSED_S. Null for a run that can't be saved anyway.
+   */
+  pausedSeconds() {
+    if (!this.run?.runId) {
+      return null;
+    }
+    const current = this.paused ? performance.now() - this.pausedAt : 0;
+    return (this.pausedMs + current) / 1000;
   }
 
   togglePause() {

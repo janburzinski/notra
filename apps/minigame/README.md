@@ -56,14 +56,16 @@ What stops it, in order:
   (`src/lib/game/state-hash.ts`); the server stamps each with its own clock. On submit
   (`src/lib/game/verify-run.ts`) the replay must hit every fingerprint at its tick, and over no
   stretch may game time outrun the server's clock, which rules out precomputing a run and sending it
-  in a burst, and fast-forwarding. Game time may fall behind only in a few gaps (pauses); slow motion
+  in a burst, and fast-forwarding. Game time may fall behind only in a few gaps (pauses), 10 minutes
+  in all, so a pause can't turn into time to work out the rest of the run offline; slow motion
   stretches every gap and is refused. Heartbeats must cover the whole run.
 - **One submit per run**, within three hours, by a signed-in X account, rate limited.
 - **Bots** playing in real time can't be told apart by these checks, and guessing from input
   patterns would hit real players, so people look at what matters: each player's best run is stored
   and anyone can watch it from the leaderboard, and every new best in the all-time top 10 goes on a
   review list. Moderators (`MINIGAME_ADMIN_IDS`; the local dev players count as moderators) see those
-  entries marked ⚑ in the leaderboard, watch them with ▶, then approve (✓) or remove and ban (✕). A
+  entries marked ⚑ in the leaderboard, watch them with ▶, then approve (✓) or remove and ban (✕). An
+  approval names the run that was watched, so a newer best that came in meanwhile stays flagged. A
   ban blocks further scores. Rejected runs are logged with their reason as `[minigame] rejected run`,
   moderation as `[minigame] moderated player`.
 

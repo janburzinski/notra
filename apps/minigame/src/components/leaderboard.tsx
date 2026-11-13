@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { CompanyBoard } from "@/components/company-board";
 import { LoadError } from "@/components/load-error";
 import { ModelSprite } from "@/components/model-sprite";
+import { ModerationButtons } from "@/components/moderation-buttons";
 import { RemoteImage } from "@/components/remote-image";
 import { BOARD_PERIODS } from "@/constants/leaderboard";
 import { MODELS } from "@/constants/models";
@@ -15,7 +16,6 @@ import type {
 import {
   fetchLeaderboard,
   fetchReviewQueue,
-  moderate,
   takePrefetchedLeaderboard,
 } from "@/utils/api-client";
 import { formatScore } from "@/utils/format";
@@ -28,8 +28,8 @@ export function Leaderboard({
   onWatch,
   onShare,
   admin,
+  watched,
 }: LeaderboardProps) {
-  const [banning, setBanning] = useState<string | null>(null);
   const [moderationError, setModerationError] = useState<string | null>(null);
   const [refresh, setRefresh] = useState(0);
   // moderators also see which entries still wait for someone to watch them
@@ -87,17 +87,8 @@ export function Leaderboard({
   // when the board lists the viewer, their row already shows the fresher score
   const pinOwn = own !== null && !listed;
 
-  const moderateEntry = async (playerId: string, action: "approve" | "ban") => {
-    setModerationError(null);
-    try {
-      await moderate(playerId, action);
-    } catch {
-      setModerationError(
-        action === "ban"
-          ? "Couldn't ban that player."
-          : "Couldn't approve that run."
-      );
-    }
+  const moderated = (error: string | null) => {
+    setModerationError(error);
     setRefresh((value) => value + 1);
   };
 
@@ -249,41 +240,13 @@ export function Leaderboard({
                       >
                         ▶
                       </button>
-                      {admin && review.has(entry.player.id) && (
-                        <button
-                          aria-label={`Approve @${entry.player.handle}'s run`}
-                          className="text-gold font-display text-2xs shrink-0 px-1"
-                          onClick={() => {
-                            moderateEntry(entry.player.id, "approve").catch(
-                              () => undefined
-                            );
-                          }}
-                          title="Waiting for review: watch it, then approve"
-                          type="button"
-                        >
-                          ⚑ ✓
-                        </button>
-                      )}
                       {admin && (
-                        <button
-                          aria-label={`Remove and ban @${entry.player.handle}`}
-                          className="text-danger font-display text-2xs shrink-0 px-1"
-                          onClick={() => {
-                            // first press arms it, the second removes and bans
-                            if (banning !== entry.player.id) {
-                              setBanning(entry.player.id);
-                              return;
-                            }
-                            setBanning(null);
-                            moderateEntry(entry.player.id, "ban").catch(
-                              () => undefined
-                            );
-                          }}
-                          title="Remove and ban"
-                          type="button"
-                        >
-                          {banning === entry.player.id ? "Ban?" : "✕"}
-                        </button>
+                        <ModerationButtons
+                          flagged={review.has(entry.player.id)}
+                          onDone={moderated}
+                          player={entry.player}
+                          watched={watched}
+                        />
                       )}
                     </li>
                   );

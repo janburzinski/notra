@@ -229,13 +229,22 @@ export function GameScreen({ initialViewer }: GameScreenProps) {
     actionRef.current += 1;
     const action = actionRef.current;
     try {
-      const replay = await fetchReplay(entry.player.id);
+      // moderators watch what is stored now, since that is what their approval vouches for
+      const replay = await fetchReplay(
+        entry.player.id,
+        viewerRef.current.admin
+      );
       if (actionRef.current !== action) {
         return;
       }
       session.startReplay(replay.seed, replay.model, replay.ticks);
       // the stored replay is the all-time best, which a weekly or model row may not show
-      setWatched({ handle: entry.player.handle, score: replay.score });
+      setWatched({
+        playerId: entry.player.id,
+        handle: entry.player.handle,
+        score: replay.score,
+        seed: replay.seed,
+      });
       setScreen("replay");
     } catch (error) {
       if (actionRef.current !== action) {
@@ -346,6 +355,7 @@ export function GameScreen({ initialViewer }: GameScreenProps) {
             }}
             starting={screen === "starting"}
             viewer={viewer}
+            watched={watched}
           />
         </div>
       )}
@@ -354,6 +364,7 @@ export function GameScreen({ initialViewer }: GameScreenProps) {
         <div className="bg-space/70 absolute inset-0 flex overflow-y-auto p-4">
           <PauseMenu
             muted={muted}
+            pausedSeconds={() => sessionRef.current?.pausedSeconds() ?? null}
             onQuit={backToMenu}
             onResume={() => sessionRef.current?.setPaused(false)}
             onToggleMute={toggleMute}

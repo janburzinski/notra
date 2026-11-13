@@ -38,4 +38,7 @@ export interface ReviewItem {
 /** What saving a verified run did: a banned player's run changes nothing. */
 export type SubmitOutcome = "improved" | "kept" | "banned";
 
-export type ModerationAction = "ban" | "approve";
+/** A moderator's call: approving names the seed of the run they watched. */
+export type ModerationRequest =
+  | { playerId: string; action: "approve"; seed: number }
+  | { playerId: string; action: "ban" };

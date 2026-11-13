@@ -2,6 +2,7 @@ import {
   BEAT_MAX_GAP_S,
   FAST_SLACK_S,
   FIRST_BEAT_SLACK_S,
+  MAX_PAUSED_S,
   MAX_STALLS,
   MIN_LIVE_RATIO,
   STALL_RATIO,
@@ -32,8 +33,8 @@ interface RunToVerify {
  *
  * - every heartbeat's fingerprint matches the replay at its tick, so the client really was there at the
  *   time the server heard from it, and no part was played at leisure and pasted in later;
- * - game time never runs ahead of wall time (no fast-forwarding) and only falls behind in a few gaps
- *   (pauses), not across the run (no slow motion);
+ * - game time never runs ahead of wall time (no fast-forwarding) and only falls behind in a few short
+ *   gaps (pauses), not across the run (no slow motion);
  * - heartbeats cover the whole run without long holes.
  */
 export function verifyRun(run: RunToVerify): RunVerdict {
@@ -80,6 +81,7 @@ export function verifyRun(run: RunToVerify): RunVerdict {
   // pacing: game time against the server's clock, from the moment the run was handed out
   const points = [{ at: run.createdAt, tick: 0 }, ...beats];
   let stalls = 0;
+  let paused = 0;
   let liveGame = 0;
   let liveWall = 0;
   // Over any stretch between two heartbeats, game time may not exceed wall time. With
@@ -118,6 +120,7 @@ export function verifyRun(run: RunToVerify): RunVerdict {
       // A pause: the client stops reporting while paused, so such a stretch holds at most one
       // heartbeat interval of game time. A longer slow stretch is slow motion and counts as live.
       stalls += 1;
+      paused += dWall - dGame;
     } else {
       liveGame += dGame;
       liveWall += dWall;
@@ -125,6 +128,9 @@ export function verifyRun(run: RunToVerify): RunVerdict {
   }
   if (stalls > MAX_STALLS) {
     return { ok: false, reason: "The run was paused or slowed down too often" };
+  }
+  if (paused > MAX_PAUSED_S) {
+    return { ok: false, reason: "The run was paused for too long" };
   }
   if (liveWall > 0 && liveGame / liveWall < MIN_LIVE_RATIO) {
     return { ok: false, reason: "The run was played in slow motion" };

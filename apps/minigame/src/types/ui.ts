@@ -10,7 +10,7 @@ import type {
   SubmitResponse,
   ViewerResponse,
 } from "@/types/leaderboard";
-import type { MenuTab } from "@/types/session";
+import type { MenuTab, WatchedRun } from "@/types/session";
 
 export interface ModelSpriteProps {
   model: ModelId;
@@ -36,6 +36,18 @@ export interface LeaderboardProps {
   onShare: (() => void) | null;
   /** Moderators see a button to remove and ban a player. */
   admin: boolean;
+  /** The replay watched last, which a moderator's approval vouches for. */
+  watched: WatchedRun | null;
+}
+
+export interface ModerationButtonsProps {
+  player: { id: string; handle: string };
+  /** Their best waits on the review list. */
+  flagged: boolean;
+  /** The replay watched last, which an approval vouches for. */
+  watched: WatchedRun | null;
+  /** Called after each action with what went wrong, or null. */
+  onDone: (error: string | null) => void;
 }
 
 export interface RemoteImageProps {
@@ -107,9 +119,12 @@ export interface MenuProps {
   onWatch: (entry: LeaderboardEntry) => void;
   /** The tab to open on, e.g. the leaderboard after watching a replay. */
   initialTab: MenuTab;
+  watched: WatchedRun | null;
 }
 
 export interface PauseMenuProps {
+  /** Seconds the run has been paused so far; null when it can't be saved anyway. */
+  pausedSeconds: () => number | null;
   onResume: () => void;
   onQuit: () => void;
   muted: boolean;

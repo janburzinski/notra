@@ -21,8 +21,11 @@ export type Screen = "menu" | "starting" | "playing" | "over" | "replay";
 
 /** A best run being watched from the leaderboard. */
 export interface WatchedRun {
+  playerId: string;
   handle: string;
   score: number;
+  /** Names the run a moderator approves after watching it. */
+  seed: number;
 }
 
 export type MenuTab = "play" | "leaderboard";

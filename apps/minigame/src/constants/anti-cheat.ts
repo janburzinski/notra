@@ -15,6 +15,11 @@ export const STALL_SLACK_S = 1.5;
 export const STALL_MAX_GAME_S = BEAT_INTERVAL_S + 2;
 /** Pauses allowed per run. */
 export const MAX_STALLS = 8;
+/**
+ * Wall time all pauses of a run may add up to. The seed is known from the start, so an open-ended
+ * pause would be time to work out the rest of the run offline and then play it back live.
+ */
+export const MAX_PAUSED_S = 10 * 60;
 /** Outside pauses, game time must keep at least this pace against wall time. */
 export const MIN_LIVE_RATIO = 0.95;
 /** Most game time between two heartbeats; anything longer was played without reporting. */

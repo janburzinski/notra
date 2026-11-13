@@ -110,12 +110,13 @@ return improved
 
 /**
  * Deletes a player in one step: takes them off their company and off every
- * board, with their review entry, profile, replay and submit limit, so an upload that lands meanwhile
+ * board, with their review entry, profile and replay, so an upload that lands meanwhile
  * can't leave a company counting a deleted player. KEYS: their company pointer, the company's
  * members, the company board, the company details hash, then each board followed by its meta hash,
- * then the review hash, profile, replay and limit. ARGV: player id, the company the caller read (''
+ * then the review hash, profile and replay. ARGV: player id, the company the caller read (''
  * for none), pilots that count, number of boards. Returns 0, changing nothing, when the company
- * pointer changed since it was read, so the caller reads it again.
+ * pointer changed since it was read, so the caller reads it again. The submit rate limit is left to
+ * run out, so deleting can't reset it.
  */
 export const DELETE_PLAYER_SCRIPT = `${RECOUNT_COMPANY}
 local company = redis.call('GET', KEYS[1]) or ''
@@ -132,7 +133,7 @@ for i = 0, boards - 1 do
 end
 local rest = 5 + boards * 2
 redis.call('HDEL', KEYS[rest], ARGV[1])
-redis.call('DEL', KEYS[rest + 1], KEYS[rest + 2], KEYS[rest + 3])
+redis.call('DEL', KEYS[rest + 1], KEYS[rest + 2])
 return 1
 `;
 
@@ -156,6 +157,17 @@ if not run then return false end
 local beats = redis.call('LRANGE', KEYS[2], 0, -1)
 redis.call('DEL', KEYS[1], KEYS[2])
 return {run, beats}
+`;
+
+/**
+ * Takes a player off the review list only while their stored best is still the replay the caller read,
+ * so a newer best saved in between stays flagged. KEYS: the review hash, the player's replay; ARGV:
+ * player id, the replay as read. Returns 1 when the watched run is still their best.
+ */
+export const CLEAR_REVIEW_SCRIPT = `
+if redis.call('GET', KEYS[2]) ~= ARGV[2] then return 0 end
+redis.call('HDEL', KEYS[1], ARGV[1])
+return 1
 `;
 
 /** Rate limit counter: counts and sets the window's expiry atomically. KEYS: the counter; ARGV: seconds. */

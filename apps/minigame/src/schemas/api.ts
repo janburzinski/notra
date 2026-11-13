@@ -37,10 +37,17 @@ export const storedReplaySchema = z.object({
 
 export const playerIdSchema = z.string().min(1).max(64);
 
-export const moderationSchema = z.object({
-  playerId: playerIdSchema,
-  action: z.enum(["ban", "approve"]),
-});
+const seedSchema = z.number().int().nonnegative();
+
+/** An approval names the run the moderator watched, by its seed, so it can't vouch for a newer best. */
+export const moderationSchema = z.discriminatedUnion("action", [
+  z.object({
+    playerId: playerIdSchema,
+    action: z.literal("approve"),
+    seed: seedSchema,
+  }),
+  z.object({ playerId: playerIdSchema, action: z.literal("ban") }),
+]);
 
 export const reviewItemSchema = z.object({
   score: z.number(),

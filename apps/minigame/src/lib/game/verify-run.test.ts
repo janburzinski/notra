@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 
-import { BEAT_INTERVAL_S } from "@/constants/anti-cheat";
+import { BEAT_INTERVAL_S, MAX_PAUSED_S } from "@/constants/anti-cheat";
 import { TICK_RATE } from "@/constants/game";
 import { autopilotInput } from "@/lib/game/autopilot";
 import { Game } from "@/lib/game/sim";
@@ -150,6 +150,23 @@ describe("run verification", () => {
       at: CREATED + 150,
     };
     expect(verify([start, ...stamp(1, { 0: 60 })]).ok).toBe(true);
+  });
+
+  test("a pause long enough to work out the rest of the run offline is caught", () => {
+    const start = {
+      tick: 0,
+      hash: stateHash(new Game(SEED, "claude")),
+      at: CREATED + 150,
+    };
+    // started on time, then paused for an hour before streaming the rest at normal pace
+    expect(verify([start, ...stamp(1, { 0: 3600 })])).toMatchObject({
+      ok: false,
+    });
+    // a few pauses that are each fine but add up to more than allowed
+    const spread = MAX_PAUSED_S / 3 + 10;
+    expect(verify(stamp(1, { 1: spread, 3: spread, 5: spread }))).toMatchObject(
+      { ok: false }
+    );
   });
 
   test("a long wait before the first heartbeat is caught", () => {

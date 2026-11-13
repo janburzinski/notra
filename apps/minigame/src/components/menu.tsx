@@ -25,6 +25,7 @@ export function Menu({
   onViewerDeleted,
   onWatch,
   initialTab,
+  watched,
 }: MenuProps) {
   const [tab, setTab] = useState<MenuTab>(initialTab);
   const [sharing, setSharing] = useState(false);
@@ -128,6 +129,7 @@ export function Menu({
                 version={leaderboardVersion}
                 viewerId={viewer.player?.id ?? null}
                 companyId={viewer.player?.company?.id ?? null}
+                watched={watched}
               />
             </div>
           )}

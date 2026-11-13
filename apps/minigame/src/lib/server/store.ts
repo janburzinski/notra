@@ -8,6 +8,7 @@ import {
   BAN_TTL_S,
   ALLOW_SCRIPT,
   BEAT_SCRIPT,
+  CLEAR_REVIEW_SCRIPT,
   KEY_PREFIX,
   DELETE_PLAYER_SCRIPT,
   LEADERBOARD_SIZE,
@@ -88,9 +89,13 @@ export interface GameStore {
   /** Blocks a player from posting scores again. */
   ban(playerId: string): Promise<void>;
   isBanned(playerId: string): Promise<boolean>;
-  /** Puts a player's new best on the moderators' review list, or takes it off. */
+  /** Puts a player's new best on the moderators' review list. */
   flagForReview(playerId: string, item: ReviewItem): Promise<void>;
-  clearReview(playerId: string): Promise<void>;
+  /**
+   * Takes a player off the review list, but only while their best is still the run with this seed, the
+   * one the moderator watched. False, changing nothing, when a newer best replaced it.
+   */
+  clearReview(playerId: string, seed: number): Promise<boolean>;
   reviewQueue(): Promise<Record<string, ReviewItem>>;
   /**
    * Records a verified run in one step: refused for banned players, and a new all-time best stores
@@ -266,8 +271,21 @@ export class RedisStore implements GameStore {
     });
   }
 
-  async clearReview(playerId: string) {
-    await this.redis.hdel(this.keys.review(), playerId);
+  async clearReview(playerId: string, seed: number) {
+    const best = await this.redis.get(this.keys.replay(playerId));
+    if (
+      typeof best !== "string" ||
+      parseJson(best, storedReplaySchema)?.seed !== seed
+    ) {
+      return false;
+    }
+    // a new best stores its replay before it is flagged, so one saved since the read above keeps its flag
+    const cleared = await this.redis.eval<string[], number>(
+      CLEAR_REVIEW_SCRIPT,
+      [this.keys.review(), this.keys.replay(playerId)],
+      [playerId, best]
+    );
+    return Number(cleared) === 1;
   }
 
   async reviewQueue() {
@@ -492,7 +510,6 @@ export class RedisStore implements GameStore {
           this.keys.review(),
           this.keys.player(playerId),
           this.keys.replay(playerId),
-          this.keys.limit(`submit:${playerId}`),
         ],
         [
           playerId,
@@ -578,8 +595,12 @@ export class MemoryStore implements GameStore {
     this.review.set(playerId, item);
   }
 
-  async clearReview(playerId: string) {
+  async clearReview(playerId: string, seed: number) {
+    if (this.replays.get(playerId)?.seed !== seed) {
+      return false;
+    }
     this.review.delete(playerId);
+    return true;
   }
 
   async reviewQueue() {

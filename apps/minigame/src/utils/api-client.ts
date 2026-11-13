@@ -2,7 +2,7 @@ import { PREFETCH_MAX_AGE_MS } from "@/constants/leaderboard";
 import { REPLAY_VERSION } from "@/constants/replay";
 import { OFFLINE_MESSAGE } from "@/constants/site";
 import type {
-  ModerationAction,
+  ModerationRequest,
   ReviewItem,
   StoredReplay,
 } from "@/types/anti-cheat";
@@ -138,10 +138,15 @@ export function sendBeat(runId: string, tick: number, hash: number) {
   }).catch(() => undefined);
 }
 
-/** A player's best run, ready to play back: the seed, the model and one input per tick. */
-export async function fetchReplay(playerId: string) {
+/**
+ * A player's best run, ready to play back: the seed, the model and one input per tick. `fresh` skips
+ * the CDN's copy, which can trail a new best by a minute, so a moderator approves what is stored now.
+ */
+export async function fetchReplay(playerId: string, fresh = false) {
+  const path = `/api/replays/${encodeURIComponent(playerId)}`;
   const stored = await call<StoredReplay>(
-    `/api/replays/${encodeURIComponent(playerId)}`
+    fresh ? `${path}?fresh=${Date.now()}` : path,
+    fresh ? { cache: "no-store" } : undefined
   );
   if (stored.version !== REPLAY_VERSION) {
     throw new ApiError("That run was set on an older version of the game", 409);
@@ -159,11 +164,11 @@ export async function fetchReplay(playerId: string) {
 }
 
 /** Approves a reviewed best, or removes and bans the player. Moderators only. */
-export async function moderate(playerId: string, action: ModerationAction) {
+export async function moderate(request: ModerationRequest) {
   const response = await fetch("/api/admin/moderate", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ playerId, action }),
+    body: JSON.stringify(request),
   });
   if (!response.ok) {
     throw new ApiError("Could not moderate that player", response.status);

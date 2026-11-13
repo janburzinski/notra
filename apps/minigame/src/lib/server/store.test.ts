@@ -152,13 +152,26 @@ function contract(name: string, make: () => GameStore) {
 
     test("keeps the review list", async () => {
       const item = { score: 900, rank: 3, at: 1 };
-      await store.flagForReview(ace.id, item);
+      // a player of its own, so earlier tests' bests don't get in the way
+      const flagged = pilot(30, null);
+      await store.submit(flagged, run(900, 1_800_000_020_000), {
+        ...replay,
+        seed: 11,
+      });
+      await store.flagForReview(flagged.id, item);
       await store.flagForReview(rival.id, { ...item, rank: 4 });
       expect(await store.reviewQueue()).toEqual({
-        [ace.id]: item,
+        [flagged.id]: item,
         [rival.id]: { ...item, rank: 4 },
       });
-      await store.clearReview(ace.id);
+      // a newer best replaced the run the moderator watched: approving the old one leaves it flagged
+      await store.submit(flagged, run(950, 1_800_000_021_000), {
+        ...replay,
+        seed: 12,
+      });
+      expect(await store.clearReview(flagged.id, 11)).toBe(false);
+      expect(await store.reviewQueue()).toHaveProperty(flagged.id);
+      expect(await store.clearReview(flagged.id, 12)).toBe(true);
       await store.deletePlayer(rival.id);
       expect(await store.reviewQueue()).toEqual({});
     });
@@ -205,10 +218,12 @@ function contract(name: string, make: () => GameStore) {
       ).toEqual(["Acme"]);
     });
 
-    test("rate limits count up to the limit", async () => {
-      expect(await store.allow("bucket", 2, 60)).toBe(true);
-      expect(await store.allow("bucket", 2, 60)).toBe(true);
-      expect(await store.allow("bucket", 2, 60)).toBe(false);
+    test("rate limits count up to the limit, and deleting a player doesn't reset them", async () => {
+      const bucket = `submit:${ace.id}`;
+      expect(await store.allow(bucket, 2, 60)).toBe(true);
+      expect(await store.allow(bucket, 2, 60)).toBe(true);
+      await store.deletePlayer(ace.id);
+      expect(await store.allow(bucket, 2, 60)).toBe(false);
     });
   });
 }
