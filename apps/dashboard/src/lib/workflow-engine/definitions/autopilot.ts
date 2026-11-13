@@ -187,6 +187,7 @@ export const AUTOPILOT_DAILY_WORKFLOW: WorkflowDefinition = {
       }),
       comparisonPage(at(4, 4)),
       step("links", "autopilot.links", at(3, 5), { onError: "continue" }),
+      step("landing", "autopilot.landing", at(3, 6), { onError: "continue" }),
       // Column 4 of the brief's row stays empty: edges into the brief bend
       // there, and a node in that spot looks like where they lead.
       contentCall(
@@ -213,6 +214,7 @@ export const AUTOPILOT_DAILY_WORKFLOW: WorkflowDefinition = {
       edge("close-stale", "rendering"),
       edge("close-stale", "comparisons"),
       edge("close-stale", "links"),
+      edge("close-stale", "landing"),
       edge("comparisons", "comparison-page"),
       edge("gather", "content"),
       edge("readiness", "content"),
@@ -222,6 +224,7 @@ export const AUTOPILOT_DAILY_WORKFLOW: WorkflowDefinition = {
       edge("rendering", "brief"),
       edge("comparison-page", "brief"),
       edge("links", "brief"),
+      edge("landing", "brief"),
     ],
     onFailure: {
       type: "autopilot.fail-run",
@@ -349,6 +352,16 @@ const AUTOPILOT_TEMPLATE_WORKFLOWS: WorkflowDefinition[] = [
     ],
     edges: [edge("start", "links"), edge("links", "finish")],
   }),
+  template(
+    AUTOPILOT_TEMPLATE_WORKFLOW_KEYS.landing,
+    "Update landing page copy",
+    {
+      nodes: [
+        step("landing", "autopilot.landing", at(2, 1), { onError: "continue" }),
+      ],
+      edges: [edge("start", "landing"), edge("landing", "finish")],
+    }
+  ),
 ];
 
 export const workflowDefinitions: Record<string, WorkflowDefinition> =

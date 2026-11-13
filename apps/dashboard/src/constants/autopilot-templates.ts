@@ -1,6 +1,7 @@
 import {
   BalanceScaleIcon,
   GitBranchIcon,
+  Home01Icon,
   Link04Icon,
   RefreshIcon,
   Robot01Icon,
@@ -33,6 +34,7 @@ export const AUTOPILOT_TEMPLATE_TONES: Record<
   comparisons: "info",
   rendering: "destructive",
   links: "success",
+  landing: "info",
 };
 
 /** Literal classes per tone, so Tailwind sees every one of them. */
@@ -175,6 +177,25 @@ export const AUTOPILOT_TEMPLATES: AutopilotTemplate[] = [
     source: "Your Search Console rankings",
     output: "pull_request",
     trigger: "weekly",
+  },
+  {
+    id: "landing",
+    kind: "landing",
+    name: "Update landing page copy",
+    description:
+      "Rewrites the copy of a landing page AI stopped citing or Google ranks on page one or two, and leaves the code as it is.",
+    highlights: [
+      "Picks a landing page that lost AI citations or ranks 4 to 20 in Google",
+      "Rewrites its headings, text and metadata for those prompts and searches",
+      "Changes only text: code, links and layout stay byte for byte",
+    ],
+    instructions:
+      "Find a landing page rendered from code that AI answers cite less than a month ago, or that ranks 4 to 20 in Google. Rewrite its visible copy and metadata for the prompts and searches it is losing, using only facts from your own pages, and open a pull request that changes text only.",
+    category: "content",
+    icon: Home01Icon,
+    source: "Your AI citations and Search Console rankings",
+    output: "pull_request",
+    trigger: "drop",
   },
   {
     id: "commits",

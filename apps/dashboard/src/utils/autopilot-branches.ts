@@ -10,7 +10,8 @@ export function autopilotDraftBranchSlug(
     | "refresh"
     | "comparison"
     | "rendering"
-    | "links",
+    | "links"
+    | "landing",
   claim: FindingClaim
 ) {
   const attempt = createHash("sha256")

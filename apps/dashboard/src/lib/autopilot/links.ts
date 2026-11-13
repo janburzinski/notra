@@ -1,15 +1,11 @@
 import { createGitHubMentionUsageCollector } from "@notra/ai/billing/github-mention-billing";
 import { AGENT_DEFAULT_MODEL } from "@notra/ai/constants/models";
 import {
-  getGscIntegration,
   GscReauthRequiredError,
   queryGscQueryPages,
 } from "@notra/ai/integrations/google-search-console";
-import { db } from "@notra/db/drizzle";
-import { geoSettings, projects } from "@notra/db/schema";
 import type { AutopilotInternalLink } from "@notra/db/types/autopilot";
 import { mapWithConcurrency } from "@notra/sites-server/utils/concurrency";
-import { and, eq } from "drizzle-orm";
 
 import {
   AUTOPILOT_MARKDOWN_FILE,
@@ -56,6 +52,10 @@ import { generateAutopilotObject } from "@/lib/autopilot/llm";
 import { createAutopilotLogger } from "@/lib/autopilot/log";
 import { fetchPageText, findDeadLinks } from "@/lib/autopilot/pages";
 import { scheduleAutopilotPublish } from "@/lib/autopilot/publish";
+import {
+  loadBrandTerms,
+  loadSearchConsoleConnection,
+} from "@/lib/autopilot/search-console";
 import { linksReviewSchema } from "@/schemas/autopilot";
 import type { AutopilotRunContext } from "@/types/autopilot";
 import type { FindingClaim } from "@/types/autopilot-runtime";
@@ -82,22 +82,6 @@ import { findPagePath, isSafeRepositoryPath } from "@/utils/autopilot-paths";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
-/** The brand's own name and aliases; a query naming the brand is not a phrase to link. */
-async function loadBrandTerms(ctx: AutopilotRunContext, projectId: string) {
-  const settings = await db.query.geoSettings.findFirst({
-    columns: { companyName: true, aliases: true },
-    where: and(
-      eq(geoSettings.organizationId, ctx.organizationId),
-      eq(geoSettings.projectId, projectId)
-    ),
-  });
-  return [
-    ctx.brand?.name,
-    settings?.companyName,
-    ...(settings?.aliases ?? []),
-  ].flatMap((term) => (term?.trim() ? [term.trim()] : []));
-}
-
 export async function checkLinks(
   ctx: AutopilotRunContext
 ): Promise<
@@ -118,24 +102,9 @@ export async function checkLinks(
   if (!ctx.projectId) {
     return skip("No GEO project to read Search Console from");
   }
-  const [project, integration] = await Promise.all([
-    db.query.projects.findFirst({
-      columns: { gscSiteUrl: true },
-      where: and(
-        eq(projects.id, ctx.projectId),
-        eq(projects.organizationId, ctx.organizationId)
-      ),
-    }),
-    getGscIntegration(ctx.organizationId),
-  ]);
-  if (!integration || integration.disconnectingAt) {
-    return skip("Search Console is not connected");
-  }
-  if (integration.status === "reauth_required") {
-    return skip("Search Console needs to be reconnected");
-  }
-  if (!project?.gscSiteUrl) {
-    return skip("No Search Console property is selected for this project");
+  const connection = await loadSearchConsoleConnection(ctx, ctx.projectId);
+  if (!connection.ok) {
+    return skip(connection.reason);
   }
   await syncFindingPullRequests(ctx.organizationId);
   const open = await countOpenPullRequests(ctx.organizationId);
@@ -159,8 +128,8 @@ export async function checkLinks(
   }
   let rows: Awaited<ReturnType<typeof queryGscQueryPages>>;
   try {
-    rows = await queryGscQueryPages(integration, {
-      siteUrl: project.gscSiteUrl,
+    rows = await queryGscQueryPages(connection.integration, {
+      siteUrl: connection.siteUrl,
       days: AUTOPILOT_LINKS_GSC_DAYS,
       rowLimit: AUTOPILOT_LINKS_GSC_ROW_LIMIT,
     });

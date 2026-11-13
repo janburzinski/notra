@@ -1,6 +1,7 @@
 import type {
   AutopilotCitationDrop,
   AutopilotComparisonTarget,
+  AutopilotCopyChange,
   AutopilotInternalLink,
   AutopilotPageAudit,
   AutopilotRenderingIssue,
@@ -162,4 +163,34 @@ export interface AutopilotLinksFix {
   files: { path: string; contents: string }[];
   links: AutopilotInternalLink[];
   checks: string[];
+}
+
+/** The text a file's new version changes, or why it changes more than text. */
+export type AutopilotCopyCheck =
+  | { ok: true; changes: AutopilotPageCopyChange[] }
+  | { ok: false; reason: string };
+
+/** A copy change and whether it is the page's title or description rather than text on it. */
+export interface AutopilotPageCopyChange extends AutopilotCopyChange {
+  metadata: boolean;
+}
+
+/** A page rendered from code that lost AI citations or ranks 4 to 20 in Google. */
+export interface AutopilotLandingCandidate {
+  url: string;
+  /** host/path without www, query, hash or trailing slash. */
+  key: string;
+  signal: "citations" | "search";
+  /** Citations before and now; null for a search candidate. */
+  drop: AutopilotCitationDrop | null;
+  promptIds: string[];
+  queries: { query: string; position: number; impressions: number }[];
+}
+
+export interface AutopilotLandingCheck {
+  candidate: AutopilotLandingCandidate;
+  /** What the live page says now, so a change can be traced to the page. */
+  pageText: string;
+  /** What the homepage says, for any other page: text it shares is a shared component's. */
+  homeText: string | null;
 }

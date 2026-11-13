@@ -30,4 +30,5 @@ export const AUTOPILOT_TEMPLATE_WORKFLOW_KEYS = {
   comparisons: "autopilot.comparisons",
   rendering: "autopilot.rendering",
   links: "autopilot.links",
+  landing: "autopilot.landing",
 } as const satisfies Record<AutopilotAutomationKind, string>;

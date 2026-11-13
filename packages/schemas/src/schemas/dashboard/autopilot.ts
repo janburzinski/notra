@@ -91,6 +91,7 @@ export const autopilotJobsSchema = z.object({
   comparisons: z.boolean().default(false),
   rendering: z.boolean().default(false),
   links: z.boolean().default(false),
+  landing: z.boolean().default(false),
 });
 
 const autopilotApprovalModeSchema = z.enum(AUTOPILOT_APPROVAL_MODES);

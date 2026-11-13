@@ -8,6 +8,7 @@ export const AUTOPILOT_JOB_KINDS = [
   "comparisons",
   "rendering",
   "links",
+  "landing",
 ] as const;
 
 /**
@@ -23,6 +24,7 @@ export const AUTOPILOT_AUTOMATION_KINDS = [
   "comparisons",
   "rendering",
   "links",
+  "landing",
 ] as const satisfies readonly (typeof AUTOPILOT_JOB_KINDS)[number][];
 
 /**

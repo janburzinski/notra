@@ -256,6 +256,17 @@ export async function runRepositoryAgent<Schema extends z.ZodType>(params: {
       description: "Leave an issue alone and say why.",
       inputSchema: z.object({ issueId: z.string(), reason: z.string() }),
       execute: async (skip) => {
+        if (!issueIds.has(skip.issueId)) {
+          return `"${skip.issueId}" is not an issue id; the ids are ${[...issueIds].join(", ")}. Files you leave alone need no skip. If every issue is handled, stop calling tools and write your answer.`;
+        }
+        // Models tend to call this again and again once done; say so once.
+        if (
+          [...staged.values()].some((file) =>
+            file.issueIds.includes(skip.issueId)
+          )
+        ) {
+          return "This issue already has staged changes, so it isn't skipped. Stop calling tools and write your answer.";
+        }
         skipped.push(skip);
         await log.decision(`Left "${params.issueName(skip.issueId)}" alone`, {
           reason: skip.reason,

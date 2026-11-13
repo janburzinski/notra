@@ -1,5 +1,6 @@
 import { decodeHTML } from "entities";
 
+import { AUTOPILOT_COPY_ATTRIBUTE } from "@/constants/autopilot-landing";
 import {
   AUTOPILOT_RENDERING_BLOCKED_STATUSES,
   AUTOPILOT_RENDERING_COPY_MIN_PLAIN_SHARE,
@@ -44,6 +45,14 @@ export function htmlToText(html: string) {
   )
     .replace(WHITESPACE, " ")
     .trim();
+}
+
+/** Text a page keeps in attributes, such as image descriptions and labels, decoded. */
+export function htmlTextAttributes(html: string) {
+  return [...html.matchAll(AUTOPILOT_COPY_ATTRIBUTE)]
+    .map((match) => decodeHTML(match[1] ?? match[2] ?? "").trim())
+    .filter(Boolean)
+    .join("\n");
 }
 
 export function markdownToText(markdown: string) {

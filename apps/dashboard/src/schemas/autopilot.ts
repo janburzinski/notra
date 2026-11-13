@@ -109,6 +109,20 @@ export const factCheckSchema = z.object({
   ),
 });
 
+export const landingAgentOutputSchema = z.object({
+  pullRequestTitle: z.string(),
+  summary: z
+    .string()
+    .describe(
+      "What the new copy answers that the old copy didn't, in one sentence"
+    ),
+  notes: z
+    .string()
+    .describe(
+      "Markdown bullets: why each change helps the prompts or searches"
+    ),
+});
+
 export const renderingAgentOutputSchema = z.object({
   framework: z
     .string()

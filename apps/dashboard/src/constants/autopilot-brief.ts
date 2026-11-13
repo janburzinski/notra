@@ -34,4 +34,5 @@ export const AUTOPILOT_BRIEF_SOURCES: Record<AutopilotJobKind, string> = {
   comparisons: "AI answers",
   rendering: "your site",
   links: "Search Console",
+  landing: "AI answers",
 };

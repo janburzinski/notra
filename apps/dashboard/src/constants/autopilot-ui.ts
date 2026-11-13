@@ -18,6 +18,7 @@ import {
   GitPullRequestClosedIcon,
   GitPullRequestIcon,
   Globe02Icon,
+  Home01Icon,
   Idea01Icon,
   Image02Icon,
   Link04Icon,
@@ -249,6 +250,7 @@ export const AUTOPILOT_KIND_META: Record<
   comparisons: { label: "Comparisons", icon: BalanceScaleIcon },
   rendering: { label: "AI-readable pages", icon: ViewIcon },
   links: { label: "Internal links", icon: Link04Icon },
+  landing: { label: "Landing page copy", icon: Home01Icon },
 };
 
 /** How one automation in a run ended, as the run panel's section badge. */
@@ -358,6 +360,15 @@ export const AUTOPILOT_AUTOMATIONS: Record<
     noun: "links pull request",
     alsoOn: "At most one pull request a week",
   },
+  landing: {
+    name: "Update landing page copy",
+    description:
+      "Rewrites the copy of a landing page AI stopped citing or Google ranks on page one or two, and leaves the code as it is.",
+    source: "Your AI citations and Search Console rankings",
+    output: "Opens a pull request",
+    noun: "copy update",
+    alsoOn: "At most one pull request every two weeks",
+  },
 };
 
 /** One automation's outcome in a run, by the level it was logged at. */
@@ -384,6 +395,7 @@ export const AUTOPILOT_AUTOMATION_SLUGS: Record<
   comparisons: "comparison-pages",
   rendering: "ai-readable-pages",
   links: "internal-links",
+  landing: "landing-pages",
 };
 
 /** GitHub's merge buttons, in GitHub's words; squash is the default. */

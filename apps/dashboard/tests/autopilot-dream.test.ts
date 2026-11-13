@@ -326,6 +326,12 @@ if (process.env.NOTRA_AUTOPILOT_DREAM_TEST !== "1") {
     writeLinks: notRun,
     openLinksPullRequest: notRun,
   }));
+  mock.module("@/lib/autopilot/landing", () => ({
+    checkLanding: async () => ({ ready: false, reason: "Not run here" }),
+    claimLanding: notRun,
+    writeLanding: notRun,
+    openLandingPullRequest: notRun,
+  }));
   mock.module("@/lib/autopilot/prompts", () => ({ runPromptsJob: emptyJob }));
   mock.module("@/lib/autopilot/planner", () => ({
     decideAutopilotPlan: async () => ({ outcome: "skip", memory: null }),

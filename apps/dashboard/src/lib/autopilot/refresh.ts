@@ -267,7 +267,8 @@ function describeEvidence(check: AutopilotRefreshCheck) {
   ].join("\n");
 }
 
-async function readPages(urls: string[]) {
+/** Each page's rendered Markdown, leaving out the ones that fail or are empty. */
+export async function readPages(urls: string[]) {
   const pages = await Promise.all(
     urls.map(async (url) => {
       try {
@@ -288,7 +289,10 @@ async function readPages(urls: string[]) {
  * The brand's own pricing and plan pages, so a refresh states today's
  * figures instead of keeping old ones.
  */
-async function readBrandFacts(ctx: AutopilotRunContext, pageUrl: string) {
+export async function readBrandFacts(
+  ctx: AutopilotRunContext,
+  pageUrl: string
+) {
   if (!ctx.brand) {
     return [];
   }

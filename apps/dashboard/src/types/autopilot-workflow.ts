@@ -8,6 +8,7 @@ import type { WorkflowNodeOutcome } from "@notra/workflows/types/run";
 import type * as z from "zod";
 
 import type { renderBlogDraftHeroImage } from "@/lib/autopilot/blog";
+import type { writeLanding } from "@/lib/autopilot/landing";
 import type { writeReadinessFix } from "@/lib/autopilot/readiness";
 import type {
   AutopilotRenderingCheck,
@@ -27,6 +28,7 @@ import type {
   FindingClaim,
 } from "@/types/autopilot-runtime";
 import type {
+  AutopilotLandingCheck,
   AutopilotLinksCheck,
   AutopilotLinksFix,
   AutopilotRefreshCheck,
@@ -97,5 +99,13 @@ export interface LinksState extends Record<string, unknown> {
   claim: FindingClaim;
   reservation: GitHubMentionBillingReservation;
   fix: AutopilotLinksFix | null;
+  usage: (AgentTokenUsage | null)[];
+}
+
+export interface LandingState extends Record<string, unknown> {
+  check: AutopilotLandingCheck;
+  claim: FindingClaim;
+  reservation: GitHubMentionBillingReservation;
+  fix: Awaited<ReturnType<typeof writeLanding>>;
   usage: (AgentTokenUsage | null)[];
 }

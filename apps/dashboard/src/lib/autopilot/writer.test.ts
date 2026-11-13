@@ -86,6 +86,7 @@ if (process.env.NOTRA_AUTOPILOT_WRITER_TEST !== "1") {
         comparisons: false,
         rendering: false,
         links: false,
+        landing: false,
       },
       maxOpenPullRequests: 3,
       timezone: "Europe/Berlin",

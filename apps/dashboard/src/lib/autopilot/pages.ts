@@ -13,6 +13,7 @@ import {
 } from "@/constants/autopilot-rendering";
 import type { AutopilotPageFetch } from "@/types/autopilot-templates-runtime";
 import {
+  htmlTextAttributes,
   htmlToText,
   isChallengePage,
   markdownToText,
@@ -75,10 +76,11 @@ async function fetchAsCrawler(url: string) {
     return {
       status: response.status,
       text: htmlToText(html),
+      attributes: htmlTextAttributes(html),
       challenged: isChallengePage(html),
     };
   } catch {
-    return { status: null, text: "", challenged: false };
+    return { status: null, text: "", attributes: "", challenged: false };
   }
 }
 
@@ -87,6 +89,14 @@ export async function fetchPageText(url: string) {
   const page = await fetchAsCrawler(url);
   return page.status && page.status < 400 && !page.challenged
     ? page.text
+    : null;
+}
+
+/** Image descriptions and labels in a page's server HTML; null when it doesn't load. */
+export async function fetchPageAttributes(url: string) {
+  const page = await fetchAsCrawler(url);
+  return page.status && page.status < 400 && !page.challenged
+    ? page.attributes
     : null;
 }
 

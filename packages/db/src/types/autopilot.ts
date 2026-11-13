@@ -112,7 +112,25 @@ export interface AutopilotFindingEvidence {
   comparison?: AutopilotComparisonTarget | null;
   /** The internal links a links pull request adds, one row per link. */
   links?: AutopilotInternalLink[] | null;
+  /** Why a landing page's copy changes, and the text it changes. */
+  landing?: AutopilotLandingUpdate | null;
   allowedAgainAt?: string;
+}
+
+/** A landing page whose copy changes to win back AI citations or searches. */
+export interface AutopilotLandingUpdate {
+  url: string;
+  signal: "citations" | "search";
+  /** Search Console queries the page ranks 4 to 20 for, best first. */
+  queries: { query: string; position: number; impressions: number }[];
+  /** Each piece of text the pull request changes, as before and after. */
+  changes: AutopilotCopyChange[];
+}
+
+export interface AutopilotCopyChange {
+  path: string;
+  before: string;
+  after: string;
 }
 
 /** One link from a post to a page that ranks for the linked words. */

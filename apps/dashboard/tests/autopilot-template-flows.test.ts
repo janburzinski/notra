@@ -3,6 +3,7 @@ import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
 import {
+  autopilotFindings,
   autopilotRuns,
   autopilotSettings,
   brandSettings,
@@ -24,7 +25,7 @@ import { createAutopilotSandbox } from "./utils/autopilot-sandbox";
 import { createWorkflowGraphRunner } from "./utils/workflow-graph-runner";
 
 if (process.env.NOTRA_AUTOPILOT_TEMPLATE_FLOW_TEST !== "1") {
-  test("Autopilot templates: refresh, comparisons, AI-readable pages and internal links run end to end", () => {
+  test("Autopilot templates: refresh, comparisons, AI-readable pages, internal links and landing pages run end to end", () => {
     const child = spawnSync(
       process.execPath,
       ["--no-env-file", "test", fileURLToPath(import.meta.url)],
@@ -87,6 +88,28 @@ if (process.env.NOTRA_AUTOPILOT_TEMPLATE_FLOW_TEST !== "1") {
     ].join("\n"),
     "content/compare/emberline-vs-modal.md":
       "---\ntitle: Emberline vs Modal\n---\nA comparison.",
+    "app/page.tsx": [
+      'import { Hero } from "@/components/hero";',
+      "",
+      "export const metadata = {",
+      '  title: "Emberline",',
+      '  description: "Run models on GPUs.",',
+      "};",
+      "",
+      "export default function Home() {",
+      "  return (",
+      '    <main className="mx-auto max-w-5xl">',
+      '      <Hero title="Deploy models fast" />',
+      "      <p>Emberline runs your models.</p>",
+      '      <img src="/gpu.png" alt="GPU dashboard" />',
+      "      <p hidden>Spring sale ends soon.</p>",
+      '      <script>{\'gtag("config", "G-OLD")\'}</script>',
+      "    </main>",
+      "  );",
+      "}",
+    ].join("\n"),
+    "pages/pricing.tsx":
+      "export default function Pricing() {\n  return (\n    <Head>\n      <title>Pricing</title>\n    </Head>\n  );\n}",
     "app/pricing/page.tsx":
       "\"use client\";\nexport default function Pricing() {\n  const [plans, setPlans] = useState([]);\n  useEffect(() => { fetch('/plans.json').then((r) => r.json()).then(setPlans); }, []);\n  return <Plans plans={plans} />;\n}",
   };
@@ -293,11 +316,19 @@ if (process.env.NOTRA_AUTOPILOT_TEMPLATE_FLOW_TEST !== "1") {
       4
     );
   const web = { homeStatus: 200 };
+  const homepageText =
+    "Deploy models fast. Emberline runs your models. Pricing Docs Blog";
   mock.module("@/lib/autopilot/pages", () => ({
-    fetchRendered: async (url: string) => ({
-      markdown: `# ${url}\nModal cold starts take under two seconds with snapshots.`,
-      text: `${url} Modal cold starts take under two seconds with snapshots.`,
-    }),
+    fetchRendered: async (url: string) => {
+      if (url.replace(/\/$/, "") === SITE) {
+        return { markdown: homepageText, text: homepageText };
+      }
+      // The pricing page shares its tagline with the homepage.
+      const text = url.endsWith("/pricing")
+        ? "H100 hourly price: $1.80. Emberline runs your models."
+        : `${url} Modal cold starts take under two seconds with snapshots.`;
+      return { markdown: text, text };
+    },
     fetchPageForCrawlers: async (url: string) => ({
       url,
       status: url.replace(/\/$/, "") === SITE ? web.homeStatus : 200,
@@ -311,14 +342,122 @@ if (process.env.NOTRA_AUTOPILOT_TEMPLATE_FLOW_TEST !== "1") {
     findDeadLinks: async (urls: string[]) =>
       urls.filter((url) => url.includes("dead.example")),
     // Only the serving post is live, and its page reads like its file.
+    // Only the homepage has an image description.
+    fetchPageAttributes: async (url: string) =>
+      url.replace(/\/$/, "") === SITE ? "GPU dashboard" : "",
     fetchPageText: async (url: string) =>
       url === `${SITE}/blog/serving-models`
         ? (repository["content/blog/serving-models.md"] ?? null)
         : null,
   }));
   const paddedRefusal: (string | null)[] = [];
+  const landingRefusals: (string | null)[] = [];
+  const landingPages: string[] = [];
+  // The landing agent: a layout change is turned away, a copy rewrite is staged.
+  const landingAgent = (params: {
+    checkFile?: (file: {
+      path: string;
+      content: string;
+      previous: string | null;
+    }) => string | null;
+    issueIds: string[];
+  }) => {
+    landingPages.push(params.issueIds[0] ?? "");
+    const path = "app/page.tsx";
+    const previous = repository[path] ?? null;
+    const edit = (from: string, to: string) =>
+      params.checkFile?.({
+        path,
+        previous,
+        content: (previous ?? "").replace(from, to),
+      }) ?? null;
+    // Only the homepage's copy is in this repository.
+    if (params.issueIds[0] !== SITE) {
+      // The homepage's files: its hero isn't on this page, its tagline is
+      // shared, and its metadata isn't this route's.
+      const own = repository["pages/pricing.tsx"] ?? null;
+      landingRefusals.push(
+        edit("Deploy models fast", "GPU prices"),
+        edit("Emberline runs your models.", "Emberline lists H100 prices."),
+        edit("Run models on GPUs.", "H100 hourly prices."),
+        // The page's own title, in a route named by its file.
+        params.checkFile?.({
+          path: "pages/pricing.tsx",
+          previous: own,
+          content: (own ?? "").replace(
+            "Pricing<",
+            "H100 and A100 GPU pricing<"
+          ),
+        }) ?? null
+      );
+      return {
+        octokit: { request: async () => ({ data: {} }) },
+        baseSha: "base-sha",
+        paths: Object.keys(repository),
+        files: [],
+        skipped: [
+          {
+            issueId: params.issueIds[0] ?? "",
+            reason: "The plans come from a CMS",
+          },
+        ],
+        output: { pullRequestTitle: "", summary: "", notes: "" },
+      };
+    }
+    const relayout = (previous ?? "").replace("max-w-5xl", "max-w-6xl");
+    // Rewrapped onto its own line with other quotes, as models do: still only copy.
+    const rewritten = (previous ?? "")
+      .replace(
+        '"Run models on GPUs.",',
+        "\n    'Serverless GPU inference for open models.',"
+      )
+      .replace("Deploy models fast", "Serverless GPUs for open models")
+      .replace(
+        "Emberline runs your models.",
+        "Emberline runs open models on H100s and scales them to zero."
+      )
+      // Image descriptions read in the page's HTML, not its body text.
+      .replace('alt="GPU dashboard"', 'alt="Serverless GPU dashboard"');
+    landingRefusals.push(
+      params.checkFile?.({ path, previous, content: relayout }) ?? null,
+      // A line break after return makes the page render nothing.
+      params.checkFile?.({
+        path,
+        previous,
+        content: rewritten.replace("return (", "return\n("),
+      }) ?? null,
+      // Script contents are code, never copy.
+      params.checkFile?.({
+        path,
+        previous,
+        content: rewritten.replace("G-OLD", "G-NEW"),
+      }) ?? null,
+      edit("Spring sale ends soon.", "Serverless GPUs, billed per second."),
+      params.checkFile?.({ path, previous, content: rewritten }) ?? null
+    );
+    return {
+      octokit: { request: async () => ({ data: {} }) },
+      baseSha: "base-sha",
+      paths: Object.keys(repository),
+      files: [
+        {
+          path,
+          content: rewritten,
+          issueIds: params.issueIds,
+          reason: "Answer the serverless GPU prompts",
+        },
+      ],
+      skipped: [],
+      output: {
+        pullRequestTitle: "Say what Emberline runs on the homepage",
+        summary: "The homepage now names serverless GPUs and open models.",
+        notes: "- The hero names the category AI answers ask about",
+      },
+    };
+  };
   mock.module("@/lib/autopilot/repository-agent", () => ({
     runRepositoryAgent: async (params: {
+      tag: string;
       checkFile?: (file: {
         path: string;
         content: string;
@@ -326,6 +465,9 @@ if (process.env.NOTRA_AUTOPILOT_TEMPLATE_FLOW_TEST !== "1") {
       }) => string | null;
       issueIds: string[];
     }) => {
+      if (params.tag === "landing-agent") {
+        return landingAgent(params);
+      }
       const path = "app/pricing/page.tsx";
       const previous = repository[path] ?? null;
       // An agent that pads the page with new copy is turned away.
@@ -414,7 +556,13 @@ if (process.env.NOTRA_AUTOPILOT_TEMPLATE_FLOW_TEST !== "1") {
     domain: "runpod.io",
   });
   const autoscale = "How do I autoscale GPU inference?";
+  const platform = "Which serverless GPU platform should I use?";
   const answers = [
+    // The homepage was cited a month ago and isn't now.
+    { prompt: platform, daysAgo: 50, sources: [`${SITE}/`] },
+    { prompt: platform, daysAgo: 44, sources: [SITE] },
+    { prompt: platform, daysAgo: 5, sources: ["https://modal.com"] },
+    { prompt: platform, daysAgo: 1, sources: ["https://modal.com/pricing"] },
     { prompt: autoscale, daysAgo: 50, sources: [POST] },
     { prompt: autoscale, daysAgo: 45, sources: [`${POST}/`] },
     { prompt: autoscale, daysAgo: 40, sources: ["https://modal.com/docs"] },
@@ -432,7 +580,9 @@ if (process.env.NOTRA_AUTOPILOT_TEMPLATE_FLOW_TEST !== "1") {
     projectId: PROJECT,
     scanId: `scan-${index}`,
     engine: "openai/chatgpt",
-    promptId: row.prompt === autoscale ? "autoscale" : "alternatives",
+    promptId:
+      { [autoscale]: "autoscale", [platform]: "platform" }[row.prompt] ??
+      "alternatives",
     prompt: row.prompt,
     answer: "An answer",
     excerpt: `${row.competitors?.join(", ") ?? ""} come up for this.`,
@@ -469,6 +619,7 @@ if (process.env.NOTRA_AUTOPILOT_TEMPLATE_FLOW_TEST !== "1") {
       comparisons: false,
       rendering: false,
       links: false,
+      landing: false,
       ...jobs,
     };
     return db
@@ -518,6 +669,8 @@ if (process.env.NOTRA_AUTOPILOT_TEMPLATE_FLOW_TEST !== "1") {
     opened.length = 0;
     writerBriefs.length = 0;
     paddedRefusal.length = 0;
+    landingRefusals.length = 0;
+    landingPages.length = 0;
     web.homeStatus = 200;
   });
 
@@ -590,18 +743,98 @@ if (process.env.NOTRA_AUTOPILOT_TEMPLATE_FLOW_TEST !== "1") {
     expect(opened).toHaveLength(1);
   });
 
+  test("landing: a homepage AI stopped citing gets a copy-only rewrite", async () => {
+    await enable({ landing: true });
+    expect((await run(AUTOPILOT_TEMPLATE_WORKFLOW_KEYS.landing)).status).toBe(
+      "completed"
+    );
+    // Layout, a line break after return and script contents are code; hidden
+    // text isn't on the page. Only the copy rewrite passes.
+    const [relayout, lineBreak, script, hidden, rewrite] = landingRefusals;
+    for (const refusal of [relayout, lineBreak, script]) {
+      expect(refusal).toContain("Only visible text may change");
+    }
+    expect(hidden).toContain("isn't on https://emberline.dev");
+    expect(rewrite).toBeNull();
+    expect(opened).toHaveLength(1);
+    expect(opened[0]?.slug.startsWith("landing-")).toBe(true);
+    expect(opened[0]?.files.map((file) => file.path)).toEqual(["app/page.tsx"]);
+    const content = opened[0]?.files[0]?.contents ?? "";
+    expect(content).toContain(
+      '<Hero title="Serverless GPUs for open models" />'
+    );
+    expect(content).toContain('className="mx-auto max-w-5xl"');
+    expect(opened[0]?.body).toContain(
+      "| `app/page.tsx` | Deploy models fast | Serverless GPUs for open models |"
+    );
+    expect(opened[0]?.body).toContain(platform);
+    const finding = await db.query.autopilotFindings.findFirst({
+      where: eq(autopilotFindings.kind, "landing"),
+    });
+    expect(finding?.evidence.landing?.changes).toHaveLength(4);
+    expect(finding?.evidence.target).toEqual({
+      kind: "citations",
+      url: SITE,
+      promptIds: ["platform"],
+      before: 0,
+    });
+
+    // One landing update waits for review at a time.
+    await run(AUTOPILOT_TEMPLATE_WORKFLOW_KEYS.landing);
+    expect(opened).toHaveLength(1);
+  });
+
+  test("landing: with the homepage settled, a page ranking 4 to 20 in Google is next", async () => {
+    await enable({ landing: true });
+    await db.insert(autopilotFindings).values({
+      id: "settled-home",
+      organizationId: ORG,
+      kind: "landing",
+      fingerprint: "landing:emberline.dev",
+      title: "Update the copy of emberline.dev",
+      summary: "Dismissed",
+      status: "dismissed",
+    });
+    expect((await run(AUTOPILOT_TEMPLATE_WORKFLOW_KEYS.landing)).status).toBe(
+      "completed"
+    );
+    expect(landingPages).toEqual([`${SITE}/pricing`]);
+    const [offPage, shared, metadata, ownTitle] = landingRefusals;
+    expect(offPage).toContain("isn't on");
+    expect(shared).toContain("also shows on the homepage");
+    expect(metadata).toContain(
+      "isn't in https://emberline.dev/pricing's own route"
+    );
+    expect(ownTitle).toBeNull();
+    expect(opened).toHaveLength(0);
+    const finding = await db.query.autopilotFindings.findFirst({
+      where: eq(autopilotFindings.fingerprint, "landing:emberline.dev/pricing"),
+    });
+    // The copy lives in a CMS: settled without a pull request, with the reason.
+    expect(finding?.status).toBe("dismissed");
+    expect(finding?.errorMessage).toBe("The plans come from a CMS");
+    expect(finding?.evidence.landing?.signal).toBe("search");
+    expect(finding?.evidence.target).toEqual({
+      kind: "search",
+      query: "h100 hourly price",
+      before: 6,
+    });
+  });
+
   test("daily run: every enabled template acts once, and a bot wall reaches the brief", async () => {
     await enable({
       refresh: true,
       comparisons: true,
       rendering: true,
       links: true,
+      landing: true,
     });
     web.homeStatus = 403;
     const result = await run(AUTOPILOT_DAILY_WORKFLOW.key);
     expect(result.status).toBe("completed");
     expect(opened.map((pull) => pull.slug.split("-")[0]).sort()).toEqual([
       "blog",
+      "landing",
       "links",
       "refresh",
       "rendering",

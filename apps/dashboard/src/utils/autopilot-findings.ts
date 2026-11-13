@@ -66,7 +66,13 @@ export function describeFindingReason(
   if (finding.kind === "readiness") {
     return "Fixes website issues found by the readiness scan.";
   }
-  const { citations, rendering, comparison, links } = finding.evidence;
+  const { citations, rendering, comparison, links, landing } = finding.evidence;
+  if (finding.kind === "landing" && landing) {
+    const [top] = landing.queries;
+    return landing.signal === "search" && top
+      ? `Google ranks this page ${top.position} for "${top.query}"; its copy now speaks to that search.`
+      : "AI answers stopped citing this page; its copy now answers the prompts they asked.";
+  }
   if (finding.kind === "refresh" && citations) {
     return `AI answers cited this page ${percent(citations.before)} of the time a month ago and ${percent(citations.now)} now.`;
   }

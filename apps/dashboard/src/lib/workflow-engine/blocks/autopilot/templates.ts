@@ -9,6 +9,12 @@ import type { WorkflowBlockStep } from "@notra/workflows/types/blocks";
 
 import { pickComparison } from "@/lib/autopilot/comparisons";
 import {
+  checkLanding,
+  claimLanding,
+  openLandingPullRequest,
+  writeLanding,
+} from "@/lib/autopilot/landing";
+import {
   checkLinks,
   claimLinks,
   openLinksPullRequest,
@@ -29,6 +35,7 @@ import {
 import { autopilotRunConfigSchema } from "@/schemas/autopilot-workflow";
 import type {
   AutopilotRunConfig,
+  LandingState,
   LinksState,
   RefreshState,
   RenderingState,
@@ -43,7 +50,7 @@ import {
 } from "./shared";
 
 function creditsStep<
-  State extends RefreshState | RenderingState | LinksState,
+  State extends RefreshState | RenderingState | LinksState | LandingState,
 >(): WorkflowBlockStep<AutopilotRunConfig, State> {
   return {
     id: "credits",
@@ -314,6 +321,91 @@ export const templateBlocks = [
             });
           }
           const pullRequest = await openLinksPullRequest({
+            ctx: await loadAutopilotContext(context),
+            claim,
+            check,
+            fix,
+          });
+          return succeed({ findingId: claim.finding.id, ...pullRequest });
+        },
+      },
+    ],
+    finally: settleClaimedDraft,
+  }),
+  defineWorkflowBlock<typeof autopilotRunConfigSchema, LandingState>({
+    type: "autopilot.landing",
+    kind: "integration",
+    title: "Update landing page copy",
+    logo: "github",
+    configSchema: autopilotRunConfigSchema,
+    steps: [
+      {
+        id: "check",
+        title: "Find a landing page losing citations or rankings",
+        run: async (context) => {
+          const ctx = await loadAutopilotContext(context);
+          const result = await withRunLease(ctx, () => checkLanding(ctx));
+          if (!result) {
+            return halt("This run no longer owns its lease");
+          }
+          if (!result.ready) {
+            return halt(result.reason);
+          }
+          const { ready: _ready, ...check } = result;
+          return next({ check });
+        },
+      },
+      {
+        id: "claim",
+        title: "Claim the page",
+        run: async (context) => {
+          const { check } = requireStepState(context.state, "check");
+          const claimed = await claimLanding({
+            ctx: await loadAutopilotContext(context),
+            check,
+            claimToken: stepClaimToken(context),
+          });
+          return "claim" in claimed
+            ? next({ claim: claimed.claim })
+            : halt(claimed.reason);
+        },
+      },
+      creditsStep<LandingState>(),
+      {
+        id: "write",
+        title: "Rewrite the copy",
+        sideEffect: true,
+        run: async (context) => {
+          const { claim, check } = requireStepState(
+            context.state,
+            "claim",
+            "check"
+          );
+          const fix = await writeLanding({
+            ctx: await loadAutopilotContext(context),
+            claim,
+            check,
+          });
+          return next({ fix, usage: [fix.usage] });
+        },
+      },
+      {
+        id: "pull-request",
+        title: "Open the pull request",
+        sideEffect: true,
+        run: async (context) => {
+          const { claim, check, fix } = requireStepState(
+            context.state,
+            "claim",
+            "check",
+            "fix"
+          );
+          if (fix.files.length === 0) {
+            return halt("The page's copy isn't in the repository", {
+              findingId: claim.finding.id,
+            });
+          }
+          const pullRequest = await openLandingPullRequest({
             ctx: await loadAutopilotContext(context),
             claim,
             check,

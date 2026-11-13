@@ -26,6 +26,7 @@ export const AUTOPILOT_APPROVAL_GROUP_BY_KIND: Partial<
   comparisons: "posts",
   refresh: "updates",
   links: "updates",
+  landing: "updates",
   rendering: "updates",
   readiness: "fixes",
 };

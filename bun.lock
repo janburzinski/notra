@@ -194,6 +194,7 @@
         "@ai-sdk/react": "4.0.132",
         "@aws-sdk/client-s3": "catalog:",
         "@aws-sdk/s3-request-presigner": "^3.1152.0",
+        "@babel/parser": "7.29.2",
         "@base-ui/react": "catalog:",
         "@calcom/embed-react": "^1.5.3",
         "@contextcompany/otel": "^1.1.1",

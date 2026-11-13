@@ -77,7 +77,8 @@ type AutopilotDirectJob =
   | "refresh"
   | "comparisons"
   | "rendering"
-  | "links";
+  | "links"
+  | "landing";
 
 export type AutopilotObservationJob = Exclude<
   AutopilotJobKind,
