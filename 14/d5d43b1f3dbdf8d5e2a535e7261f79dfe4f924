@@ -1,0 +1,20 @@
+apps/dashboard/src/components/chat-input.tsx
+  s_87e5be46483967::t_825c2490eaf64e 165
+  s_87e5be46483967::t_62ed95af312f86 180
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "14d5d43b1f3dbdf8d5e2a535e7261f79dfe4f924",
+  "prompts": {},
+  "sessions": {
+    "s_87e5be46483967": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f0582387-ea9c-4e2f-9092-6ea415257b65",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
