@@ -305,6 +305,8 @@ jobs:
     runs-on: depot-ubuntu-24.04
     # Depot runner boot counts against this budget and can take several minutes.
     timeout-minutes: 10
+    permissions:
+      actions: read
     steps:
       - name: Require all quality checks
         env:
@@ -315,3 +317,28 @@ jobs:
           test "$CHANGES_RESULT" = success
           test "$CHECKS_RESULT" = success
           [ "$INFRASTRUCTURE_RESULT" = success ] || [ "$INFRASTRUCTURE_RESULT" = skipped ]
+
+      # The repository cannot require checks before merging, so a red main is
+      # only noticed here. It also blocks production releases.
+      - name: Alert Slack when main goes red
+        if: failure() && github.event_name == 'push'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SLACK_WEBHOOK_URL: ${{ secrets.GEO_SCAN_ALERT_WEBHOOK_URL || secrets.SLACK_DEPLOY_WEBHOOK_URL }}
+          COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          if [ -z "$SLACK_WEBHOOK_URL" ]; then
+            echo "::warning::GEO_SCAN_ALERT_WEBHOOK_URL is not set; no Slack alert sent."
+            exit 0
+          fi
+          failed=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID/jobs?per_page=100" \
+            --jq '[.jobs[] | select(.conclusion == "failure" or .conclusion == "timed_out") | .name] | join(", ")') || failed=""
+          details="Commit: \`${GITHUB_SHA::10}\` ${COMMIT_MESSAGE%%$'\n'*}"$'\n'"Failed: ${failed:-unknown}"$'\n'"Fix main before merging anything else."
+          jq -n --arg details "$details" --arg url "$RUN_URL" '{
+            text: ":rotating_light: main is red: Code quality failed",
+            blocks: [
+              { type: "section", text: { type: "mrkdwn", text: "*:rotating_light: main is red: Code quality failed*\n\($details)" } },
+              { type: "actions", elements: [ { type: "button", text: { type: "plain_text", text: "Open run" }, url: $url } ] }
+            ]
+          }' | curl -fsS -X POST -H "Content-Type: application/json" --data @- "$SLACK_WEBHOOK_URL" > /dev/null

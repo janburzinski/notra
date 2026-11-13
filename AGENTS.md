@@ -35,8 +35,14 @@ Explicit requirements and this repo's conventions take precedence. Companion
 - Use the repository's Ultracite/Oxlint/Oxfmt configuration, not a separate
   style guide. Run `bun run check` and the affected workspaces' tests, type
   checks, and builds as appropriate. Vite builds do not perform type checking.
-- The pre-commit hook formats staged supported files and runs Knip. Do not
-  overwrite unrelated or partially staged changes to make it pass.
+- The pre-commit hook formats staged supported files, regenerates
+  `apps/blog/scripts/web-chrome.js` when `apps/web`, `packages/ui`,
+  `packages/utils` or `bun.lock` change, and runs Knip. Do not overwrite
+  unrelated or partially staged changes to make it pass.
+- GitHub cannot require checks on this repository, so nothing blocks a red
+  merge. Never merge a pull request while any `Code quality` check fails, even
+  one that looks unrelated; a red `main` blocks production releases and every
+  later PR. If `main` is red, fix it before merging anything else.
 - Never use production credentials or customer data for verification.
 - Before adding or swapping any third-party SDK, external API, hosting provider,
   AI gateway, AI provider called directly, model from a maker not yet on

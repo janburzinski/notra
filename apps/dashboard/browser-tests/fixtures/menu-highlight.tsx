@@ -11,6 +11,9 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@notra/ui/components/ui/dropdown-menu";
 import { createRoot } from "react-dom/client";
@@ -23,6 +26,12 @@ function MenuHighlightFixture() {
         <DropdownMenuContent>
           <DropdownMenuItem>Overview</DropdownMenuItem>
           <DropdownMenuItem>Prompts</DropdownMenuItem>
+          <DropdownMenuSub>
+            <DropdownMenuSubTrigger>Share</DropdownMenuSubTrigger>
+            <DropdownMenuSubContent>
+              <DropdownMenuItem>Copy link</DropdownMenuItem>
+            </DropdownMenuSubContent>
+          </DropdownMenuSub>
         </DropdownMenuContent>
       </DropdownMenu>
       <ContextMenu>

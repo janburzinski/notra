@@ -125,16 +125,28 @@ describe.each(["dashboard", "web"])("%s menu highlights", (theme) => {
     }
   });
 
-  test.each([false, true])(
-    "open submenu stays highlighted, dark=%s",
-    async (dark) => {
+  test.each([
+    ["context", false],
+    ["context", true],
+    ["dropdown", false],
+    ["dropdown", true],
+  ] as const)(
+    "open %s submenu stays highlighted, dark=%s",
+    async (menu, dark) => {
       const page = await browser.newPage();
       await page.goto(`${baseUrl}/${theme}${dark ? "?dark" : ""}`);
-      await page.getByTestId("context-trigger").click({ button: "right" });
-      const trigger = page.getByRole("menuitem", { name: "More", exact: true });
+      if (menu === "context") {
+        await page.getByTestId("context-trigger").click({ button: "right" });
+      } else {
+        await page.getByRole("button", { name: "Open menu" }).click();
+      }
+      const trigger = page.getByRole("menuitem", {
+        name: menu === "context" ? "More" : "Share",
+        exact: true,
+      });
       await trigger.hover();
       const child = page.getByRole("menuitem", {
-        name: "Child action",
+        name: menu === "context" ? "Child action" : "Copy link",
         exact: true,
       });
       await child.hover();

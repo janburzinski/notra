@@ -24,4 +24,21 @@ if [ -s "$files" ]; then
   git --literal-pathspecs add --pathspec-from-file="$files" --pathspec-file-nul
 fi
 
+# apps/blog/scripts/web-chrome.js is bundled from these sources; CI fails when it is stale.
+chrome_sources='apps/web packages/ui packages/utils bun.lock'
+chrome_outputs='apps/blog/scripts/web-chrome.js apps/blog/public/licenses/web-chrome.txt'
+# shellcheck disable=SC2086
+if ! git diff --cached --quiet -- $chrome_sources; then
+  # Unstaged edits in either place would be bundled or overwritten.
+  # shellcheck disable=SC2086
+  if git diff --quiet -- $chrome_sources $chrome_outputs; then
+    # No env file: CI builds it without one, and the bundle ships publicly.
+    (cd apps/web && bun --no-env-file run blog:chrome > /dev/null)
+    # shellcheck disable=SC2086
+    git add $chrome_outputs
+  else
+    printf "Not regenerating apps/blog/scripts/web-chrome.js: unstaged changes under %s %s.\nRun bun run blog:chrome in apps/web before pushing.\n" "$chrome_sources" "$chrome_outputs" >&2
+  fi
+fi
+
 bun knip
