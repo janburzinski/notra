@@ -1,0 +1,22 @@
+scripts/github/production-deploy.mjs
+  s_673745a4f2f52f::t_bebc62dfbf8772 396-407,413,417-418
+scripts/github/production-deploy.test.mjs
+  s_673745a4f2f52f::t_18f84506d129c8 1587-1628
+  s_673745a4f2f52f::t_f93970723517c2 356-357,1335-1338
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "da244dd39bdc5c075a131bd9dfe74fe8a4ceeb52",
+  "prompts": {},
+  "sessions": {
+    "s_673745a4f2f52f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "41c3de73-071e-4473-b094-b0db24729964",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
