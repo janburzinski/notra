@@ -1,0 +1,28 @@
+apps/dashboard/src/components/chat/chat-input.tsx
+  s_3428b476267439::t_464df027f43e88 876-877,879
+  s_3428b476267439::t_b15d9a2790fb02 174,184,196,201-202,204-206,221,1759,1762-1770,1867
+apps/dashboard/messages/en.json
+  s_3428b476267439::t_540344454713ad 6706-6707
+apps/dashboard/messages/de.json
+  s_3428b476267439::t_540344454713ad 6706-6707
+apps/dashboard/src/lib/hooks/use-chat-tool-approvals.ts
+  s_3428b476267439::t_540344454713ad 5-6,33,41,52-62,68-73,76,78-81
+apps/dashboard/src/app/(dashboard)/[slug]/chat/page-client.tsx
+  s_3428b476267439::t_540344454713ad 1137-1138
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "cce2c61448302f40337a618e35e991dc2cc9ee54",
+  "prompts": {},
+  "sessions": {
+    "s_3428b476267439": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c6d39551-e687-4036-a65c-3bd92bb74947",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
