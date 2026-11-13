@@ -9,11 +9,11 @@ import {
   TableHeader,
   TableRow,
 } from "@notra/ui/components/ui/table";
-import { Tabs, TabsList, TabsTrigger } from "@notra/ui/components/ui/tabs";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import dynamic from "next/dynamic";
 import { useState } from "react";
 
+import { InsightsPageHeader } from "@/components/insights/insights-page-header";
 import { SiteQueryError } from "@/components/sites/site-query-error";
 import {
   SiteStatCard,
@@ -197,26 +197,13 @@ export function SlackBotClient() {
 
   return (
     <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-6 px-4 py-6 lg:px-6">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-        <div className="flex flex-col gap-1">
-          <h1 className="text-2xl font-semibold tracking-tight">Slack Bot</h1>
-          <p className="text-muted-foreground text-sm">
-            How the Notra agent is used in Slack across every workspace.
-          </p>
-        </div>
-        <Tabs onValueChange={(value: number) => setDays(value)} value={days}>
-          <TabsList
-            aria-label="Time range"
-            className="group-data-[orientation=horizontal]/tabs:h-8"
-          >
-            {SLACK_BOT_RANGE_OPTIONS.map((option) => (
-              <TabsTrigger key={option.value} value={option.value}>
-                {option.label}
-              </TabsTrigger>
-            ))}
-          </TabsList>
-        </Tabs>
-      </div>
+      <InsightsPageHeader
+        days={days}
+        description="How the Notra agent is used in Slack across every workspace."
+        onDaysChange={setDays}
+        options={SLACK_BOT_RANGE_OPTIONS}
+        title="Slack Bot"
+      />
 
       {insightsQuery.isError && !insights ? (
         <SiteQueryError

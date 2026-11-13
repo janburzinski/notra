@@ -3,6 +3,7 @@ import { autopilotRouter } from "./routers/autopilot";
 import { freeScansRouter } from "./routers/free-scans";
 import { integrationsRouter } from "./routers/integrations";
 import { moderationRouter } from "./routers/moderation";
+import { overviewRouter } from "./routers/overview";
 import { reviewRouter } from "./routers/review";
 import { sitesRouter } from "./routers/sites";
 import { skillsRouter } from "./routers/skills";
@@ -14,6 +15,7 @@ export const consoleRouter = {
   freeScans: freeScansRouter,
   integrations: integrationsRouter,
   moderation: moderationRouter,
+  overview: overviewRouter,
   review: reviewRouter,
   sites: sitesRouter,
   skills: skillsRouter,

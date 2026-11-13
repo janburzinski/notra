@@ -3,6 +3,7 @@
 import {
   AiSearch02Icon,
   ChartLineData01Icon,
+  DashboardSquare01Icon,
   GiftIcon,
   GlobeIcon,
   Logout01Icon,
@@ -93,7 +94,7 @@ function OrganizationSwitcher({
       return;
     }
 
-    router.push(`/${organization.slug}/integrations`);
+    router.push(`/${organization.slug}`);
     router.refresh();
   }
 
@@ -177,7 +178,11 @@ function ConsoleNavigation({
   slug: string;
 }) {
   const pathname = usePathname();
+  const overviewHref = `/${slug}`;
   const items = [
+    ...(isAdmin
+      ? [{ href: overviewHref, label: "Overview", icon: DashboardSquare01Icon }]
+      : []),
     {
       href: `/${slug}/integrations`,
       label: "Integrations",
@@ -237,7 +242,11 @@ function ConsoleNavigation({
           {items.map((item) => (
             <SidebarMenuItem key={item.href}>
               <SidebarMenuButton
-                isActive={pathname.startsWith(item.href)}
+                isActive={
+                  item.href === overviewHref
+                    ? pathname === overviewHref
+                    : pathname.startsWith(item.href)
+                }
                 render={
                   <Link href={item.href}>
                     <HugeiconsIcon icon={item.icon} />

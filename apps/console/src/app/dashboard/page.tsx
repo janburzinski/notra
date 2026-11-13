@@ -11,7 +11,7 @@ export default async function DashboardPage() {
     organizations[0];
 
   if (organization) {
-    redirect(`/${organization.slug}/integrations`);
+    redirect(`/${organization.slug}`);
   }
 
   return <CreateWorkspace />;
