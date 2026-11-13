@@ -24,6 +24,7 @@ export const GitHubAppRepositoryResponseSchema = Schema.Struct({
   private: Schema.Boolean,
   description: Schema.NullOr(Schema.String),
   default_branch: Schema.String,
+  pushed_at: Schema.optional(Schema.NullOr(Schema.String)),
   owner: Schema.Struct({
     login: Schema.String,
   }),
@@ -41,6 +42,8 @@ export const GitHubAppRepositorySchema = Schema.Struct({
   private: Schema.Boolean,
   description: Schema.NullOr(Schema.String),
   defaultBranch: Schema.String,
+  /** Last push to any branch; missing in lists cached before it was read. */
+  pushedAt: Schema.optional(Schema.NullOr(Schema.String)),
 });
 
 export const GitHubAppRepositoryCacheSchema = Schema.Array(

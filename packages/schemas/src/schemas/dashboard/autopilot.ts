@@ -4,6 +4,7 @@ import {
   AUTOPILOT_AUTOMATION_KINDS,
   AUTOPILOT_DRAFT_EMAIL_MODES,
   AUTOPILOT_JOB_KINDS,
+  AUTOPILOT_MAX_SOURCE_REPOSITORIES,
 } from "@notra/db/constants/autopilot";
 import { organizationIdSchema } from "@notra/schemas/dashboard/auth/organization";
 // biome-ignore lint/performance/noNamespaceImport: Zod recommended way of importing
@@ -158,6 +159,11 @@ export const autopilotRepositoryPathSchema = z
   .max(200)
   .regex(REPOSITORY_PATH_PATTERN, "Use a path inside the repository");
 
+const autopilotSourceRepositoriesSchema = z
+  .array(z.string().max(201).regex(GITHUB_FULL_NAME_PATTERN, "Use owner/name"))
+  .max(AUTOPILOT_MAX_SOURCE_REPOSITORIES)
+  .transform(uniqueLowercase);
+
 /** Author and path filters for the pull requests "Write about releases" reads. */
 export const autopilotCommitFiltersSchema = z.object({
   excludedAuthors: z
@@ -188,12 +194,19 @@ export const autopilotCommitFiltersSchema = z.object({
         Object.entries(merged).filter(([, values]) => values.length > 0)
       );
     }),
+  /** Older clients leave it out; empty means automatic. */
+  repositories: autopilotSourceRepositoriesSchema.default([]),
 });
 
-/** Replaces the commit filters as a whole, like a job toggle. */
+/**
+ * Changes only the filters it names. The repository pick and the author/path
+ * filters are edited in different places and must not overwrite each other.
+ */
 export const autopilotSetCommitFiltersInputSchema =
   autopilotOrganizationInputSchema.extend({
-    filters: autopilotCommitFiltersSchema,
+    filters: autopilotCommitFiltersSchema
+      .extend({ repositories: autopilotSourceRepositoriesSchema })
+      .partial(),
   });
 
 /** Turns one job on or off without resending the whole settings form. */

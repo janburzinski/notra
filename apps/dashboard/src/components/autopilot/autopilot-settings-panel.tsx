@@ -14,7 +14,6 @@ import {
   RefreshIcon,
   SlackIcon,
 } from "@hugeicons/core-free-icons";
-import { HugeiconsIcon } from "@hugeicons/react";
 import { Input } from "@notra/ui/components/ui/input";
 import {
   Select,
@@ -31,6 +30,8 @@ import { useTranslations } from "use-intl";
 import { AutopilotReleaseFiltersSection } from "@/components/autopilot/autopilot-release-filters-section";
 import { AutopilotRepositoryPicker } from "@/components/autopilot/autopilot-repository-picker";
 import { AutopilotRulesSection } from "@/components/autopilot/autopilot-rules-section";
+import { AutopilotSettingsRow } from "@/components/autopilot/autopilot-settings-row";
+import { AutopilotSourceRepositoriesRow } from "@/components/autopilot/autopilot-source-repositories-row";
 import { Button } from "@/components/button";
 import {
   AUTOPILOT_DRAFT_EMAIL_OPTIONS,
@@ -41,42 +42,9 @@ import { AUTOPILOT_NO_SITE } from "@/constants/autopilot-publish";
 import { AUTOPILOT_SLACK_CHANNEL_HINT } from "@/constants/autopilot-slack";
 import { useAutopilotConnections } from "@/lib/hooks/use-autopilot-connections";
 import { dashboardOrpc } from "@/lib/orpc/query";
-import type {
-  AutopilotSettingsRowProps,
-  AutopilotSettingsPanelProps,
-} from "@/types/autopilot";
+import type { AutopilotSettingsPanelProps } from "@/types/autopilot";
 import { toAutopilotSaveInput, toStaleDays } from "@/utils/autopilot-settings";
 import { toErrorMessage } from "@/utils/error-message";
-
-function SettingsRow({
-  icon,
-  label,
-  description,
-  htmlFor,
-  children,
-}: AutopilotSettingsRowProps) {
-  return (
-    <div className="flex min-h-14 items-center gap-3 px-4 py-2.5">
-      <HugeiconsIcon
-        aria-hidden="true"
-        className="text-muted-foreground size-4 shrink-0"
-        icon={icon}
-        strokeWidth={1.75}
-      />
-      <div className="min-w-0 flex-1">
-        <label className="text-sm font-medium" htmlFor={htmlFor}>
-          {label}
-        </label>
-        {description ? (
-          <p className="text-muted-foreground text-xs text-pretty">
-            {description}
-          </p>
-        ) : null}
-      </div>
-      <div className="flex shrink-0 items-center">{children}</div>
-    </div>
-  );
-}
 
 /** Every change saves on its own; there is no form to submit. */
 export function AutopilotSettingsPanel({
@@ -172,7 +140,7 @@ export function AutopilotSettingsPanel({
       <div className="border-shell-border bg-shell rounded-2xl border p-0.5">
         <div className="divide-table-row-border shadow-table-card bg-table-card border-table-card-border divide-y overflow-hidden rounded-[14px] border">
           {overview.sites.length > 0 || settings.siteId ? (
-            <SettingsRow
+            <AutopilotSettingsRow
               htmlFor="autopilot-site"
               icon={Globe02Icon}
               label={t("site")}
@@ -197,11 +165,11 @@ export function AutopilotSettingsPanel({
                   ))}
                 </SelectContent>
               </Select>
-            </SettingsRow>
+            </AutopilotSettingsRow>
           ) : null}
           {settings.siteId ? null : (
             <>
-              <SettingsRow
+              <AutopilotSettingsRow
                 htmlFor="autopilot-repository"
                 icon={Github01Icon}
                 label="Repository"
@@ -232,8 +200,8 @@ export function AutopilotSettingsPanel({
                     Connect
                   </Button>
                 )}
-              </SettingsRow>
-              <SettingsRow
+              </AutopilotSettingsRow>
+              <AutopilotSettingsRow
                 description={t("blogFolderDescription")}
                 htmlFor="autopilot-blog-folder"
                 icon={Folder01Icon}
@@ -258,10 +226,17 @@ export function AutopilotSettingsPanel({
                   }}
                   placeholder={t("blogFolderPlaceholder")}
                 />
-              </SettingsRow>
+              </AutopilotSettingsRow>
             </>
           )}
-          <SettingsRow
+          {githubConnected ? (
+            <AutopilotSourceRepositoriesRow
+              filters={settings.commitFilters}
+              organizationId={organizationId}
+              repositories={repositories}
+            />
+          ) : null}
+          <AutopilotSettingsRow
             description={
               slackIntegration ? AUTOPILOT_SLACK_CHANNEL_HINT : undefined
             }
@@ -310,8 +285,8 @@ export function AutopilotSettingsPanel({
                 Connect
               </Button>
             )}
-          </SettingsRow>
-          <SettingsRow
+          </AutopilotSettingsRow>
+          <AutopilotSettingsRow
             description="Owners get these emails only while Drafts to review is on in Settings → Notifications"
             htmlFor="autopilot-draft-emails"
             icon={Mail01Icon}
@@ -340,8 +315,8 @@ export function AutopilotSettingsPanel({
                 ))}
               </SelectContent>
             </Select>
-          </SettingsRow>
-          <SettingsRow
+          </AutopilotSettingsRow>
+          <AutopilotSettingsRow
             htmlFor="autopilot-brief-hour"
             icon={Clock01Icon}
             label="Brief at"
@@ -364,8 +339,8 @@ export function AutopilotSettingsPanel({
                 ))}
               </SelectContent>
             </Select>
-          </SettingsRow>
-          <SettingsRow
+          </AutopilotSettingsRow>
+          <AutopilotSettingsRow
             htmlFor="autopilot-stale-days"
             icon={Archive02Icon}
             label="Close untouched drafts"
@@ -395,8 +370,8 @@ export function AutopilotSettingsPanel({
                 ))}
               </SelectContent>
             </Select>
-          </SettingsRow>
-          <SettingsRow
+          </AutopilotSettingsRow>
+          <AutopilotSettingsRow
             htmlFor="autopilot-prompt-cleanup"
             icon={AiChat01Icon}
             label="Suggest pausing dead prompts"
@@ -406,8 +381,8 @@ export function AutopilotSettingsPanel({
               id="autopilot-prompt-cleanup"
               onCheckedChange={(checked) => setPromptCleanup.mutate(checked)}
             />
-          </SettingsRow>
-          <SettingsRow
+          </AutopilotSettingsRow>
+          <AutopilotSettingsRow
             htmlFor="autopilot-enabled"
             icon={PowerIcon}
             label="Autopilot"
@@ -419,7 +394,7 @@ export function AutopilotSettingsPanel({
                 save.mutate({ enabled: checked });
               }}
             />
-          </SettingsRow>
+          </AutopilotSettingsRow>
         </div>
       </div>
       <section
@@ -437,7 +412,7 @@ export function AutopilotSettingsPanel({
         <div className="border-shell-border bg-shell rounded-2xl border p-0.5">
           <div className="divide-table-row-border shadow-table-card bg-table-card border-table-card-border divide-y overflow-hidden rounded-[14px] border">
             {approvalRows.map((row) => (
-              <SettingsRow
+              <AutopilotSettingsRow
                 htmlFor={`autopilot-approval-${row.group}`}
                 icon={row.icon}
                 key={row.group}
@@ -469,7 +444,7 @@ export function AutopilotSettingsPanel({
                     ))}
                   </SelectContent>
                 </Select>
-              </SettingsRow>
+              </AutopilotSettingsRow>
             ))}
           </div>
         </div>

@@ -573,6 +573,12 @@ export interface AutopilotTagInputProps {
   separator?: RegExp;
 }
 
+export interface AutopilotSourceRepositoriesRowProps {
+  organizationId: string;
+  filters: AutopilotCommitFilters;
+  repositories: AutopilotRepositoryOption[];
+}
+
 export interface AutopilotReleaseFiltersSectionProps {
   organizationId: string;
   githubConnected: boolean;

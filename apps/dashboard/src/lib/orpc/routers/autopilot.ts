@@ -28,7 +28,7 @@ import {
   autopilotSetJobInputSchema,
 } from "@notra/schemas/dashboard/autopilot";
 import { os } from "@orpc/server";
-import { and, desc, eq, inArray } from "drizzle-orm";
+import { and, desc, eq, inArray, sql } from "drizzle-orm";
 import { Effect } from "effect";
 
 import {
@@ -400,6 +400,7 @@ export const autopilotRouter = {
         fullName: repository.fullName,
         defaultBranch: repository.defaultBranch,
         private: repository.private,
+        pushedAt: repository.pushedAt ?? null,
       }));
     }),
 
@@ -408,10 +409,17 @@ export const autopilotRouter = {
     .input(autopilotOrganizationInputSchema)
     .use(withOrganizationAccess)
     .use(withAutopilotFlag)
-    .handler(({ input, context }) => {
+    .handler(async ({ input, context }) => {
       // Admins only: the list names people from private repositories.
       assertCanManageAutopilot(context);
-      return listRecentPullRequestAuthors(input.organizationId);
+      const settings = await db.query.autopilotSettings.findFirst({
+        columns: { commitFilters: true },
+        where: eq(autopilotSettings.organizationId, input.organizationId),
+      });
+      return listRecentPullRequestAuthors(
+        input.organizationId,
+        toAutopilotCommitFilters(settings?.commitFilters)
+      );
     }),
 
   save: authorizedProcedure
@@ -444,7 +452,11 @@ export const autopilotRouter = {
       assertCanManageAutopilot(context);
       const [updated] = await db
         .update(autopilotSettings)
-        .set({ commitFilters: input.filters })
+        // Merged in the database, so two saves of different fields can't
+        // undo each other whatever the client last read.
+        .set({
+          commitFilters: sql`coalesce(${autopilotSettings.commitFilters}, '{}'::jsonb) || ${JSON.stringify(input.filters)}::jsonb`,
+        })
         .where(eq(autopilotSettings.organizationId, input.organizationId))
         .returning({ organizationId: autopilotSettings.organizationId });
       if (!updated) {

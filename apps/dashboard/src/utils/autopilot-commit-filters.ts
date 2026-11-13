@@ -4,6 +4,7 @@ import {
   AUTOPILOT_AUTHOR_PRESETS_SHOWN,
   AUTOPILOT_CHORE_AUTHOR_MIN_PULL_REQUESTS,
   AUTOPILOT_CHORE_AUTHOR_MIN_SHARE,
+  AUTOPILOT_COMMITS_MAX_REPOSITORIES,
   AUTOPILOT_DEFAULT_COMMIT_FILTERS,
   AUTOPILOT_WELL_KNOWN_BOTS,
 } from "@/constants/autopilot";
@@ -16,6 +17,74 @@ export function toAutopilotCommitFilters(
   saved: Partial<AutopilotCommitFilters> | null | undefined
 ): AutopilotCommitFilters {
   return { ...AUTOPILOT_DEFAULT_COMMIT_FILTERS, ...saved };
+}
+
+/** Newest push first; repositories without a push time go last. */
+export function sortByRecentPush<T extends { pushedAt?: string | null }>(
+  repositories: readonly T[]
+): T[] {
+  const pushed = (repository: T) =>
+    repository.pushedAt ? Date.parse(repository.pushedAt) || 0 : 0;
+  return [...repositories].sort((a, b) => pushed(b) - pushed(a));
+}
+
+/**
+ * The repositories "Write about releases" reads: the picked ones, or without
+ * a pick the most recently pushed, so an old or archived repository never
+ * takes the place of the product.
+ */
+export function selectAutopilotSourceRepositories<
+  T extends { fullName: string; pushedAt?: string | null },
+>(repositories: readonly T[], filters: AutopilotCommitFilters): T[] {
+  if (filters.repositories.length > 0) {
+    const picked = new Set(filters.repositories);
+    return repositories.filter((repository) =>
+      picked.has(repository.fullName.toLowerCase())
+    );
+  }
+  return sortByRecentPush(repositories).slice(
+    0,
+    AUTOPILOT_COMMITS_MAX_REPOSITORIES
+  );
+}
+
+/** Which repositories are read right now, for the "Read from" row. */
+export function autopilotSourceSummary(
+  repositories: readonly {
+    fullName: string;
+    name: string;
+    pushedAt?: string | null;
+  }[],
+  picked: string[]
+) {
+  const read = selectAutopilotSourceRepositories(repositories, {
+    ...AUTOPILOT_DEFAULT_COMMIT_FILTERS,
+    repositories: picked,
+  });
+  const names = sortByRecentPush(read)
+    .map((repository) => repository.name)
+    .join(", ");
+  if (picked.length === 0) {
+    return names ? `Most recently pushed: ${names}` : undefined;
+  }
+  if (read.length === 0) {
+    return "None of the picked repositories are connected anymore, so nothing is read";
+  }
+  const missing = picked.length - read.length;
+  return missing > 0
+    ? `Only ${names} · ${missing} no longer connected`
+    : `Only ${names}`;
+}
+
+/** Why a repository is left out, or null when it is read. */
+export function excludedRepositoryReason(
+  filters: AutopilotCommitFilters,
+  fullName: string
+) {
+  return filters.repositories.length > 0 &&
+    !filters.repositories.includes(fullName.toLowerCase())
+    ? `${fullName} is not one of the chosen repositories`
+    : null;
 }
 
 /** Why a pull request's author keeps it out, or null when it may count. */

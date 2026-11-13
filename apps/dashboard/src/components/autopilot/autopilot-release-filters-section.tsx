@@ -65,10 +65,14 @@ export function AutopilotReleaseFiltersSection({
   const presets = autopilotAuthorPresets(authors, filters.excludedAuthors);
   const save = useMutation({
     scope: { id: `autopilot-commit-filters:${organizationId}` },
+    // Sends only the authors and paths; the server keeps the repository pick.
     mutationFn: (edit: { filters: AutopilotCommitFilters; version: number }) =>
       dashboardOrpc.autopilot.setCommitFilters.call({
         organizationId,
-        filters: edit.filters,
+        filters: {
+          excludedAuthors: edit.filters.excludedAuthors,
+          paths: edit.filters.paths,
+        },
       }),
     onError: (error) =>
       toast.error(toErrorMessage(error, "Could not save the filter")),

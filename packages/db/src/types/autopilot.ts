@@ -37,6 +37,11 @@ export interface AutopilotCommitFilters {
    * repository counts only when one of its changed files matches.
    */
   paths: Record<string, string[]>;
+  /**
+   * Lowercase owner/name of the repositories to read. Empty reads the most
+   * recently pushed ones the GitHub App can see.
+   */
+  repositories: string[];
 }
 
 export interface AutopilotFindingEvidence {

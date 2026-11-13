@@ -5,6 +5,7 @@ import type { AutopilotRepository } from "@/types/autopilot";
 import type { AutopilotOctokit } from "@/types/autopilot-runtime";
 import {
   excludedAuthorReason,
+  excludedRepositoryReason,
   matchesAnyRepositoryPath,
   outsidePathsReason,
   repositoryPathFilter,
@@ -50,7 +51,7 @@ async function pullRequestTouchesPaths(
 
 /**
  * Why a pull request stays out of "Write about releases", or null when it
- * counts. The author check costs nothing; changed files are read only when the
+ * counts. The repository and author checks cost nothing; changed files are read only when the
  * repository has a path filter. Runs before Jev, so a filtered pull request
  * never costs a model call. `@notra` mentions skip this: an explicit ask wins.
  */
@@ -61,6 +62,10 @@ export async function commitFilterSkipReason(params: {
   getOctokit: () => Promise<AutopilotOctokit | null>;
 }) {
   const { filters, repository, pull } = params;
+  const outside = excludedRepositoryReason(filters, repository.fullName);
+  if (outside) {
+    return outside;
+  }
   const author = excludedAuthorReason(filters, pull.author);
   if (author) {
     return author;

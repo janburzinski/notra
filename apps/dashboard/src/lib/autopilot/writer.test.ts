@@ -93,7 +93,7 @@ if (process.env.NOTRA_AUTOPILOT_WRITER_TEST !== "1") {
       approvals: { posts: "ask", updates: "ask", fixes: "ask" } as const,
       siteId: null,
       stalePullRequestDays: null,
-      commitFilters: { excludedAuthors: [], paths: {} },
+      commitFilters: { excludedAuthors: [], paths: {}, repositories: [] },
       brand: null,
     },
     log: {

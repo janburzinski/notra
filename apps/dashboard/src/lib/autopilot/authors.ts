@@ -1,31 +1,36 @@
 import { listGitHubAppRepositoriesEffect } from "@notra/ai/integrations/github";
 import { redis } from "@notra/ai/utils/redis";
+import type { AutopilotCommitFilters } from "@notra/db/types/autopilot";
 import { Effect } from "effect";
 
 import {
   AUTOPILOT_AUTHOR_SUGGESTION_CACHE_SECONDS,
   AUTOPILOT_AUTHOR_SUGGESTION_DAYS,
   AUTOPILOT_AUTHOR_SUGGESTION_MAX,
-  AUTOPILOT_COMMITS_MAX_REPOSITORIES,
 } from "@/constants/autopilot";
 import { getInstallationOctokit } from "@/lib/autopilot/github";
 import type { AutopilotAuthorSuggestion } from "@/types/autopilot";
+import { selectAutopilotSourceRepositories } from "@/utils/autopilot-commit-filters";
 import {
   isBotAuthor,
   isNotraPullRequest,
   isPostCandidateTitle,
 } from "@/utils/autopilot-github";
 
-function cacheKey(organizationId: string) {
-  return `autopilot:authors:v2:${organizationId}`;
+/** Per pick of repositories, so changing the pick shows its authors at once. */
+function cacheKey(organizationId: string, filters: AutopilotCommitFilters) {
+  return `autopilot:authors:v3:${organizationId}:${filters.repositories.join(",")}`;
 }
 
-async function readAuthors(organizationId: string) {
+async function readAuthors(
+  organizationId: string,
+  filters: AutopilotCommitFilters
+) {
   const repositories = await Effect.runPromise(
     listGitHubAppRepositoriesEffect(organizationId)
   ).catch(() => []);
   // The repositories the daily job reads; one list call each.
-  const selected = repositories.slice(0, AUTOPILOT_COMMITS_MAX_REPOSITORIES);
+  const selected = selectAutopilotSourceRepositories(repositories, filters);
   const owners = [...new Set(selected.map((repository) => repository.owner))];
   const octokits = new Map(
     await Promise.all(
@@ -98,19 +103,19 @@ async function readAuthors(organizationId: string) {
  * GitHub isn't connected.
  */
 export async function listRecentPullRequestAuthors(
-  organizationId: string
+  organizationId: string,
+  filters: AutopilotCommitFilters
 ): Promise<AutopilotAuthorSuggestion[]> {
+  const key = cacheKey(organizationId, filters);
   const cached = redis
-    ? await redis
-        .get<AutopilotAuthorSuggestion[]>(cacheKey(organizationId))
-        .catch(() => null)
+    ? await redis.get<AutopilotAuthorSuggestion[]>(key).catch(() => null)
     : null;
   if (Array.isArray(cached)) {
     return cached;
   }
-  const authors = await readAuthors(organizationId);
+  const authors = await readAuthors(organizationId, filters);
   await redis
-    ?.set(cacheKey(organizationId), JSON.stringify(authors), {
+    ?.set(key, JSON.stringify(authors), {
       ex: AUTOPILOT_AUTHOR_SUGGESTION_CACHE_SECONDS,
     })
     .catch(() => undefined);

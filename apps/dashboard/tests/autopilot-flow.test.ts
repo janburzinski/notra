@@ -600,7 +600,7 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
     await import("../src/utils/autopilot-branches");
   const { listRecentPullRequestAuthors } =
     await import("../src/lib/autopilot/authors");
-  const { autopilotAuthorPresets } =
+  const { autopilotAuthorPresets, toAutopilotCommitFilters } =
     await import("../src/utils/autopilot-commit-filters");
   const now = new Date();
   await db.insert(organizations).values({
@@ -1114,18 +1114,20 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
       "renovate[bot]",
       "github-actions[bot]",
     ]);
-    await db
-      .update(autopilotSettings)
-      .set({
-        commitFilters: {
-          excludedAuthors: [
-            ...(settings?.commitFilters.excludedAuthors ?? []),
-            "excluded-dev",
-          ],
-          paths: { "sandbox/app": ["apps/web"] },
-        },
-      })
-      .where(eq(autopilotSettings.organizationId, "sandbox-org"));
+    const filters = {
+      excludedAuthors: [
+        ...(settings?.commitFilters.excludedAuthors ?? []),
+        "excluded-dev",
+      ],
+      paths: { "sandbox/app": ["apps/web"] },
+      repositories: [] as string[],
+    };
+    const setFilters = (repositories: string[]) =>
+      db
+        .update(autopilotSettings)
+        .set({ commitFilters: { ...filters, repositories } })
+        .where(eq(autopilotSettings.organizationId, "sandbox-org"));
+    await setFilters([]);
     state.changedFiles = {
       8: ["docs/readme.md"],
       9: ["docs/readme.md", "apps/web/src/page.tsx"],
@@ -1141,6 +1143,13 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
     await handleAutopilotPullRequestEvent(event(9));
     expect(classificationInputs).toHaveLength(1);
     expect(comments).toHaveLength(1);
+    // A pick of repositories leaves every other one out, even a change
+    // under the paths.
+    state.changedFiles[10] = ["apps/web/src/picked.tsx"];
+    await setFilters(["sandbox/other"]);
+    await handleAutopilotPullRequestEvent(event(10));
+    expect(classificationInputs).toHaveLength(1);
+    await setFilters([]);
 
     // The daily job: the same filters, logged as skips in the run.
     classificationInputs.length = 0;
@@ -1198,7 +1207,10 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
       { number: 24, title: "chore: bump deps", login: "Deps-Person" },
       { number: 25, title: "ci: cache", login: "deps-person" }
     );
-    const authors = await listRecentPullRequestAuthors("sandbox-org");
+    const authors = await listRecentPullRequestAuthors(
+      "sandbox-org",
+      toAutopilotCommitFilters(null)
+    );
     expect(authors.find((author) => author.login === "helper[bot]")?.bot).toBe(
       true
     );

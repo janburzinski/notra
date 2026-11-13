@@ -47,6 +47,12 @@ export const AUTOPILOT_SCHEDULED_TRIGGERS = [
   "onboarding",
 ] as const;
 
+/**
+ * How many repositories a workspace may pick for "Write about releases". Each
+ * one costs a few GitHub list calls per run.
+ */
+export const AUTOPILOT_MAX_SOURCE_REPOSITORIES = 15;
+
 export const AUTOPILOT_RUN_STATUSES = [
   "running",
   "completed",

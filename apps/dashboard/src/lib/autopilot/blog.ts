@@ -15,7 +15,6 @@ import {
   AUTOPILOT_COMMITS_MAX_PAGES,
   AUTOPILOT_COMMITS_MAX_PULL_REQUESTS,
   AUTOPILOT_COMMITS_PAGE_SIZE,
-  AUTOPILOT_COMMITS_MAX_REPOSITORIES,
   AUTOPILOT_CONTEXT_FILE_MAX_CHARS,
   AUTOPILOT_FAILURE_LABELS,
   AUTOPILOT_FINDING_MAX_FAILURES,
@@ -115,7 +114,10 @@ import {
   searchGapDropReason,
 } from "@/utils/autopilot-blog";
 import { autopilotDraftBranchSlug } from "@/utils/autopilot-branches";
-import { excludedAuthorReason } from "@/utils/autopilot-commit-filters";
+import {
+  excludedAuthorReason,
+  selectAutopilotSourceRepositories,
+} from "@/utils/autopilot-commit-filters";
 import { unsourcedFigures } from "@/utils/autopilot-facts";
 import {
   heroImageLocation,
@@ -1191,7 +1193,10 @@ async function listRecentMergedPullRequests(
     listGitHubAppRepositoriesEffect(ctx.organizationId)
   );
   const since = Date.now() - lookbackDays * 24 * 60 * 60 * 1000;
-  const selected = repositories.slice(0, AUTOPILOT_COMMITS_MAX_REPOSITORIES);
+  const selected = selectAutopilotSourceRepositories(
+    repositories,
+    ctx.commitFilters
+  );
   // One token per installation account, not per repository.
   const owners = [...new Set(selected.map((repository) => repository.owner))];
   const octokits = new Map(

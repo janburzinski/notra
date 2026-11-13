@@ -93,6 +93,7 @@ export const AUTOPILOT_COMMITS_LOOKBACK_DAYS = 7;
 export const AUTOPILOT_COMMITS_MAX_LOOKBACK_DAYS = 30;
 /** "commits:owner/repo#123", the fingerprint of a post about one pull request. */
 export const AUTOPILOT_COMMIT_FINGERPRINT = /^commits:([^/]+)\/([^#]+)#(\d+)$/;
+/** Repositories read when the workspace picked none: the most recently pushed. */
 export const AUTOPILOT_COMMITS_MAX_REPOSITORIES = 5;
 /** Closed pull requests read per page; pages stop once the lookback window is covered. */
 export const AUTOPILOT_COMMITS_PAGE_SIZE = 100;
@@ -116,10 +117,11 @@ export const AUTOPILOT_WELL_KNOWN_BOTS = [
   "renovate[bot]",
   "github-actions[bot]",
 ];
-/** Mirrors the commit_filters column default in packages/db. */
+/** The commit_filters column default in packages/db, plus fields added since. */
 export const AUTOPILOT_DEFAULT_COMMIT_FILTERS: AutopilotCommitFilters = {
   excludedAuthors: AUTOPILOT_WELL_KNOWN_BOTS,
   paths: {},
+  repositories: [],
 };
 /** Recent pull request authors are read this far back for suggestions. */
 export const AUTOPILOT_AUTHOR_SUGGESTION_DAYS = 90;

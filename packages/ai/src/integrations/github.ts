@@ -1158,6 +1158,7 @@ function fetchInstallationRepositories(
       private: repo.private,
       description: repo.description,
       defaultBranch: repo.default_branch,
+      pushedAt: repo.pushed_at ?? null,
     }));
   });
 }
