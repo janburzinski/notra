@@ -1,0 +1,2 @@
+ALTER TABLE "autopilot_settings" ADD COLUMN "draft_emails" text DEFAULT 'without_slack' NOT NULL;--> statement-breakpoint
+ALTER TABLE "organization_notification_settings" ADD COLUMN "autopilot_drafts" boolean DEFAULT true NOT NULL;

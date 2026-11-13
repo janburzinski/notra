@@ -2,6 +2,7 @@ import {
   Alert02Icon,
   Calendar03Icon,
   Forward02Icon,
+  GitPullRequestIcon,
   News01Icon,
 } from "@hugeicons/core-free-icons";
 
@@ -25,6 +26,16 @@ export const NOTIFICATION_TOGGLE_GROUPS: NotificationToggleGroup[] = [
         key: "scheduledContentSkipped",
         defaultValue: false,
         icon: Forward02Icon,
+      },
+    ],
+  },
+  {
+    id: "autopilot",
+    toggles: [
+      {
+        key: "autopilotDrafts",
+        defaultValue: true,
+        icon: GitPullRequestIcon,
       },
     ],
   },

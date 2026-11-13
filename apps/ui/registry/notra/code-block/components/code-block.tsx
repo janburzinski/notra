@@ -177,7 +177,7 @@ export function CodeBlock({
     >
       <div className="flex h-9 min-w-0 items-center gap-3 ps-2.5 pe-1">
         {tabs ? (
-          <div className="min-w-0 flex-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <div className="min-w-0 flex-1 [scrollbar-width:none] overflow-x-auto [&::-webkit-scrollbar]:hidden">
             {tabs}
           </div>
         ) : null}
@@ -204,7 +204,7 @@ export function CodeBlock({
         </div>
         <pre
           className={cn(
-            "m-0 overflow-x-auto bg-transparent p-3 pe-10 font-mono text-xs leading-relaxed [scrollbar-width:thin]",
+            "m-0 [scrollbar-width:thin] overflow-x-auto bg-transparent p-3 pe-10 font-mono text-xs leading-relaxed",
             wrap && "wrap-anywhere whitespace-pre-wrap"
           )}
           // biome-ignore lint/security/noDangerouslySetInnerHtml: sugar-high escapes the source before tokenizing

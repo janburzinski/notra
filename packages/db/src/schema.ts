@@ -105,6 +105,7 @@ import type {
   AutopilotApprovals,
   AutopilotBriefContent,
   AutopilotCommitFilters,
+  AutopilotDraftEmails,
   AutopilotFindingEvidence,
   AutopilotJobs,
   AutopilotRunEventData,
@@ -1725,6 +1726,7 @@ export const organizationNotificationSettings = pgTable(
      */
     marketingEmails: boolean("marketing_emails").default(false).notNull(),
     dailySummary: boolean("daily_summary").default(true).notNull(),
+    autopilotDrafts: boolean("autopilot_drafts").default(true).notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at")
       .defaultNow()
@@ -4896,6 +4898,10 @@ export const autopilotSettings = pgTable("autopilot_settings", {
     .$type<AutopilotApprovals>()
     .notNull()
     .default(sql`'{"posts":"ask","updates":"ask","fixes":"ask"}'::jsonb`),
+  draftEmails: text("draft_emails")
+    .$type<AutopilotDraftEmails>()
+    .notNull()
+    .default("without_slack"),
   /** Drafts nobody touched for this many days are closed; null keeps them open. */
   stalePullRequestDays: integer("stale_pull_request_days").default(14),
   lastRunAt: timestamp("last_run_at"),

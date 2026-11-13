@@ -156,6 +156,10 @@
             "label": "Weekly recap",
             "description": "Get one email each Monday with last week's visibility, what changed and how competitors moved. Plus an alert if visibility drops sharply."
           },
+          "autopilotDrafts": {
+            "label": "Drafts to review",
+            "description": "Get an email when Autopilot opens a draft. If Autopilot posts to Slack, drafts go there instead."
+          },
           "marketingEmails": {
             "description": "Receive emails about new features, tips and announcements"
           }

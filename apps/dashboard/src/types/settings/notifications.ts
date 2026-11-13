@@ -5,6 +5,7 @@ export interface NotificationSettings {
   scheduledContentFailed: boolean;
   scheduledContentSkipped: boolean;
   dailySummary: boolean;
+  autopilotDrafts: boolean;
 }
 
 /**
@@ -37,7 +38,7 @@ type NotificationToggleDefinition = Omit<
 > & { key: NotificationToggleKey };
 
 export interface NotificationToggleGroup {
-  id: "content" | "geo";
+  id: "content" | "autopilot" | "geo";
   toggles: NotificationToggleDefinition[];
 }
 

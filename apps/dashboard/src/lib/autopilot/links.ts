@@ -24,6 +24,7 @@ import {
   AUTOPILOT_LINKS_REVIEW_INSTRUCTIONS,
 } from "@/constants/autopilot-links";
 import { AUTOPILOT_REFRESH_MAX_LINK_CHECKS } from "@/constants/autopilot-refresh";
+import { emailDraftReviewers } from "@/lib/autopilot/draft-emails";
 import {
   claimFinding,
   countOpenPullRequests,
@@ -562,6 +563,12 @@ export async function openLinksPullRequest(params: {
     event: AUTOPILOT_PULL_REQUEST_CREATED_EVENT,
     url: pullRequest.url,
     files: fix.files.map((file) => file.path),
+  });
+  await emailDraftReviewers({
+    organizationId: ctx.organizationId,
+    findingId: claim.finding.id,
+    log,
+    kind: "update",
   });
   await scheduleAutopilotPublish({
     ctx,

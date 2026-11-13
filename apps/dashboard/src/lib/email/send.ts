@@ -1,4 +1,5 @@
 import { AiCreditsDepletedEmail } from "@notra/email/emails/ai-credits-depleted";
+import { AutopilotDraftReadyEmail } from "@notra/email/emails/autopilot-draft-ready";
 import { FeedbackEmail } from "@notra/email/emails/feedback";
 import { FirstScanResultsEmail } from "@notra/email/emails/first-scan-results";
 import { GeoAlertEmail } from "@notra/email/emails/geo-alert";
@@ -17,6 +18,7 @@ import { FEEDBACK_SENTIMENT_META } from "@notra/email/utils/feedback";
 
 import type {
   SendAiCreditsDepletedEmailProps,
+  SendAutopilotDraftReadyEmailProps,
   SendVisibilityDropEmailProps,
   SendWeeklySummaryEmailProps,
   SendFeedbackEmailProps,
@@ -238,6 +240,21 @@ export async function sendScheduledContentCreatedEmail({
       automationEmail,
     }),
     idempotencyKey: digestBatchKey,
+  });
+}
+
+export async function sendAutopilotDraftReadyEmail({
+  recipientEmail,
+  findingId,
+  ...props
+}: SendAutopilotDraftReadyEmailProps) {
+  return sendBrewEmail({
+    // No dedicated Brew trigger yet; this shares the content-created one.
+    category: "schedule-content-created",
+    to: recipientEmail,
+    subject: `Draft to review: ${props.draftTitle}`,
+    react: AutopilotDraftReadyEmail(props),
+    idempotencyKey: `autopilot-draft:${findingId}:${props.pullRequestNumber}:${recipientEmail}`,
   });
 }
 

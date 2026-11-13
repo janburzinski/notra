@@ -90,3 +90,9 @@ export const AUTOPILOT_EVENT_LEVELS = [
 export const AUTOPILOT_APPROVAL_GROUPS = ["posts", "updates", "fixes"] as const;
 
 export const AUTOPILOT_APPROVAL_MODES = ["ask", "auto"] as const;
+
+/**
+ * When owners get an email about a new draft. without_slack: only when no
+ * Slack channel gets the brief. always: also when one does.
+ */
+export const AUTOPILOT_DRAFT_EMAIL_MODES = ["without_slack", "always"] as const;

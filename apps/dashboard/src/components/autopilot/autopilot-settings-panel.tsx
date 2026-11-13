@@ -8,6 +8,7 @@ import {
   Folder01Icon,
   Github01Icon,
   Globe02Icon,
+  Mail01Icon,
   NewsIcon,
   PowerIcon,
   RefreshIcon,
@@ -32,6 +33,7 @@ import { AutopilotRepositoryPicker } from "@/components/autopilot/autopilot-repo
 import { AutopilotRulesSection } from "@/components/autopilot/autopilot-rules-section";
 import { Button } from "@/components/button";
 import {
+  AUTOPILOT_DRAFT_EMAIL_OPTIONS,
   AUTOPILOT_HOUR_OPTIONS,
   AUTOPILOT_STALE_OPTIONS,
 } from "@/constants/autopilot";
@@ -308,6 +310,36 @@ export function AutopilotSettingsPanel({
                 Connect
               </Button>
             )}
+          </SettingsRow>
+          <SettingsRow
+            description="Owners get these emails only while Drafts to review is on in Settings → Notifications"
+            htmlFor="autopilot-draft-emails"
+            icon={Mail01Icon}
+            label="Email drafts"
+          >
+            <Select
+              items={AUTOPILOT_DRAFT_EMAIL_OPTIONS}
+              onValueChange={(value) => {
+                const option = AUTOPILOT_DRAFT_EMAIL_OPTIONS.find(
+                  (candidate) => candidate.value === value
+                );
+                if (option) {
+                  save.mutate({ draftEmails: option.value });
+                }
+              }}
+              value={settings.draftEmails}
+            >
+              <SelectTrigger className="w-36" id="autopilot-draft-emails">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent align="end">
+                {AUTOPILOT_DRAFT_EMAIL_OPTIONS.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </SettingsRow>
           <SettingsRow
             htmlFor="autopilot-brief-hour"

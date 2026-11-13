@@ -1,6 +1,7 @@
 import type {
   AUTOPILOT_APPROVAL_GROUPS,
   AUTOPILOT_APPROVAL_MODES,
+  AUTOPILOT_DRAFT_EMAIL_MODES,
   AUTOPILOT_EVENT_LEVELS,
   AUTOPILOT_FINDING_STATUSES,
   AUTOPILOT_JOB_KINDS,
@@ -19,6 +20,8 @@ export type AutopilotJobs = Record<AutopilotJobKind, boolean>;
 export type AutopilotApprovalGroup = (typeof AUTOPILOT_APPROVAL_GROUPS)[number];
 
 export type AutopilotApprovalMode = (typeof AUTOPILOT_APPROVAL_MODES)[number];
+
+export type AutopilotDraftEmails = (typeof AUTOPILOT_DRAFT_EMAIL_MODES)[number];
 
 export type AutopilotApprovals = Record<
   AutopilotApprovalGroup,

@@ -5,6 +5,7 @@ import {
   autopilotFindings,
   autopilotRuns,
   autopilotSettings,
+  organizationNotificationSettings,
   workflowRuns,
 } from "@notra/db/schema";
 import { and, desc, eq, inArray, isNull, sql } from "drizzle-orm";
@@ -211,6 +212,22 @@ async function runAction(
           badRequest(error);
         }
         throw error;
+      }
+      if (action.input.draftEmails === "always") {
+        const notifications =
+          await db.query.organizationNotificationSettings.findFirst({
+            columns: { autopilotDrafts: true },
+            where: eq(
+              organizationNotificationSettings.organizationId,
+              organizationId
+            ),
+          });
+        if (notifications && !notifications.autopilotDrafts) {
+          return {
+            success: true as const,
+            note: "Saved, but draft emails are off in Settings → Notifications, so no email goes out until an owner turns on Drafts to review.",
+          };
+        }
       }
       return { success: true as const };
     }

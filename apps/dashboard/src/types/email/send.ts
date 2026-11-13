@@ -1,3 +1,4 @@
+import type { AutopilotDraftReadyEmailProps } from "@notra/email/types/autopilot-draft-ready";
 import type { FeedbackSentiment } from "@notra/email/types/feedback";
 import type {
   FirstScanResultsEmailProps,
@@ -32,6 +33,11 @@ export interface SendScheduledContentFailedEmailProps extends DigestEmailProps {
   scheduleName: string;
   reason: string;
   subject?: string;
+}
+
+export interface SendAutopilotDraftReadyEmailProps extends AutopilotDraftReadyEmailProps {
+  recipientEmail: string;
+  findingId: string;
 }
 
 export interface SendScheduledPublicationFailedEmailProps extends ScheduledPublicationFailedEmailProps {

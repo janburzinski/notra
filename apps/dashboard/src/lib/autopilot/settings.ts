@@ -4,7 +4,10 @@ import {
   projects,
   slackIntegrations,
 } from "@notra/db/schema";
-import type { AutopilotJobKind } from "@notra/db/types/autopilot";
+import type {
+  AutopilotDraftEmails,
+  AutopilotJobKind,
+} from "@notra/db/types/autopilot";
 import type { autopilotSaveInputSchema } from "@notra/schemas/dashboard/autopilot";
 import { and, eq, sql } from "drizzle-orm";
 import type * as z from "zod";
@@ -91,6 +94,7 @@ export async function saveAutopilotSettings(
     contentPath: site ? site.contentPath : contentPath || null,
     ...(input.siteId === undefined ? {} : { siteId: input.siteId }),
     ...(input.approvals ? { approvals: input.approvals } : {}),
+    ...(input.draftEmails ? { draftEmails: input.draftEmails } : {}),
     slackIntegrationId: input.slack?.integrationId ?? null,
     slackChannelId: input.slack?.channelId ?? null,
     slackChannelName: input.slack?.channelName ?? null,
@@ -133,6 +137,7 @@ export async function updateAutopilotSettings(
     briefHour?: number;
     timezone?: string;
     jobs?: Partial<Record<AutopilotJobKind, boolean>>;
+    draftEmails?: AutopilotDraftEmails;
   }
 ) {
   const jobs = Object.entries(patch.jobs ?? {}).filter(
@@ -143,6 +148,7 @@ export async function updateAutopilotSettings(
     ...(patch.enabled === undefined ? {} : { enabled: patch.enabled }),
     ...(patch.briefHour === undefined ? {} : { briefHour: patch.briefHour }),
     ...(patch.timezone === undefined ? {} : { timezone: patch.timezone }),
+    ...(patch.draftEmails ? { draftEmails: patch.draftEmails } : {}),
     ...(jobs.length > 0
       ? {
           jobs: sql`${autopilotSettings.jobs} || ${JSON.stringify(Object.fromEntries(jobs))}::jsonb`,

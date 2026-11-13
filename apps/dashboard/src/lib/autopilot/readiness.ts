@@ -31,6 +31,7 @@ import {
   READINESS_AGENT_INSTRUCTIONS,
   READINESS_AGENT_WRAP_UP_NOTE,
 } from "@/constants/autopilot-readiness";
+import { emailDraftReviewers } from "@/lib/autopilot/draft-emails";
 import {
   claimFinding,
   countOpenPullRequests,
@@ -418,6 +419,12 @@ export async function openReadinessPullRequest(params: {
     event: AUTOPILOT_PULL_REQUEST_CREATED_EVENT,
     url: pullRequest.url,
     files: fix.files.map((file) => file.path),
+  });
+  await emailDraftReviewers({
+    organizationId: ctx.organizationId,
+    findingId: claim.finding.id,
+    log,
+    kind: "fix",
   });
   await scheduleAutopilotPublish({
     ctx,

@@ -40,6 +40,7 @@ import {
 import { AUTOPILOT_FACT_FLAG_HEADINGS } from "@/constants/autopilot-publish";
 import { commitFilterSkipReason } from "@/lib/autopilot/commit-filters";
 import { loadRepositoryConventions } from "@/lib/autopilot/conventions";
+import { emailDraftReviewers } from "@/lib/autopilot/draft-emails";
 import {
   factCheckComparison,
   factCheckSection,
@@ -302,6 +303,13 @@ async function openPageUpdate(params: {
     octokit,
     repository: ctx.repository,
     pullNumber: pullRequest.number,
+  });
+  await emailDraftReviewers({
+    organizationId: ctx.organizationId,
+    findingId: claim.finding.id,
+    log,
+    kind: "update",
+    draftTitle: post.title,
   });
   await scheduleAutopilotPublish({
     ctx,
@@ -674,6 +682,13 @@ export async function openBlogDraftPullRequest(params: {
     octokit,
     repository: ctx.repository,
     pullNumber: pullRequest.number,
+  });
+  await emailDraftReviewers({
+    organizationId: ctx.organizationId,
+    findingId: claim.finding.id,
+    log,
+    kind: "post",
+    draftTitle: draft.post.title,
   });
   await scheduleAutopilotPublish({
     ctx,

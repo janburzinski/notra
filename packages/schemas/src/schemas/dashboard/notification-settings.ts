@@ -8,6 +8,7 @@ const updateNotificationSettingsSchema = z.object({
   scheduledContentFailed: z.boolean().optional(),
   scheduledContentSkipped: z.boolean().optional(),
   dailySummary: z.boolean().optional(),
+  autopilotDrafts: z.boolean().optional(),
 });
 
 export const updateNotificationSettingsInputSchema =

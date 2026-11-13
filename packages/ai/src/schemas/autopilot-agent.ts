@@ -1,5 +1,6 @@
 import {
   AUTOPILOT_AUTOMATION_KINDS,
+  AUTOPILOT_DRAFT_EMAIL_MODES,
   AUTOPILOT_JOB_KINDS,
 } from "@notra/db/constants/autopilot";
 import { z } from "zod";
@@ -47,12 +48,19 @@ export const autopilotUpdateSettingsInputSchema = z
       .describe(
         "Automations to turn on (true) or off (false). Omitted automations keep their setting."
       ),
+    draftEmails: z
+      .enum(AUTOPILOT_DRAFT_EMAIL_MODES)
+      .optional()
+      .describe(
+        "When owners get an email about a new draft. without_slack (default): only when no Slack channel gets the brief. always: also when one does."
+      ),
   })
   .refine(
     (input) =>
       input.enabled !== undefined ||
       input.briefHour !== undefined ||
       input.timezone !== undefined ||
+      input.draftEmails !== undefined ||
       (input.jobs !== undefined && Object.keys(input.jobs).length > 0),
     "Change at least one setting"
   );

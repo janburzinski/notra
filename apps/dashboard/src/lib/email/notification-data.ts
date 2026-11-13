@@ -6,6 +6,7 @@ import {
 } from "@notra/db/schema";
 import { and, eq } from "drizzle-orm";
 
+import { NOTIFICATIONS_ON_WITHOUT_SETTINGS } from "@/constants/notifications";
 import type {
   NotificationData,
   NotificationSettingKey,
@@ -13,7 +14,8 @@ import type {
 
 /**
  * Whether an organization wants one kind of notification, and its owners'
- * addresses. No settings row means off, like the settings page shows it.
+ * addresses. No settings row means off, like the settings page shows it,
+ * except for the notifications in `NOTIFICATIONS_ON_WITHOUT_SETTINGS`.
  * `force` skips the setting, for an automation that asked to email itself.
  */
 export async function getNotificationData(input: {
@@ -29,7 +31,10 @@ export async function getNotificationData(input: {
       ),
     });
 
-  if (!(input.force || notificationSettings?.[input.setting])) {
+  const enabled = notificationSettings
+    ? notificationSettings[input.setting]
+    : NOTIFICATIONS_ON_WITHOUT_SETTINGS.includes(input.setting);
+  if (!(input.force || enabled)) {
     return {
       enabled: false,
       ownerEmails: [],

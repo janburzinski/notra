@@ -79,7 +79,8 @@ export interface TrackContentOutcomeInput {
 export type NotificationSettingKey =
   | "scheduledContentCreation"
   | "scheduledContentFailed"
-  | "scheduledContentSkipped";
+  | "scheduledContentSkipped"
+  | "autopilotDrafts";
 
 export interface NotificationData {
   enabled: boolean;

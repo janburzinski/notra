@@ -2,6 +2,7 @@ import "zod/compile";
 import {
   AUTOPILOT_APPROVAL_MODES,
   AUTOPILOT_AUTOMATION_KINDS,
+  AUTOPILOT_DRAFT_EMAIL_MODES,
   AUTOPILOT_JOB_KINDS,
 } from "@notra/db/constants/autopilot";
 import { organizationIdSchema } from "@notra/schemas/dashboard/auth/organization";
@@ -138,6 +139,8 @@ export const autopilotSaveInputSchema = autopilotOrganizationInputSchema.extend(
       .nullable()
       .optional(),
     approvals: autopilotApprovalsSchema.optional(),
+    /** Omit to keep the saved choice. */
+    draftEmails: z.enum(AUTOPILOT_DRAFT_EMAIL_MODES).optional(),
     siteId: z.string().trim().min(1).max(64).nullable().optional(),
   }
 );

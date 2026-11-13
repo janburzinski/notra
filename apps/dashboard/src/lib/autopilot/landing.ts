@@ -36,6 +36,7 @@ import {
   AUTOPILOT_REFRESH_WINDOW_MS,
 } from "@/constants/autopilot-refresh";
 import { loadAnswerChecks, loadOwnedHosts } from "@/lib/autopilot/answers";
+import { emailDraftReviewers } from "@/lib/autopilot/draft-emails";
 import {
   claimFinding,
   countOpenPullRequests,
@@ -671,6 +672,12 @@ export async function openLandingPullRequest(params: {
     event: AUTOPILOT_PULL_REQUEST_CREATED_EVENT,
     url: pullRequest.url,
     files: fix.files.map((file) => file.path),
+  });
+  await emailDraftReviewers({
+    organizationId: ctx.organizationId,
+    findingId: claim.finding.id,
+    log,
+    kind: "update",
   });
   await scheduleAutopilotPublish({
     ctx,

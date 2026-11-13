@@ -297,6 +297,7 @@ export const autopilotRouter = {
             ...settings?.approvals,
           },
           siteId: settings?.siteId ?? null,
+          draftEmails: settings?.draftEmails ?? "without_slack",
           stalePullRequestDays: settings
             ? settings.stalePullRequestDays
             : AUTOPILOT_DEFAULT_STALE_PULL_REQUEST_DAYS,

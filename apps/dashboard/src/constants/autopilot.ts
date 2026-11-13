@@ -1,5 +1,6 @@
 import type {
   AutopilotCommitFilters,
+  AutopilotDraftEmails,
   AutopilotFindingStatus,
   AutopilotJobKind,
   AutopilotRunStatus,
@@ -378,6 +379,11 @@ export const AUTOPILOT_STALE_OPTIONS = [
   })),
   { value: "never", label: "Never" },
 ];
+
+export const AUTOPILOT_DRAFT_EMAIL_OPTIONS = [
+  { value: "without_slack", label: "Without Slack" },
+  { value: "always", label: "Always" },
+] as const satisfies readonly { value: AutopilotDraftEmails; label: string }[];
 
 /** Recent runs searched for one automation's outcomes, and how many are shown. */
 export const AUTOPILOT_JOB_DECISION_RUNS = 30;

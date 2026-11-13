@@ -156,6 +156,10 @@
             "label": "Wöchentliche Zusammenfassung",
             "description": "Erhalte jeden Montag eine E-Mail mit der Sichtbarkeit der letzten Woche, den Änderungen und der Entwicklung der Konkurrenz. Dazu eine Warnung, wenn die Sichtbarkeit stark sinkt."
           },
+          "autopilotDrafts": {
+            "label": "Entwürfe zur Prüfung",
+            "description": "Erhalte eine E-Mail, wenn Autopilot einen Entwurf öffnet. Wenn Autopilot in Slack postet, landen Entwürfe dort."
+          },
           "marketingEmails": {
             "description": "E-Mails zu neuen Funktionen, Tipps und Ankündigungen erhalten"
           }

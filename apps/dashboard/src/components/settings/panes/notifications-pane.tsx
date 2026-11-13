@@ -33,6 +33,7 @@ export function NotificationsSettingsPane() {
   const tLabels = useTranslations("common.labels");
   const groupLabels: Record<NotificationToggleGroup["id"], string> = {
     content: tLabels("content"),
+    autopilot: tLabels("autopilot"),
     geo: tLabels("geo"),
   };
   const toggleLabels: Record<NotificationToggleKey, string> = {
@@ -40,6 +41,7 @@ export function NotificationsSettingsPane() {
     scheduledContentFailed: tLabels("failed"),
     scheduledContentSkipped: tLabels("skipped"),
     dailySummary: t("toggles.dailySummary.label"),
+    autopilotDrafts: t("toggles.autopilotDrafts.label"),
   };
   const queryClient = useQueryClient();
   const { activeOrganization } = useOrganizationsContext();

@@ -42,6 +42,7 @@ export function toAutopilotSaveInput(
     maxOpenPullRequests: settings.maxOpenPullRequests,
     stalePullRequestDays: toStaleDays(settings.stalePullRequestDays),
     approvals: settings.approvals,
+    draftEmails: settings.draftEmails,
     siteId: settings.siteId,
   };
 }
