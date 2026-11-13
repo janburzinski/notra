@@ -1,0 +1,36 @@
+apps/minigame/src/components/x-logo.tsx
+  s_673745a4f2f52f::t_928210c5aaad3b 3,8
+  s_673745a4f2f52f::t_c0fd301a802e5c 1-2,4-7,9-28
+apps/minigame/src/styles/globals.css
+  s_673745a4f2f52f::t_c0fd301a802e5c 169,171
+apps/minigame/src/constants/render.ts
+  s_673745a4f2f52f::t_c0fd301a802e5c 77,82,90
+  s_673745a4f2f52f::t_928210c5aaad3b 78-81,83-89
+apps/minigame/src/components/account.tsx
+  s_673745a4f2f52f::t_c0fd301a802e5c 4
+apps/minigame/src/components/menu.tsx
+  s_673745a4f2f52f::t_9f3da846362493 36-37
+apps/minigame/src/components/share-card.tsx
+  s_673745a4f2f52f::t_c0fd301a802e5c 3,89
+apps/minigame/src/components/game-over.tsx
+  s_673745a4f2f52f::t_9f3da846362493 37-38
+  s_673745a4f2f52f::t_c0fd301a802e5c 6,116,121,126,132
+apps/minigame/src/components/pause-menu.tsx
+  s_673745a4f2f52f::t_9f3da846362493 14-15
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "ceb48bd259d8de71b6215c6211a967e8afd5f7f1",
+  "prompts": {},
+  "sessions": {
+    "s_673745a4f2f52f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "41c3de73-071e-4473-b094-b0db24729964",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
