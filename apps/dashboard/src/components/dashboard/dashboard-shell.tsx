@@ -11,6 +11,7 @@ import { SidebarInset, SidebarProvider } from "@notra/ui/components/ui/sidebar";
 import { Skeleton } from "@notra/ui/components/ui/skeleton";
 import { cn } from "@notra/ui/lib/utils";
 import { isDemoModeClient } from "@notra/utils/demo-mode";
+import { Suspense, useEffect } from "react";
 import { useTranslations } from "use-intl";
 
 import { AnalyticsImportWatcher } from "@/components/analytics-import/analytics-import-watcher";
@@ -41,6 +42,7 @@ import type {
 } from "@/types/components/dashboard-shell";
 import { dashboardShellStyle } from "@/utils/dashboard-shell-style";
 import dynamic from "@/utils/lazy-component";
+import { lazyPage } from "@/utils/lazy-page";
 
 const DashboardDemoChrome = dynamic(() =>
   import("@/components/demo/dashboard-demo-chrome").then(
@@ -121,21 +123,33 @@ function DashboardAgentHostLoading() {
   );
 }
 
-function loadDashboardAgentHost() {
-  return import("@/components/dashboard/dashboard-agent-panel").then(
-    (module) => module.DashboardAgentHost
-  );
-}
+// Renders without suspending once its chunk is in, so warming it below means
+// the first open shows the real panel instead of a skeleton.
+const DashboardAgentHost = lazyPage(() =>
+  import("@/components/dashboard/dashboard-agent-panel").then((module) => ({
+    default: module.DashboardAgentHost,
+  }))
+);
 
-const DashboardAgentHost = dynamic(loadDashboardAgentHost, {
-  loading: DashboardAgentHostLoading,
-  ssr: false,
-});
+function useWarmDashboardAgent() {
+  useEffect(() => {
+    const warm = () => {
+      DashboardAgentHost.preload().catch(() => undefined);
+    };
+    if (typeof window.requestIdleCallback === "function") {
+      const handle = window.requestIdleCallback(warm, { timeout: 3000 });
+      return () => window.cancelIdleCallback(handle);
+    }
+    const handle = window.setTimeout(warm, 1500);
+    return () => window.clearTimeout(handle);
+  }, []);
+}
 
 function DashboardAgentSlot() {
   const { hasOpened } = useRightPanel();
   // The panel only exists in the browser; the server renders nothing here.
   const isClient = useIsClient();
+  useWarmDashboardAgent();
 
   if (!isClient) {
     return null;
@@ -143,7 +157,11 @@ function DashboardAgentSlot() {
 
   return (
     <RightPanel id="agent">
-      {hasOpened.agent ? <DashboardAgentHost /> : null}
+      {hasOpened.agent ? (
+        <Suspense fallback={<DashboardAgentHostLoading />}>
+          <DashboardAgentHost />
+        </Suspense>
+      ) : null}
     </RightPanel>
   );
 }
