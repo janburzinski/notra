@@ -98,7 +98,7 @@ export function PackageCommand({ command, className }: PackageCommandProps) {
     >
       <Tabs.List
         aria-label="Package manager"
-        className="relative flex h-9 [scrollbar-width:none] items-stretch gap-3.5 overflow-x-auto px-3 [&::-webkit-scrollbar]:hidden"
+        className="relative flex h-9 items-stretch gap-3.5 overflow-x-auto px-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       >
         {PACKAGE_MANAGERS.map((item) => (
           <Tabs.Tab
@@ -118,7 +118,7 @@ export function PackageCommand({ command, className }: PackageCommandProps) {
           key={item}
           value={item}
         >
-          <code className="min-w-0 flex-1 [scrollbar-width:none] overflow-x-auto mask-[linear-gradient(to_right,black_calc(100%-1rem),transparent)] font-mono text-[0.8125rem] whitespace-nowrap [&::-webkit-scrollbar]:hidden">
+          <code className="min-w-0 flex-1 overflow-x-auto mask-[linear-gradient(to_right,black_calc(100%-1rem),transparent)] font-mono text-[0.8125rem] whitespace-nowrap [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             <span className="text-muted-foreground select-none">$ </span>
             {commands[item]}
             <span className="inline-block w-4" />
