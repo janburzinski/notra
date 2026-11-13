@@ -134,6 +134,25 @@ test("creates a sandbox key in the demo keyspace", async () => {
   });
 });
 
+test("a time-limited create gives up instead of waiting on Unkey", async () => {
+  process.env.UNKEY_API_ID = "api-demo";
+  fetcher.mockImplementation(
+    (request) =>
+      new Promise((_resolve, reject) => {
+        request.signal.addEventListener("abort", () =>
+          reject(request.signal.reason)
+        );
+        setTimeout(() => reject(new Error("Unkey never answered")), 3000);
+      })
+  );
+  const started = Date.now();
+  await expect(
+    createDemoApiKey(createInput, { timeoutMs: 50 })
+  ).rejects.toThrow();
+  expect(Date.now() - started).toBeLessThan(1000);
+  expect(fetcher).toHaveBeenCalledTimes(1);
+});
+
 test("creating a key fails loudly when Unkey is not configured", async () => {
   process.env.UNKEY_API_ID = "api-demo";
   mock.module("@/lib/api-keys/unkey", () => ({ unkey: null }));

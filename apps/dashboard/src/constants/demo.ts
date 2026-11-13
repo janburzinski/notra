@@ -57,6 +57,7 @@ export const DEMO_SIGNUP_URL = "https://app.usenotra.com/signup";
 
 export const DEMO_API_KEY_PREFIX = "notra_demo";
 export const DEMO_API_KEY_RATE_LIMIT = { limit: 60, durationMs: 60_000 };
+export const DEMO_API_KEY_BACKFILL_TIMEOUT_MS = 2000;
 
 export const DEMO_USER_EMAIL_DOMAIN = "fieldnote.example";
 export const DEMO_VISITOR_EMAIL_LOCAL = "you";

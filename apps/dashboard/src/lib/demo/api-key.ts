@@ -10,11 +10,14 @@ import { unkey } from "@/lib/api-keys/unkey";
  * UNKEY_ROOT_KEY / UNKEY_API_ID at its own Unkey workspace, so these keys can
  * never authenticate against production.
  */
-export async function createDemoApiKey(input: {
-  organizationId: string;
-  anonymousId: string;
-  expiresAt: Date;
-}): Promise<{ key: string; keyId: string } | null> {
+export async function createDemoApiKey(
+  input: {
+    organizationId: string;
+    anonymousId: string;
+    expiresAt: Date;
+  },
+  options?: { timeoutMs: number }
+): Promise<{ key: string; keyId: string } | null> {
   const apiId = process.env.UNKEY_API_ID;
   if (!(unkey && apiId)) {
     throw new Error(
@@ -22,23 +25,26 @@ export async function createDemoApiKey(input: {
     );
   }
 
-  const created = await unkey.keys.createKey({
-    apiId,
-    externalId: input.organizationId,
-    expires: input.expiresAt.getTime(),
-    meta: { anonymousId: input.anonymousId, demo: true },
-    name: "Demo key",
-    permissions: [...API_KEY_PERMISSIONS],
-    prefix: DEMO_API_KEY_PREFIX,
-    ratelimits: [
-      {
-        name: "requests",
-        limit: DEMO_API_KEY_RATE_LIMIT.limit,
-        duration: DEMO_API_KEY_RATE_LIMIT.durationMs,
-        autoApply: true,
-      },
-    ],
-  });
+  const created = await unkey.keys.createKey(
+    {
+      apiId,
+      externalId: input.organizationId,
+      expires: input.expiresAt.getTime(),
+      meta: { anonymousId: input.anonymousId, demo: true },
+      name: "Demo key",
+      permissions: [...API_KEY_PERMISSIONS],
+      prefix: DEMO_API_KEY_PREFIX,
+      ratelimits: [
+        {
+          name: "requests",
+          limit: DEMO_API_KEY_RATE_LIMIT.limit,
+          duration: DEMO_API_KEY_RATE_LIMIT.durationMs,
+          autoApply: true,
+        },
+      ],
+    },
+    options && { timeoutMs: options.timeoutMs, retries: { strategy: "none" } }
+  );
 
   const key = created.data?.key;
   const keyId = created.data?.keyId;

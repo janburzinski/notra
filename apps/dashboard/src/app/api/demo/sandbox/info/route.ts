@@ -5,9 +5,11 @@ import { asc, eq } from "drizzle-orm";
 import { DEMO_SIGNUP_URL } from "@/constants/demo";
 import { loadDemoMissions } from "@/lib/demo/missions";
 import { demoSandboxRoute } from "@/lib/demo/route";
+import { ensureDemoApiKey } from "@/lib/demo/sandbox";
 import type { DemoSandboxInfo } from "@/types/demo";
 
-export const GET = demoSandboxRoute(async (sandbox) => {
+export const GET = demoSandboxRoute(async (loaded) => {
+  const sandbox = await ensureDemoApiKey(loaded);
   const [project, missions] = await Promise.all([
     db.query.projects.findFirst({
       columns: { id: true },

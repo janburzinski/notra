@@ -22,6 +22,7 @@ import {
   eq,
   gt,
   inArray,
+  isNull,
   like,
   lt,
   notExists,
@@ -33,6 +34,7 @@ import {
 
 import {
   DEMO_ANONYMOUS_ID_LENGTH,
+  DEMO_API_KEY_BACKFILL_TIMEOUT_MS,
   DEMO_CLEANUP_BATCH_SIZE,
   DEMO_ANONYMOUS_ID_PREFIX,
   DEMO_COMPANY_NAME,
@@ -536,6 +538,52 @@ export async function touchDemoSandbox(
   return { ...current, lastSeenAt: now };
 }
 
+/**
+ * Gives a keyless sandbox its API key. Seeding, pool refills and resets keep
+ * going when Unkey fails, so the key is retried here, when it is needed.
+ */
+export async function ensureDemoApiKey(
+  sandbox: DemoSandbox
+): Promise<DemoSandbox> {
+  if (sandbox.apiKeyId) {
+    return sandbox;
+  }
+  const created = await createDemoApiKey(
+    {
+      organizationId: sandbox.organizationId,
+      anonymousId: sandbox.anonymousId,
+      expiresAt: sandbox.expiresAt,
+    },
+    { timeoutMs: DEMO_API_KEY_BACKFILL_TIMEOUT_MS }
+  ).catch((error: unknown) => {
+    logError("[demo] Failed to backfill sandbox API key", error);
+    return null;
+  });
+  if (!created) {
+    return sandbox;
+  }
+  const [row] = await db
+    .update(demoSandboxes)
+    .set({ apiKey: created.key, apiKeyId: created.keyId })
+    .where(
+      and(
+        eq(demoSandboxes.anonymousId, sandbox.anonymousId),
+        eq(demoSandboxes.organizationId, sandbox.organizationId),
+        isNull(demoSandboxes.apiKeyId)
+      )
+    )
+    .returning()
+    .catch(async (error: unknown) => {
+      await deleteDemoSandboxApiKey({ apiKeyId: created.keyId });
+      throw error;
+    });
+  if (row) {
+    return row;
+  }
+  await deleteDemoSandboxApiKey({ apiKeyId: created.keyId });
+  return (await loadDemoSandbox(sandbox.anonymousId)) ?? sandbox;
+}
+
 async function resetDemoSandbox(
   sandbox: DemoSandbox,
   personalization: DemoPersonalization | null = sandbox.personalization
@@ -695,9 +743,17 @@ async function moveDemoApiKey(
   organizationId: string,
   now: Date
 ) {
-  if (sandbox.apiKeyId) {
+  // Read after the workspace swap, not from the snapshot: ensureDemoApiKey
+  // may have saved a key during the reset, and can no longer save one now.
+  const [current] = await db
+    .select({ apiKeyId: demoSandboxes.apiKeyId })
+    .from(demoSandboxes)
+    .where(eq(demoSandboxes.anonymousId, sandbox.anonymousId))
+    .limit(1);
+  const apiKeyId = current?.apiKeyId ?? null;
+  if (apiKeyId) {
     const moved = await updateDemoApiKey({
-      keyId: sandbox.apiKeyId,
+      keyId: apiKeyId,
       organizationId,
     }).then(
       () => true,
@@ -709,7 +765,7 @@ async function moveDemoApiKey(
     if (moved) {
       return;
     }
-    await deleteDemoApiKey(sandbox.apiKeyId).catch(() => undefined);
+    await deleteDemoApiKey(apiKeyId).catch(() => undefined);
   }
   const replacement = await createDemoApiKey({
     organizationId,

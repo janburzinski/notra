@@ -13,3 +13,16 @@ test("demo API key cleanup is idempotent without hiding other errors", () => {
   );
   expect(result.status, result.stderr).toBe(0);
 });
+
+test("keyless demo sandboxes get their API key when it is needed", () => {
+  const result = spawnSync(
+    process.execPath,
+    ["test", "./tests/fixtures/demo-api-key-backfill.fixture.ts"],
+    {
+      cwd: new URL("..", import.meta.url).pathname,
+      encoding: "utf8",
+      timeout: 15_000,
+    }
+  );
+  expect(result.status, result.stderr).toBe(0);
+});
