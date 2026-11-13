@@ -3,13 +3,14 @@
 import { Route01Icon, SmileIcon, ViewIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { GEO_EMPTY_COMPETITOR_SHARE_TIMESERIES } from "@notra/geo-core/constants/geo";
+import type { GeoTab } from "@notra/geo-core/types/geo";
 import { POSTHOG_EVENTS } from "@notra/posthog/events";
 import {
   IconTabsList,
   IconTabsTrigger,
 } from "@notra/ui/components/ui/icon-tabs";
 import { Tabs } from "@notra/ui/components/ui/tabs";
-import { Activity, type ReactNode } from "react";
+import { Activity, type ReactNode, startTransition, useState } from "react";
 import { InstrumentGrid } from "ui/card/grid";
 import { useTranslations } from "use-intl";
 
@@ -23,7 +24,7 @@ import { ShareOfVoiceCard } from "@/components/geo/share-of-voice-card";
 import { WhatChangedCard } from "@/components/geo/what-changed-card";
 import { trackEvent } from "@/lib/analytics/posthog-client";
 import { cn } from "@/lib/utils";
-import type { GeoTabsProps } from "@/types/geo";
+import type { GeoTabPanelProps, GeoTabsProps } from "@/types/geo";
 import { toGeoTab } from "@/utils/geo-tabs";
 
 function TabSection({
@@ -37,6 +38,37 @@ function TabSection({
     <div className={cn("flex h-full min-w-0 flex-col", className)}>
       {children}
     </div>
+  );
+}
+
+/**
+ * A tab stays mounted once opened, hidden by Activity, like the Traffic tabs:
+ * switching back shows it as it was instead of remounting into a skeleton.
+ * After the first switch, revealing a tab replays the fade, since leaving
+ * `display: none` restarts its animation.
+ */
+function GeoTabPanel({
+  tab,
+  activeTab,
+  opened,
+  fade,
+  children,
+}: GeoTabPanelProps) {
+  if (!opened.includes(tab)) {
+    return null;
+  }
+  return (
+    <Activity mode={tab === activeTab ? "visible" : "hidden"}>
+      <div
+        className={cn(
+          fade &&
+            "motion-safe:animate-in motion-safe:fade-in-0 motion-safe:duration-fast motion-safe:ease-out"
+        )}
+        data-geo-tab-panel={tab}
+      >
+        {children}
+      </div>
+    </Activity>
   );
 }
 
@@ -63,6 +95,24 @@ export function GeoTabs({
 }: GeoTabsProps) {
   const t = useTranslations("geo.pages.tabs");
   const tCommon = useTranslations("common");
+  // A tab change re-renders the whole page, so it runs as a transition and
+  // the tab list keeps its own state: the indicator slides at once instead
+  // of freezing until the next tab has rendered.
+  const [pendingTab, setPendingTab] = useState<GeoTab | null>(null);
+  if (pendingTab !== null && pendingTab === activeTab) {
+    setPendingTab(null);
+  }
+  const listTab = pendingTab ?? activeTab;
+  const [opened, setOpened] = useState<readonly GeoTab[]>(() =>
+    activeTab === "visibility" ? [activeTab] : ["visibility", activeTab]
+  );
+  if (!opened.includes(activeTab)) {
+    setOpened([...opened, activeTab]);
+  }
+  // Set in the same transition as the tab, so the panel being left never
+  // picks up the fade, and the first page load does not fade at all.
+  const [fade, setFade] = useState(false);
+  const panel = { activeTab, opened, fade };
 
   return (
     <div className="flex min-w-0 flex-col">
@@ -70,11 +120,15 @@ export function GeoTabs({
         onValueChange={(value) => {
           const tab = toGeoTab(value);
           trackEvent(POSTHOG_EVENTS.GEO_TAB_CHANGED, { tab });
-          onActiveTabChange(tab);
+          setPendingTab(tab);
+          startTransition(() => {
+            setFade(true);
+            onActiveTabChange(tab);
+          });
         }}
-        value={activeTab}
+        value={listTab}
       >
-        <IconTabsList aria-label={t("label")} value={activeTab}>
+        <IconTabsList aria-label={t("label")} value={listTab}>
           <IconTabsTrigger
             icon={<HugeiconsIcon icon={ViewIcon} size={15} />}
             value="visibility"
@@ -96,7 +150,7 @@ export function GeoTabs({
         </IconTabsList>
       </Tabs>
 
-      <Activity mode={activeTab === "visibility" ? "visible" : "hidden"}>
+      <GeoTabPanel tab="visibility" {...panel}>
         <div className="mt-6 flex flex-col gap-6 overflow-visible">
           <InstrumentGrid className="grid-cols-1 items-stretch gap-4 overflow-visible @min-[44rem]/main:grid-cols-12">
             <TabSection className="relative z-20 overflow-visible @min-[44rem]/main:col-span-5">
@@ -163,9 +217,9 @@ export function GeoTabs({
             </TabSection>
           </InstrumentGrid>
         </div>
-      </Activity>
+      </GeoTabPanel>
 
-      {activeTab === "brand-sentiment" ? (
+      <GeoTabPanel tab="brand-sentiment" {...panel}>
         <div className="mt-6">
           <TabSection>
             <BrandSentimentCard
@@ -174,9 +228,9 @@ export function GeoTabs({
             />
           </TabSection>
         </div>
-      ) : null}
+      </GeoTabPanel>
 
-      {activeTab === "journeys" ? (
+      <GeoTabPanel tab="journeys" {...panel}>
         <JourneysTab
           journeysFailed={journeysFailed}
           journeyStats={journeyStats}
@@ -187,7 +241,7 @@ export function GeoTabs({
           organizationSlug={organizationSlug}
           range={journeyRange}
         />
-      ) : null}
+      </GeoTabPanel>
     </div>
   );
 }

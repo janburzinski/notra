@@ -59,20 +59,29 @@ function IconTabsIndicator({ value }: IconTabsIndicatorProps) {
     const animate =
       from !== null &&
       !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const start = performance.now();
+    const effectStart = performance.now();
+    // The slide counts from its first painted frame, so a long render right
+    // after the click delays it instead of skipping it.
+    let start: number | null = null;
     let frame = 0;
+
+    const nextFrame = () => {
+      frame = requestAnimationFrame((now) => {
+        start ??= now;
+        tick(now);
+      });
+    };
 
     const tick = (now: number) => {
       frame = 0;
       const target = measureActiveTab(list);
       if (!target) {
-        if (now - start < ICON_TABS_INDICATOR_MS) {
+        if (now - effectStart < ICON_TABS_INDICATOR_MS) {
           frame = requestAnimationFrame(tick);
         }
         return;
       }
-      // rAF timestamps mark the frame start and can predate `start`.
-      const elapsed = Math.max(0, now - start);
+      const elapsed = start === null ? 0 : Math.max(0, now - start);
       const progress = animate
         ? Math.min(1, elapsed / ICON_TABS_INDICATOR_MS)
         : 1;
@@ -90,10 +99,10 @@ function IconTabsIndicator({ value }: IconTabsIndicatorProps) {
       applyIndicatorBox(element, box);
       element.dataset.ready = "";
       if (progress < 1) {
-        frame = requestAnimationFrame(tick);
+        nextFrame();
       }
     };
-    tick(start);
+    tick(effectStart);
 
     const observer = new ResizeObserver(() => {
       if (frame !== 0) {

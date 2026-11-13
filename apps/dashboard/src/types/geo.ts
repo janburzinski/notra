@@ -976,6 +976,14 @@ export interface GeoTabsProps {
   organizationId: string;
 }
 
+export interface GeoTabPanelProps {
+  tab: GeoTab;
+  activeTab: GeoTab;
+  opened: readonly GeoTab[];
+  fade: boolean;
+  children: ReactNode;
+}
+
 export interface GeoDateRange {
   dateFrom: string;
   dateTo: string;

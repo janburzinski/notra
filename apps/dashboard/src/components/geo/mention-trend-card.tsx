@@ -149,6 +149,7 @@ export function MentionTrendCard({
         />
       ) : (
         <EChartsAreaChart
+          animation={false}
           renderer="svg"
           className="min-h-64 w-full flex-1 cursor-crosshair"
           config={config}
