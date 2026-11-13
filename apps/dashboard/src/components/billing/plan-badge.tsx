@@ -57,7 +57,11 @@ export function PlanBadge({
     <span
       className={cn(
         "text-2xs relative inline-flex h-5 w-fit shrink-0 items-center rounded-md px-1.75 font-semibold whitespace-nowrap text-white/90",
-        !isShaderReady && "bg-black/90 ring-1 ring-white/20 ring-inset",
+        // The CSS badge stays under the canvas until the glass has faded in
+        // over it, so the white label never sits on the bare popover.
+        isShaderReady
+          ? "duration-fast transition-[background-color,box-shadow] delay-200 ease-out"
+          : "bg-black/90 ring-1 ring-white/20 ring-inset",
         className
       )}
       data-slot="plan-badge"
@@ -65,7 +69,7 @@ export function PlanBadge({
       <canvas
         aria-hidden
         className={cn(
-          "pointer-events-none absolute inset-0 size-full opacity-0 transition-opacity duration-300",
+          "duration-normal pointer-events-none absolute inset-0 size-full opacity-0 transition-opacity ease-out",
           isShaderReady && "opacity-100"
         )}
         ref={canvasRef}

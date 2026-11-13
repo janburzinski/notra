@@ -177,7 +177,7 @@ function PillComposerBody({
       </div>
       <div
         className={cn(
-          "duration-normal ease-emphasized transition-all motion-reduce:transition-none",
+          "duration-normal ease-emphasized transition-[padding,margin] motion-reduce:transition-none",
           // Closed: one row between the buttons. Open: the text takes the full
           // width, starting in line with the round "+" below it, and the
           // buttons get a row of their own.
