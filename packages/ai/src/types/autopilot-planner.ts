@@ -82,6 +82,7 @@ export interface AutopilotGateCheck {
   name:
     | "action"
     | "signals"
+    | "demand"
     | "confidence"
     | "active_work"
     | "budget"
@@ -93,7 +94,10 @@ export interface AutopilotGateCheck {
 export interface AutopilotGateResult {
   /** Every check passed: Autopilot may open the pull request on its own. */
   open: boolean;
-  /** Only capacity said no: keep it as an idea someone can start. */
+  /**
+   * Worth keeping as an idea someone can start: only capacity said no, or the
+   * post is likely good but not sure enough, or backed only by shipped work.
+   */
   suggest: boolean;
   checks: AutopilotGateCheck[];
 }

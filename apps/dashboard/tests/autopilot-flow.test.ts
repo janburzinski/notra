@@ -1695,7 +1695,7 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
     );
   });
 
-  test("the planner waits on one weak observation and opens one PR once the topic is seen again", async () => {
+  test("the planner waits on one weak observation, and pull requests alone make an idea, not a PR", async () => {
     const day1 = await dailyRun("planner-day-1", [exportsPull]);
     expect(day1.observations.map((row) => row.id)).toEqual([fingerprint(40)]);
     expect(opened).toHaveLength(0);
@@ -1721,20 +1721,23 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
     state.act = 0.9;
     await dailyRun("planner-day-2", [exportsPull]);
     expect(opened).toHaveLength(0);
-    // A second pull request about the same feature is the independent signal.
+    // A second pull request about the same feature is the independent signal,
+    // but nobody asked about exports: it waits as an idea for a click.
     const day3 = await dailyRun("planner-day-3", [
       exportsPull,
       exportsFollowUp,
     ]);
-    expect(opened).toHaveLength(1);
-    expect(charges).toHaveLength(1);
-    expect(holds).toEqual([expect.stringMatching(/^autopilot-draft:/)]);
+    expect(opened).toHaveLength(0);
+    expect(charges).toHaveLength(0);
     const finding = await db.query.autopilotFindings.findFirst();
     expect(finding).toMatchObject({
       fingerprint: fingerprint(42),
-      status: "proposed",
+      status: "suggested",
       runId: "planner-day-3",
     });
+    expect(await runMessages("planner-day-3")).toContainEqual(
+      'decision: Saved "Exports" as an idea: nobody is asking about it yet'
+    );
     expect(finding?.evidence.confidence).toBe(0.9);
     expect(finding?.evidence.topic).toMatchObject({
       slug: "exports",
@@ -1744,7 +1747,7 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
     const acted = await plannerState();
     expect(acted.lastRunId).toBe("planner-day-3");
     expect(acted.topics[0]).toMatchObject({
-      status: "in_progress",
+      status: "ready",
       findingId: finding?.id,
     });
     // One signal per observation: the pull request seen on three days is one.
@@ -1812,6 +1815,23 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
     ).toBe("suggested");
   });
 
+  test("a topic people ask about that Jev is unsure of is kept as an idea, not dropped", async () => {
+    state.act = 0.7;
+    await seedTopic("exports", "Exports", 40);
+    await dailyRun("planner-unsure", [exportsPull]);
+    expect(opened).toHaveLength(0);
+    expect(
+      (
+        await db.query.autopilotFindings.findFirst({
+          where: eq(autopilotFindings.fingerprint, fingerprint(40)),
+        })
+      )?.status
+    ).toBe("suggested");
+    expect(await runMessages("planner-unsure")).toContainEqual(
+      'decision: Saved "Exports" as an idea: not sure enough for an automatic pull request'
+    );
+  });
+
   const replayBlock = async (
     run: Awaited<ReturnType<typeof dailyRun>>["run"],
     nodeId: string
@@ -1854,7 +1874,7 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
     expect(memory.commits("sandbox-org")).toHaveLength(commits);
 
     // A run that decided to wait is replay-safe through its planner state.
-    state.act = 0.7;
+    state.act = 0.5;
     await seedTopic("imports", "Imports", 41);
     const waiting = await dailyRun(
       "planner-replay-wait",

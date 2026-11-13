@@ -1,11 +1,45 @@
 import { describe, expect, test } from "bun:test";
 
+import type { GeoPromptGapRow } from "@notra/geo-core/types/geo";
+
 import {
+  describePromptGap,
   detectBlogDirectory,
   integrationBlogDirectory,
+  interleave,
 } from "./autopilot-blog";
 
 const none = { setting: null, integration: null };
+
+describe("keyword candidates", () => {
+  test("search gaps get a turn instead of queuing behind every prompt gap", () => {
+    expect(interleave(["p1", "p2", "p3"], ["s1"])).toEqual([
+      "p1",
+      "s1",
+      "p2",
+      "p3",
+    ]);
+    expect(interleave([], ["s1", "s2"])).toEqual(["s1", "s2"]);
+  });
+
+  test("a prompt gap says where the brand is missing and what people searched", () => {
+    const gap = {
+      prompt: "best serverless gpu for llms",
+      engines: ["chatgpt", "google_ai_overview"],
+      mentionedEngines: ["perplexity"],
+      engineCoverage: 3,
+      ownMentionRate: 1 / 3,
+      competitors: ["Modal", "Runpod", "Replicate", "Baseten"],
+      searchQueries: ["serverless gpu llm", "cheapest gpu inference", "x"],
+    } as GeoPromptGapRow;
+    expect(describePromptGap(gap)).toBe(
+      'AI engines answer "best serverless gpu for llms" without you on 2 of 3 engines (33% mention you), while Modal, Runpod, Replicate show up. They searched for "serverless gpu llm", "cheapest gpu inference".'
+    );
+    expect(describePromptGap({ ...gap, searchQueries: [] })).not.toContain(
+      "searched"
+    );
+  });
+});
 
 describe("detectBlogDirectory", () => {
   test("finds the blog folder inside a monorepo workspace", () => {

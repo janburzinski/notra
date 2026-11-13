@@ -23,8 +23,11 @@ export interface ScenarioRunExpectation {
   action: AutopilotPlannedActionType[];
   /** The group an action must target. */
   group?: string;
-  /** never: no pull request; suggest: capacity blocks it, keep the idea. */
-  pr: "never" | "allowed" | "suggest";
+  /**
+   * never: no pull request; suggest: capacity blocks it, keep the idea;
+   * deliver: a pull request or a saved idea, never nothing.
+   */
+  pr: "never" | "allowed" | "suggest" | "deliver";
 }
 
 export interface ScenarioRun {
@@ -47,6 +50,8 @@ export interface AutopilotScenarioInput {
 
 export interface AutopilotScenarioExpected {
   groups: ScenarioGroup[];
+  /** Topics the scenario may end with; defaults to one per group. */
+  maxTopics?: number;
   /** Pull requests the whole scenario may open. */
   maxPullRequests: number;
   /** At least one run must propose an action for this group. */

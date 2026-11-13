@@ -131,6 +131,8 @@ function gate(output: AutopilotScenarioOutput, testCase: AutopilotScenario) {
       ok = 0;
     } else if (run.expected.pr === "suggest") {
       ok = actual?.acted === "suggested" ? 1 : 0.5;
+    } else if (run.expected.pr === "deliver") {
+      ok = actual?.acted ? 1 : 0;
     }
     return {
       ok,
@@ -220,6 +222,7 @@ function stability(
     };
   });
   const expected =
+    testCase.expected.maxTopics ??
     testCase.input.topics.length + groups.filter((group) => !group.slug).length;
   checks.push({
     ok: output.topics.length <= expected ? 1 : 0,

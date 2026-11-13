@@ -23,7 +23,7 @@ export const autopilotPlannerSuite: EvalSuite<
   kind: "generation",
   stage: "jobs/autopilot-planner.ts planAutopilotRun",
   description:
-    "Multi-run Autopilot scenarios through the real planAutopilotRun + evaluateAutopilotGate. The contender is the planner model; prod Jev rates the act question. State moves between runs through an in-memory @notra/memory store as actor autopilot-run. Covers linking, restraint, rules, prompt injection, budget, coverage, update_page, compaction and in-flight work.",
+    "Multi-run Autopilot scenarios through the real planAutopilotRun + evaluateAutopilotGate. The contender is the planner model; prod Jev rates the act question. State moves between runs through an in-memory @notra/memory store as actor autopilot-run. Covers linking, restraint, demand over shipped work, rules, prompt injection, budget, coverage, update_page, compaction and in-flight work.",
   cases: AUTOPILOT_SCENARIOS,
   productionModel: AUTOPILOT_PLANNER_MODEL_ID,
   defaultContenders: [

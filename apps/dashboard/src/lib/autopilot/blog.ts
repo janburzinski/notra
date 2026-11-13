@@ -104,8 +104,10 @@ import type { AutopilotFactSource } from "@/types/autopilot-templates-runtime";
 import {
   assertNoActiveContent,
   autopilotBlogSlug,
+  describePromptGap,
   detectBlogDirectory,
   detectComparisonDirectory,
+  interleave,
   keywordFingerprint,
   pageToUpdate,
   topQuery,
@@ -1012,14 +1014,14 @@ export async function runKeywordsJob(
     }
     return reason === null;
   });
-  const qualified: KeywordCandidate[] = [
-    ...promptGaps
+  const qualified = interleave<KeywordCandidate>(
+    promptGaps
       .sort((a, b) => b.opportunity - a.opportunity)
       .map((gap) => ({
         key: gap.prompt,
         topic: gap.title ?? gap.prompt,
         competitors: gap.competitors,
-        evidence: `AI engines answer "${gap.prompt}" and mention you in ${Math.round(gap.ownMentionRate * 100)}% of answers, while ${gap.competitors.slice(0, 3).join(", ")} show up.`,
+        evidence: describePromptGap(gap),
         target: {
           kind: "prompt" as const,
           promptId: gap.id,
@@ -1027,7 +1029,7 @@ export async function runKeywordsJob(
         },
         updatePage: pageToUpdate(gap.recommendation),
       })),
-    ...searchGaps
+    searchGaps
       .sort((a, b) => (b.impressions ?? 0) - (a.impressions ?? 0))
       .map((gap) => {
         // Before and after must be the same query: the gap's own position is
@@ -1045,8 +1047,8 @@ export async function runKeywordsJob(
           },
           updatePage: pageToUpdate(gap.recommendation),
         };
-      }),
-  ];
+      })
+  );
   const fresh = qualified.filter(
     (candidate) => !settled.has(keywordFingerprint(candidate.key))
   );

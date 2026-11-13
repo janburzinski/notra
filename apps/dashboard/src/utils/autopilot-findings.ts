@@ -94,9 +94,21 @@ export function describeFindingReason(
   }
   const topic = finding.evidence.topic;
   if (finding.status === "suggested") {
-    return topic
-      ? "Ready, but there is no room for an automatic pull request. It waits for a click."
-      : "Offered on GitHub. It waits for a reply or a click.";
+    if (!topic) {
+      return "Offered on GitHub. It waits for a reply or a click.";
+    }
+    const failed = new Set(
+      (finding.evidence.gate ?? [])
+        .filter((check) => !check.ok)
+        .map((check) => check.name)
+    );
+    if (failed.has("confidence")) {
+      return `People ask about this, but at ${percent(confidence)} confidence it waits for a click instead of opening a pull request.`;
+    }
+    if (failed.has("demand")) {
+      return "Shipped work only, nobody is asking about it yet, so it waits for a click.";
+    }
+    return "Ready, but there is no room for an automatic pull request. It waits for a click.";
   }
   if (finding.evidence.autoWritten) {
     // Older ideas wrote themselves when nobody dismissed them.

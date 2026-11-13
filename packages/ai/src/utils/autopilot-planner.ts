@@ -1,4 +1,5 @@
 import {
+  AUTOPILOT_ACTION_IDEA_CONFIDENCE,
   AUTOPILOT_ACTION_MIN_CONFIDENCE,
   AUTOPILOT_AUTONOMOUS_PR_BUDGET,
   AUTOPILOT_PLANNER_FILE_MAX_BYTES,
@@ -450,6 +451,10 @@ export function evaluateAutopilotGate(params: {
 }): AutopilotGateResult {
   const { action, topic } = params;
   const signals = topic ? countIndependentSignals(topic) : 0;
+  // AI answers or searches that miss the brand; merged pull requests alone
+  // only show that something shipped, not that anyone wants to read about it.
+  const demand =
+    topic?.signals.some((signal) => signal.source === "keywords") ?? false;
   // A merged or dismissed topic is never reopened on the model's word alone.
   const closed = topic?.status === "done" || topic?.status === "dismissed";
   let actionDetail = `${action.type} for ${topic?.title ?? "an unknown topic"}`;
@@ -468,6 +473,13 @@ export function evaluateAutopilotGate(params: {
       name: "signals",
       ok: signals >= AUTOPILOT_TOPIC_MIN_SIGNALS,
       detail: `${signals} of ${AUTOPILOT_TOPIC_MIN_SIGNALS} independent signals`,
+    },
+    {
+      name: "demand",
+      ok: demand,
+      detail: demand
+        ? "AI answers or searches show people look for this"
+        : "Only shipped pull requests, nobody asking for it yet",
     },
     {
       name: "confidence",
@@ -502,7 +514,12 @@ export function evaluateAutopilotGate(params: {
     },
   ];
   const failed = checks.filter((check) => !check.ok).map((check) => check.name);
-  const jevUnavailable = params.actionConfidence === null;
+  const confidence = params.actionConfidence;
+  // Unsure about a post people ask for: an idea beats nothing. Without
+  // demand only a confident post becomes an idea.
+  const ideaConfidence =
+    confidence === null ||
+    (demand && confidence >= AUTOPILOT_ACTION_IDEA_CONFIDENCE);
   return {
     open: failed.length === 0,
     suggest:
@@ -511,7 +528,8 @@ export function evaluateAutopilotGate(params: {
         (name) =>
           name === "budget" ||
           name === "draft_limit" ||
-          (name === "confidence" && jevUnavailable)
+          name === "demand" ||
+          (name === "confidence" && ideaConfidence)
       ),
     checks,
   };

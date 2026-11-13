@@ -23,6 +23,11 @@ export const AUTOPILOT_PLANNER_RETRY_REASONING = "medium";
 export const AUTOPILOT_ACTION_JEV_MODEL_ID = "typesafe-ai/jev-1.14.0";
 export const AUTOPILOT_ACTION_MIN_CONFIDENCE = 0.85;
 /**
+ * From here a post people ask for, which Jev is not sure enough about to open
+ * on its own, is kept as an idea instead of dropped.
+ */
+export const AUTOPILOT_ACTION_IDEA_CONFIDENCE = 0.6;
+/**
  * Distinct observations a topic needs before a pull request. A gap or pull
  * request seen again on a later run is still one.
  */

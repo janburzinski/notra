@@ -61,6 +61,21 @@ function describeChecks(checks: AutopilotGateResult["checks"]) {
   );
 }
 
+function ideaReason(gate: AutopilotGateResult, confidence: number | null) {
+  const failed = new Set(
+    gate.checks.filter((check) => !check.ok).map((check) => check.name)
+  );
+  if (failed.has("confidence")) {
+    return confidence === null
+      ? "Jev was unavailable"
+      : "not sure enough for an automatic pull request";
+  }
+  if (failed.has("demand")) {
+    return "nobody is asking about it yet";
+  }
+  return "no room for an automatic pull request";
+}
+
 function closedBefore(at: Date | null, fallback: string, days: number) {
   return (
     (at ?? new Date(fallback)).getTime() < Date.now() - days * AUTOPILOT_DAY_MS
@@ -342,7 +357,7 @@ export async function decideAutopilotPlan(
   await log.decision(
     outcome === "open"
       ? `Writing "${action.brief?.topic ?? topic.title}"`
-      : `Saved "${action.brief?.topic ?? topic.title}" as an idea: ${plan.actionConfidence === null ? "Jev was unavailable" : "no room for an automatic pull request"}`,
+      : `Saved "${action.brief?.topic ?? topic.title}" as an idea: ${ideaReason(gate, plan.actionConfidence)}`,
     {
       reason: action.reason,
       confidence: plan.actionConfidence,

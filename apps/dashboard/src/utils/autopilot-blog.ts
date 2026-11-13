@@ -10,6 +10,7 @@ import {
   AUTOPILOT_BLOG_DIRECTORY_FALLBACK,
   AUTOPILOT_BLOG_DIRECTORY_HINTS,
   AUTOPILOT_BLOG_SLUG_MAX_CHARS,
+  AUTOPILOT_GAP_SEARCHES_SHOWN,
   AUTOPILOT_KEYWORD_MAX_MENTION_RATE,
   AUTOPILOT_MARKDOWN_FILE,
   AUTOPILOT_SEARCH_GAP_MIN_IMPRESSIONS,
@@ -159,6 +160,33 @@ export function promptGapDropReason(gap: GeoPromptGapRow) {
     return `You show up in ${Math.round(gap.ownMentionRate * 100)}% of answers (limit ${Math.round(AUTOPILOT_KEYWORD_MAX_MENTION_RATE * 100)}%)`;
   }
   return null;
+}
+
+/**
+ * What the planner and Jev weigh a prompt gap by: on how many engines the
+ * brand is missing, who is named instead and how people phrased the search.
+ */
+export function describePromptGap(gap: GeoPromptGapRow) {
+  // engines lists only the engines that missed the brand.
+  const missed = gap.engines.length;
+  const searches = gap.searchQueries
+    .slice(0, AUTOPILOT_GAP_SEARCHES_SHOWN)
+    .map((query) => `"${query}"`)
+    .join(", ");
+  return `AI engines answer "${gap.prompt}" without you on ${missed} of ${gap.engineCoverage} engines (${Math.round(gap.ownMentionRate * 100)}% mention you), while ${gap.competitors.slice(0, 3).join(", ")} show up.${searches ? ` They searched for ${searches}.` : ""}`;
+}
+
+/**
+ * Both kinds of demand get a turn: prompt gaps alone would take every slot,
+ * and search gaps carry the only real volume numbers.
+ */
+export function interleave<T>(first: readonly T[], second: readonly T[]) {
+  return Array.from(
+    { length: Math.max(first.length, second.length) },
+    (_, index) => [first[index], second[index]]
+  )
+    .flat()
+    .filter((item): item is T => item !== undefined);
 }
 
 export function searchGapDropReason(gap: GeoSearchGapRow) {

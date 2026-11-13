@@ -227,6 +227,115 @@ const abTestSeed = pr(
   "Tours can now run two variants with a traffic split and a goal event."
 );
 
+// A busy week: every title is a feat, most are not worth a post on their own,
+// and two pull requests ship the same webhook feature.
+const webhookRetries = pr(
+  610,
+  "feat(webhooks): retry failed deliveries with exponential backoff",
+  "Failed webhook deliveries are retried up to 8 times over 24 hours with exponential backoff. Each attempt is logged."
+);
+const webhookLog = pr(
+  614,
+  "feat(webhooks): delivery log with manual retry",
+  "Settings > Webhooks shows the last 30 days of deliveries with status codes and a Retry button."
+);
+const webhookSecrets = pr(
+  627,
+  "feat(webhooks): rotate signing secrets without downtime",
+  "Two signing secrets can be active for 24 hours while consumers switch over."
+);
+const busyWeek = [
+  webhookRetries,
+  webhookLog,
+  pr(
+    611,
+    "feat(settings): move team settings into a tabbed layout",
+    "Team, roles and billing settings are now tabs on one page."
+  ),
+  pr(
+    612,
+    "feat(dashboard): sparkline on the checklist completion card",
+    "The completion card shows a 14-day sparkline."
+  ),
+  pr(
+    615,
+    "feat(admin): internal console search by account id",
+    "Support staff can search accounts by id in the internal console."
+  ),
+  pr(
+    616,
+    "feat(api): add updated_since filter to GET /v1/tours",
+    "Optional updated_since query parameter, ISO 8601."
+  ),
+  pr(
+    618,
+    "feat(editor): keyboard shortcut to duplicate a tour step",
+    "Cmd+D duplicates the selected step."
+  ),
+  pr(
+    619,
+    "feat(i18n): add Polish translations of the dashboard",
+    "Dashboard UI strings translated to Polish."
+  ),
+];
+const busyWeekTwo = [
+  webhookSecrets,
+  pr(
+    630,
+    "feat(editor): snap tour tooltips to a grid",
+    "Tooltips snap to an 8px grid while dragging."
+  ),
+  pr(
+    631,
+    "feat(billing): show invoice PDFs in settings",
+    "Past invoices can be downloaded from Settings > Billing."
+  ),
+  pr(
+    633,
+    "feat(surveys): reorder questions by drag and drop",
+    "Survey questions can be dragged into a new order."
+  ),
+];
+
+// Demand with no pull request behind it: people ask, competitors answer.
+const planOnboardingGap = gap(
+  "different-onboarding-free-vs-paid",
+  "Different onboarding for free and paid users",
+  'AI engines answer \'how do I show different onboarding to free and paid users in a B2B SaaS\' without you on 3 of 3 engines (0% mention you), while Userpilot, Chameleon, Appcues show up. They searched for "onboarding by subscription plan", "segment product tour free vs paid".'
+);
+const planMessagingGap = gap(
+  "plan-based-in-app-messaging-tools",
+  "Tools for plan-based in-app messaging",
+  "AI engines answer 'best tools to target in-app messages by subscription plan' without you on 3 of 3 engines (0% mention you), while Userpilot, Appcues show up."
+);
+const planToursSearch = gap(
+  "product-tour-by-plan",
+  "Product tour by plan",
+  "Search Console shows 1400 impressions at position 18 for 'product tour by plan' with 2 clicks."
+);
+
+// A minor feature that shipped over two pull requests.
+const exportColumns = pr(
+  640,
+  "feat(export): add account id column to CSV exports",
+  "Checklist progress CSV exports include the account id."
+);
+const exportPicker = pr(
+  641,
+  "feat(export): choose which columns a CSV export includes",
+  "A column picker in the export dialog."
+);
+const npsTimingGap = gap(
+  "when-to-send-nps-survey-b2b",
+  "When to send an in-app NPS survey in B2B SaaS",
+  'AI engines answer \'when should a B2B SaaS send an in-app NPS survey\' without you on 3 of 3 engines (0% mention you), while Delighted, Survicate, Hotjar show up. They searched for "nps survey timing b2b", "in-app nps best time to ask".'
+);
+const npsTimingSearch = gap(
+  "in-app-nps-survey-timing",
+  "In-app NPS survey timing",
+  "Search Console shows 2100 impressions at position 11 for 'in app nps survey timing' with 9 clicks."
+);
+
 export const AUTOPILOT_SCENARIOS: AutopilotScenario[] = [
   {
     id: "gap-then-pr",
@@ -623,6 +732,114 @@ export const AUTOPILOT_SCENARIOS: AutopilotScenario[] = [
         },
       ],
       maxPullRequests: 0,
+    },
+  },
+  {
+    id: "busy-week-no-demand",
+    title:
+      "Two weeks of feat merges, three of them one webhook feature, nobody asking: no automatic PR",
+    tags: ["restraint", "stress", "demand"],
+    input: scenario({
+      runs: [
+        {
+          observations: busyWeek,
+          expected: { action: ["none", "write_post"], pr: "never" },
+        },
+        {
+          observations: busyWeekTwo,
+          expected: { action: ["none", "write_post"], pr: "never" },
+        },
+      ],
+    }),
+    expected: {
+      groups: [
+        {
+          key: "webhooks",
+          title: "Webhook delivery reliability",
+          observations: [webhookRetries.id, webhookLog.id, webhookSecrets.id],
+        },
+      ],
+      // How the nine unrelated merges group is up to the planner.
+      maxTopics: 10,
+      maxPullRequests: 0,
+    },
+  },
+  {
+    id: "demand-without-pr",
+    title:
+      "Two AI answer gaps and a search gap on one need, no pull request behind it: write",
+    tags: ["act", "demand"],
+    input: scenario({
+      runs: [
+        {
+          observations: [
+            planOnboardingGap,
+            planMessagingGap,
+            planToursSearch,
+            ssoFix,
+          ],
+          expected: {
+            action: ["write_post"],
+            group: "plans",
+            pr: "deliver",
+          },
+        },
+      ],
+    }),
+    expected: {
+      groups: [
+        {
+          key: "plans",
+          title: "Onboarding targeted by plan",
+          observations: [
+            planOnboardingGap.id,
+            planMessagingGap.id,
+            planToursSearch.id,
+          ],
+        },
+        { key: "sso", title: "Okta SAML fix", observations: [ssoFix.id] },
+      ],
+      maxPullRequests: 1,
+      mustActOn: "plans",
+    },
+  },
+  {
+    id: "demand-beats-pr-pair",
+    title:
+      "A minor feature shipped over two PRs next to a need people search for: act on the need",
+    tags: ["act", "demand", "priority"],
+    input: scenario({
+      runs: [
+        {
+          observations: [
+            exportColumns,
+            exportPicker,
+            npsTimingGap,
+            npsTimingSearch,
+          ],
+          expected: {
+            action: ["write_post"],
+            group: "nps-timing",
+            pr: "deliver",
+          },
+        },
+      ],
+    }),
+    expected: {
+      groups: [
+        {
+          key: "export",
+          title: "CSV export columns",
+          observations: [exportColumns.id, exportPicker.id],
+        },
+        {
+          key: "nps-timing",
+          title: "When to send an in-app NPS survey",
+          observations: [npsTimingGap.id, npsTimingSearch.id],
+        },
+      ],
+      maxPullRequests: 1,
+      mustActOn: "nps-timing",
     },
   },
 ];

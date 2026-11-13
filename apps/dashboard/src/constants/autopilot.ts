@@ -217,6 +217,8 @@ export const AUTOPILOT_MENTION_INTENTS = {
 
 /** Prompt gaps where you already show up in more answers than this are left alone. */
 export const AUTOPILOT_KEYWORD_MAX_MENTION_RATE = 0.34;
+/** The engines' own searches quoted in a prompt gap's evidence. */
+export const AUTOPILOT_GAP_SEARCHES_SHOWN = 2;
 
 /**
  * A tracked prompt is dead when, over the lookback, it ran in enough scans and
