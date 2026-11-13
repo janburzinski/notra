@@ -1,0 +1,45 @@
+apps/minigame/src/constants/site.ts
+  s_673745a4f2f52f::t_933e545240272e 31-45
+apps/minigame/src/components/company-board.tsx
+  s_673745a4f2f52f::t_933e545240272e 3,14,27,32-33,35-41,87,95
+apps/minigame/src/components/leaderboard.tsx
+  s_673745a4f2f52f::t_933e545240272e 4,27,73-88,91-94,159,161-164,209,239-240,254,261,277-281,283-284,287
+apps/minigame/package.json
+  s_673745a4f2f52f::t_933e545240272e 16
+apps/minigame/src/types/ui.ts
+  s_673745a4f2f52f::t_933e545240272e 41-45
+apps/minigame/src/components/share-card.tsx
+  s_673745a4f2f52f::t_933e545240272e 15,20-33,37,40,42-49,54,59,93-98,102
+apps/minigame/src/components/game-screen.tsx
+  s_673745a4f2f52f::t_933e545240272e 14-20,192-193,273,276,278,330,355-360,366
+apps/minigame/src/components/load-error.tsx
+  s_673745a4f2f52f::t_b16504fff2e633 1-17
+apps/minigame/src/utils/api-client.ts
+  s_673745a4f2f52f::t_933e545240272e 2,31-34
+apps/minigame/src/components/account.tsx
+  s_673745a4f2f52f::t_933e545240272e 89,99-100,103,106,108
+apps/minigame/src/components/pause-menu.tsx
+  s_673745a4f2f52f::t_933e545240272e 18
+apps/minigame/src/components/game-over.tsx
+  s_673745a4f2f52f::t_933e545240272e 25-32,40,117,127
+apps/minigame/src/components/menu.tsx
+  s_673745a4f2f52f::t_933e545240272e 7-12,66-69,72,74,78-100,102-120,130
+apps/minigame/src/styles/globals.css
+  s_673745a4f2f52f::t_933e545240272e 3-4,8-27,46-106,115-116
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "56fcc30e6743b13126415a169fa18f9ccf164fb0",
+  "prompts": {},
+  "sessions": {
+    "s_673745a4f2f52f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "41c3de73-071e-4473-b094-b0db24729964",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
