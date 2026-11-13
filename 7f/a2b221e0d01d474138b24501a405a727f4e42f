@@ -1,0 +1,21 @@
+apps/web/src/constants/mcp-tools.ts
+  s_728c6eeefea1f0::t_2690c0ea6135ca 652
+apps/api/src/routes/geo-web-analytics.ts
+  s_728c6eeefea1f0::t_2690c0ea6135ca 121
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "7fa2b221e0d01d474138b24501a405a727f4e42f",
+  "prompts": {},
+  "sessions": {
+    "s_728c6eeefea1f0": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "06f7d93b-e6ca-49bf-baaf-7c8c8d812ccb",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
