@@ -14,17 +14,19 @@ export const PROFOUND: CompareCompetitor = {
   headline: "AI visibility you can buy without a sales call.",
   headlineAccent: "without a sales call",
   heroSubtitle:
-    "Profound is a strong enterprise suite with nine engines and its own prompt volume data. Notra gives you tracking, crawler logs and content in one self-serve plan from $100 a month.",
+    "Profound is a strong enterprise suite with ten engines and its own prompt volume data. Notra gives you tracking, crawler logs, web and MCP server analytics and content in one self-serve plan from $100 a month.",
   metaDescription:
-    "Notra vs Profound compared: engines, data, crawler logs, content and pricing. Profound is enterprise-only for brands. Notra starts self-serve at $100/mo.",
+    "Notra vs Profound compared: engines, data, crawler, web and MCP analytics, content and pricing. Profound is enterprise-only for brands. Notra starts self-serve at $100/mo.",
   chooseNotra: [
     "You want to sign up today without a demo, a contract or a sales cycle",
     "You want the gap, the draft and the rescan in one place",
     "You want to see the full answer, sources and searches behind every number",
     "You want multi-turn conversations alongside buyer personas",
+    "You want web analytics and MCP server analytics next to AI traffic",
+    "You need Microsoft Copilot tracked",
   ],
   chooseCompetitor: [
-    "You need Copilot or ChatGPT Shopping tracked",
+    "You need Perplexity or ChatGPT Shopping tracked",
     "You want prompt volume data on what real users ask AI assistants",
     "Procurement needs SOC 2, SSO and SCIM on day one",
     "You have an enterprise budget and want a dedicated success team",
@@ -33,7 +35,7 @@ export const PROFOUND: CompareCompetitor = {
     {
       title: "Sign up without a sales call",
       description:
-        "Profound removed its self-serve brand plans in September 2026. Its free trial runs a fixed prompt set on three engines for seven days. Notra plans start at $100 a month with your own prompts on every engine from day one.",
+        "Profound removed its self-serve brand plans in September 2026. Its free trial runs a fixed prompt set on three engines for seven days. Notra plans start at $100 a month with your own prompts on every engine it offers from day one.",
     },
     {
       title: "Gap, brief, post and rescan",
@@ -48,9 +50,9 @@ export const PROFOUND: CompareCompetitor = {
   ],
   strengths: [
     {
-      title: "Nine engines on Enterprise",
+      title: "Ten engines on Enterprise",
       description:
-        "ChatGPT, Perplexity, Google AI, Gemini, Copilot, DeepSeek, Claude and Exa, tracked daily across 150+ regions.",
+        "ChatGPT, Perplexity, Google AI Overviews, AI Mode, Gemini, DeepSeek, Claude, Exa, Muse Spark and Qwen, tracked daily across 150+ regions.",
     },
     {
       title: "Prompt Volumes",
@@ -65,7 +67,7 @@ export const PROFOUND: CompareCompetitor = {
     {
       title: "Enterprise readiness",
       description:
-        "SOC 2, SSO, SCIM, RBAC, ChatGPT Shopping, Ads Studio and an AI Marketer with agents. Backed by about $335M in funding and used by a third of the Fortune 100.",
+        "SOC 2, SSO, SCIM, RBAC, ChatGPT Shopping, Profound Ads and agents that run on triggers. Backed by about $335M in funding and used by a third of the Fortune 100.",
     },
   ],
   values: {
@@ -74,8 +76,8 @@ export const PROFOUND: CompareCompetitor = {
     gemini: true,
     perplexity: "Enterprise",
     aiOverviews: true,
-    copilot: "Enterprise",
-    otherEngines: "DeepSeek on Enterprise",
+    copilot: false,
+    otherEngines: "DeepSeek, Muse Spark and Qwen on Enterprise",
     codingAgents: false,
     modelChoice: false,
     entryEngines: "3 on the trial",
@@ -94,6 +96,8 @@ export const PROFOUND: CompareCompetitor = {
     crawlerLogs: true,
     referrals: true,
     conversions: true,
+    webAnalytics: false,
+    mcpAnalytics: "Not listed",
     siteAudit: "Not listed",
     gaps: true,
     contentWriting: true,
@@ -117,7 +121,7 @@ export const PROFOUND: CompareCompetitor = {
       name: "Enterprise",
       price: "Custom",
       detail:
-        "Up to 9 engines, custom prompts and regions, API, SSO and dedicated support.",
+        "Up to 10 engines, custom prompts and regions, API, SSO and dedicated support.",
     },
     {
       name: "Agency Growth",
@@ -131,12 +135,12 @@ export const PROFOUND: CompareCompetitor = {
     {
       question: "Is Notra a Profound alternative?",
       answer:
-        "Yes. Both track how AI engines talk about your brand. Profound is now an enterprise suite sold through sales. Notra is self-serve from $100 a month and adds content writing and rescans on top of tracking.",
+        "Yes. Both track how AI engines talk about your brand. Profound is now an enterprise suite sold through sales. Notra is self-serve from $100 a month and adds content writing, rescans and web and MCP server analytics on top of tracking.",
     },
     {
       question: "Does Notra track as many engines as Profound?",
       answer:
-        "Almost. Notra scans ChatGPT, Claude, Gemini, Perplexity, Google AI, Grok, DeepSeek and Meta AI on every plan. Profound Enterprise also covers Copilot and Exa, which Notra does not.",
+        "They overlap. Notra scans ChatGPT, Claude, Gemini, Copilot, Google AI Overviews, AI Mode, Grok, Kimi, GLM and DeepSeek on every plan. Profound Enterprise also covers Perplexity, Exa, Muse Spark and Qwen, while Notra adds Copilot and Grok.",
     },
     {
       question: "Does Notra have prompt volume data like Profound?",

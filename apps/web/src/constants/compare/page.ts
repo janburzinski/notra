@@ -36,16 +36,17 @@ export const NOTRA_COMPARE_LOGO: CompareLogo = {
   height: 40,
 };
 
-export const COMPARE_VERIFIED_LABEL = "October 2026";
+export const COMPARE_VERIFIED_LABEL = "November 2026";
 
-export const COMPARE_LAST_MODIFIED = new Date("2026-10-05");
+export const COMPARE_LAST_MODIFIED = new Date("2026-11-13");
 
 export const COMPARE_AT_A_GLANCE_ROWS: CompareRowId[] = [
   "startingPrice",
   "entryEngines",
-  "modelChoice",
   "prompts",
   "crawlerLogs",
+  "webAnalytics",
+  "mcpAnalytics",
   "contentWriting",
 ];
 
@@ -75,7 +76,7 @@ export const NOTRA_COMPARE_PLANS: ComparePlan[] = [
     name: PRICING_PLANS.starter.name,
     price: `$${PRICING_PLANS.starter.pricing.monthly}/mo`,
     detail:
-      "6,000 AI answers a month, unlimited prompts, 10 long-form posts, every assistant",
+      "6,000 AI answers a month, no prompt cap, 10 long-form posts, every assistant",
   },
   {
     name: PRICING_PLANS.growth.name,
@@ -181,18 +182,33 @@ export const COMPARE_ROW_GROUPS: CompareRowGroup[] = [
         label: "Search demand behind prompts",
         notra: "Search Console data",
       },
-      { id: "prompts", label: "Tracked prompts", notra: "Unlimited" },
+      {
+        id: "prompts",
+        label: "Tracked prompts",
+        notra: "No cap, metered by AI answers",
+      },
     ],
   },
   {
-    category: "AI traffic",
-    description: "The bots and buyers that reach your site from AI.",
+    category: "Analytics",
+    description:
+      "The bots, agents and people that reach your site and MCP server.",
     rows: [
       { id: "crawlerLogs", label: "AI crawler logs", notra: true },
       { id: "referrals", label: "AI referral traffic", notra: true },
       {
         id: "conversions",
         label: "Conversions from AI referrals",
+        notra: true,
+      },
+      {
+        id: "webAnalytics",
+        label: "Web analytics for human visitors",
+        notra: true,
+      },
+      {
+        id: "mcpAnalytics",
+        label: "MCP server analytics",
         notra: true,
       },
     ],

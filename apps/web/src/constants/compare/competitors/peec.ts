@@ -6,35 +6,36 @@ export const PEEC: CompareCompetitor = {
   website: "https://peec.ai",
   logo: { src: "/logos/competitors/peec.png", width: 180, height: 180 },
   summary:
-    "Popular self-serve AI search analytics for marketing teams. Strong dashboards, three engines per plan.",
+    "Popular self-serve AI search analytics for marketing teams. Strong dashboards, three engines per plan and an agent that optimizes existing pages.",
   headline: "Every engine on every plan, with no add-ons.",
   headlineAccent: "no add-ons",
   heroSubtitle:
-    "Peec AI is an analytics dashboard with published pricing. Notra tracks every engine on every plan, then writes the content that closes your gaps.",
+    "Peec AI is an analytics dashboard with published pricing. Notra tracks every assistant it offers on every plan, writes the content that closes your gaps and adds web and MCP server analytics.",
   metaDescription:
     "Notra vs Peec AI compared: engines per plan, data, crawler logs, content and pricing. See where each AI visibility tool fits best.",
   chooseNotra: [
-    "You want ChatGPT, Claude, Gemini, Perplexity and AI Overviews without paying per engine",
+    "You want ChatGPT, Claude, Gemini, Copilot and Google AI without paying per engine",
     "You want content written and published from your gaps",
     "You want to ask questions in multi-turn conversations and as buyer personas",
-    "You want unlimited prompts and choose how often each one runs",
+    "You want no prompt cap and to choose how often each prompt runs",
+    "You want web analytics and MCP server analytics next to AI visibility",
   ],
   chooseCompetitor: [
-    "You need Copilot or Naver tracked",
+    "You need Perplexity, Naver, ERNIE or Bing AI Mode tracked",
     "You want AI shopping and ChatGPT ads tracking",
-    "You want to track in many countries and up to 115 languages",
+    "You want to track in many countries and languages",
     "You want a 7-day free trial with no card",
   ],
   advantages: [
     {
       title: "Every engine, no add-ons",
       description:
-        "Peec's self-serve plans let you pick 3 models. Perplexity is a paid add-on and Claude needs Enterprise. Every Notra plan scans ChatGPT, Claude, Gemini, Perplexity and AI Overviews.",
+        "Peec's self-serve plans let you pick 3 models and charge $30 to $140 a month for each extra one. Claude needs Enterprise. Every Notra plan scans ChatGPT, Claude, Gemini, Copilot, Google AI Overviews and AI Mode, plus Grok, Kimi, GLM and DeepSeek.",
     },
     {
       title: "Notra writes the content",
       description:
-        "Peec reports what is happening and suggests actions, but it does not write content. Notra turns each gap into a brief and a draft in your brand voice, then rescans after you publish.",
+        "Peec can rewrite pages you already have, but it does not write new articles. Notra turns each gap into a brief and a new draft in your brand voice, then rescans after you publish.",
     },
     {
       title: "Prompts are not capped",
@@ -56,7 +57,7 @@ export const PEEC: CompareCompetitor = {
     {
       title: "Wide model menu on Enterprise",
       description:
-        "Up to 13 models including Copilot, Naver, Grok, DeepSeek, Qwen, Mistral and Meta Muse.",
+        "Up to 26 models including several Claude and OpenAI versions, Grok, DeepSeek, Qwen, Mistral, Meta Muse and Exa.",
     },
     {
       title: "Shopping, ads and brand perception",
@@ -73,13 +74,13 @@ export const PEEC: CompareCompetitor = {
     chatgpt: true,
     claude: "Enterprise",
     gemini: true,
-    perplexity: "Add-on",
+    perplexity: true,
     aiOverviews: true,
-    copilot: true,
+    copilot: "Not listed",
     otherEngines: "Enterprise",
     codingAgents: false,
     modelChoice: "Enterprise",
-    entryEngines: "3 of 6",
+    entryEngines: "3 of 8",
     collection: "Real browser sessions",
     shareOfVoice: true,
     sentiment: true,
@@ -88,23 +89,25 @@ export const PEEC: CompareCompetitor = {
     rawAnswers: true,
     personas: true,
     conversations: "Not listed",
-    languages: "115 languages",
+    languages: "Unlimited",
     frequency: "Daily",
     promptVolume: "Estimated score",
     prompts: "50 to 350",
     crawlerLogs: true,
     referrals: true,
     conversions: "Not listed",
+    webAnalytics: false,
+    mcpAnalytics: false,
     siteAudit: true,
     gaps: true,
-    contentWriting: false,
+    contentWriting: "Optimizes existing pages",
     socialPosts: false,
     rescan: "Not listed",
     githubPrs: "Not listed",
     commerce: true,
-    api: true,
+    api: "Pro and up",
     mcp: true,
-    soc2: false,
+    soc2: true,
     startingPrice: "$95/mo",
   },
   plans: [
@@ -121,31 +124,32 @@ export const PEEC: CompareCompetitor = {
     {
       name: "Advanced",
       price: "$495/mo",
-      detail: "350 prompts, 3 models, multi-country, Looker Studio.",
+      detail:
+        "350 prompts, 3 models, 3 countries, 31,500 answers a month, Looker Studio.",
     },
     {
       name: "Enterprise",
       price: "Custom",
-      detail: "Up to 13 models, API, SSO and dedicated support.",
+      detail: "Up to 26 models, API, SSO and dedicated support.",
     },
   ],
   pricingNote:
-    "Annual billing saves about 15%. Each extra model costs $35 to $165 a month depending on plan.",
+    "Annual billing saves about 15%. Each extra model costs $30, $70 or $140 a month depending on plan.",
   faqs: [
     {
       question: "Is Notra a good Peec AI alternative?",
       answer:
-        "If you want tracking and content in one tool, yes. Peec is a strong analytics dashboard. Notra tracks every engine on every plan and writes the posts that close your gaps.",
+        "If you want tracking, content and analytics in one tool, yes. Peec is a strong AI search dashboard. Notra tracks every assistant it offers on every plan, writes the posts that close your gaps and counts your human visitors and MCP server traffic.",
     },
     {
       question: "Which engines does Peec AI track compared to Notra?",
       answer:
-        "Peec self-serve plans pick 3 of ChatGPT, AI Mode, AI Overviews, Copilot, Gemini and Naver, with Perplexity as an add-on and Claude on Enterprise. Notra scans ChatGPT, Claude, Gemini, Perplexity, Google AI Overviews and AI Mode on every plan.",
+        "Peec self-serve plans pick 3 of ChatGPT, Perplexity, AI Overviews, AI Mode, Gemini, Naver, ERNIE and Bing AI Mode, with Claude on Enterprise. Notra scans ChatGPT, Claude, Gemini, Copilot, Google AI Overviews, AI Mode, Grok, Kimi, GLM and DeepSeek on every plan. Notra does not track Perplexity.",
     },
     {
       question: "Is Peec AI cheaper than Notra?",
       answer:
-        "Peec starts at $95 a month and Notra at $100. Peec includes more raw answers on its entry plan. Notra includes every engine, unlimited prompts and 10 long-form posts a month.",
+        "Peec starts at $95 a month and Notra at $100. Notra includes more AI answers on its entry plan, every engine it offers, no prompt cap and 10 long-form posts a month.",
     },
     {
       question: "How does Notra measure prompt demand compared to Peec?",
@@ -155,7 +159,7 @@ export const PEEC: CompareCompetitor = {
     {
       question: "Does Notra have crawler analytics like Peec?",
       answer:
-        "Yes. Notra logs 66 known AI agents through a small server middleware and keeps training crawls, live answer fetches and referral clicks apart.",
+        "Yes. Notra logs 66 known AI agents through a small server middleware and keeps training crawls, live answer fetches and referral clicks apart. It also counts human visitors with web analytics and tracks the agents that call your MCP server, which Peec does not.",
     },
   ],
 };

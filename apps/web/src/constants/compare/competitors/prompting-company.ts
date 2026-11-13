@@ -14,21 +14,24 @@ export const PROMPTING_COMPANY: CompareCompetitor = {
   headline: "Track prompts daily without a $3,000 plan.",
   headlineAccent: "daily",
   heroSubtitle:
-    "The Prompting Company tests how coding agents use your product and tracks AI visibility on credits. Notra tracks the major assistant apps on every plan and turns each gap into published content.",
+    "The Prompting Company tests how coding agents use your product and tracks AI visibility on credits. Notra tracks the major assistant apps on every plan, shows which agents call your MCP server and turns each gap into published content.",
   metaDescription:
-    "Notra vs The Prompting Company compared: engines per plan, credits vs answers, crawler logs, content and pricing for AI visibility.",
+    "Notra vs The Prompting Company compared: engines per plan, credits vs answers, crawler, web and MCP analytics, content and pricing for AI visibility.",
   chooseNotra: [
     "You want daily tracking of all your prompts without jumping to a $3,000 plan",
     "You want Claude and Google AI Overviews on the entry plan",
     "You want to know how answers are collected and how often",
+    "You want AI crawler logs without an Enterprise contract",
+    "You want to see which agents call your MCP server and which tools they use",
+    "You want web analytics for human visitors next to AI traffic",
     "You want multi-turn conversations alongside buyer personas",
     "You want content written in your brand voice for blog, changelog and social",
   ],
   chooseCompetitor: [
     "You sell a devtool and want coding agents tested against your product in sandboxes",
-    "You want CMS publishing to WordPress, Sanity, Webflow or Ghost",
+    "You want CMS publishing to WordPress, Sanity, Webflow, Ghost or Framer",
     "You want a fully managed white-glove service",
-    "Procurement needs SOC 2 and SAML SSO",
+    "Procurement needs SOC 2, ISO 27001 and SAML SSO",
   ],
   advantages: [
     {
@@ -39,7 +42,7 @@ export const PROMPTING_COMPANY: CompareCompetitor = {
     {
       title: "All engines from the start",
       description:
-        "TPC Basic covers ChatGPT, Perplexity and Gemini, with Google AI on Pro and Claude above that. Notra scans ChatGPT, Claude, Gemini, Perplexity and AI Overviews on every plan.",
+        "TPC Basic covers ChatGPT, Perplexity and Gemini, with Google AI on Pro and Claude above that. Notra scans ChatGPT, Claude, Gemini, Copilot, Google AI Overviews, AI Mode, Grok, Kimi, GLM and DeepSeek on every plan.",
     },
     {
       title: "Clear method",
@@ -51,7 +54,7 @@ export const PROMPTING_COMPANY: CompareCompetitor = {
     {
       title: "Agent experience testing",
       description:
-        "Runs Claude Code, Codex and OpenCode against your product in sandboxes and scores each run with transcripts and fixes. It is on the Enterprise plan.",
+        "Tracks Claude Code, Codex and OpenCode answers on the $3,000 plan, and on Enterprise runs them against your product in sandboxes and scores each run with transcripts and fixes.",
     },
     {
       title: "Fully managed option",
@@ -61,12 +64,12 @@ export const PROMPTING_COMPANY: CompareCompetitor = {
     {
       title: "Content and CMS publishing",
       description:
-        "A knowledge-base grounded content agent with drafts for WordPress, Sanity, Webflow, Ghost and Prismic.",
+        "A knowledge-base grounded content agent with drafts for WordPress, Sanity, Webflow, Ghost, Prismic, Framer or a custom endpoint.",
     },
     {
       title: "Crawler logs and enterprise",
       description:
-        "Cloudflare Worker, Logpush or raw event ingestion, plus SOC 2 Type II and SAML SSO. Backed by a $6.5M seed from Peak XV and YC.",
+        "Cloudflare Worker, Logpush or raw event ingestion on Enterprise, plus SOC 2 Type II, ISO 27001 and SAML SSO. Backed by a $6.5M seed from Peak XV and YC.",
     },
   ],
   values: {
@@ -77,7 +80,7 @@ export const PROMPTING_COMPANY: CompareCompetitor = {
     aiOverviews: "Pro plan",
     copilot: false,
     otherEngines: "$3,000 plan",
-    codingAgents: "Enterprise",
+    codingAgents: "$3,000 plan",
     modelChoice: false,
     entryEngines: "3",
     collection: "Not disclosed",
@@ -92,9 +95,11 @@ export const PROMPTING_COMPANY: CompareCompetitor = {
     frequency: "Not published",
     promptVolume: false,
     prompts: "25 to 100",
-    crawlerLogs: true,
-    referrals: true,
+    crawlerLogs: "Enterprise",
+    referrals: "Via GA or PostHog",
     conversions: "Not listed",
+    webAnalytics: false,
+    mcpAnalytics: "Not listed",
     siteAudit: true,
     gaps: true,
     contentWriting: "Pro plan",
@@ -121,7 +126,8 @@ export const PROMPTING_COMPANY: CompareCompetitor = {
     {
       name: "White-glove",
       price: "$3,000/mo",
-      detail: "12,000 credits, all engines, 50 articles, managed service.",
+      detail:
+        "12,000 credits, all engines, custom prompts, 50 articles, managed service.",
     },
     {
       name: "Enterprise",
@@ -135,17 +141,17 @@ export const PROMPTING_COMPANY: CompareCompetitor = {
     {
       question: "Is Notra an alternative to The Prompting Company?",
       answer:
-        "For AI visibility tracking and content, yes. If your main need is testing how coding agents use your devtool, TPC's agent experience product is more specialised.",
+        "For AI visibility tracking, analytics and content, yes. If your main need is testing how coding agents use your devtool, TPC's agent experience product is more specialised. If you run an MCP server, Notra shows which agents connect and which tools they call.",
     },
     {
       question: "How do credits compare to Notra's AI answers?",
       answer:
-        "Both count one engine answer as one unit. TPC Basic includes 1,000 credits for $99. Notra Starter includes 2,000 answers, every engine and 10 long-form posts for $100.",
+        "Both count one engine answer as one unit. TPC Basic includes 1,000 credits for $99. Notra Starter includes 6,000 answers, every engine it offers and 10 long-form posts for $100.",
     },
     {
       question: "Does Notra track coding agents?",
       answer:
-        "Not today. Notra tracks the assistant apps buyers use. TPC runs scored sandbox tests of coding agents on its Enterprise plan.",
+        "No. Notra tracks the assistant apps buyers use, and its MCP analytics shows which coding agents call your MCP server. TPC tracks coding agents on its $3,000 plan and runs scored sandbox tests on Enterprise.",
     },
   ],
 };

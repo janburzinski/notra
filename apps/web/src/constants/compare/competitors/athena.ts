@@ -10,18 +10,19 @@ export const ATHENA: CompareCompetitor = {
   headline: "A plan you can predict, with no credit math.",
   headlineAccent: "predict",
   heroSubtitle:
-    "AthenaHQ covers eleven engines and pairs them with an action agent on credits. Notra gives you predictable plans, crawler logs below Enterprise and content that closes each gap.",
+    "AthenaHQ covers eleven engines and pairs them with an action agent on credits. Notra gives you predictable plans, AI crawler logs, web analytics, MCP server analytics and content that closes each gap.",
   metaDescription:
     "Notra vs AthenaHQ compared: engines, credits vs plans, crawler logs, content and pricing for AI search visibility.",
   chooseNotra: [
     "You want a predictable plan instead of credits that run out mid-month",
-    "You want AI crawler logs without an Enterprise contract",
+    "You want AI crawler logs and your own web analytics, not a GA4 import",
     "You want buyer personas and multi-turn conversations without Enterprise",
     "You want a paid plan between free and $295",
     "You want to see how answers are collected and how often",
+    "You want to see which agents call your MCP server and its tools",
   ],
   chooseCompetitor: [
-    "You need Microsoft Copilot tracked",
+    "You need Perplexity, Meta AI or Mistral tracked",
     "You run Shopify and want AI revenue attribution",
     "You want SOC 2 Type II, SSO and audit logs",
     "You want a free tier to start",
@@ -33,9 +34,9 @@ export const ATHENA: CompareCompetitor = {
         "Athena bills one credit per AI response. G2 reviewers report using a month of credits in the first week. Notra plans meter answers too, but you set the scan schedule per project and the prompt calculator shows the monthly count up front.",
     },
     {
-      title: "Crawler logs on standard plans",
+      title: "AI traffic, web and MCP analytics",
       description:
-        "Athena lists bot and LLM traffic analytics on Enterprise. Notra logs 66 known AI agents and separates training, search and live answer fetches on its self-serve plans.",
+        "Athena no longer lists bot traffic analytics and reads human traffic from GA4. Notra logs 66 known AI agents, counts human visitors with its own cookie-free script and shows which agents call your MCP server, on every plan.",
     },
     {
       title: "Open method",
@@ -52,7 +53,7 @@ export const ATHENA: CompareCompetitor = {
     {
       title: "Action agent and content",
       description:
-        "Action Center tasks, a content optimization agent, a Content Hub and publishing to Shopify and Webflow.",
+        "Action Center tasks, a content workspace with AI agents and publishing to Shopify, Webflow, WordPress, Wix, Framer, Sanity, Contentful and Payload.",
     },
     {
       title: "Commerce and attribution",
@@ -85,12 +86,14 @@ export const ATHENA: CompareCompetitor = {
     personas: "Enterprise",
     conversations: "Not listed",
     languages: "Enterprise",
-    frequency: "Not published",
+    frequency: "Weekly or monthly",
     promptVolume: "Estimates",
     prompts: "Credit based",
-    crawlerLogs: "Enterprise",
+    crawlerLogs: "Not listed",
     referrals: true,
     conversions: true,
+    webAnalytics: "GA4 import",
+    mcpAnalytics: false,
     siteAudit: true,
     gaps: true,
     contentWriting: true,
@@ -107,7 +110,8 @@ export const ATHENA: CompareCompetitor = {
     {
       name: "Essential",
       price: "Free",
-      detail: "300 credits, 5 engines, unlimited members.",
+      detail:
+        "300 credits and $25 of free credit, 5 engines, unlimited members.",
     },
     {
       name: "Starter",
@@ -126,17 +130,17 @@ export const ATHENA: CompareCompetitor = {
     {
       question: "Is Notra an AthenaHQ alternative?",
       answer:
-        "Yes. Both track brand visibility in AI answers and help you act on it. Athena covers more engines. Notra offers predictable plans, crawler logs below Enterprise and the raw answer behind every number.",
+        "Yes. Both track brand visibility in AI answers and help you act on it. Athena covers more engines. Notra offers predictable plans, AI crawler logs, web and MCP server analytics and the raw answer behind every number.",
     },
     {
       question: "How do Athena credits compare to Notra?",
       answer:
-        "Athena Starter includes 3,600 credits for $295. Tracking 50 prompts on 5 engines every day uses that in about two weeks. Notra Growth includes 6,000 answers for $250.",
+        "Athena Starter includes 3,600 credits for $295. Tracking 50 prompts on 5 engines every day uses that in about two weeks. Notra Starter includes 6,000 answers for $100 and Growth 16,000 for $250.",
     },
     {
       question: "Which engines does AthenaHQ track that Notra does not?",
       answer:
-        "Microsoft Copilot. Notra tracks ChatGPT, Claude, Gemini, Perplexity, Google AI, Grok, DeepSeek and Meta AI.",
+        "Perplexity, Meta AI and Mistral. Notra tracks ChatGPT, Claude, Gemini, Copilot, Google AI Overviews, AI Mode, Grok, Kimi, GLM and DeepSeek.",
     },
   ],
 };

@@ -6,31 +6,32 @@ export const BYDEFAULT: CompareCompetitor = {
   website: "https://www.bydefault.so",
   logo: { src: "/logos/competitors/bydefault.svg", width: 22, height: 22 },
   summary:
-    "New, developer-friendly GEO tool with daily runs, crawler logs and a content agent.",
-  headline: "Citations counted from real answers.",
-  headlineAccent: "real answers",
+    "Developer-friendly GEO tool with daily runs, coding agent tracking, crawler logs and a content agent.",
+  headline: "AI visibility, web and MCP analytics in one tool.",
+  headlineAccent: "web and MCP analytics",
   heroSubtitle:
-    "ByDefault runs your prompts daily on four engines. Notra lets you pick exact models and counts a citation only when an answer cites you. It also adds Perplexity, personas and social content on every plan.",
+    "ByDefault runs your prompts daily on four engines and only logs AI bots. Notra adds web analytics for human visitors, MCP server analytics and AI referral tracking, and counts a citation only when an answer cites you.",
   metaDescription:
-    "Notra vs ByDefault compared: engines per plan, data, crawler logs, content and pricing for AI visibility and GEO.",
+    "Notra vs ByDefault compared: engines per plan, AI traffic, web and MCP analytics, crawler logs, content and pricing for AI visibility and GEO.",
   chooseNotra: [
-    "You want to pick the exact model version",
+    "You want web analytics for human visitors next to your AI traffic",
+    "You want to see which agents call your MCP server and which tools they use",
+    "You want AI referral clicks and the conversions they bring",
     "You want citations counted only from real answers",
-    "You want Perplexity tracked as an answer engine",
-    "You want buyer personas and multi-turn conversations",
-    "You want content on the entry plan, plus LinkedIn and X posts",
-    "You need an API and MCP server to build on",
+    "You want Copilot, AI Mode, Grok and DeepSeek tracked on every plan",
+    "You want buyer personas, multi-turn conversations and LinkedIn and X posts",
   ],
   chooseCompetitor: [
-    "You want a bigger daily answer pool on the entry plan",
+    "You want coding agents like Cursor, Codex and Claude Code tracked",
+    "You want an MCP server on the entry plan that also drafts and publishes articles",
     "You want search volume next to every content gap",
     "You want unlimited seats on every plan",
   ],
   advantages: [
     {
-      title: "Pick the exact model",
+      title: "Web, AI and MCP analytics",
       description:
-        "ByDefault plans let you choose 4 engines and do not track Perplexity answers. In Notra you pick the exact model you care about, across ChatGPT, Claude, Gemini, Perplexity and Google, and the list updates as new models ship.",
+        "ByDefault only logs requests from AI tools, with no human visitors, referrals or conversions. Notra counts every visitor with a cookie-free script, shows who arrived from an AI answer and what they did next, and tracks which agents call your MCP server, which tools they use and where calls fail.",
     },
     {
       title: "Citations from real answers",
@@ -38,30 +39,31 @@ export const BYDEFAULT: CompareCompetitor = {
         "When Meta's crawler fetches the same page ten times to train a model, Notra logs ten training crawls and zero citations. It counts a citation only when an engine cites your page in an answer, and labels training crawls separately.",
     },
     {
-      title: "Content from the first plan",
+      title: "More assistants on every plan",
       description:
-        "ByDefault Starter includes no articles. Notra Starter includes 10 long-form posts and unlimited social posts a month, written in your brand voice. The Notra GitHub App opens pull requests too, and you can reply in the PR to ask for fixes.",
+        "ByDefault plans pick 4 of 8 engines, half of them coding agents. Notra scans ChatGPT, Claude, Gemini, Copilot, Google AI Overviews, AI Mode, Grok, Kimi, GLM and DeepSeek on every plan.",
     },
     {
-      title: "Personas and conversations",
+      title: "Personas, conversations and social",
       description:
-        "Notra asks as generated buyer personas and replays multi-turn conversations, so you see answers beyond a single cold prompt.",
+        "Notra asks as generated buyer personas, replays multi-turn conversations and writes unlimited LinkedIn and X posts alongside 10 long-form posts a month.",
     },
   ],
   strengths: [
     {
+      title: "Coding agents tracked",
+      description:
+        "Cursor, Codex, Claude Code and OpenCode sit next to ChatGPT, Claude, Gemini and AI Overviews in the engine menu.",
+    },
+    {
       title: "Every prompt, every day",
       description:
-        "Each plan's answer pool covers a daily run of every included prompt.",
+        "Each plan's answer pool covers a daily run of every included prompt, with unlimited seats.",
     },
     {
-      title: "Unlimited seats",
-      description: "Every plan includes unlimited team members.",
-    },
-    {
-      title: "Crawler logs in minutes",
+      title: "Content agent and MCP",
       description:
-        "Vercel log drain, Cloudflare worker or plain server logs, with cited pages and bot purpose.",
+        "Articles on every plan with live fact checks and a tone pass, published by commit or pull request, plus an MCP server that reads and writes your data.",
     },
   ],
   values: {
@@ -88,17 +90,19 @@ export const BYDEFAULT: CompareCompetitor = {
     promptVolume: "Search volume",
     prompts: "50 to 350",
     crawlerLogs: true,
-    referrals: "Not listed",
-    conversions: "Not listed",
+    referrals: false,
+    conversions: false,
+    webAnalytics: false,
+    mcpAnalytics: "Not listed",
     siteAudit: "Not listed",
     gaps: true,
-    contentWriting: "Growth plan",
+    contentWriting: true,
     socialPosts: false,
     rescan: "Not listed",
     githubPrs: true,
     commerce: false,
-    api: "Not listed",
-    mcp: "Not listed",
+    api: "Articles only",
+    mcp: true,
     soc2: false,
     startingPrice: "$99/mo",
   },
@@ -106,17 +110,17 @@ export const BYDEFAULT: CompareCompetitor = {
     {
       name: "Starter",
       price: "$99/mo",
-      detail: "50 prompts, 4 models, 6,000 answers, no articles.",
+      detail: "50 prompts, 4 models, 6,000 answers, 2 articles.",
     },
     {
       name: "Growth",
       price: "$249/mo",
-      detail: "150 prompts, 4 models, 18,000 answers, 5 articles.",
+      detail: "150 prompts, 4 models, 18,000 answers, 10 articles, 2 projects.",
     },
     {
       name: "Scale",
       price: "$599/mo",
-      detail: "350 prompts, 4 models, 42,000 answers, 10 articles.",
+      detail: "350 prompts, 4 models, 42,000 answers, 20 articles, 5 projects.",
     },
   ],
   pricingNote:
@@ -125,12 +129,12 @@ export const BYDEFAULT: CompareCompetitor = {
     {
       question: "Is Notra a ByDefault alternative?",
       answer:
-        "Yes. Both track AI answers, log crawlers and write content. Notra covers Perplexity, adds personas and conversations and includes content on its entry plan.",
+        "Yes. Both track AI answers, log crawlers and write content. Notra adds web analytics for human visitors, MCP server analytics, AI referral tracking, personas and conversations.",
     },
     {
       question: "Does ByDefault track Perplexity?",
       answer:
-        "ByDefault shows Perplexity in crawler analytics but does not track Perplexity answers. Notra scans Perplexity on every plan.",
+        "No. ByDefault shows Perplexity in crawler analytics but does not track Perplexity answers. Notra does not track Perplexity answers either, and logs Perplexity crawls and referral clicks.",
     },
     {
       question: "How does Notra count citations differently from ByDefault?",
@@ -140,7 +144,12 @@ export const BYDEFAULT: CompareCompetitor = {
     {
       question: "Which is cheaper, ByDefault or Notra?",
       answer:
-        "ByDefault starts at $99 and Notra at $100. ByDefault includes more daily answers. Notra includes every engine, unlimited prompts, 10 long-form posts and unlimited social posts.",
+        "ByDefault starts at $99 and Notra at $100, and both include 6,000 answers. Notra includes every engine it offers, no prompt cap, 10 long-form posts, unlimited social posts and web and MCP server analytics.",
+    },
+    {
+      question: "Does ByDefault have web or MCP analytics?",
+      answer:
+        "No. ByDefault logs requests from AI tools only. Notra also counts human visitors, AI referral clicks and conversions, and shows which agents connect to your MCP server and which tools they call.",
     },
   ],
 };

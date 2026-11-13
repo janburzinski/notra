@@ -6,34 +6,35 @@ export const SCRUNCH: CompareCompetitor = {
   website: "https://scrunch.com",
   logo: { src: "/logos/competitors/scrunch.svg", width: 144, height: 144 },
   summary:
-    "Enterprise AI customer experience platform, now part of Sitecore. Seven engines and an edge layer for AI bots.",
+    "Enterprise AI customer experience platform, now part of Sitecore. Four engines on Core, nine and an edge layer for AI bots on Enterprise.",
   headline: "Find the gap and publish the fix.",
   headlineAccent: "publish the fix",
   heroSubtitle:
-    "Scrunch tracks seven engines and serves AI bots a lighter copy of your site at the edge. Notra starts at a third of the price and writes content for the prompts you lose.",
+    "Scrunch Core tracks four engines and saves the edge layer for AI bots for Enterprise. Notra starts at $100 with every engine it offers, writes full posts for the prompts you lose and adds web and MCP server analytics.",
   metaDescription:
-    "Notra vs Scrunch compared: engines, data collection, crawler logs, content and pricing for AI search visibility.",
+    "Notra vs Scrunch compared: engines, data collection, crawler, web and MCP analytics, content and pricing for AI search visibility.",
   chooseNotra: [
-    "Your budget starts closer to $100 than $300 a month",
-    "You want a writer that turns gaps into posts",
+    "Your budget starts closer to $100 than $250 a month",
+    "You want more than 125 prompts without an Enterprise contract",
     "You want to scan daily for as long as you like",
     "You want multi-turn conversations alongside buyer personas",
+    "You want web analytics for human visitors and MCP server analytics",
   ],
   chooseCompetitor: [
-    "You need Microsoft Copilot tracked",
-    "You want AXP to serve AI bots a machine-readable copy of each page",
+    "You need Perplexity or Meta AI tracked",
+    "You want Agent Pages (AXP) to serve AI bots a machine-readable copy of each page",
     "You are on Sitecore or want an enterprise vendor with SOC 2 Type II",
   ],
   advantages: [
     {
-      title: "A third of the entry price",
+      title: "More for less on the entry plan",
       description:
-        "Scrunch starts at $300 a month. Notra Starter is $100 with every engine, unlimited prompts and 10 long-form posts.",
+        "Scrunch Core is $250 a month for 125 prompts, 5,000 answers and 4 engines. Notra Starter is $100 for 6,000 answers with no prompt cap, every engine it offers and 10 long-form posts.",
     },
     {
       title: "Gaps turned into posts",
       description:
-        "Scrunch shows where you are missing but does not write content. Notra ranks gaps by opportunity, writes the brief and the draft and rescans after you publish.",
+        "Scrunch Core includes basic content generation. Notra ranks gaps by opportunity, writes the brief and a full draft in your brand voice and rescans after you publish.",
     },
     {
       title: "Your scan schedule",
@@ -43,14 +44,14 @@ export const SCRUNCH: CompareCompetitor = {
   ],
   strengths: [
     {
-      title: "Seven engines on every plan",
+      title: "Nine engines on Enterprise",
       description:
-        "ChatGPT, Claude, Gemini, Perplexity, Google AI and Meta AI on every plan, with no engine add-ons.",
+        "ChatGPT, Perplexity, Google AI Overviews and Copilot on Core, plus Gemini, Claude, AI Mode, Grok and Meta AI on Enterprise.",
     },
     {
       title: "Agent Experience Platform",
       description:
-        "AXP detects AI bots at the CDN edge and serves a compressed, machine-readable page. Scrunch cites a 364% lift for Akamai on non-branded prompts.",
+        "AXP, now sold as Agent Pages on Enterprise, detects AI bots at the CDN edge and serves a compressed, machine-readable page. Scrunch cites a 364% lift for Akamai on non-branded prompts.",
     },
     {
       title: "Enterprise scale",
@@ -60,66 +61,64 @@ export const SCRUNCH: CompareCompetitor = {
   ],
   values: {
     chatgpt: true,
-    claude: true,
-    gemini: true,
+    claude: "Enterprise",
+    gemini: "Enterprise",
     perplexity: true,
     aiOverviews: true,
     copilot: true,
-    otherEngines: "Meta AI",
+    otherEngines: "Grok and Meta AI on Enterprise",
     codingAgents: "Not listed",
     modelChoice: false,
-    entryEngines: "7",
+    entryEngines: "4",
     collection: "Browser and APIs",
     shareOfVoice: true,
     sentiment: true,
     citations: true,
-    fanout: "Not listed",
+    fanout: "Limited on Core",
     rawAnswers: true,
     personas: true,
     conversations: "Not listed",
-    languages: "By country",
+    languages: "1 on Core",
     frequency: "Every 72 hours",
-    promptVolume: "Not listed",
-    prompts: "350 to 700",
+    promptVolume: "Topic estimates",
+    prompts: "125 on Core",
     crawlerLogs: true,
     referrals: "Via GA4",
     conversions: "Not listed",
+    webAnalytics: false,
+    mcpAnalytics: "Not listed",
     siteAudit: true,
     gaps: "Not listed",
-    contentWriting: false,
+    contentWriting: "Basic",
     socialPosts: false,
     rescan: "Manual refresh",
     githubPrs: "Not listed",
-    commerce: false,
-    api: true,
-    mcp: "Not listed",
+    commerce: "Enterprise",
+    api: "Enterprise",
+    mcp: "Enterprise",
     soc2: true,
-    startingPrice: "$300/mo",
+    startingPrice: "$250/mo",
   },
   plans: [
     {
-      name: "Starter",
-      price: "$300/mo",
-      detail: "350 custom prompts, 3 personas, 3 seats, 7-day trial.",
-    },
-    {
-      name: "Growth",
-      price: "$500/mo",
-      detail: "700 custom prompts, 5 personas, 5 seats.",
+      name: "Core",
+      price: "$250/mo",
+      detail:
+        "125 prompts, 5,000 answers, 4 engines, 1 persona, 5 seats, 7-day trial.",
     },
     {
       name: "Enterprise",
       price: "Custom",
-      detail: "Custom prompts, personas and seats.",
+      detail: "9 engines, Agent Pages, API, MCP and SSO.",
     },
   ],
   pricingNote:
-    "Annual billing saves 17%, bringing Starter to $250 a month. All plans include all 7 engines.",
+    "Core covers ChatGPT, Perplexity, Google AI Overviews and Copilot. Agency plans start at $500 a month.",
   faqs: [
     {
       question: "Is Notra a Scrunch alternative?",
       answer:
-        "Yes, especially for smaller teams. Scrunch is an enterprise platform from $300 a month. Notra starts at $100 and adds content writing to tracking.",
+        "Yes, especially for smaller teams. Scrunch is an enterprise platform from $250 a month with 4 engines. Notra starts at $100 with every engine it offers, full content writing and web and MCP server analytics.",
     },
     {
       question: "What happened to Scrunch after the Sitecore deal?",

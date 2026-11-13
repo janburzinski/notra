@@ -25,6 +25,8 @@ export type CompareRowId =
   | "crawlerLogs"
   | "referrals"
   | "conversions"
+  | "webAnalytics"
+  | "mcpAnalytics"
   | "siteAudit"
   | "gaps"
   | "contentWriting"
