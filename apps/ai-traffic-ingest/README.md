@@ -32,8 +32,11 @@ waits for active requests, background work, the batchers and the pending usage
 report before closing the database pool and exiting.
 
 Concurrent requests for the same token, project or organization share one
-in-flight token-generation, host and site lookup. Nothing is kept once it
-settles, so revocation and host changes still apply on the next lookup.
+in-flight token-generation, host and site lookup. A successful lookup is kept
+in process for a minute, so each replica checks Postgres and Redis about once
+a minute per project instead of on every AI hit. Revocation, deleted projects
+and host changes therefore apply within a minute; a rotated token's new
+generation is checked right away. Failed lookups are never kept.
 Rate-limit hits return `429`; Redis transport failures and limiter timeouts return
 `502` without writing an event. Redis availability is required for tracked ingestion.
 Token generation is still checked against Postgres and fails closed on an outage.

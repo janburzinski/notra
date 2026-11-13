@@ -253,7 +253,15 @@ describe("runGeoIngest ordering", () => {
     ],
     [
       "the token was revoked",
-      () => getGeoIngestTokenGeneration.mockImplementation(async () => 2),
+      () => {
+        // A passed check is kept a minute per project, so use one no test passed.
+        verifyGeoIngestToken.mockImplementation(() => ({
+          organizationId: "org_1",
+          projectId: "proj_rotated",
+          generation: 1,
+        }));
+        getGeoIngestTokenGeneration.mockImplementation(async () => 2);
+      },
       GeoIngestInvalidTokenError,
       false,
     ],
@@ -285,6 +293,11 @@ describe("runGeoIngest ordering", () => {
   test.each([{ method: "GET" }, { method: "GET", url: ":::" }])(
     "a revoked token stays 401 for the malformed payload %j",
     async (body) => {
+      verifyGeoIngestToken.mockImplementation(() => ({
+        organizationId: "org_1",
+        projectId: "proj_deleted",
+        generation: 1,
+      }));
       getGeoIngestTokenGeneration.mockImplementation(async () => null);
       const outcome = await run(ingestRequest(body));
       expect(outcome._tag === "Failure" && outcome.failure).toBeInstanceOf(
@@ -293,6 +306,27 @@ describe("runGeoIngest ordering", () => {
       expect(ingestGeoTrafficEvents).not.toHaveBeenCalled();
     }
   );
+
+  test("server tokens check their project once a minute, and a rotated token right away", async () => {
+    const token = (generation: number) => ({
+      organizationId: "org_1",
+      projectId: "proj_server_memo",
+      generation,
+    });
+    verifyGeoIngestToken.mockImplementation(() => token(1));
+    for (let i = 0; i < 3; i++) {
+      expect(await run(ingestRequest())).toMatchObject({ _tag: "Success" });
+    }
+    expect(getGeoIngestTokenGeneration).toHaveBeenCalledTimes(1);
+
+    getGeoIngestTokenGeneration.mockImplementation(async () => 2);
+    verifyGeoIngestToken.mockImplementation(() => token(2));
+    expect(await run(ingestRequest())).toMatchObject({
+      _tag: "Success",
+      success: { outcome: "ingested" },
+    });
+    expect(getGeoIngestTokenGeneration).toHaveBeenCalledTimes(2);
+  });
 
   test("drops tracked events for hosts outside the allowed list", async () => {
     loadIngestAllowedHosts.mockImplementation(async () => ["other.example"]);
@@ -707,10 +741,10 @@ describe("runGeoIngest ordering", () => {
       _tag: "Success",
       success: { outcome: "dropped", reason: "site" },
     });
-    // Server tokens never keep the lookup in process; only public keys do.
+    // The server SDK posts on every request, so its lookup is kept in process.
     expect(loadOrganizationSitePrefixes.mock.lastCall).toEqual([
       expect.any(String),
-      false,
+      true,
     ]);
     const outside = await run(
       ingestRequest({

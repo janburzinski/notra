@@ -79,7 +79,7 @@ curl -X POST "https://api.usenotra.com/v1/geo/ingest/rotate-token?projectId=$PRO
 
 </Visibility>
 
-Rotation invalidates every tracking token previously issued for the organization and returns a fresh one. Because Notra immediately rejects events from deployments that still send the old token, update `NOTRA_GEO_TOKEN` everywhere before you rotate.
+Rotation invalidates every tracking token previously issued for the organization and returns a fresh one. Because Notra starts rejecting events from deployments that still send the old token within a minute of rotation, update `NOTRA_GEO_TOKEN` everywhere before you rotate.
 
 <Visibility for="agents">
 

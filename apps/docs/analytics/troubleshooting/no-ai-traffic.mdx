@@ -20,7 +20,7 @@ docolin:
     Set `NOTRA_GEO_TOKEN` at your hosting provider as well as locally. The tracker never throws, so a missing token fails silently unless you pass `onError` to log problems.
   </Accordion>
   <Accordion title="The token was rotated">
-    Rotating the token invalidates every earlier token right away, so update the variable and redeploy.
+    Rotating the token invalidates every earlier token within a minute, so update the variable and redeploy.
   </Accordion>
   <Accordion title="Pages are served statically">
     The tracker runs in middleware, so it never sees pages that a CDN serves without hitting your app, so on Astro you need a server adapter.

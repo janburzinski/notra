@@ -133,7 +133,7 @@ export const GEO_INGEST_IDENTITY_POLICIES = {
     followsRotation: true,
     aiEvents: "tracked",
     marksServerTraffic: true,
-    cachesChecks: false,
+    cachesChecks: true,
   },
   // A Site reports every request server-side for AI traffic; people's page
   // views and engagement come from the notra.js beacons it relays. Behind a
@@ -143,7 +143,7 @@ export const GEO_INGEST_IDENTITY_POLICIES = {
     followsRotation: false,
     aiEvents: "tracked",
     marksServerTraffic: false,
-    cachesChecks: false,
+    cachesChecks: true,
   },
   // Up to three beacons per page view (view, engagement, outbound click).
   "site-beacon": {
