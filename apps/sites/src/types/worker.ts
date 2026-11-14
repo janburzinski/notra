@@ -5,8 +5,15 @@ export interface SiteBucketObject {
   text(): Promise<string>;
 }
 
+export interface SiteBucketGetOptions {
+  range?: { offset: number; length: number };
+}
+
 export interface SiteBucket {
-  get(key: string): Promise<SiteBucketObject | null>;
+  get(
+    key: string,
+    options?: SiteBucketGetOptions
+  ): Promise<SiteBucketObject | null>;
 }
 
 export interface SiteEdgeCache {

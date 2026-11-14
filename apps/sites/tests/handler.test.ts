@@ -503,6 +503,129 @@ describe("production serving", () => {
     ).toBe(304);
   });
 
+  test("revalidation accepts the weak ETag Cloudflare sends after compressing", async () => {
+    const { request } = setup();
+    const page = await request("https://acme.notra.site/blog");
+    const etag = page.headers.get("ETag") ?? "";
+    for (const ifNoneMatch of [
+      `W/${etag}`,
+      `"other", W/${etag}`,
+      ` ${etag} , "other"`,
+      "*",
+    ]) {
+      const revalidated = await request("https://acme.notra.site/blog", {
+        "If-None-Match": ifNoneMatch,
+      });
+      expect(revalidated.status).toBe(304);
+      expect(await revalidated.text()).toBe("");
+    }
+    for (const ifNoneMatch of [
+      '"other"',
+      'W/"other"',
+      `${etag.slice(0, -2)}"`,
+    ]) {
+      const changed = await request("https://acme.notra.site/blog", {
+        "If-None-Match": ifNoneMatch,
+      });
+      expect(changed.status).toBe(200);
+    }
+  });
+
+  test("media files answer byte ranges from R2, pages stay whole", async () => {
+    const { objects, put, deps, request } = setup();
+    const clip = "0123456789";
+    const manifestKey = `deployments/${SITE}/dep_live/manifest.json`;
+    const live = JSON.parse(objects.get(manifestKey) ?? "{}");
+    live.files.push({
+      path: "/blog/media/clip.mp4",
+      size: clip.length,
+      sha256: "c".repeat(64),
+      contentType: "video/mp4",
+    });
+    put(manifestKey, live);
+    const fileKey = `deployments/${SITE}/dep_live/files/blog/media/clip.mp4`;
+    put(fileKey, clip);
+    const reads: (string | undefined)[] = [];
+    const get = deps.bucket.get;
+    deps.bucket.get = async (key, options) => {
+      if (key !== fileKey) {
+        return get(key, options);
+      }
+      const range = options?.range;
+      reads.push(range ? `${range.offset}+${range.length}` : undefined);
+      const bytes = range
+        ? clip.slice(range.offset, range.offset + range.length)
+        : clip;
+      return { body: new Response(bytes).body, text: async () => bytes };
+    };
+    const url = "https://acme.notra.site/blog/media/clip.mp4";
+
+    const whole = await request(url);
+    expect(whole.status).toBe(200);
+    expect(whole.headers.get("Accept-Ranges")).toBe("bytes");
+    expect(await whole.text()).toBe(clip);
+    const etag = whole.headers.get("ETag") ?? "";
+
+    for (const [range, body, contentRange] of [
+      ["bytes=2-5", "2345", "bytes 2-5/10"],
+      ["bytes=7-", "789", "bytes 7-9/10"],
+      ["bytes=-3", "789", "bytes 7-9/10"],
+      ["bytes=8-99", "89", "bytes 8-9/10"],
+      ["bytes=0-0", "0", "bytes 0-0/10"],
+    ] as const) {
+      reads.length = 0;
+      const partial = await request(url, { Range: range });
+      expect(partial.status).toBe(206);
+      expect(partial.headers.get("Content-Range")).toBe(contentRange);
+      expect(partial.headers.get("Content-Length")).toBe(String(body.length));
+      expect(partial.headers.get("Content-Type")).toBe("video/mp4");
+      expect(await partial.text()).toBe(body);
+      expect(reads).toHaveLength(1);
+      expect(reads[0]).toBeDefined();
+    }
+
+    for (const range of ["bytes=10-", "bytes=-0"]) {
+      const unsatisfiable = await request(url, { Range: range });
+      expect(unsatisfiable.status).toBe(416);
+      expect(unsatisfiable.headers.get("Content-Range")).toBe("bytes */10");
+    }
+
+    // Multi-range, malformed and stale If-Range requests get the whole file.
+    for (const headers of [
+      { Range: "bytes=0-1,4-5" } as Record<string, string>,
+      { Range: "bytes=5-2" },
+      { Range: "items=0-1" },
+      { Range: "bytes=0-1", "If-Range": '"stale"' },
+    ]) {
+      const full = await request(url, headers);
+      expect(full.status).toBe(200);
+      expect(await full.text()).toBe(clip);
+    }
+    const current = await request(url, {
+      Range: "bytes=0-1",
+      "If-Range": etag,
+    });
+    expect(current.status).toBe(206);
+    expect(await current.text()).toBe("01");
+
+    reads.length = 0;
+    const head = await handleSiteRequest(
+      new Request(url, { method: "HEAD", headers: { Range: "bytes=0-3" } }),
+      deps
+    );
+    expect(head.status).toBe(206);
+    expect(head.headers.get("Content-Range")).toBe("bytes 0-3/10");
+    expect(await head.text()).toBe("");
+    expect(reads).toHaveLength(0);
+
+    const page = await request("https://acme.notra.site/blog", {
+      Range: "bytes=0-3",
+    });
+    expect(page.status).toBe(200);
+    expect(page.headers.get("Accept-Ranges")).toBeNull();
+    expect(await page.text()).toBe("dep_live:/blog/index.html");
+  });
+
   test("agents get every page as Markdown, browsers keep HTML", async () => {
     const { request } = setup();
     const page = await request("https://acme.notra.site/blog/post");

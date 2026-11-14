@@ -13,8 +13,9 @@ import {
   REVALIDATE_CACHE_CONTROL,
 } from "./constants/responses";
 import { serviceErrorPage } from "./pages";
-import type { ServeFileParams } from "./types/serving";
+import type { ByteRange, ServeFileParams } from "./types/serving";
 import type { SitesDeps } from "./types/worker";
+import { byteRange, etagMatches } from "./utils/conditional";
 import { withinDeadline } from "./utils/deadline";
 import { html } from "./utils/responses";
 import { readVerifiedBody } from "./utils/verified-body";
@@ -76,6 +77,54 @@ async function readFileBody(
   return forClient;
 }
 
+/** A Range the file can answer: If-Range must name this exact (strong) ETag. */
+function requestedRange(
+  request: Request,
+  file: SiteManifestFile,
+  etag: string
+): ByteRange | "unsatisfiable" | null {
+  const ifRange = request.headers.get("If-Range");
+  if (ifRange !== null && ifRange.trim() !== etag) {
+    return null;
+  }
+  return byteRange(request.headers.get("Range"), file.size);
+}
+
+/**
+ * Partial content straight from R2. Video players need it: iOS Safari will not
+ * play a <video> whose server ignores Range, and seeking needs it everywhere.
+ */
+async function serveRange(
+  params: ServeFileParams,
+  headers: Headers,
+  range: ByteRange | "unsatisfiable"
+): Promise<Response> {
+  const { deps, request, siteId, deploymentId, file } = params;
+  if (range === "unsatisfiable") {
+    headers.set("Content-Range", `bytes */${file.size}`);
+    return new Response(null, { status: 416, headers });
+  }
+  const length = range.end - range.start + 1;
+  headers.set(
+    "Content-Range",
+    `bytes ${range.start}-${range.end}/${file.size}`
+  );
+  headers.set("Content-Length", String(length));
+  if (request.method === "HEAD") {
+    return new Response(null, { status: 206, headers });
+  }
+  const object = await withinDeadline(
+    deps.bucket.get(SITE_R2_KEYS.file(siteId, deploymentId, file.path), {
+      range: { offset: range.start, length },
+    }),
+    deps.r2ReadTimeoutMs ?? R2_READ_TIMEOUT_MS
+  );
+  if (!object?.body) {
+    return html(serviceErrorPage(), 503);
+  }
+  return new Response(object.body, { status: 206, headers });
+}
+
 export async function serveFile(params: ServeFileParams): Promise<Response> {
   const { deps, request, siteId, deploymentId, file, status, isPreview } =
     params;
@@ -109,8 +158,20 @@ export async function serveFile(params: ServeFileParams): Promise<Response> {
   if (isPreview) {
     headers.set("X-Robots-Tag", "noindex, nofollow");
   }
-  if (status === 200 && request.headers.get("If-None-Match") === etag) {
+  if (
+    status === 200 &&
+    etagMatches(request.headers.get("If-None-Match"), etag)
+  ) {
     return new Response(null, { status: 304, headers });
+  }
+  // Pages can be rewritten (notra.js) and count as page views, so only other
+  // files (video, images, fonts, downloads) are served in parts.
+  if (status === 200 && !file.contentType.startsWith("text/html")) {
+    headers.set("Accept-Ranges", "bytes");
+    const range = requestedRange(request, file, etag);
+    if (range) {
+      return serveRange(params, headers, range);
+    }
   }
   const body = await readFileBody(deps, siteId, deploymentId, file);
   if (!body) {

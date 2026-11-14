@@ -45,6 +45,12 @@ export interface ServeFileParams {
   extraHeaders?: Record<string, string>;
 }
 
+/** Inclusive byte offsets of a satisfiable single range. */
+export interface ByteRange {
+  start: number;
+  end: number;
+}
+
 export interface AnalyticsScriptTag {
   scriptSrc: string;
   eventPath: string;

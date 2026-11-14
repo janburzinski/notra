@@ -1,4 +1,8 @@
-import { IMAGE_MIME_TYPES, IMAGE_URL_EXTENSION } from "../constants/seo";
+import {
+  IMAGE_MIME_TYPES,
+  IMAGE_URL_EXTENSION,
+  VECTOR_IMAGE_PATH,
+} from "../constants/seo";
 
 export function imageMimeType(url: string): string | undefined {
   const { pathname } = new URL(url);
@@ -6,4 +10,9 @@ export function imageMimeType(url: string): string | undefined {
   return extension && Object.hasOwn(IMAGE_MIME_TYPES, extension)
     ? IMAGE_MIME_TYPES[extension]
     : undefined;
+}
+
+/** Whether social networks can show the image as a link preview. */
+export function isShareableImage(path: string): boolean {
+  return !VECTOR_IMAGE_PATH.test(path);
 }

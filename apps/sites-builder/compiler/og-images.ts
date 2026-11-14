@@ -27,6 +27,7 @@ import type { ReactElement } from "react";
 import { AREA_DEFAULT_TITLES } from "../src/constants/areas";
 import { OG_MANIFEST_FILE } from "../src/constants/og";
 import { configuredAreaTitle } from "../src/utils/area-titles";
+import { isShareableImage } from "../src/utils/images";
 import { OG_IMAGES_DIR } from "./constants/og-images";
 import type {
   FrontmatterAuthor,
@@ -204,8 +205,10 @@ export async function writeOgImages(
       customFont: Boolean(custom.font),
     });
     const now = new Date();
-    // seo.image replaces the generated section cards; posts keep their own.
-    const areas = config.seo.image ? [] : params.areas;
+    // A raster seo.image replaces the generated section cards; posts keep
+    // their own. An SVG one can't be shared, so the cards are still made.
+    const ownSiteImage = config.seo.image && isShareableImage(config.seo.image);
+    const areas = ownSiteImage ? [] : params.areas;
     await Promise.all(
       areas.map(async (area) => {
         const urlPath = `/${OG_IMAGES_DIR}/${area}.png`;
@@ -232,7 +235,9 @@ export async function writeOgImages(
           "utf8"
         );
         const { data } = parseEntryFrontmatter(entry.path, entry.area, source);
-        if (!data || data.image || (data.draft && !params.includeDrafts)) {
+        // Pages with an SVG cover still get a PNG card to share.
+        const ownImage = data?.image && isShareableImage(data.image);
+        if (!data || ownImage || (data.draft && !params.includeDrafts)) {
           return;
         }
         const card = ogEntryCard({

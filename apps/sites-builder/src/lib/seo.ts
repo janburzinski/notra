@@ -10,6 +10,7 @@ import type {
   SocialImage,
   ThemeColors,
 } from "../types/seo";
+import { isShareableImage } from "../utils/images";
 import { mailtoAddress } from "../utils/mailto";
 import { generatedAreaImage } from "./og";
 import {
@@ -155,13 +156,14 @@ export function socialImage(
   generated?: string,
   imageAlt?: string
 ): SocialImage | undefined {
-  if (image) {
+  // SVG covers are skipped: the build generates a PNG card for those pages.
+  if (image && isShareableImage(image)) {
     return chosenImage(image, imageAlt);
   }
   if (generated) {
     return { url: absoluteUrl(generated), large: true };
   }
-  if (config.seo.image) {
+  if (config.seo.image && isShareableImage(config.seo.image)) {
     return chosenImage(config.seo.image, config.seo.imageAlt);
   }
   const areaImage = generatedAreaImage();
@@ -169,7 +171,9 @@ export function socialImage(
     return { url: absoluteUrl(areaImage), large: true };
   }
   const logo = logoFor("light");
-  return logo ? { url: absoluteUrl(logo), large: false } : undefined;
+  return logo && isShareableImage(logo)
+    ? { url: absoluteUrl(logo), large: false }
+    : undefined;
 }
 
 export function extraMetaTags(): ExtraMetaTag[] {

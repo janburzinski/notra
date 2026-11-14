@@ -31,4 +31,7 @@ export const IMAGE_MIME_TYPES: Record<string, string> = {
 
 export const IMAGE_URL_EXTENSION = /\.([a-z0-9]+)$/i;
 
+/** Facebook, X, LinkedIn and Slack don't render SVG share images. */
+export const VECTOR_IMAGE_PATH = /\.svgz?(?:[?#].*)?$/i;
+
 export const FAQ_HEADING = /^(?:frequently asked questions|faqs?|q\s*&\s*a)$/i;

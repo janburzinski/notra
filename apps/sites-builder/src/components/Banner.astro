@@ -23,7 +23,11 @@ const { banner } = Astro.props;
     button.addEventListener("click", () => {
       const key = button.dataset.bannerDismiss;
       if (key) {
-        localStorage.setItem(key, "1");
+        try {
+          localStorage.setItem(key, "1");
+        } catch {
+          // Storage blocked: still hide it for this page view.
+        }
       }
       document.documentElement.toggleAttribute("data-banner-dismissed", true);
     });
