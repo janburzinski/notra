@@ -1,0 +1,29 @@
+apps/sites/src/serve-file.ts
+  s_5dbe3dd66e59f2::t_596b8fdf17a1bf 167-169
+apps/sites-builder/tests/share-images.test.ts
+  s_5dbe3dd66e59f2::t_ea72e835125316 1-27
+apps/sites/src/utils/conditional.ts
+  s_5dbe3dd66e59f2::t_4c5bb61e7a3b9e 1-62
+apps/sites/tests/handler.test.ts
+  s_5dbe3dd66e59f2::t_1ce5fab704cc21 534-594,596-605,607-628
+  s_5dbe3dd66e59f2::t_30a29a42431d8e 506-524,526-533
+  s_5dbe3dd66e59f2::t_716e9a1b7c0e88 595
+apps/sites-builder/src/lib/seo.ts
+  s_5dbe3dd66e59f2::t_7417517e97eca3 13
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "84ed937140dcd3267121e0997ee056a3c8aaff21",
+  "prompts": {},
+  "sessions": {
+    "s_5dbe3dd66e59f2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "4021b33b-765e-4376-87b3-b90278c25da3",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
