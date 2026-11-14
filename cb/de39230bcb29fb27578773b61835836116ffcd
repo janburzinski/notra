@@ -1,0 +1,24 @@
+apps/dashboard/src/components/artifacts/artifact-document.tsx
+  s_3428b476267439::t_a53967596320f0 60-62,64
+  s_3428b476267439::t_ea02cce47b225b 31
+  s_3428b476267439::t_5a4aed2241a789 200,202-204
+  s_3428b476267439::t_59efc3c8737d2a 197,201
+apps/dashboard/src/constants/artifacts.ts
+  s_3428b476267439::t_ea02cce47b225b 6-8
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "cbde39230bcb29fb27578773b61835836116ffcd",
+  "prompts": {},
+  "sessions": {
+    "s_3428b476267439": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c6d39551-e687-4036-a65c-3bd92bb74947",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
