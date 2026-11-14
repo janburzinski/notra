@@ -4,6 +4,7 @@ import {
   AUTOPILOT_AUTONOMOUS_PR_BUDGET,
   AUTOPILOT_PLANNER_FILE_MAX_BYTES,
   AUTOPILOT_DAY_MS,
+  AUTOPILOT_DEMAND_MAX_AGE_DAYS,
   AUTOPILOT_FOLLOWED_TOPIC_NEXT_STEP,
   AUTOPILOT_PLANNER_STATE_BLOCK,
   AUTOPILOT_PLANNER_STATE_FENCE,
@@ -448,13 +449,21 @@ export function evaluateAutopilotGate(params: {
   activeWork: boolean;
   autonomousPullRequestsInWindow: number;
   draftSlotsFree: boolean;
+  now: Date;
 }): AutopilotGateResult {
   const { action, topic } = params;
   const signals = topic ? countIndependentSignals(topic) : 0;
-  // AI answers or searches that miss the brand; merged pull requests alone
-  // only show that something shipped, not that anyone wants to read about it.
+  // AI answers or searches that miss the brand, seen lately; merged pull
+  // requests alone only show that something shipped, not that anyone wants
+  // to read about it, and a gap the brand has since closed is no demand.
+  const demandSince =
+    params.now.getTime() - AUTOPILOT_DEMAND_MAX_AGE_DAYS * AUTOPILOT_DAY_MS;
   const demand =
-    topic?.signals.some((signal) => signal.source === "keywords") ?? false;
+    topic?.signals.some(
+      (signal) =>
+        signal.source === "keywords" &&
+        new Date(signal.seenAt).getTime() >= demandSince
+    ) ?? false;
   // A merged or dismissed topic is never reopened on the model's word alone.
   const closed = topic?.status === "done" || topic?.status === "dismissed";
   let actionDetail = `${action.type} for ${topic?.title ?? "an unknown topic"}`;

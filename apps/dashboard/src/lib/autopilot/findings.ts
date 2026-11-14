@@ -39,6 +39,7 @@ import {
   AUTOPILOT_FINDING_CLAIM_LEASE_MS,
   AUTOPILOT_FINDING_MAX_FAILURES,
   AUTOPILOT_READINESS_DISMISS_COOLDOWN_MS,
+  AUTOPILOT_READINESS_MERGED_GRACE_MS,
   AUTOPILOT_RUN_LEASE_MS,
 } from "@/constants/autopilot";
 import {
@@ -361,7 +362,7 @@ export async function markFindingWithoutChange(
       dismissedAt: new Date(),
       claimToken: null,
       errorMessage: reason,
-      evidence: { ...claim.finding.evidence, issueIds: [] },
+      evidence: { ...claim.finding.evidence, issueIds: [], pageUrls: [] },
     })
     .where(heldBy(claim, "dismissed"));
 }
@@ -842,8 +843,12 @@ export async function listSettledLinkPairs(organizationId: string) {
   return rows.flatMap((row) => row.evidence.links ?? []);
 }
 
-/** Readiness issues whose fix pull request was closed; Autopilot stops proposing them. */
+/**
+ * Readiness issues whose fix pull request was closed, or merged so recently
+ * that the fix may not be deployed and scanned yet; Autopilot skips them.
+ */
 export async function listDismissedReadinessIssueIds(organizationId: string) {
+  const now = Date.now();
   const rows = await db
     .select({ evidence: autopilotFindings.evidence })
     .from(autopilotFindings)
@@ -851,10 +856,21 @@ export async function listDismissedReadinessIssueIds(organizationId: string) {
       and(
         eq(autopilotFindings.organizationId, organizationId),
         eq(autopilotFindings.kind, "readiness"),
-        eq(autopilotFindings.status, "dismissed"),
-        gt(
-          autopilotFindings.dismissedAt,
-          new Date(Date.now() - AUTOPILOT_READINESS_DISMISS_COOLDOWN_MS)
+        or(
+          and(
+            eq(autopilotFindings.status, "dismissed"),
+            gt(
+              autopilotFindings.dismissedAt,
+              new Date(now - AUTOPILOT_READINESS_DISMISS_COOLDOWN_MS)
+            )
+          ),
+          and(
+            eq(autopilotFindings.status, "merged"),
+            gt(
+              autopilotFindings.mergedAt,
+              new Date(now - AUTOPILOT_READINESS_MERGED_GRACE_MS)
+            )
+          )
         )
       )
     );
@@ -1133,8 +1149,8 @@ export async function syncFindingPullRequests(organizationId: string) {
           .update(autopilotFindings)
           .set({ status: "merged", mergedAt: state.mergedAt ?? new Date() })
           .where(and(unchanged, findingTransition("merged", ["proposed"])))
-          .returning({ id: autopilotFindings.id });
-        if (merged) {
+          .returning({ evidence: autopilotFindings.evidence });
+        if (merged && !merged.evidence.autoPublished) {
           await rememberMerge(organizationId, finding);
         }
       } else if (state.status === "closed") {
@@ -1170,11 +1186,24 @@ export async function syncFindingPullRequests(organizationId: string) {
   }
 }
 
+async function setAutoPublished(findingId: string, value: boolean) {
+  await db
+    .update(autopilotFindings)
+    .set({
+      evidence: value
+        ? sql`${autopilotFindings.evidence} || '{"autoPublished":true}'::jsonb`
+        : sql`${autopilotFindings.evidence} - 'autoPublished'`,
+    })
+    .where(eq(autopilotFindings.id, findingId));
+}
+
 export async function mergeFinding(
   organizationId: string,
   findingId: string,
   method?: GitHubMergeMethod,
-  beforeMerge?: () => Promise<void>
+  beforeMerge?: () => Promise<void>,
+  /** Autopilot's own scheduled publish: nobody approved it, so it teaches nothing. */
+  automatic = false
 ) {
   const finding = await loadProposedFinding(organizationId, findingId);
   if (finding.status === "merged") {
@@ -1191,6 +1220,10 @@ export async function mergeFinding(
   const state = await getContentPullRequestState(octokit, ref);
   if (state.status === "open") {
     await beforeMerge?.();
+    // Saved before GitHub merges, so a sync that sees the merge first knows too.
+    if (automatic) {
+      await setAutoPublished(finding.id, true);
+    }
     // Pinned to the commit Autopilot pushed: anything pushed after the review is never merged.
     try {
       await mergeContentPullRequest(
@@ -1201,6 +1234,9 @@ export async function mergeFinding(
         method
       );
     } catch (error) {
+      if (automatic) {
+        await setAutoPublished(finding.id, false);
+      }
       if (method && isMergeMethodNotAllowed(error)) {
         throw new Error(
           `This repository doesn't allow ${AUTOPILOT_MERGE_METHOD_LABELS[method].toLowerCase()}. Pick another way to merge.`
@@ -1223,7 +1259,7 @@ export async function mergeFinding(
       )
     )
     .returning();
-  if (updated) {
+  if (updated && !automatic) {
     await rememberMerge(organizationId, updated);
   }
   return updated ?? loadProposedFinding(organizationId, findingId);

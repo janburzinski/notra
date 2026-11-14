@@ -4,6 +4,8 @@ const DAY_MS = 24 * 60 * 60 * 1000;
 export const AUTOPILOT_REFRESH_WINDOW_MS = 30 * DAY_MS;
 /** A page needs this many citing answers in the earlier window to count as dropping. */
 export const AUTOPILOT_REFRESH_MIN_CITATIONS = 2;
+/** Answers since the drop; fewer is one unlucky scan, not a lost citation. */
+export const AUTOPILOT_REFRESH_MIN_RECENT_ANSWERS = 3;
 /** The citation rate must fall by at least this share. */
 export const AUTOPILOT_REFRESH_MIN_DROP = 0.5;
 /** Answers read per window per run; scans store one per prompt, engine and language. */

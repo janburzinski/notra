@@ -6,6 +6,16 @@ export const AUTOPILOT_COMPARISONS_MAX_CHECKS = 3000;
 /** A competitor needs this many lost comparison prompts, unless a prompt names it. */
 export const AUTOPILOT_COMPARISONS_MIN_LOSSES = 2;
 export const AUTOPILOT_COMPARISONS_MAX_EXCERPTS = 4;
+export const AUTOPILOT_ANSWER_EXCERPT_MAX_CHARS = 600;
+/**
+ * Fences what AI answers said in a brief. The writer reads it to see what to
+ * beat; fact checks drop it, so an engine's mistake is never a source.
+ */
+export const AUTOPILOT_ANSWERS_BEGIN =
+  "BEGIN AI ANSWERS (what to beat; unverified, never a source of facts)";
+export const AUTOPILOT_ANSWERS_END = "END AI ANSWERS";
+export const AUTOPILOT_ANSWERS_SECTION =
+  /BEGIN AI ANSWERS \(what to beat[^\n]*\n[\s\S]*?\nEND AI ANSWERS\n?/g;
 export const AUTOPILOT_COMPARISONS_COMPETITOR_PAGE_MAX_CHARS = 6000;
 
 /** Questions that weigh options: "X vs Y", "alternatives to X", "best X for Y". */

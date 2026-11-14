@@ -1,5 +1,9 @@
 import { db } from "@notra/db/drizzle";
-import { geoMentionChecks, geoSettings } from "@notra/db/schema";
+import {
+  geoCompetitors,
+  geoMentionChecks,
+  geoSettings,
+} from "@notra/db/schema";
 import { ingestAllowedHosts } from "@notra/geo-core/utils/geo-project-domains";
 import { and, desc, eq, gte, lt } from "drizzle-orm";
 
@@ -79,4 +83,22 @@ export async function loadIgnoredCompetitors(projectId: string) {
   return new Set(
     (settings?.ignoredCompetitors ?? []).map((name) => autopilotBlogSlug(name))
   );
+}
+
+/** Every competitor the workspace tracks, by each name it goes by. */
+export async function loadTrackedCompetitorNames(projectId: string) {
+  const [rows, settings] = await Promise.all([
+    db
+      .select({ name: geoCompetitors.name, synonyms: geoCompetitors.synonyms })
+      .from(geoCompetitors)
+      .where(eq(geoCompetitors.projectId, projectId)),
+    db.query.geoSettings.findFirst({
+      columns: { competitors: true },
+      where: eq(geoSettings.projectId, projectId),
+    }),
+  ]);
+  return [
+    ...rows.flatMap((row) => [row.name, ...row.synonyms]),
+    ...(settings?.competitors ?? []),
+  ];
 }

@@ -233,7 +233,11 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
   mock.module("@/lib/autopilot/memory", () => ({
     renderFeedback: () => "",
     deleteAutopilotMemory: async () => undefined,
-    listReadyTopicObservationIds: async () => new Set<string>(),
+    loadTopicObservationIds: async () => ({
+      ready: new Set<string>(),
+      closed: new Set<string>(),
+      known: new Set<string>(),
+    }),
     rememberFeedback: async (input: unknown) => {
       if (state.feedbackFailure) {
         throw new Error("Memory unavailable");

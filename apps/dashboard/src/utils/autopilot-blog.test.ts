@@ -7,6 +7,7 @@ import {
   detectBlogDirectory,
   integrationBlogDirectory,
   interleave,
+  promptGapDropReason,
 } from "./autopilot-blog";
 
 const none = { setting: null, integration: null };
@@ -38,6 +39,14 @@ describe("keyword candidates", () => {
     expect(describePromptGap({ ...gap, searchQueries: [] })).not.toContain(
       "searched"
     );
+    // A workspace that tracks no competitors still has who the answers named.
+    const untracked = {
+      ...gap,
+      competitors: [],
+      discoveredCompetitors: ["Modal"],
+    };
+    expect(promptGapDropReason(untracked)).toBeNull();
+    expect(describePromptGap(untracked)).toContain("while Modal show up");
   });
 });
 

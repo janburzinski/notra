@@ -46,6 +46,8 @@ export const AUTOPILOT_READINESS_MAX_AGE_MS = 20 * 60 * 60 * 1000;
 export const AUTOPILOT_READINESS_SCAN_WAIT_MS = 4 * 60 * 1000;
 export const AUTOPILOT_READINESS_SCAN_POLL_MS = 5000;
 export const AUTOPILOT_READINESS_DISMISS_COOLDOWN_MS = 30 * 24 * 60 * 60 * 1000;
+/** A merged fix needs a deploy and a new scan before its issue clears. */
+export const AUTOPILOT_READINESS_MERGED_GRACE_MS = 14 * 24 * 60 * 60 * 1000;
 
 /**
  * A draft Autopilot closed as stale may come back once this has passed; until
@@ -281,6 +283,7 @@ export const AUTOPILOT_REPOSITORY_AGENT_TIMEOUT_MS = 10 * 60_000;
 export const AUTOPILOT_REPOSITORY_AGENT_MAX_OUTPUT_TOKENS = 32_000;
 export const AUTOPILOT_LLM_CALL_TIMEOUT_MS = 3 * 60_000;
 export const AUTOPILOT_UPDATE_MIN_BODY_SHARE = 0.7;
+/** An update that moves the page's address is rejected. */
 export const AUTOPILOT_UPDATE_FIXED_FIELDS = [
   "slug",
   "permalink",
@@ -288,6 +291,13 @@ export const AUTOPILOT_UPDATE_FIXED_FIELDS = [
   "canonical",
   "lang",
   "locale",
+];
+/** First publish dates: an update puts the page's own value back. */
+export const AUTOPILOT_UPDATE_KEPT_DATE_FIELDS = [
+  "date",
+  "pubDate",
+  "publishDate",
+  "published",
 ];
 export const AUTOPILOT_RISKY_FIGURE = /^[$€£]|%$|percent$/i;
 export const AUTOPILOT_FRONTMATTER_BLOCK = /^---\r?\n([\s\S]*?)\r?\n---\r?\n?/;
@@ -333,7 +343,13 @@ export const AUTOPILOT_PROTECTED_PATH_PATTERNS = [
   /(^|\/)(vercel|netlify|now|firebase|railway|render|app|fly|turbo)\.(json|toml|ya?ml)$/,
   /(^|\/)netlify\//,
   /(^|\/)wrangler\.(json|jsonc|toml)$/,
-  /(^|\/)middleware\.[cm]?[jt]s$/,
+  /(^|\/)(middleware|proxy)\.[cm]?[jt]s$/,
+  /(^|\/)vercel\.[cm]?[jt]s$/,
+  /(^|\/)tsconfig[^/]*\.json$/,
+  /(^|\/)_(headers|redirects)$/,
+  /(^|\/)(bitbucket-pipelines|azure-pipelines|\.travis|cloudbuild|codemagic|amplify)\.ya?ml$/,
+  /(^|\/)Jenkinsfile$/,
+  /(^|\/)\.gitlab\//,
   /(^|\/)\.(husky|circleci|buildkite|devcontainer)\//,
   /(^|\/)\.gitlab-ci\.ya?ml$/,
   /(^|\/)(Makefile|Procfile|Justfile)$/,
@@ -346,6 +362,8 @@ export const AUTOPILOT_PROTECTED_PATH_PATTERNS = [
 /** Files no Autopilot agent may read: secrets and credentials that could end up in a draft. */
 export const AUTOPILOT_SECRET_PATH_PATTERNS = [
   /(^|\/)\.env/,
+  /(^|\/)\.dev\.vars/,
+  /\.(tfvars|tfstate)(\.json|\.backup)?$/,
   /(^|\/)\.(npmrc|yarnrc(\.yml)?|netrc|pypirc|htpasswd)$/,
   /(^|\/)\.(ssh|aws|gnupg|docker)\//,
   /(^|\/)[^/]*(secret|credential|password|private[-_]?key)[^/]*$/i,

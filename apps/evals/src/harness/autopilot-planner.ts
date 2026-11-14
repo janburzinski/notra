@@ -198,6 +198,7 @@ function settleRun(params: {
     autonomousPullRequestsInWindow:
       (run.autonomousPullRequestsInWindow ?? 0) + params.openedSoFar,
     draftSlotsFree: run.draftSlotsFree ?? true,
+    now: runDate(runIndex),
   });
   const outcome = resolveAutopilotOutcome({
     action: plan.action,

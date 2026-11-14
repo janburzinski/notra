@@ -98,21 +98,32 @@ export async function deleteAutopilotMemory(
 }
 
 /**
- * Observations behind topics the planner called ready and has not acted on.
- * The planner acts only on a topic something seen this run belongs to, so
- * these go to it again.
+ * Observation ids by what the planner made of them: evidence of a topic that
+ * is ready to act on, of a dismissed or written one, or of any other topic.
  */
-export async function listReadyTopicObservationIds(organizationId: string) {
+export async function loadTopicObservationIds(organizationId: string) {
+  const ids = {
+    ready: new Set<string>(),
+    closed: new Set<string>(),
+    known: new Set<string>(),
+  };
   try {
     const snapshot = await openMemorySnapshot(organizationId);
     const state = parsePlannerState(await snapshot.read(MEMORY_PATHS.planner));
-    return new Set(
-      state.topics
+    for (const topic of state.topics) {
+      let group = ids.known;
+      if (topic.status === "dismissed" || topic.status === "done") {
+        group = ids.closed;
+      } else if (topic.status === "ready" && !topic.findingId) {
         // A topic with a finding already counts as active work.
-        .filter((topic) => topic.status === "ready" && !topic.findingId)
-        .flatMap((topic) => topic.signals.map((signal) => signal.observationId))
-    );
+        group = ids.ready;
+      }
+      for (const signal of topic.signals) {
+        group.add(signal.observationId);
+      }
+    }
   } catch {
-    return new Set<string>();
+    // Without memory every observation is new.
   }
+  return ids;
 }

@@ -4,11 +4,13 @@ import { autopilotFindings } from "@notra/db/schema";
 import type {
   AutopilotApprovalGroup,
   AutopilotApprovals,
+  AutopilotJobKind,
 } from "@notra/db/types/autopilot";
-import { and, asc, eq, inArray, isNotNull, lte, sql } from "drizzle-orm";
+import { and, asc, eq, inArray, isNotNull, lte, or, sql } from "drizzle-orm";
 
 import { AUTOPILOT_BRANCH_PREFIX } from "@/constants/autopilot";
 import {
+  AUTOPILOT_APPROVAL_GROUP_BY_KIND,
   AUTOPILOT_HOLD_PAGE_SIZE,
   AUTOPILOT_HOLD_REASONS,
   AUTOPILOT_NEW_POST_KINDS,
@@ -46,21 +48,36 @@ import {
 } from "@/utils/autopilot-publish";
 import { toErrorMessage } from "@/utils/error-message";
 
+/** True once a person merged a finding of this approval group before. */
 async function hasMergedFinding(
   organizationId: string,
   group: AutopilotApprovalGroup
 ) {
+  const pageType = sql`jsonb_typeof(${autopilotFindings.evidence}->'updatePage')`;
+  const kindsOf = (target: AutopilotApprovalGroup) =>
+    Object.entries(AUTOPILOT_APPROVAL_GROUP_BY_KIND)
+      .filter(([, value]) => value === target)
+      .map(([kind]) => kind as AutopilotJobKind);
+  const groupFilter = {
+    posts: and(
+      inArray(autopilotFindings.kind, AUTOPILOT_NEW_POST_KINDS),
+      sql`${pageType} is distinct from 'object'`
+    ),
+    updates: or(
+      inArray(autopilotFindings.kind, kindsOf("updates")),
+      and(
+        inArray(autopilotFindings.kind, AUTOPILOT_NEW_POST_KINDS),
+        sql`${pageType} = 'object'`
+      )
+    ),
+    fixes: inArray(autopilotFindings.kind, kindsOf("fixes")),
+  } satisfies Record<AutopilotApprovalGroup, unknown>;
   const merged = await db.query.autopilotFindings.findFirst({
     columns: { id: true },
     where: and(
       eq(autopilotFindings.organizationId, organizationId),
       eq(autopilotFindings.status, "merged"),
-      group === "posts"
-        ? and(
-            inArray(autopilotFindings.kind, AUTOPILOT_NEW_POST_KINDS),
-            sql`jsonb_typeof(${autopilotFindings.evidence}->'updatePage') is distinct from 'object'`
-          )
-        : undefined
+      groupFilter[group]
     ),
   });
   return Boolean(merged);
@@ -388,7 +405,8 @@ async function publishFinding(
         if (!(await isStillScheduled(finding.id, claimedAt))) {
           throw new Error("The scheduled publish was cancelled");
         }
-      }
+      },
+      true
     );
   } catch (error) {
     if (!(await isStillScheduled(finding.id, claimedAt))) {

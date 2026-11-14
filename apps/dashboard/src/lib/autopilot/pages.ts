@@ -77,7 +77,7 @@ async function fetchAsCrawler(url: string) {
       status: response.status,
       text: htmlToText(html),
       attributes: htmlTextAttributes(html),
-      challenged: isChallengePage(html),
+      challenged: isChallengePage(html, response.status),
     };
   } catch {
     return { status: null, text: "", attributes: "", challenged: false };
@@ -133,7 +133,10 @@ export async function fetchPageForCrawlers(
   };
 }
 
-/** Links that don't answer with a success; a refresh never ships a dead link. */
+/**
+ * Links that are gone or unreachable. Links past the check limit count too:
+ * Autopilot never ships a link nobody checked, and the text stays.
+ */
 export async function findDeadLinks(urls: string[]) {
   const checked = urls.slice(0, AUTOPILOT_REFRESH_MAX_LINK_CHECKS);
   const results = await Promise.all(

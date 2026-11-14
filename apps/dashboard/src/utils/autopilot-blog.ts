@@ -146,6 +146,16 @@ export function topQuery(gap: GeoSearchGapRow) {
   return [...gap.queries].sort((a, b) => b.impressions - a.impressions)[0];
 }
 
+/**
+ * Who AI answers name instead of the brand. Workspaces that track no
+ * competitors yet still have the names the answers brought up.
+ */
+export function promptGapCompetitors(gap: GeoPromptGapRow) {
+  return gap.competitors.length > 0
+    ? gap.competitors
+    : (gap.discoveredCompetitors ?? []);
+}
+
 export function promptGapDropReason(gap: GeoPromptGapRow) {
   if (gap.won) {
     return "You already win this prompt";
@@ -153,7 +163,7 @@ export function promptGapDropReason(gap: GeoPromptGapRow) {
   if (gap.brief) {
     return "A GEO brief exists for it";
   }
-  if (gap.competitors.length === 0) {
+  if (promptGapCompetitors(gap).length === 0) {
     return "No competitor shows up either";
   }
   if (gap.ownMentionRate > AUTOPILOT_KEYWORD_MAX_MENTION_RATE) {
@@ -173,7 +183,7 @@ export function describePromptGap(gap: GeoPromptGapRow) {
     .slice(0, AUTOPILOT_GAP_SEARCHES_SHOWN)
     .map((query) => `"${query}"`)
     .join(", ");
-  return `AI engines answer "${gap.prompt}" without you on ${missed} of ${gap.engineCoverage} engines (${Math.round(gap.ownMentionRate * 100)}% mention you), while ${gap.competitors.slice(0, 3).join(", ")} show up.${searches ? ` They searched for ${searches}.` : ""}`;
+  return `AI engines answer "${gap.prompt}" without you on ${missed} of ${gap.engineCoverage} engines (${Math.round(gap.ownMentionRate * 100)}% mention you), while ${promptGapCompetitors(gap).slice(0, 3).join(", ")} show up.${searches ? ` They searched for ${searches}.` : ""}`;
 }
 
 /**

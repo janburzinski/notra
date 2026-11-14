@@ -70,6 +70,7 @@ import { GeoSettingsMissingError } from "./errors";
 import { requireGeoProject } from "./projects";
 import {
   activeGapScanFilter,
+  currentPromptScanFilter,
   findPromptMentionEntry,
   gapScanIds,
   shouldSkipUnmatchedGapScan,
@@ -205,7 +206,24 @@ const loadMentionGapInputs = Effect.fn("geo.mentionGapInputs")(function* (
             }
           )
           .from(geoMentionChecks)
-          .where(recentFirstTurnChecks(projectId))
+          .where(
+            and(
+              recentFirstTurnChecks(projectId),
+              // Paused and deleted custom prompts must not use up the row limit.
+              currentPromptScanFilter(
+                geoMentionChecks.promptId,
+                db
+                  .select({ id: geoPrompts.id })
+                  .from(geoPrompts)
+                  .where(
+                    and(
+                      eq(geoPrompts.projectId, projectId),
+                      eq(geoPrompts.enabled, true)
+                    )
+                  )
+              )
+            )
+          )
           .orderBy(
             geoMentionChecks.promptId,
             geoMentionChecks.engine,

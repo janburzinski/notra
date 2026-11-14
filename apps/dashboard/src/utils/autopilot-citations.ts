@@ -1,5 +1,9 @@
 import {
   AUTOPILOT_ALTERNATIVES_PROMPT_PATTERN,
+  AUTOPILOT_ANSWER_EXCERPT_MAX_CHARS,
+  AUTOPILOT_ANSWERS_BEGIN,
+  AUTOPILOT_ANSWERS_END,
+  AUTOPILOT_ANSWERS_SECTION,
   AUTOPILOT_COMPARISON_PATH_PATTERN,
   AUTOPILOT_COMPARISON_PROMPT_PATTERN,
   AUTOPILOT_COMPARISONS_MAX_EXCERPTS,
@@ -10,6 +14,7 @@ import {
   AUTOPILOT_REFRESH_MAX_CITED_INSTEAD,
   AUTOPILOT_REFRESH_MAX_SEARCHES,
   AUTOPILOT_REFRESH_MIN_CITATIONS,
+  AUTOPILOT_REFRESH_MIN_RECENT_ANSWERS,
   AUTOPILOT_REFRESH_MIN_DROP,
 } from "@/constants/autopilot-refresh";
 import type {
@@ -63,6 +68,73 @@ function countTop(values: string[], max: number) {
     .map(([value]) => value);
 }
 
+/** What AI answers said and cited, fenced for the writer; empty when there is nothing. */
+export function describeAnswers(params: {
+  excerpts: readonly string[];
+  citedUrls: readonly string[];
+}) {
+  const excerpts = params.excerpts
+    .map((excerpt) =>
+      excerpt
+        .trim()
+        .replace(/\s+/g, " ")
+        .slice(0, AUTOPILOT_ANSWER_EXCERPT_MAX_CHARS)
+    )
+    .filter(Boolean);
+  if (excerpts.length === 0 && params.citedUrls.length === 0) {
+    return "";
+  }
+  return [
+    AUTOPILOT_ANSWERS_BEGIN,
+    ...(excerpts.length
+      ? ["What the answers say:", ...excerpts.map((excerpt) => `> ${excerpt}`)]
+      : []),
+    ...(params.citedUrls.length
+      ? [
+          "Pages the answers cite:",
+          ...params.citedUrls.map((url) => `- ${url}`),
+        ]
+      : []),
+    AUTOPILOT_ANSWERS_END,
+  ].join("\n");
+}
+
+/** A brief without the AI answers, for use as a fact source. */
+export function withoutAnswers(text: string) {
+  return text.replace(AUTOPILOT_ANSWERS_SECTION, "");
+}
+
+/**
+ * Per prompt the brand is missing from: what those answers said and the
+ * pages they cited most.
+ */
+export function answersByPrompt(checks: readonly AutopilotAnswerCheck[]) {
+  const missed = new Map<string, AutopilotAnswerCheck[]>();
+  for (const check of checks) {
+    if (!check.mentioned) {
+      missed.set(check.promptId, [
+        ...(missed.get(check.promptId) ?? []),
+        check,
+      ]);
+    }
+  }
+  return new Map(
+    [...missed].map(([promptId, rows]) => [
+      promptId,
+      describeAnswers({
+        excerpts: rows
+          .map((row) => row.excerpt)
+          .filter((excerpt) => excerpt.trim())
+          .slice(0, AUTOPILOT_COMPARISONS_MAX_EXCERPTS),
+        citedUrls: countTop(
+          rows.flatMap((row) => row.sourceUrls),
+          AUTOPILOT_REFRESH_MAX_CITED_INSTEAD
+        ),
+      }),
+    ])
+  );
+}
+
 function uniqueSearches(checks: AutopilotAnswerCheck[]) {
   const seen = new Map<string, string>();
   for (const query of checks.flatMap((check) => check.queries)) {
@@ -90,7 +162,12 @@ export function findCitationDrops(params: {
   const recentStart = params.now.getTime() - windowMs;
   const previousStart = recentStart - windowMs;
   const rows = params.checks
-    .filter((check) => check.capturedAt.getTime() >= previousStart)
+    // An answer that lists no sources could not have cited the page.
+    .filter(
+      (check) =>
+        check.capturedAt.getTime() >= previousStart &&
+        check.sourceUrls.length > 0
+    )
     .map((check) => {
       const cited = new Map<string, string>();
       for (const url of check.sourceUrls) {
@@ -124,10 +201,25 @@ export function findCitationDrops(params: {
 
   const candidates: AutopilotCitationCandidate[] = [];
   for (const [key, prompts] of previousPrompts) {
-    const relevant = rows.filter((row) => prompts.has(row.check.promptId));
+    const onPrompts = rows.filter((row) => prompts.has(row.check.promptId));
+    // Only engines scanned in both windows: dropping or adding an engine is
+    // not a lost citation.
+    const enginesIn = (recent: boolean) =>
+      new Set(
+        onPrompts
+          .filter((row) => row.recent === recent)
+          .map((row) => row.check.engine)
+      );
+    const earlierEngines = enginesIn(false);
+    const latestEngines = enginesIn(true);
+    const relevant = onPrompts.filter(
+      (row) =>
+        earlierEngines.has(row.check.engine) &&
+        latestEngines.has(row.check.engine)
+    );
     const before = relevant.filter((row) => !row.recent);
     const latest = relevant.filter((row) => row.recent);
-    if (latest.length === 0) {
+    if (latest.length < AUTOPILOT_REFRESH_MIN_RECENT_ANSWERS) {
       continue;
     }
     const citedBefore = before.filter((row) => row.cited.has(key)).length;

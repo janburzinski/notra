@@ -562,11 +562,13 @@ if (process.env.NOTRA_AUTOPILOT_TEMPLATE_FLOW_TEST !== "1") {
     { prompt: platform, daysAgo: 50, sources: [`${SITE}/`] },
     { prompt: platform, daysAgo: 44, sources: [SITE] },
     { prompt: platform, daysAgo: 5, sources: ["https://modal.com"] },
+    { prompt: platform, daysAgo: 3, sources: ["https://modal.com"] },
     { prompt: platform, daysAgo: 1, sources: ["https://modal.com/pricing"] },
     { prompt: autoscale, daysAgo: 50, sources: [POST] },
     { prompt: autoscale, daysAgo: 45, sources: [`${POST}/`] },
     { prompt: autoscale, daysAgo: 40, sources: ["https://modal.com/docs"] },
     { prompt: autoscale, daysAgo: 6, sources: ["https://modal.com/docs/cold"] },
+    { prompt: autoscale, daysAgo: 4, sources: ["https://modal.com/docs/cold"] },
     { prompt: autoscale, daysAgo: 2, sources: ["https://modal.com/docs/cold"] },
     {
       prompt: "Best alternatives to Runpod for serverless inference",

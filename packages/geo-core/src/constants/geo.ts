@@ -109,7 +109,8 @@ export const GEO_WRITER_EVIDENCE_MAX_ITEMS = 8;
 export const GEO_WRITER_SITEMAP_PAGE_LIMIT = 60;
 export const GEO_WRITER_BRIEF_POLL_INTERVAL_MS = 3000;
 export const GEO_WRITER_BRIEFS_LIMIT = 20;
-export const GEO_GAPS_MAX_CHECKS = 400;
+/** Latest check per enabled prompt and engine; past it, whole prompts drop out. */
+export const GEO_GAPS_MAX_CHECKS = 2000;
 export const GEO_GAPS_SEARCH_LIMIT = 100;
 export const GEO_GAPS_ENGINE_QUERY_LIMIT = 12;
 export const GEO_AI_SEARCH_GAP_MIN_SEARCHES = 2;

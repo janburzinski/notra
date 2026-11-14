@@ -317,6 +317,7 @@ export async function decideAutopilotPlan(
     activeWork: plan.topic ? topicHasActiveWork(plan.topic, activeWork) : false,
     autonomousPullRequestsInWindow: autonomous,
     draftSlotsFree: openPullRequests < ctx.maxOpenPullRequests,
+    now: new Date(),
   });
   const outcome = resolveAutopilotOutcome({
     action: plan.action,

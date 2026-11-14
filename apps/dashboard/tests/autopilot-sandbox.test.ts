@@ -123,10 +123,21 @@ if (process.env.NOTRA_AUTOPILOT_SANDBOX_TEST !== "1") {
   mock.module("@notra/ai/utils/github-mention-auth", () => ({
     resolveGitHubMentionAuth: async () => null,
   }));
+  // GitHub stays unreachable unless a test hands it a pull request state.
+  const github: {
+    state: {
+      status: "open" | "merged" | "closed";
+      mergedAt: Date | null;
+    } | null;
+    onMerge: (() => Promise<void>) | null;
+  } = { state: null, onMerge: null };
   mock.module("@/lib/autopilot/github", () => ({
     AutopilotRepositoryAccessError: class extends Error {},
     getRepositoryOctokit: async () => {
-      throw new Error("Network is forbidden in the sandbox");
+      if (!github.state) {
+        throw new Error("Network is forbidden in the sandbox");
+      }
+      return { request: async () => undefined };
     },
     listRepositoryPaths: notRun,
     repositoryPathExists: notRun,
@@ -134,11 +145,17 @@ if (process.env.NOTRA_AUTOPILOT_SANDBOX_TEST !== "1") {
   mock.module("@/lib/integrations/github/content-pull-request", () => ({
     isMergeMethodNotAllowed: () => false,
     getContentPullRequestState: async () => {
-      throw new Error("Network is forbidden in the sandbox");
+      if (!github.state) {
+        throw new Error("Network is forbidden in the sandbox");
+      }
+      return github.state;
     },
     markContentPullRequestReady: async () => undefined,
-    mergeContentPullRequest: async () => undefined,
+    mergeContentPullRequest: async () => {
+      await github.onMerge?.();
+    },
   }));
+  const memory = await import("../src/lib/autopilot/memory");
   const {
     claimFinding,
     markFindingProposed,
@@ -148,6 +165,8 @@ if (process.env.NOTRA_AUTOPILOT_SANDBOX_TEST !== "1") {
     listSettledFingerprints,
     reserveDraftSlot,
     countOpenPullRequests,
+    mergeFinding,
+    syncFindingPullRequests,
   } = await import("../src/lib/autopilot/findings");
   const { claimAutopilotRun, finishAutopilotRun, buildAutopilotRunContext } =
     await import("../src/lib/autopilot/run");
@@ -423,6 +442,60 @@ if (process.env.NOTRA_AUTOPILOT_SANDBOX_TEST !== "1") {
     const held = await readFinding(id);
     expect(held.publishAt).toBeNull();
     expect(held.publishHoldReason).toBe("Held from the dashboard");
+  });
+
+  test("a scheduled publish teaches nothing, even when a sync sees the merge first", async () => {
+    const proposed = async (fingerprint: string, number: number) => {
+      const claim = await claimFinding("sandbox-org", "item-run", {
+        ...proposal,
+        fingerprint,
+      });
+      if (!claim) {
+        throw new Error("Expected a claim");
+      }
+      await markFindingProposed(claim, {
+        repository: "Sandbox/Site",
+        number,
+        url: `https://github.com/Sandbox/Site/pull/${number}`,
+        branch: `notra/autopilot/sandbox-${number}`,
+        headSha: "abc",
+      });
+      return claim.finding.id;
+    };
+    const remember = spyOn(memory, "rememberFeedback").mockResolvedValue(
+      undefined as never
+    );
+    try {
+      // A scheduled publish that fails leaves the pull request to people.
+      const failed = await proposed("commits:sandbox/app#21", 21);
+      github.state = { status: "open", mergedAt: null };
+      github.onMerge = async () => {
+        throw new Error("Merge conflict");
+      };
+      await expect(
+        mergeFinding("sandbox-org", failed, undefined, undefined, true)
+      ).rejects.toThrow("Merge conflict");
+      expect(
+        (await readFinding(failed)).evidence.autoPublished
+      ).toBeUndefined();
+      github.state = { status: "merged", mergedAt: now };
+      await syncFindingPullRequests("sandbox-org");
+      expect(remember).toHaveBeenCalledTimes(1);
+
+      const scheduled = await proposed("commits:sandbox/app#22", 22);
+      github.state = { status: "open", mergedAt: null };
+      github.onMerge = async () => {
+        github.state = { status: "merged", mergedAt: now };
+        await syncFindingPullRequests("sandbox-org");
+      };
+      await mergeFinding("sandbox-org", scheduled, undefined, undefined, true);
+      expect((await readFinding(scheduled)).status).toBe("merged");
+      expect(remember).toHaveBeenCalledTimes(1);
+    } finally {
+      github.state = null;
+      github.onMerge = null;
+      remember.mockRestore();
+    }
   });
 
   test("migrated unique constraints allow exactly one full run per workspace", async () => {

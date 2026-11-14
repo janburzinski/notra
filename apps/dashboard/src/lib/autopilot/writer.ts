@@ -290,7 +290,7 @@ export async function writeBlogPost(params: {
       ? [
           `You are updating the existing page ${existing.path}, not writing a new one. Return the complete new file.`,
           "Keep its frontmatter fields, slug, images, links and overall structure. Change what is needed for the topic: answer it directly near the top, add the missing sections and comparisons, refresh outdated facts. Do not remove content that is still true.",
-          "Keep the page's language and voice. Update a date field only if the page has one for last updates.",
+          "Keep the page's language and voice. Leave every date field as it is; Notra sets the last-updated date itself.",
         ]
       : [
           "Leave out any image, cover or hero field in the frontmatter; Notra adds the hero image itself.",
@@ -299,6 +299,11 @@ export async function writeBlogPost(params: {
           `Write the whole post in ${language}: slug, title, description, headings and body. The topic, query and evidence may be in another language; translate the topic into ${language} instead of switching languages.`,
           "Match the frontmatter format, field names and style of the sample post exactly. If there is no sample, use YAML frontmatter with title, description and date.",
           "Use today's date where a date is needed. 900 to 1500 words.",
+          // What answer engines quote: a question heading with a passage
+          // that answers it on its own. Notra Sites turns the FAQ into
+          // FAQPage structured data.
+          "Shape it so AI assistants can quote it: use the questions people ask (the prompt and searches in the evidence) as H2 headings, and open every section with one or two sentences that answer its heading on their own, without needing the rest of the post. Compare options in a Markdown table, not in prose.",
+          "End with a section headed exactly `## FAQ`: three to five `### ` question headings, each followed by one short paragraph that answers it. Only questions the evidence or your research supports.",
         ]),
     ctx.brand?.customInstructions
       ? `House rules from the brand, follow them: ${ctx.brand.customInstructions}`

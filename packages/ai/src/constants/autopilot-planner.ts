@@ -32,6 +32,11 @@ export const AUTOPILOT_ACTION_IDEA_CONFIDENCE = 0.6;
  * request seen again on a later run is still one.
  */
 export const AUTOPILOT_TOPIC_MIN_SIGNALS = 2;
+/**
+ * A content gap counts as demand while a run saw it this recently. Gaps are
+ * read again every day, so an older sighting means the brand closed it.
+ */
+export const AUTOPILOT_DEMAND_MAX_AGE_DAYS = 14;
 /** Autonomous pull requests per workspace and window, so a bad gate cannot spam. */
 export const AUTOPILOT_AUTONOMOUS_PR_BUDGET = { count: 1, days: 7 } as const;
 

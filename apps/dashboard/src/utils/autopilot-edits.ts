@@ -166,6 +166,17 @@ export function addedLinks(before: string, after: string) {
   ].filter((url) => !old.has(url));
 }
 
+/** Turns Markdown links to these URLs into their plain text. */
+export function unlinkUrls(content: string, urls: readonly string[]) {
+  return urls.reduce((text, url) => {
+    const escaped = url.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    return text.replace(
+      new RegExp(`\\[([^\\]]*)\\]\\(<?${escaped}>?(?:\\s+"[^"]*")?\\)`, "g"),
+      "$1"
+    );
+  }, content);
+}
+
 /**
  * Why a refreshed page must not be committed, or null. A refresh keeps the
  * frontmatter, removes headings only through an explicit cut, changes enough

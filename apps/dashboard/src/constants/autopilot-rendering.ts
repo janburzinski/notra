@@ -20,10 +20,13 @@ export const AUTOPILOT_RENDERING_MISSING_SAMPLES = 6;
 export const AUTOPILOT_RENDERING_BLOCKED_STATUSES: readonly number[] = [
   401, 403, 429,
 ];
-/** Bot walls answer with a page instead of a status; these phrases give them away. */
+/**
+ * Bot walls answer with a page instead of a status; these phrases give them
+ * away. Not "challenge-platform": Cloudflare injects that script into normal
+ * pages too.
+ */
 export const AUTOPILOT_RENDERING_CHALLENGE_MARKERS = [
   "cf-chl-",
-  "challenge-platform",
   "just a moment...",
   "verify you are human",
   "attention required!",

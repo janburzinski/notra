@@ -111,7 +111,11 @@ function crawlerCoverage(renderedText: string, rawText: string) {
   return total === 0 ? 1 : found / total;
 }
 
-export function isChallengePage(html: string) {
+/** Only a refused request counts: a normal page can mention these words. */
+export function isChallengePage(html: string, status: number) {
+  if (status < 400) {
+    return false;
+  }
   const lower = html.toLowerCase();
   return AUTOPILOT_RENDERING_CHALLENGE_MARKERS.some((marker) =>
     lower.includes(marker)

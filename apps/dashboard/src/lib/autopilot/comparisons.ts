@@ -29,6 +29,7 @@ import type { AutopilotPostBrief } from "@/types/autopilot-runtime";
 import type { AutopilotComparisonCandidate } from "@/types/autopilot-templates-runtime";
 import { autopilotBlogSlug } from "@/utils/autopilot-blog";
 import {
+  describeAnswers,
   comparisonFingerprint,
   findComparisonCandidates,
   hasComparisonPage,
@@ -107,7 +108,7 @@ function comparisonBrief(params: {
         ? `A fair guide for people looking for an alternative to ${candidate.competitor}, with ${brand} as one honest option among the ones AI answers name.`
         : `A fair comparison for people choosing between ${brand} and ${candidate.competitor}.`,
       "Open with a two-sentence answer: who each one is for. Then a comparison table on the points the AI answers and searches below bring up, where each is stronger, when to pick the other one, and how switching works.",
-      `State facts about ${candidate.competitor} only from its own site below or the answers, and mark prices and limits as of ${month}. Never claim anything about ${candidate.competitor} you can't source; leave a row out instead.`,
+      `State facts about ${candidate.competitor} only from its own site below, never from what AI answers say, and mark prices and limits as of ${month}. Never claim anything about ${candidate.competitor} you can't source; leave a row out instead.`,
     ].join(" "),
     evidence: [
       `Comparison questions where AI answers name ${candidate.competitor} and not ${brand}:`,
@@ -118,18 +119,7 @@ function comparisonBrief(params: {
             ...candidate.searches.map((query) => `- ${query}`),
           ]
         : []),
-      ...(candidate.excerpts.length
-        ? [
-            "What the answers say:",
-            ...candidate.excerpts.map((excerpt) => `> ${excerpt}`),
-          ]
-        : []),
-      ...(candidate.citedUrls.length
-        ? [
-            "Pages the answers cite:",
-            ...candidate.citedUrls.map((url) => `- ${url}`),
-          ]
-        : []),
+      describeAnswers(candidate),
       ...site.flatMap((page) => [
         `${candidate.competitor}'s own site (${page.url}):`,
         page.markdown,

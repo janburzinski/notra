@@ -8,6 +8,8 @@ import {
   notInArray,
   or,
   type SQL,
+  type SQLWrapper,
+  sql,
 } from "drizzle-orm";
 
 import { GEO_MAX_PROMPTS } from "../constants/geo";
@@ -147,6 +149,29 @@ export function activeGapScanFilter(
       not(like(scanIdColumn, `${CUSTOM_PROMPT_SCAN_ID_PREFIX}%`)),
       not(like(scanIdColumn, `${SEQUENCE_PROMPT_SCAN_ID_PREFIX}%`)),
       notInArray(scanIdColumn, [...removedAutoPromptIds])
+    )
+  );
+}
+
+/**
+ * Scans of built-in prompts, plus custom prompt scans (`custom-<id>`) whose id
+ * the subquery selects. Conversation scans never count as gaps.
+ */
+export function currentPromptScanFilter(
+  scanIdColumn: AnyColumn,
+  customPromptIds: SQLWrapper
+): SQL | undefined {
+  return or(
+    and(
+      not(like(scanIdColumn, `${CUSTOM_PROMPT_SCAN_ID_PREFIX}%`)),
+      not(like(scanIdColumn, `${SEQUENCE_PROMPT_SCAN_ID_PREFIX}%`))
+    ),
+    and(
+      like(scanIdColumn, `${CUSTOM_PROMPT_SCAN_ID_PREFIX}%`),
+      inArray(
+        sql`substr(${scanIdColumn}, ${CUSTOM_PROMPT_SCAN_ID_PREFIX.length + 1})`,
+        customPromptIds
+      )
     )
   );
 }

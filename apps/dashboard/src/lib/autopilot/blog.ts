@@ -4,6 +4,7 @@ import { listGitHubAppRepositoriesEffect } from "@notra/ai/integrations/github";
 import type { AgentTokenUsage } from "@notra/ai/types/agents";
 import type { AutopilotFindingDecision } from "@notra/db/types/autopilot";
 import { loadGeoContentGaps } from "@notra/geo-core/geo/gaps";
+import { gapScanIds } from "@notra/geo-core/geo/prompts";
 import { Effect } from "effect";
 
 import {
@@ -34,9 +35,18 @@ import {
   AUTOPILOT_PULL_REQUEST_CREATED_EVENT,
   AUTOPILOT_RISKY_FIGURE,
   AUTOPILOT_UPDATE_FIXED_FIELDS,
+  AUTOPILOT_UPDATE_KEPT_DATE_FIELDS,
   AUTOPILOT_UPDATE_MIN_BODY_SHARE,
 } from "@/constants/autopilot";
+import {
+  AUTOPILOT_COMPARISONS_LOOKBACK_MS,
+  AUTOPILOT_COMPARISONS_MAX_CHECKS,
+} from "@/constants/autopilot-comparisons";
 import { AUTOPILOT_FACT_FLAG_HEADINGS } from "@/constants/autopilot-publish";
+import {
+  loadAnswerChecks,
+  loadTrackedCompetitorNames,
+} from "@/lib/autopilot/answers";
 import { commitFilterSkipReason } from "@/lib/autopilot/commit-filters";
 import { loadRepositoryConventions } from "@/lib/autopilot/conventions";
 import { emailDraftReviewers } from "@/lib/autopilot/draft-emails";
@@ -74,7 +84,8 @@ import {
 } from "@/lib/autopilot/leases";
 import { generateAutopilotObject } from "@/lib/autopilot/llm";
 import { createAutopilotLogger } from "@/lib/autopilot/log";
-import { listReadyTopicObservationIds } from "@/lib/autopilot/memory";
+import { loadTopicObservationIds } from "@/lib/autopilot/memory";
+import { findDeadLinks } from "@/lib/autopilot/pages";
 import { scheduleAutopilotPublish } from "@/lib/autopilot/publish";
 import { loadDecisionMemory } from "@/lib/autopilot/rules";
 import { loadWritingRules, removeNewDashes } from "@/lib/autopilot/style";
@@ -110,15 +121,22 @@ import {
   keywordFingerprint,
   pageToUpdate,
   topQuery,
+  promptGapCompetitors,
   promptGapDropReason,
   searchGapDropReason,
 } from "@/utils/autopilot-blog";
 import { autopilotDraftBranchSlug } from "@/utils/autopilot-branches";
+import { answersByPrompt, withoutAnswers } from "@/utils/autopilot-citations";
 import {
   excludedAuthorReason,
   selectAutopilotSourceRepositories,
 } from "@/utils/autopilot-commit-filters";
 import { resolveDiagramEmbeds } from "@/utils/autopilot-diagrams";
+import {
+  addedLinks,
+  touchUpdatedDate,
+  unlinkUrls,
+} from "@/utils/autopilot-edits";
 import { unsourcedFigures } from "@/utils/autopilot-facts";
 import {
   heroImageLocation,
@@ -144,12 +162,16 @@ import {
 import { forceNoDashes } from "@/utils/autopilot-style";
 import { toErrorMessage } from "@/utils/error-message";
 
+/** Null when the workspace has no GEO set up: nothing to read, not a failure. */
 function loadGaps(ctx: AutopilotRunContext) {
   return Effect.runPromise(
     loadGeoContentGaps({
       organizationId: ctx.organizationId,
       projectId: ctx.projectId ?? undefined,
-    }).pipe(Effect.provide(geoCoreDashboardLayer))
+    }).pipe(
+      Effect.catchTag("GeoSettingsMissingError", () => Effect.succeed(null)),
+      Effect.provide(geoCoreDashboardLayer)
+    )
   );
 }
 
@@ -346,6 +368,42 @@ function frontmatterFields(content: string) {
   return { fields, body: match ? content.slice(match[0].length) : content };
 }
 
+/** Whether the text names this as a whole word, e.g. "Arc" but not "search". */
+function namesWord(text: string, name: string) {
+  const escaped = name.trim().replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return (
+    escaped.length > 0 &&
+    new RegExp(`(?<![\\p{L}\\p{N}])${escaped}(?![\\p{L}\\p{N}])`, "iu").test(
+      text
+    )
+  );
+}
+
+/** Puts the original frontmatter lines of these fields back, as they were. */
+function keepFrontmatterLines(
+  original: string,
+  next: string,
+  fields: readonly string[]
+) {
+  const lineOf = (content: string, field: string) =>
+    (AUTOPILOT_FRONTMATTER_BLOCK.exec(content)?.[1] ?? "")
+      .split(AUTOPILOT_LINE_BREAK)
+      .find((line) => AUTOPILOT_FRONTMATTER_FIELD.exec(line)?.[1] === field);
+  const block = AUTOPILOT_FRONTMATTER_BLOCK.exec(next);
+  if (!block) {
+    return next;
+  }
+  let frontmatter = block[0];
+  for (const field of fields) {
+    const before = lineOf(original, field);
+    const after = lineOf(next, field);
+    if (before !== undefined && after !== undefined && before !== after) {
+      frontmatter = frontmatter.replace(after, before);
+    }
+  }
+  return `${frontmatter}${next.slice(block[0].length)}`;
+}
+
 function pageUpdateProblem(original: string, next: string) {
   const before = frontmatterFields(original);
   const after = frontmatterFields(next);
@@ -383,6 +441,8 @@ async function finishPost(params: {
   previous: string | null;
   sources: AutopilotFactSource[];
   factCheck: { competitor: string } | null;
+  /** Competitors the evidence names; a post that mentions one is held for a person. */
+  competitors: readonly string[];
   onUsage?: (usage: AgentTokenUsage) => void;
 }): Promise<BlogFile> {
   const { ctx, log } = params;
@@ -418,6 +478,23 @@ async function finishPost(params: {
   }
   if (!params.factCheck && invented.length > 0) {
     pullRequestBody = `${pullRequestBody.trim()}\n\n**${AUTOPILOT_FACT_FLAG_HEADINGS.figures}, please check**\n${invented.map((figure) => `\`${figure}\``).join(" · ")}`;
+  }
+  // Only comparison pages check what they say about competitors against the
+  // competitor's own site; anywhere else a person reads it before it ships.
+  const named = params.factCheck
+    ? []
+    : params.competitors.filter((name) => namesWord(content, name));
+  if (named.length > 0) {
+    pullRequestBody = `${pullRequestBody.trim()}\n\n**${AUTOPILOT_FACT_FLAG_HEADINGS.competitors}, please check**\n${named.join(" · ")}`;
+  }
+  // The writer may only link pages it looked up; a guessed one that 404s
+  // keeps its text and loses the link.
+  const dead = await findDeadLinks(addedLinks(params.previous ?? "", content));
+  if (dead.length > 0) {
+    content = unlinkUrls(content, dead);
+    await log.info(`Removed ${dead.length} dead links from the draft`, {
+      reason: dead,
+    });
   }
   content = await removeNewDashes({
     organizationId: ctx.organizationId,
@@ -522,7 +599,7 @@ export async function writeBlogDraft(params: {
         label: "brand description",
         text: `${ctx.brand?.name ?? ""}: ${ctx.brand?.description ?? ""}`,
       },
-      { label: "brief", text: brief.evidence },
+      { label: "brief", text: withoutAnswers(brief.evidence) },
       ...sources,
     ],
     factCheck: comparison
@@ -531,6 +608,16 @@ export async function writeBlogDraft(params: {
             claim.finding.evidence.comparison?.competitor ?? "the competitor",
         }
       : null,
+    // A topic joins several signals and the finding keeps only one, so every
+    // tracked competitor counts, not just the ones this observation saw.
+    competitors: [
+      ...new Set([
+        ...(claim.finding.evidence.competitors ?? []),
+        ...(ctx.projectId
+          ? await loadTrackedCompetitorNames(ctx.projectId)
+          : []),
+      ]),
+    ],
     onUsage: params.onUsage,
   });
   if (existing) {
@@ -547,10 +634,20 @@ export async function writeBlogDraft(params: {
       await log.error("Rejected the page update", { reason: problem });
       throw new Error(problem);
     }
+    // The first publish date stays; the page's own "last updated" field is
+    // set in code, like a refresh does.
+    const touched = touchUpdatedDate(
+      keepFrontmatterLines(
+        existing.content,
+        updated.content,
+        AUTOPILOT_UPDATE_KEPT_DATE_FIELDS
+      ),
+      new Date().toISOString().slice(0, 10)
+    );
     return {
       kind: "update",
       baseSha,
-      post: updated,
+      post: { ...updated, content: touched.content },
       existingPath: existing.path,
     };
   }
@@ -1058,10 +1155,15 @@ export async function runKeywordsJob(
     await log.skip("No website repository connected");
     return result;
   }
-  const [gaps, settled] = await Promise.all([
+  const [gaps, settled, topics] = await Promise.all([
     loadGaps(ctx),
     listSettledFingerprints(ctx.organizationId, "keywords"),
+    loadTopicObservationIds(ctx.organizationId),
   ]);
+  if (!gaps) {
+    await log.skip("GEO is not set up, so there are no content gaps to read");
+    return result;
+  }
   // Cheap filters first: gaps you lose to a named competitor, search gaps
   // where no existing page covers the query, nothing already briefed or proposed.
   const dropped: { gap: string; reason: string }[] = [];
@@ -1085,7 +1187,7 @@ export async function runKeywordsJob(
       .map((gap) => ({
         key: gap.prompt,
         topic: gap.title ?? gap.prompt,
-        competitors: gap.competitors,
+        competitors: promptGapCompetitors(gap),
         evidence: describePromptGap(gap),
         target: {
           kind: "prompt" as const,
@@ -1114,9 +1216,23 @@ export async function runKeywordsJob(
         };
       })
   );
-  const fresh = qualified.filter(
-    (candidate) => !settled.has(keywordFingerprint(candidate.key))
-  );
+  const isClosed = (candidate: KeywordCandidate) =>
+    topics.closed.has(keywordFingerprint(candidate.key));
+  // A topic that is ready needs its gaps seen again to act; then gaps the
+  // planner never saw, so the same unconvincing ones don't take every slot.
+  const turn = (candidate: KeywordCandidate) => {
+    const id = keywordFingerprint(candidate.key);
+    if (topics.ready.has(id)) {
+      return 0;
+    }
+    return topics.known.has(id) ? 2 : 1;
+  };
+  const fresh = qualified
+    .filter(
+      (candidate) =>
+        !(settled.has(keywordFingerprint(candidate.key)) || isClosed(candidate))
+    )
+    .sort((a, b) => turn(a) - turn(b));
   const candidates = fresh.slice(0, AUTOPILOT_MAX_OBSERVATIONS);
   await log.trace("Keyword filter: every gap and why it was dropped", {
     dropped: [
@@ -1127,6 +1243,10 @@ export async function runKeywordsJob(
           gap: candidate.key,
           reason: "Already proposed, merged or dismissed",
         })),
+      ...qualified.filter(isClosed).map((candidate) => ({
+        gap: candidate.key,
+        reason: "The planner dismissed or wrote its topic",
+      })),
       ...fresh.slice(AUTOPILOT_MAX_OBSERVATIONS).map((candidate) => ({
         gap: candidate.key,
         reason: `Beyond the top ${AUTOPILOT_MAX_OBSERVATIONS} sent to the planner`,
@@ -1151,8 +1271,31 @@ export async function runKeywordsJob(
   if (candidates.length === 0) {
     return result;
   }
+  // What the engines answered instead, so the writer knows what to beat.
+  const answers =
+    ctx.projectId &&
+    candidates.some((candidate) => candidate.target.kind === "prompt")
+      ? await loadAnswerChecks({
+          projectId: ctx.projectId,
+          since: new Date(Date.now() - AUTOPILOT_COMPARISONS_LOOKBACK_MS),
+          limit: AUTOPILOT_COMPARISONS_MAX_CHECKS,
+        })
+          .then(answersByPrompt)
+          .catch(async (error) => {
+            await log.info("Could not read the AI answers for the brief", {
+              error: toErrorMessage(error, "unknown error"),
+            });
+            return new Map<string, string>();
+          })
+      : new Map<string, string>();
 
   result.observations = candidates.map((candidate) => {
+    const answered =
+      candidate.target.kind === "prompt"
+        ? (gapScanIds(candidate.target.promptId)
+            .map((scanId) => answers.get(scanId))
+            .find(Boolean) ?? "")
+        : "";
     const title = candidate.updatePage
       ? `Update "${candidate.updatePage.title}" for "${candidate.topic}"`
       : `Blog post for "${candidate.topic}"`;
@@ -1181,7 +1324,7 @@ export async function runKeywordsJob(
         angle: candidate.updatePage
           ? `Update the existing page so it wins the answer for "${candidate.key}"`
           : `Win the AI answer for "${candidate.key}"`,
-        evidence: candidate.evidence,
+        evidence: [candidate.evidence, answered].filter(Boolean).join("\n\n"),
       },
     };
   });
@@ -1494,7 +1637,7 @@ export async function runCommitsJob(
   const [lookbackDays, settled, ready] = await Promise.all([
     commitsLookbackDays(ctx),
     listSettledFingerprints(ctx.organizationId, "commits"),
-    listReadyTopicObservationIds(ctx.organizationId),
+    loadTopicObservationIds(ctx.organizationId).then((ids) => ids.ready),
   ]);
   // Evidence of topics that are ready to act on first, then features.
   const rank = (
@@ -1701,9 +1844,13 @@ export async function runCompetitorsJob(
   const result: AutopilotJobResult = { findingIds: [], insights: [] };
   const log = createAutopilotLogger(ctx, "competitors");
   const gaps = await loadGaps(ctx);
+  if (!gaps) {
+    await log.skip("GEO is not set up");
+    return result;
+  }
   const counts = new Map<string, number>();
   for (const gap of gaps.promptGaps.filter((row) => !row.won)) {
-    for (const name of new Set(gap.competitors)) {
+    for (const name of new Set(promptGapCompetitors(gap))) {
       counts.set(name, (counts.get(name) ?? 0) + 1);
     }
   }

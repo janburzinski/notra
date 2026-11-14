@@ -45,6 +45,8 @@ export interface AutopilotCommitFilters {
 }
 
 export interface AutopilotFindingEvidence {
+  /** Autopilot's scheduled publish merged it, not a person; teaches nothing. */
+  autoPublished?: boolean;
   sourceUrl?: string | null;
   score?: number | null;
   issueId?: string | null;
