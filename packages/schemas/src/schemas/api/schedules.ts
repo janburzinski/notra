@@ -66,7 +66,7 @@ const cronConfigSchema = z
     }),
     dayOfMonth: z.number().int().min(1).max(31).optional().openapi({
       description:
-        "Day of the month for monthly schedules (1-31). Required when frequency is monthly.",
+        "Day of the month for monthly schedules (1-31). Required when frequency is monthly. Months without that day are skipped, so 31 runs only in 31-day months.",
       example: 1,
     }),
     intervalDays: cronIntervalDaysSchema.optional().openapi({
@@ -220,7 +220,7 @@ export const createScheduleRequestSchema = z.object({
   }),
   autoPublish: z.boolean().default(false).openapi({
     description:
-      "Publish generated changelogs and blog posts automatically instead of saving them as drafts. LinkedIn, X and image posts always stay drafts.",
+      "Save generated changelogs and blog posts with status published instead of draft. This only marks them published in Notra; nothing is pushed to GitHub or a Notra site. Other output types always stay drafts.",
     example: false,
   }),
   lookbackWindow: z
@@ -275,7 +275,7 @@ export const patchScheduleRequestSchema = z
     enabled: createScheduleFields.enabled.optional(),
     autoPublish: z.boolean().optional().openapi({
       description:
-        "Publish generated changelogs and blog posts automatically instead of saving them as drafts. LinkedIn, X and image posts always stay drafts.",
+        "Save generated changelogs and blog posts with status published instead of draft. This only marks them published in Notra; nothing is pushed to GitHub or a Notra site. Other output types always stay drafts.",
     }),
     lookbackWindow: z.enum(lookbackWindowEnum.enumValues).optional().openapi({
       description: "How far back each run collects source activity.",
@@ -295,16 +295,29 @@ const scheduleSchema = z.object({
   targets: storedScheduleTargetsSchema,
   outputType: z.enum(SUPPORTED_CONTENT_GENERATION_TYPES),
   outputConfig: scheduleOutputConfigSchema.nullable().optional(),
-  enabled: z.boolean(),
-  autoPublish: z.boolean(),
+  enabled: z.boolean().openapi({
+    description:
+      "Whether the schedule runs. Disabled schedules are stored but never fire.",
+  }),
+  autoPublish: z.boolean().openapi({
+    description:
+      "Save generated changelogs and blog posts with status published instead of draft. This only marks them published in Notra; nothing is pushed to GitHub or a Notra site. Other output types always stay drafts.",
+  }),
   createdAt: z.string(),
   updatedAt: z.string(),
-  lookbackWindow: z.enum(lookbackWindowEnum.enumValues),
+  lookbackWindow: z.enum(lookbackWindowEnum.enumValues).openapi({
+    description: "How far back each run collects source activity.",
+  }),
 });
 
 export const getSchedulesResponseSchema = z.object({
-  schedules: z.array(scheduleSchema),
-  repositoryMap: z.record(z.string(), z.string()),
+  schedules: z.array(scheduleSchema).openapi({
+    description: "Schedules, newest first.",
+  }),
+  repositoryMap: z.record(z.string(), z.string()).openapi({
+    description:
+      "Maps each targeted GitHub integration ID to an owner/repo label, followed by the default branch when one is known. Integrations without an owner and repo are left out.",
+  }),
   organization: organizationResponseSchema,
 });
 
@@ -337,7 +350,10 @@ export const listScheduleRunsQuerySchema = z.object({
     .min(1)
     .max(50)
     .default(10)
-    .openapi({ param: { name: "limit", in: "query" } }),
+    .openapi({
+      param: { name: "limit", in: "query" },
+      description: "Newest runs to return. Defaults to 10.",
+    }),
 });
 
 const scheduleRunSchema = z.object({
@@ -347,20 +363,28 @@ const scheduleRunSchema = z.object({
       "`running` until the run reports back. A run that never reports back is shown as `failed` after six hours.",
   }),
   title: z.string().nullable().openapi({
-    description: "Title of what the run produced, null while running.",
+    description:
+      'Title of the post the run created, or a count such as "3 linkedin post drafts" when it created several. Null while running and for runs that created nothing.',
   }),
   postId: z.string().nullable().openapi({
-    description: "The draft post the run created, if any.",
+    description:
+      "ID of the post the run created, or the first one when it created several. Null when it created none.",
   }),
-  errorMessage: z.string().nullable(),
+  errorMessage: z.string().nullable().openapi({
+    description: "Why a failed or skipped run produced no content.",
+  }),
   manual: z.boolean().openapi({
     description: "Started on demand rather than by the schedule.",
   }),
   startedAt: z.string(),
-  finishedAt: z.string().nullable(),
+  finishedAt: z.string().nullable().openapi({
+    description: "When the run reported its result. Null while running.",
+  }),
 });
 
 export const listScheduleRunsResponseSchema = z.object({
-  runs: z.array(scheduleRunSchema),
+  runs: z.array(scheduleRunSchema).openapi({
+    description: "Runs, newest first.",
+  }),
   organization: organizationResponseSchema,
 });

@@ -9,8 +9,13 @@ const sequenceSchema = z
   .object({
     id: z.string(),
     name: z.string(),
-    steps: z.array(z.string()),
-    enabled: z.boolean(),
+    steps: z.array(z.string()).openapi({
+      description:
+        "Messages sent in order as one conversation with each engine.",
+    }),
+    enabled: z.boolean().openapi({
+      description: "Whether project scans play this conversation.",
+    }),
     createdAt: z.string(),
   })
   .openapi("GeoSequence");
@@ -22,7 +27,9 @@ const sequenceStepsSchema = z
 
 export const listSequencesResponseSchema = z
   .object({
-    sequences: z.array(sequenceSchema),
+    sequences: z.array(sequenceSchema).openapi({
+      description: "The project's sequences, oldest first.",
+    }),
     organization: organizationResponseSchema,
   })
   .openapi("ListGeoSequencesResponse");
@@ -58,7 +65,7 @@ export const patchSequenceRequestSchema = z
 
 export const deleteSequenceResponseSchema = z
   .object({
-    id: z.string(),
+    id: z.string().openapi({ description: "Id of the deleted sequence." }),
     organization: organizationResponseSchema,
   })
   .openapi("DeleteGeoSequenceResponse");
@@ -74,7 +81,7 @@ export const runSequenceResponseSchema = z
     }),
     engines: z.array(z.string()).openapi({
       description:
-        "API-based engines that answered the conversation during this request. Empty when only consumer apps run or none of the API engines answered.",
+        "Every API-based engine the conversation was played against during this request, once at least one of them answered, including engines that failed. Empty when only consumer apps run or none of the API engines answered.",
     }),
     // Defaults keep a dashboard that predates these fields parseable while
     // both sides deploy.

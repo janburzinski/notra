@@ -1,4 +1,5 @@
 import { createRoute } from "@hono/zod-openapi";
+import { GEO_COMPETITOR_DETAIL_DAYS } from "@notra/geo-core/constants/geo";
 import {
   loadGeoCompetitorDetail,
   loadGeoCompetitorShare,
@@ -15,7 +16,8 @@ import { geoWindow } from "@notra/geo-core/geo/window";
 import { projectParamsSchema } from "@notra/schemas/api/geo-params";
 import {
   competitorDetailParamsSchema,
-  geoWindowQuerySchema,
+  competitorDetailQuerySchema,
+  geoVisibilityWindowQuerySchema,
   promptResultDetailParamsSchema,
   promptResultSummaryQuerySchema,
   visibilityCompetitorDetailResponseSchema,
@@ -62,7 +64,10 @@ const overviewRoute = createRoute({
   operationId: "getGeoVisibilityOverview",
   summary: "Get mention rates per engine",
   description: `Checks, mentions and average position for every answer engine the project tracks. ${WINDOW_NOTE}`,
-  request: { params: projectParamsSchema, query: geoWindowQuerySchema },
+  request: {
+    params: projectParamsSchema,
+    query: geoVisibilityWindowQuerySchema,
+  },
   responses: {
     200: {
       description: "Overview fetched successfully",
@@ -81,7 +86,10 @@ const timeseriesRoute = createRoute({
   operationId: "getGeoVisibilityTimeseries",
   summary: "Get daily mention counts per engine",
   description: `One point per day and engine. ${WINDOW_NOTE}`,
-  request: { params: projectParamsSchema, query: geoWindowQuerySchema },
+  request: {
+    params: projectParamsSchema,
+    query: geoVisibilityWindowQuerySchema,
+  },
   responses: {
     200: {
       description: "Timeseries fetched successfully",
@@ -100,7 +108,10 @@ const promptResultsRoute = createRoute({
   operationId: "getGeoVisibilityPromptResults",
   summary: "Get the latest answer per prompt and engine",
   description: `The stored answer text, mention position, sentiment and grounding sources for each tracked prompt. ${WINDOW_NOTE}`,
-  request: { params: projectParamsSchema, query: geoWindowQuerySchema },
+  request: {
+    params: projectParamsSchema,
+    query: geoVisibilityWindowQuerySchema,
+  },
   responses: {
     200: {
       description: "Prompt results fetched successfully",
@@ -166,7 +177,10 @@ const competitorShareRoute = createRoute({
   operationId: "getGeoVisibilityCompetitorShare",
   summary: "Get share of voice across tracked brands",
   description: `Mention counts per brand with a per-brand trend, plus the daily timeseries behind it. ${WINDOW_NOTE}`,
-  request: { params: projectParamsSchema, query: geoWindowQuerySchema },
+  request: {
+    params: projectParamsSchema,
+    query: geoVisibilityWindowQuerySchema,
+  },
   responses: {
     200: {
       description: "Competitor share fetched successfully",
@@ -185,7 +199,10 @@ const languageShareRoute = createRoute({
   operationId: "getGeoVisibilityLanguageShare",
   summary: "Get mention rates per tracked language",
   description: `Checks, mentions and average position broken down by language. Only tracked prompts count, without sequences or personas. In a scan that ran several languages, a prompt counts only where the same engine also answered it in another language of that scan. ${WINDOW_NOTE}`,
-  request: { params: projectParamsSchema, query: geoWindowQuerySchema },
+  request: {
+    params: projectParamsSchema,
+    query: geoVisibilityWindowQuerySchema,
+  },
   responses: {
     200: {
       description: "Language share fetched successfully",
@@ -203,11 +220,10 @@ const competitorDetailRoute = createRoute({
   tags: [GEO_OPENAPI_TAG],
   operationId: "getGeoVisibilityCompetitorDetail",
   summary: "Get one competitor's mention history",
-  description:
-    "Daily mentions and the prompts that produced them for a single brand. Without a window this falls back to the competitor-detail default rather than the project default, matching the dashboard.",
+  description: `Daily mentions and the prompts that produced them for a single brand. Without a window this covers the last ${GEO_COMPETITOR_DETAIL_DAYS} days, matching the dashboard, while the other visibility endpoints cover all history.`,
   request: {
     params: competitorDetailParamsSchema,
-    query: geoWindowQuerySchema,
+    query: competitorDetailQuerySchema,
   },
   responses: {
     200: {

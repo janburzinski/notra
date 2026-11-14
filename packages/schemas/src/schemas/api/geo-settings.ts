@@ -24,23 +24,67 @@ const settingsSchema = z
     id: z.string(),
     organizationId: z.string(),
     projectId: z.string(),
-    companyName: z.string(),
-    aliases: z.array(z.string()),
-    conversionPaths: z.array(z.string()),
-    domains: z.array(z.string()),
-    competitors: z.array(z.string()),
-    languages: z.array(z.string()),
-    engines: z.array(z.string()),
-    enforceZdr: z.boolean(),
-    nonZdrApprovedEngines: z.array(z.string()),
-    trackWithoutSearch: z.boolean(),
-    pausedAutoPromptIds: z.array(z.string()),
-    removedAutoPromptIds: z.array(z.string()),
-    enabled: z.boolean(),
-    scanIntervalHours: z.number().int(),
-    scanStartedAt: z.string().nullable(),
-    lastScanAt: z.string().nullable(),
-    isScanning: z.boolean(),
+    companyName: z.string().openapi({
+      description: "Brand name that scans look for in AI answers.",
+    }),
+    aliases: z.array(z.string()).openapi({
+      description: "Other names that also count as a brand mention.",
+    }),
+    conversionPaths: z.array(z.string()).openapi({
+      description:
+        "Paths that count as a conversion when an AI referral reaches them. Prefix match.",
+    }),
+    domains: z.array(z.string()).openapi({
+      description:
+        "Additional hostnames that send AI traffic to this project, besides the brand website. Subdomains are included.",
+    }),
+    competitors: z.array(z.string()).openapi({
+      description:
+        "Names of the project's competitors, kept in sync with the competitors endpoints.",
+    }),
+    languages: z.array(z.string()).openapi({
+      description:
+        "Supported languages scans run in. Unsupported or duplicate stored values are left out.",
+    }),
+    engines: z.array(z.string()).openapi({
+      description:
+        "Engine ids scans run on, from GET /v1/projects/{projectId}/geo/engines. Unknown ids are dropped and the default set is used when none remain. With enforceZdr on, engines that can't run under zero data retention are left out.",
+    }),
+    enforceZdr: z.boolean().openapi({
+      description:
+        "Only run engines with zero data retention, plus those listed in nonZdrApprovedEngines.",
+    }),
+    nonZdrApprovedEngines: z.array(z.string()).openapi({
+      description:
+        "Engines without zero data retention that may still run while enforceZdr is on.",
+    }),
+    trackWithoutSearch: z.boolean().openapi({
+      description: "Also scan search-capable models without web search.",
+    }),
+    pausedAutoPromptIds: z.array(z.string()).openapi({
+      description: "Ids of auto-generated prompts skipped in scans.",
+    }),
+    removedAutoPromptIds: z.array(z.string()).openapi({
+      description: "Ids of auto-generated prompts removed from tracking.",
+    }),
+    enabled: z.boolean().openapi({
+      description: "Whether recurring scans run.",
+    }),
+    scanIntervalHours: z.number().int().openapi({
+      description: "Hours between automatic scans, in whole days.",
+    }),
+    scanStartedAt: z.string().nullable().openapi({
+      description:
+        "When the scan in progress started. Usually cleared when it finishes.",
+    }),
+    lastScanAt: z.string().nullable().openapi({
+      description:
+        "When the latest scan finished, whether it succeeded or failed. Null before the first scan.",
+    }),
+    isScanning: z.boolean().openapi({
+      description:
+        "A scan started after the latest finished one and less than two hours ago.",
+    }),
     createdAt: z.string(),
     updatedAt: z.string(),
   })
@@ -49,9 +93,13 @@ const settingsSchema = z
 export const settingsResponseSchema = z
   .object({
     configured: z.boolean().openapi({
-      description: "Whether the analytics backend is configured.",
+      description:
+        "Whether the analytics store behind AI traffic and web analytics is set up on this Notra deployment. It does not depend on the project or its settings.",
     }),
-    settings: settingsSchema.nullable(),
+    settings: z.union([settingsSchema, z.null()]).openapi({
+      description:
+        "Null when the project has no saved GEO settings yet. Save them with PATCH /v1/projects/{projectId}/geo/settings.",
+    }),
     organization: organizationResponseSchema,
   })
   .openapi("GeoSettingsResponse");
@@ -140,8 +188,12 @@ const geoEngineSchema = z
       description: "Engine id to pass in the `engines` setting.",
       example: "google/ai-overview",
     }),
-    label: z.string(),
-    provider: z.string(),
+    label: z.string().openapi({ description: "Display name." }),
+    provider: z.string().openapi({
+      description:
+        "Vendor the engine is grouped under, such as anthropic, openai, google, perplexity or microsoft. Coding-agent engines use the agent instead, such as cursor, opencode, claude-code or codex.",
+      example: "google",
+    }),
     zdr: z.enum(["all", "some", "none"]).openapi({
       description:
         "Zero data retention coverage. Engines with `none` need `enforceZdr: false` or an entry in `nonZdrApprovedEngines`.",
@@ -149,13 +201,18 @@ const geoEngineSchema = z
     default: z.boolean().openapi({
       description: "Part of the default engine set for new projects.",
     }),
-    supportsGroundedChecks: z.boolean(),
+    supportsGroundedChecks: z.boolean().openapi({
+      description: "Currently always false for engines listed by the API.",
+    }),
   })
   .openapi("GeoEngine");
 
 export const engineListResponseSchema = z
   .object({
-    engines: z.array(geoEngineSchema),
+    engines: z.array(geoEngineSchema).openapi({
+      description:
+        "Engines this organization can select. Legacy engines a project already tracks are not listed.",
+    }),
     organization: organizationResponseSchema,
   })
   .openapi("GeoEngineListResponse");

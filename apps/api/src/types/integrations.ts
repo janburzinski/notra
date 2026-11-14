@@ -67,8 +67,8 @@ export interface DeleteIntegrationProgramInput extends IntegrationProgramInput {
 
 export interface DeleteIntegrationProgramSuccess {
   id: string;
-  disabledSchedules: { id: string; name: string | null }[];
-  disabledEvents: { id: string; name: string | null }[];
+  disabledSchedules: { id: string; name: string }[];
+  disabledEvents: { id: string; name: string }[];
 }
 
 export interface GetGitHubActivityProgramInput extends IntegrationProgramInput {

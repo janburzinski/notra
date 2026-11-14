@@ -25,19 +25,37 @@ const promptTagsSchema = z
 
 const promptSchema = z
   .object({
-    id: z.string(),
+    id: z.string().openapi({
+      description:
+        "Use as `promptId` in the prompt endpoints, including `GET /v1/projects/{projectId}/geo/prompts/{promptId}/history`. A UUID for custom prompts, a fixed slug such as `best-tools` for auto prompts.",
+    }),
     prompt: z.string(),
-    enabled: z.boolean(),
-    source: z.enum(["custom", "auto"]),
-    tags: z.array(z.string()),
-    createdAt: z.string().nullable(),
+    enabled: z.boolean().openapi({
+      description: "Whether project scans ask this prompt.",
+    }),
+    source: z.enum(["custom", "auto"]).openapi({
+      description:
+        "`custom` for prompts added by the user, `auto` for prompts Notra generates from the brand settings.",
+    }),
+    tags: z.array(z.string()).openapi({
+      description: "Labels on custom prompts. Always empty for auto prompts.",
+    }),
+    createdAt: z.string().nullable().openapi({
+      description: "When the custom prompt was added. `null` for auto prompts.",
+    }),
   })
   .openapi("GeoPrompt");
 
 export const listPromptsResponseSchema = z
   .object({
-    configured: z.boolean(),
-    prompts: z.array(promptSchema),
+    configured: z.boolean().openapi({
+      description:
+        "Whether the analytics backend is configured. It does not affect which prompts are returned.",
+    }),
+    prompts: z.array(promptSchema).openapi({
+      description:
+        "Custom prompts, newest first, followed by auto prompts. Auto prompts the user removed are left out.",
+    }),
     organization: organizationResponseSchema,
   })
   .openapi("ListGeoPromptsResponse");
@@ -68,7 +86,7 @@ export const patchPromptRequestSchema = z
 
 export const deletePromptResponseSchema = z
   .object({
-    id: z.string(),
+    id: z.string().openapi({ description: "Id of the deleted prompt." }),
     organization: organizationResponseSchema,
   })
   .openapi("DeleteGeoPromptResponse");
@@ -100,9 +118,16 @@ export const importPromptsRequestSchema = z
 
 export const importPromptsResponseSchema = z
   .object({
-    imported: z.number().int(),
-    updated: z.number().int(),
-    skipped: z.number().int(),
+    imported: z.number().int().openapi({
+      description: "Prompts added as new custom prompts.",
+    }),
+    updated: z.number().int().openapi({
+      description: "Always 0: existing prompts are never changed by an import.",
+    }),
+    skipped: z.number().int().openapi({
+      description:
+        "Rows not added because the prompt was blank or already tracked, or repeated in the import. Compared case-insensitively.",
+    }),
     issues: z.array(geoImportIssueSchema).openapi({
       description: "Rows rejected while parsing CSV. Always empty for `rows`.",
     }),
@@ -112,17 +137,33 @@ export const importPromptsResponseSchema = z
 
 const promptSuggestionSchema = z
   .object({
-    id: z.string(),
-    prompt: z.string(),
-    title: z.string().nullable(),
+    id: z.string().openapi({
+      description: "Suggestion id for the accept and dismiss endpoints.",
+    }),
+    prompt: z.string().openapi({
+      description: "Prompt that would be tracked when accepted.",
+    }),
+    title: z.string().nullable().openapi({
+      description:
+        "Suggested headline for an article that could win this prompt, or `null`.",
+    }),
     source: z.literal("search_console"),
     keywords: z
       .array(
         z.object({
           query: z.string(),
-          clicks: z.number(),
-          impressions: z.number(),
-          position: z.number(),
+          clicks: z.number().openapi({
+            description:
+              "Search Console clicks over the 28 days ending 3 days before the suggestion was created (Search Console data lags by about 3 days).",
+          }),
+          impressions: z.number().openapi({
+            description:
+              "Search Console impressions over the 28 days ending 3 days before the suggestion was created (Search Console data lags by about 3 days).",
+          }),
+          position: z.number().openapi({
+            description:
+              "Average Google search position over the 28 days ending 3 days before the suggestion was created (Search Console data lags by about 3 days).",
+          }),
         })
       )
       .openapi({
@@ -140,7 +181,9 @@ export const promptSuggestionParamsSchema = projectParamsSchema.extend({
 
 export const listPromptSuggestionsResponseSchema = z
   .object({
-    suggestions: z.array(promptSuggestionSchema),
+    suggestions: z.array(promptSuggestionSchema).openapi({
+      description: "Pending suggestions, newest first.",
+    }),
     organization: organizationResponseSchema,
   })
   .openapi("ListGeoPromptSuggestionsResponse");
@@ -148,7 +191,10 @@ export const listPromptSuggestionsResponseSchema = z
 export const dismissPromptSuggestionResponseSchema = z
   .object({
     id: z.string(),
-    dismissed: z.boolean(),
+    dismissed: z.boolean().openapi({
+      description:
+        "Always `true`. Dismissing an unknown or already handled suggestion returns 404.",
+    }),
     organization: organizationResponseSchema,
   })
   .openapi("DismissGeoPromptSuggestionResponse");

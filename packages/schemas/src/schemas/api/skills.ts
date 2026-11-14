@@ -49,11 +49,16 @@ export const patchSkillRequestSchema = z
 const skillSummarySchema = z
   .object({
     id: z.string(),
-    name: z.string(),
-    description: z.string(),
+    name: z.string().openapi({
+      description:
+        "Unique within the organization. Use it as {name} in /v1/skills/{name}.",
+    }),
+    description: z.string().openapi({
+      description: "Short description of when the skill should be used.",
+    }),
     isSystem: z.boolean().openapi({
       description:
-        "True for built-in skills provided by Notra. System skills cannot be renamed or deleted.",
+        "True for built-in skills provided by Notra. System skills can be edited but not renamed or deleted.",
     }),
     updatedAt: z.string(),
   })
@@ -61,14 +66,18 @@ const skillSummarySchema = z
 
 const skillSchema = skillSummarySchema
   .extend({
-    content: z.string(),
+    content: z.string().openapi({
+      description: "Full skill instructions, typically Markdown.",
+    }),
     createdAt: z.string(),
   })
   .openapi("Skill");
 
 export const listSkillsResponseSchema = z
   .object({
-    skills: z.array(skillSummarySchema),
+    skills: z.array(skillSummarySchema).openapi({
+      description: "Skills sorted by name, without their content.",
+    }),
   })
   .openapi("ListSkillsResponse");
 

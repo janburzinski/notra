@@ -9,27 +9,59 @@ const scanSchema = z
     projectId: z.string(),
     status: z.enum(["running", "completed", "failed"]),
     startedAt: z.string(),
-    finishedAt: z.string().nullable(),
+    finishedAt: z.string().nullable().openapi({
+      description:
+        "When the scan completed or failed, or `null` while running.",
+    }),
     createdAt: z.string(),
     summary: z.object({
-      plannedChecks: z.number().int().min(0).nullable(),
-      completedChecks: z.number().int().min(0),
-      mentionCount: z.number().int().min(0),
-      failedChecks: z.number().int().min(0),
-      engines: z.array(
-        z.object({
-          engine: z.string(),
-          plannedChecks: z.number().int().min(0).nullable(),
-          completedChecks: z.number().int().min(0),
-          mentionCount: z.number().int().min(0),
-          failedChecks: z.number().int().min(0),
-        })
-      ),
+      plannedChecks: z.number().int().min(0).nullable().openapi({
+        description:
+          "Answers the scan planned to collect, or `null` when the scan recorded no plan.",
+      }),
+      completedChecks: z.number().int().min(0).openapi({
+        description: "Answers stored for this scan so far.",
+      }),
+      mentionCount: z.number().int().min(0).openapi({
+        description: "Stored answers that mentioned the tracked brand.",
+      }),
+      failedChecks: z.number().int().min(0).openapi({
+        description: "Planned answers that failed and were not stored.",
+      }),
+      engines: z
+        .array(
+          z.object({
+            engine: z.string(),
+            plannedChecks: z.number().int().min(0).nullable().openapi({
+              description:
+                "Answers planned for this engine, or `null` when the plan has no per-engine breakdown.",
+            }),
+            completedChecks: z.number().int().min(0),
+            mentionCount: z.number().int().min(0),
+            failedChecks: z.number().int().min(0),
+          })
+        )
+        .openapi({
+          description:
+            "The same counts per engine, sorted by engine id. Covers planned engines and engines with stored answers.",
+        }),
     }),
-    errorCode: z.string().nullable(),
-    errorMessage: z.string().nullable(),
-    failedStage: z.enum(["handoff", "execution", "stale"]).nullable(),
-    retryable: z.boolean().nullable(),
+    errorCode: z.string().nullable().openapi({
+      description:
+        "Machine-readable failure code such as `scan_handoff_failed` or `scan_stale`. `null` unless `status` is `failed`.",
+    }),
+    errorMessage: z.string().nullable().openapi({
+      description:
+        "Human-readable failure reason. `null` unless `status` is `failed`.",
+    }),
+    failedStage: z.enum(["handoff", "execution", "stale"]).nullable().openapi({
+      description:
+        "`handoff` when the scan could not be started, `execution` when it failed while running, `stale` when it stopped reporting progress and was closed. `null` unless `status` is `failed`.",
+    }),
+    retryable: z.boolean().nullable().openapi({
+      description:
+        "`true` when the failure was a timeout or a stale run, so starting a new scan is likely to work. `null` when unknown or the scan did not fail.",
+    }),
   })
   .openapi("GeoScan");
 
@@ -52,15 +84,25 @@ export const listScansQuerySchema = z.object({
 const scanPaginationSchema = z.object({
   limit: z.number().int().min(1),
   currentPage: z.number().int().min(1),
-  nextPage: z.number().int().min(1).nullable(),
-  previousPage: z.number().int().min(1).nullable(),
-  totalPages: z.number().int().min(1),
-  totalItems: z.number().int().min(0),
+  nextPage: z.number().int().min(1).nullable().openapi({
+    description: "Next page number, or `null` on the last page.",
+  }),
+  previousPage: z.number().int().min(1).nullable().openapi({
+    description: "Previous page number, or `null` on the first page.",
+  }),
+  totalPages: z.number().int().min(1).openapi({
+    description: "Total pages at this `limit`. At least 1, even with no scans.",
+  }),
+  totalItems: z.number().int().min(0).openapi({
+    description: "Total scans recorded for the project.",
+  }),
 });
 
 export const listScansResponseSchema = z
   .object({
-    scans: z.array(scanSchema),
+    scans: z.array(scanSchema).openapi({
+      description: "Scans for the project, most recently started first.",
+    }),
     pagination: scanPaginationSchema,
     organization: organizationResponseSchema,
   })
@@ -81,8 +123,14 @@ export const scanResponseSchema = z
  */
 export const createScanResponseSchema = z
   .object({
-    scanId: z.string(),
-    statusUrl: z.string(),
+    scanId: z.string().openapi({
+      description:
+        "Id of the queued scan, readable right away via `GET /v1/projects/{projectId}/geo/scans/{scanId}`.",
+    }),
+    statusUrl: z.string().openapi({
+      description:
+        "Relative URL of that scan, also sent as the `Location` header. Poll it until `status` leaves `running`.",
+    }),
     organization: organizationResponseSchema,
   })
   .openapi("CreateGeoScanResponse");

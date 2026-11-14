@@ -24,6 +24,7 @@ import {
   ingestSetupQuerySchema,
   ingestSetupResponseSchema,
   ingestTokenQuerySchema,
+  mcpAnalyticsQuerySchema,
   ingestTokenResponseSchema,
   journeyDetailResponseSchema,
   journeyParamsSchema,
@@ -182,7 +183,7 @@ const mcpAnalyticsRoute = createRoute({
   summary: "Get MCP server analytics",
   description:
     "Usage of your own MCP server, as reported by `@usenotra/sdk/mcp`: request and error totals against the previous window, per-tool latency and errors, clients, models, intents, recent failures and tools that were never called. Captured arguments, responses and end-user IDs are not returned.",
-  request: { params: projectParamsSchema, query: trafficOverviewQuerySchema },
+  request: { params: projectParamsSchema, query: mcpAnalyticsQuerySchema },
   responses: {
     200: {
       description: "MCP analytics fetched successfully",
@@ -200,7 +201,7 @@ const mcpToolDetailRoute = createRoute({
   summary: "Get one MCP tool's analytics",
   description:
     "Which tools agents call right before and after this one, its failures grouped by message, and the intents it was called for.",
-  request: { params: mcpToolParamsSchema, query: trafficOverviewQuerySchema },
+  request: { params: mcpToolParamsSchema, query: mcpAnalyticsQuerySchema },
   responses: {
     200: {
       description: "MCP tool analytics fetched successfully",

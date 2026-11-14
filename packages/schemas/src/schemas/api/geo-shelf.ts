@@ -11,8 +11,14 @@ export const geoShelfListQuerySchema = z.object({
 
 export const geoShelfListResponseSchema = z
   .object({
-    sources: z.array(geoShelfSourceSchema),
-    nextOffset: z.number().int().nonnegative().nullable(),
+    sources: z.array(geoShelfSourceSchema).openapi({
+      description:
+        "The project's shelf sources, most recently updated first. Homepage URLs found by scans are left out.",
+    }),
+    nextOffset: z.number().int().nonnegative().nullable().openapi({
+      description:
+        "Pass as `offset` to fetch the next page, or `null` when this is the last page.",
+    }),
     organization: organizationResponseSchema,
   })
   .openapi("GeoShelfListResponse");

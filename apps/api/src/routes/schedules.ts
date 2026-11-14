@@ -58,7 +58,7 @@ const getSchedulesRoute = createRoute({
   operationId: "listSchedules",
   summary: "List schedules",
   description:
-    "Returns the organization's cron schedules, newest first. repositoryMap maps each targeted GitHub integration ID to an owner/repo label.",
+    'Returns the organization\'s cron schedules, newest first. repositoryMap maps each targeted GitHub integration ID to an owner/repo label, followed by " · <branch>" when the integration has a default branch set.',
   request: {
     query: getSchedulesQuerySchema,
   },

@@ -14,18 +14,36 @@ import { geoImportIssueSchema } from "./geo-import";
 
 const competitorSchema = z
   .object({
-    id: z.string(),
-    name: z.string(),
-    domain: z.string().nullable(),
-    synonyms: z.array(z.string()),
-    kind: z.enum(["direct", "indirect"]),
-    color: z.string().nullable(),
+    id: z.string().openapi({
+      description:
+        "Competitor id. Competitors carried over from older settings use `legacy:` plus the lowercased name. Endpoints address competitors by `name`, not id.",
+    }),
+    name: z.string().openapi({
+      description:
+        "Competitor name. Unique per project, compared case-insensitively.",
+    }),
+    domain: z.string().nullable().openapi({
+      description:
+        "Competitor website domain, used to recognize citations of its site. `null` when unknown.",
+    }),
+    synonyms: z.array(z.string()).openapi({
+      description: "Alternate names counted as this competitor in answers.",
+    }),
+    kind: z.enum(["direct", "indirect"]).openapi({
+      description:
+        "Your own label for the competitor: direct or indirect. Only shown as a label; mentions, share of voice and gaps count both kinds the same way.",
+    }),
+    color: z.string().nullable().openapi({
+      description: "Custom chart color, or `null` to use the default palette.",
+    }),
   })
   .openapi("GeoCompetitor");
 
 export const listCompetitorsResponseSchema = z
   .object({
-    competitors: z.array(competitorSchema),
+    competitors: z.array(competitorSchema).openapi({
+      description: "Tracked competitors, oldest first.",
+    }),
     organization: organizationResponseSchema,
   })
   .openapi("ListGeoCompetitorsResponse");
@@ -45,16 +63,32 @@ export const competitorSuggestionsQuerySchema = z.object({
 
 export const competitorSuggestionsResponseSchema = z
   .object({
-    domain: z.string(),
-    field: z.string().nullable(),
-    competitors: z.array(
-      z.object({
-        name: z.string(),
-        domain: z.string().nullable(),
-        description: z.string().nullable(),
-        confidence: z.enum(["high", "medium"]).nullable(),
-      })
-    ),
+    domain: z.string().openapi({
+      description: "Website domain the suggestions are for.",
+    }),
+    field: z.string().nullable().openapi({
+      description:
+        "Market or category the lookup placed the website in, or `null` when it reported none.",
+    }),
+    competitors: z
+      .array(
+        z.object({
+          name: z.string(),
+          domain: z.string().nullable(),
+          description: z.string().nullable().openapi({
+            description:
+              "Short description of the suggested competitor, or `null`.",
+          }),
+          confidence: z.enum(["high", "medium"]).nullable().openapi({
+            description:
+              "How sure the lookup is that this is a competitor, or `null` when not reported.",
+          }),
+        })
+      )
+      .openapi({
+        description:
+          "Suggested competitors, deduplicated by domain or name. Nothing is saved; track one with `PUT /v1/projects/{projectId}/geo/competitors`.",
+      }),
     organization: organizationResponseSchema,
   })
   .openapi("GeoCompetitorSuggestionsResponse");
@@ -70,7 +104,10 @@ export const putCompetitorRequestSchema = z
       .array(createGeoShortTextSchema())
       .max(GEO_COMPETITOR_MAX_SYNONYMS)
       .optional(),
-    kind: z.enum(["direct", "indirect"]).optional(),
+    kind: z.enum(["direct", "indirect"]).optional().openapi({
+      description:
+        "Label only; it does not change how mentions are counted. Omit to keep the current kind, or direct for a new competitor.",
+    }),
     color: z
       .string()
       .trim()
@@ -83,7 +120,10 @@ export const putCompetitorRequestSchema = z
 const competitorImportRowSchema = z.object({
   name: createGeoShortTextSchema(),
   domain: geoCompetitorDomainSchema.nullable().optional(),
-  kind: z.enum(["direct", "indirect"]).optional(),
+  kind: z.enum(["direct", "indirect"]).optional().openapi({
+    description:
+      "Label only. Omit to keep an existing competitor's kind, or direct for a new one.",
+  }),
   synonyms: z
     .array(createGeoShortTextSchema())
     .max(GEO_COMPETITOR_MAX_SYNONYMS)
@@ -110,11 +150,22 @@ export const importCompetitorsRequestSchema = z
 
 export const importCompetitorsResponseSchema = z
   .object({
-    imported: z.number().int(),
-    updated: z.number().int(),
-    skipped: z.number().int(),
-    issues: z.array(geoImportIssueSchema),
-    competitors: z.array(competitorSchema),
+    imported: z.number().int().openapi({
+      description: "Rows added as new competitors.",
+    }),
+    updated: z.number().int().openapi({
+      description:
+        "Rows that matched an existing competitor by name and replaced the domain, kind or synonyms they provided.",
+    }),
+    skipped: z.number().int().openapi({
+      description: "Rows repeating a name already seen earlier in the import.",
+    }),
+    issues: z.array(geoImportIssueSchema).openapi({
+      description: "Rows rejected while parsing CSV. Always empty for `rows`.",
+    }),
+    competitors: z.array(competitorSchema).openapi({
+      description: "All tracked competitors after the import.",
+    }),
     organization: organizationResponseSchema,
   })
   .openapi("ImportGeoCompetitorsResponse");

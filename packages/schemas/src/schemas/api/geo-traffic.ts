@@ -1,14 +1,19 @@
 import "zod/compile";
 import { z } from "@hono/zod-openapi";
 import {
+  AI_TRAFFIC_DEFAULT_DAYS,
+  AI_TRAFFIC_DEFAULT_JOURNEYS_LIMIT,
+  AI_TRAFFIC_DEFAULT_LOG_LIMIT,
+  AI_TRAFFIC_DEFAULT_PAGES_LIMIT,
   GEO_SHORT_FIELD_MAX_LENGTH,
+  MCP_ANALYTICS_DEFAULT_DAYS,
   MCP_EVENT_STATUSES,
 } from "@notra/geo-core/constants/geo";
 
 import { organizationResponseSchema } from "./content";
 import { createGeoShortTextSchema } from "./geo-fields";
 import { projectParamsSchema } from "./geo-params";
-import { geoWindowQuerySchema } from "./geo-visibility";
+import { createGeoWindowQuerySchema } from "./geo-visibility";
 import { resourceIdSchema } from "./ids";
 
 const AI_TRAFFIC_MAX_LOG_LIMIT = 200;
@@ -23,14 +28,17 @@ const visitorTypeSchema = z.enum([
   "unknown",
 ]);
 
-const trafficLimitParam = (name: string, max: number) =>
+const trafficLimitParam = (name: string, max: number, defaultLimit: number) =>
   z.coerce
     .number()
     .int()
     .min(1)
     .max(max)
     .optional()
-    .openapi({ param: { name, in: "query" } });
+    .openapi({
+      param: { name, in: "query" },
+      description: `Maximum rows to return. Defaults to ${defaultLimit}.`,
+    });
 
 const trafficHostParam = () =>
   z
@@ -65,10 +73,20 @@ const commaSeparated = <T extends string>(
       description: `Comma-separated. One or more of: ${values.join(", ")}.`,
     });
 
-export const trafficOverviewQuerySchema = geoWindowQuerySchema.extend({});
+export const trafficOverviewQuerySchema = createGeoWindowQuerySchema(
+  AI_TRAFFIC_DEFAULT_DAYS
+);
+
+export const mcpAnalyticsQuerySchema = createGeoWindowQuerySchema(
+  MCP_ANALYTICS_DEFAULT_DAYS
+);
 
 export const trafficLogQuerySchema = z.object({
-  limit: trafficLimitParam("limit", AI_TRAFFIC_MAX_LOG_LIMIT),
+  limit: trafficLimitParam(
+    "limit",
+    AI_TRAFFIC_MAX_LOG_LIMIT,
+    AI_TRAFFIC_DEFAULT_LOG_LIMIT
+  ),
   visitorTypes: commaSeparated("visitorTypes", ["crawler", "ai_referral"]),
   categories: commaSeparated("categories", [
     "training-crawler",
@@ -78,12 +96,20 @@ export const trafficLogQuerySchema = z.object({
   host: trafficHostParam(),
 });
 
-export const trafficJourneysQuerySchema = geoWindowQuerySchema.extend({
-  limit: trafficLimitParam("limit", AI_TRAFFIC_MAX_JOURNEYS_LIMIT),
+export const trafficJourneysQuerySchema = trafficOverviewQuerySchema.extend({
+  limit: trafficLimitParam(
+    "limit",
+    AI_TRAFFIC_MAX_JOURNEYS_LIMIT,
+    AI_TRAFFIC_DEFAULT_JOURNEYS_LIMIT
+  ),
 });
 
-export const trafficPagesQuerySchema = geoWindowQuerySchema.extend({
-  limit: trafficLimitParam("limit", AI_TRAFFIC_MAX_PAGES_LIMIT),
+export const trafficPagesQuerySchema = trafficOverviewQuerySchema.extend({
+  limit: trafficLimitParam(
+    "limit",
+    AI_TRAFFIC_MAX_PAGES_LIMIT,
+    AI_TRAFFIC_DEFAULT_PAGES_LIMIT
+  ),
   visitorType: z
     .enum(["crawler", "ai_referral"])
     .optional()
@@ -97,29 +123,96 @@ export const journeyParamsSchema = projectParamsSchema.extend({
     .trim()
     .min(1)
     .max(GEO_SHORT_FIELD_MAX_LENGTH)
-    .openapi({ param: { name: "journeyId", in: "path" } }),
+    .openapi({
+      param: { name: "journeyId", in: "path" },
+      description: "Journey id from the traffic log or journeys list.",
+    }),
 });
 
+const visitorTypeField = visitorTypeSchema.openapi({
+  description:
+    "crawler: an AI bot fetched the page. ai_referral: a person arrived from an AI assistant's link.",
+});
+
+const sourceField = z.string().openapi({
+  description:
+    "Crawler name for crawlers, or the AI assistant a referral came from.",
+});
+
+const agentField = z.string().openapi({
+  description: "Crawler that made the request. Empty for referrals.",
+});
+
+const categoryField = z.string().openapi({
+  description:
+    "Request purpose, such as training-crawler, search-index or assistant-browse (an assistant reading the page live to answer). assistant-referral for referrals.",
+});
+
+const confidenceField = z.string().openapi({
+  description:
+    "How the visitor was identified. verified: a crawler user agent whose operator publishes a way to verify it, such as IP ranges; Notra matches the user agent and does not check the IP. reported: a user agent the operator documents without verification, a known request fingerprint, a fetch of a machine-readable file, or, for AI referrals, the referrer. Sources detected only by heuristics are left out of these endpoints.",
+});
+
+const previousWindowNote =
+  "in the previous window of the same length, right before this one";
+
+const utcTimestampField = (subject: string, note = "") =>
+  z.string().openapi({
+    description: `UTC time of ${subject}, formatted \`YYYY-MM-DD HH:MM:SS\` with no time zone suffix.${note}`,
+  });
+
+const importedDayNote = " Midnight of the day for imported history.";
+
 export const trafficSourceSchema = z.object({
-  source: z.string(),
-  visitorType: visitorTypeSchema,
-  agent: z.string(),
-  category: z.string(),
-  confidence: z.string(),
-  visits: z.number().int(),
-  previousVisits: z.number().int().optional(),
-  markdownVisits: z.number().int(),
-  previousMarkdownVisits: z.number().int().optional(),
-  paths: z.number().int(),
-  previousPaths: z.number().int().optional(),
-  lastSeenAt: z.string(),
+  source: sourceField,
+  visitorType: visitorTypeField,
+  agent: agentField,
+  category: categoryField,
+  confidence: confidenceField,
+  visits: z.number().int().openapi({
+    description: "Requests in the window, including imported history.",
+  }),
+  previousVisits: z
+    .number()
+    .int()
+    .optional()
+    .openapi({
+      description: `Requests ${previousWindowNote}.`,
+    }),
+  markdownVisits: z.number().int().openapi({
+    description:
+      "Requests that asked for Markdown or a machine-readable file. 0 when filtering by host or path, and for imported history.",
+  }),
+  previousMarkdownVisits: z
+    .number()
+    .int()
+    .optional()
+    .openapi({
+      description: `Markdown requests ${previousWindowNote}.`,
+    }),
+  paths: z.number().int().openapi({
+    description: "Distinct page paths requested in the window.",
+  }),
+  previousPaths: z
+    .number()
+    .int()
+    .optional()
+    .openapi({
+      description: `Distinct paths ${previousWindowNote}.`,
+    }),
+  lastSeenAt: utcTimestampField(
+    "the newest request in the window",
+    `${importedDayNote} \`1970-01-01 00:00:00\` when the source only had requests in the previous window.`
+  ),
 });
 
 export const trafficPointSchema = z.object({
-  day: z.string(),
-  visitorType: visitorTypeSchema,
-  source: z.string(),
-  visits: z.number().int(),
+  day: z.string().openapi({ description: "UTC day (YYYY-MM-DD)." }),
+  visitorType: visitorTypeField,
+  source: sourceField,
+  visits: z.number().int().openapi({
+    description: "Requests from this source on this day.",
+  }),
 });
 
 export const trafficConfiguredField = z.boolean().openapi({
@@ -131,9 +224,16 @@ export const trafficOverviewResponseSchema = z
   .object({
     configured: trafficConfiguredField,
     totals: z.object({
-      crawler: z.number().int(),
-      cited: z.number().int(),
-      aiReferral: z.number().int(),
+      crawler: z.number().int().openapi({
+        description: "Requests from AI crawlers in the window.",
+      }),
+      cited: z.number().int().openapi({
+        description:
+          "Crawler requests with category assistant-browse: assistants reading pages live while answering. Included in crawler.",
+      }),
+      aiReferral: z.number().int().openapi({
+        description: "Visits from people following a link in an AI assistant.",
+      }),
       conversions: z.number().int().nullable().openapi({
         description:
           "AI referral visits that reached a configured conversion path. Null when no conversion paths are set.",
@@ -143,71 +243,113 @@ export const trafficOverviewResponseSchema = z
       description:
         "Conversions in the previous window of the same length. Null when no conversion paths are set or no comparison data exists.",
     }),
-    sources: z.array(trafficSourceSchema),
-    points: z.array(trafficPointSchema),
+    sources: z.array(trafficSourceSchema).openapi({
+      description:
+        "One row per source and visitor type, crawlers and AI referrals only, most requests first.",
+    }),
+    points: z.array(trafficPointSchema).openapi({
+      description: "Daily requests per source and visitor type.",
+    }),
     organization: organizationResponseSchema,
   })
   .openapi("GeoTrafficOverviewResponse");
 
 const trafficLogEntrySchema = z.object({
-  capturedAt: z.string(),
-  visitorType: visitorTypeSchema,
-  source: z.string(),
-  agent: z.string(),
-  category: z.string(),
-  confidence: z.string(),
+  capturedAt: utcTimestampField("the request"),
+  visitorType: visitorTypeField,
+  source: sourceField,
+  agent: agentField,
+  category: categoryField,
+  confidence: confidenceField,
   path: z.string(),
   host: z.string(),
-  country: z.string(),
-  ua: z.string(),
-  journeyId: z.string(),
-  wantsMarkdown: z.boolean(),
+  country: z.string().openapi({
+    description: "Country from the request's geo data. Empty when unknown.",
+  }),
+  ua: z.string().openapi({
+    description:
+      "First 180 characters of the user agent. Empty for AI referrals, whose user agent is not stored.",
+  }),
+  journeyId: z.string().openapi({
+    description:
+      "Groups requests from one agent session; pass it to getGeoTrafficJourney. Empty when no journey could be derived.",
+  }),
+  wantsMarkdown: z.boolean().openapi({
+    description:
+      "Whether the request asked for Markdown or fetched a machine-readable file.",
+  }),
 });
 
 export const trafficLogResponseSchema = z
   .object({
     configured: trafficConfiguredField,
-    log: z.array(trafficLogEntrySchema),
-    total: z.number().int(),
+    log: z.array(trafficLogEntrySchema).openapi({
+      description: "Newest requests first, from the last 90 days.",
+    }),
+    total: z.number().int().openapi({
+      description: "Number of entries in log, not the overall request count.",
+    }),
     organization: organizationResponseSchema,
   })
   .openapi("GeoTrafficLogResponse");
 
 const journeySchema = z.object({
-  journeyId: z.string(),
-  source: z.string(),
-  visitorType: visitorTypeSchema,
-  pages: z.number().int(),
-  distinctPaths: z.number().int(),
-  firstSeenAt: z.string(),
-  lastSeenAt: z.string(),
-  entryPath: z.string(),
-  samplePaths: z.array(z.string()),
+  journeyId: z.string().openapi({
+    description: "Pass it to getGeoTrafficJourney for every request.",
+  }),
+  source: sourceField,
+  visitorType: visitorTypeField,
+  pages: z.number().int().openapi({
+    description: "Requests in this journey within the window.",
+  }),
+  distinctPaths: z.number().int().openapi({
+    description: "Distinct paths requested in this journey.",
+  }),
+  firstSeenAt: utcTimestampField("the journey's first request in the window"),
+  lastSeenAt: utcTimestampField("the journey's latest request in the window"),
+  entryPath: z.string().openapi({
+    description: "Path of the journey's first request.",
+  }),
+  samplePaths: z.array(z.string()).openapi({
+    description:
+      "Distinct paths the journey requested, in no particular order.",
+  }),
 });
 
 export const trafficJourneysResponseSchema = z
   .object({
     configured: trafficConfiguredField,
-    journeys: z.array(journeySchema),
+    journeys: z.array(journeySchema).openapi({
+      description:
+        "Crawler and AI referral journeys, most recent activity first.",
+    }),
     organization: organizationResponseSchema,
   })
   .openapi("GeoTrafficJourneysResponse");
 
 const journeyEventSchema = z.object({
-  capturedAt: z.string(),
+  capturedAt: utcTimestampField("the request"),
   path: z.string(),
   host: z.string(),
-  method: z.string(),
-  referer: z.string(),
-  country: z.string(),
-  agent: z.string(),
-  category: z.string(),
+  method: z.string().openapi({ description: "HTTP method, uppercase." }),
+  referer: z.string().openapi({
+    description:
+      "Referrer origin and path without the query string. Empty when absent.",
+  }),
+  country: z.string().openapi({
+    description: "Country from the request's geo data. Empty when unknown.",
+  }),
+  agent: agentField,
+  category: categoryField,
 });
 
 export const journeyDetailResponseSchema = z
   .object({
     configured: trafficConfiguredField,
-    events: z.array(journeyEventSchema),
+    events: z.array(journeyEventSchema).openapi({
+      description:
+        "The journey's requests within the window, oldest first, up to 200.",
+    }),
     organization: organizationResponseSchema,
   })
   .openapi("GeoJourneyDetailResponse");
@@ -215,17 +357,32 @@ export const journeyDetailResponseSchema = z
 const trafficPageSchema = z.object({
   path: z.string(),
   host: z.string(),
-  source: z.string(),
-  visitorType: visitorTypeSchema,
-  visits: z.number().int(),
-  previousVisits: z.number().int().optional(),
-  lastSeenAt: z.string(),
+  source: sourceField,
+  visitorType: visitorTypeField,
+  visits: z.number().int().openapi({
+    description:
+      "Requests to this page from this source in the window, including imported history.",
+  }),
+  previousVisits: z
+    .number()
+    .int()
+    .optional()
+    .openapi({
+      description: `Requests ${previousWindowNote}.`,
+    }),
+  lastSeenAt: utcTimestampField(
+    "the newest request in the window",
+    importedDayNote
+  ),
 });
 
 export const trafficPagesResponseSchema = z
   .object({
     configured: trafficConfiguredField,
-    pages: z.array(trafficPageSchema),
+    pages: z.array(trafficPageSchema).openapi({
+      description:
+        "One row per host, path, source and visitor type, most requests first.",
+    }),
     organization: organizationResponseSchema,
   })
   .openapi("GeoTrafficPagesResponse");
@@ -239,11 +396,17 @@ export const mcpToolParamsSchema = projectParamsSchema.extend({
 
 const mcpStatusSchema = z.enum(MCP_EVENT_STATUSES);
 
+const mcpErrorsField = z.number().int().openapi({
+  description: "Requests whose status was tool_error or rpc_error.",
+});
+
 const mcpIntentSchema = z.object({
-  intent: z.string(),
-  tool: z.string(),
+  intent: z.string().openapi({
+    description: "Intent the agent stated when calling the tool.",
+  }),
+  tool: z.string().openapi({ description: "Tool the call went to." }),
   calls: z.number().int(),
-  errors: z.number().int(),
+  errors: mcpErrorsField,
 });
 
 /**
@@ -264,100 +427,178 @@ export const mcpAnalyticsResponseSchema = z
       .openapi({
         description: "Server info from the newest event. Null before any.",
       }),
-    totals: z.object({
-      requests: z.number().int(),
-      previousRequests: z.number().int(),
-      toolCalls: z.number().int(),
-      previousToolCalls: z.number().int(),
-      errors: z.number().int(),
-      previousErrors: z.number().int(),
-      sessions: z.number().int(),
-      previousSessions: z.number().int(),
-      users: z.number().int(),
-      previousUsers: z.number().int(),
-      p95Ms: z.number().int(),
-      previousP95Ms: z.number().int(),
-    }),
-    daily: z.array(
-      z.object({
-        day: z.string(),
-        toolsCall: z.number().int(),
-        resourcesRead: z.number().int(),
-        promptsGet: z.number().int(),
-        other: z.number().int(),
-        errors: z.number().int(),
+    totals: z
+      .object({
+        requests: z.number().int().openapi({
+          description: "All MCP requests in the window, of every method.",
+        }),
+        previousRequests: z.number().int(),
+        toolCalls: z.number().int().openapi({
+          description: "tools/call requests.",
+        }),
+        previousToolCalls: z.number().int(),
+        errors: mcpErrorsField,
+        previousErrors: z.number().int(),
+        sessions: z.number().int().openapi({
+          description: "Distinct MCP sessions.",
+        }),
+        previousSessions: z.number().int(),
+        users: z.number().int().openapi({
+          description: "Distinct end-user IDs your server reported.",
+        }),
+        previousUsers: z.number().int(),
+        p95Ms: z.number().int().openapi({
+          description: "95th percentile request duration in milliseconds.",
+        }),
+        previousP95Ms: z.number().int(),
       })
-    ),
-    tools: z.array(
-      z.object({
-        name: z.string(),
-        description: z.string(),
-        calls: z.number().int(),
-        errors: z.number().int(),
-        users: z.number().int(),
-        avgResponseBytes: z.number().int(),
-        p50Ms: z.number().int(),
-        p95Ms: z.number().int(),
-        uiResource: z.string(),
-      })
-    ),
-    clients: z.array(
-      z.object({
-        name: z.string(),
-        sessions: z.number().int(),
-        requests: z.number().int(),
-        errors: z.number().int(),
-        lastSeenAt: z.string(),
-      })
-    ),
+      .openapi({
+        description:
+          "Each previous* value covers the window of the same length right before this one.",
+      }),
+    daily: z
+      .array(
+        z.object({
+          day: z.string().openapi({ description: "UTC day (YYYY-MM-DD)." }),
+          toolsCall: z.number().int(),
+          resourcesRead: z.number().int(),
+          promptsGet: z.number().int(),
+          other: z.number().int().openapi({
+            description: "Requests of every other method.",
+          }),
+          errors: mcpErrorsField,
+        })
+      )
+      .openapi({ description: "Requests per day, split by method." }),
+    tools: z
+      .array(
+        z.object({
+          name: z.string(),
+          description: z.string().openapi({
+            description:
+              "Description from the latest tools/list. Empty when not listed.",
+          }),
+          calls: z.number().int(),
+          errors: mcpErrorsField,
+          users: z.number().int().openapi({
+            description: "Distinct end-user IDs that called the tool.",
+          }),
+          avgResponseBytes: z.number().int().openapi({
+            description: "Average response size in bytes.",
+          }),
+          p50Ms: z.number().int().openapi({
+            description: "Median call duration in milliseconds.",
+          }),
+          p95Ms: z.number().int().openapi({
+            description: "95th percentile call duration in milliseconds.",
+          }),
+          uiResource: z.string().openapi({
+            description:
+              "MCP Apps ui:// resource the tool advertises. Empty when none.",
+          }),
+        })
+      )
+      .openapi({ description: "Up to 50 tools, most called first." }),
+    clients: z
+      .array(
+        z.object({
+          name: z.string(),
+          sessions: z.number().int(),
+          requests: z.number().int(),
+          errors: mcpErrorsField,
+          lastSeenAt: z.string().openapi({
+            description: "ISO timestamp of the client's newest request.",
+          }),
+        })
+      )
+      .openapi({ description: "Up to 50 MCP clients, most sessions first." }),
     errorRequests: z
       .array(
         z.object({
-          capturedAt: z.string(),
+          capturedAt: z.string().openapi({ description: "ISO timestamp." }),
           clientName: z.string(),
           clientVersion: z.string(),
-          method: z.string(),
-          target: z.string(),
+          method: z.string().openapi({
+            description: "JSON-RPC method, such as tools/call.",
+          }),
+          target: z.string().openapi({
+            description:
+              "Tool name, resource URI or prompt name the request targeted.",
+          }),
           status: mcpStatusSchema,
           errorCode: z.number().int(),
           errorMessage: z.string(),
           durationMs: z.number().int(),
-          model: z.string(),
+          model: z.string().openapi({
+            description:
+              "Model the agent reported via the optional _model parameter. Empty when not reported.",
+          }),
         })
       )
-      .openapi({ description: "Most recent failed requests, newest first." }),
-    models: z.array(
-      z.object({
-        name: z.string(),
-        sessions: z.number().int(),
-        calls: z.number().int(),
-        errors: z.number().int(),
-      })
-    ),
-    intents: z.array(mcpIntentSchema),
-    elicitations: z.array(
-      z.object({
-        method: z.string(),
-        tool: z.string(),
-        requests: z.number().int(),
-        accepted: z.number().int(),
-        declined: z.number().int(),
-        cancelled: z.number().int(),
-        errors: z.number().int(),
-      })
-    ),
-    uiRenders: z.array(
-      z.object({
-        resource: z.string(),
-        tools: z.array(z.string()),
-        renders: z.number().int(),
-        sessions: z.number().int(),
-        errors: z.number().int(),
-      })
-    ),
+      .openapi({
+        description: "Up to 100 most recent failed requests, newest first.",
+      }),
+    models: z
+      .array(
+        z.object({
+          name: z.string(),
+          sessions: z.number().int(),
+          calls: z.number().int(),
+          errors: mcpErrorsField,
+        })
+      )
+      .openapi({
+        description:
+          "Up to 50 models agents reported via the optional _model parameter, most calls first.",
+      }),
+    intents: z.array(mcpIntentSchema).openapi({
+      description: "Up to 50 most frequent intent and tool pairs.",
+    }),
+    elicitations: z
+      .array(
+        z.object({
+          method: z.string().openapi({
+            description:
+              "Server-to-client request method, such as elicitation or sampling.",
+          }),
+          tool: z.string().openapi({
+            description: "Tool that triggered the request.",
+          }),
+          requests: z.number().int(),
+          accepted: z.number().int(),
+          declined: z.number().int(),
+          cancelled: z.number().int(),
+          errors: mcpErrorsField,
+        })
+      )
+      .openapi({
+        description:
+          "Requests your server sent to clients, with how users answered.",
+      }),
+    uiRenders: z
+      .array(
+        z.object({
+          resource: z.string().openapi({ description: "ui:// resource URI." }),
+          tools: z.array(z.string()).openapi({
+            description: "Tools that advertise this resource.",
+          }),
+          renders: z.number().int().openapi({
+            description: "Successful reads of the resource.",
+          }),
+          sessions: z.number().int().openapi({
+            description: "Distinct sessions with a successful read.",
+          }),
+          errors: mcpErrorsField,
+        })
+      )
+      .openapi({
+        description: "MCP Apps interfaces hosts loaded, most renders first.",
+      }),
     catalog: z
       .object({
-        listedAt: z.string(),
+        listedAt: z.string().openapi({
+          description: "ISO timestamp of the latest tools/list response.",
+        }),
         unusedTools: z.array(
           z.object({ name: z.string(), description: z.string() })
         ),
@@ -373,8 +614,12 @@ export const mcpAnalyticsResponseSchema = z
 
 const mcpToolNeighborSchema = z.object({
   tool: z.string(),
-  calls: z.number().int(),
-  afterFailure: z.number().int(),
+  calls: z.number().int().openapi({
+    description: "Times this neighbor was adjacent to the tool.",
+  }),
+  afterFailure: z.number().int().openapi({
+    description: "Of those, how often the earlier call of the pair had failed.",
+  }),
 });
 
 export const mcpToolDetailResponseSchema = z
@@ -388,16 +633,22 @@ export const mcpToolDetailResponseSchema = z
     failures: z
       .array(
         z.object({
-          message: z.string(),
+          message: z.string().openapi({
+            description: "First 300 characters of the error message.",
+          }),
           clientName: z.string(),
           status: mcpStatusSchema,
           errorCode: z.number().int(),
           calls: z.number().int(),
-          lastSeenAt: z.string(),
+          lastSeenAt: z.string().openapi({
+            description: "ISO timestamp of the newest failure.",
+          }),
         })
       )
       .openapi({ description: "Failures grouped by error message." }),
-    intents: z.array(mcpIntentSchema),
+    intents: z.array(mcpIntentSchema).openapi({
+      description: "Up to 20 most frequent intents for this tool.",
+    }),
     organization: organizationResponseSchema,
   })
   .openapi("GeoMcpToolDetailResponse");

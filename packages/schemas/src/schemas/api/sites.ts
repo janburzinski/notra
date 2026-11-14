@@ -79,7 +79,9 @@ const siteSummarySchema = z
   .openapi("Site");
 
 export const listSitesResponseSchema = z.object({
-  sites: z.array(siteSummarySchema),
+  sites: z.array(siteSummarySchema).openapi({
+    description: "Use a Site's id as siteId in /v1/sites/{siteId}.",
+  }),
 });
 
 const siteAuthorLinksSchema = z.object({
@@ -423,19 +425,40 @@ export const publishSitePostBodySchema = z.object({
 });
 
 const siteRepositorySchema = z
-  .object({ id: z.string().nullable(), owner: z.string(), name: z.string() })
+  .object({
+    id: z.string().nullable().openapi({
+      description: "GitHub's ID for the repository.",
+    }),
+    owner: z.string(),
+    name: z.string(),
+  })
   .nullable();
 
 const siteSchema = z
   .object({
     id: z.string(),
-    projectId: z.string(),
+    projectId: z.string().openapi({
+      description:
+        "Notra project the Site belongs to. Use it as projectId in /v1/projects/{projectId}.",
+    }),
     name: z.string(),
-    slug: z.string(),
-    status: z.enum(SITE_STATUSES),
-    suspendedReason: z.string().nullable(),
-    repository: siteRepositorySchema,
-    productionBranch: z.string(),
+    slug: z.string().openapi({
+      description: "Used in the Site's Notra-hosted addresses.",
+    }),
+    status: z.enum(SITE_STATUSES).openapi({
+      description: "suspended while the Site is paused.",
+    }),
+    suspendedReason: z.string().nullable().openapi({
+      description:
+        "Why the Site is suspended. Null while active or when no reason was given.",
+    }),
+    repository: siteRepositorySchema.openapi({
+      description:
+        "GitHub repository the Site builds from, or null when none is connected.",
+    }),
+    productionBranch: z.string().openapi({
+      description: "Branch that production deployments build from.",
+    }),
     rootDirectory: z.string().openapi({
       description: "Directory in the repository that holds blog.json.",
     }),
@@ -443,35 +466,61 @@ const siteSchema = z
       description: "Public URL of the Site's first section.",
       example: "https://example.com/blog",
     }),
-    publicOrigin: z.string(),
+    publicOrigin: z.string().openapi({
+      description:
+        "Origin the Site is served from: the primary custom domain, or the Notra-hosted address when there is none.",
+    }),
     aliasOrigin: z.string().openapi({
       description: "Notra-hosted address that always serves the Site.",
     }),
-    mounts: z.object({
-      blog: z.string().optional(),
-      changelog: z.string().optional(),
-    }),
+    mounts: z
+      .object({
+        blog: z.string().optional(),
+        changelog: z.string().optional(),
+      })
+      .openapi({
+        description:
+          "Paths the blog and changelog are served under. A missing key means that section is off.",
+      }),
     mountsFromConfig: z.boolean().openapi({
       description:
         "True when the live build's blog.json sets the sections, so the dashboard can't change them. Change them with PATCH /v1/sites/{siteId}/sections or in blog.json.",
     }),
-    previewsEnabled: z.boolean(),
-    previewVisibility: z.enum(SITE_PREVIEW_VISIBILITIES),
-    smartDeployments: z.boolean(),
-    analyticsEnabled: z.boolean(),
-    liveDeploymentId: z.string().nullable(),
+    previewsEnabled: z.boolean().openapi({
+      description: "Whether preview deployments are built and served.",
+    }),
+    previewVisibility: z.enum(SITE_PREVIEW_VISIBILITIES).openapi({
+      description:
+        "public previews open for anyone; protected previews need a workspace sign-in or the preview's password.",
+    }),
+    smartDeployments: z.boolean().openapi({
+      description:
+        "Pushes and pull requests whose site inputs are unchanged from an existing build are not rebuilt; their deployments end as skipped.",
+    }),
+    analyticsEnabled: z.boolean().openapi({
+      description:
+        "Whether the live production site serves Notra's cookieless notra.js script and counts visitors and AI agent visits into the project's AI traffic and web analytics. On by default; previews are never counted.",
+    }),
+    liveDeploymentId: z.string().nullable().openapi({
+      description:
+        "Production deployment serving visitors now, or null when nothing is live.",
+    }),
     rollbackActive: z.boolean().openapi({
       description:
         "Production is pinned to an older build; new builds finish but don't go live until someone promotes one in the dashboard.",
     }),
-    liveSince: z.string().nullable(),
+    liveSince: z.string().nullable().openapi({
+      description: "When the live production deployment started serving.",
+    }),
     createdAt: z.string(),
   })
   .openapi("SiteDetail");
 
 const siteDiagnosticSchema = z.object({
   severity: z.enum(["error", "warning"]),
-  file: z.string().nullable(),
+  file: z.string().nullable().openapi({
+    description: "File the diagnostic points at, or null when it has none.",
+  }),
   line: z.number().int().optional(),
   column: z.number().int().optional(),
   code: z.string(),
@@ -481,26 +530,54 @@ const siteDiagnosticSchema = z.object({
 const siteDeploymentSchema = z
   .object({
     id: z.string(),
-    kind: z.enum(SITE_DEPLOYMENT_KINDS),
-    previewKey: z.string().nullable(),
-    trigger: z.enum(SITE_DEPLOYMENT_TRIGGERS),
+    kind: z.enum(SITE_DEPLOYMENT_KINDS).openapi({
+      description:
+        "production builds the production branch for visitors; preview builds a branch, pull request or post preview.",
+    }),
+    previewKey: z.string().nullable().openapi({
+      description:
+        "Preview the deployment builds, matching previewKey in a Site's previews. Null for production.",
+    }),
+    trigger: z.enum(SITE_DEPLOYMENT_TRIGGERS).openapi({
+      description:
+        "push and pull_request come from GitHub, manual from a deploy request, redeploy from a rebuild, config from a settings change, and toolchain from Notra rebuilding the live commit after a builder update.",
+    }),
     status: z.enum(SITE_DEPLOYMENT_STATUSES).openapi({
       description:
         "queued, building and uploading are in progress; ready, superseded, skipped, failed, canceled and expired are final.",
     }),
-    live: z.boolean(),
-    liveSince: z.string().nullable(),
+    live: z.boolean().openapi({
+      description: "The deployment is serving production or a preview now.",
+    }),
+    liveSince: z.string().nullable().openapi({
+      description: "When it started serving. Null when not live.",
+    }),
     branch: z.string(),
     commitSha: z.string(),
     commitMessage: z.string().nullable(),
     commitAuthor: z.string().nullable(),
     pullRequestNumber: z.number().int().nullable(),
-    url: z.string(),
-    fileCount: z.number().int().nullable(),
-    totalBytes: z.number().int().nullable(),
-    buildDurationMs: z.number().int().nullable(),
-    errorMessage: z.string().nullable(),
-    skipReason: z.string().nullable(),
+    url: z.string().openapi({
+      description: "Where the deployment serves its first section.",
+    }),
+    fileCount: z.number().int().nullable().openapi({
+      description:
+        "Files in the built output. Set when the build becomes ready; null for deployments that never finished a build, such as queued, skipped, failed or canceled ones.",
+    }),
+    totalBytes: z.number().int().nullable().openapi({
+      description:
+        "Total size of the built output in bytes. Null under the same conditions as fileCount.",
+    }),
+    buildDurationMs: z.number().int().nullable().openapi({
+      description: "Build time in milliseconds.",
+    }),
+    errorMessage: z.string().nullable().openapi({
+      description:
+        "Why the build failed, or why it was canceled or superseded before building.",
+    }),
+    skipReason: z.string().nullable().openapi({
+      description: "Why smart deployments skipped the build.",
+    }),
     diagnostics: z.array(siteDiagnosticSchema).openapi({
       description: "Compiler errors and warnings with file and line.",
     }),
@@ -514,32 +591,58 @@ const siteDomainSchema = z
   .object({
     id: z.string(),
     hostname: z.string(),
-    kind: z.enum(SITE_DOMAIN_KINDS),
-    status: z.enum(SITE_DOMAIN_STATUSES),
-    isPrimary: z.boolean(),
-    records: z.array(
-      z.object({
-        type: z.enum(["CNAME", "TXT", "A"]),
-        name: z.string(),
-        value: z.string(),
-        purpose: z.enum(["routing", "ownership", "certificate"]),
-      })
-    ),
-    lastError: z.string().nullable(),
-    verifiedAt: z.string().nullable(),
+    kind: z.enum(SITE_DOMAIN_KINDS).openapi({
+      description:
+        "subdomain points the hostname at Notra with DNS records and Notra issues its certificate; proxy keeps your existing website on the hostname, which forwards the Site's paths to Notra with rewrites.",
+    }),
+    status: z.enum(SITE_DOMAIN_STATUSES).openapi({
+      description:
+        "pending until the first check, verifying while checks have not passed yet, active once verified, failed when a domain that was active or failed fails a check. Domains that are not active are rechecked automatically.",
+    }),
+    isPrimary: z.boolean().openapi({
+      description: "The domain is the Site's publicOrigin.",
+    }),
+    records: z
+      .array(
+        z.object({
+          type: z.enum(["CNAME", "TXT", "A"]),
+          name: z.string(),
+          value: z.string(),
+          purpose: z.enum(["routing", "ownership", "certificate"]).openapi({
+            description:
+              "routing points the hostname at Notra, ownership proves control of the domain, and certificate lets the TLS certificate be issued.",
+          }),
+        })
+      )
+      .openapi({ description: "DNS records to create for the domain." }),
+    lastError: z.string().nullable().openapi({
+      description:
+        "What the latest check found missing, such as a DNS record, the ownership TXT record, the certificate or the proxy rewrites. Null after a passing check.",
+    }),
+    verifiedAt: z.string().nullable().openapi({
+      description:
+        "When the domain first verified. Kept if a later check fails; null until it verifies.",
+    }),
   })
   .openapi("SiteDomain");
 
 const sitePreviewSchema = z
   .object({
-    previewKey: z.string(),
-    deploymentId: z.string(),
+    previewKey: z.string().openapi({
+      description:
+        "Identifies the preview: one per branch, and one per post for post previews.",
+    }),
+    deploymentId: z.string().openapi({
+      description: "Deployment serving the preview.",
+    }),
     visibility: z.enum(SITE_PREVIEW_VISIBILITIES),
     url: z.string(),
     branch: z.string().nullable(),
     pullRequestNumber: z.number().int().nullable(),
     commitSha: z.string().nullable(),
-    activatedAt: z.string(),
+    activatedAt: z.string().openapi({
+      description: "When the deployment started serving the preview.",
+    }),
   })
   .openapi("SitePreview");
 
@@ -548,12 +651,24 @@ const sitePostPreviewSchema = z
     status: z.string().openapi({
       description: "Status of the preview's latest build.",
     }),
-    live: z.boolean(),
-    deleting: z.boolean(),
-    errorMessage: z.string().nullable(),
-    expiresAt: z.string(),
-    hasPassword: z.boolean(),
-    url: z.string(),
+    live: z.boolean().openapi({
+      description: "The preview is being served and has not expired.",
+    }),
+    deleting: z.boolean().openapi({
+      description: "The preview is being removed.",
+    }),
+    errorMessage: z.string().nullable().openapi({
+      description: "Why the latest build failed or stopped.",
+    }),
+    expiresAt: z.string().openapi({
+      description: "When the preview stops being served.",
+    }),
+    hasPassword: z.boolean().openapi({
+      description: "People outside the workspace can open it with a password.",
+    }),
+    url: z.string().openapi({
+      description: "The post's page on the preview.",
+    }),
   })
   .openapi("SitePostPreview");
 
@@ -572,7 +687,9 @@ export const siteDeploymentDataSchema = z.object({
   log: z.string().nullable().openapi({
     description: "Newest build log output, trimmed at the start when long.",
   }),
-  logTruncated: z.boolean(),
+  logTruncated: z.boolean().openapi({
+    description: "The log was cut to its last 64,000 characters.",
+  }),
 });
 
 export const siteDeploymentStartDataSchema = z.object({
@@ -587,9 +704,16 @@ export const sitePostPreviewDataSchema = z.object({
 });
 
 export const sitePostPublicationDataSchema = z.object({
-  operation: z.enum(["created", "updated"]),
-  branchName: z.string(),
-  path: z.string(),
+  operation: z.enum(["created", "updated"]).openapi({
+    description:
+      "created when a new pull request was opened, updated when the post's open pull request was updated.",
+  }),
+  branchName: z.string().openapi({
+    description: "Branch the pull request merges from.",
+  }),
+  path: z.string().openapi({
+    description: "Path of the post's file in the repository.",
+  }),
   pullRequestNumber: z.number().int(),
   pullRequestUrl: z.string(),
 });

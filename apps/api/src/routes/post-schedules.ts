@@ -29,7 +29,7 @@ const getPostScheduleRoute = createRoute({
   operationId: "getPostSchedule",
   summary: "Get a post's publishing schedule",
   description:
-    "Returns the post's current schedule with the state of every destination, or null when nothing is scheduled.",
+    "Returns the post's latest schedule with destinations that were not canceled, and the state of each of them. The schedule stays after it published or failed, and destinations that already published remain after a cancel, so check each publication's status. schedule is null when the post was never scheduled or all its destinations were canceled.",
   request: { params: getPostParamsSchema },
   responses: {
     200: {

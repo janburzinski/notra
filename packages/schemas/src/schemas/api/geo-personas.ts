@@ -2,6 +2,7 @@ import "zod/compile";
 import { z } from "@hono/zod-openapi";
 import { GEO_PERSONA_MEMORY_KINDS } from "@notra/db/constants/geo-personas";
 import {
+  GEO_PERSONA_ACTIVITY_DAYS,
   GEO_PERSONA_BRIEF_MAX_LENGTH,
   GEO_PERSONA_FIELD_MAX_LENGTH,
   GEO_PERSONA_MAX_COUNT,
@@ -10,7 +11,7 @@ import {
 } from "@notra/geo-core/constants/geo-personas";
 
 import { organizationResponseSchema } from "./content";
-import { geoWindowQuerySchema } from "./geo-visibility";
+import { createGeoWindowQuerySchema } from "./geo-visibility";
 
 const profileSchema = z.object({
   goals: z.array(z.string()),
@@ -26,10 +27,19 @@ const personaSchema = z
     name: z.string().openapi({
       description: "Buyer archetype label, such as Budgeter.",
     }),
-    role: z.string(),
-    company: z.string(),
-    summary: z.string(),
-    searchStyle: z.string(),
+    role: z.string().openapi({
+      description: "Short job title, at most two words.",
+    }),
+    company: z.string().openapi({
+      description:
+        "Kind of company the persona works at, with size and industry.",
+    }),
+    summary: z.string().openapi({
+      description: "Buying priorities and situation, one point per line.",
+    }),
+    searchStyle: z.string().openapi({
+      description: "How the persona writes to AI chats, one point per line.",
+    }),
     profile: profileSchema,
     conversationPrompts: z.array(z.string()).openapi({
       description:
@@ -38,22 +48,34 @@ const personaSchema = z
     enabled: z.boolean().openapi({
       description: "Whether scheduled scans play this persona.",
     }),
-    archivedAt: z.string().nullable(),
+    archivedAt: z.string().nullable().openapi({
+      description: "When the persona was archived, or `null` when active.",
+    }),
     createdAt: z.string(),
     updatedAt: z.string(),
-    memories: z.array(
-      z.object({
-        id: z.string(),
-        kind: z.enum(GEO_PERSONA_MEMORY_KINDS),
-        content: z.string(),
-      })
-    ),
+    memories: z
+      .array(
+        z.object({
+          id: z.string(),
+          kind: z.enum(GEO_PERSONA_MEMORY_KINDS).openapi({
+            description:
+              "`background` for career and company facts, `experience` for past events with tools or vendors, `preference` for how they like to work and buy, `constraint` for budget, compliance or team limits.",
+          }),
+          content: z.string(),
+        })
+      )
+      .openapi({
+        description:
+          "First-person facts included in the persona's context when it is played.",
+      }),
   })
   .openapi("GeoPersona");
 
 export const listPersonasResponseSchema = z
   .object({
-    configured: z.boolean(),
+    configured: z.boolean().openapi({
+      description: "Always `true` for a project-scoped request.",
+    }),
     personas: z.array(personaSchema).openapi({
       description: `Active personas first in creation order, then archived ones. A project keeps at most ${GEO_PERSONA_MAX_COUNT} active personas.`,
     }),
@@ -70,7 +92,7 @@ export const personaResponseSchema = z
 
 export const archivePersonaResponseSchema = z
   .object({
-    id: z.string(),
+    id: z.string().openapi({ description: "Id of the archived persona." }),
     organization: organizationResponseSchema,
   })
   .openapi("ArchiveGeoPersonaResponse");
@@ -128,50 +150,114 @@ const personaSourceSchema = z.object({
 
 export const personaResultsResponseSchema = z
   .object({
-    results: z.array(
-      z.object({
-        scanId: z.string(),
-        turn: z.number().int().openapi({
-          description: "Conversation turn, starting at 1.",
-        }),
-        engine: z.string(),
-        prompt: z.string(),
-        answer: z.string(),
-        mentioned: z.boolean(),
-        position: z.number().nullable(),
-        sentiment: z.string().nullable(),
-        excerpt: z.string(),
-        searchQueries: z.array(z.string()),
-        sources: z.array(personaSourceSchema),
-        snapshotVersion: z.string().nullable().openapi({
-          description:
-            "Hash of the persona context this answer was played with. Changes when the persona is edited.",
-        }),
-        lastCheckedAt: z.string(),
-      })
-    ),
-    scans: z.array(z.object({ id: z.string(), capturedAt: z.string() })),
-    selectedScanId: z.string().nullable(),
+    results: z
+      .array(
+        z.object({
+          scanId: z.string(),
+          turn: z.number().int().openapi({
+            description: "Conversation turn, starting at 1.",
+          }),
+          engine: z.string(),
+          prompt: z.string().openapi({
+            description: "Message the persona sent on this turn.",
+          }),
+          answer: z.string(),
+          mentioned: z.boolean().openapi({
+            description:
+              "Whether the answer named the tracked brand or one of its aliases.",
+          }),
+          position: z.number().nullable().openapi({
+            description:
+              "1-based rank of the brand in a list of recommended brands, or `null` when it is not mentioned or not in a list.",
+          }),
+          sentiment: z.string().nullable().openapi({
+            description:
+              "`positive`, `neutral` or `negative` toward the brand, or `null` when it is not mentioned or was not classified.",
+          }),
+          excerpt: z.string().openapi({
+            description:
+              "Part of the answer around the mention, or its opening when the brand is not mentioned.",
+          }),
+          searchQueries: z.array(z.string()).openapi({
+            description: "Web searches the engine ran while answering.",
+          }),
+          sources: z.array(personaSourceSchema).openapi({
+            description:
+              "Sources the answer cited. `domain` is empty for answers stored before domains were recorded.",
+          }),
+          snapshotVersion: z.string().nullable().openapi({
+            description:
+              "Hash of the persona context this answer was played with. Changes when the persona is edited.",
+          }),
+          lastCheckedAt: z.string().openapi({
+            description: "When this answer was captured.",
+          }),
+        })
+      )
+      .openapi({
+        description:
+          "Latest answer per turn and engine within the selected scan.",
+      }),
+    scans: z
+      .array(
+        z.object({
+          id: z.string(),
+          capturedAt: z.string().openapi({
+            description: "When the last answer of that scan was captured.",
+          }),
+        })
+      )
+      .openapi({
+        description:
+          "Up to 50 scans that played this persona, newest first. Pass an id as `scanId` to read that scan.",
+      }),
+    selectedScanId: z.string().nullable().openapi({
+      description:
+        "Scan the results come from, or `null` when the persona has not been played yet. An unknown `scanId` falls back to the latest scan.",
+    }),
     organization: organizationResponseSchema,
   })
   .openapi("GeoPersonaResultsResponse");
 
-export const personaActivityQuerySchema = geoWindowQuerySchema;
+export const personaActivityQuerySchema = createGeoWindowQuerySchema(
+  GEO_PERSONA_ACTIVITY_DAYS,
+  "requiresFrom"
+);
 
 export const personaActivityResponseSchema = z
   .object({
-    from: z.string(),
-    to: z.string(),
-    points: z.array(
-      z.object({
-        personaId: z.string(),
-        snapshotVersion: z.string(),
-        day: z.string(),
-        lastCheckedAt: z.string(),
-        checks: z.number().int(),
-        mentions: z.number().int(),
-      })
-    ),
+    from: z.string().openapi({
+      description: "First UTC day covered (YYYY-MM-DD).",
+    }),
+    to: z.string().openapi({
+      description:
+        "UTC day after the last day covered (YYYY-MM-DD). Exclusive end of the range.",
+    }),
+    points: z
+      .array(
+        z.object({
+          personaId: z.string(),
+          snapshotVersion: z.string().openapi({
+            description:
+              "Hash of the persona context the answers were played with. Changes when the persona is edited.",
+          }),
+          day: z.string().openapi({ description: "UTC day (YYYY-MM-DD)." }),
+          lastCheckedAt: z.string().openapi({
+            description: "Latest answer captured that day.",
+          }),
+          checks: z.number().int().openapi({
+            description:
+              "Persona answers captured that day across all turns and engines.",
+          }),
+          mentions: z.number().int().openapi({
+            description: "Of those, answers that mentioned the tracked brand.",
+          }),
+        })
+      )
+      .openapi({
+        description:
+          "One point per persona, persona version and day that had answers. Days without answers are omitted.",
+      }),
     organization: organizationResponseSchema,
   })
   .openapi("GeoPersonaActivityResponse");
@@ -210,9 +296,15 @@ const personaGenerationJobSchema = z
   .object({
     id: z.string(),
     status: z.enum(["queued", "running", "completed", "failed"]),
-    personaId: z.string().nullable(),
-    startedAt: z.string(),
-    error: z.string().nullable(),
+    personaId: z.string().nullable().openapi({
+      description:
+        "Persona being regenerated, or `null` when the job creates new personas.",
+    }),
+    startedAt: z.string().openapi({ description: "When the job was queued." }),
+    error: z.string().nullable().openapi({
+      description:
+        "Failure message when `status` is `failed`, otherwise `null`.",
+    }),
   })
   .openapi("GeoPersonaGenerationJob");
 
@@ -220,7 +312,7 @@ export const personaGenerationResponseSchema = z
   .object({
     job: personaGenerationJobSchema.nullable().openapi({
       description:
-        "The project's latest generation job, or `null` when none ran recently.",
+        "The project's current or most recent generation job. Starting a generation while one is queued or running returns that job instead of a new one. `null` when no job was recorded in the last 7 days.",
     }),
     organization: organizationResponseSchema,
   })
@@ -232,13 +324,21 @@ export const runPersonaResponseSchema = z
       description:
         "Answers recorded during this request by the API-based engines that responded.",
     }),
-    mentions: z.number().int(),
-    engines: z.array(z.string()),
+    mentions: z.number().int().openapi({
+      description: "How many of those answers mentioned the tracked brand.",
+    }),
+    engines: z.array(z.string()).openapi({
+      description:
+        "API-based engines the persona was played against during this request. Empty when only consumer apps run or none of the API engines answered.",
+    }),
     queuedScanId: z.string().nullable().default(null).openapi({
       description:
         "Scan that plays the persona in the tracked consumer apps in the background, or `null`. Poll `GET /v1/projects/{projectId}/geo/scans/{scanId}`.",
     }),
-    queuedEngines: z.array(z.string()).default([]),
+    queuedEngines: z.array(z.string()).default([]).openapi({
+      description:
+        "Consumer-app engines covered by `queuedScanId`. Empty when nothing was queued.",
+    }),
     organization: organizationResponseSchema,
   })
   .openapi("RunGeoPersonaResponse");

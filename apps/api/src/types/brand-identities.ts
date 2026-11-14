@@ -105,6 +105,6 @@ export interface DeleteBrandIdentityProgramInput extends BrandIdentityProgramInp
 
 export interface DeleteBrandIdentityProgramSuccess {
   id: string;
-  disabledSchedules: { id: string; name: string | null }[];
-  disabledEvents: { id: string; name: string | null }[];
+  disabledSchedules: { id: string; name: string }[];
+  disabledEvents: { id: string; name: string }[];
 }

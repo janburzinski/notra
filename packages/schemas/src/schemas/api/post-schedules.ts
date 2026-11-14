@@ -71,17 +71,57 @@ export const schedulePostRequestSchema = z
   })
   .openapi("SchedulePostRequest");
 
+const postScheduleSchema = postScheduleViewSchema
+  .extend({
+    scheduledAt: postScheduleViewSchema.shape.scheduledAt.openapi({
+      description: "When the post publishes (ISO 8601, UTC).",
+    }),
+    timeZone: postScheduleViewSchema.shape.timeZone.openapi({
+      description:
+        "IANA time zone the schedule was picked in, for display only.",
+    }),
+    publications: z
+      .array(
+        scheduledPublicationViewSchema
+          .extend({
+            destination:
+              scheduledPublicationViewSchema.shape.destination.openapi({
+                description:
+                  "notra marks the post as published in Notra; github opens or merges a pull request; social posts to a connected X or LinkedIn account.",
+              }),
+            attempts: scheduledPublicationViewSchema.shape.attempts.openapi({
+              description:
+                "Publishing attempts started for this destination, including automatic retries.",
+            }),
+            errorCode: scheduledPublicationViewSchema.shape.errorCode.openapi({
+              description:
+                "Machine-readable code of the last failed attempt, such as github_publish_failed or too_many_attempts. Cleared when the destination publishes.",
+            }),
+            lastError: scheduledPublicationViewSchema.shape.lastError.openapi({
+              description:
+                "Message of the last failed attempt. Cleared when the destination publishes.",
+            }),
+            publishedAt:
+              scheduledPublicationViewSchema.shape.publishedAt.openapi({
+                description:
+                  "When this destination published. Null until then.",
+              }),
+          })
+          .openapi("ScheduledPublication")
+      )
+      .openapi({
+        description: "One entry per destination of the schedule.",
+      }),
+  })
+  .openapi("PostSchedule");
+
 export const postScheduleResponseSchema = z
   .object({
     organization: organizationResponseSchema,
-    schedule: postScheduleViewSchema
-      .extend({
-        publications: z.array(
-          scheduledPublicationViewSchema.openapi("ScheduledPublication")
-        ),
-      })
-      .openapi("PostSchedule")
-      .nullable(),
+    schedule: z.union([postScheduleSchema, z.null()]).openapi({
+      description:
+        "The post's latest schedule with destinations that were not canceled, listing only those destinations. It stays after they published or failed, and destinations that already published remain after a cancel. Null when the post was never scheduled or all its destinations were canceled.",
+    }),
   })
   .openapi("PostScheduleResponse");
 

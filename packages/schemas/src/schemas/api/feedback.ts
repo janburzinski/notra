@@ -167,13 +167,16 @@ export const listFeedbackQuerySchema = z.object({
     .min(1)
     .max(FEEDBACK_LIST_MAX_LIMIT)
     .default(FEEDBACK_LIST_DEFAULT_LIMIT)
-    .openapi({ description: "Items per page", example: 25 }),
+    .openapi({
+      description: `Items per page. Defaults to ${FEEDBACK_LIST_DEFAULT_LIMIT}.`,
+      example: 25,
+    }),
   page: z.coerce
     .number()
     .int()
     .min(1)
     .default(1)
-    .openapi({ description: "Page number", example: 1 }),
+    .openapi({ description: "Page number. Defaults to 1.", example: 1 }),
 });
 
 export const updateFeedbackRequestSchema = z
@@ -185,12 +188,23 @@ export const updateFeedbackRequestSchema = z
 const feedbackSchema = z
   .object({
     id: z.string(),
-    projectId: z.string().nullable(),
+    projectId: z.string().nullable().openapi({
+      description: "Project the feedback is filed under, or null for none.",
+    }),
     source: feedbackSourceSchema,
-    kind: feedbackKindSchema,
-    sentiment: feedbackSentimentSchema.nullable(),
+    kind: feedbackKindSchema.openapi({
+      description:
+        "What kind of feedback this is, as submitted or classified by Notra. other when classification failed.",
+    }),
+    sentiment: feedbackSentimentSchema.nullable().openapi({
+      description:
+        "Overall sentiment, as submitted or classified by Notra. Null when it could not be classified.",
+    }),
     status: feedbackStatusSchema,
-    title: z.string().nullable(),
+    title: z.string().nullable().openapi({
+      description:
+        "Short summary, as submitted or written by Notra. Null when none could be written.",
+    }),
     message: z.string(),
     agentClient: z.string().nullable(),
     agentModel: z.string().nullable(),
@@ -199,8 +213,13 @@ const feedbackSchema = z
     contextUrl: z.string().nullable(),
     externalId: z.string().nullable(),
     idempotencyKey: z.string().nullable(),
-    metadata: z.record(z.string(), z.unknown()).nullable(),
-    resolvedAt: z.string().nullable(),
+    metadata: z.record(z.string(), z.unknown()).nullable().openapi({
+      description: "JSON submitted with the feedback, or null.",
+    }),
+    resolvedAt: z.string().nullable().openapi({
+      description:
+        "When the status was last set to resolved. Cleared when it changes to another status.",
+    }),
     createdAt: z.string(),
     updatedAt: z.string(),
   })
@@ -227,7 +246,9 @@ const feedbackPaginationSchema = z.object({
 
 export const listFeedbackResponseSchema = z
   .object({
-    feedback: z.array(feedbackSchema),
+    feedback: z.array(feedbackSchema).openapi({
+      description: "Feedback on this page, newest first.",
+    }),
     pagination: feedbackPaginationSchema,
   })
   .openapi("ListFeedbackResponse");

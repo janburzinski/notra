@@ -26,12 +26,22 @@ const hexColorSchema = z
   .regex(BRAND_GUIDELINE_HEX_COLOR_REGEX, "Must be a hex color like #13A0DC");
 
 const brandColorSchema = z.object({
-  id: z.string(),
+  id: z.string().openapi({
+    description: "Pass as colorId to update or delete the color.",
+  }),
   role: brandColorRoleSchema,
   name: z.string().nullable(),
-  lightValue: z.string().openapi({ example: "#13A0DC" }),
-  darkValue: z.string().nullable(),
-  usage: z.string().nullable(),
+  lightValue: z.string().openapi({
+    description: "Hex color for light mode.",
+    example: "#13A0DC",
+  }),
+  darkValue: z.string().nullable().openapi({
+    description:
+      "Hex color for dark mode. Null when the color has no dark variant.",
+  }),
+  usage: z.string().nullable().openapi({
+    description: "Free-text note on where the color should be used.",
+  }),
 });
 
 export const brandColorParamsSchema = getBrandIdentityParamsSchema.extend({
@@ -60,7 +70,9 @@ export const patchBrandColorRequestSchema = createBrandColorRequestSchema
 
 export const listBrandColorsResponseSchema = z.object({
   organization: organizationResponseSchema,
-  colors: z.array(brandColorSchema),
+  colors: z.array(brandColorSchema).openapi({
+    description: "Colors of the brand identity in display order.",
+  }),
 });
 
 export const brandColorResponseSchema = z.object({

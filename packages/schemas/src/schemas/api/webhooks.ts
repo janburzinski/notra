@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "@hono/zod-openapi";
 
 export const webhookEventTypeSchema = z.enum([
   "post.generation.completed",
@@ -40,60 +40,121 @@ export const webhookDeliveryParamsSchema = z.object({
   deliveryId: z.string().min(1),
 });
 export const webhookDeliveryQuerySchema = z.object({
-  offset: z.coerce.number().int().min(0).max(100000).default(0),
-  status: webhookStatusFilterSchema.default("all"),
+  offset: z.coerce.number().int().min(0).max(100000).default(0).openapi({
+    description:
+      "Deliveries to skip. Pages hold 25 deliveries, newest first, so pass a multiple of 25. Defaults to 0.",
+  }),
+  status: webhookStatusFilterSchema.default("all").openapi({
+    description: "Only return deliveries with this status. Defaults to all.",
+  }),
 });
 const webhookEndpointSchema = z.object({
   id: z.string(),
   organizationId: z.string(),
-  url: z.string(),
-  events: z.array(webhookEventTypeSchema),
-  enabled: z.boolean(),
+  url: z.string().openapi({
+    description: "HTTPS URL that receives signed POST requests.",
+  }),
+  events: z.array(webhookEventTypeSchema).openapi({
+    description: "Event types delivered to this endpoint.",
+  }),
+  enabled: z.boolean().openapi({
+    description: "Disabled endpoints receive no deliveries.",
+  }),
   createdAt: z.string(),
 });
 export const webhookIdentifierSchema = z.object({ id: z.string() });
 const webhookDeliverySchema = z.object({
-  id: z.string(),
-  eventId: z.string(),
+  id: z.string().openapi({
+    description: "Sent to the endpoint in the x-notra-delivery-id header.",
+  }),
+  eventId: z.string().openapi({
+    description:
+      "The event this delivery carries, sent in the x-notra-event-id header. Each subscribed endpoint gets its own delivery of the same event.",
+  }),
   endpointId: z.string(),
-  url: z.string(),
+  url: z.string().openapi({
+    description: "URL the delivery is sent to.",
+  }),
   eventType: webhookEventTypeSchema,
-  status: z.enum([
-    "pending",
-    "sending",
-    "retrying",
-    "succeeded",
-    "failed",
-    "cancelled",
-  ]),
-  attemptCount: z.number(),
-  nextAttemptAt: z.string(),
+  status: z
+    .enum([
+      "pending",
+      "sending",
+      "retrying",
+      "succeeded",
+      "failed",
+      "cancelled",
+    ])
+    .openapi({
+      description:
+        "pending waits for its first attempt, sending is in flight and retrying waits for another attempt. succeeded got a 2xx response; failed ran out of attempts or hit an error that is not retried; cancelled stopped because the endpoint was removed or disabled.",
+    }),
+  attemptCount: z.number().openapi({
+    description:
+      "Attempts made so far. Up to 8 attempts are made, and a manual retry allows 8 more.",
+  }),
+  nextAttemptAt: z.string().openapi({
+    description:
+      "When the next attempt is due. Only meaningful while pending or retrying.",
+  }),
   createdAt: z.string(),
-  statusCode: z.number().nullable(),
-  error: z.string().nullable(),
+  statusCode: z.number().nullable().openapi({
+    description:
+      "HTTP status of the latest attempt. Null before the first attempt finishes or when no response came back.",
+  }),
+  error: z.string().nullable().openapi({
+    description:
+      "Error code of the latest attempt: http_<status> for a non-2xx response, or network, timeout (no response within 10 seconds), unsafe_url, signing_failed or lease_expired_outcome_unknown. Null when it succeeded or has not finished.",
+  }),
 });
 const webhookAttemptSchema = z.object({
   id: z.string(),
   deliveryId: z.string(),
-  attemptNumber: z.number(),
+  attemptNumber: z.number().openapi({
+    description: "Position of the attempt, starting at 1.",
+  }),
   startedAt: z.string(),
-  finishedAt: z.string().nullable(),
-  statusCode: z.number().nullable(),
-  error: z.string().nullable(),
-  durationMs: z.number().nullable(),
+  finishedAt: z.string().nullable().openapi({
+    description: "Null while the attempt is in flight.",
+  }),
+  statusCode: z.number().nullable().openapi({
+    description:
+      "HTTP status the endpoint returned, or null without a response.",
+  }),
+  error: z.string().nullable().openapi({
+    description:
+      "Error code: http_<status> for a non-2xx response, or network, timeout, unsafe_url, signing_failed or lease_expired_outcome_unknown. Null on success or while in flight.",
+  }),
+  durationMs: z.number().nullable().openapi({
+    description: "Request duration in milliseconds.",
+  }),
 });
 export const webhookListResponseSchema = z.object({
   endpoints: z.array(webhookEndpointSchema),
 });
 export const webhookCreateResponseSchema = z.object({
   endpoint: webhookEndpointSchema,
-  secret: z.string(),
+  secret: z.string().openapi({
+    description:
+      "Signing secret, starting with whsec_. Returned only here; use it to verify the x-notra-signature header on each request.",
+  }),
 });
 export const webhookDeliveriesResponseSchema = z.object({
-  deliveries: z.array(webhookDeliverySchema),
-  hasMore: z.boolean(),
+  deliveries: z.array(webhookDeliverySchema).openapi({
+    description: "Up to 25 deliveries, newest first.",
+  }),
+  hasMore: z.boolean().openapi({
+    description:
+      "More deliveries follow. Request the next page with offset + 25.",
+  }),
 });
 export const webhookDetailResponseSchema = z.object({
-  delivery: webhookDeliverySchema.extend({ payload: z.string() }),
-  attempts: z.array(webhookAttemptSchema),
+  delivery: webhookDeliverySchema.extend({
+    payload: z.string().openapi({
+      description: "The JSON request body sent to the endpoint, as a string.",
+    }),
+  }),
+  attempts: z.array(webhookAttemptSchema).openapi({
+    description: "Every attempt, oldest first.",
+  }),
 });

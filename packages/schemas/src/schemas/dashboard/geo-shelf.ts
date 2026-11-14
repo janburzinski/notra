@@ -60,59 +60,155 @@ export const geoShelfMemberSchema = z.object({
 });
 
 export const geoShelfPlacementSchema = z.object({
-  competitorId: z.string().min(1).nullable(),
-  brandName: z.string().min(1),
-  brandDomain: z.string().nullable(),
-  status: geoShelfPlacementStatusSchema,
-  position: z.number().int().positive().nullable(),
-  hasLink: z.boolean(),
-  evidence: geoShelfPlacementEvidenceSchema,
-  excerpt: z.string().nullable(),
-  checkedAt: z.iso.datetime(),
+  competitorId: z.string().min(1).nullable().meta({
+    description:
+      "Tracked competitor this placement is for, or `null` for your own brand.",
+  }),
+  brandName: z.string().min(1).meta({
+    description: "Brand name at the time the placement was written.",
+  }),
+  brandDomain: z.string().nullable().meta({
+    description:
+      "Brand website domain at the time the placement was written. `null` when unknown.",
+  }),
+  status: geoShelfPlacementStatusSchema.meta({
+    description:
+      "present: the brand is listed on the page. absent: it is not. unknown: nobody has checked yet.",
+  }),
+  position: z.number().int().positive().nullable().meta({
+    description:
+      "1-based position of the brand on the page. `null` when unknown, and always `null` unless status is present.",
+  }),
+  hasLink: z.boolean().meta({
+    description:
+      "Whether the page links to the brand. Always false unless status is present.",
+  }),
+  evidence: geoShelfPlacementEvidenceSchema.meta({
+    description:
+      "manual: a teammate set the status. fetch: written automatically when a scan added the page.",
+  }),
+  excerpt: z.string().nullable().meta({
+    description:
+      "Text from the page around the brand. `null` when none was captured.",
+  }),
+  checkedAt: z.iso.datetime().meta({
+    description: "When this placement's status was last set.",
+  }),
 });
 
 export const geoShelfCitationSummarySchema = z.object({
-  windowCount: z.number().int().nonnegative(),
-  totalCount: z.number().int().nonnegative(),
-  promptCount: z.number().int().nonnegative(),
-  engines: z.array(z.string().min(1)),
-  firstCitedAt: z.iso.datetime().nullable(),
-  lastCitedAt: z.iso.datetime().nullable(),
+  windowCount: z.number().int().nonnegative().meta({
+    description:
+      "AI answers from the 30 days before the last citation sync that cited this page.",
+  }),
+  totalCount: z.number().int().nonnegative().meta({
+    description: "AI answers that ever cited this page.",
+  }),
+  promptCount: z.number().int().nonnegative().meta({
+    description: "Distinct prompts whose answers cited this page.",
+  }),
+  engines: z.array(z.string().min(1)).meta({
+    description: "Engines that cited this page, sorted alphabetically.",
+  }),
+  firstCitedAt: z.iso.datetime().nullable().meta({
+    description:
+      "First answer that cited this page. `null` when no answer has cited it.",
+  }),
+  lastCitedAt: z.iso.datetime().nullable().meta({
+    description:
+      "Latest answer that cited this page. `null` when no answer has cited it.",
+  }),
 });
 
 export const geoShelfOpportunityWriteSchema = z.object({
-  status: geoShelfOpportunityStatusSchema,
-  priority: geoShelfPrioritySchema.nullable(),
-  assigneeMemberId: z.string().min(1).nullable(),
-  pocMemberId: z.string().min(1).nullable(),
-  notes: z.string().max(GEO_SHELF_NOTES_MAX_LENGTH).nullable(),
-  dueAt: z.iso.datetime().nullable(),
+  status: geoShelfOpportunityStatusSchema.meta({
+    description:
+      "open or in_progress while the ticket is worked on. won, lost or dismissed close it.",
+  }),
+  priority: geoShelfPrioritySchema.nullable().meta({
+    description: "low, medium or high. `null` when no priority is set.",
+  }),
+  assigneeMemberId: z.string().min(1).nullable().meta({
+    description:
+      "Organization member id (not user id) of the assignee. `null` when unassigned.",
+  }),
+  pocMemberId: z.string().min(1).nullable().meta({
+    description:
+      "Organization member id of the point of contact. `null` when the assignee is also the point of contact.",
+  }),
+  notes: z.string().max(GEO_SHELF_NOTES_MAX_LENGTH).nullable().meta({
+    description: "Free-text notes on the ticket.",
+  }),
+  dueAt: z.iso.datetime().nullable().meta({
+    description: "Due date. `null` when none is set.",
+  }),
 });
 
 export const geoShelfOpportunitySchema = geoShelfOpportunityWriteSchema.extend({
   id: z.string().min(1),
-  createdByUserId: z.string().min(1).nullable(),
-  resolvedAt: z.iso.datetime().nullable(),
+  createdByUserId: z.string().min(1).nullable().meta({
+    description: "User who opened the ticket.",
+  }),
+  resolvedAt: z.iso.datetime().nullable().meta({
+    description:
+      "When the ticket was closed (won, lost or dismissed). Kept when it moves between closed statuses; `null` while open.",
+  }),
   createdAt: z.iso.datetime(),
   updatedAt: z.iso.datetime(),
 });
 
 export const geoShelfSourceSchema = z.object({
   id: z.string().min(1),
-  url: z.url().max(GEO_SHELF_URL_MAX_LENGTH),
-  domain: z.string().min(1),
-  title: z.string().max(GEO_SHELF_TITLE_MAX_LENGTH).nullable(),
-  kind: geoShelfSourceKindSchema,
-  ownership: geoShelfOwnershipSchema,
-  origin: geoShelfOriginSchema,
-  fetchStatus: geoShelfFetchStatusSchema,
-  lastFetchedAt: z.iso.datetime().nullable(),
-  citations: geoShelfCitationSummarySchema,
-  placements: z.array(geoShelfPlacementSchema),
-  opportunity: geoShelfOpportunitySchema.nullable(),
-  createdByUserId: z.string().min(1).nullable(),
-  createdAt: z.iso.datetime(),
-  updatedAt: z.iso.datetime(),
+  url: z.url().max(GEO_SHELF_URL_MAX_LENGTH).meta({
+    description: "Page URL.",
+  }),
+  domain: z.string().min(1).meta({ description: "Hostname of the page." }),
+  title: z.string().max(GEO_SHELF_TITLE_MAX_LENGTH).nullable().meta({
+    description:
+      "Page title, from a teammate or from the citations in AI answers. `null` when unknown.",
+  }),
+  kind: geoShelfSourceKindSchema.meta({
+    description:
+      "Type of page. For pages added by scans it is guessed from the domain, defaulting to other; teammates choose it for pages they add and can change it.",
+  }),
+  ownership: geoShelfOwnershipSchema.meta({
+    description:
+      "own: on your brand's website. competitor: on a tracked competitor's domain. third_party: anywhere else. Set when a scan adds the page; pages teammates add are third_party.",
+  }),
+  origin: geoShelfOriginSchema.meta({
+    description:
+      "scan: added automatically because AI answers cited it. manual: added by a teammate.",
+  }),
+  fetchStatus: geoShelfFetchStatusSchema.meta({
+    description:
+      "Whether Notra could read the page itself: pending, ok, blocked or failed. New sources start as pending.",
+  }),
+  lastFetchedAt: z.iso.datetime().nullable().meta({
+    description: "When Notra last read the page. `null` if it never has.",
+  }),
+  citations: geoShelfCitationSummarySchema.meta({
+    description:
+      "How often AI answers for the project cited this page, as of the last citation sync.",
+  }),
+  placements: z.array(geoShelfPlacementSchema).meta({
+    description:
+      "Which brands are listed on the page. Your own brand is always included; a competitor appears only once marked present or absent.",
+  }),
+  opportunity: geoShelfOpportunitySchema.nullable().meta({
+    description:
+      "Ticket for getting your brand listed on this page. `null` when none was opened.",
+  }),
+  createdByUserId: z.string().min(1).nullable().meta({
+    description: "User who added the page. `null` for pages added by scans.",
+  }),
+  createdAt: z.iso.datetime().meta({
+    description:
+      "For pages added by scans, when an answer first cited them; otherwise when a teammate added them.",
+  }),
+  updatedAt: z.iso.datetime().meta({
+    description:
+      "Last edit or citation change. Pages added by scans start with the time of their latest citation.",
+  }),
 });
 
 const geoShelfCountSchema = z.number().int().nonnegative();

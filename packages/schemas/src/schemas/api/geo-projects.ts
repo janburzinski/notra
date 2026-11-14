@@ -7,16 +7,24 @@ import { resourceIdSchema } from "./ids";
 
 const projectSchema = z
   .object({
-    id: z.string(),
+    id: z.string().openapi({
+      description:
+        "Use as projectId in the endpoints under /v1/projects/{projectId}.",
+    }),
     name: z.string(),
-    brandSettingsId: z.string(),
+    brandSettingsId: z.string().openapi({
+      description:
+        "ID of the brand identity linked to the project, as listed by GET /v1/brand-identities.",
+    }),
     createdAt: z.string(),
   })
   .openapi("GeoProject");
 
 export const listProjectsResponseSchema = z
   .object({
-    projects: z.array(projectSchema),
+    projects: z.array(projectSchema).openapi({
+      description: "Projects, oldest first.",
+    }),
     organization: organizationResponseSchema,
   })
   .openapi("ListGeoProjectsResponse");
