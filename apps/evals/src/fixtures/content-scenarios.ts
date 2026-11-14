@@ -24,6 +24,12 @@ export interface FixtureRelease {
   publishedAt: string;
 }
 
+export interface FixtureSitemapPage {
+  url: string;
+  path: string;
+  title: string;
+}
+
 export interface FixtureBrand {
   companyName: string;
   companyDescription: string;
@@ -59,6 +65,8 @@ export interface ContentScenario {
   commits: FixtureCommit[];
   pullRequests: FixturePullRequest[];
   releases: FixtureRelease[];
+  /** Crawled brand pages for getSitemapPages. Unset means the brand has no sitemap. */
+  sitemapPages?: FixtureSitemapPage[];
   expected: {
     decision: ContentDecision;
     keyFacts: string[];

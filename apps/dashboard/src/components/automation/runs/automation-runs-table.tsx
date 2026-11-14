@@ -9,7 +9,11 @@ import { InfiniteDataTable, type TableColumn } from "ui/table";
 import { useFormatter, useNow, useTranslations } from "use-intl";
 
 import Link from "@/components/framework/link";
-import { AUTOMATION_RUN_STATUS_BADGES } from "@/constants/automation-runs";
+import {
+  AUTOMATION_RUN_STATUS_BADGES,
+  AUTOMATION_RUNS_IDLE_CLOCK_MS,
+  AUTOMATION_RUNS_RUNNING_CLOCK_MS,
+} from "@/constants/automation-runs";
 import {
   AUTOMATION_EMPTY_TABLE_HEIGHT,
   TABLE_ROW_HEIGHT,
@@ -40,7 +44,12 @@ export function AutomationRunsTable({
 }: AutomationRunsTableProps) {
   const t = useTranslations("automation.runs");
   const format = useFormatter();
-  const now = useNow({ updateInterval: 60_000 });
+  // A running row's "x seconds ago" goes stale fast; tick quicker while one runs.
+  const now = useNow({
+    updateInterval: runs.some((run) => run.status === "running")
+      ? AUTOMATION_RUNS_RUNNING_CLOCK_MS
+      : AUTOMATION_RUNS_IDLE_CLOCK_MS,
+  });
 
   const columns: TableColumn<AutomationRun>[] = [
     ...(automationNames

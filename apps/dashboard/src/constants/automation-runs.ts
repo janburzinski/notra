@@ -4,6 +4,10 @@ import type { StatusBadgeAppearance } from "@notra/ui/types/status-badge";
 
 export const AUTOMATION_RUNS_POLL_INTERVAL_MS = 5000;
 
+/** How often relative run times ("20 seconds ago") refresh. */
+export const AUTOMATION_RUNS_RUNNING_CLOCK_MS = 10_000;
+export const AUTOMATION_RUNS_IDLE_CLOCK_MS = 60_000;
+
 export const AUTOMATION_RUN_STATUS_BADGES: Record<
   AutomationRunStatus,
   StatusBadgeAppearance

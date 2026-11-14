@@ -35,15 +35,19 @@ export function useGitHubPublishRepositorySelection({
   );
   const { connected, publishable: repositories } =
     getGitHubPublishRepositoryLists(integrationsQuery.data?.integrations ?? []);
+  const publishContentType = GITHUB_PUBLISH_CONTENT_TYPES.find(
+    (type) => type === contentType
+  );
   const selectedRepositoryId = resolveGitHubPublishRepositoryId(
     repositoryId,
-    repositories
+    repositories,
+    publishContentType
+      ? (repository) =>
+          isGitHubContentPublishingEnabled(repository, publishContentType)
+      : undefined
   );
   const selectedRepository = repositories.find(
     (repository) => repository.id === selectedRepositoryId
-  );
-  const publishContentType = GITHUB_PUBLISH_CONTENT_TYPES.find(
-    (type) => type === contentType
   );
   const selectedPublishingEnabled =
     selectedRepository && publishContentType

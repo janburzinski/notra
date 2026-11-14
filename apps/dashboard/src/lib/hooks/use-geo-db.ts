@@ -19,7 +19,7 @@ import {
   useDbClient,
   useLiveQuery,
 } from "@tanstack/react-db";
-import { useQueryClient } from "@tanstack/react-query";
+import { notifyManager, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useMemo, useState, useSyncExternalStore } from "react";
 import { toast } from "sonner";
 import { useTranslations } from "use-intl";
@@ -188,7 +188,10 @@ export function useGeoProjectsDb(
   const collection = dbClient.collection(definition);
   const queryClient = useQueryClient();
   const projectsQueryStatus = useSyncExternalStore(
-    (onChange) => queryClient.getQueryCache().subscribe(onChange),
+    // Batched like TanStack's own hooks: the cache notifies synchronously when
+    // another component's useQuery adds a query during its render.
+    (onChange) =>
+      queryClient.getQueryCache().subscribe(notifyManager.batchCalls(onChange)),
     () =>
       queryClient.getQueryState(geoDbQueryKey("projects", scope))?.status ??
       "pending",

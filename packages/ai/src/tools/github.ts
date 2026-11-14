@@ -1,4 +1,8 @@
-import { GITHUB_API_VERSION_HEADERS } from "@notra/ai/constants/github";
+import {
+  GITHUB_API_VERSION_HEADERS,
+  MERGED_PULL_REQUESTS_MAX_PAGES,
+  MERGED_PULL_REQUESTS_PAGE_SIZE,
+} from "@notra/ai/constants/github";
 import type {
   AgentDataPointSettings,
   ResolveIntegrationContext,
@@ -11,6 +15,11 @@ import type {
 } from "@notra/ai/types/tools";
 import { withGitHubRateLimitHandling } from "@notra/ai/utils/github-rate-limit";
 import { createOctokit } from "@notra/ai/utils/octokit";
+import {
+  isInternalPullRequestTitle,
+  isMaintenanceBotLogin,
+  previewPullRequestBody,
+} from "@notra/ai/utils/pull-request-body";
 import { type Tool, tool } from "ai";
 // biome-ignore lint/performance/noNamespaceImport: Zod recommended way to import
 import * as z from "zod";
@@ -206,6 +215,7 @@ export function createGetPullRequestsTool(
           closedAt: pullRequest.data.closed_at,
           mergedAt: pullRequest.data.merged_at,
           htmlUrl: pullRequest.data.html_url,
+          repositoryIsPrivate: pullRequest.data.base.repo.private,
         };
       },
     }),
@@ -361,6 +371,203 @@ export const getISODateFromDaysAgo = (days: number) => {
   return date.toISOString();
 };
 
+/** The enforced window bounds a request; tool arguments may only narrow it. */
+function createWindowClamp(enforcedWindow: CommitWindow | undefined) {
+  return (since?: string, until?: string) => {
+    if (!enforcedWindow) {
+      return { since, until };
+    }
+    return {
+      since:
+        since && Date.parse(since) > Date.parse(enforcedWindow.since)
+          ? since
+          : enforcedWindow.since,
+      until:
+        until && Date.parse(until) < Date.parse(enforcedWindow.until)
+          ? until
+          : enforcedWindow.until,
+    };
+  };
+}
+
+export function createListMergedPullRequestsTool(
+  config?: GitHubToolsAccessConfig,
+  resolveContext?: ResolveIntegrationContext
+): Tool {
+  const cached = getAICachedTools({
+    organizationId: config?.organizationId,
+    namespace: "github",
+    scope: config,
+  });
+  const resolveIntegrationContext = createIntegrationContextResolver(
+    config,
+    resolveContext
+  );
+  const allowedPullRequestNumbersByIntegrationId = createAllowedNumberLookup(
+    config?.allowedPullRequestNumbersByIntegrationId
+  );
+  const clampToWindow = createWindowClamp(config?.enforcedCommitWindow);
+
+  return cached(
+    tool({
+      description:
+        "List every pull request merged into the repository's default branch within a timeframe in one call, newest first, with title, the start of the description and labels. Pull requests from dependency and CI bots (Dependabot, Renovate and similar) and ones titled as internal work (chore, ci, test, refactor and similar) are listed only by number and title under skipped. Also says whether the repository is private. Call it once per repository, then call getPullRequests only for the few pull requests you give their own section.",
+      inputSchema: z.object({
+        integrationId: z
+          .string()
+          .describe("The integration ID for the configured repository"),
+        since: z
+          .string()
+          .datetime()
+          .optional()
+          .describe("UTC ISO timestamp for the start of the range"),
+        until: z
+          .string()
+          .datetime()
+          .optional()
+          .describe("UTC ISO timestamp for the end of the range"),
+        startPage: z
+          .number()
+          .int()
+          .min(1)
+          .optional()
+          .describe(
+            "Only when an earlier call for the same range returned nextPage: pass it here to read the rest"
+          ),
+      }),
+      execute: async ({ integrationId, since, until, startPage = 1 }) => {
+        const resolved = await resolveIntegrationContext(integrationId);
+        const window = clampToWindow(since, until);
+        const sinceMs = Date.parse(window.since ?? getISODateFromDaysAgo(7));
+        const untilMs = Date.parse(window.until ?? new Date().toISOString());
+        const allowedNumbers =
+          allowedPullRequestNumbersByIntegrationId?.get(integrationId);
+        const octokit = createOctokit(resolved.token);
+
+        let isPrivate: boolean | null = null;
+        let base = resolved.defaultBranch;
+        // Without a base, GitHub lists PRs merged into any branch, including
+        // ones that have not shipped yet.
+        if (!base) {
+          const { data: repository } = await withGitHubRateLimitHandling(() =>
+            octokit.request("GET /repos/{owner}/{repo}", {
+              owner: resolved.owner,
+              repo: resolved.repo,
+              headers: GITHUB_API_VERSION_HEADERS,
+            })
+          );
+          base = repository.default_branch;
+          isPrivate = repository.private;
+        }
+
+        const fetchClosedPullRequestsPage = (page: number) =>
+          withGitHubRateLimitHandling(() =>
+            octokit.request("GET /repos/{owner}/{repo}/pulls", {
+              owner: resolved.owner,
+              repo: resolved.repo,
+              state: "closed",
+              sort: "updated",
+              direction: "desc",
+              page,
+              per_page: MERGED_PULL_REQUESTS_PAGE_SIZE,
+              base,
+              headers: GITHUB_API_VERSION_HEADERS,
+            })
+          );
+
+        type ClosedPullRequest = Awaited<
+          ReturnType<typeof fetchClosedPullRequestsPage>
+        >["data"][number];
+        const merged: ClosedPullRequest[] = [];
+        // A request outside the enforced window clamps to an empty range.
+        let done = sinceMs > untilMs;
+        let page = startPage;
+        const lastPage = startPage + MERGED_PULL_REQUESTS_MAX_PAGES - 1;
+        for (; !done && page <= lastPage; page += 1) {
+          // react-doctor-disable-next-line react-doctor/async-await-in-loop -- each page decides whether the next one can still hold a merge in the window
+          const response = await fetchClosedPullRequestsPage(page);
+          isPrivate ??= response.data[0]?.base.repo.private ?? null;
+          for (const pullRequest of response.data) {
+            const mergedMs = pullRequest.merged_at
+              ? Date.parse(pullRequest.merged_at)
+              : Number.NaN;
+            if (
+              mergedMs >= sinceMs &&
+              mergedMs <= untilMs &&
+              (!allowedNumbers || allowedNumbers.has(pullRequest.number))
+            ) {
+              merged.push(pullRequest);
+            }
+          }
+          // Sorted by last update, so once a page reaches pull requests last
+          // touched before the window, no later page can hold one merged in it.
+          const oldest = response.data.at(-1);
+          done =
+            !oldest ||
+            Date.parse(oldest.updated_at) < sinceMs ||
+            getNextPageFromLinkHeader(response.headers?.link) === undefined;
+        }
+        const truncated = !done;
+
+        // Dependency and CI bot pull requests and ones titled as internal work never reach the
+        // entry, so only their number and title are listed.
+        const pullRequests = merged
+          .filter(
+            (pullRequest) =>
+              !isMaintenanceBotLogin(pullRequest.user?.login) &&
+              !isInternalPullRequestTitle(pullRequest.title)
+          )
+          .map((pullRequest) => {
+            const labels = pullRequest.labels.map((label) => label.name);
+            return {
+              number: pullRequest.number,
+              title: pullRequest.title,
+              ...previewPullRequestBody(pullRequest.body),
+              ...(labels.length > 0 ? { labels } : {}),
+            };
+          });
+        const listedNumbers = new Set(
+          pullRequests.map((pullRequest) => pullRequest.number)
+        );
+        const skipped = merged
+          .filter((pullRequest) => !listedNumbers.has(pullRequest.number))
+          .map(
+            (pullRequest) =>
+              `#${String(pullRequest.number)} ${pullRequest.title}`
+          );
+
+        return {
+          repository: {
+            fullName: `${resolved.owner}/${resolved.repo}`,
+            isPrivate,
+          },
+          pullRequests,
+          skipped,
+          ...(truncated
+            ? {
+                nextPage: page,
+                truncated: `More pull requests were updated since this window started than one call reads. Call listMergedPullRequests again with the same range and startPage: ${String(page)} for the rest.`,
+              }
+            : {}),
+        };
+      },
+    }),
+    {
+      ttl: 2 * 60 * 1000,
+      keyGenerator: (params: unknown) => {
+        const { integrationId, since, until, startPage } = params as {
+          integrationId: string;
+          since?: string;
+          until?: string;
+          startPage?: number;
+        };
+        const window = clampToWindow(since, until);
+        return `list_merged_pull_requests:integration=${integrationId}:since=${window.since ?? "auto"}:until=${window.until ?? "auto"}:page=${String(startPage ?? 1)}`;
+      },
+    }
+  );
+}
+
 export function createGetCommitsByTimeframeTool(
   config?: GitHubToolsAccessConfig,
   resolveContext?: ResolveIntegrationContext
@@ -382,23 +589,7 @@ export function createGetCommitsByTimeframeTool(
             .filter((value) => value.length > 0)
         )
       : undefined;
-  const enforcedWindow = config?.enforcedCommitWindow;
-  // The enforced window bounds the request; tool arguments may only narrow it.
-  const clampToCommitWindow = (since?: string, until?: string) => {
-    if (!enforcedWindow) {
-      return { since, until };
-    }
-    return {
-      since:
-        since && Date.parse(since) > Date.parse(enforcedWindow.since)
-          ? since
-          : enforcedWindow.since,
-      until:
-        until && Date.parse(until) < Date.parse(enforcedWindow.until)
-          ? until
-          : enforcedWindow.until,
-    };
-  };
+  const clampToCommitWindow = createWindowClamp(config?.enforcedCommitWindow);
 
   return cached(
     tool({
@@ -542,6 +733,16 @@ export function buildGitHubDataTools(
   return {
     ...(includePullRequests
       ? {
+          listMergedPullRequests: createListMergedPullRequestsTool(
+            {
+              organizationId,
+              allowedIntegrationIds,
+              allowedPullRequestNumbersByIntegrationId:
+                selectionFilters?.allowedPullRequestNumbersByIntegrationId,
+              enforcedCommitWindow: commitWindow,
+            },
+            resolveContext
+          ),
           getPullRequests: createGetPullRequestsTool(
             {
               organizationId,

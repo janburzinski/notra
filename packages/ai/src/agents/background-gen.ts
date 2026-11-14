@@ -17,6 +17,7 @@ import {
   createUpdatePostTool,
   createViewPostTool,
 } from "@notra/ai/tools/post";
+import { createGetSitemapPagesTool } from "@notra/ai/tools/sitemap";
 import { getSkillByName, listAvailableSkills } from "@notra/ai/tools/skills";
 import type {
   BackgroundGenOptions,
@@ -73,6 +74,7 @@ async function runBackgroundGenWithContext(
     log,
     telemetryMetadata,
     includeSearchBrandReferencesTool,
+    includeSitemapPagesTool,
   } = options;
 
   if (repositories.length === 0 && !linearIntegrations?.length) {
@@ -158,6 +160,15 @@ async function runBackgroundGenWithContext(
         dataPointSettings,
         resolveContext: resolveLinearContext,
       }),
+      ...(includeSitemapPagesTool
+        ? {
+            getSitemapPages: createGetSitemapPagesTool(
+              voiceId
+                ? { brandSettingsId: voiceId, organizationId }
+                : { organizationId }
+            ),
+          }
+        : {}),
       listAvailableSkills: listAvailableSkills({ organizationId }),
       getSkillByName: getSkillByName({ organizationId }),
       createPost: createCreatePostTool(postToolsConfig, postToolsResult),

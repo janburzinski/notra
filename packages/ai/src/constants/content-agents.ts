@@ -6,6 +6,7 @@ export const CONTENT_AGENT_PROFILES = {
     contentType: "changelog",
     brandAgentType: "changelog",
     contentLabel: "changelog",
+    includeSitemapPagesTool: true,
   },
   blog_post: {
     skillName: "blog-post",

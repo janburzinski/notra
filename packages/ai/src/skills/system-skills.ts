@@ -12,7 +12,7 @@ export function buildSystemSkills(): SystemSkillDefinition[] {
     {
       name: "changelog",
       description:
-        "Generate a comprehensive changelog from GitHub commits, pull requests, releases, and Linear issues for a given lookback window. Filters for high-signal changes and formats with Highlights + categorized More Updates.",
+        "Write a changelog entry from the pull requests, commits, releases and Linear issues in a lookback window. Covers only changes readers can see, gives the biggest ones their own sections, then Also new and Fixes, and links to docs pages instead of private pull requests.",
       content: getConversationalChangelogPrompt(),
     },
     {

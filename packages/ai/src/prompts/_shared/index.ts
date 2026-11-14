@@ -21,7 +21,8 @@ export const prohibitedLanguage = dedent`
 `;
 
 export const sharedToolGuidance = dedent`
-  - Use getPullRequests when PR descriptions are unclear or incomplete.
+  - When available, use listMergedPullRequests to see every pull request merged in the lookback window with the start of its description. One call usually covers the whole window; when it returns nextPage, call again with that startPage.
+  - Use getPullRequests for a PR's full description, and only for the few PRs you need in detail.
   - Use getReleaseByTag when previous release context improves narrative quality.
   - Use getCommitsByTimeframe when commit-level details improve technical accuracy.
   - Use getLinearIssues when Linear issue details would improve technical accuracy or provide additional context.

@@ -69,34 +69,31 @@ Changelogs live in the Studio content pipeline, so in the dashboard you switch t
 
 ## Changelog structure
 
-Every generated changelog follows the same shape.
+Every generated changelog follows the same shape, and the agent leaves out any section that would be empty.
 
-### Summary
+### Title and excerpt
 
-The summary is a single paragraph directly under the title, and the agent targets 120 to 180 words and goes shorter when there is less to cover.
+The title names the two or three biggest changes, like "Sites for every workspace, one Analytics page and Autopilot workflows". The excerpt is one sentence that a site uses as the card text and page summary.
 
-### Highlights
+### Action required
 
-Highlights lists up to five changes, chosen by importance in this order: security, breaking changes, major features, reliability fixes, performance. If there are fewer than five high-impact changes, the list is shorter, because the agent never pads it.
+Breaking changes and anything you have to do come first, with what changed, who is affected and what to do.
+
+### One section per big change
+
+The one to three biggest changes each get their own section. A section starts with a sentence or two on what changed, followed by bullets for the details.
+
+### Also new and Fixes
+
+Every other change is one bullet under **Also new**, starting with the product area in bold. **Fixes** lists what works now, written from the reader's side.
 
 <Note>
-  The agent excludes low-signal work such as small refactors, dependency bumps, wording tweaks and test-only changes from Highlights. It leaves that work out of the changelog entirely unless it has a clear effect on your audience.
+  The agent reads the description of every merged pull request, not just its title, and leaves out internal work such as refactors, tests, CI and dependency updates. It also leaves out changes that aren't live yet, such as work behind a feature flag that is still off.
 </Note>
 
-### More updates
+### Links
 
-Every remaining change appears exactly once as a bullet under one of these categories:
-
-* **Security**
-* **Features & Enhancements**
-* **Bug Fixes**
-* **Performance Improvements**
-* **Infrastructure**
-* **Internal Changes**
-* **Testing**
-* **Documentation**
-
-When a change fits several categories, the agent files it under the first match in this order: Security, Bug Fixes, Features & Enhancements, Performance Improvements, Infrastructure, Internal Changes, Testing, Documentation.
+The agent links a feature to its documentation or product page when your brand identity's crawled sitemap has one, and never makes up a URL. Pull request links only appear for a public repository and a developer audience, because links into a private repository return 404 for readers.
 
 ## Lookback windows
 
@@ -185,9 +182,9 @@ Clicking **Publish** in the editor (or enabling auto-publish) sets the post stat
 
 Every post has a content agent in the right-hand panel. Select text in the editor to give the agent context, then ask for changes such as:
 
-* "Expand the summary to mention the pricing change"
-* "Simplify the Highlights for a non-technical audience"
-* "Move the caching change into Performance Improvements"
+* "Add the pricing change to Also new"
+* "Simplify the Analytics section for a non-technical audience"
+* "Move the caching change into Also new"
 
 The agent edits the post in place, and you can review the diff before it saves.
 
@@ -203,6 +200,8 @@ Notra uses your PR titles and descriptions as source material, so descriptive PR
 **Poor PR title**\
 `Fix bug`
 
+Start each description with what changed for your users. Notra reads the first few hundred characters of every PR and the full description only for the biggest changes. PRs titled with a [Conventional Commits](https://www.conventionalcommits.org) type that never reaches users (`build`, `chore`, `ci`, `docs`, `refactor`, `revert`, `style`, `test`) are skipped unless the type has the `!` breaking-change marker. PRs from dependency and CI bots like Dependabot or Renovate are skipped too. PRs from coding agents are read like any other.
+
 ### Match the lookback window to your release cadence
 
 * If you ship daily, use `yesterday` or `current_day`
@@ -215,42 +214,36 @@ Changelogs stay drafts until you publish them, so use the review to:
 
 * Verify technical accuracy
 * Add context that GitHub activity does not capture
-* Adjust the Highlights for your audience
+* Adjust which changes get their own section
 
 ## Example changelog
 
 ```markdown
-# Product Updates - Week of March 2, 2026
+# One Analytics page and Sites for every workspace
 
-This week brought significant improvements to developer experience and
-reliability. We shipped enhanced error handling for cached components,
-improved email verification flows, and optimized authentication state
-management. The team also focused on security hardening with rotated
-webhook secret handling and cross-browser UI consistency improvements.
+## One Analytics page
 
-## Highlights
+Website traffic and social analytics used to live on separate pages. They're
+now one **Analytics** page with three tabs: Website, MCP server and Social.
 
-### Cache component support with actionable error guidance
-Runtime guardrails now catch unsupported auth calls in cached contexts
-and provide clear migration guidance with the correct usage pattern.
+- **MCP server analytics:** see which agents call your MCP server and which
+  tools they use.
+- **Clearer setup:** AI traffic tracking is now a short list of numbered steps.
 
-### Email link verification for signup flows
-Signup verification now supports secure email-link completion flows
-with clear status handling for expiration and mismatch cases.
+## Notra Sites is open to every workspace
 
-## More Updates
+Any workspace can now host a blog or changelog from a GitHub repository.
 
-### Security
-- **Rotated webhook signing secret handling** [#131](https://github.com/org/repo/pull/131) -
-  Improves secret lifecycle controls. (Author: [@lee](https://github.com/lee/))
+- **[IndexNow](https://www.usenotra.com/docs/sites/integrations/search/indexnow):**
+  new and changed posts are sent to Bing after a production deploy.
 
-### Bug Fixes
-- **Fixed null-state crash in trigger editor** [#140](https://github.com/org/repo/pull/140) -
-  Prevents editor crashes for partially configured triggers. (Author: [@sam](https://github.com/sam/))
+## Also new
 
-### Features & Enhancements
-- **Added repository filter presets** [#142](https://github.com/org/repo/pull/142) -
-  Speeds up common workflow setup. (Author: [@alex](https://github.com/alex/))
+- **Members** can leave an organization from **Settings → Members**.
+
+## Fixes
+
+- Post to X no longer publishes the same post twice.
 ```
 
 ## Common issues

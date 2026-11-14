@@ -54,15 +54,16 @@ The generation agent gathers what it needs with a small set of tools and decides
 
 The agent has these GitHub tools:
 
+* `listMergedPullRequests`: every pull request merged into the default branch in the lookback range, with the start of its description and its labels, and whether the repository is private. Pull requests from dependency and CI bots such as Dependabot and Renovate, and ones titled `build`, `chore`, `ci`, `docs`, `refactor`, `revert`, `style` or `test` without the `!` breaking-change marker are listed only by number and title
+* `getPullRequests`: one PR's full description, authors and merge status
 * `getCommitsByTimeframe`: commit history for a repository over the exact lookback range, with pagination
-* `getPullRequests`: PR titles, descriptions, authors and merge status
 * `getReleaseByTag`: release notes, tag and assets
 
 It also has two skill tools:
 
 * `listAvailableSkills` and `getSkillByName`: load writing skills from the Skills page, including the built-in human-writer skill that polishes the final text
 
-For a 7-day changelog the agent usually calls `getCommitsByTimeframe` for every source repository, then `getPullRequests` for the PRs those commits reference, and builds a candidate list from the result.
+For a 7-day changelog the agent calls `listMergedPullRequests` for every source repository, reads the full description with `getPullRequests` only for the few pull requests that get their own section, and uses `getCommitsByTimeframe` for work that has no pull request. A changelog run can also list the pages of your brand identity's crawled sitemap with `getSitemapPages`, so it links features to real docs pages.
 
 The agent then filters the candidates:
 
@@ -75,8 +76,8 @@ The agent then filters the candidates:
     Bug fixes stay when they clearly improve user experience, reliability, security, performance, compatibility or developer workflows.
   </Step>
 
-  <Step title="Category priority">
-    When a change fits several categories, the agent files it under the first match in this order: Security, Bug Fixes, Features and Enhancements, Performance Improvements, Infrastructure, Internal Changes, Testing, Documentation.
+  <Step title="Live changes only">
+    Changes that aren't live yet, such as work behind a feature flag that is still off or a PR that says it can't ship before a later date, wait for the run in which they go live.
   </Step>
 
   <Step title="Skip when empty">
@@ -85,14 +86,14 @@ The agent then filters the candidates:
 </Steps>
 
 <Tip>
-  The audience field controls this stage. A developer-oriented audience ("developers", "engineers", "technical teams") gets verified PR links on every referenced change, while any other audience gets none.
+  The audience field controls this stage. A developer-oriented audience ("developers", "engineers", "technical teams") can get PR links for a public repository. A private repository never gets PR links or author credits, because readers would get a 404.
 </Tip>
 
 ### 3. Generate drafts
 
 The agent then writes a draft for each requested format:
 
-* **Changelog entry**: release notes with a summary, Highlights and categorized More Updates
+* **Changelog entry**: release notes with a section for each big change, then Also new and Fixes
 * **Blog post**: long-form announcements and stories
 * **LinkedIn post**: a professional update
 * **Tweet**: a short post for X
@@ -101,25 +102,26 @@ The agent then writes a draft for each requested format:
 A changelog has this structure:
 
 ```markdown
-# [Title]
+# [The two or three biggest changes]
 
-[Summary paragraph, 120-180 words]
+## Action required
+[Breaking changes and what to do, only when there are any]
 
-## Highlights
+## [Biggest change]
+[One or two sentences on what changed and why it matters]
 
-### [Feature name]
-[Why it matters]
+- **[Detail]:** [What the reader can now do]
 
-## More Updates
+## Also new
 
-### Security
-- **[Change title]** [#131](https://github.com/org/repo/pull/131) - Description (Author: [@lee](https://github.com/lee/))
+- **[Area]:** [One line]
 
-### Bug Fixes
-- **[Change title]** [#140](https://github.com/org/repo/pull/140) - Description (Author: [@sam](https://github.com/sam/))
+## Fixes
+
+- [What works now]
 ```
 
-Highlights holds up to five changes with clear user, customer, reliability, security or performance impact. Every change that passed filtering appears exactly once, either in Highlights or in More Updates. Both developer and non-developer audiences get author attribution, but only developer audiences get PR links.
+The one to three biggest changes get their own sections. Every other change that passed filtering appears exactly once, under Also new or Fixes, and the excerpt is a one-sentence summary for cards and previews.
 
 <Note>
   Each format has its own prompt template per tone, so the same activity produces a separate changelog, blog post and tweet, not one text reformatted three times.

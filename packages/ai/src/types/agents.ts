@@ -107,6 +107,8 @@ export interface BackgroundGenOptions {
   log?: AILogTarget;
   telemetryMetadata?: TccMetadata;
   includeSearchBrandReferencesTool?: boolean;
+  /** Lets the agent list the brand's crawled pages so it can link to real ones. */
+  includeSitemapPagesTool?: boolean;
 }
 
 /** The per-content-type part of {@link BackgroundGenOptions}. */
@@ -117,6 +119,7 @@ export type ContentAgentProfile = Pick<
   | "brandAgentType"
   | "contentLabel"
   | "includeSearchBrandReferencesTool"
+  | "includeSitemapPagesTool"
 >;
 
 export interface BackgroundGenResult {

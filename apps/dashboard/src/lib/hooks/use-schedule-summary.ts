@@ -4,6 +4,7 @@ import { useFormatter, useTranslations } from "use-intl";
 import { DAY_MS } from "@/constants/analytics-weekdays";
 import { WEEKDAY_REFERENCE_SUNDAY_UTC } from "@/constants/schedule";
 import type { ScheduleCron } from "@/types/automation/schedule";
+import { getLocalTimezone } from "@/utils/schedule-summary";
 
 const MINUTE_MS = 60_000;
 const MINUTES_PER_HOUR = 60;
@@ -58,6 +59,8 @@ export function useScheduleSummary() {
     return t("inDays", { count: Math.floor(diffHours / HOURS_PER_DAY) });
   };
 
+  // The app formats in UTC, but the next run is shown next to the viewer's
+  // timezone, so it has to be in that timezone too.
   const nextRunDate = (nextRun: Date) =>
     format.dateTime(nextRun, {
       weekday: "short",
@@ -65,6 +68,7 @@ export function useScheduleSummary() {
       day: "numeric",
       hour: "numeric",
       minute: "2-digit",
+      timeZone: getLocalTimezone(),
     });
 
   return { summary, relative, nextRunDate, t };

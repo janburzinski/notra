@@ -49,9 +49,17 @@ export function formatGitHubRepositoryLabel(
   return `${repository.owner}/${repository.repo}`;
 }
 
-export function resolveGitHubPublishRepositoryId(
+/**
+ * The repository to preselect: the preferred one when it is still listed,
+ * otherwise the first one that accepts this content, so the dialog does not
+ * open on a repository where publishing is off.
+ */
+export function resolveGitHubPublishRepositoryId<
+  T extends Pick<GitHubRepository, "id">,
+>(
   preferredId: string | null | undefined,
-  repositories: readonly Pick<GitHubRepository, "id">[]
+  repositories: readonly T[],
+  canPublish?: (repository: T) => boolean
 ) {
   if (
     preferredId &&
@@ -60,5 +68,7 @@ export function resolveGitHubPublishRepositoryId(
     return preferredId;
   }
 
-  return repositories[0]?.id ?? "";
+  const fallback =
+    (canPublish ? repositories.find(canPublish) : undefined) ?? repositories[0];
+  return fallback?.id ?? "";
 }

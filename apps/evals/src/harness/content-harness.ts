@@ -17,6 +17,7 @@ import {
   createUpdatePostTool,
   createViewPostTool,
 } from "@notra/ai/tools/post";
+import { createGetSitemapPagesTool } from "@notra/ai/tools/sitemap";
 import { getSkillByName, listAvailableSkills } from "@notra/ai/tools/skills";
 import type { ContentAgentProfile } from "@notra/ai/types/agents";
 import type {
@@ -24,6 +25,11 @@ import type {
   PostToolsResult,
 } from "@notra/ai/types/post-tools";
 import type { BaseTonePromptInput } from "@notra/ai/types/prompts";
+import {
+  isInternalPullRequestTitle,
+  isMaintenanceBotLogin,
+  previewPullRequestBody,
+} from "@notra/ai/utils/pull-request-body";
 import {
   isStepCount,
   type ModelMessage,
@@ -130,6 +136,44 @@ const fixtureData = {
       pagination: { page: 1, perPage: 100, hasNextPage: false, nextPage: null },
     };
   },
+  // Same filtering and previews as the production listMergedPullRequests tool.
+  mergedPullRequests(scenario: ContentScenario) {
+    const isSkipped = (pr: ContentScenario["pullRequests"][number]) =>
+      isMaintenanceBotLogin(pr.authorLogin) ||
+      isInternalPullRequestTitle(pr.title);
+    return {
+      repository: {
+        fullName: `${scenario.owner}/${scenario.repo}`,
+        isPrivate: false,
+      },
+      pullRequests: scenario.pullRequests
+        .filter((pr) => !isSkipped(pr))
+        .map((pr) => ({
+          number: pr.number,
+          title: pr.title,
+          ...previewPullRequestBody(pr.body),
+          ...(pr.labels.length > 0 ? { labels: pr.labels } : {}),
+        })),
+      skipped: scenario.pullRequests
+        .filter(isSkipped)
+        .map((pr) => `#${String(pr.number)} ${pr.title}`),
+    };
+  },
+  sitemapPages(scenario: ContentScenario, query: unknown) {
+    if (!scenario.sitemapPages) {
+      return { pages: [], total: 0, hasSitemap: false };
+    }
+    const needle = typeof query === "string" ? query.toLowerCase() : "";
+    const pages = scenario.sitemapPages
+      .filter(
+        (page) =>
+          !needle ||
+          page.title.toLowerCase().includes(needle) ||
+          page.path.toLowerCase().includes(needle)
+      )
+      .map((page) => ({ ...page, category: "crawled", wordCount: 500 }));
+    return { pages, total: pages.length, hasSitemap: true };
+  },
   pullRequest(scenario: ContentScenario, pullNumber: number) {
     const pr = scenario.pullRequests.find((item) => item.number === pullNumber);
     if (!pr) {
@@ -165,6 +209,7 @@ const fixtureData = {
       closedAt: pr.mergedAt,
       mergedAt: pr.mergedAt,
       htmlUrl: `https://github.com/${scenario.owner}/${scenario.repo}/pull/${pr.number}`,
+      repositoryIsPrivate: false,
     };
   },
   release(scenario: ContentScenario, tag: string) {
@@ -256,6 +301,13 @@ export function buildHarnessTools(
       () => fixtureData.brandReferences(scenario)
     ),
   };
+  if (contentType.includeSitemapPagesTool) {
+    tools.getSitemapPages = withExecute(
+      createGetSitemapPagesTool({ organizationId: EVAL_ORG_ID }),
+      (input: Record<string, unknown>) =>
+        fixtureData.sitemapPages(scenario, input.query)
+    );
+  }
   if (contentType.includeSearchBrandReferencesTool) {
     tools.searchBrandReferences = withExecute(
       createSearchBrandReferencesTool({
@@ -271,6 +323,9 @@ export function buildHarnessTools(
       assertIntegration(scenario, String(input.integrationId));
       if (name === "getCommitsByTimeframe") {
         return fixtureData.commits(scenario);
+      }
+      if (name === "listMergedPullRequests") {
+        return fixtureData.mergedPullRequests(scenario);
       }
       if (name === "getPullRequests") {
         return fixtureData.pullRequest(scenario, Number(input.pull_number));

@@ -64,6 +64,7 @@ function processFields(
   const unslopLoaded = skills.includes("unslop");
   const fetchedData =
     calls.includes("getCommitsByTimeframe") ||
+    calls.includes("listMergedPullRequests") ||
     calls.includes("getPullRequests");
   const fields: FieldScore[] = [
     { field: "fetched-sources", score: fetchedData ? 1 : 0 },
