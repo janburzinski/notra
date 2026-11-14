@@ -328,9 +328,26 @@ const reconcileCompetitorsInTransaction = Effect.fn(
     return overLimit;
   }
 
-  const staleIds = existing.flatMap((row) =>
-    seen.has(competitorKey(row.name)) ? [] : [row.id]
+  // Names match case-insensitively but the unique index is case-sensitive, so
+  // a rename that only changes case would insert a second row. Keep one row
+  // per name, rename it in place and drop any extra rows for the same name.
+  const resolvedNames = new Map(
+    resolved.map((entry) => [competitorKey(entry.name), entry.name])
   );
+  const keptKeys = new Set<string>();
+  const renames: { id: string; name: string }[] = [];
+  const staleIds = existing.flatMap((row) => {
+    const key = competitorKey(row.name);
+    const name = resolvedNames.get(key);
+    if (name === undefined || keptKeys.has(key)) {
+      return [row.id];
+    }
+    keptKeys.add(key);
+    if (row.name !== name) {
+      renames.push({ id: row.id, name });
+    }
+    return [];
+  });
   if (staleIds.length > 0) {
     yield* geoDb("competitors delete failed", () =>
       tx
@@ -339,6 +356,20 @@ const reconcileCompetitorsInTransaction = Effect.fn(
           and(
             eq(geoCompetitors.projectId, projectId),
             inArray(geoCompetitors.id, staleIds)
+          )
+        )
+    );
+  }
+
+  for (const rename of renames) {
+    yield* geoDb("competitors rename failed", () =>
+      tx
+        .update(geoCompetitors)
+        .set({ name: rename.name })
+        .where(
+          and(
+            eq(geoCompetitors.projectId, projectId),
+            eq(geoCompetitors.id, rename.id)
           )
         )
     );
