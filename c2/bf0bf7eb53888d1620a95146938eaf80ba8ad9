@@ -1,0 +1,9 @@
+apps/dashboard/src/components/chat/chat-input.tsx
+  ai_agent 36,1717-1725,1886-1889
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "c2bf0bf7eb53888d1620a95146938eaf80ba8ad9",
+  "prompts": {}
+}
