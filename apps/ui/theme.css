@@ -16,6 +16,14 @@ html {
   scrollbar-gutter: stable;
 }
 
+/* Blume loads the brand fonts (blume.config.ts) under hashed family names, so
+   the typography.css tokens point at its variables here. */
+:root {
+  --font-satoshi: var(--blume-font-display);
+  --font-inter: var(--blume-font-body);
+  --font-geist-mono: var(--blume-font-mono);
+}
+
 /* Matches the dashboard's `antialiased` body. Without it macOS renders light
    text on dark surfaces noticeably heavier. */
 html {

@@ -1,7 +1,7 @@
-import { InstrumentSection } from "@notra/ui/components/instrument/instrument-module";
-import { TABLE_BODY_CLASS, TABLE_FRAME_CLASS } from "@notra/ui/constants/table";
 import { cn } from "@notra/ui/lib/utils";
 import type { ReactNode } from "react";
+import { InstrumentSection } from "ui/card";
+import { TABLE_BODY_CLASS, TABLE_FRAME_CLASS } from "ui/table/constants";
 
 export function ReportBlock({
   title,

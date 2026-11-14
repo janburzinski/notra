@@ -2,4 +2,5 @@
 @import "./geo-report.css";
 
 @source "../../../../packages/ui/src";
+@source "../../../ui/registry/notra/{card,table}/{components,constants,hooks,lib}";
 @source "../../node_modules/streamdown/dist";

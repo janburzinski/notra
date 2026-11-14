@@ -1,12 +1,9 @@
 "use client";
 
-import { InstrumentSection } from "@notra/ui/components/instrument/instrument-module";
 import { PageHeading } from "@notra/ui/components/shared/page-heading";
-import {
-  DataTable,
-  type TableColumn,
-} from "@notra/ui/components/ui/data-table";
 import { Skeleton } from "@notra/ui/components/ui/skeleton";
+import { InstrumentSection } from "ui/card";
+import { DataTable, type TableColumn } from "ui/table";
 import { useTranslations } from "use-intl";
 
 import { AnalyticsSourceTabs } from "@/components/analytics/analytics-source-tabs";

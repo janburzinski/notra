@@ -5,10 +5,11 @@
 
 @source "../../../../packages/ui/src/**/*.{ts,tsx}";
 @source "../**/*.{ts,tsx}";
-@source "../../../ui/registry/notra/{card,chatgpt,claude,dropdown-menu,shimmer,table}/components";
+@source "../../../ui/registry/notra/{card,chatgpt,claude,dropdown-menu,shimmer,table}/{components,constants,hooks,lib}";
 @source "../../../ui/registry/notra/workflow/{components,constants,lib}";
 
 @theme inline {
+  /* Families come from @notra/ui typography.css. */
   --font-sans: var(--font-inter);
   --font-mono: var(--font-geist-mono);
   --animate-shimmer: shimmer var(--shimmer-duration, 1.7s) linear infinite;
@@ -30,29 +31,6 @@
       background-position: 0% 0;
     }
   }
-}
-
-:root {
-  --font-inter: "Inter Variable", "Inter Fallback", Arial, sans-serif;
-  --font-geist-mono: "Geist Mono Variable", "Geist Mono Fallback", monospace;
-}
-
-@font-face {
-  font-family: "Inter Fallback";
-  src: local("Arial");
-  ascent-override: 90.44%;
-  descent-override: 22.52%;
-  line-gap-override: 0%;
-  size-adjust: 107.12%;
-}
-
-@font-face {
-  font-family: "Geist Mono Fallback";
-  src: local("Arial");
-  ascent-override: 74.67%;
-  descent-override: 21.92%;
-  line-gap-override: 0%;
-  size-adjust: 134.59%;
 }
 
 @layer base {

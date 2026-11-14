@@ -49,6 +49,7 @@
     "server-only": "^0.0.1",
     "sonner": "catalog:",
     "streamdown": "^2.7.0",
+    "ui": "workspace:*",
     "zod": "catalog:"
   },
   "devDependencies": {

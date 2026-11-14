@@ -4,6 +4,8 @@
   "private": true,
   "exports": {
     "./globals.css": "./src/styles/globals.css",
+    "./tokens.css": "./src/styles/tokens.css",
+    "./typography.css": "./src/styles/typography.css",
     "./cta-button.css": "./src/styles/cta-button.css",
     "./motion.css": "./src/styles/motion.css",
     "./charts.css": "./src/styles/charts.css",

@@ -4,16 +4,13 @@ import { CompetitorLogo } from "@notra/ui/components/geo/competitor-logo";
 import { EngineIcon } from "@notra/ui/components/geo/engine-icon";
 import { LogoStack } from "@notra/ui/components/geo/logo-stack";
 import {
-  DataTable,
-  type TableColumn,
-} from "@notra/ui/components/ui/data-table";
-import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@notra/ui/components/ui/tooltip";
 import { cn } from "@notra/ui/lib/utils";
 import { type CSSProperties, useState } from "react";
+import { DataTable, type TableColumn } from "ui/table";
 
 import {
   Brand,

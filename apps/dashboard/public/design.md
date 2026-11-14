@@ -57,7 +57,7 @@ The product is light-first and quiet. Hierarchy comes from two fills and a hairl
 | What | Source |
 | --- | --- |
 | Surfaces, violet, radius | `packages/ui/src/styles/globals.css` |
-| Fonts | `apps/dashboard/src/styles/globals.css` |
+| Fonts | `packages/ui/src/styles/typography.css` (stacks, scale), `apps/dashboard/src/styles/globals.css` (mapping) |
 | Status color | `packages/ui/src/styles/status.css` |
 | Chart hex | `apps/dashboard/src/constants/charts.ts` |
 | Tables | `apps/ui/registry/notra/table/` (imported as `ui/table`), `packages/ui/src/constants/table.ts` |
@@ -157,7 +157,7 @@ Use status color as a 10% tint with a stronger text token, paired with a label o
 
 ## Typography
 
-Inter Variable is the sans (`--font-sans`) and Geist Mono Variable is the mono (`--font-mono`). Both are set in the dashboard stylesheet with metric-matched Arial fallbacks. Put `font-sans` on a surface that must be Inter. Put `font-mono` on code, paths, and identifiers.
+Inter Variable is the sans (`--font-sans`) and Geist Mono Variable is the mono (`--font-mono`). The family stacks, Inter's metric-matched Arial fallback and `text-2xs`/`text-3xs` live in `packages/ui/src/styles/typography.css`; the dashboard stylesheet loads the fonts and maps them. Put `font-sans` on a surface that must be Inter. Put `font-mono` on code, paths, and identifiers.
 
 | Role | Classes |
 | --- | --- |

@@ -1,0 +1,74 @@
+/*
+ * Notra type tokens: the four brand families and the type scale. This file
+ * names the families; each app loads the font files it uses (apps/web subsets
+ * Inter, Satoshi and Instrument Serif, the dashboard loads Inter and Geist
+ * Mono from Fontsource, apps/ui loads them through Blume). A family an app
+ * doesn't load falls back through the same stack everywhere.
+ *
+ * - Satoshi: headlines on marketing and docs (`font-display`, `text-display-*`).
+ * - Inter: product UI and body copy. Apps map it to `font-sans`.
+ * - Instrument Serif: a rare editorial accent (`font-instrument`), never a title.
+ * - Geist Mono: code, paths and identifiers. Apps map it to `font-mono`.
+ *
+ * tokens.css imports this file. The registry's typography item gets its theme
+ * values from here (`bun run --filter=ui registry:tokens`).
+ */
+
+/* Arial tuned to Inter's metrics, so text doesn't reflow when Inter loads. */
+@font-face {
+  font-family: "Inter Fallback";
+  src: local("Arial");
+  ascent-override: 90.44%;
+  descent-override: 22.52%;
+  line-gap-override: 0%;
+  size-adjust: 107.12%;
+}
+
+:root {
+  --font-inter:
+    "Inter Variable", "Inter Fallback", ui-sans-serif, system-ui, sans-serif;
+  --font-satoshi:
+    "Satoshi", "Inter Variable", "Inter Fallback", ui-sans-serif, system-ui,
+    sans-serif;
+  --font-instrument-serif: "Instrument Serif", ui-serif, Georgia, serif;
+  --font-geist-mono:
+    "Geist Mono Variable", ui-monospace, SFMono-Regular, "SF Mono", Menlo,
+    Consolas, "Liberation Mono", monospace;
+}
+
+@theme inline {
+  --font-display: var(--font-satoshi);
+  --font-instrument: var(--font-instrument-serif);
+
+  /* Display scale: Satoshi at weight 500, tracked tight. Headings pair a
+     mobile and a desktop step (hero lg → 2xl, section md → xl). */
+  --text-display-2xl: 3rem;
+  --text-display-2xl--line-height: 1.1;
+  --text-display-2xl--letter-spacing: -0.02em;
+  --text-display-2xl--font-weight: 500;
+  --text-display-xl: 2.875rem;
+  --text-display-xl--line-height: 1.12;
+  --text-display-xl--letter-spacing: -0.02em;
+  --text-display-xl--font-weight: 500;
+  --text-display-lg: 2.25rem;
+  --text-display-lg--line-height: 1.1;
+  --text-display-lg--letter-spacing: -0.02em;
+  --text-display-lg--font-weight: 500;
+  --text-display-md: 2rem;
+  --text-display-md--line-height: 1.12;
+  --text-display-md--letter-spacing: -0.02em;
+  --text-display-md--font-weight: 500;
+  --text-display-sm: 1.75rem;
+  --text-display-sm--line-height: 1.21;
+  --text-display-sm--letter-spacing: -0.02em;
+  --text-display-sm--font-weight: 500;
+  --text-display-xs: 1.125rem;
+  --text-display-xs--line-height: 1.5rem;
+  --text-display-xs--letter-spacing: -0.015em;
+  --text-display-xs--font-weight: 500;
+
+  /* Below text-xs: 11px for captions and chart labels, 10px for counters and
+     tiny badges. Font size only, like the arbitrary values they replace. */
+  --text-2xs: 0.6875rem;
+  --text-3xs: 0.625rem;
+}

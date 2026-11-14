@@ -420,6 +420,7 @@ The semantic tokens (`background`, `card`, `muted`, `border` and the rest) follo
 | Instrument Serif 400 | `font-instrument` | Declared but reserved. Only shown as a specimen on `/brand`. Not for page titles |
 | System mono | `font-mono` | Code |
 
+- Family stacks and the display scale come from `packages/ui/src/styles/typography.css`: `text-display-2xl` (3rem) down to `text-display-xs` (1.125rem), each with its line height, `-0.02em` tracking (`-0.015em` at xs) and weight 500. `Heading` and `Text` from `ui/typography` apply them (hero `display-lg` → `sm:display-2xl`, section `display-md` → `sm:display-xl`, title `display-sm`, subhead `display-xs`).
 - Display text is weight 500. The landing hero switches to 600 from `sm` up. Body copy on marketing surfaces is usually weight 500, while long-form copy (FAQ answers, legal) is 400. Nothing on the site uses 700.
 - Headings are tracked tight: `-0.015em` on hero titles, `-0.02em` on section headings, `-0.01em` to `-0.02em` on Inter body and nav.
 - Headings are centered and `text-balance`. Paragraphs use `text-balance` or `text-pretty`.

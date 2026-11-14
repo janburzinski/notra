@@ -1,7 +1,7 @@
 "use client";
 
-import { InstrumentModule } from "@notra/ui/components/instrument/instrument-module";
 import { useMemo, useState } from "react";
+import { InstrumentModule } from "ui/card";
 
 import { AiTrendsMetricTabs } from "@/components/ai-trends/ai-trends-metric-tabs";
 import { AiTrendsSeriesChart } from "@/components/ai-trends/ai-trends-series-chart-lazy";

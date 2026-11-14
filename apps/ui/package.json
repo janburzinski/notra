@@ -21,7 +21,8 @@
     "./workflow/canvas": "./registry/notra/workflow/components/workflow-canvas.tsx",
     "./workflow/logo": "./registry/notra/workflow/components/workflow-logo.tsx",
     "./workflow/node-sheet": "./registry/notra/workflow/components/workflow-node-sheet.tsx",
-    "./workflow/types": "./registry/notra/workflow/types/workflow.ts"
+    "./workflow/types": "./registry/notra/workflow/types/workflow.ts",
+    "./typography": "./registry/notra/typography/components/typography.tsx"
   },
   "scripts": {
     "dev": "blume dev --port 3006",
@@ -29,7 +30,8 @@
     "preview": "blume preview --port 3006",
     "check-types": "blume check",
     "doctor": "blume doctor",
-    "registry:build": "shadcn build"
+    "registry:build": "bun scripts/registry-tokens.ts --check && shadcn build",
+    "registry:tokens": "bun scripts/registry-tokens.ts"
   },
   "dependencies": {
     "@base-ui/react": "catalog:",

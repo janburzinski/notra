@@ -1,14 +1,11 @@
 "use client";
 
-import {
-  InstrumentEmpty,
-  InstrumentSection,
-} from "@notra/ui/components/instrument/instrument-module";
 import { PageHeading } from "@notra/ui/components/shared/page-heading";
 import { Skeleton } from "@notra/ui/components/ui/skeleton";
 import { Tabs, TabsList, TabsTrigger } from "@notra/ui/components/ui/tabs";
 import { usePrefetchQuery, useQuery } from "@tanstack/react-query";
 import { useMemo, useRef, useState } from "react";
+import { InstrumentEmpty, InstrumentSection } from "ui/card";
 
 import { AiTrendsAdvertisers } from "@/components/ai-trends/ai-trends-advertisers";
 import { AiTrendsAnomalyCard } from "@/components/ai-trends/ai-trends-anomaly-card";

@@ -1,5 +1,5 @@
-import { InstrumentSection } from "@notra/ui/components/instrument/instrument-module";
 import { cn } from "@notra/ui/lib/utils";
+import { InstrumentSection } from "ui/card";
 
 import type { MockFrameProps } from "@/types/landing/features";
 

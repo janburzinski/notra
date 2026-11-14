@@ -4,6 +4,13 @@ import { fileURLToPath } from "node:url";
 
 const webRoot = fileURLToPath(new URL("../", import.meta.url));
 const uiRoot = path.resolve(webRoot, "../../packages/ui/src");
+// The `ui` workspace (apps/ui): `ui/*` imports point into its registry, whose
+// files import `@/components/ui/*`, aliased to @notra/ui like in vite.config.ts.
+const registryApp = path.resolve(webRoot, "../ui");
+const registryRoot = path.join(registryApp, "registry");
+const registryExports = JSON.parse(
+  readFileSync(path.join(registryApp, "package.json"), "utf8")
+).exports;
 const output = path.join(webRoot, "src/styles/ui-sources.css");
 const extensions = [".ts", ".tsx", ".js", ".jsx", ".mjs", ".mdx"];
 const pending = [];
@@ -41,6 +48,30 @@ function importSpecifiers(filename) {
   ];
 }
 
+function registryExport(specifier) {
+  const key = `./${specifier.slice("ui/".length)}`;
+  for (const [pattern, target] of Object.entries(registryExports)) {
+    const [prefix, suffix = ""] = pattern.split("*");
+    if (pattern === key) {
+      return path.join(registryApp, target);
+    }
+    if (
+      pattern.includes("*") &&
+      key.startsWith(prefix) &&
+      key.endsWith(suffix) &&
+      key.length >= prefix.length + suffix.length
+    ) {
+      const match = key.slice(prefix.length, key.length - suffix.length);
+      return path.join(registryApp, target.replace("*", match));
+    }
+  }
+  return undefined;
+}
+
+const isShared = (filename) =>
+  filename.startsWith(`${uiRoot}${path.sep}`) ||
+  filename.startsWith(`${registryRoot}${path.sep}`);
+
 function collect(directory) {
   for (const entry of readdirSync(directory, { withFileTypes: true })) {
     const filename = path.join(directory, entry.name);
@@ -74,13 +105,23 @@ while (pending.length > 0) {
     continue;
   }
   visited.add(filename);
-  if (filename.startsWith(`${uiRoot}${path.sep}`)) {
+  if (isShared(filename)) {
     sources.add(filename);
   }
   for (const specifier of importSpecifiers(filename)) {
     let base;
     if (specifier.startsWith("@notra/ui/")) {
       base = path.join(uiRoot, specifier.slice("@notra/ui/".length));
+    } else if (specifier.startsWith("ui/")) {
+      base = registryExport(specifier);
+      if (!base) {
+        throw new Error(`Unknown ui export: ${specifier} in ${filename}`);
+      }
+    } else if (
+      specifier.startsWith("@/components/ui/") &&
+      filename.startsWith(`${registryRoot}${path.sep}`)
+    ) {
+      base = path.join(uiRoot, specifier.slice("@/".length));
     } else if (specifier.startsWith(".")) {
       base = path.resolve(path.dirname(filename), specifier);
     } else {
@@ -94,7 +135,8 @@ while (pending.length > 0) {
       pending.push(resolved);
     } else if (
       specifier.startsWith("@notra/ui/") ||
-      filename.startsWith(`${uiRoot}${path.sep}`)
+      specifier.startsWith("ui/") ||
+      isShared(filename)
     ) {
       throw new Error(
         `Cannot resolve shared UI source: ${specifier} in ${filename}`

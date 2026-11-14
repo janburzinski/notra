@@ -1,11 +1,11 @@
 "use client";
 
 import { trafficVisitDelta } from "@notra/geo-core/utils/ai-traffic";
-import { InstrumentSection } from "@notra/ui/components/instrument/instrument-module";
 import { Button } from "@notra/ui/components/ui/button";
-import { DataTable } from "@notra/ui/components/ui/data-table";
 import { Tabs, TabsList, TabsTrigger } from "@notra/ui/components/ui/tabs";
 import { useState } from "react";
+import { InstrumentSection } from "ui/card";
+import { DataTable } from "ui/table";
 import { useFormatter, useLocale, useTranslations } from "use-intl";
 
 import { McpMetricCard } from "@/components/mcp/mcp-metric-card";

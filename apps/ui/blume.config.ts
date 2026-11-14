@@ -73,7 +73,16 @@ export default defineConfig({
     accent: "#8b5cf6",
     fonts: {
       body: "inter",
-      display: "inter",
+      // The website's Satoshi file, so docs headlines match usenotra.com.
+      display: {
+        name: "Satoshi",
+        variants: [
+          {
+            src: "../web/src/fonts/Satoshi-Variable.woff2",
+            weight: "300..900",
+          },
+        ],
+      },
       mono: "geist-mono",
     },
   },

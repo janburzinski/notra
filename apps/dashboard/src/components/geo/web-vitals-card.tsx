@@ -6,13 +6,13 @@ import {
   PermissionRow,
 } from "@notra/ui/components/ui/permission-selector";
 import { Skeleton } from "@notra/ui/components/ui/skeleton";
+import { type CSSProperties, type ReactNode, useState } from "react";
+import { InstrumentSection } from "ui/card";
 import {
   TABLE_BODY_CLASS,
   TABLE_FRAME_CLASS,
   TABLE_ROW_BORDER_CLASS,
-} from "@notra/ui/constants/table";
-import { type CSSProperties, type ReactNode, useState } from "react";
-import { InstrumentSection } from "ui/card";
+} from "ui/table/constants";
 import { useLocale, useTranslations } from "use-intl";
 
 import { WebScriptEmpty } from "@/components/geo/web-script-empty";

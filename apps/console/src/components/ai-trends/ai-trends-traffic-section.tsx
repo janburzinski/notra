@@ -1,12 +1,9 @@
 "use client";
 
-import {
-  InstrumentEmpty,
-  InstrumentSection,
-} from "@notra/ui/components/instrument/instrument-module";
 import { Skeleton } from "@notra/ui/components/ui/skeleton";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
+import { InstrumentEmpty, InstrumentSection } from "ui/card";
 
 import { AiTrendsAnomalyCard } from "@/components/ai-trends/ai-trends-anomaly-card";
 import { AiTrendsTrafficChart } from "@/components/ai-trends/ai-trends-traffic-chart";

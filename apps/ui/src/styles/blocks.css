@@ -1,38 +1,15 @@
+@import "../../../../packages/ui/src/styles/tokens.css";
 @import "./chatgpt.css";
 @import "./claude.css";
 
 :root {
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.6056 0.2189 292.7172);
-  --primary-foreground: oklch(0.997 0 0);
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
   --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
   --code: oklch(0.985 0 0);
   --code-foreground: oklch(0.141 0.005 285.823);
-  --sh-class: oklch(0.55 0.13 265);
-  --sh-identifier: oklch(0.42 0.02 265);
-  --sh-sign: oklch(0.62 0.01 265);
-  --sh-property: oklch(0.55 0.15 25);
-  --sh-entity: oklch(0.55 0.13 265);
-  --sh-jsxliterals: oklch(0.52 0.16 300);
-  --sh-string: oklch(0.52 0.12 155);
-  --sh-keyword: oklch(0.55 0.19 320);
-  --sh-comment: oklch(0.65 0.02 265);
-  --shell: var(--table-shell);
-  --shell-border: var(--table-shell-border);
-  --table-shell: #f3f3f2;
-  --table-shell-border: #e7e7e5;
-  --table-card: #ffffff;
-  --table-card-border: #e5e5e5;
-  --table-row-border: #efefee;
-  --table-card-shadow:
-    0 1px 2px hsl(240 10% 10% / 0.06), 0 2px 8px -2px hsl(240 10% 10% / 0.06);
-  --surface-lift:
-    0 1px 2px hsl(240 10% 10% / 0.06), 0 2px 8px -2px hsl(240 10% 10% / 0.06);
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
   --sidebar-accent: oklch(0.97 0 0);
@@ -41,42 +18,17 @@
   --sidebar-ring: oklch(0.4907 0.2412 292.5809);
 }
 
-/* Dark tokens follow the dashboard palette (packages/ui globals.css) so the
-   registry components render here exactly as they do in the app. */
+/* Neutrals for the example frames. Accent, surfaces and syntax colours come
+   from tokens.css, so registry components render as they do in the app. */
 .dark,
 [data-theme="dark"] {
   --popover: oklch(0.195 0.006 270);
   --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.6056 0.2189 292.7172);
-  --primary-foreground: oklch(0.985 0 0);
   --secondary: oklch(0.27 0.006 270);
   --secondary-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
   --input: oklch(0.33 0.006 270);
-  --ring: oklch(0.556 0 0);
   --code: oklch(0.21 0.006 285.885);
   --code-foreground: oklch(0.985 0 0);
-  --sh-class: oklch(0.78 0.11 255);
-  --sh-identifier: oklch(0.86 0.01 265);
-  --sh-sign: oklch(0.66 0.01 265);
-  --sh-property: oklch(0.76 0.12 30);
-  --sh-entity: oklch(0.78 0.11 255);
-  --sh-jsxliterals: oklch(0.78 0.13 300);
-  --sh-string: oklch(0.79 0.13 150);
-  --sh-keyword: oklch(0.76 0.15 330);
-  --sh-comment: oklch(0.6 0.02 265);
-  --shell: var(--table-shell);
-  --shell-border: var(--table-shell-border);
-  --table-shell: #161616;
-  --table-shell-border: #232323;
-  --table-card: #1f1f1f;
-  --table-card-border: #2c2c2c;
-  --table-row-border: #292929;
-  --table-card-shadow:
-    inset 0 1px 0 hsl(0 0% 100% / 0.05), inset 0 0 0 1px hsl(0 0% 100% / 0.015),
-    inset 0 12px 18px -16px hsl(0 0% 100% / 0.035);
-  --surface-lift:
-    inset 0 1px 0 hsl(0 0% 100% / 0.04), 0 1px 2px hsl(0 0% 0% / 0.4);
   --sidebar: oklch(0.17 0.006 270);
   --sidebar-foreground: oklch(0.985 0 0);
   --sidebar-accent: oklch(0.245 0.006 270);
@@ -90,22 +42,9 @@
   --color-code-foreground: var(--code-foreground);
   --color-popover: var(--popover);
   --color-popover-foreground: var(--popover-foreground);
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
-  --color-destructive: var(--destructive);
   --color-input: var(--input);
-  --color-ring: var(--ring);
-  --color-shell: var(--shell);
-  --color-shell-border: var(--shell-border);
-  --color-table-shell: var(--table-shell);
-  --color-table-shell-border: var(--table-shell-border);
-  --color-table-card: var(--table-card);
-  --color-table-card-border: var(--table-card-border);
-  --color-table-row-border: var(--table-row-border);
-  --shadow-table-card: var(--table-card-shadow);
-  --shadow-lift: var(--surface-lift);
   --color-sidebar: var(--sidebar);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar-accent: var(--sidebar-accent);

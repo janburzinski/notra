@@ -1,0 +1,109 @@
+/*
+ * Notra design tokens: the brand palette, the accent and the dualtone
+ * surfaces. This file is the only place their values live.
+ *
+ * - @notra/ui globals.css imports it (dashboard, console).
+ * - apps/ui imports it, so registry examples render like the dashboard.
+ * - The registry's cssVars are generated from it:
+ *   `bun run --filter=ui registry:tokens` (CI runs it with --check).
+ *
+ * Type tokens live next door in typography.css.
+ */
+
+@import "./typography.css";
+
+:root {
+  /* Brand palette. Violet is the accent at full strength, Lavender and Ink
+     fill and stroke the mark, Cream is the tile behind it on dark surfaces. */
+  --brand-violet: oklch(0.6056 0.2189 292.7172);
+  --brand-lavender: #c8b2ee;
+  --brand-ink: #1e1e1e;
+  --brand-cream: #f6f3f1;
+
+  /* Accent. Darker than brand violet in light mode so white text and the
+     focus ring meet AA on white and on the shell. */
+  --primary: oklch(0.56 0.22 292.7172);
+  --primary-foreground: oklch(0.997 0 0);
+  --ring: oklch(0.56 0.22 292.7172);
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: hsl(0 0% 98%);
+
+  /* Dualtone surfaces: a grey shell with a 2px rim around a lifted card. */
+  --shell: var(--table-shell);
+  --shell-border: var(--table-shell-border);
+  --table-shell: #f3f3f2;
+  --table-shell-border: #e7e7e5;
+  --table-card: #ffffff;
+  --table-card-border: #e5e5e5;
+  --table-row-border: #efefee;
+  --table-card-shadow:
+    0 1px 2px hsl(240 10% 10% / 0.06), 0 2px 8px -2px hsl(240 10% 10% / 0.06);
+  --surface-lift:
+    0 1px 2px hsl(240 10% 10% / 0.06), 0 2px 8px -2px hsl(240 10% 10% / 0.06);
+
+  /* Syntax highlighting. */
+  --sh-class: oklch(0.55 0.13 265);
+  --sh-identifier: oklch(0.42 0.02 265);
+  --sh-sign: oklch(0.62 0.01 265);
+  --sh-property: oklch(0.55 0.15 25);
+  --sh-entity: oklch(0.55 0.13 265);
+  --sh-jsxliterals: oklch(0.52 0.16 300);
+  --sh-string: oklch(0.52 0.12 155);
+  --sh-keyword: oklch(0.55 0.19 320);
+  --sh-comment: oklch(0.65 0.02 265);
+}
+
+.dark,
+[data-theme="dark"] {
+  --primary: oklch(0.6056 0.2189 292.7172);
+  --primary-foreground: oklch(0.985 0 0);
+  --ring: oklch(0.6056 0.2189 292.7172);
+  /* Same hue as the light value. Tuned as a text colour (5:1 on background);
+     solid fills dim it (see the destructive button) so white text stays 4.5:1. */
+  --destructive: oklch(0.65 0.21 25);
+  --destructive-foreground: hsl(0 0% 99%);
+
+  --shell: var(--table-shell);
+  --shell-border: var(--table-shell-border);
+  --table-shell: #161616;
+  --table-shell-border: #232323;
+  --table-card: #1f1f1f;
+  --table-card-border: #333333;
+  --table-row-border: #292929;
+  --table-card-shadow:
+    inset 0 1px 0 hsl(0 0% 100% / 0.05), inset 0 0 0 1px hsl(0 0% 100% / 0.015),
+    inset 0 12px 18px -16px hsl(0 0% 100% / 0.035);
+  --surface-lift:
+    inset 0 1px 0 hsl(0 0% 100% / 0.04), 0 1px 2px hsl(0 0% 0% / 0.4);
+
+  --sh-class: oklch(0.78 0.11 255);
+  --sh-identifier: oklch(0.86 0.01 265);
+  --sh-sign: oklch(0.66 0.01 265);
+  --sh-property: oklch(0.76 0.12 30);
+  --sh-entity: oklch(0.78 0.11 255);
+  --sh-jsxliterals: oklch(0.78 0.13 300);
+  --sh-string: oklch(0.79 0.13 150);
+  --sh-keyword: oklch(0.76 0.15 330);
+  --sh-comment: oklch(0.6 0.02 265);
+}
+
+@theme inline {
+  --color-brand-violet: var(--brand-violet);
+  --color-brand-lavender: var(--brand-lavender);
+  --color-brand-ink: var(--brand-ink);
+  --color-brand-cream: var(--brand-cream);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-ring: var(--ring);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-shell: var(--shell);
+  --color-shell-border: var(--shell-border);
+  --color-table-shell: var(--table-shell);
+  --color-table-shell-border: var(--table-shell-border);
+  --color-table-card: var(--table-card);
+  --color-table-card-border: var(--table-card-border);
+  --color-table-row-border: var(--table-row-border);
+  --shadow-table-card: var(--table-card-shadow);
+  --shadow-lift: var(--surface-lift);
+}

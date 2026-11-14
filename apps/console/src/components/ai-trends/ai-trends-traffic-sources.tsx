@@ -2,10 +2,7 @@
 
 import { EngineIcon } from "@notra/ui/components/geo/engine-icon";
 import { PurposeBadge } from "@notra/ui/components/geo/purpose-badge";
-import {
-  DataTable,
-  type TableColumn,
-} from "@notra/ui/components/ui/data-table";
+import { DataTable, type TableColumn } from "ui/table";
 
 import { AiTrendsChange } from "@/components/ai-trends/ai-trends-change";
 import { AI_TRENDS_TABLE_ROW_HEIGHT } from "@/constants/ai-trends";

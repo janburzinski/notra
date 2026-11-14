@@ -1,9 +1,6 @@
 "use client";
 
-import {
-  DataTable,
-  type TableColumn,
-} from "@notra/ui/components/ui/data-table";
+import { DataTable, type TableColumn } from "ui/table";
 
 import { AiTrendsChange } from "@/components/ai-trends/ai-trends-change";
 import { BrandLogo } from "@/components/geo-reports/brand-logo";

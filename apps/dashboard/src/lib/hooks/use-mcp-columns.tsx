@@ -2,8 +2,8 @@
 
 import { StatusBadge } from "@notra/ui/components/status-badge";
 import { Badge } from "@notra/ui/components/ui/badge";
-import type { TableColumn } from "@notra/ui/components/ui/data-table";
 import type { ReactNode } from "react";
+import type { TableColumn } from "ui/table";
 import { useFormatter, useLocale, useTranslations } from "use-intl";
 
 import { AgentFeedbackAgentIcon } from "@/components/agent-feedback/feedback-agent-icon";

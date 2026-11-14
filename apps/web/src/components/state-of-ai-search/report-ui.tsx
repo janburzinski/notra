@@ -12,9 +12,9 @@ import {
   TableHeader,
   TableRow,
 } from "@notra/ui/components/ui/table";
-import { TABLE_ROW_FOCUS_RING_CLASS } from "@notra/ui/constants/table";
 import { cn } from "@notra/ui/lib/utils";
 import type { KeyboardEvent, ReactNode } from "react";
+import { TABLE_ROW_FOCUS_RING_CLASS } from "ui/table/constants";
 
 import { ReportPanel } from "@/components/state-of-ai-search/report-section";
 import type { StateOfAiSearchRankingRow } from "@/types/state-of-ai-search";
