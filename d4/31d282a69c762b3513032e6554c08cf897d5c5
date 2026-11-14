@@ -1,0 +1,27 @@
+apps/dashboard/src/types/agent-questions.ts
+  s_3428b476267439::t_1bf113cef33ed0 53
+apps/dashboard/src/components/chat/chat-approval-card.tsx
+  s_3428b476267439::t_5575af7f633af0 234-237
+  s_3428b476267439::t_1bf113cef33ed0 267-271,291,299-303
+  s_3428b476267439::t_a73aab27f49d5f 6-9,172,211-213,215-229,231-232,238-240
+  s_3428b476267439::t_d54957da64c700 38
+  s_3428b476267439::t_0559a4d3c75174 33-37,39,214,233
+apps/dashboard/src/components/ai/answer-mark.tsx
+  s_3428b476267439::t_1bf113cef33ed0 8,11,24-25
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "d431d282a69c762b3513032e6554c08cf897d5c5",
+  "prompts": {},
+  "sessions": {
+    "s_3428b476267439": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c6d39551-e687-4036-a65c-3bd92bb74947",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
