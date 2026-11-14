@@ -824,10 +824,15 @@ export async function openBlogDraftPullRequest(params: {
     ],
     baseSha: draft.baseSha,
   });
-  const recorded = await markFindingProposed(claim, {
-    repository: `${ctx.repository.owner}/${ctx.repository.name}`,
-    ...pullRequest,
-  });
+  const recorded = await markFindingProposed(
+    claim,
+    {
+      repository: `${ctx.repository.owner}/${ctx.repository.name}`,
+      ...pullRequest,
+    },
+    undefined,
+    { filePath: draft.path }
+  );
   if (!recorded) {
     // Dismissed or taken over while writing: nothing should stay open.
     await closeAutopilotPullRequest(octokit, ctx.repository, pullRequest);

@@ -4,6 +4,7 @@ const PAGE_INDEX_FILES = new Set(["index", "page"]);
 const MARKDOWN_EXTENSION = /\.mdx?$/;
 const HTML_EXTENSION = /\.html?$/;
 const TRAILING_SLASHES = /\/+$/;
+const INDEX_SEGMENT = /\/index$/;
 
 /** Plain repository-relative paths only: no absolute paths, backslashes or dot segments. */
 export function isSafeRepositoryPath(path: string) {
@@ -47,6 +48,28 @@ export function summarizeRepositoryTree(paths: string[], maxLines: number) {
     .sort(([a], [b]) => a.localeCompare(b))
     .map(([directory, count]) => `${directory} (${count} files)`);
   return [...rootFiles, ...directoryLines].slice(0, maxLines).join("\n");
+}
+
+/** The slug a Markdown file renders under: blog/<slug>.mdx or <slug>/index.mdx. */
+export function markdownFileSlug(path: string): string | null {
+  if (!MARKDOWN_EXTENSION.test(path)) {
+    return null;
+  }
+  const parts = path.split("/");
+  const file = (parts.at(-1) ?? "").replace(MARKDOWN_EXTENSION, "");
+  const slug = PAGE_INDEX_FILES.has(file) ? parts.at(-2) : file;
+  return slug || null;
+}
+
+/** "/blog/post/", "/blog/post.md", "/blog/post/index.html" and the like all give "/blog/post". */
+export function normalizePagePath(path: string) {
+  return (
+    path
+      .replace(TRAILING_SLASHES, "")
+      .replace(MARKDOWN_EXTENSION, "")
+      .replace(HTML_EXTENSION, "")
+      .replace(INDEX_SEGMENT, "") || "/"
+  );
 }
 
 /**

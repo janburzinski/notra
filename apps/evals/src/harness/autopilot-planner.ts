@@ -157,6 +157,7 @@ function buildPlannerInput(params: {
       title,
       status,
     })),
+    results: params.input.results ?? [],
   };
 }
 

@@ -110,6 +110,8 @@ export interface AutopilotFindingEvidence {
   publishGroup?: AutopilotApprovalGroup;
   /** The page a refresh or rendering fix is about. */
   pageUrl?: string | null;
+  /** The repository file a new post's pull request adds; finds its live page. */
+  filePath?: string | null;
   /** Every page a rendering finding covers; kept when it settles without a change. */
   pageUrls?: string[];
   /** Why a page is refreshed: AI citations before and now, and who took them. */

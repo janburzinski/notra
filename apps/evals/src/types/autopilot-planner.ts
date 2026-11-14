@@ -1,6 +1,7 @@
 import type {
   AutopilotObservation,
   AutopilotPlannedActionType,
+  AutopilotPostResult,
   AutopilotSignalSource,
   AutopilotTopic,
   AutopilotTopicStatus,
@@ -45,6 +46,8 @@ export interface AutopilotScenarioInput {
   existingPosts: string[];
   /** Drafts in flight; topicSlug links one to a topic like a finding's evidence. */
   activeWork: { title: string; status: string; topicSlug?: string }[];
+  /** How earlier merged posts did, as the dashboard reports them. */
+  results?: AutopilotPostResult[];
   runs: ScenarioRun[];
 }
 

@@ -276,11 +276,16 @@ export async function markFindingProposed(
     branch: string;
     headSha: string;
   },
-  details?: Partial<Pick<FindingRow, "title" | "summary" | "evidence">>
+  details?: Partial<Pick<FindingRow, "title" | "summary" | "evidence">>,
+  /** Merged into the stored evidence, so fields written meanwhile stay. */
+  evidencePatch?: Partial<FindingRow["evidence"]>
 ) {
-  const evidence = details?.evidence
+  const base = details?.evidence
     ? sql`${JSON.stringify(details.evidence)}::jsonb`
-    : autopilotFindings.evidence;
+    : sql`${autopilotFindings.evidence}`;
+  const evidence = evidencePatch
+    ? sql`(${base} || ${JSON.stringify(evidencePatch)}::jsonb)`
+    : base;
   const rows = await db
     .update(autopilotFindings)
     .set({

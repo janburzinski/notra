@@ -42,6 +42,7 @@ import {
 } from "@/lib/autopilot/findings";
 import { generateAutopilotObject } from "@/lib/autopilot/llm";
 import { createAutopilotLogger } from "@/lib/autopilot/log";
+import { loadAutopilotResults } from "@/lib/autopilot/results";
 import { loadDecisionMemory } from "@/lib/autopilot/rules";
 import type {
   AutopilotRunContext,
@@ -226,19 +227,32 @@ export async function decideAutopilotPlan(
       },
     };
   }
-  const [synced, existingPosts, activeWork, openPullRequests, autonomous] =
-    await Promise.all([
-      syncTopicsWithFindings(ctx.organizationId, stored),
-      listBlogPostPaths(ctx),
-      listActiveBlogFindings(ctx.organizationId),
-      countOpenPullRequests(ctx.organizationId),
-      countAutonomousProposals(
-        ctx.organizationId,
-        new Date(
-          Date.now() - AUTOPILOT_AUTONOMOUS_PR_BUDGET.days * AUTOPILOT_DAY_MS
-        )
-      ),
-    ]);
+  const [
+    synced,
+    existingPosts,
+    activeWork,
+    openPullRequests,
+    autonomous,
+    results,
+  ] = await Promise.all([
+    syncTopicsWithFindings(ctx.organizationId, stored),
+    listBlogPostPaths(ctx),
+    listActiveBlogFindings(ctx.organizationId),
+    countOpenPullRequests(ctx.organizationId),
+    countAutonomousProposals(
+      ctx.organizationId,
+      new Date(
+        Date.now() - AUTOPILOT_AUTONOMOUS_PR_BUDGET.days * AUTOPILOT_DAY_MS
+      )
+    ),
+    // Only ranks ready topics, so a failure plans without it.
+    loadAutopilotResults(ctx).catch(async (error: unknown) => {
+      await log.info("Could not read how earlier posts did", {
+        error: toErrorMessage(error, "unknown error"),
+      });
+      return [];
+    }),
+  ]);
   const input = {
     brand: {
       name: ctx.brand?.name ?? "",
@@ -262,7 +276,19 @@ export async function decideAutopilotPlan(
       title: row.title,
       status: row.status,
     })),
+    results,
   };
+  if (results.length > 0) {
+    await log.decision(
+      `Read how ${results.length} earlier ${results.length === 1 ? "post" : "posts"} did`,
+      {
+        results: results.map(
+          (result) =>
+            `${result.page}: ${result.aiAnswerFetches ?? "?"} AI answer fetches, ${result.aiClicks ?? "?"} AI clicks, ${result.humanViews ?? "?"} views`
+        ),
+      }
+    );
+  }
 
   const plan = await planAutopilotRun({
     input,

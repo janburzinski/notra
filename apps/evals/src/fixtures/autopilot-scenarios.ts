@@ -1,5 +1,6 @@
 import type {
   AutopilotObservation,
+  AutopilotPostResult,
   AutopilotTopic,
 } from "@notra/ai/types/autopilot-planner";
 
@@ -198,6 +199,83 @@ const darkModeGap = gap(
   "dark-mode-product-tours",
   "Dark mode for product tours",
   "AI answers for 'product tours that support dark mode' list Chameleon; Cartwheel tours follow the host app theme."
+);
+
+const localizedToursGap = gap(
+  "localize-product-tours-de",
+  "How to localize product tours",
+  "AI answers for 'localize in-app product tours into German' list Userpilot; Cartwheel is missing. Cartwheel tours have per-locale copy picked from the user's language."
+);
+const localizationSearch = gap(
+  "translate-product-tours-search",
+  "Translate product tours into other languages",
+  "Search Console: 'translate product tour' 1,800 impressions at position 17 and 'multilingual onboarding tour' 750 impressions at position 23. No Cartwheel page ranks for either."
+);
+const darkModeSearch = gap(
+  "dark-mode-product-tours-search",
+  "Product tours that match a dark theme",
+  "Search Console: 'dark mode product tour' 1,800 impressions at position 17 and 'product tour theme' 750 impressions at position 23. No Cartwheel page ranks for either."
+);
+
+const PROVEN_LOCALIZATION_RESULTS: AutopilotPostResult[] = [
+  {
+    title: "Translating onboarding checklists into German and French",
+    kind: "post",
+    topicSlug: "localize-checklists",
+    page: "/blog/translate-onboarding-checklists",
+    mergedDaysAgo: 45,
+    aiCrawls: 140,
+    aiAnswerFetches: 64,
+    aiClicks: 18,
+    humanViews: 410,
+    answers: { metric: "mentions", before: 0, after: 0.5 },
+  },
+  {
+    title: "Theming in-app checklists to match your app",
+    kind: "post",
+    topicSlug: "checklist-theming",
+    page: "/blog/theming-checklists",
+    mergedDaysAgo: 60,
+    aiCrawls: 3,
+    aiAnswerFetches: 0,
+    aiClicks: 0,
+    humanViews: 2,
+    answers: { metric: "mentions", before: 0, after: 0 },
+  },
+];
+
+const checklistSheetsGap = gap(
+  "export-checklist-progress-sheets",
+  "Export checklist progress to Google Sheets",
+  "AI answers for 'export onboarding checklist progress to Google Sheets' list Userpilot; Cartwheel is missing. Cartwheel exports checklist progress as CSV and syncs it to Google Sheets."
+);
+const checklistSheetsSearch = gap(
+  "export-checklist-progress-search",
+  "Export onboarding data to spreadsheets",
+  "Search Console: 'export checklist progress' 1,800 impressions at position 17 and 'onboarding data google sheets' 750 impressions at position 23. No Cartwheel page ranks for either."
+);
+const NPS_EXPORT_RESULT: AutopilotPostResult = {
+  title: "Exporting NPS survey results to CSV",
+  kind: "post",
+  topicSlug: "nps-exports",
+  page: "/blog/nps-survey-results-csv",
+  mergedDaysAgo: 20,
+  aiCrawls: 70,
+  aiAnswerFetches: 63,
+  aiClicks: 24,
+  humanViews: 7,
+  answers: { metric: "mentions", before: 0, after: 0.67 },
+};
+
+const darkModeStrongSearch = gap(
+  "dark-mode-product-tours-strong",
+  "Product tours that match a dark theme",
+  "Search Console: 'dark mode product tour' 9,400 impressions at position 8 and 'product tour theme' 3,100 impressions at position 11. No Cartwheel page ranks for either."
+);
+const localizationWeakSearch = gap(
+  "translate-product-tours-weak",
+  "Translate product tours into other languages",
+  "Search Console: 'translate product tour' 90 impressions at position 41. No Cartwheel page ranks."
 );
 
 const exportApi = pr(
@@ -801,6 +879,127 @@ export const AUTOPILOT_SCENARIOS: AutopilotScenario[] = [
       ],
       maxPullRequests: 1,
       mustActOn: "plans",
+    },
+  },
+  {
+    id: "results-pick-proven-area",
+    title:
+      "Two ready topics with equal demand: act on the one next to a post AI assistants already use",
+    tags: ["act", "demand", "priority", "results"],
+    input: scenario({
+      results: PROVEN_LOCALIZATION_RESULTS,
+      runs: [
+        {
+          observations: [
+            darkModeGap,
+            localizedToursGap,
+            darkModeSearch,
+            localizationSearch,
+          ],
+          expected: {
+            action: ["write_post"],
+            group: "localization",
+            pr: "deliver",
+          },
+        },
+      ],
+    }),
+    expected: {
+      groups: [
+        {
+          key: "localization",
+          title: "Localized product tours",
+          observations: [localizedToursGap.id, localizationSearch.id],
+        },
+        {
+          key: "dark-mode",
+          title: "Dark mode product tours",
+          observations: [darkModeGap.id, darkModeSearch.id],
+        },
+      ],
+      maxPullRequests: 1,
+      mustActOn: "localization",
+    },
+  },
+  {
+    id: "results-next-to-existing-post",
+    title:
+      "The post that did well is also an existing post: a different question next to it is not covered",
+    tags: ["act", "demand", "priority", "results"],
+    input: scenario({
+      existingPosts: ["content/blog/nps-survey-results-csv.mdx"],
+      results: [NPS_EXPORT_RESULT],
+      runs: [
+        {
+          observations: [
+            darkModeGap,
+            checklistSheetsGap,
+            darkModeSearch,
+            checklistSheetsSearch,
+          ],
+          expected: {
+            action: ["write_post"],
+            group: "sheets",
+            pr: "deliver",
+          },
+        },
+      ],
+    }),
+    expected: {
+      groups: [
+        {
+          key: "sheets",
+          title: "Checklist progress in Google Sheets",
+          observations: [checklistSheetsGap.id, checklistSheetsSearch.id],
+        },
+        {
+          key: "dark-mode",
+          title: "Dark mode product tours",
+          observations: [darkModeGap.id, darkModeSearch.id],
+        },
+      ],
+      maxPullRequests: 1,
+      mustActOn: "sheets",
+    },
+  },
+  {
+    id: "results-never-beat-demand",
+    title:
+      "A post that did well next to the weaker topic: demand still decides",
+    tags: ["act", "demand", "priority", "results"],
+    input: scenario({
+      results: PROVEN_LOCALIZATION_RESULTS,
+      runs: [
+        {
+          observations: [
+            darkModeGap,
+            localizedToursGap,
+            darkModeStrongSearch,
+            localizationWeakSearch,
+          ],
+          expected: {
+            action: ["write_post"],
+            group: "dark-mode",
+            pr: "deliver",
+          },
+        },
+      ],
+    }),
+    expected: {
+      groups: [
+        {
+          key: "localization",
+          title: "Localized product tours",
+          observations: [localizedToursGap.id, localizationWeakSearch.id],
+        },
+        {
+          key: "dark-mode",
+          title: "Dark mode product tours",
+          observations: [darkModeGap.id, darkModeStrongSearch.id],
+        },
+      ],
+      maxPullRequests: 1,
+      mustActOn: "dark-mode",
     },
   },
   {

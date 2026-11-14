@@ -67,6 +67,35 @@ export interface AutopilotPlannerInput {
   existingPosts: string[];
   /** Drafts and ideas already in flight, so the planner never doubles them. */
   activeWork: { title: string; status: string }[];
+  /** How Autopilot's merged posts and page updates did since; empty without data. */
+  results?: AutopilotPostResult[];
+}
+
+/**
+ * One merged Autopilot post or page update. Traffic counts cover the last
+ * 30 days and are null when the site sends Notra no traffic data, so null
+ * means unknown, never zero.
+ */
+export interface AutopilotPostResult {
+  title: string;
+  kind: "post" | "update";
+  /** The planner topic it was written for, when it came from one. */
+  topicSlug: string | null;
+  /** The live page path, or the file slug when only that is known. */
+  page: string;
+  mergedDaysAgo: number;
+  aiCrawls: number | null;
+  /** AI assistants fetching the page while answering someone. */
+  aiAnswerFetches: number | null;
+  /** People who clicked through to it from an AI assistant. */
+  aiClicks: number | null;
+  humanViews: number | null;
+  /** AI answers naming the brand for its prompt, or citing the page, before the merge and since. */
+  answers: {
+    metric: "mentions" | "citations";
+    before: number | null;
+    after: number | null;
+  } | null;
 }
 
 export type AutopilotPlannedActionType = "none" | "write_post" | "update_page";

@@ -73,6 +73,7 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
     memoryCommitFailure: false,
     act: 0.9,
     plan: null as AutopilotPlannerOutput | null,
+    plannerPrompt: "",
     ambiguousFeedback: false,
     feedbackPrompt: "",
     takeover: false,
@@ -248,6 +249,7 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
   mock.module("@/lib/autopilot/llm", () => ({
     generateAutopilotObject: async (input: { tag: string; prompt: string }) => {
       if (input.tag === "planner") {
+        state.plannerPrompt = input.prompt;
         if (!state.plan) {
           throw new Error("No planner output in this test");
         }
@@ -676,6 +678,7 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
     state.memoryCommitFailure = false;
     state.act = 0.9;
     state.plan = null;
+    state.plannerPrompt = "";
     state.ambiguousFeedback = false;
     state.feedbackPrompt = "";
     await memory.deleteRepo("sandbox-org");
@@ -1780,6 +1783,63 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
     expect(
       planned.every((commit) => commit.paths.join() === "planner.md")
     ).toBe(true);
+  });
+
+  test("the planner sees how an earlier merged post on this site did, with its file read from the pull request once", async () => {
+    await db.insert(autopilotFindings).values({
+      id: "earlier-post",
+      organizationId: "sandbox-org",
+      kind: "commits",
+      fingerprint: "commits:sandbox/website#77",
+      title: "How CSV exports work",
+      summary: "A post about CSV exports",
+      status: "merged",
+      repository: "sandbox/website",
+      pullRequestNumber: 77,
+      mergedAt: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000),
+      evidence: { topic: { slug: "exports", title: "Exports", signals: 2 } },
+    });
+    // A post on the site Autopilot wrote to before says nothing about this one.
+    await db.insert(autopilotFindings).values({
+      id: "old-site-post",
+      organizationId: "sandbox-org",
+      kind: "commits",
+      fingerprint: "commits:sandbox/old-website#5",
+      title: "How CSV imports work",
+      summary: "A post on the old site",
+      status: "merged",
+      repository: "sandbox/old-website",
+      pullRequestNumber: 5,
+      mergedAt: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000),
+      evidence: { filePath: "content/blog/csv-imports.mdx" },
+    });
+    state.changedFiles[77] = [
+      "public/blog/csv-exports.png",
+      "content/blog/csv-exports.mdx",
+    ];
+    await dailyRun("planner-results", [exportsPull]);
+    const prompt = JSON.parse(state.plannerPrompt) as {
+      results: Record<string, unknown>[];
+    };
+    // No site sends traffic in the sandbox: unknown, never zero.
+    expect(prompt.results).toEqual([
+      expect.objectContaining({
+        title: "How CSV exports work",
+        kind: "post",
+        topicSlug: "exports",
+        page: "csv-exports",
+        mergedDaysAgo: 20,
+        aiAnswerFetches: null,
+        humanViews: null,
+      }),
+    ]);
+    const stored = await db.query.autopilotFindings.findFirst({
+      where: eq(autopilotFindings.id, "earlier-post"),
+    });
+    expect(stored?.evidence.filePath).toBe("content/blog/csv-exports.mdx");
+    expect(await runMessages("planner-results")).toContainEqual(
+      "decision: Read how 1 earlier post did"
+    );
   });
 
   test("the autonomous budget turns a second ripe topic into an idea, and an explicit write still goes through", async () => {
