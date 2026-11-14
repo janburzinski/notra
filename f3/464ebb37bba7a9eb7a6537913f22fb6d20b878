@@ -1,0 +1,36 @@
+packages/db/src/types/autopilot.ts
+  s_4123b78f8907f5::t_9618ce3b30a637 48-49
+packages/geo-core/src/geo/prompts.ts
+  s_4123b78f8907f5::t_90792cf62b8037 11-12,156-174
+packages/geo-core/src/geo/gaps.ts
+  s_4123b78f8907f5::t_90792cf62b8037 73,212-213
+apps/dashboard/src/lib/autopilot/answers.ts
+  s_4123b78f8907f5::t_4afcba9be6c6fc 2-6,87-103
+apps/dashboard/src/lib/autopilot/pages.ts
+  s_4123b78f8907f5::t_e7a94cde2d256d 136-139
+apps/dashboard/src/lib/autopilot/findings.ts
+  s_4123b78f8907f5::t_9618ce3b30a637 1152-1153,1189-1199,1223-1226,1237-1239
+apps/dashboard/src/lib/autopilot/blog.ts
+  s_4123b78f8907f5::t_4afcba9be6c6fc 608-617,1237-1239
+  s_4123b78f8907f5::t_62e4e4b36ece4b 7
+  s_4123b78f8907f5::t_031d6762b6eaf6 46-49
+apps/dashboard/tests/autopilot-sandbox.test.ts
+  s_4123b78f8907f5::t_eeedecccdd86c0 128-131,478-480
+  s_4123b78f8907f5::t_92a6ec0c0a8876 126-127,132-133,137-140,148-151,154-156,158,168-169,447-477,481-498
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "f3464ebb37bba7a9eb7a6537913f22fb6d20b878",
+  "prompts": {},
+  "sessions": {
+    "s_4123b78f8907f5": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "45f55548-7a77-4d1c-8d0f-a6d4f347d0f7",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
