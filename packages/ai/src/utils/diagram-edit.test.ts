@@ -334,6 +334,21 @@ describe("findDiagramLayoutIssues", () => {
     expect(findDiagramLayoutIssues(sceneOf(flow))).toEqual([]);
   });
 
+  test("a tall diagram fails the social card but fits a post image", () => {
+    const column = sceneOf({
+      elements: [0, 1, 2, 3].map((row) => ({
+        type: "rectangle" as const,
+        id: `step-${row}`,
+        x: 0,
+        y: row * 220,
+        width: 400,
+        height: 100,
+      })),
+    });
+    expect(findDiagramLayoutIssues(column).join(" ")).toContain("1100x530");
+    expect(findDiagramLayoutIssues(column, "content")).toEqual([]);
+  });
+
   test("checks rotated shapes by their rotated outline", () => {
     const quarter = Math.PI / 2;
     const upright = findDiagramLayoutIssues(

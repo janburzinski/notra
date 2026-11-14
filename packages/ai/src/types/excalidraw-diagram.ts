@@ -104,6 +104,12 @@ export interface DiagramTextMeasurer {
   measure(text: string, fontSize: number): { width: number; height: number };
 }
 
+/**
+ * "card" fills a 1200x630 social card; "content" crops the canvas to the
+ * diagram, for images that sit inside a post.
+ */
+export type DiagramCanvasFit = "card" | "content";
+
 export interface RenderedDiagram {
   spec: DiagramSpec;
   scene: ExcalidrawScene;

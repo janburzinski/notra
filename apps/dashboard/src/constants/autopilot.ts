@@ -248,11 +248,30 @@ export const AUTOPILOT_READINESS_AGENT_MAX_STEPS = 40;
 export const AUTOPILOT_READINESS_AGENT_WRAP_UP_STEPS = 4;
 export const AUTOPILOT_READINESS_FIND_MAX_PATHS = 100;
 
-/** The writer researches in a few steps, then writes; the last step is the post. */
-export const AUTOPILOT_WRITER_MAX_STEPS = 8;
+/** The writer researches, may draw diagrams, then writes; the last step is the post. */
+export const AUTOPILOT_WRITER_MAX_STEPS = 11;
 export const AUTOPILOT_WRITER_MAX_READS = 6;
 /** Steps that may call tools; the steps after them can only write. */
-export const AUTOPILOT_WRITER_RESEARCH_STEPS = 3;
+export const AUTOPILOT_WRITER_RESEARCH_STEPS = 4;
+/** Steps after research that may still draw diagrams, before the post is due. */
+export const AUTOPILOT_WRITER_DIAGRAM_STEPS = 3;
+export const AUTOPILOT_WRITER_MAX_DIAGRAMS = 2;
+/**
+ * Writer tools whose output never backs a claim in the fact checks: the
+ * writer's own diagrams, voice samples, and AI-written GEO answers.
+ */
+export const AUTOPILOT_WRITER_NON_FACT_TOOLS: ReadonlySet<string> = new Set([
+  "drawDiagram",
+  "getBrandReferences",
+  "getGeoContext",
+]);
+/** Render attempts per post, rejected layouts included. */
+export const AUTOPILOT_WRITER_MAX_DIAGRAM_RENDERS = 4;
+/** The writer embeds `![alt](notra-diagram-1)`; Notra swaps in the image URL once the slug is known. */
+/** Characters that would break `![alt](...)` in diagram alt text. */
+export const AUTOPILOT_DIAGRAM_ALT_UNSAFE = /[[\]\r\n]+/g;
+export const AUTOPILOT_DIAGRAM_EMBED =
+  /!\[([^\]\n]*)\]\(notra-diagram-(\d+)\)/g;
 export const AUTOPILOT_WRITER_MAX_POST_PATHS = 200;
 export const AUTOPILOT_WRITER_MAX_OUTPUT_TOKENS = 12_000;
 /** One fresh rewrite for incomplete output, never an unbounded continuation. */

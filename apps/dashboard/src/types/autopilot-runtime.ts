@@ -38,6 +38,21 @@ export interface AutopilotStopRunInput {
   runId: string;
 }
 export type BlogFile = z.infer<typeof blogFileSchema>;
+
+/** A diagram the writer drew; the post embeds it as `![alt](notra-diagram-<id>)`. */
+export interface AutopilotDiagram {
+  id: number;
+  alt: string;
+  pngBase64: string;
+}
+
+export type WrittenBlogFile = BlogFile & { diagrams?: AutopilotDiagram[] };
+
+export interface AutopilotRepositoryImage {
+  path: string;
+  contents: string;
+  encoding: "base64";
+}
 export type ReadinessAgentOutput = z.infer<typeof readinessAgentOutputSchema>;
 export type AutopilotPullRequestMoment = "ready" | "merged" | "closed";
 
@@ -95,6 +110,8 @@ export type AutopilotBlogDraft =
       path: string;
       sample: string | null;
       imageLocation: { path: string; url: string };
+      /** Optional: drafts written before diagrams existed have none. */
+      diagrams?: AutopilotRepositoryImage[];
     };
 
 export type AutopilotReadinessCheck =

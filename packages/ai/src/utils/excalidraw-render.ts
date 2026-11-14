@@ -2,6 +2,8 @@ import {
   DIAGRAM_ARROWHEAD_ANGLE_DEG,
   DIAGRAM_ARROWHEAD_LENGTH,
   DIAGRAM_CANVAS_PADDING,
+  DIAGRAM_CONTENT_PADDING,
+  DIAGRAM_CONTENT_PIXEL_RATIO,
   DIAGRAM_FONT_FAMILY,
   DIAGRAM_LINE_HEIGHT,
   DIAGRAM_ROUNDED_CORNER_RADIUS,
@@ -13,6 +15,7 @@ import {
 } from "@notra/ai/constants/repo-image";
 import { diagramSpecSchema } from "@notra/ai/schemas/excalidraw-diagram";
 import type {
+  DiagramCanvasFit,
   DiagramSpec,
   DiagramTextMeasurer,
   ExcalidrawElement,
@@ -24,6 +27,7 @@ import type {
 } from "@notra/ai/types/excalidraw-diagram";
 import {
   buildExcalidrawScene,
+  contentFitScale,
   rotatedBox,
 } from "@notra/ai/utils/excalidraw-diagram";
 import { loadRenderFont } from "@notra/ai/utils/render-font";
@@ -389,23 +393,49 @@ function sceneBounds(elements: ExcalidrawElement[]) {
   return { minX, minY, width: maxX - minX, height: maxY - minY };
 }
 
-export function renderExcalidrawSceneToSvg(
-  scene: ExcalidrawScene,
-  font: Font
-): string {
-  const generator = rough.generator();
-  const background = scene.appState.viewBackgroundColor;
-  const bounds = sceneBounds(scene.elements);
+/** Canvas size and the transform that places the scene on it. */
+function canvasLayout(
+  bounds: ReturnType<typeof sceneBounds>,
+  fit: DiagramCanvasFit
+) {
+  if (fit === "content") {
+    const scale = contentFitScale(bounds.width, bounds.height);
+    return {
+      width: Math.ceil(bounds.width * scale + DIAGRAM_CONTENT_PADDING * 2),
+      height: Math.ceil(bounds.height * scale + DIAGRAM_CONTENT_PADDING * 2),
+      scale,
+      offsetX: DIAGRAM_CONTENT_PADDING - bounds.minX * scale,
+      offsetY: DIAGRAM_CONTENT_PADDING - bounds.minY * scale,
+    };
+  }
   const scale = Math.min(
     MAX_RENDER_SCALE,
     (REPO_IMAGE_WIDTH - DIAGRAM_CANVAS_PADDING * 2) / Math.max(1, bounds.width),
     (REPO_IMAGE_HEIGHT - DIAGRAM_CANVAS_PADDING * 2) /
       Math.max(1, bounds.height)
   );
-  const offsetX =
-    (REPO_IMAGE_WIDTH - bounds.width * scale) / 2 - bounds.minX * scale;
-  const offsetY =
-    (REPO_IMAGE_HEIGHT - bounds.height * scale) / 2 - bounds.minY * scale;
+  return {
+    width: REPO_IMAGE_WIDTH,
+    height: REPO_IMAGE_HEIGHT,
+    scale,
+    offsetX:
+      (REPO_IMAGE_WIDTH - bounds.width * scale) / 2 - bounds.minX * scale,
+    offsetY:
+      (REPO_IMAGE_HEIGHT - bounds.height * scale) / 2 - bounds.minY * scale,
+  };
+}
+
+function renderSceneSvg(
+  scene: ExcalidrawScene,
+  font: Font,
+  fit: DiagramCanvasFit
+) {
+  const generator = rough.generator();
+  const background = scene.appState.viewBackgroundColor;
+  const { width, height, scale, offsetX, offsetY } = canvasLayout(
+    sceneBounds(scene.elements),
+    fit
+  );
   const linearIds = new Set(
     scene.elements.filter(isLinearElement).map((element) => element.id)
   );
@@ -434,7 +464,15 @@ export function renderExcalidrawSceneToSvg(
     })
     .join("");
 
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="${REPO_IMAGE_WIDTH}" height="${REPO_IMAGE_HEIGHT}" viewBox="0 0 ${REPO_IMAGE_WIDTH} ${REPO_IMAGE_HEIGHT}"><rect width="${REPO_IMAGE_WIDTH}" height="${REPO_IMAGE_HEIGHT}" fill="${escapeAttribute(background)}"/><g transform="translate(${offsetX.toFixed(2)} ${offsetY.toFixed(2)}) scale(${scale.toFixed(4)})">${body}</g></svg>`;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}"><rect width="${width}" height="${height}" fill="${escapeAttribute(background)}"/><g transform="translate(${offsetX.toFixed(2)} ${offsetY.toFixed(2)}) scale(${scale.toFixed(4)})">${body}</g></svg>`;
+  return { svg, width, height };
+}
+
+export function renderExcalidrawSceneToSvg(
+  scene: ExcalidrawScene,
+  font: Font
+): string {
+  return renderSceneSvg(scene, font, "card").svg;
 }
 
 /** Parses the agent's diagram.json, expands it to an Excalidraw scene, and renders PNG + SVG. */
@@ -444,16 +482,22 @@ export function renderDiagramSpec(rawSpec: string): Promise<RenderedDiagram> {
 
 /** Expands a validated spec to an Excalidraw scene and renders PNG + SVG. */
 export async function renderDiagram(
-  spec: DiagramSpec
+  spec: DiagramSpec,
+  options: { fit?: DiagramCanvasFit } = {}
 ): Promise<RenderedDiagram> {
+  const fit = options.fit ?? "card";
   const [font, { Resvg }] = await Promise.all([
     loadDiagramFont(),
     import("@resvg/resvg-js"),
   ]);
   const scene = buildExcalidrawScene(spec, createMeasurer(font));
-  const svg = renderExcalidrawSceneToSvg(scene, font);
+  const { svg, width, height } = renderSceneSvg(scene, font, fit);
   const png = new Resvg(svg, {
-    fitTo: { mode: "width", value: REPO_IMAGE_WIDTH },
+    fitTo: {
+      mode: "width",
+      // Inline diagrams get 2x pixels so they stay sharp on high-density screens.
+      value: fit === "content" ? width * DIAGRAM_CONTENT_PIXEL_RATIO : width,
+    },
   })
     .render()
     .asPng();
@@ -462,7 +506,7 @@ export async function renderDiagram(
     spec,
     scene,
     svg,
-    html: `<div style="width:${REPO_IMAGE_WIDTH}px;height:${REPO_IMAGE_HEIGHT}px;display:flex">${svg}</div>`,
+    html: `<div style="width:${width}px;height:${height}px;display:flex">${svg}</div>`,
     pngBase64: png.toString("base64"),
   };
 }

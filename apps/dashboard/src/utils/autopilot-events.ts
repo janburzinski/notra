@@ -65,16 +65,33 @@ export function formatAutopilotPercent(value: number) {
 
 /** A readable research step, without exposing the raw tool payload. */
 export function describeAutopilotToolCall(name: string, input: unknown) {
-  const args = (input ?? {}) as { path?: string; url?: string; query?: string };
-  if (name === "readFile") {
-    return `Read ${args.path}`;
+  const args = (input ?? {}) as {
+    path?: string;
+    url?: string;
+    query?: string;
+    alt?: string;
+  };
+  switch (name) {
+    case "drawDiagram":
+      return args.alt ? `Drew a diagram: ${args.alt}` : "Drew a diagram";
+    case "readFile":
+      return `Read ${args.path}`;
+    case "fetchSitemapPage":
+    case "fetchWebpage":
+      return `Read ${args.url}`;
+    case "webSearch":
+      return `Searched the web for "${args.query}"`;
+    case "getBrandReferences":
+      return "Read the brand's writing samples";
+    case "searchCompanyKnowledge":
+      return `Looked up company knowledge: "${args.query}"`;
+    case "getGeoContext":
+      return "Read how AI assistants answer the tracked prompts";
+    default:
+      return args.query
+        ? `Looked up site pages matching "${args.query}"`
+        : "Looked up the site's pages";
   }
-  if (name === "fetchSitemapPage") {
-    return `Read ${args.url}`;
-  }
-  return args.query
-    ? `Looked up site pages matching "${args.query}"`
-    : "Looked up the site's pages";
 }
 
 function formatEventDataLabel(key: string) {

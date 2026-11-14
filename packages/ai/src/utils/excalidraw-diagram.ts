@@ -16,6 +16,9 @@ import {
   EXCALIDRAW_ROUNDNESS_ADAPTIVE,
   EXCALIDRAW_ROUNDNESS_PROPORTIONAL,
   EXCALIDRAW_SCENE_SOURCE,
+  DIAGRAM_CONTENT_MAX_HEIGHT,
+  DIAGRAM_CONTENT_MAX_WIDTH,
+  DIAGRAM_CONTENT_PADDING,
 } from "@notra/ai/constants/excalidraw-diagram";
 import type {
   DiagramLinearSpec,
@@ -207,6 +210,20 @@ function buildShape(
   label.angle = shape.angle;
   shape.boundElements = [{ id: label.id, type: "text" }];
   return { shape, label };
+}
+
+/**
+ * Scale of a fit-to-content render: 1:1, shrunk only to stay inside the
+ * largest canvas. The layout check uses it to flag text that would shrink.
+ */
+export function contentFitScale(width: number, height: number) {
+  return Math.min(
+    1,
+    (DIAGRAM_CONTENT_MAX_WIDTH - DIAGRAM_CONTENT_PADDING * 2) /
+      Math.max(1, width),
+    (DIAGRAM_CONTENT_MAX_HEIGHT - DIAGRAM_CONTENT_PADDING * 2) /
+      Math.max(1, height)
+  );
 }
 
 export function shapeCenter(shape: DiagramShapeGeometry): Point {

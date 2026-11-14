@@ -118,6 +118,7 @@ import {
   excludedAuthorReason,
   selectAutopilotSourceRepositories,
 } from "@/utils/autopilot-commit-filters";
+import { resolveDiagramEmbeds } from "@/utils/autopilot-diagrams";
 import { unsourcedFigures } from "@/utils/autopilot-facts";
 import {
   heroImageLocation,
@@ -488,7 +489,7 @@ export async function writeBlogDraft(params: {
   });
   const comparison = claim.finding.kind === "comparisons";
   const sources: AutopilotFactSource[] = [];
-  const written = await writeBlogPost({
+  const { diagrams = [], ...written } = await writeBlogPost({
     decisionMemory: params.decisionMemory,
     ctx,
     log,
@@ -501,6 +502,8 @@ export async function writeBlogDraft(params: {
     sample: sample ?? null,
     brief,
     existing,
+    // Comparisons describe another company, so they check its live pages.
+    webResearch: comparison,
     writingRules: await loadWritingRules(ctx.organizationId),
     conventions: await loadRepositoryConventions(
       ctx.organizationId,
@@ -531,13 +534,25 @@ export async function writeBlogDraft(params: {
     onUsage: params.onUsage,
   });
   if (existing) {
-    assertNoActiveContent(existing.path, existing.content, post.content);
-    const problem = pageUpdateProblem(existing.content, post.content);
+    // Updates draw no diagrams, so this only drops an embed the writer made up.
+    const updated = {
+      ...post,
+      content: resolveDiagramEmbeds(post.content, [], () => {
+        throw new Error("Page updates have no diagrams");
+      }).content,
+    };
+    assertNoActiveContent(existing.path, existing.content, updated.content);
+    const problem = pageUpdateProblem(existing.content, updated.content);
     if (problem) {
       await log.error("Rejected the page update", { reason: problem });
       throw new Error(problem);
     }
-    return { kind: "update", baseSha, post, existingPath: existing.path };
+    return {
+      kind: "update",
+      baseSha,
+      post: updated,
+      existingPath: existing.path,
+    };
   }
 
   const baseSlug =
@@ -586,13 +601,56 @@ export async function writeBlogDraft(params: {
       throw new Error(`An image already exists at ${imageLocation.path}`);
     }
   }
+  // Same collision rule as the hero image: the tree listing can be truncated,
+  // so GitHub decides whether a path is free. A diagram with no free path is dropped.
+  const { repository } = ctx;
+  const isTaken = async (location: { path: string }) =>
+    !isSafeRepositoryPath(location.path) ||
+    paths.includes(location.path) ||
+    (await repositoryPathExists(octokit, repository, location.path, baseSha));
+  const diagramLocations = new Map<number, { path: string; url: string }>();
+  for (const diagram of diagrams) {
+    for (const name of [
+      `${slug}-diagram-${diagram.id}`,
+      `${slug}-${findingId}-diagram-${diagram.id}`,
+    ]) {
+      const location = heroImageLocation(paths, directory, name);
+      if (!(await isTaken(location))) {
+        diagramLocations.set(diagram.id, location);
+        break;
+      }
+    }
+  }
+  if (diagramLocations.size < diagrams.length) {
+    await log.info("Dropped diagrams whose image path is already taken", {
+      dropped: diagrams.length - diagramLocations.size,
+    });
+  }
+  const embedded = resolveDiagramEmbeds(
+    post.content,
+    diagrams.filter((diagram) => diagramLocations.has(diagram.id)),
+    (id) => {
+      const location = diagramLocations.get(id);
+      if (!location) {
+        throw new Error(`Diagram ${id} has no image path`);
+      }
+      return location;
+    }
+  );
+  const diagramFiles = embedded.files;
+  if (diagramFiles.length > 0) {
+    await log.info(`Added ${diagramFiles.length} diagrams to the post`, {
+      paths: diagramFiles.map((file) => file.path),
+    });
+  }
   return {
     kind: "new",
     baseSha,
-    post,
+    post: { ...post, content: embedded.content },
     path,
     sample: sample ?? null,
     imageLocation,
+    diagrams: diagramFiles,
   };
 }
 
@@ -648,6 +706,12 @@ export async function openBlogDraftPullRequest(params: {
   if (!(await sourcePullRequestAllowsPost(claim))) {
     return null;
   }
+  const diagrams = draft.diagrams ?? [];
+  const files = [
+    draft.path,
+    ...(hero ? [hero.file.path] : []),
+    ...diagrams.map((file) => file.path),
+  ];
   await assertAutopilotFindingLease(claim);
   const pullRequest = await openAutopilotPullRequest({
     octokit,
@@ -659,6 +723,7 @@ export async function openBlogDraftPullRequest(params: {
     files: [
       { path: draft.path, contents: hero?.content ?? draft.post.content },
       ...(hero ? [hero.file] : []),
+      ...diagrams,
     ],
     baseSha: draft.baseSha,
   });
@@ -701,10 +766,8 @@ export async function openBlogDraftPullRequest(params: {
     finding: claim.finding,
     pullRequestNumber: pullRequest.number,
     body: draft.post.pullRequestBody,
-    paths: [draft.path, ...(hero ? [hero.file.path] : [])],
-    contentFolders: [draft.path, ...(hero ? [hero.file.path] : [])].map(
-      repositoryParentDirectory
-    ),
+    paths: files,
+    contentFolders: files.map(repositoryParentDirectory),
   });
   return pullRequest;
 }

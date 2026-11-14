@@ -2,7 +2,8 @@ import { DIAGRAM_SKILL_CONTENT } from "@notra/ai/constants/excalidraw-diagram";
 import type { DiagramSpec } from "@notra/ai/types/excalidraw-diagram";
 import dedent from "dedent";
 
-const DIAGRAM_RULES = DIAGRAM_SKILL_CONTENT.slice(
+/** The diagram.json format, layout rules and palette, without the sandbox check-script step. */
+export const DIAGRAM_RULES = DIAGRAM_SKILL_CONTENT.slice(
   DIAGRAM_SKILL_CONTENT.indexOf("## Format"),
   DIAGRAM_SKILL_CONTENT.indexOf("## Check before you stop")
 ).trim();

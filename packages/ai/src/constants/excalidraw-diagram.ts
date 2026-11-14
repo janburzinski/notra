@@ -22,6 +22,12 @@ export const DIAGRAM_MIN_SHAPE_WIDTH = 120;
 export const DIAGRAM_MIN_SHAPE_HEIGHT = 60;
 export const DIAGRAM_BINDING_GAP = 8;
 export const DIAGRAM_CANVAS_PADDING = 48;
+/** Fit-to-content renders (diagrams inside a post): margin, widest canvas, PNG density. */
+export const DIAGRAM_CONTENT_PADDING = 32;
+export const DIAGRAM_CONTENT_MAX_WIDTH = 1200;
+/** Caps the canvas so a tall or runaway spec can't allocate a huge bitmap. */
+export const DIAGRAM_CONTENT_MAX_HEIGHT = 1200;
+export const DIAGRAM_CONTENT_PIXEL_RATIO = 2;
 export const DIAGRAM_LAYOUT_TOLERANCE = 6;
 export const DIAGRAM_ANGLE_TOLERANCE = 0.001;
 export const DIAGRAM_ATTACHMENT_TOLERANCE = 2;

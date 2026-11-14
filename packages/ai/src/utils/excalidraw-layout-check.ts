@@ -7,13 +7,17 @@ import {
   REPO_IMAGE_WIDTH,
 } from "@notra/ai/constants/repo-image";
 import type {
+  DiagramCanvasFit,
   ExcalidrawElement,
   ExcalidrawLinearElement,
   ExcalidrawScene,
   ExcalidrawShapeElement,
   ExcalidrawTextElement,
 } from "@notra/ai/types/excalidraw-diagram";
-import { rotatedBox } from "@notra/ai/utils/excalidraw-diagram";
+import {
+  contentFitScale,
+  rotatedBox,
+} from "@notra/ai/utils/excalidraw-diagram";
 
 type Point = [number, number];
 interface Box {
@@ -110,7 +114,10 @@ function describe(
  * Finds layout problems a reader would notice in the rendered image. Used to
  * give fast diagram edits the same feedback the sandbox check script gives.
  */
-export function findDiagramLayoutIssues(scene: ExcalidrawScene): string[] {
+export function findDiagramLayoutIssues(
+  scene: ExcalidrawScene,
+  fit: DiagramCanvasFit = "card"
+): string[] {
   const issues: string[] = [];
   const checked = scene.elements.flatMap((element): ExcalidrawElement[] => {
     if (isLinear(element)) {
@@ -268,13 +275,20 @@ export function findDiagramLayoutIssues(scene: ExcalidrawScene): string[] {
       maxY = Math.max(maxY, py);
     }
   }
-  const scale = Math.min(
-    (REPO_IMAGE_WIDTH - DIAGRAM_CANVAS_PADDING * 2) / (maxX - minX),
-    (REPO_IMAGE_HEIGHT - DIAGRAM_CANVAS_PADDING * 2) / (maxY - minY)
-  );
+  const width = maxX - minX;
+  const height = maxY - minY;
+  const scale =
+    fit === "content"
+      ? contentFitScale(width, height)
+      : Math.min(
+          (REPO_IMAGE_WIDTH - DIAGRAM_CANVAS_PADDING * 2) / width,
+          (REPO_IMAGE_HEIGHT - DIAGRAM_CANVAS_PADDING * 2) / height
+        );
   if (scale < MIN_READABLE_SCALE) {
+    const limit =
+      fit === "content" ? "the largest post image" : "the 1100x530 box";
     issues.push(
-      `The diagram is ${Math.round(maxX - minX)}x${Math.round(maxY - minY)}px, larger than the 1100x530 box, so text renders at ${Math.round(scale * 100)}% size. Tighten the layout.`
+      `The diagram is ${Math.round(width)}x${Math.round(height)}px, larger than ${limit}, so text renders at ${Math.round(scale * 100)}% size. Tighten the layout.`
     );
   }
 
