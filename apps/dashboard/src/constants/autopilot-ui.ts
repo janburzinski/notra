@@ -12,6 +12,7 @@ import {
   CheckmarkCircle02Icon,
   Clock01Icon,
   FilterIcon,
+  FilterRemoveIcon,
   GitBranchIcon,
   Github01Icon,
   GitMergeIcon,
@@ -33,6 +34,7 @@ import {
   Search01Icon,
   SlackIcon,
   Tick02Icon,
+  Upload04Icon,
   UserGroupIcon,
   ViewIcon,
 } from "@hugeicons/core-free-icons";
@@ -49,6 +51,7 @@ import { AUTOPILOT_WORKFLOW_BLOCK_TYPES } from "@/constants/autopilot-workflows"
 import { CONTENT_PULL_REQUEST_STATES } from "@/constants/content-overview";
 import type {
   AutopilotRunSectionState,
+  AutopilotSettingsSectionId,
   AutopilotTranscriptStepKind,
 } from "@/types/autopilot";
 import type {
@@ -62,6 +65,29 @@ import type { GitHubMergeMethod } from "@/types/integrations/github";
 
 /** Tabs of the Autopilot page, in order; the first is the default. */
 export const AUTOPILOT_SYNC_STALE_MS = 5 * 60 * 1000;
+
+/** Width of a control inside an open settings row; full width on phones. */
+export const AUTOPILOT_SETTINGS_CONTROL_CLASSNAME = "w-full sm:w-64";
+
+/** The settings tab's rows, in the order a run uses them. */
+export const AUTOPILOT_SETTINGS_SECTION_IDS = [
+  "publishing",
+  "brief",
+  "approvals",
+  "housekeeping",
+  "ignored",
+] as const;
+
+export const AUTOPILOT_SETTINGS_SECTION_ICONS: Record<
+  AutopilotSettingsSectionId,
+  IconSvgElement
+> = {
+  publishing: Upload04Icon,
+  brief: SlackIcon,
+  approvals: CheckmarkCircle02Icon,
+  housekeeping: Archive02Icon,
+  ignored: FilterRemoveIcon,
+};
 
 export const AUTOPILOT_PAGE_TABS = [
   "automations",

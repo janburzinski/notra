@@ -1,11 +1,7 @@
 "use client";
 
 import { Combobox as ComboboxPrimitive } from "@base-ui/react";
-import {
-  Github01Icon,
-  SquareLock02Icon,
-  UnfoldMoreIcon,
-} from "@hugeicons/core-free-icons";
+import { SquareLock02Icon, UnfoldMoreIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { AUTOPILOT_MAX_SOURCE_REPOSITORIES } from "@notra/db/constants/autopilot";
 import { buttonVariants } from "@notra/ui/components/ui/button";
@@ -21,8 +17,9 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 
-import { AutopilotSettingsRow } from "@/components/autopilot/autopilot-settings-row";
+import { AutopilotSettingsField } from "@/components/autopilot/autopilot-settings-field";
 import { Button } from "@/components/button";
+import { AUTOPILOT_SETTINGS_CONTROL_CLASSNAME } from "@/constants/autopilot-ui";
 import { dashboardOrpc } from "@/lib/orpc/query";
 import { cn } from "@/lib/utils";
 import type {
@@ -39,7 +36,7 @@ import { toErrorMessage } from "@/utils/error-message";
 const toKey = (repository: AutopilotRepositoryOption) =>
   repository.fullName.toLowerCase();
 
-/** Which repositories release posts read, as one settings row; the list opens in a dropdown. */
+/** Which repositories release posts read; the list opens in a dropdown. */
 export function AutopilotSourceRepositoriesRow({
   organizationId,
   filters,
@@ -113,10 +110,9 @@ export function AutopilotSourceRepositoriesRow({
   }
 
   return (
-    <AutopilotSettingsRow
+    <AutopilotSettingsField
       description={autopilotSourceSummary(sorted, picked)}
       htmlFor="autopilot-read-from"
-      icon={Github01Icon}
       label="Read from"
     >
       <Combobox
@@ -134,7 +130,8 @@ export function AutopilotSourceRepositoriesRow({
         <ComboboxPrimitive.Trigger
           className={cn(
             buttonVariants({ variant: "secondary", size: "sm" }),
-            "w-64 justify-between font-normal active:scale-100",
+            AUTOPILOT_SETTINGS_CONTROL_CLASSNAME,
+            "justify-between font-normal active:scale-100",
             !first && "text-foreground/70"
           )}
           id="autopilot-read-from"
@@ -212,6 +209,6 @@ export function AutopilotSourceRepositoriesRow({
           </div>
         </ComboboxContent>
       </Combobox>
-    </AutopilotSettingsRow>
+    </AutopilotSettingsField>
   );
 }

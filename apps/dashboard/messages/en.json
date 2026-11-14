@@ -10220,13 +10220,71 @@
       "site": "Site",
       "siteNone": "None",
       "siteWithoutBlog": "Selected site (no blog)",
-      "approvals": "Approvals",
-      "approvalsDescription": "Auto marks the pull request ready and publishes it the next weekday at 9:00 unless someone steps in.",
       "approvalPosts": "New posts",
       "approvalUpdates": "Page updates",
       "approvalFixes": "Readiness fixes",
       "approvalAsk": "Ask",
-      "approvalAuto": "Auto"
+      "approvalAuto": "Auto",
+      "siteDescription": "New posts go to this Notra site instead of a repository.",
+      "repository": "Website repository",
+      "repositoryDescription": "Autopilot opens draft pull requests here.",
+      "connectGitHub": "Connect GitHub",
+      "connectSlack": "Connect Slack",
+      "slackChannel": "Slack channel",
+      "slackChannelPlaceholder": "Choose a channel",
+      "slackChannelConnectDescription": "Connect Slack to get the daily brief in a channel.",
+      "briefHour": "Send the brief at",
+      "draftEmails": "Email drafts to owners",
+      "draftEmailsDescription": "Owners get these emails only while Drafts to review is on in Settings → Notifications.",
+      "staleDrafts": "Close untouched drafts",
+      "promptCleanup": "Suggest pausing dead prompts",
+      "promptCleanupDescription": "Suggestions show up on the Prompts page.",
+      "sections": {
+        "publishing": {
+          "title": "Publishing",
+          "description": "What Autopilot reads and where its posts go."
+        },
+        "brief": {
+          "title": "Daily brief",
+          "description": "How Autopilot tells you what it found."
+        },
+        "approvals": {
+          "title": "Approvals",
+          "description": "Choose what publishes without asking first."
+        },
+        "housekeeping": {
+          "title": "Housekeeping",
+          "description": "What Autopilot tidies up on its own."
+        },
+        "ignored": {
+          "title": "Ignored",
+          "description": "Autopilot never suggests posts for these. Asking @notra on a pull request still works."
+        }
+      },
+      "summary": {
+        "notSetUp": "Not set up",
+        "briefSlack": "#{channel} at {time}",
+        "briefNoChannel": "No channel yet · {time}",
+        "briefNoSlack": "Slack not connected",
+        "approvalsAsk": "Always asks",
+        "approvalsAuto": "Publishes on its own",
+        "approvalsSome": "Auto: {groups}",
+        "staleDays": "Closes drafts after {days} days",
+        "staleNever": "Keeps drafts open",
+        "ignoredAuthors": "{count, plural, one {# author} other {# authors}}",
+        "ignoredPaths": "{count, plural, one {# path filter} other {# path filters}}",
+        "ignoredTopics": "{count, plural, one {# topic} other {# topics}}",
+        "none": "Nothing yet"
+      },
+      "turnOff": {
+        "title": "Autopilot is on",
+        "description": "Turn it off to stop every automation and the daily brief. Your settings stay.",
+        "button": "Turn off Autopilot",
+        "confirmTitle": "Turn off Autopilot?",
+        "confirmDescription": "Autopilot stops running until you turn it on again. Your settings stay.",
+        "confirm": "Turn off"
+      },
+      "approvalsHint": "Auto marks the pull request ready and publishes it the next weekday at 9:00 unless someone steps in."
     }
   }
 }

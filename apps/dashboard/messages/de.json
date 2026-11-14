@@ -10220,13 +10220,71 @@
       "site": "Site",
       "siteNone": "Keine",
       "siteWithoutBlog": "Gewählte Site (kein Blog)",
-      "approvals": "Freigaben",
-      "approvalsDescription": "Bei Auto wird der Pull Request zur Prüfung freigegeben und am nächsten Werktag um 9:00 veröffentlicht, wenn niemand eingreift.",
       "approvalPosts": "Neue Beiträge",
       "approvalUpdates": "Seiten-Updates",
       "approvalFixes": "Readiness-Fixes",
       "approvalAsk": "Fragen",
-      "approvalAuto": "Auto"
+      "approvalAuto": "Auto",
+      "siteDescription": "Neue Beiträge landen auf dieser Notra-Site statt in einem Repository.",
+      "repository": "Website-Repository",
+      "repositoryDescription": "Hier öffnet Autopilot Pull Requests als Entwurf.",
+      "connectGitHub": "GitHub verbinden",
+      "connectSlack": "Slack verbinden",
+      "slackChannel": "Slack-Kanal",
+      "slackChannelPlaceholder": "Kanal wählen",
+      "slackChannelConnectDescription": "Verbinde Slack, um das tägliche Briefing in einem Kanal zu bekommen.",
+      "briefHour": "Briefing senden um",
+      "draftEmails": "Entwürfe an Owner mailen",
+      "draftEmailsDescription": "Owner bekommen diese E-Mails nur, solange „Entwürfe zur Prüfung“ unter Einstellungen → Benachrichtigungen aktiv ist.",
+      "staleDrafts": "Unbearbeitete Entwürfe schließen",
+      "promptCleanup": "Pausieren toter Prompts vorschlagen",
+      "promptCleanupDescription": "Die Vorschläge erscheinen auf der Prompts-Seite.",
+      "sections": {
+        "publishing": {
+          "title": "Veröffentlichung",
+          "description": "Was Autopilot liest und wohin seine Beiträge gehen."
+        },
+        "brief": {
+          "title": "Tägliches Briefing",
+          "description": "Wie Autopilot dir sagt, was er gefunden hat."
+        },
+        "approvals": {
+          "title": "Freigaben",
+          "description": "Wähle, was ohne Rückfrage veröffentlicht wird."
+        },
+        "housekeeping": {
+          "title": "Aufräumen",
+          "description": "Was Autopilot selbst aufräumt."
+        },
+        "ignored": {
+          "title": "Ignoriert",
+          "description": "Dafür schlägt Autopilot nie Beiträge vor. @notra in einem Pull Request zu fragen funktioniert weiterhin."
+        }
+      },
+      "summary": {
+        "notSetUp": "Nicht eingerichtet",
+        "briefSlack": "#{channel} um {time}",
+        "briefNoChannel": "Noch kein Kanal · {time}",
+        "briefNoSlack": "Slack nicht verbunden",
+        "approvalsAsk": "Fragt immer",
+        "approvalsAuto": "Veröffentlicht selbst",
+        "approvalsSome": "Auto: {groups}",
+        "staleDays": "Schließt Entwürfe nach {days} Tagen",
+        "staleNever": "Lässt Entwürfe offen",
+        "ignoredAuthors": "{count, plural, one {# Autor} other {# Autoren}}",
+        "ignoredPaths": "{count, plural, one {# Pfadfilter} other {# Pfadfilter}}",
+        "ignoredTopics": "{count, plural, one {# Thema} other {# Themen}}",
+        "none": "Noch nichts"
+      },
+      "turnOff": {
+        "title": "Autopilot ist an",
+        "description": "Schalte ihn aus, um alle Automationen und das tägliche Briefing zu stoppen. Deine Einstellungen bleiben.",
+        "button": "Autopilot ausschalten",
+        "confirmTitle": "Autopilot ausschalten?",
+        "confirmDescription": "Autopilot läuft nicht mehr, bis du ihn wieder einschaltest. Deine Einstellungen bleiben.",
+        "confirm": "Ausschalten"
+      },
+      "approvalsHint": "Bei Auto wird der Pull Request zur Prüfung freigegeben und am nächsten Werktag um 9:00 veröffentlicht, wenn niemand eingreift."
     }
   }
 }

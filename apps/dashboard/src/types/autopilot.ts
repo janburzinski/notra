@@ -6,14 +6,17 @@ import type {
   AutopilotFindingEvidence,
   AutopilotJobKind,
 } from "@notra/db/types/autopilot";
+import type { autopilotSaveInputSchema } from "@notra/schemas/dashboard/autopilot";
 import type { InferRouterOutputs } from "@orpc/server";
 import type { ReactNode } from "react";
 import type * as z from "zod";
 
 import type {
   AUTOPILOT_PAGE_TABS,
+  AUTOPILOT_SETTINGS_SECTION_IDS,
   AUTOPILOT_SETUP_STEP_IDS,
 } from "@/constants/autopilot-ui";
+import type { useAutopilotConnections } from "@/lib/hooks/use-autopilot-connections";
 import type { useAutopilotSetup } from "@/lib/hooks/use-autopilot-setup";
 import type { DashboardRouter } from "@/lib/orpc/router";
 import type { autopilotPullRequestEventSchema } from "@/schemas/autopilot-github";
@@ -536,12 +539,47 @@ export interface AutopilotFindingTablesProps extends Omit<
   idPrefix: string;
 }
 
-export interface AutopilotSettingsRowProps {
-  icon: IconSvgElement;
+export type AutopilotSettingsSectionId =
+  (typeof AUTOPILOT_SETTINGS_SECTION_IDS)[number];
+
+export type AutopilotSettingsPatch = Partial<
+  z.input<typeof autopilotSaveInputSchema>
+>;
+
+/** Saves one change on top of the latest saved settings. */
+type AutopilotSettingsSave = (
+  patch:
+    | AutopilotSettingsPatch
+    | ((current: AutopilotSettingsView) => AutopilotSettingsPatch)
+) => void;
+
+export interface AutopilotSettingsFieldProps {
   label: string;
+  /** Leave out when the control names itself, e.g. a labelled group. */
+  htmlFor?: string;
   description?: string;
-  htmlFor: string;
   children: ReactNode;
+}
+
+export interface AutopilotSettingsSectionProps {
+  organizationId: string;
+  overview: AutopilotOverview;
+  connections: ReturnType<typeof useAutopilotConnections>;
+  save: AutopilotSettingsSave;
+}
+
+export interface AutopilotIgnoredSettingsProps {
+  organizationId: string;
+  overview: AutopilotOverview;
+  connections: ReturnType<typeof useAutopilotConnections>;
+}
+
+export interface AutopilotHousekeepingSettingsProps extends AutopilotSettingsSectionProps {
+  onPromptCleanupChange: (enabled: boolean) => void;
+}
+
+export interface AutopilotTurnOffRowProps {
+  onTurnOff: () => Promise<unknown>;
 }
 
 export interface AutopilotSettingsPanelProps {

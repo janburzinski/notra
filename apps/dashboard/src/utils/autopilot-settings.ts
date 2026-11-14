@@ -2,7 +2,11 @@ import type { autopilotSaveInputSchema } from "@notra/schemas/dashboard/autopilo
 import type * as z from "zod";
 
 import { AUTOPILOT_STALE_PULL_REQUEST_DAY_OPTIONS } from "@/constants/autopilot";
-import type { AutopilotSettingsView } from "@/types/autopilot";
+import { AUTOPILOT_NO_SITE } from "@/constants/autopilot-publish";
+import type {
+  AutopilotSettingsSectionProps,
+  AutopilotSettingsView,
+} from "@/types/autopilot";
 
 type AutopilotSaveInput = z.input<typeof autopilotSaveInputSchema>;
 type StaleDays = (typeof AUTOPILOT_STALE_PULL_REQUEST_DAY_OPTIONS)[number];
@@ -45,4 +49,20 @@ export function toAutopilotSaveInput(
     draftEmails: settings.draftEmails,
     siteId: settings.siteId,
   };
+}
+
+/** Sites the posts can go to, plus a saved site Autopilot no longer lists. */
+export function autopilotSiteOptions(
+  overview: AutopilotSettingsSectionProps["overview"],
+  labels: { none: string; withoutBlog: string }
+) {
+  const { settings } = overview;
+  return [
+    { value: AUTOPILOT_NO_SITE, label: labels.none },
+    ...overview.sites.map((site) => ({ value: site.id, label: site.name })),
+    ...(settings.siteId &&
+    !overview.sites.some((site) => site.id === settings.siteId)
+      ? [{ value: settings.siteId, label: labels.withoutBlog }]
+      : []),
+  ];
 }
