@@ -1,0 +1,97 @@
+---
+title: "Notra Sites now has a public API"
+description: "Notra Sites has a public API under /v1/sites. Agents and scripts can read Sites and builds, start and retry builds, preview a post and publish it to your blog through a pull request."
+date: "2026-11-08T16:00:00.000Z"
+updated: "2026-11-08T16:00:00.000Z"
+author: "notra"
+image: "/images/blog/notra-sites-public-api.png"
+imageAlt: "Notra Sites now has a public API"
+---
+
+Notra Sites now has a public API. The endpoints under `/v1/sites` let an agent or a script read your Sites and their builds, start and retry builds, preview a post on a Site and publish a post to it. Access is controlled by two scopes, `sites.read` and `sites.write`, which you pick when you create an API key or grant OAuth access. Publishing a post always goes through a pull request, so no post reaches your live blog without a review step in GitHub.
+
+## The gap this closes
+
+Last week we launched Notra Sites, which builds and hosts your blog and changelog from MDX files in your GitHub repository. Notra could already write posts for you, and agents could already ask for one through `generate_post`. What they could not do was take that draft and put it on your blog. A person still had to open the dashboard, find the post and click Publish.
+
+The Sites API fills that gap. An agent can now generate a post, preview it on the Site it belongs to, check that the build passed and open the pull request that publishes it. The whole path from a shipped feature to a live post can run without anyone opening the dashboard, and a person still approves the final merge.
+
+## What the API can do
+
+The endpoints split into reading and writing, and each half has its own scope.
+
+With `sites.read`, a client can:
+
+- list your Sites and read their details, including custom domains and their DNS records
+- read builds with their status, commit and compiler diagnostics, plus the newest part of a build's log
+- check whether a post preview is live
+
+With `sites.write`, a client can also:
+
+- start a new build of the production branch
+- retry a build that failed
+- preview a post on a Site before it goes live
+- publish a post to a Site
+
+The same scopes also cover a Site's authors, its author page and its blog and changelog paths. Those are staged as unpublished Design changes to `blog.json`, the same draft you see in the dashboard's Design tab, and go live when you publish them.
+
+This is enough for most automation. A release script can publish the changelog entry Notra drafted for that release. An agent can retry a build after a flaky failure. A scheduled job can check whether last night's build succeeded and post the result to your team channel.
+
+## Publishing a post always opens a pull request
+
+This is the part of the design that matters most if you plan to let an agent publish for you.
+
+Some Sites are connected to repositories set up for direct publishing, where the dashboard can commit a post straight to the production branch. The API does not do that for posts. When you publish a post through the API, Notra opens a pull request with the post, its images and its frontmatter. If the post already has a pull request, Notra updates that one instead. This happens even on repositories that allow direct publishing.
+
+The chat agent already works this way and publishes through a draft pull request. The API now follows the same route. Every Notra Site builds a preview for each pull request and adds a check on GitHub, so you can read the post as it will appear on the live site before you merge. The agent writes the draft and opens the pull request, and a person decides when it goes live.
+
+Design changes are the exception. Publishing staged authors or paths commits them to the production branch, the same way the dashboard does.
+
+## What stays in the dashboard
+
+The API covers the work an agent does every day. It does not cover actions that change how a Site runs or that are hard to undo. These stay in the dashboard, for workspace owners and admins:
+
+- Site settings
+- custom domains
+- rolling back or promoting a deploy
+- suspending a Site
+- deleting a Site
+
+Retrying a production build that is older than the live one would work as a rollback, so the API refuses it and points you to the dashboard.
+
+A leaked API key or an agent that misreads an instruction can open a pull request you then close, or stage Design changes you can review before they go live. It cannot move your domain, roll back a deploy or delete the Site.
+
+## How to set it up
+
+The setup depends on whether you connect with an API key or with OAuth.
+
+**API keys.** Create a key in your workspace settings. The key picker lists `sites.read` and `sites.write` next to the other scopes, and keys with `api.write` get both automatically. Pick `sites.read` for dashboards, monitoring scripts or anything that only needs to check on builds. Add `sites.write` only for clients that should start builds or publish posts.
+
+**OAuth.** If you connect Notra to an assistant through OAuth, the access level screen includes Sites. Grant read access if you want the assistant to answer questions about your Site and its builds. Grant write access if you want it to publish.
+
+**MCP.** If your agent talks to Notra through the MCP server, the same actions are there as tools, such as `preview_post_on_site`, `publish_post_to_site` and `get_site_deployment`.
+
+Once the key or connection has the right scope, requests to `/v1/sites` work with the same bearer authentication as the rest of the Notra API. If you already call the [Chats API](https://www.usenotra.com/blog/ai-chat-is-open-to-everyone-with-images-models-and-a-public-api), you add a scope and change the path. Nothing else changes.
+
+## A typical flow
+
+Here is how an agent might take a merged feature to a live post with these endpoints:
+
+1. Call `generate_post` to draft a post about the change, in your brand voice.
+2. Read your Sites to find the one that hosts your blog.
+3. Preview the post on that Site and check how it renders.
+4. Publish it, which opens a pull request against your repository.
+5. Read the build for that pull request and wait for it to pass.
+6. If the build fails for a reason unrelated to the post, retry it.
+
+At the end, there is a pull request in your repository with the post, the frontmatter and a working preview link. Someone on the team reads it and merges. The post is live on the next production build.
+
+## Why we scoped it this way
+
+We built the API for agents, and the scopes and limits follow from that. An agent that writes posts should be able to finish the job and get the post onto your blog. It should not be able to change your infrastructure. Keeping reads and writes in separate scopes lets you give a monitoring tool only what it needs. Routing every post through a pull request means the review step on your blog matches the review step on your code.
+
+This also builds on earlier changes to the Notra API. In March we added [write-scoped API keys and async content generation](https://www.usenotra.com/changelog/notra/async-api-write-scoped-keys-framer-integration), so a client could already generate content in the background with a key limited to what it needed. The Sites API applies the same scoped-key model to the last step, publishing.
+
+## Try it
+
+If you host a blog or changelog on Notra Sites, create an API key with `sites.read` and list your Sites to confirm the connection works. When you are ready to let a script or an agent publish, add `sites.write` and send it a post to publish. The response comes back with the pull request number and link, so you can open it in GitHub right away. For more on how Notra turns shipped work into posts, read the rest of the [Notra blog](https://www.usenotra.com/blog).
