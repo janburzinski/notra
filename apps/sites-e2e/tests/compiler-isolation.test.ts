@@ -42,7 +42,14 @@ test("parallel fixture builds keep their Vite caches inside their own work direc
           expect(
             (
               await stat(
-                join(directory, "work", deployment, "cache", "vite", "blog")
+                join(
+                  directory,
+                  "work",
+                  deployment,
+                  "cache",
+                  "blog",
+                  "vite-sync"
+                )
               )
             ).isDirectory()
           ).toBe(true);

@@ -36,7 +36,7 @@
     "@tailwindcss/vite": "4.3.3",
     "acorn": "8.18.0",
     "acorn-jsx": "5.3.2",
-    "astro": "7.3.5",
+    "astro": "7.4.7",
     "estree-util-visit": "2.0.0",
     "hast-util-from-html": "2.0.3",
     "hast-util-to-mdast": "10.1.2",
