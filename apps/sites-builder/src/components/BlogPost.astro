@@ -150,7 +150,7 @@ const metaItems = [
           )
         }
         <SiteSlot name="before-post" data={{ post }} class="mb-8" />
-        {image && <img src={image} alt={entry.data.imageAlt ?? ""} class="image-outline mb-10 aspect-[1200/630] w-full rounded-2xl object-cover" loading="eager" />}
+        {image && <img data-notra-image src={image} alt={entry.data.imageAlt ?? ""} class="image-outline mb-10 aspect-[1200/630] w-full rounded-2xl object-cover" loading="eager" fetchpriority="high" />}
         <div class="mdx-content prose prose-notra max-w-none" data-md-root>
           <Content />
         </div>

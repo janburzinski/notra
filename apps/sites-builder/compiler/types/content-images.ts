@@ -10,6 +10,10 @@ export interface ContentImageTag {
   hasSizes: boolean;
   /** Both width and height attributes are set, so the layout doesn't depend on the file. */
   hasDimensions: boolean;
+  /** Width or height is set, so the author decided the size. */
+  hasAnyDimension: boolean;
+  /** A body image after the first, which can wait until it's scrolled near. */
+  deferrable: boolean;
 }
 
 export interface ContentImageCandidate {
@@ -19,6 +23,18 @@ export interface ContentImageCandidate {
 
 /** The srcset for one source image, or null when it is left as it is. */
 export type ContentImageVariants = readonly ContentImageCandidate[] | null;
+
+export interface ContentImageSize {
+  width: number;
+  height: number;
+}
+
+/** What the build learned about one source image. */
+export interface ContentImageInfo {
+  variants: ContentImageVariants;
+  /** Displayed size (after EXIF rotation), so the page can reserve its space. */
+  size: ContentImageSize | null;
+}
 
 export interface OptimizeContentImagesParams {
   outDir: string;

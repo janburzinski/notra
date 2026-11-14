@@ -468,6 +468,35 @@ describe("production serving", () => {
     expect(await outside.text()).toBe("dep_live:/blog/404.html");
   });
 
+  test("other addresses of a page redirect to its one canonical address", async () => {
+    const { request } = setup();
+    const cases: [string, string][] = [
+      ["/blog/post/index.html", "/blog/post"],
+      ["/blog/index.html?ref=x", "/blog?ref=x"],
+      ["/blog//post", "/blog/post"],
+      ["//blog/post/", "/blog/post"],
+      ["/blog///", "/blog"],
+      ["/blog/", "/blog"],
+    ];
+    for (const [path, location] of cases) {
+      const response = await request(`https://acme.notra.site${path}`);
+      expect([path, response.status, response.headers.get("Location")]).toEqual(
+        [path, 308, location]
+      );
+      const target = await request(`https://acme.notra.site${location}`);
+      expect([location, target.status]).toEqual([location, 200]);
+    }
+    // Files that aren't pages, and paths that are no page, are left alone.
+    for (const path of [
+      "/blog//_notra/assets/app.css",
+      "/blog/nope/index.html",
+      "/blog/post/index.md",
+    ]) {
+      const response = await request(`https://acme.notra.site${path}`);
+      expect([path, response.headers.get("Location")]).toEqual([path, null]);
+    }
+  });
+
   test("paths outside every mount fall back to the first area's 404", async () => {
     const { put, request } = setup({}, true);
     const outside = await request("https://acme.notra.site/outside", {
@@ -624,6 +653,35 @@ describe("production serving", () => {
     expect(page.status).toBe(200);
     expect(page.headers.get("Accept-Ranges")).toBeNull();
     expect(await page.text()).toBe("dep_live:/blog/index.html");
+  });
+
+  test("HEAD answers from the manifest without reading the file", async () => {
+    const { deps } = setup();
+    const get = deps.bucket.get;
+    const fileReads: string[] = [];
+    deps.bucket.get = (key, options) => {
+      if (key.includes("/files/")) {
+        fileReads.push(key);
+      }
+      return get(key, options);
+    };
+    const head = (path: string) =>
+      handleSiteRequest(
+        new Request(`https://acme.notra.site${path}`, { method: "HEAD" }),
+        deps
+      );
+    const asset = await head("/blog/_notra/assets/app.css");
+    expect(asset.status).toBe(200);
+    expect(asset.headers.get("Content-Length")).toBe("1");
+    expect(asset.headers.get("Content-Type")).toBe("text/css");
+    expect(await asset.text()).toBe("");
+    const page = await head("/blog/post");
+    expect(page.status).toBe(200);
+    expect(page.headers.get("ETag")).not.toBeNull();
+    expect(await page.text()).toBe("");
+    const missing = await head("/blog/nope");
+    expect(missing.status).toBe(404);
+    expect(fileReads).toEqual([]);
   });
 
   test("agents get every page as Markdown, browsers keep HTML", async () => {
@@ -1406,7 +1464,7 @@ describe("production serving", () => {
 });
 
 describe("loaders", () => {
-  test("lookup caches retain only the bounded newest positive and negative entries", async () => {
+  test("a flood of unknown keys cannot evict live sites from the lookup caches", async () => {
     for (const kind of ["host", "state"]) {
       resetCachesForTests();
       const { deps } = setup();
@@ -1433,11 +1491,45 @@ describe("loaders", () => {
         expect(await load(key)).toBeNull();
       }
       expect(reads).toBe(LOOKUP_CACHE_LIMIT + 2);
+      // The live site is still cached; only the oldest miss was dropped.
       expect(await load(positive)).not.toBeNull();
-      expect(reads).toBe(LOOKUP_CACHE_LIMIT + 3);
+      expect(reads).toBe(LOOKUP_CACHE_LIMIT + 2);
       expect(await load("first-missing.notra.site")).toBeNull();
-      expect(reads).toBe(LOOKUP_CACHE_LIMIT + 4);
+      expect(reads).toBe(LOOKUP_CACHE_LIMIT + 3);
     }
+  });
+
+  test("live sites leave the lookup cache least recently used first, refreshes included", async () => {
+    const { deps, put } = setup();
+    let now = new Date("2026-10-03T12:00:00Z").getTime();
+    deps.now = () => new Date(now);
+    const hosts = Array.from(
+      { length: LOOKUP_CACHE_LIMIT + 1 },
+      (_, index) => `site-${index}.notra.site`
+    );
+    for (const host of hosts) {
+      put(`hosts/${host}.json`, { version: 1, siteId: SITE, kind: "alias" });
+    }
+    const get = deps.bucket.get;
+    const reads: string[] = [];
+    deps.bucket.get = (key, options) => {
+      reads.push(key);
+      return get(key, options);
+    };
+    const [first, second] = hosts;
+    for (const host of hosts.slice(0, LOOKUP_CACHE_LIMIT)) {
+      await loadHost(deps, host);
+    }
+    // The first site expires and is read again: that makes it the newest.
+    now += 31_000;
+    await loadHost(deps, first ?? "");
+    // A new site evicts the least recently used one, not the refreshed one.
+    await loadHost(deps, hosts.at(-1) ?? "");
+    reads.length = 0;
+    await loadHost(deps, first ?? "");
+    expect(reads).toEqual([]);
+    await loadHost(deps, second ?? "");
+    expect(reads).toEqual([`hosts/${second}.json`]);
   });
 
   test("a read stuck in another request cannot hang later requests", async () => {

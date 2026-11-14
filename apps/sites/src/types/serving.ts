@@ -32,6 +32,12 @@ export interface TimedCacheEntry<T> {
   read: number;
 }
 
+/** Records that exist, and keys known to have none, each bounded on its own. */
+export interface LookupCache<T> {
+  found: Map<string, TimedCacheEntry<T>>;
+  missing: Map<string, TimedCacheEntry<null>>;
+}
+
 export interface ServeFileParams {
   deps: SitesDeps;
   request: Request;

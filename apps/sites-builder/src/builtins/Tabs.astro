@@ -13,7 +13,10 @@
     const list = root.querySelector<HTMLElement>("[data-tablist]");
     const indicator = root.querySelector<HTMLElement>("[data-indicator]");
     const panels = [...root.querySelectorAll<HTMLElement>("[data-notra-tab]")].filter((panel) => panel.closest("[data-notra-tabs]") === root);
-    if (!(list && indicator) || panels.length === 0) return;
+    if (!(list && indicator) || panels.length === 0) {
+      root.dataset.ready = "";
+      return;
+    }
     const buttons = panels.map((panel, panelIndex) => {
       const button = document.createElement("button");
       const id = `notra-tab-${index}-${panelIndex}`;
@@ -22,6 +25,9 @@
       button.id = id;
       button.textContent = panel.dataset.title ?? `Tab ${panelIndex + 1}`;
       button.className = "h-10 text-sm text-muted-foreground transition-colors hover:text-foreground aria-selected:text-foreground";
+      panel.id = `${id}-panel`;
+      panel.tabIndex = 0;
+      button.setAttribute("aria-controls", panel.id);
       panel.setAttribute("aria-labelledby", id);
       panel.querySelector(":scope > [data-notra-tab-title]")?.remove();
       list.append(button);
@@ -42,11 +48,15 @@
     buttons.forEach((button, buttonIndex) => {
       button.addEventListener("click", () => select(buttonIndex));
       button.addEventListener("keydown", (event) => {
-        const step = event.key === "ArrowRight" ? 1 : event.key === "ArrowLeft" ? -1 : 0;
-        if (step) select((buttonIndex + step + buttons.length) % buttons.length, true);
+        const last = buttons.length - 1;
+        const target = { ArrowRight: buttonIndex === last ? 0 : buttonIndex + 1, ArrowLeft: buttonIndex === 0 ? last : buttonIndex - 1, Home: 0, End: last }[event.key];
+        if (target === undefined) return;
+        event.preventDefault();
+        select(target, true);
       });
     });
     select(0);
+    root.dataset.ready = "";
   }
   document.querySelectorAll<HTMLElement>("[data-notra-tabs]").forEach(setupTabs);
 </script>

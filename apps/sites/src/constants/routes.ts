@@ -1,4 +1,5 @@
 import { analyticsEndpointsRoute } from "../routes/analytics-endpoints";
+import { canonicalPageRedirectRoute } from "../routes/canonical-page-redirect";
 import { faviconRoute } from "../routes/favicon";
 import { hostingApexRoute } from "../routes/hosting-apex";
 import { htmlNotFoundRoute } from "../routes/html-not-found";
@@ -17,7 +18,6 @@ import { robotsTxtRoute } from "../routes/robots-txt";
 import { rootRedirectRoute } from "../routes/root-redirect";
 import { sitemapIndexRoute } from "../routes/sitemap-index";
 import { staticFileRoute } from "../routes/static-file";
-import { trailingSlashRedirectRoute } from "../routes/trailing-slash-redirect";
 import { wellKnownLlmsTxtRoute } from "../routes/well-known-llms-txt";
 import type {
   DeploymentRouteContext,
@@ -51,7 +51,7 @@ export const MANIFEST_ROUTES: readonly SiteRoute<ManifestRouteContext>[] = [
   sitemapIndexRoute,
   wellKnownLlmsTxtRoute,
   indexNowKeyRoute,
-  trailingSlashRedirectRoute,
+  canonicalPageRedirectRoute,
   markdownFileRoute,
   markdownTwinRoute,
   staticFileRoute,

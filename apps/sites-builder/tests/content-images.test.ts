@@ -7,7 +7,7 @@ import sharp from "sharp";
 
 import { optimizeContentImages } from "../compiler/content-images";
 import {
-  addContentImageSrcsets,
+  addContentImageAttributes,
   findContentImages,
 } from "../compiler/utils/content-image-tags";
 
@@ -100,7 +100,7 @@ describe("findContentImages", () => {
   });
 });
 
-describe("addContentImageSrcsets", () => {
+describe("addContentImageAttributes", () => {
   const variants = [
     { url: "/blog/_notra/assets/images/a-1-640.webp", width: 640 },
     { url: "/blog/images/a.png", width: 1600 },
@@ -112,10 +112,10 @@ describe("addContentImageSrcsets", () => {
     const html = post(
       '<img src="/blog/images/a.png" alt="A chart"/><img loading="lazy" src="/blog/images/a.png"><img loading="lazy" width="1600" height="900" src="/blog/images/a.png">'
     );
-    const result = addContentImageSrcsets(
+    const result = addContentImageAttributes(
       html,
       findContentImages(html),
-      () => variants
+      () => ({ variants, size: null })
     );
     expect(result).toContain(
       `<img src="/blog/images/a.png" alt="A chart" ${srcset} sizes="min(1600px, 100vw)"/>`
@@ -130,14 +130,64 @@ describe("addContentImageSrcsets", () => {
     );
   });
 
+  test("reserves space and defers body images after the first", () => {
+    const size = { width: 1600, height: 900 };
+    const html = post(
+      [
+        '<img src="https://cdn.example.com/hero.png">',
+        '<img src="/blog/images/a.png">',
+        '<img src="/blog/images/a.png" loading="eager">',
+        '<img src="/blog/images/a.png" width="400">',
+      ].join(""),
+      '<img src="/blog/images/a.png">'
+    );
+    const result = addContentImageAttributes(
+      html,
+      findContentImages(html),
+      () => ({ variants, size })
+    );
+    // The external hero is the first body image, so the next one is deferred,
+    // and with its size known the browser can pick by rendered width.
+    expect(result).toContain(
+      `<img src="/blog/images/a.png" width="1600" height="900" loading="lazy" decoding="async" ${srcset} sizes="auto, min(1600px, 100vw)">`
+    );
+    // Loading and a size the author chose are kept as written.
+    expect(result).toContain(
+      `<img src="/blog/images/a.png" loading="eager" width="1600" height="900" ${srcset} sizes="min(1600px, 100vw)">`
+    );
+    expect(result).toContain(
+      `<img src="/blog/images/a.png" width="400" loading="lazy" decoding="async" ${srcset} sizes="min(1600px, 100vw)">`
+    );
+    // Theme images outside the body are not touched unless marked.
+    expect(result).toEndWith(
+      '</div></article><img src="/blog/images/a.png"></body></html>'
+    );
+  });
+
+  test("marked theme images get a size and srcset but keep their loading", () => {
+    const html = `<html><body><img data-notra-image src="/blog/images/cover.png" loading="eager" fetchpriority="high">${post('<img src="/blog/images/a.png">')}</body></html>`;
+    const images = findContentImages(html);
+    expect(images.map((image) => [image.src, image.deferrable])).toEqual([
+      ["/blog/images/cover.png", false],
+      ["/blog/images/a.png", false],
+    ]);
+    const result = addContentImageAttributes(html, images, () => ({
+      variants,
+      size: { width: 1600, height: 900 },
+    }));
+    expect(result).toContain(
+      `<img data-notra-image src="/blog/images/cover.png" loading="eager" fetchpriority="high" width="1600" height="900" ${srcset} sizes="min(1600px, 100vw)">`
+    );
+  });
+
   test("keeps sizes the author set and leaves images without copies alone", () => {
     const html = post(
       '<img src="/blog/images/a.png" sizes="240px"><img src="/blog/images/b.png">'
     );
-    const result = addContentImageSrcsets(
+    const result = addContentImageAttributes(
       html,
       findContentImages(html),
-      (src) => (src.endsWith("a.png") ? variants : null)
+      (src) => (src.endsWith("a.png") ? { variants, size: null } : null)
     );
     expect(result).toContain(`sizes="240px" ${srcset}>`);
     expect(result).not.toContain("min(1600px");
@@ -206,7 +256,7 @@ describe("optimizeContentImages", () => {
     expect([copy.width, copy.height]).toEqual([640, 1138]);
   });
 
-  test("leaves small, vector, animated, missing and outside images alone", async () => {
+  test("small, animated and GIF images only get their size; vector, missing and outside ones are left alone", async () => {
     await put("blog/images/small.png", await photo(600, 400).png().toBuffer());
     await put(
       "blog/images/logo.svg",
@@ -244,9 +294,22 @@ describe("optimizeContentImages", () => {
     ].map((name) => `<img src="/blog/images/${name}">`);
     const html = post(`${images.join("")}<img src="/blog/../secret.jpg">`);
     const result = await optimize({ "/blog/index.html": html });
-    expect(result.pages.size).toBe(0);
     expect(result.diagnostics).toEqual([]);
     expect(await readdir(outDir)).not.toContain("_notra");
+    const rewritten = result.pages.get("/blog/index.html") ?? "";
+    expect(rewritten).not.toContain("srcset=");
+    const lazy = ' loading="lazy" decoding="async"';
+    for (const tag of [
+      '<img src="/blog/images/small.png" width="600" height="400">',
+      '<img src="/blog/images/logo.svg">',
+      `<img src="/blog/images/clip.gif" width="1200" height="600"${lazy}>`,
+      `<img src="/blog/images/animated.webp" width="1200" height="600"${lazy}>`,
+      `<img src="/blog/images/apng.png" width="1200" height="600"${lazy}>`,
+      '<img src="/blog/images/missing.jpg">',
+      '<img src="/blog/../secret.jpg">',
+    ]) {
+      expect(rewritten).toContain(tag);
+    }
   });
 
   test("keeps originals and warns when images or the library fail", async () => {
@@ -300,7 +363,10 @@ describe("optimizeContentImages", () => {
         now: () => ticks.shift() ?? 5,
       }
     );
-    expect(result.pages.size).toBe(0);
+    // No copies, but the size was read in time and still reserves the space.
+    expect(result.pages.get("/blog/index.html")).toContain(
+      '<img src="/blog/images/a.jpg" width="1200" height="600">'
+    );
     expect(result.diagnostics.map((diagnostic) => diagnostic.code)).toEqual([
       "content_images_budget",
     ]);

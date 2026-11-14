@@ -4,23 +4,46 @@ import type {
   SiteManifestFile,
 } from "@notra/sites-core/types/deployment";
 import { joinMountPath } from "@notra/sites-core/utils/mounts";
-import { resolveFile } from "@notra/sites-core/utils/request-paths";
+import {
+  normalizeRequestPath,
+  resolveFile,
+} from "@notra/sites-core/utils/request-paths";
 
-import { HTML_TYPES, MARKDOWN_TYPES } from "../constants/routing";
+import {
+  HTML_TYPES,
+  INDEX_PAGE,
+  MARKDOWN_TYPES,
+  REPEATED_SLASHES,
+} from "../constants/routing";
 
-export function trailingSlashPagePath(
+/**
+ * The one address of a page, when the request used another that serves the
+ * same file: `//`, a trailing slash or `/index.html`. Each would otherwise be a
+ * duplicate of the page for search engines. Works on the raw path, so the
+ * redirect never changes how the rest of the address is encoded.
+ */
+export function canonicalPagePath(
   files: Map<string, SiteManifestFile>,
-  path: string
+  pathname: string
 ): string | null {
-  if (path === "/" || !path.endsWith("/")) {
+  const withoutSlash = (path: string) =>
+    path !== "/" && path.endsWith("/") ? path.slice(0, -1) : path;
+  let target = withoutSlash(pathname.replace(REPEATED_SLASHES, "/"));
+  if (target.endsWith(`/${INDEX_PAGE}`)) {
+    target = withoutSlash(target.slice(0, -INDEX_PAGE.length));
+  }
+  if (target === pathname) {
     return null;
   }
-  const bare = path.slice(0, -1);
-  const file = resolveFile(files, path);
-  if (!file?.path.endsWith(".html") || resolveFile(files, bare) !== file) {
+  const from = normalizeRequestPath(pathname);
+  const to = normalizeRequestPath(target);
+  if (from === null || to === null) {
     return null;
   }
-  return bare.split("/").map(encodeURIComponent).join("/");
+  const file = resolveFile(files, from);
+  return file?.path.endsWith(".html") && resolveFile(files, to) === file
+    ? target
+    : null;
 }
 
 export function markdownTwin(

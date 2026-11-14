@@ -27,8 +27,8 @@ import {
 import type {
   JsonRead,
   LoadedManifest,
+  LookupCache,
   ServerTimingName,
-  TimedCacheEntry,
 } from "./types/serving";
 import type { SitesDeps } from "./types/worker";
 import { withinDeadline } from "./utils/deadline";
@@ -38,17 +38,25 @@ import { StateUnavailableError } from "./utils/errors";
 // runtime ties a promise to the request that created it, so a read started by a
 // request that was cancelled (a visitor closing the tab) never settles. Shared,
 // it would hang every later request for that site in the isolate.
-const hostCache = new Map<string, TimedCacheEntry<SiteHostRecord | null>>();
-const stateCache = new Map<string, TimedCacheEntry<SiteServingState | null>>();
+// Misses are kept apart, so requests for many unknown hosts (or deleted sites)
+// cannot push live sites out and send every request for them back to R2.
+const hostCache = newLookupCache<SiteHostRecord>();
+const stateCache = newLookupCache<SiteServingState>();
 const manifestCache = new Map<string, LoadedManifest>();
 // Bumped by resets, so a read that finishes afterwards cannot repopulate a cache.
 let generation = 0;
 // Orders reads, so a slow read that started earlier cannot replace a newer value.
 let reads = 0;
 
+function newLookupCache<T>(): LookupCache<T> {
+  return { found: new Map(), missing: new Map() };
+}
+
 export function resetCachesForTests() {
-  hostCache.clear();
-  stateCache.clear();
+  for (const cache of [hostCache, stateCache]) {
+    cache.found.clear();
+    cache.missing.clear();
+  }
   manifestCache.clear();
   generation += 1;
 }
@@ -192,15 +200,21 @@ function remember<K, V>(cache: Map<K, V>, limit: number, key: K, value: V) {
 
 async function loadWithTtl<T>(
   deps: SitesDeps,
-  cache: Map<string, TimedCacheEntry<T>>,
+  cache: LookupCache<T>,
   key: string,
   ttlMs: number,
   timing: ServerTimingName,
-  load: () => Promise<{ value: T; readAt?: number }>
-): Promise<T> {
-  const cached = cache.get(key);
+  load: () => Promise<{ value: T | null; readAt?: number }>
+): Promise<T | null> {
+  const found = cache.found.get(key);
+  const cached = found ?? cache.missing.get(key);
   if (cached && deps.now().getTime() - cached.at < ttlMs) {
     deps.timing?.record(timing, 0, "cache");
+    if (found) {
+      // Most recently used goes last, so busy sites are the last to be evicted.
+      cache.found.delete(key);
+      cache.found.set(key, found);
+    }
     return cached.value;
   }
   const loadedIn = generation;
@@ -209,14 +223,18 @@ async function loadWithTtl<T>(
   // Freshness counts from when the read started, so a slow read cannot extend it.
   const startedAt = deps.now().getTime();
   const { value, readAt } = await load();
-  const current = cache.get(key);
+  const current = cache.found.get(key) ?? cache.missing.get(key);
   if (loadedIn === generation && (!current || current.read < read)) {
     // An edge copy keeps its original read time, so it cannot extend ttlMs.
-    remember(cache, LOOKUP_CACHE_LIMIT, key, {
-      value,
-      at: Math.min(readAt ?? startedAt, startedAt),
-      read,
-    });
+    const at = Math.min(readAt ?? startedAt, startedAt);
+    // Dropped first, so a refreshed entry moves to the end (most recently used).
+    cache.found.delete(key);
+    cache.missing.delete(key);
+    if (value === null) {
+      remember(cache.missing, LOOKUP_CACHE_LIMIT, key, { value, at, read });
+    } else {
+      remember(cache.found, LOOKUP_CACHE_LIMIT, key, { value, at, read });
+    }
   }
   return value;
 }

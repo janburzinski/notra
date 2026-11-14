@@ -173,15 +173,18 @@ export async function serveFile(params: ServeFileParams): Promise<Response> {
       return serveRange(params, headers, range);
     }
   }
+  if (request.method === "HEAD") {
+    // The manifest knows the size, so there is nothing to read. Pages that get
+    // notra.js are longer than the stored file, so they send no length.
+    if (!analytics) {
+      headers.set("Content-Length", String(file.size));
+    }
+    return new Response(null, { status, headers });
+  }
   const body = await readFileBody(deps, siteId, deploymentId, file);
   if (!body) {
     return html(serviceErrorPage(), 503);
   }
-  const response = new Response(request.method === "HEAD" ? null : body, {
-    status,
-    headers,
-  });
-  return analytics && request.method !== "HEAD"
-    ? injectAnalyticsScript(response, analytics)
-    : response;
+  const response = new Response(body, { status, headers });
+  return analytics ? injectAnalyticsScript(response, analytics) : response;
 }

@@ -1,12 +1,26 @@
 /** Elements with this class hold post and changelog bodies; only their images are optimized. */
 export const CONTENT_ROOT_CLASS = "mdx-content";
 
+/** Marks theme images outside the body (covers) that get the same treatment. */
+export const CONTENT_IMAGE_ATTRIBUTE = "data-notra-image";
+
 /** Raster formats that get resized copies. GIFs and SVGs are served as they are. */
 export const CONTENT_IMAGE_EXTENSIONS = new Set([
   ".jpg",
   ".jpeg",
   ".png",
   ".webp",
+]);
+
+/**
+ * Formats whose pixel size the build writes into the tag. SVGs are left out:
+ * one without its own width fills the column, and a width from its viewBox
+ * could shrink it.
+ */
+export const SIZED_IMAGE_EXTENSIONS = new Set([
+  ...CONTENT_IMAGE_EXTENSIONS,
+  ".gif",
+  ".avif",
 ]);
 
 /** Widths of the WebP copies; only those narrower than the original are made. */

@@ -992,6 +992,45 @@ body {
   @apply code-frame;
 }
 
+/*
+ * Until the tab script runs, lay tabs out the way it will: room for the tab row
+ * and only the first panel, so nothing below moves when it does. An animation
+ * holds that layout, so if the script never runs (blocked, failed to load)
+ * every panel shows again under its title once it ends. It uses properties
+ * every engine can animate (Firefox can't animate `display`). Without
+ * scripting, every panel shows.
+ */
+@keyframes notra-tabs-pending {
+  from,
+  to {
+    max-height: 0;
+    margin-block: 0;
+    overflow: hidden;
+    visibility: hidden;
+  }
+}
+
+@keyframes notra-tabs-row-pending {
+  from,
+  to {
+    min-height: calc(2.5rem + 1px);
+  }
+}
+
+@media (scripting: enabled) {
+  [data-notra-tabs]:not([data-ready]) > [data-tablist] {
+    animation: notra-tabs-row-pending 3s;
+  }
+
+  /* Later panels hide their own titles, so only the first panel's is hidden. */
+  [data-notra-tabs]:not([data-ready]) [data-notra-tab] ~ [data-notra-tab],
+  [data-notra-tabs]:not([data-ready])
+    [data-notra-tab]:not([data-notra-tab] ~ [data-notra-tab])
+    > [data-notra-tab-title] {
+    animation: notra-tabs-pending 3s;
+  }
+}
+
 .prose-notra [data-notra-markdown]:where(.tabs, .code-group) :where(pre) {
   margin: 0;
 }

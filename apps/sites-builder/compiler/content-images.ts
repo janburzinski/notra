@@ -14,17 +14,19 @@ import {
   CONTENT_IMAGE_WEBP,
   CONTENT_IMAGE_WIDTHS,
   CONTENT_IMAGES_DIR,
+  SIZED_IMAGE_EXTENSIONS,
 } from "./constants/content-images";
 import type {
+  ContentImageInfo,
+  ContentImageSize,
   ContentImageTag,
-  ContentImageVariants,
   OptimizeContentImagesParams,
   OptimizeContentImagesResult,
   SharpFactory,
 } from "./types/content-images";
 import { isAnimatedPng } from "./utils/animated-png";
 import {
-  addContentImageSrcsets,
+  addContentImageAttributes,
   findContentImages,
 } from "./utils/content-image-tags";
 
@@ -60,7 +62,7 @@ function outputFile(
     path.split("/").some((segment) => segment === "." || segment === "..") ||
     !mountOf(path, mounts) ||
     path.includes("/_notra/") ||
-    !CONTENT_IMAGE_EXTENSIONS.has(extname(path).toLowerCase())
+    !SIZED_IMAGE_EXTENSIONS.has(extname(path).toLowerCase())
   ) {
     return null;
   }
@@ -84,16 +86,26 @@ async function makeVariants(
   file: string,
   deadline: number,
   now: () => number
-): Promise<{
-  variants: ContentImageVariants;
-  created: number;
-  outOfTime?: boolean;
-}> {
-  const none = { variants: null, created: 0 };
+): Promise<
+  ContentImageInfo & {
+    created: number;
+    outOfTime?: boolean;
+  }
+> {
   const data = await readFile(file);
   const metadata = await sharp(data).metadata();
   const width = metadata.autoOrient?.width ?? metadata.width;
-  if (!width || (metadata.pages ?? 1) > 1 || isAnimatedPng(data)) {
+  // Animated images report the height of one frame as pageHeight.
+  const height =
+    metadata.autoOrient?.height ?? metadata.pageHeight ?? metadata.height;
+  const size: ContentImageSize | null =
+    width && height ? { width, height } : null;
+  const none = { variants: null, size, created: 0 };
+  if (
+    !(width && CONTENT_IMAGE_EXTENSIONS.has(extname(file).toLowerCase())) ||
+    (metadata.pages ?? 1) > 1 ||
+    isAnimatedPng(data)
+  ) {
     return none;
   }
   const widths = CONTENT_IMAGE_WIDTHS.filter((candidate) => candidate < width);
@@ -158,6 +170,7 @@ async function makeVariants(
   }
   return {
     variants: [...candidates, { url: src, width }],
+    size,
     created: candidates.length,
   };
 }
@@ -213,7 +226,7 @@ export async function optimizeContentImages(
   }
 
   const budget = params.budget ?? CONTENT_IMAGE_BUDGET;
-  const variants = new Map<string, ContentImageVariants>();
+  const infos = new Map<string, ContentImageInfo>();
   const failed: string[] = [];
   const queue = [...sources].slice(0, budget.maxImages);
   let skippedForBudget = sources.size - queue.length;
@@ -239,10 +252,12 @@ export async function optimizeContentImages(
           now
         );
         if (made.outOfTime) {
+          // Copies ran out of time, but the size is known and still reserves space.
+          infos.set(src, { variants: null, size: made.size });
           skippedForBudget += 1;
           continue;
         }
-        variants.set(src, made.variants);
+        infos.set(src, { variants: made.variants, size: made.size });
         if (made.variants) {
           result.images += 1;
           result.variants += made.created;
@@ -255,14 +270,15 @@ export async function optimizeContentImages(
   await Promise.all(Array.from({ length: budget.concurrency }, worker));
 
   for (const [urlPath, tags] of tagsByPage) {
-    if (!tags.some((tag) => variants.get(tag.src))) {
-      continue;
-    }
     const html = params.pageHtml.get(urlPath) ?? "";
-    result.pages.set(
-      urlPath,
-      addContentImageSrcsets(html, tags, (src) => variants.get(src) ?? null)
+    const updated = addContentImageAttributes(
+      html,
+      tags,
+      (src) => infos.get(src) ?? null
     );
+    if (updated !== html) {
+      result.pages.set(urlPath, updated);
+    }
   }
   if (failed.length > 0) {
     result.diagnostics.push({
