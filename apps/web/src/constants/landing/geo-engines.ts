@@ -36,3 +36,23 @@ export const LANDING_ENGINE_ICONS: Record<
   kimi: [Kimi],
   glm: [Zai],
 };
+
+const AI_ENGINE_LOGO_DIR = "/logos/ai-engines";
+
+// Logos repeated across the landing page load as cached files instead of
+// inline SVG, so their paths don't crowd the page's text out of its HTML.
+export const LANDING_ENGINE_IMAGES: Partial<
+  Record<LandingEngineId, readonly [string] | readonly [string, string]>
+> = {
+  chatgpt: [
+    `${AI_ENGINE_LOGO_DIR}/openai.svg`,
+    `${AI_ENGINE_LOGO_DIR}/openai-dark.svg`,
+  ],
+  claude: [`${AI_ENGINE_LOGO_DIR}/claude.svg`],
+  "claude-code": [`${AI_ENGINE_LOGO_DIR}/claude.svg`],
+  perplexity: [`${AI_ENGINE_LOGO_DIR}/perplexity.svg`],
+  grok: [
+    `${AI_ENGINE_LOGO_DIR}/grok.svg`,
+    `${AI_ENGINE_LOGO_DIR}/grok-dark.svg`,
+  ],
+};
