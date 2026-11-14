@@ -1,0 +1,27 @@
+apps/dashboard/src/components/artifacts/artifact-document.tsx
+  ai_agent 34,161-162,164,168-173,204,215-220
+apps/dashboard/src/constants/artifacts.ts
+  ai_agent 6-8
+packages/ai/src/schemas/artifact.ts
+  s_3428b476267439::t_be75a5f9363330 75-84
+apps/dashboard/src/types/artifacts.ts
+  ai_agent 21-23
+apps/dashboard/src/utils/artifact-table.ts
+  ai_agent 1-24
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "135b2441bd10cabef33e33ebcffd0e575d30a01f",
+  "prompts": {},
+  "sessions": {
+    "s_3428b476267439": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c6d39551-e687-4036-a65c-3bd92bb74947",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
