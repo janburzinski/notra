@@ -1,0 +1,46 @@
+apps/dashboard/src/components/autopilot/autopilot-settings-panel.tsx
+  s_c4c8e083286445::t_fdc0ffc0261c88 3-5,9-26,28,31,34-37,45-48,50-55,57-60,63-86,88-95,97-112,114-138,140-146,148,150-172
+  s_c4c8e083286445::t_74885745fdc5e5 61-62
+  s_c4c8e083286445::t_a9fa7d9bbc7291 96
+apps/dashboard/messages/de.json
+  s_c4c8e083286445::t_79225d9423e466 10227-10234,10236-10252,10254-10267,10269-10285
+  s_c4c8e083286445::t_a9fa7d9bbc7291 10235,10268
+  s_c4c8e083286445::t_74885745fdc5e5 10253,10286-10287
+apps/dashboard/messages/en.json
+  s_c4c8e083286445::t_a9fa7d9bbc7291 10235,10268
+  s_c4c8e083286445::t_74885745fdc5e5 10253,10286-10287
+  s_c4c8e083286445::t_79225d9423e466 10227-10234,10236-10252,10254-10267,10269-10285
+apps/dashboard/src/components/autopilot/autopilot-settings-sections.tsx
+  s_c4c8e083286445::t_58617695acfca9 1-2,10-24,26-31,33-78,80-342,380-463,473-484,486-487,490-492
+  s_c4c8e083286445::t_79edb331b4019c 5-9
+  s_c4c8e083286445::t_750ce37e4e6e46 32,343-379
+  s_c4c8e083286445::t_b500d6085f8f20 3-4,25,79,464-472
+  s_c4c8e083286445::t_74885745fdc5e5 485,488-489
+apps/dashboard/src/constants/autopilot-ui.ts
+  s_c4c8e083286445::t_d9f64b111ce2a6 54
+  s_c4c8e083286445::t_3b68672286dad2 15,37,69-87
+apps/dashboard/src/types/autopilot.ts
+  s_c4c8e083286445::t_ca710157eb61d9 9
+  s_c4c8e083286445::t_d9f64b111ce2a6 16,19,540-547,549-554,556-557,562-579
+  ai_agent 548
+apps/dashboard/src/lib/hooks/use-autopilot-settings-save.ts
+  s_c4c8e083286445::t_27d1d0be4e425c 44-50
+  s_c4c8e083286445::t_70f4c5545cb055 1-38,53,56-78
+  s_c4c8e083286445::t_001c9e3f85fcf3 39-43,51-52,54-55
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "d8905841e7e5f69ae319d172397b99ecd94167d4",
+  "prompts": {},
+  "sessions": {
+    "s_c4c8e083286445": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "0cc4c7c0-7756-433f-be87-7067d8d67fc6",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
