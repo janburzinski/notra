@@ -1,0 +1,23 @@
+packages/ui/src/components/ui/icon-tabs.tsx
+  s_b60ae382e61769::t_0b0146de746718 230,233-236,290
+  s_b60ae382e61769::t_237d0a04ab9525 209,220,223-229
+  s_b60ae382e61769::t_20dfeb660ef706 219,231
+  s_b60ae382e61769::t_c7fa2d3e848475 258-260,277-288,297-298,304,307
+  s_b60ae382e61769::t_a13ebb76e52e17 326
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "139b5f562ea73de0ca09c526dd8116b5c4768042",
+  "prompts": {},
+  "sessions": {
+    "s_b60ae382e61769": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7d56c9be-5f4d-42cf-9830-cb0c1027a3cf",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
