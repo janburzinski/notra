@@ -1,0 +1,47 @@
+apps/dashboard/src/lib/hooks/use-privacy-preferences.ts
+  s_3e9765536c2ebe::t_730457f22c946c 9
+apps/dashboard/src/constants/demo.ts
+  s_3e9765536c2ebe::t_730457f22c946c 60
+apps/dashboard/tests/demo-api-key.test.ts
+  s_3e9765536c2ebe::t_730457f22c946c 16-28
+apps/dashboard/src/lib/demo/sandbox.ts
+  s_3e9765536c2ebe::t_730457f22c946c 25,37,541-586,746-754,756,768
+apps/dashboard/public/design.md
+  s_3e9765536c2ebe::t_730457f22c946c 4,6-7,9,15-18,21-38,49,60,63-64,66,69,73,76-82,86,88-97,99-103,109,117,119-120,123-130,132-136,148,152,156,160,164-165,168-173,175,179-183,187-188,191,193-199,201,205-213,221-223,227-233,239-254,256,258,260,270,282,287-288
+packages/ui/src/types/icon-tabs.ts
+  s_3e9765536c2ebe::t_730457f22c946c 7-8,27-32
+apps/dashboard/src/lib/demo/api-key.ts
+  s_3e9765536c2ebe::t_730457f22c946c 13-20,28-47
+apps/dashboard/tests/fixtures/demo-api-key.fixture.ts
+  s_3e9765536c2ebe::t_730457f22c946c 137-155
+apps/dashboard/src/app/api/demo/sandbox/info/route.ts
+  s_3e9765536c2ebe::t_730457f22c946c 8,11-12
+apps/dashboard/tests/fixtures/demo-api-key-backfill.fixture.ts
+  s_3e9765536c2ebe::t_730457f22c946c 1-181
+apps/dashboard/src/components/analytics/analytics-source-tabs.tsx
+  s_3e9765536c2ebe::t_730457f22c946c 60,62-68
+apps/dashboard/src/components/chat/assistant-metadata-hover.tsx
+  s_3e9765536c2ebe::t_730457f22c946c 71,104,119,129
+packages/ui/src/components/ui/icon-tabs.tsx
+  s_3e9765536c2ebe::t_730457f22c946c 4-6,50-71,82-89,94-99,103-109,113,117,135,141,149,157-163,165,177-182,185
+packages/ui/src/constants/icon-tabs.ts
+  s_3e9765536c2ebe::t_730457f22c946c 3-8
+apps/web/public/design.md
+  s_3e9765536c2ebe::t_730457f22c946c 4,7,10-23,41-52,67,70-84,86-88,90-116,118-119,121-124,127-134,138-140,142-146,150-152,154,156-157,159,162-163,165,167-173,178-179,181,183-184,200-201,207-213,216-222,224-229,231-238,240-252,255-301,303,305-307,309-311,313-334,338,341-345,352,354,356,358-367,369,371,373,375,377-383,385-392,394,396,398,400-454,458-495,499,501-503,505,507-513,515
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "268f2e57a640a838c98f3069842ec60406d2ff37",
+  "prompts": {},
+  "sessions": {
+    "s_3e9765536c2ebe": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a76ae328-d43b-49cc-91ae-5e40aa5622a4",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

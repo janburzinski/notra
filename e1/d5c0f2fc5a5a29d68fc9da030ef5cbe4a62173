@@ -1,0 +1,20 @@
+apps/dashboard/src/components/geo/traffic-embed-dialog.tsx
+  s_bda12c770d9812::t_ae6bcbf65b1ce1 438-439,445,497-498
+  s_bda12c770d9812::t_3f632fe5517160 446-452,454-496
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "e1d5c0f2fc5a5a29d68fc9da030ef5cbe4a62173",
+  "prompts": {},
+  "sessions": {
+    "s_bda12c770d9812": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "430ac217-0509-4da1-98fb-b9fb62654057",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

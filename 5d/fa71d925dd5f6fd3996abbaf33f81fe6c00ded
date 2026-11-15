@@ -1,0 +1,47 @@
+apps/dashboard/src/types/autopilot-runtime.ts
+  s_553539b43a92cf::t_1d59fcdde3b132 41-55,113-114
+apps/dashboard/src/constants/autopilot.ts
+  s_553539b43a92cf::t_fe735f132d6c0d 251,262-263
+  s_553539b43a92cf::t_ff25ff89c5029a 264-265
+  s_553539b43a92cf::t_800f9dde5b9aa0 252,256-261
+packages/ai/src/prompts/diagram-edit.ts
+  s_553539b43a92cf::t_800f9dde5b9aa0 5-6
+packages/ai/src/types/excalidraw-diagram.ts
+  s_553539b43a92cf::t_8a7a369988584f 107-112
+apps/dashboard/src/lib/autopilot/writer.ts
+  s_553539b43a92cf::t_fe735f132d6c0d 30,210-218
+  s_553539b43a92cf::t_ad38f784c5f88a 169,190
+  s_553539b43a92cf::t_ff25ff89c5029a 196-202
+  s_553539b43a92cf::t_78590b842f277a 3,5,11-16,33,35-36,52,56,105,111-118,164-168,170-189,191-195,203-209,219-222,235-240,308-318,336-337,365-369,429-435
+apps/dashboard/src/lib/autopilot/blog.ts
+  s_553539b43a92cf::t_4b2610f40f4453 535-543,548-553
+  s_553539b43a92cf::t_ff25ff89c5029a 603-607,609-613
+  s_553539b43a92cf::t_1942f8bd0d3318 687-692
+  s_553539b43a92cf::t_1fa2cc0875afa8 121,492,602,608,614-623,627,631,704,747-748
+packages/ai/src/utils/excalidraw-render.ts
+  s_553539b43a92cf::t_8a7a369988584f 5-7,19,396-415,422-432,434-435,438-442,490-491,493
+  s_553539b43a92cf::t_cf4d88aba4fe80 433,436-437,472-477,479,499,501-505,514
+  s_553539b43a92cf::t_ad38f784c5f88a 478,480
+apps/dashboard/src/utils/autopilot-events.ts
+  s_553539b43a92cf::t_78590b842f277a 68-76
+packages/ai/src/constants/excalidraw-diagram.ts
+  s_553539b43a92cf::t_8a7a369988584f 25-28
+apps/dashboard/src/utils/autopilot-diagrams.ts
+  s_553539b43a92cf::t_83b19fb1fba1f3 1-44
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "5dfa71d925dd5f6fd3996abbaf33f81fe6c00ded",
+  "prompts": {},
+  "sessions": {
+    "s_553539b43a92cf": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b4b4dc4c-181d-4713-9033-c5dca3a4b9f1",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

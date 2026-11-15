@@ -1,0 +1,71 @@
+apps/console/src/utils/autopilot.ts
+  s_2fa4329cdd3a30::t_04766b742631fe 2
+apps/console/src/constants/autopilot.ts
+  s_2fa4329cdd3a30::t_447b3c8e9b80bd 40-48
+  s_2fa4329cdd3a30::t_8a6cfad61169c3 18-39
+  s_2fa4329cdd3a30::t_ccfab63d5dac03 6-17
+apps/dashboard/src/lib/autopilot/writer.ts
+  s_2fa4329cdd3a30::t_6e4827982829be 45,269-277
+  s_2fa4329cdd3a30::t_cc7355b32bdd4f 234,243-249,266-268,278-280
+apps/dashboard/src/lib/autopilot/repository-agent.ts
+  s_2fa4329cdd3a30::t_6e4827982829be 40,319-328
+  s_2fa4329cdd3a30::t_cc7355b32bdd4f 297,309-318,329-333
+apps/dashboard/src/utils/autopilot-log.ts
+  s_2fa4329cdd3a30::t_cc7355b32bdd4f 1-3,9,52-73
+apps/console/src/components/autopilot/autopilot-trace-client.tsx
+  s_2fa4329cdd3a30::t_04766b742631fe 5,10,15,30-33,63-68
+apps/console/src/components/autopilot/autopilot-trace-events.tsx
+  s_2fa4329cdd3a30::t_04766b742631fe 5,7-8,25-29,54,56
+  s_2fa4329cdd3a30::t_5b0fa352133e4b 6,23,53,55,57-58
+apps/dashboard/src/types/autopilot-runtime.ts
+  s_2fa4329cdd3a30::t_cc7355b32bdd4f 147-152,155-167
+apps/console/src/utils/autopilot-telemetry.test.ts
+  s_2fa4329cdd3a30::t_38d81f887db79a 90-91,93-98
+  s_2fa4329cdd3a30::t_7efcf9f2d7f2ea 92
+  s_2fa4329cdd3a30::t_5c1c9b70c48bc0 1-89,99-110
+apps/console/src/utils/autopilot-telemetry.ts
+  s_2fa4329cdd3a30::t_447b3c8e9b80bd 83-85,396-404
+  s_2fa4329cdd3a30::t_ccfab63d5dac03 1-8,11-12,15-16,18-44,105-111,138-209,212-213,216-224,226-229,231-236,240,244-256,258,274-335,342-395,415-424
+  s_2fa4329cdd3a30::t_b4ae55a4fcddd7 91
+  s_2fa4329cdd3a30::t_2be7d10215df0b 54
+  s_2fa4329cdd3a30::t_7efcf9f2d7f2ea 214,242,273
+  s_2fa4329cdd3a30::t_5b0fa352133e4b 112-137
+  s_2fa4329cdd3a30::t_747529258a7aba 336-341,405-414
+  s_2fa4329cdd3a30::t_8a70c772b10448 9-10,13-14,17,45-53,55-82,86-90,92-104,210-211,215,225,230,237-239,241,243,257,259-272
+apps/console/src/types/autopilot.ts
+  s_2fa4329cdd3a30::t_7efcf9f2d7f2ea 70-71
+  s_2fa4329cdd3a30::t_ccfab63d5dac03 41-44,46,53-64,68-69,74-83,85-123
+  s_2fa4329cdd3a30::t_1ed03fa5eed2f6 10,45
+  s_2fa4329cdd3a30::t_8a6cfad61169c3 47-52,65-67,72-73,84
+apps/console/src/components/autopilot/autopilot-trace-telemetry.tsx
+  s_2fa4329cdd3a30::t_747529258a7aba 29,37,285,359,463-465
+  s_2fa4329cdd3a30::t_04766b742631fe 321-325,332-336,376-377
+  s_2fa4329cdd3a30::t_63d49a750868fd 15,201,239,278,310
+  s_2fa4329cdd3a30::t_447b3c8e9b80bd 17,28,54-60,73-74,78-79,86-88,126,171-178,213-214,216,218,255,260
+  s_2fa4329cdd3a30::t_73bf54ada6dbdd 19,61-72,75-77,80-85,89-113,118-125,127-164,166-170,179-184,211-212,215,219,250-254,256-258,261-262
+  s_2fa4329cdd3a30::t_7efcf9f2d7f2ea 53,217,259
+  s_2fa4329cdd3a30::t_1ed03fa5eed2f6 440,456,459-461,491,504,507-508
+  s_2fa4329cdd3a30::t_5b0fa352133e4b 205-207,244-246,279-283,311-315
+  s_2fa4329cdd3a30::t_23fcd2bf93c09b 114-117,165
+  s_2fa4329cdd3a30::t_126d88792f2c77 1-14,16,18,20-27,30-36,38-52,185-200,202-204,208-210,220-238,240-243,247-249,263-277,284,286-309,316-320,326-331,337-358,360-375,378-439,441-455,457-458,462,466-490,492-503,505-506,509-534
+apps/dashboard/src/lib/autopilot/log.ts
+  s_2fa4329cdd3a30::t_cc7355b32bdd4f 72-73
+packages/db/src/constants/autopilot.ts
+  s_2fa4329cdd3a30::t_cc7355b32bdd4f 74-79
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "8134d023419784221566266cad215393efab6bfc",
+  "prompts": {},
+  "sessions": {
+    "s_2fa4329cdd3a30": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "72263454-3be4-4ae9-b4cc-59e514287461",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

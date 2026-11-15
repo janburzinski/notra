@@ -1,0 +1,21 @@
+apps/dashboard/src/components/chat/chat-conversation.tsx
+  s_3428b476267439::t_32a0cec43ad831 698-700
+apps/dashboard/src/types/components/chat-conversation.ts
+  s_3428b476267439::t_8be8faa019c344 80
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "258961301a361c989e575841ef13f5ceefc4cf24",
+  "prompts": {},
+  "sessions": {
+    "s_3428b476267439": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c6d39551-e687-4036-a65c-3bd92bb74947",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

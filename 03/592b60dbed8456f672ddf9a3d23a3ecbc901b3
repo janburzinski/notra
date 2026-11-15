@@ -1,0 +1,25 @@
+apps/blog/scripts/web-chrome.js
+  ai_agent 2-3
+packages/ui/src/constants/dropdown.ts
+  s_a64beba9168101::t_0c2dd1884f3cd8 24
+packages/ui/src/components/ui/combobox.tsx
+  s_a64beba9168101::t_0c2dd1884f3cd8 148
+packages/ui/src/styles/menu-highlight.css
+  s_a64beba9168101::t_0c2dd1884f3cd8 4-5,11,18-53
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "03592b60dbed8456f672ddf9a3d23a3ecbc901b3",
+  "prompts": {},
+  "sessions": {
+    "s_a64beba9168101": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b853b1b3-9b64-4152-9ea1-306dbf0ceb10",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

@@ -1,0 +1,23 @@
+packages/ui/src/components/ui/button-content.tsx
+  s_b86f76ae7bb7db::t_4d67b526d8a908 6,171-173,177-178
+packages/ui/src/lib/motion.ts
+  s_b86f76ae7bb7db::t_4d67b526d8a908 61-72
+apps/blog/scripts/web-chrome.js
+  ai_agent 2,466,474,478,503-506,509-513,553-554
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "eacd34a727f8de7c1ffdcddb3f0e65ad83ab7dbd",
+  "prompts": {},
+  "sessions": {
+    "s_b86f76ae7bb7db": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "2f109900-7372-4001-b177-d674105bc2a9",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

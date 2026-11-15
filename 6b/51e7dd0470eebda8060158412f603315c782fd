@@ -1,0 +1,30 @@
+apps/dashboard/src/lib/auth/delete-user-record.ts
+  s_0eb87d8daad6ee::t_f2f2eb3bbfa93d 187-196
+apps/dashboard/src/lib/auth/user-actions.ts
+  s_0eb87d8daad6ee::t_3a531a8281f38f 16-20,168-169
+  s_0eb87d8daad6ee::t_d817e1923acccf 27,161-167,170-172
+apps/dashboard/tests/fixtures/account-deletion.fixture.ts
+  s_0eb87d8daad6ee::t_b83e93b5137036 18,72-74,127,198-211
+apps/dashboard/tests/fixtures/user-organization-teardown.fixture.ts
+  s_0eb87d8daad6ee::t_172b54db1d5e3d 714-718
+  s_0eb87d8daad6ee::t_539d4b94b4945a 150,693,704
+apps/dashboard/src/lib/auth/delete-account.ts
+  s_0eb87d8daad6ee::t_3a531a8281f38f 110-111
+  s_0eb87d8daad6ee::t_7510f84c9c8c18 104-109,112-114
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "6b51e7dd0470eebda8060158412f603315c782fd",
+  "prompts": {},
+  "sessions": {
+    "s_0eb87d8daad6ee": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a1b22e-3639-7443-aa7f-4abac253f350",
+        "model": "gpt-6-sol"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

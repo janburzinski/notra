@@ -1,0 +1,50 @@
+packages/db/src/constants/autopilot.ts
+  s_38d1342718a2be::t_7515f9f191207c 50-55
+packages/schemas/src/schemas/dashboard/autopilot.ts
+  s_38d1342718a2be::t_7515f9f191207c 7,192-199
+packages/db/src/types/autopilot.ts
+  s_38d1342718a2be::t_7515f9f191207c 40-44
+apps/dashboard/src/lib/autopilot/commit-filters.ts
+  s_38d1342718a2be::t_16225e119b3448 8,54,65-68
+packages/ai/src/integrations/github.ts
+  s_38d1342718a2be::t_fc114e32403669 1161
+apps/dashboard/tests/autopilot-flow.test.ts
+  s_38d1342718a2be::t_3f83a9e4ace841 1117-1130,1149-1152
+  s_38d1342718a2be::t_c1c9543f97900b 1146-1148
+  s_38d1342718a2be::t_0ef46b4e90218d 603,1210-1213
+apps/dashboard/src/components/autopilot/autopilot-release-filters-section.tsx
+  s_38d1342718a2be::t_d849fee3a7b456 7,11,26,46,119-128,133-164
+apps/dashboard/src/constants/autopilot.ts
+  s_38d1342718a2be::t_7515f9f191207c 96,124
+  s_38d1342718a2be::t_16225e119b3448 120
+apps/dashboard/src/lib/orpc/routers/autopilot.ts
+  s_38d1342718a2be::t_2e3ff0699e110c 411,414-421
+apps/dashboard/src/lib/autopilot/blog.ts
+  s_38d1342718a2be::t_95838469ce73c8 1196-1199
+  s_38d1342718a2be::t_2e3ff0699e110c 117-120
+apps/dashboard/src/lib/autopilot/writer.test.ts
+  s_38d1342718a2be::t_e18a3f348aa912 96
+packages/ai/src/schemas/github-app.ts
+  s_38d1342718a2be::t_fc114e32403669 27,45-46
+apps/dashboard/src/utils/autopilot-commit-filters.ts
+  s_38d1342718a2be::t_16225e119b3448 7,22-51
+apps/dashboard/src/lib/autopilot/authors.ts
+  s_38d1342718a2be::t_eb175179a1229f 3
+  s_38d1342718a2be::t_2e3ff0699e110c 13,20-22,25-28,33,106-107,109,111,116,118
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "cb59ed3fa621b81ecd4d14d442045c39b893cfdb",
+  "prompts": {},
+  "sessions": {
+    "s_38d1342718a2be": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a03bd943-bd6c-45d8-a4f0-9f58961c8dc3",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

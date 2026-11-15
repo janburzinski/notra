@@ -1,0 +1,65 @@
+apps/blog/scripts/web-chrome.js
+  ai_agent 2
+apps/web/src/routes/api/star-video/repo.ts
+  s_b86f76ae7bb7db::t_54b7bc066f6b37 51-58
+apps/web/src/lib/star-video/github-connection.ts
+  s_b86f76ae7bb7db::t_54b7bc066f6b37 28-34,36-40
+apps/web/src/styles/theme.css
+  s_b86f76ae7bb7db::t_54b7bc066f6b37 457-513
+apps/web/src/components/landing/hero-website-form.tsx
+  s_b86f76ae7bb7db::t_54b7bc066f6b37 9,13,80-92
+apps/web/src/remotion/star-video/avatar-cloud.tsx
+  s_b86f76ae7bb7db::t_54b7bc066f6b37 60-65
+apps/web/src/remotion/star-video/constants.ts
+  s_b86f76ae7bb7db::t_54b7bc066f6b37 7-9
+apps/web/src/components/landing/hero-tap-hand.tsx
+  s_b86f76ae7bb7db::t_54b7bc066f6b37 1-26
+apps/web/src/remotion/star-video/star-counter.tsx
+  s_b86f76ae7bb7db::t_54b7bc066f6b37 3-8,65-66
+apps/web/src/routes/api/star-video/github/authorize.ts
+  s_b86f76ae7bb7db::t_54b7bc066f6b37 50-55
+apps/web/src/lib/star-video/stargazers.ts
+  s_b86f76ae7bb7db::t_54b7bc066f6b37 14-20,45-51,157-161
+apps/web/src/content/pages/repo-star-video.md
+  s_b86f76ae7bb7db::t_54b7bc066f6b37 14
+apps/web/src/lib/star-video/github-oauth.ts
+  s_b86f76ae7bb7db::t_54b7bc066f6b37 34,90-91,97-99
+apps/web/package.json
+  s_b86f76ae7bb7db::t_54b7bc066f6b37 47
+bun.lock
+  ai_agent 560,1238-1239,3814-3815,4444,7142-7143,8336-8344
+apps/web/src/constants/landing/hero.ts
+  s_b86f76ae7bb7db::t_54b7bc066f6b37 136-138
+apps/web/src/components/star-video/repo-input-form.tsx
+  s_b86f76ae7bb7db::t_54b7bc066f6b37 15
+apps/web/src/components/landing/hero-section.tsx
+  s_b86f76ae7bb7db::t_54b7bc066f6b37 12,26,139-157
+apps/web/src/components/star-video/star-video-preview.tsx
+  s_b86f76ae7bb7db::t_54b7bc066f6b37 33,106-122,174,176-194,196-208
+apps/web/src/lib/star-video/fetch-repo.ts
+  s_b86f76ae7bb7db::t_54b7bc066f6b37 14-15,19,24,29
+apps/web/src/lib/star-video/load-repo.ts
+  s_b86f76ae7bb7db::t_54b7bc066f6b37 8-13,16,18-21
+apps/web/src/remotion/star-video/load-fonts.ts
+  s_b86f76ae7bb7db::t_54b7bc066f6b37 4-5,24-31
+apps/web/vite.config.ts
+  s_b86f76ae7bb7db::t_54b7bc066f6b37 24
+apps/dashboard/src/app/(dashboard)/[slug]/sites/skeleton.tsx
+  s_b86f76ae7bb7db::t_54b7bc066f6b37 5,8,12-15,17-24
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "652054d91a10cc5213f83d3341054083b5e61b06",
+  "prompts": {},
+  "sessions": {
+    "s_b86f76ae7bb7db": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "2f109900-7372-4001-b177-d674105bc2a9",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

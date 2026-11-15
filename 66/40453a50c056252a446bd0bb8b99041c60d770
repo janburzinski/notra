@@ -1,0 +1,64 @@
+apps/web/src/components/data/data-market-share.tsx
+  s_2a641a79c946c6::t_04857a9c9c66df 98
+  s_2a641a79c946c6::t_7513f88480e72c 3,7,22-23,30-61,64,70-71,77-94,99-104,111-117,119-125,128-159,168,175-189,240,247,254
+  s_2a641a79c946c6::t_b79ddb54415bad 105-110
+  s_2a641a79c946c6::t_424a07e564a40f 20-21,118,126-127,160-167,169,171-172,174
+apps/web/src/utils/data.ts
+  s_2a641a79c946c6::t_ae32ec99701056 213
+  s_2a641a79c946c6::t_464486d9127dd1 130-134,137-145,215-216
+apps/web/src/constants/data.ts
+  s_2a641a79c946c6::t_0cecfeb0bd4f50 41-42
+  s_2a641a79c946c6::t_7513f88480e72c 46-49
+packages/ui/src/components/data-table/body.tsx
+  s_2a641a79c946c6::t_9cf8a641d028ed 106
+apps/web/src/components/data/data-view.tsx
+  s_2a641a79c946c6::t_6eea5a834f31f3 21,63-64
+apps/web/src/components/data/data-columns.tsx
+  s_2a641a79c946c6::t_66ecb1fc9b2890 67,76
+  s_2a641a79c946c6::t_df03f8a5066bde 28-30,75,89-90,121,188,216
+  s_2a641a79c946c6::t_a004e6d00faefe 46-47,156,232
+apps/web/src/components/data/data-sheet.tsx
+  s_2a641a79c946c6::t_424a07e564a40f 122-123,131-132
+  s_2a641a79c946c6::t_b0b9d7d6a7f27c 15,322-329,331,340,343-344,346,349-351,355-376,379,381,387-391,393-401,405-453
+apps/web/src/types/data.ts
+  s_2a641a79c946c6::t_464486d9127dd1 20-21
+  s_2a641a79c946c6::t_ae32ec99701056 101-106
+apps/web/src/components/data/data-hero.tsx
+  s_2a641a79c946c6::t_727421b7d044bf 32,35
+  s_2a641a79c946c6::t_96f50283916208 36
+apps/web/src/components/data/data-stats.tsx
+  s_2a641a79c946c6::t_c57a6a121166fd 79-80,86-87,92,109,111-113,115-119
+  s_2a641a79c946c6::t_e1dca676b6c3f7 132
+  s_2a641a79c946c6::t_07803ed7738b5e 1-3,8-11,13-18,21-25,28-30,46-48,53,55-58,62,65-68,71-78,81-82,84-85,93-102,107,110,133,139
+  s_2a641a79c946c6::t_3f4481fcc3ba46 4-7,12,19-20,26-27,37-45,49-52,54,59-61,63-64,123-131,134-138,140-145
+  s_2a641a79c946c6::t_7fdb2602ee767d 31-36,103-106,108
+  s_2a641a79c946c6::t_2a80824462c6f0 69-70,83,88-91,114,120-122
+apps/web/src/components/data/data-heatmap.tsx
+  s_2a641a79c946c6::t_b79ddb54415bad 114-119
+  s_2a641a79c946c6::t_7513f88480e72c 7-11,64
+  s_2a641a79c946c6::t_8b47edc3451430 139
+apps/web/src/hooks/use-coarse-pointer.ts
+  s_2a641a79c946c6::t_1b72871733c8c6 1-18
+apps/web/src/components/data/data-traffic-chart.tsx
+  s_2a641a79c946c6::t_424a07e564a40f 147,153,161,164
+  s_2a641a79c946c6::t_b79ddb54415bad 83,86
+  s_2a641a79c946c6::t_b0b9d7d6a7f27c 169
+  s_2a641a79c946c6::t_3743405e3c6b9b 6,18,40-47,70,87
+  s_2a641a79c946c6::t_0cecfeb0bd4f50 9-13,76-78,122,127-129,166,190
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "6640453a50c056252a446bd0bb8b99041c60d770",
+  "prompts": {},
+  "sessions": {
+    "s_2a641a79c946c6": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "712a2427-7f87-4390-a750-259eed0c22d3",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

@@ -1,0 +1,19 @@
+apps/dashboard/src/lib/artifacts/manage.ts
+  s_3428b476267439::t_21ec407756789e 6,18-23,27-34,37-39,41-47
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "4f68b87f07fbd47d301cfae4c2bce56257bbab02",
+  "prompts": {},
+  "sessions": {
+    "s_3428b476267439": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c6d39551-e687-4036-a65c-3bd92bb74947",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

@@ -1,0 +1,19 @@
+packages/geo-core/src/geo/model-live.ts
+  s_570e53c3487bb7::t_49c28d61c2d8f5 3,334-339
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "df98c1407a2a245a94f131d46b0d9efb376878e5",
+  "prompts": {},
+  "sessions": {
+    "s_570e53c3487bb7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8deea045-12bd-4922-aa8b-e24cfe30d9a2",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

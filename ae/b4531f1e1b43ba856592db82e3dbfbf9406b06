@@ -1,0 +1,196 @@
+apps/console/src/lib/orpc/router.ts
+  s_a4ba0f693267ad::t_dccf25eabec0f6 9,20
+apps/console/src/components/slack-bot/slack-bot-charts.tsx
+  s_a4ba0f693267ad::t_dccf25eabec0f6 1-138
+apps/agent/agent/lib/utils/slack-input-request.ts
+  s_a4ba0f693267ad::t_dccf25eabec0f6 132,138,144
+apps/web/src/lib/mcp-battle/engine.ts
+  s_a4ba0f693267ad::t_dccf25eabec0f6 1-1512
+apps/web/src/types/landing/footer.ts
+  s_a4ba0f693267ad::t_dccf25eabec0f6 33-44
+apps/web/src/types/mcp-battle.ts
+  s_a4ba0f693267ad::t_dccf25eabec0f6 1-179
+apps/console/src/app/(console)/[slug]/slack-bot/page.tsx
+  s_a4ba0f693267ad::t_dccf25eabec0f6 1-25
+apps/dashboard/src/constants/traffic-embed.ts
+  s_a4ba0f693267ad::t_92e72d6724597c 60-62
+apps/dashboard/src/components/providers/geo-live-provider.tsx
+  s_a4ba0f693267ad::t_dccf25eabec0f6 3-6,35-45
+packages/geo-core/src/utils/web-script-tag.ts
+  s_a4ba0f693267ad::t_dccf25eabec0f6 4-6,11
+apps/web/src/routes/onboard[.]md.ts
+  s_a4ba0f693267ad::t_dccf25eabec0f6 31,45,47,51-52,54-56,62
+packages/db/migrations/meta/0156_snapshot.json
+  ai_agent 1-17591
+packages/db/src/schema.ts
+  s_a4ba0f693267ad::t_dccf25eabec0f6 91-93,687-735
+apps/dashboard/src/types/geo.ts
+  s_a4ba0f693267ad::t_dccf25eabec0f6 760-761
+bun.lock
+  ai_agent 554
+apps/dashboard/src/utils/geo-ingest.ts
+  s_a4ba0f693267ad::t_dccf25eabec0f6 176-185,188-189,198
+apps/web/src/lib/mcp/functions.ts
+  s_a4ba0f693267ad::t_dccf25eabec0f6 3
+apps/console/src/schemas/slack-bot.ts
+  s_a4ba0f693267ad::t_dccf25eabec0f6 1-16
+apps/dashboard/messages/de.json
+  s_a4ba0f693267ad::t_dccf25eabec0f6 3142,3181-3182,4774
+apps/dashboard/tests/geo-ingest-script-setup.test.tsx
+  s_a4ba0f693267ad::t_dccf25eabec0f6 87,90,92-93,96-99,101,104
+packages/ui/src/components/ui/agent-prompt-button.tsx
+  s_a4ba0f693267ad::t_dccf25eabec0f6 16,23-28,36,45-48,50,54-55,58-59,61-63,65-67,121,139,145,153-156
+apps/docs/ai-traffic/install/script-tag.mdx
+  s_a4ba0f693267ad::t_dccf25eabec0f6 28,31,34,38,70,73,78,80,82-84,86,90
+packages/db/migrations/meta/0154_snapshot.json
+  ai_agent 2,15378-15586
+apps/web/src/components/mcp/mcp-hero.tsx
+  s_a4ba0f693267ad::t_dccf25eabec0f6 1-2,5,9-11,14-17,20,23-36
+apps/web/src/components/landing/hero-variant-switcher.tsx
+  s_a4ba0f693267ad::t_dccf25eabec0f6 1-2,4,17,20-23,27,40-47
+packages/geo-core/tests/web-key-setup.test.ts
+  s_a4ba0f693267ad::t_dccf25eabec0f6 83,87-91
+apps/dashboard/src/utils/providers.tsx
+  s_a4ba0f693267ad::t_dccf25eabec0f6 54-61,64-65
+packages/db/migrations/meta/0155_snapshot.json
+  ai_agent 1-17584
+apps/web/src/utils/notra-analytics.ts
+  s_a4ba0f693267ad::t_dccf25eabec0f6 1,6,12-13,18,24-25
+packages/web-tracker/tests/build.test.ts
+  s_a4ba0f693267ad::t_dccf25eabec0f6 6,10,29-52
+apps/web/package.json
+  s_a4ba0f693267ad::t_dccf25eabec0f6 43
+packages/geo-core/tests/web-script-tag.test.ts
+  s_a4ba0f693267ad::t_dccf25eabec0f6 11,15-17,27
+apps/dashboard/src/components/geo/geo-ingest-script-setup.tsx
+  s_a4ba0f693267ad::t_dccf25eabec0f6 26,69-71
+apps/api/src/routes/geo-projects.ts
+  s_a4ba0f693267ad::t_dccf25eabec0f6 20,25,140-147
+apps/agent/agent/lib/utils/slack-metrics.ts
+  s_a4ba0f693267ad::t_dccf25eabec0f6 1-187
+apps/console/src/components/slack-bot/slack-bot-client.tsx
+  s_a4ba0f693267ad::t_dccf25eabec0f6 1-242
+apps/web/src/components/mcp/mcp-hero-battle.tsx
+  s_a4ba0f693267ad::t_dccf25eabec0f6 1-36
+apps/console/src/types/slack-bot.ts
+  s_a4ba0f693267ad::t_dccf25eabec0f6 1-75
+apps/web/src/constants/notra-analytics.ts
+  s_a4ba0f693267ad::t_dccf25eabec0f6 1-2
+apps/console/src/constants/slack-bot.ts
+  s_a4ba0f693267ad::t_dccf25eabec0f6 1-48
+apps/console/src/lib/orpc/routers/slack-bot.ts
+  s_a4ba0f693267ad::t_dccf25eabec0f6 1-13
+apps/console/src/utils/slack-bot.ts
+  s_a4ba0f693267ad::t_dccf25eabec0f6 1-13
+apps/web/src/components/mcp/mcp-tools-grid.tsx
+  s_a4ba0f693267ad::t_dccf25eabec0f6 3-10,13,17-18,21-26,30,32-40,43-60,62-79
+apps/web/src/hooks/use-glitter-egg.ts
+  s_a4ba0f693267ad::t_dccf25eabec0f6 1-46
+packages/geo-core/tests/project-create-from-website.test.ts
+  s_a4ba0f693267ad::t_dccf25eabec0f6 12-16,97-100
+packages/schemas/src/schemas/api/geo-traffic.ts
+  s_a4ba0f693267ad::t_dccf25eabec0f6 487
+apps/dashboard/src/components/geo/web-key-rotate-button.tsx
+  s_a4ba0f693267ad::t_dccf25eabec0f6 12,21,24-25
+apps/dashboard/src/app/api/cron/sites-cleanup/route.ts
+  s_a4ba0f693267ad::t_dccf25eabec0f6 2,4-9,59-64
+apps/web/src/lib/mcp/markdown.ts
+  s_a4ba0f693267ad::t_dccf25eabec0f6 3,8,26,78
+apps/api/src/constants/geo.ts
+  s_a4ba0f693267ad::t_dccf25eabec0f6 1-2,27-32
+apps/agent/agent/lib/types/slack.ts
+  s_a4ba0f693267ad::t_dccf25eabec0f6 1,62-73,75
+apps/console/src/components/layout/console-shell.tsx
+  s_a4ba0f693267ad::t_dccf25eabec0f6 14,214-218
+apps/web/src/constants/mcp-tools.ts
+  s_a4ba0f693267ad::t_dccf25eabec0f6 1-667
+packages/db/migrations/meta/_journal.json
+  ai_agent 1086-1101
+apps/web/src/components/mcp/mcp-command-tabs.tsx
+  s_a4ba0f693267ad::t_dccf25eabec0f6 33-45,61,69
+apps/agent/agent/channels/slack.ts
+  s_a4ba0f693267ad::t_dccf25eabec0f6 10-11,38,76-83,121-127,130,138-144,208-224,255-256,447,499-501,549,581-590,592-594,603,622,697-702,711-715,720-727,747,749,755-757
+apps/agent/tests/slack-channel.test.ts
+  s_a4ba0f693267ad::t_dccf25eabec0f6 36,49,105-109,113-120,533-690,753-762
+apps/web/src/types/mcp.ts
+  s_a4ba0f693267ad::t_dccf25eabec0f6 1-2,30-44
+packages/ui/src/types/agent-prompt-button.ts
+  s_a4ba0f693267ad::t_dccf25eabec0f6 15-22
+apps/dashboard/src/components/geo/geo-ingest-setup.tsx
+  s_a4ba0f693267ad::t_dccf25eabec0f6 72,74,77,83,87,179,182,204-206,222-224,227-237
+apps/web/src/routes/_site/mcp/index.tsx
+  s_a4ba0f693267ad::t_dccf25eabec0f6 7,21,66-67
+apps/web/src/constants/landing/footer.ts
+  s_a4ba0f693267ad::t_dccf25eabec0f6 13,149-192
+apps/web/src/components/footer-section.tsx
+  s_a4ba0f693267ad::t_dccf25eabec0f6 6,14,68,80-84,89-93,101-108
+apps/api/tests/geo-project-create-scopes.test.ts
+  s_a4ba0f693267ad::t_dccf25eabec0f6 1-87
+packages/web-tracker/src/constants/script.ts
+  s_a4ba0f693267ad::t_dccf25eabec0f6 20-29
+apps/dashboard/src/components/analytics-import/import-history-card.tsx
+  s_a4ba0f693267ad::t_dccf25eabec0f6 10,15,17-20,24-33,63-66,77,82,86-88,90-96,102-120
+packages/ui/src/components/ui/command-tabs.tsx
+  s_a4ba0f693267ad::t_dccf25eabec0f6 398-399,405-406,444,449,453
+apps/docs/ai-traffic/tracker-reference.mdx
+  s_a4ba0f693267ad::t_dccf25eabec0f6 45,65
+apps/api/src/middleware/auth.ts
+  s_a4ba0f693267ad::t_dccf25eabec0f6 30-34,717-729
+apps/dashboard/messages/en.json
+  s_a4ba0f693267ad::t_dccf25eabec0f6 3142,3181-3182,4774
+apps/dashboard/src/components/geo/geo-ingest-method-picker.tsx
+  s_a4ba0f693267ad::t_dccf25eabec0f6 3,27-33,43,51-74
+apps/web/src/lib/mcp-battle/use-battle-canvas.ts
+  s_a4ba0f693267ad::t_dccf25eabec0f6 1-196
+apps/web/src/constants/mcp-battle.ts
+  s_a4ba0f693267ad::t_dccf25eabec0f6 1-138
+packages/web-tracker/scripts/build.ts
+  s_a4ba0f693267ad::t_dccf25eabec0f6 12-13,21-22,70-100,168-174
+packages/db/migrations/0154_slack_agent_requests.sql
+  ai_agent 1-27
+apps/web/src/lib/mcp-battle/sprites.ts
+  s_a4ba0f693267ad::t_dccf25eabec0f6 1-154
+apps/console/src/lib/slack-bot/queries.ts
+  s_a4ba0f693267ad::t_dccf25eabec0f6 1-235
+apps/web/src/utils/mcp.ts
+  s_a4ba0f693267ad::t_dccf25eabec0f6 1-15,18-39
+apps/blog/scripts/web-chrome.js
+  s_a4ba0f693267ad::t_dccf25eabec0f6 2
+apps/web/src/components/landing/glitter-wordmark.tsx
+  s_a4ba0f693267ad::t_dccf25eabec0f6 1-406
+packages/db/src/constants/slack-agent.ts
+  s_a4ba0f693267ad::t_dccf25eabec0f6 1-24
+packages/db/migrations/0155_drop_orphaned_columns.sql
+  ai_agent 1-6
+apps/dashboard/src/components/geo/traffic-embed-dialog.tsx
+  s_a4ba0f693267ad::t_354c391f108149 238-243
+  s_a4ba0f693267ad::t_5c2f822945aea8 126-127,130,133-134,136-138,142,148,153-169
+  s_a4ba0f693267ad::t_e8437fdc7e6479 357,360-361,363-366,369-370,372-375,384,394,399-400
+  s_a4ba0f693267ad::t_2cefe9546eade0 442-446,448
+  s_a4ba0f693267ad::t_dfdb6a658294a9 42
+  s_a4ba0f693267ad::t_db1775a8edc676 469-496
+  s_a4ba0f693267ad::t_8285c256a54bbb 513
+  s_a4ba0f693267ad::t_267fc7a3c2afa8 563
+  s_a4ba0f693267ad::t_5fc970a8ffdb44 316,325,327-329
+  s_a4ba0f693267ad::t_33c8427f5f27b8 30
+  s_a4ba0f693267ad::t_d6c5da901d43fb 533,535
+  s_a4ba0f693267ad::t_512f876b0326a9 627-632,634-635,637
+apps/web/src/constants/mcp.ts
+  s_a4ba0f693267ad::t_dccf25eabec0f6 3-7,54-55,57-74,76-79,82-84,86,88-90,93-96,98-100,102-104,106-107,123,126,129-131,136-143,146-149,152-154,159,168
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "aeb4531f1e1b43ba856592db82e3dbfbf9406b06",
+  "prompts": {},
+  "sessions": {
+    "s_a4ba0f693267ad": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "04602935-1e5f-4280-b3cb-88ff509d9f9f",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

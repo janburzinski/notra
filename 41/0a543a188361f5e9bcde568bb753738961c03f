@@ -1,0 +1,23 @@
+apps/agent/agent/lib/utils/autopilot-approval.ts
+  s_fd6ab57014372a::t_ed0cdece8ead23 22,29,34,70-76,83
+apps/agent/tests/autopilot-tools.test.ts
+  s_fd6ab57014372a::t_13f47870e4ef30 130-139
+apps/dashboard/src/lib/autopilot/agent.test.ts
+  s_fd6ab57014372a::t_4580d00d88093c 197-201
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "410a543a188361f5e9bcde568bb753738961c03f",
+  "prompts": {},
+  "sessions": {
+    "s_fd6ab57014372a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "eb44c9e3-b834-4d73-9c87-a1ced06752c7",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

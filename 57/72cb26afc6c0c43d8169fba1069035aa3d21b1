@@ -1,0 +1,31 @@
+apps/dashboard/src/components/autopilot/autopilot-brief-finding-card.tsx
+  s_3428b476267439::t_08deff0db3c283 23,84-117,119,121-156
+apps/dashboard/src/types/autopilot.ts
+  s_3428b476267439::t_33b472e83369d7 608-610,626-633,635-646
+  s_3428b476267439::t_fc0fc40dc1b207 611-625,634
+  s_3428b476267439::t_08deff0db3c283 675-679
+apps/dashboard/src/constants/autopilot-brief.ts
+  s_3428b476267439::t_33b472e83369d7 14-19
+apps/dashboard/src/utils/autopilot-brief.ts
+  s_3428b476267439::t_1c4cac98fcd699 87-92,97-98
+  s_3428b476267439::t_fc0fc40dc1b207 3,5,145-179
+  s_3428b476267439::t_1f1e6d8622099f 84-86,95-96,100-105,109
+apps/dashboard/src/components/autopilot/autopilot-brief-page.tsx
+  s_3428b476267439::t_10e52477d3d34b 7-8,29,36-38,43-47,66,74-85,92-115,126,128-132,135-142,193,202,204,217-445
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "5772cb26afc6c0c43d8169fba1069035aa3d21b1",
+  "prompts": {},
+  "sessions": {
+    "s_3428b476267439": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c6d39551-e687-4036-a65c-3bd92bb74947",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

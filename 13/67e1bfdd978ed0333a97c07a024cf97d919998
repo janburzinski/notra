@@ -1,0 +1,9 @@
+apps/minigame/README.md
+  ai_agent 118
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "1367e1bfdd978ed0333a97c07a024cf97d919998",
+  "prompts": {}
+}

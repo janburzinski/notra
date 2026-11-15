@@ -1,0 +1,21 @@
+apps/dashboard/src/constants/charts.ts
+  s_3428b476267439::t_4acd456aab711f 58-59
+apps/dashboard/src/components/ai/chat-tool-block/tool-output-chart.tsx
+  s_3428b476267439::t_4acd456aab711f 17,99-112,120,141
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "37e05788108f735e86b87573602c3cdd0e08ed12",
+  "prompts": {},
+  "sessions": {
+    "s_3428b476267439": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c6d39551-e687-4036-a65c-3bd92bb74947",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

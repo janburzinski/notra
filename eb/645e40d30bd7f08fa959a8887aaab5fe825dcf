@@ -1,0 +1,19 @@
+apps/dashboard/src/components/dashboard/right-panel.tsx
+  s_3428b476267439::t_ca8227a40e16fa 56-57,63
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "eb645e40d30bd7f08fa959a8887aaab5fe825dcf",
+  "prompts": {},
+  "sessions": {
+    "s_3428b476267439": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c6d39551-e687-4036-a65c-3bd92bb74947",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

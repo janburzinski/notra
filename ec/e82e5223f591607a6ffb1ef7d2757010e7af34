@@ -1,0 +1,48 @@
+apps/minigame/src/routes/api/replays/$playerId.ts
+  s_3e9765536c2ebe::t_19de1900d3f9a4 8-12,26-28,34-39
+apps/minigame/src/lib/server/store.ts
+  s_3e9765536c2ebe::t_1120d9b2e3cd8b 95-96,275,277-278,282,285-286,599
+apps/minigame/src/schemas/api.ts
+  s_3e9765536c2ebe::t_1120d9b2e3cd8b 42
+apps/minigame/src/types/anti-cheat.ts
+  s_3e9765536c2ebe::t_1120d9b2e3cd8b 31
+apps/minigame/src/components/leaderboard.tsx
+  s_3e9765536c2ebe::t_062c61d0d638f7 6,90-91,244-249
+apps/minigame/src/components/moderation-buttons.tsx
+  s_3e9765536c2ebe::t_062c61d0d638f7 1-78
+apps/minigame/src/lib/server/store.test.ts
+  s_3e9765536c2ebe::t_1120d9b2e3cd8b 154,158-160,167,169-170
+  s_3e9765536c2ebe::t_33694aa96f5153 155-157,161,164,168,172-174
+apps/minigame/src/utils/api-client.ts
+  s_3e9765536c2ebe::t_19de1900d3f9a4 141-146,148-149
+apps/minigame/src/components/pause-menu.tsx
+  s_3e9765536c2ebe::t_43fd54c008be4c 1,3,6-12,14,21,28-36,67-75
+apps/minigame/src/routes/api/admin/moderate.ts
+  s_3e9765536c2ebe::t_1120d9b2e3cd8b 11,34
+apps/minigame/src/lib/game/session.ts
+  s_3e9765536c2ebe::t_43fd54c008be4c 41-43,151,181-184,192-201
+apps/minigame/src/constants/server.ts
+  s_3e9765536c2ebe::t_1120d9b2e3cd8b 163-165,168-170
+apps/minigame/src/components/game-screen.tsx
+  s_3e9765536c2ebe::t_c17c97a454cf66 232-236
+  s_3e9765536c2ebe::t_43fd54c008be4c 367
+apps/minigame/src/types/ui.ts
+  s_3e9765536c2ebe::t_43fd54c008be4c 126-127
+  s_3e9765536c2ebe::t_062c61d0d638f7 43-52
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "ece82e5223f591607a6ffb1ef7d2757010e7af34",
+  "prompts": {},
+  "sessions": {
+    "s_3e9765536c2ebe": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a76ae328-d43b-49cc-91ae-5e40aa5622a4",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

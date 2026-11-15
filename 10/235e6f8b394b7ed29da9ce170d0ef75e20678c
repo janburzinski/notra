@@ -1,0 +1,19 @@
+apps/sites/tests/handler.test.ts
+  s_5dbe3dd66e59f2::t_2aa24b6d356f22 1502-1525,1527-1534
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "10235e6f8b394b7ed29da9ce170d0ef75e20678c",
+  "prompts": {},
+  "sessions": {
+    "s_5dbe3dd66e59f2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "4021b33b-765e-4376-87b3-b90278c25da3",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

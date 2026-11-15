@@ -1,0 +1,52 @@
+apps/dashboard/src/lib/automation/errors.ts
+  s_53a064f34be9bb::t_d19d96683aba2d 1-21
+apps/dashboard/src/lib/orpc/routers/automation-alerts.ts
+  s_53a064f34be9bb::t_07cb594e136a68 9-15,19,32,36,39-47,53,56-64,66,71-77,79-82,86-90
+apps/dashboard/src/types/automation/service.ts
+  s_53a064f34be9bb::t_f76193af3129ae 1-18
+apps/dashboard/src/lib/automation/geo-alert-service.ts
+  s_53a064f34be9bb::t_eed897e080fdf1 1-272
+apps/dashboard/src/schemas/automation-chat-tools.ts
+  s_53a064f34be9bb::t_aecb6eddbafcaf 1,6-41,45-48,52-109,113-191
+  s_53a064f34be9bb::t_f5df85f1d71858 2-5
+  s_53a064f34be9bb::t_6c44e49d9fd2bb 42-44,49-51,110-112
+apps/dashboard/src/app/api/organizations/[organizationId]/chat/route.ts
+  s_53a064f34be9bb::t_e3b95ed64c29bd 229,245,247-248,346-347
+  s_53a064f34be9bb::t_6985356b59895e 68,237
+apps/dashboard/src/lib/chat/extra-tools.ts
+  s_53a064f34be9bb::t_c7e697b0aa6834 1-19
+apps/dashboard/src/utils/chat-tool-sets.ts
+  s_53a064f34be9bb::t_cf8fbc39674454 1-23
+apps/dashboard/src/lib/automation/chat-tools.ts
+  s_53a064f34be9bb::t_6c44e49d9fd2bb 320-323,634-635,653-656,695-696
+  s_53a064f34be9bb::t_d7f4918119b716 1-319,324-633,636-652,657-694,697-736
+apps/dashboard/src/workflows/steps/chat-steps.ts
+  s_53a064f34be9bb::t_6985356b59895e 48,294
+apps/dashboard/src/lib/automation/triggers.ts
+  s_53a064f34be9bb::t_ba89cb2829f098 174
+  s_53a064f34be9bb::t_6c44e49d9fd2bb 811-814
+  s_53a064f34be9bb::t_5c0b976a1ac611 1-173,175-810,815-846
+apps/dashboard/src/lib/orpc/utils/automation-errors.ts
+  s_53a064f34be9bb::t_6c44e49d9fd2bb 4
+  s_53a064f34be9bb::t_ee1b6b11731cf8 1-3,5-64
+apps/dashboard/src/constants/automation-chat-tools.ts
+  s_53a064f34be9bb::t_0d046624b9662c 1-30
+apps/dashboard/src/lib/orpc/routers/automation.ts
+  s_53a064f34be9bb::t_e0c56a8b049124 14-23,28-29,31,33-36,38-40,44-47,51-58,78-80,86-89,96-101,103,111-113,119-127,134-142,151-156
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "b5e4402a5839343dacf892ba30bcf0a0410241db",
+  "prompts": {},
+  "sessions": {
+    "s_53a064f34be9bb": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "22682581-e125-4897-86e5-4d73e61caf20",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

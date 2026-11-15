@@ -1,0 +1,33 @@
+scripts/github/production-deploy.mjs
+  s_673745a4f2f52f::t_d5d9ca24a9c02e 144-164,405-410,412-417,846,863,869-877,895
+  s_1b1e7d7ab4c860::t_e176ad22aeb6b6 404,868
+  s_673745a4f2f52f::t_f51b69f941e9f3 143
+scripts/github/production-deploy.test.mjs
+  s_1b1e7d7ab4c860::t_e176ad22aeb6b6 1495,1512-1513,1534,1545-1581,1583
+  s_1b1e7d7ab4c860::t_f8abf5847df435 1516-1519
+  s_673745a4f2f52f::t_927ead2c426583 1492-1494,1496-1511,1514-1515,1520-1533,1535-1544,1582
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "dff03a9c5d60a79e9f6c23a6ee8ecc32742b8087",
+  "prompts": {},
+  "sessions": {
+    "s_1b1e7d7ab4c860": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a1d543-15fe-7582-abd9-600b9ac50eb6",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    },
+    "s_673745a4f2f52f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "41c3de73-071e-4473-b094-b0db24729964",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

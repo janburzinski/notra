@@ -1,0 +1,109 @@
+apps/web/src/components/state-of-ai-search/report-tables.tsx
+  s_521b313f0278a9::t_fed1911cd1bdb1 13
+apps/dashboard/src/components/mcp/mcp-sections.tsx
+  s_521b313f0278a9::t_fed1911cd1bdb1 7-8
+apps/console/src/components/ai-trends/ai-trends-traffic-chart.tsx
+  s_521b313f0278a9::t_fed1911cd1bdb1 5
+apps/dashboard/src/styles/globals.css
+  s_521b313f0278a9::t_82f0d20939473b 12
+apps/console/src/components/ai-trends/ai-trends-traffic-sources.tsx
+  s_521b313f0278a9::t_fed1911cd1bdb1 5
+apps/ui/registry/notra/typography/types/typography.ts
+  s_521b313f0278a9::t_5ab87d298ea9bf 1,4-8,10-13,15-26
+apps/dashboard/src/app/(dashboard)/[slug]/geo/traffic/mcp/skeleton.tsx
+  s_521b313f0278a9::t_fed1911cd1bdb1 5-6
+apps/web/src/styles/ui-sources.css
+  s_521b313f0278a9::t_0e2a0698f8b57d 2-33
+apps/blog/scripts/web-chrome.js
+  s_521b313f0278a9::t_1bf3df312957b0 2,553
+apps/console/src/components/ai-trends/ai-trends-engine-metrics.tsx
+  s_521b313f0278a9::t_fed1911cd1bdb1 4
+apps/ui/src/styles/blocks.css
+  s_521b313f0278a9::t_27cfc3a1892674 1,21-22
+apps/ui/theme.css
+  s_521b313f0278a9::t_303d7d23bb1dae 19-26
+apps/web/scripts/generate-ui-sources.mjs
+  s_521b313f0278a9::t_0e2a0698f8b57d 7-13,51-74,108,115-124,138-139
+apps/dashboard/public/design.md
+  s_521b313f0278a9::t_9e5945d5e1365d 60,160
+packages/ui/package.json
+  s_521b313f0278a9::t_dad7dcdf280d92 8
+  s_521b313f0278a9::t_749a5504872b2d 7
+packages/ui/src/styles/tokens.css
+  s_521b313f0278a9::t_02616dacc4dce5 1-8,11,14-109
+  s_521b313f0278a9::t_dad7dcdf280d92 9-10,12-13
+apps/console/src/components/ai-trends/ai-trends-top-domains.tsx
+  s_521b313f0278a9::t_fed1911cd1bdb1 3
+apps/console/src/components/ai-trends/ai-trends-domain-explorer.tsx
+  s_521b313f0278a9::t_fed1911cd1bdb1 20
+apps/ui/registry/notra/typography/components/typography.tsx
+  s_521b313f0278a9::t_9af565801f515d 30-32
+  s_521b313f0278a9::t_5ab87d298ea9bf 3-5,7-13,15-29,33-36,39-43,45-63
+apps/ui/registry/notra/typography/constants/typography.ts
+  s_521b313f0278a9::t_5ab87d298ea9bf 5-27
+  s_521b313f0278a9::t_23f3d99fe95496 1-4
+apps/ui/registry.json
+  s_521b313f0278a9::t_b4918e2e1fe4c0 1304-1358
+  s_521b313f0278a9::t_fa5ff627938c77 1094,1265,1563,1644,10872,10968,11009,11078,11200,11382,11538,11713,11968,12151,12301,12433,12579,12710
+apps/web/public/design.md
+  s_521b313f0278a9::t_9e5945d5e1365d 423
+bun.lock
+  ai_agent 174
+apps/console/src/components/ai-trends/ai-trends-traffic-section.tsx
+  s_521b313f0278a9::t_fed1911cd1bdb1 6
+apps/console/tsconfig.json
+  s_521b313f0278a9::t_3a174b3141093e 28
+apps/console/src/components/ai-trends/ai-trends-advertisers.tsx
+  s_521b313f0278a9::t_fed1911cd1bdb1 3
+apps/ui/blume.config.ts
+  s_521b313f0278a9::t_7d04406f10de87 76-79,84-85
+  s_521b313f0278a9::t_653bbcbeff8488 80-83
+apps/web/src/components/landing/mock-frame.tsx
+  s_521b313f0278a9::t_fed1911cd1bdb1 2
+apps/web/src/components/state-of-ai-search/report-section.tsx
+  s_521b313f0278a9::t_fed1911cd1bdb1 3-4
+packages/ui/src/styles/typography.css
+  s_521b313f0278a9::t_cc5a71965c2c0e 1-74
+apps/console/src/styles/globals.css
+  s_521b313f0278a9::t_3a174b3141093e 5
+packages/ui/src/constants/table.ts
+  s_521b313f0278a9::t_cdc92465b743fc 1-5
+apps/web/src/styles/theme.css
+  s_521b313f0278a9::t_21c8197a7abd63 4,148
+apps/ui/package.json
+  s_521b313f0278a9::t_5ab87d298ea9bf 24-25
+  s_521b313f0278a9::t_82317cf01df1d7 33-34
+apps/dashboard/src/lib/hooks/use-mcp-columns.tsx
+  s_521b313f0278a9::t_fed1911cd1bdb1 6
+packages/ui/src/styles/globals.css
+  s_521b313f0278a9::t_7c394b9436f677 13
+apps/console/package.json
+  s_521b313f0278a9::t_3a174b3141093e 52
+apps/web/src/components/state-of-ai-search/report-ui.tsx
+  s_521b313f0278a9::t_fed1911cd1bdb1 17
+apps/ui/scripts/registry-tokens.ts
+  s_521b313f0278a9::t_d9de7a41a257f4 1,5-8,11,14-15,21-24,29,41-45,52,56,67,71-79,88-90,93,95-97,99-100,103,107,110-112
+  s_521b313f0278a9::t_05d59604c75498 2-4,13,17-20,25-28,30-39,46-51,53-55,57-66,68,80-87,98,102,113
+  s_521b313f0278a9::t_819e17f4c7b7b0 9-10,70,104-106,108-109
+apps/dashboard/src/components/geo/web-vitals-card.tsx
+  s_521b313f0278a9::t_fed1911cd1bdb1 9-10
+  s_521b313f0278a9::t_e274d31b49a79a 15
+apps/console/src/components/ai-trends/ai-trends-client.tsx
+  s_521b313f0278a9::t_fed1911cd1bdb1 8
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "7de49bc1307c9535898910dbbecb7faa5fe15b66",
+  "prompts": {},
+  "sessions": {
+    "s_521b313f0278a9": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "30963561-97b4-40cd-8da8-78905c8e42ea",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

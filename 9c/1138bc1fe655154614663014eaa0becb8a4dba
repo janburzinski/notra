@@ -1,0 +1,22 @@
+apps/web/src/lib/mcp-battle/engine.ts
+  s_985e9d8eeca486::t_a0d0bada9b48f1 1466-1467,1469-1470
+apps/web/src/constants/mcp.ts
+  s_985e9d8eeca486::t_a0d0bada9b48f1 147,152-154
+  ai_agent 148-149
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "9c1138bc1fe655154614663014eaa0becb8a4dba",
+  "prompts": {},
+  "sessions": {
+    "s_985e9d8eeca486": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "4bfd388d-bc5e-4b7b-9feb-e01cd6c4542e",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

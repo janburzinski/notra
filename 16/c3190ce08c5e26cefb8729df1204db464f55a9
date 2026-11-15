@@ -1,0 +1,19 @@
+apps/dashboard/src/app/(dashboard)/[slug]/sites/skeleton.tsx
+  s_21ea671205486b::t_086fbc7df0c742 5,8,12-15,17-24
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "16c3190ce08c5e26cefb8729df1204db464f55a9",
+  "prompts": {},
+  "sessions": {
+    "s_21ea671205486b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "84f15acf-0bd2-4510-a109-2503d997fd51",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

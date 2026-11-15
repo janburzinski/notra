@@ -1,0 +1,25 @@
+packages/ui/src/constants/composer.ts
+  s_363c5a27cc910d::t_98aea508f6bddf 2
+apps/ui/registry/notra/composer/constants/composer.ts
+  s_363c5a27cc910d::t_98aea508f6bddf 2
+packages/ui/src/components/ui/composer.tsx
+  s_363c5a27cc910d::t_98aea508f6bddf 126-128
+apps/ui/registry/notra/composer/components/composer.tsx
+  s_363c5a27cc910d::t_98aea508f6bddf 102-104
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "30931f07ad16a5a4ac2fc83681a85e893c29d194",
+  "prompts": {},
+  "sessions": {
+    "s_363c5a27cc910d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8c867862-17c4-414a-9fa2-8f205d23a86f",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

@@ -1,0 +1,25 @@
+packages/db/migrations/0163_geo_products.sql
+  ai_agent 1-19
+packages/geo-core/tests/project-create-from-website.test.ts
+  s_dee84dad4454b7::t_79b785dd58f7f7 48,53-54
+packages/db/migrations/meta/0163_snapshot.json
+  ai_agent 1-17957
+packages/db/migrations/meta/_journal.json
+  ai_agent 1145-1151
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "776074ac6fed50497a6a68608e5cf1809c16cbfc",
+  "prompts": {},
+  "sessions": {
+    "s_dee84dad4454b7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c4318025-3977-48ad-a0dc-b9c3be498424",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

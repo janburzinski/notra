@@ -1,0 +1,101 @@
+apps/dashboard/src/constants/autopilot-dream.ts
+  s_39a979031e16c5::t_4d166526c829ae 1-71
+apps/dashboard/tests/autopilot-flow.test.ts
+  s_39a979031e16c5::t_579cbdc024b90c 1677-1680,1686
+apps/dashboard/src/lib/autopilot/pull-request-reviews.ts
+  s_39a979031e16c5::t_8c013e6ddf4918 1-35,43-52,54,58,60,62-132
+  s_39a979031e16c5::t_392ca2a5b74570 36-42
+apps/dashboard/src/lib/autopilot/run.ts
+  s_39a979031e16c5::t_392ca2a5b74570 29
+  s_39a979031e16c5::t_68c035a68baf15 348
+apps/dashboard/src/types/autopilot-dream.ts
+  s_39a979031e16c5::t_d4ad93df73b05f 90,92-110
+  s_39a979031e16c5::t_5df2ea69014c22 91
+  s_39a979031e16c5::t_2b31057a7bf9dc 1-89
+apps/dashboard/src/lib/autopilot/planner.ts
+  s_39a979031e16c5::t_2fb4cadc726226 28
+apps/dashboard/src/lib/autopilot/repository-agent.ts
+  s_39a979031e16c5::t_74b086f2d30207 29-31,115-120,277,296,302,320
+apps/dashboard/tests/autopilot-sandbox.test.ts
+  s_39a979031e16c5::t_079131ff0ca211 125-126
+apps/dashboard/src/lib/autopilot/writer.ts
+  s_39a979031e16c5::t_b0e18464eb3b39 31,88,174
+packages/memory/src/constants/memory.ts
+  s_39a979031e16c5::t_e0359900581ff6 39-40,43
+  s_39a979031e16c5::t_d92f577c1c86c8 44-45
+apps/dashboard/src/lib/autopilot/conventions.ts
+  s_39a979031e16c5::t_b760e0018e7321 1-26
+packages/tools/src/constants/autopilot.ts
+  s_39a979031e16c5::t_68c035a68baf15 5
+apps/dashboard/src/schemas/autopilot-dream.ts
+  s_39a979031e16c5::t_2fb4cadc726226 1-16
+apps/dashboard/src/lib/workflow-engine/blocks/autopilot/dream.ts
+  s_39a979031e16c5::t_e015241e5a22dd 1-18,20,22-25,27-71,93-98,102-109,115,123-127,131-140
+  s_39a979031e16c5::t_392ca2a5b74570 21,26,99-101,110-114,116-122,128-130
+  s_39a979031e16c5::t_d4ad93df73b05f 19
+  s_39a979031e16c5::t_da53b9c2326b2c 72-92
+apps/dashboard/src/lib/autopilot/agent.ts
+  s_39a979031e16c5::t_68c035a68baf15 94-102,196
+  s_39a979031e16c5::t_392ca2a5b74570 19,103-127,129-141
+apps/dashboard/src/lib/workflow-engine/definitions/autopilot.ts
+  s_39a979031e16c5::t_b0e18464eb3b39 190
+  s_39a979031e16c5::t_9a2566c02184e4 173-174,177-178,181-182,185,188-189,197,199,208-209
+apps/dashboard/tests/autopilot-dream.test.ts
+  s_39a979031e16c5::t_a62519db145f9d 631,650,811,820,836
+  s_39a979031e16c5::t_b09c5e6d1502bb 85,618,753-755,781-784,795-810,937
+  s_39a979031e16c5::t_40566a0f0aa61f 1-17,19,21-81,83-84,86-123,131,136-223,230,232-299,302-303,305-370,375-472,484-505,507-617,619-630,632-649,651-752,756-780,785-794,812-819,821-835,837-853,864-865,867-913,915-919,921-924,926-928,930,932-936,938-990,992-999,1003-1040
+  s_39a979031e16c5::t_4980da322a71ba 18,20,82,300-301,304,371-374,473-483,506,854-863,866,914,920,925,929,931,991,1000-1002
+  s_39a979031e16c5::t_c6b590fbe3e8ad 224-229,231
+packages/memory/src/utils/access.ts
+  s_39a979031e16c5::t_e0359900581ff6 3,14-19,36-39
+apps/dashboard/src/lib/autopilot/daily-notes.ts
+  s_39a979031e16c5::t_e015241e5a22dd 1-23
+packages/memory/src/types/memory.ts
+  s_39a979031e16c5::t_e0359900581ff6 3-4,6-10
+packages/ai/src/utils/autopilot-planner.ts
+  s_39a979031e16c5::t_2fb4cadc726226 189-198
+apps/dashboard/src/lib/workflow-engine/blocks/index.ts
+  s_39a979031e16c5::t_9a2566c02184e4 5,14
+apps/dashboard/src/lib/autopilot/brief.ts
+  s_39a979031e16c5::t_68c035a68baf15 123,191-193,195
+apps/dashboard/src/utils/autopilot-dream.test.ts
+  s_39a979031e16c5::t_b09c5e6d1502bb 94,440-445,538-546
+  s_39a979031e16c5::t_fb52453337e652 1-93,95-439,446-537,547-554
+packages/memory/src/utils/paths.ts
+  s_39a979031e16c5::t_d92f577c1c86c8 1-17
+apps/dashboard/src/lib/autopilot/blog.ts
+  s_39a979031e16c5::t_392ca2a5b74570 41
+  s_39a979031e16c5::t_b0e18464eb3b39 483-486
+apps/dashboard/src/lib/autopilot/dream.ts
+  s_39a979031e16c5::t_579cbdc024b90c 761-763
+  s_39a979031e16c5::t_392ca2a5b74570 51-54,63,133-135,138-140,189-191,196-198,253-255,264-269,530-535,538-540,556-558,582-584,643-645,652-654,660-664,669-671,701-703,744-746,748-749,752-753,775-777,843-845,849-852,856-859,862-864,886-888
+  s_39a979031e16c5::t_e4656b25d7bd95 1-50,55-62,64-70,72-132,136-137,141-188,192-195,199-252,256-263,270-529,536-537,541-555,559-581,585,587-590,594-642,646-651,655-659,665-668,672-700,704-743,747,750-751,754-760,764-774,778-842,846-848,853-855,860-861,865-885,889-901
+  s_39a979031e16c5::t_d4ad93df73b05f 71
+  s_39a979031e16c5::t_e015241e5a22dd 586,591-593
+apps/dashboard/src/utils/autopilot-dream.ts
+  s_39a979031e16c5::t_5df2ea69014c22 418
+  s_39a979031e16c5::t_392ca2a5b74570 181,324-327,419,637
+  s_39a979031e16c5::t_0b2e5c33e89f32 426-428,430-431,434-436,438
+  s_39a979031e16c5::t_d333894458211f 1-180,182-323,328-417,420-425,429,432-433,437,439-636,638-674
+packages/db/src/types/autopilot.ts
+  s_39a979031e16c5::t_b26de3c88d5228 113
+apps/dashboard/src/lib/autopilot/findings.ts
+  s_39a979031e16c5::t_cad755e727f37b 25
+  s_39a979031e16c5::t_b26de3c88d5228 85-86,91-96,756-764
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "5b2ea3cd45fc9c6b3c6c412d573f123b81e5a7ec",
+  "prompts": {},
+  "sessions": {
+    "s_39a979031e16c5": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "1e103131-c075-4c6c-b618-b56f789a7db9",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

@@ -1,0 +1,25 @@
+apps/dashboard/src/lib/hooks/use-chat-prompt-suggestions.ts
+  s_c89d704f93bfcb::t_f0cdbbfc0834ef 1-15,17-22,24-27,29-45,47-49,52-54,73,119,121,123-124,126-127,130-135,146-158,160-170,172-174
+  s_c89d704f93bfcb::t_fe8db033619853 16,23,28,46,50-51,55-72,74-118,120,122,125,128-129,136-145,159
+apps/dashboard/src/components/chat/chat-home-suggestions.tsx
+  s_c89d704f93bfcb::t_c1faef47da0f64 1-2,4-26,33-36,38-46,49-95,97-98,125-126,145-149
+  s_c89d704f93bfcb::t_c696829a73a4e2 3,27-32,37,47,96,99-124,127-144
+apps/dashboard/src/lib/chat/suggestions.ts
+  s_c89d704f93bfcb::t_66e608daccc31d 1-18,20-125,127-137,140-144,148-155,157-162,164-165,167-205,207-209,211-216,219-222
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "3be53b8bd4fa006e68a6cb0042b31e34725f260d",
+  "prompts": {},
+  "sessions": {
+    "s_c89d704f93bfcb": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "edf817e8-1735-4864-86bd-9092d04ff562",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

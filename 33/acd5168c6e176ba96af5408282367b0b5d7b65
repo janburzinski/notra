@@ -1,0 +1,36 @@
+apps/dashboard/src/lib/hooks/use-autopilot-settings-summaries.ts
+  s_a9cac4c6e46f3c::t_e66b3af323bbfe 1-90
+apps/dashboard/src/components/autopilot/autopilot-settings-panel.tsx
+  s_a9cac4c6e46f3c::t_3a7ca07548f58f 26,54-57,64-80,93,95
+apps/dashboard/src/types/autopilot.ts
+  s_a9cac4c6e46f3c::t_9f66f419b4730d 9,545-548,551-554,557
+apps/dashboard/src/utils/autopilot-settings.ts
+  s_a9cac4c6e46f3c::t_8c045bafbb637f 4,19-21,25,46-47
+apps/dashboard/src/components/autopilot/autopilot-settings-sections.tsx
+  s_a9cac4c6e46f3c::t_3a7ca07548f58f 313,315
+packages/schemas/src/schemas/dashboard/autopilot.ts
+  s_a9cac4c6e46f3c::t_e2512ba780fb98 107-125,131-134,145,149,153-171
+apps/dashboard/src/lib/autopilot/settings.ts
+  s_a9cac4c6e46f3c::t_08d57d42ef4db8 7
+  s_a9cac4c6e46f3c::t_b0bce5ec9f1713 9-11,29-31,33-67,69,71,75-83,98,100,108,147-151,154,159-165,170-172,175-193,196-198,200-204,226,228-229
+apps/dashboard/src/lib/hooks/use-autopilot-settings-save.ts
+  s_a9cac4c6e46f3c::t_d7823484b3bd61 3-7,12-13,16,20,22-26,30,36,38-42,44-52,54-55,57,63-64,66,68-71,74-77,81,83-84,88-91,93-94
+apps/dashboard/src/lib/orpc/routers/autopilot.ts
+  s_a9cac4c6e46f3c::t_08d57d42ef4db8 29,81,438-446
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "33acd5168c6e176ba96af5408282367b0b5d7b65",
+  "prompts": {},
+  "sessions": {
+    "s_a9cac4c6e46f3c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "318c8e83-3121-4bb9-8662-78a41492c642",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

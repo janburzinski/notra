@@ -1,0 +1,19 @@
+apps/dashboard/src/components/autopilot/autopilot-brief-item-dialog.tsx
+  s_3428b476267439::t_292f2d93f64fda 61-63,70,178-187
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "c18efb249ed7c06a71f6ac47ff566add2eb1b10f",
+  "prompts": {},
+  "sessions": {
+    "s_3428b476267439": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c6d39551-e687-4036-a65c-3bd92bb74947",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

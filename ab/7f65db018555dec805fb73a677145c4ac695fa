@@ -1,0 +1,26 @@
+apps/dashboard/src/lib/geo/traffic-embeds.ts
+  s_eacb6af6af8b76::t_fcf05da9a4dd9b 556-559,668,671-681,712
+apps/dashboard/src/lib/hooks/use-live-traffic-embed.ts
+  s_eacb6af6af8b76::t_17dfd0cb95f30e 12-15,24-25,27,33-35,46-66,82-84,104,119-120,123-131,200
+apps/dashboard/src/types/traffic-embed.ts
+  s_eacb6af6af8b76::t_fcf05da9a4dd9b 82-87
+apps/dashboard/src/components/geo/traffic-embed-dialog.tsx
+  s_eacb6af6af8b76::t_8ebbffe749eaba 291-298,336,347
+  s_eacb6af6af8b76::t_fc8bfe48e710ca 228-232,274-278,282-286
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "ab7f65db018555dec805fb73a677145c4ac695fa",
+  "prompts": {},
+  "sessions": {
+    "s_eacb6af6af8b76": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "2edb034b-eaba-4f3a-919f-85a761fafa20",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

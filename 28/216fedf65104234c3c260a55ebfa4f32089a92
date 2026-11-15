@@ -1,0 +1,19 @@
+apps/dashboard/src/utils/autopilot-schedule.ts
+  s_fd6ab57014372a::t_34e58ddd9cfda6 1-2,49-53
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "28216fedf65104234c3c260a55ebfa4f32089a92",
+  "prompts": {},
+  "sessions": {
+    "s_fd6ab57014372a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "eb44c9e3-b834-4d73-9c87-a1ced06752c7",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

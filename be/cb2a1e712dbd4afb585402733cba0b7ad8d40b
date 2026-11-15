@@ -1,0 +1,26 @@
+apps/ui/registry/notra/dropdown-menu/constants/dropdown-menu.ts
+  s_a64beba9168101::t_badcdb2f3fc650 2
+packages/ui/src/components/ui/select.tsx
+  s_a64beba9168101::t_077dc5a2b9f54a 38-42,67,174
+apps/blog/scripts/web-chrome.js
+  ai_agent 2-3
+packages/ui/src/constants/dropdown.ts
+  s_a64beba9168101::t_badcdb2f3fc650 24
+  s_a64beba9168101::t_077dc5a2b9f54a 27,42
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "becb2a1e712dbd4afb585402733cba0b7ad8d40b",
+  "prompts": {},
+  "sessions": {
+    "s_a64beba9168101": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b853b1b3-9b64-4152-9ea1-306dbf0ceb10",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

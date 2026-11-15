@@ -1,0 +1,19 @@
+apps/dashboard/src/components/analytics-import/import-saved-connections.tsx
+  s_b737b78f562605::t_e8d15e0bcdb698 1-51
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "4fe7f9d625234026b0d902ddf1d002ad889e29ac",
+  "prompts": {},
+  "sessions": {
+    "s_b737b78f562605": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "707f0b8b-ddee-4ffd-bce9-25638f3e1186",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

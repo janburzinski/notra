@@ -1,0 +1,20 @@
+apps/dashboard/src/lib/public-data/ai-traffic.ts
+  s_2982e69d57129d::t_79fbe3c115c5cd 224
+  s_2982e69d57129d::t_90c6720a9895d6 208-219
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "7d05f57075a2e1d28044ca3505e035deb815aeb2",
+  "prompts": {},
+  "sessions": {
+    "s_2982e69d57129d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "4719f76f-6450-4a2e-bb44-0e46db47141e",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

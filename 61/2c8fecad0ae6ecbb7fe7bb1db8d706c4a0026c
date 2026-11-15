@@ -1,0 +1,1269 @@
+apps/minigame/src/lib/server/store.test.ts
+  ai_agent 1-287
+apps/console/src/components/overview/overview-client.tsx
+  ai_agent 5,8-9,13-28,30-36,38-44,46-57,59-83,87-91,93-96,99-108,112-152,154-192,194-200,202,204-209,211,213-247,251-256,258-292,294-299,301-306,308-326,328-393,395-452
+apps/minigame/src/routes/api/admin/review.ts
+  ai_agent 1-26
+apps/dashboard/src/app/(dashboard)/[slug]/automation/loading.tsx
+  ai_agent 18
+apps/ui/src/styles/blocks.css
+  ai_agent 1,21-22
+apps/web/public/mcp/grok.svg
+  ai_agent 1-4
+apps/web/src/lib/mcp/markdown.ts
+  ai_agent 8-12,26,33-36,194-242
+apps/dashboard/vercel.json
+  ai_agent 50-53
+apps/dashboard/src/components/geo/mention-trend-card.tsx
+  ai_agent 152
+apps/dashboard/src/constants/autopilot.ts
+  ai_agent 3,49-50,98,122,126,224-225,253-254,257-276,286,295-301,346-352,365-366,401,424-428,485,499,515
+apps/minigame/src/routes/api/leaderboard.ts
+  ai_agent 1-31
+packages/ui/src/constants/fade-swap.ts
+  ai_agent 1,3
+apps/dashboard/src/components/demo/demo-banner.tsx
+  ai_agent 38
+apps/dashboard/tests/fixtures/demo-api-key.fixture.ts
+  ai_agent 137-155
+packages/schemas/src/schemas/api/skills.ts
+  ai_agent 52-58,61,69-71,78-80
+package.json
+  ai_agent 54,60,103-104
+apps/web/src/routes/_landing/home.tsx
+  ai_agent 5,9,11-12,14-17
+apps/console/src/components/slack-bot/slack-bot-client.tsx
+  ai_agent 16,200-206
+packages/ui/src/components/ui/alert-dialog.tsx
+  ai_agent 5-8,35-36,57-58
+apps/dashboard/src/constants/autopilot-slack.ts
+  ai_agent 21
+apps/console/src/components/layout/console-shell.tsx
+  ai_agent 6,97,181,183-185,245-249
+packages/geo-core/src/imports/posthog.ts
+  ai_agent 1-569
+scripts/github/production-deploy.test.mjs
+  ai_agent 356-357,1335-1338,1495-1628
+apps/minigame/src/lib/share.ts
+  ai_agent 1-27
+apps/ui/src/components/registry-install.tsx
+  ai_agent 1,7
+apps/dashboard/src/components/dashboard/right-panel.tsx
+  ai_agent 9,14,56-82
+apps/dashboard/src/constants/workflow-engine.ts
+  ai_agent 33
+apps/console/src/app/(console)/[slug]/page.tsx
+  ai_agent 1,4-11,18-24
+apps/dashboard/src/lib/demo/sandbox.ts
+  ai_agent 25,37,541-586,746-754,756,768
+apps/dashboard/src/styles/globals.css
+  ai_agent 8,12,153,158,162,166,257,313,318-326,350,353-355
+apps/dashboard/src/constants/right-panel.ts
+  ai_agent 4-5,17-23
+apps/sites-builder/tests/consent-storage.test.ts
+  ai_agent 48-66
+apps/minigame/src/lib/game/renderer.ts
+  ai_agent 1-1304
+apps/ui/registry/notra/composer/constants/composer.ts
+  ai_agent 2
+packages/sites-server/src/utils/preview-comment.ts
+  ai_agent 5,8,19-21,24-25,27,29-36,45-47
+apps/dashboard/package.json
+  ai_agent 23,137,153
+packages/ai/src/prompts/diagram-edit.ts
+  ai_agent 5-6
+apps/dashboard/src/components/autopilot/autopilot-source-repositories-row.tsx
+  ai_agent 1-214
+packages/schemas/src/types/api/geo-window.ts
+  ai_agent 1-4
+apps/web/src/routes/_site/data/index.tsx
+  ai_agent 63
+apps/dashboard/src/app/api/integrations/linear/callback/route.ts
+  ai_agent 3-7,124-125,130-132,134-138,148,179,184,198-204
+apps/dashboard/src/lib/autopilot/search-console.ts
+  ai_agent 1-58
+apps/minigame/src/utils/share.ts
+  ai_agent 1-25
+packages/db/src/constants/analytics-imports.ts
+  ai_agent 9,18
+packages/ui/src/constants/icon-tabs.ts
+  ai_agent 2-8
+apps/ui/registry/notra/code-block/components/code-block.tsx
+  ai_agent 3,5-13,15-18,20-47,50-80,84-85,87-89,91,93,96,98-134,136-142,146-147,149-159,161,163-166,171,173,176,178-185,187-188,191-195,197-203,205,207-208,210-213
+apps/dashboard/src/components/command-palette/command-palette.tsx
+  ai_agent 392
+apps/evals/src/scoring/autopilot-planner.ts
+  ai_agent 134-135,225
+apps/minigame/.gitignore
+  ai_agent 1-9
+apps/minigame/src/constants/ship-art.ts
+  ai_agent 1-132
+apps/minigame/src/types/leaderboard.ts
+  ai_agent 1-118
+packages/ai/src/types/excalidraw-diagram.ts
+  ai_agent 107-112
+apps/dashboard/src/app/(dashboard)/[slug]/brand/identity/components/guidelines-pdf-upload-button.tsx
+  ai_agent 38-43
+apps/console/src/lib/overview/queries.ts
+  ai_agent 1-22,24-34,36-37,39,41-46,49-50,52-60,63-64,67-74,77-80,83-109,111,114-136,138-144,147-170,172-178,181-217,219-228,231-265,267-277,280-299,302-312,315-334,337,339-364,366-382,385-400,403-416,419-443,445-456
+apps/api/src/routes/geo-traffic.ts
+  ai_agent 27,186,204
+apps/dashboard/messages/de.json
+  ai_agent 159-162,3126,4769,4774,4803-4806,4840-4841,4876-4881,5586,5617-5619,10227-10287
+packages/db/src/types/autopilot.ts
+  ai_agent 4,24-25,40-44,48-49,125-126,130-143
+packages/schemas/src/schemas/api/webhooks.ts
+  ai_agent 1,43-49,54-62,67-73,75-77,79-99,101-108,113-115,117-130,137-140,143-149,152-159
+apps/ui/registry/notra/code-block/examples/code-block-demo.tsx
+  ai_agent 1-35,38-51,53-56
+apps/dashboard/src/utils/autopilot-commit-filters.ts
+  ai_agent 7,22-87
+apps/dashboard/src/components/analytics/analytics-nav.tsx
+  ai_agent 3-9,26-28,34-36,42-43
+apps/dashboard/src/types/wgsl.d.ts
+  ai_agent 1
+apps/ui/registry/notra/icon-tabs/components/icon-tabs.tsx
+  ai_agent 75-78,81-87,92,97,114,117
+apps/dashboard/src/lib/autopilot/writer.test.ts
+  ai_agent 89,96
+.github/workflows/code-quality.yml
+  ai_agent 64,272-276,313-314,325-349
+apps/dashboard/src/utils/autopilot-blog.ts
+  ai_agent 13,149-158,166,175-199
+packages/ai/src/constants/linear.ts
+  ai_agent 50-65
+apps/dashboard/src/components/analytics/analytics-source-tabs.tsx
+  ai_agent 10-14,60,62-70,76-78,84-86,92,94-95,101,103
+packages/db/migrations/meta/0162_snapshot.json
+  ai_agent 1-17789
+apps/dashboard/src/lib/autopilot/blog.ts
+  ai_agent 7,38,41-44,46-49,52,87-88,117,120,124,129-139,165,171-174,334-340,371-406,444-445,482-498,569,582-583,602,611-620,624-632,637-652,701-742,746,750,806-811,823,852-858,866-867,1158,1161,1163-1166,1184-1185,1190-1191,1199,1217,1219-1235,1246-1249,1274-1290,1293-1298,1327,1402-1405,1640,1847-1850,1853
+apps/web/src/types/compare.ts
+  ai_agent 28-29
+apps/dashboard/src/utils/autopilot-rendering.ts
+  ai_agent 3,50-57,114-118
+apps/web/src/lib/sitemap/entries.ts
+  ai_agent 9,17,99-102
+apps/web/src/types/mcp-platforms.ts
+  ai_agent 1-82
+apps/web/public/mcp/gemini.svg
+  ai_agent 1
+apps/minigame/src/routes/api/runs/index.ts
+  ai_agent 1-52
+apps/web/src/constants/mcp-platforms.ts
+  ai_agent 1-614
+apps/minigame/src/lib/game/sprites.ts
+  ai_agent 1-154
+apps/dashboard/src/components/dashboard/dashboard-shell.tsx
+  ai_agent 14,45,126-132,134-146,152,160-164
+apps/minigame/vite.config.ts
+  ai_agent 1-24
+apps/sites-builder/compiler/og-images.ts
+  ai_agent 30,208-211,238-240
+apps/web/src/constants/compare/competitors/profound.ts
+  ai_agent 17,19,25-26,29,38,53,55,70,79-80,99-100,124,138,143
+apps/docs/analytics/tracker-reference.mdx
+  ai_agent 82
+apps/dashboard/src/components/geo/scan-run-detail.tsx
+  ai_agent 123,138,146
+apps/web/src/components/state-of-ai-search/report-section.tsx
+  ai_agent 3-4
+apps/web/src/content/legal/privacy.mdx
+  ai_agent 5,35,71-74,99,117
+apps/minigame/src/routes/api/me.ts
+  ai_agent 1-51
+packages/db/migrations/0163_linear_oauth_refresh_tokens.sql
+  ai_agent 1-2
+apps/dashboard/src/types/workflows/content-generation-steps.ts
+  ai_agent 82-83
+packages/schemas/src/schemas/api/geo-diagnostics.ts
+  ai_agent 7,10-61,66-80,83-99,101-105,110-113,117-146,152-158,166-171,174-176,178-185,188-190,192-212,216-224,231-234,244-246,248-271,273-314,320-323,327-330,335-377,382
+packages/schemas/src/schemas/api/geo-shelf.ts
+  ai_agent 14-21
+apps/sites/src/types/serving.ts
+  ai_agent 48-53
+apps/docs/analytics/web-analytics.mdx
+  ai_agent 43
+apps/minigame/src/lib/game/verify-run.test.ts
+  ai_agent 1-176
+packages/ui/src/components/ui/progress.tsx
+  ai_agent 4,42-56,63-66,68
+packages/ui/src/components/ui/tabs.tsx
+  ai_agent 5,8-11,72,85,125-127
+packages/schemas/src/schemas/api/geo-competitors.ts
+  ai_agent 17-38,44-46,66-91,107-110,123-126,153-168
+packages/schemas/src/schemas/api/geo-content.ts
+  ai_agent 31-35,39-67,69-75,78-81,93-99,102-106,109-168,191-207,212-227,233-240,280-286,290-297,302-345,348-383,386-390,392-395,403-406,413-416,427-444,446-453,572-575,578-584,591-594
+apps/minigame/src/components/model-picker.tsx
+  ai_agent 1-66
+apps/web/public/mcp/bolt.svg
+  ai_agent 1
+packages/sites-core/src/utils/input-fingerprint.ts
+  ai_agent 3-5,10,22-25,27-40
+apps/dashboard/src/lib/workflow-engine/blocks/autopilot/templates.ts
+  ai_agent 12-16,38,53,335-408
+apps/minigame/knip.json
+  ai_agent 1-4
+apps/ui/registry/notra/package-command/types/package-command.ts
+  ai_agent 1-16
+apps/ui/registry/notra/typography/components/typography.tsx
+  ai_agent 3-4,7-13,15-36,39-43,45,47-62
+packages/ai/src/utils/autopilot-planner.ts
+  ai_agent 2,7,452,456-466,486-492,526-531,540-541
+apps/agent/tests/linear-tools.test.ts
+  ai_agent 4,199-203
+packages/geo-core/tests/geo-grounded-engines.test.ts
+  ai_agent 68-71,109,113,117,129,223,226,231,234-237
+packages/ui/src/constants/dropdown.ts
+  ai_agent 7-13,24,27,42
+apps/dashboard/src/app/(dashboard)/[slug]/geo/traffic/mcp/skeleton.tsx
+  ai_agent 5-6
+apps/console/src/components/insights/insights-page-header.tsx
+  ai_agent 3,5,7-14,16-19,21-33
+apps/minigame/src/utils/format.ts
+  ai_agent 1-12
+apps/web/src/constants/compare/competitors/scrunch.ts
+  ai_agent 9,13,15,17-18,21,24-25,30,32,37,47,49,54,64-65,69,72,77,81,83-84,88-89,92,96-98,100,104-107,112,116,121
+packages/db/src/constants/autopilot.ts
+  ai_agent 11,27,50-55,99-104
+apps/dashboard/src/components/geo/traffic-empty.tsx
+  ai_agent 3-12,25-36
+apps/ui/registry/notra/package-command/examples/package-command-demo.tsx
+  ai_agent 1-10
+bun.lock
+  ai_agent 174,198,312,328,367-394,475,550,555,1090-1091,1308,1426-1427,1432-1433,1654,1656,1658,1778-1781,2028-2029,2032-2033,2738,2740,2742,2744,2746,2748,2750,2752,2754,2756,2758,2760,2762,2764,2766,2768,3480-3489,3656,3704,4870,5030,5204-5205,5398,5500-5501,5518-5519,5786,6112,6220,6292,6302-6303,6362-6363,6374-6375,6494-6495,6900-6901,6968,6970,7116-7118,7120,7122-7124,7140-7141,7162-7163,7358-7359,7382-7389,7398-7399,7478,7578-7579,7622,7624,7626-7656,8100-8101,8300,8302,8304,8306,8328-8329,8356-8360,8362,8414-8415,8552-8575,8580-8611,8810,8812,8814,8816,8818,8820,8822,8824,8826,8828,8830,8832,8834-8850,8878-8879,8994-9025,9120-9121,9132-9133,9198-9199,9204-9305,9314-9315,9318-9350,9360-9361,9368-9399,9404,9406,9408,9410,9412,9414,9416-9434,9436,9438,9440,9442,9444,9446,9448,9450,9452,9454,9456,9458,9460,9462,9464,9466,9468,9470,9472,9474,9476,9478,9480,9482-9524,9526,9528,9614-9645,9680-9743,9754-9787,9840-9871,9924-9969,9996
+apps/dashboard/src/workflows/onboarding-agent.ts
+  ai_agent 61-66
+packages/ai/src/integrations/slack.ts
+  ai_agent 7,436-439,444-460,481-487,489-494
+apps/dashboard/src/lib/autopilot/links.ts
+  ai_agent 27,56-59,106-108,132-133,567-571
+apps/ui/theme.css
+  ai_agent 19-26,558-584
+apps/dashboard/tests/autopilot-flow.test.ts
+  ai_agent 236-240,607,656,1121-1134,1150-1156,1214-1217,1714,1740-1741,1746-1747,1751,1754-1756,1766,1834-1850,1893
+packages/sites-server/src/webhooks.ts
+  ai_agent 43,219-221,237
+apps/evals/src/types/autopilot-planner.ts
+  ai_agent 26-30,53-54
+apps/web/src/components/navbar-mobile-menu.tsx
+  ai_agent 7,71,98
+apps/ui/registry/notra/typography/constants/typography.ts
+  ai_agent 1-28
+apps/dashboard/src/lib/billing/plan-badge-renderer.ts
+  ai_agent 1-131
+apps/dashboard/messages/en.json
+  ai_agent 159-162,3126,4769,4774,4803-4806,4840-4841,4876-4881,5586,5617-5619,10227-10287
+apps/dashboard/src/app/(dashboard)/[slug]/content/page-client.tsx
+  ai_agent 6-10,85-89,91-95,97-98
+apps/minigame/src/components/load-error.tsx
+  ai_agent 1-17
+apps/dashboard/src/app/(dashboard)/[slug]/integrations/page-client.tsx
+  ai_agent 3,8-11,222-236
+apps/minigame/public/favicon.svg
+  ai_agent 1-5
+apps/dashboard/src/components/ai/chat-activity-group.tsx
+  ai_agent 221,297
+packages/sites-server/tests/push-paths.test.ts
+  ai_agent 1-27
+apps/dashboard/src/lib/autopilot/publish.ts
+  ai_agent 7,9,13,51,56-74,80,408-409
+apps/sites-builder/src/lib/seo.ts
+  ai_agent 13,159-160,166,174-176
+apps/dashboard/src/lib/autopilot/settings.ts
+  ai_agent 7-10,97,140,151
+apps/sites/src/serve-file.ts
+  ai_agent 16,18,80-127,161-164,167-174
+packages/sites-server/src/constants/smart-deployments.ts
+  ai_agent 3-4
+apps/dashboard/src/constants/geo-directions.ts
+  ai_agent 1-6,38-41
+apps/minigame/src/utils/pending-run.ts
+  ai_agent 1-80
+apps/web/src/routes/__root.tsx
+  ai_agent 146
+apps/dashboard/src/lib/autopilot/draft-emails.ts
+  ai_agent 1,3-5,7-12,14-15,17-37,39-47,49-99,102-111
+apps/sites/tests/handler.test.ts
+  ai_agent 506-628
+apps/dashboard/src/constants/notifications.ts
+  ai_agent 1-8
+packages/schemas/src/schemas/dashboard/geo-shelf.ts
+  ai_agent 63-96,100-120,124-144,149-155,162-211
+packages/geo-core/tests/persona-scan.test.ts
+  ai_agent 258,264,326-327
+apps/minigame/src/routes/api/runs/$runId.ts
+  ai_agent 1-139
+apps/minigame/src/routes/s/$playerId.tsx
+  ai_agent 1-52
+apps/sites-builder/src/constants/seo.ts
+  ai_agent 34-36
+apps/dashboard/src/components/analytics/connect-accounts-buttons.tsx
+  ai_agent 41,47
+apps/dashboard/src/utils/autopilot-findings.ts
+  ai_agent 69-75,97-111
+apps/ui/registry/notra/code-block/types/code-block.ts
+  ai_agent 3-4,6-12,15-18,21-25,28-31,34
+apps/dashboard/src/lib/analytics-imports/providers.ts
+  ai_agent 19-24,53-85,100-101,109-110,136-137,201-204
+apps/dashboard/src/constants/autopilot-landing.ts
+  ai_agent 1-96
+apps/dashboard/src/lib/hooks/use-autopilot-dock.ts
+  ai_agent 53-55,85-91
+apps/ui/registry/notra/code-block/constants/code-block.ts
+  ai_agent 1-11
+apps/web/src/routes/_landing/landing.tsx
+  ai_agent 5,9,11-12,14-17
+packages/sites-core/tests/input-fingerprint.test.ts
+  ai_agent 171-223
+apps/web/public/mcp/raycast.svg
+  ai_agent 1-3
+apps/dashboard/src/utils/autopilot-citations.ts
+  ai_agent 3-6,17,71-137,165-170,204-219,222
+apps/dashboard/src/lib/analytics-imports/credentials.ts
+  ai_agent 9,45-46,76-79
+packages/sites-server/src/types/smart-deployments.ts
+  ai_agent 3-4,9-16
+apps/api/src/routes/geo-visibility.ts
+  ai_agent 2,19-20,67-70,89-92,111-114,180-183,202-205,223,226
+apps/sites-builder/src/layouts/Base.astro
+  ai_agent 97-102,113-118
+apps/dashboard/src/lib/hooks/use-autopilot-settings-save.ts
+  ai_agent 1-78
+apps/dashboard/src/constants/chat-activity.ts
+  ai_agent 7
+apps/minigame/src/routes/index.tsx
+  ai_agent 1-13
+apps/ui/registry/notra/dropdown-menu/constants/dropdown-menu.ts
+  ai_agent 2
+apps/dashboard/src/lib/email/notification-data.ts
+  ai_agent 9,17-18,34-37
+apps/ui/components.ts
+  ai_agent 11
+packages/ai/src/prompts/content-dispatcher.ts
+  ai_agent 27
+packages/ai/src/schemas/autopilot-agent.ts
+  ai_agent 3,51-56,63
+apps/ui/docs/components/meta.ts
+  ai_agent 16-17
+apps/web/src/constants/compare/competitors/bydefault.ts
+  ai_agent 9-11,13,15,17-19,21-22,25-26,32,34,42,44,47,49,54,56,59-61,64,66,93-96,99,104-105,113,118,123,132,137,147-152
+packages/geo-core/src/constants/ingest.ts
+  ai_agent 136,146
+apps/minigame/src/constants/anti-cheat.ts
+  ai_agent 1-31
+apps/minigame/src/components/menu.tsx
+  ai_agent 1,3-6,8-15,17-34,36-46,48-53,56-84,86-90,92-115,117-155,157-166
+apps/minigame/src/types/render.ts
+  ai_agent 1-76
+apps/ui/registry/notra/package-command/lib/package-command.ts
+  ai_agent 1-110
+apps/ui/scripts/registry-tokens.ts
+  ai_agent 1-114
+apps/minigame/src/lib/game/sim.ts
+  ai_agent 1-1545
+apps/dashboard/src/components/autopilot/autopilot-templates.tsx
+  ai_agent 7,46
+apps/minigame/src/lib/game/autopilot.ts
+  ai_agent 1-137
+apps/minigame/src/routes/auth/x/start.ts
+  ai_agent 1-51
+AGENTS.md
+  ai_agent 38-45
+apps/web/public/design.md
+  ai_agent 4,7,10-23,41-52,67,70-84,86-88,90-116,118-119,121-124,127-134,138-140,142-146,150-152,154,156-157,159,162-163,165,167-173,178-179,181,183-184,200-201,207-213,216-222,224-229,231-238,240-252,255-301,303,305-307,309-311,313-334,338,341-345,352,354,356,358-367,369,371,373,375,377-383,385-392,394,396,398,400-455,459-496,500,502-504,506,508-514,516
+packages/ai/src/constants/slack.ts
+  ai_agent 14-21
+packages/schemas/src/schemas/api/geo-scans.ts
+  ai_agent 12-15,18-63,87-98,103-105,126-133
+packages/geo-core/src/types/analytics-imports.ts
+  ai_agent 171-189,264-267,292-303
+apps/minigame/package.json
+  ai_agent 1-38
+apps/dashboard/src/app/(dashboard)/[slug]/integrations/linear/[id]/page-client.tsx
+  ai_agent 174-178
+packages/ui/src/styles/tokens.css
+  ai_agent 1-109
+apps/minigame/src/routes/auth/x/callback.ts
+  ai_agent 1-54
+apps/sites/src/types/worker.ts
+  ai_agent 8-11,13-16
+apps/web/src/constants/compare/competitors/jam.ts
+  ai_agent 9-11,13,15,18-21,24-26,30,32,35,37,40,42,47-49,52,54,57-58,62-63,66-67,71-72,77-78,81,83,85,87-88,91,94,98-99,103-105,108-110,113-115,120,124,129,134,139
+packages/ai/src/types/integrations.ts
+  ai_agent 2,76,80-81
+packages/ui/src/constants/tabs.ts
+  ai_agent 1-7
+apps/dashboard/src/components/dashboard/sidebar-org-menu.tsx
+  ai_agent 31,38,82,111,151
+apps/dashboard/browser-tests/menu-highlight.test.ts
+  ai_agent 128-135,138-146,149
+apps/ui/registry.json
+  ai_agent 1094,1265,1303-1358,1529-1674,10872,10968,11009,11078,11200,11382,11538,11713,11968,12151,12301,12433,12579,12710
+apps/dashboard/src/utils/autopilot-events.ts
+  ai_agent 68-93
+apps/dashboard/src/components/autopilot/autopilot-settings-panel.tsx
+  ai_agent 3-5,9-25,27,30,32,34-37,45-48,50-60,62-91,93-117,119-143,145-151,153,155-177
+apps/dashboard/vite.config.ts
+  ai_agent 5,83
+packages/ai/src/types/autopilot-planner.ts
+  ai_agent 85,97-100
+apps/minigame/src/lib/viewer.ts
+  ai_agent 1-22
+apps/web/public/mcp/claude.svg
+  ai_agent 1
+apps/sites-builder/tests/share-images.test.ts
+  ai_agent 1-27
+apps/dashboard/src/app/(dashboard)/[slug]/integrations/granola/page-client.tsx
+  ai_agent 231
+apps/minigame/src/lib/game/sim.test.ts
+  ai_agent 1-127
+apps/sites-builder/src/utils/images.ts
+  ai_agent 1-5,14-17
+apps/api/src/routes/post-schedules.ts
+  ai_agent 32
+apps/dashboard/src/components/empty-state.tsx
+  ai_agent 1-10,15-18,36,42-48,50,54,56,59-66,69-71
+apps/sites-e2e/tests/compiler-isolation.test.ts
+  ai_agent 45-52
+apps/dashboard/src/components/chat/assistant-metadata-hover.tsx
+  ai_agent 71,104,119,129
+apps/web/src/styles/theme.css
+  ai_agent 4,148
+packages/ui/src/components/ui/sidebar.tsx
+  ai_agent 35,42-44,79,90-91,121-137,180,184,235-242,346,489
+packages/schemas/src/schemas/api/brand-colors.ts
+  ai_agent 29-31,34-44,73-75
+apps/console/tsconfig.json
+  ai_agent 28
+apps/dashboard/src/constants/autopilot-rendering.ts
+  ai_agent 23-27
+apps/docs/analytics/import-history.mdx
+  ai_agent 4,31,106-114
+apps/dashboard/src/components/mcp/mcp-empty.tsx
+  ai_agent 3-12,18,22-37
+apps/dashboard/src/lib/orpc/routers/analytics-imports.ts
+  ai_agent 32,62,64,111-113,193-195,203,213-217,219,221,301,305-308,310-312,355-358,363,390,400
+apps/dashboard/src/types/integrations.ts
+  ai_agent 68
+apps/web/public/mcp/chatgpt.svg
+  ai_agent 1-3
+apps/ui/registry/notra/typography/types/typography.ts
+  ai_agent 1-26
+apps/web/src/constants/compare/competitors/peec.ts
+  ai_agent 9,13,17,20-21,24,26,33,38,60,77,79,83,92,99-100,103,108,110,127-128,133,137,142,147,152,162
+packages/schemas/src/schemas/dashboard/autopilot.ts
+  ai_agent 5,7,96,143-144,162-166,197-198,201-204,207-209
+apps/dashboard/tests/autopilot-template-flows.test.ts
+  ai_agent 6,28,91-112,319-320,322-331,345-347,354-457,460,468-470,559,561-566,571,585-587,624,674-675,748-825,832,839
+apps/minigame/src/constants/pixel-font.ts
+  ai_agent 1-58
+packages/ui/src/lib/motion.ts
+  ai_agent 13-14,17-18,61-72
+apps/dashboard/tests/linear-tokens-cron.test.ts
+  ai_agent 1-72
+apps/dashboard/src/lib/autopilot/answers.ts
+  ai_agent 2-6,87-103
+apps/dashboard/src/lib/autopilot/rendering.ts
+  ai_agent 24,490-494
+packages/schemas/src/schemas/api/responses.ts
+  ai_agent 7-16
+apps/dashboard/src/utils/providers.tsx
+  ai_agent 12,125-167
+apps/dashboard/src/components/dashboard/connect-agent.tsx
+  ai_agent 12,37
+apps/minigame/src/utils/base64url.ts
+  ai_agent 1-24
+apps/dashboard/src/app/(dashboard)/[slug]/brand/identity/components/brand-identity-actions.tsx
+  ai_agent 57,65
+apps/minigame/src/lib/server/x-oauth.ts
+  ai_agent 2-10,12-14,17-22,25-29,31-42,44-46,48-64,66-81,83-141
+apps/dashboard/tests/demo-api-key.test.ts
+  ai_agent 16-28
+apps/minigame/src/lib/game/backdrop.ts
+  ai_agent 1-124
+packages/geo-core/src/constants/geo.ts
+  ai_agent 112-113
+apps/dashboard/src/components/geo/web-vitals-card.tsx
+  ai_agent 9-10,15
+apps/dashboard/src/components/billing/usage-section.tsx
+  ai_agent 79,82
+apps/dashboard/src/constants/autopilot-refresh.ts
+  ai_agent 7-8
+packages/sites-core/src/constants/source.ts
+  ai_agent 6-15
+packages/ui/package.json
+  ai_agent 7-8
+packages/ui/src/constants/command-tabs.ts
+  ai_agent 1-3
+apps/dashboard/src/lib/autopilot/findings.ts
+  ai_agent 42,365,846-849,851,859-873,1152-1153,1189-1199,1204-1206,1223-1226,1237-1239,1262
+apps/dashboard/src/lib/autopilot/authors.ts
+  ai_agent 3,13,20-22,25-28,33,106-107,109,111,116,118
+apps/minigame/src/lib/server/png.ts
+  ai_agent 1-58
+apps/web/src/routes/_landing/index.tsx
+  ai_agent 5,9,11-12,14-17
+packages/ai/src/schemas/github-app.ts
+  ai_agent 27,45-46
+apps/dashboard/src/lib/email/send.ts
+  ai_agent 2,21,246-260
+apps/minigame/src/constants/site.ts
+  ai_agent 1-51
+packages/email/package.json
+  ai_agent 20,29
+packages/ui/src/components/ui/step-slider.tsx
+  ai_agent 136,176
+apps/dashboard/src/utils/autopilot-blog.test.ts
+  ai_agent 3-4,6,9-10,15-51
+apps/dashboard/src/lib/orpc/routers/onboarding.ts
+  ai_agent 162-165
+apps/api/src/routes/geo-web-analytics.ts
+  ai_agent 121
+apps/console/package.json
+  ai_agent 52
+apps/minigame/src/components/moderation-buttons.tsx
+  ai_agent 1-78
+apps/minigame/src/constants/replay.ts
+  ai_agent 1-4
+apps/minigame/src/types/session.ts
+  ai_agent 1-31
+packages/schemas/src/schemas/api/geo-agent-readiness.ts
+  ai_agent 7-18,25-30,35-38,42-47,54-83,90-102,118-130,141-144,152,164-167
+apps/minigame/src/lib/server/session.ts
+  ai_agent 1-55
+apps/dashboard/src/components/autopilot/autopilot-trend.tsx
+  ai_agent 10,17,21-23
+apps/sites-e2e/emulators/github/index.ts
+  ai_agent 38-41,46-47,49-62,585-653,738-753
+apps/dashboard/src/components/content/content-plan-view.tsx
+  ai_agent 22,65,70
+apps/dashboard/src/routes/api.cron.linear-tokens.ts
+  ai_agent 1-18
+apps/minigame/src/utils/rng.ts
+  ai_agent 1-11
+packages/schemas/src/schemas/api/geo-web-analytics.ts
+  ai_agent 9,14,24,110-112,132-134,158-164,171-187,189-196,199-201,203-206,212-223,232-275,277-280,287,290-296,301,310-316,319-322,331-333,336-339,348-353,357-358,360-362,376-382,390-395,400-463,478-485,487-492,496-531
+apps/dashboard/src/components/integrations/github/github-branch-panel-transition.tsx
+  ai_agent 3,51
+packages/ai/src/utils/diagram-edit.test.ts
+  ai_agent 337-351
+apps/dashboard/src/app/(dashboard)/[slug]/chat/page-client.tsx
+  ai_agent 36,397,420,3004
+apps/dashboard/src/app/(dashboard)/[slug]/geo/personas/page-client.tsx
+  ai_agent 250-251,257-261
+apps/minigame/src/utils/det-math.ts
+  ai_agent 1-3,5-8,10-26,28,30-55,57-59,61-63,65-74,76-77
+packages/ai/src/integrations/linear-oauth.postgres.test.ts
+  ai_agent 1-466
+packages/ai/src/utils/excalidraw-diagram.ts
+  ai_agent 19-21,215-226
+packages/ui/src/components/ui/tooltip.tsx
+  ai_agent 46-49,55,63,129-130,133-136,206-209
+packages/ui/src/components/ui/dialog.tsx
+  ai_agent 8-11,34,36,40-41,56,63-64,71,74-75
+apps/dashboard/browser-tests/fixtures/menu-highlight.tsx
+  ai_agent 14-16,29-34
+apps/dashboard/src/lib/autopilot/comparisons.ts
+  ai_agent 32,111,122
+apps/minigame/src/lib/game/session.ts
+  ai_agent 1-310
+apps/minigame/src/routes/__root.tsx
+  ai_agent 1-71
+apps/ui/blume.config.ts
+  ai_agent 76-85
+apps/dashboard/src/lib/autopilot/pages.ts
+  ai_agent 16,79-80,83,95-102,136-139
+apps/web/scripts/generate-ui-sources.mjs
+  ai_agent 7-13,51-74,108,115-124,138-139
+packages/ui/src/components/ui/popover.tsx
+  ai_agent 6,45,62-63
+apps/dashboard/src/app/api/cron/linear-tokens/route.ts
+  ai_agent 1-19
+apps/dashboard/src/app/(dashboard)/[slug]/geo/skeleton.tsx
+  ai_agent 3-9,16-19,21,57,67-72,74-79,81-86,88-89
+apps/minigame/src/routeTree.gen.ts
+  ai_agent 1-387
+apps/dashboard/src/components/content/content-document-tabs.tsx
+  ai_agent 121-123
+apps/dashboard/src/workflows/steps/onboarding-agent-steps.ts
+  ai_agent 23,26-28,34
+apps/minigame/tsconfig.json
+  ai_agent 1-18
+apps/dashboard/src/lib/autopilot/planner.ts
+  ai_agent 64-78,320,361
+packages/geo-core/src/utils/geo-engine-policy.ts
+  ai_agent 10-11
+apps/web/src/components/mcp/mcp-platform-page.tsx
+  ai_agent 1-11,13-15,17-32,34,36-41,43-56,59-65,68-80,82-90,92-95,97-119,121-161,164-165,169-174,176-187,189-226,228-230,232-281,283-284,286-290,292-318,320-323
+apps/console/src/components/ai-trends/ai-trends-top-domains.tsx
+  ai_agent 3
+apps/web/public/mcp/v0.svg
+  ai_agent 1
+apps/minigame/src/lib/server/signed-cookie.ts
+  ai_agent 1,3-4,6-7,9-55,58-59,61-65
+apps/minigame/src/utils/color.ts
+  ai_agent 1-27
+apps/dashboard/src/components/autopilot/autopilot-automations-overview.tsx
+  ai_agent 24,108,110-148
+apps/web/public/mcp/le-chat.svg
+  ai_agent 1
+apps/dashboard/src/components/onboarding/progress.tsx
+  ai_agent 39
+apps/minigame/src/utils/security-headers.ts
+  ai_agent 1-31
+packages/schemas/src/schemas/api/sites.ts
+  ai_agent 82-84,428-434,440-443,445-461,469-472,476-484,489-507,512-514,521-523,533-544,549-554,560-580,594-625,631-637,643-645,654-671,690-692,707-716
+packages/ai/src/integrations/github.ts
+  ai_agent 1161
+apps/dashboard/src/shaders/chrome-badge.wgsl
+  ai_agent 1-73
+apps/web/src/constants/mcp.ts
+  ai_agent 169-171
+apps/minigame/src/constants/share-card.ts
+  ai_agent 1-18
+apps/dashboard/src/lib/autopilot/agent.ts
+  ai_agent 8,216-230
+apps/blog/blog/notra-sites-public-api.mdx
+  ai_agent 1-97
+apps/minigame/src/lib/server/leaderboard-cache.ts
+  ai_agent 1-51
+packages/ai/src/integrations/linear-oauth.ts
+  ai_agent 1,3-6,8-12,14-63,65,68-74,77-81,84-109,112-119,121-134,137-154,156,159-177,179-186,188-206,208-224,228-232,234,236-237,239-242,244,247-277,279-282,284-289,291-305,308-325,327,330-351,354-368,370,373-377,379-385,387-393,395-397,402-405,407-431,433-459
+scripts/testing/dashboard/README.md
+  ai_agent 48-51
+apps/minigame/src/utils/api-client.ts
+  ai_agent 1-185
+packages/ai/src/types/linear-oauth.ts
+  ai_agent 1-22
+apps/web/src/content/legal/dpa.mdx
+  ai_agent 5,198
+apps/web/src/types/mcp.ts
+  ai_agent 4,6,25
+apps/dashboard/src/constants/autopilot-comparisons.ts
+  ai_agent 9-18
+apps/dashboard/src/app/(dashboard)/[slug]/skills/loading.tsx
+  ai_agent 19
+apps/dashboard/src/types/email/send.ts
+  ai_agent 1,38-42
+apps/dashboard/src/app/(dashboard)/[slug]/skills/page-client.tsx
+  ai_agent 110-114
+apps/minigame/src/lib/server/config.ts
+  ai_agent 1-21,24-25,27-31,33,37-38,40,44-45,47,51-53,56-60,62-64
+packages/ai/src/integrations/linear-oauth-errors.ts
+  ai_agent 1-27
+apps/dashboard/src/utils/autopilot-settings.ts
+  ai_agent 5-9,49,53-67
+apps/console/src/components/ai-trends/ai-trends-traffic-chart.tsx
+  ai_agent 5
+apps/console/src/constants/overview.ts
+  ai_agent 1-55
+apps/dashboard/src/utils/billing-plans.ts
+  ai_agent 24,64-68,324,326
+packages/ai/src/integrations/linear.ts
+  ai_agent 3,7,85,115
+apps/console/src/components/ai-trends/ai-trends-domain-explorer.tsx
+  ai_agent 20
+apps/dashboard/src/app/(dashboard)/[slug]/integrations/slack/page-client.tsx
+  ai_agent 655
+packages/ui/src/styles/globals.css
+  ai_agent 13
+packages/geo-core/tests/types/fixtures.ts
+  ai_agent 15-16
+apps/minigame/src/routes/api/admin/moderate.ts
+  ai_agent 1-53
+apps/minigame/src/lib/server/request.ts
+  ai_agent 1-106
+apps/minigame/src/lib/game/input.ts
+  ai_agent 1-335
+apps/dashboard/src/types/autopilot-templates-runtime.ts
+  ai_agent 4,167-195
+packages/schemas/src/schemas/api/geo-prompts.ts
+  ai_agent 28-31,33-45,51-58,89,121-130,140-149,155-166,184-186,194-197
+apps/dashboard/src/lib/orpc/routers/notifications.ts
+  ai_agent 41,78-81,91
+packages/ai/src/utils/excalidraw-render.ts
+  ai_agent 5-6,18,30,396-410,417-438,467-475,485-486,488,494,496-500,509
+packages/sites-server/src/reporting.ts
+  ai_agent 127
+apps/ui/registry/notra/package-command/components/package-command.tsx
+  ai_agent 3,5-7,10-11,14-18,20-25,27-43,46-67,69-74,76,80-82,85-129
+apps/dashboard/src/app/(dashboard)/[slug]/integrations/linear/page-client.tsx
+  ai_agent 51,57,167-169,192-200,287,317
+packages/ui/src/constants/dialog.ts
+  ai_agent 1-10
+packages/ui/src/components/ui/dropdown-menu.tsx
+  ai_agent 142
+apps/api/src/types/integrations.ts
+  ai_agent 70-71
+packages/ai/src/constants/autopilot-planner.ts
+  ai_agent 26-29,35-39
+packages/ui/src/styles/motion.css
+  ai_agent 9-11,20-27,128-129,131-132,188-191,199-200,202
+packages/sites-server/src/utils/push-paths.ts
+  ai_agent 1-3,49-72
+apps/dashboard/src/components/chat/chat-content-panel.tsx
+  ai_agent 46,79
+apps/ai-traffic-ingest/README.md
+  ai_agent 35-39
+apps/dashboard/src/app/(dashboard)/[slug]/integrations/loading.tsx
+  ai_agent 21
+apps/minigame/src/components/share-card.tsx
+  ai_agent 1-117
+packages/ui/src/constants/table.ts
+  ai_agent 1-5
+apps/dashboard/src/schemas/autopilot.ts
+  ai_agent 112-125
+apps/dashboard/src/utils/autopilot-landing.ts
+  ai_agent 1-116
+apps/onboarding-agent/agent/lib/constants/models.ts
+  ai_agent 2,4-6
+apps/minigame/src/lib/game/audio.ts
+  ai_agent 1-212
+apps/dashboard/src/components/analytics-import/import-provider-mark.tsx
+  ai_agent 4,19
+apps/dashboard/src/constants/demo.ts
+  ai_agent 60
+apps/minigame/src/routes/api/card/$playerId.ts
+  ai_agent 1-30
+apps/dashboard/src/lib/autopilot/repository-agent.ts
+  ai_agent 259-269
+apps/sites/src/utils/conditional.ts
+  ai_agent 1-62
+apps/web/tsconfig.json
+  ai_agent 11
+apps/sites-e2e/scripts/constants/mutations.ts
+  ai_agent 43-68
+apps/dashboard/src/components/chat/chat-suggestions.tsx
+  ai_agent 6,219,272
+apps/console/src/components/ai-trends/ai-trends-client.tsx
+  ai_agent 8
+apps/dashboard/src/app/(dashboard)/[slug]/brand/identity/skeleton.tsx
+  ai_agent 3-9,11-15,19,36,50-69,71-101
+apps/dashboard/src/app/(dashboard)/[slug]/integrations/google-search-console/loading.tsx
+  ai_agent 20
+apps/dashboard/src/lib/integrations/constants.ts
+  ai_agent 1-7,16-19
+apps/dashboard/tests/autopilot-sandbox.test.ts
+  ai_agent 111-116,126-133,137-140,148-151,154-156,158,168-169,447-498
+apps/minigame/src/lib/server/store.ts
+  ai_agent 1-746
+apps/dashboard/src/constants/analytics-imports.ts
+  ai_agent 92,97-104,116,131,142,146,153-166
+apps/dashboard/src/lib/orpc/routers/autopilot.ts
+  ai_agent 32,302,421,430,433-440,473-477
+apps/minigame/src/constants/leaderboard.ts
+  ai_agent 1-12
+apps/dashboard/src/components/geo/agent-readiness/readiness-score-card.tsx
+  ai_agent 91,94
+apps/minigame/src/utils/models.ts
+  ai_agent 1-19
+apps/dashboard/src/lib/orpc/routers/content.ts
+  ai_agent 4-5,1891-1893
+apps/minigame/src/schemas/api.ts
+  ai_agent 1-119
+apps/minigame/src/types/ui.ts
+  ai_agent 1-163
+apps/web/src/utils/mcp-platforms.ts
+  ai_agent 1-59
+packages/ai/src/prompts/autopilot-planner.ts
+  ai_agent 18,36-37
+packages/geo-core/tests/ingest-pipeline.test.ts
+  ai_agent 256-264,296-300,310-330,744,747
+apps/console/src/lib/orpc/routers/overview.ts
+  ai_agent 1-13
+apps/console/src/styles/globals.css
+  ai_agent 5
+packages/sites-server/src/pipeline.ts
+  ai_agent 19-21,255-259,261
+apps/dashboard/src/app/(dashboard)/[slug]/analytics/skeleton.tsx
+  ai_agent 28
+apps/minigame/AGENTS.md
+  ai_agent 1-8
+apps/web/public/mcp/perplexity.svg
+  ai_agent 1-24
+apps/dashboard/src/app/(dashboard)/[slug]/brand/identity/components/brand-identity-workspace.tsx
+  ai_agent 3,52,111-116
+packages/ui/src/components/ui/select.tsx
+  ai_agent 38-42,67,137,174
+apps/sites-builder/src/components/Banner.astro
+  ai_agent 26-30
+apps/web/src/components/state-of-ai-search/report-tables.tsx
+  ai_agent 13
+apps/minigame/src/components/remote-image.tsx
+  ai_agent 1,3,5-11,13-18,20-21,23-28
+packages/geo-core/tests/analytics-import-posthog.test.ts
+  ai_agent 1-350
+packages/db/migrations/meta/0163_snapshot.json
+  ai_agent 1-17801
+apps/dashboard/src/app/(dashboard)/[slug]/geo/competitors/skeleton.tsx
+  ai_agent 61
+apps/web/src/lib/landing-flags/functions.ts
+  ai_agent 1-96
+packages/ui/src/constants/toggle.ts
+  ai_agent 4
+packages/geo-core/src/schemas/analytics-imports.ts
+  ai_agent 240-266,288-290
+apps/web/public/mcp/windsurf.svg
+  ai_agent 1
+apps/agent/agent/subagents/content-writer/instructions.md
+  ai_agent 32
+apps/dashboard/src/components/settings/panes/notifications-pane.tsx
+  ai_agent 36,44
+apps/dashboard/src/app/(dashboard)/[slug]/integrations/github/page-client.tsx
+  ai_agent 54,66
+apps/dashboard/src/utils/autopilot-edits.ts
+  ai_agent 169-179
+packages/geo-core/src/geo/prompts.ts
+  ai_agent 11-12,156-174
+apps/console/src/components/ai-trends/ai-trends-advertisers.tsx
+  ai_agent 3
+packages/ui/src/types/icon-tabs.ts
+  ai_agent 7-8,27-32
+packages/ui/src/components/ai-elements/prompt-input.tsx
+  ai_agent 280,1142
+apps/dashboard/public/design.md
+  ai_agent 4,6-7,9,15-18,21-38,49,60,63-64,66,69,73,76-82,86,88-97,99-103,109,117,119-120,123-130,132-136,148,152,156,160,164-165,168-173,175,179-183,187-188,191,193-199,201,205-213,221-223,227-233,239-254,256,258,260,270,282,287-288
+packages/ai/src/utils/linear.ts
+  ai_agent 12,63-65
+apps/dashboard/src/lib/orpc/routers/integrations.ts
+  ai_agent 1360
+apps/sites-e2e/emulators/README.md
+  ai_agent 11
+apps/minigame/src/utils/return-path.ts
+  ai_agent 1-26
+apps/sites-e2e/tests/connected-lifecycle-postgres.test.ts
+  ai_agent 2160-2323,2329,2375
+packages/ui/src/components/ui/button-content.tsx
+  ai_agent 6,10-12,15-28,99-100,107-109,162-165,169-193,201
+apps/dashboard/tests/analytics-import-ui.test.tsx
+  ai_agent 211-229
+apps/dashboard/src/components/billing/credit-summary-cards.tsx
+  ai_agent 7,91,96
+apps/web/src/components/mcp/mcp-command-tabs.tsx
+  ai_agent 46-49,51,53-60,66,68,75
+apps/web/src/constants/compare/page.ts
+  ai_agent 39,41,48-49,79,185-189,193-195,204-211
+packages/ai/src/constants/excalidraw-diagram.ts
+  ai_agent 25-30
+packages/schemas/src/schemas/api/feedback.ts
+  ai_agent 170-173,179,191-193,195-202,204-207,216-222,249-251
+packages/ui/src/styles/menu-highlight.css
+  ai_agent 4-5,11,18-53
+apps/dashboard/src/app/(dashboard)/[slug]/integrations/github/loading.tsx
+  ai_agent 25
+apps/dashboard/src/components/command-palette/command-palette-item.tsx
+  ai_agent 42,55,70
+apps/dashboard/src/types/geo.ts
+  ai_agent 979-986
+apps/sites-builder/package.json
+  ai_agent 39
+packages/sites-core/src/types/smart-deployments.ts
+  ai_agent 13-14
+apps/dashboard/src/utils/autopilot-branches.ts
+  ai_agent 13-14
+apps/dashboard/src/components/chat/chat-home-suggestions.tsx
+  ai_agent 7,97,134-138
+apps/minigame/src/constants/server.ts
+  ai_agent 1-187
+apps/dashboard/src/components/ai/chat-subagent-block.tsx
+  ai_agent 130
+apps/ui/registry/notra/composer/components/composer.tsx
+  ai_agent 102-104
+apps/ui/src/components/mdx-table.astro
+  ai_agent 1-21
+packages/geo-core/src/utils/geo-grounded-engines.ts
+  ai_agent 68,70-71,73
+apps/dashboard/src/components/geo/mention-trend-agents.tsx
+  ai_agent 10,22-25,37,40-41,44,65-67,70,73,103-110
+apps/minigame/src/components/leaderboard.tsx
+  ai_agent 1-292
+packages/ui/src/components/kibo-ui/image-zoom/index.tsx
+  ai_agent 45
+apps/docs/sites/integrations/consent/c15t.mdx
+  ai_agent 192
+apps/minigame/src/routes/api/replays/$playerId.ts
+  ai_agent 1-41
+packages/ui/src/components/ui/icon-tabs.tsx
+  ai_agent 4-6,25-27,34-35,40-41,50-71,82-89,93-99,102-113,117,135,138,141,149,157-163,165,177-182,185,191
+apps/dashboard/src/types/workflows/onboarding-agent.ts
+  ai_agent 3
+apps/dashboard/src/app/(dashboard)/[slug]/integrations/mcp/page-client.tsx
+  ai_agent 135
+apps/minigame/src/components/company-board.tsx
+  ai_agent 1-117
+apps/minigame/src/components/game-over.tsx
+  ai_agent 1-190
+apps/dashboard/src/types/settings/notifications.ts
+  ai_agent 8,41
+apps/dashboard/src/components/analytics-import/import-connect-step.tsx
+  ai_agent 12,16,45,84-87,168,170,187
+apps/console/src/types/overview.ts
+  ai_agent 1-119
+apps/dashboard/src/components/motion/checkbox.tsx
+  ai_agent 3,8,114
+apps/ui/docs/components/package-command.mdx
+  ai_agent 1-37
+apps/minigame/src/types/anti-cheat.ts
+  ai_agent 1-44
+apps/web/src/constants/landing/flags.ts
+  ai_agent 1-7
+apps/web/src/constants/compare/competitors/prompting-company.ts
+  ai_agent 17,19,24-26,32,34,45,57,67,72,83,98-99,101-102,129-130,144,149,154
+apps/dashboard/src/components/ai/agent-question-dock.tsx
+  ai_agent 118
+apps/dashboard/src/constants/nav.ts
+  ai_agent 239-240,244,246,248,251
+apps/minigame/.env.example
+  ai_agent 1-17
+apps/dashboard/src/app/(dashboard)/[slug]/geo/directions/page-client.tsx
+  ai_agent 3,6-10,24,28,34-41,43-44,46
+apps/dashboard/src/app/(dashboard)/[slug]/integrations/google-search-console/page-client.tsx
+  ai_agent 773
+apps/minigame/src/constants/render.ts
+  ai_agent 1-90
+packages/sites-core/src/utils/git-attributes.ts
+  ai_agent 1-21
+packages/sites-server/tests/smart-deployments-postgres.test.ts
+  ai_agent 60,85-95,281-285,362,772,782-951
+apps/docs/analytics/troubleshooting/no-ai-traffic.mdx
+  ai_agent 23
+packages/schemas/src/schemas/api/geo-import.ts
+  ai_agent 5-10
+apps/api/src/routes/schedules.ts
+  ai_agent 61
+packages/geo-core/src/constants/analytics-imports.ts
+  ai_agent 61-67,99-105,212-226,290-318
+apps/dashboard/src/lib/settings/notification-toggles.ts
+  ai_agent 5,32-38
+apps/minigame/src/components/touch-controls.tsx
+  ai_agent 1-42
+packages/ui/src/components/ui/message-scroller.tsx
+  ai_agent 94
+apps/ui/docs/components/code-block.mdx
+  ai_agent 1-52
+apps/dashboard/src/lib/onboarding-agent.ts
+  ai_agent 330-332,334-335
+apps/dashboard/src/constants/autopilot-templates.ts
+  ai_agent 4,37,181-198
+apps/console/src/components/ai-trends/ai-trends-traffic-section.tsx
+  ai_agent 6
+apps/minigame/src/lib/game/verify-run.ts
+  ai_agent 2-18,20-28,30-48,50-56,58,60-67,69-71,73-79,81-95,97-101,103-141,144-145
+apps/web/src/routeTree.gen.ts
+  ai_agent 92,526-530,746,851,961,1068,1173,1282,1931-1937,2205,2255
+apps/dashboard/src/lib/autopilot/landing.ts
+  ai_agent 1-692
+packages/schemas/src/schemas/api/geo-projects.ts
+  ai_agent 10-13,15-18,25-27
+apps/dashboard/src/components/content/create-content-button-group.tsx
+  ai_agent 33,49,66
+packages/schemas/src/schemas/dashboard/notification-settings.ts
+  ai_agent 11
+apps/minigame/src/components/x-logo.tsx
+  ai_agent 1-28
+apps/minigame/src/router.tsx
+  ai_agent 1-13
+apps/minigame/src/routes/auth/logout.ts
+  ai_agent 1-13
+apps/web/src/routes/_site/mcp/$platform.tsx
+  ai_agent 1-115
+packages/schemas/src/schemas/api/post-agent-reach.ts
+  ai_agent 17-20,26-29,42-51
+packages/schemas/src/schemas/api/schedules.ts
+  ai_agent 69,223,278,298-305,308-310,314-320,353-356,366-367,370-374,380-382,386-388
+apps/minigame/src/routes/api/beats/$runId.ts
+  ai_agent 1-35
+apps/minigame/public/robots.txt
+  ai_agent 1-2
+apps/console/src/schemas/overview.ts
+  ai_agent 1-13
+apps/dashboard/src/components/autopilot/autopilot-settings-field.tsx
+  ai_agent 1-35
+apps/minigame/src/routes/auth/dev.ts
+  ai_agent 1-53
+apps/web/src/components/landing/landing-page.tsx
+  ai_agent 13,148,154-157,168,175
+apps/api/src/types/brand-identities.ts
+  ai_agent 108-109
+apps/web/src/constants/compare/competitors/promptwatch.ts
+  ai_agent 13-15,17,19,21,24-25,28-29,31,35,37,42,45,47,50,52,59,62,64,69,72,74,97,103-104,127,133,138-139,143,148,151,153,158
+apps/minigame/src/components/game-screen.tsx
+  ai_agent 1-7,9-25,27-37,39-61,63-64,66-70,72-75,78-94,96-103,105-107,109-118,120-130,132-154,156,158-159,161-318,321-421
+apps/ui/registry/notra/package-command/constants/package-command.ts
+  ai_agent 1-13
+apps/dashboard/src/app/api/demo/sandbox/info/route.ts
+  ai_agent 8,11-12
+apps/dashboard/src/app/(dashboard)/[slug]/automation/page-client.tsx
+  ai_agent 114,126
+apps/dashboard/src/lib/hooks/use-mcp-columns.tsx
+  ai_agent 6
+apps/web/src/utils/markdown-twins.ts
+  ai_agent 11,34,47,247-250
+apps/dashboard/src/components/sites/sites-empty-state.tsx
+  ai_agent 3,5-11,32-99,101-103
+apps/minigame/src/types/game.ts
+  ai_agent 1-309
+apps/dashboard/src/app/(dashboard)/[slug]/api-keys/page.tsx
+  ai_agent 244,262
+apps/dashboard/src/types/billing/plan-badge.ts
+  ai_agent 1-7
+packages/db/migrations/meta/_journal.json
+  ai_agent 1138-1151
+packages/sites-server/src/smart-deployments.ts
+  ai_agent 8-10,16,21,79-92,105-123,126,128,135-139,156-160,163-178,182-192,195,198-200,205-210,252-253,277,308-309,317-346,401-403
+apps/dashboard/src/utils/autopilot-copy.ts
+  ai_agent 1-381
+apps/minigame/src/constants/models.ts
+  ai_agent 1-248
+packages/geo-core/tests/utils/infrastructure.ts
+  ai_agent 26
+apps/dashboard/src/app/(dashboard)/[slug]/brand/identity/components/modal-content.tsx
+  ai_agent 37
+apps/minigame/src/lib/game/state-hash.ts
+  ai_agent 1-35
+apps/minigame/src/components/pause-menu.tsx
+  ai_agent 1-78
+apps/web/src/components/mcp/mcp-hero.tsx
+  ai_agent 6,38-43
+packages/email/src/types/autopilot-draft-ready.ts
+  ai_agent 1-5,8-11,14-23
+packages/ai/src/utils/first-chunk-fallback.ts
+  ai_agent 1-8,10-33,35,37,39-47,49-83,85-93,95-112,114-139
+apps/minigame/src/styles/globals.css
+  ai_agent 1-198
+apps/blog/scripts/web-chrome.js
+  ai_agent 2-3,5,8,10-11,161,178,181,187,193,221,246,248-249,462,465-466,474,478,503-506,509-513,553-554
+apps/dashboard/src/components/sites/pages/site-domains-page.tsx
+  ai_agent 95
+apps/console/src/components/ai-trends/ai-trends-traffic-sources.tsx
+  ai_agent 5
+apps/ui/registry/notra/package-command/components/package-manager-icon.tsx
+  ai_agent 1-16
+packages/ai/src/schemas/linear-oauth.ts
+  ai_agent 1-12
+apps/web/src/components/state-of-ai-search/report-ui.tsx
+  ai_agent 17
+packages/schemas/src/schemas/api/geo-traffic.ts
+  ai_agent 4-7,9,16,31,38-41,76-82,85-89,99-104,107-112,126-148,151-165,167-206,210-215,227-236,246-252,258-263,266-280,286-291,297-316,322-325,331,334-343,349-352,360-376,382-385,399-402,404-407,409,430-453,455-514,518,521-527,532-535,538-596,599-601,617-622,636-638,643-645,649-651
+apps/minigame/src/lib/game/replay-run.ts
+  ai_agent 1-19
+packages/ai/src/utils/first-chunk-fallback.test.ts
+  ai_agent 1,3-7,9,11-12,15-28,30-59,61-70,72-73,75-80,82-86,88-93,95-99,101-124
+apps/onboarding-agent/agent/lib/utils/model.ts
+  ai_agent 3,10-14,16-22
+apps/dashboard/src/types/geo-directions.ts
+  ai_agent 1,6
+apps/evals/src/harness/autopilot-planner.ts
+  ai_agent 201
+packages/ui/src/constants/chart-tooltip.ts
+  ai_agent 2
+apps/console/src/lib/orpc/router.ts
+  ai_agent 6,18
+packages/schemas/src/schemas/api/event-triggers.ts
+  ai_agent 34-35,37-51,54-57,70-77,90,100-104,110-117,123-129
+apps/dashboard/src/lib/autopilot/writer.ts
+  ai_agent 3,5-8,13-16,18-23,30,38-39,42,44-45,61,65,108-109,116,122-135,138-154,198-256,261-273,281-286,293,302-306,359-369,387-388,416-420,480-486
+packages/ui/src/components/ui/combobox.tsx
+  ai_agent 148
+packages/sites-server/src/utils/urls.ts
+  ai_agent 9,16-17,42-49
+apps/dashboard/src/types/autopilot-runtime.ts
+  ai_agent 41-55,95-96,113-114
+apps/dashboard/src/lib/hooks/use-privacy-preferences.ts
+  ai_agent 9
+apps/dashboard/src/components/autopilot/autopilot-settings-sections.tsx
+  ai_agent 1-468
+packages/schemas/src/schemas/api/workspaces.ts
+  ai_agent 7-17,24-29,34-37,43-46
+packages/ai/src/schemas/slack.ts
+  ai_agent 37-41
+packages/ui/src/components/ui/stepper.tsx
+  ai_agent 989
+apps/minigame/src/utils/replay.ts
+  ai_agent 1-116
+packages/email/src/emails/autopilot-draft-ready.tsx
+  ai_agent 1,4,6,10-19,22-23,26-37,39-47,49-50,52-57,59-97
+packages/ui/src/lib/icon-tabs.ts
+  ai_agent 3
+packages/ui/src/styles/typography.css
+  ai_agent 1-74
+apps/minigame/src/lib/server/share-card.ts
+  ai_agent 1-255
+apps/web/src/constants/compare/competitors/athena.ts
+  ai_agent 13,18,22,25,37,39,56,89,92,95-96,113-114,133,138,143
+apps/dashboard/src/lib/hooks/use-linear-connection-toast.ts
+  ai_agent 3,10-11,18-21,23
+apps/dashboard/src/types/autopilot-workflow.ts
+  ai_agent 11,31,104-109
+packages/db/migrations/0162_autopilot_draft_emails.sql
+  ai_agent 1-2
+apps/console/src/components/ai-trends/ai-trends-engine-metrics.tsx
+  ai_agent 4
+apps/minigame/src/components/model-sprite.tsx
+  ai_agent 1,3-5,7-10,12-19,22-28
+apps/dashboard/src/lib/workflow-engine/definitions/autopilot.ts
+  ai_agent 190,217,227,355-364
+packages/sites-server/src/utils/deployment-check-report.ts
+  ai_agent 2,5-6,9,49-54,59
+packages/ui/src/components/ui/hover-card.tsx
+  ai_agent 9,54-55
+apps/dashboard/src/lib/autopilot/memory.ts
+  ai_agent 101-102,104-109,113-117,119-124,126,128
+apps/evals/src/fixtures/autopilot-scenarios.ts
+  ai_agent 230-338,737-842
+apps/web/src/styles/ui-sources.css
+  ai_agent 2-33,225
+apps/minigame/src/utils/storage.ts
+  ai_agent 1-5,8-19
+packages/tools/src/constants/autopilot.ts
+  ai_agent 7
+packages/ui/src/components/ui/button.tsx
+  ai_agent 9
+apps/dashboard/src/utils/autopilot-diagrams.ts
+  ai_agent 1,3-5,8-10,12-39,41-42
+apps/console/src/types/insights.ts
+  ai_agent 1-12
+apps/minigame/src/utils/week.ts
+  ai_agent 1-11
+apps/ui/registry/notra/package-command/hooks/use-package-manager.ts
+  ai_agent 5-9,11-16
+packages/geo-core/src/geo/gaps.ts
+  ai_agent 73,209-226
+apps/dashboard/src/components/billing/plan-badge.tsx
+  ai_agent 3-7,10-11,13-24,26-27,30-35,38-49,51-52,54-79
+apps/web/src/components/landing/hero-section.tsx
+  ai_agent 1,11,29,39,54,63,81
+packages/geo-core/src/ingest/README.md
+  ai_agent 21
+apps/dashboard/src/lib/autopilot/commit-filters.ts
+  ai_agent 8,54,65-68
+packages/schemas/src/schemas/api/geo-sequences.ts
+  ai_agent 12-18,30-32,68,84
+packages/ui/src/components/ui/composer.tsx
+  ai_agent 126-128
+turbo.json
+  ai_agent 81-87,229-232
+apps/dashboard/src/components/autopilot/autopilot-release-filters-section.tsx
+  ai_agent 68,72-75
+apps/dashboard/src/components/mcp/mcp-sections.tsx
+  ai_agent 7-8
+apps/console/src/app/dashboard/page.tsx
+  ai_agent 14
+apps/dashboard/src/lib/autopilot/refresh.ts
+  ai_agent 24,271-272,293-296,624-628
+apps/console/src/components/overview/overview-charts.tsx
+  ai_agent 1-130
+apps/evals/src/suites/autopilot-planner.ts
+  ai_agent 26
+apps/dashboard/src/components/geo/geo-engine-picker.tsx
+  ai_agent 3,77-79,85-89,289
+packages/schemas/src/schemas/api/geo-visibility.ts
+  ai_agent 3-7,9,16,22-123,126-143,146-157,162-165,172-178,183-187,193-195,197-199,203-244,259-263,265-275,279-286,298-317,325-329,334-338,340-347,351-355,360-368,386-392,398-409,414-421,427-439,444-447
+apps/web/src/content/legal/subprocessors.mdx
+  ai_agent 5,85
+apps/dashboard/src/components/sites/pages/site-overview-page.tsx
+  ai_agent 70,86
+packages/schemas/src/schemas/api/geo-personas.ts
+  ai_agent 5,14,30-42,51-53,56-70,76-78,95,153-217,222-225,229-260,299-307,315,327-333,338-340
+apps/web/src/lib/mcp/platform-experiment.ts
+  ai_agent 1-2,4-10,12-17,19-20,22,24-29,31-33,35-44,46-59,61-77
+packages/schemas/src/schemas/api/geo-settings.ts
+  ai_agent 27-87,96-101,191-196,204-206,212-215
+scripts/github/production-deploy.mjs
+  ai_agent 143-164,396-407,413,415-421,423-428,857,874,879-888,906
+apps/dashboard/src/components/skills/skill-detail-header.tsx
+  ai_agent 70
+.husky/pre-commit
+  ai_agent 27-43
+packages/ai/src/utils/excalidraw-layout-check.ts
+  ai_agent 10,17-20,117-120,278-286,288-289,291
+apps/dashboard/tests/fixtures/demo-api-key-backfill.fixture.ts
+  ai_agent 1-181
+apps/web/public/mcp/vscode.svg
+  ai_agent 1
+apps/minigame/src/constants/upgrades.ts
+  ai_agent 1-275
+apps/minigame/src/constants/game.ts
+  ai_agent 1-145
+apps/web/src/components/landing/mock-frame.tsx
+  ai_agent 2
+apps/dashboard/src/components/analytics/platform-tabs.tsx
+  ai_agent 8-16,26-31,45,55,61,72,89
+apps/web/src/types/landing/flags.ts
+  ai_agent 1-14
+apps/dashboard/src/app/(dashboard)/[slug]/geo/components/geo-tabs.tsx
+  ai_agent 3-4,6,8-13,27,44-74,98-115,123-127,129,131-135,137-141,143-147,149-150,153,220,222,231,233,244
+apps/dashboard/src/types/analytics-imports.ts
+  ai_agent 20,42-43
+apps/dashboard/src/constants/autopilot-publish.ts
+  ai_agent 29,43
+packages/ui/src/components/fade-swap.tsx
+  ai_agent 25,28,31
+packages/geo-core/src/utils/geo-engines.ts
+  ai_agent 21,173
+packages/ui/src/constants/composer.ts
+  ai_agent 2
+packages/db/src/schema.ts
+  ai_agent 108,634-635,1731,4903-4906
+apps/minigame/src/utils/upgrades.ts
+  ai_agent 1-10
+apps/minigame/src/routes/api/companies.ts
+  ai_agent 1-25
+apps/dashboard/src/lib/autopilot/readiness.ts
+  ai_agent 34,423-427
+packages/schemas/src/schemas/api/post-schedules.ts
+  ai_agent 74-117,121-124
+apps/dashboard/src/routeTree.gen.ts
+  ai_agent 40,266-270,756,867,979,1092,1203,1314,1426,1694-1700,2397
+apps/dashboard/src/components/ai/chat-tool-block.tsx
+  ai_agent 73,998
+apps/dashboard/src/components/chat-input.tsx
+  ai_agent 52,180,184,261
+apps/dashboard/src/app/(dashboard)/[slug]/brand/identity/components/brand-identity-tabs.tsx
+  ai_agent 4-14,48-52,54-64,66-70,72-73
+apps/ui/package.json
+  ai_agent 24-25,33-34,54,59
+apps/web/public/mcp/lovable.svg
+  ai_agent 1
+packages/ui/src/components/ui/autocomplete.tsx
+  ai_agent 8,52-53
+apps/minigame/README.md
+  ai_agent 1-121
+apps/minigame/vercel.json
+  ai_agent 1-5
+apps/dashboard/src/components/agent-feedback/feedback-empty.tsx
+  ai_agent 3-12,27-49,52-53
+apps/dashboard/src/constants/plan-badge.ts
+  ai_agent 1-10
+apps/dashboard/tests/autopilot-dream.test.ts
+  ai_agent 329-334
+apps/web/src/constants/compare/competitors/otterly.ts
+  ai_agent 9,13,15,17,19,21,25-26,30,32,40,42,52-54,59,64-65,72,81-82,84,88-89,106,111-112,117-118,123,127,132,137,140,142
+apps/dashboard/src/app/(dashboard)/[slug]/brand/identity/components/voice-selector.tsx
+  ai_agent 155
+packages/geo-core/src/geo/model-catalog.ts
+  ai_agent 3,12-13,103,106-107,109-112,119-121
+apps/web/src/constants/mcp-tools.ts
+  ai_agent 652
+packages/ui/src/components/ui/context-menu.tsx
+  ai_agent 162
+apps/dashboard/src/components/geo/geo-setup-empty.tsx
+  ai_agent 7,26-28,31-35
+apps/minigame/src/components/account.tsx
+  ai_agent 1-163
+packages/schemas/src/schemas/api/content.ts
+  ai_agent 192,252-255,258-260,283-286,288-321,327-346,352-354,356-359,504-507,523-526,528-531,544-555,566-569,745-747,749-755,758-761,886-900,906-907,918-919,924-926,930-933,951-952,973,976-990,999-1006,1010-1013,1309-1311,1313-1316,1328-1339,1345-1346,1353-1355,1358-1361,1402-1404,1428-1431
+apps/dashboard/src/lib/demo/api-key.ts
+  ai_agent 13-20,28-47
+apps/sites-builder/compiler/utils/consent.ts
+  ai_agent 10,161,164-166
+packages/sites-server/README.md
+  ai_agent 260-265,268-273,286
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "612c8fecad0ae6ecbb7fe7bb1db8d706c4a0026c",
+  "prompts": {}
+}

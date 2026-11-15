@@ -1,0 +1,69 @@
+apps/dashboard/messages/en.json
+  s_c4c8e083286445::t_909626934c0308 10245
+apps/dashboard/src/components/autopilot/autopilot-settings-field.tsx
+  s_c4c8e083286445::t_3f9d9a790f42d0 1-35
+apps/dashboard/src/components/autopilot/autopilot-automations-overview.tsx
+  s_c4c8e083286445::t_11de0b00724d7f 24,108,110-148
+apps/dashboard/messages/de.json
+  s_c4c8e083286445::t_cbdaa42766b2e9 10245
+apps/dashboard/src/components/autopilot/autopilot-trend.tsx
+  s_c4c8e083286445::t_11de0b00724d7f 10,17,21-23
+apps/dashboard/src/lib/autopilot/authors.ts
+  s_c4c8e083286445::t_11de0b00724d7f 3,13,20-22,25-28,33,106-107,109,111,116,118
+apps/dashboard/src/utils/autopilot-commit-filters.ts
+  s_c4c8e083286445::t_11de0b00724d7f 7,22-87
+apps/dashboard/src/types/autopilot.ts
+  s_c4c8e083286445::t_3f9d9a790f42d0 565
+  s_c4c8e083286445::t_11de0b00724d7f 204-205,616-619
+apps/dashboard/src/components/autopilot/autopilot-source-repositories-row.tsx
+  s_c4c8e083286445::t_11de0b00724d7f 1-3,5-19,21,23-38,40-112,114-132,135-211,213-214
+  s_c4c8e083286445::t_3f9d9a790f42d0 20,22,39,113,133-134,212
+  s_c4c8e083286445::t_cbdaa42766b2e9 4
+apps/dashboard/src/constants/autopilot.ts
+  s_c4c8e083286445::t_11de0b00724d7f 96,120,124
+packages/ai/src/schemas/github-app.ts
+  s_c4c8e083286445::t_11de0b00724d7f 27,45-46
+apps/dashboard/src/lib/autopilot/blog.ts
+  s_c4c8e083286445::t_11de0b00724d7f 117-120,1196-1199
+apps/dashboard/tests/autopilot-flow.test.ts
+  s_c4c8e083286445::t_11de0b00724d7f 603,1117-1130,1146-1152,1210-1212
+apps/dashboard/src/lib/autopilot/writer.test.ts
+  s_c4c8e083286445::t_11de0b00724d7f 96
+packages/db/src/constants/autopilot.ts
+  s_c4c8e083286445::t_11de0b00724d7f 50-55
+packages/db/src/types/autopilot.ts
+  s_c4c8e083286445::t_11de0b00724d7f 40-44
+packages/schemas/src/schemas/dashboard/autopilot.ts
+  s_c4c8e083286445::t_11de0b00724d7f 7,162-166,197-198,201-204,207-209
+apps/dashboard/src/components/autopilot/autopilot-release-filters-section.tsx
+  s_c4c8e083286445::t_11de0b00724d7f 68,72-75
+apps/dashboard/src/lib/orpc/routers/autopilot.ts
+  s_c4c8e083286445::t_11de0b00724d7f 31,403,412,415-422,455-459
+apps/dashboard/src/components/autopilot/autopilot-settings-sections.tsx
+  s_c4c8e083286445::t_cbdaa42766b2e9 96-99,373-376
+  s_c4c8e083286445::t_3f9d9a790f42d0 30-34,44,70,82,84,110,114,121,149-150,156,174,177-184,197-198,228,251-252,263,276-277,295,308-309,326,336,338,356,359,372,392,405-406,416-417
+apps/dashboard/src/constants/autopilot-ui.ts
+  s_c4c8e083286445::t_3f9d9a790f42d0 69-71
+packages/ai/src/integrations/github.ts
+  s_c4c8e083286445::t_11de0b00724d7f 1161
+apps/dashboard/src/components/autopilot/autopilot-settings-panel.tsx
+  ai_agent 55-60
+apps/dashboard/src/lib/autopilot/commit-filters.ts
+  s_c4c8e083286445::t_11de0b00724d7f 8,54,65-68
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "28a9b6fbc8ff10321fac3831ef21574ccd65bafa",
+  "prompts": {},
+  "sessions": {
+    "s_c4c8e083286445": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "0cc4c7c0-7756-433f-be87-7067d8d67fc6",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

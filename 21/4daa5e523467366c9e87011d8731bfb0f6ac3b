@@ -1,0 +1,92 @@
+apps/dashboard/src/lib/autopilot/comparisons.ts
+  s_4123b78f8907f5::t_a765278185ac83 111,122
+  s_4123b78f8907f5::t_38fb6827c21185 32
+apps/dashboard/src/lib/autopilot/memory.ts
+  s_4123b78f8907f5::t_18a4c6b867c5ee 101-102,104-109,113,121-124,126,128
+  s_4123b78f8907f5::t_982a3b43a02bd4 114-117,119-120
+apps/dashboard/tests/autopilot-flow.test.ts
+  s_4123b78f8907f5::t_7973be682ce4f8 236-240
+apps/dashboard/src/lib/autopilot/findings.ts
+  s_4123b78f8907f5::t_ca5b646e5779b8 42,365,846-849,851,859-873
+  s_4123b78f8907f5::t_a2ad68833cb0aa 1193-1195,1244
+apps/dashboard/src/lib/autopilot/blog.ts
+  s_4123b78f8907f5::t_9e213044f7bbae 40-43,45,595,1203-1213,1216-1219,1222-1225,1254
+  s_4123b78f8907f5::t_8490ebdbe54bbf 84,125
+  s_4123b78f8907f5::t_3973a7d9e32080 1214
+  s_4123b78f8907f5::t_f63d4242f49af9 1774-1777,1780
+  s_4123b78f8907f5::t_75457da04f26c9 160,166-169,1092-1095
+  s_4123b78f8907f5::t_18a4c6b867c5ee 83,1087,1090,1148-1164,1175-1178,1567
+  s_4123b78f8907f5::t_a8ec0883b56267 1215
+  s_4123b78f8907f5::t_730cf057f934f5 130-134,484-492
+  s_4123b78f8907f5::t_a7ccdd86e5d4c0 366-376,481
+  s_4123b78f8907f5::t_2118911869c8b6 120,1119
+  s_4123b78f8907f5::t_3a2cc0df8f27da 37,377-401,614-615,617-621
+  s_4123b78f8907f5::t_e1a68950e01238 439-440,477-480,482-483,493,604
+  s_4123b78f8907f5::t_20be067853aa59 616,622-629
+apps/dashboard/src/utils/autopilot-citations.ts
+  s_4123b78f8907f5::t_a765278185ac83 3-6,71-77,82-92,97-114,119-135
+  s_4123b78f8907f5::t_5a6cb6479a2a85 17,165-170,204-219,222
+  s_4123b78f8907f5::t_8490ebdbe54bbf 78-81,93-96,115-118
+apps/dashboard/src/lib/autopilot/writer.ts
+  s_4123b78f8907f5::t_ac68fb77c99653 170-174
+  s_4123b78f8907f5::t_20be067853aa59 161
+apps/dashboard/src/constants/autopilot-comparisons.ts
+  s_4123b78f8907f5::t_a765278185ac83 9-18
+apps/evals/src/harness/autopilot-planner.ts
+  s_4123b78f8907f5::t_2a7a690726be34 201
+apps/dashboard/tests/autopilot-template-flows.test.ts
+  s_4123b78f8907f5::t_9fea3a46b80f2c 565,571
+apps/dashboard/src/utils/autopilot-edits.ts
+  s_4123b78f8907f5::t_730cf057f934f5 169-179
+packages/ai/src/utils/autopilot-planner.ts
+  s_4123b78f8907f5::t_f9a43058b3521d 7
+  s_4123b78f8907f5::t_a7b8c99a7147a4 452,456-460,462-466
+apps/dashboard/src/lib/autopilot/pages.ts
+  s_4123b78f8907f5::t_36f1ff075fd08d 80
+apps/dashboard/src/constants/autopilot.ts
+  s_4123b78f8907f5::t_9f33b6aec37880 327-333,346-347
+  s_4123b78f8907f5::t_3a2cc0df8f27da 267,276-281
+  s_4123b78f8907f5::t_ca5b646e5779b8 49-50
+apps/dashboard/src/utils/autopilot-rendering.ts
+  s_4123b78f8907f5::t_36f1ff075fd08d 114-118
+packages/geo-core/src/constants/geo.ts
+  s_4123b78f8907f5::t_0e372843a20e08 112-113
+apps/dashboard/src/constants/autopilot-rendering.ts
+  s_4123b78f8907f5::t_36f1ff075fd08d 23-27
+packages/geo-core/src/geo/gaps.ts
+  s_4123b78f8907f5::t_0e372843a20e08 208-225
+apps/dashboard/src/constants/autopilot-publish.ts
+  s_4123b78f8907f5::t_e1a68950e01238 43
+apps/dashboard/src/utils/autopilot-blog.ts
+  s_4123b78f8907f5::t_2118911869c8b6 149-158,166,186
+apps/dashboard/src/utils/autopilot-blog.test.ts
+  s_4123b78f8907f5::t_b964176894a08d 42-49
+  s_4123b78f8907f5::t_8af17956786154 10
+apps/dashboard/src/lib/autopilot/publish.ts
+  s_4123b78f8907f5::t_0e5024270b67b2 7,13,51,57-63,65-67,72-74,80
+  s_4123b78f8907f5::t_8490ebdbe54bbf 9
+  s_4123b78f8907f5::t_a2ad68833cb0aa 408-409
+  s_4123b78f8907f5::t_19d65c6483e129 56,64,68-71
+packages/ai/src/constants/autopilot-planner.ts
+  s_4123b78f8907f5::t_a7b8c99a7147a4 35-39
+apps/dashboard/src/constants/autopilot-refresh.ts
+  s_4123b78f8907f5::t_5a6cb6479a2a85 7-8
+apps/dashboard/src/lib/autopilot/planner.ts
+  s_4123b78f8907f5::t_842fc1896b9b7e 320
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "214daa5e523467366c9e87011d8731bfb0f6ac3b",
+  "prompts": {},
+  "sessions": {
+    "s_4123b78f8907f5": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "45f55548-7a77-4d1c-8d0f-a6d4f347d0f7",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

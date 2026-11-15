@@ -1,0 +1,13 @@
+packages/ui/src/components/ai-elements/message.tsx
+  ai_agent 250
+apps/dashboard/src/components/ai/chat-tool-block.tsx
+  ai_agent 1040
+apps/dashboard/src/components/dashboard/dashboard-agent-panel.tsx
+  ai_agent 36
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "e50ab047d5fd5626f2d84c6011327879f8467fff",
+  "prompts": {}
+}

@@ -1,0 +1,21 @@
+apps/dashboard/src/components/dashboard/chat-history-nav.tsx
+  s_3428b476267439::t_1093d57a87794b 390-392
+  s_3428b476267439::t_6b92b26f957a0a 393
+  s_3428b476267439::t_b111d4a95c6aad 394-421
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "7bf5c3df51e58a053fd48d7228bf814ca28a8b13",
+  "prompts": {},
+  "sessions": {
+    "s_3428b476267439": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c6d39551-e687-4036-a65c-3bd92bb74947",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

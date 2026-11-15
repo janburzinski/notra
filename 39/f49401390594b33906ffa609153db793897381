@@ -1,0 +1,32 @@
+apps/dashboard/src/constants/public-data.ts
+  s_2a641a79c946c6::t_d9e7825a8b715d 16-22
+apps/dashboard/src/utils/public-ai-traffic.ts
+  s_2a641a79c946c6::t_d9e7825a8b715d 2,27,45-48,107-128,130-138,143,158,163-164,184,187,190,193,196,200,480-489
+  ai_agent 129
+apps/dashboard/src/lib/public-data/ai-traffic.ts
+  s_2a641a79c946c6::t_1f6aaf9554c6b8 8-9,17,39,49,61-62,133-140,143-145,154-167
+apps/web/src/components/data/data-stats.tsx
+  s_2a641a79c946c6::t_06df6721891b55 5,42-45,60-61
+apps/web/src/utils/data.ts
+  s_2a641a79c946c6::t_06df6721891b55 16-17
+packages/analytics/src/tinybird/pipes/geo-traffic-trends.ts
+  s_2a641a79c946c6::t_5d88a02344ce7e 3-7,21,31-35,42-50,68-102,111-114,117
+apps/dashboard/src/utils/public-ai-traffic.test.ts
+  s_2a641a79c946c6::t_1acf200f7a99e3 175-248
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "39f49401390594b33906ffa609153db793897381",
+  "prompts": {},
+  "sessions": {
+    "s_2a641a79c946c6": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "712a2427-7f87-4390-a750-259eed0c22d3",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

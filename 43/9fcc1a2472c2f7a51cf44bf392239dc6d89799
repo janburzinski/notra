@@ -1,0 +1,33 @@
+apps/dashboard/src/constants/web-analytics.ts
+  s_7dca59934d3bd0::t_b790f51db3cf33 39-61
+apps/dashboard/src/components/geo/web-referrer-icon.tsx
+  s_7dca59934d3bd0::t_80f456f1e9c513 9-14,21-32,36-44,50
+apps/dashboard/src/components/geo/web-visitors-section.tsx
+  s_7dca59934d3bd0::t_2cecc8208d0f73 139-154,207
+apps/dashboard/src/types/geo.ts
+  s_7dca59934d3bd0::t_b790f51db3cf33 2057-2058
+apps/dashboard/src/components/geo/web-breakdown-table.tsx
+  s_7dca59934d3bd0::t_2cecc8208d0f73 9-12,37-38
+apps/dashboard/src/components/geo/web-sources-card.tsx
+  s_7dca59934d3bd0::t_2cecc8208d0f73 51-57
+apps/dashboard/src/components/geo/web-referrer-icon.test.tsx
+  s_7dca59934d3bd0::t_61ac2ba7c5325d 50-64
+apps/dashboard/src/components/geo/web-outbound-favicon.tsx
+  s_7dca59934d3bd0::t_80f456f1e9c513 12-16,27
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "439fcc1a2472c2f7a51cf44bf392239dc6d89799",
+  "prompts": {},
+  "sessions": {
+    "s_7dca59934d3bd0": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d062f5f8-48df-46f6-ab42-ed0dc6ab453b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

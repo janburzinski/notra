@@ -1,0 +1,19 @@
+apps/dashboard/src/lib/hooks/use-chat-effort.ts
+  s_c89d704f93bfcb::t_201a1c68919093 3-5,14-19
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "4cae36a7ef90b716a72c010ae1b22176af6e40cb",
+  "prompts": {},
+  "sessions": {
+    "s_c89d704f93bfcb": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "edf817e8-1735-4864-86bd-9092d04ff562",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

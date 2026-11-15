@@ -1,0 +1,11 @@
+apps/web/src/components/data/data-view.tsx
+  ai_agent 87
+apps/web/src/constants/data.ts
+  ai_agent 18-19,22
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "898cbae1e0888aca9640ad8abf0a63e8bc86b560",
+  "prompts": {}
+}

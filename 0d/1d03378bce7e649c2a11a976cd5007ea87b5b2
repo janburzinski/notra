@@ -1,0 +1,25 @@
+packages/ai/src/utils/pull-request-body.ts
+  s_01a550f0007653::t_57a853ac91f4e1 16-17,19
+apps/docs/content/changelogs.mdx
+  s_01a550f0007653::t_57a853ac91f4e1 203
+packages/ai/src/tools/github.ts
+  s_01a550f0007653::t_57a853ac91f4e1 447-462,473
+apps/docs/concepts/content-pipeline.mdx
+  s_01a550f0007653::t_57a853ac91f4e1 57
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "0d1d03378bce7e649c2a11a976cd5007ea87b5b2",
+  "prompts": {},
+  "sessions": {
+    "s_01a550f0007653": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "3e51f301-da84-4a9c-bb46-54d9edf6c9d9",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

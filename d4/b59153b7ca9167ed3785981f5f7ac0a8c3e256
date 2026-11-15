@@ -1,0 +1,33 @@
+packages/db/src/types/autopilot.ts
+  s_3428b476267439::t_8955fdefb5f087 222-230,246-247
+apps/dashboard/src/lib/autopilot/brief-artifact.ts
+  s_3428b476267439::t_8955fdefb5f087 1-96
+apps/dashboard/src/schemas/autopilot-brief.ts
+  s_3428b476267439::t_8955fdefb5f087 3-13,44-52
+apps/dashboard/src/lib/autopilot/brief-page.ts
+  s_3428b476267439::t_8955fdefb5f087 1,7-11,15-16,26-27,45,53-60,97,146,150-163,210,216,224-268,283,318
+apps/dashboard/src/lib/autopilot/run.ts
+  s_3428b476267439::t_8955fdefb5f087 377
+apps/dashboard/src/routes/-brief-loaders.ts
+  s_3428b476267439::t_8955fdefb5f087 1,3-8,11,41,48-56,71-75
+apps/dashboard/tests/autopilot-flow.test.ts
+  s_3428b476267439::t_8955fdefb5f087 16-17,271-277,1413-1430
+apps/dashboard/src/constants/autopilot-brief.ts
+  s_3428b476267439::t_8955fdefb5f087 1-4,42-55
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "d4b59153b7ca9167ed3785981f5f7ac0a8c3e256",
+  "prompts": {},
+  "sessions": {
+    "s_3428b476267439": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c6d39551-e687-4036-a65c-3bd92bb74947",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

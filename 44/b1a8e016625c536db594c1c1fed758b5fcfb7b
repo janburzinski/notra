@@ -1,0 +1,23 @@
+apps/dashboard/src/components/autopilot/autopilot-brief-page.tsx
+  s_3428b476267439::t_d5e77b0338db7e 326
+apps/dashboard/src/types/autopilot.ts
+  s_3428b476267439::t_d5e77b0338db7e 689-690,708
+apps/dashboard/src/components/autopilot/autopilot-brief-finding-card.tsx
+  s_3428b476267439::t_d5e77b0338db7e 20,46,53,58-67,82
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "44b1a8e016625c536db594c1c1fed758b5fcfb7b",
+  "prompts": {},
+  "sessions": {
+    "s_3428b476267439": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c6d39551-e687-4036-a65c-3bd92bb74947",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

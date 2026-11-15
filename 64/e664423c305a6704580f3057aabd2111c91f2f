@@ -1,0 +1,21 @@
+apps/dashboard/src/lib/email/geo-first-scan.ts
+  s_939982392779ac::t_58149f55162d5e 1-105
+packages/email/src/emails/first-scan-results.tsx
+  s_939982392779ac::t_2fcc2b7789dac0 1-43,49-68,70-79,81-166,169-177,180-188,191-212
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "64e664423c305a6704580f3057aabd2111c91f2f",
+  "prompts": {},
+  "sessions": {
+    "s_939982392779ac": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "0f6a1856-c4e6-4d1a-aad8-ec3f1b52af96",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

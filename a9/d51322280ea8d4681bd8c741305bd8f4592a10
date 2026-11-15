@@ -1,0 +1,21 @@
+apps/ui/registry/notra/code-block/components/code-block.tsx
+  s_ce94ac95dc01a5::t_c4c36e18e9cc6b 180,207
+apps/ui/registry/notra/package-command/components/package-command.tsx
+  s_ce94ac95dc01a5::t_c4c36e18e9cc6b 101,121
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "a9d51322280ea8d4681bd8c741305bd8f4592a10",
+  "prompts": {},
+  "sessions": {
+    "s_ce94ac95dc01a5": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "2ca0787f-f05d-49f2-a350-5638e65b2177",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

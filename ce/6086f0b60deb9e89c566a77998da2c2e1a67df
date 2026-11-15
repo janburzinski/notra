@@ -1,0 +1,36 @@
+packages/geo-core/tests/analytics-import-posthog.test.ts
+  s_728c6eeefea1f0::t_bc16858b790051 7,10,128,276-327
+apps/docs/analytics/import-history.mdx
+  s_728c6eeefea1f0::t_d2ea3149aba770 112
+apps/dashboard/src/lib/orpc/routers/analytics-imports.ts
+  s_728c6eeefea1f0::t_aee68bb17edb9a 62,193-195,203,213-217,219,221,355-358,363,390,400
+packages/geo-core/src/constants/analytics-imports.ts
+  s_728c6eeefea1f0::t_28b497e52a59e7 303
+packages/geo-core/src/imports/posthog.ts
+  s_728c6eeefea1f0::t_3768f4b2202368 134-145,148,152-161,175,177,330-331,348-349,351-353,375-376,457-459,472-473,537-539,548-549,555-556
+  s_728c6eeefea1f0::t_bc16858b790051 338-346
+apps/dashboard/src/constants/analytics-imports.ts
+  s_728c6eeefea1f0::t_688fe5412532cf 146,154
+  s_728c6eeefea1f0::t_9516f7bf14e0df 160-167
+apps/dashboard/src/lib/analytics-imports/providers.ts
+  s_728c6eeefea1f0::t_f5141a934573cc 19,72-83
+apps/dashboard/src/components/analytics-import/import-connect-step.tsx
+  s_728c6eeefea1f0::t_9516f7bf14e0df 16,84-87,168,170
+  s_728c6eeefea1f0::t_bc16858b790051 187
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "ce6086f0b60deb9e89c566a77998da2c2e1a67df",
+  "prompts": {},
+  "sessions": {
+    "s_728c6eeefea1f0": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "06f7d93b-e6ca-49bf-baaf-7c8c8d812ccb",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

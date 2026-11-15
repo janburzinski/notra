@@ -1,0 +1,72 @@
+apps/dashboard/src/lib/analytics-imports/providers.ts
+  s_728c6eeefea1f0::t_23ce46369cb88c 19-23,52-71,86-87,95-96,122-123,187-190
+apps/docs/analytics/web-analytics.mdx
+  s_728c6eeefea1f0::t_0729033e61d57b 43
+apps/dashboard/src/lib/orpc/routers/analytics-imports.ts
+  s_728c6eeefea1f0::t_bf4d5c5390624c 32
+  s_728c6eeefea1f0::t_765f6ec109d568 63,110-112,302-303,305,307-309
+  s_728c6eeefea1f0::t_924e35dfbd431b 298,304
+apps/dashboard/messages/de.json
+  s_728c6eeefea1f0::t_82645715eae70c 4769,4774,4803-4806,4840-4841,4876-4881
+apps/dashboard/src/constants/analytics-imports.ts
+  s_728c6eeefea1f0::t_765f6ec109d568 98-103
+  s_728c6eeefea1f0::t_23ce46369cb88c 92,97,104,116,131,142,153-157
+packages/geo-core/src/imports/posthog.ts
+  s_728c6eeefea1f0::t_55914fa1fc2b05 445-446,448-449,454-457
+  s_728c6eeefea1f0::t_8889317686d57a 134,400
+  s_728c6eeefea1f0::t_8da22444c35483 335-336
+  s_728c6eeefea1f0::t_990df0e2c1f44c 54,60,68,74,80,86,92,101,113,294-296,299,304,306,309,410-425
+  s_728c6eeefea1f0::t_11e68bbe71da87 357-360,370,374-375,381-384,386,388,391
+  s_728c6eeefea1f0::t_2d7f7f7f3398c9 1-53,55-59,61-67,69-73,75-79,81-85,87-91,93-100,102-112,114-133,135-293,297-298,300-303,305,307-308,310-334,337-356,361-369,371-373,376-380,385,387,389-390,392-399,401-409,426-444,447,450-453,458-547
+apps/docs/analytics/import-history.mdx
+  s_728c6eeefea1f0::t_0729033e61d57b 4,31,106-114
+packages/geo-core/src/schemas/analytics-imports.ts
+  s_728c6eeefea1f0::t_2a15b534c4f572 240-266,288-290
+packages/geo-core/src/types/analytics-imports.ts
+  s_728c6eeefea1f0::t_2a15b534c4f572 171-178,184-189,292-303
+  s_728c6eeefea1f0::t_990df0e2c1f44c 179-183
+  s_728c6eeefea1f0::t_11e68bbe71da87 264-267
+apps/dashboard/src/components/analytics-import/import-provider-mark.tsx
+  s_728c6eeefea1f0::t_765f6ec109d568 4,19
+apps/web/src/content/legal/dpa.mdx
+  s_728c6eeefea1f0::t_3effd7981c8d6e 198
+  s_728c6eeefea1f0::t_2f7621647b8909 5
+apps/dashboard/src/components/analytics-import/import-connect-step.tsx
+  s_728c6eeefea1f0::t_765f6ec109d568 13,15,46,165,167-170,191
+packages/geo-core/src/constants/analytics-imports.ts
+  s_728c6eeefea1f0::t_2a15b534c4f572 61-67,99-105,212-226,290,295-317
+  s_728c6eeefea1f0::t_8f9897440bbae2 318
+  s_728c6eeefea1f0::t_7a32b9dc4a747e 292-293
+apps/dashboard/src/lib/analytics-imports/credentials.ts
+  s_728c6eeefea1f0::t_23ce46369cb88c 9,45-46,76-79
+packages/geo-core/tests/analytics-import-posthog.test.ts
+  s_728c6eeefea1f0::t_8da22444c35483 77-80,245
+  s_728c6eeefea1f0::t_452b3c5da7b51a 1-76,81-104,106-153,155,159-164,170-244,246-294
+  s_728c6eeefea1f0::t_11e68bbe71da87 154,156-158,165-169
+apps/dashboard/messages/en.json
+  s_728c6eeefea1f0::t_82645715eae70c 4769,4774,4803-4806,4840-4841,4876-4881
+apps/dashboard/tests/analytics-import-ui.test.tsx
+  s_728c6eeefea1f0::t_2e245e39b4ef84 211-229
+apps/dashboard/src/types/analytics-imports.ts
+  s_728c6eeefea1f0::t_23ce46369cb88c 20,42-43
+packages/db/src/constants/analytics-imports.ts
+  s_728c6eeefea1f0::t_2a15b534c4f572 9,18
+apps/web/src/content/legal/subprocessors.mdx
+  s_728c6eeefea1f0::t_3effd7981c8d6e 5,85
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "a193875635dc909d1ebf30c3a2b3c09b4c25091b",
+  "prompts": {},
+  "sessions": {
+    "s_728c6eeefea1f0": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "06f7d93b-e6ca-49bf-baaf-7c8c8d812ccb",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

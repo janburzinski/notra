@@ -1,0 +1,87 @@
+apps/dashboard/messages/en.json
+  s_dee84dad4454b7::t_9a52c913e1b426 3366-3367,3491
+  s_dee84dad4454b7::t_53a3c900af8239 3492
+packages/geo-core/src/schemas/geo.ts
+  s_dee84dad4454b7::t_42441eb470cf06 23-24,26-27,467-474,479-480
+packages/db/src/schema.ts
+  s_dee84dad4454b7::t_026042eef9e649 1894-1925,1942-1947,1957
+packages/geo-core/src/geo/mappers.ts
+  s_dee84dad4454b7::t_5c42ab94679c40 4,11
+  s_dee84dad4454b7::t_b57067a0534cf3 117-118,122-123
+packages/geo-core/src/geo/discover.ts
+  s_dee84dad4454b7::t_5e5110b7c3aa6e 5,28-29,35-36
+  s_dee84dad4454b7::t_6da4d9a277084d 117,234
+  s_dee84dad4454b7::t_80dabc19635064 116,118-147,163-164,166-170,178-180,235-238,250-252,257,274
+  s_dee84dad4454b7::t_c22d2c7b2a6683 8,148-162,165,171-177,295-296,306,325-326,341-342,515-532,548-550,555-556
+  s_dee84dad4454b7::t_26e191e9b7be3a 19,69,94,104-109
+  s_dee84dad4454b7::t_d52b5b661ec82b 372,429-435,440-443,588,603,652,684
+  s_dee84dad4454b7::t_45bc85143e469b 253-256
+  s_dee84dad4454b7::t_2715627f5e38eb 72-73,76-79,92-93
+apps/dashboard/src/constants/geo-prompts.ts
+  s_dee84dad4454b7::t_453c996537bb94 17-18
+apps/dashboard/src/components/geo/prompts-table.tsx
+  s_dee84dad4454b7::t_453c996537bb94 61,80,245-249,583-587,589
+  s_dee84dad4454b7::t_66ef9b9352a487 418-428,582
+packages/geo-core/tests/utils/database.ts
+  s_dee84dad4454b7::t_553dfbb210327b 10,48
+apps/dashboard/src/utils/geo-prompts.ts
+  s_dee84dad4454b7::t_5a84a41acd5b69 11
+  s_dee84dad4454b7::t_45ed44e654a881 265
+  s_dee84dad4454b7::t_453c996537bb94 13,63-64,66-83,85-88
+  s_dee84dad4454b7::t_8abbd7d4d6b444 62,65,84
+  s_dee84dad4454b7::t_bc2dab7ac3f668 106,118
+packages/geo-core/src/constants/geo.ts
+  s_dee84dad4454b7::t_42441eb470cf06 484,521-531
+apps/ui/registry/notra/table/components/data-table-body.tsx
+  s_dee84dad4454b7::t_59519e04cf54c7 249
+  s_dee84dad4454b7::t_b51fb8d7925fb0 4,27,205-208,210-213,215-216,218,220-223,225-228,251-256,323-329,331-333
+  s_dee84dad4454b7::t_85c3c8984721da 3,202-203,230-233,236-241,243-245,247-248,250
+  s_dee84dad4454b7::t_d613d64ec99579 18
+  s_dee84dad4454b7::t_435118f0fda611 201,204,209,214,219,224,229,234-235,242,246
+  s_dee84dad4454b7::t_ac3d0112c9186d 217,330
+apps/ui/registry/notra/table/components/data-table-root.tsx
+  s_dee84dad4454b7::t_b51fb8d7925fb0 4,23,88-89,136-154
+apps/ui/registry/notra/table/lib/data-table.ts
+  s_dee84dad4454b7::t_b51fb8d7925fb0 13,71-120
+apps/ui/registry/notra/table/components/data-table.tsx
+  s_dee84dad4454b7::t_5a84a41acd5b69 13,22
+apps/dashboard/messages/de.json
+  s_dee84dad4454b7::t_9a52c913e1b426 3366-3367,3491
+  s_dee84dad4454b7::t_53a3c900af8239 3492
+packages/geo-core/src/types/geo.ts
+  s_dee84dad4454b7::t_67cc1388ff851d 953
+  s_dee84dad4454b7::t_42441eb470cf06 565
+  s_dee84dad4454b7::t_80dabc19635064 1699-1701,2152-2153
+  s_dee84dad4454b7::t_45bc85143e469b 941-943
+  s_dee84dad4454b7::t_8b7ae2d3bdae5f 603-604
+  s_dee84dad4454b7::t_7f447b43086ca2 586
+  s_dee84dad4454b7::t_e16eb6350e1a02 21-24
+  s_dee84dad4454b7::t_b57067a0534cf3 584-585,587-594,624,1690-1696
+packages/geo-core/src/geo/programs.ts
+  s_dee84dad4454b7::t_1d255c660b7c83 18,103
+  s_dee84dad4454b7::t_5c42ab94679c40 1704,1710,1718-1724,1731,1744,1768,1866-1867
+  ai_agent 1732-1734
+  s_dee84dad4454b7::t_7f447b43086ca2 1735-1738
+apps/dashboard/src/types/geo.ts
+  s_dee84dad4454b7::t_bc2dab7ac3f668 48,292
+apps/dashboard/src/lib/hooks/use-geo-prompt-intent-label.ts
+  s_dee84dad4454b7::t_bc2dab7ac3f668 8
+apps/ui/registry/notra/table/types/data-table.ts
+  s_dee84dad4454b7::t_b51fb8d7925fb0 179-185,227-241
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "49288f7221028709dfdadb948a05e66cf519bca9",
+  "prompts": {},
+  "sessions": {
+    "s_dee84dad4454b7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c4318025-3977-48ad-a0dc-b9c3be498424",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

@@ -1,0 +1,43 @@
+apps/dashboard/src/lib/chat/message-components.ts
+  s_3428b476267439::t_00fac178537372 1-4
+apps/dashboard/src/components/chat/chat-message-link.tsx
+  s_3428b476267439::t_7dc0311cdfbd74 46
+packages/ui/src/components/ui/composer.tsx
+  s_3428b476267439::t_7dc0311cdfbd74 159
+apps/dashboard/src/components/chat/shared-chat-page.tsx
+  s_3428b476267439::t_c5c50de2eebbdd 45
+apps/dashboard/src/components/chat/chat-input.tsx
+  s_3428b476267439::t_7dc0311cdfbd74 1498
+  s_3428b476267439::t_c5c50de2eebbdd 65
+  s_3428b476267439::t_00fac178537372 1722-1724
+apps/dashboard/src/utils/chat-composer-nudge.ts
+  s_3428b476267439::t_fdd6af76f4de56 1-56
+apps/dashboard/src/components/chat/chat-conversation.tsx
+  s_3428b476267439::t_c5c50de2eebbdd 47
+  s_3428b476267439::t_7dc0311cdfbd74 482
+apps/dashboard/src/components/ai/chat-tool-block.tsx
+  s_3428b476267439::t_7dc0311cdfbd74 753
+apps/dashboard/src/components/artifacts/artifact-document.tsx
+  s_3428b476267439::t_7dc0311cdfbd74 368
+apps/dashboard/src/components/artifacts/artifact-actions.tsx
+  s_3428b476267439::t_7dc0311cdfbd74 323,338
+apps/dashboard/src/components/chat/chat-composer-parts.tsx
+  s_3428b476267439::t_7dc0311cdfbd74 106
+  s_3428b476267439::t_fdd6af76f4de56 48
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "6c07584fea14dac3b9871f8455d51331ec192e6d",
+  "prompts": {},
+  "sessions": {
+    "s_3428b476267439": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c6d39551-e687-4036-a65c-3bd92bb74947",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

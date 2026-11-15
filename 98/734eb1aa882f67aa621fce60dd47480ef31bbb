@@ -1,0 +1,29 @@
+apps/minigame/src/lib/server/request.ts
+  s_673745a4f2f52f::t_f5b2265da67ff4 5,12-24,27,29-35
+apps/minigame/src/routes/api/me.ts
+  s_673745a4f2f52f::t_cae74f06ac0528 46-49
+apps/minigame/src/routes/api/runs/index.ts
+  s_673745a4f2f52f::t_cae74f06ac0528 49-51
+apps/minigame/src/routes/api/beats/$runId.ts
+  s_673745a4f2f52f::t_cae74f06ac0528 31-32
+apps/minigame/src/routes/api/runs/$runId.ts
+  s_673745a4f2f52f::t_cae74f06ac0528 126-127
+apps/minigame/src/routes/api/admin/moderate.ts
+  s_673745a4f2f52f::t_cae74f06ac0528 47-49
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "98734eb1aa882f67aa621fce60dd47480ef31bbb",
+  "prompts": {},
+  "sessions": {
+    "s_673745a4f2f52f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "41c3de73-071e-4473-b094-b0db24729964",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

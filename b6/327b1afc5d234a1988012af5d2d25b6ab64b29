@@ -1,0 +1,21 @@
+apps/dashboard/src/lib/ui-sounds/listeners.ts
+  s_ec1a78e4f5b8a8::t_48c0fda6db2932 69-70,74-77,86-89,95-97,132,135,184,201,223
+apps/dashboard/src/lib/ui-sounds/classify.ts
+  s_ec1a78e4f5b8a8::t_48c0fda6db2932 105-108
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "b6327b1afc5d234a1988012af5d2d25b6ab64b29",
+  "prompts": {},
+  "sessions": {
+    "s_ec1a78e4f5b8a8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e59baf75-4db2-4ed2-b5bc-108cf188f1a5",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

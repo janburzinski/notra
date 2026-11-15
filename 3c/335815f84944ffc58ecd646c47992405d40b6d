@@ -1,0 +1,32 @@
+packages/ui/src/components/ui/context-menu.tsx
+  s_9ddd8dca998e5b::t_3250073d84281f 8-16,80,104-105,127-129,132,161-162,165,172,211-212,219,248-249,256,274,287
+packages/ui/src/components/ui/dropdown-menu.tsx
+  s_9ddd8dca998e5b::t_9220841735a735 9-10,12,14-15,47,88,113-114,142,151,200-203,213,228,236,270,278,296,309
+apps/dashboard/src/components/automation/alerts/geo-alert-form.tsx
+  s_9ddd8dca998e5b::t_b5f56e4017f4c2 393
+packages/ui/src/components/ui/combobox.tsx
+  s_9ddd8dca998e5b::t_72be796fd96548 18-24,131-132,165-166,175,204,236
+apps/dashboard/src/components/dashboard/brand-topbar-identity-selector.tsx
+  s_9ddd8dca998e5b::t_b73d98e9ed8222 145
+packages/ui/src/constants/dropdown.ts
+  s_9ddd8dca998e5b::t_3570c36c095840 34
+  s_9ddd8dca998e5b::t_7590acbaaf7e91 6-16,19-33
+packages/ui/src/components/ui/select.tsx
+  s_9ddd8dca998e5b::t_72be796fd96548 14,16,18,148,164,175,194-198
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "3c335815f84944ffc58ecd646c47992405d40b6d",
+  "prompts": {},
+  "sessions": {
+    "s_9ddd8dca998e5b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f4a7e88f-13a6-402c-bb1c-2c144f714fa2",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

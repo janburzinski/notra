@@ -1,0 +1,31 @@
+apps/console/src/types/overview.ts
+  s_dbf54ebf98af8f::t_5787e722203c4d 107
+  s_dbf54ebf98af8f::t_0174d220bf09b6 1-2,62-64,106,108-118
+apps/console/src/components/insights/insights-page-header.tsx
+  s_dbf54ebf98af8f::t_0174d220bf09b6 1-35
+apps/console/src/components/overview/overview-client.tsx
+  s_dbf54ebf98af8f::t_0174d220bf09b6 18,30,149,301-306,310,315-350,359-372,374,376-392,394-409,411,428-434
+apps/console/src/lib/overview/queries.ts
+  s_dbf54ebf98af8f::t_0174d220bf09b6 391-392,395-397
+apps/console/src/components/slack-bot/slack-bot-client.tsx
+  s_dbf54ebf98af8f::t_0174d220bf09b6 16,200-206
+apps/console/src/types/insights.ts
+  s_dbf54ebf98af8f::t_5787e722203c4d 1
+  s_dbf54ebf98af8f::t_0174d220bf09b6 2-12
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "a3fb77d7487bcbae4c63ed288423f561ae774938",
+  "prompts": {},
+  "sessions": {
+    "s_dbf54ebf98af8f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "136e800b-75e4-4e44-a5ee-7cc73212fa4f",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

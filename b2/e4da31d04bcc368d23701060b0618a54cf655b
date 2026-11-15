@@ -1,0 +1,623 @@
+apps/dashboard/src/lib/analytics-imports/recovery.ts
+  s_3428b476267439::t_dec71bae649fa4 9,11,25-26,34-42,46-49,51-54,57-69,74-81,88-99,104-140,193-203,205-238,243,256,260-266,277-283,295,306
+apps/web/src/components/landing/hero-tap-hand.tsx
+  s_3428b476267439::t_dec71bae649fa4 1-26
+apps/dashboard/src/utils/autopilot-dream.test.ts
+  s_3428b476267439::t_dec71bae649fa4 1-731
+apps/dashboard/src/types/analytics-imports.ts
+  s_3428b476267439::t_dec71bae649fa4 74,323-326,335-339
+packages/ui/src/components/ui/context-menu.tsx
+  s_3428b476267439::t_dec71bae649fa4 8-16,80,104-105,127-129,132,161-162,165,172,211-212,219,248-249,256,274,287
+apps/dashboard/src/lib/autopilot/rendering.ts
+  s_3428b476267439::t_dec71bae649fa4 46,489-496
+packages/geo-core/src/constants/ingest.ts
+  s_3428b476267439::t_dec71bae649fa4 29,40-77
+apps/web/src/constants/features-page.ts
+  s_3428b476267439::t_dec71bae649fa4 100
+apps/dashboard/src/schemas/autopilot-github.ts
+  s_3428b476267439::t_dec71bae649fa4 14-15
+packages/geo-core/src/utils/android-app-referrer.ts
+  s_3428b476267439::t_dec71bae649fa4 1-14
+apps/dashboard/tests/autopilot-schedule.test.ts
+  s_3428b476267439::t_dec71bae649fa4 1,19-22,25-27,48,51-58,62-71,73-123
+apps/dashboard/src/types/autopilot-memory.ts
+  s_3428b476267439::t_dec71bae649fa4 15
+packages/geo-core/src/ingest/journey.ts
+  s_3428b476267439::t_dec71bae649fa4 15
+apps/dashboard/tests/autopilot-flow.test.ts
+  s_3428b476267439::t_dec71bae649fa4 298,1295-1330,1752-1755,1761
+apps/dashboard/src/app/api/internal/autopilot/agent/route.ts
+  s_3428b476267439::t_dec71bae649fa4 1-35
+apps/docs/quickstart.mdx
+  s_3428b476267439::t_dec71bae649fa4 162-163
+apps/dashboard/src/constants/autopilot-dream.ts
+  s_3428b476267439::t_dec71bae649fa4 1-75
+apps/dashboard/src/lib/autopilot/github.ts
+  s_3428b476267439::t_dec71bae649fa4 6,31-32,53,63-64,77
+apps/api/src/constants/analytics.ts
+  s_3428b476267439::t_dec71bae649fa4 4,20
+packages/geo-core/tests/ingest-pipeline.test.ts
+  s_3428b476267439::t_dec71bae649fa4 1-8,15-22,135-142,609-628,631-636
+apps/dashboard/src/lib/autopilot/dream.ts
+  s_3428b476267439::t_dec71bae649fa4 1-1039
+apps/dashboard/src/lib/workflow-engine/blocks/autopilot/dream.ts
+  s_3428b476267439::t_dec71bae649fa4 1-140
+apps/agent/agent/tools/act_on_autopilot_finding.ts
+  s_3428b476267439::t_dec71bae649fa4 1-17
+packages/geo-core/tests/analytics-import-mapping.test.ts
+  s_3428b476267439::t_dec71bae649fa4 34-36,55-60,83-88,215-228
+apps/dashboard/tests/autopilot-template-flows.test.ts
+  s_3428b476267439::t_dec71bae649fa4 164
+apps/dashboard/src/schemas/autopilot-slack.ts
+  s_3428b476267439::t_763617eeb8074d 17-31
+apps/docs/analytics/overview.mdx
+  s_3428b476267439::t_dec71bae649fa4 4,10,18,22,27,43,45,53,57,60,63,66,69,72,75,78,88,91,98,100,102,119,138,145,147,166,175
+packages/geo-core/src/constants/geo.ts
+  s_3428b476267439::t_dec71bae649fa4 577-578,611,718-726
+apps/api/tests/openapi-publish-destination.test.ts
+  s_3428b476267439::t_dec71bae649fa4 1-49
+packages/tools/src/constants/autopilot.ts
+  s_3428b476267439::t_dec71bae649fa4 1-20
+apps/dashboard/src/workflows/steps/github-mention-step.ts
+  s_3428b476267439::t_dec71bae649fa4 17-18,48-69
+apps/dashboard/src/lib/orpc/routers/integrations.ts
+  s_3428b476267439::t_dec71bae649fa4 162,1494-1496,1508
+apps/dashboard/tests/autopilot-dream.test.ts
+  s_3428b476267439::t_dec71bae649fa4 1-1350
+packages/schemas/src/schemas/dashboard/autopilot.ts
+  s_3428b476267439::t_dec71bae649fa4 3,96-103,139-140
+bun.lock
+  ai_agent 571,765,3415
+apps/docs/playbooks/agencies.mdx
+  s_3428b476267439::t_dec71bae649fa4 33
+apps/dashboard/src/routeTree.gen.ts
+  s_3428b476267439::t_dec71bae649fa4 80,485-490,790,900,1011,1123,1233,1343,1448,1961-1967,2415
+apps/dashboard/src/utils/analytics-import-progress.ts
+  s_3428b476267439::t_dec71bae649fa4 12,298-301,305,308,310
+apps/dashboard/src/lib/autopilot/links.ts
+  s_3428b476267439::t_dec71bae649fa4 58,597-604
+apps/web/src/constants/landing/faq.ts
+  s_3428b476267439::t_dec71bae649fa4 32
+apps/dashboard/src/components/autopilot/autopilot-settings-panel.tsx
+  s_3428b476267439::t_dec71bae649fa4 6,10-11,13,38,105-118,150-166,172-180,182,185,187-261,393-444
+apps/dashboard/tests/autopilot-memory.test.ts
+  s_3428b476267439::t_dec71bae649fa4 89-114
+packages/ui/src/constants/dropdown.ts
+  s_3428b476267439::t_dec71bae649fa4 6-16,19-34
+apps/dashboard/src/lib/orpc/routers/analytics-imports.ts
+  s_3428b476267439::t_dec71bae649fa4 228
+packages/geo-core/src/utils/geo-drain-records.ts
+  s_3428b476267439::t_dec71bae649fa4 3
+packages/ai/src/schemas/autopilot-agent.ts
+  s_3428b476267439::t_dec71bae649fa4 1-151
+apps/dashboard/src/lib/workflow-engine/blocks/autopilot/shared.ts
+  s_3428b476267439::t_dec71bae649fa4 27,159
+apps/dashboard/src/lib/autopilot/slack.test.ts
+  s_3428b476267439::t_763617eeb8074d 25,32
+packages/geo-core/src/ingest/drain.ts
+  s_3428b476267439::t_dec71bae649fa4 95
+packages/ui/src/components/ui/combobox.tsx
+  s_3428b476267439::t_dec71bae649fa4 18-24,131-132,165-166,175,204,236
+apps/dashboard/src/lib/workflows/event/handlers/index.ts
+  s_3428b476267439::t_dec71bae649fa4 8,29-30,62,82
+apps/dashboard/src/app/api/cron/monitoring/route.ts
+  s_3428b476267439::t_dec71bae649fa4 43
+apps/dashboard/src/lib/autopilot/settings.ts
+  s_3428b476267439::t_dec71bae649fa4 1-173
+apps/dashboard/src/lib/analytics-imports/write.ts
+  s_3428b476267439::t_dec71bae649fa4 97-98,102,104-107,117-118,123-129,132,150
+apps/docs/analytics/install/sveltekit.mdx
+  s_3428b476267439::t_dec71bae649fa4 4,10,18,21,26,42,51,55,59,63,73,81,84,91,94
+apps/dashboard/src/workflows/analytics-import.ts
+  s_3428b476267439::t_dec71bae649fa4 11,21-22,24-27,33,50-51,59-60,67-69,75-84,86-87
+apps/dashboard/src/constants/mcp-analytics.ts
+  s_3428b476267439::t_dec71bae649fa4 69,77
+packages/geo-core/tests/utils/web-limit-script.ts
+  s_3428b476267439::t_dec71bae649fa4 1-31
+apps/dashboard/src/types/workflows/analytics-import.ts
+  s_3428b476267439::t_dec71bae649fa4 3-9
+packages/geo-core/src/ingest/classify-visitor.ts
+  s_3428b476267439::t_dec71bae649fa4 2,15-17,22,29-34,60-63,90,110-115,128-142,152-155,161-170,219-231
+apps/dashboard/src/types/autopilot-workflows.ts
+  s_3428b476267439::t_dec71bae649fa4 312-313
+apps/agent/agent/tools/add_autopilot_rule.ts
+  s_3428b476267439::t_dec71bae649fa4 1-17
+apps/dashboard/src/app/api/webhooks/github/app/route.ts
+  s_3428b476267439::t_dec71bae649fa4 6,9,63-77
+apps/dashboard/src/lib/autopilot/daily-notes.ts
+  s_3428b476267439::t_dec71bae649fa4 1-23
+apps/docs/api/types.mdx
+  s_3428b476267439::t_dec71bae649fa4 29,32-35,42
+apps/docs/analytics/install/cloudflare-logpush.mdx
+  s_3428b476267439::t_dec71bae649fa4 10,31,119,125,127,132,135
+apps/dashboard/src/lib/autopilot/schedule.ts
+  s_3428b476267439::t_dec71bae649fa4 1,3,5,9-10,12,14,18,20-64,69,81-95,97,99-101,103,105-107,112-114,119,121-123
+apps/web/src/styles/theme.css
+  s_3428b476267439::t_dec71bae649fa4 457-513
+packages/memory/src/utils/access.ts
+  s_3428b476267439::t_dec71bae649fa4 3,14-19,36-39
+packages/memory/src/utils/paths.ts
+  s_3428b476267439::t_dec71bae649fa4 1-29
+apps/dashboard/src/app/(dashboard)/[slug]/autopilot/page-client.tsx
+  s_3428b476267439::t_84cddc8c77672b 65-71,166,180,392
+apps/agent/README.md
+  s_3428b476267439::t_dec71bae649fa4 119,125
+apps/docs/playbooks/first-30-days.mdx
+  s_3428b476267439::t_dec71bae649fa4 36,53
+apps/dashboard/src/app/(dashboard)/[slug]/autopilot/[automation]/page-client.tsx
+  s_3428b476267439::t_dec71bae649fa4 209
+apps/dashboard/tests/autopilot-sandbox.test.ts
+  s_3428b476267439::t_dec71bae649fa4 63,125-126,151-156,244,276-421,757-772
+apps/dashboard/src/app/api/integrations/slack/callback/route.ts
+  s_3428b476267439::t_dec71bae649fa4 24-27,191,200-201
+apps/dashboard/src/types/slack-integration.ts
+  s_3428b476267439::t_dec71bae649fa4 61-70
+apps/dashboard/tests/analytics-import-workflow.test.ts
+  s_3428b476267439::t_dec71bae649fa4 12,26,34,58,62-73,81
+packages/schemas/src/schemas/api/schedules.ts
+  s_3428b476267439::t_dec71bae649fa4 172-174,223,278
+packages/geo-core/src/ingest/ratelimit.ts
+  s_3428b476267439::t_dec71bae649fa4 9,35-37
+apps/dashboard/src/lib/autopilot/flag.ts
+  s_3428b476267439::t_dec71bae649fa4 9,11,14,16,20,22-30
+packages/db/migrations/0158_rerun_broken_analytics_imports.sql
+  ai_agent 1-55
+packages/db/migrations/meta/0161_snapshot.json
+  ai_agent 1-17775
+packages/geo-core/tests/analytics-import-providers.test.ts
+  s_3428b476267439::t_dec71bae649fa4 30-34,518-589,1103,1105-1106,1114-1115,1119-1120,1124-1135,1146-1155,1165-1170,1184,1188-1192,1198-1249,1251-1262,1265,1277
+apps/web/src/utils/proxy-paths.ts
+  s_3428b476267439::t_dec71bae649fa4 2
+packages/geo-core/src/schemas/analytics-import-errors.ts
+  s_3428b476267439::t_dec71bae649fa4 4-7,10-14,17-21,24-28
+apps/web/src/constants/landing/footer.ts
+  s_3428b476267439::t_dec71bae649fa4 79
+packages/db/src/constants/autopilot.ts
+  s_3428b476267439::t_dec71bae649fa4 87-90
+apps/docs/analytics/journeys.mdx
+  s_3428b476267439::t_dec71bae649fa4 4,10,27
+packages/ai/src/schemas/autopilot-slack-action.ts
+  s_3428b476267439::t_dec71bae649fa4 8
+packages/db/src/schema.ts
+  s_3428b476267439::t_ccdf7c685636e0 105,4428-4429,4470-4471,4869,4895-4898,4980-4981
+apps/agent/agent/tools/get_autopilot_status.ts
+  s_3428b476267439::t_dec71bae649fa4 1-17
+apps/agent/agent/tools/run_autopilot_workflow.ts
+  s_3428b476267439::t_dec71bae649fa4 1-17
+apps/dashboard/src/app/(dashboard)/[slug]/integrations/slack/page-client.tsx
+  s_3428b476267439::t_dec71bae649fa4 463,530-540
+apps/docs/analytics/install/astro.mdx
+  s_3428b476267439::t_dec71bae649fa4 4,10,18,21,26,51,55,59,63,68,72,80,83,90,93
+apps/web/src/components/landing/hero-website-form.tsx
+  s_3428b476267439::t_dec71bae649fa4 9,13,80-92
+packages/ai/src/prompts/autopilot-planner.ts
+  s_3428b476267439::t_dec71bae649fa4 15,17
+apps/dashboard/src/constants/autopilot-transitions.ts
+  s_3428b476267439::t_dec71bae649fa4 9,13
+apps/dashboard/src/utils/autopilot-schedule.ts
+  s_3428b476267439::t_dec71bae649fa4 1-2,5-8,14-15,19,26-27,39-40,47,50-56
+packages/geo-core/src/ingest/web.ts
+  s_3428b476267439::t_dec71bae649fa4 14,17,34,44,104-107,121-124,159-168,173-175
+bunfig.toml
+  s_3428b476267439::t_dec71bae649fa4 5
+packages/ai/src/utils/autopilot-planner.ts
+  s_3428b476267439::t_dec71bae649fa4 189-198,219-220,242-243,245,247,250,438-439,505,510-515
+apps/agent/agent/tools/run_autopilot.ts
+  s_3428b476267439::t_dec71bae649fa4 1-17
+packages/schemas/src/schemas/api/event-triggers.ts
+  s_3428b476267439::t_dec71bae649fa4 43-50,63-66
+apps/docs/analytics/web-analytics.mdx
+  s_3428b476267439::t_dec71bae649fa4 1-159
+apps/dashboard/src/lib/autopilot/blog.ts
+  s_3428b476267439::t_dec71bae649fa4 22-24,26,30,32,36-38,40,42,78,116,133-137,169,306-316,320-361,371-372,383,391-408,437-440,449,493-497,505-512,523-527,618-620,678-689,853,1090,1229-1230,1236-1238,1605-1607
+apps/dashboard/src/lib/hooks/use-autopilot-workflows.ts
+  s_3428b476267439::t_dec71bae649fa4 34-44,85
+apps/agent/agent/lib/constants/autopilot.ts
+  s_3428b476267439::t_dec71bae649fa4 1-7
+apps/dashboard/src/lib/autopilot/writer.ts
+  s_3428b476267439::t_dec71bae649fa4 22-23,31,88,108-112,152,174,248
+apps/dashboard/src/app/(dashboard)/[slug]/autopilot/runs/[id]/page-client.tsx
+  s_3428b476267439::t_dec71bae649fa4 27,35,49-56,72,75-81,88-115,256,259
+apps/dashboard/src/components/autopilot/autopilot-pull-requests-table.tsx
+  s_3428b476267439::t_dec71bae649fa4 23,47,93-100
+packages/geo-core/tests/web-session.test.ts
+  s_3428b476267439::t_dec71bae649fa4 49-65
+apps/dashboard/src/lib/orpc/routers/autopilot.ts
+  s_3428b476267439::t_dec71bae649fa4 5,31,39,42-43,51-54,71-75,77-81,85,92,97,101,145-166,171-181,223-244,246-250,253-270,295-299,309,311,313,317-357,359,363,368,371,376-378,383-384,391-392,422,432-434,580,587,594-595,601-602,606-613,615,617-618,622,624,692-713,720-733
+apps/docs/analytics/crawlers.mdx
+  s_3428b476267439::t_dec71bae649fa4 10,18,28,330
+apps/dashboard/src/lib/analytics-imports/runner.ts
+  s_3428b476267439::t_dec71bae649fa4 2,34,37-38,191-214,232-234,243,245-249,252,257-258,262,269-270,278-287,289-292,295-299,304-312,324-325,352,359-364,366-374,443-447,457,461-462,464-497,538-540
+packages/ai/src/constants/autopilot-planner.ts
+  s_3428b476267439::t_dec71bae649fa4 14,40-41
+apps/dashboard/src/lib/analytics-imports/rate-limit.ts
+  s_3428b476267439::t_dec71bae649fa4 54
+apps/dashboard/src/utils/autopilot-paths.ts
+  s_3428b476267439::t_dec71bae649fa4 24-28
+packages/geo-core/src/ingest/web-limits.ts
+  s_3428b476267439::t_dec71bae649fa4 4,8,11,14,18,21-25,28,41-43,45-47,49-51,54-60,63-64,67-68,74-85,88-104,107-125,127-142,144-149,152-168,170-237,243-246,253-261,264-272
+packages/db/migrations/meta/0160_snapshot.json
+  ai_agent 1-17649
+apps/dashboard/src/lib/workflow-engine/execute-node.ts
+  s_3428b476267439::t_dec71bae649fa4 12,72
+apps/dashboard/src/lib/autopilot/slack.ts
+  s_3428b476267439::t_763617eeb8074d 41,43
+apps/agent/agent/lib/utils/autopilot-approval.ts
+  s_3428b476267439::t_dec71bae649fa4 1-93
+apps/blog/blog.json
+  s_3428b476267439::t_dec71bae649fa4 96-98
+apps/dashboard/src/utils/autopilot-publish.test.ts
+  s_3428b476267439::t_dec71bae649fa4 1-289
+apps/docs/theme.css
+  s_3428b476267439::t_dec71bae649fa4 1-4
+apps/dashboard/src/lib/workflow-engine/store.ts
+  s_3428b476267439::t_dec71bae649fa4 191-209,230,236
+apps/docs/analytics/install/script-tag.mdx
+  s_3428b476267439::t_dec71bae649fa4 3,10,20,24,46-88,94-95,101,105,115,122,127,141,145
+apps/dashboard/tests/analytics-imports-e2e.test.ts
+  s_3428b476267439::t_dec71bae649fa4 149,156-159,161,163,166,184-187,203,205,217,297,460-512
+apps/docs/playbooks/developer-tools.mdx
+  s_3428b476267439::t_dec71bae649fa4 24,30-31,36
+apps/dashboard/src/types/autopilot-dream.ts
+  s_3428b476267439::t_dec71bae649fa4 1-112
+packages/geo-core/src/ingest/collect.ts
+  s_3428b476267439::t_dec71bae649fa4 80
+apps/dashboard/src/components/dashboard/brand-topbar-identity-selector.tsx
+  s_3428b476267439::t_dec71bae649fa4 145
+apps/dashboard/src/lib/autopilot/agent.ts
+  s_3428b476267439::t_dec71bae649fa4 1-373
+apps/web/middleware.ts
+  s_3428b476267439::t_dec71bae649fa4 1
+packages/geo-core/src/constants/geo-accept.ts
+  s_3428b476267439::t_dec71bae649fa4 8-11,44-47
+apps/dashboard/src/lib/autopilot/workflows/service.ts
+  s_3428b476267439::t_dec71bae649fa4 30,39,46-47,56-59,390-445,482,683-702,710-734
+apps/dashboard/src/lib/analytics-imports/runs.ts
+  s_3428b476267439::t_dec71bae649fa4 23-28
+packages/geo-core/src/constants/geo-hidden-sources.ts
+  s_3428b476267439::t_dec71bae649fa4 1
+packages/geo-core/src/imports/http.ts
+  s_3428b476267439::t_dec71bae649fa4 4,16,62-95,118-122,170-173,176
+apps/api/src/routes/geo-traffic.ts
+  s_3428b476267439::t_dec71bae649fa4 184
+apps/agent/tests/autopilot-tools.test.ts
+  s_3428b476267439::t_dec71bae649fa4 1-253
+packages/geo-core/src/types/ingest.ts
+  s_3428b476267439::t_dec71bae649fa4 9,81,137-161,262-264
+apps/dashboard/src/lib/autopilot/slack-actions.ts
+  s_3428b476267439::t_efd97dda7ba5e1 13,17-18,60-61,63-67,69-72,87-89,120-129,137,139,191,197-207
+packages/geo-core/src/imports/cloudflare.ts
+  s_3428b476267439::t_dec71bae649fa4 1
+apps/dashboard/src/constants/autopilot-publish.ts
+  s_3428b476267439::t_dec71bae649fa4 1-74
+apps/dashboard/src/lib/autopilot/cleanup.ts
+  s_3428b476267439::t_dec71bae649fa4 8,15,297,305-309,348-376,386
+apps/dashboard/src/lib/autopilot/planner.ts
+  s_3428b476267439::t_dec71bae649fa4 5-6,10,28,64-73,99-105,107-113,266,345
+apps/dashboard/src/constants/geo-ingest-script.ts
+  s_3428b476267439::t_dec71bae649fa4 4
+packages/tools/src/autopilot/tools.ts
+  s_3428b476267439::t_dec71bae649fa4 1-95
+apps/dashboard/messages/en.json
+  s_3428b476267439::t_dec71bae649fa4 1339-1340,4595,4778,4783,4956-4959,5657-5658,10216-10226
+apps/agent/agent/tools/delete_autopilot_rule.ts
+  s_3428b476267439::t_dec71bae649fa4 1-17
+apps/dashboard/src/workflows/github-mention.test.ts
+  s_3428b476267439::t_dec71bae649fa4 51-53,57-58
+apps/dashboard/src/app/(dashboard)/[slug]/autopilot/workflows/[id]/page-client.tsx
+  s_3428b476267439::t_dec71bae649fa4 9,147-148,153-174,209,267-269,271
+packages/geo-core/src/ingest/event.ts
+  s_3428b476267439::t_dec71bae649fa4 5,74-75
+apps/dashboard/src/lib/autopilot/finding-actions.ts
+  s_3428b476267439::t_dec71bae649fa4 1-90
+apps/dashboard/src/lib/analytics-imports/alerts.ts
+  s_3428b476267439::t_dec71bae649fa4 1-41
+apps/blog/header.mdx
+  s_3428b476267439::t_dec71bae649fa4 26
+apps/dashboard/src/components/geo/web-trend-chart.tsx
+  s_3428b476267439::t_dec71bae649fa4 53
+apps/dashboard/src/lib/hooks/use-autopilot.ts
+  s_3428b476267439::t_dec71bae649fa4 7-10,18-19,35-51,118,127-137
+packages/geo-core/src/imports/map-dimensions.ts
+  s_3428b476267439::t_dec71bae649fa4 120,122
+apps/docs/integrations/slack.mdx
+  s_3428b476267439::t_9f786caaa8b61c 86
+apps/dashboard/tests/analytics-import-progress.test.ts
+  s_3428b476267439::t_dec71bae649fa4 3,300-315
+apps/dashboard/src/utils/autopilot-events.ts
+  s_3428b476267439::t_dec71bae649fa4 14-16,136-140,329-335,342-350
+apps/dashboard/src/constants/analytics-imports.ts
+  s_3428b476267439::t_dec71bae649fa4 21-34,46-50,55-56
+apps/dashboard/src/lib/autopilot/conventions.ts
+  s_3428b476267439::t_dec71bae649fa4 1-26
+apps/dashboard/src/constants/autopilot.ts
+  s_3428b476267439::t_dec71bae649fa4 29-30,47,54-59,88-89,175-176,188-191,255-275,307-330
+apps/docs/playbooks/win-a-prompt.mdx
+  s_3428b476267439::t_dec71bae649fa4 36
+apps/web/src/start.ts
+  s_3428b476267439::t_dec71bae649fa4 2
+apps/docs/analytics/install/netlify.mdx
+  s_3428b476267439::t_dec71bae649fa4 4,10,18,21,26,42,51,55,59,63,68,72,88,95,98
+packages/db/migrations/0160_analytics_import_write_tracking.sql
+  ai_agent 1-56
+apps/dashboard/src/types/autopilot-runtime.ts
+  s_3428b476267439::t_dec71bae649fa4 88
+packages/geo-core/tests/web-limits.test.ts
+  s_3428b476267439::t_dec71bae649fa4 9-10,13,15,17,26-28,30-31,34-37,41,47,49-50,56,58,61,63,67
+apps/docs/analytics/install/react-router.mdx
+  s_3428b476267439::t_dec71bae649fa4 4,10,21,26,51,55,59,63,72,85,123,130,133
+packages/geo-core/src/imports/rows.ts
+  s_3428b476267439::t_dec71bae649fa4 5,14,81
+packages/ui/src/components/ui/select.tsx
+  s_3428b476267439::t_dec71bae649fa4 14,16,18,148,164,175,194-198
+packages/ui/src/lib/geo-engine-icon.ts
+  s_3428b476267439::t_dec71bae649fa4 66,78,213-214,217
+apps/dashboard/src/lib/autopilot/workflows/agent-tools.ts
+  s_3428b476267439::t_dec71bae649fa4 22,270-282
+apps/dashboard/src/constants/web-analytics.ts
+  s_3428b476267439::t_dec71bae649fa4 3-4,62,65-66,204-208
+apps/agent/agent/tools/update_autopilot_settings.ts
+  s_3428b476267439::t_dec71bae649fa4 1-17
+packages/geo-core/src/constants/web-session.ts
+  s_3428b476267439::t_dec71bae649fa4 1-10
+apps/docs/analytics/mcp-analytics.mdx
+  s_3428b476267439::t_dec71bae649fa4 1-131
+packages/geo-core/src/utils/ai-traffic.ts
+  s_3428b476267439::t_dec71bae649fa4 3
+apps/docs/analytics/tracker-reference.mdx
+  s_3428b476267439::t_dec71bae649fa4 3,9,23,35,41,45,51,65,86
+apps/dashboard/src/lib/autopilot/sites.ts
+  s_3428b476267439::t_dec71bae649fa4 1-194
+apps/docs/geo/agent-readiness.mdx
+  s_3428b476267439::t_dec71bae649fa4 184
+apps/docs/api/getting-started.mdx
+  s_3428b476267439::t_dec71bae649fa4 35,91,158,164-165,169,172,174
+apps/docs/analytics/import-history.mdx
+  s_3428b476267439::t_dec71bae649fa4 10,18,20,28,31-32,38,45,48,57,79,83,95,107,111
+apps/agent/agent/lib/utils/autopilot-slack.ts
+  s_3428b476267439::t_dec71bae649fa4 40-44,55-56,70
+apps/dashboard/src/utils/autopilot-sites.ts
+  s_3428b476267439::t_dec71bae649fa4 1-9
+apps/dashboard/src/workflows/steps/analytics-import-steps.ts
+  s_3428b476267439::t_dec71bae649fa4 1-2,4,35-36,39-47,64-70
+packages/analytics/src/errors/tinybird.ts
+  s_3428b476267439::t_dec71bae649fa4 1-8
+apps/dashboard/messages/de.json
+  s_3428b476267439::t_dec71bae649fa4 1339-1340,4595,4778,4783,4956-4959,5657-5658,10216-10226
+apps/dashboard/src/app/api/internal/autopilot/slack/route.ts
+  s_3428b476267439::t_c328e56130fdf3 9-10
+apps/dashboard/src/lib/autopilot/run.ts
+  ai_agent 18,23,40,42,49-52,54-57,198-202,234-237,242,245-246,254-256,262-264,395-399,405,528-533
+apps/web/package.json
+  s_3428b476267439::t_dec71bae649fa4 58
+apps/web/src/utils/site-markdown.ts
+  s_3428b476267439::t_dec71bae649fa4 136,157
+apps/dashboard/src/constants/autopilot-findings.ts
+  s_3428b476267439::t_dec71bae649fa4 15-25,28
+apps/dashboard/tests/content-git-publishing.test.ts
+  s_3428b476267439::t_dec71bae649fa4 318-361
+apps/dashboard/src/lib/autopilot/writer.test.ts
+  s_3428b476267439::t_dec71bae649fa4 91-93
+apps/docs/analytics/referrals.mdx
+  s_3428b476267439::t_dec71bae649fa4 10,34,42,53
+apps/docs/analytics/embed.mdx
+  s_3428b476267439::t_dec71bae649fa4 10,26,39,43,47,51,71,101,108,122,136,138,142,144,146,148,151
+apps/docs/devtools/mcp.mdx
+  s_3428b476267439::t_dec71bae649fa4 426
+apps/dashboard/src/lib/autopilot/fact-check.ts
+  s_3428b476267439::t_dec71bae649fa4 4,225,232
+apps/api/src/middleware/geo-entitlement.ts
+  s_3428b476267439::t_dec71bae649fa4 6,17-20
+apps/web/src/components/landing/hero-section.tsx
+  s_3428b476267439::t_dec71bae649fa4 12,26,139-157
+packages/geo-core/src/constants/web-analytics.ts
+  s_3428b476267439::t_dec71bae649fa4 1-2,75-83,118-125,128-159
+packages/geo-core/src/ingest/README.md
+  s_3428b476267439::t_dec71bae649fa4 8,29,39
+packages/web-tracker/scripts/build.ts
+  s_3428b476267439::t_dec71bae649fa4 22
+packages/memory/src/constants/memory.ts
+  s_3428b476267439::t_dec71bae649fa4 39-40,43-47
+apps/dashboard/src/constants/autopilot-workflows.ts
+  s_3428b476267439::t_dec71bae649fa4 76-88
+apps/dashboard/src/lib/autopilot/findings.ts
+  s_3428b476267439::t_dec71bae649fa4 4-5,18,25,27,35,37,41,45,52-55,70-73,75,79-111,137,213,216,249,303-325,593,747-748,759-762,764,768-785,788,791,854-858,1090-1105,1132,1135-1139,1149-1168,1176-1177,1193,1226-1228
+apps/dashboard/src/lib/autopilot/llm.ts
+  s_3428b476267439::t_dec71bae649fa4 9,20,37-39
+packages/geo-core/package.json
+  s_3428b476267439::t_dec71bae649fa4 37
+apps/dashboard/src/types/autopilot-publish.ts
+  s_3428b476267439::t_dec71bae649fa4 1-29
+apps/dashboard/src/lib/workflow-engine/blocks/index.ts
+  s_3428b476267439::t_dec71bae649fa4 5,14
+apps/dashboard/src/lib/autopilot/brief.ts
+  s_3428b476267439::t_6bc58d34aa332f 12-15,19,37,53-54,60-63,65,73-75,79,93,102,109,136,144-148,391-400,402-404,407-411
+apps/docs/analytics/install/nextjs.mdx
+  s_3428b476267439::t_dec71bae649fa4 4,10,18,21,26,51,55,59,63,72,84-96,100-101,104,111,114
+apps/dashboard/src/utils/autopilot-facts.ts
+  s_3428b476267439::t_dec71bae649fa4 1-5,61-67,73-75,79-81
+apps/dashboard/src/types/integrations.ts
+  s_3428b476267439::t_dec71bae649fa4 50
+packages/analytics/src/tinybird/purge.test.ts
+  s_3428b476267439::t_dec71bae649fa4 157-195
+apps/dashboard/tests/automation-auto-publish.test.ts
+  s_3428b476267439::t_dec71bae649fa4 1-74
+packages/geo-core/tests/web-page-view.test.ts
+  s_3428b476267439::t_dec71bae649fa4 8,110-174
+packages/geo-core/src/constants/analytics-imports.ts
+  s_3428b476267439::t_dec71bae649fa4 22-23,44-48,52,64-67,474-477
+apps/agent/agent/tools/set_autopilot_workflow.ts
+  s_3428b476267439::t_dec71bae649fa4 1-17
+apps/dashboard/src/lib/workflow-engine/definitions/autopilot.ts
+  s_3428b476267439::t_dec71bae649fa4 173-174,177-178,181-182,185,188-190,197,199,208-209
+apps/dashboard/src/components/geo/web-visitors-section.tsx
+  s_3428b476267439::t_dec71bae649fa4 15-19,107-110,112
+apps/api/src/lib/billing.ts
+  s_3428b476267439::t_dec71bae649fa4 90-101
+apps/dashboard/src/lib/autopilot/pull-request-events.ts
+  s_3428b476267439::t_dec71bae649fa4 134-141,144-157,161-166,192-194
+apps/dashboard/src/lib/integrations/github/publish-saved-content.ts
+  s_3428b476267439::t_dec71bae649fa4 43,351-361,374,382-391
+apps/dashboard/src/constants/agent-feedback.ts
+  s_3428b476267439::t_dec71bae649fa4 29
+apps/dashboard/src/constants/analytics-import-progress.ts
+  s_3428b476267439::t_dec71bae649fa4 3-10,43-53
+apps/api/src/routes/agent-chats.ts
+  s_3428b476267439::t_dec71bae649fa4 12,284-287
+apps/dashboard/src/lib/autopilot/readiness.ts
+  s_3428b476267439::t_dec71bae649fa4 55,281,422-429
+apps/blog/footer.mdx
+  s_3428b476267439::t_dec71bae649fa4 55
+apps/dashboard/src/lib/autopilot/publish.ts
+  s_3428b476267439::t_dec71bae649fa4 1-536
+apps/dashboard/src/utils/autopilot-dream.ts
+  s_3428b476267439::t_dec71bae649fa4 1-728
+apps/dashboard/src/constants/autopilot-style.ts
+  s_3428b476267439::t_dec71bae649fa4 17-23
+apps/dashboard/tests/utils/fake-import-providers.ts
+  s_3428b476267439::t_dec71bae649fa4 3-8,68-72,75,344-483,494-495,505,645-705,710,717-719,753
+apps/docs/docs.json
+  s_3428b476267439::t_dec71bae649fa4 3-5,79,83-93,105,350,354,357-377,381-388,393,398
+apps/docs/analytics/troubleshooting/no-ai-traffic.mdx
+  s_3428b476267439::t_dec71bae649fa4 4,10,26,29
+apps/dashboard/src/lib/autopilot/agent.test.ts
+  s_3428b476267439::t_dec71bae649fa4 1-361
+apps/dashboard/src/lib/autopilot/pull-request-reviews.ts
+  s_3428b476267439::t_dec71bae649fa4 1-202
+apps/dashboard/src/lib/integrations/slack/member.ts
+  s_3428b476267439::t_dec71bae649fa4 1-194
+apps/agent/agent/tools/stop_autopilot_run.ts
+  s_3428b476267439::t_dec71bae649fa4 1-17
+apps/dashboard/src/lib/workflows/schedule/handlers/index.ts
+  s_3428b476267439::t_dec71bae649fa4 11,77,79-83
+apps/dashboard/src/lib/workflow-engine/blocks/autopilot/custom.ts
+  s_3428b476267439::t_dec71bae649fa4 90,117
+apps/docs/feedback/inbox.mdx
+  s_3428b476267439::t_dec71bae649fa4 22
+apps/docs/playbooks/ecommerce.mdx
+  s_3428b476267439::t_dec71bae649fa4 30
+packages/geo-core/src/geo/ingest.ts
+  s_3428b476267439::t_dec71bae649fa4 367,384,399,418,433,445,456
+packages/memory/src/types/memory.ts
+  s_3428b476267439::t_dec71bae649fa4 3-4,6-10
+apps/docs/analytics/install/tanstack-start.mdx
+  s_3428b476267439::t_dec71bae649fa4 4,10,18,21,26,51,55,59,63,73,85,88,95,98
+apps/dashboard/src/utils/autopilot-settings.ts
+  s_3428b476267439::t_dec71bae649fa4 44-45
+apps/docs/sites/agents.mdx
+  s_3428b476267439::t_dec71bae649fa4 61,65,67
+packages/db/src/types/autopilot.ts
+  s_3428b476267439::t_dec71bae649fa4 2-3,19-27,46,99-100,115
+apps/web/src/constants/landing/hero.ts
+  s_3428b476267439::t_dec71bae649fa4 136-138
+apps/dashboard/src/lib/autopilot/billing.ts
+  s_3428b476267439::t_dec71bae649fa4 9,48-53
+packages/geo-core/tests/web-collect.test.ts
+  s_3428b476267439::t_dec71bae649fa4 12-19,95-102,407-408,410-412,416,425-428
+packages/geo-core/src/ingest/pipeline.ts
+  s_3428b476267439::t_dec71bae649fa4 45,89,193-207,291-292,297-301,374-375,380-382,401-402,411-412,418-422,425,450-451,453,471-472,474,540-541,545-549,555-559,566,571-580,584,589-601,621-629,634-636,805-808,815-844,854-861,887-888,906-907,925-926,965
+packages/schemas/src/schemas/api/agent-chats.ts
+  s_3428b476267439::t_dec71bae649fa4 57-63
+apps/dashboard/src/lib/orpc/routers/autopilot.test.ts
+  s_3428b476267439::t_dec71bae649fa4 28,60-71,91,161-179
+packages/analytics/src/tinybird/purge.ts
+  s_3428b476267439::t_dec71bae649fa4 8,46-51,144-146,169-172,185-192,320-322
+apps/docs/analytics/install/vercel-log-drain.mdx
+  s_3428b476267439::t_dec71bae649fa4 10,21,28,32,64,70,72,77,80
+apps/dashboard/src/constants/autopilot-ui.ts
+  s_3428b476267439::t_c328e56130fdf3 63-64,567-572
+apps/dashboard/src/lib/autopilot/mentions.ts
+  s_3428b476267439::t_dec71bae649fa4 649
+apps/dashboard/src/routes/api.internal.autopilot.agent.ts
+  s_3428b476267439::t_dec71bae649fa4 1-19
+apps/dashboard/src/schemas/autopilot-dream.ts
+  s_3428b476267439::t_dec71bae649fa4 1-17
+apps/dashboard/src/workflows/autopilot-items.test.ts
+  s_3428b476267439::t_dec71bae649fa4 31,50-58,60,70-72,93-101,158,164
+packages/ui/src/components/ui/dropdown-menu.tsx
+  s_3428b476267439::t_dec71bae649fa4 9-10,12,14-15,47,88,113-114,142,151,200-203,213,228,236,270,278,296,309
+apps/dashboard/src/app/(dashboard)/[slug]/sites/skeleton.tsx
+  s_3428b476267439::t_dec71bae649fa4 5,8,12-15,17-24
+packages/geo-core/tests/traffic-baseline.test.ts
+  s_3428b476267439::t_dec71bae649fa4 4
+apps/dashboard/src/app/(dashboard)/[slug]/autopilot/findings/[id]/page-client.tsx
+  s_3428b476267439::t_84cddc8c77672b 32,39,51,70-75,82-108,122,127-130,150-153,158-159,230,239-258,269-270,279,295-304,306-317
+apps/dashboard/tests/analytics-imports.test.ts
+  s_3428b476267439::t_dec71bae649fa4 21,30,32,61-62,72-76,92-95,188,192-198,200,214,221-223,237,242-243,360-361,373-374,587,594-604,798-799,813-965,1223,1229,1252-1418
+apps/dashboard/src/lib/autopilot/memory.ts
+  s_3428b476267439::t_dec71bae649fa4 16,18,31-37,40-41,51-56,82
+apps/dashboard/src/constants/slack-integration.ts
+  ai_agent 26-33
+apps/docs/feedback/send-feedback.mdx
+  s_3428b476267439::t_dec71bae649fa4 25,34,53,57,61,65,71
+apps/docs/geo/product-map.mdx
+  s_3428b476267439::t_dec71bae649fa4 34
+packages/ai/src/constants/slack.ts
+  s_3428b476267439::t_dec71bae649fa4 3
+packages/ai/src/utils/github-mention-auth.ts
+  s_3428b476267439::t_dec71bae649fa4 9,55-58
+apps/dashboard/src/lib/autopilot/repository-agent.ts
+  s_3428b476267439::t_dec71bae649fa4 23-25,28-31,115-120,181-185,277,280,296,302,320,325
+apps/dashboard/src/utils/autopilot-feedback.ts
+  s_3428b476267439::t_dec71bae649fa4 4-5,16-22
+apps/dashboard/src/types/autopilot.ts
+  s_3428b476267439::t_c328e56130fdf3 4,44-46,86-87,229-233,356,359-362,500,617
+apps/web/src/components/landing/hero-headline.tsx
+  s_3428b476267439::t_dec71bae649fa4 25-35,78
+packages/geo-core/src/schemas/analytics-imports.ts
+  s_3428b476267439::t_dec71bae649fa4 264-283
+apps/docs/playbooks/software-companies.mdx
+  s_3428b476267439::t_dec71bae649fa4 33
+packages/db/migrations/meta/_journal.json
+  ai_agent 1114-1136
+apps/dashboard/src/constants/schedule-output-types.ts
+  s_3428b476267439::t_dec71bae649fa4 3-6,8-9
+packages/tools/src/types/autopilot.ts
+  s_3428b476267439::t_dec71bae649fa4 1-12
+apps/dashboard/src/components/automation/alerts/geo-alert-form.tsx
+  s_3428b476267439::t_dec71bae649fa4 393
+packages/db/migrations/0159_autopilot_auto_publish.sql
+  ai_agent 1-5
+apps/docs/theme-toggle.js
+  s_3428b476267439::t_dec71bae649fa4 1-26
+README.md
+  s_3428b476267439::t_dec71bae649fa4 31,42
+apps/web/src/constants/mcp-tools.ts
+  s_3428b476267439::t_dec71bae649fa4 617
+apps/agent/agent/instructions.md
+  s_3428b476267439::t_dec71bae649fa4 51-54
+apps/dashboard/src/lib/autopilot/refresh.ts
+  s_3428b476267439::t_dec71bae649fa4 50,619-626
+apps/docs/analytics/install/nuxt.mdx
+  s_3428b476267439::t_dec71bae649fa4 4,10,18,21,26,30,42,46,51,55,59,63,72,87,94,97
+apps/dashboard/src/utils/autopilot-publish.ts
+  s_3428b476267439::t_dec71bae649fa4 1-209
+packages/geo-core/src/utils/geo-accept.ts
+  s_3428b476267439::t_dec71bae649fa4 1-4,42-44
+apps/docs/api/authentication.mdx
+  s_3428b476267439::t_dec71bae649fa4 64,74,329,331,337-339
+packages/tools/src/autopilot/client.ts
+  s_3428b476267439::t_dec71bae649fa4 1-90
+packages/db/migrations/meta/0159_snapshot.json
+  ai_agent 1-17636
+packages/geo-core/src/imports/vercel.ts
+  s_3428b476267439::t_dec71bae649fa4 23,31,242-246,248-304,333-335,338-340,342
+packages/db/migrations/meta/0158_snapshot.json
+  ai_agent 2,92,94,107,109,119,123-124,294,296,315,317,330,332,351,353,363,367-368,376,380-381,489,491,504,506,519,521,531,535-536,544,548-549,630,634-635,738,740,750,754-755,763,767-768,994,996,1009,1011,1024,1026,1057,1059-1060,1070,1074-1075,1083,1087-1088,1096,1100-1101,1109,1113-1114,1215,1217,1242,1244,1254,1258-1259,1267,1271-1272,1280,1284-1285,1464,1466,1485,1487,1506,1508,1518,1522-1523,1531,1535-1536,1544,1548-1549,1588,1590,1687,1689,1708,1710,1720,1724-1725,1733,1737-1738,1840,1842,1855,1857-1858,1868,1872-1873,2018,2022-2023,2031,2035-2036,2044,2048-2049,2156,2158,2168,2172-2173,2181,2185-2186,2325,2327,2337,2341-2342,2439,2441,2451,2455-2456,2559,2561,2571,2575-2576,2697,2699,2709,2713-2714,2811,2813,2823,2827-2828,2936,2938,2951,2953,2963,2967-2968,3074,3076,3086,3090-3091,3179,3181-3182,3201,3203,3213,3217-3218,3226,3230-3231,3285,3289-3290,3405,3407,3417,3421-3422,3543,3545,3558,3560-3561,3571,3575-3576,3712,3714,3733,3735,3745,3749-3750,3879,3881,3891,3895-3896,3977,3979,3992,3994,4004,4008-4009,4017,4021-4022,4031-4032,4137,4139,4158,4160,4191,4193,4218,4220-4221,4231,4235-4236,4244,4248-4249,4257,4261-4262,4351,4353,4366,4368-4369,4379,4383-4384,4392,4396-4397,4405,4409-4410,4517,4519,4529,4533-4534,4682,4684,4703,4705-4706,4716,4720-4721,4729,4733-4734,4847,4849,4868,4870,4883,4885-4886,4917,4919,4929,4933-4934,4942,4946-4947,4955,4959-4960,4969,4974-4975,4984,4989-4990,5032,5036-5037,5158,5160,5170,5174-5175,5275,5277,5287,5291-5292,5393,5395,5408,5410,5420,5424-5425,5433,5437-5438,5562,5564,5583,5585,5604,5606,5616,5620-5621,5629,5633-5634,5642,5646-5647,5655,5659-5660,5668,5672-5673,5681,5685-5686,5694,5698-5699,5778,5780,5790,5794-5795,5803,5807-5808,5865,5867,5877,5881-5882,6003,6005,6024,6026,6039,6041-6042,6052,6056-6057,6065,6069-6070,6160,6162,6181,6183,6193,6197-6198,6206,6210-6211,6393,6395,6414,6416,6447,6449,6474,6476-6477,6487,6491-6492,6500,6504-6505,6513,6517-6518,6526,6530-6531,6539,6543-6544,6552,6556-6557,6603,6607-6608,6616,6620-6621,6853,6855,6886,6888,6979,6981,7012,7014,7027,7029,7060,7062-7063,7082,7084,7121,7123,7133,7137-7138,7146,7150-7151,7159,7163-7164,7172,7176-7177,7251,7253,7266,7268,7278,7282-7283,7291,7295-7296,7304,7308-7309,7429,7431,7444,7446,7456,7460-7461,7469,7473-7474,7552,7554,7567,7569,7579,7583-7584,7592,7596-7597,7725,7727,7746,7748,7779,7781,7791,7795-7796,7804,7808-7809,7817,7821-7822,7923,7925,7938,7940,7950,7954-7955,7963,7967-7968,8052,8054,8073,8075,8085,8089-8090,8098,8102-8103,8220,8222,8235,8237,8247,8251-8252,8260,8264-8265,8369,8371,8381,8385-8386,8565,8567,8586,8588,8598,8602-8603,8611,8615-8616,8825,8827,8840,8842,8852,8856-8857,8865,8869-8870,9000,9002,9021,9023,9042,9044,9054,9058-9059,9067,9071-9072,9080,9084-9085,9187,9189,9199,9203-9204,9212,9216-9217,9225,9229-9230,9337,9339,9358,9360,9379,9381,9391,9395-9396,9404,9408-9409,9535,9537,9562,9564,9583,9585,9595,9599-9600,9608,9612-9613,9621,9625-9626,9635,9640-9641,9767,9769,9782,9784,9794,9798-9799,9807,9811-9812,9895,9897,9910,9912,9922,9926-9927,9935,9939-9940,10023,10025,10038,10040,10050,10054-10055,10063,10067-10068,10175,10177,10202,10204,10223,10225-10226,10236,10240-10241,10249,10253-10254,10380,10382,10395,10397,10407,10411-10412,10420,10424-10425,10433,10437-10438,10447,10452-10453,10588,10590,10603,10605,10618,10620,10633,10635,10648,10650,10660,10664-10665,10673,10677-10678,10686,10690-10691,10700,10705-10706,10714,10718-10719,10728-10729,10942,10944,10957,10959,10972,10974,10987,10989,11008,11010,11035,11037,11056,11058-11059,11072,11074-11075,11085,11089-11090,11098,11102-11103,11111,11115-11116,11242,11244,11257,11259,11269,11273-11274,11282,11286-11287,11296,11301-11302,11464,11466,11485,11487,11506,11508,11527,11529,11548,11550,11558,11563,11565,11575,11579-11580,11588,11592-11593,11602,11607-11608,11665,11667,11686,11688,11698,11702-11703,11711,11715-11716,11806,11808,11818,11822-11823,11910,11912,11922,11926-11927,12072,12074,12084-12085,12091-12092,12218,12220,12245,12247,12266,12268,12293,12295-12296,12306,12310-12311,12319,12323-12324,12437,12439,12464,12466-12467,12477,12481-12482,12490,12494-12495,12504,12509-12510,12717,12719-12720,12745,12747,12760,12762,12781,12783,12808,12810,12829,12831-12832,12857,12859,12878,12880-12881,12891,12895-12896,12904,12908-12909,13025,13027,13040,13042-13043,13053,13057-13058,13066,13070-13071,13148,13150,13160,13164-13165,13334,13336-13337,13356,13358,13371,13373,13392,13394-13395,13405,13409-13410,13418,13422-13423,13431,13435-13436,13556,13558,13568,13572-13573,13581,13585-13586,13640,13644-13645,13898,13900,13919,13921,13940,13942,13961,13963,13982,13984,13994,13998-13999,14007,14011-14012,14020,14024-14025,14034,14039-14040,14175,14177,14190,14192-14193,14206,14208,14218,14222-14223,14231,14235-14236,14245,14250-14251,14375,14377,14402,14404,14414,14418-14419,14427,14431-14432,14477,14479,14489,14493-14494,14623,14625,14638,14640,14659,14661,14671,14675-14676,14685,14690-14691,14751,14755-14756,15026,15028,15041,15043,15056,15058,15077,15079,15089,15093-15094,15102,15106-15107,15115,15119-15120,15128,15132-15133,15141,15145-15146,15155,15160-15161,15170,15175-15176,15185,15190-15191,15303,15305,15318,15320,15330,15334-15335,15343,15347-15348,15497,15499,15512,15514,15533,15535,15545,15549-15550,15666,15668,15681,15683,15696,15698,15708,15712-15713,15721,15725-15726,15814,15816,15835,15837,15847,15851-15852,15966,15968,15978,15982-15983,16064,16066,16076,16080-16081,16089,16093-16094,16160-16161,16266,16268,16278,16282-16283,16346,16348,16358,16362-16363,16499-16500,16506-16507,16586,16588,16598,16602-16603,16725,16727,16746,16748,16767,16769,16780,16785-16786,16795,16800-16801,16882,16886-16887,16897-16898,16972,16974,16987,16989,17002,17004,17014,17018-17019,17029-17030,17140,17142,17152,17156-17157,17165,17169-17170,17306,17308,17333,17335,17348,17350,17369,17371,17381,17385-17386,17394,17398-17399,17589
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "b2e4da31d04bcc368d23701060b0618a54cf655b",
+  "prompts": {},
+  "sessions": {
+    "s_3428b476267439": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c6d39551-e687-4036-a65c-3bd92bb74947",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

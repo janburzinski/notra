@@ -1,0 +1,21 @@
+apps/dashboard/src/components/autopilot/autopilot-settings-sections.tsx
+  s_a9cac4c6e46f3c::t_fa34f7855f7c7a 76-87
+apps/dashboard/src/lib/hooks/use-autopilot-settings-summaries.ts
+  s_a9cac4c6e46f3c::t_5c3857f2390b53 13-15,23-28,30-33,35-39,41-47,49-51,56-57,59-63,65-68,70-78,80-81,83-89,91-93,95,97-98
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "dee94cf5472ef712eb3ec016c9ece884228886d8",
+  "prompts": {},
+  "sessions": {
+    "s_a9cac4c6e46f3c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "318c8e83-3121-4bb9-8662-78a41492c642",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

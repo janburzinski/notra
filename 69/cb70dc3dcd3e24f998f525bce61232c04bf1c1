@@ -1,0 +1,31 @@
+apps/api/src/routes/geo-projects.ts
+  s_a4ba0f693267ad::t_6e469659d47316 2,7,51-52,137,140-151
+packages/geo-core/src/geo/discover.ts
+  s_a4ba0f693267ad::t_6e469659d47316 280,296,479,512-513,561
+packages/geo-core/src/types/geo.ts
+  s_a4ba0f693267ad::t_6e469659d47316 2125-2126
+packages/schemas/src/schemas/api/geo-projects.ts
+  s_a4ba0f693267ad::t_6e469659d47316 38-41
+apps/dashboard/src/components/geo/traffic-embed-dialog.tsx
+  ai_agent 549-552,560-596,598-630
+packages/geo-core/tests/project-create-from-website.test.ts
+  s_a4ba0f693267ad::t_6e469659d47316 1-144
+packages/geo-core/src/geo/projects.ts
+  s_a4ba0f693267ad::t_6e469659d47316 99,111,114-122,128-131
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "69cb70dc3dcd3e24f998f525bce61232c04bf1c1",
+  "prompts": {},
+  "sessions": {
+    "s_a4ba0f693267ad": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "04602935-1e5f-4280-b3cb-88ff509d9f9f",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

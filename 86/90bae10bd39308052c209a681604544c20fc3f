@@ -1,0 +1,21 @@
+apps/minigame/README.md
+  s_673745a4f2f52f::t_4801964ab16c17 111
+apps/minigame/src/constants/site.ts
+  s_673745a4f2f52f::t_4801964ab16c17 8
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "8690bae10bd39308052c209a681604544c20fc3f",
+  "prompts": {},
+  "sessions": {
+    "s_673745a4f2f52f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "41c3de73-071e-4473-b094-b0db24729964",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
