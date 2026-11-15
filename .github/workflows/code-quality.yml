@@ -21,6 +21,7 @@ jobs:
     outputs:
       checks: ${{ steps.plan.outputs.checks }}
       infrastructure: ${{ steps.plan.outputs.infrastructure }}
+      builds: ${{ steps.plan.outputs.builds }}
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -40,7 +41,8 @@ jobs:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
         run: |
           if [ "$GITHUB_EVENT_NAME" != pull_request ] || git diff --name-only "$BASE_SHA"...HEAD | grep -q '^\.github/workflows/code-quality\.yml$'; then
-            echo 'checks=["lint","tests","tests-sites-builder","browser","build-api","build-web","build-dashboard","build-console","build-ui","typecheck"]' >> "$GITHUB_OUTPUT"
+            echo 'checks=["lint","tests","tests-sites-builder","browser","build-api","build-apps","build-dashboard","typecheck"]' >> "$GITHUB_OUTPUT"
+            echo 'builds=web console ui' >> "$GITHUB_OUTPUT"
             echo infrastructure=true >> "$GITHUB_OUTPUT"
             exit 0
           fi
@@ -55,12 +57,16 @@ jobs:
           # menu-highlight builds both the dashboard and the web stylesheet.
           if has dashboard || has web; then checks="$checks,\"browser\""; fi
           has api && checks="$checks,\"build-api\""
-          # apps/blog is not a workspace, but its scripts/web-chrome.js is generated from web.
-          if has web || grep -qE '^apps/blog/scripts/' <<< "$files"; then checks="$checks,\"build-web\""; fi
           has dashboard && checks="$checks,\"build-dashboard\""
-          has console && checks="$checks,\"build-console\""
-          has ui && checks="$checks,\"build-ui\""
+          # Small app builds share one job: each alone spent half its time on setup.
+          builds=""
+          # apps/blog is not a workspace, but its scripts/web-chrome.js is generated from web.
+          if has web || grep -qE '^apps/blog/scripts/' <<< "$files"; then builds="$builds web"; fi
+          has console && builds="$builds console"
+          has ui && builds="$builds ui"
+          [ -n "$builds" ] && checks="$checks,\"build-apps\""
           echo "checks=$checks]" >> "$GITHUB_OUTPUT"
+          echo "builds=${builds# }" >> "$GITHUB_OUTPUT"
           if grep -qE '^(packages/db|packages/sites-server|packages/schemas)/|^packages/ai/src/integrations/linear|^(bun\.lock|package\.json)$' <<< "$files"; then
             echo infrastructure=true >> "$GITHUB_OUTPUT"
           else
@@ -96,7 +102,7 @@ jobs:
       # No package cache: restoring it took as long as a fresh install, and
       # saving it after a lockfile change added up to two minutes to lint.
       - name: Check Vercel installs
-        if: matrix.check == 'build-web'
+        if: matrix.check == 'build-apps' && contains(format(' {0} ', needs.changes.outputs.builds), ' web ')
         run: |
           for app in dashboard web ui agent onboarding-agent; do
             echo "::group::Check $app Vercel install"
@@ -144,12 +150,15 @@ jobs:
         working-directory: apps/dashboard
         run: bun run test:browser
 
-      - name: Verify web build
-        if: matrix.check == 'build-web'
-        run: bun run build --filter=web
+      # The ui build needs network access: it fetches fallback fonts from Google Fonts.
+      - name: Verify ${{ needs.changes.outputs.builds }} builds
+        if: matrix.check == 'build-apps'
+        env:
+          BUILDS: ${{ needs.changes.outputs.builds }}
+        run: bun run build --concurrency=2 $(printf -- '--filter=%s ' $BUILDS)
 
       - name: Verify the blog's generated navbar and dither bundle
-        if: matrix.check == 'build-web'
+        if: matrix.check == 'build-apps' && contains(format(' {0} ', needs.changes.outputs.builds), ' web ')
         working-directory: apps/web
         run: bun run blog:chrome:check
 
@@ -167,15 +176,6 @@ jobs:
         env:
           VERCEL: "1"
         run: bun run build && bun run test:workflow-production
-
-      - name: Verify console build
-        if: matrix.check == 'build-console'
-        run: bun run build --filter=console
-
-      # Needs network access: the build fetches fallback fonts from Google Fonts.
-      - name: Verify ui build
-        if: matrix.check == 'build-ui'
-        run: bun run build --filter=ui
 
       - name: Restore incremental TypeScript state
         if: matrix.check == 'typecheck'
