@@ -1,7 +1,12 @@
 {
   "$schema": "https://v2-11-7.turborepo.dev/schema.json",
   "ui": "tui",
-  "globalDependencies": [".npmrc", "bunfig.toml", "scripts/prepare-effect.sh"],
+  "globalDependencies": [
+    ".npmrc",
+    "bunfig.toml",
+    "patches/**",
+    "scripts/prepare-effect.sh"
+  ],
   "globalEnv": [
     "SITES_BRANCH_TEST_DATABASE_URL",
     "SITES_TEST_DATABASE_URL",
