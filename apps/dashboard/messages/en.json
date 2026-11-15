@@ -1089,6 +1089,43 @@
           "description": "This invitation was already accepted. Sign in to open your workspace."
         }
       }
+    },
+    "agentClaim": {
+      "linked": {
+        "title": "Connect your agent",
+        "description": "Give this code to your agent. It will act in {workspace} with your access.",
+        "hint": "Only share it with an agent you started. The code expires in a few minutes."
+      },
+      "no-workspace": {
+        "title": "Create a workspace first",
+        "description": "Your agent needs a workspace to work in. Create one, then open the link from your agent again.",
+        "action": "Create workspace"
+      },
+      "missing": {
+        "title": "Link incomplete",
+        "description": "This link is missing its claim token. Open the exact link your agent gave you.",
+        "action": "Go to Notra"
+      },
+      "expired": {
+        "title": "Link expired",
+        "description": "Ask your agent to start the sign-in again to get a new link.",
+        "action": "Go to Notra"
+      },
+      "claimed": {
+        "title": "Agent already connected",
+        "description": "This agent was already connected, or the claim is in use. Ask your agent to start again if it still has no access.",
+        "action": "Go to Notra"
+      },
+      "mismatch": {
+        "title": "Different email",
+        "description": "Your agent asked to connect a different email address. Sign in with that account, or ask your agent to use this one.",
+        "action": "Go to Notra"
+      },
+      "failed": {
+        "title": "Could not connect agent",
+        "description": "Something went wrong. Ask your agent to start the sign-in again.",
+        "action": "Go to Notra"
+      }
     }
   },
   "errors": {

@@ -43,6 +43,7 @@ import { Route as ApiCronPublicDataRouteImport } from './routes/api.cron.public-
 import { Route as ApiCronScheduledPublicationsRouteImport } from './routes/api.cron.scheduled-publications'
 import { Route as ApiCronSitesRouteImport } from './routes/api.cron.sites'
 import { Route as ApiCronSitesCleanupRouteImport } from './routes/api.cron.sites-cleanup'
+import { Route as ApiDemoAgentRouteImport } from './routes/api.demo.agent'
 import { Route as ApiDemoEnterRouteImport } from './routes/api.demo.enter'
 import { Route as ApiDemoRequestsRouteImport } from './routes/api.demo.requests'
 import { Route as ApiDemoSandboxRouteImport } from './routes/api.demo.sandbox'
@@ -292,6 +293,11 @@ const ApiCronSitesRoute = ApiCronSitesRouteImport.update({
 const ApiCronSitesCleanupRoute = ApiCronSitesCleanupRouteImport.update({
   id: '/api/cron/sites-cleanup',
   path: '/api/cron/sites-cleanup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiDemoAgentRoute = ApiDemoAgentRouteImport.update({
+  id: '/api/demo/agent',
+  path: '/api/demo/agent',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiDemoEnterRoute = ApiDemoEnterRouteImport.update({
@@ -759,6 +765,7 @@ export interface FileRoutesByFullPath {
   '/api/cron/scheduled-publications': typeof ApiCronScheduledPublicationsRoute
   '/api/cron/sites': typeof ApiCronSitesRoute
   '/api/cron/sites-cleanup': typeof ApiCronSitesCleanupRoute
+  '/api/demo/agent': typeof ApiDemoAgentRoute
   '/api/demo/enter': typeof ApiDemoEnterRoute
   '/api/demo/requests': typeof ApiDemoRequestsRouteWithChildren
   '/api/demo/sandbox': typeof ApiDemoSandboxRouteWithChildren
@@ -870,6 +877,7 @@ export interface FileRoutesByTo {
   '/api/cron/scheduled-publications': typeof ApiCronScheduledPublicationsRoute
   '/api/cron/sites': typeof ApiCronSitesRoute
   '/api/cron/sites-cleanup': typeof ApiCronSitesCleanupRoute
+  '/api/demo/agent': typeof ApiDemoAgentRoute
   '/api/demo/enter': typeof ApiDemoEnterRoute
   '/api/demo/requests': typeof ApiDemoRequestsRouteWithChildren
   '/api/demo/sandbox': typeof ApiDemoSandboxRouteWithChildren
@@ -982,6 +990,7 @@ export interface FileRoutesById {
   '/api/cron/scheduled-publications': typeof ApiCronScheduledPublicationsRoute
   '/api/cron/sites': typeof ApiCronSitesRoute
   '/api/cron/sites-cleanup': typeof ApiCronSitesCleanupRoute
+  '/api/demo/agent': typeof ApiDemoAgentRoute
   '/api/demo/enter': typeof ApiDemoEnterRoute
   '/api/demo/requests': typeof ApiDemoRequestsRouteWithChildren
   '/api/demo/sandbox': typeof ApiDemoSandboxRouteWithChildren
@@ -1095,6 +1104,7 @@ export interface FileRouteTypes {
     | '/api/cron/scheduled-publications'
     | '/api/cron/sites'
     | '/api/cron/sites-cleanup'
+    | '/api/demo/agent'
     | '/api/demo/enter'
     | '/api/demo/requests'
     | '/api/demo/sandbox'
@@ -1206,6 +1216,7 @@ export interface FileRouteTypes {
     | '/api/cron/scheduled-publications'
     | '/api/cron/sites'
     | '/api/cron/sites-cleanup'
+    | '/api/demo/agent'
     | '/api/demo/enter'
     | '/api/demo/requests'
     | '/api/demo/sandbox'
@@ -1317,6 +1328,7 @@ export interface FileRouteTypes {
     | '/api/cron/scheduled-publications'
     | '/api/cron/sites'
     | '/api/cron/sites-cleanup'
+    | '/api/demo/agent'
     | '/api/demo/enter'
     | '/api/demo/requests'
     | '/api/demo/sandbox'
@@ -1429,6 +1441,7 @@ export interface RootRouteChildren {
   ApiCronScheduledPublicationsRoute: typeof ApiCronScheduledPublicationsRoute
   ApiCronSitesRoute: typeof ApiCronSitesRoute
   ApiCronSitesCleanupRoute: typeof ApiCronSitesCleanupRoute
+  ApiDemoAgentRoute: typeof ApiDemoAgentRoute
   ApiDemoEnterRoute: typeof ApiDemoEnterRoute
   ApiDemoRequestsRoute: typeof ApiDemoRequestsRouteWithChildren
   ApiDemoSandboxRoute: typeof ApiDemoSandboxRouteWithChildren
@@ -1731,6 +1744,13 @@ declare module '@tanstack/react-router' {
       path: '/api/cron/sites-cleanup'
       fullPath: '/api/cron/sites-cleanup'
       preLoaderRoute: typeof ApiCronSitesCleanupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/demo/agent': {
+      id: '/api/demo/agent'
+      path: '/api/demo/agent'
+      fullPath: '/api/demo/agent'
+      preLoaderRoute: typeof ApiDemoAgentRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/demo/enter': {
@@ -2400,6 +2420,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiCronScheduledPublicationsRoute: ApiCronScheduledPublicationsRoute,
   ApiCronSitesRoute: ApiCronSitesRoute,
   ApiCronSitesCleanupRoute: ApiCronSitesCleanupRoute,
+  ApiDemoAgentRoute: ApiDemoAgentRoute,
   ApiDemoEnterRoute: ApiDemoEnterRoute,
   ApiDemoRequestsRoute: ApiDemoRequestsRouteWithChildren,
   ApiDemoSandboxRoute: ApiDemoSandboxRouteWithChildren,

@@ -21,7 +21,6 @@ const HOUR_MS = 60 * 60 * 1000;
 export const DEMO_SANDBOX_MAX_AGE_MS = 6 * HOUR_MS;
 export const DEMO_SESSION_COOKIE_MAX_AGE_SECONDS =
   DEMO_SANDBOX_MAX_AGE_MS / 1000;
-export const DEMO_TOUCH_INTERVAL_MS = 5 * 60 * 1000;
 
 export const DEMO_ANONYMOUS_ID_PREFIX = "anon_";
 export const DEMO_ANONYMOUS_ID_PATTERN = /^anon_[A-Za-z0-9_-]{16}$/;
@@ -45,6 +44,12 @@ export const DEMO_ENTER_PATH = "/api/demo/enter";
 
 export const DEMO_SANDBOX_CREATE_LIMIT = 30;
 export const DEMO_SANDBOX_CREATE_WINDOW = "1 h";
+export const DEMO_AGENT_SANDBOX_LIMIT = 3;
+export const DEMO_AGENT_SANDBOX_WINDOW = "1 h";
+export const DEMO_AGENT_SUBJECT_PREFIX = "agent_reg_";
+export const DEMO_AGENT_AUTHKIT_DOMAIN = "oauth.usenotra.com";
+export const DEMO_AGENT_AUTH_GUIDE = "https://www.usenotra.com/auth.md";
+export const DEMO_AGENT_BEARER_REGEX = /^Bearer\s+(\S+)$/i;
 export const DEMO_SANDBOX_RESET_LIMIT = 3;
 export const DEMO_SANDBOX_RESET_WINDOW = "1 m";
 export const DEMO_SANDBOX_RESET_LOCK_PREFIX = "demo:sandbox-reset:";

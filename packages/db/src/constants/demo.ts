@@ -6,6 +6,7 @@ export const DEMO_REQUEST_SOURCES = [
 ] as const;
 
 export const DEMO_REQUEST_LOG_MAX_ROWS = 500;
+export const DEMO_TOUCH_INTERVAL_MS = 5 * 60 * 1000;
 export const DEMO_REQUEST_BODY_MAX_CHARS = 8000;
 
 /**

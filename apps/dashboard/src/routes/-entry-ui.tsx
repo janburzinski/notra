@@ -9,6 +9,7 @@ import { Suspense } from "react";
 import { LoginFormSkeleton } from "@/components/auth/login-form-skeleton";
 import { lazyPage } from "@/utils/lazy-page";
 
+import { loadAgentClaim } from "./-agent-claim-loaders";
 import { loadArtifactPage, loadSharedArtifact } from "./-artifact-loaders";
 import { loadAutopilotBriefPage } from "./-brief-loaders";
 import { createDevelopmentUiRoutes } from "./-development-ui";
@@ -41,6 +42,11 @@ const DemoStart = lazyPage(() =>
 const InvitationConfirm = lazyPage(() =>
   import("@/components/invitation/invitation-confirm").then((module) => ({
     default: module.InvitationConfirm,
+  }))
+);
+const AgentClaim = lazyPage(() =>
+  import("@/components/agent-registration/agent-claim").then((module) => ({
+    default: module.AgentClaim,
   }))
 );
 const Signup = lazyPage(() => import("@/app/(auth)/signup/page"));
@@ -177,6 +183,20 @@ export function createEntryUiRoutes(parent: AnyRoute) {
       component: ({ data }) => (
         <AuthSplitShell>
           <InvitationConfirm data={data} />
+        </AuthSplitShell>
+      ),
+    }),
+    createUiRoute({
+      parent,
+      path: "agent/claim",
+      noindex: true,
+      title: { title: "Connect agent" },
+      loader: (input) => loadAgentClaim({ data: input }),
+      preload: () =>
+        Promise.all([AgentClaim.preload(), AuthSplitShell.preload()]),
+      component: ({ data }) => (
+        <AuthSplitShell>
+          <AgentClaim data={data} />
         </AuthSplitShell>
       ),
     }),

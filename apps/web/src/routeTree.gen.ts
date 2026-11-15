@@ -96,7 +96,6 @@ import { Route as SiteOfferingIndexRouteImport } from './routes/_site/offering/i
 import { Route as SiteOfferingReportRouteImport } from './routes/_site/offering/report'
 import { Route as SiteStateOfAiSearchIndexRouteImport } from './routes/_site/state-of-ai-search/index'
 import { Route as AgentAuthAuthorizeRouteImport } from './routes/agent/auth/authorize'
-import { Route as AgentAuthClaimRouteImport } from './routes/agent/auth/claim'
 import { Route as AgentAuthRegisterRouteImport } from './routes/agent/auth/register'
 import { Route as AgentAuthRevokeRouteImport } from './routes/agent/auth/revoke'
 import { Route as AgentAuthTokenRouteImport } from './routes/agent/auth/token'
@@ -561,11 +560,6 @@ const AgentAuthAuthorizeRoute = AgentAuthAuthorizeRouteImport.update({
   path: '/agent/auth/authorize',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AgentAuthClaimRoute = AgentAuthClaimRouteImport.update({
-  id: '/agent/auth/claim',
-  path: '/agent/auth/claim',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const AgentAuthRegisterRoute = AgentAuthRegisterRouteImport.update({
   id: '/agent/auth/register',
   path: '/agent/auth/register',
@@ -747,7 +741,6 @@ export interface FileRoutesByFullPath {
   '/notra-vs-{$slug}/opengraph-image': typeof SiteNotraVsChar123slugChar125OpengraphImageRoute
   '/offering/report': typeof SiteOfferingReportRoute
   '/agent/auth/authorize': typeof AgentAuthAuthorizeRoute
-  '/agent/auth/claim': typeof AgentAuthClaimRoute
   '/agent/auth/register': typeof AgentAuthRegisterRoute
   '/agent/auth/revoke': typeof AgentAuthRevokeRoute
   '/agent/auth/token': typeof AgentAuthTokenRoute
@@ -852,7 +845,6 @@ export interface FileRoutesByTo {
   '/notra-vs-{$slug}/opengraph-image': typeof SiteNotraVsChar123slugChar125OpengraphImageRoute
   '/offering/report': typeof SiteOfferingReportRoute
   '/agent/auth/authorize': typeof AgentAuthAuthorizeRoute
-  '/agent/auth/claim': typeof AgentAuthClaimRoute
   '/agent/auth/register': typeof AgentAuthRegisterRoute
   '/agent/auth/revoke': typeof AgentAuthRevokeRoute
   '/agent/auth/token': typeof AgentAuthTokenRoute
@@ -962,7 +954,6 @@ export interface FileRoutesById {
   '/_site/notra-vs-{$slug}/opengraph-image': typeof SiteNotraVsChar123slugChar125OpengraphImageRoute
   '/_site/offering/report': typeof SiteOfferingReportRoute
   '/agent/auth/authorize': typeof AgentAuthAuthorizeRoute
-  '/agent/auth/claim': typeof AgentAuthClaimRoute
   '/agent/auth/register': typeof AgentAuthRegisterRoute
   '/agent/auth/revoke': typeof AgentAuthRevokeRoute
   '/agent/auth/token': typeof AgentAuthTokenRoute
@@ -1069,7 +1060,6 @@ export interface FileRouteTypes {
     | '/notra-vs-{$slug}/opengraph-image'
     | '/offering/report'
     | '/agent/auth/authorize'
-    | '/agent/auth/claim'
     | '/agent/auth/register'
     | '/agent/auth/revoke'
     | '/agent/auth/token'
@@ -1174,7 +1164,6 @@ export interface FileRouteTypes {
     | '/notra-vs-{$slug}/opengraph-image'
     | '/offering/report'
     | '/agent/auth/authorize'
-    | '/agent/auth/claim'
     | '/agent/auth/register'
     | '/agent/auth/revoke'
     | '/agent/auth/token'
@@ -1283,7 +1272,6 @@ export interface FileRouteTypes {
     | '/_site/notra-vs-{$slug}/opengraph-image'
     | '/_site/offering/report'
     | '/agent/auth/authorize'
-    | '/agent/auth/claim'
     | '/agent/auth/register'
     | '/agent/auth/revoke'
     | '/agent/auth/token'
@@ -1353,7 +1341,6 @@ export interface RootRouteChildren {
   V1IndexRoute: typeof V1IndexRoute
   DotwellKnownMcpServerCardDotjsonRoute: typeof DotwellKnownMcpServerCardDotjsonRoute
   AgentAuthAuthorizeRoute: typeof AgentAuthAuthorizeRoute
-  AgentAuthClaimRoute: typeof AgentAuthClaimRoute
   AgentAuthRegisterRoute: typeof AgentAuthRegisterRoute
   AgentAuthRevokeRoute: typeof AgentAuthRevokeRoute
   AgentAuthTokenRoute: typeof AgentAuthTokenRoute
@@ -1977,13 +1964,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AgentAuthAuthorizeRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/agent/auth/claim': {
-      id: '/agent/auth/claim'
-      path: '/agent/auth/claim'
-      fullPath: '/agent/auth/claim'
-      preLoaderRoute: typeof AgentAuthClaimRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/agent/auth/register': {
       id: '/agent/auth/register'
       path: '/agent/auth/register'
@@ -2320,7 +2300,6 @@ const rootRouteChildren: RootRouteChildren = {
   V1IndexRoute: V1IndexRoute,
   DotwellKnownMcpServerCardDotjsonRoute: DotwellKnownMcpServerCardDotjsonRoute,
   AgentAuthAuthorizeRoute: AgentAuthAuthorizeRoute,
-  AgentAuthClaimRoute: AgentAuthClaimRoute,
   AgentAuthRegisterRoute: AgentAuthRegisterRoute,
   AgentAuthRevokeRoute: AgentAuthRevokeRoute,
   AgentAuthTokenRoute: AgentAuthTokenRoute,

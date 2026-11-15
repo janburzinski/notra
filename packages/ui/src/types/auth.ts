@@ -194,6 +194,7 @@ export interface LoginFormProps {
   onSuccess?: () => void;
   returnTo?: string;
   showSignupLink?: boolean;
+  signupHref?: string;
   showForgotPasswordLink?: boolean;
   initialError?: string;
   initialPending?: PendingAuthStep;

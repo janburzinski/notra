@@ -47,6 +47,14 @@ export interface DemoSandboxCreateResponse {
   slug: string;
 }
 
+export interface DemoAgentSandboxResponse {
+  organizationId: string;
+  apiKey: string;
+  apiBaseUrl: string;
+  expiresAt: string;
+  signupUrl: string;
+}
+
 export interface DemoStartProps {
   returnTo: string | null;
   turnstileSiteKey: string | null;

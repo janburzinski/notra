@@ -25,21 +25,10 @@ function normalizeProtectedResource(resource: string) {
 }
 
 const AGENT_AUTH_METADATA = {
-  register_uri: `${AUTH_SERVER_URL}/oauth2/register`,
-  claim_uri: `${SITE_URL}/agent/auth/claim`,
-  revocation_uri: `${AUTH_SERVER_URL}/oauth2/revoke`,
   skill: AUTH_GUIDE_URL,
-  identity_types_supported: ["anonymous", "identity_assertion"],
-  anonymous: {
-    credential_types_supported: ["api_key"],
-  },
-  identity_assertion: {
-    assertion_types_supported: [
-      "verified_email",
-      "urn:ietf:params:oauth:token-type:id-jag",
-    ],
-    credential_types_supported: ["api_key", "bearer"],
-  },
+  identity_endpoint: `${AUTH_SERVER_URL}/agent/identity`,
+  claim_endpoint: `${AUTH_SERVER_URL}/agent/identity/claim`,
+  identity_types_supported: ["anonymous", "service_auth"],
 } as const;
 
 export function buildProtectedResourceMetadata(resource = API_URL) {

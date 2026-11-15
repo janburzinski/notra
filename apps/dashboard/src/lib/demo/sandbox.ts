@@ -3,6 +3,7 @@ import { logError, logWarn } from "@notra/ai/utils/server-log";
 import {
   DEMO_ORG_SLUG_PREFIX,
   DEMO_SEEDING_GRACE_MINUTES,
+  DEMO_TOUCH_INTERVAL_MS,
 } from "@notra/db/constants/demo";
 import { db } from "@notra/db/drizzle";
 import {
@@ -51,7 +52,6 @@ import {
   DEMO_SANDBOX_RESET_LOCK_SECONDS,
   DEMO_SEED_ID_PREFIX,
   DEMO_STORAGE_LOCK_KEY,
-  DEMO_TOUCH_INTERVAL_MS,
   DEMO_USER_EMAIL_DOMAIN,
   DEMO_VISITOR_EMAIL_LOCAL,
   DEMO_VISITOR_NAME,

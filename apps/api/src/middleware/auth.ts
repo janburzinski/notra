@@ -25,6 +25,7 @@ import {
   jwtVerify,
 } from "jose";
 
+import { AGENT_REGISTRATION_SUBJECT_PREFIX } from "../constants/agent-registration";
 import { API_AUTH_KINDS } from "../constants/analytics";
 import type { ApiAuthKind } from "../types/analytics";
 import {
@@ -337,6 +338,20 @@ function hasRequiredScope(scopes: string[], requiredScope?: string) {
   );
 }
 
+function resolveOAuthSubject(payload: JWTPayload): string | null {
+  if (!payload.sub?.startsWith(AGENT_REGISTRATION_SUBJECT_PREFIX)) {
+    return payload.sub ?? null;
+  }
+  const actor = payload.act;
+  return typeof actor === "object" &&
+    actor !== null &&
+    "sub" in actor &&
+    typeof actor.sub === "string" &&
+    actor.sub.length > 0
+    ? actor.sub
+    : null;
+}
+
 async function verifyOAuthToken(
   c: Context,
   token: string,
@@ -369,7 +384,8 @@ async function verifyOAuthToken(
     const scopes = grant?.scopes ?? extractScopes(payload) ?? [];
     const workosOrgId = payload.org_id;
 
-    if (!payload.sub) {
+    const subject = resolveOAuthSubject(payload);
+    if (!subject) {
       return { success: false, error: "Missing OAuth subject", status: 401 };
     }
 
@@ -390,7 +406,7 @@ async function verifyOAuthToken(
 
     const db = c.get("db");
     const [localUserId, localOrgId] = await Promise.all([
-      resolveLocalUserId(db, payload.sub, c.env.WORKOS_API_KEY),
+      resolveLocalUserId(db, subject, c.env.WORKOS_API_KEY),
       grant?.organizationSource === "local"
         ? Promise.resolve(grant.organizationId)
         : resolveLocalOrganizationId(

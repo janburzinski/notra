@@ -50,3 +50,16 @@ export function markdownTable(
     ...rows.map((row) => `| ${row.map(tableCell).join(" | ")} |`),
   ].join("\n");
 }
+
+export function demoteMarkdownHeadings(source: string) {
+  let inFence = false;
+  return source
+    .split("\n")
+    .map((line) => {
+      if (line.startsWith("```")) {
+        inFence = !inFence;
+      }
+      return !inFence && line.startsWith("#") ? `#${line}` : line;
+    })
+    .join("\n");
+}

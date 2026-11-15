@@ -1089,6 +1089,43 @@
           "description": "Diese Einladung wurde schon angenommen. Melde dich an, um deinen Workspace zu öffnen."
         }
       }
+    },
+    "agentClaim": {
+      "linked": {
+        "title": "Verbinde deinen Agenten",
+        "description": "Gib diesen Code deinem Agenten. Er arbeitet dann mit deinen Rechten in {workspace}.",
+        "hint": "Teile ihn nur mit einem Agenten, den du selbst gestartet hast. Der Code läuft nach wenigen Minuten ab."
+      },
+      "no-workspace": {
+        "title": "Erstelle zuerst einen Workspace",
+        "description": "Dein Agent braucht einen Workspace. Erstelle einen und öffne danach den Link von deinem Agenten erneut.",
+        "action": "Workspace erstellen"
+      },
+      "missing": {
+        "title": "Link unvollständig",
+        "description": "Diesem Link fehlt das Claim-Token. Öffne genau den Link, den dein Agent dir gegeben hat.",
+        "action": "Zu Notra"
+      },
+      "expired": {
+        "title": "Link abgelaufen",
+        "description": "Bitte deinen Agenten, die Anmeldung neu zu starten, um einen neuen Link zu bekommen.",
+        "action": "Zu Notra"
+      },
+      "claimed": {
+        "title": "Agent bereits verbunden",
+        "description": "Dieser Agent ist schon verbunden oder der Claim wird gerade verwendet. Bitte deinen Agenten, neu zu starten, falls er noch keinen Zugriff hat.",
+        "action": "Zu Notra"
+      },
+      "mismatch": {
+        "title": "Andere E-Mail-Adresse",
+        "description": "Dein Agent wollte eine andere E-Mail-Adresse verbinden. Melde dich mit diesem Konto an oder bitte deinen Agenten, dieses zu verwenden.",
+        "action": "Zu Notra"
+      },
+      "failed": {
+        "title": "Agent konnte nicht verbunden werden",
+        "description": "Etwas ist schiefgelaufen. Bitte deinen Agenten, die Anmeldung neu zu starten.",
+        "action": "Zu Notra"
+      }
     }
   },
   "errors": {

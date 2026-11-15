@@ -91,6 +91,9 @@ export function LoginForm({ returnTo, ...props }: LoginFormProps) {
       labels={labels}
       returnTo={returnTo ? buildPostAuthRedirectPath(returnTo) : undefined}
       signInWithPassword={signInWithPasswordTracked}
+      signupHref={
+        returnTo ? `/signup?${new URLSearchParams({ returnTo })}` : undefined
+      }
       startSocialSignIn={startSocialSignInAction}
       redeemBackupCode={redeemBackupCodeTracked}
       validators={validators}

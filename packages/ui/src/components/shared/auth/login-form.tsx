@@ -44,6 +44,7 @@ export function LoginForm({
   onSuccess,
   returnTo,
   showSignupLink = true,
+  signupHref = "/signup",
   showForgotPasswordLink = true,
   initialError,
   initialPending,
@@ -291,7 +292,7 @@ export function LoginForm({
               {l.noAccount}{" "}
               <Link
                 className="underline underline-offset-4 hover:text-primary"
-                href="/signup"
+                href={signupHref}
               >
                 {l.register}
               </Link>

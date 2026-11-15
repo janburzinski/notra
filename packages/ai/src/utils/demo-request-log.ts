@@ -3,6 +3,7 @@ import { logError } from "@notra/ai/utils/server-log";
 import {
   DEMO_REQUEST_BODY_MAX_CHARS,
   DEMO_REQUEST_LOG_MAX_ROWS,
+  DEMO_TOUCH_INTERVAL_MS,
 } from "@notra/db/constants/demo";
 import { db } from "@notra/db/drizzle";
 import { demoRequestLog, demoSandboxes } from "@notra/db/schema";
@@ -30,7 +31,7 @@ export async function recordDemoRequest(
 ): Promise<DemoRequestEvent | null> {
   try {
     const sandbox = await db.query.demoSandboxes.findFirst({
-      columns: { anonymousId: true },
+      columns: { anonymousId: true, lastSeenAt: true },
       where: eq(demoSandboxes.organizationId, input.organizationId),
     });
     if (!sandbox) {
@@ -38,6 +39,15 @@ export async function recordDemoRequest(
     }
 
     const createdAt = new Date();
+    if (
+      createdAt.getTime() - sandbox.lastSeenAt.getTime() >=
+      DEMO_TOUCH_INTERVAL_MS
+    ) {
+      await db
+        .update(demoSandboxes)
+        .set({ lastSeenAt: createdAt })
+        .where(eq(demoSandboxes.anonymousId, sandbox.anonymousId));
+    }
     const event: DemoRequestEvent = {
       id: crypto.randomUUID(),
       source: input.source,

@@ -6,6 +6,8 @@ import { getRequestHeaders as headers } from "@tanstack/react-start/server";
 import { ANALYTICS_IMPORT_RATE_LIMIT_PER_HOUR } from "@/constants/analytics-imports";
 import { COMPANY_LOGO_RATE_LIMIT_PER_USER_PER_MINUTE } from "@/constants/company-logo";
 import {
+  DEMO_AGENT_SANDBOX_LIMIT,
+  DEMO_AGENT_SANDBOX_WINDOW,
   DEMO_SANDBOX_CREATE_LIMIT,
   DEMO_SANDBOX_CREATE_WINDOW,
   DEMO_SANDBOX_RESET_LIMIT,
@@ -190,6 +192,11 @@ export const ratelimit = {
     prefix: "ratelimit:auth-mfa-verify",
     requests: 5,
     window: "1m",
+  }),
+  demoAgentSandbox: createLimiter({
+    prefix: "ratelimit:demo-agent-sandbox",
+    requests: DEMO_AGENT_SANDBOX_LIMIT,
+    window: DEMO_AGENT_SANDBOX_WINDOW,
   }),
   demoSandboxCreate: createLimiter({
     prefix: "ratelimit:demo-sandbox-create",
