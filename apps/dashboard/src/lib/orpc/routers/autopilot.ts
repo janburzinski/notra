@@ -27,6 +27,7 @@ import {
   autopilotSaveInputSchema,
   autopilotSetCommitFiltersInputSchema,
   autopilotSetJobInputSchema,
+  autopilotUpdateInputSchema,
 } from "@notra/schemas/dashboard/autopilot";
 import { os } from "@orpc/server";
 import { and, desc, eq, inArray, sql } from "drizzle-orm";
@@ -79,6 +80,7 @@ import { findAutopilotProject } from "@/lib/autopilot/run";
 import {
   AutopilotSettingsError,
   saveAutopilotSettings,
+  updateAutopilotSettings,
   setAutopilotJob,
 } from "@/lib/autopilot/settings";
 import { attachSitePreviews, listAutopilotSites } from "@/lib/autopilot/sites";
@@ -448,6 +450,18 @@ export const autopilotRouter = {
     .handler(async ({ input, context }) => {
       assertCanManageAutopilot(context);
       await settingsCall(() => saveAutopilotSettings(input));
+      return { success: true as const };
+    }),
+
+  /** One settings change, merged into the saved settings on the server. */
+  update: authorizedProcedure
+    .input(autopilotUpdateInputSchema)
+    .use(withOrganizationAccess)
+    .use(withAutopilotFlag)
+    .handler(async ({ input, context }) => {
+      assertCanManageAutopilot(context);
+      const { organizationId, ...patch } = input;
+      await settingsCall(() => updateAutopilotSettings(organizationId, patch));
       return { success: true as const };
     }),
 

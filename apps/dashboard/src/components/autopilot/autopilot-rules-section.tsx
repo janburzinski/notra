@@ -21,6 +21,7 @@ import { AUTOPILOT_RULE_PREFIX } from "@/constants/autopilot";
 import { dashboardOrpc } from "@/lib/orpc/query";
 import type {
   AutopilotRuleFormValues,
+  AutopilotRuleRow,
   AutopilotRulesSectionProps,
 } from "@/types/autopilot";
 import { toAutopilotRuleText } from "@/utils/autopilot-rules";
@@ -35,38 +36,92 @@ export function AutopilotRulesSection({
 }: AutopilotRulesSectionProps) {
   const queryClient = useQueryClient();
   const [adding, setAdding] = useState(false);
+  // Changes show at once and stay until the refetch after their save has the
+  // server's list; a failed save takes its change back. Saves go one at a
+  // time because each one is a commit to Autopilot's memory.
+  const [pending, setPending] = useState<string[]>([]);
+  const [removed, setRemoved] = useState<ReadonlySet<string>>(new Set());
+  const scope = { id: `autopilot-rules:${organizationId}` };
   const close = () => {
     form.reset();
     setAdding(false);
   };
-  const invalidate = () =>
-    queryClient.invalidateQueries({ queryKey: dashboardOrpc.autopilot.key() });
+  const refresh = () =>
+    queryClient
+      .invalidateQueries({ queryKey: dashboardOrpc.autopilot.key() })
+      .catch(() => undefined);
+  const dropPending = (text: string) =>
+    setPending((current) => current.filter((row) => row !== text));
+  const showAgain = (ruleId: string) =>
+    setRemoved((current) => {
+      const next = new Set(current);
+      next.delete(ruleId);
+      return next;
+    });
   const add = useMutation({
-    mutationFn: (text: string) =>
-      dashboardOrpc.autopilot.addRule.call({ organizationId, text }),
-    onSuccess: async () => {
+    scope,
+    onMutate: ({ text }: { text: string; topic: string }) => {
+      setPending((current) => [...current, text]);
       close();
-      await invalidate();
     },
-    onError: (error) =>
-      toast.error(toErrorMessage(error, "Could not save the rule")),
+    mutationFn: ({ text }: { text: string; topic: string }) =>
+      dashboardOrpc.autopilot.addRule.call({ organizationId, text }),
+    onError: (error, { text, topic }) => {
+      dropPending(text);
+      // Hands the typed topic back so it can be fixed and sent again, unless
+      // a newer topic is already being typed.
+      if (!form.getFieldValue("topic").trim()) {
+        form.setFieldValue("topic", topic);
+        setAdding(true);
+      }
+      toast.error(toErrorMessage(error, "Could not save the rule"));
+    },
+    onSuccess: async (_data, { text }) => {
+      await refresh();
+      dropPending(text);
+    },
   });
   const remove = useMutation({
+    scope,
+    onMutate: (ruleId: string) =>
+      setRemoved((current) => new Set(current).add(ruleId)),
     mutationFn: (ruleId: string) =>
       dashboardOrpc.autopilot.deleteRule.call({ organizationId, ruleId }),
-    onSuccess: invalidate,
-    onError: (error) =>
-      toast.error(toErrorMessage(error, "Could not remove the rule")),
+    onError: (error, ruleId) => {
+      showAgain(ruleId);
+      toast.error(toErrorMessage(error, "Could not remove the rule"));
+    },
+    onSuccess: async (_data, ruleId) => {
+      await refresh();
+      showAgain(ruleId);
+    },
   });
   const form = useForm({
     defaultValues: DEFAULT_RULE_VALUES,
     onSubmit: ({ value }) => {
       const ruleText = toAutopilotRuleText(value.topic);
       if (ruleText) {
-        add.mutate(ruleText);
+        add.mutate({ text: ruleText, topic: value.topic });
       }
     },
   });
+
+  const saved = new Set(rules.map((rule) => rule.text.toLowerCase()));
+  const rows: AutopilotRuleRow[] = [
+    ...rules
+      .filter((rule) => !removed.has(rule.id))
+      .map((rule) => ({ ...rule, saving: false })),
+    ...pending
+      .filter((text) => !saved.has(text.toLowerCase()))
+      .map((text) => ({
+        id: `pending:${text}`,
+        text,
+        source: "dashboard" as const,
+        sourceUrl: null,
+        createdBy: null,
+        saving: true,
+      })),
+  ];
 
   return (
     <div className="border-shell-border bg-shell rounded-2xl border p-0.5">
@@ -74,12 +129,12 @@ export function AutopilotRulesSection({
         <div className="px-4 py-3">
           <p className="text-sm font-medium">Topics to skip</p>
           <p className="text-muted-foreground text-xs text-pretty">
-            {rules.length > 0
+            {rows.length > 0
               ? "Autopilot reads these before every suggestion."
               : "When you decline a suggestion and say why, Autopilot remembers it here and reads it before every suggestion."}
           </p>
         </div>
-        {rules.map((rule) => {
+        {rows.map((rule) => {
           const sourceLabel =
             rule.source === "github" ? "From GitHub" : "From the dashboard";
           return (
@@ -110,7 +165,7 @@ export function AutopilotRulesSection({
               <Button
                 aria-label={`Remove rule: ${rule.text}`}
                 className="text-muted-foreground"
-                disabled={remove.isPending}
+                disabled={rule.saving}
                 onClick={() => remove.mutate(rule.id)}
                 size="icon-sm"
                 variant="ghost"
@@ -139,7 +194,7 @@ export function AutopilotRulesSection({
                     onBlur={field.handleBlur}
                     onChange={(event) => field.handleChange(event.target.value)}
                     onKeyDown={(event) => {
-                      if (event.key === "Escape" && !add.isPending) {
+                      if (event.key === "Escape") {
                         close();
                       }
                     }}
@@ -154,23 +209,12 @@ export function AutopilotRulesSection({
                 selector={(state) => toAutopilotRuleText(state.values.topic)}
               >
                 {(ruleText) => (
-                  <Button
-                    disabled={!ruleText}
-                    loading={add.isPending}
-                    size="sm"
-                    type="submit"
-                  >
+                  <Button disabled={!ruleText} size="sm" type="submit">
                     Add
                   </Button>
                 )}
               </form.Subscribe>
-              <Button
-                disabled={add.isPending}
-                onClick={close}
-                size="sm"
-                type="button"
-                variant="ghost"
-              >
+              <Button onClick={close} size="sm" type="button" variant="ghost">
                 Cancel
               </Button>
             </div>

@@ -104,27 +104,34 @@ export const autopilotApprovalsSchema = z.object({
   fixes: autopilotApprovalModeSchema,
 });
 
+const autopilotRepositoryTargetSchema = z.object({
+  owner: z.string().trim().min(1).max(100).regex(GITHUB_NAME_PATTERN),
+  name: z.string().trim().min(1).max(100).regex(GITHUB_NAME_PATTERN),
+  branch: z.string().trim().min(1).max(255),
+});
+const autopilotContentPathSchema = z.string().trim().max(200);
+const autopilotSlackTargetSchema = z.object({
+  integrationId: z.string().trim().min(1),
+  channelId: z.string().trim().min(1).max(64),
+  channelName: z.string().trim().max(200).nullable(),
+});
+const autopilotBriefHourSchema = z.number().int().min(0).max(23);
+const autopilotStaleDaysSchema = z.union([
+  z.literal(7),
+  z.literal(14),
+  z.literal(30),
+]);
+const autopilotSiteIdSchema = z.string().trim().min(1).max(64);
+
 export const autopilotSaveInputSchema = autopilotOrganizationInputSchema.extend(
   {
     enabled: z.boolean(),
     /** GEO project Autopilot works for. Omit to keep the saved project. */
     projectId: z.string().trim().min(1).max(64).optional(),
-    repository: z
-      .object({
-        owner: z.string().trim().min(1).max(100).regex(GITHUB_NAME_PATTERN),
-        name: z.string().trim().min(1).max(100).regex(GITHUB_NAME_PATTERN),
-        branch: z.string().trim().min(1).max(255),
-      })
-      .nullable(),
-    contentPath: z.string().trim().max(200).nullable(),
-    slack: z
-      .object({
-        integrationId: z.string().trim().min(1),
-        channelId: z.string().trim().min(1).max(64),
-        channelName: z.string().trim().max(200).nullable(),
-      })
-      .nullable(),
-    briefHour: z.number().int().min(0).max(23),
+    repository: autopilotRepositoryTargetSchema.nullable(),
+    contentPath: autopilotContentPathSchema.nullable(),
+    slack: autopilotSlackTargetSchema.nullable(),
+    briefHour: autopilotBriefHourSchema,
     timezone: z
       .string()
       .trim()
@@ -135,16 +142,33 @@ export const autopilotSaveInputSchema = autopilotOrganizationInputSchema.extend(
     jobs: autopilotJobsSchema.optional(),
     maxOpenPullRequests: z.number().int().min(1).max(10),
     /** Days before an untouched draft is closed; null never closes. Omit to keep. */
-    stalePullRequestDays: z
-      .union([z.literal(7), z.literal(14), z.literal(30)])
-      .nullable()
-      .optional(),
+    stalePullRequestDays: autopilotStaleDaysSchema.nullable().optional(),
     approvals: autopilotApprovalsSchema.optional(),
     /** Omit to keep the saved choice. */
     draftEmails: z.enum(AUTOPILOT_DRAFT_EMAIL_MODES).optional(),
-    siteId: z.string().trim().min(1).max(64).nullable().optional(),
+    siteId: autopilotSiteIdSchema.nullable().optional(),
   }
 );
+
+/**
+ * Changes only the settings it names; the server merges them into the saved
+ * row, so a change can never resend a value another change replaced.
+ * Approvals merge per group.
+ */
+export const autopilotUpdateInputSchema = autopilotOrganizationInputSchema
+  .extend({
+    enabled: z.boolean(),
+    repository: autopilotRepositoryTargetSchema.nullable(),
+    contentPath: autopilotContentPathSchema.nullable(),
+    slack: autopilotSlackTargetSchema.nullable(),
+    briefHour: autopilotBriefHourSchema,
+    stalePullRequestDays: autopilotStaleDaysSchema.nullable(),
+    approvals: autopilotApprovalsSchema.partial(),
+    draftEmails: z.enum(AUTOPILOT_DRAFT_EMAIL_MODES),
+    siteId: autopilotSiteIdSchema.nullable(),
+  })
+  .partial()
+  .required({ organizationId: true });
 
 export const autopilotGitHubLoginSchema = z
   .string()

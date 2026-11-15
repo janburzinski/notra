@@ -73,7 +73,18 @@ export function AutopilotPublishingSettings({
           <Select
             items={siteOptions}
             onValueChange={(value) =>
-              save({ siteId: value === AUTOPILOT_NO_SITE ? null : value })
+              save(
+                value === AUTOPILOT_NO_SITE
+                  ? // Picking a site copies its target over the manual one,
+                    // so leaving it sends the target shown here, whichever
+                    // save the server sees first.
+                    {
+                      siteId: null,
+                      repository: settings.repository,
+                      contentPath: settings.contentPath,
+                    }
+                  : { siteId: value }
+              )
             }
             value={settings.siteId ?? AUTOPILOT_NO_SITE}
           >
@@ -310,12 +321,9 @@ export function AutopilotApprovalSettings({
       <AutopilotSettingsFields>
         {AUTOPILOT_APPROVAL_GROUPS.map((group) => {
           const current = overview.settings.approvals[group];
-          // Each option saves its own mode. The group's computed next value
-          // can't be trusted while an earlier save is still on its way back.
+          // Sends only this group; the server merges it into the others.
           const choose = (mode: AutopilotApprovalMode) =>
-            save((saved) => ({
-              approvals: { ...saved.approvals, [group]: mode },
-            }));
+            save({ approvals: { [group]: mode } });
           return (
             <AutopilotSettingsField key={group} label={labels[group]}>
               {/* The segmented group always fills its box, so the box sets the width. */}

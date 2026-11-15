@@ -1,14 +1,11 @@
-import type { autopilotSaveInputSchema } from "@notra/schemas/dashboard/autopilot";
-import type * as z from "zod";
-
 import { AUTOPILOT_STALE_PULL_REQUEST_DAY_OPTIONS } from "@/constants/autopilot";
 import { AUTOPILOT_NO_SITE } from "@/constants/autopilot-publish";
 import type {
+  AutopilotSettingsPendingChange,
   AutopilotSettingsSectionProps,
   AutopilotSettingsView,
 } from "@/types/autopilot";
 
-type AutopilotSaveInput = z.input<typeof autopilotSaveInputSchema>;
 type StaleDays = (typeof AUTOPILOT_STALE_PULL_REQUEST_DAY_OPTIONS)[number];
 
 export function toStaleDays(value: number | null): StaleDays | null {
@@ -19,35 +16,37 @@ export function toStaleDays(value: number | null): StaleDays | null {
 }
 
 /**
- * The saved settings as a save input, so one change can be sent on its own.
- * Jobs are left out: they change through their own endpoint, and resending
- * them here could undo a toggle that landed in between.
+ * The settings as they will read once a change lands, so the page can show
+ * it before the server confirms it. The refetch afterwards fills in what only
+ * the server knows, like a site's repository or a normalized folder.
  */
-export function toAutopilotSaveInput(
-  organizationId: string,
-  settings: AutopilotSettingsView
-): AutopilotSaveInput {
+export function applyAutopilotSettingsPatch(
+  settings: AutopilotSettingsView,
+  patch: AutopilotSettingsPendingChange
+): AutopilotSettingsView {
+  const keep = <T>(value: T | undefined, current: T) =>
+    value === undefined ? current : value;
   return {
-    organizationId,
-    enabled: settings.enabled,
-    projectId: settings.projectId ?? undefined,
-    repository: settings.repository,
-    contentPath: settings.contentPath,
-    slack:
-      settings.slackIntegrationId && settings.slackChannelId
-        ? {
-            integrationId: settings.slackIntegrationId,
-            channelId: settings.slackChannelId,
-            channelName: settings.slackChannelName,
-          }
-        : null,
-    briefHour: settings.briefHour,
-    timezone: settings.timezone,
-    maxOpenPullRequests: settings.maxOpenPullRequests,
-    stalePullRequestDays: toStaleDays(settings.stalePullRequestDays),
-    approvals: settings.approvals,
-    draftEmails: settings.draftEmails,
-    siteId: settings.siteId,
+    ...settings,
+    enabled: keep(patch.enabled, settings.enabled),
+    repository: keep(patch.repository, settings.repository),
+    contentPath: keep(patch.contentPath, settings.contentPath),
+    ...(patch.slack === undefined
+      ? {}
+      : {
+          slackIntegrationId: patch.slack?.integrationId ?? null,
+          slackChannelId: patch.slack?.channelId ?? null,
+          slackChannelName: patch.slack?.channelName ?? null,
+        }),
+    briefHour: keep(patch.briefHour, settings.briefHour),
+    stalePullRequestDays: keep(
+      patch.stalePullRequestDays,
+      settings.stalePullRequestDays
+    ),
+    approvals: { ...settings.approvals, ...patch.approvals },
+    jobs: { ...settings.jobs, ...patch.jobs },
+    draftEmails: keep(patch.draftEmails, settings.draftEmails),
+    siteId: keep(patch.siteId, settings.siteId),
   };
 }
 

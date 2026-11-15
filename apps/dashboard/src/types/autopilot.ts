@@ -6,7 +6,7 @@ import type {
   AutopilotFindingEvidence,
   AutopilotJobKind,
 } from "@notra/db/types/autopilot";
-import type { autopilotSaveInputSchema } from "@notra/schemas/dashboard/autopilot";
+import type { autopilotUpdateInputSchema } from "@notra/schemas/dashboard/autopilot";
 import type { InferRouterOutputs } from "@orpc/server";
 import type { ReactNode } from "react";
 import type * as z from "zod";
@@ -542,16 +542,19 @@ export interface AutopilotFindingTablesProps extends Omit<
 export type AutopilotSettingsSectionId =
   (typeof AUTOPILOT_SETTINGS_SECTION_IDS)[number];
 
-export type AutopilotSettingsPatch = Partial<
-  z.input<typeof autopilotSaveInputSchema>
+/** One settings change; the server merges it into the saved settings. */
+export type AutopilotSettingsPatch = Omit<
+  z.input<typeof autopilotUpdateInputSchema>,
+  "organizationId"
 >;
 
+/** A change the page shows while its save is on its way. */
+export type AutopilotSettingsPendingChange = AutopilotSettingsPatch & {
+  jobs?: Partial<AutopilotSettingsView["jobs"]>;
+};
+
 /** Saves one change on top of the latest saved settings. */
-type AutopilotSettingsSave = (
-  patch:
-    | AutopilotSettingsPatch
-    | ((current: AutopilotSettingsView) => AutopilotSettingsPatch)
-) => void;
+type AutopilotSettingsSave = (patch: AutopilotSettingsPatch) => void;
 
 export interface AutopilotSettingsFieldProps {
   label: string;
@@ -634,6 +637,12 @@ export interface AutopilotRulesSectionProps {
   organizationId: string;
   rules: AutopilotOverview["rules"];
 }
+
+/** A rule as listed, including one still on its way to the server. */
+export type AutopilotRuleRow = Pick<
+  AutopilotOverview["rules"][number],
+  "id" | "text" | "source" | "sourceUrl" | "createdBy"
+> & { saving: boolean };
 
 export interface AutopilotOverviewToolbarProps {
   organizationId: string;
