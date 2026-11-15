@@ -1,6 +1,11 @@
 "use client";
 
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  useMutation,
+  useMutationState,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { toast } from "sonner";
 
 import { AUTOPILOT_POLL_INTERVAL_MS } from "@/constants/autopilot";
@@ -13,6 +18,24 @@ import type { AutopilotAutomationKind } from "@/types/autopilot-metrics";
 import type { GitHubMergeMethod } from "@/types/integrations/github";
 import { toErrorMessage } from "@/utils/error-message";
 
+type AutopilotJobChange = {
+  kind: AutopilotAutomationKind;
+  enabled: boolean;
+};
+
+const setJobKey = (organizationId: string) => [
+  ...dashboardOrpc.autopilot.setJob.key(),
+  organizationId,
+];
+
+/** Automation switches whose save hasn't come back yet, oldest first. */
+export function useSavingAutopilotJobs(organizationId: string) {
+  return useMutationState({
+    filters: { mutationKey: setJobKey(organizationId), status: "pending" },
+    select: (mutation) => mutation.state.variables as AutopilotJobChange,
+  });
+}
+
 /**
  * The workspace's Autopilot state, polled while a run or a write is in
  * flight. Admins sync GitHub at most every few minutes so merges and closes
@@ -20,10 +43,28 @@ import { toErrorMessage } from "@/utils/error-message";
  */
 export function useAutopilotOverview(organizationId: string) {
   const queryClient = useQueryClient();
+  const saving = useSavingAutopilotJobs(organizationId);
   const query = useQuery(
     dashboardOrpc.autopilot.get.queryOptions({
       input: { organizationId },
       enabled: organizationId.length > 0,
+      // A poll or sync that lands mid-save still has the old switch, so
+      // switches being saved win over what the server said.
+      select:
+        saving.length > 0
+          ? (data) => ({
+              ...data,
+              settings: {
+                ...data.settings,
+                jobs: {
+                  ...data.settings.jobs,
+                  ...Object.fromEntries(
+                    saving.map((change) => [change.kind, change.enabled])
+                  ),
+                },
+              },
+            })
+          : undefined,
       refetchInterval: (state) =>
         state.state.data?.runs.some((run) => run.status === "running") ||
         state.state.data?.findings.some((finding) => finding.status === "open")
@@ -101,17 +142,49 @@ export function useAutopilotActions(organizationId: string) {
       toast.error(toErrorMessage(error, "Could not start writing")),
   });
 
+  const overviewKey = dashboardOrpc.autopilot.get.queryOptions({
+    input: { organizationId },
+  }).queryKey;
+  const savingJobKey = setJobKey(organizationId);
+  const setCachedJob = (kind: AutopilotAutomationKind, enabled: boolean) =>
+    queryClient.setQueryData(overviewKey, (current) =>
+      current
+        ? {
+            ...current,
+            settings: {
+              ...current.settings,
+              jobs: { ...current.settings.jobs, [kind]: enabled },
+            },
+          }
+        : current
+    );
+  // The switch flips at once, so a template's card leaves and its row
+  // arrives on the click instead of after the round trip.
   const setJob = useMutation({
-    mutationFn: (input: { kind: AutopilotAutomationKind; enabled: boolean }) =>
+    mutationKey: savingJobKey,
+    mutationFn: (input: AutopilotJobChange) =>
       dashboardOrpc.autopilot.setJob.call({ organizationId, ...input }),
+    onMutate: async ({ kind, enabled }) => {
+      await queryClient.cancelQueries({ queryKey: overviewKey });
+      setCachedJob(kind, enabled);
+    },
     onSuccess: (_, input) => {
+      // A read that landed mid-save holds the old switch until the refetch.
+      setCachedJob(input.kind, input.enabled);
       toast.success(
         `${AUTOPILOT_AUTOMATIONS[input.kind].name} is ${input.enabled ? "on" : "off"}`
       );
-      invalidate();
     },
-    onError: (error) =>
-      toast.error(toErrorMessage(error, "Could not change the automation")),
+    onError: (error, { kind, enabled }) => {
+      setCachedJob(kind, !enabled);
+      toast.error(toErrorMessage(error, "Could not change the automation"));
+    },
+    // A refetch mid-way through a second click would undo its card.
+    onSettled: () => {
+      if (queryClient.isMutating({ mutationKey: savingJobKey }) === 1) {
+        void invalidate();
+      }
+    },
   });
 
   const merge = useMutation({

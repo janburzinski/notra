@@ -294,7 +294,6 @@ function AutopilotOverviewPage({
 
   const templateActions = {
     canManage,
-    isAdding: setJob.isPending,
     jobs: settings.jobs,
     onAddBuiltIn: (kind: (typeof AUTOPILOT_AUTOMATION_KINDS)[number]) =>
       setJob.mutate({ kind, enabled: true }),
@@ -348,11 +347,6 @@ function AutopilotOverviewPage({
 
         <TabsContent className="mt-4" value="automations">
           <AutopilotAutomationsOverview
-            addingKind={
-              setJob.isPending && setJob.variables.enabled
-                ? setJob.variables.kind
-                : null
-            }
             canManage={canManage}
             days={days}
             isRunning={runs.some((run) => run.status === "running")}

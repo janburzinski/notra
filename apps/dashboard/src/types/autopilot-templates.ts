@@ -22,8 +22,8 @@ export interface AutopilotTemplate {
 export interface AutopilotTemplateActions {
   jobs: Partial<Record<AutopilotAutomationKind, boolean>>;
   canManage: boolean;
-  isAdding: boolean;
-  onAddBuiltIn: (kind: AutopilotAutomationKind) => void;
+  /** `from` is the used card's title, for the hand-off to the table. */
+  onAddBuiltIn: (kind: AutopilotAutomationKind, from?: HTMLElement) => void;
   onOpenBuiltIn: (kind: AutopilotAutomationKind) => void;
 }
 
@@ -37,4 +37,17 @@ export interface AutopilotTemplateDialogProps extends AutopilotTemplateActions {
   onOpenChange: (open: boolean) => void;
   /** The overview hides active templates, so their cards are not focus targets. */
   removesActiveCards?: boolean;
+}
+
+/** A used card on its way into the automations table. */
+export interface AutopilotTemplateHandOff {
+  id: number;
+  template: AutopilotTemplate;
+  from: DOMRect;
+}
+
+/** How far a used card's label travels to the row's name. */
+export interface AutopilotTemplateHandOffTarget {
+  x: number;
+  y: number;
 }

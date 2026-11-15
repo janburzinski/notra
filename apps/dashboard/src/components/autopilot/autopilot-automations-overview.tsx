@@ -17,6 +17,7 @@ import {
   DropdownMenuTrigger,
 } from "@notra/ui/components/ui/dropdown-menu";
 import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 import { DataTable, type TableColumn } from "ui/table";
 
 import { AutopilotStatStrip } from "@/components/autopilot/autopilot-stat-strip";
@@ -29,12 +30,15 @@ import {
   AUTOPILOT_AUTOMATIONS,
   AUTOPILOT_EMPTY_TABLE_HEIGHT,
   AUTOPILOT_KIND_META,
+  AUTOPILOT_ROW_NAME_ATTRIBUTE,
 } from "@/constants/autopilot-ui";
 import { AUTOPILOT_WORKFLOW_BUILD_PROMPT } from "@/constants/autopilot-workflows";
 import { TABLE_ROW_HEIGHT } from "@/constants/table";
+import { useSavingAutopilotJobs } from "@/lib/hooks/use-autopilot";
 import { useAutopilotWorkflowActions } from "@/lib/hooks/use-autopilot-workflows";
 import { dashboardOrpc } from "@/lib/orpc/query";
 import type {
+  AutopilotAutomationKind,
   AutopilotAutomationNumberProps,
   AutopilotAutomationRow,
   AutopilotAutomationsOverviewProps,
@@ -63,7 +67,6 @@ export function AutopilotAutomationsOverview({
   jobs,
   isRunning,
   canManage,
-  addingKind,
   onOpenAutomation,
   onOpenWorkflow,
   onAddAutomation,
@@ -84,8 +87,11 @@ export function AutopilotAutomationsOverview({
     })
   );
   const { run: runWorkflow } = useAutopilotWorkflowActions(organizationId);
+  // The server rejects a run for a switch it hasn't saved yet.
+  const saving = useSavingAutopilotJobs(organizationId);
   const metrics = query.data;
   const enabled = AUTOPILOT_AUTOMATION_KINDS.filter((kind) => jobs[kind]);
+  const arrived = useArrivedKinds(enabled);
   const available = AUTOPILOT_AUTOMATION_KINDS.filter((kind) => !jobs[kind]);
   const rows: AutopilotAutomationRow[] = [
     ...enabled.map((kind) => {
@@ -166,7 +172,12 @@ export function AutopilotAutomationsOverview({
             }
             size={16}
           />
-          <span className="truncate font-medium">
+          <span
+            className="truncate font-medium"
+            {...(row.type === "builtin"
+              ? { [AUTOPILOT_ROW_NAME_ATTRIBUTE]: row.kind }
+              : {})}
+          >
             {row.type === "builtin"
               ? AUTOPILOT_AUTOMATIONS[row.kind].name
               : row.workflow.name}
@@ -226,7 +237,10 @@ export function AutopilotAutomationsOverview({
                 <Button
                   aria-label={`Run ${name}`}
                   disabled={
-                    row.type === "builtin" ? runDisabled : runWorkflow.isPending
+                    row.type === "builtin"
+                      ? runDisabled ||
+                        saving.some((change) => change.kind === row.kind)
+                      : runWorkflow.isPending
                   }
                   loading={
                     row.type === "builtin"
@@ -259,11 +273,7 @@ export function AutopilotAutomationsOverview({
     <DropdownMenu>
       <DropdownMenuTrigger
         render={
-          <Button
-            loading={addingKind !== null}
-            size="sm"
-            variant={rows.length === 0 ? "outline" : "ghost"}
-          />
+          <Button size="sm" variant={rows.length === 0 ? "outline" : "ghost"} />
         }
       >
         <HugeiconsIcon icon={Add01Icon} size={14} />
@@ -319,32 +329,55 @@ export function AutopilotAutomationsOverview({
           </Button>
         </div>
       ) : null}
-      <DataTable
-        columns={columns}
-        data={rows}
-        // Without built-in automations the workflows decide whether it's empty.
-        loading={rows.length === 0 && workflowsQuery.isPending}
-        emptyState={
-          <AutopilotTableEmpty
-            action={addMenu}
-            description="Add one, or describe your own in the chat box below."
-            icon={WorkflowSquare03Icon}
-            title="No automations on"
-          />
-        }
-        getRowId={(row) => row.id}
-        height={
-          rows.length > 0
-            ? tableHeightFor(rows.length)
-            : AUTOPILOT_EMPTY_TABLE_HEIGHT
-        }
-        onRowClick={(row) =>
-          row.type === "builtin"
-            ? onOpenAutomation(row.kind)
-            : onOpenWorkflow(row.id)
-        }
-        rowHeight={TABLE_ROW_HEIGHT}
-      />
+      {/* The body grows by a row in step with the card leaving below. */}
+      <div className="[&_.bg-table-card]:transition-[height,border-radius] [&_.bg-table-card]:duration-250 [&_.bg-table-card]:ease-(--ease-out) motion-reduce:[&_.bg-table-card]:transition-none">
+        <DataTable
+          columns={columns}
+          data={rows}
+          // Without built-in automations the workflows decide whether it's empty.
+          loading={rows.length === 0 && workflowsQuery.isPending}
+          emptyState={
+            <AutopilotTableEmpty
+              action={addMenu}
+              description="Add one, or describe your own in the chat box below."
+              icon={WorkflowSquare03Icon}
+              title="No automations on"
+            />
+          }
+          getRowClassName={(row) =>
+            // Only the glow: the growing body already reveals the row, and
+            // a sliding cell would move the name under the template's label.
+            row.type === "builtin" && arrived.includes(row.kind)
+              ? "motion-safe:animate-[geo-log-row-glow_2.4s_ease-out_backwards]"
+              : undefined
+          }
+          getRowId={(row) => row.id}
+          height={
+            rows.length > 0
+              ? tableHeightFor(rows.length)
+              : AUTOPILOT_EMPTY_TABLE_HEIGHT
+          }
+          onRowClick={(row) =>
+            row.type === "builtin"
+              ? onOpenAutomation(row.kind)
+              : onOpenWorkflow(row.id)
+          }
+          rowHeight={TABLE_ROW_HEIGHT}
+        />
+      </div>
     </div>
   );
+}
+
+/** Kinds turned on since the table first rendered, so their rows can glow in. */
+function useArrivedKinds(enabled: AutopilotAutomationKind[]) {
+  const key = enabled.join();
+  const [seen, setSeen] = useState(key);
+  const [arrived, setArrived] = useState<AutopilotAutomationKind[]>([]);
+  if (key !== seen) {
+    const before = new Set(seen.split(","));
+    setSeen(key);
+    setArrived(enabled.filter((kind) => !before.has(kind)));
+  }
+  return arrived;
 }

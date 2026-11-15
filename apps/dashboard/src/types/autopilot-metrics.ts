@@ -52,7 +52,6 @@ export interface AutopilotAutomationsOverviewProps {
   isRunning: boolean;
   canManage: boolean;
   /** The automation being turned on right now, if any. */
-  addingKind: AutopilotAutomationKind | null;
   onOpenAutomation: (kind: AutopilotAutomationKind) => void;
   onAddAutomation: (kind: AutopilotAutomationKind) => void;
   onRunAutomation: (kind: AutopilotAutomationKind) => void;

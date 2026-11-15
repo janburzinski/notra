@@ -15,7 +15,6 @@ const ALL = AUTOPILOT_TEMPLATES.length;
 const actions: AutopilotTemplateActions = {
   jobs: {},
   canManage: true,
-  isAdding: false,
   onAddBuiltIn: () => undefined,
   onOpenBuiltIn: () => undefined,
 };
@@ -40,22 +39,17 @@ describe("Autopilot templates", () => {
     expect(html).toContain("Ask a workspace admin to enable templates.");
   });
 
-  test("active jobs stay openable for members while inactive jobs are blocked during a save", () => {
+  test("active jobs stay openable for members", () => {
     const html = renderToStaticMarkup(
       <AutopilotTemplatesPage
         {...actions}
         canManage={false}
-        isAdding
         jobs={{ readiness: true }}
       />
     );
     expect(html.match(/<button[^>]*disabled=""/g)).toHaveLength(ALL - 1);
     expect(html).toContain("Open automation");
     expect(html).toContain("Active");
-    const pending = renderToStaticMarkup(
-      <AutopilotTemplatesPage {...actions} isAdding />
-    );
-    expect(pending.match(/<button[^>]*disabled=""/g)).toHaveLength(ALL);
   });
 
   test("featured templates are visible to members and available kinds match real jobs", () => {

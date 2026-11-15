@@ -70,7 +70,6 @@ export function AutopilotTemplateDialog({
   onOpenChange,
   jobs,
   canManage,
-  isAdding,
   onAddBuiltIn,
   onOpenBuiltIn,
 }: AutopilotTemplateDialogProps) {
@@ -90,7 +89,6 @@ export function AutopilotTemplateDialog({
           <TemplateDetails
             active={jobs[template.kind] === true}
             canManage={canManage}
-            isAdding={isAdding}
             onEnable={() => onAddBuiltIn(template.kind)}
             onOpen={() => onOpenBuiltIn(template.kind)}
             template={template}
@@ -142,14 +140,12 @@ function TemplateDetails({
   template,
   active,
   canManage,
-  isAdding,
   onEnable,
   onOpen,
 }: {
   template: AutopilotTemplate;
   active: boolean;
   canManage: boolean;
-  isAdding: boolean;
   onEnable: () => void;
   onOpen: () => void;
 }) {
@@ -234,12 +230,7 @@ function TemplateDetails({
               Open automation
             </Button>
           ) : (
-            <Button
-              disabled={!canManage}
-              loading={isAdding}
-              onClick={onEnable}
-              size="sm"
-            >
+            <Button disabled={!canManage} onClick={onEnable} size="sm">
               Use template
             </Button>
           )}
