@@ -19,6 +19,7 @@ export interface ChatComposerDropOverlayProps {
 export interface ChatComposerAttachmentChipsProps {
   attachments: ChatAttachment[];
   pendingUploads: PendingChatUpload[];
-  removeAttachment: (key: string) => void;
+  /** Left out while the files can't change, e.g. a send waiting on uploads. */
+  removeAttachment?: (key: string) => void;
   setPreviewAttachment: (attachment: ChatAttachment) => void;
 }

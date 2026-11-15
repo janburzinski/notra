@@ -1,35 +1,10 @@
 import type { IconSvgElement } from "@hugeicons/react";
 import type { ChatSessionSummary } from "@notra/ai/types/chat";
-import type { ChatStatus, DynamicToolUIPart, ToolUIPart, UIMessage } from "ai";
 import type { ReactNode } from "react";
 
-/** Tools a host renders itself, such as a preview of what the agent builds. */
-interface ContentChatCustomToolContext {
-  isActive: boolean;
-  /** Set while the tool waits for the user's approval. */
-  onApprove?: () => void;
-  onDeny?: () => void;
-}
+import type { ChatConversationProps } from "@/types/components/chat-conversation";
 
-export interface ContentChatCustomTools {
-  names: ReadonlySet<string>;
-  render: (
-    part: ToolUIPart | DynamicToolUIPart,
-    context: ContentChatCustomToolContext
-  ) => ReactNode;
-}
-
-export interface ContentChatActivityConversationProps {
-  messages: UIMessage[];
-  status: ChatStatus;
-  activeChatId: string | null;
-  organizationSlug?: string;
-  onApproveTool?: (approvalId: string) => void;
-  onDenyTool?: (approvalId: string) => void;
-  customTools?: ContentChatCustomTools;
-}
-
-export interface ContentChatActivityPanelProps extends ContentChatActivityConversationProps {
+export interface ContentChatActivityPanelProps extends ChatConversationProps {
   title?: string;
   /** Replaces the title, e.g. with tabs when the panel hosts more than the agent. */
   titleSlot?: ReactNode;
@@ -41,16 +16,6 @@ export interface ContentChatActivityPanelProps extends ContentChatActivityConver
   onOpenChat?: () => void;
   showHistory?: boolean;
   children?: ReactNode;
-}
-
-export interface ContentChatActivityMessageProps {
-  message: UIMessage;
-  isLoading: boolean;
-  elapsedSeconds?: number;
-  organizationSlug?: string;
-  onApproveTool?: (approvalId: string) => void;
-  onDenyTool?: (approvalId: string) => void;
-  customTools?: ContentChatCustomTools;
 }
 
 export type ContentChatActivityHeaderProps = Pick<
@@ -66,6 +31,7 @@ export type ContentChatActivityHeaderProps = Pick<
   | "onClose"
   | "onOpenChat"
   | "showHistory"
+  | "surface"
 >;
 
 export type ContentChatHistoryItemsProps = Pick<

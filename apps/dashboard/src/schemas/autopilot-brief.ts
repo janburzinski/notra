@@ -1,6 +1,16 @@
 import * as z from "zod";
 
-import { AUTOPILOT_BRIEF_MAX_SECTIONS } from "@/constants/autopilot-brief";
+import {
+  AUTOPILOT_BRIEF_ARTIFACT_HEADINGS,
+  AUTOPILOT_BRIEF_MAX_SECTIONS,
+} from "@/constants/autopilot-brief";
+
+const heading = (key: keyof typeof AUTOPILOT_BRIEF_ARTIFACT_HEADINGS) =>
+  z
+    .string()
+    .describe(
+      `"${AUTOPILOT_BRIEF_ARTIFACT_HEADINGS[key]}" in the brief's language.`
+    );
 
 /** What the model writes for a daily brief page; lengths are clamped after. */
 export const autopilotBriefDraftSchema = z.object({
@@ -31,4 +41,12 @@ export const autopilotBriefDraftSchema = z.object({
       })
     )
     .max(AUTOPILOT_BRIEF_MAX_SECTIONS),
+  headings: z
+    .object({
+      waiting: heading("waiting"),
+      alsoWaiting: heading("alsoWaiting"),
+      merged: heading("merged"),
+      worthKnowing: heading("worthKnowing"),
+    })
+    .describe("Fixed labels for the page, translated; short, sentence case."),
 });

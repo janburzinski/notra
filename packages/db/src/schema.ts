@@ -101,6 +101,7 @@ import type {
   AgentReadinessScoreBreakdown,
 } from "./types/agent-readiness";
 import type { AnalyticsImportCapabilities } from "./types/analytics-imports";
+import type { StoredArtifactContent } from "./types/artifacts";
 import type {
   AutopilotApprovals,
   AutopilotBriefContent,
@@ -5021,6 +5022,10 @@ export const autopilotBriefs = pgTable(
       onDelete: "set null",
     }),
     content: jsonb("content").$type<AutopilotBriefContent>().notNull(),
+    /** The artifact the brief is read as; older briefs have their own page. */
+    artifactId: text("artifact_id").references(() => artifacts.id, {
+      onDelete: "set null",
+    }),
     slackTeamId: text("slack_team_id"),
     slackChannelId: text("slack_channel_id"),
     slackMessageTs: text("slack_message_ts"),
@@ -5178,4 +5183,55 @@ export const autopilotWorkflows = pgTable(
       table.updatedAt
     ),
   ]
+);
+
+/**
+ * A report or visual the agent made in a chat or a Slack thread. Members open
+ * it from the chat or its own page; a share id makes a read-only public copy.
+ */
+export const artifacts = pgTable(
+  "artifacts",
+  {
+    id: text("id").primaryKey(),
+    organizationId: text("organization_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "cascade" }),
+    chatId: text("chat_id").references(() => chatSessions.id, {
+      onDelete: "set null",
+    }),
+    source: text("source").notNull(),
+    title: text("title").notNull(),
+    currentVersion: integer("current_version").notNull().default(1),
+    createdByUserId: text("created_by_user_id").references(() => users.id, {
+      onDelete: "set null",
+    }),
+    shareId: text("share_id"),
+    deletedAt: timestamp("deleted_at"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at")
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (table) => [
+    uniqueIndex("artifacts_shareId_uidx").on(table.shareId),
+    index("artifacts_organizationId_chatId_idx").on(
+      table.organizationId,
+      table.chatId
+    ),
+  ]
+);
+
+/** Every saved version; the agent's edits add one instead of overwriting. */
+export const artifactVersions = pgTable(
+  "artifact_versions",
+  {
+    artifactId: text("artifact_id")
+      .notNull()
+      .references(() => artifacts.id, { onDelete: "cascade" }),
+    version: integer("version").notNull(),
+    content: jsonb("content").$type<StoredArtifactContent>().notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [primaryKey({ columns: [table.artifactId, table.version] })]
 );

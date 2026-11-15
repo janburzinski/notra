@@ -28,6 +28,11 @@ export const dashboardRouter = {
   apiKeys: lazy(() =>
     import("./routers/api-keys").then((m) => ({ default: m.apiKeysRouter }))
   ),
+  artifacts: lazy(() =>
+    import("./routers/artifacts").then((m) => ({
+      default: m.artifactsRouter,
+    }))
+  ),
   attachments: lazy(() =>
     import("./routers/attachments").then((m) => ({
       default: m.attachmentsRouter,

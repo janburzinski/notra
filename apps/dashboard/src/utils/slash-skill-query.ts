@@ -1,5 +1,4 @@
 import type {
-  ApplySlashSkillResult,
   SkillSlashOption,
   SlashMenuKeyHandler,
   SlashSkillQuery,
@@ -56,17 +55,6 @@ export function filterSlashSkills<T extends SkillSlashOption>(
       skill.name.toLowerCase().includes(q) ||
       skill.description.toLowerCase().includes(q)
   );
-}
-
-export function applySlashSkill(
-  text: string,
-  slashQuery: SlashSkillQuery,
-  cursor: number
-): ApplySlashSkillResult {
-  return {
-    text: `${text.slice(0, slashQuery.start)}${text.slice(cursor)}`,
-    cursor: slashQuery.start,
-  };
 }
 
 export function prependTaggedSkills(

@@ -1,8 +1,14 @@
+import { artifactPath } from "@notra/ai/utils/artifact-path";
 import { db } from "@notra/db/drizzle";
-import { autopilotBriefs, members, organizations } from "@notra/db/schema";
+import {
+  artifacts,
+  autopilotBriefs,
+  members,
+  organizations,
+} from "@notra/db/schema";
 import { notFound, redirect } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
-import { and, eq } from "drizzle-orm";
+import { and, eq, isNull } from "drizzle-orm";
 
 import { AUTOPILOT_BRIEF_ID_PATTERN } from "@/constants/autopilot-brief";
 import { getSession } from "@/lib/auth/actions";
@@ -32,11 +38,21 @@ export const loadAutopilotBriefPage = createServerFn({ method: "GET" })
         organizationId: organizations.id,
         organizationSlug: organizations.slug,
         organizationName: organizations.name,
+        artifactId: artifacts.id,
       })
       .from(autopilotBriefs)
       .innerJoin(
         organizations,
         eq(organizations.id, autopilotBriefs.organizationId)
+      )
+      // Briefs written since they became artifacts open as one, unless it
+      // was deleted; older briefs keep their own page.
+      .leftJoin(
+        artifacts,
+        and(
+          eq(artifacts.id, autopilotBriefs.artifactId),
+          isNull(artifacts.deletedAt)
+        )
       )
       .innerJoin(
         members,
@@ -52,5 +68,9 @@ export const loadAutopilotBriefPage = createServerFn({ method: "GET" })
     ) {
       throw notFound();
     }
-    return { briefId, ...row };
+    if (row.artifactId) {
+      throw redirect({ href: artifactPath(row.artifactId) });
+    }
+    const { artifactId: _artifactId, ...organization } = row;
+    return { briefId, ...organization };
   });

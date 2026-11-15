@@ -28,10 +28,10 @@ import { useTranslations } from "use-intl";
 import { AgentQuestionDock } from "@/components/ai/agent-question-dock";
 import { AutopilotWorkflowDraftPreview } from "@/components/autopilot/autopilot-workflow-draft-preview";
 import { autopilotWorkflowDraftTools } from "@/components/autopilot/autopilot-workflow-draft-tools";
-import ChatInput from "@/components/chat-input";
+import { ChatConversation } from "@/components/chat/chat-conversation";
+import { ChatInput } from "@/components/chat/chat-input";
 import { ChatQuoteProvider } from "@/components/chat/chat-quote";
 import { ChatSuggestions } from "@/components/chat/chat-suggestions";
-import { ContentChatActivityConversation } from "@/components/content/content-chat-activity-panel";
 import { ContentPanelHeaderButton } from "@/components/content/content-panel-header-button";
 import { AGENT_QUESTION_INPUT_RETURN_CLASS } from "@/constants/agent-questions";
 import {
@@ -502,12 +502,13 @@ export function AutopilotAgentDock({
                 />
                 <div className={chatCardClass(fullscreen)}>
                   <ChatQuoteProvider key={agent.activeChatId}>
-                    <ContentChatActivityConversation
+                    <ChatConversation
                       activeChatId={agent.activeChatId}
                       customTools={customTools}
                       messages={messages}
                       onApproveTool={agent.handleApproveTool}
                       onDenyTool={agent.handleDenyTool}
+                      organizationId={organizationId}
                       organizationSlug={organizationSlug}
                       status={agent.status}
                     />

@@ -547,6 +547,13 @@ const TOOL_COPY = {
   createSchedule: {
     suffix: (input) => quotedSuffix(input, ["name"]),
   },
+  createArtifact: {
+    suffix: (input) => quotedSuffix(input, ["title"]),
+  },
+  updateArtifact: {
+    suffix: (input) => quotedSuffix(input, ["title"]),
+  },
+  getArtifact: {},
   listSchedules: {},
   schedulePost: {
     suffix: (input) => idSuffix(input, ["postId"]),
@@ -742,6 +749,31 @@ function getSubtitle({
   );
 }
 
+/** What the approval asks for, e.g. `Approve schedule "Weekly report"`. */
+// react-doctor-disable-next-line react-doctor/only-export-components -- reads the tool copy table above; moving it out moves the whole table
+export function getToolApprovalTitle({
+  toolName,
+  input,
+  toolMetadata,
+  t,
+}: {
+  toolName: string;
+  input: unknown;
+  toolMetadata?: unknown;
+  t: ToolBlockTranslator;
+}): string {
+  return getSubtitle({
+    toolName,
+    input,
+    output: undefined,
+    isStreaming: false,
+    isError: false,
+    isAwaitingApproval: true,
+    toolMetadata,
+    t,
+  });
+}
+
 const MAX_JSON_RENDER_CHARS = 20_000;
 
 function stringifyForDisplay(value: unknown): string | undefined {
@@ -752,7 +784,7 @@ function stringifyForDisplay(value: unknown): string | undefined {
   }
 }
 
-function JsonView({ value }: { value: unknown }) {
+export function JsonView({ value }: { value: unknown }) {
   const t = useTranslations("ai.toolBlock");
   const raw = stringifyForDisplay(value);
   if (raw === undefined) {
@@ -1005,6 +1037,7 @@ function ChatToolTrigger({
   );
 }
 
+// react-doctor-disable-next-line react-doctor/no-high-complexity-react-function -- one branch per tool state (streaming, approval, output, error); split in a dedicated refactor
 export function ChatToolBlock({
   toolCallId,
   toolName,
@@ -1012,19 +1045,24 @@ export function ChatToolBlock({
   isActive,
   input,
   output,
-  onApprove,
-  onDeny,
+  onApprove: approve,
+  onDeny: deny,
   editorHref,
   isMcp = false,
   iconUrl,
   mcpLogoDarkUrl,
   mcpLogoLightUrl,
   toolMetadata,
+  approvalInComposer = false,
 }: ChatToolBlockProps) {
   const t = useTranslations("ai.toolBlock");
   const isAwaitingApproval = state === "approval-requested";
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
-  const isOpen = isAwaitingApproval || isDetailsOpen;
+  // An approval asked in the composer stays a single line here, without
+  // buttons of its own.
+  const isOpen = (isAwaitingApproval && !approvalInComposer) || isDetailsOpen;
+  const onApprove = approvalInComposer ? undefined : approve;
+  const onDeny = approvalInComposer ? undefined : deny;
   const isError = state === "output-error" || isFailedToolOutput(output);
   const isPending = state === "input-streaming" || state === "input-available";
   const isStreaming = isActive && isPending;

@@ -228,6 +228,14 @@ export interface AutopilotBriefSection {
   findingIds: string[];
 }
 
+/** Headings the brief's artifact puts above its parts, in the brand's language. */
+export interface AutopilotBriefHeadings {
+  waiting: string;
+  alsoWaiting: string;
+  merged: string;
+  worthKnowing: string;
+}
+
 /**
  * What a daily brief page shows. The agent writes the words; everything that
  * can be acted on comes from the findings, so their status is always current.
@@ -243,6 +251,8 @@ export interface AutopilotBriefContent {
   /** Merged since the previous brief. */
   mergedIds: string[];
   insights: string[];
+  /** Written with the words; older and fallback briefs use the English ones. */
+  headings?: AutopilotBriefHeadings;
   /** "fallback" when the model failed and the words were assembled from the counts. */
   writtenBy: "agent" | "fallback";
 }

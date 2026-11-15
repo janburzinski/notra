@@ -8,19 +8,15 @@ import type {
 import type { ReactNode, Ref } from "react";
 
 import type { QueuedMessage } from "@/components/chat/chat-queue";
+import type { ChatMessageAuthor } from "@/types/chat";
+import type { ChatComposerApproval } from "@/types/chat-approval";
 import type { ChatPostMention } from "@/types/chat-posts";
-import type { PendingChatUpload } from "@/types/hooks/chat-composer-attachments";
-import type { UseContentChatInputResult } from "@/types/hooks/content-chat-input";
 import type { GitHubRepository } from "@/types/integrations";
-import type { SkillSlashOption } from "@/types/skills/slash";
 
-export type ContentChatInputHandle = Pick<
-  ChatInputHandle,
-  "setAttachments" | "focus"
-> & {
+export interface ChatComposerHandle extends ChatInputHandle {
   /** The content page mounts a floating and a panel composer; only one shows. */
   isVisible: () => boolean;
-};
+}
 
 export interface ChatInputEditingTarget {
   title: string;
@@ -28,7 +24,7 @@ export interface ChatInputEditingTarget {
 }
 
 export interface ChatInputProps {
-  ref?: Ref<ContentChatInputHandle>;
+  ref?: Ref<ChatComposerHandle>;
   onSend?: (value: string, attachments: ChatAttachment[]) => void;
   onStop?: () => void;
   isLoading?: boolean;
@@ -62,6 +58,24 @@ export interface ChatInputProps {
   pillExpanded?: boolean;
   /** Lifts the pill off the page with a shadow; on by default for pills. */
   elevated?: boolean;
+  /** `card` draws the input as a dualtone card, for a grey panel shell. */
+  surface?: "default" | "card";
+  /** Text the composer starts with, e.g. from a `?q=` link. */
+  initialValue?: string;
+  /** A stop is on its way; the send button waits for it. */
+  isStopping?: boolean;
+  /** Queued messages show who wrote them in a shared chat. */
+  authorsById?: Map<string, ChatMessageAuthor>;
+  showAuthorAvatars?: boolean;
+  onEmptyChange?: (isEmpty: boolean) => void;
+  /** Keeps an unsent draft, with its context and skills, under this key. */
+  draftStorageKey?: string;
+  /** Posts of this chat the @ menu offers. */
+  postMentions?: readonly ChatPostMention[];
+  /** `document` attaches files dropped anywhere on the page. */
+  dropZone?: "element" | "document";
+  /** A tool waiting on you; the composer asks about it above the input. */
+  approval?: ChatComposerApproval | null;
 }
 
 export interface ChatEffortMenuProps {
@@ -109,43 +123,6 @@ interface ChatPostMentionOption {
 
 export type ChatMentionOption = ChatContextOption | ChatPostMentionOption;
 
-export interface ChatInputContextPickerProps {
-  contextOptions: ChatContextOption[];
-  contextPickerId: string;
-  disabledReason: string | null;
-  isInContext: (item: ContextItem) => boolean;
-  isOpen: boolean;
-  onOpenChange: (open: boolean) => void;
-  organizationSlug?: string;
-  toggleContextItem: (item: ContextItem, inContext: boolean) => void;
-}
-
-export interface ChatInputComposerNudgeProps {
-  chips?: ReactNode;
-  onRetry?: () => void;
-  attachments: ChatAttachment[];
-  context: ContextItem[];
-  editingTarget?: ChatInputEditingTarget;
-  hasAttachmentChips: boolean;
-  hasContextChips: boolean;
-  onClearSelection?: () => void;
-  onEditQueued?: (message: QueuedMessage) => void;
-  onRemoveContext?: (item: ContextItem) => void;
-  onRemoveQueued?: (id: string) => void;
-  onSteerQueued?: (message: QueuedMessage) => void;
-  organizationSlug?: string;
-  pendingUploads: PendingChatUpload[];
-  queuedMessages: QueuedMessage[];
-  remainingChatCredits: number | null;
-  removeAttachment: (key: string) => void;
-  selection?: TextSelection | null;
-  setPreviewAttachment: (attachment: ChatAttachment) => void;
-  shouldShowLowCredits: boolean;
-  taggedSkills: SkillSlashOption[];
-  untagSkill: (name: string) => void;
-  usageLimitError: string | null;
-}
-
 export interface ChatContextOptionContentProps {
   option: ChatContextOption;
 }
@@ -168,37 +145,4 @@ export interface ChatFileAttachmentProps {
   url: string;
   filename?: string;
   mediaType?: string;
-}
-
-export interface ChatInputErrorProps {
-  message: string;
-  onRetry?: () => void;
-}
-
-export interface ChatComposerTextareaProps {
-  input: UseContentChatInputResult;
-  pill: boolean;
-  slashListId: string;
-  /** Set while editing a post, to describe what the message edits. */
-  editingTargetId?: string;
-}
-
-export interface ChatComposerSendButtonProps {
-  input: UseContentChatInputResult;
-}
-
-export interface PillComposerBodyProps {
-  /** Two rows while you write, one otherwise. */
-  open: boolean;
-  attachButton: ReactNode;
-  textarea: ReactNode;
-  sendButton: ReactNode;
-}
-
-export interface CardComposerToolbarProps {
-  input: UseContentChatInputResult;
-  onAddContext: ChatInputProps["onAddContext"];
-  effort: ChatInputProps["effort"];
-  attachButton: ReactNode;
-  sendButton: ReactNode;
 }

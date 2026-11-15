@@ -4,7 +4,9 @@ import { type RefObject, useEffect, useRef, useState } from "react";
 
 function isTextField(target: EventTarget | null) {
   return (
-    target instanceof HTMLTextAreaElement || target instanceof HTMLInputElement
+    target instanceof HTMLTextAreaElement ||
+    target instanceof HTMLInputElement ||
+    (target instanceof HTMLElement && target.isContentEditable)
   );
 }
 

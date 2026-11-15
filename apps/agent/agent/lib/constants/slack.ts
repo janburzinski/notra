@@ -20,6 +20,15 @@ export const AUTOPILOT_SLACK_ACTION_TIMEOUT_MS = 60_000;
 /** `action_id` of the Open buttons on Autopilot briefs and items. */
 export const AUTOPILOT_LEGACY_ACTION_ID_PREFIX = "autopilot_open";
 
+/** Summary characters shown in an artifact's thread message. */
+export const SLACK_ARTIFACT_SUMMARY_MAX = 500;
+
+/** Tools whose result is posted as a message with an Open button. */
+export const SLACK_ARTIFACT_TOOL_NAMES = new Set([
+  "create_artifact",
+  "update_artifact",
+]);
+
 /** Slack's limit for the `markdown_text` field eve uses to post replies. */
 export const SLACK_MARKDOWN_TEXT_MAX_LENGTH = 12_000;
 

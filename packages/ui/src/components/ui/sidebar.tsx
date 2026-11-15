@@ -32,7 +32,6 @@ import { useIsMobile } from "@notra/ui/hooks/use-mobile";
 import { cn } from "@notra/ui/lib/utils";
 import { cva, type VariantProps } from "class-variance-authority";
 import * as React from "react";
-import { flushSync } from "react-dom";
 
 const SIDEBAR_WIDTH = "16rem";
 const SIDEBAR_WIDTH_MOBILE = "18rem";
@@ -87,8 +86,6 @@ function SidebarProvider({
 	const isMobile = useIsMobile();
 	const [openMobile, setOpenMobile] = React.useState(false);
 	const { contentRef, proxyWheelToContent } = useSidebarScroll();
-	const wrapperRef = React.useRef<HTMLDivElement>(null);
-	const composedWrapperRef = useComposedRefs<HTMLDivElement>(wrapperRef, ref);
 
 	const [_open, _setOpen] = React.useState(defaultOpen);
 	const open = openProp ?? _open;
@@ -118,23 +115,15 @@ function SidebarProvider({
 			(event.metaKey || event.ctrlKey)
 		) {
 			event.preventDefault();
-			// Keyboard toggles snap: transitions are off while the new state
-			// commits and styles recalculate, then back on for pointer toggles.
+			// The docked sidebar slides on the shortcut like it does on a click.
 			if (isMobile) {
-				// The mobile sheet renders in a portal outside the wrapper and
-				// Base UI starts its transition a frame later, so the flag sits on
-				// the root until the sheet reports the change as complete.
+				// The mobile sheet still snaps: it renders in a portal outside the
+				// wrapper and Base UI starts its transition a frame later, so the
+				// flag sits on the root until the sheet reports the change as
+				// complete.
 				document.documentElement.setAttribute(SIDEBAR_INSTANT_ATTRIBUTE, "");
-				toggleSidebar();
-				return;
 			}
-			const wrapper = wrapperRef.current;
-			wrapper?.setAttribute(SIDEBAR_INSTANT_ATTRIBUTE, "");
-			flushSync(toggleSidebar);
-			if (wrapper) {
-				wrapper.getBoundingClientRect();
-				wrapper.removeAttribute(SIDEBAR_INSTANT_ATTRIBUTE);
-			}
+			toggleSidebar();
 		}
 	});
 
@@ -177,11 +166,11 @@ function SidebarProvider({
 		<SidebarContext.Provider value={contextValue}>
 			<div
 				className={cn(
-					"group/sidebar-wrapper flex min-h-svh w-full min-w-0 max-w-full has-data-[variant=inset]:bg-sidebar data-sidebar-instant:transition-none! data-sidebar-instant:**:transition-none!",
+					"group/sidebar-wrapper flex min-h-svh w-full min-w-0 max-w-full has-data-[variant=inset]:bg-sidebar",
 					className,
 				)}
 				data-slot="sidebar-wrapper"
-				ref={composedWrapperRef}
+				ref={ref}
 				style={
 					{
 						"--sidebar-width": SIDEBAR_WIDTH,
@@ -595,7 +584,6 @@ function SidebarMenuButton({
 		isActive?: boolean;
 		tooltip?: string | React.ComponentProps<typeof TooltipContent>;
 	} & VariantProps<typeof sidebarMenuButtonVariants>) {
-	const { isMobile, state } = useSidebar();
 	const baseComp = useRender({
 		defaultTagName: "button",
 		props: mergeProps<"button">(
@@ -635,15 +623,29 @@ function SidebarMenuButton({
 	return (
 		<Tooltip>
 			{comp}
-			<TooltipContent
-				align="center"
-				hidden={state !== "collapsed" || isMobile}
-				side="right"
-				sideOffset={8}
-				{...tooltip}
-				showArrow={false}
-			/>
+			<SidebarMenuTooltipContent {...tooltip} />
 		</Tooltip>
+	);
+}
+
+/**
+ * The tooltip only shows in the collapsed rail. Reading the sidebar state
+ * here, not in the button, keeps every menu button from re-rendering when
+ * the sidebar opens or closes.
+ */
+function SidebarMenuTooltipContent(
+	props: React.ComponentProps<typeof TooltipContent>,
+) {
+	const { isMobile, state } = useSidebar();
+	return (
+		<TooltipContent
+			align="center"
+			hidden={state !== "collapsed" || isMobile}
+			side="right"
+			sideOffset={8}
+			{...props}
+			showArrow={false}
+		/>
 	);
 }
 

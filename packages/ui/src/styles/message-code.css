@@ -1,22 +1,22 @@
+/* Code blocks wear the tables' dualtone frame: a grey shell with the language
+   and actions on it, and the code on a lifted card inside. */
 .message-response [data-streamdown="code-block"] {
   position: relative;
   gap: 0;
   overflow: hidden;
-  border-color: var(--border);
-  border-radius: calc(var(--radius) + 4px);
-  background: color-mix(in oklab, var(--muted) 40%, var(--background));
-  padding: 0;
+  border: 1px solid var(--table-shell-border);
+  border-radius: 1rem;
+  background: var(--table-shell);
+  padding: 2px;
   content-visibility: visible !important;
   contain-intrinsic-size: none !important;
 }
 
 .message-response [data-streamdown="code-block-header"] {
-  height: 2.5rem;
-  border-start-start-radius: calc(var(--radius) + 3px);
-  border-start-end-radius: calc(var(--radius) + 3px);
-  border-bottom: 1px solid var(--border);
-  background: var(--muted);
-  padding-inline: 1rem 5rem;
+  height: 2.375rem;
+  border: 0;
+  background: transparent;
+  padding-inline: 0.875rem 5rem;
   color: var(--muted-foreground);
 }
 
@@ -26,9 +26,9 @@
 
 .message-response [data-streamdown="code-block"] > div:has(> [data-streamdown="code-block-actions"]) {
   position: absolute;
-  inset-block-start: 0;
+  inset-block-start: 2px;
   inset-inline-end: 0.375rem;
-  height: 2.5rem;
+  height: 2.375rem;
   margin: 0;
 }
 
@@ -44,8 +44,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 2rem;
-  height: 2rem;
+  width: 1.75rem;
+  height: 1.75rem;
   border-radius: calc(var(--radius) - 4px);
   color: var(--muted-foreground);
   transition-property: color, background-color;
@@ -64,10 +64,11 @@
 }
 
 .message-response [data-streamdown="code-block-body"] {
-  border: 0;
-  border-radius: 0;
-  background: transparent;
-  padding: 1rem;
+  border: 1px solid var(--table-card-border);
+  border-radius: 14px;
+  background: var(--table-card);
+  box-shadow: var(--table-card-shadow);
+  padding: 0.875rem 1rem;
   font-size: 0.8125rem;
   line-height: 1.65;
 }

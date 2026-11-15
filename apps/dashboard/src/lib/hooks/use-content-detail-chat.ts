@@ -45,7 +45,7 @@ import {
 import { useChatEffort } from "@/lib/hooks/use-chat-effort";
 import { useContentDetailChatLabels } from "@/lib/hooks/use-content-detail-chat-labels";
 import type { ContentDetailDocument } from "@/lib/hooks/use-content-detail-document";
-import type { ContentChatInputHandle } from "@/types/components/chat-input";
+import type { ChatComposerHandle } from "@/types/components/chat-input";
 import type { ContentChatMessageMetadata } from "@/types/content/chat";
 import {
   hasPendingApproval,
@@ -113,8 +113,8 @@ export function useContentDetailChat({
   const [chatIdToHydrate, setChatIdToHydrate] = useState<string | null>(null);
   const [chatError, setChatError] = useState<string | null>(null);
 
-  const floatingInputRef = useRef<ContentChatInputHandle | null>(null);
-  const panelInputRef = useRef<ContentChatInputHandle | null>(null);
+  const floatingInputRef = useRef<ChatComposerHandle | null>(null);
+  const panelInputRef = useRef<ChatComposerHandle | null>(null);
   const drainQueueRef = useRef<() => void>(() => {});
   const flushSteerAfterStopRef = useRef<() => void>(() => {});
   const isDrainingRef = useRef(false);

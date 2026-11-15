@@ -13,6 +13,8 @@ import {
   renderPlannerState,
 } from "@notra/ai/utils/autopilot-planner";
 import {
+  artifacts,
+  artifactVersions,
   autopilotBriefs,
   autopilotFindings,
   autopilotRuns,
@@ -272,6 +274,12 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
               findingIds: [...ids, "not-in-the-input"],
             },
           ],
+          headings: {
+            waiting: "Wartet auf dich",
+            alsoWaiting: "Wartet außerdem",
+            merged: "Gemergt",
+            worthKnowing: "",
+          },
         };
       }
       state.feedbackPrompt = input.prompt;
@@ -1420,7 +1428,29 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
     if (!page?.content.lead) {
       throw new Error("Expected a brief page with a lead item");
     }
-    expect(slackMessages[0]).toContain(`/brief/${page.id}`);
+    // The brief is read as an artifact, and Slack links there.
+    if (!page.artifactId) {
+      throw new Error("Expected the brief to be saved as an artifact");
+    }
+    expect(slackMessages[0]).toContain(`/artifact/${page.artifactId}`);
+    const artifact = await db.query.artifacts.findFirst({
+      where: eq(artifacts.id, page.artifactId),
+    });
+    expect(artifact?.source).toBe("autopilot");
+    // Headings come translated with the words; an empty one stays English.
+    expect(page.content.headings).toMatchObject({
+      waiting: "Wartet auf dich",
+      worthKnowing: "Worth knowing",
+    });
+    const version = await db.query.artifactVersions.findFirst({
+      where: eq(artifactVersions.artifactId, page.artifactId),
+    });
+    // The lead item opens the artifact on its own, without a callout above it.
+    expect(version?.content.blocks[0]).toEqual({
+      type: "autopilot",
+      findingIds: [page.content.lead.findingId],
+    });
+    expect(JSON.stringify(version?.content)).not.toContain('"callout"');
     expect(slackMessages[0]).toContain("Two calls to make today");
     expect(page.content.writtenBy).toBe("agent");
     expect(page.content.findingIds).toHaveLength(2);

@@ -1,5 +1,6 @@
 import type { DraggableSyntheticListeners } from "@dnd-kit/core";
 
+import type { ChatArtifactEntry } from "@/types/artifacts";
 import type { ChatAnnotationFocus } from "@/types/chat-annotations";
 import type { ChatPostEntry } from "@/types/chat-posts";
 
@@ -17,14 +18,26 @@ export interface ChatContentPanelProps {
   onReorderTabs: (toolCallIds: string[]) => void;
   organizationId: string;
   organizationSlug: string;
+  organizationName: string;
   posts: ChatPostEntry[];
+  artifacts: ChatArtifactEntry[];
 }
+
+/** One tab of the panel: a post the chat wrote or an artifact it saved. */
+export type ChatContentPanelEntry =
+  | { kind: "post"; id: string; title: string; post: ChatPostEntry }
+  | {
+      kind: "artifact";
+      id: string;
+      title: string;
+      artifact: ChatArtifactEntry;
+    };
 
 export interface ChatContentPanelTabProps {
   isActive: boolean;
   onActivate: () => void;
   onClose: () => void;
-  post: ChatPostEntry;
+  entry: ChatContentPanelEntry;
 }
 
 export interface ChatContentPanelTabSurfaceProps extends ChatContentPanelTabProps {

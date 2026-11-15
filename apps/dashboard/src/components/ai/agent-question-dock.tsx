@@ -9,6 +9,7 @@ import { domAnimation, LazyMotion, m, useReducedMotion } from "motion/react";
 import { useEffect, useEffectEvent, useId, useRef, useState } from "react";
 import { useTranslations } from "use-intl";
 
+import { AnswerMark } from "@/components/ai/answer-mark";
 import { Button } from "@/components/button";
 import {
   AGENT_QUESTION_ADVANCE_DELAY_MS,
@@ -23,31 +24,9 @@ import type {
   AgentQuestionFooterProps,
   AgentQuestionProgressProps,
   AgentQuestionDockProps,
-  AgentQuestionMarkProps,
   AgentQuestionOptionProps,
   AgentQuestionPaneProps,
 } from "@/types/agent-questions";
-
-/**
- * The answer's number, which is also its key: picked, it fills in. Round for
- * a pick-one question, square for pick-all-that-apply.
- */
-function Mark({ multiple, picked, number }: AgentQuestionMarkProps) {
-  return (
-    <span
-      aria-hidden="true"
-      className={cn(
-        "duration-fast flex size-5 shrink-0 items-center justify-center text-xs font-medium tabular-nums ring-1 transition-colors ease-out ring-inset",
-        multiple ? "rounded-md" : "rounded-full",
-        picked
-          ? "bg-primary text-primary-foreground ring-primary"
-          : "bg-background text-muted-foreground ring-border"
-      )}
-    >
-      {number}
-    </span>
-  );
-}
 
 function Option({
   label,
@@ -72,7 +51,7 @@ function Option({
       role={multiple ? "checkbox" : "radio"}
       type="button"
     >
-      <Mark multiple={multiple} number={shortcut} picked={picked} />
+      <AnswerMark multiple={multiple} number={shortcut} picked={picked} />
       <span className="min-w-0 flex-1 space-y-0.5">
         <span className="block text-sm text-pretty">{label}</span>
         {description ? (
@@ -166,7 +145,7 @@ function QuestionPane({
             role={multiple ? "checkbox" : "radio"}
             type="button"
           >
-            <Mark
+            <AnswerMark
               multiple={multiple}
               number={options.length + 1}
               picked={ownAnswerOn}

@@ -156,7 +156,7 @@ function DashboardAgentSlot() {
   }
 
   return (
-    <RightPanel id="agent">
+    <RightPanel id="agent" surface="shell">
       {hasOpened.agent ? (
         <Suspense fallback={<DashboardAgentHostLoading />}>
           <DashboardAgentHost />

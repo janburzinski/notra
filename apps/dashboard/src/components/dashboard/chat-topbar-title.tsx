@@ -231,7 +231,9 @@ export function ChatTopbarTitle({ chatId }: ChatTopbarTitleProps) {
           ) : (
             <motion.div
               animate={{ opacity: 1, filter: "blur(0px)", scale: 1 }}
-              className="min-w-0"
+              // Flex, so the title truncates in a narrow topbar instead of
+              // pushing its chevron out of view.
+              className="flex min-w-0"
               exit={{ opacity: 0, filter: "blur(4px)", scale: 0.98 }}
               initial={{ opacity: 0, filter: "blur(4px)", scale: 0.98 }}
               key="display"

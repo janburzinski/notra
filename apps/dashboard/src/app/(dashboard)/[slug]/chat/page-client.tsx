@@ -8,10 +8,8 @@ import {
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { createdPostToolOutputSchema } from "@notra/ai/schemas/post";
-import { chatTodoListSchema } from "@notra/ai/schemas/todos";
 import type {
   ChatAttachment,
-  ChatInputHandle,
   ChatMessagePart,
   ChatUIMessage,
   ContextItem,
@@ -19,20 +17,13 @@ import type {
 } from "@notra/ai/types/chat";
 import { linkSavedChatPosts } from "@notra/ai/utils/chat-post";
 import { POSTHOG_EVENTS } from "@notra/posthog/events";
-import {
-  MessageContent,
-  MessageResponse,
-} from "@notra/ui/components/ai-elements/message";
 import { Button } from "@notra/ui/components/ui/button";
-import {
-  MessageScroller,
-  MessageScrollerButton,
-  MessageScrollerContent,
-  MessageScrollerItem,
-  MessageScrollerProvider,
-  MessageScrollerViewport,
-} from "@notra/ui/components/ui/message-scroller";
 import { Skeleton } from "@notra/ui/components/ui/skeleton";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@notra/ui/components/ui/tooltip";
 import { EASE } from "@notra/ui/lib/motion";
 import { ORPCError } from "@orpc/client";
 import {
@@ -69,35 +60,15 @@ import {
 } from "react";
 import { useLocale, useTranslations } from "use-intl";
 
-import { ChatActivityStatus } from "@/components/ai/chat-activity-status";
-import { ChatAssistantParts } from "@/components/ai/chat-assistant-parts";
 import { ChatDraftStreamingPreview } from "@/components/ai/chat-draft-streaming-preview";
-import { ChatReasoningBlock } from "@/components/ai/chat-reasoning-block";
-import { ChatSubagentToolPart } from "@/components/ai/chat-subagent-tool-part";
-import { ChatTodoList } from "@/components/ai/chat-todo-list";
-import { ChatToolBlock } from "@/components/ai/chat-tool-block";
-import { getMcpToolServerId } from "@/components/ai/chat-tool-block/mcp/utils";
-import { AssistantMetadataHover } from "@/components/chat/assistant-metadata-hover";
-import { AttachmentPreviewDialog } from "@/components/chat/attachment-preview";
 import { ChatContentPanel } from "@/components/chat/chat-content-panel";
-import { ChatFileAttachment } from "@/components/chat/chat-file-attachment";
+import { ChatConversation } from "@/components/chat/chat-conversation";
 import { ChatHomeSuggestions } from "@/components/chat/chat-home-suggestions";
-import { ChatImageAttachment } from "@/components/chat/chat-image-attachment";
-import {
-  ChatInputAdvanced,
-  type ThinkingLevel,
-} from "@/components/chat/chat-input";
-import { ChatMessageAnnotations } from "@/components/chat/chat-message-annotations";
+import { ChatInput, type ThinkingLevel } from "@/components/chat/chat-input";
 import { ChatMinimapRail } from "@/components/chat/chat-minimap-rail";
 import type { QueuedMessage } from "@/components/chat/chat-queue";
-import {
-  ChatQuoteProvider,
-  ChatQuoteMessage as Message,
-  useChatQuote,
-} from "@/components/chat/chat-quote";
-import { ChatScrollOnSend } from "@/components/chat/chat-scroll-on-send";
+import { ChatQuoteProvider, useChatQuote } from "@/components/chat/chat-quote";
 import { ChatSharePopover } from "@/components/chat/chat-share-popover";
-import { renderTextWithIntegrationReferences } from "@/components/chat/integration-reference";
 import { MessageAuthorAvatar } from "@/components/chat/message-author-avatar";
 import { SlackRelayFooterNotice } from "@/components/chat/slack-relay-footer-notice";
 import {
@@ -108,13 +79,12 @@ import { HeaderActionsPortal } from "@/components/dashboard/header-actions-porta
 import { useRightPanel } from "@/components/dashboard/right-panel-context";
 import { useOrganizationsContext } from "@/components/providers/organization-provider";
 import { CHAT_ACTIVE_STREAM_POLL_INTERVAL_MS } from "@/constants/chat-active-stream";
-import { ACTIVITY_STEP_SETTLE_MS } from "@/constants/chat-activity";
 import { MAX_VISIBLE_CHAT_IMAGES } from "@/constants/chat-images";
 import {
+  CHAT_CREATE_TOOL_NAMES,
   CHAT_CREATE_TOOL_TYPES,
   CHAT_POST_EDIT_TOOL_NAMES,
   CHAT_REFERENCE_TOKEN_SPLIT_REGEX,
-  UPDATE_TODOS_TOOL_NAME,
 } from "@/constants/chat-posts";
 import { TOOL_TIMER_THRESHOLD_SECONDS } from "@/constants/chat-tool-timer";
 import { MIRROR_WORKING_TIMEOUT_MS } from "@/constants/slack-mirror";
@@ -130,27 +100,30 @@ import {
 } from "@/lib/chat/slack-relay";
 import { createStandaloneChatTransport } from "@/lib/chat/standalone-chat-transport";
 import { useActiveProject } from "@/lib/hooks/use-active-project";
-import { useChatActivityTimer } from "@/lib/hooks/use-chat-activity-timer";
 import { useChatPromptSuggestions } from "@/lib/hooks/use-chat-prompt-suggestions";
 import {
   reconcileCreatedChatTitle,
   useChatSessionMutations,
 } from "@/lib/hooks/use-chat-sessions";
-import { useDelayedAppearance } from "@/lib/hooks/use-delayed-appearance";
+import { useChatToolApprovals } from "@/lib/hooks/use-chat-tool-approvals";
 import { useElapsedSeconds } from "@/lib/hooks/use-elapsed-seconds";
+import { useMcpLogosByConnectionId } from "@/lib/hooks/use-mcp-logos";
 import { useSlackMirrorStream } from "@/lib/hooks/use-slack-mirror-stream";
 import { useStableValue } from "@/lib/hooks/use-stable-value";
-import { getMcpIconUrls } from "@/lib/integrations/mcp";
 import { usePathname, useRouter } from "@/lib/navigation";
 import { dashboardOrpcClient } from "@/lib/orpc/client";
 import { dashboardOrpc } from "@/lib/orpc/query";
-import { isImageMimeType } from "@/lib/upload/mime";
 import { cn } from "@/lib/utils";
 import type {
   ChatDraftAction,
   ChatToolApprovalDecision,
 } from "@/types/analytics/studio-events";
 import type { ChatMessageAuthor } from "@/types/chat";
+import type {
+  ChatCustomTools,
+  ChatToolPart,
+} from "@/types/components/chat-conversation";
+import type { ChatComposerHandle } from "@/types/components/chat-input";
 import type {
   ChatTurnEvent,
   ChatTurnPhase,
@@ -159,7 +132,7 @@ import type {
 } from "@/types/components/chat-page";
 import type { PublishedSocialPost } from "@/types/content/post-social";
 import { resolveOrganizationLogo } from "@/utils/avatar";
-import { getChatActivity, hasVisibleChatContent } from "@/utils/chat-activity";
+import { hasVisibleChatContent } from "@/utils/chat-activity";
 import {
   parseChatAnnotations,
   restoreChatReferences,
@@ -169,6 +142,11 @@ import {
   isTerminalToolState,
   shouldContinueAfterApprovalResponse,
 } from "@/utils/chat-approvals";
+import {
+  artifactTabId,
+  getChatArtifacts,
+  getLatestArtifactWrite,
+} from "@/utils/chat-artifact";
 import { handleStandaloneChatError } from "@/utils/chat-error";
 import { chatHistoryQueryOptions } from "@/utils/chat-history-query";
 import {
@@ -195,8 +173,6 @@ import {
   resetNewChatClientState,
   updateWasStoppedByUser,
 } from "@/utils/chat-state";
-import { isChatSubagentName } from "@/utils/chat-subagents";
-import { isContentEditorStandaloneTool } from "@/utils/content-editor-standalone-tool";
 import { formatLongDate } from "@/utils/dashboard-greeting";
 import { getGreetingPeriod } from "@/utils/dashboard-greeting-period";
 import { formatElapsedSeconds } from "@/utils/format-elapsed-seconds";
@@ -312,10 +288,6 @@ function isDispatchingQueued(phase: ChatTurnPhase): boolean {
   return phase === "sendingQueued" || phase === "stoppingForQueue";
 }
 
-function isCreateTool(type: string): boolean {
-  return type in CHAT_CREATE_TOOL_TYPES;
-}
-
 function hasSendableParts(message: ChatUIMessage): boolean {
   return Array.isArray(message.parts) && message.parts.length > 0;
 }
@@ -392,6 +364,7 @@ function UserImageGrid({ children }: UserImageGridProps) {
     <m.div
       className="relative flex w-[28rem] max-w-full flex-wrap justify-end gap-1.5"
       layout={!reduceMotion}
+      layoutDependency={isExpanded}
       ref={gridRef}
       transition={
         reduceMotion ? { duration: 0 } : { duration: 0.3, ease: EASE.out }
@@ -416,6 +389,7 @@ function UserImageGrid({ children }: UserImageGridProps) {
             }
             key={imageItem.key}
             layout={!reduceMotion}
+            layoutDependency={isExpanded}
             transition={
               reduceMotion ? { duration: 0 } : { duration: 0.3, ease: EASE.out }
             }
@@ -445,22 +419,37 @@ function UserImageGrid({ children }: UserImageGridProps) {
 
 function ChatContentPanelToggle({
   count,
-  onOpen,
+  open,
+  onToggle,
 }: {
   count: number;
-  onOpen: () => void;
+  open: boolean;
+  onToggle: () => void;
 }) {
   const t = useTranslations("chat.contentPanel");
+  const label = t("toggle", { count });
   return (
-    <Button
-      className="absolute top-3 right-4 z-20 hidden lg:inline-flex"
-      onClick={onOpen}
-      size="sm"
-      variant="outline"
-    >
-      <HugeiconsIcon className="size-4" icon={File02Icon} strokeWidth={1.8} />
-      {t("toggle", { count })}
-    </Button>
+    <Tooltip>
+      <TooltipTrigger
+        render={
+          <Button
+            aria-label={label}
+            aria-pressed={open}
+            className="hidden lg:inline-flex"
+            data-content-toggle=""
+            onClick={onToggle}
+            size="sm"
+            variant={open ? "secondary" : "outline"}
+          />
+        }
+      >
+        <HugeiconsIcon className="size-4" icon={File02Icon} strokeWidth={1.8} />
+        <span aria-hidden="true" className="tabular-nums">
+          {count}
+        </span>
+      </TooltipTrigger>
+      <TooltipContent>{label}</TooltipContent>
+    </Tooltip>
   );
 }
 
@@ -539,47 +528,7 @@ function StandaloneChatPageClient({
     enabled: Boolean(organizationId),
     staleTime: 1000 * 60 * 5,
   });
-  const { data: customMcpData } = useQuery(
-    dashboardOrpc.integrations.mcp.list.queryOptions({
-      input: { organizationId },
-      enabled: Boolean(organizationId),
-    })
-  );
-  const { data: mcpStoreData } = useQuery(
-    dashboardOrpc.integrations.mcp.storeList.queryOptions({
-      input: { organizationId },
-      enabled: Boolean(organizationId),
-    })
-  );
-  const mcpLogosByConnectionId = useMemo(
-    () =>
-      new Map([
-        ...(customMcpData?.servers ?? []).map(
-          (server) =>
-            [
-              server.id,
-              getMcpIconUrls({
-                darkUrl: server.logoDarkUrl,
-                lightUrl: server.logoLightUrl,
-              }),
-            ] as const
-        ),
-        ...(mcpStoreData?.integrations ?? []).flatMap((integration) =>
-          integration.connection
-            ? [
-                [
-                  integration.connection.id,
-                  getMcpIconUrls({
-                    darkUrl: integration.logoDarkUrl,
-                    lightUrl: integration.logoLightUrl,
-                  }),
-                ] as const,
-              ]
-            : []
-        ),
-      ]),
-    [customMcpData?.servers, mcpStoreData?.integrations]
-  );
+  const mcpLogosByConnectionId = useMcpLogosByConnectionId(organizationId);
   const [pendingMessageId, setPendingMessageId] = useState<string | null>(null);
   const [historyStreamId, setHistoryStreamId] = useState<string | null>(null);
   const isHydrated = useSyncExternalStore(
@@ -602,11 +551,6 @@ function StandaloneChatPageClient({
   const [context, setContext] = useState<ContextItem[]>([]);
   const [hasCustomizedContext, setHasCustomizedContext] = useState(false);
   const [chatError, setChatError] = useState<string | null>(null);
-  const [previewAttachment, setPreviewAttachment] = useState<{
-    url: string;
-    filename: string;
-    mediaType: string;
-  } | null>(null);
   const [queuedMessages, setQueuedMessages] = useState<QueuedMessage[]>([]);
   const [thinkingLevel, setThinkingLevel] = useState<ThinkingLevel>(
     DEFAULT_CHAT_PREFERENCES.thinkingLevel
@@ -615,7 +559,7 @@ function StandaloneChatPageClient({
   const [messageBranches, setMessageBranches] = useState<
     Record<string, { tails: ChatUIMessage[][]; active: number }>
   >({});
-  const chatInputRef = useRef<ChatInputHandle | null>(null);
+  const chatInputRef = useRef<ChatComposerHandle | null>(null);
   const [isInputEmpty, setIsInputEmpty] = useState(true);
   const reduceMotion = useReducedMotion();
 
@@ -837,6 +781,8 @@ function StandaloneChatPageClient({
   });
 
   const chatPosts = useMemo(() => getChatPosts(messages), [messages]);
+  const chatArtifacts = useMemo(() => getChatArtifacts(messages), [messages]);
+  const previewCount = chatPosts.length + chatArtifacts.length;
   const mentionsDraft = chatPosts.flatMap((post) =>
     post.postId
       ? [
@@ -867,9 +813,12 @@ function StandaloneChatPageClient({
     string | null
   >(null);
   const previewTabIds = useMemo(() => {
-    const postIds = new Set(chatPosts.map((post) => post.toolCallId));
+    const postIds = new Set([
+      ...chatPosts.map((post) => post.toolCallId),
+      ...chatArtifacts.map((artifact) => artifact.tabId),
+    ]);
     return storedPreviewTabIds.filter((id) => postIds.has(id));
-  }, [chatPosts, storedPreviewTabIds]);
+  }, [chatArtifacts, chatPosts, storedPreviewTabIds]);
   const previewToolCallId =
     storedPreviewToolCallId && previewTabIds.includes(storedPreviewToolCallId)
       ? storedPreviewToolCallId
@@ -900,15 +849,27 @@ function StandaloneChatPageClient({
     },
     [closePanel, previewTabIds, previewToolCallId]
   );
+  const openArtifact = useCallback(
+    (artifactId: string) => openPostPreview(artifactTabId(artifactId)),
+    [openPostPreview]
+  );
   const openContentPanel = useCallback(() => {
     const activeTab =
       previewToolCallId && previewTabIds.includes(previewToolCallId)
         ? previewToolCallId
-        : (previewTabIds.at(-1) ?? chatPosts.at(-1)?.toolCallId);
+        : (previewTabIds.at(-1) ??
+          chatPosts.at(-1)?.toolCallId ??
+          chatArtifacts.at(-1)?.tabId);
     if (activeTab) {
       openPostPreview(activeTab);
     }
-  }, [chatPosts, openPostPreview, previewTabIds, previewToolCallId]);
+  }, [
+    chatArtifacts,
+    chatPosts,
+    openPostPreview,
+    previewTabIds,
+    previewToolCallId,
+  ]);
   const handleAskForPostChanges = useCallback(
     (post: { postId: string; title: string }) => {
       chatInputRef.current?.insertPostReference({
@@ -1176,9 +1137,8 @@ function StandaloneChatPageClient({
   );
 
   const relayApproval = useCallback(
-    (requestId: string, approved: boolean) => {
-      relayApprovalMutation.mutate({ requestId, approved });
-    },
+    (requestId: string, approved: boolean) =>
+      relayApprovalMutation.mutateAsync({ requestId, approved }),
     [relayApprovalMutation]
   );
 
@@ -1330,11 +1290,30 @@ function StandaloneChatPageClient({
       dispatchTurn("send");
     }
   }, [dispatchTurn, isLoading]);
-  const activitySeconds = useChatActivityTimer(
-    isLoading || isMirrorWorking,
-    stableChatId,
-    messages.at(-1)?.role === "assistant" ? messages.at(-1)?.id : undefined
+
+  // An artifact the agent writes while replying opens in the side panel; the
+  // ones already in the chat when it loads stay closed.
+  const [hasReplied, setHasReplied] = useState(false);
+  if (isLoading && !hasReplied) {
+    setHasReplied(true);
+  }
+  const latestArtifactWrite = useMemo(
+    () => getLatestArtifactWrite(messages),
+    [messages]
   );
+  const latestArtifactWriteCallId = latestArtifactWrite?.toolCallId;
+  const latestWrittenArtifactId = latestArtifactWrite?.artifactId;
+  const openWrittenArtifact = useEffectEvent((artifactId: string) => {
+    if (hasReplied) {
+      openArtifact(artifactId);
+    }
+  });
+  useEffect(() => {
+    if (latestArtifactWriteCallId && latestWrittenArtifactId) {
+      // react-doctor-disable-next-line react-hooks-js/set-state-in-effect -- the tool output arrives from the stream; opening the shared right panel can't happen during render
+      openWrittenArtifact(latestWrittenArtifactId);
+    }
+  }, [latestArtifactWriteCallId, latestWrittenArtifactId]);
   const isPendingAutoSubmit =
     !initialChatId && Boolean(initialQuery?.trim()) && messages.length === 0;
   const isProjectScopePending = !initialChatId && !isProjectResolved;
@@ -2242,564 +2221,108 @@ function StandaloneChatPageClient({
     await handleRetryMessage(lastUserMessage.id);
   }, [handleRetryMessage]);
 
-  const chatActivity = getChatActivity(messages, isLoading || isMirrorWorking, {
-    isStandaloneTool: (part) =>
-      isContentEditorStandaloneTool(part) ||
-      (isToolUIPart(part) && isChatSubagentName(getToolName(part))) ||
-      (isToolUIPart(part) &&
-        part.type !== "dynamic-tool" &&
-        (isCreateTool(part.type) ||
-          part.type === "tool-createImage" ||
-          part.type === `tool-${UPDATE_TODOS_TOOL_NAME}`)),
-  });
-  const showThinkingIndicator = useDelayedAppearance(
-    chatActivity.showThinkingIndicator,
-    {
-      delayMs: ACTIVITY_STEP_SETTLE_MS,
-      immediate: messages.at(-1)?.role !== "assistant",
-    }
-  );
-
-  function renderTodoPart(toolPart: RenderableToolPart, messageId: string) {
-    const message = messages.find((entry) => entry.id === messageId);
-    const todoParts =
-      message?.parts.filter(
-        (part) =>
-          isToolUIPart(part) && getToolName(part) === UPDATE_TODOS_TOOL_NAME
-      ) ?? [];
-    if (todoParts[0] !== toolPart) {
-      return null;
-    }
-    const latest = todoParts.findLast((part, partIndex) => {
-      if (!isToolUIPart(part)) {
-        return false;
-      }
-      const output = part.output as { accepted?: boolean } | undefined;
-      const isComplete =
-        part.state === "input-available" || part.state === "output-available";
-      return (
-        (partIndex === 0 || isComplete) &&
-        output?.accepted !== false &&
-        chatTodoListSchema.safeParse(part.input).success
-      );
+  const trackToolApproval = (
+    part: ChatToolPart,
+    decision: ChatToolApprovalDecision
+  ) =>
+    trackEvent(POSTHOG_EVENTS.CHAT_TOOL_APPROVAL, {
+      tool: getToolName(part),
+      decision,
+      chat_id: stableChatId,
+      relayed_to_slack: isSlackMirrored,
     });
-    const todos = chatTodoListSchema.safeParse(
-      latest && isToolUIPart(latest) ? latest.input : undefined
-    );
-    if (!todos.success) {
-      return null;
-    }
-    const isActive = messageId === chatActivity.activeMessageId;
-    const isLastAssistant =
-      messages.findLast((entry) => entry.role === "assistant")?.id ===
-      messageId;
-    const isStopped = isLastAssistant
-      ? wasStoppedByUser
-      : todos.data.todos.some((todo) => todo.status === "in_progress");
-    return (
-      <ChatTodoList
-        isActive={isActive}
-        isStopped={isStopped}
-        key={toolPart.toolCallId}
-        todos={todos.data.todos}
-      />
-    );
-  }
+  const handleApproveTool = (approvalId: string, part: ChatToolPart) => {
+    trackToolApproval(part, "approved");
+    return isSlackMirrored
+      ? relayApproval(approvalId, true)
+      : addToolApprovalResponse({ id: approvalId, approved: true });
+  };
+  const handleDenyTool = (approvalId: string, part: ChatToolPart) => {
+    trackToolApproval(part, "denied");
+    return isSlackMirrored
+      ? relayApproval(approvalId, false)
+      : addToolApprovalResponse({ id: approvalId, approved: false });
+  };
 
-  function renderPart(
-    part: ChatUIMessage["parts"][number],
-    messageId: string,
-    index: number
+  const { approval: composerApproval, isApprovalInComposer } =
+    useChatToolApprovals({
+      chatId: stableChatId,
+      messages,
+      ownCardToolNames: CHAT_CREATE_TOOL_NAMES,
+      onApprove: handleApproveTool,
+      onDeny: handleDenyTool,
+    });
+
+  /** A draft the agent writes: streams in, then waits to be saved or sent back. */
+  function renderCreateTool(
+    toolPart: ChatToolPart,
+    isActive: boolean,
+    hasInlineActivity: boolean
   ) {
-    if (part.type === "text") {
-      const rawText = part.text as string;
-      if (!rawText.trim()) {
-        return null;
-      }
+    const contentType =
+      CHAT_CREATE_TOOL_TYPES[
+        `tool-${getToolName(toolPart)}` as keyof typeof CHAT_CREATE_TOOL_TYPES
+      ];
+    const input = toolPart.input as
+      | { title?: string; markdown?: string }
+      | undefined;
+    const title = input?.title ?? tCommon("labels.untitled");
+    const markdown = input?.markdown ?? "";
 
-      const annotated = parseChatAnnotations(rawText);
-      if (annotated) {
-        return (
-          <div className="size-full" key={`${messageId}-text-${index}`}>
-            <ChatMessageAnnotations annotations={annotated.annotations} />
-            {annotated.rest.trim()
-              ? renderPart({ ...part, text: annotated.rest }, messageId, index)
-              : null}
-          </div>
-        );
-      }
-      const text = rawText;
-
-      const hasInlineReference =
-        text.includes("integration/github/") ||
-        text.includes("integration/linear/") ||
-        text.includes("integration/mcp/") ||
-        text.includes("@post/");
-
-      if (hasInlineReference) {
-        return (
-          <div
-            className="size-full wrap-break-word whitespace-pre-wrap"
-            key={`${messageId}-text-${index}`}
-          >
-            {renderTextWithIntegrationReferences(
-              text,
-              mcpLogosByConnectionId,
-              postTitlesById
-            )}
-          </div>
-        );
-      }
-
-      return (
-        <MessageResponse
-          isAnimating={messageId === chatActivity.activeMessageId}
-          key={`${messageId}-text-${index}`}
-        >
-          {text}
-        </MessageResponse>
-      );
-    }
-
-    if (part.type === "file") {
-      const url = typeof part.url === "string" ? part.url : "";
-      const mediaType =
-        typeof part.mediaType === "string" ? part.mediaType : "";
-      const filename =
-        typeof part.filename === "string" ? part.filename : undefined;
-      if (!url) {
-        return null;
-      }
-      const fileKey = `${messageId}-file-${index}`;
-      if (isImageMimeType(mediaType)) {
-        return (
-          <ChatImageAttachment
-            filename={filename}
-            key={fileKey}
-            mediaType={mediaType}
-            onClick={() =>
-              setPreviewAttachment({
-                url,
-                filename: filename ?? "attachment",
-                mediaType,
-              })
-            }
-            url={url}
-          />
-        );
-      }
-      return (
-        <ChatFileAttachment
-          filename={filename}
-          key={fileKey}
-          mediaType={mediaType}
-          url={url}
-        />
-      );
-    }
-
-    if (part.type === "reasoning") {
-      const text = part.text as string;
-      if (!text) {
-        return null;
-      }
-      const reasoningKey = `${messageId}-reasoning-${index}`;
-      return <ChatReasoningBlock key={reasoningKey}>{text}</ChatReasoningBlock>;
-    }
-
-    if (isToolUIPart(part)) {
-      const toolPart = part as RenderableToolPart;
-      const toolName = getToolName(toolPart);
-      const staticToolType =
-        toolPart.type === "dynamic-tool" ? null : toolPart.type;
-
-      if (staticToolType && isCreateTool(staticToolType)) {
-        const contentType =
-          CHAT_CREATE_TOOL_TYPES[
-            staticToolType as keyof typeof CHAT_CREATE_TOOL_TYPES
-          ];
-        const input = toolPart.input as
-          | { title?: string; markdown?: string }
-          | undefined;
-        const title = input?.title ?? tCommon("labels.untitled");
-        const markdown = input?.markdown ?? "";
-
-        if (
-          toolPart.state === "input-streaming" ||
-          toolPart.state === "input-available"
-        ) {
-          if (messageId !== chatActivity.activeMessageId) {
-            return (
-              <CompletedToolTimer
-                key={toolPart.toolCallId}
-                toolCallId={toolPart.toolCallId}
-              >
-                <span className="text-muted-foreground text-sm">
-                  Draft generation interrupted
-                </span>
-              </CompletedToolTimer>
-            );
-          }
-          const hasDraftText = Boolean(input?.title || markdown);
-          if (chatActivity.hasInlineActivity) {
-            return hasDraftText ? (
-              <ChatDraftStreamingPreview
-                key={toolPart.toolCallId}
-                markdown={markdown}
-                title={input?.title}
-              />
-            ) : null;
-          }
-          return (
-            <div className="flex flex-col gap-2" key={toolPart.toolCallId}>
-              <CreateToolPendingIndicator toolCallId={toolPart.toolCallId} />
-              {hasDraftText ? (
-                <ChatDraftStreamingPreview
-                  markdown={markdown}
-                  title={input?.title}
-                />
-              ) : null}
-            </div>
-          );
-        }
-
-        if (toolPart.state === "output-error") {
-          return (
-            <CompletedToolTimer
-              key={toolPart.toolCallId}
-              toolCallId={toolPart.toolCallId}
-            >
-              <div className="bg-destructive/10 text-destructive flex w-fit items-center gap-1.5 rounded-md px-2 py-1 text-xs">
-                <HugeiconsIcon className="size-3.5" icon={X} />
-                <span>{t("draftGenerationFailed")}</span>
-              </div>
-            </CompletedToolTimer>
-          );
-        }
-
-        if (toolPart.state === "output-denied") {
-          return (
-            <CompletedToolTimer
-              key={toolPart.toolCallId}
-              toolCallId={toolPart.toolCallId}
-            />
-          );
-        }
-
-        if (toolPart.approval?.reason === "discard") {
-          return (
-            <CompletedToolTimer
-              key={toolPart.toolCallId}
-              toolCallId={toolPart.toolCallId}
-            />
-          );
-        }
-
-        const savedPostResult = createdPostToolOutputSchema.safeParse(
-          toolPart.output
-        );
-        const savedPost = savedPostResult.success
-          ? savedPostResult.data
-          : undefined;
-        const previewState: "draft" | "finished" =
-          toolPart.state === "output-available" ||
-          toolPart.approval?.reason === "manual-draft" ||
-          toolPart.approval?.reason === "manual-published"
-            ? "finished"
-            : "draft";
-        const persistedStatus: "draft" | "published" =
-          savedPost?.status === "published" ||
-          toolPart.approval?.reason === "manual-published"
-            ? "published"
-            : "draft";
-
-        const approvalId =
-          toolPart.state === "approval-requested"
-            ? toolPart.approval.id
-            : undefined;
-        const trackDraftAction = (action: ChatDraftAction) => {
-          trackEvent(POSTHOG_EVENTS.CHAT_DRAFT_ACTION, {
-            action,
-            type: contentType,
-            chat_id: stableChatId,
-            relayed_to_slack: isSlackMirrored,
-          });
-        };
-        const handleApprove = approvalId
-          ? () => {
-              trackDraftAction("approve");
-              return isSlackMirrored
-                ? relayApprovalMutation.mutateAsync({
-                    requestId: approvalId,
-                    approved: true,
-                  })
-                : addToolApprovalResponse({
-                    id: approvalId,
-                    approved: true,
-                  });
-            }
-          : undefined;
-        const handleDeny = approvalId
-          ? () => {
-              trackDraftAction("deny");
-              return isSlackMirrored
-                ? relayApproval(approvalId, false)
-                : addToolApprovalResponse({
-                    id: approvalId,
-                    approved: false,
-                    reason: "discard",
-                  });
-            }
-          : undefined;
-        const handlePersist =
-          approvalId && !isSlackMirrored
-            ? async (
-                status: "draft" | "published",
-                payload: { title: string; markdown: string }
-              ) => {
-                trackDraftAction(
-                  status === "published" ? "save_published" : "save_draft"
-                );
-                const savedPost = await dashboardOrpcClient.chat.posts
-                  .create({
-                    ...payload,
-                    organizationId,
-                    chatId: stableChatId,
-                    toolCallId: toolPart.toolCallId,
-                    contentType,
-                    status,
-                  })
-                  .catch(() => {
-                    throw new Error(tCommon("errors.generic"));
-                  });
-                setMessages((current) =>
-                  linkSavedChatPosts(current, [
-                    {
-                      postId: savedPost.postId,
-                      toolCallId: toolPart.toolCallId,
-                      title: payload.title,
-                      markdown: payload.markdown,
-                      contentType,
-                      status,
-                    },
-                  ])
-                );
-                queryClient.invalidateQueries({
-                  queryKey: ["chat-sessions", organizationId],
-                });
-              }
-            : undefined;
-        const handleRegenerate = approvalId
-          ? async (
-              instructions: string,
-              payload: { title: string; markdown: string }
-            ) => {
-              trackDraftAction("regenerate");
-              const regeneratePrompt = `Regenerate the ${getOutputTypePromptLabel(contentType)} with these changes: ${instructions}\n\nCurrent title: ${payload.title}\n\nCurrent draft:\n${payload.markdown}`;
-              if (isSlackMirrored) {
-                const sent = await relayMessage(regeneratePrompt);
-                if (sent) {
-                  await relayApprovalMutation.mutateAsync({
-                    requestId: approvalId,
-                    approved: false,
-                  });
-                }
-                return;
-              }
-              await addToolApprovalResponse({
-                id: approvalId,
-                approved: false,
-                reason: "discard",
-              });
-              sendMessage({
-                text: regeneratePrompt,
-                metadata: authorMetadata,
-              });
-            }
-          : undefined;
-
-        const handlePublished = (published: PublishedSocialPost) => {
-          trackEvent(POSTHOG_EVENTS.CHAT_DRAFT_ACTION, {
-            action: "publish_social",
-            type: contentType,
-            chat_id: stableChatId,
-            platform: published.platform,
-            relayed_to_slack: isSlackMirrored,
-          });
-          sendMessage({
-            text: buildPublishedChatMessage(published),
-            metadata: authorMetadata,
-          });
-        };
-
-        if (contentType === "twitter_post") {
-          return (
-            <CompletedToolTimer
-              key={toolPart.toolCallId}
-              toolCallId={toolPart.toolCallId}
-            >
-              <TwitterPreview
-                markdown={markdown}
-                onApprove={handleApprove}
-                onDeny={handleDeny}
-                onPersist={handlePersist}
-                onPublished={handlePublished}
-                onRegenerate={handleRegenerate}
-                organization={{
-                  name: organization?.name ?? tCommon("labels.yourName"),
-                  logo: resolveOrganizationLogo(organization?.logo) ?? null,
-                }}
-                organizationId={organizationId}
-                persistedStatus={persistedStatus}
-                state={previewState}
-                title={title}
-              />
-            </CompletedToolTimer>
-          );
-        }
-
-        if (contentType === "linkedin_post") {
-          return (
-            <CompletedToolTimer
-              key={toolPart.toolCallId}
-              toolCallId={toolPart.toolCallId}
-            >
-              <LinkedInPreview
-                markdown={markdown}
-                onApprove={handleApprove}
-                onDeny={handleDeny}
-                onPersist={handlePersist}
-                onPublished={handlePublished}
-                onRegenerate={handleRegenerate}
-                organization={{
-                  name: organization?.name ?? tCommon("labels.yourName"),
-                  logo: resolveOrganizationLogo(organization?.logo) ?? null,
-                }}
-                organizationId={organizationId}
-                persistedStatus={persistedStatus}
-                state={previewState}
-                title={title}
-              />
-            </CompletedToolTimer>
-          );
-        }
-
+    if (
+      toolPart.state === "input-streaming" ||
+      toolPart.state === "input-available"
+    ) {
+      if (!isActive) {
         return (
           <CompletedToolTimer
             key={toolPart.toolCallId}
             toolCallId={toolPart.toolCallId}
           >
-            <BlogChangelogPreview
-              contentType={contentType}
-              organizationId={organizationId}
-              organizationSlug={organizationSlug}
-              postId={savedPost?.postId}
-              onOpenPreview={() => openPostPreview(toolPart.toolCallId)}
-              onRevise={() => {
-                if (savedPost?.postId) {
-                  handleAskForPostChanges({ postId: savedPost.postId, title });
-                } else if (isInputEmpty) {
-                  chatInputRef.current?.setText(t("revisePrefill", { title }));
-                } else {
-                  chatInputRef.current?.focus();
-                }
-              }}
-              markdown={markdown}
-              onApprove={handleApprove}
-              onDeny={handleDeny}
-              onPersist={handlePersist}
-              persistedStatus={persistedStatus}
-              state={previewState}
-              title={title}
-            />
+            <span className="text-muted-foreground text-sm">
+              Draft generation interrupted
+            </span>
           </CompletedToolTimer>
         );
       }
-
-      if (toolName === UPDATE_TODOS_TOOL_NAME) {
-        return renderTodoPart(toolPart, messageId);
-      }
-
-      if (isChatSubagentName(toolName)) {
-        return (
-          <ChatSubagentToolPart
-            isActive={messageId === chatActivity.activeMessageId}
+      const hasDraftText = Boolean(input?.title || markdown);
+      if (hasInlineActivity) {
+        return hasDraftText ? (
+          <ChatDraftStreamingPreview
             key={toolPart.toolCallId}
-            part={toolPart}
+            markdown={markdown}
+            title={input?.title}
           />
-        );
+        ) : null;
       }
+      return (
+        <div className="flex flex-col gap-2" key={toolPart.toolCallId}>
+          <CreateToolPendingIndicator toolCallId={toolPart.toolCallId} />
+          {hasDraftText ? (
+            <ChatDraftStreamingPreview
+              markdown={markdown}
+              title={input?.title}
+            />
+          ) : null}
+        </div>
+      );
+    }
 
-      if (
-        toolPart.state === "input-streaming" ||
-        toolPart.state === "input-available" ||
-        toolPart.state === "approval-requested" ||
-        toolPart.state === "output-available" ||
-        toolPart.state === "output-error"
-      ) {
-        const approvalId =
-          toolPart.state === "approval-requested"
-            ? toolPart.approval.id
-            : undefined;
-        const trackToolApproval = (decision: ChatToolApprovalDecision) => {
-          trackEvent(POSTHOG_EVENTS.CHAT_TOOL_APPROVAL, {
-            tool: toolName,
-            decision,
-            chat_id: stableChatId,
-            relayed_to_slack: isSlackMirrored,
-          });
-        };
-        const handleApprove = approvalId
-          ? () => {
-              trackToolApproval("approved");
-              return isSlackMirrored
-                ? relayApproval(approvalId, true)
-                : addToolApprovalResponse({
-                    id: approvalId,
-                    approved: true,
-                  });
-            }
-          : undefined;
-        const handleDeny = approvalId
-          ? () => {
-              trackToolApproval("denied");
-              return isSlackMirrored
-                ? relayApproval(approvalId, false)
-                : addToolApprovalResponse({
-                    id: approvalId,
-                    approved: false,
-                  });
-            }
-          : undefined;
-        const output =
-          toolPart.state === "output-error"
-            ? { error: toolPart.errorText }
-            : toolPart.output;
-        const toolMetadata =
-          toolPart.type === "dynamic-tool" ? toolPart.toolMetadata : undefined;
-        const mcpLogos = toolName.startsWith("mcp_")
-          ? mcpLogosByConnectionId.get(getMcpToolServerId(toolMetadata) ?? "")
-          : undefined;
+    if (toolPart.state === "output-error") {
+      return (
+        <CompletedToolTimer
+          key={toolPart.toolCallId}
+          toolCallId={toolPart.toolCallId}
+        >
+          <div className="bg-destructive/10 text-destructive flex w-fit items-center gap-1.5 rounded-md px-2 py-1 text-xs">
+            <HugeiconsIcon className="size-3.5" icon={X} />
+            <span>{t("draftGenerationFailed")}</span>
+          </div>
+        </CompletedToolTimer>
+      );
+    }
 
-        return (
-          <ChatToolBlock
-            input={toolPart.input}
-            isActive={messageId === chatActivity.activeMessageId}
-            isMcp={toolName.startsWith("mcp_")}
-            key={toolPart.toolCallId}
-            mcpLogoDarkUrl={mcpLogos?.darkUrl}
-            mcpLogoLightUrl={mcpLogos?.lightUrl}
-            onApprove={handleApprove}
-            onDeny={handleDeny}
-            output={output}
-            state={toolPart.state}
-            toolCallId={toolPart.toolCallId}
-            toolMetadata={toolMetadata}
-            toolName={toolName}
-          />
-        );
-      }
-
+    if (toolPart.state === "output-denied") {
       return (
         <CompletedToolTimer
           key={toolPart.toolCallId}
@@ -2808,8 +2331,235 @@ function StandaloneChatPageClient({
       );
     }
 
-    return null;
+    if (toolPart.approval?.reason === "discard") {
+      return (
+        <CompletedToolTimer
+          key={toolPart.toolCallId}
+          toolCallId={toolPart.toolCallId}
+        />
+      );
+    }
+
+    const savedPostResult = createdPostToolOutputSchema.safeParse(
+      toolPart.output
+    );
+    const savedPost = savedPostResult.success
+      ? savedPostResult.data
+      : undefined;
+    const previewState: "draft" | "finished" =
+      toolPart.state === "output-available" ||
+      toolPart.approval?.reason === "manual-draft" ||
+      toolPart.approval?.reason === "manual-published"
+        ? "finished"
+        : "draft";
+    const persistedStatus: "draft" | "published" =
+      savedPost?.status === "published" ||
+      toolPart.approval?.reason === "manual-published"
+        ? "published"
+        : "draft";
+
+    const approvalId =
+      toolPart.state === "approval-requested"
+        ? toolPart.approval.id
+        : undefined;
+    const trackDraftAction = (action: ChatDraftAction) => {
+      trackEvent(POSTHOG_EVENTS.CHAT_DRAFT_ACTION, {
+        action,
+        type: contentType,
+        chat_id: stableChatId,
+        relayed_to_slack: isSlackMirrored,
+      });
+    };
+    const handleApprove = approvalId
+      ? () => {
+          trackDraftAction("approve");
+          return isSlackMirrored
+            ? relayApproval(approvalId, true)
+            : addToolApprovalResponse({
+                id: approvalId,
+                approved: true,
+              });
+        }
+      : undefined;
+    const handleDeny = approvalId
+      ? () => {
+          trackDraftAction("deny");
+          return isSlackMirrored
+            ? relayApproval(approvalId, false)
+            : addToolApprovalResponse({
+                id: approvalId,
+                approved: false,
+                reason: "discard",
+              });
+        }
+      : undefined;
+    const handlePersist =
+      approvalId && !isSlackMirrored
+        ? async (
+            status: "draft" | "published",
+            payload: { title: string; markdown: string }
+          ) => {
+            trackDraftAction(
+              status === "published" ? "save_published" : "save_draft"
+            );
+            const savedPost = await dashboardOrpcClient.chat.posts
+              .create({
+                ...payload,
+                organizationId,
+                chatId: stableChatId,
+                toolCallId: toolPart.toolCallId,
+                contentType,
+                status,
+              })
+              .catch(() => {
+                throw new Error(tCommon("errors.generic"));
+              });
+            setMessages((current) =>
+              linkSavedChatPosts(current, [
+                {
+                  postId: savedPost.postId,
+                  toolCallId: toolPart.toolCallId,
+                  title: payload.title,
+                  markdown: payload.markdown,
+                  contentType,
+                  status,
+                },
+              ])
+            );
+            queryClient.invalidateQueries({
+              queryKey: ["chat-sessions", organizationId],
+            });
+          }
+        : undefined;
+    const handleRegenerate = approvalId
+      ? async (
+          instructions: string,
+          payload: { title: string; markdown: string }
+        ) => {
+          trackDraftAction("regenerate");
+          const regeneratePrompt = `Regenerate the ${getOutputTypePromptLabel(contentType)} with these changes: ${instructions}\n\nCurrent title: ${payload.title}\n\nCurrent draft:\n${payload.markdown}`;
+          if (isSlackMirrored) {
+            const sent = await relayMessage(regeneratePrompt);
+            if (sent) {
+              await relayApproval(approvalId, false);
+            }
+            return;
+          }
+          await addToolApprovalResponse({
+            id: approvalId,
+            approved: false,
+            reason: "discard",
+          });
+          sendMessage({
+            text: regeneratePrompt,
+            metadata: authorMetadata,
+          });
+        }
+      : undefined;
+
+    const handlePublished = (published: PublishedSocialPost) => {
+      trackEvent(POSTHOG_EVENTS.CHAT_DRAFT_ACTION, {
+        action: "publish_social",
+        type: contentType,
+        chat_id: stableChatId,
+        platform: published.platform,
+        relayed_to_slack: isSlackMirrored,
+      });
+      sendMessage({
+        text: buildPublishedChatMessage(published),
+        metadata: authorMetadata,
+      });
+    };
+
+    if (contentType === "twitter_post") {
+      return (
+        <CompletedToolTimer
+          key={toolPart.toolCallId}
+          toolCallId={toolPart.toolCallId}
+        >
+          <TwitterPreview
+            markdown={markdown}
+            onApprove={handleApprove}
+            onDeny={handleDeny}
+            onPersist={handlePersist}
+            onPublished={handlePublished}
+            onRegenerate={handleRegenerate}
+            organization={{
+              name: organization?.name ?? tCommon("labels.yourName"),
+              logo: resolveOrganizationLogo(organization?.logo) ?? null,
+            }}
+            organizationId={organizationId}
+            persistedStatus={persistedStatus}
+            state={previewState}
+            title={title}
+          />
+        </CompletedToolTimer>
+      );
+    }
+
+    if (contentType === "linkedin_post") {
+      return (
+        <CompletedToolTimer
+          key={toolPart.toolCallId}
+          toolCallId={toolPart.toolCallId}
+        >
+          <LinkedInPreview
+            markdown={markdown}
+            onApprove={handleApprove}
+            onDeny={handleDeny}
+            onPersist={handlePersist}
+            onPublished={handlePublished}
+            onRegenerate={handleRegenerate}
+            organization={{
+              name: organization?.name ?? tCommon("labels.yourName"),
+              logo: resolveOrganizationLogo(organization?.logo) ?? null,
+            }}
+            organizationId={organizationId}
+            persistedStatus={persistedStatus}
+            state={previewState}
+            title={title}
+          />
+        </CompletedToolTimer>
+      );
+    }
+
+    return (
+      <CompletedToolTimer
+        key={toolPart.toolCallId}
+        toolCallId={toolPart.toolCallId}
+      >
+        <BlogChangelogPreview
+          contentType={contentType}
+          organizationId={organizationId}
+          organizationSlug={organizationSlug}
+          postId={savedPost?.postId}
+          onOpenPreview={() => openPostPreview(toolPart.toolCallId)}
+          onRevise={() => {
+            if (savedPost?.postId) {
+              handleAskForPostChanges({ postId: savedPost.postId, title });
+            } else if (isInputEmpty) {
+              chatInputRef.current?.setText(t("revisePrefill", { title }));
+            } else {
+              chatInputRef.current?.focus();
+            }
+          }}
+          markdown={markdown}
+          onApprove={handleApprove}
+          onDeny={handleDeny}
+          onPersist={handlePersist}
+          persistedStatus={persistedStatus}
+          state={previewState}
+          title={title}
+        />
+      </CompletedToolTimer>
+    );
   }
+
+  const createTools: ChatCustomTools = {
+    names: CHAT_CREATE_TOOL_NAMES,
+    render: (part, { isActive, hasInlineActivity }) =>
+      renderCreateTool(part, isActive, hasInlineActivity),
+  };
 
   if (isLoadingHistory) {
     return <ChatPageSkeleton />;
@@ -2852,7 +2602,9 @@ function StandaloneChatPageClient({
             {isProjectScopePending ? (
               <ProjectScopeLoadingInput />
             ) : (
-              <ChatInputAdvanced
+              <ChatInput
+                approval={composerApproval}
+                dropZone="document"
                 authorsById={messageAuthorsById}
                 context={context}
                 draftStorageKey={draftStorageKey}
@@ -2890,26 +2642,14 @@ function StandaloneChatPageClient({
     );
   }
 
-  const lastMessage = messages.at(-1);
   const visibleMessages = messages.filter((message) =>
     hasVisibleChatContent(message)
   );
-  const lastVisibleMessage = visibleMessages.at(-1);
-  // Once the reply is on screen, a pause between steps shows its status inside
-  // the reply, where the next step will render, instead of below it.
-  const isThinkingInline =
-    showThinkingIndicator &&
-    lastVisibleMessage?.role === "assistant" &&
-    lastVisibleMessage.id === lastMessage?.id;
-  const thinkingStatus = (
-    <span className="text-muted-foreground flex items-center gap-2 text-sm leading-5">
-      <ChatActivityStatus
-        active={!isStopping}
-        label={isStopping ? t("stopping") : tCommon("labels.thinkingLabel")}
-        seconds={activitySeconds ?? 0}
-      />
-    </span>
-  );
+  const branchPointIndex = branchSwitchSignal
+    ? visibleMessages.findIndex(
+        (message) => message.id === branchSwitchSignal.userMessageId
+      )
+    : -1;
   const minimapTurns = buildChatMinimapTurns(visibleMessages, (message) =>
     toDisplayText(getUserMessageText(message))
   );
@@ -2920,246 +2660,171 @@ function StandaloneChatPageClient({
         <div className="@container/chat relative flex min-w-0 flex-1 flex-col overflow-hidden">
           {visibleMessages.length > 0 ? (
             <HeaderActionsPortal>
-              <ChatSharePopover chatId={stableChatId} />
+              <div className="flex items-center gap-2">
+                {previewCount > 0 ? (
+                  <ChatContentPanelToggle
+                    count={previewCount}
+                    onToggle={() =>
+                      isPreviewOpen ? closePanel("preview") : openContentPanel()
+                    }
+                    open={isPreviewOpen}
+                  />
+                ) : null}
+                <ChatSharePopover chatId={stableChatId} />
+              </div>
             </HeaderActionsPortal>
           ) : null}
-          {chatPosts.length > 0 && !isPreviewOpen ? (
-            <ChatContentPanelToggle
-              count={chatPosts.length}
-              onOpen={openContentPanel}
-            />
-          ) : null}
-          <MessageScrollerProvider autoScroll>
-            <ChatScrollOnSend
-              lastUserMessageId={
-                visibleMessages.findLast((message) => message.role === "user")
-                  ?.id
-              }
-            />
-            <MessageScroller className="min-h-0 flex-1">
-              <MessageScrollerViewport className="min-w-0 overflow-x-hidden">
-                <MessageScrollerContent className="gap-8 px-4 pt-6 pb-8">
-                  {(() => {
-                    const branchPointIndex = branchSwitchSignal
-                      ? visibleMessages.findIndex(
-                          (m) => m.id === branchSwitchSignal.userMessageId
-                        )
-                      : -1;
-                    const lastAssistantMessageId =
-                      lastVisibleMessage?.role === "assistant"
-                        ? lastVisibleMessage.id
-                        : undefined;
-                    return visibleMessages.map((message, messageIndex) => {
-                      const isUser = message.role === "user";
-                      const isGenerating =
-                        (isLoading || isMirrorWorking) &&
-                        message.id === lastAssistantMessageId;
-                      const isEditing =
-                        isUser && editingMessageId === message.id;
-                      const userContentParts = isUser
-                        ? message.parts.filter((part) => part.type !== "file")
-                        : message.parts;
-                      const userAttachmentParts = isUser
-                        ? message.parts.filter((part) => part.type === "file")
-                        : [];
-                      const branches = isUser
-                        ? messageBranches[message.id]
-                        : undefined;
-                      const branchTotal = branches?.tails.length ?? 0;
-                      const branchIdx = branches?.active ?? 0;
-                      const isDownstreamOfBranchSwitch =
-                        branchPointIndex !== -1 &&
-                        messageIndex > branchPointIndex;
-                      const branchFadeKey = isDownstreamOfBranchSwitch
-                        ? `${message.id}-${branchSwitchSignal?.tick}`
-                        : message.id;
-                      const messageAuthor =
-                        isUser && showMessageAuthorAvatars
-                          ? resolveChatMessageAuthor({
-                              metadata: message.metadata,
-                              membersById: messageAuthorsById,
-                              sessionUser: session?.user,
-                            })
-                          : null;
-                      return (
-                        <MessageScrollerItem
-                          className="mx-auto w-full max-w-2xl"
-                          key={branchFadeKey}
-                          messageId={message.id}
+          <ChatConversation
+            activeChatId={stableChatId}
+            customTools={createTools}
+            getMessageClassName={(_message, index) =>
+              branchPointIndex !== -1 &&
+              index > branchPointIndex &&
+              "chat-branch-fade-in"
+            }
+            getMessageKey={(message, index) =>
+              branchPointIndex !== -1 && index > branchPointIndex
+                ? `${message.id}-${branchSwitchSignal?.tick}`
+                : message.id
+            }
+            isStandalonePartVisible={(content) =>
+              !isValidElement<ComponentProps<typeof CompletedToolTimer>>(
+                content
+              ) ||
+              content.type !== CompletedToolTimer ||
+              content.props.children != null
+            }
+            isApprovalInComposer={isApprovalInComposer}
+            isStopping={isStopping}
+            isWorking={isMirrorWorking}
+            layout="page"
+            mcpLogosByConnectionId={mcpLogosByConnectionId}
+            messages={messages}
+            notices={
+              <>
+                {wasStoppedByUser && !isLoading && (
+                  <div className="bg-destructive/10 text-destructive flex w-fit items-center gap-1.5 rounded-md px-2 py-1 text-xs">
+                    <HugeiconsIcon className="size-3.5" icon={X} />
+                    <span>{t("responseStopped")}</span>
+                  </div>
+                )}
+                {chatError && !isLoading && (
+                  <div className="bg-destructive/10 text-destructive flex w-fit flex-wrap items-center gap-2 rounded-md px-2.5 py-1.5 text-xs">
+                    <HugeiconsIcon className="size-3.5 shrink-0" icon={X} />
+                    <span>{chatError}</span>
+                    {!isSlackMirrored && (
+                      <button
+                        className="focus-visible:ring-ring inline-flex items-center gap-1 rounded font-medium underline-offset-2 transition-colors hover:underline focus-visible:ring-2 focus-visible:outline-none"
+                        onClick={handleRetryAfterError}
+                        type="button"
+                      >
+                        <HugeiconsIcon
+                          className="size-3.5"
+                          icon={ArrowReloadHorizontalIcon}
+                        />
+                        <span>{tCommon("actions.retry")}</span>
+                      </button>
+                    )}
+                  </div>
+                )}
+              </>
+            }
+            onApproveTool={handleApproveTool}
+            onDenyTool={handleDenyTool}
+            onOpenArtifact={openArtifact}
+            organizationId={organizationId}
+            organizationSlug={organizationSlug}
+            overlay={<ChatMinimapRail turns={minimapTurns} />}
+            postTitlesById={postTitlesById}
+            renderUserMessage={(uiMessage, _index, renderContentPart) => {
+              const message = uiMessage as ChatUIMessage;
+              const isEditing = editingMessageId === message.id;
+              const contentParts = message.parts.filter(
+                (part) => part.type !== "file"
+              );
+              const attachmentParts = message.parts.filter(
+                (part) => part.type === "file"
+              );
+              const branches = messageBranches[message.id];
+              const branchTotal = branches?.tails.length ?? 0;
+              const messageAuthor = showMessageAuthorAvatars
+                ? resolveChatMessageAuthor({
+                    metadata: message.metadata,
+                    membersById: messageAuthorsById,
+                    sessionUser: session?.user,
+                  })
+                : null;
+              const messageText = toDisplayText(getUserMessageText(message));
+              return (
+                <>
+                  <m.div
+                    className="ml-auto flex w-full max-w-full items-start justify-end gap-2"
+                    layout={!reduceMotion}
+                    // Animates opening and closing the editor only; a resized
+                    // chat column (a side panel opening) must not glide every
+                    // bubble.
+                    layoutDependency={isEditing}
+                    transition={{ duration: 0.22, ease: EASE.out }}
+                  >
+                    <div className="flex w-full min-w-0 flex-col items-end gap-2">
+                      {attachmentParts.length > 0 && (
+                        <UserImageGrid>
+                          {attachmentParts.map((part, index) =>
+                            renderContentPart(
+                              part,
+                              `${message.id}-file-${index}`
+                            )
+                          )}
+                        </UserImageGrid>
+                      )}
+                      {(isEditing || contentParts.length > 0) && (
+                        <UserMessageTextBubble
+                          initialText={messageText}
+                          isEditing={isEditing}
+                          onCancel={handleCancelEditMessage}
+                          onSubmit={(text) =>
+                            handleEditMessage(message.id, text)
+                          }
                         >
-                          <Message
-                            className={cn(
-                              "group/message relative",
-                              isDownstreamOfBranchSwitch &&
-                                "chat-branch-fade-in"
-                            )}
-                            from={message.role}
-                          >
-                            {isUser ? (
-                              <m.div
-                                className="ml-auto flex w-full max-w-full items-start justify-end gap-2"
-                                layout={!reduceMotion}
-                                transition={{
-                                  duration: 0.22,
-                                  ease: EASE.out,
-                                }}
-                              >
-                                <div className="flex w-full min-w-0 flex-col items-end gap-2">
-                                  {userAttachmentParts.length > 0 && (
-                                    <UserImageGrid>
-                                      {userAttachmentParts.map((part, index) =>
-                                        renderPart(part, message.id, index)
-                                      )}
-                                    </UserImageGrid>
-                                  )}
-                                  {(isEditing ||
-                                    userContentParts.length > 0) && (
-                                    <UserMessageTextBubble
-                                      initialText={toDisplayText(
-                                        getUserMessageText(message)
-                                      )}
-                                      isEditing={isEditing}
-                                      onCancel={handleCancelEditMessage}
-                                      onSubmit={(text) =>
-                                        handleEditMessage(message.id, text)
-                                      }
-                                    >
-                                      {userContentParts.map((part, index) =>
-                                        renderPart(part, message.id, index)
-                                      )}
-                                    </UserMessageTextBubble>
-                                  )}
-                                </div>
-                                {messageAuthor ? (
-                                  <MessageAuthorAvatar author={messageAuthor} />
-                                ) : null}
-                              </m.div>
-                            ) : (
-                              <MessageContent>
-                                <ChatAssistantParts
-                                  activityTimings={
-                                    message.metadata?.activityTimings
-                                  }
-                                  durationMs={
-                                    message.metadata?.generationDurationMs
-                                  }
-                                  elapsedSeconds={
-                                    message.id === lastMessage?.id
-                                      ? activitySeconds
-                                      : undefined
-                                  }
-                                  isLoading={isGenerating}
-                                  isStandalonePartVisible={(content) =>
-                                    !isValidElement<
-                                      ComponentProps<typeof CompletedToolTimer>
-                                    >(content) ||
-                                    content.type !== CompletedToolTimer ||
-                                    content.props.children != null
-                                  }
-                                  isStandaloneTool={(part) =>
-                                    isContentEditorStandaloneTool(part) ||
-                                    (isToolUIPart(part) &&
-                                      isChatSubagentName(getToolName(part))) ||
-                                    (isToolUIPart(part) &&
-                                      part.type !== "dynamic-tool" &&
-                                      (isCreateTool(part.type) ||
-                                        part.type === "tool-createImage" ||
-                                        part.type ===
-                                          `tool-${UPDATE_TODOS_TOOL_NAME}`))
-                                  }
-                                  messageId={message.id}
-                                  parts={message.parts}
-                                  renderStandalone={(part, index) =>
-                                    renderPart(part, message.id, index)
-                                  }
-                                  renderTool={(part, index) =>
-                                    renderPart(part, message.id, index)
-                                  }
-                                />
-                                {isThinkingInline &&
-                                message.id === lastAssistantMessageId
-                                  ? thinkingStatus
-                                  : null}
-                              </MessageContent>
-                            )}
-                            {isUser && !isSlackMirrored && (
-                              <UserMessageActions
-                                branchIndex={
-                                  branchTotal > 1 ? branchIdx : undefined
-                                }
-                                branchTotal={
-                                  branchTotal > 1 ? branchTotal : undefined
-                                }
-                                canInteract={!isLoading}
-                                className={messageAuthor ? "pr-10" : undefined}
-                                isEditing={isEditing}
-                                messageText={toDisplayText(
-                                  getUserMessageText(message)
-                                )}
-                                onEdit={() =>
-                                  handleStartEditMessage(message.id)
-                                }
-                                onNextBranch={() =>
-                                  handleSwitchBranch(message.id, "next")
-                                }
-                                onPreviousBranch={() =>
-                                  handleSwitchBranch(message.id, "prev")
-                                }
-                                onRetry={() => handleRetryMessage(message.id)}
-                              />
-                            )}
-                            {message.role === "assistant" && !isGenerating && (
-                              <AssistantMetadataHover
-                                metadata={message.metadata}
-                              />
-                            )}
-                          </Message>
-                        </MessageScrollerItem>
-                      );
-                    });
-                  })()}
-                  {wasStoppedByUser && !isLoading && (
-                    <div className="mx-auto w-full max-w-2xl">
-                      <div className="bg-destructive/10 text-destructive flex w-fit items-center gap-1.5 rounded-md px-2 py-1 text-xs">
-                        <HugeiconsIcon className="size-3.5" icon={X} />
-                        <span>{t("responseStopped")}</span>
-                      </div>
+                          {contentParts.map((part, index) =>
+                            renderContentPart(
+                              part,
+                              `${message.id}-text-${index}`
+                            )
+                          )}
+                        </UserMessageTextBubble>
+                      )}
                     </div>
+                    {messageAuthor ? (
+                      <MessageAuthorAvatar author={messageAuthor} />
+                    ) : null}
+                  </m.div>
+                  {!isSlackMirrored && (
+                    <UserMessageActions
+                      branchIndex={
+                        branchTotal > 1 ? (branches?.active ?? 0) : undefined
+                      }
+                      branchTotal={branchTotal > 1 ? branchTotal : undefined}
+                      canInteract={!isLoading}
+                      className={messageAuthor ? "pr-10" : undefined}
+                      isEditing={isEditing}
+                      messageText={messageText}
+                      onEdit={() => handleStartEditMessage(message.id)}
+                      onNextBranch={() =>
+                        handleSwitchBranch(message.id, "next")
+                      }
+                      onPreviousBranch={() =>
+                        handleSwitchBranch(message.id, "prev")
+                      }
+                      onRetry={() => handleRetryMessage(message.id)}
+                    />
                   )}
-                  {chatError && !isLoading && (
-                    <div className="mx-auto w-full max-w-2xl">
-                      <div className="bg-destructive/10 text-destructive flex w-fit flex-wrap items-center gap-2 rounded-md px-2.5 py-1.5 text-xs">
-                        <HugeiconsIcon className="size-3.5 shrink-0" icon={X} />
-                        <span>{chatError}</span>
-                        {!isSlackMirrored && (
-                          <button
-                            className="focus-visible:ring-ring inline-flex items-center gap-1 rounded font-medium underline-offset-2 transition-colors hover:underline focus-visible:ring-2 focus-visible:outline-none"
-                            onClick={handleRetryAfterError}
-                            type="button"
-                          >
-                            <HugeiconsIcon
-                              className="size-3.5"
-                              icon={ArrowReloadHorizontalIcon}
-                            />
-                            <span>{tCommon("actions.retry")}</span>
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  )}
-                  {showThinkingIndicator && !isThinkingInline && (
-                    <div className="mx-auto w-full max-w-2xl">
-                      <Message from="assistant">
-                        <MessageContent>{thinkingStatus}</MessageContent>
-                      </Message>
-                    </div>
-                  )}
-                </MessageScrollerContent>
-              </MessageScrollerViewport>
-              <MessageScrollerButton />
-              <ChatMinimapRail turns={minimapTurns} />
-            </MessageScroller>
-          </MessageScrollerProvider>
+                </>
+              );
+            }}
+            status={status}
+            wasStoppedByUser={wasStoppedByUser}
+          />
           <div
             className={cn(
               "bg-background z-10 px-4 pb-4",
@@ -3185,7 +2850,9 @@ function StandaloneChatPageClient({
               {isProjectScopePending ? (
                 <ProjectScopeLoadingInput />
               ) : (
-                <ChatInputAdvanced
+                <ChatInput
+                  approval={composerApproval}
+                  dropZone="document"
                   authorsById={messageAuthorsById}
                   context={context}
                   draftStorageKey={draftStorageKey}
@@ -3213,16 +2880,7 @@ function StandaloneChatPageClient({
           </div>
         </div>
       </LazyMotion>
-      <AttachmentPreviewDialog
-        attachment={previewAttachment}
-        onOpenChange={(open) => {
-          if (!open) {
-            setPreviewAttachment(null);
-          }
-        }}
-        open={previewAttachment !== null}
-      />
-      {chatPosts.length > 0 ? (
+      {previewCount > 0 ? (
         <ChatContentPanel
           activeToolCallId={previewToolCallId}
           focus={annotationFocus}
@@ -3233,6 +2891,8 @@ function StandaloneChatPageClient({
           onReorderTabs={setPreviewTabIds}
           openToolCallIds={previewTabIds}
           organizationId={organizationId}
+          artifacts={chatArtifacts}
+          organizationName={organization?.name ?? ""}
           organizationSlug={organizationSlug}
           posts={chatPosts}
         />

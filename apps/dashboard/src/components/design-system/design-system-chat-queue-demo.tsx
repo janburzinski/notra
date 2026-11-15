@@ -1,7 +1,6 @@
 "use client";
 
-import ChatInput from "@/components/chat-input";
-import { ChatInputAdvanced } from "@/components/chat/chat-input";
+import { ChatInput } from "@/components/chat/chat-input";
 import {
   DESIGN_SYSTEM_QUEUED_MESSAGES,
   DESIGN_SYSTEM_STEERING_MESSAGES,
@@ -18,7 +17,7 @@ function AiChatQueuePreview({
 }) {
   return (
     <div className="max-w-2xl">
-      <ChatInputAdvanced
+      <ChatInput
         isLoading
         onEditQueued={ignoreQueuedEdit}
         onRemoveQueued={ignoreQueuedRemove}

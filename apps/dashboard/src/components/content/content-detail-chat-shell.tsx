@@ -15,7 +15,7 @@ import {
   useLayoutEffect,
 } from "react";
 
-import ChatInput from "@/components/chat-input";
+import { ChatInput } from "@/components/chat/chat-input";
 import type { QueuedMessage } from "@/components/chat/chat-queue";
 import { ContentChatActivityPanel } from "@/components/content/content-chat-activity-panel";
 import {
@@ -34,11 +34,11 @@ import {
 import type {
   ChatInputEditingTarget,
   ChatInputProps,
-  ContentChatInputHandle,
+  ChatComposerHandle,
 } from "@/types/components/chat-input";
 
 export interface ContentDetailChatComposerProps {
-  ref: RefObject<ContentChatInputHandle | null>;
+  ref: RefObject<ChatComposerHandle | null>;
   context: ContextItem[];
   disabled: boolean;
   error: string | null;

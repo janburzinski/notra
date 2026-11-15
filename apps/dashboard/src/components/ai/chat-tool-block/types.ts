@@ -36,6 +36,8 @@ export interface ChatToolBlockProps {
   mcpLogoDarkUrl?: string | null;
   mcpLogoLightUrl?: string | null;
   toolMetadata?: unknown;
+  /** The composer asks about this approval, so the block keeps closed. */
+  approvalInComposer?: boolean;
 }
 
 export type ChatToolIconProps = Pick<

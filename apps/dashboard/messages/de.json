@@ -6696,6 +6696,17 @@
     }
   },
   "chat": {
+    "approval": {
+      "allowOnce": "Einmal erlauben",
+      "allowForChat": "Für diesen Chat erlauben",
+      "deny": "Ablehnen",
+      "showInput": "Eingabe anzeigen",
+      "hideInput": "Eingabe ausblenden",
+      "replyPlaceholder": "Sag Notra, was es stattdessen tun soll…",
+      "send": "Senden",
+      "label": "Freigabe nötig",
+      "failed": "Deine Antwort wurde nicht gesendet. Versuch es noch einmal."
+    },
     "shared": {
       "sendAMessage": "Nachricht senden",
       "queueAMessage": "Nachricht einreihen…",
@@ -6733,7 +6744,8 @@
         "mcpGroup": "MCP-Tools"
       },
       "mention": {
-        "noneConnected": "Kein Kontext und keine MCP-Tools verbunden",
+        "emptyTitle": "Noch nichts zum Erwähnen",
+        "emptyDescription": "Verbinde GitHub, Linear oder einen MCP-Server, dann holt @ ihre Repos, Teams und Tools in den Chat.",
         "noMatches": "Keine Treffer gefunden",
         "connectIntegrations": "Integrationen verbinden",
         "postsGroup": "In diesem Chat"
@@ -6995,9 +7007,7 @@
       "close": "Panel einklappen",
       "empty": "Beiträge, die der Agent in diesem Chat schreibt, erscheinen hier.",
       "status": {
-        "writing": "Wird geschrieben…",
-        "unsaved": "Noch nicht gespeichert",
-        "draft": "Entwurf"
+        "writing": "Wird geschrieben…"
       },
       "openTab": "Weiteren Beitrag öffnen",
       "closeTab": "{title} schließen",
@@ -8345,7 +8355,10 @@
         "getAutopilotWorkflow": "{state, select, running {Workflow wird gelesen} done {Workflow gelesen} approve {Lesen des Workflows bestätigen} other {Workflow konnte nicht gelesen werden}}",
         "getAutopilotWorkflowRun": "{state, select, running {Workflow-Lauf wird geprüft} done {Workflow-Lauf geprüft} approve {Prüfen des Workflow-Laufs bestätigen} other {Workflow-Lauf konnte nicht geprüft werden}}",
         "saveAutopilotWorkflow": "{state, select, running {Workflow wird gespeichert} done {Workflow gespeichert} approve {Speichern des Workflows bestätigen} other {Workflow konnte nicht gespeichert werden}}",
-        "runAutopilotWorkflow": "{state, select, running {Workflow wird gestartet} done {Workflow gestartet} approve {Start des Workflows bestätigen} other {Workflow konnte nicht gestartet werden}}"
+        "runAutopilotWorkflow": "{state, select, running {Workflow wird gestartet} done {Workflow gestartet} approve {Start des Workflows bestätigen} other {Workflow konnte nicht gestartet werden}}",
+        "createArtifact": "{state, select, running {Erstelle Artefakt} done {Artefakt erstellt} approve {Genehmigen: Artefakt} other {Fehlgeschlagen: Artefakt}}",
+        "updateArtifact": "{state, select, running {Aktualisiere Artefakt} done {Artefakt aktualisiert} approve {Genehmigen: Artefakt} other {Fehlgeschlagen: Artefakt}}",
+        "getArtifact": "{state, select, running {Lese Artefakt} done {Artefakt gelesen} approve {Genehmigen: Artefakt} other {Fehlgeschlagen: Artefakt}}"
       },
       "withSuffix": "{label} {suffix}",
       "memory": {
@@ -10286,5 +10299,46 @@
       },
       "approvalsHint": "Bei Auto wird der Pull Request zur Prüfung freigegeben und am nächsten Werktag um 9:00 veröffentlicht, wenn niemand eingreift."
     }
+  },
+  "artifacts": {
+    "label": "Artefakt",
+    "dailyBrief": "Tagesbriefing",
+    "versionShort": "v{version}",
+    "version": "Version {version}",
+    "viewingOld": "Du siehst Version {version}.",
+    "showLatest": "Neueste anzeigen",
+    "open": "Öffnen",
+    "openPage": "In neuem Tab öffnen",
+    "openChat": "Chat öffnen",
+    "more": "Weitere Aktionen",
+    "delete": "Löschen",
+    "deleteTitle": "Dieses Artefakt löschen?",
+    "deleteDescription": "Es verschwindet aus dem Chat und seine Links funktionieren nicht mehr. Das lässt sich nicht rückgängig machen.",
+    "deleted": "Artefakt gelöscht",
+    "deleteFailed": "Das Artefakt konnte nicht gelöscht werden",
+    "loadFailed": "Dieses Artefakt konnte nicht geladen werden",
+    "gone": "Dieses Artefakt wurde gelöscht",
+    "retry": "Erneut versuchen",
+    "loading": "Artefakt wird geladen",
+    "madeWith": "Erstellt mit Notra",
+    "share": {
+      "button": "Teilen",
+      "title": "Artefakt teilen",
+      "accessLabel": "Wer den Link öffnen kann",
+      "access": {
+        "team": "Nur {organization}",
+        "public": "Alle mit dem Link"
+      },
+      "linkLabel": "Link zum Artefakt",
+      "copy": "Kopieren",
+      "copied": "Kopiert",
+      "createdAndCopied": "Öffentlicher Link erstellt und kopiert",
+      "created": "Öffentlicher Link erstellt",
+      "revoked": "Nur dein Team kann dieses Artefakt jetzt öffnen",
+      "publishFailed": "Der öffentliche Link konnte nicht erstellt werden",
+      "revokeFailed": "Der öffentliche Link konnte nicht deaktiviert werden"
+    },
+    "sources": "Quellen",
+    "latest": "Neueste"
   }
 }

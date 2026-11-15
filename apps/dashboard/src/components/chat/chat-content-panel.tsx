@@ -17,6 +17,7 @@ import {
   useSortable,
 } from "@dnd-kit/sortable";
 import {
+  Analytics01Icon,
   Cancel01Icon,
   PlusSignIcon,
   SidebarRightIcon,
@@ -47,6 +48,7 @@ import { EASE } from "@notra/ui/lib/motion";
 import { cn } from "@notra/ui/lib/utils";
 import {
   type CSSProperties,
+  type ReactNode,
   useEffect,
   useEffectEvent,
   useRef,
@@ -56,10 +58,13 @@ import { createPortal } from "react-dom";
 import { toast } from "sonner";
 import { useTranslations } from "use-intl";
 
+import { ChatArtifactDocument } from "@/components/artifacts/chat-artifact-document";
 import { useChatQuote } from "@/components/chat/chat-quote";
+import { ContentStatusBadge } from "@/components/content/overview/content-status-badge";
 import { RightPanel } from "@/components/dashboard/right-panel";
 import { useRightPanel } from "@/components/dashboard/right-panel-context";
 import Link from "@/components/framework/link";
+import { RIGHT_PANEL_SHELL_CARD_CLASSNAME } from "@/constants/right-panel";
 import { useAnnotationFlash } from "@/lib/hooks/use-annotation-flash";
 import { useAnnotationHighlights } from "@/lib/hooks/use-annotation-highlights";
 import { useContent } from "@/lib/hooks/use-content";
@@ -68,6 +73,7 @@ import { useOutputTypeLabel } from "@/lib/hooks/use-output-type-label";
 import type { ChatPostEntry } from "@/types/chat-posts";
 import type {
   ChatContentPanelDocumentProps,
+  ChatContentPanelEntry,
   ChatContentPanelProps,
   ChatContentPanelTabProps,
   ChatContentPanelTabSurfaceProps,
@@ -118,21 +124,30 @@ function ChatContentPanelDocument({
     () => quoteContext?.clearAnnotationFocus()
   );
 
-  let status = t("status.unsaved");
+  // Nothing to say or do yet (not saved, not writing): no footer at all.
+  const hasFooter = post.state === "writing" || Boolean(postId);
+  // While writing it says so; once saved, the post's status badge. A draft
+  // that isn't saved yet shows nothing.
+  let status: ReactNode = null;
   if (post.state === "writing") {
-    status = t("status.writing");
-  } else if (postId) {
-    status =
-      savedPost?.content.status === "published"
-        ? tCommon("labels.published")
-        : t("status.draft");
+    status = (
+      <span className="text-muted-foreground truncate text-xs">
+        {t("status.writing")}
+      </span>
+    );
+  } else if (postId && savedPost) {
+    status = <ContentStatusBadge status={savedPost.content.status} />;
   }
 
   return (
     <>
       <div
         aria-label={tPreview("contentRegion", { type: title })}
-        className="bg-background mx-2 min-h-0 flex-1 overflow-y-auto overscroll-contain rounded-lg border px-6 py-6 focus-visible:outline-none"
+        className={cn(
+          RIGHT_PANEL_SHELL_CARD_CLASSNAME,
+          "min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-5 focus-visible:outline-none",
+          !hasFooter && "mb-0.5"
+        )}
         ref={scrollRef}
         role="region"
         // oxlint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- The scrollable preview must be reachable for keyboard scrolling.
@@ -176,34 +191,58 @@ function ChatContentPanelDocument({
           )}
         </article>
       </div>
-      <footer className="flex h-12 shrink-0 items-center justify-between gap-2 px-4">
-        <span
-          aria-live="polite"
-          className="text-muted-foreground truncate text-xs"
-        >
-          {status}
-        </span>
-        {postId ? (
-          <div className="-mr-1.5 flex items-center gap-1">
-            <Button
-              onClick={() => onAskForChanges({ ...post, postId, title })}
-              size="sm"
-              variant="ghost"
-            >
-              {tPreview("askForChanges")}
-            </Button>
-            <Button
-              nativeButton={false}
-              render={<Link href={`/${organizationSlug}/content/${postId}`} />}
-              size="sm"
-              variant="secondary"
-            >
-              {tToolBlock("openInEditor")}
-            </Button>
+      {hasFooter ? (
+        <footer className="flex h-12 shrink-0 items-center justify-between gap-2 px-4">
+          <div aria-live="polite" className="flex min-w-0 items-center">
+            {status}
           </div>
-        ) : null}
-      </footer>
+          {postId ? (
+            <div className="-mr-1.5 flex items-center gap-1">
+              <Button
+                onClick={() => onAskForChanges({ ...post, postId, title })}
+                size="sm"
+                variant="ghost"
+              >
+                {tPreview("askForChanges")}
+              </Button>
+              <Button
+                nativeButton={false}
+                render={
+                  <Link href={`/${organizationSlug}/content/${postId}`} />
+                }
+                size="sm"
+                variant="secondary"
+              >
+                {tToolBlock("openInEditor")}
+              </Button>
+            </div>
+          ) : null}
+        </footer>
+      ) : null}
     </>
+  );
+}
+
+function ChatContentPanelEntryIcon({
+  entry,
+}: {
+  entry: ChatContentPanelEntry;
+}) {
+  if (entry.kind === "artifact") {
+    return (
+      <HugeiconsIcon
+        aria-hidden="true"
+        className="size-3.5 shrink-0"
+        icon={Analytics01Icon}
+        strokeWidth={1.8}
+      />
+    );
+  }
+  return (
+    <OutputTypeIcon
+      className="size-3.5 shrink-0"
+      outputType={entry.post.contentType}
+    />
   );
 }
 
@@ -213,11 +252,11 @@ function ChatContentPanelTabSurface({
   isOverlay = false,
   onActivate,
   onClose,
-  post,
+  entry,
 }: ChatContentPanelTabSurfaceProps) {
   const t = useTranslations("chat.contentPanel");
   const tCommon = useTranslations("common");
-  const title = post.title || tCommon("labels.untitled");
+  const title = entry.title || tCommon("labels.untitled");
 
   return (
     <div
@@ -245,10 +284,7 @@ function ChatContentPanelTabSurface({
         type="button"
         {...dragHandleProps}
       >
-        <OutputTypeIcon
-          className="size-3.5 shrink-0"
-          outputType={post.contentType}
-        />
+        <ChatContentPanelEntryIcon entry={entry} />
         <span
           className={cn(
             "truncate",
@@ -281,10 +317,10 @@ function ChatContentPanelTab({
   isActive,
   onActivate,
   onClose,
-  post,
+  entry,
 }: ChatContentPanelTabProps) {
   const { setNodeRef, listeners, transform, transition, isDragging } =
-    useSortable({ id: post.toolCallId });
+    useSortable({ id: entry.id });
 
   return (
     <div
@@ -293,7 +329,7 @@ function ChatContentPanelTab({
         "-my-1 overflow-clip py-1 transition-[max-width,min-width,opacity] duration-200 ease-out [overflow-clip-margin:4px] motion-reduce:transition-none starting:max-w-0 starting:min-w-0 starting:opacity-0",
         isDragging && "opacity-35"
       )}
-      data-tab-id={post.toolCallId}
+      data-tab-id={entry.id}
       ref={setNodeRef}
       style={{
         transform: transform
@@ -307,7 +343,7 @@ function ChatContentPanelTab({
         isActive={isActive}
         onActivate={onActivate}
         onClose={onClose}
-        post={post}
+        entry={entry}
       />
     </div>
   );
@@ -324,30 +360,58 @@ export function ChatContentPanel({
   openToolCallIds,
   organizationId,
   organizationSlug,
+  organizationName,
   posts,
+  artifacts,
 }: ChatContentPanelProps) {
   const t = useTranslations("chat.contentPanel");
   const tCommon = useTranslations("common");
   const getOutputTypeLabel = useOutputTypeLabel();
   const { active, closePanel } = useRightPanel();
   const isDesktop = useDesktopBreakpoint();
-  const postsById = new Map(posts.map((post) => [post.toolCallId, post]));
-  const openPosts = openToolCallIds.flatMap((id) => {
-    const post = postsById.get(id);
-    return post ? [post] : [];
+  const tArtifacts = useTranslations("artifacts");
+  const entries: ChatContentPanelEntry[] = [
+    ...posts.map((post) => ({
+      kind: "post" as const,
+      id: post.toolCallId,
+      title: post.title,
+      post,
+    })),
+    ...artifacts.map((artifact) => ({
+      kind: "artifact" as const,
+      id: artifact.tabId,
+      title: artifact.title,
+      artifact,
+    })),
+  ];
+  const entriesById = new Map(entries.map((entry) => [entry.id, entry]));
+  const openEntries = openToolCallIds.flatMap((id) => {
+    const entry = entriesById.get(id);
+    return entry ? [entry] : [];
   });
   const openIds = new Set(openToolCallIds);
-  const closedPosts = posts.filter((post) => !openIds.has(post.toolCallId));
-  const activePost = openPosts.find(
-    (post) => post.toolCallId === activeToolCallId
+  const closedEntries = entries.filter((entry) => !openIds.has(entry.id));
+  const activeEntry = openEntries.find(
+    (entry) => entry.id === activeToolCallId
   );
+  // Closing the last tab closes the panel; it keeps showing that tab while it
+  // slides out instead of flashing the empty state.
+  const [lastEntryId, setLastEntryId] = useState<string | null>(null);
+  if (activeEntry && activeEntry.id !== lastEntryId) {
+    setLastEntryId(activeEntry.id);
+  }
+  const shownEntry =
+    activeEntry ??
+    (active !== "preview" && lastEntryId
+      ? entriesById.get(lastEntryId)
+      : undefined);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } })
   );
   const tablistRef = useRef<HTMLDivElement>(null);
   const [draggingId, setDraggingId] = useState<string | null>(null);
-  const draggingPost = draggingId ? postsById.get(draggingId) : undefined;
+  const draggingEntry = draggingId ? entriesById.get(draggingId) : undefined;
   const keepInTabBar: Modifier = ({ transform, draggingNodeRect }) => {
     const bar = tablistRef.current?.getBoundingClientRect();
     if (!(bar && draggingNodeRect)) {
@@ -366,7 +430,7 @@ export function ChatContentPanel({
     if (!over || active.id === over.id) {
       return;
     }
-    const ids = openPosts.map((post) => post.toolCallId);
+    const ids = openEntries.map((entry) => entry.id);
     onReorderTabs(
       arrayMove(
         ids,
@@ -428,7 +492,7 @@ export function ChatContentPanel({
             role="tablist"
             style={
               {
-                "--tabs-max-width": `calc(${openPosts.length} * 16rem + ${Math.max(openPosts.length - 1, 0)} * 0.25rem)`,
+                "--tabs-max-width": `calc(${openEntries.length} * 16rem + ${Math.max(openEntries.length - 1, 0)} * 0.25rem)`,
               } as CSSProperties
             }
           >
@@ -441,16 +505,16 @@ export function ChatContentPanel({
               sensors={sensors}
             >
               <SortableContext
-                items={openPosts.map((post) => post.toolCallId)}
+                items={openEntries.map((entry) => entry.id)}
                 strategy={horizontalListSortingStrategy}
               >
-                {openPosts.map((post) => (
+                {openEntries.map((entry) => (
                   <ChatContentPanelTab
-                    isActive={post.toolCallId === activePost?.toolCallId}
-                    key={post.toolCallId}
-                    onActivate={() => onActivateTab(post.toolCallId)}
-                    onClose={() => onCloseTab(post.toolCallId)}
-                    post={post}
+                    entry={entry}
+                    isActive={entry.id === activeEntry?.id}
+                    key={entry.id}
+                    onActivate={() => onActivateTab(entry.id)}
+                    onClose={() => onCloseTab(entry.id)}
                   />
                 ))}
               </SortableContext>
@@ -460,15 +524,13 @@ export function ChatContentPanel({
                   modifiers={[keepInTabBar]}
                   zIndex={60}
                 >
-                  {draggingPost ? (
+                  {draggingEntry ? (
                     <ChatContentPanelTabSurface
-                      isActive={
-                        draggingPost.toolCallId === activePost?.toolCallId
-                      }
+                      entry={draggingEntry}
+                      isActive={draggingEntry.id === activeEntry?.id}
                       isOverlay
                       onActivate={noop}
                       onClose={noop}
-                      post={draggingPost}
                     />
                   ) : null}
                 </DragOverlay>,
@@ -482,7 +544,7 @@ export function ChatContentPanel({
                 render={
                   <DropdownMenuTrigger
                     className="inline-flex shrink-0"
-                    disabled={closedPosts.length === 0}
+                    disabled={closedEntries.length === 0}
                     render={<Button size="icon-sm" variant="ghost" />}
                   />
                 }
@@ -497,20 +559,19 @@ export function ChatContentPanel({
               <TooltipContent>{t("openTab")}</TooltipContent>
             </Tooltip>
             <DropdownMenuContent align="start" className="w-72" sideOffset={6}>
-              {closedPosts.map((post) => (
+              {closedEntries.map((entry) => (
                 <DropdownMenuItem
-                  key={post.toolCallId}
-                  onClick={() => onOpenTab(post.toolCallId)}
+                  key={entry.id}
+                  onClick={() => onOpenTab(entry.id)}
                 >
-                  <OutputTypeIcon
-                    className="size-3.5 shrink-0"
-                    outputType={post.contentType}
-                  />
+                  <ChatContentPanelEntryIcon entry={entry} />
                   <span className="min-w-0 flex-1 truncate">
-                    {post.title || tCommon("labels.untitled")}
+                    {entry.title || tCommon("labels.untitled")}
                   </span>
                   <span className="text-muted-foreground shrink-0 text-xs">
-                    {getOutputTypeLabel(post.contentType)}
+                    {entry.kind === "post"
+                      ? getOutputTypeLabel(entry.post.contentType)
+                      : tArtifacts("label")}
                   </span>
                 </DropdownMenuItem>
               ))}
@@ -518,18 +579,29 @@ export function ChatContentPanel({
           </DropdownMenu>
         </TooltipProvider>
       </header>
-      {activePost ? (
+      {shownEntry?.kind === "post" ? (
         <ChatContentPanelDocument
           focus={
-            focus && focus.postId === activePost.postId ? focus : undefined
+            focus && focus.postId === shownEntry.post.postId ? focus : undefined
           }
-          key={activePost.toolCallId}
+          key={shownEntry.id}
           onAskForChanges={onAskForChanges}
           organizationId={organizationId}
           organizationSlug={organizationSlug}
-          post={activePost}
+          post={shownEntry.post}
         />
-      ) : (
+      ) : null}
+      {shownEntry?.kind === "artifact" ? (
+        <ChatArtifactDocument
+          entry={shownEntry.artifact}
+          key={shownEntry.id}
+          onDeleted={() => onCloseTab(shownEntry.id)}
+          organizationId={organizationId}
+          organizationName={organizationName}
+          organizationSlug={organizationSlug}
+        />
+      ) : null}
+      {shownEntry ? null : (
         <p className="text-muted-foreground px-4 text-sm">{t("empty")}</p>
       )}
     </>
@@ -537,7 +609,7 @@ export function ChatContentPanel({
 
   if (isDesktop) {
     return (
-      <RightPanel id="preview" size="wide">
+      <RightPanel id="preview" size="wide" surface="shell">
         {content}
       </RightPanel>
     );

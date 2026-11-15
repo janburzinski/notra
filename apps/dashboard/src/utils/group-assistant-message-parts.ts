@@ -14,6 +14,7 @@ import type {
   AssistantActivityStep,
   AssistantActivityWaitingStep,
 } from "@/types/components/chat-activity-group";
+import { parseToolOutputArtifact } from "@/utils/chat-artifact";
 import {
   isSearchToolPart,
   isStackableSearchPart,
@@ -41,10 +42,12 @@ function isActivityPart(
   if (!isToolUIPart(part)) {
     return false;
   }
-  // A finished chart is part of the answer, not the work log that collapses.
+  // A finished chart or artifact is part of the answer, not the work log
+  // that collapses.
   if (
     part.state === "output-available" &&
-    parseToolOutputChart(part.output) !== undefined
+    (parseToolOutputChart(part.output) !== undefined ||
+      parseToolOutputArtifact(part.output) !== undefined)
   ) {
     return false;
   }

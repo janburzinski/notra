@@ -1,7 +1,7 @@
 import { AutopilotWorkflowDraftPreview } from "@/components/autopilot/autopilot-workflow-draft-preview";
 import { AUTOPILOT_WORKFLOW_PREVIEW_TOOLS } from "@/constants/autopilot-workflows";
 import type { AutopilotWorkflowDraftToolsOptions } from "@/types/autopilot-workflows";
-import type { ContentChatCustomTools } from "@/types/components/content-chat-activity-panel";
+import type { ChatCustomTools } from "@/types/components/chat-conversation";
 import { readAutopilotWorkflowDraft } from "@/utils/autopilot-workflow-draft";
 
 /**
@@ -11,22 +11,24 @@ import { readAutopilotWorkflowDraft } from "@/utils/autopilot-workflow-draft";
 export function autopilotWorkflowDraftTools({
   latestToolCallId,
   compactAll = false,
-}: AutopilotWorkflowDraftToolsOptions): ContentChatCustomTools {
+}: AutopilotWorkflowDraftToolsOptions): ChatCustomTools {
   return {
     names: AUTOPILOT_WORKFLOW_PREVIEW_TOOLS,
     render: (part, { onApprove, onDeny }) => {
       const draft = readAutopilotWorkflowDraft(part);
       return draft ? (
-        <AutopilotWorkflowDraftPreview
-          draft={draft}
-          onApprove={onApprove}
-          onDeny={onDeny}
-          variant={
-            compactAll || draft.toolCallId !== latestToolCallId
-              ? "compact"
-              : "inline"
-          }
-        />
+        <div className="py-1">
+          <AutopilotWorkflowDraftPreview
+            draft={draft}
+            onApprove={onApprove}
+            onDeny={onDeny}
+            variant={
+              compactAll || draft.toolCallId !== latestToolCallId
+                ? "compact"
+                : "inline"
+            }
+          />
+        </div>
       ) : null;
     },
   };

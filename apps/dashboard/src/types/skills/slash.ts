@@ -8,11 +8,6 @@ export interface SlashSkillQuery {
   start: number;
 }
 
-export interface ApplySlashSkillResult {
-  text: string;
-  cursor: number;
-}
-
 export interface SlashMenuKeyHandler {
   isOpen: boolean;
   matchCount: number;

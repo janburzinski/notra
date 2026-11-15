@@ -88,14 +88,15 @@ export function ProjectSwitcherTrigger({
   if (!project) {
     return (
       <SidebarMenuButton
-        className="data-popup-open:bg-sidebar-accent cursor-pointer"
+        className="data-popup-open:bg-sidebar-accent cursor-pointer [--sidebar-lg-icon:1.75rem]"
         size="lg"
         tooltip="Notra"
         {...props}
       >
-        <span className="bg-background flex size-7 shrink-0 items-center justify-center rounded-lg dark:bg-[#F6F3F1]">
+        {/* A div, not a span: the collapsed rail hides a button's spans. */}
+        <div className="bg-background flex size-7 shrink-0 items-center justify-center rounded-lg dark:bg-[#F6F3F1]">
           <Notra className="size-7 dark:size-5" />
-        </span>
+        </div>
         <SidebarLabel className="flex-1 text-base font-semibold">
           Notra
         </SidebarLabel>

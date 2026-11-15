@@ -59,6 +59,10 @@ function ComposerNudgeShell({ children }: { children: ReactNode }) {
   const reduceMotion = useReducedMotion();
   const contentRef = useRef<HTMLDivElement>(null);
   const [height, setHeight] = useState<number | "auto">("auto");
+  // The tray slides open once; after that it follows its content at once,
+  // so rows that animate themselves (a queued message leaving) aren't chased
+  // by a second, lagging height animation.
+  const [settled, setSettled] = useState(false);
 
   useLayoutEffect(() => {
     const element = contentRef.current;
@@ -77,10 +81,18 @@ function ComposerNudgeShell({ children }: { children: ReactNode }) {
       animate={{ height, opacity: 1 }}
       className="overflow-hidden"
       // react-doctor-disable-next-line react-doctor/no-layout-property-animation -- the tray has to push the input card down, a transform would leave a gap
-      exit={{ height: 0, opacity: 0 }}
+      exit={{
+        // react-doctor-disable-next-line react-doctor/no-layout-property-animation -- the tray has to push the input card down, a transform would leave a gap
+        height: 0,
+        opacity: 0,
+        transition: reduceMotion ? { duration: 0 } : TRANSITION.resize,
+      }}
       // react-doctor-disable-next-line react-doctor/no-layout-property-animation -- the tray has to push the input card down, a transform would leave a gap
       initial={{ height: 0, opacity: 0 }}
-      transition={reduceMotion ? { duration: 0 } : TRANSITION.resize}
+      onAnimationComplete={() => setSettled(true)}
+      transition={
+        reduceMotion || settled ? { duration: 0 } : TRANSITION.resize
+      }
     >
       <div ref={contentRef}>{children}</div>
     </m.div>
@@ -102,18 +114,71 @@ function cardLight({ highlight, lifted }: ComposerCardLightOptions) {
   return lifted ? COMPOSER_ELEVATED_SHADOW : undefined;
 }
 
+/**
+ * The composer as a dualtone card. Queued messages sit on a tinted sheet of
+ * the same material, barely narrower, tucked under the input's top edge so
+ * the two read as one stack.
+ */
+function CardComposerFrame({
+  children,
+  nudge,
+  className,
+}: Pick<ComposerFrameProps, "children" | "nudge" | "className">) {
+  const hasNudge = Boolean(nudge);
+  return (
+    <div
+      className={cn("flex w-full min-w-0 flex-col", className)}
+      data-slot="composer"
+    >
+      <LazyMotion features={domAnimation} strict>
+        <AnimatePresence initial={false}>
+          {nudge ? (
+            <ComposerNudgeShell key="nudge">
+              {/* One compact line per message, its text lined up with the
+                  input's text below. The bottom padding hides under the card. */}
+              <div className="border-table-card-border bg-muted/50 mx-1.5 rounded-t-[9px] border border-b-0 pb-2 [&_[data-slot=composer-chip]]:py-0.5 [&_[data-slot=composer-chip]]:pl-0.75 [&_[data-slot=composer-nudge]]:px-0.5 [&_[data-slot=composer-nudge]]:py-1.5">
+                {nudge}
+              </div>
+            </ComposerNudgeShell>
+          ) : null}
+        </AnimatePresence>
+      </LazyMotion>
+      <div
+        className={cn(
+          "border-table-card-border bg-table-card shadow-table-card relative z-10 min-w-0 overflow-hidden rounded-[10px] border",
+          hasNudge && "-mt-2"
+        )}
+        data-slot="composer-card"
+      >
+        {children}
+      </div>
+    </div>
+  );
+}
+
+// react-doctor-disable-next-line react-doctor/no-high-complexity-react-function -- each branch is one optional slot of the frame
 function ComposerFrame({
   children,
   nudge,
   connectedTop = false,
   flat = false,
+  rimless = false,
   elevated = false,
   size = "default",
   highlight = false,
+  surface = "default",
   className,
 }: ComposerFrameProps) {
   const hasNudge = Boolean(nudge);
-  const showTray = hasNudge || !flat;
+  const isCard = surface === "card";
+  const showTray = hasNudge || !(flat || rimless);
+  if (isCard) {
+    return (
+      <CardComposerFrame className={className} nudge={nudge}>
+        {children}
+      </CardComposerFrame>
+    );
+  }
 
   return (
     <div

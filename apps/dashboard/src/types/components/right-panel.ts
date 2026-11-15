@@ -39,4 +39,6 @@ export interface RightPanelProps {
   children: ReactNode;
   /** `wide` docks at reading width for document previews. */
   size?: "default" | "wide";
+  /** `shell` is the tables' dualtone frame, for panels that hold a card. */
+  surface?: "muted" | "shell";
 }

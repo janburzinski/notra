@@ -12,11 +12,12 @@ export interface UseChatComposerAttachmentsResult {
   attachments: ChatAttachment[];
   attachmentTooltipText: string;
   consumeAttachments: () => ChatAttachment[];
+  /** Spread on the drop area; empty when the whole page takes drops. */
   dragHandlers: {
-    onDragEnter: (event: DragEvent<HTMLElement>) => void;
-    onDragLeave: (event: DragEvent<HTMLElement>) => void;
-    onDragOver: (event: DragEvent<HTMLElement>) => void;
-    onDrop: (event: DragEvent<HTMLElement>) => void;
+    onDragEnter?: (event: DragEvent<HTMLElement>) => void;
+    onDragLeave?: (event: DragEvent<HTMLElement>) => void;
+    onDragOver?: (event: DragEvent<HTMLElement>) => void;
+    onDrop?: (event: DragEvent<HTMLElement>) => void;
   };
   fileInputRef: RefObject<HTMLInputElement | null>;
   handleFilesSelected: (selected: FileList | File[]) => Promise<boolean>;
@@ -29,4 +30,8 @@ export interface UseChatComposerAttachmentsResult {
   removeAttachment: (key: string) => void;
   restoreAttachments: (attachments: ChatAttachment[]) => boolean;
   setPreviewAttachment: (attachment: ChatAttachment | null) => void;
+  /** Marks what went out as sent and empties the composer's files. */
+  submitAttachments: (sent: ChatAttachment[]) => void;
+  /** The uploads a waiting send needs, or null when one of them failed. */
+  takeCompletedUploads: (ids: readonly string[]) => ChatAttachment[] | null;
 }

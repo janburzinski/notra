@@ -34,7 +34,6 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  useSidebar,
 } from "@notra/ui/components/ui/sidebar";
 import { Skeleton } from "@notra/ui/components/ui/skeleton";
 import { useQueryClient } from "@tanstack/react-query";
@@ -73,8 +72,6 @@ export function ChatHistoryNav() {
   const pathname = usePathname();
   const router = useRouter();
   const queryClient = useQueryClient();
-  const { state: sidebarState, isMobile } = useSidebar();
-  const isCollapsed = sidebarState === "collapsed" && !isMobile;
   const [editingChatId, setEditingChatId] = useState<string | null>(null);
   const [draftTitle, setDraftTitle] = useState("");
   const [renamingChatId, setRenamingChatId] = useState<string | null>(null);
@@ -272,23 +269,15 @@ export function ChatHistoryNav() {
                                 role="status"
                               />
                             ) : (
-                              <span className="truncate">
+                              <SidebarLabel>
                                 {displayChatTitle(
                                   session.title,
                                   tCommon2("labels.newChat")
                                 )}
-                              </span>
+                              </SidebarLabel>
                             )}
                           </SidebarNavLink>
                         )
-                      }
-                      tooltip={
-                        isGeneratingTitle
-                          ? undefined
-                          : displayChatTitle(
-                              session.title,
-                              tCommon2("labels.newChat")
-                            )
                       }
                     />
 
@@ -398,37 +387,38 @@ export function ChatHistoryNav() {
         </SidebarGroupContent>
       </SidebarGroup>
 
-      {!isCollapsed && (
-        <div className="flex-1 overflow-x-hidden overflow-y-auto">
-          {showError && (
-            <div className="space-y-2 p-3" role="alert">
-              <p className="text-muted-foreground text-xs">{t("loadFailed")}</p>
-              <Button
-                onClick={() => window.location.reload()}
-                size="sm"
-                type="button"
-                variant="outline"
-              >
-                {tCommon("refresh")}
-              </Button>
-            </div>
-          )}
-          {showLoading && <ChatHistoryNavLoading />}
-          {!(showError || showLoading) && (
-            <div>
-              {renderSessions(t("pinned"), pinnedSessions)}
-              {historyGroups.map((group) =>
-                renderSessions(
-                  group.id === "lastMonth"
-                    ? t("groups.lastMonth")
-                    : tCommon2(`labels.${group.id}`),
-                  group.sessions
-                )
-              )}
-            </div>
-          )}
-        </div>
-      )}
+      {/* The rail fades the chats out and hides them with CSS instead of
+          unmounting them, and they have no rail tooltips: re-rendering every
+          chat when the sidebar toggled held up its first frame. */}
+      <div className="duration-fast flex-1 overflow-x-hidden overflow-y-auto transition-[opacity,display] transition-discrete ease-(--sidebar-ease) group-data-[collapsible=icon]:hidden group-data-[collapsible=icon]:opacity-0 motion-reduce:transition-none starting:opacity-0">
+        {showError && (
+          <div className="space-y-2 p-3" role="alert">
+            <p className="text-muted-foreground text-xs">{t("loadFailed")}</p>
+            <Button
+              onClick={() => window.location.reload()}
+              size="sm"
+              type="button"
+              variant="outline"
+            >
+              {tCommon("refresh")}
+            </Button>
+          </div>
+        )}
+        {showLoading && <ChatHistoryNavLoading />}
+        {!(showError || showLoading) && (
+          <div>
+            {renderSessions(t("pinned"), pinnedSessions)}
+            {historyGroups.map((group) =>
+              renderSessions(
+                group.id === "lastMonth"
+                  ? t("groups.lastMonth")
+                  : tCommon2(`labels.${group.id}`),
+                group.sessions
+              )
+            )}
+          </div>
+        )}
+      </div>
 
       <ConfirmDialog
         confirmLabel={tCommon("delete")}

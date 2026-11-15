@@ -6696,6 +6696,17 @@
     }
   },
   "chat": {
+    "approval": {
+      "allowOnce": "Allow once",
+      "allowForChat": "Allow for this chat",
+      "deny": "Deny",
+      "showInput": "Show input",
+      "hideInput": "Hide input",
+      "replyPlaceholder": "Tell Notra what to do instead…",
+      "send": "Send",
+      "label": "Approval needed",
+      "failed": "Couldn't send your answer. Try again."
+    },
     "shared": {
       "sendAMessage": "Send a message",
       "queueAMessage": "Queue a message…",
@@ -6733,7 +6744,8 @@
         "mcpGroup": "MCP tools"
       },
       "mention": {
-        "noneConnected": "No context or MCP tools connected",
+        "emptyTitle": "Nothing to mention yet",
+        "emptyDescription": "Connect GitHub, Linear or an MCP server, then @ brings their repos, teams and tools into the chat.",
         "noMatches": "No matches found",
         "connectIntegrations": "Connect integrations",
         "postsGroup": "In this chat"
@@ -6995,9 +7007,7 @@
       "close": "Collapse panel",
       "empty": "Posts the agent writes in this chat show up here.",
       "status": {
-        "writing": "Writing…",
-        "unsaved": "Not saved yet",
-        "draft": "Draft"
+        "writing": "Writing…"
       },
       "openTab": "Open another post",
       "closeTab": "Close {title}",
@@ -8345,7 +8355,10 @@
         "getAutopilotWorkflow": "{state, select, running {Reading workflow} done {Read workflow} approve {Approve reading workflow} other {Failed to read workflow}}",
         "getAutopilotWorkflowRun": "{state, select, running {Checking workflow run} done {Checked workflow run} approve {Approve checking workflow run} other {Failed to check workflow run}}",
         "saveAutopilotWorkflow": "{state, select, running {Saving workflow} done {Saved workflow} approve {Approve saving workflow} other {Failed to save workflow}}",
-        "runAutopilotWorkflow": "{state, select, running {Starting workflow} done {Started workflow} approve {Approve starting workflow} other {Failed to start workflow}}"
+        "runAutopilotWorkflow": "{state, select, running {Starting workflow} done {Started workflow} approve {Approve starting workflow} other {Failed to start workflow}}",
+        "createArtifact": "{state, select, running {Building artifact} done {Built artifact} approve {Approve artifact} other {Failed artifact}}",
+        "updateArtifact": "{state, select, running {Updating artifact} done {Updated artifact} approve {Approve artifact update} other {Failed artifact update}}",
+        "getArtifact": "{state, select, running {Reading artifact} done {Read artifact} approve {Approve artifact} other {Failed artifact}}"
       },
       "withSuffix": "{label} {suffix}",
       "memory": {
@@ -10286,5 +10299,46 @@
       },
       "approvalsHint": "Auto marks the pull request ready and publishes it the next weekday at 9:00 unless someone steps in."
     }
+  },
+  "artifacts": {
+    "label": "Artifact",
+    "dailyBrief": "Daily brief",
+    "versionShort": "v{version}",
+    "version": "Version {version}",
+    "viewingOld": "You're looking at version {version}.",
+    "showLatest": "Show latest",
+    "open": "Open",
+    "openPage": "Open in new tab",
+    "openChat": "Open chat",
+    "more": "More actions",
+    "delete": "Delete",
+    "deleteTitle": "Delete this artifact?",
+    "deleteDescription": "It disappears from the chat and its links stop working. This can't be undone.",
+    "deleted": "Artifact deleted",
+    "deleteFailed": "Couldn't delete the artifact",
+    "loadFailed": "This artifact couldn't be loaded",
+    "gone": "This artifact was deleted",
+    "retry": "Try again",
+    "loading": "Loading the artifact",
+    "madeWith": "Made with Notra",
+    "share": {
+      "button": "Share",
+      "title": "Share artifact",
+      "accessLabel": "Who can open the link",
+      "access": {
+        "team": "Only {organization}",
+        "public": "Anyone with the link"
+      },
+      "linkLabel": "Artifact link",
+      "copy": "Copy",
+      "copied": "Copied",
+      "createdAndCopied": "Public link created and copied",
+      "created": "Public link created",
+      "revoked": "Only your team can open this artifact now",
+      "publishFailed": "Couldn't create the public link",
+      "revokeFailed": "Couldn't disable the public link"
+    },
+    "sources": "Sources",
+    "latest": "Latest"
   }
 }

@@ -20,7 +20,7 @@ export function BlogPreviewActions({
   const tToolBlock = useTranslations("ai.toolBlock");
   if (isFinished) {
     return (
-      <div className="border-border bg-muted/30 flex flex-wrap items-center justify-between gap-3 border-t px-4 py-3">
+      <div className="flex flex-wrap items-center justify-between gap-3 px-4 pb-3">
         {savedStatus === "published" ? (
           <span className="text-muted-foreground text-xs">
             {tLabels("published")}
@@ -49,7 +49,7 @@ export function BlogPreviewActions({
     return null;
   }
   return (
-    <div className="border-border bg-muted/30 flex flex-wrap items-center justify-between gap-3 border-t px-4 py-3">
+    <div className="flex flex-wrap items-center justify-between gap-3 px-4 pb-3">
       {onDeny ? (
         <Button
           className="-ml-2.5"

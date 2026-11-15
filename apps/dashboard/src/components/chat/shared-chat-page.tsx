@@ -42,6 +42,7 @@ import {
 } from "@/constants/chat-share";
 import { CHAT_TOOL_LABEL_ALIASES } from "@/constants/chat-tool-labels";
 import { authClient } from "@/lib/auth/client";
+import { chatMessageComponents } from "@/lib/chat/message-components";
 import { cn } from "@/lib/utils";
 import type { PublicChatShare } from "@/types/chat-share";
 import { buildChatMinimapTurns } from "@/utils/chat-minimap";
@@ -202,7 +203,11 @@ function SharedFile({
 
 function SharedPart({ part }: { part: SharedChatPart }) {
   if (part.type === "text") {
-    return <MessageResponse>{part.text}</MessageResponse>;
+    return (
+      <MessageResponse components={chatMessageComponents}>
+        {part.text}
+      </MessageResponse>
+    );
   }
   if (part.type === "post") {
     return <SharedPost part={part} />;

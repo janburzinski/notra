@@ -228,7 +228,7 @@ Use the shared scale. The CSS utilities and `DURATION`, `EASE`, and `SPRING` in 
 - Tab indicators slide on a 200ms tween, not a spring.
 - Springs: `indicatorFlat` for dense controls (no bounce), `snappy` for list reorder and quick layout moves, `gentle` for large surfaces such as the welcome tour. `indicator` (bounce 0.2) is for expandable tabs.
 - Menus, popovers and hover cards fade and scale from 0.97, 150ms in and 100ms out, without sliding (`POPUP_MOTION_CLASS_NAME`). Dialogs fade and scale from 0.96, 200ms in and 150ms out.
-- Actions triggered from the keyboard do not animate. Dialogs take an `instant` prop.
+- Actions triggered from the keyboard do not animate. Dialogs take an `instant` prop. The docked sidebar is the exception: ⌘B slides it like a click does.
 - Buttons press to `scale(0.96)`. Disabled controls stay still.
 - Reduced motion drops movement and keeps feedback: keyframes and transforms stop, opacity and color changes keep a 150ms fade, and view transitions are off.
 

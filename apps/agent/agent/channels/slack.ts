@@ -17,6 +17,7 @@ import {
   POST_TO_X_NOT_PENDING_MESSAGE,
   POST_TO_X_NOT_REQUESTER_MESSAGE,
   SLACK_WORKING_REACTIONS_KEY_ATTRIBUTE,
+  SLACK_ARTIFACT_TOOL_NAMES,
   SLACK_PERMISSION_ERROR_PATTERN,
   SLACK_SESSION_FAILED_MESSAGE,
   SLACK_TURN_FAILED_MESSAGE,
@@ -48,6 +49,7 @@ import {
   mirrorToolApprovals,
   mirrorToolResult,
 } from "../lib/utils/chat-mirror";
+import { buildSlackArtifactPost } from "../lib/utils/slack-artifact";
 import {
   buildNotraSlackAuth,
   getSlackAuthUserId,
@@ -536,6 +538,21 @@ export default slackChannel({
 
       if (result.toolName === "add_reference") {
         state.notraReferenceCompletionTurnId = data.turnId;
+        return;
+      }
+
+      if (SLACK_ARTIFACT_TOOL_NAMES.has(result.toolName)) {
+        try {
+          const post = buildSlackArtifactPost(result.output);
+          if (post) {
+            await channel.thread.post(post);
+            await markSlackTurnResponded(channel.state);
+          }
+        } catch (error) {
+          logError("Slack artifact delivery failed", error, {
+            sessionId: ctx.session.id,
+          });
+        }
         return;
       }
 

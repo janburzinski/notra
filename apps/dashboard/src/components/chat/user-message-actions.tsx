@@ -291,6 +291,9 @@ export function UserMessageTextBubble({
         isEditing ? "w-full" : "is-user:dark w-fit max-w-full"
       )}
       layout={!reduceMotion}
+      // Only opening and closing the editor animates; a resized chat column
+      // (a side panel opening) moves the bubble at once.
+      layoutDependency={isEditing}
       transition={USER_MESSAGE_EDIT_TRANSITION}
     >
       <AnimatePresence initial={false} mode="popLayout">
@@ -311,7 +314,8 @@ export function UserMessageTextBubble({
         ) : (
           <m.div
             animate={{ opacity: 1 }}
-            className="flex min-w-0 flex-col gap-2 overflow-hidden"
+            // Keeps the user's own line breaks, which markdown would fold.
+            className="flex min-w-0 flex-col gap-2 overflow-hidden [&_p]:whitespace-pre-line"
             exit={reduceMotion ? undefined : { opacity: 0 }}
             initial={reduceMotion ? false : { opacity: 0 }}
             key="view"

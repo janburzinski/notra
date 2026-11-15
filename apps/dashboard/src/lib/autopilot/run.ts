@@ -374,7 +374,7 @@ export async function deliverAutopilotBrief(params: {
       merged,
       insights: params.insights,
     });
-    const pageUrl = autopilotBriefUrl(page.id);
+    const pageUrl = autopilotBriefUrl(page);
     await log.action("Wrote the daily brief", { url: pageUrl });
     // Slack lists exactly what the page lists, also when a retry reuses the
     // page an earlier attempt saved.

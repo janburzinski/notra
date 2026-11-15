@@ -86,8 +86,16 @@ function resolveChartEngineId(label: string): string {
   return chartLabelToEngineId(label.trim());
 }
 
+/** A page path or link, which reads as written and is never a model id. */
+function isPathOrUrl(label: string): boolean {
+  return label.startsWith("/") || label.includes("://");
+}
+
 export function formatChartEngineLabel(label: string): string {
   const trimmed = label.trim();
+  if (isPathOrUrl(trimmed)) {
+    return trimmed;
+  }
   const engineId = chartLabelToEngineId(trimmed);
   const catalog =
     ownCatalogLabel(GEO_ENGINE_LABELS, engineId) ??

@@ -12,27 +12,28 @@ import { useTranslations } from "use-intl";
 
 import { AgentQuestionDock } from "@/components/ai/agent-question-dock";
 import { autopilotWorkflowDraftTools } from "@/components/autopilot/autopilot-workflow-draft-tools";
-import ChatInput from "@/components/chat-input";
+import { ChatInput } from "@/components/chat/chat-input";
 import { ChatQuoteProvider } from "@/components/chat/chat-quote";
-import { ChatSuggestions } from "@/components/chat/chat-suggestions";
 import { ContentChatActivityPanel } from "@/components/content/content-chat-activity-panel";
 import { useRightPanel } from "@/components/dashboard/right-panel-context";
 import { useOrganizationsContext } from "@/components/providers/organization-provider";
 import { AGENT_QUESTION_INPUT_RETURN_CLASS } from "@/constants/agent-questions";
-import { DASHBOARD_AGENT_SUGGESTIONS } from "@/constants/chat-suggestions";
-import { localStorageKeys } from "@/constants/storage";
+import { AUTOPILOT_WORKFLOW_PREVIEW_TOOLS } from "@/constants/autopilot-workflows";
 import {
   useAgentDraftTarget,
   useAgentPromptTarget,
 } from "@/lib/hooks/use-agent-handoff";
+import { useChatToolApprovals } from "@/lib/hooks/use-chat-tool-approvals";
 import { useDashboardAgentChat } from "@/lib/hooks/use-dashboard-agent-chat";
 import { useDesktopBreakpoint } from "@/lib/hooks/use-desktop-breakpoint";
+import { useMcpLogosByConnectionId } from "@/lib/hooks/use-mcp-logos";
 import { useOpenAgentChatPage } from "@/lib/hooks/use-open-agent-chat-page";
 import type { DashboardAgentChatProps } from "@/types/components/dashboard-agent";
 import { findPendingAgentQuestion } from "@/utils/agent-questions";
 import { findAutopilotWorkflowDraft } from "@/utils/autopilot-workflow-draft";
 import { upgradeLinkSlug } from "@/utils/chat-upgrade";
 
+// react-doctor-disable-next-line react-doctor/no-high-complexity-react-function -- wires the panel chat to its host page; split in a dedicated refactor
 function DashboardAgentChat({
   hasOpened,
   organizationId,
@@ -70,10 +71,6 @@ function DashboardAgentChat({
     window.requestAnimationFrame(() => chatInputRef.current?.focus());
   });
 
-  const handleSuggestionSelect = (prompt: string) => {
-    setChatInputValue(prompt);
-  };
-
   const handleOpenChat = useOpenAgentChatPage({
     organizationSlug,
     chatId: activeChatId,
@@ -85,10 +82,19 @@ function DashboardAgentChat({
       ),
   });
 
+  const mcpLogosByConnectionId = useMcpLogosByConnectionId(
+    hasOpened ? organizationId : ""
+  );
+  const { approval: composerApproval, isApprovalInComposer } =
+    useChatToolApprovals({
+      chatId: activeChatId,
+      messages,
+      ownCardToolNames: AUTOPILOT_WORKFLOW_PREVIEW_TOOLS,
+      onApprove: agent.handleApproveTool,
+      onDeny: agent.handleDenyTool,
+    });
   const isChatDisabled = isHydratingHistory;
   const pendingQuestion = findPendingAgentQuestion(messages);
-  const showExamplePrompts =
-    messages.length === 0 && !isAgentBusy && !isHydratingHistory;
 
   const chat = hasOpened ? (
     <div className="h-full min-h-0 max-w-full min-w-0">
@@ -101,34 +107,28 @@ function DashboardAgentChat({
             latestToolCallId:
               findAutopilotWorkflowDraft(messages)?.toolCallId ?? null,
           })}
+          isApprovalInComposer={isApprovalInComposer}
           onApproveTool={agent.handleApproveTool}
           onClose={onClose}
           onDenyTool={agent.handleDenyTool}
           onNewChat={agent.handleNewChat}
           onOpenChat={handleOpenChat}
           onSelectChat={agent.handleSelectChat}
+          mcpLogosByConnectionId={mcpLogosByConnectionId}
+          organizationId={organizationId}
           organizationSlug={organizationSlug}
           showHistory={false}
           sessions={agent.sessions}
           status={agent.status}
+          surface={isDesktop ? "shell" : "muted"}
           title={tCommon("labels.agent")}
         >
-          {showExamplePrompts ? (
-            <div className="px-2">
-              <ChatSuggestions
-                disabled={isChatDisabled}
-                dismissStorageKey={
-                  localStorageKeys.dashboardAgentSuggestionsDismissed
-                }
-                hidden={chatInputValue.trim().length > 0}
-                layout="list"
-                onSelect={handleSuggestionSelect}
-                rotate
-                suggestions={DASHBOARD_AGENT_SUGGESTIONS}
-              />
-            </div>
-          ) : null}
-          <div className="shrink-0 p-2 pt-1">
+          <div
+            className={cn(
+              "shrink-0",
+              isDesktop ? "px-2 pt-1 pb-2" : "p-2 pt-1"
+            )}
+          >
             {pendingQuestion ? (
               <AgentQuestionDock
                 key={pendingQuestion.toolCallId}
@@ -147,6 +147,7 @@ function DashboardAgentChat({
               hidden={pendingQuestion !== null}
             >
               <ChatInput
+                approval={composerApproval}
                 disabled={isChatDisabled}
                 error={chatError}
                 isLoading={isAgentBusy}
@@ -168,6 +169,7 @@ function DashboardAgentChat({
                 placeholder={t("placeholder")}
                 queuedMessages={agent.queuedMessages}
                 ref={chatInputRef}
+                surface={isDesktop ? "card" : "default"}
                 value={chatInputValue}
               />
             </div>

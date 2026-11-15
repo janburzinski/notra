@@ -243,7 +243,7 @@ import { DesignSystemGeminiCatalog } from "@/app/design-system/gemini/page-clien
 import { DesignSystemOpencodeCatalog } from "@/app/design-system/opencode/page-client";
 import { DesignSystemPerplexityCatalog } from "@/app/design-system/perplexity/page-client";
 import { Button, buttonVariants } from "@/components/button";
-import ChatInput from "@/components/chat-input";
+import { ChatInput } from "@/components/chat/chat-input";
 import { DesignSystemCategory } from "@/components/design-system/design-system-category";
 import { DesignSystemChatQueueDemo } from "@/components/design-system/design-system-chat-queue-demo";
 import { DesignSystemComposerDemo } from "@/components/design-system/design-system-composer-demo";

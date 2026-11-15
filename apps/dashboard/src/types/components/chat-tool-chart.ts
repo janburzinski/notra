@@ -4,6 +4,11 @@ export interface ToolOutputChartProps {
   chart: ChartArtifact;
 }
 
+export interface ToolOutputChartPlotProps extends ToolOutputChartProps {
+  /** Lines run to the card's edges, for charts inside a table-style frame. */
+  flush?: boolean;
+}
+
 export interface ToolOutputRankRow {
   engine: string;
   name: string;

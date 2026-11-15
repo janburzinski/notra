@@ -69,7 +69,7 @@ export function BlogChangelogPreview({
   }
 
   return (
-    <div className="border-border bg-background ml-px max-w-xl overflow-hidden rounded-lg border">
+    <div className="bg-card ring-foreground/10 ml-px max-w-xl overflow-hidden rounded-xl ring-1">
       <div className="flex items-start gap-3 px-4 py-3">
         <div className="min-w-0 flex-1 space-y-1.5">
           <span className="text-muted-foreground flex items-center gap-1.5 text-xs">

@@ -50,7 +50,8 @@ export interface AgentQuestionOptionProps {
 }
 
 export interface AgentQuestionMarkProps {
-  multiple: boolean;
+  className?: string;
+  multiple?: boolean;
   picked: boolean;
   number: number;
 }

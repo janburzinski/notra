@@ -44,6 +44,7 @@ import {
   AUTOPILOT_WORKFLOW_UNSCHEDULE_FAILED,
 } from "@/constants/autopilot-workflows";
 import { AUTOPILOT_DAILY_WORKFLOW_KEY } from "@/constants/workflow-engine";
+import { loadAutopilotActionContext } from "@/lib/autopilot/action-context";
 import { loadAutopilotAnalytics } from "@/lib/autopilot/analytics";
 import { listRecentPullRequestAuthors } from "@/lib/autopilot/authors";
 import { loadAutopilotBrief } from "@/lib/autopilot/brief-page";
@@ -528,24 +529,19 @@ export const autopilotRouter = {
     .use(withOrganizationAccess)
     .use(withAutopilotFlag)
     .handler(async ({ input, context }) => {
-      const [loaded, settings] = await Promise.all([
+      const [loaded, actions] = await Promise.all([
         loadAutopilotBrief(input.organizationId, input.briefId),
-        db.query.autopilotSettings.findFirst({
-          columns: { enabled: true, repositoryBranch: true, timezone: true },
-          where: eq(autopilotSettings.organizationId, input.organizationId),
-        }),
+        loadAutopilotActionContext(
+          input.organizationId,
+          context.auth.membership.role
+        ),
       ]);
       if (!loaded) {
         throw notFound("Brief not found");
       }
       const { brief, findings } = loaded;
       return {
-        canManage: canManageAutopilot(context.auth.membership.role),
-        // Writing an idea needs Autopilot switched on.
-        canWrite: settings?.enabled ?? false,
-        branch: settings?.repositoryBranch ?? null,
-        // The brief's date in the workspace's time, not the viewer's UTC default.
-        timeZone: settings?.timezone ?? "UTC",
+        ...actions,
         id: brief.id,
         createdAt: brief.createdAt,
         content: brief.content,

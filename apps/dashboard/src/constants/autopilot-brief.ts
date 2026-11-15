@@ -1,4 +1,7 @@
-import type { AutopilotJobKind } from "@notra/db/types/autopilot";
+import type {
+  AutopilotBriefHeadings,
+  AutopilotJobKind,
+} from "@notra/db/types/autopilot";
 
 /** Daily briefs are plain pages at /brief/:id, outside the dashboard shell. */
 export const AUTOPILOT_BRIEFS_PATH = "/brief";
@@ -36,3 +39,16 @@ export const AUTOPILOT_BRIEF_SOURCES: Record<AutopilotJobKind, string> = {
   links: "Search Console",
   landing: "AI answers",
 };
+
+/**
+ * Headings the brief's artifact puts above its parts. The model translates
+ * them into the brand's language; these are the originals and the fallback.
+ */
+export const AUTOPILOT_BRIEF_ARTIFACT_HEADINGS: AutopilotBriefHeadings = {
+  waiting: "Waiting for you",
+  alsoWaiting: "Also waiting",
+  merged: "Merged",
+  worthKnowing: "Worth knowing",
+};
+
+export const AUTOPILOT_BRIEF_HEADING_MAX = 40;

@@ -8,7 +8,6 @@ import {
 } from "@notra/schemas/constants/dashboard/upload";
 import {
   type ChangeEvent,
-  type DragEvent,
   useCallback,
   useEffect,
   useRef,
@@ -36,33 +35,19 @@ import {
   attachedContentHashes,
   splitDuplicateChatFiles,
 } from "@/utils/chat-attachment-dedupe";
-import { mergeChatAttachments } from "@/utils/chat-input";
+import { mergeChatAttachments, renamePastedFiles } from "@/utils/chat-input";
 import { prepareChatImage } from "@/utils/prepare-chat-image";
 
-const GENERIC_PASTED_IMAGE_NAME_RE = /^image\.(jpe?g|png|gif|webp)$/i;
-
-function renamePastedFiles(files: File[]): File[] {
-  const pasteTimestamp = Date.now();
-  return files.map((file, index) => {
-    const hasMeaningfulName =
-      file.name && !GENERIC_PASTED_IMAGE_NAME_RE.test(file.name);
-    if (hasMeaningfulName) {
-      return file;
-    }
-    const extFromType = file.type.split("/")[1]?.split("+")[0];
-    const extFromName = file.name?.includes(".")
-      ? file.name.split(".").pop()
-      : undefined;
-    const ext = extFromName ?? extFromType ?? "png";
-    const suffix = index === 0 ? "" : `-${index}`;
-    return new File([file], `pasted-${pasteTimestamp}${suffix}.${ext}`, {
-      type: file.type,
-      lastModified: file.lastModified,
-    });
-  });
-}
-
-export function useChatComposerAttachments(): UseChatComposerAttachmentsResult {
+/**
+ * A composer's files: picking, pasting and dropping them, uploading with
+ * dedupe and HEIC conversion, and cleaning up what never got sent. With
+ * `dropZone: "document"` a file dropped anywhere on the page is attached.
+ */
+export function useChatComposerAttachments({
+  dropZone = "element",
+}: {
+  dropZone?: "element" | "document";
+} = {}): UseChatComposerAttachmentsResult {
   const tUpload = useTranslations("chat.input.upload");
   const tCommon = useTranslations("common");
   const tAttach = useTranslations("chat.input.attach");
@@ -77,6 +62,8 @@ export function useChatComposerAttachments(): UseChatComposerAttachmentsResult {
   const pendingUploadsRef = useRef(pendingUploads);
   const pendingHashesRef = useRef(new Map<string, string>());
   const submittedKeysRef = useRef(new Set<string>());
+  /** Finished uploads by placeholder id, for a send that waited on them. */
+  const completedUploadsRef = useRef(new Map<string, ChatAttachment>());
   const isMountedRef = useRef(true);
   const dragCounterRef = useRef(0);
 
@@ -219,6 +206,7 @@ export function useChatComposerAttachments(): UseChatComposerAttachmentsResult {
               mediaType: readyFile.type,
               size: readyFile.size,
             };
+            completedUploadsRef.current.set(placeholder.id, uploadedAttachment);
 
             if (!isMountedRef.current) {
               await cleanupChatUpload(result.key);
@@ -336,16 +324,16 @@ export function useChatComposerAttachments(): UseChatComposerAttachmentsResult {
     };
   }, [cleanupUnsubmittedAttachments]);
 
-  const onDragEnter = useCallback((event: DragEvent<HTMLElement>) => {
-    if (!dragEventHasFiles(event.nativeEvent)) {
+  const onDragEnter = useCallback((event: globalThis.DragEvent) => {
+    if (!dragEventHasFiles(event)) {
       return;
     }
     dragCounterRef.current += 1;
     setIsDraggingFile(true);
   }, []);
 
-  const onDragLeave = useCallback((event: DragEvent<HTMLElement>) => {
-    if (!dragEventHasFiles(event.nativeEvent)) {
+  const onDragLeave = useCallback((event: globalThis.DragEvent) => {
+    if (!dragEventHasFiles(event)) {
       return;
     }
     dragCounterRef.current = Math.max(0, dragCounterRef.current - 1);
@@ -354,8 +342,8 @@ export function useChatComposerAttachments(): UseChatComposerAttachmentsResult {
     }
   }, []);
 
-  const onDragOver = useCallback((event: DragEvent<HTMLElement>) => {
-    if (!dragEventHasFiles(event.nativeEvent)) {
+  const onDragOver = useCallback((event: globalThis.DragEvent) => {
+    if (!dragEventHasFiles(event)) {
       return;
     }
     event.preventDefault();
@@ -365,10 +353,9 @@ export function useChatComposerAttachments(): UseChatComposerAttachmentsResult {
   }, []);
 
   const onDrop = useCallback(
-    (event: DragEvent<HTMLElement>) => {
+    (event: globalThis.DragEvent) => {
       const files = event.dataTransfer?.files;
-      const hasFiles =
-        (files && files.length > 0) || dragEventHasFiles(event.nativeEvent);
+      const hasFiles = (files && files.length > 0) || dragEventHasFiles(event);
       if (!hasFiles) {
         return;
       }
@@ -381,6 +368,40 @@ export function useChatComposerAttachments(): UseChatComposerAttachmentsResult {
     },
     [handleFilesSelected]
   );
+
+  useEffect(() => {
+    if (dropZone !== "document") {
+      return;
+    }
+    document.addEventListener("dragenter", onDragEnter);
+    document.addEventListener("dragleave", onDragLeave);
+    document.addEventListener("dragover", onDragOver);
+    document.addEventListener("drop", onDrop);
+    return () => {
+      document.removeEventListener("dragenter", onDragEnter);
+      document.removeEventListener("dragleave", onDragLeave);
+      document.removeEventListener("dragover", onDragOver);
+      document.removeEventListener("drop", onDrop);
+    };
+  }, [dropZone, onDragEnter, onDragLeave, onDragOver, onDrop]);
+
+  const submitAttachments = useCallback((sent: ChatAttachment[]) => {
+    for (const attachment of sent) {
+      submittedKeysRef.current.add(attachment.key);
+    }
+    attachmentsRef.current = [];
+    setAttachments([]);
+    setPreviewAttachment(null);
+    completedUploadsRef.current.clear();
+  }, []);
+
+  const takeCompletedUploads = useCallback((ids: readonly string[]) => {
+    const uploaded = ids.flatMap((id) => {
+      const attachment = completedUploadsRef.current.get(id);
+      return attachment ? [attachment] : [];
+    });
+    return uploaded.length === ids.length ? uploaded : null;
+  }, []);
 
   const handlePasteFiles = useCallback(
     (files: File[]) => {
@@ -403,12 +424,15 @@ export function useChatComposerAttachments(): UseChatComposerAttachmentsResult {
     attachments,
     attachmentTooltipText: tAttach("files"),
     consumeAttachments,
-    dragHandlers: {
-      onDragEnter,
-      onDragLeave,
-      onDragOver,
-      onDrop,
-    },
+    dragHandlers:
+      dropZone === "document"
+        ? {}
+        : {
+            onDragEnter: (event) => onDragEnter(event.nativeEvent),
+            onDragLeave: (event) => onDragLeave(event.nativeEvent),
+            onDragOver: (event) => onDragOver(event.nativeEvent),
+            onDrop: (event) => onDrop(event.nativeEvent),
+          },
     fileInputRef,
     handleFilesSelected,
     handlePasteFiles,
@@ -419,5 +443,7 @@ export function useChatComposerAttachments(): UseChatComposerAttachmentsResult {
     previewAttachment,
     removeAttachment,
     setPreviewAttachment,
+    submitAttachments,
+    takeCompletedUploads,
   };
 }

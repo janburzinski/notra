@@ -39,6 +39,9 @@ export function ChatActivityStatus({
           <span className="sr-only" role="status">
             {resolvedLabel}
           </span>
+          {/* The labels roll like an odometer: each moves a full line, so the
+              old one has left the clipped line before the new one is read,
+              instead of the two overlapping half way. */}
           <AnimatePresence initial={false} mode="popLayout">
             <m.span
               aria-hidden="true"
@@ -46,7 +49,7 @@ export function ChatActivityStatus({
               key={active ? resolvedLabel : "done"}
               initial={{
                 opacity: 0,
-                transform: reduceMotion ? "none" : "translateY(50%)",
+                transform: reduceMotion ? "none" : "translateY(100%)",
               }}
               animate={{
                 opacity: 1,
@@ -54,7 +57,7 @@ export function ChatActivityStatus({
               }}
               exit={{
                 opacity: 0,
-                transform: reduceMotion ? "none" : "translateY(-50%)",
+                transform: reduceMotion ? "none" : "translateY(-100%)",
               }}
               transition={TRANSITION.enter}
             >

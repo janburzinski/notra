@@ -127,9 +127,13 @@ export function ChatComposerAttachmentChips({
           onClick={() => {
             setPreviewAttachment(attachment);
           }}
-          onRemove={() => {
-            removeAttachment(attachment.key);
-          }}
+          onRemove={
+            removeAttachment
+              ? () => {
+                  removeAttachment(attachment.key);
+                }
+              : undefined
+          }
         />
       ))}
       {pendingUploads.map((pending) => (

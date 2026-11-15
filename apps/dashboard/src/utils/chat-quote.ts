@@ -1,13 +1,3 @@
-export function prependChatQuote(text: string, quote?: string | null): string {
-  if (!quote) {
-    return text;
-  }
-  return `${quote
-    .split(/\r?\n/)
-    .map((line) => `> ${line}`)
-    .join("\n")}\n\n${text}`;
-}
-
 export function getChatQuoteComposer(scopeId: string): HTMLElement | undefined {
   return Array.from(
     document.querySelectorAll<HTMLElement>("[data-chat-quote-composer]")

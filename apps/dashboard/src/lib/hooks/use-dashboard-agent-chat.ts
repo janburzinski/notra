@@ -33,7 +33,7 @@ import { useChatEffort } from "@/lib/hooks/use-chat-effort";
 import { dashboardOrpcClient } from "@/lib/orpc/client";
 import { dashboardOrpc } from "@/lib/orpc/query";
 import type { AgentQuestionAnswer } from "@/types/agent-questions";
-import type { ContentChatInputHandle } from "@/types/components/chat-input";
+import type { ChatComposerHandle } from "@/types/components/chat-input";
 import type { UseDashboardAgentChatOptions } from "@/types/components/dashboard-agent";
 import type { AgentPanelPrompt } from "@/types/components/right-panel";
 import {
@@ -92,7 +92,7 @@ export function useDashboardAgentChat({
   const wasStoppedByUserRef = useRef(false);
   const drainQueueRef = useRef<() => void>(() => {});
   const flushSteerRef = useRef<() => void>(() => {});
-  const chatInputRef = useRef<ContentChatInputHandle | null>(null);
+  const chatInputRef = useRef<ChatComposerHandle | null>(null);
   // Read when a request goes out, so each message carries the page it was
   // sent from, including the sends after an answer or an approval.
   const focusRef = useRef({ autopilotWorkflowId, autopilotAutomation });

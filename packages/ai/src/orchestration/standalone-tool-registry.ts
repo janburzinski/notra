@@ -1,5 +1,6 @@
 import { CODE_RESEARCHER_TOOL_NAME } from "@notra/ai/constants/code-research";
 import { contentTypeSchema } from "@notra/ai/schemas/content";
+import { createArtifactTools } from "@notra/ai/tools/artifacts";
 import {
   createAddBrandReferenceTool,
   createGetAvailableBrandReferencesTool,
@@ -209,6 +210,15 @@ export function buildStandaloneToolSet(
   descriptions.push(
     "**GEO Analytics**: List GEO projects and inspect AI visibility summaries, trends, prompt-level results, competitor share, and detailed project context using listGeoProjects, getGeoOverview, getGeoTimeseries, getGeoPromptResults, getGeoCompetitorShare, and getGeoProjectContext"
   );
+
+  const artifactTools = createArtifactTools({
+    organizationId,
+    chatId,
+    userId,
+    source: "chat",
+  });
+  Object.assign(tools, artifactTools.tools);
+  descriptions.push(artifactTools.description);
 
   tools.listSchedules = createListSchedulesTool({ organizationId });
   tools.createSchedule = createCreateScheduleTool({ organizationId });

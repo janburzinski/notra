@@ -110,7 +110,9 @@ export const MessageContent = ({
   <div
     className={cn(
       "is-user:dark flex w-fit min-w-0 max-w-full flex-col gap-2 overflow-hidden text-sm",
-      "group-[.is-user]:ml-auto group-[.is-user]:rounded-lg group-[.is-user]:bg-secondary group-[.is-user]:px-4 group-[.is-user]:py-3 group-[.is-user]:text-foreground",
+      // A user's line breaks are theirs: keep them, though markdown would
+      // fold single newlines into one line.
+      "group-[.is-user]:ml-auto group-[.is-user]:[&_p]:whitespace-pre-line group-[.is-user]:rounded-lg group-[.is-user]:bg-secondary group-[.is-user]:px-4 group-[.is-user]:py-3 group-[.is-user]:text-foreground",
       "group-[.is-assistant]:w-full group-[.is-assistant]:text-foreground",
       className,
     )}
@@ -245,6 +247,7 @@ export const MessageBranch = ({
 
 export type MessageBranchContentProps = HTMLAttributes<HTMLDivElement>;
 
+// react-doctor-disable-next-line react-doctor/only-export-components -- a component that returns its branches as an array, not a non-component export
 export const MessageBranchContent = ({
   children,
   ...props
@@ -482,7 +485,7 @@ function MessageMarkdownTable({
     <div className={cn("max-w-full overflow-x-auto", TABLE_INNER_RADIUS_CLASS)}>
       <table
         className={cn(
-          "w-full min-w-max caption-bottom border-separate border-spacing-0 text-sm [&_thead_th:last-child]:pr-24",
+          "w-full min-w-max caption-bottom border-separate border-spacing-0 text-sm [&_thead_th:last-child:not([style*=right])]:pr-24",
           TABLE_CARD_CELLS_CLASS,
           className,
         )}

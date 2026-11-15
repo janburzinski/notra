@@ -9,6 +9,7 @@ import { Suspense } from "react";
 import { LoginFormSkeleton } from "@/components/auth/login-form-skeleton";
 import { lazyPage } from "@/utils/lazy-page";
 
+import { loadArtifactPage, loadSharedArtifact } from "./-artifact-loaders";
 import { loadAutopilotBriefPage } from "./-brief-loaders";
 import { createDevelopmentUiRoutes } from "./-development-ui";
 import { loadTrafficEmbed } from "./-embed-loaders";
@@ -59,6 +60,16 @@ const TrafficEmbed = lazyPage(() =>
 const AutopilotBrief = lazyPage(() =>
   import("@/components/autopilot/autopilot-brief-page").then((module) => ({
     default: module.AutopilotBriefPage,
+  }))
+);
+const Artifact = lazyPage(() =>
+  import("@/components/artifacts/artifact-page").then((module) => ({
+    default: module.ArtifactPage,
+  }))
+);
+const SharedArtifact = lazyPage(() =>
+  import("@/components/artifacts/shared-artifact-page").then((module) => ({
+    default: module.SharedArtifactPage,
   }))
 );
 const SharedChat = lazyPage(() =>
@@ -178,6 +189,26 @@ export function createEntryUiRoutes(parent: AnyRoute) {
       preload: AutopilotBrief.preload,
       loader: (input) => loadAutopilotBriefPage({ data: input }),
       component: ({ data }) => <AutopilotBrief {...data} />,
+    }),
+    createUiRoute({
+      parent,
+      path: "artifact/$id",
+      noindex: true,
+      pendingComponent: () => <div className="bg-background min-h-svh" />,
+      preload: Artifact.preload,
+      loader: (input) => loadArtifactPage({ data: input }),
+      pageTitle: (data) => data.title,
+      component: ({ data }) => <Artifact {...data} />,
+    }),
+    createUiRoute({
+      parent,
+      path: "share/artifact/$id",
+      noindex: true,
+      pendingComponent: () => <div className="bg-background min-h-svh" />,
+      preload: SharedArtifact.preload,
+      loader: (input) => loadSharedArtifact({ data: input }),
+      pageTitle: (data) => data.title,
+      component: ({ data }) => <SharedArtifact artifact={data} />,
     }),
     createUiRoute({
       parent,

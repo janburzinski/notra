@@ -13,6 +13,11 @@ export const CHAT_POST_EDIT_TOOL_NAMES: ReadonlySet<string> = new Set([
   "editPost",
 ]);
 
+/** The draft tools by name, as a reply's tool parts report them. */
+export const CHAT_CREATE_TOOL_NAMES: ReadonlySet<string> = new Set(
+  Object.keys(CHAT_CREATE_TOOL_TYPES).map((type) => type.replace(/^tool-/, ""))
+);
+
 export const UPDATE_TODOS_TOOL_NAME = "updateTodos";
 
 export const POST_REFERENCE_PREFIX = "@post/";

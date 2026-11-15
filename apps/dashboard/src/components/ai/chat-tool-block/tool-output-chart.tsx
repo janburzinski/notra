@@ -10,21 +10,26 @@ import { EChartsAreaChart } from "@notra/ui/components/evilcharts/charts/echarts
 import { EChartsPieChart } from "@notra/ui/components/evilcharts/charts/echarts-pie-chart";
 import type { ChartConfig } from "@notra/ui/types/charts";
 import type { CSSProperties, ReactNode } from "react";
+import { InstrumentEmpty } from "ui/card";
 import { useLocale, useTranslations } from "use-intl";
 
 import { EngineIcon } from "@/components/geo/engine-icon";
 import {
+  CHART_LEGEND_TOP,
   CHAT_TOOL_CHART_HEIGHT_CLASS,
+  CHAT_TOOL_DONUT_INNER_RADIUS,
+  CHAT_TOOL_DONUT_OUTER_RADIUS,
+  CHAT_TOOL_PIE_HEIGHT_CLASS,
   CHAT_TOOL_CHART_OPTIONS,
   CHAT_TOOL_RANK_TRACK_CLASS,
   CHART_SEARCH_FILL_CLASS,
   DONUT_CORNER_RADIUS,
-  DONUT_INNER_RADIUS,
-  DONUT_OUTER_RADIUS,
   DONUT_PADDING_ANGLE,
+  FLUSH_CHART_OPTIONS,
 } from "@/constants/charts";
 import { cn } from "@/lib/utils";
 import type {
+  ToolOutputChartPlotProps,
   ToolOutputChartProps,
   ToolOutputRankRow,
 } from "@/types/components/chat-tool-chart";
@@ -71,7 +76,13 @@ function EmptyChartMessage({ message }: { message: string }) {
   );
 }
 
-function AreaArtifactChart({ chart }: { chart: AreaChartArtifact }) {
+function AreaArtifactChart({
+  chart,
+  flush = false,
+}: {
+  chart: AreaChartArtifact;
+  flush?: boolean;
+}) {
   const t = useTranslations("ai.toolBlock");
   const series = chart.series;
   const data = pivotChartSeries(series);
@@ -87,6 +98,20 @@ function AreaArtifactChart({ chart }: { chart: AreaChartArtifact }) {
     };
   }
 
+  // With one line the title names it; with more, a legend says which is
+  // which, above the plot so it covers none of the lines.
+  const showLegend = keyedSeries.length > 1;
+  const baseOptions = flush ? FLUSH_CHART_OPTIONS : CHAT_TOOL_CHART_OPTIONS;
+  const chartOptions = showLegend
+    ? {
+        ...baseOptions,
+        grid: {
+          ...(baseOptions.grid as Record<string, unknown>),
+          top: CHART_LEGEND_TOP,
+        },
+      }
+    : baseOptions;
+
   if (data.length === 0) {
     return <EmptyChartMessage message={t("chartEmptySeries")} />;
   }
@@ -94,8 +119,12 @@ function AreaArtifactChart({ chart }: { chart: AreaChartArtifact }) {
   return (
     <EChartsAreaChart
       animation={false}
-      chartOptions={CHAT_TOOL_CHART_OPTIONS}
-      className={cn("w-full px-1 pb-1", CHAT_TOOL_CHART_HEIGHT_CLASS)}
+      chartOptions={chartOptions}
+      className={cn(
+        "w-full",
+        !flush && "px-1 pb-1",
+        CHAT_TOOL_CHART_HEIGHT_CLASS
+      )}
       config={config}
       curveType="monotone"
       data={data}
@@ -111,6 +140,7 @@ function AreaArtifactChart({ chart }: { chart: AreaChartArtifact }) {
         />
       ))}
       <EChartsAreaChart.Tooltip confine={false} />
+      {showLegend ? <EChartsAreaChart.Legend /> : null}
     </EChartsAreaChart>
   );
 }
@@ -198,15 +228,15 @@ function PieArtifactChart({ chart }: { chart: PieChartArtifact }) {
   return (
     <EChartsPieChart
       animation={false}
-      className={cn("w-full px-1 pb-2", CHAT_TOOL_CHART_HEIGHT_CLASS)}
+      className={cn("w-full px-1", CHAT_TOOL_PIE_HEIGHT_CLASS)}
       config={config}
       data={data}
       dataKey={VALUE_KEY}
       nameKey="name"
     >
       <EChartsPieChart.Pie
-        innerRadius={DONUT_INNER_RADIUS}
-        outerRadius={DONUT_OUTER_RADIUS}
+        innerRadius={CHAT_TOOL_DONUT_INNER_RADIUS}
+        outerRadius={CHAT_TOOL_DONUT_OUTER_RADIUS}
         cornerRadius={DONUT_CORNER_RADIUS}
         paddingAngle={DONUT_PADDING_ANGLE}
       />
@@ -216,16 +246,26 @@ function PieArtifactChart({ chart }: { chart: PieChartArtifact }) {
   );
 }
 
-function ChartPlot({ chart }: { chart: ChartArtifact }) {
+/** The chart without its chat frame, for surfaces that bring their own. */
+export function ToolOutputChartPlot({
+  chart,
+  flush = false,
+}: ToolOutputChartPlotProps) {
   switch (chart.kind) {
     case "empty":
-      return <EmptyChartMessage message={chart.emptyMessage} />;
+      // On a page the empty chart keeps a chart's footprint, like the
+      // analytics cards; the chat keeps it to a line.
+      return flush ? (
+        <InstrumentEmpty className="min-h-40" message={chart.emptyMessage} />
+      ) : (
+        <EmptyChartMessage message={chart.emptyMessage} />
+      );
     case "pie":
       return <PieArtifactChart chart={chart} />;
     case "bar":
       return <BarArtifactChart chart={chart} />;
     case "area":
-      return <AreaArtifactChart chart={chart} />;
+      return <AreaArtifactChart chart={chart} flush={flush} />;
     default: {
       const exhaustive: never = chart;
       return exhaustive;
@@ -236,7 +276,7 @@ function ChartPlot({ chart }: { chart: ChartArtifact }) {
 export function ToolOutputChart({ chart }: ToolOutputChartProps) {
   return (
     <ChartFrame subtitle={chart.subtitle} title={chart.title}>
-      <ChartPlot chart={chart} />
+      <ToolOutputChartPlot chart={chart} />
     </ChartFrame>
   );
 }
