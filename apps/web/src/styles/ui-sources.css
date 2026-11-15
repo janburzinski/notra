@@ -244,6 +244,7 @@
 @source "../../../../packages/ui/src/hooks/use-opencode-frame.ts";
 @source "../../../../packages/ui/src/hooks/use-retained-value.ts";
 @source "../../../../packages/ui/src/lib/charts/chart-locale.ts";
+@source "../../../../packages/ui/src/lib/charts/chart-tooltip-motion.ts";
 @source "../../../../packages/ui/src/lib/charts/chart-tooltip-position.ts";
 @source "../../../../packages/ui/src/lib/charts/chart-tooltip-size.ts";
 @source "../../../../packages/ui/src/lib/charts/chart-zero-baseline.ts";

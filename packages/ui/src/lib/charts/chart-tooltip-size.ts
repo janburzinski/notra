@@ -2,12 +2,16 @@ import {
   TOOLTIP_MOVE_DURATION_S,
   TOOLTIP_MOVE_EASING,
 } from "@notra/ui/constants/chart-tooltip";
-
-const SIZE_MOTION_SETTLE_MS = 300;
+import {
+  fadeInNewRows,
+  resetTooltipSide,
+  snapshotTooltipRows,
+} from "@notra/ui/lib/charts/chart-tooltip-motion";
 
 type TooltipContent = {
   el?: HTMLElement;
   setContent: (content: unknown, ...rest: unknown[]) => void;
+  hide?: () => void;
 };
 
 type ChartWithTooltipView = {
@@ -15,6 +19,14 @@ type ChartWithTooltipView = {
 };
 
 const patchedTooltipContents = new WeakSet<object>();
+
+// `hideTip` waits for the tooltip's hideDelay. When the pointer really left a
+// scrub chart, hide it in this frame so it goes together with the hover dot.
+export function hideTooltipNow(chart: unknown) {
+  for (const view of (chart as ChartWithTooltipView)._componentsViews ?? []) {
+    view?._tooltipContent?.hide?.();
+  }
+}
 
 // Any childList mutation in the document costs a full style recalc on the
 // dashboard (its :has() rules make every insertion invalidate the whole tree,
@@ -102,7 +114,10 @@ export function withTooltipSizeMotion(formatter: (params: unknown) => string) {
   let template: HTMLTemplateElement | undefined;
   let animation: Animation | undefined;
   let lastHtml = "";
-  let lastChangeAt = 0;
+  // Widest the tooltip has been during this hover. Days with shorter labels
+  // or fewer rows would otherwise narrow it, and a tooltip left of the
+  // pointer would shift all its text sideways with every such day.
+  let stickyWidth = 0;
 
   return (params: unknown): string | HTMLElement => {
     const html = formatter(params);
@@ -115,9 +130,7 @@ export function withTooltipSizeMotion(formatter: (params: unknown) => string) {
     if (html === lastHtml && container.firstElementChild) {
       return container;
     }
-    const now = performance.now();
-    const settled = now - lastChangeAt > SIZE_MOTION_SETTLE_MS;
-    lastChangeAt = now;
+    const rowsBefore = lastHtml === "" ? null : snapshotTooltipRows(container);
     lastHtml = html;
     const previous = container.firstElementChild?.getBoundingClientRect();
     animation?.cancel();
@@ -127,18 +140,35 @@ export function withTooltipSizeMotion(formatter: (params: unknown) => string) {
     template.innerHTML = html;
     morphChildren(container, template.content);
     const surface = container.firstElementChild;
+    const wasShown = previous !== undefined && previous.width > 0;
+    if (surface instanceof HTMLElement) {
+      if (!wasShown) {
+        stickyWidth = 0;
+        resetTooltipSide(surface);
+      }
+      // Detached on the very first hover, so nothing can be measured yet;
+      // keep the shell's own min-width class until something can.
+      const width = surface.getBoundingClientRect().width;
+      if (width > 0) {
+        stickyWidth = Math.max(stickyWidth, width);
+        surface.style.minWidth = `${stickyWidth}px`;
+      }
+    }
     if (
-      settled &&
       surface instanceof HTMLElement &&
       previous &&
-      previous.width > 0 &&
+      wasShown &&
       previous.height > 0 &&
       !window.matchMedia("(prefers-reduced-motion: reduce)").matches
     ) {
       const next = surface.getBoundingClientRect();
       container.style.width = `${next.width}px`;
       container.style.height = `${next.height}px`;
-      if (previous.width !== next.width || previous.height !== next.height) {
+      // Only the height morphs; the width snaps. Scaling the width from the
+      // top-left corner clips the right-aligned numbers while it grows, and
+      // when the tooltip sits left of the pointer the old, wider box covers
+      // the hover line while it shrinks.
+      if (previous.height !== next.height) {
         queueMicrotask(() => {
           if (
             container?.firstElementChild !== surface ||
@@ -148,11 +178,8 @@ export function withTooltipSizeMotion(formatter: (params: unknown) => string) {
           }
           animation = surface.animate(
             [
-              {
-                "--ec-tooltip-scale-x": previous.width / next.width,
-                "--ec-tooltip-scale-y": previous.height / next.height,
-              },
-              { "--ec-tooltip-scale-x": 1, "--ec-tooltip-scale-y": 1 },
+              { "--ec-tooltip-scale-y": previous.height / next.height },
+              { "--ec-tooltip-scale-y": 1 },
             ],
             {
               duration: TOOLTIP_MOVE_DURATION_S * 1000,
@@ -161,6 +188,9 @@ export function withTooltipSizeMotion(formatter: (params: unknown) => string) {
           );
         });
       }
+    }
+    if (rowsBefore) {
+      fadeInNewRows(container, rowsBefore);
     }
     return container;
   };

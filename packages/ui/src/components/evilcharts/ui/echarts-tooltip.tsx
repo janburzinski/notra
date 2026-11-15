@@ -2,6 +2,7 @@ import type { TooltipComponentOption } from "echarts/components";
 import {
   TOOLTIP_MOVE_DURATION_S,
   TOOLTIP_MOVE_EASING,
+  TOOLTIP_SCRUB_FADE_S,
 } from "@notra/ui/constants/chart-tooltip";
 import {
   getColorsCount,
@@ -11,9 +12,11 @@ import {
 } from "@notra/ui/components/evilcharts/ui/echarts-chart";
 import type { ChartConfig, TooltipBodyGroup, TooltipBodyItem, TooltipLayout, TooltipValueFormatter } from "@notra/ui/types/charts";
 import {
+  confinedTooltipPosition,
   fixedTooltipPosition,
   overflowTooltipPosition,
 } from "@notra/ui/lib/charts/chart-tooltip-position";
+import { glideOnSideFlip } from "@notra/ui/lib/charts/chart-tooltip-motion";
 import { echartsDatumValue } from "@notra/ui/lib/charts/echarts-datum";
 import { escapeHtml } from "@notra/utils/escape";
 
@@ -53,13 +56,16 @@ export function tooltipRow({
   labelText,
   valueText,
   dimmed,
+  rowKey,
 }: {
   indicatorHtml: string;
   labelText: string;
   valueText: string;
   dimmed: string;
+  rowKey?: string;
 }): string {
-  return `<div class="flex w-full flex-wrap items-center gap-2${dimmed}">
+  const keyAttr = rowKey === undefined ? "" : ` data-ec-row="${escapeHtml(rowKey)}"`;
+  return `<div${keyAttr} class="flex w-full flex-wrap items-center gap-2${dimmed}">
           ${indicatorHtml}
           <div class="flex flex-1 items-center justify-between gap-4 leading-none">
             <span class="text-muted-foreground">${escapeHtml(labelText)}</span>
@@ -333,6 +339,7 @@ export function composeTooltipBody(
           labelText: item.labelText,
           valueText: item.valueText,
           dimmed: item.dimmed,
+          rowKey: item.key,
         })
       )
       .join("");
@@ -398,21 +405,48 @@ export function tooltipShell({
 
 export function resolveTooltipPosition(
   position: TooltipPosition,
-  confine = true
+  confine = true,
+  scrub = false
 ): TooltipComponentOption["position"] {
   if (position === "fixed") {
-    return (point, _params, _dom, _rect, size) =>
-      fixedTooltipPosition(point[0], size.contentSize[0], size.viewSize[0]);
+    return (point, _params, dom, _rect, size) => {
+      const at = fixedTooltipPosition(
+        point[0],
+        size.contentSize[0],
+        size.viewSize[0]
+      );
+      if (scrub) {
+        glideOnSideFlip(dom, point[0], at[0]);
+      }
+      return at;
+    };
   }
   if (confine) {
-    return undefined;
+    if (!scrub) {
+      return undefined;
+    }
+    // ECharts' own placement, reproduced so a side switch can glide too.
+    return (point, _params, dom, _rect, size) => {
+      const at = confinedTooltipPosition(
+        [point[0], point[1]],
+        [size.contentSize[0], size.contentSize[1]],
+        [size.viewSize[0], size.viewSize[1]]
+      );
+      glideOnSideFlip(dom, point[0], at[0]);
+      return at;
+    };
   }
-  return (point, _params, _dom, _rect, size) =>
-    overflowTooltipPosition(
+  return (point, _params, dom, _rect, size) => {
+    const at = overflowTooltipPosition(
       [point[0], point[1]],
       [size.contentSize[0], size.contentSize[1]],
       [size.viewSize[0], size.viewSize[1]]
     );
+    if (scrub) {
+      glideOnSideFlip(dom, point[0], at[0]);
+    }
+    return at;
+  };
 }
 
 export function tooltipBaseOption(params: {
@@ -458,7 +492,7 @@ export function tooltipBaseOption(params: {
   };
 
   const moveDuration = scrub ? 0 : TOOLTIP_MOVE_DURATION_S;
-  const tooltipMotionCss = `box-shadow:none;pointer-events:none;will-change:transform;transition:transform ${moveDuration}s ${TOOLTIP_MOVE_EASING},opacity 0.28s ease;`;
+  const tooltipMotionCss = `box-shadow:none;pointer-events:none;will-change:transform;transition:transform ${moveDuration}s ${TOOLTIP_MOVE_EASING},opacity ${scrub ? TOOLTIP_SCRUB_FADE_S : 0.28}s ease;`;
 
   return {
     show: present,
@@ -466,7 +500,11 @@ export function tooltipBaseOption(params: {
     confine,
     enterable: false,
     showDelay: 0,
-    hideDelay: 80,
+    // Scrub charts sweep the hover line away on leave; a lingering tooltip
+    // would keep showing the old day while the line crosses other days. Not 0:
+    // ECharts then hides synchronously (display: none) before every scrub
+    // show, and the formatter could no longer measure the tooltip.
+    hideDelay: scrub ? 1 : 80,
     transitionDuration: moveDuration,
     ...(confine ? {} : { appendTo: "body" as const }),
     backgroundColor: "transparent",
@@ -482,7 +520,7 @@ export function tooltipBaseOption(params: {
               shadowStyle: { color: axisPointerColor },
             }
           : linePointer,
-    position: resolveTooltipPosition(position, confine),
+    position: resolveTooltipPosition(position, confine, scrub),
   };
 }
 
@@ -506,7 +544,7 @@ export function composeTooltipSectionedRows(
             (item.paint
               ? tooltipColorSwatchHtml(item.paint)
               : tooltipIndicatorHtml(item.key, item.colorsCount));
-          return `<div class="flex w-full items-center gap-2 whitespace-nowrap${item.dimmed}">
+          return `<div data-ec-row="${escapeHtml(`${group.heading.key}/${item.key}`)}" class="flex w-full items-center gap-2 whitespace-nowrap${item.dimmed}">
           ${tooltipIndicatorSlot(indicatorHtml)}
           <div class="flex flex-1 items-center justify-between gap-4 leading-none">
             <span class="text-muted-foreground">${escapeHtml(item.labelText)}</span>
@@ -519,7 +557,7 @@ export function composeTooltipSectionedRows(
         index > 0
           ? `<div class="border-border my-0.5 border-t" role="separator"></div>`
           : "";
-      return `${separator}<div class="grid gap-1.5">
+      return `${separator}<div data-ec-row="${escapeHtml(group.heading.key)}:group" class="grid gap-1.5">
           <div class="flex items-center justify-between gap-4 leading-none">
             <span class="flex items-center gap-2 font-medium text-foreground">${tooltipIndicatorSlot(tooltipColorSwatchHtml(fill))}${escapeHtml(group.heading.labelText)}</span>
             <span class="font-mono text-2xs font-medium text-foreground tabular-nums">${escapeHtml(group.heading.valueText)}</span>

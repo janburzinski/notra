@@ -1,11 +1,6 @@
-/* Shared ECharts tooltip morph: the surface scales to the new size while the
-   content counter-scales, so tooltip size changes animate instead of jumping. */
-@property --ec-tooltip-scale-x {
-  syntax: "<number>";
-  inherits: true;
-  initial-value: 1;
-}
-
+/* Shared ECharts tooltip morph: the surface scales to the new height while the
+   content counter-scales, so tooltip height changes animate instead of
+   jumping. The width snaps; a scaled width clips right-aligned values. */
 @property --ec-tooltip-scale-y {
   syntax: "<number>";
   inherits: true;
@@ -15,14 +10,11 @@
 @layer components {
   .ec-tooltip-surface {
     transform-origin: top left;
-    transform: scale(var(--ec-tooltip-scale-x), var(--ec-tooltip-scale-y));
+    transform: scaleY(var(--ec-tooltip-scale-y));
   }
 
   .ec-tooltip-content {
     transform-origin: top left;
-    transform: scale(
-      calc(1 / var(--ec-tooltip-scale-x)),
-      calc(1 / var(--ec-tooltip-scale-y))
-    );
+    transform: scaleY(calc(1 / var(--ec-tooltip-scale-y)));
   }
 }

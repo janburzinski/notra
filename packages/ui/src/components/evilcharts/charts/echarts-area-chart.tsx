@@ -82,6 +82,7 @@ import {
   tooltipShell,
 } from "@notra/ui/components/evilcharts/ui/echarts-tooltip";
 import {
+  hideTooltipNow,
   keepTooltipContentMounted,
   withTooltipSizeMotion,
 } from "@notra/ui/lib/charts/chart-tooltip-size";
@@ -2324,7 +2325,7 @@ export function EChartsAreaChart<TData extends Record<string, unknown>>({
       );
     };
 
-    const paintScrub = () => {
+    const drawScrub = () => {
       const grid = readScrubGrid(chart);
       const index = live.scrubIndex;
       if (index === null || !grid || live.dataLength <= 0) {
@@ -2381,6 +2382,12 @@ export function EChartsAreaChart<TData extends Record<string, unknown>>({
         dots,
       });
     };
+    // The tooltip DOM updates in this frame; draw the line, dot and dimming
+    // now too instead of on zrender's next frame, or they trail it by one.
+    const paintScrub = () => {
+      drawScrub();
+      chart.getZr()?.flush();
+    };
     live.paintScrub = paintScrub;
 
     const tickScrub = () => {
@@ -2432,6 +2439,7 @@ export function EChartsAreaChart<TData extends Record<string, unknown>>({
       if (live.scrubTarget === 0 && live.scrubOpacity === 0) return;
       live.scrubTarget = 0;
       chart.dispatchAction({ type: "hideTip" });
+      hideTooltipNow(chart);
       if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
         const grid = readScrubGrid(chart);
         if (grid) live.scrubX = grid.x + grid.width;
