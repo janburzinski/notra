@@ -39,6 +39,10 @@ Explicit requirements and this repo's conventions take precedence. Companion
   `apps/blog/scripts/web-chrome.js` when `apps/web`, `packages/ui`,
   `packages/utils` or `bun.lock` change, and runs Knip. Do not overwrite
   unrelated or partially staged changes to make it pass.
+- The pre-push hook checks the formatting, lint and Effect lint of files
+  changed since `origin/main` and type checks the packages they belong to. It
+  only checks the checked-out commit, so commit or stash first and push the
+  current branch. Fix what it reports; don't push with `--no-verify`.
 - GitHub cannot require checks on this repository, so nothing blocks a red
   merge. Never merge a pull request while any `Code quality` check fails, even
   one that looks unrelated; a red `main` blocks production releases and every

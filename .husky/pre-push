@@ -1,0 +1,52 @@
+set -eu
+
+# Checks what this branch changed since it left main: format, lint (including
+# the Effect rules) and type checks of the packages it touches. The checks read
+# files on disk, so they only run for the checked-out commit with no tracked
+# changes. CI still runs everything.
+head=$(git rev-parse HEAD)
+while read -r local_ref local_sha _remote_ref _remote_sha; do
+  case "$local_ref" in refs/tags/*) continue ;; esac
+  case "$local_sha" in *[!0]*) ;; *) continue ;; esac
+  if [ "$local_sha" != "$head" ]; then
+    printf 'pre-push: %s is not the checked-out commit, so it cannot be checked.\nCheck it out and push again.\n' "$local_ref" >&2
+    exit 1
+  fi
+done
+
+if ! git diff --quiet HEAD --; then
+  printf 'pre-push: the checks read files on disk, which differ from the commits being pushed.\nCommit or stash your changes and push again.\n' >&2
+  exit 1
+fi
+
+if ! base=$(git merge-base HEAD origin/main 2>/dev/null); then
+  printf 'pre-push: origin/main is missing, so there is nothing to compare against.\nRun `git fetch origin main` and push again.\n' >&2
+  exit 1
+fi
+
+files=$(mktemp)
+effect_files=$(mktemp)
+trap 'rm -f "$files" "$effect_files"' EXIT
+trap 'exit 1' HUP INT TERM
+
+git diff --name-only --diff-filter=ACMR -z "$base" HEAD -- \
+  '*.js' '*.jsx' '*.ts' '*.tsx' '*.mjs' '*.cjs' '*.mts' '*.cts' \
+  '*.json' '*.jsonc' '*.css' '*.scss' '*.less' '*.html' '*.vue' '*.svelte' > "$files"
+
+# The Effect rules cover only the directories `bun run check:effect` lists.
+effect_specs=$(bun -e 'for (const arg of require("./package.json").scripts["check:effect"].split(" ")) if (/^(apps|packages)\//.test(arg)) console.log(`:(glob)${arg}/**/*.ts :(glob)${arg}/**/*.tsx`)')
+set -f
+# shellcheck disable=SC2086
+git diff --name-only --diff-filter=ACMR -z "$base" HEAD -- $effect_specs > "$effect_files"
+set +f
+
+if [ -s "$files" ]; then
+  xargs -0 bun x --no-install oxfmt --check --no-error-on-unmatched-pattern -- < "$files"
+  xargs -0 bun x --no-install oxlint --threads=4 --no-error-on-unmatched-pattern -- < "$files"
+fi
+
+if [ -s "$effect_files" ]; then
+  xargs -0 bun x --no-install oxlint --config oxlint.effect.config.ts --no-error-on-unmatched-pattern -- < "$effect_files"
+fi
+
+bun x --no-install turbo run check-types --filter="[$base]" --output-logs=errors-only
