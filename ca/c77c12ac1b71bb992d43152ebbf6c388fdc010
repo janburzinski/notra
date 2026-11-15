@@ -1,0 +1,42 @@
+apps/dashboard/src/components/autopilot/autopilot-agent-dock.tsx
+  s_f12bcfe1c08d71::t_8ebccd5b133d00 4,6,10,14,65,77,191-229,231-253,454-472,523-535
+  s_f12bcfe1c08d71::t_af73a582967788 46,109,118-122,377-379,385,517-518
+  s_f12bcfe1c08d71::t_25d58d14ae3ea5 91-97,108,110,365,380,449-453,590,594-597,601,614,628-659,678
+  s_f12bcfe1c08d71::t_94c834d79ec02d 230
+apps/dashboard/src/utils/autopilot-dock-activity.ts
+  s_f12bcfe1c08d71::t_d3af1dc3b95f27 1-44
+packages/ui/src/components/ui/composer.tsx
+  s_f12bcfe1c08d71::t_4e1e266f021c5d 175
+  s_f12bcfe1c08d71::t_cd2237bfb58137 189
+  s_f12bcfe1c08d71::t_c08882a2236026 208-212
+apps/dashboard/messages/en.json
+  s_f12bcfe1c08d71::t_829a13e84a9bed 8137-8142
+apps/dashboard/src/constants/autopilot-ui.ts
+  s_f12bcfe1c08d71::t_8fddfaae500020 510,512,528
+  s_f12bcfe1c08d71::t_af73a582967788 515-520
+apps/dashboard/src/components/chat/chat-composer-parts.tsx
+  s_f12bcfe1c08d71::t_3336f238ff2c1b 32
+  s_f12bcfe1c08d71::t_679a84f6ccc299 81-85,98,101
+  s_f12bcfe1c08d71::t_9d143eeffa8844 89-95,105
+apps/dashboard/src/types/autopilot-workflows.ts
+  s_f12bcfe1c08d71::t_829a13e84a9bed 316-326
+  s_f12bcfe1c08d71::t_25d58d14ae3ea5 353-354
+apps/dashboard/messages/de.json
+  s_f12bcfe1c08d71::t_829a13e84a9bed 8137-8142
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "cac77c12ac1b71bb992d43152ebbf6c388fdc010",
+  "prompts": {},
+  "sessions": {
+    "s_f12bcfe1c08d71": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "615fcb5d-cacc-4061-b916-085eeae38134",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
