@@ -1,13 +1,17 @@
 "use client";
 
 import {
+  Alert02Icon,
   ArrowDown01Icon,
+  ArrowUp01Icon,
   FlowConnectionIcon,
   FullScreenIcon,
   PlusSignIcon,
+  Tick02Icon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Composer } from "@notra/ui/components/ui/composer";
+import { Spinner } from "@notra/ui/components/ui/spinner";
 import { TooltipProvider } from "@notra/ui/components/ui/tooltip";
 import {
   COMPOSER_ELEVATED_SHADOW,
@@ -39,6 +43,7 @@ import {
   AUTOPILOT_AGENT_DOCK_ENTER,
   AUTOPILOT_AGENT_DOCK_EXIT,
   AUTOPILOT_AGENT_DOCK_FULLSCREEN_CLASS,
+  AUTOPILOT_AGENT_DOCK_INPUT_CLASS,
   AUTOPILOT_AUTOMATIONS,
   AUTOPILOT_KIND_META,
 } from "@/constants/autopilot-ui";
@@ -50,14 +55,18 @@ import {
 import { localStorageKeys } from "@/constants/storage";
 import { useAgentDraftTarget } from "@/lib/hooks/use-agent-handoff";
 import {
+  useAutopilotDockActivity,
   useAutopilotDockFocus,
   useAutopilotDockKeys,
+  useDockShell,
 } from "@/lib/hooks/use-autopilot-dock";
 import { useAgentWorkflowRefresh } from "@/lib/hooks/use-autopilot-workflows";
 import { useDashboardAgentChat } from "@/lib/hooks/use-dashboard-agent-chat";
 import { useDesktopBreakpoint } from "@/lib/hooks/use-desktop-breakpoint";
 import type {
+  AutopilotAgentDockActivityRowProps,
   AutopilotAgentDockChip,
+  AutopilotAgentDockChipsProps,
   AutopilotAgentDockFocus,
   AutopilotAgentDockFocusChipProps,
   AutopilotAgentDockHeaderProps,
@@ -81,7 +90,13 @@ function dockLayerClass(fullscreen: boolean) {
     : "pointer-events-none absolute inset-x-0 bottom-0 z-20 flex justify-center px-4 pb-4";
 }
 
-function dockClass(mode: AutopilotAgentDockMode) {
+/**
+ * `shelled` holds the shell from the moment the dock opens until the
+ * conversation has folded away again. It comes on at once, so the page never
+ * shows through the conversation as it grows, and only fades once the
+ * conversation is gone.
+ */
+function dockClass(mode: AutopilotAgentDockMode, shelled: boolean) {
   if (mode === "fullscreen") {
     return AUTOPILOT_AGENT_DOCK_FULLSCREEN_CLASS;
   }
@@ -92,10 +107,9 @@ function dockClass(mode: AutopilotAgentDockMode) {
     "pointer-events-auto flex max-h-[min(41rem,calc(100svh-8rem))] w-full max-w-2xl flex-col border",
     // The pill's own corners, so the open dock and the pill line up.
     COMPOSER_PILL_RADIUS,
-    COMPOSER_TRAY_TRANSITION,
-    mode === "open"
-      ? cn("bg-muted border-sidebar-border p-1", COMPOSER_ELEVATED_SHADOW)
-      : "border-transparent bg-transparent"
+    shelled
+      ? cn("bg-shell border-shell-border p-1", COMPOSER_ELEVATED_SHADOW)
+      : cn("border-transparent bg-transparent", COMPOSER_TRAY_TRANSITION)
   );
 }
 
@@ -103,7 +117,11 @@ function chatCardClass(fullscreen: boolean) {
   return cn(
     AUTOPILOT_AGENT_DOCK_CARD_CLASS,
     "flex min-h-0 min-w-0 flex-col [grid-area:chat]",
-    fullscreen ? "rounded-b-none border-b-0" : "mb-1 h-svh min-h-32 rounded-3xl"
+    // Full screen, the input below continues this card, so neither casts a
+    // shadow across the seam between them.
+    fullscreen
+      ? "rounded-b-none border-b-0 shadow-none"
+      : "mb-1 h-svh min-h-32 rounded-3xl"
   );
 }
 
@@ -169,6 +187,89 @@ function FocusChip({ focus, onRemove }: AutopilotAgentDockFocusChipProps) {
       onRemove={onRemove}
       removeLabel={t("dock.detachWorkflow", { name: focus.name })}
     />
+  );
+}
+
+/**
+ * Folded, the dock keeps one line of the conversation above its input: what
+ * the agent is working on, a step waiting for you, or a reply you haven't
+ * read. Clicking it opens the dock.
+ */
+function DockActivityRow({
+  activity,
+  onOpen,
+}: AutopilotAgentDockActivityRowProps) {
+  const t = useTranslations("dashboard.agent");
+  const icon = {
+    working: <Spinner className="text-muted-foreground size-3.5" />,
+    approval: (
+      <HugeiconsIcon
+        aria-hidden="true"
+        className="text-warning size-3.5 shrink-0"
+        icon={Alert02Icon}
+      />
+    ),
+    replied: (
+      <HugeiconsIcon
+        aria-hidden="true"
+        className="text-muted-foreground size-3.5 shrink-0"
+        icon={Tick02Icon}
+      />
+    ),
+  }[activity.kind];
+  const label = {
+    working: t("dock.activityWorking"),
+    approval: t("dock.activityApproval"),
+    replied: t("dock.activityReplied"),
+  }[activity.kind];
+  const detail =
+    activity.kind === "approval"
+      ? t("dock.activityApprovalHint")
+      : activity.text;
+  return (
+    <button
+      className={cn(
+        "border-table-card-border bg-table-card hover:bg-accent/60 focus-visible:ring-ring/50 animate-in fade-in duration-normal flex w-full min-w-0 cursor-pointer items-center gap-1.5 rounded-md border py-1 pr-1.5 pl-1.5 text-left text-xs transition-colors outline-none focus-visible:ring-3 motion-reduce:animate-none",
+        // A step waiting on you stands out like an error, without being one.
+        activity.kind === "approval" &&
+          "border-warning/25 bg-warning/10 hover:bg-warning/15"
+      )}
+      data-dock-activity={activity.kind}
+      onClick={onOpen}
+      title={t("dock.activityOpen")}
+      type="button"
+    >
+      {icon}
+      <span className="text-foreground shrink-0 font-medium">{label}</span>
+      <span className="text-muted-foreground min-w-0 flex-1 truncate">
+        {detail}
+      </span>
+      <HugeiconsIcon
+        aria-hidden="true"
+        className="text-muted-foreground size-3.5 shrink-0"
+        icon={ArrowUp01Icon}
+      />
+    </button>
+  );
+}
+
+/**
+ * What sits above the pill: the folded activity row, then the workflow or
+ * automation the conversation is about.
+ */
+function DockChips({
+  activity,
+  focus,
+  onDetach,
+  onOpen,
+}: AutopilotAgentDockChipsProps) {
+  return (
+    <>
+      {activity ? (
+        <DockActivityRow activity={activity} onOpen={onOpen} />
+      ) : null}
+      {focus ? <FocusChip focus={focus} onRemove={onDetach} /> : null}
+    </>
   );
 }
 
@@ -283,6 +384,7 @@ function DockWorkflowPreview({
  * stays mounted so its attachments survive.
  */
 function DockInput({
+  shelled,
   fullscreen,
   pendingQuestion,
   questionsElevated,
@@ -294,11 +396,15 @@ function DockInput({
     <div
       className={cn(
         "flex min-h-0 shrink-0 flex-col",
+        AUTOPILOT_AGENT_DOCK_INPUT_CLASS,
+        // Open, the dock is the pill's tray; a second one inside it would
+        // push the attachments in twice as far as the conversation.
+        shelled && !fullscreen && "[&_[data-slot=composer]]:p-0",
         fullscreen &&
           cn(
             AUTOPILOT_AGENT_DOCK_CARD_CLASS,
             // Continues the chat card above, so the input sits inside it.
-            "rounded-t-none border-t-0 px-4 pb-4 [grid-area:input]"
+            "rounded-t-none border-t-0 px-4 pb-4 shadow-none [grid-area:input]"
           )
       )}
     >
@@ -362,6 +468,13 @@ export function AutopilotAgentDock({
   const pendingQuestion = findPendingAgentQuestion(messages);
   const fullscreen = mode === "fullscreen";
   const expanded = mode !== "collapsed";
+  const shell = useDockShell(expanded);
+  const activity = useAutopilotDockActivity({
+    messages,
+    busy: agent.isAgentBusy,
+    expanded,
+    failed: chatError !== null,
+  });
   const hasMessages = messages.length > 0;
   const dockRef = useRef<HTMLElement | null>(null);
   const keepCollapsedRef = useAutopilotDockKeys({
@@ -399,6 +512,13 @@ export function AutopilotAgentDock({
     placeholderKey({ hasMessages, focusWorkflow, focusAutomation })
   );
 
+  const openFromActivity = () => {
+    setMode("open");
+    // The row goes away as the dock opens; keep the keyboard in the dock,
+    // on the input.
+    window.requestAnimationFrame(() => chatInputRef.current?.focus());
+  };
+
   const composer = (
     <ChatInput
       disabled={agent.isHydratingHistory}
@@ -406,11 +526,22 @@ export function AutopilotAgentDock({
       error={chatError}
       isLoading={agent.isAgentBusy}
       layout="pill"
+      // The agent panel's shell and card colours.
+      surface="card"
       onClearError={() => setChatError(null)}
       onRetry={agent.canRetry ? agent.retry : undefined}
       // On a workflow's page, the workflow is attached: it's what "this"
       // means to the agent, until it's taken off.
-      chips={focus ? <FocusChip focus={focus} onRemove={detach} /> : undefined}
+      chips={
+        activity || focus ? (
+          <DockChips
+            activity={activity}
+            focus={focus}
+            onDetach={detach}
+            onOpen={openFromActivity}
+          />
+        ) : undefined
+      }
       // Open, the input keeps its size, so the dock doesn't move under the
       // pointer when focus leaves it for a button.
       pillExpanded={expanded}
@@ -465,15 +596,15 @@ export function AutopilotAgentDock({
     <div className={cn(dockLayerClass(fullscreen), hidden && "hidden")}>
       <section
         aria-label={tCommon("labels.agent")}
-        className={dockClass(mode)}
+        className={dockClass(mode, shell.shelled)}
         ref={dockRef}
       >
         <LazyMotion features={domAnimation} strict>
-          <AnimatePresence initial={false}>
+          <AnimatePresence initial={false} onExitComplete={shell.release}>
             {expanded ? (
               <m.div
                 // react-doctor-disable-next-line react-doctor/no-layout-property-animation -- the conversation grows out of the input once per open; a transform would stretch its text
-                animate={{ height: "auto", opacity: 1 }}
+                animate={{ height: "auto" }}
                 // In full screen its children sit on the dock's grid.
                 className={
                   fullscreen
@@ -483,11 +614,10 @@ export function AutopilotAgentDock({
                 exit={{
                   // react-doctor-disable-next-line react-doctor/no-layout-property-animation -- the conversation folds into the input once per close; a transform would squash its text
                   height: 0,
-                  opacity: 0,
                   transition: motionOf(reduceMotion, AUTOPILOT_AGENT_DOCK_EXIT),
                 }}
                 // react-doctor-disable-next-line react-doctor/no-layout-property-animation -- the start of the one-time open above
-                initial={{ height: 0, opacity: 0 }}
+                initial={{ height: 0 }}
                 key="conversation"
                 transition={motionOf(reduceMotion, AUTOPILOT_AGENT_DOCK_ENTER)}
               >
@@ -501,19 +631,38 @@ export function AutopilotAgentDock({
                   }
                 />
                 <div className={chatCardClass(fullscreen)}>
-                  <ChatQuoteProvider key={agent.activeChatId}>
-                    <ChatConversation
-                      activeChatId={agent.activeChatId}
-                      customTools={customTools}
-                      messages={messages}
-                      onApproveTool={agent.handleApproveTool}
-                      onDenyTool={agent.handleDenyTool}
-                      organizationId={organizationId}
-                      organizationSlug={organizationSlug}
-                      status={agent.status}
-                    />
-                  </ChatQuoteProvider>
-                  {suggestions}
+                  {/* Only the messages fade; the card stays solid, so the
+                      page doesn't show through it while it grows. */}
+                  <m.div
+                    animate={{ opacity: 1 }}
+                    className="flex min-h-0 flex-1 flex-col"
+                    exit={{
+                      opacity: 0,
+                      transition: motionOf(
+                        reduceMotion,
+                        AUTOPILOT_AGENT_DOCK_EXIT
+                      ),
+                    }}
+                    initial={{ opacity: 0 }}
+                    transition={motionOf(
+                      reduceMotion,
+                      AUTOPILOT_AGENT_DOCK_ENTER
+                    )}
+                  >
+                    <ChatQuoteProvider key={agent.activeChatId}>
+                      <ChatConversation
+                        activeChatId={agent.activeChatId}
+                        customTools={customTools}
+                        messages={messages}
+                        onApproveTool={agent.handleApproveTool}
+                        onDenyTool={agent.handleDenyTool}
+                        organizationId={organizationId}
+                        organizationSlug={organizationSlug}
+                        status={agent.status}
+                      />
+                    </ChatQuoteProvider>
+                    {suggestions}
+                  </m.div>
                 </div>
                 {fullscreen ? (
                   <aside
@@ -532,6 +681,7 @@ export function AutopilotAgentDock({
         </LazyMotion>
         <DockInput
           fullscreen={fullscreen}
+          shelled={shell.shelled}
           onAnswer={agent.answerQuestion}
           onDismissQuestion={agent.dismissQuestion}
           pendingQuestion={pendingQuestion}

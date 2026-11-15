@@ -172,7 +172,7 @@ function ComposerFrame({
   const hasNudge = Boolean(nudge);
   const isCard = surface === "card";
   const showTray = hasNudge || !(flat || rimless);
-  if (isCard) {
+  if (isCard && !flat) {
     return (
       <CardComposerFrame className={className} nudge={nudge}>
         {children}
@@ -186,7 +186,7 @@ function ComposerFrame({
         "flex w-full min-w-0 flex-col",
         COMPOSER_TRAY_TRANSITION,
         elevated && hasNudge && COMPOSER_ELEVATED_SHADOW,
-        showTray ? "bg-muted p-1" : "bg-transparent",
+        showTray ? cn(isCard ? "bg-shell" : "bg-muted", "p-1") : "bg-transparent",
         frameRadius(flat, size),
         // Chips above the pill sit near the top edge, where the pill's wide
         // corners would crowd them, so the tray's top matches the card's.
@@ -205,7 +205,11 @@ function ComposerFrame({
       </LazyMotion>
       <div
         className={cn(
-          "border-border/70 bg-background min-w-0 overflow-hidden border",
+          "min-w-0 overflow-hidden border",
+          // A card-surface pill uses the shell and card tokens tables use.
+          isCard
+            ? "border-table-card-border bg-table-card"
+            : "border-border/70 bg-background",
           flat
             ? // pill input with a round send button; the radius is half the
               // single-line height so wrapped lines keep the button concentric

@@ -8134,7 +8134,12 @@
         "preview": "Workflow-Vorschau",
         "previewEmptyTitle": "Hier erscheint dein Workflow",
         "previewEmptyDescription": "Beschreib, worauf Autopilot achten soll. Der Agent fragt nach, wenn etwas unklar ist, und baut ihn dann Schritt für Schritt.",
-        "detachWorkflow": "{name} aus dem Gespräch nehmen"
+        "detachWorkflow": "{name} aus dem Gespräch nehmen",
+        "activityWorking": "Arbeitet",
+        "activityApproval": "Wartet auf deine Freigabe",
+        "activityApprovalHint": "Ein Schritt wartet darauf, dass du ihn erlaubst",
+        "activityReplied": "Geantwortet",
+        "activityOpen": "Unterhaltung öffnen"
       }
     },
     "brandSelector": {

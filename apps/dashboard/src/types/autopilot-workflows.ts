@@ -313,6 +313,24 @@ export interface AutopilotWorkflowActionsProps {
   stopping: boolean;
 }
 
+export interface AutopilotAgentDockActivity {
+  kind: "working" | "approval" | "replied";
+  /** Your last message while it works, or the start of the reply. */
+  text: string;
+}
+
+export interface AutopilotAgentDockChipsProps {
+  activity: AutopilotAgentDockActivity | null;
+  focus: AutopilotAgentDockChip | null;
+  onDetach: () => void;
+  onOpen: () => void;
+}
+
+export interface AutopilotAgentDockActivityRowProps {
+  activity: AutopilotAgentDockActivity;
+  onOpen: () => void;
+}
+
 export interface AutopilotAgentDockFocusChipProps {
   focus: AutopilotAgentDockChip;
   onRemove: () => void;
@@ -339,6 +357,8 @@ export interface AutopilotAgentDockPreviewProps {
 }
 
 export interface AutopilotAgentDockInputProps {
+  /** On the open dock's shell, which then serves as the pill's tray. */
+  shelled: boolean;
   fullscreen: boolean;
   pendingQuestion: PendingAgentQuestion | null;
   /** Floating on its own, the questions lift off the page like the input. */

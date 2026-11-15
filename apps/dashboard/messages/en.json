@@ -8134,7 +8134,12 @@
         "preview": "Workflow preview",
         "previewEmptyTitle": "Your workflow shows up here",
         "previewEmptyDescription": "Describe what Autopilot should keep an eye on. The agent asks when something is unclear, then builds it step by step.",
-        "detachWorkflow": "Take {name} off the conversation"
+        "detachWorkflow": "Take {name} off the conversation",
+        "activityWorking": "Working",
+        "activityApproval": "Needs your approval",
+        "activityApprovalHint": "A step is waiting for you to allow it",
+        "activityReplied": "Replied",
+        "activityOpen": "Open the conversation"
       }
     },
     "brandSelector": {

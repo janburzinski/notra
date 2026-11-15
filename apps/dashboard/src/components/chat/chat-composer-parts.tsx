@@ -29,6 +29,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@notra/ui/components/ui/tooltip";
+import { cn } from "@notra/ui/lib/utils";
 import { useTranslations } from "use-intl";
 
 import { ChatComposerAttachmentChips } from "@/components/chat/chat-composer-attachments";
@@ -77,21 +78,31 @@ export function ChatComposerSendButton({
   );
 }
 
-/** What went wrong, and a way to try again when there is one. */
+/**
+ * What went wrong, and a way to try again when there is one. Shaped like the
+ * chips beside it, icon and text in line with theirs, but tinted so it
+ * doesn't read as one more thing the message carries.
+ */
 function ChatInputError({ message, onRetry }: ChatInputErrorProps) {
   const tCommon = useTranslations("common");
   return (
-    <span className="flex w-full min-w-0 items-center gap-1.5 text-sm">
+    <span
+      className={cn(
+        "border-warning/25 bg-warning/10 text-foreground flex w-full min-w-0 items-center gap-1.5 rounded-md border pr-1 pl-1.5 text-xs",
+        // The button fills the row's height, as tall as a chip.
+        onRetry ? "py-0" : "py-1"
+      )}
+    >
       <HugeiconsIcon
         aria-hidden="true"
-        className="text-warning size-4 shrink-0"
+        className="text-warning size-3.5 shrink-0"
         icon={Alert02Icon}
       />
-      <span className="min-w-0 flex-1 truncate" role="alert">
+      <span className="min-w-0 flex-1 truncate" role="alert" title={message}>
         {message}
       </span>
       {onRetry ? (
-        <Button onClick={onRetry} size="xs" variant="outline">
+        <Button onClick={onRetry} size="xs" variant="ghost">
           {tCommon("actions.tryAgain")}
         </Button>
       ) : null}

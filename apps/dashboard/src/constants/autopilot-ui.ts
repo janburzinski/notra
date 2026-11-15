@@ -507,9 +507,17 @@ export const AUTOPILOT_WORKFLOW_STEP_ICONS = {
   [AUTOPILOT_WORKFLOW_BLOCK_TYPES.postToSlack]: SlackIcon,
 } as const satisfies Record<string, IconSvgElement>;
 
-/** A white card on the agent dock's grey tray, like the agent panel's body. */
+/** A card on the agent dock's shell, in the agent panel's colours. */
 export const AUTOPILOT_AGENT_DOCK_CARD_CLASS =
-  "bg-background border-border/70 overflow-hidden rounded-lg border";
+  "bg-table-card border-table-card-border shadow-table-card overflow-hidden rounded-lg border";
+
+/**
+ * Attachments above the dock's pill: solid cards on the shell, as far from
+ * the pill as from what's above them, their left edge in line with the
+ * pill's "+".
+ */
+export const AUTOPILOT_AGENT_DOCK_INPUT_CLASS =
+  "[&_[data-slot=composer-chip]]:border-solid [&_[data-slot=composer-chip]]:border-table-card-border [&_[data-slot=composer-chip]]:bg-table-card [&_[data-slot=composer-nudge]]:px-2 [&_[data-slot=composer-nudge]]:pt-1 [&_[data-slot=composer-nudge]]:pb-2";
 
 /**
  * Full screen fills the page and lays the dock out on a grid, so the chat,
@@ -517,7 +525,7 @@ export const AUTOPILOT_AGENT_DOCK_CARD_CLASS =
  * changes size.
  */
 export const AUTOPILOT_AGENT_DOCK_FULLSCREEN_CLASS =
-  "bg-muted h-full min-h-0 grid grid-cols-1 grid-rows-[auto_minmax(0,1fr)_auto] gap-x-1 px-1 pb-1 [grid-template-areas:'header'_'chat'_'input'] lg:grid-cols-[minmax(20rem,26rem)_minmax(0,1fr)] lg:[grid-template-areas:'header_header'_'chat_aside'_'input_aside']";
+  "bg-shell h-full min-h-0 grid grid-cols-1 grid-rows-[auto_minmax(0,1fr)_auto] gap-x-1 px-1 pb-1 [grid-template-areas:'header'_'chat'_'input'] lg:grid-cols-[minmax(20rem,26rem)_minmax(0,1fr)] lg:[grid-template-areas:'header_header'_'chat_aside'_'input_aside']";
 
 /** The workflow preview zooms out this far to show every step at once. */
 export const AUTOPILOT_WORKFLOW_PREVIEW_FIT_MIN_ZOOM = 0.4;
