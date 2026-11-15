@@ -5022,7 +5022,7 @@ export const autopilotBriefs = pgTable(
       onDelete: "set null",
     }),
     content: jsonb("content").$type<AutopilotBriefContent>().notNull(),
-    /** The artifact the brief is read as; older briefs have their own page. */
+    /** The artifact the brief is read as; an older brief gets one when first opened. */
     artifactId: text("artifact_id").references(() => artifacts.id, {
       onDelete: "set null",
     }),
@@ -5186,8 +5186,10 @@ export const autopilotWorkflows = pgTable(
 );
 
 /**
- * A report or visual the agent made in a chat or a Slack thread. Members open
- * it from the chat or its own page; a share id makes a read-only public copy.
+ * A report or visual the agent made in a chat, a Slack thread or a daily
+ * brief. Its file and every version live in its own code.storage repository
+ * (`notra-artifact-<id>`); this row indexes it and caches the current version
+ * so pages never wait on git. A share id makes a public copy of one version.
  */
 export const artifacts = pgTable(
   "artifacts",
@@ -5202,10 +5204,27 @@ export const artifacts = pgTable(
     source: text("source").notNull(),
     title: text("title").notNull(),
     currentVersion: integer("current_version").notNull().default(1),
+    /**
+     * The commit of the current version; every write must build on it. Empty
+     * only on a row the previous app inserted while this migration deployed;
+     * those rows are hidden and the follow-up migration deletes them.
+     */
+    headSha: text("head_sha").notNull().default(""),
+    content: jsonb("content")
+      .$type<StoredArtifactContent>()
+      .notNull()
+      .default({ title: "", blocks: [] }),
     createdByUserId: text("created_by_user_id").references(() => users.id, {
       onDelete: "set null",
     }),
     shareId: text("share_id"),
+    /** The version the public link shows; later edits stay private until republished. */
+    shareVersion: integer("share_version"),
+    shareContent: jsonb("share_content").$type<StoredArtifactContent>(),
+    /**
+     * @deprecated Unused. Kept so the app still running during a deploy can
+     * read it; drop in the migration after artifacts on code.storage ship.
+     */
     deletedAt: timestamp("deleted_at"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at")
@@ -5219,10 +5238,18 @@ export const artifacts = pgTable(
       table.organizationId,
       table.chatId
     ),
+    index("artifacts_organizationId_updatedAt_idx").on(
+      table.organizationId,
+      table.updatedAt
+    ),
   ]
 );
 
-/** Every saved version; the agent's edits add one instead of overwriting. */
+/**
+ * @deprecated Versions live in git now. Kept so the app still running during
+ * a deploy can read it; drop in the migration after artifacts on code.storage
+ * ship.
+ */
 export const artifactVersions = pgTable(
   "artifact_versions",
   {
@@ -5234,4 +5261,39 @@ export const artifactVersions = pgTable(
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
   (table) => [primaryKey({ columns: [table.artifactId, table.version] })]
+);
+
+/** Who saved each version and its commit; the content stays in git. */
+export const artifactRevisions = pgTable(
+  "artifact_revisions",
+  {
+    artifactId: text("artifact_id")
+      .notNull()
+      .references(() => artifacts.id, { onDelete: "cascade" }),
+    version: integer("version").notNull(),
+    sha: text("sha").notNull(),
+    /** chat, slack, autopilot or member (a restore from the page). */
+    actor: text("actor").notNull(),
+    userId: text("user_id").references(() => users.id, {
+      onDelete: "set null",
+    }),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [primaryKey({ columns: [table.artifactId, table.version] })]
+);
+
+/**
+ * code.storage repositories to delete. A trigger queues an artifact's
+ * repository when its row goes, however it goes (one delete or a workspace's
+ * cascade), and the Autopilot cron retries until code.storage confirms.
+ */
+export const codeStorageDeletions = pgTable(
+  "code_storage_deletions",
+  {
+    repoId: text("repo_id").primaryKey(),
+    nextAttemptAt: timestamp("next_attempt_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("codeStorageDeletions_nextAttemptAt_idx").on(table.nextAttemptAt),
+  ]
 );

@@ -1,8 +1,6 @@
 import { AUTOPILOT_BRIEFS_PATH } from "@/constants/autopilot-brief";
 import type {
-  AutopilotBriefGroups,
   AutopilotBriefSource,
-  AutopilotBriefView,
   AutopilotFindingView,
 } from "@/types/autopilot";
 
@@ -33,19 +31,6 @@ export function describeBriefCounts(counts: {
       .filter(Boolean)
       .join(" · ") || "Nothing to review today"
   );
-}
-
-/** Still waiting for someone to merge, write or close it. */
-export function isFindingPending(finding: { status: string }) {
-  return finding.status === "proposed" || finding.status === "suggested";
-}
-
-/** What goes before item `index` of a list read aloud: "", ", " or " and ". */
-export function listSeparator(index: number, count: number) {
-  if (index === 0) {
-    return "";
-  }
-  return index === count - 1 ? " and " : ", ";
 }
 
 function percent(value: number) {
@@ -141,42 +126,4 @@ export function briefFindingSources(
     });
   }
   return sources;
-}
-
-/**
- * Places a brief's items in reading order: the lead, the model's sections,
- * whatever no section took, then what was merged. Ids whose item is gone
- * are skipped.
- */
-export function groupBriefFindings(
-  brief: Pick<AutopilotBriefView, "content" | "findings">
-): AutopilotBriefGroups {
-  const { content } = brief;
-  const byId = new Map(brief.findings.map((finding) => [finding.id, finding]));
-  const pick = (ids: string[]) =>
-    ids.flatMap((id) => {
-      const finding = byId.get(id);
-      return finding ? [finding] : [];
-    });
-  const lead = content.lead ? (byId.get(content.lead.findingId) ?? null) : null;
-  const placed = new Set([
-    ...(lead ? [lead.id] : []),
-    ...content.sections.flatMap((section) => section.findingIds),
-  ]);
-  const unplaced = (finding: AutopilotFindingView) => !placed.has(finding.id);
-  return {
-    lead,
-    sections: content.sections
-      .map((section) => ({
-        // Each item sits in one section only, so its ids name it.
-        key: section.findingIds.join(",") || section.title,
-        title: section.title,
-        body: section.body,
-        rows: pick(section.findingIds),
-      }))
-      .filter((section) => section.rows.length > 0),
-    rest: pick(content.findingIds).filter(unplaced),
-    merged: pick(content.mergedIds).filter(unplaced),
-    asked: pick(content.findingIds),
-  };
 }

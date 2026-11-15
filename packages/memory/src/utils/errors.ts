@@ -13,3 +13,8 @@ export class MemoryLimitError extends Error {
 export class MemoryNotConfiguredError extends Error {
   override name = "MemoryNotConfiguredError";
 }
+
+/** The branch moved since the writer read it; nothing was saved. */
+export class RepoConflictError extends Error {
+  override name = "RepoConflictError";
+}

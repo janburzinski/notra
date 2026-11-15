@@ -1,16 +1,14 @@
+import { artifactModelText } from "@notra/ai/chat/artifacts";
 import {
-  artifactModelText,
-  artifactToolOutput,
-  createArtifact,
-  readArtifactForModel,
-  updateArtifact,
-} from "@notra/ai/chat/artifacts";
-import {
-  artifactContentSchema,
+  createArtifactInputSchema,
   getArtifactInputSchema,
+  listArtifactsInputSchema,
   updateArtifactInputSchema,
 } from "@notra/ai/schemas/artifact";
-import { ARTIFACT_TOOL_GUIDE } from "@notra/ai/tools/artifacts";
+import {
+  ARTIFACT_TOOL_GUIDE,
+  artifactToolHandlers,
+} from "@notra/ai/tools/artifacts";
 import type { SessionContext } from "eve/context";
 import { defineTool } from "eve/tools";
 
@@ -22,26 +20,29 @@ function isSlackSession(ctx: SessionContext) {
   return auth?.authenticator === "slack-webhook";
 }
 
+function handlers(ctx: SessionContext) {
+  const slack = isSlackSession(ctx);
+  return artifactToolHandlers({
+    organizationId: requireOrganizationId(ctx),
+    // The dashboard chat this thread mirrors into, when there is one.
+    chatId: getSessionAttribute(ctx, "chatId"),
+    // Slack sessions carry a Slack user, not a Notra one.
+    userId: slack ? null : getSessionAttribute(ctx, "userId"),
+    source: slack ? "slack" : "chat",
+  });
+}
+
+const toModelOutput = (output: Parameters<typeof artifactModelText>[0]) => ({
+  type: "text" as const,
+  value: artifactModelText(output, "slack"),
+});
+
 export function createCreateArtifactTool() {
   return defineTool({
     description: ARTIFACT_TOOL_GUIDE.create,
-    inputSchema: artifactContentSchema,
-    async execute(input, ctx) {
-      const saved = await createArtifact(
-        {
-          organizationId: requireOrganizationId(ctx),
-          // The dashboard chat this thread mirrors into, when there is one.
-          chatId: getSessionAttribute(ctx, "chatId"),
-          source: isSlackSession(ctx) ? "slack" : "chat",
-        },
-        input
-      );
-      return artifactToolOutput(saved);
-    },
-    toModelOutput: (output) => ({
-      type: "text",
-      value: artifactModelText(output, "slack"),
-    }),
+    inputSchema: createArtifactInputSchema,
+    execute: (input, ctx) => handlers(ctx).create(input),
+    toModelOutput,
   });
 }
 
@@ -49,18 +50,8 @@ export function createUpdateArtifactTool() {
   return defineTool({
     description: ARTIFACT_TOOL_GUIDE.update,
     inputSchema: updateArtifactInputSchema,
-    async execute({ artifactId, ...content }, ctx) {
-      const saved = await updateArtifact(
-        requireOrganizationId(ctx),
-        artifactId,
-        content
-      );
-      return artifactToolOutput(saved);
-    },
-    toModelOutput: (output) => ({
-      type: "text",
-      value: artifactModelText(output, "slack"),
-    }),
+    execute: (input, ctx) => handlers(ctx).update(input),
+    toModelOutput,
   });
 }
 
@@ -68,7 +59,14 @@ export function createGetArtifactTool() {
   return defineTool({
     description: ARTIFACT_TOOL_GUIDE.get,
     inputSchema: getArtifactInputSchema,
-    execute: ({ artifactId }, ctx) =>
-      readArtifactForModel(requireOrganizationId(ctx), artifactId),
+    execute: (input, ctx) => handlers(ctx).get(input),
+  });
+}
+
+export function createListArtifactsTool() {
+  return defineTool({
+    description: ARTIFACT_TOOL_GUIDE.list,
+    inputSchema: listArtifactsInputSchema,
+    execute: (input, ctx) => handlers(ctx).list(input),
   });
 }

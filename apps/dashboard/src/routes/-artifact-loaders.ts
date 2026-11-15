@@ -8,7 +8,7 @@ import { artifacts, members, organizations } from "@notra/db/schema";
 import { isDemoMode } from "@notra/utils/demo-mode";
 import { notFound, redirect } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
-import { and, eq, isNull } from "drizzle-orm";
+import { and, eq, ne } from "drizzle-orm";
 
 import { getSession } from "@/lib/auth/actions";
 import type { UiRouteInput } from "@/types/ui-route";
@@ -53,7 +53,8 @@ export const loadArtifactPage = createServerFn({ method: "GET" })
           eq(members.userId, session.user.id)
         )
       )
-      .where(and(eq(artifacts.id, artifactId), isNull(artifacts.deletedAt)))
+      // Rows the previous app inserted mid-deploy have no repository.
+      .where(and(eq(artifacts.id, artifactId), ne(artifacts.headSha, "")))
       .limit(1);
     if (!row) {
       throw notFound();

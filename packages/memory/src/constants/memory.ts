@@ -55,3 +55,10 @@ export const MEMORY_REPO_HASH_LENGTH = 12;
 export const MEMORY_REPO_NOT_FOUND = /^Repository not found$/i;
 export const MEMORY_RECORD_META_LINE = /^<!--\s*notra\s+(\{.*\})\s*-->$/;
 export const MEMORY_RECORD_SECTION = /^## (.+)$/;
+
+/** Branch of every repository the repo store writes. */
+export const REPO_BRANCH = "main";
+
+/** The local file store's lock: how long a writer waits, and when a lock left by a crash is taken over. */
+export const FILE_REPOS_LOCK_WAIT_MS = 5000;
+export const FILE_REPOS_LOCK_STALE_MS = 10_000;

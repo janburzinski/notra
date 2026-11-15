@@ -1,18 +1,18 @@
 import { createHash } from "node:crypto";
 
-import { ApiError, GitStorage, RefUpdateError } from "@pierre/storage";
+import { GitStorage, RefUpdateError } from "@pierre/storage";
 import type { Repo } from "@pierre/storage";
 
 import {
   MEMORY_AUTHOR,
   MEMORY_BRANCH,
   MEMORY_REPO_HASH_LENGTH,
-  MEMORY_REPO_NOT_FOUND,
   MEMORY_REPO_PREFIX,
   MEMORY_REPO_UNSAFE_CHARS,
   MEMORY_SEED,
 } from "../constants/memory";
 import type { MemoryStore } from "../types/memory";
+import { deleteRepoBefore, isRepoNotFound } from "../utils/code-storage";
 import { MemoryConflictError } from "../utils/errors";
 
 /** Ids with unsafe characters get a hash suffix, so "org.a" and "org_a" never share a repo. */
@@ -23,14 +23,6 @@ export function memoryRepoId(organizationId: string) {
   }
   const hash = createHash("sha256").update(organizationId).digest("hex");
   return `${MEMORY_REPO_PREFIX}${safe}-${hash.slice(0, MEMORY_REPO_HASH_LENGTH)}`;
-}
-
-/** The SDK reports a missing repository as a plain Error on some calls. */
-function isNotFound(error: unknown) {
-  return (
-    (error instanceof ApiError && error.status === 404) ||
-    (error instanceof Error && MEMORY_REPO_NOT_FOUND.test(error.message))
-  );
 }
 
 export function createCodeStorageStore(options: {
@@ -70,7 +62,7 @@ export function createCodeStorageStore(options: {
     try {
       return await use(repo);
     } catch (error) {
-      if (!(cached && isNotFound(error))) {
+      if (!(cached && isRepoNotFound(error))) {
         throw error;
       }
       handles.delete(organizationId);
@@ -158,7 +150,7 @@ export function createCodeStorageStore(options: {
         },
         () => null
       ).catch((error: unknown) => {
-        if (isNotFound(error)) {
+        if (isRepoNotFound(error)) {
           return null;
         }
         throw error;
@@ -193,7 +185,7 @@ export function createCodeStorageStore(options: {
         if (error instanceof RefUpdateError) {
           throw new MemoryConflictError(error.message);
         }
-        if (isNotFound(error)) {
+        if (isRepoNotFound(error)) {
           handles.delete(organizationId);
           throw new MemoryConflictError(
             "The memory was deleted since it was read"
@@ -205,35 +197,10 @@ export function createCodeStorageStore(options: {
     async deleteRepo(organizationId, signal) {
       signal?.throwIfAborted();
       handles.delete(organizationId);
-      const deleted = storage
-        .deleteRepo({ id: memoryRepoId(organizationId) })
-        .then(
-          () => undefined,
-          (error: unknown) => {
-            if (!isNotFound(error)) {
-              throw error;
-            }
-          }
-        );
-      if (!signal) {
-        return deleted;
-      }
-      // The SDK takes no signal, so the deadline is enforced around it. One
-      // signal can cover many deletions, so each removes its own listener.
-      let onAbort: (() => void) | undefined;
-      try {
-        await Promise.race([
-          deleted,
-          new Promise<never>((_resolve, reject) => {
-            onAbort = () => reject(signal.reason);
-            signal.addEventListener("abort", onAbort, { once: true });
-          }),
-        ]);
-      } finally {
-        if (onAbort) {
-          signal.removeEventListener("abort", onAbort);
-        }
-      }
+      await deleteRepoBefore(
+        storage.deleteRepo({ id: memoryRepoId(organizationId) }),
+        signal
+      );
     },
   };
 }

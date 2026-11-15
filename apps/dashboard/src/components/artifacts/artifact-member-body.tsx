@@ -1,12 +1,16 @@
 "use client";
 
 import { Skeleton } from "@notra/ui/components/ui/skeleton";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import { useTranslations } from "use-intl";
 
 import { ArtifactAutopilotBlock } from "@/components/artifacts/artifact-autopilot-block";
 import { ArtifactDocument } from "@/components/artifacts/artifact-document";
 import { ArtifactEyebrow } from "@/components/artifacts/artifact-eyebrow";
+import { dashboardOrpc } from "@/lib/orpc/query";
 import type { ArtifactDensity, ArtifactViewData } from "@/types/artifacts";
+import { toErrorMessage } from "@/utils/error-message";
 
 export function ArtifactSkeleton() {
   const t = useTranslations("artifacts");
@@ -65,20 +69,48 @@ export function ArtifactMemberBody({
   showEyebrow?: boolean;
 }) {
   const t = useTranslations("artifacts");
+  const queryClient = useQueryClient();
   const isOld = artifact.version !== artifact.currentVersion;
+  const restore = useMutation({
+    mutationFn: () =>
+      dashboardOrpc.artifacts.restore.call({
+        organizationId,
+        artifactId: artifact.id,
+        version: artifact.version,
+      }),
+    onSuccess: async ({ version }) => {
+      toast.success(t("restored", { version }));
+      await queryClient.invalidateQueries({
+        queryKey: dashboardOrpc.artifacts.key(),
+      });
+      onShowLatest();
+    },
+    onError: (error) => toast.error(toErrorMessage(error, t("restoreFailed"))),
+  });
+
   return (
     <>
       {isOld ? (
-        <p className="bg-muted/60 text-muted-foreground mb-6 flex flex-wrap items-center justify-between gap-2 rounded-lg px-3 py-2 text-sm">
+        <div className="bg-muted/60 text-muted-foreground mb-6 flex flex-wrap items-center justify-between gap-2 rounded-lg px-3 py-2 text-sm">
           {t("viewingOld", { version: artifact.version })}
-          <button
-            className="text-foreground font-medium underline-offset-4 hover:underline"
-            onClick={onShowLatest}
-            type="button"
-          >
-            {t("showLatest")}
-          </button>
-        </p>
+          <span className="flex items-center gap-3">
+            <button
+              className="text-foreground font-medium underline-offset-4 hover:underline disabled:opacity-50"
+              disabled={restore.isPending}
+              onClick={() => restore.mutate()}
+              type="button"
+            >
+              {t("restore")}
+            </button>
+            <button
+              className="text-foreground font-medium underline-offset-4 hover:underline"
+              onClick={onShowLatest}
+              type="button"
+            >
+              {t("showLatest")}
+            </button>
+          </span>
+        </div>
       ) : null}
       <ArtifactDocument
         blocks={artifact.blocks}

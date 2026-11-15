@@ -839,6 +839,7 @@ test("one overall cleanup deadline aborts a stalled deletion, preserves partial 
       started: 0,
       failed: 0,
       cleanup: { checked: 5, failed: 1 },
+      repoCleanup: { checked: 0, failed: 0 },
     });
     expect(timeout).toHaveBeenCalledTimes(1);
     expect(timeout).toHaveBeenCalledWith(AUTOPILOT_NAMESPACE_CLEANUP_BUDGET_MS);

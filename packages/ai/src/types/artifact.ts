@@ -1,4 +1,7 @@
-import type { ARTIFACT_SOURCES } from "@notra/ai/constants/artifacts";
+import type {
+  ARTIFACT_ACTORS,
+  ARTIFACT_SOURCES,
+} from "@notra/ai/constants/artifacts";
 import type {
   artifactAutopilotBlockSchema,
   artifactBlockSchema,
@@ -13,7 +16,20 @@ export type ArtifactAutopilotBlock = z.infer<
   typeof artifactAutopilotBlockSchema
 >;
 export type ArtifactSource = (typeof ARTIFACT_SOURCES)[number];
+export type ArtifactActor = (typeof ARTIFACT_ACTORS)[number];
 export type ArtifactToolOutput = z.infer<typeof toolOutputArtifactSchema>;
+
+export interface ArtifactFileIssue {
+  /** 1-based line in the file. */
+  line: number;
+  message: string;
+}
+
+export interface ParsedArtifactFile {
+  /** null when nothing usable is left. */
+  content: ArtifactContent | null;
+  issues: ArtifactFileIssue[];
+}
 
 export interface ArtifactWriter {
   organizationId: string;

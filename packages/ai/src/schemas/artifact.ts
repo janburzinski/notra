@@ -141,12 +141,38 @@ export const artifactContentSchema = z.object({
   blocks: z.array(artifactBlockSchema).min(1).max(LIMITS.blocks),
 });
 
-export const updateArtifactInputSchema = artifactContentSchema.extend({
+const artifactFileSchema = z
+  .string()
+  .min(1)
+  .describe("The complete artifact file: frontmatter, then the blocks");
+
+export const createArtifactInputSchema = z.object({
+  content: artifactFileSchema,
+});
+
+export const updateArtifactInputSchema = z.object({
   artifactId: z.string().trim().min(1),
+  version: z
+    .number()
+    .int()
+    .positive()
+    .describe("The version you read; a newer one in between rejects the save"),
+  content: artifactFileSchema.describe(
+    "The complete new file, with every block you keep copied exactly"
+  ),
 });
 
 export const getArtifactInputSchema = z.object({
   artifactId: z.string().trim().min(1),
+});
+
+export const listArtifactsInputSchema = z.object({
+  query: z
+    .string()
+    .trim()
+    .max(120)
+    .optional()
+    .describe("Words from the title; leave out for the most recent"),
 });
 
 /** What the chat recognises as an artifact, whichever agent made it. */

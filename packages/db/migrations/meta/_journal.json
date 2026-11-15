@@ -1156,6 +1156,13 @@
       "when": 1794599810003,
       "tag": "0164_agent_artifacts",
       "breakpoints": true
+    },
+    {
+      "idx": 165,
+      "version": "7",
+      "when": 1794758004316,
+      "tag": "0165_artifact_repositories",
+      "breakpoints": true
     }
   ]
 }

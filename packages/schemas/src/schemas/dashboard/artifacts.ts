@@ -17,3 +17,7 @@ export const setArtifactSharedInputSchema = artifactInputSchema.extend({
 });
 
 export const deleteArtifactInputSchema = artifactInputSchema;
+
+export const restoreArtifactInputSchema = artifactInputSchema.extend({
+  version: z.number().int().positive(),
+});

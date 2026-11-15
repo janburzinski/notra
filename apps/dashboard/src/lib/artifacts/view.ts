@@ -5,11 +5,15 @@ import {
 } from "@notra/ai/chat/artifacts";
 import type { ArtifactBlock } from "@notra/ai/types/artifact";
 import { artifactSharePath } from "@notra/ai/utils/artifact-path";
+import { db } from "@notra/db/drizzle";
+import { autopilotBriefs } from "@notra/db/schema";
+import { and, eq } from "drizzle-orm";
 
 import { loadAutopilotActionContext } from "@/lib/autopilot/action-context";
 import { loadBriefFindings } from "@/lib/autopilot/brief-page";
 import { recoverStaleFindings } from "@/lib/autopilot/findings";
 import { isAutopilotEnabledForOrganization } from "@/lib/autopilot/flag";
+import { slackThreadUrl } from "@/utils/autopilot-brief";
 import { findingDisplayTitle } from "@/utils/autopilot-findings";
 
 /**
@@ -34,6 +38,24 @@ async function loadArtifactAutopilot(
     loadAutopilotActionContext(organizationId, role),
   ]);
   return { findings, ...actions };
+}
+
+/** The Slack thread a daily brief was posted in, when it was. */
+async function briefSlackUrl(organizationId: string, artifactId: string) {
+  const brief = await db.query.autopilotBriefs.findFirst({
+    columns: { slackTeamId: true, slackChannelId: true, slackMessageTs: true },
+    where: and(
+      eq(autopilotBriefs.organizationId, organizationId),
+      eq(autopilotBriefs.artifactId, artifactId)
+    ),
+  });
+  return brief?.slackTeamId && brief.slackChannelId && brief.slackMessageTs
+    ? slackThreadUrl(
+        brief.slackTeamId,
+        brief.slackChannelId,
+        brief.slackMessageTs
+      )
+    : null;
 }
 
 export async function loadArtifactView(params: {
@@ -65,11 +87,16 @@ export async function loadArtifactView(params: {
     createdAt: artifact.createdAt,
     updatedAt: artifact.updatedAt,
     sharePath: artifact.shareId ? artifactSharePath(artifact.shareId) : null,
+    shareVersion: artifact.shareVersion,
     autopilot: await loadArtifactAutopilot(
       params.organizationId,
       params.role,
       read.content.blocks
     ),
+    slackUrl:
+      artifact.source === "autopilot"
+        ? await briefSlackUrl(params.organizationId, artifact.id)
+        : null,
   };
 }
 

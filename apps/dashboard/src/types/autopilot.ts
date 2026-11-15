@@ -688,55 +688,6 @@ export type AutopilotSettingsTabProps = Pick<
   "basePath" | "organizationId" | "overview"
 >;
 
-/** What the /brief/:id loader resolves before the page asks for the brief. */
-export type AutopilotBriefView =
-  InferRouterOutputs<DashboardRouter>["autopilot"]["brief"];
-
-/** A brief's items in reading order, as `groupBriefFindings` places them. */
-export interface AutopilotBriefGroups {
-  lead: AutopilotFindingView | null;
-  sections: {
-    key: string;
-    title: string;
-    body?: string;
-    rows: AutopilotFindingView[];
-  }[];
-  rest: AutopilotFindingView[];
-  merged: AutopilotFindingView[];
-  /** Everything the brief asks about, decided or not. */
-  asked: AutopilotFindingView[];
-}
-
-export interface AutopilotBriefHeroProps {
-  brief: AutopilotBriefView;
-  /** Items the brief asks about, and how many of them still wait. */
-  asked: number;
-  waiting: number;
-  autopilotHref: string;
-}
-
-export interface AutopilotBriefItemsProps {
-  brief: AutopilotBriefView;
-  groups: AutopilotBriefGroups;
-  organizationId: string;
-  organizationSlug: string;
-  autopilotHref: string;
-  onDismiss: (finding: AutopilotFindingView) => void;
-}
-
-export interface AutopilotBriefHeadingProps {
-  id: string;
-  title: string;
-  description?: string;
-}
-
-export interface AutopilotBriefPageProps {
-  briefId: string;
-  organizationId: string;
-  organizationSlug: string;
-  organizationName: string;
-}
-
 export interface AutopilotBriefFindingCardProps {
   finding: AutopilotFindingView;
   canManage: boolean;
@@ -767,11 +718,6 @@ export type AutopilotBriefFindingActionsProps = Omit<
   AutopilotBriefFindingCardProps,
   "timeZone" | "onOpen" | "onPreview"
 > & { title: string };
-
-export interface AutopilotBriefSceneSwitcherProps {
-  index: number;
-  onChange: (index: number) => void;
-}
 
 export interface AutopilotBriefFindingListProps {
   children: ReactNode;

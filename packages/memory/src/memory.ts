@@ -14,6 +14,7 @@ import type {
   MemoryUpdateResult,
 } from "./types/memory";
 import { assertWritable, overSoftLimit } from "./utils/access";
+import { codeStorageCredentials } from "./utils/code-storage";
 import { MemoryConflictError, MemoryNotConfiguredError } from "./utils/errors";
 
 let configured: MemoryStore | null = null;
@@ -27,9 +28,8 @@ export function getMemoryStore(): MemoryStore {
   if (configured) {
     return configured;
   }
-  const name = process.env.CODE_STORAGE_NAME?.trim();
-  const key = process.env.CODE_STORAGE_API_KEY?.trim().replace(/\\n/g, "\n");
-  if (!(name && key) && process.env.NODE_ENV === "development") {
+  const credentials = codeStorageCredentials();
+  if (!credentials && process.env.NODE_ENV === "development") {
     // Local dev without code.storage keeps memory in this process, so
     // Autopilot works; it resets whenever the dev server restarts.
     console.warn(
@@ -38,12 +38,12 @@ export function getMemoryStore(): MemoryStore {
     configured = createInMemoryStore();
     return configured;
   }
-  if (!(name && key)) {
+  if (!credentials) {
     throw new MemoryNotConfiguredError(
       "CODE_STORAGE_NAME and CODE_STORAGE_API_KEY are required for workspace memory"
     );
   }
-  configured = createCodeStorageStore({ name, key });
+  configured = createCodeStorageStore(credentials);
   return configured;
 }
 

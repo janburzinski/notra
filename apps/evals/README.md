@@ -26,6 +26,7 @@ Reads the repo root `.env` (only `AI_GATEWAY_API_KEY` is needed). Runs are saved
 | `collection-title` | `jobs/collection-title.ts` | format rules, brand spelling, Jev |
 | `feedback-classifier` | `jobs/feedback-classifier.ts` (Jev vs LLM) | kind, sentiment |
 | `autopilot-planner` | `jobs/autopilot-planner.ts` + `evaluateAutopilotGate`, multi-run | linking, action, gate, rules, stability, memory |
+| `artifact-edit` | `tools/artifacts.ts` create and update, one retry on a save error | file saved, requested change made, every other block unchanged |
 
 The content suites import the real dispatcher prompt, skills, user prompt and tool definitions from `@notra/ai`. Only the tools' `execute` functions are swapped for fixture data (`src/fixtures/content-scenarios.ts`), so nothing touches the DB, GitHub or Redis.
 

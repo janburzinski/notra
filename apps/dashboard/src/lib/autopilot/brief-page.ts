@@ -25,7 +25,6 @@ import {
 import { AUTOPILOT_SLACK_KIND_LABELS } from "@/constants/autopilot-slack";
 import { deleteArtifact } from "@/lib/artifacts/manage";
 import { buildBriefArtifactContent } from "@/lib/autopilot/brief-artifact";
-import { recoverStaleFindings } from "@/lib/autopilot/findings";
 import { generateAutopilotObject } from "@/lib/autopilot/llm";
 import { createAutopilotLogger } from "@/lib/autopilot/log";
 import { autopilotBriefDraftSchema } from "@/schemas/autopilot-brief";
@@ -50,7 +49,10 @@ function clamp(value: string, limit: number) {
   return text.length > limit ? `${text.slice(0, limit - 1).trimEnd()}…` : text;
 }
 
-/** Where the brief is read: its artifact, or its own page for older briefs. */
+/**
+ * Where the brief is read: its artifact, or /brief/:id, which saves the
+ * artifact on the first visit when delivery couldn't.
+ */
 export function autopilotBriefUrl(brief: {
   id: string;
   artifactId: string | null;
@@ -213,7 +215,7 @@ async function writeWords(params: {
 
 function findBriefRow(organizationId: string, runId: string) {
   return db.query.autopilotBriefs.findFirst({
-    columns: { id: true, content: true, artifactId: true },
+    columns: { id: true, content: true, artifactId: true, createdAt: true },
     where: and(
       eq(autopilotBriefs.organizationId, organizationId),
       eq(autopilotBriefs.runId, runId)
@@ -225,42 +227,52 @@ type BriefRow = NonNullable<Awaited<ReturnType<typeof findBriefRow>>>;
 
 /**
  * Saves the brief as an artifact once, so it reads like any other artifact
- * and its items keep their buttons. When that fails the brief keeps its own
- * page; a retried delivery tries again.
+ * and its items keep their buttons. Delivery calls it, and so does opening
+ * a brief that has none yet (older briefs, or a delivery whose save failed).
+ * `replaces` is a stored artifact id that no longer opens; it is swapped out.
  */
-async function ensureBriefArtifact(
-  ctx: AutopilotRunContext,
-  brief: BriefRow
+export async function ensureBriefArtifact(
+  organizationId: string,
+  brief: BriefRow,
+  options: { replaces?: string } = {}
 ): Promise<BriefRow> {
-  if (brief.artifactId) {
+  if (brief.artifactId && !options.replaces) {
     return brief;
   }
   try {
+    // Dated like the brief, so an older one opened today reads as its day.
     const artifact = await createArtifact(
-      { organizationId: ctx.organizationId, source: "autopilot" },
-      buildBriefArtifactContent(brief.content)
+      { organizationId, source: "autopilot" },
+      buildBriefArtifactContent(brief.content),
+      { createdAt: brief.createdAt }
     );
     const [linked] = await db
       .update(autopilotBriefs)
       .set({ artifactId: artifact.id })
       .where(
         and(
-          eq(autopilotBriefs.organizationId, ctx.organizationId),
+          eq(autopilotBriefs.organizationId, organizationId),
           eq(autopilotBriefs.id, brief.id),
-          isNull(autopilotBriefs.artifactId)
+          options.replaces
+            ? eq(autopilotBriefs.artifactId, options.replaces)
+            : isNull(autopilotBriefs.artifactId)
         )
       )
       .returning({ id: autopilotBriefs.id });
     if (!linked) {
-      // A concurrent retry linked its own artifact first; drop this one.
-      await deleteArtifact(ctx.organizationId, artifact.id);
-      return (await findBriefRow(ctx.organizationId, ctx.runId)) ?? brief;
+      // A concurrent delivery or visit linked its own artifact first.
+      await deleteArtifact(organizationId, artifact.id);
+      const current = await db.query.autopilotBriefs.findFirst({
+        columns: { id: true, content: true, artifactId: true, createdAt: true },
+        where: eq(autopilotBriefs.id, brief.id),
+      });
+      return current ?? brief;
     }
     return { ...brief, artifactId: artifact.id };
   } catch (error) {
     logError("Autopilot brief artifact failed", error, {
-      organizationId: ctx.organizationId,
-      runId: ctx.runId,
+      organizationId,
+      briefId: brief.id,
     });
     return brief;
   }
@@ -280,7 +292,7 @@ export async function writeAutopilotBriefPage(params: {
   const { ctx, pending, merged, insights } = params;
   const existing = await findBriefRow(ctx.organizationId, ctx.runId);
   if (existing) {
-    return await ensureBriefArtifact(ctx, existing);
+    return await ensureBriefArtifact(ctx.organizationId, existing);
   }
   let words: BriefWords;
   let writtenBy: AutopilotBriefContent["writtenBy"] = "agent";
@@ -315,7 +327,7 @@ export async function writeAutopilotBriefPage(params: {
   if (!saved) {
     throw new Error("The brief page could not be saved");
   }
-  return await ensureBriefArtifact(ctx, saved);
+  return await ensureBriefArtifact(ctx.organizationId, saved);
 }
 
 /** The current rows of every item a brief lists, by id. */
@@ -353,26 +365,4 @@ export async function recordAutopilotBriefDelivery(
         eq(autopilotBriefs.id, briefId)
       )
     );
-}
-
-/** A brief and the current state of every item it mentions. */
-export async function loadAutopilotBrief(
-  organizationId: string,
-  briefId: string
-) {
-  const brief = await db.query.autopilotBriefs.findFirst({
-    where: and(
-      eq(autopilotBriefs.organizationId, organizationId),
-      eq(autopilotBriefs.id, briefId)
-    ),
-  });
-  if (!brief) {
-    return null;
-  }
-  // A writer that died must not leave the page polling an "open" item forever.
-  await recoverStaleFindings(organizationId);
-  return {
-    brief,
-    findings: await loadBriefFindings(organizationId, brief.content),
-  };
 }

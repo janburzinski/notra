@@ -13,8 +13,8 @@ import {
   renderPlannerState,
 } from "@notra/ai/utils/autopilot-planner";
 import {
+  artifactRevisions,
   artifacts,
-  artifactVersions,
   autopilotBriefs,
   autopilotFindings,
   autopilotRuns,
@@ -26,7 +26,9 @@ import {
 } from "@notra/db/schema";
 import { MEMORY_PATHS } from "@notra/memory/constants/memory";
 import { setMemoryStore } from "@notra/memory/memory";
+import { setRepoStore } from "@notra/memory/repos";
 import { createInMemoryStore } from "@notra/memory/stores/in-memory";
+import { createInMemoryRepos } from "@notra/memory/stores/in-memory-repos";
 import { renderRecords } from "@notra/memory/utils/records";
 import { resolveReferences } from "@notra/workflows/utils/references";
 import { and, eq, sql } from "drizzle-orm";
@@ -116,6 +118,8 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
   const actionEvaluations: unknown[] = [];
   // The workspace memory is a real in-memory repository; only failures are injected.
   const memory = createInMemoryStore();
+  const artifactRepos = createInMemoryRepos();
+  setRepoStore(artifactRepos);
   const memoryCommits: { message: string; paths: string[] }[] = [];
   const unavailable = () => {
     if (state.memoryFailure) {
@@ -1442,15 +1446,19 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
       waiting: "Wartet auf dich",
       worthKnowing: "Worth knowing",
     });
-    const version = await db.query.artifactVersions.findFirst({
-      where: eq(artifactVersions.artifactId, page.artifactId),
-    });
     // The lead item opens the artifact on its own, without a callout above it.
-    expect(version?.content.blocks[0]).toEqual({
+    expect(artifact?.content.blocks[0]).toEqual({
       type: "autopilot",
       findingIds: [page.content.lead.findingId],
     });
-    expect(JSON.stringify(version?.content)).not.toContain('"callout"');
+    expect(JSON.stringify(artifact?.content)).not.toContain('"callout"');
+    // Its file is the first commit of its own repository.
+    const revision = await db.query.artifactRevisions.findFirst({
+      where: eq(artifactRevisions.artifactId, page.artifactId),
+    });
+    const [commit] = artifactRepos.commits(`notra-artifact-${page.artifactId}`);
+    expect(revision?.sha).toBe(commit?.sha);
+    expect(commit?.files.get("artifact.md")).toContain("```autopilot");
     expect(slackMessages[0]).toContain("Two calls to make today");
     expect(page.content.writtenBy).toBe("agent");
     expect(page.content.findingIds).toHaveLength(2);

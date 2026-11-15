@@ -63,11 +63,6 @@ const TrafficEmbed = lazyPage(() =>
     default: module.AiTrafficEmbed,
   }))
 );
-const AutopilotBrief = lazyPage(() =>
-  import("@/components/autopilot/autopilot-brief-page").then((module) => ({
-    default: module.AutopilotBriefPage,
-  }))
-);
 const Artifact = lazyPage(() =>
   import("@/components/artifacts/artifact-page").then((module) => ({
     default: module.ArtifactPage,
@@ -206,9 +201,9 @@ export function createEntryUiRoutes(parent: AnyRoute) {
       noindex: true,
       title: { title: "Daily brief" },
       pendingComponent: () => <div className="bg-background min-h-svh" />,
-      preload: AutopilotBrief.preload,
+      // The loader always redirects to the brief's artifact.
       loader: (input) => loadAutopilotBriefPage({ data: input }),
-      component: ({ data }) => <AutopilotBrief {...data} />,
+      component: () => null,
     }),
     createUiRoute({
       parent,

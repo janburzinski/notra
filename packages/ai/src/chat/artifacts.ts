@@ -1,44 +1,93 @@
 import {
+  ARTIFACT_AUTHORS,
+  ARTIFACT_CREATE_GRACE_MS,
+  ARTIFACT_FILE_PATH,
   ARTIFACT_ID_LENGTH,
   ARTIFACT_LIMITS,
+  ARTIFACT_REPO_PREFIX,
 } from "@notra/ai/constants/artifacts";
 import { artifactBlockSchema } from "@notra/ai/schemas/artifact";
 import type {
+  ArtifactActor,
   ArtifactBlock,
   ArtifactContent,
   ArtifactWriter,
   SavedArtifact,
 } from "@notra/ai/types/artifact";
+import {
+  parseArtifactFile,
+  serializeArtifactFile,
+} from "@notra/ai/utils/artifact-file";
 import { artifactPath } from "@notra/ai/utils/artifact-path";
 import { getAppUrl } from "@notra/ai/utils/url";
 import { db } from "@notra/db/drizzle";
 import {
+  artifactRevisions,
   artifacts,
-  artifactVersions,
   autopilotFindings,
   chatSessions,
+  codeStorageDeletions,
 } from "@notra/db/schema";
 import type { StoredArtifactContent } from "@notra/db/types/artifacts";
-import { and, desc, eq, inArray, isNull, sql } from "drizzle-orm";
+import { getRepoStore } from "@notra/memory/repos";
+import { RepoConflictError } from "@notra/memory/utils/errors";
+import { and, desc, eq, ilike, inArray, ne, sql } from "drizzle-orm";
 import { nanoid } from "nanoid";
 
 export class ArtifactNotFoundError extends Error {
+  override name = "ArtifactNotFoundError";
   constructor() {
     super("No artifact with this id in this workspace.");
-    this.name = "ArtifactNotFoundError";
   }
+}
+
+/** Someone saved a newer version; nothing was saved. */
+export class ArtifactConflictError extends Error {
+  override name = "ArtifactConflictError";
+  readonly currentVersion: number;
+  constructor(currentVersion: number) {
+    super(
+      `The artifact changed: it is at version ${currentVersion} now. Nothing was saved. Read it again and make your change to that version.`
+    );
+    this.currentVersion = currentVersion;
+  }
+}
+
+export class ArtifactReadOnlyError extends Error {
+  override name = "ArtifactReadOnlyError";
+  constructor() {
+    super(
+      "Daily briefs are written by Autopilot and can't be edited. Create a new artifact instead."
+    );
+  }
+}
+
+/** A file the writer sent that doesn't parse; every problem names its line. */
+export class ArtifactFileError extends Error {
+  override name = "ArtifactFileError";
+}
+
+export function artifactRepoId(artifactId: string) {
+  return `${ARTIFACT_REPO_PREFIX}${artifactId}`;
 }
 
 export function artifactUrl(artifactId: string) {
   return `${getAppUrl() ?? ""}${artifactPath(artifactId)}`;
 }
 
-/** An artifact in this workspace that hasn't been deleted. */
+/**
+ * Rows with a repository. The app running while this storage deployed could
+ * still insert rows without one; they are hidden until a migration drops them.
+ */
+export function artifactHasRepo() {
+  return ne(artifacts.headSha, "");
+}
+
 export function artifactWhere(organizationId: string, artifactId: string) {
   return and(
     eq(artifacts.organizationId, organizationId),
     eq(artifacts.id, artifactId),
-    isNull(artifacts.deletedAt)
+    artifactHasRepo()
   );
 }
 
@@ -67,6 +116,31 @@ export function parseArtifactContent(stored: StoredArtifactContent): {
     }
   }
   return { title: stored.title, summary: stored.summary ?? null, blocks };
+}
+
+function toContent(stored: StoredArtifactContent): ArtifactContent {
+  const { title, summary, blocks } = parseArtifactContent(stored);
+  return { title, ...(summary ? { summary } : {}), blocks };
+}
+
+/** The file a version is stored as, the same text the agent reads and writes. */
+export function artifactFile(stored: StoredArtifactContent) {
+  return serializeArtifactFile(toContent(stored));
+}
+
+/**
+ * Reads a file a writer sent. Anything wrong is an error naming its line, so
+ * the agent can fix exactly that on its next call.
+ */
+export function parseWrittenArtifact(file: string): ArtifactContent {
+  const { content, issues } = parseArtifactFile(file);
+  if (issues.length > 0 || !content) {
+    const lines = issues.map((issue) => `Line ${issue.line}: ${issue.message}`);
+    throw new ArtifactFileError(
+      `Nothing was saved. Fix the file and send it again. ${lines.join(" ") || "The file has no blocks."}`
+    );
+  }
+  return content;
 }
 
 /**
@@ -122,7 +196,7 @@ async function prepareContent(
     content.blocks
   );
   if (blocks.length === 0) {
-    throw new Error(
+    throw new ArtifactFileError(
       "The artifact has no blocks left to show. Add text, metrics, a chart or a table."
     );
   }
@@ -166,7 +240,9 @@ function savedArtifact(
 
 export async function createArtifact(
   writer: ArtifactWriter,
-  content: ArtifactContent
+  content: ArtifactContent,
+  /** When it was written, if not now: a brief saved as an artifact later keeps its day. */
+  options: { createdAt?: Date } = {}
 ): Promise<SavedArtifact> {
   const [{ stored, warnings }, chatId] = await Promise.all([
     prepareContent(writer.organizationId, content),
@@ -175,6 +251,19 @@ export async function createArtifact(
       : Promise.resolve(null),
   ]);
   const id = nanoid(ARTIFACT_ID_LENGTH);
+  const repoId = artifactRepoId(id);
+  const store = getRepoStore();
+  // Queued before the repository exists and dequeued with the row, so a
+  // repository whose row never lands is still deleted, after a grace period.
+  await db.insert(codeStorageDeletions).values({
+    repoId,
+    nextAttemptAt: new Date(Date.now() + ARTIFACT_CREATE_GRACE_MS),
+  });
+  const sha = await store.create(repoId, {
+    message: `Create "${stored.title}"`,
+    author: ARTIFACT_AUTHORS[writer.source],
+    files: { [ARTIFACT_FILE_PATH]: artifactFile(stored) },
+  });
   await db.transaction(async (tx) => {
     await tx.insert(artifacts).values({
       id,
@@ -183,39 +272,182 @@ export async function createArtifact(
       source: writer.source,
       title: stored.title,
       currentVersion: 1,
+      headSha: sha,
+      content: stored,
       createdByUserId: writer.userId ?? null,
+      ...(options.createdAt
+        ? { createdAt: options.createdAt, updatedAt: options.createdAt }
+        : {}),
+    });
+    await tx.insert(artifactRevisions).values({
+      artifactId: id,
+      version: 1,
+      sha,
+      actor: writer.source,
+      userId: writer.userId ?? null,
+      ...(options.createdAt ? { createdAt: options.createdAt } : {}),
     });
     await tx
-      .insert(artifactVersions)
-      .values({ artifactId: id, version: 1, content: stored });
+      .delete(codeStorageDeletions)
+      .where(eq(codeStorageDeletions.repoId, repoId));
   });
   return savedArtifact(id, stored, 1, warnings);
 }
 
-/** Saves the content as the next version; the earlier ones stay readable. */
-export async function updateArtifact(
-  organizationId: string,
-  artifactId: string,
-  content: ArtifactContent
-): Promise<SavedArtifact> {
-  const { stored, warnings } = await prepareContent(organizationId, content);
-  const version = await db.transaction(async (tx) => {
-    const [row] = await tx
+type ArtifactHead = Pick<
+  typeof artifacts.$inferSelect,
+  "id" | "currentVersion" | "headSha"
+>;
+
+/** Moves the row to a commit; false when another writer moved it first. */
+async function advance(
+  head: ArtifactHead,
+  next: {
+    sha: string;
+    stored: StoredArtifactContent;
+    actor: ArtifactActor;
+    userId?: string | null;
+  }
+) {
+  const version = head.currentVersion + 1;
+  return db.transaction(async (tx) => {
+    const [moved] = await tx
       .update(artifacts)
       .set({
-        title: stored.title,
-        currentVersion: sql`${artifacts.currentVersion} + 1`,
+        title: next.stored.title,
+        content: next.stored,
+        headSha: next.sha,
+        currentVersion: version,
       })
-      .where(artifactWhere(organizationId, artifactId))
+      .where(
+        and(eq(artifacts.id, head.id), eq(artifacts.headSha, head.headSha))
+      )
       .returning({ version: artifacts.currentVersion });
-    if (!row) {
-      throw new ArtifactNotFoundError();
+    if (!moved) {
+      return null;
     }
-    await tx
-      .insert(artifactVersions)
-      .values({ artifactId, version: row.version, content: stored });
-    return row.version;
+    await tx.insert(artifactRevisions).values({
+      artifactId: head.id,
+      version,
+      sha: next.sha,
+      actor: next.actor,
+      userId: next.userId ?? null,
+    });
+    return version;
   });
+}
+
+/**
+ * The repository is ahead of the row when a write committed but its row
+ * update was lost. The commit is the truth, so the row catches up to it.
+ */
+async function catchUp(head: ArtifactHead) {
+  const repoId = artifactRepoId(head.id);
+  const store = getRepoStore();
+  const sha = await store.head(repoId);
+  if (!sha || sha === head.headSha) {
+    return;
+  }
+  const file = await store.read(repoId, ARTIFACT_FILE_PATH, sha);
+  const content = file ? parseArtifactFile(file).content : null;
+  if (!content) {
+    return;
+  }
+  await advance(head, {
+    sha,
+    stored: { ...content, summary: content.summary ?? null },
+    actor: "recovered",
+  });
+}
+
+/**
+ * Saves the content as the next version: one commit in the artifact's
+ * repository, then the row. `baseVersion` is the version the writer read; a
+ * newer one in between rejects the write instead of dropping that change.
+ */
+export async function updateArtifact(
+  writer: ArtifactWriter & { actor?: ArtifactActor },
+  artifactId: string,
+  content: ArtifactContent,
+  baseVersion?: number
+): Promise<SavedArtifact> {
+  const row = await db.query.artifacts.findFirst({
+    columns: {
+      id: true,
+      source: true,
+      currentVersion: true,
+      headSha: true,
+      content: true,
+    },
+    where: artifactWhere(writer.organizationId, artifactId),
+  });
+  if (!row) {
+    throw new ArtifactNotFoundError();
+  }
+  const actor = writer.actor ?? writer.source;
+  if (
+    row.source === "autopilot" &&
+    actor !== "autopilot" &&
+    actor !== "member"
+  ) {
+    throw new ArtifactReadOnlyError();
+  }
+  if (baseVersion !== undefined && baseVersion !== row.currentVersion) {
+    throw new ArtifactConflictError(row.currentVersion);
+  }
+  const { stored, warnings } = await prepareContent(
+    writer.organizationId,
+    content
+  );
+  const file = artifactFile(stored);
+  if (file === artifactFile(row.content)) {
+    return savedArtifact(artifactId, stored, row.currentVersion, [
+      ...warnings,
+      "Nothing changed, so no new version was saved.",
+    ]);
+  }
+  let sha: string;
+  try {
+    sha = await getRepoStore().commit(artifactRepoId(artifactId), {
+      expectedHeadSha: row.headSha,
+      message: `Update "${stored.title}"`,
+      author: ARTIFACT_AUTHORS[actor],
+      files: { [ARTIFACT_FILE_PATH]: file },
+    });
+  } catch (error) {
+    if (error instanceof RepoConflictError) {
+      await catchUp(row).catch(() => undefined);
+      const latest = await db.query.artifacts.findFirst({
+        columns: { currentVersion: true },
+        where: eq(artifacts.id, artifactId),
+      });
+      throw new ArtifactConflictError(
+        latest?.currentVersion ?? row.currentVersion
+      );
+    }
+    throw error;
+  }
+  const version = await advance(row, {
+    sha,
+    stored,
+    actor,
+    userId: writer.userId,
+  });
+  if (version === null) {
+    // A concurrent writer's conflict may have caught the row up to our own
+    // commit first: then it is saved. Otherwise our commit is in git and the
+    // next write catches the row up to it.
+    const latest = await db.query.artifacts.findFirst({
+      columns: { currentVersion: true, headSha: true },
+      where: eq(artifacts.id, artifactId),
+    });
+    if (latest?.headSha === sha) {
+      return savedArtifact(artifactId, stored, latest.currentVersion, warnings);
+    }
+    throw new ArtifactConflictError(
+      latest?.currentVersion ?? row.currentVersion + 1
+    );
+  }
   return savedArtifact(artifactId, stored, version, warnings);
 }
 
@@ -223,6 +455,41 @@ export function findArtifact(organizationId: string, artifactId: string) {
   return db.query.artifacts.findFirst({
     where: artifactWhere(organizationId, artifactId),
   });
+}
+
+/** One saved version's file, read from git; the current one comes from the row. */
+async function readArtifactVersionFile(
+  organizationId: string,
+  artifactId: string,
+  version: number
+): Promise<string | null> {
+  const [row] = await db
+    .select({
+      currentVersion: artifacts.currentVersion,
+      content: artifacts.content,
+      sha: artifactRevisions.sha,
+    })
+    .from(artifacts)
+    .innerJoin(
+      artifactRevisions,
+      and(
+        eq(artifactRevisions.artifactId, artifacts.id),
+        eq(artifactRevisions.version, version)
+      )
+    )
+    .where(artifactWhere(organizationId, artifactId))
+    .limit(1);
+  if (!row) {
+    return null;
+  }
+  if (version === row.currentVersion) {
+    return artifactFile(row.content);
+  }
+  return getRepoStore().read(
+    artifactRepoId(artifactId),
+    ARTIFACT_FILE_PATH,
+    row.sha
+  );
 }
 
 /** One version of an artifact (the current one by default) and its history. */
@@ -236,93 +503,155 @@ export async function readArtifact(
     return null;
   }
   const wanted = version ?? artifact.currentVersion;
-  const [row, versions] = await Promise.all([
-    db.query.artifactVersions.findFirst({
-      where: and(
-        eq(artifactVersions.artifactId, artifactId),
-        eq(artifactVersions.version, wanted)
-      ),
-    }),
-    db
-      .select({
-        version: artifactVersions.version,
-        createdAt: artifactVersions.createdAt,
-      })
-      .from(artifactVersions)
-      .where(eq(artifactVersions.artifactId, artifactId))
-      .orderBy(desc(artifactVersions.version))
-      .limit(ARTIFACT_LIMITS.versionsListed),
-  ]);
-  if (!row) {
+  const versions = await db
+    .select({
+      version: artifactRevisions.version,
+      actor: artifactRevisions.actor,
+      createdAt: artifactRevisions.createdAt,
+    })
+    .from(artifactRevisions)
+    .where(eq(artifactRevisions.artifactId, artifactId))
+    .orderBy(desc(artifactRevisions.version))
+    .limit(ARTIFACT_LIMITS.versionsListed);
+  if (wanted === artifact.currentVersion) {
+    return {
+      artifact,
+      version: wanted,
+      versionCreatedAt: artifact.updatedAt,
+      content: parseArtifactContent(artifact.content),
+      versions,
+    };
+  }
+  const file = await readArtifactVersionFile(
+    organizationId,
+    artifactId,
+    wanted
+  );
+  const content = file ? parseArtifactFile(file).content : null;
+  if (!content) {
     return null;
   }
   return {
     artifact,
-    version: row.version,
-    versionCreatedAt: row.createdAt,
-    content: parseArtifactContent(row.content),
+    version: wanted,
+    versionCreatedAt:
+      versions.find((entry) => entry.version === wanted)?.createdAt ??
+      artifact.updatedAt,
+    content: { ...content, summary: content.summary ?? null },
     versions,
   };
 }
 
-/**
- * What the get tools hand the model: the current version's content, read
- * with one join and without the version history it has no use for.
- */
+/** Saves an earlier version again as the newest; history keeps both. */
+export async function restoreArtifactVersion(params: {
+  organizationId: string;
+  artifactId: string;
+  version: number;
+  userId: string;
+}) {
+  const artifact = await findArtifact(params.organizationId, params.artifactId);
+  if (!artifact) {
+    throw new ArtifactNotFoundError();
+  }
+  const file = await readArtifactVersionFile(
+    params.organizationId,
+    params.artifactId,
+    params.version
+  );
+  const content = file ? parseArtifactFile(file).content : null;
+  if (!content) {
+    throw new ArtifactNotFoundError();
+  }
+  return updateArtifact(
+    {
+      organizationId: params.organizationId,
+      userId: params.userId,
+      source: artifact.source as ArtifactWriter["source"],
+      actor: "member",
+    },
+    params.artifactId,
+    content,
+    artifact.currentVersion
+  );
+}
+
+/** What the get tool hands the model: the current file and its version. */
 export async function readArtifactForModel(
   organizationId: string,
   artifactId: string
 ) {
-  const [row] = await db
-    .select({
-      version: artifacts.currentVersion,
-      content: artifactVersions.content,
-    })
-    .from(artifacts)
-    .innerJoin(
-      artifactVersions,
-      and(
-        eq(artifactVersions.artifactId, artifacts.id),
-        eq(artifactVersions.version, artifacts.currentVersion)
-      )
-    )
-    .where(artifactWhere(organizationId, artifactId))
-    .limit(1);
+  const row = await db.query.artifacts.findFirst({
+    columns: { currentVersion: true, content: true },
+    where: artifactWhere(organizationId, artifactId),
+  });
   if (!row) {
     throw new ArtifactNotFoundError();
   }
   return {
     artifactId,
-    version: row.version,
-    ...parseArtifactContent(row.content),
+    version: row.currentVersion,
+    content: artifactFile(row.content),
   };
 }
 
-/** The current version of a publicly shared artifact. */
-export async function readSharedArtifact(shareId: string) {
-  const [row] = await db
+/** The workspace's artifacts, newest change first, for the agent to find one again. */
+export async function listArtifacts(
+  organizationId: string,
+  options: { query?: string; limit?: number } = {}
+) {
+  const query = options.query?.trim();
+  const rows = await db
     .select({
       id: artifacts.id,
-      organizationId: artifacts.organizationId,
+      title: artifacts.title,
+      summary: sql<string | null>`${artifacts.content}->>'summary'`,
       source: artifacts.source,
       version: artifacts.currentVersion,
       updatedAt: artifacts.updatedAt,
-      content: artifactVersions.content,
+    })
+    .from(artifacts)
+    .where(
+      and(
+        eq(artifacts.organizationId, organizationId),
+        artifactHasRepo(),
+        query
+          ? ilike(artifacts.title, `%${query.replace(/[%_\\]/g, "\\$&")}%`)
+          : undefined
+      )
+    )
+    .orderBy(desc(artifacts.updatedAt))
+    .limit(options.limit ?? ARTIFACT_LIMITS.listed);
+  return rows.map((row) => ({ ...row, url: artifactUrl(row.id) }));
+}
+
+/** The version of a publicly shared artifact its link was published at. */
+export async function readSharedArtifact(shareId: string) {
+  const [row] = await db
+    .select({
+      organizationId: artifacts.organizationId,
+      source: artifacts.source,
+      version: artifacts.shareVersion,
+      content: artifacts.shareContent,
+      updatedAt: artifactRevisions.createdAt,
     })
     .from(artifacts)
     .innerJoin(
-      artifactVersions,
+      artifactRevisions,
       and(
-        eq(artifactVersions.artifactId, artifacts.id),
-        eq(artifactVersions.version, artifacts.currentVersion)
+        eq(artifactRevisions.artifactId, artifacts.id),
+        eq(artifactRevisions.version, artifacts.shareVersion)
       )
     )
-    .where(and(eq(artifacts.shareId, shareId), isNull(artifacts.deletedAt)))
+    .where(and(eq(artifacts.shareId, shareId), artifactHasRepo()))
     .limit(1);
-  if (!row) {
+  if (!(row?.content && row.version)) {
     return null;
   }
-  return { ...row, content: parseArtifactContent(row.content) };
+  return {
+    ...row,
+    version: row.version,
+    content: parseArtifactContent(row.content),
+  };
 }
 
 /** What a tool hands back: enough for the chat card, not the whole content. */

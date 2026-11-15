@@ -8413,7 +8413,8 @@
         "runAutopilotWorkflow": "{state, select, running {Workflow wird gestartet} done {Workflow gestartet} approve {Start des Workflows bestätigen} other {Workflow konnte nicht gestartet werden}}",
         "createArtifact": "{state, select, running {Erstelle Artefakt} done {Artefakt erstellt} approve {Genehmigen: Artefakt} other {Fehlgeschlagen: Artefakt}}",
         "updateArtifact": "{state, select, running {Aktualisiere Artefakt} done {Artefakt aktualisiert} approve {Genehmigen: Artefakt} other {Fehlgeschlagen: Artefakt}}",
-        "getArtifact": "{state, select, running {Lese Artefakt} done {Artefakt gelesen} approve {Genehmigen: Artefakt} other {Fehlgeschlagen: Artefakt}}"
+        "getArtifact": "{state, select, running {Lese Artefakt} done {Artefakt gelesen} approve {Genehmigen: Artefakt} other {Fehlgeschlagen: Artefakt}}",
+        "listArtifacts": "{state, select, running {Suche Artefakte} done {Artefakte gesucht} approve {Genehmigen: Artefakte suchen} other {Fehlgeschlagen: Artefakte suchen}}"
       },
       "withSuffix": "{label} {suffix}",
       "memory": {
@@ -10366,6 +10367,7 @@
     "open": "Öffnen",
     "openPage": "In neuem Tab öffnen",
     "openChat": "Chat öffnen",
+    "openSlack": "Slack-Thread öffnen",
     "more": "Weitere Aktionen",
     "delete": "Löschen",
     "deleteTitle": "Dieses Artefakt löschen?",
@@ -10392,9 +10394,15 @@
       "created": "Öffentlicher Link erstellt",
       "revoked": "Nur dein Team kann dieses Artefakt jetzt öffnen",
       "publishFailed": "Der öffentliche Link konnte nicht erstellt werden",
-      "revokeFailed": "Der öffentliche Link konnte nicht deaktiviert werden"
+      "revokeFailed": "Der öffentliche Link konnte nicht deaktiviert werden",
+      "showsLatest": "Der Link zeigt diese Version. Spätere Änderungen bleiben privat, bis du sie veröffentlichst.",
+      "publishLatest": "Version {version} veröffentlichen",
+      "republished": "Der Link zeigt jetzt Version {version}"
     },
     "sources": "Quellen",
-    "latest": "Neueste"
+    "latest": "Neueste",
+    "restore": "Diese Version wiederherstellen",
+    "restored": "Als Version {version} wiederhergestellt",
+    "restoreFailed": "Diese Version konnte nicht wiederhergestellt werden"
   }
 }

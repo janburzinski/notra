@@ -40,6 +40,7 @@ import { useState } from "react";
 import { useTranslations } from "use-intl";
 
 import { McpIcon } from "@/components/integrations/mcp-icon";
+import { ARTIFACT_FILE_TITLE } from "@/constants/artifacts";
 import { CHAT_TOOL_LABEL_ALIASES } from "@/constants/chat-tool-labels";
 import { TOOL_TIMER_THRESHOLD_SECONDS } from "@/constants/chat-tool-timer";
 import { useElapsedSeconds } from "@/lib/hooks/use-elapsed-seconds";
@@ -137,6 +138,19 @@ function quotedSuffixFromFields<T extends object>(
     }
   }
   return undefined;
+}
+
+/** The title from an artifact file's frontmatter, even while it streams in. */
+function artifactFileSuffix(input: unknown): string | undefined {
+  const content =
+    typeof input === "object" &&
+    input !== null &&
+    "content" in input &&
+    typeof input.content === "string"
+      ? input.content
+      : "";
+  const title = ARTIFACT_FILE_TITLE.exec(content)?.[1]?.trim();
+  return title ? `"${shortPreview(title)}"` : undefined;
 }
 
 function quotedSuffix(
@@ -548,12 +562,15 @@ const TOOL_COPY = {
     suffix: (input) => quotedSuffix(input, ["name"]),
   },
   createArtifact: {
-    suffix: (input) => quotedSuffix(input, ["title"]),
+    suffix: artifactFileSuffix,
   },
   updateArtifact: {
-    suffix: (input) => quotedSuffix(input, ["title"]),
+    suffix: artifactFileSuffix,
   },
   getArtifact: {},
+  listArtifacts: {
+    suffix: (input) => quotedSuffix(input, ["query"]),
+  },
   listSchedules: {},
   schedulePost: {
     suffix: (input) => idSuffix(input, ["postId"]),

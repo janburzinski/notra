@@ -8413,7 +8413,8 @@
         "runAutopilotWorkflow": "{state, select, running {Starting workflow} done {Started workflow} approve {Approve starting workflow} other {Failed to start workflow}}",
         "createArtifact": "{state, select, running {Building artifact} done {Built artifact} approve {Approve artifact} other {Failed artifact}}",
         "updateArtifact": "{state, select, running {Updating artifact} done {Updated artifact} approve {Approve artifact update} other {Failed artifact update}}",
-        "getArtifact": "{state, select, running {Reading artifact} done {Read artifact} approve {Approve artifact} other {Failed artifact}}"
+        "getArtifact": "{state, select, running {Reading artifact} done {Read artifact} approve {Approve artifact} other {Failed artifact}}",
+        "listArtifacts": "{state, select, running {Looking for artifacts} done {Looked for artifacts} approve {Approve looking for artifacts} other {Failed to look for artifacts}}"
       },
       "withSuffix": "{label} {suffix}",
       "memory": {
@@ -10366,6 +10367,7 @@
     "open": "Open",
     "openPage": "Open in new tab",
     "openChat": "Open chat",
+    "openSlack": "Open Slack thread",
     "more": "More actions",
     "delete": "Delete",
     "deleteTitle": "Delete this artifact?",
@@ -10392,9 +10394,15 @@
       "created": "Public link created",
       "revoked": "Only your team can open this artifact now",
       "publishFailed": "Couldn't create the public link",
-      "revokeFailed": "Couldn't disable the public link"
+      "revokeFailed": "Couldn't disable the public link",
+      "showsLatest": "The link shows this version. Later edits stay private until you publish them.",
+      "publishLatest": "Publish version {version}",
+      "republished": "The link now shows version {version}"
     },
     "sources": "Sources",
-    "latest": "Latest"
+    "latest": "Latest",
+    "restore": "Restore this version",
+    "restored": "Restored as version {version}",
+    "restoreFailed": "Couldn't restore this version"
   }
 }

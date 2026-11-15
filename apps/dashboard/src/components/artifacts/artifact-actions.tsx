@@ -37,6 +37,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@notra/ui/components/ui/select";
+import { Slack } from "@notra/ui/components/ui/svgs/slack";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -63,6 +64,11 @@ function ArtifactSharePopover({
   const origin = typeof window === "undefined" ? "" : window.location.origin;
   const access: ShareAccess = artifact.sharePath ? "public" : "team";
   const url = `${origin}${artifact.sharePath ?? artifactPath(artifact.id)}`;
+  let published: "latest" | "behind" | null = null;
+  if (artifact.sharePath && artifact.shareVersion) {
+    published =
+      artifact.shareVersion === artifact.currentVersion ? "latest" : "behind";
+  }
 
   const setShared = useMutation({
     mutationFn: (shared: boolean) =>
@@ -71,12 +77,17 @@ function ArtifactSharePopover({
         artifactId: artifact.id,
         shared,
       }),
-    onSuccess: async ({ sharePath }) => {
+    onSuccess: async ({ sharePath, shareVersion }) => {
+      const republished = Boolean(artifact.sharePath);
       await queryClient.invalidateQueries({
         queryKey: dashboardOrpc.artifacts.key(),
       });
       if (!sharePath) {
         toast.success(t("revoked"));
+        return;
+      }
+      if (republished) {
+        toast.success(t("republished", { version: shareVersion ?? 0 }));
         return;
       }
       try {
@@ -179,6 +190,21 @@ function ArtifactSharePopover({
               />
             </InputGroupAddon>
           </InputGroup>
+          {published === "latest" ? (
+            <p className="text-muted-foreground text-xs">{t("showsLatest")}</p>
+          ) : null}
+          {published === "behind" ? (
+            <Button
+              className="self-start"
+              disabled={setShared.isPending}
+              onClick={() => setShared.mutate(true)}
+              size="sm"
+              type="button"
+              variant="outline"
+            >
+              {t("publishLatest", { version: artifact.currentVersion })}
+            </Button>
+          ) : null}
         </div>
       </PopoverContent>
     </Popover>
@@ -278,6 +304,7 @@ export function ArtifactActions({
   const queryClient = useQueryClient();
   const [confirmDelete, setConfirmDelete] = useState(false);
   const showOpenChat = !showOpenPage && Boolean(artifact.chatId);
+  const showLinks = showOpenPage || showOpenChat || Boolean(artifact.slackUrl);
   const remove = useMutation({
     mutationFn: () =>
       dashboardOrpc.artifacts.delete.call({
@@ -343,8 +370,19 @@ export function ArtifactActions({
               {t("openChat")}
             </DropdownMenuItem>
           ) : null}
+          {artifact.slackUrl ? (
+            <DropdownMenuItem
+              render={
+                // react-doctor-disable-next-line react-doctor/anchor-has-content -- Base UI renders the item's icon and label inside this link
+                <a href={artifact.slackUrl} rel="noreferrer" target="_blank" />
+              }
+            >
+              <Slack className="size-4" />
+              {t("openSlack")}
+            </DropdownMenuItem>
+          ) : null}
           {/* The line only separates Delete from a link above it. */}
-          {showOpenPage || showOpenChat ? <DropdownMenuSeparator /> : null}
+          {showLinks ? <DropdownMenuSeparator /> : null}
           <DropdownMenuItem
             onClick={() => setConfirmDelete(true)}
             variant="destructive"
