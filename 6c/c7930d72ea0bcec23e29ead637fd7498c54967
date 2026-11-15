@@ -1,0 +1,59 @@
+apps/dashboard/src/lib/orpc/routers/autopilot.ts
+  s_a7702e78286dbc::t_137d05e144eaad 42-44,302-304
+packages/ai/src/utils/autopilot-planner.ts
+  s_a7702e78286dbc::t_854ec9b366ffe2 469-487,496-497,572-573
+apps/dashboard/src/utils/autopilot-publish.test.ts
+  s_a7702e78286dbc::t_6e2ff192666e8c 283-285,287-306
+apps/dashboard/tests/autopilot-flow.test.ts
+  s_a7702e78286dbc::t_41aee4353b4012 1988-1989
+  s_a7702e78286dbc::t_2b5d4be68c8eff 1997
+  s_a7702e78286dbc::t_10f3e53ffd37e5 1984-1987,1990-1996,1998-2005,2009-2010
+  s_a7702e78286dbc::t_fe39c5d90d8ef7 2006-2008
+apps/dashboard/src/utils/autopilot-publish.ts
+  s_a7702e78286dbc::t_7c376600b3e76d 14,121-124
+apps/dashboard/src/lib/autopilot/findings.ts
+  s_a7702e78286dbc::t_af89338b22f6e8 723-732,735-747
+  s_a7702e78286dbc::t_b4cde9c640443c 733-734
+apps/evals/src/harness/autopilot-planner.ts
+  s_a7702e78286dbc::t_63577840a641a4 204-205
+  s_a7702e78286dbc::t_daa565f7c7ef2f 2
+apps/dashboard/src/lib/autopilot/schedule.ts
+  s_a7702e78286dbc::t_137d05e144eaad 18-21,95-113
+apps/dashboard/tests/autopilot-schedule.test.ts
+  s_a7702e78286dbc::t_6a373145b5b6de 56,59,75
+packages/ai/src/constants/autopilot-planner.ts
+  s_a7702e78286dbc::t_854ec9b366ffe2 40-54
+apps/dashboard/src/lib/hooks/use-autopilot-setup.ts
+  s_a7702e78286dbc::t_137d05e144eaad 102-103
+apps/dashboard/src/lib/autopilot/planner.ts
+  s_a7702e78286dbc::t_f8f9b836a3eea8 22
+  s_a7702e78286dbc::t_b4cde9c640443c 40
+  s_a7702e78286dbc::t_63577840a641a4 250,263-269,369
+packages/db/src/types/autopilot.ts
+  s_a7702e78286dbc::t_7c376600b3e76d 111-114
+apps/dashboard/src/constants/autopilot.ts
+  s_a7702e78286dbc::t_137d05e144eaad 419-421
+apps/dashboard/src/constants/autopilot-publish.ts
+  s_a7702e78286dbc::t_7c376600b3e76d 21-43,78,101-121
+apps/dashboard/src/lib/autopilot/publish.ts
+  s_a7702e78286dbc::t_bb56aba446250d 9-19,29-32,120,125,127,131,140,175-179,181,186,191-195,222,498-685
+apps/dashboard/tests/autopilot-sandbox.test.ts
+  s_a7702e78286dbc::t_d625366bb56575 428-432
+  s_a7702e78286dbc::t_0081980808f846 133-136,143-146,187,240-241,420-427,433-560
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "6cc7930d72ea0bcec23e29ead637fd7498c54967",
+  "prompts": {},
+  "sessions": {
+    "s_a7702e78286dbc": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "0b0397d3-6f99-4b95-a002-548c7546ba3c",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
