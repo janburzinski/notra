@@ -313,9 +313,10 @@ jobs:
           [ "$INFRASTRUCTURE_RESULT" = success ] || [ "$INFRASTRUCTURE_RESULT" = skipped ]
 
       # The repository cannot require checks before merging, so a red main is
-      # only noticed here. It also blocks production releases.
+      # only noticed here. It also blocks production releases. A run cancelled
+      # because a newer push superseded it is not red, so only real failures alert.
       - name: Alert Slack when main goes red
-        if: failure() && github.event_name == 'push'
+        if: failure() && github.event_name == 'push' && contains(needs.*.result, 'failure')
         env:
           GH_TOKEN: ${{ github.token }}
           SLACK_WEBHOOK_URL: ${{ secrets.GEO_SCAN_ALERT_WEBHOOK_URL || secrets.SLACK_DEPLOY_WEBHOOK_URL }}
