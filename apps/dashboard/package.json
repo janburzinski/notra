@@ -9,7 +9,7 @@
     "start": "node .output/server/index.mjs",
     "check-types": "tsc --noEmit --incremental --tsBuildInfoFile .cache/typecheck.tsbuildinfo",
     "knip": "knip",
-    "test": "bun test ./src && bun test ./tests",
+    "test": "bun test --parallel ./src ./tests",
     "test:browser": "bun test ./browser-tests",
     "test:demo-production": "node --test scripts/demo-production.test.mjs",
     "test:workflow-production": "node --test scripts/workflow-production.test.mjs"

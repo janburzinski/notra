@@ -35,6 +35,11 @@ Explicit requirements and this repo's conventions take precedence. Companion
 - Use the repository's Ultracite/Oxlint/Oxfmt configuration, not a separate
   style guide. Run `bun run check` and the affected workspaces' tests, type
   checks, and builds as appropriate. Vite builds do not perform type checking.
+- The dashboard, `@notra/ai`, `@notra/agent` and `@notra/geo-core` run tests
+  with `bun test --parallel`: each file gets its own worker global, and files
+  run in any order. Keep each file self-contained, and restore mocks, spies,
+  fake timers, env vars and module-level caches in `afterEach` so tests in the
+  same file don't depend on order. Check with `bun test --randomize`.
 - The pre-commit hook formats staged supported files, regenerates
   `apps/blog/scripts/web-chrome.js` when `apps/web`, `packages/ui`,
   `packages/utils` or `bun.lock` change, and runs Knip. Do not overwrite

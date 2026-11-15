@@ -16,7 +16,7 @@
   },
   "scripts": {
     "check-types": "tsc --noEmit --incremental --tsBuildInfoFile .cache/typecheck.tsbuildinfo",
-    "test": "bun test --isolate tests"
+    "test": "bun test --parallel tests"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "4.0.73",

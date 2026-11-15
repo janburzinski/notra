@@ -76,7 +76,10 @@ jobs:
   checks:
     name: Quality (${{ matrix.check }})
     needs: changes
-    runs-on: depot-ubuntu-24.04
+    # 4 cores cost twice as much per minute, so only jobs they speed up about
+    # 2x get them: tests run files in parallel, and type-aware lint peaks at
+    # 8.7 GB, past the 2-core runner's 8 GB.
+    runs-on: ${{ contains(fromJSON('["lint","tests"]'), matrix.check) && 'depot-ubuntu-24.04-4' || 'depot-ubuntu-24.04' }}
     timeout-minutes: 10
     strategy:
       fail-fast: false
@@ -130,9 +133,9 @@ jobs:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
         run: |
           if [ "$GITHUB_EVENT_NAME" = pull_request ]; then
-            TURBO_SCM_BASE="$BASE_SHA" bun run test --force --log-order=stream --affected --concurrency=2 --filter='!@notra/sites-builder'
+            TURBO_SCM_BASE="$BASE_SHA" bun run test --force --log-order=stream --affected --concurrency=1 --filter='!@notra/sites-builder'
           else
-            bun run test --force --log-order=stream --concurrency=2 --filter='!@notra/sites-builder'
+            bun run test --force --log-order=stream --concurrency=1 --filter='!@notra/sites-builder'
           fi
 
       - name: Run sites builder tests
