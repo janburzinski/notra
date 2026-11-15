@@ -23,7 +23,9 @@ export function AnalyticsNav({ slug }: AnalyticsNavProps) {
 
   return (
     <Tabs value={value}>
-      <IconTabsList value={value}>
+      {/* Overview and Leaderboard are separate routes, each with its own
+          copy of this list; the shared indicator slides between them. */}
+      <IconTabsList indicatorId="analytics-social" value={value}>
         <IconTabsTrigger
           icon={<HugeiconsIcon icon={ChartLineData01Icon} size={15} />}
           nativeButton={false}

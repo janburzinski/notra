@@ -93,6 +93,8 @@ function TrafficTabPending() {
 /**
  * Every tab opened stays mounted, hidden by Activity: switching back shows it
  * as it was, and a hidden tab's effects (its queries among them) pause.
+ * Leaving `display: none` restarts CSS animations, so after the first switch
+ * each revealed tab replays the fade on what differs between tabs.
  */
 function TrafficTabPanels({ data, params }: UiPageProps<GeoTrafficPageData>) {
   const tab = geoTrafficTab(params.tab);
@@ -102,15 +104,27 @@ function TrafficTabPanels({ data, params }: UiPageProps<GeoTrafficPageData>) {
   if (tab && !opened.includes(tab)) {
     setOpened([...opened, tab]);
   }
+  // The first page load doesn't fade; every switch after it does.
+  const [shownTab, setShownTab] = useState(tab);
+  const [fade, setFade] = useState(false);
+  if (tab !== shownTab) {
+    setShownTab(tab);
+    setFade(true);
+  }
   return (
     <HydrationBoundary state={data?.state}>
       {opened.map((name) => {
         const { page: Page, skeleton: Skeleton } = GEO_TRAFFIC_TAB_PAGES[name];
         return (
           <Activity key={name} mode={name === tab ? "visible" : "hidden"}>
-            <Suspense fallback={<Skeleton />}>
-              <Page organizationSlug={params.slug} />
-            </Suspense>
+            <div
+              className="contents"
+              data-traffic-tab-fade={fade ? "" : undefined}
+            >
+              <Suspense fallback={<Skeleton />}>
+                <Page organizationSlug={params.slug} />
+              </Suspense>
+            </div>
           </Activity>
         );
       })}

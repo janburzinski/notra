@@ -15,6 +15,31 @@ export interface IconTabsIndicatorBox {
   height: number;
 }
 
+/** A tab's label and icon x (relative to the list) and icon opacity. */
+export interface IconTabsContentPosition {
+  label: number;
+  glyph: number;
+  opacity: number;
+}
+
+/** The indicator box and every tab's label and icon, at one moment. */
+export interface IconTabsFrame {
+  box: IconTabsIndicatorBox;
+  content: IconTabsContentPosition[];
+}
+
+/**
+ * A slide from one frame to another. `animations` run it (the first is the
+ * indicator's, the clock); once they are cancelled, `elapsed` says how far it
+ * got.
+ */
+export interface IconTabsMotion {
+  from: IconTabsFrame;
+  to: IconTabsFrame;
+  animations: Animation[];
+  elapsed: number;
+}
+
 export interface SlideInTabIconProps {
   children: ReactNode;
   /** Keeps the icon visible on inactive tabs, e.g. for a live spinner. */

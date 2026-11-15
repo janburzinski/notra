@@ -53,7 +53,10 @@ export function AnalyticsSourceTabs({ actions }: AnalyticsSourceTabsProps) {
   }
 
   return (
-    <div className="flex min-h-8 flex-wrap items-center justify-between gap-2">
+    <div
+      className="flex min-h-8 flex-wrap items-center justify-between gap-2"
+      data-analytics-source-tabs=""
+    >
       {/* Narrow screens scroll the tabs instead of clipping the last ones. */}
       <Tabs
         className="max-w-full min-w-0 scrollbar-none overflow-x-auto"
