@@ -5,6 +5,7 @@ export const AGENT_READINESS_HTTP_NOT_FOUND = 404;
 /** Scans usually finish in 1-3 minutes; abort well past that. */
 export const AGENT_READINESS_SCAN_TIMEOUT_MS = 8 * 60 * 1000;
 export const AGENT_READINESS_REPORT_TIMEOUT_MS = 30 * 1000;
+export const AGENT_READINESS_AUTO_START_TIMEOUT_MS = 5000;
 /** A running row older than this is treated as stuck and can be replaced. */
 export const AGENT_READINESS_STALE_RUNNING_MS = 10 * 60 * 1000;
 /** Poll cadence while a scan is in flight. */

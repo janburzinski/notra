@@ -1147,7 +1147,7 @@ export const geoRouter = {
     .input(geoOrganizationInputSchema)
     .handler(
       async ({ context, input }): Promise<AgentReadinessScanResponse> => {
-        await assertGeoAccess(accessParams({ context, input }));
+        await assertOrganizationAccess(accessParams({ context, input }));
         const scope = await runOrpcEffect(
           requireGeoProject(input),
           toGeoOrpcError

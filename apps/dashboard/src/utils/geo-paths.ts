@@ -1,6 +1,6 @@
 const GEO_DASHBOARD_PATH_PATTERN = /(?:^|\/)geo(?:\/|\?|$)/;
 const GEO_UNGATED_PATH_PATTERN =
-  /(?:^|\/)geo\/(?:traffic|shelf-space)(?:\/|\?|$)/;
+  /(?:^|\/)geo\/(?:traffic|shelf-space|agent-readiness)(?:\/|\?|$)/;
 
 export function geoDashboardPath(
   organizationSlug: string,

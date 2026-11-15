@@ -22,6 +22,7 @@ import { trackedGeoLanguages } from "../utils/geo-language-rows";
 import { logGeoFailure } from "../utils/geo-log";
 import { geoEnginesForAudience } from "../utils/geo-model-catalog";
 import { normalizeWebsiteUrl } from "../utils/geo-website";
+import { startAgentReadinessScanBestEffort } from "./agent-readiness";
 import { readGeoCache, writeGeoCache } from "./cache";
 import { discoverGeoWebsite } from "./discover";
 import { normalizeCompetitorDomain } from "./domain";
@@ -78,6 +79,7 @@ export const saveGeoOnboardingBrand = Effect.fn("geo.onboardingBrand")(
       { organizationId, projectId },
       entries
     );
+    yield* startAgentReadinessScanBestEffort({ organizationId, projectId });
 
     const result: GeoOnboardingBrandResult = {
       projectId,

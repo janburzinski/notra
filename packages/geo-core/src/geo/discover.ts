@@ -41,6 +41,7 @@ import { geoDiscoveryCacheKey } from "../utils/geo-discovery-cache";
 import { trackedGeoLanguages } from "../utils/geo-language-rows";
 import { logGeoFailure } from "../utils/geo-log";
 import { geoEnginesForAudience } from "../utils/geo-model-catalog";
+import { startAgentReadinessScanBestEffort } from "./agent-readiness";
 import { readGeoCache, writeGeoCache } from "./cache";
 import { competitorKey, normalizeCompetitorDomain } from "./domain";
 import { geoDb, geoSkip } from "./effect";
@@ -366,30 +367,37 @@ const persistGeoWebsiteGeneration = Effect.fn(
 const startGeoScanAfterWebsiteGeneration = Effect.fn(
   "geo.generateFromWebsite.startScan"
 )(function* (organizationId: string, projectId: string, scanEnabled: boolean) {
+  const readiness = startAgentReadinessScanBestEffort({
+    organizationId,
+    projectId,
+  });
   if (!scanEnabled) {
-    return;
+    return yield* readiness;
   }
 
-  const claim = yield* claimGeoScanRun(projectId).pipe(
-    geoSkip("scan claim failed")
-  );
-  if (claim) {
-    yield* startClaimedGeoScanRun(
-      organizationId,
-      projectId,
-      claim.claimedAt
-    ).pipe(
-      Effect.catch((error) => {
-        logGeoFailure(
-          "geo.discover.scan_start_failed",
-          "Failed to start scan after website generate",
-          error,
-          { projectId }
-        );
-        return Effect.void;
-      })
+  const scan = Effect.gen(function* () {
+    const claim = yield* claimGeoScanRun(projectId).pipe(
+      geoSkip("scan claim failed")
     );
-  }
+    if (claim) {
+      yield* startClaimedGeoScanRun(
+        organizationId,
+        projectId,
+        claim.claimedAt
+      ).pipe(
+        Effect.catch((error) => {
+          logGeoFailure(
+            "geo.discover.scan_start_failed",
+            "Failed to start scan after website generate",
+            error,
+            { projectId }
+          );
+          return Effect.void;
+        })
+      );
+    }
+  });
+  yield* Effect.all([readiness, scan], { concurrency: "unbounded" });
 });
 
 const loadExistingSettings = (projectId: string) =>

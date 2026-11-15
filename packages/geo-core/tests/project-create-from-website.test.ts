@@ -64,7 +64,7 @@ const startGeoScanRun = mock<GeoWorkflowServiceShape["startGeoScanRun"]>(() =>
 const workflows: GeoWorkflowServiceShape = {
   startGeoScanRun,
   startGeoWriterRun: () => Effect.die("Unexpected writer workflow"),
-  startAgentReadinessRun: () => Effect.die("Unexpected readiness workflow"),
+  startAgentReadinessRun: () => Effect.succeed({ runId: "readiness-test" }),
 };
 const entitlements: GeoEntitlementServiceShape = {
   resolveZdrEntitlement: () => Effect.succeed("unknown"),

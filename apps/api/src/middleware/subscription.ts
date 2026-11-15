@@ -5,6 +5,7 @@ import type { Context, Next } from "hono";
 
 import { API_PAYWALL_FEATURES } from "../constants/analytics";
 import { RESTRICTED_BILLING_METHODS } from "../constants/billing";
+import { GEO_FREE_PATH_PATTERN } from "../constants/geo";
 import { ORGANIZATION_SCOPED_API_KEY_ERROR } from "../constants/skills";
 import { BillingService, getBillingLayer } from "../lib/billing";
 import { isIngestAuth } from "../types/auth";
@@ -13,7 +14,10 @@ import { getOrganizationId } from "../utils/auth";
 
 export function subscriptionMiddleware() {
   return async (c: Context, next: Next) => {
-    if (!RESTRICTED_BILLING_METHODS.has(c.req.method)) {
+    if (
+      !RESTRICTED_BILLING_METHODS.has(c.req.method) ||
+      GEO_FREE_PATH_PATTERN.test(c.req.path)
+    ) {
       return next();
     }
 

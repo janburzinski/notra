@@ -4,7 +4,10 @@ import { and, desc, eq, inArray, ne, sql } from "drizzle-orm";
 import { unionAll } from "drizzle-orm/pg-core";
 import { Effect } from "effect";
 
-import { AGENT_READINESS_HISTORY_LIMIT } from "../constants/agent-readiness";
+import {
+  AGENT_READINESS_AUTO_START_TIMEOUT_MS,
+  AGENT_READINESS_HISTORY_LIMIT,
+} from "../constants/agent-readiness";
 import { GeoWorkflowService, AgentReadinessNetwork } from "../deps";
 import {
   AgentReadinessApiError,
@@ -24,17 +27,19 @@ import type {
   AgentReadinessWorkflowPayload,
   AgentReadinessWorkflowResult,
 } from "../types/agent-readiness";
+import type { GeoScopeInput } from "../types/geo";
 import {
   canReuseAgentReadinessScan,
   compareAgentReadinessIssues,
 } from "../utils/agent-readiness";
-import { logGeoFailure } from "../utils/geo-log";
+import { describeGeoError, geoLogWarn, logGeoFailure } from "../utils/geo-log";
 import {
   areWebsiteUrlsEquivalent,
   getWebsiteUrlLookupVariants,
   normalizeWebsiteUrl,
 } from "../utils/geo-website";
 import { geoDb } from "./effect";
+import { requireGeoProject } from "./projects";
 
 type AgentReadinessReportFields = Pick<
   AgentReadinessReportRow,
@@ -387,6 +392,25 @@ export const startAgentReadinessScan = Effect.fn("geo.agentReadiness.start")(
       );
   }
 );
+
+/** Free on every plan: never blocks the caller and logs instead of failing. */
+export const startAgentReadinessScanBestEffort = Effect.fn(
+  "geo.agentReadiness.startBestEffort"
+)(function* (input: GeoScopeInput) {
+  yield* requireGeoProject(input).pipe(
+    Effect.flatMap(startAgentReadinessScan),
+    Effect.timeout(AGENT_READINESS_AUTO_START_TIMEOUT_MS),
+    Effect.catch((error) =>
+      geoLogWarn({
+        event: "geo.agent_readiness.auto_scan_failed",
+        message: "Failed to start automatic agent readiness scan",
+        organizationId: input.organizationId,
+        projectId: input.projectId,
+        ...describeGeoError(error),
+      })
+    )
+  );
+});
 
 async function latestCompletedBefore(
   projectId: string,
