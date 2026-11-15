@@ -3,6 +3,7 @@ import {
   listGitHubAppRepositoriesEffect,
 } from "@notra/ai/integrations/github";
 import { consumeChatGenerationRateLimit } from "@notra/ai/utils/chat-generation-rate-limit";
+import { logError } from "@notra/ai/utils/server-log";
 import { AUTOPILOT_SCHEDULED_TRIGGERS } from "@notra/db/constants/autopilot";
 import { db } from "@notra/db/drizzle";
 import {
@@ -52,6 +53,7 @@ import {
   dismissFindingWithFeedback,
   writeSuggestedFinding,
 } from "@/lib/autopilot/finding-actions";
+import { loadFindingContent } from "@/lib/autopilot/finding-content";
 import {
   listFindings,
   mergeFinding,
@@ -355,6 +357,22 @@ export const autopilotRouter = {
         [finding]
       );
       return withPreview;
+    }),
+
+  /** What the item's pull request changes, read from GitHub for the brief's modal. */
+  findingContent: authorizedProcedure
+    .input(autopilotFindingInputSchema)
+    .use(withOrganizationAccess)
+    .use(withAutopilotFlag)
+    .handler(async ({ input }) => {
+      try {
+        return await loadFindingContent(input.organizationId, input.findingId);
+      } catch (error) {
+        logError("Autopilot finding content failed", error, {
+          organizationId: input.organizationId,
+        });
+        throw badRequest("Couldn't read this pull request from GitHub");
+      }
     }),
 
   impact: authorizedProcedure

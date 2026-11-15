@@ -730,7 +730,6 @@ export interface AutopilotBriefPageProps {
 
 export interface AutopilotBriefFindingCardProps {
   finding: AutopilotFindingView;
-  organizationSlug: string;
   canManage: boolean;
   /** Writing an idea needs Autopilot switched on. */
   canWrite: boolean;
@@ -741,6 +740,10 @@ export interface AutopilotBriefFindingCardProps {
   onMerge: (method: GitHubMergeMethod) => void;
   onWrite: () => void;
   onDismiss: () => void;
+  /** Opens the item's modal with what it actually changes. */
+  onOpen: () => void;
+  /** Starts loading the post on hover, so the modal opens on it. */
+  onPreview: () => void;
 }
 
 /** One piece of evidence behind a brief item: a pull request, search, page or AI answers. */
@@ -753,7 +756,7 @@ export interface AutopilotBriefSource {
 
 export type AutopilotBriefFindingActionsProps = Omit<
   AutopilotBriefFindingCardProps,
-  "organizationSlug" | "timeZone"
+  "timeZone" | "onOpen" | "onPreview"
 > & { title: string };
 
 export interface AutopilotBriefSceneSwitcherProps {
@@ -764,3 +767,47 @@ export interface AutopilotBriefSceneSwitcherProps {
 export interface AutopilotBriefFindingListProps {
   children: ReactNode;
 }
+
+/** A post or page a pull request writes, as the item modal renders it. */
+export interface AutopilotFindingPost {
+  path: string;
+  status: string;
+  title: string | null;
+  description: string | null;
+  /** Markdown without its frontmatter, its inlined images pointing at keys. */
+  body: string;
+  /** Image keys in the body, mapped to data URLs read from the pull request. */
+  images: Record<string, string>;
+}
+
+/** Any other file the pull request changes, with its patch. */
+export interface AutopilotFindingChangedFile {
+  path: string;
+  status: string;
+  additions: number;
+  deletions: number;
+  patch: string | null;
+}
+
+export interface AutopilotFindingContent {
+  posts: AutopilotFindingPost[];
+  otherFiles: AutopilotFindingChangedFile[];
+  /** Files the pull request changes that the modal does not show. */
+  hiddenFiles: number;
+}
+
+export type AutopilotBriefItemDialogProps = Omit<
+  AutopilotBriefFindingActionsProps,
+  "finding" | "title"
+> & {
+  /** The open item; null keeps the modal closed. */
+  finding: AutopilotFindingView | null;
+  organizationId: string;
+  organizationSlug: string;
+  onOpenChange: (open: boolean) => void;
+};
+
+export type AutopilotBriefItemViewProps = Omit<
+  AutopilotBriefItemDialogProps,
+  "finding" | "onOpenChange"
+> & { finding: AutopilotFindingView };

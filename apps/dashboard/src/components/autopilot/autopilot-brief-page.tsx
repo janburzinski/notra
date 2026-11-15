@@ -15,6 +15,7 @@ import {
   AutopilotBriefFindingCard,
   AutopilotBriefFindingList,
 } from "@/components/autopilot/autopilot-brief-finding-card";
+import { AutopilotBriefItemDialog } from "@/components/autopilot/autopilot-brief-item-dialog";
 import {
   AutopilotBriefScene,
   AutopilotBriefSceneSwitcher,
@@ -33,6 +34,7 @@ import {
   AUTOPILOT_BRIEF_SOURCES,
 } from "@/constants/autopilot-brief";
 import { useAutopilotActions } from "@/lib/hooks/use-autopilot";
+import { findingContentQueryOptions } from "@/lib/hooks/use-finding-content";
 import { dashboardOrpc } from "@/lib/orpc/query";
 import { cn } from "@/lib/utils";
 import type {
@@ -43,6 +45,7 @@ import type {
   AutopilotFindingView,
   AutopilotPendingFindingAction,
 } from "@/types/autopilot";
+import type { GitHubMergeMethod } from "@/types/integrations/github";
 import {
   groupBriefFindings,
   isFindingPending,
@@ -303,31 +306,40 @@ function BriefItems({
   onDismiss,
 }: AutopilotBriefItemsProps) {
   const { merge, writeSuggestion } = useAutopilotActions(organizationId);
+  const queryClient = useQueryClient();
+  const [openId, setOpenId] = useState<string | null>(null);
   const { content } = brief;
+  // The same decision, from a row or from its modal.
+  const actionsFor = (findingId: string) => ({
+    canManage: brief.canManage,
+    canWrite: brief.canWrite,
+    merging: merge.isPending && merge.variables?.findingId === findingId,
+    writing:
+      writeSuggestion.isPending && writeSuggestion.variables === findingId,
+    onMerge: (method: GitHubMergeMethod) => merge.mutate({ findingId, method }),
+    onWrite: () => writeSuggestion.mutate(findingId),
+  });
+  const openFinding =
+    brief.findings.find((finding) => finding.id === openId) ?? null;
   const list = (rows: AutopilotFindingView[]) =>
     rows.length > 0 ? (
       <div className="mt-4">
         <AutopilotBriefFindingList>
           {rows.map((finding) => (
             <AutopilotBriefFindingCard
-              canManage={brief.canManage}
-              canWrite={brief.canWrite}
+              {...actionsFor(finding.id)}
               finding={finding}
               key={finding.id}
-              merging={
-                merge.isPending && merge.variables?.findingId === finding.id
-              }
               onDismiss={() => onDismiss(finding)}
-              onMerge={(method) =>
-                merge.mutate({ findingId: finding.id, method })
-              }
-              onWrite={() => writeSuggestion.mutate(finding.id)}
-              organizationSlug={organizationSlug}
+              onOpen={() => setOpenId(finding.id)}
+              onPreview={() => {
+                if (finding.pullRequestNumber !== null) {
+                  void queryClient.prefetchQuery(
+                    findingContentQueryOptions(organizationId, finding)
+                  );
+                }
+              }}
               timeZone={brief.timeZone}
-              writing={
-                writeSuggestion.isPending &&
-                writeSuggestion.variables === finding.id
-              }
             />
           ))}
         </AutopilotBriefFindingList>
@@ -423,6 +435,24 @@ function BriefItems({
         autopilotHref={autopilotHref}
         brief={brief}
         groups={groups}
+      />
+      <AutopilotBriefItemDialog
+        {...actionsFor(openFinding?.id ?? "")}
+        finding={openFinding}
+        onDismiss={() => {
+          if (openFinding) {
+            // Close the modal first so the confirm dialog isn't stacked on it.
+            setOpenId(null);
+            onDismiss(openFinding);
+          }
+        }}
+        onOpenChange={(open) => {
+          if (!open) {
+            setOpenId(null);
+          }
+        }}
+        organizationId={organizationId}
+        organizationSlug={organizationSlug}
       />
     </article>
   );

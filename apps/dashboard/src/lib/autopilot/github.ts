@@ -118,6 +118,37 @@ export function getBaseBranchSha(
   });
 }
 
+/**
+ * A file's bytes as base64 with its size, or null when it is missing, not a
+ * file or too large for GitHub to return inline (over 1 MB).
+ */
+export async function readRepositoryFileBase64(
+  octokit: AutopilotOctokit,
+  repository: AutopilotRepository,
+  path: string,
+  ref: string
+): Promise<{ base64: string; size: number } | null> {
+  try {
+    const { data } = await octokit.request(
+      "GET /repos/{owner}/{repo}/contents/{path}",
+      {
+        owner: repository.owner,
+        repo: repository.name,
+        path,
+        ref,
+      }
+    );
+    if (Array.isArray(data) || data.type !== "file" || !("content" in data)) {
+      return null;
+    }
+    // GitHub wraps the base64 in lines; past 1 MB it sends none.
+    const base64 = data.content.replaceAll("\n", "");
+    return base64 ? { base64, size: data.size } : null;
+  } catch {
+    return null;
+  }
+}
+
 /** Returns the full file; callers trim it for prompts. */
 export async function readRepositoryFile(
   octokit: AutopilotOctokit,

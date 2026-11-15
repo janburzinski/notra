@@ -12,8 +12,6 @@ import { useFormatter } from "use-intl";
 import { AutopilotFindingStatus } from "@/components/autopilot/autopilot-finding-status";
 import { AutopilotMergeMenu } from "@/components/autopilot/autopilot-merge-menu";
 import { Button } from "@/components/button";
-import Link from "@/components/framework/link";
-import { AUTOPILOT_NAV_LINK } from "@/constants/autopilot";
 import {
   AUTOPILOT_BRIEF_SOURCE_ICONS,
   AUTOPILOT_KIND_META,
@@ -40,7 +38,6 @@ import {
  */
 export function AutopilotBriefFindingCard({
   finding,
-  organizationSlug,
   canManage,
   canWrite,
   timeZone,
@@ -49,6 +46,8 @@ export function AutopilotBriefFindingCard({
   onMerge,
   onWrite,
   onDismiss,
+  onOpen,
+  onPreview,
 }: AutopilotBriefFindingCardProps) {
   const format = useFormatter();
   const meta = AUTOPILOT_KIND_META[finding.kind];
@@ -83,18 +82,21 @@ export function AutopilotBriefFindingCard({
             </>
           ) : null}
         </p>
-        <Link
-          className="text-foreground block text-sm font-medium text-pretty underline-offset-4 hover:underline"
-          href={`/${organizationSlug}${AUTOPILOT_NAV_LINK}/findings/${finding.id}`}
+        <button
+          className="text-foreground block text-left text-sm font-medium text-pretty underline-offset-4 hover:underline"
+          onClick={onOpen}
+          onFocus={onPreview}
+          onPointerEnter={onPreview}
+          type="button"
         >
           {title}
-        </Link>
+        </button>
         <p className="text-muted-foreground text-sm text-pretty">
           {findingSummary(finding)}
         </p>
-        <FindingWhy finding={finding} />
+        <AutopilotBriefFindingWhy finding={finding} />
       </div>
-      <FindingActions
+      <AutopilotBriefFindingActions
         canManage={canManage}
         canWrite={canWrite}
         finding={finding}
@@ -113,7 +115,7 @@ export function AutopilotBriefFindingCard({
  * The call to make while an item waits and the viewer may make it: merge
  * (or close) a pull request, write (or close) an idea. Otherwise its status.
  */
-function FindingActions({
+export function AutopilotBriefFindingActions({
   finding,
   title,
   canManage,
@@ -175,7 +177,11 @@ function FindingActions({
  * How Autopilot got to this item, folded away until asked: the reason in one
  * line, then the pull requests, searches, answers or page it came from.
  */
-function FindingWhy({ finding }: { finding: AutopilotFindingView }) {
+export function AutopilotBriefFindingWhy({
+  finding,
+}: {
+  finding: AutopilotFindingView;
+}) {
   const format = useFormatter();
   const [open, setOpen] = useState(false);
   const panelId = useId();

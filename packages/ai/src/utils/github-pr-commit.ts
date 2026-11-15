@@ -140,6 +140,7 @@ export async function getPullRequestHead(params: {
     authorLogin: data.user?.login ?? null,
     state: data.state,
     merged: Boolean(data.merged),
+    changedFiles: data.changed_files,
   };
 }
 

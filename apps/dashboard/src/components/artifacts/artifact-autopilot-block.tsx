@@ -9,16 +9,19 @@ import {
   AutopilotBriefFindingCard,
   AutopilotBriefFindingList,
 } from "@/components/autopilot/autopilot-brief-finding-card";
+import { AutopilotBriefItemDialog } from "@/components/autopilot/autopilot-brief-item-dialog";
 import { AutopilotFindingConfirmDialog } from "@/components/autopilot/autopilot-finding-confirm-dialog";
 import { ARTIFACT_SHARED_FINDING_STAGES } from "@/constants/artifacts";
 import { AUTOPILOT_KIND_META } from "@/constants/autopilot-ui";
 import { useAutopilotActions } from "@/lib/hooks/use-autopilot";
+import { findingContentQueryOptions } from "@/lib/hooks/use-finding-content";
 import { dashboardOrpc } from "@/lib/orpc/query";
 import type {
   ArtifactAutopilotBlockProps,
   SharedArtifactAutopilotBlockProps,
 } from "@/types/artifacts";
 import type { AutopilotPendingFindingAction } from "@/types/autopilot";
+import type { GitHubMergeMethod } from "@/types/integrations/github";
 import { findingsInBlockOrder } from "@/utils/artifact-findings";
 
 /**
@@ -37,6 +40,7 @@ export function ArtifactAutopilotBlock({
   const [pending, setPending] = useState<AutopilotPendingFindingAction | null>(
     null
   );
+  const [openId, setOpenId] = useState<string | null>(null);
   if (!autopilot) {
     return null;
   }
@@ -51,6 +55,18 @@ export function ArtifactAutopilotBlock({
         input: { organizationId, artifactId },
       }),
     });
+  // The same decision, from a row or from its modal.
+  const actionsFor = (findingId: string) => ({
+    canManage: autopilot.canManage,
+    canWrite: autopilot.canWrite,
+    merging: merge.isPending && merge.variables?.findingId === findingId,
+    writing:
+      writeSuggestion.isPending && writeSuggestion.variables === findingId,
+    onMerge: (method: GitHubMergeMethod) =>
+      merge.mutate({ findingId, method }, { onSettled: refresh }),
+    onWrite: () => writeSuggestion.mutate(findingId, { onSettled: refresh }),
+  });
+  const openFinding = findings.find((finding) => finding.id === openId) ?? null;
 
   return (
     <section>
@@ -60,32 +76,40 @@ export function ArtifactAutopilotBlock({
       <AutopilotBriefFindingList>
         {findings.map((finding) => (
           <AutopilotBriefFindingCard
-            canManage={autopilot.canManage}
-            canWrite={autopilot.canWrite}
+            {...actionsFor(finding.id)}
             finding={finding}
             key={finding.id}
-            merging={
-              merge.isPending && merge.variables?.findingId === finding.id
-            }
             onDismiss={() => setPending({ kind: "dismiss", finding })}
-            onMerge={(method) =>
-              merge.mutate(
-                { findingId: finding.id, method },
-                { onSettled: refresh }
-              )
-            }
-            onWrite={() =>
-              writeSuggestion.mutate(finding.id, { onSettled: refresh })
-            }
-            organizationSlug={organizationSlug}
+            onOpen={() => setOpenId(finding.id)}
+            onPreview={() => {
+              if (finding.pullRequestNumber !== null) {
+                void queryClient.prefetchQuery(
+                  findingContentQueryOptions(organizationId, finding)
+                );
+              }
+            }}
             timeZone={autopilot.timeZone}
-            writing={
-              writeSuggestion.isPending &&
-              writeSuggestion.variables === finding.id
-            }
           />
         ))}
       </AutopilotBriefFindingList>
+      <AutopilotBriefItemDialog
+        {...actionsFor(openFinding?.id ?? "")}
+        finding={openFinding}
+        onDismiss={() => {
+          if (openFinding) {
+            // Close the modal first so the confirm dialog isn't stacked on it.
+            setOpenId(null);
+            setPending({ kind: "dismiss", finding: openFinding });
+          }
+        }}
+        onOpenChange={(open) => {
+          if (!open) {
+            setOpenId(null);
+          }
+        }}
+        organizationId={organizationId}
+        organizationSlug={organizationSlug}
+      />
       <AutopilotFindingConfirmDialog
         branch={autopilot.branch}
         onClose={() => {
