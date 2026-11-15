@@ -1,0 +1,50 @@
+packages/ui/src/lib/icon-tabs.ts
+  s_b60ae382e61769::t_eb72178ea6d26f 1-3,6,9,18-36,52-58,63,74,114-119,145-164,166-169
+  s_b60ae382e61769::t_3f2e7bd4a695b0 5,143-144
+  s_b60ae382e61769::t_d4e9e22bf0eea7 4,120-142,165
+  s_b60ae382e61769::t_db333e636d4f92 7-8,10-11,67-73,75-79,85-88,92
+  s_b60ae382e61769::t_7d4e866d2c245a 80-84,89-91,93-113
+apps/dashboard/src/routes/-geo-ui.tsx
+  s_b60ae382e61769::t_eb6812c23d9858 96-97,107-113,120-127
+apps/dashboard/src/styles/globals.css
+  s_b60ae382e61769::t_eb6812c23d9858 282-301
+packages/ui/src/components/ui/icon-tabs.tsx
+  s_b60ae382e61769::t_e87a5de6f78486 338
+  s_b60ae382e61769::t_42aacb0eb5926c 51-54
+  s_b60ae382e61769::t_7d4e866d2c245a 11,156-158,162-163,165-166
+  s_b60ae382e61769::t_2520a79ff22ab4 143-144,159-161
+  s_b60ae382e61769::t_3f2e7bd4a695b0 5,12,168,170-176,185
+  s_b60ae382e61769::t_9bbe0fcdd912cc 248-255,257-258,260,262-263,269-270
+  s_b60ae382e61769::t_d4e9e22bf0eea7 4,169,177-184
+  s_b60ae382e61769::t_b80e1623608029 13-14,17,23,27,37,66-68,70,73-75,79-82,85-104,108-111,113-114,116-138,141-142,145-155,164,167,186,188,193,202-206,208,211-216,219,221-223,225,229,232-247,259,261,265,268,271-273,276-278,285-291,293-296
+  s_b60ae382e61769::t_94cc56993c2fe0 16,18,35-36,38,45,57-58,105-107,112,115,139-140,187,230,324,344-349
+  s_b60ae382e61769::t_d9665af6d23311 303
+  s_b60ae382e61769::t_f14553fae23ff5 335-337
+packages/ui/src/constants/icon-tabs.ts
+  s_b60ae382e61769::t_d4e9e22bf0eea7 11-12,15,17-19,21
+  s_b60ae382e61769::t_3f2e7bd4a695b0 9-10,13-14
+  s_b60ae382e61769::t_2bd11586522462 4-8
+apps/dashboard/src/components/analytics/analytics-source-tabs.tsx
+  s_b60ae382e61769::t_eb6812c23d9858 56-59
+apps/dashboard/src/components/analytics/analytics-nav.tsx
+  s_b60ae382e61769::t_c328cf2ef9c8e9 26-28
+packages/ui/src/types/icon-tabs.ts
+  s_b60ae382e61769::t_bda6a8442a5f1b 18-24,27-28,41-42
+  s_b60ae382e61769::t_b80e1623608029 25-26,29-40
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "1f3df307628090d0c04f4ddeb1796488a883fc07",
+  "prompts": {},
+  "sessions": {
+    "s_b60ae382e61769": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7d56c9be-5f4d-42cf-9830-cb0c1027a3cf",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
