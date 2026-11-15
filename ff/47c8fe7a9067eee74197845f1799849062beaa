@@ -1,0 +1,70 @@
+packages/ai/src/orchestration/standalone-tool-registry.ts
+  s_53a064f34be9bb::t_3a9d003d160655 8-11
+  s_53a064f34be9bb::t_eecf0993fb064a 199-200,219-220
+packages/ai/src/utils/chart-artifact.ts
+  s_53a064f34be9bb::t_42a952b98bbe15 75,116,153,217
+  s_53a064f34be9bb::t_fa8a1292e6ef5b 157-216,218-221
+apps/dashboard/src/components/ai/chat-chart-part.tsx
+  s_53a064f34be9bb::t_20c1efd27905cb 1-20
+apps/dashboard/src/components/chat/chat-share-popover.tsx
+  s_53a064f34be9bb::t_5e25ad841b6218 118-125
+packages/ai/src/prompts/standalone-chat.ts
+  s_53a064f34be9bb::t_eecf0993fb064a 66,102-108
+apps/dashboard/messages/en.json
+  s_53a064f34be9bb::t_a77c22089fbde2 8332-8333,8415
+  s_53a064f34be9bb::t_a7ffbdfbcb547c 8306-8315
+packages/ai/src/tools/charts.ts
+  s_53a064f34be9bb::t_fa8a1292e6ef5b 1-52
+apps/dashboard/src/types/components/chat-tool-chart.ts
+  s_53a064f34be9bb::t_b30fa700dc0827 5,20-27
+packages/ai/src/constants/chart-artifact.ts
+  s_53a064f34be9bb::t_42a952b98bbe15 1-2
+apps/dashboard/src/components/ai/chat-tool-block.tsx
+  s_53a064f34be9bb::t_1a338183a08740 963-965
+  s_53a064f34be9bb::t_8e8cff371416fb 601-604
+apps/dashboard/src/constants/charts.ts
+  s_53a064f34be9bb::t_b30fa700dc0827 50-52
+  s_53a064f34be9bb::t_d8162511be5063 63-64,66-69
+apps/dashboard/src/constants/chat-tool-icons.ts
+  s_53a064f34be9bb::t_b2244eb015889f 2,42-43
+apps/dashboard/messages/de.json
+  s_53a064f34be9bb::t_a7ffbdfbcb547c 8306-8315
+  s_53a064f34be9bb::t_a77c22089fbde2 8332-8333,8415
+packages/ai/src/schemas/chart-artifact.ts
+  s_53a064f34be9bb::t_4fcf04411bbcd2 68-73
+  s_53a064f34be9bb::t_3a9d003d160655 1
+  s_53a064f34be9bb::t_42a952b98bbe15 26-31
+packages/ai/src/constants/chart-tools.ts
+  s_53a064f34be9bb::t_da84b8875cbe3f 1-10
+apps/dashboard/src/utils/chat-tool-chart.ts
+  s_53a064f34be9bb::t_b30fa700dc0827 8-15,63-126,128,134-137,160
+apps/dashboard/src/components/ai/chat-tool-block/tool-output-chart.tsx
+  s_53a064f34be9bb::t_bc9525e6719157 8,12-13,16,20-21,24,34,36-37,39,42-43,47,52,54-55,58,60-64,76,79-85,99-101,105-121,123-165,171,175,186,213,224,232-264,266-272,274-276,280-286,288-291,295-301,303-341,345,352-356,371-372,374-387
+apps/dashboard/src/components/chat/chat-conversation.tsx
+  s_53a064f34be9bb::t_20c1efd27905cb 3,27,69,305-311
+packages/ai/src/schemas/geo-tools.ts
+  s_53a064f34be9bb::t_4fcf04411bbcd2 1,68-75
+packages/ai/src/utils/geo-tool-data.ts
+  s_53a064f34be9bb::t_3a9d003d160655 9
+  s_53a064f34be9bb::t_900117e06896a5 1,232-291
+packages/ai/src/tools/geo.ts
+  s_53a064f34be9bb::t_eecf0993fb064a 49,68,112
+packages/ai/src/utils/geo-tool-model-output.ts
+  s_53a064f34be9bb::t_900117e06896a5 135
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "ff47c8fe7a9067eee74197845f1799849062beaa",
+  "prompts": {},
+  "sessions": {
+    "s_53a064f34be9bb": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "22682581-e125-4897-86e5-4d73e61caf20",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
