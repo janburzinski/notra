@@ -1,0 +1,21 @@
+packages/ui/src/hooks/use-visibility-epoch.ts
+  s_f7f9c62d44d659::t_4a048cecf922db 1-25
+packages/ui/src/components/animated-number.tsx
+  s_f7f9c62d44d659::t_890f785f5b6cf6 5,18-19,32-34,45-47,57-62,66-123
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "6fb8e497f904ef84ad78bc530df244432b28a79c",
+  "prompts": {},
+  "sessions": {
+    "s_f7f9c62d44d659": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "3520c090-232c-4ec8-a6f8-f8146e54e761",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
