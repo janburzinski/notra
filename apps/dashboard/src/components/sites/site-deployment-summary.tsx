@@ -35,6 +35,7 @@ import {
   githubBranchUrl,
   githubCommitUrl,
   githubPullRequestUrl,
+  siteUrlOnOrigin,
 } from "@/utils/site-links";
 
 function Fact({ label, children }: SiteDeploymentFactProps) {
@@ -88,6 +89,12 @@ export function SiteDeploymentSummary({
   const repository = deployment.repository ?? detail.site.repository;
   const branchUrl = githubBranchUrl(repository, deployment.branch);
   const protectedPreview = isDeploymentProtected(deployment, detail);
+  // Custom domains may forbid framing, so production previews use the
+  // Notra address, which serves the same deployment.
+  const previewUrl =
+    deployment.kind === "production"
+      ? siteUrlOnOrigin(detail.site.aliasOrigin, detail.site.liveUrl)
+      : primaryUrl;
 
   let fallback = t("preview.notLive");
   if (inProgress) {
@@ -124,7 +131,7 @@ export function SiteDeploymentSummary({
               {fallback}
             </p>
           }
-          url={live && !protectedPreview ? primaryUrl : null}
+          url={live && !protectedPreview ? previewUrl : null}
         />
         <dl className="grid content-center gap-x-8 gap-y-5 sm:grid-cols-2">
           <Fact label={t("fields.status")}>

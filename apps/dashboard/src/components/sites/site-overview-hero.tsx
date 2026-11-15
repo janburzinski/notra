@@ -83,6 +83,7 @@ export function SiteOverviewHero() {
     (a, b) => Number(b.isPrimary) - Number(a.isPrimary)
   );
   const aliasUrl = siteUrlOnOrigin(site.aliasOrigin, site.liveUrl);
+  const servingLive = liveDeployment !== null && !suspended;
 
   return (
     <InstrumentModule
@@ -100,7 +101,8 @@ export function SiteOverviewHero() {
           firstBuild={firstBuild}
           live={liveDeployment !== null}
           suspended={suspended}
-          url={liveDeployment && !suspended ? site.liveUrl : null}
+          previewUrl={servingLive ? aliasUrl : null}
+          url={servingLive ? site.liveUrl : null}
         />
 
         <ul className="flex min-w-0 flex-col justify-center gap-2.5">

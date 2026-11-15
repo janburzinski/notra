@@ -7,6 +7,7 @@ import type { SiteOverviewPreviewProps } from "@/types/components/sites";
 
 export function SiteOverviewPreview({
   url,
+  previewUrl,
   suspended,
   firstBuild,
   live,
@@ -23,7 +24,11 @@ export function SiteOverviewPreview({
   }
 
   const preview = (
-    <SitePreviewFrame className="rounded-lg" fallback={fallback} url={url} />
+    <SitePreviewFrame
+      className="rounded-lg"
+      fallback={fallback}
+      url={previewUrl}
+    />
   );
   if (!url) {
     return preview;

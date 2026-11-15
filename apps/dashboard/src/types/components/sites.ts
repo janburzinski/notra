@@ -264,6 +264,8 @@ export interface SiteOverviewStatusProps {
 
 export interface SiteOverviewPreviewProps {
   url: string | null;
+  /** Framed in place of `url`, whose host may forbid framing. */
+  previewUrl: string | null;
   suspended: boolean;
   firstBuild: boolean;
   live: boolean;
