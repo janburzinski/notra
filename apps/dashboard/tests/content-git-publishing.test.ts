@@ -88,8 +88,10 @@ if (!databaseUrl) {
   const billing = await import("@/lib/billing/subscription");
   mock.module("@/lib/billing/subscription", () => ({
     ...billing,
-    resolveAiProductAccess: async () => ({ hasAccess: true }),
     assertActiveSubscription: async () => {},
+  }));
+  mock.module("@/lib/billing/ai-product-access", () => ({
+    resolveAiProductAccess: async () => ({ hasAccess: true }),
   }));
   const { db } = await import("@notra/db/drizzle");
   const {

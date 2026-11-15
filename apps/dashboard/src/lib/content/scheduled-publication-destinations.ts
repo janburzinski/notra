@@ -25,7 +25,7 @@ import { Effect } from "effect";
 
 import { DEFAULT_GITHUB_CONTENT_OUTPUT_ENABLED } from "@/constants/github";
 import { trackServerEventAndFlush } from "@/lib/analytics/posthog-server";
-import { resolveAiProductAccess } from "@/lib/billing/subscription";
+import { resolveAiProductAccess } from "@/lib/billing/ai-product-access";
 import { requestGeoRescanForPublishedPost } from "@/lib/geo/rescan";
 import {
   getContentPullRequestState,

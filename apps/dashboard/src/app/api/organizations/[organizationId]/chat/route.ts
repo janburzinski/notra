@@ -65,7 +65,7 @@ import {
   getChatContextKinds,
 } from "@/lib/analytics/studio-events";
 import { withOrganizationAuth } from "@/lib/auth/organization";
-import { buildAutopilotWorkflowTools } from "@/lib/autopilot/workflows/agent-tools";
+import { buildChatExtraTools } from "@/lib/chat/extra-tools";
 import { isCodeResearchEnabledForOrganization } from "@/lib/code-research/flag";
 import { afterResponse } from "@/lib/framework/after-response";
 import { buildStandaloneChatTelemetryMetadata } from "@/lib/tcc";
@@ -226,7 +226,7 @@ export const POST = withEvlog(async function POST(
       hydrationResult,
       integrationsResult,
       codeResearchResult,
-      autopilotToolsResult,
+      extraToolsResult,
     ] = await Promise.allSettled([
       hydrateSavedChatPosts(organizationId, chatId, messages),
       getStandaloneChatIntegrations(organizationId),
@@ -234,7 +234,7 @@ export const POST = withEvlog(async function POST(
       // The durable run builds these in its own step.
       canUseChatWorkflowStreaming()
         ? Promise.resolve(undefined)
-        : buildAutopilotWorkflowTools({
+        : buildChatExtraTools({
             organizationId,
             userId: auth.context.user.id,
             surface: parseResult.data.surface,
@@ -242,10 +242,10 @@ export const POST = withEvlog(async function POST(
             focusAutomation: parseResult.data.autopilotAutomation,
           }),
     ]);
-    if (autopilotToolsResult.status === "rejected") {
+    if (extraToolsResult.status === "rejected") {
       logError(
-        "[Standalone Chat] Autopilot workflow tools unavailable",
-        autopilotToolsResult.reason,
+        "[Standalone Chat] Dashboard chat tools unavailable",
+        extraToolsResult.reason,
         { requestId, organizationId }
       );
     }
@@ -343,8 +343,8 @@ export const POST = withEvlog(async function POST(
         projectId: projectId ?? undefined,
         surface: parseResult.data.surface,
         extraTools:
-          autopilotToolsResult.status === "fulfilled"
-            ? autopilotToolsResult.value
+          extraToolsResult.status === "fulfilled"
+            ? extraToolsResult.value
             : undefined,
       });
     }

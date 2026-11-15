@@ -104,7 +104,7 @@ export const loadDashboardHome = createServerFn({
     if (!gated) {
       await redirectOrgRootToStoredMode(slug, Promise.resolve(searchParams));
     }
-    const billingPromise = import("@/lib/billing/subscription").then(
+    const billingPromise = import("@/lib/billing/ai-product-access").then(
       ({ resolveAiProductAccess }) => resolveAiProductAccess(organization.id)
     );
     const greetingPromise = (async () => {

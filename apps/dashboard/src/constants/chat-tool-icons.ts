@@ -1,4 +1,5 @@
 import {
+  Analytics01Icon,
   File01Icon,
   FileCodeIcon,
   Folder01Icon,
@@ -38,4 +39,6 @@ export const CHAT_TOOL_ICONS: Record<string, ChatToolIcon> = {
   get_brand_references: PaintBoardIcon,
   getBrandReferences: PaintBoardIcon,
   create_post: PencilEdit02Icon,
+  showGeoChart: Analytics01Icon,
+  showChart: Analytics01Icon,
 };

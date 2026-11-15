@@ -5,6 +5,10 @@ import {
   createAddBrandReferenceTool,
   createGetAvailableBrandReferencesTool,
 } from "@notra/ai/tools/brand-references";
+import {
+  createShowChartTool,
+  createShowGeoChartTool,
+} from "@notra/ai/tools/charts";
 import { createCodeResearcherTool } from "@notra/ai/tools/code-researcher";
 import { exampleTool } from "@notra/ai/tools/example";
 import {
@@ -192,6 +196,8 @@ export function buildStandaloneToolSet(
   tools.getGeoProjectContext = createGetGeoProjectContextTool({
     organizationId,
   });
+  tools.showGeoChart = createShowGeoChartTool({ organizationId });
+  tools.showChart = createShowChartTool();
 
   descriptions.push(
     userId
@@ -209,6 +215,9 @@ export function buildStandaloneToolSet(
   );
   descriptions.push(
     "**GEO Analytics**: List GEO projects and inspect AI visibility summaries, trends, prompt-level results, competitor share, and detailed project context using listGeoProjects, getGeoOverview, getGeoTimeseries, getGeoPromptResults, getGeoCompetitorShare, and getGeoProjectContext"
+  );
+  descriptions.push(
+    "**Charts**: Draw a chart into your answer with showGeoChart (GEO engines, trend, competitors) or showChart (other numbers a tool returned). The data tools return numbers only and draw nothing."
   );
 
   const artifactTools = createArtifactTools({

@@ -47,7 +47,9 @@ export const SPARKLINE_CHART_OPTIONS: Record<string, unknown> = {
   grid: { left: 1, right: 1, top: 2, bottom: 1, containLabel: false },
 };
 
-export const CHAT_TOOL_CHART_HEIGHT_CLASS = "h-40";
+export const CHAT_TOOL_CHART_HEIGHT_CLASS = "h-48";
+/** Donut slices shown in a chat chart before the rest fold into "Other". */
+export const CHAT_TOOL_SHARE_VISIBLE_SLICES = 6;
 export const CHAT_TOOL_CHART_OPTIONS: Record<string, unknown> = {
   grid: { left: 4, right: 8, top: 8, bottom: 4, containLabel: true },
 };
@@ -55,17 +57,16 @@ export const CHAT_TOOL_CHART_OPTIONS: Record<string, unknown> = {
 export const FLUSH_CHART_OPTIONS: Record<string, unknown> = {
   grid: { left: 0, right: 0, top: 12, bottom: 0, containLabel: true },
 };
-/** Room above the plot for a top legend, as the area chart reserves itself. */
-export const CHART_LEGEND_TOP = 42;
 export const CHAT_TOOL_RANK_TRACK_CLASS = "bg-muted";
 
 /**
- * A tool or artifact donut: taller than the other chat charts and a smaller
- * ring, so it clears the top edge and the legend floating under it.
+ * A tool or artifact donut: a thin ring in a fixed square beside its ranked
+ * list, the competitors page's share-of-voice shape at chat size.
  */
-export const CHAT_TOOL_PIE_HEIGHT_CLASS = "h-60";
-export const CHAT_TOOL_DONUT_INNER_RADIUS = "52%";
-export const CHAT_TOOL_DONUT_OUTER_RADIUS = "72%";
+export const CHAT_TOOL_DONUT_INNER_RADIUS = "76%";
+export const CHAT_TOOL_DONUT_OUTER_RADIUS = "96%";
+export const CHAT_TOOL_DONUT_CORNER_RADIUS = 8;
+export const CHAT_TOOL_DONUT_PADDING_ANGLE = 2.5;
 export const DONUT_INNER_RADIUS = "58%";
 export const DONUT_OUTER_RADIUS = "82%";
 export const DONUT_CORNER_RADIUS = 6;

@@ -1,3 +1,4 @@
+import { CHART_UNITS } from "@notra/ai/constants/chart-artifact";
 // biome-ignore lint/performance/noNamespaceImport: Zod recommended way to import
 import * as z from "zod";
 
@@ -17,11 +18,23 @@ export const chartSeriesSchema = z.object({
 export const chartSegmentSchema = z.object({
   label: z.string().min(1),
   value: z.number(),
+  other: z
+    .boolean()
+    .optional()
+    .describe(
+      "true for the segment that sums every category not drawn by name"
+    ),
 });
 
 const chartMetaSchema = {
   title: chartTitleSchema,
   subtitle: chartSubtitleSchema,
+  unit: z
+    .enum(CHART_UNITS)
+    .optional()
+    .describe(
+      "percent when values are percentages from 0 to 100, count for plain numbers"
+    ),
 };
 
 export const emptyChartArtifactSchema = z.object({
@@ -57,4 +70,10 @@ export const chartArtifactSchema = z.discriminatedUnion("kind", [
 
 export const toolOutputChartSchema = z.looseObject({
   chart: chartArtifactSchema,
+});
+
+export const showChartInputSchema = z.object({
+  chart: chartArtifactSchema.describe(
+    "area for trends over time (x is an ISO date like 2026-11-03 or a short label), bar for ranking categories, pie for shares of a whole. Use only numbers other tools returned."
+  ),
 });

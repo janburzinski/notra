@@ -13,6 +13,7 @@ import {
   ENTITLEMENT_SURFACES,
 } from "@/constants/analytics-events";
 import { trackServerEvent } from "@/lib/analytics/posthog-server";
+import { resolveAiProductAccess } from "@/lib/billing/ai-product-access";
 import { getTranslations } from "@/lib/i18n/server";
 import { getORPCRequestMemo } from "@/lib/orpc/context";
 import { internalServerError, paymentRequired } from "@/lib/orpc/utils/errors";
@@ -54,23 +55,6 @@ const geoEntitlementCache = Effect.runSync(
   )
 );
 
-async function hasAiCreditsBalance(organizationId: string): Promise<boolean> {
-  if (!autumn) {
-    return false;
-  }
-
-  const data = await autumn.check(
-    {
-      customerId: organizationId,
-      featureId: FEATURES.AI_CREDITS,
-      requiredBalance: 1,
-    },
-    { timeoutMs: AUTUMN_READ_TIMEOUT_MS }
-  );
-
-  return data.allowed === true;
-}
-
 export async function hasAiCreditsGrant(
   organizationId: string
 ): Promise<boolean> {
@@ -87,74 +71,6 @@ export async function hasAiCreditsGrant(
   );
 
   return data.balance != null;
-}
-
-async function lookupAiProductAccess(organizationId: string) {
-  if (!autumn) {
-    return { hasAccess: true, activePlanId: null };
-  }
-
-  const customer = await autumn.customers.getOrCreate({
-    customerId: organizationId,
-  });
-
-  const activePlanId =
-    customer.subscriptions.find(
-      (subscription) => !subscription.addOn && subscription.status === "active"
-    )?.planId ?? null;
-
-  const hasPaidPlan = customer.subscriptions.some(
-    (subscription) =>
-      !subscription.addOn &&
-      subscription.status === "active" &&
-      PAID_OR_LEGACY_PLAN_IDS.has(subscription.planId)
-  );
-
-  return {
-    hasAccess: hasPaidPlan || (await hasAiCreditsBalance(organizationId)),
-    activePlanId,
-  };
-}
-
-const aiProductAccessCache = Effect.runSync(
-  Cache.makeWith(
-    (organizationId: string) =>
-      Effect.tryPromise({
-        try: () => lookupAiProductAccess(organizationId),
-        catch: (cause) => cause,
-      }),
-    {
-      capacity: GRANTED_ACCESS_CACHE_CAPACITY,
-      timeToLive: (exit) =>
-        Exit.isSuccess(exit) && exit.value.hasAccess
-          ? GRANTED_ACCESS_TTL
-          : Duration.zero,
-    }
-  )
-);
-
-export async function resolveAiProductAccess(organizationId: string) {
-  if (allowUnmeteredAiInDevelopment) {
-    return { hasAccess: true, activePlanId: null };
-  }
-
-  if (!autumn) {
-    if (process.env.NODE_ENV === "production") {
-      throw internalServerError("Billing is not configured");
-    }
-    return { hasAccess: true, activePlanId: null };
-  }
-
-  try {
-    return await Effect.runPromise(
-      Cache.get(aiProductAccessCache, organizationId)
-    );
-  } catch (error) {
-    if (error instanceof ORPCError) {
-      throw error;
-    }
-    throw internalServerError("Failed to verify subscription status");
-  }
 }
 
 export async function assertActiveSubscription(

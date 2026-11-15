@@ -1,9 +1,15 @@
+export const CHART_UNITS = ["percent", "count"] as const;
+
 export const CHART_MENTION_RATE_PERCENT_SCALE = 100;
 export const CHART_MENTION_RATE_PERCENT_PRECISION = 10;
 
 export const GEO_OVERVIEW_CHART_TITLE = "Mention rate by engine";
 export const GEO_TIMESERIES_CHART_TITLE = "Mention rate trend";
 export const GEO_COMPETITOR_SHARE_CHART_TITLE = "Competitor share of voice";
+
+/** Brands drawn by name in a share chart; the rest fold into one segment. */
+export const GEO_COMPETITOR_CHART_MAX_BRANDS = 10;
+export const GEO_CHART_OTHER_BRANDS_LABEL = "Other brands";
 
 export const GEO_CHART_MENTION_RATE_SUBTITLE = "Mention rate (%)";
 export const GEO_CHART_MENTION_COUNT_SUBTITLE = "Mentions";

@@ -598,6 +598,10 @@ const TOOL_COPY = {
   getGeoProjectContext: {
     suffix: (input) => idSuffix(input, ["projectId"]),
   },
+  showGeoChart: {
+    suffix: geoDaysSuffix,
+  },
+  showChart: {},
   getSitemapPages: {
     suffix: (input, output, t) =>
       quotedSuffix(input, ["query"]) ??
@@ -956,7 +960,9 @@ function ChatToolContent({
   return (
     <>
       <ToolOutputImages images={outputImages} />
-      {chart && !isStreaming ? <ToolOutputChart chart={chart} /> : null}
+      {chart && !isStreaming ? (
+        <ToolOutputChart chart={chart} className="mt-3" />
+      ) : null}
       {documentDiff ? <DocumentDiff {...documentDiff} /> : null}
       {showDraftPreview && draft ? (
         <ToolDraftPreview

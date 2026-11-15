@@ -1,3 +1,4 @@
+import type { GEO_CHART_KINDS } from "@notra/ai/constants/chart-tools";
 import { GEO_TOOL_DEFAULT_COMPETITOR_LIMIT } from "@notra/ai/constants/geo-tools";
 import {
   GEO_CONTEXT_LOOKBACK_DAYS,
@@ -5,6 +6,7 @@ import {
   GEO_CONTEXT_MAX_CHECKS,
   GEO_CONTEXT_MAX_EXCERPT_CHARS,
 } from "@notra/ai/constants/geo-writer";
+import type { ChartArtifact } from "@notra/ai/types/chart-artifact";
 import {
   buildGeoCompetitorShareChart,
   buildGeoOverviewChart,
@@ -122,10 +124,6 @@ export async function loadGeoOverviewForTool(
       brand: row.brand,
       mentions: row.mentions,
     })),
-    chart: buildGeoOverviewChart({
-      days,
-      engines,
-    }),
   };
 }
 
@@ -159,7 +157,6 @@ export async function loadGeoTimeseriesForTool(
     project_id: scope.projectId,
     days,
     points,
-    chart: buildGeoTimeseriesChart({ days, points }),
   };
 }
 
@@ -229,11 +226,76 @@ export async function loadGeoCompetitorShareForTool(
     project_id: scope.projectId,
     days,
     competitors: competitorRows,
-    chart: buildGeoCompetitorShareChart({
-      days,
-      competitors: competitorRows,
-    }),
   };
+}
+
+/**
+ * The chart the chat draws into an answer. Data tools return numbers only,
+ * so a chart shows up where the model chose to show one, not after every
+ * lookup.
+ */
+export async function loadGeoChartForTool(
+  organizationId: string,
+  chart: (typeof GEO_CHART_KINDS)[number],
+  projectId: string | undefined,
+  days: number
+): Promise<{ project_id: string | null; days: number; chart: ChartArtifact }> {
+  const scope = geoScope(organizationId, projectId);
+  switch (chart) {
+    case "engines": {
+      const rows = await queryGeoCheckOverview(
+        scope,
+        toGeoCheckWindow({ days })
+      );
+      return {
+        project_id: scope.projectId,
+        days,
+        chart: buildGeoOverviewChart({
+          days,
+          engines: rows.map((row) => ({
+            engine: row.engine,
+            mention_rate: row.mentionRate,
+          })),
+        }),
+      };
+    }
+    case "trend": {
+      const { points } = await loadGeoTimeseriesForTool(
+        organizationId,
+        projectId,
+        days
+      );
+      return {
+        project_id: scope.projectId,
+        days,
+        chart: buildGeoTimeseriesChart({ days, points }),
+      };
+    }
+    case "competitors": {
+      // All brands, so shares divide by the real total; the chart folds
+      // the tail into one segment.
+      const rows = await queryGeoCheckCompetitorShare(
+        scope,
+        toGeoCheckWindow({ days }),
+        Number.MAX_SAFE_INTEGER
+      );
+      return {
+        project_id: scope.projectId,
+        days,
+        chart: buildGeoCompetitorShareChart({
+          days,
+          competitors: rows.map((row) => ({
+            brand: row.brand,
+            mentions: row.mentions,
+          })),
+        }),
+      };
+    }
+    default: {
+      const exhaustive: never = chart;
+      return exhaustive;
+    }
+  }
 }
 
 function searchTrackedCompetitors(

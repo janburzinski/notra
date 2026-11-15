@@ -5,8 +5,14 @@ import type {
   ChartSeries,
 } from "@notra/ai/types/chart-artifact";
 
-import { CHART_PERCENT_SCALE } from "@/constants/charts";
-import type { ToolOutputRankRow } from "@/types/components/chat-tool-chart";
+import {
+  CHART_PERCENT_SCALE,
+  CHAT_TOOL_SHARE_VISIBLE_SLICES,
+} from "@/constants/charts";
+import type {
+  ToolOutputRankRow,
+  ToolOutputShareRow,
+} from "@/types/components/chat-tool-chart";
 import { chartKey } from "@/utils/chart-keys";
 import {
   formatChartEngineLabel,
@@ -54,13 +60,91 @@ function formatRankNumber(value: number, locale: string): string {
   );
 }
 
+/**
+ * Whether values are 0–100 percentages. Charts saved before `unit` existed
+ * fall back to the old guess: everything at or below 100 reads as percent.
+ */
+export function isPercentChart(
+  chart: Pick<ChartArtifact, "unit">,
+  values: readonly number[]
+): boolean {
+  if (chart.unit) {
+    return chart.unit === "percent";
+  }
+  return Math.max(0, ...values) <= CHART_PERCENT_SCALE;
+}
+
+export function formatChartValue(
+  value: number,
+  asPercent: boolean,
+  locale: string
+): string {
+  const formatted = formatRankNumber(value, locale);
+  return asPercent ? `${formatted}%` : formatted;
+}
+
+/**
+ * Donut rows, largest first. Past the visible budget the tail folds into one
+ * "Other" slice so the ring and the list stay readable at chat width. A
+ * segment the server already folded (`other`) always joins that slice.
+ */
+export function buildShareChartRows(
+  segments: readonly ChartSegment[],
+  otherLabel: string
+): ToolOutputShareRow[] {
+  const positive = segments.filter((segment) => segment.value > 0);
+  const total = positive.reduce((sum, segment) => sum + segment.value, 0);
+  if (total === 0) {
+    return [];
+  }
+  const named = positive
+    .filter((segment) => !segment.other)
+    .toSorted((left, right) => right.value - left.value);
+  const folded = positive
+    .filter((segment) => segment.other)
+    .reduce((sum, segment) => sum + segment.value, 0);
+  const folds =
+    named.length > CHAT_TOOL_SHARE_VISIBLE_SLICES + (folded > 0 ? 0 : 1);
+  const visible = folds
+    ? named.slice(0, CHAT_TOOL_SHARE_VISIBLE_SLICES)
+    : named;
+  const rows: ToolOutputShareRow[] = visible.map((segment, index) => ({
+    key: `${chartKey(segment.label)}-${index}`,
+    label: segment.label,
+    value: segment.value,
+    share: segment.value / total,
+    other: false,
+  }));
+  const rest =
+    folded +
+    (folds
+      ? named
+          .slice(CHAT_TOOL_SHARE_VISIBLE_SLICES)
+          .reduce((sum, segment) => sum + segment.value, 0)
+      : 0);
+  if (rest > 0) {
+    rows.push({
+      key: "other",
+      label: otherLabel,
+      value: rest,
+      share: rest / total,
+      other: true,
+    });
+  }
+  return rows;
+}
+
 export function rankBarChartSegments(
+  chart: Pick<ChartArtifact, "unit">,
   segments: readonly ChartSegment[],
   formatWithoutSearch: (engine: string) => string,
   locale: string
 ): ToolOutputRankRow[] {
   const maxValue = Math.max(0, ...segments.map((segment) => segment.value));
-  const asPercent = maxValue <= CHART_PERCENT_SCALE;
+  const asPercent = isPercentChart(
+    chart,
+    segments.map((segment) => segment.value)
+  );
   const scale = asPercent ? CHART_PERCENT_SCALE : maxValue || 1;
 
   const ranked = segments.toSorted((left, right) => right.value - left.value);
@@ -83,9 +167,7 @@ export function rankBarChartSegments(
         formatWithoutSearch
       ),
       value: segment.value,
-      valueLabel: asPercent
-        ? `${formatRankNumber(segment.value, locale)}%`
-        : formatRankNumber(segment.value, locale),
+      valueLabel: formatChartValue(segment.value, asPercent, locale),
       widthPercent: (segment.value / scale) * CHART_PERCENT_SCALE,
     };
   });

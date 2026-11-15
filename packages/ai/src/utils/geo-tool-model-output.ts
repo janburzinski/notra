@@ -132,7 +132,7 @@ export function compactRecords(records: unknown[]): CompactTable | null {
 
 export function geoToolModelOutput(output: unknown) {
   let value = output;
-  if (isRow(output) && "chart" in output) {
+  if (isRow(output)) {
     const metrics: Row = { ...output };
     Reflect.deleteProperty(metrics, "chart");
     for (const [key, field] of Object.entries(metrics)) {

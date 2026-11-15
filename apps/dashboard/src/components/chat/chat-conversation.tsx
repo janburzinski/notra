@@ -1,5 +1,6 @@
 "use client";
 
+import { SHOW_CHART_TOOL_NAMES } from "@notra/ai/constants/chart-tools";
 import { isTrustedChatFileUrl } from "@notra/ai/schemas/chat";
 import { chatTodoListSchema } from "@notra/ai/schemas/todos";
 import { artifactPath } from "@notra/ai/utils/artifact-path";
@@ -23,6 +24,7 @@ import { useTranslations } from "use-intl";
 import { AgentQuestionCard } from "@/components/ai/agent-question-card";
 import { ChatActivityStatus } from "@/components/ai/chat-activity-status";
 import { ChatAssistantParts } from "@/components/ai/chat-assistant-parts";
+import { ChatChartPart } from "@/components/ai/chat-chart-part";
 import { ChatEmptyDither } from "@/components/ai/chat-empty-dither";
 import { ChatReasoningBlock } from "@/components/ai/chat-reasoning-block";
 import { ChatSubagentToolPart } from "@/components/ai/chat-subagent-tool-part";
@@ -64,6 +66,7 @@ import { parseChatAnnotations } from "@/utils/chat-annotations";
 import { parseToolOutputArtifact } from "@/utils/chat-artifact";
 import { getChatFilePartFields } from "@/utils/chat-message-parts";
 import { isChatSubagentName } from "@/utils/chat-subagents";
+import { parseToolOutputChart } from "@/utils/chat-tool-chart";
 import { parseCreatedPostId } from "@/utils/chat-tool-draft";
 import {
   getContentChatAttachments,
@@ -298,6 +301,14 @@ function ChatAssistantMessage({
           version={savedArtifact.version}
         />
       );
+    }
+    const drawnChart =
+      part.state === "output-available" &&
+      SHOW_CHART_TOOL_NAMES.includes(toolName)
+        ? parseToolOutputChart(part.output)
+        : undefined;
+    if (drawnChart) {
+      return <ChatChartPart chart={drawnChart} key={part.toolCallId} />;
     }
     if (isAgentQuestionPart(part)) {
       return (

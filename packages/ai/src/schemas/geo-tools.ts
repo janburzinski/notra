@@ -1,3 +1,4 @@
+import { GEO_CHART_KINDS } from "@notra/ai/constants/chart-tools";
 import {
   GEO_TOOL_DEFAULT_COMPETITOR_LIMIT,
   GEO_TOOL_DEFAULT_DAYS,
@@ -62,6 +63,16 @@ export const getGeoCompetitorShareInputSchema = z.object({
     .max(GEO_TOOL_MAX_COMPETITOR_LIMIT)
     .default(GEO_TOOL_DEFAULT_COMPETITOR_LIMIT)
     .describe("Maximum number of competing brands to return."),
+});
+
+export const showGeoChartInputSchema = z.object({
+  chart: z
+    .enum(GEO_CHART_KINDS)
+    .describe(
+      "engines: mention rate per AI engine. trend: mention rate per engine over time. competitors: share of voice, the brands AI answers mention most."
+    ),
+  projectId: projectIdSchema,
+  days: daysSchema,
 });
 
 export const getGeoProjectContextInputSchema = z.object({

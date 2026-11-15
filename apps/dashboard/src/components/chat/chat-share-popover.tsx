@@ -115,7 +115,14 @@ export function ChatSharePopover({ chatId }: { chatId: string }) {
   return (
     <Popover onOpenChange={setOpen} open={open}>
       <PopoverTrigger
-        render={<Button size="sm" type="button" variant="outline" />}
+        render={
+          <Button
+            className="active:scale-100"
+            size="sm"
+            type="button"
+            variant="outline"
+          />
+        }
       >
         <HugeiconsIcon
           className="size-4"

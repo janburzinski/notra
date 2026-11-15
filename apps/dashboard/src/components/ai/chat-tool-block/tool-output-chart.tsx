@@ -3,28 +3,27 @@
 import type {
   AreaChartArtifact,
   BarChartArtifact,
-  ChartArtifact,
   PieChartArtifact,
 } from "@notra/ai/types/chart-artifact";
+import { formatDayLabel } from "@notra/geo-core/utils/day-label";
 import { EChartsAreaChart } from "@notra/ui/components/evilcharts/charts/echarts-area-chart";
 import { EChartsPieChart } from "@notra/ui/components/evilcharts/charts/echarts-pie-chart";
 import type { ChartConfig } from "@notra/ui/types/charts";
-import type { CSSProperties, ReactNode } from "react";
-import { InstrumentEmpty } from "ui/card";
+import type { CSSProperties } from "react";
+import { InstrumentEmpty, InstrumentModule } from "ui/card";
 import { useLocale, useTranslations } from "use-intl";
 
+import { ChartColorScope } from "@/components/charts/chart-color-scope";
 import { EngineIcon } from "@/components/geo/engine-icon";
 import {
-  CHART_LEGEND_TOP,
   CHAT_TOOL_CHART_HEIGHT_CLASS,
+  CHAT_TOOL_CHART_OPTIONS,
+  CHAT_TOOL_DONUT_CORNER_RADIUS,
   CHAT_TOOL_DONUT_INNER_RADIUS,
   CHAT_TOOL_DONUT_OUTER_RADIUS,
-  CHAT_TOOL_PIE_HEIGHT_CLASS,
-  CHAT_TOOL_CHART_OPTIONS,
+  CHAT_TOOL_DONUT_PADDING_ANGLE,
   CHAT_TOOL_RANK_TRACK_CLASS,
   CHART_SEARCH_FILL_CLASS,
-  DONUT_CORNER_RADIUS,
-  DONUT_PADDING_ANGLE,
   FLUSH_CHART_OPTIONS,
 } from "@/constants/charts";
 import { cn } from "@/lib/utils";
@@ -32,47 +31,37 @@ import type {
   ToolOutputChartPlotProps,
   ToolOutputChartProps,
   ToolOutputRankRow,
+  ToolOutputShareRow,
 } from "@/types/components/chat-tool-chart";
-import { accountSeriesColors } from "@/utils/chart-colors";
+import { formatFullDayLabel } from "@/utils/analytics-charts";
+import { accountSeriesColors, softGradientColors } from "@/utils/chart-colors";
 import {
+  buildShareChartRows,
   CHART_CATEGORY_KEY,
   chartSeriesDataKey,
+  formatChartValue,
+  isPercentChart,
   pivotChartSeries,
   rankBarChartSegments,
 } from "@/utils/chat-tool-chart";
+import { formatChartInteger, formatUsageShare } from "@/utils/geo-charts";
 import { formatChartEngineLabel } from "@/utils/geo-model-display";
 
-const VALUE_KEY = "value";
 const RANK_STAGGER_MS = 40;
 const RANK_STAGGER_MAX_STEPS = 8;
+const ISO_DAY_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 
-function ChartFrame({
-  title,
-  subtitle,
-  children,
-}: {
-  title: string;
-  subtitle?: string;
-  children: ReactNode;
-}) {
-  return (
-    <div className="border-border bg-muted/20 duration-normal ease-emphasized mt-3 translate-y-0 overflow-hidden rounded-lg border opacity-100 transition-[opacity,transform] motion-reduce:transition-none starting:translate-y-1.5 starting:opacity-0">
-      <div className="px-3 pt-2.5 pb-1 wrap-anywhere">
-        <p className="text-foreground text-sm font-medium">{title}</p>
-        {subtitle ? (
-          <p className="text-muted-foreground text-xs">{subtitle}</p>
-        ) : null}
-      </div>
-      {children}
-    </div>
-  );
+function legendDotStyle(key: string): CSSProperties {
+  return { "--legend-color": `var(--color-${key}-0)` } as CSSProperties;
 }
 
-function EmptyChartMessage({ message }: { message: string }) {
+function LegendDot({ colorKey }: { colorKey: string }) {
   return (
-    <p className="text-muted-foreground px-3 pt-1 pb-3 text-xs leading-5">
-      {message}
-    </p>
+    <span
+      aria-hidden="true"
+      className="size-2 shrink-0 rounded-full bg-(--legend-color)"
+      style={legendDotStyle(colorKey)}
+    />
   );
 }
 
@@ -84,8 +73,16 @@ function AreaArtifactChart({
   flush?: boolean;
 }) {
   const t = useTranslations("ai.toolBlock");
+  const locale = useLocale();
   const series = chart.series;
   const data = pivotChartSeries(series);
+  const asPercent = isPercentChart(
+    chart,
+    series.flatMap((entry) => entry.points.map((point) => point.y))
+  );
+  const isDaily = data.every((row) =>
+    ISO_DAY_PATTERN.test(String(row[CHART_CATEGORY_KEY]))
+  );
   const keyedSeries = series.map((entry, index) => ({
     dataKey: chartSeriesDataKey(entry.name, index),
     label: formatChartEngineLabel(entry.name),
@@ -98,60 +95,84 @@ function AreaArtifactChart({
     };
   }
 
-  // With one line the title names it; with more, a legend says which is
-  // which, above the plot so it covers none of the lines.
-  const showLegend = keyedSeries.length > 1;
-  const baseOptions = flush ? FLUSH_CHART_OPTIONS : CHAT_TOOL_CHART_OPTIONS;
-  const chartOptions = showLegend
-    ? {
-        ...baseOptions,
-        grid: {
-          ...(baseOptions.grid as Record<string, unknown>),
-          top: CHART_LEGEND_TOP,
-        },
-      }
-    : baseOptions;
-
   if (data.length === 0) {
-    return <EmptyChartMessage message={t("chartEmptySeries")} />;
+    return (
+      <InstrumentEmpty className="min-h-32" message={t("chartEmptySeries")} />
+    );
   }
 
   return (
-    <EChartsAreaChart
-      animation={false}
-      chartOptions={chartOptions}
-      className={cn(
-        "w-full",
-        !flush && "px-1 pb-1",
-        CHAT_TOOL_CHART_HEIGHT_CLASS
-      )}
-      config={config}
-      curveType="monotone"
-      data={data}
-      xDataKey={CHART_CATEGORY_KEY}
-    >
-      {keyedSeries.map((entry) => (
-        <EChartsAreaChart.Area
-          dataKey={entry.dataKey}
-          gapMissing
-          key={entry.dataKey}
-          strokeVariant="solid"
-          variant="gradient"
+    <ChartColorScope className="flex flex-col gap-3" config={config}>
+      <EChartsAreaChart
+        animation={false}
+        chartOptions={flush ? FLUSH_CHART_OPTIONS : CHAT_TOOL_CHART_OPTIONS}
+        className={cn("w-full cursor-crosshair", CHAT_TOOL_CHART_HEIGHT_CLASS)}
+        config={config}
+        curveType="monotone"
+        data={data}
+        renderer="svg"
+        xDataKey={CHART_CATEGORY_KEY}
+      >
+        <EChartsAreaChart.Grid variant="solid" />
+        <EChartsAreaChart.XAxis
+          dataKey={CHART_CATEGORY_KEY}
+          tickFormatter={
+            isDaily ? (value) => formatDayLabel(value, locale) : undefined
+          }
         />
-      ))}
-      <EChartsAreaChart.Tooltip confine={false} />
-      {showLegend ? <EChartsAreaChart.Legend /> : null}
-    </EChartsAreaChart>
+        <EChartsAreaChart.YAxis
+          tickFormatter={(value) => formatChartValue(value, asPercent, locale)}
+        />
+        {keyedSeries.map((entry) => (
+          <EChartsAreaChart.Area
+            dataKey={entry.dataKey}
+            gapMissing
+            key={entry.dataKey}
+            strokeVariant="solid"
+            variant={keyedSeries.length > 1 ? "none" : "gradient"}
+          >
+            <EChartsAreaChart.ActiveDot variant="border" />
+          </EChartsAreaChart.Area>
+        ))}
+        <EChartsAreaChart.Tooltip
+          confine={false}
+          labelFormatter={
+            isDaily
+              ? (day: string) => formatFullDayLabel(day, locale)
+              : undefined
+          }
+          roundness="xl"
+          valueFormatter={(value: number) =>
+            formatChartValue(value, asPercent, locale)
+          }
+        />
+      </EChartsAreaChart>
+      {/* With one line the title names it; with more, a wrapping legend
+          below the plot says which is which without clipping. */}
+      {keyedSeries.length > 1 ? (
+        <ul className="flex flex-wrap gap-x-4 gap-y-1.5">
+          {keyedSeries.map((entry) => (
+            <li
+              className="text-muted-foreground flex min-w-0 items-center gap-1.5 text-xs"
+              key={entry.dataKey}
+            >
+              <LegendDot colorKey={entry.dataKey} />
+              <span className="truncate">{entry.label}</span>
+            </li>
+          ))}
+        </ul>
+      ) : null}
+    </ChartColorScope>
   );
 }
 
 function RankMeter({ index, row }: { index: number; row: ToolOutputRankRow }) {
   return (
-    <li className="flex items-center gap-2">
+    <li className="flex items-center gap-2.5">
       <EngineIcon className="size-4" engine={row.engine} />
       <div className="min-w-0 flex-1">
         <div className="flex items-baseline justify-between gap-2">
-          <span className="truncate text-xs font-medium">{row.name}</span>
+          <span className="truncate text-sm font-medium">{row.name}</span>
           <span className="text-muted-foreground shrink-0 text-xs tabular-nums">
             {row.valueLabel}
           </span>
@@ -162,7 +183,7 @@ function RankMeter({ index, row }: { index: number; row: ToolOutputRankRow }) {
           aria-valuemin={0}
           aria-valuenow={Math.round(row.widthPercent)}
           className={cn(
-            "mt-1 h-1.5 overflow-hidden rounded-full",
+            "mt-1.5 h-1.5 overflow-hidden rounded-full",
             CHAT_TOOL_RANK_TRACK_CLASS
           )}
           role="meter"
@@ -189,6 +210,7 @@ function BarArtifactChart({ chart }: { chart: BarChartArtifact }) {
   const tMode = useTranslations("geo.shared.engineMode");
   const locale = useLocale();
   const rows = rankBarChartSegments(
+    chart,
     chart.segments,
     (engine) => tMode("engineWithoutSearch", { engine }),
     locale
@@ -199,7 +221,7 @@ function BarArtifactChart({ chart }: { chart: BarChartArtifact }) {
   }
 
   return (
-    <ul className="flex flex-col gap-2 px-3 pt-1 pb-3">
+    <ul className="flex flex-col gap-3">
       {rows.map((row, index) => (
         <RankMeter index={index} key={row.engine} row={row} />
       ))}
@@ -207,58 +229,129 @@ function BarArtifactChart({ chart }: { chart: BarChartArtifact }) {
   );
 }
 
-function PieArtifactChart({ chart }: { chart: PieChartArtifact }) {
-  const segments = chart.segments;
-  const data = segments.map((segment) => ({
-    name: segment.label,
-    [VALUE_KEY]: segment.value,
-  }));
-  const config: ChartConfig = {};
-  for (const [index, segment] of segments.entries()) {
-    config[segment.label] = {
-      label: segment.label,
-      colors: accountSeriesColors(index),
-    };
-  }
-
-  if (data.length === 0) {
-    return null;
-  }
-
+function ShareListRow({
+  row,
+  asPercent,
+  locale,
+}: {
+  row: ToolOutputShareRow;
+  asPercent: boolean;
+  locale: string;
+}) {
   return (
-    <EChartsPieChart
-      animation={false}
-      className={cn("w-full px-1", CHAT_TOOL_PIE_HEIGHT_CLASS)}
-      config={config}
-      data={data}
-      dataKey={VALUE_KEY}
-      nameKey="name"
-    >
-      <EChartsPieChart.Pie
-        innerRadius={CHAT_TOOL_DONUT_INNER_RADIUS}
-        outerRadius={CHAT_TOOL_DONUT_OUTER_RADIUS}
-        cornerRadius={DONUT_CORNER_RADIUS}
-        paddingAngle={DONUT_PADDING_ANGLE}
-      />
-      <EChartsPieChart.Tooltip />
-      <EChartsPieChart.Legend />
-    </EChartsPieChart>
+    <li className="border-border flex h-8 min-w-0 items-center gap-2 border-b last:border-b-0">
+      <LegendDot colorKey={row.key} />
+      <span
+        className={cn(
+          "min-w-0 flex-1 truncate text-sm",
+          row.other ? "text-muted-foreground" : "font-medium"
+        )}
+        title={row.label}
+      >
+        {row.label}
+      </span>
+      {asPercent ? null : (
+        <span className="text-muted-foreground shrink-0 text-xs tabular-nums">
+          {formatChartInteger(row.value, locale)}
+        </span>
+      )}
+      <span className="w-12 shrink-0 text-right text-sm tabular-nums">
+        {formatUsageShare(row.share)}
+      </span>
+    </li>
   );
 }
 
-/** The chart without its chat frame, for surfaces that bring their own. */
+function PieArtifactChart({ chart }: { chart: PieChartArtifact }) {
+  const t = useTranslations("ai.toolBlock");
+  const locale = useLocale();
+  const rows = buildShareChartRows(chart.segments, t("chartOther"));
+  // Pies always showed raw values; only an explicit unit makes them percent.
+  const asPercent = chart.unit === "percent";
+  const config: ChartConfig = {};
+  for (const [index, row] of rows.entries()) {
+    config[row.key] = {
+      label: row.label,
+      colors: accountSeriesColors(index),
+    };
+  }
+  const donutConfig: ChartConfig = Object.fromEntries(
+    Object.entries(config).map(([key, item]) => [
+      key,
+      item.colors ? { ...item, colors: softGradientColors(item.colors) } : item,
+    ])
+  );
+  const leader = rows[0];
+
+  if (!leader) {
+    return (
+      <InstrumentEmpty className="min-h-32" message={t("chartEmptySeries")} />
+    );
+  }
+
+  return (
+    <ChartColorScope className="@container" config={config}>
+      <div className="grid items-center gap-x-6 gap-y-4 @md:grid-cols-[9rem_minmax(0,1fr)]">
+        <div className="relative mx-auto size-36">
+          <EChartsPieChart
+            animation={false}
+            className="absolute inset-0"
+            config={donutConfig}
+            data={rows.map((row) => ({ key: row.key, value: row.value }))}
+            dataKey="value"
+            nameKey="key"
+          >
+            <EChartsPieChart.Pie
+              cornerRadius={CHAT_TOOL_DONUT_CORNER_RADIUS}
+              innerRadius={CHAT_TOOL_DONUT_INNER_RADIUS}
+              outerRadius={CHAT_TOOL_DONUT_OUTER_RADIUS}
+              paddingAngle={CHAT_TOOL_DONUT_PADDING_ANGLE}
+            />
+            <EChartsPieChart.Tooltip
+              roundness="xl"
+              valueFormatter={(value: number) =>
+                asPercent
+                  ? formatChartValue(value, true, locale)
+                  : formatChartInteger(value, locale)
+              }
+            />
+          </EChartsPieChart>
+          <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-0.5">
+            <span className="text-xl font-medium tracking-tight tabular-nums">
+              {formatUsageShare(leader.share)}
+            </span>
+            <span className="text-muted-foreground max-w-24 truncate text-xs">
+              {leader.label}
+            </span>
+          </div>
+        </div>
+        <ol className="min-w-0">
+          {rows.map((row) => (
+            <ShareListRow
+              asPercent={asPercent}
+              key={row.key}
+              locale={locale}
+              row={row}
+            />
+          ))}
+        </ol>
+      </div>
+    </ChartColorScope>
+  );
+}
+
+/** The chart without its card, for surfaces that bring their own. */
 export function ToolOutputChartPlot({
   chart,
   flush = false,
 }: ToolOutputChartPlotProps) {
   switch (chart.kind) {
     case "empty":
-      // On a page the empty chart keeps a chart's footprint, like the
-      // analytics cards; the chat keeps it to a line.
-      return flush ? (
-        <InstrumentEmpty className="min-h-40" message={chart.emptyMessage} />
-      ) : (
-        <EmptyChartMessage message={chart.emptyMessage} />
+      return (
+        <InstrumentEmpty
+          className={flush ? "min-h-40" : "min-h-32"}
+          message={chart.emptyMessage}
+        />
       );
     case "pie":
       return <PieArtifactChart chart={chart} />;
@@ -273,10 +366,22 @@ export function ToolOutputChartPlot({
   }
 }
 
-export function ToolOutputChart({ chart }: ToolOutputChartProps) {
+/** A chart in the chat, on the same card as the GEO and analytics pages. */
+export function ToolOutputChart({ chart, className }: ToolOutputChartProps) {
   return (
-    <ChartFrame subtitle={chart.subtitle} title={chart.title}>
-      <ToolOutputChartPlot chart={chart} />
-    </ChartFrame>
+    <div
+      className={cn(
+        "duration-normal ease-emphasized min-w-0 translate-y-0 opacity-100 transition-[opacity,transform] motion-reduce:transition-none starting:translate-y-1.5 starting:opacity-0",
+        className
+      )}
+    >
+      <InstrumentModule
+        eyebrow={chart.title}
+        readout={chart.subtitle}
+        variant="table"
+      >
+        <ToolOutputChartPlot chart={chart} />
+      </InstrumentModule>
+    </div>
   );
 }

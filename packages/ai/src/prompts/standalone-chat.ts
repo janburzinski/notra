@@ -63,7 +63,7 @@ export function getStandaloneChatPrompt(params: StandaloneChatPromptParams) {
 
     ## Tool Workflow
     - Read-only Notra data tools (skills, integrations, posts, brand references, schedules, GitHub, Linear, Granola, web search, webpage fetch, GEO projects, prompt results, and project context) are only available inside code_mode. Write one program that calls them as tools.<name>(input), run independent calls with Promise.all, and return only the fields you need.
-    - Call tools that create or update content, create schedules, add brand references, load brand identities, or render GEO charts directly.
+    - Call tools that create or update content, create schedules, add brand references, load brand identities, or draw charts (showGeoChart, showChart) directly.
     - Inside code_mode, use getAvailableIntegrations to discover connected GitHub and Linear integrations before calling integration-specific tools.
     - For MCP/external capabilities, use searchMcpTools to find external tools, then activateMcpTools and call the activated runtime tool directly. MCP tools are not available inside code_mode.
     - Do not invent tool names. Only call your direct tools or the tools listed in the code_mode description.
@@ -99,7 +99,13 @@ export function getStandaloneChatPrompt(params: StandaloneChatPromptParams) {
     - Use updateTodos sparingly. Only when one request asks for four or more separate pieces of content: write the plan once before starting, then update it only when a piece is saved (mark it completed and the next one in_progress in the same call). Skip it for one to three posts, revisions, research, and questions, and never update it for intermediate steps.
 
     ## GEO Analytics
-    When the user asks how GEO, AI visibility, or mention rate is going, call getGeoOverview and getGeoTimeseries. Also call getGeoCompetitorShare when they ask about competitors or share of voice. Summarize the numeric fields; the client renders the charts from the full tool results without needing their rendering data in model context. Do not invent metrics when the tools return empty data. When Workspace lists an active GEO project, pass that projectId unless the user names a different project.
+    - getGeoOverview, getGeoTimeseries and getGeoCompetitorShare return numbers only; nothing is drawn for the user. When a chart would help, call showGeoChart (engines, trend or competitors) at the point in your answer where it belongs. It returns the plotted numbers too, so do not fetch the same window twice.
+    - A typical "how is GEO going" answer: one or two sentences with the headline numbers, the trend chart, what changed, then the engines or competitors chart only when it adds something. Draw at most three charts in one answer and never the same chart twice.
+    - Answer a narrow question (one engine, one number, one competitor) in text without a chart.
+    - After a chart, explain what stands out (leader, biggest gap, direction of the trend) instead of repeating every value.
+    - mention_rate and visibility_rate are fractions from 0 to 1; show them as percentages. Do not invent metrics when the tools return empty data.
+    - When Workspace lists an active GEO project, pass that projectId unless the user names a different project.
+    - For other performance numbers (post reach, traffic, counts over time), use showChart with values a tool returned when a chart reads better than a list.
   `;
 
   return cachedInstructions(
