@@ -4292,7 +4292,8 @@
           "toolCalls": "Tool-Aufrufe",
           "sessions": "Sitzungen",
           "errorRate": "Fehlerrate",
-          "p95Latency": "p95-Latenz"
+          "p95Latency": "p95-Latenz",
+          "chartLabel": "Im Diagramm gezeigte Metrik"
         },
         "columns": {
           "tool": "Tool",

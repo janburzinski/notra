@@ -279,26 +279,6 @@
   }
 }
 
-/* Analytics source tabs: the title and tab bar are the same on every tab, so
-   only the subheading, the toolbar and the content fade in. */
-@keyframes traffic-tab-fade-in {
-  from {
-    opacity: 0;
-  }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  [data-traffic-tab-fade]
-    :is(
-      header p,
-      [data-analytics-source-tabs] > :not(:first-child),
-      [data-analytics-source-tabs] ~ *
-    ) {
-    animation: traffic-tab-fade-in var(--transition-duration-fast)
-      var(--ease-out);
-  }
-}
-
 .chat-document-diff {
   --diffs-font-family: var(--font-mono);
   --diffs-header-font-family: var(--font-sans);

@@ -2,6 +2,7 @@
 
 import { PageHeading } from "@notra/ui/components/shared/page-heading";
 import { Skeleton } from "@notra/ui/components/ui/skeleton";
+import { cn } from "@notra/ui/lib/utils";
 import { InstrumentSection } from "ui/card";
 import { DataTable, type TableColumn } from "ui/table";
 import { useTranslations } from "use-intl";
@@ -10,8 +11,13 @@ import { AnalyticsSourceTabs } from "@/components/analytics/analytics-source-tab
 import { GeoRangePicker } from "@/components/geo/geo-range-picker";
 import { PageContainer } from "@/components/layout/container";
 import {
-  MCP_METRIC_CARD_CLASS,
-  MCP_METRIC_CHART_SURFACE_CLASS,
+  TRAFFIC_HERO_CHART_SURFACE_CLASS,
+  TRAFFIC_HERO_FRAME_CLASS,
+  TRAFFIC_HERO_METRICS_GRID_CLASS,
+} from "@/constants/geo-traffic-hero";
+import {
+  MCP_HERO_METRIC_CELL_CLASS,
+  MCP_HERO_METRICS_CLASS,
   MCP_TOOLS_SKELETON_ROWS,
 } from "@/constants/mcp-analytics";
 import { TABLE_ROW_HEIGHT } from "@/constants/table";
@@ -86,23 +92,38 @@ export function McpTrafficSkeleton({ geoRange }: McpTrafficSkeletonProps) {
           </div>
         </PageHeading>
         <AnalyticsSourceTabs />
-        <div className="grid gap-4 lg:grid-cols-2">
-          {metricLabels.map((label) => (
-            <div className={MCP_METRIC_CARD_CLASS} key={label}>
-              <div className="flex items-center justify-between gap-3 px-4 py-3">
-                <p className="text-foreground/75 text-sm leading-5 font-semibold tracking-tight">
+        <div className={TRAFFIC_HERO_FRAME_CLASS}>
+          <div
+            className={cn(
+              TRAFFIC_HERO_METRICS_GRID_CLASS,
+              MCP_HERO_METRICS_CLASS
+            )}
+          >
+            {metricLabels.map((label, index) => (
+              <div
+                className={MCP_HERO_METRIC_CELL_CLASS}
+                data-selected={index === 0 ? "" : undefined}
+                key={label}
+              >
+                <p
+                  className={cn(
+                    "text-sm leading-5 font-semibold tracking-tight",
+                    index === 0 ? "text-foreground" : "text-muted-foreground"
+                  )}
+                >
                   {label}
                 </p>
-                <div className="flex items-center gap-2.5">
-                  <Skeleton className="h-5 w-12" />
+                <div className="flex flex-col items-start gap-2 @3xl/hero:flex-row @3xl/hero:items-center @3xl/hero:gap-3">
+                  <Skeleton className="h-6 w-16 @4xl/hero:h-7" />
                   <Skeleton className="h-5 w-12 rounded-full" />
                 </div>
               </div>
-              <div className={MCP_METRIC_CHART_SURFACE_CLASS}>
-                <Skeleton className="h-40 w-full rounded-xl" />
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
+          <div className={cn(TRAFFIC_HERO_CHART_SURFACE_CLASS, "mt-0.5")}>
+            <p className="mb-3 text-sm font-medium">{metricLabels[0]}</p>
+            <Skeleton className="h-52 w-full rounded-xl @md/hero:h-72" />
+          </div>
         </div>
         <InstrumentSection
           eyebrow={t("mcp.tools.title")}

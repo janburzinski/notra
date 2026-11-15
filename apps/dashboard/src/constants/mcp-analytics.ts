@@ -8,6 +8,7 @@ import type { StatusBadgeAppearance } from "@notra/ui/types/status-badge";
 import { CHART_PRIMARY_COLOR } from "@/constants/charts";
 import { TABLE_ROW_HEIGHT } from "@/constants/table";
 import type {
+  McpChartMetric,
   McpOutcomeBadgeVariant,
   McpRpcErrorKey,
   McpServerRequestKey,
@@ -91,7 +92,7 @@ export const MCP_VERSION_ALL = "*";
 
 export const MCP_METRIC_SERIES_KEY = "value";
 
-/** The metric charts are 160px tall; more than four steps crowd the labels. */
+/** More than four steps crowd the labels of the hero chart on small screens. */
 export const MCP_AXIS_MAX_STEPS = 4;
 
 export const MCP_AXIS_NICE_STEPS = [1, 2, 2.5, 5, 10] as const;
@@ -105,12 +106,26 @@ export const MCP_HOUR_MS = 3_600_000;
 
 export const MCP_METRIC_COLOR = CHART_PRIMARY_COLOR;
 
-/** Same shell rim as the website hero, one per metric. */
-export const MCP_METRIC_CARD_CLASS =
-  "min-w-0 rounded-2xl border border-shell-border bg-shell px-0.5 pb-0.5";
+/** The hero opens on tool calls; each tile switches the chart to its metric. */
+export const MCP_DEFAULT_CHART_METRIC: McpChartMetric = "toolCalls";
 
-export const MCP_METRIC_CHART_SURFACE_CLASS =
-  "border-table-card-border bg-table-card shadow-table-card rounded-[14px] border px-3 pt-3 pb-2";
+/** The hero tiles sit flat on the shell, two pixels apart like its rim. */
+export const MCP_HERO_METRICS_CLASS = "gap-0.5 pt-0.5";
+
+/** The selected tile is raised as a card like the chart below it. */
+export const MCP_HERO_METRIC_CELL_CLASS =
+  "group/metric relative flex min-w-0 flex-col gap-2 rounded-[14px] border border-transparent p-4 transition-colors data-[selected]:border-table-card-border data-[selected]:bg-table-card data-[selected]:shadow-table-card";
+
+/**
+ * The tile's label is its button and stretches over the whole tile, so the
+ * change badge (its own tooltip button) isn't nested inside it.
+ */
+export const MCP_HERO_METRIC_BUTTON_CLASS =
+  "cursor-pointer self-start text-left text-sm leading-5 font-semibold tracking-tight outline-none transition-colors after:absolute after:inset-0 after:rounded-[14px] focus-visible:after:ring-2 focus-visible:after:ring-ring focus-visible:after:ring-inset";
+
+/** Unselected tiles read quieter and light up on hover. */
+export const MCP_HERO_METRIC_MUTED_CLASS =
+  "text-muted-foreground transition-colors group-hover/metric:text-foreground";
 
 /** Marks the newest server version in the version select. */
 export const MCP_LATEST_VERSION_BADGE: StatusBadgeAppearance = {

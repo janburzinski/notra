@@ -1,14 +1,12 @@
 "use client";
 
-import { trafficVisitDelta } from "@notra/geo-core/utils/ai-traffic";
 import { Button } from "@notra/ui/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@notra/ui/components/ui/tabs";
 import { useState } from "react";
 import { InstrumentSection } from "ui/card";
 import { DataTable } from "ui/table";
-import { useFormatter, useLocale, useTranslations } from "use-intl";
+import { useTranslations } from "use-intl";
 
-import { McpMetricCard } from "@/components/mcp/mcp-metric-card";
 import { McpTableEmpty } from "@/components/mcp/mcp-sheet-parts";
 import {
   MCP_LOG_FILTERS,
@@ -18,20 +16,13 @@ import { TABLE_ROW_HEIGHT } from "@/constants/table";
 import { useDesktopBreakpoint } from "@/lib/hooks/use-desktop-breakpoint";
 import { useMcpColumns } from "@/lib/hooks/use-mcp-columns";
 import type {
-  McpAnalyticsHeroProps,
   McpAudienceSectionsProps,
   McpLoadFailedProps,
   McpLogFilter,
-  McpMetric,
   McpRequestLogProps,
   McpToolSectionsProps,
 } from "@/types/mcp-analytics";
-import { formatMilliseconds } from "@/utils/format";
-import {
-  errorRate,
-  mcpTableHeight,
-  percentChange,
-} from "@/utils/mcp-analytics";
+import { mcpTableHeight } from "@/utils/mcp-analytics";
 
 /** Side by side, a pair of tables shares the taller height so the cards line up. */
 function usePairHeight() {
@@ -51,80 +42,6 @@ export function McpLoadFailed({ onRetry }: McpLoadFailedProps) {
         {tActions("tryAgain")}
       </Button>
     </InstrumentSection>
-  );
-}
-
-/** Rate and latency changes only mean something once the last period had requests. */
-function comparableChange(
-  current: number,
-  previous: number,
-  previousRequests: number
-): number | null {
-  return previousRequests > 0 && previous > 0
-    ? percentChange(current, previous)
-    : null;
-}
-
-function useMcpMetrics({ totals }: McpAnalyticsHeroProps["data"]): McpMetric[] {
-  const t = useTranslations("geo.pages.mcp.metrics");
-  const format = useFormatter();
-  const locale = useLocale();
-  const rate = errorRate(totals.errors, totals.requests);
-  return [
-    {
-      key: "toolCalls",
-      label: t("toolCalls"),
-      value: format.number(totals.toolCalls),
-      delta: trafficVisitDelta(totals.toolCalls, totals.previousToolCalls),
-    },
-    {
-      key: "sessions",
-      label: t("sessions"),
-      value: format.number(totals.sessions),
-      delta: trafficVisitDelta(totals.sessions, totals.previousSessions),
-    },
-    {
-      key: "errorRate",
-      label: t("errorRate"),
-      value: format.number(rate / 100, {
-        style: "percent",
-        minimumFractionDigits: 1,
-        maximumFractionDigits: 1,
-      }),
-      delta: comparableChange(
-        rate,
-        errorRate(totals.previousErrors, totals.previousRequests),
-        totals.previousRequests
-      ),
-      lowerIsBetter: true,
-    },
-    {
-      key: "p95Latency",
-      label: t("p95Latency"),
-      value: formatMilliseconds(totals.p95Ms, locale),
-      delta: comparableChange(
-        totals.p95Ms,
-        totals.previousP95Ms,
-        totals.previousRequests
-      ),
-      lowerIsBetter: true,
-    },
-  ];
-}
-
-export function McpAnalyticsHero({ data, range }: McpAnalyticsHeroProps) {
-  const metrics = useMcpMetrics(data);
-  return (
-    <div className="grid gap-4 lg:grid-cols-2">
-      {metrics.map((metric) => (
-        <McpMetricCard
-          data={data}
-          key={metric.key}
-          metric={metric}
-          range={range}
-        />
-      ))}
-    </div>
   );
 }
 

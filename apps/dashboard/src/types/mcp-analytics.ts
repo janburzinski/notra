@@ -135,10 +135,16 @@ export interface McpAxisScale {
   decimals: number;
 }
 
-export interface McpMetricCardProps {
+export interface McpMetricChartProps {
   metric: McpMetric;
   data: Pick<McpAnalyticsResponse, "daily" | "hourly">;
   range: GeoRangeQuery;
+}
+
+export interface McpHeroMetricProps {
+  metric: McpMetric;
+  selected: boolean;
+  onSelect: () => void;
 }
 
 export interface McpLoadFailedProps {

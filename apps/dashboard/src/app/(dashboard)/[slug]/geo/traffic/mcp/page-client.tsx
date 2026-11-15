@@ -8,10 +8,10 @@ import { AnalyticsSourceTabs } from "@/components/analytics/analytics-source-tab
 import { EmptyState } from "@/components/empty-state";
 import { GeoRangePicker } from "@/components/geo/geo-range-picker";
 import { PageContainer } from "@/components/layout/container";
+import { McpAnalyticsHero } from "@/components/mcp/mcp-analytics-hero";
 import { McpEmpty } from "@/components/mcp/mcp-empty";
 import { McpRequestSheet } from "@/components/mcp/mcp-request-sheet";
 import {
-  McpAnalyticsHero,
   McpAudienceSections,
   McpLoadFailed,
   McpRequestLog,
