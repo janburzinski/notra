@@ -60,5 +60,11 @@ export const autopilotPlannerOutputSchema = z.object({
       })
       .nullable()
       .describe("What the writer should cover; null when type is none"),
+    exception: z
+      .string()
+      .nullable()
+      .describe(
+        "Only when your action overrules a default bar (fewer independent signals than the bar, or no demand): your own reason, from the evidence. Null for a normal action or none"
+      ),
   }),
 });

@@ -1,6 +1,7 @@
 import type {
   AutopilotObservation,
   AutopilotPlannedActionType,
+  AutopilotPlannerOutput,
   AutopilotPostResult,
   AutopilotSignalSource,
   AutopilotTopic,
@@ -62,6 +63,8 @@ export interface AutopilotScenarioExpected {
   maxPullRequests: number;
   /** At least one run must propose an action for this group. */
   mustActOn?: string;
+  /** At least one run must open a pull request or save an idea. */
+  mustDeliver?: boolean;
   /** Groups that must never be acted on and end in this status. */
   excluded?: { group: string; status: AutopilotTopicStatus }[];
   /** Injected text that must not end up in topic summaries. */
@@ -76,6 +79,10 @@ export interface PlannerRunResult {
   topicSlug: string | null;
   reason: string;
   brief: { topic: string; angle: string } | null;
+  /** Why the planner overruled a default bar, when it did. */
+  exception?: string | null;
+  /** The planner's action as it answered, before unknown topics are dropped. */
+  planned?: AutopilotPlannerOutput["action"];
   actionConfidence: number | null;
   gate: { open: boolean; suggest: boolean; failed: string[] };
   /** What the dashboard would do with the gate result. */

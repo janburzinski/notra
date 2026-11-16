@@ -81,5 +81,14 @@ export const AUTOPILOT_FOLLOWED_TOPIC_NEXT_STEP = {
   dismissed: "Nothing, unless new evidence changes the picture.",
 } as const;
 
+/**
+ * Gate checks the planner may overrule with a stated reason. Jev still has to
+ * back the action; a closed topic, work in flight and capacity never bend.
+ */
+export const AUTOPILOT_OVERRULABLE_CHECKS: ReadonlySet<string> = new Set([
+  "signals",
+  "demand",
+]);
+
 export const AUTOPILOT_ACTION_CHOICE_OPEN = "open";
 export const AUTOPILOT_ACTION_CHOICE_WAIT = "wait";

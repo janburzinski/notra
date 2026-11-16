@@ -110,6 +110,11 @@ export interface AutopilotPlannedAction {
   topicSlug: string | null;
   reason: string;
   brief: { topic: string; angle: string } | null;
+  /**
+   * Why the planner overrules the default evidence bars (signals, demand).
+   * Jev still decides whether it opens or stays an idea.
+   */
+  exception?: string | null;
 }
 
 export interface AutopilotGateCheck {
@@ -123,6 +128,8 @@ export interface AutopilotGateCheck {
     | "draft_limit";
   ok: boolean;
   detail: string;
+  /** Failed, but the planner overruled it with a reason. */
+  waived?: boolean;
 }
 
 export interface AutopilotGateResult {

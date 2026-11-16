@@ -917,6 +917,7 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
       title?: string;
       action?: "none" | "write_post";
       summary?: string;
+      exception?: string;
     } = {}
   ): AutopilotPlannerOutput => {
     const slug = options.slug ?? "exports";
@@ -945,6 +946,7 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
           action === "none"
             ? null
             : { topic: title, angle: `What ${title} changes for users` },
+        exception: options.exception ?? null,
       },
     };
   };
@@ -2240,6 +2242,44 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
         })
       )?.status
     ).toBe("suggested");
+  });
+
+  test("the planner's own call on one gap opens a PR when Jev backs it", async () => {
+    const exception = "Every engine leaves the brand out of a core question";
+    state.gaps = [gapRow("Exports")];
+    await dailyRun("planner-own-call", [], (ids) =>
+      plannerOutput(ids, { exception })
+    );
+    expect(opened).toHaveLength(1);
+    const finding = await db.query.autopilotFindings.findFirst();
+    expect(finding).toMatchObject({
+      kind: "keywords",
+      fingerprint: gapFingerprint("Exports"),
+    });
+    expect(finding?.evidence.exception).toBe(exception);
+    expect(finding?.evidence.gate).toContainEqual(
+      expect.objectContaining({ name: "signals", ok: false, waived: true })
+    );
+    expect(await runMessages("planner-own-call")).toContainEqual(
+      `decision: Writing "Exports", its own call: ${exception}`
+    );
+  });
+
+  test("the planner's own call stays an idea when Jev is unsure", async () => {
+    const exception = "Every engine leaves the brand out of a core question";
+    state.act = 0.7;
+    state.gaps = [gapRow("Exports")];
+    await dailyRun("planner-own-call-unsure", [], (ids) =>
+      plannerOutput(ids, { exception })
+    );
+    expect(opened).toHaveLength(0);
+    expect(charges).toHaveLength(0);
+    expect((await db.query.autopilotFindings.findFirst())?.status).toBe(
+      "suggested"
+    );
+    expect(await runMessages("planner-own-call-unsure")).toContainEqual(
+      `decision: Saved "Exports" as an idea: Jev was not sure enough about its own call (${exception})`
+    );
   });
 
   test("a topic people ask about that Jev is unsure of is kept as an idea, not dropped", async () => {

@@ -6,6 +6,7 @@ import {
   AUTOPILOT_DAY_MS,
   AUTOPILOT_DEMAND_MAX_AGE_DAYS,
   AUTOPILOT_FOLLOWED_TOPIC_NEXT_STEP,
+  AUTOPILOT_OVERRULABLE_CHECKS,
   AUTOPILOT_PLANNER_STATE_BLOCK,
   AUTOPILOT_PLANNER_STATE_FENCE,
   AUTOPILOT_SIGNAL_DETAIL_MAX_CHARS,
@@ -457,6 +458,7 @@ export function applyPlannerOutput(params: {
             topicSlug: actionSlug,
             reason: output.action.reason,
             brief: output.action.brief,
+            exception: output.action.exception?.trim() || null,
           },
   };
 }
@@ -581,13 +583,27 @@ export function evaluateAutopilotGate(params: {
         : "The open pull request limit is reached",
     },
   ];
-  const failed = checks.filter((check) => !check.ok).map((check) => check.name);
+  // The evidence bars are defaults the planner may overrule with a reason.
+  // Jev still has to back the call, and a closed topic, work in flight and
+  // capacity never bend.
+  if (action.exception) {
+    for (const check of checks) {
+      if (!check.ok && AUTOPILOT_OVERRULABLE_CHECKS.has(check.name)) {
+        check.waived = true;
+      }
+    }
+  }
+  const waived = checks.some((check) => check.waived);
+  const failed = checks
+    .filter((check) => !(check.ok || check.waived))
+    .map((check) => check.name);
   const confidence = params.actionConfidence;
   // Unsure about a post people ask for: an idea beats nothing. Without
-  // demand only a confident post becomes an idea.
-  const ideaConfidence =
-    confidence === null ||
-    (demand && confidence >= AUTOPILOT_ACTION_IDEA_CONFIDENCE);
+  // demand only a confident post becomes an idea, and an exception needs Jev.
+  const ideaConfidence = waived
+    ? confidence !== null && confidence >= AUTOPILOT_ACTION_IDEA_CONFIDENCE
+    : confidence === null ||
+      (demand && confidence >= AUTOPILOT_ACTION_IDEA_CONFIDENCE);
   return {
     open: failed.length === 0,
     suggest:

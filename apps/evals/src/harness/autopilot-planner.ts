@@ -235,6 +235,8 @@ function settleRun(params: {
       topicSlug: plan.action.topicSlug,
       reason: plan.action.reason,
       brief: plan.action.brief,
+      exception: plan.action.exception ?? null,
+      planned: plan.output.action,
       actionConfidence: plan.actionConfidence,
       gate: {
         open: gate.open,
@@ -496,6 +498,7 @@ function demoPlannerOutput(params: {
         type === "none"
           ? null
           : { topic: targetTitle ?? "demo", angle: "demo angle" },
+      exception: null,
     },
   };
 }

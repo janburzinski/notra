@@ -55,6 +55,10 @@ export function isListedPullRequest(finding: AutopilotFindingView) {
   );
 }
 
+function sentence(text: string) {
+  return text.endsWith(".") ? text : `${text}.`;
+}
+
 /**
  * Why Autopilot wrote this, or why it is still an idea, in one or two
  * sentences. `formatDate` keeps locale formatting with the caller.
@@ -93,15 +97,19 @@ export function describeFindingReason(
     return "Requested on GitHub.";
   }
   const topic = finding.evidence.topic;
+  const exception = finding.evidence.exception?.trim();
   if (finding.status === "suggested") {
     if (!topic) {
       return "Offered on GitHub. It waits for a reply or a click.";
     }
     const failed = new Set(
       (finding.evidence.gate ?? [])
-        .filter((check) => !check.ok)
+        .filter((check) => !(check.ok || check.waived))
         .map((check) => check.name)
     );
+    if (exception && failed.has("confidence")) {
+      return `Autopilot's own call: ${sentence(exception)} At ${percent(confidence)} confidence it waits for a click.`;
+    }
     if (failed.has("confidence")) {
       return `People ask about this, but at ${percent(confidence)} confidence it waits for a click instead of opening a pull request.`;
     }
@@ -113,6 +121,9 @@ export function describeFindingReason(
   if (finding.evidence.autoWritten) {
     // Older ideas wrote themselves when nobody dismissed them.
     return `Written automatically: the idea from ${formatDate(new Date(finding.createdAt))} was not dismissed.`;
+  }
+  if (exception && confidence >= threshold) {
+    return `Autopilot's own call: ${sentence(exception)} ${percent(confidence)} confidence in this post.`;
   }
   if (topic && confidence >= threshold) {
     return `${topic.signals} related signals and ${percent(confidence)} confidence in this post.`;

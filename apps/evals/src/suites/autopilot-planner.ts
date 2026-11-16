@@ -40,7 +40,7 @@ export const autopilotPlannerSuite: EvalSuite<
     return output.runs
       .map(
         (run) =>
-          `${run.runId}: ${run.action}${run.topicSlug ? ` on ${run.topicSlug}` : ""} (${run.reason})\n  gate failed ${run.gate.failed.join(", ") || "nothing"}, acted ${run.acted ?? "no"}, signals ${JSON.stringify(run.signals)}`
+          `${run.runId}: ${run.action}${run.topicSlug ? ` on ${run.topicSlug}` : ""} (${run.reason})${run.exception ? `\n  exception: ${run.exception}` : ""}\n  gate failed ${run.gate.failed.join(", ") || "nothing"}, acted ${run.acted ?? "no"}, signals ${JSON.stringify(run.signals)}`
       )
       .concat(
         output.topics.map(

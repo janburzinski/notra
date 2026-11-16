@@ -142,6 +142,12 @@ function gate(output: AutopilotScenarioOutput, testCase: AutopilotScenario) {
       label: `run ${index + 1}: ${open ? "opened" : (actual?.acted ?? "nothing")}, wanted ${run.expected.pr}`,
     };
   });
+  if (testCase.expected.mustDeliver) {
+    checks.push({
+      ok: output.runs.some((run) => run.acted) ? 1 : 0,
+      label: "never opened a pull request or saved an idea",
+    });
+  }
   const opened = output.runs.filter((run) => run.acted === "opened").length;
   checks.push({
     ok: opened <= testCase.expected.maxPullRequests ? 1 : 0,

@@ -87,7 +87,11 @@ export interface AutopilotFindingEvidence {
   /** Written because someone asked (a click or a reply), not by the planner alone. */
   requested?: boolean;
   /** Each gate check the planner ran before acting. */
-  gate?: { name: string; ok: boolean; detail: string }[] | null;
+  gate?:
+    | { name: string; ok: boolean; detail: string; waived?: boolean }[]
+    | null;
+  /** Why the planner acted below the signal bar; such a finding is an idea. */
+  exception?: string | null;
   /** Failed writes so far; Autopilot gives up after a few. */
   failures?: number;
   /** Claim token holding an automatic draft slot; inert once the claim settles. */

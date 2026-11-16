@@ -58,17 +58,32 @@ import type {
 } from "@/types/autopilot-runtime";
 import { toErrorMessage } from "@/utils/error-message";
 
+function statusOf(check: AutopilotGateResult["checks"][number]) {
+  if (check.ok) {
+    return "passed";
+  }
+  return check.waived ? "waived" : "failed";
+}
+
 function describeChecks(checks: AutopilotGateResult["checks"]) {
   return checks.map(
-    (check) =>
-      `${check.ok ? "passed" : "failed"} ${check.name}: ${check.detail}`
+    (check) => `${statusOf(check)} ${check.name}: ${check.detail}`
   );
 }
 
-function ideaReason(gate: AutopilotGateResult, confidence: number | null) {
+function ideaReason(
+  gate: AutopilotGateResult,
+  confidence: number | null,
+  exception: string | null
+) {
   const failed = new Set(
-    gate.checks.filter((check) => !check.ok).map((check) => check.name)
+    gate.checks
+      .filter((check) => !(check.ok || check.waived))
+      .map((check) => check.name)
   );
+  if (exception && failed.has("confidence")) {
+    return `Jev was not sure enough about its own call (${exception})`;
+  }
   if (failed.has("confidence")) {
     return confidence === null
       ? "Jev was unavailable"
@@ -409,10 +424,11 @@ export async function decideAutopilotPlan(
   const { topic, action } = plan;
   await log.decision(
     outcome === "open"
-      ? `Writing "${action.brief?.topic ?? topic.title}"`
-      : `Saved "${action.brief?.topic ?? topic.title}" as an idea: ${ideaReason(gate, plan.actionConfidence)}`,
+      ? `Writing "${action.brief?.topic ?? topic.title}"${action.exception ? `, its own call: ${action.exception}` : ""}`
+      : `Saved "${action.brief?.topic ?? topic.title}" as an idea: ${ideaReason(gate, plan.actionConfidence, action.exception ?? null)}`,
     {
       reason: action.reason,
+      ...(action.exception ? { exception: action.exception } : {}),
       confidence: plan.actionConfidence,
       checks: describeChecks(gate.checks),
     }
@@ -446,6 +462,7 @@ export async function decideAutopilotPlan(
       evidence: {
         ...observation.proposal.evidence,
         ...(action.type === "update_page" ? {} : { updatePage: null }),
+        ...(action.exception ? { exception: action.exception } : {}),
         // The shipped work behind the answer: shown as sources and its
         // authors are asked to review the facts.
         ...(pullRequests.length > 0 ? { pullRequests } : {}),

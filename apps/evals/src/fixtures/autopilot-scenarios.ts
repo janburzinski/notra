@@ -420,6 +420,39 @@ const npsTimingSearch = gap(
   "Search Console shows 2100 impressions at position 11 for 'in app nps survey timing' with 9 clicks."
 );
 
+// One gap, seen run after run, that no second observation will ever join:
+// the brand is missing everywhere for a question in its core use case.
+const checklistTemplatesGap = gap(
+  "onboarding-checklist-templates-b2b",
+  "Onboarding checklist templates for B2B SaaS",
+  'AI engines answer \'onboarding checklist template for a B2B SaaS app\' without you on 4 of 4 engines (0% mention you), while Userpilot, Appcues, Userflow, Chameleon show up. They searched for "b2b onboarding checklist template", "in-app checklist examples saas". Search Console shows 6,200 impressions at position 9 with 31 clicks.'
+);
+// AI engines repeat something false about the brand, from the page that is
+// supposed to say otherwise.
+const securityPage = {
+  url: "https://cartwheel.so/security",
+  title: "Security",
+};
+const soc2Gap = gap(
+  "cartwheel-soc2-gdpr",
+  "Is Cartwheel SOC 2 and GDPR compliant",
+  "AI engines answer 'is Cartwheel SOC 2 compliant' on 4 of 4 engines saying Cartwheel has no SOC 2 report and stores data only in the US, and recommend Appcues for regulated teams instead. They quote cartwheel.so/security, which still says 'SOC 2 audit in progress (2024)'. Cartwheel has had a SOC 2 Type II report since March 2026 and an EU data region since June 2026.",
+  securityPage
+);
+// A breaking change every API customer must act on before a deadline:
+// nobody searches for it yet, but waiting for demand would be too late.
+const v1Sunset = pr(
+  650,
+  "feat(api)!: remove the v1 tours API on 1 December",
+  "Breaking: /v1/tours stops answering on 2026-12-01. Every customer calling v1 must move to /v2/tours, which renames target to audience and paginates with cursors instead of pages. The migration guide at /docs/api/v2-migration is still a stub."
+);
+// One weak gap: thin demand, nothing that makes waiting the wrong call.
+const tourAnalyticsWeakGap = gap(
+  "product-tour-heatmap",
+  "Heatmaps for product tours",
+  "AI engines answer 'product tour heatmap' without you on 1 of 3 engines (67% mention you), while Pendo shows up. Search Console shows 40 impressions at position 52 with 0 clicks."
+);
+
 export const AUTOPILOT_SCENARIOS: AutopilotScenario[] = [
   {
     id: "gap-then-pr",
@@ -1113,6 +1146,141 @@ export const AUTOPILOT_SCENARIOS: AutopilotScenario[] = [
       maxPullRequests: 1,
       mustActOn: "roles",
       briefNotAnnouncement: true,
+    },
+  },
+  {
+    id: "off-track-one-strong-gap",
+    title:
+      "One very strong gap in the core use case, seen three runs in a row: deliver it even though no second signal joins",
+    tags: ["act", "demand", "off-track"],
+    input: scenario({
+      runs: [
+        {
+          observations: [checklistTemplatesGap],
+          expected: {
+            action: ["write_post", "none"],
+            group: "templates",
+            pr: "allowed",
+          },
+        },
+        {
+          observations: [checklistTemplatesGap, typoFix],
+          expected: {
+            action: ["write_post", "none"],
+            group: "templates",
+            pr: "allowed",
+          },
+        },
+        {
+          observations: [checklistTemplatesGap],
+          expected: {
+            action: ["write_post", "none"],
+            group: "templates",
+            pr: "allowed",
+          },
+        },
+      ],
+    }),
+    expected: {
+      groups: [
+        {
+          key: "templates",
+          title: "Onboarding checklist templates",
+          observations: [checklistTemplatesGap.id],
+        },
+        { key: "typo", title: "NPS email typo", observations: [typoFix.id] },
+      ],
+      maxPullRequests: 1,
+      mustActOn: "templates",
+      mustDeliver: true,
+    },
+  },
+  {
+    id: "off-track-wrong-ai-answer",
+    title:
+      "AI engines repeat a false compliance claim from an outdated page: update the page now, one signal is enough",
+    tags: ["act", "demand", "off-track"],
+    input: scenario({
+      runs: [
+        {
+          observations: [soc2Gap, tooltipFix],
+          expected: {
+            action: ["update_page", "write_post"],
+            group: "soc2",
+            pr: "deliver",
+          },
+        },
+      ],
+    }),
+    expected: {
+      groups: [
+        {
+          key: "soc2",
+          title: "SOC 2 and GDPR compliance",
+          observations: [soc2Gap.id],
+        },
+        { key: "rtl", title: "RTL tooltip fix", observations: [tooltipFix.id] },
+      ],
+      maxPullRequests: 1,
+      mustActOn: "soc2",
+    },
+  },
+  {
+    id: "own-call-breaking-change",
+    title:
+      "A breaking API change with a deadline, nobody searching yet: write the migration post anyway",
+    tags: ["act", "off-track"],
+    input: scenario({
+      runs: [
+        {
+          observations: [v1Sunset, typoFix],
+          expected: {
+            action: ["write_post"],
+            group: "sunset",
+            pr: "deliver",
+          },
+        },
+      ],
+    }),
+    expected: {
+      groups: [
+        {
+          key: "sunset",
+          title: "Migrating from the v1 tours API",
+          observations: [v1Sunset.id],
+        },
+        { key: "typo", title: "NPS email typo", observations: [typoFix.id] },
+      ],
+      maxPullRequests: 1,
+      mustActOn: "sunset",
+    },
+  },
+  {
+    id: "off-track-weak-gap-waits",
+    title:
+      "One weak gap where the brand is mostly named already: keep watching, no exception",
+    tags: ["restraint", "off-track"],
+    input: scenario({
+      runs: [
+        {
+          observations: [tourAnalyticsWeakGap],
+          expected: { action: ["none"], pr: "nothing" },
+        },
+        {
+          observations: [tourAnalyticsWeakGap],
+          expected: { action: ["none"], pr: "nothing" },
+        },
+      ],
+    }),
+    expected: {
+      groups: [
+        {
+          key: "heatmap",
+          title: "Product tour heatmaps",
+          observations: [tourAnalyticsWeakGap.id],
+        },
+      ],
+      maxPullRequests: 0,
     },
   },
 ];
