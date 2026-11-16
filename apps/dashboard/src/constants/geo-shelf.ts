@@ -100,6 +100,28 @@ export const GEO_SHELF_KIND_BY_DOMAIN: Record<
 };
 
 export const GEO_SHELF_DOCS_HOSTNAME_PREFIX = "docs.";
+/** Most cited pages read per scan; the rest wait for the next one. */
+export const GEO_SHELF_FETCH_BATCH_SIZE = 25;
+export const GEO_SHELF_FETCH_CONCURRENCY = 5;
+export const GEO_SHELF_FETCH_TIMEOUT_MS = 30_000;
+/** Context.dev may serve a cached copy this old; pages are shared across projects. */
+export const GEO_SHELF_FETCH_CACHE_MS = 7 * 24 * 60 * 60 * 1000;
+/** A read page is read again after this, to catch lists that added or dropped a brand. */
+export const GEO_SHELF_REFETCH_AFTER_MS = 30 * 24 * 60 * 60 * 1000;
+/** A failed read (timeout, 5xx) is retried after this. */
+export const GEO_SHELF_FETCH_RETRY_AFTER_MS = 24 * 60 * 60 * 1000;
+/** Less main-content text than this means a wall (login, captcha, cookie page). */
+export const GEO_SHELF_FETCH_MIN_TEXT_LENGTH = 200;
+/** Walls and dead pages: re-checked monthly like a read page, not retried daily. */
+export const GEO_SHELF_FETCH_UNREADABLE_STATUSES: readonly number[] = [
+  401, 402, 403, 404, 407, 410, 429, 451,
+];
+/** Hosts that only redirect to the real page and expire, e.g. Gemini grounding links. */
+export const GEO_SHELF_FETCH_SKIPPED_HOSTS: readonly string[] = [
+  "vertexaisearch.cloud.google.com",
+];
+export const GEO_SHELF_EXCERPT_MAX_LENGTH = 280;
+export const GEO_SHELF_LISTICLE_MIN_NUMBERED_ENTRIES = 5;
 export const GEO_SHELF_ADD_HOTKEY = "A";
 export const GEO_SHELF_POC_SAME_AS_ASSIGNEE = "__assignee__";
 export const GEO_SHELF_UNASSIGNED = "__unassigned__";

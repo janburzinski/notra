@@ -85,7 +85,7 @@ export const geoShelfPlacementSchema = z.object({
   }),
   evidence: geoShelfPlacementEvidenceSchema.meta({
     description:
-      "manual: a teammate set the status. fetch: written automatically when a scan added the page.",
+      "manual: a teammate set the status. fetch: Notra read the page after a scan and found the brand there or not.",
   }),
   excerpt: z.string().nullable().meta({
     description:

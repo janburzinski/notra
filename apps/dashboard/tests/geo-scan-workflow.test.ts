@@ -50,6 +50,10 @@ const syncShelf =
   mock<
     typeof import("../src/workflows/steps/sync-geo-shelf-citations").syncGeoShelfCitationsStep
   >();
+const fetchShelfPages =
+  mock<
+    typeof import("../src/workflows/steps/fetch-geo-shelf-pages").fetchGeoShelfPagesStep
+  >();
 const refreshGaps =
   mock<
     typeof import("../src/workflows/steps/refresh-geo-content-gaps").refreshGeoContentGapsStep
@@ -60,6 +64,9 @@ mock.module("../src/workflows/steps/start-geo-sentiment", () => ({
 }));
 mock.module("../src/workflows/steps/sync-geo-shelf-citations", () => ({
   syncGeoShelfCitationsStep: syncShelf,
+}));
+mock.module("../src/workflows/steps/fetch-geo-shelf-pages", () => ({
+  fetchGeoShelfPagesStep: fetchShelfPages,
 }));
 mock.module("../src/workflows/steps/geo-alert-steps", () => ({
   evaluateGeoAlertsStep: async () => ({ fired: 0 }),
@@ -126,6 +133,7 @@ beforeEach(() => {
     fetchRetention,
     startSentiment,
     syncShelf,
+    fetchShelfPages,
     refreshGaps,
   ]) {
     fn.mockReset();
@@ -133,6 +141,7 @@ beforeEach(() => {
   appendLog.mockResolvedValue(undefined);
   startSentiment.mockResolvedValue("sentiment-run");
   syncShelf.mockResolvedValue(0);
+  fetchShelfPages.mockResolvedValue(0);
   refreshGaps.mockResolvedValue(undefined);
   fetchRetention.mockResolvedValue(30);
   renewClaim.mockImplementation(async (_projectId, claimedAt) => claimedAt);
@@ -254,6 +263,14 @@ describe("GEO scan workflow orchestration", () => {
       organizationId: plan.context.organizationId,
       projectId: plan.context.projectId,
     });
+    // Cited pages are read only after the citation sync has put them on the shelf.
+    expect(fetchShelfPages).toHaveBeenCalledWith({
+      organizationId: plan.context.organizationId,
+      projectId: plan.context.projectId,
+    });
+    expect(syncShelf.mock.invocationCallOrder[0]).toBeLessThan(
+      fetchShelfPages.mock.invocationCallOrder[0] ?? 0
+    );
     expect(sleep).not.toHaveBeenCalled();
   });
 

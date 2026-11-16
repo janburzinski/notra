@@ -489,3 +489,36 @@ export interface GeoShelfNotSetupProps {
   organizationSlug: string;
   projectId: string | undefined;
 }
+
+/** A tracked brand as the page reader looks for it. */
+export interface GeoShelfPageBrand {
+  competitorId: string | null;
+  name: string;
+  domain: string | null;
+  aliases: readonly string[];
+}
+
+export interface GeoShelfPageBrandResult {
+  competitorId: string | null;
+  status: "present" | "absent";
+  position: number | null;
+  hasLink: boolean;
+  excerpt: string | null;
+}
+
+export interface GeoShelfPageRead {
+  kind: GeoShelfSourceKind;
+  brands: GeoShelfPageBrandResult[];
+}
+
+/** One page the fetch job should read, with what it needs to merge results. */
+export interface GeoShelfFetchCandidate {
+  id: string;
+  url: string;
+  title: string | null;
+  kind: GeoShelfSourceKind;
+}
+
+export type GeoShelfFetchOutcome =
+  | { status: "ok"; title: string | null; read: GeoShelfPageRead }
+  | { status: "blocked" | "failed" };

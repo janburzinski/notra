@@ -49,6 +49,7 @@ import {
   appendAutomationLogBestEffort,
   fetchLogRetention,
 } from "./steps/content-generation-steps";
+import { fetchGeoShelfPagesStep } from "./steps/fetch-geo-shelf-pages";
 import { evaluateGeoAlertsStep } from "./steps/geo-alert-steps";
 import {
   collectGeoOlostepResultsStep,
@@ -338,6 +339,15 @@ async function finalizeProjectRun(
     } catch (error) {
       await logFollowUpFailure(
         `GEO shelf space could not refresh for ${context.companyName}`,
+        error,
+        { scanId: context.scanId }
+      );
+    }
+    try {
+      await fetchGeoShelfPagesStep(scope);
+    } catch (error) {
+      await logFollowUpFailure(
+        `GEO shelf pages could not be read for ${context.companyName}`,
         error,
         { scanId: context.scanId }
       );

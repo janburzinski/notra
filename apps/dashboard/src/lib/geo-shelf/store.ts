@@ -2,16 +2,33 @@ import { GEO_SHELF_ROOT_URL_PATTERN_SOURCE } from "@notra/db/constants/geo-shelf
 import { db } from "@notra/db/drizzle";
 import { geoShelfSources } from "@notra/db/schema";
 import { geoShelfSourceSchema } from "@notra/schemas/dashboard/geo-shelf";
-import { and, asc, desc, eq, inArray, type SQL, sql } from "drizzle-orm";
+import {
+  and,
+  asc,
+  desc,
+  eq,
+  inArray,
+  isNull,
+  lt,
+  notInArray,
+  or,
+  type SQL,
+  sql,
+} from "drizzle-orm";
 
 import {
   GEO_SHELF_CITATION_INSERT_CHUNK,
+  GEO_SHELF_FETCH_BATCH_SIZE,
+  GEO_SHELF_FETCH_RETRY_AFTER_MS,
+  GEO_SHELF_FETCH_SKIPPED_HOSTS,
+  GEO_SHELF_REFETCH_AFTER_MS,
   GEO_SHELF_RELEVANT_MIN_CITATIONS,
 } from "@/constants/geo-shelf";
 
 import type {
   GeoShelfCitationState,
   GeoShelfCitationSummary,
+  GeoShelfFetchCandidate,
   GeoShelfPageQuery,
   GeoShelfSearchQuery,
   GeoShelfSource,
@@ -432,5 +449,95 @@ export async function patchGeoShelfSource(
       .where(and(scopeWhere(key), eq(geoShelfSources.id, sourceId)))
       .returning();
     return updated ? toSource(updated) : null;
+  });
+}
+
+const SHELF_WINDOW_COUNT = sql`coalesce((${geoShelfSources.citations}->>'windowCount')::int, 0)`;
+const SHELF_TOTAL_COUNT = sql`coalesce((${geoShelfSources.citations}->>'totalCount')::int, 0)`;
+
+/**
+ * Third-party pages worth reading, most cited first: unread ones, failed reads
+ * after a day, and read or walled ones once they are a month old.
+ */
+export async function listGeoShelfFetchCandidates(
+  key: GeoShelfStoreKey,
+  now: Date
+): Promise<GeoShelfFetchCandidate[]> {
+  const retryBefore = new Date(now.getTime() - GEO_SHELF_FETCH_RETRY_AFTER_MS);
+  const refetchBefore = new Date(now.getTime() - GEO_SHELF_REFETCH_AFTER_MS);
+  const rows = await db
+    .select({
+      id: geoShelfSources.id,
+      url: geoShelfSources.url,
+      title: geoShelfSources.title,
+      kind: geoShelfSources.kind,
+    })
+    .from(geoShelfSources)
+    .where(
+      and(
+        visibleScopeWhere(key),
+        eq(geoShelfSources.ownership, "third_party"),
+        notInArray(geoShelfSources.domain, [...GEO_SHELF_FETCH_SKIPPED_HOSTS]),
+        sql`(${geoShelfSources.origin} = 'manual' or ${SHELF_WINDOW_COUNT} >= ${GEO_SHELF_RELEVANT_MIN_CITATIONS})`,
+        or(
+          eq(geoShelfSources.fetchStatus, "pending"),
+          isNull(geoShelfSources.lastFetchedAt),
+          and(
+            eq(geoShelfSources.fetchStatus, "failed"),
+            lt(geoShelfSources.lastFetchedAt, retryBefore)
+          ),
+          and(
+            inArray(geoShelfSources.fetchStatus, ["ok", "blocked"]),
+            lt(geoShelfSources.lastFetchedAt, refetchBefore)
+          )
+        )
+      )
+    )
+    .orderBy(
+      desc(SHELF_WINDOW_COUNT),
+      desc(SHELF_TOTAL_COUNT),
+      asc(geoShelfSources.id)
+    )
+    .limit(GEO_SHELF_FETCH_BATCH_SIZE);
+  return rows;
+}
+
+/**
+ * Stores one read under a row lock, so a teammate's edit in the meantime is
+ * merged instead of overwritten. `updated_at` keeps meaning "last cited".
+ */
+export async function writeGeoShelfFetchResult(
+  key: GeoShelfStoreKey,
+  sourceId: string,
+  update: (
+    current: GeoShelfSource
+  ) => Pick<
+    GeoShelfSource,
+    "fetchStatus" | "lastFetchedAt" | "kind" | "title" | "placements"
+  >
+): Promise<boolean> {
+  return await db.transaction(async (tx) => {
+    const [row] = await tx
+      .select()
+      .from(geoShelfSources)
+      .where(and(scopeWhere(key), eq(geoShelfSources.id, sourceId)))
+      .limit(1)
+      .for("update");
+    if (!row) {
+      return false;
+    }
+    const next = update(toSource(row));
+    await tx
+      .update(geoShelfSources)
+      .set({
+        fetchStatus: next.fetchStatus,
+        lastFetchedAt: next.lastFetchedAt ? new Date(next.lastFetchedAt) : null,
+        kind: next.kind,
+        title: next.title,
+        placements: next.placements,
+        updatedAt: row.updatedAt,
+      })
+      .where(and(scopeWhere(key), eq(geoShelfSources.id, sourceId)));
+    return true;
   });
 }

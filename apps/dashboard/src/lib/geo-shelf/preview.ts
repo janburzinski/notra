@@ -55,7 +55,9 @@ async function resolvePublicShelfHostname(hostname: string): Promise<string[]> {
   return addresses.map(({ address }) => address).sort();
 }
 
-async function assertStablePublicShelfUrl(rawUrl: string): Promise<void> {
+export async function assertStablePublicShelfUrl(
+  rawUrl: string
+): Promise<void> {
   const hostname = new URL(shelfFetchUrl(rawUrl)).hostname;
   const firstResolution = await resolvePublicShelfHostname(hostname);
   // react-doctor-disable-next-line react-doctor/server-sequential-independent-await -- ordered observations detect DNS changes
