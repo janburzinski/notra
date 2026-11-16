@@ -77,7 +77,34 @@ function isZombie(pid: number) {
   }
 }
 
-export function scopedProcesses(temp: string) {
+async function scopedExecutable(pid: number) {
+  for (let attempt = 0; ; attempt += 1) {
+    try {
+      return executablePath(pid);
+    } catch (cause) {
+      try {
+        process.kill(pid, 0);
+      } catch (error) {
+        if ((error as NodeJS.ErrnoException).code === "ESRCH") {
+          return;
+        }
+      }
+      if (isZombie(pid)) {
+        return;
+      }
+      if (attempt === 19) {
+        throw new Error(
+          `Cannot verify executable for profile-argument candidate ${pid}`,
+          { cause }
+        );
+      }
+      // Linux can release /proc/<pid>/exe before the process becomes a zombie.
+      await setTimeout(25);
+    }
+  }
+}
+
+export async function scopedProcesses(temp: string) {
   const selected: number[] = [];
   for (const line of execFileSync("ps", ["-axo", "pid=,args="], {
     encoding: "utf8",
@@ -89,27 +116,8 @@ export function scopedProcesses(temp: string) {
     if (pid === process.pid) {
       continue;
     }
-    let command: string;
-    try {
-      command = executablePath(pid);
-    } catch {
-      try {
-        process.kill(pid, 0);
-      } catch (error) {
-        if ((error as NodeJS.ErrnoException).code === "ESRCH") {
-          continue;
-        }
-      }
-      // An exited but unreaped process still answers signal 0, yet has no
-      // executable to read; it is not a surviving browser.
-      if (isZombie(pid)) {
-        continue;
-      }
-      throw new Error(
-        `Cannot verify executable for profile-argument candidate ${pid}`
-      );
-    }
-    if (isOwnedBrowserProcess(command, line, temp)) {
+    const command = await scopedExecutable(pid);
+    if (command && isOwnedBrowserProcess(command, line, temp)) {
       selected.push(pid);
     }
   }
@@ -123,7 +131,7 @@ export async function reapProcesses(pid: number, temp: string) {
     }).trim()
   );
   const groups = new Set([pid]);
-  for (const child of scopedProcesses(temp)) {
+  for (const child of await scopedProcesses(temp)) {
     try {
       const group = Number(
         execFileSync("ps", ["-o", "pgid=", "-p", String(child)], {
@@ -133,12 +141,12 @@ export async function reapProcesses(pid: number, temp: string) {
       if (
         group === child &&
         group !== ownGroup &&
-        scopedProcesses(temp).includes(child)
+        (await scopedProcesses(temp)).includes(child)
       ) {
         groups.add(group);
       }
     } catch {
-      if (scopedProcesses(temp).includes(child)) {
+      if ((await scopedProcesses(temp)).includes(child)) {
         throw new Error(
           `Cannot identify process group for surviving scoped process ${child}`
         );
@@ -148,7 +156,7 @@ export async function reapProcesses(pid: number, temp: string) {
   for (const group of groups) {
     signalGroup(group, "SIGTERM");
   }
-  for (const child of scopedProcesses(temp)) {
+  for (const child of await scopedProcesses(temp)) {
     if (!groups.has(child)) {
       try {
         process.kill(child, "SIGTERM");
@@ -162,14 +170,14 @@ export async function reapProcesses(pid: number, temp: string) {
   for (
     let attempt = 0;
     attempt < 20 &&
-    ([...groups].some(groupExists) || scopedProcesses(temp).length);
+    ([...groups].some(groupExists) || (await scopedProcesses(temp)).length);
     attempt += 1
   ) {
     if (attempt === 10) {
       for (const group of groups) {
         signalGroup(group, "SIGKILL");
       }
-      for (const child of scopedProcesses(temp)) {
+      for (const child of await scopedProcesses(temp)) {
         try {
           process.kill(child, "SIGKILL");
         } catch (error) {
@@ -181,9 +189,9 @@ export async function reapProcesses(pid: number, temp: string) {
     }
     await setTimeout(100);
   }
-  if ([...groups].some(groupExists) || scopedProcesses(temp).length) {
+  if ([...groups].some(groupExists) || (await scopedProcesses(temp)).length) {
     throw new Error(
-      `Processes survived cleanup for group ${pid}: ${scopedProcesses(temp).join(", ")}`
+      `Processes survived cleanup for group ${pid}: ${(await scopedProcesses(temp)).join(", ")}`
     );
   }
 }

@@ -98,7 +98,7 @@ async function verify([
     `${name} left its builder toolchain behind`
   );
   assert.equal(groupExists(pid), false);
-  assert.deepEqual(scopedProcesses(temp), []);
+  assert.deepEqual(await scopedProcesses(temp), []);
   process.stdout.write(
     `${JSON.stringify({ name, exitCode: code, status: report.status, cleanup: report.cleanup })}\n`
   );

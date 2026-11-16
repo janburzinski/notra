@@ -76,7 +76,7 @@ try {
     executablePath: chromium.executablePath(),
     env: syntheticEnvironment(temp),
   });
-  const roots = scopedProcesses(temp);
+  const roots = await scopedProcesses(temp);
   assert.ok(roots.length > 0, "Actual isolated Chromium root must be selected");
   assert.equal(
     roots.includes(unrelated.pid),
@@ -85,7 +85,7 @@ try {
   );
   await reapProcesses(worker.pid, temp);
   assert.equal(groupExists(worker.pid), false);
-  assert.deepEqual(scopedProcesses(temp), []);
+  assert.deepEqual(await scopedProcesses(temp), []);
   process.kill(unrelated.pid, 0);
   assert.equal(
     groupExists(unrelated.pid),

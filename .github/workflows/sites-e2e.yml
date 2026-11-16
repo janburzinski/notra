@@ -159,6 +159,7 @@ jobs:
 
       - name: Verify cleanup and orphan isolation
         run: |
+          bun --no-env-file test apps/sites-e2e/tests/process-discovery.test.ts
           bun --no-env-file apps/sites-e2e/tests/processes.ts
           bun --no-env-file apps/sites-e2e/tests/cleanup.ts
 

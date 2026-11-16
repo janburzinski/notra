@@ -26,6 +26,7 @@ bun --no-env-file install --ignore-scripts
 bun --no-env-file apps/sites-e2e/node_modules/playwright/cli.js install chromium
 
 bun --no-env-file apps/sites-e2e/src/run.ts --repetitions 3
+bun --no-env-file test apps/sites-e2e/tests/process-discovery.test.ts
 bun --no-env-file apps/sites-e2e/tests/processes.ts
 bun --no-env-file apps/sites-e2e/tests/cleanup.ts
 bun --no-env-file run --cwd apps/sites-e2e check-types
@@ -158,6 +159,9 @@ process groups/profile-scoped processes. `--failure-probe` and `--hold-probe` ar
 only used by these lifecycle tests. Nothing is skipped or marked as a fake pass.
 
 The lifecycle verifier requires POSIX process groups and `ps` (macOS/Linux).
+Process discovery briefly rechecks an unreadable executable during shutdown:
+Linux can release it before the PID disappears or becomes a zombie. A live PID
+whose executable remains unreadable still fails cleanup with the original cause.
 SIGKILL of the supervisor, machine loss, and an OS crash cannot run `finally` or
 signal handlers; those cases are outside the cleanup guarantee. No cloud resources
 are created, so there is no cloud cleanup in this workspace.
