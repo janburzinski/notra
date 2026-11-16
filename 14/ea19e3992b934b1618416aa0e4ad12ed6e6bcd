@@ -1,0 +1,29 @@
+packages/geo-core/tests/geo-context-fallback.test.ts
+  ai_agent 157-160
+  s_bfa6057c8fd3ae::t_3b1ba635e55e56 149-156,161-170
+packages/geo-core/scripts/__pair.ts
+  ai_agent 2,4-5,11-58,64-65,67-77,79-83,86-107,109-111,117-135,143-150,152-164
+  s_bfa6057c8fd3ae::t_2409386515e8bf 1,3,6-10,59-63,66,78,84-85,108,112-116,136-142,151,165-167
+packages/geo-core/src/utils/geo-context-answer.ts
+  s_bfa6057c8fd3ae::t_3b1ba635e55e56 5,343-344
+packages/geo-core/src/geo/olostep.ts
+  s_bfa6057c8fd3ae::t_3b1ba635e55e56 6-8,328-334,337-338
+packages/geo-core/src/constants/geo-ai-overview.ts
+  s_bfa6057c8fd3ae::t_3b1ba635e55e56 3-5
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "14ea19e3992b934b1618416aa0e4ad12ed6e6bcd",
+  "prompts": {},
+  "sessions": {
+    "s_bfa6057c8fd3ae": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "377df655-40d7-4500-a7c7-946d5b2f832f",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
