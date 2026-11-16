@@ -1,0 +1,21 @@
+packages/geo-core/src/ingest/pipeline.ts
+  s_0db5a1b6311a8b::t_d38efa5b062a83 958-970
+packages/geo-core/tests/ingest-pipeline.test.ts
+  s_0db5a1b6311a8b::t_d38efa5b062a83 479-494
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "18dd5a0f93f2c643109072e1d1d4e5cca254677f",
+  "prompts": {},
+  "sessions": {
+    "s_0db5a1b6311a8b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c7931017-abf4-4153-b942-8ece9fb30fc3",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
