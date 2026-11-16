@@ -1,0 +1,27 @@
+packages/geo-core/src/geo/analytics-imports.ts
+  s_0db5a1b6311a8b::t_ff2dbf456e1bb5 18,20
+  s_0db5a1b6311a8b::t_c83360c503a9af 81,98,101-103,110-117,134-138
+packages/geo-core/src/geo/web-analytics.ts
+  s_0db5a1b6311a8b::t_c83360c503a9af 436-437,443-445
+packages/geo-core/src/types/analytics-imports.ts
+  s_0db5a1b6311a8b::t_c83360c503a9af 337-342
+apps/dashboard/tests/analytics-imports.test.ts
+  s_0db5a1b6311a8b::t_05ea338670149c 732-742
+  s_0db5a1b6311a8b::t_67a0fb83426bea 743
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "d323e9dc304a615c12efb13a4b03d28314ab35cd",
+  "prompts": {},
+  "sessions": {
+    "s_0db5a1b6311a8b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c7931017-abf4-4153-b942-8ece9fb30fc3",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
