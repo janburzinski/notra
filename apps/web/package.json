@@ -50,7 +50,7 @@
     "@tanstack/react-start": "^1.169.2",
     "@toolwind/corner-shape": "^0.0.8-3",
     "@upstash/redis": "catalog:",
-    "@usenotra/agentside": "0.3.5",
+    "@usenotra/agentside": "0.4.1",
     "@usenotra/sdk": "^2.0.0",
     "@vercel/functions": "^3.10.1",
     "ai": "catalog:",

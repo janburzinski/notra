@@ -50,7 +50,9 @@ export async function negotiateMarkdown(
       acceptsMarkdown ||
       detectAgent(request.headers.get("user-agent")) !== null;
     const response =
-      serveTool && wantsMarkdown ? serveTool(request) : await next();
+      serveTool && wantsMarkdown
+        ? serveTool(request)
+        : await twins.handle(request, next);
     if (!isMarkdown(response)) {
       appendHeaderValue(
         response.headers,
