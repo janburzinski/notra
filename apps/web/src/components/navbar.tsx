@@ -16,7 +16,6 @@ import { tween } from "@notra/ui/lib/motion";
 import { cn } from "@notra/ui/lib/utils";
 import { Link, useLocation } from "@tanstack/react-router";
 import {
-  AnimatePresence,
   domAnimation,
   LazyMotion,
   m,
@@ -47,7 +46,6 @@ import {
 import { NAVBAR_DESKTOP_SIGNUP_SOURCE } from "@/constants/navbar";
 import {
   NAVBAR_CONTENT_TRANSITION,
-  NAVBAR_CONTENT_VARIANTS,
   NAVBAR_ENTER_TRANSITION,
   NAVBAR_EXIT_TRANSITION,
   NAVBAR_MORPH_TRANSITION,
@@ -68,6 +66,7 @@ import type {
 } from "@/types/navbar";
 import { copySvgAsset } from "@/utils/copy-svg-asset";
 import { copyToClipboard } from "@/utils/copy-to-clipboard";
+import { getNavbarContentMotion } from "@/utils/navbar-content-motion";
 import {
   handleNavbarMenuKeyDown,
   handleNavbarTriggerKeyDown,
@@ -245,9 +244,6 @@ export function Navbar({ variant }: NavbarProps = {}) {
   const [panelSizes, setPanelSizes] = useState<Map<string, NavbarPanelSize>>(
     new Map()
   );
-  // The outgoing panel overflows the shrinking shell mid-morph, which would
-  // flash a scrollbar and shift the layout, so scrolling waits for it to settle.
-  const [isPanelMorphing, setIsPanelMorphing] = useState(false);
   const triggerRefs = useRef(new Map<string, HTMLButtonElement>());
   const panelRef = useRef<HTMLDivElement>(null);
   const measureRefs = useRef(new Map<string, HTMLDivElement>());
@@ -373,11 +369,13 @@ export function Navbar({ variant }: NavbarProps = {}) {
     const observer = new ResizeObserver(() => {
       const next = new Map<string, NavbarPanelSize>();
       for (const [label, node] of nodes) {
-        const rect = node.getBoundingClientRect();
+        // Layout size, not getBoundingClientRect: the closed dropdown is
+        // scaled down, which would shrink the measured box and clip the menu.
+        const style = getComputedStyle(node);
         const trigger = triggerRefs.current.get(label);
         next.set(label, {
-          width: rect.width,
-          height: rect.height,
+          width: Number.parseFloat(style.width),
+          height: Number.parseFloat(style.height),
           anchorOffset: trigger
             ? trigger.offsetLeft +
               trigger.offsetWidth / 2 -
@@ -393,10 +391,14 @@ export function Navbar({ variant }: NavbarProps = {}) {
     return () => observer.disconnect();
   }, [isClient]);
 
-  const activeGroupData = groups.find((group) => group.label === activeGroup);
-  const activeSize = activeGroup ? panelSizes.get(activeGroup) : undefined;
-  const compactPanel = isCompactNavbarPanel(activeGroupData);
-  const panelX = getNavbarPanelX(activeSize, compactPanel);
+  // While the dropdown fades out it keeps the size and place of the last group.
+  const displayGroup = activeGroup ?? previousGroup;
+  const displayGroupData = groups.find((group) => group.label === displayGroup);
+  const displaySize = displayGroup ? panelSizes.get(displayGroup) : undefined;
+  const dropdownOpen = activeGroup !== null;
+  const justOpened = dropdownOpen && previousGroup === null;
+  const compactPanel = isCompactNavbarPanel(displayGroupData);
+  const panelX = getNavbarPanelX(displaySize, compactPanel);
   const instantMenuMotion = Boolean(reduceMotion) || keyboardNavigation;
 
   const slideDirection = getSlideDirection(groups, activeGroup, previousGroup);
@@ -416,6 +418,7 @@ export function Navbar({ variant }: NavbarProps = {}) {
     morphTransition,
     shellTransition,
   } = getNavbarMotion(Boolean(reduceMotion), instantMenuMotion);
+  const sizeTransition = justOpened ? { duration: 0 } : morphTransition;
   const mutedNavClass = cn(
     "-mx-3 rounded-full px-3 py-1.5 hover:bg-[#1E1E1E1F] hover:text-[#1E1E1E] dark:hover:bg-white/14 dark:hover:text-white",
     chrome
@@ -606,108 +609,123 @@ export function Navbar({ variant }: NavbarProps = {}) {
                 })}
 
                 {isClient && (
-                  <div
-                    aria-hidden="true"
-                    className="pointer-events-none invisible absolute top-full left-0 -z-10 size-0 overflow-hidden"
-                  >
-                    {groups.map((group) => (
-                      <div
-                        className="w-max"
-                        key={group.label}
-                        ref={(node) => {
-                          if (node) {
-                            measureRefs.current.set(group.label, node);
-                          } else {
-                            measureRefs.current.delete(group.label);
+                  // Mounted once and kept: hovering between groups only
+                  // animates opacity and transforms, so no panel mounts on hover.
+                  <m.div
+                    animate={
+                      dropdownOpen
+                        ? {
+                            ...NAVBAR_PANEL_REST,
+                            x: panelX,
+                            visibility: "visible",
                           }
-                        }}
-                      >
-                        <MegaPanel group={group} onSelect={closePanel} />
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                <AnimatePresence
-                  onExitComplete={() => setIsPanelMorphing(false)}
-                >
-                  {activeGroupData && (
+                        : {
+                            ...NAVBAR_PANEL_EXIT,
+                            x: panelX,
+                            transitionEnd: {
+                              ...NAVBAR_PANEL_ENTER,
+                              visibility: "hidden",
+                            },
+                          }
+                    }
+                    // Its own compositor layer, so the morph repaints only the
+                    // panel instead of the header and the page under it.
+                    className={cn(
+                      "absolute top-full left-1/2 z-50 will-change-transform",
+                      chrome ? "pt-[1.75rem]" : "pt-3",
+                      !dropdownOpen && "pointer-events-none"
+                    )}
+                    data-slot="navbar-dropdown"
+                    inert={!dropdownOpen}
+                    initial={{ ...NAVBAR_PANEL_ENTER, visibility: "hidden" }}
+                    style={{ transformOrigin: "top center" }}
+                    transition={
+                      dropdownOpen
+                        ? {
+                            ...enterExitTransition,
+                            x: justOpened ? { duration: 0 } : morphTransition,
+                          }
+                        : exitTransition
+                    }
+                  >
                     <m.div
-                      animate={{ ...NAVBAR_PANEL_REST, x: panelX }}
-                      className={`absolute top-full left-1/2 z-50 ${chrome ? "pt-[1.75rem]" : "pt-3"}`}
-                      data-slot="navbar-dropdown"
-                      exit={{
-                        ...NAVBAR_PANEL_EXIT,
-                        transition: exitTransition,
+                      animate={{
+                        width: displaySize?.width,
+                        height: displaySize?.height,
                       }}
-                      initial={
-                        instantMenuMotion
-                          ? false
-                          : { ...NAVBAR_PANEL_ENTER, x: panelX }
-                      }
-                      key="navbar-dropdown"
-                      style={{
-                        transformOrigin: "top center",
-                      }}
+                      className="relative max-h-[calc(100dvh-7.5rem)]"
+                      initial={false}
                       transition={{
-                        ...enterExitTransition,
-                        x: morphTransition,
+                        width: sizeTransition,
+                        height: sizeTransition,
                       }}
                     >
-                      <m.div
-                        animate={{
-                          width: activeSize?.width,
-                          height: activeSize?.height,
-                        }}
-                        className="relative max-h-[calc(100dvh-7.5rem)]"
-                        onAnimationComplete={() => setIsPanelMorphing(false)}
-                        onAnimationStart={() => setIsPanelMorphing(true)}
-                        initial={{
-                          width: activeSize?.width,
-                          height: activeSize?.height,
-                        }}
-                        transition={{
-                          width: morphTransition,
-                          height: morphTransition,
-                        }}
+                      <div
+                        className={cn(
+                          "relative h-full w-full overflow-hidden rounded-[1.375rem] bg-[linear-gradient(180deg,#FFFFFF_0%,#F3F3F3_100%)] shadow-[0_0.125rem_2.0625rem_#1E1E1E1A,0_0_0_0.0625rem_#ECECEC,0_0.0625rem_0.125rem_#28282814] ring-1 ring-[#1E1E1E0D] dark:bg-neutral-950 dark:bg-none dark:shadow-black/50 dark:ring-white/10",
+                          compactPanel && "bg-popover rounded-2xl bg-none"
+                        )}
+                        ref={panelRef}
                       >
-                        <div
-                          className={cn(
-                            "relative h-full w-full overflow-hidden overscroll-contain rounded-[1.375rem] bg-[linear-gradient(180deg,#FFFFFF_0%,#F3F3F3_100%)] shadow-[0_0.125rem_2.0625rem_#1E1E1E1A,0_0_0_0.0625rem_#ECECEC,0_0.0625rem_0.125rem_#28282814] ring-1 ring-[#1E1E1E0D] dark:bg-neutral-950 dark:bg-none dark:shadow-black/50 dark:ring-white/10",
-                            compactPanel && "bg-popover rounded-2xl bg-none",
-                            !isPanelMorphing && "overflow-y-auto"
-                          )}
-                          ref={panelRef}
-                        >
-                          <AnimatePresence custom={direction} initial={false}>
+                        {groups.map((group) => {
+                          const content = getNavbarContentMotion({
+                            label: group.label,
+                            activeGroup,
+                            previousGroup,
+                            direction,
+                            contentTransition,
+                          });
+                          return (
                             <m.div
-                              animate="center"
-                              className="absolute top-0 left-1/2 w-max origin-center -translate-x-1/2"
-                              custom={direction}
-                              exit="exit"
-                              initial={direction === 0 ? false : "enter"}
-                              key={activeGroupData.label}
-                              aria-label={activeGroupData.label}
-                              id={`desktop-navigation-${activeGroupData.label}`}
+                              animate={content.animate}
+                              aria-label={group.label}
+                              // Each panel scrolls itself, so the outgoing one can
+                              // overflow the shrinking shell without a scrollbar.
+                              // While the menu is open each panel gets its own layer, so
+                              // sliding and fading never repaint it.
+                              className={cn(
+                                "absolute top-0 left-1/2 max-h-[calc(100dvh-7.5rem)] w-max origin-center -translate-x-1/2 overflow-y-auto overscroll-contain",
+                                dropdownOpen &&
+                                  "will-change-[transform,opacity]"
+                              )}
+                              id={`desktop-navigation-${group.label}`}
+                              inert={group.label !== activeGroup}
+                              initial={false}
+                              key={group.label}
                               onKeyDown={(event) => {
                                 setKeyboardNavigation(true);
                                 handleNavbarMenuKeyDown(event, closePanel);
                               }}
                               role="menu"
-                              transition={contentTransition}
-                              variants={NAVBAR_CONTENT_VARIANTS}
+                              style={{
+                                visibility: content.visible
+                                  ? "visible"
+                                  : "hidden",
+                              }}
+                              transition={content.transition}
                             >
-                              <MegaPanel
-                                group={activeGroupData}
-                                onSelect={closePanel}
-                              />
+                              <div
+                                className="w-max"
+                                ref={(node) => {
+                                  if (node) {
+                                    measureRefs.current.set(group.label, node);
+                                  } else {
+                                    measureRefs.current.delete(group.label);
+                                  }
+                                }}
+                              >
+                                <MegaPanel
+                                  group={group}
+                                  onSelect={closePanel}
+                                />
+                              </div>
                             </m.div>
-                          </AnimatePresence>
-                        </div>
-                      </m.div>
+                          );
+                        })}
+                      </div>
                     </m.div>
-                  )}
-                </AnimatePresence>
+                  </m.div>
+                )}
               </nav>
 
               <div

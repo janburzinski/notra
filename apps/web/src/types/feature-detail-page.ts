@@ -129,9 +129,3 @@ export interface FeatureTableCardProps {
   head: ReactNode;
   children: ReactNode;
 }
-
-export interface PersonasHeadlineWordProps {
-  value: string;
-  animated: boolean;
-  morph: boolean;
-}

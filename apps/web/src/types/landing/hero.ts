@@ -16,7 +16,6 @@ export interface HeroHeadlineBrand {
 }
 
 export interface HeroHeadlineProps {
-  word: HeroCycleWord;
   lineOne: string | HeroHeadlineBrand;
   lineTwo: HeroHeadlineLineTwo;
 }
@@ -26,6 +25,19 @@ export interface CycleMarkProps {
   animated: boolean;
   className?: string;
   children: ReactNode;
+}
+
+export interface CycleLineProps {
+  cycleKey: string;
+  animated: boolean;
+  className?: string;
+  children: ReactNode;
+}
+
+export interface CycleWordProps {
+  value: string;
+  animated: boolean;
+  className?: string;
 }
 
 type HeroHeadlineLineTwo =

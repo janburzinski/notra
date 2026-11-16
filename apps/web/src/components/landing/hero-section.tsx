@@ -1,11 +1,9 @@
 import { track } from "@databuddy/sdk/react";
 import { CtaButton } from "@notra/ui/components/shared/cta-button";
-import { useIsMobile } from "@notra/ui/hooks/use-mobile";
 import { cn } from "@notra/ui/lib/utils";
 import { Link } from "@tanstack/react-router";
-import { useReducedMotion } from "motion/react";
 import { parseAsString, useQueryState } from "nuqs";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 
 import { HeroDither } from "@/components/landing/hero-dither";
 import { HeroHeadline } from "@/components/landing/hero-headline";
@@ -17,9 +15,6 @@ import { TrackedSignupLink } from "@/components/tracked-signup-link";
 import {
   HERO_CONTROL_VARIANT,
   HERO_EXPERIMENT_FLAG,
-  HERO_HEADLINE_CYCLE,
-  HERO_HEADLINE_CYCLE_MOBILE,
-  HERO_HEADLINE_CYCLE_MS,
   HERO_PREVIEW_ENABLED,
   HERO_PREVIEW_VARIANT_PARAM,
   HERO_SIGNUP_SOURCE,
@@ -37,12 +32,6 @@ const CTA_BUTTON_CLASSNAME =
   "h-auto rounded-[2.5625rem] px-4 py-3 font-display font-medium text-[1.125rem] leading-[1.14] tracking-[-0.015em] sm:px-6";
 
 export function HeroSection({ enrolled, flagVariant }: HeroSectionProps) {
-  const reduceMotion = useReducedMotion();
-  const cycle = useIsMobile()
-    ? HERO_HEADLINE_CYCLE_MOBILE
-    : HERO_HEADLINE_CYCLE;
-  const [index, setIndex] = useState(0);
-  const word = cycle[index % cycle.length] ?? cycle[0];
   const [preview] = useQueryState(HERO_PREVIEW_VARIANT_PARAM, parseAsString);
   const previewVariant =
     HERO_PREVIEW_ENABLED && preview && HERO_VARIANTS[preview] ? preview : null;
@@ -61,16 +50,6 @@ export function HeroSection({ enrolled, flagVariant }: HeroSectionProps) {
       variant,
     });
   }, [enrolled, previewVariant, variant]);
-
-  useEffect(() => {
-    if (reduceMotion !== false) {
-      return;
-    }
-    const interval = window.setInterval(() => {
-      setIndex((current) => current + 1);
-    }, HERO_HEADLINE_CYCLE_MS);
-    return () => window.clearInterval(interval);
-  }, [reduceMotion]);
 
   function trackPrimaryClick() {
     if (previewVariant || !copy) {
@@ -97,7 +76,7 @@ export function HeroSection({ enrolled, flagVariant }: HeroSectionProps) {
     });
   }
 
-  if (!word || !copy) {
+  if (!copy) {
     return null;
   }
 
@@ -112,11 +91,7 @@ export function HeroSection({ enrolled, flagVariant }: HeroSectionProps) {
         <div className="relative flex h-full w-full flex-col items-center">
           <div className="flex w-full min-w-0 flex-col items-center gap-7 px-3 pt-22 pb-2 sm:gap-10 sm:px-6 sm:pt-28 lg:pt-[7.5rem]">
             <div className="flex w-full min-w-0 flex-col items-center gap-5 sm:gap-7">
-              <HeroHeadline
-                lineOne={copy.headlineLineOne}
-                lineTwo={copy}
-                word={word}
-              />
+              <HeroHeadline lineOne={copy.headlineLineOne} lineTwo={copy} />
               <p className="max-w-[42.875rem] text-center font-sans text-[0.9375rem]/[1.45] font-medium tracking-[-0.005em] text-pretty text-[#1E1E1EBF] sm:text-[1.25rem]/[1.14] dark:text-white/70">
                 {copy.subhead}
               </p>

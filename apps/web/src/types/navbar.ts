@@ -1,4 +1,4 @@
-import type { Variants } from "motion/react";
+import type { TargetAndTransition, Transition, Variants } from "motion/react";
 import type { ReactNode } from "react";
 
 import type { MarketingNavGroup } from "@/utils/navigation";
@@ -15,6 +15,21 @@ export type NavbarMobileOverlayLayout = "announcement" | "compact" | "hero";
 
 export interface NavbarProps {
   variant?: NavbarVariant;
+}
+
+export interface NavbarContentMotionInput {
+  label: string;
+  activeGroup: string | null;
+  previousGroup: string | null;
+  /** 1 when moving right, -1 when moving left, 0 for an instant swap. */
+  direction: number;
+  contentTransition: Transition;
+}
+
+export interface NavbarContentMotion {
+  animate: TargetAndTransition;
+  transition: Transition;
+  visible: boolean;
 }
 
 export interface NavbarPanelSize {

@@ -17,32 +17,15 @@ export const NAVBAR_ENTER_TRANSITION = {
 } as const;
 export const NAVBAR_EXIT_TRANSITION = tween("fast", "out");
 
-const NAVBAR_CONTENT_SHIFT = 24;
+/** How far a group's panel slides in or out when hovering to a neighbour, in px. */
+export const NAVBAR_CONTENT_SHIFT = 24;
 
 export const NAVBAR_CONTENT_TRANSITION = {
   ...NAVBAR_MORPH_TRANSITION,
   opacity: tween("normal", "out"),
 } as const;
 
-export const NAVBAR_CONTENT_VARIANTS = {
-  enter: (direction: number) => ({
-    x: direction * NAVBAR_CONTENT_SHIFT,
-    opacity: 0,
-    pointerEvents: "none" as const,
-  }),
-  center: {
-    x: 0,
-    opacity: 1,
-    pointerEvents: "none" as const,
-    transitionEnd: { pointerEvents: "auto" as const },
-  },
-  exit: (direction: number) => ({
-    x: direction * -NAVBAR_CONTENT_SHIFT,
-    opacity: direction === 0 ? 1 : 0,
-    pointerEvents: "none" as const,
-    transition:
-      direction === 0
-        ? { duration: 0 }
-        : { ...NAVBAR_MORPH_TRANSITION, opacity: tween("fast", "out") },
-  }),
-};
+export const NAVBAR_CONTENT_EXIT_TRANSITION = {
+  ...NAVBAR_MORPH_TRANSITION,
+  opacity: tween("fast", "out"),
+} as const;

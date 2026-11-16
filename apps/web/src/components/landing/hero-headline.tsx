@@ -1,6 +1,6 @@
+import { useIsMobile } from "@notra/ui/hooks/use-mobile";
 import { tween } from "@notra/ui/lib/motion";
 import { cn } from "@notra/ui/lib/utils";
-import Scritto from "@scritto/react";
 import {
   AnimatePresence,
   domAnimation,
@@ -8,10 +8,17 @@ import {
   m,
   useReducedMotion,
 } from "motion/react";
-import { createElement, useSyncExternalStore, type ReactNode } from "react";
+import { useSyncExternalStore } from "react";
 
+import { CycleLine, CycleWord } from "@/components/landing/cycle-text";
 import { LandingEngineIcon } from "@/components/landing/landing-engine-icon";
-import { HERO_HEADLINE_SUFFIX } from "@/constants/landing/hero";
+import {
+  HERO_HEADLINE_CYCLE,
+  HERO_HEADLINE_CYCLE_MOBILE,
+  HERO_HEADLINE_CYCLE_MS,
+  HERO_HEADLINE_SUFFIX,
+} from "@/constants/landing/hero";
+import { useCycleIndex } from "@/hooks/use-cycle-index";
 import type {
   CycleMarkProps,
   HeroHeadlineBrand,
@@ -53,7 +60,7 @@ export function CycleMark({
   children,
 }: CycleMarkProps) {
   return (
-    <span className={cn(ICON_SLOT_CLASS, className)}>
+    <span className={cn(ICON_SLOT_CLASS, className)} data-cycle-piece="">
       <AnimatePresence initial={false}>
         <m.span
           animate={ICON_SHOWN}
@@ -81,16 +88,6 @@ function EngineMark({
   );
 }
 
-export function HeadlineFlow({
-  children,
-  className,
-}: {
-  children: ReactNode;
-  className?: string;
-}) {
-  return createElement("scritto-flow", { className }, children);
-}
-
 function HeadlineLineTwo({
   word,
   prefix,
@@ -100,37 +97,28 @@ function HeadlineLineTwo({
   prefix: string;
   animated: boolean;
 }) {
-  const morph = useIsClient();
-  const name = morph ? (
-    <Scritto
+  return (
+    <CycleLine
       animated={animated}
-      className="ml-[0.16em] align-baseline"
-      value={word.text}
-    />
-  ) : (
-    <span className="ml-[0.16em] [font-kerning:none] [font-variant-ligatures:none]">
-      {word.text}
-    </span>
-  );
-  const line = (
-    <>
-      {prefix}{" "}
+      className="block text-[0.9em] sm:text-[1em]"
+      cycleKey={word.text}
+      key={prefix}
+    >
+      <span className="inline-block" data-cycle-piece="">
+        {prefix}
+      </span>{" "}
       <span className="inline-block whitespace-nowrap">
         <EngineMark animated={animated} engine={word.engine} />
-        {name}
-        {HERO_HEADLINE_SUFFIX}
+        <CycleWord
+          animated={animated}
+          className="ml-[0.16em] align-baseline"
+          value={word.text}
+        />
+        <span className="inline-block" data-cycle-piece="">
+          {HERO_HEADLINE_SUFFIX}
+        </span>
       </span>
-    </>
-  );
-
-  if (!morph) {
-    return <span className="block text-[0.9em] sm:text-[1em]">{line}</span>;
-  }
-
-  return (
-    <HeadlineFlow className="text-[0.9em] sm:text-[1em]" key={prefix}>
-      {line}
-    </HeadlineFlow>
+    </CycleLine>
   );
 }
 
@@ -158,8 +146,18 @@ function HeadlineLineOne({ line }: { line: string | HeroHeadlineBrand }) {
   );
 }
 
-export function HeroHeadline({ word, lineOne, lineTwo }: HeroHeadlineProps) {
+export function HeroHeadline({ lineOne, lineTwo }: HeroHeadlineProps) {
   const animated = useReducedMotion() === false;
+  const cycle = useIsMobile()
+    ? HERO_HEADLINE_CYCLE_MOBILE
+    : HERO_HEADLINE_CYCLE;
+  const cycles = "headlineLineTwoPrefix" in lineTwo;
+  const index = useCycleIndex(animated && cycles, HERO_HEADLINE_CYCLE_MS);
+  const word = cycle[index % cycle.length] ?? cycle[0];
+
+  if (!word) {
+    return null;
+  }
 
   return (
     <LazyMotion features={domAnimation}>

@@ -46,7 +46,6 @@
     "@remotion/player": "4.0.533",
     "@remotion/web-renderer": "4.0.533",
     "@resvg/resvg-js": "^2.6.2",
-    "@scritto/react": "^0.1.0",
     "@tailwindcss/typography": "^0.5.20",
     "@tanstack/react-form": "catalog:",
     "@tanstack/react-hotkeys": "^0.3.3",
