@@ -1,0 +1,32 @@
+apps/web/src/constants/navbar-motion.ts
+  s_62a1fceec3383e::t_73b284d92bbf73 20-21,28-31
+apps/web/src/types/navbar.ts
+  s_62a1fceec3383e::t_f798006d58eaf8 1,20-32
+apps/blog/scripts/web-chrome.js
+  ai_agent 2-3,10,474-475
+apps/web/src/utils/navbar-content-motion.ts
+  s_62a1fceec3383e::t_6362c002af96d6 1-34,40-49
+  s_62a1fceec3383e::t_b1f325adc0976f 35-39
+apps/web/src/components/navbar.tsx
+  s_62a1fceec3383e::t_73b284d92bbf73 69
+  s_62a1fceec3383e::t_9f42d0769adfb6 682-683
+  s_62a1fceec3383e::t_b1f325adc0976f 615-618,710-713
+  s_62a1fceec3383e::t_817a251a9aaed4 680-681
+  s_62a1fceec3383e::t_f7e61183605bd4 392-399,419,610-614,620-648,650-652,654-655,657-658,661-666,668-676,678-679,684-687,693-698,700-709,714,716-718,720-721
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "db13b5cad09ff5634169bad7857101893062593f",
+  "prompts": {},
+  "sessions": {
+    "s_62a1fceec3383e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5eba935b-3529-411e-855a-75e3bcf238f1",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
