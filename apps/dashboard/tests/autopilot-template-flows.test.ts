@@ -172,6 +172,14 @@ if (process.env.NOTRA_AUTOPILOT_TEMPLATE_FLOW_TEST !== "1") {
       impressions: impressions as number,
     })),
   };
+  const gsc = {
+    inspected: [] as string[],
+    inspection: {
+      verdict: "NEUTRAL",
+      coverageState: "Discovered - currently not indexed" as string | null,
+      lastCrawlAt: null as string | null,
+    },
+  };
   const realSearchConsole =
     await import("@notra/ai/integrations/google-search-console");
   mock.module("@notra/ai/integrations/google-search-console", () => ({
@@ -181,6 +189,13 @@ if (process.env.NOTRA_AUTOPILOT_TEMPLATE_FLOW_TEST !== "1") {
       disconnectingAt: null,
     }),
     queryGscQueryPages: async () => searchConsole.rows,
+    inspectGscUrl: async (
+      _integration: unknown,
+      params: { inspectionUrl: string }
+    ) => {
+      gsc.inspected.push(params.inspectionUrl);
+      return gsc.inspection;
+    },
   }));
   mock.module("@/lib/autopilot/flag", () => ({
     isAutopilotEnabledForOrganization: async () => true,
@@ -274,6 +289,16 @@ if (process.env.NOTRA_AUTOPILOT_TEMPLATE_FLOW_TEST !== "1") {
         },
       ],
     },
+    // An illustrative figure no source has is rewritten, not a failed post.
+    "no-figures": {
+      edits: [
+        {
+          // Models copy the "- " the sentence was listed with.
+          find: "- Teams that switch cut their bill by 12.5%.",
+          replace: "Teams that switch often cut their bill.",
+        },
+      ],
+    },
     "no-dashes": {
       edits: [
         {
@@ -283,10 +308,33 @@ if (process.env.NOTRA_AUTOPILOT_TEMPLATE_FLOW_TEST !== "1") {
       ],
     },
   };
+  const modelPrompts: { tag: string; prompt: string }[] = [];
+  // A refresh of the serving post edits that post, not the autoscaling guide.
+  const servingRefresh = {
+    audit: { keep: ["Scaling"], update: [], add: ["Which platform"], cut: [] },
+    edits: [
+      {
+        action: "add",
+        section: "Which platform",
+        find: "Serving models is mostly about gpu autoscaling and cost.",
+        replace:
+          "Serving models is mostly about gpu autoscaling and cost.\n\n## Which serverless GPU platform to use\n\nPick a platform that scales to zero, bills per second and starts a cold endpoint in seconds. Emberline does all three on H100s.",
+      },
+    ],
+    pullRequestTitle: "Answer which serverless GPU platform to use",
+    summary: "Answers the platform question AI answers name Modal for.",
+  };
   mock.module("@/lib/autopilot/llm", () => ({
-    generateAutopilotObject: async (input: { tag: string }) => {
+    generateAutopilotObject: async (input: { tag: string; prompt: string }) => {
       if (!(input.tag in MODEL_OUTPUT)) {
         throw new Error(`No model output for ${input.tag} in this test`);
+      }
+      modelPrompts.push({ tag: input.tag, prompt: input.prompt });
+      if (
+        input.tag === "refresh" &&
+        input.prompt.includes("content/blog/serving-models.md")
+      ) {
+        return servingRefresh;
       }
       return MODEL_OUTPUT[input.tag];
     },
@@ -299,7 +347,7 @@ if (process.env.NOTRA_AUTOPILOT_TEMPLATE_FLOW_TEST !== "1") {
         title: input.brief.topic,
         slug: "runpod-alternatives",
         extension: "md",
-        content: `---\ntitle: ${input.brief.topic}\n---\nWho each is for — side by side. Runpod costs $9.99 per hour.`,
+        content: `---\ntitle: ${input.brief.topic}\n---\nWho each is for — side by side. Runpod costs $9.99 per hour. Teams that switch cut their bill by 12.5%.`,
         pullRequestBody: `Compares options for ${input.brief.topic}.`,
       };
     },
@@ -673,8 +721,44 @@ if (process.env.NOTRA_AUTOPILOT_TEMPLATE_FLOW_TEST !== "1") {
     paddedRefusal.length = 0;
     landingRefusals.length = 0;
     landingPages.length = 0;
+    modelPrompts.length = 0;
+    gsc.inspected.length = 0;
     web.homeStatus = 200;
   });
+
+  const mergedPost = (values: {
+    id: string;
+    filePath: string;
+    mergedDaysAgo: number;
+    evidence?: Record<string, unknown>;
+  }) =>
+    db.insert(autopilotFindings).values({
+      id: values.id,
+      organizationId: ORG,
+      kind: "keywords",
+      fingerprint: `keywords:${values.id}`,
+      title: `Blog post: ${values.id}`,
+      summary: "Merged",
+      status: "merged",
+      repository: "emberline/site",
+      pullRequestNumber: 40,
+      mergedAt: new Date(now.getTime() - values.mergedDaysAgo * DAY),
+      evidence: {
+        filePath: values.filePath,
+        target: { kind: "prompt", promptId: "platform", before: 0 },
+        ...values.evidence,
+      },
+    });
+
+  const readFinding = async (id: string) => {
+    const row = await db.query.autopilotFindings.findFirst({
+      where: eq(autopilotFindings.id, id),
+    });
+    if (!row) {
+      throw new Error(`No finding ${id}`);
+    }
+    return row;
+  };
 
   test("refresh: a page AI stopped citing gets targeted edits", async () => {
     await enable({ refresh: true });
@@ -710,6 +794,12 @@ if (process.env.NOTRA_AUTOPILOT_TEMPLATE_FLOW_TEST !== "1") {
     expect(page).not.toContain("$9.99");
     expect(page).not.toMatch(/[–—]/);
     expect(page).toContain("Who each is for, side by side.");
+    // A decimal figure is found in its sentence and rewritten, and the fact
+    // check lists only what is left, so nothing holds the page for a person.
+    expect(page).not.toContain("12.5%");
+    expect(page).toContain("Teams that switch often cut their bill.");
+    expect(opened[0]?.body).toContain("### Fact check");
+    expect(opened[0]?.body).not.toContain("Figures no source contains");
   });
 
   test("rendering: content only the browser shows moves into the server render", async () => {
@@ -844,5 +934,163 @@ if (process.env.NOTRA_AUTOPILOT_TEMPLATE_FLOW_TEST !== "1") {
     expect(result.row?.summary?.insights?.join(" ")).toContain(
       "AI crawlers get 403"
     );
+  });
+
+  test("refresh: an Autopilot post that did not win its prompt gets one more try", async () => {
+    await enable({ refresh: true });
+    // The guide that lost citations was handled already.
+    await db.insert(autopilotFindings).values({
+      id: "settled-guide",
+      organizationId: ORG,
+      kind: "refresh",
+      fingerprint: "refresh:emberline.dev/blog/gpu-autoscaling",
+      title: "Refresh the guide",
+      summary: "Dismissed",
+      status: "dismissed",
+    });
+    // Merged before pages were followed: its URL comes from the sitemap.
+    await db
+      .insert(brandSitemapPages)
+      .values({
+        id: "sandbox-serving",
+        sitemapId: "sandbox-sitemap",
+        url: `${SITE}/blog/serving-models`,
+        path: "/blog/serving-models",
+        category: "crawled",
+      })
+      .onConflictDoNothing();
+    await mergedPost({
+      id: "platform-post",
+      filePath: "content/blog/serving-models.md",
+      mergedDaysAgo: 60,
+    });
+    // Too young for the scans to tell.
+    await mergedPost({
+      id: "young-post",
+      filePath: "content/blog/hello.md",
+      mergedDaysAgo: 20,
+      evidence: {
+        live: { url: `${SITE}/blog/hello`, at: now.toISOString() },
+      },
+    });
+    expect((await run(AUTOPILOT_TEMPLATE_WORKFLOW_KEYS.refresh)).status).toBe(
+      "completed"
+    );
+    expect(opened).toHaveLength(1);
+    expect(opened[0]?.files[0]?.path).toBe("content/blog/serving-models.md");
+    expect(opened[0]?.files[0]?.contents).toContain(
+      "## Which serverless GPU platform to use"
+    );
+    const prompt =
+      modelPrompts.find((call) => call.tag === "refresh")?.prompt ?? "";
+    expect(prompt).toContain("Written 60 days ago to win the AI answer");
+    expect(prompt).toContain("https://modal.com");
+    expect(opened[0]?.body).toContain(
+      "Autopilot wrote this post 60 days ago to win the AI answer below"
+    );
+    expect(opened[0]?.body).toContain("**Prompt it was written for**");
+    const refresh = await db.query.autopilotFindings.findFirst({
+      where: eq(autopilotFindings.kind, "refresh"),
+      orderBy: (table, { desc }) => [desc(table.createdAt)],
+    });
+    expect((await readFinding("platform-post")).evidence.live?.url).toBe(
+      `${SITE}/blog/serving-models`
+    );
+    expect(refresh?.evidence.underperforming).toEqual({
+      findingId: "platform-post",
+      mergedDaysAgo: 60,
+    });
+    expect(refresh?.evidence.target).toEqual({
+      kind: "prompt",
+      promptId: "platform",
+      before: 0,
+    });
+
+    // One more try, never a second: closed, it stays closed.
+    await db
+      .update(autopilotFindings)
+      .set({ status: "dismissed", dismissedAt: now })
+      .where(eq(autopilotFindings.id, refresh?.id ?? ""));
+    await run(AUTOPILOT_TEMPLATE_WORKFLOW_KEYS.refresh);
+    expect(opened).toHaveLength(1);
+  });
+
+  test("published pages: followed until Google indexed them, and the brief hears what is stuck", async () => {
+    await enable({});
+    const { buildAutopilotRunContext } =
+      await import("../src/lib/autopilot/run");
+    const { followPublishedPages } = await import("../src/lib/autopilot/live");
+    await db
+      .insert(brandSitemapPages)
+      .values({
+        id: "sandbox-serving",
+        sitemapId: "sandbox-sitemap",
+        url: `${SITE}/blog/serving-models`,
+        path: "/blog/serving-models",
+        category: "crawled",
+      })
+      .onConflictDoNothing();
+    await mergedPost({
+      id: "serving-post",
+      filePath: "content/blog/serving-models.md",
+      mergedDaysAgo: 4,
+    });
+    await mergedPost({
+      id: "missing-post",
+      filePath: "content/blog/never-deployed.md",
+      mergedDaysAgo: 4,
+    });
+    const runs = ["follow-1", "follow-2", "follow-3", "follow-4", "follow-5"];
+    await db.insert(autopilotRuns).values(
+      runs.map((id) => ({
+        id,
+        organizationId: ORG,
+        trigger: "manual" as const,
+        status: "completed" as const,
+      }))
+    );
+    const base = await buildAutopilotRunContext(ORG, "follow-1");
+    const inRun = (index: number) => ({ ...base, runId: runs[index] ?? "" });
+
+    const first = await followPublishedPages(inRun(0), now);
+    expect((await readFinding("serving-post")).evidence.live?.url).toBe(
+      `${SITE}/blog/serving-models`
+    );
+    expect(gsc.inspected).toEqual([`${SITE}/blog/serving-models`]);
+    expect((await readFinding("serving-post")).evidence.indexing).toMatchObject(
+      { verdict: "NEUTRAL" }
+    );
+    // Not live after the grace period: named once, never again.
+    expect(first).toEqual([
+      `"missing-post" was merged 4 days ago but its page isn't in the sitemap of emberline.dev yet.`,
+    ]);
+    // A retry of the same run says it again instead of losing it.
+    expect(await followPublishedPages(inRun(0), now)).toEqual(first);
+    expect(gsc.inspected).toHaveLength(1);
+    const later = new Date(now.getTime() + 15 * DAY);
+    const second = await followPublishedPages(inRun(1), later);
+    expect(second.join(" ")).not.toContain("missing-post");
+    expect(second).toEqual([
+      `Google hasn't indexed "serving-post" 15 days after it went live (Discovered - currently not indexed). Link to it from a page Google already ranks or request indexing in Search Console.`,
+    ]);
+    // Checked again only after the interval, and the late note is said once.
+    expect(await followPublishedPages(inRun(2), later)).toEqual([]);
+    expect(gsc.inspected).toHaveLength(2);
+
+    gsc.inspection = {
+      verdict: "PASS",
+      coverageState: "Submitted and indexed",
+      lastCrawlAt: null,
+    };
+    const indexedAt = new Date(later.getTime() + 3 * DAY);
+    expect(await followPublishedPages(inRun(3), indexedAt)).toEqual([
+      `Google indexed "serving-post" (${SITE}/blog/serving-models).`,
+    ]);
+    // Indexed pages are done.
+    await followPublishedPages(
+      inRun(4),
+      new Date(indexedAt.getTime() + 3 * DAY)
+    );
+    expect(gsc.inspected).toHaveLength(3);
   });
 }

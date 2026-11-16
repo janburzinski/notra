@@ -23,6 +23,7 @@ import {
   GSC_SEARCH_ANALYTICS_BASE_URL,
   GSC_SITES_URL,
   GSC_TOKEN_REVOKE_TIMEOUT_MS,
+  GSC_URL_INSPECTION_URL,
   GSC_USERINFO_URL,
   MS_PER_DAY,
   REAUTH_ERROR_CODES,
@@ -32,6 +33,7 @@ import {
   gscSitesResponseSchema,
   gscTokenErrorSchema,
   gscTokenResponseSchema,
+  gscUrlInspectionResponseSchema,
   gscUserInfoSchema,
 } from "../schemas/google-search-console";
 import type {
@@ -43,6 +45,7 @@ import type {
   GscQueryPageRow,
   GscQueryRow,
   GscSite,
+  GscUrlInspection,
   QueryGscTopQueriesParams,
   UpsertGscIntegrationParams,
 } from "../types/google-search-console";
@@ -737,4 +740,36 @@ export async function queryGscQueryPages(
       position: row.position,
     };
   });
+}
+
+/** Whether Google indexed `inspectionUrl`, as the property's owner sees it. */
+export async function inspectGscUrl(
+  integration: GscIntegrationRow,
+  params: { siteUrl: string; inspectionUrl: string }
+): Promise<GscUrlInspection> {
+  const response = await gscFetch(integration, GSC_URL_INSPECTION_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      inspectionUrl: params.inspectionUrl,
+      siteUrl: params.siteUrl,
+    }),
+  });
+  if (!response.ok) {
+    throw new GscApiError("Failed to inspect the URL", response.status);
+  }
+  const parsed = gscUrlInspectionResponseSchema.safeParse(
+    await response.json()
+  );
+  const status = parsed.success
+    ? parsed.data.inspectionResult?.indexStatusResult
+    : undefined;
+  if (!status?.verdict) {
+    throw new GscApiError("Unexpected Search Console response", 502);
+  }
+  return {
+    verdict: status.verdict,
+    coverageState: status.coverageState ?? null,
+    lastCrawlAt: status.lastCrawlTime ?? null,
+  };
 }

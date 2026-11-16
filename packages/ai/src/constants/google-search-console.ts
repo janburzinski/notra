@@ -7,6 +7,9 @@ export const GSC_USERINFO_URL =
 export const GSC_SITES_URL = "https://www.googleapis.com/webmasters/v3/sites";
 export const GSC_SEARCH_ANALYTICS_BASE_URL =
   "https://searchconsole.googleapis.com/webmasters/v3/sites";
+/** Works with the read-only scope: it reports how Google indexed a URL, it requests nothing. */
+export const GSC_URL_INSPECTION_URL =
+  "https://searchconsole.googleapis.com/v1/urlInspection/index:inspect";
 export const GSC_OAUTH_SCOPES = [
   "https://www.googleapis.com/auth/webmasters.readonly",
   "openid",

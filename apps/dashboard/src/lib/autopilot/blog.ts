@@ -88,7 +88,11 @@ import { loadTopicObservationIds } from "@/lib/autopilot/memory";
 import { findDeadLinks } from "@/lib/autopilot/pages";
 import { scheduleAutopilotPublish } from "@/lib/autopilot/publish";
 import { loadDecisionMemory } from "@/lib/autopilot/rules";
-import { loadWritingRules, removeNewDashes } from "@/lib/autopilot/style";
+import {
+  loadWritingRules,
+  removeNewDashes,
+  removeUnsourcedFigures,
+} from "@/lib/autopilot/style";
 import { writeBlogPost } from "@/lib/autopilot/writer";
 import { geoCoreDashboardLayer } from "@/lib/geo/configure";
 import { autopilotRuleComplianceSchema } from "@/schemas/autopilot";
@@ -110,7 +114,10 @@ import type {
   AutopilotPostBrief as PostBrief,
   FindingClaim,
 } from "@/types/autopilot-runtime";
-import type { AutopilotFactSource } from "@/types/autopilot-templates-runtime";
+import type {
+  AutopilotFactReport,
+  AutopilotFactSource,
+} from "@/types/autopilot-templates-runtime";
 import {
   assertNoActiveContent,
   autopilotBlogSlug,
@@ -470,6 +477,7 @@ async function finishPost(params: {
   const { ctx, log } = params;
   let content = params.post.content;
   let pullRequestBody = params.post.pullRequestBody;
+  let comparisonReport: AutopilotFactReport | null = null;
   if (params.factCheck) {
     const checked = await factCheckComparison({
       organizationId: ctx.organizationId,
@@ -481,15 +489,27 @@ async function finishPost(params: {
       onUsage: params.onUsage,
     });
     content = checked.content;
-    pullRequestBody = `${pullRequestBody.trim()}\n\n${factCheckSection(checked.report)}`;
+    comparisonReport = checked.report;
   }
-  const invented = unsourcedFigures(content, [
+  const factSources = [
     ...params.sources,
     ...(params.previous ? [{ label: "page", text: params.previous }] : []),
-  ]);
-  const risky = invented.filter((figure) =>
-    AUTOPILOT_RISKY_FIGURE.test(figure)
-  );
+  ];
+  const riskyIn = (figures: string[]) =>
+    figures.filter((figure) => AUTOPILOT_RISKY_FIGURE.test(figure));
+  let invented = unsourcedFigures(content, factSources);
+  let risky = riskyIn(invented);
+  if (risky.length > 0) {
+    content = await removeUnsourcedFigures({
+      organizationId: ctx.organizationId,
+      log,
+      content,
+      figures: risky,
+      onUsage: params.onUsage,
+    });
+    invented = unsourcedFigures(content, factSources);
+    risky = riskyIn(invented);
+  }
   if (risky.length > 0) {
     await log.error("The draft has prices or percentages no source contains", {
       reason: risky,
@@ -498,16 +518,38 @@ async function finishPost(params: {
       `The draft states figures no source contains: ${risky.join(", ")}`
     );
   }
-  if (!params.factCheck && invented.length > 0) {
+  if (comparisonReport) {
+    // The report lists the figures left after the rewrite, not before it.
+    pullRequestBody = `${pullRequestBody.trim()}\n\n${factCheckSection({ ...comparisonReport, figures: invented })}`;
+  } else if (invented.length > 0) {
     pullRequestBody = `${pullRequestBody.trim()}\n\n**${AUTOPILOT_FACT_FLAG_HEADINGS.figures}, please check**\n${invented.map((figure) => `\`${figure}\``).join(" · ")}`;
   }
-  // Only comparison pages check what they say about competitors against the
-  // competitor's own site; anywhere else a person reads it before it ships.
+  // A post that names competitors gets what it says about them checked
+  // against its sources: unsupported claims go, sourced ones stay. Only when
+  // the check itself fails does a person read it before it ships.
   const named = params.factCheck
     ? []
     : params.competitors.filter((name) => namesWord(content, name));
   if (named.length > 0) {
-    pullRequestBody = `${pullRequestBody.trim()}\n\n**${AUTOPILOT_FACT_FLAG_HEADINGS.competitors}, please check**\n${named.join(" · ")}`;
+    try {
+      const checked = await factCheckComparison({
+        organizationId: ctx.organizationId,
+        log,
+        content,
+        sources: params.sources,
+        brand: ctx.brand?.name ?? "the brand",
+        competitor: named.join(", "),
+        competitorClaimsOnly: true,
+        onUsage: params.onUsage,
+      });
+      content = checked.content;
+      pullRequestBody = `${pullRequestBody.trim()}\n\n${factCheckSection(checked.report)}`;
+    } catch (error) {
+      await log.info("Could not check what the post says about competitors", {
+        error: toErrorMessage(error, "unknown error"),
+      });
+      pullRequestBody = `${pullRequestBody.trim()}\n\n**${AUTOPILOT_FACT_FLAG_HEADINGS.competitors}, please check**\n${named.join(" · ")}`;
+    }
   }
   // The writer may only link pages it looked up; a guessed one that 404s
   // keeps its text and loses the link.

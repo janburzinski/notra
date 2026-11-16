@@ -46,3 +46,17 @@ export const gscSearchAnalyticsResponseSchema = z.looseObject({
     )
     .optional(),
 });
+
+export const gscUrlInspectionResponseSchema = z.looseObject({
+  inspectionResult: z
+    .looseObject({
+      indexStatusResult: z
+        .looseObject({
+          verdict: z.string().optional(),
+          coverageState: z.string().optional(),
+          lastCrawlTime: z.string().optional(),
+        })
+        .optional(),
+    })
+    .optional(),
+});

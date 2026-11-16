@@ -116,6 +116,25 @@ export interface AutopilotFindingEvidence {
   pageUrl?: string | null;
   /** The repository file a new post's pull request adds; finds its live page. */
   filePath?: string | null;
+  /** Where a merged page went live, once it loaded after the merge. */
+  live?: { url: string; at: string } | null;
+  /** The last live check that failed, and the run whose brief said so. */
+  liveCheck?: {
+    url: string | null;
+    checkedAt: string;
+    reportedRun?: string;
+  };
+  /** How Google indexed the live page, from Search Console, and the run whose brief said so. */
+  indexing?: {
+    verdict: string;
+    coverageState: string | null;
+    checkedAt: string;
+    reportedRun?: string;
+  };
+  /** When the refresh job last asked whether this merged post moved its prompt. */
+  underperformingCheckedAt?: string;
+  /** A refresh of an Autopilot post whose numbers did not move after it shipped. */
+  underperforming?: { findingId: string; mergedDaysAgo: number } | null;
   /** Every page a rendering finding covers; kept when it settles without a change. */
   pageUrls?: string[];
   /** Why a page is refreshed: AI citations before and now, and who took them. */

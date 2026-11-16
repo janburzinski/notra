@@ -67,3 +67,12 @@ export interface QueryGscTopQueriesParams {
   /** RE2 pattern; only queries that match it are returned. */
   queryPattern?: string;
 }
+
+/** How Google indexed one URL, from the URL Inspection API. */
+export interface GscUrlInspection {
+  /** PASS when indexed; PARTIAL, FAIL or NEUTRAL otherwise. */
+  verdict: string;
+  /** Google's words, for example "Submitted and indexed" or "Discovered - currently not indexed". */
+  coverageState: string | null;
+  lastCrawlAt: string | null;
+}

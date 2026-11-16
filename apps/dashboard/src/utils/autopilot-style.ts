@@ -78,3 +78,46 @@ export function forceNoDashes(content: string, previous: string | null) {
   }
   return next;
 }
+
+// A period between digits ($9.99, 12.5%) is part of the figure, not a sentence end.
+const ANY_SENTENCE = /(?:[^.!?\n]|(?<=\d)\.(?=\d))+[.!?]?/g;
+
+/** The sentences (or lines, in tables and lists) of new prose that state one of `figures`. */
+export function sentencesWithFigures(
+  content: string,
+  figures: readonly string[]
+) {
+  const found: string[] = [];
+  mapProse(content, (prose) => {
+    for (const match of prose.matchAll(ANY_SENTENCE)) {
+      const sentence = match[0].trim();
+      if (sentence && figures.some((figure) => sentence.includes(figure))) {
+        found.push(sentence);
+      }
+    }
+    return prose;
+  });
+  return [...new Set(found)];
+}
+
+const LIST_MARKER = /^- /;
+
+/**
+ * The edits for the sentences a model was asked to rewrite. The sentences are
+ * listed as "- sentence", and the model sometimes copies that marker into
+ * `find`: such an edit is for the sentence without it.
+ */
+export function askedEdits(
+  edits: readonly { find: string; replace: string }[],
+  asked: ReadonlySet<string>
+) {
+  return edits.flatMap((edit) => {
+    if (asked.has(edit.find)) {
+      return [edit];
+    }
+    const find = edit.find.replace(LIST_MARKER, "");
+    return asked.has(find)
+      ? [{ find, replace: edit.replace.replace(LIST_MARKER, "") }]
+      : [];
+  });
+}

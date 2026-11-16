@@ -61,6 +61,7 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
   const db = sandbox.db;
   mock.module("@notra/db/drizzle", () => ({ db }));
   const state = {
+    postContent: null as string | null,
     flag: true,
     credits: true,
     confidence: 0.99,
@@ -112,6 +113,7 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
   const slackReplies: string[] = [];
   const slackCalls: { method: string; body: unknown }[] = [];
   const opened: string[] = [];
+  const openedBodies: string[] = [];
   const writtenFiles: { path: string; contents?: string }[][] = [];
   const closed: number[] = [];
   const reviewers: string[][] = [];
@@ -268,6 +270,40 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
           throw new Error("No planner output in this test");
         }
         return state.plan;
+      }
+      if (input.tag === "fact-check") {
+        // Quotes the brief where it names Rival; the other claim has no source.
+        const quote = input.prompt.includes("while Rival show up")
+          ? "while Rival show up"
+          : "";
+        return {
+          claims: [
+            {
+              claim: "AI answers name Rival for exports",
+              about: "competitor",
+              supported: true,
+              source: "brief",
+              quote,
+              fix: null,
+            },
+            {
+              claim: "Rival exports to every format",
+              about: "competitor",
+              supported: false,
+              source: "",
+              quote: "",
+              fix: { find: " Rival exports to every format.", replace: "" },
+            },
+            {
+              claim: "Sandbox exports in one click",
+              about: "brand",
+              supported: false,
+              source: "",
+              quote: "",
+              fix: null,
+            },
+          ],
+        };
       }
       if (input.tag === "brief") {
         // The writer of the brief page: leads with the first pending item and
@@ -473,7 +509,9 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
         title: "Sandbox exports",
         slug: "sandbox-exports",
         extension: "md",
-        content: "---\ntitle: Sandbox exports\n---\nA sandbox announcement.",
+        content:
+          state.postContent ??
+          "---\ntitle: Sandbox exports\n---\nA sandbox announcement.",
         pullRequestBody: "Explains the sandbox change.",
       };
     },
@@ -508,10 +546,12 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
         : path.endsWith(".png") && state.fallbackImageCollision,
     openAutopilotPullRequest: async (input: {
       slug: string;
+      body: string;
       files: { path: string; contents?: string }[];
     }) => {
       expect(input.files[0]?.path).toStartWith("content/blog/");
       opened.push(input.slug);
+      openedBodies.push(input.body);
       writtenFiles.push(input.files);
       if (state.takeover) {
         const finding = await db.query.autopilotFindings.findFirst();
@@ -686,6 +726,8 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
   });
   afterAll(() => sandbox.postgres.close());
   beforeEach(async () => {
+    state.postContent = null;
+    openedBodies.length = 0;
     state.gaps = [];
     state.flag = true;
     state.credits = true;
@@ -2034,6 +2076,25 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
       findingId: idea.id,
     });
     expect(opened).toHaveLength(2);
+  });
+
+  test("a post that names a competitor keeps what a source backs and loses the rest, without waiting for a person", async () => {
+    state.postContent =
+      "---\ntitle: Sandbox exports\n---\nAI answers name Rival for exports. Rival exports to every format. Sandbox exports in one click.";
+    await seedTopic("exports", "Exports", 40);
+    await dailyRun("planner-competitor-check", [exportsPull]);
+    expect(opened).toHaveLength(1);
+    const post =
+      writtenFiles[0]?.find((file) => file.path.endsWith(".md"))?.contents ??
+      "";
+    expect(post).toContain("AI answers name Rival for exports.");
+    expect(post).not.toContain("Rival exports to every format");
+    // Brand claims are not this check's business.
+    expect(post).toContain("Sandbox exports in one click.");
+    const body = openedBodies[0] ?? "";
+    expect(body).toContain("### Fact check");
+    expect(body).toContain("1 of 2 claims are quoted from a source");
+    expect(body).not.toContain("Names competitors");
   });
 
   test("a full draft limit keeps a ripe topic as an idea", async () => {

@@ -59,6 +59,7 @@ const INSIGHTS = [
   out("gather", "prompts.insights"),
   out("gather", "competitors.insights"),
   out("rendering", "insights"),
+  out("published", "insights"),
 ];
 
 const DRAFT_CONFIG = {
@@ -188,6 +189,9 @@ export const AUTOPILOT_DAILY_WORKFLOW: WorkflowDefinition = {
       comparisonPage(at(4, 4)),
       step("links", "autopilot.links", at(3, 5), { onError: "continue" }),
       step("landing", "autopilot.landing", at(3, 6), { onError: "continue" }),
+      step("published", "autopilot.follow-published", at(3, 7), {
+        onError: "continue",
+      }),
       // Column 4 of the brief's row stays empty: edges into the brief bend
       // there, and a node in that spot looks like where they lead.
       contentCall(
@@ -215,6 +219,7 @@ export const AUTOPILOT_DAILY_WORKFLOW: WorkflowDefinition = {
       edge("close-stale", "comparisons"),
       edge("close-stale", "links"),
       edge("close-stale", "landing"),
+      edge("close-stale", "published"),
       edge("comparisons", "comparison-page"),
       edge("gather", "content"),
       edge("readiness", "content"),
@@ -225,6 +230,7 @@ export const AUTOPILOT_DAILY_WORKFLOW: WorkflowDefinition = {
       edge("comparison-page", "brief"),
       edge("links", "brief"),
       edge("landing", "brief"),
+      edge("published", "brief"),
     ],
     onFailure: {
       type: "autopilot.fail-run",

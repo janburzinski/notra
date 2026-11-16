@@ -8,6 +8,7 @@ import type { WorkflowBlockStepContext } from "@notra/workflows/types/blocks";
 
 import { AUTOPILOT_OBSERVATION_STEPS as OBSERVATION_STEPS } from "@/constants/autopilot-workflow";
 import { closeStalePullRequests } from "@/lib/autopilot/cleanup";
+import { followPublishedPages } from "@/lib/autopilot/live";
 import { createAutopilotLogger } from "@/lib/autopilot/log";
 import {
   decideAutopilotPlan,
@@ -86,6 +87,18 @@ export const autopilotRunBlocks = [
     run: async (context) =>
       succeed({
         closed: await closeStalePullRequests(
+          await loadAutopilotContext(context)
+        ),
+      }),
+  }),
+  defineWorkflowBlock({
+    type: "autopilot.follow-published",
+    kind: "integration",
+    title: "Check published pages",
+    configSchema: autopilotRunConfigSchema,
+    run: async (context) =>
+      succeed({
+        insights: await followPublishedPages(
           await loadAutopilotContext(context)
         ),
       }),

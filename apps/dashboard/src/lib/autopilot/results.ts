@@ -45,7 +45,7 @@ const MARKDOWN_FILE = /\.mdx?$/;
  * Older merged posts never stored the file they added: read it from the pull
  * request once and keep it, a few per run.
  */
-async function backfillFilePaths(
+export async function backfillFilePaths(
   ctx: AutopilotRunContext,
   findings: AutopilotFindingRow[]
 ) {

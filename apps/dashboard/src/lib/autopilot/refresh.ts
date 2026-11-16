@@ -1,8 +1,13 @@
 import { createGitHubMentionUsageCollector } from "@notra/ai/billing/github-mention-billing";
 import { CONTENT_AGENT_MODEL } from "@notra/ai/constants/models";
 import { db } from "@notra/db/drizzle";
-import { brandSitemapPages, brandSitemaps } from "@notra/db/schema";
-import { and, asc, eq, ne, sql } from "drizzle-orm";
+import {
+  autopilotFindings,
+  brandSitemapPages,
+  brandSitemaps,
+  projects,
+} from "@notra/db/schema";
+import { and, asc, eq, gte, inArray, lte, ne, sql } from "drizzle-orm";
 
 import {
   AUTOPILOT_MARKDOWN_FILE,
@@ -19,6 +24,10 @@ import {
   AUTOPILOT_REFRESH_MAX_OUTPUT_TOKENS,
   AUTOPILOT_REFRESH_PAGE_MAX_CHARS,
   AUTOPILOT_REFRESH_WINDOW_MS,
+  AUTOPILOT_UNDERPERFORMING_MAX_AGE_MS,
+  AUTOPILOT_UNDERPERFORMING_MAX_FINDINGS,
+  AUTOPILOT_UNDERPERFORMING_MIN_AGE_MS,
+  AUTOPILOT_UNDERPERFORMING_MIN_GAIN,
 } from "@/constants/autopilot-refresh";
 import { loadAnswerChecks, loadOwnedHosts } from "@/lib/autopilot/answers";
 import { emailDraftReviewers } from "@/lib/autopilot/draft-emails";
@@ -41,10 +50,12 @@ import {
   openAutopilotPullRequest,
   readRepositoryFile,
 } from "@/lib/autopilot/github";
+import { loadFindingImpacts } from "@/lib/autopilot/impact";
 import {
   assertAutopilotFindingLease,
   withAutopilotFindingLease,
 } from "@/lib/autopilot/leases";
+import { loadPostSite, resolveLiveUrl } from "@/lib/autopilot/live";
 import { generateAutopilotObject } from "@/lib/autopilot/llm";
 import { createAutopilotLogger } from "@/lib/autopilot/log";
 import { fetchRendered, findDeadLinks } from "@/lib/autopilot/pages";
@@ -55,6 +66,8 @@ import { refreshOutputSchema, refreshRepairSchema } from "@/schemas/autopilot";
 import type { AutopilotRunContext } from "@/types/autopilot";
 import type { FindingClaim } from "@/types/autopilot-runtime";
 import type {
+  AutopilotAnswerCheck,
+  AutopilotCitationCandidate,
   AutopilotRefreshCheck,
   AutopilotRefreshFix,
 } from "@/types/autopilot-templates-runtime";
@@ -63,6 +76,7 @@ import { autopilotDraftBranchSlug } from "@/utils/autopilot-branches";
 import {
   findCitationDrops,
   refreshFingerprint,
+  underperformingCandidate,
 } from "@/utils/autopilot-citations";
 import {
   addedLinks,
@@ -75,6 +89,120 @@ import { findPagePath, isSafeRepositoryPath } from "@/utils/autopilot-paths";
 import { forceNoDashes } from "@/utils/autopilot-style";
 
 const percent = (value: number) => `${Math.round(value * 100)}%`;
+
+/**
+ * Autopilot's own posts that shipped to win a prompt and did not move it,
+ * old enough for the scans to tell. Each gets one refresh: its fingerprint
+ * settles once tried.
+ */
+async function findUnderperformingPosts(params: {
+  ctx: AutopilotRunContext;
+  now: Date;
+  checks: AutopilotAnswerCheck[];
+  ownedHosts: string[];
+}): Promise<AutopilotCitationCandidate[]> {
+  const { ctx, now } = params;
+  const repository = ctx.repository;
+  if (!(repository && ctx.projectId)) {
+    return [];
+  }
+  const findings = await db
+    .select()
+    .from(autopilotFindings)
+    .where(
+      and(
+        eq(autopilotFindings.organizationId, ctx.organizationId),
+        sql`lower(${autopilotFindings.repository}) = ${`${repository.owner}/${repository.name}`.toLowerCase()}`,
+        eq(autopilotFindings.status, "merged"),
+        inArray(autopilotFindings.kind, ["keywords", "comparisons"]),
+        sql`${autopilotFindings.evidence}->'target'->>'kind' = 'prompt'`,
+        sql`${autopilotFindings.evidence}->>'filePath' is not null`,
+        gte(
+          autopilotFindings.mergedAt,
+          new Date(now.getTime() - AUTOPILOT_UNDERPERFORMING_MAX_AGE_MS)
+        ),
+        lte(
+          autopilotFindings.mergedAt,
+          new Date(now.getTime() - AUTOPILOT_UNDERPERFORMING_MIN_AGE_MS)
+        )
+      )
+    )
+    // Least recently asked first: posts that moved, lack data or already got
+    // their try must not hold the slots of the ones after them.
+    .orderBy(
+      sql`${autopilotFindings.evidence}->>'underperformingCheckedAt' asc nulls first`,
+      asc(autopilotFindings.mergedAt)
+    )
+    .limit(AUTOPILOT_UNDERPERFORMING_MAX_FINDINGS);
+  if (findings.length === 0) {
+    return [];
+  }
+  await db
+    .update(autopilotFindings)
+    .set({
+      evidence: sql`jsonb_set(${autopilotFindings.evidence}, '{underperformingCheckedAt}', to_jsonb(${now.toISOString()}::text))`,
+    })
+    .where(
+      inArray(
+        autopilotFindings.id,
+        findings.map((finding) => finding.id)
+      )
+    );
+  const project = await db.query.projects.findFirst({
+    columns: { id: true, gscTopQueries: true, gscLastSyncedAt: true },
+    where: and(
+      eq(projects.id, ctx.projectId),
+      eq(projects.organizationId, ctx.organizationId)
+    ),
+  });
+  const impacts = await loadFindingImpacts(project ?? null, findings);
+  let site: Awaited<ReturnType<typeof loadPostSite>> | undefined;
+  const candidates: AutopilotCitationCandidate[] = [];
+  for (const finding of findings) {
+    const impact = impacts[finding.id];
+    const target = finding.evidence.target;
+    const path = finding.evidence.filePath;
+    if (
+      !(impact && target?.kind === "prompt" && path) ||
+      impact.after === null ||
+      impact.before === null ||
+      impact.after - impact.before >= AUTOPILOT_UNDERPERFORMING_MIN_GAIN
+    ) {
+      continue;
+    }
+    // Posts merged before pages were followed have no live URL saved yet.
+    site ??= await loadPostSite(ctx);
+    const resolved = await resolveLiveUrl({
+      ctx,
+      finding,
+      site,
+      ownedHosts: params.ownedHosts,
+      now,
+    }).catch(() => null);
+    const url = resolved?.live ? resolved.url : null;
+    if (!url) {
+      continue;
+    }
+    const candidate = underperformingCandidate({
+      findingId: finding.id,
+      url,
+      path,
+      promptId: target.promptId,
+      before: impact.before,
+      after: impact.after,
+      mergedDaysAgo: Math.floor(
+        (now.getTime() - (finding.mergedAt ?? now).getTime()) /
+          (24 * 60 * 60 * 1000)
+      ),
+      checks: params.checks,
+      ownedHosts: params.ownedHosts,
+    });
+    if (candidate) {
+      candidates.push(candidate);
+    }
+  }
+  return candidates;
+}
 
 export async function checkRefresh(
   ctx: AutopilotRunContext
@@ -151,7 +279,25 @@ export async function checkRefresh(
         ),
     }
   );
-  if (fresh.length === 0) {
+  // Lost citations come first: the page earned them once.
+  const underperforming = (
+    await findUnderperformingPosts({ ctx, now, checks, ownedHosts })
+  ).filter((candidate) => !settled.has(refreshFingerprint(candidate.key)));
+  if (underperforming.length > 0) {
+    await log.decision(
+      `${underperforming.length} of Autopilot's posts did not win the answer they were written for`,
+      {
+        candidates: underperforming
+          .slice(0, 5)
+          .map(
+            (candidate) =>
+              `${candidate.url}: ${percent(candidate.drop.before)} → ${percent(candidate.drop.now)} after ${candidate.underperforming?.mergedDaysAgo ?? "?"} days`
+          ),
+      }
+    );
+  }
+  const candidates = [...fresh, ...underperforming];
+  if (candidates.length === 0) {
     return { ready: false, reason: "No page lost AI citations" };
   }
   const octokit = await getRepositoryOctokit(
@@ -161,8 +307,11 @@ export async function checkRefresh(
   const baseSha = await getBaseBranchSha(octokit, ctx.repository);
   const paths = await listRepositoryPaths(octokit, ctx.repository, baseSha);
   const markdown = paths.filter((path) => AUTOPILOT_MARKDOWN_FILE.test(path));
-  for (const candidate of fresh) {
-    const path = findPagePath(markdown, candidate.url);
+  for (const candidate of candidates) {
+    const path =
+      candidate.path && markdown.includes(candidate.path)
+        ? candidate.path
+        : findPagePath(markdown, candidate.url);
     if (!(path && isSafeRepositoryPath(path))) {
       await log.info(
         `No Markdown file in the repository renders ${candidate.url}`,
@@ -209,6 +358,7 @@ export async function claimRefresh(params: {
   const { ctx, check } = params;
   const { candidate } = check;
   const log = createAutopilotLogger(ctx, "refresh");
+  const missed = candidate.underperforming;
   const claim = await claimFinding(
     ctx.organizationId,
     ctx.runId,
@@ -216,17 +366,28 @@ export async function claimRefresh(params: {
       kind: "refresh",
       fingerprint: refreshFingerprint(candidate.key),
       title: `Refresh ${candidate.url.replace(/^https?:\/\//, "")}`,
-      summary: `Cited in ${percent(candidate.drop.before)} of AI answers to its prompts a month ago, ${percent(candidate.drop.now)} now.`,
+      summary: missed
+        ? `Written ${missed.mergedDaysAgo} days ago to win an AI answer: named in ${percent(candidate.drop.before)} of answers before, ${percent(candidate.drop.now)} since.`
+        : `Cited in ${percent(candidate.drop.before)} of AI answers to its prompts a month ago, ${percent(candidate.drop.now)} now.`,
       evidence: {
         sourceUrl: candidate.url,
         pageUrl: candidate.url,
         citations: candidate.drop,
-        target: {
-          kind: "citations",
-          url: candidate.url,
-          promptIds: candidate.promptIds,
-          before: candidate.drop.now,
-        },
+        underperforming: missed
+          ? { findingId: missed.findingId, mergedDaysAgo: missed.mergedDaysAgo }
+          : null,
+        target: missed
+          ? {
+              kind: "prompt",
+              promptId: missed.promptId,
+              before: candidate.drop.now,
+            }
+          : {
+              kind: "citations",
+              url: candidate.url,
+              promptIds: candidate.promptIds,
+              before: candidate.drop.now,
+            },
       },
     },
     params.claimToken
@@ -251,11 +412,15 @@ export async function claimRefresh(params: {
 }
 
 function describeEvidence(check: AutopilotRefreshCheck) {
-  const { drop } = check.candidate;
+  const { drop, underperforming } = check.candidate;
   return [
     `Page: ${check.candidate.url} (file ${check.path})`,
-    `Cited in ${percent(drop.before)} of answers to its prompts a month ago, ${percent(drop.now)} now.`,
-    "Prompts whose answers stopped citing it:",
+    underperforming
+      ? `Written ${underperforming.mergedDaysAgo} days ago to win the AI answer to the prompt below. It did not: the answers named the brand in ${percent(drop.before)} of cases before it shipped and ${percent(drop.now)} since. Make it the page those answers would cite.`
+      : `Cited in ${percent(drop.before)} of answers to its prompts a month ago, ${percent(drop.now)} now.`,
+    underperforming
+      ? "Prompt it was written for:"
+      : "Prompts whose answers stopped citing it:",
     ...drop.lostPrompts.map((prompt) => `- ${prompt}`),
     "What the engines searched while answering them:",
     ...(drop.searches.length
@@ -541,13 +706,17 @@ function refreshPullRequestBody(
   check: AutopilotRefreshCheck,
   fix: AutopilotRefreshFix
 ) {
-  const { drop } = check.candidate;
+  const { drop, underperforming } = check.candidate;
   return [
     fix.summary,
     "",
-    `**Why now:** AI answers to this page's prompts cited it ${percent(drop.before)} of the time a month ago and ${percent(drop.now)} now.`,
+    underperforming
+      ? `**Why now:** Autopilot wrote this post ${underperforming.mergedDaysAgo} days ago to win the AI answer below. AI answers named the brand ${percent(drop.before)} of the time before it shipped and ${percent(drop.now)} since, so it gets one more try.`
+      : `**Why now:** AI answers to this page's prompts cited it ${percent(drop.before)} of the time a month ago and ${percent(drop.now)} now.`,
     "",
-    "**Prompts it stopped showing up for**",
+    underperforming
+      ? "**Prompt it was written for**"
+      : "**Prompts it stopped showing up for**",
     ...drop.lostPrompts.map((prompt) => `- ${prompt}`),
     ...(drop.searches.length
       ? [

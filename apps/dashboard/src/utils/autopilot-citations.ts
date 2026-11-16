@@ -1,3 +1,5 @@
+import { gapScanIds } from "@notra/geo-core/geo/prompts";
+
 import {
   AUTOPILOT_ALTERNATIVES_PROMPT_PATTERN,
   AUTOPILOT_ANSWER_EXCERPT_MAX_CHARS,
@@ -412,4 +414,64 @@ export function comparisonFingerprint(competitor: string) {
 
 export function refreshFingerprint(key: string) {
   return `refresh:${key}`;
+}
+
+/**
+ * An Autopilot post that shipped to win a prompt and did not: what the
+ * engines answered and cited on that prompt since, as a refresh candidate.
+ */
+export function underperformingCandidate(params: {
+  findingId: string;
+  url: string;
+  path: string;
+  promptId: string;
+  before: number;
+  after: number;
+  mergedDaysAgo: number;
+  checks: readonly AutopilotAnswerCheck[];
+  ownedHosts: readonly string[];
+}): AutopilotCitationCandidate | null {
+  const key = citationKey(params.url);
+  if (!key) {
+    return null;
+  }
+  // Custom prompts are scanned under their own ID, as the impact reads them.
+  const scanIds = new Set(gapScanIds(params.promptId));
+  const missed = params.checks.filter(
+    (check) => scanIds.has(check.promptId) && !check.mentioned
+  );
+  return {
+    url: params.url,
+    key: `${key}#underperforming`,
+    promptIds: [params.promptId],
+    path: params.path,
+    underperforming: {
+      findingId: params.findingId,
+      mergedDaysAgo: params.mergedDaysAgo,
+      promptId: params.promptId,
+    },
+    drop: {
+      before: params.before,
+      now: params.after,
+      lostPrompts: [...new Set(missed.map((check) => check.prompt))].slice(
+        0,
+        1
+      ),
+      citedInstead: countTop(
+        missed.flatMap((check) =>
+          [
+            ...new Set(
+              check.sourceUrls.filter((url) => {
+                const other = citationKey(url);
+                return other !== null && !isOwnedKey(other, params.ownedHosts);
+              })
+            ),
+          ].map((url) => url.split("#")[0] ?? url)
+        ),
+        AUTOPILOT_REFRESH_MAX_CITED_INSTEAD
+      ),
+      searches: uniqueSearches(missed),
+    },
+    score: 0,
+  };
 }

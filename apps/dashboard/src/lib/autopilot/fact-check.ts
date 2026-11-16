@@ -90,6 +90,11 @@ export async function factCheckComparison(params: {
   sources: AutopilotFactSource[];
   brand: string;
   competitor: string;
+  /**
+   * A post that only mentions competitors: just what it says about them is
+   * checked; the brand's own claims and other numbers are handled elsewhere.
+   */
+  competitorClaimsOnly?: boolean;
   onUsage?: (usage: AgentTokenUsage) => void;
 }): Promise<{ content: string; report: AutopilotFactReport }> {
   const { log, sources } = params;
@@ -123,7 +128,13 @@ export async function factCheckComparison(params: {
         onUsage: params.onUsage,
       })
   );
-  const result = { claims: results.flatMap((row) => row.claims) };
+  const result = {
+    claims: results
+      .flatMap((row) => row.claims)
+      .filter(
+        (claim) => !params.competitorClaimsOnly || claim.about === "competitor"
+      ),
+  };
   // The model says supported; the quote has to agree.
   const claims: AutopilotFactClaim[] = result.claims.map((claim) => ({
     ...claim,
@@ -196,7 +207,9 @@ export async function factCheckComparison(params: {
     unconfirmed: unsupported
       .filter((claim) => claim.about === "brand")
       .map((claim) => claim.claim),
-    figures: unsourcedFigures(applied.content, sources),
+    figures: params.competitorClaimsOnly
+      ? []
+      : unsourcedFigures(applied.content, sources),
   };
   await log.decision(
     `Fact check: ${report.supported} of ${report.checked} claims sourced, ${report.removed.length} removed`,

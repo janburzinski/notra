@@ -31,6 +31,14 @@ export interface AutopilotCitationCandidate {
   drop: AutopilotCitationDrop;
   /** Citations lost, weighted by how many prompts the page served. */
   score: number;
+  /** The file behind the page when Autopilot wrote it, so no lookup by URL. */
+  path?: string;
+  /** Set when this is an Autopilot post whose numbers did not move. */
+  underperforming?: {
+    findingId: string;
+    mergedDaysAgo: number;
+    promptId: string;
+  };
 }
 
 /** A competitor that wins comparison questions the brand loses. */
