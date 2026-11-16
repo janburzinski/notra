@@ -2211,6 +2211,7 @@
       "copyLabel": "{label} kopieren",
       "labelCopied": "{label} kopiert",
       "chat": "Chat",
+      "agentChat": "Agent-Chat",
       "organizations": "Organisationen",
       "failedToSwitchOrganization": "Organisation konnte nicht gewechselt werden",
       "logo": "Logo",

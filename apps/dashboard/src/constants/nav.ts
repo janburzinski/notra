@@ -167,6 +167,12 @@ export const NAV_GROUPS: readonly NavGroup[] = [
     links: [GEO_OVERVIEW_NAV_LINK, HOME_NAV_LINK, GEO_TRAFFIC_NAV_LINK],
   },
   {
+    id: "agentChat",
+    icon: Message01Icon,
+    labelKey: "agentChat",
+    links: [CHAT_NAV_LINK],
+  },
+  {
     id: "prompts",
     icon: AiChat01Icon,
     labelKey: "prompts",
@@ -194,7 +200,7 @@ export const NAV_GROUPS: readonly NavGroup[] = [
     id: "content",
     icon: NoteIcon,
     labelKey: "content",
-    links: [CONTENT_NAV_LINK, CHAT_NAV_LINK],
+    links: [CONTENT_NAV_LINK],
   },
   {
     id: "sites",

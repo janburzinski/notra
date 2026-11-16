@@ -30,6 +30,7 @@ type NavBadgeKey = "beta";
 type NavGroupLabelKey =
   | "autopilot"
   | "overview"
+  | "agentChat"
   | "prompts"
   | "competitors"
   | "improve"
