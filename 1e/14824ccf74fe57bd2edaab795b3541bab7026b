@@ -1,0 +1,21 @@
+packages/geo-core/tests/ingest-pipeline.test.ts
+  s_84517655eac374::t_9597b1362e6f26 65-68,72
+packages/geo-core/tests/web-collect.test.ts
+  s_84517655eac374::t_9597b1362e6f26 1,107-108
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "1e14824ccf74fe57bd2edaab795b3541bab7026b",
+  "prompts": {},
+  "sessions": {
+    "s_84517655eac374": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a1e584-6218-77c1-ad6a-b4f55ccd2990",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
