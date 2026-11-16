@@ -6,6 +6,7 @@ import {
   CHART_MEMORY_FILL_CLASS,
   CHART_MUTED_COLOR,
   CHART_SEARCH_FILL_CLASS,
+  CHAT_TOOL_SERIES_COLORS,
 } from "@/constants/charts";
 
 const SOFT_GRADIENT_LIGHT_TINT = 0.45;
@@ -28,6 +29,13 @@ export function accountSeriesColorPair(index: number): ChartColorPair {
 
 export function accountSeriesColors(index: number): ChartSeriesColors {
   return seriesColors(accountSeriesColorPair(index));
+}
+
+export function chatToolSeriesColor(index: number): ChartColorPair {
+  return (
+    CHAT_TOOL_SERIES_COLORS[index % CHAT_TOOL_SERIES_COLORS.length] ??
+    CHART_MUTED_COLOR
+  );
 }
 
 /** Base color plus a lighter tint, so a sector reads as a soft gradient. */

@@ -47,15 +47,19 @@ export const SPARKLINE_CHART_OPTIONS: Record<string, unknown> = {
   grid: { left: 1, right: 1, top: 2, bottom: 1, containLabel: false },
 };
 
-export const CHAT_TOOL_CHART_HEIGHT_CLASS = "h-48";
+export const CHAT_TOOL_CHART_HEIGHT_CLASS = "h-52";
+export const CHAT_TOOL_CHART_STROKE_WIDTH = 2;
+/** Line chart series in chat and artifacts, in the GEO traffic chart's order. */
+export const CHAT_TOOL_SERIES_COLORS: readonly ChartColorPair[] = [
+  CHART_PRIMARY_COLOR,
+  CHART_REFERRAL_COLOR,
+  CHART_SECONDARY_COLOR,
+  ...ACCOUNT_SERIES_COLORS,
+];
 /** Donut slices shown in a chat chart before the rest fold into "Other". */
 export const CHAT_TOOL_SHARE_VISIBLE_SLICES = 6;
 export const CHAT_TOOL_CHART_OPTIONS: Record<string, unknown> = {
   grid: { left: 4, right: 8, top: 8, bottom: 4, containLabel: true },
-};
-/** No side inset: the area runs edge to edge inside an artifact's card. */
-export const FLUSH_CHART_OPTIONS: Record<string, unknown> = {
-  grid: { left: 0, right: 0, top: 12, bottom: 0, containLabel: true },
 };
 export const CHAT_TOOL_RANK_TRACK_CLASS = "bg-muted";
 

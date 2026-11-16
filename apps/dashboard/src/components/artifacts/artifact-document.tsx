@@ -24,6 +24,7 @@ import {
   TableHeader,
   TableRow,
 } from "@notra/ui/components/ui/table";
+import { InstrumentModule } from "ui/card";
 import { TABLE_BODY_CLASS, TABLE_FRAME_CLASS } from "ui/table/constants";
 import { useFormatter, useTranslations } from "use-intl";
 
@@ -137,24 +138,17 @@ function MetricsBlock({
   );
 }
 
-/**
- * A chart framed like a table: title and range on the grey shell, the plot
- * on the white card, its lines running edge to edge.
- */
+/** A chart on the same card the chat and the GEO pages use. */
 function ChartBlock({ block }: { block: Block<"chart"> }) {
   const { chart } = block;
   return (
-    <section className={TABLE_FRAME_CLASS}>
-      <div className="flex min-h-9 flex-wrap items-baseline gap-x-2 px-4 py-2">
-        <h2 className="text-sm font-medium">{chart.title}</h2>
-        {chart.subtitle ? (
-          <p className="text-muted-foreground text-xs">{chart.subtitle}</p>
-        ) : null}
-      </div>
-      <div className={cn(TABLE_BODY_CLASS, "overflow-hidden pt-1")}>
-        <ToolOutputChartPlot chart={chart} flush />
-      </div>
-    </section>
+    <InstrumentModule
+      eyebrow={chart.title}
+      readout={chart.subtitle}
+      variant="table"
+    >
+      <ToolOutputChartPlot chart={chart} />
+    </InstrumentModule>
   );
 }
 

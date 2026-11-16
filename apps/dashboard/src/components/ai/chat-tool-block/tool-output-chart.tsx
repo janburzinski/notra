@@ -15,6 +15,7 @@ import { useLocale, useTranslations } from "use-intl";
 
 import { ChartColorScope } from "@/components/charts/chart-color-scope";
 import { EngineIcon } from "@/components/geo/engine-icon";
+import { TrafficTrendLegend } from "@/components/geo/traffic-trend-legend";
 import {
   CHAT_TOOL_CHART_HEIGHT_CLASS,
   CHAT_TOOL_CHART_OPTIONS,
@@ -23,18 +24,23 @@ import {
   CHAT_TOOL_DONUT_OUTER_RADIUS,
   CHAT_TOOL_DONUT_PADDING_ANGLE,
   CHAT_TOOL_RANK_TRACK_CLASS,
+  CHAT_TOOL_CHART_STROKE_WIDTH,
   CHART_SEARCH_FILL_CLASS,
-  FLUSH_CHART_OPTIONS,
 } from "@/constants/charts";
 import { cn } from "@/lib/utils";
 import type {
-  ToolOutputChartPlotProps,
   ToolOutputChartProps,
   ToolOutputRankRow,
   ToolOutputShareRow,
 } from "@/types/components/chat-tool-chart";
 import { formatFullDayLabel } from "@/utils/analytics-charts";
-import { accountSeriesColors, softGradientColors } from "@/utils/chart-colors";
+import {
+  accountSeriesColors,
+  chatToolSeriesColor,
+  seriesColors,
+  softGradientColors,
+} from "@/utils/chart-colors";
+import { isolatedPointIndices } from "@/utils/chart-series";
 import {
   buildShareChartRows,
   CHART_CATEGORY_KEY,
@@ -65,13 +71,7 @@ function LegendDot({ colorKey }: { colorKey: string }) {
   );
 }
 
-function AreaArtifactChart({
-  chart,
-  flush = false,
-}: {
-  chart: AreaChartArtifact;
-  flush?: boolean;
-}) {
+function AreaArtifactChart({ chart }: { chart: AreaChartArtifact }) {
   const t = useTranslations("ai.toolBlock");
   const locale = useLocale();
   const series = chart.series;
@@ -83,15 +83,26 @@ function AreaArtifactChart({
   const isDaily = data.every((row) =>
     ISO_DAY_PATTERN.test(String(row[CHART_CATEGORY_KEY]))
   );
-  const keyedSeries = series.map((entry, index) => ({
-    dataKey: chartSeriesDataKey(entry.name, index),
-    label: formatChartEngineLabel(entry.name),
-  }));
+  const keyedSeries = series.map((entry, index) => {
+    const dataKey = chartSeriesDataKey(entry.name, index);
+    return {
+      dataKey,
+      label: formatChartEngineLabel(entry.name),
+      color: chatToolSeriesColor(index),
+      // A point with no neighbours draws no line, so it gets a dot.
+      isolated: isolatedPointIndices(
+        data.map((row) => {
+          const value = row[dataKey];
+          return typeof value === "number" ? value : null;
+        })
+      ),
+    };
+  });
   const config: ChartConfig = {};
-  for (const [index, entry] of keyedSeries.entries()) {
+  for (const entry of keyedSeries) {
     config[entry.dataKey] = {
       label: entry.label,
-      colors: accountSeriesColors(index),
+      colors: seriesColors(entry.color),
     };
   }
 
@@ -102,10 +113,10 @@ function AreaArtifactChart({
   }
 
   return (
-    <ChartColorScope className="flex flex-col gap-3" config={config}>
+    <div className="min-w-0">
       <EChartsAreaChart
         animation={false}
-        chartOptions={flush ? FLUSH_CHART_OPTIONS : CHAT_TOOL_CHART_OPTIONS}
+        chartOptions={CHAT_TOOL_CHART_OPTIONS}
         className={cn("w-full cursor-crosshair", CHAT_TOOL_CHART_HEIGHT_CLASS)}
         config={config}
         curveType="monotone"
@@ -129,9 +140,12 @@ function AreaArtifactChart({
             gapMissing
             key={entry.dataKey}
             strokeVariant="solid"
-            variant={keyedSeries.length > 1 ? "none" : "gradient"}
+            strokeWidth={CHAT_TOOL_CHART_STROKE_WIDTH}
+            variant="gradient"
           >
-            <EChartsAreaChart.ActiveDot variant="border" />
+            {entry.isolated.length > 0 ? (
+              <EChartsAreaChart.Dot indices={entry.isolated} variant="border" />
+            ) : null}
           </EChartsAreaChart.Area>
         ))}
         <EChartsAreaChart.Tooltip
@@ -141,28 +155,26 @@ function AreaArtifactChart({
               ? (day: string) => formatFullDayLabel(day, locale)
               : undefined
           }
+          position="fixed"
           roundness="xl"
+          scrub={data.length > 1}
           valueFormatter={(value: number) =>
             formatChartValue(value, asPercent, locale)
           }
+          variant="frosted-glass"
         />
       </EChartsAreaChart>
-      {/* With one line the title names it; with more, a wrapping legend
-          below the plot says which is which without clipping. */}
+      {/* With one series the title names it. */}
       {keyedSeries.length > 1 ? (
-        <ul className="flex flex-wrap gap-x-4 gap-y-1.5">
-          {keyedSeries.map((entry) => (
-            <li
-              className="text-muted-foreground flex min-w-0 items-center gap-1.5 text-xs"
-              key={entry.dataKey}
-            >
-              <LegendDot colorKey={entry.dataKey} />
-              <span className="truncate">{entry.label}</span>
-            </li>
-          ))}
-        </ul>
+        <TrafficTrendLegend
+          items={keyedSeries.map((entry) => ({
+            key: entry.dataKey,
+            label: entry.label,
+            color: entry.color,
+          }))}
+        />
       ) : null}
-    </ChartColorScope>
+    </div>
   );
 }
 
@@ -343,22 +355,18 @@ function PieArtifactChart({ chart }: { chart: PieChartArtifact }) {
 /** The chart without its card, for surfaces that bring their own. */
 export function ToolOutputChartPlot({
   chart,
-  flush = false,
-}: ToolOutputChartPlotProps) {
+}: Pick<ToolOutputChartProps, "chart">) {
   switch (chart.kind) {
     case "empty":
       return (
-        <InstrumentEmpty
-          className={flush ? "min-h-40" : "min-h-32"}
-          message={chart.emptyMessage}
-        />
+        <InstrumentEmpty className="min-h-32" message={chart.emptyMessage} />
       );
     case "pie":
       return <PieArtifactChart chart={chart} />;
     case "bar":
       return <BarArtifactChart chart={chart} />;
     case "area":
-      return <AreaArtifactChart chart={chart} flush={flush} />;
+      return <AreaArtifactChart chart={chart} />;
     default: {
       const exhaustive: never = chart;
       return exhaustive;
