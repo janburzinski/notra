@@ -90,7 +90,7 @@ At the end, there is a pull request in your repository with the post, the frontm
 
 We built the API for agents, and the scopes and limits follow from that. An agent that writes posts should be able to finish the job and get the post onto your blog. It should not be able to change your infrastructure. Keeping reads and writes in separate scopes lets you give a monitoring tool only what it needs. Routing every post through a pull request means the review step on your blog matches the review step on your code.
 
-This also builds on earlier changes to the Notra API. In March we added [write-scoped API keys and async content generation](https://www.usenotra.com/changelog/notra/async-api-write-scoped-keys-framer-integration), so a client could already generate content in the background with a key limited to what it needed. The Sites API applies the same scoped-key model to the last step, publishing.
+This also builds on earlier changes to the Notra API. In March we added [write-scoped API keys and async content generation](https://www.usenotra.com/changelog/async-api-write-scoped-keys-framer-integration), so a client could already generate content in the background with a key limited to what it needed. The Sites API applies the same scoped-key model to the last step, publishing.
 
 ## Try it
 

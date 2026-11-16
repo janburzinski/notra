@@ -53,18 +53,139 @@ export const GitHubLogo = ({ className }) => (
   </LogoSvg>
 );
 
+// Analytics providers for the "Web analytics" post, copied from packages/ui/src/components/ui/svgs.
+const PlausibleLogo = ({ className }) => (
+  <svg
+    aria-hidden="true"
+    className={className}
+    fill="none"
+    viewBox="0 0 46 60"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      d="M45.2456 22.6027C44.1545 33.0584 35.0129 40.83 24.5003 40.83H20.4525V50.4C20.4525 55.7019 16.1545 60 10.8525 60H3.35999C1.50432 60 0 58.4956 0 56.64V36.9375L5.03807 29.8688C5.94988 28.5895 7.62603 28.1121 9.07506 28.719L11.9408 29.9193C13.3853 30.5243 15.0562 30.0488 15.9656 28.7738L22.6828 19.3567C23.5899 18.0849 25.2572 17.6116 26.6972 18.2169L32.2171 20.5373C33.6601 21.144 35.3308 20.6693 36.2394 19.3946L42.6988 10.332C44.7236 13.8918 45.7133 18.1208 45.2456 22.6027Z"
+      fill="url(#blog-plausible-a)"
+    />
+    <path
+      d="M3.29209 28.8726C4.11538 27.7175 5.313 26.8291 6.70596 26.5612C7.79212 26.3523 8.86287 26.4619 9.85321 26.8767L12.7182 28.0767C12.8833 28.1458 13.0571 28.1808 13.2347 28.1808C13.6713 28.1808 14.0835 27.9684 14.3373 27.6125L20.9316 18.3677C21.7547 17.2137 22.952 16.3267 24.344 16.0594C25.4262 15.8516 26.4904 15.9605 27.4723 16.3732L32.9921 18.6937C33.1587 18.7637 33.3339 18.7992 33.5128 18.7992C33.948 18.7992 34.3585 18.5878 34.6108 18.2338L41.53 8.52606C37.8272 3.36444 31.7802 0 24.945 0H3.35999C1.50432 0 0 1.50432 0 3.35999V33.4916L3.29209 28.8726Z"
+      fill="url(#blog-plausible-b)"
+    />
+    <defs>
+      <linearGradient
+        gradientUnits="userSpaceOnUse"
+        id="blog-plausible-a"
+        x1="14.8413"
+        x2="27.4731"
+        y1="22.5436"
+        y2="44.6493"
+      >
+        <stop stopColor="#909CF7" />
+        <stop offset="1" stopColor="#4B38D8" />
+      </linearGradient>
+      <linearGradient
+        gradientUnits="userSpaceOnUse"
+        id="blog-plausible-b"
+        x1="7.98379"
+        x2="21.001"
+        y1="-1.35829"
+        y2="21.4218"
+      >
+        <stop stopColor="#909CF7" />
+        <stop offset="1" stopColor="#4B38D8" />
+      </linearGradient>
+    </defs>
+  </svg>
+);
+
+const CloudflareLogo = ({ className }) => (
+  <svg
+    aria-hidden="true"
+    className={className}
+    viewBox="0 0 256 116"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      d="M176.332 108.348c1.593-5.31 1.062-10.622-1.593-13.809-2.656-3.187-6.374-5.31-11.154-5.842L71.17 87.634c-.531 0-1.062-.53-1.593-.53-.531-.532-.531-1.063 0-1.594.531-1.062 1.062-1.594 2.124-1.594l92.946-1.062c11.154-.53 22.839-9.56 27.087-20.182l5.312-13.809c0-.532.531-1.063 0-1.594C191.203 20.182 166.772 0 138.091 0 111.535 0 88.697 16.995 80.73 40.896c-5.311-3.718-11.684-5.843-19.12-5.31-12.747 1.061-22.838 11.683-24.432 24.43-.531 3.187 0 6.374.532 9.56C16.996 70.107 0 87.103 0 108.348c0 2.124 0 3.718.531 5.842 0 1.063 1.062 1.594 1.594 1.594h170.489c1.062 0 2.125-.53 2.125-1.594l1.593-5.842Z"
+      fill="#F4811F"
+    />
+    <path
+      d="M205.544 48.863h-2.656c-.531 0-1.062.53-1.593 1.062l-3.718 12.747c-1.593 5.31-1.062 10.623 1.594 13.809 2.655 3.187 6.373 5.31 11.153 5.843l19.652 1.062c.53 0 1.062.53 1.593.53.53.532.53 1.063 0 1.594-.531 1.063-1.062 1.594-2.125 1.594l-20.182 1.062c-11.154.53-22.838 9.56-27.087 20.182l-1.063 4.78c-.531.532 0 1.594 1.063 1.594h70.108c1.062 0 1.593-.531 1.593-1.593 1.062-4.25 2.124-9.03 2.124-13.81 0-27.618-22.838-50.456-50.456-50.456"
+      fill="#FAAD3F"
+    />
+  </svg>
+);
+
+const PostHogLogo = ({ className }) => (
+  <svg
+    aria-hidden="true"
+    className={className}
+    fill="none"
+    viewBox="0 0 52 28"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      d="M10.74 7.16 4.54.8A2.66 2.66 0 0 0 0 2.66V7.5l10.74 11.18z"
+      fill="#1D4AFF"
+    />
+    <path d="M9.19 28h1.55v-9.32L0 7.5v10.73z" fill="#1D4AFF" />
+    <path d="M0 25.41A2.6 2.6 0 0 0 2.58 28H9.2L0 18.23z" fill="#1D4AFF" />
+    <path
+      d="M10.74 2.66v4.5l11.22 11.52V7.63L15.3.8a2.66 2.66 0 0 0-4.56 1.86"
+      fill="#F54E00"
+    />
+    <path d="M10.74 28h8.96l-8.96-9.32z" fill="#F54E00" />
+    <path d="M10.74 7.16v11.52L19.7 28h2.26v-9.32z" fill="#F54E00" />
+    <path
+      d="M21.96 2.67v4.96l11.3 11.6h.02V7.75L26.63.85a2.8 2.8 0 0 0-2-.85 2.67 2.67 0 0 0-2.67 2.67"
+      fill="#F9BD2B"
+    />
+    <path d="M21.96 7.63v11.05L31.03 28h2.25v-8.75z" fill="#F9BD2B" />
+    <path d="M21.96 28h9.07l-9.07-9.32z" fill="#F9BD2B" />
+    <path
+      className="fill-[#111] dark:fill-white"
+      d="M51.66 25.22A1.9 1.9 0 0 0 50 23.33l-.34-.04c-1-.13-1.94-.6-2.65-1.33L33.28 7.75V28H49a2.66 2.66 0 0 0 2.67-2.67zM39.2 23.54h-.09a1.78 1.78 0 1 1 .1 0"
+    />
+  </svg>
+);
+
+const RybbitLogo = ({ className }) => (
+  <svg
+    aria-hidden="true"
+    className={className}
+    fill="currentColor"
+    viewBox="0 0 152 100"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <polygon points="103.92 97.99 129.95 71.22 149.19 97.99 103.92 97.99" />
+    <path d="M149.19,51.43L118.29,2.29l-18.82,10.06-19.62-4.19c1.63,3.15,2.59,6.86,2.59,10.85,0,11.35-7.63,20.55-17.03,20.55-7.74,0-14.27-6.24-16.34-14.77l-22.62,40.5L2.42,54.35l12.84,43.64h31.63l12.63-30.61v30.61h36.64l-28.31-46.56h81.33Z" />
+    <ellipse cx="61.22" cy="17.18" rx="7.31" ry="10.7" />
+  </svg>
+);
+
+// Square marks use a square box. Wide marks keep the text height and grow sideways.
 const BRAND_LOGOS = {
-  GitHub: GitHubLogo,
-  Railway: RailwayLogo,
-  Tinybird: TinybirdLogo,
-  WorkOS: WorkOSLogo,
+  Cloudflare: { Logo: CloudflareLogo, wide: true },
+  Databuddy: { Logo: (props) => <DatabuddyLogo {...props} /> },
+  GitHub: { Logo: GitHubLogo },
+  Plausible: { Logo: PlausibleLogo },
+  PostHog: { Logo: PostHogLogo, wide: true },
+  Railway: { Logo: RailwayLogo },
+  Rybbit: { Logo: RybbitLogo, wide: true },
+  Tinybird: { Logo: TinybirdLogo },
+  Vercel: { Logo: VercelLogo },
+  WorkOS: { Logo: WorkOSLogo },
 };
 
 export const Brand = ({ name, children }) => {
-  const Logo = BRAND_LOGOS[name];
+  const { Logo, wide } = BRAND_LOGOS[name];
   return (
     <span className="inline-flex items-baseline gap-1 whitespace-nowrap">
-      <Logo className="size-[0.9em] translate-y-[0.1em]" />
+      <Logo
+        className={cn(
+          "shrink-0 translate-y-[0.1em]",
+          wide ? "h-[0.9em] w-auto" : "size-[0.9em]"
+        )}
+      />
       {children ?? name}
     </span>
   );
@@ -1151,3 +1272,137 @@ export const SitesFreePlanCard = () => (
     </div>
   </aside>
 );
+
+// "Web analytics"
+
+const WEB_ANALYTICS_PROMPT = `Add Notra web analytics to this site.
+
+1. Read https://www.usenotra.com/docs/analytics/install/script-tag first.
+2. If this is a React, Next.js or Astro app, install @usenotra/sdk and add it to the root layout as that page shows (NotraAnalytics for React and Next.js, notraScriptTag for Astro). Load it in production only.
+3. Otherwise, add the script tag from that page to the <head> of every page, keeping its integrity and crossorigin attributes.
+4. Ask me for the public web key. It starts with nwk. and I can copy it from Settings → Tracking in Notra.
+5. When you're done, list every hostname that serves the site, so I can add them to Tracked domains in Notra.`;
+
+// Falls back to a hidden textarea where the async clipboard API is blocked.
+const copyText = async (text) => {
+  try {
+    await navigator.clipboard.writeText(text);
+    return true;
+  } catch {
+    const field = document.createElement("textarea");
+    field.value = text;
+    field.setAttribute("readonly", "");
+    field.style.position = "fixed";
+    field.style.opacity = "0";
+    document.body.append(field);
+    field.select();
+    const copied = document.execCommand("copy");
+    field.remove();
+    return copied;
+  }
+};
+
+// The lab logo stack from AgentPromptButton in packages/ui. Solid circles, so
+// each logo covers the one to its left.
+const AGENT_LOGO_CIRCLE =
+  "bg-background border-foreground/15 relative grid size-9 shrink-0 place-items-center rounded-full border";
+
+const AgentLogoStack = () => (
+  <span aria-hidden="true" className="flex shrink-0 items-center">
+    <span className={AGENT_LOGO_CIRCLE}>
+      <svg
+        className="size-[1.125rem]"
+        preserveAspectRatio="xMidYMid"
+        viewBox="0 0 256 257"
+      >
+        <path
+          d="m50.228 170.321 50.357-28.257.843-2.463-.843-1.361h-2.462l-8.426-.518-28.775-.778-24.952-1.037-24.175-1.296-6.092-1.297L0 125.796l.583-3.759 5.12-3.434 7.324.648 16.202 1.101 24.304 1.685 17.629 1.037 26.118 2.722h4.148l.583-1.685-1.426-1.037-1.101-1.037-25.147-17.045-27.22-18.017-14.258-10.37-7.713-5.25-3.888-4.925-1.685-10.758 7-7.713 9.397.649 2.398.648 9.527 7.323 20.35 15.75L94.817 91.9l3.889 3.24 1.555-1.102.195-.777-1.75-2.917-14.453-26.118-15.425-26.572-6.87-11.018-1.814-6.61c-.648-2.723-1.102-4.991-1.102-7.778l7.972-10.823L71.42 0 82.05 1.426l4.472 3.888 6.61 15.101 10.694 23.786 16.591 32.34 4.861 9.592 2.592 8.879.973 2.722h1.685v-1.556l1.36-18.211 2.528-22.36 2.463-28.776.843-8.1 4.018-9.722 7.971-5.25 6.222 2.981 5.12 7.324-.713 4.73-3.046 19.768-5.962 30.98-3.889 20.739h2.268l2.593-2.593 10.499-13.934 17.628-22.036 7.778-8.749 9.073-9.657 5.833-4.601h11.018l8.1 12.055-3.628 12.443-11.342 14.388-9.398 12.184-13.48 18.147-8.426 14.518.778 1.166 2.01-.194 30.46-6.481 16.462-2.982 19.637-3.37 8.88 4.148.971 4.213-3.5 8.62-20.998 5.184-24.628 4.926-36.682 8.685-.454.324.519.648 16.526 1.555 7.065.389h17.304l32.21 2.398 8.426 5.574 5.055 6.805-.843 5.184-12.962 6.611-17.498-4.148-40.83-9.721-14-3.5h-1.944v1.167l11.666 11.406 21.387 19.314 26.767 24.887 1.36 6.157-3.434 4.86-3.63-.518-23.526-17.693-9.073-7.972-20.545-17.304h-1.36v1.814l4.73 6.935 25.017 37.59 1.296 11.536-1.814 3.76-6.481 2.268-7.13-1.297-14.647-20.544-15.1-23.138-12.185-20.739-1.49.843-7.194 77.448-3.37 3.953-7.778 2.981-6.48-4.925-3.436-7.972 3.435-15.749 4.148-20.544 3.37-16.333 3.046-20.285 1.815-6.74-.13-.454-1.49.194-15.295 20.999-23.267 31.433-18.406 19.702-4.407 1.75-7.648-3.954.713-7.064 4.277-6.286 25.47-32.405 15.36-20.092 9.917-11.6-.065-1.686h-.583L44.07 198.125l-12.055 1.555-5.185-4.86.648-7.972 2.463-2.593 20.35-13.999-.064.065Z"
+          fill="#D97757"
+        />
+      </svg>
+    </span>
+    <span className={cn(AGENT_LOGO_CIRCLE, "-ms-2.5")}>
+      <svg
+        className="size-[1.125rem] fill-[#0A0A0A] dark:fill-white"
+        preserveAspectRatio="xMidYMid"
+        viewBox="0 0 256 260"
+      >
+        <path d="M239.184 106.203a64.716 64.716 0 0 0-5.576-53.103C219.452 28.459 191 15.784 163.213 21.74A65.586 65.586 0 0 0 52.096 45.22a64.716 64.716 0 0 0-43.23 31.36c-14.31 24.602-11.061 55.634 8.033 76.74a64.665 64.665 0 0 0 5.525 53.102c14.174 24.65 42.644 37.324 70.446 31.36a64.72 64.72 0 0 0 48.754 21.744c28.481.025 53.714-18.361 62.414-45.481a64.767 64.767 0 0 0 43.229-31.36c14.137-24.558 10.875-55.423-8.083-76.483Zm-97.56 136.338a48.397 48.397 0 0 1-31.105-11.255l1.535-.87 51.67-29.825a8.595 8.595 0 0 0 4.247-7.367v-72.85l21.845 12.636c.218.111.37.32.409.563v60.367c-.056 26.818-21.783 48.545-48.601 48.601Zm-104.466-44.61a48.345 48.345 0 0 1-5.781-32.589l1.534.921 51.722 29.826a8.339 8.339 0 0 0 8.441 0l63.181-36.425v25.221a.87.87 0 0 1-.358.665l-52.335 30.184c-23.257 13.398-52.97 5.431-66.404-17.803ZM23.549 85.38a48.499 48.499 0 0 1 25.58-21.333v61.39a8.288 8.288 0 0 0 4.195 7.316l62.874 36.272-21.845 12.636a.819.819 0 0 1-.767 0L41.353 151.53c-23.211-13.454-31.171-43.144-17.804-66.405v.256Zm179.466 41.695-63.08-36.63L161.73 77.86a.819.819 0 0 1 .768 0l52.233 30.184a48.6 48.6 0 0 1-7.316 87.635v-61.391a8.544 8.544 0 0 0-4.4-7.213Zm21.742-32.69-1.535-.922-51.619-30.081a8.39 8.39 0 0 0-8.492 0L99.98 99.808V74.587a.716.716 0 0 1 .307-.665l52.233-30.133a48.652 48.652 0 0 1 72.236 50.391v.205ZM88.061 139.097l-21.845-12.585a.87.87 0 0 1-.41-.614V65.685a48.652 48.652 0 0 1 79.757-37.346l-1.535.87-51.67 29.825a8.595 8.595 0 0 0-4.246 7.367l-.051 72.697Zm11.868-25.58 28.138-16.217 28.188 16.218v32.434l-28.086 16.218-28.188-16.218-.052-32.434Z" />
+      </svg>
+    </span>
+    <span className={cn(AGENT_LOGO_CIRCLE, "-ms-2.5")}>
+      <svg
+        className="size-[1.125rem] fill-[#0A0A0A] dark:fill-white"
+        viewBox="0 0 1024 1024"
+      >
+        <path d="M395.479 633.828L735.91 381.105C752.599 368.715 776.454 373.548 784.406 392.792C826.26 494.285 807.561 616.253 724.288 699.996C641.016 783.739 525.151 802.104 419.247 760.277L303.556 814.143C469.49 928.202 670.987 899.995 796.901 773.282C896.776 672.843 927.708 535.937 898.785 412.476L899.047 412.739C857.105 231.37 909.358 158.874 1016.4 10.6326C1018.93 7.11771 1021.47 3.60279 1024 0L883.144 141.651V141.212L395.392 633.916" />
+        <path d="M325.226 695.251C206.128 580.84 226.662 403.776 328.285 301.668C403.431 226.097 526.549 195.254 634.026 240.596L749.454 186.994C728.657 171.88 702.007 155.623 671.424 144.2C533.19 86.9942 367.693 115.465 255.323 228.382C147.234 337.081 113.244 504.215 171.613 646.833C215.216 753.423 143.739 828.818 71.7385 904.916C46.2237 931.893 20.6216 958.87 0 987.429L325.139 695.339" />
+      </svg>
+    </span>
+  </span>
+);
+
+// Both labels share one grid cell, so the button keeps the width of the longer
+// one. The old label leaves upwards while the new one rises in.
+const COPY_LABEL = cn(
+  "text-center transition-[opacity,transform,filter] duration-200 [grid-area:stack]",
+  EASE_OUT,
+  "motion-reduce:transform-none motion-reduce:blur-none"
+);
+
+export const WebAnalyticsPromptCard = () => {
+  const [copied, setCopied] = useState(false);
+  useEffect(() => {
+    if (!copied) {
+      return undefined;
+    }
+    const timeout = setTimeout(() => setCopied(false), 2000);
+    return () => clearTimeout(timeout);
+  }, [copied]);
+  const copy = async () => {
+    setCopied(await copyText(WEB_ANALYTICS_PROMPT));
+  };
+
+  return (
+    <aside className="not-prose border-border bg-card my-8 flex flex-col gap-4 rounded-2xl border p-5 sm:flex-row sm:items-center sm:justify-between">
+      <span className="flex items-center gap-3">
+        <AgentLogoStack />
+        <span className="text-foreground font-sans text-base font-medium">
+          Let your coding agent do it
+        </span>
+      </span>
+      <button
+        aria-live="polite"
+        className="notra-cta-button notra-cta-primary shrink-0 transition-transform duration-150 ease-out active:scale-[0.97]"
+        onClick={copy}
+        style={{
+          fontSize: "0.9375rem",
+          height: "2.25rem",
+          paddingInline: "1rem",
+        }}
+        type="button"
+      >
+        <span className="grid [grid-template-areas:'stack']">
+          <span
+            aria-hidden={copied}
+            className={cn(
+              COPY_LABEL,
+              copied && "-translate-y-1.5 opacity-0 blur-[2px]"
+            )}
+          >
+            Copy prompt
+          </span>
+          <span
+            aria-hidden={!copied}
+            className={cn(
+              COPY_LABEL,
+              !copied && "translate-y-1.5 opacity-0 blur-[2px]"
+            )}
+          >
+            Copied
+          </span>
+        </span>
+      </button>
+    </aside>
+  );
+};
