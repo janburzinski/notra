@@ -5,6 +5,7 @@ import { db } from "@notra/db/drizzle";
 import { geoSettings, geoTrafficEmbeds, projects } from "@notra/db/schema";
 import { advisoryXactLock } from "@notra/db/utils/advisory-xact-lock";
 import { geoCheckGenerationKey } from "@notra/db/utils/geo-check-cache";
+import { GEO_SELF_SERVE_ENGINE_IDS } from "@notra/geo-core/constants/geo-engine-policy";
 import { geoDb } from "@notra/geo-core/geo/effect";
 import {
   loadAiTraffic,
@@ -56,6 +57,7 @@ import type {
   TrafficEmbedSourceData,
   TrafficEmbedSummary,
 } from "@/types/traffic-embed";
+import { withoutStoppedEngines } from "@/utils/geo-charts";
 import { geoPresetRange } from "@/utils/geo-range";
 import {
   isTrafficEmbedId,
@@ -406,6 +408,25 @@ const loadShareOfVoiceSettings = Effect.fn("geo.embedShareOfVoiceSettings")(
   }
 );
 
+const loadRunningVisibility = Effect.fn("geo.embedRunningVisibility")(
+  function* (scope: GeoScopeInput, window: GeoWindowInput) {
+    const [timeseries, overview, settings] = yield* Effect.all(
+      [
+        loadGeoTimeseries(scope, window),
+        loadGeoOverview(scope, window),
+        loadShareOfVoiceSettings(scope),
+      ],
+      { concurrency: "unbounded" }
+    );
+    const stored = settings?.engines ?? [];
+    return withoutStoppedEngines(
+      overview.engines,
+      timeseries.points,
+      stored.length > 0 ? stored : [...GEO_SELF_SERVE_ENGINE_IDS]
+    );
+  }
+);
+
 type SourceLoader<K extends TrafficEmbedDataSource> = (
   config: TrafficEmbedConfig,
   scope: GeoScopeInput,
@@ -451,9 +472,9 @@ const SOURCE_LOADERS: { [K in TrafficEmbedDataSource]: SourceLoader<K> } = {
     return { source: "agents", traffic };
   },
   timeseries: async (_config, scope, window) =>
-    (await runGeo(loadGeoTimeseries(scope, window))).points,
+    (await runGeo(loadRunningVisibility(scope, window))).points,
   overview: async (_config, scope, window) =>
-    (await runGeo(loadGeoOverview(scope, window))).engines,
+    (await runGeo(loadRunningVisibility(scope, window))).engines,
   shareOfVoice: async (_config, scope, window) => {
     const [share, { competitors }, settings, overview] = await runGeo(
       Effect.all(

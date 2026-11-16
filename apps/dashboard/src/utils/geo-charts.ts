@@ -692,6 +692,50 @@ function splitTrendDays(
   };
 }
 
+function engineLineOf(engine: string): string {
+  return `${engineFamilyOf(engine)}:${isGroundedEngine(engine)}`;
+}
+
+function engineLinesOn(
+  points: readonly GeoTimeseriesPoint[],
+  days: readonly string[]
+): Set<string> {
+  const wanted = new Set(days);
+  return new Set(
+    points
+      .filter((point) => point.checks > 0 && wanted.has(point.day))
+      .map((point) => engineLineOf(point.engine))
+  );
+}
+
+function trendWindows(
+  points: readonly GeoTimeseriesPoint[],
+  today: string
+): { previous: string[]; current: string[] } | null {
+  const days = [...new Set(points.map((point) => point.day))].sort();
+  return splitTrendDays(daysWithSettledUsage(days, today));
+}
+
+export function withoutStoppedEngines(
+  engines: readonly GeoOverviewEngine[],
+  points: readonly GeoTimeseriesPoint[],
+  trackedEngines: readonly string[] = []
+): { engines: GeoOverviewEngine[]; points: GeoTimeseriesPoint[] } {
+  const latest = points.reduce(
+    (max, point) => (point.checks > 0 && point.day > max ? point.day : max),
+    ""
+  );
+  const running = new Set([
+    ...trackedEngines.map((engine) => engineLineOf(engine)),
+    ...engineLinesOn(points, [latest]),
+  ]);
+  const runs = (engine: string) => running.has(engineLineOf(engine));
+  return {
+    engines: engines.filter((engine) => runs(engine.engine)),
+    points: points.filter((point) => runs(point.engine)),
+  };
+}
+
 export function mentionStatTrends(
   points: readonly GeoTimeseriesPoint[],
   options?: { family?: string; today?: string }
@@ -703,12 +747,22 @@ export function mentionStatTrends(
     positionDelta: null,
   };
   const today = options?.today ?? todayIsoDate();
-  const byDay = familyDayBuckets(points, options?.family);
-  const knownDays = [...byDay.keys()].sort();
-  const windows = splitTrendDays(daysWithSettledUsage(knownDays, today));
+  const family = options?.family;
+  const scoped = family
+    ? points.filter((point) => engineFamilyOf(point.engine) === family)
+    : points;
+  const windows = trendWindows(scoped, today);
   if (!windows) {
     return empty;
   }
+  const inPrevious = engineLinesOn(scoped, windows.previous);
+  const inCurrent = engineLinesOn(scoped, windows.current);
+  const byDay = familyDayBuckets(
+    scoped.filter((point) => {
+      const line = engineLineOf(point.engine);
+      return inPrevious.has(line) && inCurrent.has(line);
+    })
+  );
   const previous = sumFamilyWindow(windows.previous, byDay);
   const current = sumFamilyWindow(windows.current, byDay);
   const previousRate = windowVisibilityRate(previous);

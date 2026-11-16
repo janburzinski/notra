@@ -21,6 +21,8 @@ import type {
 } from "@/types/geo";
 import type { GeoScanModelMenuProps } from "@/types/geo-scan-activity";
 
+import { withoutStoppedEngines } from "./geo-charts";
+
 export function countEnabledGeoPrompts(
   prompts: readonly GeoTrackedPrompt[] | undefined
 ): number | undefined {
@@ -104,8 +106,11 @@ export function toGeoOverviewReadyPage(input: {
   isScanning: boolean;
   scanMenu: GeoScanModelMenuProps;
 }): GeoOverviewPageReady {
-  const engines = input.engines ?? [];
-  const timeseriesPoints = input.timeseriesPoints ?? [];
+  const { engines, points: timeseriesPoints } = withoutStoppedEngines(
+    input.engines ?? [],
+    input.timeseriesPoints ?? [],
+    input.settings.engines
+  );
   const competitorPoints = input.competitorPoints ?? [];
   const competitorShareTimeseries =
     input.competitorShareTimeseries ?? GEO_EMPTY_COMPETITOR_SHARE_TIMESERIES;
