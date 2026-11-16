@@ -1,0 +1,38 @@
+apps/web/src/components/feature-pages/personas-headline.tsx
+  s_62a1fceec3383e::t_358695030e8002 3-4,10,14,27-46
+apps/web/src/constants/landing/cycle-text.ts
+  s_62a1fceec3383e::t_62b4e9e10c87f3 7-9
+  s_62a1fceec3383e::t_e8524c839259b4 1-6,10-35
+apps/web/src/types/landing/hero.ts
+  s_62a1fceec3383e::t_e5421bcc7d9c4f 30-40
+apps/web/src/components/landing/hero-section.tsx
+  s_62a1fceec3383e::t_d0bd815d64c826 6,79,94
+apps/web/src/components/landing/cycle-text.tsx
+  s_62a1fceec3383e::t_62b4e9e10c87f3 10
+  s_62a1fceec3383e::t_7636920b382706 1-9,11-119,121-138,142-143,145-151,154,157-188,190-216
+  s_62a1fceec3383e::t_9a7399019aa031 120
+  s_62a1fceec3383e::t_a6d95eebf889f6 139-141,144,152-153,155-156
+  s_62a1fceec3383e::t_1b5ae6a083fe6b 189
+apps/web/src/components/landing/hero-headline.tsx
+  s_62a1fceec3383e::t_a965e9f53ccb49 149,151-153
+  s_62a1fceec3383e::t_d0bd815d64c826 11,13,15-21,63,100-101,103-109,112-119,121,154-160
+  s_62a1fceec3383e::t_9a7399019aa031 1
+apps/web/src/hooks/use-cycle-index.ts
+  s_62a1fceec3383e::t_15a99500e31546 1-20
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "c5916d5613ec27b6326a93c2a74b36d805f82444",
+  "prompts": {},
+  "sessions": {
+    "s_62a1fceec3383e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5eba935b-3529-411e-855a-75e3bcf238f1",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
