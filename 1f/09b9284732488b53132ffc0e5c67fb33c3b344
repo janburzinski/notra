@@ -1,0 +1,23 @@
+apps/dashboard/src/lib/hooks/use-agent-chat.ts
+  s_dce5829a402951::t_74f3db30ba6177 50,1088,1090-1091,1095-1100,1108
+apps/dashboard/src/utils/agent-questions.ts
+  s_dce5829a402951::t_66d1edf74ebb4b 126,133-173
+apps/dashboard/src/app/(dashboard)/[slug]/chat/page-client.tsx
+  ai_agent 127,1343-1345
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "1f09b9284732488b53132ffc0e5c67fb33c3b344",
+  "prompts": {},
+  "sessions": {
+    "s_dce5829a402951": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e9bbbee6-ef3c-41b8-b6f5-3492ea56608b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
