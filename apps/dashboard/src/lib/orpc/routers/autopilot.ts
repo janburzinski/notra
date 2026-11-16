@@ -38,7 +38,10 @@ import {
   AUTOPILOT_DEFAULT_STALE_PULL_REQUEST_DAYS,
   AUTOPILOT_RUNS_PAGE_SIZE,
 } from "@/constants/autopilot";
-import { AUTOPILOT_DEFAULT_APPROVALS } from "@/constants/autopilot-publish";
+import {
+  AUTOPILOT_DEFAULT_APPROVALS,
+  AUTOPILOT_SETUP_APPROVALS,
+} from "@/constants/autopilot-publish";
 import {
   AUTOPILOT_WORKFLOW_NOT_FOUND,
   AUTOPILOT_WORKFLOW_NOT_RUNNING,
@@ -296,10 +299,9 @@ export const autopilotRouter = {
             : AUTOPILOT_SETUP_JOBS,
           commitFilters: toAutopilotCommitFilters(settings?.commitFilters),
           maxOpenPullRequests: settings?.maxOpenPullRequests ?? 3,
-          approvals: {
-            ...AUTOPILOT_DEFAULT_APPROVALS,
-            ...settings?.approvals,
-          },
+          approvals: settings
+            ? { ...AUTOPILOT_DEFAULT_APPROVALS, ...settings.approvals }
+            : AUTOPILOT_SETUP_APPROVALS,
           siteId: settings?.siteId ?? null,
           draftEmails: settings?.draftEmails ?? "without_slack",
           stalePullRequestDays: settings

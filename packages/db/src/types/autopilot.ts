@@ -108,6 +108,10 @@ export interface AutopilotFindingEvidence {
   slackActingAt?: string;
   previewUrl?: string | null;
   publishGroup?: AutopilotApprovalGroup;
+  /** Folders a held pull request may change without waiting for a person. */
+  publishRoots?: string[];
+  /** When a held pull request was last checked for a hold that cleared. */
+  holdCheckedAt?: string;
   /** The page a refresh or rendering fix is about. */
   pageUrl?: string | null;
   /** The repository file a new post's pull request adds; finds its live page. */

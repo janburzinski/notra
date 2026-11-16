@@ -280,10 +280,32 @@ describe("hold rules", () => {
 
   test("finds files outside the content folders", () => {
     expect(touchesPathsOutside(["blog/a.mdx"], ["/blog/", null])).toBe(false);
-    expect(touchesPathsOutside(["blog/a.mdx", "robots.txt"], ["blog"])).toBe(
-      true
-    );
+    expect(
+      touchesPathsOutside(["blog/a.mdx", "app/layout.tsx"], ["blog"])
+    ).toBe(true);
     expect(touchesPathsOutside(["blogs/a.mdx"], ["blog"])).toBe(true);
-    expect(touchesPathsOutside(["llms.txt"], [null])).toBe(true);
+  });
+
+  test("lets crawler-only files through, never code next to them", () => {
+    expect(
+      touchesPathsOutside(
+        [
+          "public/llms.txt",
+          "public/llms-full.txt",
+          "robots.txt",
+          "apps/web/public/sitemap.xml",
+          "public/.well-known/llms.txt",
+        ],
+        [null]
+      )
+    ).toBe(false);
+    expect(touchesPathsOutside(["app/robots.ts"], [null])).toBe(true);
+    expect(touchesPathsOutside(["public/llms.txt.js"], [null])).toBe(true);
+    expect(
+      touchesPathsOutside(["public/.well-known/assetlinks.json"], [null])
+    ).toBe(true);
+    expect(
+      touchesPathsOutside(["public/llms.txt", "app/layout.tsx"], [null])
+    ).toBe(true);
   });
 });

@@ -1,4 +1,5 @@
 import {
+  AUTOPILOT_AUTONOMOUS_PR_BUDGET,
   AUTOPILOT_ACTION_JEV_MODEL_ID,
   AUTOPILOT_DAY_MS,
   AUTOPILOT_PLANNER_MAX_OUTPUT_TOKENS,
@@ -200,6 +201,8 @@ function settleRun(params: {
       : false,
     autonomousPullRequestsInWindow:
       (run.autonomousPullRequestsInWindow ?? 0) + params.openedSoFar,
+    // Scenarios judge the plan, so the budget stays at one per window.
+    autonomousPullRequestBudget: AUTOPILOT_AUTONOMOUS_PR_BUDGET.min,
     draftSlotsFree: run.draftSlotsFree ?? true,
     demandTracked: params.demandTracked,
     now: runDate(runIndex),

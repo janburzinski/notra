@@ -416,6 +416,9 @@ export const AUTOPILOT_SETUP_JOBS = {
   ...AUTOPILOT_DEFAULT_JOBS,
   refresh: true,
   comparisons: true,
+  rendering: true,
+  links: true,
+  landing: true,
 } as const;
 
 export const AUTOPILOT_FLAG_TIMEOUT_MS = 2000;

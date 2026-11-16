@@ -19,6 +19,7 @@ import type {
 } from "@notra/ai/types/autopilot-planner";
 import {
   actionableObservations,
+  autonomousPullRequestBudget,
   countIndependentSignals,
   evaluateAutopilotGate,
   fitPlannerState,
@@ -36,6 +37,7 @@ import { openMemorySnapshot, updateMemory } from "@notra/memory/memory";
 import { listBlogPostPaths } from "@/lib/autopilot/blog";
 import {
   countAutonomousProposals,
+  countAutonomousTrackRecord,
   countOpenPullRequests,
   listActiveBlogFindings,
   listFindingStatuses,
@@ -245,6 +247,7 @@ export async function decideAutopilotPlan(
     activeWork,
     openPullRequests,
     autonomous,
+    trackRecord,
     results,
   ] = await Promise.all([
     syncTopicsWithFindings(ctx.organizationId, stored),
@@ -255,6 +258,13 @@ export async function decideAutopilotPlan(
       ctx.organizationId,
       new Date(
         Date.now() - AUTOPILOT_AUTONOMOUS_PR_BUDGET.days * AUTOPILOT_DAY_MS
+      )
+    ),
+    countAutonomousTrackRecord(
+      ctx.organizationId,
+      new Date(
+        Date.now() -
+          AUTOPILOT_AUTONOMOUS_PR_BUDGET.trackRecordDays * AUTOPILOT_DAY_MS
       )
     ),
     // Only ranks ready topics, so a failure plans without it.
@@ -356,6 +366,7 @@ export async function decideAutopilotPlan(
     // crash before the memory write must not let the next run act twice.
     activeWork: plan.topic ? topicHasActiveWork(plan.topic, activeWork) : false,
     autonomousPullRequestsInWindow: autonomous,
+    autonomousPullRequestBudget: autonomousPullRequestBudget(trackRecord),
     draftSlotsFree: openPullRequests < ctx.maxOpenPullRequests,
     demandTracked: input.demandTracked,
     now: new Date(),

@@ -37,8 +37,21 @@ export const AUTOPILOT_TOPIC_MIN_SIGNALS = 2;
  * read again every day, so an older sighting means the brand closed it.
  */
 export const AUTOPILOT_DEMAND_MAX_AGE_DAYS = 14;
-/** Autonomous pull requests per workspace and window, so a bad gate cannot spam. */
-export const AUTOPILOT_AUTONOMOUS_PR_BUDGET = { count: 1, days: 7 } as const;
+/**
+ * Automatic pull requests per workspace and window, so a bad gate cannot spam.
+ * A workspace starts at `base`, earns one more for every `earnedPerMerges`
+ * posts people merged over `trackRecordDays` beyond the ones they closed, and
+ * drops to `min` once people closed `closedMoreToShrink` more than they merged.
+ */
+export const AUTOPILOT_AUTONOMOUS_PR_BUDGET = {
+  base: 3,
+  min: 1,
+  max: 7,
+  days: 7,
+  earnedPerMerges: 3,
+  closedMoreToShrink: 2,
+  trackRecordDays: 60,
+} as const;
 
 export const AUTOPILOT_TOPIC_MAX_SIGNALS = 10;
 export const AUTOPILOT_SIGNAL_DETAIL_MAX_CHARS = 280;

@@ -99,6 +99,8 @@ export function useAutopilotSetup({
         briefHour,
         timezone,
         jobs,
+        // A first setup publishes on its own; a saved choice is kept.
+        ...(settings.configured ? {} : { approvals: settings.approvals }),
         maxOpenPullRequests: settings.maxOpenPullRequests,
       }),
     onSuccess: async () => {

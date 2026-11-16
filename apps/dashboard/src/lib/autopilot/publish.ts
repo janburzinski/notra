@@ -6,7 +6,17 @@ import type {
   AutopilotApprovals,
   AutopilotJobKind,
 } from "@notra/db/types/autopilot";
-import { and, asc, eq, inArray, isNotNull, lte, or, sql } from "drizzle-orm";
+import {
+  and,
+  asc,
+  eq,
+  inArray,
+  isNotNull,
+  isNull,
+  lte,
+  or,
+  sql,
+} from "drizzle-orm";
 
 import { AUTOPILOT_BRANCH_PREFIX } from "@/constants/autopilot";
 import {
@@ -16,6 +26,10 @@ import {
   AUTOPILOT_NEW_POST_KINDS,
   AUTOPILOT_PUBLISH_BATCH,
   AUTOPILOT_PUBLISH_RETRY_MS,
+  AUTOPILOT_PULL_REQUEST_FILE_PAGES,
+  AUTOPILOT_RESUMABLE_AFTER_READY,
+  AUTOPILOT_RESUMABLE_BEFORE_READY,
+  AUTOPILOT_RESUME_BATCH,
 } from "@/constants/autopilot-publish";
 import { mergeFinding, pullRequestRef } from "@/lib/autopilot/findings";
 import { getRepositoryOctokit } from "@/lib/autopilot/github";
@@ -103,19 +117,18 @@ async function featureShipped(
 }
 
 async function holdReasonFor(params: {
-  ctx: AutopilotRunContext;
+  organizationId: string;
   group: AutopilotApprovalGroup;
   finding: AutopilotFindingRow;
   body: string;
   paths: string[];
-  contentFolders: string[];
+  roots: string[];
 }): Promise<AutopilotHoldReason | null> {
-  const { ctx } = params;
-  if (!(await hasMergedFinding(ctx.organizationId, params.group))) {
+  if (!(await hasMergedFinding(params.organizationId, params.group))) {
     return AUTOPILOT_HOLD_REASONS.firstPost;
   }
   if (
-    !(await featureShipped(ctx.organizationId, params.finding).catch(
+    !(await featureShipped(params.organizationId, params.finding).catch(
       () => false
     ))
   ) {
@@ -124,13 +137,7 @@ async function holdReasonFor(params: {
   if (hasFactCheckFlags(params.body)) {
     return AUTOPILOT_HOLD_REASONS.factCheck;
   }
-  if (
-    touchesPathsOutside(params.paths, [
-      ctx.contentPath,
-      ctx.integrationContentPath,
-      ...params.contentFolders,
-    ])
-  ) {
+  if (touchesPathsOutside(params.paths, params.roots)) {
     return AUTOPILOT_HOLD_REASONS.outsideContent;
   }
   return null;
@@ -165,18 +172,27 @@ export async function scheduleAutopilotPublish(params: {
       );
     return;
   }
+  const roots = [
+    ctx.contentPath,
+    ctx.integrationContentPath,
+    ...(params.contentFolders ?? []),
+  ].filter((root): root is string => Boolean(root));
   const reason = await holdReasonFor({
-    ctx,
+    organizationId: ctx.organizationId,
     group,
     finding: params.finding,
     body: params.body,
     paths: params.paths,
-    contentFolders: params.contentFolders ?? [],
+    roots,
   });
   if (reason) {
     await db
       .update(autopilotFindings)
-      .set({ publishAt: null, publishHoldReason: reason })
+      .set({
+        publishAt: null,
+        publishHoldReason: reason,
+        evidence: sql`${autopilotFindings.evidence} || ${JSON.stringify({ publishGroup: group, publishRoots: roots })}::jsonb`,
+      })
       .where(eq(autopilotFindings.id, findingId));
     await log.skip(`Waits for you: ${reason}`);
     return;
@@ -203,7 +219,7 @@ export async function scheduleAutopilotPublish(params: {
     .set({
       publishAt,
       publishHoldReason: null,
-      evidence: sql`jsonb_set(${autopilotFindings.evidence}, '{publishGroup}', to_jsonb(${group}::text))`,
+      evidence: sql`${autopilotFindings.evidence} || ${JSON.stringify({ publishGroup: group, publishRoots: roots })}::jsonb`,
     })
     .where(
       and(
@@ -479,6 +495,203 @@ export async function publishDueFindings(
   return outcomes;
 }
 
+async function listPullRequestFiles(
+  octokit: AutopilotOctokit,
+  target: { owner: string; repo: string; pullNumber: number }
+) {
+  const paths: string[] = [];
+  for (let page = 1; page <= AUTOPILOT_PULL_REQUEST_FILE_PAGES; page += 1) {
+    const { data } = await octokit.request(
+      "GET /repos/{owner}/{repo}/pulls/{pull_number}/files",
+      {
+        owner: target.owner,
+        repo: target.repo,
+        pull_number: target.pullNumber,
+        per_page: AUTOPILOT_HOLD_PAGE_SIZE,
+        page,
+      }
+    );
+    paths.push(...data.map((file) => file.filename));
+    if (data.length < AUTOPILOT_HOLD_PAGE_SIZE) {
+      return paths;
+    }
+  }
+  // More files than read: unknown is not "inside the content folder".
+  return [...paths, ""];
+}
+
+/**
+ * Whether a held pull request may be scheduled again: the reason it waits is
+ * gone and nothing else holds it. Null keeps it held as it is.
+ */
+async function clearedHold(params: {
+  finding: AutopilotFindingRow;
+  group: AutopilotApprovalGroup;
+  reason: string;
+  now: Date;
+  baseBranch: string | null;
+}): Promise<{ ready: boolean } | AutopilotHoldReason | null> {
+  const { finding, group } = params;
+  const ref = pullRequestRef(finding);
+  if (!ref) {
+    return null;
+  }
+  if (AUTOPILOT_RESUMABLE_AFTER_READY.has(params.reason)) {
+    const decision = await inspectHold(finding, params.now, params.baseBranch);
+    if (decision.action === "publish") {
+      return { ready: true };
+    }
+    return decision.action === "cancel" && decision.reason !== params.reason
+      ? decision.reason
+      : null;
+  }
+  const octokit = await getRepositoryOctokit(finding.organizationId, {
+    owner: ref.owner,
+    name: ref.repo,
+  });
+  const { data: pull } = await octokit.request(
+    "GET /repos/{owner}/{repo}/pulls/{pull_number}",
+    { owner: ref.owner, repo: ref.repo, pull_number: ref.pullNumber }
+  );
+  if (pull.state !== "open" || pull.merged) {
+    return null;
+  }
+  const reason = await holdReasonFor({
+    organizationId: finding.organizationId,
+    group,
+    finding,
+    body: pull.body ?? "",
+    paths: await listPullRequestFiles(octokit, ref),
+    roots: finding.evidence.publishRoots ?? [],
+  });
+  if (reason) {
+    return reason === params.reason ? null : reason;
+  }
+  await markContentPullRequestReady(octokit, {
+    draft: Boolean(pull.draft),
+    nodeId: pull.node_id,
+  });
+  return { ready: true };
+}
+
+/**
+ * Schedules held pull requests again once what held them cleared: the first
+ * post of the group got merged, the feature shipped, checks went green or
+ * approvals went back to auto. Holds a person caused stay.
+ */
+export async function resumeClearedHolds(params: {
+  organizationId: string;
+  approvals: AutopilotApprovals;
+  timezone: string;
+  now?: Date;
+  target?: { siteId: string | null; repositoryBranch: string | null } | null;
+}) {
+  const now = params.now ?? new Date();
+  const reasons = [
+    ...AUTOPILOT_RESUMABLE_BEFORE_READY,
+    ...AUTOPILOT_RESUMABLE_AFTER_READY,
+  ];
+  const held = await db.query.autopilotFindings.findMany({
+    where: and(
+      eq(autopilotFindings.organizationId, params.organizationId),
+      eq(autopilotFindings.status, "proposed"),
+      isNull(autopilotFindings.publishAt),
+      inArray(autopilotFindings.publishHoldReason, reasons)
+    ),
+    orderBy: [
+      sql`${autopilotFindings.evidence}->>'holdCheckedAt' asc nulls first`,
+    ],
+    limit: AUTOPILOT_RESUME_BATCH,
+  });
+  const outcomes = { resumed: 0, held: 0 };
+  const baseBranch =
+    held.length > 0 && params.target
+      ? await autopilotBaseBranch(params.organizationId, params.target)
+      : null;
+  for (const finding of held) {
+    const reason = finding.publishHoldReason ?? "";
+    const group = heldApprovalGroup(finding);
+    await db
+      .update(autopilotFindings)
+      .set({
+        evidence: sql`jsonb_set(${autopilotFindings.evidence}, '{holdCheckedAt}', to_jsonb(${now.toISOString()}::text))`,
+      })
+      .where(eq(autopilotFindings.id, finding.id));
+    if (!(group && params.approvals[group] === "auto")) {
+      outcomes.held += 1;
+      continue;
+    }
+    let cleared: Awaited<ReturnType<typeof clearedHold>>;
+    try {
+      cleared = await clearedHold({
+        finding,
+        group,
+        reason,
+        now,
+        baseBranch,
+      });
+    } catch (error) {
+      logError("[Autopilot] Could not check a held pull request", error, {
+        organizationId: finding.organizationId,
+        findingId: finding.id,
+      });
+      outcomes.held += 1;
+      continue;
+    }
+    if (typeof cleared === "string") {
+      // Cleared, but something else holds it now: show that reason instead.
+      await db
+        .update(autopilotFindings)
+        .set({ publishHoldReason: cleared })
+        .where(
+          and(
+            eq(autopilotFindings.id, finding.id),
+            eq(autopilotFindings.status, "proposed"),
+            isNull(autopilotFindings.publishAt),
+            eq(autopilotFindings.publishHoldReason, reason)
+          )
+        );
+      outcomes.held += 1;
+      continue;
+    }
+    if (!cleared) {
+      outcomes.held += 1;
+      continue;
+    }
+    const publishAt = nextAutopilotPublishAt(now, params.timezone);
+    const resumed = await db
+      .update(autopilotFindings)
+      .set({
+        publishAt,
+        publishHoldReason: null,
+        evidence: sql`jsonb_set(${autopilotFindings.evidence}, '{publishGroup}', to_jsonb(${group}::text))`,
+      })
+      .where(
+        and(
+          eq(autopilotFindings.id, finding.id),
+          eq(autopilotFindings.status, "proposed"),
+          isNull(autopilotFindings.publishAt),
+          eq(autopilotFindings.publishHoldReason, reason)
+        )
+      )
+      .returning({ id: autopilotFindings.id });
+    if (resumed.length === 0) {
+      continue;
+    }
+    outcomes.resumed += 1;
+    if (finding.runId) {
+      await createAutopilotLogger(
+        { organizationId: finding.organizationId, runId: finding.runId },
+        finding.kind
+      ).action(
+        `No longer waits (${reason.toLowerCase()}): publishes ${formatAutopilotPublishAt(publishAt, params.timezone)} unless someone steps in`,
+        { url: finding.pullRequestUrl, publishAt: publishAt.toISOString() }
+      );
+    }
+  }
+  return outcomes;
+}
+
 export async function holdFinding(organizationId: string, findingId: string) {
   const finding = await db.query.autopilotFindings.findFirst({
     where: and(
@@ -550,5 +763,36 @@ export async function cancelHoldsForPullRequestEvent(
   });
   for (const finding of held) {
     await recordHoldCancel(finding, reason);
+  }
+  // A held draft is not scheduled yet, but a person acting on it must still
+  // keep the hourly resume from undoing what they did.
+  const resumable = await db
+    .update(autopilotFindings)
+    .set({ publishHoldReason: reason })
+    .where(
+      and(
+        sql`lower(${autopilotFindings.repository}) = ${event.repository.full_name.toLowerCase()}`,
+        eq(autopilotFindings.pullRequestNumber, event.pull_request.number),
+        eq(autopilotFindings.status, "proposed"),
+        isNull(autopilotFindings.publishAt),
+        inArray(autopilotFindings.publishHoldReason, [
+          ...AUTOPILOT_RESUMABLE_BEFORE_READY,
+          ...AUTOPILOT_RESUMABLE_AFTER_READY,
+        ])
+      )
+    )
+    .returning({
+      organizationId: autopilotFindings.organizationId,
+      runId: autopilotFindings.runId,
+      kind: autopilotFindings.kind,
+      pullRequestUrl: autopilotFindings.pullRequestUrl,
+    });
+  for (const finding of resumable) {
+    if (finding.runId) {
+      await createAutopilotLogger(
+        { organizationId: finding.organizationId, runId: finding.runId },
+        finding.kind
+      ).skip(`Waits for you: ${reason}`, { url: finding.pullRequestUrl });
+    }
   }
 }

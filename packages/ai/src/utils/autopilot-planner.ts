@@ -462,6 +462,26 @@ export function applyPlannerOutput(params: {
 }
 
 /**
+ * Automatic pull requests a workspace may get per window, from what people
+ * did with the earlier ones: merged posts earn more, closed ones cost.
+ */
+export function autonomousPullRequestBudget(trackRecord: {
+  merged: number;
+  closed: number;
+}) {
+  const budget = AUTOPILOT_AUTONOMOUS_PR_BUDGET;
+  const net = trackRecord.merged - trackRecord.closed;
+  // Closing posts is a signal once people closed clearly more than they merged.
+  if (net <= -budget.closedMoreToShrink) {
+    return budget.min;
+  }
+  return Math.min(
+    budget.max,
+    budget.base + Math.floor(Math.max(0, net) / budget.earnedPerMerges)
+  );
+}
+
+/**
  * Whether Autopilot may open a pull request on its own. Every check must
  * pass; when only capacity or an unavailable Jev blocks it, the action is
  * kept as an idea.
@@ -474,6 +494,8 @@ export function evaluateAutopilotGate(params: {
   /** A draft, a write or an idea already exists for this topic. */
   activeWork: boolean;
   autonomousPullRequestsInWindow: number;
+  /** What autonomousPullRequestBudget gives this workspace. */
+  autonomousPullRequestBudget: number;
   draftSlotsFree: boolean;
   /**
    * The workspace tracks AI answers or searches, so a topic nobody asks about
@@ -548,8 +570,8 @@ export function evaluateAutopilotGate(params: {
       name: "budget",
       ok:
         params.autonomousPullRequestsInWindow <
-        AUTOPILOT_AUTONOMOUS_PR_BUDGET.count,
-      detail: `${params.autonomousPullRequestsInWindow} of ${AUTOPILOT_AUTONOMOUS_PR_BUDGET.count} automatic pull requests in the last ${AUTOPILOT_AUTONOMOUS_PR_BUDGET.days} days`,
+        params.autonomousPullRequestBudget,
+      detail: `${params.autonomousPullRequestsInWindow} of ${params.autonomousPullRequestBudget} automatic pull requests in the last ${AUTOPILOT_AUTONOMOUS_PR_BUDGET.days} days`,
     },
     {
       name: "draft_limit",

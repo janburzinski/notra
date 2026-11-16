@@ -11,6 +11,7 @@ import {
   AUTOPILOT_PUBLISH_HOUR,
   AUTOPILOT_PUBLISH_MIN_HOLD_MS,
   AUTOPILOT_PUBLISH_WAIT_LIMIT_MS,
+  AUTOPILOT_SAFE_FIX_FILES,
   AUTOPILOT_WEEKEND_DAYS,
 } from "@/constants/autopilot-publish";
 import type {
@@ -117,7 +118,10 @@ export function touchesPathsOutside(
     .filter(Boolean);
   return paths.some(
     (path) =>
-      !roots.some((root) => path === root || path.startsWith(`${root}/`))
+      !(
+        roots.some((root) => path === root || path.startsWith(`${root}/`)) ||
+        AUTOPILOT_SAFE_FIX_FILES.some((pattern) => pattern.test(path))
+      )
   );
 }
 

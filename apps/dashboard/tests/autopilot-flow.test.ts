@@ -1981,7 +1981,33 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
     ]);
   });
 
-  test("the autonomous budget turns a second ripe topic into an idea, and an explicit write still goes through", async () => {
+  test("a clean track record opens a second ripe topic in the same week", async () => {
+    await seedTopic("exports", "Exports", 40);
+    await dailyRun("planner-budget-open-1", [exportsPull]);
+    await seedTopic("imports", "Imports", 41);
+    await dailyRun("planner-budget-open-2", [exportsPull, importsPull], (ids) =>
+      plannerOutput(ids, { slug: "imports", title: "Imports" })
+    );
+    expect(opened).toHaveLength(2);
+  });
+
+  test("posts people closed shrink the budget: a second ripe topic becomes an idea, an explicit write still goes through", async () => {
+    await db.insert(autopilotFindings).values(
+      [1, 2].map((number) => ({
+        id: `closed-finding-${number}`,
+        organizationId: "sandbox-org",
+        kind: "keywords" as const,
+        fingerprint: `keywords:closed-${number}`,
+        title: `Closed post ${number}`,
+        summary: "Closed by a person",
+        status: "dismissed" as const,
+        pullRequestNumber: 900 + number,
+        dismissedAt: new Date(),
+        evidence: {
+          topic: { slug: `closed-${number}`, title: "Closed", signals: 2 },
+        },
+      }))
+    );
     await seedTopic("exports", "Exports", 40);
     await dailyRun("planner-budget-1", [exportsPull]);
     expect(opened).toHaveLength(1);

@@ -18,6 +18,28 @@ export const AUTOPILOT_DEFAULT_APPROVALS: AutopilotApprovals = {
   fixes: "ask",
 };
 
+/**
+ * A first setup publishes on its own: the first pull request of each group
+ * still waits for a person (AUTOPILOT_HOLD_REASONS.firstPost).
+ */
+export const AUTOPILOT_SETUP_APPROVALS: AutopilotApprovals = {
+  posts: "auto",
+  updates: "auto",
+  fixes: "auto",
+};
+
+/**
+ * Files only crawlers and AI agents read, which no build depends on: a fix
+ * that changes nothing else may publish like content.
+ */
+export const AUTOPILOT_SAFE_FIX_FILES = [
+  /(^|\/)(llms|llms-full|robots|ai)\.txt$/,
+  /(^|\/)sitemap\.xml$/,
+];
+
+/** Held pull requests checked per workspace each hour for a hold that cleared. */
+export const AUTOPILOT_RESUME_BATCH = 5;
+
 export const AUTOPILOT_APPROVAL_GROUP_BY_KIND: Partial<
   Record<AutopilotJobKind, AutopilotApprovalGroup>
 > = {
@@ -52,6 +74,7 @@ export const AUTOPILOT_FAILED_CHECK_CONCLUSIONS: ReadonlySet<string> = new Set([
 ]);
 
 export const AUTOPILOT_HOLD_PAGE_SIZE = 100;
+export const AUTOPILOT_PULL_REQUEST_FILE_PAGES = 3;
 
 export const AUTOPILOT_HOLD_REASONS = {
   firstPost: "The first post waits for you",
@@ -74,3 +97,24 @@ export const AUTOPILOT_HOLD_REASONS = {
   held: "Held from the dashboard",
   mergeFailed: "Could not merge",
 } as const;
+
+/** Holds checked again before the pull request is ready for review. */
+export const AUTOPILOT_RESUMABLE_BEFORE_READY: ReadonlySet<string> = new Set([
+  AUTOPILOT_HOLD_REASONS.firstPost,
+  AUTOPILOT_HOLD_REASONS.unshipped,
+]);
+
+/**
+ * Holds from the pull request or the settings that can clear without anyone
+ * touching it: checks re-run green, a conflict resolved by the base, approvals
+ * set back to auto. Holds a person caused (comments, pushes, a manual hold)
+ * stay until that person acts.
+ */
+export const AUTOPILOT_RESUMABLE_AFTER_READY: ReadonlySet<string> = new Set([
+  AUTOPILOT_HOLD_REASONS.checksFailed,
+  AUTOPILOT_HOLD_REASONS.checksStuck,
+  AUTOPILOT_HOLD_REASONS.conflict,
+  AUTOPILOT_HOLD_REASONS.mergeFailed,
+  AUTOPILOT_HOLD_REASONS.switchedToAsk,
+  AUTOPILOT_HOLD_REASONS.autopilotOff,
+]);

@@ -720,6 +720,32 @@ export async function countAutonomousProposals(
   return rows.length;
 }
 
+/**
+ * What people did with Autopilot's own posts since `since`: merged or closed
+ * without merging. Posts Notra merged itself, auto-closed stale drafts and
+ * requested posts don't count: only a person's merge earns budget.
+ */
+export async function countAutonomousTrackRecord(
+  organizationId: string,
+  since: Date
+) {
+  const [row] = await db
+    .select({
+      merged: sql<number>`count(*) filter (where ${autopilotFindings.status} = 'merged' and ${autopilotFindings.mergedAt} >= ${since.toISOString()}::timestamp and coalesce((${autopilotFindings.evidence}->>'autoPublished')::boolean, false) = false)::int`,
+      closed: sql<number>`count(*) filter (where ${autopilotFindings.status} = 'dismissed' and ${autopilotFindings.dismissedAt} >= ${since.toISOString()}::timestamp and ${autopilotFindings.pullRequestNumber} is not null)::int`,
+    })
+    .from(autopilotFindings)
+    .where(
+      and(
+        eq(autopilotFindings.organizationId, organizationId),
+        inArray(autopilotFindings.kind, ["keywords", "commits"]),
+        sql`${autopilotFindings.evidence} ? 'topic'`,
+        sql`coalesce((${autopilotFindings.evidence}->>'requested')::boolean, false) = false`
+      )
+    );
+  return { merged: row?.merged ?? 0, closed: row?.closed ?? 0 };
+}
+
 /** Posts and pages being written, waiting as ideas or open as drafts: the planner must not double them. */
 export function listActiveBlogFindings(organizationId: string) {
   return db

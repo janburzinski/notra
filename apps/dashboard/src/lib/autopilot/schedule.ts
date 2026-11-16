@@ -15,7 +15,10 @@ import { AUTOPILOT_DEFAULT_APPROVALS } from "@/constants/autopilot-publish";
 import { syncOfferReactionFeedback } from "@/lib/autopilot/findings";
 import { isAutopilotEnabledForOrganization } from "@/lib/autopilot/flag";
 import { purgeExpiredAutopilotTraceDetails } from "@/lib/autopilot/log";
-import { publishDueFindings } from "@/lib/autopilot/publish";
+import {
+  publishDueFindings,
+  resumeClearedHolds,
+} from "@/lib/autopilot/publish";
 import { startAutopilot } from "@/lib/autopilot/start";
 import type { AutopilotSchedule } from "@/types/autopilot-runtime";
 import {
@@ -89,6 +92,25 @@ export async function runDueAutopilots() {
         } catch (error) {
           failed += 1;
           logError("[Autopilot] Reaction feedback sync failed", error, {
+            organizationId: row.organizationId,
+          });
+        }
+      }
+      if (now.getUTCMinutes() < AUTOPILOT_CRON_INTERVAL_MINUTES) {
+        try {
+          await resumeClearedHolds({
+            organizationId: row.organizationId,
+            approvals: { ...AUTOPILOT_DEFAULT_APPROVALS, ...row.approvals },
+            timezone: row.timezone,
+            now,
+            target: {
+              siteId: row.siteId,
+              repositoryBranch: row.repositoryBranch,
+            },
+          });
+        } catch (error) {
+          failed += 1;
+          logError("[Autopilot] Resuming held pull requests failed", error, {
             organizationId: row.organizationId,
           });
         }

@@ -130,14 +130,20 @@ if (process.env.NOTRA_AUTOPILOT_SANDBOX_TEST !== "1") {
       mergedAt: Date | null;
     } | null;
     onMerge: (() => Promise<void>) | null;
-  } = { state: null, onMerge: null };
+    respond:
+      | ((route: string, params: Record<string, unknown>) => unknown)
+      | null;
+  } = { state: null, onMerge: null, respond: null };
   mock.module("@/lib/autopilot/github", () => ({
     AutopilotRepositoryAccessError: class extends Error {},
     getRepositoryOctokit: async () => {
       if (!github.state) {
         throw new Error("Network is forbidden in the sandbox");
       }
-      return { request: async () => undefined };
+      return {
+        request: async (route: string, params: Record<string, unknown>) =>
+          github.respond ? { data: github.respond(route, params) } : undefined,
+      };
     },
     listRepositoryPaths: notRun,
     repositoryPathExists: notRun,
@@ -178,6 +184,7 @@ if (process.env.NOTRA_AUTOPILOT_SANDBOX_TEST !== "1") {
     cancelHoldsForPullRequestEvent,
     holdFinding,
     publishDueFindings,
+    resumeClearedHolds,
   } = await import("../src/lib/autopilot/publish");
   const {
     renewAutopilotFindingLease,
@@ -230,6 +237,8 @@ if (process.env.NOTRA_AUTOPILOT_SANDBOX_TEST !== "1") {
   beforeEach(async () => {
     startup.finishBeforeError = false;
     startup.flag = true;
+    github.state = null;
+    github.respond = null;
     await sandbox.postgres.exec(
       'TRUNCATE "autopilot_runs" CASCADE; TRUNCATE "autopilot_settings" CASCADE;'
     );
@@ -406,6 +415,184 @@ if (process.env.NOTRA_AUTOPILOT_SANDBOX_TEST !== "1") {
         now
       )
     ).toEqual({ published: 0, waiting: 0, cancelled: 0 });
+  });
+
+  const waitingFinding = async (reason: string) => {
+    const id = await heldFinding(new Date());
+    const row = await readFinding(id);
+    await db
+      .update(autopilotFindings)
+      .set({
+        publishAt: null,
+        publishHoldReason: reason,
+        evidence: {
+          ...row.evidence,
+          publishGroup: "posts",
+          publishRoots: ["blog"],
+        },
+      })
+      .where(eq(autopilotFindings.id, id));
+    return id;
+  };
+
+  const mergedPost = async () => {
+    const claim = await claimFinding("sandbox-org", "item-run", {
+      ...proposal,
+      fingerprint: "commits:sandbox/app#2",
+    });
+    if (!claim) {
+      throw new Error("Expected a claim");
+    }
+    await db
+      .update(autopilotFindings)
+      .set({ status: "merged", mergedAt: now })
+      .where(eq(autopilotFindings.id, claim.finding.id));
+  };
+
+  const openPullRequest = (files: string[]) => {
+    github.state = { status: "open", mergedAt: null };
+    github.respond = (route, params) => {
+      if (route.endsWith("/files")) {
+        return files.map((filename) => ({ filename }));
+      }
+      if (params.pull_number === 1) {
+        return { merged_at: now.toISOString() };
+      }
+      return {
+        state: "open",
+        merged: false,
+        draft: true,
+        body: "A post",
+        node_id: "PR_7",
+      };
+    };
+  };
+
+  const autoPosts = { posts: "auto", updates: "ask", fixes: "ask" } as const;
+
+  test("a post waiting for the first merge publishes once a person merged one", async () => {
+    const id = await waitingFinding("The first post waits for you");
+    openPullRequest(["blog/exports.mdx"]);
+    expect(
+      await resumeClearedHolds({
+        organizationId: "sandbox-org",
+        approvals: autoPosts,
+        timezone: "Europe/Berlin",
+        now,
+      })
+    ).toEqual({ resumed: 0, held: 1 });
+    const waiting = await readFinding(id);
+    expect(waiting.publishAt).toBeNull();
+    expect(waiting.evidence.holdCheckedAt).toBe(now.toISOString());
+
+    await mergedPost();
+    expect(
+      await resumeClearedHolds({
+        organizationId: "sandbox-org",
+        approvals: autoPosts,
+        timezone: "Europe/Berlin",
+        now,
+      })
+    ).toEqual({ resumed: 1, held: 0 });
+    const resumed = await readFinding(id);
+    expect(resumed.publishHoldReason).toBeNull();
+    expect(resumed.publishAt?.getTime()).toBeGreaterThan(
+      now.getTime() + 23 * 60 * 60 * 1000
+    );
+  });
+
+  test("a cleared hold shows the next reason instead of publishing", async () => {
+    const id = await waitingFinding("The first post waits for you");
+    await mergedPost();
+    openPullRequest(["blog/exports.mdx", "app/layout.tsx"]);
+    await resumeClearedHolds({
+      organizationId: "sandbox-org",
+      approvals: autoPosts,
+      timezone: "Europe/Berlin",
+      now,
+    });
+    const row = await readFinding(id);
+    expect(row.publishAt).toBeNull();
+    expect(row.publishHoldReason).toBe(
+      "Changes files outside the content folder"
+    );
+    // Not a hold that clears by itself, so it is never checked again.
+    github.respond = () => {
+      throw new Error("Checked a hold that only a person can clear");
+    };
+    expect(
+      await resumeClearedHolds({
+        organizationId: "sandbox-org",
+        approvals: autoPosts,
+        timezone: "Europe/Berlin",
+        now,
+      })
+    ).toEqual({ resumed: 0, held: 0 });
+  });
+
+  test("holds people caused stay, and nothing resumes while approvals ask", async () => {
+    const commented = await waitingFinding("Someone commented");
+    await mergedPost();
+    openPullRequest(["blog/exports.mdx"]);
+    expect(
+      await resumeClearedHolds({
+        organizationId: "sandbox-org",
+        approvals: autoPosts,
+        timezone: "Europe/Berlin",
+        now,
+      })
+    ).toEqual({ resumed: 0, held: 0 });
+    expect((await readFinding(commented)).publishHoldReason).toBe(
+      "Someone commented"
+    );
+    await db
+      .update(autopilotFindings)
+      .set({ publishHoldReason: "The first post waits for you" })
+      .where(eq(autopilotFindings.id, commented));
+    expect(
+      await resumeClearedHolds({
+        organizationId: "sandbox-org",
+        approvals: { posts: "ask", updates: "ask", fixes: "ask" },
+        timezone: "Europe/Berlin",
+        now,
+      })
+    ).toEqual({ resumed: 0, held: 1 });
+    expect((await readFinding(commented)).publishAt).toBeNull();
+  });
+
+  test("a person turning a held draft back into a draft keeps it from resuming", async () => {
+    const id = await waitingFinding("The first post waits for you");
+    await mergedPost();
+    openPullRequest(["blog/exports.mdx"]);
+    await cancelHoldsForPullRequestEvent({
+      action: "converted_to_draft",
+      installation: { id: 1 },
+      repository: {
+        id: 1,
+        name: "site",
+        full_name: "sandbox/site",
+        owner: { login: "sandbox" },
+      },
+      sender: { type: "User" },
+      pull_request: {
+        number: 7,
+        title: "Blog: Exports",
+        html_url: "https://github.com/Sandbox/Site/pull/7",
+        head: { ref: "notra/autopilot/sandbox" },
+      },
+    });
+    expect((await readFinding(id)).publishHoldReason).toBe(
+      "Converted to draft"
+    );
+    expect(
+      await resumeClearedHolds({
+        organizationId: "sandbox-org",
+        approvals: autoPosts,
+        timezone: "Europe/Berlin",
+        now,
+      })
+    ).toEqual({ resumed: 0, held: 0 });
+    expect((await readFinding(id)).publishAt).toBeNull();
   });
 
   test("pushes by people and the Hold button cancel the hold, bot pushes do not", async () => {

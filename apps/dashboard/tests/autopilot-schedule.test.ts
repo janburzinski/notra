@@ -53,8 +53,10 @@ if (process.env.NOTRA_SCHEDULE_TEST !== "1") {
     waiting: 0,
     cancelled: 0,
   }));
+  const resume = mock(async () => ({ resumed: 0, held: 0 }));
   mock.module("@/lib/autopilot/publish", () => ({
     publishDueFindings: publish,
+    resumeClearedHolds: resume,
   }));
   const { runDueAutopilots } = await import("../src/lib/autopilot/schedule");
 
@@ -70,6 +72,7 @@ if (process.env.NOTRA_SCHEDULE_TEST !== "1") {
       setSystemTime();
     }
     expect(start).toHaveBeenCalledWith("org-a", "cron");
+    expect(resume).toHaveBeenCalledTimes(1);
     expect(publish).toHaveBeenCalledWith(
       "org-a",
       { posts: "ask", updates: "ask", fixes: "ask" },
