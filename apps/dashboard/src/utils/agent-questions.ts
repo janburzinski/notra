@@ -7,7 +7,10 @@ import type {
   AgentQuestionAnswer,
   PendingAgentQuestion,
 } from "@/types/agent-questions";
-import { isTerminalToolState } from "@/utils/chat-approvals";
+import {
+  isTerminalToolState,
+  shouldContinueAfterApprovalResponse,
+} from "@/utils/chat-approvals";
 
 export function isAgentQuestionPart(part: AgentMessagePart): boolean {
   return isToolUIPart(part) && getToolName(part) === AGENT_QUESTION_TOOL_NAME;
@@ -114,6 +117,60 @@ export function findSettledAgentQuestion(messages: readonly UIMessage[]) {
       (part.state === "output-available" || part.state === "output-error")
   );
   return settled?.toolCallId ?? null;
+}
+
+/**
+ * The agent's turn still owes a send: an answered question or an approved
+ * tool. Retrying sends that, not the user's last message again.
+ */
+function isAgentTurnContinuation(messages: UIMessage[]): boolean {
+  return (
+    findSettledAgentQuestion(messages) !== null ||
+    shouldContinueAfterApprovalResponse({ messages })
+  );
+}
+
+/**
+ * What Retry sends again after a failed request in the agent's turn: the
+ * messages as they are when the send after an answer or an approval failed,
+ * or, when the reply after an answer failed partway, the turn without its
+ * failed step, so the answer and the finished steps stay. Null means the
+ * user's last message goes out again.
+ */
+export function findAgentTurnToRetry<T extends UIMessage>(
+  messages: T[]
+): T[] | null {
+  if (isAgentTurnContinuation(messages)) {
+    return messages;
+  }
+  const last = messages.at(-1);
+  if (
+    last?.role !== "assistant" ||
+    !last.parts.some(
+      (part) =>
+        isAgentQuestionPart(part) &&
+        isToolUIPart(part) &&
+        (part.state === "output-available" || part.state === "output-error")
+    )
+  ) {
+    return null;
+  }
+  const failedStepStart = last.parts.findLastIndex(
+    (part) => part.type === "step-start"
+  );
+  if (failedStepStart <= 0) {
+    return null;
+  }
+  const parts = last.parts.slice(0, failedStepStart);
+  const stepStart = parts.findLastIndex((part) => part.type === "step-start");
+  const stepTools = parts.slice(stepStart + 1).filter(isToolUIPart);
+  if (
+    stepTools.length === 0 ||
+    !stepTools.every((part) => isTerminalToolState(part.state))
+  ) {
+    return null;
+  }
+  return [...messages.slice(0, -1), { ...last, parts }];
 }
 
 /** The answers as the model reads them, one quoted pair per question. */

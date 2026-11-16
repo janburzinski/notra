@@ -59,7 +59,9 @@ import {
 } from "react";
 import { useLocale, useTranslations } from "use-intl";
 
+import { AgentQuestionDock } from "@/components/ai/agent-question-dock";
 import { ChatDraftStreamingPreview } from "@/components/ai/chat-draft-streaming-preview";
+import { autopilotWorkflowDraftTools } from "@/components/autopilot/autopilot-workflow-draft-tools";
 import { Button } from "@/components/button";
 import { ChatContentPanel } from "@/components/chat/chat-content-panel";
 import { ChatConversation } from "@/components/chat/chat-conversation";
@@ -78,7 +80,14 @@ import {
 import { HeaderActionsPortal } from "@/components/dashboard/header-actions-portal";
 import { useRightPanel } from "@/components/dashboard/right-panel-context";
 import { useOrganizationsContext } from "@/components/providers/organization-provider";
+import {
+  AGENT_QUESTION_DISMISSED,
+  AGENT_QUESTION_INPUT_RETURN_CLASS,
+  AGENT_QUESTION_TOOL_NAME,
+} from "@/constants/agent-questions";
+import { AUTOPILOT_AGENT_CONTINUES_AFTER_DENIAL } from "@/constants/autopilot-workflows";
 import { CHAT_ACTIVE_STREAM_POLL_INTERVAL_MS } from "@/constants/chat-active-stream";
+import { CHAT_PAGE_CARD_TOOL_NAMES } from "@/constants/chat-custom-tools";
 import { MAX_VISIBLE_CHAT_IMAGES } from "@/constants/chat-images";
 import {
   CHAT_CREATE_TOOL_NAMES,
@@ -114,15 +123,13 @@ import { usePathname, useRouter } from "@/lib/navigation";
 import { dashboardOrpcClient } from "@/lib/orpc/client";
 import { dashboardOrpc } from "@/lib/orpc/query";
 import { cn } from "@/lib/utils";
+import type { AgentQuestionAnswer } from "@/types/agent-questions";
 import type {
   ChatDraftAction,
   ChatToolApprovalDecision,
 } from "@/types/analytics/studio-events";
 import type { ChatMessageAuthor } from "@/types/chat";
-import type {
-  ChatCustomTools,
-  ChatToolPart,
-} from "@/types/components/chat-conversation";
+import type { ChatToolPart } from "@/types/components/chat-conversation";
 import type { ChatComposerHandle } from "@/types/components/chat-input";
 import type {
   ChatTurnEvent,
@@ -131,6 +138,12 @@ import type {
   UserImageGridProps,
 } from "@/types/components/chat-page";
 import type { PublishedSocialPost } from "@/types/content/post-social";
+import {
+  findPendingAgentQuestion,
+  findSettledAgentQuestion,
+  findAgentTurnToRetry,
+} from "@/utils/agent-questions";
+import { findAutopilotWorkflowDraft } from "@/utils/autopilot-workflow-draft";
 import { resolveOrganizationLogo } from "@/utils/avatar";
 import { hasVisibleChatContent } from "@/utils/chat-activity";
 import {
@@ -138,6 +151,7 @@ import {
   restoreChatReferences,
 } from "@/utils/chat-annotations";
 import {
+  findContinuableDenial,
   hasPendingApproval,
   isTerminalToolState,
   shouldContinueAfterApprovalResponse,
@@ -147,6 +161,7 @@ import {
   getChatArtifacts,
   getLatestArtifactWrite,
 } from "@/utils/chat-artifact";
+import { mergeChatCustomTools } from "@/utils/chat-custom-tools";
 import { handleStandaloneChatError } from "@/utils/chat-error";
 import { chatHistoryQueryOptions } from "@/utils/chat-history-query";
 import {
@@ -654,6 +669,27 @@ function StandaloneChatPageClient({
     () => {}
   );
 
+  // Questions the user settled that still owe the agent a resend; each goes
+  // back once, so a double press or a stale state can't send twice.
+  const unsentAnswersRef = useRef(new Set<string>());
+  // Workflow saves the user discarded with the button go back to the agent,
+  // so it asks what to change instead of leaving the user to start over.
+  const discardedApprovalsRef = useRef(new Set<string>());
+  /** Whether the turn ended on a Discard press that still owes the agent a send. */
+  const isPressedDiscard = (current: ChatUIMessage[], claim: boolean) => {
+    const approvalId = findContinuableDenial(
+      current,
+      AUTOPILOT_AGENT_CONTINUES_AFTER_DENIAL
+    );
+    if (!(approvalId && discardedApprovalsRef.current.has(approvalId))) {
+      return false;
+    }
+    if (claim) {
+      discardedApprovalsRef.current.delete(approvalId);
+    }
+    return true;
+  };
+
   const handleFinish = useCallback<ChatOnFinishCallback<ChatUIMessage>>(
     ({
       message,
@@ -735,6 +771,7 @@ function StandaloneChatPageClient({
     setMessages,
     sendMessage,
     addToolApprovalResponse,
+    addToolOutput,
     status,
     stop,
   } = useChat<ChatUIMessage>({
@@ -745,9 +782,19 @@ function StandaloneChatPageClient({
     ),
     experimental_throttle: 90,
     transport,
-    sendAutomaticallyWhen: shouldContinueAfterApprovalResponse,
+    sendAutomaticallyWhen: ({ messages: current }) => {
+      if (
+        shouldContinueAfterApprovalResponse({ messages: current }) ||
+        isPressedDiscard(current, true)
+      ) {
+        return true;
+      }
+      const answered = findSettledAgentQuestion(current);
+      return answered !== null && unsentAnswersRef.current.delete(answered);
+    },
     onFinish: handleFinish,
     onError: (err) => {
+      unsentAnswersRef.current.clear();
       if (steerAfterStopRef.current) {
         return;
       }
@@ -1628,6 +1675,45 @@ function StandaloneChatPageClient({
     [messageBranches, setMessages, stableChatId]
   );
 
+  const settleQuestion = useCallback(
+    (
+      toolCallId: string,
+      result:
+        | { output: { answers: AgentQuestionAnswer[] } }
+        | { state: "output-error"; errorText: string }
+    ) => {
+      if (unsentAnswersRef.current.has(toolCallId)) {
+        return;
+      }
+      unsentAnswersRef.current.add(toolCallId);
+      setChatError(null);
+      updateWasStoppedByUser(false, wasStoppedByUserRef, setWasStoppedByUser);
+      Promise.resolve(
+        addToolOutput({ tool: AGENT_QUESTION_TOOL_NAME, toolCallId, ...result })
+      ).catch((error: unknown) => {
+        unsentAnswersRef.current.delete(toolCallId);
+        console.error("[Chat] Failed to answer the agent's question:", error);
+      });
+    },
+    [addToolOutput]
+  );
+
+  const answerQuestion = useCallback(
+    (toolCallId: string, answers: AgentQuestionAnswer[]) =>
+      settleQuestion(toolCallId, { output: { answers } }),
+    [settleQuestion]
+  );
+
+  /** The agent hears that the user skipped its questions, and carries on. */
+  const dismissQuestion = useCallback(
+    (toolCallId: string) =>
+      settleQuestion(toolCallId, {
+        state: "output-error",
+        errorText: AGENT_QUESTION_DISMISSED,
+      }),
+    [settleQuestion]
+  );
+
   const dispatchMessage = useCallback(
     async (text: string, attachments: ChatAttachment[] = []) => {
       if (isSlackMirrored || isProjectScopePending) {
@@ -1635,6 +1721,18 @@ function StandaloneChatPageClient({
       }
 
       if (text.trim().length === 0 && attachments.length === 0) {
+        return;
+      }
+
+      // A message sent while the agent waits on questions answers the first.
+      const pendingQuestion = findPendingAgentQuestion(messagesRef.current);
+      if (pendingQuestion && attachments.length === 0) {
+        answerQuestion(
+          pendingQuestion.toolCallId,
+          pendingQuestion.questions.map((_, index) =>
+            index === 0 ? [text] : []
+          )
+        );
         return;
       }
 
@@ -1690,6 +1788,7 @@ function StandaloneChatPageClient({
     },
     [
       addToolApprovalResponse,
+      answerQuestion,
       authorMetadata,
       dispatchTurn,
       initialChatId,
@@ -1963,7 +2062,16 @@ function StandaloneChatPageClient({
       if (steerAfterStopRef.current) {
         return;
       }
-      if (hasPendingApproval(messagesRef.current)) {
+      const current = messagesRef.current;
+      if (
+        hasPendingApproval(current) ||
+        // A queued message would answer the agent's open questions for the user.
+        findPendingAgentQuestion(current) !== null ||
+        // The SDK resends on its own after an answer or a discard; draining
+        // now would double-submit.
+        unsentAnswersRef.current.size > 0 ||
+        isPressedDiscard(current, false)
+      ) {
         return;
       }
       const queue = queuedMessagesRef.current;
@@ -2208,6 +2316,17 @@ function StandaloneChatPageClient({
   const handleClearError = useCallback(() => setChatError(null), []);
 
   const handleRetryAfterError = useCallback(async () => {
+    // A failed send after an answer or an approval goes out again from the
+    // agent's turn, so the answer stays in the conversation.
+    const continuation = findAgentTurnToRetry(messagesRef.current);
+    if (continuation) {
+      setChatError(null);
+      if (continuation !== messagesRef.current) {
+        setMessages(continuation);
+      }
+      await sendMessage();
+      return;
+    }
     let lastUserMessage: ChatUIMessage | undefined;
     for (const message of messagesRef.current) {
       if (message.role === "user") {
@@ -2219,7 +2338,7 @@ function StandaloneChatPageClient({
     }
     setChatError(null);
     await handleRetryMessage(lastUserMessage.id);
-  }, [handleRetryMessage]);
+  }, [handleRetryMessage, sendMessage, setMessages]);
 
   const trackToolApproval = (
     part: ChatToolPart,
@@ -2239,16 +2358,18 @@ function StandaloneChatPageClient({
   };
   const handleDenyTool = (approvalId: string, part: ChatToolPart) => {
     trackToolApproval(part, "denied");
-    return isSlackMirrored
-      ? relayApproval(approvalId, false)
-      : addToolApprovalResponse({ id: approvalId, approved: false });
+    if (isSlackMirrored) {
+      return relayApproval(approvalId, false);
+    }
+    discardedApprovalsRef.current.add(approvalId);
+    return addToolApprovalResponse({ id: approvalId, approved: false });
   };
 
   const { approval: composerApproval, isApprovalInComposer } =
     useChatToolApprovals({
       chatId: stableChatId,
       messages,
-      ownCardToolNames: CHAT_CREATE_TOOL_NAMES,
+      ownCardToolNames: CHAT_PAGE_CARD_TOOL_NAMES,
       onApprove: handleApproveTool,
       onDeny: handleDenyTool,
     });
@@ -2555,11 +2676,20 @@ function StandaloneChatPageClient({
     );
   }
 
-  const createTools: ChatCustomTools = {
-    names: CHAT_CREATE_TOOL_NAMES,
-    render: (part, { isActive, hasInlineActivity }) =>
-      renderCreateTool(part, isActive, hasInlineActivity),
-  };
+  const customTools = mergeChatCustomTools(
+    {
+      names: CHAT_CREATE_TOOL_NAMES,
+      render: (part, { isActive, hasInlineActivity }) =>
+        renderCreateTool(part, isActive, hasInlineActivity),
+    },
+    autopilotWorkflowDraftTools({
+      latestToolCallId:
+        findAutopilotWorkflowDraft(messages)?.toolCallId ?? null,
+    })
+  );
+  const pendingQuestion = isSlackMirrored
+    ? null
+    : findPendingAgentQuestion(messages);
 
   if (isLoadingHistory) {
     return <ChatPageSkeleton />;
@@ -2676,7 +2806,7 @@ function StandaloneChatPageClient({
           ) : null}
           <ChatConversation
             activeChatId={stableChatId}
-            customTools={createTools}
+            customTools={customTools}
             getMessageClassName={(_message, index) =>
               branchPointIndex !== -1 &&
               index > branchPointIndex &&
@@ -2847,34 +2977,51 @@ function StandaloneChatPageClient({
                   />
                 </div>
               )}
+              {pendingQuestion ? (
+                <AgentQuestionDock
+                  key={pendingQuestion.toolCallId}
+                  onDismiss={() => dismissQuestion(pendingQuestion.toolCallId)}
+                  onSubmit={(answers) =>
+                    answerQuestion(pendingQuestion.toolCallId, answers)
+                  }
+                  questions={pendingQuestion.questions}
+                />
+              ) : null}
               {isProjectScopePending ? (
                 <ProjectScopeLoadingInput />
               ) : (
-                <ChatInput
-                  approval={composerApproval}
-                  dropZone="document"
-                  authorsById={messageAuthorsById}
-                  context={context}
-                  draftStorageKey={draftStorageKey}
-                  error={null}
-                  initialValue={initialQuery ?? undefined}
-                  postMentions={postMentions}
-                  isLoading={isLoading}
-                  isStopping={isStopping}
-                  onAddContext={handleAddContext}
-                  onClearError={handleClearError}
-                  onEditQueued={handleEditQueued}
-                  onRemoveContext={handleRemoveContext}
-                  onRemoveQueued={handleRemoveQueued}
-                  onSend={handleSend}
-                  onSteerQueued={handleSteerQueued}
-                  onStop={handleStop}
-                  organizationId={organizationId}
-                  organizationSlug={organizationSlug}
-                  queuedMessages={queuedMessages}
-                  ref={chatInputRef}
-                  showAuthorAvatars={showMessageAuthorAvatars}
-                />
+                // Stays mounted under the questions, so its draft survives.
+                <div
+                  className={AGENT_QUESTION_INPUT_RETURN_CLASS}
+                  hidden={pendingQuestion !== null}
+                >
+                  <ChatInput
+                    approval={composerApproval}
+                    // Hidden under the questions, it takes no files dropped on the page.
+                    dropZone={pendingQuestion ? "element" : "document"}
+                    authorsById={messageAuthorsById}
+                    context={context}
+                    draftStorageKey={draftStorageKey}
+                    error={null}
+                    initialValue={initialQuery ?? undefined}
+                    postMentions={postMentions}
+                    isLoading={isLoading}
+                    isStopping={isStopping}
+                    onAddContext={handleAddContext}
+                    onClearError={handleClearError}
+                    onEditQueued={handleEditQueued}
+                    onRemoveContext={handleRemoveContext}
+                    onRemoveQueued={handleRemoveQueued}
+                    onSend={handleSend}
+                    onSteerQueued={handleSteerQueued}
+                    onStop={handleStop}
+                    organizationId={organizationId}
+                    organizationSlug={organizationSlug}
+                    queuedMessages={queuedMessages}
+                    ref={chatInputRef}
+                    showAuthorAvatars={showMessageAuthorAvatars}
+                  />
+                </div>
               )}
             </div>
           </div>

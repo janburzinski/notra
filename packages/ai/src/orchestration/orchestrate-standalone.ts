@@ -77,7 +77,6 @@ export async function orchestrateStandaloneChat(
     telemetryMetadata,
     useMarkup,
     projectId,
-    surface = "chat",
   } = input;
 
   const log = deps?.log ?? inputLog;
@@ -166,10 +165,6 @@ export async function orchestrateStandaloneChat(
               : undefined,
         });
 
-  const toolingDescription =
-    surface === "dashboard-agent"
-      ? `${NOTRA_TOOLING_DESCRIPTION} This is the GEO dashboard: call the GEO chart tools directly for AI Traffic, visibility, trend, engine, and competitor questions, and use code_mode for prompt-level results and project context.`
-      : NOTRA_TOOLING_DESCRIPTION;
   // Naming the direct tools stops the model from first trying them inside
   // code_mode, which fails with "Unknown tool" and costs a full extra step.
   const codeModeOnlyToolNames = new Set<string>(
@@ -181,7 +176,7 @@ export async function orchestrateStandaloneChat(
   );
   const directToolsDescription = `Call these tools directly; they are not available inside code_mode: ${directToolNames.join(", ")}.`;
   const descriptions = [
-    toolingDescription,
+    NOTRA_TOOLING_DESCRIPTION,
     directToolsDescription,
     ...(deps?.extraTools?.descriptions ?? []),
     ...(lazyMcpRuntime?.descriptions ?? []),

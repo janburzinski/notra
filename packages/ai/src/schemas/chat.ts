@@ -131,8 +131,6 @@ export const uiMessageSchema = z.object({
   metadata: z.looseObject({}).optional(),
 }) as unknown as z.ZodType<UIMessage>;
 
-export const chatSurfaceSchema = z.enum(["chat", "dashboard-agent"]);
-
 export const standaloneChatRequestSchema = z.object({
   chatId: chatIdSchema.optional(),
   projectId: z.string().min(1).optional(),
@@ -142,7 +140,6 @@ export const standaloneChatRequestSchema = z.object({
   enableThinking: z.boolean().optional(),
   thinkingLevel: thinkingLevelSchema.optional(),
   timezone: z.string().min(1).max(100).optional(),
-  surface: chatSurfaceSchema.default("chat"),
   /** The Autopilot workflow whose page the user is on, so "this" means it. */
   autopilotWorkflowId: z.string().min(1).max(64).optional(),
   /** The built-in Autopilot automation whose page the user is on. */
@@ -176,7 +173,6 @@ export const chatWorkflowPayloadSchema = z.object({
   thinkingLevel: thinkingLevelSchema.optional(),
   timezone: z.string().min(1).max(100).optional(),
   projectId: z.string().min(1).optional(),
-  surface: chatSurfaceSchema.default("chat"),
   autopilotWorkflowId: z.string().min(1).max(64).optional(),
   autopilotAutomation: z.string().min(1).max(40).optional(),
 });

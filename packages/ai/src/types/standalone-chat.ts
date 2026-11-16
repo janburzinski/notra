@@ -1,6 +1,5 @@
 import type { AILogTarget } from "@notra/ai/observability";
 import type { StandaloneChatContextItem } from "@notra/ai/schemas/standalone-chat";
-import type { ChatSurface } from "@notra/ai/types/chat";
 import type { PostAgentReachLoader } from "@notra/ai/types/post-agent-reach";
 import type { RouteUsageSummary } from "@notra/ai/types/router";
 import type { TccMetadata } from "@notra/ai/types/tcc";
@@ -34,7 +33,6 @@ export interface StandaloneChatInput {
   useMarkup?: boolean;
   chargeAiCredits?: boolean;
   codeResearch?: boolean;
-  surface?: ChatSurface;
 }
 
 export interface StandaloneChatDeps {

@@ -237,7 +237,6 @@ export const POST = withEvlog(async function POST(
         : buildChatExtraTools({
             organizationId,
             userId: auth.context.user.id,
-            surface: parseResult.data.surface,
             focusWorkflowId: parseResult.data.autopilotWorkflowId,
             focusAutomation: parseResult.data.autopilotAutomation,
           }),
@@ -341,7 +340,6 @@ export const POST = withEvlog(async function POST(
         telemetryMetadata,
         headers: request.headers,
         projectId: projectId ?? undefined,
-        surface: parseResult.data.surface,
         extraTools:
           extraToolsResult.status === "fulfilled"
             ? extraToolsResult.value
@@ -362,7 +360,6 @@ export const POST = withEvlog(async function POST(
       thinkingLevel: parseResult.data.thinkingLevel,
       timezone: parseResult.data.timezone,
       projectId: projectId ?? undefined,
-      surface: parseResult.data.surface,
       autopilotWorkflowId: parseResult.data.autopilotWorkflowId,
       autopilotAutomation: parseResult.data.autopilotAutomation,
     };
@@ -426,7 +423,6 @@ async function createDirectStandaloneChatResponse({
   telemetryMetadata,
   headers,
   projectId,
-  surface,
   extraTools,
 }: {
   streamId: string;
@@ -448,7 +444,6 @@ async function createDirectStandaloneChatResponse({
   telemetryMetadata: TccMetadata;
   headers: Headers;
   projectId?: string;
-  surface?: ChatWorkflowPayload["surface"];
   extraTools?: ToolSet;
 }) {
   const lifecycle = await createChatStreamLifecycle({
@@ -498,7 +493,6 @@ async function createDirectStandaloneChatResponse({
         chargeAiCredits,
         codeResearch,
         projectId,
-        surface,
       },
       {
         preValidatedIntegrations: validatedIntegrations,

@@ -160,7 +160,6 @@ export function useDashboardAgentChat({
             // A response stopped before its first chunk leaves an empty
             // assistant message, which the request schema rejects.
             messages: messages.filter((message) => message.parts.length > 0),
-            surface: "dashboard-agent",
             ...focusRef.current,
           },
         }),

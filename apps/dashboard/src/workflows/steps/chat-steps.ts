@@ -174,7 +174,6 @@ export async function streamChatResponseStep(
     timezone,
     streamId,
     chargeAiCredits,
-    surface,
     autopilotWorkflowId,
     autopilotAutomation,
   } = input;
@@ -272,7 +271,6 @@ export async function streamChatResponseStep(
         chargeAiCredits,
         codeResearch,
         projectId,
-        surface,
         telemetryMetadata: buildStandaloneChatTelemetryMetadata({
           chatId,
           organizationId,
@@ -294,7 +292,6 @@ export async function streamChatResponseStep(
         extraTools: await buildChatExtraTools({
           organizationId,
           userId,
-          surface,
           focusWorkflowId: autopilotWorkflowId,
           focusAutomation: autopilotAutomation,
         }),

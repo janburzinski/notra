@@ -1,4 +1,3 @@
-import type { ChatSurface } from "@notra/ai/types/chat";
 import type { ToolSet } from "@notra/ai/types/orchestration";
 import { toolDescription } from "@notra/ai/utils/description";
 import { AUTOPILOT_AUTOMATION_KINDS } from "@notra/db/constants/autopilot";
@@ -322,15 +321,12 @@ function questionTool(): Record<string, Tool> {
 export async function buildAutopilotWorkflowTools(params: {
   organizationId: string;
   userId?: string;
-  /** Only the dashboard agent can show the agent's questions. */
-  surface?: ChatSurface;
   /** The workflow whose page the user is on. */
   focusWorkflowId?: string;
   /** The built-in automation whose page the user is on. */
   focusAutomation?: string;
 }): Promise<ToolSet | undefined> {
-  const { organizationId, userId, surface, focusWorkflowId, focusAutomation } =
-    params;
+  const { organizationId, userId, focusWorkflowId, focusAutomation } = params;
   const [enabled, manager, focus] = await Promise.all([
     isAutopilotEnabledForOrganization(organizationId),
     canManage(organizationId, userId),
@@ -339,22 +335,20 @@ export async function buildAutopilotWorkflowTools(params: {
   if (!enabled) {
     return undefined;
   }
-  const canAsk = manager && surface === "dashboard-agent";
   return {
     descriptions: [
-      [
-        AUTOPILOT_WORKFLOW_AGENT_DESCRIPTION,
-        canAsk ? AUTOPILOT_WORKFLOW_QUESTION_NOTE : null,
-        manager ? null : AUTOPILOT_WORKFLOW_READ_ONLY_NOTE,
-      ]
-        .filter(Boolean)
-        .join(" "),
+      `${AUTOPILOT_WORKFLOW_AGENT_DESCRIPTION} ${
+        manager
+          ? AUTOPILOT_WORKFLOW_QUESTION_NOTE
+          : AUTOPILOT_WORKFLOW_READ_ONLY_NOTE
+      }`,
       ...(focus ? [focus] : []),
     ],
     tools: {
       ...readTools(organizationId),
-      ...(manager ? manageTools(organizationId, userId) : {}),
-      ...(canAsk ? questionTool() : {}),
+      ...(manager
+        ? { ...manageTools(organizationId, userId), ...questionTool() }
+        : {}),
     },
     // Saving schedules work and running spends credits or posts to Slack,
     // so the user approves both, like the chat's own schedule tool.
