@@ -1,0 +1,39 @@
+apps/dashboard/src/constants/autopilot-templates.ts
+  s_571b849ad9fa65::t_27083ed4aaa55d 3-5,7-8,11,17,65-81
+apps/dashboard/src/lib/autopilot/metrics.ts
+  s_571b849ad9fa65::t_e1251631615246 44-47
+  s_571b849ad9fa65::t_5cb9c4f61899df 26,28,31,34-43,48-50,61,64-68,88-90,92-102,106-108,110-112,117-120,122,124-128,151
+  s_571b849ad9fa65::t_bfd7b92ac976c5 7,51-60,62-63,69-87,91,103-105,109,113-116,121,123
+apps/dashboard/src/components/autopilot/autopilot-run-history.tsx
+  s_571b849ad9fa65::t_5b95857ddc5111 1-9,12,15,19-20,23-31,33-45,47-58
+  s_571b849ad9fa65::t_8dc18eecb8b6bd 46
+  s_571b849ad9fa65::t_8a36b3a89d2b94 10-11,13-14,16-18,21-22,32,59-61
+apps/dashboard/src/constants/autopilot-run-history.ts
+  s_571b849ad9fa65::t_bfd7b92ac976c5 1,7,12-19
+  s_571b849ad9fa65::t_5cb9c4f61899df 2-6,8-11,20
+apps/dashboard/src/lib/orpc/routers/autopilot.ts
+  s_571b849ad9fa65::t_5cb9c4f61899df 75-77,214,221,223
+apps/dashboard/src/components/autopilot/autopilot-templates.tsx
+  s_571b849ad9fa65::t_27f9b0ed6d62bf 3,26-27,395-426,465-466
+apps/dashboard/src/components/autopilot/autopilot-automations-overview.tsx
+  s_571b849ad9fa65::t_c6c032beae22d5 23,30,107,216-218,220-225
+apps/dashboard/src/types/autopilot-metrics.ts
+  s_571b849ad9fa65::t_5cb9c4f61899df 27-28,40,48-50
+  s_571b849ad9fa65::t_bfd7b92ac976c5 41-47
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "0f84b8d5687505e58eb37730df0374b5ef54a520",
+  "prompts": {},
+  "sessions": {
+    "s_571b849ad9fa65": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "55c40e41-13e8-42e0-916a-90ffbc8be14a",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
