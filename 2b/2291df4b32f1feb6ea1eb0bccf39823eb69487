@@ -1,0 +1,23 @@
+packages/geo-core/tests/geo-context-fallback.test.ts
+  s_bfa6057c8fd3ae::t_78096f1fa09179 118-148
+packages/geo-core/src/geo/olostep.ts
+  s_bfa6057c8fd3ae::t_78096f1fa09179 316-324
+packages/geo-core/src/schemas/geo-olostep.ts
+  s_bfa6057c8fd3ae::t_78096f1fa09179 75
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "2b2291df4b32f1feb6ea1eb0bccf39823eb69487",
+  "prompts": {},
+  "sessions": {
+    "s_bfa6057c8fd3ae": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "377df655-40d7-4500-a7c7-946d5b2f832f",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
