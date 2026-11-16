@@ -1,0 +1,405 @@
+apps/dashboard/src/utils/autopilot-citations.ts
+  s_dce5829a402951::t_e7dbead128a2b7 1-2,418-476
+apps/web/src/lib/markdown/twins.ts
+  s_dce5829a402951::t_e7dbead128a2b7 1,4-5,7-10
+apps/dashboard/src/components/dashboard/feedback-popover.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 134,139-144
+apps/dashboard/src/components/design-system/design-system-todo-list-demo.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 6
+apps/dashboard/src/lib/autopilot/findings.ts
+  s_dce5829a402951::t_e7dbead128a2b7 723-748
+apps/dashboard/src/utils/autopilot-style.ts
+  s_dce5829a402951::t_e7dbead128a2b7 81-123
+apps/web/src/constants/proxy.ts
+  s_dce5829a402951::t_e7dbead128a2b7 1
+apps/dashboard/src/components/error-content.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 6,45,47
+apps/web/src/constants/landing/cycle-text.ts
+  s_dce5829a402951::t_e7dbead128a2b7 1-35
+apps/dashboard/src/components/sites/site-asset-field.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 100,107-117
+apps/dashboard/src/types/autopilot-templates-runtime.ts
+  s_dce5829a402951::t_e7dbead128a2b7 34-41
+apps/web/src/lib/mcp/markdown.ts
+  s_dce5829a402951::t_e7dbead128a2b7 27
+apps/dashboard/src/components/chat/chat-home-suggestions.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 10
+apps/dashboard/src/components/geo/shelf/shelf-ticket-form.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 20,177-178,181,183,186
+apps/web/src/hooks/use-cycle-index.ts
+  s_dce5829a402951::t_e7dbead128a2b7 1-20
+apps/web/src/utils/proxy-paths.ts
+  s_dce5829a402951::t_e7dbead128a2b7 1,19,21
+apps/dashboard/src/components/geo/geo-language-picker.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 22,118,120,125,127,130
+apps/web/src/routes/llms[.]txt.ts
+  s_dce5829a402951::t_e7dbead128a2b7 6-7
+apps/dashboard/src/components/dashboard/sidebar-quick-actions.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 14
+apps/dashboard/src/components/geo/traffic-zoom-chip.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 5
+apps/dashboard/tests/autopilot-sandbox.test.ts
+  s_dce5829a402951::t_e7dbead128a2b7 133-136,143-146,187,240-241,420-595
+apps/dashboard/src/app/design-system/button-states-demo.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 7
+apps/dashboard/src/components/artifacts/artifact-actions.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 45
+apps/dashboard/src/components/geo/writer/write-competitor-choices.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 8,71-72,74,76,81
+apps/dashboard/src/components/demo/demo-customize-dialog.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 18
+apps/dashboard/src/components/geo/geo-answer-mention-card.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 9,107-108,110,112,120
+apps/web/src/constants/markdown-twins.ts
+  s_dce5829a402951::t_e7dbead128a2b7 1-32
+apps/dashboard/src/constants/autopilot-refresh.ts
+  s_dce5829a402951::t_e7dbead128a2b7 58-67
+apps/dashboard/src/components/content/overview/overview-tags-input.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 13,70,72,74-75,82
+apps/dashboard/src/lib/hooks/use-autopilot-setup.ts
+  s_dce5829a402951::t_e7dbead128a2b7 102-103
+apps/dashboard/src/components/analytics/posting-performance-card.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 12
+apps/dashboard/src/components/geo/competitor-edit-form.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 211,213,217,219,222
+apps/dashboard/src/components/geo/language-performance-card.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 84,97,123
+apps/dashboard/src/components/not-found-content.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 6,35,37
+packages/ai/src/schemas/google-search-console.ts
+  s_dce5829a402951::t_e7dbead128a2b7 49-62
+apps/dashboard/src/components/chat/chat-quote.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 34
+apps/dashboard/src/app/(dashboard)/[slug]/brand/identity/components/voice-selector.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 218-219,223,265,272
+apps/web/src/lib/proxy/markdown.ts
+  s_dce5829a402951::t_e7dbead128a2b7 1-5,7-9,12,15,18,23,34-35,43-45,47-62,65-66,69-74
+apps/dashboard/src/app/(dashboard)/[slug]/collection/[id]/page-client.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 10
+apps/dashboard/src/components/members/invite-member-popover.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 198-199,203
+apps/dashboard/src/components/content/create/step-brand-identities.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 14
+apps/dashboard/src/components/chat/chat-annotation-note-form.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 9
+apps/dashboard/src/constants/autopilot-live.ts
+  s_dce5829a402951::t_e7dbead128a2b7 1-16
+apps/dashboard/src/types/components/empty-state.ts
+  s_dce5829a402951::t_e7dbead128a2b7 3
+apps/dashboard/src/components/geo/shelf/shelf-title-field.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 9,46-47,49,51,54
+apps/dashboard/src/app/(auth-public)/reset-password/page.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 85-91,115-121,247-248
+apps/web/src/components/landing/cycle-text.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 1-216
+apps/dashboard/src/app/(dashboard)/[slug]/skills/page-client.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 592,595
+apps/dashboard/src/components/chat/chat-input.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 32
+apps/web/src/constants/ip-checker.ts
+  s_dce5829a402951::t_e7dbead128a2b7 11
+apps/dashboard/src/components/content/add-reference-control.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 13,38
+apps/dashboard/src/lib/workflow-engine/blocks/autopilot/run.ts
+  s_dce5829a402951::t_e7dbead128a2b7 11,91-101
+apps/dashboard/src/components/chat/chat-annotations-preview.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 17
+apps/dashboard/src/components/analytics/range-picker.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 12
+apps/web/src/components/navbar.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 69,372-374,377-378,394-401,421,612-620,622-650,652-654,656-657,659-660,663-668,670-678,680-694,700-705,707-721,723-725,727-728
+apps/dashboard/src/components/ai/chat-tool-block/tool-draft-preview.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 5
+apps/dashboard/src/lib/workflow-engine/definitions/autopilot.ts
+  s_dce5829a402951::t_e7dbead128a2b7 62,192-194,222,233
+apps/web/package.json
+  s_dce5829a402951::t_e7dbead128a2b7 53
+apps/dashboard/src/components/chat/chat-suggestions.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 17
+apps/dashboard/src/components/content/inline-comments/content-inline-comment.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 164,167-169,185
+apps/dashboard/src/components/demo/demo-missions.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 7
+apps/dashboard/src/lib/autopilot/blog.ts
+  s_dce5829a402951::t_e7dbead128a2b7 91-95,117-120,133,186-206,480,492,494,497-512,521-524,527-529,534-552,649-652,1905
+apps/dashboard/src/components/integrations/github/github-directory-picker.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 577,581
+packages/ai/src/types/autopilot-planner.ts
+  s_dce5829a402951::t_e7dbead128a2b7 72-76
+apps/dashboard/tests/autopilot-schedule.test.ts
+  s_dce5829a402951::t_e7dbead128a2b7 56,59,75
+apps/dashboard/src/components/content/create-content-dialog.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 35
+apps/dashboard/src/components/sites/site-author-avatar-field.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 68
+apps/dashboard/tests/autopilot-template-flows.test.ts
+  s_dce5829a402951::t_e7dbead128a2b7 175-182,192-198,292-301,311-326,328,332-338,350,724-725,729-762,797-802,938-1094
+apps/dashboard/src/components/comments/comment-actions.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 130,132,134-135,150
+apps/dashboard/src/components/dashboard/dashboard-agent-button.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 7
+apps/dashboard/tests/autopilot-flow.test.ts
+  s_dce5829a402951::t_e7dbead128a2b7 27,64,82-83,116,123-127,274-307,382,470-474,476,512-514,549,554,672,716,729-731,756,877-896,943-944,961,1963-2052,2062,2081-2099,2114,2128,2231
+apps/dashboard/src/components/demo/demo-banner.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 11
+apps/dashboard/src/components/geo/prompt-add-dialog.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 318
+apps/dashboard/src/components/demo/demo-start.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 7
+apps/dashboard/src/app/(dashboard)/[slug]/brand/identity/components/guidelines-asset-edit-dialog.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 431-432
+apps/dashboard/src/components/chat/shared-chat-page.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 35
+apps/dashboard/src/constants/autopilot.ts
+  s_dce5829a402951::t_e7dbead128a2b7 278-282,409-421
+apps/web/src/utils/markdown.ts
+  s_dce5829a402951::t_e7dbead128a2b7 6-7,22-36
+apps/dashboard/src/components/autopilot/create-slack-channel-dialog.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 23
+packages/ai/src/integrations/google-search-console.ts
+  s_dce5829a402951::t_e7dbead128a2b7 26,36,48,744-774
+apps/dashboard/src/components/dashboard/onboarding-agent-banner.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 83-85
+apps/web/src/utils/markdown-twins.ts
+  s_dce5829a402951::t_e7dbead128a2b7 1,6,8,81-88,92-99,128,162-181,183,185-232,235,238,240-249
+apps/dashboard/src/components/demo/demo-request-feed.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 10
+apps/web/src/lib/integrations/markdown.ts
+  s_dce5829a402951::t_e7dbead128a2b7 95
+apps/dashboard/src/components/ai/chat-tool-block.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 41
+apps/dashboard/src/components/content/content-plan-view.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 123,126
+apps/dashboard/src/lib/autopilot/schedule.ts
+  s_dce5829a402951::t_e7dbead128a2b7 18-21,95-113
+packages/db/src/types/autopilot.ts
+  s_dce5829a402951::t_e7dbead128a2b7 111-114,119-137
+apps/dashboard/src/components/content/content-chat-activity-panel.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 30
+apps/dashboard/src/components/content/social-video-attachment.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 123,128-131
+apps/dashboard/src/components/chat/shared-chat-continue.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 17
+apps/dashboard/src/app/design-system/geo-traffic/page-client.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 5
+apps/dashboard/src/components/geo/geo-range-picker.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 19
+packages/ai/src/prompts/autopilot-planner.ts
+  s_dce5829a402951::t_e7dbead128a2b7 18-20,55
+apps/dashboard/src/components/ai/chat-assistant-parts.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 16,119
+apps/web/src/components/feature-pages/personas-headline.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 3-4,10,14,27-46
+apps/dashboard/src/components/sites/site-domain-check-button.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 29,38
+apps/dashboard/src/app/(dashboard)/[slug]/brand/identity/components/add-reference-dialog.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 551-553,556,558,561,748-749,753
+apps/dashboard/src/components/dashboard/chat-history-nav.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 43
+apps/dashboard/src/components/autopilot/autopilot-repository-list.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 17
+apps/dashboard/src/components/charts/chart-download-button.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 3,65,73
+packages/ai/src/constants/autopilot-planner.ts
+  s_dce5829a402951::t_e7dbead128a2b7 40-54
+apps/dashboard/src/app/(dashboard)/[slug]/integrations/slack/page-client.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 430-431,439
+apps/dashboard/src/components/settings/sounds-section.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 18
+apps/dashboard/src/components/geo/sentiment-breakdown-placeholder.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 9
+apps/blog/scripts/web-chrome.js
+  s_dce5829a402951::t_e7dbead128a2b7 2-3,10,474-475
+apps/dashboard/src/components/ai/chat-activity-group.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 44-46,135,139-142,144,146-151,156,163,180,201-203
+apps/dashboard/src/components/autopilot/autopilot-repository-picker.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 15
+apps/dashboard/src/components/geo/ai-traffic-log-card.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 27
+apps/dashboard/src/components/chat/attachment-preview.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 18,155,165
+apps/dashboard/src/components/integrations/github/github-branch-picker.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 100,106
+apps/dashboard/src/components/autopilot/autopilot-source-repositories-row.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 20
+apps/dashboard/src/components/automation/automations-table.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 268,272-275
+apps/dashboard/src/app/(dashboard)/[slug]/settings/billing/success/page.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 12,111,113,115,118
+apps/dashboard/src/components/dashboard/sidebar-toggle.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 13
+apps/dashboard/src/components/geo/search-console-card.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 160-162,168,280,285
+apps/dashboard/src/components/integrations/github/select-repositories-dialog.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 127-128,132
+apps/dashboard/src/lib/orpc/routers/autopilot.ts
+  s_dce5829a402951::t_e7dbead128a2b7 37,41-44,297-299,302-304
+packages/ai/src/utils/autopilot-planner.ts
+  s_dce5829a402951::t_e7dbead128a2b7 147-176,192,464-483,497-498,500-505,523-529,550,573-574,599-601
+apps/dashboard/src/components/content/overview/overview-cover-field.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 106,111-114
+apps/dashboard/src/components/dashboard/header.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 14,64,66,68,70,73
+apps/web/src/start.ts
+  s_dce5829a402951::t_e7dbead128a2b7 9
+apps/dashboard/src/components/geo/mention-rate-card.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 144,150-154
+apps/dashboard/src/lib/autopilot/writer.ts
+  s_dce5829a402951::t_e7dbead128a2b7 112-117,313-319,347-355
+apps/web/src/types/navbar.ts
+  s_dce5829a402951::t_e7dbead128a2b7 1,20-32
+apps/dashboard/src/lib/autopilot/style.ts
+  s_dce5829a402951::t_e7dbead128a2b7 10,17,22,71-72,97-159
+apps/dashboard/src/components/demo/demo-api-console.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 10
+apps/dashboard/src/components/content/content-detail-main-document.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 7
+apps/dashboard/src/components/integrations/mcp-server-card.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 127,132
+apps/web/src/constants/navbar-motion.ts
+  s_dce5829a402951::t_e7dbead128a2b7 20-21,28-31
+apps/dashboard/src/components/chat/chat-content-panel.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 61,298,301,307,309,312
+apps/dashboard/src/components/geo/geo-engine-picker.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 24
+apps/web/src/utils/navbar-content-motion.ts
+  s_dce5829a402951::t_e7dbead128a2b7 1-49
+bun.lock
+  ai_agent 597,3446-3447,4640-4641,5280-5281,7026-7027,7400-7401,8132-8133,8612-8613,9178-9179,9520
+apps/dashboard/src/components/geo/writer/writer-execute.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 15,162,183-184,189
+apps/dashboard/src/components/content/content-card.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 22
+apps/dashboard/src/components/mcp/mcp-setup.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 12
+apps/dashboard/src/components/settings/settings-modal.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 18
+bunfig.toml
+  s_dce5829a402951::t_e7dbead128a2b7 6
+apps/dashboard/src/components/content/collection-menu-items.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 25
+packages/ai/src/schemas/autopilot-planner.ts
+  s_dce5829a402951::t_e7dbead128a2b7 49-60
+apps/dashboard/src/components/analytics/leaderboard-card.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 25
+apps/evals/src/harness/autopilot-planner.ts
+  s_dce5829a402951::t_e7dbead128a2b7 2,162,187,204-205,207,372,551
+apps/dashboard/src/components/mcp/mcp-sections.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 9
+apps/dashboard/src/app/(dashboard)/[slug]/integrations/google-search-console/page-client.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 199-200,559-565
+apps/dashboard/src/components/onboarding/selected-competitors.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 7,43,45,48,50,53
+apps/dashboard/src/components/demo/demo-api-callout.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 7
+apps/dashboard/src/lib/autopilot/live.ts
+  s_dce5829a402951::t_e7dbead128a2b7 1-428
+apps/dashboard/src/utils/autopilot-publish.test.ts
+  s_dce5829a402951::t_e7dbead128a2b7 283-285,287-309
+apps/dashboard/src/utils/autopilot-publish.ts
+  s_dce5829a402951::t_e7dbead128a2b7 14,121-124
+apps/dashboard/src/lib/autopilot/fact-check.ts
+  s_dce5829a402951::t_e7dbead128a2b7 93-97,131-137,210-212
+apps/dashboard/src/lib/autopilot/planner.ts
+  s_dce5829a402951::t_e7dbead128a2b7 21-22,40,150-152,159-177,250,263-269,302-303,369,371,420-426,429-432,449-451,463-471
+apps/dashboard/tests/site-domain-setup.test.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 100-102
+apps/dashboard/src/components/geo/conversations-card.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 275,280-281
+apps/evals/src/scoring/autopilot-planner.ts
+  s_dce5829a402951::t_e7dbead128a2b7 6,131-132,210-227,301,306
+apps/dashboard/src/components/content/overview/content-panel-tabs.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 12,50,72,74,77
+apps/dashboard/src/components/chat/chat-composer-parts.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 34
+apps/evals/src/constants/autopilot-planner.ts
+  s_dce5829a402951::t_e7dbead128a2b7 6-9
+packages/ai/src/constants/google-search-console.ts
+  s_dce5829a402951::t_e7dbead128a2b7 10-12
+packages/ai/src/types/google-search-console.ts
+  s_dce5829a402951::t_e7dbead128a2b7 70-78
+apps/dashboard/src/components/geo/persona-activity-card.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 10,97,102,105
+apps/dashboard/src/components/geo/geo-tag-list.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 16,63,65,68,70,73
+apps/dashboard/src/components/integrations/add-repository-dialog.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 356,358,365
+apps/dashboard/src/components/geo/traffic-hero.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 18
+apps/dashboard/src/components/settings/settings-modal-nav.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 10,185,187,189,191,194
+apps/dashboard/src/constants/autopilot-publish.ts
+  s_dce5829a402951::t_e7dbead128a2b7 21-42,77,100-120
+apps/dashboard/src/types/components/chat-activity-group.ts
+  s_dce5829a402951::t_e7dbead128a2b7 36,38-39,75
+apps/dashboard/src/utils/group-assistant-message-parts.ts
+  s_dce5829a402951::t_e7dbead128a2b7 209-210,212-213,215,217-221
+apps/dashboard/src/components/auth/banned-notice.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 6
+apps/dashboard/src/lib/autopilot/refresh.ts
+  s_dce5829a402951::t_e7dbead128a2b7 4-10,27-30,53,58,69-70,79,93-206,282-300,310-314,361,369-371,376-390,415,418-423,709,713-715,717-719
+apps/dashboard/src/utils/autopilot-blog.ts
+  s_dce5829a402951::t_e7dbead128a2b7 18,146-149,151,223-254
+apps/dashboard/src/components/autopilot/autopilot-setup-rows.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 16
+apps/evals/src/types/autopilot-planner.ts
+  s_dce5829a402951::t_e7dbead128a2b7 28-30,32,52-53,69-70
+apps/dashboard/src/components/ai/chat-tool-block/tool-output-images/index.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 8,41,43,47,49,56
+apps/dashboard/src/components/chat/chat-approval-card.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 20
+apps/dashboard/src/components/geo/geo-csv-import-dialog.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 349
+apps/dashboard/src/components/geo/persona-profile-editor.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 272,274,282-283,286,400-401
+apps/web/src/types/landing/hero.ts
+  s_dce5829a402951::t_e7dbead128a2b7 30-40
+apps/web/src/utils/llms.ts
+  s_dce5829a402951::t_e7dbead128a2b7 1-3,6-9,11-13,15,22-97,122-127,129-139,142,145-154,156,195,197
+apps/dashboard/src/app/(dashboard)/[slug]/chat/page-client.tsx
+  ai_agent 65
+apps/dashboard/src/components/settings/delete-account-dialog.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 316-317,321
+apps/evals/src/fixtures/autopilot-scenarios.ts
+  s_dce5829a402951::t_e7dbead128a2b7 95-100,486-487,490,832,836,1052-1115
+apps/dashboard/src/components/chat/chat-share-popover.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 28
+apps/dashboard/src/components/autopilot/autopilot-setup-flow.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 12
+apps/dashboard/src/components/geo/prompt-suggestions.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 57,62,69,74,262-263,280-285,288
+apps/web/src/components/landing/hero-headline.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 1,11,13,15-21,63,100-101,103-109,112-119,121,149,151-160
+apps/dashboard/src/constants/autopilot-style.ts
+  s_dce5829a402951::t_e7dbead128a2b7 41-43
+apps/dashboard/src/lib/autopilot/publish.ts
+  s_dce5829a402951::t_e7dbead128a2b7 9-19,29-32,120,125,127,131,140,175-179,181,186,191-195,222,498-694,767-796
+apps/dashboard/src/components/geo/gaps-table.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 222,232,239,354,565
+apps/web/src/components/landing/hero-section.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 6,79,94
+apps/dashboard/src/components/content/content-collections-section.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 9
+apps/dashboard/src/components/calendar.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 18
+apps/dashboard/src/lib/autopilot/results.ts
+  s_dce5829a402951::t_e7dbead128a2b7 48
+apps/dashboard/src/app/design-system/write-dialog-demo.tsx
+  s_dce5829a402951::t_e7dbead128a2b7 5
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "8d5a65bcd33616e1575597c6ffe54038aa795a1f",
+  "prompts": {},
+  "sessions": {
+    "s_dce5829a402951": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e9bbbee6-ef3c-41b8-b6f5-3492ea56608b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
