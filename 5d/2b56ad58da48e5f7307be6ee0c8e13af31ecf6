@@ -1,0 +1,61 @@
+apps/evals/src/harness/autopilot-planner.ts
+  s_4c95fd0641c330::t_b478de3c33e63a 238
+  s_4c95fd0641c330::t_364686bd079eed 501
+  s_4c95fd0641c330::t_896a90388e232e 239
+apps/dashboard/tests/autopilot-flow.test.ts
+  s_4c95fd0641c330::t_fcd2b60a051613 2247,2250,2253,2262-2278,2280-2284
+  s_4c95fd0641c330::t_6467070394ef96 920,949,2248-2249,2251-2252,2254-2261,2279
+apps/evals/src/types/autopilot-planner.ts
+  s_4c95fd0641c330::t_b478de3c33e63a 81
+  s_4c95fd0641c330::t_896a90388e232e 4,80,82-83
+packages/ai/src/prompts/autopilot-planner.ts
+  s_4c95fd0641c330::t_f1d94459d13851 81
+  s_4c95fd0641c330::t_a495afbb81f87b 80,82
+  s_4c95fd0641c330::t_32c7b5c5bd14ed 17
+  s_4c95fd0641c330::t_079023c3305caa 18-20
+packages/ai/src/constants/autopilot-planner.ts
+  s_4c95fd0641c330::t_951f914c1e04a7 84-92
+apps/dashboard/src/lib/autopilot/planner.ts
+  s_4c95fd0641c330::t_7a6caab3f0df35 70
+  s_4c95fd0641c330::t_ecd0b119d8acaf 61-67,74-78,428,431,465
+  s_4c95fd0641c330::t_bbd6f713e23271 80-82,84-86,427
+packages/ai/src/utils/autopilot-planner.ts
+  s_4c95fd0641c330::t_43127b26c1376c 595,597-599,602-606
+  s_4c95fd0641c330::t_69e355d797d3b4 461
+  s_4c95fd0641c330::t_951f914c1e04a7 9,586-594,596
+apps/dashboard/src/utils/autopilot-findings.ts
+  s_4c95fd0641c330::t_4b165617158f3b 107
+  s_4c95fd0641c330::t_ecd0b119d8acaf 112
+  s_4c95fd0641c330::t_bbd6f713e23271 58-61,100,110-111,125-126
+packages/ai/src/schemas/autopilot-planner.ts
+  s_4c95fd0641c330::t_5017a2b8f06e31 63,65-66,68
+  s_4c95fd0641c330::t_69e355d797d3b4 64
+  s_4c95fd0641c330::t_951f914c1e04a7 67
+apps/evals/src/fixtures/autopilot-scenarios.ts
+  s_4c95fd0641c330::t_8e3d18a450b137 442-448,1207,1225-1254
+  s_4c95fd0641c330::t_bafce909237fb5 423-441,449-455,1151-1206,1208-1224,1255-1282
+packages/db/src/types/autopilot.ts
+  s_4c95fd0641c330::t_ecd0b119d8acaf 90-94
+packages/ai/src/types/autopilot-planner.ts
+  s_4c95fd0641c330::t_951f914c1e04a7 114-115,131
+  s_4c95fd0641c330::t_5017a2b8f06e31 132
+  s_4c95fd0641c330::t_69e355d797d3b4 113,116-117
+apps/evals/src/suites/autopilot-planner.ts
+  s_4c95fd0641c330::t_b478de3c33e63a 43
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "5d2b56ad58da48e5f7307be6ee0c8e13af31ecf6",
+  "prompts": {},
+  "sessions": {
+    "s_4c95fd0641c330": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "0a6fd627-1711-40be-b85f-52328df7b16b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
