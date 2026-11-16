@@ -1,7 +1,7 @@
 export const ANNOUNCEMENT_TEXT =
-  "AI traffic analytics is now free for up to 1 million events a month";
+  "Agent and web analytics share 1 million free events a month";
 
 export const ANNOUNCEMENT_TEXT_MOBILE =
-  "AI traffic is now free up to 1M events a month";
+  "Agent + web analytics: 1M free events / mo";
 
 export const ANNOUNCEMENT_HREF = "/pricing";

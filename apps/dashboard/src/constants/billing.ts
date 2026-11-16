@@ -127,6 +127,7 @@ export const USAGE_RANGE_LABEL_KEYS = {
 
 /** Quotas that are tracked against Autumn; the rest are never decremented. */
 export const USAGE_METERED_FEATURES: readonly string[] = [
+  FEATURES.AI_TRAFFIC_EVENTS,
   FEATURES.LONG_FORM_POSTS,
   FEATURES.IMAGE_GENERATIONS,
   FEATURES.REFERENCES,

@@ -233,19 +233,26 @@ function acceptsBeaconHost(
 function storeWebRow<Row extends { organization_id: string }>(
   row: Row,
   enqueued: boolean | undefined,
-  write: (rows: Row[]) => Promise<unknown>,
+  write: (rows: Row[]) => ReturnType<typeof ingestWebPageViews>,
   failure: { event: GeoLogEventName; message: string }
 ) {
   if (enqueued) {
-    return Effect.void;
+    return Effect.succeed(true);
   }
   return Effect.promise(() =>
-    write([row]).catch((error: unknown) => {
-      logGeoFailure(failure.event, failure.message, error, {
-        organizationId: row.organization_id,
-      });
-      return null;
-    })
+    write([row])
+      .then(
+        (result) =>
+          result !== null &&
+          result.successful_rows > 0 &&
+          result.quarantined_rows === 0
+      )
+      .catch((error: unknown) => {
+        logGeoFailure(failure.event, failure.message, error, {
+          organizationId: row.organization_id,
+        });
+        return false;
+      })
   );
 }
 
@@ -391,6 +398,9 @@ const admitWebBeacon = Effect.fnUntraced(function* (
   );
   if (!acceptsBeaconHost(identity, url, allowedHosts)) {
     return droppedResult(identity, "human", "host", url.hostname);
+  }
+  if (!(yield* hasAiTrafficEventsQuota(identity.organizationId))) {
+    return droppedResult(identity, "human", "quota", url.hostname);
   }
   return null;
 });
@@ -680,6 +690,16 @@ export const runGeoEnvelopeIngest = Effect.fnUntraced(function* (
     );
   }
 
+  // Agent requests and web page views spend the same organization allowance.
+  if (!(yield* hasAiTrafficEventsQuota(identity.organizationId))) {
+    return droppedResult(
+      identity,
+      classification.visitorType,
+      "quota",
+      url.hostname
+    );
+  }
+
   const capturedAt = toCapturedDate(payload.timestamp);
   const webRow = countsVisitors
     ? yield* Effect.promise(() =>
@@ -693,8 +713,9 @@ export const runGeoEnvelopeIngest = Effect.fnUntraced(function* (
         }).catch(() => null)
       )
     : null;
+  let trackedWebView = false;
   if (webRow) {
-    yield* storeWebRow(
+    trackedWebView = yield* storeWebRow(
       webRow,
       buffer?.enqueueWeb?.(webRow),
       ingestWebPageViews,
@@ -703,19 +724,20 @@ export const runGeoEnvelopeIngest = Effect.fnUntraced(function* (
         message: "Web page view write failed",
       }
     );
+    // Server-tracked referrals already spend an event for this visit. Sites
+    // behind a banner and browser-only installs meter their referral here.
+    if (
+      trackedWebView &&
+      (isAi || classification.visitorType !== "ai_referral")
+    ) {
+      yield* Effect.sync(() =>
+        defer(() => trackUsage(buffer, identity.organizationId))
+      );
+    }
   }
   if (!isAi) {
     return webOnlyResult(identity, classification.visitorType);
   }
-  if (!(yield* hasAiTrafficEventsQuota(identity.organizationId))) {
-    return droppedResult(
-      identity,
-      classification.visitorType,
-      "quota",
-      url.hostname
-    );
-  }
-
   const resolved = resolveJourneyId({
     url,
     source: classification.source,
@@ -774,7 +796,10 @@ export const runGeoEnvelopeIngest = Effect.fnUntraced(function* (
         buffered && buffer
           ? expediteForLiveViewers(buffer, event.organization_id)
           : announceGeoTrafficEvent(event.organization_id, event.project_id);
-      const tracked = trackUsage(buffer, event.organization_id);
+      // One AI-referred page view can write both rows, but spends one event.
+      const tracked = trackedWebView
+        ? Promise.resolve()
+        : trackUsage(buffer, event.organization_id);
       try {
         await Effect.runPromise(trackGeoIngestAnalytics({ identity, event }));
       } catch (error) {

@@ -36,7 +36,7 @@ export const PRICING_HEADING =
   "Simple pricing that scales with what you track.";
 
 export const PRICING_SUBHEADING =
-  "Paid plans come with prompt tracking, traffic attribution and the writer, and they differ in how many answers and AI traffic events you track a month. The free plan covers AI traffic analytics and agent feedback for up to 1 million events a month, and you can cancel a paid plan anytime.";
+  "Paid plans come with prompt tracking, traffic attribution and the writer, and they differ in how many answers and analytics events you track a month. The free plan includes agent and web analytics sharing 1 million events a month, plus agent feedback, and you can cancel a paid plan anytime.";
 
 const SIGNUP_URL = "https://app.usenotra.com/signup";
 const ENTERPRISE_MAIL_URL = "mailto:hello@usenotra.com";
@@ -44,7 +44,7 @@ const ENTERPRISE_MAIL_URL = "mailto:hello@usenotra.com";
 export const PRICING_FREE_PLAN: PricingFreePlan = {
   name: "Free",
   description:
-    "Track which AI crawlers and assistants visit your site and collect feedback from the agents that use it.",
+    "Track AI agents and people visiting your site with one shared event allowance, and collect agent feedback.",
   price: "$0",
   cta: {
     label: "Start for free",
@@ -54,7 +54,7 @@ export const PRICING_FREE_PLAN: PricingFreePlan = {
     showArrow: true,
   },
   features: [
-    { label: "1M AI traffic events / mo", icon: "traffic" },
+    { label: "1M analytics events / mo", icon: "traffic" },
     { label: "Agent feedback", icon: "feedback" },
   ],
 };
@@ -85,8 +85,8 @@ export const PRICING_PLANS: PricingPlan[] = [
     features: [
       { label: "6,000 AI answers tracked / mo", icon: "tracking" },
       {
-        label: "5M AI traffic events / mo",
-        subtitle: "includes agent feedback",
+        label: "5M analytics events / mo",
+        subtitle: "shared by agent and web analytics",
         icon: "traffic",
       },
       { label: "8 image generations / mo", icon: "images" },
@@ -120,8 +120,8 @@ export const PRICING_PLANS: PricingPlan[] = [
     features: [
       { label: "16,000 AI answers tracked / mo", icon: "tracking" },
       {
-        label: "15M AI traffic events / mo",
-        subtitle: "includes agent feedback",
+        label: "15M analytics events / mo",
+        subtitle: "shared by agent and web analytics",
         icon: "traffic",
       },
       { label: "20 image generations / mo", icon: "images" },
@@ -155,8 +155,8 @@ export const PRICING_PLANS: PricingPlan[] = [
     features: [
       { label: "35,000 AI answers tracked / mo", icon: "tracking" },
       {
-        label: "30M AI traffic events / mo",
-        subtitle: "includes agent feedback",
+        label: "30M analytics events / mo",
+        subtitle: "shared by agent and web analytics",
         icon: "traffic",
       },
       { label: "45 image generations / mo", icon: "images" },
@@ -187,7 +187,7 @@ export const PRICING_PLANS: PricingPlan[] = [
     },
     features: [
       { label: "Unlimited AI answers tracked", icon: "tracking" },
-      { label: "Unlimited AI traffic events", icon: "traffic" },
+      { label: "Unlimited analytics events", icon: "traffic" },
       { label: "Unlimited image generations", icon: "images" },
       { label: "Unlimited long-form posts", icon: "content" },
       { label: "Unlimited social posts", icon: "social" },

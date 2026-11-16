@@ -4281,7 +4281,7 @@
           "title": "No MCP activity yet",
           "description": "Wrap your MCP server's transport to see which agents connect, which tools they call and where they fail.",
           "tokenTitle": "Set your token",
-          "tokenDescription": "Add this as {env} wherever your MCP server runs. Every request counts toward your monthly AI traffic events.",
+          "tokenDescription": "Add this as {env} wherever your MCP server runs. Every request counts toward your shared monthly agent and web analytics allowance.",
           "tokenFailed": "Your token didn't load.",
           "transportTitle": "Wrap the transport",
           "transport": "Transport",
@@ -6424,7 +6424,7 @@
     },
     "features": {
       "team_members": "Team members",
-      "ai_traffic_events": "AI traffic events",
+      "ai_traffic_events": "Agent and web analytics events",
       "long_form_posts": "Long-form posts",
       "social_posts": "Social posts",
       "image_generations": "Image generations",
@@ -6565,8 +6565,8 @@
       "tierDescription": "{tier, select, starter {For founders tracking their first prompts.} growth {For teams tracking prompts across engines and languages.} scale {For agencies and teams running several brands.} other {}}",
       "features": {
         "aiAnswers": "{count, number} AI answers tracked / mo",
-        "aiTrafficEvents": "{count, number} AI traffic events / mo",
-        "aiTrafficEventsDetail": "Includes agent feedback",
+        "aiTrafficEvents": "{count, number} analytics events / mo",
+        "aiTrafficEventsDetail": "Shared by agent and web analytics; agent feedback included",
         "imageGenerations": "{count, number} image generations / mo",
         "longFormPosts": "{count, number} long-form posts / mo",
         "unlimitedSocialPosts": "Unlimited social posts",
@@ -6589,14 +6589,14 @@
     },
     "freePlan": {
       "heading": "Free",
-      "description": "Keep agent feedback and 1M AI traffic events a month. Your plan's included allowances end, and AI credits you bought stay available.",
+      "description": "Keep agent feedback and 1M shared agent and web analytics events a month. Your plan's included allowances end, and AI credits you bought stay available.",
       "periodEnd": "Your paid plan stays active until {date, date, long}.",
       "scheduled": "Your plan switches to Free on {date, date, long}.",
       "scheduledNoDate": "Your plan switches to Free at the end of this billing cycle.",
       "scheduledBadge": "Scheduled",
       "downgrade": "Downgrade to Free",
       "confirmTitle": "Downgrade to Free?",
-      "confirmBody": "Your paid plan ends at the end of this billing cycle. After that you keep agent feedback and 1M AI traffic events a month, and AI credits you bought stay available. Your plan's included allowances end.",
+      "confirmBody": "Your paid plan ends at the end of this billing cycle. After that you keep agent feedback and 1M shared agent and web analytics events a month, and AI credits you bought stay available. Your plan's included allowances end.",
       "confirm": "Downgrade",
       "cancel": "Keep my plan",
       "success": "Your plan will switch to Free at the end of this billing cycle.",
@@ -6689,7 +6689,7 @@
       "theme": "Theme"
     },
     "upgrade": {
-      "freeDescription": "Your free plan includes agent feedback and 1M AI traffic events a month. Upgrade for AI content, visibility tracking and higher event limits.",
+      "freeDescription": "Your free plan includes agent feedback and 1M shared agent and web analytics events a month. Upgrade for AI content, visibility tracking and higher event limits.",
       "freeHeading": "Get more from Notra"
     },
     "sidebar": {

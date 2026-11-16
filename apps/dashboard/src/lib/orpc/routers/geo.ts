@@ -1342,15 +1342,16 @@ export const geoRouter = {
         toGeoOrpcError
       );
     }),
+  // Domain corrections are part of Free analytics setup, not paid GEO scans.
   rejectedHosts: authorizedProcedure
     .input(geoOrganizationInputSchema)
-    .handler(geoHandler((input) => loadGeoRejectedHosts(input))),
+    .handler(geoOpenHandler((input) => loadGeoRejectedHosts(input))),
   trackedDomainAdd: authorizedProcedure
     .input(geoRejectedHostInputSchema)
-    .handler(geoHandler((input) => addGeoTrackedDomain(input))),
+    .handler(geoOpenHandler((input) => addGeoTrackedDomain(input))),
   rejectedHostDismiss: authorizedProcedure
     .input(geoRejectedHostInputSchema)
-    .handler(geoHandler((input) => dismissGeoRejectedHost(input))),
+    .handler(geoOpenHandler((input) => dismissGeoRejectedHost(input))),
   ingestSetup: authorizedProcedure
     .input(geoOrganizationInputSchema)
     .handler(async ({ context, input }): Promise<DashboardGeoIngestSetup> => {

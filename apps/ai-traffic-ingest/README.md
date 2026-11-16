@@ -201,7 +201,7 @@ the service. Use isolated equivalents for origin testing, never production data:
 | `UPSTASH_REDIS_REST_TOKEN` | Existing Redis credentials |
 | `TINYBIRD_TOKEN` | Existing token with append access to `geo_traffic_events`, `mcp_events`, `web_page_views`, `web_page_engagement`, `web_events` and `web_errors` |
 | `GEO_INGEST_SECRET` | The exact signing secret used by the dashboard |
-| `AUTUMN_SECRET_KEY` | Existing billing key; meters and limits `ai_traffic_events`. Without it, events are accepted unmetered and a warning is logged |
+| `AUTUMN_SECRET_KEY` | Existing billing key; meters and limits the shared `ai_traffic_events` allowance for agent traffic, MCP requests and web page views. Without it, events are accepted unmetered and a warning is logged |
 | `TINYBIRD_BASE_URL` | Optional existing Tinybird endpoint, especially for a non-default region |
 
 `TINYBIRD_URL` remains a supported alias for the Tinybird base URL.

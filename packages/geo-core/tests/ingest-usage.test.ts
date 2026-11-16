@@ -47,12 +47,20 @@ test("usage batcher flushes on its interval and stop waits for writes in flight"
 
 test("usage batcher retries sums Autumn did not record and refuses counts after stop", async () => {
   const recorded = [false, true];
-  const track = mock(
-    async (_organizationId: string, _value: number) => recorded.shift() ?? true
-  );
+  let markRetried = () => {};
+  const retried = new Promise<void>((resolve) => {
+    markRetried = resolve;
+  });
+  const track = mock(async (_organizationId: string, _value: number) => {
+    const success = recorded.shift() ?? true;
+    if (success) {
+      markRetried();
+    }
+    return success;
+  });
   const usage = createUsageBatcher({ intervalMs: 10, track });
   usage.add("org-a", 4);
-  await sleep(30);
+  await retried;
   expect(track).toHaveBeenNthCalledWith(1, "org-a", 4);
   expect(track).toHaveBeenNthCalledWith(2, "org-a", 4);
 

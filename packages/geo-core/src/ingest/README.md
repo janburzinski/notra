@@ -22,6 +22,8 @@ A valid token is not enough to write an event. After the URL parses, ingest load
 
 The SDK is deliberately dumb: it forwards a neutral envelope and never classifies anything. All intelligence lives here, so signature updates ship instantly without customers bumping a package.
 
+Agent traffic, MCP requests and web page views share the organization's monthly `ai_traffic_events` allowance. Free includes 1 million events. Ingest checks the same cached Autumn quota before writing any of these rows and meters accepted page views through the usage batcher, just like agent requests. A page view and its AI referral spend one event, including when a server report and a browser beacon record them separately. Engagement, outbound clicks and errors check the shared allowance but do not spend additional events. Existing quota caching and deferred usage reporting can admit events briefly after the allowance is exhausted.
+
 ## Classification (`classify-visitor.ts`)
 
 Per event, in order:

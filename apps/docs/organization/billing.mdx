@@ -29,7 +29,9 @@ Billing is per organization, and you open **Settings > Billing & Usage** to chan
 
 ## Plans
 
-Notra has three self-serve plans plus Enterprise, and every plan is available monthly or annually.
+Notra has a Free plan, three paid self-serve plans and Enterprise. Paid self-serve plans are available monthly or annually.
+
+Free includes agent feedback and 1 million analytics events a month. Agent traffic, MCP server requests and web page views share this allowance across the workspace. The shared monthly allowance is 5 million events on Starter, 15 million on Growth and 30 million on Scale.
 
 | Plan        | Monthly | Annual  | AI answers tracked / mo | Long-form posts / mo | Image generations / mo | Projects | References |
 | ----------- | ------- | ------- | ----------------------- | -------------------- | ---------------------- | -------- | ---------- |
@@ -50,6 +52,7 @@ Starter and Growth get standard support plus Slack, Scale gets priority support 
 
 ### What the quotas mean
 
+* **Analytics events.** Each recorded agent request, MCP server request or web page view spends one event from the same monthly allowance. A page view that also records an AI referral spends one event. Engagement, performance measurements, outbound clicks and errors do not spend extra events. Collection pauses when the allowance runs out and resumes when it resets or you upgrade.
 * **AI answers tracked.** Every answer Notra collects from an assistant during a GEO scan counts as one, and persona conversations count twice per answer. Scans stop when the quota is used up, with no overage charges, and organization owners get an email. Tracking resumes when the quota resets or you upgrade, and AI credits do not extend it. Manual persona runs paid with AI credits cost twice their model usage. This quota covers prompt tracking, competitor tracking and share of voice.
 * **Long-form posts.** This quota covers changelogs and blog posts.
 * **Social posts.** LinkedIn and X posts are unlimited on every plan.
@@ -71,8 +74,9 @@ Organizations that subscribed before the current plans launched can stay on Basi
 
 An organization without an active plan can sign in and manage settings, but:
 
-* GEO pages show **GEO is locked on your current plan**, because GEO needs a Starter, Growth or Scale plan
-* API requests return `402 Active subscription required`
+* Agent analytics, web analytics, MCP server analytics and agent feedback remain available within the Free allowance
+* GEO visibility tracking needs a Starter, Growth or Scale plan
+* API requests for paid features return `402 Active subscription required`
 * Content generation needs plan quota or AI credits
 * [Sites](/sites/overview) are limited to one site and one custom domain, and every site shows the "Powered by Notra" badge. Paid plans remove these limits. See [Free plan limits](/sites/publishing#free-plan-limits)
 
