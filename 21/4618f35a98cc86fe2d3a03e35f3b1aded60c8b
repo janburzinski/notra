@@ -1,0 +1,34 @@
+apps/dashboard/src/app/(dashboard)/[slug]/chat/page-client.tsx
+  s_dce5829a402951::t_710cae9e75c218 63,65,83-88,90,141-145,153,163,671-691,773,784-793,796,1677-1715,1726-1737,1790,2064-2073,2349-2353,2360,2667-2673,2676-2680,2797,2968-2977,2981-2985,3011
+  s_dce5829a402951::t_fd4bb0eec21a2e 132
+  s_dce5829a402951::t_bda7095e6e0bf5 126,2674-2675,2986-3010
+apps/dashboard/src/lib/chat/extra-tools.ts
+  s_dce5829a402951::t_e3c5cdaa5a9c42 3,14
+apps/dashboard/src/utils/chat-custom-tools.ts
+  s_dce5829a402951::t_710cae9e75c218 1-16
+packages/ai/src/orchestration/orchestrate-standalone.ts
+  s_dce5829a402951::t_cfbe0788576e74 179
+apps/dashboard/src/constants/chat-extra-tools.ts
+  s_dce5829a402951::t_b3c2ad0a789157 1-3
+apps/dashboard/src/constants/chat-custom-tools.ts
+  s_dce5829a402951::t_710cae9e75c218 1-8
+apps/dashboard/src/lib/autopilot/workflows/agent-tools.ts
+  s_dce5829a402951::t_bda7095e6e0bf5 329
+  s_dce5829a402951::t_dab5134dd6bd5f 340-344,349-351
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "214618f35a98cc86fe2d3a03e35f3b1aded60c8b",
+  "prompts": {},
+  "sessions": {
+    "s_dce5829a402951": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e9bbbee6-ef3c-41b8-b6f5-3492ea56608b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
