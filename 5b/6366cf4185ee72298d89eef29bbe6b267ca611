@@ -1,0 +1,19 @@
+apps/dashboard/src/components/ai/chat-activity-group.tsx
+  s_b15605c2c6df6a::t_50f8da45a55f6d 148-149
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "5b6366cf4185ee72298d89eef29bbe6b267ca611",
+  "prompts": {},
+  "sessions": {
+    "s_b15605c2c6df6a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "81680805-5db7-4256-b828-a4602f3985cb",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
