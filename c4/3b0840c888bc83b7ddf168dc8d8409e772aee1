@@ -1,0 +1,42 @@
+apps/agent/agent/lib/constants/slack-addressing.ts
+  s_b46631a63f0e1f::t_51aa18eb46a4c1 1-32
+apps/agent/agent/channels/slack.ts
+  s_b46631a63f0e1f::t_ba9f23a3d303fd 51,170-173
+  s_b46631a63f0e1f::t_5faeb0251ebcba 494
+apps/agent/tests/slack-controls.test.ts
+  s_b46631a63f0e1f::t_6f12a11828fb91 1,3
+apps/agent/tests/slack-channel.test.ts
+  s_b46631a63f0e1f::t_9234c73e65cc1f 93-102,444-445,447-460,462-470,779-780
+  s_b46631a63f0e1f::t_7446a866539655 446,461
+apps/agent/agent/lib/types/slack-controls.ts
+  s_b46631a63f0e1f::t_5faeb0251ebcba 2
+apps/agent/agent/lib/utils/slack-controls.ts
+  s_b46631a63f0e1f::t_5faeb0251ebcba 1
+apps/agent/agent/instructions.md
+  s_b46631a63f0e1f::t_a904e0e41a4a10 61
+apps/agent/README.md
+  s_b46631a63f0e1f::t_c076210f1ee85d 21
+  s_b46631a63f0e1f::t_98099a73a04bd7 113
+apps/agent/agent/lib/constants/slack-controls.ts
+  s_b46631a63f0e1f::t_5faeb0251ebcba 1
+apps/agent/agent/lib/utils/slack-addressing.ts
+  s_b46631a63f0e1f::t_13445487c0be66 1-34,38-63,65-89,93-116
+  s_b46631a63f0e1f::t_ba9f23a3d303fd 64
+  s_b46631a63f0e1f::t_9a992fb0705e39 35-37,90-92
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "c43b0840c888bc83b7ddf168dc8d8409e772aee1",
+  "prompts": {},
+  "sessions": {
+    "s_b46631a63f0e1f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5aa16da7-c57a-4920-a7c7-e2902214fc20",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
