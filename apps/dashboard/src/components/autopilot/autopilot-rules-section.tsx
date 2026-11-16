@@ -164,11 +164,10 @@ export function AutopilotRulesSection({
               </span>
               <Button
                 aria-label={`Remove rule: ${rule.text}`}
-                className="text-muted-foreground"
                 disabled={rule.saving}
                 onClick={() => remove.mutate(rule.id)}
                 size="icon-sm"
-                variant="ghost"
+                variant="ghost-muted"
               >
                 <HugeiconsIcon icon={Delete02Icon} size={14} />
               </Button>

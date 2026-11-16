@@ -134,11 +134,11 @@ function RefreshChannelsButton({
         render={
           <Button
             aria-label={t("refreshAriaLabel")}
-            className="text-muted-foreground hover:text-foreground aria-expanded:bg-transparent"
+            className="aria-expanded:bg-transparent"
             loading={refreshMutation.isPending}
             onClick={() => refreshMutation.mutate()}
             size="icon-sm"
-            variant="ghost"
+            variant="ghost-muted"
           />
         }
       >

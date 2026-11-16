@@ -63,11 +63,10 @@ export function SiteHeader() {
           {isMobile ? (
             <Button
               aria-label={tCommon("actions.search")}
-              className="text-muted-foreground"
               onClick={() => setCommandPaletteOpen(true)}
               size="icon-sm"
               type="button"
-              variant="ghost"
+              variant="ghost-muted"
             >
               <HugeiconsIcon icon={SearchIcon} size={14} strokeWidth={1.8} />
             </Button>

@@ -69,10 +69,10 @@ export function OverviewTagsInput({
             {tag}
             <Button
               aria-label={t("remove", { tag })}
-              className="text-muted-foreground size-5"
+              className="size-5"
               onClick={() => onChange(tags.filter((item) => item !== tag))}
               size="icon-xs"
-              variant="ghost"
+              variant="ghost-muted"
             >
               <HugeiconsIcon
                 className="size-3"

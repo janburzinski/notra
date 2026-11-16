@@ -38,12 +38,12 @@ export function CompetitorSuggestions({
         </p>
         {remainingCount > 1 ? (
           <Button
-            className="text-muted-foreground h-auto px-0"
+            className="h-auto px-0"
             disabled={busy || atLimit}
             onClick={onAddAll}
             size="sm"
             type="button"
-            variant="ghost"
+            variant="ghost-muted"
           >
             {t("addAll")}
           </Button>

@@ -184,11 +184,11 @@ export function SettingsModalNav({
           {isSearching ? (
             <Button
               aria-label={tCommon("labels.clearSearch")}
-              className="text-muted-foreground absolute top-1/2 right-1.5 size-5 -translate-y-1/2 rounded-sm"
+              className="absolute top-1/2 right-1.5 size-5 -translate-y-1/2 rounded-sm"
               onClick={() => onQueryChange("")}
               size="icon-xs"
               type="button"
-              variant="ghost"
+              variant="ghost-muted"
             >
               <HugeiconsIcon className="size-3" icon={Cancel01Icon} />
             </Button>

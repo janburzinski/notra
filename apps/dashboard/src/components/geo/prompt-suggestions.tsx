@@ -65,11 +65,10 @@ function SuggestionRowActions({
       <Button
         aria-label={tGeoShared("removePrompt", { prompt: suggestion.prompt })}
         disabled={disabled}
-        className="text-muted-foreground"
         loading={dismissing}
         onClick={onDismiss}
         size="icon-sm"
-        variant="ghost"
+        variant="ghost-muted"
       >
         <HugeiconsIcon icon={Delete02Icon} size={14} />
       </Button>

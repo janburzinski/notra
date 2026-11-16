@@ -291,7 +291,7 @@ export function ShelfTable({
     return (
       <EmptyState
         action={
-          <Button className="gap-1.5" onClick={onAddShelf}>
+          <Button onClick={onAddShelf}>
             <HugeiconsIcon className="size-4" icon={PlusSignIcon} />
             {tGeoShared("addShelf")}
           </Button>

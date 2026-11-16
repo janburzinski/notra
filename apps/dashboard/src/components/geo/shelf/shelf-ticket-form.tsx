@@ -175,7 +175,7 @@ export function ShelfTicketForm({
           <Label htmlFor={`${id}-assignee`}>{t("assignee")}</Label>
           {currentMemberId && assigneeMemberId !== currentMemberId ? (
             <Button
-              className="text-muted-foreground hover:text-foreground h-auto px-0 text-xs"
+              className="text-muted-foreground hover:text-foreground h-auto px-0"
               disabled={disabled}
               onClick={() => onChange({ assigneeMemberId: currentMemberId })}
               size="xs"

@@ -587,6 +587,7 @@ export default function DesignSystemClientPage() {
                 <Button variant="secondary">Secondary</Button>
                 <Button variant="outline">Outline</Button>
                 <Button variant="ghost">Ghost</Button>
+                <Button variant="ghost-muted">Ghost muted</Button>
                 <Button variant="destructive">Destructive</Button>
                 <Button variant="link">Link</Button>
               </div>

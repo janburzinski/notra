@@ -218,14 +218,13 @@ function WriteCell({
             render={
               <Button
                 aria-label={t("ignore")}
-                className="text-muted-foreground"
                 loading={isIgnoring}
                 onClick={(event) => {
                   event.stopPropagation();
                   onIgnore();
                 }}
                 size="icon-sm"
-                variant="ghost"
+                variant="ghost-muted"
               />
             }
           >

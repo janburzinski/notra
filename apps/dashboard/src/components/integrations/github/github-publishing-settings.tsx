@@ -83,10 +83,9 @@ function GitHubContentPublishingSettings({
                   aria-label={t("publishing.editPathsAriaLabel", {
                     type: contentType,
                   })}
-                  className="text-muted-foreground"
                   size="icon-sm"
                   type="button"
-                  variant="ghost"
+                  variant="ghost-muted"
                   onClick={publishing.toggleEditor}
                 />
               }

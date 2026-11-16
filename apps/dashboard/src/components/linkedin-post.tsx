@@ -307,18 +307,16 @@ function LinkedInPostHeader({
       <div className="flex shrink-0 items-center">
         <Button
           aria-label={t("postActions")}
-          className="text-muted-foreground"
           size="icon-sm"
-          variant="ghost"
+          variant="ghost-muted"
         >
           <HugeiconsIcon className="size-5" icon={MoreHorizontalIcon} />
         </Button>
         <Button
           aria-label={t("closePost")}
-          className="text-muted-foreground"
           onClick={onClose}
           size="icon-sm"
-          variant="ghost"
+          variant="ghost-muted"
         >
           <HugeiconsIcon className="size-5" icon={Cancel01Icon} />
         </Button>
@@ -467,37 +465,37 @@ function LinkedInPost({
 
         <div className="flex items-center justify-around px-2">
           <Button
-            className="text-muted-foreground flex-1 gap-1.5"
+            className="flex-1 gap-1.5"
             onClick={onLike}
             size="sm"
-            variant="ghost"
+            variant="ghost-muted"
           >
             <HugeiconsIcon className="size-4" icon={ThumbsUpIcon} />
             <span className="text-xs">{t("linkedinLike")}</span>
           </Button>
           <Button
-            className="text-muted-foreground flex-1 gap-1.5"
+            className="flex-1 gap-1.5"
             onClick={onComment}
             size="sm"
-            variant="ghost"
+            variant="ghost-muted"
           >
             <HugeiconsIcon className="size-4" icon={Comment01Icon} />
             <span className="text-xs">{t("linkedinComment")}</span>
           </Button>
           <Button
-            className="text-muted-foreground flex-1 gap-1.5"
+            className="flex-1 gap-1.5"
             onClick={onRepost}
             size="sm"
-            variant="ghost"
+            variant="ghost-muted"
           >
             <HugeiconsIcon className="size-4" icon={RepostIcon} />
             <span className="text-xs">{t("linkedinRepost")}</span>
           </Button>
           <Button
-            className="text-muted-foreground flex-1 gap-1.5"
+            className="flex-1 gap-1.5"
             onClick={onSend}
             size="sm"
-            variant="ghost"
+            variant="ghost-muted"
           >
             <HugeiconsIcon className="size-4" icon={SentIcon} />
             <span className="text-xs">{tCommon("labels.send")}</span>

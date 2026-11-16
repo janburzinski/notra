@@ -19,6 +19,7 @@ const depthVariants = cva("relative", {
       secondary:
         "border-foreground/60 from-foreground/85 to-foreground text-background hover:from-foreground/70 hover:to-foreground/85 bg-linear-to-b shadow-[inset_0_1px_0_rgba(255,255,255,0.28),0_1px_2px_rgba(0,0,0,0.18)] [corner-shape:squircle] supports-[corner-shape:squircle]:rounded-[0.75rem]",
       ghost: "",
+      "ghost-muted": "text-muted-foreground",
       destructive:
         "border-destructive/60 from-destructive focus-visible:border-destructive/40 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 bg-linear-to-b to-[color-mix(in_oklab,var(--color-destructive),black_12%)] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.28),0_1px_2px_rgba(0,0,0,0.18)] [corner-shape:squircle] hover:brightness-110 supports-[corner-shape:squircle]:rounded-[0.75rem] dark:from-[color-mix(in_oklab,var(--color-destructive),black_20%)] dark:to-[color-mix(in_oklab,var(--color-destructive),black_30%)]",
       link: "text-foreground",
@@ -29,16 +30,36 @@ const depthVariants = cva("relative", {
   },
 });
 
-type ButtonVariantProps = VariantProps<typeof shadcnButtonVariants>;
+type ButtonVariant = NonNullable<VariantProps<typeof depthVariants>["variant"]>;
+
+type ButtonVariantProps = Omit<
+  VariantProps<typeof shadcnButtonVariants>,
+  "variant"
+> & { variant?: ButtonVariant | null };
+
+// shadcn's Button has no ghost-muted, so it renders as ghost and depthVariants
+// adds the muted text.
+function baseVariant(variant: ButtonVariant) {
+  return variant === "ghost-muted" ? "ghost" : variant;
+}
 
 function buttonVariants({
   className,
+  variant,
   ...props
 }: ButtonVariantProps & { className?: string } = {}) {
-  return cn(shadcnButtonVariants(props), depthVariants(props), className);
+  return cn(
+    shadcnButtonVariants({
+      ...props,
+      variant: variant ? baseVariant(variant) : variant,
+    }),
+    depthVariants({ variant }),
+    className
+  );
 }
 
-type ButtonProps = ComponentProps<typeof ShadcnButton> & {
+type ButtonProps = Omit<ComponentProps<typeof ShadcnButton>, "variant"> & {
+  variant?: ButtonVariant;
   /** Swaps the label for bouncing dots while an action runs. */
   loading?: boolean;
   /**
@@ -83,7 +104,7 @@ function Button({
       disabled={disabled || busy}
       focusableWhenDisabled={focusableWhenDisabled ?? busy}
       size={size}
-      variant={variant}
+      variant={baseVariant(variant)}
       {...props}
     >
       <ButtonContent

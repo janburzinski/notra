@@ -57,9 +57,8 @@ export function SiteDeploymentMenu({
         render={
           <Button
             aria-label={t("label", { sha: shortSha(deployment.commitSha) })}
-            className="text-muted-foreground"
             size="icon-sm"
-            variant="ghost"
+            variant="ghost-muted"
           />
         }
       >

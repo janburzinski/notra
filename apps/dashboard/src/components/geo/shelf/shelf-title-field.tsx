@@ -44,7 +44,7 @@ export function ShelfTitleField({
         !showPreviewTitle &&
         value.trim() !== previewTitle ? (
           <Button
-            className="text-muted-foreground hover:text-foreground h-auto px-0 text-xs"
+            className="text-muted-foreground hover:text-foreground h-auto px-0"
             onClick={() => onChange(previewTitle)}
             size="xs"
             type="button"

@@ -20,11 +20,11 @@ export function GeoAnswerActions({ text, sources }: GeoAnswerActionsProps) {
     <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-2 text-sm">
       <Button
         aria-label={t("copy")}
-        className="text-muted-foreground h-7 gap-1.5 px-2"
+        className="h-7 gap-1.5 px-2"
         onClick={() => copyTextToClipboard(text, t("copied"))}
         size="sm"
         type="button"
-        variant="ghost"
+        variant="ghost-muted"
       >
         <HugeiconsIcon aria-hidden="true" icon={Copy01Icon} size={14} />
         {t("copy")}

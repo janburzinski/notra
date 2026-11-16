@@ -120,12 +120,12 @@ function RemoveItemButton({
   return (
     <Button
       aria-label={label}
-      className="text-muted-foreground shrink-0 opacity-0 group-focus-within/item:opacity-100 group-hover/item:opacity-100 focus-visible:opacity-100"
+      className="shrink-0 opacity-0 group-focus-within/item:opacity-100 group-hover/item:opacity-100 focus-visible:opacity-100"
       onClick={onClick}
       onMouseDown={onMouseDown}
       size="icon-sm"
       type="button"
-      variant="ghost"
+      variant="ghost-muted"
     >
       <HugeiconsIcon className="size-3.5" icon={Cancel01Icon} />
     </Button>

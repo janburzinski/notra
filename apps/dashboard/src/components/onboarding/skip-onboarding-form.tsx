@@ -21,7 +21,7 @@ export function SkipOnboardingForm({ slug, step }: SkipOnboardingFormProps) {
       }}
       className="flex justify-center py-2"
     >
-      <Button className="text-muted-foreground" type="submit" variant="ghost">
+      <Button type="submit" variant="ghost-muted">
         {t("skipOnboarding")}
       </Button>
     </form>

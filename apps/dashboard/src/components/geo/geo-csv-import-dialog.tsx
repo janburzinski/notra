@@ -323,7 +323,7 @@ function GeoCsvImportDialog<TRow>({
           ) : null}
           <div className="flex justify-end">
             <Button
-              className="h-auto shrink-0 gap-1 px-0 text-xs"
+              className="h-auto shrink-0 px-0"
               onClick={downloadTemplate}
               size="xs"
               type="button"

@@ -280,9 +280,9 @@ function TwitterPostIdentity({
       ) : (
         <Button
           aria-label={t("postActions")}
-          className="text-muted-foreground ml-auto"
+          className="ml-auto"
           size="icon-sm"
-          variant="ghost"
+          variant="ghost-muted"
         >
           <HugeiconsIcon className="size-4" icon={MoreHorizontalIcon} />
         </Button>
@@ -393,40 +393,20 @@ function TwitterPost({
             )}
 
             <div className="mt-auto flex items-center justify-between pt-2">
-              <Button
-                className="text-muted-foreground gap-1.5"
-                size="icon-sm"
-                variant="ghost"
-              >
+              <Button className="gap-1.5" size="icon-sm" variant="ghost-muted">
                 <HugeiconsIcon className="size-4" icon={Comment01Icon} />
               </Button>
-              <Button
-                className="text-muted-foreground gap-1.5"
-                size="icon-sm"
-                variant="ghost"
-              >
+              <Button className="gap-1.5" size="icon-sm" variant="ghost-muted">
                 <HugeiconsIcon className="size-4" icon={RepeatIcon} />
               </Button>
-              <Button
-                className="text-muted-foreground gap-1.5"
-                size="icon-sm"
-                variant="ghost"
-              >
+              <Button className="gap-1.5" size="icon-sm" variant="ghost-muted">
                 <HugeiconsIcon className="size-4" icon={FavouriteIcon} />
               </Button>
               <div className="flex items-center gap-0.5">
-                <Button
-                  className="text-muted-foreground"
-                  size="icon-sm"
-                  variant="ghost"
-                >
+                <Button size="icon-sm" variant="ghost-muted">
                   <HugeiconsIcon className="size-4" icon={Bookmark02Icon} />
                 </Button>
-                <Button
-                  className="text-muted-foreground"
-                  size="icon-sm"
-                  variant="ghost"
-                >
+                <Button size="icon-sm" variant="ghost-muted">
                   <HugeiconsIcon className="size-4" icon={Share01Icon} />
                 </Button>
               </div>

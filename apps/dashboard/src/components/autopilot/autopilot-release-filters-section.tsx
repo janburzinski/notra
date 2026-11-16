@@ -208,7 +208,7 @@ export function AutopilotReleaseFiltersSection({
                   </div>
                   <Button
                     aria-label={`Remove the path filter for ${name}`}
-                    className="text-muted-foreground -mt-1 -mr-2"
+                    className="-mt-1 -mr-2"
                     onClick={() => {
                       if (repository === addedRepository) {
                         setAddedRepository(null);
@@ -218,7 +218,7 @@ export function AutopilotReleaseFiltersSection({
                       }
                     }}
                     size="icon-sm"
-                    variant="ghost"
+                    variant="ghost-muted"
                   >
                     <HugeiconsIcon icon={Delete02Icon} size={14} />
                   </Button>

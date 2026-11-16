@@ -415,10 +415,10 @@ export function CompetitorDetailView({
                   render={
                     <Button
                       aria-label={t("editNamed", { competitor })}
-                      className="text-muted-foreground size-7 shrink-0"
+                      className="shrink-0"
                       onClick={() => setEditOpen(true)}
                       size="icon-sm"
-                      variant="ghost"
+                      variant="ghost-muted"
                     />
                   }
                 >

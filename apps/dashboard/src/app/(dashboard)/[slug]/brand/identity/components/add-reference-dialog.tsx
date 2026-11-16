@@ -550,12 +550,12 @@ function ImportXStep({
                 </Button>
                 <Button
                   aria-label={tCommon("disconnect")}
-                  className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+                  className="hover:bg-destructive/10 hover:text-destructive"
                   disabled={disconnectAccount.isPending}
                   onClick={() => handleDisconnect(account)}
                   size="icon-sm"
                   type="button"
-                  variant="ghost"
+                  variant="ghost-muted"
                 >
                   <HugeiconsIcon className="size-3.5" icon={Cancel01Icon} />
                 </Button>

@@ -42,12 +42,12 @@ export function SelectedCompetitors({
             <span className="max-w-40 truncate">{entry.name}</span>
             <Button
               aria-label={tCommon("labels.removeName", { name: entry.name })}
-              className="text-muted-foreground size-5 rounded-full"
+              className="size-5 rounded-full"
               disabled={disabled}
               onClick={() => onRemove(entry)}
               size="icon-xs"
               type="button"
-              variant="ghost"
+              variant="ghost-muted"
             >
               <HugeiconsIcon icon={Cancel01Icon} size={12} />
             </Button>

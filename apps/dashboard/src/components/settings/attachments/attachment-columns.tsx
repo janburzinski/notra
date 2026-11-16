@@ -114,11 +114,11 @@ export function createAttachmentColumns({
               render={
                 <Button
                   aria-label={t("deleteFile", { filename: row.filename })}
-                  className="text-muted-foreground hover:text-destructive"
+                  className="hover:text-destructive"
                   loading={pending}
                   onClick={() => onDelete(row.key)}
                   size="icon-sm"
-                  variant="ghost"
+                  variant="ghost-muted"
                 >
                   <HugeiconsIcon icon={Delete02Icon} size={14} />
                 </Button>

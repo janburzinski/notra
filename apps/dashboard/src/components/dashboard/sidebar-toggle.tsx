@@ -26,7 +26,7 @@ export function SidebarToggle({
       aria-expanded={isOpen}
       aria-label={isOpen ? t("hide") : t("show")}
       className={cn(
-        "hover:bg-muted aria-expanded:hover:bg-muted dark:hover:bg-muted/50 dark:aria-expanded:hover:bg-muted/50 cursor-pointer bg-transparent aria-expanded:bg-transparent",
+        "aria-expanded:hover:bg-muted dark:hover:bg-muted/50 dark:aria-expanded:hover:bg-muted/50 cursor-pointer bg-transparent aria-expanded:bg-transparent",
         className
       )}
       data-sidebar="trigger"

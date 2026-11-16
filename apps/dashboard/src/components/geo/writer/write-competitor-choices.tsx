@@ -69,7 +69,7 @@ export function WriteCompetitorChoices({
         {children}
         {competitors.length > 0 && (fitsLimit || selectedIds.length > 0) ? (
           <Button
-            className="text-muted-foreground hover:text-foreground h-auto px-0 text-xs hover:no-underline"
+            className="text-muted-foreground hover:text-foreground h-auto px-0 hover:no-underline"
             onClick={toggleAll}
             size="xs"
             type="button"

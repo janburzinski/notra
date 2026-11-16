@@ -20,7 +20,6 @@ import {
   useContentPanelHasPreview,
   useContentPanelTab,
 } from "@/lib/content-panel-tab";
-import { cn } from "@/lib/utils";
 import type {
   ContentPanelOverviewProps,
   ContentPanelTab,
@@ -49,10 +48,7 @@ export function ContentPanelTabs() {
         return (
           <Button
             aria-selected={isActive}
-            className={cn(
-              "text-xs transition-[background-color,color,box-shadow] active:scale-100",
-              !isActive && "text-muted-foreground"
-            )}
+            className="text-xs transition-[background-color,color,box-shadow] active:scale-100"
             id={`content-panel-tab-${id}`}
             key={id}
             onClick={() => setContentPanelTab(id)}
@@ -71,7 +67,7 @@ export function ContentPanelTabs() {
             role="tab"
             size="sm"
             tabIndex={isActive ? 0 : -1}
-            variant={isActive ? "secondary" : "ghost"}
+            variant={isActive ? "secondary" : "ghost-muted"}
           >
             {t(id)}
           </Button>

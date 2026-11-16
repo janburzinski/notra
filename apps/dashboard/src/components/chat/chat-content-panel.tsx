@@ -298,7 +298,7 @@ function ChatContentPanelTabSurface({
       <Button
         aria-label={t("closeTab", { title })}
         className={cn(
-          "text-muted-foreground absolute top-1/2 right-1 size-5 -translate-y-1/2",
+          "absolute top-1/2 right-1 size-5 -translate-y-1/2",
           isActive || isOverlay
             ? "opacity-100"
             : "opacity-0 group-hover/tab:opacity-100 focus-visible:opacity-100"
@@ -306,7 +306,7 @@ function ChatContentPanelTabSurface({
         onClick={onClose}
         size="icon-xs"
         tabIndex={isOverlay ? -1 : undefined}
-        variant="ghost"
+        variant="ghost-muted"
       >
         <HugeiconsIcon className="size-3" icon={Cancel01Icon} strokeWidth={2} />
       </Button>

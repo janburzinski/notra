@@ -121,10 +121,10 @@ export default function PageClient({
               <span className="inline-flex max-w-full items-center gap-2">
                 <span className="min-w-0">{collection.name}</span>
                 <Button
-                  className="text-muted-foreground shrink-0"
+                  className="shrink-0"
                   onClick={() => setShowRenameDialog(true)}
                   size="icon-sm"
-                  variant="ghost"
+                  variant="ghost-muted"
                 >
                   <span className="sr-only">
                     {tContentShared("renameCollection")}

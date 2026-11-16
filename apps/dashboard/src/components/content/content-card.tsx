@@ -164,8 +164,9 @@ const ContentCard = memo(function ContentCard({
               <DropdownMenuTrigger
                 render={
                   <Button
-                    className="text-muted-foreground hover:text-foreground -mt-0.5 -mr-1 size-7 p-0"
-                    variant="ghost"
+                    className="-mt-0.5 -mr-1"
+                    size="icon-sm"
+                    variant="ghost-muted"
                   >
                     <span className="sr-only">
                       {tCommon2("labels.openMenu")}

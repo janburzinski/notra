@@ -488,7 +488,7 @@ function CreateSkillFormDialog({
                     />
                     <InputGroupAddon align="inline-end" className="pr-1">
                       <Button
-                        className="h-7 px-2.5"
+                        className="h-7"
                         disabled={
                           !quickstartUrl.trim() ||
                           !!quickstartError ||

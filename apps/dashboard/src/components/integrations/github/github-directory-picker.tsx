@@ -418,7 +418,7 @@ export function GitHubDirectoryPicker({
               type: contentType,
               directory: directory || t("repositoryRoot"),
             })}
-            className="bg-background text-muted-foreground h-10 w-full justify-between gap-3 rounded-lg border px-3 font-normal shadow-none"
+            className="text-muted-foreground h-10 w-full justify-between gap-3 px-3 font-normal shadow-none"
             disabled={disabled}
             id={triggerId}
             type="button"

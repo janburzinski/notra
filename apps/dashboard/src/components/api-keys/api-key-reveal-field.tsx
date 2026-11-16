@@ -30,11 +30,11 @@ export function ApiKeyRevealField({
       <div className="absolute inset-y-0 right-1.5 flex items-center gap-0.5">
         <Button
           aria-label={revealed ? t("hide") : t("show")}
-          className="text-muted-foreground size-7"
+          className="size-7"
           onClick={() => setRevealed((current) => !current)}
           size="icon"
           type="button"
-          variant="ghost"
+          variant="ghost-muted"
         >
           <HugeiconsIcon
             className="size-4"
