@@ -23,6 +23,7 @@ import {
   DUB_ANALYTICS_SCRIPTS,
   DUB_CLEAR_ON_REVOCATION,
 } from "@/constants/dub";
+import { NOTRA_WEB_KEY } from "@/constants/notra-analytics";
 import { resolveDashboardConsent } from "@/lib/consent-manager/resolve";
 import { consentComponents, consentTheme } from "@/lib/consent-manager/theme";
 import {
@@ -32,6 +33,7 @@ import {
 } from "@/lib/i18n/catalog";
 import { getEmbedLocale, getLocale } from "@/lib/i18n/server";
 import dynamic from "@/utils/lazy-component";
+import { notraAnalyticsScript } from "@/utils/notra-analytics";
 import { Providers } from "@/utils/providers";
 import { isTrafficEmbedPath, trafficEmbedTheme } from "@/utils/traffic-embed";
 
@@ -44,6 +46,11 @@ const DatabuddyAnalytics = dynamic(
     ),
   { ssr: false }
 );
+
+const CONSENT_SCRIPTS = [
+  ...DUB_ANALYTICS_SCRIPTS,
+  ...(NOTRA_WEB_KEY ? [notraAnalyticsScript(NOTRA_WEB_KEY)] : []),
+];
 
 const loadRootState = createServerFn({ method: "GET" })
   .validator((data: { embedLocale?: unknown } | undefined) => data)
@@ -150,7 +157,7 @@ function Root() {
                   : { mode: local() }),
               }}
               clearOnRevocation={DUB_CLEAR_ON_REVOCATION}
-              scripts={DUB_ANALYTICS_SCRIPTS}
+              scripts={CONSENT_SCRIPTS}
               state={consent}
             >
               {app}
