@@ -2197,7 +2197,8 @@ export interface WebAnalyticsSource {
   source: string;
   aiProduct: string;
   sessions: number;
-  previousSessions: number;
+  /** Null when filtered to a page whose previous period the raw rows lost. */
+  previousSessions: number | null;
   visitors: number;
 }
 
@@ -2207,7 +2208,8 @@ export type WebUtmDimension = (typeof WEB_UTM_DIMENSIONS)[number];
 export interface WebAnalyticsUtmRow {
   value: string;
   sessions: number;
-  previousSessions: number;
+  /** Null when read from raw rows that no longer cover the previous period. */
+  previousSessions: number | null;
   visitors: number;
 }
 
@@ -2234,7 +2236,8 @@ export interface WebAnalyticsOutboundLink {
   /** Destination host and path, no query. */
   url: string;
   clicks: number;
-  previousClicks: number;
+  /** Null when the raw clicks no longer cover the previous period. */
+  previousClicks: number | null;
   visitors: number;
 }
 
@@ -2322,7 +2325,8 @@ export interface WebEngagement {
   /** Page views that reported a visible time; zero before the script ran. */
   views: number;
   avgSeconds: number;
-  previousAvgSeconds: number;
+  /** Null when the raw engagement no longer covers the previous period. */
+  previousAvgSeconds: number | null;
   pages: WebEngagementPage[];
 }
 

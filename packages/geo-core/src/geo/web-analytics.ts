@@ -30,6 +30,7 @@ import {
   WEB_DEFAULT_DAYS,
   WEB_PAGES_LIMIT,
   WEB_SOURCES_LIMIT,
+  WEB_UTM_RAW_ONLY_DIMENSIONS,
   WEB_VITAL_METRICS,
 } from "../constants/web-analytics";
 import type {
@@ -54,6 +55,7 @@ import type {
 } from "../types/geo";
 import { NATIVE_EPOCH_DAY } from "../utils/analytics-import-range";
 import { webHostFilter } from "../utils/geo-project-domains";
+import { rawWebPreviousKept } from "../utils/web-raw-retention";
 import { loadCompletedImports } from "./analytics-imports";
 import { geoQuery, geoRequiredQuery } from "./effect";
 import { loadAiTraffic } from "./programs";
@@ -61,24 +63,30 @@ import { resolveGeoScope } from "./projects";
 import { geoTrafficWindowParams } from "./window";
 
 function toBreakdown(
-  rows: readonly (WebAudienceRow | WebLanguagesRow)[] | undefined
+  rows: readonly (WebAudienceRow | WebLanguagesRow)[] | undefined,
+  previousKept = true
 ): WebAnalyticsBreakdown[] {
   return (rows ?? []).map((row) => ({
     value: row.value,
     visitors: Number(row.visitors),
     previousVisitors:
-      row.previous_visitors == null ? null : Number(row.previous_visitors),
+      !previousKept || row.previous_visitors == null
+        ? null
+        : Number(row.previous_visitors),
   }));
 }
 
 function toEngagement(
-  rows: readonly WebEngagementRow[] | undefined
+  rows: readonly WebEngagementRow[] | undefined,
+  previousKept: boolean
 ): WebEngagement {
   const overall = rows?.find((row) => row.path === "");
   return {
     views: Number(overall?.views ?? 0),
     avgSeconds: Number(overall?.avg_seconds ?? 0),
-    previousAvgSeconds: Number(overall?.previous_avg_seconds ?? 0),
+    previousAvgSeconds: previousKept
+      ? Number(overall?.previous_avg_seconds ?? 0)
+      : null,
     pages: (rows ?? [])
       .filter((row) => row.path !== "")
       .map((row) => ({
@@ -121,7 +129,8 @@ function toVitals(
  * page's core breakdowns.
  */
 const loadScriptReports = Effect.fnUntraced(function* (
-  params: Parameters<typeof queryWebVitals>[0]
+  params: Parameters<typeof queryWebVitals>[0],
+  previousKept: boolean
 ) {
   const listed = { ...params, limit: WEB_SOURCES_LIMIT };
   const [outbound, vitals, errors, languages] = yield* Effect.all(
@@ -141,7 +150,7 @@ const loadScriptReports = Effect.fnUntraced(function* (
     outboundLinks: (outbound?.data ?? []).map((row) => ({
       url: row.url,
       clicks: Number(row.clicks),
-      previousClicks: Number(row.previous_clicks),
+      previousClicks: previousKept ? Number(row.previous_clicks) : null,
       visitors: Number(row.visitors),
     })),
     vitals: toVitals(vitals?.data, "all"),
@@ -155,7 +164,7 @@ const loadScriptReports = Effect.fnUntraced(function* (
       events: Number(row.events),
       views: Number(row.views),
     })),
-    languages: toBreakdown(languages?.data),
+    languages: toBreakdown(languages?.data, previousKept),
   };
   return reports;
 });
@@ -215,6 +224,9 @@ const loadWebAnalyticsForScope = Effect.fn("web.analytics")(function* (
   withScriptReports = false
 ) {
   const { base, params } = webQueryParams(scope, window, path, sites);
+  // Filtered to a page, sources and audience read the raw page views.
+  const previousKept = rawWebPreviousKept(params);
+  const pathPreviousKept = path === "" || previousKept;
   const configured = isTinybirdConfigured();
   const query = configured && !isDemoMode() ? geoRequiredQuery : geoQuery;
   const completed = yield* loadCompletedImports(
@@ -275,7 +287,7 @@ const loadWebAnalyticsForScope = Effect.fn("web.analytics")(function* (
         queryWebHosts({ ...base, hosts: "", imports })
       ),
       breakdowns && withScriptReports
-        ? loadScriptReports(params)
+        ? loadScriptReports(params, previousKept)
         : Effect.succeed(undefined),
     ],
     { concurrency: "unbounded" }
@@ -309,11 +321,11 @@ const loadWebAnalyticsForScope = Effect.fn("web.analytics")(function* (
       source: row.referrer_source,
       aiProduct: row.ai_product,
       sessions: Number(row.sessions),
-      previousSessions: Number(row.previous_sessions),
+      previousSessions: pathPreviousKept ? Number(row.previous_sessions) : null,
       visitors: Number(row.visitors),
     })),
-    countries: toBreakdown(countries?.data),
-    devices: toBreakdown(devices?.data),
+    countries: toBreakdown(countries?.data, pathPreviousKept),
+    devices: toBreakdown(devices?.data, pathPreviousKept),
     outcomes: (outcomes?.data ?? []).map((row) => ({
       source: row.source,
       sessions: Number(row.sessions),
@@ -374,7 +386,13 @@ export const loadWebAnalytics = Effect.fn("web.projectAnalytics")(function* (
     return web;
   }
   const response: WebAnalyticsResponse = withEngagement
-    ? { ...web, engagement: toEngagement(engagement?.data) }
+    ? {
+        ...web,
+        engagement: toEngagement(
+          engagement?.data,
+          rawWebPreviousKept(geoTrafficWindowParams(window, WEB_DEFAULT_DAYS))
+        ),
+      }
     : web;
   return response;
 });
@@ -414,10 +432,22 @@ export const loadWebUtm = Effect.fn("web.utm")(function* (
       limit: WEB_SOURCES_LIMIT,
     })
   );
+  // Term and content, and every dimension filtered to a page, read the raw
+  // page views. Without a path, imports add theirs, which never expire, but
+  // only when the import covers every host the report reads.
+  const previousKept =
+    (path === "" && !WEB_UTM_RAW_ONLY_DIMENSIONS.includes(dimension)) ||
+    rawWebPreviousKept(
+      params,
+      new Date(),
+      path === "" && completed.coversHosts
+        ? completed.coverage?.until
+        : undefined
+    );
   return (result?.data ?? []).map((row): WebAnalyticsUtmRow => ({
     value: row.value,
     sessions: Number(row.sessions),
-    previousSessions: Number(row.previous_sessions),
+    previousSessions: previousKept ? Number(row.previous_sessions) : null,
     visitors: Number(row.visitors),
   }));
 });
@@ -496,7 +526,10 @@ export const loadSiteAnalytics = Effect.fn("web.siteAnalytics")(function* (
   const response: SiteAnalyticsResponse = {
     web,
     traffic,
-    engagement: toEngagement(engagement?.data),
+    engagement: toEngagement(
+      engagement?.data,
+      rawWebPreviousKept(geoTrafficWindowParams(window, WEB_DEFAULT_DAYS))
+    ),
   };
   return response;
 });

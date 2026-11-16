@@ -729,6 +729,18 @@ if (process.env.NOTRA_ANALYTICS_IMPORTS_SANDBOX_TEST !== "1") {
     });
     expect((await coverage([]))?.nativeStart).toBe("2026-11-01");
     expect(await coverage(["unrelated.example"])).toBeNull();
+    // Imported days stand in for expired native ones only when the import
+    // covers every host read: a filter it wrote, subdomains included.
+    const coversHosts = async (hosts: string[]) =>
+      (
+        await Effect.runPromise(
+          loadCompletedImports("org-a", "project-a", "web", hosts)
+        )
+      ).coversHosts;
+    expect(await coversHosts(["www.example.com"])).toBe(true);
+    expect(await coversHosts(["blog.example.com"])).toBe(true);
+    expect(await coversHosts([])).toBe(false);
+    expect(await coversHosts(["example.com", "unrelated.example"])).toBe(false);
 
     nativeFirstDay = "1970-01-01";
     const beforeTracking = await createCsvImport("new.example", {

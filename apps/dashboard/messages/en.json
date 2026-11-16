@@ -4611,6 +4611,7 @@
     },
     "webVisitors": {
       "comparisonUnavailable": "No data for the previous period",
+      "pageFilterRetention": "Filtered to one page, every table except Top pages covers only the last 90 days.",
       "visitors": "Visitors",
       "views": "Page views",
       "fromAi": "From AI answers",

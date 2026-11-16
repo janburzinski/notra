@@ -1,7 +1,9 @@
 "use client";
 
+import { InformationCircleIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { trafficLogHostFilter } from "@notra/geo-core/utils/geo-project-domains";
+import { startsBeforeRawWebRetention } from "@notra/geo-core/utils/web-raw-retention";
 import { TruncateWithTooltip } from "@notra/ui/components/shared/truncate-with-tooltip";
 import { useLocale, useTranslations } from "use-intl";
 
@@ -39,6 +41,12 @@ export function WebVisitorsSection({
   const locale = useLocale();
   const sideBySide = useDesktopBreakpoint();
   const compare = hasPreviousWebPeriod(web);
+  // Filtered to a page, every table but Top pages reads visits Notra keeps
+  // for 90 days, while the totals and Top pages cover the whole range.
+  const tablesCutShort =
+    Boolean(utm?.path) &&
+    range !== undefined &&
+    startsBeforeRawWebRetention(range.from);
 
   const showPageHost = new Set(web.pages.map((page) => page.host)).size > 1;
   const pageRows: WebBreakdownRow[] = web.pages
@@ -145,6 +153,16 @@ export function WebVisitorsSection({
         traffic={traffic}
         web={web}
       />
+      {tablesCutShort ? (
+        <p className="text-muted-foreground -mb-2 flex items-center gap-1.5 text-sm">
+          <HugeiconsIcon
+            className="shrink-0"
+            icon={InformationCircleIcon}
+            size={14}
+          />
+          {t("pageFilterRetention")}
+        </p>
+      ) : null}
       <div className="grid gap-4 lg:grid-cols-2">
         <WebBreakdownTable
           compare={compare}

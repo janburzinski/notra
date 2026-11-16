@@ -1,3 +1,4 @@
+import type { WebUtmDimension } from "../types/geo";
 import type { WebAndroidAppReferrer } from "../types/ingest";
 
 export const WEB_SESSION_TTL_SECONDS = 30 * 60;
@@ -12,6 +13,11 @@ export const WEB_UTM_DIMENSIONS = [
   "term",
   "content",
 ] as const;
+/** UTM parameters only the raw page views keep, not web_sources_daily. */
+export const WEB_UTM_RAW_ONLY_DIMENSIONS: readonly WebUtmDimension[] = [
+  "term",
+  "content",
+];
 export const WEB_UTM_CAMPAIGN_MAX_LENGTH = 200;
 
 /**

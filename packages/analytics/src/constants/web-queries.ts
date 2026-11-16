@@ -12,6 +12,13 @@ import {
   IMPORTS_SQL,
 } from "./geo-queries";
 
+/**
+ * Days the raw web datasources (page views, engagement, outbound clicks and
+ * errors) keep a row. Reports that read them cannot compare a period that
+ * starts earlier.
+ */
+export const WEB_RAW_RETENTION_DAYS = 90;
+
 const WEB_SCOPE_PARAMS = {
   site_id: p
     .string()

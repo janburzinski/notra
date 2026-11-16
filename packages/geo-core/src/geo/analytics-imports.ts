@@ -15,7 +15,9 @@ import type {
 } from "../types/analytics-imports";
 import { CompletedImportsCacheKey } from "../types/ingest-cache-keys";
 import {
+  importHostScope,
   importHostScopesOverlap,
+  isInImportHostScope,
   providerHostScope,
 } from "../utils/analytics-import-host";
 import { toDay } from "../utils/analytics-import-range";
@@ -76,6 +78,7 @@ function toCompletedImports(
   hosts: readonly string[]
 ): CompletedImports {
   let coverage: CompletedImports["coverage"] = null;
+  let covering: CompletedImportRow | null = null;
   for (const row of rows) {
     const relevant =
       hosts.length === 0 ||
@@ -92,14 +95,26 @@ function toCompletedImports(
         until: row.until,
         nativeStart: row.nativeStart,
       };
+      covering = row;
     }
   }
+  const scope = covering
+    ? providerHostScope(covering.provider, covering.host)
+    : null;
   return {
     ids: rows
       .map((row) => row.id)
       .toSorted()
       .join(","),
     coverage,
+    // A host filter also reads its subdomains (GEO_HOSTS_SQL).
+    coversHosts:
+      scope !== null &&
+      scope.subdomains &&
+      hosts.length > 0 &&
+      hosts.every((host) =>
+        isInImportHostScope(host, importHostScope(scope.host))
+      ),
   };
 }
 
@@ -116,7 +131,11 @@ export function forgetCompletedImportIds(organizationId: string): void {
   );
 }
 
-const NO_IMPORTS: CompletedImports = { ids: "", coverage: null };
+const NO_IMPORTS: CompletedImports = {
+  ids: "",
+  coverage: null,
+  coversHosts: false,
+};
 
 /**
  * Completed imports for the analytics `imports` param, plus the latest one's

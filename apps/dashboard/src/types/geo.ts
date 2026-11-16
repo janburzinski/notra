@@ -2108,7 +2108,8 @@ export interface WebScriptEmptyProps {
 export interface WebMetricProps {
   label: string;
   value: number;
-  previous: number;
+  /** Null when the previous period is past what the raw rows keep. */
+  previous: number | null;
   /** Durations are in seconds and skip the delta until both periods have data. */
   format?: "count" | "duration";
   /** False when the previous period has nothing to compare with. */

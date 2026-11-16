@@ -4611,6 +4611,7 @@
     },
     "webVisitors": {
       "comparisonUnavailable": "Keine Daten für den vorherigen Zeitraum",
+      "pageFilterRetention": "Für eine einzelne Seite zeigen alle Tabellen außer „Top-Seiten“ nur die letzten 90 Tage.",
       "visitors": "Besucher",
       "views": "Seitenaufrufe",
       "fromAi": "Aus KI-Antworten",

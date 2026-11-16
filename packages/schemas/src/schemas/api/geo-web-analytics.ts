@@ -104,7 +104,7 @@ const breakdownSchema = z.object({
   }),
   previousVisitors: z.number().int().nullable().optional().openapi({
     description:
-      "Visitors in the previous window of the same length, immediately before this one. Returned on every row; 0 when there were none.",
+      "Visitors in the previous window of the same length, immediately before this one. Returned on every row; 0 when there were none. Null when the row is read from visits Notra keeps for 90 days (languages, or any breakdown filtered to a path) and the previous window starts before them.",
   }),
 });
 
@@ -209,7 +209,10 @@ export const webAnalyticsBreakdownsResponseSchema = z
           sessions: z.number().int().openapi({
             description: "Sessions whose first page had this referrer.",
           }),
-          previousSessions: z.number().int(),
+          previousSessions: z.number().int().nullable().openapi({
+            description:
+              "Sessions in the previous window of the same length. Null when filtered to a path and the previous window starts before the 90 days of visits Notra keeps.",
+          }),
           visitors: z.number().int(),
         })
       )
@@ -251,9 +254,9 @@ export const webAnalyticsBreakdownsResponseSchema = z
             description: "Destination host and path, without the query.",
           }),
           clicks: z.number().int(),
-          previousClicks: z.number().int().openapi({
+          previousClicks: z.number().int().nullable().openapi({
             description:
-              "Clicks in the previous window of the same length, immediately before this one.",
+              "Clicks in the previous window of the same length, immediately before this one. Null when that window starts before the 90 days of clicks Notra keeps.",
           }),
           visitors: z.number().int().openapi({
             description: "Unique visitors who clicked.",
@@ -320,9 +323,9 @@ export const webAnalyticsUtmResponseSchema = z
         sessions: z.number().int().openapi({
           description: "Sessions whose first page carried this UTM value.",
         }),
-        previousSessions: z.number().int().openapi({
+        previousSessions: z.number().int().nullable().openapi({
           description:
-            "Sessions in the previous window of the same length, immediately before this one.",
+            "Sessions in the previous window of the same length, immediately before this one. Null when read from visits Notra keeps for 90 days (term, content, or any parameter filtered to a path) and the previous window starts before them.",
         }),
         visitors: z.number().int(),
       })

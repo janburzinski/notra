@@ -448,4 +448,20 @@ if (!isIsolatedTestWorker(import.meta.url)) {
     );
     expect(site.web).not.toHaveProperty("script");
   });
+
+  test("raw-backed reports drop their comparison once the previous period is past retention", async () => {
+    const scope = await seedProject("raw-retention");
+    const web = await Effect.runPromise(
+      loadWebAnalytics(scope, { days: 90 }, undefined, "", undefined, "all", {
+        scriptReports: true,
+      })
+    );
+    // Languages and outbound clicks read raw rows kept for 90 days, so a
+    // 90-day window has no previous period to compare with: null, not 0.
+    expect(web.script?.languages).toEqual([
+      { value: "de", visitors: 5, previousVisitors: null },
+    ]);
+    expect(web.script?.outboundLinks[0]?.previousClicks).toBeNull();
+    expect(web.engagement?.previousAvgSeconds).toBeNull();
+  });
 }

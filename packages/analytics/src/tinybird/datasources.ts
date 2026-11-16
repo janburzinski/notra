@@ -1,5 +1,7 @@
 import { defineDatasource, engine, type InferRow, t } from "@tinybirdco/sdk";
 
+import { WEB_RAW_RETENTION_DAYS } from "../constants/web-queries";
+
 export const socialAccounts = defineDatasource("social_accounts", {
   description:
     "Connected social account dimension snapshots for Twitter/X and LinkedIn",
@@ -342,7 +344,7 @@ export const webPageViews = defineDatasource("web_page_views", {
   engine: engine.mergeTree({
     sortingKey: ["organization_id", "project_id", "host", "captured_at"],
     partitionKey: "toYYYYMM(captured_at)",
-    ttl: "captured_at + toIntervalDay(90)",
+    ttl: `captured_at + toIntervalDay(${WEB_RAW_RETENTION_DAYS})`,
     settings: { ttl_only_drop_parts: 1 },
   }),
 });
@@ -369,7 +371,7 @@ export const webPageEngagement = defineDatasource("web_page_engagement", {
   engine: engine.mergeTree({
     sortingKey: ["organization_id", "site_id", "captured_at"],
     partitionKey: "toYYYYMM(captured_at)",
-    ttl: "captured_at + toIntervalDay(90)",
+    ttl: `captured_at + toIntervalDay(${WEB_RAW_RETENTION_DAYS})`,
     settings: { ttl_only_drop_parts: 1 },
   }),
 });
@@ -394,7 +396,7 @@ export const webEvents = defineDatasource("web_events", {
   engine: engine.mergeTree({
     sortingKey: ["organization_id", "project_id", "name", "captured_at"],
     partitionKey: "toYYYYMM(captured_at)",
-    ttl: "captured_at + toIntervalDay(90)",
+    ttl: `captured_at + toIntervalDay(${WEB_RAW_RETENTION_DAYS})`,
     settings: { ttl_only_drop_parts: 1 },
   }),
 });
@@ -419,7 +421,7 @@ export const webErrors = defineDatasource("web_errors", {
   engine: engine.mergeTree({
     sortingKey: ["organization_id", "project_id", "site_id", "captured_at"],
     partitionKey: "toYYYYMM(captured_at)",
-    ttl: "captured_at + toIntervalDay(90)",
+    ttl: `captured_at + toIntervalDay(${WEB_RAW_RETENTION_DAYS})`,
     settings: { ttl_only_drop_parts: 1 },
   }),
 });

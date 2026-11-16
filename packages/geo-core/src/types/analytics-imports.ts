@@ -334,4 +334,10 @@ export interface CompletedImportRow {
 export interface CompletedImports {
   ids: string;
   coverage: ImportCoverage | null;
+  /**
+   * Whether `coverage` holds for everything the read covers: a host filter
+   * is set and the import wrote each filtered host and its subdomains.
+   * Without a filter other domains may have no import at all.
+   */
+  coversHosts: boolean;
 }

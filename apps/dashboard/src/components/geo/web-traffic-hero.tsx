@@ -37,7 +37,10 @@ function WebMetric({
 }: WebMetricProps) {
   const tShared = useTranslations("geo.shared");
   const isDuration = format === "duration";
-  const showDelta = compare && (!isDuration || (value > 0 && previous > 0));
+  const showDelta =
+    compare &&
+    previous !== null &&
+    (!isDuration || (value > 0 && previous > 0));
   return (
     <div
       className={
@@ -62,7 +65,7 @@ function WebMetric({
         )}
         {showDelta ? (
           <GeoStatDelta
-            delta={trafficVisitDelta(value, previous)}
+            delta={trafficVisitDelta(value, previous ?? 0)}
             hint={tShared("vsPreviousPeriodOfThe")}
             label={label}
           />
