@@ -93,12 +93,8 @@ function PlatformTab({
     </m.button>
   );
 
-  if (alwaysVisible || isActive) {
-    return button;
-  }
-
   return (
-    <Tooltip>
+    <Tooltip disabled={alwaysVisible || isActive}>
       <TooltipTrigger render={button} />
       <TooltipContent>{item.label}</TooltipContent>
     </Tooltip>

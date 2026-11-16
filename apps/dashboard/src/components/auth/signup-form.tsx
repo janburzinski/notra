@@ -16,7 +16,6 @@ import type { AuthMethod, SocialProvider } from "@notra/ui/types/auth";
 import { useForm } from "@tanstack/react-form";
 import { useQueryStates } from "nuqs";
 import { useRef, useState } from "react";
-import { flushSync } from "react-dom";
 import { useTranslations } from "use-intl";
 import * as z from "zod";
 
@@ -133,7 +132,7 @@ export function SignupForm({
 
     setFormError(null);
     authInFlightRef.current = true;
-    flushSync(() => setAuthMethod(provider));
+    setAuthMethod(provider);
     persistMarketingAttribution({ ...attribution, signupMethod: provider });
     trackEvent(POSTHOG_EVENTS.SIGNUP_STARTED, {
       method: provider,
@@ -168,7 +167,7 @@ export function SignupForm({
 
       setFormError(null);
       authInFlightRef.current = true;
-      flushSync(() => setAuthMethod("email"));
+      setAuthMethod("email");
       trackEvent(POSTHOG_EVENTS.SIGNUP_STARTED, {
         method: "password",
         db_source: attribution.source ?? null,

@@ -124,6 +124,7 @@ function RepositorySelector({
   return (
     <>
       <select
+        aria-label={tCommon2("labels.repository")}
         className="border-border bg-background w-full rounded-lg border px-3 py-2"
         disabled={mutation.isPending}
         onBlur={field.handleBlur}

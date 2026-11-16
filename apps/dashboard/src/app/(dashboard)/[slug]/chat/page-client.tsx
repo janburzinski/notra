@@ -841,6 +841,13 @@ function StandaloneChatPageClient({
         }
         return [...withoutTemp, message];
       });
+      // Mark stale without refetching so the live mirror stream keeps owning
+      // the open chat, and the next visit loads the relayed message.
+      queryClient.invalidateQueries({
+        queryKey: chatHistoryQueryOptions(organizationId, initialChatId)
+          .queryKey,
+        refetchType: "none",
+      });
     },
     onError: (error, input) => {
       setMessages((prev) => prev.filter((item) => item.id !== input.tempId));

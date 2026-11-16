@@ -50,6 +50,12 @@ export function ChatAnnotationNoteForm({
             onBlur={field.handleBlur}
             onChange={(event) => field.handleChange(event.target.value)}
             onKeyDown={(event) => {
+              if (
+                event.nativeEvent.isComposing ||
+                event.nativeEvent.keyCode === 229
+              ) {
+                return;
+              }
               if (event.key === "Enter" && !event.shiftKey) {
                 event.preventDefault();
                 event.currentTarget.form?.requestSubmit();
