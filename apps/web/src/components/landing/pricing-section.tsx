@@ -1,16 +1,9 @@
 import { ArrowRight02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { CtaButton } from "@notra/ui/components/shared/cta-button";
-import { SPRING } from "@notra/ui/lib/motion";
 import { cn } from "@notra/ui/lib/utils";
 import { Link } from "@tanstack/react-router";
-import {
-  AnimatePresence,
-  domMax,
-  LazyMotion,
-  m,
-  useReducedMotion,
-} from "motion/react";
+import { AnimatePresence, domMax, LazyMotion, m } from "motion/react";
 import { useRef, useState } from "react";
 
 import { PricingGiftIcon } from "@/components/landing/pricing-icons";
@@ -44,8 +37,6 @@ function PricingBillingToggle({
   value,
   onValueChange,
 }: PricingBillingToggleProps) {
-  const shouldReduceMotion = useReducedMotion();
-
   return (
     <div className="flex items-center justify-center gap-2 rounded-full bg-[linear-gradient(180deg,#FFFFFF,#F2F2F2)] p-1.75 shadow-[0_0.0625rem_0.125rem_#28282814,0_0_0_0.0625rem_#ECECEC] dark:bg-white/[0.06] dark:bg-none dark:shadow-[0_0_0_0.0625rem] dark:shadow-white/10">
       {PRICING_BILLING_OPTIONS.map((option) => {
@@ -63,16 +54,12 @@ function PricingBillingToggle({
             type="button"
           >
             {isActive ? (
-              <m.span
+              <span
                 className="cta-gradient-primary absolute inset-0 rounded-full"
-                layoutId="pricing-billing-thumb"
                 style={{
                   boxShadow:
                     "0 0.0625rem 0.125rem #28282814, 0 0 0 0.0625rem #1E1E1E40",
                 }}
-                transition={
-                  shouldReduceMotion ? { duration: 0 } : SPRING.snappy
-                }
               />
             ) : null}
             <span className="duration-normal relative z-10 transition-colors">
