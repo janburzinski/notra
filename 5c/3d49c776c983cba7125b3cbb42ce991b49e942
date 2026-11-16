@@ -1,0 +1,52 @@
+apps/dashboard/src/types/geo.ts
+  s_0db5a1b6311a8b::t_56b2a09ffe924e 2111-2112
+packages/geo-core/src/constants/web-analytics.ts
+  s_0db5a1b6311a8b::t_41624d06faae78 1
+  s_0db5a1b6311a8b::t_3cfdc317da7d9b 16-20
+packages/schemas/src/schemas/api/geo-web-analytics.ts
+  s_0db5a1b6311a8b::t_dfde1f1f65abd9 163,268-271,313,315,382,384
+apps/dashboard/src/components/geo/web-visitors-section.tsx
+  s_0db5a1b6311a8b::t_6984feae01d099 3,6,44-49,156-165
+apps/dashboard/messages/de.json
+  s_0db5a1b6311a8b::t_6984feae01d099 4614
+packages/geo-core/src/utils/web-raw-retention.ts
+  s_0db5a1b6311a8b::t_bf24fe88472d2d 1-2,5-8,15-28,30-37,39-40,47-48,50
+  s_0db5a1b6311a8b::t_d8fa9937724b3a 3-4,9-14,29,38,41-46,49
+packages/analytics/src/constants/web-queries.ts
+  s_0db5a1b6311a8b::t_f290d4b715ec98 15-21
+packages/geo-core/tests/web-raw-retention.test.ts
+  s_0db5a1b6311a8b::t_45a5ca3d1e302b 23-25
+  s_0db5a1b6311a8b::t_983c94c89be0cf 1-22,26-35
+packages/geo-core/src/geo/web-analytics.ts
+  s_0db5a1b6311a8b::t_f6fea6d8a3a90a 58,227-229,290,327-328,389-395,435-439,443,522-525
+  s_0db5a1b6311a8b::t_9adc8bd07d692f 66-67,73-75,80-81,87-89,132-133,153,167
+  s_0db5a1b6311a8b::t_45a5ca3d1e302b 324
+  s_0db5a1b6311a8b::t_41624d06faae78 33
+packages/geo-core/tests/web-analytics.test.ts
+  s_0db5a1b6311a8b::t_45a5ca3d1e302b 455-457
+  s_0db5a1b6311a8b::t_983c94c89be0cf 451-454,458-466
+apps/dashboard/src/components/geo/web-traffic-hero.tsx
+  s_0db5a1b6311a8b::t_56b2a09ffe924e 40-43,68
+packages/analytics/src/tinybird/datasources.ts
+  s_0db5a1b6311a8b::t_f290d4b715ec98 3-4,347,374,399,424
+packages/geo-core/src/types/geo.ts
+  s_0db5a1b6311a8b::t_9adc8bd07d692f 2200-2201,2211-2212,2239-2240,2328-2329
+apps/dashboard/messages/en.json
+  s_0db5a1b6311a8b::t_6984feae01d099 4614
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "5c3d49c776c983cba7125b3cbb42ce991b49e942",
+  "prompts": {},
+  "sessions": {
+    "s_0db5a1b6311a8b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c7931017-abf4-4153-b942-8ece9fb30fc3",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
