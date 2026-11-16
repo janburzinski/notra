@@ -69,6 +69,11 @@ export interface AutopilotPlannerInput {
   activeWork: { title: string; status: string }[];
   /** How Autopilot's merged posts and page updates did since; empty without data. */
   results?: AutopilotPostResult[];
+  /**
+   * The brand tracks AI answers or searches, so content gaps are the demand
+   * and a topic backed only by pull requests has none. Defaults to true.
+   */
+  demandTracked?: boolean;
 }
 
 /**

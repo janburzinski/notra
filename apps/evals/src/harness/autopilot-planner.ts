@@ -158,6 +158,7 @@ function buildPlannerInput(params: {
       status,
     })),
     results: params.input.results ?? [],
+    demandTracked: params.input.demandTracked ?? true,
   };
 }
 
@@ -182,6 +183,7 @@ function settleRun(params: {
   runIndex: number;
   openedSoFar: number;
   activeWork: AutopilotScenarioInput["activeWork"];
+  demandTracked: boolean;
 }): { state: AutopilotPlannerState; result: PlannerRunResult } {
   const { plan, run, runIndex } = params;
   const topic = plan.topic;
@@ -199,6 +201,7 @@ function settleRun(params: {
     autonomousPullRequestsInWindow:
       (run.autonomousPullRequestsInWindow ?? 0) + params.openedSoFar,
     draftSlotsFree: run.draftSlotsFree ?? true,
+    demandTracked: params.demandTracked,
     now: runDate(runIndex),
   });
   const outcome = resolveAutopilotOutcome({
@@ -363,6 +366,7 @@ export async function runPlannerScenario(
       runIndex: index,
       openedSoFar: opened,
       activeWork: input.activeWork,
+      demandTracked: input.demandTracked ?? true,
     });
     if (settled.result.acted === "opened") {
       opened += 1;
@@ -541,6 +545,7 @@ export function demoPlannerScenario(
       runIndex: index,
       openedSoFar: opened,
       activeWork: input.activeWork,
+      demandTracked: input.demandTracked ?? true,
     });
     if (settled.result.acted === "opened") {
       opened += 1;

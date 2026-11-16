@@ -92,6 +92,12 @@ const rolePr = pr(
   "Tours and checklists can now target users by role (admin, member, viewer) synced from the identify call. Includes a role picker in the audience editor and docs at /docs/targeting/roles."
 );
 
+const roleSearch = gap(
+  "product-tour-for-admins-only",
+  "Product tour for admins only",
+  "Search Console shows 1400 impressions at position 14 for 'product tour for admin users only' with 6 clicks."
+);
+
 const tooltipFix = pr(
   430,
   "fix(tours): tooltip arrow misaligned in RTL layouts",
@@ -477,9 +483,11 @@ export const AUTOPILOT_SCENARIOS: AutopilotScenario[] = [
   },
   {
     id: "feature-over-three-prs",
-    title: "One feature shipped over three PRs: one topic, one action",
+    title:
+      "One feature shipped over three PRs, no answer or search data: one topic, one idea",
     tags: ["linking", "act", "stability"],
     input: scenario({
+      demandTracked: false,
       runs: [
         {
           observations: [branchingModel],
@@ -821,11 +829,11 @@ export const AUTOPILOT_SCENARIOS: AutopilotScenario[] = [
       runs: [
         {
           observations: busyWeek,
-          expected: { action: ["none", "write_post"], pr: "never" },
+          expected: { action: ["none", "write_post"], pr: "nothing" },
         },
         {
           observations: busyWeekTwo,
-          expected: { action: ["none", "write_post"], pr: "never" },
+          expected: { action: ["none", "write_post"], pr: "nothing" },
         },
       ],
     }),
@@ -1039,6 +1047,72 @@ export const AUTOPILOT_SCENARIOS: AutopilotScenario[] = [
       ],
       maxPullRequests: 1,
       mustActOn: "nps-timing",
+    },
+  },
+  {
+    id: "feature-over-three-prs-tracked",
+    title:
+      "One feature shipped over three PRs while answers and searches are tracked and none ask for it: no post, not even an idea",
+    tags: ["restraint", "demand"],
+    input: scenario({
+      runs: [
+        {
+          observations: [branchingModel],
+          expected: { action: ["none"], pr: "nothing" },
+        },
+        {
+          observations: [branchingEditor],
+          expected: { action: ["none"], pr: "nothing" },
+        },
+        {
+          observations: [branchingLaunch],
+          expected: { action: ["none"], pr: "nothing" },
+        },
+      ],
+    }),
+    expected: {
+      groups: [
+        {
+          key: "branching",
+          title: "Survey branching logic",
+          observations: [
+            branchingModel.id,
+            branchingEditor.id,
+            branchingLaunch.id,
+          ],
+        },
+      ],
+      maxPullRequests: 0,
+    },
+  },
+  {
+    id: "gap-and-pr-same-run",
+    title:
+      "A gap and the PR that answers it arrive together: one topic, a post for the question",
+    tags: ["linking", "act", "demand"],
+    input: scenario({
+      runs: [
+        {
+          observations: [roleGap, roleSearch, rolePr],
+          expected: {
+            action: ["write_post"],
+            group: "roles",
+            pr: "deliver",
+          },
+        },
+      ],
+    }),
+    expected: {
+      groups: [
+        {
+          key: "roles",
+          title: "Role-based targeting for tours",
+          observations: [roleGap.id, roleSearch.id, rolePr.id],
+        },
+      ],
+      maxPullRequests: 1,
+      mustActOn: "roles",
+      briefNotAnnouncement: true,
     },
   },
 ];

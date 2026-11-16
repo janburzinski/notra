@@ -15,6 +15,7 @@ import {
   AUTOPILOT_MARKDOWN_FILE,
   AUTOPILOT_SEARCH_GAP_MIN_IMPRESSIONS,
   AUTOPILOT_WORKSPACE_ROOTS,
+  AUTOPILOT_WRITER_MAX_QUESTIONS,
 } from "@/constants/autopilot";
 import { AUTOPILOT_COMPARISON_DIRECTORY_HINTS } from "@/constants/autopilot-comparisons";
 import { normalizeRepositoryDirectory } from "@/utils/autopilot-paths";
@@ -142,8 +143,12 @@ export function pageToUpdate(
     : null;
 }
 
+function queriesByImpressions(gap: GeoSearchGapRow) {
+  return [...gap.queries].sort((a, b) => b.impressions - a.impressions);
+}
+
 export function topQuery(gap: GeoSearchGapRow) {
-  return [...gap.queries].sort((a, b) => b.impressions - a.impressions)[0];
+  return queriesByImpressions(gap)[0];
 }
 
 /**
@@ -214,4 +219,37 @@ export function searchGapDropReason(gap: GeoSearchGapRow) {
     return `${gap.impressions ?? 0} impressions (minimum ${AUTOPILOT_SEARCH_GAP_MIN_IMPRESSIONS})`;
   }
   return null;
+}
+
+/**
+ * The questions people ask that the brand tracks: AI prompts, the searches
+ * behind them and Search Console queries, most valuable first. A post about
+ * shipped work picks the one it answers instead of announcing the release.
+ */
+export function questionsPeopleAsk(gaps: {
+  promptGaps: readonly GeoPromptGapRow[];
+  searchGaps: readonly GeoSearchGapRow[];
+}) {
+  const prompts = [...gaps.promptGaps]
+    .sort((a, b) => b.opportunity - a.opportunity)
+    .map((gap) => {
+      const searches = gap.searchQueries
+        .slice(0, AUTOPILOT_GAP_SEARCHES_SHOWN)
+        .map((query) => `"${query}"`)
+        .join(", ");
+      return `"${gap.prompt}" (AI answers name the brand in ${Math.round(gap.ownMentionRate * 100)}%${searches ? `; also searched as ${searches}` : ""})`;
+    });
+  const searches = [...gaps.searchGaps]
+    .sort((a, b) => (b.impressions ?? 0) - (a.impressions ?? 0))
+    .map((gap) => {
+      const queries = queriesByImpressions(gap)
+        .slice(0, AUTOPILOT_GAP_SEARCHES_SHOWN)
+        .map((query) => `"${query.query}"`)
+        .join(", ");
+      return `"${gap.prompt}" (Search Console: ${gap.impressions ?? 0} impressions${gap.position ? `, position ${Math.round(gap.position)}` : ""}${queries ? `; searched as ${queries}` : ""})`;
+    });
+  return [...new Set(interleave(prompts, searches))].slice(
+    0,
+    AUTOPILOT_WRITER_MAX_QUESTIONS
+  );
 }

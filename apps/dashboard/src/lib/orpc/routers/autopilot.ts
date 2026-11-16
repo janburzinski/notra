@@ -34,6 +34,7 @@ import { Effect } from "effect";
 
 import {
   AUTOPILOT_DEFAULT_JOBS,
+  AUTOPILOT_SETUP_JOBS,
   AUTOPILOT_DEFAULT_STALE_PULL_REQUEST_DAYS,
   AUTOPILOT_RUNS_PAGE_SIZE,
 } from "@/constants/autopilot";
@@ -290,7 +291,9 @@ export const autopilotRouter = {
           slackChannelName: settings?.slackChannelName ?? null,
           briefHour: settings?.briefHour ?? 9,
           timezone: settings?.timezone ?? "Europe/Berlin",
-          jobs: { ...AUTOPILOT_DEFAULT_JOBS, ...settings?.jobs },
+          jobs: settings
+            ? { ...AUTOPILOT_DEFAULT_JOBS, ...settings.jobs }
+            : AUTOPILOT_SETUP_JOBS,
           commitFilters: toAutopilotCommitFilters(settings?.commitFilters),
           maxOpenPullRequests: settings?.maxOpenPullRequests ?? 3,
           approvals: {

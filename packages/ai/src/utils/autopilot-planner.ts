@@ -144,6 +144,37 @@ export function topicHasActiveWork(
 }
 
 /**
+ * The observations from this run an action on this topic may be built from,
+ * newest signal first. A page update needs one that names the page. A topic
+ * people ask about is written from the gap, never from the pull request next
+ * to it: the gap carries the question and the target the post is measured by,
+ * the pull request only the product facts.
+ */
+export function actionableObservations<T extends AutopilotObservation>(
+  action: Pick<AutopilotPlannedAction, "type">,
+  topic: AutopilotTopic,
+  observations: readonly T[]
+): T[] {
+  const byId = new Map(observations.map((row) => [row.id, row]));
+  const ofTopic = [...topic.signals]
+    .reverse()
+    .flatMap((signal) => {
+      const row = byId.get(signal.observationId);
+      return row ? [row] : [];
+    })
+    .filter((row, index, rows) => rows.indexOf(row) === index);
+  if (action.type === "update_page") {
+    return ofTopic.filter((row) => row.updatePage);
+  }
+  const hasDemand = topic.signals.some(
+    (signal) => signal.source === "keywords"
+  );
+  return hasDemand
+    ? ofTopic.filter((row) => row.source === "keywords")
+    : ofTopic;
+}
+
+/**
  * What the run does with the gate's verdict. It acts only on a topic that
  * something seen this run belongs to, so the finding has fresh evidence; a
  * page update also needs one of those observations to name the page.
@@ -158,12 +189,7 @@ export function resolveAutopilotOutcome(params: {
   if (action.type === "none" || !topic) {
     return null;
   }
-  const usable = new Set(
-    params.observations
-      .filter((row) => action.type !== "update_page" || row.updatePage)
-      .map((row) => row.id)
-  );
-  if (!topic.signals.some((signal) => usable.has(signal.observationId))) {
+  if (actionableObservations(action, topic, params.observations).length === 0) {
     return null;
   }
   if (gate.open) {
@@ -449,6 +475,12 @@ export function evaluateAutopilotGate(params: {
   activeWork: boolean;
   autonomousPullRequestsInWindow: number;
   draftSlotsFree: boolean;
+  /**
+   * The workspace tracks AI answers or searches, so a topic nobody asks about
+   * is known to have no demand. Without that data, shipped work is the only
+   * signal and a confident post about it may still become an idea.
+   */
+  demandTracked: boolean;
   now: Date;
 }): AutopilotGateResult {
   const { action, topic } = params;
@@ -466,6 +498,13 @@ export function evaluateAutopilotGate(params: {
     ) ?? false;
   // A merged or dismissed topic is never reopened on the model's word alone.
   const closed = topic?.status === "done" || topic?.status === "dismissed";
+  let demandDetail = "Only shipped pull requests, nobody asking for it yet";
+  if (demand) {
+    demandDetail = "AI answers or searches show people look for this";
+  } else if (params.demandTracked) {
+    demandDetail =
+      "Only shipped pull requests: no tracked answer or search asks for it";
+  }
   let actionDetail = `${action.type} for ${topic?.title ?? "an unknown topic"}`;
   if (action.type === "none") {
     actionDetail = "The planner chose to wait";
@@ -486,9 +525,7 @@ export function evaluateAutopilotGate(params: {
     {
       name: "demand",
       ok: demand,
-      detail: demand
-        ? "AI answers or searches show people look for this"
-        : "Only shipped pull requests, nobody asking for it yet",
+      detail: demandDetail,
     },
     {
       name: "confidence",
@@ -537,7 +574,9 @@ export function evaluateAutopilotGate(params: {
         (name) =>
           name === "budget" ||
           name === "draft_limit" ||
-          name === "demand" ||
+          // Where answers and searches are tracked, a post nobody asks for
+          // helps neither, so it is not even an idea.
+          (name === "demand" && !params.demandTracked) ||
           (name === "confidence" && ideaConfidence)
       ),
     checks,

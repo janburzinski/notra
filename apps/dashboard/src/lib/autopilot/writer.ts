@@ -109,6 +109,12 @@ export async function writeBlogPost(params: {
   webResearch?: boolean;
   /** The workspace's writing rules (its "unslop" skill). */
   writingRules?: string | null;
+  /**
+   * Set for a post about shipped work: the tracked prompts and searches it
+   * may be built around (empty without GEO data), so it targets a question
+   * people ask instead of announcing the release.
+   */
+  questions?: readonly string[] | null;
   conventions?: readonly string[];
   /** Gets every page and file the writer read, e.g. for a fact check. */
   onSource?: (source: AutopilotFactSource) => void;
@@ -304,6 +310,13 @@ export async function writeBlogPost(params: {
           // FAQPage structured data.
           "Shape it so AI assistants can quote it: use the questions people ask (the prompt and searches in the evidence) as H2 headings, and open every section with one or two sentences that answer its heading on their own, without needing the rest of the post. Compare options in a Markdown table, not in prose.",
           "End with a section headed exactly `## FAQ`: three to five `### ` question headings, each followed by one short paragraph that answers it. Only questions the evidence or your research supports.",
+          ...(params.questions
+            ? [
+                // Nobody searches for a release; they search for the problem
+                // it solves, so that is what the post has to rank and be cited for.
+                "This post starts from shipped work, but nobody asks AI assistants or search engines about a release. Before writing, pick the one question a reader with this problem would ask that the change answers: the closest match from Questions people ask if one fits, otherwise the plain question in the reader's own words. Build the post around it: use its words in the title, description and slug, answer it in the first paragraph, and present the change as part of that answer with how to use it. Never title or open the post as an announcement such as 'X now supports Y', 'Introducing Z' or 'What's new'.",
+              ]
+            : []),
         ]),
     ctx.brand?.customInstructions
       ? `House rules from the brand, follow them: ${ctx.brand.customInstructions}`
@@ -331,6 +344,15 @@ export async function writeBlogPost(params: {
     brief.evidence,
     "END EVIDENCE",
     "",
+    ...(params.questions && !existing
+      ? [
+          "Questions people ask (tracked AI prompts and searches, most valuable first):",
+          params.questions.length > 0
+            ? params.questions.map((question) => `- ${question}`).join("\n")
+            : "(none tracked)",
+          "",
+        ]
+      : []),
     `Existing posts in ${params.directory} (read related ones with readFile):`,
     params.postPaths.slice(-AUTOPILOT_WRITER_MAX_POST_PATHS).join("\n") ||
       "(none)",

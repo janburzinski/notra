@@ -3,6 +3,7 @@ import {
   MEMORY_PRELOADED_SOFT_LIMIT_BYTES,
 } from "@notra/memory/constants/memory";
 
+import { EVAL_ANNOUNCEMENT_BRIEF } from "../constants/autopilot-planner";
 import type {
   AutopilotScenario,
   AutopilotScenarioOutput,
@@ -127,6 +128,8 @@ function gate(output: AutopilotScenarioOutput, testCase: AutopilotScenario) {
     let ok = 1;
     if (run.expected.pr === "never") {
       ok = open ? 0 : 1;
+    } else if (run.expected.pr === "nothing") {
+      ok = actual?.acted ? 0 : 1;
     } else if (run.expected.pr === "suggest" && open) {
       ok = 0;
     } else if (run.expected.pr === "suggest") {
@@ -204,6 +207,24 @@ function rules(output: AutopilotScenarioOutput, testCase: AutopilotScenario) {
   );
 }
 
+/** A brief written as a release note targets nothing people ask for. */
+function brief(output: AutopilotScenarioOutput, testCase: AutopilotScenario) {
+  if (!testCase.expected.briefNotAnnouncement) {
+    return null;
+  }
+  const briefs = output.runs.flatMap((run, index) =>
+    run.brief ? [{ index, brief: run.brief }] : []
+  );
+  return field(
+    "brief",
+    briefs.map(({ index, brief: written }) => ({
+      ok: EVAL_ANNOUNCEMENT_BRIEF.test(written.topic) ? 0 : 1,
+      label: `run ${index + 1} brief "${written.topic}" reads as an announcement`,
+    })),
+    "briefs name the question, not the release"
+  );
+}
+
 /** Follow-up runs reuse a topic's slug instead of starting a duplicate. */
 function stability(
   output: AutopilotScenarioOutput,
@@ -277,11 +298,12 @@ export function scorePlannerScenario(
     action(output, testCase),
     gate(output, testCase),
     rules(output, testCase),
+    brief(output, testCase),
     stability(output, testCase),
     memory(output),
   ].filter((item): item is FieldScore => item !== null);
   const decisive = fields.filter((item) =>
-    ["linking", "action", "gate", "rules"].includes(item.field)
+    ["linking", "action", "gate", "rules", "brief"].includes(item.field)
   );
   return {
     score: mean(fields.map((item) => item.score)),

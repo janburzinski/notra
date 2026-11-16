@@ -275,6 +275,11 @@ export const AUTOPILOT_DIAGRAM_ALT_UNSAFE = /[[\]\r\n]+/g;
 export const AUTOPILOT_DIAGRAM_EMBED =
   /!\[([^\]\n]*)\]\(notra-diagram-(\d+)\)/g;
 export const AUTOPILOT_WRITER_MAX_POST_PATHS = 200;
+/**
+ * Tracked prompts and searches a post about shipped work may be built
+ * around, so it targets a question people ask instead of the release.
+ */
+export const AUTOPILOT_WRITER_MAX_QUESTIONS = 30;
 export const AUTOPILOT_WRITER_MAX_OUTPUT_TOKENS = 12_000;
 /** One fresh rewrite for incomplete output, never an unbounded continuation. */
 export const AUTOPILOT_WRITER_MAX_ATTEMPTS = 2;
@@ -399,6 +404,18 @@ export const AUTOPILOT_DEFAULT_JOBS = {
   rendering: false,
   links: false,
   landing: false,
+} as const;
+
+/**
+ * What a first setup starts with. Pages AI stopped citing and competitors
+ * named instead of you are the clearest GEO wins, so both start on. Saved
+ * workspaces keep AUTOPILOT_DEFAULT_JOBS for keys they never stored, so this
+ * never switches anything on for them.
+ */
+export const AUTOPILOT_SETUP_JOBS = {
+  ...AUTOPILOT_DEFAULT_JOBS,
+  refresh: true,
+  comparisons: true,
 } as const;
 
 export const AUTOPILOT_FLAG_TIMEOUT_MS = 2000;

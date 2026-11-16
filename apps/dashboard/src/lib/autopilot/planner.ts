@@ -18,6 +18,7 @@ import type {
   AutopilotTopic,
 } from "@notra/ai/types/autopilot-planner";
 import {
+  actionableObservations,
   countIndependentSignals,
   evaluateAutopilotGate,
   fitPlannerState,
@@ -144,23 +145,34 @@ async function syncTopicsWithFindings(
 }
 
 /**
- * The observation from this run that becomes the finding: the newest one, or
- * for a page update the newest that names the page. Without such a page an
- * update has no target, so there is nothing to act on.
+ * The observation from this run that becomes the finding: the newest one the
+ * action may be built from (see actionableObservations). Without one there is
+ * nothing to act on.
  */
 function primaryObservation(
   topic: AutopilotTopic,
   observations: readonly AutopilotRunObservation[],
   action: AutopilotPlannedAction["type"]
 ) {
-  const byId = new Map(observations.map((row) => [row.id, row]));
-  for (const signal of [...topic.signals].reverse()) {
-    const observation = byId.get(signal.observationId);
-    if (observation && (action !== "update_page" || observation.updatePage)) {
-      return observation;
-    }
-  }
-  return null;
+  return (
+    actionableObservations({ type: action }, topic, observations)[0] ?? null
+  );
+}
+
+/**
+ * Pull requests from this run linked to a gap topic. They are not what the
+ * post is about; they tell the writer what the product really does now.
+ */
+function shippedFacts(
+  topic: AutopilotTopic,
+  observations: readonly AutopilotRunObservation[],
+  primary: AutopilotRunObservation
+) {
+  const ids = new Set(topic.signals.map((signal) => signal.observationId));
+  return observations.filter(
+    (row) =>
+      row.id !== primary.id && row.source === "commits" && ids.has(row.id)
+  );
 }
 
 async function writePlannerMemory(params: {
@@ -277,6 +289,8 @@ export async function decideAutopilotPlan(
       status: row.status,
     })),
     results,
+    // Content gaps are read only for a GEO project with the gaps job on.
+    demandTracked: Boolean(ctx.projectId && ctx.jobs.keywords),
   };
   if (results.length > 0) {
     await log.decision(
@@ -343,6 +357,7 @@ export async function decideAutopilotPlan(
     activeWork: plan.topic ? topicHasActiveWork(plan.topic, activeWork) : false,
     autonomousPullRequestsInWindow: autonomous,
     draftSlotsFree: openPullRequests < ctx.maxOpenPullRequests,
+    demandTracked: input.demandTracked,
     now: new Date(),
   });
   const outcome = resolveAutopilotOutcome({
@@ -391,9 +406,19 @@ export async function decideAutopilotPlan(
       checks: describeChecks(gate.checks),
     }
   );
-  const evidence = topic.signals
+  const shipped = shippedFacts(topic, observations, observation);
+  const others = topic.signals
+    .filter(
+      (signal) =>
+        signal.observationId !== observation.id &&
+        !shipped.some((row) => row.id === signal.observationId)
+    )
     .map((signal) => `- ${signal.detail}`)
     .join("\n");
+  const pullRequests = [
+    ...(observation.proposal.evidence.pullRequests ?? []),
+    ...shipped.flatMap((row) => row.proposal.evidence.pullRequests ?? []),
+  ];
   return {
     outcome,
     memory: plan.state,
@@ -410,6 +435,9 @@ export async function decideAutopilotPlan(
       evidence: {
         ...observation.proposal.evidence,
         ...(action.type === "update_page" ? {} : { updatePage: null }),
+        // The shipped work behind the answer: shown as sources and its
+        // authors are asked to review the facts.
+        ...(pullRequests.length > 0 ? { pullRequests } : {}),
         topic: {
           slug: topic.slug,
           title: topic.title,
@@ -421,7 +449,15 @@ export async function decideAutopilotPlan(
     brief: {
       topic: action.brief?.topic ?? observation.brief.topic,
       angle: action.brief?.angle ?? observation.brief.angle,
-      evidence: `${observation.brief.evidence}\n\nRelated signals:\n${evidence}`,
+      evidence: [
+        observation.brief.evidence,
+        shipped.length > 0
+          ? `What the product does now, from shipped work. Use it as facts for the answer, not as the subject of the post:\n\n${shipped.map((row) => row.brief.evidence).join("\n\n---\n\n")}`
+          : "",
+        others ? `Related signals:\n${others}` : "",
+      ]
+        .filter(Boolean)
+        .join("\n\n"),
     },
   };
 }

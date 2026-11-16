@@ -123,6 +123,7 @@ import {
   topQuery,
   promptGapCompetitors,
   promptGapDropReason,
+  questionsPeopleAsk,
   searchGapDropReason,
 } from "@/utils/autopilot-blog";
 import { autopilotDraftBranchSlug } from "@/utils/autopilot-branches";
@@ -173,6 +174,27 @@ function loadGaps(ctx: AutopilotRunContext) {
       Effect.provide(geoCoreDashboardLayer)
     )
   );
+}
+
+/**
+ * What a post about shipped work can target. Empty without GEO data or when
+ * the gaps can't be read: the writer then phrases the question itself.
+ */
+async function loadQuestionsPeopleAsk(
+  ctx: AutopilotRunContext,
+  log: AutopilotLogger
+) {
+  const gaps = await loadGaps(ctx).catch(async (error: unknown) => {
+    await log.info("Could not read the tracked prompts and searches", {
+      error: toErrorMessage(error, "unknown error"),
+    });
+    return null;
+  });
+  const questions = gaps ? questionsPeopleAsk(gaps) : [];
+  await log.trace("Questions the post about shipped work can target", {
+    questions,
+  });
+  return questions;
 }
 
 /** Slugs of the posts already in the repo, so covered topics are skipped. */
@@ -582,6 +604,10 @@ export async function writeBlogDraft(params: {
     // Comparisons describe another company, so they check its live pages.
     webResearch: comparison,
     writingRules: await loadWritingRules(ctx.organizationId),
+    questions:
+      claim.finding.kind === "commits"
+        ? await loadQuestionsPeopleAsk(ctx, log)
+        : null,
     conventions: await loadRepositoryConventions(
       ctx.organizationId,
       ctx.repository
@@ -1834,7 +1860,7 @@ function commitProposal(pull: MergedPullRequest) {
     brief: {
       topic: pull.title,
       angle:
-        "Explain what changed for users, why it matters and how to use it.",
+        "Answer the question a user with the problem this solves would ask, with the change as the answer: what it lets them do and how to set it up.",
       evidence: pull.private
         ? `Based on an internal pull request: ${pull.title}\n\n${pull.body.replace(AUTOPILOT_INTERNAL_REFERENCE, "")}`
         : `Based on ${pull.repository}#${pull.number}: ${pull.title}\n\n${pull.body}`,

@@ -46,7 +46,18 @@ export const autopilotPlannerOutputSchema = z.object({
       ),
     reason: z.string(),
     brief: z
-      .object({ topic: z.string(), angle: z.string() })
+      .object({
+        topic: z
+          .string()
+          .describe(
+            "The question or problem in the words people ask an AI assistant or search for, never a release announcement"
+          ),
+        angle: z
+          .string()
+          .describe(
+            "How the post answers it better than the pages that win today, with any shipped feature as part of the answer"
+          ),
+      })
       .nullable()
       .describe("What the writer should cover; null when type is none"),
   }),

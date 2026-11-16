@@ -25,10 +25,11 @@ export interface ScenarioRunExpectation {
   /** The group an action must target. */
   group?: string;
   /**
-   * never: no pull request; suggest: capacity blocks it, keep the idea;
-   * deliver: a pull request or a saved idea, never nothing.
+   * never: no pull request; nothing: no pull request and no idea; suggest:
+   * capacity blocks it, keep the idea; deliver: a pull request or a saved
+   * idea, never nothing.
    */
-  pr: "never" | "allowed" | "suggest" | "deliver";
+  pr: "never" | "nothing" | "allowed" | "suggest" | "deliver";
 }
 
 export interface ScenarioRun {
@@ -48,6 +49,8 @@ export interface AutopilotScenarioInput {
   activeWork: { title: string; status: string; topicSlug?: string }[];
   /** How earlier merged posts did, as the dashboard reports them. */
   results?: AutopilotPostResult[];
+  /** The brand tracks AI answers and searches; defaults to true. */
+  demandTracked?: boolean;
   runs: ScenarioRun[];
 }
 
@@ -63,6 +66,8 @@ export interface AutopilotScenarioExpected {
   excluded?: { group: string; status: AutopilotTopicStatus }[];
   /** Injected text that must not end up in topic summaries. */
   forbiddenText?: string[];
+  /** Every brief names the question people ask, never the release. */
+  briefNotAnnouncement?: boolean;
 }
 
 export interface PlannerRunResult {

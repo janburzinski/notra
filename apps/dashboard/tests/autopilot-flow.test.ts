@@ -24,6 +24,7 @@ import {
   slackIntegrations,
   users,
 } from "@notra/db/schema";
+import type { GeoPromptGapRow } from "@notra/geo-core/types/geo";
 import { MEMORY_PATHS } from "@notra/memory/constants/memory";
 import { setMemoryStore } from "@notra/memory/memory";
 import { setRepoStore } from "@notra/memory/repos";
@@ -77,6 +78,8 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
     memoryCommitFailure: false,
     act: 0.9,
     plan: null as AutopilotPlannerOutput | null,
+    /** Prompt gaps the keywords job reads, i.e. what people ask about. */
+    gaps: [] as GeoPromptGapRow[],
     plannerPrompt: "",
     ambiguousFeedback: false,
     feedbackPrompt: "",
@@ -115,6 +118,11 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
   const charges: unknown[] = [];
   const holds: string[] = [];
   const writerCalls: string[] = [];
+  /** What the writer was asked for: the brief and the questions it may target. */
+  const writerInputs: {
+    brief: { topic: string; angle: string; evidence: string };
+    questions?: readonly string[] | null;
+  }[] = [];
   const actionEvaluations: unknown[] = [];
   // The workspace memory is a real in-memory repository; only failures are injected.
   const memory = createInMemoryStore();
@@ -335,7 +343,7 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
   }));
   mock.module("@notra/geo-core/geo/gaps", () => ({
     loadGeoContentGaps: () =>
-      Effect.succeed({ promptGaps: [], searchGaps: [] }),
+      Effect.succeed({ promptGaps: state.gaps, searchGaps: [] }),
   }));
   mock.module("@notra/ai/evaluation/client", () => ({
     getEvaluationClient: () => ({
@@ -423,8 +431,13 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
     consumeGitHubMentionRateLimit: async () => ({ allowed: true }),
   }));
   mock.module("@/lib/autopilot/writer", () => ({
-    writeBlogPost: async (input: { onUsage?: (usage: unknown) => void }) => {
+    writeBlogPost: async (input: {
+      onUsage?: (usage: unknown) => void;
+      brief: { topic: string; angle: string; evidence: string };
+      questions?: readonly string[] | null;
+    }) => {
       writerCalls.push("write");
+      writerInputs.push({ brief: input.brief, questions: input.questions });
       if (state.cancelDuringWriting) {
         state.sourceClosed = true;
         await handleAutopilotPullRequestEvent(
@@ -616,6 +629,7 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
     await import("../src/workflows/autopilot-suggestion");
   const { autopilotDraftBranchSlug } =
     await import("../src/utils/autopilot-branches");
+  const { keywordFingerprint } = await import("../src/utils/autopilot-blog");
   const { listRecentPullRequestAuthors } =
     await import("../src/lib/autopilot/authors");
   const { autopilotAuthorPresets, toAutopilotCommitFilters } =
@@ -659,7 +673,7 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
     slackChannelId: "C_SANDBOX",
     jobs: {
       readiness: false,
-      keywords: false,
+      keywords: true,
       commits: true,
       prompts: false,
       competitors: true,
@@ -672,6 +686,7 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
   });
   afterAll(() => sandbox.postgres.close());
   beforeEach(async () => {
+    state.gaps = [];
     state.flag = true;
     state.credits = true;
     state.confidence = 0.99;
@@ -696,6 +711,7 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
     await memory.deleteRepo("sandbox-org");
     memoryCommits.length = 0;
     writerCalls.length = 0;
+    writerInputs.length = 0;
     actionEvaluations.length = 0;
     threadComments.length = 0;
     ruleWrites.length = 0;
@@ -816,6 +832,26 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
 
   const DAY_MS = 24 * 60 * 60 * 1000;
   const fingerprint = (number: number) => `commits:sandbox/app#${number}`;
+  /** The content gap behind a seeded topic: people ask about it, the brand is missing. */
+  const gapPrompt = (title: string) =>
+    `how to use ${title.toLowerCase()} in a b2b app`;
+  const gapFingerprint = (title: string) =>
+    keywordFingerprint(gapPrompt(title));
+  const gapRow = (title: string): GeoPromptGapRow => ({
+    id: `gap-${title.toLowerCase()}`,
+    prompt: gapPrompt(title),
+    title,
+    engines: ["chatgpt", "perplexity"],
+    mentionedEngines: [],
+    competitors: ["Rival"],
+    discoveredCompetitors: [],
+    searchQueries: [],
+    ownMentionRate: 0,
+    engineCoverage: 2,
+    opportunity: 1,
+    won: false,
+    brief: null,
+  });
 
   /** What the planner model answers: every observation linked into one topic. */
   const plannerOutput = (
@@ -862,6 +898,8 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
    * that ships its answer is the second independent signal that makes it ripe.
    */
   const seedTopic = async (slug: string, title: string, number: number) => {
+    // The gap is still open, so the keywords job sees it again this run.
+    state.gaps = [...state.gaps, gapRow(title)];
     const current = parsePlannerState(await readMemory(MEMORY_PATHS.planner));
     const seenAt = new Date(Date.now() - DAY_MS).toISOString();
     await seedMemory({
@@ -878,7 +916,7 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
             nextStep: "",
             signals: [
               {
-                observationId: `keywords:${slug}`,
+                observationId: gapFingerprint(title),
                 source: "keywords",
                 title,
                 detail: `AI answers about ${title} miss the brand`,
@@ -1880,6 +1918,69 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
     );
   });
 
+  test("a gap and the pull request that ships its answer are written from the gap, with the pull request as facts", async () => {
+    await seedTopic("exports", "Exports", 40);
+    const { observations } = await dailyRun("planner-gap-first", [exportsPull]);
+    // The pull request came last, yet the post is for the question.
+    expect(observations.map((row) => row.id)).toEqual([
+      gapFingerprint("Exports"),
+      fingerprint(40),
+    ]);
+    expect(opened).toHaveLength(1);
+    const finding = await db.query.autopilotFindings.findFirst();
+    expect(finding).toMatchObject({
+      kind: "keywords",
+      fingerprint: gapFingerprint("Exports"),
+    });
+    expect(finding?.evidence.target).toMatchObject({ kind: "prompt" });
+    expect(finding?.evidence.pullRequests).toEqual([
+      expect.objectContaining({ number: 40, title: exportsPull.title }),
+    ]);
+    const brief = writerInputs.at(-1)?.brief;
+    expect(brief?.evidence.startsWith("AI engines answer")).toBe(true);
+    expect(brief?.evidence).toContain("What the product does now");
+    expect(brief?.evidence).toContain(exportsPull.title);
+    // A post for a gap already has its question; no list to pick from.
+    expect(writerInputs.at(-1)?.questions).toBeNull();
+  });
+
+  test("where answers and searches are tracked, pull requests alone make no post and no idea", async () => {
+    state.closedPulls = [exportsPull, exportsFollowUp].map((pull) => ({
+      ...pull,
+      login: "sandbox-dev",
+    }));
+    await db.insert(autopilotRuns).values({
+      id: "planner-tracked",
+      organizationId: "sandbox-org",
+      trigger: "cron",
+    });
+    const ctx = {
+      ...(await buildAutopilotRunContext("sandbox-org", "planner-tracked")),
+      projectId: "sandbox-project",
+    };
+    const observations =
+      (await runAutopilotJob(ctx, "commits")).observations ?? [];
+    expect(observations).toHaveLength(2);
+    state.plan = plannerOutput(observations.map((row) => row.id));
+    const decision = await decideAutopilotPlan(ctx, observations);
+    expect(decision.outcome).toBe("wait");
+    expect(state.plannerPrompt).toContain('"demandTracked":true');
+    expect(await runMessages("planner-tracked")).toContainEqual(
+      'decision: Not acting on "Exports" yet'
+    );
+    expect(await db.query.autopilotFindings.findMany()).toHaveLength(0);
+    expect(opened).toHaveLength(0);
+  });
+
+  test("a post someone asks for about a pull request gets the tracked questions to target", async () => {
+    state.gaps = [gapRow("Exports")];
+    await askToWrite(1);
+    expect(opened).toHaveLength(1);
+    expect(writerInputs.at(-1)?.questions).toEqual([
+      expect.stringContaining(`"${gapPrompt("Exports")}"`),
+    ]);
+  });
+
   test("the autonomous budget turns a second ripe topic into an idea, and an explicit write still goes through", async () => {
     await seedTopic("exports", "Exports", 40);
     await dailyRun("planner-budget-1", [exportsPull]);
@@ -1890,7 +1991,7 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
     );
     expect(opened).toHaveLength(1);
     const idea = await db.query.autopilotFindings.findFirst({
-      where: eq(autopilotFindings.fingerprint, fingerprint(41)),
+      where: eq(autopilotFindings.fingerprint, gapFingerprint("Imports")),
     });
     expect(idea?.status).toBe("suggested");
     expect(
@@ -1923,7 +2024,7 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
     expect(
       (
         await db.query.autopilotFindings.findFirst({
-          where: eq(autopilotFindings.fingerprint, fingerprint(40)),
+          where: eq(autopilotFindings.fingerprint, gapFingerprint("Exports")),
         })
       )?.status
     ).toBe("suggested");
@@ -1937,7 +2038,7 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
     expect(
       (
         await db.query.autopilotFindings.findFirst({
-          where: eq(autopilotFindings.fingerprint, fingerprint(40)),
+          where: eq(autopilotFindings.fingerprint, gapFingerprint("Exports")),
         })
       )?.status
     ).toBe("suggested");
@@ -2040,7 +2141,7 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
       (await db.query.autopilotFindings.findMany()).map(
         (row) => row.fingerprint
       )
-    ).toEqual([fingerprint(40)]);
+    ).toEqual([gapFingerprint("Exports")]);
   });
 
   test("a failed credit check for a planned draft releases its claim and the next run retries", async () => {
