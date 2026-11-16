@@ -5,7 +5,7 @@ import {
   projects,
 } from "@notra/db/schema";
 import type { AutopilotImpactTarget } from "@notra/db/types/autopilot";
-import { gapScanIds } from "@notra/geo-core/geo/prompts";
+import { gapScanIds, promptIdFromScanId } from "@notra/geo-core/geo/prompts";
 import { and, count, desc, eq, gt, inArray, sql } from "drizzle-orm";
 
 import { AUTOPILOT_IMPACT_WINDOW_MS } from "@/constants/autopilot";
@@ -42,6 +42,57 @@ async function mentionRateSince(
       )
     );
   return row && row.total > 0 ? row.mentioned / row.total : null;
+}
+
+/**
+ * Each prompt's share of first-turn answers naming the brand over the last
+ * window: the "before" that mentionRateSince is later compared with. Prompts
+ * without answers in the window are left out.
+ */
+export async function recentMentionRates(
+  projectId: string,
+  promptIds: readonly string[]
+) {
+  const rates = new Map<string, number>();
+  if (promptIds.length === 0) {
+    return rates;
+  }
+  const rows = await db
+    .select({
+      scanId: geoMentionChecks.promptId,
+      total: count(),
+      mentioned:
+        sql<number>`count(*) filter (where ${geoMentionChecks.mentioned})`.mapWith(
+          Number
+        ),
+    })
+    .from(geoMentionChecks)
+    .where(
+      and(
+        eq(geoMentionChecks.projectId, projectId),
+        eq(geoMentionChecks.turn, 0),
+        inArray(geoMentionChecks.promptId, promptIds.flatMap(gapScanIds)),
+        gt(
+          geoMentionChecks.capturedAt,
+          new Date(Date.now() - AUTOPILOT_IMPACT_WINDOW_MS)
+        )
+      )
+    )
+    .groupBy(geoMentionChecks.promptId);
+  const totals = new Map<string, { total: number; mentioned: number }>();
+  for (const row of rows) {
+    const promptId = promptIdFromScanId(row.scanId);
+    const sum = totals.get(promptId) ?? { total: 0, mentioned: 0 };
+    sum.total += row.total;
+    sum.mentioned += row.mentioned;
+    totals.set(promptId, sum);
+  }
+  for (const [promptId, sum] of totals) {
+    if (sum.total > 0) {
+      rates.set(promptId, sum.mentioned / sum.total);
+    }
+  }
+  return rates;
 }
 
 /** Share of first-turn answers to the page's prompts citing it since the merge. */

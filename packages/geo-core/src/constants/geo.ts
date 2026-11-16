@@ -475,7 +475,9 @@ export const GEO_SCAN_DUE_LIMIT_PER_SWEEP = 25;
 export const GEO_SCAN_BILLING_PRECHECK_TIMEOUT_MS = 10_000;
 export const GEO_SCAN_POLL_INTERVAL_MS = 3000;
 export const GEO_START_SCAN_MUTATION_KEY = "geo-start-scan";
-export const GEO_RESCAN_SOURCE_KINDS = ["gap", "prompt"] as const;
+export const GEO_RESCAN_SOURCE_KINDS = ["gap", "prompt", "ai_search"] as const;
+/** An AI search gap spans prompts; a published brief rescans the top few. */
+export const GEO_RESCAN_AI_SEARCH_MAX_PROMPTS = 3;
 export const GEO_EXCERPT_MAX_LENGTH = 300;
 export const GEO_PROMPT_MIN_LENGTH = 8;
 export const GEO_PROMPT_MAX_LENGTH = 300;

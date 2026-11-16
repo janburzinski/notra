@@ -78,6 +78,7 @@ import {
   requestAutopilotReviewers,
 } from "@/lib/autopilot/github";
 import { renderPostHeroImage } from "@/lib/autopilot/hero-image";
+import { recentMentionRates } from "@/lib/autopilot/impact";
 import {
   assertAutopilotFindingLease,
   withAutopilotFindingLease,
@@ -119,8 +120,11 @@ import type {
   AutopilotFactSource,
 } from "@/types/autopilot-templates-runtime";
 import {
+  aiSearchGapCompetitors,
+  aiSearchGapDropReason,
   assertNoActiveContent,
   autopilotBlogSlug,
+  describeAiSearchGap,
   describePromptGap,
   detectBlogDirectory,
   detectComparisonDirectory,
@@ -1238,7 +1242,8 @@ export async function runKeywordsJob(
     return result;
   }
   // Cheap filters first: gaps you lose to a named competitor, search gaps
-  // where no existing page covers the query, nothing already briefed or proposed.
+  // where no existing page covers the query, AI searches that miss you,
+  // nothing already briefed or proposed.
   const dropped: { gap: string; reason: string }[] = [];
   const promptGaps = gaps.promptGaps.filter((gap) => {
     const reason = promptGapDropReason(gap);
@@ -1254,6 +1259,45 @@ export async function runKeywordsJob(
     }
     return reason === null;
   });
+  // An AI search gap is measured on the prompt whose answers ran the search
+  // most, so a page written for it gets a before and after like a prompt gap.
+  const aiSearchGapsQualified = gaps.aiSearchGaps.filter((gap) => {
+    const reason = aiSearchGapDropReason(gap);
+    if (reason) {
+      dropped.push({ gap: gap.query, reason });
+    }
+    return reason === null;
+  });
+  const promptRates =
+    ctx.projectId && aiSearchGapsQualified.length > 0
+      ? await recentMentionRates(
+          ctx.projectId,
+          aiSearchGapsQualified.flatMap((gap) => gap.promptIds ?? [])
+        )
+      : new Map<string, number>();
+  const aiSearchCandidates = aiSearchGapsQualified.flatMap(
+    (gap): KeywordCandidate[] => {
+      const promptId = gap.promptIds?.find((id) => promptRates.has(id));
+      const before = promptId ? promptRates.get(promptId) : undefined;
+      if (!promptId || before === undefined) {
+        dropped.push({
+          gap: gap.query,
+          reason: "No recent answers for its prompts to measure against",
+        });
+        return [];
+      }
+      return [
+        {
+          key: gap.query,
+          topic: gap.query,
+          competitors: aiSearchGapCompetitors(gap),
+          evidence: describeAiSearchGap(gap),
+          target: { kind: "prompt", promptId, before },
+          updatePage: pageToUpdate(gap.recommendation),
+        },
+      ];
+    }
+  );
   const qualified = interleave<KeywordCandidate>(
     promptGaps
       .sort((a, b) => b.opportunity - a.opportunity)
@@ -1287,7 +1331,9 @@ export async function runKeywordsJob(
           },
           updatePage: pageToUpdate(gap.recommendation),
         };
-      })
+      }),
+    // Already ranked by opportunity in the snapshot.
+    aiSearchCandidates
   );
   const isClosed = (candidate: KeywordCandidate) =>
     topics.closed.has(keywordFingerprint(candidate.key));
@@ -1328,12 +1374,14 @@ export async function runKeywordsJob(
     kept: candidates,
   });
   await log.decision(
-    `${candidates.length} candidates from ${gaps.promptGaps.length + gaps.searchGaps.length} content gaps`,
+    `${candidates.length} candidates from ${gaps.promptGaps.length + gaps.searchGaps.length + gaps.aiSearchGaps.length} content gaps`,
     {
       promptGaps: gaps.promptGaps.length,
       promptGapsQualified: promptGaps.length,
       searchGaps: gaps.searchGaps.length,
       searchGapsQualified: searchGaps.length,
+      aiSearchGaps: gaps.aiSearchGaps.length,
+      aiSearchGapsQualified: aiSearchCandidates.length,
       alreadyHandled: qualified.length - fresh.length,
       candidates: candidates.map((candidate) => candidate.topic),
       dropped: dropped

@@ -16,6 +16,10 @@ import {
   artifactRevisions,
   artifacts,
   autopilotBriefs,
+  brandSettings,
+  geoMentionChecks,
+  geoScans,
+  projects,
   autopilotFindings,
   autopilotRuns,
   autopilotSettings,
@@ -24,7 +28,10 @@ import {
   slackIntegrations,
   users,
 } from "@notra/db/schema";
-import type { GeoPromptGapRow } from "@notra/geo-core/types/geo";
+import type {
+  GeoAiSearchGapRow,
+  GeoPromptGapRow,
+} from "@notra/geo-core/types/geo";
 import { MEMORY_PATHS } from "@notra/memory/constants/memory";
 import { setMemoryStore } from "@notra/memory/memory";
 import { setRepoStore } from "@notra/memory/repos";
@@ -81,6 +88,8 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
     plan: null as AutopilotPlannerOutput | null,
     /** Prompt gaps the keywords job reads, i.e. what people ask about. */
     gaps: [] as GeoPromptGapRow[],
+    /** Searches AI engines ran without finding the brand. */
+    aiSearchGaps: [] as GeoAiSearchGapRow[],
     plannerPrompt: "",
     ambiguousFeedback: false,
     feedbackPrompt: "",
@@ -379,7 +388,11 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
   }));
   mock.module("@notra/geo-core/geo/gaps", () => ({
     loadGeoContentGaps: () =>
-      Effect.succeed({ promptGaps: state.gaps, searchGaps: [] }),
+      Effect.succeed({
+        promptGaps: state.gaps,
+        searchGaps: [],
+        aiSearchGaps: state.aiSearchGaps,
+      }),
   }));
   mock.module("@notra/ai/evaluation/client", () => ({
     getEvaluationClient: () => ({
@@ -729,6 +742,7 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
     state.postContent = null;
     openedBodies.length = 0;
     state.gaps = [];
+    state.aiSearchGaps = [];
     state.flag = true;
     state.credits = true;
     state.confidence = 0.99;
@@ -2012,6 +2026,117 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
     );
     expect(await db.query.autopilotFindings.findMany()).toHaveLength(0);
     expect(opened).toHaveLength(0);
+  });
+
+  test("an AI search gap becomes a keyword idea measured on the prompt whose answers ran the search", async () => {
+    await db.insert(brandSettings).values({
+      id: "sandbox-brand",
+      organizationId: "sandbox-org",
+      websiteUrl: "https://sandbox.dev",
+    });
+    await db.insert(projects).values({
+      id: "sandbox-project",
+      organizationId: "sandbox-org",
+      name: "Sandbox",
+      brandSettingsId: "sandbox-brand",
+    });
+    await db.insert(geoScans).values({
+      id: "scan-1",
+      organizationId: "sandbox-org",
+      projectId: "sandbox-project",
+      status: "completed",
+    });
+    // Three of four recent answers to the custom prompt miss the brand.
+    await db.insert(geoMentionChecks).values(
+      [false, false, false, true].map((mentioned, index) => ({
+        id: `check-${index}`,
+        organizationId: "sandbox-org",
+        projectId: "sandbox-project",
+        scanId: "scan-1",
+        engine: ["chatgpt", "perplexity", "gemini", "claude"][index] ?? "",
+        promptId: "custom-prompt-csv",
+        prompt: "how do I export reports to csv",
+        answer: "",
+        mentioned,
+        competitors: ["Rival"],
+        grounding: { queries: ["export reports csv"], sources: [] },
+        sources: [],
+        capturedAt: new Date(Date.now() - DAY_MS),
+      }))
+    );
+    const gap: GeoAiSearchGapRow = {
+      id: "ai-search-csv",
+      query: "export reports csv",
+      variants: [],
+      prompts: ["how do I export reports to csv"],
+      // The first prompt has no recent answers to compare with.
+      promptIds: ["prompt-gone", "prompt-csv"],
+      engines: ["chatgpt"],
+      searches: 3,
+      ownMentionRate: 0.25,
+      competitors: ["Rival"],
+      discoveredCompetitors: [],
+      opportunity: 1,
+      brief: null,
+      // A page on the site already covers the search, so the idea updates it.
+      recommendation: {
+        action: "update",
+        reason: "Existing page covers 80% of this query cluster.",
+        targets: [
+          {
+            kind: "page",
+            id: "page-exports",
+            url: "https://sandbox.dev/docs/exports",
+            title: "Exports",
+            score: 0.8,
+          },
+        ],
+      },
+    };
+    state.aiSearchGaps = [
+      gap,
+      {
+        ...gap,
+        id: "ai-search-briefed",
+        query: "csv exports",
+        brief: {
+          briefId: "brief-1",
+          status: "draft",
+          postId: null,
+          workingTitle: null,
+          publishedAt: null,
+          baseline: null,
+          rescanned: false,
+        },
+      },
+    ];
+    await db.insert(autopilotRuns).values({
+      id: "keywords-ai-search",
+      organizationId: "sandbox-org",
+      trigger: "cron",
+    });
+    const ctx = {
+      ...(await buildAutopilotRunContext("sandbox-org", "keywords-ai-search")),
+      projectId: "sandbox-project",
+    };
+    const observations =
+      (await runAutopilotJob(ctx, "keywords")).observations ?? [];
+    expect(observations.map((row) => row.title)).toEqual([
+      "export reports csv",
+    ]);
+    const [observation] = observations;
+    expect(observation?.detail).toBe(
+      'AI engines searched for "export reports csv" 3 times without finding you (25% of those answers mention you), while Rival show up. They searched it to answer "how do I export reports to csv".'
+    );
+    expect(observation?.proposal.evidence.target).toEqual({
+      kind: "prompt",
+      promptId: "prompt-csv",
+      before: 0.25,
+    });
+    expect(observation?.updatePage).toEqual({
+      url: "https://sandbox.dev/docs/exports",
+      title: "Exports",
+    });
   });
 
   test("a post someone asks for about a pull request gets the tracked questions to target", async () => {

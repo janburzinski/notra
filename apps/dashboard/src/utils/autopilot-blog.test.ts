@@ -21,6 +21,12 @@ describe("keyword candidates", () => {
       "p3",
     ]);
     expect(interleave([], ["s1", "s2"])).toEqual(["s1", "s2"]);
+    expect(interleave(["p1", "p2"], [], ["a1", "a2"])).toEqual([
+      "p1",
+      "a1",
+      "p2",
+      "a2",
+    ]);
   });
 
   test("a prompt gap says where the brand is missing and what people searched", () => {

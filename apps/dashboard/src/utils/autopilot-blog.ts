@@ -1,5 +1,6 @@
 import { findNewActiveContent } from "@notra/ai/utils/github-mention-content-policy";
 import type {
+  GeoAiSearchGapRow,
   GeoPromptGapRow,
   GeoSearchGapRow,
 } from "@notra/geo-core/types/geo";
@@ -192,16 +193,51 @@ export function describePromptGap(gap: GeoPromptGapRow) {
 }
 
 /**
- * Both kinds of demand get a turn: prompt gaps alone would take every slot,
+ * Every kind of demand gets a turn: prompt gaps alone would take every slot,
  * and search gaps carry the only real volume numbers.
  */
-export function interleave<T>(first: readonly T[], second: readonly T[]) {
+export function interleave<T>(...lists: readonly (readonly T[])[]) {
   return Array.from(
-    { length: Math.max(first.length, second.length) },
-    (_, index) => [first[index], second[index]]
+    { length: Math.max(0, ...lists.map((list) => list.length)) },
+    (_, index) => lists.map((list) => list[index])
   )
     .flat()
     .filter((item): item is T => item !== undefined);
+}
+
+/** Who the answers that ran the search named instead of the brand. */
+export function aiSearchGapCompetitors(gap: GeoAiSearchGapRow) {
+  return gap.competitors.length > 0
+    ? gap.competitors
+    : gap.discoveredCompetitors;
+}
+
+export function aiSearchGapDropReason(gap: GeoAiSearchGapRow) {
+  if (gap.brief) {
+    return "A GEO brief exists for it";
+  }
+  if (!gap.promptIds?.length) {
+    return "No tracked prompt to measure it on";
+  }
+  if (aiSearchGapCompetitors(gap).length === 0) {
+    return "No competitor shows up either";
+  }
+  if (gap.ownMentionRate > AUTOPILOT_KEYWORD_MAX_MENTION_RATE) {
+    return `You show up in ${Math.round(gap.ownMentionRate * 100)}% of answers (limit ${Math.round(AUTOPILOT_KEYWORD_MAX_MENTION_RATE * 100)}%)`;
+  }
+  return null;
+}
+
+/**
+ * What the planner and Jev weigh an AI search gap by: how often engines ran
+ * the search, for which prompts, and who they named instead of the brand.
+ */
+export function describeAiSearchGap(gap: GeoAiSearchGapRow) {
+  const prompts = gap.prompts
+    .slice(0, AUTOPILOT_GAP_SEARCHES_SHOWN)
+    .map((prompt) => `"${prompt}"`)
+    .join(", ");
+  return `AI engines searched for "${gap.query}" ${gap.searches} times without finding you (${Math.round(gap.ownMentionRate * 100)}% of those answers mention you), while ${aiSearchGapCompetitors(gap).slice(0, 3).join(", ")} show up.${prompts ? ` They searched it to answer ${prompts}.` : ""}`;
 }
 
 export function searchGapDropReason(gap: GeoSearchGapRow) {

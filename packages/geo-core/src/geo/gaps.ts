@@ -73,6 +73,7 @@ import {
   currentPromptScanFilter,
   findPromptMentionEntry,
   gapScanIds,
+  promptIdFromScanId,
   shouldSkipUnmatchedGapScan,
 } from "./prompts";
 import {
@@ -283,6 +284,7 @@ const loadAiSearchQueries = Effect.fn("geo.gaps.aiSearchQueries")(function* (
       with searched as (
         select
           ${geoMentionChecks.id} as check_id,
+          ${geoMentionChecks.promptId} as prompt_id,
           ${geoMentionChecks.engine} as engine,
           ${geoMentionChecks.prompt} as prompt,
           ${geoMentionChecks.mentioned} as mentioned,
@@ -306,6 +308,7 @@ const loadAiSearchQueries = Effect.fn("geo.gaps.aiSearchQueries")(function* (
         coalesce(array_agg(distinct check_id) filter (where mentioned or owned_source_cited), '{}') as covered_check_ids,
         coalesce(array_agg(distinct engine) filter (where not mentioned and not owned_source_cited), '{}') as engines,
         coalesce(array_agg(distinct prompt) filter (where not mentioned and not owned_source_cited), '{}') as prompts,
+        coalesce(jsonb_object_agg(check_id::text, prompt_id) filter (where not mentioned and not owned_source_cited), '{}'::jsonb) as missed_prompt_ids,
         coalesce(jsonb_agg(distinct to_jsonb(competitors)) filter (where not mentioned and not owned_source_cited), '[]'::jsonb) as competitors
       from searched
       where query <> ''
@@ -320,6 +323,7 @@ const loadAiSearchQueries = Effect.fn("geo.gaps.aiSearchQueries")(function* (
     coveredCheckIds: row.covered_check_ids,
     engines: row.engines,
     prompts: row.prompts,
+    missedPromptIds: row.missed_prompt_ids,
     competitors: row.competitors,
   }));
 });
@@ -382,6 +386,7 @@ function aggregateAiSearches(
       engines: new Set(),
       checkIds: new Set(),
       coveredCheckIds: new Set(),
+      missedPrompts: new Map(),
       competitors: [],
     };
     entry.variants.set(
@@ -394,10 +399,24 @@ function aggregateAiSearches(
     addAll(entry.engines, row.engines);
     addAll(entry.checkIds, row.checkIds);
     addAll(entry.coveredCheckIds, row.coveredCheckIds);
+    for (const [checkId, scanId] of Object.entries(row.missedPromptIds)) {
+      entry.missedPrompts.set(checkId, promptIdFromScanId(scanId));
+    }
     entry.competitors.push(...row.competitors.flat());
     byKey.set(key, entry);
   }
   return byKey;
+}
+
+/** Prompts by how many answers ran the search without the brand. */
+function rankMissedPrompts(missed: Map<string, string>): string[] {
+  const counts = new Map<string, number>();
+  for (const promptId of missed.values()) {
+    counts.set(promptId, (counts.get(promptId) ?? 0) + 1);
+  }
+  return [...counts.entries()]
+    .sort((left, right) => right[1] - left[1])
+    .map(([promptId]) => promptId);
 }
 
 function addAll<T>(target: Set<T>, values: readonly T[]): void {
@@ -410,7 +429,11 @@ function toAiSearchGapRows(
   byKey: Map<string, GeoAiSearchAgg>,
   trackedAliases: Map<string, string>,
   searchConsoleKeys: ReadonlySet<string>,
-  briefFor: (key: string) => GapBriefRow | undefined
+  briefFor: (key: string) => GapBriefRow | undefined,
+  recommend: (
+    query: string,
+    variants: readonly string[]
+  ) => GeoSearchGapRecommendation
 ): GeoAiSearchGapRow[] {
   const rows: GeoAiSearchGapRow[] = [];
   for (const [key, entry] of byKey) {
@@ -434,6 +457,10 @@ function toAiSearchGapRows(
       query,
       variants: variants.slice(0, GEO_AI_SEARCH_GAP_VARIANT_LIMIT),
       prompts: [...entry.prompts].slice(0, GEO_AI_SEARCH_GAP_PROMPT_LIMIT),
+      promptIds: rankMissedPrompts(entry.missedPrompts).slice(
+        0,
+        GEO_AI_SEARCH_GAP_PROMPT_LIMIT
+      ),
       engines: [...entry.engines],
       searches,
       ...scoreGap(
@@ -445,6 +472,7 @@ function toAiSearchGapRows(
         trackedAliases
       ),
       brief: toBriefRef(briefFor(id)),
+      recommendation: recommend(query, variants),
     });
   }
   return rows
@@ -846,7 +874,17 @@ const computeGeoContentGaps = Effect.fn("geo.gaps.compute")(function* (
         .map(aiSearchGroupKey)
         .filter(Boolean)
     ),
-    (key) => briefBySource.get(sourceKey("ai_search", key))
+    (key) => briefBySource.get(sourceKey("ai_search", key)),
+    // Same check as prompt gaps: does a page on the site already cover it?
+    (query, variants) =>
+      recommendSearchGapAction({
+        matches: scoreContentCollisions(
+          { prompt: query, title: null, queries: [query, ...variants] },
+          collisionCandidates
+        ),
+        impressions: null,
+        clicks: null,
+      })
   );
 
   const response: GeoContentGapsResponse = {

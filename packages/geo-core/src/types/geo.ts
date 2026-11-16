@@ -1824,6 +1824,8 @@ export type GeoAiSearchQueryDbRow = {
   covered_check_ids: string[];
   engines: string[];
   prompts: string[];
+  /** Check id → scan id of each answer that ran the search without the brand. */
+  missed_prompt_ids: Record<string, string>;
   competitors: string[][];
 };
 
@@ -1833,6 +1835,7 @@ export interface GeoAiSearchQueryRow {
   coveredCheckIds: string[];
   engines: string[];
   prompts: string[];
+  missedPromptIds: Record<string, string>;
   competitors: string[][];
 }
 
@@ -1842,6 +1845,8 @@ export interface GeoAiSearchAgg {
   engines: Set<string>;
   checkIds: Set<string>;
   coveredCheckIds: Set<string>;
+  /** Check id → prompt id, for answers that ran the search without the brand. */
+  missedPrompts: Map<string, string>;
   competitors: string[];
 }
 
@@ -1932,6 +1937,12 @@ export interface GeoAiSearchGapRow {
   query: string;
   variants: string[];
   prompts: string[];
+  /**
+   * Tracked prompts whose answers ran the search without the brand, most
+   * first. A rescan of these measures a page written for the gap. Absent in
+   * older snapshots.
+   */
+  promptIds?: string[];
   engines: string[];
   searches: number;
   ownMentionRate: number;
@@ -1939,6 +1950,8 @@ export interface GeoAiSearchGapRow {
   discoveredCompetitors: string[];
   opportunity: number;
   brief: GeoGapBriefRef | null;
+  /** Whether an existing page already covers the search; absent in older snapshots. */
+  recommendation?: GeoSearchGapRecommendation;
 }
 
 export interface GeoContentGapsResponse {
