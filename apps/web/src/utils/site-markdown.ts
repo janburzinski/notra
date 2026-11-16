@@ -378,8 +378,6 @@ export function buildLandingMarkdown() {
     "",
     HERO_SUBHEAD,
     "",
-    SITE_DESCRIPTION,
-    "",
     "Primary CTA: [Start for free](https://app.usenotra.com/signup)",
     "",
     markdownSection("Explore in Markdown", [
