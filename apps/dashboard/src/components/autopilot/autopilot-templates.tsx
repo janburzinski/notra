@@ -1,6 +1,6 @@
 "use client";
 
-import { Add01Icon } from "@hugeicons/core-free-icons";
+import { Add01Icon, ArrowRight02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { PageHeading } from "@notra/ui/components/shared/page-heading";
 import { StatusBadge } from "@notra/ui/components/status-badge";
@@ -23,6 +23,8 @@ import {
 import { Button } from "@/components/button";
 import {
   AUTOPILOT_TEMPLATE_CATEGORIES,
+  AUTOPILOT_TEMPLATE_OUTPUT_CHIPS,
+  AUTOPILOT_TEMPLATE_TRIGGER_CHIPS,
   AUTOPILOT_TEMPLATES,
 } from "@/constants/autopilot-templates";
 import {
@@ -390,6 +392,38 @@ export function AutopilotTemplatesPage(actions: AutopilotTemplateActions) {
   );
 }
 
+/** When the template runs and what it makes, like the Automations page cards. */
+function AutopilotTemplateFlow({ template }: { template: AutopilotTemplate }) {
+  const trigger = AUTOPILOT_TEMPLATE_TRIGGER_CHIPS[template.trigger];
+  const output = AUTOPILOT_TEMPLATE_OUTPUT_CHIPS[template.output];
+  return (
+    <span className="text-muted-foreground flex min-w-0 items-center gap-2">
+      <span className="flex items-center gap-1.5">
+        <HugeiconsIcon
+          aria-hidden="true"
+          className="size-3.5"
+          icon={trigger.icon}
+        />
+        {trigger.label}
+      </span>
+      <HugeiconsIcon
+        aria-label="then"
+        className="size-3 opacity-60"
+        icon={ArrowRight02Icon}
+        role="img"
+      />
+      <span className="flex items-center gap-1.5">
+        <HugeiconsIcon
+          aria-hidden="true"
+          className="size-3.5"
+          icon={output.icon}
+        />
+        {output.label}
+      </span>
+    </span>
+  );
+}
+
 function AutopilotTemplateCard({
   template,
   jobs,
@@ -427,6 +461,9 @@ function AutopilotTemplateCard({
         ) : null}
         {!active && !canManage ? (
           <span className="text-muted-foreground">Admin access required</span>
+        ) : null}
+        {!active && canManage ? (
+          <AutopilotTemplateFlow template={template} />
         ) : null}
         <Button
           className="relative z-10 ml-auto"

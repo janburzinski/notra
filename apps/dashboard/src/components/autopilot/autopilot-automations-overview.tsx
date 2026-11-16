@@ -20,12 +20,14 @@ import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { DataTable, type TableColumn } from "ui/table";
 
+import { AutopilotRunHistory } from "@/components/autopilot/autopilot-run-history";
 import { AutopilotStatStrip } from "@/components/autopilot/autopilot-stat-strip";
 import { AutopilotTableEmpty } from "@/components/autopilot/autopilot-table-empty";
 import { AutopilotTrend } from "@/components/autopilot/autopilot-trend";
 import { Button } from "@/components/button";
 import { useRightPanel } from "@/components/dashboard/right-panel-context";
 import { AUTOPILOT_POLL_INTERVAL_MS } from "@/constants/autopilot";
+import { AUTOPILOT_RUN_HISTORY_DAYS } from "@/constants/autopilot-run-history";
 import {
   AUTOPILOT_AUTOMATIONS,
   AUTOPILOT_EMPTY_TABLE_HEIGHT,
@@ -102,7 +104,7 @@ export function AutopilotAutomationsOverview({
         kind,
         pullRequests: metric?.pullRequests ?? null,
         merged: metric?.merged ?? null,
-        creditsPerRun: metric?.creditsPerRun ?? null,
+        history: metrics?.history[kind] ?? null,
       };
     }),
     ...(workflowsQuery.data ?? []).map((workflow) => ({
@@ -211,15 +213,16 @@ export function AutopilotAutomationsOverview({
       ),
     },
     {
-      key: "creditsPerRun",
-      header: "Credits/run",
-      width: "7rem",
+      key: "history",
+      header: `Last ${AUTOPILOT_RUN_HISTORY_DAYS} days`,
+      width: "13rem",
       collapsePriority: 1,
-      cell: (row) => (
-        <AutomationNumber
-          value={row.type === "builtin" ? row.creditsPerRun : undefined}
-        />
-      ),
+      cell: (row) =>
+        row.type === "builtin" && row.history ? (
+          <AutopilotRunHistory days={row.history} />
+        ) : (
+          <span className="text-muted-foreground">—</span>
+        ),
     },
     ...(canManage
       ? [

@@ -71,7 +71,10 @@ import {
   listJobDecisions,
   listRunEvents,
 } from "@/lib/autopilot/log";
-import { loadAutopilotMetrics } from "@/lib/autopilot/metrics";
+import {
+  loadAutopilotMetrics,
+  loadAutopilotRunHistory,
+} from "@/lib/autopilot/metrics";
 import {
   cancelHoldsAfterSettingsChange,
   holdFinding,
@@ -208,15 +211,16 @@ export const autopilotRouter = {
     .handler(async ({ input }) => {
       // The period before, for the trend next to each number.
       const now = new Date();
-      const [current, previous] = await Promise.all([
+      const [current, previous, history] = await Promise.all([
         loadAutopilotMetrics(input.organizationId, input.days, now),
         loadAutopilotMetrics(
           input.organizationId,
           input.days,
           new Date(now.getTime() - input.days * 24 * 60 * 60 * 1000)
         ),
+        loadAutopilotRunHistory(input.organizationId, now),
       ]);
-      return { ...current, previous };
+      return { ...current, previous, history };
     }),
   get: authorizedProcedure
     .input(autopilotOrganizationInputSchema)

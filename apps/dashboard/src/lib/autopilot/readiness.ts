@@ -31,6 +31,7 @@ import {
   READINESS_AGENT_INSTRUCTIONS,
   READINESS_AGENT_WRAP_UP_NOTE,
 } from "@/constants/autopilot-readiness";
+import { AUTOPILOT_JOB_OFF_MESSAGE } from "@/constants/autopilot-run-history";
 import { emailDraftReviewers } from "@/lib/autopilot/draft-emails";
 import {
   claimFinding,
@@ -210,7 +211,7 @@ export async function checkReadiness(
     return skip("No website repository connected");
   }
   if (!ctx.jobs.readiness) {
-    return skip("Turned off in settings");
+    return skip(AUTOPILOT_JOB_OFF_MESSAGE);
   }
   // PRs merged or closed on GitHub since the last run free up the budget.
   await syncFindingPullRequests(ctx.organizationId);

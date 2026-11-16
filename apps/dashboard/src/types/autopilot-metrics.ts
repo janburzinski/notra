@@ -24,7 +24,8 @@ export type AutopilotAutomationRow =
       kind: AutopilotAutomationKind;
       pullRequests: number | null;
       merged: number | null;
-      creditsPerRun: number | null;
+      /** One state per day of the last two weeks, oldest first. */
+      history: AutopilotRunDay[] | null;
     }
   | { type: "workflow"; id: string; workflow: AutopilotWorkflowSummary };
 
@@ -34,6 +35,19 @@ interface AutopilotAutomationMetrics {
   merged: number;
   /** Credits charged for this automation per run it took part in. */
   creditsPerRun: number;
+}
+
+/** What an automation did on one day: opened a pull request, failed, only ran, or didn't run. */
+export type AutopilotRunDayState = "opened" | "failed" | "ran" | "idle";
+
+export interface AutopilotRunDay {
+  /** Calendar date in the workspace's time zone, "2026-11-16". */
+  date: string;
+  state: AutopilotRunDayState;
+}
+
+export interface AutopilotRunHistoryProps {
+  days: AutopilotRunDay[];
 }
 
 export interface AutopilotMetrics {

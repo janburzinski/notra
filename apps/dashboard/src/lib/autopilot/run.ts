@@ -21,6 +21,7 @@ import {
   AUTOPILOT_RUN_LEASE_MS,
 } from "@/constants/autopilot";
 import { AUTOPILOT_DEFAULT_APPROVALS } from "@/constants/autopilot-publish";
+import { AUTOPILOT_JOB_OFF_MESSAGE } from "@/constants/autopilot-run-history";
 import {
   runCommitsJob,
   runCompetitorsJob,
@@ -302,7 +303,7 @@ export async function runAutopilotJob(
   }
   // Competitors is one line in the brief, not an automation with a switch.
   if (!(kind === "competitors" || ctx.jobs[kind])) {
-    await log.skip("Turned off in settings");
+    await log.skip(AUTOPILOT_JOB_OFF_MESSAGE);
     return empty;
   }
   return await withAutopilotRunLease(ctx, () => OBSERVATION_JOBS[kind](ctx));

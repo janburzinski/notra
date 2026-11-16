@@ -1,13 +1,20 @@
 import {
   BalanceScaleIcon,
+  Calendar03Icon,
+  ChartDecreaseIcon,
+  Clock01Icon,
   GitBranchIcon,
+  GitMergeIcon,
+  GitPullRequestIcon,
   Home01Icon,
   Link04Icon,
+  NoteIcon,
   RefreshIcon,
   Robot01Icon,
   Search01Icon,
   ViewIcon,
 } from "@hugeicons/core-free-icons";
+import type { IconSvgElement } from "@hugeicons/react";
 
 import type {
   AutopilotTemplate,
@@ -53,6 +60,25 @@ export const AUTOPILOT_TEMPLATE_TRIGGER_LABELS: Record<
   merge: "When pull requests merge",
   weekly: "Once a week",
   drop: "When AI citations drop",
+};
+
+/** When a template runs and what it makes, short enough for a card's footer. */
+export const AUTOPILOT_TEMPLATE_TRIGGER_CHIPS: Record<
+  AutopilotTemplate["trigger"],
+  { label: string; icon: IconSvgElement }
+> = {
+  run: { label: "Every run", icon: Clock01Icon },
+  merge: { label: "PR merged", icon: GitMergeIcon },
+  weekly: { label: "Weekly", icon: Calendar03Icon },
+  drop: { label: "Citations drop", icon: ChartDecreaseIcon },
+};
+
+export const AUTOPILOT_TEMPLATE_OUTPUT_CHIPS: Record<
+  AutopilotTemplate["output"],
+  { label: string; icon: IconSvgElement }
+> = {
+  pull_request: { label: "Pull request", icon: GitPullRequestIcon },
+  post: { label: "Post", icon: NoteIcon },
 };
 
 export const AUTOPILOT_TEMPLATE_OUTPUT_LABELS: Record<
