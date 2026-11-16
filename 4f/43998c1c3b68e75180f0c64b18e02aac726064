@@ -1,0 +1,24 @@
+packages/geo-core/src/ingest/pipeline.ts
+  s_84517655eac374::t_cf5a6f2eaff5d8 727-732
+packages/geo-core/src/ingest/README.md
+  s_84517655eac374::t_b40133a775ebfc 25
+packages/geo-core/tests/ingest-usage.test.ts
+  s_84517655eac374::t_1368b15aad5db9 54-56,58-60
+  s_84517655eac374::t_f0b6ab2fb20667 50-53,57,63
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "4f43998c1c3b68e75180f0c64b18e02aac726064",
+  "prompts": {},
+  "sessions": {
+    "s_84517655eac374": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a1e584-6218-77c1-ad6a-b4f55ccd2990",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
