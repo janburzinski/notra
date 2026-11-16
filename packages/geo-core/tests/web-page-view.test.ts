@@ -116,6 +116,16 @@ describe("referrers", () => {
     ["https://www.google.co.uk/", "search", "google"],
     ["https://news.google.com/", "search", "google"],
     ["https://docs.google.com/", "search", "google"],
+    ["https://www.google.com.tr/", "search", "google"],
+    ["https://yandex.ru/", "search", "yandex"],
+    // Not Google: the part after `google.` is no public suffix.
+    ["https://google.evil.example/", "other", "google.evil.example"],
+    ["https://foo.yandex.attacker.net/", "other", "foo.yandex.attacker.net"],
+    ["https://mail.yahoo.com/", "other", "yahoo-mail"],
+    ["https://outlook.live.com/", "other", "outlook"],
+    // Sign-in and checkout returns are not where a visit came from.
+    ["https://accounts.google.com/", "direct", ""],
+    ["https://checkout.stripe.com/", "direct", ""],
     ["https://slack.com/", "social", "slack"],
     ["https://app.slack.com/", "social", "slack"],
     ["https://slack-redir.net/", "social", "slack"],
@@ -209,6 +219,7 @@ test("hash routes are kept only on request, path-like, scrubbed and capped", () 
   expect(path("/app#!/settings/team&tab=1")).toBe("/app#!/settings/team");
   expect(path("/#section")).toBe("/");
   expect(path("/#access_token=abc.def&x=1")).toBe("/");
+  expect(path("/app%3Bjsessionid=ABC#!/pricing")).toBe("/app#!/pricing");
   expect(path("/app#/invite/Zx8Kq2LmP4wR7tYu9VbN3cHj")).toBe(
     "/app#/invite/:id"
   );
@@ -249,4 +260,36 @@ test("ids and personal data in paths become :id, readable slugs stay", () => {
   expect(scrubWebPath("/docs/getting-started/Introduction")).toBe(
     "/docs/getting-started/Introduction"
   );
+});
+
+test("tokens split by dashes, padded or percent-encoded become :id, Title-Case slugs stay", () => {
+  expect(
+    scrubWebPath(
+      "/reset/q8Zr%2BkL%2FwYpXvAbCdEfGh%3D%3D/verify/dGhpc2lzYXNlY3JldA==/magic/Ab3dE5Gh_Jk9Lm1Np-3Qr5St7Uv"
+    )
+  ).toBe("/reset/:id/verify/:id/magic/:id");
+  expect(scrubWebPath("/checkout;jsessionid=A1B2C3D4E5F6A7B8C9D0/done")).toBe(
+    "/checkout/done"
+  );
+  expect(
+    scrubWebPath("/checkout%3Bjsessionid=ABCDEF12FEDCBA34AABBCC56DDEEFF78/done")
+  ).toBe("/checkout/done");
+  for (const slug of [
+    "Getting-Started-With-TypeScript",
+    "iOS17ReleaseNotes",
+    "K8sOperatorPatterns",
+    "OAuth2-Setup-Guide",
+    "x86_64-linux-gnu-build",
+    "caf%C3%A9-und-kuchen-rezepte",
+  ]) {
+    expect(scrubWebPath(`/blog/${slug}`)).toBe(`/blog/${slug}`);
+  }
+});
+
+test("error text loses percent-encoded emails and IPv4 addresses, and keeps a URL's host", () => {
+  expect(
+    scrubWebErrorText(
+      "GET https://api.x.com/users/john.doe%40gmail.com/profile 404 from 10.0.0.12"
+    )
+  ).toBe("GET https://api.x.com/users/[email]/profile 404 from #");
 });

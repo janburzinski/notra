@@ -7,6 +7,8 @@ import {
   queryWebSources,
   queryWebTimeseries,
 } from "@notra/analytics/tinybird/client";
+import { loadCompletedImports } from "@notra/geo-core/geo/analytics-imports";
+import { Effect } from "effect";
 import { defineTool } from "eve/tools";
 
 import {
@@ -45,16 +47,32 @@ export function createGetWebAnalyticsTool() {
           return ANALYTICS_PROJECT_NOT_FOUND_MESSAGE;
         }
 
+        const hosts = normalizeHostFilter(input.host);
+        // History imported from another tool counts here as on the
+        // dashboard; without it the agent's totals did not match.
+        const imports = project
+          ? (
+              await Effect.runPromise(
+                loadCompletedImports(
+                  organizationId,
+                  project.id,
+                  "web",
+                  hosts ? [hosts] : []
+                )
+              )
+            ).ids
+          : "";
         const params = {
           organization_id: organizationId,
           project_id: project?.id ?? "",
           include_unassigned: project?.isDefault ? 1 : 0,
           site_id: input.siteId ?? "",
-          hosts: normalizeHostFilter(input.host),
+          hosts,
           path: input.path ?? "",
           days: range.days,
           date_from: range.from,
           date_to: range.to,
+          imports,
         };
         const [overview, timeseries, pages, sources, audience] =
           await Promise.all([

@@ -14,17 +14,26 @@ declare const NOTRA_PLUS: boolean;
   const nav = navigator;
   const loc = location;
   const perf = performance;
-  const script = doc.currentScript as HTMLScriptElement | null;
+  // `type="module"` scripts have no currentScript; find the tag instead.
+  const script = (doc.currentScript ||
+    doc.querySelector(
+      "script[data-key][src*=notra]"
+    )) as HTMLScriptElement | null;
   const data = script?.dataset;
   const key = data?.key;
+  const flags = win as unknown as { __notra?: 1 };
   if (
     !(script && key) ||
     top !== win ||
     nav.webdriver ||
-    /^(localhost|127\.|\[::1\]$)/.test(loc.hostname)
+    // A second copy of the tag would wrap history again and count twice.
+    flags.__notra ||
+    // Loopback only: not localhost-staging.example.com or 127.example.com.
+    /(^|\.)localhost$|^127\.\d+\.\d+\.\d+$|^\[::1\]$/.test(loc.hostname)
   ) {
     return;
   }
+  flags.__notra = 1;
   const endpoint =
     data.api || script.src.replace(/^(\w+:\/\/[^/]+).*/, "$1/api/collect");
   const withHash = "hash" in data;
@@ -49,11 +58,13 @@ declare const NOTRA_PLUS: boolean;
   let errors = 0;
 
   // `h` tells the server the page uses hash routes, so it keeps `#/route`.
+  // URLs are cut so the body stays under the server's 4 KB limit (a long
+  // URL used to fail the whole beacon); the server keeps 2048 characters.
   const send = (fields: object) => {
     const body = JSON.stringify({
       k: key,
       v: view,
-      u: url,
+      u: url.slice(0, 2048),
       h: withHash,
       ...fields,
     });
@@ -105,11 +116,17 @@ declare const NOTRA_PLUS: boolean;
     }
   };
 
+  // With data-hash only `#/route` and `#!/route` are pages: an in-page
+  // anchor (`#features`) or an OAuth fragment (`#access_token=…`) is not.
+  const hashRoute = () => (withHash && /^#!?\//.test(loc.hash) ? loc.hash : "");
+  const href = () => loc.href.replace(/#.*/, "") + hashRoute();
+
   const start = (force?: unknown) => {
-    const next = withHash ? loc.href : loc.href.replace(/#.*/, "");
+    const next = href();
     if (next !== url || force === true) {
       report();
-      const referrer = url || doc.referrer;
+      // Only the referrer's host and path are used; 1 KB is plenty.
+      const referrer = (url || doc.referrer).slice(0, 1024);
       hard = !url;
       url = next;
       // Unique per page view, not a secret: no need for the slower crypto API.
@@ -124,7 +141,11 @@ declare const NOTRA_PLUS: boolean;
       cls = 0;
       clsWindow = 0;
       inp = 0;
-      viewStart = now();
+      // The first view owns everything since navigation began, including
+      // layout shifts before this deferred script ran. A later view starts
+      // at the event that caused it, so the click that navigates an SPA
+      // counts toward the new view's INP instead of neither view's.
+      viewStart = hard ? 0 : (win.event?.timeStamp ?? now());
       if (NOTRA_PLUS) {
         errors = 0;
       }
@@ -135,15 +156,19 @@ declare const NOTRA_PLUS: boolean;
 
   // A replace that keeps the route (filters, sort order) is the same view.
   // With data-hash the route includes the hash, cut before its query.
-  const route = () =>
-    loc.pathname + (withHash ? loc.hash.replace(/\?.*/, "") : "");
+  // It still moves the current URL, so a later push back to the bare route
+  // (clearing the filters) is a new view rather than "no change".
+  const route = () => loc.pathname + hashRoute().replace(/\?.*/, "");
   for (const method of ["pushState", "replaceState"] as const) {
     const original = history[method];
+    // oxlint-disable-next-line no-loop-func -- `url` is meant to be the live view's URL.
     history[method] = function (...args) {
       const before = route();
       original.apply(this, args);
       if (method < "r" || before !== route()) {
         start();
+      } else if (url) {
+        url = href();
       }
     };
   }
@@ -172,9 +197,13 @@ declare const NOTRA_PLUS: boolean;
   // and no query string, since either can carry personal data.
   const onClick = (event: MouseEvent) => {
     // Left and middle button; a right click only opens the context menu.
+    // composedPath()[0] is the real target, also inside an open shadow root,
+    // where event.target is only the shadow host.
     const el =
       event.button < 2
-        ? ((event.target as Element).closest?.("a") as HTMLAnchorElement | null)
+        ? ((event.composedPath()[0] as Element).closest?.(
+            "a"
+          ) as HTMLAnchorElement | null)
         : null;
     if (el?.host && el.host !== loc.host) {
       send({ o: el.host + el.pathname });
@@ -192,7 +221,9 @@ declare const NOTRA_PLUS: boolean;
       ).observe({
         type,
         buffered: true,
-        durationThreshold: 40,
+        // The minimum: at 40 a view with only quick interactions reported
+        // no INP at all, which left the fast views out of p75.
+        durationThreshold: 16,
       } as PerformanceObserverInit);
     } catch {
       // No PerformanceObserver, or an entry type this browser lacks.
@@ -228,7 +259,11 @@ declare const NOTRA_PLUS: boolean;
     // carries one) and scrubs the message before storing either.
     const onError = (message: unknown, source = "", line = 0) => {
       if (view && /^https?:/.test(source) && errors++ < 5) {
-        send({ x: String(message).slice(0, 300), xs: source, xl: line });
+        send({
+          x: String(message).slice(0, 300),
+          xs: source.slice(0, 512),
+          xl: line,
+        });
       }
     };
     on("error", (event: ErrorEvent) =>

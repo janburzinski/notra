@@ -476,6 +476,22 @@ describe("runGeoIngest ordering", () => {
     });
   });
 
+  test("a site counts Safari before 16.4, whose relayed beacon has no fetch metadata", async () => {
+    const page = {
+      ...SITE_PAGE,
+      userAgent:
+        "Mozilla/5.0 (iPhone; CPU iPhone OS 15_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.6 Mobile/15E148 Safari/604.1",
+      signals: { clientHints: false, fetchMode: null, tracing: false },
+    };
+    expect(
+      await run(ingestRequest(relayed({}, page), SITE_TOKEN))
+    ).toMatchObject({
+      _tag: "Success",
+      success: { outcome: "ingested", visitorType: "human" },
+    });
+    expect(ingestWebPageViews).toHaveBeenCalledTimes(1);
+  });
+
   test("without a cookie banner a site reports AI traffic server-side, never from relayed beacons", async () => {
     const referral = { ...SITE_PAGE, referer: "https://chatgpt.com/" };
     expect(await run(ingestRequest(referral, SITE_TOKEN))).toMatchObject({

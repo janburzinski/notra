@@ -2,6 +2,7 @@ import { afterAll, beforeAll, expect, mock, test } from "bun:test";
 
 import { Effect } from "effect";
 
+import { geoTrafficWindowParams } from "../src/geo/window";
 import {
   isIsolatedTestWorker,
   testInIsolatedProcess,
@@ -73,3 +74,16 @@ if (!isIsolatedTestWorker(import.meta.url)) {
     expect(response.devices[0]?.previousVisitors).toBeNull();
   });
 }
+
+test("last N days is today and the N - 1 days before, compared with N days", () => {
+  const now = new Date("2026-11-16T09:30:00Z");
+  expect(geoTrafficWindowParams({ days: 7 }, 30, now)).toEqual({
+    days: 7,
+    date_from: "2026-11-10",
+    date_to: "",
+  });
+  expect(geoTrafficWindowParams({}, 1, now).date_from).toBe("2026-11-16");
+  expect(
+    geoTrafficWindowParams({ from: "2026-01-01", to: "2026-01-31" }, 30, now)
+  ).toEqual({ days: 30, date_from: "2026-01-01", date_to: "2026-01-31" });
+});

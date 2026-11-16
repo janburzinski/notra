@@ -955,7 +955,19 @@ const runSiteBeaconRelay = Effect.fnUntraced(function* (
       new GeoIngestInvalidPayloadError({ issues: parsed.error.issues })
     );
   }
-  const { request, beacon, proxied } = parsed.data;
+  const { beacon, proxied } = parsed.data;
+  // The relayed request is the beacon's fetch from the page's JavaScript, so
+  // a missing Sec-Fetch-Mode means an older browser (Safari before 16.4) or
+  // a privacy proxy, not a bot: unknown (""), as for a public-key beacon.
+  const request = parsed.data.request.signals
+    ? {
+        ...parsed.data.request,
+        signals: {
+          ...parsed.data.request.signals,
+          fetchMode: parsed.data.request.signals.fetchMode ?? "",
+        },
+      }
+    : parsed.data.request;
   const urlResult = yield* Effect.result(parseUrl(request.url));
   if (urlResult._tag === "Failure") {
     return yield* failWithAuthPrecedence(beaconIdentity, urlResult.failure);

@@ -79,7 +79,34 @@ export const WEB_AI_PRODUCTS: Record<string, string> = {
 export const WEB_MAIL_HOSTS: Record<string, string> = {
   "mail.google.com": "gmail",
   "inbox.google.com": "gmail",
+  "mail.yahoo.com": "yahoo-mail",
+  "outlook.live.com": "outlook",
+  "outlook.office.com": "outlook",
+  "outlook.office365.com": "outlook",
 };
+
+/**
+ * Sign-in and checkout pages that send a visitor back mid-visit. They are
+ * not where a visit came from, so a return from one never opens a session
+ * (as a referral exclusion in other analytics tools).
+ */
+export const WEB_RETURN_HOSTS: readonly string[] = [
+  "accounts.google.com",
+  "accounts.youtube.com",
+  "login.microsoftonline.com",
+  "login.live.com",
+  "appleid.apple.com",
+  "checkout.stripe.com",
+  "billing.stripe.com",
+  "paypal.com",
+];
+
+/**
+ * What may follow `google.` or `yandex.` in a search host: a TLD, or a
+ * second-level one such as `co.uk` or `com.tr`. Not `google.evil.example`.
+ */
+export const WEB_SEARCH_SUFFIX_PATTERN =
+  /^(?:[a-z]{2,6}|(?:co|com|org|net|ac|gov|edu)\.[a-z]{2})$/;
 
 export const WEB_SEARCH_HOSTS: Record<string, string> = {
   "google.": "google",
@@ -180,6 +207,8 @@ export const WEB_OPERATING_SYSTEMS: readonly [string, string][] = [
 ];
 
 export const ISO_DATE_LENGTH = 10;
+/** Longest date range a web analytics report covers, in days. */
+export const ANALYTICS_MAX_RANGE_DAYS = 366;
 /** Largest value the UInt32 web columns (visible time, error line) hold. */
 export const WEB_UINT32_MAX = 4_294_967_295;
 
@@ -192,3 +221,15 @@ export const WEB_PATH_DIGIT_RUN_PATTERN = /\d{4,}/;
 /** Token-like: 20+ characters of id alphabet with a long unbroken run. */
 export const WEB_PATH_TOKEN_SEGMENT_PATTERN = /^[\w.~-]{20,}$/;
 export const WEB_PATH_TOKEN_RUN_PATTERN = /[A-Za-z0-9]{16,}/g;
+/** Separators, base64 padding and percent escapes a token may contain. */
+export const WEB_PATH_TOKEN_FILLER_PATTERN = /[-_.~=+]|%[0-9a-f]{2}/gi;
+export const WEB_PATH_TOKEN_MIN_LENGTH = 16;
+/**
+ * Random text switches between lowercase, uppercase and digits about every
+ * other character; words, CamelCase included, rarely do.
+ */
+export const WEB_PATH_TOKEN_MIN_CLASS_CHANGES = 0.3;
+/** Above this, text switches so often it is random even if it has vowels. */
+export const WEB_PATH_TOKEN_SURE_CLASS_CHANGES = 0.55;
+/** Words are about 40% vowels, random letters about 20%. */
+export const WEB_PATH_WORD_MIN_VOWELS = 0.3;

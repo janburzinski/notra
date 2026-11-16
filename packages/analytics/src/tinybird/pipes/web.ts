@@ -429,6 +429,19 @@ export const webSources = defineEndpoint("web_sources", {
   },
 });
 
+/**
+ * Imported rows that carry UTM values. PostHog writes each session's
+ * utm_source on both its source and its campaign rows, so reading both
+ * counted those sessions twice. Each grain keeps its own top rows per day,
+ * so a PostHog source comes from its source rows (fewer combinations, so
+ * none cut off) and medium and campaign from its campaign rows.
+ */
+const WEB_IMPORTED_UTM_GRAINS_SQL = `if(
+            source_provider = 'posthog',
+            grain = if({{String(dimension, 'source')}} = 'source', 'source', 'campaign'),
+            grain IN ('source', 'campaign')
+          )`;
+
 export const webUtm = defineEndpoint("web_utm", {
   description:
     "Sessions per UTM source, medium, campaign, term or content, counted on each session's first page, with the previous period. Term and content come from the raw page views (90 days). Completed imports add their rows when no path is set.",
@@ -487,7 +500,7 @@ export const webUtm = defineEndpoint("web_utm", {
         FROM web_imported_daily AS i
         ${WEB_IMPORTED_WHERE}
           AND NOT ${WEB_PATH_SET}
-          AND grain IN ('source', 'campaign')
+          AND ${WEB_IMPORTED_UTM_GRAINS_SQL}
           ${GEO_DAY_COMPARISON_WINDOW_SQL}
         GROUP BY value
         HAVING value != ''

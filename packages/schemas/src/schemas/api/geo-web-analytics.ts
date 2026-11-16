@@ -15,67 +15,11 @@ import {
   WEB_UTM_DIMENSIONS,
   WEB_VITAL_METRICS,
 } from "@notra/geo-core/constants/web-analytics";
+import { withAnalyticsRangeCap } from "@notra/geo-core/utils/analytics-range-cap";
 
-import {
-  ANALYTICS_API_MAX_RANGE_DAYS,
-  ANALYTICS_API_PATH_MAX_LENGTH,
-} from "../../constants/geo-analytics-api";
+import { ANALYTICS_API_PATH_MAX_LENGTH } from "../../constants/geo-analytics-api";
 import { organizationResponseSchema } from "./content";
 import { createGeoWindowQuerySchema } from "./geo-visibility";
-
-const DAY_MS = 86_400_000;
-
-function utcDay(value: string): number | null {
-  const time = Date.parse(`${value}T00:00:00.000Z`);
-  return Number.isNaN(time) ||
-    new Date(time).toISOString().slice(0, 10) !== value
-    ? null
-    : time;
-}
-
-/**
- * Rejects impossible days, a `from` after `to` and spans over
- * {@link ANALYTICS_API_MAX_RANGE_DAYS}. An open `to` runs to today, so an old
- * `from` alone cannot ask for years of data either. Apply it last: zod
- * objects with refinements cannot be extended.
- */
-function withAnalyticsRangeCap<
-  T extends z.ZodType<{ from?: string; to?: string }>,
->(schema: T) {
-  return schema.superRefine((value, ctx) => {
-    const from = value.from === undefined ? null : utcDay(value.from);
-    const to = value.to === undefined ? null : utcDay(value.to);
-    if (value.from !== undefined && from === null) {
-      ctx.addIssue({
-        code: "custom",
-        path: ["from"],
-        message: "Not a real day",
-      });
-    }
-    if (value.to !== undefined && to === null) {
-      ctx.addIssue({ code: "custom", path: ["to"], message: "Not a real day" });
-    }
-    if (from === null) {
-      return;
-    }
-    const end = to ?? Date.now();
-    if (end < from) {
-      ctx.addIssue({
-        code: "custom",
-        path: ["from"],
-        message: "from must be on or before to",
-      });
-      return;
-    }
-    if (Math.floor((end - from) / DAY_MS) + 1 > ANALYTICS_API_MAX_RANGE_DAYS) {
-      ctx.addIssue({
-        code: "custom",
-        path: ["from"],
-        message: `A range can cover at most ${ANALYTICS_API_MAX_RANGE_DAYS} days`,
-      });
-    }
-  });
-}
 
 const hostParam = z
   .string()

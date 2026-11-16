@@ -77,8 +77,8 @@ The chart below shows page views per day and draws today as unfinished until the
 
 **Sources** shows where sessions started. Switch it between:
 
-- **Referrers**: the sites that linked to you, grouped into names such as Google, X, LinkedIn, ChatGPT or Perplexity. Visits without a referrer count as **Direct**, and visits between your own pages don't count as a source.
-- **UTM parameters**: the **Source**, **Medium**, **Campaign**, **Term** or **Content** of links tagged with `utm_` parameters. Campaign, term and content values that look like an email address, an ID or a token show as `:id`.
+- **Referrers**: the sites that linked to you, grouped into names such as Google, X, LinkedIn, ChatGPT or Perplexity. Visits without a referrer count as **Direct**, as do returns from sign-in and checkout pages such as Google accounts, Microsoft, Apple ID, Stripe and PayPal, and visits between your own pages don't count as a source.
+- **UTM parameters**: the **Source**, **Medium**, **Campaign**, **Term** or **Content** of links tagged with `utm_` parameters. Values that look like an email address, an ID or a token show as `:id`.
 
 ## Countries, devices and AI visitors
 
@@ -139,7 +139,7 @@ When both mobile and desktop visits have data, switch between **All devices**, *
 - **Visitors** are recognized by a hash of the IP address and user agent, salted with a random value that changes every day and is deleted after 48 hours. Notra never stores the IP address and can't follow a visitor from one day to the next, so visitors over a range are the sum of each day's unique visitors.
 - **Sessions** end after 30 minutes without a page view. A visit that arrives from a different outside source, for example from Google after an earlier visit from ChatGPT, starts a new session.
 - **Left out**: known bots, headless browsers, page-speed tools such as Lighthouse, prefetches, redirects and requests for files such as `robots.txt`, `sitemap.xml` or `llms.txt`.
-- **Paths** are stored with any segment that looks like an email address, a UUID, a number of four or more digits or a token replaced by `:id`.
+- **Paths** are stored with any segment that looks like an email address, a UUID, a number of four or more digits or a token replaced by `:id`, and without path parameters such as `;jsessionid=…`.
 - **Numbers refresh on their own** while the tab is open. Page views arrive in batches, so a new visit can take a few minutes to show up.
 
 For everything the script sends and stores, see [What is sent](/analytics/install/script-tag#what-is-sent).

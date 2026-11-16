@@ -259,6 +259,27 @@ describe("web endpoints add completed imports", () => {
     ]);
   });
 
+  test("a PostHog import counts each UTM session once: sources from its source rows, the rest from campaign rows", () => {
+    // Both grains carry utm_source; the campaign grain kept fewer rows, as
+    // its many combinations fall out of the importer's top rows per day.
+    pipe.db.exec(`
+      INSERT INTO web_imported_daily (organization_id, project_id, import_id, source_provider, grain, day, referrer_group,
+        referrer_source, utm_source, utm_medium, utm_campaign, visitors, visits) VALUES
+        ('org','project','imp-ph','posthog','source','2026-10-02','other','newsletter','newsletter','','',5,6),
+        ('org','project','imp-ph','posthog','campaign','2026-10-02','other','newsletter','newsletter','email','launch',3,4);
+    `);
+    const params = { ...WEB, imports: "imp-ph" };
+    const utm = (dimension: string) =>
+      pipe.run(webUtm, { ...params, dimension });
+    // The rollup's two native sessions plus the import's own rows.
+    expect(utm("source")).toEqual([
+      { value: "newsletter", sessions: 8, previous_sessions: 0, visitors: 7 },
+    ]);
+    expect(utm("medium")).toEqual([
+      { value: "email", sessions: 6, previous_sessions: 0, visitors: 5 },
+    ]);
+  });
+
   test("UTM terms and content come from each session's first page view", () => {
     expect(pipe.run(webUtm, { ...WEB, dimension: "term" })).toEqual([
       { value: "shoes", sessions: 7, previous_sessions: 0, visitors: 6 },

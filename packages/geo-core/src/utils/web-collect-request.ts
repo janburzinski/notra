@@ -1,9 +1,6 @@
 import { getClientIp } from "@notra/utils/client-ip";
 
-import {
-  GEO_CF_RAY_PATTERN,
-  GEO_DRAIN_TRACING_HEADERS,
-} from "../constants/ingest";
+import { GEO_CF_RAY_PATTERN } from "../constants/ingest";
 import type { GeoIngestPayload, WebCollectOptions } from "../types/ingest";
 
 const UNKNOWN_COUNTRY = "XX";
@@ -79,10 +76,15 @@ export function webCollectEnvelope(
     userAgent: headers.get("user-agent") ?? undefined,
     acceptLanguage: headers.get("accept-language") ?? undefined,
     requestId: cloudflareRayId(headers),
+    // The beacon is a fetch made by the page's own JavaScript, so a missing
+    // Sec-Fetch-Mode only means an older browser (Safari before 16.4) or a
+    // privacy proxy, not a bot: "" says "not known", where null would mark
+    // a crawler. Tracing headers come from fetch instrumentation in the
+    // page's scripts, as for a beacon a Notra Site relays.
     signals: {
       clientHints: headers.has("sec-ch-ua"),
-      fetchMode: headers.get("sec-fetch-mode"),
-      tracing: GEO_DRAIN_TRACING_HEADERS.some((name) => headers.has(name)),
+      fetchMode: headers.get("sec-fetch-mode") ?? "",
+      tracing: false,
     },
   };
 }

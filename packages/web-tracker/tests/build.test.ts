@@ -76,8 +76,8 @@ test("no archived build has changed since its name and integrity were issued", (
 });
 
 test.each([
-  ["notra.js", 1300, TRACKER_SCRIPT],
-  ["notra.plus.js", 1400, TRACKER_PLUS_SCRIPT],
+  ["notra.js", 1400, TRACKER_SCRIPT],
+  ["notra.plus.js", 1500, TRACKER_PLUS_SCRIPT],
 ] as const)("%s stays under %d bytes gzipped", (_name, budget, script) => {
   expect(
     gzipSync(Buffer.from(script), { level: 9 }).length

@@ -68,6 +68,7 @@ import {
   WEB_UINT32_MAX,
   WEB_UTM_DIMENSIONS,
 } from "../constants/web-analytics";
+import { withAnalyticsRangeCap } from "../utils/analytics-range-cap";
 import { normalizeProjectDomain } from "../utils/geo-project-domains";
 import { normalizePromptTags } from "../utils/geo-prompt-tags";
 import {
@@ -493,16 +494,23 @@ export const aiTrafficInputSchema = geoOrganizationInputSchema.extend({
   sites: geoTrafficSitesField,
 });
 
-export const webAnalyticsInputSchema = geoOrganizationInputSchema.extend({
+const webAnalyticsInputBaseSchema = geoOrganizationInputSchema.extend({
   ...geoWindowFields,
   host: string().trim().max(GEO_SHORT_FIELD_MAX_LENGTH).optional(),
   path: geoTrafficPathField,
   sites: geoTrafficSitesField,
 });
 
-export const webUtmInputSchema = webAnalyticsInputSchema.extend({
-  dimension: enumType(WEB_UTM_DIMENSIONS),
-});
+/** The dashboard's web reads, capped at 366 real days like the public API. */
+export const webAnalyticsInputSchema = withAnalyticsRangeCap(
+  webAnalyticsInputBaseSchema
+);
+
+export const webUtmInputSchema = withAnalyticsRangeCap(
+  webAnalyticsInputBaseSchema.extend({
+    dimension: enumType(WEB_UTM_DIMENSIONS),
+  })
+);
 
 export const geoTrafficLogInputSchema = geoOrganizationInputSchema.extend({
   limit: number().int().min(1).max(MAX_AI_TRAFFIC_LOG_LIMIT).optional(),
@@ -569,6 +577,15 @@ export const webEngagementPayloadSchema = object({
 });
 
 /**
+ * A URL a browser sent, cut to the stored length. Rejecting a long one lost
+ * the whole page view (ad click ids easily pass 2 KB); the 4 KB body limit
+ * already bounds it.
+ */
+const beaconUrlField = string().transform((value) =>
+  value.slice(0, MAX_GEO_URL_LENGTH)
+);
+
+/**
  * What notra.js sends: a page view carries `r`; engagement carries `t` and
  * `s` plus web vitals (`l f b i c`); an outbound link click carries `o` (the
  * link's host and path); an error from notra.plus.js carries `x`, `xs` and
@@ -577,10 +594,10 @@ export const webEngagementPayloadSchema = object({
 export const webCollectPayloadSchema = object({
   k: string().min(1).max(GEO_SHORT_FIELD_MAX_LENGTH),
   v: string().regex(SITE_ENGAGEMENT_VIEW_ID_PATTERN),
-  u: string().min(1).max(MAX_GEO_URL_LENGTH),
+  u: string().min(1).pipe(beaconUrlField),
   /** Sent by a `data-hash` install: hash routes are separate pages. */
   h: boolean().optional(),
-  r: string().max(MAX_GEO_URL_LENGTH).optional(),
+  r: beaconUrlField.optional(),
   t: number().int().min(0).max(WEB_UINT32_MAX).optional(),
   s: number().int().min(0).max(100).optional(),
   l: webVitalValue.optional(),
@@ -590,7 +607,7 @@ export const webCollectPayloadSchema = object({
   c: webVitalValue.optional(),
   o: string().min(1).max(MAX_GEO_URL_LENGTH).optional(),
   x: string().max(WEB_ERROR_MESSAGE_MAX_LENGTH).optional(),
-  xs: string().max(MAX_GEO_URL_LENGTH).optional(),
+  xs: beaconUrlField.optional(),
   xl: number().int().min(0).max(WEB_UINT32_MAX).optional(),
 });
 

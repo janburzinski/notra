@@ -8,6 +8,7 @@ import type {
   WebPageViewRow,
 } from "@notra/analytics/types/tinybird-datasources";
 import { toClickHouseDateTime } from "@notra/analytics/utils/datetime";
+import { GEO_INGEST_RATELIMIT_TIMEOUT_MS } from "@notra/geo-core/constants/ingest";
 import {
   ISO_DATE_LENGTH,
   WEB_AI_PRODUCTS,
@@ -17,7 +18,9 @@ import {
   WEB_MAIL_HOSTS,
   WEB_OPERATING_SYSTEMS,
   WEB_OUTBOUND_EVENT,
+  WEB_RETURN_HOSTS,
   WEB_SEARCH_HOSTS,
+  WEB_SEARCH_SUFFIX_PATTERN,
   WEB_SESSION_KEY_PREFIX,
   WEB_SESSION_TTL_SECONDS,
   WEB_SOCIAL_HOSTS,
@@ -51,6 +54,7 @@ import { dailySalt } from "./daily-salt";
 
 const LEADING_WWW_REGEX = /^www\./;
 const QUERY_OR_FRAGMENT_REGEX = /[?#].*$/;
+const TRAILING_DOT_REGEX = /\.$/;
 
 export async function webVisitorId(
   scope: string,
@@ -96,7 +100,9 @@ function webRowBase({
     project_id: identity.projectId ?? "",
     site_id: identity.site?.id ?? "",
     captured_at: toClickHouseDateTime(capturedAt),
-    host: url.hostname.toLowerCase(),
+    // `example.com.` is the same site as `example.com` (the allowlist
+    // already treats it so); one spelling keeps its stats in one place.
+    host: url.hostname.toLowerCase().replace(TRAILING_DOT_REGEX, ""),
     path: webPagePath(url, hashRoutes),
   };
 }
@@ -120,19 +126,40 @@ async function resolveSession(
   const key = `${WEB_SESSION_KEY_PREFIX}:${visitorId}`;
   // `EVALSHA`, then `EVAL` once when Redis does not have the script yet.
   sessionScript ??= createSessionScript(client);
-  const session = await sessionScript
-    .exec([key], [id, origin ?? "", String(WEB_SESSION_TTL_SECONDS)])
-    .catch(() => null);
+  // Bounded like the rate limit: the client retries with backoff for
+  // seconds, which held every beacon open while Redis was slow.
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const session = await Promise.race([
+    sessionScript
+      .exec([key], [id, origin ?? "", String(WEB_SESSION_TTL_SECONDS)])
+      .catch(() => null),
+    new Promise<null>((resolve) => {
+      timer = setTimeout(resolve, GEO_INGEST_RATELIMIT_TIMEOUT_MS, null);
+    }),
+  ]).finally(() => clearTimeout(timer));
   return session ? { id: session[0], index: session[1] } : { id, index: 0 };
+}
+
+/** Whether `host` is `domain` or one of its subdomains. */
+function isOnDomain(host: string, domain: string): boolean {
+  return host === domain || host.endsWith(`.${domain}`);
 }
 
 function matchHost(host: string, table: Record<string, string>): string | null {
   for (const [pattern, name] of Object.entries(table)) {
     if (pattern.endsWith(".")) {
-      if (host.startsWith(pattern) || host.includes(`.${pattern}`)) {
+      // `google.` is Google on any country domain, and only there: the part
+      // after it must be a public suffix, not `google.evil.example`.
+      const at = host.startsWith(pattern)
+        ? 0
+        : host.lastIndexOf(`.${pattern}`) + 1;
+      if (
+        (at > 0 || host.startsWith(pattern)) &&
+        WEB_SEARCH_SUFFIX_PATTERN.test(host.slice(at + pattern.length))
+      ) {
         return name;
       }
-    } else if (host === pattern || host.endsWith(`.${pattern}`)) {
+    } else if (isOnDomain(host, pattern)) {
       return name;
     }
   }
@@ -169,6 +196,9 @@ export function classifyWebReferrer(
   const bare = host.replace(LEADING_WWW_REGEX, "");
   if (bare === pageHost.replace(LEADING_WWW_REGEX, "")) {
     return { host, group: "internal", source: "", aiProduct: "" };
+  }
+  if (WEB_RETURN_HOSTS.some((domain) => isOnDomain(bare, domain))) {
+    return { host, group: "direct", source: "", aiProduct: "" };
   }
   const mail = matchHost(bare, WEB_MAIL_HOSTS);
   if (mail) {
@@ -244,7 +274,9 @@ export async function buildWebPageView(
     return null;
   }
   const params = url.searchParams;
-  const utmSource = (params.get("utm_source") ?? "")
+  // Source and medium are scrubbed like the free-text tags: links tagged per
+  // recipient put emails and ids in any of them.
+  const utmSource = scrubWebUtmText(params.get("utm_source"))
     .slice(0, WEB_UTM_MAX_LENGTH)
     .toLowerCase();
   // ChatGPT's apps send no referrer but tag links with utm_source=chatgpt.com.
@@ -254,7 +286,7 @@ export async function buildWebPageView(
       : resolveAiReferrer(utmSource ? `https://${utmSource}` : undefined);
   const referrer = classifyWebReferrer(
     payload.referer,
-    url.hostname.toLowerCase(),
+    url.hostname.toLowerCase().replace(TRAILING_DOT_REGEX, ""),
     aiSource
   );
   // Tags count only on arrival: going back to a tagged URL inside the site
@@ -283,7 +315,7 @@ export async function buildWebPageView(
     referrer_source: referrer.source,
     ai_product: referrer.aiProduct,
     utm_source: utmSource,
-    utm_medium: (params.get("utm_medium") ?? "")
+    utm_medium: scrubWebUtmText(params.get("utm_medium"))
       .slice(0, WEB_UTM_MAX_LENGTH)
       .toLowerCase(),
     utm_campaign: scrubWebUtmText(params.get("utm_campaign")),

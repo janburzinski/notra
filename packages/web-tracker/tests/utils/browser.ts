@@ -3,6 +3,8 @@ import { existsSync } from "node:fs";
 import { type Browser, chromium } from "playwright-core";
 
 export const SITE_HOST = "site.test";
+/** A real hostname that merely starts with "localhost", not a local one. */
+export const LOCALHOST_LOOKALIKE_HOST = "localhost-staging.test";
 /** Headless Chromium says "HeadlessChrome", which trackers rightly skip. */
 export const DESKTOP_CHROME_USER_AGENT =
   "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36";
@@ -19,7 +21,7 @@ export function hasChromium(): boolean {
 export function launchChromium(): Promise<Browser> {
   return chromium.launch({
     args: [
-      `--host-resolver-rules=MAP ${SITE_HOST} 127.0.0.1`,
+      `--host-resolver-rules=MAP ${SITE_HOST} 127.0.0.1, MAP ${LOCALHOST_LOOKALIKE_HOST} 127.0.0.1`,
       "--disable-blink-features=AutomationControlled",
     ],
   });

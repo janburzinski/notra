@@ -227,6 +227,48 @@ describe("runWebCollect", () => {
     expect(JSON.stringify(row)).not.toMatch(/203\.0\.113\.9|secret/);
   });
 
+  test("counts Safari before 16.4, which sends no fetch metadata, and pages with fetch instrumentation", async () => {
+    await send(
+      {},
+      {
+        "user-agent":
+          "Mozilla/5.0 (iPhone; CPU iPhone OS 15_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.6 Mobile/15E148 Safari/604.1",
+        "sec-ch-ua": "",
+        "sec-fetch-mode": "",
+        traceparent: "00-0af7651916cd43dd8448eb211c80319c-b7ad6b7169203331-01",
+      }
+    );
+    expect(viewRows()).toEqual([
+      expect.objectContaining({ browser: "Safari", device: "mobile" }),
+    ]);
+  });
+
+  test("cuts a URL longer than 2 KB instead of losing the page view", async () => {
+    await send({
+      u: `https://acme.com/landing?gclid=${"x".repeat(2500)}`,
+      r: `https://www.google.com/${"y".repeat(1200)}`,
+    });
+    expect(viewRows()).toEqual([
+      expect.objectContaining({ path: "/landing", referrer_group: "search" }),
+    ]);
+  });
+
+  test("stores a trailing-dot domain under its usual host and scrubs utm source and medium", async () => {
+    await send(
+      {
+        u: "https://acme.com./?utm_source=jan@example.com&utm_medium=Ab3dE5Gh-Jk9Lm1Np-3Qr5",
+      },
+      { origin: "https://acme.com." }
+    );
+    expect(viewRows()).toEqual([
+      expect.objectContaining({
+        host: "acme.com",
+        utm_source: ":id",
+        utm_medium: ":id",
+      }),
+    ]);
+  });
+
   test("keeps hash routes only for data-hash beacons, on views, engagement and events", async () => {
     const u = "https://acme.com/#/pricing?plan=pro";
     await send({ u, h: true });

@@ -5,6 +5,7 @@ import type { Browser, Page } from "playwright-core";
 import { TRACKER_PLUS_SCRIPT, TRACKER_SCRIPT } from "../src/generated/script";
 import {
   hasChromium,
+  LOCALHOST_LOOKALIKE_HOST,
   launchChromium,
   startServers,
   waitFor,
@@ -23,15 +24,25 @@ ${TAG}</body></html>`;
 // Text paints (FCP, LCP); a late block shifts it (CLS); a slow handler is
 // an interaction (INP).
 const VITALS = `<html><body><p id="text">Some text that paints first.</p>
-<button id="slow">slow</button><div style="height:2000px"></div>
+<button id="slow">slow</button><button id="nav">nav</button><div style="height:2000px"></div>
 <script>setTimeout(()=>{const d=document.createElement("div");d.style.height="300px";document.body.prepend(d)},300);
-document.getElementById("slow").addEventListener("click",()=>{const t=performance.now();while(performance.now()-t<120){}});</script>
+document.getElementById("slow").addEventListener("click",()=>{const t=performance.now();while(performance.now()-t<120){}});
+document.getElementById("nav").addEventListener("click",()=>{const t=performance.now();while(performance.now()-t<120){}history.pushState({},"","/vitals/nav")});</script>
 ${TAG}</body></html>`;
 const ERRORS = `<html><body>${TAG}<script>
 addEventListener("load",()=>{
   for(let n=0;n<7;n++){setTimeout(()=>{throw new Error("boom "+n+" user@example.com")},n)}
   setTimeout(()=>Promise.reject(new Error("rejected")),20);
 });
+</script></body></html>`;
+// A layout shift that happens before the (late) script runs still counts.
+const EARLY_SHIFT = `<html><body><p>Text that paints first.</p><div style="height:2000px"></div>
+<script>setTimeout(()=>{const d=document.createElement("div");d.style.height="300px";document.body.prepend(d);
+setTimeout(()=>{const s=document.createElement("script");s.src="/notra.js";s.dataset.key="nwk.test";s.dataset.api="{{endpoint}}";document.body.append(s)},300)},300);</script>
+</body></html>`;
+const SHADOW = `<html><body><div id="host"></div>${TAG}${TAG}<script>
+const root=document.getElementById("host").attachShadow({mode:"open"});
+root.innerHTML='<a id="deep" href="https://docs.example.org/deep" onclick="event.preventDefault()">deep</a>';
 </script></body></html>`;
 const PAGES = {
   "/": `<html><body><a href="/about">about</a>${TAG}</body></html>`,
@@ -43,6 +54,9 @@ const PAGES = {
   "/derived": `<html><body><script defer src="{{collector}}/js/notra.js" data-key="nwk.test"></script></body></html>`,
   "/no-key": `<html><body><script defer src="/notra.js"></script></body></html>`,
   "/hash": `<html><body>${TAG.replace("<script ", "<script data-hash ")}</body></html>`,
+  "/early-shift": EARLY_SHIFT,
+  "/shadow": SHADOW,
+  "/module": `<html><body>${TAG.replace("<script defer ", '<script type="module" ')}</body></html>`,
   "/no-referrer": `<html><head><meta name="referrer" content="no-referrer"></head><body>${TAG}</body></html>`,
   "/fetch-throws": `<html><head><script>window.fetch=()=>{throw new TypeError("blocked")}</script></head><body>${TAG}</body></html>`,
   "/fetch-rejects": `<html><head><script>window.fetch=()=>Promise.reject(new TypeError("offline"))</script></head><body>${TAG}</body></html>`,
@@ -176,8 +190,10 @@ describe.skipIf(!hasChromium())("notra.js in Chromium", () => {
         history.pushState({}, "", "/pricing");
         history.replaceState({}, "", "/en");
         history.replaceState({}, "", "/en?sort=new");
+        // Clearing the filters is a new view of the bare route.
+        history.pushState({}, "", "/en");
       });
-      await waitFor(() => bodies().filter((body) => "r" in body).length >= 3);
+      await waitFor(() => bodies().filter((body) => "r" in body).length >= 4);
       await page.waitForTimeout(100);
     });
     const views = bodies().filter((body) => "r" in body);
@@ -185,8 +201,11 @@ describe.skipIf(!hasChromium())("notra.js in Chromium", () => {
       `${servers.origin}/`,
       `${servers.origin}/pricing`,
       `${servers.origin}/en`,
+      `${servers.origin}/en`,
     ]);
-    expect(views[1]?.r).toBe(`${servers.origin}/`);
+    // The URL the visitor was on, filters included.
+    expect(views[1]?.r).toBe(`${servers.origin}/?filter=1`);
+    expect(views[3]?.r).toBe(`${servers.origin}/en?sort=new`);
   });
 
   test("with data-hash, hash routes are views, replaced ones too, and every beacon says so", async () => {
@@ -212,6 +231,91 @@ describe.skipIf(!hasChromium())("notra.js in Chromium", () => {
       `${servers.origin}/hash#/account`,
     ]);
     expect(sent.every((body) => body.h === true)).toBe(true);
+  });
+
+  test("with data-hash, in-page anchors and OAuth fragments are not views and are never sent", async () => {
+    servers.collected.length = 0;
+    await withPage(async (page) => {
+      await page.goto(`${servers.origin}/hash`);
+      await waitFor(() => posts().length === 1);
+      await page.evaluate(() => {
+        location.hash = "#features";
+        location.hash = "#access_token=secret";
+        location.hash = "#/signup";
+      });
+      await waitFor(() => bodies().filter((body) => "r" in body).length >= 2);
+      await page.waitForTimeout(100);
+    });
+    expect(
+      bodies()
+        .filter((body) => "r" in body)
+        .map((body) => body.u)
+    ).toEqual([`${servers.origin}/hash`, `${servers.origin}/hash#/signup`]);
+    expect(JSON.stringify(bodies())).not.toContain("secret");
+  });
+
+  test("cuts very long URLs instead of losing the page view", async () => {
+    servers.collected.length = 0;
+    const long = `${servers.origin}/long?q=${"x".repeat(3000)}`;
+    await withPage(async (page) => {
+      await page.goto(long);
+      await waitFor(() => posts().length === 1);
+    });
+    const [view] = bodies();
+    expect(view?.u).toBe(long.slice(0, 2048));
+    expect(JSON.stringify(view).length).toBeLessThan(4096);
+  });
+
+  test("counts layout shifts from before the script ran", async () => {
+    servers.collected.length = 0;
+    await withPage(async (page) => {
+      await page.goto(`${servers.origin}/early-shift`);
+      await waitFor(() => posts().length === 1);
+      await page.goto(`${servers.origin}/after`);
+      await waitFor(() => posts().length === 3);
+    });
+    const hide = bodies().find((body) => "t" in body);
+    expect(Number(hide?.c)).toBeGreaterThan(0);
+  });
+
+  test("runs once when the tag is included twice, and sees links inside shadow roots", async () => {
+    servers.collected.length = 0;
+    await withPage(async (page) => {
+      await page.goto(`${servers.origin}/shadow`);
+      await waitFor(() => posts().length === 1);
+      await page.evaluate(() => history.pushState({}, "", "/shadow/next"));
+      await page.click("#deep");
+      await waitFor(() => posts().length >= 3);
+      await page.waitForTimeout(150);
+    });
+    const views = bodies().filter((body) => "r" in body);
+    expect(views.map((body) => body.u)).toEqual([
+      `${servers.origin}/shadow`,
+      `${servers.origin}/shadow/next`,
+    ]);
+    expect(bodies().filter((body) => "o" in body)).toEqual([
+      expect.objectContaining({ o: "docs.example.org/deep" }),
+    ]);
+  });
+
+  test("works as a module script and on hosts that only start with localhost", async () => {
+    servers.collected.length = 0;
+    await withPage(async (page) => {
+      await page.goto(`${servers.origin}/module`);
+      await waitFor(() => posts().length === 1);
+      await page.goto(
+        `${servers.origin.replace("site.test", LOCALHOST_LOOKALIKE_HOST)}/`
+      );
+      await waitFor(() => posts().length >= 2);
+    });
+    expect(
+      bodies()
+        .filter((body) => "r" in body)
+        .map((body) => String(body.u))
+    ).toEqual([
+      `${servers.origin}/module`,
+      `http://${LOCALHOST_LOOKALIKE_HOST}:${new URL(servers.origin).port}/`,
+    ]);
   });
 
   test("stays silent in iframes, on localhost, for automation and without a key, and stores nothing", async () => {
@@ -308,6 +412,23 @@ describe.skipIf(!hasChromium())("notra.js in Chromium", () => {
     for (const field of ["l", "f", "b"]) {
       expect(soft).not.toHaveProperty(field);
     }
+  });
+
+  test("counts a slow click that navigates an SPA toward the new view's INP", async () => {
+    servers.collected.length = 0;
+    await withPage(async (page) => {
+      await page.goto(`${servers.origin}/vitals`);
+      await waitFor(() => posts().length === 1);
+      await page.click("#nav");
+      await waitFor(() => posts().length === 3);
+      await page.waitForTimeout(200);
+      await page.goto(`${servers.origin}/after`);
+      await waitFor(() => posts().length === 5);
+    });
+    const soft = bodies().find(
+      (body) => "t" in body && body.u === `${servers.origin}/vitals/nav`
+    );
+    expect(Number(soft?.i)).toBeGreaterThanOrEqual(100);
   });
 
   test("leaves CLS out where the browser has no layout-shift entries", async () => {

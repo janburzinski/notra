@@ -5,7 +5,7 @@ import {
   WEB_PATH_UUID_PATTERN,
   WEB_UTM_CAMPAIGN_MAX_LENGTH,
 } from "../constants/web-analytics";
-import { mixesClasses } from "./web-path-scrub";
+import { isSeparatedToken, mixesClasses } from "./web-path-scrub";
 
 /**
  * A free-text UTM parameter (campaign, term or content) as stored: trimmed,
@@ -17,6 +17,7 @@ export function scrubWebUtmText(value: string | null | undefined): string {
   const identifies =
     WEB_PATH_EMAIL_PATTERN.test(text) ||
     WEB_PATH_UUID_PATTERN.test(text) ||
-    (text.match(WEB_PATH_TOKEN_RUN_PATTERN) ?? []).some(mixesClasses);
+    (text.match(WEB_PATH_TOKEN_RUN_PATTERN) ?? []).some(mixesClasses) ||
+    isSeparatedToken(text);
   return identifies ? WEB_PATH_ID_PLACEHOLDER : text;
 }
