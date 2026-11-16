@@ -353,17 +353,16 @@ export function AddRepositoryDialog({
             <form.Subscribe selector={(state) => [state.canSubmit]}>
               {([canSubmit]) => (
                 <Button
-                  disabled={!canSubmit || mutation.isPending || loadingRepos}
+                  disabled={!canSubmit || loadingRepos}
                   data-dialog-confirm
+                  loading={mutation.isPending}
                   onClick={(e) => {
                     e.preventDefault();
                     form.handleSubmit();
                   }}
                   type="button"
                 >
-                  {mutation.isPending
-                    ? tCommon("labels.adding")
-                    : tIntegrationsShared("addRepository")}
+                  {tIntegrationsShared("addRepository")}
                 </Button>
               )}
             </form.Subscribe>

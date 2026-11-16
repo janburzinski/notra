@@ -4,7 +4,6 @@ import { Copy01Icon, Download01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import type { ChatAttachment } from "@notra/ai/types/chat";
 import { MIME_DISPLAY_LABELS } from "@notra/schemas/constants/dashboard/upload";
-import { Button } from "@notra/ui/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -16,6 +15,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { useLocale, useTranslations } from "use-intl";
 
+import { Button } from "@/components/button";
 import Image from "@/components/framework/image";
 import {
   isImageMimeType,
@@ -152,7 +152,7 @@ export function AttachmentPreviewDialog({
           <div className="flex shrink-0 flex-wrap items-center justify-end gap-2">
             {isImage ? (
               <Button
-                disabled={isCopying}
+                loading={isCopying}
                 onClick={handleCopyImage}
                 size="sm"
                 variant="outline"
@@ -162,7 +162,7 @@ export function AttachmentPreviewDialog({
               </Button>
             ) : null}
             <Button
-              disabled={isDownloading}
+              loading={isDownloading}
               onClick={handleDownload}
               size="sm"
               variant="outline"

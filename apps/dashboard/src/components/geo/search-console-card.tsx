@@ -58,7 +58,6 @@ import {
   useGscSync,
 } from "@/lib/hooks/use-geo";
 import { useGeoProjectsDb } from "@/lib/hooks/use-geo-db";
-import { cn } from "@/lib/utils";
 import type {
   SearchConsoleConnectedStateProps,
   SearchConsolePropertyPickerProps,
@@ -98,7 +97,6 @@ export function SearchConsolePropertyPicker({
   onSelected,
 }: SearchConsolePropertyPickerProps) {
   const t = useTranslations("geo.searchConsoleCard");
-  const tCommon = useTranslations("common");
   const id = useId();
   const [selectedSiteUrl, setSelectedSiteUrl] = useState<string | null>(null);
   const selectSite = useGscSelectSite(organizationId);
@@ -159,18 +157,15 @@ export function SearchConsolePropertyPicker({
         </Select>
       </div>
       <Button
-        aria-busy={selectSite.isPending}
-        className={cn("w-full", selectSite.isPending && "disabled:opacity-100")}
-        disabled={siteUrl.length === 0 || selectSite.isPending}
+        className="w-full"
+        disabled={siteUrl.length === 0}
+        loading={selectSite.isPending}
         onClick={() => {
           selectSite.mutate({ siteUrl });
           onSelected?.();
         }}
       >
-        {selectSite.isPending ? <Spinner className="size-3.5" /> : null}
-        {selectSite.isPending
-          ? tCommon("labels.connecting")
-          : t("connectProperty")}
+        {t("connectProperty")}
       </Button>
     </div>
   );
@@ -282,14 +277,12 @@ function ConnectedState({
           {action}
           <Button
             disabled={busy}
+            loading={sync.isPending}
             onClick={() => sync.mutate()}
             size="sm"
             variant="outline"
           >
-            {sync.isPending ? <Spinner className="size-3.5" /> : null}
-            {sync.isPending
-              ? tCommon("labels.syncing")
-              : tCommon("labels.syncNow")}
+            {tCommon("labels.syncNow")}
           </Button>
           <DropdownMenu>
             <DropdownMenuTrigger

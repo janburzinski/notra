@@ -3,7 +3,6 @@
 import { Combobox as ComboboxPrimitive } from "@base-ui/react";
 import { SquareLock02Icon, UnfoldMoreIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { buttonVariants } from "@notra/ui/components/ui/button";
 import {
   Combobox,
   ComboboxContent,
@@ -13,6 +12,7 @@ import {
   ComboboxList,
 } from "@notra/ui/components/ui/combobox";
 
+import { buttonVariants } from "@/components/button";
 import { cn } from "@/lib/utils";
 import type {
   AutopilotRepositoryOption,

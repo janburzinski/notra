@@ -124,14 +124,12 @@ export function McpServerCard({
               <p className="text-warning text-sm">{t("accessExpired")}</p>
               <Button
                 aria-label={t("reauthorizeAriaLabel", { name: server.name })}
-                disabled={reauthorizing}
+                loading={reauthorizing}
                 onClick={() => onReauthorize?.(server.id)}
                 size="sm"
                 variant="outline"
               >
-                {reauthorizing
-                  ? tIntegrationsShared("redirecting")
-                  : tIntegrationsShared("reauthorize")}
+                {tIntegrationsShared("reauthorize")}
               </Button>
             </>
           ) : undefined

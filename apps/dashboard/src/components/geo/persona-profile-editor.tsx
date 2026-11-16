@@ -43,12 +43,6 @@ export function PersonaProfileEditor({
   const update = useGeoPersonaUpdate(organizationId);
   const generatePersona = useGeoPersonasGenerate(organizationId);
   const isPending = update.isPending || generatePersona.isPending;
-  let submitLabel = t("savePersona");
-  if (update.isPending) {
-    submitLabel = tCommon("saving");
-  } else if (generatePersona.isPending) {
-    submitLabel = t("regeneratingPrompts");
-  }
   const [error, setError] = useState<string | null>(null);
   const [stackDraft, setStackDraft] = useState("");
   const stackInput = useRef<HTMLInputElement>(null);
@@ -275,9 +269,9 @@ export function PersonaProfileEditor({
                         key={tool}
                       >
                         <span className="min-w-0 wrap-anywhere">{tool}</span>
-                        <button
+                        <Button
                           type="button"
-                          className="hover:bg-muted focus-visible:ring-ring flex size-6 shrink-0 items-center justify-center rounded-sm focus-visible:ring-2 focus-visible:outline-none"
+                          className="rounded-sm"
                           aria-label={t("removeTool", { tool })}
                           onClick={() => {
                             form.setFieldValue("currentStack", (items) =>
@@ -285,9 +279,11 @@ export function PersonaProfileEditor({
                             );
                             stackInput.current?.focus();
                           }}
+                          size="icon-xs"
+                          variant="ghost"
                         >
                           <span aria-hidden="true">×</span>
-                        </button>
+                        </Button>
                       </Badge>
                     ))}
                     <input
@@ -401,8 +397,8 @@ export function PersonaProfileEditor({
           >
             {tCommon("cancel")}
           </Button>
-          <Button type="submit" disabled={isPending}>
-            {submitLabel}
+          <Button type="submit" loading={isPending}>
+            {t("savePersona")}
           </Button>
         </div>
       </footer>

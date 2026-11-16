@@ -9,7 +9,7 @@ import { TooltipProvider } from "@notra/ui/components/ui/tooltip";
 import { useEffect } from "react";
 import { useTranslations } from "use-intl";
 
-import { buttonVariants } from "@/components/button";
+import { Button } from "@/components/button";
 import { ContentPanelHeaderButton } from "@/components/content/content-panel-header-button";
 import { useRightPanel } from "@/components/dashboard/right-panel-context";
 import { CONTENT_PANEL_TABS } from "@/constants/content-overview";
@@ -47,13 +47,9 @@ export function ContentPanelTabs() {
       {tabs.map(({ id }) => {
         const isActive = tab === id;
         return (
-          <button
+          <Button
             aria-selected={isActive}
             className={cn(
-              buttonVariants({
-                variant: isActive ? "secondary" : "ghost",
-                size: "sm",
-              }),
               "text-xs transition-[background-color,color,box-shadow] active:scale-100",
               !isActive && "text-muted-foreground"
             )}
@@ -73,11 +69,12 @@ export function ContentPanelTabs() {
               }
             }}
             role="tab"
+            size="sm"
             tabIndex={isActive ? 0 : -1}
-            type="button"
+            variant={isActive ? "secondary" : "ghost"}
           >
             {t(id)}
-          </button>
+          </Button>
         );
       })}
     </div>

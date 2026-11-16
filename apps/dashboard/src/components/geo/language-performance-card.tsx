@@ -15,7 +15,6 @@ import {
 } from "@notra/geo-core/utils/geo-language-rows";
 import { GeoBar } from "@notra/ui/components/geo/geo-bar";
 import { ConfirmDialog } from "@notra/ui/components/shared/confirm-dialog";
-import { Spinner } from "@notra/ui/components/ui/spinner";
 import {
   Tooltip,
   TooltipContent,
@@ -82,11 +81,7 @@ function LanguageAddButton({
   const t = useTranslations("geo.languagePerformanceCard");
   const languageLabel = useLanguageLabel();
   const tCommon2 = useTranslations("common");
-  const content = pending ? (
-    <Spinner className="size-3.5" />
-  ) : (
-    <HugeiconsIcon className="size-3.5" icon={PlusSignIcon} />
-  );
+  const content = <HugeiconsIcon className="size-3.5" icon={PlusSignIcon} />;
 
   if (limitReached) {
     return (
@@ -99,6 +94,7 @@ function LanguageAddButton({
                 language: languageLabel(language),
               })}
               className="shrink-0 aria-disabled:cursor-not-allowed aria-disabled:opacity-50 aria-disabled:active:scale-100"
+              loading={pending}
               onClick={(event) => event.preventDefault()}
               size="sm"
               type="button"
@@ -124,6 +120,7 @@ function LanguageAddButton({
       aria-label={t("addLanguageAria", { language: languageLabel(language) })}
       className="shrink-0"
       disabled={disabled}
+      loading={pending}
       onClick={() => onAdd(language)}
       size="sm"
       type="button"

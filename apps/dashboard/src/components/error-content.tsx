@@ -3,7 +3,7 @@
 import { cn } from "@notra/ui/lib/utils";
 import { useEffect } from "react";
 
-import { buttonVariants } from "@/components/button";
+import { Button, buttonVariants } from "@/components/button";
 import Link from "@/components/framework/link";
 import { DEFAULT_ERROR_CONTENT_COPY } from "@/constants/error-content";
 import { trackClientException } from "@/lib/analytics/posthog-client";
@@ -42,13 +42,9 @@ export function ErrorContent({
           </p>
         ) : null}
         <div className="mt-8 flex items-center justify-center gap-3">
-          <button
-            className={cn(buttonVariants())}
-            onClick={() => reset()}
-            type="button"
-          >
+          <Button onClick={() => reset()} type="button">
             {copy.tryAgain}
-          </button>
+          </Button>
           <Link className={cn(buttonVariants({ variant: "outline" }))} href="/">
             {copy.goHome}
           </Link>

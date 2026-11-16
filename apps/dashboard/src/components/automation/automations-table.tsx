@@ -16,7 +16,6 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@notra/ui/components/ui/dropdown-menu";
-import { Spinner } from "@notra/ui/components/ui/spinner";
 import { Switch } from "@notra/ui/components/ui/switch";
 import {
   Tooltip,
@@ -266,18 +265,14 @@ export function AutomationsTable({
                 aria-label={tCommon("labels.actionsForName", {
                   name: nameOf(row),
                 })}
-                disabled={busyId === row.id}
+                loading={busyId === row.id}
                 size="icon"
                 variant="ghost"
               >
-                {busyId === row.id ? (
-                  <Spinner />
-                ) : (
-                  <HugeiconsIcon
-                    className="text-muted-foreground size-4"
-                    icon={MoreVerticalIcon}
-                  />
-                )}
+                <HugeiconsIcon
+                  className="text-muted-foreground size-4"
+                  icon={MoreVerticalIcon}
+                />
               </Button>
             }
           />

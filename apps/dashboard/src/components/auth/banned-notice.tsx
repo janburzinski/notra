@@ -1,9 +1,9 @@
 "use client";
 
-import { Button } from "@notra/ui/components/ui/button";
 import { useState } from "react";
 import { useTranslations } from "use-intl";
 
+import { Button } from "@/components/button";
 import { authClient } from "@/lib/auth/client";
 
 export function BannedNotice() {

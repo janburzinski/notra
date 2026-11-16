@@ -5,6 +5,7 @@ import type { GeoCompetitor } from "@notra/geo-core/types/geo";
 import { useState } from "react";
 import { useTranslations } from "use-intl";
 
+import { Button } from "@/components/button";
 import {
   CompetitorChoicesFooter,
   CompetitorChoicesSearch,
@@ -67,15 +68,17 @@ export function WriteCompetitorChoices({
       <div className="flex items-start justify-between gap-3">
         {children}
         {competitors.length > 0 && (fitsLimit || selectedIds.length > 0) ? (
-          <button
-            className="text-muted-foreground hover:text-foreground shrink-0 cursor-pointer text-xs transition-colors"
+          <Button
+            className="text-muted-foreground hover:text-foreground h-auto px-0 text-xs hover:no-underline"
             onClick={toggleAll}
+            size="xs"
             type="button"
+            variant="link"
           >
             {allSelected || !fitsLimit
               ? t("clearAll")
               : tGeoShared("selectAll")}
-          </button>
+          </Button>
         ) : null}
       </div>
       {competitors.length === 0 ? (

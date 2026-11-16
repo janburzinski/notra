@@ -1,7 +1,6 @@
 "use client";
 
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Button } from "@notra/ui/components/ui/button";
 import { parseAsStringLiteral, useQueryState } from "nuqs";
 
 import { AutopilotAutomationChoices } from "@/components/autopilot/autopilot-automation-choices";
@@ -10,6 +9,7 @@ import {
   AutopilotScheduleRow,
   AutopilotSlackRow,
 } from "@/components/autopilot/autopilot-setup-rows";
+import { Button } from "@/components/button";
 import { SiteCreateStage } from "@/components/sites/site-create-stage";
 import { SiteCreateStep } from "@/components/sites/site-create-step";
 import { SiteCreateStepList } from "@/components/sites/site-create-step-list";

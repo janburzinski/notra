@@ -2,8 +2,9 @@
 
 import { FileImportIcon, FileUploadIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Button } from "@notra/ui/components/ui/button";
 import { useEffect, useState } from "react";
+
+import { Button } from "@/components/button";
 
 const LOADING_DURATION_MS = 2000;
 const UPLOAD_TICK_MS = 280;

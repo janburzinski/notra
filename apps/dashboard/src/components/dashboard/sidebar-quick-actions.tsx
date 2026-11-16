@@ -2,7 +2,6 @@
 
 import { SearchIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Button } from "@notra/ui/components/ui/button";
 import { Kbd } from "@notra/ui/components/ui/kbd";
 import {
   SidebarMenu,
@@ -12,6 +11,7 @@ import {
 import { useIsApplePlatform } from "@notra/ui/hooks/use-is-apple-platform";
 import { useTranslations } from "use-intl";
 
+import { Button } from "@/components/button";
 import { useCommandPalette } from "@/components/command-palette/command-palette-context";
 import { useRightPanel } from "@/components/dashboard/right-panel-context";
 import { AgentIcon } from "@/components/icons/agent-icon";

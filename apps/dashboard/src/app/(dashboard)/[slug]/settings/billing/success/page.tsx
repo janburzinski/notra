@@ -9,7 +9,7 @@ import { Suspense, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { useTranslations } from "use-intl";
 
-import { buttonVariants } from "@/components/button";
+import { Button, buttonVariants } from "@/components/button";
 import { Confetti } from "@/components/confetti";
 import Link from "@/components/framework/link";
 import { CHECKOUT_SURFACES } from "@/constants/analytics-events";
@@ -108,13 +108,14 @@ function BillingSuccessPageContent() {
           >
             {tSettingsShared("goToDashboard")}
           </Link>
-          <button
-            className={cn(buttonVariants({ variant: "outline", size: "lg" }))}
+          <Button
             onClick={handleManageBilling}
+            size="lg"
             type="button"
+            variant="outline"
           >
             {t("manageBilling")}
-          </button>
+          </Button>
         </div>
 
         <Link

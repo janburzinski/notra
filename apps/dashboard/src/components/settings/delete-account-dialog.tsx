@@ -24,7 +24,6 @@ import {
   RadioGroupItem,
 } from "@notra/ui/components/ui/radio-group";
 import { Skeleton } from "@notra/ui/components/ui/skeleton";
-import { Spinner } from "@notra/ui/components/ui/spinner";
 import { ORPCError } from "@orpc/client";
 import { useQuery } from "@tanstack/react-query";
 import type { ReactElement } from "react";
@@ -314,18 +313,12 @@ export function DeleteAccountDialog({
             {tCommon("cancel")}
           </ResponsiveAlertDialogCancel>
           <ResponsiveAlertDialogAction
-            disabled={isDeleting || isLoadingOrgs || !canProceed}
+            disabled={isLoadingOrgs || !canProceed}
+            loading={isDeleting}
             onClick={handleDeleteAccount}
             variant="destructive"
           >
-            {isDeleting ? (
-              <>
-                <Spinner />
-                {tCommon("deleting")}
-              </>
-            ) : (
-              tCommon2("labels.deleteAccount")
-            )}
+            {tCommon2("labels.deleteAccount")}
           </ResponsiveAlertDialogAction>
         </ResponsiveAlertDialogFooter>
       </ResponsiveAlertDialogContent>

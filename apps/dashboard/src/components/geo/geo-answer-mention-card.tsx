@@ -6,6 +6,7 @@ import { DetailCardContent } from "@notra/ui/components/ui/detail-card";
 import { Skeleton } from "@notra/ui/components/ui/skeleton";
 import { useTranslations } from "use-intl";
 
+import { Button } from "@/components/button";
 import { CompetitorLogo } from "@/components/geo/competitor-logo";
 import { BrandTrackingBadge } from "@/components/geo/share-of-voice-brand-tag";
 import { useGeoCompetitorPromptSummary } from "@/lib/hooks/use-geo";
@@ -103,10 +104,12 @@ export function GeoAnswerMentionCompetitorCard({
       </dl>
       {showView ? (
         <div className="border-border mt-1 border-t px-1 py-1">
-          <button
-            className="hover:bg-muted/60 flex w-full items-center justify-between gap-2 rounded-md px-2 py-1.5 text-left text-xs font-medium"
+          <Button
+            className="w-full justify-between px-2 text-xs"
             onClick={onView}
+            size="sm"
             type="button"
+            variant="ghost"
           >
             {t("viewCompetitor")}
             <HugeiconsIcon
@@ -114,7 +117,7 @@ export function GeoAnswerMentionCompetitorCard({
               className="text-muted-foreground size-3.5"
               icon={ArrowRight01Icon}
             />
-          </button>
+          </Button>
         </div>
       ) : null}
     </DetailCardContent>

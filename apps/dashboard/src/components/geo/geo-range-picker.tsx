@@ -6,7 +6,6 @@ import {
   GEO_MAX_RANGE_DAYS,
   GEO_RANGE_PRESETS,
 } from "@notra/geo-core/constants/geo";
-import { Button } from "@notra/ui/components/ui/button";
 import {
   Popover,
   PopoverContent,
@@ -17,6 +16,7 @@ import { LazyMotion, m, useReducedMotion } from "motion/react";
 import { useState } from "react";
 import { useLocale, useTranslations } from "use-intl";
 
+import { Button } from "@/components/button";
 import { Calendar } from "@/components/calendar";
 import { GEO_RANGE_PRESET_LABEL_KEYS } from "@/constants/geo-analytics";
 import { useAnimatedSize } from "@/lib/hooks/use-animated-size";

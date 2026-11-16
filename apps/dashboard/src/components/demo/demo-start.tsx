@@ -1,10 +1,10 @@
 "use client";
 
-import { Button } from "@notra/ui/components/ui/button";
 import { Spinner } from "@notra/ui/components/ui/spinner";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslations } from "use-intl";
 
+import { Button } from "@/components/button";
 import { DemoHumanCheck } from "@/components/demo/demo-human-check";
 import type { DemoSandboxCreateResponse, DemoStartProps } from "@/types/demo";
 import type { TurnstileHandle } from "@/types/turnstile";

@@ -2,7 +2,6 @@
 
 import { Cancel01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Button } from "@notra/ui/components/ui/button";
 import { EASE, tween } from "@notra/ui/lib/motion";
 import { cn } from "@notra/ui/lib/utils";
 import {
@@ -15,6 +14,7 @@ import {
 import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "use-intl";
 
+import { Button } from "@/components/button";
 import {
   CHAT_SUGGESTION_ROTATE_MS,
   CHAT_SUGGESTION_SWAP_BLUR_PX,

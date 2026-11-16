@@ -131,22 +131,17 @@ export function FeedbackForm({
 
         <Button
           disabled={!canSubmit}
+          loading={isSubmitting}
           onClick={handleSubmit}
           size="sm"
           type="button"
         >
-          {isSubmitting ? (
-            tCommon("labels.sending")
-          ) : (
-            <>
-              {tCommon("labels.send")}
-              <HugeiconsIcon
-                className="-translate-y-px"
-                icon={SentIcon}
-                size={14}
-              />
-            </>
-          )}
+          {tCommon("labels.send")}
+          <HugeiconsIcon
+            className="-translate-y-px"
+            icon={SentIcon}
+            size={14}
+          />
         </Button>
       </div>
     </>

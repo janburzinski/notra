@@ -13,7 +13,6 @@ import { CHAT_TITLE_MAX_LENGTH } from "@notra/ai/constants/chat";
 import type { ChatSessionSummary } from "@notra/ai/types/chat";
 import { normalizeChatTitle } from "@notra/ai/utils/chat";
 import { ConfirmDialog } from "@notra/ui/components/shared/confirm-dialog";
-import { Button } from "@notra/ui/components/ui/button";
 import {
   ContextMenu,
   ContextMenuContent,
@@ -41,6 +40,7 @@ import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { useTranslations } from "use-intl";
 
+import { Button } from "@/components/button";
 import { useOrganizationsContext } from "@/components/providers/organization-provider";
 import {
   useChatSessionMutations,

@@ -7,7 +7,6 @@ import {
   Tick02Icon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Button } from "@notra/ui/components/ui/button";
 import {
   InputGroup,
   InputGroupAddon,
@@ -15,6 +14,7 @@ import {
 } from "@notra/ui/components/ui/input-group";
 import { useState } from "react";
 
+import { Button } from "@/components/button";
 import { cn } from "@/lib/utils";
 import type { AutopilotSetupRowsProps } from "@/types/autopilot";
 

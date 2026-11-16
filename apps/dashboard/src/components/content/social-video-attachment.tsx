@@ -120,19 +120,15 @@ export function SocialVideoAttachment({
           {disabled ? null : (
             <div className="absolute top-2 right-2 flex gap-1 opacity-0 transition-opacity group-focus-within/video:opacity-100 group-hover/video:opacity-100 pointer-coarse:opacity-100">
               <Button
-                disabled={uploading}
+                loading={uploading}
                 onClick={() => inputRef.current?.click()}
                 size="xs"
                 variant="secondary"
               >
-                {uploading ? (
-                  <Spinner className="size-3" />
-                ) : (
-                  <HugeiconsIcon
-                    icon={ArrowReloadHorizontalIcon}
-                    strokeWidth={1.8}
-                  />
-                )}
+                <HugeiconsIcon
+                  icon={ArrowReloadHorizontalIcon}
+                  strokeWidth={1.8}
+                />
                 {t("replaceVideo")}
               </Button>
               <Button

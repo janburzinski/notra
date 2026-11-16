@@ -427,10 +427,8 @@ function SlackChannelAccessEditor({
           {isDirty && (
             <div className="flex justify-end">
               <Button
-                disabled={
-                  saveMutation.isPending ||
-                  (isRestricted && selectedChannelIds.size === 0)
-                }
+                disabled={isRestricted && selectedChannelIds.size === 0}
+                loading={saveMutation.isPending}
                 onClick={() =>
                   saveMutation.mutate(
                     isRestricted ? [...selectedChannelIds] : null
@@ -438,9 +436,7 @@ function SlackChannelAccessEditor({
                 }
                 size="sm"
               >
-                {saveMutation.isPending
-                  ? tCommon("actions.saving")
-                  : tCommon("actions.saveChanges")}
+                {tCommon("actions.saveChanges")}
               </Button>
             </div>
           )}

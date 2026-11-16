@@ -7,7 +7,6 @@ import {
   ALLOWED_CHAT_MIME_TYPES,
   PASTE_TO_ATTACHMENT_THRESHOLD,
 } from "@notra/schemas/constants/dashboard/upload";
-import { Button } from "@notra/ui/components/ui/button";
 import { Composer } from "@notra/ui/components/ui/composer";
 import { Kbd } from "@notra/ui/components/ui/kbd";
 import { Github } from "@notra/ui/components/ui/svgs/github";
@@ -30,6 +29,7 @@ import {
 } from "react";
 import { useTranslations } from "use-intl";
 
+import { Button } from "@/components/button";
 import { ChatAnnotationsPreview } from "@/components/chat/chat-annotations-preview";
 import { ChatQuotePreview, useChatQuote } from "@/components/chat/chat-quote";
 import Link from "@/components/framework/link";

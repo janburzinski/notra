@@ -2,7 +2,6 @@
 
 import { ArrowDown01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Button, buttonVariants } from "@notra/ui/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,6 +14,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useTranslations } from "use-intl";
 
+import { Button, buttonVariants } from "@/components/button";
 import Link from "@/components/framework/link";
 import { authClient } from "@/lib/auth/client";
 import { useRouter } from "@/lib/navigation";

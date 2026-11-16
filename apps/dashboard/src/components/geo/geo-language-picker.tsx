@@ -19,6 +19,7 @@ import {
 import { useState } from "react";
 import { useTranslations } from "use-intl";
 
+import { Button } from "@/components/button";
 import { Twemoji } from "@/components/geo/twemoji";
 import { LANGUAGE_FLAGS } from "@/constants/language-flags";
 import { useLanguageLabel } from "@/lib/hooks/use-language-label";
@@ -114,17 +115,19 @@ export function GeoLanguagePicker({
                   <span className="sr-only">{t("locked")}</span>
                 </span>
               ) : (
-                <button
+                <Button
                   aria-label={t("remove", { language })}
-                  className="hover:bg-background cursor-pointer rounded-full p-0.5 disabled:cursor-not-allowed disabled:opacity-50"
+                  className="hover:bg-background size-4 rounded-full"
                   disabled={disabled || lastLanguage}
                   onClick={() =>
                     onChange(selected.filter((item) => item !== language))
                   }
+                  size="icon-xs"
                   type="button"
+                  variant="ghost"
                 >
                   <HugeiconsIcon icon={Cancel01Icon} size={12} />
-                </button>
+                </Button>
               )}
             </Badge>
           ))}

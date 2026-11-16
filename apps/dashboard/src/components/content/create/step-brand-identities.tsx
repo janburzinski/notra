@@ -2,7 +2,6 @@
 
 import { Tick01Icon, UserGroupIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Button } from "@notra/ui/components/ui/button";
 import { Label } from "@notra/ui/components/ui/label";
 import { Skeleton } from "@notra/ui/components/ui/skeleton";
 import { cn } from "@notra/ui/lib/utils";
@@ -12,6 +11,7 @@ import { useTranslations } from "use-intl";
 // biome-ignore lint/performance/noNamespaceImport: Zod recommended way of importing
 import * as z from "zod";
 
+import { Button } from "@/components/button";
 import {
   useAnalyzeBrand,
   useBrandAnalysisProgress,

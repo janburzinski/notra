@@ -4,10 +4,10 @@ import { PencilEdit02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { POSTHOG_EVENTS } from "@notra/posthog/events";
 import { PageHeading } from "@notra/ui/components/shared/page-heading";
-import { Button } from "@notra/ui/components/ui/button";
 import { useEffect, useRef, useState } from "react";
 import { useLocale, useTranslations } from "use-intl";
 
+import { Button } from "@/components/button";
 import { ContentCard } from "@/components/content/content-card";
 import { ContentSkeletonCard } from "@/components/content/content-skeleton-card";
 import { GroupContentTypes } from "@/components/content/group/group-content-types";

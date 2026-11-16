@@ -3,12 +3,12 @@
 import { Refresh03Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { ConfirmDialog } from "@notra/ui/components/shared/confirm-dialog";
-import { Button } from "@notra/ui/components/ui/button";
 import { Notra } from "@notra/ui/components/ui/svgs/notra";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useTranslations } from "use-intl";
 
+import { Button } from "@/components/button";
 import { DemoCustomizeDialog } from "@/components/demo/demo-customize-dialog";
 import { DEMO_SIGNUP_URL } from "@/constants/demo";
 import { useDemoSandbox } from "@/lib/hooks/use-demo-sandbox";

@@ -97,9 +97,9 @@ if (!process.env.NOTRA_DOMAIN_SETUP_TEST_WORKER) {
         .map((match) => match[0])
         .find((markup) => markup.includes(`aria-label="${label}"`));
       expect(button).toBeDefined();
-      expect(button).toContain(`aria-busy="${String(pending)}"`);
-      expect(/\sdisabled(?:=|\s|>)/.test(button ?? "")).toBe(pending);
-      expect(button?.includes("motion-safe:animate-spin")).toBe(pending);
+      expect(button?.includes('aria-busy="true"')).toBe(pending);
+      expect(button?.includes('aria-disabled="true"')).toBe(pending);
+      expect(button?.includes('data-slot="button-loader"')).toBe(pending);
       expect(html).toContain(
         messages.sites.domainsPage.dns.openProvider.replace(
           "{provider}",

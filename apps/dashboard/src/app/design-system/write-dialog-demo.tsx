@@ -1,8 +1,8 @@
 "use client";
 
-import { Button } from "@notra/ui/components/ui/button";
 import { useState } from "react";
 
+import { Button } from "@/components/button";
 import { DesignSystemSectionHeader } from "@/components/design-system/design-system-section-header";
 import { WriteDialog } from "@/components/geo/writer/write-dialog";
 

@@ -8,7 +8,6 @@ import {
   PlusSignIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Button } from "@notra/ui/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -28,6 +27,7 @@ import { cn } from "@notra/ui/lib/utils";
 import { Fragment } from "react";
 import { useTranslations } from "use-intl";
 
+import { Button } from "@/components/button";
 import { ChatConversation } from "@/components/chat/chat-conversation";
 import { ContentPanelHeaderButton } from "@/components/content/content-panel-header-button";
 import { useRightPanel } from "@/components/dashboard/right-panel-context";

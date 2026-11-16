@@ -25,7 +25,6 @@ import {
   InputGroupText,
 } from "@notra/ui/components/ui/input-group";
 import { Label } from "@notra/ui/components/ui/label";
-import { Spinner } from "@notra/ui/components/ui/spinner";
 import {
   Tabs,
   TabsContent,
@@ -316,9 +315,9 @@ export function PromptAddDialog({
               data-dialog-confirm
               disabled={!canGenerate}
               form={formId}
+              loading={generate.isPending}
               type="submit"
             >
-              {generate.isPending ? <Spinner className="size-3.5" /> : null}
               {tGeoShared("generatePrompts")}
             </Button>
           )}

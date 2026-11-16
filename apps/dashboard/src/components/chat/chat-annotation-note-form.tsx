@@ -1,12 +1,12 @@
 "use client";
 
-import { Button } from "@notra/ui/components/ui/button";
 import { Textarea } from "@notra/ui/components/ui/textarea";
 import { cn } from "@notra/ui/lib/utils";
 import { useForm } from "@tanstack/react-form";
 import { useEffect, useRef } from "react";
 import { useTranslations } from "use-intl";
 
+import { Button } from "@/components/button";
 import type { ChatAnnotationNoteFormProps } from "@/types/components/chat-annotation-note-form";
 
 export function ChatAnnotationNoteForm({

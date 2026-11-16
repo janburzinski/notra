@@ -2,7 +2,6 @@
 
 import { Cancel01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Button } from "@notra/ui/components/ui/button";
 import { tween } from "@notra/ui/lib/motion";
 import { cn } from "@notra/ui/lib/utils";
 import {
@@ -15,6 +14,7 @@ import {
 import { useState } from "react";
 import { useTranslations } from "use-intl";
 
+import { Button } from "@/components/button";
 import { ChatAnnotationNoteForm } from "@/components/chat/chat-annotation-note-form";
 import { useChatQuote } from "@/components/chat/chat-quote";
 import type { ChatAnnotationsPreviewProps } from "@/types/components/chat-annotations-preview";

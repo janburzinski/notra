@@ -27,7 +27,6 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@notra/ui/components/ui/empty";
-import { Spinner } from "@notra/ui/components/ui/spinner";
 import { Switch } from "@notra/ui/components/ui/switch";
 import {
   Tooltip,
@@ -187,7 +186,6 @@ export function ConversationsCard({
   const consumerRunBlocked = useIsGeoConsumerRunBlocked(organizationId);
   const runBlocked = runSequence.isPending || consumerRunBlocked;
   const t = useTranslations("geo.conversationsCard");
-  const tCommon3 = useTranslations("common");
   const tGeoShared = useTranslations("geo.shared");
   const generateSequences = useGeoSequencesGenerate(organizationId);
   const [builderOpen, setBuilderOpen] = useState(false);
@@ -274,19 +272,13 @@ export function ConversationsCard({
   };
   const generateButton = (
     <Button
-      disabled={generateSequences.isPending}
+      loading={generateSequences.isPending}
       onClick={() => generateSequences.mutate()}
       size="sm"
       variant={sequences.length === 0 ? "default" : "ghost"}
     >
-      {generateSequences.isPending ? (
-        <Spinner className="size-3.5" />
-      ) : (
-        <HugeiconsIcon icon={AiMagicIcon} size={14} />
-      )}
-      {generateSequences.isPending
-        ? tCommon3("labels.generating")
-        : t("generate")}
+      <HugeiconsIcon icon={AiMagicIcon} size={14} />
+      {t("generate")}
     </Button>
   );
   const newButton = (

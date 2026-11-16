@@ -11,7 +11,6 @@ import { useTranslations } from "use-intl";
 
 import { Button } from "@/components/button";
 import { useSiteDomainCheck } from "@/lib/hooks/use-site-domain-check";
-import { cn } from "@/lib/utils";
 import type { SiteDomainCheckButtonProps } from "@/types/components/sites";
 
 export function SiteDomainCheckButton({
@@ -26,9 +25,8 @@ export function SiteDomainCheckButton({
       <TooltipTrigger
         render={
           <Button
-            aria-busy={check.isPending}
             aria-label={t("checkLabel", { hostname: domain.hostname })}
-            disabled={check.isPending}
+            loading={check.isPending}
             onClick={() => check.mutate()}
             size="icon-sm"
             variant={variant}
@@ -37,10 +35,7 @@ export function SiteDomainCheckButton({
       >
         <HugeiconsIcon
           aria-hidden="true"
-          className={cn(
-            "size-4",
-            check.isPending && "motion-safe:animate-spin"
-          )}
+          className="size-4"
           icon={Refresh03Icon}
           strokeWidth={1.5}
         />

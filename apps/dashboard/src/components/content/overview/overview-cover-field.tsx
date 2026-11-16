@@ -103,19 +103,15 @@ export function OverviewCoverField({ api, markdown }: OverviewCoverFieldProps) {
           />
           <div className="absolute top-2 right-2 flex gap-1 opacity-0 transition-opacity group-focus-within/cover:opacity-100 group-hover/cover:opacity-100 pointer-coarse:opacity-100">
             <Button
-              disabled={uploading}
+              loading={uploading}
               onClick={() => inputRef.current?.click()}
               size="xs"
               variant="secondary"
             >
-              {uploading ? (
-                <Spinner className="size-3" />
-              ) : (
-                <HugeiconsIcon
-                  icon={ArrowReloadHorizontalIcon}
-                  strokeWidth={1.8}
-                />
-              )}
+              <HugeiconsIcon
+                icon={ArrowReloadHorizontalIcon}
+                strokeWidth={1.8}
+              />
               {t("replace")}
             </Button>
             <Button

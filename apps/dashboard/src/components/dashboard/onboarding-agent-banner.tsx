@@ -80,10 +80,10 @@ export function OnboardingAgentBanner({
           </span>
           <ResponsiveDialog onOpenChange={setConfirmOpen} open={confirmOpen}>
             <ResponsiveDialogTrigger
-              disabled={starting}
-              render={<Button className="shrink-0" size="sm" />}
+              render={
+                <Button className="shrink-0" loading={starting} size="sm" />
+              }
             >
-              {starting ? <Spinner /> : null}
               {t("start")}
             </ResponsiveDialogTrigger>
             <ResponsiveDialogContent>

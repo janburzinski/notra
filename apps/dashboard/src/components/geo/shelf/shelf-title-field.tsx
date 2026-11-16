@@ -6,6 +6,7 @@ import { Label } from "@notra/ui/components/ui/label";
 import { Spinner } from "@notra/ui/components/ui/spinner";
 import { useTranslations } from "use-intl";
 
+import { Button } from "@/components/button";
 import type { GeoShelfTitleFieldProps } from "@/types/geo-shelf";
 
 export function ShelfTitleField({
@@ -42,13 +43,15 @@ export function ShelfTitleField({
         previewTitle !== null &&
         !showPreviewTitle &&
         value.trim() !== previewTitle ? (
-          <button
-            className="text-muted-foreground hover:text-foreground text-xs underline-offset-4 hover:underline"
+          <Button
+            className="text-muted-foreground hover:text-foreground h-auto px-0 text-xs"
             onClick={() => onChange(previewTitle)}
+            size="xs"
             type="button"
+            variant="link"
           >
             {t("usePageTitle")}
-          </button>
+          </Button>
         ) : null}
       </span>
       <Input

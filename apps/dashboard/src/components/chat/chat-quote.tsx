@@ -11,7 +11,6 @@ import {
   Message,
   type MessageProps,
 } from "@notra/ui/components/ai-elements/message";
-import { Button } from "@notra/ui/components/ui/button";
 import { tween } from "@notra/ui/lib/motion";
 import {
   AnimatePresence,
@@ -32,6 +31,7 @@ import {
 import { toast } from "sonner";
 import { useTranslations } from "use-intl";
 
+import { Button } from "@/components/button";
 import { ChatAnnotationNoteForm } from "@/components/chat/chat-annotation-note-form";
 import {
   CHAT_ANNOTATION_DRAFT_HIGHLIGHT_NAME,

@@ -4,7 +4,6 @@ import { Combobox as ComboboxPrimitive } from "@base-ui/react";
 import { SquareLock02Icon, UnfoldMoreIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { AUTOPILOT_MAX_SOURCE_REPOSITORIES } from "@notra/db/constants/autopilot";
-import { buttonVariants } from "@notra/ui/components/ui/button";
 import {
   Combobox,
   ComboboxContent,
@@ -18,7 +17,7 @@ import { useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { AutopilotSettingsField } from "@/components/autopilot/autopilot-settings-field";
-import { Button } from "@/components/button";
+import { Button, buttonVariants } from "@/components/button";
 import { AUTOPILOT_SETTINGS_CONTROL_CLASSNAME } from "@/constants/autopilot-ui";
 import { dashboardOrpc } from "@/lib/orpc/query";
 import { cn } from "@/lib/utils";

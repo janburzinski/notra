@@ -127,10 +127,12 @@ export function CommentActions({
             sideOffset={6}
           >
             {COMMENT_REACTIONS.map(({ emoji, key }) => (
-              <button
+              <Button
                 aria-label={t(`reactions.${key}`)}
-                className="hover:bg-muted focus-visible:outline-ring flex size-7 shrink-0 items-center justify-center rounded-full text-base leading-none focus-visible:outline-2"
+                className="rounded-full text-base leading-none"
                 key={emoji}
+                size="icon-sm"
+                variant="ghost"
                 onClick={() => {
                   onReact(
                     comment.id,
@@ -145,7 +147,7 @@ export function CommentActions({
                 }}
               >
                 {emoji}
-              </button>
+              </Button>
             ))}
           </PopoverContent>
         </Popover>

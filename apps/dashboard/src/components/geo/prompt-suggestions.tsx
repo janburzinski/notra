@@ -7,7 +7,6 @@ import {
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { ConfirmDialog } from "@notra/ui/components/shared/confirm-dialog";
-import { Spinner } from "@notra/ui/components/ui/spinner";
 import { type RefObject, useRef, useState } from "react";
 import { DataTable, type TableColumn } from "ui/table";
 import { useLocale, useTranslations } from "use-intl";
@@ -54,32 +53,25 @@ function SuggestionRowActions({
   return (
     <div className="flex h-full shrink-0 items-center justify-end gap-1">
       <Button
-        aria-busy={accepting}
         disabled={disabled}
+        loading={accepting}
         onClick={onAccept}
         size="sm"
         variant="secondary"
       >
-        {accepting ? (
-          <Spinner className="size-3.5" />
-        ) : (
-          <HugeiconsIcon icon={PlusSignIcon} size={14} />
-        )}
+        <HugeiconsIcon icon={PlusSignIcon} size={14} />
         {tGeoShared("track")}
       </Button>
       <Button
         aria-label={tGeoShared("removePrompt", { prompt: suggestion.prompt })}
         disabled={disabled}
         className="text-muted-foreground"
+        loading={dismissing}
         onClick={onDismiss}
         size="icon-sm"
         variant="ghost"
       >
-        {dismissing ? (
-          <Spinner className="size-3.5" />
-        ) : (
-          <HugeiconsIcon icon={Delete02Icon} size={14} />
-        )}
+        <HugeiconsIcon icon={Delete02Icon} size={14} />
       </Button>
     </div>
   );
@@ -267,18 +259,8 @@ function DismissSuggestionDialog({
 function TrackAllButton({ pending, onClick }: TrackAllButtonProps) {
   const t = useTranslations("geo.promptSuggestions");
   return (
-    <Button
-      aria-busy={pending}
-      disabled={pending}
-      onClick={onClick}
-      size="sm"
-      variant="outline"
-    >
-      {pending ? (
-        <Spinner className="size-3.5" />
-      ) : (
-        <HugeiconsIcon icon={PlusSignIcon} size={14} />
-      )}
+    <Button loading={pending} onClick={onClick} size="sm" variant="outline">
+      <HugeiconsIcon icon={PlusSignIcon} size={14} />
       {t("trackAll")}
     </Button>
   );
@@ -295,12 +277,15 @@ function SuggestionDetailActions({
   const tActions = useTranslations("common.actions");
   return (
     <>
-      <Button disabled={disabled} onClick={onDismiss} variant="outline">
-        {dismissing ? <Spinner className="size-3.5" /> : null}
+      <Button
+        disabled={disabled}
+        loading={dismissing}
+        onClick={onDismiss}
+        variant="outline"
+      >
         {tActions("remove")}
       </Button>
-      <Button aria-busy={accepting} disabled={disabled} onClick={onAccept}>
-        {accepting ? <Spinner className="size-3.5" /> : null}
+      <Button disabled={disabled} loading={accepting} onClick={onAccept}>
         {tGeoShared("track")}
       </Button>
     </>

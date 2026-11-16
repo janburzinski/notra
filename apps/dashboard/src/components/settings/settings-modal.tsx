@@ -6,7 +6,6 @@ import {
   SplitModalContent,
   SplitModalPane,
 } from "@notra/ui/components/shared/split-modal";
-import { Button } from "@notra/ui/components/ui/button";
 import {
   Dialog,
   DialogDescription,
@@ -16,6 +15,7 @@ import { cn } from "@notra/ui/lib/utils";
 import { type ComponentType, useId, useState } from "react";
 import { useTranslations } from "use-intl";
 
+import { Button } from "@/components/button";
 import { AccountApiKeysSettingsPane } from "@/components/settings/panes/account-api-keys-pane";
 import { AccountSettingsPane } from "@/components/settings/panes/account-pane";
 import { AppearanceSettingsPane } from "@/components/settings/panes/appearance-pane";

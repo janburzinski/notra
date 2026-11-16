@@ -8,11 +8,11 @@ import {
   AlertDescription,
   AlertTitle,
 } from "@notra/ui/components/ui/alert";
-import { Button } from "@notra/ui/components/ui/button";
 import { Spinner } from "@notra/ui/components/ui/spinner";
 import { createContext, use, useEffect, useLayoutEffect, useRef } from "react";
 import { useTranslations } from "use-intl";
 
+import { Button } from "@/components/button";
 import { trackEvent } from "@/lib/analytics/posthog-client";
 import {
   useGeoWriterBrief,
@@ -156,11 +156,10 @@ function WriterExecuteBanner() {
 }
 
 function WriterExecuteButton() {
-  const tCommon = useTranslations("common");
   const tGeoShared = useTranslations("geo.shared");
   const tActions = useTranslations("common.actions");
   const {
-    state: { status, isBusy, isStarting, isPending, hasUnsavedChanges },
+    state: { status, isBusy, isPending, hasUnsavedChanges },
     actions: { execute },
   } = useWriterExecute();
 
@@ -170,9 +169,6 @@ function WriterExecuteButton() {
 
   const isFailed = status === "failed";
   const label = (() => {
-    if (isStarting) {
-      return tCommon("labels.starting");
-    }
     if (status === "writing" || status === "approved") {
       return tGeoShared("writingInProgress");
     }
@@ -184,16 +180,13 @@ function WriterExecuteButton() {
 
   return (
     <Button
-      disabled={isBusy || hasUnsavedChanges}
+      disabled={hasUnsavedChanges}
+      loading={isBusy}
       onClick={execute}
       size="sm"
       variant={isFailed ? "outline" : "default"}
     >
-      {isBusy ? (
-        <Spinner className="size-3.5" />
-      ) : (
-        <HugeiconsIcon className="size-4" icon={PlayIcon} />
-      )}
+      <HugeiconsIcon className="size-4" icon={PlayIcon} />
       {label}
     </Button>
   );

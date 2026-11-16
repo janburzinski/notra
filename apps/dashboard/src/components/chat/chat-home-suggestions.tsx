@@ -2,12 +2,12 @@
 
 import { Cancel01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Button } from "@notra/ui/components/ui/button";
 import { Skeleton } from "@notra/ui/components/ui/skeleton";
 import { EASE } from "@notra/ui/lib/motion";
 import { LazyMotion, m, useReducedMotion } from "motion/react";
 import { useTranslations } from "use-intl";
 
+import { Button } from "@/components/button";
 import { CHAT_HOME_SUGGESTION_COUNT } from "@/constants/chat-suggestions";
 import { localStorageKeys } from "@/constants/storage";
 import { useStoredDismissal } from "@/lib/hooks/use-stored-dismissal";

@@ -23,7 +23,6 @@ import {
   HoverCard,
   HoverCardTrigger,
 } from "@notra/ui/components/ui/hover-card";
-import { Spinner } from "@notra/ui/components/ui/spinner";
 import {
   Tooltip,
   TooltipContent,
@@ -142,20 +141,17 @@ function ProviderRow({
             <Button
               aria-label={t("trackAria", { name })}
               disabled={trackingDisabled}
+              loading={tracking}
               onClick={() => onTrack(trackEngine, name)}
               size="xs"
               type="button"
               variant="outline"
             >
-              {tracking ? (
-                <Spinner className="size-3.5" />
-              ) : (
-                <HugeiconsIcon
-                  data-icon="inline-start"
-                  icon={PlusSignIcon}
-                  strokeWidth={2}
-                />
-              )}
+              <HugeiconsIcon
+                data-icon="inline-start"
+                icon={PlusSignIcon}
+                strokeWidth={2}
+              />
               {tGeoShared("track")}
             </Button>
           ) : null

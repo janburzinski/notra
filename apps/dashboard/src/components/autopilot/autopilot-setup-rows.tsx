@@ -2,7 +2,6 @@
 
 import { Add01Icon, Clock01Icon, SlackIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Button } from "@notra/ui/components/ui/button";
 import {
   Select,
   SelectContent,
@@ -14,6 +13,7 @@ import {
 import { useRef, useState } from "react";
 
 import { CreateSlackChannelDialog } from "@/components/autopilot/create-slack-channel-dialog";
+import { Button } from "@/components/button";
 import { AUTOPILOT_HOUR_OPTIONS } from "@/constants/autopilot";
 import {
   AUTOPILOT_CREATE_SLACK_CHANNEL_VALUE,

@@ -548,14 +548,17 @@ function ImportXStep({
                   {didImport && t("importedLabel")}
                   {!didImport && tCommon2("actions.import")}
                 </Button>
-                <button
-                  className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-md transition-colors"
+                <Button
+                  aria-label={tCommon("disconnect")}
+                  className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
                   disabled={disconnectAccount.isPending}
                   onClick={() => handleDisconnect(account)}
+                  size="icon-sm"
                   type="button"
+                  variant="ghost"
                 >
                   <HugeiconsIcon className="size-3.5" icon={Cancel01Icon} />
-                </button>
+                </Button>
               </div>
             );
           })}
@@ -742,11 +745,12 @@ function CustomTextStep({
           {tCommon("back")}
         </Button>
         <Button
-          disabled={createReference.isPending || !content.trim()}
+          disabled={!content.trim()}
+          loading={createReference.isPending}
           onClick={handleSave}
           data-dialog-confirm
         >
-          {createReference.isPending ? tCommon("saving") : t("custom.submit")}
+          {t("custom.submit")}
         </Button>
       </ResponsiveDialogFooter>
     </>

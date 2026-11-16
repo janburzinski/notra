@@ -208,16 +208,18 @@ function CompetitorSynonymsField({
         {synonyms.map((synonym) => (
           <Badge className="gap-1 pr-1" key={synonym} variant="secondary">
             {synonym}
-            <button
+            <Button
               aria-label={t("removeSynonym", { synonym })}
-              className="hover:bg-background rounded-full p-0.5"
+              className="hover:bg-background size-4 rounded-full"
               onClick={() =>
                 onChange(synonyms.filter((item) => item !== synonym))
               }
+              size="icon-xs"
               type="button"
+              variant="ghost"
             >
               <HugeiconsIcon icon={Cancel01Icon} size={12} />
-            </button>
+            </Button>
           </Badge>
         ))}
         <AnimatePresence initial={false} mode="popLayout">

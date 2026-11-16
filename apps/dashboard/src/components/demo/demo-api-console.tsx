@@ -2,12 +2,12 @@
 
 import { Copy01Icon, SentIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Button } from "@notra/ui/components/ui/button";
 import { Input } from "@notra/ui/components/ui/input";
 import { Textarea } from "@notra/ui/components/ui/textarea";
 import { useMemo, useState } from "react";
 import { useTranslations } from "use-intl";
 
+import { Button } from "@/components/button";
 import {
   DEMO_CONSOLE_METHODS,
   DEMO_CONSOLE_PRESETS,

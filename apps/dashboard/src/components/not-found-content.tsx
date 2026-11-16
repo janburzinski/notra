@@ -3,7 +3,7 @@
 import { cn } from "@notra/ui/lib/utils";
 import { useTranslations } from "use-intl";
 
-import { buttonVariants } from "@/components/button";
+import { Button, buttonVariants } from "@/components/button";
 import Link from "@/components/framework/link";
 import { useRouter } from "@/lib/navigation";
 import type { NotFoundContentProps } from "@/types/components/not-found";
@@ -32,13 +32,9 @@ export function NotFoundContent({ className }: NotFoundContentProps) {
           <Link className={cn(buttonVariants())} href="/">
             {tErrorsShared("goHome")}
           </Link>
-          <button
-            className={cn(buttonVariants({ variant: "outline" }))}
-            onClick={() => router.back()}
-            type="button"
-          >
+          <Button onClick={() => router.back()} type="button" variant="outline">
             {t("goBack")}
-          </button>
+          </Button>
         </div>
       </div>
     </div>

@@ -5,6 +5,7 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { ImageZoom } from "@notra/ui/components/kibo-ui/image-zoom";
 import { useTranslations } from "use-intl";
 
+import { Button } from "@/components/button";
 import Image from "@/components/framework/image";
 
 import type { ToolOutputImage } from "./types";
@@ -37,21 +38,22 @@ export function ToolOutputImages({ images }: { images: ToolOutputImage[] }) {
               width={768}
             />
           </ImageZoom>
-          <button
+          <Button
             aria-label={tCommon("labels.downloadImage")}
-            className="border-border bg-background/90 text-foreground hover:bg-muted focus-visible:ring-ring absolute top-2 right-2 inline-flex size-8 cursor-pointer items-center justify-center rounded-md border opacity-0 shadow-sm backdrop-blur transition-opacity group-hover/image:opacity-100 focus-visible:opacity-100 focus-visible:ring-2 focus-visible:outline-none"
+            className="bg-background/90 dark:bg-background/90 absolute top-2 right-2 opacity-0 shadow-sm backdrop-blur group-hover/image:opacity-100 focus-visible:opacity-100"
             onClick={() => {
               downloadToolOutputImage(image);
             }}
+            size="icon"
             title={tCommon("labels.downloadImage")}
-            type="button"
+            variant="outline"
           >
             <HugeiconsIcon
               icon={Download01Icon}
               aria-hidden="true"
               className="size-4"
             />
-          </button>
+          </Button>
         </div>
       ))}
     </div>

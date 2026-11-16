@@ -11,7 +11,6 @@ import {
 import { HugeiconsIcon } from "@hugeicons/react";
 import { artifactPath } from "@notra/ai/utils/artifact-path";
 import { ConfirmDialog } from "@notra/ui/components/shared/confirm-dialog";
-import { Button } from "@notra/ui/components/ui/button";
 import { CopyButton } from "@notra/ui/components/ui/copy-button";
 import {
   DropdownMenu,
@@ -43,6 +42,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { useFormatter, useTranslations } from "use-intl";
 
+import { Button } from "@/components/button";
 import { dashboardOrpc } from "@/lib/orpc/query";
 import { cn } from "@/lib/utils";
 import type { ArtifactActionsProps } from "@/types/artifacts";

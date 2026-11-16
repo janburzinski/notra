@@ -124,11 +124,12 @@ export function SelectRepositoriesDialog({
             {tCommon("actions.cancel")}
           </ResponsiveDialogClose>
           <Button
-            disabled={isSaving || isLoading || Boolean(error)}
+            disabled={isLoading || Boolean(error)}
+            loading={isSaving}
             onClick={() => onSave(selected)}
             data-dialog-confirm
           >
-            {isSaving ? tCommon("actions.saving") : t("save")}
+            {t("save")}
           </Button>
         </ResponsiveDialogFooter>
       </ResponsiveDialogContent>

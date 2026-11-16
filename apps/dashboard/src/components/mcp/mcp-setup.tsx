@@ -6,10 +6,10 @@ import {
   GEO_INGEST_TOKEN_ENV,
 } from "@notra/geo-core/constants/geo";
 import { AgentPromptButton } from "@notra/ui/components/ui/agent-prompt-button";
-import { Button } from "@notra/ui/components/ui/button";
 import { useState } from "react";
 import { useTranslations } from "use-intl";
 
+import { Button } from "@/components/button";
 import { CodeSnippet, CodeSnippetTabs } from "@/components/geo/code-snippet";
 import { GeoSetupCopyField } from "@/components/geo/geo-setup-copy-field";
 import { GeoSetupStep } from "@/components/geo/geo-setup-step";

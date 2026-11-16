@@ -1,8 +1,8 @@
 "use client";
 
-import { Button } from "@notra/ui/components/ui/button";
 import { useTranslations } from "use-intl";
 
+import { Button } from "@/components/button";
 import type { TrafficZoomChipProps } from "@/types/geo";
 
 export function TrafficZoomChip({

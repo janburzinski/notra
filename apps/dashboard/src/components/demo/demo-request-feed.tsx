@@ -4,10 +4,10 @@ import { Copy01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import type { DemoRequestEvent } from "@notra/db/types/demo";
 import { Badge } from "@notra/ui/components/ui/badge";
-import { Button } from "@notra/ui/components/ui/button";
 import { useState } from "react";
 import { useFormatter, useTranslations } from "use-intl";
 
+import { Button } from "@/components/button";
 import Link from "@/components/framework/link";
 import { useOrganizationsContext } from "@/components/providers/organization-provider";
 import {

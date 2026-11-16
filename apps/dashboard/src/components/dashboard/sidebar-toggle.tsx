@@ -5,11 +5,12 @@ import {
   SidebarRight01Icon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Button } from "@notra/ui/components/ui/button";
 import { useSidebar } from "@notra/ui/components/ui/sidebar";
 import { cn } from "@notra/ui/lib/utils";
 import type { ComponentProps } from "react";
 import { useTranslations } from "use-intl";
+
+import { Button } from "@/components/button";
 
 export function SidebarToggle({
   className,

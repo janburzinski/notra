@@ -195,13 +195,12 @@ export function InviteMemberPopover({
             >
               {(hasEmail) => (
                 <Button
-                  disabled={!hasEmail || isPending}
+                  disabled={!hasEmail}
+                  loading={isPending}
                   size="sm"
                   type="submit"
                 >
-                  {isPending
-                    ? tCommon("labels.sending")
-                    : tCommon("labels.send")}
+                  {tCommon("labels.send")}
                 </Button>
               )}
             </form.Subscribe>

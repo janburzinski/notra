@@ -7,6 +7,7 @@ import { cn } from "@notra/ui/lib/utils";
 import { type KeyboardEvent, useEffect, useRef, useState } from "react";
 import { useTranslations } from "use-intl";
 
+import { Button } from "@/components/button";
 import type {
   SettingsModalNavProps,
   SettingsNavItem,
@@ -181,14 +182,16 @@ export function SettingsModalNav({
             value={query}
           />
           {isSearching ? (
-            <button
+            <Button
               aria-label={tCommon("labels.clearSearch")}
-              className="text-muted-foreground hover:text-foreground absolute top-1/2 right-1.5 flex size-5 -translate-y-1/2 items-center justify-center rounded-sm"
+              className="text-muted-foreground absolute top-1/2 right-1.5 size-5 -translate-y-1/2 rounded-sm"
               onClick={() => onQueryChange("")}
+              size="icon-xs"
               type="button"
+              variant="ghost"
             >
               <HugeiconsIcon className="size-3" icon={Cancel01Icon} />
-            </button>
+            </Button>
           ) : null}
         </div>
       </div>

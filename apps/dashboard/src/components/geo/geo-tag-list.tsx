@@ -13,6 +13,7 @@ import { Label } from "@notra/ui/components/ui/label";
 import { useState } from "react";
 import { useTranslations } from "use-intl";
 
+import { Button } from "@/components/button";
 import type { GeoTagListProps } from "@/types/geo";
 
 export function GeoTagList({
@@ -59,15 +60,17 @@ export function GeoTagList({
             variant="secondary"
           >
             <span className="truncate">{value}</span>
-            <button
+            <Button
               aria-label={t("remove", { value })}
-              className="hover:bg-background focus-visible:ring-ring flex size-6 shrink-0 cursor-pointer items-center justify-center rounded-full outline-none focus-visible:ring-2 disabled:cursor-not-allowed"
+              className="hover:bg-background rounded-full"
               disabled={disabled}
               onClick={() => onChange(removeValue(values, value))}
+              size="icon-xs"
               type="button"
+              variant="ghost"
             >
               <HugeiconsIcon aria-hidden="true" icon={Cancel01Icon} size={12} />
-            </button>
+            </Button>
           </Badge>
         ))}
       </div>

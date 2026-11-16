@@ -2,9 +2,9 @@
 
 import { SidebarRightIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Button } from "@notra/ui/components/ui/button";
 import { useTranslations } from "use-intl";
 
+import { Button } from "@/components/button";
 import { useRightPanel } from "@/components/dashboard/right-panel-context";
 import { AgentIcon } from "@/components/icons/agent-icon";
 import {

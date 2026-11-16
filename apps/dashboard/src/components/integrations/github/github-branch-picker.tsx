@@ -7,7 +7,6 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@notra/ui/components/ui/popover";
-import { Spinner } from "@notra/ui/components/ui/spinner";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -98,17 +97,13 @@ export function GitHubBranchPicker({
               repository: `${repository.owner}/${repository.repo}`,
             })}
             className="max-w-52 min-w-0 gap-1.5 font-normal"
-            disabled={isPending}
+            loading={isPending}
             size="sm"
             variant="outline"
           />
         }
       >
-        {isPending ? (
-          <Spinner className="size-3.5" />
-        ) : (
-          <HugeiconsIcon className="size-3.5" icon={GitBranchIcon} />
-        )}
+        <HugeiconsIcon className="size-3.5" icon={GitBranchIcon} />
         <span
           className="truncate"
           title={repository.defaultBranch ?? undefined}

@@ -1,8 +1,8 @@
 "use client";
 
-import { Button } from "@notra/ui/components/ui/button";
 import { useMemo, useState } from "react";
 
+import { Button } from "@/components/button";
 import { DesignSystemFrame } from "@/components/design-system/design-system-frame";
 import { AiTrafficCard } from "@/components/geo/ai-traffic-card";
 import { DESIGN_SYSTEM_TRAFFIC_RESPONSE } from "@/constants/design-system-traffic";

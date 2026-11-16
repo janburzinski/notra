@@ -9,7 +9,6 @@ import {
   InputGroupButton,
   InputGroupInput,
 } from "@notra/ui/components/ui/input-group";
-import { Spinner } from "@notra/ui/components/ui/spinner";
 import {
   Tooltip,
   TooltipContent,
@@ -96,33 +95,26 @@ export function SiteAssetField({
                 <TooltipTrigger
                   render={
                     <InputGroupButton
-                      aria-busy={upload.uploading}
                       aria-label={t("uploadLabel", { label })}
                       className="group/thumb relative overflow-hidden"
-                      disabled={upload.uploading}
+                      loading={upload.uploading}
                       onClick={() => inputRef.current?.click()}
                       size="icon-xs"
                       variant="outline"
                     />
                   }
                 >
-                  {upload.uploading ? (
-                    <Spinner className="size-3" />
-                  ) : (
-                    <>
-                      {thumbnail}
-                      {showImage ? (
-                        <span className="bg-background/80 absolute inset-0 flex items-center justify-center opacity-0 transition-opacity group-hover/thumb:opacity-100 group-focus-visible/thumb:opacity-100">
-                          <HugeiconsIcon
-                            aria-hidden="true"
-                            className="size-3.5"
-                            icon={Upload04Icon}
-                            strokeWidth={1.8}
-                          />
-                        </span>
-                      ) : null}
-                    </>
-                  )}
+                  {thumbnail}
+                  {showImage ? (
+                    <span className="bg-background/80 absolute inset-0 flex items-center justify-center opacity-0 transition-opacity group-hover/thumb:opacity-100 group-focus-visible/thumb:opacity-100">
+                      <HugeiconsIcon
+                        aria-hidden="true"
+                        className="size-3.5"
+                        icon={Upload04Icon}
+                        strokeWidth={1.8}
+                      />
+                    </span>
+                  ) : null}
                 </TooltipTrigger>
                 <TooltipContent>{uploadHint}</TooltipContent>
               </Tooltip>

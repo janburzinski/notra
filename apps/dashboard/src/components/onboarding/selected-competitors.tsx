@@ -4,6 +4,7 @@ import { Cancel01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { useTranslations } from "use-intl";
 
+import { Button } from "@/components/button";
 import { CompetitorBrandLogo } from "@/components/onboarding/competitor-brand-logo";
 import type { SelectedCompetitorsProps } from "@/types/onboarding";
 
@@ -39,15 +40,17 @@ export function SelectedCompetitors({
               name={entry.name}
             />
             <span className="max-w-40 truncate">{entry.name}</span>
-            <button
+            <Button
               aria-label={tCommon("labels.removeName", { name: entry.name })}
-              className="text-muted-foreground hover:bg-muted hover:text-foreground cursor-pointer rounded-full p-0.5 disabled:cursor-not-allowed"
+              className="text-muted-foreground size-5 rounded-full"
               disabled={disabled}
               onClick={() => onRemove(entry)}
+              size="icon-xs"
               type="button"
+              variant="ghost"
             >
               <HugeiconsIcon icon={Cancel01Icon} size={12} />
-            </button>
+            </Button>
           </li>
         ))}
       </ul>

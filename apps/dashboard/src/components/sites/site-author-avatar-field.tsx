@@ -65,8 +65,7 @@ export function SiteAuthorAvatarField({
             />
             <div className="flex flex-wrap gap-2">
               <Button
-                aria-busy={upload.uploading}
-                disabled={upload.uploading}
+                loading={upload.uploading}
                 onClick={() => fileRef.current?.click()}
                 size="sm"
                 type="button"

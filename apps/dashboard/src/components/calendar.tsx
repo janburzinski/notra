@@ -6,7 +6,6 @@ import {
   ArrowRight01Icon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Button, buttonVariants } from "@notra/ui/components/ui/button";
 import type * as React from "react";
 import { useEffect, useRef } from "react";
 import {
@@ -16,6 +15,7 @@ import {
 } from "react-day-picker";
 import { useLocale, useTranslations } from "use-intl";
 
+import { Button, buttonVariants } from "@/components/button";
 import { useDateFnsLocale } from "@/lib/i18n/date-fns";
 import { cn } from "@/lib/utils";
 

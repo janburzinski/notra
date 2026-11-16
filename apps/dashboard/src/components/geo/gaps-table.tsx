@@ -219,7 +219,7 @@ function WriteCell({
               <Button
                 aria-label={t("ignore")}
                 className="text-muted-foreground"
-                disabled={isIgnoring}
+                loading={isIgnoring}
                 onClick={(event) => {
                   event.stopPropagation();
                   onIgnore();
@@ -229,18 +229,14 @@ function WriteCell({
               />
             }
           >
-            {isIgnoring ? (
-              <Spinner className="size-3.5" />
-            ) : (
-              <HugeiconsIcon icon={ViewOffSlashIcon} size={15} />
-            )}
+            <HugeiconsIcon icon={ViewOffSlashIcon} size={15} />
           </TooltipTrigger>
           <TooltipContent>{t("ignore")}</TooltipContent>
         </Tooltip>
       ) : null}
       {onIgnore && !compact ? (
         <Button
-          disabled={isIgnoring}
+          loading={isIgnoring}
           onClick={(event) => {
             event.stopPropagation();
             onIgnore();
@@ -248,7 +244,6 @@ function WriteCell({
           size="sm"
           variant="ghost"
         >
-          {isIgnoring ? <Spinner className="size-3.5" /> : null}
           {t("ignore")}
         </Button>
       ) : null}
@@ -356,7 +351,7 @@ function SearchWriteCell({
     return (
       <span className="inline-flex items-center gap-1.5">
         <Button
-          disabled={isDismissing}
+          loading={isDismissing}
           onClick={(event) => {
             event.stopPropagation();
             onDismiss();
@@ -364,7 +359,6 @@ function SearchWriteCell({
           size="sm"
           variant="ghost"
         >
-          {isDismissing ? <Spinner className="size-3.5" /> : null}
           {tCommon("labels.dismiss")}
         </Button>
         <Button
@@ -568,8 +562,7 @@ function GapsEmpty({ kind, isScanning, onRunScan }: GeoGapsEmptyProps) {
   let action = null;
   if (kind === "no-scan") {
     action = (
-      <Button disabled={isScanning} onClick={onRunScan}>
-        {isScanning ? <Spinner className="size-3.5" /> : null}
+      <Button loading={isScanning} onClick={onRunScan}>
         {tGeoShared("runScan")}
       </Button>
     );

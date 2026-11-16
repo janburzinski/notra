@@ -31,7 +31,6 @@ import {
   ResponsiveDialogHeader,
   ResponsiveDialogTitle,
 } from "@notra/ui/components/shared/responsive-dialog";
-import { Button, buttonVariants } from "@notra/ui/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -59,6 +58,7 @@ import { toast } from "sonner";
 import { useTranslations } from "use-intl";
 
 import { ChatArtifactDocument } from "@/components/artifacts/chat-artifact-document";
+import { Button, buttonVariants } from "@/components/button";
 import { useChatQuote } from "@/components/chat/chat-quote";
 import { ContentStatusBadge } from "@/components/content/overview/content-status-badge";
 import { RightPanel } from "@/components/dashboard/right-panel";
@@ -295,20 +295,21 @@ function ChatContentPanelTabSurface({
           {title}
         </span>
       </button>
-      <button
+      <Button
         aria-label={t("closeTab", { title })}
         className={cn(
-          "text-muted-foreground hover:text-foreground focus-visible:ring-ring absolute top-1/2 right-1 flex size-5 -translate-y-1/2 cursor-pointer items-center justify-center rounded outline-none focus-visible:ring-2",
+          "text-muted-foreground absolute top-1/2 right-1 size-5 -translate-y-1/2",
           isActive || isOverlay
             ? "opacity-100"
             : "opacity-0 group-hover/tab:opacity-100 focus-visible:opacity-100"
         )}
         onClick={onClose}
+        size="icon-xs"
         tabIndex={isOverlay ? -1 : undefined}
-        type="button"
+        variant="ghost"
       >
         <HugeiconsIcon className="size-3" icon={Cancel01Icon} strokeWidth={2} />
-      </button>
+      </Button>
     </div>
   );
 }

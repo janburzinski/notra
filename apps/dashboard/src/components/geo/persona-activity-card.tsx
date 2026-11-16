@@ -7,6 +7,7 @@ import { useState } from "react";
 import { InstrumentEmpty, InstrumentModule } from "ui/card";
 import { useLocale, useTranslations } from "use-intl";
 
+import { Button } from "@/components/button";
 import { EmptyStateTrendPreview } from "@/components/empty-state-preview";
 import { GeoRangePicker } from "@/components/geo/geo-range-picker";
 import { GeoStatDelta } from "@/components/geo/geo-stat-delta";
@@ -93,15 +94,15 @@ export function PersonaActivityCard({
       {isError ? (
         <div className="flex h-64 flex-col items-center justify-center gap-3 text-sm">
           <p>{t("loadFailed")}</p>
-          <button
+          <Button
             type="button"
-            className="underline underline-offset-4"
             onClick={() => {
               refetch();
             }}
+            variant="outline"
           >
             {tCommon("tryAgain")}
-          </button>
+          </Button>
         </div>
       ) : null}
       {!isPending && !isError && data && hasResults ? (

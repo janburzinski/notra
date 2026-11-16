@@ -9,7 +9,6 @@ import {
 import { HugeiconsIcon } from "@hugeicons/react";
 import type { BlogPostSubtype } from "@notra/db/types/content";
 import { Badge } from "@notra/ui/components/ui/badge";
-import { Button } from "@notra/ui/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,6 +19,7 @@ import {
 import { memo, useState } from "react";
 import { useTranslations } from "use-intl";
 
+import { Button } from "@/components/button";
 import { ContentDeleteDialog } from "@/components/content/content-delete-dialog";
 import Image from "@/components/framework/image";
 import Link from "@/components/framework/link";

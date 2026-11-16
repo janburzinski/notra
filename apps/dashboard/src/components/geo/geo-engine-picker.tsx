@@ -9,7 +9,6 @@ import {
 } from "@notra/geo-core/utils/geo-engines";
 import { isGeoOlostepEngine } from "@notra/geo-core/utils/geo-olostep";
 import { ConfirmDialog } from "@notra/ui/components/shared/confirm-dialog";
-import { Button } from "@notra/ui/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -22,6 +21,7 @@ import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { toast } from "sonner";
 import { useTranslations } from "use-intl";
 
+import { Button } from "@/components/button";
 import { EngineIcon } from "@/components/geo/engine-icon";
 import { ZDR_CHECKOUT_SUCCESS_PARAM } from "@/constants/billing";
 import { cn } from "@/lib/utils";

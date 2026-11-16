@@ -161,11 +161,12 @@ export function ContentInlineComment({
                       className="bg-background text-foreground flex items-center gap-1 rounded-xl border p-1 shadow-lg outline-none"
                     >
                       {INLINE_COMMENT_REACTIONS.map(({ emoji, key }) => (
-                        <button
+                        <Button
                           key={emoji}
-                          type="button"
                           aria-label={t(`reactions.${key}`)}
-                          className="hover:bg-muted focus-visible:ring-ring/50 duration-fast inline-flex size-8 items-center justify-center rounded-md text-lg transition-[background-color,scale] ease-out outline-none focus-visible:ring-2 active:scale-90 motion-reduce:transition-none"
+                          className="text-lg"
+                          size="icon"
+                          variant="ghost"
                           disabled={disabled}
                           onClick={() => {
                             onReact(
@@ -181,7 +182,7 @@ export function ContentInlineComment({
                           }}
                         >
                           {emoji}
-                        </button>
+                        </Button>
                       ))}
                     </Popover.Popup>
                   </Popover.Positioner>

@@ -215,13 +215,12 @@ export function VoiceSelector({
                 {(hasName) => (
                   <Button
                     className="w-full justify-center sm:w-auto"
-                    disabled={!hasName || updateMutation.isPending}
+                    disabled={!hasName}
+                    loading={updateMutation.isPending}
                     type="submit"
                     data-dialog-confirm
                   >
-                    {updateMutation.isPending
-                      ? tCommon("saving")
-                      : tCommon("save")}
+                    {tCommon("save")}
                   </Button>
                 )}
               </renameForm.Subscribe>
@@ -263,14 +262,14 @@ export function VoiceSelector({
             </ResponsiveDialogClose>
             <Button
               className="w-full justify-center sm:w-auto"
-              disabled={isDeleting}
+              loading={isDeleting}
               onClick={() => {
                 onDelete();
                 onDeleteDialogChange(false);
               }}
               variant="destructive"
             >
-              {isDeleting ? tCommon("deleting") : t("deleteIdentity")}
+              {t("deleteIdentity")}
             </Button>
           </ResponsiveDialogFooter>
         </ResponsiveDialogContent>

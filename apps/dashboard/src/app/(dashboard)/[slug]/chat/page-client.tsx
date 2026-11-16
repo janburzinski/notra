@@ -17,7 +17,6 @@ import type {
 } from "@notra/ai/types/chat";
 import { linkSavedChatPosts } from "@notra/ai/utils/chat-post";
 import { POSTHOG_EVENTS } from "@notra/posthog/events";
-import { Button } from "@notra/ui/components/ui/button";
 import { Skeleton } from "@notra/ui/components/ui/skeleton";
 import {
   Tooltip,
@@ -61,6 +60,7 @@ import {
 import { useLocale, useTranslations } from "use-intl";
 
 import { ChatDraftStreamingPreview } from "@/components/ai/chat-draft-streaming-preview";
+import { Button } from "@/components/button";
 import { ChatContentPanel } from "@/components/chat/chat-content-panel";
 import { ChatConversation } from "@/components/chat/chat-conversation";
 import { ChatHomeSuggestions } from "@/components/chat/chat-home-suggestions";

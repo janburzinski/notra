@@ -1,6 +1,6 @@
 "use client";
 
-import { Download01Icon, Loading03Icon } from "@hugeicons/core-free-icons";
+import { Download01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   Tooltip,
@@ -62,7 +62,7 @@ export function ChartDownloadButton({ className }: { className?: string }) {
           <Button
             aria-label={tCommon("actions.export")}
             className={className}
-            disabled={isDownloading}
+            loading={isDownloading}
             onClick={handleDownload}
             size="icon"
             type="button"
@@ -70,11 +70,7 @@ export function ChartDownloadButton({ className }: { className?: string }) {
           />
         }
       >
-        <HugeiconsIcon
-          className={isDownloading ? "animate-spin" : undefined}
-          icon={isDownloading ? Loading03Icon : Download01Icon}
-          size={14}
-        />
+        <HugeiconsIcon icon={Download01Icon} size={14} />
       </TooltipTrigger>
       <TooltipContent side="left">{tCommon("actions.export")}</TooltipContent>
     </Tooltip>

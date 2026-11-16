@@ -1,12 +1,12 @@
 "use client";
 
-import { Button } from "@notra/ui/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@notra/ui/components/ui/tabs";
 import { useState } from "react";
 import { InstrumentSection } from "ui/card";
 import { DataTable } from "ui/table";
 import { useTranslations } from "use-intl";
 
+import { Button } from "@/components/button";
 import { McpTableEmpty } from "@/components/mcp/mcp-sheet-parts";
 import {
   MCP_LOG_FILTERS,

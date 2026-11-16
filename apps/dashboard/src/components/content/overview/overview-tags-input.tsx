@@ -10,6 +10,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useId, useState } from "react";
 import { useTranslations } from "use-intl";
 
+import { Button } from "@/components/button";
 import { TAG_SUGGESTION_COUNT } from "@/constants/content-overview";
 import { dashboardOrpc } from "@/lib/orpc/query";
 import type { OverviewTagsInputProps } from "@/types/content/overview";
@@ -66,18 +67,19 @@ export function OverviewTagsInput({
             key={tag}
           >
             {tag}
-            <button
+            <Button
               aria-label={t("remove", { tag })}
-              className="text-muted-foreground hover:text-foreground inline-flex size-5 cursor-pointer items-center justify-center rounded"
+              className="text-muted-foreground size-5"
               onClick={() => onChange(tags.filter((item) => item !== tag))}
-              type="button"
+              size="icon-xs"
+              variant="ghost"
             >
               <HugeiconsIcon
                 className="size-3"
                 icon={Cancel01Icon}
                 strokeWidth={2}
               />
-            </button>
+            </Button>
           </span>
         ))}
         {full ? null : (

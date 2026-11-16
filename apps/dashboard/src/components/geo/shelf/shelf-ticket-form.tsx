@@ -17,6 +17,7 @@ import { Textarea } from "@notra/ui/components/ui/textarea";
 import { useEffect, useId, useRef, useState } from "react";
 import { useTranslations } from "use-intl";
 
+import { Button } from "@/components/button";
 import { ShelfDueDateField } from "@/components/geo/shelf/shelf-due-date-field";
 import { ShelfMemberSelect } from "@/components/geo/shelf/shelf-member-select";
 import { ShelfTicketMark } from "@/components/geo/shelf/shelf-ticket-badge";
@@ -173,14 +174,16 @@ export function ShelfTicketForm({
         <span className="flex items-center justify-between">
           <Label htmlFor={`${id}-assignee`}>{t("assignee")}</Label>
           {currentMemberId && assigneeMemberId !== currentMemberId ? (
-            <button
-              className="text-muted-foreground hover:text-foreground text-xs underline-offset-4 hover:underline"
+            <Button
+              className="text-muted-foreground hover:text-foreground h-auto px-0 text-xs"
               disabled={disabled}
               onClick={() => onChange({ assigneeMemberId: currentMemberId })}
+              size="xs"
               type="button"
+              variant="link"
             >
               {tLabels("assignToMe")}
-            </button>
+            </Button>
           ) : null}
         </span>
         <ShelfMemberSelect

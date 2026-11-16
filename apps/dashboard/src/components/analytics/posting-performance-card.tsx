@@ -2,7 +2,6 @@
 
 import { ArrowLeft01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Button } from "@notra/ui/components/ui/button";
 import { SPRING } from "@notra/ui/lib/motion";
 import { domAnimation, LazyMotion, m, useReducedMotion } from "motion/react";
 import { useMemo, useState } from "react";
@@ -10,6 +9,7 @@ import { InstrumentEmpty, InstrumentModule } from "ui/card";
 import { useFormatter, useLocale, useTranslations } from "use-intl";
 
 import { CursorTooltip } from "@/components/analytics/cursor-tooltip";
+import { Button } from "@/components/button";
 import { POSTING_ACTIVITY_BAR_CLASSES } from "@/constants/analytics";
 import {
   DAY_MS,

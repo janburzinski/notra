@@ -574,11 +574,11 @@ export function GitHubDirectoryPicker({
           </ResponsiveDialogClose>
           <Button
             data-dialog-confirm
-            disabled={isSaving}
+            loading={isSaving}
             onClick={handleSave}
             type="button"
           >
-            {isSaving ? tCommon("actions.saving") : t("useFolder")}
+            {t("useFolder")}
           </Button>
         </ResponsiveDialogFooter>
       </ResponsiveDialogContent>

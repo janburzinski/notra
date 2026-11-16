@@ -589,10 +589,10 @@ function CreateSkillFormDialog({
           />
           <Button
             data-dialog-confirm
-            disabled={createPending}
+            loading={createPending}
             onClick={() => form.handleSubmit()}
           >
-            {createPending ? tCommon("creating") : tSkillsShared("createSkill")}
+            {tSkillsShared("createSkill")}
           </Button>
         </ResponsiveDialogFooter>
       </ResponsiveDialogContent>

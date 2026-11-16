@@ -1,9 +1,9 @@
 "use client";
 
-import { Button } from "@notra/ui/components/ui/button";
 import { useEffect, useState } from "react";
 
 import { ChatTodoList } from "@/components/ai/chat-todo-list";
+import { Button } from "@/components/button";
 import {
   DESIGN_SYSTEM_TODO_LIVE_STEP_MS,
   DESIGN_SYSTEM_TODO_LIVE_STEPS,

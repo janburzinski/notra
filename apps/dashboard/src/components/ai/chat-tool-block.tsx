@@ -29,7 +29,6 @@ import {
   AvatarFallback,
   AvatarImage,
 } from "@notra/ui/components/ui/avatar";
-import { Button } from "@notra/ui/components/ui/button";
 import {
   Collapsible,
   CollapsibleContent,
@@ -39,6 +38,7 @@ import { cn } from "@notra/ui/lib/utils";
 import { useState } from "react";
 import { useTranslations } from "use-intl";
 
+import { Button } from "@/components/button";
 import { McpIcon } from "@/components/integrations/mcp-icon";
 import { ARTIFACT_FILE_TITLE } from "@/constants/artifacts";
 import { CHAT_TOOL_LABEL_ALIASES } from "@/constants/chat-tool-labels";

@@ -11,6 +11,7 @@ import { Separator } from "@notra/ui/components/ui/separator";
 import { useSidebar } from "@notra/ui/components/ui/sidebar";
 import { useTranslations } from "use-intl";
 
+import { Button } from "@/components/button";
 import { useCommandPalette } from "@/components/command-palette/command-palette-context";
 import { BrandTopbarIdentitySelector } from "@/components/dashboard/brand-topbar-identity-selector";
 import { ChatTopbarTitle } from "@/components/dashboard/chat-topbar-title";
@@ -60,14 +61,16 @@ export function SiteHeader() {
         <div className="flex min-w-0 items-center gap-1">
           <HeaderActionsOutlet />
           {isMobile ? (
-            <button
+            <Button
               aria-label={tCommon("actions.search")}
-              className="text-muted-foreground hover:bg-muted/50 hover:text-foreground inline-flex size-7 items-center justify-center rounded-lg"
+              className="text-muted-foreground"
               onClick={() => setCommandPaletteOpen(true)}
+              size="icon-sm"
               type="button"
+              variant="ghost"
             >
               <HugeiconsIcon icon={SearchIcon} size={14} strokeWidth={1.8} />
-            </button>
+            </Button>
           ) : null}
           {isChatPathname(pathname) ? null : <DashboardAgentButton />}
         </div>

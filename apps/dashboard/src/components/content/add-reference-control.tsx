@@ -8,11 +8,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@notra/ui/components/ui/dropdown-menu";
-import { Spinner } from "@notra/ui/components/ui/spinner";
 import { useTranslations } from "use-intl";
 
-import { Button, buttonVariants } from "@/components/button";
-import { cn } from "@/lib/utils";
+import { Button } from "@/components/button";
 import type { AddReferenceControlProps } from "@/types/content/post-social";
 
 export function AddReferenceControl({
@@ -37,10 +35,8 @@ export function AddReferenceControl({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
-        className={cn(buttonVariants({ variant: "outline" }))}
-        disabled={isPending}
+        render={<Button loading={isPending} variant="outline" />}
       >
-        {isPending ? <Spinner /> : null}
         {t("addAsReference")}
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">

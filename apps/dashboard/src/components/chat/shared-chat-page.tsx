@@ -16,7 +16,6 @@ import {
   MessageContent,
   MessageResponse,
 } from "@notra/ui/components/ai-elements/message";
-import { buttonVariants } from "@notra/ui/components/ui/button";
 import {
   MessageScroller,
   MessageScrollerButton,
@@ -33,6 +32,7 @@ import {
   getMcpToolLabel,
   isMcpToolName,
 } from "@/components/ai/chat-tool-block/mcp/utils";
+import { buttonVariants } from "@/components/button";
 import { ChatMinimapRail } from "@/components/chat/chat-minimap-rail";
 import { SharedChatContinue } from "@/components/chat/shared-chat-continue";
 import Link from "@/components/framework/link";

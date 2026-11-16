@@ -2,7 +2,6 @@
 
 import { ArrowDown01Icon, Calendar03Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Button } from "@notra/ui/components/ui/button";
 import {
   Popover,
   PopoverContent,
@@ -10,6 +9,7 @@ import {
 } from "@notra/ui/components/ui/popover";
 import { useState } from "react";
 
+import { Button } from "@/components/button";
 import { Calendar } from "@/components/calendar";
 import { ANALYTICS_RANGE_PRESETS } from "@/constants/analytics";
 import { useAnalyticsRangeLabels } from "@/lib/hooks/use-analytics-range-labels";

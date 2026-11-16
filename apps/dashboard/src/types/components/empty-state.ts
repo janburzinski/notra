@@ -1,5 +1,6 @@
-import type { Button as UiButton } from "@notra/ui/components/ui/button";
 import type { ComponentProps, ReactNode } from "react";
+
+import type { Button as UiButton } from "@/components/button";
 
 export interface EmptyStateProps extends ComponentProps<"div"> {
   title: string;

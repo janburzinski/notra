@@ -2,7 +2,6 @@
 
 import { ArrowDown01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Button } from "@notra/ui/components/ui/button";
 import {
   Collapsible,
   CollapsibleContent,
@@ -18,6 +17,7 @@ import {
   getToolApprovalTitle,
   JsonView,
 } from "@/components/ai/chat-tool-block";
+import { Button } from "@/components/button";
 import {
   CHAT_APPROVAL_ROW_CLASS,
   CHAT_APPROVAL_ROW_IDLE_CLASS,

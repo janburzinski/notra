@@ -35,7 +35,6 @@ import {
   ResponsiveDialogHeader,
   ResponsiveDialogTitle,
 } from "@notra/ui/components/shared/responsive-dialog";
-import { Spinner } from "@notra/ui/components/ui/spinner";
 import { Effect } from "effect";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -347,10 +346,10 @@ function GeoCsvImportDialog<TRow>({
           <Button
             data-dialog-confirm
             disabled={!canImport}
+            loading={isPending}
             onClick={handleImport}
             type="button"
           >
-            {isPending ? <Spinner className="size-3.5" /> : null}
             {rows.length > 0
               ? t(`kinds.${kind}.importCount`, { count: rows.length })
               : importLabel}

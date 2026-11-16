@@ -2,9 +2,9 @@
 
 import { CheckmarkCircle02Icon, CircleIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Button } from "@notra/ui/components/ui/button";
 import { useTranslations } from "use-intl";
 
+import { Button } from "@/components/button";
 import { DEMO_MISSION_IDS } from "@/constants/demo-missions";
 import type { DemoSandboxInfo } from "@/types/demo";
 

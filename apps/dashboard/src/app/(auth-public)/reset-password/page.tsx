@@ -82,9 +82,13 @@ function ResetPasswordForm() {
             {t("invalidDescription")}
           </p>
         </div>
-        <Link href="/forgot-password">
-          <Button className="w-full">{t("requestNew")}</Button>
-        </Link>
+        <Button
+          className="w-full"
+          nativeButton={false}
+          render={<Link href="/forgot-password" />}
+        >
+          {t("requestNew")}
+        </Button>
         <div className="text-muted-foreground px-8 text-center text-xs">
           <Link
             className="hover:text-primary underline underline-offset-4"
@@ -108,9 +112,13 @@ function ResetPasswordForm() {
             {t("missingDescription")}
           </p>
         </div>
-        <Link href="/forgot-password">
-          <Button className="w-full">{t("requestNew")}</Button>
-        </Link>
+        <Button
+          className="w-full"
+          nativeButton={false}
+          render={<Link href="/forgot-password" />}
+        >
+          {t("requestNew")}
+        </Button>
         <div className="text-muted-foreground px-8 text-center text-xs">
           <Link
             className="hover:text-primary underline underline-offset-4"
@@ -236,12 +244,8 @@ function ResetPasswordForm() {
               <p className="text-muted-foreground mt-2 text-xs">
                 {t("passwordMin")}
               </p>
-              <Button
-                className="mt-4 w-full"
-                disabled={isLoading}
-                type="submit"
-              >
-                {isLoading ? tCommon2("labels.resetting") : t("submit")}
+              <Button className="mt-4 w-full" loading={isLoading} type="submit">
+                {t("submit")}
               </Button>
             </>
           )}

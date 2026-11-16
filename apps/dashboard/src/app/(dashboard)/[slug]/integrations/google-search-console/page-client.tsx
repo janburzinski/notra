@@ -195,11 +195,9 @@ function ChangePropertyDialog({
 
 function SyncNowButton({ busy, onSync }: GoogleSearchConsoleSyncButtonProps) {
   const tCommon2 = useTranslations("common");
-  const label = busy ? tCommon2("labels.syncing") : tCommon2("labels.syncNow");
   return (
-    <Button disabled={busy} onClick={onSync} size="sm" variant="outline">
-      {busy ? <Spinner className="size-3.5" /> : null}
-      {label}
+    <Button loading={busy} onClick={onSync} size="sm" variant="outline">
+      {tCommon2("labels.syncNow")}
     </Button>
   );
 }
@@ -558,12 +556,13 @@ function ConnectionMenu({
       <DropdownMenu>
         <DropdownMenuTrigger
           render={
-            <Button disabled={busy} size="icon-sm" variant="ghost">
-              <HugeiconsIcon
-                aria-label={tIntegrationsShared("moreOptions")}
-                className="size-4"
-                icon={MoreHorizontalIcon}
-              />
+            <Button
+              aria-label={tIntegrationsShared("moreOptions")}
+              disabled={busy}
+              size="icon-sm"
+              variant="ghost"
+            >
+              <HugeiconsIcon className="size-4" icon={MoreHorizontalIcon} />
             </Button>
           }
         />

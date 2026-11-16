@@ -2,7 +2,6 @@
 
 import { PlayIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Button } from "@notra/ui/components/ui/button";
 import { Label } from "@notra/ui/components/ui/label";
 import {
   Select,
@@ -16,6 +15,7 @@ import { Switch } from "@notra/ui/components/ui/switch";
 import { TitleCard } from "@notra/ui/components/ui/title-card";
 import { useTranslations } from "use-intl";
 
+import { Button } from "@/components/button";
 import { UI_SOUND_CATEGORIES, UI_SOUND_VARIANTS } from "@/constants/ui-sounds";
 import { useUiSoundSettings } from "@/lib/hooks/use-ui-sound-settings";
 import { previewUiSound, previewUiSoundVariant } from "@/lib/ui-sounds/player";

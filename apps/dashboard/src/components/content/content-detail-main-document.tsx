@@ -1,10 +1,10 @@
 "use client";
 
 import type { TextSelection } from "@notra/ai/types/chat";
-import { Button } from "@notra/ui/components/ui/button";
 import { Skeleton } from "@notra/ui/components/ui/skeleton";
 import { useTranslations } from "use-intl";
 
+import { Button } from "@/components/button";
 import { ContentPlanView } from "@/components/content/content-plan-view";
 import { ContentEditorSwitch } from "@/components/content/editors";
 import { useOrganizationsContext } from "@/components/providers/organization-provider";

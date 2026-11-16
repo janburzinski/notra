@@ -2,7 +2,6 @@
 
 import { Globe02Icon, UserGroupIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Button } from "@notra/ui/components/ui/button";
 import { CopyButton } from "@notra/ui/components/ui/copy-button";
 import {
   InputGroup,
@@ -26,6 +25,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { useFormatter, useTranslations } from "use-intl";
 
+import { Button } from "@/components/button";
 import { useOrganizationsContext } from "@/components/providers/organization-provider";
 import { dashboardOrpc } from "@/lib/orpc/query";
 import type { ChatShareAccess, ChatShareSummary } from "@/types/chat-share";

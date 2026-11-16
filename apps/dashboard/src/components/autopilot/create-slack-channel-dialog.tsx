@@ -8,7 +8,6 @@ import {
   ResponsiveDialogHeader,
   ResponsiveDialogTitle,
 } from "@notra/ui/components/shared/responsive-dialog";
-import { Button } from "@notra/ui/components/ui/button";
 import {
   InputGroup,
   InputGroupAddon,
@@ -21,6 +20,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useId } from "react";
 import { toast } from "sonner";
 
+import { Button } from "@/components/button";
 import { dashboardOrpc } from "@/lib/orpc/query";
 import type {
   CreateAutopilotSlackChannelProps,

@@ -9,13 +9,13 @@ import {
   ResponsiveDialogHeader,
   ResponsiveDialogTitle,
 } from "@notra/ui/components/shared/responsive-dialog";
-import { Button } from "@notra/ui/components/ui/button";
 import { Field, FieldLabel } from "@notra/ui/components/ui/field";
 import { Input } from "@notra/ui/components/ui/input";
 import { useForm } from "@tanstack/react-form";
 import { toast } from "sonner";
 import { useTranslations } from "use-intl";
 
+import { Button } from "@/components/button";
 import {
   DEMO_PERSONALIZATION_COMPANY_MAX,
   DEMO_PERSONALIZATION_NAME_MAX,

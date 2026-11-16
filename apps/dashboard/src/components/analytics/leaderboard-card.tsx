@@ -7,7 +7,6 @@ import {
   AvatarFallback,
   AvatarImage,
 } from "@notra/ui/components/ui/avatar";
-import { Button } from "@notra/ui/components/ui/button";
 import { Input } from "@notra/ui/components/ui/input";
 import {
   Tooltip,
@@ -23,6 +22,7 @@ import { useTranslations } from "use-intl";
 import { PlatformTabs } from "@/components/analytics/platform-tabs";
 import { ProviderIcon } from "@/components/analytics/provider-icon";
 import { AnalyticsRangePicker } from "@/components/analytics/range-picker";
+import { Button } from "@/components/button";
 import { XVerificationBadge } from "@/components/icons/x-verification-badge";
 import {
   ANALYTICS_PROVIDER_FILTER_VALUES,

@@ -120,10 +120,10 @@ function RemoveItemButton({
   return (
     <Button
       aria-label={label}
-      className="text-muted-foreground size-7 shrink-0 opacity-0 transition-opacity duration-150 ease-out group-focus-within/item:opacity-100 group-hover/item:opacity-100 focus-visible:opacity-100"
+      className="text-muted-foreground shrink-0 opacity-0 group-focus-within/item:opacity-100 group-hover/item:opacity-100 focus-visible:opacity-100"
       onClick={onClick}
       onMouseDown={onMouseDown}
-      size="sm"
+      size="icon-sm"
       type="button"
       variant="ghost"
     >
