@@ -13,8 +13,8 @@ import {
   getAssistantActivityStep,
   getAssistantActivityWaitingStep,
   getActivityGroupDuration,
+  getAssistantActivityForceOpenIds,
   groupAssistantMessageParts,
-  isAssistantActivityForceOpen,
   isAssistantActivityStreaming,
   stackAssistantActivityItems,
 } from "@/utils/group-assistant-message-parts";
@@ -71,11 +71,6 @@ export function ChatAssistantParts({
       isLoading,
       segmentIndex === lastActivityIndex
     );
-    const forceOpen =
-      isAssistantActivityForceOpen(segment.items) ||
-      segment.items.some(
-        ({ part }) => isToolUIPart(part) && part.state === "approval-requested"
-      );
     const details = stackAssistantActivityItems(segment.items)
       .map((item) => {
         if (item.kind === "searches") {
@@ -121,7 +116,7 @@ export function ChatAssistantParts({
           (hasSingleActivityGroup ? durationMs : undefined)
         }
         elapsedSeconds={isStreaming ? elapsedSeconds : undefined}
-        forceOpen={forceOpen}
+        forceOpenIds={getAssistantActivityForceOpenIds(segment.items)}
         groupId={`${messageId}-${segment.startIndex}`}
         hasDetails={details.length > 0}
         isLoading={isStreaming}

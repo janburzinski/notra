@@ -206,17 +206,19 @@ export function getAssistantActivityStep(
   return "thinking";
 }
 
-export function isAssistantActivityForceOpen(
+/** The tool calls that open their group: failed ones and approval requests. */
+export function getAssistantActivityForceOpenIds(
   items: AssistantPartRef[]
-): boolean {
-  return items.some(({ part }) => {
+): string[] {
+  return items.flatMap(({ part }) => {
     if (!isToolUIPart(part)) {
-      return false;
+      return [];
     }
-    if (part.state === "output-error") {
-      return true;
-    }
-    return part.state === "output-available" && isFailedToolOutput(part.output);
+    const opens =
+      part.state === "output-error" ||
+      part.state === "approval-requested" ||
+      (part.state === "output-available" && isFailedToolOutput(part.output));
+    return opens ? [part.toolCallId] : [];
   });
 }
 

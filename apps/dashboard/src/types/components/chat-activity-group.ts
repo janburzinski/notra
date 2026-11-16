@@ -33,7 +33,10 @@ export interface ChatActivityGroupProps {
   defaultOpen?: boolean;
   durationMs?: number;
   elapsedSeconds?: number;
+  /** Keeps the group open, for previews that always show their details. */
   forceOpen?: boolean;
+  /** Tool calls that open the group once each, e.g. a failure or approval. */
+  forceOpenIds?: readonly string[];
   groupId: string;
   hasDetails: boolean;
   isLoading: boolean;
@@ -69,7 +72,7 @@ export interface ChatAssistantPartsProps {
 
 export interface ChatActivityGroupOpenOptions {
   defaultOpen: boolean;
-  forceOpen: boolean;
+  openTriggers: readonly string[];
   isLoading: boolean;
   isStreaming: boolean;
 }

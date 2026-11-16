@@ -41,6 +41,9 @@ import {
 } from "@/utils/chat-search-activity";
 import { formatElapsedSeconds } from "@/utils/format-elapsed-seconds";
 
+const NO_FORCE_OPEN_IDS: readonly string[] = [];
+const FORCE_OPEN_TRIGGER = "force-open";
+
 const NESTED_ROW_CLASSNAME =
   "text-muted-foreground flex min-w-0 items-center gap-2 text-sm leading-5";
 
@@ -129,26 +132,35 @@ function useActivityLabel({
  */
 function useActivityGroupOpen({
   defaultOpen,
-  forceOpen,
+  openTriggers,
   isLoading,
   isStreaming,
 }: ChatActivityGroupOpenOptions) {
-  const [isOpen, setIsOpen] = useState(forceOpen || isStreaming || defaultOpen);
+  const hasOpenTrigger = openTriggers.length > 0;
+  const [isOpen, setIsOpen] = useState(
+    hasOpenTrigger || isStreaming || defaultOpen
+  );
   const [hasInteracted, setHasInteracted] = useState(false);
+  const [seenTriggers, setSeenTriggers] = useState(openTriggers);
 
-  if (forceOpen && !isOpen) {
+  // Each failed tool or approval request opens the group once when it
+  // appears; the user can still close it afterwards.
+  const seenTriggerSet = new Set(seenTriggers);
+  const newTriggers = openTriggers.filter((id) => !seenTriggerSet.has(id));
+  if (newTriggers.length > 0) {
+    setSeenTriggers([...seenTriggers, ...newTriggers]);
     setIsOpen(true);
   }
 
   useEffect(() => {
-    if (isLoading || forceOpen || defaultOpen || hasInteracted) {
+    if (isLoading || hasOpenTrigger || defaultOpen || hasInteracted) {
       return;
     }
     const closeTimer = window.setTimeout(() => {
       setIsOpen(false);
     }, ACTIVITY_AUTO_CLOSE_DELAY_MS);
     return () => window.clearTimeout(closeTimer);
-  }, [defaultOpen, forceOpen, hasInteracted, isLoading]);
+  }, [defaultOpen, hasOpenTrigger, hasInteracted, isLoading]);
 
   return {
     isOpen,
@@ -165,6 +177,7 @@ export function ChatActivityGroup({
   durationMs,
   elapsedSeconds,
   forceOpen = false,
+  forceOpenIds = NO_FORCE_OPEN_IDS,
   groupId,
   hasDetails,
   isLoading,
@@ -185,7 +198,9 @@ export function ChatActivityGroup({
   });
   const { isOpen, onOpenChange } = useActivityGroupOpen({
     defaultOpen,
-    forceOpen,
+    openTriggers: forceOpen
+      ? [FORCE_OPEN_TRIGGER, ...forceOpenIds]
+      : forceOpenIds,
     isLoading,
     isStreaming,
   });
