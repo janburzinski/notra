@@ -1,7 +1,7 @@
 import { detectAgent, negotiateFormat } from "@usenotra/agentside";
 import { classifyUserAgent } from "@usenotra/sdk/classify";
 
-import { PROXY_EXCLUDED_PATH_PREFIXES } from "../constants/proxy";
+import { PROXY_EXCLUDED_PATH_PREFIXES } from "../constants/proxy.js";
 
 export function isProxiedPath(pathname: string) {
   if (pathname === "/api" || pathname === "/favicon.ico") {

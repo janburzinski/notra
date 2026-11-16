@@ -2,8 +2,11 @@ import { Tracker } from "@usenotra/sdk/geo";
 import { waitUntil } from "@vercel/functions";
 import { rewrite } from "@vercel/functions/middleware";
 
-import { AGENT_BYPASS_PARAM, GEO_INGEST_ENDPOINT } from "./src/constants/proxy";
-import { isAgentRequest, isProxiedPath } from "./src/utils/proxy-paths";
+import {
+  AGENT_BYPASS_PARAM,
+  GEO_INGEST_ENDPOINT,
+} from "./src/constants/proxy.js";
+import { isAgentRequest, isProxiedPath } from "./src/utils/proxy-paths.js";
 
 const geoTracker = new Tracker({
   token: process.env.NOTRA_GEO_TOKEN ?? "",
@@ -11,6 +14,7 @@ const geoTracker = new Tracker({
 });
 
 export const config = {
+  runtime: "nodejs",
   matcher: [
     "/((?!assets/|_serverFn/|api/|docs$|docs/|blog/_notra/|\\.well-known/oauth-authorization-server$|\\.well-known/openid-configuration$).*)",
   ],
