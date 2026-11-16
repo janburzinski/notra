@@ -16,7 +16,7 @@ import type {
   GeoGroundedInvocation,
   GeoGroundedInvocationOptions,
 } from "../types/geo";
-import { geoAnthropicWebSearch } from "../utils/geo-anthropic-web-search";
+import { geoAnthropicWebTools } from "../utils/geo-anthropic-web-tools";
 
 export function buildGroundedInvocation(
   engine: GeoGroundedEngine,
@@ -38,12 +38,7 @@ export function buildGroundedInvocation(
     case "gateway-anthropic":
       return {
         model: gateway(engine.model, routed),
-        tools: {
-          web_search: geoAnthropicWebSearch(
-            engine.model,
-            options.zdr === "none"
-          ),
-        },
+        tools: geoAnthropicWebTools(engine.model, options.zdr === "none"),
       };
     case "gateway-google":
       return {
@@ -85,12 +80,7 @@ export function buildGroundedInvocation(
       });
       return {
         model: provider(engine.model),
-        tools: {
-          web_search: geoAnthropicWebSearch(
-            engine.model,
-            options.zdr === "none"
-          ),
-        },
+        tools: geoAnthropicWebTools(engine.model, options.zdr === "none"),
       };
     }
     default: {
