@@ -307,6 +307,38 @@ if (process.env.NOTRA_AUTOPILOT_SANDBOX_TEST !== "1") {
     }
   });
 
+  test("the Slack brief reads like a message: summary, lead, items and the page link", async () => {
+    const claim = await claimFinding("sandbox-org", "item-run", proposal);
+    if (!claim) {
+      throw new Error("Expected a claim");
+    }
+    const brief = buildAutopilotBrief({
+      organizationSlug: "sandbox",
+      timezone: "Europe/Berlin",
+      proposed: [claim.finding],
+      merged: [],
+      insights: ["Rival gained two citations"],
+      page: {
+        url: "https://app.example.com/brief/b1",
+        headline: "Comparison page missing",
+        summary: "AI answers name Rival in 4 of 5 comparison prompts.",
+        lead: { findingId: claim.finding.id, why: "Rival is gaining fast." },
+      },
+    });
+    const shown = JSON.stringify(brief?.blocks);
+    expect(shown).toContain("*Comparison page missing*");
+    expect(shown).toContain("AI answers name Rival in 4 of 5");
+    expect(shown).toContain("*Start with*");
+    expect(shown).toContain("Rival is gaining fast.");
+    expect(shown).toContain("Waiting on you (1 ready to merge)");
+    expect(shown).toContain("Rival gained two citations");
+    expect(shown).toContain(
+      "<https://app.example.com/brief/b1|Read the full brief>"
+    );
+    expect(shown).not.toContain("accessory");
+    expect(brief?.text).toContain("AI answers name Rival in 4 of 5");
+  });
+
   const heldFinding = async (publishAt: Date) => {
     const claim = await claimFinding("sandbox-org", "item-run", proposal);
     if (!claim) {

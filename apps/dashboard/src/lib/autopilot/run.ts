@@ -403,7 +403,14 @@ export async function deliverAutopilotBrief(params: {
       ),
       insights: page.content.insights,
       recentDays: await loadRecentDailyNotes(ctx.organizationId),
-      page: { url: pageUrl, headline: page.content.headline },
+      page: {
+        url: pageUrl,
+        headline: page.content.headline,
+        // The fallback summary only says to act below, which the message does.
+        summary:
+          page.content.writtenBy === "agent" ? page.content.summary : undefined,
+        lead: page.content.lead,
+      },
     });
     if (!brief) {
       // Only on a retry whose items were all decided in the meantime.
