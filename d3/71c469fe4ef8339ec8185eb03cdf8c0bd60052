@@ -1,0 +1,23 @@
+apps/blog/blog/notra-web-analytics.mdx
+  s_c337364fc4908c::t_5e0761b7b8d835 45
+apps/blog/blog/notra-sites-public-api.mdx
+  s_c337364fc4908c::t_5e0761b7b8d835 93
+apps/blog/snippets/diagrams.jsx
+  s_c337364fc4908c::t_267371c3044f3d 58-72,74-81,85-92,101-114,119-129,132-135,138-141,144-147,152-158
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "d371c469fe4ef8339ec8185eb03cdf8c0bd60052",
+  "prompts": {},
+  "sessions": {
+    "s_c337364fc4908c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e8c5049d-71cb-4242-87ee-3e1d3d41b9f8",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
