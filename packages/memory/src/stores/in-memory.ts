@@ -1,5 +1,6 @@
 import { createHash } from "node:crypto";
 
+import { MEMORY_COMPACT_MESSAGE } from "../constants/memory";
 import type {
   InMemoryCommit,
   MemoryCommitInfo,
@@ -13,6 +14,8 @@ export function createInMemoryStore(): MemoryStore & {
   commits(organizationId: string): readonly MemoryCommitInfo[];
 } {
   const repos = new Map<string, InMemoryCommit[]>();
+  // Shas never repeat, even after compaction shortens a history.
+  let sequence = 0;
   const tip = (organizationId: string) => repos.get(organizationId)?.at(-1);
   const at = (organizationId: string, ref: string) =>
     repos.get(organizationId)?.find((commit) => commit.sha === ref) ??
@@ -39,8 +42,9 @@ export function createInMemoryStore(): MemoryStore & {
         }
       }
       const commits = repos.get(organizationId) ?? [];
+      sequence += 1;
       const sha = createHash("sha1")
-        .update(`${organizationId}:${commits.length}:${input.message}`)
+        .update(`${organizationId}:${sequence}:${input.message}`)
         .digest("hex");
       commits.push({
         sha,
@@ -55,6 +59,32 @@ export function createInMemoryStore(): MemoryStore & {
     deleteRepo: async (organizationId, signal) => {
       signal?.throwIfAborted();
       repos.delete(organizationId);
+    },
+    compactHistory: async ({ now, signal, maxAgeMs, limit }) => {
+      let compacted = 0;
+      for (const [organizationId, commits] of repos) {
+        const [first] = commits;
+        const current = commits.at(-1);
+        if (
+          !(first && current) ||
+          commits.length < 2 ||
+          Date.parse(first.date) >= now.getTime() - maxAgeMs
+        ) {
+          continue;
+        }
+        if (signal.aborted || compacted >= limit) {
+          break;
+        }
+        repos.set(organizationId, [
+          {
+            ...current,
+            message: MEMORY_COMPACT_MESSAGE,
+            date: now.toISOString(),
+          },
+        ]);
+        compacted += 1;
+      }
+      return { compacted, deleted: 0, failed: 0 };
     },
     commits: (organizationId) => repos.get(organizationId) ?? [],
   };

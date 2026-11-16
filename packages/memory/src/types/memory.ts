@@ -38,6 +38,29 @@ export interface MemoryStore {
   commit(organizationId: string, input: MemoryCommitInput): Promise<string>;
   /** Idempotent; rejects with the signal's reason once it aborts. */
   deleteRepo(organizationId: string, signal?: AbortSignal): Promise<void>;
+  /**
+   * Drops the history of every workspace memory older than `maxAgeMs`,
+   * keeping its current files, and deletes generations it replaced.
+   */
+  compactHistory(options: MemoryCompactOptions): Promise<MemoryCompactResult>;
+}
+
+export interface MemoryCompactOptions {
+  now: Date;
+  signal: AbortSignal;
+  maxAgeMs: number;
+  graceMs: number;
+  limit: number;
+  /** A workspace that failed; the next sweep tries it again. */
+  onError?: (repo: string, error: unknown) => void;
+}
+
+export interface MemoryCompactResult {
+  /** Workspaces whose history was dropped. */
+  compacted: number;
+  /** Replaced generations deleted. */
+  deleted: number;
+  failed: number;
 }
 
 /** Reads pinned to one commit, so a run never mixes two versions. */

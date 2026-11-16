@@ -404,6 +404,9 @@ export const AUTOPILOT_DEFAULT_JOBS = {
 export const AUTOPILOT_FLAG_TIMEOUT_MS = 2000;
 /** One budget for the whole outbox drain, leaving cron time for daily runs. */
 export const AUTOPILOT_NAMESPACE_CLEANUP_BUDGET_MS = 5000;
+/** Only one memory history sweep runs at a time, so two never move the same workspace. */
+export const AUTOPILOT_MEMORY_COMPACTION_LOCK_KEY =
+  "autopilot:memory-compaction";
 export const AUTOPILOT_RUNS_PAGE_SIZE = 20;
 export const AUTOPILOT_ADMIN_RUNS_DEFAULT_LIMIT = 50;
 

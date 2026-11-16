@@ -38,7 +38,8 @@ function isNegativeFeedback(record: MemoryRecord) {
 /**
  * Feedback is preloaded into every decision, so it stays under the soft limit:
  * the oldest notes go first, the oldest negative one while negatives make up
- * more than their share. Git history keeps what was dropped.
+ * more than their share. Dropped notes leave the memory's history within a
+ * week (`compactMemoryHistory`).
  */
 function compactFeedback(records: MemoryRecord[]) {
   const sorted = [...records].sort((a, b) =>
@@ -64,7 +65,7 @@ export async function rememberFeedback(params: AutopilotFeedbackInput) {
   await updateMemory({
     organizationId: params.organizationId,
     actor: "user",
-    message: `Feedback from ${params.createdBy}`,
+    message: "Record feedback",
     mutate: async (snapshot) => {
       const records = parseRecords(
         await snapshot.read(MEMORY_PATHS.feedback),

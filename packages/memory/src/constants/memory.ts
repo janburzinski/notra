@@ -53,6 +53,32 @@ export const MEMORY_SAFE_PATH =
 export const MEMORY_REPO_UNSAFE_CHARS = /[^a-zA-Z0-9_-]/g;
 export const MEMORY_REPO_HASH_LENGTH = 12;
 export const MEMORY_REPO_NOT_FOUND = /^Repository not found$/i;
+
+/**
+ * Memory keeps no history past this age: the repo is copied, current files
+ * only, into its next generation (`<repo>.g<N>`; sanitized ids never hold a
+ * dot) and the old one is deleted, so dropped, retracted and rewritten notes
+ * leave code.storage within days, well inside the DPA's 30.
+ */
+export const MEMORY_HISTORY_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
+/**
+ * How long a replaced generation stays readable, so a run that opened its
+ * snapshot before the move can finish on it.
+ */
+export const MEMORY_GENERATION_GRACE_MS = 60 * 60 * 1000;
+/** Workspaces one sweep compacts at most; the next sweep continues. */
+export const MEMORY_COMPACT_BATCH = 20;
+/** Commits whose repo a store remembers, so snapshots survive a move. */
+export const MEMORY_PINNED_REFS = 1000;
+/** A move that runs during a deletion adds one generation, so deletion looks again. */
+export const MEMORY_DELETE_PASSES = 3;
+export const MEMORY_GENERATION_SUFFIX = /\.g(\d+)$/;
+/** The last commit of a replaced generation names its successor. */
+export const MEMORY_MOVED = {
+  path: ".moved",
+  message: "Memory moved to ",
+} as const;
+export const MEMORY_COMPACT_MESSAGE = "Workspace memory";
 export const MEMORY_RECORD_META_LINE = /^<!--\s*notra\s+(\{.*\})\s*-->$/;
 export const MEMORY_RECORD_SECTION = /^## (.+)$/;
 

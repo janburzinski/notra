@@ -85,7 +85,19 @@ const deleteNamespace = mock(
     memory.delete(organizationId);
   }
 );
-setMemoryStore({ ...createInMemoryStore(), deleteRepo: deleteNamespace });
+let failCompaction = false;
+const inMemory = createInMemoryStore();
+setMemoryStore({
+  ...inMemory,
+  deleteRepo: deleteNamespace,
+  // Throws before any promise exists, like a store without credentials.
+  compactHistory: (options) => {
+    if (failCompaction) {
+      throw new Error("Synthetic memory setup failure");
+    }
+    return inMemory.compactHistory(options);
+  },
+});
 afterAll(() => setMemoryStore(null));
 
 // The app's queries are logged so tests can check statement order.
@@ -198,6 +210,7 @@ beforeEach(async () => {
   deleteNamespace.mockClear();
   failTeardown = false;
   failMemoryCleanup = false;
+  failCompaction = false;
   failWorkos = false;
   stalledRequest = 0;
   abortedRequests = 0;
@@ -805,6 +818,21 @@ test("cron reports remote cleanup failure and retries on the next due sweep", as
   expect(memory.has("workspace")).toBe(false);
 });
 
+test("cron reports a memory history failure and still starts daily runs", async () => {
+  process.env.CRON_SECRET = "synthetic-cron-secret";
+  failCompaction = true;
+  const response = await GET(
+    new Request("https://example.test/api/cron/autopilot", {
+      headers: { authorization: "Bearer synthetic-cron-secret" },
+    })
+  );
+  expect(response.status).toBe(500);
+  expect(await response.json()).toMatchObject({
+    memoryHistory: { compacted: 0, deleted: 0, failed: 1 },
+  });
+  expect(runDueAutopilots).toHaveBeenCalledTimes(1);
+});
+
 test("one overall cleanup deadline aborts a stalled deletion, preserves partial progress and starts daily runs", async () => {
   process.env.CRON_SECRET = "synthetic-cron-secret";
   const now = new Date();
@@ -840,6 +868,7 @@ test("one overall cleanup deadline aborts a stalled deletion, preserves partial 
       failed: 0,
       cleanup: { checked: 5, failed: 1 },
       repoCleanup: { checked: 0, failed: 0 },
+      memoryHistory: { compacted: 0, deleted: 0, failed: 0 },
     });
     expect(timeout).toHaveBeenCalledTimes(1);
     expect(timeout).toHaveBeenCalledWith(AUTOPILOT_NAMESPACE_CLEANUP_BUDGET_MS);

@@ -18,29 +18,25 @@ export function isRepoNotFound(error: unknown) {
 }
 
 /**
- * Deletes a repository, treating one that is already gone as deleted. The
- * SDK takes no signal, so the deadline is enforced around it; one signal can
- * cover many deletions, so each removes its own listener.
+ * Settles with the request, or rejects with the signal's reason once it
+ * aborts. The SDK takes no signal, so the request itself may still land.
  */
-export async function deleteRepoBefore(
-  deletion: Promise<unknown>,
+export async function beforeAbort<RESULT>(
+  request: Promise<RESULT>,
   signal?: AbortSignal
-) {
-  const deleted = deletion.then(
-    () => undefined,
-    (error: unknown) => {
-      if (!isRepoNotFound(error)) {
-        throw error;
-      }
-    }
-  );
+): Promise<RESULT> {
   if (!signal) {
-    return deleted;
+    return request;
   }
+  if (signal.aborted) {
+    request.catch(() => undefined);
+    throw signal.reason;
+  }
+  // One signal covers many requests, so each removes its own listener.
   let onAbort: (() => void) | undefined;
   try {
-    await Promise.race([
-      deleted,
+    return await Promise.race([
+      request,
       new Promise<never>((_resolve, reject) => {
         onAbort = () => reject(signal.reason);
         signal.addEventListener("abort", onAbort, { once: true });
@@ -51,4 +47,22 @@ export async function deleteRepoBefore(
       signal.removeEventListener("abort", onAbort);
     }
   }
+}
+
+/** Deletes a repository, treating one that is already gone as deleted. */
+export function deleteRepoBefore(
+  deletion: Promise<unknown>,
+  signal?: AbortSignal
+) {
+  return beforeAbort(
+    deletion.then(
+      () => undefined,
+      (error: unknown) => {
+        if (!isRepoNotFound(error)) {
+          throw error;
+        }
+      }
+    ),
+    signal
+  );
 }

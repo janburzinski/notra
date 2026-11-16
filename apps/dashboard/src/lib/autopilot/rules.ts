@@ -150,7 +150,7 @@ export async function addRule(params: {
   await updateMemory({
     organizationId: params.organizationId,
     actor: "user",
-    message: `Add rule: ${text}`,
+    message: "Add rule",
     mutate: async (snapshot) => {
       const existing = readRules(
         params.organizationId,

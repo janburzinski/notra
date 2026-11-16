@@ -2,13 +2,17 @@ import { setTimeout as sleep } from "node:timers/promises";
 
 import {
   MEMORY_COMMIT_ATTEMPTS,
+  MEMORY_COMPACT_BATCH,
   MEMORY_CONFLICT_BACKOFF_MS,
+  MEMORY_GENERATION_GRACE_MS,
+  MEMORY_HISTORY_MAX_AGE_MS,
 } from "./constants/memory";
 import { createCodeStorageStore } from "./stores/code-storage";
 import { createInMemoryStore } from "./stores/in-memory";
 import type {
   MemoryActor,
   MemoryChanges,
+  MemoryCompactOptions,
   MemorySnapshot,
   MemoryStore,
   MemoryUpdateResult,
@@ -162,4 +166,23 @@ export function deleteMemory(
     organizationId,
     options.signal
   );
+}
+
+/**
+ * Drops memory history older than a week, keeping every current file, so
+ * notes people removed or retracted don't stay in git forever.
+ */
+export function compactMemoryHistory(
+  options: Pick<MemoryCompactOptions, "now" | "signal" | "onError"> & {
+    store?: MemoryStore;
+  }
+) {
+  return (options.store ?? getMemoryStore()).compactHistory({
+    now: options.now,
+    signal: options.signal,
+    onError: options.onError,
+    maxAgeMs: MEMORY_HISTORY_MAX_AGE_MS,
+    graceMs: MEMORY_GENERATION_GRACE_MS,
+    limit: MEMORY_COMPACT_BATCH,
+  });
 }
