@@ -1,0 +1,46 @@
+packages/geo-core/scripts/state-of-ai-search/utils/context.ts
+  s_bfa6057c8fd3ae::t_80218312f8d661 38-39
+packages/geo-core/src/geo/conversation.ts
+  s_bfa6057c8fd3ae::t_80218312f8d661 99
+  s_bfa6057c8fd3ae::t_6695975686528f 98
+packages/geo-core/src/schemas/geo-olostep.ts
+  s_bfa6057c8fd3ae::t_affba49a908158 92-96
+packages/geo-core/src/utils/geo-context-answer.ts
+  s_bfa6057c8fd3ae::t_6e7fea3a65361f 295-300
+packages/geo-core/src/schemas/geo-context.ts
+  s_bfa6057c8fd3ae::t_6e7fea3a65361f 10-11
+packages/geo-core/src/constants/geo-olostep.ts
+  s_bfa6057c8fd3ae::t_ee5b6445bf78ab 22-44
+  s_bfa6057c8fd3ae::t_affba49a908158 14-21
+packages/geo-core/src/geo/olostep.ts
+  s_bfa6057c8fd3ae::t_ee5b6445bf78ab 12,284,299
+  s_bfa6057c8fd3ae::t_85c9fdc3353d22 51,285-289
+  s_bfa6057c8fd3ae::t_d191a05b130f52 5,7,14,22,37-38,275-283,290-298,300-323
+packages/geo-core/src/geo/context.ts
+  s_bfa6057c8fd3ae::t_6b906f16d6a0a7 20,27,30,145-156,161-167,169,171-181,184-219
+  s_bfa6057c8fd3ae::t_80218312f8d661 157-160,170
+  s_bfa6057c8fd3ae::t_2d8f557c205501 182-183
+  s_bfa6057c8fd3ae::t_015c30fff09e82 33-34,168
+packages/geo-core/src/geo/scan.ts
+  s_bfa6057c8fd3ae::t_80218312f8d661 465
+  s_bfa6057c8fd3ae::t_6695975686528f 464,466
+packages/geo-core/tests/geo-context-fallback.test.ts
+  s_bfa6057c8fd3ae::t_24c53e5f3172d4 1-80,83-117
+  s_bfa6057c8fd3ae::t_ee5b6445bf78ab 81-82
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "1bd541109ffe92a7dcf4f9011e2bb2c4f21cb048",
+  "prompts": {},
+  "sessions": {
+    "s_bfa6057c8fd3ae": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "377df655-40d7-4500-a7c7-946d5b2f832f",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
