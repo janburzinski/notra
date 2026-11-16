@@ -4,7 +4,6 @@ import { getSessionAttribute } from "@notra/tools/utils/session";
 import { getLinkedTwitterAccounts } from "@notra/tools/utils/social-accounts";
 import { Effect } from "effect";
 import {
-  experimental_slackActivityRenderer,
   experimental_slackActivityStatus,
   type SlackChannelConfig,
   type SlackMentionResult,
@@ -49,6 +48,7 @@ import {
   mirrorToolApprovals,
   mirrorToolResult,
 } from "../lib/utils/chat-mirror";
+import { isSlackReplyForAgent } from "../lib/utils/slack-addressing";
 import { buildSlackArtifactPost } from "../lib/utils/slack-artifact";
 import {
   buildNotraSlackAuth,
@@ -58,7 +58,6 @@ import {
 import { uploadSlackChart } from "../lib/utils/slack-chart";
 import { mirrorPublicSlackThread } from "../lib/utils/slack-chat-mirror";
 import {
-  createSlackControlsRenderer,
   handleSlackControl,
   handleSlackControlAction,
   parseSlackControlMessage,
@@ -166,6 +165,12 @@ const onSlackMessage = async (
     );
     if (control) {
       await handleSlackControl(control, ctx);
+      return null;
+    }
+    if (
+      trigger === "thread_reply" &&
+      !(await isSlackReplyForAgent(ctx, message, installation.organizationId))
+    ) {
       return null;
     }
     const slackUserId = message.author?.userId;
@@ -486,12 +491,7 @@ const credentials = createSlackAgentCredentials();
 export default slackChannel({
   credentials,
   activity: {
-    renderers: [
-      experimental_slackActivityRenderer(
-        createSlackControlsRenderer(credentials.botToken)
-      ),
-      experimental_slackActivityStatus(),
-    ],
+    renderers: [experimental_slackActivityStatus()],
   },
   events: {
     "action.result": async (data, channel, ctx) => {

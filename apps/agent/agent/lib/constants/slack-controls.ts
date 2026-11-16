@@ -1,13 +1,6 @@
+/** Buttons on control cards posted before the card was removed. */
 export const SLACK_STOP_ACTION_ID = "notra_stop_turn";
 export const SLACK_LEAVE_ACTION_ID = "notra_leave_thread";
-export const SLACK_CONTROLS_RENDERER_ID = "notra.slack.controls";
-export const SLACK_CONTROLS_METADATA_TYPE = "notra_controls";
-
-export const SLACK_CONTROLS_TEXT = {
-  working: "Stop request · Stop replying here",
-  waiting: "Stop replying here",
-  idle: "Stop replying here",
-} as const;
 
 export const SLACK_CONTROL_MENTION_REGEX =
   /^(?:<@[^>]+>|@(?:notra|[UW][A-Z0-9]+))[,\s:]*/iu;

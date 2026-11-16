@@ -90,6 +90,17 @@ if (scenario === "voice-reply") {
     return { text: " Draft a LinkedIn post about the launch ", durationInSeconds: 30 };
   } }));
 }
+const evaluations = [];
+let evaluationAvailable = true;
+mock.module("@notra/ai/evaluation/client", () => ({ getEvaluationClient: () => ({
+  isAvailable: () => scenario === "addressing" && evaluationAvailable,
+  tryEvaluate: async (params) => {
+    if (scenario !== "addressing" || !evaluationAvailable) return null;
+    evaluations.push(params);
+    const forNotra = params.state.latestMessage.includes("week before");
+    return { answers: { addressedToNotra: { value: forNotra, probability: forNotra ? 0.9 : 0.1 } }, confidence: {}, usage: {}, modelId: "fixture", durationMs: 1 };
+  },
+}) }));
 const linkedLookups = [];
 mock.module("@notra/tools/utils/social-accounts", () => ({
   isTwitterPublishConfigured: () => true,
@@ -431,6 +442,37 @@ if (scenario === "draft-pr-completion") {
   assert(content.includes("Prior topic"));
   assert(content.includes("U-human"));
   assert.equal(exactSends[0].command.auth.attributes.organizationId, "org-install");
+} else if (scenario === "addressing") {
+  await message("cool");
+  await message("<@U0COLLEAGUE> see, we're growing");
+  await message("and the week before?");
+  await Promise.all(tasks);
+  assert.equal(exactSends.length, 1);
+  assert(JSON.stringify(exactSends[0].command.payload.message).includes("and the week before?"));
+  // Skipped replies get no 👀 and are not counted as requests.
+  assert.deepEqual(reactionCalls("reactions.add"), [eyes("2.3")]);
+  assert.equal(metricInserts.length, 1);
+  assert.equal(evaluations.length, 3);
+  assert.equal(evaluations[0].organizationId, "org-install");
+  assert.equal(evaluations[0].state.recentThread, "Person 1: Prior topic");
+  assert.equal(evaluations[0].state.latestMessage, "Person 2: cool");
+  assert.equal(evaluations[1].state.latestMessage, "Person 2: @Person 3 see, we're growing");
+  // Without the classifier only replies naming someone else are skipped,
+  // and the thread history is not fetched.
+  evaluationAvailable = false;
+  const repliesBefore = outbound.filter((call) => call.url.endsWith("conversations.replies")).length;
+  await message("<@U0COLLEAGUE> look at this");
+  await message("thanks");
+  await Promise.all(tasks);
+  assert.equal(exactSends.length, 2);
+  assert(JSON.stringify(exactSends[1].command.payload.message).includes("thanks"));
+  // Only the delivered reply loads thread context.
+  assert.equal(outbound.filter((call) => call.url.endsWith("conversations.replies")).length, repliesBefore + 1);
+  // Controls still work without a mention.
+  await message("stop");
+  await Promise.all(tasks);
+  assert.equal(exactSends.length, 2);
+  assert.equal(evaluations.length, 3);
 } else if (scenario === "working-reaction") {
   const eventChannel = { ...binding, state: { installationTeamId: "T-install", channelId: "C-room" } };
   owner = undefined;
@@ -739,6 +781,8 @@ describe("Slack native channel boundaries", () => {
     runSlackChannel("leave-race"));
   test("pinned replies preserve speaker attribution and thread context", () =>
     runSlackChannel("reply"));
+  test("unmentioned thread replies only start a turn when they are meant for Notra", () =>
+    runSlackChannel("addressing"));
   test("voice messages reach the agent as a transcript", () =>
     runSlackChannel("voice-reply"));
   test("unmentioned replies stay ignored after Leave and a mention restarts the thread", () =>

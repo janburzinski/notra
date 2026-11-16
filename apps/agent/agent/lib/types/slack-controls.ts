@@ -1,5 +1,5 @@
 import type { Session } from "eve/channels";
-import type { SlackPostInput, SlackThread } from "eve/channels/slack";
+import type { SlackThread } from "eve/channels/slack";
 import type { z } from "zod";
 
 import type { slackControlValueSchema } from "../schemas/slack-controls";
@@ -14,17 +14,3 @@ export interface SlackControlContext {
 }
 
 export type SlackControlValue = z.infer<typeof slackControlValueSchema>;
-
-export type SlackControlsPost = Extract<
-  SlackPostInput,
-  { readonly blocks: readonly unknown[] }
-> & { readonly text: string };
-
-export type SlackControlsPhase = "working" | "waiting" | "idle";
-
-export interface SlackControlsRendererState {
-  sessionId: string;
-  messageTs: string;
-  text: string;
-  turnId: string;
-}

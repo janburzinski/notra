@@ -18,7 +18,7 @@ apps/api /v2/agent-chats
 
 eve agent (this package, separate Vercel project)
   ├─ root: task → gpt-6-sol; chat → eve autoModel: gpt-6-luna / claude-sonnet-5.5 / claude-opus-5.5
-  ├─ Slack: mentions, DMs, and active thread replies through /eve/v1/slack
+  ├─ Slack: mentions, DMs, and active thread replies meant for Notra (Jev-classified) through /eve/v1/slack
   ├─ subagents/content-writer (openai/gpt-6-sol, structured result)
   └─ subagents/image-designer (claude-sonnet-5.5; wraps the @upstash/box sandbox image pipeline)
 ```
@@ -110,7 +110,7 @@ The Slack transport is Eve's native Slack channel. Eve owns signed webhook verif
 
 For production, both **Event Subscriptions** and **Interactivity & Shortcuts** must use `https://agent.usenotra.com/eve/v1/slack`. Keep development tunnels on a separate Slack test app so a local test cannot redirect production events. The webhook URL must be publicly reachable without Vercel deployment authentication.
 
-Slack shows the current tool activity through its native thinking status without exposing reasoning text or tool arguments. One buttons-only control card is updated in place for each conversation, before setting the native status so posting the card does not clear it: **Stop request** cooperatively cancels the active request and its tasks, while **Stop replying here** retires the thread session, including pending approvals. Neither action undoes work already saved or published. A new mention starts a fresh session after leaving. The same controls are available as whole-message commands: `stop` / `stopp`, or `stop replying` / `nicht mehr antworten`.
+Slack shows the current tool activity through its native thinking status without exposing reasoning text or tool arguments. Threads get no control buttons. Whole-message commands control the conversation instead: `stop` / `stopp` cooperatively cancels the active request and its tasks, and `stop replying` / `nicht mehr antworten` retires the thread session, including pending approvals. Neither undoes work already saved or published. A new mention starts a fresh session after leaving. Buttons on control cards posted by earlier versions keep working.
 
 Stop buttons are scoped to the displayed request's activity cohort, including resumed approvals and delegated work. Text-only `stop` cancels all current work in the thread session. Controls use the app installation's workspace policy, not a Slack Connect actor's workspace. Ordinary replies are delivered to the exact session that admitted them, so an in-flight reply cannot recreate a session after Leave. Control cards carry recovery metadata; thread history access is required to recover a post whose response was lost without creating a duplicate.
 
