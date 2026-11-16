@@ -1,6 +1,5 @@
 "use client";
 
-import { useChat } from "@ai-sdk/react";
 import {
   ArrowReloadHorizontalIcon,
   File02Icon,
@@ -24,7 +23,6 @@ import {
   TooltipTrigger,
 } from "@notra/ui/components/ui/tooltip";
 import { EASE } from "@notra/ui/lib/motion";
-import { ORPCError } from "@orpc/client";
 import {
   useMutation,
   useQuery,
@@ -33,7 +31,6 @@ import {
 } from "@tanstack/react-query";
 import { useLocation } from "@tanstack/react-router";
 import {
-  type ChatOnFinishCallback,
   type DynamicToolUIPart,
   getToolName,
   isToolUIPart,
@@ -68,7 +65,6 @@ import { ChatConversation } from "@/components/chat/chat-conversation";
 import { ChatHomeSuggestions } from "@/components/chat/chat-home-suggestions";
 import { ChatInput, type ThinkingLevel } from "@/components/chat/chat-input";
 import { ChatMinimapRail } from "@/components/chat/chat-minimap-rail";
-import type { QueuedMessage } from "@/components/chat/chat-queue";
 import { ChatQuoteProvider, useChatQuote } from "@/components/chat/chat-quote";
 import { ChatSharePopover } from "@/components/chat/chat-share-popover";
 import { MessageAuthorAvatar } from "@/components/chat/message-author-avatar";
@@ -80,13 +76,7 @@ import {
 import { HeaderActionsPortal } from "@/components/dashboard/header-actions-portal";
 import { useRightPanel } from "@/components/dashboard/right-panel-context";
 import { useOrganizationsContext } from "@/components/providers/organization-provider";
-import {
-  AGENT_QUESTION_DISMISSED,
-  AGENT_QUESTION_INPUT_RETURN_CLASS,
-  AGENT_QUESTION_TOOL_NAME,
-} from "@/constants/agent-questions";
-import { AUTOPILOT_AGENT_CONTINUES_AFTER_DENIAL } from "@/constants/autopilot-workflows";
-import { CHAT_ACTIVE_STREAM_POLL_INTERVAL_MS } from "@/constants/chat-active-stream";
+import { AGENT_QUESTION_INPUT_RETURN_CLASS } from "@/constants/agent-questions";
 import { CHAT_PAGE_CARD_TOOL_NAMES } from "@/constants/chat-custom-tools";
 import { MAX_VISIBLE_CHAT_IMAGES } from "@/constants/chat-images";
 import {
@@ -101,14 +91,13 @@ import { localStorageKeys } from "@/constants/storage";
 import { trackEvent } from "@/lib/analytics/posthog-client";
 import { getChatContextKind } from "@/lib/analytics/studio-events";
 import { authClient } from "@/lib/auth/client";
-import { emitAutumnRefresh } from "@/lib/billing/autumn-refresh";
 import {
   relaySlackApproval,
   relaySlackMirrorMessage,
   SlackRelayError,
 } from "@/lib/chat/slack-relay";
-import { createStandaloneChatTransport } from "@/lib/chat/standalone-chat-transport";
 import { useActiveProject } from "@/lib/hooks/use-active-project";
+import { useAgentChat } from "@/lib/hooks/use-agent-chat";
 import { useChatPromptSuggestions } from "@/lib/hooks/use-chat-prompt-suggestions";
 import {
   reconcileCreatedChatTitle,
@@ -123,7 +112,6 @@ import { usePathname, useRouter } from "@/lib/navigation";
 import { dashboardOrpcClient } from "@/lib/orpc/client";
 import { dashboardOrpc } from "@/lib/orpc/query";
 import { cn } from "@/lib/utils";
-import type { AgentQuestionAnswer } from "@/types/agent-questions";
 import type {
   ChatDraftAction,
   ChatToolApprovalDecision,
@@ -132,17 +120,11 @@ import type { ChatMessageAuthor } from "@/types/chat";
 import type { ChatToolPart } from "@/types/components/chat-conversation";
 import type { ChatComposerHandle } from "@/types/components/chat-input";
 import type {
-  ChatTurnEvent,
-  ChatTurnPhase,
   StandaloneChatPageClientProps,
   UserImageGridProps,
 } from "@/types/components/chat-page";
 import type { PublishedSocialPost } from "@/types/content/post-social";
-import {
-  findPendingAgentQuestion,
-  findSettledAgentQuestion,
-  findAgentTurnToRetry,
-} from "@/utils/agent-questions";
+import { findAgentTurnToRetry } from "@/utils/agent-questions";
 import { findAutopilotWorkflowDraft } from "@/utils/autopilot-workflow-draft";
 import { resolveOrganizationLogo } from "@/utils/avatar";
 import { hasVisibleChatContent } from "@/utils/chat-activity";
@@ -151,18 +133,11 @@ import {
   restoreChatReferences,
 } from "@/utils/chat-annotations";
 import {
-  findContinuableDenial,
-  hasPendingApproval,
-  isTerminalToolState,
-  shouldContinueAfterApprovalResponse,
-} from "@/utils/chat-approvals";
-import {
   artifactTabId,
   getChatArtifacts,
   getLatestArtifactWrite,
 } from "@/utils/chat-artifact";
 import { mergeChatCustomTools } from "@/utils/chat-custom-tools";
-import { handleStandaloneChatError } from "@/utils/chat-error";
 import { chatHistoryQueryOptions } from "@/utils/chat-history-query";
 import {
   resolveChatMessageAuthor,
@@ -177,17 +152,6 @@ import {
   readStoredChatPreferences,
   subscribeToStoredChatPreferences,
 } from "@/utils/chat-preferences";
-import {
-  markQueuedMessageSteering,
-  parseQueuedMessages,
-  shouldDrainQueueAfterFinish,
-  takeQueuedMessage,
-} from "@/utils/chat-queue";
-import {
-  clearPendingChatClientState,
-  resetNewChatClientState,
-  updateWasStoppedByUser,
-} from "@/utils/chat-state";
 import { formatLongDate } from "@/utils/dashboard-greeting";
 import { getGreetingPeriod } from "@/utils/dashboard-greeting-period";
 import { formatElapsedSeconds } from "@/utils/format-elapsed-seconds";
@@ -264,86 +228,6 @@ function CompletedToolTimer({
 }
 
 type RenderableToolPart = DynamicToolUIPart | ToolUIPart;
-
-function nextChatTurnPhase(
-  phase: ChatTurnPhase,
-  event: ChatTurnEvent
-): ChatTurnPhase {
-  switch (event) {
-    case "send":
-      return phase === "idle" ? "sending" : phase;
-    case "sendQueued":
-      return phase === "waitingForActiveStream" ? phase : "sendingQueued";
-    case "streamStarted":
-      if (phase === "sendingQueued") {
-        return "sending";
-      }
-      return phase === "stoppingForQueue" ? "stoppedForQueue" : phase;
-    case "stopForQueue":
-      return phase === "waitingForActiveStream" ? phase : "stoppingForQueue";
-    case "stopForQueueFailed":
-      return phase === "stoppingForQueue" ? "stoppedForQueue" : phase;
-    case "userStopped":
-      if (phase === "stoppingForQueue") {
-        return "sendingQueued";
-      }
-      return phase === "stoppedForQueue" ? "sending" : phase;
-    case "settled":
-      return phase === "waitingForActiveStream" ? phase : "idle";
-    case "streamConflict":
-      return "waitingForActiveStream";
-    case "activeStreamEnded":
-      return "idle";
-    default:
-      return phase;
-  }
-}
-
-function isDispatchingQueued(phase: ChatTurnPhase): boolean {
-  return phase === "sendingQueued" || phase === "stoppingForQueue";
-}
-
-function hasSendableParts(message: ChatUIMessage): boolean {
-  return Array.isArray(message.parts) && message.parts.length > 0;
-}
-
-function normalizeToolApprovalsForSend(
-  messages: ChatUIMessage[]
-): ChatUIMessage[] {
-  return messages.map((message) => {
-    if (!Array.isArray(message.parts)) {
-      return message;
-    }
-
-    let changed = false;
-    const parts = message.parts.map((part) => {
-      if (
-        isToolUIPart(part) &&
-        part.state === "approval-responded" &&
-        part.approval.approved === false &&
-        (part.approval.reason === "discard" || part.approval.reason == null)
-      ) {
-        changed = true;
-        return {
-          ...part,
-          approval: {
-            ...part.approval,
-            approved: false,
-          },
-          state: "output-denied" as const,
-        } as ChatUIMessage["parts"][number];
-      }
-
-      return part;
-    });
-
-    return changed ? { ...message, parts } : message;
-  }) as ChatUIMessage[];
-}
-
-function getSendableMessages(messages: ChatUIMessage[]): ChatUIMessage[] {
-  return normalizeToolApprovalsForSend(messages).filter(hasSendableParts);
-}
 
 function UserImageGrid({ children }: UserImageGridProps) {
   const t = useTranslations("chat.page");
@@ -544,29 +428,14 @@ function StandaloneChatPageClient({
     staleTime: 1000 * 60 * 5,
   });
   const mcpLogosByConnectionId = useMcpLogosByConnectionId(organizationId);
-  const [pendingMessageId, setPendingMessageId] = useState<string | null>(null);
-  const [historyStreamId, setHistoryStreamId] = useState<string | null>(null);
   const isHydrated = useSyncExternalStore(
     emptySubscribe,
     () => true,
     () => false
   );
 
-  const [generatedChatId, setGeneratedChatId] = useState<string>(() =>
-    crypto.randomUUID()
-  );
-  const stableChatId = initialChatId ?? generatedChatId;
-  const [initialMessages] = useState(
-    () =>
-      queryClient.getQueryData(
-        chatHistoryQueryOptions(organizationId, initialChatId).queryKey
-      )?.messages ?? []
-  );
-
   const [context, setContext] = useState<ContextItem[]>([]);
   const [hasCustomizedContext, setHasCustomizedContext] = useState(false);
-  const [chatError, setChatError] = useState<string | null>(null);
-  const [queuedMessages, setQueuedMessages] = useState<QueuedMessage[]>([]);
   const [thinkingLevel, setThinkingLevel] = useState<ThinkingLevel>(
     DEFAULT_CHAT_PREFERENCES.thinkingLevel
   );
@@ -574,9 +443,123 @@ function StandaloneChatPageClient({
   const [messageBranches, setMessageBranches] = useState<
     Record<string, { tails: ChatUIMessage[][]; active: number }>
   >({});
-  const chatInputRef = useRef<ChatComposerHandle | null>(null);
   const [isInputEmpty, setIsInputEmpty] = useState(true);
+  const chatInputRef = useRef<ChatComposerHandle | null>(null);
   const reduceMotion = useReducedMotion();
+
+  const {
+    data: chatHistoryData,
+    isLoading: isChatHistoryLoading,
+    isPending: isChatHistoryPending,
+  } = useQuery(chatHistoryQueryOptions(organizationId, initialChatId));
+  const isSlackMirrored =
+    chatHistoryData?.externalChannelId?.source === "slack";
+  const isProjectScopePending = !initialChatId && !isProjectResolved;
+  const currentAuthorUserId = session?.user.id;
+
+  const [isFirstMessageTransition, setIsFirstMessageTransition] =
+    useState(false);
+  const firstMessageTransitionTimerRef = useRef<ReturnType<
+    typeof setTimeout
+  > | null>(null);
+  const triggerFirstMessageTransition = useCallback(() => {
+    if (firstMessageTransitionTimerRef.current) {
+      clearTimeout(firstMessageTransitionTimerRef.current);
+    }
+    setIsFirstMessageTransition(true);
+    firstMessageTransitionTimerRef.current = setTimeout(() => {
+      setIsFirstMessageTransition(false);
+      firstMessageTransitionTimerRef.current = null;
+    }, 600);
+  }, []);
+  useEffect(
+    () => () => {
+      if (firstMessageTransitionTimerRef.current) {
+        clearTimeout(firstMessageTransitionTimerRef.current);
+      }
+    },
+    []
+  );
+
+  const agent = useAgentChat({
+    organizationId,
+    initialChatId,
+    projectId: activeProjectId,
+    thinkingLevel,
+    context,
+    hasCustomizedContext,
+    authorUserId: currentAuthorUserId,
+    chatInputRef,
+    persistQueue: true,
+    canSend: !isProjectScopePending,
+    paused: isSlackMirrored,
+    onBeforeSend: ({ chatId, isEmptyChat, isFirstInNewChat }) => {
+      if (isEmptyChat) {
+        triggerFirstMessageTransition();
+      }
+      if (isFirstInNewChat) {
+        insertPendingChatSession(chatId);
+      }
+    },
+    onChatCreated: (chatId) => {
+      void reconcileCreatedChatTitle(
+        queryClient,
+        organizationId,
+        activeProjectId,
+        chatId
+      );
+    },
+    onNewChatReplied: ({ chatId, messages: replied, wasStoppedByUser }) => {
+      queryClient.setQueryData(["chat-history", organizationId, chatId], {
+        messages: replied,
+        lastResponseStopped: wasStoppedByUser,
+        activeStreamId: null,
+        externalChannelId: null,
+        slackThreadUrl: null,
+      });
+      router.replace(`/${organizationSlug}/chat/${chatId}`, {
+        scroll: false,
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["chat-sessions", organizationId],
+      });
+    },
+    onError: (chatId) =>
+      discardFailedNewChatFromSidebar({
+        chatId,
+        initialChatId,
+        organizationId,
+        queryClient,
+        removePendingChatSession,
+      }),
+  });
+  const {
+    chatId: stableChatId,
+    messages,
+    messagesRef,
+    setMessages,
+    sendMessage,
+    addToolApprovalResponse,
+    status,
+    isLoading,
+    isStopping,
+    wasStoppedByUser,
+    isWaitingForActiveStream,
+    chatError,
+    setChatError,
+    queuedMessages,
+    authorMetadata,
+    handleStop,
+    handleRemoveQueued,
+    handleEditQueued,
+    handleSteerQueued,
+    handleSend: sendToAgent,
+    resendFrom,
+    retry,
+    pendingQuestion,
+    answerQuestion,
+    dismissQuestion,
+  } = agent;
 
   const handleSuggestionSelect = useCallback((text: string) => {
     chatInputRef.current?.setText(text);
@@ -585,246 +568,6 @@ function StandaloneChatPageClient({
     organizationId,
     projectId: activeProjectId,
     enabled: isProjectResolved && !initialChatId,
-  });
-
-  const contextRef = useRef(context);
-  const hasCustomizedContextRef = useRef(hasCustomizedContext);
-  const organizationIdRef = useRef(organizationId);
-  const activeProjectIdRef = useRef(activeProjectId);
-  const activeStreamConflictRef = useRef<string | null>(null);
-  const requeueConflictedMessageRef = useRef<(messageId: string) => boolean>(
-    () => false
-  );
-  const thinkingLevelRef = useRef(thinkingLevel);
-
-  const handleChatCreated = useCallback(
-    (chatId: string) => {
-      void reconcileCreatedChatTitle(
-        queryClient,
-        organizationId,
-        activeProjectId,
-        chatId
-      );
-    },
-    [activeProjectId, organizationId, queryClient]
-  );
-  const onChatCreatedRef = useRef(
-    initialChatId ? undefined : handleChatCreated
-  );
-
-  useEffect(() => {
-    contextRef.current = context;
-    hasCustomizedContextRef.current = hasCustomizedContext;
-    thinkingLevelRef.current = thinkingLevel;
-    organizationIdRef.current = organizationId;
-    activeProjectIdRef.current = activeProjectId;
-    onChatCreatedRef.current = initialChatId ? undefined : handleChatCreated;
-  }, [
-    activeProjectId,
-    context,
-    handleChatCreated,
-    hasCustomizedContext,
-    initialChatId,
-    organizationId,
-    thinkingLevel,
-  ]);
-
-  // react-doctor-disable-next-line react-hooks-js/refs -- the transport only reads these refs inside fetch callbacks, never during render
-  const [transport] = useState(() =>
-    createStandaloneChatTransport({
-      getSendableMessages,
-      live: {
-        activeProjectId: activeProjectIdRef,
-        context: contextRef,
-        hasCustomizedContext: hasCustomizedContextRef,
-        onChatCreated: onChatCreatedRef,
-        organizationId: organizationIdRef,
-        streamConflict: activeStreamConflictRef,
-        thinkingLevel: thinkingLevelRef,
-      },
-      setPendingMessageId,
-    })
-  );
-
-  const [wasStoppedByUser, setWasStoppedByUser] = useState(false);
-  const wasStoppedByUserRef = useRef(false);
-
-  const drainQueueRef = useRef<() => void>(() => {});
-  const flushSteerAfterStopRef = useRef<() => void>(() => {});
-  const steerAfterStopRef = useRef<QueuedMessage | null>(null);
-  const queuedMessagesRef = useRef<QueuedMessage[]>([]);
-  const messagesRef = useRef<ChatUIMessage[]>([]);
-  const [turnPhase, setTurnPhase] = useState<ChatTurnPhase>("idle");
-  const turnPhaseRef = useRef<ChatTurnPhase>("idle");
-  const dispatchTurn = useCallback((event: ChatTurnEvent) => {
-    const next = nextChatTurnPhase(turnPhaseRef.current, event);
-    turnPhaseRef.current = next;
-    setTurnPhase(next);
-  }, []);
-  const isWaitingForActiveStream = turnPhase === "waitingForActiveStream";
-  const isStoppingResponseRef = useRef(false);
-  const finishAfterStopRef = useRef<(() => void) | null>(null);
-  const hasPendingChatNavigationRef = useRef(false);
-  const navigateToNewChatRef = useRef<(message: ChatUIMessage) => void>(
-    () => {}
-  );
-
-  // Questions the user settled that still owe the agent a resend; each goes
-  // back once, so a double press or a stale state can't send twice.
-  const unsentAnswersRef = useRef(new Set<string>());
-  // Workflow saves the user discarded with the button go back to the agent,
-  // so it asks what to change instead of leaving the user to start over.
-  const discardedApprovalsRef = useRef(new Set<string>());
-  /** Whether the turn ended on a Discard press that still owes the agent a send. */
-  const isPressedDiscard = (current: ChatUIMessage[], claim: boolean) => {
-    const approvalId = findContinuableDenial(
-      current,
-      AUTOPILOT_AGENT_CONTINUES_AFTER_DENIAL
-    );
-    if (!(approvalId && discardedApprovalsRef.current.has(approvalId))) {
-      return false;
-    }
-    if (claim) {
-      discardedApprovalsRef.current.delete(approvalId);
-    }
-    return true;
-  };
-
-  const handleFinish = useCallback<ChatOnFinishCallback<ChatUIMessage>>(
-    ({
-      message,
-      messages: finishedMessages,
-      isAbort,
-      isError,
-      isDisconnect,
-    }) => {
-      messagesRef.current = finishedMessages;
-      if (!isError && !isDisconnect) {
-        queryClient.setQueryData(
-          chatHistoryQueryOptions(organizationId, stableChatId).queryKey,
-          (current) =>
-            current
-              ? {
-                  ...current,
-                  messages: finishedMessages,
-                  lastResponseStopped: isAbort || wasStoppedByUserRef.current,
-                  activeStreamId: null,
-                }
-              : current
-        );
-      }
-      setPendingMessageId(null);
-      emitAutumnRefresh();
-      queryClient.invalidateQueries({
-        queryKey: ["chat-sessions", organizationId],
-      });
-      for (const part of message.parts) {
-        if (!isToolUIPart(part) || part.state !== "output-available") {
-          continue;
-        }
-        const savedPost = createdPostToolOutputSchema.safeParse(part.output);
-        if (savedPost.success) {
-          queryClient.invalidateQueries({
-            queryKey: dashboardOrpc.content.get.queryKey({
-              input: { organizationId, contentId: savedPost.data.postId },
-            }),
-          });
-        }
-      }
-      const finishQueue = () => {
-        const wasInterruptedForQueue =
-          turnPhaseRef.current === "stoppingForQueue" ||
-          turnPhaseRef.current === "stoppedForQueue";
-        dispatchTurn("settled");
-        if (steerAfterStopRef.current) {
-          flushSteerAfterStopRef.current();
-          return;
-        }
-        if (
-          shouldDrainQueueAfterFinish({
-            isAbort,
-            isError,
-            isDisconnect,
-            wasInterruptedForQueue,
-            wasStoppedByUser: wasStoppedByUserRef.current,
-          })
-        ) {
-          drainQueueRef.current();
-        }
-        if (!isError && !isDisconnect) {
-          navigateToNewChatRef.current(message);
-        } else if (turnPhaseRef.current !== "waitingForActiveStream") {
-          hasPendingChatNavigationRef.current = false;
-        }
-      };
-      if (isStoppingResponseRef.current) {
-        finishAfterStopRef.current = finishQueue;
-        return;
-      }
-      finishQueue();
-    },
-    [dispatchTurn, organizationId, queryClient, stableChatId]
-  );
-
-  const {
-    messages,
-    setMessages,
-    sendMessage,
-    addToolApprovalResponse,
-    addToolOutput,
-    status,
-    stop,
-  } = useChat<ChatUIMessage>({
-    id: stableChatId,
-    messages: initialMessages,
-    resume: Boolean(
-      initialChatId && historyStreamId && pendingMessageId === historyStreamId
-    ),
-    experimental_throttle: 90,
-    transport,
-    sendAutomaticallyWhen: ({ messages: current }) => {
-      if (
-        shouldContinueAfterApprovalResponse({ messages: current }) ||
-        isPressedDiscard(current, true)
-      ) {
-        return true;
-      }
-      const answered = findSettledAgentQuestion(current);
-      return answered !== null && unsentAnswersRef.current.delete(answered);
-    },
-    onFinish: handleFinish,
-    onError: (err) => {
-      unsentAnswersRef.current.clear();
-      if (steerAfterStopRef.current) {
-        return;
-      }
-      const conflictedMessageId = activeStreamConflictRef.current;
-      activeStreamConflictRef.current = null;
-      if (
-        conflictedMessageId &&
-        requeueConflictedMessageRef.current(conflictedMessageId)
-      ) {
-        return;
-      }
-      discardFailedNewChatFromSidebar({
-        chatId: stableChatId,
-        initialChatId,
-        organizationId,
-        queryClient,
-        removePendingChatSession,
-      });
-      handleStandaloneChatError(err, {
-        setChatError,
-        setPendingMessageId,
-        messages: {
-          usageLimit: tChatErrors("usageLimit"),
-          fallback: tChatErrors("fallback"),
-        },
-      });
-    },
-  });
-  const replaceChatMessages = useEffectEvent((next: []) => {
-    setMessages(next);
   });
 
   const chatPosts = useMemo(() => getChatPosts(messages), [messages]);
@@ -982,8 +725,6 @@ function StandaloneChatPageClient({
     }
   }, [messages, organizationId, queryClient]);
 
-  const [isStopping, setIsStopping] = useState(false);
-
   useEffect(() => {
     function syncChatPreferencesFromStorage() {
       const storedPreferences = readStoredChatPreferences();
@@ -1020,51 +761,6 @@ function StandaloneChatPageClient({
     };
   }, [initialChatId]);
 
-  const stopActiveResponse = useCallback(async () => {
-    if (isStoppingResponseRef.current) {
-      return;
-    }
-    isStoppingResponseRef.current = true;
-    try {
-      if (organizationId && stableChatId) {
-        await fetch(
-          `/api/organizations/${organizationId}/chat/${encodeURIComponent(stableChatId)}/stop`,
-          { method: "POST" }
-        );
-      }
-    } catch (stopError) {
-      console.error("[Chat] Failed to notify server to stop:", stopError);
-    }
-    stop();
-    isStoppingResponseRef.current = false;
-    const finish = finishAfterStopRef.current;
-    finishAfterStopRef.current = null;
-    finish?.();
-  }, [organizationId, stableChatId, stop]);
-
-  const handleStop = useCallback(async () => {
-    dispatchTurn("userStopped");
-    steerAfterStopRef.current = null;
-    const next = queuedMessagesRef.current.map((message) => ({
-      ...message,
-      steering: false,
-    }));
-    queuedMessagesRef.current = next;
-    setQueuedMessages(next);
-    setIsStopping(true);
-    updateWasStoppedByUser(true, wasStoppedByUserRef, setWasStoppedByUser);
-    await stopActiveResponse();
-  }, [dispatchTurn, stopActiveResponse]);
-
-  const {
-    data: chatHistoryData,
-    isLoading: isChatHistoryLoading,
-    isPending: isChatHistoryPending,
-  } = useQuery(chatHistoryQueryOptions(organizationId, initialChatId));
-
-  const isSlackMirrored =
-    chatHistoryData?.externalChannelId?.source === "slack";
-
   const messageAuthorsById = useMemo(() => {
     const authors = new Map<string, ChatMessageAuthor>();
     for (const member of membersData?.members ?? []) {
@@ -1076,12 +772,6 @@ function StandaloneChatPageClient({
     isSlackMirrored,
     memberCount: messageAuthorsById.size,
   });
-  const currentAuthorUserId = session?.user.id;
-  const authorMetadata = useMemo(
-    () =>
-      currentAuthorUserId ? { authorUserId: currentAuthorUserId } : undefined,
-    [currentAuthorUserId]
-  );
 
   const appendMirroredMessage = useCallback(
     (message: ChatUIMessage | null) => {
@@ -1189,141 +879,56 @@ function StandaloneChatPageClient({
     [relayApprovalMutation]
   );
 
+  // A saved chat picks its effort back up from the last message that set it.
   useLayoutEffect(() => {
-    if (!chatHistoryData) {
+    const historyMessages = chatHistoryData?.messages;
+    if (!historyMessages?.length) {
       return;
     }
-    const historyMessages = chatHistoryData.messages;
-    if (historyMessages?.length) {
-      setMessages(historyMessages);
-
-      for (let index = historyMessages.length - 1; index >= 0; index -= 1) {
-        const thinkingLevelToRestore =
-          historyMessages[index]?.metadata?.requestedThinkingLevel;
-        const parsedThinkingLevel = thinkingLevelToRestore
-          ? parseStoredThinkingLevel(thinkingLevelToRestore)
-          : null;
-        if (parsedThinkingLevel) {
-          setThinkingLevel(parsedThinkingLevel);
-          break;
-        }
+    for (let index = historyMessages.length - 1; index >= 0; index -= 1) {
+      const thinkingLevelToRestore =
+        historyMessages[index]?.metadata?.requestedThinkingLevel;
+      const parsedThinkingLevel = thinkingLevelToRestore
+        ? parseStoredThinkingLevel(thinkingLevelToRestore)
+        : null;
+      if (parsedThinkingLevel) {
+        setThinkingLevel(parsedThinkingLevel);
+        break;
       }
     }
-    updateWasStoppedByUser(
-      Boolean(chatHistoryData.lastResponseStopped),
-      wasStoppedByUserRef,
-      setWasStoppedByUser
-    );
-    if (chatHistoryData.activeStreamId) {
-      setHistoryStreamId(chatHistoryData.activeStreamId);
-      setPendingMessageId(chatHistoryData.activeStreamId);
-    } else {
-      setHistoryStreamId(null);
-      setPendingMessageId(null);
-    }
-  }, [chatHistoryData, setMessages]);
+  }, [chatHistoryData]);
 
-  const hasUpdatedUrlRef = useRef(false);
   const pathname = usePathname();
   const navigationKey = useLocation({
     select: (location) => location.state.__TSR_key,
   });
   const previousNavigationKeyRef = useRef(navigationKey);
-  const previousInitialChatIdRef = useRef(initialChatId);
-
+  const startOverInNewChat = useEffectEvent(() => {
+    agent.startNewChat();
+    setContext([]);
+    setHasCustomizedContext(false);
+  });
+  // Opening the new-chat link again from a chat that started here starts over.
+  const returnToNewChat = useEffectEvent(() => {
+    if (agent.hasSentInNewChat() && agent.isIdle()) {
+      startOverInNewChat();
+    }
+  });
   useEffect(() => {
     const hasNavigated = previousNavigationKeyRef.current !== navigationKey;
     previousNavigationKeyRef.current = navigationKey;
-    const returnedToNewChat =
-      !initialChatId &&
-      hasUpdatedUrlRef.current &&
-      turnPhaseRef.current === "idle" &&
-      hasNavigated &&
-      pathname === `/${organizationSlug}/chat`;
     if (
-      previousInitialChatIdRef.current === initialChatId &&
-      !returnedToNewChat
+      !initialChatId &&
+      hasNavigated &&
+      pathname === `/${organizationSlug}/chat`
     ) {
-      return;
+      returnToNewChat();
     }
-    previousInitialChatIdRef.current = initialChatId;
-
-    if (initialChatId) {
-      queuedMessagesRef.current = [];
-      clearPendingChatClientState({
-        setChatError,
-        setPendingMessageId,
-        setQueuedMessages,
-      });
-      return;
-    }
-
-    queuedMessagesRef.current = [];
-    hasPendingChatNavigationRef.current = false;
-    resetNewChatClientState({
-      hasUpdatedUrlRef,
-      setChatError,
-      setContext,
-      setGeneratedChatId,
-      setHasCustomizedContext,
-      setMessages: replaceChatMessages,
-      setPendingMessageId,
-      setQueuedMessages,
-      setWasStoppedByUser,
-      wasStoppedByUserRef,
-    });
   }, [initialChatId, navigationKey, organizationSlug, pathname]);
 
   const draftStorageKey = localStorageKeys.chatDraft(
     initialChatId ?? `new:${organizationSlug}`
   );
-  const queueStorageKey = currentAuthorUserId
-    ? localStorageKeys.chatQueue(stableChatId, currentAuthorUserId)
-    : null;
-  const loadedQueueKeyRef = useRef<string | null>(null);
-
-  useEffect(() => {
-    if (isSlackMirrored || !queueStorageKey) {
-      return;
-    }
-    if (loadedQueueKeyRef.current === queueStorageKey) {
-      return;
-    }
-    loadedQueueKeyRef.current = queueStorageKey;
-    try {
-      const raw = window.localStorage.getItem(queueStorageKey);
-      if (!raw) {
-        queuedMessagesRef.current = [];
-        setQueuedMessages([]);
-        return;
-      }
-      const parsed = parseQueuedMessages(JSON.parse(raw));
-      queuedMessagesRef.current = parsed;
-      setQueuedMessages(parsed);
-    } catch {
-      queuedMessagesRef.current = [];
-      setQueuedMessages([]);
-    }
-  }, [isSlackMirrored, queueStorageKey]);
-
-  useEffect(() => {
-    if (!queueStorageKey || loadedQueueKeyRef.current !== queueStorageKey) {
-      return;
-    }
-    try {
-      if (queuedMessages.length === 0) {
-        window.localStorage.removeItem(queueStorageKey);
-      } else {
-        window.localStorage.setItem(
-          queueStorageKey,
-          JSON.stringify(queuedMessages)
-        );
-      }
-    } catch {
-      // noop
-    }
-  }, [queueStorageKey, queuedMessages]);
-
   const pendingHistoryMessages = chatHistoryData?.messages?.length ?? 0;
   const isLoadingHistory =
     Boolean(initialChatId) &&
@@ -1331,12 +936,6 @@ function StandaloneChatPageClient({
     (isChatHistoryLoading ||
       isChatHistoryPending ||
       pendingHistoryMessages > 0);
-  const isLoading = status === "streaming" || status === "submitted";
-  useLayoutEffect(() => {
-    if (isLoading) {
-      dispatchTurn("send");
-    }
-  }, [dispatchTurn, isLoading]);
 
   // An artifact the agent writes while replying opens in the side panel; the
   // ones already in the chat when it loads stay closed.
@@ -1363,32 +962,7 @@ function StandaloneChatPageClient({
   }, [latestArtifactWriteCallId, latestWrittenArtifactId]);
   const isPendingAutoSubmit =
     !initialChatId && Boolean(initialQuery?.trim()) && messages.length === 0;
-  const isProjectScopePending = !initialChatId && !isProjectResolved;
   const hasMessages = messages.length > 0;
-
-  const [isFirstMessageTransition, setIsFirstMessageTransition] =
-    useState(false);
-  const firstMessageTransitionTimerRef = useRef<ReturnType<
-    typeof setTimeout
-  > | null>(null);
-  const triggerFirstMessageTransition = useCallback(() => {
-    if (firstMessageTransitionTimerRef.current) {
-      clearTimeout(firstMessageTransitionTimerRef.current);
-    }
-    setIsFirstMessageTransition(true);
-    firstMessageTransitionTimerRef.current = setTimeout(() => {
-      setIsFirstMessageTransition(false);
-      firstMessageTransitionTimerRef.current = null;
-    }, 600);
-  }, []);
-  useEffect(
-    () => () => {
-      if (firstMessageTransitionTimerRef.current) {
-        clearTimeout(firstMessageTransitionTimerRef.current);
-      }
-    },
-    []
-  );
 
   useEffect(() => {
     function isEditableTarget(target: EventTarget | null): boolean {
@@ -1467,10 +1041,6 @@ function StandaloneChatPageClient({
     );
   }, []);
 
-  useEffect(() => {
-    messagesRef.current = messages;
-  }, [messages]);
-
   const extractUserMessageContent = useCallback((message: ChatUIMessage) => {
     let text = "";
     const attachments: ChatMessagePart[] = [];
@@ -1535,7 +1105,6 @@ function StandaloneChatPageClient({
       }
 
       const currentTail = current.slice(index);
-      const truncated = current.slice(0, index + 1);
 
       setMessageBranches((prev) => {
         const existing = prev[userMessageId];
@@ -1554,42 +1123,9 @@ function StandaloneChatPageClient({
         };
       });
 
-      setMessages(truncated);
-      setIsStopping(false);
-      updateWasStoppedByUser(false, wasStoppedByUserRef, setWasStoppedByUser);
-      setChatError(null);
-      dispatchTurn("send");
-      if (!initialChatId) {
-        hasPendingChatNavigationRef.current = true;
-      }
-      if (attachments.length > 0) {
-        const parts: ChatMessagePart[] = [];
-        if (text.length > 0) {
-          parts.push({ type: "text", text });
-        }
-        parts.push(...attachments);
-        await sendMessage({
-          role: "user",
-          parts,
-          messageId: userMessageId,
-          metadata: authorMetadata,
-        });
-      } else {
-        await sendMessage({
-          text,
-          messageId: userMessageId,
-          metadata: authorMetadata,
-        });
-      }
+      await resendFrom(userMessageId, text, attachments);
     },
-    [
-      authorMetadata,
-      dispatchTurn,
-      initialChatId,
-      isSlackMirrored,
-      sendMessage,
-      setMessages,
-    ]
+    [isSlackMirrored, messagesRef, resendFrom]
   );
 
   const handleEditMessage = useCallback(
@@ -1609,6 +1145,7 @@ function StandaloneChatPageClient({
     },
     [
       extractUserMessageContent,
+      messagesRef,
       postTitlesById,
       resendFromUserMessage,
       stableChatId,
@@ -1629,7 +1166,12 @@ function StandaloneChatPageClient({
       trackEvent(POSTHOG_EVENTS.CHAT_RETRY, { chat_id: stableChatId });
       await resendFromUserMessage(userMessageId, text, attachments);
     },
-    [extractUserMessageContent, resendFromUserMessage, stableChatId]
+    [
+      extractUserMessageContent,
+      messagesRef,
+      resendFromUserMessage,
+      stableChatId,
+    ]
   );
 
   const [branchSwitchSignal, setBranchSwitchSignal] = useState<{
@@ -1672,133 +1214,7 @@ function StandaloneChatPageClient({
         branch_count: total,
       });
     },
-    [messageBranches, setMessages, stableChatId]
-  );
-
-  const settleQuestion = useCallback(
-    (
-      toolCallId: string,
-      result:
-        | { output: { answers: AgentQuestionAnswer[] } }
-        | { state: "output-error"; errorText: string }
-    ) => {
-      if (unsentAnswersRef.current.has(toolCallId)) {
-        return;
-      }
-      unsentAnswersRef.current.add(toolCallId);
-      setChatError(null);
-      updateWasStoppedByUser(false, wasStoppedByUserRef, setWasStoppedByUser);
-      Promise.resolve(
-        addToolOutput({ tool: AGENT_QUESTION_TOOL_NAME, toolCallId, ...result })
-      ).catch((error: unknown) => {
-        unsentAnswersRef.current.delete(toolCallId);
-        console.error("[Chat] Failed to answer the agent's question:", error);
-      });
-    },
-    [addToolOutput]
-  );
-
-  const answerQuestion = useCallback(
-    (toolCallId: string, answers: AgentQuestionAnswer[]) =>
-      settleQuestion(toolCallId, { output: { answers } }),
-    [settleQuestion]
-  );
-
-  /** The agent hears that the user skipped its questions, and carries on. */
-  const dismissQuestion = useCallback(
-    (toolCallId: string) =>
-      settleQuestion(toolCallId, {
-        state: "output-error",
-        errorText: AGENT_QUESTION_DISMISSED,
-      }),
-    [settleQuestion]
-  );
-
-  const dispatchMessage = useCallback(
-    async (text: string, attachments: ChatAttachment[] = []) => {
-      if (isSlackMirrored || isProjectScopePending) {
-        return;
-      }
-
-      if (text.trim().length === 0 && attachments.length === 0) {
-        return;
-      }
-
-      // A message sent while the agent waits on questions answers the first.
-      const pendingQuestion = findPendingAgentQuestion(messagesRef.current);
-      if (pendingQuestion && attachments.length === 0) {
-        answerQuestion(
-          pendingQuestion.toolCallId,
-          pendingQuestion.questions.map((_, index) =>
-            index === 0 ? [text] : []
-          )
-        );
-        return;
-      }
-
-      dispatchTurn("send");
-      if (!initialChatId) {
-        hasPendingChatNavigationRef.current = true;
-      }
-      const isFirstMessage = !initialChatId && !hasUpdatedUrlRef.current;
-      if (messagesRef.current.length === 0) {
-        triggerFirstMessageTransition();
-      }
-      setIsStopping(false);
-      updateWasStoppedByUser(false, wasStoppedByUserRef, setWasStoppedByUser);
-      for (const message of messagesRef.current) {
-        if (message.role !== "assistant") {
-          continue;
-        }
-        for (const part of message.parts) {
-          if (!(isToolUIPart(part) && part.state === "approval-requested")) {
-            continue;
-          }
-          const approvalId = part.approval?.id;
-          if (!approvalId) {
-            continue;
-          }
-          addToolApprovalResponse({
-            id: approvalId,
-            approved: false,
-          });
-        }
-      }
-      if (isFirstMessage) {
-        hasUpdatedUrlRef.current = true;
-        insertPendingChatSession(stableChatId);
-      }
-      if (attachments.length > 0) {
-        const parts: ChatMessagePart[] = [];
-        if (text.length > 0) {
-          parts.push({ type: "text", text });
-        }
-        for (const attachment of attachments) {
-          parts.push({
-            type: "file",
-            url: attachment.url,
-            mediaType: attachment.mediaType,
-            filename: attachment.filename,
-          });
-        }
-        await sendMessage({ role: "user", parts, metadata: authorMetadata });
-      } else {
-        await sendMessage({ text, metadata: authorMetadata });
-      }
-    },
-    [
-      addToolApprovalResponse,
-      answerQuestion,
-      authorMetadata,
-      dispatchTurn,
-      initialChatId,
-      insertPendingChatSession,
-      isProjectScopePending,
-      isSlackMirrored,
-      sendMessage,
-      stableChatId,
-      triggerFirstMessageTransition,
-    ]
+    [messageBranches, messagesRef, setMessages, stableChatId]
   );
 
   const handleSend = useCallback(
@@ -1810,29 +1226,9 @@ function StandaloneChatPageClient({
         }
         return;
       }
-      if (turnPhaseRef.current !== "idle" || isLoading) {
-        const next = [
-          ...queuedMessagesRef.current,
-          {
-            id: nanoid(10),
-            text,
-            authorUserId: currentAuthorUserId,
-            ...(attachments.length > 0 ? { attachments } : {}),
-          },
-        ];
-        queuedMessagesRef.current = next;
-        setQueuedMessages(next);
-        return;
-      }
-      await dispatchMessage(text, attachments);
+      await sendToAgent(text, attachments);
     },
-    [
-      currentAuthorUserId,
-      dispatchMessage,
-      isLoading,
-      isSlackMirrored,
-      relayMessage,
-    ]
+    [isSlackMirrored, relayMessage, sendToAgent]
   );
 
   const autoSubmittedQueryRef = useRef<string | null>(null);
@@ -1858,19 +1254,7 @@ function StandaloneChatPageClient({
         return;
       }
       pendingInitialQueryResetRef.current = trimmedInitialQuery;
-      queuedMessagesRef.current = [];
-      resetNewChatClientState({
-        hasUpdatedUrlRef,
-        setChatError,
-        setContext,
-        setGeneratedChatId,
-        setHasCustomizedContext,
-        setMessages: replaceChatMessages,
-        setPendingMessageId,
-        setQueuedMessages,
-        setWasStoppedByUser,
-        wasStoppedByUserRef,
-      });
+      startOverInNewChat();
       return;
     }
 
@@ -1907,376 +1291,13 @@ function StandaloneChatPageClient({
       cancelled = true;
     };
   }, [
+    chatInputRef,
     initialChatId,
     initialQuery,
     isProjectResolved,
+    messagesRef,
     organizationId,
     setInitialQuery,
-  ]);
-
-  const handleRemoveQueued = useCallback((id: string) => {
-    if (steerAfterStopRef.current?.id === id) {
-      steerAfterStopRef.current = null;
-      updateWasStoppedByUser(true, wasStoppedByUserRef, setWasStoppedByUser);
-    }
-    const next = queuedMessagesRef.current.filter((m) => m.id !== id);
-    queuedMessagesRef.current = next;
-    setQueuedMessages(next);
-  }, []);
-
-  const handleEditQueued = useCallback((message: QueuedMessage) => {
-    if (
-      message.attachments?.length &&
-      !chatInputRef.current?.setAttachments(message.attachments)
-    ) {
-      return;
-    }
-    if (steerAfterStopRef.current?.id === message.id) {
-      steerAfterStopRef.current = null;
-      updateWasStoppedByUser(true, wasStoppedByUserRef, setWasStoppedByUser);
-    }
-    const next = queuedMessagesRef.current.filter((m) => m.id !== message.id);
-    queuedMessagesRef.current = next;
-    setQueuedMessages(next);
-    chatInputRef.current?.setText(message.text);
-  }, []);
-
-  const sendSteeredQueued = useCallback(
-    (message: QueuedMessage) => {
-      const taken = takeQueuedMessage(queuedMessagesRef.current, message.id);
-      if (!taken) {
-        return;
-      }
-      queuedMessagesRef.current = taken.remaining;
-      setQueuedMessages(taken.remaining);
-      dispatchTurn("sendQueued");
-      updateWasStoppedByUser(false, wasStoppedByUserRef, setWasStoppedByUser);
-      dispatchMessage(message.text, message.attachments).catch((error) => {
-        console.error("[Chat] Failed to steer queued message:", error);
-        dispatchTurn("settled");
-        const restored = [message, ...queuedMessagesRef.current];
-        queuedMessagesRef.current = restored;
-        setQueuedMessages(restored);
-      });
-    },
-    [dispatchMessage, dispatchTurn]
-  );
-
-  const flushSteerAfterStop = useCallback(() => {
-    const next = steerAfterStopRef.current;
-    if (!next) {
-      return;
-    }
-    steerAfterStopRef.current = null;
-    sendSteeredQueued(next);
-  }, [sendSteeredQueued]);
-
-  const handleSteerQueued = useCallback(
-    (message: QueuedMessage) => {
-      if (steerAfterStopRef.current) {
-        return;
-      }
-      if (
-        !queuedMessagesRef.current.some((queued) => queued.id === message.id)
-      ) {
-        return;
-      }
-      if (turnPhaseRef.current === "idle" && !isLoading) {
-        sendSteeredQueued(message);
-        return;
-      }
-      const next = markQueuedMessageSteering(
-        queuedMessagesRef.current,
-        message.id
-      );
-      queuedMessagesRef.current = next;
-      setQueuedMessages(next);
-      steerAfterStopRef.current = message;
-      updateWasStoppedByUser(false, wasStoppedByUserRef, setWasStoppedByUser);
-      stopActiveResponse().catch((error) => {
-        console.error(
-          "[Chat] Failed to stop active response for steer:",
-          error
-        );
-        flushSteerAfterStop();
-      });
-    },
-    [flushSteerAfterStop, isLoading, sendSteeredQueued, stopActiveResponse]
-  );
-
-  useEffect(() => {
-    flushSteerAfterStopRef.current = flushSteerAfterStop;
-  }, [flushSteerAfterStop]);
-
-  const navigateToNewChat = useCallback(
-    (finishedMessage: ChatUIMessage) => {
-      if (
-        !hasPendingChatNavigationRef.current ||
-        isDispatchingQueued(turnPhaseRef.current) ||
-        turnPhaseRef.current === "waitingForActiveStream" ||
-        queuedMessagesRef.current.length > 0
-      ) {
-        return;
-      }
-      hasPendingChatNavigationRef.current = false;
-      queryClient.setQueryData(["chat-history", organizationId, stableChatId], {
-        messages: [
-          ...messagesRef.current.filter(
-            (message) => message.id !== finishedMessage.id
-          ),
-          finishedMessage,
-        ],
-        lastResponseStopped: wasStoppedByUserRef.current,
-        activeStreamId: null,
-        externalChannelId: null,
-        slackThreadUrl: null,
-      });
-      router.replace(`/${organizationSlug}/chat/${stableChatId}`, {
-        scroll: false,
-      });
-      queryClient.invalidateQueries({
-        queryKey: ["chat-sessions", organizationId],
-      });
-    },
-    [organizationId, organizationSlug, queryClient, router, stableChatId]
-  );
-
-  useEffect(() => {
-    navigateToNewChatRef.current = navigateToNewChat;
-  }, [navigateToNewChat]);
-
-  const seenToolOutputsRef = useRef<Set<string>>(new Set());
-  const prevIsLoadingRef = useRef(false);
-
-  useEffect(() => {
-    drainQueueRef.current = () => {
-      if (isSlackMirrored) {
-        return;
-      }
-      if (turnPhaseRef.current !== "idle") {
-        return;
-      }
-      if (wasStoppedByUserRef.current) {
-        return;
-      }
-      if (steerAfterStopRef.current) {
-        return;
-      }
-      const current = messagesRef.current;
-      if (
-        hasPendingApproval(current) ||
-        // A queued message would answer the agent's open questions for the user.
-        findPendingAgentQuestion(current) !== null ||
-        // The SDK resends on its own after an answer or a discard; draining
-        // now would double-submit.
-        unsentAnswersRef.current.size > 0 ||
-        isPressedDiscard(current, false)
-      ) {
-        return;
-      }
-      const queue = queuedMessagesRef.current;
-      const next = queue[0];
-      if (!next) {
-        return;
-      }
-
-      dispatchTurn("sendQueued");
-      const remaining = queue.slice(1);
-      queuedMessagesRef.current = remaining;
-      setQueuedMessages(remaining);
-      dispatchMessage(next.text, next.attachments).catch((error) => {
-        console.error("[Chat] Failed to drain queued message:", error);
-        dispatchTurn("settled");
-        const restored = [next, ...queuedMessagesRef.current];
-        queuedMessagesRef.current = restored;
-        setQueuedMessages(restored);
-      });
-    };
-  }, [dispatchMessage, dispatchTurn, isSlackMirrored]);
-
-  const activeStreamPollRef = useRef<ReturnType<typeof setInterval> | null>(
-    null
-  );
-
-  const stopActiveStreamPolling = useCallback(() => {
-    if (activeStreamPollRef.current) {
-      clearInterval(activeStreamPollRef.current);
-      activeStreamPollRef.current = null;
-    }
-  }, []);
-
-  const checkActiveStream = useCallback(async () => {
-    const data = await dashboardOrpcClient.chat.sessions
-      .get({ organizationId, chatId: stableChatId })
-      .catch((error: unknown) => {
-        if (error instanceof ORPCError) {
-          return null;
-        }
-        throw error;
-      });
-    if (!data || data.activeStreamId || !activeStreamPollRef.current) {
-      return;
-    }
-    stopActiveStreamPolling();
-    if (data.messages?.length) {
-      setMessages(data.messages);
-    }
-    dispatchTurn("activeStreamEnded");
-  }, [
-    dispatchTurn,
-    organizationId,
-    setMessages,
-    stableChatId,
-    stopActiveStreamPolling,
-  ]);
-
-  const startActiveStreamPolling = useCallback(() => {
-    stopActiveStreamPolling();
-    let isChecking = false;
-    activeStreamPollRef.current = setInterval(() => {
-      if (isChecking) {
-        return;
-      }
-      isChecking = true;
-      checkActiveStream()
-        .catch((error) => {
-          console.error("[Chat] Failed to check the active response:", error);
-        })
-        .finally(() => {
-          isChecking = false;
-        });
-    }, CHAT_ACTIVE_STREAM_POLL_INTERVAL_MS);
-  }, [checkActiveStream, stopActiveStreamPolling]);
-
-  useEffect(() => stopActiveStreamPolling, [stopActiveStreamPolling]);
-
-  useEffect(() => {
-    requeueConflictedMessageRef.current = (messageId) => {
-      const current = messagesRef.current;
-      const index = current.findIndex((message) => message.id === messageId);
-      const message = current[index];
-      if (!message || message.role !== "user") {
-        return false;
-      }
-      const { text, attachments } = extractUserMessageContent(message);
-      if (attachments.length > 0 || !text.trim()) {
-        return false;
-      }
-      setMessages(current.slice(0, index));
-      const requeued: QueuedMessage = {
-        id: nanoid(10),
-        text,
-        authorUserId: currentAuthorUserId,
-      };
-      queuedMessagesRef.current = [requeued, ...queuedMessagesRef.current];
-      setQueuedMessages(queuedMessagesRef.current);
-      dispatchTurn("streamConflict");
-      setPendingMessageId(null);
-      startActiveStreamPolling();
-      return true;
-    };
-  }, [
-    currentAuthorUserId,
-    dispatchTurn,
-    extractUserMessageContent,
-    setMessages,
-    startActiveStreamPolling,
-  ]);
-
-  const wasWaitingForActiveStreamRef = useRef(false);
-  useEffect(() => {
-    if (isWaitingForActiveStream) {
-      wasWaitingForActiveStreamRef.current = true;
-      return;
-    }
-    if (!wasWaitingForActiveStreamRef.current || isLoading) {
-      return;
-    }
-    wasWaitingForActiveStreamRef.current = false;
-    if (steerAfterStopRef.current) {
-      flushSteerAfterStopRef.current();
-      return;
-    }
-    drainQueueRef.current();
-  }, [isLoading, isWaitingForActiveStream]);
-
-  useEffect(() => {
-    if (isLoading && !prevIsLoadingRef.current) {
-      const snapshot = new Set<string>();
-      for (const message of messagesRef.current) {
-        if (message.role !== "assistant") {
-          continue;
-        }
-        for (const part of message.parts) {
-          if (isToolUIPart(part) && isTerminalToolState(part.state)) {
-            snapshot.add(part.toolCallId);
-          }
-        }
-      }
-      seenToolOutputsRef.current = snapshot;
-      dispatchTurn("streamStarted");
-    }
-    prevIsLoadingRef.current = isLoading;
-  }, [dispatchTurn, isLoading]);
-
-  useEffect(() => {
-    if (isSlackMirrored) {
-      return;
-    }
-    if (!isLoading) {
-      return;
-    }
-    if (isDispatchingQueued(turnPhaseRef.current)) {
-      return;
-    }
-    if (wasStoppedByUser) {
-      return;
-    }
-    if (queuedMessages.length === 0) {
-      return;
-    }
-    if (hasPendingApproval(messages)) {
-      return;
-    }
-
-    let hasNewToolOutput = false;
-    for (const message of messages) {
-      if (message.role !== "assistant") {
-        continue;
-      }
-      for (const part of message.parts) {
-        if (
-          isToolUIPart(part) &&
-          isTerminalToolState(part.state) &&
-          !seenToolOutputsRef.current.has(part.toolCallId)
-        ) {
-          seenToolOutputsRef.current.add(part.toolCallId);
-          hasNewToolOutput = true;
-        }
-      }
-    }
-
-    if (!hasNewToolOutput) {
-      return;
-    }
-
-    dispatchTurn("stopForQueue");
-
-    stopActiveResponse().catch((error) => {
-      console.error(
-        "[Chat] Failed to stop active response for queue drain:",
-        error
-      );
-      dispatchTurn("stopForQueueFailed");
-    });
-  }, [
-    dispatchTurn,
-    isLoading,
-    messages,
-    queuedMessages.length,
-    isSlackMirrored,
-    wasStoppedByUser,
-    stopActiveResponse,
   ]);
 
   useEffect(() => {
@@ -2313,18 +1334,16 @@ function StandaloneChatPageClient({
     };
   }, [isSlackMirrored]);
 
-  const handleClearError = useCallback(() => setChatError(null), []);
+  const handleClearError = useCallback(
+    () => setChatError(null),
+    [setChatError]
+  );
 
   const handleRetryAfterError = useCallback(async () => {
     // A failed send after an answer or an approval goes out again from the
     // agent's turn, so the answer stays in the conversation.
-    const continuation = findAgentTurnToRetry(messagesRef.current);
-    if (continuation) {
-      setChatError(null);
-      if (continuation !== messagesRef.current) {
-        setMessages(continuation);
-      }
-      await sendMessage();
+    if (findAgentTurnToRetry(messagesRef.current)) {
+      retry();
       return;
     }
     let lastUserMessage: ChatUIMessage | undefined;
@@ -2338,7 +1357,7 @@ function StandaloneChatPageClient({
     }
     setChatError(null);
     await handleRetryMessage(lastUserMessage.id);
-  }, [handleRetryMessage, sendMessage, setMessages]);
+  }, [handleRetryMessage, messagesRef, retry, setChatError]);
 
   const trackToolApproval = (
     part: ChatToolPart,
@@ -2354,15 +1373,13 @@ function StandaloneChatPageClient({
     trackToolApproval(part, "approved");
     return isSlackMirrored
       ? relayApproval(approvalId, true)
-      : addToolApprovalResponse({ id: approvalId, approved: true });
+      : agent.handleApproveTool(approvalId);
   };
   const handleDenyTool = (approvalId: string, part: ChatToolPart) => {
     trackToolApproval(part, "denied");
-    if (isSlackMirrored) {
-      return relayApproval(approvalId, false);
-    }
-    discardedApprovalsRef.current.add(approvalId);
-    return addToolApprovalResponse({ id: approvalId, approved: false });
+    return isSlackMirrored
+      ? relayApproval(approvalId, false)
+      : agent.handleDenyTool(approvalId);
   };
 
   const { approval: composerApproval, isApprovalInComposer } =
@@ -2687,9 +1704,6 @@ function StandaloneChatPageClient({
         findAutopilotWorkflowDraft(messages)?.toolCallId ?? null,
     })
   );
-  const pendingQuestion = isSlackMirrored
-    ? null
-    : findPendingAgentQuestion(messages);
 
   if (isLoadingHistory) {
     return <ChatPageSkeleton />;

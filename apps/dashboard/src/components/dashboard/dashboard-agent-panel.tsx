@@ -29,7 +29,6 @@ import { useDesktopBreakpoint } from "@/lib/hooks/use-desktop-breakpoint";
 import { useMcpLogosByConnectionId } from "@/lib/hooks/use-mcp-logos";
 import { useOpenAgentChatPage } from "@/lib/hooks/use-open-agent-chat-page";
 import type { DashboardAgentChatProps } from "@/types/components/dashboard-agent";
-import { findPendingAgentQuestion } from "@/utils/agent-questions";
 import { findAutopilotWorkflowDraft } from "@/utils/autopilot-workflow-draft";
 import { upgradeLinkSlug } from "@/utils/chat-upgrade";
 
@@ -46,19 +45,16 @@ function DashboardAgentChat({
   const { active, expanded } = useRightPanel();
   const isDesktop = useDesktopBreakpoint();
   const open = active === "agent";
-  const agent = useDashboardAgentChat({
-    organizationId,
-    loadSessions: hasOpened,
-  });
+  const agent = useDashboardAgentChat({ organizationId });
   const {
-    activeChatId,
+    chatId: activeChatId,
     chatError,
     chatInputRef,
     chatInputValue,
-    isAgentBusy,
-    isHydratingHistory,
+    isLoading: isAgentBusy,
     messages,
     messagesRef,
+    pendingQuestion,
     setChatError,
     setChatInputValue,
   } = agent;
@@ -75,11 +71,7 @@ function DashboardAgentChat({
     organizationSlug,
     chatId: activeChatId,
     onClose,
-    hasConversation: () =>
-      messagesRef.current.length > 0 ||
-      Boolean(
-        agent.sessionsData?.some((session) => session.chatId === activeChatId)
-      ),
+    hasConversation: () => messagesRef.current.length > 0,
   });
 
   const mcpLogosByConnectionId = useMcpLogosByConnectionId(
@@ -93,15 +85,13 @@ function DashboardAgentChat({
       onApprove: agent.handleApproveTool,
       onDeny: agent.handleDenyTool,
     });
-  const isChatDisabled = isHydratingHistory;
-  const pendingQuestion = findPendingAgentQuestion(messages);
 
   const chat = hasOpened ? (
     <div className="h-full min-h-0 max-w-full min-w-0">
       <ChatQuoteProvider key={activeChatId}>
         <ContentChatActivityPanel
           activeChatId={activeChatId}
-          isHistoryLoading={agent.isSessionsLoading || isHydratingHistory}
+          isStopping={agent.isStopping}
           messages={messages}
           customTools={autopilotWorkflowDraftTools({
             latestToolCallId:
@@ -113,13 +103,12 @@ function DashboardAgentChat({
           onDenyTool={agent.handleDenyTool}
           onNewChat={agent.handleNewChat}
           onOpenChat={handleOpenChat}
-          onSelectChat={agent.handleSelectChat}
           mcpLogosByConnectionId={mcpLogosByConnectionId}
           organizationId={organizationId}
           organizationSlug={organizationSlug}
           showHistory={false}
-          sessions={agent.sessions}
           status={agent.status}
+          wasStoppedByUser={agent.wasStoppedByUser}
           surface={isDesktop ? "shell" : "muted"}
           title={tCommon("labels.agent")}
         >
@@ -148,9 +137,9 @@ function DashboardAgentChat({
             >
               <ChatInput
                 approval={composerApproval}
-                disabled={isChatDisabled}
                 error={chatError}
                 isLoading={isAgentBusy}
+                isStopping={agent.isStopping}
                 effort={agent.effort}
                 onClearError={() => setChatError(null)}
                 onRetry={agent.canRetry ? agent.retry : undefined}

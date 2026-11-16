@@ -8,10 +8,11 @@ export interface ContentChatActivityPanelProps extends ChatConversationProps {
   title?: string;
   /** Replaces the title, e.g. with tabs when the panel hosts more than the agent. */
   titleSlot?: ReactNode;
-  sessions: ChatSessionSummary[];
-  isHistoryLoading: boolean;
+  /** The thread list; without `onSelectChat` the panel shows none. */
+  sessions?: ChatSessionSummary[];
+  isHistoryLoading?: boolean;
   onNewChat: () => void;
-  onSelectChat: (chatId: string) => void;
+  onSelectChat?: (chatId: string) => void;
   onClose: () => void;
   onOpenChat?: () => void;
   showHistory?: boolean;
@@ -34,9 +35,11 @@ export type ContentChatActivityHeaderProps = Pick<
   | "surface"
 >;
 
-export type ContentChatHistoryItemsProps = Pick<
-  ContentChatActivityPanelProps,
-  "sessions" | "activeChatId" | "isHistoryLoading" | "status" | "onSelectChat"
+export type ContentChatHistoryItemsProps = Required<
+  Pick<
+    ContentChatActivityPanelProps,
+    "sessions" | "activeChatId" | "isHistoryLoading" | "status" | "onSelectChat"
+  >
 >;
 
 export interface ContentPanelHeaderButtonProps {

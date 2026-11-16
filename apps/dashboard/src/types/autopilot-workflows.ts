@@ -337,7 +337,6 @@ export interface AutopilotAgentDockFocusChipProps {
 }
 
 export interface AutopilotAgentDockSuggestionsProps {
-  disabled: boolean;
   hidden: boolean;
   onSelect: (prompt: string) => void;
   suggestions: ChatSuggestion[];

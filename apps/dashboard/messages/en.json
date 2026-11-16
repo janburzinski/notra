@@ -7028,7 +7028,8 @@
       "usageLimit": "You've used all your chat messages this month. Upgrade for more.",
       "fallback": "Something went wrong while generating a response. Try again.",
       "offline": "You're offline. Check your connection.",
-      "agentFallback": "The agent couldn't respond."
+      "agentFallback": "The agent couldn't respond.",
+      "stopFailed": "Couldn't stop the response. Try again."
     },
     "quote": {
       "quoteSelection": "Quote selected text",
@@ -8120,8 +8121,6 @@
       "openLabel": "Open agent",
       "closeLabel": "Close agent",
       "placeholder": "Ask anything… (type / for skills)",
-      "stopFailed": "Couldn't stop the response. Try again.",
-      "historyLoadFailed": "Failed to load agent chat history. Try again.",
       "description": "Chat with your dashboard agent.",
       "loadingTitle": "Loading agent",
       "loadingDescription": "Loading the dashboard agent.",

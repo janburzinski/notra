@@ -7028,7 +7028,8 @@
       "usageLimit": "Du hast diesen Monat alle Chat-Nachrichten aufgebraucht. Upgrade für mehr.",
       "fallback": "Beim Erstellen der Antwort ist etwas schiefgelaufen. Versuch es nochmal.",
       "offline": "Du bist offline. Prüf deine Verbindung.",
-      "agentFallback": "Der Agent konnte nicht antworten."
+      "agentFallback": "Der Agent konnte nicht antworten.",
+      "stopFailed": "Die Antwort konnte nicht gestoppt werden. Versuch es nochmal."
     },
     "quote": {
       "quoteSelection": "Markierten Text zitieren",
@@ -8120,8 +8121,6 @@
       "openLabel": "Agent öffnen",
       "closeLabel": "Agent schließen",
       "placeholder": "Frag irgendwas… (tippe / für Skills)",
-      "stopFailed": "Die Antwort konnte nicht gestoppt werden. Versuch es nochmal.",
-      "historyLoadFailed": "Agent-Chatverlauf konnte nicht geladen werden. Versuch es nochmal.",
       "description": "Chatte mit deinem Dashboard-Agent.",
       "loadingTitle": "Agent wird geladen",
       "loadingDescription": "Der Dashboard-Agent wird geladen.",

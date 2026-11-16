@@ -5,12 +5,15 @@ import type { RefObject } from "react";
 
 import { CHAT_ACTIVE_STREAM_CONFLICT_STATUS } from "@/constants/chat-active-stream";
 import { CHAT_STREAM_ID_HEADER } from "@/constants/chat-stream";
+import type { AgentChatFocus } from "@/types/hooks/agent-chat";
 import { encodeChatStreamId } from "@/utils/chat-stream-id";
 import { fetchResumableChatStream } from "@/utils/fetch-resumable-chat-stream";
 
 export type StandaloneChatTransportLive = {
   activeProjectId: RefObject<string | null>;
   context: RefObject<ContextItem[]>;
+  /** The Autopilot page the user is on, read when each request goes out. */
+  focus: RefObject<AgentChatFocus | undefined>;
   hasCustomizedContext: RefObject<boolean>;
   onChatCreated: RefObject<((chatId: string) => void) | undefined>;
   organizationId: RefObject<string>;
@@ -40,6 +43,7 @@ export function createStandaloneChatTransport({
         enableThinking: live.thinkingLevel.current !== "off",
         thinkingLevel: live.thinkingLevel.current,
         timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        ...live.focus.current,
       },
     }),
     prepareReconnectToStreamRequest: ({ id }) => ({

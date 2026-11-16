@@ -76,7 +76,6 @@ import type {
   AutopilotAgentDockMode,
   AutopilotAgentDockProps,
 } from "@/types/autopilot-workflows";
-import { findPendingAgentQuestion } from "@/utils/agent-questions";
 import { findAutopilotWorkflowDraft } from "@/utils/autopilot-workflow-draft";
 import { upgradeLinkSlug } from "@/utils/chat-upgrade";
 
@@ -275,7 +274,6 @@ function DockChips({
 
 /** An empty conversation offers workflows the agent can build right away. */
 function DockSuggestions({
-  disabled,
   hidden,
   onSelect,
   suggestions,
@@ -283,7 +281,6 @@ function DockSuggestions({
   return (
     <div className="shrink-0 px-4 pb-2">
       <ChatSuggestions
-        disabled={disabled}
         dismissStorageKey={localStorageKeys.autopilotAgentSuggestionsDismissed}
         hidden={hidden}
         layout="list"
@@ -450,7 +447,6 @@ export function AutopilotAgentDock({
     useAutopilotDockFocus(organizationId, () => setMode("collapsed"));
   const agent = useDashboardAgentChat({
     organizationId,
-    loadSessions: false,
     autopilotWorkflowId: focusWorkflowId ?? undefined,
     autopilotAutomation: focusAutomation ?? undefined,
   });
@@ -465,13 +461,13 @@ export function AutopilotAgentDock({
   } = agent;
   const draft = findAutopilotWorkflowDraft(messages);
   useAgentWorkflowRefresh(messages);
-  const pendingQuestion = findPendingAgentQuestion(messages);
+  const { pendingQuestion } = agent;
   const fullscreen = mode === "fullscreen";
   const expanded = mode !== "collapsed";
   const shell = useDockShell(expanded);
   const activity = useAutopilotDockActivity({
     messages,
-    busy: agent.isAgentBusy,
+    busy: agent.isLoading,
     expanded,
     failed: chatError !== null,
   });
@@ -521,10 +517,10 @@ export function AutopilotAgentDock({
 
   const composer = (
     <ChatInput
-      disabled={agent.isHydratingHistory}
       elevated={mode === "collapsed"}
       error={chatError}
-      isLoading={agent.isAgentBusy}
+      isLoading={agent.isLoading}
+      isStopping={agent.isStopping}
       layout="pill"
       // The agent panel's shell and card colours.
       surface="card"
@@ -572,9 +568,8 @@ export function AutopilotAgentDock({
 
   // An empty conversation offers workflows the agent can build right away.
   const suggestions =
-    !hasMessages && !agent.isAgentBusy ? (
+    !hasMessages && !agent.isLoading ? (
       <DockSuggestions
-        disabled={agent.isHydratingHistory}
         hidden={chatInputValue.trim().length > 0}
         onSelect={(prompt) => {
           setChatInputValue(prompt);
@@ -649,9 +644,10 @@ export function AutopilotAgentDock({
                       AUTOPILOT_AGENT_DOCK_ENTER
                     )}
                   >
-                    <ChatQuoteProvider key={agent.activeChatId}>
+                    <ChatQuoteProvider key={agent.chatId}>
                       <ChatConversation
-                        activeChatId={agent.activeChatId}
+                        activeChatId={agent.chatId}
+                        isStopping={agent.isStopping}
                         customTools={customTools}
                         messages={messages}
                         onApproveTool={agent.handleApproveTool}
@@ -659,6 +655,7 @@ export function AutopilotAgentDock({
                         organizationId={organizationId}
                         organizationSlug={organizationSlug}
                         status={agent.status}
+                        wasStoppedByUser={agent.wasStoppedByUser}
                       />
                     </ChatQuoteProvider>
                     {suggestions}

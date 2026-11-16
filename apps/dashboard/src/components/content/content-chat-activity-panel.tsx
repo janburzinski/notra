@@ -93,9 +93,9 @@ function ContentChatHistoryItems({
 }
 
 function ContentChatActivityHeader({
-  sessions,
+  sessions = [],
   activeChatId,
-  isHistoryLoading,
+  isHistoryLoading = false,
   status,
   onNewChat,
   onSelectChat,
@@ -146,7 +146,7 @@ function ContentChatActivityHeader({
             </TooltipTrigger>
             <TooltipContent>{tCommon("labels.newChat")}</TooltipContent>
           </Tooltip>
-          {showHistory ? (
+          {showHistory && onSelectChat ? (
             <DropdownMenu>
               <Tooltip>
                 <TooltipTrigger
