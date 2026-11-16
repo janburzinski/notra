@@ -1,0 +1,21 @@
+apps/web/src/components/navbar.tsx
+  s_62a1fceec3383e::t_8aaf0d4bdfcb7e 372-374,377-378,684-690
+apps/blog/scripts/web-chrome.js
+  ai_agent 2,474
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "a661a3d14a8643bc94567562ad8210b7bc1232d6",
+  "prompts": {},
+  "sessions": {
+    "s_62a1fceec3383e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5eba935b-3529-411e-855a-75e3bcf238f1",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
