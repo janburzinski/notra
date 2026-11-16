@@ -2,6 +2,7 @@ import { Buffer } from "node:buffer";
 
 import { DomUtils, parseDocument } from "htmlparser2";
 
+import { GEO_AI_OVERVIEW_MIN_ANSWER_LENGTH } from "../constants/geo-ai-overview";
 import {
   GEO_CONTEXT_BLOCK_TAGS,
   GEO_CONTEXT_GOOGLE_ORIGIN,
@@ -292,7 +293,12 @@ export function parseGeoContextCapture(
     !response.html.data ||
     Buffer.byteLength(response.html.data) > GEO_CONTEXT_MAX_HTML_BYTES
   ) {
-    throw new Error("Context returned no usable rendered HTML");
+    // The code (e.g. WEBSITE_ACCESS_ERROR when Google blocks the browser) is
+    // what tells a provider outage apart from a page we could not parse.
+    const code = response.html.error_code;
+    throw new Error(
+      `Context returned no usable rendered HTML${code ? ` (${code})` : ""}`
+    );
   }
   const url = new URL(response.url);
   const expected =
@@ -334,7 +340,8 @@ export function parseGeoContextCapture(
       : overviewCapture(document);
   if (
     !result.absent &&
-    (result.text.length < 80 || result.sources.length === 0)
+    (result.text.length < GEO_AI_OVERVIEW_MIN_ANSWER_LENGTH ||
+      result.sources.length === 0)
   ) {
     throw new Error(
       "Context answer is empty, incomplete, or missing citations"

@@ -35,7 +35,8 @@ export async function askReportContext(
     flag: "wx",
   });
   const captured = await Effect.runPromise(
-    askGeoContextAnswer(engine, prompt, "en")
+    // The report labels these answers as Context captures, so no Olostep fallback.
+    askGeoContextAnswer(engine, prompt, "en", { olostepFallback: false })
   );
   const answer = {
     text: captured.text,

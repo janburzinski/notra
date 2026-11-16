@@ -1,5 +1,8 @@
 import type { GeoAiOverviewLocale } from "../types/geo-ai-overview";
 
+/** Shorter captures, or captures without citations, are incomplete pages. */
+export const GEO_AI_OVERVIEW_MIN_ANSWER_LENGTH = 80;
+
 export const GEO_AI_OVERVIEW_ABSENT_ANSWER =
   "No AI Overview was shown for this query.";
 

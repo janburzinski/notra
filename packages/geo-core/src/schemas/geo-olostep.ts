@@ -72,6 +72,7 @@ export const geoOlostepAnswerSchema = object({
   products: moduleItems(geoOlostepProductSchema),
   shopping_cards: array(unknown()).nullish().catch(null),
   related_queries: array(string()).nullish().catch(null),
+  organic_results: array(unknown()).nullish().catch(null),
   model: string().nullish().catch(null),
   web_searched: boolean().nullish().catch(null),
 });
@@ -88,4 +89,9 @@ export const geoOlostepBatchItemsSchema = object({
 
 export const geoOlostepRetrieveSchema = object({
   json_content: string().nullish(),
+});
+
+export const geoOlostepScrapeSchema = object({
+  id: string().nullish(),
+  result: object({ json_content: string().nullish() }),
 });

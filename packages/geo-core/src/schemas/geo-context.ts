@@ -7,5 +7,7 @@ export const geoContextResponseSchema = object({
     requested: boolean(),
     success: boolean().nullable(),
     data: string().nullable(),
+    error_code: string().nullish(),
+    message: string().nullish(),
   }),
 });

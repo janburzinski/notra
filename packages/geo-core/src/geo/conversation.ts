@@ -95,7 +95,8 @@ export const runGeoConversation = Effect.fn("geo.runConversation")(function* (
           source.snapshot
             ? geoOlostepPersonaQuery(source.snapshot, question)
             : question,
-          language
+          language,
+          { logFields: { ...fields, turn: index + 1 } }
         );
       } else {
         answer = yield* models.groundedAnswer({

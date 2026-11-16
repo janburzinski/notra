@@ -3,11 +3,18 @@ import { Effect } from "effect";
 import type { output, ZodType } from "zod";
 
 import {
+  GEO_AI_OVERVIEW_MIN_ANSWER_LENGTH,
+  geoAiOverviewLocale,
+} from "../constants/geo-ai-overview";
+import {
+  GEO_OLOSTEP_AI_OVERVIEW_PARSER,
   GEO_OLOSTEP_API_KEY_ENV,
   GEO_OLOSTEP_BASE_URL,
   GEO_OLOSTEP_ENGINES,
   GEO_OLOSTEP_ITEMS_PAGE_LIMIT,
+  GEO_OLOSTEP_NODE_COUNTRIES,
   GEO_OLOSTEP_REQUEST_TIMEOUT_MS,
+  GEO_OLOSTEP_SCRAPE_TIMEOUT_MS,
   GEO_OLOSTEP_TERMINAL_BATCH_STATUSES,
 } from "../constants/geo-olostep";
 import {
@@ -15,6 +22,7 @@ import {
   geoOlostepBatchItemsSchema,
   geoOlostepBatchSchema,
   geoOlostepRetrieveSchema,
+  geoOlostepScrapeSchema,
 } from "../schemas/geo-olostep";
 import type {
   GeoOlostepBatchRequest,
@@ -29,7 +37,8 @@ import { GeoOlostepError, GeoScanError } from "./errors";
 function olostepRequest<S extends ZodType>(
   path: string,
   schema: S,
-  init?: { method: "POST"; body: unknown }
+  init?: { method: "POST"; body: unknown },
+  timeoutMs = GEO_OLOSTEP_REQUEST_TIMEOUT_MS
 ): Effect.Effect<output<S>, GeoOlostepError> {
   return Effect.gen(function* () {
     const apiKey = yield* Effect.try({
@@ -42,10 +51,7 @@ function olostepRequest<S extends ZodType>(
         fetch(`${GEO_OLOSTEP_BASE_URL}${path}`, {
           method: init?.method ?? "GET",
           body: init ? JSON.stringify(init.body) : undefined,
-          signal: AbortSignal.any([
-            signal,
-            AbortSignal.timeout(GEO_OLOSTEP_REQUEST_TIMEOUT_MS),
-          ]),
+          signal: AbortSignal.any([signal, AbortSignal.timeout(timeoutMs)]),
           headers: {
             authorization: `Bearer ${apiKey}`,
             "content-type": "application/json",
@@ -268,4 +274,70 @@ export const askGeoOlostepAnswer = Effect.fn("geo.askOlostepAnswer")(function* (
         })
     )
   );
+});
+
+/**
+ * Scrapes one Google AI Overview synchronously. Only the Context.dev capture
+ * falls back to this, so it runs inside the check instead of a planned batch.
+ */
+export const askGeoOlostepAiOverviewAnswer = Effect.fn(
+  "geo.askOlostepAiOverviewAnswer"
+)(function* (prompt: string, language: string) {
+  const locale = geoAiOverviewLocale(language);
+  const country = locale.gl.toUpperCase();
+  const params = new URLSearchParams({
+    q: prompt,
+    hl: locale.hl,
+    gl: locale.gl,
+  });
+  const scrape = yield* olostepRequest(
+    "/scrapes",
+    geoOlostepScrapeSchema,
+    {
+      method: "POST",
+      body: {
+        url_to_scrape: `https://www.google.com/search?${params}`,
+        formats: ["json"],
+        parser: { id: GEO_OLOSTEP_AI_OVERVIEW_PARSER },
+        ...(GEO_OLOSTEP_NODE_COUNTRIES.has(country) ? { country } : {}),
+      },
+    },
+    GEO_OLOSTEP_SCRAPE_TIMEOUT_MS
+  );
+  const payload = yield* Effect.try({
+    try: () =>
+      geoOlostepAnswerSchema.parse(
+        JSON.parse(scrape.result.json_content ?? "")
+      ),
+    catch: (cause) =>
+      new GeoOlostepError({
+        message: "Olostep AI Overview scrape has no parsed answer",
+        cause,
+      }),
+  });
+  const answer = geoOlostepAnswer(payload);
+  // A blocked or half-loaded page also has no overview; only a page with
+  // organic results proves Google answered and showed none.
+  if (answer.absent && !payload.organic_results?.length) {
+    return yield* Effect.fail(
+      new GeoOlostepError({
+        message: "Olostep reported no AI Overview on a page without results",
+      })
+    );
+  }
+  // Same bar as a Context capture: a short or uncited answer is an
+  // incomplete page, not an overview to judge.
+  if (
+    !answer.absent &&
+    (answer.text.length < GEO_AI_OVERVIEW_MIN_ANSWER_LENGTH ||
+      answer.sources.length === 0)
+  ) {
+    return yield* Effect.fail(
+      new GeoOlostepError({
+        message:
+          "Olostep AI Overview scrape returned an empty, incomplete, or uncited answer",
+      })
+    );
+  }
+  return { answer, requestId: scrape.id ?? null };
 });

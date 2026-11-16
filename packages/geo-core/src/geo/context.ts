@@ -17,26 +17,24 @@ import {
 } from "../constants/geo-context";
 import { geoContextResponseSchema } from "../schemas/geo-context";
 import type { GeoEngineAnswer } from "../types/geo";
+import type { GeoContextEngine } from "../types/geo-context";
 import {
   buildGeoContextRequest,
   isGeoContextEngine,
 } from "../utils/geo-context";
 import { parseGeoContextCapture } from "../utils/geo-context-answer";
 import { resolveGeoContextSource } from "../utils/geo-context-source";
+import { describeGeoError, geoLogError, geoLogWarn } from "../utils/geo-log";
 import { getReferenceDomain } from "../utils/reference-display";
 import { GeoScanError } from "./errors";
+import { askGeoOlostepAiOverviewAnswer } from "./olostep";
 
 /** Only 429s are retried (per Retry-After): submitting a consumer prompt is a paid, non-idempotent operation. */
-export const askGeoContextAnswer = Effect.fn("geo.askContextAnswer")(function* (
-  engine: string,
+const captureContextAnswer = Effect.fn("geo.captureContext")(function* (
+  engine: GeoContextEngine,
   prompt: string,
   language: string
 ) {
-  if (!isGeoContextEngine(engine)) {
-    return yield* Effect.fail(
-      new GeoScanError({ message: "Unsupported Context engine" })
-    );
-  }
   return yield* Effect.gen(function* () {
     const response = yield* Effect.gen(function* () {
       const apiKey = yield* Effect.try(() =>
@@ -141,6 +139,84 @@ export const askGeoContextAnswer = Effect.fn("geo.askContextAnswer")(function* (
             timedOut: true,
           })
         ),
+    })
+  );
+});
+
+/**
+ * Google blocks Context.dev's browser for part of the traffic
+ * (WEBSITE_ACCESS_ERROR, unbilled), so an AI Overview capture that fails for
+ * any reason is retried once through Olostep's AI Overview parser. Gemini has
+ * no Olostep parser and keeps failing the check. A Context page that shows no
+ * overview is an answer, not a failure, and is never retried.
+ */
+export const askGeoContextAnswer = Effect.fn("geo.askContextAnswer")(function* (
+  engine: string,
+  prompt: string,
+  language: string,
+  {
+    logFields = {},
+    olostepFallback = true,
+  }: { logFields?: Record<string, unknown>; olostepFallback?: boolean } = {}
+) {
+  if (!isGeoContextEngine(engine)) {
+    return yield* Effect.fail(
+      new GeoScanError({ message: "Unsupported Context engine" })
+    );
+  }
+  const startedMs = performance.now();
+  return yield* captureContextAnswer(engine, prompt, language).pipe(
+    Effect.catchTag("GeoScanError", (contextError) => {
+      if (engine !== "google/ai-overview" || !olostepFallback) {
+        return Effect.fail(contextError);
+      }
+      const contextDurationMs = Math.round(performance.now() - startedMs);
+      const fallbackStartedMs = performance.now();
+      const fields = {
+        ...logFields,
+        engine,
+        language,
+        fallbackProvider: "olostep",
+        contextDurationMs,
+        contextTimedOut: contextError.timedOut === true,
+        contextErrorMessage: contextError.message,
+        contextCauseMessage: describeGeoError(contextError).causeMessage,
+      };
+      return askGeoOlostepAiOverviewAnswer(prompt, language).pipe(
+        Effect.tap(({ answer, requestId }) =>
+          geoLogWarn({
+            ...fields,
+            event: "geo.context.fallback",
+            status: "success",
+            fallbackDurationMs: Math.round(
+              performance.now() - fallbackStartedMs
+            ),
+            olostepRequestId: requestId,
+            absent: answer.absent === true,
+            answerLength: answer.text.length,
+            sourceCount: answer.sources.length,
+          })
+        ),
+        Effect.map(({ answer }) => answer),
+        Effect.tapError((fallbackError) =>
+          geoLogError({
+            ...fields,
+            event: "geo.context.fallback",
+            status: "error",
+            fallbackDurationMs: Math.round(
+              performance.now() - fallbackStartedMs
+            ),
+            ...describeGeoError(fallbackError),
+          })
+        ),
+        Effect.mapError(
+          (fallbackError) =>
+            new GeoScanError({
+              message: `Engine ${engine} failed through Context and its Olostep fallback`,
+              cause: fallbackError,
+            })
+        )
+      );
     })
   );
 });

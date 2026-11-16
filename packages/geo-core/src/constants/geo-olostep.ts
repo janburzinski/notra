@@ -11,6 +11,37 @@ export const GEO_OLOSTEP_MAX_WAIT_MS = 30 * 60 * 1000;
 export const GEO_OLOSTEP_RESULT_GRACE_MS = 3 * 60 * 1000;
 export const GEO_OLOSTEP_REQUEST_TIMEOUT_MS = 30_000;
 export const GEO_OLOSTEP_ITEMS_PAGE_LIMIT = 100;
+/** A single synchronous scrape renders the page first; observed ~25–35 s. */
+export const GEO_OLOSTEP_SCRAPE_TIMEOUT_MS = 90_000;
+/**
+ * Parser for Google's AI Overview, used only as the fallback when Context.dev
+ * cannot load the search page (Google blocks its browser for part of the traffic).
+ */
+export const GEO_OLOSTEP_AI_OVERVIEW_PARSER =
+  "@olostep/google-ai-overview-results";
+/**
+ * Countries Olostep has scrape nodes in (its 400 lists them; 2026-11-16).
+ * Others, e.g. DE, are rejected, so those scrapes rely on the URL's `hl`/`gl`.
+ */
+export const GEO_OLOSTEP_NODE_COUNTRIES: ReadonlySet<string> = new Set([
+  "AU",
+  "CA",
+  "GB",
+  "ID",
+  "IN",
+  "IT",
+  "JP",
+  "KR",
+  "MX",
+  "MY",
+  "PH",
+  "RU",
+  "SG",
+  "TH",
+  "TW",
+  "UA",
+  "US",
+]);
 /** Provider-reported terminal states; item results still need reconciliation. */
 export const GEO_OLOSTEP_TERMINAL_BATCH_STATUSES: ReadonlySet<string> = new Set(
   ["completed", "failed", "cancelled"]

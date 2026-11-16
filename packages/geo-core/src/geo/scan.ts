@@ -461,7 +461,9 @@ const askEngine = Effect.fn("geo.askEngine")(function* (
   language = DEFAULT_LANGUAGE
 ) {
   if (gatewayPin === "context") {
-    return yield* askGeoContextAnswer(engine, promptText, language);
+    return yield* askGeoContextAnswer(engine, promptText, language, {
+      logFields: { organizationId, ...logContext },
+    });
   }
   if (gatewayPin === "olostep") {
     return yield* askGeoOlostepAnswer(engine, olostepRetrieveId);
