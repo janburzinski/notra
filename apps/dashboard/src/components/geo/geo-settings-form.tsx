@@ -14,7 +14,11 @@ import type { GeoSettingsUpsertInput } from "@notra/geo-core/types/geo";
 import { normalizeConversionPaths } from "@notra/geo-core/utils/geo-conversion-paths";
 import { trackedGeoLanguages } from "@notra/geo-core/utils/geo-language-rows";
 import { geoDefaultEngines } from "@notra/geo-core/utils/geo-model-catalog";
-import { extraProjectDomains } from "@notra/geo-core/utils/geo-project-domains";
+import {
+  extraProjectDomains,
+  ingestAllowedHosts,
+  matchesProjectHost,
+} from "@notra/geo-core/utils/geo-project-domains";
 import { PageHeading } from "@notra/ui/components/shared/page-heading";
 import { Badge } from "@notra/ui/components/ui/badge";
 import { Input } from "@notra/ui/components/ui/input";
@@ -29,7 +33,12 @@ import { GeoLanguagePicker } from "@/components/geo/geo-language-picker";
 import { GeoScanFrequencyMenu } from "@/components/geo/geo-scan-schedule";
 import { GeoTagList } from "@/components/geo/geo-tag-list";
 import { GeoProjectBrandSection } from "@/components/geo/project-brand-section";
-import { useGeoSettingsUpsert } from "@/lib/hooks/use-geo";
+import { UntrackedDomainBanner } from "@/components/geo/untracked-domain-banner";
+import {
+  useGeoRejectedHostDismiss,
+  useGeoRejectedHosts,
+  useGeoSettingsUpsert,
+} from "@/lib/hooks/use-geo";
 import { useGeoActiveProject } from "@/lib/hooks/use-geo-active-project";
 import { useLanguageLabel } from "@/lib/hooks/use-language-label";
 import { useHasZdrEntitlement } from "@/lib/hooks/use-plan";
@@ -84,6 +93,13 @@ export function GeoSettingsForm({
   const { hasZdr: canEnforceZdr, isLoading: planLoading } =
     useHasZdrEntitlement();
   const nameMissing = companyName.trim().length === 0;
+  const showBrand = section === undefined || section === "brand";
+  const rejectedHosts = useGeoRejectedHosts(organizationId, showBrand);
+  const dismissRejectedHost = useGeoRejectedHostDismiss(organizationId);
+  const trackedHosts = ingestAllowedHosts(brandDomain, extraDomains);
+  const untrackedHosts = (rejectedHosts.data?.hosts ?? []).filter(
+    (host) => !matchesProjectHost(host, trackedHosts)
+  );
   const { savedAt } = useGeoSettingsAutosave({
     aliases,
     brandDomain,
@@ -104,7 +120,6 @@ export function GeoSettingsForm({
     settings,
   });
 
-  const showBrand = section === undefined || section === "brand";
   const showModels = section === undefined || section === "models";
 
   return (
@@ -130,6 +145,18 @@ export function GeoSettingsForm({
             companyName={companyName}
             conversionPaths={conversionPaths}
             domains={extraDomains}
+            domainsNotice={
+              <UntrackedDomainBanner
+                atDomainLimit={extraDomains.length >= GEO_MAX_DOMAINS}
+                hosts={untrackedHosts}
+                onAdd={(host) =>
+                  setDomains(
+                    extraProjectDomains([...extraDomains, host], brandDomain)
+                  )
+                }
+                onDismiss={(host) => dismissRejectedHost.mutate(host)}
+              />
+            }
             id={id}
             nameMissing={nameMissing}
             onAliasesChange={setAliases}
@@ -325,6 +352,7 @@ function GeoBrandSection({
   companyName,
   conversionPaths,
   domains,
+  domainsNotice,
   id,
   nameMissing,
   onAliasesChange,
@@ -374,6 +402,7 @@ function GeoBrandSection({
                 {t("domains.description")}
               </p>
             </div>
+            {domainsNotice}
             {brandDomain ? (
               <div className="flex flex-wrap items-center gap-2">
                 <Badge

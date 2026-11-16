@@ -7,6 +7,7 @@ import {
   GEO_LIVE_FALLBACK_INTERVAL_MS,
   GEO_LIVE_SCAN_FALLBACK_INTERVAL_MS,
   GEO_MODEL_CATALOG_STALE_MS,
+  GEO_REJECTED_HOSTS_REFRESH_MS,
   GEO_SCAN_POLL_INTERVAL_MS,
   GEO_START_SCAN_MUTATION_KEY,
   GEO_TRAFFIC_LIVE_INTERVAL_MS,
@@ -32,6 +33,7 @@ import type {
   GeoPromptHistoryResponse,
   GeoPromptResultSummariesResponse,
   GeoPromptRescanInput,
+  GeoRejectedHostsResponse,
   GeoSequenceResultsResponse,
   GeoSettingsResponse,
   GeoSettingsUpsertInput,
@@ -1367,6 +1369,91 @@ export function useGeoIngestSetup(organizationId: string) {
     }),
     enabled: !!organizationId,
     meta: { errorMessage: tToast("loadTrackingSetupFailed") },
+  });
+}
+
+export function useGeoRejectedHosts(organizationId: string, enabled = true) {
+  const { projectId } = useGeoProjectScope();
+  return useQuery<GeoRejectedHostsResponse>({
+    ...dashboardOrpc.geo.rejectedHosts.queryOptions({
+      input: geoSettingsQueryInput({ organizationId, projectId }),
+    }),
+    enabled: !!organizationId && enabled,
+    refetchInterval: GEO_REJECTED_HOSTS_REFRESH_MS,
+  });
+}
+
+function useRejectedHostsCache(organizationId: string) {
+  const { projectId } = useGeoProjectScope();
+  const queryClient = useQueryClient();
+  const queryKey = dashboardOrpc.geo.rejectedHosts.queryKey({
+    input: geoSettingsQueryInput({ organizationId, projectId }),
+  });
+  return {
+    queryClient,
+    queryKey,
+    remove: (host: string) =>
+      queryClient.setQueryData<GeoRejectedHostsResponse>(queryKey, (current) =>
+        current
+          ? { hosts: current.hosts.filter((entry) => entry !== host) }
+          : current
+      ),
+  };
+}
+
+export function useGeoTrackedDomainAdd(organizationId: string) {
+  const tToast = useTranslations("geo.toasts");
+  const { projectId } = useGeoProjectScope();
+  const rejectedHosts = useRejectedHostsCache(organizationId);
+  return useMutation({
+    mutationFn: (host: string) =>
+      dashboardOrpc.geo.trackedDomainAdd.call({
+        organizationId,
+        projectId,
+        host,
+      }),
+    onSuccess: async (_result, host) => {
+      rejectedHosts.remove(host);
+      await invalidateCompetitorQueries(
+        rejectedHosts.queryClient,
+        organizationId,
+        projectId
+      );
+      toast.success(tToast("trackedDomainAdded", { domain: host }));
+    },
+    onError: (error) => {
+      trackEvent(POSTHOG_EVENTS.GEO_SETTINGS_SAVE_FAILED);
+      toast.error(toErrorMessage(error, tToast("addTrackedDomainFailed")));
+    },
+  });
+}
+
+export function useGeoRejectedHostDismiss(organizationId: string) {
+  const tToast = useTranslations("geo.toasts");
+  const { projectId } = useGeoProjectScope();
+  const { queryClient, queryKey, remove } =
+    useRejectedHostsCache(organizationId);
+  return useMutation({
+    mutationFn: (host: string) =>
+      dashboardOrpc.geo.rejectedHostDismiss.call({
+        organizationId,
+        projectId,
+        host,
+      }),
+    onMutate: async (host) => {
+      await queryClient.cancelQueries({ queryKey });
+      const previous =
+        queryClient.getQueryData<GeoRejectedHostsResponse>(queryKey);
+      remove(host);
+      return { previous };
+    },
+    onError: (error, _host, context) => {
+      if (context?.previous) {
+        queryClient.setQueryData(queryKey, context.previous);
+      }
+      toast.error(toErrorMessage(error, tToast("dismissRejectedHostFailed")));
+    },
+    onSettled: () => queryClient.invalidateQueries({ queryKey }),
   });
 }
 

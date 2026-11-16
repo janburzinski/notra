@@ -534,6 +534,21 @@ export const GEO_INGEST_SITE_MEMORY_MAX_ENTRIES = 5000;
 export const GEO_INGEST_ORGANIZATION_SITES_CACHE_PREFIX =
   "geo:ingest-organization-sites:v2";
 export const GEO_INGEST_IDENTITY_ACTIVE_TTL_SECONDS = 5 * 60;
+export const GEO_REJECTED_HOSTS_CACHE_PREFIX = "geo:rejected-hosts:v1";
+export const GEO_REJECTED_HOSTS_DISMISSED_CACHE_PREFIX =
+  "geo:rejected-hosts-dismissed:v1";
+export const GEO_REJECTED_HOSTS_TTL_SECONDS = 7 * 24 * 60 * 60;
+export const GEO_REJECTED_HOSTS_DISMISSED_TTL_SECONDS = 90 * 24 * 60 * 60;
+/** Distinct hosts kept per project; the least-seen ones fall off first. */
+export const GEO_REJECTED_HOSTS_MAX = 50;
+/** Minutes with traffic before a host is suggested, so one-off junk is ignored. */
+export const GEO_REJECTED_HOSTS_MIN_HITS = 3;
+/** Each replica records a project host at most once per window. */
+export const GEO_REJECTED_HOSTS_RECORD_INTERVAL_MS = 60_000;
+export const GEO_REJECTED_HOSTS_RECORD_MEMORY_MAX_ENTRIES = 5000;
+export const GEO_REJECTED_HOSTS_SUGGESTED_MAX = 5;
+/** How often an open dashboard re-checks for newly rejected hosts. */
+export const GEO_REJECTED_HOSTS_REFRESH_MS = 60_000;
 export const GEO_ONBOARDING_MAX_PROMPTS = 30;
 export const GEO_ONBOARDING_SUGGESTED_COMPETITORS = 10;
 export const GEO_BRAND_SEARCH_MIN_QUERY_LENGTH = 2;

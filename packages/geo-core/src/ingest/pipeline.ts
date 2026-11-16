@@ -18,6 +18,7 @@ import {
   verifyGeoIngestSiteToken,
   verifyGeoIngestToken,
 } from "@notra/geo-core/geo/ingest";
+import { recordRejectedIngestHost } from "@notra/geo-core/geo/rejected-hosts-cache";
 import {
   geoRequestPayloadSchema,
   mcpEventBatchSchema,
@@ -658,6 +659,11 @@ export const runGeoEnvelopeIngest = Effect.fnUntraced(function* (
     );
   }
   if (!acceptsBeaconHost(identity, url, allowedHosts)) {
+    if (!acceptsIngestHost(url.hostname, allowedHosts)) {
+      yield* Effect.sync(() =>
+        defer(() => recordRejectedIngestHost(identity, url.hostname))
+      );
+    }
     return droppedResult(
       identity,
       classification.visitorType,

@@ -125,6 +125,11 @@ import {
   updateGeoPromptTranslation,
 } from "@notra/geo-core/geo/prompt-translations";
 import {
+  addGeoTrackedDomain,
+  dismissGeoRejectedHost,
+  loadGeoRejectedHosts,
+} from "@notra/geo-core/geo/rejected-hosts";
+import {
   clearGeoSampleData,
   seedGeoSampleData,
 } from "@notra/geo-core/geo/sample-data";
@@ -201,6 +206,7 @@ import {
   geoPromptResultDetailInputSchema,
   geoPromptRescanInputSchema,
   geoPromptGapIgnoreInputSchema,
+  geoRejectedHostInputSchema,
   geoScanStatusInputSchema,
   geoPromptsImportInputSchema,
   geoPromptDeleteInputSchema,
@@ -1336,6 +1342,15 @@ export const geoRouter = {
         toGeoOrpcError
       );
     }),
+  rejectedHosts: authorizedProcedure
+    .input(geoOrganizationInputSchema)
+    .handler(geoHandler((input) => loadGeoRejectedHosts(input))),
+  trackedDomainAdd: authorizedProcedure
+    .input(geoRejectedHostInputSchema)
+    .handler(geoHandler((input) => addGeoTrackedDomain(input))),
+  rejectedHostDismiss: authorizedProcedure
+    .input(geoRejectedHostInputSchema)
+    .handler(geoHandler((input) => dismissGeoRejectedHost(input))),
   ingestSetup: authorizedProcedure
     .input(geoOrganizationInputSchema)
     .handler(async ({ context, input }): Promise<DashboardGeoIngestSetup> => {

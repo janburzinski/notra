@@ -3316,6 +3316,14 @@
     "geoTagList": {
       "remove": "{value} entfernen"
     },
+    "untrackedDomainBanner": {
+      "title": "Traffic von {domain} wird nicht erfasst",
+      "description": "Die Domain wird nicht getrackt, deshalb werden diese Besuche verworfen. Tracke nur Domains, die dir gehören.",
+      "moreDomains": "{count, plural, one {Betrifft auch # weitere Domain.} other {Betrifft auch # weitere Domains.}}",
+      "domainLimit": "Du hast das Limit von {max} Domains erreicht.",
+      "add": "{domain} tracken",
+      "dismiss": "{domain} ausblenden"
+    },
     "geoUpgradeGate": {
       "title": "GEO ist in deinem aktuellen Tarif gesperrt",
       "readOnly": "Deine GEO-Daten bleiben sichtbar, für Scans und Änderungen brauchst du aber einen Tarif.",
@@ -4471,6 +4479,9 @@
       "saveSettingsFailed": "Einstellungen konnten nicht gespeichert werden",
       "addModelTrackingFailed": "Modell konnte nicht zum Tracking hinzugefügt werden",
       "addLanguageTrackingFailed": "Sprache konnte nicht zum Tracking hinzugefügt werden",
+      "addTrackedDomainFailed": "Domain konnte nicht zum Tracking hinzugefügt werden",
+      "dismissRejectedHostFailed": "Domain konnte nicht ausgeblendet werden",
+      "trackedDomainAdded": "{domain} wird jetzt getrackt",
       "loadAIVisibilityOverviewFailed": "KI-Sichtbarkeitsübersicht konnte nicht geladen werden",
       "loadAIVisibilityTrendFailed": "KI-Sichtbarkeitstrend konnte nicht geladen werden",
       "loadPromptResultsFailed": "Prompt-Ergebnisse konnten nicht geladen werden",

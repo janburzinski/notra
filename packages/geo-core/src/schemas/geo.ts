@@ -145,6 +145,10 @@ const geoProjectDomainSchema = string()
     message: "Enter a domain like example.com",
   });
 
+export const geoRejectedHostInputSchema = geoOrganizationInputSchema.extend({
+  host: geoProjectDomainSchema,
+});
+
 export const geoSettingsUpsertInputSchema = geoOrganizationInputSchema.extend({
   companyName: string().min(1),
   aliases: array(string().min(1)).max(GEO_MAX_ALIASES),

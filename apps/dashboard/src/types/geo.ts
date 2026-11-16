@@ -1210,6 +1210,19 @@ export interface GeoBrandSectionProps {
   brandDomain: string | null;
   nameMissing: boolean;
   savedAt: Date | null;
+  domainsNotice?: ReactNode;
+}
+
+export interface UntrackedDomainBannerProps {
+  hosts: string[];
+  onAdd: (host: string) => void;
+  onDismiss: (host: string) => void;
+  addDisabled?: boolean;
+  atDomainLimit?: boolean;
+}
+
+export interface TrafficUntrackedDomainBannerProps {
+  organizationId: string;
 }
 
 export interface GeoLanguagesSectionProps {

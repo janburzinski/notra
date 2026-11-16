@@ -14,6 +14,7 @@ import { TrafficDomainSelect } from "@/components/geo/traffic-domain-select";
 import { TrafficEmpty } from "@/components/geo/traffic-empty";
 import { TrafficPathEmpty } from "@/components/geo/traffic-path-empty";
 import { TrafficPathFilter } from "@/components/geo/traffic-path-filter";
+import { TrafficUntrackedDomainBanner } from "@/components/geo/untracked-domain-banner";
 import { PageContainer } from "@/components/layout/container";
 import {
   EMPTY_STATE_TABLE_COLUMNS,
@@ -122,6 +123,7 @@ export function TrafficPageShell({
             <GeoRangePicker control={geoRange} />
           </div>
         </PageHeading>
+        <TrafficUntrackedDomainBanner organizationId={scope.organizationId} />
         {isEmpty ? (
           <>
             <AnalyticsSourceTabs

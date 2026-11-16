@@ -74,6 +74,10 @@ const ingestWebPageEngagement = mock(async (_rows: unknown[]) => ({
   successful_rows: 1,
   quarantined_rows: 0,
 }));
+const recordRejectedIngestHost = mock(
+  async (_identity: GeoIngestIdentity, _host: string) => {}
+);
+const deferred: (() => Promise<void>)[] = [];
 
 const SITE_TOKEN = "nst.site_1.good";
 const HUMAN_USER_AGENT = "Mozilla/5.0 Chrome/130.0 Safari/537.36";
@@ -118,6 +122,9 @@ mock.module("@notra/ai/billing/ai-traffic-events", () => ({
 }));
 mock.module("../src/ingest/hosts", () => ({
   loadIngestAllowedHosts,
+}));
+mock.module("@notra/geo-core/geo/rejected-hosts-cache", () => ({
+  recordRejectedIngestHost,
 }));
 mock.module("../src/ingest/sites", () => ({
   loadIngestSite,
@@ -165,7 +172,11 @@ function ingestRequest(
 
 async function run(request: unknown) {
   return Effect.runPromise(
-    Effect.result(runGeoIngest(request as never, () => {})) as never
+    Effect.result(
+      runGeoIngest(request as never, (task) => {
+        deferred.push(task);
+      })
+    ) as never
   ) as Promise<
     | { _tag: "Success"; success: unknown }
     | { _tag: "Failure"; failure: unknown }
@@ -187,9 +198,11 @@ describe("runGeoIngest ordering", () => {
       resolveJourneyId,
       hasAiTrafficEventsQuota,
       trackAiTrafficEvent,
+      recordRejectedIngestHost,
     ]) {
       m.mockClear();
     }
+    deferred.length = 0;
     hasAiTrafficEventsQuota.mockImplementation(() => Effect.succeed(true));
     webRatelimitLimit.mockImplementation(async () => ({ success: true }));
     webNetworkLimit.mockImplementation(async () => ({ success: true }));
@@ -335,6 +348,12 @@ describe("runGeoIngest ordering", () => {
 
     expect(outcome._tag).toBe("Success");
     expect(ingestGeoTrafficEvents).not.toHaveBeenCalled();
+    expect(recordRejectedIngestHost).not.toHaveBeenCalled();
+    await Promise.all(deferred.map((task) => task()));
+    expect(recordRejectedIngestHost).toHaveBeenCalledWith(
+      { organizationId: "org_1", projectId: "proj_1", generation: 1 },
+      "example.com"
+    );
   });
 
   test("drops tracked events once the AI traffic events quota is used up", async () => {
@@ -419,6 +438,8 @@ describe("runGeoIngest ordering", () => {
       success: { outcome: "dropped", reason: "host" },
     });
     expect(ingestGeoTrafficEvents).not.toHaveBeenCalled();
+    await Promise.all(deferred.map((task) => task()));
+    expect(recordRejectedIngestHost).not.toHaveBeenCalled();
   });
 
   test("a site counts its people from relayed notra.js page views only", async () => {

@@ -42,6 +42,10 @@ if (!process.env.NOTRA_TRAFFIC_PAGE_SHELL_TEST_WORKER) {
     ["../src/components/geo/traffic-actions-menu", "TrafficActionsMenu"],
     ["../src/components/geo/traffic-path-empty", "TrafficPathEmpty"],
     ["../src/components/geo/traffic-path-filter", "TrafficPathFilter"],
+    [
+      "../src/components/geo/untracked-domain-banner",
+      "TrafficUntrackedDomainBanner",
+    ],
   ] as const) {
     mock.module(path, () => ({ [name]: marker(name) }));
   }

@@ -513,6 +513,15 @@ export interface GeoSettingsLanguageAddInput extends GeoScopeInput {
   language: string;
 }
 
+export interface GeoRejectedHostInput extends GeoScopeInput {
+  host: string;
+}
+
+export interface GeoRejectedHostsResponse {
+  /** Hosts sending traffic that ingest drops because they are not tracked. */
+  hosts: string[];
+}
+
 export interface DueGeoScanRow {
   id: string;
   organizationId: string;

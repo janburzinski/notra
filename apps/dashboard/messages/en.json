@@ -3316,6 +3316,14 @@
     "geoTagList": {
       "remove": "Remove {value}"
     },
+    "untrackedDomainBanner": {
+      "title": "Traffic from {domain} isn't being recorded",
+      "description": "It's not one of your tracked domains, so these visits are dropped. Only track domains you own.",
+      "moreDomains": "{count, plural, one {Same for # other domain.} other {Same for # other domains.}}",
+      "domainLimit": "You've hit the limit of {max} domains.",
+      "add": "Track {domain}",
+      "dismiss": "Dismiss {domain}"
+    },
     "geoUpgradeGate": {
       "title": "GEO is locked on your current plan",
       "readOnly": "Your GEO data stays visible, but scans and changes need a plan.",
@@ -4471,6 +4479,9 @@
       "saveSettingsFailed": "Failed to save settings",
       "addModelTrackingFailed": "Failed to add model to tracking",
       "addLanguageTrackingFailed": "Failed to add language to tracking",
+      "addTrackedDomainFailed": "Failed to add domain to tracking",
+      "dismissRejectedHostFailed": "Failed to dismiss domain",
+      "trackedDomainAdded": "Now tracking {domain}",
       "loadAIVisibilityOverviewFailed": "Failed to load AI visibility overview",
       "loadAIVisibilityTrendFailed": "Failed to load AI visibility trend",
       "loadPromptResultsFailed": "Failed to load prompt results",
