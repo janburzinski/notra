@@ -1,0 +1,27 @@
+apps/blog/blog/notra-web-analytics.mdx
+  s_c337364fc4908c::t_85a5c3975f6822 1,4-10,15-18,23,25,27,34,36,38,40,42,44,46,48,50,52,54,60-62,64-70
+  s_c337364fc4908c::t_06a2a850c64766 35
+  s_c337364fc4908c::t_909a556a10e92d 49
+  s_c337364fc4908c::t_c482c55432aa9a 72-73
+  s_c337364fc4908c::t_c7acc5029bf861 2-3,13-14,19-22,24,26,28-33,37,39,41,43,45,47,51,53,63,71
+  s_c337364fc4908c::t_a02f96e1d1a430 55-59
+  s_c337364fc4908c::t_f8fd1df279d8b1 11-12
+apps/blog/snippets/diagrams.jsx
+  s_c337364fc4908c::t_909a556a10e92d 56-104,106-115,119,122-127
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "aae0d647b83ad740751c391a1b80f27daf91a7d1",
+  "prompts": {},
+  "sessions": {
+    "s_c337364fc4908c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e8c5049d-71cb-4242-87ee-3e1d3d41b9f8",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
