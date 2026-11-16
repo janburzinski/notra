@@ -60,7 +60,6 @@ import { Route as ApiStatusRouteImport } from './routes/api/status'
 import { Route as ApiV1RouteImport } from './routes/api/v1'
 import { Route as DevelopersLlmsDottxtRouteImport } from './routes/developers/llms[.]txt'
 import { Route as MarketingChatRouteImport } from './routes/marketing/chat'
-import { Route as MdSplatRouteImport } from './routes/md/$'
 import { Route as SchemaNotraDotjsonlRouteImport } from './routes/schema/notra[.]jsonl'
 import { Route as V1IndexRouteImport } from './routes/v1/index'
 import { Route as V1StatusRouteImport } from './routes/v1/status'
@@ -371,11 +370,6 @@ const DevelopersLlmsDottxtRoute = DevelopersLlmsDottxtRouteImport.update({
 const MarketingChatRoute = MarketingChatRouteImport.update({
   id: '/marketing/chat',
   path: '/marketing/chat',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MdSplatRoute = MdSplatRouteImport.update({
-  id: '/md/$',
-  path: '/md/$',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SchemaNotraDotjsonlRoute = SchemaNotraDotjsonlRouteImport.update({
@@ -714,7 +708,6 @@ export interface FileRoutesByFullPath {
   '/api/v1': typeof ApiV1Route
   '/developers/llms.txt': typeof DevelopersLlmsDottxtRoute
   '/marketing/chat': typeof MarketingChatRoute
-  '/md/$': typeof MdSplatRoute
   '/schema/notra.jsonl': typeof SchemaNotraDotjsonlRoute
   '/v1/status': typeof V1StatusRoute
   '/api/': typeof ApiIndexRoute
@@ -818,7 +811,6 @@ export interface FileRoutesByTo {
   '/api/v1': typeof ApiV1Route
   '/developers/llms.txt': typeof DevelopersLlmsDottxtRoute
   '/marketing/chat': typeof MarketingChatRoute
-  '/md/$': typeof MdSplatRoute
   '/schema/notra.jsonl': typeof SchemaNotraDotjsonlRoute
   '/v1/status': typeof V1StatusRoute
   '/api': typeof ApiIndexRoute
@@ -926,7 +918,6 @@ export interface FileRoutesById {
   '/api/v1': typeof ApiV1Route
   '/developers/llms.txt': typeof DevelopersLlmsDottxtRoute
   '/marketing/chat': typeof MarketingChatRoute
-  '/md/$': typeof MdSplatRoute
   '/schema/notra.jsonl': typeof SchemaNotraDotjsonlRoute
   '/v1/status': typeof V1StatusRoute
   '/_landing/': typeof LandingIndexRoute
@@ -1033,7 +1024,6 @@ export interface FileRouteTypes {
     | '/api/v1'
     | '/developers/llms.txt'
     | '/marketing/chat'
-    | '/md/$'
     | '/schema/notra.jsonl'
     | '/v1/status'
     | '/api/'
@@ -1137,7 +1127,6 @@ export interface FileRouteTypes {
     | '/api/v1'
     | '/developers/llms.txt'
     | '/marketing/chat'
-    | '/md/$'
     | '/schema/notra.jsonl'
     | '/v1/status'
     | '/api'
@@ -1244,7 +1233,6 @@ export interface FileRouteTypes {
     | '/api/v1'
     | '/developers/llms.txt'
     | '/marketing/chat'
-    | '/md/$'
     | '/schema/notra.jsonl'
     | '/v1/status'
     | '/_landing/'
@@ -1334,7 +1322,6 @@ export interface RootRouteChildren {
   ApiV1Route: typeof ApiV1Route
   DevelopersLlmsDottxtRoute: typeof DevelopersLlmsDottxtRoute
   MarketingChatRoute: typeof MarketingChatRoute
-  MdSplatRoute: typeof MdSplatRoute
   SchemaNotraDotjsonlRoute: typeof SchemaNotraDotjsonlRoute
   V1StatusRoute: typeof V1StatusRoute
   ApiIndexRoute: typeof ApiIndexRoute
@@ -1710,13 +1697,6 @@ declare module '@tanstack/react-router' {
       path: '/marketing/chat'
       fullPath: '/marketing/chat'
       preLoaderRoute: typeof MarketingChatRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/md/$': {
-      id: '/md/$'
-      path: '/md/$'
-      fullPath: '/md/$'
-      preLoaderRoute: typeof MdSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/schema/notra.jsonl': {
@@ -2293,7 +2273,6 @@ const rootRouteChildren: RootRouteChildren = {
   ApiV1Route: ApiV1Route,
   DevelopersLlmsDottxtRoute: DevelopersLlmsDottxtRoute,
   MarketingChatRoute: MarketingChatRoute,
-  MdSplatRoute: MdSplatRoute,
   SchemaNotraDotjsonlRoute: SchemaNotraDotjsonlRoute,
   V1StatusRoute: V1StatusRoute,
   ApiIndexRoute: ApiIndexRoute,

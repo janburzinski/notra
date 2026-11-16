@@ -88,9 +88,3 @@ export interface McpUseCaseDetailViewProps {
   entry: McpUseCase;
   related: McpUseCase[];
 }
-
-export interface McpUseCaseMarkdownEntry {
-  slug: string;
-  title: string;
-  description: string;
-}

@@ -1,14 +1,11 @@
-import type { CollectionEntry } from "@dualmark/converters";
-import type {
-  CollectionConfig,
-  ParameterizedRouteConfig,
-  StaticPageConfig,
-} from "@dualmark/nextjs";
+import type { Source } from "@usenotra/agentside";
 
 import { changelog } from "@/../.source/server";
 import { DATA_PATH } from "@/constants/data";
 import { FEATURE_DETAIL_SLUGS } from "@/constants/feature-pages/paths";
+import { LEGAL_PAGES } from "@/constants/markdown-twins";
 import { MCP_PLATFORMS } from "@/constants/mcp-platforms";
+import { MCP_USE_CASES } from "@/constants/mcp-use-cases";
 import { STATE_OF_AI_SEARCH_PATH } from "@/constants/state-of-ai-search";
 import { buildAgentPageMarkdown } from "@/lib/agent/markdown";
 import {
@@ -26,7 +23,6 @@ import {
   buildGranolaIntegrationMarkdown,
   buildLinearIntegrationMarkdown,
   buildSlackIntegrationMarkdown,
-  listIntegrationMarkdownEntries,
 } from "@/lib/integrations/markdown";
 import { buildMarketingAssetsMarkdown } from "@/lib/marketing-assets/markdown";
 import {
@@ -34,18 +30,15 @@ import {
   buildMcpPlatformMarkdown,
   buildMcpUseCaseMarkdown,
   buildMcpUseCasesMarkdown,
-  listMcpUseCaseMarkdownEntries,
 } from "@/lib/mcp/markdown";
 import {
   buildStateOfAiSearchIndexMarkdown,
   buildStateOfAiSearchReportMarkdown,
 } from "@/lib/state-of-ai-search/markdown";
 import { listSummaries, loadReport } from "@/lib/state-of-ai-search/reports";
-import type { McpUseCaseMarkdownEntry } from "@/types/mcp-use-cases";
 import { stripFrontmatter } from "@/utils/markdown";
 import { readAppMarkdownSource } from "@/utils/markdown-source";
 import { getMcpPlatformHref } from "@/utils/mcp-platforms";
-import { MarkdownNotFoundError } from "@/utils/not-found";
 import {
   getShowcaseCompany,
   getShowcaseEntrySlug,
@@ -59,48 +52,6 @@ import {
 } from "@/utils/site-markdown";
 import { reportPath } from "@/utils/state-of-ai-search";
 import { SITE_URL } from "@/utils/urls";
-
-interface MarkdownTwinData {
-  title: string;
-  description?: string;
-  dateLabel?: string;
-  publishedDate?: Date;
-}
-
-type MarkdownTwinEntry = CollectionEntry<MarkdownTwinData>;
-
-const LEGAL_PAGES = [
-  {
-    pattern: "/privacy",
-    title: "Privacy Policy",
-    filename: "privacy.mdx",
-  },
-  {
-    pattern: "/terms",
-    title: "Terms of Service",
-    filename: "terms.mdx",
-  },
-  {
-    pattern: "/partner-terms",
-    title: "Partner Terms and Conditions",
-    filename: "partner-terms.mdx",
-  },
-  {
-    pattern: "/legal",
-    title: "Legal Notice",
-    filename: "legal.mdx",
-  },
-  {
-    pattern: "/dpa",
-    title: "Data Processing Agreement",
-    filename: "dpa.mdx",
-  },
-  {
-    pattern: "/subprocessors",
-    title: "Sub-processors",
-    filename: "subprocessors.mdx",
-  },
-] as const;
 
 const STATIC_MARKDOWN_PAGES = [
   "about",
@@ -127,51 +78,25 @@ function markdownFromTitleAndBody(title: string, body: string) {
   return withTrailingNewline([`# ${title}`, "", content].join("\n"));
 }
 
-function renderBodyEntry(entry: MarkdownTwinEntry) {
-  return withTrailingNewline((entry.body ?? "").trim());
-}
-
-async function getShowcaseEntries(name: string): Promise<MarkdownTwinEntry[]> {
-  const entries = changelog.filter((entry) =>
-    entry.info.path.startsWith(`${name}/`)
-  );
-
-  return Promise.all(
-    entries.map(async (entry) => {
-      const slug = getShowcaseEntrySlug(entry.info.path);
-
-      return {
-        id: slug,
-        data: {
-          title: entry.title,
-          description: entry.description,
-          dateLabel: entry.date,
-          publishedDate: new Date(entry.date),
-        },
-        body: stripFrontmatter(
-          readAppMarkdownSource("changelog", entry.info.path)
-        ),
-      };
-    })
+function findShowcaseEntry(company: string, slug: string) {
+  if (!getShowcaseCompany(company)) {
+    return;
+  }
+  return changelog.find(
+    (entry) =>
+      entry.info.path.startsWith(`${company}/`) &&
+      getShowcaseEntrySlug(entry.info.path) === slug
   );
 }
 
-function toMarkdownEntries(
-  pages: McpUseCaseMarkdownEntry[],
-  bodies: (string | null)[]
-): MarkdownTwinEntry[] {
-  return pages.map((page, index) => ({
-    id: page.slug,
-    data: { title: page.title, description: page.description },
-    body: bodies[index] ?? "",
-  }));
-}
-
-function getMcpUseCaseEntries() {
-  const pages = listMcpUseCaseMarkdownEntries();
-  return toMarkdownEntries(
-    pages,
-    pages.map((page) => buildMcpUseCaseMarkdown(page.slug))
+function buildShowcaseEntryMarkdown(company: string, slug: string) {
+  const entry = findShowcaseEntry(company, slug);
+  if (!entry) {
+    return null;
+  }
+  return markdownFromTitleAndBody(
+    entry.title,
+    `Date: ${entry.date}\n\n${stripFrontmatter(readAppMarkdownSource("changelog", entry.info.path))}`
   );
 }
 
@@ -200,7 +125,7 @@ function buildShowcaseCompanyMarkdown(name: string) {
   const company = getShowcaseCompany(name);
 
   if (!company) {
-    return "# Not found\n";
+    return null;
   }
 
   const entries = changelog
@@ -234,119 +159,93 @@ async function buildLegalMarkdown(title: string, filename: string) {
   return markdownFromTitleAndBody(title, source);
 }
 
-export function buildDualmarkStaticPages(): StaticPageConfig[] {
-  return [
-    { pattern: "/", render: () => buildLandingMarkdown() },
-    { pattern: "/features", render: () => buildFeaturesMarkdown() },
-    { pattern: "/pricing", render: () => buildPricingMarkdown() },
-    { pattern: "/brand", render: () => buildBrandMarkdown() },
-    { pattern: "/feedback-md", render: () => buildFeedbackMdPageMarkdown() },
-    { pattern: "/agent", render: () => buildAgentPageMarkdown() },
-    { pattern: "/mcp", render: () => buildMcpMarkdown() },
-    { pattern: "/mcp/use-cases", render: () => buildMcpUseCasesMarkdown() },
-    ...MCP_PLATFORMS.map((platform) => ({
-      pattern: getMcpPlatformHref(platform.id),
-      render: () => buildMcpPlatformMarkdown(platform),
-    })),
-    { pattern: "/compare", render: () => buildCompareIndexMarkdown() },
-    {
-      pattern: STATE_OF_AI_SEARCH_PATH,
-      render: () => buildStateOfAiSearchIndexMarkdown(),
-    },
-    { pattern: DATA_PATH, render: () => buildDataMarkdown() },
-    ...listSummaries().map((summary) => ({
-      pattern: reportPath(summary.slug, summary.edition),
-      render: async () => {
+export function buildMarkdownRoutes(): Record<string, Source> {
+  const pages: [string, Source][] = [
+    ["/", () => buildLandingMarkdown()],
+    ["/features", () => buildFeaturesMarkdown()],
+    ["/pricing", () => buildPricingMarkdown()],
+    ["/brand", () => buildBrandMarkdown()],
+    ["/feedback-md", () => buildFeedbackMdPageMarkdown()],
+    ["/agent", () => buildAgentPageMarkdown()],
+    ["/mcp", () => buildMcpMarkdown()],
+    ["/mcp/use-cases", () => buildMcpUseCasesMarkdown()],
+    ...MCP_PLATFORMS.map((platform): [string, Source] => [
+      getMcpPlatformHref(platform.id),
+      () => buildMcpPlatformMarkdown(platform),
+    ]),
+    ["/compare", () => buildCompareIndexMarkdown()],
+    [STATE_OF_AI_SEARCH_PATH, () => buildStateOfAiSearchIndexMarkdown()],
+    [DATA_PATH, () => buildDataMarkdown()],
+    ...listSummaries().map((summary): [string, Source] => [
+      reportPath(summary.slug, summary.edition),
+      async () => {
         const report = await loadReport(summary.slug, summary.edition);
-        return report ? buildStateOfAiSearchReportMarkdown(report) : "";
+        return report ? buildStateOfAiSearchReportMarkdown(report) : null;
       },
-    })),
-    ...listCompareMarkdownPages().map((page) => ({
-      pattern: page.pattern,
-      render: () => buildCompareMarkdown(page.slug) ?? "",
-    })),
-    { pattern: "/contributors", render: () => buildContributorsMarkdown() },
-    { pattern: "/integrations", render: () => buildIntegrationsMarkdown() },
-    {
-      pattern: "/integrations/slack",
-      render: () => buildSlackIntegrationMarkdown(),
-    },
-    {
-      pattern: "/integrations/github",
-      render: () => buildGithubIntegrationMarkdown(),
-    },
-    {
-      pattern: "/integrations/linear",
-      render: () => buildLinearIntegrationMarkdown(),
-    },
-    {
-      pattern: "/integrations/granola",
-      render: () => buildGranolaIntegrationMarkdown(),
-    },
-    {
-      pattern: "/features/marketing/assets",
-      render: () => buildMarketingAssetsMarkdown(),
-    },
-    { pattern: "/showcase", render: () => buildChangelogHubMarkdown() },
-    ...SHOWCASE_COMPANIES.map((company) => ({
-      pattern: `/showcase/${company.slug}`,
-      render: () => buildShowcaseCompanyMarkdown(company.slug),
-    })),
-    ...FEATURE_DETAIL_SLUGS.map((slug) => ({
-      pattern: `/features/${slug}`,
-      render: () => readAppMarkdownSource("pages", "features", `${slug}.md`),
-    })),
-    ...STATIC_MARKDOWN_PAGES.map((page) => ({
-      pattern: `/${page}`,
-      render: () => readAppMarkdownSource("pages", `${page}.md`),
-    })),
-    ...LEGAL_PAGES.map((page) => ({
-      pattern: page.pattern,
-      render: () => buildLegalMarkdown(page.title, page.filename),
-    })),
+    ]),
+    ...listCompareMarkdownPages().map((page): [string, Source] => [
+      page.pattern,
+      () => buildCompareMarkdown(page.slug),
+    ]),
+    ["/contributors", () => buildContributorsMarkdown()],
+    ["/integrations", () => buildIntegrationsMarkdown()],
+    ["/integrations/slack", () => buildSlackIntegrationMarkdown()],
+    ["/integrations/github", () => buildGithubIntegrationMarkdown()],
+    ["/integrations/linear", () => buildLinearIntegrationMarkdown()],
+    ["/integrations/granola", () => buildGranolaIntegrationMarkdown()],
+    ["/features/marketing/assets", () => buildMarketingAssetsMarkdown()],
+    ["/showcase", () => buildChangelogHubMarkdown()],
+    ...SHOWCASE_COMPANIES.map((company): [string, Source] => [
+      `/showcase/${company.slug}`,
+      () => buildShowcaseCompanyMarkdown(company.slug),
+    ]),
+    ...FEATURE_DETAIL_SLUGS.map((slug): [string, Source] => [
+      `/features/${slug}`,
+      () => readAppMarkdownSource("pages", "features", `${slug}.md`),
+    ]),
+    ...STATIC_MARKDOWN_PAGES.map((page): [string, Source] => [
+      `/${page}`,
+      () => readAppMarkdownSource("pages", `${page}.md`),
+    ]),
+    ...LEGAL_PAGES.map((page): [string, Source] => [
+      page.pattern,
+      () => buildLegalMarkdown(page.title, page.filename),
+    ]),
+    [
+      "/mcp/use-cases/[slug]",
+      ({ params }) => {
+        const markdown = buildMcpUseCaseMarkdown(params.slug ?? "");
+        return markdown === null ? null : withTrailingNewline(markdown);
+      },
+    ],
+    [
+      "/showcase/[company]/[slug]",
+      ({ params }) =>
+        buildShowcaseEntryMarkdown(params.company ?? "", params.slug ?? ""),
+    ],
+    [
+      "/integrations/[id]",
+      async ({ params }) => {
+        const markdown = await buildIntegrationMarkdown(params.id ?? "");
+        return markdown ? withTrailingNewline(markdown) : null;
+      },
+    ],
   ];
+
+  return Object.fromEntries(pages);
 }
 
-export function buildDualmarkCollections() {
-  const collections: Record<string, CollectionConfig> = {
-    mcpUseCases: {
-      route: "mcp/use-cases",
-      emitListing: false,
-      converter: (entry) => withTrailingNewline(entry.body ?? ""),
-      getEntries: getMcpUseCaseEntries,
-    },
-  };
-
-  for (const company of SHOWCASE_COMPANIES) {
-    collections[`showcase-${company.slug}`] = {
-      route: `showcase/${company.slug}`,
-      emitListing: false,
-      converter: (entry) => renderBodyEntry(entry as MarkdownTwinEntry),
-      getEntries: () => getShowcaseEntries(company.slug),
-    };
-  }
-
-  return collections;
-}
-
-export function buildDualmarkParameterizedRoutes(): ParameterizedRouteConfig[] {
+export function listMarkdownPaths() {
   return [
-    {
-      pattern: "/integrations/[id]",
-      getStaticPaths: async () =>
-        (await listIntegrationMarkdownEntries()).map((entry) => ({
-          params: { id: entry.id },
-        })),
-      render: async ({ params }) => {
-        const id = params.id ?? "";
-        const markdown = await buildIntegrationMarkdown(id);
-
-        if (!markdown) {
-          throw new MarkdownNotFoundError(`/integrations/${id}`);
-        }
-
-        return withTrailingNewline(markdown);
-      },
-    },
+    ...Object.keys(buildMarkdownRoutes()).filter((path) => !path.includes("[")),
+    ...MCP_USE_CASES.map((useCase) => `/mcp/use-cases/${useCase.slug}`),
+    ...changelog
+      .filter((entry) =>
+        getShowcaseCompany(entry.info.path.split("/")[0] ?? "")
+      )
+      .map(
+        (entry) =>
+          `/showcase/${entry.info.path.split("/")[0]}/${getShowcaseEntrySlug(entry.info.path)}`
+      ),
   ];
 }

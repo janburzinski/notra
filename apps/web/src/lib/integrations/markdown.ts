@@ -92,11 +92,7 @@ import {
   getIntegrationHref,
   getToolDescription,
 } from "@/lib/integrations/helpers";
-import type {
-  Integration,
-  IntegrationMarkdownEntry,
-  IntegrationTool,
-} from "@/types/integrations";
+import type { Integration, IntegrationTool } from "@/types/integrations";
 import { getIntegrationReferralUrl } from "@/utils/integration-referral-url";
 import { escapeMarkdownLinkText, markdownSection } from "@/utils/markdown";
 import { SITE_URL } from "@/utils/urls";
@@ -170,25 +166,6 @@ export async function buildIntegrationsMarkdown(): Promise<string> {
       `- [Read the docs](${INTEGRATIONS_DOCS_URL})`,
     ]),
   ].join("\n");
-}
-
-export async function listIntegrationMarkdownEntries(): Promise<
-  IntegrationMarkdownEntry[]
-> {
-  const integrations = await fetchIntegrations();
-  const entries: IntegrationMarkdownEntry[] = [];
-  for (const integration of integrations) {
-    const id = getIntegrationSlug(integration);
-    if (STATIC_INTEGRATION_PAGE_SLUGS.has(id)) {
-      continue;
-    }
-    entries.push({
-      id,
-      title: `${integration.name} integration for Notra`,
-      description: getIntegrationDescription(integration),
-    });
-  }
-  return entries;
 }
 
 export async function buildIntegrationMarkdown(

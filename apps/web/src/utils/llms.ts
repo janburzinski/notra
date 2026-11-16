@@ -1,39 +1,100 @@
+import type { PrerenderedPage } from "@usenotra/agentside";
+import { llmsFullTxt, llmsTxt } from "@usenotra/agentside/build";
+
 import { changelog } from "@/../.source/server";
 import { COMPARE_COMPETITORS } from "@/constants/compare/competitors";
+import { LEGAL_PAGES } from "@/constants/markdown-twins";
+import { MCP_USE_CASES } from "@/constants/mcp-use-cases";
+import { STATE_OF_AI_SEARCH_PATH } from "@/constants/state-of-ai-search";
+import { twins } from "@/lib/markdown/twins";
 import { NOTRA_CAPABILITIES } from "@/utils/agent-metadata";
-import { getCompareHref, getCompareTitle } from "@/utils/compare";
-import { stripFrontmatter } from "@/utils/markdown";
-import { readAppMarkdownSource } from "@/utils/markdown-source";
+import { getCompareHref } from "@/utils/compare";
+import { readMarkdownMeta } from "@/utils/markdown";
+import { listMarkdownPaths } from "@/utils/markdown-twins";
 import { SITE_DESCRIPTION } from "@/utils/metadata";
-import {
-  getShowcaseCompany,
-  getShowcaseEntrySlug,
-  SHOWCASE_COMPANIES,
-} from "@/utils/showcase";
-import {
-  buildFeaturesMarkdown,
-  buildLandingMarkdown,
-  buildPricingMarkdown,
-} from "@/utils/site-markdown";
+import { getShowcaseEntrySlug } from "@/utils/showcase";
 import { DOCS_URL, MCP_URL, SITE_URL } from "@/utils/urls";
 
 function absoluteUrl(path: string) {
   return `${SITE_URL}${path}`;
 }
 
-function formatLink(title: string, path: string, description?: string) {
-  const suffix = description ? `: ${description}` : "";
-  return `- [${title}](${absoluteUrl(path)})${suffix}`;
-}
+const PAGE_DESCRIPTIONS: Record<string, string> = {
+  "/": "Landing page overview",
+  "/features": "Product capabilities and publishing workflows",
+  "/pricing":
+    "Plans, feature comparison and a step-by-step guide for estimating AI answers and linking a prefilled calculator",
+  "/compare":
+    "Comparisons of Notra with Profound, Peec AI, AthenaHQ, Scrunch and other GEO tools",
+  "/showcase": "Changelogs Notra wrote for open source projects",
+  ...Object.fromEntries(
+    MCP_USE_CASES.map((useCase) => [
+      `/mcp/use-cases/${useCase.slug}`,
+      useCase.tagline,
+    ])
+  ),
+  ...Object.fromEntries(
+    changelog.map((entry) => [
+      `/showcase/${entry.info.path.split("/")[0]}/${getShowcaseEntrySlug(entry.info.path)}`,
+      `${entry.date} - ${entry.description}`,
+    ])
+  ),
+};
 
-function sortShowcaseEntries() {
-  return changelog
-    .slice()
-    .sort(
-      (left, right) =>
-        new Date(right.date).getTime() - new Date(left.date).getTime()
-    );
-}
+const LLMS_SECTIONS: Record<string, string> = {
+  "/features": "Features",
+  "/mcp": "MCP",
+  "/integrations": "Integrations",
+  [STATE_OF_AI_SEARCH_PATH]: "State of AI Search",
+  "/showcase": "Example Company Changelogs",
+  "/compare": "Comparisons",
+  ...Object.fromEntries(
+    COMPARE_COMPETITORS.map((competitor) => [
+      getCompareHref(competitor),
+      "Comparisons",
+    ])
+  ),
+  ...Object.fromEntries(LEGAL_PAGES.map((page) => [page.pattern, "Legal"])),
+};
+
+const LLMS_ORDER = ["/", "/features", "/pricing", "/compare", "/showcase"];
+
+const AGENT_RESOURCE_LINKS = [
+  ["Blog", "/blog/llms.txt", "Index of Notra blog posts"],
+  ["Changelog", "/changelog/llms.txt", "Index of Notra product updates"],
+  [
+    "Developer Resources",
+    "/developers/llms.txt",
+    "Scoped agent and API integration resources",
+  ],
+  ["API Resources", "/api/llms.txt", "OpenAPI, auth and MCP"],
+  [
+    "Agent Onboarding",
+    "/onboard.md",
+    "Steps for an agent to connect itself to Notra",
+  ],
+  ["Agent Auth", "/auth.md", "Credential discovery and usage"],
+  ["Agent Feedback", "/feedback.md", "Where agents send feedback"],
+  [
+    "Agent Discovery",
+    "/.well-known/agent.json",
+    "Machine-readable product capabilities",
+  ],
+  [
+    "API Catalog",
+    "/.well-known/api-catalog",
+    "RFC 9727 linkset for API descriptions",
+  ],
+  [
+    "Integration Surfaces",
+    "/.well-known/integrations.json",
+    "integrations.sh manifest of API, MCP and CLI surfaces with credentials",
+  ],
+].map(([title, path, description]) => ({
+  title: title ?? "",
+  url: absoluteUrl(path ?? ""),
+  description,
+}));
 
 export function buildDeveloperLlmsText() {
   return `# Notra Developer Resources
@@ -58,95 +119,41 @@ Use Notra developer resources when integrating AI agents, SDKs, MCP clients or A
 `;
 }
 
-async function buildShowcaseEntrySections() {
-  const entries = sortShowcaseEntries();
-
-  return Promise.all(
-    entries.map(async (entry) => {
-      const companySlug = entry.info.path.split("/")[0] ?? "";
-      const company = getShowcaseCompany(companySlug);
-      const slug = getShowcaseEntrySlug(entry.info.path);
-      const content = stripFrontmatter(
-        readAppMarkdownSource("changelog", entry.info.path)
+async function loadMarkdownPages() {
+  const pages = await Promise.all(
+    listMarkdownPaths().map(async (path): Promise<PrerenderedPage | null> => {
+      const response = await twins.serve(
+        new Request(absoluteUrl(path === "/" ? "/index.md" : `${path}.md`)),
+        path
       );
-
-      return [
-        `## ${company?.name ?? companySlug}: ${entry.title}`,
-        "",
-        `URL: ${absoluteUrl(`/showcase/${companySlug}/${slug}.md`)}`,
-        `Date: ${entry.date}`,
-        "",
-        content,
-        "",
-      ].join("\n");
+      if (!response.ok) {
+        return null;
+      }
+      const markdown = await response.text();
+      const meta = readMarkdownMeta(markdown);
+      return {
+        path,
+        markdown,
+        title: meta.title,
+        description: PAGE_DESCRIPTIONS[path] ?? meta.description,
+      };
     })
   );
+  return pages.filter((page) => page !== null);
 }
 
-export function buildLlmsText() {
+export async function buildLlmsText() {
+  const index = llmsTxt(await loadMarkdownPages(), {
+    title: "Notra",
+    description: SITE_DESCRIPTION,
+    siteUrl: SITE_URL,
+    sections: LLMS_SECTIONS,
+    order: LLMS_ORDER,
+    links: { "Agent Resources": AGENT_RESOURCE_LINKS },
+  });
+
   return [
-    "# Notra",
-    "",
-    `> ${SITE_DESCRIPTION}`,
-    "",
-    "## Main Pages",
-    "",
-    formatLink("Home", "/index.md", "Landing page overview"),
-    formatLink(
-      "Features",
-      "/features.md",
-      "Product capabilities and publishing workflows"
-    ),
-    formatLink(
-      "Pricing",
-      "/pricing.md",
-      "Plans, feature comparison and a step-by-step guide for estimating AI answers and linking a prefilled calculator"
-    ),
-    formatLink(
-      "Compare",
-      "/compare.md",
-      "Comparisons of Notra with Profound, Peec AI, AthenaHQ, Scrunch and other GEO tools"
-    ),
-    formatLink("Blog", "/blog/llms.txt", "Index of Notra blog posts"),
-    formatLink(
-      "Showcase",
-      "/showcase.md",
-      "Changelogs Notra wrote for open source projects"
-    ),
-    formatLink(
-      "Changelog",
-      "/changelog/llms.txt",
-      "Index of Notra product updates"
-    ),
-    formatLink(
-      "Developer Resources",
-      "/developers/llms.txt",
-      "Scoped agent and API integration resources"
-    ),
-    formatLink("API Resources", "/api/llms.txt", "OpenAPI, auth and MCP"),
-    formatLink(
-      "Agent Onboarding",
-      "/onboard.md",
-      "Steps for an agent to connect itself to Notra"
-    ),
-    formatLink("Agent Auth", "/auth.md", "Credential discovery and usage"),
-    formatLink("Agent Feedback", "/feedback.md", "Where agents send feedback"),
-    formatLink(
-      "Agent Discovery",
-      "/.well-known/agent.json",
-      "Machine-readable product capabilities"
-    ),
-    formatLink(
-      "API Catalog",
-      "/.well-known/api-catalog",
-      "RFC 9727 linkset for API descriptions"
-    ),
-    formatLink(
-      "Integration Surfaces",
-      "/.well-known/integrations.json",
-      "integrations.sh manifest of API, MCP and CLI surfaces with credentials"
-    ),
-    "",
+    index,
     "## When to use Notra",
     "",
     "Use Notra when a user or team wants to get recommended by AI engines: track how often ChatGPT, Claude, Gemini and Perplexity mention their brand for buyer prompts, attribute AI agent traffic on their site, find content gaps for the questions they lose and write the articles, changelogs, launch posts and social updates that close those gaps in a saved brand voice.",
@@ -172,75 +179,21 @@ export function buildLlmsText() {
     "",
     ...NOTRA_CAPABILITIES.map((capability) => `- ${capability}`),
     "",
-    "## Comparisons",
-    "",
-    ...COMPARE_COMPETITORS.map((competitor) =>
-      formatLink(
-        getCompareTitle(competitor),
-        `${getCompareHref(competitor)}.md`,
-        competitor.summary
-      )
-    ),
-    "",
-    "## Example Company Changelogs",
-    "",
-    ...SHOWCASE_COMPANIES.map((company) =>
-      formatLink(
-        `${company.name} Changelog`,
-        `/showcase/${company.slug}.md`,
-        company.description
-      )
-    ),
-    "",
-    "## Example Company Entries",
-    "",
-    ...sortShowcaseEntries().map((entry) => {
-      const companySlug = entry.info.path.split("/")[0] ?? "";
-      const company = getShowcaseCompany(companySlug);
-      const slug = getShowcaseEntrySlug(entry.info.path);
-
-      return formatLink(
-        `${company?.name ?? companySlug}: ${entry.title}`,
-        `/showcase/${companySlug}/${slug}.md`,
-        `${entry.date} - ${entry.description}`
-      );
-    }),
-    "",
     `Full content: ${absoluteUrl("/llms-full.txt")}`,
     "",
   ].join("\n");
 }
 
 export async function buildLlmsFullText() {
-  const showcaseEntrySections = await buildShowcaseEntrySections();
-
   return [
     "# Notra",
     "",
     `Source index: ${absoluteUrl("/llms.txt")}`,
-    "",
-    "## Home",
-    "",
-    buildLandingMarkdown(),
-    "",
-    "## Features",
-    "",
-    buildFeaturesMarkdown(),
-    "",
-    "## Pricing",
-    "",
-    buildPricingMarkdown(),
-    "",
-    "## Blog",
-    "",
     `Blog posts: ${absoluteUrl("/blog/llms.txt")}`,
-    "",
-    "## Notra Changelog",
-    "",
     `Changelog entries: ${absoluteUrl("/changelog/llms.txt")}`,
     "",
-    "## Example Company Changelogs",
+    "---",
     "",
-    ...showcaseEntrySections,
+    llmsFullTxt(await loadMarkdownPages(), { siteUrl: SITE_URL }),
   ].join("\n");
 }

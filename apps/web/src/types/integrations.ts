@@ -92,12 +92,6 @@ export interface IntegrationDetailViewProps {
   integration: Integration;
 }
 
-export interface IntegrationMarkdownEntry {
-  id: string;
-  title: string;
-  description: string;
-}
-
 export interface IntegrationDraftCardProps {
   title: string;
   actionLabel: string;

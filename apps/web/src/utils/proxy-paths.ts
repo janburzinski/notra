@@ -1,4 +1,4 @@
-import { detectAIBot, negotiateFormat } from "@dualmark/core";
+import { detectAgent, negotiateFormat } from "@usenotra/agentside";
 import { classifyUserAgent } from "@usenotra/sdk/classify";
 
 import { PROXY_EXCLUDED_PATH_PREFIXES } from "../constants/proxy";
@@ -16,8 +16,8 @@ export function isAgentRequest(request: Request) {
   const userAgent = request.headers.get("user-agent") ?? "";
   const accept = request.headers.get("accept") ?? "";
   return (
-    detectAIBot(userAgent).isBot ||
+    detectAgent(userAgent) !== null ||
     classifyUserAgent(userAgent) !== null ||
-    (accept !== "" && negotiateFormat(accept) !== "html")
+    negotiateFormat(accept, "contains") !== "html"
   );
 }

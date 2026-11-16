@@ -8,7 +8,7 @@ import type {
 } from "@/types/ip-checker";
 import { SITE_URL } from "@/utils/urls";
 
-const IP_CHECKER_PATH = "/ip-checker";
+export const IP_CHECKER_PATH = "/ip-checker";
 
 export const IP_CHECKER_URL = `${SITE_URL}${IP_CHECKER_PATH}`;
 

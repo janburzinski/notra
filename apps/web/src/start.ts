@@ -6,7 +6,7 @@ import {
   DYNAMIC_PAGE_CACHE_CONTROL,
   PUBLIC_PAGE_CACHE_CONTROL,
 } from "@/constants/proxy";
-import { appendHeaderValue, negotiateMarkdown } from "@/lib/proxy/dualmark";
+import { appendHeaderValue, negotiateMarkdown } from "@/lib/proxy/markdown";
 import { findRedirect } from "@/lib/proxy/redirects";
 import { isProxiedPath } from "@/utils/proxy-paths";
 import { HOMEPAGE_LINK_HEADER, SITE_URL } from "@/utils/urls";

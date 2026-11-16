@@ -1,6 +1,4 @@
-export const MARKDOWN_NAMESPACE = "md";
-
-export const DUALMARK_SKIP_PATHS = [
+export const MARKDOWN_SKIP_PATHS = [
   "/.well-known",
   "/api",
   "/ask",
@@ -33,7 +31,6 @@ export const DUALMARK_SKIP_PATHS = [
 
 export const PROXY_EXCLUDED_PATH_PREFIXES = [
   "/_serverFn/",
-  "/md/",
   "/api/",
   "/@",
   "/node_modules/",

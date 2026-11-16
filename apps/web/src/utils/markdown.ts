@@ -3,6 +3,8 @@ const MARKDOWN_LINK_TEXT_REGEX = /[\\[\]]/g;
 const BACKSLASH_REGEX = /\\/g;
 const TABLE_PIPE_REGEX = /\|/g;
 const LINE_BREAK_REGEX = /\s*\n\s*/g;
+const BLOCKQUOTE_PREFIX_REGEX = /^>\s*/;
+const BOLD_ONLY_LINE_REGEX = /^\*\*[^*]+\*\*$/;
 
 export function textResponse(content: string, status = 200) {
   return new Response(content, {
@@ -15,6 +17,23 @@ export function textResponse(content: string, status = 200) {
 
 export function markdownSection(title: string, lines: string[]) {
   return [`## ${title}`, "", ...lines, ""].join("\n");
+}
+
+export function readMarkdownMeta(markdown: string) {
+  const lines = markdown.split("\n");
+  const titleIndex = lines.findIndex((line) => line.startsWith("# "));
+  const description = lines
+    .slice(titleIndex + 1)
+    .find(
+      (line) =>
+        line.trim() !== "" &&
+        !line.startsWith("#") &&
+        !BOLD_ONLY_LINE_REGEX.test(line.trim())
+    );
+  return {
+    title: lines[titleIndex]?.slice(2).trim() ?? "",
+    description: description?.replace(BLOCKQUOTE_PREFIX_REGEX, "").trim() ?? "",
+  };
 }
 
 export function stripFrontmatter(source: string) {

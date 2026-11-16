@@ -13,10 +13,3 @@ export function markdownNotFoundResponse() {
     },
   });
 }
-
-export class MarkdownNotFoundError extends Error {
-  constructor(pathname: string) {
-    super(`No markdown twin for ${pathname}`);
-    this.name = "MarkdownNotFoundError";
-  }
-}

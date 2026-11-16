@@ -24,10 +24,7 @@ import {
 } from "@/constants/mcp-use-cases";
 import { fetchMcpTools } from "@/lib/mcp/tools";
 import type { McpPlatform } from "@/types/mcp-platforms";
-import type {
-  McpUseCase,
-  McpUseCaseMarkdownEntry,
-} from "@/types/mcp-use-cases";
+import type { McpUseCase } from "@/types/mcp-use-cases";
 import { markdownSection } from "@/utils/markdown";
 import { formatMcpUseCasesCalloutLabel } from "@/utils/mcp";
 import {
@@ -128,14 +125,6 @@ export function buildMcpUseCasesMarkdown(): string {
     "",
     ...categorySections,
   ].join("\n");
-}
-
-export function listMcpUseCaseMarkdownEntries(): McpUseCaseMarkdownEntry[] {
-  return MCP_USE_CASES.map((entry) => ({
-    slug: entry.slug,
-    title: entry.title,
-    description: entry.tagline,
-  }));
 }
 
 export function buildMcpUseCaseMarkdown(slug: string): string | null {
