@@ -22,6 +22,7 @@ import type {
 import { trafficVisitDelta } from "@notra/geo-core/utils/ai-traffic";
 import { formatDayLabel } from "@notra/geo-core/utils/day-label";
 
+import { JOURNEYS_METRIC_SERIES_KEY } from "@/constants/geo-traffic-hero";
 import type {
   GeoJourneyGroupSelection,
   GeoJourneyKindCount,
@@ -31,6 +32,8 @@ import type {
   GeoJourneySourceRow,
   GeoJourneyTreeNode,
   JourneyGroupSheetStat,
+  JourneyMetricRow,
+  JourneysChartMetric,
 } from "@/types/geo";
 
 const WWW_PREFIX = /^www\./;
@@ -436,7 +439,7 @@ export function journeyGroupSheetStats(input: {
   return [journeyStat];
 }
 
-export function journeyActivityRows(
+function journeyActivityRows(
   sources: readonly GeoJourneySourceStats[],
   days: readonly string[],
   locale: string
@@ -454,5 +457,67 @@ export function journeyActivityRows(
     rawDay: day,
     [GEO_TRAFFIC_TREND_CRAWLER_KEY]: crawler.get(day) ?? 0,
     [GEO_TRAFFIC_TREND_REFERRAL_KEY]: aiReferral.get(day) ?? 0,
+  }));
+}
+
+/**
+ * Daily rows for the Journeys hero chart of one metric. Journeys split into
+ * crawlers and referrals; the rest are one series. Depth and deep-crawl share
+ * are null on days without journeys, so the line breaks instead of dropping
+ * to zero.
+ */
+export function journeyMetricRows(
+  metric: JourneysChartMetric,
+  sources: readonly GeoJourneySourceStats[],
+  pages: readonly GeoJourneyPageStats[],
+  days: readonly string[],
+  locale: string
+): JourneyMetricRow[] {
+  if (metric === "journeys") {
+    return journeyActivityRows(sources, days, locale).map((row) => ({
+      ...row,
+      [GEO_TRAFFIC_TREND_REFERRAL_KEY]:
+        row[GEO_TRAFFIC_TREND_REFERRAL_KEY] > 0
+          ? row[GEO_TRAFFIC_TREND_REFERRAL_KEY]
+          : null,
+    }));
+  }
+  const values = new Map<string, number | null>();
+  if (metric === "pages") {
+    for (const page of pages) {
+      for (const point of page.daily) {
+        if (point.journeys > 0) {
+          values.set(point.day, (values.get(point.day) ?? 0) + 1);
+        }
+      }
+    }
+  } else {
+    const journeys = new Map<string, number>();
+    const counts = new Map<string, number>();
+    for (const row of sources) {
+      for (const point of row.daily) {
+        journeys.set(
+          point.day,
+          (journeys.get(point.day) ?? 0) + point.journeys
+        );
+        const count = metric === "depth" ? point.pages : point.deepCrawls;
+        counts.set(point.day, (counts.get(point.day) ?? 0) + count);
+      }
+    }
+    for (const [day, total] of journeys) {
+      const count = counts.get(day) ?? 0;
+      values.set(
+        day,
+        metric === "depth"
+          ? journeyAverageDepth(count, total)
+          : Math.round(shareOf(count, total) * 1000) / 10
+      );
+    }
+  }
+  const fallback = metric === "pages" ? 0 : null;
+  return days.map((day) => ({
+    day: formatDayLabel(day, locale),
+    rawDay: day,
+    [JOURNEYS_METRIC_SERIES_KEY]: values.get(day) ?? fallback,
   }));
 }

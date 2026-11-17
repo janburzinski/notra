@@ -109,24 +109,6 @@ export const MCP_METRIC_COLOR = CHART_PRIMARY_COLOR;
 /** The hero opens on tool calls; each tile switches the chart to its metric. */
 export const MCP_DEFAULT_CHART_METRIC: McpChartMetric = "toolCalls";
 
-/** The hero tiles sit flat on the shell, two pixels apart like its rim. */
-export const MCP_HERO_METRICS_CLASS = "gap-0.5 pt-0.5";
-
-/** The selected tile is raised as a card like the chart below it. */
-export const MCP_HERO_METRIC_CELL_CLASS =
-  "group/metric relative flex min-w-0 flex-col gap-2 rounded-[14px] border border-transparent p-4 transition-colors data-[selected]:border-table-card-border data-[selected]:bg-table-card data-[selected]:shadow-table-card";
-
-/**
- * The tile's label is its button and stretches over the whole tile, so the
- * change badge (its own tooltip button) isn't nested inside it.
- */
-export const MCP_HERO_METRIC_BUTTON_CLASS =
-  "cursor-pointer self-start text-left text-sm leading-5 font-semibold tracking-tight outline-none transition-colors after:absolute after:inset-0 after:rounded-[14px] focus-visible:after:ring-2 focus-visible:after:ring-ring focus-visible:after:ring-inset";
-
-/** Unselected tiles read quieter and light up on hover. */
-export const MCP_HERO_METRIC_MUTED_CLASS =
-  "text-muted-foreground transition-colors group-hover/metric:text-foreground";
-
 /** Marks the newest server version in the version select. */
 export const MCP_LATEST_VERSION_BADGE: StatusBadgeAppearance = {
   variant: "success",

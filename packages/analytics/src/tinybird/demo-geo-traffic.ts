@@ -427,7 +427,7 @@ function journeySources(
       single_fetch: number;
       deep_crawls: number;
       last_seen_at: string | null;
-      perDay: Map<string, number>;
+      perDay: Map<string, { journeys: number; pages: number; deep: number }>;
     }
   >();
   for (const journey of rollups) {
@@ -441,7 +441,7 @@ function journeySources(
       single_fetch: 0,
       deep_crawls: 0,
       last_seen_at: null,
-      perDay: new Map<string, number>(),
+      perDay: new Map(),
     };
     const day = utcDay(journey.first_seen_at);
     if (window.isCurrent(day)) {
@@ -451,7 +451,15 @@ function journeySources(
       group.deep_crawls +=
         journey.pages >= GEO_JOURNEY_DEEP_CRAWL_PAGES_SQL ? 1 : 0;
       group.last_seen_at = maxTime(group.last_seen_at, journey.last_seen_at);
-      group.perDay.set(day, (group.perDay.get(day) ?? 0) + 1);
+      const point = group.perDay.get(day) ?? {
+        journeys: 0,
+        pages: 0,
+        deep: 0,
+      };
+      point.journeys++;
+      point.pages += journey.pages;
+      point.deep += journey.pages >= GEO_JOURNEY_DEEP_CRAWL_PAGES_SQL ? 1 : 0;
+      group.perDay.set(day, point);
     } else {
       group.previous_journeys++;
     }
@@ -460,11 +468,18 @@ function journeySources(
   return [...groups.values()]
     .filter((group) => group.journeys > 0 || group.previous_journeys > 0)
     .sort((a, b) => b.journeys - a.journeys || a.source.localeCompare(b.source))
-    .map(({ perDay, ...group }) => ({
-      ...group,
-      last_seen_at: group.last_seen_at ?? "",
-      ...dailySeries(perDay),
-    }));
+    .map(({ perDay, ...group }) => {
+      const days = [...perDay.keys()].sort();
+      const points = days.map((day) => perDay.get(day));
+      return {
+        ...group,
+        last_seen_at: group.last_seen_at ?? "",
+        days,
+        daily_journeys: points.map((point) => point?.journeys ?? 0),
+        daily_pages: points.map((point) => point?.pages ?? 0),
+        daily_deep_crawls: points.map((point) => point?.deep ?? 0),
+      };
+    });
 }
 
 function journeyPages(

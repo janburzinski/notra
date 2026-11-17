@@ -22,9 +22,9 @@ import { SkeletonCrossfade } from "@/components/skeleton-crossfade";
 import {
   TRAFFIC_HERO_CHART_SURFACE_CLASS,
   TRAFFIC_HERO_FRAME_CLASS,
-  TRAFFIC_HERO_METRIC_CELL_CLASS,
   TRAFFIC_HERO_METRICS_GRID_CLASS,
-  TRAFFIC_HERO_METRICS_SURFACE_CLASS,
+  TRAFFIC_HERO_TILE_CLASS,
+  TRAFFIC_HERO_TILES_CLASS,
 } from "@/constants/geo-traffic-hero";
 import { trackEvent } from "@/lib/analytics/posthog-client";
 import { usePrefetchGeoJourneyDetail } from "@/lib/hooks/use-geo";
@@ -40,19 +40,26 @@ function JourneysHeroSkeleton() {
       <div
         className={cn(
           TRAFFIC_HERO_METRICS_GRID_CLASS,
-          TRAFFIC_HERO_METRICS_SURFACE_CLASS
+          TRAFFIC_HERO_TILES_CLASS
         )}
       >
-        {HERO_SKELETON_KEYS.map((key) => (
-          <div className={TRAFFIC_HERO_METRIC_CELL_CLASS} key={key}>
-            <Skeleton className="h-4 w-24" />
-            <Skeleton className="h-8 w-20" />
+        {HERO_SKELETON_KEYS.map((key, index) => (
+          <div
+            className={TRAFFIC_HERO_TILE_CLASS}
+            data-selected={index === 0 ? "" : undefined}
+            key={key}
+          >
+            <Skeleton className="h-5 w-24" />
+            <div className="flex flex-col items-start gap-2 @3xl/hero:flex-row @3xl/hero:items-center @3xl/hero:gap-3">
+              <Skeleton className="h-6 w-16 @4xl/hero:h-7" />
+              <Skeleton className="h-5 w-12 rounded-full" />
+            </div>
           </div>
         ))}
       </div>
-      <div className={TRAFFIC_HERO_CHART_SURFACE_CLASS}>
-        <Skeleton className="mb-3 h-4 w-28" />
-        <Skeleton className="h-52 w-full @md/hero:h-64" />
+      <div className={cn(TRAFFIC_HERO_CHART_SURFACE_CLASS, "mt-0.5")}>
+        <Skeleton className="mb-3 h-5 w-20" />
+        <Skeleton className="h-52 w-full rounded-xl @md/hero:h-72" />
       </div>
     </div>
   );
@@ -138,6 +145,7 @@ export function JourneysTab({
           <>
             <JourneysHero
               days={days}
+              pages={pages}
               previousTotalPages={journeyStats?.previousTotalPages ?? 0}
               sources={sources}
               totalPages={journeyStats?.totalPages ?? 0}

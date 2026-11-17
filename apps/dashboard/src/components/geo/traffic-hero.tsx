@@ -302,7 +302,7 @@ export function TrafficHero({
             </div>
           </div>
           <EChartsAreaChart
-            animationType="left-to-right"
+            animation={false}
             chartOptions={TRAFFIC_HERO_CHART_OPTIONS}
             className="h-52 w-full cursor-crosshair @md/hero:h-72"
             config={config}

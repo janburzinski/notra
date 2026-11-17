@@ -14,12 +14,10 @@ import {
   TRAFFIC_HERO_CHART_SURFACE_CLASS,
   TRAFFIC_HERO_FRAME_CLASS,
   TRAFFIC_HERO_METRICS_GRID_CLASS,
+  TRAFFIC_HERO_TILE_CLASS,
+  TRAFFIC_HERO_TILES_CLASS,
 } from "@/constants/geo-traffic-hero";
-import {
-  MCP_HERO_METRIC_CELL_CLASS,
-  MCP_HERO_METRICS_CLASS,
-  MCP_TOOLS_SKELETON_ROWS,
-} from "@/constants/mcp-analytics";
+import { MCP_TOOLS_SKELETON_ROWS } from "@/constants/mcp-analytics";
 import { TABLE_ROW_HEIGHT } from "@/constants/table";
 import type { McpTrafficSkeletonProps } from "@/types/mcp-analytics";
 import { mcpTableHeight } from "@/utils/mcp-analytics";
@@ -96,12 +94,12 @@ export function McpTrafficSkeleton({ geoRange }: McpTrafficSkeletonProps) {
           <div
             className={cn(
               TRAFFIC_HERO_METRICS_GRID_CLASS,
-              MCP_HERO_METRICS_CLASS
+              TRAFFIC_HERO_TILES_CLASS
             )}
           >
             {metricLabels.map((label, index) => (
               <div
-                className={MCP_HERO_METRIC_CELL_CLASS}
+                className={TRAFFIC_HERO_TILE_CLASS}
                 data-selected={index === 0 ? "" : undefined}
                 key={label}
               >

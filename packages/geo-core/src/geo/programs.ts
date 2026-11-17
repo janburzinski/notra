@@ -101,6 +101,7 @@ import type {
   GeoTrackedPrompt,
   GeoTrackedPromptsResponse,
   GeoJourneyDailyPoint,
+  GeoJourneySourceDailyPoint,
   GeoJourneyStatsResponse,
   GeoTrafficJourneysResponse,
   GeoTrafficLogResponse,
@@ -1589,6 +1590,24 @@ function toJourneyDailyPoints(
   }));
 }
 
+/**
+ * `daily_pages` and `daily_deep_crawls` are optional because a cached row from
+ * before the pipe returned them can still be read until it expires.
+ */
+function toJourneySourceDailyPoints(row: {
+  days: readonly string[];
+  daily_journeys: readonly (number | string)[];
+  daily_pages?: readonly (number | string)[];
+  daily_deep_crawls?: readonly (number | string)[];
+}): GeoJourneySourceDailyPoint[] {
+  return row.days.map((day, index) => ({
+    day,
+    journeys: Number(row.daily_journeys[index] ?? 0),
+    pages: Number(row.daily_pages?.[index] ?? 0),
+    deepCrawls: Number(row.daily_deep_crawls?.[index] ?? 0),
+  }));
+}
+
 function journeyLastSeen(value: string): string | null {
   return value.startsWith(JOURNEY_EPOCH_PREFIX) ? null : value;
 }
@@ -1629,7 +1648,7 @@ export const loadGeoJourneyStats = Effect.fn("geo.journeyStats")(function* (
       singleFetch: Number(row.single_fetch),
       deepCrawls: Number(row.deep_crawls),
       lastSeenAt: journeyLastSeen(row.last_seen_at),
-      daily: toJourneyDailyPoints(row.days, row.daily_journeys),
+      daily: toJourneySourceDailyPoints(row),
     })),
     pages: pageRows
       .filter((row) => Number(row.journeys) > 0)

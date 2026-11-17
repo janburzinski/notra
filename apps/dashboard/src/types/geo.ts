@@ -602,17 +602,42 @@ export interface JourneyPathSummaryProps {
 
 export interface JourneysHeroProps {
   sources: GeoJourneySourceStats[];
+  pages: GeoJourneyPageStats[];
   days: readonly string[];
   totalPages: number;
   previousTotalPages: number;
 }
 
+export type JourneysChartMetric = "journeys" | "pages" | "depth" | "deepCrawls";
+
 export interface JourneysHeroMetric {
-  key: string;
+  key: JourneysChartMetric;
   label: string;
-  value: number | string;
+  value: string;
   /** Percent change vs the previous window; omitted when there is no comparison. */
   delta?: number | null;
+}
+
+export interface JourneysMetricChartProps {
+  metric: JourneysHeroMetric;
+  sources: readonly GeoJourneySourceStats[];
+  pages: readonly GeoJourneyPageStats[];
+  days: readonly string[];
+}
+
+export type JourneyMetricRow = { day: string; rawDay: string } & Record<
+  string,
+  number | string | null
+>;
+
+export interface TrafficHeroTileProps {
+  label: string;
+  value: string;
+  /** Percent change vs the previous window; undefined hides the badge. */
+  delta?: number | null;
+  lowerIsBetter?: boolean;
+  selected: boolean;
+  onSelect: () => void;
 }
 
 export interface JourneyEmptyProps {

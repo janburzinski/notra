@@ -141,12 +141,6 @@ export interface McpMetricChartProps {
   range: GeoRangeQuery;
 }
 
-export interface McpHeroMetricProps {
-  metric: McpMetric;
-  selected: boolean;
-  onSelect: () => void;
-}
-
 export interface McpLoadFailedProps {
   onRetry: () => unknown;
 }

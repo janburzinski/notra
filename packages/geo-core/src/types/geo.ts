@@ -1158,6 +1158,12 @@ export interface GeoJourneyDailyPoint {
   journeys: number;
 }
 
+export interface GeoJourneySourceDailyPoint extends GeoJourneyDailyPoint {
+  /** Requests across the journeys that started that day. */
+  pages: number;
+  deepCrawls: number;
+}
+
 /** Exact journey counts for one source; journeys count toward the window they started in. */
 export interface GeoJourneySourceStats {
   source: string;
@@ -1169,7 +1175,7 @@ export interface GeoJourneySourceStats {
   deepCrawls: number;
   lastSeenAt: string | null;
   /** Days with at least one journey in the current window, oldest first. */
-  daily: GeoJourneyDailyPoint[];
+  daily: GeoJourneySourceDailyPoint[];
 }
 
 export interface GeoJourneyPageStats {

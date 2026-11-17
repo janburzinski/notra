@@ -661,7 +661,7 @@ const GEO_JOURNEY_COMPARISON_EVENTS_SQL = `
 
 export const geoJourneySources = defineEndpoint("geo_journey_sources", {
   description:
-    "Exact journey counts per source for the window and the previous window, with a daily series for the current window",
+    "Exact journey counts per source for the window and the previous window, with daily journeys, requests and deep crawls for the current window",
   params: {
     organization_id: p.string().describe("Organization id"),
     ...GEO_PROJECT_SCOPE_PARAMS,
@@ -718,7 +718,9 @@ export const geoJourneySources = defineEndpoint("geo_journey_sources", {
           sumIf(day_deep_crawls, is_current) AS deep_crawls,
           maxIf(day_last_seen_at, is_current) AS last_seen_at,
           arrayMap(x -> x.1, arraySort(groupArrayIf((day, day_journeys), is_current))) AS days,
-          arrayMap(x -> x.2, arraySort(groupArrayIf((day, day_journeys), is_current))) AS daily_journeys
+          arrayMap(x -> x.2, arraySort(groupArrayIf((day, day_journeys), is_current))) AS daily_journeys,
+          arrayMap(x -> x.2, arraySort(groupArrayIf((day, day_pages), is_current))) AS daily_pages,
+          arrayMap(x -> x.2, arraySort(groupArrayIf((day, day_deep_crawls), is_current))) AS daily_deep_crawls
         FROM journey_source_days
         GROUP BY source, visitor_type
         HAVING journeys > 0 OR previous_journeys > 0
@@ -737,6 +739,8 @@ export const geoJourneySources = defineEndpoint("geo_journey_sources", {
     last_seen_at: t.dateTime(),
     days: t.array(t.date()),
     daily_journeys: t.array(t.uint64()),
+    daily_pages: t.array(t.uint64()),
+    daily_deep_crawls: t.array(t.uint64()),
   },
 });
 
