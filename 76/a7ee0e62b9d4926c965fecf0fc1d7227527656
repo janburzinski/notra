@@ -1,0 +1,87 @@
+apps/console/src/types/autopilot.ts
+  s_012423b8623daf::t_f405067b769cdf 272-277
+  s_012423b8623daf::t_ae21c1fcebf62d 129
+  s_012423b8623daf::t_16a76438a2e50f 295-306
+  s_012423b8623daf::t_80e9079d20fc49 1,127-128,130-145,147-148,150-155,159-206,209-244,246-252,254,281-283
+  s_012423b8623daf::t_b69416b49df8db 146,149,207-208
+  s_012423b8623daf::t_475b7ceb38745b 7
+  s_012423b8623daf::t_3328bef5b68e47 21
+  s_012423b8623daf::t_5ed3df18bdc9d7 284-294,307
+  s_012423b8623daf::t_4da5c9e1855f82 156-158,245
+  s_012423b8623daf::t_96392be390a5d2 253,255-271,278-280
+apps/dashboard/src/lib/orpc/routers/autopilot.ts
+  s_012423b8623daf::t_50a548eb798d5e 7-10
+apps/console/src/components/autopilot/autopilot-page-client.tsx
+  s_012423b8623daf::t_3328bef5b68e47 1-12,17-47,52-70
+  s_012423b8623daf::t_475b7ceb38745b 13-16,48-51
+apps/console/src/lib/orpc/routers/autopilot.test.ts
+  s_012423b8623daf::t_d76cba12578384 34-37,50-59
+apps/console/src/schemas/autopilot.ts
+  s_012423b8623daf::t_80e9079d20fc49 1-16
+apps/console/src/constants/autopilot.ts
+  s_012423b8623daf::t_80e9079d20fc49 1-3,53-69,74-97
+  s_012423b8623daf::t_2bbc1c190797a8 70-73
+apps/console/src/app/(console)/[slug]/autopilot/page.tsx
+  s_012423b8623daf::t_3328bef5b68e47 4,11-15,20-25
+apps/dashboard/src/lib/autopilot/agent.ts
+  s_012423b8623daf::t_475b7ceb38745b 3
+apps/console/src/utils/autopilot.ts
+  s_012423b8623daf::t_2bbc1c190797a8 5,129
+  s_012423b8623daf::t_5ed3df18bdc9d7 1-4,6-14,69-128,130-155
+apps/console/src/components/autopilot/autopilot-trace-client.tsx
+  s_012423b8623daf::t_212d02598a65f3 38
+apps/console/src/components/autopilot/autopilot-runs-client.tsx
+  s_012423b8623daf::t_3328bef5b68e47 56-61,69,215
+apps/dashboard/src/lib/autopilot/pull-request-events.ts
+  s_012423b8623daf::t_48bfdcc2914cad 7
+apps/console/src/lib/autopilot/health.ts
+  s_012423b8623daf::t_87677e6a833b36 58
+  s_012423b8623daf::t_4da5c9e1855f82 1-35,37-47,54,59-61,64-66,81-150,152-187,192-213,215,218-220,227-231,233-246,248-255,259-273,275-276,282-293,296-298,300-377,380-383,385-392,394-405,407-469,471-485,487-514,516-529
+  s_012423b8623daf::t_f6bda6515e82c5 55-56
+  s_012423b8623daf::t_c11a55d08cc8b8 378-379,406
+  s_012423b8623daf::t_b69416b49df8db 50-52,63,67-80,151,188-191,214,216-217,221-226,232,247,256-258,274,277-281,294-295,299,384,393,470,486,515
+  s_012423b8623daf::t_80c53774dc10a6 36,48-49,53,57,62
+apps/console/src/components/autopilot/autopilot-health-client.tsx
+  s_012423b8623daf::t_440ed34fdce20b 1-23,25-64,66-79,81-116,118-181,185-261
+  s_012423b8623daf::t_96392be390a5d2 24,80,117
+  s_012423b8623daf::t_475b7ceb38745b 65,183-184
+  s_012423b8623daf::t_469b2167b82764 182
+apps/dashboard/src/lib/autopilot/start.ts
+  s_012423b8623daf::t_475b7ceb38745b 1
+apps/dashboard/src/constants/autopilot.ts
+  s_012423b8623daf::t_50a548eb798d5e 1
+packages/db/src/constants/autopilot.ts
+  s_012423b8623daf::t_7ee90b861f8b22 31-47
+apps/console/src/components/autopilot/autopilot-health-chart.tsx
+  s_012423b8623daf::t_c730bb463ecc5a 1-35,37-67,87-90
+  s_012423b8623daf::t_525e38f61bc02b 36
+  s_012423b8623daf::t_fd8564ca992c35 68-86
+apps/dashboard/src/lib/autopilot/run.ts
+  s_012423b8623daf::t_50a548eb798d5e 2-5
+apps/console/src/lib/orpc/routers/autopilot.ts
+  s_012423b8623daf::t_4da5c9e1855f82 10,12,15-20
+apps/console/src/components/autopilot/autopilot-health-tables.tsx
+  s_012423b8623daf::t_66ccd376f29bf9 1-19,21-24,27,29-73,75-76,79-83,106-114,116-146,148-162,189-200,202-219,221,225,227-229,244-263,265-285,288-289,291-293,295-301,303-307,309-311,318-325,333-342,345-354,356-373,376-382,384-386,393,398,402-403,411-419
+  s_012423b8623daf::t_2bbc1c190797a8 20,147
+  s_012423b8623daf::t_91373ac7bdb87a 163-164,174-176,187-188,238,312-313,343-344,387
+  s_012423b8623daf::t_96392be390a5d2 25,28,74,105,115,201,264,355
+  s_012423b8623daf::t_475b7ceb38745b 222-224
+  s_012423b8623daf::t_f405067b769cdf 26,77-78,84-104,165-173,177-186,220,226,230-237,239-243,286-287,290,294,302,308,314-317,388-392,394-397,399,401,404-410
+  s_012423b8623daf::t_87677e6a833b36 326-332,374-375,383,400
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "76a7ee0e62b9d4926c965fecf0fc1d7227527656",
+  "prompts": {},
+  "sessions": {
+    "s_012423b8623daf": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "bd62822a-d7a0-468f-83cd-d27d0072a3e7",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
