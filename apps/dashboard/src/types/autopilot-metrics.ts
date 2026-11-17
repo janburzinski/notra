@@ -69,10 +69,26 @@ export interface AutopilotAutomationsOverviewProps {
   onOpenAutomation: (kind: AutopilotAutomationKind) => void;
   onAddAutomation: (kind: AutopilotAutomationKind) => void;
   onRunAutomation: (kind: AutopilotAutomationKind) => void;
+  onTurnOffAutomation: (kind: AutopilotAutomationKind) => void;
   onOpenWorkflow: (workflowId: string) => void;
   /** The automation being started right now, if any. */
   runningKind: AutopilotAutomationKind | null;
   runDisabled: boolean;
+}
+
+/** Right-click actions for a row of the Autopilot automations table. */
+export interface AutopilotAutomationMenuItemsProps {
+  row: AutopilotAutomationRow;
+  canManage: boolean;
+  /** Whether the row can't be started right now. */
+  runDisabled: boolean;
+  /** Whether its on/off state is being saved right now. */
+  toggleBusy: boolean;
+  onOpen: (row: AutopilotAutomationRow) => void;
+  onRun: (row: AutopilotAutomationRow) => void;
+  onTurnOff: (kind: AutopilotAutomationKind) => void;
+  onSetWorkflowEnabled: (workflowId: string, enabled: boolean) => void;
+  onDeleteWorkflow: (workflow: AutopilotWorkflowSummary) => void;
 }
 
 export interface AutopilotPeriodSelectProps {

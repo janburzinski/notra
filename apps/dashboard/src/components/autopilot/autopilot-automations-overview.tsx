@@ -8,6 +8,7 @@ import {
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { AUTOPILOT_AUTOMATION_KINDS } from "@notra/db/constants/autopilot";
+import { ConfirmDialog } from "@notra/ui/components/shared/confirm-dialog";
 import { StatusBadge } from "@notra/ui/components/status-badge";
 import {
   DropdownMenu,
@@ -21,6 +22,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { DataTable, type TableColumn } from "ui/table";
 
+import { AutopilotAutomationMenuItems } from "@/components/autopilot/autopilot-automation-menu-items";
 import { AutopilotRunHistory } from "@/components/autopilot/autopilot-run-history";
 import { AutopilotStatStrip } from "@/components/autopilot/autopilot-stat-strip";
 import { AutopilotTableEmpty } from "@/components/autopilot/autopilot-table-empty";
@@ -46,6 +48,7 @@ import type {
   AutopilotAutomationRow,
   AutopilotAutomationsOverviewProps,
 } from "@/types/autopilot-metrics";
+import type { AutopilotWorkflowSummary } from "@/types/autopilot-workflows";
 import { tableHeightFor } from "@/utils/table";
 
 const formatNumber = (value: number | null | undefined) =>
@@ -74,6 +77,7 @@ export function AutopilotAutomationsOverview({
   onOpenWorkflow,
   onAddAutomation,
   onRunAutomation,
+  onTurnOffAutomation,
   runningKind,
   runDisabled,
 }: AutopilotAutomationsOverviewProps) {
@@ -89,7 +93,14 @@ export function AutopilotAutomationsOverview({
       input: { organizationId },
     })
   );
-  const { run: runWorkflow } = useAutopilotWorkflowActions(organizationId);
+  const {
+    run: runWorkflow,
+    setEnabled: setWorkflowEnabled,
+    remove: removeWorkflow,
+  } = useAutopilotWorkflowActions(organizationId);
+  const [deleting, setDeleting] = useState<AutopilotWorkflowSummary | null>(
+    null
+  );
   // The server rejects a run for a switch it hasn't saved yet.
   const saving = useSavingAutopilotJobs(organizationId);
   const metrics = query.data;
@@ -114,6 +125,23 @@ export function AutopilotAutomationsOverview({
       workflow,
     })),
   ];
+  const isSaving = (kind: AutopilotAutomationKind) =>
+    saving.some((change) => change.kind === kind);
+  const isRunDisabled = (row: AutopilotAutomationRow) =>
+    row.type === "builtin"
+      ? runDisabled || isSaving(row.kind)
+      : runWorkflow.isPending;
+  const openRow = (row: AutopilotAutomationRow) =>
+    row.type === "builtin"
+      ? onOpenAutomation(row.kind)
+      : onOpenWorkflow(row.id);
+  const runRow = (row: AutopilotAutomationRow) => {
+    if (row.type === "builtin") {
+      onRunAutomation(row.kind);
+    } else {
+      runWorkflow.mutate(row.id);
+    }
+  };
   const previous = metrics?.previous;
   const stats = [
     {
@@ -240,12 +268,7 @@ export function AutopilotAutomationsOverview({
               return (
                 <Button
                   aria-label={`Run ${name}`}
-                  disabled={
-                    row.type === "builtin"
-                      ? runDisabled ||
-                        saving.some((change) => change.kind === row.kind)
-                      : runWorkflow.isPending
-                  }
+                  disabled={isRunDisabled(row)}
                   loading={
                     row.type === "builtin"
                       ? runningKind === row.kind
@@ -254,11 +277,7 @@ export function AutopilotAutomationsOverview({
                   }
                   onClick={(event) => {
                     event.stopPropagation();
-                    if (row.type === "builtin") {
-                      onRunAutomation(row.kind);
-                    } else {
-                      runWorkflow.mutate(row.id);
-                    }
+                    runRow(row);
                   }}
                   size="xs"
                   variant="outline"
@@ -364,15 +383,51 @@ export function AutopilotAutomationsOverview({
                 ? tableHeightFor(rows.length)
                 : AUTOPILOT_EMPTY_TABLE_HEIGHT
             }
-            onRowClick={(row) =>
-              row.type === "builtin"
-                ? onOpenAutomation(row.kind)
-                : onOpenWorkflow(row.id)
-            }
+            onRowClick={openRow}
+            renderRowContextMenu={(row) => (
+              <AutopilotAutomationMenuItems
+                canManage={canManage}
+                onDeleteWorkflow={setDeleting}
+                onOpen={openRow}
+                onRun={runRow}
+                onSetWorkflowEnabled={(workflowId, enabled) =>
+                  setWorkflowEnabled.mutate({ workflowId, enabled })
+                }
+                onTurnOff={onTurnOffAutomation}
+                row={row}
+                runDisabled={isRunDisabled(row)}
+                toggleBusy={
+                  row.type === "builtin"
+                    ? isSaving(row.kind)
+                    : setWorkflowEnabled.isPending
+                }
+              />
+            )}
             rowHeight={TABLE_ROW_HEIGHT}
           />
         </TooltipProvider>
       </div>
+      <ConfirmDialog
+        confirmLabel="Delete workflow"
+        description="Autopilot stops running it. This can't be undone."
+        // A failed delete already shows a toast; the dialog stays open to retry.
+        onConfirm={() =>
+          deleting
+            ? removeWorkflow
+                .mutateAsync(deleting.id)
+                .then(() => setDeleting(null))
+                .catch(() => undefined)
+            : undefined
+        }
+        onOpenChange={(open) => {
+          if (!open) {
+            setDeleting(null);
+          }
+        }}
+        open={deleting !== null}
+        title={deleting ? `Delete ${deleting.name}?` : "Delete this workflow?"}
+        variant="destructive"
+      />
     </div>
   );
 }

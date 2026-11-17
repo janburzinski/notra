@@ -361,6 +361,9 @@ function AutopilotOverviewPage({
               )
             }
             onRunAutomation={(kind) => runNow.mutate(kind)}
+            onTurnOffAutomation={(kind) =>
+              setJob.mutate({ kind, enabled: false })
+            }
             organizationId={organizationId}
             runDisabled={isRunning || runNow.isPending}
             runningKind={
