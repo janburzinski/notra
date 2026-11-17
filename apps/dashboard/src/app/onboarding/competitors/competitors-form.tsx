@@ -151,13 +151,11 @@ function CompetitorsPicker({
         />
       </div>
 
-      {competitors.length > 0 ? (
-        <SelectedCompetitors
-          competitors={competitors}
-          disabled={busy}
-          onRemove={remove}
-        />
-      ) : null}
+      <SelectedCompetitors
+        competitors={competitors}
+        disabled={busy}
+        onRemove={remove}
+      />
 
       {domain ? (
         <CompetitorSuggestions

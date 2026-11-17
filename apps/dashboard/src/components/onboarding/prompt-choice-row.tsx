@@ -1,7 +1,6 @@
 "use client";
 
-import { PlusSignIcon, Tick02Icon } from "@hugeicons/core-free-icons";
-import { HugeiconsIcon } from "@hugeicons/react";
+import { Checkbox } from "@notra/ui/components/ui/checkbox";
 
 import { cn } from "@/lib/utils";
 import type { PromptChoiceRowProps } from "@/types/onboarding";
@@ -13,31 +12,28 @@ export function PromptChoiceRow({
   onToggle,
 }: PromptChoiceRowProps) {
   return (
-    <li className="w-full max-w-full min-w-0 overflow-hidden">
-      <button
-        aria-pressed={selected}
+    <li className="border-table-row-border min-w-0 border-b last:border-b-0">
+      <label
         className={cn(
-          "border-input hover:bg-muted/40 flex w-full max-w-full min-w-0 cursor-pointer items-center gap-3 overflow-hidden rounded-xl border px-3.5 py-2.5 text-left transition-colors disabled:cursor-not-allowed disabled:opacity-50",
-          selected && "border-primary/40 bg-primary/5"
+          "hover:bg-muted/60 flex min-w-0 cursor-pointer items-start gap-3 px-3.5 py-3 transition-colors",
+          disabled && "pointer-events-none opacity-50"
         )}
-        disabled={disabled}
-        onClick={onToggle}
-        type="button"
       >
-        <span className="line-clamp-2 min-w-0 flex-1 text-sm">{prompt}</span>
+        <Checkbox
+          checked={selected}
+          className="mt-0.5"
+          disabled={disabled}
+          onCheckedChange={onToggle}
+        />
         <span
-          aria-hidden="true"
           className={cn(
-            "border-input text-muted-foreground flex size-6 shrink-0 items-center justify-center rounded-full border transition-colors",
-            selected && "border-primary bg-primary text-primary-foreground"
+            "min-w-0 flex-1 text-sm leading-5 text-pretty transition-colors",
+            !selected && "text-muted-foreground"
           )}
         >
-          <HugeiconsIcon
-            icon={selected ? Tick02Icon : PlusSignIcon}
-            size={14}
-          />
+          {prompt}
         </span>
-      </button>
+      </label>
     </li>
   );
 }

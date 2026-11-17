@@ -1338,6 +1338,7 @@
       "startTracking": "Start tracking",
       "addBrand": "Add a brand",
       "yourCompetitors": "Your competitors <muted>({count})</muted>",
+      "noneSelected": "None yet. Add a brand or pick a suggestion.",
       "suggestedFor": "Suggested for {domain}",
       "addAll": "Add all",
       "otherCompaniesIn": "Other companies in {field}",
@@ -1357,18 +1358,18 @@
       "questionsFrom": "Questions from {host} <muted>({selected} of {total})</muted>",
       "questions": "Questions <muted>({selected} of {total})</muted>",
       "skipStep": "Skip this step",
-      "description": "Notra is a modern GEO tool that asks ChatGPT, Claude and Gemini the questions your buyers ask. See if you show up, who shows up instead and how to fix it.",
+      "description": "Find out if ChatGPT, Claude and Gemini recommend you when buyers ask.",
       "title": "See what AI says about you",
       "loading": {
+        "title": "Writing your buyer questions",
         "reading": "Reading your website",
         "brand": "Figuring out what you sell",
         "competitors": "Spotting your competitors",
         "questions": "Drafting the questions your buyers ask",
-        "polish": "Picking the ones that help you win"
+        "polish": "Picking the questions that matter most"
       },
-      "reading": "Reading {host}. Takes about 30 seconds.",
       "readFailed": "Could not read {host}. Check the address and try again, or just type your brand name below.",
-      "languagesHint": "Questions are written in {language}. Other languages are translated when we scan."
+      "languagesHint": "Written in {language}, translated for the rest."
     },
     "workspace": {
       "slugStatus": {

@@ -81,8 +81,10 @@ function ComboboxInput({
 }) {
   return (
     <InputGroup className={cn("w-auto", className)}>
+      {/* render props override Base UI's, so disabled here would mask the root's */}
       <ComboboxPrimitive.Input
-        render={<InputGroupInput disabled={disabled} />}
+        disabled={disabled}
+        render={<InputGroupInput />}
         {...props}
       />
       <InputGroupAddon align="inline-end">

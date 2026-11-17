@@ -104,7 +104,12 @@ export function GeoLanguagePicker({
       {selected.length > 0 ? (
         <div className="flex flex-wrap items-center gap-1.5">
           {selected.map((language) => (
-            <Badge className="gap-1 pr-1" key={language} variant="secondary">
+            <Badge
+              className="gap-1 pr-1"
+              key={language}
+              shape="rounded"
+              variant="secondary"
+            >
               <LanguageLabel language={language} />
               {language === lockedLanguage ? (
                 <span
@@ -117,7 +122,7 @@ export function GeoLanguagePicker({
               ) : (
                 <Button
                   aria-label={t("remove", { language })}
-                  className="hover:bg-background size-4 rounded-full"
+                  className="hover:bg-background size-4 rounded-sm"
                   disabled={disabled || lastLanguage}
                   onClick={() =>
                     onChange(selected.filter((item) => item !== language))

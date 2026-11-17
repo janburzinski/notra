@@ -1,7 +1,6 @@
 "use client";
 
-import { PlusSignIcon, Tick02Icon } from "@hugeicons/core-free-icons";
-import { HugeiconsIcon } from "@hugeicons/react";
+import { Checkbox } from "@notra/ui/components/ui/checkbox";
 
 import { CompetitorBrandLogo } from "@/components/onboarding/competitor-brand-logo";
 import { cn } from "@/lib/utils";
@@ -16,24 +15,30 @@ export function CompetitorChoiceRow({
   onToggle,
 }: CompetitorChoiceRowProps) {
   return (
-    <li className="w-full max-w-full min-w-0 overflow-hidden">
-      <button
-        aria-pressed={selected}
+    <li className="border-table-row-border min-w-0 border-b last:border-b-0">
+      <label
         className={cn(
-          "border-input hover:bg-muted/40 flex w-full max-w-full min-w-0 cursor-pointer items-center gap-3 overflow-hidden rounded-xl border px-3.5 py-2.5 text-left transition-colors disabled:cursor-not-allowed disabled:opacity-50",
-          selected && "border-primary/40 bg-primary/5"
+          "hover:bg-muted/60 flex min-w-0 cursor-pointer items-center gap-3 px-3.5 py-3 transition-colors",
+          disabled && "pointer-events-none opacity-50"
         )}
-        disabled={disabled}
-        onClick={onToggle}
-        type="button"
       >
+        <Checkbox
+          checked={selected}
+          disabled={disabled}
+          onCheckedChange={onToggle}
+        />
         <CompetitorBrandLogo
           className="size-8 rounded-md"
           domain={domain}
           logo={null}
           name={name}
         />
-        <span className="min-w-0 flex-1">
+        <span
+          className={cn(
+            "min-w-0 flex-1 transition-colors",
+            !selected && "text-muted-foreground"
+          )}
+        >
           <span className="flex min-w-0 items-baseline gap-2 overflow-hidden">
             <span className="min-w-0 truncate text-sm font-medium">{name}</span>
             {domain ? (
@@ -43,24 +48,12 @@ export function CompetitorChoiceRow({
             ) : null}
           </span>
           {description ? (
-            <span className="text-muted-foreground line-clamp-1 text-xs">
+            <span className="text-muted-foreground block text-xs text-pretty">
               {description}
             </span>
           ) : null}
         </span>
-        <span
-          aria-hidden="true"
-          className={cn(
-            "border-input text-muted-foreground flex size-6 shrink-0 items-center justify-center rounded-full border transition-colors",
-            selected && "border-primary bg-primary text-primary-foreground"
-          )}
-        >
-          <HugeiconsIcon
-            icon={selected ? Tick02Icon : PlusSignIcon}
-            size={14}
-          />
-        </span>
-      </button>
+      </label>
     </li>
   );
 }

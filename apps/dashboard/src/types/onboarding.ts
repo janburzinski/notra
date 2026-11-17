@@ -52,7 +52,6 @@ export interface WorkspaceSlugCheck {
 
 export interface WebsiteDiscoveryStatusProps {
   host: string;
-  isReading: boolean;
   failed: boolean;
   onRetry: (websiteUrl: string) => void;
 }

@@ -1,12 +1,14 @@
 "use client";
 
 import { useState } from "react";
+import { TABLE_BODY_CLASS, TABLE_FRAME_CLASS } from "ui/table/constants";
 import { useTranslations } from "use-intl";
 
 import { Button } from "@/components/button";
 import { CompetitorChoiceRow } from "@/components/onboarding/competitor-choice-row";
 import { CompetitorSuggestionsSkeleton } from "@/components/onboarding/competitor-suggestions-skeleton";
 import { ONBOARDING_VISIBLE_SUGGESTIONS } from "@/constants/onboarding";
+import { cn } from "@/lib/utils";
 import type { CompetitorSuggestionsProps } from "@/types/onboarding";
 import { findCompetitor } from "@/utils/onboarding-competitors";
 
@@ -82,30 +84,32 @@ export function CompetitorSuggestions({
         </p>
       ) : null}
       {suggested.length > 0 ? (
-        <ul className="w-full max-w-full min-w-0 space-y-1.5 overflow-hidden">
-          {visible.map((entry) => {
-            const existing = findCompetitor(
-              competitors,
-              entry.domain,
-              entry.name
-            );
-            return (
-              <CompetitorChoiceRow
-                description={entry.description}
-                disabled={busy || (atLimit && !existing)}
-                domain={entry.domain}
-                key={entry.domain ?? entry.name}
-                name={entry.name}
-                onToggle={() =>
-                  existing
-                    ? onRemove(existing)
-                    : onAdd(entry.name, entry.domain)
-                }
-                selected={existing !== undefined}
-              />
-            );
-          })}
-        </ul>
+        <div className={TABLE_FRAME_CLASS}>
+          <ul className={cn(TABLE_BODY_CLASS, "min-w-0 overflow-hidden")}>
+            {visible.map((entry) => {
+              const existing = findCompetitor(
+                competitors,
+                entry.domain,
+                entry.name
+              );
+              return (
+                <CompetitorChoiceRow
+                  description={entry.description}
+                  disabled={busy || (atLimit && !existing)}
+                  domain={entry.domain}
+                  key={entry.domain ?? entry.name}
+                  name={entry.name}
+                  onToggle={() =>
+                    existing
+                      ? onRemove(existing)
+                      : onAdd(entry.name, entry.domain)
+                  }
+                  selected={existing !== undefined}
+                />
+              );
+            })}
+          </ul>
+        </div>
       ) : null}
       {hiddenCount > 0 ? (
         <Button

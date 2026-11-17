@@ -19,8 +19,10 @@ function AutocompleteInput({
 }: AutocompletePrimitive.Input.Props) {
   return (
     <InputGroup className={cn("w-full", className)}>
+      {/* render props override Base UI's, so disabled here would mask the root's */}
       <AutocompletePrimitive.Input
-        render={<InputGroupInput disabled={disabled} />}
+        disabled={disabled}
+        render={<InputGroupInput />}
         {...props}
       />
       {children}

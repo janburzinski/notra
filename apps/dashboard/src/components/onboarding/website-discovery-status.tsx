@@ -9,7 +9,6 @@ import type { WebsiteDiscoveryStatusProps } from "@/types/onboarding";
 
 export function WebsiteDiscoveryStatus({
   host,
-  isReading,
   failed,
   onRetry,
 }: WebsiteDiscoveryStatusProps) {
@@ -24,13 +23,6 @@ export function WebsiteDiscoveryStatus({
     }
   };
 
-  if (isReading) {
-    return (
-      <p className="text-muted-foreground text-xs wrap-anywhere">
-        {t("reading", { host })}
-      </p>
-    );
-  }
   if (!failed) {
     return null;
   }

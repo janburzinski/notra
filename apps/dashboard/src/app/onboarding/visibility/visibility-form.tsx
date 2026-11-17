@@ -11,6 +11,7 @@ import { Input } from "@notra/ui/components/ui/input";
 import { Label } from "@notra/ui/components/ui/label";
 import { useForm, useStore } from "@tanstack/react-form";
 import { useEffect, useId, useRef, useState } from "react";
+import { TABLE_BODY_CLASS, TABLE_FRAME_CLASS } from "ui/table/constants";
 import { useTranslations } from "use-intl";
 
 import { Button } from "@/components/button";
@@ -35,6 +36,7 @@ import {
 } from "@/lib/hooks/use-geo";
 import { useLanguageLabel } from "@/lib/hooks/use-language-label";
 import { useRouter } from "@/lib/navigation";
+import { cn } from "@/lib/utils";
 import type {
   OnboardingPreviewFocus,
   VisibilityFormProps,
@@ -205,20 +207,22 @@ function VisibilityReview({
               ),
             })}
           </p>
-          <ul className="w-full max-w-full min-w-0 space-y-1.5 overflow-hidden">
-            {prompts.map((entry) => {
-              const key = promptKey(entry.prompt);
-              return (
-                <PromptChoiceRow
-                  disabled={busy}
-                  key={key}
-                  onToggle={() => togglePrompt(key)}
-                  prompt={entry.prompt}
-                  selected={!droppedKeys.includes(key)}
-                />
-              );
-            })}
-          </ul>
+          <div className={TABLE_FRAME_CLASS}>
+            <ul className={cn(TABLE_BODY_CLASS, "min-w-0 overflow-hidden")}>
+              {prompts.map((entry) => {
+                const key = promptKey(entry.prompt);
+                return (
+                  <PromptChoiceRow
+                    disabled={busy}
+                    key={key}
+                    onToggle={() => togglePrompt(key)}
+                    prompt={entry.prompt}
+                    selected={!droppedKeys.includes(key)}
+                  />
+                );
+              })}
+            </ul>
+          </div>
         </div>
       ) : null}
 
@@ -336,7 +340,6 @@ export function VisibilityForm({
           <WebsiteDiscoveryStatus
             failed={discover.isError}
             host={analyzedHost}
-            isReading={isAnalyzing}
             key={analyzedHost}
             onRetry={(url) => {
               discoveryStartedAtRef.current = Date.now();
