@@ -1,0 +1,45 @@
+apps/dashboard/src/components/chat/chat-share-popover.tsx
+  s_cd6bd7b9699b2b::t_3d538217bd9f44 223
+  s_cd6bd7b9699b2b::t_91924c9eee6316 5,75-81,94-97,199-203,205-218,222,224-234
+  s_cd6bd7b9699b2b::t_dcbba2052f95b6 204
+  s_cd6bd7b9699b2b::t_66225423b9b345 82
+apps/dashboard/src/types/chat-share.ts
+  s_cd6bd7b9699b2b::t_3a44f2355e0038 6
+apps/dashboard/messages/en.json
+  s_cd6bd7b9699b2b::t_91924c9eee6316 7084-7085,7091
+  s_cd6bd7b9699b2b::t_94ccc3c7dd4d56 7083,7089,7092
+packages/db/migrations/meta/_journal.json
+  ai_agent 1173-1179
+apps/dashboard/src/lib/orpc/routers/chat.ts
+  s_cd6bd7b9699b2b::t_3a44f2355e0038 26,39,168-176
+packages/db/migrations/0167_chat_share_auto_update.sql
+  ai_agent 1
+packages/db/migrations/meta/0167_snapshot.json
+  ai_agent 1-18227
+apps/dashboard/src/lib/chat/shares.ts
+  s_cd6bd7b9699b2b::t_3a44f2355e0038 19,27,34,59-60,62,84-104,112,118,124-155,174-178,184-185,188,190,207-209,212-214
+packages/db/src/schema.ts
+  s_cd6bd7b9699b2b::t_a47aacf7c66087 305-306
+packages/schemas/src/schemas/dashboard/chat.ts
+  s_cd6bd7b9699b2b::t_66225423b9b345 23-25
+  s_cd6bd7b9699b2b::t_3a44f2355e0038 26
+apps/dashboard/messages/de.json
+  s_cd6bd7b9699b2b::t_94ccc3c7dd4d56 7083,7089,7092
+  s_cd6bd7b9699b2b::t_91924c9eee6316 7084-7085,7091
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "7247c29940eb681d700571c88f9d3c68f0a86e93",
+  "prompts": {},
+  "sessions": {
+    "s_cd6bd7b9699b2b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9a8108e4-11a2-477b-87a6-d9229decee67",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
