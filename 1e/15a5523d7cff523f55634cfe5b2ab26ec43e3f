@@ -1,0 +1,9 @@
+apps/dashboard/src/components/geo/sentiment-breakdown.tsx
+  ai_agent 78
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "1e15a5523d7cff523f55634cfe5b2ab26ec43e3f",
+  "prompts": {}
+}
