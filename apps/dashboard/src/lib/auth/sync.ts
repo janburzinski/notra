@@ -1,3 +1,4 @@
+import { logError } from "@notra/ai/utils/server-log";
 import { db } from "@notra/db/drizzle";
 import { organizations, socialConnections, users } from "@notra/db/schema";
 import { encryptToken } from "@notra/db/utils/integration-encryption";
@@ -304,25 +305,32 @@ export const ensureLocalUser = Effect.fn("auth.sync.ensureLocalUser")(
     yield* linkWorkOSExternalId(workosUser.id, created.id);
     yield* Effect.sync(() => {
       runAfterResponse("[Signup] Welcome email failed", async () => {
-        const [{ sendWelcomeEmail }, { sendOnboardingSlackInvite }] =
-          await Promise.all([
-            import("@/lib/email/send"),
-            import("@/lib/onboarding/slack-invite"),
-          ]);
+        const [
+          { sendWelcomeEmail },
+          { sendOnboardingSlackInvite },
+          { startBrewOnboarding },
+        ] = await Promise.all([
+          import("@/lib/email/send"),
+          import("@/lib/onboarding/slack-invite"),
+          import("@/lib/email/brew-contacts"),
+        ]);
         const { invited } = await sendOnboardingSlackInvite({
           email: created.email,
         });
-        const { error } = await sendWelcomeEmail({
-          userEmail: created.email,
-          slackInvited: invited,
-        });
-        if (error) {
-          throw new Error(`${error.name}: ${error.message}`);
+        const [welcome, onboarding] = await Promise.allSettled([
+          sendWelcomeEmail({ userEmail: created.email }),
+          startBrewOnboarding({ userId: created.id, slackInvited: invited }),
+        ]);
+        if (onboarding.status === "rejected") {
+          logError("[Signup] Brew onboarding failed", onboarding.reason);
         }
-      });
-      runAfterResponse("[BrewContacts] Sync failed", async () => {
-        const { syncBrewContacts } = await import("@/lib/email/brew-contacts");
-        await syncBrewContacts([created.id]);
+        if (welcome.status === "rejected") {
+          throw welcome.reason;
+        }
+        if (welcome.value.error) {
+          const { name, message } = welcome.value.error;
+          throw new Error(`${name}: ${message}`);
+        }
       });
     });
 

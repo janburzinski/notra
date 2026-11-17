@@ -81,6 +81,12 @@ export interface BrewContactCustomFields {
   contentCreatedEmails: boolean;
   contentFailedEmails: boolean;
   contentSkippedEmails: boolean;
+  autopilotDraftsEmails: boolean;
+  /** Any organization of the user is on a paid plan; unset when unknown. */
+  isPaying?: boolean;
+  plan?: string;
+  /** Any organization of the user claimed the free scan. */
+  freeScanClaimed: boolean;
 }
 
 /** Provenance of a marketing opt-in, kept by Brew as proof of consent. */

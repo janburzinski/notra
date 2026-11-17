@@ -115,7 +115,6 @@ export interface SendGeoAlertEmailProps extends GeoAlertEmailProps {
 
 export interface SendWelcomeEmailProps {
   userEmail: string;
-  slackInvited: boolean;
 }
 
 export interface SendSiteSuspendedEmailProps extends SiteSuspendedEmailProps {

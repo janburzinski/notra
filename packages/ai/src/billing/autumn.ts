@@ -16,7 +16,10 @@ export const AUTUMN_READ_TIMEOUT_MS = 5000;
 interface AutumnClient {
   check: Autumn["check"];
   track: Autumn["track"];
-  customers: Pick<Autumn["customers"], "getOrCreate" | "update" | "delete">;
+  customers: Pick<
+    Autumn["customers"],
+    "getOrCreate" | "list" | "update" | "delete"
+  >;
   balances: Pick<
     Autumn["balances"],
     "create" | "update" | "delete" | "finalize"
@@ -38,6 +41,7 @@ function createLazyAutumn(secretKey: string): AutumnClient {
     customers: {
       getOrCreate: async (...args) =>
         (await load()).customers.getOrCreate(...args),
+      list: async (...args) => (await load()).customers.list(...args),
       update: async (...args) => (await load()).customers.update(...args),
       delete: async (...args) => (await load()).customers.delete(...args),
     },

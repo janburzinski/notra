@@ -31,3 +31,38 @@ export async function resolveOrganizationPlan(
 
   return hasPaidPlan ? "paid" : "free";
 }
+
+/**
+ * Each organization's active paid or legacy plan id, or `null` without a
+ * configured Autumn client.
+ */
+export async function listPaidOrganizationPlans(): Promise<Map<
+  string,
+  string
+> | null> {
+  if (!autumn) {
+    return null;
+  }
+
+  const plans = [...PAID_OR_LEGACY_PLAN_IDS].map((id) => ({ id }));
+  const paid = new Map<string, string>();
+  let startCursor: string | undefined;
+  do {
+    const page = await autumn.customers.list(
+      { plans, subscriptionStatus: "active", limit: 1000, startCursor },
+      { timeoutMs: AUTUMN_READ_TIMEOUT_MS }
+    );
+    for (const customer of page.list) {
+      const subscription = customer.subscriptions.find(
+        ({ addOn, status, planId }) =>
+          !addOn && status === "active" && PAID_OR_LEGACY_PLAN_IDS.has(planId)
+      );
+      if (customer.id && subscription) {
+        paid.set(customer.id, subscription.planId);
+      }
+    }
+    startCursor = page.nextCursor ?? undefined;
+  } while (startCursor);
+
+  return paid;
+}

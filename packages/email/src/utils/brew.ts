@@ -166,15 +166,28 @@ function toBodyHtml(html: string): string {
 }
 
 /** Brew caps keys at 100 chars, and hashing keeps PII out of the header. */
-function toIdempotencyKey(
-  category: SendBrewEmailOptions["category"],
-  key: string
-): string {
+function toIdempotencyKey(scope: string, key: string): string {
   const hash = createHash("sha256")
     .update(key)
     .digest("hex")
     .slice(0, BREW_IDEMPOTENCY_HASH_LENGTH);
-  return `notra:${category}:${hash}`;
+  return `notra:${scope}:${hash}`;
+}
+
+/** Fires a Brew automation trigger; `idempotencyKey` is hashed first. */
+export function fireBrewTrigger(
+  triggerId: string,
+  payload: Record<string, unknown>,
+  { scope, idempotencyKey }: { scope: string; idempotencyKey: string }
+): Promise<BrewResponse<BrewTriggerFireResponse>> {
+  return brewRequest<BrewTriggerFireResponse>(
+    `/automations/triggers/${triggerId}/fire`,
+    {
+      method: "POST",
+      body: { payload },
+      idempotencyKey: toIdempotencyKey(scope, idempotencyKey),
+    }
+  );
 }
 
 /**
@@ -190,13 +203,10 @@ export async function sendBrewEmail(
 
   const { category, to, subject, react, idempotencyKey } = options;
   const html = toBodyHtml(await render(react));
-  const result = await brewRequest<BrewTriggerFireResponse>(
-    `/automations/triggers/${BREW_EMAIL_TRIGGERS[category]}/fire`,
-    {
-      method: "POST",
-      body: { payload: { email: to, message: { subject, html } } },
-      idempotencyKey: toIdempotencyKey(category, idempotencyKey),
-    }
+  const result = await fireBrewTrigger(
+    BREW_EMAIL_TRIGGERS[category],
+    { email: to, message: { subject, html } },
+    { scope: category, idempotencyKey }
   );
 
   if (!result.ok) {

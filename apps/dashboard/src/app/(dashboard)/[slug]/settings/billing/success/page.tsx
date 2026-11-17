@@ -12,17 +12,21 @@ import { useTranslations } from "use-intl";
 import { Button, buttonVariants } from "@/components/button";
 import { Confetti } from "@/components/confetti";
 import Link from "@/components/framework/link";
+import { useOrganizationsContext } from "@/components/providers/organization-provider";
 import { CHECKOUT_SURFACES } from "@/constants/analytics-events";
 import { billingInterval } from "@/lib/analytics/billing-events";
 import { trackEvent } from "@/lib/analytics/posthog-client";
 import { useBillingCustomer } from "@/lib/hooks/use-billing-customer";
 import { useParams } from "@/lib/navigation";
+import { dashboardOrpc } from "@/lib/orpc/query";
 import { isAnnualPlanId, planDisplayName } from "@/utils/billing-plans";
 
 function BillingSuccessPageContent() {
   const t = useTranslations("settings.billingSuccess");
   const tSettingsShared = useTranslations("settings.shared");
   const { slug } = useParams<{ slug: string }>();
+  const { activeOrganization } = useOrganizationsContext();
+  const organizationId = activeOrganization?.id;
   const { openCustomerPortal, data: customer } = useBillingCustomer({
     expand: ["subscriptions.plan"],
   });
@@ -41,16 +45,19 @@ function BillingSuccessPageContent() {
     activeSubscription.trialEndsAt > now;
 
   useEffect(() => {
-    if (!activeSubscription || completedRef.current) {
+    if (!activeSubscription || !organizationId || completedRef.current) {
       return;
     }
     completedRef.current = true;
+    dashboardOrpc.notifications.syncBillingContacts
+      .call({ organizationId })
+      .catch(() => undefined);
     trackEvent(POSTHOG_EVENTS.CHECKOUT_COMPLETED, {
       plan_id: activePlanId,
       interval: billingInterval(isAnnualPlanId(activePlanId ?? undefined)),
       is_trial: isTrial,
     });
-  }, [activeSubscription, activePlanId, isTrial]);
+  }, [activeSubscription, activePlanId, isTrial, organizationId]);
 
   async function handleManageBilling() {
     trackEvent(POSTHOG_EVENTS.CUSTOMER_PORTAL_OPENED, {

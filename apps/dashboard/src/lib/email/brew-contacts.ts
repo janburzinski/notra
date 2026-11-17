@@ -1,14 +1,18 @@
 import "@tanstack/react-start/server-only";
+import { listPaidOrganizationPlans } from "@notra/ai/billing/plan";
 import { logError } from "@notra/ai/utils/server-log";
 import { db } from "@notra/db/drizzle";
 import {
+  freeScanClaims,
   members,
   organizationNotificationSettings,
   users,
 } from "@notra/db/schema";
+import { BREW_SIGNED_UP_TRIGGER } from "@notra/email/constants/brew";
 import type { BrewContactInput } from "@notra/email/types/brew";
 import {
   deleteBrewContact,
+  fireBrewTrigger,
   isBrewConfigured,
   listBrewContacts,
   upsertBrewContacts,
@@ -19,6 +23,7 @@ import {
   BREW_CONTACTS_LOGGED_ERROR_LIMIT,
   BREW_CONTACTS_MAX_PRUNE_RATIO,
   BREW_CONTACTS_PRUNE_FLOOR,
+  BREW_PLAN_TIERS,
 } from "@/constants/email/brew-contacts";
 
 const WHITESPACE_REGEX = /\s+/;
@@ -36,7 +41,38 @@ function splitName(name: string, email: string) {
   return { firstName, lastName: rest.join(" ") };
 }
 
+function toPlanTier(planId: string) {
+  return (
+    BREW_PLAN_TIERS.find((tier) => planId.split("_")[0] === tier) ?? "free"
+  );
+}
+
+function highestPlanTier(
+  organizationIds: string[],
+  paidOrganizationPlans: Map<string, string>
+) {
+  let rank = 0;
+  for (const id of organizationIds) {
+    const planId = paidOrganizationPlans.get(id);
+    if (planId) {
+      rank = Math.max(rank, BREW_PLAN_TIERS.indexOf(toPlanTier(planId)));
+    }
+  }
+  return BREW_PLAN_TIERS[rank];
+}
+
+/** Billing lives in Autumn; on failure `isPaying` and `plan` are left out. */
+async function loadPaidOrganizationPlans() {
+  try {
+    return await listPaidOrganizationPlans();
+  } catch (error) {
+    logError("[BrewContacts] Paid plan lookup failed", error);
+    return null;
+  }
+}
+
 async function loadContacts(userIds?: string[]): Promise<BrewContactInput[]> {
+  const paidOrganizationPlans = await loadPaidOrganizationPlans();
   const rows = await db
     .select({
       id: users.id,
@@ -62,6 +98,14 @@ async function loadContacts(userIds?: string[]): Promise<BrewContactInput[]> {
         organizationNotificationSettings.scheduledContentSkipped,
         false
       ),
+      autopilotDraftsEmails: ownedOrganizationsWith(
+        organizationNotificationSettings.autopilotDrafts,
+        true
+      ),
+      freeScanClaimed: sql<boolean>`coalesce(bool_or(exists(select 1 from ${freeScanClaims} where ${freeScanClaims.organizationId} = ${members.organizationId} and ${freeScanClaims.claimedAt} is not null and ${freeScanClaims.revokedAt} is null)), false)`,
+      organizationIds: sql<
+        string[]
+      >`coalesce(array_agg(distinct ${members.organizationId}) filter (where ${members.organizationId} is not null), '{}')`,
     })
     .from(users)
     .leftJoin(members, eq(members.userId, users.id))
@@ -84,6 +128,7 @@ async function loadContacts(userIds?: string[]): Promise<BrewContactInput[]> {
       marketingOptInAt,
       marketingOptInEvidence,
       marketingOptInPolicyVersion,
+      organizationIds,
       ...preferences
     }) => ({
       email,
@@ -93,6 +138,10 @@ async function loadContacts(userIds?: string[]): Promise<BrewContactInput[]> {
         signedUpAt: createdAt.toISOString(),
         marketingEmails: marketingOptInAt !== null,
         ...preferences,
+        ...(paidOrganizationPlans && {
+          isPaying: organizationIds.some((id) => paidOrganizationPlans.has(id)),
+          plan: highestPlanTier(organizationIds, paidOrganizationPlans),
+        }),
       },
       ...(marketingOptInAt &&
         marketingOptInEvidence &&
@@ -125,6 +174,41 @@ export async function syncBrewContacts(userIds?: string[]) {
   }
 
   return { synced: contacts.length - failed, failed };
+}
+
+/**
+ * Syncs a new user's contact, then starts the Brew onboarding sequence. The
+ * contact goes first because the sequence reads its fields.
+ */
+export async function startBrewOnboarding({
+  userId,
+  slackInvited,
+}: {
+  userId: string;
+  slackInvited: boolean;
+}) {
+  if (!isBrewConfigured()) {
+    return;
+  }
+
+  const [contact] = await loadContacts([userId]);
+  if (!contact) {
+    return;
+  }
+
+  const { errors } = await upsertBrewContacts([contact]);
+  if (errors.length > 0) {
+    logError("[BrewContacts] Upsert failed", undefined, { errors });
+  }
+
+  const result = await fireBrewTrigger(
+    BREW_SIGNED_UP_TRIGGER,
+    { email: contact.email, firstName: contact.firstName, slackInvited },
+    { scope: "signed-up", idempotencyKey: userId }
+  );
+  if (!result.ok) {
+    throw new Error(`${result.error.name}: ${result.error.message}`);
+  }
 }
 
 /**

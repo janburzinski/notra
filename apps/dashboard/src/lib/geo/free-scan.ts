@@ -18,6 +18,7 @@ import { and, eq, isNotNull, isNull, sql } from "drizzle-orm";
 import { Effect } from "effect";
 
 import { FREE_SCAN_BALANCE_ID, FREE_SCAN_ENGINE } from "@/constants/free-scan";
+import { runAfterResponse } from "@/lib/after-response";
 import { resolveCompanyDomain } from "@/lib/onboarding/company-domain";
 import type { AuthenticatedUser } from "@/types/auth/organization";
 import type { FreeScanResult, FreeScanSkipReason } from "@/types/free-scan";
@@ -192,6 +193,13 @@ export const startFreeGeoScan = Effect.fn("geo.startFreeScan")(function* (
   if (!claim) {
     return skipped("already_claimed");
   }
+  yield* Effect.sync(() =>
+    runAfterResponse("[BrewContacts] Sync failed", async () => {
+      const { syncBrewContactsForOrganizationOwners } =
+        await import("@/lib/email/brew-contacts");
+      await syncBrewContactsForOrganizationOwners(organizationId);
+    })
+  );
   return yield* runFreeScan(input, domain, claim.promptLimit);
 });
 

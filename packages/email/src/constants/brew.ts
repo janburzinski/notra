@@ -56,6 +56,12 @@ export const BREW_EMAIL_TRIGGERS: Record<BrewEmailCategory, string> = {
   "daily-summary": "ZNAUEsBwkQIE5XQzFaWpJ",
 };
 
+/**
+ * Starts the "Notra · Onboarding (founder sequence)" automation, built in
+ * Brew. Payload: `email`, `firstName`, `slackInvited`.
+ */
+export const BREW_SIGNED_UP_TRIGGER = "VMZ9ELuT5Xxqburkwv7hl";
+
 /** Contact fields kept in sync by the app; created by `bun run brew:setup`. */
 export const BREW_CONTACT_FIELD_TYPES: Record<
   keyof BrewContactCustomFields,
@@ -68,4 +74,8 @@ export const BREW_CONTACT_FIELD_TYPES: Record<
   contentCreatedEmails: "bool",
   contentFailedEmails: "bool",
   contentSkippedEmails: "bool",
+  autopilotDraftsEmails: "bool",
+  isPaying: "bool",
+  plan: "string",
+  freeScanClaimed: "bool",
 };

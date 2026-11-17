@@ -41,15 +41,12 @@ function getSchedulesLink(organizationSlug: string) {
   return `${getAppUrl()}/${organizationSlug}/automation`;
 }
 
-export async function sendWelcomeEmail({
-  userEmail,
-  slackInvited,
-}: SendWelcomeEmailProps) {
+export async function sendWelcomeEmail({ userEmail }: SendWelcomeEmailProps) {
   return sendBrewEmail({
     category: "welcome",
     to: userEmail,
     subject: "Welcome to Notra",
-    react: WelcomeEmail({ slackInvited }),
+    react: WelcomeEmail(),
     idempotencyKey: userEmail,
   });
 }

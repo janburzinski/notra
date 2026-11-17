@@ -102,6 +102,15 @@ export const notificationsRouter = {
 
       return { settings: updated };
     }),
+  syncBillingContacts: authorizedProcedure
+    .input(organizationIdInputSchema)
+    .use(withOrganizationAccess)
+    .handler(({ input }) => {
+      runAfterResponse("[BrewContacts] Sync failed", () =>
+        syncBrewContactsForOrganizationOwners(input.organizationId)
+      );
+      return { queued: true };
+    }),
   marketing: authorizedProcedure.handler(({ context }) =>
     getMarketingEmailsState(context.user.id)
   ),
