@@ -1,14 +1,22 @@
 "use client";
 
-import { Search01Icon } from "@hugeicons/core-free-icons";
+import {
+  Alert02Icon,
+  CheckmarkCircle02Icon,
+  Search01Icon,
+} from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Badge } from "@notra/ui/components/ui/badge";
+import {
+  IconTabsList,
+  IconTabsTrigger,
+} from "@notra/ui/components/ui/icon-tabs";
 import {
   InputGroup,
   InputGroupAddon,
   InputGroupInput,
 } from "@notra/ui/components/ui/input-group";
-import { Tabs, TabsList, TabsTrigger } from "@notra/ui/components/ui/tabs";
+import { Tabs } from "@notra/ui/components/ui/tabs";
 import { parseAsInteger, useQueryState } from "nuqs";
 import { useState } from "react";
 import { DataTable, type TableColumn } from "ui/table";
@@ -136,15 +144,26 @@ export function SitemapPagesTable({
         }
       }}
     >
-      <TabsList aria-label={t("statusFilter")}>
+      <IconTabsList aria-label={t("statusFilter")} value={activeFilter}>
         {PAGE_FILTER_TABS.map((tab) => (
-          <TabsTrigger key={tab.value} value={tab.value}>
+          <IconTabsTrigger
+            icon={
+              <HugeiconsIcon
+                icon={
+                  tab.value === "failed" ? Alert02Icon : CheckmarkCircle02Icon
+                }
+                size={15}
+              />
+            }
+            key={tab.value}
+            value={tab.value}
+          >
             {t(`filters.${tab.value}`, {
               count: countsByCategory[tab.value],
             })}
-          </TabsTrigger>
+          </IconTabsTrigger>
         ))}
-      </TabsList>
+      </IconTabsList>
     </Tabs>
   );
 

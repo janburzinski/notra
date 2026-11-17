@@ -226,21 +226,6 @@ export interface AnalyticsSourceTabsProps {
   actions?: ReactNode;
 }
 
-export interface PlatformTabItem {
-  value: string;
-  label: string;
-  icon?: ReactNode;
-  collapsedLabel?: string;
-}
-
-export interface PlatformTabsProps {
-  items: PlatformTabItem[];
-  value: string;
-  onValueChange: (value: string) => void;
-  label?: string;
-  className?: string;
-}
-
 export interface AnalyticsContextValue {
   organizationId: string;
   organizationSlug: string;

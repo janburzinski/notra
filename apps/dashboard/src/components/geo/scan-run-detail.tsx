@@ -2,6 +2,7 @@
 
 import {
   AiChat02Icon,
+  Alert02Icon,
   Clock01Icon,
   Loading03Icon,
   MinusSignIcon,
@@ -21,6 +22,10 @@ import {
   EmptyTitle,
 } from "@notra/ui/components/ui/empty";
 import {
+  IconTabsList,
+  IconTabsTrigger,
+} from "@notra/ui/components/ui/icon-tabs";
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -28,7 +33,7 @@ import {
   SelectValue,
 } from "@notra/ui/components/ui/select";
 import { Skeleton } from "@notra/ui/components/ui/skeleton";
-import { Tabs, TabsList, TabsTrigger } from "@notra/ui/components/ui/tabs";
+import { Tabs } from "@notra/ui/components/ui/tabs";
 import {
   Tooltip,
   TooltipContent,
@@ -567,23 +572,32 @@ export function ScanRunFilters({
           }}
           value={view}
         >
-          <TabsList aria-label={t("viewLabel")}>
-            <TabsTrigger value="answers">
+          <IconTabsList aria-label={t("viewLabel")} value={view}>
+            <IconTabsTrigger
+              icon={<HugeiconsIcon icon={AiChat02Icon} size={15} />}
+              value="answers"
+            >
               {tGeoShared("answers")}
               <ViewCount count={answerCount} locale={locale} />
-            </TabsTrigger>
-            <TabsTrigger value="mentioned">
+            </IconTabsTrigger>
+            <IconTabsTrigger
+              icon={<HugeiconsIcon icon={Tick02Icon} size={15} />}
+              value="mentioned"
+            >
               {tGeoShared("mentioned")}
               <ViewCount count={mentionedCount} locale={locale} />
-            </TabsTrigger>
+            </IconTabsTrigger>
             {pendingCount > 0 ? (
               <Tooltip>
                 <TooltipTrigger
                   render={
-                    <TabsTrigger value="pending">
+                    <IconTabsTrigger
+                      icon={<HugeiconsIcon icon={Alert02Icon} size={15} />}
+                      value="pending"
+                    >
                       {t("failed")}
                       <ViewCount count={pendingCount} locale={locale} />
-                    </TabsTrigger>
+                    </IconTabsTrigger>
                   }
                 />
                 <TooltipContent className="max-w-60">
@@ -591,7 +605,7 @@ export function ScanRunFilters({
                 </TooltipContent>
               </Tooltip>
             ) : null}
-          </TabsList>
+          </IconTabsList>
         </Tabs>
       ) : null}
       {showEngines ? (

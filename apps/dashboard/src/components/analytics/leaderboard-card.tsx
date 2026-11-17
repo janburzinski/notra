@@ -1,13 +1,22 @@
 "use client";
 
-import { Cancel01Icon, SearchIcon } from "@hugeicons/core-free-icons";
+import {
+  Cancel01Icon,
+  GridViewIcon,
+  SearchIcon,
+} from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   Avatar,
   AvatarFallback,
   AvatarImage,
 } from "@notra/ui/components/ui/avatar";
+import {
+  IconTabsList,
+  IconTabsTrigger,
+} from "@notra/ui/components/ui/icon-tabs";
 import { Input } from "@notra/ui/components/ui/input";
+import { Tabs } from "@notra/ui/components/ui/tabs";
 import {
   Tooltip,
   TooltipContent,
@@ -19,7 +28,6 @@ import { InstrumentEmpty, InstrumentSection } from "ui/card";
 import { DataTable, type TableColumn } from "ui/table";
 import { useTranslations } from "use-intl";
 
-import { PlatformTabs } from "@/components/analytics/platform-tabs";
 import { ProviderIcon } from "@/components/analytics/provider-icon";
 import { AnalyticsRangePicker } from "@/components/analytics/range-picker";
 import { Button } from "@/components/button";
@@ -269,26 +277,35 @@ export function LeaderboardCard({
                 value={search}
               />
             </div>
-            <PlatformTabs
-              items={ANALYTICS_PROVIDER_FILTERS.map((option) => ({
-                value: option.value,
-                label:
-                  option.value === "all"
-                    ? tCommon("labels.allPlatforms")
-                    : option.label,
-                collapsedLabel:
-                  option.value === "all" ? tCommon("labels.all") : undefined,
-                icon:
-                  option.value === "all" ? undefined : (
-                    <ProviderIcon provider={option.value} />
-                  ),
-              }))}
-              label={t("platformFilter")}
+            <Tabs
               onValueChange={(value) =>
                 setProviderFilter(toProviderFilter(value))
               }
               value={providerFilter}
-            />
+            >
+              <IconTabsList
+                aria-label={t("platformFilter")}
+                value={providerFilter}
+              >
+                {ANALYTICS_PROVIDER_FILTERS.map((option) => (
+                  <IconTabsTrigger
+                    icon={
+                      option.value === "all" ? (
+                        <HugeiconsIcon icon={GridViewIcon} size={15} />
+                      ) : (
+                        <ProviderIcon provider={option.value} />
+                      )
+                    }
+                    key={option.value}
+                    value={option.value}
+                  >
+                    {option.value === "all"
+                      ? tCommon("labels.allPlatforms")
+                      : option.label}
+                  </IconTabsTrigger>
+                ))}
+              </IconTabsList>
+            </Tabs>
             {selectedTrackedIds.length > 0 && (
               <Button
                 disabled={untrack.isPending}

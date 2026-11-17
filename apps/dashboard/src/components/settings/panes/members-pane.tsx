@@ -1,19 +1,21 @@
 "use client";
 
-import { Logout02Icon, Mail01Icon } from "@hugeicons/core-free-icons";
-import { HugeiconsIcon } from "@hugeicons/react";
-import { Badge } from "@notra/ui/components/ui/badge";
-import { Skeleton } from "@notra/ui/components/ui/skeleton";
 import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@notra/ui/components/ui/tabs";
+  Logout02Icon,
+  Mail01Icon,
+  UserGroupIcon,
+} from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
+import {
+  IconTabsList,
+  IconTabsTrigger,
+} from "@notra/ui/components/ui/icon-tabs";
+import { Skeleton } from "@notra/ui/components/ui/skeleton";
+import { Tabs, TabsContent } from "@notra/ui/components/ui/tabs";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { DataTable } from "ui/table";
-import { useFormatter, useTranslations } from "use-intl";
+import { useTranslations } from "use-intl";
 
 import { Button } from "@/components/button";
 import { useMemberColumns } from "@/components/members/columns";
@@ -24,6 +26,7 @@ import { useOrganizationsContext } from "@/components/providers/organization-pro
 import { OrganizationMembershipActionDialog } from "@/components/settings/organization-membership-action-dialog";
 import { SettingsPane } from "@/components/settings/settings-pane";
 import { SettingsTableEmpty } from "@/components/settings/settings-table-empty";
+import { TabCount } from "@/components/tab-count";
 import { SETTINGS_TABLE_EMPTY_HEIGHT } from "@/constants/settings";
 import { TABLE_ROW_HEIGHT } from "@/constants/table";
 import { authClient } from "@/lib/auth/client";
@@ -34,7 +37,6 @@ export function MembersSettingsPane() {
   const t = useTranslations("settings.panes.members");
   const tCommon = useTranslations("common");
   const tAction = useTranslations("settings.membershipAction");
-  const format = useFormatter();
   const memberColumns = useMemberColumns();
   const invitationColumns = useInvitationColumns();
   const { activeOrganization: organization } = useOrganizationsContext();
@@ -108,24 +110,22 @@ export function MembersSettingsPane() {
     <SettingsPane>
       <Tabs onValueChange={setActiveTab} value={activeTab}>
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <TabsList aria-label={t("listsLabel")}>
-            <TabsTrigger value="members">
+          <IconTabsList aria-label={t("listsLabel")} value={activeTab}>
+            <IconTabsTrigger
+              icon={<HugeiconsIcon icon={UserGroupIcon} size={15} />}
+              value="members"
+            >
               {tCommon("labels.members")}
-              {members && members.length > 0 ? (
-                <Badge size="sm" variant="secondary">
-                  {format.number(members.length)}
-                </Badge>
-              ) : null}
-            </TabsTrigger>
-            <TabsTrigger value="pending">
+              <TabCount count={members?.length} />
+            </IconTabsTrigger>
+            <IconTabsTrigger
+              icon={<HugeiconsIcon icon={Mail01Icon} size={15} />}
+              value="pending"
+            >
               {tCommon("labels.pending")}
-              {pendingInvitations && pendingInvitations.length > 0 ? (
-                <Badge size="sm" variant="secondary">
-                  {format.number(pendingInvitations.length)}
-                </Badge>
-              ) : null}
-            </TabsTrigger>
-          </TabsList>
+              <TabCount count={pendingInvitations?.length} />
+            </IconTabsTrigger>
+          </IconTabsList>
           <div className="flex items-center gap-2">
             {canLeave ? (
               <OrganizationMembershipActionDialog

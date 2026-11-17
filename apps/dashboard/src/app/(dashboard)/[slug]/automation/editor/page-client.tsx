@@ -1,7 +1,13 @@
 "use client";
 
+import { Clock01Icon, Settings01Icon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
+import {
+  IconTabsList,
+  IconTabsTrigger,
+} from "@notra/ui/components/ui/icon-tabs";
 import { Skeleton } from "@notra/ui/components/ui/skeleton";
-import { Tabs, TabsList, TabsTrigger } from "@notra/ui/components/ui/tabs";
+import { Tabs } from "@notra/ui/components/ui/tabs";
 import { useQuery } from "@tanstack/react-query";
 import { useRef, useState } from "react";
 import { useTranslations } from "use-intl";
@@ -202,10 +208,20 @@ export default function PageClient({
               onValueChange={(value) => setTab(value as "settings" | "runs")}
               value={tab}
             >
-              <TabsList>
-                <TabsTrigger value="settings">{t("tabs.settings")}</TabsTrigger>
-                <TabsTrigger value="runs">{t("tabs.runs")}</TabsTrigger>
-              </TabsList>
+              <IconTabsList value={tab}>
+                <IconTabsTrigger
+                  icon={<HugeiconsIcon icon={Settings01Icon} size={15} />}
+                  value="settings"
+                >
+                  {t("tabs.settings")}
+                </IconTabsTrigger>
+                <IconTabsTrigger
+                  icon={<HugeiconsIcon icon={Clock01Icon} size={15} />}
+                  value="runs"
+                >
+                  {t("tabs.runs")}
+                </IconTabsTrigger>
+              </IconTabsList>
             </Tabs>
           ) : null}
         </div>
