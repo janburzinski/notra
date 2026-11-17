@@ -1,0 +1,27 @@
+apps/dashboard/src/constants/chat-approval.ts
+  s_39b0454aff7e1d::t_d284f200ca5903 9-16
+apps/dashboard/src/components/chat/chat-approval-card.tsx
+  s_39b0454aff7e1d::t_d284f200ca5903 63-68,75,133-134,136-137,146-147,253,293,298,305
+apps/dashboard/src/lib/geo/agent-prompt-scan.ts
+  s_39b0454aff7e1d::t_959404a395108f 8,20-27,91
+apps/dashboard/src/lib/hooks/use-chat-tool-approvals.ts
+  s_39b0454aff7e1d::t_d284f200ca5903 8,97-105
+apps/dashboard/src/types/chat-approval.ts
+  s_39b0454aff7e1d::t_d284f200ca5903 13-17
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "2532e2c5f16e65e16661ce7f6bfa72984bfd487e",
+  "prompts": {},
+  "sessions": {
+    "s_39b0454aff7e1d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "4ea4b605-0963-45cd-b19b-40e15b96751d",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
