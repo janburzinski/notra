@@ -89,6 +89,8 @@ import { Route as ApiInternalGeoAnswerLimitRouteImport } from './routes/api.inte
 import { Route as ApiInternalGeoFreeScanRouteImport } from './routes/api.internal.geo.free-scan'
 import { Route as ApiInternalGeoPersonaGenerationRouteImport } from './routes/api.internal.geo.persona-generation'
 import { Route as ApiInternalGeoPersonaRunRouteImport } from './routes/api.internal.geo.persona-run'
+import { Route as ApiInternalGeoPromptFindRouteImport } from './routes/api.internal.geo.prompt-find'
+import { Route as ApiInternalGeoPromptScanRouteImport } from './routes/api.internal.geo.prompt-scan'
 import { Route as ApiInternalGeoSequenceRunRouteImport } from './routes/api.internal.geo.sequence-run'
 import { Route as ApiInternalGeoWriterPlanRouteImport } from './routes/api.internal.geo.writer-plan'
 import { Route as ApiInternalSitesAdminRouteImport } from './routes/api.internal.sites.admin'
@@ -553,6 +555,18 @@ const ApiInternalGeoPersonaRunRoute =
     path: '/api/internal/geo/persona-run',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiInternalGeoPromptFindRoute =
+  ApiInternalGeoPromptFindRouteImport.update({
+    id: '/api/internal/geo/prompt-find',
+    path: '/api/internal/geo/prompt-find',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiInternalGeoPromptScanRoute =
+  ApiInternalGeoPromptScanRouteImport.update({
+    id: '/api/internal/geo/prompt-scan',
+    path: '/api/internal/geo/prompt-scan',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiInternalGeoSequenceRunRoute =
   ApiInternalGeoSequenceRunRouteImport.update({
     id: '/api/internal/geo/sequence-run',
@@ -811,6 +825,8 @@ export interface FileRoutesByFullPath {
   '/api/internal/geo/free-scan': typeof ApiInternalGeoFreeScanRoute
   '/api/internal/geo/persona-generation': typeof ApiInternalGeoPersonaGenerationRoute
   '/api/internal/geo/persona-run': typeof ApiInternalGeoPersonaRunRoute
+  '/api/internal/geo/prompt-find': typeof ApiInternalGeoPromptFindRoute
+  '/api/internal/geo/prompt-scan': typeof ApiInternalGeoPromptScanRoute
   '/api/internal/geo/sequence-run': typeof ApiInternalGeoSequenceRunRoute
   '/api/internal/geo/writer-plan': typeof ApiInternalGeoWriterPlanRoute
   '/api/internal/sites/admin': typeof ApiInternalSitesAdminRoute
@@ -923,6 +939,8 @@ export interface FileRoutesByTo {
   '/api/internal/geo/free-scan': typeof ApiInternalGeoFreeScanRoute
   '/api/internal/geo/persona-generation': typeof ApiInternalGeoPersonaGenerationRoute
   '/api/internal/geo/persona-run': typeof ApiInternalGeoPersonaRunRoute
+  '/api/internal/geo/prompt-find': typeof ApiInternalGeoPromptFindRoute
+  '/api/internal/geo/prompt-scan': typeof ApiInternalGeoPromptScanRoute
   '/api/internal/geo/sequence-run': typeof ApiInternalGeoSequenceRunRoute
   '/api/internal/geo/writer-plan': typeof ApiInternalGeoWriterPlanRoute
   '/api/internal/sites/admin': typeof ApiInternalSitesAdminRoute
@@ -1036,6 +1054,8 @@ export interface FileRoutesById {
   '/api/internal/geo/free-scan': typeof ApiInternalGeoFreeScanRoute
   '/api/internal/geo/persona-generation': typeof ApiInternalGeoPersonaGenerationRoute
   '/api/internal/geo/persona-run': typeof ApiInternalGeoPersonaRunRoute
+  '/api/internal/geo/prompt-find': typeof ApiInternalGeoPromptFindRoute
+  '/api/internal/geo/prompt-scan': typeof ApiInternalGeoPromptScanRoute
   '/api/internal/geo/sequence-run': typeof ApiInternalGeoSequenceRunRoute
   '/api/internal/geo/writer-plan': typeof ApiInternalGeoWriterPlanRoute
   '/api/internal/sites/admin': typeof ApiInternalSitesAdminRoute
@@ -1150,6 +1170,8 @@ export interface FileRouteTypes {
     | '/api/internal/geo/free-scan'
     | '/api/internal/geo/persona-generation'
     | '/api/internal/geo/persona-run'
+    | '/api/internal/geo/prompt-find'
+    | '/api/internal/geo/prompt-scan'
     | '/api/internal/geo/sequence-run'
     | '/api/internal/geo/writer-plan'
     | '/api/internal/sites/admin'
@@ -1262,6 +1284,8 @@ export interface FileRouteTypes {
     | '/api/internal/geo/free-scan'
     | '/api/internal/geo/persona-generation'
     | '/api/internal/geo/persona-run'
+    | '/api/internal/geo/prompt-find'
+    | '/api/internal/geo/prompt-scan'
     | '/api/internal/geo/sequence-run'
     | '/api/internal/geo/writer-plan'
     | '/api/internal/sites/admin'
@@ -1374,6 +1398,8 @@ export interface FileRouteTypes {
     | '/api/internal/geo/free-scan'
     | '/api/internal/geo/persona-generation'
     | '/api/internal/geo/persona-run'
+    | '/api/internal/geo/prompt-find'
+    | '/api/internal/geo/prompt-scan'
     | '/api/internal/geo/sequence-run'
     | '/api/internal/geo/writer-plan'
     | '/api/internal/sites/admin'
@@ -1481,6 +1507,8 @@ export interface RootRouteChildren {
   ApiInternalGeoFreeScanRoute: typeof ApiInternalGeoFreeScanRoute
   ApiInternalGeoPersonaGenerationRoute: typeof ApiInternalGeoPersonaGenerationRoute
   ApiInternalGeoPersonaRunRoute: typeof ApiInternalGeoPersonaRunRoute
+  ApiInternalGeoPromptFindRoute: typeof ApiInternalGeoPromptFindRoute
+  ApiInternalGeoPromptScanRoute: typeof ApiInternalGeoPromptScanRoute
   ApiInternalGeoSequenceRunRoute: typeof ApiInternalGeoSequenceRunRoute
   ApiInternalGeoWriterPlanRoute: typeof ApiInternalGeoWriterPlanRoute
   ApiInternalSitesAdminRoute: typeof ApiInternalSitesAdminRoute
@@ -2068,6 +2096,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiInternalGeoPersonaRunRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/internal/geo/prompt-find': {
+      id: '/api/internal/geo/prompt-find'
+      path: '/api/internal/geo/prompt-find'
+      fullPath: '/api/internal/geo/prompt-find'
+      preLoaderRoute: typeof ApiInternalGeoPromptFindRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/internal/geo/prompt-scan': {
+      id: '/api/internal/geo/prompt-scan'
+      path: '/api/internal/geo/prompt-scan'
+      fullPath: '/api/internal/geo/prompt-scan'
+      preLoaderRoute: typeof ApiInternalGeoPromptScanRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/internal/geo/sequence-run': {
       id: '/api/internal/geo/sequence-run'
       path: '/api/internal/geo/sequence-run'
@@ -2466,6 +2508,8 @@ const rootRouteChildren: RootRouteChildren = {
   ApiInternalGeoFreeScanRoute: ApiInternalGeoFreeScanRoute,
   ApiInternalGeoPersonaGenerationRoute: ApiInternalGeoPersonaGenerationRoute,
   ApiInternalGeoPersonaRunRoute: ApiInternalGeoPersonaRunRoute,
+  ApiInternalGeoPromptFindRoute: ApiInternalGeoPromptFindRoute,
+  ApiInternalGeoPromptScanRoute: ApiInternalGeoPromptScanRoute,
   ApiInternalGeoSequenceRunRoute: ApiInternalGeoSequenceRunRoute,
   ApiInternalGeoWriterPlanRoute: ApiInternalGeoWriterPlanRoute,
   ApiInternalSitesAdminRoute: ApiInternalSitesAdminRoute,

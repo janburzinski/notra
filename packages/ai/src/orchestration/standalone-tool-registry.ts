@@ -16,8 +16,11 @@ import {
   createGetGeoOverviewTool,
   createGetGeoProjectContextTool,
   createGetGeoPromptResultsTool,
+  createGetGeoScanTool,
   createGetGeoTimeseriesTool,
   createListGeoProjectsTool,
+  createFindGeoPromptsTool,
+  createScanGeoPromptTool,
 } from "@notra/ai/tools/geo";
 import { buildGitHubDataTools } from "@notra/ai/tools/github";
 import {
@@ -91,6 +94,7 @@ export function getStandaloneApprovalToolNames(): Set<string> {
     "updatePost",
     "schedulePost",
     "cancelPostSchedule",
+    "scanGeoPrompt",
   ]);
   for (const contentType of contentTypeSchema.options) {
     if (contentType !== "image") {
@@ -197,6 +201,20 @@ export function buildStandaloneToolSet(
     organizationId,
   });
   tools.showGeoChart = createShowGeoChartTool({ organizationId });
+  if (deps?.startGeoPromptScan && deps.findGeoPrompts) {
+    tools.findGeoPrompts = createFindGeoPromptsTool({
+      organizationId,
+      findGeoPrompts: deps.findGeoPrompts,
+    });
+    tools.scanGeoPrompt = createScanGeoPromptTool({
+      organizationId,
+      startGeoPromptScan: deps.startGeoPromptScan,
+    });
+    tools.getGeoScan = createGetGeoScanTool({ organizationId });
+    descriptions.push(
+      '**GEO Prompt Scans**: When the user wants a tracked prompt asked again now, on all engines or specific ones ("check that prompt on ChatGPT again"), find the exact prompt with findGeoPrompts first and ask which one when the request fits several, then call scanGeoPrompt with its id and engine ids such as openai/chatgpt. The user approves each call because it uses AI answers. Say the scan is running, then read it with getGeoScan once it had time and report only the answers it returned.'
+    );
+  }
   tools.showChart = createShowChartTool();
 
   descriptions.push(

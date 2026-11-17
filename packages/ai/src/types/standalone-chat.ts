@@ -1,5 +1,9 @@
 import type { AILogTarget } from "@notra/ai/observability";
 import type { StandaloneChatContextItem } from "@notra/ai/schemas/standalone-chat";
+import type {
+  GeoPromptFinder,
+  GeoPromptScanStarter,
+} from "@notra/ai/types/geo-prompt-scan";
 import type { PostAgentReachLoader } from "@notra/ai/types/post-agent-reach";
 import type { RouteUsageSummary } from "@notra/ai/types/router";
 import type { TccMetadata } from "@notra/ai/types/tcc";
@@ -44,6 +48,8 @@ export interface StandaloneChatDeps {
   /** Tools the host app adds, such as the dashboard's workflow builder. */
   extraTools?: ToolSet;
   loadPostAgentReach?: PostAgentReachLoader;
+  startGeoPromptScan?: GeoPromptScanStarter;
+  findGeoPrompts?: GeoPromptFinder;
   onUsage?: (
     usage: LanguageModelUsage,
     modelId: string,

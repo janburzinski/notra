@@ -381,6 +381,18 @@ export interface GeoCheckScanPromptRow {
   bestPosition: number | null;
 }
 
+/** One answer a scan stored for a tracked prompt, without the full text. */
+export interface GeoCheckScanAnswerRow {
+  promptId: string;
+  prompt: string;
+  engine: string;
+  language: string;
+  mentioned: boolean;
+  position: number | null;
+  competitors: string[];
+  excerpt: string;
+}
+
 export interface GeoCheckScanCompetitorRow {
   brand: string;
   checks: number;

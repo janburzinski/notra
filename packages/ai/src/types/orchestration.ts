@@ -5,6 +5,10 @@ import type {
   ResolveLinearIntegrationContext,
 } from "@notra/ai/types/agents";
 import type { DiagramSpec } from "@notra/ai/types/excalidraw-diagram";
+import type {
+  GeoPromptFinder,
+  GeoPromptScanStarter,
+} from "@notra/ai/types/geo-prompt-scan";
 import type { PostAgentReachLoader } from "@notra/ai/types/post-agent-reach";
 import type { PostToolsResult } from "@notra/ai/types/post-tools";
 import type { RepoImageFormat } from "@notra/ai/types/repo-image";
@@ -216,6 +220,8 @@ export interface BuildStandaloneToolSetDeps {
   resolveLinearContext?: ResolveLinearIntegrationContext;
   resolveGranolaContext?: ResolveGranolaIntegrationContext;
   loadPostAgentReach?: PostAgentReachLoader;
+  startGeoPromptScan?: GeoPromptScanStarter;
+  findGeoPrompts?: GeoPromptFinder;
 }
 
 export interface GitHubIntegrationData {

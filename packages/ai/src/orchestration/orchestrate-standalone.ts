@@ -138,6 +138,8 @@ export async function orchestrateStandaloneChat(
       resolveLinearContext: deps?.resolveLinearContext,
       resolveGranolaContext: deps?.resolveGranolaContext,
       loadPostAgentReach: deps?.loadPostAgentReach,
+      startGeoPromptScan: deps?.startGeoPromptScan,
+      findGeoPrompts: deps?.findGeoPrompts,
     }
   );
   Object.assign(baseToolSet.tools, deps?.extraTools?.tools);

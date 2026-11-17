@@ -1,10 +1,11 @@
 import { setTimeout as sleep } from "node:timers/promises";
 
 import { db } from "@notra/db/drizzle";
-import { geoMentionChecks, geoScans } from "@notra/db/schema";
+import { geoScans } from "@notra/db/schema";
+import { queryGeoScanAnswers } from "@notra/db/utils/geo-checks";
 import type { GeoRouterError } from "@notra/geo-core/geo/errors";
 import { startGeoPromptRescan } from "@notra/geo-core/geo/programs";
-import { and, asc, eq, isNull } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { Effect } from "effect";
 
 import {
@@ -72,27 +73,10 @@ async function loadAnswers(
   organizationId: string,
   scanId: string
 ): Promise<AutopilotPromptScanResult[]> {
-  const rows = await db
-    .select({
-      engine: geoMentionChecks.engine,
-      language: geoMentionChecks.language,
-      mentioned: geoMentionChecks.mentioned,
-      position: geoMentionChecks.position,
-      competitors: geoMentionChecks.competitors,
-      excerpt: geoMentionChecks.excerpt,
-    })
-    .from(geoMentionChecks)
-    .where(
-      and(
-        eq(geoMentionChecks.scanId, scanId),
-        eq(geoMentionChecks.organizationId, organizationId),
-        isNull(geoMentionChecks.personaId),
-        isNull(geoMentionChecks.sequenceId),
-        eq(geoMentionChecks.turn, 0)
-      )
-    )
-    .orderBy(asc(geoMentionChecks.engine), asc(geoMentionChecks.language))
-    .limit(AUTOPILOT_WORKFLOW_SCAN_PROMPT_RESULTS_LIMIT);
+  const rows = await queryGeoScanAnswers(
+    { organizationId, scanId },
+    { limit: AUTOPILOT_WORKFLOW_SCAN_PROMPT_RESULTS_LIMIT }
+  );
   return rows.map((row) => ({
     engine: row.engine,
     language: row.language,

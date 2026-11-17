@@ -5,6 +5,7 @@ import { useEffect, useEffectEvent, useRef, useState } from "react";
 import { toast } from "sonner";
 import { useTranslations } from "use-intl";
 
+import { CHAT_APPROVAL_ONCE_ONLY_TOOL_NAMES } from "@/constants/chat-approval";
 import type { ChatComposerApproval } from "@/types/chat-approval";
 import type { ChatToolPart } from "@/types/components/chat-conversation";
 import {
@@ -93,13 +94,15 @@ export function useChatToolApprovals({
   const approval: ChatComposerApproval = {
     part,
     onAllowOnce: () => answer(true),
-    onAllowForChat: () => {
-      setAllowed({
-        chatId,
-        toolNames: new Set([...allowedToolNames, toolName]),
-      });
-      answer(true);
-    },
+    onAllowForChat: CHAT_APPROVAL_ONCE_ONLY_TOOL_NAMES.has(toolName)
+      ? null
+      : () => {
+          setAllowed({
+            chatId,
+            toolNames: new Set([...allowedToolNames, toolName]),
+          });
+          answer(true);
+        },
     onDeny: () => answer(false),
   };
   return { approval, isApprovalInComposer };

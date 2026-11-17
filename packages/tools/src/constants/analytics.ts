@@ -26,3 +26,15 @@ export const ANALYTICS_PROJECT_NOT_FOUND_MESSAGE =
   "Project not found in this organization. Call list_geo_projects for valid project IDs.";
 
 export const DAY_MS = 86_400_000;
+
+export const GEO_PROMPT_SCAN_FAILED_MESSAGE =
+  "The prompt scan couldn't be started. Try again in a moment.";
+
+export const GEO_PROMPT_SCAN_NOT_CONFIGURED_MESSAGE =
+  "Prompt scans aren't available here because the connection to Notra isn't configured.";
+
+export const GEO_PROMPT_SCAN_TASK_DENIED_MESSAGE =
+  "Prompt scans use AI answers, so they only run when a person asks for one in chat.";
+
+export const GEO_SCAN_NOT_FOUND_MESSAGE =
+  "No scan with that id exists in this workspace.";

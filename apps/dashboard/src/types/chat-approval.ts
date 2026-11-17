@@ -10,8 +10,11 @@ export interface ChatApprovalInputChip {
 export interface ChatComposerApproval {
   part: ChatToolPart;
   onAllowOnce: () => void;
-  /** Allows it, and every later call of this tool in the chat. */
-  onAllowForChat: () => void;
+  /**
+   * Allows it, and every later call of this tool in the chat. `null` for tools
+   * that must ask every time, such as a scan that spends AI answers.
+   */
+  onAllowForChat: (() => void) | null;
   onDeny: () => void;
 }
 

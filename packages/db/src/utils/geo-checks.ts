@@ -1,5 +1,6 @@
 import {
   and,
+  asc,
   desc,
   eq,
   exists,
@@ -45,6 +46,7 @@ import type {
   GeoCheckPromptSummaryQuery,
   GeoCheckScanComparison,
   GeoCheckScanComparisonInput,
+  GeoCheckScanAnswerRow,
   GeoCheckScanComparisonRow,
   GeoCheckScanCompetitorRow,
   GeoCheckScanPromptRow,
@@ -1602,6 +1604,46 @@ export async function queryGeoScanPrompts(
     visible: toNumber(row.visible),
     bestPosition: toNullableNumber(row.bestPosition),
   }));
+}
+
+/**
+ * The tracked-prompt answers one scan stored, ordered by prompt, engine and
+ * language. Scoped by organization only, so a caller holding a scan id from
+ * its own scan start can read it without knowing the project.
+ */
+export async function queryGeoScanAnswers(
+  scope: { organizationId: string; scanId: string },
+  page: { limit: number; offset?: number }
+): Promise<GeoCheckScanAnswerRow[]> {
+  return await db
+    .select({
+      promptId: geoMentionChecks.promptId,
+      prompt: geoMentionChecks.prompt,
+      engine: geoMentionChecks.engine,
+      language: geoMentionChecks.language,
+      mentioned: geoMentionChecks.mentioned,
+      position: geoMentionChecks.position,
+      competitors: geoMentionChecks.competitors,
+      excerpt: geoMentionChecks.excerpt,
+    })
+    .from(geoMentionChecks)
+    .where(
+      and(
+        eq(geoMentionChecks.scanId, scope.scanId),
+        eq(geoMentionChecks.organizationId, scope.organizationId),
+        isNull(geoMentionChecks.personaId),
+        isNull(geoMentionChecks.sequenceId),
+        eq(geoMentionChecks.turn, 0)
+      )
+    )
+    .orderBy(
+      asc(geoMentionChecks.promptId),
+      asc(geoMentionChecks.engine),
+      asc(geoMentionChecks.language),
+      asc(geoMentionChecks.id)
+    )
+    .limit(page.limit)
+    .offset(page.offset ?? 0);
 }
 
 /**

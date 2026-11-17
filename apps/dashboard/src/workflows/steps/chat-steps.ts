@@ -47,6 +47,10 @@ import { WORKFLOW_ANALYTICS_NAMES } from "@/constants/workflow-analytics";
 import { trackServerEventAndFlush } from "@/lib/analytics/posthog-server";
 import { buildChatExtraTools } from "@/lib/chat/extra-tools";
 import { isCodeResearchEnabledForOrganization } from "@/lib/code-research/flag";
+import {
+  findGeoPromptsForChat,
+  startGeoPromptScanForChat,
+} from "@/lib/geo/agent-prompt-scan";
 import { buildStandaloneChatTelemetryMetadata } from "@/lib/tcc";
 import { reportStepError } from "@/lib/workflows/step-errors";
 import type {
@@ -296,6 +300,8 @@ export async function streamChatResponseStep(
           focusAutomation: autopilotAutomation,
         }),
         loadPostAgentReach: loadPostAgentReachSummary,
+        startGeoPromptScan: startGeoPromptScanForChat,
+        findGeoPrompts: findGeoPromptsForChat,
         onFirstChunk() {
           if (timing.firstChunkAt === null) {
             timing.firstChunkAt = Date.now();

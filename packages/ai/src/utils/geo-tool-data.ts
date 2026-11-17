@@ -1,5 +1,10 @@
 import type { GEO_CHART_KINDS } from "@notra/ai/constants/chart-tools";
-import { GEO_TOOL_DEFAULT_COMPETITOR_LIMIT } from "@notra/ai/constants/geo-tools";
+import {
+  GEO_SCAN_RESULT_ANSWERS_LIMIT,
+  GEO_SCAN_RESULT_COMPETITORS_LIMIT,
+  GEO_SCAN_RESULT_EXCERPT_CHARS,
+  GEO_TOOL_DEFAULT_COMPETITOR_LIMIT,
+} from "@notra/ai/constants/geo-tools";
 import {
   GEO_CONTEXT_LOOKBACK_DAYS,
   GEO_CONTEXT_MAX_ANSWER_CHARS,
@@ -18,6 +23,7 @@ import {
   geoCompetitors,
   geoMentionChecks,
   geoPrompts,
+  geoScans,
   geoSettings,
   projects,
 } from "@notra/db/schema";
@@ -27,6 +33,7 @@ import {
   queryGeoCheckOverview,
   queryGeoCheckPromptResults,
   queryGeoCheckTimeseries,
+  queryGeoScanAnswers,
   toGeoCheckWindow,
 } from "@notra/db/utils/geo-checks";
 import { selectGeoContextCompetitors } from "@notra/db/utils/geo-context-competitors";
@@ -440,5 +447,60 @@ export async function loadGeoProjectContextForTool(
     trackedCompetitorCount: competitors.total,
     trackedPrompts: prompts.map((prompt) => prompt.prompt),
     latestChecks,
+  };
+}
+
+/**
+ * One scan's status and the tracked-prompt answers it stored, a page at a
+ * time, for agents that started a prompt scan. `null` when the workspace has no
+ * scan with that id.
+ */
+export async function loadGeoScanForTool(
+  organizationId: string,
+  scanId: string,
+  offset = 0
+) {
+  const scan = await db.query.geoScans.findFirst({
+    columns: {
+      status: true,
+      startedAt: true,
+      finishedAt: true,
+      errorMessage: true,
+      planSummary: true,
+    },
+    where: and(
+      eq(geoScans.id, scanId),
+      eq(geoScans.organizationId, organizationId)
+    ),
+  });
+  if (!scan) {
+    return null;
+  }
+  // One extra row tells whether another page exists.
+  const rows = await queryGeoScanAnswers(
+    { organizationId, scanId },
+    { limit: GEO_SCAN_RESULT_ANSWERS_LIMIT + 1, offset }
+  );
+  const answers = rows.slice(0, GEO_SCAN_RESULT_ANSWERS_LIMIT);
+  const hasMore = rows.length > GEO_SCAN_RESULT_ANSWERS_LIMIT;
+  return {
+    scanId,
+    status: scan.status,
+    started_at: scan.startedAt.toISOString(),
+    finished_at: scan.finishedAt?.toISOString() ?? null,
+    error: scan.status === "failed" ? scan.errorMessage : null,
+    engines: scan.planSummary?.engines ?? [],
+    answers: answers.map((row) => ({
+      prompt_id: row.promptId,
+      prompt: row.prompt,
+      engine: row.engine,
+      language: row.language,
+      mentioned: row.mentioned,
+      position: row.position,
+      competitors: row.competitors.slice(0, GEO_SCAN_RESULT_COMPETITORS_LIMIT),
+      excerpt: row.excerpt.slice(0, GEO_SCAN_RESULT_EXCERPT_CHARS),
+    })),
+    has_more: hasMore,
+    next_offset: hasMore ? offset + answers.length : null,
   };
 }

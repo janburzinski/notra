@@ -1,12 +1,19 @@
 import { GEO_TOOL_TABLE_NOTE } from "@notra/ai/constants/geo-tools";
 import {
+  findGeoPromptsInputSchema,
   getGeoCompetitorShareInputSchema,
   getGeoOverviewInputSchema,
   getGeoProjectContextInputSchema,
   getGeoPromptResultsInputSchema,
+  getGeoScanInputSchema,
   getGeoTimeseriesInputSchema,
   listGeoProjectsInputSchema,
+  scanGeoPromptInputSchema,
 } from "@notra/ai/schemas/geo-tools";
+import type {
+  GeoPromptFinder,
+  GeoPromptScanStarter,
+} from "@notra/ai/types/geo-prompt-scan";
 import type { OrganizationToolConfig } from "@notra/ai/types/organization";
 import { toolDescription } from "@notra/ai/utils/description";
 import {
@@ -15,6 +22,7 @@ import {
   loadGeoProjectContextForTool,
   loadGeoProjectsForTool,
   loadGeoPromptResultsForTool,
+  loadGeoScanForTool,
   loadGeoTimeseriesForTool,
 } from "@notra/ai/utils/geo-tool-data";
 import { geoToolModelOutput } from "@notra/ai/utils/geo-tool-model-output";
@@ -144,5 +152,72 @@ export function createGetGeoProjectContextTool(
         includeAnswers,
         competitorSearch
       ),
+  });
+}
+
+export function createScanGeoPromptTool(
+  config: OrganizationToolConfig & { startGeoPromptScan: GeoPromptScanStarter }
+): Tool {
+  return tool({
+    description: toolDescription({
+      toolName: "scanGeoPrompt",
+      intro:
+        "Asks AI engines one tracked GEO prompt again now, on every engine the project tracks or only the engines listed (one is fine).",
+      whenToUse:
+        "Use when the user wants fresh answers for a prompt, for example to check whether ChatGPT mentions the brand today or after publishing content for it.",
+      usageNotes:
+        "The user approves each call, so first find the exact prompt with findGeoPrompts and pass its id; when the request fits several prompts, ask which one before calling. It uses the workspace's AI answers like a rescan in GEO. Returns status started with a scanId; read it with getGeoScan after a minute or two (consumer apps such as ChatGPT can take several minutes). status choose or not_found lists prompts to pick from: ask the user which one, never guess. status error carries the reason, including the engine ids this project can scan when one was unknown.",
+    }),
+    inputSchema: scanGeoPromptInputSchema,
+    execute: ({ projectId, prompt, engines }) =>
+      config.startGeoPromptScan({
+        organizationId: config.organizationId,
+        projectId,
+        prompt,
+        engines,
+      }),
+  });
+}
+
+export function createGetGeoScanTool(config: OrganizationToolConfig): Tool {
+  return tool({
+    description: toolDescription({
+      toolName: "getGeoScan",
+      intro:
+        "Reads a GEO scan by scanId: status (running, completed or failed), the engines it asked and each answer stored so far with mention, rank, competitors and an excerpt.",
+      whenToUse:
+        "Use after scanGeoPrompt started a scan, to report what the engines answered.",
+      usageNotes:
+        "While status is running, answers may still be missing; say so instead of reporting them as not mentioned. When has_more is true, call again with offset set to next_offset.",
+    }),
+    inputSchema: getGeoScanInputSchema,
+    execute: async ({ scanId, offset }) =>
+      (await loadGeoScanForTool(config.organizationId, scanId, offset)) ?? {
+        found: false,
+        message: "No scan with that id exists in this workspace.",
+      },
+  });
+}
+
+export function createFindGeoPromptsTool(
+  config: OrganizationToolConfig & { findGeoPrompts: GeoPromptFinder }
+): Tool {
+  return tool({
+    description: toolDescription({
+      toolName: "findGeoPrompts",
+      intro:
+        "Finds the project's enabled tracked GEO prompts, auto-generated and custom, that match a few words, with their ids.",
+      whenToUse:
+        "Use before scanGeoPrompt to name the exact prompt, or when the user asks which prompts are tracked.",
+      usageNotes:
+        "Returns up to 20 prompts and the total that matched. When more than one fits the request, ask the user which one.",
+    }),
+    inputSchema: findGeoPromptsInputSchema,
+    execute: ({ projectId, query }) =>
+      config.findGeoPrompts({
+        organizationId: config.organizationId,
+        projectId,
+        query,
+      }),
   });
 }

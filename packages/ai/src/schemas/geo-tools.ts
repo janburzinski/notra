@@ -1,5 +1,8 @@
 import { GEO_CHART_KINDS } from "@notra/ai/constants/chart-tools";
 import {
+  GEO_PROMPT_SCAN_ID_MAX_LENGTH,
+  GEO_PROMPT_SCAN_INPUT_MAX_LENGTH,
+  GEO_PROMPT_SCAN_MAX_ENGINES,
   GEO_TOOL_DEFAULT_COMPETITOR_LIMIT,
   GEO_TOOL_DEFAULT_DAYS,
   GEO_TOOL_DEFAULT_PROMPT_RESULT_LIMIT,
@@ -94,4 +97,63 @@ export const getGeoProjectContextInputSchema = z.object({
 
 export const getGeoWriterContextInputSchema = z.object({
   includeAnswers: includeAnswersSchema,
+});
+
+export const scanGeoPromptInputSchema = z.object({
+  projectId: z
+    .string()
+    .min(1)
+    .optional()
+    .describe(
+      "GEO project ID from the project-listing tool. Omit for the default project."
+    ),
+  prompt: z
+    .string()
+    .trim()
+    .min(1)
+    .max(GEO_PROMPT_SCAN_INPUT_MAX_LENGTH)
+    .describe(
+      "The tracked prompt to ask again: its id, its wording, or a part of the wording only one prompt contains."
+    ),
+  engines: z
+    .array(z.string().trim().min(1).max(GEO_PROMPT_SCAN_ID_MAX_LENGTH))
+    .min(1)
+    .max(GEO_PROMPT_SCAN_MAX_ENGINES)
+    .optional()
+    .describe(
+      'Engine ids to ask, for example ["openai/chatgpt"] for the ChatGPT app or ["google/ai-overview"] for Google AI Overviews. Omit to ask every engine the project tracks.'
+    ),
+});
+
+export const getGeoScanInputSchema = z.object({
+  scanId: z
+    .string()
+    .trim()
+    .min(1)
+    .max(GEO_PROMPT_SCAN_ID_MAX_LENGTH)
+    .describe("The scanId the prompt scan tool returned"),
+  offset: z
+    .number()
+    .int()
+    .min(0)
+    .default(0)
+    .describe("Answers to skip; pass next_offset from the previous call."),
+});
+
+export const findGeoPromptsInputSchema = z.object({
+  projectId: z
+    .string()
+    .min(1)
+    .optional()
+    .describe(
+      "GEO project ID from the project-listing tool. Omit for the default project."
+    ),
+  query: z
+    .string()
+    .trim()
+    .max(GEO_PROMPT_SCAN_INPUT_MAX_LENGTH)
+    .optional()
+    .describe(
+      "Words from the prompt the user means, such as 'jira alternative'. Omit to list the tracked prompts."
+    ),
 });

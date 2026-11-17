@@ -37,8 +37,6 @@ import { getChatToolIcon } from "@/utils/chat-tool-icon";
 const INPUT_PANEL_CLASSNAME =
   "h-[var(--collapsible-panel-height)] overflow-hidden outline-none transition-[height,opacity] duration-normal ease-out data-[ending-style]:h-0 data-[starting-style]:h-0 data-[ending-style]:opacity-0 data-[starting-style]:opacity-0 motion-reduce:transition-none";
 
-const CHOICES: ChatApprovalChoice[] = ["once", "chat", "reply"];
-
 /**
  * A tool call waiting on you, in place of the chat input, laid out like the
  * agent's questions: what it will do, its input as chips (the JSON on
@@ -62,13 +60,19 @@ export function ChatApprovalCard({ approval, onReply }: ChatApprovalCardProps) {
     part.type === "dynamic-tool" ? part.toolMetadata : undefined;
   const chips = getApprovalInputChips(part.input);
   const hasInput = part.input != null;
+  // Tools that must ask every time offer no "for this chat" row.
+  const choices: ChatApprovalChoice[] = approval.onAllowForChat
+    ? ["once", "chat", "reply"]
+    : ["once", "reply"];
+  const allowChoices = choices.filter((value) => value !== "reply");
+  const replyIndex = choices.length - 1;
   const replyText = reply.trim();
 
   const confirm = () => {
     if (choice === "once") {
       approval.onAllowOnce();
     } else if (choice === "chat") {
-      approval.onAllowForChat();
+      approval.onAllowForChat?.();
     } else if (replyText && onReply(replyText)) {
       setReply("");
     }
@@ -126,11 +130,11 @@ export function ChatApprovalCard({ approval, onReply }: ChatApprovalCardProps) {
     if (typing || event.altKey || event.ctrlKey || event.metaKey) {
       return;
     }
-    if (/^[1-3]$/.test(event.key)) {
+    const index = Number(event.key) - 1;
+    if (/^[1-9]$/.test(event.key) && index < choices.length) {
       event.preventDefault();
-      const index = Number(event.key) - 1;
-      pick(CHOICES[index] ?? "once");
-      if (index < CHOICES.length - 1) {
+      pick(choices[index] ?? "once");
+      if (index < choices.length - 1) {
         rowsRef.current[index]?.focus();
       }
       return;
@@ -139,8 +143,8 @@ export function ChatApprovalCard({ approval, onReply }: ChatApprovalCardProps) {
       event.preventDefault();
       const at = rowsRef.current.indexOf(document.activeElement as HTMLElement);
       const step = event.key === "ArrowDown" ? 1 : -1;
-      const next = Math.max(0, Math.min(CHOICES.length - 1, at + step));
-      pick(CHOICES[next] ?? "once");
+      const next = Math.max(0, Math.min(choices.length - 1, at + step));
+      pick(choices[next] ?? "once");
       rowsRef.current[next]?.focus();
     }
   });
@@ -246,7 +250,7 @@ export function ChatApprovalCard({ approval, onReply }: ChatApprovalCardProps) {
         className="flex flex-col gap-1.5 px-3"
         role="radiogroup"
       >
-        {(["once", "chat"] as const).map((value, index) => (
+        {allowChoices.map((value, index) => (
           <button
             aria-checked={choice === value}
             aria-keyshortcuts={String(index + 1)}
@@ -286,19 +290,19 @@ export function ChatApprovalCard({ approval, onReply }: ChatApprovalCardProps) {
         >
           <button
             aria-checked={choice === "reply"}
-            aria-keyshortcuts="3"
+            aria-keyshortcuts={String(replyIndex + 1)}
             aria-label={t("replyPlaceholder")}
             className="focus-visible:ring-ring/50 -my-1 flex shrink-0 rounded-md py-1 outline-none focus-visible:ring-2"
             onClick={() => pick("reply")}
             ref={(element) => {
-              rowsRef.current[2] = element;
+              rowsRef.current[replyIndex] = element;
             }}
             role="radio"
             type="button"
           >
             <AnswerMark
               className="rounded-md"
-              number={3}
+              number={replyIndex + 1}
               picked={choice === "reply"}
             />
           </button>
