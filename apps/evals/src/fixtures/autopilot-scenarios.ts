@@ -25,7 +25,8 @@ function gap(
   slug: string,
   title: string,
   detail: string,
-  updatePage?: { url: string; title: string }
+  updatePage?: { url: string; title: string } | null,
+  sustained?: boolean
 ): AutopilotObservation {
   return {
     id: `keywords:${slug}`,
@@ -33,6 +34,7 @@ function gap(
     title,
     detail,
     updatePage: updatePage ?? null,
+    ...(sustained ? { sustained: true } : {}),
   };
 }
 
@@ -451,6 +453,22 @@ const tourAnalyticsWeakGap = gap(
   "product-tour-heatmap",
   "Heatmaps for product tours",
   "AI engines answer 'product tour heatmap' without you on 1 of 3 engines (67% mention you), while Pendo shows up. Search Console shows 40 impressions at position 52 with 0 clicks."
+);
+
+// The brand stayed missing from these answers across separate scans.
+const sustainedNpsGap = gap(
+  "nps-survey-in-app-b2b",
+  "How to run an in-app NPS survey in a B2B SaaS product",
+  "AI engines answer 'how to run an in-app NPS survey in a B2B SaaS product' without you on 3 of 5 engines (40% mention you), while Delighted, Survicate, Pendo show up. Missing in 4 scans over 18 days.",
+  null,
+  true
+);
+const sustainedPayrollGap = gap(
+  "payroll-software-small-business",
+  "Best payroll software for small businesses",
+  "AI engines answer 'best payroll software for a small business' without you on 4 of 4 engines (0% mention you), while Gusto, Rippling, ADP show up. Missing in 5 scans over 21 days.",
+  null,
+  true
 );
 
 export const AUTOPILOT_SCENARIOS: AutopilotScenario[] = [
@@ -1278,6 +1296,56 @@ export const AUTOPILOT_SCENARIOS: AutopilotScenario[] = [
           key: "heatmap",
           title: "Product tour heatmaps",
           observations: [tourAnalyticsWeakGap.id],
+        },
+      ],
+      maxPullRequests: 0,
+    },
+  },
+  {
+    id: "sustained-gap-acts",
+    title:
+      "One gap in the core use case the brand stayed missing from across scans: write it without a second signal",
+    tags: ["act", "demand"],
+    input: scenario({
+      runs: [
+        {
+          observations: [sustainedNpsGap],
+          expected: { action: ["write_post"], group: "nps", pr: "deliver" },
+        },
+      ],
+    }),
+    expected: {
+      groups: [
+        {
+          key: "nps",
+          title: "In-app NPS surveys",
+          observations: [sustainedNpsGap.id],
+        },
+      ],
+      maxPullRequests: 1,
+      mustActOn: "nps",
+      mustDeliver: true,
+    },
+  },
+  {
+    id: "sustained-gap-off-brand",
+    title:
+      "A sustained gap outside what the brand does: lasting demand is still no reason to write",
+    tags: ["restraint", "demand"],
+    input: scenario({
+      runs: [
+        {
+          observations: [sustainedPayrollGap],
+          expected: { action: ["none"], pr: "nothing" },
+        },
+      ],
+    }),
+    expected: {
+      groups: [
+        {
+          key: "payroll",
+          title: "Payroll software",
+          observations: [sustainedPayrollGap.id],
         },
       ],
       maxPullRequests: 0,

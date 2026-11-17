@@ -28,6 +28,7 @@ import {
   AUTOPILOT_JEV_NONE_CHOICE,
   AUTOPILOT_JEV_WORTH_CHOICE,
   AUTOPILOT_INTERNAL_REFERENCE,
+  AUTOPILOT_KEYWORD_CITED_PAGES,
   AUTOPILOT_MARKDOWN_FILE as MARKDOWN_FILE,
   AUTOPILOT_LINE_BREAK,
   AUTOPILOT_LOG_DROPPED_MAX,
@@ -43,8 +44,10 @@ import {
   AUTOPILOT_COMPARISONS_MAX_CHECKS,
 } from "@/constants/autopilot-comparisons";
 import { AUTOPILOT_FACT_FLAG_HEADINGS } from "@/constants/autopilot-publish";
+import { AUTOPILOT_REFRESH_COMPETITOR_PAGE_MAX_CHARS } from "@/constants/autopilot-refresh";
 import {
   loadAnswerChecks,
+  loadOwnedHosts,
   loadTrackedCompetitorNames,
 } from "@/lib/autopilot/answers";
 import { commitFilterSkipReason } from "@/lib/autopilot/commit-filters";
@@ -77,7 +80,7 @@ import {
   repositoryPathExists,
 } from "@/lib/autopilot/github";
 import { renderPostHeroImage } from "@/lib/autopilot/hero-image";
-import { recentMentionRates } from "@/lib/autopilot/impact";
+import { recentMentionRates, sustainedGaps } from "@/lib/autopilot/impact";
 import {
   assertAutopilotFindingLease,
   withAutopilotFindingLease,
@@ -85,7 +88,7 @@ import {
 import { generateAutopilotObject } from "@/lib/autopilot/llm";
 import { createAutopilotLogger } from "@/lib/autopilot/log";
 import { loadTopicObservationIds } from "@/lib/autopilot/memory";
-import { resolveLinks } from "@/lib/autopilot/pages";
+import { readPages, resolveLinks } from "@/lib/autopilot/pages";
 import { scheduleAutopilotPublish } from "@/lib/autopilot/publish";
 import { requestDraftReviewers } from "@/lib/autopilot/reviewers";
 import { loadDecisionMemory } from "@/lib/autopilot/rules";
@@ -138,7 +141,12 @@ import {
   searchGapDropReason,
 } from "@/utils/autopilot-blog";
 import { autopilotDraftBranchSlug } from "@/utils/autopilot-branches";
-import { answersByPrompt, withoutAnswers } from "@/utils/autopilot-citations";
+import {
+  answersByPrompt,
+  citedInsteadByPrompt,
+  describeCitedPages,
+  withoutAnswers,
+} from "@/utils/autopilot-citations";
 import {
   excludedAuthorReason,
   selectAutopilotSourceRepositories,
@@ -606,6 +614,22 @@ export async function writeBlogDraft(params: {
     page: claim.finding.evidence.updatePage ?? null,
   });
   const comparison = claim.finding.kind === "comparisons";
+  // The pages that win the answer today, so the post covers what they do.
+  const cited =
+    claim.finding.kind === "keywords"
+      ? await readPages(
+          (claim.finding.evidence.citedInstead ?? []).slice(
+            0,
+            AUTOPILOT_KEYWORD_CITED_PAGES
+          ),
+          AUTOPILOT_REFRESH_COMPETITOR_PAGE_MAX_CHARS
+        )
+      : [];
+  if (cited.length > 0) {
+    await log.info(`Read ${cited.length} pages the engines cite instead`, {
+      files: cited.map((page) => page.url),
+    });
+  }
   const sources: AutopilotFactSource[] = [];
   const { diagrams = [], ...written } = await writeBlogPost({
     decisionMemory: params.decisionMemory,
@@ -618,7 +642,13 @@ export async function writeBlogDraft(params: {
     directory,
     postPaths,
     sample: sample ?? null,
-    brief,
+    brief:
+      cited.length > 0
+        ? {
+            ...brief,
+            evidence: `${brief.evidence}\n\n${describeCitedPages(cited)}`,
+          }
+        : brief,
     existing,
     // Comparisons describe another company, so they check its live pages.
     webResearch: comparison,
@@ -1367,30 +1397,63 @@ export async function runKeywordsJob(
     return result;
   }
   // What the engines answered instead, so the writer knows what to beat.
-  const answers =
-    ctx.projectId &&
-    candidates.some((candidate) => candidate.target.kind === "prompt")
-      ? await loadAnswerChecks({
-          projectId: ctx.projectId,
-          since: new Date(Date.now() - AUTOPILOT_COMPARISONS_LOOKBACK_MS),
-          limit: AUTOPILOT_COMPARISONS_MAX_CHECKS,
+  const promptIds = candidates.flatMap((candidate) =>
+    candidate.target.kind === "prompt" ? [candidate.target.promptId] : []
+  );
+  const [checks, ownedHosts, sustained] =
+    ctx.projectId && promptIds.length > 0
+      ? await Promise.all([
+          loadAnswerChecks({
+            projectId: ctx.projectId,
+            since: new Date(Date.now() - AUTOPILOT_COMPARISONS_LOOKBACK_MS),
+            limit: AUTOPILOT_COMPARISONS_MAX_CHECKS,
+          }),
+          loadOwnedHosts(ctx),
+          sustainedGaps(ctx.projectId, promptIds),
+        ]).catch(async (error) => {
+          await log.info("Could not read the AI answers for the brief", {
+            error: toErrorMessage(error, "unknown error"),
+          });
+          return [
+            [],
+            [],
+            new Map<string, { scans: number; days: number }>(),
+          ] as const;
         })
-          .then(answersByPrompt)
-          .catch(async (error) => {
-            await log.info("Could not read the AI answers for the brief", {
-              error: toErrorMessage(error, "unknown error"),
-            });
-            return new Map<string, string>();
-          })
-      : new Map<string, string>();
+      : ([[], [], new Map<string, { scans: number; days: number }>()] as const);
+  const answers = answersByPrompt(checks);
+  const citedInstead = citedInsteadByPrompt(checks, ownedHosts);
+  if (sustained.size > 0) {
+    await log.decision(
+      `${sustained.size} ${sustained.size === 1 ? "gap stayed" : "gaps stayed"} open across scans days apart`,
+      {
+        candidates: candidates
+          .filter(
+            (candidate) =>
+              candidate.target.kind === "prompt" &&
+              sustained.has(candidate.target.promptId)
+          )
+          .map((candidate) => candidate.topic),
+      }
+    );
+  }
 
   result.observations = candidates.map((candidate) => {
-    const answered =
+    const scanIds =
       candidate.target.kind === "prompt"
-        ? (gapScanIds(candidate.target.promptId)
-            .map((scanId) => answers.get(scanId))
-            .find(Boolean) ?? "")
-        : "";
+        ? gapScanIds(candidate.target.promptId)
+        : [];
+    const answered =
+      scanIds.map((scanId) => answers.get(scanId)).find(Boolean) ?? "";
+    const cited =
+      scanIds.map((scanId) => citedInstead.get(scanId)).find(Boolean) ?? [];
+    const lasting =
+      candidate.target.kind === "prompt"
+        ? sustained.get(candidate.target.promptId)
+        : undefined;
+    const evidence = lasting
+      ? `${candidate.evidence} Missing in ${lasting.scans} scans over ${lasting.days} days.`
+      : candidate.evidence;
     const title = candidate.updatePage
       ? `Update "${candidate.updatePage.title}" for "${candidate.topic}"`
       : `Blog post for "${candidate.topic}"`;
@@ -1398,20 +1461,22 @@ export async function runKeywordsJob(
       id: keywordFingerprint(candidate.key),
       source: "keywords" as const,
       title: candidate.topic,
-      detail: candidate.evidence,
+      detail: evidence,
       updatePage: candidate.updatePage,
+      ...(lasting ? { sustained: true } : {}),
       proposal: {
         kind: "keywords" as const,
         fingerprint: keywordFingerprint(candidate.key),
         title,
-        summary: candidate.evidence,
+        summary: evidence,
         evidence: {
           keyword: candidate.key,
           projectId: ctx.projectId,
           competitors: candidate.competitors.slice(0, 5),
-          detail: candidate.evidence,
+          detail: evidence,
           target: candidate.target,
           updatePage: candidate.updatePage,
+          ...(cited.length > 0 ? { citedInstead: cited } : {}),
         },
       },
       brief: {
@@ -1419,7 +1484,7 @@ export async function runKeywordsJob(
         angle: candidate.updatePage
           ? `Update the existing page so it wins the answer for "${candidate.key}"`
           : `Win the AI answer for "${candidate.key}"`,
-        evidence: [candidate.evidence, answered].filter(Boolean).join("\n\n"),
+        evidence: [evidence, answered].filter(Boolean).join("\n\n"),
       },
     };
   });

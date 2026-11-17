@@ -374,17 +374,25 @@ if (process.env.NOTRA_AUTOPILOT_TEMPLATE_FLOW_TEST !== "1") {
   const web = { homeStatus: 200 };
   const homepageText =
     "Deploy models fast. Emberline runs your models. Pricing Docs Blog";
+  const fetchRendered = async (url: string) => {
+    if (url.replace(/\/$/, "") === SITE) {
+      return { markdown: homepageText, text: homepageText };
+    }
+    // The pricing page shares its tagline with the homepage.
+    const text = url.endsWith("/pricing")
+      ? "H100 hourly price: $1.80. Emberline runs your models."
+      : `${url} Modal cold starts take under two seconds with snapshots.`;
+    return { markdown: text, text };
+  };
   mock.module("@/lib/autopilot/pages", () => ({
-    fetchRendered: async (url: string) => {
-      if (url.replace(/\/$/, "") === SITE) {
-        return { markdown: homepageText, text: homepageText };
-      }
-      // The pricing page shares its tagline with the homepage.
-      const text = url.endsWith("/pricing")
-        ? "H100 hourly price: $1.80. Emberline runs your models."
-        : `${url} Modal cold starts take under two seconds with snapshots.`;
-      return { markdown: text, text };
-    },
+    fetchRendered,
+    readPages: async (urls: readonly string[]) =>
+      Promise.all(
+        urls.map(async (url) => ({
+          url,
+          markdown: (await fetchRendered(url)).markdown,
+        }))
+      ),
     fetchPageForCrawlers: async (url: string) => ({
       url,
       status: url.replace(/\/$/, "") === SITE ? web.homeStatus : 200,

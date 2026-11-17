@@ -2089,6 +2089,119 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
     expect(opened).toHaveLength(0);
   });
 
+  test("a gap the brand stayed missing from across scans days apart opens a PR on its own; one scan waits", async () => {
+    // Its own project, removed afterwards: daily runs elsewhere in this file
+    // fall back to the workspace's only project.
+    await db.insert(brandSettings).values({
+      id: "sustained-brand",
+      organizationId: "sandbox-org",
+      name: "Sustained",
+      websiteUrl: "https://sandbox.dev",
+    });
+    await db.insert(projects).values({
+      id: "sustained-project",
+      organizationId: "sandbox-org",
+      name: "Sustained",
+      brandSettingsId: "sustained-brand",
+    });
+    try {
+      const gap = gapRow("Exports");
+      state.gaps = [gap];
+      const scanned = async (
+        scanId: string,
+        daysAgo: number,
+        mentioned = false
+      ) => {
+        await db.insert(geoScans).values({
+          id: scanId,
+          organizationId: "sandbox-org",
+          projectId: "sustained-project",
+          status: "completed",
+        });
+        await db.insert(geoMentionChecks).values({
+          id: `${scanId}-check`,
+          organizationId: "sandbox-org",
+          projectId: "sustained-project",
+          scanId,
+          engine: "chatgpt",
+          promptId: gap.id,
+          prompt: gap.prompt,
+          answer: "",
+          mentioned,
+          competitors: ["Rival"],
+          grounding: { queries: [], sources: [] },
+          sources: [],
+          capturedAt: new Date(Date.now() - daysAgo * DAY_MS),
+        });
+      };
+      const plan = async (runId: string) => {
+        await db.insert(autopilotRuns).values({
+          id: runId,
+          organizationId: "sandbox-org",
+          trigger: "cron",
+        });
+        const ctx = {
+          ...(await buildAutopilotRunContext("sandbox-org", runId)),
+          projectId: "sustained-project",
+        };
+        const observations =
+          (await runAutopilotJob(ctx, "keywords")).observations ?? [];
+        state.plan = plannerOutput(observations.map((row) => row.id));
+        const decision = await decideAutopilotPlan(ctx, observations);
+        await db
+          .update(autopilotRuns)
+          .set({ status: "completed" })
+          .where(eq(autopilotRuns.id, runId));
+        return { observations, decision };
+      };
+
+      // One scan: the gap may be noise, so a single signal still waits.
+      await scanned("sustained-scan-1", 6);
+      const once = await plan("sustained-once");
+      expect(once.observations[0]?.sustained).toBeUndefined();
+      expect(once.decision.outcome).toBe("wait");
+
+      // Missing again five days later, but the scan is still running: some
+      // engines may not have answered yet, so it doesn't count.
+      await scanned("sustained-scan-2", 1);
+      await db
+        .update(geoScans)
+        .set({ status: "running" })
+        .where(eq(geoScans.id, "sustained-scan-2"));
+      const running = await plan("sustained-running");
+      expect(running.observations[0]?.sustained).toBeUndefined();
+      expect(running.decision.outcome).toBe("wait");
+
+      // Finished: lasting demand on its own.
+      await db
+        .update(geoScans)
+        .set({ status: "completed" })
+        .where(eq(geoScans.id, "sustained-scan-2"));
+      const twice = await plan("sustained-twice");
+      expect(twice.observations[0]).toMatchObject({ sustained: true });
+      expect(twice.observations[0]?.detail).toContain(
+        "Missing in 2 scans over 5 days."
+      );
+      expect(twice.decision.outcome).toBe("open");
+      if (twice.decision.outcome === "open") {
+        expect(twice.decision.proposal.evidence.gate).toContainEqual(
+          expect.objectContaining({ name: "signals", ok: true })
+        );
+      }
+
+      // Named in the latest scan: the gap is closing, so it waits again.
+      await scanned("sustained-scan-3", 0, true);
+      const closing = await plan("sustained-closing");
+      expect(closing.observations[0]?.sustained).toBeUndefined();
+      expect(closing.decision.outcome).toBe("wait");
+    } finally {
+      await db.delete(projects).where(eq(projects.id, "sustained-project"));
+      await db
+        .delete(brandSettings)
+        .where(eq(brandSettings.id, "sustained-brand"));
+    }
+  });
+
   test("an AI search gap becomes a keyword idea measured on the prompt whose answers ran the search", async () => {
     await db.insert(brandSettings).values({
       id: "sandbox-brand",

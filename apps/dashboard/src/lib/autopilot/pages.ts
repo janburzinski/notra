@@ -128,6 +128,21 @@ export async function fetchRendered(url: string, maxChars?: number) {
   };
 }
 
+/** Pages read as Markdown; ones that fail or come back empty are left out. */
+export async function readPages(urls: readonly string[], maxChars: number) {
+  const pages = await Promise.all(
+    urls.map(async (url) => {
+      try {
+        const page = await fetchRendered(url, maxChars);
+        return page.markdown.trim() ? { url, markdown: page.markdown } : null;
+      } catch {
+        return null;
+      }
+    })
+  );
+  return pages.filter((page) => page !== null);
+}
+
 export async function fetchPageForCrawlers(
   url: string
 ): Promise<AutopilotPageFetch & { challenged: boolean }> {

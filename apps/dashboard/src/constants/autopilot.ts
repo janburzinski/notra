@@ -219,8 +219,23 @@ export const AUTOPILOT_MENTION_INTENTS = {
     "Anything else: code review, edits to files in this pull request, questions or chat",
 } as const;
 
-/** Prompt gaps where you already show up in more answers than this are left alone. */
-export const AUTOPILOT_KEYWORD_MAX_MENTION_RATE = 0.34;
+/**
+ * Gaps where you already show up in more answers than this are left alone:
+ * Autopilot writes where the brand is missing from at least half of them.
+ * The ranking puts the biggest losses first.
+ */
+export const AUTOPILOT_KEYWORD_MAX_MENTION_RATE = 0.5;
+/**
+ * A prompt gap is sustained when at least this many scans, spread over at
+ * least this long within the lookback and including the latest, each left
+ * the brand out of at least half their answers. One gap like that meets the
+ * planner's signal bar on its own.
+ */
+export const AUTOPILOT_SUSTAINED_GAP_MIN_SCANS = 2;
+export const AUTOPILOT_SUSTAINED_GAP_MIN_SPAN_MS = 3 * 24 * 60 * 60 * 1000;
+export const AUTOPILOT_SUSTAINED_GAP_LOOKBACK_MS = 30 * 24 * 60 * 60 * 1000;
+/** Pages AI answers cite instead of the brand that a gap's writer reads. */
+export const AUTOPILOT_KEYWORD_CITED_PAGES = 2;
 /** The engines' own searches quoted in a prompt gap's evidence. */
 export const AUTOPILOT_GAP_SEARCHES_SHOWN = 2;
 

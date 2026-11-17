@@ -17,6 +17,11 @@ export interface AutopilotObservation {
   detail: string;
   /** An existing page this would rewrite instead of adding a post. */
   updatePage?: { url: string; title: string } | null;
+  /**
+   * A content gap the brand stayed missing from across several scans days
+   * apart: real, lasting demand rather than one noisy answer.
+   */
+  sustained?: boolean;
 }
 
 export interface AutopilotTopicSignal {
@@ -26,6 +31,7 @@ export interface AutopilotTopicSignal {
   detail: string;
   runId: string;
   seenAt: string;
+  sustained?: boolean;
 }
 
 export type AutopilotTopicStatus =

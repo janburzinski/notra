@@ -2,13 +2,20 @@ import { db } from "@notra/db/drizzle";
 import {
   geoAgentReadinessReports,
   geoMentionChecks,
+  geoScans,
   projects,
 } from "@notra/db/schema";
 import type { AutopilotImpactTarget } from "@notra/db/types/autopilot";
 import { gapScanIds, promptIdFromScanId } from "@notra/geo-core/geo/prompts";
 import { and, count, desc, eq, gt, inArray, sql } from "drizzle-orm";
 
-import { AUTOPILOT_IMPACT_WINDOW_MS } from "@/constants/autopilot";
+import {
+  AUTOPILOT_IMPACT_WINDOW_MS,
+  AUTOPILOT_KEYWORD_MAX_MENTION_RATE,
+  AUTOPILOT_SUSTAINED_GAP_LOOKBACK_MS,
+  AUTOPILOT_SUSTAINED_GAP_MIN_SCANS,
+  AUTOPILOT_SUSTAINED_GAP_MIN_SPAN_MS,
+} from "@/constants/autopilot";
 import type {
   AutopilotImpact,
   AutopilotFindingRow as FindingRow,
@@ -42,6 +49,85 @@ async function mentionRateSince(
       )
     );
   return row && row.total > 0 ? row.mentioned / row.total : null;
+}
+
+/**
+ * Prompts the brand was missing from in several separate scans days apart,
+ * the latest one included, with how many scans and over how many days. A
+ * scan counts when the brand is missing from at least half of that scan's
+ * answers, the same bar a gap has to clear. Re-reading one snapshot every day
+ * is not persistence; separate scans are.
+ */
+export async function sustainedGaps(
+  projectId: string,
+  promptIds: readonly string[]
+) {
+  const sustained = new Map<string, { scans: number; days: number }>();
+  if (promptIds.length === 0) {
+    return sustained;
+  }
+  const rows = await db
+    .select({
+      scanPromptId: geoMentionChecks.promptId,
+      scanId: geoMentionChecks.scanId,
+      total: count(),
+      mentioned:
+        sql<number>`count(*) filter (where ${geoMentionChecks.mentioned})`.mapWith(
+          Number
+        ),
+      at: sql<Date>`max(${geoMentionChecks.capturedAt})`.mapWith(
+        (value) => new Date(value)
+      ),
+    })
+    .from(geoMentionChecks)
+    // Only finished scans: one still running has saved some engines and not
+    // others, so its share says nothing yet.
+    .innerJoin(
+      geoScans,
+      and(
+        eq(geoScans.id, geoMentionChecks.scanId),
+        eq(geoScans.status, "completed")
+      )
+    )
+    .where(
+      and(
+        eq(geoMentionChecks.projectId, projectId),
+        eq(geoMentionChecks.turn, 0),
+        inArray(geoMentionChecks.promptId, promptIds.flatMap(gapScanIds)),
+        gt(
+          geoMentionChecks.capturedAt,
+          new Date(Date.now() - AUTOPILOT_SUSTAINED_GAP_LOOKBACK_MS)
+        )
+      )
+    )
+    .groupBy(geoMentionChecks.promptId, geoMentionChecks.scanId);
+  const scansByPrompt = new Map<string, { missed: boolean; at: Date }[]>();
+  for (const row of rows) {
+    const promptId = promptIdFromScanId(row.scanPromptId);
+    scansByPrompt.set(promptId, [
+      ...(scansByPrompt.get(promptId) ?? []),
+      {
+        missed: row.mentioned / row.total <= AUTOPILOT_KEYWORD_MAX_MENTION_RATE,
+        at: row.at,
+      },
+    ]);
+  }
+  for (const [promptId, scans] of scansByPrompt) {
+    const latest = scans.reduce((a, b) => (b.at > a.at ? b : a));
+    const missed = scans.filter((scan) => scan.missed);
+    if (!latest.missed || missed.length < AUTOPILOT_SUSTAINED_GAP_MIN_SCANS) {
+      continue;
+    }
+    const times = missed.map((scan) => scan.at.getTime());
+    const spanMs = Math.max(...times) - Math.min(...times);
+    if (spanMs >= AUTOPILOT_SUSTAINED_GAP_MIN_SPAN_MS) {
+      sustained.set(promptId, {
+        scans: missed.length,
+        days: Math.round(spanMs / (24 * 60 * 60 * 1000)),
+      });
+    }
+  }
+  return sustained;
 }
 
 /**

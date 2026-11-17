@@ -31,6 +31,7 @@ import {
   AUTOPILOT_LINKS_GSC_ROW_LIMIT,
 } from "@/constants/autopilot-links";
 import {
+  AUTOPILOT_REFRESH_COMPETITOR_PAGE_MAX_CHARS,
   AUTOPILOT_REFRESH_COMPETITOR_PAGES,
   AUTOPILOT_REFRESH_MAX_CHECKS,
   AUTOPILOT_REFRESH_WINDOW_MS,
@@ -61,9 +62,13 @@ import {
   withAutopilotFindingLease,
 } from "@/lib/autopilot/leases";
 import { createAutopilotLogger } from "@/lib/autopilot/log";
-import { fetchPageAttributes, fetchRendered } from "@/lib/autopilot/pages";
+import {
+  fetchPageAttributes,
+  fetchRendered,
+  readPages,
+} from "@/lib/autopilot/pages";
 import { scheduleAutopilotPublish } from "@/lib/autopilot/publish";
-import { readBrandFacts, readPages } from "@/lib/autopilot/refresh";
+import { readBrandFacts } from "@/lib/autopilot/refresh";
 import { runRepositoryAgent } from "@/lib/autopilot/repository-agent";
 import { requestDraftReviewers } from "@/lib/autopilot/reviewers";
 import { loadDecisionMemory } from "@/lib/autopilot/rules";
@@ -446,7 +451,8 @@ export async function writeLanding(params: {
       (candidate.drop?.citedInstead ?? []).slice(
         0,
         AUTOPILOT_REFRESH_COMPETITOR_PAGES
-      )
+      ),
+      AUTOPILOT_REFRESH_COMPETITOR_PAGE_MAX_CHARS
     ),
     readBrandFacts(ctx, candidate.url),
     loadDecisionMemory(ctx.organizationId),

@@ -361,6 +361,7 @@ export function applyPlannerOutput(params: {
       detail: observation.detail.slice(0, AUTOPILOT_SIGNAL_DETAIL_MAX_CHARS),
       runId,
       seenAt: at,
+      ...(observation.sustained ? { sustained: true } : {}),
     };
     topic.signals = [
       ...topic.signals.filter((row) => row.observationId !== observation.id),
@@ -520,6 +521,15 @@ export function evaluateAutopilotGate(params: {
         signal.source === "keywords" &&
         new Date(signal.seenAt).getTime() >= demandSince
     ) ?? false;
+  // One gap the brand stayed missing from across scans days apart is lasting
+  // demand on its own; the second-signal bar exists to filter one-off noise.
+  const sustained =
+    topic?.signals.some(
+      (signal) =>
+        signal.source === "keywords" &&
+        signal.sustained === true &&
+        new Date(signal.seenAt).getTime() >= demandSince
+    ) ?? false;
   // A merged or dismissed topic is never reopened on the model's word alone.
   const closed = topic?.status === "done" || topic?.status === "dismissed";
   let demandDetail = "Only shipped pull requests, nobody asking for it yet";
@@ -543,8 +553,11 @@ export function evaluateAutopilotGate(params: {
     },
     {
       name: "signals",
-      ok: signals >= AUTOPILOT_TOPIC_MIN_SIGNALS,
-      detail: `${signals} of ${AUTOPILOT_TOPIC_MIN_SIGNALS} independent signals`,
+      ok: signals >= AUTOPILOT_TOPIC_MIN_SIGNALS || sustained,
+      detail:
+        sustained && signals < AUTOPILOT_TOPIC_MIN_SIGNALS
+          ? "A content gap that stayed open across scans days apart"
+          : `${signals} of ${AUTOPILOT_TOPIC_MIN_SIGNALS} independent signals`,
     },
     {
       name: "demand",

@@ -70,6 +70,84 @@ function countTop(values: string[], max: number) {
     .map(([value]) => value);
 }
 
+/**
+ * Text from outside (answers, other sites) with the fence markers taken out,
+ * so it can't close the fence early and slip past the fact check.
+ */
+function fenceSafe(text: string) {
+  return text
+    .replaceAll(AUTOPILOT_ANSWERS_BEGIN, "")
+    .replaceAll(AUTOPILOT_ANSWERS_END, "");
+}
+
+/**
+ * Per prompt the brand is missing from: the pages those answers cite most,
+ * leaving out the brand's own.
+ */
+export function citedInsteadByPrompt(
+  checks: readonly AutopilotAnswerCheck[],
+  ownedHosts: readonly string[]
+) {
+  // Per prompt, each page once per answer, keyed so /guide#a and /guide#b
+  // are one page; the first URL seen is the one fetched.
+  const pages = new Map<
+    string,
+    Map<string, { url: string; answers: number }>
+  >();
+  for (const check of checks) {
+    if (check.mentioned) {
+      continue;
+    }
+    const byKey = pages.get(check.promptId) ?? new Map();
+    pages.set(check.promptId, byKey);
+    const seen = new Set<string>();
+    for (const url of check.sourceUrls) {
+      const key = citationKey(url);
+      if (!key || seen.has(key) || isOwnedKey(key, ownedHosts)) {
+        continue;
+      }
+      seen.add(key);
+      const page = byKey.get(key);
+      byKey.set(key, {
+        url: page?.url ?? url,
+        answers: (page?.answers ?? 0) + 1,
+      });
+    }
+  }
+  return new Map(
+    [...pages].map(([promptId, byKey]) => [
+      promptId,
+      [...byKey.entries()]
+        .sort((a, b) => b[1].answers - a[1].answers || a[0].localeCompare(b[0]))
+        .slice(0, AUTOPILOT_REFRESH_MAX_CITED_INSTEAD)
+        .map(([, page]) => page.url),
+    ])
+  );
+}
+
+/**
+ * The pages AI answers cite instead of the brand, for the writer to cover
+ * and beat. Fenced like the answers, so the fact check never treats them as
+ * a source.
+ */
+export function describeCitedPages(
+  pages: readonly { url: string; markdown: string }[]
+) {
+  if (pages.length === 0) {
+    return "";
+  }
+  return [
+    AUTOPILOT_ANSWERS_BEGIN,
+    "Pages the AI answers cite instead of the brand. Cover what they cover and answer the question better; never take facts about any product from them:",
+    ...pages.flatMap((page) => [
+      "",
+      `Cited instead: ${page.url}`,
+      fenceSafe(page.markdown),
+    ]),
+    AUTOPILOT_ANSWERS_END,
+  ].join("\n");
+}
+
 /** What AI answers said and cited, fenced for the writer; empty when there is nothing. */
 export function describeAnswers(params: {
   excerpts: readonly string[];
@@ -77,7 +155,7 @@ export function describeAnswers(params: {
 }) {
   const excerpts = params.excerpts
     .map((excerpt) =>
-      excerpt
+      fenceSafe(excerpt)
         .trim()
         .replace(/\s+/g, " ")
         .slice(0, AUTOPILOT_ANSWER_EXCERPT_MAX_CHARS)

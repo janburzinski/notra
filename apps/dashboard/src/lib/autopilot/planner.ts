@@ -300,12 +300,13 @@ export async function decideAutopilotPlan(
     feedback: decisionMemory.feedback,
     state: synced,
     observations: observations.map(
-      ({ id, source, title, detail, updatePage }) => ({
+      ({ id, source, title, detail, updatePage, sustained }) => ({
         id,
         source,
         title,
         detail,
         updatePage: updatePage ?? null,
+        ...(sustained ? { sustained: true } : {}),
       })
     ),
     existingPosts,

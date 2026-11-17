@@ -58,7 +58,7 @@ import {
 import { loadPostSite, resolveLiveUrl } from "@/lib/autopilot/live";
 import { generateAutopilotObject } from "@/lib/autopilot/llm";
 import { createAutopilotLogger } from "@/lib/autopilot/log";
-import { fetchRendered, resolveLinks } from "@/lib/autopilot/pages";
+import { readPages, resolveLinks } from "@/lib/autopilot/pages";
 import { scheduleAutopilotPublish } from "@/lib/autopilot/publish";
 import { requestDraftReviewers } from "@/lib/autopilot/reviewers";
 import { loadDecisionMemory } from "@/lib/autopilot/rules";
@@ -435,24 +435,6 @@ function describeEvidence(check: AutopilotRefreshCheck) {
   ].join("\n");
 }
 
-/** Each page's rendered Markdown, leaving out the ones that fail or are empty. */
-export async function readPages(urls: string[]) {
-  const pages = await Promise.all(
-    urls.map(async (url) => {
-      try {
-        const page = await fetchRendered(
-          url,
-          AUTOPILOT_REFRESH_COMPETITOR_PAGE_MAX_CHARS
-        );
-        return page.markdown.trim() ? { url, markdown: page.markdown } : null;
-      } catch {
-        return null;
-      }
-    })
-  );
-  return pages.filter((page) => page !== null);
-}
-
 /**
  * The brand's own pricing and plan pages, so a refresh states today's
  * figures instead of keeping old ones.
@@ -479,7 +461,10 @@ export async function readBrandFacts(
     )
     .orderBy(asc(brandSitemapPages.path))
     .limit(AUTOPILOT_REFRESH_BRAND_PAGES);
-  return readPages(rows.map((row) => row.url));
+  return readPages(
+    rows.map((row) => row.url),
+    AUTOPILOT_REFRESH_COMPETITOR_PAGE_MAX_CHARS
+  );
 }
 
 /**
@@ -501,7 +486,8 @@ export async function writeRefresh(params: {
         check.candidate.drop.citedInstead.slice(
           0,
           AUTOPILOT_REFRESH_COMPETITOR_PAGES
-        )
+        ),
+        AUTOPILOT_REFRESH_COMPETITOR_PAGE_MAX_CHARS
       ),
       readBrandFacts(ctx, check.candidate.url),
       loadDecisionMemory(ctx.organizationId),

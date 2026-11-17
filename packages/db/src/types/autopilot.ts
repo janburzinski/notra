@@ -78,6 +78,8 @@ export interface AutopilotFindingEvidence {
   target?: AutopilotImpactTarget | null;
   /** An existing page the pull request rewrites instead of adding a post. */
   updatePage?: { url: string; title: string } | null;
+  /** Pages AI answers cite instead of the brand for a gap; the writer reads the top ones. */
+  citedInstead?: string[];
   /** How Jev chose this over the other candidates of the same run. */
   decision?: AutopilotFindingDecision | null;
   /** Written by the daily run because nobody dismissed the idea in time (before the planner). */
