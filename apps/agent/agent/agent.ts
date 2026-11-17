@@ -27,6 +27,7 @@ export default defineAgent({
       "pg",
       "satori",
       "satori-html",
+      "sharp",
       "zod",
     ],
   },

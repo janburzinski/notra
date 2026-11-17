@@ -24,7 +24,7 @@ function buildTaskMessage(options: AgentContentTaskOptions): string {
     .join("\n");
 
   return [
-    "Call generate_content exactly once with the complete task below. It waits for the content-writer's final result. Then report that structured result via final_output without changing it. Do not call the background content-writer subagent directly or respond with a progress acknowledgement.",
+    "Call generate_content exactly once with the complete task below. It waits for the content-writer's final result. Then report that structured result via eve__reply without changing it. Do not call the background content-writer subagent directly or respond with a progress acknowledgement.",
     "",
     `Task for content-writer: produce one ${options.contentLabel} (contentType: ${options.contentType}).`,
     "",
@@ -62,7 +62,6 @@ export async function generateContentViaAgentTask(
         },
       },
       message: buildTaskMessage(options),
-      mode: "task",
       outputSchema: z.toJSONSchema(contentWriterResultSchema),
     });
 

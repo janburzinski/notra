@@ -14,6 +14,7 @@ import {
 } from "@notra/schemas/dashboard/slack-relay";
 
 import type { SlackRelayTarget } from "@/types/slack-relay";
+import { findSlackButton, isEveInteractionButton } from "@/utils/slack-blocks";
 
 const TRAILING_SLASH_REGEX = /\/$/u;
 
@@ -181,26 +182,24 @@ async function findApprovalCard(input: {
     throw new Error("Slack approval relay could not load the thread");
   }
 
-  const actionPrefix = `eve_input:${input.requestId}:button:`;
   const wantedValue = input.approved ? "approve" : "deny";
   for (const message of parsed.data.messages ?? []) {
     if (!message.bot_id) {
       continue;
     }
-    for (const block of message.blocks ?? []) {
-      for (const element of block.elements ?? []) {
-        if (
-          element.action_id?.startsWith(actionPrefix) &&
-          element.value === wantedValue
-        ) {
-          return {
-            cardTs: message.ts,
-            blocks: message.blocks ?? [],
-            actionId: element.action_id,
-            value: element.value,
-          };
-        }
-      }
+    const button = findSlackButton(
+      message.blocks ?? [],
+      (element) =>
+        element.value === wantedValue &&
+        isEveInteractionButton(element.action_id, input.requestId)
+    );
+    if (button?.action_id) {
+      return {
+        cardTs: message.ts,
+        blocks: message.blocks ?? [],
+        actionId: button.action_id,
+        value: wantedValue,
+      };
     }
   }
   return null;

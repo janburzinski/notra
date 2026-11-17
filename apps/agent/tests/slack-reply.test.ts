@@ -4,11 +4,7 @@ import {
   SLACK_MARKDOWN_TEXT_MAX_LENGTH,
   SLACK_PERMISSION_ERROR_PATTERN,
 } from "../agent/lib/constants/slack";
-import {
-  getErrorId,
-  postSlackReply,
-  withErrorId,
-} from "../agent/lib/utils/slack-reply";
+import { postSlackReply, withErrorId } from "../agent/lib/utils/slack-reply";
 
 function fakeChannel(threadTs: string, options: { failUpload?: boolean } = {}) {
   const posts: string[] = [];
@@ -73,10 +69,8 @@ describe("Slack replies", () => {
   });
 
   test("failure messages include eve's error id without raw error text", () => {
-    const errorId = getErrorId({ errorId: "err_1", message: "db down" });
-    expect(errorId).toBe("err_1");
-    expect(withErrorId("Oops.", errorId)).toBe("Oops.\n\n_Error id: `err_1`_");
-    expect(withErrorId("Oops.", getErrorId(undefined))).toBe("Oops.");
+    expect(withErrorId("Oops.", "err_1")).toBe("Oops.\n\n_Error id: `err_1`_");
+    expect(withErrorId("Oops.", null)).toBe("Oops.");
   });
 
   test("only whole Slack permission error codes count as permission errors", () => {

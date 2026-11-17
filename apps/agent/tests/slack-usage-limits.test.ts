@@ -1,11 +1,7 @@
 import { describe, expect, test } from "bun:test";
-import { realpathSync } from "node:fs";
 import { resolve } from "node:path";
 
 function runSlackUsageScenario(scenario: string) {
-  const runtime = realpathSync(
-    resolve(import.meta.dir, "../node_modules/eve/dist/src")
-  );
   const channelPath = resolve(import.meta.dir, "../agent/channels/slack.ts");
   const mirrorPath = resolve(
     import.meta.dir,
@@ -22,7 +18,6 @@ import assert from "node:assert/strict";
 import { createHmac } from "node:crypto";
 import { Effect } from "effect";
 const scenario = ${JSON.stringify(scenario)};
-const runtimePath = ${JSON.stringify(runtime)};
 process.env.SLACK_AGENT_SIGNING_SECRET = "fixture-signing-secret";
 const installation = { slackTeamId: "T-install", organizationId: "org-install", enabled: true, allowedChannelIds: null, botToken: "fixture-install" };
 mock.module("@notra/ai/integrations/slack-workspace", () => ({
@@ -62,27 +57,20 @@ globalThis.fetch = async (url, init) => {
   if (name === "conversations.replies") return Response.json({ ok: true, messages: [] });
   return Response.json({ ok: true, ts: "posted-message" });
 };
-const { createSession } = await import(runtimePath + "/channel/session.js");
-const { createChannelAddress } = await import(runtimePath + "/channel/channel-address.js");
 const threaded = scenario !== "allowed-mention";
 let owner = threaded ? "original-session" : undefined;
-const exactSends = [];
-const created = [];
-const runtime = {
-  resolveContinuation: async () => owner ? { sessionId: owner } : undefined,
-  dispatchSession: async ({ sessionId, command }) => {
-    if (command.kind === "send") exactSends.push(command);
-    return { status: "accepted", sessionId, deliveryId: "fixture-delivery" };
-  },
-  dispatchContinuation: async () => ({ status: "session_not_active" }),
-  createSession: async (input) => { created.push(input); owner = "new-session"; return { sessionId: owner }; },
-};
-const address = createChannelAddress({ channelName: "slack", continuationToken: "C-room:1.0", adapter: { kind: "slack", state: {} }, runtime });
+const sends = [];
 const { default: channel } = await import(${JSON.stringify(channelPath)});
 const tasks = [];
 const args = {
-  from: () => address,
-  resolveSession: async () => owner ? createSession(owner, runtime) : undefined,
+  from: (address) => ({
+    send: async (message, options) => {
+      sends.push({ address, message, options });
+      owner ??= "new-session";
+      return { sessionId: owner, deliveryId: "fixture-delivery" };
+    },
+  }),
+  resolveSession: async () => owner ? { id: owner } : undefined,
   waitUntil: (task) => tasks.push(task), params: {}, requestIp: null,
 };
 const body = JSON.stringify({ type: "event_callback", team_id: "T-install", api_app_id: "A-notra", event_id: "event-1", authorizations: [{ is_bot: true, team_id: "T-install", user_id: "U-notra" }],
@@ -100,7 +88,7 @@ await Promise.all(tasks);
 assert.deepEqual(billingCalls, ["org-install"]);
 assert.deepEqual(rateLimitCalls, [["org-install", "slack:T-install:U-human"]]);
 const ephemerals = outbound.filter((call) => call.name === "chat.postEphemeral");
-const turns = [...exactSends.map((command) => command.auth), ...created.map((input) => JSON.stringify(input))];
+const turns = sends;
 const notices = {
   "out-of-credits": "out of AI credits",
   "rate-limited": "sending messages too quickly",
@@ -113,16 +101,10 @@ if (scenario in notices) {
   const text = JSON.stringify(ephemerals[0].body);
   assert(text.includes(notices[scenario]));
   assert(!outbound.some((call) => call.name === "assistant.threads.setStatus" && call.body.status));
-} else if (scenario === "allowed-mention") {
-  assert.equal(ephemerals.length, 0);
-  assert.equal(created.length, 1);
-  const input = JSON.stringify(created[0]);
-  assert(input.includes('"useMarkup":"true"'));
-  assert(input.includes('"chargeAiCredits":"true"'));
 } else {
   assert.equal(ephemerals.length, 0);
-  assert.equal(exactSends.length, 1);
-  const attributes = exactSends[0].auth.attributes;
+  assert.equal(sends.length, 1);
+  const attributes = sends[0].options.auth.attributes;
   assert.equal(attributes.organizationId, "org-install");
   assert.equal(attributes.useMarkup, "true");
   assert.equal(attributes.chargeAiCredits, "true");

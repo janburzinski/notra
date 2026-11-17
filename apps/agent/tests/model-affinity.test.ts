@@ -10,15 +10,16 @@ test("chat and task turns run on the assistant model, tasks with low reasoning",
       `
 import assert from "node:assert/strict";
 import { mock } from "bun:test";
-mock.module("eve", () => ({ defineDynamic: (value) => value }));
+mock.module("eve/models", () => ({ defineDynamic: (value) => value }));
 mock.module("@notra/tools/utils/organization", () => ({ getOrganizationId: () => "org-1" }));
 const { createAssistantModel } = await import("./agent/lib/utils/model.ts");
 const { ASSISTANT_MODEL_ID } = await import("./agent/lib/constants/models.ts");
 delete process.env.AI_SDK_DEVTOOLS;
-const route = createAssistantModel().events["step.started"];
+const route = createAssistantModel();
 function select(turnId, surface) {
-  return route({ data: { turnId } }, {
+  return route({
     session: { id: "thread-1", auth: { current: { attributes: { surface } } } },
+    turn: { id: turnId },
   });
 }
 const chat = select("1", "standalone-chat");

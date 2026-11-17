@@ -48,7 +48,7 @@ export async function createAgentClient(scope: ApiAgentScope): Promise<Client> {
 
   const clientOptions = {
     headers,
-    host: getNotraAgentUrl(),
+    baseUrl: getNotraAgentUrl(),
     redirect: "error" as const,
   };
 

@@ -47,8 +47,12 @@ afterEach(() => {
 
 describe("scan_geo_prompt", () => {
   test("asks the person first, and never scans from a background task", () => {
-    expect(tool.approval(context("chat"))).toBe("user-approval");
-    expect(tool.approval(context("task"))).toMatchObject({ type: "denied" });
+    expect(tool.approval.request(context("chat"))).toBe("user-approval");
+    expect(tool.approval.request(context("task"))).toMatchObject({
+      type: "denied",
+    });
+    // Approval cards are collaborative, so anyone who sees one may answer.
+    expect(tool.approval.response()).toEqual({ status: "allowed" });
   });
 
   test("hands the prompt and engines to the dashboard for this workspace", async () => {

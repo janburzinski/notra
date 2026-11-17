@@ -19,7 +19,7 @@
     "@notra/utils": "workspace:*",
     "drizzle-orm": "catalog:",
     "effect": "catalog:",
-    "eve": "0.19.0",
+    "eve": "1.0.2",
     "post-for-me": "^2.9.1",
     "zod": "catalog:"
   },

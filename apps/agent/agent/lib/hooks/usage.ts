@@ -15,6 +15,7 @@ import {
   getBooleanSessionAttribute,
   getSessionAttribute,
 } from "@notra/tools/utils/session";
+import { runs } from "eve/events";
 import {
   defineHook,
   type HookContext,
@@ -123,6 +124,32 @@ async function trackUsage(
   }
 }
 
+/**
+ * The model runs v26 billed through `step.completed`: the session's own
+ * completed model calls in a turn. Skips usage eve records for retried or
+ * abandoned attempts, compaction summaries (owned by a context change), tool
+ * side calls such as `decide()`, and spend a child session reports back to
+ * its parent, which the child's own usage hook already bills.
+ */
+function billableModelRun(
+  event: HookEvent<"usage.recorded">,
+  ctx: HookContext<"usage.recorded">
+): { runId: string; turnId: string } | null {
+  const { kind, owner } = event.data;
+  if (kind !== "model" || !(owner && "runId" in owner)) {
+    return null;
+  }
+  if (event.scope?.changeId) {
+    return null;
+  }
+  const run = runs(ctx.view).find((item) => item.runId === owner.runId);
+  if (run && !(run.status === "settled" && run.outcome === "completed")) {
+    return null;
+  }
+  const turnId = event.scope?.turnId ?? run?.turnId ?? ctx.turn?.id;
+  return turnId ? { runId: owner.runId, turnId } : null;
+}
+
 function shouldChargeAiCredits(ctx: Parameters<typeof getSessionAttribute>[0]) {
   return getSessionAttribute(ctx, "chargeAiCredits") !== "false";
 }
@@ -134,8 +161,8 @@ export function createUsageHook(
     typeof modelId === "string" ? modelId : modelId(turnId);
 
   async function settleTurn(
-    event: HookEvent<"turn.completed" | "turn.failed" | "turn.cancelled">,
-    ctx: HookContext
+    event: HookEvent<"turn.settled">,
+    ctx: HookContext<"turn.settled">
   ) {
     const key = accumulatorKey(ctx.session.id, event.data.turnId);
     const billedKey = billedKeyFor(ctx.session.id, event.data.turnId);
@@ -234,27 +261,33 @@ export function createUsageHook(
 
   return defineHook({
     events: {
-      async "step.completed"(event, ctx) {
+      async "usage.recorded"(event, ctx) {
+        let turnId: string | undefined;
         try {
+          const billed = billableModelRun(event, ctx);
+          if (!billed) {
+            return;
+          }
+          turnId = billed.turnId;
+          const { runId } = billed;
           if (allowUnmeteredAiInDevelopment || !shouldChargeAiCredits(ctx)) {
             return;
           }
           const organizationId = getOrganizationId(ctx);
-          const usage = event.data.usage;
-          if (!(organizationId && usage)) {
+          if (!organizationId) {
             return;
           }
           // eve reports the AI SDK counts, where the prompt total still
           // contains the cached tokens.
-          const billable = toAgentTokenUsage(usage);
+          const billable = toAgentTokenUsage(event.data.usage);
           // Eve's costUsd is the Gateway charge, not a verified total including
-          // separately billed BYOK inference. Keep per-step token pricing.
+          // separately billed BYOK inference. Keep per-run token pricing.
           const costUsd = calculateTokenCostUsd(
             billable,
-            resolveModelId(event.data.turnId)
+            resolveModelId(turnId)
           );
           const costMicroUsd = Math.round(costUsd * MICRO_USD_PER_USD);
-          const stepUsage: AccumulatedUsage = {
+          const runUsage: AccumulatedUsage = {
             inputTokens: billable.inputTokens,
             outputTokens: billable.outputTokens,
             cacheReadTokens: billable.cacheReadTokens,
@@ -263,33 +296,28 @@ export function createUsageHook(
           };
 
           if (!redis) {
-            await trackUsage(
-              resolveModelId(event.data.turnId),
-              organizationId,
-              stepUsage,
-              {
-                ...usageProperties(ctx, event.data.turnId),
-                step_index: event.data.stepIndex,
-              }
-            );
+            await trackUsage(resolveModelId(turnId), organizationId, runUsage, {
+              ...usageProperties(ctx, turnId),
+              run_id: runId,
+            });
             return;
           }
 
-          const stepKey = `agent:usage:step:${ctx.session.id}:${event.data.turnId}:${event.data.stepIndex}`;
-          const key = accumulatorKey(ctx.session.id, event.data.turnId);
+          const runKey = `agent:usage:step:${ctx.session.id}:${turnId}:${runId}`;
+          const key = accumulatorKey(ctx.session.id, turnId);
           const accumulated = await redis.eval<number[], number>(
             ACCUMULATE_USAGE_SCRIPT,
             [
-              stepKey,
+              runKey,
               key,
               `${key}:billing`,
-              billedKeyFor(ctx.session.id, event.data.turnId),
+              billedKeyFor(ctx.session.id, turnId),
             ],
             [
-              stepUsage.inputTokens,
-              stepUsage.outputTokens,
-              stepUsage.cacheReadTokens,
-              stepUsage.cacheWriteTokens,
+              runUsage.inputTokens,
+              runUsage.outputTokens,
+              runUsage.cacheReadTokens,
+              runUsage.cacheWriteTokens,
               costMicroUsd,
               USAGE_KEY_TTL_SECONDS,
             ]
@@ -300,7 +328,7 @@ export function createUsageHook(
               undefined,
               {
                 sessionId: ctx.session.id,
-                turnId: event.data.turnId,
+                turnId,
                 billingKey: key,
                 reason: "usage_during_or_after_settlement",
                 automaticRetry: false,
@@ -310,13 +338,11 @@ export function createUsageHook(
         } catch (error) {
           logError("[agent] Usage accumulation failed", error, {
             sessionId: ctx.session.id,
-            turnId: event.data.turnId,
+            turnId,
           });
         }
       },
-      "turn.completed": settleTurn,
-      "turn.failed": settleTurn,
-      "turn.cancelled": settleTurn,
+      "turn.settled": settleTurn,
     },
   });
 }

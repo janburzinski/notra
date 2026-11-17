@@ -14,12 +14,13 @@ import {
 import type { MirrorChatStatus } from "@notra/ai/types/chat";
 import { getSessionAttribute } from "@notra/tools/utils/session";
 import { Effect } from "effect";
-import type {
-  ActionResultStreamEvent,
-  InputRequestedStreamEvent,
-  MessageAppendedStreamEvent,
-} from "eve/client";
 import type { SessionContext } from "eve/context";
+import {
+  call,
+  type CallSettled,
+  type ContentDelta,
+  type InteractionOpened,
+} from "eve/events";
 import type { HookContext } from "eve/hooks";
 
 import {
@@ -31,11 +32,18 @@ import {
 } from "../constants/chat-mirror";
 import { ASSISTANT_MODEL_ID } from "../constants/models";
 import { ChatMirrorError } from "../schemas/chat-mirror";
-import type { MirrorTarget, MirrorUiMessage } from "../types/chat-mirror";
+import type {
+  MirrorEventContext,
+  MirrorTarget,
+  MirrorUiMessage,
+} from "../types/chat-mirror";
 
 const SNAKE_SEGMENT_REGEX = /_([a-z0-9])/gu;
 
-const deltaBuffers = new Map<string, { publishedAt: number; text: string }>();
+const deltaBuffers = new Map<
+  string,
+  { mirrored: boolean; publishedAt: number; text: string }
+>();
 
 function mirrorStep<T>(
   operation: string,
@@ -225,27 +233,49 @@ export function mirrorAssistantMetadata() {
   return { model: ASSISTANT_MODEL_ID };
 }
 
+/** The id of the mirrored message for one streamed text part of a reply. */
+export function assistantMessageId(sessionId: string, partId: string) {
+  return `eve:${sessionId}:${partId}`;
+}
+
+function rememberDeltaBuffer(
+  messageId: string,
+  buffer: { mirrored: boolean; publishedAt: number; text: string }
+) {
+  if (deltaBuffers.size >= MIRROR_DELTA_THROTTLE_MAX_ENTRIES) {
+    const oldestKey = deltaBuffers.keys().next().value;
+    if (oldestKey !== undefined) {
+      deltaBuffers.delete(oldestKey);
+    }
+  }
+  deltaBuffers.set(messageId, buffer);
+}
+
 export async function mirrorAssistantDelta(
   ctx: SessionContext,
-  data: MessageAppendedStreamEvent["data"]
+  event: ContentDelta
 ): Promise<void> {
   const target = getMirrorTarget(ctx);
   if (!target) {
     return;
   }
 
-  const messageId = `eve:${target.sessionId}:${data.turnId}:${data.stepIndex}`;
-  const buffer = deltaBuffers.get(messageId) ?? { publishedAt: 0, text: "" };
-  buffer.text += data.messageDelta;
-  if (!deltaBuffers.has(messageId)) {
-    if (deltaBuffers.size >= MIRROR_DELTA_THROTTLE_MAX_ENTRIES) {
-      const oldestKey = deltaBuffers.keys().next().value;
-      if (oldestKey !== undefined) {
-        deltaBuffers.delete(oldestKey);
-      }
+  const { data } = event;
+  const messageId = assistantMessageId(target.sessionId, data.partId);
+  let buffer = deltaBuffers.get(messageId);
+  if (!buffer) {
+    // Only the record that announces a part names its kind. Reasoning and
+    // parts announced before this process saw them stay unmirrored.
+    if (data.kind === undefined) {
+      return;
     }
-    deltaBuffers.set(messageId, buffer);
+    buffer = { mirrored: data.kind === "text", publishedAt: 0, text: "" };
+    rememberDeltaBuffer(messageId, buffer);
   }
+  if (!buffer.mirrored) {
+    return;
+  }
+  buffer.text += data.delta;
 
   const now = Date.now();
   if (
@@ -270,39 +300,42 @@ export async function mirrorAssistantDelta(
 }
 
 export async function mirrorToolApprovals(
-  ctx: SessionContext,
-  data: InputRequestedStreamEvent["data"]
+  ctx: MirrorEventContext,
+  event: InteractionOpened
 ): Promise<void> {
+  const { data } = event;
+  if (data.request.kind !== "approval" || !("callId" in data.subject)) {
+    return;
+  }
   const target = getMirrorTarget(ctx);
   if (!target) {
     return;
   }
 
-  for (const request of data.requests) {
-    if (request.action.kind !== "tool-call") {
-      continue;
-    }
-    const message: MirrorUiMessage = {
-      id: toolMessageId(target.sessionId, request.action.callId),
-      role: "assistant",
-      parts: [
-        {
-          type: mirrorToolPartType(request.action.toolName),
-          toolCallId: request.action.callId,
-          state: "approval-requested",
-          input: request.action.input,
-          approval: { id: request.requestId },
-        },
-      ],
-    };
-    await runMirrorEffect(
-      upsertAndPublishMirrorMessage(
-        target.organizationId,
-        target.chatId,
-        message
-      )
-    );
+  // A subagent's approval is relayed with the child's call as its origin.
+  const relayed = data.origin?.call;
+  const observed = relayed ? undefined : call(ctx.view, data.subject.callId);
+  const callId = relayed?.callId ?? data.subject.callId;
+  const toolName = relayed?.name ?? observed?.name;
+  if (!toolName) {
+    return;
   }
+  const message: MirrorUiMessage = {
+    id: toolMessageId(target.sessionId, callId),
+    role: "assistant",
+    parts: [
+      {
+        type: mirrorToolPartType(toolName),
+        toolCallId: callId,
+        state: "approval-requested",
+        input: (relayed ? relayed.input : observed?.input) ?? {},
+        approval: { id: data.interactionId },
+      },
+    ],
+  };
+  await runMirrorEffect(
+    upsertAndPublishMirrorMessage(target.organizationId, target.chatId, message)
+  );
 }
 
 function findExistingToolPart(
@@ -322,12 +355,22 @@ function findExistingToolPart(
   return { input: {}, approvalId: null };
 }
 
+function toolErrorText(event: CallSettled): string {
+  const { error, output } = event.data;
+  const message = error?.message ?? (typeof output === "string" ? output : "");
+  return message
+    ? message.slice(0, MIRROR_TOOL_OUTPUT_MAX_CHARS)
+    : "Tool call failed";
+}
+
 export async function mirrorToolResult(
-  ctx: SessionContext,
-  data: ActionResultStreamEvent["data"]
+  ctx: MirrorEventContext,
+  event: CallSettled
 ): Promise<void> {
-  const result = data.result;
-  if (result.kind !== "tool-result") {
+  const { data } = event;
+  const observed = call(ctx.view, data.callId);
+  // Task waits and cancels and skill loads were never tool results.
+  if (!(observed && (observed.kind === "tool" || observed.kind === "agent"))) {
     return;
   }
   const target = getMirrorTarget(ctx);
@@ -335,52 +378,50 @@ export async function mirrorToolResult(
     return;
   }
 
-  const messageId = toolMessageId(target.sessionId, result.callId);
+  const messageId = toolMessageId(target.sessionId, data.callId);
   await runMirrorEffect(
     Effect.gen(function* () {
       const existing = yield* mirrorStep("load-mirror-message", () =>
         getChatMessageById(target.organizationId, target.chatId, messageId)
       );
-      const { input, approvalId } = findExistingToolPart(
-        existing,
-        result.callId
-      );
+      const stored = findExistingToolPart(existing, data.callId);
+      const input = observed.input ?? stored.input;
+      const { approvalId } = stored;
 
-      const type = mirrorToolPartType(result.toolName);
+      const type = mirrorToolPartType(observed.name);
       let part: MirrorUiMessage["parts"][number];
-      if (data.status === "rejected") {
+      if (data.outcome === "rejected") {
         part = {
           type,
-          toolCallId: result.callId,
+          toolCallId: data.callId,
           state: "output-denied",
           input,
           approval: {
-            id: approvalId ?? result.callId,
+            id: approvalId ?? data.callId,
             approved: false,
             reason: "discard",
           },
         };
-      } else if (result.isError) {
+      } else if (data.outcome === "completed") {
         part = {
           type,
-          toolCallId: result.callId,
-          state: "output-error",
+          toolCallId: data.callId,
+          state: "output-available",
           input,
-          errorText:
-            typeof result.output === "string"
-              ? result.output.slice(0, MIRROR_TOOL_OUTPUT_MAX_CHARS)
-              : "Tool call failed",
+          output: truncateToolOutput(
+            data.output ?? observed.output ?? data.outputRef?.preview ?? null
+          ),
+          ...(approvalId
+            ? { approval: { id: approvalId, approved: true as const } }
+            : {}),
         };
       } else {
         part = {
           type,
-          toolCallId: result.callId,
-          state: "output-available",
+          toolCallId: data.callId,
+          state: "output-error",
           input,
-          output: truncateToolOutput(result.output),
-          ...(approvalId
-            ? { approval: { id: approvalId, approved: true as const } }
-            : {}),
+          errorText: toolErrorText(event),
         };
       }
 

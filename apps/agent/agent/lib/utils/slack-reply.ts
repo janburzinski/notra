@@ -1,4 +1,9 @@
-import type { SlackEventContext } from "eve/channels/slack";
+import { logWarn } from "@notra/ai/utils/server-log";
+import type {
+  SlackContext,
+  SlackEventContext,
+  SlackMessage,
+} from "eve/channels/slack";
 
 import {
   SLACK_LONG_REPLY_NOTICE,
@@ -58,18 +63,29 @@ export async function postSlackReply(
   }
 }
 
-/** Reads the error id eve attaches to failure events, when present. */
-export function getErrorId(details: unknown): string | null {
-  return typeof details === "object" &&
-    details !== null &&
-    "errorId" in details &&
-    typeof details.errorId === "string" &&
-    details.errorId.length > 0
-    ? details.errorId
-    : null;
-}
-
 /** Appends an error id so support can trace the failure in the logs. */
 export function withErrorId(message: string, errorId: string | null): string {
   return errorId ? `${message}\n\n_Error id: \`${errorId}\`_` : message;
+}
+
+/**
+ * Shows `text` to one person in the message's thread. eve's
+ * `thread.postEphemeral` only threads it once a session thread exists, so a
+ * reply to a new top-level mention would otherwise land in the channel.
+ */
+export async function postSlackThreadEphemeral(
+  ctx: Pick<SlackContext, "slack">,
+  message: Pick<SlackMessage, "channelId" | "threadTs">,
+  userId: string,
+  text: string
+): Promise<void> {
+  const response = await ctx.slack.request("chat.postEphemeral", {
+    channel: message.channelId,
+    thread_ts: message.threadTs,
+    user: userId,
+    markdown_text: text,
+  });
+  if (!response.ok) {
+    logWarn("Slack ephemeral reply failed", { error: response.error });
+  }
 }

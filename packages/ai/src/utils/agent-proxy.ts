@@ -31,7 +31,6 @@ export async function createAgentSessionWithMapping(
     headers: { "content-type": "application/json" },
     body: JSON.stringify({
       message: params.message,
-      ...(params.mode ? { mode: params.mode } : {}),
       ...(params.outputSchema ? { outputSchema: params.outputSchema } : {}),
     }),
   });
@@ -95,7 +94,12 @@ export async function forwardAgentFollowUp(
         body: JSON.stringify({
           ...(params.message ? { message: params.message } : {}),
           ...(params.inputResponses?.length
-            ? { inputResponses: params.inputResponses }
+            ? {
+                answers: params.inputResponses.map((response) => ({
+                  interactionId: response.requestId,
+                  optionId: response.optionId,
+                })),
+              }
             : {}),
         }),
       }

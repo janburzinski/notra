@@ -3,6 +3,7 @@ import { defineHook } from "eve/hooks";
 
 import {
   appendAndPublishMirrorMessage,
+  assistantMessageId,
   mirrorAssistantMetadata,
   resolveMirrorChatId,
   runMirrorEffect,
@@ -10,9 +11,15 @@ import {
 
 export default defineHook({
   events: {
-    async "message.completed"(event, ctx) {
-      const messageText = event.data.message;
-      if (event.data.finishReason === "tool-calls" || !messageText?.trim()) {
+    async "content.completed"(event, ctx) {
+      // Narration before tool calls and reasoning stay out of the mirror; only
+      // the text that answers the turn is stored.
+      const { interrupted, kind, partId, phase, value } = event.data;
+      if (kind !== "text" || phase !== "reply" || interrupted) {
+        return;
+      }
+      const messageText = typeof value === "string" ? value : "";
+      if (!messageText.trim()) {
         return;
       }
 
@@ -24,7 +31,7 @@ export default defineHook({
 
       await runMirrorEffect(
         appendAndPublishMirrorMessage(organizationId, chatId, {
-          id: `eve:${ctx.session.id}:${event.data.turnId}:${event.data.stepIndex}`,
+          id: assistantMessageId(ctx.session.id, partId),
           role: "assistant",
           parts: [{ type: "text", text: messageText }],
           metadata: mirrorAssistantMetadata(),

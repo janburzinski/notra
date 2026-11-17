@@ -83,3 +83,11 @@ export const SLACK_WEBHOOK_AUTHENTICATOR = "slack-webhook";
 
 export const CHANNEL_NOT_ENABLED_MESSAGE =
   "The Notra agent is not enabled in this channel. An admin can enable it from the Slack integration settings in the Notra dashboard.";
+
+export const SLACK_WORKING_STATUS = "On it…";
+export const SLACK_WORKING_LOADING_MESSAGES = [
+  SLACK_WORKING_STATUS,
+  "Working…",
+  "Getting it ready…",
+  "Doing overtime…",
+];

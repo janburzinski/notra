@@ -10,10 +10,14 @@ export function createCreateSkillTool() {
     description:
       "Create a new content skill for this organization. A skill is reusable writing guidance (voice, format, structure) applied when drafting content. Always call list_available_skills first and reuse an existing skill when one fits; only create when the user explicitly asks for a new skill or a clearly new, recurring writing need appears. The name must be unique and lowercase kebab-case.",
     inputSchema: createSkillInputSchema,
-    approval: (ctx) =>
-      getSessionAttribute(ctx, "surface") === "task"
-        ? "approved"
-        : "user-approval",
+    approval: {
+      request: (ctx) =>
+        getSessionAttribute(ctx, "surface") === "task"
+          ? "approved"
+          : "user-approval",
+      // Approval cards are collaborative: anyone who sees one may answer it.
+      response: () => ({ status: "allowed" }),
+    },
     async execute({ name, description, content }, ctx) {
       const organizationId = requireOrganizationId(ctx);
       const skill = await createSkill(

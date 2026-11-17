@@ -13,11 +13,7 @@ import {
   SLACK_WORKING_REACTIONS_KEY_ATTRIBUTE,
   SLACK_WORKING_REACTIONS_TTL_SECONDS,
 } from "../constants/slack";
-import type {
-  NotraSlackStateExtras,
-  SlackMessageRef,
-  SlackSessionSender,
-} from "../types/slack";
+import type { NotraSlackStateExtras, SlackMessageRef } from "../types/slack";
 import { getNotraSlackState } from "./slack-state";
 
 let missingScopeLogged = false;
@@ -93,7 +89,8 @@ export async function addSlackWorkingReaction(
   return key;
 }
 
-async function removeSlackWorkingReaction(
+/** Removes the 👀 from a message that won't get a turn after all. */
+export async function releaseSlackWorkingReaction(
   slack: Pick<SlackHandle, "request">,
   key: string,
   message: SlackMessageRef
@@ -104,30 +101,6 @@ async function removeSlackWorkingReaction(
       logError("Slack working reaction tracking failed", error);
     }),
   ]);
-}
-
-/** Removes the 👀 again when the session refuses the message it marked. */
-export function withWorkingReactionRelease(
-  session: SlackSessionSender,
-  slack: Pick<SlackHandle, "request">,
-  key: string,
-  message: SlackMessageRef
-): SlackSessionSender {
-  return {
-    async send(content, options) {
-      let result: Awaited<ReturnType<SlackSessionSender["send"]>>;
-      try {
-        result = await session.send(content, options);
-      } catch (error) {
-        await removeSlackWorkingReaction(slack, key, message);
-        throw error;
-      }
-      if (result.status !== "accepted") {
-        await removeSlackWorkingReaction(slack, key, message);
-      }
-      return result;
-    },
-  };
 }
 
 /** Remembers the running turn's reaction set so events without a ctx can clear it. */

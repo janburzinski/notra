@@ -14,7 +14,7 @@ You are Notra's code researcher. A content writer is about to write about a feat
 
 # Output
 
-Finish with `final_output`:
+Finish with `eve__reply`:
 
 - `found`: fill every field you have evidence for. `summary` and `userFacingBehavior` describe outcomes for users, not implementation. `howToUse` lists how to reach it: the UI navigation a user follows (for example "Dashboard sidebar, then Skills", never a route pattern), a public endpoint, a command, or a setting. `codeExamples` only holds usage a customer would write themselves (public API calls, CLI commands, SDK calls, config). Never include internal implementation code. `sources` lists the files and commit SHAs you relied on.
   `limitations` lists what a user needs to know to use the feature: prerequisites, plan gates, permissions, supported platforms. Internal gaps belong in `openQuestions` or nowhere.

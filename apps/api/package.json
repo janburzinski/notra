@@ -11,7 +11,7 @@
     "knip": "knip"
   },
   "dependencies": {
-    "@ai-sdk/otel": "1.0.129",
+    "@ai-sdk/otel": "1.0.172",
     "@contextcompany/otel": "^1.1.1",
     "@hono/zod-openapi": "^1.6.3",
     "@notra/ai": "workspace:*",
@@ -34,7 +34,7 @@
     "autumn-js": "catalog:",
     "drizzle-orm": "catalog:",
     "effect": "catalog:",
-    "eve": "0.19.0",
+    "eve": "1.0.2",
     "evlog": "catalog:",
     "hono": "^4.13.13",
     "jose": "^6.2.12",

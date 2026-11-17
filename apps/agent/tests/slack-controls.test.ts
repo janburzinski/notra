@@ -16,17 +16,26 @@ import { withToolActivityLabel } from "../agent/lib/utils/tool-activity";
 
 afterEach(() => mock.restore());
 
-function controlContext() {
+function controlContext(cancelOutcome: "applied" | "ignored" = "applied") {
+  const delivery = (outcome: "applied" | "ignored") => ({
+    sessionId: "session-1",
+    deliveryId: "delivery-1",
+    stream: () => (async function* () {})(),
+    result: async () => ({
+      deliveryId: "delivery-1",
+      sessionId: "session-1",
+      outcome,
+      sessionEnded: false,
+      reply: undefined,
+      data: undefined,
+      interactions: [],
+      status: "completed" as const,
+    }),
+  });
   const session = {
     id: "session-1",
-    cancel: mock(async () => ({
-      status: "accepted" as const,
-      sessionId: "session-1",
-    })),
-    reset: mock(async () => ({
-      status: "reset" as const,
-      previousSessionId: "session-1",
-    })),
+    cancel: mock(async () => delivery(cancelOutcome)),
+    end: mock(async () => delivery("applied")),
   };
   const thread = {
     post: mock(async () => ({ id: "message-1", raw: { ok: true } })),
@@ -68,26 +77,32 @@ describe("Slack thread controls", () => {
     expect(parseSlackControlMessage("stop", false)).toBe("stop");
   });
 
-  test("stops the pinned turn and its tasks without starting another turn", async () => {
+  test("stops the pinned turn without starting another turn", async () => {
     const { ctx, session } = controlContext();
     await handleSlackControl("stop", ctx, {
       sessionId: session.id,
       turnId: "turn-1",
     });
-    expect(session.cancel).toHaveBeenCalledWith({
-      tasks: true,
-      turnId: "turn-1",
-    });
-    expect(session.reset).not.toHaveBeenCalled();
+    expect(session.cancel).toHaveBeenCalledWith({ turnId: "turn-1" });
+    expect(session.end).not.toHaveBeenCalled();
     expect(ctx.thread.post).toHaveBeenCalledWith(
       expect.stringContaining("doesn't undo")
+    );
+  });
+
+  test("a stop with nothing running says so", async () => {
+    const { ctx, session } = controlContext("ignored");
+    await handleSlackControl("stop", ctx);
+    expect(session.cancel).toHaveBeenCalledWith(undefined);
+    expect(ctx.thread.post).toHaveBeenCalledWith(
+      "There isn't an active request to stop."
     );
   });
 
   test("leaving retires the thread session and clears typing", async () => {
     const { ctx, session } = controlContext();
     await handleSlackControl("leave", ctx);
-    expect(session.reset).toHaveBeenCalledTimes(1);
+    expect(session.end).toHaveBeenCalledTimes(1);
     expect(session.cancel).not.toHaveBeenCalled();
     expect(ctx.thread.startTyping).not.toHaveBeenCalled();
     expect(ctx.thread.post).toHaveBeenCalledWith(
@@ -104,7 +119,7 @@ describe("Slack thread controls", () => {
       });
     }
     expect(session.cancel).not.toHaveBeenCalled();
-    expect(session.reset).not.toHaveBeenCalled();
+    expect(session.end).not.toHaveBeenCalled();
   });
 
   test("malformed and unrelated interactions cannot cancel a session", async () => {
@@ -140,10 +155,7 @@ describe("Slack thread controls", () => {
       user: { id: "user-1" },
     };
     await handleSlackControlAction(action, ctx);
-    expect(session.cancel).toHaveBeenCalledWith({
-      tasks: true,
-      turnId: "turn-1",
-    });
+    expect(session.cancel).toHaveBeenCalledWith({ turnId: "turn-1" });
   });
 
   test("activity labels retain non-enumerable tool identity metadata", () => {

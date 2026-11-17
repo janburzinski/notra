@@ -1,4 +1,6 @@
 import type { AGENT_SURFACES } from "@notra/ai/constants/agent";
+import type { agentStreamEventSchema } from "@notra/schemas/dashboard/agent";
+import type { z } from "zod";
 
 export type AgentSurface = (typeof AGENT_SURFACES)[number];
 
@@ -23,7 +25,6 @@ export interface AgentSessionScope {
 export interface StartAgentSessionInput {
   scope: AgentSessionScope;
   message: string;
-  mode?: "conversation" | "task";
   outputSchema?: Record<string, unknown>;
 }
 
@@ -41,3 +42,5 @@ export type AgentTaskStreamResult =
   | { output: unknown }
   | { failed: string }
   | null;
+
+export type AgentStreamEvent = z.infer<typeof agentStreamEventSchema>;

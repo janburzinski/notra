@@ -77,9 +77,10 @@ export function autopilotApproval<TInput extends Record<string, unknown>>(
       return "user-approval";
     },
     response: async ({
-      responder,
+      response,
       request,
     }: ApprovalResponseContext<TInput>) => {
+      const responder = response.principal;
       const requester = await readRequester(request.callId);
       return responder.authenticator === SLACK_WEBHOOK_AUTHENTICATOR &&
         requester === responder.principalId

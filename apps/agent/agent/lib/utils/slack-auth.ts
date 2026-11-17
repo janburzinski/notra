@@ -1,6 +1,7 @@
 import {
   defaultSlackAuth,
   type SlackContext,
+  type SlackHandle,
   type SlackMessage,
 } from "eve/channels/slack";
 import type { SessionAuthContext } from "eve/context";
@@ -57,6 +58,23 @@ export function buildNotraSlackAuth(
 }
 
 /**
+ * The workspace whose installation serves this click. eve resolves the bot
+ * token for that workspace but doesn't expose it on the handle, so ask Slack
+ * who the token belongs to.
+ */
+async function getInstallationTeamId(
+  slack: Pick<SlackHandle, "request">
+): Promise<string | undefined> {
+  try {
+    const response = await slack.request("auth.test", {});
+    const teamId = response.ok ? response.team_id : undefined;
+    return typeof teamId === "string" && teamId.length > 0 ? teamId : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+/**
  * Resolves the installation for a button click, or `null` when the click must
  * be ignored. Like messages, buttons only work for members of the installing
  * workspace; Slack Connect guests get an ephemeral explanation.
@@ -65,7 +83,7 @@ export async function resolveSlackActionInstallation(
   ctx: SlackContext,
   userId: string
 ): Promise<ResolvedSlackInstallation | null> {
-  const teamId = ctx.slack.installationTeamId;
+  const teamId = await getInstallationTeamId(ctx.slack);
   const installation = teamId ? await resolveSlackInstallation(teamId) : null;
   if (!installation || !isChannelAllowed(installation, ctx.slack.channelId)) {
     return null;

@@ -6,6 +6,7 @@ import type { SessionContext } from "eve/context";
 
 import { CHANNEL_NOT_ENABLED_MESSAGE } from "../constants/slack";
 import { DRAFT_NOTIFICATION_LABELS } from "../constants/slack-notifications";
+import { SlackApiError } from "../schemas/slack";
 import { escapeSlackText } from "./text";
 
 export async function notifySlackDraftCreated(
@@ -26,7 +27,8 @@ export async function notifySlackDraftCreated(
   await Effect.runPromise(
     Effect.tryPromise({
       try: () => postSlackNotification(organizationId, text),
-      catch: (cause) => cause,
+      catch: (cause) =>
+        new SlackApiError({ cause, operation: "draft-notification" }),
     }).pipe(
       Effect.asVoid,
       Effect.catch((error) =>

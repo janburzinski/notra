@@ -188,7 +188,7 @@ agentChatsRoutes.openAPIRegistry.registerPath(
     operationId: "sendAgentSessionMessage",
     summary: "Send a follow-up message or answer a pending input request",
     description:
-      "Sends the next turn of an agent session. The server binds the session's stored continuation token, so the client-provided one is ignored. Answer input.requested events (tool approvals, questions) from the event stream via inputResponses.",
+      "Sends the next turn of an agent session. The server binds the session's stored continuation token, so the client-provided one is ignored. Answer interaction.opened events (tool approvals, questions) from the event stream via inputResponses.",
     request: {
       params: agentSessionParamsSchema,
       body: {
@@ -280,7 +280,7 @@ agentChatsRoutes.openAPIRegistry.registerPath(
     operationId: "streamAgentSessionEvents",
     summary: "Stream an agent session's events",
     description:
-      "Durable, replayable eve session event stream (newline-delimited JSON). Pass startIndex to resume from a known position. Includes input.requested events for tool approvals.",
+      "Durable, replayable eve session event stream (newline-delimited JSON, stream version 27). Each stored line holds a `facts` array of events or a `progress` record. Pass startIndex to resume from a known line. Includes interaction.opened events for tool approvals.",
     request: {
       params: agentSessionParamsSchema,
       query: agentSessionStreamQuerySchema,

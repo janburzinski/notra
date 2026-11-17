@@ -20,9 +20,12 @@ const input: ChartInput = {
 
 describe("Slack data charts", () => {
   test("exposes the chart tool only to Slack and authenticated dashboard relays", async () => {
-    const resolveTool = chartTool.events["turn.started"];
+    // defineDynamic keeps its resolver under eve's global sentinel symbol.
+    const resolveTool = (
+      chartTool as unknown as Record<symbol, (ctx: never) => unknown>
+    )[Symbol.for("eve.dynamic")];
     if (!resolveTool) {
-      throw new Error("Chart tool must resolve per turn");
+      throw new Error("Chart tool must resolve per session");
     }
     for (const authenticator of [
       "slack-webhook",
@@ -30,12 +33,9 @@ describe("Slack data charts", () => {
       "dashboard",
       undefined,
     ]) {
-      const tool = await resolveTool(
-        {} as never,
-        {
-          session: { auth: { current: { authenticator } } },
-        } as never
-      );
+      const tool = await resolveTool({
+        session: { auth: { current: { authenticator } } },
+      } as never);
       expect(tool !== null).toBe(
         authenticator === "slack-webhook" ||
           authenticator === "notra-dashboard-relay"

@@ -6,12 +6,7 @@ import {
   isTwitterPublishConfigured,
 } from "@notra/tools/utils/social-accounts";
 import { and, eq } from "drizzle-orm";
-import type {
-  SlackEventContext,
-  SlackInputRequestedDefaultDeliver,
-  SlackPostInput,
-} from "eve/channels/slack";
-import type { InputRequest, InputRequestedStreamEvent } from "eve/client";
+import type { SlackEventContext, SlackPostInput } from "eve/channels/slack";
 
 import { POST_TO_X_CONFIRM_ACTION_PREFIX } from "../constants/slack-post-x";
 import { resolveSlackInstallation } from "./slack-installation";
@@ -21,8 +16,7 @@ async function createTwitterDraftPost(
   markdown: string,
   callId: string,
   channel: SlackEventContext,
-  requestedBy: string | undefined,
-  request?: InputRequest
+  requestedBy: string | undefined
 ): Promise<SlackPostInput> {
   const linkedAccount = await resolveLinkedTwitterAccount(
     channel,
@@ -34,49 +28,25 @@ async function createTwitterDraftPost(
     type: "plain_text" as const,
     text: value,
   });
-  const actions: unknown[] = [];
-  for (const [index, optionId, label] of [
-    [0, "approve", "Save as draft"],
-    [1, "deny", "Regenerate"],
-  ] as const) {
-    const option = request?.options?.find((item) => item.id === optionId);
-    if (option) {
-      actions.push({
+  const action = linkedAccount
+    ? {
         type: "button",
-        action_id: `eve_input:tool-approval:${request?.requestId}:button:${index}`,
-        text: text(label),
-        value: option.id,
-      });
-    }
-  }
-  actions.push(
-    linkedAccount
-      ? {
-          type: "button",
-          action_id: `${POST_TO_X_CONFIRM_ACTION_PREFIX}:${callId}`,
-          text: text(`Post to @${linkedAccount.username}`),
-          value: JSON.stringify({
-            ...(request ? { requestId: request.requestId } : {}),
-            callId,
-            username: linkedAccount.username,
-          }),
-        }
-      : {
-          type: "button",
-          action_id: `notra_open_x:${callId}`,
-          text: text("Open X composer"),
-          url: `https://twitter.com/intent/tweet?text=${encodeURIComponent(markdown)}`,
-          value: "open_x",
-        }
-  );
+        action_id: `${POST_TO_X_CONFIRM_ACTION_PREFIX}:${callId}`,
+        text: text(`Post to @${linkedAccount.username}`),
+        value: JSON.stringify({ callId, username: linkedAccount.username }),
+      }
+    : {
+        type: "button",
+        action_id: `notra_open_x:${callId}`,
+        text: text("Open X composer"),
+        url: `https://twitter.com/intent/tweet?text=${encodeURIComponent(markdown)}`,
+        value: "open_x",
+      };
   return {
-    text: request ? "Tweet draft" : "Tweet saved as a draft",
+    text: "Tweet saved as a draft",
     blocks: [
-      {
-        type: "section",
-        text: text(request ? "Tweet draft" : "Tweet saved as a draft"),
-      },
-      { type: "actions", elements: actions },
+      { type: "section", text: text("Tweet saved as a draft") },
+      { type: "actions", elements: [action] },
     ],
   };
 }
@@ -142,35 +112,4 @@ export async function offerSavedTweetPublishing(
     await createTwitterDraftPost(post.markdown, callId, channel, requestedBy)
   );
   return true;
-}
-
-export async function handleSlackInputRequested(
-  data: InputRequestedStreamEvent["data"],
-  channel: SlackEventContext,
-  defaultDeliver: SlackInputRequestedDefaultDeliver,
-  requestedBy?: string
-) {
-  for (const request of data.requests) {
-    const markdown = request.action.input.markdown;
-    // Keep already-pending tweet approvals usable after deployment, without
-    // embedding the draft in the message Slack echoes back on a button click.
-    if (
-      request.kind === "tool-approval" &&
-      request.action.toolName === "create_twitter_post" &&
-      typeof markdown === "string"
-    ) {
-      await channel.thread.post(markdown);
-      await channel.thread.post(
-        await createTwitterDraftPost(
-          markdown,
-          request.action.callId,
-          channel,
-          requestedBy,
-          request
-        )
-      );
-    } else {
-      await defaultDeliver({ ...data, requests: [request] });
-    }
-  }
 }

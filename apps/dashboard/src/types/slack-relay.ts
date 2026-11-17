@@ -15,3 +15,9 @@ export interface SlackRelayInputMode {
 export type SlackThreadReply = NonNullable<
   z.infer<typeof slackThreadRepliesResponseSchema>["messages"]
 >[number];
+
+/** An interactive element inside a Slack block, such as a button. */
+export interface SlackBlockElement {
+  action_id?: string;
+  value?: string;
+}

@@ -19,11 +19,11 @@
     "test": "bun test --parallel tests"
   },
   "dependencies": {
-    "@ai-sdk/anthropic": "4.0.73",
-    "@ai-sdk/google": "4.0.89",
-    "@ai-sdk/openai": "4.0.85",
+    "@ai-sdk/anthropic": "4.0.104",
+    "@ai-sdk/google": "4.0.120",
+    "@ai-sdk/openai": "4.0.117",
     "@ai-sdk/perplexity": "4.0.52",
-    "@ai-sdk/xai": "5.0.2",
+    "@ai-sdk/xai": "5.0.45",
     "@cursor/sdk": "catalog:",
     "@notra/ai": "workspace:*",
     "@notra/analytics": "workspace:*",

@@ -44,7 +44,6 @@ function toolContext(current: unknown, initiator: unknown = current) {
   return {
     callId: "call_1",
     toolName: "act_on_autopilot_finding",
-    approvedTools: new Set<string>(),
     session: { auth: { current, initiator } },
   };
 }
@@ -60,9 +59,13 @@ function approvalOf(tool: unknown) {
 
 function responseContext(responder: unknown, initiator: unknown) {
   return {
-    responder,
-    request: { callId: "call_1", requestId: "req_1", toolName: "x" },
-    response: { decision: "approve" },
+    request: {
+      callId: "call_1",
+      interactionId: "interaction_1",
+      principal: initiator,
+      toolName: "x",
+    },
+    response: { decision: "approve", principal: responder },
     session: { id: "s1", initiator, turn: { id: "t1", sequence: 1 } },
     auth: {},
   };

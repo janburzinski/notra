@@ -6,12 +6,17 @@ import { releaseCodeResearchWorkspaces } from "@notra/ai/utils/code-research-ses
 import { isCodeResearchEnabled } from "@notra/tools/utils/code-research";
 import { defineWorkflowTool, type WorkflowToolContext } from "eve/tools";
 
+import {
+  CODE_RESEARCHER_AGENT,
+  CONTENT_WRITER_AGENT,
+} from "../lib/constants/subagents";
 import { contentTaskInputSchema } from "../lib/schemas/content-task";
 import type {
   ContentTaskInput,
   ContentTaskResult,
   ContentTaskTool,
 } from "../lib/types/content-task";
+import { requestSubagentResult } from "../lib/utils/subagent-result";
 
 async function canResearchCode(
   session: WorkflowToolContext["session"]
@@ -42,8 +47,11 @@ async function researchFeature(
   message: string
 ): Promise<CodeResearchBrief | null> {
   try {
-    const brief = codeResearchBriefSchema.parse(
-      await ctx.agent("code-researcher", { message })
+    const brief = await requestSubagentResult(
+      ctx,
+      CODE_RESEARCHER_AGENT,
+      message,
+      codeResearchBriefSchema
     );
     return brief.status === "found" ? brief : null;
   } catch {
@@ -68,10 +76,12 @@ async function generateContentTask(
     const writerMessage = brief
       ? `${message}\n\nCode research brief (JSON):\n${JSON.stringify(brief)}`
       : message;
-    const result = await ctx.agent("content-writer", {
-      message: writerMessage,
-    });
-    return contentWriterResultSchema.parse(result);
+    return await requestSubagentResult(
+      ctx,
+      CONTENT_WRITER_AGENT,
+      writerMessage,
+      contentWriterResultSchema
+    );
   } finally {
     if (shouldResearch) {
       await releaseResearchBoxes(sessionKey);
@@ -79,10 +89,7 @@ async function generateContentTask(
   }
 }
 
-const generateContent: ContentTaskTool = defineWorkflowTool<
-  typeof contentTaskInputSchema,
-  Promise<ContentTaskResult>
->({
+const generateContent: ContentTaskTool = defineWorkflowTool({
   label: { start: () => "Researching and drafting content" },
   description:
     "Generate and save content through the content-writer, waiting durably for its final created/skipped/failed result. Use this for automated content tasks instead of calling the background content-writer subagent directly. Pass the complete task, sources, and lookback context in message. For a task about one specific feature, also pass codeResearch so the code-researcher reads the repository first.",

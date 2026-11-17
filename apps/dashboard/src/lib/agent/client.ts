@@ -108,7 +108,7 @@ export async function createNotraAgentClient(
 ): Promise<Client> {
   const clientOptions = {
     headers: buildAgentScopeHeaders(scope),
-    host: getNotraAgentUrl(),
+    baseUrl: getNotraAgentUrl(),
     redirect: "error" as const,
   };
 
@@ -148,7 +148,6 @@ export async function startAgentSession(
       collectionId: input.scope.collectionId,
     },
     message: input.message,
-    mode: input.mode,
     outputSchema: input.outputSchema,
   });
 }
@@ -172,7 +171,7 @@ export async function runAgentTask(
 ): Promise<AgentTaskRunResult> {
   const [client, started] = await Promise.all([
     createNotraAgentClient(input.scope),
-    startAgentSession({ ...input, mode: "task" }),
+    startAgentSession(input),
   ]);
 
   const setSessionStatus = (status: "failed" | "completed" | "timed_out") =>

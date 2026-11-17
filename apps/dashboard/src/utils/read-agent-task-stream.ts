@@ -1,6 +1,6 @@
-import { agentStreamEventSchema } from "@notra/schemas/dashboard/agent";
+import { agentStreamLineSchema } from "@notra/schemas/dashboard/agent";
 
-import type { AgentTaskStreamResult } from "@/types/agent";
+import type { AgentStreamEvent, AgentTaskStreamResult } from "@/types/agent";
 
 export async function readAgentTaskStream(
   response: Response,
@@ -26,26 +26,51 @@ export async function readAgentTaskStream(
       throw new DOMException("Agent task deadline exceeded", "TimeoutError");
     }
   };
-  const consumeLine = (line: string) => {
+  // eve v27 streams store `{ at, facts }` event lines next to progress and
+  // transport records. Sessions stay open after a turn, so the task is done
+  // when its turn settles, not when the stream closes.
+  const consumeEvent = (event: AgentStreamEvent): boolean => {
+    const data = event.data ?? {};
+    if (event.type === "content.completed" && data.kind === "result") {
+      output = data.value;
+      return false;
+    }
+    if (event.type === "turn.settled") {
+      if (data.outcome === "completed") {
+        completed = true;
+      } else {
+        failed ??= errorMessage(data.error) ?? `turn ${String(data.outcome)}`;
+      }
+      return true;
+    }
+    if (event.type === "session.ended") {
+      if (data.outcome !== "completed") {
+        failed = errorMessage(data.error) ?? "session failed";
+      } else if (!completed) {
+        failed ??= "session ended before the task finished";
+      }
+      return true;
+    }
+    return false;
+  };
+  const consumeLine = (line: string): boolean => {
     checkDeadline();
-    let event;
+    let parsed;
     try {
-      event = agentStreamEventSchema.parse(JSON.parse(line.trim()));
+      parsed = agentStreamLineSchema.safeParse(JSON.parse(line.trim()));
     } catch {
-      return;
+      return false;
     }
-    if (event.type === "result.completed") {
-      output = event.data?.output ?? event.data?.result ?? event.data;
+    if (!parsed.success) {
+      return false;
     }
-    if (event.type === "session.completed") {
-      completed = true;
+    // Read the whole line: a failed session records its turn as cancelled and
+    // the error on `session.ended` in the same line.
+    let settled = false;
+    for (const event of parsed.data.facts) {
+      settled = consumeEvent(event) || settled;
     }
-    if (event.type === "session.failed") {
-      failed =
-        typeof event.data?.message === "string"
-          ? event.data.message
-          : "unknown failure";
-    }
+    return settled;
   };
 
   signal.addEventListener("abort", cancel, { once: true });
@@ -59,12 +84,16 @@ export async function readAgentTaskStream(
         : decoder.decode(value, { stream: true });
       let start = 0;
       let newline = buffer.indexOf("\n");
-      while (newline !== -1) {
-        consumeLine(buffer.slice(start, newline));
+      let settled = false;
+      while (newline !== -1 && !settled) {
+        settled = consumeLine(buffer.slice(start, newline));
         start = newline + 1;
         newline = buffer.indexOf("\n", start);
       }
       buffer = buffer.slice(start);
+      if (settled) {
+        break;
+      }
       if (done) {
         if (buffer.trim()) {
           consumeLine(buffer);
@@ -82,4 +111,11 @@ export async function readAgentTaskStream(
     return { failed };
   }
   return completed ? { output } : null;
+}
+
+function errorMessage(error: unknown): string | undefined {
+  if (typeof error !== "object" || error === null || !("message" in error)) {
+    return undefined;
+  }
+  return typeof error.message === "string" ? error.message : undefined;
 }

@@ -16,7 +16,6 @@ export interface CreateAgentSessionParams {
   fetchUpstream: AgentUpstreamFetch;
   scope: AgentSessionScopeRecord;
   message: string;
-  mode?: "conversation" | "task";
   outputSchema?: Record<string, unknown>;
 }
 

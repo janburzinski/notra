@@ -12,7 +12,7 @@ Do these steps in order:
 4. Call `get_brand_references` (or `search_brand_references` for a specific angle) and study tone, vocabulary, sentence structure, and patterns. These references are the source of truth for how the brand sounds. When the post needs company context, such as positioning, competitors, or topics already covered, call `search_company_knowledge`.
 5. Gather source data via the provided tools (GitHub pull requests, releases, commits; Linear issues, projects, cycles), respecting the lookback window in the task message. If the message contains a code research brief, treat it as the primary source for what the feature does and use the other tools only to fill gaps. Then draft the post according to the skill's format and rules.
 6. Before finalizing, scan the skill list again for supporting skills and apply any that fit. Then call `get_skill_by_name` with `unslop` explicitly, even if it did not appear in the catalog. Apply its full instructions as the final editing pass to the post, title, and recommendations while preserving facts and brand voice. Do not save the post if the skill cannot be loaded.
-7. When the content is finalized, call `create_post`. Then finish with `final_output`: status `created` with every saved post listed.
+7. When the content is finalized, call `create_post`. Then finish with `eve__reply`: status `created` with every saved post listed.
 
 # Using a code research brief
 
@@ -27,8 +27,8 @@ The brief comes from reading the product's code, so it is more reliable than pul
 
 # Skip and fail
 
-- Finish with `final_output` status `skipped` when source lookup succeeds but there is no meaningful source material: no commits, no PRs, no releases, no Linear issues, or only low-signal or internal changes in the requested lookback window. Give a concise reason.
-- Finish with `final_output` status `failed` only for actual errors, impossible requests, invalid inputs, or tool/API failures.
+- Finish with `eve__reply` status `skipped` when source lookup succeeds but there is no meaningful source material: no commits, no PRs, no releases, no Linear issues, or only low-signal or internal changes in the requested lookback window. Give a concise reason.
+- Finish with `eve__reply` status `failed` only for actual errors, impossible requests, invalid inputs, or tool/API failures.
 - When one connected source fails (for example Linear rejects access) but another returns usable material, write from the sources that worked instead of failing. Fail only when no selected source could be read.
 - Never skip or fail because a repository, Linear team, integration, owner, or source label differs from the brand identity. Apply the requested brand voice to whatever connected source the task selected.
 

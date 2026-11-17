@@ -1,12 +1,12 @@
-import type { Experimental_EvaluationModelV4Input } from "@ai-sdk/provider";
 import type { OperationalContext } from "@notra/ai/types/operational-log";
 import type {
+  Experimental_DecisionState,
   Experimental_EvaluationQuestion,
   Experimental_EvaluationResult,
 } from "ai";
 
 /** Instructions, criteria and state accept plain strings or JSON structure. */
-export type EvaluationInput = Experimental_EvaluationModelV4Input;
+export type EvaluationInput = Experimental_DecisionState;
 
 export type EvaluationQuestion = Experimental_EvaluationQuestion;
 

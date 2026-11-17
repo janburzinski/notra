@@ -22,10 +22,13 @@ export const createAgentSessionResponseSchema = z
   .openapi("CreateAgentSessionResponse");
 
 const agentInputResponseSchema = z.object({
-  requestId: z.string().min(1),
+  requestId: z.string().min(1).openapi({
+    description:
+      "The interactionId of the pending interaction.opened event to answer.",
+  }),
   optionId: z.string().min(1).openapi({
     description:
-      'The chosen option id from the input.requested event, e.g. "approve" or "deny".',
+      'The chosen option id from the interaction.opened event, e.g. "approve" or "deny".',
   }),
 });
 
@@ -42,7 +45,7 @@ export const sendAgentMessageRequestSchema = z
       }),
     inputResponses: z.array(agentInputResponseSchema).optional().openapi({
       description:
-        "Answers to pending input.requested events (tool approvals, questions) from the event stream.",
+        "Answers to pending interaction.opened events (tool approvals, questions) from the event stream.",
     }),
   })
   .openapi("SendAgentMessageRequest");
@@ -57,7 +60,7 @@ export const agentSessionParamsSchema = z.object({
 export const agentSessionStreamQuerySchema = z.object({
   startIndex: z.coerce.number().int().min(0).optional().openapi({
     description:
-      "Index of the first event to send, to resume a stream after the last event you received.",
+      "Index of the first stored line to send, to resume a stream after the last line you received.",
   }),
 });
 
