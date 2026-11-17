@@ -86,7 +86,7 @@ import {
   touchUpdatedDate,
 } from "@/utils/autopilot-edits";
 import { findPagePath, isSafeRepositoryPath } from "@/utils/autopilot-paths";
-import { forceNoDashes } from "@/utils/autopilot-style";
+import { brandToneInstruction, forceNoDashes } from "@/utils/autopilot-style";
 
 const percent = (value: number) => `${Math.round(value * 100)}%`;
 
@@ -521,6 +521,7 @@ export async function writeRefresh(params: {
       ctx.brand?.customInstructions
         ? `House rules from the brand, follow them: ${ctx.brand.customInstructions}`
         : "",
+      brandToneInstruction(ctx.brand),
       `Writing rules for every replacement, never use em dashes or en dashes:\n${writingRules}`,
     ]
       .filter(Boolean)

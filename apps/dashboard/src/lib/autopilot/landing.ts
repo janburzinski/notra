@@ -99,6 +99,7 @@ import {
 } from "@/utils/autopilot-landing";
 import { pickLinkTargets } from "@/utils/autopilot-links";
 import { findPagePath, summarizeRepositoryTree } from "@/utils/autopilot-paths";
+import { brandToneInstruction } from "@/utils/autopilot-style";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 const percent = (value: number) => `${Math.round(value * 100)}%`;
@@ -458,6 +459,7 @@ export async function writeLanding(params: {
     ctx.brand?.customInstructions
       ? `House rules from the brand, follow them: ${ctx.brand.customInstructions}`
       : "",
+    brandToneInstruction(ctx.brand),
     `Writing rules for every piece of copy, never use em dashes or en dashes:\n${writingRules}`,
   ]
     .filter(Boolean)

@@ -1,3 +1,4 @@
+import { toneProfileSchema } from "@notra/ai/schemas/tone";
 import { AUTOPILOT_SCHEDULED_TRIGGERS } from "@notra/db/constants/autopilot";
 import { db } from "@notra/db/drizzle";
 import {
@@ -273,6 +274,9 @@ export async function buildAutopilotRunContext(
           audience: brand.audience ?? null,
           language: brand.language ?? "English",
           customInstructions: brand.customInstructions ?? null,
+          toneProfile:
+            toneProfileSchema.safeParse(brand.toneProfile).data ?? null,
+          customTone: brand.customTone ?? null,
           settingsId: brand.id,
         }
       : null,

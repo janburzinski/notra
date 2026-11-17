@@ -68,6 +68,7 @@ import type { AutopilotFactSource } from "@/types/autopilot-templates-runtime";
 import { autopilotDraftIssue } from "@/utils/autopilot-draft";
 import { describeAutopilotToolCall } from "@/utils/autopilot-events";
 import { autopilotAgentStepData } from "@/utils/autopilot-log";
+import { brandToneInstruction } from "@/utils/autopilot-style";
 
 /**
  * The text a tool returned. Objects keep their string fields as they are:
@@ -321,6 +322,7 @@ export async function writeBlogPost(params: {
     ctx.brand?.customInstructions
       ? `House rules from the brand, follow them: ${ctx.brand.customInstructions}`
       : "",
+    brandToneInstruction(ctx.brand),
     conventionsInstruction(params.conventions ?? []),
     params.writingRules
       ? `Writing rules, apply them to the title, description and every sentence. Never use em dashes or en dashes.\n${params.writingRules}`

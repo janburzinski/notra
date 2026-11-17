@@ -2,7 +2,9 @@ import { beforeEach, expect, mock, test } from "bun:test";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
+import { tool } from "ai";
 import { MockLanguageModelV4 } from "ai/test";
+import * as z from "zod";
 
 if (process.env.NOTRA_AUTOPILOT_WRITER_TEST !== "1") {
   test("Autopilot writer rejects incomplete output and retries only once", () => {
@@ -53,9 +55,15 @@ if (process.env.NOTRA_AUTOPILOT_WRITER_TEST !== "1") {
   mock.module("@notra/ai/utils/tcc", () => ({
     buildTelemetryOptions: () => ({}),
   }));
+  const sitemapTool = () =>
+    tool({
+      description: "Sitemap fixture",
+      inputSchema: z.object({}),
+      execute: async () => "",
+    });
   mock.module("@notra/ai/tools/sitemap", () => ({
-    createGetSitemapPagesTool: () => undefined,
-    createFetchSitemapPageTool: () => undefined,
+    createGetSitemapPagesTool: sitemapTool,
+    createFetchSitemapPageTool: sitemapTool,
   }));
   mock.module("@/lib/autopilot/github", () => ({
     readRepositoryFile: async () => null,
@@ -131,6 +139,32 @@ if (process.env.NOTRA_AUTOPILOT_WRITER_TEST !== "1") {
     expect((await writeBlogPost(params)).content).toBe("A complete article.");
     expect(model.doGenerateCalls).toHaveLength(1);
     expect(usage).toHaveBeenCalledTimes(1);
+    expect(JSON.stringify(model.doGenerateCalls[0]?.prompt)).not.toContain(
+      "Brand tone"
+    );
+  });
+  test("writes in the brand identity's tone", async () => {
+    contents.push("A complete article.");
+    await writeBlogPost({
+      ...params,
+      ctx: {
+        ...params.ctx,
+        brand: {
+          name: "Acme",
+          websiteUrl: "https://acme.test",
+          description: "Exports for teams.",
+          audience: null,
+          language: "English",
+          customInstructions: null,
+          toneProfile: "Casual",
+          customTone: "Talk like a friendly engineer.",
+          settingsId: "brand",
+        },
+      },
+    });
+    const prompt = JSON.stringify(model.doGenerateCalls[0]?.prompt);
+    expect(prompt).toContain("Brand tone from the brand identity");
+    expect(prompt).toContain("Talk like a friendly engineer.");
   });
   test("rewrites a syntactically valid but unfinished article once and records both usages", async () => {
     contents.push("Two people exporting the ", "A complete rewrite.");

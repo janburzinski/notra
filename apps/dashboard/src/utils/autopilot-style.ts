@@ -1,8 +1,12 @@
+import { buildToneContext } from "@notra/ai/prompts/_shared/tone";
+
 import {
+  AUTOPILOT_BRAND_TONE_INSTRUCTIONS,
   AUTOPILOT_DASH,
   AUTOPILOT_NUMERIC_RANGE_DASH,
   AUTOPILOT_SPACED_DASH,
 } from "@/constants/autopilot-style";
+import type { AutopilotRunContext } from "@/types/autopilot";
 
 const CODE = /(```[\s\S]*?```|`[^`\n]*`|https?:\/\/[^\s)<>"']+)/g;
 const SENTENCE = /[^.!?\n]*[–—][^.!?\n]*[.!?]?/g;
@@ -120,4 +124,13 @@ export function askedEdits(
       ? [{ find, replace: edit.replace.replace(LIST_MARKER, "") }]
       : [];
   });
+}
+
+/** The brand's tone for a writer prompt; empty when the identity sets none. */
+export function brandToneInstruction(brand: AutopilotRunContext["brand"]) {
+  const tone = buildToneContext({
+    toneProfile: brand?.toneProfile,
+    customTone: brand?.customTone,
+  }).trim();
+  return tone ? `${AUTOPILOT_BRAND_TONE_INSTRUCTIONS}\n${tone}` : "";
 }

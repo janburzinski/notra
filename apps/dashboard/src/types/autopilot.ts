@@ -1,4 +1,5 @@
 import type { IconSvgElement } from "@hugeicons/react";
+import type { ToneProfile } from "@notra/ai/schemas/tone";
 import type { AutopilotObservation } from "@notra/ai/types/autopilot-planner";
 import type {
   AutopilotApprovals,
@@ -59,6 +60,9 @@ export interface AutopilotRunContext {
     language: string;
     /** Brand house rules from the identity settings; the writer follows them. */
     customInstructions: string | null;
+    /** The identity's tone; custom notes win over the named profile. */
+    toneProfile: ToneProfile | null;
+    customTone: string | null;
     /** brand_settings id, for the brand's colors and logo. */
     settingsId: string;
   } | null;
