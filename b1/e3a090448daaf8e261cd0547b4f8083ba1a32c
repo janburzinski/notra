@@ -1,0 +1,86 @@
+packages/db/migrations/meta/0169_snapshot.json
+  ai_agent 1-18427
+apps/dashboard/src/lib/autopilot/competitor-watch.ts
+  s_26b5161603a7be::t_125745c4b474d9 1-4,6-11,36,52-55,163-167,171-180,188-193,228-231,248-258,260-274,278-280,309,323-330,350-351,365-415,418-437,454-457,463-465,538-549,552
+  s_26b5161603a7be::t_df38b9d5b72cd1 519,522-535
+  s_26b5161603a7be::t_aa83cea2145e03 5,12-35,37-51,56-162,168-170,181-187,194-227,232-247,259,275-277,281-308,310-322,331-349,352-364,438-453,458-462,466-518,520-521,536-537,550-551,553-554
+  s_26b5161603a7be::t_aa50ebb65f42af 416-417
+packages/db/src/constants/geo-competitor-pages.ts
+  s_26b5161603a7be::t_bbd2b450aad201 1-11
+packages/db/src/types/geo-prompt-suggestions.ts
+  s_26b5161603a7be::t_609e453c1821bb 1-17
+packages/db/src/schema.ts
+  s_26b5161603a7be::t_ec931bb8ba7bb0 2151-2152,2168-2206
+  s_26b5161603a7be::t_bbd2b450aad201 74
+apps/dashboard/src/types/autopilot.ts
+  s_26b5161603a7be::t_6731d1a2ca5275 103
+apps/dashboard/src/lib/orpc/routers/geo.ts
+  s_26b5161603a7be::t_59cf9b0c3dd320 2504-2507
+apps/dashboard/src/utils/autopilot-competitor-pages.ts
+  s_26b5161603a7be::t_652005e25a9309 1-139
+apps/dashboard/src/lib/autopilot/planner.ts
+  s_26b5161603a7be::t_dab5df40c06d34 453
+  s_26b5161603a7be::t_6731d1a2ca5275 180-182,184,187-188,192,443-448,481-492,509-510
+  s_26b5161603a7be::t_125745c4b474d9 437-442
+apps/dashboard/tests/autopilot-flow.test.ts
+  s_26b5161603a7be::t_b75c93fcb9bc81 695
+  s_26b5161603a7be::t_f07734dc1ebaaf 2096-2127,2129-2175,2177-2183,2185-2216
+  s_26b5161603a7be::t_e0b8a44e66c514 2128
+  s_26b5161603a7be::t_7f9b93c3c80a7d 20-21,2095,2176,2184,2217
+packages/ai/src/constants/autopilot-planner.ts
+  s_26b5161603a7be::t_0fbf7556cdad7a 1,96-102
+packages/ai/src/prompts/autopilot-planner.ts
+  s_26b5161603a7be::t_bf76f6d5c20020 79-80,83-87
+  s_26b5161603a7be::t_4b2587b6667f8b 101
+  s_26b5161603a7be::t_0fbf7556cdad7a 4
+  s_26b5161603a7be::t_dd42446422570e 15,21,42-44
+packages/db/migrations/meta/_journal.json
+  ai_agent 1187-1193
+apps/dashboard/messages/en.json
+  s_26b5161603a7be::t_3d6ed091797154 4660,4666-4671
+packages/ai/src/types/autopilot-planner.ts
+  s_26b5161603a7be::t_dd42446422570e 6,9-11
+apps/dashboard/src/lib/hooks/use-geo.ts
+  s_26b5161603a7be::t_ade253b1e014d0 1909,1912,1914-1915,1922-1923,1927-1932
+apps/dashboard/src/constants/autopilot-workflow.ts
+  s_26b5161603a7be::t_6731d1a2ca5275 10
+apps/dashboard/src/lib/workflow-engine/definitions/autopilot.ts
+  s_26b5161603a7be::t_6731d1a2ca5275 202
+apps/dashboard/src/constants/geo-analytics.ts
+  s_26b5161603a7be::t_59cf9b0c3dd320 13
+apps/dashboard/messages/de.json
+  s_26b5161603a7be::t_3d6ed091797154 4660,4666-4671
+apps/dashboard/src/schemas/autopilot-competitors.ts
+  s_26b5161603a7be::t_0c825ddcc86761 1-15
+packages/ai/src/utils/autopilot-planner.ts
+  s_26b5161603a7be::t_dd42446422570e 173-174,177
+apps/dashboard/src/components/geo/autopilot-prompt-suggestions.tsx
+  s_26b5161603a7be::t_125745c4b474d9 60
+  s_26b5161603a7be::t_5a083efd47016c 35,45,48-53,56-57,61
+  s_26b5161603a7be::t_3d6ed091797154 54-55,58-59,62-67,81,85,89,95
+apps/dashboard/src/lib/autopilot/blog.ts
+  s_26b5161603a7be::t_125745c4b474d9 51
+  s_26b5161603a7be::t_6731d1a2ca5275 1954-1970
+apps/dashboard/src/constants/autopilot-competitors.ts
+  s_26b5161603a7be::t_0c825ddcc86761 1-28,35-54,59,61-64,66-69
+  s_26b5161603a7be::t_125745c4b474d9 29-34,65
+  s_26b5161603a7be::t_c0721bb7cc2160 55-58,60
+packages/db/migrations/0169_geo_competitor_pages.sql
+  ai_agent 1-24
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "b1e3a090448daaf8e261cd0547b4f8083ba1a32c",
+  "prompts": {},
+  "sessions": {
+    "s_26b5161603a7be": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6ff4a519-d469-4cab-bb61-edc5fe62f169",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
