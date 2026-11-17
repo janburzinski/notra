@@ -1,0 +1,41 @@
+apps/dashboard/src/lib/organizations/actions.ts
+  s_abe51e5848ac20::t_151b88ca4307a1 328-331
+apps/dashboard/src/routes/-onboarding-loaders.ts
+  s_abe51e5848ac20::t_151b88ca4307a1 38-41,214
+apps/dashboard/src/lib/onboarding/submit-workspace-form.ts
+  s_abe51e5848ac20::t_151b88ca4307a1 95
+packages/schemas/src/schemas/dashboard/onboarding/workspace.ts
+  s_abe51e5848ac20::t_151b88ca4307a1 27
+apps/dashboard/messages/de.json
+  s_abe51e5848ac20::t_57e373754f9b82 1314-1318
+apps/dashboard/messages/en.json
+  s_abe51e5848ac20::t_57e373754f9b82 1314-1318
+apps/dashboard/src/components/onboarding/domain-invite-pref.tsx
+  s_abe51e5848ac20::t_57e373754f9b82 1-26,28-31
+  s_abe51e5848ac20::t_9e826106c008bc 27
+apps/dashboard/src/types/organizations/actions.ts
+  s_abe51e5848ac20::t_aa2dce6c3e9b49 42
+apps/dashboard/src/types/onboarding.ts
+  s_abe51e5848ac20::t_57e373754f9b82 318-324
+  s_abe51e5848ac20::t_151b88ca4307a1 46-47,273
+packages/schemas/src/schemas/dashboard/organizations/actions.ts
+  s_abe51e5848ac20::t_151b88ca4307a1 46-47
+apps/dashboard/src/app/onboarding/workspace/workspace-form.tsx
+  s_abe51e5848ac20::t_57e373754f9b82 23,57,95,362-373
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "f414151980293330009ebffc76fe22f98633510d",
+  "prompts": {},
+  "sessions": {
+    "s_abe51e5848ac20": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "322ad6af-3eea-4536-aad9-cfecd6892696",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
