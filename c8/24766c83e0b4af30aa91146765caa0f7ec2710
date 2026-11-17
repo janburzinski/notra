@@ -1,0 +1,132 @@
+apps/dashboard/src/components/dashboard/chat-history-header.tsx
+  s_cef68fc8e5a98f::t_58c269492758d6 21,99-101
+  s_cef68fc8e5a98f::t_312e4c0586d8c9 1-20,23-36,38-56,58-79,81-98,102-136,138-141,143-154
+  s_cef68fc8e5a98f::t_efcc5db92b9b2f 57
+  s_cef68fc8e5a98f::t_6ea14e43724933 80,137,142
+  s_cef68fc8e5a98f::t_42f2293911063c 22,37
+apps/dashboard/src/components/dashboard/chat-history-nav.tsx
+  s_cef68fc8e5a98f::t_3fdd9119b10cc4 439-440
+  s_cef68fc8e5a98f::t_bb1e1d613a9dea 50-51,56-57,59,63,65,90-93,95-97,120-121,127-131
+  s_cef68fc8e5a98f::t_22adfd61fdc35d 210-217,221-225,227-245,248-252,254-282,289-292,324-325,327-330,332-337,339-347,349-355,357-408
+  s_cef68fc8e5a98f::t_adbbe5aff78809 207,209,409,437-438,441-455,457-460
+  s_cef68fc8e5a98f::t_58c269492758d6 54,122,456
+  s_cef68fc8e5a98f::t_3d45b5bef799f6 14,45,218-219
+  s_cef68fc8e5a98f::t_be0cdf6c41b2b2 43,295
+  s_cef68fc8e5a98f::t_c645ca8e5bfbaf 123-126,283-287,293-294,296-309,311-316
+  s_cef68fc8e5a98f::t_beb62d622cf473 310,317-323
+  s_cef68fc8e5a98f::t_106ea76bc1f8c0 226
+  s_cef68fc8e5a98f::t_c344c7c3bd59f8 422
+apps/dashboard/src/app/api/organizations/[organizationId]/chat/[chatId]/relay/route.ts
+  s_cef68fc8e5a98f::t_549cda1b76c571 123
+apps/dashboard/src/constants/chat-history.ts
+  s_cef68fc8e5a98f::t_de7872b92cde95 10-12
+  s_cef68fc8e5a98f::t_f3f3332abe439b 1,3-7
+apps/dashboard/src/lib/slack/thread-backfill.ts
+  s_cef68fc8e5a98f::t_906eb71d5652c5 12,19,28-31,35-36
+  s_cef68fc8e5a98f::t_16f94d6f8838aa 16
+  s_cef68fc8e5a98f::t_3abad9687fc55c 1-5,7-11,13-15,17-18,20-27,32-34,37-86
+  s_cef68fc8e5a98f::t_cdebf86fd9c5fd 6
+packages/ai/src/chat/history.ts
+  s_cef68fc8e5a98f::t_e1f358a76c4e55 603-617,624-640
+  s_cef68fc8e5a98f::t_c645ca8e5bfbaf 618-622
+  s_cef68fc8e5a98f::t_bc19d578499c2a 11,623
+apps/dashboard/src/types/chat.ts
+  s_cef68fc8e5a98f::t_30335a63a47238 25-26
+  s_cef68fc8e5a98f::t_549cda1b76c571 13-14,21-22
+  s_cef68fc8e5a98f::t_78274eb67739ad 28
+apps/agent/agent/lib/utils/slack-chat-mirror.ts
+  s_cef68fc8e5a98f::t_9a0f86a04b4f71 1,11,35-36,47-48,53,58-59,70-89,114-124,134,137-147,150-151
+apps/dashboard/src/components/chat/message-author-avatar.tsx
+  s_cef68fc8e5a98f::t_549cda1b76c571 26-27
+apps/dashboard/src/utils/chat-message-author.ts
+  s_cef68fc8e5a98f::t_549cda1b76c571 26,34,41,43-52,65-66
+apps/dashboard/src/components/dashboard/chat-source-icon.tsx
+  s_cef68fc8e5a98f::t_30335a63a47238 6
+  s_cef68fc8e5a98f::t_42f2293911063c 1-5,7,10,19
+  s_cef68fc8e5a98f::t_94bc25121702e8 8-9,11-18
+apps/dashboard/src/utils/slack-mrkdwn.ts
+  s_cef68fc8e5a98f::t_77446a015a78a4 1-34
+apps/dashboard/src/lib/slack/thread-reader.ts
+  s_cef68fc8e5a98f::t_16f94d6f8838aa 1-16,21-131,134-179
+  s_cef68fc8e5a98f::t_ff7562e2bb1c7d 17-20,132-133
+apps/dashboard/src/app/(dashboard)/[slug]/chat/page-client.tsx
+  s_cef68fc8e5a98f::t_549cda1b76c571 1906
+apps/dashboard/src/constants/slack-integration.ts
+  s_cef68fc8e5a98f::t_77446a015a78a4 34,37-38,41-42
+  s_cef68fc8e5a98f::t_ff7562e2bb1c7d 35-36
+  s_cef68fc8e5a98f::t_906eb71d5652c5 39-40
+apps/dashboard/src/utils/chat-history-groups.ts
+  s_cef68fc8e5a98f::t_f3f3332abe439b 4,8-11,17-22,25,27-34,36-37,39-40,42-47
+  s_cef68fc8e5a98f::t_30335a63a47238 12-14
+  s_cef68fc8e5a98f::t_6ea14e43724933 38,49-55
+  s_cef68fc8e5a98f::t_58c269492758d6 7
+apps/dashboard/tests/slack-thread-reader.test.ts
+  s_cef68fc8e5a98f::t_276c40c06bb634 1-8,11,13-28,31-43,50-85,87-132
+  s_cef68fc8e5a98f::t_ff7562e2bb1c7d 9-10,12,29-30,44-49,86
+apps/dashboard/src/lib/chat/history.ts
+  s_cef68fc8e5a98f::t_906eb71d5652c5 13,28,33-38
+apps/dashboard/src/types/components/chat-history.ts
+  s_cef68fc8e5a98f::t_58c269492758d6 1
+  s_cef68fc8e5a98f::t_42f2293911063c 2-16
+apps/agent/agent/lib/constants/chat-mirror.ts
+  s_cef68fc8e5a98f::t_d5c32c764452cb 15-19
+packages/schemas/src/schemas/dashboard/slack-relay.ts
+  s_cef68fc8e5a98f::t_77446a015a78a4 50-111
+packages/ai/src/types/chat.ts
+  s_cef68fc8e5a98f::t_cc75b3a81b8945 34-36
+  s_cef68fc8e5a98f::t_d5c32c764452cb 7
+apps/agent/agent/lib/utils/slack-message-authors.ts
+  s_cef68fc8e5a98f::t_d5c32c764452cb 1-94
+apps/dashboard/src/lib/hooks/use-chat-sessions.ts
+  s_cef68fc8e5a98f::t_de7872b92cde95 15-18,49-50,119-141,171-175
+apps/dashboard/src/lib/orpc/routers/chat.ts
+  s_cef68fc8e5a98f::t_bc19d578499c2a 4,9,70-88
+apps/dashboard/src/lib/hooks/use-agent-chat.ts
+  s_cef68fc8e5a98f::t_de7872b92cde95 35,419-429
+apps/dashboard/messages/de.json
+  s_cef68fc8e5a98f::t_c9b887676a0fce 8215-8222
+  s_cef68fc8e5a98f::t_87749c12b55bea 8223
+  s_cef68fc8e5a98f::t_beb62d622cf473 8224
+  s_cef68fc8e5a98f::t_dbb9cbc534a729 8225-8227
+  s_cef68fc8e5a98f::t_549cda1b76c571 6862-6863
+apps/dashboard/src/lib/hooks/use-chat-run-state.ts
+  s_cef68fc8e5a98f::t_dbb9cbc534a729 1-13,16-28,30-58,67-71,78,80-84
+  s_cef68fc8e5a98f::t_03520fa09aeb8f 29,59-61,63-66,72-77,79
+  s_cef68fc8e5a98f::t_58c269492758d6 14-15
+  s_cef68fc8e5a98f::t_c645ca8e5bfbaf 62
+packages/ai/src/schemas/chat.ts
+  s_cef68fc8e5a98f::t_e1f358a76c4e55 232-233
+  s_cef68fc8e5a98f::t_cc75b3a81b8945 74-80,84
+apps/agent/agent/lib/schemas/slack-user.ts
+  s_cef68fc8e5a98f::t_d5c32c764452cb 1-19
+packages/ai/src/constants/chat.ts
+  s_cef68fc8e5a98f::t_bc19d578499c2a 8-14
+apps/dashboard/messages/en.json
+  s_cef68fc8e5a98f::t_dbb9cbc534a729 8225-8227
+  s_cef68fc8e5a98f::t_549cda1b76c571 6862-6863
+  s_cef68fc8e5a98f::t_c9b887676a0fce 8215-8222
+  s_cef68fc8e5a98f::t_beb62d622cf473 8224
+  s_cef68fc8e5a98f::t_87749c12b55bea 8223
+apps/dashboard/src/components/dashboard/app-sidebar.tsx
+  s_cef68fc8e5a98f::t_a992ad10a0f9fd 3,12,30,45-55,57-58,61-83,192-204,220
+  s_cef68fc8e5a98f::t_79247c90fa92e5 60
+  s_cef68fc8e5a98f::t_86db6f70585757 227-236
+apps/dashboard/src/lib/slack/relay.ts
+  s_cef68fc8e5a98f::t_77446a015a78a4 39
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "c824766c83e0b4af30aa91146765caa0f7ec2710",
+  "prompts": {},
+  "sessions": {
+    "s_cef68fc8e5a98f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f52bd503-c707-4247-93a8-ff980133f029",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
