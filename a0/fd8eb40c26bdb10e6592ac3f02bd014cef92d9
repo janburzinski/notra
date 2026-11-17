@@ -1,0 +1,19 @@
+apps/dashboard/src/app/api/workflows/autopilot-workflow/route.ts
+  s_395c9414fcd198::t_8c8d4119b107a8 5,55-64
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "a0fd8eb40c26bdb10e6592ac3f02bd014cef92d9",
+  "prompts": {},
+  "sessions": {
+    "s_395c9414fcd198": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "82014d90-dedb-4b0a-8542-695277c56534",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
