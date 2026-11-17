@@ -21,6 +21,7 @@ import {
   condensePlannerState,
   dailyNotesToPrune,
   dedupeRules,
+  describeLearnedConventions,
   dreamActionCap,
   EMPTY_DREAM_STATE,
   findDuplicateTopics,
@@ -727,5 +728,31 @@ describe("dream state", () => {
     expect(partial.lastDreamAt).toBeNull();
     expect(partial.candidates.map((row) => row.key)).toEqual(["b"]);
     expect(partial.checked).toEqual({ ok: "2026-11-10" });
+  });
+});
+
+describe("learned conventions in the daily brief", () => {
+  test("name the first few and count the rest", () => {
+    expect(describeLearnedConventions([])).toEqual([]);
+    expect(
+      describeLearnedConventions(["acme/site: Use sentence case for headings"])
+    ).toEqual([
+      "Learned from your edits on acme/site: Use sentence case for headings",
+    ]);
+    expect(
+      describeLearnedConventions([
+        "acme/site: Use sentence case for headings",
+        "acme/site: Address the reader as you",
+        "acme/site: Keep titles under 60 characters",
+        "acme/docs: Link the API reference",
+      ])
+    ).toEqual([
+      "Learned from your edits on acme/site: Use sentence case for headings",
+      "Learned from your edits on acme/site: Address the reader as you",
+      "Learned 2 more habits from your edits",
+    ]);
+    expect(
+      describeLearnedConventions(["a/b: One", "a/b: Two", "a/b: Three"]).at(-1)
+    ).toBe("Learned 1 more habit from your edits");
   });
 });

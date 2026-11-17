@@ -101,11 +101,11 @@ export const dreamBlocks = [
         }),
         { sideEffect: true }
       ),
-      dreamStep("learn", "Learn conventions", async (ctx, log, context) => ({
-        learned: context.state.consolidation
+      dreamStep("learn", "Learn conventions", async (ctx, log, context) =>
+        context.state.consolidation
           ? await learnConventions(ctx, log, context.state.consolidation)
-          : [],
-      })),
+          : { learned: [], insights: [] }
+      ),
       dreamStep("tidy", "Tidy memory", async (ctx, log, context) => ({
         tidied: await tidyMemory(
           ctx,

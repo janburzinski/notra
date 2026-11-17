@@ -94,6 +94,7 @@ import {
   condensePlannerState,
   dailyNotesToPrune,
   dedupeRules,
+  describeLearnedConventions,
   dreamActionCap,
   findDuplicateTopics,
   hashMemoryFile,
@@ -370,7 +371,7 @@ export async function learnConventions(
   consolidation: AutopilotDreamConsolidation
 ) {
   if (consolidation.reviewed.length === 0) {
-    return [];
+    return { learned: [], insights: [] };
   }
   const outcome = { promoted: [] as string[], reinforced: [] as string[] };
   const pullRequests = new Map(
@@ -448,12 +449,15 @@ export async function learnConventions(
       lessons: consolidation.lessons.length,
     }
   );
-  return [
-    ...outcome.promoted,
-    ...(outcome.reinforced.length
-      ? [`confirmed ${outcome.reinforced.length} known conventions`]
-      : []),
-  ];
+  return {
+    learned: [
+      ...outcome.promoted,
+      ...(outcome.reinforced.length
+        ? [`confirmed ${outcome.reinforced.length} known conventions`]
+        : []),
+    ],
+    insights: describeLearnedConventions(outcome.promoted),
+  };
 }
 
 export async function tidyMemory(

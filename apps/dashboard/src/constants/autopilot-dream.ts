@@ -37,6 +37,9 @@ export const AUTOPILOT_DREAM_LESSON_KEY_MAX_CHARS = 48;
 export const AUTOPILOT_DREAM_CONVENTIONS_INTRO =
   "How this repository's team edits Autopilot's drafts, learned from merged and closed pull requests. Style, format and structure only: never a rule about topics. Written by Autopilot's dream; delete an entry to make it forget.";
 
+/** New conventions the daily brief names one per line; the rest are counted. */
+export const AUTOPILOT_DREAM_BRIEF_MAX_LESSONS = 2;
+
 export const AUTOPILOT_DREAM_MAX_CHECKS = 25;
 export const AUTOPILOT_DREAM_MIN_ACTION_CAP = 3;
 export const AUTOPILOT_DREAM_ACTION_CAP_SHARE = 0.15;

@@ -845,11 +845,76 @@ if (process.env.NOTRA_AUTOPILOT_DREAM_TEST !== "1") {
       ],
       merges: [],
     };
-    await dream();
+    const { run } = await dream();
     expect(
       await readMemory(memoryConventionsPath(REPO.owner, REPO.name))
     ).toBeNull();
     expect((await dreamState()).candidates).toHaveLength(1);
+    // A candidate is not learned yet, so the brief says nothing about it.
+    expect(run.state.nodes.dream?.output).toMatchObject({ insights: [] });
+  });
+
+  test("a convention learned in the daily run is a line in that day's brief", async () => {
+    for (const [number, days] of [
+      [61, 2],
+      [64, 1],
+    ] as const) {
+      await finding({
+        status: "merged",
+        pullRequestNumber: number,
+        headSha: `autopilot-${number}`,
+        mergedAt: daysAgo(days),
+      });
+      state.pulls[number] = {
+        head: `person-${number}`,
+        files: [{ filename: "content/blog/post.md", status: "added" }],
+        compare: {
+          patch: sentenceCase(`Post ${number}`),
+          author: { type: "User" },
+        },
+      };
+    }
+    state.dream = {
+      lessons: ["sandbox/website#61", "sandbox/website#64"].map(
+        (pullRequest) => ({
+          pullRequest,
+          key: "sentence-case-headings",
+          area: "style",
+          lesson: "Use sentence case for headings",
+          explicit: false,
+          reverses: false,
+        })
+      ),
+      merges: [],
+    };
+    const id = await newRun();
+    const run = await runGraph({
+      organizationId: ORG,
+      definition: AUTOPILOT_DAILY_WORKFLOW,
+      definitions: Object.values(workflowDefinitions),
+      input: { autopilotRunId: id, previousRunAt: null },
+    });
+    const line =
+      "Learned from your edits on sandbox/website: Use sentence case for headings";
+    expect(run.status).toBe("completed");
+    expect(run.state.nodes.brief?.status).toBe("success");
+    const row = await db.query.autopilotRuns.findFirst({
+      where: eq(autopilotRuns.id, id),
+    });
+    expect(row?.summary?.insights).toContain(line);
+
+    // The next day already knows it, so the brief doesn't repeat it.
+    const next = await newRun();
+    await runGraph({
+      organizationId: ORG,
+      definition: AUTOPILOT_DAILY_WORKFLOW,
+      definitions: Object.values(workflowDefinitions),
+      input: { autopilotRunId: next, previousRunAt: null },
+    });
+    const nextRow = await db.query.autopilotRuns.findFirst({
+      where: eq(autopilotRuns.id, next),
+    });
+    expect(nextRow?.summary?.insights ?? []).not.toContain(line);
   });
 
   test("a done topic whose post file is gone is reopened, one whose post exists stays done", async () => {

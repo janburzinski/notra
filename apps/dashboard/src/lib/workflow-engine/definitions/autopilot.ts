@@ -56,6 +56,7 @@ const out = (node: string, path?: string) =>
   `{{nodes.${node}.output${path ? `.${path}` : ""}}}`;
 
 const INSIGHTS = [
+  out("dream", "insights"),
   out("gather", "prompts.insights"),
   out("gather", "competitors.insights"),
   out("rendering", "insights"),

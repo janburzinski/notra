@@ -17,6 +17,7 @@ import { parseRecords, renderRecords } from "@notra/memory/utils/records";
 
 import {
   AUTOPILOT_DREAM_ACTION_CAP_SHARE,
+  AUTOPILOT_DREAM_BRIEF_MAX_LESSONS,
   AUTOPILOT_DREAM_CLOSED_TOPIC_SUMMARY_MAX_CHARS,
   AUTOPILOT_DREAM_CONVENTIONS_INTRO,
   AUTOPILOT_DREAM_CONVENTIONS_MAX_BYTES,
@@ -580,6 +581,23 @@ function conventionRecord(convention: AutopilotConvention): MemoryRecord {
       learnedAt: convention.learnedAt,
     },
   };
+}
+
+/**
+ * The daily brief's lines about conventions learned in this dream, from
+ * `applyLessons`' "owner/repo: lesson" entries. A few by name, the rest counted.
+ */
+export function describeLearnedConventions(promoted: readonly string[]) {
+  const named = promoted.slice(0, AUTOPILOT_DREAM_BRIEF_MAX_LESSONS);
+  const rest = promoted.length - named.length;
+  return [
+    ...named.map((entry) => `Learned from your edits on ${entry}`),
+    ...(rest > 0
+      ? [
+          `Learned ${rest} more ${rest === 1 ? "habit" : "habits"} from your edits`,
+        ]
+      : []),
+  ];
 }
 
 export function parseConventions(markdown: string | null) {

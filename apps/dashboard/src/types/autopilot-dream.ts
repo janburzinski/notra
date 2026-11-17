@@ -107,6 +107,8 @@ export type AutopilotDreamBlockState = {
   since: string | null;
   consolidation: AutopilotDreamConsolidation;
   learned: string[];
+  /** Lines for the daily brief about conventions learned in this dream. */
+  insights: string[];
   tidied: string[];
   verified: string[];
 };
