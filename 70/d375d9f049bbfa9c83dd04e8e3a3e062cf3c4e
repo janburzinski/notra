@@ -1,0 +1,61 @@
+apps/dashboard/src/lib/autopilot/findings.ts
+  s_a55c242e38d4bb::t_7f690dd6aac39a 1248
+  s_a55c242e38d4bb::t_7a66bf405257ab 1237-1239,1245-1247
+packages/schemas/src/schemas/dashboard/autopilot.ts
+  s_a55c242e38d4bb::t_7a66bf405257ab 67-68
+apps/dashboard/src/lib/autopilot/revisions.ts
+  s_a55c242e38d4bb::t_be7b896ffdbc69 259
+  s_a55c242e38d4bb::t_8f2046d1240d36 31,57-61,63-84,96,100-110,114,127-129,133-148,230-243,257-258,260-267,309-319
+  s_a55c242e38d4bb::t_3b94c319d74c09 62
+apps/dashboard/src/utils/autopilot-post-images.tsx
+  s_a55c242e38d4bb::t_07428d38811f72 1-30
+apps/dashboard/src/utils/inline-diff.ts
+  s_a55c242e38d4bb::t_fb933bdf33ffc5 274
+  s_a55c242e38d4bb::t_948578cdece293 27-37,261,264-266,271-273,282,297-298
+  ai_agent 23
+apps/dashboard/src/components/autopilot/autopilot-post-diff.tsx
+  s_a55c242e38d4bb::t_5171472c7cfb32 181
+  s_a55c242e38d4bb::t_948578cdece293 4-7,15,125,131-132,135-136,161-163,169-180,182-187
+apps/dashboard/src/app/(dashboard)/[slug]/autopilot/findings/[id]/page-client.tsx
+  s_a55c242e38d4bb::t_7f690dd6aac39a 158-160,169
+  s_a55c242e38d4bb::t_7398cb1804824a 48,125-126,128,156,172-174,293-304,477
+apps/dashboard/src/lib/hooks/use-finding-revisions.ts
+  s_a55c242e38d4bb::t_e0b58cd0f4f63f 18,33,36,40-44,51-68,70-93,108,130-132,142-144,147-148
+  s_a55c242e38d4bb::t_d96d77bf8ebbb5 7,69,133-136,141
+apps/dashboard/src/lib/orpc/routers/autopilot.ts
+  s_a55c242e38d4bb::t_7a66bf405257ab 86,431-439,643-646
+apps/dashboard/src/components/autopilot/autopilot-merge-menu.tsx
+  s_a55c242e38d4bb::t_7f690dd6aac39a 28,34-36
+apps/dashboard/src/types/autopilot-revisions.ts
+  s_a55c242e38d4bb::t_948578cdece293 58-62
+  s_a55c242e38d4bb::t_de606017aeddf6 33-39,46
+apps/dashboard/src/lib/hooks/use-autopilot.ts
+  s_a55c242e38d4bb::t_7a66bf405257ab 191-196
+apps/dashboard/src/types/autopilot.ts
+  s_a55c242e38d4bb::t_7398cb1804824a 247-250
+  s_a55c242e38d4bb::t_7f690dd6aac39a 491-492
+apps/dashboard/src/components/autopilot/autopilot-post-workbench.tsx
+  s_a55c242e38d4bb::t_7f690dd6aac39a 221-225,299-303
+  s_a55c242e38d4bb::t_abdf4d4455914b 28,45,50,53-54,82,92-104,107-108,121,129,131-132,135-136,139,141-157,160,178,199-212,214-220,226-298,304-364,378,400-407,409-418,422
+  s_a55c242e38d4bb::t_de606017aeddf6 14,130,133-134,213
+apps/dashboard/src/utils/autopilot-revisions.ts
+  s_a55c242e38d4bb::t_8f2046d1240d36 44-66,71
+apps/dashboard/src/components/autopilot/autopilot-brief-item-dialog.tsx
+  s_a55c242e38d4bb::t_07428d38811f72 4,33
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "70d375d9f049bbfa9c83dd04e8e3a3e062cf3c4e",
+  "prompts": {},
+  "sessions": {
+    "s_a55c242e38d4bb": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6b1b600f-4f52-4630-9b56-b485ce7f20dc",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
