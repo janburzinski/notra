@@ -44,6 +44,8 @@ interface NavGroupListProps {
   groups: readonly NavGroup[];
   slug: string;
   activeLink: string | null;
+  /** Decides which group shows its pages. Defaults to `activeLink`. */
+  openLink?: string | null;
   projectId?: string;
   visibility: NavVisibility;
 }
@@ -84,6 +86,7 @@ function NavGroupRow({
   group,
   slug,
   activeLink,
+  openLink = activeLink,
   projectId,
   visibility,
 }: Omit<NavGroupListProps, "groups"> & { group: NavGroup }) {
@@ -100,8 +103,9 @@ function NavGroupRow({
   }
 
   const label = tLabels(group.labelKey);
-  const { subRows, groupActive, ownPageActive, showSubRows, showOwnBadge } =
+  const { subRows, groupActive, ownPageActive, showOwnBadge } =
     resolveNavGroupRow(group, first, rest, activeLink);
+  const { showSubRows } = resolveNavGroupRow(group, first, rest, openLink);
 
   if (collapseSettled && rest.length > 0) {
     return (
@@ -212,6 +216,7 @@ export function NavGroupList({
   groups,
   slug,
   activeLink,
+  openLink,
   projectId,
   visibility,
 }: NavGroupListProps) {
@@ -222,6 +227,7 @@ export function NavGroupList({
           activeLink={activeLink}
           group={group}
           key={group.id}
+          openLink={openLink}
           projectId={projectId}
           slug={slug}
           visibility={visibility}

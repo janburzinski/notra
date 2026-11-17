@@ -2,9 +2,11 @@
 
 import { SidebarGroup } from "@notra/ui/components/ui/sidebar";
 import { useRouterState } from "@tanstack/react-router";
+import { useState } from "react";
 
 import { useOrganizationsContext } from "@/components/providers/organization-provider";
 import {
+  CHAT_NAV_LINK,
   NAV_ACTIVE_LINK_ALIASES,
   NAV_GROUPS,
   NAV_WORKSPACE_GROUP,
@@ -50,6 +52,12 @@ export function NavJobs() {
   const visibility = useNavVisibility();
   const slug = activeOrganization?.slug;
   const activeLink = useActiveNavLink(slug ?? "");
+  // Agent Chat swaps this navigation for the chat list. The groups stay as
+  // they were so nothing folds up while the navigation slides away.
+  const [openLink, setOpenLink] = useState(activeLink);
+  if (activeLink !== CHAT_NAV_LINK && openLink !== activeLink) {
+    setOpenLink(activeLink);
+  }
   // Persists the route's mode so the bare org URL still restores GEO or Studio.
   useSidebarMode(sidebarRouteFromPathname(pathname));
 
@@ -62,6 +70,7 @@ export function NavJobs() {
       <NavGroupList
         activeLink={activeLink}
         groups={NAV_GROUPS}
+        openLink={openLink}
         projectId={projectParam ?? undefined}
         slug={slug}
         visibility={visibility}

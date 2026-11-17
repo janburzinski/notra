@@ -110,6 +110,15 @@ export interface NavLockHintProps {
 
 export type SidebarSwapSide = "left" | "right";
 
+export type SidebarSwapMotion = "fade" | "push";
+
+export interface SidebarSwapMotionConfig {
+  enterClass: string;
+  exitLeftClass: string;
+  exitRightClass: string;
+  exitMs: number;
+}
+
 export interface SidebarSwapItem {
   id: string;
   side: SidebarSwapSide;
@@ -122,5 +131,7 @@ export interface SidebarSwapProps {
   items: readonly SidebarSwapItem[];
   /** Keep every panel mounted. Use when both sides stay cheap to hold. */
   keepMounted?: boolean;
+  /** How panels trade places. Defaults to `fade`. */
+  motion?: SidebarSwapMotion;
   className?: string;
 }

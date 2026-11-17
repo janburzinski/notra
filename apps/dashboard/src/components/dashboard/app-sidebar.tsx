@@ -189,28 +189,25 @@ export function DashboardSidebar({
       <SidebarHeader className="pt-px pb-0.5">
         <SidebarHeaderRow />
       </SidebarHeader>
-      {/* The chat list brings its own search, so the global field steps
-          aside there; ⌘K still opens the palette. */}
-      <div
-        className={cn(
-          "grid transition-[grid-template-rows,opacity] duration-(--sidebar-duration) ease-(--sidebar-ease) motion-reduce:transition-none",
-          isSubpage ? "grid-rows-[0fr] opacity-0" : "grid-rows-[1fr]"
-        )}
-        inert={isSubpage ? true : undefined}
-      >
-        <div className="min-h-0 overflow-hidden">
-          <SidebarTopQuickActions />
-        </div>
-      </div>
       <SidebarContent>
         <SidebarSwap
           activeId={panelId}
           className="overflow-x-clip"
+          motion="push"
           items={[
             {
               id: "main",
               side: "left",
-              children: <NavJobs />,
+              // The search rides along with the navigation; the chat list
+              // brings its own, and ⌘K still opens the palette there.
+              children: (
+                <>
+                  <div className="bg-sidebar sticky top-0 z-20">
+                    <SidebarTopQuickActions />
+                  </div>
+                  <NavJobs />
+                </>
+              ),
             },
             {
               id: "chat",
@@ -237,7 +234,9 @@ export function DashboardSidebar({
           <NavFooter slug={slug} />
           <DeferredSidebarStatus />
         </div>
-        <div aria-hidden className="h-px shrink-0" ref={scrollEndRef} />
+        {/* Overlaps the footer instead of adding a pixel under it, so the
+            footer sits at the same height whether the list scrolls or not. */}
+        <div aria-hidden className="-mt-px h-px shrink-0" ref={scrollEndRef} />
       </SidebarContent>
       <SidebarFooter className="pt-1.75">
         <SidebarUserMenu />

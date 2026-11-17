@@ -18,6 +18,11 @@
 
 :root {
   --sidebar-ease: var(--ease-out);
+  /* Sidebar panels pushing each other aside travel a full sidebar width, so
+     they get a longer, softer curve than --ease-out, which would cover most
+     of the distance in the first few frames. */
+  --sidebar-push-duration: 400ms;
+  --sidebar-push-ease: cubic-bezier(0.25, 0.5, 0.15, 1);
 }
 
 /* ⌘B on narrow screens opens the sidebar as a sheet in a portal; the

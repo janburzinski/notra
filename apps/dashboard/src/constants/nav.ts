@@ -39,13 +39,15 @@ import type {
   NavGroup,
   NavMainItem,
   NavPrimaryActionConfig,
+  SidebarSwapMotion,
+  SidebarSwapMotionConfig,
   NavVisibility,
   SidebarMode,
   SidebarModeOption,
 } from "@/types/components/nav";
 
 export const HOME_NAV_LINK = "";
-const CHAT_NAV_LINK = "/chat";
+export const CHAT_NAV_LINK = "/chat";
 const CONTENT_NAV_LINK = "/content";
 export const ANALYTICS_NAV_LINK = "/analytics";
 const BRAND_IDENTITY_NAV_LINK = "/brand/identity";
@@ -242,16 +244,42 @@ export const DEFAULT_NAV_VISIBILITY: NavVisibility = {
   sites: false,
 };
 
-const SIDEBAR_MODE_ENTER_TIMING = "duration-normal ease-out";
-const SIDEBAR_MODE_EXIT_TIMING = "duration-fast ease-out";
+const SIDEBAR_SWAP_ENTER_TIMING = "duration-normal ease-out";
+const SIDEBAR_SWAP_EXIT_TIMING = "duration-fast ease-out";
+// Both panels of a push move as one strip, so they share a single timing.
+const SIDEBAR_SWAP_PUSH_TIMING =
+  "duration-(--sidebar-push-duration) ease-(--sidebar-push-ease)";
+// Reduced motion turns every transition into a short fade; the leaving panel
+// hides at once so the two never show on top of each other.
+const SIDEBAR_SWAP_PUSH_EXIT_REDUCED = "motion-reduce:invisible";
+/** Mirrors `--sidebar-push-duration`. */
+const SIDEBAR_SWAP_PUSH_MS = 400;
 
-export const SIDEBAR_MODE_EXIT_MS = DURATION.fast * 1000;
+/**
+ * `fade` nudges the panels 20px and crossfades them in place. `push` slides
+ * them a full width side by side, like drilling into a page, so the two never
+ * overlap. Push needs a parent that clips horizontally.
+ */
+export const SIDEBAR_SWAP_MOTION = {
+  fade: {
+    enterClass: `z-10 translate-x-0 opacity-100 ${SIDEBAR_SWAP_ENTER_TIMING}`,
+    exitLeftClass: `pointer-events-none z-0 -translate-x-5 opacity-0 ${SIDEBAR_SWAP_EXIT_TIMING}`,
+    exitRightClass: `pointer-events-none z-0 translate-x-5 opacity-0 ${SIDEBAR_SWAP_EXIT_TIMING}`,
+    exitMs: DURATION.fast * 1000,
+  },
+  push: {
+    enterClass: `z-10 translate-x-0 opacity-100 ${SIDEBAR_SWAP_PUSH_TIMING}`,
+    exitLeftClass: `pointer-events-none z-0 -translate-x-full opacity-0 ${SIDEBAR_SWAP_PUSH_EXIT_REDUCED} ${SIDEBAR_SWAP_PUSH_TIMING}`,
+    exitRightClass: `pointer-events-none z-0 translate-x-full opacity-0 ${SIDEBAR_SWAP_PUSH_EXIT_REDUCED} ${SIDEBAR_SWAP_PUSH_TIMING}`,
+    exitMs: SIDEBAR_SWAP_PUSH_MS,
+  },
+} as const satisfies Record<SidebarSwapMotion, SidebarSwapMotionConfig>;
 
-export const SIDEBAR_MODE_ENTER_CLASS = `z-10 translate-x-0 opacity-100 ${SIDEBAR_MODE_ENTER_TIMING}`;
+/** A frame callback running this far behind its frame time came after a long task. */
+export const SIDEBAR_SWAP_STALE_FRAME_MS = 24;
 
-export const SIDEBAR_MODE_EXIT_LEFT_CLASS = `pointer-events-none z-0 -translate-x-5 opacity-0 ${SIDEBAR_MODE_EXIT_TIMING}`;
-
-export const SIDEBAR_MODE_EXIT_RIGHT_CLASS = `pointer-events-none z-0 translate-x-5 opacity-0 ${SIDEBAR_MODE_EXIT_TIMING}`;
+/** Upper bound for holding the scroll between a route change and the trade. */
+export const SIDEBAR_SWAP_PRE_TRADE_HOLD_MS = 1000;
 
 const SIDEBAR_MODE_FADE_CLASS =
   "transition-[opacity,translate] will-change-[opacity,translate] motion-reduce:translate-x-0 motion-reduce:transition-opacity";
