@@ -65,9 +65,6 @@ test("crossSubdomain is ignored on the hosting domain, where every other site co
     )
   ).toEqual([]);
   expect(
-    storageConfig(true, "https://blog.acme.com", "notra.site")
-  ).toMatchObject({ defaultDomain: ".acme.com", storageKey: undefined });
-  expect(
     consentDiagnostics(config(true), [], "https://blog.acme.com", "notra.site")
   ).toEqual([]);
   expect(

@@ -1,4 +1,4 @@
-import { expect, mock, test } from "bun:test";
+import { expect, test } from "bun:test";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
@@ -43,14 +43,6 @@ if (!process.env.NOTRA_ANALYTICS_IMPORT_UI_TEST_WORKER) {
     await import("../src/lib/hooks/use-analytics-import-notices");
   const { finishedSinceLastSeen } =
     await import("../src/utils/analytics-import-watch");
-  mock.module("../src/lib/hooks/use-geo-active-project", () => ({
-    useGeoActiveProject: () => ({
-      project: { id: "project" },
-      domain: "example.com",
-    }),
-  }));
-  const { ImportHistoryCard } =
-    await import("../src/components/analytics-import/import-history-card");
   const { ANALYTICS_IMPORT_LOST_ERROR } =
     await import("../src/constants/analytics-imports");
   const { dashboardOrpc } = await import("../src/lib/orpc/query");

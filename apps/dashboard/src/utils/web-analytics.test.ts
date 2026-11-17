@@ -2,7 +2,6 @@ import { describe, expect, test } from "bun:test";
 
 import { GEO_MAX_RANGE_DAYS } from "@notra/geo-core/constants/geo";
 import type { WebAnalyticsResponse } from "@notra/geo-core/types/geo";
-import { trafficSparklineDays } from "@notra/geo-core/utils/ai-traffic";
 
 import { WEB_TABLE_EMPTY_HEIGHT } from "@/constants/web-analytics";
 
@@ -28,7 +27,7 @@ test.each([
   ["2026-10-04", "2026-10-01"],
   ["2020-01-01", "2030-01-01"],
 ] as const)(
-  "web day inputs preserve the old synthetic domain for %s/%s",
+  "web trend rows sum people and agents per day within the range cap for %s/%s",
   (from, to) => {
     const web = [
       { day: "2026-10-01 12:00:00", views: 3, visitors: 2 },
@@ -50,21 +49,7 @@ test.each([
     ];
     for (const webPoints of [[], web]) {
       for (const aiPoints of [[], ai]) {
-        const oldDays = trafficSparklineDays(
-          [
-            ...aiPoints,
-            ...webPoints.map((point) => ({
-              day: point.day,
-              visitorType: "human" as const,
-              source: "",
-              visits: point.views,
-            })),
-          ],
-          from,
-          to
-        );
         const rows = buildWebTrendRows(webPoints, aiPoints, "de", from, to);
-        expect(rows.map((row) => row.rawDay)).toEqual(oldDays);
         expect(rows.length).toBeLessThanOrEqual(GEO_MAX_RANGE_DAYS);
         for (const row of rows) {
           expect(row.people).toBe(

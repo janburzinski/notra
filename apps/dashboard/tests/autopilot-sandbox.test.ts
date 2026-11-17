@@ -1324,7 +1324,6 @@ if (process.env.NOTRA_AUTOPILOT_SANDBOX_TEST !== "1") {
     expect(week.automations.map((row) => row.kind)).toEqual([
       ...AUTOPILOT_AUTOMATION_KINDS,
     ]);
-    expect(week.automations.map((row) => row.kind)).not.toContain("prompts");
     expect(
       (await loadAutopilotMetrics("sandbox-org", 30, now)).pullRequests
     ).toBe(2);

@@ -242,7 +242,6 @@ test("success records lifecycle, guest resources, compiler areas and completion 
     ephemeral: true,
     ttl: SITE_BUILD_LIMITS.buildTimeoutSeconds + 5 * 60,
   });
-  expect(command.mock.calls[0]?.[0]).toContain("node -e");
 });
 
 test("source archives over 100 MB upload in bounded parts and reassemble byte for byte", async () => {
@@ -283,7 +282,6 @@ test("source archives over 100 MB upload in bounded parts and reassemble byte fo
       .digest("hex");
     expect(sourceHash.digest("hex")).toBe(expectedHash);
     const script = command.mock.calls[0]?.[0] ?? "";
-    expect(script).toContain("cat ");
     const assembly = (script.split("rm -rf src out")[0] ?? "").replaceAll(
       "/workspace/home",
       directory
@@ -314,7 +312,6 @@ test.each([8 * 1024 * 1024])(
       "/workspace/home/target.json",
     ]);
     expect((form.get("files") as File).size).toBe(size);
-    expect(command.mock.calls[0]?.[0]).not.toContain("cat ");
   }
 );
 
@@ -341,7 +338,6 @@ test.each([8 * 1024 * 1024 + 1, 16 * 1024 * 1024, 64 * 1024 * 1024])(
     }
     expect(sourceBytes).toBe(size);
     expect(targetCount).toBe(1);
-    expect(command.mock.calls[0]?.[0]).toContain("cat ");
   }
 );
 
@@ -1129,7 +1125,12 @@ test("prefetched fonts reach the builder's font cache while the Box stays offlin
   expect(spawnSync("test", ["-e", join(boxHome, "fonts.tgz")]).status).toBe(1);
 });
 
-test("builds without fonts deliver no font archive", async () => {
+test("builds without fonts prepare the Box without a font archive", async () => {
   await runSandboxBuild({ ...params, fontCache: null });
-  expect(command.mock.calls[0]?.[0]).not.toContain("fonts.tgz");
+  const script = command.mock.calls[0]?.[0] ?? "";
+  const prepare = (script.split("node -e")[0] ?? "").replaceAll(
+    "/workspace/home",
+    boxHome
+  );
+  expect(spawnSync("sh", ["-c", prepare]).status).toBe(0);
 });

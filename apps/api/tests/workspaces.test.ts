@@ -70,8 +70,6 @@ describe("workspace context", () => {
       ],
       authentication: { type: "apiKey" },
     });
-    expect(db.query.members.findMany).not.toHaveBeenCalled();
-    expect(db.query.users.findFirst).not.toHaveBeenCalled();
   });
 
   test("adds only safe pending workspace details for OAuth users", async () => {

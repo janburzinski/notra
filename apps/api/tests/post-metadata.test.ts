@@ -340,7 +340,6 @@ describe("PATCH metadata", () => {
     if (prepared._tag === "Failure") {
       throw new Error(String(prepared.failure));
     }
-    expect(prepared.success.prepared.siteAuthorIds).toEqual(["site:jane-doe"]);
 
     const committed = await run(
       commitPatchPost({

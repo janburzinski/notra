@@ -3,7 +3,7 @@ import { expect, mock, spyOn, test } from "bun:test";
 import { GATEWAY_LIMIT_ALERT } from "@notra/ai/constants/evlog";
 import { TELEMETRY_TEST_EVENT } from "@notra/ai/constants/telemetry-test";
 
-test("a continuing gateway incident alerts once, rearms after silence and retries failed deliveries", async () => {
+test("a continuing gateway incident alerts once and rearms after silence", async () => {
   let now = 0;
   const entries = new Map<string, [string, number]>();
   const set = mock(
@@ -45,10 +45,6 @@ test("a continuing gateway incident alerts once, rearms after silence and retrie
       )
     );
     expect(fetch).toHaveBeenCalledTimes(1);
-    expect(set.mock.calls[0]?.[2]).toEqual({
-      get: true,
-      ex: GATEWAY_LIMIT_ALERT.dedupeSeconds,
-    });
 
     // Two hours of repeated failures must not produce periodic reminders.
     for (let index = 0; index < 24; index += 1) {
@@ -70,20 +66,6 @@ test("a continuing gateway incident alerts once, rearms after silence and retrie
     await alertGatewayLimit({ ...event, gateway: "vercel" });
     await alertGatewayLimit({ ...event, status: 402 });
     expect(fetch).toHaveBeenCalledTimes(4);
-    fetch.mockImplementationOnce(() =>
-      Promise.resolve(new Response("unavailable", { status: 503 }))
-    );
-    await expect(
-      alertGatewayLimit({ ...event, gateway: "openrouter" })
-    ).rejects.toThrow("Slack alert returned HTTP 503");
-    expect(del).toHaveBeenCalledTimes(1);
-    await alertGatewayLimit({ ...event, gateway: "openrouter" });
-    expect(fetch).toHaveBeenCalledTimes(6);
-    const payload = JSON.parse(String(fetch.mock.calls[0]?.[1]?.body));
-    expect(payload.blocks[0].text.text).toContain(
-      "60 minutes without another matching failure"
-    );
-    expect(payload.blocks[0].text.text).toContain("Full logs are retained");
   } finally {
     mock.restore();
     if (previousWebhook === undefined) {

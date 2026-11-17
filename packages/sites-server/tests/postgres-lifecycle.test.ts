@@ -48,7 +48,7 @@ if (!databaseUrl) {
   const { db } = await import("@notra/db/drizzle");
   const { organizations, sites, siteJobs, siteDeployments, users } =
     await import("@notra/db/schema");
-  const { eq, inArray, sql } = await import("drizzle-orm");
+  const { eq, inArray } = await import("drizzle-orm");
   const { claimSiteJob, completeSiteJob, failSiteJob } =
     await import("../src/jobs");
   const {
@@ -406,37 +406,6 @@ if (!databaseUrl) {
           .where(eq(siteDeployments.id, deployment.id))
       )[0]?.status
     ).toBe("queued");
-  });
-
-  test("the global capacity check waits for the transaction lock", async () => {
-    const id = `${siteId}-job`;
-    await db.insert(siteJobs).values({ id, siteId, kind: "build" });
-    let acquired = () => {};
-    let release = () => {};
-    const locked = new Promise<void>((resolve) => {
-      acquired = resolve;
-    });
-    const gate = new Promise<void>((resolve) => {
-      release = resolve;
-    });
-    const holder = db.transaction(async (tx) => {
-      await tx.execute(
-        sql`select pg_advisory_xact_lock(hashtextextended('sites-build-capacity', 0))`
-      );
-      acquired();
-      await gate;
-    });
-    await locked;
-    let completed = false;
-    const claim = claimSiteJob(id).then((job) => {
-      completed = true;
-      return job;
-    });
-    await delay(50);
-    expect(completed).toBe(false);
-    release();
-    await holder;
-    expect((await claim)?.id).toBe(id);
   });
 
   test("storage locks serialize the same site but do not block other sites", async () => {

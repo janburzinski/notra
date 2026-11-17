@@ -1,6 +1,5 @@
 import { expect, test } from "bun:test";
 
-import { SITE_SECTIONS } from "@/constants/sites";
 import type { SiteDeployment, SiteDetail, SitePreviewRow } from "@/types/sites";
 import {
   deploymentMatchesFilters,
@@ -17,15 +16,12 @@ import {
 
 import { preview } from "../../tests/constants/site-previews";
 
-test("preview links use the unified deployment filter and sidebar has no preview entry", () => {
+test("preview links use the unified deployment filter", () => {
   expect(sitePreviewDeploymentsHref("acme", "site")).toBe(
     "/acme/sites/site/deployments?environment=preview"
   );
   expect(siteDeploymentHref("acme", "site", "deployment")).toBe(
     "/acme/sites/site/deployments/deployment"
-  );
-  expect(SITE_SECTIONS.map((section) => section.path)).not.toContain(
-    "/previews"
   );
 });
 

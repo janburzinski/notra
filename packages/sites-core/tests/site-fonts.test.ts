@@ -1,5 +1,4 @@
 import { afterEach, expect, spyOn, test } from "bun:test";
-import { createHash } from "node:crypto";
 
 import { downloadSiteFonts, planSiteFonts } from "../src/utils/site-fonts";
 
@@ -43,11 +42,9 @@ test("sites without Google Fonts plan nothing", async () => {
 test("the cache key keeps the builder's earlier formula, so older toolchains find prefetched fonts", async () => {
   const plan = await planSiteFonts({ family: "Lato" });
   expect(plan?.families).toEqual(["Lato"]);
-  const expected = createHash("sha256")
-    .update(plan?.url ?? "")
-    .update(JSON.stringify(plan?.candidates))
-    .digest("hex");
-  expect(plan?.key).toBe(expected);
+  expect(plan?.key).toBe(
+    "f5bf658268a2a4dba3d706196624781365ab314b8cbcd10815860a4afb96decd"
+  );
   expect(plan?.url).toBe(
     "https://fonts.googleapis.com/css2?family=Lato%3Awght%40300..800&display=swap"
   );

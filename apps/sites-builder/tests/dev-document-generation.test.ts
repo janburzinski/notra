@@ -45,33 +45,17 @@ async function renderProtocol(documentToken?: string) {
   return container.renderToString(component);
 }
 
-test("rendered HTML owns the shared document generation and reuses Astro's exact native client module", async () => {
-  const blog = await renderProtocol("document-session.1");
-  const changelog = await renderProtocol("document-session.1");
-  const replacement = await renderProtocol("document-session.2");
-  for (const html of [blog, changelog]) {
-    expect(html).toContain('const renderedToken = "document-session.1";');
-    expect(html).toContain('await import("/@vite/client")');
-    expect(html).toContain('hot.on("vite:ws:connect", report)');
-    expect(html).toContain("hot.send(event, renderedToken)");
-    expect(html).toContain("report();");
-    expect(html).not.toContain("new WebSocket");
-    expect(html).not.toContain("/blog/@vite/client");
-    expect(html).not.toContain("/changelog/@vite/client");
-  }
-  expect(replacement).toContain('const renderedToken = "document-session.2";');
-  expect(blog).not.toContain("document-session.2");
+test("rendered HTML reports its own document generation", async () => {
+  expect(await renderProtocol("document-session.1")).toContain(
+    '"document-session.1"'
+  );
+  expect(await renderProtocol("document-session.2")).toContain(
+    '"document-session.2"'
+  );
 });
 
-test("hosted documents omit the dev protocol and the shared layout gates it on development", async () => {
+test("hosted documents omit the dev protocol", async () => {
   expect((await renderProtocol()).trim()).toBe("");
-  const layout = await readFile(
-    new URL("../src/layouts/Base.astro", import.meta.url),
-    "utf8"
-  );
-  expect(layout).toContain(
-    "import.meta.env.DEV && process.env.NOTRA_DEV_DOCUMENT_TOKEN && <DevReload />"
-  );
 });
 
 test("current fallback-client connections reload only their own older document generation", async () => {

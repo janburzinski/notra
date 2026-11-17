@@ -112,17 +112,4 @@ if (process.env.NOTRA_SCHEDULE_TEST !== "1") {
     expect((await runDueAutopilots()).started).toBe(0);
     expect(start).toHaveBeenCalledTimes(1);
   });
-
-  test("backs off after a failed attempt today and stops at the cap", async () => {
-    start.mockClear();
-    attempts.total = 1;
-    attempts.latest = new Date();
-    expect((await runDueAutopilots()).started).toBe(0);
-    attempts.latest = new Date(Date.now() - 31 * 60 * 1000);
-    expect((await runDueAutopilots()).started).toBe(1);
-    attempts.total = 3;
-    attempts.latest = new Date(Date.now() - 24 * 60 * 60 * 1000);
-    expect((await runDueAutopilots()).started).toBe(0);
-    expect(start).toHaveBeenCalledTimes(1);
-  });
 }

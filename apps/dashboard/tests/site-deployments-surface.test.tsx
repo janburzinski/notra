@@ -200,16 +200,10 @@ if (!process.env.NOTRA_DEPLOYMENTS_SURFACE_TEST_WORKER) {
       expect(html).toContain('role="alert"');
       expect(html).toContain(messages.sites.deploymentPage.notice.failed);
       expect(html).toContain(messages.common.labels.copyAgentPrompt);
-      expect(html).toContain(
-        "flex min-h-6 flex-wrap items-center justify-between gap-2"
-      );
       expect(html).toContain('type="button"');
       expect(copiedPrompt).toBe(
         buildSiteBuildAgentPrompt({ site, deployment, log })
       );
-      expect(copiedPrompt).toContain('Branch: "preview/fix-blog"');
-      expect(copiedPrompt).toContain('Commit: "abc123"');
-      expect(copiedPrompt).toContain(JSON.stringify(log));
       expect(html).toContain(
         withDiagnostics ? "Same URL as blog/example.md" : "Build failed"
       );

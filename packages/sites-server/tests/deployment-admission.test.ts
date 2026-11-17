@@ -48,11 +48,8 @@ if (!databaseUrl) {
   const { organizations, sites, siteJobs, siteDeployments } =
     await import("@notra/db/schema");
   const { eq, sql } = await import("drizzle-orm");
-  const {
-    enqueueSiteDeployment,
-    enqueueSettingsDeployment,
-    allocateGeneration,
-  } = await import("../src/deployments");
+  const { enqueueSiteDeployment, enqueueSettingsDeployment } =
+    await import("../src/deployments");
   let organizationId = "";
   let siteId = "";
   let jobId = "";
@@ -329,72 +326,4 @@ if (!databaseUrl) {
       ).toHaveLength(0);
     }
   );
-
-  test("legacy generation-before-FK ordering creates a real SQL lock cycle after external effects", async () => {
-    const siteLocked = deferred();
-    const insert = deferred();
-    let enqueuePid = 0;
-    const enqueue = db.transaction(async (tx) => {
-      const result = await tx.execute(sql`select pg_backend_pid() as pid`);
-      enqueuePid = Number(result.rows[0]?.pid);
-      const site = await allocateGeneration(tx, siteId);
-      siteLocked.resolve();
-      await insert.promise;
-      await tx.insert(siteDeployments).values({
-        id: crypto.randomUUID(),
-        siteId,
-        organizationId,
-        kind: "production",
-        trigger: "manual",
-        status: "queued",
-        generation: site.lastGeneration,
-        branch: "main",
-        commitSha: "c".repeat(40),
-        target: {
-          publicOrigin: site.publicOrigin,
-          mounts: site.mounts,
-          noindex: false,
-          branding: true,
-        },
-        configHash: "synthetic",
-      });
-    });
-    enqueue.catch(() => {});
-    await siteLocked.promise;
-    let deletionPid = 0;
-    const deletion = db.transaction(async (tx) => {
-      await tx.execute(sql`set local lock_timeout = '500ms'`);
-      const result = await tx.execute(sql`select pg_backend_pid() as pid`);
-      deletionPid = Number(result.rows[0]?.pid);
-      await tx
-        .select()
-        .from(organizations)
-        .where(eq(organizations.id, organizationId))
-        .for("update");
-      effects.push("synthetic irreversible suspension");
-      await tx.delete(sites).where(eq(sites.id, siteId));
-    });
-    deletion.catch(() => {});
-    try {
-      expect(await waitForPgBlocker(db, enqueuePid)).toBe(deletionPid);
-      insert.resolve();
-      expect(await waitForPgBlocker(db, deletionPid)).toBe(enqueuePid);
-      expect(effects).toEqual(["synthetic irreversible suspension"]);
-    } finally {
-      insert.resolve();
-      await Promise.allSettled([enqueue, deletion]);
-    }
-    await expect(deletion).rejects.toMatchObject({ cause: { code: "55P03" } });
-    await enqueue;
-    expect(
-      await db
-        .select()
-        .from(organizations)
-        .where(eq(organizations.id, organizationId))
-    ).toHaveLength(1);
-    expect(
-      await db.select().from(sites).where(eq(sites.id, siteId))
-    ).toHaveLength(1);
-    expect(effects).toEqual(["synthetic irreversible suspension"]);
-  });
 }

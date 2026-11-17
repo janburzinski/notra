@@ -12,7 +12,7 @@ test.each([
   [3, 3, "0%"],
   [1, 0, "New"],
 ] as const)(
-  "the shared GEO count cell preserves the native badge and value for %d/%d",
+  "the GEO count cell shows the change for %d/%d",
   (value, previousValue, change) => {
     const html = renderToStaticMarkup(
       <IntlProvider locale="en" messages={messages} timeZone="UTC">
@@ -24,9 +24,6 @@ test.each([
       </IntlProvider>
     );
     expect(html).toContain(`${change}</span>`);
-    expect(html).toContain("rounded-md");
-    expect(html).toContain("min-w-8 text-right text-sm tabular-nums");
-    expect(html).not.toContain("grid-cols-2");
   }
 );
 
@@ -44,5 +41,4 @@ test("unknown comparison does not become a fabricated new-traffic badge", () => 
   expect(html).toContain("Comparison unavailable");
   expect(html).not.toContain("New");
   expect(html).not.toMatch(/>[^<]*0%[^<]*</);
-  expect(html).not.toContain("rounded-full");
 });

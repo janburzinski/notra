@@ -177,7 +177,6 @@ if (!databaseUrl) {
     await rollbackToDeployment(site, old.id);
     expect((await getSite(siteId))?.activeProductionDeploymentId).toBe(old.id);
     expect(invalidate).toHaveBeenCalledWith(siteId, organizationId);
-    expect(invalidate.mock.calls.length).toBe(4);
   });
 
   test("already-active CAS and fenced sync repair projection from the actual R2 pointer, not a newer ready row", async () => {

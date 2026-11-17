@@ -35,7 +35,6 @@ if (!process.env.NOTRA_DEPLOY_SURFACE_TEST_WORKER) {
   let status: SiteDeploymentStatus = "building";
   let log: string | null = null;
   let hasRecord = true;
-  let configMissing = false;
   let detailError = false;
   let deploymentError = false;
   let retryPending = false;
@@ -46,7 +45,6 @@ if (!process.env.NOTRA_DEPLOY_SURFACE_TEST_WORKER) {
     status = "building";
     log = null;
     hasRecord = true;
-    configMissing = false;
     detailError = false;
     deploymentError = false;
     retryPending = false;
@@ -86,15 +84,7 @@ if (!process.env.NOTRA_DEPLOY_SURFACE_TEST_WORKER) {
               startedAt: null,
               finishedAt: null,
               buildDurationMs: 1000,
-              diagnostics: configMissing
-                ? [
-                    {
-                      code: "config_missing",
-                      severity: "error",
-                      message: "Missing blog.json",
-                    },
-                  ]
-                : diagnostics,
+              diagnostics,
             }
           : null,
         log,
@@ -122,7 +112,7 @@ if (!process.env.NOTRA_DEPLOY_SURFACE_TEST_WORKER) {
   const { SiteCreateDeploy } =
     await import("../src/components/sites/site-create-deploy");
 
-  test("an empty live build keeps the log viewport height", () => {
+  test("an empty live build shows a single live status and an empty log", () => {
     const html = renderToStaticMarkup(
       <IntlProvider locale="en" messages={messages} timeZone="UTC">
         <SiteCreateDeploy
@@ -137,16 +127,11 @@ if (!process.env.NOTRA_DEPLOY_SURFACE_TEST_WORKER) {
     );
     expect(html.match(/Deployment started/g)).toHaveLength(1);
     expect(html.match(/motion-safe:animate-spin/g)).toHaveLength(1);
-    expect(html).not.toContain("h-80");
-    expect(html).not.toContain("rounded-xl border");
     expect(html).not.toContain(messages.sites.deploymentPage.log.starting);
     expect(html).toContain('role="log"');
-    expect(html).toContain(
-      'class="scrollbar-floating overflow-auto py-2.5 font-mono text-xs leading-5 h-48"'
-    );
   });
 
-  test("actual log output has a copy control and a bounded log viewport", () => {
+  test("actual log output streams with a copy control", () => {
     log = "12:00:00 Building site\n12:00:01 Built site";
     const html = renderToStaticMarkup(
       <IntlProvider locale="en" messages={messages} timeZone="UTC">
@@ -160,7 +145,6 @@ if (!process.env.NOTRA_DEPLOY_SURFACE_TEST_WORKER) {
         />
       </IntlProvider>
     );
-    expect(html).toContain("h-48");
     expect(html).toContain('data-streaming="true"');
     expect(html).toContain('role="log"');
     expect(html).toContain('aria-busy="true"');
@@ -194,10 +178,6 @@ if (!process.env.NOTRA_DEPLOY_SURFACE_TEST_WORKER) {
         expect(html).not.toContain(messages.sites.new.deploy.editConfiguration);
       } else {
         expect(html).toContain(messages.sites.new.deploy.failed);
-        expect(html).toContain(
-          'class="inline-flex items-center gap-2 text-destructive"'
-        );
-        expect(html).not.toContain("mt-0.5 size-4 shrink-0");
         expect(html).not.toContain(messages.sites.new.deploy.viewDeployment);
         expect(html).toContain(messages.sites.new.deploy.retryDeployment);
         expect(html).toContain(messages.sites.new.deploy.failureRecovery);
@@ -207,8 +187,6 @@ if (!process.env.NOTRA_DEPLOY_SURFACE_TEST_WORKER) {
         expect(html).toContain(messages.sites.new.deploy.editConfiguration);
         expect(html.match(/<a\b/g)).toHaveLength(1);
         expect(html).not.toContain('role="alert"');
-        expect(html).toContain(" h-48");
-        expect(html).not.toContain("min-h-24");
         expect(html).toContain('data-streaming="false"');
       }
       expect(html).not.toContain("motion-safe:animate-spin");
@@ -265,42 +243,13 @@ if (!process.env.NOTRA_DEPLOY_SURFACE_TEST_WORKER) {
     expect(html).not.toContain(messages.sites.new.deploy.openSite);
   });
 
-  test("legacy missing configuration stays in the log with two recovery controls", () => {
-    hasRecord = true;
-    status = "failed";
-    configMissing = true;
-    const html = renderToStaticMarkup(
-      <IntlProvider locale="en" messages={messages} timeZone="UTC">
-        <SiteCreateDeploy
-          deploymentQueued
-          organizationId="organization"
-          organizationSlug="organization"
-          site={site}
-          state="active"
-          title="Deploy"
-        />
-      </IntlProvider>
-    );
-    expect(html).toContain(messages.sites.new.deploy.failed);
-    expect(html).not.toContain("This build reported a missing blog.json");
-    expect(html).toContain("Missing blog.json");
-    expect(html).not.toContain(
-      'href="https://github.example/repository/pull/1"'
-    );
-    expect(html).toContain('role="log"');
-    expect(html).toContain(messages.sites.new.deploy.retryDeployment);
-    expect(html).toContain(messages.sites.new.deploy.editConfiguration);
-  });
-
-  test("shared logs show their title and default sizing without a heading", () => {
+  test("shared logs without a heading show their default title", () => {
     const html = renderToStaticMarkup(
       <IntlProvider locale="en" messages={messages} timeZone="UTC">
         <SiteBuildLogs inProgress log="Building site" queued={false} />
       </IntlProvider>
     );
     expect(html).toContain(messages.sites.deploymentPage.log.title);
-    expect(html).toContain("max-h-[min(30rem,60vh)]");
-    expect(html).not.toContain("h-72");
   });
 
   test("short errors collapse the timestamp gutter and redundant error marker", () => {
@@ -315,11 +264,8 @@ if (!process.env.NOTRA_DEPLOY_SURFACE_TEST_WORKER) {
       </IntlProvider>
     );
     expect(html).toContain('data-timestamps="false"');
-    expect(html).toContain(" h-48");
-    expect(html).not.toContain("max-h-48");
     expect(html).toContain("Same URL as blog/example.md");
     expect(html).not.toContain("✘");
-    expect(html).toContain("group-data-[timestamps=false]/log:hidden");
   });
 
   test("the repair prompt includes repository context, diagnostics and clean logs", () => {

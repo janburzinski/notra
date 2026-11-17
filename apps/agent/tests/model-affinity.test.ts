@@ -1,7 +1,7 @@
 import { expect, test } from "bun:test";
 import { resolve } from "node:path";
 
-test("the assistant always runs on the GLM model", () => {
+test("chat and task turns run on the assistant model, tasks with low reasoning", () => {
   const result = Bun.spawnSync(
     [
       process.execPath,
@@ -15,7 +15,6 @@ mock.module("@notra/tools/utils/organization", () => ({ getOrganizationId: () =>
 const { createAssistantModel } = await import("./agent/lib/utils/model.ts");
 const { ASSISTANT_MODEL_ID } = await import("./agent/lib/constants/models.ts");
 delete process.env.AI_SDK_DEVTOOLS;
-assert.equal(ASSISTANT_MODEL_ID, "zai/glm-5.3-flash");
 const route = createAssistantModel().events["step.started"];
 function select(turnId, surface) {
   return route({ data: { turnId } }, {

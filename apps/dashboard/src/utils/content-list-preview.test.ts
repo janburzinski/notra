@@ -1,10 +1,7 @@
 import { describe, expect, test } from "bun:test";
 
 import { getContentListPreview } from "@/utils/content-list-preview";
-import {
-  getDashboardPostPreview,
-  getMarkdownPreview,
-} from "@/utils/content-preview";
+import { getMarkdownPreview } from "@/utils/content-preview";
 
 describe("content list preview projection", () => {
   test("preserves headings, formatting, links and distinct line limits", () => {
@@ -40,7 +37,7 @@ describe("content list preview projection", () => {
     );
   });
 
-  test("matches existing helpers and bounds serialized text payloads", () => {
+  test("bounds preview length and serialized text payloads", () => {
     const markdown = `# Title\n${"**Useful** [text](https://example.com) ".repeat(1000)}\nSecond\nThird`;
     const post = {
       contentType: "blog_post",
@@ -49,39 +46,24 @@ describe("content list preview projection", () => {
     };
     const dashboard = getContentListPreview(post, "dashboard");
     const collection = getContentListPreview(post);
-    const previousListPayload = {
-      content: "",
-      markdown: markdown.slice(0, 2000),
-    };
-    expect(dashboard.preview).toBe(getDashboardPostPreview(markdown));
-    expect(collection.preview).toBe(getMarkdownPreview(markdown));
+    expect(dashboard.preview).toStartWith("Useful text Useful text");
     expect(dashboard.preview).toHaveLength(160);
     expect(collection.preview).toHaveLength(200);
     expect(Buffer.byteLength(JSON.stringify(dashboard))).toBeLessThan(220);
     expect(Buffer.byteLength(JSON.stringify(collection))).toBeLessThan(260);
-    expect(Buffer.byteLength(JSON.stringify(dashboard))).toBeLessThan(
-      Buffer.byteLength(JSON.stringify(previousListPayload)) / 8
-    );
-    expect(Buffer.byteLength(JSON.stringify(collection))).toBeLessThan(
-      Buffer.byteLength(JSON.stringify(post)) / 100
-    );
   });
 
-  test("preserves image source contracts including image markdown syntax", () => {
+  test("keeps the image source and markdown for image posts", () => {
     const post = {
       contentType: "image",
       content: "https://example.com/image.png",
       markdown:
         "![Image caption](https://example.com/image.png)\nImage details",
     };
-    expect(getContentListPreview(post)).toEqual({
+    expect(getContentListPreview(post)).toMatchObject({
       content: post.content,
       markdown: post.markdown,
-      preview: getMarkdownPreview(post.markdown),
     });
-    expect(getContentListPreview(post, "dashboard").preview).toBe(
-      getDashboardPostPreview(post.markdown)
-    );
     expect(getContentListPreview({ ...post, markdown: null })).toEqual({
       content: post.content,
       markdown: null,

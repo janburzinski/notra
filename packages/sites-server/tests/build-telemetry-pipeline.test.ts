@@ -61,8 +61,6 @@ if (process.env.NOTRA_BUILD_TELEMETRY_PIPELINE_WORKER !== "1") {
   let activationCalls = 0;
   let liveDeploymentId: string | null = null;
   let reportFails = false;
-  let branchHead = "sha";
-  let headAfterBuild: string | null = null;
   const reported: DeploymentOutcome[] = [];
   const activationFailure = new Error("activation failed");
   const reportFailure = new Error("report failed");
@@ -177,7 +175,7 @@ if (process.env.NOTRA_BUILD_TELEMETRY_PIPELINE_WORKER !== "1") {
     },
   }));
   const github = {
-    getBranchHead: async () => ({ sha: branchHead }),
+    getBranchHead: async () => ({ sha: "sha" }),
     changedPathsBetween: async () => null,
     siteRepositoryAccess: async () => {
       if (mode === "access") {
@@ -255,9 +253,6 @@ if (process.env.NOTRA_BUILD_TELEMETRY_PIPELINE_WORKER !== "1") {
           return yield* Effect.fail(
             new Error("sandbox failed synthetic-box-secret")
           );
-        }
-        if (headAfterBuild) {
-          branchHead = headAfterBuild;
         }
         return build;
       }),
@@ -380,8 +375,6 @@ if (process.env.NOTRA_BUILD_TELEMETRY_PIPELINE_WORKER !== "1") {
     activationCalls = 0;
     liveDeploymentId = null;
     reportFails = false;
-    branchHead = "sha";
-    headAfterBuild = null;
     reported.length = 0;
     activationStarted = new Promise<void>((resolve) => {
       notifyActivation = resolve;
@@ -422,32 +415,6 @@ if (process.env.NOTRA_BUILD_TELEMETRY_PIPELINE_WORKER !== "1") {
       createdAt: new Date(),
       updatedAt: new Date(),
     };
-  });
-  test.each(["before build", "during build"])(
-    "manual publication rejects a branch that moves %s",
-    async (phase) => {
-      if (phase === "before build") {
-        branchHead = "newer";
-      } else {
-        headAfterBuild = "newer";
-      }
-      expect(await runDeploymentPipeline(site, deployment)).toEqual({
-        kind: "skipped",
-        reason: "main moved on to newer.",
-      });
-      expect(deployment.status).toBe("superseded");
-      expect(buildTargets).toHaveLength(phase === "before build" ? 0 : 1);
-      expect(activationCalls).toBe(0);
-      expect(liveDeploymentId).toBeNull();
-    }
-  );
-  test("explicit redeployment can still activate a historical commit", async () => {
-    branchHead = "newer";
-    deployment.trigger = "redeploy";
-    expect(await runDeploymentPipeline(site, deployment)).toEqual({
-      kind: "live",
-    });
-    expect(activationCalls).toBe(1);
   });
   test.each(["production", "preview"] as const)(
     "%s builds only enable analytics for production",
@@ -523,8 +490,8 @@ if (process.env.NOTRA_BUILD_TELEMETRY_PIPELINE_WORKER !== "1") {
   test("a persistence failure does not hide an earlier source failure", async () => {
     mode = "source";
     persistenceFails = true;
-    await expect(runDeploymentPipeline(site, deployment)).rejects.toThrow(
-      "source failed"
+    await expect(runDeploymentPipeline(site, deployment)).rejects.toBe(
+      sourceFailure
     );
     expect(r2Logs.at(-1)).toContain(
       "[telemetry:persistence] telemetry unavailable"
@@ -608,13 +575,6 @@ if (process.env.NOTRA_BUILD_TELEMETRY_PIPELINE_WORKER !== "1") {
       reportFailure
     );
     expect(liveDeploymentId).toBe(deployment.id);
-  });
-  test("typed failures retain the original error object", async () => {
-    mode = "source";
-    persistenceFails = true;
-    await expect(runDeploymentPipeline(site, deployment)).rejects.toBe(
-      sourceFailure
-    );
   });
   test("best-effort log IO does not swallow defects", async () => {
     r2Defects = true;

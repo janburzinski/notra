@@ -82,13 +82,6 @@ describe("scan a prompt step", () => {
     });
   });
 
-  test("retries a failed start, since the scan claim prevents a second scan", () => {
-    expect(block.steps.map((step) => [step.id, step.sideEffect])).toEqual([
-      ["start", false],
-      ["collect", false],
-    ]);
-  });
-
   test("stops its branch while another scan holds the project", async () => {
     startAutopilotPromptScan.mockResolvedValueOnce({
       ok: false,

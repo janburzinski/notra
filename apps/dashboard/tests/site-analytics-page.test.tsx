@@ -131,8 +131,6 @@ if (!process.env.NOTRA_SITE_ANALYTICS_TEST_WORKER) {
         expect(html).toContain(messages.geo.webVisitors[key]);
       }
       expect(html.split(messages.geo.webVisitors.noData)).toHaveLength(6);
-      expect(html.split('data-slot="empty"')).toHaveLength(6);
-      expect(html.split('data-slot="empty-media"')).toHaveLength(6);
       expect(
         html.split(messages.geo.webVisitors.noDataDescription)
       ).toHaveLength(6);

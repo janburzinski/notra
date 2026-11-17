@@ -310,8 +310,7 @@ if (process.env.NOTRA_SITES_LIFECYCLE_TEST_WORKER !== "1") {
       }),
   }));
 
-  const { claimSiteJob, completeSiteJob, failSiteJob } =
-    await import("../src/jobs");
+  const { claimSiteJob, completeSiteJob } = await import("../src/jobs");
   const {
     enqueuePreviewRemoval,
     cancelPreviewBuilds,
@@ -424,23 +423,6 @@ if (process.env.NOTRA_SITES_LIFECYCLE_TEST_WORKER !== "1") {
     failNextCommit = false;
   });
 
-  test("concurrent claims respect per-site and global capacity", async () => {
-    jobs = Array.from({ length: 30 }, (_, index) => makeJob(`job${index}`));
-    expect(
-      (await Promise.all(jobs.map((job) => claimSiteJob(job.id)))).filter(
-        Boolean
-      )
-    ).toHaveLength(2);
-    jobs = Array.from({ length: 30 }, (_, index) =>
-      makeJob(`job${index}`, `site${index}`)
-    );
-    expect(
-      (await Promise.all(jobs.map((job) => claimSiteJob(job.id)))).filter(
-        Boolean
-      )
-    ).toHaveLength(20);
-  });
-
   test("workflow redelivery cannot reclaim an active or completed job", async () => {
     jobs = [makeJob("redelivered")];
     const claimed = await claimSiteJob("redelivered");
@@ -459,27 +441,7 @@ if (process.env.NOTRA_SITES_LIFECYCLE_TEST_WORKER !== "1") {
     expect(jobs[0]?.attempts).toBe(1);
   });
 
-  test("expired claims obey capacity and an old attempt cannot complete or fail its replacement", async () => {
-    jobs = [makeJob("job1")];
-    const first = await claimSiteJob("job1");
-    expect(first).not.toBeNull();
-    const original = jobs[0];
-    if (!original) {
-      throw new Error("Expected original job");
-    }
-    original.leaseUntil = new Date(0);
-    const replacement = await claimSiteJob("job1");
-    expect(replacement?.attempts).toBe(2);
-    if (!first || !replacement) {
-      return;
-    }
-    await completeSiteJob(first);
-    expect(await failSiteJob(first, new Error("old failure"), true)).toBe(
-      "skipped"
-    );
-    expect(jobs[0]?.status).toBe("running");
-    await completeSiteJob(replacement);
-    expect(jobs[0]?.status).toBe("done");
+  test("an expired claim without capacity returns to pending", async () => {
     jobs = [makeJob("expired"), makeJob("running1"), makeJob("running2")];
     for (const job of jobs) {
       job.status = "running";

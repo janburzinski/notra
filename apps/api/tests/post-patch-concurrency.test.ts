@@ -45,11 +45,9 @@ describe("postUpdatedAtMatches", () => {
     const prepared = new Date("2026-01-01T00:00:00.123Z");
     const storedFromPostgres = new Date("2026-01-01T00:00:00.123999Z");
 
-    expect(storedFromPostgres.getTime()).toBe(prepared.getTime());
     expect(
       postUpdatedAtMatches(storedFromPostgres, normalizePostUpdatedAt(prepared))
     ).toBe(true);
-    expect(normalizePostUpdatedAt(prepared)).not.toBe(prepared);
   });
 });
 

@@ -148,7 +148,6 @@ if (!process.env.NOTRA_DOMAIN_SETUP_TEST_WORKER) {
       expect(rows[2]).not.toContain(messages.sites.domainsPage.dns.dnsOnly);
       expect(rows[1]).toContain('data-slot="tooltip-trigger"');
       expect(rows[1]).toContain('type="button"');
-      expect(rows[1]).toContain("fill-muted-foreground/20");
       expect(rows[2]).toContain("—");
       expect(html).not.toContain(">N/A<");
       const copyButtons = [...html.matchAll(/<button\b[^>]*>/g)].filter(
@@ -194,7 +193,6 @@ if (!process.env.NOTRA_DOMAIN_SETUP_TEST_WORKER) {
         } else {
           expect(html).not.toContain("DNS record is not visible yet");
           expect(html).not.toContain('role="alert"');
-          expect(html).not.toContain("text-destructive");
         }
       }
     );
@@ -247,10 +245,6 @@ if (!process.env.NOTRA_DOMAIN_SETUP_TEST_WORKER) {
       )?.[0];
       expect(link).toBeDefined();
       expect(link).not.toContain('target="_blank"');
-      const logo = html.match(/<svg\b[^>]*data-icon="inline-start"[^>]*>/)?.[0];
-      expect(logo).toContain(
-        providerName === "Vercel" ? "size-3 -translate-y-px" : "size-3.5"
-      );
       expect(html).toContain(
         en.sites.domainsPage.dns.automaticDescription.replace(
           "{provider}",

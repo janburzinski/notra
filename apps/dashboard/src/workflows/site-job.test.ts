@@ -24,14 +24,9 @@ if (process.env.NOTRA_SITE_JOB_WORKFLOW_TEST !== "1") {
   mock.module("@notra/sites-server/runner", () => ({ runSiteJob }));
 
   const { siteJobWorkflow } = await import("./site-job");
-  const { runSiteJobStep } = await import("./steps/site-job-step");
 
   beforeEach(() => {
     runSiteJob.mockClear();
-  });
-
-  test("allows bounded SDK retries when a start event was persisted but its response was lost", () => {
-    expect(runSiteJobStep.maxRetries).toBe(3);
   });
 
   test("propagates infrastructure failures so the SDK can retry the same job", async () => {

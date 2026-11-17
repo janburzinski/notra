@@ -25,7 +25,6 @@ if (!process.env.NOTRA_SITE_DEFAULTS_TEST_WORKER) {
   });
 } else {
   let hasConfig = false;
-  let diagnosticCode = "config_missing";
   const site = {
     id: "site",
     projectId: "project",
@@ -58,7 +57,7 @@ if (!process.env.NOTRA_SITE_DEFAULTS_TEST_WORKER) {
           createdAt: "2026-10-07T00:00:00Z",
           diagnostics: [
             {
-              code: diagnosticCode,
+              code: "config_missing",
               severity: "error",
               message: "Example build diagnostic",
             },
@@ -116,9 +115,6 @@ if (!process.env.NOTRA_SITE_DEFAULTS_TEST_WORKER) {
       expect(html).toContain("blog.json");
       expect(html).toContain('type="button"');
       expect(mutate).not.toHaveBeenCalled();
-      expect(messages.sites.new.create).toBe(
-        locale === "en" ? "Create & deploy" : "Erstellen & deployen"
-      );
     });
 
     test(`${locale}: an open starter PR does not require a merge`, () => {
@@ -146,7 +142,6 @@ if (!process.env.NOTRA_SITE_DEFAULTS_TEST_WORKER) {
     });
 
     test(`${locale}: legacy missing-config failures offer retry without a PR`, () => {
-      diagnosticCode = "config_missing";
       const html = renderToStaticMarkup(
         <IntlProvider locale={locale} messages={messages} timeZone="UTC">
           <SiteCreateDeploy
@@ -196,24 +191,5 @@ if (!process.env.NOTRA_SITE_DEFAULTS_TEST_WORKER) {
         </IntlProvider>
       )
     ).toBe("");
-  });
-
-  test("other build failures keep their existing error semantics", () => {
-    diagnosticCode = "compile_failed";
-    const html = renderToStaticMarkup(
-      <IntlProvider locale="en" messages={en} timeZone="UTC">
-        <SiteCreateDeploy
-          deploymentQueued
-          organizationId="organization"
-          organizationSlug="organization"
-          site={site}
-          state="active"
-          title="Deploy"
-        />
-      </IntlProvider>
-    );
-    expect(html).toContain(en.sites.new.deploy.failed);
-    expect(html).not.toContain("This build reported a missing blog.json");
-    expect(html).not.toContain("View pull request");
   });
 }

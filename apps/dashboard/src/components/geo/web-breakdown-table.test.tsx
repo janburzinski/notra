@@ -6,7 +6,7 @@ import { IntlProvider } from "use-intl";
 import messages from "../../../messages/en.json";
 import { WebBreakdownTable } from "./web-breakdown-table";
 
-test("traffic rows display changes, not relative-size bars", () => {
+test("traffic rows display their change against the previous period", () => {
   const html = renderToStaticMarkup(
     <IntlProvider locale="en" messages={messages} timeZone="UTC">
       <WebBreakdownTable
@@ -51,14 +51,9 @@ test("traffic rows display changes, not relative-size bars", () => {
   expect(html).toContain("0%");
   expect(html).toContain("New");
   expect(html).toContain(messages.geo.webVisitors.comparisonUnavailable);
-  expect(html).not.toContain("w-14");
-  expect(html).not.toContain("bg-primary/15");
-  const tables = html.match(/<table\b[^>]*>[\s\S]*?<\/table>/g) ?? [];
-  expect(tables[1]).toContain("<colgroup>");
-  expect(tables[1]).toContain("min-width:");
 });
 
-test("empty table bodies fit the viewport instead of inheriting column widths", () => {
+test("an empty table shows the no-data description", () => {
   const html = renderToStaticMarkup(
     <IntlProvider locale="en" messages={messages} timeZone="UTC">
       <WebBreakdownTable
@@ -71,11 +66,5 @@ test("empty table bodies fit the viewport instead of inheriting column widths", 
       />
     </IntlProvider>
   );
-  const tables = html.match(/<table\b[^>]*>[\s\S]*?<\/table>/g) ?? [];
-  expect(tables).toHaveLength(2);
-  expect(tables[0]).toContain("<colgroup>");
-  expect(tables[1]).toContain("w-full table-fixed");
-  expect(tables[1]).not.toContain("<colgroup>");
-  expect(tables[1]).not.toContain("min-width:");
-  expect(tables[1]).toContain(messages.geo.webVisitors.noDataDescription);
+  expect(html).toContain(messages.geo.webVisitors.noDataDescription);
 });

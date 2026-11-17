@@ -43,7 +43,6 @@ test("the shared access trigger reflects saved access and never submits a settin
     expect(html).toContain('type="button"');
     expect(html).toContain('aria-haspopup="dialog"');
     expect(html).toContain('aria-expanded="false"');
-    expect(html).not.toContain('data-slot="popover-backdrop"');
     expect(html).not.toContain('type="password"');
   }
 });

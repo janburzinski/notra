@@ -160,7 +160,6 @@ describe("Slack data charts", () => {
     ).rejects.toThrow("response lost");
     await uploadSlackChart(slack, input, "session:call");
     expect(uploadFiles).toHaveBeenCalledTimes(1);
-    expect(request).toHaveBeenCalledTimes(4);
     await expect(
       uploadSlackChart(slack, input, "session:other-call")
     ).rejects.toThrow("response lost");

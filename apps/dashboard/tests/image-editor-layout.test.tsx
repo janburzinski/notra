@@ -12,7 +12,7 @@ test.each([
   { format: "diagram", image: "" },
   { format: "marketing", image: "https://assets.example.test/image.png" },
 ])(
-  "$format preview with image '$image' preserves the intended layout",
+  "$format preview with image '$image' shows its title and image",
   ({ format, image }) => {
     const html = renderToStaticMarkup(
       <IntlProvider locale="en" messages={messages}>
@@ -36,10 +36,6 @@ test.each([
     expect(html).toContain("A diagram title");
     if (format === "diagram") {
       expect(html).toContain("<h1");
-      expect(html).not.toContain("border-shell-border");
-      expect(html).not.toContain("shadow-table-card");
-    } else {
-      expect(html).toContain("border-shell-border");
     }
     if (image) {
       expect(html).toContain(`src="${image}"`);

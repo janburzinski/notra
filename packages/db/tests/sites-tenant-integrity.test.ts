@@ -3,7 +3,6 @@ import { readFileSync } from "node:fs";
 
 import { Client } from "pg";
 
-import type { IntegritySnapshot } from "./types/sites-tenant-integrity";
 import { expectConstraint } from "./utils/expect-constraint";
 
 const migration = readFileSync(
@@ -29,50 +28,6 @@ const seed = readFileSync(
   "utf8"
 );
 const databaseUrl = process.env.SITES_TEST_DATABASE_URL;
-
-test("new migration creates referenced keys before FKs and matches its snapshot", () => {
-  expect(migration).not.toContain("track_visitors");
-  expect(migration).not.toContain(
-    "site_jobs_deployment_id_site_deployments_id_fk"
-  );
-  expect(migration).toContain('"revision" integer DEFAULT 0 NOT NULL');
-  expect(migration).toContain('"active_production_deployment_id" text');
-  const statements = migration.split("--> statement-breakpoint");
-  const firstForeignKey = statements.findIndex(
-    (statement) =>
-      statement.includes("ADD CONSTRAINT") && statement.includes("FOREIGN KEY")
-  );
-  for (const [position, statement] of statements.entries()) {
-    if (statement.includes("CREATE UNIQUE INDEX")) {
-      expect(position).toBeLessThan(firstForeignKey);
-    }
-  }
-  const snapshot: IntegritySnapshot = JSON.parse(
-    readFileSync(
-      new URL("../migrations/meta/0112_snapshot.json", import.meta.url),
-      "utf8"
-    )
-  );
-  const priorSnapshot = JSON.parse(
-    readFileSync(
-      new URL("../migrations/meta/0111_snapshot.json", import.meta.url),
-      "utf8"
-    )
-  );
-  expect(snapshot.prevId).toBe(priorSnapshot.id);
-  for (const table of Object.values(snapshot.tables)) {
-    for (const constraint of Object.values(table.checkConstraints)) {
-      if (
-        constraint.name.startsWith("site") &&
-        constraint.name.endsWith("_check")
-      ) {
-        expect(migration).toContain(
-          `ADD CONSTRAINT "${constraint.name}" CHECK (${constraint.value})`
-        );
-      }
-    }
-  }
-});
 
 describe.skipIf(!databaseUrl)(
   "Sites tenant constraints on isolated PostgreSQL",

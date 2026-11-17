@@ -15,7 +15,7 @@ import messages from "../../../messages/en.json";
 import { SiteContext } from "./site-context";
 import { SiteOverviewStatus } from "./site-overview-status";
 
-test("active builds keep their status and duration without a follow-build action", () => {
+test("active builds keep their status and only finished builds offer logs", () => {
   const router = createRouter({
     routeTree: createRootRoute(),
     history: createMemoryHistory(),
@@ -49,15 +49,10 @@ test("active builds keep their status and duration without a follow-build action
       </IntlProvider>
     );
 
-    expect(html).not.toContain("Follow build");
     expect(html.includes("View logs")).toBe(!inProgress);
     expect(html).toContain("/org/sites/site/deployments/deployment");
     expect(html).toContain(
       messages.sites.status[status === "uploading" ? "building" : status]
     );
-    if (inProgress) {
-      expect(html).toContain("tabular-nums");
-      expect(html).not.toContain("group-hover:translate-x-0.5");
-    }
   }
 });

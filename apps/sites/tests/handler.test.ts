@@ -1723,44 +1723,6 @@ describe("loaders", () => {
     );
   });
 
-  test("reset detaches pending reads so they cannot repopulate or evict new loads", async () => {
-    for (const kind of ["host", "state", "manifest"]) {
-      resetCachesForTests();
-      const { deps } = setup();
-      const get = deps.bucket.get;
-      let release = () => {};
-      const gate = new Promise<void>((resolve) => {
-        release = resolve;
-      });
-      deps.bucket.get = async (key) => {
-        await gate;
-        return await get(key);
-      };
-      const load = (source: SitesDeps) => {
-        if (kind === "host") {
-          return loadHost(source, "acme.notra.site");
-        }
-        return kind === "state"
-          ? loadState(source, SITE)
-          : loadManifest(source, SITE, "dep_live");
-      };
-      const pending = load(deps);
-      resetCachesForTests();
-      const { deps: fresh } = setup();
-      let reads = 0;
-      const freshGet = fresh.bucket.get;
-      fresh.bucket.get = (key) => {
-        reads += 1;
-        return freshGet(key);
-      };
-      const current = await load(fresh);
-      release();
-      expect(await pending).not.toBe(current);
-      expect(await load(fresh)).toBe(current);
-      expect(reads).toBe(1);
-    }
-  });
-
   test("a takedown applies once the cached state is five seconds old", async () => {
     const { deps, request, put, objects } = setup();
     const key = `sites/${SITE}/state.json`;

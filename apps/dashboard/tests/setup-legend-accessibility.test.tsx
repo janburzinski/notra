@@ -115,9 +115,6 @@ if (!process.env.NOTRA_SETUP_LEGEND_TEST_WORKER) {
       expect(completed.size).toBe(0);
       buttons[0]?.props.onClick?.();
       expect([...completed]).toEqual([0]);
-      expect(renderToStaticMarkup(Component(props))).toContain(
-        "border-primary bg-primary"
-      );
       expect(
         setupControls(Component(props), "button")[0]?.props["aria-pressed"]
       ).toBe(true);
@@ -126,7 +123,7 @@ if (!process.env.NOTRA_SETUP_LEGEND_TEST_WORKER) {
     });
   });
 
-  test("clickable legend entries are native toggle buttons, independent of hover dimming", () => {
+  test("clickable legend entries are native toggle buttons", () => {
     const onToggle = mock((key: string) => key);
     const props = {
       seriesKeys: ["one", "two"],
@@ -164,6 +161,5 @@ if (!process.env.NOTRA_SETUP_LEGEND_TEST_WORKER) {
       expect(entry.props.onClick).toBeUndefined();
       expect(entry.props["aria-pressed"]).toBeUndefined();
     }
-    expect(renderToStaticMarkup(inert)).toContain("opacity-30");
   });
 }

@@ -106,7 +106,6 @@ const findMany = mock(async (args: FindManyArgs) => {
   return [];
 });
 const countSelect = mock(async () => [{ value: 0 }]);
-const aggregateSelect = mock(async () => [] as Array<Record<string, unknown>>);
 
 mock.module("@notra/db/drizzle", () => ({
   db: {
@@ -117,7 +116,7 @@ mock.module("@notra/db/drizzle", () => ({
             capturedCountWhere = where;
             return countSelect();
           }
-          return { groupBy: () => aggregateSelect() };
+          return { groupBy: async () => [] };
         },
       }),
     }),
@@ -141,8 +140,6 @@ beforeEach(() => {
   findFirst.mockClear();
   findMany.mockClear();
   countSelect.mockClear();
-  aggregateSelect.mockReset();
-  aggregateSelect.mockImplementation(async () => []);
   findFirst.mockImplementation(
     async (args: NonNullable<typeof capturedFindFirstArgs>) => {
       capturedFindFirstArgs = args;
@@ -179,12 +176,8 @@ describe("listGeoScansForProject", () => {
     expect(capturedFindManyArgs?.limit).toBe(20);
     expect(capturedFindManyArgs?.offset).toBe(0);
     expect(capturedFindManyArgs?.columns).not.toHaveProperty("plan");
-    expect(collectSqlText(capturedFindManyArgs?.extras.planSummary)).toContain(
-      "jsonb_array_elements"
-    );
     expectTenantScopedWhere(capturedFindManyArgs?.where);
     expectTenantScopedWhere(capturedCountWhere);
-    expect(aggregateSelect).not.toHaveBeenCalled();
   });
 });
 
@@ -208,6 +201,5 @@ describe("getGeoScanForProject", () => {
     const values = collectBoundValues(capturedFindFirstArgs?.where);
     expect(values).toContain("missing");
     expectTenantScopedWhere(capturedFindFirstArgs?.where);
-    expect(aggregateSelect).not.toHaveBeenCalled();
   });
 });

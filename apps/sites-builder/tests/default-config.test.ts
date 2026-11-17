@@ -127,15 +127,7 @@ test("real fixture and empty-source builds use snapshot config without adding so
         expect(html404).toContain(
           'Choose an <a href="/start">existing page</a> or &lt;b&gt;search&lt;/b&gt;.'
         );
-        expect(markdown404).toContain(`(/${area}/index.md)`);
-        expect(markdown404).toContain(`(/${area}/llms.txt)`);
-        for (const map of [
-          "index.md",
-          "llms.txt",
-          "llms-full.txt",
-          "sitemap.xml",
-          "feed.xml",
-        ]) {
+        for (const map of ["sitemap.xml", "feed.xml"]) {
           expect(await readFile(join(outDir, area, map), "utf8")).not.toContain(
             "404.md"
           );

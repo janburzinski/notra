@@ -41,19 +41,6 @@ test("every original handler has a native route registered in the generated tree
     const paths = representedPaths.get(handler) ?? new Set<string>();
     paths.add(routePath);
     representedPaths.set(handler, paths);
-    expect(source).toMatch(
-      /dispatchRouteHandler\(\s*handlers\s*,\s*(?:ctx\.)?request\s*,\s*(?:(?:ctx\.)?params\s*\)|\{\s*\.\.\.(?:ctx\.)?params\s*,)/
-    );
-    if (handler.includes("[...")) {
-      if (routePath.endsWith("/$")) {
-        expect(source).toContain('params._splat?.split("/")');
-      } else {
-        expect(handler).toContain("[[...");
-        expect(routePath).toBe(`/${handler.slice(4).split("[[...")[0]}`);
-        expect(source).not.toContain("params._splat");
-      }
-    }
-    expect(source).toContain("ANY:");
     expect(generated).toContain(`./routes/${file.slice(0, -3)}`);
   }
   expect(

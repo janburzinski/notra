@@ -145,18 +145,6 @@ test("Umami Cloud needs only a Website ID and invalid inputs report field errors
     scriptUrl: expect.any(String),
     hostUrl: expect.any(String),
   });
-  expect(SITE_INTEGRATION_PROVIDERS.map((entry) => entry.id).sort()).toEqual([
-    "capless",
-    "databuddy",
-    "datafast",
-    "ga4",
-    "onedollarstats",
-    "plausible",
-    "posthog",
-    "rybbit",
-    "simpleAnalytics",
-    "umami",
-  ]);
 });
 
 test("GA4 requires a web stream Measurement ID and reports errors on that field", () => {

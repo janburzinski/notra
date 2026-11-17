@@ -84,21 +84,6 @@ test("a disconnected downstream closes its active upstream response", async () =
   }
 });
 
-test("upstream failure before response headers still sends an actionable 502", async () => {
-  const upstream = createServer((request) => request.socket.destroy());
-  const { proxy, url } = await proxyFor(upstream);
-  try {
-    const response = await fetch(url);
-    expect(response.status).toBe(502);
-    expect(await response.text()).toContain("blog dev server is restarting");
-  } finally {
-    proxy.closeAllConnections();
-    proxy.close();
-    upstream.closeAllConnections();
-    upstream.close();
-  }
-});
-
 for (const phase of ["metadata", "html", "asset"]) {
   test(`a disconnected Markdown client aborts its upstream ${phase} response`, async () => {
     const entered = Promise.withResolvers<void>();

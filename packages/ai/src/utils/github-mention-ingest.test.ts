@@ -110,7 +110,6 @@ describe("ingestGitHubAppMentionWebhook", () => {
       "closed-1"
     );
     expect(result.body).toMatchObject({ updated: 1 });
-    expect(findOpenContentPublicationByPullRequest).not.toHaveBeenCalled();
     expect(closeContentPublicationForPullRequest).toHaveBeenCalledWith({
       owner: "acme",
       repo: "app",

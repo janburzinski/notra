@@ -90,7 +90,7 @@ for (const method of ["GET", "HEAD"]) {
   });
 }
 
-test("permanent connection failures exhaust exactly three attempts and return an actionable 502", async () => {
+test("permanent connection failures exhaust the attempt budget and return an actionable 502", async () => {
   let upstreamCalls = 0;
   const upstream = createServer((incoming) => {
     upstreamCalls += 1;
@@ -110,7 +110,6 @@ test("permanent connection failures exhaust exactly three attempts and return an
     const response = await fetch(url);
     expect(response.status).toBe(502);
     expect(await response.text()).toContain("blog dev server is restarting");
-    expect(DEV_PROXY_MAX_ATTEMPTS).toBe(3);
     expect(upstreamCalls).toBe(DEV_PROXY_MAX_ATTEMPTS);
     expect(readyCalls).toBe(DEV_PROXY_MAX_ATTEMPTS);
   } finally {

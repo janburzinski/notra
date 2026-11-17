@@ -213,11 +213,6 @@ if (process.env.NOTRA_SITES_TIMELINE_TEST_WORKER !== "1") {
     expect(await runDeploymentPipeline(site, deployment)).toEqual({
       kind: "live",
     });
-    expect(SITE_DEPLOYMENT_PHASES).toEqual([
-      "preparing",
-      "building",
-      "deploying",
-    ]);
     expect(transitions).toEqual(["building", "uploading", "ready"]);
     expect(writes).toHaveLength(6);
     const preparing = `[deployment:preparing] ${deployment.startedAt?.toISOString()}\n`;

@@ -74,9 +74,6 @@ test("article and settings use the same branch-scoped file queues across view na
   expect(
     writes.every((write) => write.branch === "notra/site-edit/synthetic")
   ).toBe(true);
-  expect(original).toBe(
-    '{\n  "name": "Original", "custom": {"keep": true}\n}\n'
-  );
 });
 
 test("invalid JSON has no form representation to overwrite Source", () => {

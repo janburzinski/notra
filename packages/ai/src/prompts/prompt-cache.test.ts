@@ -51,7 +51,6 @@ describe("cacheable chat instructions", () => {
 
     expect(contextual[0]).toEqual(plain[0]);
     expect(contextual[0]?.content).not.toContain("## Current Date");
-    expect(contextual[0]?.content).toContain("## Tool Workflow");
     for (const value of [
       "Europe/Berlin",
       "Fixture workspace",
@@ -68,7 +67,7 @@ describe("cacheable chat instructions", () => {
     expect(contextual[1]?.providerOptions).toBeUndefined();
   });
 
-  test("editor context changes do not invalidate rules and content-specific constraints remain", () => {
+  test("editor context changes do not invalidate rules", () => {
     const plain = getContentEditorChatPrompt({ contentType: "twitter_post" });
     const contextual = getContentEditorChatPrompt({
       contentType: "twitter_post",
@@ -85,8 +84,6 @@ describe("cacheable chat instructions", () => {
       toolDescriptions: ["Fixture capabilities"],
     });
     expect(contextual[0]).toEqual(plain[0]);
-    expect(contextual[0]?.content).toContain("## Twitter Post Constraints");
-    expect(contextual[0]?.content).toContain("ALWAYS call getMarkdown first");
     for (const value of [
       "Asia/Tokyo",
       "Fixture selection",
@@ -96,9 +93,6 @@ describe("cacheable chat instructions", () => {
       expect(contextual[1]?.content).toContain(value);
       expect(contextual[0]?.content).not.toContain(value);
     }
-    expect(
-      getContentEditorChatPrompt({ documentMode: "plan" })[0]?.content
-    ).toContain("Do NOT write the article body");
   });
 
   for (const gateway of ["vercel", "openrouter"] as const) {

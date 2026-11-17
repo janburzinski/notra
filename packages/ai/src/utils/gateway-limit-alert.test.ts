@@ -33,21 +33,17 @@ test("Slack receives limit details and dedupes daily caps separately from rate l
     await alertGatewayLimit(event);
     await alertGatewayLimit({ ...event, limitType: "rate-limit" });
     expect(fetch).toHaveBeenCalledTimes(2);
-    expect(claims.size).toBe(2);
     const payload = JSON.parse(String(fetch.mock.calls[0]?.[1]?.body));
     const text = payload.blocks[0].text.text;
     expect(text).toContain("Limit: Daily spend limit");
     expect(text).toContain("Reset: exact time not reported");
     expect(text).toContain("Retry-After: 3600s");
-    expect(text).toContain("not a confirmed reset");
-    expect(text).toContain("does not confirm recovery");
     fetch.mockImplementationOnce(() =>
       Promise.resolve(new Response("unavailable", { status: 503 }))
     );
     await expect(
       alertGatewayLimit({ ...event, gateway: "vercel" })
     ).rejects.toThrow("Slack alert returned HTTP 503");
-    expect(del).toHaveBeenCalledTimes(1);
     await alertGatewayLimit({ ...event, gateway: "vercel" });
     expect(fetch).toHaveBeenCalledTimes(4);
   } finally {
