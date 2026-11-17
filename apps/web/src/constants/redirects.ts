@@ -2,6 +2,7 @@ import type { SiteRedirect } from "@/types/redirects";
 import { SOCIAL_LINKS } from "@/utils/social-links";
 
 export const SITE_REDIRECTS: SiteRedirect[] = [
+  { source: "/home", destination: "/", permanent: true },
   { source: "/rss.xml", destination: "/blog/feed.xml", permanent: true },
   { source: "/blog.md", destination: "/blog/index.md", permanent: true },
   {

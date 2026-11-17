@@ -9,11 +9,7 @@ export function SignedOutLandingRedirect({
 }: DashboardSessionState) {
   const location = useLocation();
 
-  if (
-    isResolved &&
-    !isAuthenticated &&
-    (location.pathname === "/home" || location.pathname === "/landing")
-  ) {
+  if (isResolved && !isAuthenticated && location.pathname === "/landing") {
     return (
       <Navigate
         href={buildSignedOutLandingHref(location.searchStr, location.hash)}

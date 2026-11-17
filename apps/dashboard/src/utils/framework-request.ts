@@ -37,7 +37,7 @@ export function getDashboardRedirect(request: Request): Response | undefined {
   let status = 307;
 
   if (url.pathname === "/home" || url.pathname === "/landing") {
-    destination = `https://www.usenotra.com${url.pathname}`;
+    destination = `https://www.usenotra.com${url.pathname === "/home" ? "/" : url.pathname}`;
     status = 308;
   } else if (url.pathname === "/api-keys") {
     const cookie = request.headers
