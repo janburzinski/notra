@@ -31,7 +31,6 @@ import {
   COMPOSER_TOOLBAR_BUTTON,
   COMPOSER_TOOLBAR_BUTTON_FILLED,
   COMPOSER_TOOLBAR_BUTTON_LABEL,
-  COMPOSER_TRAY_TRANSITION,
 } from "@notra/ui/constants/composer";
 import { TRANSITION } from "@notra/ui/lib/motion";
 import { cn } from "@notra/ui/lib/utils";
@@ -164,54 +163,55 @@ function CardComposerFrame({
   );
 }
 
+/** The pill, which grows a tray around itself to hold chips. */
 // react-doctor-disable-next-line react-doctor/no-high-complexity-react-function -- each branch is one optional slot of the frame
-function ComposerFrame({
+function PillComposerFrame({
   children,
   nudge,
   connectedTop = false,
-  flat = false,
   elevated = false,
   size = "default",
   highlight = false,
   surface = "default",
   className,
-}: ComposerFrameProps) {
-  if (!flat) {
-    return (
-      <CardComposerFrame
-        className={className}
-        connectedTop={connectedTop}
-        nudge={nudge}
-      >
-        {children}
-      </CardComposerFrame>
-    );
-  }
-
+}: Omit<ComposerFrameProps, "flat">) {
   const hasNudge = Boolean(nudge);
+  // The tray stays laid out until its chips have folded away; its colour
+  // fades alongside them.
+  const [trayMounted, setTrayMounted] = useState(hasNudge);
+  if (hasNudge && !trayMounted) {
+    setTrayMounted(true);
+  }
+  const hasTray = hasNudge || trayMounted;
   const isCard = surface === "card";
 
   return (
     <div
       className={cn(
-        "flex w-full min-w-0 flex-col",
-        COMPOSER_TRAY_TRANSITION,
+        "flex min-w-0 flex-col",
+        // The tray's colour keeps pace with its chips folding in and out,
+        // so they never show on a tray that's already gone.
+        "transition-[background-color,border-radius] duration-slow ease-emphasized-in-out motion-reduce:transition-none",
         elevated && hasNudge && COMPOSER_ELEVATED_SHADOW,
-        // The pill only grows a tray to hold chips above it.
-        hasNudge
-          ? cn(isCard ? "bg-shell" : "bg-muted", "p-1")
-          : "bg-transparent",
+        // The pill only grows a tray to hold chips above it. The tray grows
+        // out around the pill, its padding cancelled by a negative margin,
+        // so the pill itself never moves or narrows when chips come and go.
+        hasTray ? "-mx-1 -mb-1 w-[calc(100%+0.5rem)] p-1" : "w-full",
+        hasNudge ? (isCard ? "bg-shell" : "bg-muted") : "bg-transparent",
         pillRadius(size),
         // Chips above the pill sit near the top edge, where the pill's wide
         // corners would crowd them, so the tray's top matches the card's.
-        hasNudge && "rounded-t-[18px]",
+        hasTray && "rounded-t-[18px]",
         connectedTop && "rounded-t-none",
         className
       )}
       data-slot="composer"
     >
       <LazyMotion features={domAnimation} strict>
-        <AnimatePresence initial={false}>
+        <AnimatePresence
+          initial={false}
+          onExitComplete={() => setTrayMounted(false)}
+        >
           {nudge ? (
             <ComposerNudgeShell key="nudge">{nudge}</ComposerNudgeShell>
           ) : null}
@@ -236,6 +236,21 @@ function ComposerFrame({
         {children}
       </div>
     </div>
+  );
+}
+
+function ComposerFrame({ flat = false, ...props }: ComposerFrameProps) {
+  if (flat) {
+    return <PillComposerFrame {...props} />;
+  }
+  return (
+    <CardComposerFrame
+      className={props.className}
+      connectedTop={props.connectedTop}
+      nudge={props.nudge}
+    >
+      {props.children}
+    </CardComposerFrame>
   );
 }
 

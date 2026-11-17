@@ -396,7 +396,9 @@ function DockInput({
         AUTOPILOT_AGENT_DOCK_INPUT_CLASS,
         // Open, the dock is the pill's tray; a second one inside it would
         // push the attachments in twice as far as the conversation.
-        shelled && !fullscreen && "[&_[data-slot=composer]]:p-0",
+        shelled &&
+          !fullscreen &&
+          "[&_[data-slot=composer]]:m-0 [&_[data-slot=composer]]:w-full [&_[data-slot=composer]]:p-0",
         fullscreen &&
           cn(
             AUTOPILOT_AGENT_DOCK_CARD_CLASS,
