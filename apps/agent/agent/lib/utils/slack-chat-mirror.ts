@@ -1,3 +1,4 @@
+import type { ChatMessageSlackAuthor } from "@notra/ai/types/chat";
 import { Effect } from "effect";
 import type {
   SlackInboundMessageContext,
@@ -7,6 +8,7 @@ import type {
 
 import type { MirrorUiMessage } from "../types/chat-mirror";
 import { claimMirroredChatSession } from "./chat-mirror";
+import { resolveSlackAuthors } from "./slack-message-authors";
 import { isPublicSlackChannel } from "./slack-public-channel";
 
 const SLACK_MENTION_REGEX = /<@[A-Z0-9]+>/gu;
@@ -30,7 +32,8 @@ function getSlackMessageText(message: {
 
 function toSlackThreadUiMessage(
   channelId: string,
-  message: SlackThreadMessage
+  message: SlackThreadMessage,
+  authors: ReadonlyMap<string, ChatMessageSlackAuthor>
 ): MirrorUiMessage | null {
   if (message.botId && !message.isMe) {
     return null;
@@ -41,15 +44,19 @@ function toSlackThreadUiMessage(
     return null;
   }
 
+  const author =
+    !message.isMe && message.user ? authors.get(message.user) : undefined;
   return {
     id: `slack:${channelId}:${message.ts}`,
     role: message.isMe ? "assistant" : "user",
     parts: [{ type: "text", text }],
+    ...(author ? { metadata: { slackAuthor: author } } : {}),
   };
 }
 
 function toSlackInboundUiMessage(
-  message: SlackMessage
+  message: SlackMessage,
+  author: ChatMessageSlackAuthor | undefined
 ): MirrorUiMessage | null {
   const text = getSlackMessageText(message);
   if (!text) {
@@ -60,6 +67,26 @@ function toSlackInboundUiMessage(
     id: `slack:${message.channelId}:${message.ts}`,
     role: "user",
     parts: [{ type: "text", text }],
+    ...(author ? { metadata: { slackAuthor: author } } : {}),
+  };
+}
+
+/** The sender's profile, falling back to the names the event carries. */
+function inboundSlackAuthor(
+  message: SlackMessage,
+  lookedUp: ChatMessageSlackAuthor | undefined
+): ChatMessageSlackAuthor | undefined {
+  const userId = message.author?.userId;
+  if (!userId) {
+    return undefined;
+  }
+  const name =
+    lookedUp?.name ??
+    (message.author?.fullName?.trim() || message.author?.userName?.trim());
+  return {
+    userId,
+    ...(name ? { name } : {}),
+    ...(lookedUp?.image ? { image: lookedUp.image } : {}),
   };
 }
 
@@ -84,6 +111,17 @@ export function mirrorPublicSlackThread(
       return null;
     }
 
+    const senderId = message.author?.userId;
+    const senders = senderId
+      ? yield* Effect.promise(() =>
+          resolveSlackAuthors(ctx.slack, message.teamId, [senderId])
+        )
+      : new Map<string, ChatMessageSlackAuthor>();
+    const sender = inboundSlackAuthor(
+      message,
+      senderId ? senders.get(senderId) : undefined
+    );
+
     return yield* claimMirroredChatSession({
       organizationId,
       source: "slack",
@@ -93,13 +131,24 @@ export function mirrorPublicSlackThread(
         message.threadTs
       ),
       title: getSlackChatTitle(message),
-      inboundMessage: toSlackInboundUiMessage(message),
+      inboundMessage: toSlackInboundUiMessage(message, sender),
       loadHistory: async () => {
         await ctx.thread.refresh();
-        return ctx.thread.recentMessages.flatMap((threadMessage) => {
+        const threadMessages = ctx.thread.recentMessages;
+        const authors = await resolveSlackAuthors(
+          ctx.slack,
+          message.teamId,
+          threadMessages.flatMap((threadMessage) =>
+            threadMessage.user && !threadMessage.isMe && !threadMessage.botId
+              ? [threadMessage.user]
+              : []
+          )
+        );
+        return threadMessages.flatMap((threadMessage) => {
           const uiMessage = toSlackThreadUiMessage(
             message.channelId,
-            threadMessage
+            threadMessage,
+            authors
           );
           return uiMessage ? [uiMessage] : [];
         });

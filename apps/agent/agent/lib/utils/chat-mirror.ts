@@ -4,6 +4,7 @@ import {
   generateChatId,
   getChatMessageById,
   renameChatSession,
+  setChatMirrorRunning,
   upsertChatMessageById,
 } from "@notra/ai/chat/history";
 import {
@@ -207,7 +208,15 @@ export async function mirrorSessionStatus(
   }
   await runMirrorEffect(
     mirrorStep("publish-mirror-status", () =>
-      publishChatMirrorStatus(target.organizationId, target.chatId, status)
+      Promise.all([
+        publishChatMirrorStatus(target.organizationId, target.chatId, status),
+        // The dashboard's chat list reads this to show the turn as running.
+        setChatMirrorRunning(
+          target.organizationId,
+          target.chatId,
+          status === "working"
+        ),
+      ])
     )
   );
 }

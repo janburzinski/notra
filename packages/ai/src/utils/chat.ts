@@ -7,6 +7,22 @@ import type {
   ChatSessionSummary,
 } from "../types/chat";
 
+/**
+ * Drops Slack sender details from messages a client sent. Only the Slack
+ * mirror may set them; from anyone else they would put a made-up name and
+ * photo on a message.
+ */
+export function withoutSlackAuthors<T extends UIMessage>(messages: T[]): T[] {
+  return messages.map((message) => {
+    const metadata = message.metadata as ChatMessageMetadata | undefined;
+    if (!metadata?.slackAuthor) {
+      return message;
+    }
+    const { slackAuthor: _slackAuthor, ...rest } = metadata;
+    return { ...message, metadata: rest };
+  });
+}
+
 export function stampUserMessageAuthors<T extends UIMessage>(
   messages: T[],
   authorUserId: string

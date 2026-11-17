@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft01Icon } from "@hugeicons/core-free-icons";
+import { ArrowLeft01Icon, PencilEdit02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   Sidebar,
@@ -9,6 +9,7 @@ import {
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
+  SidebarMenuItem,
   useSidebar,
 } from "@notra/ui/components/ui/sidebar";
 import { cn } from "@notra/ui/lib/utils";
@@ -26,6 +27,7 @@ import { DeferredSidebarStatus } from "./deferred-sidebar-status";
 import { NavFooter } from "./nav-footer";
 import { NavJobs } from "./nav-jobs";
 import { SidebarLabel } from "./sidebar-label";
+import { SidebarNavLink } from "./sidebar-nav-link";
 import { SidebarProjectSwitcher } from "./sidebar-project-switcher";
 import { SidebarTopQuickActions } from "./sidebar-quick-actions";
 import { SidebarResizeHandle } from "./sidebar-resize-handle";
@@ -40,19 +42,45 @@ const ChatHistoryNav = dynamic(
   }
 );
 
-function SidebarBackButton({ onBack }: { onBack: () => void }) {
+/**
+ * Back and New chat share one row so the chat list starts higher. In the rail
+ * they stack, like every other rail item.
+ */
+function SidebarChatTopRow({
+  onBack,
+  slug,
+}: {
+  onBack: () => void;
+  slug: string;
+}) {
   const t = useTranslations("common.actions");
+  const tLabels = useTranslations("common.labels");
+  const newChatLabel = tLabels("newChat");
   return (
-    <div className="bg-sidebar sticky top-0 z-10 p-2">
-      <SidebarMenu>
-        <SidebarMenuButton
-          className="hover:bg-sidebar-accent duration-normal cursor-pointer transition-colors [&>*]:group-data-[collapsible=icon]:-translate-x-px"
-          onClick={onBack}
-          tooltip={t("back")}
-        >
-          <HugeiconsIcon icon={ArrowLeft01Icon} />
-          <SidebarLabel>{t("back")}</SidebarLabel>
-        </SidebarMenuButton>
+    <div className="bg-sidebar sticky top-0 z-20 flex items-center gap-1 p-2 group-data-[collapsible=icon]:flex-col">
+      <SidebarMenu className="min-w-0 flex-1 group-data-[collapsible=icon]:w-full">
+        <SidebarMenuItem>
+          <SidebarMenuButton
+            className="hover:bg-sidebar-accent duration-normal cursor-pointer transition-colors [&>*]:group-data-[collapsible=icon]:-translate-x-px"
+            onClick={onBack}
+            tooltip={t("back")}
+          >
+            <HugeiconsIcon icon={ArrowLeft01Icon} />
+            <SidebarLabel>{t("back")}</SidebarLabel>
+          </SidebarMenuButton>
+        </SidebarMenuItem>
+      </SidebarMenu>
+      <SidebarMenu className="w-auto shrink-0 group-data-[collapsible=icon]:w-full">
+        <SidebarMenuItem>
+          <SidebarMenuButton
+            aria-label={newChatLabel}
+            className="w-8 cursor-pointer justify-center px-0"
+            render={<SidebarNavLink href={`/${slug}/chat`} replace />}
+            tooltip={newChatLabel}
+          >
+            <HugeiconsIcon icon={PencilEdit02Icon} />
+          </SidebarMenuButton>
+        </SidebarMenuItem>
       </SidebarMenu>
     </div>
   );
@@ -161,7 +189,19 @@ export function DashboardSidebar({
       <SidebarHeader className="pt-px pb-0.5">
         <SidebarHeaderRow />
       </SidebarHeader>
-      <SidebarTopQuickActions />
+      {/* The chat list brings its own search, so the global field steps
+          aside there; ⌘K still opens the palette. */}
+      <div
+        className={cn(
+          "grid transition-[grid-template-rows,opacity] duration-(--sidebar-duration) ease-(--sidebar-ease) motion-reduce:transition-none",
+          isSubpage ? "grid-rows-[0fr] opacity-0" : "grid-rows-[1fr]"
+        )}
+        inert={isSubpage ? true : undefined}
+      >
+        <div className="min-h-0 overflow-hidden">
+          <SidebarTopQuickActions />
+        </div>
+      </div>
       <SidebarContent>
         <SidebarSwap
           activeId={panelId}
@@ -177,28 +217,28 @@ export function DashboardSidebar({
               side: "right",
               children: (
                 <>
-                  <SidebarBackButton onBack={handleBack} />
+                  <SidebarChatTopRow onBack={handleBack} slug={slug} />
                   <ChatHistoryNav />
                 </>
               ),
             },
           ]}
         />
-        <div className="mt-auto">
+        {/* Workspace, Docs and the agent buttons stay in reach while a long
+            chat list or navigation scrolls underneath them. */}
+        <div className="bg-sidebar sticky bottom-0 z-10 mt-auto">
+          {hasMoreNavigation && (
+            <div
+              aria-hidden
+              className="from-sidebar pointer-events-none absolute inset-x-0 bottom-full h-8 bg-linear-to-t to-transparent group-data-[collapsible=icon]:hidden"
+              data-sidebar="scroll-fade"
+            />
+          )}
           <NavFooter slug={slug} />
           <DeferredSidebarStatus />
         </div>
         <div aria-hidden className="h-px shrink-0" ref={scrollEndRef} />
       </SidebarContent>
-      <div className="relative shrink-0">
-        {hasMoreNavigation && (
-          <div
-            aria-hidden
-            className="from-sidebar pointer-events-none absolute inset-x-0 bottom-full z-10 h-8 bg-linear-to-t to-transparent group-data-[collapsible=icon]:hidden"
-            data-sidebar="scroll-fade"
-          />
-        )}
-      </div>
       <SidebarFooter className="pt-1.75">
         <SidebarUserMenu />
       </SidebarFooter>

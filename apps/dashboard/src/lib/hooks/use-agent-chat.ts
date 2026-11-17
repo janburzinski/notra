@@ -32,6 +32,7 @@ import { CHAT_ACTIVE_STREAM_POLL_INTERVAL_MS } from "@/constants/chat-active-str
 import { localStorageKeys } from "@/constants/storage";
 import { emitAutumnRefresh } from "@/lib/billing/autumn-refresh";
 import { createStandaloneChatTransport } from "@/lib/chat/standalone-chat-transport";
+import { markChatSessionRunning } from "@/lib/hooks/use-chat-sessions";
 import { dashboardOrpcClient } from "@/lib/orpc/client";
 import { dashboardOrpc } from "@/lib/orpc/query";
 import type { AgentQuestionAnswer } from "@/types/agent-questions";
@@ -414,6 +415,18 @@ export function useAgentChat({
   useLayoutEffect(() => {
     messagesRef.current = messages;
   }, [messages]);
+
+  // Keeps the sidebar's running state in step with this chat: optimistic on
+  // send, then confirmed (and a new chat listed) once the stream starts.
+  useEffect(() => {
+    if (status === "submitted") {
+      markChatSessionRunning(queryClient, organizationId, chatId);
+    } else if (status === "streaming") {
+      queryClient.invalidateQueries({
+        queryKey: ["chat-sessions", organizationId],
+      });
+    }
+  }, [chatId, organizationId, queryClient, status]);
 
   const historyQuery = useQuery(
     chatHistoryQueryOptions(

@@ -12,3 +12,8 @@ export const MIRROR_TOOL_NAME_OVERRIDES: Record<string, string> = {
   web_search: "webSearch",
   web_fetch: "fetchWebpage",
 };
+
+/** How long a Slack person's name and photo are reused before a new lookup. */
+export const SLACK_AUTHOR_CACHE_TTL_MS = 60 * 60 * 1000;
+/** Slack people remembered at once; the oldest is dropped past this. */
+export const SLACK_AUTHOR_CACHE_MAX_ENTRIES = 1000;

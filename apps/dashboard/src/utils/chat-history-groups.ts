@@ -1,103 +1,58 @@
 import type { ChatSessionSummary } from "@notra/ai/types/chat";
 
 import {
-  CHAT_HISTORY_GROUP_ORDER,
-  CHAT_HISTORY_LAST_7_DAYS,
-  CHAT_HISTORY_LAST_MONTH_DAYS,
+  CHAT_HISTORY_SOURCES,
   DEFAULT_CHAT_TITLE,
 } from "@/constants/chat-history";
-import type { ChatHistoryGroup, ChatHistoryGroupId } from "@/types/chat";
+import type { ChatHistorySource, ChatHistorySourceFilter } from "@/types/chat";
 
-function startOfLocalDay(date: Date): Date {
-  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+export function chatSessionSource(
+  session: ChatSessionSummary
+): ChatHistorySource {
+  // Ask agent and API-linked chats are regular chats here; only Slack
+  // threads are marked.
+  return session.externalChannelId?.source === "slack" ? "slack" : "dashboard";
 }
 
-function addLocalDays(date: Date, days: number): Date {
-  return new Date(date.getFullYear(), date.getMonth(), date.getDate() + days);
+/** The sources present in the list, in a stable order, for the filter menu. */
+export function chatSessionSources(
+  sessions: ChatSessionSummary[]
+): ChatHistorySource[] {
+  const present = new Set(sessions.map(chatSessionSource));
+  return CHAT_HISTORY_SOURCES.filter((source) => present.has(source));
 }
 
-function resolveChatHistoryGroupId(
-  updatedAt: Date,
-  todayStart: Date,
-  yesterdayStart: Date,
-  last7DaysStart: Date,
-  lastMonthStart: Date
-): ChatHistoryGroupId {
-  if (updatedAt >= todayStart) {
-    return "today";
-  }
-
-  if (updatedAt >= yesterdayStart) {
-    return "yesterday";
-  }
-
-  if (updatedAt >= last7DaysStart) {
-    return "last7Days";
-  }
-
-  if (updatedAt >= lastMonthStart) {
-    return "lastMonth";
-  }
-
-  return "older";
-}
-
-function compareSessionsByUpdatedAtDesc(
-  left: ChatSessionSummary,
-  right: ChatSessionSummary
-): number {
-  return Date.parse(right.updatedAt) - Date.parse(left.updatedAt);
-}
-
-export function getChatHistoryGroups(
+export function filterChatSessions(
   sessions: ChatSessionSummary[],
-  now = new Date()
-): ChatHistoryGroup[] {
-  const todayStart = startOfLocalDay(now);
-  const yesterdayStart = addLocalDays(todayStart, -1);
-  const last7DaysStart = addLocalDays(todayStart, -CHAT_HISTORY_LAST_7_DAYS);
-  const lastMonthStart = addLocalDays(
-    todayStart,
-    -CHAT_HISTORY_LAST_MONTH_DAYS
-  );
-
-  const sessionsByGroup: Record<ChatHistoryGroupId, ChatSessionSummary[]> = {
-    today: [],
-    yesterday: [],
-    last7Days: [],
-    lastMonth: [],
-    older: [],
-  };
-
-  for (const session of sessions) {
-    const updatedAt = new Date(session.updatedAt);
-    if (Number.isNaN(updatedAt.getTime())) {
-      continue;
-    }
-
-    const groupId = resolveChatHistoryGroupId(
-      updatedAt,
-      todayStart,
-      yesterdayStart,
-      last7DaysStart,
-      lastMonthStart
-    );
-    sessionsByGroup[groupId].push(session);
+  {
+    source,
+    query,
+    newChatLabel,
+  }: {
+    source: ChatHistorySourceFilter;
+    query: string;
+    newChatLabel: string;
   }
-
-  return CHAT_HISTORY_GROUP_ORDER.flatMap((id) => {
-    const grouped = sessionsByGroup[id];
-    if (grouped.length === 0) {
-      return [];
+): ChatSessionSummary[] {
+  const needle = query.trim().toLocaleLowerCase();
+  const visible = sessions.filter((session) => {
+    if (source !== "all" && chatSessionSource(session) !== source) {
+      return false;
     }
-
-    return [
-      {
-        id,
-        sessions: grouped.slice().sort(compareSessionsByUpdatedAtDesc),
-      },
-    ];
+    if (!needle) {
+      return true;
+    }
+    return displayChatTitle(session.title, newChatLabel)
+      .toLocaleLowerCase()
+      .includes(needle);
   });
+  // Pinned chats stay on top, but each row shows when it was last active, so
+  // both halves read newest first rather than in the order they were pinned.
+  return visible.sort(
+    (left, right) =>
+      Number(Boolean(right.pinnedAt)) - Number(Boolean(left.pinnedAt)) ||
+      Date.parse(right.updatedAt) - Date.parse(left.updatedAt)
+  );
 }
 
 export function mergePendingChatSessions(

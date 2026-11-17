@@ -12,7 +12,11 @@ import { toast } from "sonner";
 import { useTranslations } from "use-intl";
 
 import { useOrganizationsContext } from "@/components/providers/organization-provider";
-import { DEFAULT_CHAT_TITLE } from "@/constants/chat-history";
+import {
+  CHAT_IDLE_POLL_INTERVAL_MS,
+  CHAT_RUNNING_POLL_INTERVAL_MS,
+  DEFAULT_CHAT_TITLE,
+} from "@/constants/chat-history";
 import { useActiveProject } from "@/lib/hooks/use-active-project";
 import { dashboardOrpcClient } from "@/lib/orpc/client";
 import {
@@ -43,6 +47,8 @@ function createPendingChatSession(chatId: string): ChatSessionSummary {
     createdAt: now,
     updatedAt: now,
     pinnedAt: null,
+    // A pending chat exists because a message just went out.
+    isRunning: true,
   };
 }
 
@@ -111,6 +117,29 @@ export async function reconcileCreatedChatTitle(
   }
 }
 
+/**
+ * Shows a chat as running the moment a message goes out, before the next
+ * list fetch confirms it from the server.
+ */
+export function markChatSessionRunning(
+  queryClient: QueryClient,
+  organizationId: string | undefined,
+  chatId: string
+) {
+  if (!organizationId) {
+    return;
+  }
+  queryClient.setQueriesData<ChatSessionSummary[]>(
+    { queryKey: ["chat-sessions", organizationId] },
+    (current) =>
+      current?.map((session) =>
+        session.chatId === chatId && !session.isRunning
+          ? { ...session, isRunning: true }
+          : session
+      )
+  );
+}
+
 export function useChatSessions() {
   const queryClient = useQueryClient();
   const { activeOrganization } = useOrganizationsContext();
@@ -140,6 +169,13 @@ export function useChatSessions() {
     },
     enabled: Boolean(organizationId) && isResolved,
     staleTime: 1000 * 60,
+    // Fast while a reply streams so running rows settle on their own, slow
+    // otherwise so a run started in another tab or by a teammate shows up.
+    // Background tabs don't poll.
+    refetchInterval: (current) =>
+      current.state.data?.some((session) => session.isRunning)
+        ? CHAT_RUNNING_POLL_INTERVAL_MS
+        : CHAT_IDLE_POLL_INTERVAL_MS,
   });
   const pendingQuery = useQuery({
     queryKey: pendingQueryKey,

@@ -1903,6 +1903,7 @@ function StandaloneChatPageClient({
                     metadata: message.metadata,
                     membersById: messageAuthorsById,
                     sessionUser: session?.user,
+                    isSlackMirrored,
                   })
                 : null;
               const messageText = toDisplayText(getUserMessageText(message));

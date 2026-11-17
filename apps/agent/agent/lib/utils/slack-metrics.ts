@@ -1,3 +1,4 @@
+import { stripSlackAuthorsForTeam } from "@notra/ai/chat/history";
 import { logError } from "@notra/ai/utils/server-log";
 import { db } from "@notra/db/drizzle";
 import { slackAgentRequests } from "@notra/db/schema";
@@ -5,6 +6,7 @@ import { and, eq, isNull, lt } from "drizzle-orm";
 import type { SlackChannelState, SlackMessage } from "eve/channels/slack";
 
 import type { SlackRequestTrigger, SlackTurnOutcome } from "../types/slack";
+import { forgetSlackAuthors } from "./slack-message-authors";
 import { getNotraSlackState } from "./slack-state";
 
 /** Slack `ts` values are epoch seconds with a microsecond suffix. */
@@ -108,15 +110,25 @@ export async function markSlackTurnResponded(
   }
 }
 
-/** Keeps the counts but drops who asked once a workspace removes the app. */
+/**
+ * Keeps the counts and mirrored chats but drops who asked and who wrote each
+ * mirrored message once a workspace removes the app.
+ */
 export async function anonymizeSlackRequests(teamId: string): Promise<void> {
-  try {
-    await db
+  forgetSlackAuthors(teamId);
+  const results = await Promise.allSettled([
+    db
       .update(slackAgentRequests)
       .set({ slackUserId: null })
-      .where(eq(slackAgentRequests.slackTeamId, teamId));
-  } catch (error) {
-    logError("Slack request anonymization failed", error, { teamId });
+      .where(eq(slackAgentRequests.slackTeamId, teamId)),
+    stripSlackAuthorsForTeam(teamId),
+  ]);
+  for (const result of results) {
+    if (result.status === "rejected") {
+      logError("Slack request anonymization failed", result.reason, {
+        teamId,
+      });
+    }
   }
 }
 

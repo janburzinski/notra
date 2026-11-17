@@ -120,6 +120,7 @@ export async function POST(
     id: `slack:${target.channelId}:${ts}`,
     role: "user",
     parts: [{ type: "text", text: bodyParse.data.text }],
+    metadata: { authorUserId: auth.context.user.id },
   };
   await appendChatMessageIfMissing(organizationId, chatIdParse.data, message);
   await publishChatMirrorMessage(organizationId, chatIdParse.data, message);

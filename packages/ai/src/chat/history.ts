@@ -8,6 +8,8 @@ import { and, desc, eq, isNull, sql } from "drizzle-orm";
 import {
   CHAT_ABORT_FLAG_TTL_SECONDS,
   CHAT_ACTIVE_STREAM_TTL_SECONDS,
+  CHAT_MIRROR_RUNNING_TTL_SECONDS,
+  CHAT_RUNNING_LOOKUP_BATCH,
   CHAT_LAST_STOPPED_TTL_SECONDS,
   CHAT_WORKFLOW_REQUEST_TTL_SECONDS,
 } from "../constants/chat";
@@ -36,6 +38,11 @@ const REFRESH_ACTIVE_STREAM_IF_MATCHES_SCRIPT =
 
 function activeStreamKey(organizationId: string, chatId: string) {
   return `chat:stream:${organizationId}:${chatId}`;
+}
+
+/** Set while a mirrored (Slack) turn runs; those have no dashboard stream. */
+function mirrorRunningKey(organizationId: string, chatId: string) {
+  return `chat:mirror-running:${organizationId}:${chatId}`;
 }
 
 function abortFlagKey(
@@ -597,6 +604,97 @@ export async function getActiveChatStream(
     activeStreamKey(organizationId, chatId)
   );
   return typeof streamId === "string" && streamId.length > 0 ? streamId : null;
+}
+
+/**
+ * Which of these chats are streaming a reply right now, read from the active
+ * stream keys in one MGET per batch. Without Redis nothing counts as running.
+ */
+export async function getRunningChatIds(
+  organizationId: string,
+  chatIds: string[]
+): Promise<Set<string>> {
+  const redis = getChatRedis();
+  const running = new Set<string>();
+  if (!redis || chatIds.length === 0) {
+    return running;
+  }
+
+  const batches: string[][] = [];
+  for (
+    let start = 0;
+    start < chatIds.length;
+    start += CHAT_RUNNING_LOOKUP_BATCH
+  ) {
+    batches.push(chatIds.slice(start, start + CHAT_RUNNING_LOOKUP_BATCH));
+  }
+  await Promise.all(
+    batches.map(async (batch) => {
+      // Each chat's dashboard stream key, then its mirrored-turn key.
+      const values = await redis.mget<(string | null)[]>(
+        ...batch.flatMap((chatId) => [
+          activeStreamKey(organizationId, chatId),
+          mirrorRunningKey(organizationId, chatId),
+        ])
+      );
+      for (const [index, chatId] of batch.entries()) {
+        const streamId = values[index * 2];
+        const mirrorRunning = values[index * 2 + 1];
+        if (
+          (typeof streamId === "string" && streamId.length > 0) ||
+          mirrorRunning
+        ) {
+          running.add(chatId);
+        }
+      }
+    })
+  );
+  return running;
+}
+
+/**
+ * Removes Slack sender names, ids and photos from a workspace's mirrored
+ * chats, for when the workspace removes the app. The messages stay.
+ */
+export async function stripSlackAuthorsForTeam(teamId: string): Promise<void> {
+  await db.execute(sql`
+    UPDATE ${chatSessions}
+    SET messages = (
+      SELECT jsonb_agg(
+        CASE
+          WHEN message->'metadata' ? 'slackAuthor'
+            THEN jsonb_set(message, '{metadata}', (message->'metadata') - 'slackAuthor')
+          ELSE message
+        END
+        ORDER BY position
+      )
+      FROM jsonb_array_elements(${chatSessions.messages}) WITH ORDINALITY AS t(message, position)
+    )
+    WHERE ${chatSessions.externalChannelSource} = 'slack'
+      AND ${chatSessions.externalChannelId} LIKE ${`${teamId}:%`}
+      AND jsonb_path_exists(${chatSessions.messages}, '$[*].metadata.slackAuthor')
+  `);
+}
+
+/**
+ * Marks a mirrored chat as running while its Slack turn works, so the
+ * dashboard's chat list shows it. The TTL clears a turn whose agent died.
+ */
+export async function setChatMirrorRunning(
+  organizationId: string,
+  chatId: string,
+  running: boolean
+): Promise<void> {
+  const redis = getChatRedis();
+  if (!redis) {
+    return;
+  }
+  const key = mirrorRunningKey(organizationId, chatId);
+  if (running) {
+    await redis.set(key, "1", { ex: CHAT_MIRROR_RUNNING_TTL_SECONDS });
+    return;
+  }
+  await redis.del(key);
 }
 
 export async function claimChatWorkflowRequest(

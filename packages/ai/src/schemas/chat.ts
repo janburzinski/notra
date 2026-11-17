@@ -71,9 +71,17 @@ export const slackRelayMetadataSchema = z.object({
   text: z.string().min(1).max(4000),
 });
 
+/** The Slack person who wrote a message mirrored from a Slack thread. */
+export const chatMessageSlackAuthorSchema = z.object({
+  userId: z.string().min(1).max(64),
+  name: z.string().min(1).max(200).optional(),
+  image: z.url().max(2000).optional(),
+});
+
 export const chatMessageMetadataSchema = z.object({
   chatId: z.string().min(1).optional(),
   authorUserId: z.string().min(1).max(200).optional(),
+  slackAuthor: chatMessageSlackAuthorSchema.optional(),
   model: z.string().min(1).optional(),
   requestedModel: chatModelSchema.optional(),
   thinkingLevel: thinkingLevelSchema.optional(),
@@ -221,6 +229,8 @@ export const chatSessionSummarySchema = z.object({
   createdAt: z.string().min(1),
   pinnedAt: z.string().min(1).nullable(),
   externalChannelId: externalChannelIdSchema.nullable().optional(),
+  /** A reply is streaming right now; only the dashboard's list sets it. */
+  isRunning: z.boolean().optional(),
 });
 
 export const chatSessionsListResponseSchema = z.object({

@@ -36,7 +36,7 @@ export function parseSlackExternalChannelKey(
  * installation must belong to the organization relaying, never just any team.
  * The env binding only covers the workspace and organization it names.
  */
-async function resolveRelayBotToken(
+export async function resolveRelayBotToken(
   teamId: string,
   organizationId: string
 ): Promise<string> {

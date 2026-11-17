@@ -6859,7 +6859,8 @@
       "attachments": "{count, plural, one {# Anhang} other {# Anhänge}}: {names}"
     },
     "author": {
-      "formerMember": "Ehemaliges Mitglied"
+      "formerMember": "Ehemaliges Mitglied",
+      "slackUser": "Slack-Nutzer"
     },
     "contextRow": {
       "removeSelection": "Auswahl entfernen",
@@ -8211,9 +8212,19 @@
       "options": "Chat-Optionen",
       "pinned": "Angeheftet",
       "loadFailed": "Chatverlauf konnte nicht geladen werden.",
-      "groups": {
-        "lastMonth": "Letzter Monat"
-      }
+      "recent": "Zuletzt",
+      "search": "Chats durchsuchen",
+      "searchPlaceholder": "Chats durchsuchen…",
+      "closeSearch": "Suche schließen",
+      "filter": "Nach Quelle filtern",
+      "noMatches": "Keine passenden Chats",
+      "sources": {
+        "all": "Alle Quellen",
+        "dashboard": "Chat",
+        "slack": "Slack"
+      },
+      "working": "Arbeitet…",
+      "newReply": "Neue Antwort"
     },
     "feedback": {
       "thanks": "Danke für dein Feedback!",

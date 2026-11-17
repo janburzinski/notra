@@ -23,7 +23,8 @@ export function MessageAuthorAvatar({
   size = "default",
 }: MessageAuthorAvatarProps) {
   const t = useTranslations("chat.author");
-  const label = author.name ?? t("formerMember");
+  const label =
+    author.name ?? (author.fromSlack ? t("slackUser") : t("formerMember"));
   const reduceMotion = useReducedMotion();
 
   return (

@@ -10,25 +10,22 @@ export interface ChatMessageAuthor {
   name: string | null;
   image: string | null;
   seed: string;
+  /** Someone in the Slack thread rather than a Notra member. */
+  fromSlack?: boolean;
 }
 
 export interface ResolveChatMessageAuthorInput {
   metadata: ChatMessageMetadata | undefined;
   membersById: Map<string, ChatMessageAuthor>;
   sessionUser: ClientSessionData["user"] | undefined;
+  /** The chat mirrors a Slack thread, so unattributed messages aren't yours. */
+  isSlackMirrored?: boolean;
 }
 
-export type ChatHistoryGroupId =
-  | "today"
-  | "yesterday"
-  | "last7Days"
-  | "lastMonth"
-  | "older";
+/** Where a chat came from, as the sidebar tells them apart. */
+export type ChatHistorySource = "dashboard" | "slack";
 
-export interface ChatHistoryGroup {
-  id: ChatHistoryGroupId;
-  sessions: ChatSessionSummary[];
-}
+export type ChatHistorySourceFilter = ChatHistorySource | "all";
 
 export type ChatSuggestionSignal =
   | { kind: "draft"; postId: string; title: string; updatedAt: string }

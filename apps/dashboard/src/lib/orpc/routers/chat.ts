@@ -1,10 +1,12 @@
 import {
   deleteChatSession,
   getChatProjectId,
+  getRunningChatIds,
   listChatSessions,
   renameChatSession,
   setChatSessionPinned,
 } from "@notra/ai/chat/history";
+import { CHAT_RUNNING_LOOKUP_WINDOW_MS } from "@notra/ai/constants/chat";
 import { maybeGenerateCollectionTitle } from "@notra/ai/jobs/collection-title";
 import { supportsPostSlug } from "@notra/ai/schemas/post";
 import { stripLeadingFrontmatter } from "@notra/ai/utils/post-markdown";
@@ -65,7 +67,25 @@ export const chatRouter = {
         const sessions = await listChatSessions(organizationId, {
           projectId: input.projectId ?? null,
         });
-        return { sessions };
+        const recentSince = Date.now() - CHAT_RUNNING_LOOKUP_WINDOW_MS;
+        const recentChatIds = sessions
+          .filter((session) => Date.parse(session.updatedAt) >= recentSince)
+          .map((session) => session.chatId);
+        // The list still loads when Redis is down; nothing shows as running.
+        const runningChatIds = await getRunningChatIds(
+          organizationId,
+          recentChatIds
+        ).catch((error: unknown) => {
+          console.error("Failed to read running chats", error);
+          return new Set<string>();
+        });
+        return {
+          sessions: sessions.map((session) =>
+            runningChatIds.has(session.chatId)
+              ? { ...session, isRunning: true }
+              : session
+          ),
+        };
       }),
 
     get: authorizedProcedure

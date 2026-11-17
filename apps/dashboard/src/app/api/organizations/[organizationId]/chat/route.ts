@@ -39,6 +39,7 @@ import type { TccMetadata } from "@notra/ai/types/tcc";
 import {
   buildChatFinishMetadata,
   stampUserMessageAuthors,
+  withoutSlackAuthors,
 } from "@notra/ai/utils/chat";
 import { createChatActivityTimingTracker } from "@notra/ai/utils/chat-activity-timing";
 import { routeUsageProperties } from "@notra/ai/utils/route-usage";
@@ -112,7 +113,7 @@ export const POST = withEvlog(async function POST(
     }
 
     let messages = stampUserMessageAuthors(
-      parseResult.data.messages,
+      withoutSlackAuthors(parseResult.data.messages),
       auth.context.user.id
     );
     const chatId = parseResult.data.chatId ?? generateChatId();

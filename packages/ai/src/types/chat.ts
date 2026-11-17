@@ -4,6 +4,7 @@ import type * as z from "zod";
 
 import type {
   chatMessageMetadataSchema,
+  chatMessageSlackAuthorSchema,
   chatModelSchema,
   chatToolApprovalResponseSchema,
   chatSessionSummarySchema,
@@ -30,6 +31,9 @@ export type ChatToolApprovalResponse = z.infer<
 >;
 export type ThinkingLevel = z.infer<typeof thinkingLevelSchema>;
 export type ChatMessageMetadata = z.infer<typeof chatMessageMetadataSchema>;
+export type ChatMessageSlackAuthor = z.infer<
+  typeof chatMessageSlackAuthorSchema
+>;
 export type ChatUIMessage = UIMessage<ChatMessageMetadata>;
 export type StoredChatPreferences = z.infer<typeof storedChatPreferencesSchema>;
 export type ChatSessionSummary = z.infer<typeof chatSessionSummarySchema>;

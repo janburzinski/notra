@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  Add01Icon,
   Delete02Icon,
   MoreHorizontalIcon,
   PencilEdit02Icon,
@@ -12,6 +11,7 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { CHAT_TITLE_MAX_LENGTH } from "@notra/ai/constants/chat";
 import type { ChatSessionSummary } from "@notra/ai/types/chat";
 import { normalizeChatTitle } from "@notra/ai/utils/chat";
+import { Shimmer } from "@notra/ui/components/ai-elements/shimmer";
 import { ConfirmDialog } from "@notra/ui/components/shared/confirm-dialog";
 import {
   ContextMenu,
@@ -29,7 +29,6 @@ import { Input } from "@notra/ui/components/ui/input";
 import {
   SidebarGroup,
   SidebarGroupContent,
-  SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
@@ -41,20 +40,29 @@ import { toast } from "sonner";
 import { useTranslations } from "use-intl";
 
 import { Button } from "@/components/button";
+import { AgentLoader } from "@/components/icons/agent-loader";
 import { useOrganizationsContext } from "@/components/providers/organization-provider";
+import { useChatRunState } from "@/lib/hooks/use-chat-run-state";
 import {
   useChatSessionMutations,
   useChatSessions,
 } from "@/lib/hooks/use-chat-sessions";
+import { useFormatRelative } from "@/lib/hooks/use-format-relative";
+import { useMinuteTick } from "@/lib/hooks/use-minute-tick";
 import { usePathname, useRouter } from "@/lib/navigation";
 import { cn } from "@/lib/utils";
+import type { ChatHistorySourceFilter } from "@/types/chat";
 import {
+  chatSessionSource,
+  chatSessionSources,
   displayChatTitle,
-  getChatHistoryGroups,
+  filterChatSessions,
 } from "@/utils/chat-history-groups";
 import { chatHistoryQueryOptions } from "@/utils/chat-history-query";
 
+import { ChatHistoryHeader } from "./chat-history-header";
 import { ChatHistoryNavLoading } from "./chat-history-nav-loading";
+import { ChatSourceIcon } from "./chat-source-icon";
 import { SidebarLabel } from "./sidebar-label";
 import { SidebarNavLink } from "./sidebar-nav-link";
 
@@ -79,7 +87,14 @@ export function ChatHistoryNav() {
   const [deleteCandidate, setDeleteCandidate] =
     useState<ChatSessionSummary | null>(null);
   const [deletingChatId, setDeletingChatId] = useState<string | null>(null);
+  const [sourceFilter, setSourceFilter] =
+    useState<ChatHistorySourceFilter>("all");
+  const [query, setQuery] = useState("");
+  const [searchOpen, setSearchOpen] = useState(false);
   const editInputRef = useRef<HTMLInputElement | null>(null);
+  const formatRelative = useFormatRelative();
+  // Keeps "5 minutes ago" counting while the sidebar stays open.
+  useMinuteTick();
 
   const slug = activeOrganization?.slug;
   const organizationId = activeOrganization?.id;
@@ -102,12 +117,18 @@ export function ChatHistoryNav() {
   const pathSegments = pathname.split("/").filter(Boolean);
   const currentChatId = chatIdFromPath(pathname);
   const isOnChatRoute = pathSegments[1] === "chat";
-  const pinnedSessions = sessions.filter((session) =>
-    Boolean(session.pinnedAt)
-  );
-  const historyGroups = getChatHistoryGroups(
-    sessions.filter((session) => !session.pinnedAt)
-  );
+  const newChatLabel = tCommon2("labels.newChat");
+  const sources = chatSessionSources(sessions);
+  const { finishedUnseenIds } = useChatRunState({
+    organizationId,
+    sessions,
+    currentChatId,
+  });
+  const visibleSessions = filterChatSessions(sessions, {
+    source: sourceFilter,
+    query,
+    newChatLabel,
+  });
 
   useEffect(() => {
     if (!editingChatId) {
@@ -183,179 +204,209 @@ export function ChatHistoryNav() {
     setPinningChatId(null);
   }
 
-  function renderSessions(label: string, items: ChatSessionSummary[]) {
-    if (items.length === 0) {
-      return null;
-    }
-
+  function renderSessions(items: ChatSessionSummary[]) {
     return (
-      <SidebarGroup key={label}>
-        <SidebarGroupLabel>{label}</SidebarGroupLabel>
-        <SidebarGroupContent>
-          <SidebarMenu>
-            {items.map((session) => {
-              const isEditing = editingChatId === session.chatId;
-              const isRenaming = renamingChatId === session.chatId;
-              const isPinning = pinningChatId === session.chatId;
-              const isBusy = isRenaming || isPinning;
-              const isGeneratingTitle = generatingTitleChatIds.has(
-                session.chatId
-              );
-              const sessionHref = `/${slug}/chat/${session.chatId}`;
+      <SidebarMenu className="gap-px">
+        {items.map((session) => {
+          const isEditing = editingChatId === session.chatId;
+          const isRenaming = renamingChatId === session.chatId;
+          const isPinning = pinningChatId === session.chatId;
+          const isBusy = isRenaming || isPinning;
+          const isGeneratingTitle = generatingTitleChatIds.has(session.chatId);
+          const sessionHref = `/${slug}/chat/${session.chatId}`;
+          const source = chatSessionSource(session);
+          const hasUnseenReply =
+            !session.isRunning && finishedUnseenIds.has(session.chatId);
 
-              return (
-                <ContextMenu key={session.chatId}>
-                  <ContextMenuTrigger render={<SidebarMenuItem />}>
-                    <SidebarMenuButton
-                      className={cn(
-                        "cursor-pointer pr-8",
-                        isBusy && "opacity-70"
-                      )}
-                      isActive={session.chatId === currentChatId}
-                      render={
-                        isEditing ? (
-                          <div className="w-full">
-                            <Input
-                              className="h-7"
-                              disabled={isBusy}
-                              maxLength={CHAT_TITLE_MAX_LENGTH}
-                              onBlur={() => submitRename(session)}
-                              onChange={(event) =>
-                                setDraftTitle(event.target.value)
-                              }
-                              onKeyDown={(event) => {
-                                if (event.key === "Enter") {
-                                  event.preventDefault();
-                                  submitRename(session);
-                                  return;
-                                }
+          return (
+            <ContextMenu key={session.chatId}>
+              <ContextMenuTrigger render={<SidebarMenuItem />}>
+                <SidebarMenuButton
+                  className={cn(
+                    "h-auto min-h-12.5 cursor-pointer flex-col items-stretch justify-center gap-0.5 py-1.5",
+                    isBusy && "opacity-70"
+                  )}
+                  isActive={session.chatId === currentChatId}
+                  render={
+                    isEditing ? (
+                      <div className="w-full">
+                        <Input
+                          className="h-7"
+                          disabled={isBusy}
+                          maxLength={CHAT_TITLE_MAX_LENGTH}
+                          onBlur={() => submitRename(session)}
+                          onChange={(event) =>
+                            setDraftTitle(event.target.value)
+                          }
+                          onKeyDown={(event) => {
+                            if (event.key === "Enter") {
+                              event.preventDefault();
+                              submitRename(session);
+                              return;
+                            }
 
-                                if (event.key === "Escape") {
-                                  event.preventDefault();
-                                  setDraftTitle(session.title);
-                                  setEditingChatId(null);
-                                }
-                              }}
-                              ref={editInputRef}
-                              value={draftTitle}
-                            />
-                          </div>
-                        ) : (
-                          <SidebarNavLink
-                            aria-label={
-                              isGeneratingTitle
-                                ? tChat("generating")
-                                : undefined
+                            if (event.key === "Escape") {
+                              event.preventDefault();
+                              setDraftTitle(session.title);
+                              setEditingChatId(null);
                             }
-                            href={sessionHref}
-                            onClick={(event) => {
-                              if (window.location.pathname === sessionHref) {
-                                event.preventDefault();
-                              }
-                            }}
-                            onFocus={() => prefetchChatHistory(session.chatId)}
-                            onMouseEnter={() =>
-                              prefetchChatHistory(session.chatId)
-                            }
-                            onPointerDown={() =>
-                              prefetchChatHistory(session.chatId)
-                            }
-                            replace={isOnChatRoute}
-                          >
-                            {isGeneratingTitle ? (
-                              <Skeleton
-                                aria-label={tChat("generating")}
-                                className="h-4 w-28 max-w-full"
-                                role="status"
-                              />
-                            ) : (
-                              <SidebarLabel>
-                                {displayChatTitle(
-                                  session.title,
-                                  tCommon2("labels.newChat")
-                                )}
-                              </SidebarLabel>
-                            )}
-                          </SidebarNavLink>
-                        )
-                      }
-                    />
-
-                    {!isEditing && (
-                      <DropdownMenu>
-                        <DropdownMenuTrigger
-                          aria-label={t("options")}
-                          className="text-muted-foreground ring-sidebar-ring hover:bg-sidebar-accent hover:text-foreground data-popup-open:bg-sidebar-accent data-popup-open:text-foreground duration-fast absolute top-1/2 right-1.5 flex size-6 -translate-y-1/2 cursor-pointer items-center justify-center rounded-md opacity-0 outline-hidden transition-opacity ease-out group-focus-within/menu-item:opacity-100 group-hover/menu-item:opacity-100 focus-visible:opacity-100 focus-visible:ring-2 data-popup-open:opacity-100 [&>svg]:size-4 [&>svg]:shrink-0"
-                          onClick={(event) => {
-                            event.preventDefault();
-                            event.stopPropagation();
                           }}
-                        >
-                          <HugeiconsIcon icon={MoreHorizontalIcon} />
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent
-                          align="start"
-                          className="w-44"
-                          side="right"
-                          sideOffset={6}
-                        >
-                          <DropdownMenuItem
-                            onClick={() => handleTogglePinned(session)}
+                          ref={editInputRef}
+                          value={draftTitle}
+                        />
+                      </div>
+                    ) : (
+                      <SidebarNavLink
+                        aria-label={
+                          isGeneratingTitle ? tChat("generating") : undefined
+                        }
+                        href={sessionHref}
+                        onClick={(event) => {
+                          if (window.location.pathname === sessionHref) {
+                            event.preventDefault();
+                          }
+                        }}
+                        onFocus={() => prefetchChatHistory(session.chatId)}
+                        onMouseEnter={() => prefetchChatHistory(session.chatId)}
+                        onPointerDown={() =>
+                          prefetchChatHistory(session.chatId)
+                        }
+                        replace={isOnChatRoute}
+                      >
+                        {isGeneratingTitle ? (
+                          <Skeleton
+                            aria-label={tChat("generating")}
+                            className="my-0.5 h-4 w-28 max-w-full"
+                            role="status"
+                          />
+                        ) : (
+                          <span
+                            className={cn(
+                              "duration-fast truncate transition-[padding] ease-out group-focus-within/menu-item:pr-6 group-hover/menu-item:pr-6 group-has-data-popup-open/menu-item:pr-6",
+                              hasUnseenReply && "font-medium"
+                            )}
                           >
+                            {displayChatTitle(session.title, newChatLabel)}
+                          </span>
+                        )}
+                        <span className="text-muted-foreground flex min-w-0 items-center gap-1.5 text-xs font-normal">
+                          {session.isRunning ? (
+                            <span className="flex min-w-0 items-center gap-1.5">
+                              <AgentLoader className="text-foreground/75 size-3.5! min-h-3.5! min-w-3.5!" />
+                              <Shimmer as="span" className="truncate">
+                                {t("working")}
+                              </Shimmer>
+                            </span>
+                          ) : (
+                            <>
+                              {hasUnseenReply && (
+                                <span
+                                  aria-label={t("newReply")}
+                                  className="bg-primary size-1.5 shrink-0 rounded-full"
+                                  role="img"
+                                />
+                              )}
+                              <time
+                                className="shrink-0 tabular-nums"
+                                dateTime={session.updatedAt}
+                              >
+                                {formatRelative(session.updatedAt)}
+                              </time>
+                            </>
+                          )}
+                          {source === "slack" && (
+                            <>
+                              <ChatSourceIcon source={source} />
+                              <span className="sr-only">
+                                {t("sources.slack")}
+                              </span>
+                            </>
+                          )}
+                          {session.pinnedAt && (
                             <HugeiconsIcon
-                              icon={session.pinnedAt ? PinOffIcon : PinIcon}
+                              aria-label={t("pinned")}
+                              className="size-3.5"
+                              icon={PinIcon}
+                              role="img"
                             />
-                            {session.pinnedAt ? tChat("unpin") : tChat("pin")}
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            disabled={isGeneratingTitle}
-                            onClick={() => startEditing(session)}
-                          >
-                            <HugeiconsIcon icon={PencilEdit02Icon} />
-                            {tCommon("rename")}
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => setDeleteCandidate(session)}
-                            variant="destructive"
-                          >
-                            <HugeiconsIcon icon={Delete02Icon} />
-                            {tCommon("delete")}
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    )}
-                  </ContextMenuTrigger>
+                          )}
+                        </span>
+                      </SidebarNavLink>
+                    )
+                  }
+                />
 
-                  <ContextMenuContent>
-                    <ContextMenuItem
-                      onClick={() => handleTogglePinned(session)}
+                {!isEditing && (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger
+                      aria-label={t("options")}
+                      className="text-muted-foreground ring-sidebar-ring hover:bg-sidebar-accent hover:text-foreground data-popup-open:bg-sidebar-accent data-popup-open:text-foreground duration-fast absolute top-1 right-1.5 flex size-6 cursor-pointer items-center justify-center rounded-md opacity-0 outline-hidden transition-opacity ease-out group-focus-within/menu-item:opacity-100 group-hover/menu-item:opacity-100 focus-visible:opacity-100 focus-visible:ring-2 data-popup-open:opacity-100 [&>svg]:size-4 [&>svg]:shrink-0"
+                      onClick={(event) => {
+                        event.preventDefault();
+                        event.stopPropagation();
+                      }}
                     >
-                      <HugeiconsIcon
-                        icon={session.pinnedAt ? PinOffIcon : PinIcon}
-                      />
-                      {session.pinnedAt ? tChat("unpin") : tChat("pin")}
-                    </ContextMenuItem>
-                    <ContextMenuItem
-                      disabled={isGeneratingTitle}
-                      onClick={() => startEditing(session)}
+                      <HugeiconsIcon icon={MoreHorizontalIcon} />
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent
+                      align="start"
+                      className="w-44"
+                      side="right"
+                      sideOffset={6}
                     >
-                      <HugeiconsIcon icon={PencilEdit02Icon} />
-                      {tCommon("rename")}
-                    </ContextMenuItem>
-                    <ContextMenuItem
-                      onClick={() => setDeleteCandidate(session)}
-                      variant="destructive"
-                    >
-                      <HugeiconsIcon icon={Delete02Icon} />
-                      {tCommon("delete")}
-                    </ContextMenuItem>
-                  </ContextMenuContent>
-                </ContextMenu>
-              );
-            })}
-          </SidebarMenu>
-        </SidebarGroupContent>
-      </SidebarGroup>
+                      <DropdownMenuItem
+                        onClick={() => handleTogglePinned(session)}
+                      >
+                        <HugeiconsIcon
+                          icon={session.pinnedAt ? PinOffIcon : PinIcon}
+                        />
+                        {session.pinnedAt ? tChat("unpin") : tChat("pin")}
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        disabled={isGeneratingTitle}
+                        onClick={() => startEditing(session)}
+                      >
+                        <HugeiconsIcon icon={PencilEdit02Icon} />
+                        {tCommon("rename")}
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => setDeleteCandidate(session)}
+                        variant="destructive"
+                      >
+                        <HugeiconsIcon icon={Delete02Icon} />
+                        {tCommon("delete")}
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                )}
+              </ContextMenuTrigger>
+
+              <ContextMenuContent>
+                <ContextMenuItem onClick={() => handleTogglePinned(session)}>
+                  <HugeiconsIcon
+                    icon={session.pinnedAt ? PinOffIcon : PinIcon}
+                  />
+                  {session.pinnedAt ? tChat("unpin") : tChat("pin")}
+                </ContextMenuItem>
+                <ContextMenuItem
+                  disabled={isGeneratingTitle}
+                  onClick={() => startEditing(session)}
+                >
+                  <HugeiconsIcon icon={PencilEdit02Icon} />
+                  {tCommon("rename")}
+                </ContextMenuItem>
+                <ContextMenuItem
+                  onClick={() => setDeleteCandidate(session)}
+                  variant="destructive"
+                >
+                  <HugeiconsIcon icon={Delete02Icon} />
+                  {tCommon("delete")}
+                </ContextMenuItem>
+              </ContextMenuContent>
+            </ContextMenu>
+          );
+        })}
+      </SidebarMenu>
     );
   }
 
@@ -365,32 +416,10 @@ export function ChatHistoryNav() {
 
   return (
     <>
-      <SidebarGroup>
-        <SidebarGroupContent>
-          <SidebarMenu>
-            <SidebarMenuItem>
-              <SidebarMenuButton
-                className="cursor-pointer"
-                render={
-                  <SidebarNavLink
-                    href={`/${slug}/chat`}
-                    replace={isOnChatRoute}
-                  >
-                    <HugeiconsIcon icon={Add01Icon} />
-                    <SidebarLabel>{tCommon2("labels.newChat")}</SidebarLabel>
-                  </SidebarNavLink>
-                }
-                tooltip={tCommon2("labels.newChat")}
-              />
-            </SidebarMenuItem>
-          </SidebarMenu>
-        </SidebarGroupContent>
-      </SidebarGroup>
-
       {/* The rail fades the chats out and hides them with CSS instead of
           unmounting them, and they have no rail tooltips: re-rendering every
           chat when the sidebar toggled held up its first frame. */}
-      <div className="duration-fast flex-1 overflow-x-hidden overflow-y-auto transition-[opacity,display] transition-discrete ease-(--sidebar-ease) group-data-[collapsible=icon]:hidden group-data-[collapsible=icon]:opacity-0 motion-reduce:transition-none starting:opacity-0">
+      <div className="duration-fast flex-1 overflow-x-clip transition-[opacity,display] transition-discrete ease-(--sidebar-ease) group-data-[collapsible=icon]:hidden group-data-[collapsible=icon]:opacity-0 motion-reduce:transition-none starting:opacity-0">
         {showError && (
           <div className="space-y-2 p-3" role="alert">
             <p className="text-muted-foreground text-xs">{t("loadFailed")}</p>
@@ -405,18 +434,30 @@ export function ChatHistoryNav() {
           </div>
         )}
         {showLoading && <ChatHistoryNavLoading />}
-        {!(showError || showLoading) && (
-          <div>
-            {renderSessions(t("pinned"), pinnedSessions)}
-            {historyGroups.map((group) =>
-              renderSessions(
-                group.id === "lastMonth"
-                  ? t("groups.lastMonth")
-                  : tCommon2(`labels.${group.id}`),
-                group.sessions
-              )
-            )}
-          </div>
+        {!(showError || showLoading) && sessions.length > 0 && (
+          <SidebarGroup className="pt-0">
+            {/* Sticks right under the Back row (h-12) above it. */}
+            <div className="bg-sidebar sticky top-12 z-10 pb-1">
+              <ChatHistoryHeader
+                onQueryChange={setQuery}
+                onSearchOpenChange={setSearchOpen}
+                onSourceChange={setSourceFilter}
+                query={query}
+                searchOpen={searchOpen}
+                source={sourceFilter}
+                sources={sources}
+              />
+            </div>
+            <SidebarGroupContent>
+              {visibleSessions.length > 0 ? (
+                renderSessions(visibleSessions)
+              ) : (
+                <p className="text-muted-foreground px-2 py-1.5 text-xs">
+                  {t("noMatches")}
+                </p>
+              )}
+            </SidebarGroupContent>
+          </SidebarGroup>
         )}
       </div>
 

@@ -23,6 +23,7 @@ export function unknownChatMessageAuthor(
   return { id: authorUserId, name: null, image: null, seed: authorUserId };
 }
 
+/** Slack threads are shared by nature, so they always show who wrote what. */
 export function shouldShowChatAuthorAvatars({
   isSlackMirrored,
   memberCount,
@@ -30,13 +31,14 @@ export function shouldShowChatAuthorAvatars({
   isSlackMirrored: boolean;
   memberCount: number;
 }) {
-  return !isSlackMirrored && memberCount > 1;
+  return isSlackMirrored || memberCount > 1;
 }
 
 export function resolveChatMessageAuthor({
   metadata,
   membersById,
   sessionUser,
+  isSlackMirrored = false,
 }: ResolveChatMessageAuthorInput): ChatMessageAuthor | null {
   const authorUserId = metadata?.authorUserId;
   if (authorUserId) {
@@ -49,8 +51,21 @@ export function resolveChatMessageAuthor({
     }
     return unknownChatMessageAuthor(authorUserId);
   }
+  // The server-stamped sender wins; Slack details only name messages the
+  // Slack mirror wrote, which have no Notra sender.
+  const slackAuthor = isSlackMirrored ? metadata?.slackAuthor : undefined;
+  if (slackAuthor) {
+    return {
+      id: `slack:${slackAuthor.userId}`,
+      name: slackAuthor.name ?? null,
+      image: slackAuthor.image ?? null,
+      seed: slackAuthor.userId,
+      fromSlack: true,
+    };
+  }
   const externalSource = metadata?.externalChannelId?.source;
-  if (externalSource && externalSource !== "dashboard") {
+  // Slack messages mirrored before senders were recorded have no author.
+  if (isSlackMirrored || (externalSource && externalSource !== "dashboard")) {
     return null;
   }
   return sessionUser ? toChatMessageAuthor(sessionUser) : null;
