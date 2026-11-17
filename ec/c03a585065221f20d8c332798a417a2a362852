@@ -1,0 +1,168 @@
+apps/agent/agent/hooks/chat-mirror.ts
+  s_9d08e97deaec89::t_6ad2d8a5dc0585 17-18
+  s_9d08e97deaec89::t_16fa89f8533c0a 6,14-16,21-22,34
+apps/dashboard/package.json
+  s_9d08e97deaec89::t_d75ed9755d1465 18-20
+  s_9d08e97deaec89::t_d07ad709951f7b 105
+apps/agent/agent/tools/content-writer.ts
+  s_9d08e97deaec89::t_67e82187cce8df 1-3,8-17,24-26,28-34
+  s_9d08e97deaec89::t_430eb7d0469ba1 4-7,27
+  s_9d08e97deaec89::t_ed00767ae32b7b 18-23
+apps/agent/tests/slack-usage-limits.test.ts
+  s_9d08e97deaec89::t_dd759804bbd234 62,66-73,91,106-107
+apps/agent/agent/lib/utils/slack-reply.ts
+  s_9d08e97deaec89::t_597f58b5991d9f 1-6,70-90
+apps/agent/tests/autopilot-tools.test.ts
+  s_9d08e97deaec89::t_fe011628031d49 62-68
+apps/agent/agent/lib/utils/session-model.ts
+  s_9d08e97deaec89::t_af0a77c64a4008 3,5,12-24,26
+apps/dashboard/src/types/agent.ts
+  s_9d08e97deaec89::t_a32135f0cc585f 2-3,45-46
+apps/agent/agent/channels/slack.ts
+  s_9d08e97deaec89::t_89fd9f87c4e76b 7,62,75,79-81,92,96,176,178-183,222-223,226-228,230-231,234-240,394-397,454,459
+  s_9d08e97deaec89::t_597f58b5991d9f 116-118,156
+  s_9d08e97deaec89::t_af0b1460bd3481 82
+apps/agent/agent/subagents/code-researcher-agent/agent.ts
+  s_9d08e97deaec89::t_342cc4ba51b135 5,9,15-17
+packages/ai/package.json
+  s_9d08e97deaec89::t_d75ed9755d1465 41-42,44-48
+apps/agent/agent/lib/types/content-task.ts
+  s_9d08e97deaec89::t_ac548644fdef47 2,9-11
+apps/agent/agent/lib/types/slack-controls.ts
+  s_9d08e97deaec89::t_f45d335f1b250d 2,11
+apps/agent/agent/subagents/image-designer-agent/instructions.md
+  s_9d08e97deaec89::t_6f7ac3ab8c5260 1-15
+apps/dashboard/src/lib/slack/relay.ts
+  s_9d08e97deaec89::t_93b5d1966edbf8 185-187,193-206
+  s_9d08e97deaec89::t_ae3990f02e5eaf 17
+packages/geo-core/package.json
+  s_9d08e97deaec89::t_d75ed9755d1465 22-24
+apps/agent/agent/lib/utils/slack-notifications.ts
+  s_9d08e97deaec89::t_74ea80e8aefe4b 9,30-31
+apps/agent/tests/slack-channel.test.ts
+  s_9d08e97deaec89::t_91d535fb40de1e 10-13,36-37,41-44,139,142,149,154,156-167,169-170,172,174-176,178,180,187-196,215-243,250-253,255,257,259,262-263,283-289,297,301-302,343,348-357,360-371,379-380,383,393,401,411,436,439,441-444,448-451,455,461-462,478-479,485-486,500-504,506-507,509,511,513,521-523,530-532,534,538,545,553-557,568-569,577-578,584,622,634-637,640,645,661,663,675-676,681-682,685,691-692,696-697,700,706,708,710,724,733,737-740,745,748,751-755,772,778,780-781,796
+  s_9d08e97deaec89::t_b731445b42c77e 168,173
+  s_9d08e97deaec89::t_bf924369964ea0 662,664-665
+apps/agent/agent/tools/code-researcher.ts
+  s_9d08e97deaec89::t_67e82187cce8df 1-3,8-17,24-26,28-34
+  s_9d08e97deaec89::t_ed00767ae32b7b 18-23
+  s_9d08e97deaec89::t_430eb7d0469ba1 4-7,27
+apps/agent/agent/lib/constants/subagents.ts
+  s_9d08e97deaec89::t_96bf193f2c5104 1-8
+  s_9d08e97deaec89::t_430eb7d0469ba1 9-16
+apps/agent/tests/slack-reply.test.ts
+  s_9d08e97deaec89::t_f0b64f7724d693 7,72-73
+apps/api/package.json
+  s_9d08e97deaec89::t_d75ed9755d1465 14
+  s_9d08e97deaec89::t_d07ad709951f7b 37
+apps/agent/agent/lib/utils/model.ts
+  s_9d08e97deaec89::t_af0a77c64a4008 7,34-55,57
+packages/tools/package.json
+  s_9d08e97deaec89::t_d07ad709951f7b 22
+apps/agent/agent/tools/image-designer.ts
+  s_9d08e97deaec89::t_430eb7d0469ba1 4-7,27
+  s_9d08e97deaec89::t_67e82187cce8df 1-3,8-17,24-26,28-34
+  s_9d08e97deaec89::t_ed00767ae32b7b 18-23
+apps/agent/tests/geo-scan-tools.test.ts
+  s_9d08e97deaec89::t_5df5ae244bbb74 54-55
+  s_9d08e97deaec89::t_2d6258d0990d30 50-53
+apps/api/src/routes/agent-chats.ts
+  s_9d08e97deaec89::t_ea0b2d77fa2042 191,283
+apps/agent/agent/subagents/content-writer-agent/agent.ts
+  s_9d08e97deaec89::t_342cc4ba51b135 7,11,17-19
+apps/agent/tests/model-affinity.test.ts
+  s_9d08e97deaec89::t_4fe413854aa18a 13,18,20,22
+apps/web/package.json
+  s_9d08e97deaec89::t_d75ed9755d1465 21
+apps/agent/agent/lib/schemas/subagent-task.ts
+  s_9d08e97deaec89::t_67e82187cce8df 1-10
+apps/dashboard/src/types/slack-relay.ts
+  s_9d08e97deaec89::t_ae3990f02e5eaf 18-23
+apps/agent/package.json
+  s_9d08e97deaec89::t_fe844cb961e76f 42
+  s_9d08e97deaec89::t_d07ad709951f7b 35
+apps/agent/agent/tools/create_chart.ts
+  s_9d08e97deaec89::t_4fe413854aa18a 6-22
+  s_9d08e97deaec89::t_af0a77c64a4008 1,5
+apps/agent/README.md
+  s_9d08e97deaec89::t_9957ad8c190149 22-23,32,69,71,115,117
+apps/agent/agent/tools/generate_content.ts
+  s_9d08e97deaec89::t_ac548644fdef47 19,50-51,53-54,79-80,82-84,92
+  s_9d08e97deaec89::t_430eb7d0469ba1 9-12,52,81
+apps/agent/agent/subagents/image-designer-agent/agent.ts
+  s_9d08e97deaec89::t_342cc4ba51b135 7,11,17-19
+apps/agent/agent/lib/utils/slack-auth.ts
+  s_9d08e97deaec89::t_2b2f1486eece1e 4,60-76,86
+apps/agent/agent/instructions.md
+  s_9d08e97deaec89::t_6f7ac3ab8c5260 11,19
+apps/agent/agent/subagents/code-researcher-agent/instructions.md
+  s_9d08e97deaec89::t_6f7ac3ab8c5260 1-31
+apps/agent/agent/lib/utils/subagent-result.ts
+  s_9d08e97deaec89::t_67e82187cce8df 1-26
+apps/agent/agent/lib/types/chat-mirror.ts
+  s_9d08e97deaec89::t_ba812aec783db6 2-3,12-16
+apps/agent/agent/lib/utils/chat-mirror.ts
+  s_9d08e97deaec89::t_131835df821ed0 359-360
+  s_9d08e97deaec89::t_ba812aec783db6 18-23,35-39,43-46,236-253,256,263-270,272-273,275-278,303-304,306-309,315-321,323-338,358,361-365,367-368,370-373,381,387-389,391,393,396,400,405,408-409,411-416,421-422,424
+apps/agent/agent/lib/utils/autopilot-approval.ts
+  s_9d08e97deaec89::t_6df14eb02a23dd 80,83
+apps/agent/agent/subagents/content-writer-agent/instructions.md
+  s_9d08e97deaec89::t_6f7ac3ab8c5260 1-41
+apps/dashboard/src/utils/read-agent-task-stream.ts
+  s_9d08e97deaec89::t_3dde566b118aa0 1,29-41,43-46,48-56,58,60,62,64-65,87-89,94-96,115-120
+  s_9d08e97deaec89::t_3c048dbeb9cdf7 42,47,67-71,73
+  s_9d08e97deaec89::t_a32135f0cc585f 3
+bunfig.toml
+  s_9d08e97deaec89::t_67f4b2a30a1bdf 9
+  s_9d08e97deaec89::t_a569c189f3c418 10-42
+apps/agent/agent/lib/utils/slack-renderer.ts
+  s_9d08e97deaec89::t_f0b573d687bd19 3,77,83
+  s_9d08e97deaec89::t_ff7ddb8a0d1ed0 1-2,4-7,9-12,15-31,37-76,78-82,84-210,222-229,236-250,257-265,271-309,313-405
+  s_9d08e97deaec89::t_bccb24d8359e55 251-256,310-312
+  s_9d08e97deaec89::t_602e7dd6eb581a 8
+  s_9d08e97deaec89::t_6b5b0ce8aa45e1 32-36,211-221,230-235
+  s_9d08e97deaec89::t_f5c729a9376620 13-14
+  s_9d08e97deaec89::t_4c91c717418b63 266-270
+apps/agent/agent/lib/utils/slack-input-request.ts
+  s_9d08e97deaec89::t_02707577d0dfc8 9,19,31-32,34-44,46,48-49
+package.json
+  s_9d08e97deaec89::t_d75ed9755d1465 11-12,28
+packages/schemas/src/schemas/api/agent-chats.ts
+  s_9d08e97deaec89::t_ea0b2d77fa2042 25-28,31,48,63
+apps/agent/agent/lib/hooks/usage.ts
+  s_9d08e97deaec89::t_e05f8fb2fbdec3 149
+  s_9d08e97deaec89::t_162586e14b8592 18,127-148,150-152,164-165,264,277,282,284,287,290,299-302,306-307,311,314,317-320,331,341,345
+  s_9d08e97deaec89::t_9442bd58109783 265,267-272
+apps/agent/agent/lib/constants/slack.ts
+  s_9d08e97deaec89::t_f5c729a9376620 86-93
+apps/dashboard/src/lib/agent/content-task.ts
+  s_9d08e97deaec89::t_6f7ac3ab8c5260 27
+apps/dashboard/src/utils/slack-blocks.ts
+  s_9d08e97deaec89::t_904e1b14301267 1-31
+packages/schemas/src/schemas/dashboard/agent.ts
+  s_9d08e97deaec89::t_3dde566b118aa0 9-13
+apps/agent/agent/tools/edit_file.ts
+  s_9d08e97deaec89::t_c1acc4bbcd8bff 1-3
+apps/agent/tests/chart.test.ts
+  s_9d08e97deaec89::t_fe011628031d49 23-26,28,36-38
+apps/agent/agent/lib/utils/slack-reactions.ts
+  s_9d08e97deaec89::t_b5ff36efe1f5d0 16,92-93
+apps/agent/tests/slack-controls.test.ts
+  s_9d08e97deaec89::t_ed4e9efc660ec2 19-34,37-38,80,86-87,93-101,105,122,158
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "ecc03a585065221f20d8c332798a417a2a362852",
+  "prompts": {},
+  "sessions": {
+    "s_9d08e97deaec89": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5ba60396-9bf1-4c99-af49-ea239a519446",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
