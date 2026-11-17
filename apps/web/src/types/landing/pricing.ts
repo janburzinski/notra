@@ -76,5 +76,6 @@ export interface PricingBillingToggleProps {
 }
 
 export interface LandingPricingSectionProps {
+  className?: string;
   showHeader?: boolean;
 }

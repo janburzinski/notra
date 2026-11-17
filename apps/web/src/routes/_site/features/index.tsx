@@ -6,6 +6,7 @@ import BrandVoicePreview from "@/components/brand-voice-preview";
 import { AnswerExampleSection } from "@/components/landing/answer-example-section";
 import { CtaBanner } from "@/components/landing/cta-banner";
 import { FeaturesSection } from "@/components/landing/features-section";
+import { LandingPricingSection } from "@/components/landing/pricing-section";
 import { MarketingHeroWash } from "@/components/marketing-hero-wash";
 import ReferencesPreview from "@/components/references-preview";
 import {
@@ -233,6 +234,8 @@ function FeaturesPage() {
           ))}
         </div>
       </section>
+
+      <LandingPricingSection className="py-0 sm:py-0" />
 
       <section className="w-full px-6 lg:px-20">
         <CtaBanner />

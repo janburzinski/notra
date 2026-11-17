@@ -32,11 +32,10 @@ export const PRICING_BILLING_OPTIONS: BillingToggleOption[] = [
   { value: "yearly", label: "Yearly" },
 ];
 
-export const PRICING_HEADING =
-  "Simple pricing that scales with what you track.";
+export const PRICING_HEADING = "Pricing that grows with you.";
 
 export const PRICING_SUBHEADING =
-  "Paid plans come with prompt tracking, traffic attribution and the writer, and they differ in how many answers and analytics events you track a month. The free plan includes agent and web analytics sharing 1 million events a month, plus agent feedback, and you can cancel a paid plan anytime.";
+  "Every paid plan includes tracking, attribution and the writer. Start free and cancel anytime.";
 
 const SIGNUP_URL = "https://app.usenotra.com/signup";
 const ENTERPRISE_MAIL_URL = "mailto:hello@usenotra.com";

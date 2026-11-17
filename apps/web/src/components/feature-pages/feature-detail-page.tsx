@@ -3,6 +3,7 @@ import { cn } from "@notra/ui/lib/utils";
 import { Link } from "@tanstack/react-router";
 
 import { CtaBanner } from "@/components/landing/cta-banner";
+import { LandingPricingSection } from "@/components/landing/pricing-section";
 import { MarketingHeroWash } from "@/components/marketing-hero-wash";
 import { NumberedStepCard } from "@/components/numbered-step-card";
 import { TrackedSignupLink } from "@/components/tracked-signup-link";
@@ -113,6 +114,8 @@ export function FeatureDetailPage({
           ))}
         </ol>
       </section>
+
+      <LandingPricingSection className="py-0 sm:py-0" />
 
       {footer}
 

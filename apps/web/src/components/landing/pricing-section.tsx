@@ -365,6 +365,7 @@ function PricingFreeTier() {
 }
 
 export function LandingPricingSection({
+  className,
   showHeader = true,
 }: LandingPricingSectionProps) {
   const [billingPeriod, setBillingPeriod] = useState<BillingPeriod>(
@@ -384,7 +385,8 @@ export function LandingPricingSection({
       <section
         className={cn(
           "flex w-full flex-col items-center gap-10 px-6 pb-20 sm:gap-13.5 sm:pb-24",
-          showHeader ? "pt-20 sm:pt-24" : "pt-6"
+          showHeader ? "pt-20 sm:pt-24" : "pt-6",
+          className
         )}
         id="pricing"
       >
