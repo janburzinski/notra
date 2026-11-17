@@ -325,8 +325,7 @@ export const AUTOPILOT_AUTOMATIONS: Record<
 > = {
   readiness: {
     name: "Fix agent readiness",
-    description:
-      "Rescans your site and opens a pull request for llms.txt, AI crawler rules and structured data.",
+    description: "Fixes llms.txt, AI crawler rules and structured data.",
     source: "Your Agent Readiness scan",
     output: "Opens a pull request",
     noun: "fix",
@@ -334,8 +333,7 @@ export const AUTOPILOT_AUTOMATIONS: Record<
   },
   keywords: {
     name: "Write for content gaps",
-    description:
-      "Drafts a post for prompts and searches where competitors show up and you don't.",
+    description: "Drafts posts for prompts and searches you lose.",
     source: "Prompts and searches you lose",
     output: "Writes a post",
     noun: "post",
@@ -343,8 +341,7 @@ export const AUTOPILOT_AUTOMATIONS: Record<
   },
   commits: {
     name: "Write about releases",
-    description:
-      "Drafts a post when you ship something worth telling users about.",
+    description: "Drafts a post when you ship something worth sharing.",
     source: "Pull requests you ship",
     output: "Writes a post",
     noun: "post",
@@ -352,8 +349,7 @@ export const AUTOPILOT_AUTOMATIONS: Record<
   },
   refresh: {
     name: "Refresh pages AI stopped citing",
-    description:
-      "Finds your pages that AI answers cite less than before and opens a pull request with targeted updates.",
+    description: "Updates pages AI cites less than last month.",
     source: "Your pages in AI citations",
     output: "Opens a pull request",
     noun: "refresh",
@@ -361,8 +357,7 @@ export const AUTOPILOT_AUTOMATIONS: Record<
   },
   comparisons: {
     name: "Write comparison pages",
-    description:
-      "Drafts a comparison page when AI answers to comparison questions show a competitor and not you.",
+    description: "Drafts comparison pages where AI picks a competitor.",
     source: "Comparison prompts you lose",
     output: "Writes a page",
     noun: "page",
@@ -370,8 +365,7 @@ export const AUTOPILOT_AUTOMATIONS: Record<
   },
   rendering: {
     name: "Make pages readable for AI",
-    description:
-      "Checks what AI crawlers get from your key pages and opens a pull request when content only shows up with JavaScript.",
+    description: "Fixes content AI crawlers can't see without JavaScript.",
     source: "Your pages, fetched like an AI crawler",
     output: "Opens a pull request",
     noun: "fix",
@@ -379,8 +373,7 @@ export const AUTOPILOT_AUTOMATIONS: Record<
   },
   links: {
     name: "Add internal links",
-    description:
-      "Links your posts to pages that rank on page one or two of Google for the words they already use, once a week.",
+    description: "Links your posts to pages ranking 4 to 20 in Google.",
     source: "Your Search Console rankings",
     output: "Opens a pull request",
     noun: "links pull request",
@@ -389,7 +382,7 @@ export const AUTOPILOT_AUTOMATIONS: Record<
   landing: {
     name: "Update landing page copy",
     description:
-      "Rewrites the copy of a landing page AI stopped citing or Google ranks on page one or two, and leaves the code as it is.",
+      "Rewrites landing pages AI cites less or Google ranks 4 to 20.",
     source: "Your AI citations and Search Console rankings",
     output: "Opens a pull request",
     noun: "copy update",

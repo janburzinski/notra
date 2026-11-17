@@ -94,8 +94,7 @@ export const AUTOPILOT_TEMPLATES: AutopilotTemplate[] = [
     id: "readiness",
     kind: "readiness",
     name: "Fix agent readiness",
-    description:
-      "Rescans your site and opens a pull request for llms.txt, AI crawler rules and structured data.",
+    description: "Fixes llms.txt, AI crawler rules and structured data.",
     highlights: [
       "Rescans your site on every Autopilot run",
       "Adds llms.txt, AI crawler rules and structured data",
@@ -113,8 +112,7 @@ export const AUTOPILOT_TEMPLATES: AutopilotTemplate[] = [
     id: "rendering",
     kind: "rendering",
     name: "Make pages readable for AI",
-    description:
-      "Fetches your key pages like ChatGPT does and fixes content that only shows up with JavaScript.",
+    description: "Fixes content AI crawlers can't see without JavaScript.",
     highlights: [
       "Fetches your key pages without JavaScript, like an AI crawler",
       "Compares them with what a browser shows",
@@ -132,8 +130,7 @@ export const AUTOPILOT_TEMPLATES: AutopilotTemplate[] = [
     id: "keywords",
     kind: "keywords",
     name: "Write for content gaps",
-    description:
-      "Drafts a post for prompts and searches where competitors show up and you don't.",
+    description: "Drafts posts for prompts and searches you lose.",
     highlights: [
       "Picks the biggest prompt or search you lose to competitors",
       "Drafts a post that answers it",
@@ -151,8 +148,7 @@ export const AUTOPILOT_TEMPLATES: AutopilotTemplate[] = [
     id: "refresh",
     kind: "refresh",
     name: "Refresh pages AI stopped citing",
-    description:
-      "Updates pages AI answers cite less than a month ago, with targeted edits based on what the engines now search and cite.",
+    description: "Updates pages AI cites less than last month.",
     highlights: [
       "Compares this month's AI citations with last month's",
       "Checks the page that dropped most against what engines cite now",
@@ -170,8 +166,7 @@ export const AUTOPILOT_TEMPLATES: AutopilotTemplate[] = [
     id: "comparisons",
     kind: "comparisons",
     name: "Write comparison pages",
-    description:
-      "Drafts a fair comparison page when AI answers to comparison questions name a competitor and not you.",
+    description: "Drafts comparison pages where AI picks a competitor.",
     highlights: [
       "Finds comparison questions where AI names a competitor and not you",
       "Drafts a fair page about the competitor that costs you most",
@@ -189,8 +184,7 @@ export const AUTOPILOT_TEMPLATES: AutopilotTemplate[] = [
     id: "links",
     kind: "links",
     name: "Add internal links",
-    description:
-      "Links your posts to pages that rank on page one or two of Google for the words they already use, once a week.",
+    description: "Links your posts to pages ranking 4 to 20 in Google.",
     highlights: [
       "Reads three months of your Search Console data",
       "Links words your posts already use to pages ranking 4 to 20",
@@ -209,7 +203,7 @@ export const AUTOPILOT_TEMPLATES: AutopilotTemplate[] = [
     kind: "landing",
     name: "Update landing page copy",
     description:
-      "Rewrites the copy of a landing page AI stopped citing or Google ranks on page one or two, and leaves the code as it is.",
+      "Rewrites landing pages AI cites less or Google ranks 4 to 20.",
     highlights: [
       "Picks a landing page that lost AI citations or ranks 4 to 20 in Google",
       "Rewrites its headings, text and metadata for those prompts and searches",
@@ -227,8 +221,7 @@ export const AUTOPILOT_TEMPLATES: AutopilotTemplate[] = [
     id: "commits",
     kind: "commits",
     name: "Write about releases",
-    description:
-      "Drafts a post when you ship something worth telling users about.",
+    description: "Drafts a post when you ship something worth sharing.",
     highlights: [
       "Reads the pull requests merged since the last run",
       "Picks the changes new users need explained",
