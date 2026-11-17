@@ -1,0 +1,40 @@
+apps/dashboard/messages/en.json
+  s_5eb59c8ed311b2::t_34d1f551e370bb 5033
+  s_5eb59c8ed311b2::t_b2679f31ac1308 8151-8154
+  s_5eb59c8ed311b2::t_af998a09e6b180 5027-5032
+apps/dashboard/src/components/dashboard/connect-agent.tsx
+  s_5eb59c8ed311b2::t_0e4876ee2f87cd 52-55
+  s_5eb59c8ed311b2::t_5fc9503f3b36cf 35,41
+apps/dashboard/src/constants/storage.ts
+  s_5eb59c8ed311b2::t_401cdb1142e05e 31-32
+apps/dashboard/src/components/integrations/add-slack-integration-dialog.tsx
+  s_5eb59c8ed311b2::t_3326a8c52d9145 3-4,26-32,53
+  s_5eb59c8ed311b2::t_34d1f551e370bb 70-81
+  s_5eb59c8ed311b2::t_cb8636324ec9fd 55-63
+apps/dashboard/messages/de.json
+  s_5eb59c8ed311b2::t_af998a09e6b180 5027-5032
+  s_5eb59c8ed311b2::t_b2679f31ac1308 8151-8154
+  s_5eb59c8ed311b2::t_34d1f551e370bb 5033
+apps/dashboard/src/components/dashboard/connect-slack.tsx
+  s_5eb59c8ed311b2::t_5fc9503f3b36cf 1-69,71-75,77-103
+  s_5eb59c8ed311b2::t_7e9a0448f1dbdb 70
+  s_5eb59c8ed311b2::t_2d11c299c208f8 76
+apps/dashboard/src/components/dashboard/nav-footer.tsx
+  s_5eb59c8ed311b2::t_5fc9503f3b36cf 18,57
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "2e9a4e54cc422c6bcf7151f8eaaa73d24bbf45ec",
+  "prompts": {},
+  "sessions": {
+    "s_5eb59c8ed311b2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "1c69bbd4-78a5-4b30-9579-5badc2d98e53",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
