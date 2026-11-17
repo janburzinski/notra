@@ -76,6 +76,8 @@ export interface ChatInputProps {
   dropZone?: "element" | "document";
   /** A tool waiting on you; the composer asks about it above the input. */
   approval?: ChatComposerApproval | null;
+  /** Off where files make no sense: no attach button, drop or file paste. */
+  attachments?: boolean;
 }
 
 export interface ChatEffortMenuProps {

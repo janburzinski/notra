@@ -22,6 +22,9 @@ export function createDevelopmentUiRoutes(parent: AnyRoute) {
   const TwoFactor = lazyPage(
     () => import("@/app/design-system/2fa-preview/page.dev")
   );
+  const ArtifactIterate = lazyPage(
+    () => import("@/app/design-system/artifact-iterate/page.dev")
+  );
   const AuthFlow = lazyPage(
     () => import("@/app/design-system/auth-flow/page.dev")
   );
@@ -89,6 +92,12 @@ export function createDevelopmentUiRoutes(parent: AnyRoute) {
         path: "2fa-preview",
         preload: TwoFactor.preload,
         component: () => <TwoFactor />,
+      }),
+      createUiRoute({
+        parent: preview,
+        path: "artifact-iterate",
+        preload: ArtifactIterate.preload,
+        component: () => <ArtifactIterate />,
       }),
       createUiRoute({
         parent: preview,

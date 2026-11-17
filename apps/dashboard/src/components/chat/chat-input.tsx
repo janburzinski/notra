@@ -657,6 +657,7 @@ export function ChatInput({
   surface,
   dropZone = "element",
   approval,
+  attachments: allowAttachments = true,
 }: ChatInputProps) {
   const t = useTranslations("chat.input");
   const tCommon2 = useTranslations("common");
@@ -1517,9 +1518,9 @@ export function ChatInput({
 
   const handlePaste = useCallback(
     (event: React.ClipboardEvent<HTMLDivElement>) => {
-      const pastedFiles = renamePastedFiles(
-        Array.from(event.clipboardData.files)
-      );
+      const pastedFiles = allowAttachments
+        ? renamePastedFiles(Array.from(event.clipboardData.files))
+        : [];
       const text = event.clipboardData.getData("text/plain");
       event.preventDefault();
       // Rich clipboards can carry an image rendering next to the text; only
@@ -1535,7 +1536,8 @@ export function ChatInput({
         return;
       }
 
-      if (text.length >= PASTE_TO_ATTACHMENT_THRESHOLD) {
+      // Without attachments a long paste stays text instead of a file.
+      if (allowAttachments && text.length >= PASTE_TO_ATTACHMENT_THRESHOLD) {
         const selection = window.getSelection();
         const fallbackRange =
           selection && selection.rangeCount > 0
@@ -1558,7 +1560,7 @@ export function ChatInput({
 
       insertTextAtRange(text);
     },
-    [handleFilesSelected, insertTextAtRange]
+    [allowAttachments, handleFilesSelected, insertTextAtRange]
   );
 
   const handleCopy = useCallback(
@@ -1782,7 +1784,7 @@ export function ChatInput({
       />
     </div>
   );
-  const attachButton = (
+  const attachButton = allowAttachments ? (
     <ChatComposerAttachButton
       attachmentCount={attachments.length}
       disabled={isLocked}
@@ -1791,7 +1793,7 @@ export function ChatInput({
       pendingUploadCount={pendingUploads.length}
       tooltip={t("attach.files")}
     />
-  );
+  ) : null;
   const sendButton = (
     <ChatComposerSendButton
       busy={send.busy}
@@ -1813,7 +1815,7 @@ export function ChatInput({
       <div
         className="relative w-full min-w-0"
         data-chat-quote-composer={quoteContext?.scopeId}
-        {...dragHandlers}
+        {...(allowAttachments ? dragHandlers : {})}
       >
         {mentionQuery === null ? null : (
           <ChatMentionMenu

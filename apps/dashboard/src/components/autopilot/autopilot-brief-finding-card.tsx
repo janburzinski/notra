@@ -1,11 +1,12 @@
 "use client";
 
+import { Collapsible } from "@base-ui/react/collapsible";
 import {
   ArrowDown01Icon,
   ArrowUpRight01Icon,
+  Clock01Icon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { useId, useState } from "react";
 import { TABLE_BODY_CLASS, TABLE_FRAME_CLASS } from "ui/table/constants";
 import { useFormatter } from "use-intl";
 
@@ -48,24 +49,24 @@ export function AutopilotBriefFindingCard({
   onDismiss,
   onOpen,
   onPreview,
+  working = false,
 }: AutopilotBriefFindingCardProps) {
   const format = useFormatter();
   const meta = AUTOPILOT_KIND_META[finding.kind];
   const title = findingDisplayTitle(finding);
-  const pending =
-    finding.status === "proposed" || finding.status === "suggested";
-  // A scheduled pull request merges on its own; Merge publishes it now.
-  let stage = "Ready to merge";
-  if (finding.status === "suggested") {
-    stage = "Idea";
-  } else if (finding.publishAt) {
-    stage = `Publishes ${format.dateTime(new Date(finding.publishAt), {
-      ...AUTOPILOT_PUBLISH_AT_FORMAT,
-      timeZone,
-    })}`;
-  }
+  // The buttons already say "merge" or "write"; only a scheduled publish
+  // adds something, so it sits next to them: it goes out on its own then.
+  const publishesAt =
+    finding.status === "proposed" && finding.publishAt
+      ? format.dateTime(new Date(finding.publishAt), {
+          ...AUTOPILOT_PUBLISH_AT_FORMAT,
+          timeZone,
+        })
+      : null;
+  // The title's button stretches over the whole row, so the row opens the
+  // item; the controls in it sit above that and keep their own clicks.
   return (
-    <div className="flex flex-col gap-3 px-4 py-3.5 sm:flex-row sm:items-start sm:justify-between">
+    <div className="relative flex flex-col gap-3 px-4 py-3.5 sm:flex-row sm:items-start sm:justify-between">
       <div className="min-w-0 space-y-1">
         <p className="text-muted-foreground flex items-center gap-1.5 text-xs">
           <HugeiconsIcon
@@ -75,15 +76,9 @@ export function AutopilotBriefFindingCard({
             strokeWidth={1.5}
           />
           {meta.label}
-          {pending ? (
-            <>
-              <span aria-hidden="true">·</span>
-              {stage}
-            </>
-          ) : null}
         </p>
         <button
-          className="text-foreground block text-left text-sm font-medium text-pretty underline-offset-4 hover:underline"
+          className="text-foreground block text-left text-sm font-medium text-pretty underline-offset-4 after:absolute after:inset-0 hover:underline"
           onClick={onOpen}
           onFocus={onPreview}
           onPointerEnter={onPreview}
@@ -96,17 +91,35 @@ export function AutopilotBriefFindingCard({
         </p>
         <AutopilotBriefFindingWhy finding={finding} />
       </div>
-      <AutopilotBriefFindingActions
-        canManage={canManage}
-        canWrite={canWrite}
-        finding={finding}
-        merging={merging}
-        onDismiss={onDismiss}
-        onMerge={onMerge}
-        onWrite={onWrite}
-        title={title}
-        writing={writing}
-      />
+      <div className="flex shrink-0 items-center gap-3">
+        {publishesAt ? (
+          <span
+            className="text-muted-foreground relative z-10 inline-flex items-center gap-1 text-xs tabular-nums"
+            title={`Publishes on its own ${publishesAt} unless you merge it first`}
+          >
+            <HugeiconsIcon
+              aria-hidden="true"
+              icon={Clock01Icon}
+              size={13}
+              strokeWidth={1.75}
+            />
+            <span className="sr-only">Publishes </span>
+            {publishesAt}
+          </span>
+        ) : null}
+        <AutopilotBriefFindingActions
+          canManage={canManage}
+          canWrite={canWrite}
+          finding={finding}
+          merging={merging}
+          onDismiss={onDismiss}
+          onMerge={onMerge}
+          onWrite={onWrite}
+          title={title}
+          working={working}
+          writing={writing}
+        />
+      </div>
     </div>
   );
 }
@@ -125,20 +138,21 @@ export function AutopilotBriefFindingActions({
   onMerge,
   onWrite,
   onDismiss,
+  working = false,
 }: AutopilotBriefFindingActionsProps) {
   const pending =
     finding.status === "proposed" || finding.status === "suggested";
   if (!(pending && canManage)) {
     return (
-      <div className="flex shrink-0 items-center gap-2">
-        <AutopilotFindingStatus finding={finding} linked={false} />
+      <div className="relative z-10 flex shrink-0 items-center gap-2">
+        <AutopilotFindingStatus finding={finding} working={working} />
       </div>
     );
   }
   return (
-    <div className="flex shrink-0 items-center gap-2">
+    <div className="relative z-10 flex shrink-0 items-center gap-2">
       {finding.pullRequestUrl ? (
-        <AutopilotFindingStatus finding={finding} linked={false} />
+        <AutopilotFindingStatus finding={finding} working={working} />
       ) : null}
       {finding.status === "proposed" ? (
         <AutopilotMergeMenu
@@ -183,8 +197,6 @@ export function AutopilotBriefFindingWhy({
   finding: AutopilotFindingView;
 }) {
   const format = useFormatter();
-  const [open, setOpen] = useState(false);
-  const panelId = useId();
   const sources = briefFindingSources(finding);
   if (sources.length === 0) {
     return null;
@@ -192,46 +204,55 @@ export function AutopilotBriefFindingWhy({
   const reason = describeFindingReason(finding, (date) =>
     format.dateTime(date, { month: "short", day: "numeric" })
   );
+  // The row grows to the panel's height and the sources fade in as it does,
+  // on one curve; closing runs the same in reverse.
+  const motion = "duration-slow ease-emphasized motion-reduce:transition-none";
   return (
-    <div className="pt-1">
-      <button
-        aria-controls={panelId}
-        aria-expanded={open}
-        className="text-muted-foreground hover:text-foreground -mx-1 inline-flex items-center gap-1 rounded px-1 text-xs transition-colors"
-        onClick={() => setOpen((value) => !value)}
-        type="button"
-      >
+    <Collapsible.Root className="pt-1">
+      <Collapsible.Trigger className="text-muted-foreground hover:text-foreground relative z-10 -mx-1 inline-flex items-center gap-1 rounded px-1 text-xs transition-colors">
         Why this
         <span className="text-muted-foreground/70 tabular-nums">
           · {sources.length} {sources.length === 1 ? "source" : "sources"}
         </span>
         <HugeiconsIcon
           aria-hidden="true"
-          className={cn("transition-transform", open && "rotate-180")}
+          className={cn(
+            "transition-transform in-data-panel-open:rotate-180",
+            motion
+          )}
           icon={ArrowDown01Icon}
           size={12}
           strokeWidth={2}
         />
-      </button>
-      {open ? (
+      </Collapsible.Trigger>
+      <Collapsible.Panel
+        className={cn(
+          "relative z-10 h-(--collapsible-panel-height) overflow-hidden transition-[height] data-ending-style:h-0 data-starting-style:h-0",
+          motion
+        )}
+      >
         <div
-          className="border-table-row-border mt-2 space-y-2.5 border-l-2 pl-3"
-          id={panelId}
+          className={cn(
+            "pt-2 transition-[opacity,translate] in-data-ending-style:-translate-y-1 in-data-ending-style:opacity-0 in-data-starting-style:-translate-y-1 in-data-starting-style:opacity-0",
+            motion
+          )}
         >
-          <p className="text-muted-foreground text-xs/5 text-pretty">
-            {reason}
-          </p>
-          <ul className="space-y-2">
-            {sources.map((source) => (
-              <SourceItem
-                key={`${source.kind}-${source.title}`}
-                source={source}
-              />
-            ))}
-          </ul>
+          <div className="border-table-row-border space-y-2.5 border-l-2 pl-3">
+            <p className="text-muted-foreground text-xs/5 text-pretty">
+              {reason}
+            </p>
+            <ul className="space-y-2">
+              {sources.map((source) => (
+                <SourceItem
+                  key={`${source.kind}-${source.title}`}
+                  source={source}
+                />
+              ))}
+            </ul>
+          </div>
         </div>
-      ) : null}
-    </div>
+      </Collapsible.Panel>
+    </Collapsible.Root>
   );
 }
 

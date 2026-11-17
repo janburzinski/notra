@@ -493,6 +493,8 @@ export interface AutopilotFindingStatusProps {
   finding: AutopilotFindingView;
   /** Off where the row already has its own actions, so the badge isn't a second click target. */
   linked?: boolean;
+  /** Autopilot is changing the pull request: the chat's loader replaces its icon. */
+  working?: boolean;
 }
 
 export interface AutopilotStatStripProps {
@@ -712,6 +714,8 @@ export interface AutopilotBriefFindingCardProps {
   onOpen: () => void;
   /** Starts loading the post on hover, so the modal opens on it. */
   onPreview: () => void;
+  /** Autopilot is changing its pull request right now. */
+  working?: boolean;
 }
 
 /** One piece of evidence behind a brief item: a pull request, search, page or AI answers. */

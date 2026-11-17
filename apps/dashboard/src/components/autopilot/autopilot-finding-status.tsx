@@ -2,6 +2,7 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { StatusBadge } from "@notra/ui/components/status-badge";
 import { Badge } from "@notra/ui/components/ui/badge";
 
+import { AgentLoader } from "@/components/icons/agent-loader";
 import { AUTOPILOT_FINDING_STATUS_BADGES } from "@/constants/autopilot";
 import { AUTOPILOT_PULL_REQUEST_STATES } from "@/constants/autopilot-ui";
 import type { AutopilotFindingStatusProps } from "@/types/autopilot";
@@ -14,6 +15,7 @@ import type { AutopilotFindingStatusProps } from "@/types/autopilot";
 export function AutopilotFindingStatus({
   finding,
   linked = true,
+  working = false,
 }: AutopilotFindingStatusProps) {
   const state = AUTOPILOT_PULL_REQUEST_STATES[finding.status];
   if (!(state && finding.pullRequestUrl)) {
@@ -37,7 +39,11 @@ export function AutopilotFindingStatus({
       size="md"
       variant={state.variant}
     >
-      <HugeiconsIcon aria-hidden="true" icon={state.icon} strokeWidth={1.5} />
+      {working ? (
+        <AgentLoader className="size-3.5" label="Working on it" />
+      ) : (
+        <HugeiconsIcon aria-hidden="true" icon={state.icon} strokeWidth={1.5} />
+      )}
       <span className="tabular-nums">#{finding.pullRequestNumber}</span>
     </Badge>
   );
