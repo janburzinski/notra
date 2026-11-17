@@ -107,7 +107,18 @@ export interface AutopilotPostResult {
     before: number | null;
     after: number | null;
   } | null;
+  /** AI answers since the merge that cite a new post's own page; null when unknown or for updates. */
+  aiCitations?: number | null;
+  /** Whether a new post earned AI citations or visits; null for updates. */
+  outcome?: AutopilotPostOutcome | null;
 }
+
+/**
+ * worked: AI answers cite the post or assistants fetch it. missed: weeks
+ * after the merge, enough answers were scanned and none cited it, and no
+ * assistant came by. too_early: neither yet.
+ */
+export type AutopilotPostOutcome = "worked" | "missed" | "too_early";
 
 export type AutopilotPlannedActionType = "none" | "write_post" | "update_page";
 

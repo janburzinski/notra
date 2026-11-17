@@ -28,6 +28,7 @@ import {
 } from "@/constants/autopilot-results";
 import type { AutopilotRunContext } from "@/types/autopilot";
 import type { AutopilotFindingRow } from "@/types/autopilot-runtime";
+import { postOutcome } from "@/utils/autopilot-outcome";
 import {
   type AutopilotResultPage,
   addPageVisits,
@@ -36,7 +37,7 @@ import {
 } from "@/utils/autopilot-results";
 
 import { getRepositoryOctokit } from "./github";
-import { loadFindingImpacts } from "./impact";
+import { countPageCitations, loadFindingImpacts } from "./impact";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 const MARKDOWN_FILE = /\.mdx?$/;
@@ -149,7 +150,8 @@ interface AiTrafficRows {
  */
 async function loadPageVisits(
   scope: NonNullable<Awaited<ReturnType<typeof loadTrafficScope>>>,
-  pages: AutopilotResultPage[]
+  pages: AutopilotResultPage[],
+  days: number
 ) {
   const params = {
     ...scope.params,
@@ -159,7 +161,7 @@ async function loadPageVisits(
     path: "",
     page_paths: "",
     imports: "",
-    days: AUTOPILOT_RESULTS_WINDOW_DAYS,
+    days,
     date_from: "",
     date_to: "",
   };
@@ -234,9 +236,136 @@ async function loadPageVisits(
 
 /**
  * How Autopilot's merged posts and page updates did: AI crawler visits,
- * assistant fetches, AI clicks and human views over the last window, and AI
- * mentions before and after. Reads only stored analytics; no model calls.
+ * assistant fetches, AI clicks and human views over the last `visitsDays`,
+ * AI mentions before and after, and for new posts the answers citing them
+ * and whether that makes them worked, missed or too early. Reads only stored
+ * analytics; no model calls.
  */
+export async function measurePosts(
+  ctx: AutopilotRunContext,
+  findings: AutopilotFindingRow[],
+  now = new Date(),
+  visitsDays: number = AUTOPILOT_RESULTS_WINDOW_DAYS
+): Promise<Map<string, AutopilotPostResult>> {
+  const measured = new Map<string, AutopilotPostResult>();
+  if (findings.length === 0) {
+    return measured;
+  }
+  await backfillFilePaths(ctx, findings);
+  const [scope, project] = await Promise.all([
+    loadTrafficScope(ctx),
+    ctx.projectId
+      ? db.query.projects.findFirst({
+          columns: { id: true, gscTopQueries: true, gscLastSyncedAt: true },
+          where: and(
+            eq(projects.id, ctx.projectId),
+            eq(projects.organizationId, ctx.organizationId)
+          ),
+        })
+      : null,
+  ]);
+  const pages = new Map(
+    findings.flatMap((finding) => {
+      const page = resultPage(finding.evidence, (filePath) =>
+        scope?.site
+          ? siteEntryPagePath({
+              filePath,
+              rootDirectory: scope.site.rootDirectory,
+              mounts: scope.site.mounts,
+            })
+          : null
+      );
+      return page ? [[finding.id, page] as const] : [];
+    })
+  );
+  const isNewPost = (finding: AutopilotFindingRow) =>
+    finding.kind !== "refresh" && !finding.evidence.updatePage;
+  const [traffic, impacts, citations] = await Promise.all([
+    // Analytics down leaves traffic unknown; mentions still come from the scans.
+    scope && isTinybirdConfigured() && pages.size > 0
+      ? loadPageVisits(scope, [...pages.values()], visitsDays).then(
+          (visits) => ({ visits, failed: false }),
+          () => ({ visits: null, failed: true })
+        )
+      : { visits: null, failed: false },
+    loadFindingImpacts(project ?? null, findings, now),
+    // Only a new post's page is new, so only there is every citation its doing.
+    Promise.all(
+      findings.map(async (finding) => {
+        const url = finding.evidence.live?.url;
+        if (!(project && url && finding.mergedAt && isNewPost(finding))) {
+          return [finding.id, null] as const;
+        }
+        return [
+          finding.id,
+          await countPageCitations(project.id, url, finding.mergedAt),
+        ] as const;
+      })
+    ).then((rows) => new Map(rows)),
+  ]);
+
+  const { visits } = traffic;
+  for (const finding of findings) {
+    const page = pages.get(finding.id);
+    if (!page) {
+      continue;
+    }
+    const ai = page.match === "path" ? visits?.exact : visits?.top;
+    const counts = visits
+      ? addPageVisits(page, {
+          ai: ai && !ai.cutOff ? ai.rows : null,
+          human: visits.human,
+          humanCutOff: visits.humanCutOff,
+        })
+      : null;
+    const impact = impacts[finding.id];
+    const mergedDaysAgo = Math.floor(
+      (now.getTime() - (finding.mergedAt ?? now).getTime()) / DAY_MS
+    );
+    const cited = citations.get(finding.id) ?? null;
+    const aiAnswerFetches = counts?.aiAnswerFetches ?? null;
+    const aiClicks = counts?.aiClicks ?? null;
+    const aiVisits =
+      aiAnswerFetches === null && aiClicks === null
+        ? null
+        : (aiAnswerFetches ?? 0) + (aiClicks ?? 0);
+    measured.set(finding.id, {
+      title: finding.title,
+      kind: isNewPost(finding) ? "post" : "update",
+      topicSlug: finding.evidence.topic?.slug ?? null,
+      page: page.value,
+      mergedDaysAgo,
+      aiCrawls: counts?.aiCrawls ?? null,
+      aiAnswerFetches,
+      aiClicks,
+      humanViews: counts?.humanViews ?? null,
+      answers:
+        impact &&
+        (impact.metric === "mentions" || impact.metric === "citations")
+          ? {
+              metric: impact.metric,
+              before: impact.before,
+              after: impact.after,
+            }
+          : null,
+      aiCitations: cited?.citations ?? null,
+      outcome: isNewPost(finding)
+        ? postOutcome({
+            mergedDaysAgo,
+            citations: cited?.citations ?? null,
+            answers: cited?.answers ?? 0,
+            aiVisits,
+            // A failed or cut-off read is not "no visits".
+            aiVisitsUnknown:
+              traffic.failed || (visits !== null && aiVisits === null),
+          })
+        : null,
+    });
+  }
+  return measured;
+}
+
+/** How the workspace's recent merged posts and page updates did, newest first. */
 export async function loadAutopilotResults(
   ctx: AutopilotRunContext,
   now = new Date()
@@ -268,84 +397,22 @@ export async function loadAutopilotResults(
     )
     .orderBy(desc(autopilotFindings.mergedAt))
     .limit(AUTOPILOT_RESULTS_MAX_FINDINGS);
-  if (findings.length === 0) {
-    return [];
-  }
-  await backfillFilePaths(ctx, findings);
-  const [scope, project] = await Promise.all([
-    loadTrafficScope(ctx),
-    ctx.projectId
-      ? db.query.projects.findFirst({
-          columns: { id: true, gscTopQueries: true, gscLastSyncedAt: true },
-          where: and(
-            eq(projects.id, ctx.projectId),
-            eq(projects.organizationId, ctx.organizationId)
-          ),
-        })
-      : null,
-  ]);
-  const pages = new Map(
-    findings.flatMap((finding) => {
-      const page = resultPage(finding.evidence, (filePath) =>
-        scope?.site
-          ? siteEntryPagePath({
-              filePath,
-              rootDirectory: scope.site.rootDirectory,
-              mounts: scope.site.mounts,
-            })
-          : null
-      );
-      return page ? [[finding.id, page] as const] : [];
-    })
-  );
-  const [visits, impacts] = await Promise.all([
-    // Analytics down leaves traffic unknown; mentions still come from the scans.
-    scope && isTinybirdConfigured() && pages.size > 0
-      ? loadPageVisits(scope, [...pages.values()]).catch(() => null)
-      : null,
-    loadFindingImpacts(project ?? null, findings),
-  ]);
-
-  const results: AutopilotPostResult[] = [];
-  for (const finding of findings) {
-    const page = pages.get(finding.id);
-    if (!page) {
-      continue;
+  const results = await measurePosts(ctx, findings, now);
+  // The verdict is the saved one: it covers every visit since the merge, not
+  // just the last window, and a post that worked once stays worked.
+  return findings.flatMap((finding) => {
+    const result = results.get(finding.id);
+    if (!result) {
+      return [];
     }
-    const ai = page.match === "path" ? visits?.exact : visits?.top;
-    const counts = visits
-      ? addPageVisits(page, {
-          ai: ai && !ai.cutOff ? ai.rows : null,
-          human: visits.human,
-          humanCutOff: visits.humanCutOff,
-        })
-      : null;
-    const impact = impacts[finding.id];
-    results.push({
-      title: finding.title,
-      kind:
-        finding.kind === "refresh" || finding.evidence.updatePage
-          ? "update"
-          : "post",
-      topicSlug: finding.evidence.topic?.slug ?? null,
-      page: page.value,
-      mergedDaysAgo: Math.floor(
-        (now.getTime() - (finding.mergedAt ?? now).getTime()) / DAY_MS
-      ),
-      aiCrawls: counts?.aiCrawls ?? null,
-      aiAnswerFetches: counts?.aiAnswerFetches ?? null,
-      aiClicks: counts?.aiClicks ?? null,
-      humanViews: counts?.humanViews ?? null,
-      answers:
-        impact &&
-        (impact.metric === "mentions" || impact.metric === "citations")
-          ? {
-              metric: impact.metric,
-              before: impact.before,
-              after: impact.after,
-            }
-          : null,
-    });
-  }
-  return results;
+    return [
+      {
+        ...result,
+        outcome:
+          result.kind === "post"
+            ? (finding.evidence.outcome?.verdict ?? "too_early")
+            : null,
+      },
+    ];
+  });
 }

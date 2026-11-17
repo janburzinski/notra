@@ -45,6 +45,10 @@ import {
 } from "@/lib/autopilot/findings";
 import { generateAutopilotObject } from "@/lib/autopilot/llm";
 import { createAutopilotLogger } from "@/lib/autopilot/log";
+import {
+  countPostOutcomes,
+  updatePostOutcomes,
+} from "@/lib/autopilot/outcomes";
 import { loadAutopilotResults } from "@/lib/autopilot/results";
 import { loadDecisionMemory } from "@/lib/autopilot/rules";
 import type {
@@ -256,6 +260,17 @@ export async function decideAutopilotPlan(
       },
     };
   }
+  // Before the results and the budget read them; failing only leaves the
+  // saved verdicts a day older.
+  await updatePostOutcomes(ctx).catch(async (error: unknown) => {
+    await log.info("Could not measure earlier posts", {
+      error: toErrorMessage(error, "unknown error"),
+    });
+  });
+  const trackRecordSince = new Date(
+    Date.now() -
+      AUTOPILOT_AUTONOMOUS_PR_BUDGET.trackRecordDays * AUTOPILOT_DAY_MS
+  );
   const [
     synced,
     existingPosts,
@@ -263,6 +278,7 @@ export async function decideAutopilotPlan(
     openPullRequests,
     autonomous,
     trackRecord,
+    outcomes,
     results,
   ] = await Promise.all([
     syncTopicsWithFindings(ctx.organizationId, stored),
@@ -275,13 +291,8 @@ export async function decideAutopilotPlan(
         Date.now() - AUTOPILOT_AUTONOMOUS_PR_BUDGET.days * AUTOPILOT_DAY_MS
       )
     ),
-    countAutonomousTrackRecord(
-      ctx.organizationId,
-      new Date(
-        Date.now() -
-          AUTOPILOT_AUTONOMOUS_PR_BUDGET.trackRecordDays * AUTOPILOT_DAY_MS
-      )
-    ),
+    countAutonomousTrackRecord(ctx.organizationId, trackRecordSince),
+    countPostOutcomes(ctx.organizationId, trackRecordSince),
     // Only ranks ready topics, so a failure plans without it.
     loadAutopilotResults(ctx).catch(async (error: unknown) => {
       await log.info("Could not read how earlier posts did", {
@@ -324,7 +335,7 @@ export async function decideAutopilotPlan(
       {
         results: results.map(
           (result) =>
-            `${result.page}: ${result.aiAnswerFetches ?? "?"} AI answer fetches, ${result.aiClicks ?? "?"} AI clicks, ${result.humanViews ?? "?"} views`
+            `${result.page}: ${result.outcome ?? "update"}, ${result.aiCitations ?? "?"} AI citations, ${result.aiAnswerFetches ?? "?"} AI answer fetches, ${result.aiClicks ?? "?"} AI clicks, ${result.humanViews ?? "?"} views`
         ),
       }
     );
@@ -382,7 +393,10 @@ export async function decideAutopilotPlan(
     // crash before the memory write must not let the next run act twice.
     activeWork: plan.topic ? topicHasActiveWork(plan.topic, activeWork) : false,
     autonomousPullRequestsInWindow: autonomous,
-    autonomousPullRequestBudget: autonomousPullRequestBudget(trackRecord),
+    autonomousPullRequestBudget: autonomousPullRequestBudget({
+      ...trackRecord,
+      ...outcomes,
+    }),
     draftSlotsFree: openPullRequests < ctx.maxOpenPullRequests,
     demandTracked: input.demandTracked,
     now: new Date(),

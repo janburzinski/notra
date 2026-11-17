@@ -137,6 +137,13 @@ export interface AutopilotFindingEvidence {
     checkedAt: string;
     reportedRun?: string;
   };
+  /**
+   * Whether a merged new post earned AI citations or assistant visits. Saved
+   * once settled: worked is kept for good, missed until the post is cited.
+   */
+  outcome?: { verdict: "worked" | "missed"; at: string } | null;
+  /** When Autopilot last measured this post's outcome. */
+  outcomeCheckedAt?: string;
   /** When the refresh job last asked whether this merged post moved its prompt. */
   underperformingCheckedAt?: string;
   /** A refresh of an Autopilot post whose numbers did not move after it shipped. */

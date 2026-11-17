@@ -201,6 +201,12 @@ export interface AutopilotKeywordCandidate {
  * position: Search Console position (lower is better); score: agent readiness
  * score. after is null until there is data after the merge.
  */
+/** Answers one engine gave in a window, and how many of them counted. */
+export interface AutopilotEngineTally {
+  total: number;
+  hits: number;
+}
+
 export interface AutopilotImpact {
   metric: "mentions" | "citations" | "position" | "score";
   before: number | null;

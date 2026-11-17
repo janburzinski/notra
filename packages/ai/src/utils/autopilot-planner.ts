@@ -466,14 +466,23 @@ export function applyPlannerOutput(params: {
 
 /**
  * Automatic pull requests a workspace may get per window, from what people
- * did with the earlier ones: merged posts earn more, closed ones cost.
+ * did with the earlier ones and how the merged posts did: merged posts and
+ * posts AI answers cite earn more, closed posts and posts nobody cited cost.
  */
 export function autonomousPullRequestBudget(trackRecord: {
   merged: number;
   closed: number;
+  /** Merged posts that worked, by when that was settled. */
+  worked?: number;
+  /** Merged posts that missed, by when that was settled. */
+  missed?: number;
 }) {
   const budget = AUTOPILOT_AUTONOMOUS_PR_BUDGET;
-  const net = trackRecord.merged - trackRecord.closed;
+  const net =
+    trackRecord.merged -
+    trackRecord.closed +
+    (trackRecord.worked ?? 0) -
+    (trackRecord.missed ?? 0);
   // Closing posts is a signal once people closed clearly more than they merged.
   if (net <= -budget.closedMoreToShrink) {
     return budget.min;

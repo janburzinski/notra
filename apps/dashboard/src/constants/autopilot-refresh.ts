@@ -57,11 +57,9 @@ export const AUTOPILOT_REFRESH_INSTRUCTIONS = [
 ].join(" ");
 
 /**
- * An Autopilot post gets one refresh when, this long after it shipped, the
- * share of AI answers that name the brand for its prompt grew by less than
- * AUTOPILOT_UNDERPERFORMING_MIN_GAIN.
+ * An Autopilot post gets one refresh when, this long after it shipped, its
+ * outcome is "missed": no AI answer cited it and no assistant fetched it.
  */
 export const AUTOPILOT_UNDERPERFORMING_MIN_AGE_MS = 45 * DAY_MS;
 export const AUTOPILOT_UNDERPERFORMING_MAX_AGE_MS = 180 * DAY_MS;
-export const AUTOPILOT_UNDERPERFORMING_MIN_GAIN = 0.05;
 export const AUTOPILOT_UNDERPERFORMING_MAX_FINDINGS = 10;

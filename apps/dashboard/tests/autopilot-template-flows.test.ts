@@ -965,8 +965,36 @@ if (process.env.NOTRA_AUTOPILOT_TEMPLATE_FLOW_TEST !== "1") {
     );
   });
 
-  test("refresh: an Autopilot post that did not win its prompt gets one more try", async () => {
+  test("refresh: an Autopilot post no AI answer cited gets one more try", async () => {
     await enable({ refresh: true });
+    // Enough answers since the merge for "never cited" to mean something.
+    const quiet = Array.from({ length: 50 }, (_, index) => ({
+      id: `quiet-${index}`,
+      organizationId: ORG,
+      projectId: PROJECT,
+      scanId: `quiet-scan-${index}`,
+      engine: "openai/chatgpt",
+      promptId: "platform",
+      prompt: "Which serverless GPU platform should I use?",
+      answer: "An answer",
+      mentioned: false,
+      grounding: {
+        queries: [],
+        sources: [
+          { url: "https://modal.com", title: "Modal", domain: "modal.com" },
+        ],
+      },
+      capturedAt: new Date(now.getTime() - (10 + (index % 40)) * DAY),
+    }));
+    await db.insert(geoScans).values(
+      quiet.map((row) => ({
+        id: row.scanId,
+        organizationId: ORG,
+        projectId: PROJECT,
+        status: "completed" as const,
+      }))
+    );
+    await db.insert(geoMentionChecks).values(quiet);
     // The guide that lost citations was handled already.
     await db.insert(autopilotFindings).values({
       id: "settled-guide",

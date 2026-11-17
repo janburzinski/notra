@@ -27,7 +27,6 @@ import {
   AUTOPILOT_UNDERPERFORMING_MAX_AGE_MS,
   AUTOPILOT_UNDERPERFORMING_MAX_FINDINGS,
   AUTOPILOT_UNDERPERFORMING_MIN_AGE_MS,
-  AUTOPILOT_UNDERPERFORMING_MIN_GAIN,
 } from "@/constants/autopilot-refresh";
 import { loadAnswerChecks, loadOwnedHosts } from "@/lib/autopilot/answers";
 import { emailDraftReviewers } from "@/lib/autopilot/draft-emails";
@@ -58,6 +57,7 @@ import {
 import { loadPostSite, resolveLiveUrl } from "@/lib/autopilot/live";
 import { generateAutopilotObject } from "@/lib/autopilot/llm";
 import { createAutopilotLogger } from "@/lib/autopilot/log";
+import { updatePostOutcomes } from "@/lib/autopilot/outcomes";
 import { readPages, resolveLinks } from "@/lib/autopilot/pages";
 import { scheduleAutopilotPublish } from "@/lib/autopilot/publish";
 import { requestDraftReviewers } from "@/lib/autopilot/reviewers";
@@ -76,6 +76,7 @@ import { assertNoActiveContent } from "@/utils/autopilot-blog";
 import { autopilotDraftBranchSlug } from "@/utils/autopilot-branches";
 import {
   findCitationDrops,
+  citationKey,
   refreshFingerprint,
   underperformingCandidate,
 } from "@/utils/autopilot-citations";
@@ -93,21 +94,25 @@ import { brandToneInstruction, forceNoDashes } from "@/utils/autopilot-style";
 const percent = (value: number) => `${Math.round(value * 100)}%`;
 
 /**
- * Autopilot's own posts that shipped to win a prompt and did not move it,
- * old enough for the scans to tell. Each gets one refresh: its fingerprint
- * settles once tried.
+ * Autopilot's own posts written to win a prompt whose saved verdict is
+ * missed: no AI answer cited them and no assistant fetched them. Each gets
+ * one refresh: its fingerprint settles once tried.
  */
 async function findUnderperformingPosts(params: {
   ctx: AutopilotRunContext;
   now: Date;
   checks: AutopilotAnswerCheck[];
   ownedHosts: string[];
+  /** Refresh fingerprints already tried: skipped before the limit, so later misses get their turn. */
+  settled: ReadonlySet<string>;
 }): Promise<AutopilotCitationCandidate[]> {
   const { ctx, now } = params;
   const repository = ctx.repository;
   if (!(repository && ctx.projectId)) {
     return [];
   }
+  await updatePostOutcomes(ctx, now);
+  const evidence = autopilotFindings.evidence;
   const findings = await db
     .select()
     .from(autopilotFindings)
@@ -117,8 +122,10 @@ async function findUnderperformingPosts(params: {
         sql`lower(${autopilotFindings.repository}) = ${`${repository.owner}/${repository.name}`.toLowerCase()}`,
         eq(autopilotFindings.status, "merged"),
         inArray(autopilotFindings.kind, ["keywords", "comparisons"]),
-        sql`${autopilotFindings.evidence}->'target'->>'kind' = 'prompt'`,
-        sql`${autopilotFindings.evidence}->>'filePath' is not null`,
+        sql`${evidence}->'outcome'->>'verdict' = 'missed'`,
+        sql`${evidence}->'target'->>'kind' = 'prompt'`,
+        sql`${evidence}->>'filePath' is not null`,
+        sql`${evidence}->'live'->>'url' is not null`,
         gte(
           autopilotFindings.mergedAt,
           new Date(now.getTime() - AUTOPILOT_UNDERPERFORMING_MAX_AGE_MS)
@@ -129,27 +136,23 @@ async function findUnderperformingPosts(params: {
         )
       )
     )
-    // Least recently asked first: posts that moved, lack data or already got
-    // their try must not hold the slots of the ones after them.
-    .orderBy(
-      sql`${autopilotFindings.evidence}->>'underperformingCheckedAt' asc nulls first`,
-      asc(autopilotFindings.mergedAt)
-    )
-    .limit(AUTOPILOT_UNDERPERFORMING_MAX_FINDINGS);
+    // Every miss, not a page of them: a page whose posts all had their try
+    // would block the later ones. The automatic budget bounds the count.
+    .orderBy(asc(autopilotFindings.mergedAt))
+    .then((rows) =>
+      rows
+        .filter((row) => {
+          const key = citationKey(row.evidence.live?.url ?? "");
+          return !(
+            key &&
+            params.settled.has(refreshFingerprint(`${key}#underperforming`))
+          );
+        })
+        .slice(0, AUTOPILOT_UNDERPERFORMING_MAX_FINDINGS)
+    );
   if (findings.length === 0) {
     return [];
   }
-  await db
-    .update(autopilotFindings)
-    .set({
-      evidence: sql`jsonb_set(${autopilotFindings.evidence}, '{underperformingCheckedAt}', to_jsonb(${now.toISOString()}::text))`,
-    })
-    .where(
-      inArray(
-        autopilotFindings.id,
-        findings.map((finding) => finding.id)
-      )
-    );
   const project = await db.query.projects.findFirst({
     columns: { id: true, gscTopQueries: true, gscLastSyncedAt: true },
     where: and(
@@ -157,41 +160,23 @@ async function findUnderperformingPosts(params: {
       eq(projects.organizationId, ctx.organizationId)
     ),
   });
-  const impacts = await loadFindingImpacts(project ?? null, findings);
-  let site: Awaited<ReturnType<typeof loadPostSite>> | undefined;
+  const impacts = await loadFindingImpacts(project ?? null, findings, now);
   const candidates: AutopilotCitationCandidate[] = [];
   for (const finding of findings) {
-    const impact = impacts[finding.id];
     const target = finding.evidence.target;
     const path = finding.evidence.filePath;
-    if (
-      !(impact && target?.kind === "prompt" && path) ||
-      impact.after === null ||
-      impact.before === null ||
-      impact.after - impact.before >= AUTOPILOT_UNDERPERFORMING_MIN_GAIN
-    ) {
+    const url = finding.evidence.live?.url;
+    if (!(target?.kind === "prompt" && path && url)) {
       continue;
     }
-    // Posts merged before pages were followed have no live URL saved yet.
-    site ??= await loadPostSite(ctx);
-    const resolved = await resolveLiveUrl({
-      ctx,
-      finding,
-      site,
-      ownedHosts: params.ownedHosts,
-      now,
-    }).catch(() => null);
-    const url = resolved?.live ? resolved.url : null;
-    if (!url) {
-      continue;
-    }
+    const impact = impacts[finding.id];
     const candidate = underperformingCandidate({
       findingId: finding.id,
       url,
       path,
       promptId: target.promptId,
-      before: impact.before,
-      after: impact.after,
+      before: impact?.before ?? target.before,
+      after: impact?.after ?? target.before,
       mergedDaysAgo: Math.floor(
         (now.getTime() - (finding.mergedAt ?? now).getTime()) /
           (24 * 60 * 60 * 1000)
@@ -283,17 +268,17 @@ export async function checkRefresh(
   );
   // Lost citations come first: the page earned them once.
   const underperforming = (
-    await findUnderperformingPosts({ ctx, now, checks, ownedHosts })
+    await findUnderperformingPosts({ ctx, now, checks, ownedHosts, settled })
   ).filter((candidate) => !settled.has(refreshFingerprint(candidate.key)));
   if (underperforming.length > 0) {
     await log.decision(
-      `${underperforming.length} of Autopilot's posts did not win the answer they were written for`,
+      `${underperforming.length} of Autopilot's posts were never cited or visited by AI`,
       {
         candidates: underperforming
           .slice(0, 5)
           .map(
             (candidate) =>
-              `${candidate.url}: ${percent(candidate.drop.before)} → ${percent(candidate.drop.now)} after ${candidate.underperforming?.mergedDaysAgo ?? "?"} days`
+              `${candidate.url}: no citations after ${candidate.underperforming?.mergedDaysAgo ?? "?"} days, mentions ${percent(candidate.drop.before)} → ${percent(candidate.drop.now)}`
           ),
       }
     );
@@ -369,7 +354,7 @@ export async function claimRefresh(params: {
       fingerprint: refreshFingerprint(candidate.key),
       title: `Refresh ${candidate.url.replace(/^https?:\/\//, "")}`,
       summary: missed
-        ? `Written ${missed.mergedDaysAgo} days ago to win an AI answer: named in ${percent(candidate.drop.before)} of answers before, ${percent(candidate.drop.now)} since.`
+        ? `Written ${missed.mergedDaysAgo} days ago to win an AI answer; no AI answer has cited it since and no assistant has fetched it.`
         : `Cited in ${percent(candidate.drop.before)} of AI answers to its prompts a month ago, ${percent(candidate.drop.now)} now.`,
       evidence: {
         sourceUrl: candidate.url,
@@ -418,7 +403,7 @@ function describeEvidence(check: AutopilotRefreshCheck) {
   return [
     `Page: ${check.candidate.url} (file ${check.path})`,
     underperforming
-      ? `Written ${underperforming.mergedDaysAgo} days ago to win the AI answer to the prompt below. It did not: the answers named the brand in ${percent(drop.before)} of cases before it shipped and ${percent(drop.now)} since. Make it the page those answers would cite.`
+      ? `Written ${underperforming.mergedDaysAgo} days ago to win the AI answer to the prompt below. It did not: no AI answer has cited it since it went live and no assistant has fetched it. Make it the page those answers would cite.`
       : `Cited in ${percent(drop.before)} of answers to its prompts a month ago, ${percent(drop.now)} now.`,
     underperforming
       ? "Prompt it was written for:"
@@ -723,7 +708,7 @@ function refreshPullRequestBody(
     fix.summary,
     "",
     underperforming
-      ? `**Why now:** Autopilot wrote this post ${underperforming.mergedDaysAgo} days ago to win the AI answer below. AI answers named the brand ${percent(drop.before)} of the time before it shipped and ${percent(drop.now)} since, so it gets one more try.`
+      ? `**Why now:** Autopilot wrote this post ${underperforming.mergedDaysAgo} days ago to win the AI answer below. No AI answer has cited it since it went live and no AI assistant has fetched it, so it gets one more try.`
       : `**Why now:** AI answers to this page's prompts cited it ${percent(drop.before)} of the time a month ago and ${percent(drop.now)} now.`,
     "",
     underperforming

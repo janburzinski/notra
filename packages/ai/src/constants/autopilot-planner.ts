@@ -40,8 +40,10 @@ export const AUTOPILOT_DEMAND_MAX_AGE_DAYS = 14;
 /**
  * Automatic pull requests per workspace and window, so a bad gate cannot spam.
  * A workspace starts at `base`, earns one more for every `earnedPerMerges`
- * posts people merged over `trackRecordDays` beyond the ones they closed, and
- * drops to `min` once people closed `closedMoreToShrink` more than they merged.
+ * points over `trackRecordDays`, and drops to `min` at `closedMoreToShrink`
+ * points below zero. A merged post and a post AI answers cite or assistants
+ * visit each add a point; a closed post and a post nobody cited each take one.
+ * A post's verdict counts while it was reached within `trackRecordDays`.
  */
 export const AUTOPILOT_AUTONOMOUS_PR_BUDGET = {
   base: 3,
