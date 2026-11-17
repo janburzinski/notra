@@ -1,8 +1,8 @@
+import { AUTOPILOT_DEFAULT_JOBS } from "@notra/db/constants/autopilot";
 import { db } from "@notra/db/drizzle";
 import { autopilotRuns, autopilotSettings } from "@notra/db/schema";
 import { and, eq } from "drizzle-orm";
 
-import { AUTOPILOT_DEFAULT_JOBS } from "@/constants/autopilot";
 import {
   AUTOPILOT_DAILY_WORKFLOW_KEY,
   AUTOPILOT_TEMPLATE_WORKFLOW_KEYS,

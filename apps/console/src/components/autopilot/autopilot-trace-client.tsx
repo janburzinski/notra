@@ -35,7 +35,7 @@ export function AutopilotTraceClient({ slug, runId }: AutopilotTracePageProps) {
     <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-6 px-4 py-6 lg:px-6">
       <Link
         className="text-muted-foreground w-fit text-sm underline underline-offset-4"
-        href={`/${slug}/autopilot`}
+        href={`/${slug}/autopilot?view=runs`}
       >
         Back to Autopilot runs
       </Link>

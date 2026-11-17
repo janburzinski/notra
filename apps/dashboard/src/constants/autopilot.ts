@@ -1,3 +1,4 @@
+import { AUTOPILOT_DEFAULT_JOBS } from "@notra/db/constants/autopilot";
 import type {
   AutopilotCommitFilters,
   AutopilotDraftEmails,
@@ -406,20 +407,6 @@ export const AUTOPILOT_BLOG_DIRECTORY_HINTS = [
 /** Monorepo folders whose packages are searched for the hints above (apps/web/src/content/blog). */
 export const AUTOPILOT_WORKSPACE_ROOTS = ["apps", "packages"];
 export const AUTOPILOT_BLOG_DIRECTORY_FALLBACK = "content/blog";
-
-/** Templates added after launch start off; a workspace turns them on. */
-export const AUTOPILOT_DEFAULT_JOBS = {
-  readiness: true,
-  keywords: true,
-  commits: true,
-  prompts: true,
-  competitors: true,
-  refresh: false,
-  comparisons: false,
-  rendering: false,
-  links: false,
-  landing: false,
-} as const;
 
 /**
  * What a first setup starts with. Pages AI stopped citing and competitors

@@ -1,5 +1,6 @@
 import type { autopilotAgentRequestSchema } from "@notra/ai/schemas/autopilot-agent";
 import { consumeChatGenerationRateLimit } from "@notra/ai/utils/chat-generation-rate-limit";
+import { AUTOPILOT_DEFAULT_JOBS } from "@notra/db/constants/autopilot";
 import { db } from "@notra/db/drizzle";
 import {
   autopilotFindings,
@@ -11,7 +12,6 @@ import {
 import { and, desc, eq, inArray, isNull, sql } from "drizzle-orm";
 import type * as z from "zod";
 
-import { AUTOPILOT_DEFAULT_JOBS } from "@/constants/autopilot";
 import {
   AUTOPILOT_WORKFLOW_KEY_PREFIX,
   AUTOPILOT_WORKFLOW_NOT_FOUND,

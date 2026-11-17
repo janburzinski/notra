@@ -31,6 +31,10 @@ if (process.env.NOTRA_CONSOLE_AUTOPILOT_TEST !== "1") {
   mock.module("@/lib/autopilot/dashboard", () => ({
     callAutopilotAdmin: request,
   }));
+  const health = mock(async (_days: number) => ({}));
+  mock.module("@/lib/autopilot/health", () => ({
+    getAutopilotHealth: health,
+  }));
   const { autopilotRouter } = await import("./autopilot");
   const context = { headers: new Headers() };
 
@@ -42,6 +46,17 @@ if (process.env.NOTRA_CONSOLE_AUTOPILOT_TEST !== "1") {
       call(autopilotRouter.trace, { runId: "run-sandbox" }, { context })
     ).rejects.toThrow();
     expect(request).not.toHaveBeenCalled();
+  });
+  test("members can't read Autopilot health across workspaces", async () => {
+    role = "member";
+    health.mockClear();
+    await expect(
+      call(autopilotRouter.health, { days: 7 }, { context })
+    ).rejects.toThrow();
+    expect(health).not.toHaveBeenCalled();
+    role = "admin";
+    await call(autopilotRouter.health, { days: 7 }, { context });
+    expect(health).toHaveBeenLastCalledWith(7);
   });
   test("admin trace requests omit raw details unless explicitly requested", async () => {
     role = "admin";

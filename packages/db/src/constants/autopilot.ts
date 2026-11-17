@@ -28,6 +28,24 @@ export const AUTOPILOT_AUTOMATION_KINDS = [
 ] as const satisfies readonly (typeof AUTOPILOT_JOB_KINDS)[number][];
 
 /**
+ * Templates added after launch start off; a workspace turns them on. A stored
+ * `jobs` value only holds the keys a workspace changed, so read it on top of
+ * this.
+ */
+export const AUTOPILOT_DEFAULT_JOBS = {
+  readiness: true,
+  keywords: true,
+  commits: true,
+  prompts: true,
+  competitors: true,
+  refresh: false,
+  comparisons: false,
+  rendering: false,
+  links: false,
+  landing: false,
+} as const satisfies Record<(typeof AUTOPILOT_JOB_KINDS)[number], boolean>;
+
+/**
  * manual, cron and onboarding run every job and never overlap. github (a
  * `@notra` mention or a merge) and suggestion (writing a dashboard
  * suggestion) handle one item and may run next to them.

@@ -4,7 +4,10 @@ import {
 } from "@notra/ai/integrations/github";
 import { consumeChatGenerationRateLimit } from "@notra/ai/utils/chat-generation-rate-limit";
 import { logError } from "@notra/ai/utils/server-log";
-import { AUTOPILOT_SCHEDULED_TRIGGERS } from "@notra/db/constants/autopilot";
+import {
+  AUTOPILOT_DEFAULT_JOBS,
+  AUTOPILOT_SCHEDULED_TRIGGERS,
+} from "@notra/db/constants/autopilot";
 import { db } from "@notra/db/drizzle";
 import {
   autopilotFindings,
@@ -34,7 +37,6 @@ import { and, desc, eq, inArray, sql } from "drizzle-orm";
 import { Effect } from "effect";
 
 import {
-  AUTOPILOT_DEFAULT_JOBS,
   AUTOPILOT_SETUP_JOBS,
   AUTOPILOT_DEFAULT_STALE_PULL_REQUEST_DAYS,
   AUTOPILOT_RUNS_PAGE_SIZE,

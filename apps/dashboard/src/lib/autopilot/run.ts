@@ -1,5 +1,8 @@
 import { toneProfileSchema } from "@notra/ai/schemas/tone";
-import { AUTOPILOT_SCHEDULED_TRIGGERS } from "@notra/db/constants/autopilot";
+import {
+  AUTOPILOT_DEFAULT_JOBS,
+  AUTOPILOT_SCHEDULED_TRIGGERS,
+} from "@notra/db/constants/autopilot";
 import { db } from "@notra/db/drizzle";
 import {
   autopilotFindings,
@@ -17,7 +20,6 @@ import { nanoid } from "nanoid";
 
 import {
   AUTOPILOT_DEFAULT_BRANCH,
-  AUTOPILOT_DEFAULT_JOBS,
   AUTOPILOT_RUN_EXPIRED_MESSAGE,
   AUTOPILOT_RUN_LEASE_MS,
 } from "@/constants/autopilot";

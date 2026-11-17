@@ -4,13 +4,13 @@ import {
 } from "@notra/ai/utils/github-mention-auth";
 import { postGitHubIssueComment } from "@notra/ai/utils/github-pr-comments";
 import { logInfo } from "@notra/ai/utils/server-log";
+import { AUTOPILOT_DEFAULT_JOBS } from "@notra/db/constants/autopilot";
 import { db } from "@notra/db/drizzle";
 import { autopilotSettings } from "@notra/db/schema";
 import type { AutopilotCommitFilters } from "@notra/db/types/autopilot";
 import { eq } from "drizzle-orm";
 
 import {
-  AUTOPILOT_DEFAULT_JOBS,
   AUTOPILOT_FINDING_MAX_FAILURES,
   AUTOPILOT_PR_OFFER_CONFIDENCE,
 } from "@/constants/autopilot";

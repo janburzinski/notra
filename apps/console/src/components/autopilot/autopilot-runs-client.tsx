@@ -53,14 +53,12 @@ export function AutopilotRunsClient({ slug }: AutopilotPageProps) {
   const last = runs.at(-1);
 
   return (
-    <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-6 px-4 py-6 lg:px-6">
-      <header className="flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Autopilot</h1>
-          <p className="text-muted-foreground mt-1 text-sm">
-            Runs and decisions across workspaces. Notra admins only.
-          </p>
-        </div>
+    <div className="flex flex-col gap-6">
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <p className="text-muted-foreground text-sm">
+          Every run with its trigger, status and drafts. Open one for its full
+          decision trace.
+        </p>
         <Button
           variant="outline"
           disabled={query.isFetching}
@@ -68,7 +66,7 @@ export function AutopilotRunsClient({ slug }: AutopilotPageProps) {
         >
           Refresh
         </Button>
-      </header>
+      </div>
       <form
         className="flex flex-wrap items-end gap-3"
         onSubmit={(event) => {
@@ -214,6 +212,6 @@ export function AutopilotRunsClient({ slug }: AutopilotPageProps) {
           Older runs
         </Button>
       </div>
-    </main>
+    </div>
   );
 }
