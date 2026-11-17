@@ -1,0 +1,37 @@
+packages/ui/src/components/ui/autocomplete.tsx
+  s_72f23c5170a572::t_3dbe8805d98bd3 24-25
+  s_72f23c5170a572::t_6444b61e7aaff7 22
+apps/dashboard/src/app/onboarding/visibility/visibility-form.tsx
+  s_72f23c5170a572::t_17f9419068ebb8 14,39,212-223
+  s_72f23c5170a572::t_4e2fff90fd0c7c 210-211,224-225
+apps/dashboard/messages/en.json
+  s_72f23c5170a572::t_178acf5a047bfc 1361,1364,1369,1372
+apps/dashboard/src/components/onboarding/prompt-choice-row.tsx
+  s_72f23c5170a572::t_17f9419068ebb8 31
+  s_72f23c5170a572::t_4e2fff90fd0c7c 3,15-16,18-19,22-27,30,34,36
+apps/dashboard/src/components/onboarding/brand-review-loading.tsx
+  s_72f23c5170a572::t_aa1aa1323e2940 33-41
+packages/ui/src/components/ui/combobox.tsx
+  s_72f23c5170a572::t_3dbe8805d98bd3 86-87
+  s_72f23c5170a572::t_6444b61e7aaff7 84
+apps/dashboard/src/components/geo/geo-language-picker.tsx
+  s_72f23c5170a572::t_dc4e814ff21405 107-112,125
+apps/dashboard/messages/de.json
+  s_72f23c5170a572::t_178acf5a047bfc 1361,1364,1369,1372
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "2343f4c2e2449960fd12495f0874ebfd61ca90cf",
+  "prompts": {},
+  "sessions": {
+    "s_72f23c5170a572": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "274de591-b280-4b1e-a517-c86b07c0fb77",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
