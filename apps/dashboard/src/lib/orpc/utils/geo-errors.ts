@@ -93,6 +93,7 @@ export async function toGeoOrpcError(failure: GeoRouterError): Promise<Error> {
     case "GeoScanAlreadyRunningError":
       return conflict(t("errors.geo.scanAlreadyRunning"));
     case "GeoScanEnginesEmptyError":
+    case "GeoScanEnginesUnknownError":
       return badRequest(t("errors.geo.selectModel"));
     case "GeoWriterCreditsExhaustedError":
       return paymentRequired(t("errors.billing.contentLimitReached"));

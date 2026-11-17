@@ -1,6 +1,7 @@
 import {
   AiChat02Icon,
   AiMagicIcon,
+  AiSearchIcon,
   Alert02Icon,
   AlertCircleIcon,
   Archive02Icon,
@@ -495,6 +496,7 @@ export const AUTOPILOT_WORKFLOW_STEP_ICONS = {
   "core.if": GitBranchIcon,
   "core.switch": GitBranchIcon,
   [AUTOPILOT_WORKFLOW_BLOCK_TYPES.compareVisibility]: ChartAnalysisIcon,
+  [AUTOPILOT_WORKFLOW_BLOCK_TYPES.scanPrompt]: AiSearchIcon,
   [AUTOPILOT_WORKFLOW_BLOCK_TYPES.askAgent]: AiMagicIcon,
   [AUTOPILOT_WORKFLOW_BLOCK_TYPES.decide]: GitBranchIcon,
   [AUTOPILOT_WORKFLOW_BLOCK_TYPES.postToSlack]: SlackIcon,

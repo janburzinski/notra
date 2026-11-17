@@ -1,3 +1,7 @@
+import {
+  GEO_MAX_ENGINES,
+  GEO_SHORT_FIELD_MAX_LENGTH,
+} from "@notra/geo-core/constants/geo";
 import { organizationIdInputSchema } from "@notra/schemas/dashboard/auth/organization";
 import { WORKFLOW_ERROR_POLICIES } from "@notra/workflows/constants/graph";
 import * as z from "zod";
@@ -9,6 +13,26 @@ export const compareVisibilityConfigSchema = z.object({
   projectId: z.string().min(1).optional(),
   // The agent sometimes writes numbers as text.
   days: z.coerce.number().int().min(1).max(90).default(7),
+});
+
+export const scanPromptConfigSchema = z.object({
+  projectId: z.string().min(1).optional(),
+  promptId: z
+    .string()
+    .trim()
+    .min(1)
+    .max(GEO_SHORT_FIELD_MAX_LENGTH)
+    .describe(
+      "Id of an enabled tracked prompt, from getGeoProjectContext or getGeoPromptResults"
+    ),
+  engines: z
+    .array(z.string().trim().min(1).max(GEO_SHORT_FIELD_MAX_LENGTH))
+    .min(1)
+    .max(GEO_MAX_ENGINES)
+    .optional()
+    .describe(
+      'Engine ids to ask, such as ["openai/chatgpt"] for one engine. Omit for every engine the project tracks.'
+    ),
 });
 
 // Limits leave room for earlier steps' output filled into the text at run time.

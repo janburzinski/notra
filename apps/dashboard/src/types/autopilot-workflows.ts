@@ -389,3 +389,22 @@ export interface AutopilotWorkflowEnabledInput {
   workflowId: string;
   enabled: boolean;
 }
+
+/** One answer a prompt scan step got back. */
+export interface AutopilotPromptScanResult {
+  engine: string;
+  language: string;
+  mentioned: boolean;
+  position: number | null;
+  competitors: string[];
+  excerpt: string;
+}
+
+export type AutopilotPromptScanStart =
+  | { ok: true; scanId: string; prompt: string }
+  | { ok: false; reason: string; outcome: "halt" | "fail" | "retry" };
+
+export interface AutopilotPromptScanState extends Record<string, unknown> {
+  scanId: string;
+  prompt: string;
+}

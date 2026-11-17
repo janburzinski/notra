@@ -93,6 +93,11 @@ function toGeoFailure(failure: GeoFailureWire): GeoFailure {
         status: 400,
         error: "Select at least one available model to scan",
       };
+    case "GeoScanEnginesUnknownError":
+      return {
+        status: 400,
+        error: failure.message ?? "Unknown engines",
+      };
     case "GeoCompetitorLimitError":
       return {
         status: 400,

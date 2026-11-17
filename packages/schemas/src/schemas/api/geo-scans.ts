@@ -1,7 +1,9 @@
 import "zod/compile";
 import { z } from "@hono/zod-openapi";
+import { GEO_MAX_ENGINES } from "@notra/geo-core/constants/geo";
 
 import { organizationResponseSchema } from "./content";
+import { createGeoShortTextSchema } from "./geo-fields";
 
 const scanSchema = z
   .object({
@@ -114,6 +116,21 @@ export const scanResponseSchema = z
     organization: organizationResponseSchema,
   })
   .openapi("GeoScanResponse");
+
+export const createScanRequestSchema = z
+  .object({
+    engines: z
+      .array(createGeoShortTextSchema())
+      .min(1)
+      .max(GEO_MAX_ENGINES)
+      .optional()
+      .openapi({
+        description:
+          "Run only these engines, using ids from `GET /v1/projects/{projectId}/geo/engines`, for example `[\"openai/chatgpt\"]` for one engine. An engine the project doesn't track can be tried once without tracking it. Omit to run every tracked engine. An unknown id is rejected with a 400. A scan that leaves out tracked engines doesn't count as the project's scheduled scan.",
+        example: ["openai/chatgpt"],
+      }),
+  })
+  .openapi("CreateGeoScanRequest");
 
 /**
  * The scan row is created before the workflow is handed off, so the id here is

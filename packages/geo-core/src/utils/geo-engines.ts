@@ -87,6 +87,51 @@ export function scopeGeoScanEngines(
 }
 
 /**
+ * Requested engines a this-run selection must turn down: ids the catalog
+ * doesn't know and hidden legacy models the project doesn't track. Only exact
+ * catalog ids, retired ids with a named replacement and the project's own
+ * tracked ids count as known, because the engine policy folds every unknown id
+ * of a family (`google/ai-overveiw`) into that family's default engine.
+ */
+export function unknownGeoScanEngines(
+  catalog: GeoModelCatalog,
+  tracked: readonly string[],
+  requested: readonly string[]
+): string[] {
+  const trackedIds = new Set([
+    ...tracked,
+    ...remapRetiredGeoEngineIds(tracked, false),
+  ]);
+  const scoped = new Set(scopeGeoScanEngines(catalog, tracked, requested));
+  return [
+    ...new Set(
+      requested.filter((engine) => {
+        const [named] = remapRetiredGeoEngineIds([engine], false);
+        const known =
+          named !== undefined &&
+          (getGeoModelCatalogEntry(catalog, named) !== undefined ||
+            trackedIds.has(engine) ||
+            trackedIds.has(named));
+        const [mapped] = remapRetiredGeoEngineIds([engine]);
+        return !(known && mapped && scoped.has(mapped));
+      })
+    ),
+  ];
+}
+
+/** Every engine a this-run selection may name, in catalog order. */
+export function scannableGeoScanEngines(
+  catalog: GeoModelCatalog,
+  tracked: readonly string[]
+): string[] {
+  return scopeGeoScanEngines(
+    catalog,
+    tracked,
+    catalog.models.map((model) => model.id)
+  );
+}
+
+/**
  * Whether a run's engine selection leaves out a tracked engine. Such a run
  * must not cover a scheduled project scan, or the skipped engines would go a
  * whole interval without data.

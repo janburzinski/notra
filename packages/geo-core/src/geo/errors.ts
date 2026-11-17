@@ -130,6 +130,15 @@ export class GeoScanEnginesEmptyError extends Data.TaggedError(
   readonly projectId: string;
 }> {}
 
+/** An explicit engine selection named engines this project can't scan. */
+export class GeoScanEnginesUnknownError extends Data.TaggedError(
+  "GeoScanEnginesUnknownError"
+)<{
+  readonly projectId: string;
+  readonly engines: readonly string[];
+  readonly message: string;
+}> {}
+
 export class GeoProjectNotFoundError extends Data.TaggedError(
   "GeoProjectNotFoundError"
 )<{
@@ -304,6 +313,7 @@ export type GeoRouterError =
   | GeoSampleDataDisabledError
   | GeoScanAlreadyRunningError
   | GeoScanEnginesEmptyError
+  | GeoScanEnginesUnknownError
   | GeoScanStartError
   | GeoSequenceCreateFailedError
   | GeoSequenceLimitError

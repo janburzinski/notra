@@ -140,7 +140,9 @@ import {
 import { engineFamilyOf } from "../utils/geo-engine-family";
 import {
   remapRetiredGeoEngineIds,
+  scannableGeoScanEngines,
   scopeGeoScanEngines,
+  unknownGeoScanEngines,
 } from "../utils/geo-engines";
 import { withPromptLanguage } from "../utils/geo-language-rows";
 import {
@@ -165,6 +167,7 @@ import {
   GeoPromptNotFoundError,
   GeoScanAlreadyRunningError,
   GeoScanEnginesEmptyError,
+  GeoScanEnginesUnknownError,
   GeoSettingsDisabledError,
   GeoSettingsMissingError,
   GeoSettingsTrackingError,
@@ -2276,9 +2279,48 @@ export const startGeoScanScoped = Effect.fn("geo.startScanScoped")(function* (
   );
 });
 
+/**
+ * Turns down an explicit engine selection that names an engine the scan would
+ * silently drop, so a caller asking for one engine never gets a scan of
+ * another. Internal callers that pass engines they derived themselves go
+ * straight to `startGeoScanScoped`.
+ */
+const requireScannableGeoEngines = Effect.fn("geo.requireScannableEngines")(
+  function* (input: GeoScopeInput, engines: readonly string[] | undefined) {
+    if (!engines) {
+      return;
+    }
+    const scope = yield* requireGeoProject(input);
+    const row = yield* geoDb("settings lookup failed", () =>
+      db.query.geoSettings.findFirst({
+        columns: { engines: true },
+        where: eq(geoSettings.projectId, scope.projectId),
+      })
+    );
+    if (!row) {
+      // startGeoScanScoped reports the missing settings.
+      return;
+    }
+    const catalog = yield* loadGeoModelCatalog(scope.organizationId);
+    const tracked = row.engines ?? [];
+    const unknown = unknownGeoScanEngines(catalog, tracked, engines);
+    if (unknown.length === 0) {
+      return;
+    }
+    return yield* Effect.fail(
+      new GeoScanEnginesUnknownError({
+        projectId: scope.projectId,
+        engines: unknown,
+        message: `Unknown engines: ${unknown.join(", ")}. Engines this project can scan: ${scannableGeoScanEngines(catalog, tracked).join(", ")}`,
+      })
+    );
+  }
+);
+
 export const startGeoScan = Effect.fn("geo.startScan")(function* (
   input: GeoScanStartInput
 ) {
+  yield* requireScannableGeoEngines(input, input.engines);
   return yield* startGeoScanScoped(input, undefined, input.engines);
 });
 
@@ -2297,7 +2339,9 @@ export const startGeoPromptRescan = Effect.fn("geo.rescanPrompt")(function* (
       new GeoPromptNotFoundError({ promptId: input.promptId })
     );
   }
-  return yield* startGeoScanScoped(input, [prompt.id], input.engines);
+  yield* requireScannableGeoEngines(input, input.engines);
+  const started = yield* startGeoScanScoped(input, [prompt.id], input.engines);
+  return { ...started, prompt: prompt.prompt };
 });
 
 export const loadGeoScanStatus = Effect.fn("geo.scanStatus")(function* (

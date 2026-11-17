@@ -13,6 +13,7 @@ import {
   resolveGeoGroundedZdrMode,
   resolveTrackedEngines,
   scopeGeoScanEngines,
+  unknownGeoScanEngines,
 } from "../src/utils/geo-engines";
 import {
   hasGroundedVariant,
@@ -236,5 +237,42 @@ describe("partial engine scope", () => {
         ["spacexai/grok-4.20-non-reasoning"]
       )
     ).toBe(false);
+  });
+});
+
+describe("explicit scan engine selections", () => {
+  test("names the engines a scan would silently drop", () => {
+    // Models no policy swaps for another, so the request names what runs.
+    const [visible, hiddenModel] = catalog.models.filter(
+      (model) =>
+        !model.hidden && remapRetiredGeoEngineIds([model.id])[0] === model.id
+    );
+    if (!(visible && hiddenModel)) {
+      throw new Error("The seed catalog needs two visible models");
+    }
+    const withHidden: GeoModelCatalog = {
+      ...catalog,
+      models: catalog.models.map((model) =>
+        model.id === hiddenModel.id ? { ...model, hidden: true } : model
+      ),
+    };
+
+    // A retired id maps to its replacement, so it isn't unknown.
+    expect(
+      unknownGeoScanEngines(
+        withHidden,
+        [],
+        [visible.id, "spacexai/grok-4.6", "acme/nope", hiddenModel.id]
+      )
+    ).toEqual(["acme/nope", hiddenModel.id]);
+    // The engine policy folds unknown family ids into the family default,
+    // so a typo must not pass as that default.
+    expect(
+      unknownGeoScanEngines(withHidden, [], ["google/ai-overveiw"])
+    ).toEqual(["google/ai-overveiw"]);
+    // A hidden model the project already tracks can still run.
+    expect(
+      unknownGeoScanEngines(withHidden, [hiddenModel.id], [hiddenModel.id])
+    ).toEqual([]);
   });
 });

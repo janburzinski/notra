@@ -3,6 +3,8 @@ import { loadGeoOverviewForTool } from "@notra/ai/utils/geo-tool-data";
 import {
   defineWorkflowBlock,
   halt,
+  next,
+  requireStepState,
   succeed,
 } from "@notra/workflows/runtime/registry";
 import { FatalError } from "workflow";
@@ -19,11 +21,17 @@ import {
 } from "@/lib/autopilot/workflows/agent";
 import { loadIsOwnBrand } from "@/lib/autopilot/workflows/own-brands";
 import {
+  collectAutopilotPromptScan,
+  startAutopilotPromptScan,
+} from "@/lib/autopilot/workflows/scan-prompt";
+import {
   askAgentConfigSchema,
   decideConfigSchema,
   compareVisibilityConfigSchema,
   postToSlackConfigSchema,
+  scanPromptConfigSchema,
 } from "@/schemas/autopilot-workflows";
+import type { AutopilotPromptScanState } from "@/types/autopilot-workflows";
 import { autopilotWorkflowAgentPrompt } from "@/utils/autopilot-workflows";
 
 function geoSummary(params: {
@@ -79,6 +87,64 @@ export const customAutopilotBlocks = [
         summary: geoSummary({ days: config.days, checks, mentions, leader }),
       });
     },
+  }),
+  defineWorkflowBlock<typeof scanPromptConfigSchema, AutopilotPromptScanState>({
+    type: AUTOPILOT_WORKFLOW_BLOCK_TYPES.scanPrompt,
+    kind: "task",
+    title: "Scan a prompt",
+    description:
+      "Asks AI engines one tracked prompt again now, on every engine the project tracks or only the engines listed (one engine is fine), and waits up to 4 minutes for the answers. Uses the workspace's AI answers like a rescan in GEO. Output: scanId, status (running, completed or failed), finished (false when engines were still answering at the deadline), prompt, engines, checks, mentions, mentionRate (0 to 1), results [{engine, language, mentioned, position, competitors, excerpt}], summary.",
+    configSchema: scanPromptConfigSchema,
+    steps: [
+      {
+        id: "start",
+        title: "Start the scan",
+        // Not a side effect, so a failed start retries. A repeat can't start or
+        // bill the scan twice: after a started or ambiguous hand-off the
+        // project's scan claim is still held, so it halts as already running.
+        run: async ({ organizationId, config }) => {
+          const started = await startAutopilotPromptScan({
+            organizationId,
+            projectId: config.projectId,
+            promptId: config.promptId,
+            engines: config.engines,
+          });
+          if (started.ok) {
+            return next({ scanId: started.scanId, prompt: started.prompt });
+          }
+          if (started.outcome === "halt") {
+            return halt(started.reason);
+          }
+          if (started.outcome === "fail") {
+            throw new FatalError(started.reason);
+          }
+          throw new Error(started.reason);
+        },
+      },
+      {
+        id: "collect",
+        title: "Wait for the answers",
+        run: async ({ organizationId, state }) => {
+          const { scanId, prompt } = requireStepState(
+            state,
+            "scanId",
+            "prompt"
+          );
+          const scan = await collectAutopilotPromptScan({
+            organizationId,
+            scanId,
+            prompt,
+          });
+          if (!scan) {
+            throw new FatalError("The scan was deleted before it finished");
+          }
+          if (scan.status === "failed" && scan.checks === 0) {
+            throw new FatalError(scan.summary);
+          }
+          return succeed(scan);
+        },
+      },
+    ],
   }),
   defineWorkflowBlock({
     type: AUTOPILOT_WORKFLOW_BLOCK_TYPES.askAgent,
