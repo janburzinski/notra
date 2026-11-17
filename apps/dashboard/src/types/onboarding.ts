@@ -42,6 +42,7 @@ export interface OnboardingExistingOrg {
 export interface WorkspaceFormProps {
   existingOrg?: OnboardingExistingOrg;
   progressHrefs?: OnboardingProgressHrefs;
+  suggestedWebsite?: string;
 }
 
 export interface WorkspaceSlugCheck {

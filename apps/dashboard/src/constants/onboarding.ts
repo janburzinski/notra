@@ -87,9 +87,9 @@ export const ONBOARDING_PREVIEW_PAGE_PATHS: Record<
 };
 
 export const WORKSPACE_FIELD_INPUT_IDS = [
+  ["websiteUrl", "website"],
   ["name", "name"],
   ["slug", "slug"],
-  ["websiteUrl", "website"],
   ["heardAboutNotraSource", "heard-about-notra"],
   ["heardAboutNotraOther", "heard-about-notra-other"],
 ] as const;

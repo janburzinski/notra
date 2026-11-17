@@ -57,6 +57,15 @@ export function onboardingPreviewFocusProps(
   };
 }
 
+// ponytail: first hostname label ("unkey.com" -> "Unkey"), subdomains guess wrong; users can edit
+export function companyNameFromWebsite(website: string): string {
+  const label =
+    onboardingPreviewHost(website)
+      .replace(/^www\./i, "")
+      .split(".")[0] ?? "";
+  return label.charAt(0).toUpperCase() + label.slice(1);
+}
+
 export function onboardingPreviewHost(website: string | undefined): string {
   return stripWebsitePrefix(website ?? "").split("/")[0] ?? "";
 }

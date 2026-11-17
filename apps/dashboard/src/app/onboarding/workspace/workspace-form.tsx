@@ -44,6 +44,7 @@ import type {
   WorkspaceFormProps,
 } from "@/types/onboarding";
 import {
+  companyNameFromWebsite,
   focusFirstInvalidWorkspaceField,
   isHeardAboutNotraSource,
   onboardingPreviewFocusProps,
@@ -54,6 +55,7 @@ const WEBSITE_PREFIX_REGEX = /^https?:\/\//i;
 export function WorkspaceForm({
   existingOrg,
   progressHrefs,
+  suggestedWebsite,
 }: WorkspaceFormProps) {
   const t = useTranslations("onboarding.workspace");
   const tCommon = useTranslations("common");
@@ -66,7 +68,10 @@ export function WorkspaceForm({
     ONBOARDING_WEBSITE_PARAM,
     parseAsOnboardingWebsite
   );
-  const initialWebsite = existingOrg?.websiteUrl ?? websiteParam ?? "";
+  const initialWebsite =
+    existingOrg?.websiteUrl ?? websiteParam ?? suggestedWebsite ?? "";
+  const initialName =
+    existingOrg?.name ?? companyNameFromWebsite(initialWebsite);
   const logo = useWorkspaceLogo(existingOrg, initialWebsite);
   const existingSource = existingOrg?.heardAboutNotraSource;
   const initialSource = isHeardAboutNotraSource(existingSource)
@@ -80,8 +85,8 @@ export function WorkspaceForm({
     defaultValues: {
       heardAboutNotraOther: existingOrg?.heardAboutNotraOther ?? "",
       heardAboutNotraSource: initialSource,
-      name: existingOrg?.name ?? "",
-      slug: existingOrg?.slug ?? "",
+      name: initialName,
+      slug: existingOrg?.slug ?? slugifyOrganization(initialName),
       websiteUrl: initialWebsite,
       dailySummary: existingOrg?.dailySummary ?? true,
       marketingEmails: existingOrg?.marketingEmails ?? false,
@@ -114,7 +119,17 @@ export function WorkspaceForm({
     wait: COMPANY_LOGO_DEBOUNCE_MS,
   });
   const [previewFocus, setPreviewFocus] =
-    useState<OnboardingPreviewFocus | null>(isResuming ? null : "name");
+    useState<OnboardingPreviewFocus | null>(isResuming ? null : "website");
+  const setName = (nextName: string) => {
+    const currentSlug = form.getFieldValue("slug");
+    if (
+      !currentSlug ||
+      currentSlug === slugifyOrganization(form.getFieldValue("name"))
+    ) {
+      form.setFieldValue("slug", slugifyOrganization(nextName));
+    }
+    form.setFieldValue("name", nextName);
+  };
   const slugStatus = useWorkspaceSlugStatus(
     slug,
     !isResuming &&
@@ -163,6 +178,43 @@ export function WorkspaceForm({
         }}
       >
         <form.Field
+          name="websiteUrl"
+          validators={{
+            onSubmit: onboardingWorkspaceFormFieldsSchema.shape.websiteUrl,
+          }}
+        >
+          {(field) => (
+            <PrefixedInputField
+              error={fieldError(field.name, field.state.meta.errors)}
+              id="website"
+              inputClassName="flex-1 px-3.5"
+              inputProps={{
+                autoFocus: !existingOrg?.hasBrand,
+                disabled: isSubmitting || Boolean(existingOrg?.hasBrand),
+                onBlur: field.handleBlur,
+                onChange: (e) => {
+                  const currentName = form.getFieldValue("name");
+                  if (
+                    !isResuming &&
+                    (!currentName ||
+                      currentName === companyNameFromWebsite(field.state.value))
+                  ) {
+                    setName(companyNameFromWebsite(e.target.value));
+                  }
+                  field.handleChange(e.target.value);
+                  logo.setWebsiteValue(e.target.value);
+                },
+                placeholder: "acme.com",
+                value: field.state.value.replace(WEBSITE_PREFIX_REGEX, ""),
+              }}
+              label={tCommon("labels.website")}
+              preview="website"
+              prefix="https://"
+            />
+          )}
+        </form.Field>
+
+        <form.Field
           name="name"
           validators={{
             onChange: onboardingWorkspaceFormFieldsSchema.shape.name,
@@ -184,24 +236,11 @@ export function WorkspaceForm({
                       : undefined
                   }
                   aria-invalid={field.state.meta.errors.length > 0}
-                  autoFocus={!isResuming}
                   className="h-11 rounded-xl px-3.5"
                   disabled={isSubmitting || isResuming}
                   id="name"
                   onBlur={field.handleBlur}
-                  onChange={(e) => {
-                    field.handleChange(e.target.value);
-                    const currentSlug = form.getFieldValue("slug");
-                    if (
-                      !currentSlug ||
-                      currentSlug === slugifyOrganization(field.state.value)
-                    ) {
-                      form.setFieldValue(
-                        "slug",
-                        slugifyOrganization(e.target.value)
-                      );
-                    }
-                  }}
+                  onChange={(e) => setName(e.target.value)}
                   placeholder={tCommon("labels.acmeInc")}
                   type="text"
                   value={field.state.value}
@@ -253,35 +292,6 @@ export function WorkspaceForm({
             >
               <SlugStatusIndicator status={slugStatus} />
             </PrefixedInputField>
-          )}
-        </form.Field>
-
-        <form.Field
-          name="websiteUrl"
-          validators={{
-            onSubmit: onboardingWorkspaceFormFieldsSchema.shape.websiteUrl,
-          }}
-        >
-          {(field) => (
-            <PrefixedInputField
-              error={fieldError(field.name, field.state.meta.errors)}
-              id="website"
-              inputClassName="flex-1 px-3.5"
-              inputProps={{
-                autoFocus: isResuming && !existingOrg?.hasBrand,
-                disabled: isSubmitting || Boolean(existingOrg?.hasBrand),
-                onBlur: field.handleBlur,
-                onChange: (e) => {
-                  field.handleChange(e.target.value);
-                  logo.setWebsiteValue(e.target.value);
-                },
-                placeholder: "acme.com",
-                value: field.state.value.replace(WEBSITE_PREFIX_REGEX, ""),
-              }}
-              label={tCommon("labels.website")}
-              preview="website"
-              prefix="https://"
-            />
           )}
         </form.Field>
 

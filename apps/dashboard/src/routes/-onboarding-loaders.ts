@@ -32,6 +32,7 @@ import {
 import { hasPaidSubscriptionHistory } from "@/lib/billing/subscription";
 import { resolveGeoAccessLevel } from "@/lib/geo/access-level.server";
 import { redirectIfAnyOrganizationHasPaidHistory } from "@/lib/onboarding/billing-gate";
+import { resolveCompanyDomain } from "@/lib/onboarding/company-domain";
 import { redirectIfOnboardingDismissed } from "@/lib/onboarding/dismissal";
 import { resolveOnboardingVariant } from "@/lib/onboarding/experiment";
 import { redirectToPendingInvitation } from "@/lib/organizations/domain-invites";
@@ -202,7 +203,12 @@ export const loadOnboardingWorkspace = createServerFn({ method: "GET" })
     if (!organization) {
       await redirectIfAnyOrganizationHasPaidHistory();
       await redirectToPendingInvitation(sessionUser);
-      return { existingOrg: undefined, progressHrefs: undefined };
+      return {
+        existingOrg: undefined,
+        progressHrefs: undefined,
+        suggestedWebsite: resolveCompanyDomain({ email: sessionUser.email })
+          ?.domain,
+      };
     }
     await redirectIfOnboardingDismissed(
       organization.id,
