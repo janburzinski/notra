@@ -38,20 +38,37 @@ function SuggestionCard({
   const t = useTranslations("chat.suggestions.sources");
   return (
     <button
-      className="bg-muted/70 hover:bg-muted duration-fast flex h-full w-full cursor-pointer flex-col items-start gap-1.5 rounded-xl px-3.5 py-3 text-left transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+      className="border-table-card-border bg-table-card shadow-table-card hover:bg-muted/30 disabled:hover:bg-table-card focus-visible:ring-ring/50 duration-fast flex h-full w-full cursor-pointer items-start gap-3 rounded-xl border p-3 text-left transition-colors outline-none focus-visible:ring-3 disabled:cursor-not-allowed disabled:opacity-50"
       disabled={disabled}
       onClick={() => onSelect(suggestion.prompt)}
       type="button"
     >
-      <span className="text-muted-foreground flex items-center gap-1.5 text-xs">
-        <HugeiconsIcon className="size-3.5 shrink-0" icon={suggestion.icon} />
-        {showSource ? t(suggestion.source) : null}
+      <span className="bg-background text-muted-foreground ring-foreground/10 flex size-8 shrink-0 items-center justify-center rounded-lg ring-1">
+        <HugeiconsIcon
+          className="size-4"
+          icon={suggestion.icon}
+          strokeWidth={1.75}
+        />
       </span>
-      <span className="text-foreground line-clamp-2 text-sm font-medium tracking-tight">
-        {suggestion.title}
-      </span>
-      <span className="text-muted-foreground line-clamp-1 text-xs">
-        {suggestion.description}
+      {/* Every line is single so all cards match the skeleton height and the
+          composer doesn't move when suggestions load. */}
+      <span className="flex min-w-0 flex-1 flex-col gap-0.5">
+        <span className="flex min-w-0 items-baseline gap-2">
+          <span
+            className="text-foreground min-w-0 truncate text-sm font-medium tracking-tight"
+            title={suggestion.title}
+          >
+            {suggestion.title}
+          </span>
+          {showSource ? (
+            <span className="text-muted-foreground ml-auto shrink-0 text-xs">
+              {t(suggestion.source)}
+            </span>
+          ) : null}
+        </span>
+        <span className="text-muted-foreground truncate text-xs">
+          {suggestion.description}
+        </span>
       </span>
     </button>
   );
@@ -120,7 +137,7 @@ export function ChatHomeSuggestions({
         {isLoading ? (
           <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
             {SKELETON_KEYS.map((key) => (
-              <Skeleton className="h-21 rounded-xl" key={key} />
+              <Skeleton className="h-16 rounded-xl" key={key} />
             ))}
           </div>
         ) : (
