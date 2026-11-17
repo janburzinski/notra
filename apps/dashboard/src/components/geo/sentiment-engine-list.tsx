@@ -1,19 +1,29 @@
 import {
+  GEO_MENTION_FADE_HEIGHT_REM,
+  GEO_MENTION_ROW_HEIGHT_REM,
+  GEO_MENTION_SUMMARY_VISIBLE,
+} from "@notra/geo-core/constants/geo";
+import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@notra/ui/components/ui/tooltip";
-import { InstrumentModule } from "ui/card";
 import { useFormatter, useTranslations } from "use-intl";
 
 import { EngineIcon } from "@/components/geo/engine-icon";
-import { SentimentDistributionBar } from "@/components/geo/sentiment-distribution-bar";
 import {
   SENTIMENT_POLARITIES,
   SENTIMENT_POLARITY_STYLES,
 } from "@/constants/geo-sentiment";
+import { useScrollOverflow } from "@/lib/hooks/use-scroll-overflow";
 import { cn } from "@/lib/utils";
 import type { SentimentFamilyBucket } from "@/types/geo-sentiment";
+
+const ROW_STYLE = { height: `${GEO_MENTION_ROW_HEIGHT_REM}rem` } as const;
+const LIST_STYLE = {
+  maxHeight: `${GEO_MENTION_SUMMARY_VISIBLE * GEO_MENTION_ROW_HEIGHT_REM + GEO_MENTION_FADE_HEIGHT_REM}rem`,
+  scrollbarWidth: "none",
+} as const;
 
 export function SentimentEngineList({
   families,
@@ -22,65 +32,105 @@ export function SentimentEngineList({
 }) {
   const t = useTranslations("geo.sentimentBreakdown");
   const tCommon = useTranslations("common.labels");
+  const tGeoShared = useTranslations("geo.shared");
   const format = useFormatter();
+  const { ref, atEnd } = useScrollOverflow<HTMLDivElement>(families.length);
+
   return (
-    <InstrumentModule
-      bodyClassName="flex min-h-0 flex-col divide-y overflow-y-auto p-0"
-      className="h-full @min-[44rem]/main:col-span-5 @min-[44rem]/main:[contain:size]"
-      eyebrow={t("byEngine")}
-      readout={t("enginesCount", { count: families.length })}
-      variant="table"
-    >
-      {families.map(({ family, iconEngine, label, bucket }) => (
-        <Tooltip key={family}>
-          <TooltipTrigger className="hover:bg-muted/60 focus-visible:bg-muted/60 focus-visible:ring-ring grid w-full grid-cols-[minmax(0,9rem)_minmax(0,1fr)_2rem] items-center gap-4 px-5 py-2.5 text-left text-sm transition-colors outline-none focus-visible:ring-2 focus-visible:ring-inset">
-            <span className="flex min-w-0 items-center gap-2 font-medium">
-              <EngineIcon className="size-4 shrink-0" engine={iconEngine} />
-              <span className="truncate">{label}</span>
-            </span>
-            <SentimentDistributionBar bucket={bucket} className="h-1.5" />
-            <span className="text-right font-semibold tabular-nums">
-              {bucket.score === null
-                ? "—"
-                : format.number(Math.round(bucket.score))}
-            </span>
-          </TooltipTrigger>
-          <TooltipContent side="left">
-            <div className="flex min-w-40 flex-col gap-1.5 text-xs">
-              <span className="font-medium">{label}</span>
-              {bucket.classifiedMentions === 0 ? (
-                <span className="opacity-70">{t("noRatedAnswers")}</span>
-              ) : (
-                <>
-                  {SENTIMENT_POLARITIES.map((polarity) => (
-                    <span className="flex items-center gap-1.5" key={polarity}>
-                      <span
-                        aria-hidden="true"
-                        className={cn(
-                          "size-2 rounded-full",
-                          polarity === "neutral"
-                            ? "bg-background/50"
-                            : SENTIMENT_POLARITY_STYLES[polarity].fill
-                        )}
-                      />
-                      <span className="opacity-70">{tCommon(polarity)}</span>
-                      <span className="ml-auto font-medium tabular-nums">
-                        {format.number(bucket[`${polarity}Share`] ?? 0, {
-                          style: "percent",
-                          maximumFractionDigits: 1,
+    <div className="flex flex-1 flex-col gap-1">
+      <div className="flex items-center justify-between gap-3 text-sm font-medium">
+        <span>{tGeoShared("provider")}</span>
+        <span>{t("scoreColumn")}</span>
+      </div>
+      <div className="relative">
+        <div
+          aria-label={t("scoreByProvider")}
+          className="focus-visible:ring-ring relative overflow-y-auto overscroll-contain outline-none focus-visible:ring-2 [&::-webkit-scrollbar]:hidden [&>button:last-of-type]:border-b-0"
+          ref={ref}
+          role="region"
+          style={LIST_STYLE}
+          // oxlint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- The scroll region must support keyboard scrolling.
+          tabIndex={0}
+        >
+          {families.map(({ family, iconEngine, label, bucket }, index) => (
+            <Tooltip key={family}>
+              <TooltipTrigger
+                className="hover:bg-muted/50 focus-visible:bg-muted/50 grid w-full grid-cols-[1rem_minmax(0,1fr)_auto] items-center gap-1.5 border-b text-left transition-colors outline-none"
+                style={ROW_STYLE}
+              >
+                <span className="text-muted-foreground w-4 text-right text-xs tabular-nums">
+                  {index + 1}
+                </span>
+                <span className="flex min-w-0 items-center gap-2">
+                  <span className="flex size-7 shrink-0 items-center justify-center">
+                    <EngineIcon className="size-4" engine={iconEngine} />
+                  </span>
+                  <span className="truncate text-sm font-medium">{label}</span>
+                </span>
+                <span
+                  className={cn(
+                    "text-sm tabular-nums",
+                    bucket.score === null && "text-muted-foreground"
+                  )}
+                >
+                  {bucket.score === null
+                    ? "—"
+                    : format.number(Math.round(bucket.score))}
+                </span>
+              </TooltipTrigger>
+              <TooltipContent side="left">
+                <div className="flex min-w-40 flex-col gap-1.5 text-xs">
+                  <span className="font-medium">{label}</span>
+                  {bucket.classifiedMentions === 0 ? (
+                    <span className="opacity-70">{t("noRatedAnswers")}</span>
+                  ) : (
+                    <>
+                      {SENTIMENT_POLARITIES.map((polarity) => (
+                        <span
+                          className="flex items-center gap-1.5"
+                          key={polarity}
+                        >
+                          <span
+                            aria-hidden="true"
+                            className={cn(
+                              "size-2 rounded-full",
+                              polarity === "neutral"
+                                ? "bg-background/50"
+                                : SENTIMENT_POLARITY_STYLES[polarity].fill
+                            )}
+                          />
+                          <span className="opacity-70">
+                            {tCommon(polarity)}
+                          </span>
+                          <span className="ml-auto font-medium tabular-nums">
+                            {format.number(bucket[`${polarity}Share`] ?? 0, {
+                              style: "percent",
+                              maximumFractionDigits: 1,
+                            })}
+                          </span>
+                        </span>
+                      ))}
+                      <span className="opacity-70">
+                        {t("ratedAnswers", {
+                          count: bucket.classifiedMentions,
                         })}
                       </span>
-                    </span>
-                  ))}
-                  <span className="opacity-70">
-                    {t("ratedAnswers", { count: bucket.classifiedMentions })}
-                  </span>
-                </>
-              )}
-            </div>
-          </TooltipContent>
-        </Tooltip>
-      ))}
-    </InstrumentModule>
+                    </>
+                  )}
+                </div>
+              </TooltipContent>
+            </Tooltip>
+          ))}
+        </div>
+        <div
+          aria-hidden="true"
+          className={cn(
+            "from-table-card pointer-events-none absolute inset-x-0 bottom-0 bg-linear-to-t to-transparent transition-opacity duration-200 motion-reduce:transition-none",
+            atEnd ? "opacity-0" : "opacity-100"
+          )}
+          style={{ height: `${GEO_MENTION_FADE_HEIGHT_REM}rem` }}
+        />
+      </div>
+    </div>
   );
 }

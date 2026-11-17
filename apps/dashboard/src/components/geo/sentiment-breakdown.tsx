@@ -1,23 +1,13 @@
 "use client";
 
-import { formatDayLabel } from "@notra/geo-core/utils/day-label";
-import { EChartsBarChart } from "@notra/ui/components/evilcharts/charts/echarts-bar-chart";
 import { InstrumentModule } from "ui/card";
-import { useFormatter, useLocale, useTranslations } from "use-intl";
+import { useFormatter, useTranslations } from "use-intl";
 
 import { GeoStatDelta } from "@/components/geo/geo-stat-delta";
 import { SentimentEngineList } from "@/components/geo/sentiment-engine-list";
-import {
-  SENTIMENT_MIX_COLORS,
-  SENTIMENT_POLARITIES,
-  SENTIMENT_POLARITY_STYLES,
-  SENTIMENT_SCORE_FORMAT,
-} from "@/constants/geo-sentiment";
+import { SentimentTrendChart } from "@/components/geo/sentiment-trend-chart";
 import type { SentimentBreakdownProps } from "@/types/geo-sentiment";
-import {
-  sentimentFamilyBuckets,
-  sentimentScoreBand,
-} from "@/utils/geo-sentiment";
+import { sentimentFamilyBuckets } from "@/utils/geo-sentiment";
 
 export function SentimentBreakdown({
   data,
@@ -28,118 +18,86 @@ export function SentimentBreakdown({
   const tGeoShared = useTranslations("geo.shared");
   const tScore = useTranslations("geo.brandSentimentCard");
   const format = useFormatter();
-  const locale = useLocale();
   const { summary, comparison, points, engines } = data;
   const families = sentimentFamilyBuckets(engines);
-  const rows = points.map(
-    ({ day, positiveShare, neutralShare, negativeShare }) => ({
-      day,
-      positive: (positiveShare ?? 0) * 100,
-      neutral: (neutralShare ?? 0) * 100,
-      negative: (negativeShare ?? 0) * 100,
-    })
-  );
   const formatShare = (share: number | null) =>
     share === null
       ? "—"
-      : format.number(share, {
-          style: "percent",
-          minimumFractionDigits: 1,
-          maximumFractionDigits: 1,
-        });
+      : format.number(share, { style: "percent", maximumFractionDigits: 0 });
+  const scanning = isScanning ? tGeoShared("scanInProgress") : undefined;
 
   return (
     <div className="grid grid-cols-1 items-stretch gap-4 @min-[44rem]/main:grid-cols-12">
       <InstrumentModule
-        bodyClassName="flex min-h-0 flex-1 flex-col gap-4 px-5 pt-4 pb-4"
-        className="h-full @min-[44rem]/main:col-span-7"
+        className="h-full @min-[44rem]/main:col-span-5"
         eyebrow={t("eyebrow")}
         hint={tScore("scoreHint")}
-        readout={isScanning ? tGeoShared("scanInProgress") : undefined}
+        readout={scanning}
         variant="table"
       >
-        <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
-          <div className="flex items-center gap-3">
-            <p className="flex items-baseline gap-1.5 text-4xl leading-none font-semibold tracking-tight tabular-nums">
+        <div className="flex flex-1 flex-col gap-4">
+          <div className="flex items-end gap-2">
+            <p className="flex items-baseline gap-1.5 text-3xl leading-none font-semibold tracking-tight tabular-nums">
               {summary.score === null
                 ? "—"
-                : SENTIMENT_SCORE_FORMAT.format(summary.score)}
+                : format.number(Math.round(summary.score))}
               <span className="text-muted-foreground text-sm font-normal">
                 / 100
               </span>
             </p>
-            <div className="flex flex-col gap-1.5">
+            <span className="mb-0.5 inline-flex">
               <GeoStatDelta
                 delta={comparison?.delta ?? null}
                 hint={t("deltaHint")}
                 kind="score"
                 label={t("deltaLabel")}
               />
-              {summary.score === null ? null : (
-                <span className="text-muted-foreground text-xs">
-                  {t(`band.${sentimentScoreBand(summary.score)}`)}
-                </span>
-              )}
-            </div>
+            </span>
           </div>
-          <ul className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs">
-            {SENTIMENT_POLARITIES.map((polarity) => (
-              <li className="flex items-center gap-1.5" key={polarity}>
+          <div className="flex flex-col gap-1.5">
+            <div
+              aria-label={
+                summary.score === null
+                  ? t("noRatedAnswers")
+                  : t("scaleLabel", { score: Math.round(summary.score) })
+              }
+              className="relative flex h-3.5 items-center"
+              role="img"
+            >
+              <div className="from-geo-down/45 via-muted to-geo-up/45 h-1 w-full rounded-full bg-linear-to-r" />
+              {summary.score === null ? null : (
                 <span
                   aria-hidden="true"
-                  className={`size-2 rounded-full ${SENTIMENT_POLARITY_STYLES[polarity].fill}`}
+                  className="bg-foreground absolute inset-y-0 w-[3px] -translate-x-1/2 rounded-full"
+                  style={{
+                    left: `${Math.min(100, Math.max(0, summary.score))}%`,
+                  }}
                 />
-                <span className="text-muted-foreground">
-                  {tCommon(polarity)}
-                </span>
-                <span className="font-medium tabular-nums">
-                  {formatShare(summary[`${polarity}Share`])}
-                </span>
-              </li>
-            ))}
-          </ul>
+              )}
+            </div>
+            <div className="text-muted-foreground/70 text-2xs flex justify-between">
+              <span>{tCommon("negative")}</span>
+              <span>{tCommon("positive")}</span>
+            </div>
+            <p className="text-muted-foreground text-xs tabular-nums">
+              {t("mixSummary", {
+                positive: formatShare(summary.positiveShare),
+                neutral: formatShare(summary.neutralShare),
+                negative: formatShare(summary.negativeShare),
+              })}
+            </p>
+          </div>
+          <SentimentEngineList families={families} />
         </div>
-        <EChartsBarChart
-          animation={false}
-          barCategoryGap={4}
-          className="h-56 w-full cursor-crosshair"
-          config={{
-            positive: {
-              label: tCommon("positive"),
-              colors: SENTIMENT_MIX_COLORS.positive,
-            },
-            neutral: {
-              label: tCommon("neutral"),
-              colors: SENTIMENT_MIX_COLORS.neutral,
-            },
-            negative: {
-              label: tCommon("negative"),
-              colors: SENTIMENT_MIX_COLORS.negative,
-            },
-          }}
-          data={rows}
-          stackType="percent"
-          xDataKey="day"
-        >
-          <EChartsBarChart.Grid />
-          <EChartsBarChart.XAxis
-            hideDots
-            tickFormatter={(day) => formatDayLabel(day, locale)}
-          />
-          <EChartsBarChart.YAxis
-            hideDots
-            tickFormatter={(value) => `${value}%`}
-          />
-          <EChartsBarChart.Bar dataKey="positive" radius={2} />
-          <EChartsBarChart.Bar dataKey="neutral" radius={2} />
-          <EChartsBarChart.Bar dataKey="negative" radius={2} />
-          <EChartsBarChart.Tooltip
-            roundness="xl"
-            valueFormatter={(value) => `${Number(value).toFixed(1)}%`}
-          />
-        </EChartsBarChart>
       </InstrumentModule>
-      <SentimentEngineList families={families} />
+      <InstrumentModule
+        bodyClassName="flex min-h-0 flex-1 flex-col px-4 pt-1 pb-4"
+        className="h-full @min-[44rem]/main:col-span-7"
+        eyebrow={t("trendEyebrow")}
+        variant="table"
+      >
+        <SentimentTrendChart points={points} />
+      </InstrumentModule>
     </div>
   );
 }

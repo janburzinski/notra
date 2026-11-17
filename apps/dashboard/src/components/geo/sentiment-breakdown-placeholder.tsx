@@ -2,95 +2,20 @@
 
 import { Shimmer } from "@notra/ui/components/ai-elements/shimmer";
 import { Skeleton } from "@notra/ui/components/ui/skeleton";
-import type { CSSProperties } from "react";
 import { InstrumentModule } from "ui/card";
 import { useTranslations } from "use-intl";
 
 import { Button } from "@/components/button";
+import { EmptyStateTrendPreview } from "@/components/empty-state-preview";
 import {
   GEO_SENTIMENT_EMPTY_LABEL_KEYS,
-  SENTIMENT_PREVIEW_BARS,
-  SENTIMENT_PREVIEW_ENGINE_SHARES,
+  SENTIMENT_PREVIEW_ROWS,
 } from "@/constants/geo-sentiment";
 import { cn } from "@/lib/utils";
 import type { SentimentBreakdownPlaceholderProps } from "@/types/geo-sentiment";
 
 const FADE_MASK =
   "[mask-image:linear-gradient(to_bottom,black_0%,black_55%,transparent_100%)]";
-
-function MixPreview({ busy }: { busy: boolean }) {
-  return (
-    <div
-      aria-hidden="true"
-      className={cn(
-        "pointer-events-none flex h-full min-h-52 items-end gap-1 select-none",
-        busy ? "opacity-70" : "opacity-40",
-        FADE_MASK
-      )}
-    >
-      {SENTIMENT_PREVIEW_BARS.map(({ id, positive, negative }, index) => (
-        <div
-          className={cn(
-            "flex h-full flex-1 flex-col justify-end gap-0.5",
-            busy && "sentiment-scan-bar"
-          )}
-          key={id}
-          style={{ "--scan-index": index } as CSSProperties}
-        >
-          <span
-            className="bg-geo-down/20 w-full rounded-[2px]"
-            style={{ height: `${negative}%` }}
-          />
-          <span
-            className="bg-muted-foreground/15 w-full rounded-[2px]"
-            style={{ height: `${100 - positive - negative}%` }}
-          />
-          <span
-            className="bg-geo-up/25 w-full rounded-[2px]"
-            style={{ height: `${positive}%` }}
-          />
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function EnginePreview({ busy }: { busy: boolean }) {
-  return (
-    <div
-      aria-hidden="true"
-      className={cn("flex flex-col divide-y select-none", FADE_MASK)}
-    >
-      {SENTIMENT_PREVIEW_ENGINE_SHARES.map((share, index) => (
-        <div
-          className="grid grid-cols-[minmax(0,9rem)_minmax(0,1fr)_2rem] items-center gap-4 px-5 py-2.5"
-          key={share}
-        >
-          <Skeleton className="h-4 w-24 animate-none" />
-          <div className="bg-muted overflow-hidden rounded-full">
-            <div
-              className={cn(
-                "flex h-1.5 gap-0.5",
-                busy && "sentiment-scan-fill"
-              )}
-              style={{ "--scan-index": index } as CSSProperties}
-            >
-              <span
-                className="bg-geo-up/25 h-full"
-                style={{ width: `${share}%` }}
-              />
-              <span className="bg-muted-foreground/15 h-full flex-1" />
-              {index % 2 === 0 ? (
-                <span className="bg-geo-down/20 h-full w-[4%]" />
-              ) : null}
-            </div>
-          </div>
-          <Skeleton className="ml-auto h-4 w-6 animate-none" />
-        </div>
-      ))}
-    </div>
-  );
-}
 
 export function SentimentBreakdownPlaceholder({
   state,
@@ -120,13 +45,48 @@ export function SentimentBreakdownPlaceholder({
   return (
     <div className="grid grid-cols-1 items-stretch gap-4 @min-[44rem]/main:grid-cols-12">
       <InstrumentModule
-        bodyClassName="relative flex min-h-0 flex-1 flex-col p-5"
-        className="h-full @min-[44rem]/main:col-span-7"
+        className="h-full @min-[44rem]/main:col-span-5"
         eyebrow={t("eyebrow")}
         hint={tScore("scoreHint")}
         variant="table"
       >
-        <MixPreview busy={busy} />
+        <div
+          aria-hidden="true"
+          className={cn("flex flex-1 flex-col gap-4 select-none", FADE_MASK)}
+        >
+          <Skeleton className="h-7 w-24 animate-none" />
+          <Skeleton className="h-1.5 w-full animate-none rounded-full" />
+          <div className="flex flex-col">
+            {SENTIMENT_PREVIEW_ROWS.map((width) => (
+              <div
+                className="flex h-11 items-center justify-between gap-4 border-b last:border-b-0"
+                key={width}
+              >
+                <Skeleton
+                  className="h-4 animate-none"
+                  style={{ width: `${width}%` }}
+                />
+                <Skeleton className="h-4 w-6 animate-none" />
+              </div>
+            ))}
+          </div>
+        </div>
+      </InstrumentModule>
+      <InstrumentModule
+        bodyClassName="relative flex min-h-0 flex-1 flex-col px-4 pt-1 pb-4"
+        className="h-full @min-[44rem]/main:col-span-7"
+        eyebrow={t("trendEyebrow")}
+        variant="table"
+      >
+        <div
+          aria-hidden="true"
+          className={cn(
+            "pointer-events-none min-h-64 flex-1 select-none",
+            busy ? "opacity-70" : "opacity-40"
+          )}
+        >
+          <EmptyStateTrendPreview />
+        </div>
         <div
           aria-busy={busy}
           aria-label={state === "pending" ? tSkeleton("loading") : undefined}
@@ -147,14 +107,6 @@ export function SentimentBreakdownPlaceholder({
             </Button>
           ) : null}
         </div>
-      </InstrumentModule>
-      <InstrumentModule
-        bodyClassName="p-0"
-        className="h-full @min-[44rem]/main:col-span-5"
-        eyebrow={t("byEngine")}
-        variant="table"
-      >
-        <EnginePreview busy={busy} />
       </InstrumentModule>
     </div>
   );

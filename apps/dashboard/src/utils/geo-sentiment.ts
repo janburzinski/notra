@@ -5,15 +5,8 @@ import {
 } from "@notra/geo-core/utils/geo-engine-family";
 import { summarizeSentiment } from "@notra/geo-core/utils/geo-sentiment";
 
-import {
-  SENTIMENT_BAND_MIXED_MIN,
-  SENTIMENT_BAND_POSITIVE_MIN,
-  SENTIMENT_BAND_STRONG_MIN,
-} from "@/constants/geo-sentiment";
 import type {
   SentimentFamilyBucket,
-  SentimentScoreBand,
-  SentimentTrendCardProps,
   SentimentThemesMessage,
   SentimentThemesStateInput,
 } from "@/types/geo-sentiment";
@@ -90,19 +83,6 @@ export function sentimentThemesState({
     showEmpty: !loading && !isError && !showResults,
     canAnalyze,
   };
-}
-
-export function sentimentScoreBand(score: number): SentimentScoreBand {
-  if (score >= SENTIMENT_BAND_STRONG_MIN) {
-    return "strong";
-  }
-  if (score >= SENTIMENT_BAND_POSITIVE_MIN) {
-    return "positive";
-  }
-  if (score >= SENTIMENT_BAND_MIXED_MIN) {
-    return "mixed";
-  }
-  return "negative";
 }
 
 export function sentimentFamilyBuckets(

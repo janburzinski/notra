@@ -13,14 +13,8 @@ export interface SentimentDetailRow {
   evidence: SentimentTheme["evidence"];
 }
 
-export interface SentimentTrendCardProps {
-  summary?: GeoSentimentResponse["summary"];
-  retry?: () => void;
-  comparison?: GeoSentimentResponse["comparison"];
-  points: GeoSentimentResponse["points"] | undefined;
-  isPending: boolean;
-  isError: boolean;
-  isScanning: boolean;
+export interface SentimentTrendChartProps {
+  points: GeoSentimentResponse["points"];
 }
 
 export interface SentimentThemeTableProps {
@@ -75,7 +69,6 @@ export type SentimentAnalysisStatusKey =
   | "failedPrevious"
   | "failedRetry"
   | "unavailable";
-export type SentimentScoreBand = "strong" | "positive" | "mixed" | "negative";
 
 export interface SentimentBreakdownProps {
   data: GeoSentimentResponse;
@@ -87,14 +80,6 @@ export interface SentimentFamilyBucket {
   iconEngine: string;
   label: string;
   bucket: GeoSentimentResponse["summary"];
-}
-
-export interface SentimentDistributionBarProps {
-  bucket: Pick<
-    GeoSentimentResponse["summary"],
-    "positiveShare" | "neutralShare" | "negativeShare"
-  >;
-  className?: string;
 }
 
 export interface SentimentBreakdownPlaceholderProps {

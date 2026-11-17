@@ -3782,8 +3782,11 @@
     },
     "sentimentBreakdown": {
       "eyebrow": "Brand sentiment",
-      "byEngine": "By engine",
-      "enginesCount": "{count, plural, one {# engine} other {# engines}}",
+      "trendEyebrow": "Sentiment over time",
+      "scoreColumn": "Score",
+      "scoreByProvider": "Sentiment score by provider",
+      "scaleLabel": "Score {score} out of 100",
+      "mixSummary": "{positive} positive · {neutral} neutral · {negative} negative",
       "loading": {
         "title": "Loading sentiment"
       },
@@ -3799,13 +3802,7 @@
       "noRatedAnswers": "No rated answers",
       "ratedAnswers": "{count, plural, one {# rated answer} other {# rated answers}}",
       "deltaLabel": "Sentiment score",
-      "deltaHint": "vs. previous period",
-      "band": {
-        "strong": "Strongly positive",
-        "positive": "Mostly positive",
-        "mixed": "Mixed",
-        "negative": "Mostly negative"
-      }
+      "deltaHint": "vs. previous period"
     },
     "sentimentSkeleton": {
       "loading": "Loading sentiment"
