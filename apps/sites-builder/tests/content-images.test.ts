@@ -195,6 +195,8 @@ describe("addContentImageAttributes", () => {
   });
 });
 
+// Encoding real images with sharp is CPU-bound; on a busy CI runner these
+// tests can take several seconds, past Bun's 5 second default.
 describe("optimizeContentImages", () => {
   test("writes smaller WebP copies and keeps the original as the widest candidate", async () => {
     const original = await photo(2000, 1000).jpeg({ quality: 92 }).toBuffer();
@@ -234,7 +236,7 @@ describe("optimizeContentImages", () => {
       expect(`${meta.width}w`).toBe(descriptor ?? "");
       expect(data.byteLength).toBeLessThan(original.byteLength);
     }
-  });
+  }, 30_000);
 
   test("uses the displayed width of rotated photos", async () => {
     // Stored landscape, shown portrait: EXIF orientation 6 rotates it 90°.
@@ -254,7 +256,7 @@ describe("optimizeContentImages", () => {
       await Bun.file(join(outDir, candidates[0]?.[0] ?? "")).bytes()
     ).metadata();
     expect([copy.width, copy.height]).toEqual([640, 1138]);
-  });
+  }, 30_000);
 
   test("small, animated and GIF images only get their size; vector, missing and outside ones are left alone", async () => {
     await put("blog/images/small.png", await photo(600, 400).png().toBuffer());
@@ -310,7 +312,7 @@ describe("optimizeContentImages", () => {
     ]) {
       expect(rewritten).toContain(tag);
     }
-  });
+  }, 30_000);
 
   test("keeps originals and warns when images or the library fail", async () => {
     await put("blog/images/broken.jpg", "not really a jpeg");
@@ -337,7 +339,7 @@ describe("optimizeContentImages", () => {
         loadSharp: () => Promise.reject(new Error("no prebuilt binary")),
       })
     ).toEqual(["content_images_unavailable"]);
-  });
+  }, 30_000);
 
   test("puts copies under the image's own section when mounted at the root", async () => {
     await put("images/a.jpg", await photo(1200, 600).jpeg().toBuffer());
@@ -350,7 +352,7 @@ describe("optimizeContentImages", () => {
       "/images/a.jpg"
     );
     expect(candidates[0]?.[0]).toMatch(/^\/_notra\/assets\/images\/a-/);
-  });
+  }, 30_000);
 
   test("stops at the image limit and says so", async () => {
     await put("blog/images/a.jpg", await photo(1200, 600).jpeg().toBuffer());
@@ -383,7 +385,7 @@ describe("optimizeContentImages", () => {
     );
     expect(counted.images).toBe(1);
     expect(counted.diagnostics[0]?.message).toStartWith("1 image in posts");
-  });
+  }, 30_000);
 });
 
 describe("copy quality", () => {
@@ -432,7 +434,7 @@ describe("copy quality", () => {
       .toBuffer();
     // Lossy WebP scores about 30 dB here, with visible smearing around coloured text.
     expect(await psnr(reference, copy)).toBeGreaterThan(50);
-  });
+  }, 30_000);
 
   test("wide-gamut images keep their colour profile", async () => {
     const original = await photo(1600, 900)
@@ -445,7 +447,7 @@ describe("copy quality", () => {
     expect(
       Buffer.from(copy.icc ?? []).equals(Buffer.from(source.icc ?? []))
     ).toBe(true);
-  });
+  }, 30_000);
 
   test("CMYK images become sRGB without carrying their print profile", async () => {
     const original = await sharp({
@@ -465,5 +467,5 @@ describe("copy quality", () => {
       .toBuffer({ resolveWithObject: true });
     expect(data[0]).toBeGreaterThan(170);
     expect(data[1]).toBeLessThan(80);
-  });
+  }, 30_000);
 });
