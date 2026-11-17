@@ -7,7 +7,6 @@ COPY apps/ai-traffic-ingest/package.json ./apps/ai-traffic-ingest/package.json
 COPY apps/api/package.json ./apps/api/package.json
 COPY apps/dashboard/package.json ./apps/dashboard/package.json
 COPY apps/docs/package.json ./apps/docs/package.json
-COPY apps/onboarding-agent/package.json ./apps/onboarding-agent/package.json
 COPY apps/ui/package.json ./apps/ui/package.json
 COPY apps/web/package.json ./apps/web/package.json
 COPY packages/ai/package.json ./packages/ai/package.json

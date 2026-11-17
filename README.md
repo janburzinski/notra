@@ -54,7 +54,7 @@ Notra is a Bun and Turborepo monorepo, built with TypeScript, React, Hono, Postg
 | `apps/web` | Public website at [www.usenotra.com](https://www.usenotra.com) |
 | `apps/api` | Public Hono REST API |
 | `apps/docs` | Product documentation |
-| `apps/agent`, `apps/onboarding-agent` | Content and onboarding agents |
+| `apps/agent` | Notra agent (chat, content and image generation) |
 | `apps/ui` | Blume UI app |
 | `packages/geo-core` | Shared GEO logic |
 | `packages/db` | Database schema and helpers |

@@ -135,7 +135,7 @@ function AutomationTemplateCard({
  * description on the inner panel, "trigger → action" underneath. `corner`
  * sits top right outside the clickable area, for controls like dismiss.
  */
-export function AutomationCard({
+function AutomationCard({
   icon,
   tone,
   title,

@@ -3,7 +3,7 @@
 import { Skeleton } from "@notra/ui/components/ui/skeleton";
 import { Tabs, TabsList, TabsTrigger } from "@notra/ui/components/ui/tabs";
 import { useQuery } from "@tanstack/react-query";
-import { useMemo, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useTranslations } from "use-intl";
 
 import { GeoAlertForm } from "@/components/automation/alerts/geo-alert-form";
@@ -22,17 +22,9 @@ import { useOrganizationsContext } from "@/components/providers/organization-pro
 import { AUTOMATION_TEMPLATES } from "@/constants/automation-templates";
 import { useAutomationQueries } from "@/lib/hooks/use-automation-mutations";
 import { useAutomationRuns } from "@/lib/hooks/use-automation-runs";
-import {
-  useDismissOnboardingSuggestion,
-  useOnboardingSuggestions,
-} from "@/lib/hooks/use-onboarding";
 import { useRouter, useSearchParams } from "@/lib/navigation";
 import { dashboardOrpc } from "@/lib/orpc/query";
 import type { AutomationTemplate } from "@/types/automation/automations";
-import {
-  eventPresetFromSuggestion,
-  scheduleValuesFromSuggestion,
-} from "@/utils/onboarding-suggestions";
 
 function isFormKind(value: string | null): value is AutomationFormKind {
   return value === "alert" || value === "schedule" || value === "event";
@@ -54,23 +46,6 @@ export default function PageClient({
   const { getOrganization } = useOrganizationsContext();
   const organizationId = getOrganization(organizationSlug)?.id;
   const { invalidate } = useAutomationQueries(organizationId);
-  const { mutate: dismissSuggestion } = useDismissOnboardingSuggestion();
-  const suggestionId = searchParams.get("suggestion");
-  const suggestions = useOnboardingSuggestions(
-    suggestionId ? (organizationId ?? "") : ""
-  );
-  const suggestion = suggestionId
-    ? suggestions.data?.find((item) => item.id === suggestionId)
-    : undefined;
-  // Memoized so the schedule form doesn't reset on every render.
-  const suggestionScheduleValues = useMemo(
-    () => (suggestion ? scheduleValuesFromSuggestion(suggestion) : undefined),
-    [suggestion]
-  );
-  const suggestionEventPreset = useMemo(
-    () => (suggestion ? eventPresetFromSuggestion(suggestion) : null),
-    [suggestion]
-  );
 
   const template: AutomationTemplate | undefined = AUTOMATION_TEMPLATES.find(
     (item) => item.id === searchParams.get("template")
@@ -113,9 +88,6 @@ export default function PageClient({
   const onSaved = () => {
     refreshed.current = invalidate();
     stayAfterSave.current = !!triggerId;
-    if (organizationId && suggestionId) {
-      dismissSuggestion({ organizationId, suggestionId });
-    }
   };
 
   const editAlert = alerts.data?.alerts.find((item) => item.id === triggerId);
@@ -135,9 +107,8 @@ export default function PageClient({
   }
 
   const editLoading =
-    (!!triggerId &&
-      (schedules.isPending || events.isPending || alerts.isPending)) ||
-    (!!suggestionId && suggestions.isPending);
+    !!triggerId &&
+    (schedules.isPending || events.isPending || alerts.isPending);
   const editMissing =
     !!triggerId && !editLoading && !(editAlert || editSchedule || editEvent);
 
@@ -175,13 +146,12 @@ export default function PageClient({
         <ScheduleForm
           kindPicker={kindPicker}
           editTrigger={editSchedule}
-          key={`schedule-${triggerId ?? template?.id ?? suggestionId ?? "new"}`}
+          key={`schedule-${triggerId ?? template?.id ?? "new"}`}
           onOpenChange={(open) => !open && close()}
           onSuccess={onSaved}
           open
           organizationId={organizationId}
           presetId={template?.kind === "schedule" ? template.presetId : null}
-          presetValues={suggestionScheduleValues}
         />
       );
     } else {
@@ -189,14 +159,12 @@ export default function PageClient({
         <EventTriggerForm
           kindPicker={kindPicker}
           editTrigger={editEvent}
-          key={`event-${triggerId ?? template?.id ?? suggestionId ?? "new"}`}
+          key={`event-${triggerId ?? template?.id ?? "new"}`}
           onOpenChange={(open) => !open && close()}
           onSuccess={onSaved}
           open
           organizationId={organizationId}
-          preset={
-            template?.kind === "event" ? template.preset : suggestionEventPreset
-          }
+          preset={template?.kind === "event" ? template.preset : null}
         />
       );
     }

@@ -1,29 +1,15 @@
 import type { CSSProperties, ReactNode } from "react";
 
-import type { InitialOnboardingAgentRun } from "@/types/hooks/onboarding";
-
 export interface DashboardShellProps {
   children: ReactNode;
   demoBannerHidden: boolean;
-  initialOnboardingAgentRun: InitialOnboardingAgentRun;
   initialSidebarOpen: boolean;
   initialSidebarWidth: number;
-  onboardingBannerDismissed: boolean;
-}
-
-export interface DashboardOnboardingBannerProps {
-  available: boolean;
-  dismissing: boolean;
-  onDismiss: () => void;
-  onExitComplete: () => void;
-  onStart: () => void;
-  running: boolean;
-  starting: boolean;
-  visible: boolean;
 }
 
 export interface DashboardShellStyle extends CSSProperties {
-  "--eve-banner-height": string;
+  "--top-banner-height": string;
+  "--dashboard-banner-height": string;
   "--demo-banner-height"?: string;
 }
 

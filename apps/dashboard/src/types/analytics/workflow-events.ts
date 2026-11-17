@@ -57,8 +57,3 @@ export interface StepErrorContext {
   step: string;
   organizationId?: string | null;
 }
-
-export interface OnboardingAgentStartedInput {
-  organizationId: string;
-  runId?: string;
-}

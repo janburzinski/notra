@@ -4,7 +4,6 @@ export const WORKFLOW_ANALYTICS_NAMES = {
   BRAND_ANALYSIS: "brand-analysis",
   BRAND_GUIDELINES: "brand-guidelines",
   CHAT: "chat",
-  ONBOARDING_AGENT: "onboarding-agent",
   SCHEDULE_CONTENT: "schedule-content",
   EVENT_CONTENT: "event-content",
   SOCIAL_ANALYTICS_SYNC: "social-analytics-sync",

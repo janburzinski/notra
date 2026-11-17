@@ -1,19 +1,11 @@
-import type { LookupAddress } from "node:dns";
-import { request as httpRequest } from "node:http";
-import { request as httpsRequest } from "node:https";
 import { isIP } from "node:net";
 
-import { assertPublicHttpUrl, resolvePublicHttpUrl } from "@notra/utils/url";
+import { assertPublicHttpUrl } from "@notra/utils/url";
 import { DOMAINS } from "free-email-domains-list";
 import { isValid as isNotDisposableEmail } from "mailchecker";
 
-import {
-  SERVER_ERROR_STATUS,
-  WEBSITE_REACHABILITY_MAX_REDIRECTS,
-  WEBSITE_REACHABILITY_TIMEOUT_MS,
-  WWW_PREFIX_PATTERN,
-} from "@/constants/onboarding-agent";
-import type { CompanyDomainResolution } from "@/types/onboarding-agent";
+import { WWW_PREFIX_PATTERN } from "@/constants/company-domain";
+import type { CompanyDomainResolution } from "@/types/onboarding";
 
 function extractDomain(value: string): string | null {
   const trimmed = value.trim().toLowerCase();
@@ -60,101 +52,4 @@ export function resolveCompanyDomain({
   }
 
   return null;
-}
-
-function requestWebsiteAddress(
-  url: URL,
-  method: "HEAD" | "GET",
-  address: LookupAddress,
-  signal: AbortSignal
-) {
-  const request = url.protocol === "https:" ? httpsRequest : httpRequest;
-  return new Promise<readonly [number, string | null]>((resolve, reject) => {
-    const outgoingRequest = request(
-      url,
-      {
-        family: address.family,
-        lookup: (_hostname, options, callback) => {
-          queueMicrotask(() => {
-            if (options.all) {
-              callback(null, [address]);
-              return;
-            }
-            callback(null, address.address, address.family);
-          });
-        },
-        method,
-        signal,
-      },
-      (response) => {
-        const status = response.statusCode ?? SERVER_ERROR_STATUS;
-        const location = response.headers.location ?? null;
-        response.destroy();
-        resolve([status, location]);
-      }
-    );
-    outgoingRequest.once("error", reject);
-    outgoingRequest.end();
-  });
-}
-
-async function requestWebsiteUrl(
-  url: URL,
-  method: "HEAD" | "GET",
-  signal: AbortSignal
-) {
-  const addresses = await resolvePublicHttpUrl(url.toString());
-  let lastError: unknown;
-  for (const address of addresses) {
-    try {
-      const [status, location] = await requestWebsiteAddress(
-        url,
-        method,
-        address,
-        signal
-      );
-      return { location, status };
-    } catch (error) {
-      lastError = error;
-    }
-  }
-  throw lastError ?? new Error(`Could not connect to ${url.hostname}`);
-}
-
-async function fetchWebsite(domain: string, method: "HEAD" | "GET") {
-  const signal = AbortSignal.timeout(WEBSITE_REACHABILITY_TIMEOUT_MS);
-  let url = new URL(`https://${domain}`);
-  let redirectsRemaining = WEBSITE_REACHABILITY_MAX_REDIRECTS;
-  while (true) {
-    const response = await requestWebsiteUrl(url, method, signal);
-    if (
-      response.status < 300 ||
-      response.status >= 400 ||
-      response.location === null
-    ) {
-      return { status: response.status, url: url.toString() };
-    }
-    if (redirectsRemaining === 0) {
-      throw new Error(`Too many redirects while checking ${domain}`);
-    }
-    redirectsRemaining -= 1;
-    url = new URL(response.location, url);
-  }
-}
-
-async function resolveWebsiteMethodUrl(domain: string, method: "HEAD" | "GET") {
-  return await fetchWebsite(domain, method).then(
-    (result) => (result.status < SERVER_ERROR_STATUS ? result.url : null),
-    () => null
-  );
-}
-
-export async function resolveReachableWebsiteUrl(
-  domain: string
-): Promise<string | null> {
-  const headUrl = await resolveWebsiteMethodUrl(domain, "HEAD");
-  if (headUrl) {
-    return headUrl;
-  }
-  return await resolveWebsiteMethodUrl(domain, "GET");
 }

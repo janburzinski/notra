@@ -22,7 +22,6 @@ export const POSTHOG_EVENTS = {
   WORKSPACE_CREATED: "workspace_created",
   ONBOARDING_BRAND_ANALYSIS_STARTED: "onboarding_brand_analysis_started",
   ONBOARDING_BRAND_ANALYSIS_FAILED: "onboarding_brand_analysis_failed",
-  ONBOARDING_AGENT_STARTED: "onboarding_agent_started",
   ONBOARDING_AGENT_COMPLETED: "onboarding_agent_completed",
   ONBOARDING_AGENT_FAILED: "onboarding_agent_failed",
   WEBSITE_DISCOVERED: "website_discovered",

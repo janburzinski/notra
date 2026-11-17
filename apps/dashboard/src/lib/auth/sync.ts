@@ -307,7 +307,7 @@ export const ensureLocalUser = Effect.fn("auth.sync.ensureLocalUser")(
         const [{ sendWelcomeEmail }, { sendOnboardingSlackInvite }] =
           await Promise.all([
             import("@/lib/email/send"),
-            import("@/lib/onboarding-agent"),
+            import("@/lib/onboarding/slack-invite"),
           ]);
         const { invited } = await sendOnboardingSlackInvite({
           email: created.email,

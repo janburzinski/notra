@@ -46,11 +46,6 @@ const projects = [
     directory: "apps/agent",
     productionAlias: "notra-agent-notra.vercel.app",
   },
-  {
-    name: "notra-onboarding-agent",
-    directory: "apps/onboarding-agent",
-    productionAlias: "notra-onboarding-agent-notra.vercel.app",
-  },
 ];
 const unkeyServices = [
   {

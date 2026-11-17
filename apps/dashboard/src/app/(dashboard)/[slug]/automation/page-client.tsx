@@ -34,7 +34,6 @@ import { useTranslations } from "use-intl";
 import { AutomationLoadError } from "@/components/automation/automation-load-error";
 import { AutomationTemplateGrid } from "@/components/automation/automation-template-gallery";
 import { AutomationsTable } from "@/components/automation/automations-table";
-import { OnboardingSuggestions } from "@/components/automation/onboarding-suggestions";
 import { Button, buttonVariants } from "@/components/button";
 import Link from "@/components/framework/link";
 import { PageContainer } from "@/components/layout/container";
@@ -47,7 +46,6 @@ import { useAutomationMutations } from "@/lib/hooks/use-automation-mutations";
 import { useAutomationRowName } from "@/lib/hooks/use-automation-row-name";
 import { useAutomationRows } from "@/lib/hooks/use-automation-rows";
 import { useLatestAutomationRuns } from "@/lib/hooks/use-automation-runs";
-import { useOnboardingSuggestions } from "@/lib/hooks/use-onboarding";
 import { useSettingsModal } from "@/lib/hooks/use-settings-modal";
 import { useRouter } from "@/lib/navigation";
 import type { AutomationRow } from "@/types/automation/automations";
@@ -85,12 +83,7 @@ export default function PageClient({ organizationSlug }: PageClientProps) {
     refetch,
   } = useAutomationRows(organizationId);
   const latestRuns = useLatestAutomationRuns(organizationId);
-  // Hold the sections below the table until suggestions are known, otherwise
-  // templates render first and get pushed down when suggestions arrive.
-  const suggestionsLoading = useOnboardingSuggestions(
-    organizationId ?? ""
-  ).isLoading;
-  const showSections = !isPending && !suggestionsLoading;
+  const showSections = !isPending;
   const lastRuns = new Map(Object.entries(latestRuns.data?.lastRunAt ?? {}));
 
   const basePath = `/${organizationSlug}/automation`;
@@ -199,17 +192,6 @@ export default function PageClient({ organizationSlug }: PageClientProps) {
 
         {showSections ? (
           <>
-            {organizationId ? (
-              <OnboardingSuggestions
-                onCreate={(suggestionId, type) => {
-                  const kind =
-                    type === "event_automation" ? "event" : "schedule";
-                  goToNew(`?type=${kind}&suggestion=${suggestionId}`);
-                }}
-                organizationId={organizationId}
-              />
-            ) : null}
-
             <InstrumentSection
               action={
                 <Link

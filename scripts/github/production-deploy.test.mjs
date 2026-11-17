@@ -280,7 +280,7 @@ test("the release prepares before the gates and changes nothing live until they 
     "worker",
     "script-worker",
   ]);
-  assert.equal(builds(calls).length, 10);
+  assert.equal(builds(calls).length, 9);
 });
 
 test("a failed script worker deploy fails the release without stopping the other deploys", async () => {
@@ -290,7 +290,7 @@ test("a failed script worker deploy fails the release without stopping the other
   });
   await assert.rejects(run(), /script worker: wrangler exited 1/);
   assert.ok(events.includes("script-worker"));
-  assert.equal(builds(calls).length, 10);
+  assert.equal(builds(calls).length, 9);
 });
 
 test("a failed release gate stops the release before any build or live change", async () => {
@@ -327,7 +327,7 @@ test("the demo database is migrated before any build and the demo apps start whi
     events.filter((event) => event.startsWith("demo-migrate")),
     ["demo-migrate@0"]
   );
-  assert.equal(builds(calls).length, 10);
+  assert.equal(builds(calls).length, 9);
 });
 
 test("a failed demo migration stops both demo builds and nothing else", async () => {
@@ -342,7 +342,7 @@ test("a failed demo migration stops both demo builds and nothing else", async ()
   const started = builds(calls).map(({ body }) => body.project ?? body.app);
   assert.ok(!started.includes("app_demo-api"));
   assert.ok(!started.includes("app_demo-dashboard"));
-  assert.equal(started.length, 8);
+  assert.equal(started.length, 7);
 });
 
 test("a demo app rolled back after planning stops the demo migration and both demo builds", async () => {
@@ -371,7 +371,7 @@ test("a demo app rolled back after planning stops the demo migration and both de
   const started = builds(calls).map(({ body }) => body.project ?? body.app);
   assert.ok(!started.includes("app_demo-api"));
   assert.ok(!started.includes("app_demo-dashboard"));
-  assert.equal(started.length, 8);
+  assert.equal(started.length, 7);
 });
 
 test("a demo failure during the dashboard build does not hold back production API and ingest", async () => {
@@ -509,21 +509,14 @@ test("failed toolchain env update prevents every build", async () => {
   assert.equal(builds(calls).length, 0);
 });
 
-test("all six Vercel projects deploy the pinned SHA", async () => {
+test("all five Vercel projects deploy the pinned SHA", async () => {
   const { run, calls, sha, directories } = fixture();
   await run();
   const started = builds(calls);
-  assert.equal(started.length, 6);
+  assert.equal(started.length, 5);
   assert.deepEqual(
     started.map(({ body }) => body.project),
-    [
-      "notra",
-      "notra-web",
-      "notra-console",
-      "notra-ui",
-      "notra-agent",
-      "notra-onboarding-agent",
-    ]
+    ["notra", "notra-web", "notra-console", "notra-ui", "notra-agent"]
   );
   for (const { body } of started) {
     assert.deepEqual(body.gitSource, {
@@ -535,7 +528,6 @@ test("all six Vercel projects deploy the pinned SHA", async () => {
     assert.equal(body.target, "production");
   }
   assert.ok(directories.includes("apps/agent"));
-  assert.ok(directories.includes("apps/onboarding-agent"));
 });
 
 test("the dashboard migrates first, then the other projects build together", async () => {
@@ -629,11 +621,11 @@ test("dry run validates every target without creating any builds", async () => {
   });
   await run();
   assert.equal(builds(calls).length, 0);
-  assert.equal(directories.length, 6);
+  assert.equal(directories.length, 5);
   assert.equal(toolchainBuilds.length, 0);
 });
 
-for (const directory of ["apps/agent", "apps/onboarding-agent"]) {
+for (const directory of ["apps/agent"]) {
   test(`${directory} changes deploy only its own project`, async () => {
     const { run, calls } = fixture({ changed: (app) => app === directory });
     await run();
@@ -643,7 +635,7 @@ for (const directory of ["apps/agent", "apps/onboarding-agent"]) {
   });
 }
 
-for (const project of ["notra-agent", "notra-onboarding-agent"]) {
+for (const project of ["notra-agent"]) {
   for (const guard of ["active", "alias", "commit", "branch"]) {
     test(`${project} fails closed on ${guard} before any builds`, async () => {
       const { run, calls } = fixture({
@@ -704,7 +696,7 @@ test("an active production build is waited out instead of failing the release", 
   });
   await run();
   assert.equal(checks, 3);
-  assert.equal(builds(calls).length, 6);
+  assert.equal(builds(calls).length, 5);
 });
 
 test("a production build that never finishes still prevents every build", async () => {
@@ -782,7 +774,7 @@ test("Vercel OOM retries only the failed project at the pinned SHA", async () =>
   assert.equal(agentBuilds[1].url.searchParams.get("forceNew"), "1");
   assert.deepEqual(agentBuilds[0].body, agentBuilds[1].body);
   assert.equal(agentBuilds[1].body.gitSource.sha, sha);
-  assert.equal(builds(calls).length, 11);
+  assert.equal(builds(calls).length, 10);
   const retryReady = calls.findIndex(
     ({ url }) => url.pathname === "/v13/deployments/new-notra-agent-2"
   );
@@ -985,10 +977,10 @@ for (const [path, error, attempts] of [
       assert.ok(failure.message.includes(error.message));
       return true;
     });
-    // Creations run once per target: six Vercel projects and four
+    // Creations run once per target: five Vercel projects and four
     // independent Unkey services.
     const creations = {
-      "/v13/deployments": 6,
+      "/v13/deployments": 5,
       "/v3/deployments.createDeployment": 4,
     };
     assert.equal(reads, creations[path] ?? attempts);
@@ -1148,7 +1140,7 @@ test("Unkey discovers the verified production domain and deploys the pinned comm
     git: { branch: "main", commitSha: sha },
   });
   // The two demo apps are checked once more before their shared migration.
-  assert.equal(directories.length, 16);
+  assert.equal(directories.length, 15);
   assert.equal(
     directories.filter((directory) => directory === "apps/api").length,
     5
@@ -1344,7 +1336,7 @@ for (const [name, path, data] of [
     await assert.rejects(run(), /unkey/);
     assert.equal(
       calls.filter(({ url }) => url.pathname === "/v13/deployments").length,
-      6
+      5
     );
     assert.ok(builds(calls).every(({ body }) => body.app !== "app_test"));
   });
@@ -1397,7 +1389,7 @@ test("a Vercel project whose production is newer is skipped and the rest ships",
   await run();
   const started = builds(calls).map(({ body }) => body.project ?? body.app);
   assert.ok(!started.includes("notra-web"));
-  assert.equal(started.length, 9);
+  assert.equal(started.length, 8);
 });
 
 test("a dashboard whose production is newer still stops the whole release", async () => {

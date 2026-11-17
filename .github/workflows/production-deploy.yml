@@ -105,7 +105,7 @@ jobs:
 
       - name: Build and boot agents
         run: |
-          for app in agent onboarding-agent; do
+          for app in agent; do
             echo "::group::Build and boot $app"
             (
               cd "apps/$app"

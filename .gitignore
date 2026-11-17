@@ -48,7 +48,6 @@ opencode.json
 
 .eve
 .output
-apps/onboarding-agent/logs
 .workflow-data
 .swc/
 .tanstack/

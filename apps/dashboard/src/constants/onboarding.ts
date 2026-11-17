@@ -98,3 +98,4 @@ export const NOTRA_MCP_DOCS_URL = "https://www.usenotra.com/docs/devtools/mcp";
 export const NOTRA_CHATGPT_APP_URL =
   "https://chatgpt.com/plugins/plugin_asdk_app_6ad054bf08248191a320ed1334e3ffde";
 export const NOTRA_CLAUDE_DIRECTORY_URL = "https://claude.ai/directory/notra";
+export const ONBOARDING_STATUS_REFETCH_INTERVAL_MS = 30_000;

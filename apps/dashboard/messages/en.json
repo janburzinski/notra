@@ -1390,12 +1390,7 @@
       "noTransferTarget": "Organization {orgId} has no other members to transfer ownership to"
     },
     "onboarding": {
-      "tooManyLogoLookups": "Too many logo lookups. Please try again shortly.",
-      "tooManyAgentRequests": "Too many onboarding agent requests. Please try again shortly.",
-      "selfServeAgent": {
-        "no-company-domain": "We couldn't determine your company website. Add a website URL to your brand identity first.",
-        "website-unreachable": "We couldn't reach your company website. Check the website URL in your brand identity."
-      }
+      "tooManyLogoLookups": "Too many logo lookups. Please try again shortly."
     },
     "contentCalendar": {
       "postNotFound": "Post not found",
@@ -5927,11 +5922,6 @@
     "brandVoice": {
       "defaultIdentity": "Default identity"
     },
-    "suggestions": {
-      "dismissFailed": "Couldn't dismiss the suggestion",
-      "dismissLabel": "Dismiss suggestion \"{title}\"",
-      "dismissTooltip": "Dismiss suggestion"
-    },
     "outputTypeLabels": {
       "blog_post": "Blog post",
       "twitter_post": "Twitter post",
@@ -8237,24 +8227,6 @@
         "happy": "Happy",
         "excited": "Excited"
       }
-    },
-    "onboardingBanner": {
-      "running": "We are setting up your workspace",
-      "prompt": "We can set up your workspace for you",
-      "start": "Start setup",
-      "dialogTitle": "Let us set up your workspace",
-      "dialogDescription": "We visit your website, work out what your company does and set Notra up to match. It takes a few minutes.",
-      "pros": {
-        "brandColors": "Brand colors and voice pulled from your website",
-        "writingSkills": "Writing skills matched to your product and audience",
-        "references": "References and examples to guide future content"
-      },
-      "cons": {
-        "skillsOverwritten": "Skills you already edited may be overwritten",
-        "colorsReplaced": "Custom colors and references may be replaced"
-      },
-      "dismiss": "Dismiss workspace setup banner",
-      "startFailed": "Couldn't start the setup agent. Try again later."
     },
     "metaTitle": "Dashboard",
     "welcomeTour": {

@@ -80,13 +80,6 @@ export default defineConfig({
     ...headerRouting.routeRules,
     "/ingest/static/**": { proxy: `${posthogAssetsHost}/static/**` },
     "/ingest/**": { proxy: `${posthogHost}/**` },
-    ...(process.env.NODE_ENV === "development"
-      ? {
-          "/eve/v1/**": {
-            proxy: `${process.env.EVE_ONBOARDING_AGENT_URL ?? "http://127.0.0.1:3100"}/eve/v1/**`,
-          },
-        }
-      : {}),
   },
   vercel: {
     immutableStaticFiles:

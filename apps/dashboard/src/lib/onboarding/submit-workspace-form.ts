@@ -3,7 +3,6 @@ import { onboardingWorkspaceSchema } from "@notra/schemas/dashboard/onboarding/w
 import {
   saveOnboardingAttribution,
   saveOnboardingNotificationSettings,
-  triggerOnboardingAgentSetup,
   triggerOnboardingBrandAnalysis,
   validateOnboardingWebsiteUrl,
 } from "@/app/onboarding/workspace/actions";
@@ -177,18 +176,6 @@ async function submitWorkspaceForm({
     if (analysis.error) {
       throw new Error(analysis.error.message);
     }
-  }
-
-  try {
-    await triggerOnboardingAgentSetup({
-      organizationId,
-      websiteUrl: parsed.data.websiteUrl || undefined,
-    });
-  } catch (error) {
-    console.error("[Onboarding] Background onboarding agent setup failed", {
-      organizationId,
-      error,
-    });
   }
 }
 

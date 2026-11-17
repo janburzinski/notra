@@ -10,18 +10,11 @@ import { cn } from "@notra/ui/lib/utils";
 import { useSyncExternalStore } from "react";
 import { useTranslations } from "use-intl";
 
-import { AgentLoader } from "@/components/icons/agent-loader";
 import { useOrganizationsContext } from "@/components/providers/organization-provider";
-import {
-  AGENT_RUN_REFETCH_INTERVAL_MS,
-  ONBOARDING_STATUS_REFETCH_INTERVAL_MS,
-} from "@/constants/onboarding-agent";
+import { ONBOARDING_STATUS_REFETCH_INTERVAL_MS } from "@/constants/onboarding";
 import { localStorageKeys } from "@/constants/storage";
 import { useBillingCustomer } from "@/lib/hooks/use-billing-customer";
-import {
-  useOnboardingAgentRun,
-  useOnboardingStatus,
-} from "@/lib/hooks/use-onboarding";
+import { useOnboardingStatus } from "@/lib/hooks/use-onboarding";
 
 const collapsedListeners = new Set<() => void>();
 
@@ -48,8 +41,6 @@ export function SidebarOnboarding() {
   const orgId = activeOrganization?.id ?? "";
   const slug = activeOrganization?.slug ?? "";
 
-  const { data: agentRun } = useOnboardingAgentRun(orgId);
-  const agentRunning = agentRun?.running ?? false;
   const { data: customer } = useBillingCustomer({
     expand: ["subscriptions.plan"],
   });
@@ -58,9 +49,7 @@ export function SidebarOnboarding() {
   );
   const checklistHidden = !!customer && !hasActiveSubscription;
   const { data } = useOnboardingStatus(orgId, {
-    refetchInterval: agentRunning
-      ? AGENT_RUN_REFETCH_INTERVAL_MS
-      : !checklistHidden && ONBOARDING_STATUS_REFETCH_INTERVAL_MS,
+    refetchInterval: !checklistHidden && ONBOARDING_STATUS_REFETCH_INTERVAL_MS,
   });
 
   const storageKey = localStorageKeys.sidebarOnboardingCollapsed(orgId);
@@ -142,9 +131,6 @@ export function SidebarOnboarding() {
                 })
               : t("title")}
           </span>
-          {agentRunning && (
-            <AgentLoader className="text-muted-foreground size-3.5" />
-          )}
           <svg
             aria-hidden="true"
             className="size-3.5 shrink-0"
@@ -165,9 +151,6 @@ export function SidebarOnboarding() {
             )}
           </svg>
         </button>
-        <span className="sr-only" role="status">
-          {agentRunning ? tCommon("states.loading") : ""}
-        </span>
 
         <div
           aria-hidden={collapsed}

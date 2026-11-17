@@ -414,3 +414,17 @@ export interface VisibilityReviewFormValues {
   companyName: string;
   droppedKeys: string[];
 }
+
+export interface CompanyDomainResolution {
+  domain: string;
+  source: "website" | "email";
+}
+
+export interface OnboardingSlackInviteInput {
+  email: string;
+}
+
+export interface OnboardingSlackInviteResult {
+  invited: boolean;
+  channelId?: string;
+}

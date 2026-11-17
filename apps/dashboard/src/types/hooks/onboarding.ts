@@ -10,32 +10,3 @@ export interface OnboardingStatus {
 export interface UseOnboardingStatusOptions {
   refetchInterval?: number | false;
 }
-
-export interface UseOnboardingSuggestionsOptions {
-  agentRunning?: boolean;
-}
-
-export interface OnboardingRunSnapshot {
-  organizationId: string;
-  running: boolean;
-}
-
-export interface OnboardingAgentStateSource {
-  ran: boolean;
-  startedAt: Date | null;
-}
-
-export interface OnboardingAgentRunState extends OnboardingAgentStateSource {
-  running: boolean;
-}
-
-export interface InitialOnboardingAgentRun {
-  organizationId: string;
-  state: OnboardingAgentRunState;
-}
-
-export interface UseOnboardingBannerOptions {
-  organizationId: string;
-  initialRun: InitialOnboardingAgentRun;
-  initiallyDismissed: boolean;
-}

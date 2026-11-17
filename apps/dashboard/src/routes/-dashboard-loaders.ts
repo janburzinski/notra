@@ -22,14 +22,12 @@ import { getTranslations } from "@/lib/i18n/server";
 import { redirectOrgRootToStoredMode } from "@/lib/nav/org-root-redirect";
 import type { GeoTrafficPageKind } from "@/types/geo-traffic-pages";
 import type { UiRouteInput } from "@/types/ui-route";
-import { onboardingBannerDismissedCookie } from "@/utils/cookies";
 import { getGreetingPeriod } from "@/utils/dashboard-greeting-period";
 import {
   geoProjectRepairPath,
   geoRequestedProjectId,
 } from "@/utils/geo-hydration";
 import { geoPathWithSearch } from "@/utils/geo-paths";
-import { resolveOnboardingAgentRunState } from "@/utils/onboarding-agent-run";
 import { toOrganizationSummary } from "@/utils/organization-summary";
 import { settingsPath } from "@/utils/settings-path";
 import { getSidebarWidthFromCookie } from "@/utils/sidebar-width";
@@ -70,15 +68,6 @@ export const loadOrganizationShell = createServerFn({
         getCookie(SIDEBAR_WIDTH_COOKIE_NAME)
       ),
       demoBannerHidden: getCookie(DEMO_BANNER_COOKIE) === DEMO_BANNER_OFF,
-      onboardingBannerDismissed:
-        getCookie(onboardingBannerDismissedCookie(organization.id)) === "1",
-      initialOnboardingAgentRun: {
-        organizationId: organization.id,
-        state: resolveOnboardingAgentRunState({
-          ran: organization.onboardingAgentRan,
-          startedAt: organization.onboardingAgentStartedAt,
-        }),
-      },
     };
   });
 

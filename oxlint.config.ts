@@ -239,7 +239,6 @@ export default defineConfig({
         "apps/api/src/errors/**/*.ts",
         "apps/agent/agent/lib/schemas/chat-mirror.ts",
         "apps/agent/agent/lib/schemas/slack.ts",
-        "packages/schemas/src/schemas/dashboard/onboarding-agent.ts",
         "packages/schemas/src/schemas/api/internal-dashboard.ts",
         "packages/schemas/src/schemas/api/qstash.ts",
         "packages/ai/src/integrations/mcp-auth-errors.ts",

@@ -1390,12 +1390,7 @@
       "noTransferTarget": "Die Organisation {orgId} hat keine anderen Mitglieder, an die du die Inhaberschaft übertragen kannst"
     },
     "onboarding": {
-      "tooManyLogoLookups": "Zu viele Logo-Abfragen. Bitte versuch es gleich nochmal.",
-      "tooManyAgentRequests": "Zu viele Anfragen an den Onboarding-Agent. Bitte versuch es gleich nochmal.",
-      "selfServeAgent": {
-        "no-company-domain": "Wir konnten deine Firmenwebsite nicht ermitteln. Füge zuerst eine Website-URL zu deiner Markenidentität hinzu.",
-        "website-unreachable": "Wir konnten deine Firmenwebsite nicht erreichen. Prüfe die Website-URL in deiner Markenidentität."
-      }
+      "tooManyLogoLookups": "Zu viele Logo-Abfragen. Bitte versuch es gleich nochmal."
     },
     "contentCalendar": {
       "postNotFound": "Beitrag nicht gefunden",
@@ -5927,11 +5922,6 @@
     "brandVoice": {
       "defaultIdentity": "Standardidentität"
     },
-    "suggestions": {
-      "dismissFailed": "Vorschlag konnte nicht verworfen werden",
-      "dismissLabel": "Vorschlag „{title}“ verwerfen",
-      "dismissTooltip": "Vorschlag verwerfen"
-    },
     "outputTypeLabels": {
       "blog_post": "Blogbeitrag",
       "twitter_post": "Twitter-Beitrag",
@@ -8237,24 +8227,6 @@
         "happy": "Zufrieden",
         "excited": "Begeistert"
       }
-    },
-    "onboardingBanner": {
-      "running": "Wir richten deinen Workspace ein",
-      "prompt": "Wir können deinen Workspace für dich einrichten",
-      "start": "Einrichtung starten",
-      "dialogTitle": "Lass uns deinen Workspace einrichten",
-      "dialogDescription": "Wir besuchen deine Website, finden heraus, was dein Unternehmen macht, und richten Notra passend ein. Das dauert ein paar Minuten.",
-      "pros": {
-        "brandColors": "Markenfarben und Tonalität von deiner Website übernommen",
-        "writingSkills": "Schreib-Skills passend zu deinem Produkt und deiner Zielgruppe",
-        "references": "Referenzen und Beispiele als Leitfaden für künftige Inhalte"
-      },
-      "cons": {
-        "skillsOverwritten": "Bereits bearbeitete Skills können überschrieben werden",
-        "colorsReplaced": "Eigene Farben und Referenzen können ersetzt werden"
-      },
-      "dismiss": "Banner zur Workspace-Einrichtung schließen",
-      "startFailed": "Der Einrichtungs-Agent konnte nicht gestartet werden. Versuch es später nochmal."
     },
     "metaTitle": "Dashboard",
     "welcomeTour": {

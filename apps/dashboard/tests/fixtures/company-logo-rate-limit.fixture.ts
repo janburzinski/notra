@@ -38,10 +38,6 @@ mock.module("@/lib/auth/organization", () => ({
     return { user: { id }, session: {} };
   },
 }));
-mock.module("@/lib/onboarding-agent", () => ({
-  getOnboardingAgentState: mock(),
-  startSelfServeOnboardingAgent: mock(),
-}));
 mock.module("@/lib/onboarding/company-logo-cache", () => ({
   readCachedCompanyLogo: async ({ query }: { query: string }) =>
     cached.get(query) ?? null,

@@ -82,11 +82,6 @@ export const ratelimit = {
     requests: COMPANY_LOGO_RATE_LIMIT_PER_USER_PER_MINUTE,
     window: "1m",
   }),
-  onboardingAgent: createLimiter({
-    prefix: "ratelimit:onboarding-agent",
-    requests: 2,
-    window: "10m",
-  }),
   commandPaletteNavigate: createLimiter({
     prefix: "ratelimit:cmdk-navigate",
     requests: 15,

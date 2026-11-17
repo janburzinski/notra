@@ -72,7 +72,6 @@ export const WORKFLOW_TELEMETRY_ENUMS: Readonly<
     "brand-analysis",
     "brand-guidelines",
     "chat",
-    "onboarding-agent",
     "schedule-content",
     "event-content",
     "social-analytics-sync",

@@ -17,7 +17,6 @@ import {
   OrganizationsProvider,
 } from "@/components/providers/organization-provider";
 import { useSettingsModal } from "@/lib/hooks/use-settings-modal";
-import type { InitialOnboardingAgentRun } from "@/types/hooks/onboarding";
 import dynamic from "@/utils/lazy-component";
 
 const loadCommandPalette = () =>
@@ -89,22 +88,18 @@ interface DashboardClientWrapperProps {
   children: React.ReactNode;
   demoBannerHidden?: boolean;
   initialActiveOrganization?: InitialActiveOrganization | null;
-  initialOnboardingAgentRun: InitialOnboardingAgentRun;
   initialSidebarOpen?: boolean;
   initialSidebarWidth: number;
   modal?: React.ReactNode;
-  onboardingBannerDismissed?: boolean;
 }
 
 export function DashboardClientWrapper({
   children,
   demoBannerHidden = false,
   initialActiveOrganization,
-  initialOnboardingAgentRun,
   initialSidebarOpen = true,
   initialSidebarWidth,
   modal,
-  onboardingBannerDismissed = false,
 }: DashboardClientWrapperProps) {
   return (
     <DashboardRuntimeProviders>
@@ -117,10 +112,8 @@ export function DashboardClientWrapper({
               <RightPanelProvider>
                 <DashboardShell
                   demoBannerHidden={demoBannerHidden}
-                  initialOnboardingAgentRun={initialOnboardingAgentRun}
                   initialSidebarOpen={initialSidebarOpen}
                   initialSidebarWidth={initialSidebarWidth}
-                  onboardingBannerDismissed={onboardingBannerDismissed}
                 >
                   {children}
                 </DashboardShell>

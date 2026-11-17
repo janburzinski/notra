@@ -5,26 +5,17 @@ import {
   geoCompetitors,
   geoPrompts,
   geoScans,
-  onboardingSuggestions,
   organizations,
 } from "@notra/db/schema";
 import { createGeoProject } from "@notra/geo-core/geo/projects";
 import { organizationIdInputSchema } from "@notra/schemas/dashboard/auth/organization";
-import {
-  dismissSuggestionInputSchema,
-  listSuggestionsInputSchema,
-} from "@notra/schemas/dashboard/onboarding-agent";
 import { companyLogoInputSchema } from "@notra/schemas/dashboard/onboarding/company-logo";
 import { ORPCError } from "@orpc/server";
-import { and, desc, eq, sql } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 
 import { COMPANY_LOGO_LOOKUP_TIMEOUT_MS } from "@/constants/company-logo";
 import { assertOrganizationAccess } from "@/lib/auth/organization";
 import { getTranslations } from "@/lib/i18n/server";
-import {
-  getOnboardingAgentState,
-  startSelfServeOnboardingAgent,
-} from "@/lib/onboarding-agent";
 import {
   pickBrandSearchResult,
   pickCompanyLogoUrl,
@@ -37,7 +28,6 @@ import { authorizedProcedure, withOrganizationAccess } from "@/lib/orpc/base";
 import { runOrpcEffect } from "@/lib/orpc/effect";
 import { toGeoOrpcError } from "@/lib/orpc/utils/geo-errors";
 import type { CompanyLogoResult } from "@/types/onboarding";
-import { resolveOnboardingAgentRunState } from "@/utils/onboarding-agent-run";
 import { ratelimit } from "@/utils/ratelimit";
 
 export const onboardingRouter = {
@@ -153,87 +143,5 @@ export const onboardingRouter = {
         onboardingCompleted: setupComplete || onboardingCompleted,
         onboardingDismissed,
       };
-    }),
-  agentRun: authorizedProcedure
-    .input(organizationIdInputSchema)
-    .use(withOrganizationAccess)
-    .handler(async ({ input }) => {
-      return resolveOnboardingAgentRunState(
-        (await getOnboardingAgentState(input.organizationId)) ?? {
-          ran: false,
-          startedAt: null,
-        }
-      );
-    }),
-  runAgent: authorizedProcedure
-    .input(organizationIdInputSchema)
-    .use(withOrganizationAccess)
-    .handler(async ({ context, input }) => {
-      const { success: withinLimit } = await ratelimit.onboardingAgent.limit(
-        input.organizationId
-      );
-      if (!withinLimit) {
-        const tErrors = await getTranslations("errors.onboarding");
-        throw new ORPCError("TOO_MANY_REQUESTS", {
-          message: tErrors("tooManyAgentRequests"),
-        });
-      }
-
-      const result = await startSelfServeOnboardingAgent({
-        email: context.user.email,
-        organizationId: input.organizationId,
-      });
-
-      if (
-        !result.started &&
-        (result.reason === "no-company-domain" ||
-          result.reason === "website-unreachable")
-      ) {
-        const tErrors = await getTranslations("errors.onboarding");
-        throw new ORPCError("BAD_REQUEST", {
-          message: tErrors(`selfServeAgent.${result.reason}`),
-        });
-      }
-
-      return { started: result.started };
-    }),
-  suggestions: authorizedProcedure
-    .input(listSuggestionsInputSchema)
-    .use(withOrganizationAccess)
-    .handler(async ({ input }) => {
-      const filters = [
-        eq(onboardingSuggestions.organizationId, input.organizationId),
-      ];
-      if (!input.includeDismissed) {
-        filters.push(eq(onboardingSuggestions.dismissed, false));
-      }
-
-      return await db.query.onboardingSuggestions.findMany({
-        orderBy: [desc(onboardingSuggestions.createdAt)],
-        where: and(...filters),
-      });
-    }),
-  dismissSuggestion: authorizedProcedure
-    .input(dismissSuggestionInputSchema)
-    .use(withOrganizationAccess)
-    .handler(async ({ input }) => {
-      const updated = await db
-        .update(onboardingSuggestions)
-        .set({ dismissed: true })
-        .where(
-          and(
-            eq(onboardingSuggestions.id, input.suggestionId),
-            eq(onboardingSuggestions.organizationId, input.organizationId)
-          )
-        )
-        .returning({ id: onboardingSuggestions.id });
-
-      if (!updated[0]) {
-        throw new ORPCError("NOT_FOUND", {
-          message: "Suggestion not found",
-        });
-      }
-
-      return { id: updated[0].id };
     }),
 };

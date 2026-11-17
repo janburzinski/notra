@@ -107,7 +107,7 @@ jobs:
       - name: Check Vercel installs
         if: matrix.check == 'build-apps' && contains(format(' {0} ', needs.changes.outputs.builds), ' web ')
         run: |
-          for app in dashboard web ui agent onboarding-agent; do
+          for app in dashboard web ui agent; do
             echo "::group::Check $app Vercel install"
             (
               cd "apps/$app"

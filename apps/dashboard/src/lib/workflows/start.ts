@@ -3,7 +3,6 @@ import { publicationSyncRepairSchema } from "@notra/ai/schemas/content-publicati
 import type { BrandGuidelinesWorkflowPayload } from "@notra/ai/types/brand-guidelines";
 import type { ChatWorkflowPayload } from "@notra/ai/types/chat";
 import type { GitHubMentionContext } from "@notra/ai/types/github-mention";
-import type { OnboardingAgentWorkflowPayload } from "@notra/ai/types/onboarding-agent";
 import { contentGenerationWorkflowPayloadSchema } from "@notra/content-generation/schemas";
 import { agentReadinessWorkflowPayloadSchema } from "@notra/geo-core/schemas/agent-readiness";
 import {
@@ -20,7 +19,6 @@ import {
   eventWorkflowPayloadSchema,
   scheduleWorkflowPayloadSchema,
 } from "@notra/schemas/dashboard/workflows";
-import { onboardingAgentWorkflowPayloadSchema } from "@notra/schemas/dashboard/workflows/onboarding-agent-payload";
 import { start } from "workflow/api";
 
 import {
@@ -60,7 +58,6 @@ import { geoWriterWorkflow } from "@/workflows/geo-writer";
 import { githubMentionWorkflow } from "@/workflows/github-mention";
 import { gscSyncWorkflow } from "@/workflows/gsc-sync";
 import { onDemandContentWorkflow } from "@/workflows/on-demand-content";
-import { onboardingAgentWorkflow } from "@/workflows/onboarding-agent";
 import { scheduleContentWorkflow } from "@/workflows/schedule-content";
 import { scheduledPublicationWorkflow } from "@/workflows/scheduled-publication";
 import { siteJobWorkflow } from "@/workflows/site-job";
@@ -143,19 +140,6 @@ export async function startScheduledPublicationRun(
   input: ScheduledPublicationWorkflowInput
 ): Promise<{ runId: string }> {
   const run = await start(scheduledPublicationWorkflow, [input]);
-  return { runId: run.runId };
-}
-
-export async function startOnboardingAgentRun(
-  payload: OnboardingAgentWorkflowPayload
-): Promise<{ runId: string }> {
-  const parsed = onboardingAgentWorkflowPayloadSchema.parse(payload);
-  const run = await start(onboardingAgentWorkflow, [parsed]);
-  trackWorkflowStarted({
-    workflow: WORKFLOW_ANALYTICS_NAMES.ONBOARDING_AGENT,
-    runId: run.runId,
-    organizationId: parsed.organizationId,
-  });
   return { runId: run.runId };
 }
 

@@ -3,8 +3,6 @@ import {
   LAST_VISITED_ORGANIZATION_COOKIE_MAX_AGE,
   LAST_VISITED_PROJECT_COOKIE,
   LAST_VISITED_PROJECT_COOKIE_MAX_AGE,
-  ONBOARDING_BANNER_DISMISSED_COOKIE_MAX_AGE,
-  ONBOARDING_BANNER_DISMISSED_COOKIE_PREFIX,
   SIDEBAR_MODE_COOKIE,
   SIDEBAR_MODE_COOKIE_MAX_AGE,
 } from "@/constants/cookies";
@@ -124,24 +122,6 @@ export const getLastVisitedProjectFromClient = (
     readClientCookie(LAST_VISITED_PROJECT_COOKIE),
     organizationSlug
   );
-
-export const onboardingBannerDismissedCookie = (organizationId: string) =>
-  `${ONBOARDING_BANNER_DISMISSED_COOKIE_PREFIX}${organizationId}`;
-
-export const isOnboardingBannerDismissedFromClient = (
-  organizationId: string
-): boolean =>
-  readClientCookie(onboardingBannerDismissedCookie(organizationId)) === "1";
-
-export const setOnboardingBannerDismissedCookie = async (
-  organizationId: string
-): Promise<void> => {
-  await setClientCookie(
-    onboardingBannerDismissedCookie(organizationId),
-    "1",
-    ONBOARDING_BANNER_DISMISSED_COOKIE_MAX_AGE
-  );
-};
 
 export const setSidebarModeCookie = async (
   mode: SidebarMode,

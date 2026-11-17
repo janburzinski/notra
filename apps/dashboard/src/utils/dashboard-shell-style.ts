@@ -1,21 +1,25 @@
+import { DASHBOARD_BANNER_HEIGHT } from "@/constants/dashboard-banner";
 import { DEMO_BANNER_HEIGHT } from "@/constants/demo";
-import { EVE_BANNER_HEIGHT } from "@/constants/onboarding-agent";
 import type { DashboardShellStyle } from "@/types/components/dashboard-shell";
 
 /**
- * Everything below the top banners offsets by `--eve-banner-height`; the demo
- * bar stacks above the onboarding banner when it is shown.
+ * Everything below the top banners offsets by `--top-banner-height`; the demo
+ * bar stacks above the dashboard banner when both are shown.
  */
 export function dashboardShellStyle(
   demoBanner: boolean,
-  eveBanner: boolean
+  dashboardBanner: boolean
 ): DashboardShellStyle {
-  const eveBannerHeight = eveBanner ? EVE_BANNER_HEIGHT : "0rem";
+  const bannerHeight = dashboardBanner ? DASHBOARD_BANNER_HEIGHT : "0rem";
   if (!demoBanner) {
-    return { "--eve-banner-height": eveBannerHeight };
+    return {
+      "--top-banner-height": bannerHeight,
+      "--dashboard-banner-height": bannerHeight,
+    };
   }
   return {
-    "--eve-banner-height": `calc(${DEMO_BANNER_HEIGHT} + ${eveBannerHeight})`,
+    "--top-banner-height": `calc(${DEMO_BANNER_HEIGHT} + ${bannerHeight})`,
+    "--dashboard-banner-height": bannerHeight,
     "--demo-banner-height": DEMO_BANNER_HEIGHT,
   };
 }

@@ -779,9 +779,8 @@ All five Vercel app configurations disable automatic Git deployments with
 development and GitHub's code-quality checks continue to run as before.
 
 The [Production deploy workflow](.github/workflows/production-deploy.yml) releases
-`dashboard` (`notra`), `web` (`notra-web`), `ui` (`notra-ui`), `agent`
-(`notra-agent`), and `onboarding-agent` (`notra-onboarding-agent`) at **12:00 and
-19:00 Europe/Berlin** each day. The timezone includes daylight-saving changes;
+`dashboard` (`notra`), `web` (`notra-web`), `ui` (`notra-ui`) and `agent`
+(`notra-agent`) at **12:00 and 19:00 Europe/Berlin** each day. The timezone includes daylight-saving changes;
 GitHub may start scheduled runs late. Production remains on `main`.
 
 Before merging this configuration, add a GitHub Actions repository secret named
@@ -813,8 +812,7 @@ cancelled, skipped or missing gate job ends the release with nothing deployed.
 
 Each project is compared with the deployment serving its stable production alias
 (`notra-notra.vercel.app`, `notra-web-notra.vercel.app`,
-`notra-ui-notra.vercel.app`, `notra-agent-notra.vercel.app`, or
-`notra-onboarding-agent-notra.vercel.app`). The script resolves that alias to a
+`notra-ui-notra.vercel.app` or `notra-agent-notra.vercel.app`). The script resolves that alias to a
 deployment ID, then reads its commit SHA. A missing alias, wrong project, or unidentified live
 commit blocks all new builds. Neither the latest successful build nor
 `targets.production` is used as a substitute: the latter can refer to a skipped
@@ -943,10 +941,10 @@ to skip projects whose source and dependencies have not changed. Each workspace
 must have a unique package name and explicitly declare its internal dependencies
 in `package.json`.
 
-`agent` and `onboarding-agent` have `git.deploymentEnabled: false` in their
-`vercel.json` files. Pushes and merges do not deploy them. They now participate
+`agent` has `git.deploymentEnabled: false` in its `vercel.json` file. Pushes
+and merges do not deploy it. It now participates
 in the same scheduled and manually dispatched production release as the other
-Vercel apps, with their own live-alias, history, and change checks.
+Vercel apps, with its own live-alias, history, and change checks.
 
 The app configs do not set an `ignoreCommand`. Keep
 [Vercel's built-in skipping](https://vercel.com/docs/monorepos#skipping-unaffected-projects)

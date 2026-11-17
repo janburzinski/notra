@@ -117,8 +117,6 @@ export const SUGGESTION_OUTCOMES = {
 export const FIRST_LOGIN_WINDOW_MS = 60_000;
 
 export const ONBOARDING_BRAND_ANALYSIS_FAILURE_REASONS = {
-  NO_COMPANY_DOMAIN: "no_company_domain",
-  WEBSITE_UNREACHABLE: "website_unreachable",
   RATE_LIMITED: "rate_limited",
   QUEUE_FAILED: "queue_failed",
 } as const;

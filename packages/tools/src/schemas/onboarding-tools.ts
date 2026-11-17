@@ -1,15 +1,6 @@
-import { onboardingSuggestionPresetSchema } from "@notra/ai/schemas/onboarding-agent";
-import { toneProfileSchema } from "@notra/ai/schemas/tone";
-import {
-  applicablePlatformEnum,
-  brandGuidelineColorRoleEnum,
-  onboardingSuggestionTypeEnum,
-  referenceTypeEnum,
-} from "@notra/db/schema";
+import { applicablePlatformEnum, referenceTypeEnum } from "@notra/db/schema";
 import { z } from "zod";
 
-import { BRAND_PROFILE_FIELDS, MAX_BRAND_COLORS } from "../constants/brand";
-import { MEMORY_SEARCH_DEFAULT_LIMIT } from "../constants/knowledge";
 import { SHA256_HEX_REGEX } from "../constants/reference-snapshot";
 
 export const referenceInputSchema = z
@@ -45,53 +36,3 @@ export const referenceInputSchema = z
   );
 
 export const addReferenceInputSchema = referenceInputSchema;
-
-export const addReferencesInputSchema = z.object({
-  references: z.array(referenceInputSchema).min(1),
-});
-
-export const addSuggestionInputSchema = z.object({
-  type: z.enum(onboardingSuggestionTypeEnum.enumValues),
-  title: z.string().min(1),
-  description: z.string().min(1).optional(),
-  evidence: z.string().min(1).optional(),
-  preset: onboardingSuggestionPresetSchema.optional(),
-  data: z.record(z.string(), z.unknown()).optional(),
-});
-
-export const saveBrandColorsInputSchema = z.object({
-  colors: z
-    .array(
-      z.object({
-        role: z.enum(brandGuidelineColorRoleEnum.enumValues),
-        name: z.string().min(1).optional(),
-        lightValue: z.string().min(1),
-        darkValue: z.string().min(1).optional(),
-        usage: z.string().min(1).optional(),
-      })
-    )
-    .min(1)
-    .max(MAX_BRAND_COLORS),
-});
-
-export const saveMemoryInputSchema = z.object({
-  content: z.string().min(1),
-  topic: z.string().min(1),
-});
-
-export const searchMemoryInputSchema = z.object({
-  query: z.string().min(1),
-  limit: z.number().int().min(1).max(20).default(MEMORY_SEARCH_DEFAULT_LIMIT),
-});
-
-export const updateBrandProfileInputSchema = z
-  .object({
-    companyName: z.string().min(1).optional(),
-    companyDescription: z.string().min(1).optional(),
-    toneProfile: toneProfileSchema.optional(),
-    audience: z.string().min(1).optional(),
-  })
-  .refine(
-    (input) => BRAND_PROFILE_FIELDS.some((field) => input[field] !== undefined),
-    { message: "Provide at least one brand profile field to update" }
-  );

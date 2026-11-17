@@ -185,8 +185,6 @@
     "SLACK_AGENT_ALLOWED_CHANNEL_IDS",
     "SLACK_OAUTH_REDIRECT_BASE_URL",
     "TCC_API_KEY",
-    "EVE_ONBOARDING_AGENT_URL",
-    "EVE_ONBOARDING_AGENT_PASSWORD",
     "DASHBOARD_VERCEL_TEAM_SLUG",
     "DASHBOARD_VERCEL_PROJECT_NAME",
     "DASHBOARD_VERCEL_ENVIRONMENT",
@@ -235,15 +233,6 @@
       "dependsOn": ["transit"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
       "outputs": [".output/**", ".vercel/output/**"]
-    },
-    "@notra/onboarding-agent#build": {
-      "dependsOn": ["transit"],
-      "outputs": [
-        ".output/**",
-        ".vercel/output/**",
-        ".eve/compile/**",
-        ".eve/discovery/**"
-      ]
     },
     "check-types": {
       "dependsOn": ["transit"],

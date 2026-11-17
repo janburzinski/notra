@@ -1,6 +1,6 @@
 # Notra Agent
 
-The unified eve-based agent for all Notra product work (everything except onboarding, which stays in `apps/onboarding-agent`). The root agent is the Notra assistant chat surface; content generation and image generation run as subagents.
+The unified eve-based agent for all Notra product work. The root agent is the Notra assistant chat surface; content generation and image generation run as subagents.
 
 ## Architecture at a glance
 

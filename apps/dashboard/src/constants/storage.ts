@@ -15,8 +15,8 @@ export const localStorageKeys = {
       : "onboarding-collapsed",
   brandIdentity: (organizationId: string) =>
     `notra:brand-identity:v1:${organizationId}`,
-  onboardingAgentBannerDismissed: (organizationId: string) =>
-    `notra:eve-banner-dismissed:${organizationId}`,
+  dashboardBannerDismissed: (bannerId: string) =>
+    `notra:dashboard-banner-dismissed:${bannerId}`,
   geoUpgradeDismissed: (organizationId: string) =>
     `notra:geo-upgrade-dismissed:${organizationId}`,
   chatSuggestionsDismissed: "notra:chat-suggestions-dismissed:v1",

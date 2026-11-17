@@ -24,19 +24,17 @@ import { RestoreSidebarHome } from "@/components/dashboard/restore-sidebar-home"
 import { RightPanel } from "@/components/dashboard/right-panel";
 import { useRightPanel } from "@/components/dashboard/right-panel-context";
 import { useOrganizationsContext } from "@/components/providers/organization-provider";
-import { EVE_BANNER_HEIGHT } from "@/constants/onboarding-agent";
 import { RIGHT_PANEL_PORTAL_ID } from "@/constants/right-panel";
 import { useAgentPromptBarVisible } from "@/lib/hooks/use-agent-prompt-bar-visible";
+import { useDashboardBanner } from "@/lib/hooks/use-dashboard-banner";
 import { useDashboardRootMarker } from "@/lib/hooks/use-dashboard-root-marker";
 import { useDemoBannerVisible } from "@/lib/hooks/use-demo-banner-visible";
 import { useDesktopBreakpoint } from "@/lib/hooks/use-desktop-breakpoint";
 import { useIsClient } from "@/lib/hooks/use-is-client";
-import { useOnboardingBanner } from "@/lib/hooks/use-onboarding-banner";
 import { useSidebarWidth } from "@/lib/hooks/use-sidebar-width";
 import { useWelcomeTour } from "@/lib/hooks/use-welcome-tour";
 import { usePathname } from "@/lib/navigation";
 import type {
-  DashboardOnboardingBannerProps,
   DashboardShellProps,
   DashboardSidebarStyle,
 } from "@/types/components/dashboard-shell";
@@ -55,9 +53,9 @@ const DemoPlaygroundProvider = dynamic(() =>
   )
 );
 
-const OnboardingAgentBanner = dynamic(() =>
-  import("@/components/dashboard/onboarding-agent-banner").then(
-    (module) => module.OnboardingAgentBanner
+const DashboardBanner = dynamic(() =>
+  import("@/components/dashboard/dashboard-banner").then(
+    (module) => module.DashboardBanner
   )
 );
 
@@ -166,48 +164,6 @@ function DashboardAgentSlot() {
   );
 }
 
-function DashboardOnboardingBanner({
-  available,
-  dismissing,
-  onDismiss,
-  onExitComplete,
-  onStart,
-  running,
-  starting,
-  visible,
-}: DashboardOnboardingBannerProps) {
-  if (!(available || dismissing)) {
-    return null;
-  }
-
-  return (
-    <div
-      className={cn(
-        "duration-normal w-full shrink-0 overflow-hidden transition-[max-height,opacity] ease-out motion-reduce:transition-none",
-        visible ? "opacity-100" : "opacity-0"
-      )}
-      onTransitionEnd={(event) => {
-        if (
-          event.target === event.currentTarget &&
-          event.propertyName === "max-height"
-        ) {
-          onExitComplete();
-        }
-      }}
-      style={{ maxHeight: visible ? EVE_BANNER_HEIGHT : "0rem" }}
-    >
-      <div style={{ height: EVE_BANNER_HEIGHT }}>
-        <OnboardingAgentBanner
-          onDismiss={onDismiss}
-          onStart={onStart}
-          starting={starting}
-          state={running ? "running" : "idle"}
-        />
-      </div>
-    </div>
-  );
-}
-
 function DashboardPageViewport({
   children,
 }: Pick<DashboardShellProps, "children">) {
@@ -236,22 +192,16 @@ function DashboardPageViewport({
 export function DashboardShell({
   children,
   demoBannerHidden,
-  initialOnboardingAgentRun,
   initialSidebarOpen,
   initialSidebarWidth,
-  onboardingBannerDismissed,
 }: DashboardShellProps) {
   const { activeOrganization } = useOrganizationsContext();
   const { expanded } = useRightPanel();
-  const banner = useOnboardingBanner({
-    organizationId: activeOrganization?.id ?? "",
-    initialRun: initialOnboardingAgentRun,
-    initiallyDismissed: onboardingBannerDismissed,
-  });
   const demo = isDemoModeClient();
   const showDemoBanner = useDemoBannerVisible(demoBannerHidden);
   const welcomeTour = useWelcomeTour();
-  const shellStyle = dashboardShellStyle(showDemoBanner, banner.visible);
+  const banner = useDashboardBanner();
+  const shellStyle = dashboardShellStyle(showDemoBanner, !!banner);
   const {
     finishSidebarResize,
     setSidebarWidth,
@@ -280,16 +230,11 @@ export function DashboardShell({
           <DashboardDemoChrome showBanner={showDemoBanner} />
         </div>
       ) : null}
-      <DashboardOnboardingBanner
-        available={banner.available}
-        dismissing={banner.dismissing}
-        onDismiss={banner.dismiss}
-        onExitComplete={banner.finishDismissing}
-        onStart={banner.start}
-        running={banner.running}
-        starting={banner.starting}
-        visible={banner.visible}
-      />
+      {banner ? (
+        <div className="h-(--dashboard-banner-height) shrink-0">
+          <DashboardBanner {...banner} />
+        </div>
+      ) : null}
       <SidebarProvider
         className={cn(
           "min-h-0! flex-1 overflow-hidden overscroll-none",
@@ -300,7 +245,7 @@ export function DashboardShell({
         style={sidebarStyle}
       >
         <DashboardSidebar
-          className="transition-[left,right,width,top,height] [transition-duration:var(--sidebar-duration),var(--sidebar-duration),var(--sidebar-duration),200ms,200ms] [transition-timing-function:var(--sidebar-ease),var(--sidebar-ease),var(--sidebar-ease),ease-out,ease-out] motion-reduce:transition-none md:top-(--eve-banner-height) md:h-[calc(100svh-var(--eve-banner-height))]"
+          className="transition-[left,right,width,top,height] [transition-duration:var(--sidebar-duration),var(--sidebar-duration),var(--sidebar-duration),200ms,200ms] [transition-timing-function:var(--sidebar-ease),var(--sidebar-ease),var(--sidebar-ease),ease-out,ease-out] motion-reduce:transition-none md:top-(--top-banner-height) md:h-[calc(100svh-var(--top-banner-height))]"
           onWidthChange={setSidebarWidth}
           onWidthChangeEnd={finishSidebarResize}
           onWidthChangeStart={startSidebarResize}

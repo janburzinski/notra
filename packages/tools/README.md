@@ -7,14 +7,15 @@ keeps a small adapter file under its own `tools/` directory that re-exports a
 definition from this package:
 
 ```ts
-export { default } from "@notra/tools/onboarding/save-memory";
+import { createAddReferenceTool } from "@notra/tools/onboarding/add-reference";
+
+export default createAddReferenceTool();
 ```
 
 Layout:
 
-- `src/onboarding/` — root tools of the onboarding agent (brand profile, references, memories, suggestions)
-- `src/researcher/` — research subagent tools (context.dev scraping, GitHub, X)
-- `src/skill-editor/` — skill CRUD tools
+- `src/assistant/`, `src/analytics/`, `src/content-writer/`, `src/image/`, `src/code-research/`, `src/autopilot/` — tools used by `apps/agent`
+- `src/onboarding/add-reference.ts` — saves a brand reference
 - `src/disabled.ts` — `createDisabledTool()` for switching off eve built-ins (the adapter file's name selects the built-in)
 - `src/schemas/`, `src/types/`, `src/constants/`, `src/utils/` — the shared building blocks the tools are made of
 

@@ -13,7 +13,6 @@ COPY apps/console/package.json ./apps/console/package.json
 COPY apps/dashboard/package.json ./apps/dashboard/package.json
 COPY apps/docs/package.json ./apps/docs/package.json
 COPY apps/evals/package.json ./apps/evals/package.json
-COPY apps/onboarding-agent/package.json ./apps/onboarding-agent/package.json
 COPY apps/sites/package.json ./apps/sites/package.json
 COPY apps/sites-builder/package.json ./apps/sites-builder/package.json
 COPY apps/ui/package.json ./apps/ui/package.json

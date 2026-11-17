@@ -1,1 +1,0 @@
-export const MEMORY_SEARCH_DEFAULT_LIMIT = 8;
