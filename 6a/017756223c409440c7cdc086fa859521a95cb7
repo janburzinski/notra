@@ -1,0 +1,19 @@
+apps/dashboard/src/components/chat/chat-home-suggestions.tsx
+  s_17dd8025b1880e::t_63e4cc1f71c3e6 53-61,63-67,69
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "6a017756223c409440c7cdc086fa859521a95cb7",
+  "prompts": {},
+  "sessions": {
+    "s_17dd8025b1880e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "3d5dbb3b-99bf-4af5-b799-56c2a1fb13c3",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
