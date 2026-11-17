@@ -1,0 +1,33 @@
+apps/dashboard/messages/de.json
+  s_3c33f7b1504a3c::t_23aac5e6abd706 130,1315
+apps/dashboard/src/components/onboarding/domain-invite-pref.tsx
+  s_3c33f7b1504a3c::t_957809649a7e7f 23
+  s_3c33f7b1504a3c::t_10df31056513a9 4,9-10
+  s_3c33f7b1504a3c::t_58c9660b49afb4 3,21-22,24-25,36,39,42-43
+  s_3c33f7b1504a3c::t_0ffb30b6ec6939 20
+  s_3c33f7b1504a3c::t_23aac5e6abd706 26-35
+apps/dashboard/messages/en.json
+  s_3c33f7b1504a3c::t_23aac5e6abd706 130,1315
+apps/dashboard/src/app/onboarding/workspace/workspace-form.tsx
+  s_3c33f7b1504a3c::t_1b722833fec0c8 95,346-357
+apps/dashboard/src/components/members/domain-auto-invite-card.tsx
+  s_3c33f7b1504a3c::t_6bd3458f910182 51-58
+apps/dashboard/src/lib/organizations/actions.ts
+  s_3c33f7b1504a3c::t_1b722833fec0c8 328
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "d8df31a4663b66aff8d05f438f3c8266991870f4",
+  "prompts": {},
+  "sessions": {
+    "s_3c33f7b1504a3c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "2735215f-d6a3-4456-91e8-3144c45bfa09",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
