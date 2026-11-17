@@ -1,0 +1,21 @@
+apps/docs/autopilot/automations/overview.mdx
+  s_33e63524097acb::t_ab46c402fdaaab 44,48,75,93,95,105
+apps/docs/autopilot/settings.mdx
+  s_33e63524097acb::t_ab46c402fdaaab 73
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "2ad0dc0eebc8059f0bb317dddd72293f4655a087",
+  "prompts": {},
+  "sessions": {
+    "s_33e63524097acb": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "bcecfd44-f88f-4203-b447-55ae342dcd8a",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
