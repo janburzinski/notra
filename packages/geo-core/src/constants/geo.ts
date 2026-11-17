@@ -517,6 +517,50 @@ export const GEO_GAP_TITLE_MAX_LENGTH = 160;
 export const GEO_DISCOVERY_MODEL = "anthropic/claude-sonnet-5";
 export const GEO_WEBSITE_DISCOVERY_MODEL = "moonshotai/kimi-k3";
 export const GEO_DISCOVERY_MAX_TOKENS = 10000;
+export const GEO_AUTO_PROMPT_IDS = [
+  "best-tools",
+  "alternatives",
+  "recommendation",
+  "comparison",
+  "what-is",
+  "how-to-choose",
+  "top-list",
+  "audience-specific",
+] as const;
+export const GEO_AUTO_PROMPT_MAX_TOKENS = 4000;
+export const GEO_AUTO_PROMPT_MIN_WORDS = 5;
+export const GEO_AUTO_PROMPT_MAX_WORDS = 40;
+export const GEO_AUTO_PROMPT_MAX_CONTEXT_PROMPTS = 20;
+export const GEO_AUTO_PROMPT_SLOTS: Record<
+  (typeof GEO_AUTO_PROMPT_IDS)[number],
+  string
+> = {
+  "best-tools":
+    "A short, direct ask for the best product for the core job, typed in a hurry. 6 to 14 words. No backstory.",
+  alternatives:
+    "Someone stuck with one listed competitor, or with a homegrown setup when no competitor fits, asks what to switch to and says in a few words what is not working. The only product it may name is one from the known competitors list.",
+  recommendation:
+    "First person with one or two real constraints that change the answer, such as team size, stack, budget, scale, region or compliance, asking what to use. 15 to 35 words.",
+  comparison:
+    "Asks how two or three options compare for one specific use case. Every option is either a product from the known competitors list or building it in-house. No other product names.",
+  "what-is":
+    "Problem first: describes the job or the pain and asks how people usually solve it, without asking for a list of products. It must be a problem this product directly solves.",
+  "how-to-choose":
+    "Asks what actually matters when choosing a product for this job and names one or two criteria this buyer would care about.",
+  "top-list":
+    'Asks what is commonly used in practice for one concrete job this product handles. Describe the people asking with a detail from "Who buys it" that fits this company, never a stock group like indie hackers or small SaaS teams unless that is literally the buyer.',
+  "audience-specific":
+    "Written as the core buyer: says who they are (role, company type or size) and what they need, then asks for a recommendation. Pick a different buyer detail than the recommendation slot.",
+};
+export const GEO_AUTO_PROMPT_COMPETITOR_SLOTS: ReadonlySet<string> = new Set([
+  "alternatives",
+  "comparison",
+]);
+export const GEO_AUTO_PROMPT_ATTEMPTS = 2;
+export const GEO_AUTO_PROMPT_IN_HOUSE_REGEX =
+  /\b(in-house|in house|homegrown|home-grown|diy|ourselves|myself|my own|our own|build(?:ing)? it|roll(?:ing)? (?:my|our) own|self-built|custom-built)\b/i;
+export const GEO_AUTO_PROMPT_SYSTEM_PROMPT =
+  "You write the questions real buyers type into ChatGPT, Perplexity or Claude while looking for a product, before they know a specific company. Return only the requested structured data.";
 export const GEO_DISCOVERY_MAX_ALIASES = 6;
 export const GEO_DISCOVERY_MIN_COMPETITORS = 0;
 export const GEO_DISCOVERY_MAX_COMPETITORS = 10;

@@ -4,6 +4,7 @@ import { and, asc, eq } from "drizzle-orm";
 import { Effect } from "effect";
 
 import type { GeoSettings } from "../types/geo";
+import { ensureGeoAutoPrompts } from "./auto-prompts";
 import { geoDb } from "./effect";
 import { loadGeoProjectBrand } from "./project-brand";
 import { assembleGeoScanPrompts, buildGeoPrompts } from "./prompts";
@@ -34,16 +35,13 @@ export const loadGeoScanPrompts = Effect.fn("geo.scanPrompts")(function* (
     ],
     { concurrency: "unbounded" }
   );
+  const autoPrompts = yield* ensureGeoAutoPrompts(
+    settings,
+    brand,
+    customRows.map((row) => row.prompt)
+  );
   const prompts = assembleGeoScanPrompts({
-    autoPrompts: buildGeoPrompts(
-      settings,
-      brand
-        ? {
-            companyDescription: brand.companyDescription,
-            audience: brand.audience,
-          }
-        : null
-    ),
+    autoPrompts: buildGeoPrompts(settings, autoPrompts),
     customRows,
     pausedAutoPromptIds: settings.pausedAutoPromptIds,
     removedAutoPromptIds: settings.removedAutoPromptIds,

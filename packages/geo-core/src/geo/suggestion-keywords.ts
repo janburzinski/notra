@@ -2,7 +2,6 @@ import type {
   GscQueryPageRow,
   GscQueryRow,
 } from "@notra/ai/types/google-search-console";
-import { escapeRegExp } from "@notra/utils/escape";
 
 import {
   GSC_BUYING_INTENT_WEIGHT,
@@ -18,16 +17,6 @@ import { buyingIntentSection } from "../utils/gsc-buying-intent";
 import { isQuestionQuery } from "../utils/gsc-question";
 
 const MIN_BRAND_TERM_LENGTH = 3;
-const BRAND_TOKEN_SEPARATOR = "[-_\\s]+";
-/*
- * `\b` counts only [A-Za-z0-9_] as word characters, so a brand that starts or
- * ends on a non-ASCII letter never gets a boundary there and survives the
- * strip — "Nestlé" and "ブランド" did, while "Müller" happened to work because
- * its umlaut sits between two ASCII letters. Same class the answer mention
- * matcher uses; marks are included so a stray combining mark cannot split a
- * letter from its accent.
- */
-const BRAND_WORD_CHAR = "[\\p{L}\\p{N}\\p{M}_]";
 const NAVIGATIONAL_QUERY =
   /^(?:[\p{L}\p{N}._-]+\s+){0,2}(?:log(?:in|\s+in|-in)|sign(?:\s+|-)?(?:in|up)|anmelden|einloggen|careers|karriere|stellenangebote|impressum)$/iu;
 const WINNING_POSITION = 3;
@@ -59,31 +48,6 @@ export function promptMentionsBrand(
   return brandTerms.some((term) =>
     normalized.includes(` ${normalizeForBrandMatch(term)} `)
   );
-}
-
-export function stripBrandTerms(text: string, brandTerms: string[]): string {
-  let result = text.normalize("NFC");
-  const sorted = [...brandTerms].sort(
-    (left, right) => right.length - left.length
-  );
-  for (const term of sorted) {
-    const folded = normalizeForBrandMatch(term);
-    if (folded.length === 0) {
-      continue;
-    }
-    const parts = folded.split(" ").filter(Boolean).map(escapeRegExp);
-    if (parts.length === 0) {
-      continue;
-    }
-    result = result.replace(
-      new RegExp(
-        `(?<!${BRAND_WORD_CHAR})${parts.join(BRAND_TOKEN_SEPARATOR)}(?!${BRAND_WORD_CHAR})`,
-        "giu"
-      ),
-      " "
-    );
-  }
-  return result.replace(/\s+/g, " ").trim();
 }
 
 export function buildBrandTerms(

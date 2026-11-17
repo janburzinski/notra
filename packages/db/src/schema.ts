@@ -1884,6 +1884,7 @@ export const geoSettings = pgTable(
       .array()
       .notNull()
       .default(sql`ARRAY[]::text[]`),
+    autoPrompts: jsonb("auto_prompts").$type<{ id: string; text: string }[]>(),
     ignoredGapPromptIds: text("ignored_gap_prompt_ids")
       .array()
       .notNull()

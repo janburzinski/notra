@@ -18,7 +18,10 @@ import type { GeoContentBriefStatus } from "@notra/db/types/geo-writer";
 import type { FinishReason, LanguageModel, ToolSet } from "ai";
 import type { z } from "zod";
 
-import type { GEO_TRAFFIC_SITES_MODES } from "../constants/geo";
+import type {
+  GEO_AUTO_PROMPT_IDS,
+  GEO_TRAFFIC_SITES_MODES,
+} from "../constants/geo";
 import type { GEO_AUDIENCE_TYPES } from "../constants/geo-model-catalog";
 import type { WEB_UTM_DIMENSIONS } from "../constants/web-analytics";
 import type {
@@ -810,6 +813,22 @@ export interface GeoScanFinishTotals {
 export interface GeoPromptDefinition {
   id: string;
   text: string;
+}
+
+export type GeoAutoPromptId = (typeof GEO_AUTO_PROMPT_IDS)[number];
+
+export interface GeoAutoPromptSlotOutput {
+  prompt: string;
+  products: string[];
+}
+
+export interface GeoAutoPromptContext {
+  companyName: string;
+  aliases: string[];
+  companyDescription: string | null;
+  audience: string | null;
+  competitors: string[];
+  trackedPrompts: string[];
 }
 
 export interface GeoCheckTask {

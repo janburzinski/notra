@@ -478,6 +478,22 @@ export const geoWebsiteDiscoverySchema = object({
   ),
 });
 
+const geoAutoPromptSlotSchema = object({
+  prompt: string(),
+  products: array(string()),
+});
+
+export const geoAutoPromptsSchema = object({
+  "best-tools": geoAutoPromptSlotSchema,
+  alternatives: geoAutoPromptSlotSchema,
+  recommendation: geoAutoPromptSlotSchema,
+  comparison: geoAutoPromptSlotSchema,
+  "what-is": geoAutoPromptSlotSchema,
+  "how-to-choose": geoAutoPromptSlotSchema,
+  "top-list": geoAutoPromptSlotSchema,
+  "audience-specific": geoAutoPromptSlotSchema,
+});
+
 export const geoJudgeResultSchema = object({
   mentioned: boolean(),
   position: number().nullable(),

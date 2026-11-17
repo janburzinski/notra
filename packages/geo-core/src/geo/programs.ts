@@ -184,7 +184,6 @@ import {
   toTrackedPrompt,
 } from "./mappers";
 import { loadGeoModelCatalog } from "./model-catalog";
-import { loadGeoProjectBrand } from "./project-brand";
 import {
   ensureGeoProject,
   geoCheckScope,
@@ -201,7 +200,6 @@ import {
   applyAutoPromptChange,
   buildGeoPrompts,
   customPromptScanId,
-  generatedAutoPromptIds,
   isGeoAutoPromptId,
   toAutoTrackedPrompts,
 } from "./prompts";
@@ -1757,7 +1755,7 @@ export const listGeoPrompts = Effect.fn("geo.promptsList")(function* (
   }
 
   const projectId = scope.projectId;
-  const [customRows, settingsRow, brand] = yield* Effect.all(
+  const [customRows, settingsRow] = yield* Effect.all(
     [
       geoDb("prompts lookup failed", () =>
         db.query.geoPrompts.findMany({
@@ -1766,7 +1764,6 @@ export const listGeoPrompts = Effect.fn("geo.promptsList")(function* (
         })
       ),
       geoDb("settings lookup failed", () => findGeoSettingsRow(projectId)),
-      loadGeoProjectBrand({ organizationId: scope.organizationId, projectId }),
     ],
     { concurrency: "unbounded" }
   );
@@ -1785,12 +1782,7 @@ export const listGeoPrompts = Effect.fn("geo.promptsList")(function* (
   const autoPrompts = toAutoTrackedPrompts(
     buildGeoPrompts(
       toGeoSettings(settingsRow, catalog),
-      brand
-        ? {
-            companyDescription: brand.companyDescription,
-            audience: brand.audience,
-          }
-        : null
+      settingsRow.autoPrompts
     ),
     settingsRow.pausedAutoPromptIds,
     settingsRow.removedAutoPromptIds
@@ -1976,9 +1968,7 @@ type AutoPromptPatchOutcome =
 const patchAutoPromptInTransaction = Effect.fn("geo.promptsPatchAutoTx")(
   function* (
     tx: DbTransaction,
-    organizationId: string,
     projectId: string,
-    brandSettingsId: string,
     promptId: string,
     change: "pause" | "resume" | "remove"
   ) {
@@ -1989,6 +1979,7 @@ const patchAutoPromptInTransaction = Effect.fn("geo.promptsPatchAutoTx")(
           companyName: true,
           aliases: true,
           promptLanguage: true,
+          autoPrompts: true,
           pausedAutoPromptIds: true,
           removedAutoPromptIds: true,
         },
@@ -2003,27 +1994,15 @@ const patchAutoPromptInTransaction = Effect.fn("geo.promptsPatchAutoTx")(
       const outcome: AutoPromptPatchOutcome = { status: "not-found" };
       return outcome;
     }
-    const brand = yield* geoDb("brand lookup failed", () =>
-      tx.query.brandSettings.findFirst({
-        columns: { companyDescription: true, audience: true },
-        where: and(
-          eq(brandSettings.organizationId, organizationId),
-          eq(brandSettings.id, brandSettingsId)
-        ),
-      })
-    );
-    const generatedIds = generatedAutoPromptIds(
-      {
-        companyName: settingsRow.companyName,
-        aliases: settingsRow.aliases,
-        promptLanguage: settingsRow.promptLanguage ?? undefined,
-      },
-      brand
-        ? {
-            companyDescription: brand.companyDescription,
-            audience: brand.audience,
-          }
-        : null
+    const generatedIds = new Set(
+      buildGeoPrompts(
+        {
+          companyName: settingsRow.companyName,
+          aliases: settingsRow.aliases,
+          promptLanguage: settingsRow.promptLanguage ?? undefined,
+        },
+        settingsRow.autoPrompts
+      ).map((prompt) => prompt.id)
     );
     if (!generatedIds.has(promptId)) {
       const outcome: AutoPromptPatchOutcome = { status: "not-found" };
@@ -2052,19 +2031,11 @@ const patchAutoPromptInTransaction = Effect.fn("geo.promptsPatchAutoTx")(
 const patchAutoPromptSettings = Effect.fn("geo.promptsPatchAuto")(function* (
   organizationId: string,
   projectId: string,
-  brandSettingsId: string,
   promptId: string,
   change: "pause" | "resume" | "remove"
 ) {
   const outcome = yield* geoTransaction("auto prompt update failed", (tx) =>
-    patchAutoPromptInTransaction(
-      tx,
-      organizationId,
-      projectId,
-      brandSettingsId,
-      promptId,
-      change
-    )
+    patchAutoPromptInTransaction(tx, projectId, promptId, change)
   );
   if (outcome.status === "missing-settings") {
     return yield* Effect.fail(new GeoSettingsMissingError({ organizationId }));
@@ -2119,7 +2090,6 @@ export const deleteGeoPrompt = Effect.fn("geo.promptsDelete")(function* (
   yield* patchAutoPromptSettings(
     scope.organizationId,
     scope.projectId,
-    scope.brandSettingsId,
     promptId,
     "remove"
   );
@@ -2164,7 +2134,6 @@ export const updateGeoPrompt = Effect.fn("geo.promptsUpdate")(function* (
   yield* patchAutoPromptSettings(
     scope.organizationId,
     scope.projectId,
-    scope.brandSettingsId,
     promptId,
     changes.enabled ? "resume" : "pause"
   );
@@ -2180,7 +2149,6 @@ export const toggleGeoAutoPrompt = Effect.fn("geo.promptsToggleAuto")(
     const next = yield* patchAutoPromptSettings(
       scope.organizationId,
       scope.projectId,
-      scope.brandSettingsId,
       promptId,
       enabled ? "resume" : "pause"
     );
@@ -2223,7 +2191,6 @@ export const toggleGeoPrompt = Effect.fn("geo.promptsToggle")(function* (
   yield* patchAutoPromptSettings(
     scope.organizationId,
     scope.projectId,
-    scope.brandSettingsId,
     promptId,
     enabled ? "resume" : "pause"
   );

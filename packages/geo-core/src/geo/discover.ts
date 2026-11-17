@@ -298,7 +298,12 @@ const persistGeoWebsiteGeneration = Effect.fn(
         })
         .onConflictDoUpdate({
           target: geoSettings.projectId,
-          set: { companyName, aliases },
+          set: {
+            companyName,
+            aliases,
+            autoPrompts: null,
+            updatedAt: new Date(),
+          },
         }),
     catch: (cause) =>
       new GeoDiscoveryError({
