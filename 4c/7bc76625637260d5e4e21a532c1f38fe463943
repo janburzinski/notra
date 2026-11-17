@@ -1,0 +1,98 @@
+packages/db/src/utils/geo-checks.ts
+  s_39b0454aff7e1d::t_345febdf21ca02 1616,1642-1643,1645-1646
+packages/tools/src/analytics/get-geo-scan.ts
+  s_39b0454aff7e1d::t_345febdf21ca02 15,17
+  s_39b0454aff7e1d::t_dedf040f5921f8 1
+  s_39b0454aff7e1d::t_67fdd18fe197d9 2,20-22
+apps/dashboard/src/workflows/steps/chat-steps.ts
+  s_39b0454aff7e1d::t_a215c28196d264 50-53,304
+  s_39b0454aff7e1d::t_1fee8c8dba69d2 303
+apps/agent/agent/instructions.md
+  s_39b0454aff7e1d::t_5bb4849dbdd283 36
+packages/tools/src/utils/geo-dashboard.ts
+  s_39b0454aff7e1d::t_5bb4849dbdd283 1-41
+packages/ai/src/tools/geo.ts
+  s_39b0454aff7e1d::t_62dfa5ee596c9f 8,11,25,157-168,170-198
+  s_39b0454aff7e1d::t_a215c28196d264 3,13-16,169,199-221
+packages/ai/src/types/geo-prompt-scan.ts
+  s_39b0454aff7e1d::t_5d852cde137507 1-27
+  s_39b0454aff7e1d::t_05f9cf35d48361 28-43
+apps/agent/tests/geo-scan-tools.test.ts
+  s_39b0454aff7e1d::t_9374d8e7c7e234 119-122
+  s_39b0454aff7e1d::t_ac0e2e58300d61 9-10,116-118,123-134
+packages/ai/src/orchestration/standalone-tool-registry.ts
+  s_39b0454aff7e1d::t_62dfa5ee596c9f 19,23,97,209-214,216-217
+  s_39b0454aff7e1d::t_a215c28196d264 22,204-208,215
+apps/dashboard/src/routeTree.gen.ts
+  s_39b0454aff7e1d::t_1e3069c214b0e8 92,558-563,828,942,1057,1173,1287,1401,1510,2099-2105,2511
+apps/dashboard/tests/geo-prompt-scan.test.ts
+  s_39b0454aff7e1d::t_ac0e2e58300d61 5-8,69-83
+packages/ai/src/orchestration/orchestrate-standalone.ts
+  s_39b0454aff7e1d::t_62dfa5ee596c9f 141
+  s_39b0454aff7e1d::t_a215c28196d264 142
+apps/dashboard/src/utils/geo-prompt-scan.ts
+  s_39b0454aff7e1d::t_9374d8e7c7e234 90-92
+  s_39b0454aff7e1d::t_05f9cf35d48361 53,80-89,93-94
+  s_39b0454aff7e1d::t_c0fb5290e8da89 54-79
+apps/dashboard/src/lib/autopilot/workflows/scan-prompt.ts
+  s_39b0454aff7e1d::t_345febdf21ca02 78
+packages/tools/src/analytics/scan-geo-prompt.ts
+  s_39b0454aff7e1d::t_5bb4849dbdd283 1,14,21,30-38
+  s_39b0454aff7e1d::t_dedf040f5921f8 2
+apps/dashboard/src/app/api/organizations/[organizationId]/chat/route.ts
+  s_39b0454aff7e1d::t_a215c28196d264 71-74,510
+  s_39b0454aff7e1d::t_1fee8c8dba69d2 509
+packages/geo-core/src/schemas/geo-prompt-scan.ts
+  s_39b0454aff7e1d::t_05f9cf35d48361 22-28,31-34
+apps/dashboard/src/app/api/internal/geo/prompt-scan/route.ts
+  s_39b0454aff7e1d::t_1fee8c8dba69d2 3,7-8,27-29
+  s_39b0454aff7e1d::t_dedf040f5921f8 26
+packages/ai/src/types/standalone-chat.ts
+  s_39b0454aff7e1d::t_62dfa5ee596c9f 51
+  s_39b0454aff7e1d::t_a215c28196d264 3-6,52
+apps/dashboard/src/app/api/internal/geo/prompt-find/route.ts
+  s_39b0454aff7e1d::t_1e3069c214b0e8 1-30
+packages/tools/src/analytics/find-geo-prompts.ts
+  s_39b0454aff7e1d::t_9374d8e7c7e234 24-28
+  s_39b0454aff7e1d::t_5bb4849dbdd283 1-23,29-37
+apps/dashboard/src/routes/api.internal.geo.prompt-find.ts
+  s_39b0454aff7e1d::t_1e3069c214b0e8 1-19
+apps/agent/agent/tools/find_geo_prompts.ts
+  s_39b0454aff7e1d::t_5bb4849dbdd283 1-3
+packages/ai/src/constants/geo-tools.ts
+  s_39b0454aff7e1d::t_6b8832882f79aa 19-25
+  s_39b0454aff7e1d::t_1e3069c214b0e8 26-27
+packages/ai/src/schemas/geo-tools.ts
+  s_39b0454aff7e1d::t_1e3069c214b0e8 142-159
+  s_39b0454aff7e1d::t_6b8832882f79aa 3-5,101-140
+packages/ai/src/types/orchestration.ts
+  s_39b0454aff7e1d::t_62dfa5ee596c9f 223
+  s_39b0454aff7e1d::t_a215c28196d264 8-11,224
+packages/ai/src/utils/geo-tool-data.ts
+  s_39b0454aff7e1d::t_67fdd18fe197d9 3-7,26,36,452-504
+apps/dashboard/src/lib/geo/agent-prompt-scan.ts
+  s_39b0454aff7e1d::t_c0fb5290e8da89 2-3,12-15,25-72,88-90,93
+  s_39b0454aff7e1d::t_1fee8c8dba69d2 1,4-11,16-24,73-87,91-92,94-123
+packages/ai/src/orchestration/standalone-tool-registry.test.ts
+  s_39b0454aff7e1d::t_1ecdca73a8ecfa 1-2,7-17,19-27,33-45,50-51,53-56,58-69,79-81
+  s_39b0454aff7e1d::t_ac0e2e58300d61 3-6,28-32,46-49,52,70-74
+  s_39b0454aff7e1d::t_71805110b4aa72 57
+  s_39b0454aff7e1d::t_9374d8e7c7e234 75-78
+  s_39b0454aff7e1d::t_be8cd1aaa4cf30 18
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "4c7bc76625637260d5e4e21a532c1f38fe463943",
+  "prompts": {},
+  "sessions": {
+    "s_39b0454aff7e1d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "4ea4b605-0963-45cd-b19b-40e15b96751d",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
