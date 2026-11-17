@@ -21,6 +21,7 @@ import type {
   McpLogFilter,
   McpRequestLogProps,
   McpToolSectionsProps,
+  McpUnusedToolsProps,
 } from "@/types/mcp-analytics";
 import { mcpTableHeight } from "@/utils/mcp-analytics";
 
@@ -47,34 +48,42 @@ export function McpLoadFailed({ onRetry }: McpLoadFailedProps) {
 
 export function McpToolSections({ data, onOpenTool }: McpToolSectionsProps) {
   const t = useTranslations("geo.pages.mcp");
+  const columns = useMcpColumns({
+    maxToolCalls: Math.max(0, ...data.tools.map((tool) => tool.calls)),
+  });
+  return (
+    <InstrumentSection eyebrow={t("tools.title")} hint={t("tools.hint")}>
+      <DataTable
+        columns={columns.tools}
+        data={data.tools}
+        defaultSort={{ key: "calls", direction: "desc" }}
+        getRowId={(row) => row.name}
+        height={mcpTableHeight(data.tools.length)}
+        onRowClick={(row) => onOpenTool(row.name)}
+        rowHeight={TABLE_ROW_HEIGHT}
+      />
+    </InstrumentSection>
+  );
+}
+
+export function McpUnusedTools({ data }: McpUnusedToolsProps) {
+  const t = useTranslations("geo.pages.mcp.unused");
   const columns = useMcpColumns();
   const unusedTools = data.catalog?.unusedTools ?? [];
+  if (unusedTools.length === 0) {
+    return null;
+  }
   return (
-    <>
-      <InstrumentSection eyebrow={t("tools.title")} hint={t("tools.hint")}>
-        <DataTable
-          columns={columns.tools}
-          data={data.tools}
-          defaultSort={{ key: "calls", direction: "desc" }}
-          getRowId={(row) => row.name}
-          height={mcpTableHeight(data.tools.length)}
-          onRowClick={(row) => onOpenTool(row.name)}
-          rowHeight={TABLE_ROW_HEIGHT}
-        />
-      </InstrumentSection>
-      {unusedTools.length > 0 ? (
-        <InstrumentSection eyebrow={t("unused.title")} hint={t("unused.hint")}>
-          <DataTable
-            columns={columns.unusedTools}
-            data={unusedTools}
-            defaultSort={{ key: "name", direction: "asc" }}
-            getRowId={(row) => row.name}
-            height={mcpTableHeight(unusedTools.length)}
-            rowHeight={TABLE_ROW_HEIGHT}
-          />
-        </InstrumentSection>
-      ) : null}
-    </>
+    <InstrumentSection eyebrow={t("title")} hint={t("hint")}>
+      <DataTable
+        columns={columns.unusedTools}
+        data={unusedTools}
+        defaultSort={{ key: "name", direction: "asc" }}
+        getRowId={(row) => row.name}
+        height={mcpTableHeight(unusedTools.length)}
+        rowHeight={TABLE_ROW_HEIGHT}
+      />
+    </InstrumentSection>
   );
 }
 

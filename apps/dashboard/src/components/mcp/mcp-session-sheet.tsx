@@ -22,7 +22,9 @@ import { MCP_SHEET_ROW_HEIGHT } from "@/constants/mcp-analytics";
 import { useMcpSession } from "@/lib/hooks/use-mcp-analytics";
 import type { SheetStat } from "@/types/geo";
 import type { McpSessionSheetProps } from "@/types/mcp-analytics";
+import { formatAgentFeedbackClient } from "@/utils/agent-feedback-client";
 import { formatMilliseconds } from "@/utils/format";
+import { formatModelLabel } from "@/utils/geo-model-display";
 import {
   mcpSessionRequest,
   mcpTableHeight,
@@ -52,7 +54,9 @@ export function McpSessionSheet({
   );
   const events = data?.events ?? [];
   const startedAt = session ? Date.parse(session.startedAt) : 0;
-  const client = session?.clientName || t("fallback.unknownClient");
+  const client = session?.clientName
+    ? formatAgentFeedbackClient(session.clientName)
+    : t("fallback.unknownClient");
   const durationSeconds = session
     ? sessionDurationSeconds(session.startedAt, session.endedAt)
     : 0;
@@ -148,7 +152,7 @@ export function McpSessionSheet({
                 dateStyle: "medium",
                 timeStyle: "medium",
               })} · ${session.id}`}
-              icon={<AgentFeedbackAgentIcon client={client} />}
+              icon={<AgentFeedbackAgentIcon client={session.clientName} />}
               title={
                 <span className="min-w-0 truncate">
                   {t("sessionSheet.title", { client })}
@@ -173,7 +177,9 @@ export function McpSessionSheet({
                     {
                       key: "model",
                       label: t("requestSheet.model"),
-                      value: session.model || null,
+                      value: session.model
+                        ? formatModelLabel(session.model)
+                        : null,
                     },
                   ]}
                 />

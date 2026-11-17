@@ -74,6 +74,8 @@ export type McpToolSectionsProps = Pick<
   "data" | "onOpenTool"
 >;
 
+export type McpUnusedToolsProps = Pick<McpAnalyticsSectionsProps, "data">;
+
 export type McpAudienceSectionsProps = Omit<
   McpAnalyticsSectionsProps,
   "onOpenRequest"
@@ -83,6 +85,18 @@ export type McpRequestLogProps = Pick<
   McpAnalyticsSectionsProps,
   "data" | "onOpenRequest"
 >;
+
+export interface McpToolUsageCellProps {
+  /** Calls as a fraction of the busiest tool's, from 0 to 1. */
+  share: number;
+  /** The formatted call count. */
+  children: ReactNode;
+}
+
+export interface McpColumnsOptions {
+  /** Calls of the busiest tool; scales the usage bar behind each tool name. */
+  maxToolCalls?: number;
+}
 
 export interface McpTableEmptyProps {
   description: string;

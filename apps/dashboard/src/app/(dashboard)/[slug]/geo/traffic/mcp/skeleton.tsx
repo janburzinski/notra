@@ -36,6 +36,8 @@ export function McpTrafficSkeleton({ geoRange }: McpTrafficSkeletonProps) {
     {
       key: "calls",
       header: t("mcp.columns.calls"),
+      width: "1.5fr",
+      minWidth: "11rem",
       align: "right",
       sortable: true,
     },

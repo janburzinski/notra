@@ -8,12 +8,14 @@ import { useFormatter, useLocale, useTranslations } from "use-intl";
 
 import { AgentFeedbackAgentIcon } from "@/components/agent-feedback/feedback-agent-icon";
 import { McpRequestStatusBadge } from "@/components/mcp/mcp-request-sheet";
+import { McpToolUsageCell } from "@/components/mcp/mcp-tool-usage-cell";
 import {
   MCP_SERVER_REQUEST_KEYS,
   MCP_UI_TOOL_BADGE,
 } from "@/constants/mcp-analytics";
 import type {
   McpClientStats,
+  McpColumnsOptions,
   McpElicitationStats,
   McpIntentStats,
   McpModelStats,
@@ -24,7 +26,9 @@ import type {
   McpUnusedTool,
   McpUserStats,
 } from "@/types/mcp-analytics";
+import { formatAgentFeedbackClient } from "@/utils/agent-feedback-client";
 import { formatBytes, formatMilliseconds } from "@/utils/format";
+import { formatModelLabel } from "@/utils/geo-model-display";
 import {
   acceptRate,
   errorRate,
@@ -35,7 +39,7 @@ function mono(value: string) {
   return <span className="truncate font-mono text-sm">{value}</span>;
 }
 
-export function useMcpColumns() {
+export function useMcpColumns({ maxToolCalls = 0 }: McpColumnsOptions = {}) {
   const t = useTranslations("geo.pages.mcp");
   const format = useFormatter();
   const locale = useLocale();
@@ -54,12 +58,17 @@ export function useMcpColumns() {
   );
   const named = (value: string, fallback = t("fallback.unknown")) =>
     mono(value || fallback);
-  const branded = (value: string) => (
-    <span className="flex min-w-0 items-center gap-2">
+  const branded = (value: string, toLabel: (raw: string) => string) => (
+    <span className="flex min-w-0 items-center gap-2" title={value}>
       <AgentFeedbackAgentIcon client={value} />
-      {named(value)}
+      <span className="truncate text-sm">
+        {value ? toLabel(value) : t("fallback.unknown")}
+      </span>
     </span>
   );
+  const clientName = (value: string) =>
+    branded(value, formatAgentFeedbackClient);
+  const modelName = (value: string) => branded(value, formatModelLabel);
   const answered = (row: McpElicitationStats, value: ReactNode) =>
     row.method === "elicitation/create" ? (
       value
@@ -89,9 +98,17 @@ export function useMcpColumns() {
     {
       key: "calls",
       header: t("columns.calls"),
+      width: "1.5fr",
+      minWidth: "11rem",
       align: "right",
       sortable: true,
-      cell: (row) => count(row.calls),
+      cell: (row) => (
+        <McpToolUsageCell
+          share={maxToolCalls > 0 ? row.calls / maxToolCalls : 0}
+        >
+          {format.number(row.calls)}
+        </McpToolUsageCell>
+      ),
     },
     {
       key: "users",
@@ -139,7 +156,8 @@ export function useMcpColumns() {
     {
       key: "name",
       header: t("columns.tool"),
-      width: "minmax(10rem, 1fr)",
+      width: "1fr",
+      minWidth: "10rem",
       sortable: true,
       cell: (row) => named(row.name),
     },
@@ -162,7 +180,7 @@ export function useMcpColumns() {
       header: t("columns.client"),
       width: "2fr",
       sortable: true,
-      cell: (row) => branded(row.name),
+      cell: (row) => clientName(row.name),
     },
     {
       key: "sessions",
@@ -195,7 +213,7 @@ export function useMcpColumns() {
       header: t("columns.model"),
       width: "2fr",
       sortable: true,
-      cell: (row) => branded(row.name),
+      cell: (row) => modelName(row.name),
     },
     {
       key: "sessions",
@@ -379,7 +397,7 @@ export function useMcpColumns() {
     {
       key: "clientName",
       header: t("columns.client"),
-      cell: (row) => branded(row.clientName),
+      cell: (row) => clientName(row.clientName),
     },
     {
       key: "userId",
@@ -447,7 +465,7 @@ export function useMcpColumns() {
       key: "clientName",
       header: t("columns.client"),
       collapsePriority: 2,
-      cell: (row) => branded(row.clientName),
+      cell: (row) => clientName(row.clientName),
     },
     {
       key: "status",

@@ -17,6 +17,7 @@ import {
   McpRequestLog,
   McpServerRequestSections,
   McpToolSections,
+  McpUnusedTools,
 } from "@/components/mcp/mcp-sections";
 import { McpSessionSheet } from "@/components/mcp/mcp-session-sheet";
 import { McpToolSheet } from "@/components/mcp/mcp-tool-sheet";
@@ -141,6 +142,7 @@ export default function McpAnalyticsPage({
                   setRequestOpen(true);
                 }}
               />
+              <McpUnusedTools data={data} />
             </>
           ) : null}
         </div>

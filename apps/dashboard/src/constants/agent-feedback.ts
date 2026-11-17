@@ -125,7 +125,7 @@ export const AGENT_FEEDBACK_CLIENT_BRAND_RULES: readonly AgentFeedbackClientBran
   [
     { brand: "claude", aliases: ["claude", "anthropic"] },
     { brand: "cursor", aliases: ["cursor"] },
-    { brand: "openai", aliases: ["openai", "chatgpt", "gpt"] },
+    { brand: "openai", aliases: ["openai", "chatgpt", "gpt", "codex"] },
     { brand: "vercel", aliases: ["vercel"] },
     { brand: "windsurf", aliases: ["windsurf", "cascade"] },
     { brand: "amp", aliases: ["amp", "sourcegraph"] },
@@ -136,6 +136,15 @@ export const AGENT_FEEDBACK_CLIENT_BRAND_RULES: readonly AgentFeedbackClientBran
     { brand: "copilot", aliases: ["copilot"] },
     { brand: "gemini", aliases: ["gemini"] },
   ];
+
+/** Product names for the client IDs agents send in the MCP handshake. */
+export const AGENT_FEEDBACK_CLIENT_LABELS: Record<string, string> = {
+  "claude-ai": "Claude",
+  "codex-mcp-client": "Codex",
+  "cursor-vscode": "Cursor",
+  "gemini-cli-mcp-client": "Gemini CLI",
+  "openai-mcp": "ChatGPT",
+};
 
 export const AGENT_FEEDBACK_CLIENT_WORD_LABELS: Record<string, string> = {
   ai: "AI",

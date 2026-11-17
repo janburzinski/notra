@@ -1,5 +1,6 @@
 import {
   AGENT_FEEDBACK_CLIENT_BRAND_RULES,
+  AGENT_FEEDBACK_CLIENT_LABELS,
   AGENT_FEEDBACK_CLIENT_WORD_LABELS,
 } from "@/constants/agent-feedback";
 import type { AgentFeedbackClientBrand } from "@/types/agent-feedback";
@@ -21,6 +22,12 @@ const CLIENT_SLUG_SEPARATOR = /[-_.]/;
  */
 export function formatAgentFeedbackClient(client: string): string {
   const trimmed = client.trim();
+  const known = Object.hasOwn(AGENT_FEEDBACK_CLIENT_LABELS, trimmed)
+    ? AGENT_FEEDBACK_CLIENT_LABELS[trimmed]
+    : undefined;
+  if (known) {
+    return known;
+  }
   if (!CLIENT_SLUG_PATTERN.test(trimmed)) {
     return trimmed;
   }

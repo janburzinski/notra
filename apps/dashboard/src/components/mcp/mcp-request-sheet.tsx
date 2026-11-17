@@ -20,7 +20,9 @@ import type {
   McpRequestSheetProps,
   McpRequestStatusBadgeProps,
 } from "@/types/mcp-analytics";
+import { formatAgentFeedbackClient } from "@/utils/agent-feedback-client";
 import { formatBytes, formatMilliseconds } from "@/utils/format";
+import { formatModelLabel } from "@/utils/geo-model-display";
 import { elicitationOutcome, prettyJson } from "@/utils/mcp-analytics";
 
 export function McpRequestStatusBadge({ entry }: McpRequestStatusBadgeProps) {
@@ -74,7 +76,9 @@ export function McpRequestSheet({
   const locale = useLocale();
   const format = useFormatter();
   const t = useTranslations("geo.pages.mcp");
-  const client = entry?.clientName || t("fallback.unknownClient");
+  const client = entry?.clientName
+    ? formatAgentFeedbackClient(entry.clientName)
+    : t("fallback.unknownClient");
 
   return (
     <Sheet onOpenChange={onOpenChange} open={open}>
@@ -86,7 +90,7 @@ export function McpRequestSheet({
                 new Date(entry.capturedAt),
                 { dateStyle: "medium", timeStyle: "medium" }
               )}`}
-              icon={<AgentFeedbackAgentIcon client={client} />}
+              icon={<AgentFeedbackAgentIcon client={entry.clientName} />}
               title={
                 <>
                   <span className="min-w-0 truncate font-mono">
@@ -128,7 +132,7 @@ export function McpRequestSheet({
                   {
                     key: "model",
                     label: t("requestSheet.model"),
-                    value: entry.model || null,
+                    value: entry.model ? formatModelLabel(entry.model) : null,
                   },
                   {
                     key: "size",

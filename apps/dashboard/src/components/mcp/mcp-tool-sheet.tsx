@@ -30,6 +30,7 @@ import type {
   McpNeighborTableProps,
   McpToolSheetProps,
 } from "@/types/mcp-analytics";
+import { formatAgentFeedbackClient } from "@/utils/agent-feedback-client";
 import { formatMilliseconds } from "@/utils/format";
 import {
   errorRate,
@@ -147,8 +148,10 @@ export function McpToolSheet({
           <span className="truncate text-sm">
             {row.message || t("toolSheet.noErrorMessage")}
           </span>
-          <span className="text-muted-foreground truncate font-mono text-xs">
-            {row.clientName || t("fallback.unknownClient")}
+          <span className="text-muted-foreground truncate text-xs">
+            {row.clientName
+              ? formatAgentFeedbackClient(row.clientName)
+              : t("fallback.unknownClient")}
           </span>
         </span>
       ),
