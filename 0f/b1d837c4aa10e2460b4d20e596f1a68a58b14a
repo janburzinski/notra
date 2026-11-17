@@ -1,0 +1,28 @@
+apps/agent/agent/channels/slack.ts
+  s_9d08e97deaec89::t_9cb082be14ca1c 177-178
+apps/agent/tests/usage-hook.test.ts
+  s_9d08e97deaec89::t_e96857c9b915f4 1-23,25-44,46-78
+  s_9d08e97deaec89::t_94d20147b8f1a7 24,45
+apps/agent/agent/lib/utils/slack-renderer.ts
+  s_9d08e97deaec89::t_9cb082be14ca1c 30,214-218
+apps/dashboard/src/utils/slack-blocks.ts
+  s_9d08e97deaec89::t_61a913aec41445 32-47
+apps/dashboard/src/lib/slack/relay.ts
+  s_9d08e97deaec89::t_61a913aec41445 17,193-194
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "0fb1d837c4aa10e2460b4d20e596f1a68a58b14a",
+  "prompts": {},
+  "sessions": {
+    "s_9d08e97deaec89": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5ba60396-9bf1-4c99-af49-ea239a519446",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
