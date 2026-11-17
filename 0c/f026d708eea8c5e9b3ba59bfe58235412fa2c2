@@ -1,0 +1,34 @@
+apps/dashboard/src/components/chat/chat-input.tsx
+  s_2fd84e1b6bb83d::t_3d2d123aa91579 1539-1540
+apps/dashboard/src/components/design-system/artifact-iterate/use-post-revisions.ts
+  s_2fd84e1b6bb83d::t_78b1392161d11c 58-64,208-211,230-231
+  s_2fd84e1b6bb83d::t_7eb5b99fb31820 181-190,274
+apps/dashboard/src/components/design-system/artifact-iterate/fixtures.ts
+  s_2fd84e1b6bb83d::t_78b1392161d11c 233-234
+apps/dashboard/src/components/autopilot/autopilot-brief-finding-card.tsx
+  s_2fd84e1b6bb83d::t_375c250536e6a0 7,57-65,94-122
+apps/dashboard/src/components/design-system/artifact-iterate/split.tsx
+  s_2fd84e1b6bb83d::t_a7dd14c78cdb40 7,98-107,112-114,117-119,155-166,168-182
+apps/dashboard/src/components/design-system/artifact-iterate/playground.tsx
+  s_2fd84e1b6bb83d::t_bac6c0b6a729d0 3,10-45,48,51-55,70,76
+apps/dashboard/src/components/design-system/artifact-iterate/post-workbench.tsx
+  s_2fd84e1b6bb83d::t_a7dd14c78cdb40 26-32,415-442,449
+  s_2fd84e1b6bb83d::t_78b1392161d11c 176-184,222-223
+  ai_agent 520-524,527,544-591,605,676
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "0cf026d708eea8c5e9b3ba59bfe58235412fa2c2",
+  "prompts": {},
+  "sessions": {
+    "s_2fd84e1b6bb83d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "316e8d0d-0d28-4407-b608-d499c0d5884b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
