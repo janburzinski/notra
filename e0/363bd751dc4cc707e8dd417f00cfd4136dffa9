@@ -1,0 +1,30 @@
+apps/dashboard/src/types/components/geo.ts
+  s_dee84dad4454b7::t_8ef6f85b7e4321 218-226
+apps/dashboard/messages/de.json
+  s_dee84dad4454b7::t_8ef6f85b7e4321 4769-4772
+  s_dee84dad4454b7::t_f1884b5635b777 4763
+apps/dashboard/messages/en.json
+  s_dee84dad4454b7::t_8ef6f85b7e4321 4769-4772
+  s_dee84dad4454b7::t_f1884b5635b777 4763
+apps/dashboard/src/components/geo/product-suggestion-sheet.tsx
+  s_dee84dad4454b7::t_e29d1492aa04ef 1-132
+apps/dashboard/src/components/geo/product-prompt-suggestions.tsx
+  s_dee84dad4454b7::t_f1884b5635b777 205
+  s_dee84dad4454b7::t_c41de9660f5a26 149-153
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "e0363bd751dc4cc707e8dd417f00cfd4136dffa9",
+  "prompts": {},
+  "sessions": {
+    "s_dee84dad4454b7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c4318025-3977-48ad-a0dc-b9c3be498424",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
