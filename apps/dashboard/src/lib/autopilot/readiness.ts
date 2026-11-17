@@ -56,6 +56,7 @@ import {
 import { createAutopilotLogger } from "@/lib/autopilot/log";
 import { scheduleAutopilotPublish } from "@/lib/autopilot/publish";
 import { runRepositoryAgent } from "@/lib/autopilot/repository-agent";
+import { requestDraftReviewers } from "@/lib/autopilot/reviewers";
 import { geoCoreDashboardLayer } from "@/lib/geo/configure";
 import { readinessAgentOutputSchema } from "@/schemas/autopilot";
 import type {
@@ -420,6 +421,13 @@ export async function openReadinessPullRequest(params: {
     event: AUTOPILOT_PULL_REQUEST_CREATED_EVENT,
     url: pullRequest.url,
     files: fix.files.map((file) => file.path),
+  });
+  await requestDraftReviewers({
+    ctx,
+    log,
+    octokit,
+    repository,
+    pullNumber: pullRequest.number,
   });
   await emailDraftReviewers({
     organizationId: ctx.organizationId,

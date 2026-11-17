@@ -32,6 +32,7 @@ export function AutopilotTagInput({
   disabled,
   suggestions = [],
   separator = DEFAULT_SEPARATOR,
+  max,
 }: AutopilotTagInputProps) {
   const [draft, setDraft] = useState("");
   const [invalid, setInvalid] = useState(false);
@@ -63,6 +64,10 @@ export function AutopilotTagInput({
     const next = [
       ...new Set([...values, ...parsed.filter((entry) => entry !== null)]),
     ];
+    if (max !== undefined && next.length > max) {
+      setInvalid(true);
+      return;
+    }
     setDraft("");
     if (next.length !== values.length) {
       onChange(next);

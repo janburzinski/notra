@@ -1,0 +1,1 @@
+ALTER TABLE "autopilot_settings" ADD COLUMN "reviewers" jsonb DEFAULT '[]'::jsonb NOT NULL;

@@ -75,7 +75,6 @@ import {
   openAutopilotPullRequest,
   readRepositoryFile,
   repositoryPathExists,
-  requestAutopilotReviewers,
 } from "@/lib/autopilot/github";
 import { renderPostHeroImage } from "@/lib/autopilot/hero-image";
 import { recentMentionRates } from "@/lib/autopilot/impact";
@@ -88,6 +87,7 @@ import { createAutopilotLogger } from "@/lib/autopilot/log";
 import { loadTopicObservationIds } from "@/lib/autopilot/memory";
 import { findDeadLinks } from "@/lib/autopilot/pages";
 import { scheduleAutopilotPublish } from "@/lib/autopilot/publish";
+import { requestDraftReviewers } from "@/lib/autopilot/reviewers";
 import { loadDecisionMemory } from "@/lib/autopilot/rules";
 import {
   loadWritingRules,
@@ -156,7 +156,6 @@ import {
   setFrontmatterFields,
 } from "@/utils/autopilot-frontmatter";
 import {
-  autopilotReviewers,
   commitFingerprint,
   describePullRequest,
   pullRequestLabel,
@@ -275,43 +274,6 @@ async function loadPageToUpdate(params: {
   return { path, content };
 }
 
-/**
- * Asks the authors of the source pull requests to review the draft. They are
- * often not collaborators on the website repository, so a refusal is expected
- * and never fails the draft.
- */
-async function requestSourceReviewers(params: {
-  claim: FindingClaim;
-  log: AutopilotLogger;
-  octokit: AutopilotOctokit;
-  repository: AutopilotRepository;
-  pullNumber: number;
-}) {
-  const reviewers = autopilotReviewers(
-    params.claim.finding.evidence.pullRequests
-  );
-  if (reviewers.length === 0) {
-    return;
-  }
-  try {
-    await requestAutopilotReviewers(
-      params.octokit,
-      params.repository,
-      params.pullNumber,
-      reviewers
-    );
-    await params.log.action(
-      `Requested review from ${reviewers.map((login) => `@${login}`).join(", ")}`,
-      { reviewers }
-    );
-  } catch (error) {
-    await params.log.skip("Could not request review from the source authors", {
-      reviewers,
-      error: toErrorMessage(error, String(error)),
-    });
-  }
-}
-
 /** Commits the rewritten page over the original file. */
 async function openPageUpdate(params: {
   ctx: AutopilotRunContext;
@@ -357,12 +319,13 @@ async function openPageUpdate(params: {
     path,
     updated: true,
   });
-  await requestSourceReviewers({
-    claim,
+  await requestDraftReviewers({
+    ctx,
     log,
     octokit,
     repository: ctx.repository,
     pullNumber: pullRequest.number,
+    sourcePullRequests: claim.finding.evidence.pullRequests,
   });
   await emailDraftReviewers({
     organizationId: ctx.organizationId,
@@ -919,12 +882,13 @@ export async function openBlogDraftPullRequest(params: {
     title: draft.post.title,
     path: draft.path,
   });
-  await requestSourceReviewers({
-    claim,
+  await requestDraftReviewers({
+    ctx,
     log,
     octokit,
     repository: ctx.repository,
     pullNumber: pullRequest.number,
+    sourcePullRequests: claim.finding.evidence.pullRequests,
   });
   await emailDraftReviewers({
     organizationId: ctx.organizationId,

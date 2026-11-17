@@ -4,7 +4,9 @@ import {
   AUTOPILOT_AUTOMATION_KINDS,
   AUTOPILOT_DRAFT_EMAIL_MODES,
   AUTOPILOT_JOB_KINDS,
+  AUTOPILOT_MAX_WORKSPACE_REVIEWERS,
   AUTOPILOT_MAX_SOURCE_REPOSITORIES,
+  AUTOPILOT_REVIEWER_PATTERN,
 } from "@notra/db/constants/autopilot";
 import { organizationIdSchema } from "@notra/schemas/dashboard/auth/organization";
 // biome-ignore lint/performance/noNamespaceImport: Zod recommended way of importing
@@ -118,6 +120,14 @@ const autopilotStaleDaysSchema = z.union([
 ]);
 const autopilotSiteIdSchema = z.string().trim().min(1).max(64);
 
+export const autopilotReviewerSchema = z
+  .string()
+  .trim()
+  .regex(AUTOPILOT_REVIEWER_PATTERN, "Use a GitHub login or org/team");
+const autopilotReviewersSchema = z
+  .array(autopilotReviewerSchema)
+  .max(AUTOPILOT_MAX_WORKSPACE_REVIEWERS);
+
 export const autopilotSaveInputSchema = autopilotOrganizationInputSchema.extend(
   {
     enabled: z.boolean(),
@@ -160,6 +170,8 @@ export const autopilotUpdateInputSchema = autopilotOrganizationInputSchema
     stalePullRequestDays: autopilotStaleDaysSchema.nullable(),
     approvals: autopilotApprovalsSchema.partial(),
     draftEmails: z.enum(AUTOPILOT_DRAFT_EMAIL_MODES),
+    /** The whole list; it replaces the saved one. */
+    reviewers: autopilotReviewersSchema,
     siteId: autopilotSiteIdSchema.nullable(),
   })
   .partial()

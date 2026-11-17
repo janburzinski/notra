@@ -102,3 +102,12 @@ export const AUTOPILOT_APPROVAL_MODES = ["ask", "auto"] as const;
  * Slack channel gets the brief. always: also when one does.
  */
 export const AUTOPILOT_DRAFT_EMAIL_MODES = ["without_slack", "always"] as const;
+
+/** Reviewers a workspace may name; GitHub takes at most 15 per pull request. */
+export const AUTOPILOT_MAX_WORKSPACE_REVIEWERS = 10;
+/**
+ * A GitHub user (`octocat`) or a team in the repository's organization
+ * (`acme/docs`), with or without a leading @.
+ */
+export const AUTOPILOT_REVIEWER_PATTERN =
+  /^@?[A-Za-z0-9](?:[A-Za-z0-9-]{0,38})(?:\/[A-Za-z0-9][A-Za-z0-9_.-]{0,99})?$/;

@@ -16,6 +16,7 @@ import { AUTOPILOT_DEFAULT_APPROVALS } from "@/constants/autopilot-publish";
 import { cancelHoldsAfterSettingsChange } from "@/lib/autopilot/publish";
 import { loadAutopilotSiteTarget } from "@/lib/autopilot/sites";
 import { normalizeRepositoryDirectory } from "@/utils/autopilot-paths";
+import { normalizeAutopilotReviewers } from "@/utils/autopilot-reviewers";
 
 export class AutopilotSettingsError extends Error {
   constructor(message: string) {
@@ -197,6 +198,9 @@ export async function updateAutopilotSettings(
       ? {}
       : { stalePullRequestDays: patch.stalePullRequestDays }),
     ...(patch.draftEmails ? { draftEmails: patch.draftEmails } : {}),
+    ...(patch.reviewers === undefined
+      ? {}
+      : { reviewers: normalizeAutopilotReviewers(patch.reviewers) }),
     ...(approvals.length > 0
       ? {
           approvals: sql`coalesce(${autopilotSettings.approvals}, ${JSON.stringify(AUTOPILOT_DEFAULT_APPROVALS)}::jsonb) || ${JSON.stringify(Object.fromEntries(approvals))}::jsonb`,

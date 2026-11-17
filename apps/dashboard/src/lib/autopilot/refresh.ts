@@ -60,6 +60,7 @@ import { generateAutopilotObject } from "@/lib/autopilot/llm";
 import { createAutopilotLogger } from "@/lib/autopilot/log";
 import { fetchRendered, findDeadLinks } from "@/lib/autopilot/pages";
 import { scheduleAutopilotPublish } from "@/lib/autopilot/publish";
+import { requestDraftReviewers } from "@/lib/autopilot/reviewers";
 import { loadDecisionMemory } from "@/lib/autopilot/rules";
 import { loadWritingRules, removeNewDashes } from "@/lib/autopilot/style";
 import { refreshOutputSchema, refreshRepairSchema } from "@/schemas/autopilot";
@@ -790,6 +791,13 @@ export async function openRefreshPullRequest(params: {
     event: AUTOPILOT_PULL_REQUEST_CREATED_EVENT,
     url: pullRequest.url,
     files: [check.path],
+  });
+  await requestDraftReviewers({
+    ctx,
+    log,
+    octokit,
+    repository: ctx.repository,
+    pullNumber: pullRequest.number,
   });
   await emailDraftReviewers({
     organizationId: ctx.organizationId,

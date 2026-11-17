@@ -266,6 +266,7 @@ export async function buildAutopilotRunContext(
     siteId: site ? settings.siteId : null,
     stalePullRequestDays: settings.stalePullRequestDays,
     commitFilters: toAutopilotCommitFilters(settings.commitFilters),
+    reviewers: settings.reviewers,
     brand: brand
       ? {
           name: brand.companyName ?? brand.name,

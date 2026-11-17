@@ -46,6 +46,7 @@ import { createAutopilotLogger } from "@/lib/autopilot/log";
 import { fetchPageForCrawlers } from "@/lib/autopilot/pages";
 import { scheduleAutopilotPublish } from "@/lib/autopilot/publish";
 import { runRepositoryAgent } from "@/lib/autopilot/repository-agent";
+import { requestDraftReviewers } from "@/lib/autopilot/reviewers";
 import { renderingAgentOutputSchema } from "@/schemas/autopilot";
 import type { AutopilotRunContext } from "@/types/autopilot";
 import type {
@@ -486,6 +487,13 @@ export async function openRenderingPullRequest(params: {
     event: AUTOPILOT_PULL_REQUEST_CREATED_EVENT,
     url: pullRequest.url,
     files: fix.files.map((file) => file.path),
+  });
+  await requestDraftReviewers({
+    ctx,
+    log,
+    octokit,
+    repository,
+    pullNumber: pullRequest.number,
   });
   await emailDraftReviewers({
     organizationId: ctx.organizationId,

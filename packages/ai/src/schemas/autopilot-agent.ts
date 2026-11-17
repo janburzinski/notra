@@ -2,6 +2,8 @@ import {
   AUTOPILOT_AUTOMATION_KINDS,
   AUTOPILOT_DRAFT_EMAIL_MODES,
   AUTOPILOT_JOB_KINDS,
+  AUTOPILOT_MAX_WORKSPACE_REVIEWERS,
+  AUTOPILOT_REVIEWER_PATTERN,
 } from "@notra/db/constants/autopilot";
 import { z } from "zod";
 
@@ -54,6 +56,13 @@ export const autopilotUpdateSettingsInputSchema = z
       .describe(
         "When owners get an email about a new draft. without_slack (default): only when no Slack channel gets the brief. always: also when one does."
       ),
+    reviewers: z
+      .array(z.string().trim().regex(AUTOPILOT_REVIEWER_PATTERN))
+      .max(AUTOPILOT_MAX_WORKSPACE_REVIEWERS)
+      .optional()
+      .describe(
+        "Everyone GitHub asks to review Autopilot's pull requests: GitHub logins (octocat) and teams as org/team (acme/docs). The whole list, replacing the current one: to add or remove someone, start from the reviewers in get_autopilot_status. [] removes them all."
+      ),
   })
   .refine(
     (input) =>
@@ -61,6 +70,7 @@ export const autopilotUpdateSettingsInputSchema = z
       input.briefHour !== undefined ||
       input.timezone !== undefined ||
       input.draftEmails !== undefined ||
+      input.reviewers !== undefined ||
       (input.jobs !== undefined && Object.keys(input.jobs).length > 0),
     "Change at least one setting"
   );

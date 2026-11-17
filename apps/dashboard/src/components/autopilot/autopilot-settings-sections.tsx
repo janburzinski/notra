@@ -5,8 +5,10 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import {
   AUTOPILOT_APPROVAL_GROUPS,
   AUTOPILOT_APPROVAL_MODES,
+  AUTOPILOT_MAX_WORKSPACE_REVIEWERS,
 } from "@notra/db/constants/autopilot";
 import type { AutopilotApprovalMode } from "@notra/db/types/autopilot";
+import { autopilotReviewerSchema } from "@notra/schemas/dashboard/autopilot";
 import { ConfirmDialog } from "@notra/ui/components/shared/confirm-dialog";
 import { Input } from "@notra/ui/components/ui/input";
 import {
@@ -32,6 +34,7 @@ import {
   AutopilotSettingsFields,
 } from "@/components/autopilot/autopilot-settings-field";
 import { AutopilotSourceRepositoriesRow } from "@/components/autopilot/autopilot-source-repositories-row";
+import { AutopilotTagInput } from "@/components/autopilot/autopilot-tag-input";
 import { Button } from "@/components/button";
 import { SiteSettingsHint } from "@/components/sites/site-settings-item";
 import {
@@ -48,7 +51,15 @@ import type {
   AutopilotSettingsSectionProps,
   AutopilotTurnOffRowProps,
 } from "@/types/autopilot";
+import { normalizeAutopilotReviewers } from "@/utils/autopilot-reviewers";
 import { autopilotSiteOptions, toStaleDays } from "@/utils/autopilot-settings";
+
+function parseReviewer(value: string) {
+  const parsed = autopilotReviewerSchema.safeParse(value);
+  return parsed.success
+    ? (normalizeAutopilotReviewers([parsed.data])[0] ?? null)
+    : null;
+}
 
 export function AutopilotPublishingSettings({
   organizationId,
@@ -176,6 +187,25 @@ export function AutopilotPublishingSettings({
           repositories={connections.repositories}
         />
       ) : null}
+      <AutopilotSettingsField
+        description={t("reviewersDescription", {
+          max: AUTOPILOT_MAX_WORKSPACE_REVIEWERS,
+        })}
+        htmlFor="autopilot-reviewers"
+        label={t("reviewers")}
+      >
+        <div className={AUTOPILOT_SETTINGS_CONTROL_CLASSNAME}>
+          <AutopilotTagInput
+            id="autopilot-reviewers"
+            label={t("reviewers")}
+            max={AUTOPILOT_MAX_WORKSPACE_REVIEWERS}
+            onChange={(reviewers) => save({ reviewers })}
+            parse={parseReviewer}
+            placeholder={t("reviewersPlaceholder")}
+            values={settings.reviewers}
+          />
+        </div>
+      </AutopilotSettingsField>
     </AutopilotSettingsFields>
   );
 }

@@ -102,6 +102,8 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
     imageCollision: false,
     fallbackImageCollision: false,
     reviewersRefused: false,
+    /** GitHub refuses any request naming one of these, as it does for non-collaborators. */
+    refusedReviewers: [] as string[],
     closedPulls: [] as {
       number: number;
       title: string;
@@ -611,12 +613,17 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
       _octokit: unknown,
       _repo: unknown,
       _pullNumber: number,
-      logins: string[]
+      logins: string[],
+      teams: string[] = []
     ) => {
-      if (state.reviewersRefused) {
+      const requested = [...logins, ...teams.map((team) => `team:${team}`)];
+      if (
+        state.reviewersRefused ||
+        requested.some((name) => state.refusedReviewers.includes(name))
+      ) {
         throw new Error("Reviews may only be requested from collaborators");
       }
-      reviewers.push(logins);
+      reviewers.push(requested);
     },
   }));
   mock.module("@/lib/integrations/github/content-pull-request", () => ({
@@ -687,6 +694,8 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
     await import("../src/lib/autopilot/authors");
   const { autopilotAuthorPresets, toAutopilotCommitFilters } =
     await import("../src/utils/autopilot-commit-filters");
+  const { updateAutopilotSettings } =
+    await import("../src/lib/autopilot/settings");
   const now = new Date();
   await db.insert(organizations).values({
     id: "sandbox-org",
@@ -784,6 +793,7 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
     state.imageCollision = false;
     state.fallbackImageCollision = false;
     state.reviewersRefused = false;
+    state.refusedReviewers = [];
     state.closedPulls = [];
     state.changedFiles = {};
     reviewers.length = 0;
@@ -808,6 +818,7 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
         maxOpenPullRequests: 3,
         enabled: true,
         commitFilters: sql`DEFAULT`,
+        reviewers: sql`DEFAULT`,
       })
       .where(eq(autopilotSettings.organizationId, "sandbox-org"));
   });
@@ -1126,6 +1137,54 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
       columns: { status: true },
     });
     expect(findings.map((finding) => finding.status)).toEqual([
+      "proposed",
+      "proposed",
+      "proposed",
+    ]);
+  });
+
+  test("drafts ask the workspace's reviewers first and the source author only once", async () => {
+    await updateAutopilotSettings("sandbox-org", {
+      reviewers: ["@Maria", "sandbox/docs", "other-org/docs", "Sandbox-Dev"],
+    });
+    expect(
+      (
+        await db.query.autopilotSettings.findFirst({
+          columns: { reviewers: true },
+        })
+      )?.reviewers
+    ).toEqual(["maria", "sandbox/docs", "other-org/docs", "sandbox-dev"]);
+    expect((await handleAutopilotMention(mentionContext(1)))?.status).toBe(
+      "replied"
+    );
+    // other-org/docs is not a team of the website's organization.
+    expect(reviewers).toEqual([["maria", "sandbox-dev", "team:docs"]]);
+
+    // One name GitHub refuses doesn't cost the others their request, and a
+    // refused workspace reviewer who wrote the source is still asked as author.
+    reviewers.length = 0;
+    state.refusedReviewers = ["ghost"];
+    await updateAutopilotSettings("sandbox-org", {
+      reviewers: ["maria", "ghost", "sandbox/docs"],
+    });
+    await askToWrite(2);
+    expect(reviewers).toEqual([["maria"], ["team:docs"], ["sandbox-dev"]]);
+
+    reviewers.length = 0;
+    state.refusedReviewers = ["sandbox-dev"];
+    await updateAutopilotSettings("sandbox-org", {
+      reviewers: ["sandbox-dev"],
+    });
+    await askToWrite(3);
+    expect(reviewers).toEqual([]);
+
+    state.reviewersRefused = true;
+    await askToWrite(4);
+    const findings = await db.query.autopilotFindings.findMany({
+      columns: { status: true },
+    });
+    expect(findings.map((finding) => finding.status)).toEqual([
+      "proposed",
       "proposed",
       "proposed",
       "proposed",

@@ -102,6 +102,7 @@ if (process.env.NOTRA_AUTOPILOT_WRITER_TEST !== "1") {
       siteId: null,
       stalePullRequestDays: null,
       commitFilters: { excludedAuthors: [], paths: {}, repositories: [] },
+      reviewers: [],
       brand: null,
     },
     log: {

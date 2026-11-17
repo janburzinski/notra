@@ -249,7 +249,8 @@ export async function requestAutopilotReviewers(
   octokit: AutopilotOctokit,
   repository: AutopilotRepository,
   pullNumber: number,
-  reviewers: string[]
+  reviewers: string[],
+  teamReviewers: string[] = []
 ) {
   await octokit.request(
     "POST /repos/{owner}/{repo}/pulls/{pull_number}/requested_reviewers",
@@ -258,6 +259,7 @@ export async function requestAutopilotReviewers(
       repo: repository.name,
       pull_number: pullNumber,
       reviewers,
+      ...(teamReviewers.length > 0 ? { team_reviewers: teamReviewers } : {}),
     }
   );
 }

@@ -52,6 +52,8 @@ export interface AutopilotRunContext {
   stalePullRequestDays: number | null;
   /** Which product pull requests the commits job reads. */
   commitFilters: AutopilotCommitFilters;
+  /** GitHub logins and org/team slugs asked to review every draft. */
+  reviewers: string[];
   brand: {
     name: string;
     websiteUrl: string;
@@ -618,6 +620,8 @@ export interface AutopilotTagInputProps {
   suggestions?: string[];
   /** Splits pasted or typed text into entries; whitespace and commas by default. */
   separator?: RegExp;
+  /** Entries past this many are refused and the typed text stays. */
+  max?: number;
 }
 
 export interface AutopilotSourceRepositoriesRowProps {

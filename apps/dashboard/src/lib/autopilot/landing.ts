@@ -65,6 +65,7 @@ import { fetchPageAttributes, fetchRendered } from "@/lib/autopilot/pages";
 import { scheduleAutopilotPublish } from "@/lib/autopilot/publish";
 import { readBrandFacts, readPages } from "@/lib/autopilot/refresh";
 import { runRepositoryAgent } from "@/lib/autopilot/repository-agent";
+import { requestDraftReviewers } from "@/lib/autopilot/reviewers";
 import { loadDecisionMemory } from "@/lib/autopilot/rules";
 import {
   loadBrandTerms,
@@ -674,6 +675,13 @@ export async function openLandingPullRequest(params: {
     event: AUTOPILOT_PULL_REQUEST_CREATED_EVENT,
     url: pullRequest.url,
     files: fix.files.map((file) => file.path),
+  });
+  await requestDraftReviewers({
+    ctx,
+    log,
+    octokit,
+    repository,
+    pullNumber: pullRequest.number,
   });
   await emailDraftReviewers({
     organizationId: ctx.organizationId,

@@ -5,6 +5,7 @@ import type {
   AutopilotSettingsSectionProps,
   AutopilotSettingsView,
 } from "@/types/autopilot";
+import { normalizeAutopilotReviewers } from "@/utils/autopilot-reviewers";
 
 type StaleDays = (typeof AUTOPILOT_STALE_PULL_REQUEST_DAY_OPTIONS)[number];
 
@@ -46,6 +47,9 @@ export function applyAutopilotSettingsPatch(
     approvals: { ...settings.approvals, ...patch.approvals },
     jobs: { ...settings.jobs, ...patch.jobs },
     draftEmails: keep(patch.draftEmails, settings.draftEmails),
+    reviewers: patch.reviewers
+      ? normalizeAutopilotReviewers(patch.reviewers)
+      : settings.reviewers,
     siteId: keep(patch.siteId, settings.siteId),
   };
 }

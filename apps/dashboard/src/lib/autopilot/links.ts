@@ -53,6 +53,7 @@ import { generateAutopilotObject } from "@/lib/autopilot/llm";
 import { createAutopilotLogger } from "@/lib/autopilot/log";
 import { fetchPageText, findDeadLinks } from "@/lib/autopilot/pages";
 import { scheduleAutopilotPublish } from "@/lib/autopilot/publish";
+import { requestDraftReviewers } from "@/lib/autopilot/reviewers";
 import {
   loadBrandTerms,
   loadSearchConsoleConnection,
@@ -563,6 +564,13 @@ export async function openLinksPullRequest(params: {
     event: AUTOPILOT_PULL_REQUEST_CREATED_EVENT,
     url: pullRequest.url,
     files: fix.files.map((file) => file.path),
+  });
+  await requestDraftReviewers({
+    ctx,
+    log,
+    octokit,
+    repository: ctx.repository,
+    pullNumber: pullRequest.number,
   });
   await emailDraftReviewers({
     organizationId: ctx.organizationId,

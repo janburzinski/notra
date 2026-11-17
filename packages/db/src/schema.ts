@@ -4905,6 +4905,11 @@ export const autopilotSettings = pgTable("autopilot_settings", {
     .$type<AutopilotDraftEmails>()
     .notNull()
     .default("without_slack"),
+  /** GitHub logins and org/team slugs asked to review every draft. */
+  reviewers: jsonb("reviewers")
+    .$type<string[]>()
+    .notNull()
+    .default(sql`'[]'::jsonb`),
   /** Drafts nobody touched for this many days are closed; null keeps them open. */
   stalePullRequestDays: integer("stale_pull_request_days").default(14),
   lastRunAt: timestamp("last_run_at"),

@@ -165,6 +165,7 @@ async function loadStatus(
               ? `${settings.repositoryOwner}/${settings.repositoryName}`
               : null,
           slackChannelName: settings.slackChannelName,
+          reviewers: settings.reviewers,
           lastRunAt: settings.lastRunAt?.toISOString() ?? null,
         }
       : null,
