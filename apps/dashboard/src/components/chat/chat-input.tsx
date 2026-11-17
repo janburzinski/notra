@@ -1842,8 +1842,6 @@ export function ChatInput({
           connectedTop={connectedTop}
           elevated={pill && elevated !== false}
           flat={pill}
-          // An approval in the input's place stands without the grey rim.
-          rimless={approvalInPlace !== null}
           // The inner light is for the pill floating on its own. Inside the
           // open dock it sits beside the conversation card and matches it.
           highlight={pill && pillExpanded !== true}

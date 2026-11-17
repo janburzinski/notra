@@ -99,10 +99,7 @@ function ComposerNudgeShell({ children }: { children: ReactNode }) {
   );
 }
 
-function frameRadius(flat: boolean, size: ComposerFrameProps["size"]) {
-  if (!flat) {
-    return "rounded-[18px]";
-  }
+function pillRadius(size: ComposerFrameProps["size"]) {
   return size === "sm" ? "rounded-[22px]" : COMPOSER_PILL_RADIUS;
 }
 
@@ -115,15 +112,19 @@ function cardLight({ highlight, lifted }: ComposerCardLightOptions) {
 }
 
 /**
- * The composer as a dualtone card. Queued messages sit on a tinted sheet of
- * the same material, barely narrower, tucked under the input's top edge so
- * the two read as one stack.
+ * The composer as a dualtone card, the frame for every composer but the pill.
+ * Queued messages sit on a tinted sheet of the same material, barely
+ * narrower, tucked under the input's top edge so the two read as one stack.
  */
 function CardComposerFrame({
   children,
   nudge,
+  connectedTop = false,
   className,
-}: Pick<ComposerFrameProps, "children" | "nudge" | "className">) {
+}: Pick<
+  ComposerFrameProps,
+  "children" | "nudge" | "connectedTop" | "className"
+>) {
   const hasNudge = Boolean(nudge);
   return (
     <div
@@ -136,7 +137,13 @@ function CardComposerFrame({
             <ComposerNudgeShell key="nudge">
               {/* One compact line per message, its text lined up with the
                   input's text below. The bottom padding hides under the card. */}
-              <div className="border-table-card-border bg-muted/50 mx-1.5 rounded-t-[9px] border border-b-0 pb-2 [&_[data-slot=composer-chip]]:py-0.5 [&_[data-slot=composer-chip]]:pl-0.75 [&_[data-slot=composer-nudge]]:px-0.5 [&_[data-slot=composer-nudge]]:py-1.5">
+              <div
+                className={cn(
+                  "border-table-card-border bg-muted/50 border border-b-0 pb-2 [&_[data-slot=composer-chip]]:py-0.5 [&_[data-slot=composer-chip]]:pl-0.75 [&_[data-slot=composer-nudge]]:px-0.5 [&_[data-slot=composer-nudge]]:py-1.5",
+                  // Flush under the surface above, like the card would be.
+                  connectedTop ? "rounded-t-none border-t-0" : "mx-1.5 rounded-t-[9px]"
+                )}
+              >
                 {nudge}
               </div>
             </ComposerNudgeShell>
@@ -146,7 +153,8 @@ function CardComposerFrame({
       <div
         className={cn(
           "border-table-card-border bg-table-card shadow-table-card relative z-10 min-w-0 overflow-hidden rounded-[10px] border",
-          hasNudge && "-mt-2"
+          hasNudge && "-mt-2",
+          connectedTop && !hasNudge && "rounded-t-none border-t-0"
         )}
         data-slot="composer-card"
       >
@@ -162,23 +170,26 @@ function ComposerFrame({
   nudge,
   connectedTop = false,
   flat = false,
-  rimless = false,
   elevated = false,
   size = "default",
   highlight = false,
   surface = "default",
   className,
 }: ComposerFrameProps) {
-  const hasNudge = Boolean(nudge);
-  const isCard = surface === "card";
-  const showTray = hasNudge || !(flat || rimless);
-  if (isCard && !flat) {
+  if (!flat) {
     return (
-      <CardComposerFrame className={className} nudge={nudge}>
+      <CardComposerFrame
+        className={className}
+        connectedTop={connectedTop}
+        nudge={nudge}
+      >
         {children}
       </CardComposerFrame>
     );
   }
+
+  const hasNudge = Boolean(nudge);
+  const isCard = surface === "card";
 
   return (
     <div
@@ -186,11 +197,14 @@ function ComposerFrame({
         "flex w-full min-w-0 flex-col",
         COMPOSER_TRAY_TRANSITION,
         elevated && hasNudge && COMPOSER_ELEVATED_SHADOW,
-        showTray ? cn(isCard ? "bg-shell" : "bg-muted", "p-1") : "bg-transparent",
-        frameRadius(flat, size),
+        // The pill only grows a tray to hold chips above it.
+        hasNudge
+          ? cn(isCard ? "bg-shell" : "bg-muted", "p-1")
+          : "bg-transparent",
+        pillRadius(size),
         // Chips above the pill sit near the top edge, where the pill's wide
         // corners would crowd them, so the tray's top matches the card's.
-        flat && hasNudge && "rounded-t-[18px]",
+        hasNudge && "rounded-t-[18px]",
         connectedTop && "rounded-t-none",
         className
       )}
@@ -210,14 +224,10 @@ function ComposerFrame({
           isCard
             ? "border-table-card-border bg-table-card"
             : "border-border/70 bg-background",
-          flat
-            ? // pill input with a round send button; the radius is half the
-              // single-line height so wrapped lines keep the button concentric
-              cn(
-                "**:data-[slot=composer-send]:[corner-shape:round] **:data-[slot=composer-send]:rounded-full **:data-[slot=composer-send]:supports-[corner-shape:squircle]:rounded-full",
-                size === "sm" ? "rounded-[18px]" : "rounded-[25px]"
-              )
-            : "rounded-[14px] shadow-[inset_0_1px_0_rgba(255,255,255,0.9),inset_0_0_6px_rgba(255,255,255,0.8),0_1px_2px_rgba(0,0,0,0.04)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.07),inset_0_0_6px_rgba(255,255,255,0.03)]",
+          // A round send button; the radius is half the single-line height so
+          // wrapped lines keep the button concentric.
+          "**:data-[slot=composer-send]:[corner-shape:round] **:data-[slot=composer-send]:rounded-full **:data-[slot=composer-send]:supports-[corner-shape:squircle]:rounded-full",
+          size === "sm" ? "rounded-[18px]" : "rounded-[25px]",
           connectedTop && !hasNudge && "rounded-t-none border-t-0",
           cardLight({ highlight, lifted: elevated && !hasNudge })
         )}

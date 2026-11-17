@@ -1,13 +1,13 @@
 ---
 title: Composer
-description: The chat composer from the Notra dashboard, a muted tray around the input card.
+description: The chat composer from the Notra dashboard, a dualtone input card.
 ---
 
 <Component path="composer/examples/composer" />
 
 <RegistryInstall name="composer" />
 
-The frame is a muted tray with the input card inside. The toolbar buttons and the send button are the Notra `Button`, the input is the shadcn `Textarea` with its field chrome removed, because the card is the field. The send tooltip is the Notra `Tooltip`. A disabled send button stays focusable, so the tooltip can still say why it is disabled.
+The frame is a dualtone card, the same material as the Notra table and card. The toolbar buttons and the send button are the Notra `Button`, the input is the shadcn `Textarea` with its field chrome removed, because the card is the field. The send tooltip is the Notra `Tooltip`. A disabled send button stays focusable, so the tooltip can still say why it is disabled.
 
 ```tsx
 <ComposerFrame>
@@ -30,7 +30,7 @@ The frame is a muted tray with the input card inside. The toolbar buttons and th
 
 ## Queue and attachments
 
-Pass a `ComposerNudge` to `nudge` and it slides in on the tray above the card. Queued messages and files are `ComposerChip`s. Each chip shows the actions you give it: send now, edit and remove.
+Pass a `ComposerNudge` to `nudge` and it slides in on a tinted sheet tucked under the card's top edge. Queued messages and files are `ComposerChip`s. Each chip shows the actions you give it: send now, edit and remove.
 
 <Component path="composer/examples/composer-queue" />
 
@@ -64,7 +64,7 @@ Stop was pressed and the reply is winding down. `busy` swaps the icon for a spin
 
 ### Queued
 
-Typing while a reply streams queues the message as a chip on the tray. It can be sent right away, edited or removed.
+Typing while a reply streams queues the message as a chip above the input. It can be sent right away, edited or removed.
 
 <Component path="composer/examples/composer-state-queued" />
 
@@ -76,7 +76,7 @@ The message waits for the reply to finish. The input is locked and send cancels 
 
 ### Uploading
 
-Files upload as chips on the tray. A `pending` chip hides its actions, and send waits until every upload is done.
+Files upload as chips above the input. A `pending` chip hides its actions, and send waits until every upload is done.
 
 <Component path="composer/examples/composer-state-uploading" />
 
@@ -102,8 +102,8 @@ Rich editors with inline mentions can skip `ComposerInput` and put their own `co
 
 | Component | Prop | Default | Description |
 | --- | --- | --- | --- |
-| `ComposerFrame` | `nudge` | | Shown on the tray above the card, animated in and out. |
-| `ComposerFrame` | `flat` | `false` | Tighter radius, no shadow, and no tray until there is a nudge. For inline composers like comments. |
+| `ComposerFrame` | `nudge` | | Tucked under the card's top edge (on a tray for `flat`), animated in and out. |
+| `ComposerFrame` | `flat` | `false` | A round pill instead of the card, with a tray only while there is a nudge. For inline composers like comments. |
 | `ComposerFrame` | `connectedTop` | `false` | Drops the top radius so the frame sits flush under another surface. |
 | `ComposerChip` | `onSteer`, `onEdit`, `onRemove` | | Each one adds its action button. Steer and edit hide while `pending`. |
 | `ComposerChip` | `onClick` | | Makes the label a button, e.g. to preview a file. |

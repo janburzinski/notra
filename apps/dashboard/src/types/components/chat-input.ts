@@ -58,7 +58,7 @@ export interface ChatInputProps {
   pillExpanded?: boolean;
   /** Lifts the pill off the page with a shadow; on by default for pills. */
   elevated?: boolean;
-  /** `card` draws the input as a dualtone card, for a grey panel shell. */
+  /** `card` draws the pill in the table card colours, for a grey panel shell. */
   surface?: "default" | "card";
   /** Text the composer starts with, e.g. from a `?q=` link. */
   initialValue?: string;

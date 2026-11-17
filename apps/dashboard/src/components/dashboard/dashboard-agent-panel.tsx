@@ -158,7 +158,6 @@ function DashboardAgentChat({
                 placeholder={t("placeholder")}
                 queuedMessages={agent.queuedMessages}
                 ref={chatInputRef}
-                surface={isDesktop ? "card" : "default"}
                 value={chatInputValue}
               />
             </div>

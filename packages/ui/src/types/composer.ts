@@ -6,19 +6,17 @@ export interface ComposerFrameProps {
   nudge?: ReactNode;
   /** Drops the top radius so the frame can sit flush under another surface. */
   connectedTop?: boolean;
-  /** Tighter radius, no shadow and no tray until there is a nudge. For inline composers like comments. */
+  /** A round pill instead of the card, with a tray only while there is a nudge. For inline composers like comments. */
   flat?: boolean;
-  /** No grey tray around the card until there is a nudge, for content that stands in for the input. */
-  rimless?: boolean;
-  /** Casts a shadow, for a composer floating over page content. */
+  /** Casts a shadow, for a pill floating over page content. Only applies with `flat`. */
   elevated?: boolean;
   /** `sm` is a 36px single-line pill for dense inline composers. Pair it with `Composer.Send size="sm"`. Only applies with `flat`. */
   size?: "default" | "sm";
-  /** A soft inner light, for a pill floating over the page. */
+  /** A soft inner light, for a pill floating over the page. Only applies with `flat`. */
   highlight?: boolean;
   /**
-   * `card` drops the tray and draws the input as a dualtone table card, for
-   * a composer that sits on a grey shell next to other cards.
+   * `card` draws the pill in the table card tokens, for a pill on a grey
+   * shell next to other cards. The non-pill composer is always a card.
    */
   surface?: "default" | "card";
   className?: string;

@@ -4,11 +4,11 @@ import type { Button } from "../../button/components/button";
 
 export interface ComposerFrameProps {
   children: ReactNode;
-  /** Queued messages, attachments or notices, shown on the tray above the card. */
+  /** Queued messages, attachments or notices, tucked under the card's top edge (or on the pill's tray). */
   nudge?: ReactNode;
   /** Drops the top radius so the frame can sit flush under another surface. */
   connectedTop?: boolean;
-  /** Tighter radius, no shadow and no tray until there is a nudge. For inline composers like comments. */
+  /** A round pill instead of the card, with a tray only while there is a nudge. For inline composers like comments. */
   flat?: boolean;
   /** `sm` is a 36px single-line pill for dense inline composers. Pair it with `Composer.Send size="sm"`. Only applies with `flat`. */
   size?: "default" | "sm";

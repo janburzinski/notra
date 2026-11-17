@@ -77,6 +77,60 @@ function ComposerNudgeShell({ children }: { children: ReactNode }) {
   );
 }
 
+/**
+ * The composer as a dualtone card. Queued messages sit on a tinted sheet of
+ * the same material, barely narrower, tucked under the input's top edge so
+ * the two read as one stack.
+ */
+function CardComposerFrame({
+  children,
+  nudge,
+  connectedTop = false,
+  className,
+}: Pick<
+  ComposerFrameProps,
+  "children" | "nudge" | "connectedTop" | "className"
+>) {
+  const hasNudge = Boolean(nudge);
+  return (
+    <div
+      className={cn("flex w-full min-w-0 flex-col", className)}
+      data-slot="composer"
+    >
+      <LazyMotion features={domAnimation} strict>
+        <AnimatePresence initial={false}>
+          {nudge ? (
+            <ComposerNudgeShell key="nudge">
+              {/* The bottom padding hides under the card. */}
+              <div
+                className={cn(
+                  "border-table-card-border bg-muted/50 border border-b-0 pt-1 pb-2",
+                  // Flush under the surface above, like the card would be.
+                  connectedTop
+                    ? "rounded-t-none border-t-0"
+                    : "mx-1.5 rounded-t-[9px]"
+                )}
+              >
+                {nudge}
+              </div>
+            </ComposerNudgeShell>
+          ) : null}
+        </AnimatePresence>
+      </LazyMotion>
+      <div
+        className={cn(
+          "border-table-card-border bg-table-card shadow-table-card relative z-10 min-w-0 overflow-hidden rounded-[10px] border",
+          hasNudge && "-mt-2",
+          connectedTop && !hasNudge && "rounded-t-none border-t-0"
+        )}
+        data-slot="composer-card"
+      >
+        {children}
+      </div>
+    </div>
+  );
+}
+
 export function ComposerFrame({
   children,
   nudge,
@@ -85,23 +139,31 @@ export function ComposerFrame({
   size = "default",
   className,
 }: ComposerFrameProps) {
+  if (!flat) {
+    return (
+      <CardComposerFrame
+        className={className}
+        connectedTop={connectedTop}
+        nudge={nudge}
+      >
+        {children}
+      </CardComposerFrame>
+    );
+  }
+
   const hasNudge = Boolean(nudge);
-  const showTray = hasNudge || !flat;
 
   return (
     <div
       className={cn(
         "flex w-full min-w-0 flex-col",
         COMPOSER_TRAY_TRANSITION,
-        showTray ? "bg-muted p-1" : "bg-transparent",
-        flat
-          ? size === "sm"
-            ? "rounded-[22px]"
-            : "rounded-[29px]"
-          : "rounded-[18px]",
+        // The pill only grows a tray to hold chips above it.
+        hasNudge ? "bg-muted p-1" : "bg-transparent",
+        size === "sm" ? "rounded-[22px]" : "rounded-[29px]",
         // Chips above the pill sit near the top edge, where the pill's wide
         // corners would crowd them, so the tray's top matches the card's.
-        flat && hasNudge && "rounded-t-[18px]",
+        hasNudge && "rounded-t-[18px]",
         connectedTop && "rounded-t-none",
         className
       )}
@@ -117,14 +179,10 @@ export function ComposerFrame({
       <div
         className={cn(
           "border-border/70 bg-background min-w-0 overflow-hidden border",
-          flat
-            ? // pill input with a round send button; the radius is half the
-              // single-line height so wrapped lines keep the button concentric
-              cn(
-                "**:data-[slot=composer-send]:rounded-full **:data-[slot=composer-send]:[corner-shape:round] **:data-[slot=composer-send]:supports-[corner-shape:squircle]:rounded-full",
-                size === "sm" ? "rounded-[18px]" : "rounded-[25px]"
-              )
-            : "rounded-[14px] shadow-[inset_0_1px_0_rgba(255,255,255,0.9),inset_0_0_6px_rgba(255,255,255,0.8),0_1px_2px_rgba(0,0,0,0.04)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.07),inset_0_0_6px_rgba(255,255,255,0.03)]",
+          // A round send button; the radius is half the single-line height so
+          // wrapped lines keep the button concentric.
+          "**:data-[slot=composer-send]:rounded-full **:data-[slot=composer-send]:[corner-shape:round] **:data-[slot=composer-send]:supports-[corner-shape:squircle]:rounded-full",
+          size === "sm" ? "rounded-[18px]" : "rounded-[25px]",
           connectedTop && !hasNudge && "rounded-t-none border-t-0"
         )}
         data-slot="composer-card"
