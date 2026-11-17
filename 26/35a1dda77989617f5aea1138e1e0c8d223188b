@@ -1,0 +1,19 @@
+packages/ui/src/components/ui/message-scroller.tsx
+  s_2f73f2e6696cde::t_2e94566ead103e 45
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "2635a1dda77989617f5aea1138e1e0c8d223188b",
+  "prompts": {},
+  "sessions": {
+    "s_2f73f2e6696cde": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c3c8bb18-1fb1-4fc1-bb3e-323db5bbc50d",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
