@@ -15,6 +15,7 @@ import { useGeoProjectQueryState } from "@/lib/hooks/use-geo-project-query";
 import { useNavVisibility } from "@/lib/hooks/use-nav-visibility";
 
 import { ConnectAgentPill } from "./connect-agent";
+import { ConnectSlackPill } from "./connect-slack";
 import { NavGroupList } from "./nav-group-list";
 import { useActiveNavLink } from "./nav-jobs";
 import { SidebarLabel } from "./sidebar-label";
@@ -53,6 +54,7 @@ export function NavFooter({ slug }: { slug: string }) {
         </SidebarMenuItem>
       </SidebarMenu>
       <div className="pt-2">
+        <ConnectSlackPill />
         <ConnectAgentPill />
         <SidebarAskAgentButton />
       </div>

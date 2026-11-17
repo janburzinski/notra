@@ -32,13 +32,13 @@ import { toastCopyError } from "@/utils/copy-to-clipboard";
 const PILL_HIDDEN = { opacity: 0, height: 0, paddingBottom: 0, scale: 0.96 };
 const PILL_SHOWN = { opacity: 1, height: "auto", paddingBottom: 6, scale: 1 };
 
-const PILL_TRANSITION = {
+export const PILL_TRANSITION = {
   duration: 0.2,
   ease: EASE.out,
   opacity: { duration: 0.12 },
 } as const;
 
-function pillMotion(reduceMotion: boolean | null) {
+export function pillMotion(reduceMotion: boolean | null) {
   if (reduceMotion) {
     return {
       initial: { opacity: 0 },
@@ -49,7 +49,10 @@ function pillMotion(reduceMotion: boolean | null) {
   return { initial: PILL_HIDDEN, animate: PILL_SHOWN, exit: PILL_HIDDEN };
 }
 
-function DismissButton({ label, onDismiss }: ConnectAgentDismissButtonProps) {
+export function DismissButton({
+  label,
+  onDismiss,
+}: ConnectAgentDismissButtonProps) {
   return (
     <button
       aria-label={label}

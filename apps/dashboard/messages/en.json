@@ -5024,8 +5024,13 @@
     },
     "slackDialog": {
       "title": "Add Slack integration",
-      "description": "Install the Notra agent in your Slack workspace to chat, draft and approve content from Slack threads.",
-      "redirectNote": "You will be redirected to Slack to approve the installation. Public threads with the agent are mirrored into the dashboard, and you can limit which channels the agent responds in after connecting."
+      "description": "Install the Notra agent in your Slack workspace.",
+      "features": {
+        "chat": "Chat with the agent and draft content in any thread",
+        "approve": "Approve content without leaving Slack",
+        "mirror": "Public threads show up in your dashboard",
+        "channels": "Choose which channels it answers in"
+      }
     },
     "gscDialog": {
       "titleConnect": "Connect Google Search Console",
@@ -8142,6 +8147,10 @@
     "label": "Connect agent",
     "toast": "Copied. Paste it into your agent.",
     "dismiss": "Hide Connect agent"
+  },
+  "connectSlack": {
+    "label": "Connect Slack",
+    "dismiss": "Hide Connect Slack"
   },
   "home": {
     "greeting": "{period, select, morning {Good morning} afternoon {Good afternoon} other {Good evening}}!",

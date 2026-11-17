@@ -5024,8 +5024,13 @@
     },
     "slackDialog": {
       "title": "Slack-Integration hinzufügen",
-      "description": "Installiere den Notra-Agenten in deinem Slack-Workspace, um direkt in Slack-Threads zu chatten, Entwürfe zu erstellen und Inhalte freizugeben.",
-      "redirectNote": "Du wirst zu Slack weitergeleitet, um die Installation zu bestätigen. Öffentliche Threads mit dem Agenten werden ins Dashboard gespiegelt, und nach dem Verbinden kannst du festlegen, in welchen Kanälen der Agent antwortet."
+      "description": "Installiere den Notra-Agenten in deinem Slack-Workspace.",
+      "features": {
+        "chat": "Chatte mit dem Agenten und erstelle Entwürfe in jedem Thread",
+        "approve": "Gib Inhalte frei, ohne Slack zu verlassen",
+        "mirror": "Öffentliche Threads erscheinen in deinem Dashboard",
+        "channels": "Lege fest, in welchen Kanälen er antwortet"
+      }
     },
     "gscDialog": {
       "titleConnect": "Google Search Console verbinden",
@@ -8142,6 +8147,10 @@
     "label": "Agent verbinden",
     "toast": "Kopiert. Füge es in deinen Agent ein.",
     "dismiss": "„Agent verbinden“ ausblenden"
+  },
+  "connectSlack": {
+    "label": "Slack verbinden",
+    "dismiss": "„Slack verbinden“ ausblenden"
   },
   "home": {
     "greeting": "{period, select, morning {Guten Morgen} afternoon {Guten Tag} other {Guten Abend}}!",

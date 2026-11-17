@@ -28,6 +28,8 @@ export const localStorageKeys = {
     `notra:github-publish-repository:v1:${organizationId}`,
   welcomeTourSeen: "notra:welcome-tour-seen",
   connectAgentDismissed: "notra:connect-agent-dismissed:v1",
+  connectSlackDismissed: (organizationId: string) =>
+    `notra:connect-slack-dismissed:v1:${organizationId}`,
   uiSounds: "notra:ui-sounds:v1",
   siteSettingsGroupCollapsed: (id: string) =>
     `notra:site-settings-group-collapsed:v1:${id}`,
