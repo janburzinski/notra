@@ -92,7 +92,6 @@ export const SETTINGS_NAV_GROUPS: readonly SettingsNavGroupConfig[] = [
           "sound",
           "sounds",
           "audio",
-          "volume",
           "click sounds",
         ],
       },

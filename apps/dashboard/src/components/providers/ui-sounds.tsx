@@ -2,12 +2,12 @@
 
 import { useEffect } from "react";
 
-import { useUiSoundSettings } from "@/lib/hooks/use-ui-sound-settings";
+import { useUiSoundsEnabled } from "@/lib/hooks/use-ui-sounds-enabled";
 import { installUiSoundListeners } from "@/lib/ui-sounds/listeners";
 
 /** Listens for interactions only while the user has sounds turned on. */
 export function UiSounds() {
-  const { enabled } = useUiSoundSettings();
+  const enabled = useUiSoundsEnabled();
 
   useEffect(() => {
     if (!enabled) {
