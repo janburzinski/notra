@@ -1,0 +1,37 @@
+apps/dashboard/messages/en.json
+  s_d43316500410f4::t_fc9c1ad3d4cde0 3788-3789
+  s_d43316500410f4::t_3937ffd4fcf0a7 3785-3787,3805
+apps/dashboard/src/components/geo/sentiment-trend-chart.tsx
+  s_d43316500410f4::t_9edbb499116e65 1-83
+apps/dashboard/src/components/geo/sentiment-engine-list.tsx
+  s_d43316500410f4::t_38451dabfc05dc 2-5,18,22-27,35,37-38,40-115,118-134
+apps/dashboard/src/components/geo/sentiment-breakdown-placeholder.tsx
+  s_d43316500410f4::t_35849f21217dc6 9,12,48,53-89
+apps/dashboard/src/types/geo-sentiment.ts
+  s_d43316500410f4::t_35849f21217dc6 16-17
+apps/dashboard/messages/de.json
+  s_d43316500410f4::t_3937ffd4fcf0a7 3785,3805
+  s_d43316500410f4::t_01f9fe3638ed03 3786-3787
+  s_d43316500410f4::t_fc9c1ad3d4cde0 3788-3789
+apps/dashboard/src/components/geo/sentiment-breakdown.tsx
+  s_d43316500410f4::t_7d129ab0a30098 4,8,10,27,32,35,38-40,43,48,55,89-90,93-99
+  s_d43316500410f4::t_fc9c1ad3d4cde0 26,57-68,71-74,76-88
+apps/dashboard/src/constants/geo-sentiment.ts
+  s_d43316500410f4::t_35849f21217dc6 16-18
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "4e9a97c8c114bc1b11affb3c16a0a40193d571ec",
+  "prompts": {},
+  "sessions": {
+    "s_d43316500410f4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ac84dda6-22be-475c-8cb8-42e85918b326",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
