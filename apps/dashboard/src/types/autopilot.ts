@@ -244,6 +244,10 @@ export interface AutopilotFindingHeaderActionsProps {
   publishAt: Date | null;
   canWrite: boolean;
   onClose: () => void;
+  /** The commit the person is reading; merging anything newer is refused. */
+  headSha?: string | null;
+  /** Autopilot is changing the pull request: merging waits for it. */
+  busy?: boolean;
 }
 
 export type AutopilotFindingByIdLoaderProps = Omit<
@@ -484,6 +488,8 @@ export interface AutopilotTableEmptyProps {
 export interface AutopilotMergeMenuProps {
   size?: "xs" | "sm";
   loading?: boolean;
+  /** While Autopilot still changes the pull request. */
+  disabled?: boolean;
   onMerge: (method: GitHubMergeMethod) => void;
   /** Adds "Close pull request" under the merge options, as GitHub does. */
   onClosePullRequest?: () => void;
@@ -757,6 +763,7 @@ export interface AutopilotFindingChangedFile {
 }
 
 export interface AutopilotFindingContent {
+  headSha: string;
   posts: AutopilotFindingPost[];
   otherFiles: AutopilotFindingChangedFile[];
   /** Files the pull request changes that the modal does not show. */

@@ -17,6 +17,7 @@ import {
   autopilotFindingInputSchema,
   autopilotJobDecisionsInputSchema,
   autopilotMergeInputSchema,
+  autopilotRequestChangesInputSchema,
   autopilotMetricsInputSchema,
   autopilotOrganizationInputSchema,
   autopilotRuleIdInputSchema,
@@ -42,6 +43,7 @@ import {
   AUTOPILOT_DEFAULT_APPROVALS,
   AUTOPILOT_SETUP_APPROVALS,
 } from "@/constants/autopilot-publish";
+import { AUTOPILOT_REVISION_ANONYMOUS_REQUESTER } from "@/constants/autopilot-revisions";
 import {
   AUTOPILOT_WORKFLOW_NOT_FOUND,
   AUTOPILOT_WORKFLOW_NOT_RUNNING,
@@ -79,6 +81,11 @@ import {
   cancelHoldsAfterSettingsChange,
   holdFinding,
 } from "@/lib/autopilot/publish";
+import {
+  loadFindingConversation,
+  prepareFindingRevision,
+  withdrawFindingRevision,
+} from "@/lib/autopilot/revisions";
 import { addRule, deleteRule, listRules } from "@/lib/autopilot/rules";
 import { findAutopilotProject } from "@/lib/autopilot/run";
 import {
@@ -111,6 +118,7 @@ import {
 } from "@/lib/orpc/utils/errors";
 import { workflowDefinitions } from "@/lib/workflow-engine/definitions/autopilot";
 import { getWorkflowRunViews } from "@/lib/workflow-engine/run-view";
+import { startGitHubMentionRun } from "@/lib/workflows/start";
 import {
   autopilotWorkflowEnabledInputSchema,
   autopilotWorkflowInputSchema,
@@ -383,6 +391,59 @@ export const autopilotRouter = {
       }
     }),
 
+  /** The requests from Notra on the item's pull request and the agent's replies. */
+  conversation: authorizedProcedure
+    .input(autopilotFindingInputSchema)
+    .use(withOrganizationAccess)
+    .use(withAutopilotFlag)
+    .handler(async ({ input }) => {
+      try {
+        return await loadFindingConversation(
+          input.organizationId,
+          input.findingId
+        );
+      } catch (error) {
+        logError("Autopilot finding conversation failed", error, {
+          organizationId: input.organizationId,
+        });
+        throw badRequest("Couldn't read this pull request from GitHub");
+      }
+    }),
+
+  /** Posts the request on the pull request and lets the agent change the branch. */
+  requestChanges: authorizedProcedure
+    .input(autopilotRequestChangesInputSchema)
+    .use(withOrganizationAccess)
+    .use(withAutopilotFlag)
+    .handler(async ({ input, context }) => {
+      assertCanManageAutopilot(context);
+      let mention: Awaited<ReturnType<typeof prepareFindingRevision>>;
+      try {
+        mention = await prepareFindingRevision({
+          organizationId: input.organizationId,
+          findingId: input.findingId,
+          userId: context.auth.user.id,
+          // The comment is public on GitHub: a name, never an email address.
+          requester:
+            context.auth.user.name?.trim() ||
+            AUTOPILOT_REVISION_ANONYMOUS_REQUESTER,
+          instruction: input.instruction,
+        });
+      } catch (error) {
+        throw badRequest(errorMessage(error));
+      }
+      try {
+        await startGitHubMentionRun(mention);
+      } catch (error) {
+        // Without a run nobody answers the request, so it must not read as working.
+        await withdrawFindingRevision(input.organizationId, mention).catch(
+          () => undefined
+        );
+        throw error;
+      }
+      return { success: true as const };
+    }),
+
   impact: authorizedProcedure
     .input(autopilotFindingInputSchema)
     .use(withOrganizationAccess)
@@ -583,7 +644,10 @@ export const autopilotRouter = {
         const finding = await mergeFinding(
           input.organizationId,
           input.findingId,
-          input.method
+          input.method,
+          undefined,
+          false,
+          input.headSha
         );
         return { status: finding.status };
       } catch (error) {

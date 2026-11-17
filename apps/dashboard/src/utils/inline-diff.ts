@@ -1,3 +1,5 @@
+import type { BlockDiff } from "@/types/autopilot-revisions";
+
 /**
  * A word-level diff of two paragraphs, for showing a rewrite inline the way
  * a doc's suggestion mode does. Paragraphs only carry **bold** and `code`,
@@ -18,8 +20,19 @@ export interface DiffRun {
 /** Starts of blocks that are not a plain paragraph: these aren't diffed inline. */
 const NOT_A_PARAGRAPH = /^(#|```|\||[-*+] |>|\d+\. )/u;
 
-export function isParagraph(markdown: string) {
+function isParagraph(markdown: string) {
   return !NOT_A_PARAGRAPH.test(markdown.trim());
+}
+
+/** Links, images, HTML, strikethrough and single-star or underscore emphasis. */
+const BEYOND_BOLD_AND_CODE = /\[|\]\(|<|~~|_|(?<!\*)\*(?!\*)/u;
+
+/**
+ * A paragraph the word diff can draw as it is: it only knows **bold** and
+ * `code`, so anything else keeps the real Markdown renderer.
+ */
+export function isPlainParagraph(markdown: string) {
+  return isParagraph(markdown) && !BEYOND_BOLD_AND_CODE.test(markdown);
 }
 
 /** Splits a paragraph into words and spaces, each with its inline style. */
@@ -196,4 +209,91 @@ function mergeSpaces(runs: DiffRun[]): DiffRun[] {
   }
   flush();
   return out;
+}
+
+/** A post's Markdown in blocks: paragraphs, headings, lists, fenced code whole. */
+function splitMarkdownBlocks(markdown: string): string[] {
+  const blocks: string[] = [];
+  let current: string[] = [];
+  let fenced = false;
+  for (const line of markdown.split("\n")) {
+    if (/^\s*(```|~~~)/u.test(line)) {
+      fenced = !fenced;
+    }
+    if (!fenced && line.trim() === "") {
+      if (current.length > 0) {
+        blocks.push(current.join("\n"));
+        current = [];
+      }
+      continue;
+    }
+    current.push(line);
+  }
+  if (current.length > 0) {
+    blocks.push(current.join("\n"));
+  }
+  return blocks;
+}
+
+/**
+ * Which blocks of a post a commit touched. Blocks are matched by their whole
+ * text; in a stretch between two unchanged blocks, the new blocks replace the
+ * old ones in order, so a rewritten paragraph reads as an inline diff.
+ */
+export function diffBlocks(before: string, after: string): BlockDiff {
+  const a = splitMarkdownBlocks(before);
+  const b = splitMarkdownBlocks(after);
+  const cols = b.length + 1;
+  const table = new Uint32Array((a.length + 1) * cols);
+  for (let i = a.length - 1; i >= 0; i -= 1) {
+    for (let j = b.length - 1; j >= 0; j -= 1) {
+      table[i * cols + j] =
+        a[i] === b[j]
+          ? (table[(i + 1) * cols + j + 1] ?? 0) + 1
+          : Math.max(
+              table[(i + 1) * cols + j] ?? 0,
+              table[i * cols + j + 1] ?? 0
+            );
+    }
+  }
+  const changed: number[] = [];
+  const replaced: Record<number, string | null> = {};
+  const dropped: Record<number, string[]> = {};
+  let removed: string[] = [];
+  let added: number[] = [];
+  // `at` is the index of the next block in the new version, where blocks
+  // that were removed without a replacement are shown struck through.
+  const flush = (at: number) => {
+    for (const [rank, index] of added.entries()) {
+      changed.push(index);
+      replaced[index] = removed[rank] ?? null;
+    }
+    const gone = removed.slice(added.length);
+    if (gone.length > 0) {
+      dropped[at] = gone;
+    }
+    removed = [];
+    added = [];
+  };
+  let i = 0;
+  let j = 0;
+  while (i < a.length || j < b.length) {
+    if (i < a.length && j < b.length && a[i] === b[j]) {
+      flush(j);
+      i += 1;
+      j += 1;
+    } else if (
+      i < a.length &&
+      (j >= b.length ||
+        (table[(i + 1) * cols + j] ?? 0) >= (table[i * cols + j + 1] ?? 0))
+    ) {
+      removed.push(a[i] as string);
+      i += 1;
+    } else {
+      added.push(j);
+      j += 1;
+    }
+  }
+  flush(b.length);
+  return { blocks: b, changed, before: replaced, removed: dropped };
 }

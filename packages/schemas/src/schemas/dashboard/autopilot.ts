@@ -64,6 +64,8 @@ export const autopilotMergeMethodSchema = z.enum(["squash", "merge", "rebase"]);
 export const autopilotMergeInputSchema = autopilotFindingInputSchema.extend({
   /** Omitted: the first method the repository allows, squash first. */
   method: autopilotMergeMethodSchema.optional(),
+  /** The commit the person read; the merge is refused once the branch moved past it. */
+  headSha: z.string().trim().min(7).max(64).optional(),
 });
 
 export const autopilotDismissInputSchema = autopilotFindingInputSchema.extend({
@@ -258,4 +260,10 @@ export const autopilotRunNowInputSchema =
     trigger: z.enum(["manual", "onboarding"]).default("manual"),
     /** Runs only this automation instead of the whole daily run. */
     kind: z.enum(AUTOPILOT_AUTOMATION_KINDS).optional(),
+  });
+
+/** "Ask for changes" on an Autopilot pull request, from its page. */
+export const autopilotRequestChangesInputSchema =
+  autopilotFindingInputSchema.extend({
+    instruction: z.string().trim().min(2).max(2000),
   });

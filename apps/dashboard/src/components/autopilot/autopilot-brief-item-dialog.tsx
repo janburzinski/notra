@@ -1,10 +1,7 @@
 "use client";
 
 import { HugeiconsIcon } from "@hugeicons/react";
-import {
-  MessageResponse,
-  type MessageResponseProps,
-} from "@notra/ui/components/ai-elements/message";
+import { MessageResponse } from "@notra/ui/components/ai-elements/message";
 import {
   ResponsiveDialog,
   ResponsiveDialogContent,
@@ -13,7 +10,6 @@ import {
   ResponsiveDialogTitle,
 } from "@notra/ui/components/shared/responsive-dialog";
 import { Skeleton } from "@notra/ui/components/ui/skeleton";
-import type { ComponentProps } from "react";
 
 import {
   AutopilotBriefFindingActions,
@@ -34,6 +30,7 @@ import {
   findingDisplayTitle,
   findingSummary,
 } from "@/utils/autopilot-findings";
+import { postImageComponents } from "@/utils/autopilot-post-images";
 
 /**
  * One brief item opened up without leaving the brief: the post its pull
@@ -205,35 +202,11 @@ function ItemReader({
   );
 }
 
-/**
- * Shows the pull request's own images, which the server read and keyed in
- * the body. Data URLs can't go in the Markdown: the renderer blocks them, so
- * they are swapped in on the rendered <img>, where an SVG can't run scripts.
- */
-function postImageComponents(
-  images: Record<string, string>
-): MessageResponseProps["components"] {
-  if (Object.keys(images).length === 0) {
-    return undefined;
-  }
-  return {
-    img: ({
-      alt,
-      node: _node,
-      src,
-      ...props
-    }: ComponentProps<"img"> & { node?: unknown }) => (
-      <img
-        {...props}
-        alt={alt ?? ""}
-        className="max-w-full rounded-lg"
-        src={typeof src === "string" ? (images[src] ?? src) : src}
-      />
-    ),
-  };
-}
-
-function ReadFailed({ pullRequestUrl }: { pullRequestUrl: string | null }) {
+export function ReadFailed({
+  pullRequestUrl,
+}: {
+  pullRequestUrl: string | null;
+}) {
   return (
     <p className="text-muted-foreground text-sm text-pretty">
       Couldn't read this pull request from GitHub.
@@ -255,7 +228,7 @@ function ReadFailed({ pullRequestUrl }: { pullRequestUrl: string | null }) {
   );
 }
 
-function OtherFiles({ content }: { content: AutopilotFindingContent }) {
+export function OtherFiles({ content }: { content: AutopilotFindingContent }) {
   const { posts, otherFiles, hiddenFiles } = content;
   return (
     <>

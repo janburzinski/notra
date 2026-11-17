@@ -19,10 +19,12 @@ import { AutopilotFindingStatus } from "@/components/autopilot/autopilot-finding
 import { AutopilotFindingTranscript } from "@/components/autopilot/autopilot-finding-transcript";
 import { AutopilotMergeMenu } from "@/components/autopilot/autopilot-merge-menu";
 import { AutopilotPageShell } from "@/components/autopilot/autopilot-page-shell";
+import { AutopilotPostWorkbench } from "@/components/autopilot/autopilot-post-workbench";
 import { Button } from "@/components/button";
 import { EmptyState } from "@/components/empty-state";
 import Link from "@/components/framework/link";
 import {
+  AUTOPILOT_BRANCH_PREFIX,
   AUTOPILOT_FROM_PARAM,
   AUTOPILOT_NAV_LINK,
 } from "@/constants/autopilot";
@@ -43,6 +45,7 @@ import type {
   AutopilotFindingPageProps,
   AutopilotPendingFindingAction,
 } from "@/types/autopilot";
+import type { AutopilotPostWorkbenchView } from "@/types/autopilot-revisions";
 import {
   formatAutopilotPercent,
   runEventsRefetchInterval,
@@ -119,7 +122,10 @@ function FindingHeaderActions({
   publishAt,
   canWrite,
   onClose,
+  headSha,
+  busy = false,
 }: AutopilotFindingHeaderActionsProps) {
+  const pin = headSha ?? undefined;
   const { writeSuggestion, merge, hold } = useAutopilotActions(organizationId);
   const writing =
     writeSuggestion.isPending && writeSuggestion.variables === finding.id;
@@ -147,8 +153,11 @@ function FindingHeaderActions({
             Hold
           </Button>
           <Button
+            disabled={busy}
             loading={merge.isPending}
-            onClick={() => merge.mutate({ findingId: finding.id })}
+            onClick={() =>
+              merge.mutate({ findingId: finding.id, headSha: pin })
+            }
             size="sm"
           >
             Publish now
@@ -157,9 +166,12 @@ function FindingHeaderActions({
       ) : null}
       {finding.status === "proposed" && !publishAt ? (
         <AutopilotMergeMenu
+          disabled={busy}
           loading={merge.isPending}
           onClosePullRequest={onClose}
-          onMerge={(method) => merge.mutate({ findingId: finding.id, method })}
+          onMerge={(method) =>
+            merge.mutate({ findingId: finding.id, method, headSha: pin })
+          }
           size="sm"
         />
       ) : null}
@@ -278,26 +290,20 @@ function FindingPage({
     </>
   );
 
-  return (
-    <div className="space-y-6">
-      <div className="space-y-3">
-        <AutopilotBackLink slug={organizationSlug} tab="pull-requests" />
-        <PageHeading
-          description={`${AUTOPILOT_KIND_META[finding.kind].label} · ${formatDate(new Date(finding.createdAt))}`}
-          title={evidence.brief?.topic ?? finding.title}
-        >
-          {overview.canManage ? (
-            <FindingHeaderActions
-              canWrite={overview.settings.enabled}
-              finding={finding}
-              onClose={() => setPending({ kind: "dismiss", finding })}
-              organizationId={organizationId}
-              publishAt={publishAt}
-            />
-          ) : null}
-        </PageHeading>
-      </div>
-
+  const headerActions = (view?: AutopilotPostWorkbenchView) =>
+    overview.canManage ? (
+      <FindingHeaderActions
+        busy={view?.working}
+        canWrite={overview.settings.enabled}
+        finding={finding}
+        headSha={view?.headSha}
+        onClose={() => setPending({ kind: "dismiss", finding })}
+        organizationId={organizationId}
+        publishAt={publishAt}
+      />
+    ) : null;
+  const details = (
+    <>
       <div className={TABLE_FRAME_CLASS}>
         <dl
           className={cn(
@@ -419,13 +425,60 @@ function FindingPage({
           />
         </section>
       ) : null}
+    </>
+  );
+  const confirm = (
+    <AutopilotFindingConfirmDialog
+      branch={overview.settings.repository?.branch ?? null}
+      onClose={() => setPending(null)}
+      organizationId={organizationId}
+      pending={pending}
+    />
+  );
 
-      <AutopilotFindingConfirmDialog
-        branch={overview.settings.repository?.branch ?? null}
-        onClose={() => setPending(null)}
-        organizationId={organizationId}
-        pending={pending}
-      />
+  // A pull request leads with the post it writes, to read and change in place.
+  if (finding.pullRequestNumber !== null) {
+    return (
+      <div className="space-y-6">
+        <AutopilotBackLink slug={organizationSlug} tab="pull-requests" />
+        <AutopilotPostWorkbench
+          actions={headerActions}
+          canRequest={
+            overview.canManage &&
+            finding.status === "proposed" &&
+            Boolean(finding.branch?.startsWith(`${AUTOPILOT_BRANCH_PREFIX}/`))
+          }
+          finding={finding}
+          organizationId={organizationId}
+        >
+          <section
+            aria-labelledby="finding-details"
+            className="border-table-row-border mx-auto max-w-2xl space-y-6 border-t pt-8"
+          >
+            <h2 className="text-sm font-medium" id="finding-details">
+              Why Autopilot wrote this
+            </h2>
+            {details}
+          </section>
+        </AutopilotPostWorkbench>
+        {confirm}
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="space-y-3">
+        <AutopilotBackLink slug={organizationSlug} tab="pull-requests" />
+        <PageHeading
+          description={`${AUTOPILOT_KIND_META[finding.kind].label} · ${formatDate(new Date(finding.createdAt))}`}
+          title={evidence.brief?.topic ?? finding.title}
+        >
+          {headerActions()}
+        </PageHeading>
+      </div>
+      {details}
+      {confirm}
     </div>
   );
 }

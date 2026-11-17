@@ -188,8 +188,12 @@ export function useAutopilotActions(organizationId: string) {
   });
 
   const merge = useMutation({
-    mutationFn: (input: { findingId: string; method?: GitHubMergeMethod }) =>
-      dashboardOrpc.autopilot.merge.call({ organizationId, ...input }),
+    mutationFn: (input: {
+      findingId: string;
+      method?: GitHubMergeMethod;
+      /** The commit on screen; the merge is refused if the branch moved on. */
+      headSha?: string;
+    }) => dashboardOrpc.autopilot.merge.call({ organizationId, ...input }),
     onSuccess: () => {
       toast.success("Merged");
       invalidate();

@@ -179,6 +179,8 @@ export async function loadFindingContent(
     .filter((file) => !postPaths.has(file.path))
     .slice(0, AUTOPILOT_CONTENT_MAX_OTHER_FILES);
   return {
+    /** The commit this was read at; a request's commit moves it. */
+    headSha: head.headSha,
     posts,
     otherFiles: otherFiles.map((file) => ({
       ...file,

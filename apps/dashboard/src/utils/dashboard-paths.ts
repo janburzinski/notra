@@ -19,6 +19,12 @@ export function isAutopilotPathname(pathname: string | null): boolean {
   return pathname?.split("/").filter(Boolean)[1] === "autopilot";
 }
 
+/** An Autopilot item's page, which has its own composer for its pull request. */
+export function isAutopilotFindingPathname(pathname: string | null): boolean {
+  const parts = pathname?.split("/").filter(Boolean) ?? [];
+  return parts[1] === "autopilot" && parts[2] === "findings";
+}
+
 /** A standalone chat already is the agent, so it skips the topbar agent button. */
 export function isChatPathname(pathname: string | null): boolean {
   return pathname?.split("/").filter(Boolean)[1] === "chat";

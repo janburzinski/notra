@@ -25,12 +25,15 @@ import type { AutopilotMergeMenuProps } from "@/types/autopilot";
 export function AutopilotMergeMenu({
   size = "xs",
   loading,
+  disabled = false,
   onMerge,
   onClosePullRequest,
 }: AutopilotMergeMenuProps) {
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger render={<Button loading={loading} size={size} />}>
+      <DropdownMenuTrigger
+        render={<Button disabled={disabled} loading={loading} size={size} />}
+      >
         Merge
         <HugeiconsIcon icon={ArrowDown01Icon} size={14} />
       </DropdownMenuTrigger>

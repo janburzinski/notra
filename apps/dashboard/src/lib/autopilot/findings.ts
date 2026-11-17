@@ -1234,11 +1234,18 @@ export async function mergeFinding(
   method?: GitHubMergeMethod,
   beforeMerge?: () => Promise<void>,
   /** Autopilot's own scheduled publish: nobody approved it, so it teaches nothing. */
-  automatic = false
+  automatic = false,
+  /** The commit the person read; a later commit is never merged unread. */
+  expectedHeadSha?: string
 ) {
   const finding = await loadProposedFinding(organizationId, findingId);
   if (finding.status === "merged") {
     return finding;
+  }
+  if (expectedHeadSha && finding.headSha !== expectedHeadSha) {
+    throw new Error(
+      "The pull request changed since you read it. Read the new version, then merge."
+    );
   }
   const ref = pullRequestRef(finding);
   if (finding.status !== "proposed" || !ref) {

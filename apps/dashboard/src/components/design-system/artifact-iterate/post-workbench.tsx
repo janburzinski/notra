@@ -41,23 +41,27 @@ import {
 import { toast } from "sonner";
 import { useFormatter } from "use-intl";
 
+import {
+  type AgentActivity,
+  AgentActivityCard,
+} from "@/components/autopilot/autopilot-agent-activity-card";
 import { AutopilotFindingStatus } from "@/components/autopilot/autopilot-finding-status";
 import { AutopilotMergeMenu } from "@/components/autopilot/autopilot-merge-menu";
+import {
+  AutopilotChangedBlock,
+  AutopilotInlineDiff,
+  AutopilotSuggestionChips,
+} from "@/components/autopilot/autopilot-post-diff";
 import { Button } from "@/components/button";
 import { ChatInput } from "@/components/chat/chat-input";
 import { useChatQuote } from "@/components/chat/chat-quote";
+import { AUTOPILOT_REVISION_SUGGESTIONS } from "@/constants/autopilot-revisions";
 import { AUTOPILOT_KIND_META } from "@/constants/autopilot-ui";
 import type { AutopilotFindingView } from "@/types/autopilot";
 import { findingDisplayTitle } from "@/utils/autopilot-findings";
+import { diffWords } from "@/utils/inline-diff";
 
-import { type AgentActivity, AgentActivityCard } from "./agent-activity-card";
 import { ITERATE_DRAFTS, type IteratePost } from "./fixtures";
-import {
-  type DiffRun,
-  type DiffWord,
-  diffWords,
-  isParagraph,
-} from "./inline-diff";
 import { postContentQueryOptions } from "./post-content";
 import {
   type PlanState,
@@ -65,13 +69,6 @@ import {
   type PostVersion,
   WRITE_MS,
 } from "./use-post-revisions";
-
-const SUGGESTIONS = [
-  { label: "Make it shorter", icon: ScissorIcon },
-  { label: "Punchier title", icon: Heading01Icon },
-  { label: "Add a code example", icon: SourceCodeIcon },
-  { label: "Less salesy", icon: Megaphone01Icon },
-] as const;
 
 /** One-tap changes to an idea's plan, before anything is written. */
 const PLAN_SUGGESTIONS = [
@@ -235,153 +232,6 @@ function VersionMenu({
   );
 }
 
-/** Changed blocks come in one after another, this far apart. */
-const STAGGER_S = 0.25;
-/** New words write themselves in, this far apart. */
-const WORD_S = 0.03;
-
-const INLINE_CODE = "rounded bg-muted px-1.5 py-0.5 font-mono text-sm";
-
-function DiffText({ word }: { word: DiffWord }) {
-  if (word.code) {
-    return <code className={INLINE_CODE}>{word.text}</code>;
-  }
-  return word.bold ? <strong>{word.text}</strong> : word.text;
-}
-
-/**
- * A rewrite read like a doc's suggestion mode: the sentence flows as one,
- * removed words faintly struck through, new words on a soft neutral highlight.
- * Fresh, the new words write themselves in one after another.
- */
-function InlineDiff({
-  runs,
-  animate,
-  delay,
-}: {
-  runs: DiffRun[];
-  animate: boolean;
-  delay: number;
-}) {
-  // Where each added run's first word falls in the order new words appear.
-  const firstAdded: number[] = [];
-  let count = 0;
-  for (const run of runs) {
-    firstAdded.push(count);
-    if (run.kind === "added") {
-      count += run.words.length;
-    }
-  }
-  return (
-    <>
-      {runs.map((run, runIndex) => {
-        // react-doctor-disable-next-line react-doctor/no-array-index-as-key -- a diff's runs are fixed for its version
-        const key = runIndex;
-        if (run.kind === "same") {
-          return (
-            <span key={key}>
-              {run.words.map((word, index) => (
-                // react-doctor-disable-next-line react-doctor/no-array-index-as-key -- words have no ids; their order is the text
-                <DiffText key={index} word={word} />
-              ))}
-            </span>
-          );
-        }
-        if (run.kind === "removed") {
-          return (
-            <m.del
-              animate={{ opacity: 1 }}
-              className="text-muted-foreground/80 decoration-muted-foreground/70 line-through decoration-1"
-              initial={animate ? { opacity: 0 } : false}
-              key={key}
-              transition={{ duration: 0.3, delay }}
-            >
-              {run.words.map((word, index) => (
-                // react-doctor-disable-next-line react-doctor/no-array-index-as-key -- words have no ids; their order is the text
-                <DiffText key={index} word={word} />
-              ))}
-            </m.del>
-          );
-        }
-        return (
-          <ins
-            className="bg-foreground/[0.08] text-foreground rounded-[3px] box-decoration-clone px-0.5 no-underline"
-            key={key}
-          >
-            {run.words.map((word, index) => {
-              const at =
-                delay + 0.15 + ((firstAdded[runIndex] ?? 0) + index) * WORD_S;
-              return (
-                <m.span
-                  animate={{ opacity: 1, filter: "blur(0px)" }}
-                  initial={
-                    animate ? { opacity: 0, filter: "blur(4px)" } : false
-                  }
-                  // react-doctor-disable-next-line react-doctor/no-array-index-as-key -- words have no ids; their order is the text
-                  key={index}
-                  transition={{ duration: 0.35, delay: at }}
-                >
-                  <DiffText word={word} />
-                </m.span>
-              );
-            })}
-          </ins>
-        );
-      })}
-    </>
-  );
-}
-
-/**
- * One changed block. A rewritten paragraph shows its diff inline; anything
- * else that is new or rewritten (a heading, a table, code) shows as it is
- * now. Either way a thin grey bar marks it in the margin.
- */
-function ChangedBlock({
-  before,
-  after,
-  order,
-  animate,
-}: {
-  before: string | null;
-  after: string;
-  order: number;
-  animate: boolean;
-}) {
-  const delay = order * STAGGER_S;
-  const inline = before !== null && isParagraph(before) && isParagraph(after);
-  // Its own presence boundary: the pane sits in an AnimatePresence with
-  // initial={false}, which would otherwise mute this entrance too.
-  return (
-    <AnimatePresence>
-      <div
-        className="before:bg-foreground/20 relative before:absolute before:inset-y-1 before:-left-4 before:w-0.5 before:rounded-full"
-        data-changed=""
-      >
-        {inline ? (
-          <p className="message-response wrap-anywhere">
-            <InlineDiff
-              animate={animate}
-              delay={delay}
-              runs={diffWords(before, after)}
-            />
-          </p>
-        ) : (
-          <m.div
-            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-            initial={
-              animate ? { opacity: 0, y: 6, filter: "blur(6px)" } : false
-            }
-            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1], delay }}
-          >
-            <MessageResponse mode="static">{after}</MessageResponse>
-          </m.div>
-        )}
-      </div>
-    </AnimatePresence>
-  );
-}
-
 /**
  * The post. With changes shown, what the latest request rewrote reads as a
  * diff; selecting text offers the chat's own Annotate.
@@ -440,7 +290,7 @@ function PostBody({
         const key = `${version.number}-${index}`;
         if (diff && rank !== undefined) {
           return (
-            <ChangedBlock
+            <AutopilotChangedBlock
               after={block}
               animate={fresh && !reduceMotion}
               before={version.before[index] ?? null}
@@ -455,38 +305,6 @@ function PostBody({
           </div>
         );
       })}
-    </div>
-  );
-}
-
-/** One-tap requests above the composer, styled like the chat's suggestions. */
-function SuggestionChips({
-  disabled,
-  onPick,
-  suggestions = SUGGESTIONS,
-}: {
-  disabled: boolean;
-  onPick: (text: string) => void;
-  suggestions?: readonly { label: string; icon: typeof ScissorIcon }[];
-}) {
-  return (
-    <div className="flex flex-wrap gap-1.5">
-      {suggestions.map((suggestion) => (
-        <button
-          className="bg-muted/70 hover:bg-muted text-foreground duration-normal inline-flex h-8 items-center gap-2 rounded-lg px-3 text-sm font-medium tracking-tight transition-colors disabled:pointer-events-none disabled:opacity-50"
-          disabled={disabled}
-          key={suggestion.label}
-          onClick={() => onPick(suggestion.label)}
-          type="button"
-        >
-          <HugeiconsIcon
-            aria-hidden="true"
-            className="text-muted-foreground size-4 shrink-0"
-            icon={suggestion.icon}
-          />
-          {suggestion.label}
-        </button>
-      ))}
     </div>
   );
 }
@@ -785,7 +603,7 @@ export function PostWorkbench({
               {/* A new title reads as the same inline diff as the body. */}
               {diffShown && version.titleBefore ? (
                 <AnimatePresence>
-                  <InlineDiff
+                  <AutopilotInlineDiff
                     animate={arrived === version.number}
                     delay={0}
                     runs={diffWords(version.titleBefore, version.title)}
@@ -875,8 +693,9 @@ function PostFooter({
               ) : null}
             </AnimatePresence>
           </div>
-          <SuggestionChips
+          <AutopilotSuggestionChips
             disabled={false}
+            suggestions={AUTOPILOT_REVISION_SUGGESTIONS}
             onPick={(text) => revisions.ask(finding.id, text, null)}
           />
         </div>
@@ -1049,7 +868,7 @@ function IdeaPane({
                 <HugeiconsIcon icon={PencilEdit02Icon} strokeWidth={2} />
                 Write it
               </Button>
-              <SuggestionChips
+              <AutopilotSuggestionChips
                 disabled={busy}
                 onPick={(text) => revisions.revisePlan(finding.id, text)}
                 suggestions={PLAN_SUGGESTIONS}
@@ -1139,7 +958,7 @@ function IdeaPlan({
         <p className="text-base/7 text-pretty">
           {previous && previous.angle !== current.angle ? (
             <AnimatePresence>
-              <InlineDiff
+              <AutopilotInlineDiff
                 animate={animate}
                 delay={0}
                 runs={diffWords(previous.angle, current.angle)}
@@ -1162,7 +981,7 @@ function IdeaPlan({
             } else if (before !== undefined && before !== section) {
               text = (
                 <AnimatePresence>
-                  <InlineDiff
+                  <AutopilotInlineDiff
                     animate={animate}
                     delay={index * 0.08}
                     runs={diffWords(before, section)}
