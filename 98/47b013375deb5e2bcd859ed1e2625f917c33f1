@@ -1,0 +1,63 @@
+apps/dashboard/src/lib/orpc/routers/geo.ts
+  s_dee84dad4454b7::t_9bb9a664dcdaa1 81,1406-1408,1469
+apps/dashboard/src/lib/db/geo-collections.ts
+  s_dee84dad4454b7::t_e2dad4118a9a6f 134,146-148
+packages/geo-core/src/schemas/geo.ts
+  s_dee84dad4454b7::t_dda2025830d12b 353-359
+  s_dee84dad4454b7::t_1ab37ea0007d68 347-351
+packages/geo-core/src/geo/programs.ts
+  s_dee84dad4454b7::t_cf977e8d02b2d4 104,168,1698-1719,1741,2149-2150,2157-2173
+apps/dashboard/src/lib/orpc/utils/geo-errors.ts
+  s_dee84dad4454b7::t_9bb9a664dcdaa1 22-23
+apps/dashboard/src/lib/hooks/use-geo.ts
+  s_dee84dad4454b7::t_b63d4858989dc3 1784-1794
+apps/dashboard/messages/de.json
+  s_dee84dad4454b7::t_da419725b2356c 3610-3611,3613-3615,3630,4550
+apps/dashboard/src/components/geo/prompts-table.tsx
+  s_dee84dad4454b7::t_7fc7099f073a89 57,65-68,198,201-202,373-377,379-393
+  s_dee84dad4454b7::t_03b30ecd2d4317 378
+apps/dashboard/src/lib/hooks/use-geo-db.ts
+  s_dee84dad4454b7::t_b63d4858989dc3 5
+  s_dee84dad4454b7::t_e2dad4118a9a6f 138-148,184
+apps/dashboard/src/utils/geo-prompts.ts
+  s_dee84dad4454b7::t_a89d732e5eec10 12,61-64
+packages/geo-core/src/types/geo.ts
+  s_dee84dad4454b7::t_dda2025830d12b 615-620
+apps/dashboard/src/components/geo/prompt-product-cell.tsx
+  s_dee84dad4454b7::t_966a46267440eb 1-2,4-15,20-21,39,41-47,58-60,62-69,79-93,95-99,101-108
+  s_dee84dad4454b7::t_a8b938d2745a3e 3,16,19,40,48-56,61,70-71,73-75,77
+  s_dee84dad4454b7::t_e9b12caec1d2a2 17,25-27
+  s_dee84dad4454b7::t_2ae9cbc960bd7a 18,57,76,78
+  s_dee84dad4454b7::t_f74303c71eaf9a 28-31,33-34
+  s_dee84dad4454b7::t_f1c700f7eeb03d 32
+  s_dee84dad4454b7::t_66050340e236fa 72
+apps/dashboard/src/constants/geo-prompts.ts
+  s_dee84dad4454b7::t_f74303c71eaf9a 34,39-42
+  s_dee84dad4454b7::t_a8b938d2745a3e 8
+  s_dee84dad4454b7::t_3142b3f2da641a 23,26,44
+  s_dee84dad4454b7::t_a89d732e5eec10 24-25,27-33,35-38,43
+apps/ui/registry/notra/table/components/data-table-root.tsx
+  ai_agent 4,133,143
+apps/dashboard/messages/en.json
+  s_dee84dad4454b7::t_da419725b2356c 3610-3611,3613-3615,3630,4550
+packages/geo-core/src/geo/errors.ts
+  s_dee84dad4454b7::t_dda2025830d12b 88-93,309
+apps/dashboard/src/types/components/geo.ts
+  s_dee84dad4454b7::t_966a46267440eb 2-4,13,205-211
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "9847b013375deb5e2bcd859ed1e2625f917c33f1",
+  "prompts": {},
+  "sessions": {
+    "s_dee84dad4454b7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c4318025-3977-48ad-a0dc-b9c3be498424",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
