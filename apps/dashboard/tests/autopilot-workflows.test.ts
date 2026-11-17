@@ -130,6 +130,66 @@ describe("Autopilot workflow graphs", () => {
     expect(issues).toEqual([]);
   });
 
+  test("accepts a weekly broken-link check the agent would build", () => {
+    const linkCheck = {
+      name: "Weekly broken-link check",
+      schedule: { frequency: "weekly", hour: 7, dayOfWeek: 1 },
+      nodes: [
+        { id: "trigger", type: "core.trigger", title: "Every Monday" },
+        {
+          id: "links",
+          type: AUTOPILOT_WORKFLOW_BLOCK_TYPES.checkLinks,
+          title: "Check the site's links",
+          // As the agent writes numbers sometimes.
+          config: { maxPages: "30" },
+        },
+        {
+          id: "found",
+          type: "core.if",
+          title: "Anything broken?",
+          config: {
+            rule: {
+              subject: "{{nodes.links.output.brokenCount}}",
+              operator: "gt",
+              value: 0,
+            },
+          },
+        },
+        {
+          id: "slack",
+          type: AUTOPILOT_WORKFLOW_BLOCK_TYPES.postToSlack,
+          title: "Post the broken links",
+          config: { message: "{{nodes.links.output.report}}" },
+        },
+      ],
+      edges: [
+        { source: "trigger", target: "links" },
+        { source: "links", target: "found" },
+        { source: "found", sourcePort: "true", target: "slack" },
+      ],
+    };
+    const { graph, issues } = validate(linkCheck);
+    expect(issues).toEqual([]);
+    expect(findAutopilotWorkflowMistakes(graph)).toEqual([]);
+    expect(
+      findAutopilotWorkflowMistakes({
+        ...graph,
+        nodes: graph.nodes.map((node) =>
+          node.id === "slack"
+            ? {
+                ...node,
+                config: { message: "{{nodes.links.output.deadLinks}}" },
+              }
+            : node
+        ),
+      })
+    ).toEqual([
+      expect.stringContaining(
+        'reads "deadLinks" from "Check the site\'s links"'
+      ),
+    ]);
+  });
+
   test("reports steps Autopilot workflows can't use and broken references", () => {
     const { issues } = validate({
       ...competitorWorkflow,
@@ -175,6 +235,18 @@ describe("Autopilot workflow schedules", () => {
 });
 
 describe("Autopilot workflow page text", () => {
+  test("shows a link check's report, with its lists as Markdown", () => {
+    expect(
+      describeAutopilotWorkflowOutput({
+        summary: "Checked 6 links on 3 pages of acme.test: 1 broken link.",
+        report:
+          "Checked 6 links on 3 pages of acme.test: 1 broken link.\n\n*Broken links*\n• https://acme.test/old (404) on /pricing",
+      })
+    ).toBe(
+      "Checked 6 links on 3 pages of acme.test: 1 broken link.\n\n**Broken links**\n- https://acme.test/old (404) on /pricing"
+    );
+  });
+
   test("reads agent output and decisions as text", () => {
     expect(describeAutopilotWorkflowOutput({ text: "# Plan" })).toBe("# Plan");
     expect(

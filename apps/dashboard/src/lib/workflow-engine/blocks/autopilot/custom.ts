@@ -19,6 +19,11 @@ import {
   runAutopilotAgentDecision,
   runAutopilotAgentText,
 } from "@/lib/autopilot/workflows/agent";
+import {
+  AutopilotLinkCheckUnavailableError,
+  checkCollectedLinks,
+  collectSiteLinks,
+} from "@/lib/autopilot/workflows/check-links";
 import { loadIsOwnBrand } from "@/lib/autopilot/workflows/own-brands";
 import {
   collectAutopilotPromptScan,
@@ -26,11 +31,13 @@ import {
 } from "@/lib/autopilot/workflows/scan-prompt";
 import {
   askAgentConfigSchema,
+  checkLinksConfigSchema,
   decideConfigSchema,
   compareVisibilityConfigSchema,
   postToSlackConfigSchema,
   scanPromptConfigSchema,
 } from "@/schemas/autopilot-workflows";
+import type { AutopilotLinkCheckState } from "@/types/autopilot-link-check";
 import type { AutopilotPromptScanState } from "@/types/autopilot-workflows";
 import { autopilotWorkflowAgentPrompt } from "@/utils/autopilot-workflows";
 
@@ -142,6 +149,47 @@ export const customAutopilotBlocks = [
             throw new FatalError(scan.summary);
           }
           return succeed(scan);
+        },
+      },
+    ],
+  }),
+  defineWorkflowBlock<typeof checkLinksConfigSchema, AutopilotLinkCheckState>({
+    type: AUTOPILOT_WORKFLOW_BLOCK_TYPES.checkLinks,
+    kind: "task",
+    title: "Check site links",
+    description:
+      "Reads the project's website (the homepage and up to maxPages pages from its sitemap) and requests every link on them, to the site itself and to other sites. Only links that answer 404 or 410 count as broken; ones that time out or answer a server error are listed apart as unreachable. Also lists the paths real visitors opened that answered 404 over the last days, when the site sends web analytics. Takes a few minutes and costs no credits. To act only when something is broken, follow it with a core.if on brokenCount (operator gt, value 0), not an agent step. Output: site, pagesChecked, linksChecked, brokenCount, broken [{url, status, internal, foundOn}], unreachableCount, unreachable [{url, internal, foundOn}], missingPages [{path, views}], summary (one sentence), report (summary plus the lists, ready to post to Slack).",
+    configSchema: checkLinksConfigSchema,
+    steps: [
+      {
+        id: "collect",
+        title: "Read the site",
+        run: async ({ organizationId, config }) => {
+          try {
+            return next<AutopilotLinkCheckState>(
+              await collectSiteLinks({
+                organizationId,
+                projectId: config.projectId,
+                maxPages: config.maxPages,
+                days: config.days,
+              })
+            );
+          } catch (error) {
+            if (error instanceof AutopilotLinkCheckUnavailableError) {
+              return halt(error.message);
+            }
+            throw error;
+          }
+        },
+      },
+      {
+        id: "check",
+        title: "Check the links",
+        run: async ({ state }) => {
+          requireStepState(state, "site", "links");
+          return succeed(
+            await checkCollectedLinks(state as AutopilotLinkCheckState)
+          );
         },
       },
     ],

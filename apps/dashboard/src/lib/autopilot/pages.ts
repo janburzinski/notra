@@ -2,6 +2,11 @@ import { fetchWebpage } from "@notra/ai/utils/context-dev";
 import { fetchPublicUrl } from "@notra/ai/utils/public-fetch";
 
 import {
+  AUTOPILOT_LINK_CHECK_GONE_STATUSES,
+  AUTOPILOT_LINK_CHECK_LINK_TIMEOUT_MS,
+  AUTOPILOT_LINK_CHECK_USER_AGENT,
+} from "@/constants/autopilot-link-check";
+import {
   AUTOPILOT_REFRESH_LINK_TIMEOUT_MS,
   AUTOPILOT_REFRESH_MAX_LINK_CHECKS,
 } from "@/constants/autopilot-refresh";
@@ -11,6 +16,7 @@ import {
   AUTOPILOT_RENDERING_HTML_MAX_BYTES,
   AUTOPILOT_RENDERING_MAX_REDIRECTS,
 } from "@/constants/autopilot-rendering";
+import type { AutopilotLinkStatus } from "@/types/autopilot-link-check";
 import type { AutopilotPageFetch } from "@/types/autopilot-templates-runtime";
 import {
   htmlTextAttributes,
@@ -27,14 +33,15 @@ import {
 function fetchPublic(
   url: string,
   timeoutMs: number,
-  redirect: RequestRedirect = "follow"
+  redirect: RequestRedirect = "follow",
+  userAgent = AUTOPILOT_RENDERING_CRAWLER_USER_AGENT
 ) {
   return fetchPublicUrl(
     url,
     {
       redirect,
       headers: {
-        "user-agent": AUTOPILOT_RENDERING_CRAWLER_USER_AGENT,
+        "user-agent": userAgent,
         accept: "text/html,application/xhtml+xml",
       },
     },
@@ -138,15 +145,14 @@ export async function fetchPageForCrawlers(
   };
 }
 
-/** Where a link ends up after its redirects; null when it is gone or unreachable. */
-async function landingUrl(url: string) {
+/**
+ * The status a link ends on after its redirects, and where; null after too
+ * many redirects. Throws when it can't be reached.
+ */
+async function followLink(url: string, timeoutMs: number, userAgent?: string) {
   let current = url;
   for (let hop = 0; hop <= AUTOPILOT_RENDERING_MAX_REDIRECTS; hop += 1) {
-    const response = await fetchPublic(
-      current,
-      AUTOPILOT_REFRESH_LINK_TIMEOUT_MS,
-      "manual"
-    );
+    const response = await fetchPublic(current, timeoutMs, "manual", userAgent);
     await response.body?.cancel();
     const location = response.headers.get("location");
     if (response.status >= 300 && response.status < 400 && location) {
@@ -156,10 +162,69 @@ async function landingUrl(url: string) {
       current = next.href;
       continue;
     }
-    // Bot walls answer 403 to scripts and work for readers; only gone is dead.
-    return response.status === 404 || response.status === 410 ? null : current;
+    return { status: response.status, url: current };
   }
   return null;
+}
+
+/** Where a link ends up after its redirects; null when it is gone or unreachable. */
+async function landingUrl(url: string) {
+  const landed = await followLink(url, AUTOPILOT_REFRESH_LINK_TIMEOUT_MS);
+  // Bot walls answer 403 to scripts and work for readers; only gone is dead.
+  return landed && !AUTOPILOT_LINK_CHECK_GONE_STATUSES.has(landed.status)
+    ? landed.url
+    : null;
+}
+
+/**
+ * Whether a link still works for a reader. Only 404 and 410 mean gone: bot
+ * walls answer 403 or 429 to scripts and work in a browser. A server error,
+ * a timeout or a redirect loop is "unreachable", which may pass on its own.
+ */
+export async function checkLinkStatus(
+  url: string
+): Promise<AutopilotLinkStatus> {
+  try {
+    const landed = await followLink(
+      url,
+      AUTOPILOT_LINK_CHECK_LINK_TIMEOUT_MS,
+      AUTOPILOT_LINK_CHECK_USER_AGENT
+    );
+    if (!landed || landed.status >= 500) {
+      return { kind: "unreachable" };
+    }
+    return AUTOPILOT_LINK_CHECK_GONE_STATUSES.has(landed.status)
+      ? { kind: "gone", status: landed.status }
+      : { kind: "ok" };
+  } catch {
+    return { kind: "unreachable" };
+  }
+}
+
+/**
+ * A page's server HTML as a reader's browser gets it, and the address it
+ * landed on; null when it doesn't load.
+ */
+export async function fetchPageHtml(url: string) {
+  try {
+    const response = await fetchPublic(
+      url,
+      AUTOPILOT_RENDERING_FETCH_TIMEOUT_MS,
+      "follow",
+      AUTOPILOT_LINK_CHECK_USER_AGENT
+    );
+    if (response.status >= 400) {
+      await response.body?.cancel();
+      return null;
+    }
+    const html = await readLimited(
+      response,
+      AUTOPILOT_RENDERING_HTML_MAX_BYTES
+    );
+    return { html, url: response.url || url };
+  } catch {
+    return null;
+  }
 }
 
 function siteOf(url: URL) {

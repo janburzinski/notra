@@ -6,6 +6,11 @@ import { organizationIdInputSchema } from "@notra/schemas/dashboard/auth/organiz
 import { WORKFLOW_ERROR_POLICIES } from "@notra/workflows/constants/graph";
 import * as z from "zod";
 
+import {
+  AUTOPILOT_LINK_CHECK_DEFAULT_DAYS,
+  AUTOPILOT_LINK_CHECK_DEFAULT_PAGES,
+  AUTOPILOT_LINK_CHECK_MAX_PAGES,
+} from "@/constants/autopilot-link-check";
 import { AUTOPILOT_WORKFLOW_SLACK_MESSAGE_LIMIT } from "@/constants/autopilot-workflows";
 import { truncateText } from "@/utils/autopilot-workflows";
 
@@ -33,6 +38,25 @@ export const scanPromptConfigSchema = z.object({
     .describe(
       'Engine ids to ask, such as ["openai/chatgpt"] for one engine. Omit for every engine the project tracks.'
     ),
+});
+
+export const checkLinksConfigSchema = z.object({
+  projectId: z.string().min(1).optional(),
+  // The agent sometimes writes numbers as text.
+  maxPages: z.coerce
+    .number()
+    .int()
+    .min(1)
+    .max(AUTOPILOT_LINK_CHECK_MAX_PAGES)
+    .default(AUTOPILOT_LINK_CHECK_DEFAULT_PAGES)
+    .describe("Pages to read, the homepage included"),
+  days: z.coerce
+    .number()
+    .int()
+    .min(1)
+    .max(90)
+    .default(AUTOPILOT_LINK_CHECK_DEFAULT_DAYS)
+    .describe("How far back to look for missing pages visitors opened"),
 });
 
 // Limits leave room for earlier steps' output filled into the text at run time.

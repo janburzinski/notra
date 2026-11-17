@@ -44,6 +44,9 @@ import type {
   WorkflowRunViewNode,
 } from "@/types/workflow-engine";
 
+const SLACK_HEADING_LINE = /^\*([^*\n]+)\*$/gm;
+const SLACK_BULLET_LINE = /^• /gm;
+
 export function describeAutopilotWorkflowSchedule(
   schedule: AutopilotWorkflowSchedule | null
 ) {
@@ -159,9 +162,21 @@ function readString(value: unknown, key: string) {
   return typeof field === "string" && field.trim() ? field : null;
 }
 
+/** A report written for Slack, as Markdown: its *headings* bold, its • bullets a list. */
+function slackReportToMarkdown(report: string) {
+  return report
+    .replace(SLACK_HEADING_LINE, "**$1**")
+    .replace(SLACK_BULLET_LINE, "- ");
+}
+
 /** What a step produced, as Markdown worth reading, or null when its status says it all. */
 export function describeAutopilotWorkflowOutput(output: unknown) {
-  const text = readString(output, "text") ?? readString(output, "summary");
+  // A full report (a link check's lists) says more than its summary.
+  const report = readString(output, "report");
+  const text =
+    readString(output, "text") ??
+    (report ? slackReportToMarkdown(report) : null) ??
+    readString(output, "summary");
   if (text) {
     return text;
   }

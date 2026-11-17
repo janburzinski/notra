@@ -411,6 +411,9 @@ if (process.env.NOTRA_AUTOPILOT_TEMPLATE_FLOW_TEST !== "1") {
       url === `${SITE}/blog/serving-models`
         ? (repository["content/blog/serving-models.md"] ?? null)
         : null,
+    // The "Check site links" workflow step; these templates never run it.
+    fetchPageHtml: async () => null,
+    checkLinkStatus: async () => ({ kind: "ok" }),
   }));
   const paddedRefusal: (string | null)[] = [];
   const landingRefusals: (string | null)[] = [];
