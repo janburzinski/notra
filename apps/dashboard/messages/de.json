@@ -825,8 +825,7 @@
       "show": "Kundenstimme von {name} anzeigen"
     },
     "signup": {
-      "freeScanTitle": "Kostenloser KI-Sichtbarkeits-Scan mit Firmen-E-Mail",
-      "freeScanDescription": "Registriere dich mit deiner Firmen-E-Mail und wir prüfen, wie KI-Antworten deine Marke erwähnen. Keine Karte nötig.",
+      "freeScan": "<strong>Kostenloser KI-Sichtbarkeits-Scan</strong> mit Firmen-E-Mail. Keine Karte nötig.",
       "title": "Erstelle dein Konto",
       "description": "Mach aus dem, was du shippst, das, was du veröffentlichst.",
       "failed": "Registrierung fehlgeschlagen. Bitte versuch es nochmal.",

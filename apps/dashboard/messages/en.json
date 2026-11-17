@@ -825,8 +825,7 @@
       "show": "Show testimonial from {name}"
     },
     "signup": {
-      "freeScanTitle": "Free AI visibility scan with a work email",
-      "freeScanDescription": "Sign up with your company email and we check how AI answers mention your brand. No card needed.",
+      "freeScan": "<strong>Free AI visibility scan</strong> with a work email. No card needed.",
       "title": "Create your account",
       "description": "Start turning what you ship into what you publish.",
       "failed": "Failed to sign up. Please try again.",
