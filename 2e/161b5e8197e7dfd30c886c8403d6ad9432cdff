@@ -1,0 +1,19 @@
+apps/dashboard/src/components/geo/traffic-website-setup.tsx
+  s_cf3e8441b50bd6::t_e5c22a4278c1e2 18,31,56,84-90
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "2e161b5e8197e7dfd30c886c8403d6ad9432cdff",
+  "prompts": {},
+  "sessions": {
+    "s_cf3e8441b50bd6": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e52ab21d-1810-4f70-b912-b47f0ce6add6",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
