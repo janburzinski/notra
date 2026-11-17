@@ -34,7 +34,8 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           repository: millionco/react-doctor
-          ref: v2
+          # Pinned so the patches below apply to known content.
+          ref: 695e46eee203a5d1855020191aa7e9c010a1250e # v2.4.0
           path: .github/actions/react-doctor
           persist-credentials: false
           sparse-checkout: |
@@ -42,10 +43,38 @@ jobs:
             scripts
           sparse-checkout-cone-mode: false
 
-      - name: Preserve full history for React Doctor
-        # v2's depth=1 fetch re-shallows the checkout and breaks PR merge bases.
-        # Remove this workaround when the upstream action preserves full history.
-        run: sed -i 's/fetch --no-tags --depth=1 origin/fetch --no-tags origin/' .github/actions/react-doctor/action.yml
+      - name: Patch React Doctor for full history and the merged base
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          action=.github/actions/react-doctor/action.yml
+          # Fails unless the pattern is there before and gone after, so an
+          # upstream change can't make a patch silently stop applying.
+          patch() {
+            if ! grep -Eq "$1" "$action"; then
+              echo "::error::The React Doctor action changed; update the $3 patch."
+              exit 1
+            fi
+            sed -i -E "s/$1/$2/g" "$action"
+            if grep -Eq "${4:-$1}" "$action"; then
+              echo "::error::The React Doctor action changed; update the $3 patch."
+              exit 1
+            fi
+          }
+          # v2's depth=1 fetch re-shallows the checkout and breaks PR merge bases.
+          patch 'fetch --no-tags --depth=1 origin' 'fetch --no-tags origin' history 'fetch [^|]*--depth=1'
+          if [ "$EVENT_NAME" = pull_request ]; then
+            # The event's base SHA is main when the PR opened, but the scanned
+            # merge commit also holds everything merged since. The action lists
+            # changed files against the PR head, so with a stale base React
+            # Doctor can't match them to the merge and reports every issue in
+            # the changed files. Compare against the merge's first parent.
+            test "$(git rev-parse HEAD^2)" = "$PR_HEAD_SHA"
+            base="$(git rev-parse HEAD^1)"
+            patch '\$[{][{] *github\.event\.pull_request\.base\.sha *[}][}]' "$base" base 'pull_request\.base\.sha'
+            echo "REACT_DOCTOR_PR_BASE_SHA=$base" >> "$GITHUB_ENV"
+          fi
 
       - uses: ./.github/actions/react-doctor
         with:
@@ -55,11 +84,18 @@ jobs:
           version: latest
           node-version: "24"
 
-      - name: Verify React Doctor baseline history
+      - name: Verify React Doctor compared against the base
         if: github.event_name == 'pull_request'
         env:
-          BASE_SHA: ${{ github.event.pull_request.base.sha }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
           test "$(git rev-parse --is-shallow-repository)" = false
-          git merge-base "$BASE_SHA" "$HEAD_SHA" > /dev/null
+          git merge-base "$REACT_DOCTOR_PR_BASE_SHA" "$HEAD_SHA" > /dev/null
+          node -e '
+            const report = require(process.argv[1]);
+            const baseline = report.baseline ?? {};
+            console.log(`mode=${report.mode} base=${baseline.baseRef} new=${baseline.newCount} matched=${baseline.matchedCount} fixed=${baseline.fixedCount}`);
+            if (report.mode !== "baseline") {
+              console.log(`::warning::React Doctor fell back to "${report.mode}" mode and reports every issue in the changed files, not only new ones.`);
+            }
+          ' "$RUNNER_TEMP/react-doctor-report-$GITHUB_RUN_ID.json"
