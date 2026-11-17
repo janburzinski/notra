@@ -51,7 +51,7 @@ import {
 } from "@/lib/autopilot/leases";
 import { generateAutopilotObject } from "@/lib/autopilot/llm";
 import { createAutopilotLogger } from "@/lib/autopilot/log";
-import { fetchPageText, findDeadLinks } from "@/lib/autopilot/pages";
+import { fetchPageText, resolveLinks } from "@/lib/autopilot/pages";
 import { scheduleAutopilotPublish } from "@/lib/autopilot/publish";
 import { requestDraftReviewers } from "@/lib/autopilot/reviewers";
 import {
@@ -278,19 +278,21 @@ export async function checkLinks(
 }
 
 /**
- * Before anything is claimed: every linked page must load, and the post must
- * read on its published URL as it does in the repository, which proves the
- * file renders there. A page that is down just waits for the next run.
+ * Before anything is claimed: every linked page must load at its own address,
+ * not through a redirect, and the post must read on its published URL as it
+ * does in the repository, which proves the file renders there. A page that is
+ * down just waits for the next run.
  */
 async function confirmLive(spots: Omit<AutopilotLinkSpot, "id">[]) {
   const targets = [...new Set(spots.map((spot) => spot.targetUrl))].slice(
     0,
     AUTOPILOT_REFRESH_MAX_LINK_CHECKS
   );
-  const dead = new Set(await findDeadLinks(targets));
+  const { dead, moved } = await resolveLinks(targets);
+  const unusable = new Set([...dead, ...moved.keys()]);
   const checked = new Set(targets);
   const reachable = spots.filter(
-    (spot) => checked.has(spot.targetUrl) && !dead.has(spot.targetUrl)
+    (spot) => checked.has(spot.targetUrl) && !unusable.has(spot.targetUrl)
   );
   const sources = [...new Set(reachable.map((spot) => spot.sourceUrl))];
   const pages = new Map(

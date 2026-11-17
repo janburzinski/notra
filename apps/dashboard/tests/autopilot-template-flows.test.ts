@@ -252,7 +252,15 @@ if (process.env.NOTRA_AUTOPILOT_TEMPLATE_FLOW_TEST !== "1") {
           section: "Cold starts",
           find: "## Setup",
           replace:
-            "## Cold starts\n\nA scaled-to-zero endpoint takes a few seconds to start; keep one warm replica for latency-sensitive traffic.\n\n## Setup",
+            "## Cold starts\n\nA scaled-to-zero endpoint takes a few seconds to start; keep one warm replica for latency-sensitive traffic. See https://emberline.dev/docs/cold-starts.\n\n## Setup",
+        },
+        {
+          // Finds text the edit above added, redirected link included.
+          action: "update",
+          section: "Cold starts",
+          find: "See https://emberline.dev/docs/cold-starts.",
+          replace:
+            "See https://emberline.dev/docs/cold-starts for setup steps.",
         },
         {
           action: "add",
@@ -387,8 +395,14 @@ if (process.env.NOTRA_AUTOPILOT_TEMPLATE_FLOW_TEST !== "1") {
       renderedText: pricingText,
       challenged: false,
     }),
-    findDeadLinks: async (urls: string[]) =>
-      urls.filter((url) => url.includes("dead.example")),
+    resolveLinks: async (urls: string[]) => ({
+      dead: urls.filter((url) => url.includes("dead.example")),
+      moved: new Map(
+        urls
+          .filter((url) => url.endsWith("/docs/cold-starts"))
+          .map((url) => [url, url.replace("/docs/", "/docs/scaling/")])
+      ),
+    }),
     // Only the serving post is live, and its page reads like its file.
     // Only the homepage has an image description.
     fetchPageAttributes: async (url: string) =>
@@ -772,6 +786,10 @@ if (process.env.NOTRA_AUTOPILOT_TEMPLATE_FLOW_TEST !== "1") {
     expect(content).toContain("## Cold starts");
     // The edit with a dead link is dropped; the date is set by code.
     expect(content).not.toContain("dead.example");
+    // A link that redirects within its site points at where it lands.
+    expect(content).toContain(
+      "See https://emberline.dev/docs/scaling/cold-starts for setup steps."
+    );
     expect(content).toContain(`updated: ${now.toISOString().slice(0, 10)}`);
 
     // One refresh waits for review at a time.

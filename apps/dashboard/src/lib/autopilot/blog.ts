@@ -85,7 +85,7 @@ import {
 import { generateAutopilotObject } from "@/lib/autopilot/llm";
 import { createAutopilotLogger } from "@/lib/autopilot/log";
 import { loadTopicObservationIds } from "@/lib/autopilot/memory";
-import { findDeadLinks } from "@/lib/autopilot/pages";
+import { resolveLinks } from "@/lib/autopilot/pages";
 import { scheduleAutopilotPublish } from "@/lib/autopilot/publish";
 import { requestDraftReviewers } from "@/lib/autopilot/reviewers";
 import { loadDecisionMemory } from "@/lib/autopilot/rules";
@@ -146,6 +146,7 @@ import {
 import { resolveDiagramEmbeds } from "@/utils/autopilot-diagrams";
 import {
   addedLinks,
+  relinkUrls,
   touchUpdatedDate,
   unlinkUrls,
 } from "@/utils/autopilot-edits";
@@ -520,12 +521,21 @@ async function finishPost(params: {
   }
   // The writer may only link pages it looked up; a guessed one that 404s
   // keeps its text and loses the link.
-  const dead = await findDeadLinks(addedLinks(params.previous ?? "", content));
+  const { dead, moved } = await resolveLinks(
+    addedLinks(params.previous ?? "", content)
+  );
   if (dead.length > 0) {
     content = unlinkUrls(content, dead);
     await log.info(`Removed ${dead.length} dead links from the draft`, {
       reason: dead,
     });
+  }
+  if (moved.size > 0) {
+    content = relinkUrls(content, moved);
+    await log.info(
+      `Pointed ${moved.size} redirected links at their final address`,
+      { reason: [...moved].map(([from, to]) => `${from} → ${to}`) }
+    );
   }
   content = await removeNewDashes({
     organizationId: ctx.organizationId,

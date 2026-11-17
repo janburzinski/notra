@@ -178,6 +178,21 @@ export function unlinkUrls(content: string, urls: readonly string[]) {
 }
 
 /**
+ * Points these URLs at their new address. URLs are read the way `addedLinks`
+ * reads them, so one that only appears inside a longer URL is left alone.
+ */
+export function relinkUrls(
+  content: string,
+  moved: ReadonlyMap<string, string>
+) {
+  return content.replace(URL_PATTERN, (match) => {
+    const url = match.replace(TRAILING_PUNCTUATION, "");
+    const to = moved.get(url);
+    return to ? to + match.slice(url.length) : match;
+  });
+}
+
+/**
  * Why a refreshed page must not be committed, or null. A refresh keeps the
  * frontmatter, removes headings only through an explicit cut, changes enough
  * to be a real update and not so much that it is a rewrite.

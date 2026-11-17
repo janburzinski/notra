@@ -58,7 +58,7 @@ import {
 import { loadPostSite, resolveLiveUrl } from "@/lib/autopilot/live";
 import { generateAutopilotObject } from "@/lib/autopilot/llm";
 import { createAutopilotLogger } from "@/lib/autopilot/log";
-import { fetchRendered, findDeadLinks } from "@/lib/autopilot/pages";
+import { fetchRendered, resolveLinks } from "@/lib/autopilot/pages";
 import { scheduleAutopilotPublish } from "@/lib/autopilot/publish";
 import { requestDraftReviewers } from "@/lib/autopilot/reviewers";
 import { loadDecisionMemory } from "@/lib/autopilot/rules";
@@ -83,6 +83,7 @@ import {
   addedLinks,
   applyPageEdits,
   refreshProblem,
+  relinkUrls,
   tidyBlankLines,
   touchUpdatedDate,
 } from "@/utils/autopilot-edits";
@@ -603,21 +604,39 @@ export async function writeRefresh(params: {
     await log.skip(`No pull request: ${reason.toLowerCase()}`);
     return { fix: null, usage: usage.get() };
   }
-  const dead = new Set(
-    await findDeadLinks(addedLinks(check.original, result.content))
-  );
-  if (dead.size > 0) {
+  const links = await resolveLinks(addedLinks(check.original, result.content));
+  const dead = new Set(links.dead);
+  const { moved } = links;
+  if (dead.size > 0 || moved.size > 0) {
     // Dropping an edit with a dead link keeps the rest of the refresh.
     const kept = result.applied.filter(
       (edit) => ![...dead].some((url) => edit.replace.includes(url))
     );
-    await log.info(
-      `Dropped ${result.applied.length - kept.length} edits with dead links`,
-      {
-        reason: [...dead],
-      }
+    if (dead.size > 0) {
+      await log.info(
+        `Dropped ${result.applied.length - kept.length} edits with dead links`,
+        {
+          reason: [...dead],
+        }
+      );
+    }
+    if (moved.size > 0) {
+      await log.info(
+        `Pointed ${moved.size} redirected links at their final address`,
+        {
+          reason: [...moved].map(([from, to]) => `${from} → ${to}`),
+        }
+      );
+    }
+    // A later edit can find text an earlier one added, so both sides move.
+    result = applyPageEdits(
+      check.original,
+      kept.map((edit) => ({
+        ...edit,
+        find: relinkUrls(edit.find, moved),
+        replace: relinkUrls(edit.replace, moved),
+      }))
     );
-    result = applyPageEdits(check.original, kept);
   }
   result = {
     ...result,
@@ -678,6 +697,11 @@ export async function writeRefresh(params: {
       dead.size > 0
         ? `${dead.size} dead ${dead.size === 1 ? "link" : "links"} dropped`
         : "Every new link resolves",
+      ...(moved.size > 0
+        ? [
+            `${moved.size} redirected ${moved.size === 1 ? "link points" : "links point"} at the final address`,
+          ]
+        : []),
     ],
   };
   await log.action(

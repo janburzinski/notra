@@ -24,10 +24,15 @@ import {
  * pins each connection to the address it checked and checks every redirect,
  * so a site that redirects or resolves to a private address is refused.
  */
-function fetchPublic(url: string, timeoutMs: number) {
+function fetchPublic(
+  url: string,
+  timeoutMs: number,
+  redirect: RequestRedirect = "follow"
+) {
   return fetchPublicUrl(
     url,
     {
+      redirect,
       headers: {
         "user-agent": AUTOPILOT_RENDERING_CRAWLER_USER_AGENT,
         accept: "text/html,application/xhtml+xml",
@@ -133,30 +138,57 @@ export async function fetchPageForCrawlers(
   };
 }
 
+/** Where a link ends up after its redirects; null when it is gone or unreachable. */
+async function landingUrl(url: string) {
+  let current = url;
+  for (let hop = 0; hop <= AUTOPILOT_RENDERING_MAX_REDIRECTS; hop += 1) {
+    const response = await fetchPublic(
+      current,
+      AUTOPILOT_REFRESH_LINK_TIMEOUT_MS,
+      "manual"
+    );
+    await response.body?.cancel();
+    const location = response.headers.get("location");
+    if (response.status >= 300 && response.status < 400 && location) {
+      const next = new URL(location, current);
+      // Like a browser, a redirect without its own #section keeps the link's.
+      next.hash ||= new URL(current).hash;
+      current = next.href;
+      continue;
+    }
+    // Bot walls answer 403 to scripts and work for readers; only gone is dead.
+    return response.status === 404 || response.status === 410 ? null : current;
+  }
+  return null;
+}
+
+function siteOf(url: URL) {
+  return url.hostname.replace(/^www\./, "");
+}
+
 /**
- * Links that are gone or unreachable. Links past the check limit count too:
- * Autopilot never ships a link nobody checked, and the text stays.
+ * Links that are gone or unreachable, and links that redirect within their
+ * own site with the address they land on. Links past the check limit count as
+ * dead: Autopilot never ships a link nobody checked, and the text stays.
+ * A redirect to another site is left alone, since it may be a sign-in page.
  */
-export async function findDeadLinks(urls: string[]) {
+export async function resolveLinks(urls: string[]) {
   const checked = urls.slice(0, AUTOPILOT_REFRESH_MAX_LINK_CHECKS);
-  const results = await Promise.all(
+  const dead = urls.slice(AUTOPILOT_REFRESH_MAX_LINK_CHECKS);
+  const moved = new Map<string, string>();
+  await Promise.all(
     checked.map(async (url) => {
-      try {
-        const response = await fetchPublic(
-          url,
-          AUTOPILOT_REFRESH_LINK_TIMEOUT_MS
-        );
-        await response.body?.cancel();
-        // Bot walls answer 403 to scripts and work for readers; only gone is dead.
-        return response.status === 404 || response.status === 410 ? url : null;
-      } catch {
-        // Unreachable or private addresses never go into a page.
-        return url;
+      // Unreachable or private addresses never go into a page.
+      const landed = await landingUrl(url).catch(() => null);
+      if (landed === null) {
+        dead.push(url);
+      } else if (
+        landed !== url &&
+        siteOf(new URL(landed)) === siteOf(new URL(url))
+      ) {
+        moved.set(url, landed);
       }
     })
   );
-  return [
-    ...results.filter((url): url is string => url !== null),
-    ...urls.slice(AUTOPILOT_REFRESH_MAX_LINK_CHECKS),
-  ];
+  return { dead, moved };
 }
