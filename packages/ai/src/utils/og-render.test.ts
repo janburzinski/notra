@@ -134,7 +134,9 @@ describe("findInvisibleOgLogos", () => {
     expect(
       await findInvisibleOgLogos(document, "Title", brand, pngBase64)
     ).toEqual([1]);
-  });
+    // The first render in a worker loads satori, resvg, sharp and the font;
+    // on a busy CI runner that alone can pass Bun's 5 second default.
+  }, 35_000);
 });
 
 describe("renderOgImage alignment", () => {
