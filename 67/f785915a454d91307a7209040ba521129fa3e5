@@ -1,0 +1,27 @@
+apps/console/src/components/autopilot/autopilot-health-tables.tsx
+  s_012423b8623daf::t_b190e7f4abc964 17,22-24,32,79-95,148,213,216-219,271,274-277,354,357-360
+apps/console/src/components/autopilot/autopilot-page-client.tsx
+  s_012423b8623daf::t_b190e7f4abc964 4,33-34,38-39
+apps/console/src/lib/autopilot/health.ts
+  s_012423b8623daf::t_b190e7f4abc964 13,102-109,136,138,386,399-403
+apps/console/src/constants/autopilot.ts
+  s_012423b8623daf::t_b190e7f4abc964 4-5,100-146
+apps/console/src/types/autopilot.ts
+  s_012423b8623daf::t_b190e7f4abc964 308-316
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "67f785915a454d91307a7209040ba521129fa3e5",
+  "prompts": {},
+  "sessions": {
+    "s_012423b8623daf": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "bd62822a-d7a0-468f-83cd-d27d0072a3e7",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
