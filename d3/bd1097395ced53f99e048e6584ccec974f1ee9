@@ -1,0 +1,139 @@
+apps/dashboard/src/components/settings/sounds-section.tsx
+  s_dee84dad4454b7::t_72b18cb2fdc24d 8-10,13,22,36
+apps/dashboard/src/lib/hooks/use-agent-prompt-bar-visible.ts
+  s_dee84dad4454b7::t_72b18cb2fdc24d 6-9,13-14,20-25
+apps/dashboard/src/utils/agent-feedback-client.test.ts
+  s_dee84dad4454b7::t_72b18cb2fdc24d 1-28
+apps/dashboard/src/utils/autopilot-post-images.tsx
+  s_dee84dad4454b7::t_72b18cb2fdc24d 1-30
+apps/dashboard/src/constants/ui-sounds.ts
+  s_dee84dad4454b7::t_72b18cb2fdc24d 1,31-32
+packages/schemas/src/schemas/dashboard/autopilot.ts
+  s_dee84dad4454b7::t_72b18cb2fdc24d 67-68,264-268
+apps/dashboard/src/components/autopilot/autopilot-post-workbench.tsx
+  s_dee84dad4454b7::t_72b18cb2fdc24d 1-428
+apps/dashboard/src/components/autopilot/autopilot-brief-item-dialog.tsx
+  s_dee84dad4454b7::t_72b18cb2fdc24d 4,33,205-209,231
+apps/dashboard/src/components/autopilot/autopilot-merge-menu.tsx
+  s_dee84dad4454b7::t_72b18cb2fdc24d 28,34-36
+packages/db/migrations/0168_geo_auto_prompts.sql
+  ai_agent 1
+apps/dashboard/src/utils/agent-feedback-client.ts
+  s_dee84dad4454b7::t_72b18cb2fdc24d 3,25-30
+apps/dashboard/src/lib/ui-sounds/store.ts
+  s_dee84dad4454b7::t_72b18cb2fdc24d 5-6,8,10-17,19,23,25,27,31-32,49,62-63,65
+apps/dashboard/src/types/autopilot-revisions.ts
+  s_dee84dad4454b7::t_72b18cb2fdc24d 1-88
+packages/geo-core/src/geo/discover.ts
+  s_dee84dad4454b7::t_72b18cb2fdc24d 400-405
+apps/dashboard/src/constants/autopilot-revisions.ts
+  s_dee84dad4454b7::t_72b18cb2fdc24d 1-42
+apps/dashboard/src/lib/hooks/use-autopilot.ts
+  s_dee84dad4454b7::t_72b18cb2fdc24d 191-196
+packages/db/src/schema.ts
+  s_dee84dad4454b7::t_72b18cb2fdc24d 1887
+packages/db/migrations/meta/_journal.json
+  ai_agent 1184-1185,1191-1199
+apps/dashboard/src/utils/dashboard-paths.ts
+  s_dee84dad4454b7::t_72b18cb2fdc24d 22-27
+apps/dashboard/src/utils/autopilot-revisions.ts
+  s_dee84dad4454b7::t_72b18cb2fdc24d 1-107
+apps/dashboard/src/components/mcp/mcp-session-sheet.tsx
+  s_dee84dad4454b7::t_72b18cb2fdc24d 25,27,57-59,155,180-182
+apps/dashboard/src/app/(dashboard)/[slug]/geo/traffic/mcp/page-client.tsx
+  s_dee84dad4454b7::t_72b18cb2fdc24d 20,145
+apps/dashboard/src/lib/ui-sounds/player.ts
+  s_dee84dad4454b7::t_72b18cb2fdc24d 3,8,10,37,54,56-62,77,88-89,108,110,114-115
+apps/dashboard/src/lib/hooks/use-ui-sounds-enabled.ts
+  s_dee84dad4454b7::t_72b18cb2fdc24d 6-8,11,13-15
+packages/geo-core/src/types/geo.ts
+  s_dee84dad4454b7::t_72b18cb2fdc24d 22,847-860
+.github/workflows/react-doctor.yml
+  s_dee84dad4454b7::t_72b18cb2fdc24d 37-38,46-77,87,93-101
+apps/dashboard/src/types/autopilot.ts
+  s_dee84dad4454b7::t_72b18cb2fdc24d 247-250,491-492,766
+packages/geo-core/src/schemas/geo.ts
+  s_dee84dad4454b7::t_72b18cb2fdc24d 531-546
+apps/dashboard/src/lib/orpc/routers/autopilot.ts
+  s_dee84dad4454b7::t_72b18cb2fdc24d 20,46,84-88,121,394-446,647-650
+apps/dashboard/src/components/mcp/mcp-request-sheet.tsx
+  s_dee84dad4454b7::t_72b18cb2fdc24d 23,25,79-81,93,135
+apps/dashboard/src/lib/autopilot/revisions.ts
+  s_dee84dad4454b7::t_72b18cb2fdc24d 1-329
+docs/prd/autopilot-playbooks.md
+  s_dee84dad4454b7::t_72b18cb2fdc24d 1-203
+apps/dashboard/messages/de.json
+  s_dee84dad4454b7::t_72b18cb2fdc24d 366
+packages/geo-core/src/geo/prompts.ts
+  s_dee84dad4454b7::t_72b18cb2fdc24d 15,21,195,197-200,204-209
+packages/geo-core/src/geo/scan-prompts.ts
+  s_dee84dad4454b7::t_72b18cb2fdc24d 7,38-42,44
+apps/dashboard/src/app/(dashboard)/[slug]/autopilot/findings/[id]/page-client.tsx
+  s_dee84dad4454b7::t_72b18cb2fdc24d 22,27,48,125-126,128,156,158-160,169,172-174,293-306,428-437,439-481
+packages/geo-core/src/constants/geo.ts
+  s_dee84dad4454b7::t_72b18cb2fdc24d 521-564
+apps/dashboard/src/components/mcp/mcp-tool-usage-cell.tsx
+  s_dee84dad4454b7::t_72b18cb2fdc24d 1-25
+apps/dashboard/src/components/design-system/artifact-iterate/post-workbench.tsx
+  s_dee84dad4454b7::t_72b18cb2fdc24d 44-47,50-54,58,62,293,606,696,698,871,961,984
+apps/dashboard/src/components/autopilot/autopilot-agent-activity-card.tsx
+  s_dee84dad4454b7::t_72b18cb2fdc24d 1-490
+packages/geo-core/src/geo/programs.ts
+  s_dee84dad4454b7::t_72b18cb2fdc24d 1855,1890,2119,2134-2142,2175
+apps/dashboard/src/lib/hooks/use-mcp-columns.tsx
+  s_dee84dad4454b7::t_72b18cb2fdc24d 11,18,29,31,42,61-62,64-66,69-71,101-102,105-111,159-160,183,216,400,468
+apps/dashboard/src/components/mcp/mcp-tool-sheet.tsx
+  s_dee84dad4454b7::t_72b18cb2fdc24d 33,151-154
+apps/dashboard/src/lib/hooks/use-finding-revisions.ts
+  s_dee84dad4454b7::t_72b18cb2fdc24d 1-166
+apps/dashboard/src/types/mcp-analytics.ts
+  s_dee84dad4454b7::t_72b18cb2fdc24d 77-78,89-99
+apps/dashboard/src/lib/autopilot/findings.ts
+  s_dee84dad4454b7::t_72b18cb2fdc24d 1237-1239,1245-1248
+apps/dashboard/src/types/ui-sounds.ts
+  s_dee84dad4454b7::t_72b18cb2fdc24d 3-16
+apps/dashboard/src/app/(dashboard)/[slug]/geo/traffic/mcp/skeleton.tsx
+  s_dee84dad4454b7::t_72b18cb2fdc24d 39-40
+packages/db/migrations/meta/0170_snapshot.json
+  ai_agent 1-18426
+apps/dashboard/src/constants/agent-feedback.ts
+  s_dee84dad4454b7::t_72b18cb2fdc24d 128,140-147
+apps/dashboard/src/components/autopilot/autopilot-post-diff.tsx
+  s_dee84dad4454b7::t_72b18cb2fdc24d 1-221
+apps/dashboard/src/utils/inline-diff.ts
+  s_dee84dad4454b7::t_72b18cb2fdc24d 1-2,23,27-37,213-299
+apps/dashboard/src/lib/orpc/routers/autopilot.test.ts
+  s_dee84dad4454b7::t_72b18cb2fdc24d 51
+packages/geo-core/src/geo/auto-prompts.ts
+  s_dee84dad4454b7::t_72b18cb2fdc24d 1-313
+packages/db/migrations/meta/0169_snapshot.json
+  ai_agent 2-3,9512-9516
+apps/dashboard/src/components/mcp/mcp-sections.tsx
+  s_dee84dad4454b7::t_72b18cb2fdc24d 24,51-70,73-75,77-86
+apps/dashboard/src/components/providers/ui-sounds.tsx
+  s_dee84dad4454b7::t_72b18cb2fdc24d 5,10
+packages/db/migrations/meta/0168_snapshot.json
+  ai_agent 2,9344-9348
+apps/dashboard/messages/en.json
+  s_dee84dad4454b7::t_72b18cb2fdc24d 366
+apps/dashboard/src/lib/autopilot/finding-content.ts
+  s_dee84dad4454b7::t_72b18cb2fdc24d 182-183
+apps/dashboard/src/lib/ui-sounds/synth.ts
+  s_dee84dad4454b7::t_72b18cb2fdc24d 1,121-134,136-143,145-152,154-155,157-166,168-177,179-181,183-199,201-214,216-229,231-238,240-265
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "d3bd1097395ced53f99e048e6584ccec974f1ee9",
+  "prompts": {},
+  "sessions": {
+    "s_dee84dad4454b7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c4318025-3977-48ad-a0dc-b9c3be498424",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
