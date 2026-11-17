@@ -1,0 +1,19 @@
+apps/dashboard/src/components/geo/sentiment-trend-chart.tsx
+  s_d43316500410f4::t_7aaf7c4671a293 28-34,71-73,87
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "77b20f3ca3096486ce4c9c6003edd534049890de",
+  "prompts": {},
+  "sessions": {
+    "s_d43316500410f4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ac84dda6-22be-475c-8cb8-42e85918b326",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
