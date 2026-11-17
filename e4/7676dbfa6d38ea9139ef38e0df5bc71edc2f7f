@@ -1,0 +1,33 @@
+apps/dashboard/messages/de.json
+  s_72f23c5170a572::t_801ee81598ac2c 1342
+apps/dashboard/messages/en.json
+  s_72f23c5170a572::t_801ee81598ac2c 1342
+apps/dashboard/src/app/onboarding/competitors/competitors-form.tsx
+  s_72f23c5170a572::t_801ee81598ac2c 154-158
+apps/dashboard/src/components/onboarding/competitor-choice-row.tsx
+  s_72f23c5170a572::t_801ee81598ac2c 3,18-19,21-22,25-29,36-41,51,56
+apps/dashboard/src/components/onboarding/competitor-suggestions.tsx
+  s_72f23c5170a572::t_801ee81598ac2c 4,11,87-112
+apps/dashboard/src/components/onboarding/selected-competitors.tsx
+  s_72f23c5170a572::t_18b9568acaf14e 38
+  s_72f23c5170a572::t_801ee81598ac2c 5,31-37,39-64
+apps/dashboard/src/components/onboarding/competitor-suggestions-skeleton.tsx
+  s_72f23c5170a572::t_801ee81598ac2c 2,5,9-15,17-25
+  s_72f23c5170a572::t_d92e1400f3b8f0 16
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "e47676dbfa6d38ea9139ef38e0df5bc71edc2f7f",
+  "prompts": {},
+  "sessions": {
+    "s_72f23c5170a572": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "274de591-b280-4b1e-a517-c86b07c0fb77",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
