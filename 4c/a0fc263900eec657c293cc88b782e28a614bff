@@ -1,0 +1,43 @@
+apps/dashboard/src/utils/autopilot-outcome.ts
+  s_40289d5bd1d8e9::t_72f32883fa5f18 50-52,62-63,75
+apps/dashboard/src/lib/autopilot/impact.ts
+  s_40289d5bd1d8e9::t_8632b8653ca77a 23-26,230-233,245-248,253-256,259-260
+apps/dashboard/src/lib/autopilot/results.ts
+  s_40289d5bd1d8e9::t_72f32883fa5f18 307,358,400-417
+  s_40289d5bd1d8e9::t_408fc803cacef4 359-360
+  s_40289d5bd1d8e9::t_e5aac283978377 153-154,164,239-241,247-248,283,286-290
+packages/ai/src/constants/autopilot-planner.ts
+  s_40289d5bd1d8e9::t_a874d84deea1e2 46
+packages/db/src/types/autopilot.ts
+  s_40289d5bd1d8e9::t_f373244e7a7f57 138-144
+packages/ai/src/utils/autopilot-planner.ts
+  s_40289d5bd1d8e9::t_a874d84deea1e2 474,476
+apps/dashboard/tests/autopilot-template-flows.test.ts
+  s_40289d5bd1d8e9::t_8ef5df4690e19c 957,959-986
+apps/dashboard/src/lib/autopilot/outcomes.ts
+  s_40289d5bd1d8e9::t_fa929bd8d1d457 1-148
+apps/dashboard/src/lib/autopilot/refresh.ts
+  s_40289d5bd1d8e9::t_408fc803cacef4 52,60
+  s_40289d5bd1d8e9::t_6242b382145516 96-98,111-112,122-125,136,141-148,154,157,163-168
+apps/dashboard/src/lib/autopilot/planner.ts
+  s_40289d5bd1d8e9::t_a874d84deea1e2 263-270,273,281,294-295,397
+  s_40289d5bd1d8e9::t_408fc803cacef4 48-51,271-272
+apps/dashboard/src/constants/autopilot-outcome.ts
+  s_40289d5bd1d8e9::t_f373244e7a7f57 15-18
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "4ca0fc263900eec657c293cc88b782e28a614bff",
+  "prompts": {},
+  "sessions": {
+    "s_40289d5bd1d8e9": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "4049f314-8ceb-4fe6-8091-e9d3944dac62",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
