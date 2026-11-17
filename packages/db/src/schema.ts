@@ -302,6 +302,8 @@ export const chatShares = pgTable(
       .$type<SharedChatMessage[]>()
       .notNull()
       .default(sql`'[]'::jsonb`),
+    /** Serve the live chat instead of the stored snapshot. */
+    autoUpdate: boolean("auto_update").notNull().default(false),
     revokedAt: timestamp("revoked_at"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at")

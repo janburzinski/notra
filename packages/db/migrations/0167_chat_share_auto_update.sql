@@ -1,0 +1,1 @@
+ALTER TABLE "chat_shares" ADD COLUMN "auto_update" boolean DEFAULT false NOT NULL;

@@ -16,6 +16,7 @@ import {
 const shareSummaryColumns = {
   shareId: chatShares.id,
   messageCount: sql<number>`jsonb_array_length(${chatShares.messages})::int`,
+  autoUpdate: chatShares.autoUpdate,
   createdAt: chatShares.createdAt,
   updatedAt: chatShares.updatedAt,
 };
@@ -23,12 +24,14 @@ const shareSummaryColumns = {
 function toSummary(row: {
   shareId: string;
   messageCount: number;
+  autoUpdate: boolean;
   createdAt: Date;
   updatedAt: Date;
 }): ChatShareSummary {
   return {
     shareId: row.shareId,
     messageCount: row.messageCount,
+    autoUpdate: row.autoUpdate,
     createdAt: row.createdAt.toISOString(),
     updatedAt: row.updatedAt.toISOString(),
   };
@@ -53,18 +56,10 @@ export async function getActiveChatShare(
 }
 
 /**
- * Creates the chat's public link, or refreshes its snapshot when one is
- * already active so the URL people already have keeps working.
+ * The chat as the public page shows it right now, or null when the chat is
+ * gone or belongs to a post.
  */
-export async function publishChatShare({
-  organizationId,
-  chatId,
-  userId,
-}: {
-  organizationId: string;
-  chatId: string;
-  userId: string;
-}): Promise<ChatShareSummary | null> {
+async function buildChatSnapshot(organizationId: string, chatId: string) {
   const [history, [session]] = await Promise.all([
     getChatHistorySnapshot<ChatUIMessage>(organizationId, chatId),
     db
@@ -86,6 +81,27 @@ export async function publishChatShare({
   const messages = buildChatShareSnapshot(
     await hydrateSavedChatPosts(organizationId, chatId, history.messages)
   );
+  return { title: session.title, messages };
+}
+
+/**
+ * Creates the chat's public link, or refreshes its snapshot when one is
+ * already active so the URL people already have keeps working.
+ */
+export async function publishChatShare({
+  organizationId,
+  chatId,
+  userId,
+}: {
+  organizationId: string;
+  chatId: string;
+  userId: string;
+}): Promise<ChatShareSummary | null> {
+  const snapshot = await buildChatSnapshot(organizationId, chatId);
+  if (!snapshot) {
+    return null;
+  }
+  const { title, messages } = snapshot;
   const [row] = await db
     .insert(chatShares)
     .values({
@@ -93,14 +109,46 @@ export async function publishChatShare({
       organizationId,
       chatId,
       createdByUserId: userId,
-      title: session.title,
+      title,
       messages,
     })
     .onConflictDoUpdate({
       target: chatShares.chatId,
       targetWhere: isNull(chatShares.revokedAt),
-      set: { title: session.title, messages, updatedAt: new Date() },
+      set: { title, messages, updatedAt: new Date() },
     })
+    .returning(shareSummaryColumns);
+  return row ? toSummary(row) : null;
+}
+
+/**
+ * Turns live updates on or off for the chat's active link. Either way the
+ * stored snapshot is refreshed, so switching off freezes the chat as it is
+ * now rather than as it was when the link was created.
+ */
+export async function setChatShareAutoUpdate({
+  organizationId,
+  chatId,
+  autoUpdate,
+}: {
+  organizationId: string;
+  chatId: string;
+  autoUpdate: boolean;
+}): Promise<ChatShareSummary | null> {
+  const snapshot = await buildChatSnapshot(organizationId, chatId);
+  if (!snapshot) {
+    return null;
+  }
+  const [row] = await db
+    .update(chatShares)
+    .set({ ...snapshot, autoUpdate, updatedAt: new Date() })
+    .where(
+      and(
+        eq(chatShares.organizationId, organizationId),
+        eq(chatShares.chatId, chatId),
+        isNull(chatShares.revokedAt)
+      )
+    )
     .returning(shareSummaryColumns);
   return row ? toSummary(row) : null;
 }
@@ -123,15 +171,23 @@ export async function revokeChatShare(
   return rows.length > 0;
 }
 
-/** Null for unknown or revoked links and for chats deleted since sharing. */
+/**
+ * Null for unknown or revoked links and for chats deleted since sharing.
+ * Links with live updates show the chat as it is now; the rest show the
+ * stored snapshot.
+ */
 export async function getPublicChatShare(
   shareId: string
 ): Promise<PublicChatShare | null> {
   const [row] = await db
     .select({
+      organizationId: chatShares.organizationId,
+      chatId: chatShares.chatId,
       title: chatShares.title,
       messages: chatShares.messages,
+      autoUpdate: chatShares.autoUpdate,
       updatedAt: chatShares.updatedAt,
+      chatUpdatedAt: chatSessions.updatedAt,
       organizationName: organizations.name,
     })
     .from(chatShares)
@@ -148,11 +204,14 @@ export async function getPublicChatShare(
   if (!row) {
     return null;
   }
+  const live = row.autoUpdate
+    ? await buildChatSnapshot(row.organizationId, row.chatId)
+    : null;
   return {
     shareId,
-    title: row.title,
-    messages: row.messages,
-    sharedAt: row.updatedAt.toISOString(),
+    title: live?.title ?? row.title,
+    messages: live?.messages ?? row.messages,
+    sharedAt: (live ? row.chatUpdatedAt : row.updatedAt).toISOString(),
     organizationName: row.organizationName,
   };
 }

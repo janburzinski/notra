@@ -3,6 +3,7 @@ import type { SharedChatMessage } from "@notra/db/types/chat-shares";
 export interface ChatShareSummary {
   shareId: string;
   messageCount: number;
+  autoUpdate: boolean;
   createdAt: string;
   updatedAt: string;
 }

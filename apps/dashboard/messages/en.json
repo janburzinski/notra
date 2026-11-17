@@ -7080,14 +7080,16 @@
       "linkLabel": "Chat link",
       "copy": "Copy",
       "copied": "Copied",
-      "update": "Update",
+      "delete": "Delete link",
+      "autoUpdate": "Keep link up to date",
+      "autoUpdateOn": "New messages show up on the link.",
       "snapshotInfo": "Snapshot from {date}",
       "createdAndCopied": "Public link created and copied",
       "created": "Public link created",
-      "updated": "Public link updated",
-      "revoked": "Only your team can open this chat now",
+      "revoked": "Public link deleted. Only your team can open this chat now.",
       "publishFailed": "Couldn't create the public link",
-      "revokeFailed": "Couldn't disable the public link"
+      "autoUpdateFailed": "Couldn't change live updates",
+      "revokeFailed": "Couldn't delete the public link"
     },
     "sharedPage": {
       "sharedBy": "Shared from {organization} on {date}",

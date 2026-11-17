@@ -20,6 +20,10 @@ export const chatSessionInputSchema = chatOrganizationInputSchema.extend({
   chatId: z.string().min(1),
 });
 
+export const setChatShareAutoUpdateInputSchema = chatSessionInputSchema.extend({
+  autoUpdate: z.boolean(),
+});
+
 export const forkChatShareInputSchema = chatOrganizationInputSchema.extend({
   shareId: z.string().min(1).max(64),
 });

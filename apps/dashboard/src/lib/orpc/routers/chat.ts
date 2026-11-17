@@ -23,6 +23,7 @@ import {
   createChatPostInputSchema,
   forkChatShareInputSchema,
   listChatSessionsInputSchema,
+  setChatShareAutoUpdateInputSchema,
   updateChatSessionInputSchema,
 } from "@notra/schemas/dashboard/chat";
 import { and, eq, isNotNull, sql } from "drizzle-orm";
@@ -35,6 +36,7 @@ import {
   getActiveChatShare,
   publishChatShare,
   revokeChatShare,
+  setChatShareAutoUpdate,
 } from "@/lib/chat/shares";
 import { loadChatSuggestionSignals } from "@/lib/chat/suggestions";
 import { afterResponse } from "@/lib/framework/after-response";
@@ -156,6 +158,22 @@ export const chatRouter = {
           organizationId,
           chatId: input.chatId,
           userId: context.user.id,
+        });
+        if (!share) {
+          throw notFound(CHAT_NOT_FOUND_MESSAGE);
+        }
+        return { share };
+      }),
+
+    setAutoUpdate: authorizedProcedure
+      .input(setChatShareAutoUpdateInputSchema)
+      .use(withOrganizationAccess)
+      .handler(async ({ context, input }) => {
+        assertNotDemo();
+        const share = await setChatShareAutoUpdate({
+          organizationId: context.auth.organizationId,
+          chatId: input.chatId,
+          autoUpdate: input.autoUpdate,
         });
         if (!share) {
           throw notFound(CHAT_NOT_FOUND_MESSAGE);
