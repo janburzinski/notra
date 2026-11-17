@@ -1,0 +1,34 @@
+packages/ui/src/components/ui/composer.tsx
+  s_cef68fc8e5a98f::t_d77de9f0f9e266 115-117,194-197,221-224
+  s_cef68fc8e5a98f::t_ef535b5bb5c988 102,122,124-127,150-151,173,175-179,185-186,198,201
+apps/dashboard/src/types/components/chat-input.ts
+  s_cef68fc8e5a98f::t_e1c33f25e19188 61
+packages/ui/src/types/composer.ts
+  s_cef68fc8e5a98f::t_d77de9f0f9e266 9,11,15,18-19
+apps/ui/registry.json
+  s_cef68fc8e5a98f::t_cdc08e1d146df3 1679,1703-1720
+apps/ui/docs/components/composer.mdx
+  s_cef68fc8e5a98f::t_459398493812e5 3,10,33,105-106
+  s_cef68fc8e5a98f::t_cdc08e1d146df3 67,79
+apps/ui/registry/notra/composer/types/composer.ts
+  s_cef68fc8e5a98f::t_459398493812e5 7,11
+apps/ui/registry/notra/composer/components/composer.tsx
+  s_cef68fc8e5a98f::t_74863eb2c71663 104-105
+  s_cef68fc8e5a98f::t_459398493812e5 80-103,106-125,134-145,153-155,158,174-177
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "615764a0cbcb657af4313dae6c927859c990b4ac",
+  "prompts": {},
+  "sessions": {
+    "s_cef68fc8e5a98f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f52bd503-c707-4247-93a8-ff980133f029",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
