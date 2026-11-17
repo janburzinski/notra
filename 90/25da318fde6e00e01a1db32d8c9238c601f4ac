@@ -1,0 +1,19 @@
+packages/ui/src/components/ui/composer.tsx
+  s_33d9c9fb257287::t_4c2114b407f7a6 166,168,177,242-253
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "9025da318fde6e00e01a1db32d8c9238c601f4ac",
+  "prompts": {},
+  "sessions": {
+    "s_33d9c9fb257287": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "29bef2da-0eb1-4c8c-8e76-db8762de0997",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
