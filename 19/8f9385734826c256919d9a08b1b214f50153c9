@@ -1,0 +1,26 @@
+apps/dashboard/src/components/autopilot/autopilot-automation-menu-items.tsx
+  s_2bcb3b109f2ef4::t_1faf7e78d83611 1-78
+apps/dashboard/src/components/autopilot/autopilot-automations-overview.tsx
+  s_2bcb3b109f2ef4::t_09967fcad45989 11,25,51,80,96-103,128-134,138-144,271,280,386-405,410-430
+  s_2bcb3b109f2ef4::t_6de82c469c7f38 135-137
+apps/dashboard/src/app/(dashboard)/[slug]/autopilot/page-client.tsx
+  s_2bcb3b109f2ef4::t_09967fcad45989 364-366
+apps/dashboard/src/types/autopilot-metrics.ts
+  s_2bcb3b109f2ef4::t_1faf7e78d83611 72,79-91
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "198f9385734826c256919d9a08b1b214f50153c9",
+  "prompts": {},
+  "sessions": {
+    "s_2bcb3b109f2ef4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "035c8f25-244e-429c-9192-fb85f0d925cc",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
