@@ -1,0 +1,19 @@
+apps/agent/tests/usage-hook.test.ts
+  s_9d08e97deaec89::t_a20beb663004d8 4-34,44,46,51-54,76-77,79-94,111-114,116-139
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "26e9ebacf0be00d96d500f605ec3ca527f01663f",
+  "prompts": {},
+  "sessions": {
+    "s_9d08e97deaec89": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5ba60396-9bf1-4c99-af49-ea239a519446",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
