@@ -58,7 +58,8 @@ if (!process.env.NOTRA_TRAFFIC_PAGE_SHELL_TEST_WORKER) {
     knownPaths: [],
     knownHosts: [],
     siteHosts: [],
-    settings: {},
+    hasProject: true,
+    hasGeoSettings: true,
     geoRange: { query: {} },
   } as unknown as TrafficPageScope;
 
@@ -68,9 +69,9 @@ if (!process.env.NOTRA_TRAFFIC_PAGE_SHELL_TEST_WORKER) {
         <TrafficPageShell
           copy={{
             description: "Visitors",
-            setupDescription: "Set up",
             emptyRangeTitle: "No visits in this period",
             emptyRangeDescription: "Pick another period",
+            websiteDescription: "Enter your site",
           }}
           emptyFooter={() => <aside>import history</aside>}
           hasPreviousData={hasPreviousData}

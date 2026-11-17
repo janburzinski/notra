@@ -26,5 +26,6 @@ export function useGeoActiveProject(organizationId: string): GeoActiveProject {
   return {
     project,
     domain: getWebsiteDomain(voice?.websiteUrl ?? null),
+    isPending: !(isError || hasLoadedProjects),
   };
 }

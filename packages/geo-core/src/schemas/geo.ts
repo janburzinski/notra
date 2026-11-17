@@ -272,11 +272,21 @@ export const geoProjectCreateInputSchema = object({
   brandSettingsId: string().min(1),
   /** Tracked languages; the first one is the language prompts are written in. */
   languages: geoTrackingLanguagesSchema.optional(),
+  /**
+   * False adds the project for analytics only: no competitor and prompt
+   * discovery and no scan. GEO tracking can be set up on it later.
+   */
+  discover: boolean().optional(),
 });
 
 export const geoProjectDeleteInputSchema = object({
   organizationId: string().min(1),
   projectId: string().min(1),
+});
+
+export const geoProjectSetUpInputSchema = geoProjectDeleteInputSchema.extend({
+  /** Tracked languages; the first one is the language prompts are written in. */
+  languages: geoTrackingLanguagesSchema.optional(),
 });
 
 export const geoProjectUpdateInputSchema = geoProjectDeleteInputSchema.extend({

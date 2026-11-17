@@ -238,6 +238,7 @@ export function useGeoProjectsDb(
           name: input.name.trim(),
           brandSettingsId: input.brandSettingsId,
           languages: input.languages,
+          discover: input.discover,
         },
         { signal: AbortSignal.timeout(GEO_PROJECT_CREATE_TIMEOUT_MS) }
       )

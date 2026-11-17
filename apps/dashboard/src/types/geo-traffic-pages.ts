@@ -1,7 +1,6 @@
 import type {
   AiTrafficResponse,
   GeoIngestMethod,
-  GeoSettings,
   GeoTrafficSitesMode,
   WebAnalyticsResponse,
 } from "@notra/geo-core/types/geo";
@@ -17,7 +16,7 @@ export type GeoTrafficPageKind = (typeof GEO_TRAFFIC_PAGE_KINDS)[number];
 
 export type GeoTrafficTab = (typeof GEO_TRAFFIC_TABS)[number];
 
-/** Data both analytics pages share: scope, filters, settings and pickers. */
+/** Data both analytics pages share: scope, filters, setup state and pickers. */
 export interface TrafficPageScope {
   organizationId: string;
   organizationSlug: string;
@@ -26,8 +25,16 @@ export interface TrafficPageScope {
   hostQuery: string;
   pathQuery: string;
   sites: GeoTrafficSitesMode | undefined;
-  settings: GeoSettings | null;
-  isSettingsPending: boolean;
+  /**
+   * Analytics only need a project with a website, not GEO tracking: the
+   * notra.js key and the accepted hosts both come from the project.
+   */
+  hasProject: boolean;
+  isProjectPending: boolean;
+  /** Whether the project has GEO settings, which hold its extra domains. */
+  hasGeoSettings: boolean;
+  /** The project's website, from its brand identity. */
+  domain: string | null;
   ingestSetup: DashboardGeoIngestSetup | undefined;
   isIngestPending: boolean;
   traffic: AiTrafficResponse | undefined;
@@ -42,9 +49,10 @@ export interface TrafficPageScope {
 
 interface TrafficPageCopy {
   description: string;
-  setupDescription: string;
   emptyRangeTitle: string;
   emptyRangeDescription: string;
+  /** Under "Connect your website" when the organization has no project. */
+  websiteDescription: string;
 }
 
 export interface TrafficPageEmptyProps {
@@ -68,7 +76,7 @@ export interface TrafficPageShellProps extends TrafficPageEmptyProps {
 export interface TrafficViewedInput {
   page: GeoTrafficPageKind;
   ready: boolean;
-  hasSettings: boolean;
+  isSetUp: boolean;
   hasData: boolean;
   rangePreset: string;
 }

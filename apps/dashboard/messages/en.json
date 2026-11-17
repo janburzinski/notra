@@ -3732,8 +3732,17 @@
       "trendLabel": "{brand} share of voice trend",
       "empty": "No competitor data yet"
     },
+    "trafficWebsite": {
+      "title": "Connect your website",
+      "label": "Website",
+      "subdomains": "Visits to {domain} and its subdomains are counted.",
+      "submit": "Continue",
+      "invalid": "Enter a website like acme.com.",
+      "failed": "Couldn't save the website. Try again."
+    },
     "trafficEmpty": {
       "title": "No activity yet",
+      "titleFor": "No activity on {domain} yet",
       "description": "Install the tracker to see visits from ChatGPT, Claude and other AI agents."
     },
     "trafficHero": {
@@ -4323,16 +4332,16 @@
       "aiAnalytics": {
         "metaTitle": "AI analytics",
         "description": "AI crawlers, citation fetches and people arriving from AI answers",
-        "setupDescription": "Set up GEO tracking first, then watch AI crawlers and referrals as they arrive.",
         "emptyRangeTitle": "No AI activity in this period",
-        "emptyRangeDescription": "Try a different date range or domain."
+        "emptyRangeDescription": "Try a different date range or domain.",
+        "websiteDescription": "Enter the site you want to see AI crawlers and AI referrals for."
       },
       "webAnalytics": {
         "metaTitle": "Web analytics",
         "description": "People visiting your site, where they come from and what they read",
-        "setupDescription": "Set up GEO tracking first, then see who visits your site and where they come from.",
         "emptyRangeTitle": "No visitors in this period",
         "emptyRangeDescription": "Try a different date range or domain.",
+        "websiteDescription": "Enter the site you want to count visitors on.",
         "installDescription": "Add the script tag to count visitors, page views and referrers."
       }
     },
@@ -4418,6 +4427,8 @@
       "conversationsAdded": "Added {count, plural, one {# conversation} other {# conversations}}",
       "promptsAddedTracking": "{count, plural, one {# prompt} other {# prompts}} added to tracking",
       "projectCreated": "Project created",
+      "geoSetUp": "GEO tracking set up",
+      "geoSetUpFailed": "Failed to set up GEO tracking",
       "projectDeleted": "Project deleted",
       "loadPersonasFailed": "Failed to load personas",
       "loadPersonaActivityFailed": "Failed to load persona activity",

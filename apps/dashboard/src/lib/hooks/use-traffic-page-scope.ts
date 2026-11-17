@@ -46,14 +46,17 @@ export function useTrafficPageScope(
     activeOrganization,
     getOrganization(organizationSlug)
   );
-  const { domain: brandDomain } = useGeoActiveProject(organizationId);
+  const {
+    project,
+    domain: brandDomain,
+    isPending: isProjectPending,
+  } = useGeoActiveProject(organizationId);
   const geoRange = useGeoRange();
   const [hostQuery] = useGeoTrafficHostQuery();
   const [pathQuery] = useTrafficPathQuery();
   const sites = useTrafficSitesMode();
 
-  const { data: settingsData, isPending: isSettingsPending } =
-    useGeoSettings(organizationId);
+  const { data: settingsData } = useGeoSettings(organizationId);
   const { data: ingestSetup, isPending: isIngestPending } =
     useGeoIngestSetup(organizationId);
   const {
@@ -95,8 +98,10 @@ export function useTrafficPageScope(
     hostQuery,
     pathQuery,
     sites,
-    settings: settingsData?.settings ?? null,
-    isSettingsPending,
+    hasProject: project !== null,
+    hasGeoSettings: Boolean(settingsData?.settings),
+    isProjectPending,
+    domain: brandDomain,
     ingestSetup,
     isIngestPending,
     traffic,

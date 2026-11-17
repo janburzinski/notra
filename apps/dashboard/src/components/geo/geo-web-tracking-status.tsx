@@ -1,9 +1,10 @@
 "use client";
 
-import { Spinner } from "@notra/ui/components/ui/spinner";
+import { Shimmer } from "@notra/ui/components/ai-elements/shimmer";
 import { useFormatter, useTranslations } from "use-intl";
 
 import Link from "@/components/framework/link";
+import { AgentLoader } from "@/components/icons/agent-loader";
 import { WEB_ANALYTICS_NAV_LINK } from "@/constants/geo-traffic-pages";
 import { useWebTrackingStatus } from "@/lib/hooks/use-web-tracking-status";
 import { useParams } from "@/lib/navigation";
@@ -44,8 +45,8 @@ export function GeoWebTrackingStatus({
         </>
       ) : (
         <>
-          <Spinner aria-hidden="true" className="size-3" />
-          <span>{t("awaiting")}</span>
+          <AgentLoader className="text-foreground/75 size-3" />
+          <Shimmer as="span">{t("awaiting")}</Shimmer>
         </>
       )}
     </div>

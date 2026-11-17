@@ -2,7 +2,10 @@ import type { IconSvgElement } from "@hugeicons/react";
 import type { ToneProfile } from "@notra/ai/schemas/tone";
 import type { GeoWriterBrief } from "@notra/ai/types/geo-writer";
 import type { GeoWriterSourceKind } from "@notra/db/types/geo-writer";
-import type { geoProjectCreateInputSchema } from "@notra/geo-core/schemas/geo";
+import type {
+  geoProjectCreateInputSchema,
+  geoProjectSetUpInputSchema,
+} from "@notra/geo-core/schemas/geo";
 import type {
   AiTrafficResponse,
   WebAnalyticsOutcome,
@@ -102,7 +105,9 @@ export interface GeoProjectCreateInput {
   name: string;
   brandSettingsId: string;
   /** Tracked languages; the first one is the language prompts are written in. */
-  languages: string[];
+  languages?: string[];
+  /** False adds the project for analytics only, without GEO tracking. */
+  discover?: boolean;
 }
 
 export interface GeoProjectContextValue {
@@ -114,6 +119,8 @@ export interface GeoProjectContextValue {
 export interface GeoActiveProject {
   project: GeoProject | null;
   domain: string | null;
+  /** True until the organization's project list has loaded. */
+  isPending: boolean;
 }
 
 export interface GeoProjectProviderProps {
@@ -450,6 +457,8 @@ export type GeoProjectCreateHandlerInput = z.infer<
   typeof geoProjectCreateInputSchema
 >;
 
+export type GeoProjectSetUpInput = z.infer<typeof geoProjectSetUpInputSchema>;
+
 export interface GeoTrafficLogQueryOptions {
   host?: string;
   path?: string;
@@ -756,10 +765,17 @@ export interface GeoSetupStepProps {
   plain?: boolean;
 }
 
+export interface TrafficWebsiteSetupProps {
+  organizationId: string;
+  description: string;
+}
+
 export interface TrafficEmptyProps {
   setup: DashboardGeoIngestSetup | undefined;
   defaultMethod?: GeoIngestMethod;
   description?: string;
+  /** The project's website, named in the title. */
+  domain?: string | null;
 }
 
 export interface GeoIngestSdkSetupProps {

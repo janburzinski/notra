@@ -19,6 +19,7 @@ export function TrafficEmpty({
   setup,
   defaultMethod,
   description,
+  domain,
 }: TrafficEmptyProps) {
   const t = useTranslations("geo.trafficEmpty");
   return (
@@ -27,7 +28,9 @@ export function TrafficEmpty({
         <EmptyMedia variant="icon">
           <HugeiconsIcon icon={AiBrowserIcon} />
         </EmptyMedia>
-        <EmptyTitle>{t("title")}</EmptyTitle>
+        <EmptyTitle>
+          {domain ? t("titleFor", { domain }) : t("title")}
+        </EmptyTitle>
         <EmptyDescription>{description ?? t("description")}</EmptyDescription>
       </EmptyHeader>
       <EmptyContent className="max-w-2xl items-stretch text-left">

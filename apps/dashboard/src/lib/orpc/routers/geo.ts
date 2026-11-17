@@ -35,6 +35,7 @@ import {
   createGeoProjectFromWebsite,
   discoverGeoWebsite,
   generateGeoFromWebsite,
+  setUpGeoOnProject,
 } from "@notra/geo-core/geo/discover";
 import type { GeoRouterError } from "@notra/geo-core/geo/errors";
 import {
@@ -106,6 +107,7 @@ import {
   upsertGeoSettings,
 } from "@notra/geo-core/geo/programs";
 import {
+  createGeoProject,
   deleteGeoProject,
   listGeoProjects,
   requireBrandIdentity,
@@ -199,6 +201,7 @@ import {
   geoPromptTranslationTargetInputSchema,
   geoPromptTranslationUpdateInputSchema,
   geoProjectCreateInputSchema,
+  geoProjectSetUpInputSchema,
   geoProjectDeleteInputSchema,
   geoProjectUpdateInputSchema,
   geoPromptCreateInputSchema,
@@ -257,7 +260,7 @@ import type {
   AgentReadinessResponse,
   AgentReadinessScanResponse,
 } from "@notra/geo-core/types/agent-readiness";
-import type { GeoTrackedPrompt } from "@notra/geo-core/types/geo";
+import type { GeoProject, GeoTrackedPrompt } from "@notra/geo-core/types/geo";
 import type {
   GeoSearchConsoleStatus,
   GscKeywordsResponse,
@@ -358,6 +361,7 @@ import type {
   GeoBrandSearchHandlerInput,
   GeoCompetitorSuggestionsHandlerInput,
   GeoProjectCreateHandlerInput,
+  GeoProjectSetUpInput,
   GeoPromptSuggestionsResponse,
 } from "@/types/geo";
 import type { GeoDashboardRuntime } from "@/types/geo-runtime";
@@ -1813,28 +1817,38 @@ export const geoRouter = {
     .input(geoProjectCreateInputSchema)
     .handler(async (options) => {
       await assertOrganizationAccess(accessParams(options));
+      const discover = options.input.discover !== false;
       const scanEnabled =
+        discover &&
         (await resolveGeoEntitlement(
           options.input.organizationId,
           options.context.headers
         )) !== "denied";
       return geoOpenHandler(
-        (input: GeoProjectCreateHandlerInput) =>
-          requireBrandIdentity(
-            input.organizationId,
-            input.brandSettingsId
-          ).pipe(
-            Effect.flatMap((identity) =>
-              createGeoProjectFromWebsite(
+        (
+          input: GeoProjectCreateHandlerInput
+        ): Effect.Effect<GeoProject, GeoRouterError, GeoDashboardRuntime> =>
+          discover
+            ? requireBrandIdentity(
+                input.organizationId,
+                input.brandSettingsId
+              ).pipe(
+                Effect.flatMap((identity) =>
+                  createGeoProjectFromWebsite(
+                    input.organizationId,
+                    input.name,
+                    input.brandSettingsId,
+                    identity.websiteUrl,
+                    scanEnabled,
+                    input.languages
+                  )
+                )
+              )
+            : createGeoProject(
                 input.organizationId,
                 input.name,
-                input.brandSettingsId,
-                identity.websiteUrl,
-                scanEnabled,
-                input.languages
-              )
-            )
-          ),
+                input.brandSettingsId
+              ),
         async ({ context, input, output }) => {
           const projectCount = await countGeoProjects(
             input.organizationId
@@ -1855,9 +1869,43 @@ export const geoRouter = {
             input,
             event: POSTHOG_EVENTS.GEO_PROJECT_CREATED,
             projectId: output.id,
-            properties: { is_sample: false, project_count: projectCount },
+            properties: {
+              is_sample: false,
+              project_count: projectCount,
+              analytics_only: !discover,
+            },
           });
         }
+      )(options);
+    }),
+  projectsSetUpGeo: authorizedProcedure
+    .input(geoProjectSetUpInputSchema)
+    .handler(async (options) => {
+      await assertOrganizationAccess(accessParams(options));
+      const scanEnabled =
+        (await resolveGeoEntitlement(
+          options.input.organizationId,
+          options.context.headers
+        )) !== "denied";
+      return geoOpenHandler((input: GeoProjectSetUpInput) =>
+        requireGeoProject(input).pipe(
+          Effect.flatMap((project) =>
+            requireBrandIdentity(
+              input.organizationId,
+              project.brandSettingsId
+            ).pipe(
+              Effect.flatMap((identity) =>
+                setUpGeoOnProject(
+                  input.organizationId,
+                  project.projectId,
+                  identity.websiteUrl,
+                  scanEnabled,
+                  input.languages
+                )
+              )
+            )
+          )
+        )
       )(options);
     }),
   projectsUpdate: authorizedProcedure

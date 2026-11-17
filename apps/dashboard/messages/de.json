@@ -3732,8 +3732,17 @@
       "trendLabel": "Share-of-Voice-Trend von {brand}",
       "empty": "Noch keine Wettbewerberdaten"
     },
+    "trafficWebsite": {
+      "title": "Website verbinden",
+      "label": "Website",
+      "subdomains": "Gezählt werden Besuche auf {domain} und seinen Subdomains.",
+      "submit": "Weiter",
+      "invalid": "Gib eine Website wie acme.com ein.",
+      "failed": "Die Website konnte nicht gespeichert werden. Versuch es noch einmal."
+    },
     "trafficEmpty": {
       "title": "Noch keine Aktivität",
+      "titleFor": "Noch keine Aktivität auf {domain}",
       "description": "Installiere den Tracker, um Besuche von ChatGPT, Claude und anderen KI-Agenten zu sehen."
     },
     "trafficHero": {
@@ -4323,16 +4332,16 @@
       "aiAnalytics": {
         "metaTitle": "KI-Analytics",
         "description": "KI-Crawler, Zitat-Abrufe und Menschen, die über KI-Antworten kommen",
-        "setupDescription": "Richte zuerst das GEO-Tracking ein und beobachte dann KI-Crawler und Verweise, sobald sie eintreffen.",
         "emptyRangeTitle": "Keine KI-Aktivität in diesem Zeitraum",
-        "emptyRangeDescription": "Wähle einen anderen Zeitraum oder eine andere Domain."
+        "emptyRangeDescription": "Wähle einen anderen Zeitraum oder eine andere Domain.",
+        "websiteDescription": "Gib die Website ein, für die du KI-Crawler und Verweise aus KI-Antworten sehen willst."
       },
       "webAnalytics": {
         "metaTitle": "Web-Analytics",
         "description": "Menschen auf deiner Website, woher sie kommen und was sie lesen",
-        "setupDescription": "Richte zuerst das GEO-Tracking ein und sieh dann, wer deine Website besucht und woher die Besucher kommen.",
         "emptyRangeTitle": "Keine Besucher in diesem Zeitraum",
         "emptyRangeDescription": "Wähle einen anderen Zeitraum oder eine andere Domain.",
+        "websiteDescription": "Gib die Website ein, deren Besucher du zählen willst.",
         "installDescription": "Füge das Script-Tag ein, um Besucher, Seitenaufrufe und Verweise zu zählen."
       }
     },
@@ -4418,6 +4427,8 @@
       "conversationsAdded": "{count, plural, one {# Unterhaltung} other {# Unterhaltungen}} hinzugefügt",
       "promptsAddedTracking": "{count, plural, one {# Prompt} other {# Prompts}} zum Tracking hinzugefügt",
       "projectCreated": "Projekt erstellt",
+      "geoSetUp": "GEO-Tracking eingerichtet",
+      "geoSetUpFailed": "GEO-Tracking konnte nicht eingerichtet werden",
       "projectDeleted": "Projekt gelöscht",
       "loadPersonasFailed": "Personas konnten nicht geladen werden",
       "loadPersonaActivityFailed": "Persona-Aktivität konnte nicht geladen werden",

@@ -10,7 +10,7 @@ import type { TrafficViewedInput } from "@/types/geo-traffic-pages";
 export function useTrafficViewed({
   page,
   ready,
-  hasSettings,
+  isSetUp,
   hasData,
   rangePreset,
 }: TrafficViewedInput) {
@@ -23,9 +23,10 @@ export function useTrafficViewed({
     viewedRef.current = true;
     trackEvent(POSTHOG_EVENTS.TRAFFIC_VIEWED, {
       page,
-      has_traffic: hasSettings && hasData,
-      has_settings: hasSettings,
+      has_traffic: isSetUp && hasData,
+      // Kept under its old name so existing PostHog insights keep working.
+      has_settings: isSetUp,
       range: rangePreset,
     });
-  }, [hasData, hasSettings, page, rangePreset, ready]);
+  }, [hasData, isSetUp, page, rangePreset, ready]);
 }

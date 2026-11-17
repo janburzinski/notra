@@ -514,6 +514,73 @@ export const generateGeoFromWebsite = Effect.fn("geo.generateFromWebsite")(
   }
 );
 
+/** Discovery shared by creating a project and setting up GEO on one. */
+const discoverProjectSeed = Effect.fn("geo.projectSeed")(function* (
+  organizationId: string,
+  url: string,
+  languages: readonly string[] | undefined
+) {
+  const seedLanguages = languages?.length
+    ? trackedGeoLanguages(languages)
+    : null;
+  const { discovery } = yield* discoverGeoWebsite(
+    organizationId,
+    url,
+    true,
+    seedLanguages?.at(0) ?? DEFAULT_LANGUAGE
+  );
+  const generation = yield* prepareGeoWebsiteGeneration(discovery);
+  const seedEngines = yield* resolveSeedEngines(organizationId, discovery);
+  return { seedLanguages, discovery, generation, seedEngines };
+});
+
+/**
+ * Sets up GEO tracking on a project that was added without it, for example
+ * from the analytics pages: the same discovery, prompts and first scan as
+ * creating a project from its website.
+ */
+export const setUpGeoOnProject = Effect.fn("geo.projectSetUp")(function* (
+  organizationId: string,
+  projectId: string,
+  url: string,
+  scanEnabled: boolean,
+  languages?: readonly string[]
+) {
+  const { seedLanguages, discovery, generation, seedEngines } =
+    yield* discoverProjectSeed(organizationId, url, languages);
+  const { aliases, companyName, entries, conversations } = generation;
+
+  yield* geoTransaction("GEO setup failed", (tx) =>
+    persistGeoWebsiteGeneration(tx, {
+      organizationId,
+      projectId,
+      companyName,
+      aliases,
+      entries,
+      conversations,
+      discoveredCompetitors: discovery.competitors,
+      seedEngines,
+      seedLanguages,
+      trackingEnabled: true,
+    })
+  ).pipe(
+    Effect.catchTag("GeoDatabaseError", (cause) =>
+      Effect.fail(
+        new GeoDiscoveryError({
+          message: "Failed to set up GEO tracking",
+          cause,
+        })
+      )
+    )
+  );
+  yield* Effect.promise(() => bumpGeoCheckGeneration([organizationId]));
+  yield* startGeoScanAfterWebsiteGeneration(
+    organizationId,
+    projectId,
+    scanEnabled
+  );
+});
+
 export const createGeoProjectFromWebsite = Effect.fn(
   "geo.projectCreateFromWebsite"
 )(function* (
@@ -525,18 +592,9 @@ export const createGeoProjectFromWebsite = Effect.fn(
   languages?: readonly string[],
   trackingEnabled = true
 ) {
-  const seedLanguages = languages?.length
-    ? trackedGeoLanguages(languages)
-    : null;
-  const { discovery } = yield* discoverGeoWebsite(
-    organizationId,
-    url,
-    true,
-    seedLanguages?.at(0) ?? DEFAULT_LANGUAGE
-  );
-  const { aliases, companyName, entries, conversations } =
-    yield* prepareGeoWebsiteGeneration(discovery);
-  const seedEngines = yield* resolveSeedEngines(organizationId, discovery);
+  const { seedLanguages, discovery, generation, seedEngines } =
+    yield* discoverProjectSeed(organizationId, url, languages);
+  const { aliases, companyName, entries, conversations } = generation;
 
   const project = yield* geoTransaction("project create failed", (tx) =>
     Effect.gen(function* () {

@@ -76,6 +76,7 @@ import { useGeoProjectScope } from "@/components/providers/geo-project-provider"
 import { FIRST_SCAN_COMPLETED_TOAST_ID } from "@/constants/free-scan";
 import { TRAFFIC_LOG_DEFAULT_FILTERS } from "@/constants/geo-analytics";
 import { GEO_COMPETITOR_DETAIL_QUERY_KEY } from "@/constants/geo-competitors";
+import { GEO_SETUP_DB_COLLECTIONS } from "@/constants/geo-projects";
 import {
   trackFirstScanCompleted,
   trackFirstScanStarted,
@@ -741,6 +742,32 @@ export function useGeoGenerateFromWebsite(organizationId: string) {
       toast.error(
         toErrorMessage(error, tToast("generateGEOTrackingWebsiteFailed"))
       );
+    },
+  });
+}
+
+/** Sets up GEO tracking on a project that was added for analytics only. */
+export function useGeoProjectSetUp(organizationId: string) {
+  const tToast = useTranslations("geo.toasts");
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (input: { projectId: string; languages: string[] }) =>
+      dashboardOrpc.geo.projectsSetUpGeo.call({ ...input, organizationId }),
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: dashboardOrpc.geo.key() }),
+        // The prompts, competitors and conversations lists live in the
+        // geo-db collections, under their own keys.
+        ...GEO_SETUP_DB_COLLECTIONS.map((name) =>
+          queryClient.invalidateQueries({
+            queryKey: geoDbOrgQueryKey(name, organizationId),
+          })
+        ),
+      ]);
+      toast.success(tToast("geoSetUp"));
+    },
+    onError: (error) => {
+      toast.error(toErrorMessage(error, tToast("geoSetUpFailed")));
     },
   });
 }

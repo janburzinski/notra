@@ -26,7 +26,7 @@ import { AiAnalyticsSkeleton } from "./skeleton";
 export default function PageClient({ organizationSlug }: GeoPageClientProps) {
   const t = useTranslations("geo.pages.aiAnalytics");
   const scope = useTrafficPageScope(organizationSlug);
-  const { organizationId, projectId, geoRange, traffic, settings } = scope;
+  const { organizationId, projectId, geoRange, traffic } = scope;
   const {
     data: trafficPages,
     isPending: isPagesPending,
@@ -52,7 +52,7 @@ export default function PageClient({ organizationSlug }: GeoPageClientProps) {
   usePrefetchGeoTrafficLog(
     organizationId,
     { host: scope.hostQuery, path: scope.pathQuery, sites: scope.sites },
-    settings !== null
+    scope.hasProject
   );
   const pages = trafficPages?.pages ?? [];
   // Undefined keeps the page-count cells loading; an empty list after an error
@@ -66,8 +66,8 @@ export default function PageClient({ organizationSlug }: GeoPageClientProps) {
   const isEmpty =
     !scope.isTrafficPending && !sources.some((source) => source.visits > 0);
   const showSkeleton = isTrafficPagePending({
-    isSettingsPending: scope.isSettingsPending,
-    hasSettings: settings !== null,
+    isSettingsPending: scope.isProjectPending,
+    hasSettings: scope.hasProject,
     isTrafficPending: scope.isTrafficPending,
     isEmptyTraffic: isEmpty,
     isIngestPending: scope.isIngestPending,
@@ -76,7 +76,7 @@ export default function PageClient({ organizationSlug }: GeoPageClientProps) {
   useTrafficViewed({
     page: "agent-analytics",
     ready: !showSkeleton,
-    hasSettings: settings !== null,
+    isSetUp: scope.hasProject,
     hasData: !isEmpty,
     rangePreset: geoRange.preset,
   });
@@ -89,9 +89,9 @@ export default function PageClient({ organizationSlug }: GeoPageClientProps) {
       <TrafficPageShell
         copy={{
           description: t("description"),
-          setupDescription: t("setupDescription"),
           emptyRangeTitle: t("emptyRangeTitle"),
           emptyRangeDescription: t("emptyRangeDescription"),
+          websiteDescription: t("websiteDescription"),
         }}
         hasPreviousData={hasPreviousData}
         isEmpty={isEmpty}

@@ -24,7 +24,7 @@ import { WebAnalyticsSkeleton } from "./skeleton";
 export default function PageClient({ organizationSlug }: GeoPageClientProps) {
   const t = useTranslations("geo.pages.webAnalytics");
   const scope = useTrafficPageScope(organizationSlug);
-  const { organizationId, geoRange, settings } = scope;
+  const { organizationId, geoRange } = scope;
   const {
     data: webBreakdowns,
     isPending: isBreakdownsPending,
@@ -51,8 +51,8 @@ export default function PageClient({ organizationSlug }: GeoPageClientProps) {
 
   const isEmpty = !scope.isWebPending && !hasWebAnalytics(web);
   const showSkeleton = isTrafficPagePending({
-    isSettingsPending: scope.isSettingsPending,
-    hasSettings: settings !== null,
+    isSettingsPending: scope.isProjectPending,
+    hasSettings: scope.hasProject,
     isTrafficPending: scope.isWebPending,
     isEmptyTraffic: isEmpty,
     isIngestPending: scope.isIngestPending,
@@ -61,7 +61,7 @@ export default function PageClient({ organizationSlug }: GeoPageClientProps) {
   useTrafficViewed({
     page: "web-analytics",
     ready: !showSkeleton,
-    hasSettings: settings !== null,
+    isSetUp: scope.hasProject,
     hasData: !isEmpty,
     rangePreset: geoRange.preset,
   });
@@ -74,9 +74,9 @@ export default function PageClient({ organizationSlug }: GeoPageClientProps) {
       <TrafficPageShell
         copy={{
           description: t("description"),
-          setupDescription: t("setupDescription"),
           emptyRangeTitle: t("emptyRangeTitle"),
           emptyRangeDescription: t("emptyRangeDescription"),
+          websiteDescription: t("websiteDescription"),
         }}
         emptyFooter={(openImport) => <ImportHistoryCard onOpen={openImport} />}
         hasPreviousData={hasPreviousWebPeriod(web)}
