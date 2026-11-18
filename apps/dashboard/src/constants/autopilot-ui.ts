@@ -486,12 +486,6 @@ export const AUTOPILOT_PULL_REQUEST_STATES: Partial<
 /** Room for an empty table's icon, title and text; a one-row table would clip them. */
 export const AUTOPILOT_EMPTY_TABLE_HEIGHT = 300;
 
-/** Marks an automation's name in the table, valued with its kind, for the template hand-off. */
-export const AUTOPILOT_ROW_NAME_ATTRIBUTE = "data-autopilot-row-name";
-
-/** Frames a used template's card waits for its table row before skipping the hand-off. */
-export const AUTOPILOT_HAND_OFF_MAX_FRAMES = 10;
-
 export const AUTOPILOT_WORKFLOW_STEP_ICONS = {
   "core.trigger": Clock01Icon,
   "core.if": GitBranchIcon,

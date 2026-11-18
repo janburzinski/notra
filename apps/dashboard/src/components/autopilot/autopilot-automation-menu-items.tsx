@@ -58,6 +58,7 @@ export function AutopilotAutomationMenuItems({
             <ContextMenuItem
               disabled={toggleBusy}
               onClick={() => onTurnOff(row.kind)}
+              variant="destructive"
             >
               <HugeiconsIcon icon={Cancel01Icon} />
               Turn off

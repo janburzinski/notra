@@ -35,7 +35,6 @@ import {
   AUTOPILOT_AUTOMATIONS,
   AUTOPILOT_EMPTY_TABLE_HEIGHT,
   AUTOPILOT_KIND_META,
-  AUTOPILOT_ROW_NAME_ATTRIBUTE,
 } from "@/constants/autopilot-ui";
 import { AUTOPILOT_WORKFLOW_BUILD_PROMPT } from "@/constants/autopilot-workflows";
 import { TABLE_ROW_HEIGHT } from "@/constants/table";
@@ -203,12 +202,7 @@ export function AutopilotAutomationsOverview({
             }
             size={16}
           />
-          <span
-            className="truncate font-medium"
-            {...(row.type === "builtin"
-              ? { [AUTOPILOT_ROW_NAME_ATTRIBUTE]: row.kind }
-              : {})}
-          >
+          <span className="truncate font-medium">
             {row.type === "builtin"
               ? AUTOPILOT_AUTOMATIONS[row.kind].name
               : row.workflow.name}
@@ -371,10 +365,9 @@ export function AutopilotAutomationsOverview({
               />
             }
             getRowClassName={(row) =>
-              // Only the glow: the growing body already reveals the row, and
-              // a sliding cell would move the name under the template's label.
+              // Glows, and its cells settle in, like new rows in the GEO logs.
               row.type === "builtin" && arrived.includes(row.kind)
-                ? "motion-safe:animate-[geo-log-row-glow_2.4s_ease-out_backwards]"
+                ? "geo-log-row-arrive"
                 : undefined
             }
             getRowId={(row) => row.id}

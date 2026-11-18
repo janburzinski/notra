@@ -13,7 +13,6 @@ import {
   useReducedMotion,
 } from "motion/react";
 import { useLayoutEffect, useState } from "react";
-import { createPortal } from "react-dom";
 import { InstrumentSection } from "ui/card";
 
 import {
@@ -27,16 +26,10 @@ import {
   AUTOPILOT_TEMPLATE_TRIGGER_CHIPS,
   AUTOPILOT_TEMPLATES,
 } from "@/constants/autopilot-templates";
-import {
-  AUTOPILOT_HAND_OFF_MAX_FRAMES,
-  AUTOPILOT_ROW_NAME_ATTRIBUTE,
-} from "@/constants/autopilot-ui";
 import type { AutopilotAutomationKind } from "@/types/autopilot-metrics";
 import type {
   AutopilotTemplate,
   AutopilotTemplateActions,
-  AutopilotTemplateHandOff,
-  AutopilotTemplateHandOffTarget,
   AutopilotTemplateCardProps,
   AutopilotTemplateCategory,
 } from "@/types/autopilot-templates";
@@ -109,11 +102,6 @@ function useWrapKeys(ids: string[], columns: number) {
 
 /** Cards closing the gap. A tween, so nothing creeps after it lands. */
 const SLIDE = { duration: 0.3, ease: [0.25, 1, 0.5, 1] } as const;
-/**
- * The label travelling to the table: starts at once and ends on time, without
- * the long creep of a strong ease-out or a spring.
- */
-const HAND_OFF = { duration: 0.34, ease: [0.33, 0.7, 0.3, 1] } as const;
 
 export function AutopilotTemplatesSection({
   onMore,
@@ -123,7 +111,6 @@ export function AutopilotTemplatesSection({
   const reduceMotion = useReducedMotion();
   const [gridRef, columns] = useGridColumns();
   const [selected, setSelected] = useState<AutopilotTemplate | null>(null);
-  const [handOff, setHandOff] = useState<AutopilotTemplateHandOff | null>(null);
   // The used card leaves on the click itself, before the switch reaches the
   // cache; the next change to `jobs` (the switch, or its rollback) takes over.
   const [leaving, setLeaving] = useState<{
@@ -145,17 +132,7 @@ export function AutopilotTemplatesSection({
     templates.map((template) => template.id),
     columns
   );
-  const addFromCard = (kind: AutopilotAutomationKind, from?: HTMLElement) => {
-    if (from && !reduceMotion) {
-      const template = AUTOPILOT_TEMPLATES.find((item) => item.kind === kind);
-      if (template) {
-        setHandOff({
-          id: Date.now(),
-          template,
-          from: from.getBoundingClientRect(),
-        });
-      }
-    }
+  const addFromCard = (kind: AutopilotAutomationKind) => {
     setLeaving({ kind, jobs: actions.jobs });
     onAddBuiltIn(kind);
   };
@@ -225,13 +202,6 @@ export function AutopilotTemplatesSection({
             </m.div>
           ) : null}
         </AnimatePresence>
-        {handOff ? (
-          <AutopilotTemplateHandOffGhost
-            handOff={handOff}
-            key={handOff.id}
-            onDone={() => setHandOff(null)}
-          />
-        ) : null}
       </LazyMotion>
       <AutopilotTemplateDialog
         onAddBuiltIn={onAddBuiltIn}
@@ -245,99 +215,6 @@ export function AutopilotTemplatesSection({
         {...actions}
       />
     </>
-  );
-}
-
-/**
- * The used card's title lifts off and settles into the name cell of its new
- * row in the automations table. Template and automation share the name and
- * the type style, so only the label travels: the card's title and the row's
- * name stay hidden while it flies, and it lands exactly where the real text
- * is.
- */
-function AutopilotTemplateHandOffGhost({
-  handOff,
-  onDone,
-}: {
-  handOff: AutopilotTemplateHandOff;
-  onDone: () => void;
-}) {
-  const [target, setTarget] = useState<AutopilotTemplateHandOffTarget | null>(
-    null
-  );
-  const [lost, setLost] = useState(false);
-  const { from, template } = handOff;
-  // The label starts travelling once the row has rendered, a few frames
-  // after the click.
-  useLayoutEffect(() => {
-    let frame = 0;
-    let tries = 0;
-    const find = () => {
-      const name = document.querySelector<HTMLElement>(
-        `[${AUTOPILOT_ROW_NAME_ATTRIBUTE}="${template.kind}"]`
-      );
-      if (!name && tries < AUTOPILOT_HAND_OFF_MAX_FRAMES) {
-        tries += 1;
-        frame = requestAnimationFrame(find);
-        return;
-      }
-      const rect = name?.getBoundingClientRect();
-      if (name && rect && rect.bottom > 0 && rect.top < window.innerHeight) {
-        setTarget({ x: rect.left - from.left, y: rect.top - from.top });
-      } else {
-        // The row is off screen: fade out with the card instead.
-        setLost(true);
-      }
-    };
-    frame = requestAnimationFrame(find);
-    return () => cancelAnimationFrame(frame);
-  }, [from, template]);
-  let animate = {};
-  if (target) {
-    animate = { x: target.x, y: target.y };
-  } else if (lost) {
-    animate = { opacity: 0 };
-  }
-  // Only mounted after a click, but the server render must not reach for it.
-  if (typeof document === "undefined") {
-    return null;
-  }
-  return createPortal(
-    <m.div
-      animate={animate}
-      aria-hidden="true"
-      className="pointer-events-none fixed z-50"
-      initial={{ x: 0, y: 0, opacity: 1 }}
-      inert
-      onAnimationComplete={() => {
-        if (target || lost) {
-          onDone();
-        }
-      }}
-      style={{ top: from.top, left: from.left }}
-      transition={lost ? { duration: 0.15, ease: EASE.out } : HAND_OFF}
-    >
-      {/*
-        The card's title and the row's name stay hidden from their first
-        paint until the label has landed on the row.
-      */}
-      <style>{`[data-autopilot-template="${template.id}"],[${AUTOPILOT_ROW_NAME_ATTRIBUTE}="${template.kind}"]{visibility:hidden}`}</style>
-      {/* A plate keeps the label readable over the cards sliding under it. */}
-      <m.span
-        animate={target ? { opacity: [1, 1, 0, 0] } : { opacity: 1 }}
-        className="bg-background shadow-lift ring-foreground/10 absolute -inset-x-2 -inset-y-1 rounded-md ring-1"
-        initial={{ opacity: 1 }}
-        transition={
-          target
-            ? { duration: 0.34, ease: "linear", times: [0, 0.55, 0.85, 1] }
-            : { duration: 0 }
-        }
-      />
-      <span className="relative block text-sm leading-5 font-medium whitespace-nowrap">
-        {template.name}
-      </span>
-    </m.div>,
-    document.body
   );
 }
 
@@ -397,28 +274,28 @@ function AutopilotTemplateFlow({ template }: { template: AutopilotTemplate }) {
   const trigger = AUTOPILOT_TEMPLATE_TRIGGER_CHIPS[template.trigger];
   const output = AUTOPILOT_TEMPLATE_OUTPUT_CHIPS[template.output];
   return (
-    <span className="text-muted-foreground flex min-w-0 items-center gap-2">
-      <span className="flex items-center gap-1.5">
+    <span className="text-muted-foreground flex min-w-0 items-center gap-1.5">
+      <span className="flex min-w-0 items-center gap-1">
         <HugeiconsIcon
           aria-hidden="true"
-          className="size-3.5"
+          className="size-3.5 shrink-0"
           icon={trigger.icon}
         />
-        {trigger.label}
+        <span className="truncate">{trigger.label}</span>
       </span>
       <HugeiconsIcon
         aria-label="then"
-        className="size-3 opacity-60"
+        className="size-3 shrink-0 opacity-60"
         icon={ArrowRight02Icon}
         role="img"
       />
-      <span className="flex items-center gap-1.5">
+      <span className="flex min-w-0 items-center gap-1">
         <HugeiconsIcon
           aria-hidden="true"
-          className="size-3.5"
+          className="size-3.5 shrink-0"
           icon={output.icon}
         />
-        {output.label}
+        <span className="truncate">{output.label}</span>
       </span>
     </span>
   );
@@ -455,7 +332,8 @@ function AutopilotTemplateCard({
           </p>
         </div>
       </div>
-      <div className="flex min-h-12 flex-wrap items-center justify-between gap-2 px-3.5 py-2 text-xs">
+      {/* One line: the chips truncate before the button would wrap under them. */}
+      <div className="flex min-h-12 items-center justify-between gap-2 px-3.5 py-2 text-xs">
         {active ? (
           <StatusBadge appearance={{ variant: "success" }} label="Active" />
         ) : null}
@@ -466,20 +344,14 @@ function AutopilotTemplateCard({
           <AutopilotTemplateFlow template={template} />
         ) : null}
         <Button
-          className="relative z-10 ml-auto"
+          className="relative z-10 ml-auto shrink-0"
           aria-label={`${active ? "Open automation" : "Use template"}: ${template.name}`}
           disabled={!(active || canManage)}
-          onClick={(event) => {
+          onClick={() => {
             if (active) {
               onOpenBuiltIn(kind);
             } else if (canManage) {
-              onAddBuiltIn(
-                kind,
-                event.currentTarget
-                  .closest("article")
-                  ?.querySelector<HTMLElement>("[data-autopilot-template]") ??
-                  undefined
-              );
+              onAddBuiltIn(kind);
             }
           }}
           size="sm"
