@@ -1,0 +1,76 @@
+apps/web/src/components/feature-pages/feature-detail-page.tsx
+  s_97ea80ffc4b18c::t_772c2473aa94f2 59-62
+  s_97ea80ffc4b18c::t_4f9a6fc7323211 31,57-58,63-66,70
+apps/web/src/utils/navigation.ts
+  s_97ea80ffc4b18c::t_f08e479986d1d0 2
+  s_97ea80ffc4b18c::t_34a8f3572e5b9e 76-81
+apps/web/src/components/feature-pages/sites-stage.tsx
+  s_97ea80ffc4b18c::t_0ba1ed0c60d3cf 15,26
+apps/web/src/components/feature-pages/autopilot-card-results.tsx
+  s_97ea80ffc4b18c::t_46cbcf1031ad9a 1-74
+apps/web/src/routes/_site/features/autopilot.tsx
+  s_97ea80ffc4b18c::t_46cbcf1031ad9a 1-38
+apps/web/src/components/feature-pages/autopilot-card-workflow.tsx
+  s_97ea80ffc4b18c::t_46cbcf1031ad9a 1-37
+apps/web/src/components/feature-pages/autopilot-features.tsx
+  s_97ea80ffc4b18c::t_46cbcf1031ad9a 1-51
+apps/blog/scripts/web-chrome.js
+  ai_agent 3,10-11,161,178,181,187,193,221,246,249,462,465-466,474-475
+apps/web/src/constants/landing/footer.ts
+  s_97ea80ffc4b18c::t_34a8f3572e5b9e 49
+apps/web/src/components/feature-pages/autopilot-card-brief.tsx
+  s_97ea80ffc4b18c::t_46cbcf1031ad9a 1-12,14-107
+  s_97ea80ffc4b18c::t_88863b64c0314d 13
+apps/web/src/constants/feature-pages/stage.ts
+  s_97ea80ffc4b18c::t_0ba1ed0c60d3cf 9-12
+apps/web/src/constants/feature-pages/autopilot.ts
+  s_97ea80ffc4b18c::t_47639320ac994a 94,167
+  s_97ea80ffc4b18c::t_134be99a8684ba 3,7,16,92-93,96-117,121-135,137-141,144-165,168
+  s_97ea80ffc4b18c::t_718352c4348b41 120,136
+  s_97ea80ffc4b18c::t_46cbcf1031ad9a 1-2,4-6,8-15,17-91,95,118-119,142-143,166,169-369
+apps/web/src/components/feature-pages/stage-shell.tsx
+  s_97ea80ffc4b18c::t_1dcdffd8e842f2 37
+apps/web/src/components/feature-pages/autopilot-stage.tsx
+  s_97ea80ffc4b18c::t_46cbcf1031ad9a 1-20,22-26,28-36,41-51,56,58-65,67-71,75-76,79-81,83-84,87-88,93-94,96-98,100-194,196-227,230-241,243-265,277-282,284-307,309-314,316-338,355-400,402-428
+  s_97ea80ffc4b18c::t_134be99a8684ba 21,37-40,57,72,74,77-78,82,85-86,89-92,95,228-229,242,266-276,283,308
+  s_97ea80ffc4b18c::t_47639320ac994a 53-55,66,73,99
+  s_97ea80ffc4b18c::t_88863b64c0314d 195,315
+  s_97ea80ffc4b18c::t_6073196ad3503a 27,52
+  s_97ea80ffc4b18c::t_59e4e7c0216fd1 339-354
+  s_97ea80ffc4b18c::t_b0336b56e88d97 401
+apps/web/src/types/feature-detail-page.ts
+  s_97ea80ffc4b18c::t_4f9a6fc7323211 46-51
+  s_97ea80ffc4b18c::t_1dcdffd8e842f2 122-123
+apps/web/src/constants/feature-pages/paths.ts
+  s_97ea80ffc4b18c::t_34a8f3572e5b9e 6
+apps/web/src/styles/ui-sources.css
+  s_97ea80ffc4b18c::t_9a77e9d7f94f89 119,226,285
+  s_97ea80ffc4b18c::t_7007855773b109 125,230,287
+apps/web/src/components/feature-pages/autopilot-works-with.tsx
+  s_97ea80ffc4b18c::t_3a599079ddbf3d 63,65
+  s_97ea80ffc4b18c::t_46cbcf1031ad9a 1-62,64,66-75
+apps/web/src/types/autopilot-page.ts
+  s_97ea80ffc4b18c::t_47639320ac994a 16,27
+  s_97ea80ffc4b18c::t_46cbcf1031ad9a 1-15,17-24,30-38
+  s_97ea80ffc4b18c::t_134be99a8684ba 25-26,28-29
+apps/web/src/routeTree.gen.ts
+  s_97ea80ffc4b18c::t_c3b352b745face 80,463-467,724,827,935,1040,1143,1250,1821-1827,2155,2206,2296-2305
+apps/web/src/components/feature-pages/autopilot-card-drafts.tsx
+  s_97ea80ffc4b18c::t_46cbcf1031ad9a 1-63
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "70e43aaf19bf6c45d3cd34591c95a019161ed3ab",
+  "prompts": {},
+  "sessions": {
+    "s_97ea80ffc4b18c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a963f39b-ffc0-4357-9d72-f720f8f19f5f",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
