@@ -243,8 +243,8 @@ export const ensureLocalUser = Effect.fn("auth.sync.ensureLocalUser")(
 
     // Signup-only dependencies (multi-MB domain lists, email templates) load
     // here, not with the module: every request's auth path imports this file.
-    const { isValid: isNotDisposableEmail } = yield* Effect.promise(
-      () => import("mailchecker")
+    const { isNotDisposableEmail } = yield* Effect.promise(
+      () => import("@/lib/auth/disposable-email")
     );
     if (!isNotDisposableEmail(workosUser.email)) {
       return yield* Effect.fail(

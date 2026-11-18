@@ -4,8 +4,8 @@ import { getWorkOS } from "@workos-inc/authkit-nextjs";
 import type { User } from "@workos-inc/node";
 import { eq } from "drizzle-orm";
 import { Effect } from "effect";
-import { isValid as isNotDisposableEmail } from "mailchecker";
 
+import { isNotDisposableEmail } from "@/lib/auth/disposable-email";
 import { UserSyncError } from "@/lib/auth/errors";
 
 function buildUserName(workosUser: User) {

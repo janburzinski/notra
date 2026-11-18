@@ -23,7 +23,6 @@ import type { Invitation } from "@workos-inc/node";
 import { getWorkOS } from "@workos/authkit-session";
 import { and, count, desc, eq } from "drizzle-orm";
 import { Effect } from "effect";
-import { isValid as isNotDisposableEmail } from "mailchecker";
 
 import { ACTION_ERROR_CODES } from "@/constants/actions";
 import { QUOTA_FEATURES } from "@/constants/analytics-events";
@@ -44,6 +43,7 @@ import {
   trackServerEvent,
 } from "@/lib/analytics/posthog-server";
 import { readRequestHeaders } from "@/lib/analytics/request-headers";
+import { isNotDisposableEmail } from "@/lib/auth/disposable-email";
 import { readWorkOSError } from "@/lib/auth/workos-error";
 import { getTranslations } from "@/lib/i18n/server";
 import { failWithOrganizationMessage } from "@/lib/organizations/action-messages";

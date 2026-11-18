@@ -2,9 +2,9 @@ import { isIP } from "node:net";
 
 import { assertPublicHttpUrl } from "@notra/utils/url";
 import { DOMAINS } from "free-email-domains-list";
-import { isValid as isNotDisposableEmail } from "mailchecker";
 
 import { WWW_PREFIX_PATTERN } from "@/constants/company-domain";
+import { isNotDisposableEmail } from "@/lib/auth/disposable-email";
 import type { CompanyDomainResolution } from "@/types/onboarding";
 
 function extractDomain(value: string): string | null {
