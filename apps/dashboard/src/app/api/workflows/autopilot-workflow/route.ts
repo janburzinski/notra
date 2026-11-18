@@ -2,13 +2,13 @@ import { logError } from "@notra/ai/utils/server-log";
 import { isPgUniqueViolation } from "@notra/db/utils/pg-errors";
 
 import { AUTOPILOT_WORKFLOW_RUN_PATH } from "@/constants/autopilot-workflows";
-import { autopilotAccessState } from "@/lib/autopilot/flag";
 import {
   anyAutopilotWorkflowRunLaunched,
   dropStaleAutopilotSchedule,
   findScheduledAutopilotWorkflow,
   runAutopilotWorkflow,
 } from "@/lib/autopilot/workflows/service";
+import { autopilotAccessState } from "@/lib/billing/autopilot-entitlement";
 import { verifyQstashSignature } from "@/lib/workflows/qstash-verify";
 import { autopilotWorkflowDeliverySchema } from "@/schemas/autopilot-workflows";
 
@@ -56,7 +56,7 @@ export async function POST(request: Request) {
     return Response.json({ skipped: true });
   }
   const access = await autopilotAccessState(workflow.organizationId);
-  // A failed flag or plan lookup is not a "no": fail the delivery so QStash
+  // A failed plan lookup is not a "no": fail the delivery so QStash
   // retries it instead of dropping the scheduled run.
   if (access === "unavailable") {
     return new Response("Autopilot access check unavailable", { status: 503 });

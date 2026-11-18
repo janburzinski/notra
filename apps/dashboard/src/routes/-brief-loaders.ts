@@ -7,7 +7,7 @@ import { and, eq, ne } from "drizzle-orm";
 
 import { AUTOPILOT_BRIEF_ID_PATTERN } from "@/constants/autopilot-brief";
 import { getSession } from "@/lib/auth/actions";
-import { isAutopilotEnabledForOrganization } from "@/lib/autopilot/flag";
+import { isAutopilotEnabledForOrganization } from "@/lib/billing/autopilot-entitlement";
 import type { UiRouteInput } from "@/types/ui-route";
 import { autopilotBriefPath } from "@/utils/autopilot-brief";
 

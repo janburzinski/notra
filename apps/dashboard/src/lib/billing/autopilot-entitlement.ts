@@ -44,7 +44,7 @@ const autopilotEntitlementCache = Effect.runSync(
  * Autumn only non-production environments count as entitled; a billing outage
  * answers `unavailable` so callers can tell it apart from a denial.
  */
-export async function resolveAutopilotEntitlement(
+export async function autopilotAccessState(
   organizationId: string
 ): Promise<GeoFlagState> {
   if (allowUnmeteredAiInDevelopment) {
@@ -61,4 +61,18 @@ export async function resolveAutopilotEntitlement(
   } catch {
     return "unavailable";
   }
+}
+
+export async function isAutopilotEnabledForOrganization(
+  organizationId: string
+) {
+  return (await autopilotAccessState(organizationId)) === "enabled";
+}
+
+/**
+ * For work already underway, only a definite denial stops it. New runs and
+ * reads use `isAutopilotEnabledForOrganization`, which fails closed.
+ */
+export async function isAutopilotOffForOrganization(organizationId: string) {
+  return (await autopilotAccessState(organizationId)) === "disabled";
 }

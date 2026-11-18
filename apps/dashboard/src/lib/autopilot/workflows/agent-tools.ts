@@ -16,7 +16,6 @@ import {
   AUTOPILOT_WORKFLOW_SAVE_TOOL_NAME,
   AUTOPILOT_WORKFLOWS_PATH,
 } from "@/constants/autopilot-workflows";
-import { isAutopilotEnabledForOrganization } from "@/lib/autopilot/flag";
 import {
   AutopilotWorkflowBusyError,
   describeAutopilotWorkflowSteps,
@@ -28,6 +27,7 @@ import {
   runAutopilotWorkflow,
   saveAutopilotWorkflow,
 } from "@/lib/autopilot/workflows/service";
+import { isAutopilotEnabledForOrganization } from "@/lib/billing/autopilot-entitlement";
 import {
   agentQuestionInputSchema,
   agentQuestionOutputSchema,

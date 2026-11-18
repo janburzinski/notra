@@ -112,6 +112,20 @@ describe("reserveGitHubMentionBilling", () => {
     await releaseGitHubMentionBilling(reservation);
     expect(finalizeAutumnLock.mock.calls[0]?.[1]).toBe("release");
   });
+
+  test("confirms the minimum when usage is missing", async () => {
+    checkAutumnFeature.mockResolvedValueOnce(available(1000));
+    const reservation = await reserve();
+
+    expect(
+      await confirmGitHubMentionBilling({ reservation, usage: null })
+    ).toBe(1);
+    expect(finalizeAutumnLock.mock.calls[0]?.slice(0, 3)).toEqual([
+      lock("pull_request_credits"),
+      "confirm",
+      1,
+    ]);
+  });
 });
 
 test("collects outer steps and nested sandbox spend once", () => {

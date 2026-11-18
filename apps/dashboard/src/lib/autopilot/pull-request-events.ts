@@ -24,7 +24,6 @@ import {
   findFindingByFingerprint,
   rememberOfferComment,
 } from "@/lib/autopilot/findings";
-import { isAutopilotOffForOrganization } from "@/lib/autopilot/flag";
 import {
   getInstallationOctokit,
   getRepositoryOctokit,
@@ -38,6 +37,7 @@ import {
   createItemAutopilotRun,
   finishAutopilotRun,
 } from "@/lib/autopilot/run";
+import { isAutopilotOffForOrganization } from "@/lib/billing/autopilot-entitlement";
 import {
   getContentPullRequestState,
   markContentPullRequestReady,

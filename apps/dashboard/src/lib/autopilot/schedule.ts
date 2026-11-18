@@ -17,13 +17,13 @@ import {
   skipScheduledRunForCredits,
 } from "@/lib/autopilot/credits";
 import { syncOfferReactionFeedback } from "@/lib/autopilot/findings";
-import { isAutopilotEnabledForOrganization } from "@/lib/autopilot/flag";
 import { purgeExpiredAutopilotTraceDetails } from "@/lib/autopilot/log";
 import {
   publishDueFindings,
   resumeClearedHolds,
 } from "@/lib/autopilot/publish";
 import { startAutopilot } from "@/lib/autopilot/start";
+import { isAutopilotEnabledForOrganization } from "@/lib/billing/autopilot-entitlement";
 import type { AutopilotSchedule } from "@/types/autopilot-runtime";
 import {
   autopilotLocalDayStart,

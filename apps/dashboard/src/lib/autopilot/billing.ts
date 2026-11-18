@@ -28,7 +28,7 @@ export async function settleAutopilotBilling(params: {
   properties?: Record<string, string | number | boolean>;
 }) {
   try {
-    if (!(params.charge && params.usage)) {
+    if (!params.charge) {
       await releaseGitHubMentionBilling(params.reservation);
       return 0;
     }

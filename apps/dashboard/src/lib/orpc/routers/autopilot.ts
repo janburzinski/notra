@@ -74,7 +74,6 @@ import {
 import {
   canResetAutopilotOnboarding,
   isAutopilotWorkflowGraphEnabled,
-  resolveAutopilotAvailability,
 } from "@/lib/autopilot/flag";
 import { loadFindingImpacts } from "@/lib/autopilot/impact";
 import {
@@ -122,6 +121,7 @@ import {
   setAutopilotWorkflowEnabled,
   stopAutopilotWorkflowRun,
 } from "@/lib/autopilot/workflows/service";
+import { autopilotAccessState } from "@/lib/billing/autopilot-entitlement";
 import { authorizedProcedure, withOrganizationAccess } from "@/lib/orpc/base";
 import {
   badRequest,
@@ -145,25 +145,15 @@ import { toAutopilotCommitFilters } from "@/utils/autopilot-commit-filters";
 import { canManageAutopilot } from "@/utils/autopilot-permissions";
 import { ratelimit } from "@/utils/ratelimit";
 
-/**
- * Autopilot needs the `autopilot` flag and the `autopilot` plan feature: every
- * procedure but `get` refuses workspaces without both, and `get` returns
- * nothing but `available: false` and whether an upgrade would unlock it.
- */
-const withAutopilotFlag = os
+const withAutopilotEntitlement = os
   .$context<ORPCContext>()
   .middleware(async ({ next }, input: { organizationId: string }) => {
-    const availability = await resolveAutopilotAvailability(
-      input.organizationId
-    );
-    if (availability === "upgrade_required") {
+    const availability = await autopilotAccessState(input.organizationId);
+    if (availability === "disabled") {
       throw paymentRequired(AUTOPILOT_UPGRADE_REQUIRED_MESSAGE);
     }
     if (availability === "unavailable") {
       throw serviceUnavailable(AUTOPILOT_ACCESS_CHECK_FAILED_MESSAGE);
-    }
-    if (availability !== "enabled") {
-      throw forbidden("Autopilot is not available for this workspace yet.");
     }
     return next();
   });
@@ -245,7 +235,7 @@ export const autopilotRouter = {
   analytics: authorizedProcedure
     .input(autopilotMetricsInputSchema)
     .use(withOrganizationAccess)
-    .use(withAutopilotFlag)
+    .use(withAutopilotEntitlement)
     .handler(async ({ input }) => {
       const now = new Date();
       const [current, previous] = await Promise.all([
@@ -261,7 +251,7 @@ export const autopilotRouter = {
   metrics: authorizedProcedure
     .input(autopilotMetricsInputSchema)
     .use(withOrganizationAccess)
-    .use(withAutopilotFlag)
+    .use(withAutopilotEntitlement)
     .handler(async ({ input }) => {
       // The period before, for the trend next to each number.
       const now = new Date();
@@ -282,7 +272,7 @@ export const autopilotRouter = {
     .handler(async ({ input, context }) => {
       const { organizationId } = input;
       // Without access nothing about Autopilot leaves the server.
-      const availability = await resolveAutopilotAvailability(organizationId);
+      const availability = await autopilotAccessState(organizationId);
       // A failed check shows "try again", not "not available" or the paywall.
       if (availability === "unavailable") {
         throw serviceUnavailable(AUTOPILOT_ACCESS_CHECK_FAILED_MESSAGE);
@@ -346,7 +336,7 @@ export const autopilotRouter = {
       return {
         available: enabled,
         outOfCredits,
-        upgradeRequired: availability === "upgrade_required",
+        upgradeRequired: availability === "disabled",
         canManage: canManageAutopilot(context.auth.membership.role),
         /** Behind a flag: lets this person meet Ollie again. */
         canResetOnboarding: onboardingReset,
@@ -409,7 +399,7 @@ export const autopilotRouter = {
   run: authorizedProcedure
     .input(autopilotRunInputSchema)
     .use(withOrganizationAccess)
-    .use(withAutopilotFlag)
+    .use(withAutopilotEntitlement)
     .handler(async ({ input }) => {
       const run = await db.query.autopilotRuns.findFirst({
         where: and(
@@ -429,7 +419,7 @@ export const autopilotRouter = {
   finding: authorizedProcedure
     .input(autopilotFindingInputSchema)
     .use(withOrganizationAccess)
-    .use(withAutopilotFlag)
+    .use(withAutopilotEntitlement)
     .handler(async ({ input }) => {
       const finding = await db.query.autopilotFindings.findFirst({
         where: and(
@@ -451,7 +441,7 @@ export const autopilotRouter = {
   findingContent: authorizedProcedure
     .input(autopilotFindingInputSchema)
     .use(withOrganizationAccess)
-    .use(withAutopilotFlag)
+    .use(withAutopilotEntitlement)
     .handler(async ({ input }) => {
       try {
         return await loadFindingContent(input.organizationId, input.findingId);
@@ -467,7 +457,7 @@ export const autopilotRouter = {
   conversation: authorizedProcedure
     .input(autopilotFindingInputSchema)
     .use(withOrganizationAccess)
-    .use(withAutopilotFlag)
+    .use(withAutopilotEntitlement)
     .handler(async ({ input }) => {
       try {
         return await loadFindingConversation(
@@ -486,7 +476,7 @@ export const autopilotRouter = {
   requestChanges: authorizedProcedure
     .input(autopilotRequestChangesInputSchema)
     .use(withOrganizationAccess)
-    .use(withAutopilotFlag)
+    .use(withAutopilotEntitlement)
     .handler(async ({ input, context }) => {
       assertCanManageAutopilot(context);
       let mention: Awaited<ReturnType<typeof prepareFindingRevision>>;
@@ -519,7 +509,7 @@ export const autopilotRouter = {
   impact: authorizedProcedure
     .input(autopilotFindingInputSchema)
     .use(withOrganizationAccess)
-    .use(withAutopilotFlag)
+    .use(withAutopilotEntitlement)
     .handler(async ({ input }) => {
       const [settings, finding] = await Promise.all([
         db.query.autopilotSettings.findFirst({
@@ -548,7 +538,7 @@ export const autopilotRouter = {
   repositories: authorizedProcedure
     .input(autopilotOrganizationInputSchema)
     .use(withOrganizationAccess)
-    .use(withAutopilotFlag)
+    .use(withAutopilotEntitlement)
     .handler(async ({ input, context }) => {
       assertCanManageAutopilot(context);
       const repositories = await Effect.runPromise(
@@ -568,7 +558,7 @@ export const autopilotRouter = {
   authorSuggestions: authorizedProcedure
     .input(autopilotOrganizationInputSchema)
     .use(withOrganizationAccess)
-    .use(withAutopilotFlag)
+    .use(withAutopilotEntitlement)
     .handler(async ({ input, context }) => {
       // Admins only: the list names people from private repositories.
       assertCanManageAutopilot(context);
@@ -585,7 +575,7 @@ export const autopilotRouter = {
   save: authorizedProcedure
     .input(autopilotSaveInputSchema)
     .use(withOrganizationAccess)
-    .use(withAutopilotFlag)
+    .use(withAutopilotEntitlement)
     .handler(async ({ input, context }) => {
       assertCanManageAutopilot(context);
       await settingsCall(() =>
@@ -614,7 +604,7 @@ export const autopilotRouter = {
   onboardingIntro: authorizedProcedure
     .input(autopilotOnboardingIntroInputSchema)
     .use(withOrganizationAccess)
-    .use(withAutopilotFlag)
+    .use(withAutopilotEntitlement)
     .handler(async ({ input, context }) => {
       assertCanManageAutopilot(context);
       const rate = await ratelimit.autopilotOnboardingIntro.limit(
@@ -632,7 +622,7 @@ export const autopilotRouter = {
   onboardingTurn: authorizedProcedure
     .input(autopilotOnboardingTurnInputSchema)
     .use(withOrganizationAccess)
-    .use(withAutopilotFlag)
+    .use(withAutopilotEntitlement)
     .handler(async ({ input, context }) => {
       assertCanManageAutopilot(context);
       const rate = await ratelimit.autopilotOnboardingTurn.limit(
@@ -658,7 +648,7 @@ export const autopilotRouter = {
   resetOnboarding: authorizedProcedure
     .input(autopilotOrganizationInputSchema)
     .use(withOrganizationAccess)
-    .use(withAutopilotFlag)
+    .use(withAutopilotEntitlement)
     .handler(async ({ input, context }) => {
       assertCanManageAutopilot(context);
       if (
@@ -676,7 +666,7 @@ export const autopilotRouter = {
   update: authorizedProcedure
     .input(autopilotUpdateInputSchema)
     .use(withOrganizationAccess)
-    .use(withAutopilotFlag)
+    .use(withAutopilotEntitlement)
     .handler(async ({ input, context }) => {
       assertCanManageAutopilot(context);
       const { organizationId, ...patch } = input;
@@ -687,7 +677,7 @@ export const autopilotRouter = {
   setJob: authorizedProcedure
     .input(autopilotSetJobInputSchema)
     .use(withOrganizationAccess)
-    .use(withAutopilotFlag)
+    .use(withAutopilotEntitlement)
     .handler(async ({ input, context }) => {
       assertCanManageAutopilot(context);
       await settingsCall(() =>
@@ -699,7 +689,7 @@ export const autopilotRouter = {
   setCommitFilters: authorizedProcedure
     .input(autopilotSetCommitFiltersInputSchema)
     .use(withOrganizationAccess)
-    .use(withAutopilotFlag)
+    .use(withAutopilotEntitlement)
     .handler(async ({ input, context }) => {
       assertCanManageAutopilot(context);
       const [updated] = await db
@@ -720,7 +710,7 @@ export const autopilotRouter = {
   runNow: authorizedProcedure
     .input(autopilotRunNowInputSchema)
     .use(withOrganizationAccess)
-    .use(withAutopilotFlag)
+    .use(withAutopilotEntitlement)
     .handler(async ({ input, context }) => {
       assertCanManageAutopilot(context);
       try {
@@ -737,7 +727,7 @@ export const autopilotRouter = {
   stop: authorizedProcedure
     .input(autopilotRunInputSchema)
     .use(withOrganizationAccess)
-    .use(withAutopilotFlag)
+    .use(withAutopilotEntitlement)
     .handler(async ({ input, context }) => {
       assertCanManageAutopilot(context);
       const stopped = await stopAutopilotRun({
@@ -753,19 +743,19 @@ export const autopilotRouter = {
   jobDecisions: authorizedProcedure
     .input(autopilotJobDecisionsInputSchema)
     .use(withOrganizationAccess)
-    .use(withAutopilotFlag)
+    .use(withAutopilotEntitlement)
     .handler(({ input }) => listJobDecisions(input.organizationId, input.kind)),
 
   runEvents: authorizedProcedure
     .input(autopilotRunInputSchema)
     .use(withOrganizationAccess)
-    .use(withAutopilotFlag)
+    .use(withAutopilotEntitlement)
     .handler(({ input }) => listRunEvents(input.organizationId, input.runId)),
 
   runGraph: authorizedProcedure
     .input(autopilotRunInputSchema)
     .use(withOrganizationAccess)
-    .use(withAutopilotFlag)
+    .use(withAutopilotEntitlement)
     .handler(async ({ input }) => {
       if (!(await isAutopilotWorkflowGraphEnabled(input.organizationId))) {
         throw forbidden(
@@ -778,7 +768,7 @@ export const autopilotRouter = {
   sync: authorizedProcedure
     .input(autopilotOrganizationInputSchema)
     .use(withOrganizationAccess)
-    .use(withAutopilotFlag)
+    .use(withAutopilotEntitlement)
     .handler(async ({ input, context }) => {
       // Sync writes finding status and deletes finished branches on GitHub.
       assertCanManageAutopilot(context);
@@ -789,7 +779,7 @@ export const autopilotRouter = {
   merge: authorizedProcedure
     .input(autopilotMergeInputSchema)
     .use(withOrganizationAccess)
-    .use(withAutopilotFlag)
+    .use(withAutopilotEntitlement)
     .handler(async ({ input, context }) => {
       assertCanManageAutopilot(context);
       try {
@@ -810,7 +800,7 @@ export const autopilotRouter = {
   hold: authorizedProcedure
     .input(autopilotFindingInputSchema)
     .use(withOrganizationAccess)
-    .use(withAutopilotFlag)
+    .use(withAutopilotEntitlement)
     .handler(async ({ input, context }) => {
       assertCanManageAutopilot(context);
       try {
@@ -824,7 +814,7 @@ export const autopilotRouter = {
   writeSuggestion: authorizedProcedure
     .input(autopilotFindingInputSchema)
     .use(withOrganizationAccess)
-    .use(withAutopilotFlag)
+    .use(withAutopilotEntitlement)
     .handler(async ({ input, context }) => {
       assertCanManageAutopilot(context);
       try {
@@ -838,7 +828,7 @@ export const autopilotRouter = {
   dismiss: authorizedProcedure
     .input(autopilotDismissInputSchema)
     .use(withOrganizationAccess)
-    .use(withAutopilotFlag)
+    .use(withAutopilotEntitlement)
     .handler(async ({ input, context }) => {
       assertCanManageAutopilot(context);
       try {
@@ -858,7 +848,7 @@ export const autopilotRouter = {
   addRule: authorizedProcedure
     .input(autopilotRuleInputSchema)
     .use(withOrganizationAccess)
-    .use(withAutopilotFlag)
+    .use(withAutopilotEntitlement)
     .handler(async ({ input, context }) => {
       assertCanManageAutopilot(context);
       const saved = await addRule({
@@ -876,7 +866,7 @@ export const autopilotRouter = {
   deleteRule: authorizedProcedure
     .input(autopilotRuleIdInputSchema)
     .use(withOrganizationAccess)
-    .use(withAutopilotFlag)
+    .use(withAutopilotEntitlement)
     .handler(async ({ input, context }) => {
       assertCanManageAutopilot(context);
       await deleteRule(input.organizationId, input.ruleId);
@@ -887,13 +877,13 @@ export const autopilotRouter = {
     list: authorizedProcedure
       .input(autopilotOrganizationInputSchema)
       .use(withOrganizationAccess)
-      .use(withAutopilotFlag)
+      .use(withAutopilotEntitlement)
       .handler(({ input }) => listAutopilotWorkflows(input.organizationId)),
 
     get: authorizedProcedure
       .input(autopilotWorkflowInputSchema)
       .use(withOrganizationAccess)
-      .use(withAutopilotFlag)
+      .use(withAutopilotEntitlement)
       .handler(async ({ input }) => {
         const workflow = await getAutopilotWorkflow(
           input.organizationId,
@@ -908,7 +898,7 @@ export const autopilotRouter = {
     runGraph: authorizedProcedure
       .input(autopilotWorkflowRunInputSchema)
       .use(withOrganizationAccess)
-      .use(withAutopilotFlag)
+      .use(withAutopilotEntitlement)
       .handler(({ input }) =>
         getAutopilotWorkflowRunViews(input.organizationId, input.runId)
       ),
@@ -916,7 +906,7 @@ export const autopilotRouter = {
     run: authorizedProcedure
       .input(autopilotWorkflowInputSchema)
       .use(withOrganizationAccess)
-      .use(withAutopilotFlag)
+      .use(withAutopilotEntitlement)
       .handler(async ({ input, context }) => {
         assertCanManageAutopilot(context);
         const limit = await consumeChatGenerationRateLimit(
@@ -950,7 +940,7 @@ export const autopilotRouter = {
     stop: authorizedProcedure
       .input(autopilotWorkflowRunInputSchema)
       .use(withOrganizationAccess)
-      .use(withAutopilotFlag)
+      .use(withAutopilotEntitlement)
       .handler(async ({ input, context }) => {
         assertCanManageAutopilot(context);
         const stopped = await stopAutopilotWorkflowRun(
@@ -966,7 +956,7 @@ export const autopilotRouter = {
     setEnabled: authorizedProcedure
       .input(autopilotWorkflowEnabledInputSchema)
       .use(withOrganizationAccess)
-      .use(withAutopilotFlag)
+      .use(withAutopilotEntitlement)
       .handler(async ({ input, context }) => {
         assertCanManageAutopilot(context);
         const result = await setAutopilotWorkflowEnabled(
@@ -983,7 +973,7 @@ export const autopilotRouter = {
     delete: authorizedProcedure
       .input(autopilotWorkflowInputSchema)
       .use(withOrganizationAccess)
-      .use(withAutopilotFlag)
+      .use(withAutopilotEntitlement)
       .handler(async ({ input, context }) => {
         assertCanManageAutopilot(context);
         const result = await deleteAutopilotWorkflow(

@@ -198,8 +198,7 @@ if (process.env.NOTRA_AUTOPILOT_TEMPLATE_FLOW_TEST !== "1") {
       return gsc.inspection;
     },
   }));
-  mock.module("@/lib/autopilot/flag", () => ({
-    canResetAutopilotOnboarding: async () => false,
+  mock.module("@/lib/billing/autopilot-entitlement", () => ({
     isAutopilotEnabledForOrganization: async () => true,
     isAutopilotOffForOrganization: async () => false,
     autopilotAccessState: async () => "enabled",

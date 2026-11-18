@@ -316,7 +316,7 @@ import {
 } from "@/lib/analytics/geo-server-events";
 import { identifyProjectGroup } from "@/lib/analytics/posthog-server";
 import { assertOrganizationAccess } from "@/lib/auth/organization";
-import { isAutopilotEnabledForOrganization } from "@/lib/autopilot/flag";
+import { isAutopilotEnabledForOrganization } from "@/lib/billing/autopilot-entitlement";
 import {
   assertActiveSubscription,
   assertGeoEntitlement,
@@ -2529,7 +2529,6 @@ export const geoRouter = {
         listAutopilotPromptSuggestions(input),
         toGeoOrpcError
       );
-      // Behind the Autopilot flag, like everything else Autopilot made.
       return (await isAutopilotEnabledForOrganization(input.organizationId))
         ? result
         : { ...result, suggestions: [] };

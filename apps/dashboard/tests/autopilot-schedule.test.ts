@@ -33,8 +33,7 @@ if (process.env.NOTRA_SCHEDULE_TEST !== "1") {
       },
     },
   }));
-  mock.module("@/lib/autopilot/flag", () => ({
-    canResetAutopilotOnboarding: async () => false,
+  mock.module("@/lib/billing/autopilot-entitlement", () => ({
     isAutopilotEnabledForOrganization: async () => true,
     isAutopilotOffForOrganization: async () => false,
   }));

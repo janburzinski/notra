@@ -56,7 +56,7 @@ export interface CommandRoute {
   path: (slug: string) => string;
   requiresAiCredits?: boolean;
   settingsSection?: SettingsSectionId;
-  /** Hidden unless this feature flag is on for the workspace. */
+  /** Hidden unless this feature is visible in workspace navigation. */
   flag?: keyof NavVisibility;
 }
 

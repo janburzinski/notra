@@ -13,7 +13,7 @@ import {
 
 import { deleteArtifact, setArtifactShared } from "@/lib/artifacts/manage";
 import { loadArtifactView } from "@/lib/artifacts/view";
-import { isAutopilotEnabledForOrganization } from "@/lib/autopilot/flag";
+import { isAutopilotEnabledForOrganization } from "@/lib/billing/autopilot-entitlement";
 import { authorizedProcedure, withOrganizationAccess } from "@/lib/orpc/base";
 import { assertNotDemo, conflict, notFound } from "@/lib/orpc/utils/errors";
 

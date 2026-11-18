@@ -66,6 +66,7 @@ export interface AutopilotWorkflowAgentPromptParams {
 
 export interface AutopilotWorkflowAgentCall {
   organizationId: string;
+  idempotencyKey: string;
   tag: string;
   instructions: string;
   prompt: string;

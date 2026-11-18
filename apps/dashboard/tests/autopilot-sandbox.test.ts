@@ -42,7 +42,7 @@ if (process.env.NOTRA_AUTOPILOT_SANDBOX_TEST !== "1") {
 } else {
   const sandbox = await createAutopilotSandbox();
   const db = sandbox.db;
-  const startup = { finishBeforeError: false, flag: true };
+  const startup = { finishBeforeError: false, entitled: true };
   mock.module("@/lib/workflows/start", () => ({
     startWorkflowGraphRun: async (payload: {
       input: { autopilotRunId: string };
@@ -58,11 +58,11 @@ if (process.env.NOTRA_AUTOPILOT_SANDBOX_TEST !== "1") {
     },
   }));
   mock.module("@notra/db/drizzle", () => ({ db }));
-  mock.module("@/lib/autopilot/flag", () => ({
-    canResetAutopilotOnboarding: async () => false,
-    isAutopilotEnabledForOrganization: async () => startup.flag,
-    isAutopilotOffForOrganization: async () => !startup.flag,
-    autopilotAccessState: async () => (startup.flag ? "enabled" : "disabled"),
+  mock.module("@/lib/billing/autopilot-entitlement", () => ({
+    isAutopilotEnabledForOrganization: async () => startup.entitled,
+    isAutopilotOffForOrganization: async () => !startup.entitled,
+    autopilotAccessState: async () =>
+      startup.entitled ? "enabled" : "disabled",
   }));
   const emptyJob = async () => ({ findingIds: [], insights: [] });
   const notRun = async () => {
@@ -240,7 +240,7 @@ if (process.env.NOTRA_AUTOPILOT_SANDBOX_TEST !== "1") {
   afterAll(() => sandbox.postgres.close());
   beforeEach(async () => {
     startup.finishBeforeError = false;
-    startup.flag = true;
+    startup.entitled = true;
     github.state = null;
     github.respond = null;
     await sandbox.postgres.exec(
@@ -253,8 +253,8 @@ if (process.env.NOTRA_AUTOPILOT_SANDBOX_TEST !== "1") {
     });
   });
 
-  test("a revoked flag blocks resumed jobs and Slack delivery", async () => {
-    startup.flag = false;
+  test("a revoked entitlement blocks resumed jobs and Slack delivery", async () => {
+    startup.entitled = false;
     await expect(
       buildAutopilotRunContext("sandbox-org", "item-run")
     ).rejects.toThrow("not available");

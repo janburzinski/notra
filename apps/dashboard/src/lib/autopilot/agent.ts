@@ -27,7 +27,6 @@ import {
   writeSuggestedFinding,
 } from "@/lib/autopilot/finding-actions";
 import { mergeFinding } from "@/lib/autopilot/findings";
-import { resolveAutopilotAvailability } from "@/lib/autopilot/flag";
 import { addRule, deleteRule, listRules } from "@/lib/autopilot/rules";
 import {
   AutopilotSettingsError,
@@ -42,6 +41,7 @@ import {
   setAutopilotWorkflowEnabled,
   stopAutopilotWorkflowRun,
 } from "@/lib/autopilot/workflows/service";
+import { autopilotAccessState } from "@/lib/billing/autopilot-entitlement";
 import { resolveSlackMember } from "@/lib/integrations/slack/member";
 import { canManageAutopilot } from "@/utils/autopilot-permissions";
 
@@ -359,18 +359,12 @@ async function runAction(
 
 export async function handleAutopilotAgentRequest(request: AgentRequest) {
   const { organizationId, slack, action } = request;
-  const availability = await resolveAutopilotAvailability(organizationId);
+  const availability = await autopilotAccessState(organizationId);
   if (availability === "unavailable") {
     throw new AutopilotAgentError(503, AUTOPILOT_ACCESS_CHECK_FAILED_MESSAGE);
   }
-  if (availability === "upgrade_required") {
+  if (availability === "disabled") {
     throw new AutopilotAgentError(402, AUTOPILOT_UPGRADE_REQUIRED_MESSAGE);
-  }
-  if (availability !== "enabled") {
-    throw new AutopilotAgentError(
-      403,
-      "Autopilot is not available for this workspace yet."
-    );
   }
   const member = await resolveSlackMember(
     organizationId,

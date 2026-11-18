@@ -9,9 +9,9 @@ import {
   AUTOPILOT_TEMPLATE_WORKFLOW_KEYS,
 } from "@/constants/workflow-engine";
 import { resolveAutopilotCredits } from "@/lib/autopilot/credits";
-import { isAutopilotEnabledForOrganization } from "@/lib/autopilot/flag";
 import { claimAutopilotRun } from "@/lib/autopilot/run";
 import { runTransition } from "@/lib/autopilot/transitions";
+import { isAutopilotEnabledForOrganization } from "@/lib/billing/autopilot-entitlement";
 import { startWorkflowRun } from "@/lib/workflow-engine/start";
 import type { AutopilotAutomationKind } from "@/types/autopilot-metrics";
 import type { AutopilotRunTrigger } from "@/types/autopilot-runtime";
@@ -21,7 +21,6 @@ export async function startAutopilot(
   trigger: AutopilotRunTrigger,
   kind?: AutopilotAutomationKind
 ): Promise<{ runId: string; alreadyRunning: boolean }> {
-  // Every run starts here, so a workspace without the flag never runs one.
   if (!(await isAutopilotEnabledForOrganization(organizationId))) {
     throw new Error("Autopilot is not available for this workspace");
   }

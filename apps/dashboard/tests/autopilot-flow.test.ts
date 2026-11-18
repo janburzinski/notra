@@ -69,8 +69,9 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
   mock.module("@notra/db/drizzle", () => ({ db }));
   const state = {
     postContent: null as string | null,
-    flag: true,
+    entitled: true,
     credits: true,
+    reportUsage: true,
     confidence: 0.99,
     billingCrash: false,
     crash: false,
@@ -366,11 +367,10 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
     resolveGitHubMentionAuth: async () =>
       state.linkedReaction ? { userId: "sandbox-user" } : null,
   }));
-  mock.module("@/lib/autopilot/flag", () => ({
-    canResetAutopilotOnboarding: async () => false,
-    isAutopilotEnabledForOrganization: async () => state.flag,
-    isAutopilotOffForOrganization: async () => !state.flag,
-    autopilotAccessState: async () => (state.flag ? "enabled" : "disabled"),
+  mock.module("@/lib/billing/autopilot-entitlement", () => ({
+    isAutopilotEnabledForOrganization: async () => state.entitled,
+    isAutopilotOffForOrganization: async () => !state.entitled,
+    autopilotAccessState: async () => (state.entitled ? "enabled" : "disabled"),
   }));
   const githubIntegration = await import("@notra/ai/integrations/github");
   mock.module("@notra/ai/integrations/github", () => ({
@@ -505,7 +505,7 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
         );
       }
       if (state.disableWhileWriting) {
-        state.flag = false;
+        state.entitled = false;
       }
       if (state.disableSettingsWhileWriting) {
         await db
@@ -516,12 +516,14 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
       if (state.crash) {
         throw new Error("Sandbox writer stopped");
       }
-      input.onUsage?.({
-        modelId: "sandbox",
-        inputTokens: 10,
-        outputTokens: 20,
-        totalTokens: 30,
-      });
+      if (state.reportUsage) {
+        input.onUsage?.({
+          modelId: "sandbox",
+          inputTokens: 10,
+          outputTokens: 20,
+          totalTokens: 30,
+        });
+      }
       return {
         title: "Sandbox exports",
         slug: "sandbox-exports",
@@ -755,8 +757,9 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
     openedBodies.length = 0;
     state.gaps = [];
     state.aiSearchGaps = [];
-    state.flag = true;
+    state.entitled = true;
     state.credits = true;
+    state.reportUsage = true;
     state.confidence = 0.99;
     state.billingCrash = false;
     state.crash = false;
@@ -1468,6 +1471,15 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
     ).toBe(true);
   });
 
+  test("an opened draft confirms the hold even without usage telemetry", async () => {
+    state.reportUsage = false;
+    await askToWrite();
+    expect(opened).toHaveLength(1);
+    expect(charges).toHaveLength(1);
+    expect(charges[0]).toMatchObject({ usage: null });
+    expect(release).not.toHaveBeenCalled();
+  });
+
   for (const duringWriting of [true, false]) {
     test(`a canceled source ${duringWriting ? "during writing" : "before the claim"} leaves no post or charge`, async () => {
       state.cancelDuringWriting = duringWriting;
@@ -1712,13 +1724,13 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
     expect(release).not.toHaveBeenCalled();
   });
 
-  test("a revoked flag is rechecked by the queued worker before credits or writes", async () => {
+  test("a revoked entitlement is rechecked before a queued write reserves credits", async () => {
     await handleAutopilotPullRequestEvent(event());
     const idea = await db.query.autopilotFindings.findFirst();
     if (!idea) {
       throw new Error("Expected a suggestion");
     }
-    state.flag = false;
+    state.entitled = false;
     await expect(
       autopilotSuggestionWorkflow({
         organizationId: "sandbox-org",
@@ -1730,7 +1742,7 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
     expect(release).not.toHaveBeenCalled();
   });
 
-  test("revoking the flag during generation prevents a PR and releases credits", async () => {
+  test("losing plan access during generation prevents a PR and releases credits", async () => {
     await handleAutopilotPullRequestEvent(event());
     const idea = await db.query.autopilotFindings.findFirst();
     if (!idea) {

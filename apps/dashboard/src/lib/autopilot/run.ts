@@ -43,7 +43,6 @@ import {
 } from "@/lib/autopilot/brief-page";
 import { loadRecentDailyNotes } from "@/lib/autopilot/daily-notes";
 import { syncFindingPullRequests } from "@/lib/autopilot/findings";
-import { autopilotAccessState } from "@/lib/autopilot/flag";
 import {
   withAutopilotRunLease,
   renewAutopilotRunLease,
@@ -55,6 +54,7 @@ import {
   loadAutopilotSiteTarget,
 } from "@/lib/autopilot/sites";
 import { runTransition } from "@/lib/autopilot/transitions";
+import { autopilotAccessState } from "@/lib/billing/autopilot-entitlement";
 import {
   failWorkflowRunTrees,
   workflowRunTreeHasErrors,

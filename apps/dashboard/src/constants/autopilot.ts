@@ -10,7 +10,6 @@ import type { StatusBadgeAppearance } from "@notra/ui/types/status-badge";
 
 import type { AutopilotOutcomeKey } from "@/types/autopilot-metrics";
 
-export const AUTOPILOT_FLAG_KEY = "autopilot";
 export const AUTOPILOT_WORKFLOW_GRAPH_FLAG_KEY = "autopilot-workflow-graph";
 /** Lets whoever has it reset a workspace's onboarding and meet Ollie again. */
 export const AUTOPILOT_ONBOARDING_RESET_FLAG_KEY = "autopilot-onboarding-reset";

@@ -193,7 +193,6 @@ export const NAV_GROUPS: readonly NavGroup[] = [
     labelKey: "feedback",
     links: [AGENT_FEEDBACK_NAV_LINK],
   },
-  // Behind the autopilot flag; resolveNavItems drops it when the flag is off.
   {
     id: "autopilot",
     icon: Rocket01Icon,

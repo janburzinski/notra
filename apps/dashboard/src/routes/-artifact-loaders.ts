@@ -11,7 +11,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { and, eq, ne } from "drizzle-orm";
 
 import { getSession } from "@/lib/auth/actions";
-import { isAutopilotEnabledForOrganization } from "@/lib/autopilot/flag";
+import { isAutopilotEnabledForOrganization } from "@/lib/billing/autopilot-entitlement";
 import type { UiRouteInput } from "@/types/ui-route";
 
 const ARTIFACT_ID_PATTERN = new RegExp(

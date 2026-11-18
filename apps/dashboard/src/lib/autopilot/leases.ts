@@ -7,7 +7,7 @@ import {
 import { and, eq } from "drizzle-orm";
 
 import { AUTOPILOT_LEASE_RENEW_INTERVAL_MS } from "@/constants/autopilot";
-import { isAutopilotOffForOrganization } from "@/lib/autopilot/flag";
+import { isAutopilotOffForOrganization } from "@/lib/billing/autopilot-entitlement";
 import type { AutopilotRunContext } from "@/types/autopilot";
 import type { FindingClaim } from "@/types/autopilot-runtime";
 import { withHeartbeat } from "@/utils/autopilot-leases";

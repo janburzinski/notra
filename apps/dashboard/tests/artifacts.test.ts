@@ -38,14 +38,10 @@ if (process.env.NOTRA_ARTIFACTS_TEST !== "1") {
   const db = sandbox.db;
   mock.module("@notra/db/drizzle", () => ({ db }));
   const gate = { on: true };
-  mock.module("@/lib/autopilot/flag", () => ({
-    canResetAutopilotOnboarding: async () => false,
+  mock.module("@/lib/billing/autopilot-entitlement", () => ({
     isAutopilotEnabledForOrganization: async () => gate.on,
     isAutopilotOffForOrganization: async () => !gate.on,
     autopilotAccessState: async () => (gate.on ? "enabled" : "disabled"),
-    resolveAutopilotAvailability: async () =>
-      gate.on ? "enabled" : "upgrade_required",
-    isAutopilotWorkflowGraphEnabled: async () => false,
   }));
   const repos = createInMemoryRepos();
   const failures = { deleteRepo: false };

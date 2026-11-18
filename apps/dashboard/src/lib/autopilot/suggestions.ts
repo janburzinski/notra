@@ -11,7 +11,6 @@ import {
   returnFindingToSuggested,
   recoverStaleFindings,
 } from "@/lib/autopilot/findings";
-import { isAutopilotEnabledForOrganization } from "@/lib/autopilot/flag";
 import { renewAutopilotRunLease } from "@/lib/autopilot/leases";
 import { createAutopilotLogger } from "@/lib/autopilot/log";
 import {
@@ -19,6 +18,7 @@ import {
   createItemAutopilotRun,
   finishAutopilotRun,
 } from "@/lib/autopilot/run";
+import { isAutopilotEnabledForOrganization } from "@/lib/billing/autopilot-entitlement";
 import type { FindingClaim } from "@/types/autopilot-runtime";
 import { toErrorMessage } from "@/utils/error-message";
 

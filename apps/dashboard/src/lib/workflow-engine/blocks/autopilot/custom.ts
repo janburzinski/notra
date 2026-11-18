@@ -202,9 +202,10 @@ export const customAutopilotBlocks = [
       "Runs the agent with GEO data and web search on the instructions, which can embed earlier outputs. Output: text.",
     configSchema: askAgentConfigSchema,
     sideEffect: true,
-    run: async ({ organizationId, config, node }) => {
+    run: async ({ organizationId, config, idempotencyKey, node }) => {
       const text = await runAutopilotAgentText({
         organizationId,
+        idempotencyKey,
         tag: "agent",
         instructions: AUTOPILOT_WORKFLOW_STEP_INSTRUCTIONS,
         prompt: autopilotWorkflowAgentPrompt({
@@ -229,9 +230,10 @@ export const customAutopilotBlocks = [
     outputs: AUTOPILOT_WORKFLOW_DECIDE_PORTS,
     configSchema: decideConfigSchema,
     sideEffect: true,
-    run: async ({ organizationId, config, node }) => {
+    run: async ({ organizationId, config, idempotencyKey, node }) => {
       const decision = await runAutopilotAgentDecision({
         organizationId,
+        idempotencyKey,
         tag: "decide",
         instructions: `${AUTOPILOT_WORKFLOW_STEP_INSTRUCTIONS} Decide the question with yes or no.`,
         prompt: autopilotWorkflowAgentPrompt({

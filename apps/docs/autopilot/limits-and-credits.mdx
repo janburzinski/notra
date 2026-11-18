@@ -31,18 +31,18 @@ Autopilot charges when it opens a pull request. You pay what the model calls for
 | **Ask the agent** and **Let the agent decide** steps in [workflows](/autopilot/workflows), from AI credits | Runs that find nothing to change, writes that fail, and pull requests that don't open |
 | Changes you ask for on a pull request, like a GitHub mention | |
 
-Credits come from your plan's **pull request credits** first, then from your AI credits:
+Pull request work uses your plan's **pull request credits** first, then your AI credits. The GitHub bot and Autopilot share the same pull request credit balance. The two agent workflow steps use AI credits only.
 
-| Plan | Pull request credits |
-| --- | --- |
-| Free | $1, once |
-| Starter | $10 per month |
-| Growth | $15 per month |
-| Scale | $25 per month |
+| Plan | Pull request credits | Autopilot |
+| --- | --- | --- |
+| Free | 100 credits, once | Not included |
+| Starter | 1,000 credits per month | Not included |
+| Growth | 3,000 credits per month | Included |
+| Scale | 5,000 credits per month | Included |
 
 Your remaining budget is under **Settings → Billing → Usage** (see [Billing](/organization/billing)). What each automation costs per run is on its page and on the **Automations** tab.
 
-Running out doesn't stop Autopilot. A post it would have opened is saved as an idea, a fix is tried again the next day without counting as a failure, and writing an idea from the dashboard says "No credits left to write this post. Add AI credits in Notra and try again."
+When both balances are empty, Autopilot skips scheduled runs until credits reset or you top up. If credits run out during a run, Autopilot can save a post as an idea or retry a fix without counting it as a failed write. An agent workflow step stops if AI credits are unavailable, even if pull request credits remain.
 
 ## Limits
 

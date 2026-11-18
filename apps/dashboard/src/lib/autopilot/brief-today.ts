@@ -4,7 +4,7 @@ import { and, desc, eq, gte } from "drizzle-orm";
 
 import { AUTOPILOT_BRIEF_PREVIEW_ITEMS } from "@/constants/autopilot-brief";
 import { loadBriefFindings } from "@/lib/autopilot/brief-page";
-import { isAutopilotEnabledForOrganization } from "@/lib/autopilot/flag";
+import { isAutopilotEnabledForOrganization } from "@/lib/billing/autopilot-entitlement";
 import { autopilotBriefPath } from "@/utils/autopilot-brief";
 import { autopilotLocalDayStart } from "@/utils/autopilot-schedule";
 

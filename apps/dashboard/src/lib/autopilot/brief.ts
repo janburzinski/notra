@@ -14,13 +14,13 @@ import {
   AUTOPILOT_NAV_LINK,
 } from "@/constants/autopilot";
 import { AUTOPILOT_SLACK_KIND_LABELS } from "@/constants/autopilot-slack";
-import { isAutopilotOffForOrganization } from "@/lib/autopilot/flag";
 import { createAutopilotLogger } from "@/lib/autopilot/log";
 import { attachSitePreviews } from "@/lib/autopilot/sites";
 import {
   callAutopilotSlack,
   postAutopilotSlackMessage,
 } from "@/lib/autopilot/slack";
+import { isAutopilotOffForOrganization } from "@/lib/billing/autopilot-entitlement";
 import type { AutopilotFindingRow as FindingRow } from "@/types/autopilot-runtime";
 import type {
   AutopilotBrief,

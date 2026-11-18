@@ -12,7 +12,7 @@ import { and, eq } from "drizzle-orm";
 import { loadAutopilotActionContext } from "@/lib/autopilot/action-context";
 import { loadBriefFindings } from "@/lib/autopilot/brief-page";
 import { recoverStaleFindings } from "@/lib/autopilot/findings";
-import { isAutopilotEnabledForOrganization } from "@/lib/autopilot/flag";
+import { isAutopilotEnabledForOrganization } from "@/lib/billing/autopilot-entitlement";
 import { slackThreadUrl } from "@/utils/autopilot-brief";
 import { findingDisplayTitle } from "@/utils/autopilot-findings";
 

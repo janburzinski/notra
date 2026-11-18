@@ -46,7 +46,6 @@ import {
   dismissSuggestedFinding,
   findFindingByFingerprint,
 } from "@/lib/autopilot/findings";
-import { isAutopilotOffForOrganization } from "@/lib/autopilot/flag";
 import { generateAutopilotObject } from "@/lib/autopilot/llm";
 import { createAutopilotLogger } from "@/lib/autopilot/log";
 import { rememberFeedback } from "@/lib/autopilot/memory";
@@ -61,6 +60,7 @@ import {
   createItemAutopilotRun,
   finishAutopilotRun,
 } from "@/lib/autopilot/run";
+import { isAutopilotOffForOrganization } from "@/lib/billing/autopilot-entitlement";
 import { autopilotFeedbackSchema } from "@/schemas/autopilot";
 import type {
   AutopilotJobResult,

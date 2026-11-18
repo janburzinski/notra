@@ -22,7 +22,7 @@ if (process.env.NOTRA_AUTOPILOT_AGENT_TEST !== "1") {
 } else {
   const schema = await import("@notra/db/schema");
   const state = {
-    flag: true,
+    entitled: true,
     integration: { id: "slk_1", encryptedBotToken: "enc" } as unknown,
     memberRows: [] as { userId: string; role: string }[],
     destination: [{ organizationId: "org_1", encryptedBotToken: "enc" }],
@@ -104,14 +104,10 @@ if (process.env.NOTRA_AUTOPILOT_AGENT_TEST !== "1") {
     ...slackWorkspace,
     getSlackIntegrationBotToken: () => "xoxb-fixture",
   }));
-  mock.module("@/lib/autopilot/flag", () => ({
-    canResetAutopilotOnboarding: async () => false,
-    isAutopilotEnabledForOrganization: async () => state.flag,
-    isAutopilotOffForOrganization: async () => !state.flag,
-    resolveAutopilotAvailability: async () =>
-      state.flag ? "enabled" : "disabled",
-    autopilotAccessState: async () => (state.flag ? "enabled" : "disabled"),
-    isAutopilotWorkflowGraphEnabled: async () => false,
+  mock.module("@/lib/billing/autopilot-entitlement", () => ({
+    isAutopilotEnabledForOrganization: async () => state.entitled,
+    isAutopilotOffForOrganization: async () => !state.entitled,
+    autopilotAccessState: async () => (state.entitled ? "enabled" : "disabled"),
   }));
   const dismissFinding = mock(async () => ({ id: "f1", status: "dismissed" }));
   const findings = await import("@/lib/autopilot/findings");
@@ -267,7 +263,7 @@ if (process.env.NOTRA_AUTOPILOT_AGENT_TEST !== "1") {
     expect(dismissWithFeedback).not.toHaveBeenCalled();
   });
 
-  test("unlinked Slack users and workspaces without the flag are refused", async () => {
+  test("unlinked Slack users and workspaces without an eligible plan are refused", async () => {
     clearSlackMemberCache();
     slackUser("ULONER");
     state.memberRows = [];
@@ -277,14 +273,14 @@ if (process.env.NOTRA_AUTOPILOT_AGENT_TEST !== "1") {
       status: 403,
       message: expect.stringMatching(/isn't linked/),
     });
-    state.flag = false;
+    state.entitled = false;
     await expect(
       handleAutopilotAgentRequest(request("ULONER", { type: "status" }))
     ).rejects.toMatchObject({
-      status: 403,
-      message: expect.stringMatching(/not available/),
+      status: 402,
+      message: expect.stringMatching(/Upgrade/),
     });
-    state.flag = true;
+    state.entitled = true;
   });
 
   test("admins dismiss with a reason and ids must belong to the workspace", async () => {

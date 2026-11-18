@@ -24,7 +24,7 @@ if (process.env.NOTRA_AUTOPILOT_ROUTER_TEST !== "1") {
 } else {
   const state = {
     role: "admin",
-    flag: true,
+    entitled: true,
     settingsExist: true,
   };
   const writes: { insert?: Record<string, unknown>; update?: unknown }[] = [];
@@ -89,12 +89,13 @@ if (process.env.NOTRA_AUTOPILOT_ROUTER_TEST !== "1") {
   }));
   mock.module("@/lib/autopilot/flag", () => ({
     canResetAutopilotOnboarding: async () => false,
-    isAutopilotEnabledForOrganization: async () => state.flag,
-    isAutopilotOffForOrganization: async () => !state.flag,
-    resolveAutopilotAvailability: async () =>
-      state.flag ? "enabled" : "disabled",
-    autopilotAccessState: async () => (state.flag ? "enabled" : "disabled"),
-    isAutopilotWorkflowGraphEnabled: async () => state.flag,
+    isAutopilotWorkflowGraphEnabled: async () => false,
+  }));
+  const autumnModule = await import("@notra/ai/billing/autumn");
+  mock.module("@notra/ai/billing/autumn", () => ({
+    ...autumnModule,
+    allowUnmeteredAiInDevelopment: false,
+    autumn: { check: async () => ({ allowed: state.entitled }) },
   }));
   const findings = await import("@/lib/autopilot/findings");
   mock.module("@/lib/autopilot/findings", () => ({
@@ -166,7 +167,7 @@ if (process.env.NOTRA_AUTOPILOT_ROUTER_TEST !== "1") {
   test("setJob merges one job and needs saved settings", async () => {
     writes.length = 0;
     state.role = "admin";
-    state.flag = true;
+    state.entitled = true;
     state.settingsExist = true;
     const input = {
       organizationId: "org_fixture",
@@ -184,19 +185,19 @@ if (process.env.NOTRA_AUTOPILOT_ROUTER_TEST !== "1") {
     state.settingsExist = true;
   });
 
-  test("sync needs an admin and the Autopilot flag", async () => {
+  test("sync needs an eligible plan and an admin", async () => {
     sync.mockClear();
     state.role = "member";
     await expect(
       call(autopilotRouter.sync, { organizationId: "org_fixture" }, { context })
     ).rejects.toMatchObject({ code: "FORBIDDEN" });
     state.role = "admin";
-    state.flag = false;
+    state.entitled = false;
     await expect(
-      call(autopilotRouter.sync, { organizationId: "org_fixture" }, { context })
-    ).rejects.toMatchObject({ code: "FORBIDDEN" });
+      call(autopilotRouter.sync, { organizationId: "org_upgrade" }, { context })
+    ).rejects.toMatchObject({ code: "PAYMENT_REQUIRED" });
     expect(sync).not.toHaveBeenCalled();
-    state.flag = true;
+    state.entitled = true;
     await call(
       autopilotRouter.sync,
       { organizationId: "org_fixture" },
@@ -215,7 +216,7 @@ if (process.env.NOTRA_AUTOPILOT_ROUTER_TEST !== "1") {
       fn.mockClear();
     }
     calls.length = 0;
-    state.flag = true;
+    state.entitled = true;
     state.role = "member";
     const input = { organizationId: "org_fixture", findingId: "idea" };
     await expect(
