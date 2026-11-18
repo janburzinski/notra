@@ -2,7 +2,7 @@ import { logError } from "@notra/ai/utils/server-log";
 import { db } from "@notra/db/drizzle";
 import { autopilotRuns, autopilotSettings } from "@notra/db/schema";
 import { mapWithConcurrency } from "@notra/sites-server/utils/concurrency";
-import { and, count, eq, gte, max } from "drizzle-orm";
+import { and, count, eq, gte, max, sql } from "drizzle-orm";
 
 import {
   AUTOPILOT_CRON_CONCURRENCY,
@@ -12,6 +12,10 @@ import {
   AUTOPILOT_RUN_RETRY_BACKOFF_MS,
 } from "@/constants/autopilot";
 import { AUTOPILOT_DEFAULT_APPROVALS } from "@/constants/autopilot-publish";
+import {
+  resolveAutopilotCredits,
+  skipScheduledRunForCredits,
+} from "@/lib/autopilot/credits";
 import { syncOfferReactionFeedback } from "@/lib/autopilot/findings";
 import { isAutopilotEnabledForOrganization } from "@/lib/autopilot/flag";
 import { purgeExpiredAutopilotTraceDetails } from "@/lib/autopilot/log";
@@ -43,7 +47,14 @@ async function canAttemptScheduledRun(
   now: Date
 ) {
   const [attempts] = await db
-    .select({ total: count(), latest: max(autopilotRuns.startedAt) })
+    .select({
+      total: count(),
+      latest: max(autopilotRuns.startedAt),
+      skipped:
+        sql<number>`count(*) filter (where ${autopilotRuns.status} = 'skipped')`.mapWith(
+          Number
+        ),
+    })
     .from(autopilotRuns)
     .where(
       and(
@@ -58,6 +69,10 @@ async function canAttemptScheduledRun(
   const total = attempts?.total ?? 0;
   if (total === 0 || !attempts?.latest) {
     return true;
+  }
+  // One "no credits" entry a day is enough; tomorrow's run checks again.
+  if (attempts.skipped > 0) {
+    return false;
   }
   if (total >= AUTOPILOT_DAILY_RUN_MAX_ATTEMPTS) {
     return false;
@@ -132,6 +147,13 @@ export async function runDueAutopilots() {
         return;
       }
       if (!(await canAttemptScheduledRun(row.organizationId, row, now))) {
+        return;
+      }
+      // With nothing to spend every draft would be refused, so the planner,
+      // dream and brief calls aren't made either. Unknown still runs: each
+      // draft checks its own credits.
+      if ((await resolveAutopilotCredits(row.organizationId)) === "exhausted") {
+        await skipScheduledRunForCredits(row.organizationId, row.timezone, now);
         return;
       }
       const claim = await startAutopilot(row.organizationId, "cron");

@@ -5,7 +5,17 @@ import {
   autopilotRunEvents,
   autopilotRuns,
 } from "@notra/db/schema";
-import { and, count, eq, gte, inArray, isNotNull, lte, sql } from "drizzle-orm";
+import {
+  and,
+  count,
+  eq,
+  gte,
+  inArray,
+  isNotNull,
+  lte,
+  ne,
+  sql,
+} from "drizzle-orm";
 
 import {
   AUTOPILOT_CREDITS_CHARGED_EVENT,
@@ -129,6 +139,8 @@ export async function loadAutopilotAnalytics(
         .where(
           and(
             eq(autopilotRuns.organizationId, organizationId),
+            // Skipped runs (no credits left) never started, so they aren't runs.
+            ne(autopilotRuns.status, "skipped"),
             gte(autopilotRuns.startedAt, since),
             lte(autopilotRuns.startedAt, now)
           )

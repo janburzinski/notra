@@ -3,10 +3,12 @@ import { db } from "@notra/db/drizzle";
 import { autopilotRuns, autopilotSettings } from "@notra/db/schema";
 import { and, eq } from "drizzle-orm";
 
+import { AUTOPILOT_NO_CREDITS_MESSAGE } from "@/constants/autopilot";
 import {
   AUTOPILOT_DAILY_WORKFLOW_KEY,
   AUTOPILOT_TEMPLATE_WORKFLOW_KEYS,
 } from "@/constants/workflow-engine";
+import { resolveAutopilotCredits } from "@/lib/autopilot/credits";
 import { isAutopilotEnabledForOrganization } from "@/lib/autopilot/flag";
 import { claimAutopilotRun } from "@/lib/autopilot/run";
 import { runTransition } from "@/lib/autopilot/transitions";
@@ -33,6 +35,13 @@ export async function startAutopilot(
   const jobs = { ...AUTOPILOT_DEFAULT_JOBS, ...settings.jobs };
   if (kind && !jobs[kind]) {
     throw new Error("Turn this automation on before running it.");
+  }
+  // The scheduler checks credits itself and records a skipped run instead.
+  if (
+    trigger !== "cron" &&
+    (await resolveAutopilotCredits(organizationId)) === "exhausted"
+  ) {
+    throw new Error(AUTOPILOT_NO_CREDITS_MESSAGE);
   }
   const workflowKey = kind
     ? AUTOPILOT_TEMPLATE_WORKFLOW_KEYS[kind]

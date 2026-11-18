@@ -163,7 +163,7 @@ function RunEndNotice({ run }: AutopilotRunEndNoticeProps) {
     <p
       className={cn(
         "rounded-xl border px-4 py-3 text-sm",
-        run.status === "stopped"
+        run.status === "stopped" || run.status === "skipped"
           ? "text-muted-foreground bg-muted/40"
           : "text-destructive bg-destructive/5"
       )}

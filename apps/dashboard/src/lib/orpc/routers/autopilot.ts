@@ -57,6 +57,7 @@ import {
 import { AUTOPILOT_DAILY_WORKFLOW_KEY } from "@/constants/workflow-engine";
 import { loadAutopilotAnalytics } from "@/lib/autopilot/analytics";
 import { listRecentPullRequestAuthors } from "@/lib/autopilot/authors";
+import { resolveAutopilotCredits } from "@/lib/autopilot/credits";
 import {
   dismissFindingWithFeedback,
   writeSuggestedFinding,
@@ -163,6 +164,25 @@ function assertCanManageAutopilot(context: {
   if (!canManageAutopilot(context.auth.membership.role)) {
     throw forbidden("Only workspace admins can change Autopilot.");
   }
+}
+
+/**
+ * Only asks billing after a skipped scheduled run, so the notice clears as
+ * soon as a top-up or reset lands rather than at the next scheduled run.
+ */
+async function isOutOfCredits(organizationId: string) {
+  const latest = await db.query.autopilotRuns.findFirst({
+    columns: { status: true },
+    where: and(
+      eq(autopilotRuns.organizationId, organizationId),
+      inArray(autopilotRuns.trigger, AUTOPILOT_SCHEDULED_TRIGGERS)
+    ),
+    orderBy: [desc(autopilotRuns.startedAt)],
+  });
+  return (
+    latest?.status === "skipped" &&
+    (await resolveAutopilotCredits(organizationId)) === "exhausted"
+  );
 }
 
 function templateTitle(workflowKey: string | null) {
@@ -304,9 +324,13 @@ export const autopilotRouter = {
         enabled ? isAutopilotWorkflowGraphEnabled(organizationId) : false,
         enabled ? listAutopilotSites(organizationId) : [],
       ]);
-      const describedRuns = await describeRuns(organizationId, runs);
+      const [describedRuns, outOfCredits] = await Promise.all([
+        describeRuns(organizationId, runs),
+        enabled ? isOutOfCredits(organizationId) : false,
+      ]);
       return {
         available: enabled,
+        outOfCredits,
         upgradeRequired: availability === "upgrade_required",
         canManage: canManageAutopilot(context.auth.membership.role),
         settings: {

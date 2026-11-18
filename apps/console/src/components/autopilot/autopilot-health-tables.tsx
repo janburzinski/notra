@@ -52,6 +52,7 @@ const STATUS_VARIANT: Record<
   failed: "destructive",
   running: "info",
   stopped: "secondary",
+  skipped: "secondary",
 };
 
 export function AutopilotHealthSection({

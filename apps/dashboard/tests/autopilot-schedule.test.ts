@@ -16,9 +16,10 @@ if (process.env.NOTRA_SCHEDULE_TEST !== "1") {
   });
 } else {
   const start = mock(async () => ({ alreadyRunning: false }));
-  const attempts: { total: number; latest: Date | null } = {
+  const attempts: { total: number; latest: Date | null; skipped: number } = {
     total: 0,
     latest: null,
+    skipped: 0,
   };
   mock.module("@notra/db/drizzle", () => ({
     db: {
@@ -49,6 +50,14 @@ if (process.env.NOTRA_SCHEDULE_TEST !== "1") {
     autopilotLocalDayStart: () => new Date(0),
   }));
   mock.module("@/lib/autopilot/start", () => ({ startAutopilot: start }));
+  const credits: { state: "available" | "exhausted" | "unknown" } = {
+    state: "available",
+  };
+  const skipForCredits = mock(async () => undefined);
+  mock.module("@/lib/autopilot/credits", () => ({
+    resolveAutopilotCredits: async () => credits.state,
+    skipScheduledRunForCredits: skipForCredits,
+  }));
   const publish = mock(async () => ({
     published: 0,
     waiting: 0,
@@ -112,5 +121,37 @@ if (process.env.NOTRA_SCHEDULE_TEST !== "1") {
     attempts.latest = new Date(Date.now() - 24 * 60 * 60 * 1000);
     expect((await runDueAutopilots()).started).toBe(0);
     expect(start).toHaveBeenCalledTimes(1);
+  });
+
+  test("skips the daily run with no credits left, but runs when billing can't answer", async () => {
+    start.mockClear();
+    attempts.total = 0;
+    attempts.latest = null;
+    try {
+      credits.state = "exhausted";
+      expect((await runDueAutopilots()).started).toBe(0);
+      expect(skipForCredits).toHaveBeenCalledWith(
+        "org-a",
+        undefined,
+        expect.any(Date)
+      );
+      expect(start).not.toHaveBeenCalled();
+
+      credits.state = "unknown";
+      expect((await runDueAutopilots()).started).toBe(1);
+      expect(skipForCredits).toHaveBeenCalledTimes(1);
+
+      // A skip already recorded today ends the day's attempts.
+      start.mockClear();
+      credits.state = "available";
+      attempts.total = 1;
+      attempts.skipped = 1;
+      attempts.latest = new Date(Date.now() - 24 * 60 * 60 * 1000);
+      expect((await runDueAutopilots()).started).toBe(0);
+    } finally {
+      credits.state = "available";
+      attempts.skipped = 0;
+      skipForCredits.mockClear();
+    }
   });
 }

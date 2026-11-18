@@ -20,4 +20,5 @@ export const AUTOPILOT_RUN_TRANSITIONS = {
   completed: [],
   failed: [],
   stopped: [],
+  skipped: [],
 } as const satisfies StatusTransitions<AutopilotRunStatus>;

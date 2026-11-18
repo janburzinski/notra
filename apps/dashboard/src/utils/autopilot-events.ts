@@ -14,6 +14,7 @@ import {
   AUTOPILOT_RUN_EVENTS_SLOW_AFTER_MS,
   AUTOPILOT_RUN_EVENTS_SLOW_REFETCH_MS,
   AUTOPILOT_RUN_LEASE_MS,
+  AUTOPILOT_RUN_STATUS_BADGES,
 } from "@/constants/autopilot";
 import { AUTOPILOT_TEMPLATE_WORKFLOW_KEYS } from "@/constants/workflow-engine";
 import type {
@@ -416,8 +417,11 @@ export function describeRunResult(run: AutopilotRunView): AutopilotRunResult {
   if (run.status === "failed") {
     return { tone: "failed", text: run.errorMessage ?? "Failed" };
   }
-  if (run.status === "stopped") {
-    return { tone: "quiet", text: run.errorMessage ?? "Stopped" };
+  if (run.status === "stopped" || run.status === "skipped") {
+    return {
+      tone: "quiet",
+      text: run.errorMessage ?? AUTOPILOT_RUN_STATUS_BADGES[run.status].label,
+    };
   }
   // Item runs (a mention, a pull request event) are decided by one log line.
   if (run.outcome) {

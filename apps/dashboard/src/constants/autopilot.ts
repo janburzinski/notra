@@ -199,6 +199,9 @@ export const AUTOPILOT_CRON_CONCURRENCY = 8;
 export const AUTOPILOT_CRON_INTERVAL_MINUTES = 5;
 export const AUTOPILOT_DEFAULT_TIMEZONE = "Europe/Berlin";
 export const AUTOPILOT_DAILY_RUN_MAX_ATTEMPTS = 3;
+/** Shown on a skipped run and when someone starts a run with nothing left to spend. */
+export const AUTOPILOT_NO_CREDITS_MESSAGE =
+  "No credits left. Top up AI credits or move to a bigger plan, and Autopilot runs again.";
 export const AUTOPILOT_RUN_RETRY_BACKOFF_MS = 30 * 60 * 1000;
 /** Observations per job handed to the planner each run. */
 export const AUTOPILOT_MAX_OBSERVATIONS = 8;
@@ -493,6 +496,7 @@ export const AUTOPILOT_RUN_STATUS_BADGES: Record<
   completed: { label: "Completed", appearance: { variant: "success" } },
   failed: { label: "Failed", appearance: { variant: "destructive" } },
   stopped: { label: "Stopped", appearance: { variant: "secondary" } },
+  skipped: { label: "Skipped", appearance: { variant: "secondary" } },
 };
 
 export const AUTOPILOT_RUN_TRIGGER_LABELS = {

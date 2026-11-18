@@ -71,11 +71,13 @@ export const AUTOPILOT_SCHEDULED_TRIGGERS = [
  */
 export const AUTOPILOT_MAX_SOURCE_REPOSITORIES = 15;
 
+/** skipped: a scheduled run that never started, for example with no credits left. */
 export const AUTOPILOT_RUN_STATUSES = [
   "running",
   "completed",
   "failed",
   "stopped",
+  "skipped",
 ] as const;
 
 /**

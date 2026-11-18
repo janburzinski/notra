@@ -137,7 +137,8 @@ async function getRunTotals(window: HealthWindow) {
       percentile_cont(0.9) within group (order by extract(epoch from finished_at - started_at) * 1000)
         filter (where started_at >= ${window.since} and ${fullRun}) as "p90DurationMs"
     from autopilot_runs
-    where started_at >= ${window.previous}
+    -- Skipped runs (no credits left) never started, so they aren't runs.
+    where started_at >= ${window.previous} and status <> 'skipped'
   `);
   return result.rows[0];
 }
@@ -364,7 +365,7 @@ async function getWorkspaces(
         count(*)::int as runs,
         (count(*) filter (where status = 'failed'))::int as failed
       from autopilot_runs
-      where started_at >= ${window.since}
+      where started_at >= ${window.since} and status <> 'skipped'
       group by organization_id
     ),
     findings as (

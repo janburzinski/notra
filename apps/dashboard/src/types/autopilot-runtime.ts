@@ -213,6 +213,9 @@ export interface AutopilotImpact {
   after: number | null;
 }
 
+/** exhausted: neither pull request credits nor AI credits are left. unknown: billing could not be reached. */
+export type AutopilotCreditState = "available" | "exhausted" | "unknown";
+
 /** upgrade_required: in the rollout, but the plan doesn't include Autopilot. */
 export type AutopilotAvailability =
   | "enabled"

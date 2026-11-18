@@ -22,6 +22,7 @@ import { useState } from "react";
 import { AutopilotAutomationsOverview } from "@/components/autopilot/autopilot-automations-overview";
 import { AutopilotFindingConfirmDialog } from "@/components/autopilot/autopilot-finding-confirm-dialog";
 import { AutopilotFindingTables } from "@/components/autopilot/autopilot-finding-tables";
+import { AutopilotOutOfCreditsNotice } from "@/components/autopilot/autopilot-out-of-credits-notice";
 import { AutopilotPageShell } from "@/components/autopilot/autopilot-page-shell";
 import { AutopilotPeriodSelect } from "@/components/autopilot/autopilot-period-select";
 import { AutopilotSettingsPanel } from "@/components/autopilot/autopilot-settings-panel";
@@ -313,6 +314,7 @@ function AutopilotOverviewPage({
   return (
     <>
       <PageHeading title="Autopilot" />
+      {overview.outOfCredits ? <AutopilotOutOfCreditsNotice /> : null}
 
       <Tabs
         onValueChange={(value) => {

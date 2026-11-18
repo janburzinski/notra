@@ -14,6 +14,7 @@ import {
   gte,
   like,
   lte,
+  ne,
   not,
   or,
   sql,
@@ -209,6 +210,7 @@ export async function loadAutopilotMetrics(
       .where(
         and(
           eq(autopilotRuns.organizationId, organizationId),
+          ne(autopilotRuns.status, "skipped"),
           gte(autopilotRuns.startedAt, since),
           lte(autopilotRuns.startedAt, now)
         )
