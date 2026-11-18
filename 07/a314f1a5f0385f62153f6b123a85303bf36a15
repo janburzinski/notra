@@ -1,0 +1,33 @@
+apps/dashboard/src/constants/autopilot-onboarding.ts
+  s_51485dc008574a::t_7628f3e13d08c1 151-155
+  s_51485dc008574a::t_7c77709b0dd405 186
+apps/dashboard/src/lib/autopilot/onboarding.ts
+  s_51485dc008574a::t_7c77709b0dd405 193
+apps/dashboard/src/utils/autopilot-onboarding.ts
+  s_51485dc008574a::t_7628f3e13d08c1 13,316-319,500-501,504,506-509
+  s_51485dc008574a::t_7c77709b0dd405 502-503,505
+  s_51485dc008574a::t_6ca195bc7ca538 510
+apps/dashboard/src/schemas/autopilot.ts
+  s_51485dc008574a::t_7c77709b0dd405 231
+apps/dashboard/src/components/autopilot/autopilot-onboarding.tsx
+  s_51485dc008574a::t_7628f3e13d08c1 219,325
+apps/dashboard/src/lib/hooks/use-autopilot-onboarding.ts
+  s_51485dc008574a::t_7628f3e13d08c1 26,53,777-780,831-833,835
+  s_51485dc008574a::t_7c77709b0dd405 140,834
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "07a314f1a5f0385f62153f6b123a85303bf36a15",
+  "prompts": {},
+  "sessions": {
+    "s_51485dc008574a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a92c9619-515f-4397-b2d8-f36b36bf95f4",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
