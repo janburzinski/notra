@@ -1,0 +1,31 @@
+apps/dashboard/src/lib/autopilot/writer.ts
+  s_0d48d6dd5045a9::t_2242314ac74916 283-285,312,316-317,332,336
+  s_0d48d6dd5045a9::t_04e86457a97437 286
+  s_0d48d6dd5045a9::t_6fa9a4b6cda302 41,377-380
+apps/dashboard/src/utils/autopilot-facts.ts
+  s_0d48d6dd5045a9::t_b7dc0692f86671 94-99,101-102
+  s_0d48d6dd5045a9::t_69f9f8935dd81a 5,85-93,100,103
+apps/dashboard/src/lib/autopilot/fact-check.ts
+  s_0d48d6dd5045a9::t_69f9f8935dd81a 23-27,150-157,193
+apps/dashboard/src/constants/autopilot-style.ts
+  s_0d48d6dd5045a9::t_69f9f8935dd81a 14-18,20,45
+  s_0d48d6dd5045a9::t_fd403f71d0321d 19
+apps/dashboard/src/constants/autopilot.ts
+  s_0d48d6dd5045a9::t_6fa9a4b6cda302 307-317
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "a9d9edddc4608ba8d259735b98bcb5548d7d24b5",
+  "prompts": {},
+  "sessions": {
+    "s_0d48d6dd5045a9": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "1d864e52-4fea-466d-8627-8a02c0b6797a",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
