@@ -1,0 +1,735 @@
+packages/ai/src/schemas/post-schedules.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 28-49
+apps/web/src/types/feature-detail-page.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 3-4,44,49-55,126-127,144-153
+packages/schemas/src/schemas/api/brand-colors.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 21-25,32-53,79-86,88-93,95-100
+apps/blog/scripts/web-chrome.js
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 2-3,10-13,163,180,183,189,195,223,248-251,464,467-468,476-477
+apps/dashboard/src/components/geo/engine-icon.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 13
+apps/web/src/constants/navbar-resources.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 53,61,72,77,82,87
+apps/docs/concepts/brand-voice.mdx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 27
+apps/web/src/utils/site-markdown.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1-3,5-6,37-74,134-135,137-138,141,150,157-158,226,235,240-241,254-259,262,388,397,407-414,416-417,419-420,422-423,425-426,428,430-431,436-439
+packages/db/src/utils/geo-checks.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 347-349,504-505,524,689,698-703,707-712,735,741-744
+packages/geo-core/src/utils/geo-conversation-run-claim.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1-64
+packages/schemas/src/schemas/api/geo-agent-readiness.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 22-38,47-54,65-68,99-101,103-106,109,126-133,170-171,181-184,198-200
+packages/sites-server/src/preview-access.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 14
+apps/dashboard/src/utils/autopilot-publish.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 8,11,202-211,214-216,228-275
+packages/ui/src/components/ui/context-menu.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 35-36,44-45
+packages/geo-core/src/types/deps.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 51-52
+apps/dashboard/src/lib/analytics/programs.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 27
+apps/web/src/components/navbar.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 27,47,62,65-67,202-203,233-235,265-266,385,461,463,487-490,494,500,505,511,518,534,552,557,562,565,568,576,581,583,658,677-678,680,697,699,734,765,778,788,796
+packages/schemas/src/schemas/api/geo-scans.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 10-23,28-34,36,38-77,95-96,114-136,146-150,157-160,162,164-167,179-187,208-211
+packages/geo-core/tests/geo-conversation-run-claim.test.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1-148
+apps/web/src/routes/_site/pricing.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 2,119-120,133
+apps/web/messages/parts/en/languageSwitcher.json
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1-3
+apps/docs/autopilot/daily-brief.mdx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1-79
+packages/utils/src/geo-engine-icon.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1-243
+apps/web/src/constants/i18n.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1-13
+apps/web/messages/en.json
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1-651
+apps/web/src/components/landing/landing-page.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 2,13-14,37,39,42-50,52-56,58,60-77,79-82,84,86-94,96,98-131,162,173
+apps/web/src/constants/reports-navigation.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 13-17,30-37,51-59,61,63,67
+apps/web/src/routes/__root.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 7,9,25-26,32,35,37-40,55-64,117-121,124,170-172
+apps/docs/api/common-tasks.mdx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 541-542,547,551-552
+apps/web/src/utils/constants.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 92,115,132,208-213
+packages/geo-core/tests/scan-history.test.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 26-29,36-127
+packages/ui/src/components/ui/edge-light.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1-58
+packages/schemas/src/schemas/api/feedback.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 190-193,211-238,246-251,253-255,262,265-268,270-292,301-303,309
+apps/web/src/components/navbar-products-panel.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 8,18,28,35,47,63,69,72,83,95-96,101-114,124,127,133,136,152,156,158,185,188,200,205-206,289-308,325-327,338-340,348,357-358,371,383-387
+apps/docs/autopilot/automations/overview.mdx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1-108
+apps/web/src/hooks/use-landing-faq-content.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1-18
+apps/dashboard/src/app/(dashboard)/[slug]/api-keys/page.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 88,291-301,396,428
+apps/dashboard/src/components/settings/panes/logs-pane.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 29,38,47,163-169
+apps/dashboard/src/types/geo.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 407-408
+apps/web/messages/de.json
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1-651
+apps/console/src/lib/auth/sync.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 8
+apps/web/src/components/compare/compare-index-view.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 2,17,33
+apps/web/src/components/landing/logo-marquee.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 6,14,18
+apps/web/src/types/i18n.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1-3
+apps/web/src/utils/landing-locale.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1-101
+apps/dashboard/browser-tests/menu-highlight.test.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 28-68,135-195
+apps/web/src/components/landing/testimonials-section.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 2,73,78-80,83
+packages/schemas/src/schemas/api/geo-traffic.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 226-244,258-261,270-273,302-304,338-341,345-348,370-372,375-378,407-410,430-432,446-454,465-467,471-473,475-477,481-483,487-489,493-496,506-517,528,533-536,560-571,583-588,596-609,622-629,650-664,696-708,717-720,723,746-759,771-774,808-831,834-837,889-891,901-903
+apps/web/src/lib/i18n/catalog.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1-35
+apps/ui/src/styles/examples.css
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 6
+apps/web/src/components/feature-pages/autopilot-works-with.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1-75
+apps/web/messages/parts/de/landing.logoMarquee.json
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1-3
+apps/web/src/client.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1-25
+apps/web/src/components/landing/features-card-engines.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 3,28-29,31,36,39,48,57,78-80,91,100
+apps/api/src/utils/feedback.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1-3,16,25-62
+apps/docs/autopilot/slack.mdx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1-65
+apps/dashboard/src/components/geo/conversations-card.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 16-18,195-196,343-385
+apps/dashboard/src/components/sites/site-deployment-menu.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 15-17,29,48-49,55-58,60-112,114,121,124,131-140,144-164
+apps/dashboard/src/lib/orpc/routers/logs.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 2
+apps/web/src/constants/navbar-products.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 44,52,60,71-78,85,107,113,121-123,126-130,199-201
+apps/web/src/routes/_site/features/free-scan.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1-42
+apps/web/src/utils/cta-banner-markdown.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 2,6-9,11-12,14,16
+CONTRIBUTING.md
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 14,26,45,379,382-384,981-986,1009-1010
+apps/dashboard/src/components/geo/scan-answer-sheet.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 48-56
+apps/web/src/components/feature-pages/autopilot-card-results.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1-74
+apps/dashboard/src/components/geo/journeys-card.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 10,24,39,154-167
+apps/api/src/types/geo.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 30
+apps/web/src/components/feature-pages/stage-shell.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 37
+apps/web/src/constants/feature-pages/free-scan.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1-130
+packages/ui/src/lib/geo-chat-skin.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 2
+apps/web/messages/parts/de/landing.answers.json
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1-44
+apps/ui/registry/notra/edge-light/constants/edge-light.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1-2
+apps/dashboard/src/components/geo/prompt-suggestions.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 10,400,404-405,461-484
+apps/ui/registry/notra/package-command/examples/package-command-demo.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 7
+apps/web/messages/parts/en/landing.promptCalculator.json
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1-62
+apps/dashboard/src/components/geo/mention-trend-agents.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 18
+apps/dashboard/src/lib/orpc/routers/sites.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 138
+apps/web/src/components/landing/features-card-share.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1-2,5,8,10,12-16
+apps/web/src/lib/navigation/navbar-variant.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1,4-8
+apps/api/src/types/feedback.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 21,44-45,48-51,83
+apps/web/src/routes/_landing/de.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1-17
+apps/web/src/routeTree.gen.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 34,81,83,233-237,470-474,481-485,697,737,739,802,842,844,909,952,954,1019,1059,1061,1124,1164,1166,1230,1273,1275,1523-1529,1852-1858,1866-1872,2122,2128,2195,2197,2247,2249,2338-2347
+packages/geo-core/src/schemas/geo-workflows.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 36-40
+packages/ui/src/styles/edge-light.css
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1-237
+apps/web/src/types/landing/footer.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 2,5,11
+apps/web/src/embed/blog-chrome/entry.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 8,25,34-40
+apps/dashboard/src/constants/autopilot-publish.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 12-13,78-82,102,108-112,121-124,130-131
+packages/schemas/src/schemas/api/geo-shelf.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 24-27
+apps/web/src/lib/navigation/use-marketing-nav.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1-51
+apps/web/src/components/landing/share-of-voice-rows.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 3,26-27,76,115-117,127
+apps/web/messages/parts/de/landing.promptCalculator.json
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1-62
+apps/web/src/components/landing/hero-headline.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 11-12,26,94,96,100,102,107,121-122,129-136,138-140,143-151,155-158,163-166,173-175,180-184,186,189-191,194-198
+apps/web/src/constants/navbar-reports.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 15
+apps/web/src/routes/_site/features/autopilot.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1-40
+apps/web/src/components/landing/pricing-section.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 8,34-35,39,48-49,62,72-73,77,124,161,172,180-181,190,199,201,210,220,256,275,295-297,308-310,326,340,349,352,367,377-378,380-383,389,410,413,426-430,435,444,447,463-467
+apps/dashboard/src/components/autopilot/autopilot-pull-requests-table.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 11,19,227-252
+packages/schemas/src/schemas/api/content.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 251-265,286-338,340-366,368,371,374,379-382,387-390,441-446,469-493,497-501,507-518,525-528,563-615,617-638,640-649,651-661,767-774,781-799,803-810,827-832,847-890,892-893,895-903,916-921,1018-1025,1045-1057,1059-1064,1066-1076,1078-1085,1087-1095,1097-1098,1159-1167,1169,1171-1195,1197-1212,1477-1493,1497-1499,1506-1564,1566-1574,1604-1628,1641-1651
+apps/dashboard/tests/autopilot-flow.test.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 632
+packages/ui/src/types/edge-light.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1-5
+apps/dashboard/src/lib/orpc/utils/geo-errors.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 72-73
+apps/web/src/components/landing/hero-section.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 7,42-43,65-66,78-79,99,101,106-109,127,151
+apps/ui/registry/notra/composer/examples/composer-state-streaming.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 18
+apps/web/src/components/landing/prompt-calculator.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 34,154,163,184,194,196,202,205-208,316,426,442,453,472,483,550,581,583,609,614-615,619,630,658,668-669,675,680-681,684,686,693-698,709-716,726-727,732,747,758-761,764-766,786-788,803,823,827,841-843,855,868,870,873-877,935-936,945,948
+apps/api/src/programs/feedback.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 4,8,18,27,50-57,60,64-74,78-96,235-251,258,260-284,320-323,339,342-343,346,357,359,363-366
+apps/web/messages/parts/en/landing.hero.json
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1-67
+packages/geo-core/src/geo/auto-prompts.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 192-194,201-203
+apps/dashboard/tests/geo-scan-workflow.test.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 107-116,702-728,767-815
+packages/geo-core/src/geo/errors.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 5,252-262,337
+apps/web/src/components/landing/live-traffic-log.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 3,15,39-44
+apps/web/src/utils/head.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 80-84
+apps/web/src/types/navbar-bento.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1,3,9,72-73,75,82-83,111-112,114-117,123-126
+packages/schemas/src/schemas/api/webhooks.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 52-57,67-69,71-78,87-89,93-95,117-119,130-133,137-139,155-158,160-200
+apps/dashboard/src/types/logs/data-table.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 29
+apps/dashboard/src/utils/geo-chat-skin.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 2
+packages/schemas/src/schemas/api/agent-chats.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 19-25,27-28,84-106,108-109,113-116,118-119
+apps/ui/components/ui/context-menu.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 20,28-49
+apps/web/src/start.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 11-12,64-66
+apps/web/src/content/pages/features/autopilot.md
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1-61
+apps/ui/docs/components/edge-light.mdx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1-34
+apps/dashboard/src/components/autopilot/autopilot-runs-table.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 12,212-214
+packages/schemas/src/schemas/api/geo-prompts.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 20-22,39-40,54-58,65-69,92-96,140-143,157-160,164-166,184-186,188-192,207-210,214,221-225
+apps/dashboard/src/constants/autopilot.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 307-317
+apps/web/src/constants/feature-pages/paths.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 6-7
+apps/docs/autopilot/troubleshooting.mdx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1-89
+apps/web/src/components/compare/compare-sections.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 6,49,88
+packages/schemas/src/schemas/api/skills.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 51,63-65,67-69,76-78,80-82,90-92,98-100,106-108,114-116,120-122,124-126
+apps/docs/autopilot/automations/content.mdx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1-146
+apps/api/src/runtime/geo.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 60-65,88-90,102,108
+apps/dashboard/src/lib/organizations/actions.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 46
+apps/api/src/routes/geo-scans.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 13,50,84,89-91,190,194,212,220
+apps/dashboard/src/lib/workflows/start.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 216-217
+apps/web/messages/parts/en/landing.answers.json
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1-44
+apps/dashboard/src/components/sites/site-deployments-table.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 214-243,251-259,291-292
+packages/geo-core/src/utils/geo-engine-family.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1-2
+packages/geo-core/src/types/geo.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 37-41,76-78,87-88,387-392,401,421
+packages/schemas/src/schemas/api/geo-content.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 30-34,49,54-56,83-87,98-112,114-115,122-128,176-179,192-220,289-293,306-312,315-319,408-411,420-427,433-440,463-471,476-478,480-481,491-495,499-505,507,526-528,538-541,548-551,666,676-680,690-693
+packages/schemas/src/schemas/dashboard/geo-shelf.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 148,156-161,165
+apps/web/messages/parts/en/landing.logoMarquee.json
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1-3
+packages/ui/src/styles/globals.css
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 4
+apps/docs/autopilot/automations/releases.mdx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1-97
+packages/schemas/src/schemas/api/post-agent-reach.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 16,31-48,58-62,72-75
+packages/schemas/src/schemas/api/geo-personas.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 16-34,38-40,68-73,77,82-84,92-96,108-111,118-122,129-133,181-188,196-198,202-204,208-210,250,266-270,289-291,315-319,353-357,368-369,379-383,408-412
+apps/dashboard/src/components/settings/attachments/attachments-section.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 12,215-228
+apps/web/src/types/use-intl.d.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1-10
+apps/api/src/constants/feedback.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 17-18
+apps/ui/registry/notra/edge-light/examples/edge-light.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1-28
+apps/web/src/components/navbar-reports-panel.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 2,16,26-28,54-55,57-64
+apps/ui/registry/notra/table/types/data-table.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 171
+apps/dashboard/src/types/autopilot-templates.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 25
+apps/dashboard/src/types/autopilot-publish.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 22-23,31-32
+apps/dashboard/src/lib/auth/sync.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 246-247
+apps/web/messages/parts/de/navbar.json
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1-194
+apps/web/src/components/theme-toggle.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 7,27,42,44,46
+apps/web/src/constants/landing/metadata.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1,3-8,11-16,18,20-49
+apps/web/src/lib/sitemap/entries.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 68-70
+apps/dashboard/src/components/sites/site-preview-row-menu.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 4,11-14,31,34-35,38-85,102
+apps/web/package.json
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 77
+apps/web/src/constants/feature-pages/autopilot.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1-369
+apps/web/src/constants/landing/pricing-icons.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 2,27
+packages/schemas/src/schemas/api/geo-web-analytics.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 87-89,103-106,123,137-172,177-184,193-196,205-210,215-218,236-239,251-254,274-277,297-300,317-320,341-344,362-365,369-394,397-399,402-410,422-431,469-472,496-499,503-575,577,579,581,583-598,601-604
+apps/docs/autopilot/review-and-publish.mdx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1-161
+apps/web/src/components/language-switcher.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1-42
+apps/api/src/routes/feedback.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 205
+apps/ui/docs/components/composer.mdx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 55
+apps/web/src/components/feature-pages/autopilot-card-drafts.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1-63
+apps/web/src/constants/mcp-tools.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 340,498-499,504
+apps/web/messages/parts/de/landing.page.json
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1-4
+apps/web/src/content/pages/features/free-scan.md
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1-37
+apps/web/src/components/landing/answer-example-section.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 4,29,33,39,42,45,48,65-66,77,99,110-111,117,120,126,128-130,138,140,143
+apps/web/src/constants/landing/pricing.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 24,33,40-41,54,61,63-65,68-71,73-76,79,90,97,99-101,104-107,109-112,115-116,127,134,136-138,141-144,146-149,152-153,160,163,170-178,183-185
+apps/dashboard/src/lib/autopilot/writer.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 41,283-286,312,316-317,332,336,377-380
+packages/db/package.json
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 31
+apps/ui/registry/notra/edge-light/components/edge-light.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1-59
+packages/ui/src/types/geo.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 4-8
+apps/web/src/components/feature-pages/sites-card-config.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 17
+apps/web/src/constants/landing/faq.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1,3-10
+apps/docs/autopilot/overview.mdx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1-105
+apps/web/src/components/landing/live-demo-preview.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 2,12,30
+apps/dashboard/src/components/autopilot/autopilot-automation-menu-items.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 61
+apps/docs/autopilot/settings.mdx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1-111
+apps/dashboard/src/components/sites/site-previews-table.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 264-273
+apps/web/src/types/landing/faq.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1-2,20-23
+apps/web/src/types/landing/pricing.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 2,14-15,21-23,26-29,36,44,47,81-82
+packages/geo-core/src/geo/persona-scan.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 36,41,43,245,265-268,497-504
+packages/utils/src/types/geo-engine-icon.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1-52
+apps/web/src/components/landing/announcement-banner.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 4,6,9,15-16
+apps/dashboard/src/constants/disposable-email.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1-4
+apps/dashboard/src/lib/autopilot/findings.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1300-1302
+packages/schemas/src/schemas/api/geo-visibility.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 12,92-98,106-109,180-183,204-207,213,280-289,293,316-319,327-350,352,356-359,370-373,412-415,440-445,472-475,501-504
+apps/dashboard/src/components/automation/runs/automation-runs-table.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 7,22,48,175-200
+apps/web/messages/parts/de/landing.hero.json
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1-67
+packages/geo-core/src/constants/geo-conversations.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 2-7
+apps/dashboard/src/app/(dashboard)/[slug]/settings/logs/data-table.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 24,56
+packages/schemas/src/schemas/api/geo-settings.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 24-30,92-98,100-101,115-118,221-222,232-236
+apps/web/messages/parts/en/landing.page.json
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1-4
+apps/dashboard/src/workflows/geo-scan.ts
+  s_1c956e48e36b9e::t_638d2801b813ad 124-141,151-152,163-166,168-171,189,216,226-228,254,256-257,259,261,276,282,443-444,477,480-495,498,500-501,507-508,515-516,523-524,526-527,532-536,554,599-600,607,632-633,643-645,672
+apps/dashboard/src/types/components/sites.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 471,474
+apps/web/src/components/navbar-resources-panel.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 3,29-30,32,39,65-66,69-72,74,86,107,110
+apps/web/messages/parts/en/landing.features.json
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1-106
+apps/dashboard/src/constants/free-scan.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1
+apps/web/src/lib/integrations/markdown.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 44,96-97,255-256,302-303,347-348,395-396
+packages/utils/package.json
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 10
+packages/geo-core/tests/products.test.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 24-36,83-84,271-291
+apps/web/src/components/feature-pages/autopilot-stage.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1-455
+packages/geo-core/tests/persona-scan.test.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 17,303-306,308-312,329-361
+apps/dashboard/src/components/shared/row-details-menu-items.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1-30
+apps/web/README.md
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 12
+apps/dashboard/messages/en.json
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1055,1097,2004-2006,6322,6370,6738
+apps/web/src/constants/feature-pages/stage.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 9-12
+packages/geo-core/src/utils/geo-scan-event.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1-2,14,16-22
+packages/schemas/src/schemas/api/geo-projects.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 14,19-21,23-24,33-37,44-47,76,79-83
+apps/dashboard/src/components/geo/traffic-pages-card.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 12,41,120,137-147
+apps/web/middleware.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 9,32,35-36
+apps/dashboard/src/lib/auth/disposable-email.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1-11
+apps/web/src/components/landing/answer-example-demo.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 8,14,26-28,39,60,63,66-69,81
+apps/web/src/components/landing/live-demo-link.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 3,6,9,14,21
+packages/geo-core/src/geo/scan-handoff.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 88-89,110-113
+packages/schemas/src/schemas/api/chats.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 33-40,49-52,56-77,79-81,179-182,184-186,191-194,196-198
+packages/schemas/src/schemas/api/geo-sequences.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 10-13,21-23,25-29,43-47,54-58,87-91,118-122
+packages/ui/src/components/geo/engine-icon.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 61
+apps/docs/devtools/mcp.mdx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 374-375
+apps/web/src/components/feature-pages/autopilot-card-workflow.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1-37
+apps/api/tests/feedback-program.test.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 12,44,125-230
+apps/dashboard/src/components/billing/invoices-table.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 5,20-24,98-105
+apps/ui/package.json
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 33-35
+apps/dashboard/tests/autopilot-sandbox.test.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 154-155,455-649,734-769,947-964
+apps/docs/autopilot/workflows.mdx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1-96
+apps/dashboard/messages/de.json
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1055,1097,2004-2006,6322,6370,6738
+apps/web/src/components/landing/citation-rows.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 4,106,111
+apps/web/src/types/navbar.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1,4,6-81
+packages/schemas/src/schemas/api/geo-competitors.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 40-41,50-54,81-87,104-108,185-189
+apps/web/messages/parts/de/footer.json
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1-51
+apps/web/src/components/navbar-mobile-menu.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 17,24,26-27,169-170,175,194,210,214,216,336,349,363,372
+apps/web/src/utils/navbar-panel-position.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1
+packages/schemas/src/schemas/api/sites.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 59-66,87-93,96-125,130-134,140-151,174-180,183,198-201,300-309,314,322-325,327-330,362-365,389-392,504-507,513,518,550-553,584-586,588,591-594,598-610,615-618,641-655,680-690,692-694,698-702,717-723,740-742,753-769,774-776,806-813,817-819,854-859,864-869,873-874,878-879,883-884,888-889,893-894,898-899
+apps/docs/autopilot/grow.mdx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1-98
+apps/dashboard/src/utils/geo-prompt-history.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 99-101
+apps/web/src/components/feature-pages/free-scan-table.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1-50
+apps/web/src/components/feature-pages/free-scan-stage.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1-64
+apps/ui/registry/notra/code-block/examples/code-block-demo.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 10-11,13-14,17-20,24,26-27
+packages/db/src/types/geo-scan.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1-7
+apps/dashboard/src/components/geo/traffic-source-sheet.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 19
+apps/dashboard/src/utils/ai-traffic-groups.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 18
+apps/dashboard/src/workflows/steps/geo-scan-steps.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 93,103,121-122,136-137
+apps/web/messages/parts/en/landing.testimonials.json
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1-4
+apps/web/src/components/landing/cta-banner.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 3,29-30,33,41,44,55,63
+apps/dashboard/src/lib/geo/free-scan.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 20,134,142
+apps/web/src/components/landing/features-card-traffic.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 4,25,28-29,31,36-37,44,47,56,65,79-83,92,101-105
+apps/web/src/components/landing/hero-website-form.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 8,21-25,31,41,46,69,79,104
+packages/geo-core/src/geo/programs.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1036-1037,1041-1045,2221-2222,2224-2225,2233-2239,2247-2266,2556-2557,2575,2610-2611,2657-2667,2686-2694,2696
+packages/schemas/src/schemas/api/status.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 6-7,9-28,30-33
+apps/docs/autopilot/learning.mdx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1-102
+apps/dashboard/src/utils/engine-icon-html.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1
+apps/web/messages/parts/de/landing.announcement.json
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1-4
+apps/web/messages/parts/de/landing.faq.json
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1-30
+apps/web/src/constants/landing/footer.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 40,42-50,54,56,58,63,74,77,82,87,92,98,100-103,111,113,115,119,123,125-126,130,132-136,144-146
+packages/schemas/src/schemas/shared/automation.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 27-34
+apps/dashboard/src/components/api-keys/account-api-keys-section.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 59,292-297,384-391
+apps/docs/geo/how-scans-work.mdx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 74,88-90,103
+apps/dashboard/src/components/chat/chat-input.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1872
+apps/docs/autopilot/quickstart.mdx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1-113
+apps/docs/docs.json
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 130-133,240-282
+apps/web/src/types/landing/geo.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 2,27,48-49,93,97,107-118,120
+packages/ui/src/constants/edge-light.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1-2
+apps/web/src/constants/landing/prompt-calculator.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 20-25,47-51
+apps/dashboard/src/components/webhooks/deliveries.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 28,106-108
+packages/db/src/types/autopilot.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 50-51
+packages/geo-core/src/utils/geo-prompt-results.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 39,48-55
+apps/ui/registry/notra/composer/types/composer.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 15-16
+apps/dashboard/browser-tests/fixtures/menu-highlight.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 19,21-61,92
+apps/web/src/components/feature-pages/autopilot-card-brief.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1-107
+packages/geo-core/tests/model-scan.test.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 12
+apps/api/src/routes/geo-visibility.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 20,70,134,245,250-251,293
+apps/dashboard/src/lib/autopilot/publish.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 34-38,44,66,273-312,336,342-343,347-354,360-386,388,390-423,427-429,431,455-456,481-523,553-567,569,584-587,599-604,701-702
+apps/dashboard/src/components/autopilot/autopilot-automations-overview.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 205,368,370
+apps/dashboard/src/utils/content-agent-reach.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 10
+apps/web/messages/parts/en/landing.faq.json
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1-30
+packages/schemas/src/schemas/api/event-triggers.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 37-58,60,62-63,84-88,106-145,147-148,150-161,163-164,166-171,173-178
+apps/console/src/constants/disposable-email.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1-4
+packages/schemas/src/schemas/api/schedules.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 113-119,161-170,205-209,299-339,341-342,344-355,357-358,360-365,367-372,378-386,402,421-423,429-436
+apps/docs/autopilot/limits-and-credits.mdx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1-76
+apps/docs/automation/overview.mdx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 26-29
+apps/api/tests/geo-scan-engines.test.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 3-4,7-13,61,104-125,132-147
+apps/dashboard/src/components/api-keys/api-key-menu-items.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1-43
+apps/web/messages/parts/en/landing.pricing.json
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1-51
+apps/dashboard/src/utils/autopilot-publish.test.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 12,113,242-285,358-418
+apps/dashboard/tests/autopilot-template-flows.test.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 151
+apps/dashboard/src/lib/onboarding/company-domain.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 7
+apps/dashboard/src/components/geo/competitors-table.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 6-9,245,259-289
+apps/docs/autopilot/automations/site-fixes.mdx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1-97
+apps/dashboard/src/utils/ai-traffic-trend.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 14
+apps/dashboard/src/components/autopilot/autopilot-workflow-runs-table.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 9,97-99
+apps/web/src/components/feature-pages/feature-detail-page.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 4,15,24-25,30,32,34,47-77,136-140
+apps/docs/autopilot/results.mdx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1-86
+apps/web/src/components/landing/features-card-gaps.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 6,27,30,32,37,40,49,65,70-74,98
+apps/web/src/components/feature-pages/sites-stage.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 15,26
+apps/web/src/constants/landing/answer-example.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1-2,5-6,11,13,15-19,65-68
+apps/web/messages/parts/en/landing.cta.json
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1-6
+packages/db/src/types/geo-checks.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 9,166-169,172
+apps/web/src/types/autopilot-page.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1-38
+packages/schemas/src/schemas/api/geo-diagnostics.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 64-72,82-88,98,101,123-126,139-141,146-149,154-157,173-175,185-193,209-211,220-226,228,230-256,269-272,275-277,285-289,311-313,332-355,379-382,413-421,442-444,453-455
+packages/ui/src/lib/geo-perplexity-sources.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 6,27,38
+apps/api/src/routes/agent-chats.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 206-212
+apps/docs/feedback/send-feedback.mdx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 134
+apps/ui/registry/notra/composer/components/composer.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 21,90,94,122-123,126,128,131-140,152,161,195,197,200-213
+apps/web/src/components/landing/hero-variant-switcher.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 5,19,28,43
+apps/docs/integrations/slack.mdx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 79,83,88
+packages/schemas/src/schemas/api/workspaces.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 20-25,27-37,39-40,58-62
+apps/web/src/components/landing/features-section.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1,10,16,19-20,24-29,33-37,41-46,49-54
+apps/dashboard/src/components/geo/product-prompt-suggestions.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 11,47,222-242
+apps/docs/autopilot/how-it-works.mdx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1-143
+apps/web/messages/parts/de/landing.pricing.json
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1-51
+apps/web/messages/parts/de/languageSwitcher.json
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1-3
+apps/web/src/utils/prompt-calculator.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 134
+apps/dashboard/src/constants/design-system-geo.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 134-136
+packages/ui/src/components/ui/composer.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 11,123,127,154-155,158,160,163-172,188,235,237,240-258,273
+apps/dashboard/src/lib/integrations/github/content-pull-request.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 24,71-76
+apps/blog/public/licenses/web-chrome.txt
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 169-204,999-1034,1238-1255
+packages/geo-core/tests/scan-lifecycle.test.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 28,42,57,165-198
+apps/dashboard/src/constants/agent-questions.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 12-17,19
+apps/dashboard/src/components/ai/answer-mark.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 8-10,22
+apps/ui/registry/notra/table/components/data-table-body.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 101,116-120,144-148,194,201
+apps/dashboard/src/components/autopilot/autopilot-templates.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 135,277-278,281,284,288,292,295,298,335-336,347,350,354
+apps/dashboard/src/constants/autopilot-style.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 14-20,45
+packages/geo-core/tests/auto-prompts.test.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1-58
+packages/schemas/src/schemas/api/post-schedules.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 76-78,90-105,135-138,148-149,162-163
+apps/ui/registry.json
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1477-1583,1787,1790
+apps/dashboard/tests/autopilot-dream.test.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 346
+apps/web/knip.json
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 8
+apps/web/src/components/landing/pricing-icons.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 123-132
+packages/db/src/schema.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 126-129,1813,1836-1838
+packages/ui/src/types/composer.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 22-23
+apps/ui/docs/components/meta.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 13
+apps/web/messages/parts/de/landing.cta.json
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1-6
+packages/geo-core/src/geo/scan.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 91,118,125,632,661-662,710-711,738-740,859-861,892-894,1076-1077,1272-1273,1341,1387-1390,1528,1571-1574,1648,2236-2243
+apps/dashboard/src/lib/autopilot/fact-check.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 23-27,150-157,193
+apps/console/src/lib/auth/disposable-email.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1-11
+apps/dashboard/src/lib/orpc/utils/analytics-errors.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 3
+apps/web/messages/parts/en/landing.announcement.json
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1-4
+apps/web/src/components/footer-section.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 4,8,25,33,46,71,117,124,142,144,151,155,157,163,165,167,171
+apps/web/messages/parts/en/navbar.json
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1-194
+apps/web/src/constants/landing/features.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 18,26,34,42,50,58,127-129,139,147,155,163,171,179,187,193,199,205,211,217
+apps/web/src/styles/ui-sources.css
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 119,125,226,230,284,286
+apps/web/src/types/metadata.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 17,80
+apps/web/messages/parts/de/landing.features.json
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1-106
+apps/api/src/utils/geo.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 11,14,16,18,20,22,24
+apps/web/src/components/feature-pages/autopilot-features.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1-51
+apps/dashboard/src/utils/autopilot-facts.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 5,85-115
+apps/dashboard/src/components/geo/competitor-suggestions-table.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 6,35,145-162
+apps/ui/scripts/registry-css.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1-116
+apps/dashboard/src/components/billing/usage-alerts-section.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 11,100-107,227,265-281
+apps/web/messages/parts/de/landing.testimonials.json
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1-4
+apps/ui/registry/notra/edge-light/types/edge-light.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1-5
+apps/web/messages/parts/en/footer.json
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 1-51
+apps/web/src/components/landing/faq-section.tsx
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 4,91-93
+apps/web/src/utils/navigation.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 2,14,16,19,22,24,28-29,35,38-40,44,50,58
+apps/web/src/lib/state-of-ai-search/markdown.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 34,67
+apps/web/src/constants/landing/hero.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 5,33,35-36,40-41,45-47,51-53,57-59,63-66,70-73
+apps/web/src/types/landing/hero.ts
+  s_1c956e48e36b9e::t_2b9fb702ac2d54 2,11-21,25,50-51
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "0cb9b1a8d4a7d4b924d265136f0fdef0d189e431",
+  "prompts": {},
+  "sessions": {
+    "s_1c956e48e36b9e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b35e43ed-78f0-4783-91b1-bd02008adce9",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
