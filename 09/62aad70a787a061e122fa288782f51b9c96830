@@ -1,0 +1,22 @@
+apps/web/src/components/feature-pages/feature-detail-page.tsx
+  s_97ea80ffc4b18c::t_772c2473aa94f2 62-65
+  s_97ea80ffc4b18c::t_4f9a6fc7323211 60-61,66-73
+apps/web/src/constants/landing/footer.ts
+  s_97ea80ffc4b18c::t_34a8f3572e5b9e 46
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "0962aad70a787a061e122fa288782f51b9c96830",
+  "prompts": {},
+  "sessions": {
+    "s_97ea80ffc4b18c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a963f39b-ffc0-4357-9d72-f720f8f19f5f",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
