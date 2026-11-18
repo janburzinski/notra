@@ -9,7 +9,7 @@
   },
   "favicon": "/brand/favicon.svg",
   "colors": { "primary": "#8B5CF6", "light": "#A78BFA", "dark": "#8B5CF6" },
-  "appearance": { "default": "system", "storageKey": "theme" },
+  "appearance": { "default": "system", "storageKey": "notra-system-theme" },
   "fonts": {
     "heading": {
       "family": "Satoshi",

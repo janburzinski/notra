@@ -474,11 +474,6 @@
       "open": "Open menu",
       "close": "Close menu"
     },
-    "theme": {
-      "toggle": "Toggle theme",
-      "light": "Switch to light mode",
-      "dark": "Switch to dark mode"
-    },
     "groups": {
       "products": "Products",
       "resources": "Resources",

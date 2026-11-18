@@ -3,7 +3,6 @@
 // data-notra-web gets a shadow root with this app's own CSS, so the blog's styles and these
 // components never affect each other.
 import { DropdownMenuPortalContainer } from "@notra/ui/components/ui/dropdown-menu";
-import { ThemeProvider } from "next-themes";
 import { createRoot } from "react-dom/client";
 import { IntlProvider } from "use-intl";
 
@@ -14,6 +13,7 @@ import { FooterDither } from "@/components/footer-section";
 import { CtaBannerDither } from "@/components/landing/cta-banner";
 import { HeroDither } from "@/components/landing/hero-dither";
 import { Navbar } from "@/components/navbar";
+import { ThemeProvider } from "@/components/theme-provider";
 import {
   BLOG_CHROME_INDEX_PAGE,
   BLOG_CHROME_PAPER_STYLE_SELECTOR,
@@ -103,12 +103,7 @@ function mount(host: HTMLElement) {
     });
   }
   createRoot(shell).render(
-    <ThemeProvider
-      attribute="class"
-      defaultTheme="system"
-      disableTransitionOnChange
-      enableSystem
-    >
+    <ThemeProvider>
       <DropdownMenuPortalContainer.Provider value={shell}>
         {render(host)}
       </DropdownMenuPortalContainer.Provider>

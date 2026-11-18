@@ -36,7 +36,6 @@ import { NavbarReportsPanel } from "@/components/navbar-reports-panel";
 import { NavbarResourcesPanel } from "@/components/navbar-resources-panel";
 import { NotraMark, notraMarkSvgString } from "@/components/notra-mark";
 import { SignedOutLandingRedirect } from "@/components/signed-out-landing-redirect";
-import { ThemeToggle } from "@/components/theme-toggle";
 import { TrackedSignupLink } from "@/components/tracked-signup-link";
 import {
   AUTH_APP_HOTKEY,
@@ -718,15 +717,8 @@ export function Navbar({ variant }: NavbarProps = {}) {
                 className="flex flex-1 items-center justify-end gap-2 lg:gap-3"
                 data-slot="navbar-actions"
               >
-                {isResolved ? (
-                  <>
-                    <ThemeToggle />
-                    <DesktopAuthActions isAuthenticated={isAuthenticated} />
-                  </>
-                ) : (
-                  <div className="lg:hidden">
-                    <ThemeToggle />
-                  </div>
+                {isResolved && (
+                  <DesktopAuthActions isAuthenticated={isAuthenticated} />
                 )}
                 <button
                   aria-controls="mobile-navigation"

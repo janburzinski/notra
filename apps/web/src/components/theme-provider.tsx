@@ -1,9 +1,16 @@
 import { ThemeProvider as NextThemesProvider } from "next-themes";
 import type * as React from "react";
 
-export function ThemeProvider({
-  children,
-  ...props
-}: React.ComponentProps<typeof NextThemesProvider>) {
-  return <NextThemesProvider {...props}>{children}</NextThemesProvider>;
+export function ThemeProvider({ children }: React.PropsWithChildren) {
+  return (
+    <NextThemesProvider
+      attribute="class"
+      defaultTheme="system"
+      disableTransitionOnChange
+      enableSystem
+      storageKey="notra-system-theme"
+    >
+      {children}
+    </NextThemesProvider>
+  );
 }

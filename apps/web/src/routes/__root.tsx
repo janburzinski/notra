@@ -139,12 +139,7 @@ function RootDocument({ children }: { children: ReactNode }) {
         />
       </head>
       <body className="antialiased">
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          disableTransitionOnChange
-          enableSystem
-        >
+        <ThemeProvider>
           <ConsentTheme theme={consentTheme} />
           <ConsentRoot
             state={consent}

@@ -1,42 +1,28 @@
-import { useTheme } from "next-themes";
 import { useTranslations } from "use-intl";
 
 import {
   LIVE_DEMO_PREVIEW_DARK_SRC,
   LIVE_DEMO_PREVIEW_SRC,
-  LIVE_DEMO_PREVIEW_THEME_SCRIPT,
 } from "@/constants/landing/live-demo";
 
 export function LiveDemoPreview() {
-  const { resolvedTheme } = useTheme();
   const t = useTranslations("landing.hero");
-  let previewMedia = "(prefers-color-scheme: dark)";
-  if (resolvedTheme) {
-    previewMedia = resolvedTheme === "dark" ? "all" : "not all";
-  }
-
   return (
-    <>
-      <picture>
-        <source
-          media={previewMedia}
-          srcSet={LIVE_DEMO_PREVIEW_DARK_SRC}
-          suppressHydrationWarning
-          type="image/webp"
-        />
-        <img
-          decoding="async"
-          loading={resolvedTheme ? "eager" : "lazy"}
-          alt={t("demoPreviewAlt")}
-          className="pointer-events-none absolute top-0 left-0 h-auto w-[320%] max-w-none -translate-x-[19%] -translate-y-[7%] sm:inset-0 sm:size-full sm:translate-0 sm:object-cover sm:object-top-left"
-          fetchPriority="high"
-          height={1250}
-          src={LIVE_DEMO_PREVIEW_SRC}
-          suppressHydrationWarning
-          width={2000}
-        />
-      </picture>
-      <script>{LIVE_DEMO_PREVIEW_THEME_SCRIPT}</script>
-    </>
+    <picture>
+      <source
+        media="(prefers-color-scheme: dark)"
+        srcSet={LIVE_DEMO_PREVIEW_DARK_SRC}
+        type="image/webp"
+      />
+      <img
+        decoding="async"
+        alt={t("demoPreviewAlt")}
+        className="pointer-events-none absolute top-0 left-0 h-auto w-[320%] max-w-none -translate-x-[19%] -translate-y-[7%] sm:inset-0 sm:size-full sm:translate-0 sm:object-cover sm:object-top-left"
+        fetchPriority="high"
+        height={1250}
+        src={LIVE_DEMO_PREVIEW_SRC}
+        width={2000}
+      />
+    </picture>
   );
 }

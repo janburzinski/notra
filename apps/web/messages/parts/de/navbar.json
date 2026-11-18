@@ -18,11 +18,6 @@
     "open": "Menü öffnen",
     "close": "Menü schließen"
   },
-  "theme": {
-    "toggle": "Design wechseln",
-    "light": "Zum hellen Modus wechseln",
-    "dark": "Zum dunklen Modus wechseln"
-  },
   "groups": {
     "products": "Produkte",
     "resources": "Ressourcen",
