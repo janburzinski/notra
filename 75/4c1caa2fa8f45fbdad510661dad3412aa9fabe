@@ -1,0 +1,19 @@
+apps/blog/scripts/web-chrome.js
+  s_44538c480544b6::t_4748552c0d7495 2,178,181,187,193,221,247-249,462,465-466,474-475
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "754c1caa2fa8f45fbdad510661dad3412aa9fabe",
+  "prompts": {},
+  "sessions": {
+    "s_44538c480544b6": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b9a8d9ed-308c-48fb-82f9-8d5e7735a94b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
