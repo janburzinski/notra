@@ -1,0 +1,25 @@
+apps/dashboard/src/lib/autopilot/run.ts
+  s_a69441b239a3c3::t_3a1cac9558122c 427-428,436
+  s_a69441b239a3c3::t_c1dccec32ad9cc 319-350,429-435,437-439,496
+apps/dashboard/tests/autopilot-flow.test.ts
+  s_a69441b239a3c3::t_65c93075ab8119 1676-1684,1689,1696
+  s_a69441b239a3c3::t_78491433a37514 1652,1656,1710
+  s_a69441b239a3c3::t_3a1cac9558122c 1672
+  s_a69441b239a3c3::t_8506992fa7f81a 1653-1655,1657-1671,1673-1675,1685-1688,1690-1695,1697-1709
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "3433c85d7c29f2546463d3cb2dc3e5c27f6584c0",
+  "prompts": {},
+  "sessions": {
+    "s_a69441b239a3c3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7b34e9e7-e4ec-4cd6-82a8-4e49009ecceb",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
