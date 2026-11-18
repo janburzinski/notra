@@ -2,6 +2,7 @@ import {
   AUTOPILOT_FACT_MIN_QUOTE_CHARS,
   AUTOPILOT_FIGURE_PARTS,
   AUTOPILOT_FIGURE_UNIT_ALIASES,
+  AUTOPILOT_SOURCE_NOTE,
 } from "@/constants/autopilot-style";
 import type {
   AutopilotFactClaim,
@@ -80,4 +81,36 @@ export function unsourcedFigures(
     (figure) =>
       !(all.includes(squash(figure)) || values.has(figureValue(figure)))
   );
+}
+
+/**
+ * A fix's replacement without a note about the sources in prose. The fact
+ * check removes a claim; "Not stated in the material reviewed." left in its
+ * place reads as a broken sentence. In a table row the note marks a gap, so
+ * it stays: the first line counts as a row when `find` starts inside one,
+ * which covers an edit of a single cell.
+ */
+export function withoutSourceNotes(
+  edit: { find: string; replace: string },
+  page: string
+) {
+  const at = page.indexOf(edit.find);
+  const startsInRow =
+    at >= 0 &&
+    page
+      .slice(page.lastIndexOf("\n", at) + 1)
+      .trimStart()
+      .startsWith("|");
+  return edit.replace
+    .split("\n")
+    .map((line, index) => {
+      if ((index === 0 && startsInRow) || line.trimStart().startsWith("|")) {
+        return line;
+      }
+      const next = line.replace(AUTOPILOT_SOURCE_NOTE, "");
+      return next === line
+        ? line
+        : `${line.slice(0, line.length - line.trimStart().length)}${next.trim()}`;
+    })
+    .join("\n");
 }

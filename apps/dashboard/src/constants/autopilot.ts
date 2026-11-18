@@ -304,7 +304,17 @@ export const AUTOPILOT_WRITER_MAX_POST_PATHS = 200;
  * around, so it targets a question people ask instead of the release.
  */
 export const AUTOPILOT_WRITER_MAX_QUESTIONS = 30;
-export const AUTOPILOT_WRITER_MAX_OUTPUT_TOKENS = 12_000;
+/** Room for high-effort thinking before the post; a run used up to ~9k in total. */
+export const AUTOPILOT_WRITER_MAX_OUTPUT_TOKENS = 16_000;
+/**
+ * High effort, not Opus 5.5's medium default: on replayed briefs it won every
+ * blind comparison for nuance and stated fewer unsourced claims, at ~14% more
+ * output tokens. `thinking` is set so OpenRouter maps the effort too.
+ */
+export const AUTOPILOT_WRITER_ANTHROPIC_OPTIONS = {
+  thinking: { type: "adaptive" },
+  effort: "high",
+} as const;
 /** One fresh rewrite for incomplete output, never an unbounded continuation. */
 export const AUTOPILOT_WRITER_MAX_ATTEMPTS = 2;
 export const AUTOPILOT_WRITER_ATTEMPT_TIMEOUT_MS = 6 * 60_000;

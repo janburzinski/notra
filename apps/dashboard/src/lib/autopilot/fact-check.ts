@@ -20,7 +20,11 @@ import type {
   AutopilotFactSource,
 } from "@/types/autopilot-templates-runtime";
 import { applyPageEdits } from "@/utils/autopilot-edits";
-import { quoteIsInSource, unsourcedFigures } from "@/utils/autopilot-facts";
+import {
+  quoteIsInSource,
+  unsourcedFigures,
+  withoutSourceNotes,
+} from "@/utils/autopilot-facts";
 
 class AutopilotFactCheckError extends Error {
   override name = "AutopilotFactCheckError";
@@ -143,7 +147,14 @@ export async function factCheckComparison(params: {
   const unsupported = claims.filter((claim) => !claim.supported);
   const fixes = unsupported.flatMap((claim) =>
     claim.fix && claim.about !== "brand"
-      ? [{ action: "cut" as const, section: claim.claim, ...claim.fix }]
+      ? [
+          {
+            action: "cut" as const,
+            section: claim.claim,
+            find: claim.fix.find,
+            replace: withoutSourceNotes(claim.fix, params.content),
+          },
+        ]
       : []
   );
   let applied = applyPageEdits(params.content, fixes);
@@ -179,7 +190,7 @@ export async function factCheckComparison(params: {
         action: "cut" as const,
         section: edit.claim,
         find: edit.find,
-        replace: edit.replace,
+        replace: withoutSourceNotes(edit, applied.content),
       }))
     );
     for (const edit of second.applied) {
