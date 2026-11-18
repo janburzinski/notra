@@ -1,0 +1,31 @@
+bun.lock
+  ai_agent 561
+apps/web/package.json
+  s_dc4e61d73b3291::t_7aa88b019c6c97 41
+apps/web/src/components/dithering-shader.tsx
+  s_dc4e61d73b3291::t_d8046e3de03884 17,55-56
+  s_dc4e61d73b3291::t_7aa88b019c6c97 2-9,12-16,26-30,37-46,54,57,65-73,75,79-94
+apps/web/src/lib/dithering/use-dither-cell-budget.ts
+  s_dc4e61d73b3291::t_4f137f333b9b87 1-37
+apps/web/src/constants/dithering.ts
+  s_dc4e61d73b3291::t_d8046e3de03884 20-22
+apps/web/src/constants/dithering-shader.ts
+  s_dc4e61d73b3291::t_7aa88b019c6c97 1-13
+  s_dc4e61d73b3291::t_64b5c064386cae 14-18
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "5bf316d84a14148db3388d5e84d4826cd1e4333b",
+  "prompts": {},
+  "sessions": {
+    "s_dc4e61d73b3291": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "bb4c56a0-c007-42d5-b20c-f55231d6b91e",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
