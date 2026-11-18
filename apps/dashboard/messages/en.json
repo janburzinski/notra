@@ -127,7 +127,7 @@
         "noPendingDescription": "Invitations you send appear here until they're accepted.",
         "domainAutoInvite": {
           "heading": "Join by email domain",
-          "label": "Anyone with an @{domain} email can join",
+          "label": "Anyone with <code>@{domain}</code> can join",
           "description": "New sign-ups with this email are invited to {organization} and join with one click.",
           "managersOnly": "Only owners and admins can change this.",
           "enabled": "Colleagues on your domain will be invited",
@@ -1309,6 +1309,10 @@
         "label": "Weekly GEO recap",
         "description": "One email each Monday with last week's visibility and what changed."
       }
+    },
+    "domainInvite": {
+      "legend": "Team",
+      "label": "Anyone with <code>@{domain}</code> can join"
     },
     "logoField": {
       "upload": "Upload logo"

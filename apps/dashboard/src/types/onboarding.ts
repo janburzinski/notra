@@ -43,6 +43,8 @@ export interface WorkspaceFormProps {
   existingOrg?: OnboardingExistingOrg;
   progressHrefs?: OnboardingProgressHrefs;
   suggestedWebsite?: string;
+  /** Verified company email domain the new workspace may open to, if any. */
+  autoInviteDomain?: string | null;
 }
 
 export interface WorkspaceSlugCheck {
@@ -267,6 +269,7 @@ interface OnboardingWorkspaceFormValues {
   websiteUrl: string;
   dailySummary: boolean;
   marketingEmails: boolean;
+  autoInviteDomain: boolean;
 }
 
 export interface SubmitWorkspaceFormArgs {
@@ -309,6 +312,13 @@ export interface OnboardingEmailPrefsProps {
   disabled: boolean;
   onDailySummaryChange: (checked: boolean) => void;
   onMarketingEmailsChange: (checked: boolean) => void;
+}
+
+export interface OnboardingDomainInvitePrefProps {
+  checked: boolean;
+  disabled: boolean;
+  domain: string;
+  onCheckedChange: (checked: boolean) => void;
 }
 
 export type LogoFileValidationError = "invalidType" | "tooLarge";

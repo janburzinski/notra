@@ -24,6 +24,7 @@ const onboardingWorkspaceFieldsSchema = z.object({
   heardAboutNotraOther: z.string().trim().max(120).nullish(),
   dailySummary: z.boolean(),
   marketingEmails: z.boolean(),
+  autoInviteDomain: z.boolean(),
 });
 
 function addAttributionIssues(

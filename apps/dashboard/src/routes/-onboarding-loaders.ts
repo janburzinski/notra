@@ -35,7 +35,10 @@ import { redirectIfAnyOrganizationHasPaidHistory } from "@/lib/onboarding/billin
 import { resolveCompanyDomain } from "@/lib/onboarding/company-domain";
 import { redirectIfOnboardingDismissed } from "@/lib/onboarding/dismissal";
 import { resolveOnboardingVariant } from "@/lib/onboarding/experiment";
-import { redirectToPendingInvitation } from "@/lib/organizations/domain-invites";
+import {
+  autoInviteDomainFor,
+  redirectToPendingInvitation,
+} from "@/lib/organizations/domain-invites";
 import type { OnboardingLayoutContext } from "@/types/onboarding-layout";
 import type { UiRouteInput } from "@/types/ui-route";
 import {
@@ -208,6 +211,7 @@ export const loadOnboardingWorkspace = createServerFn({ method: "GET" })
         progressHrefs: undefined,
         suggestedWebsite: resolveCompanyDomain({ email: sessionUser.email })
           ?.domain,
+        autoInviteDomain: autoInviteDomainFor(sessionUser),
       };
     }
     await redirectIfOnboardingDismissed(

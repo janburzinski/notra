@@ -48,7 +48,14 @@ export function DomainAutoInviteCard({
       <div className="flex items-center justify-between gap-4">
         <div className="min-w-0 space-y-1">
           <Label className="cursor-pointer" htmlFor="domain-auto-invite">
-            {t("label", { domain })}
+            {t.rich("label", {
+              domain,
+              code: (chunks) => (
+                <code className="bg-muted rounded px-1 py-0.5 font-mono text-xs">
+                  {chunks}
+                </code>
+              ),
+            })}
           </Label>
           <p className="text-muted-foreground text-xs">
             {t("description", { organization: organizationName })}

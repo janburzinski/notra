@@ -20,6 +20,7 @@ import { toast } from "sonner";
 import { useTranslations } from "use-intl";
 
 import { OnboardingDashboardPreview } from "@/components/onboarding/dashboard-preview";
+import { OnboardingDomainInvitePref } from "@/components/onboarding/domain-invite-pref";
 import { OnboardingEmailPrefs } from "@/components/onboarding/email-prefs";
 import { HeardAboutNotraField } from "@/components/onboarding/heard-about-notra-field";
 import { OrgLogoField } from "@/components/onboarding/org-logo-field";
@@ -53,6 +54,7 @@ import {
 const WEBSITE_PREFIX_REGEX = /^https?:\/\//i;
 
 export function WorkspaceForm({
+  autoInviteDomain,
   existingOrg,
   progressHrefs,
   suggestedWebsite,
@@ -90,6 +92,7 @@ export function WorkspaceForm({
       websiteUrl: initialWebsite,
       dailySummary: existingOrg?.dailySummary ?? true,
       marketingEmails: existingOrg?.marketingEmails ?? false,
+      autoInviteDomain: true,
     },
     validators: {
       onSubmit: onboardingWorkspaceFormSchema,
@@ -339,6 +342,19 @@ export function WorkspaceForm({
             )}
           </form.Field>
         )}
+
+        {autoInviteDomain && !isResuming ? (
+          <form.Field name="autoInviteDomain">
+            {(field) => (
+              <OnboardingDomainInvitePref
+                checked={field.state.value}
+                disabled={isSubmitting}
+                domain={autoInviteDomain}
+                onCheckedChange={field.handleChange}
+              />
+            )}
+          </form.Field>
+        ) : null}
 
         <form.Field name="dailySummary">
           {(dailyField) => (

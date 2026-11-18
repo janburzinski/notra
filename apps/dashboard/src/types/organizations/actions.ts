@@ -39,6 +39,7 @@ export interface CreateOrganizationInput {
   name: string;
   slug: string;
   logo?: string;
+  autoInviteDomain?: boolean;
   keepCurrentActiveOrganization?: boolean;
 }
 

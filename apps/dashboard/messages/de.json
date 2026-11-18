@@ -127,7 +127,7 @@
         "noPendingDescription": "Gesendete Einladungen erscheinen hier, bis sie angenommen werden.",
         "domainAutoInvite": {
           "heading": "Beitritt per E-Mail-Domain",
-          "label": "Alle mit einer @{domain}-E-Mail können beitreten",
+          "label": "Alle mit <code>@{domain}</code> können beitreten",
           "description": "Neue Anmeldungen mit dieser E-Mail werden zu {organization} eingeladen und treten mit einem Klick bei.",
           "managersOnly": "Nur Owner und Admins können das ändern.",
           "enabled": "Teammitglieder mit deiner Domain werden eingeladen",
@@ -1309,6 +1309,10 @@
         "label": "Wöchentlicher GEO-Überblick",
         "description": "Eine E-Mail jeden Montag mit der Sichtbarkeit der letzten Woche und den Änderungen."
       }
+    },
+    "domainInvite": {
+      "legend": "Team",
+      "label": "Alle mit <code>@{domain}</code> können beitreten"
     },
     "logoField": {
       "upload": "Logo hochladen"

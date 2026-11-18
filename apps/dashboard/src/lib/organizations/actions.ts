@@ -325,8 +325,10 @@ export async function createOrganization(
                 slug,
                 logo: input.logo ?? null,
                 createdAt: now,
-                // On by default; admins can turn it off under Members.
-                autoInviteDomain: autoInviteDomainFor(session.user),
+                // Only when onboarding asks for it (on by default there); admins can change it under Members.
+                autoInviteDomain: input.autoInviteDomain
+                  ? autoInviteDomainFor(session.user)
+                  : null,
               })
               .returning();
 

@@ -92,6 +92,7 @@ async function submitWorkspaceForm({
       name: parsed.data.name,
       slug: parsed.data.slug,
       logo: generateOrganizationAvatar(parsed.data.slug),
+      autoInviteDomain: parsed.data.autoInviteDomain,
     });
 
     if (error || !data) {

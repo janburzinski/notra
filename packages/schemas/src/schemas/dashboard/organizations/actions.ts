@@ -43,6 +43,8 @@ export const createOrganizationInputSchema = z.object({
   name: organizationNameSchema,
   slug: trimmedOrganizationSlugSchema,
   logo: organizationLogoSchema.optional(),
+  /** Opt in to inviting new sign-ups on the creator's verified email domain. */
+  autoInviteDomain: z.boolean().optional(),
   keepCurrentActiveOrganization: z.boolean().optional(),
 });
 
