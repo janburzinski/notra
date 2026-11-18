@@ -1,0 +1,53 @@
+apps/dashboard/src/lib/autopilot/schedule.ts
+  s_395c9414fcd198::t_3115cef20b192c 5,50-57,73-75
+  s_395c9414fcd198::t_8182e341d97156 15-18,152-154,156
+  s_395c9414fcd198::t_f8a28eb26f3850 155
+apps/dashboard/src/constants/autopilot-transitions.ts
+  s_395c9414fcd198::t_ffa58db0b4fea5 23
+apps/dashboard/src/lib/autopilot/credits.ts
+  s_395c9414fcd198::t_58555d22e572ad 1-129
+apps/dashboard/src/lib/autopilot/metrics.ts
+  s_395c9414fcd198::t_80dd6291d2ce66 213
+  s_395c9414fcd198::t_a8bf13c24978b5 17
+apps/dashboard/src/components/autopilot/autopilot-out-of-credits-notice.tsx
+  s_395c9414fcd198::t_f8a28eb26f3850 1-37
+apps/dashboard/tests/autopilot-schedule.test.ts
+  s_395c9414fcd198::t_2502f9c87e1893 52-59,124-137,146-147,149-150
+  s_395c9414fcd198::t_3115cef20b192c 19,22,138-145,148
+apps/dashboard/src/utils/autopilot-events.ts
+  s_395c9414fcd198::t_1a1e6e51652652 17
+  s_395c9414fcd198::t_ffa58db0b4fea5 420-424
+apps/dashboard/src/lib/orpc/routers/autopilot.ts
+  s_395c9414fcd198::t_7292d70885cb66 56,288-302,305
+apps/dashboard/src/constants/autopilot.ts
+  s_395c9414fcd198::t_58555d22e572ad 196-198
+  s_395c9414fcd198::t_ffa58db0b4fea5 492
+apps/dashboard/src/types/autopilot-runtime.ts
+  s_395c9414fcd198::t_58555d22e572ad 209-211
+apps/dashboard/src/lib/autopilot/analytics.ts
+  s_395c9414fcd198::t_7e0353654a7c44 212-215
+apps/dashboard/src/components/autopilot/autopilot-page-shell.tsx
+  s_395c9414fcd198::t_f8a28eb26f3850 5,73
+packages/db/src/constants/autopilot.ts
+  s_395c9414fcd198::t_b9cda51a62884f 56,62
+apps/dashboard/src/lib/autopilot/start.ts
+  s_395c9414fcd198::t_8182e341d97156 6-8,13,41-46
+apps/dashboard/src/app/(dashboard)/[slug]/autopilot/runs/[id]/page-client.tsx
+  s_395c9414fcd198::t_ffa58db0b4fea5 166
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "f4f445e480b3762beaa5becc4572d94988c9b258",
+  "prompts": {},
+  "sessions": {
+    "s_395c9414fcd198": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "82014d90-dedb-4b0a-8542-695277c56534",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
