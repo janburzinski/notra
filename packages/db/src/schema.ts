@@ -2608,6 +2608,12 @@ export const geoPromptSuggestions = pgTable(
       () => geoPrompts.id,
       { onDelete: "set null" }
     ),
+    /** Product a "product" suggestion was written for; tracking files it there. */
+    productId: text("product_id").references(() => geoProducts.id, {
+      onDelete: "cascade",
+    }),
+    /** Intent the suggestion was written with; copied to the tracked prompt. */
+    intent: text("intent"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at")
       .defaultNow()

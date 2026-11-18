@@ -250,6 +250,18 @@ export const geoProductSortResultSchema = object({
   ),
 });
 
+// Loose on purpose: one overlong prompt must not fail the whole call; the
+// suggestion step drops entries that break the prompt length rules.
+export const geoProductSuggestResultSchema = object({
+  suggestions: array(
+    object({
+      prompt: string(),
+      intent: enumType(GEO_DISCOVERED_PROMPT_INTENTS),
+      reason: string(),
+    })
+  ),
+});
+
 export const geoSequenceCreateInputSchema = geoOrganizationInputSchema.extend({
   id: string().uuid().optional(),
   name: string().trim().min(1).max(GEO_SHORT_FIELD_MAX_LENGTH),

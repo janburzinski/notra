@@ -237,6 +237,13 @@ export class GeoPersonaGenerateError extends Data.TaggedError(
   readonly cause?: unknown;
 }> {}
 
+/** Every product's suggestion call failed, so nothing new was written. */
+export class GeoProductSuggestError extends Data.TaggedError(
+  "GeoProductSuggestError"
+)<{
+  readonly message: string;
+}> {}
+
 export class GeoPersonaRunUnavailableError extends Data.TaggedError(
   "GeoPersonaRunUnavailableError"
 )<Record<string, never>> {}
@@ -318,6 +325,7 @@ export type GeoRouterError =
   | GeoDatabaseError
   | GeoDiscoveryError
   | GeoPersonaGenerateError
+  | GeoProductSuggestError
   | GeoPersonaLimitError
   | GeoPersonaNotFoundError
   | GeoPersonaRunError

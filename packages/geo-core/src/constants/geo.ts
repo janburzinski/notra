@@ -586,6 +586,15 @@ export const GEO_PRODUCT_SORT_MAX_PROMPTS = 200;
 export const GEO_PRODUCT_SORT_MAX_TOKENS = 8000;
 /** Healthy sort calls took up to ~19 s in testing; one stuck call took 6 minutes. */
 export const GEO_PRODUCT_SORT_TIMEOUT_MS = 30_000;
+/** Writes new prompts for one product at a time, shown as suggestions to track. */
+export const GEO_PRODUCT_SUGGEST_MODEL = "openai/gpt-6-luna";
+export const GEO_PRODUCT_SUGGEST_COUNT = 5;
+export const GEO_PRODUCT_SUGGEST_MAX_TOKENS = 4000;
+/** Calls took 8 to 12 s in testing; the same stuck-provider guard as sorting. */
+export const GEO_PRODUCT_SUGGEST_TIMEOUT_MS = 30_000;
+/** Tracked prompts and earlier suggestions sent along so the model avoids repeats. */
+export const GEO_PRODUCT_SUGGEST_CONTEXT_LIMIT = 60;
+export const GEO_PRODUCT_SUGGEST_REASON_MAX_LENGTH = 160;
 export const GEO_DISCOVERY_ALIAS_LIMIT = 8;
 export const GEO_DISCOVERY_COMPETITOR_LIMIT = 12;
 export const GEO_DISCOVERY_CACHE_PREFIX = "geo:discovery:v7";

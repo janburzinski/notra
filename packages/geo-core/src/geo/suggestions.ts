@@ -5,18 +5,20 @@ import { Effect } from "effect";
 
 import { GeoSuggestionNotFoundError } from "../schemas/suggestion-errors";
 import type { DbTransaction } from "../types/db";
-import type { GeoScopeInput } from "../types/geo";
+import type { GeoPromptRow, GeoScopeInput } from "../types/geo";
 import type {
   GeoSuggestionInput,
   GeoSuggestionRow,
 } from "../types/suggestions";
-import { geoDb } from "./effect";
+import { geoDb, geoSkip } from "./effect";
 import { GeoDatabaseError } from "./errors";
 import { lockGeoProjectInTransaction } from "./lock";
 import { toTrackedPrompt } from "./mappers";
 import { toggleGeoPrompt } from "./programs";
 import { requireGeoProject } from "./projects";
 import { promptKey } from "./prompt-key";
+import { pickNewGeoPrompts } from "./prompt-translations";
+import { customPromptScanId } from "./prompts";
 
 export const listSuggestions = Effect.fn("geo.suggestions.list")(function* (
   input: GeoScopeInput
@@ -45,11 +47,35 @@ export const listSuggestions = Effect.fn("geo.suggestions.list")(function* (
   };
 });
 
+/**
+ * A suggestion that matches a prompt the project already tracks fills in the
+ * product and intent that prompt is missing; set values are never overwritten.
+ */
+async function adoptSuggestionDetails(
+  tx: DbTransaction,
+  existing: GeoPromptRow,
+  suggestion: GeoSuggestionRow
+) {
+  const productId = existing.productId ?? suggestion.productId;
+  const intent = existing.intent ?? suggestion.intent;
+  if (productId === existing.productId && intent === existing.intent) {
+    return existing;
+  }
+  const [updated] = await tx
+    .update(geoPrompts)
+    .set({ productId, intent })
+    .where(eq(geoPrompts.id, existing.id))
+    .returning();
+  return updated ?? existing;
+}
+
 async function acceptSuggestionInTx(
   tx: DbTransaction,
   organizationId: string,
   projectId: string,
-  suggestion: GeoSuggestionRow
+  suggestion: GeoSuggestionRow,
+  /** Collects ids of prompts this call created, not reused. */
+  created: string[] = []
 ) {
   const existing = await tx.query.geoPrompts.findFirst({
     where: and(
@@ -58,22 +84,28 @@ async function acceptSuggestionInTx(
       sql`lower(trim(${geoPrompts.prompt})) = ${promptKey(suggestion.prompt)}`
     ),
   });
-  const prompt =
-    existing ??
-    (
-      await tx
-        .insert(geoPrompts)
-        .values({
-          id: crypto.randomUUID(),
-          organizationId,
-          projectId,
-          prompt: suggestion.prompt,
-          title: suggestion.title,
-        })
-        .returning()
-    )[0];
+  const prompt = existing
+    ? await adoptSuggestionDetails(tx, existing, suggestion)
+    : (
+        await tx
+          .insert(geoPrompts)
+          .values({
+            id: crypto.randomUUID(),
+            organizationId,
+            projectId,
+            prompt: suggestion.prompt,
+            title: suggestion.title,
+            // Product suggestions get their product's badge right away.
+            productId: suggestion.productId,
+            intent: suggestion.intent,
+          })
+          .returning()
+      )[0];
   if (!prompt) {
     throw new Error("Failed to create suggestion prompt");
+  }
+  if (!existing) {
+    created.push(prompt.id);
   }
   await tx
     .update(geoPromptSuggestions)
@@ -88,6 +120,18 @@ async function acceptSuggestionInTx(
     );
   return toTrackedPrompt(prompt);
 }
+
+/**
+ * Gives newly tracked prompts their slot in languages that already have saved
+ * picks, like `createGeoPrompt` does; a failed pick never fails tracking.
+ */
+const pickTrackedSuggestions = (
+  input: GeoScopeInput,
+  promptIds: readonly string[]
+) =>
+  pickNewGeoPrompts(input, promptIds.map(customPromptScanId)).pipe(
+    geoSkip("prompt translation pick failed")
+  );
 
 /** Autopilot's pending changes to tracked prompts, e.g. pausing a dead prompt. */
 export const listAutopilotPromptSuggestions = Effect.fn(
@@ -184,7 +228,8 @@ export const acceptSuggestion = Effect.fn("geo.suggestions.accept")(function* (
   if (paused) {
     return paused;
   }
-  return yield* Effect.tryPromise({
+  const created: string[] = [];
+  const accepted = yield* Effect.tryPromise({
     try: () =>
       db.transaction(async (tx) => {
         await lockGeoProjectInTransaction(tx, projectId);
@@ -209,7 +254,8 @@ export const acceptSuggestion = Effect.fn("geo.suggestions.accept")(function* (
           tx,
           input.organizationId,
           projectId,
-          suggestion
+          suggestion,
+          created
         );
         return { projectId, prompt, suggestion };
       }),
@@ -218,6 +264,8 @@ export const acceptSuggestion = Effect.fn("geo.suggestions.accept")(function* (
         ? cause
         : new GeoDatabaseError({ label: "accept suggestion", cause }),
   });
+  yield* pickTrackedSuggestions(input, created);
+  return accepted;
 });
 
 export const acceptAllSuggestions = Effect.fn("geo.suggestions.acceptAll")(
@@ -237,7 +285,8 @@ export const acceptAllSuggestions = Effect.fn("geo.suggestions.acceptAll")(
     if (!pending) {
       return { projectId, suggestions: [], accepted: 0 };
     }
-    return yield* geoDb("accept all suggestions", () =>
+    const created: string[] = [];
+    const result = yield* geoDb("accept all suggestions", () =>
       db.transaction(async (tx) => {
         await lockGeoProjectInTransaction(tx, projectId);
         const suggestions = await tx
@@ -259,11 +308,19 @@ export const acceptAllSuggestions = Effect.fn("geo.suggestions.acceptAll")(
           )
           .for("update");
         for (const row of suggestions) {
-          await acceptSuggestionInTx(tx, input.organizationId, projectId, row);
+          await acceptSuggestionInTx(
+            tx,
+            input.organizationId,
+            projectId,
+            row,
+            created
+          );
         }
         return { projectId, suggestions, accepted: suggestions.length };
       })
     );
+    yield* pickTrackedSuggestions(input, created);
+    return result;
   }
 );
 

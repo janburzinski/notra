@@ -1061,6 +1061,7 @@
       "tooManyRuns": "Too many runs. Please wait a few minutes.",
       "tooManyPersonaGenerations": "Too many persona generations. Please wait a few minutes.",
       "tooManyLookups": "Too many lookups. Please wait a minute.",
+      "tooManySuggestionRefreshes": "Too many suggestion refreshes. Please wait a few minutes.",
       "tooManySearches": "Too many searches. Please wait a minute.",
       "tooManyBriefs": "Too many briefs. Please wait a few minutes.",
       "propertyUnavailable": "That property is not available on the connected Google account",
@@ -4424,6 +4425,7 @@
       "addPromptFailed": "Failed to add prompt",
       "addPromptsFailed": "Failed to add prompts",
       "dismissSuggestionFailed": "Failed to dismiss suggestion",
+      "suggestPromptsFailed": "Could not suggest prompts",
       "importResult": {
         "imported": "Imported {count} {kind, select, prompts {{count, plural, one {prompt} other {prompts}}} other {{count, plural, one {competitor} other {competitors}}}}",
         "updated": "updated {count}",
@@ -4681,6 +4683,21 @@
       "trackNamed": "Track {brand}",
       "dismissNamed": "Dismiss {brand}",
       "dismiss": "Dismiss suggestion"
+    },
+    "productSuggestions": {
+      "title": "Suggested prompts",
+      "description": "Questions people might ask where your products could be the answer. Track the ones that matter to you.",
+      "refresh": "Refresh",
+      "refreshing": "Refreshing…",
+      "refreshHint": "Writes new suggestions for every product. Ones you dismissed or already track won't come back.",
+      "generating": "Writing suggestions for your products…",
+      "empty": "No suggestions right now. Refresh to get new ones.",
+      "suggestion": "Suggestion",
+      "product": "Product",
+      "dismiss": "Dismiss \"{prompt}\"",
+      "suggestedPrompt": "Suggested prompt",
+      "why": "Why this prompt",
+      "dismissAction": "Dismiss"
     },
     "autopilotPromptSuggestions": {
       "eyebrow": "Autopilot suggests",

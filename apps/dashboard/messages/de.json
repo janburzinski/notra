@@ -1061,6 +1061,7 @@
       "tooManyRuns": "Zu viele Ausführungen. Bitte warte ein paar Minuten.",
       "tooManyPersonaGenerations": "Zu viele Persona-Erstellungen. Bitte warte ein paar Minuten.",
       "tooManyLookups": "Zu viele Abfragen. Bitte warte eine Minute.",
+      "tooManySuggestionRefreshes": "Zu viele neue Vorschläge angefordert. Bitte warte ein paar Minuten.",
       "tooManySearches": "Zu viele Suchen. Bitte warte eine Minute.",
       "tooManyBriefs": "Zu viele Briefings. Bitte warte ein paar Minuten.",
       "propertyUnavailable": "Diese Property ist im verbundenen Google-Konto nicht verfügbar",
@@ -4424,6 +4425,7 @@
       "addPromptFailed": "Prompt konnte nicht hinzugefügt werden",
       "addPromptsFailed": "Prompts konnten nicht hinzugefügt werden",
       "dismissSuggestionFailed": "Vorschlag konnte nicht verworfen werden",
+      "suggestPromptsFailed": "Prompts konnten nicht vorgeschlagen werden",
       "importResult": {
         "imported": "{count} {kind, select, prompts {{count, plural, one {Prompt} other {Prompts}}} other {Wettbewerber}} importiert",
         "updated": "{count} aktualisiert",
@@ -4681,6 +4683,21 @@
       "trackNamed": "{brand} tracken",
       "dismissNamed": "{brand} ausblenden",
       "dismiss": "Vorschlag ausblenden"
+    },
+    "productSuggestions": {
+      "title": "Vorgeschlagene Prompts",
+      "description": "Fragen, bei denen deine Produkte die Antwort sein könnten. Tracke die, die dir wichtig sind.",
+      "refresh": "Aktualisieren",
+      "refreshing": "Wird aktualisiert…",
+      "refreshHint": "Schreibt neue Vorschläge für jedes Produkt. Verworfene oder schon getrackte kommen nicht wieder.",
+      "generating": "Vorschläge für deine Produkte werden geschrieben…",
+      "empty": "Gerade keine Vorschläge. Aktualisiere für neue.",
+      "suggestion": "Vorschlag",
+      "product": "Produkt",
+      "dismiss": "\"{prompt}\" verwerfen",
+      "suggestedPrompt": "Vorgeschlagener Prompt",
+      "why": "Warum dieser Prompt",
+      "dismissAction": "Verwerfen"
     },
     "autopilotPromptSuggestions": {
       "eyebrow": "Autopilot schlägt vor",

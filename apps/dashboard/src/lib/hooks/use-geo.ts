@@ -158,6 +158,26 @@ async function invalidateCompetitorQueries(
   ]);
 }
 
+/** Products and their suggestions, after website discovery changed them. */
+async function invalidateProductQueries(
+  queryClient: QueryClient,
+  organizationId: string,
+  projectId: string | undefined
+) {
+  await Promise.all([
+    queryClient.invalidateQueries({
+      queryKey: dashboardOrpc.geo.productsList.queryKey({
+        input: { organizationId, projectId },
+      }),
+    }),
+    queryClient.invalidateQueries({
+      queryKey: dashboardOrpc.geo.productSuggestionsList.queryKey({
+        input: { organizationId, projectId },
+      }),
+    }),
+  ]);
+}
+
 async function invalidatePromptQueries(
   queryClient: QueryClient,
   organizationId: string,
@@ -736,6 +756,8 @@ export function useGeoGenerateFromWebsite(organizationId: string) {
       await Promise.all([
         invalidateCompetitorQueries(queryClient, organizationId, projectId),
         invalidatePromptQueries(queryClient, organizationId, projectId),
+        // A project's first products show the suggestions section.
+        invalidateProductQueries(queryClient, organizationId, projectId),
       ]);
       toast.success(tToast("geoTrackingGeneratedWebsite"));
     },
@@ -1991,6 +2013,100 @@ export function useGeoAutopilotPromptSuggestionAction(organizationId: string) {
         toErrorMessage(
           error,
           action === "pause" ? t("pauseFailed") : t("keepFailed")
+        )
+      );
+    },
+  });
+}
+
+function useInvalidateProductSuggestions(organizationId: string) {
+  const { projectId } = useGeoProjectScope();
+  const queryClient = useQueryClient();
+  return () =>
+    Promise.all([
+      queryClient.invalidateQueries({
+        queryKey: dashboardOrpc.geo.productSuggestionsList.queryKey({
+          input: { organizationId, projectId },
+        }),
+      }),
+      // The prompts table reads the geo-db collection, not the oRPC list.
+      queryClient.invalidateQueries({
+        queryKey: geoDbOrgQueryKey("prompts", organizationId),
+      }),
+    ]);
+}
+
+export function useGeoProductSuggestions(organizationId: string) {
+  const { projectId } = useGeoProjectScope();
+  return useQuery({
+    ...dashboardOrpc.geo.productSuggestionsList.queryOptions({
+      input: { organizationId, projectId },
+    }),
+    enabled: !!organizationId,
+  });
+}
+
+/** Writes fresh suggestions for every product; the list query gets the result. */
+export function useGeoProductSuggestionsGenerate(organizationId: string) {
+  const tToast = useTranslations("geo.toasts");
+  const { projectId } = useGeoProjectScope();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: () =>
+      withMinLoading(
+        dashboardOrpc.geo.productSuggestionsGenerate.call({
+          organizationId,
+          projectId,
+        })
+      ),
+    onSuccess: (response) => {
+      queryClient.setQueryData(
+        dashboardOrpc.geo.productSuggestionsList.queryKey({
+          input: { organizationId, projectId },
+        }),
+        response
+      );
+    },
+    onError: (error) => {
+      toast.error(toErrorMessage(error, tToast("suggestPromptsFailed")));
+    },
+  });
+}
+
+export function useGeoProductSuggestionAction(organizationId: string) {
+  const tToast = useTranslations("geo.toasts");
+  const { projectId } = useGeoProjectScope();
+  const invalidate = useInvalidateProductSuggestions(organizationId);
+  return useMutation({
+    mutationFn: async ({
+      suggestionId,
+      action,
+    }: {
+      suggestionId: string;
+      action: "track" | "dismiss";
+    }) => {
+      const input = { suggestionId, organizationId, projectId };
+      await withMinLoading<unknown>(
+        action === "track"
+          ? dashboardOrpc.geo.suggestionAccept.call(input)
+          : dashboardOrpc.geo.suggestionDismiss.call(input)
+      );
+    },
+    onSuccess: async (_, { action }) => {
+      await invalidate();
+      if (action === "track") {
+        toast.success(tToast("promptAddedTracking"), {
+          description: tToast("trackedPromptNextScan"),
+        });
+      }
+    },
+    onError: (error, { action }) => {
+      toast.error(
+        toErrorMessage(
+          error,
+          action === "track"
+            ? tToast("addPromptFailed")
+            : tToast("dismissSuggestionFailed")
         )
       );
     },

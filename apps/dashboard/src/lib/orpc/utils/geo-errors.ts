@@ -61,6 +61,9 @@ export async function toGeoOrpcError(failure: GeoRouterError): Promise<Error> {
     case "GeoPersonaGenerateError":
       logError("[GEO] persona generation failed", failure);
       return badRequest(t("geo.toasts.personaGenerationFailed"));
+    case "GeoProductSuggestError":
+      logError("[GEO] product prompt suggestions failed", failure);
+      return badRequest(t("geo.toasts.suggestPromptsFailed"));
     case "GeoPersonaRunUnavailableError":
       return badRequest(t("errors.geo.noGroundedEngines"));
     case "GeoPersonaRunError":

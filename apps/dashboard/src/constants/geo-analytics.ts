@@ -10,6 +10,7 @@ export const GEO_PROMPT_SOURCES = {
   WEBSITE_GENERATE: "website_generate",
   CSV: "csv",
   GSC_SUGGESTION: "gsc_suggestion",
+  PRODUCT_SUGGESTION: "product_suggestion",
   API: "api",
 } as const;
 

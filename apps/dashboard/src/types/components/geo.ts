@@ -8,10 +8,15 @@ import type {
   GeoImportKind,
 } from "@notra/geo-core/types/geo-import";
 import type { GeoSearchConsoleStatus } from "@notra/geo-core/types/google-search-console";
+import type { GeoProductSuggestion } from "@notra/geo-core/types/suggestions";
 import type { ReactNode } from "react";
 
 import type { GeoPromptSuggestion, GeoPromptTableRow } from "@/types/geo";
 import type { GeoAccessLevel } from "@/types/geo-access";
+
+export interface ProductPromptSuggestionsProps {
+  organizationId: string;
+}
 
 export interface PromptSuggestionsProps {
   organizationId: string;
@@ -213,4 +218,13 @@ export interface PromptProductCellProps {
   onMove: (product: GeoProduct | null) => void;
   /** Creates a product with this name and moves the prompt into it. */
   onCreateProduct: (name: string) => void;
+}
+
+export interface ProductSuggestionSheetProps {
+  suggestion: GeoProductSuggestion | null;
+  product: GeoProduct | null;
+  busy: boolean;
+  onTrack: () => void;
+  onDismiss: () => void;
+  onOpenChange: (open: boolean) => void;
 }

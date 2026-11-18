@@ -29,6 +29,7 @@ import { ConversationsCard } from "@/components/geo/conversations-card";
 import { PromptsCsvImportDialog } from "@/components/geo/geo-csv-import-dialog";
 import { GeoRangePicker } from "@/components/geo/geo-range-picker";
 import { GeoSetupButton } from "@/components/geo/geo-setup-button";
+import { ProductPromptSuggestions } from "@/components/geo/product-prompt-suggestions";
 import { PromptAddDialog } from "@/components/geo/prompt-add-dialog";
 import { PromptSuggestions } from "@/components/geo/prompt-suggestions";
 import { PromptsTable } from "@/components/geo/prompts-table";
@@ -229,6 +230,7 @@ export default function PageClient({ organizationSlug }: PageClientProps) {
                 prompts={prompts}
                 results={promptResults?.results ?? []}
               />
+              <ProductPromptSuggestions organizationId={organizationId} />
             </TabsContent>
             <TabsContent className="mt-4" value="conversations">
               <ConversationsCard

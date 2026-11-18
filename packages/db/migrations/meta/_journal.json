@@ -1191,6 +1191,13 @@
       "when": 1794935629862,
       "tag": "0169_geo_products",
       "breakpoints": true
+    },
+    {
+      "idx": 170,
+      "version": "7",
+      "when": 1794935715033,
+      "tag": "0170_geo_product_suggestions",
+      "breakpoints": true
     }
   ]
 }

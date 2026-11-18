@@ -70,6 +70,10 @@ import {
   updateGeoPersona,
 } from "@notra/geo-core/geo/personas";
 import {
+  generateProductSuggestions,
+  listProductSuggestions,
+} from "@notra/geo-core/geo/product-suggestions";
+import {
   addGeoTrackedEngine,
   addGeoTrackedLanguage,
   createGeoPrompt,
@@ -270,6 +274,7 @@ import type {
   GscSitesResponse,
   GscSyncResult,
 } from "@notra/geo-core/types/google-search-console";
+import type { GeoProductSuggestionsResponse } from "@notra/geo-core/types/suggestions";
 import { webHostFilter } from "@notra/geo-core/utils/geo-project-domains";
 import { POSTHOG_EVENTS } from "@notra/posthog/events";
 import { organizationIdInputSchema } from "@notra/schemas/dashboard/auth/organization";
@@ -2495,6 +2500,35 @@ export const geoRouter = {
         return await runOrpcEffect(listSuggestions(input), toGeoOrpcError);
       }
     ),
+  productSuggestionsList: authorizedProcedure
+    .input(geoOrganizationInputSchema)
+    .handler(
+      async ({ context, input }): Promise<GeoProductSuggestionsResponse> => {
+        await assertOrganizationAccess(accessParams({ context, input }));
+        return await runOrpcEffect(
+          listProductSuggestions(input),
+          toGeoOrpcError
+        );
+      }
+    ),
+  productSuggestionsGenerate: authorizedProcedure
+    .input(geoOrganizationInputSchema)
+    .handler(
+      async ({ context, input }): Promise<GeoProductSuggestionsResponse> => {
+        await assertGeoAccess(accessParams({ context, input }));
+        const rate = await ratelimit.geoProductSuggestions.limit(
+          input.organizationId
+        );
+        if (!rate.success) {
+          const tErrors = await getTranslations("errors.geo");
+          throw badRequest(tErrors("tooManySuggestionRefreshes"));
+        }
+        return await runOrpcEffect(
+          generateProductSuggestions(input),
+          toGeoOrpcError
+        );
+      }
+    ),
   autopilotPromptSuggestionsList: authorizedProcedure
     .input(geoOrganizationInputSchema)
     .handler(async ({ context, input }) => {
@@ -2522,6 +2556,30 @@ export const geoRouter = {
         refreshGeoContentGapsBestEffort(input),
         toGeoOrpcError
       );
+      if (suggestion.source === "product") {
+        trackGeoRouterEvent({
+          context,
+          input,
+          event: POSTHOG_EVENTS.GEO_SUGGESTION_ACCEPTED,
+          projectId,
+          properties: {
+            count: 1,
+            suggestion_id: suggestion.id,
+            source: suggestion.source,
+          },
+        });
+        trackGeoRouterEvent({
+          context,
+          input,
+          event: POSTHOG_EVENTS.GEO_PROMPT_ADDED,
+          projectId,
+          properties: {
+            source: GEO_PROMPT_SOURCES.PRODUCT_SUGGESTION,
+            prompt_id: accepted.id,
+          },
+        });
+        return accepted;
+      }
       if (suggestion.action === "pause") {
         trackGeoRouterEvent({
           context,

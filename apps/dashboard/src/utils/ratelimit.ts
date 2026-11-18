@@ -147,6 +147,11 @@ export const ratelimit = {
     requests: 10,
     window: "10m",
   }),
+  geoProductSuggestions: createLimiter({
+    prefix: "ratelimit:geo-product-suggestions",
+    requests: 10,
+    window: "10m",
+  }),
   geoBrandSearch: createLimiter({
     prefix: "ratelimit:geo-brand-search",
     requests: 60,
