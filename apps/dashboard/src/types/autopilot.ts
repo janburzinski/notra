@@ -517,6 +517,19 @@ export interface AutopilotBackLinkProps {
   tab?: (typeof AUTOPILOT_PAGE_TABS)[number];
 }
 
+export interface AutopilotUpgradeSectionProps {
+  heading: string;
+  action?: ReactNode;
+  footer?: ReactNode;
+  children: ReactNode;
+}
+
+export interface AutopilotUpgradeGateProps {
+  organizationSlug: string;
+  /** Called when the upgrade dialog closes, so Autopilot can load if the plan changed. */
+  onDialogClosed: () => void;
+}
+
 export interface AutopilotPageShellProps {
   organizationSlug: string;
   children: (context: {

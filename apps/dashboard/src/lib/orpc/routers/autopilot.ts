@@ -40,6 +40,8 @@ import {
   AUTOPILOT_SETUP_JOBS,
   AUTOPILOT_DEFAULT_STALE_PULL_REQUEST_DAYS,
   AUTOPILOT_RUNS_PAGE_SIZE,
+  AUTOPILOT_ACCESS_CHECK_FAILED_MESSAGE,
+  AUTOPILOT_UPGRADE_REQUIRED_MESSAGE,
 } from "@/constants/autopilot";
 import {
   AUTOPILOT_DEFAULT_APPROVALS,
@@ -66,8 +68,8 @@ import {
   syncFindingPullRequests,
 } from "@/lib/autopilot/findings";
 import {
-  isAutopilotEnabledForOrganization,
   isAutopilotWorkflowGraphEnabled,
+  resolveAutopilotAvailability,
 } from "@/lib/autopilot/flag";
 import { loadFindingImpacts } from "@/lib/autopilot/impact";
 import {
@@ -115,6 +117,7 @@ import {
   conflict,
   forbidden,
   notFound,
+  paymentRequired,
   serviceUnavailable,
   tooManyRequests,
 } from "@/lib/orpc/utils/errors";
@@ -131,13 +134,23 @@ import { toAutopilotCommitFilters } from "@/utils/autopilot-commit-filters";
 import { canManageAutopilot } from "@/utils/autopilot-permissions";
 
 /**
- * Autopilot is behind the `autopilot` flag: every procedure but `get` refuses
- * workspaces without it, and `get` returns nothing but `available: false`.
+ * Autopilot needs the `autopilot` flag and the `autopilot` plan feature: every
+ * procedure but `get` refuses workspaces without both, and `get` returns
+ * nothing but `available: false` and whether an upgrade would unlock it.
  */
 const withAutopilotFlag = os
   .$context<ORPCContext>()
   .middleware(async ({ next }, input: { organizationId: string }) => {
-    if (!(await isAutopilotEnabledForOrganization(input.organizationId))) {
+    const availability = await resolveAutopilotAvailability(
+      input.organizationId
+    );
+    if (availability === "upgrade_required") {
+      throw paymentRequired(AUTOPILOT_UPGRADE_REQUIRED_MESSAGE);
+    }
+    if (availability === "unavailable") {
+      throw serviceUnavailable(AUTOPILOT_ACCESS_CHECK_FAILED_MESSAGE);
+    }
+    if (availability !== "enabled") {
       throw forbidden("Autopilot is not available for this workspace yet.");
     }
     return next();
@@ -237,8 +250,13 @@ export const autopilotRouter = {
     .use(withOrganizationAccess)
     .handler(async ({ input, context }) => {
       const { organizationId } = input;
-      // Without the flag nothing about Autopilot leaves the server.
-      const enabled = await isAutopilotEnabledForOrganization(organizationId);
+      // Without access nothing about Autopilot leaves the server.
+      const availability = await resolveAutopilotAvailability(organizationId);
+      // A failed check shows "try again", not "not available" or the paywall.
+      if (availability === "unavailable") {
+        throw serviceUnavailable(AUTOPILOT_ACCESS_CHECK_FAILED_MESSAGE);
+      }
+      const enabled = availability === "enabled";
       const [
         settings,
         installations,
@@ -289,6 +307,7 @@ export const autopilotRouter = {
       const describedRuns = await describeRuns(organizationId, runs);
       return {
         available: enabled,
+        upgradeRequired: availability === "upgrade_required",
         canManage: canManageAutopilot(context.auth.membership.role),
         settings: {
           configured: Boolean(settings),

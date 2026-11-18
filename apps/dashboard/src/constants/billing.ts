@@ -17,6 +17,12 @@ export const PLAN_NAME_BILLING_INTERVAL_SUFFIX =
 
 export const FEATURED_PLAN_TIER: string = PLANS.GROWTH;
 
+/** The tiers whose plans include the `autopilot` feature in Autumn. */
+export const AUTOPILOT_PLAN_TIERS: readonly string[] = [
+  PLANS.GROWTH,
+  PLANS.SCALE,
+];
+
 export const LEGACY_PLAN_TIERS: Record<string, string> = {
   [LEGACY_PLANS.BASIC]: PLANS.STARTER,
   [LEGACY_PLANS.BASIC_YEARLY]: PLANS.STARTER,
@@ -29,7 +35,7 @@ export const PLAN_TIER_LIMITS: Record<string, PlanTierLimits> = {
     aiAnswers: 6000,
     imageGenerations: 8,
     longFormPosts: 10,
-    pullRequestCredits: 10,
+    pullRequestCredits: null,
     projects: 1,
     references: 100,
     referenceOveragePrice: "0.05",
@@ -39,7 +45,7 @@ export const PLAN_TIER_LIMITS: Record<string, PlanTierLimits> = {
     aiAnswers: 16_000,
     imageGenerations: 20,
     longFormPosts: 25,
-    pullRequestCredits: 15,
+    pullRequestCredits: 3000,
     projects: 3,
     references: 500,
     referenceOveragePrice: "0.04",
@@ -49,7 +55,7 @@ export const PLAN_TIER_LIMITS: Record<string, PlanTierLimits> = {
     aiAnswers: 35_000,
     imageGenerations: 45,
     longFormPosts: 50,
-    pullRequestCredits: 25,
+    pullRequestCredits: 5000,
     projects: 10,
     references: 1000,
     referenceOveragePrice: "0.03",

@@ -62,7 +62,8 @@ if (process.env.NOTRA_AUTOPILOT_DREAM_TEST !== "1") {
   mock.module("@notra/db/drizzle", () => ({ db }));
   mock.module("@/lib/autopilot/flag", () => ({
     isAutopilotEnabledForOrganization: async () => true,
-    autopilotFlagState: async () => "enabled",
+    isAutopilotOffForOrganization: async () => false,
+    autopilotAccessState: async () => "enabled",
   }));
 
   type PullFixture = {

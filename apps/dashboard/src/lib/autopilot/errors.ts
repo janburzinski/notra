@@ -8,3 +8,11 @@ export class AutopilotSlackDeliveryError extends Data.TaggedError(
   readonly organizationId: string;
   readonly cause?: unknown;
 }> {}
+
+export class AutopilotEntitlementError extends Data.TaggedError(
+  "AutopilotEntitlementError"
+)<{
+  readonly message: string;
+  readonly organizationId: string;
+  readonly cause: unknown;
+}> {}

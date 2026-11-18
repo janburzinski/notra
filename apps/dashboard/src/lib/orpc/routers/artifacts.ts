@@ -1,6 +1,7 @@
 import {
   ArtifactConflictError,
   ArtifactNotFoundError,
+  readArtifact,
   restoreArtifactVersion,
 } from "@notra/ai/chat/artifacts";
 import {
@@ -12,6 +13,7 @@ import {
 
 import { deleteArtifact, setArtifactShared } from "@/lib/artifacts/manage";
 import { loadArtifactView } from "@/lib/artifacts/view";
+import { isAutopilotEnabledForOrganization } from "@/lib/autopilot/flag";
 import { authorizedProcedure, withOrganizationAccess } from "@/lib/orpc/base";
 import { assertNotDemo, conflict, notFound } from "@/lib/orpc/utils/errors";
 
@@ -63,6 +65,16 @@ export const artifactsRouter = {
     .use(withOrganizationAccess)
     .handler(async ({ input }) => {
       assertNotDemo();
+      // Unsharing always works; publishing an Autopilot brief needs the plan.
+      if (input.shared) {
+        const read = await readArtifact(input.organizationId, input.artifactId);
+        if (
+          read?.artifact.source === "autopilot" &&
+          !(await isAutopilotEnabledForOrganization(input.organizationId))
+        ) {
+          throw notFound(NOT_FOUND);
+        }
+      }
       const result = await setArtifactShared(
         input.organizationId,
         input.artifactId,

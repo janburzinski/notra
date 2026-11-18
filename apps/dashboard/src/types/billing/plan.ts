@@ -91,7 +91,8 @@ export interface PlanTierLimits {
   aiAnswers: number;
   imageGenerations: number;
   longFormPosts: number;
-  pullRequestCredits: number;
+  /** Monthly credits for Autopilot and @notra mentions; null hides the line. */
+  pullRequestCredits: number | null;
   projects: number;
   references: number;
   referenceOveragePrice: string;

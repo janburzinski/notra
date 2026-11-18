@@ -73,6 +73,13 @@ export async function loadArtifactView(params: {
     return null;
   }
   const { artifact } = read;
+  // An Autopilot brief goes with the plan, like its /brief link.
+  if (
+    artifact.source === "autopilot" &&
+    !(await isAutopilotEnabledForOrganization(params.organizationId))
+  ) {
+    return null;
+  }
   return {
     id: artifact.id,
     source: artifact.source,
@@ -107,6 +114,14 @@ export async function loadArtifactView(params: {
 export async function loadSharedArtifactView(shareId: string) {
   const shared = await readSharedArtifact(shareId);
   if (!shared) {
+    return null;
+  }
+  // A brief shared before a downgrade goes with the plan too. A public read
+  // fails closed: without a confirmed plan it isn't served.
+  if (
+    shared.source === "autopilot" &&
+    !(await isAutopilotEnabledForOrganization(shared.organizationId))
+  ) {
     return null;
   }
   const findingIds = artifactFindingIds(shared.content.blocks);

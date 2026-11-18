@@ -16,6 +16,7 @@ export const FEATURES = {
   LOG_RETENTION_14_DAYS: "log_retention_14_days",
   LOG_RETENTION_30_DAYS: "log_retention_30_days",
   ZDR: "zdr",
+  AUTOPILOT: "autopilot",
 } as const;
 
 export const PLANS = {

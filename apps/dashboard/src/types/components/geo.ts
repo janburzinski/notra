@@ -144,7 +144,7 @@ export interface GeoUpgradeDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onOpenChangeComplete?: (open: boolean) => void;
-  entry?: "geo" | "sidebar" | "studio" | "sites";
+  entry?: "geo" | "sidebar" | "studio" | "sites" | "autopilot";
 }
 
 export interface GeoCsvImportDialogProps<TRow> {

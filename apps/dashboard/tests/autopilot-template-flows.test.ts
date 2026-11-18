@@ -199,7 +199,8 @@ if (process.env.NOTRA_AUTOPILOT_TEMPLATE_FLOW_TEST !== "1") {
   }));
   mock.module("@/lib/autopilot/flag", () => ({
     isAutopilotEnabledForOrganization: async () => true,
-    autopilotFlagState: async () => "enabled",
+    isAutopilotOffForOrganization: async () => false,
+    autopilotAccessState: async () => "enabled",
   }));
   mock.module("@/lib/geo/configure", () => ({
     geoCoreDashboardLayer: Layer.empty,

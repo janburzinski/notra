@@ -15,7 +15,7 @@ import { createRequestLogger } from "evlog";
 
 import { isAnalyticsEnabledForOrganization } from "@/lib/analytics/flag";
 import { getServerSession } from "@/lib/auth/session";
-import { isAutopilotEnabledForOrganization } from "@/lib/autopilot/flag";
+import { resolveAutopilotAvailability } from "@/lib/autopilot/flag";
 import { hasAiCreditsGrant } from "@/lib/billing/subscription";
 import { resolveNavigationWithJev } from "@/lib/command-palette/jev-navigation";
 import { searchWorkspace } from "@/lib/search/workspace-search";
@@ -160,7 +160,11 @@ export async function POST(request: Request) {
   const organizationId = member.organizationId;
   const [hasAiCredits, autopilot, analytics, searchData] = await Promise.all([
     hasAiCreditsGrant(organizationId).catch(() => false),
-    isAutopilotEnabledForOrganization(organizationId),
+    // Workspaces that need to upgrade keep the route: it opens the paywall.
+    resolveAutopilotAvailability(organizationId).then(
+      (availability) =>
+        availability === "enabled" || availability === "upgrade_required"
+    ),
     isAnalyticsEnabledForOrganization(organizationId).catch(() => false),
     searchWorkspace({
       organizationId,

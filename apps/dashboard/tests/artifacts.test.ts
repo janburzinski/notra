@@ -37,6 +37,15 @@ if (process.env.NOTRA_ARTIFACTS_TEST !== "1") {
   const sandbox = await createAutopilotSandbox();
   const db = sandbox.db;
   mock.module("@notra/db/drizzle", () => ({ db }));
+  const gate = { on: true };
+  mock.module("@/lib/autopilot/flag", () => ({
+    isAutopilotEnabledForOrganization: async () => gate.on,
+    isAutopilotOffForOrganization: async () => !gate.on,
+    autopilotAccessState: async () => (gate.on ? "enabled" : "disabled"),
+    resolveAutopilotAvailability: async () =>
+      gate.on ? "enabled" : "upgrade_required",
+    isAutopilotWorkflowGraphEnabled: async () => false,
+  }));
   const repos = createInMemoryRepos();
   const failures = { deleteRepo: false };
   const hooks: {
@@ -400,6 +409,19 @@ if (process.env.NOTRA_ARTIFACTS_TEST !== "1") {
       expect(view?.slackUrl).toBe(
         "https://app.slack.com/client/T1/C1/thread/C1-1.2"
       );
+      // Without Autopilot on the plan the brief is gone, like its /brief link.
+      gate.on = false;
+      try {
+        expect(
+          await loadArtifactView({
+            organizationId: ORG,
+            artifactId: saved.artifactId ?? "",
+            role: "owner",
+          })
+        ).toBeNull();
+      } finally {
+        gate.on = true;
+      }
     });
 
     test("the tools take a file and name the line of every problem", async () => {

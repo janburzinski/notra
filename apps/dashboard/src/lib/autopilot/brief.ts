@@ -14,7 +14,7 @@ import {
   AUTOPILOT_NAV_LINK,
 } from "@/constants/autopilot";
 import { AUTOPILOT_SLACK_KIND_LABELS } from "@/constants/autopilot-slack";
-import { isAutopilotEnabledForOrganization } from "@/lib/autopilot/flag";
+import { isAutopilotOffForOrganization } from "@/lib/autopilot/flag";
 import { createAutopilotLogger } from "@/lib/autopilot/log";
 import { attachSitePreviews } from "@/lib/autopilot/sites";
 import {
@@ -214,7 +214,7 @@ export function buildAutopilotBrief(params: {
 
 /** The Autopilot channel and bot token, or null when Slack is off for Autopilot. */
 export async function loadSlackDestination(organizationId: string) {
-  if (!(await isAutopilotEnabledForOrganization(organizationId))) {
+  if (await isAutopilotOffForOrganization(organizationId)) {
     return null;
   }
   const [destination] = await db

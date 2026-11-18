@@ -368,7 +368,8 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
   }));
   mock.module("@/lib/autopilot/flag", () => ({
     isAutopilotEnabledForOrganization: async () => state.flag,
-    autopilotFlagState: async () => (state.flag ? "enabled" : "disabled"),
+    isAutopilotOffForOrganization: async () => !state.flag,
+    autopilotAccessState: async () => (state.flag ? "enabled" : "disabled"),
   }));
   const githubIntegration = await import("@notra/ai/integrations/github");
   mock.module("@notra/ai/integrations/github", () => ({

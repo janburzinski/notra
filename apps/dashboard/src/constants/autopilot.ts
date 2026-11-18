@@ -15,6 +15,11 @@ export const AUTOPILOT_WORKFLOW_GRAPH_FLAG_KEY = "autopilot-workflow-graph";
 export const AUTOPILOT_GITHUB_DELIVERY_PREFIX = "autopilot:";
 
 export const AUTOPILOT_NAV_LINK = "/autopilot";
+export const AUTOPILOT_LEARN_MORE_URL = "https://www.usenotra.com/autopilot";
+export const AUTOPILOT_ACCESS_CHECK_FAILED_MESSAGE =
+  "Couldn't check Autopilot access right now. Try again in a moment.";
+export const AUTOPILOT_UPGRADE_REQUIRED_MESSAGE =
+  "Autopilot is included in the Growth and Scale plans. Upgrade to use it.";
 
 /** The Analytics tab's outcome bucket for each finding status. */
 export const AUTOPILOT_OUTCOME_BY_STATUS = {

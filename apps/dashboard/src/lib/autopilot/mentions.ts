@@ -46,7 +46,7 @@ import {
   dismissSuggestedFinding,
   findFindingByFingerprint,
 } from "@/lib/autopilot/findings";
-import { isAutopilotEnabledForOrganization } from "@/lib/autopilot/flag";
+import { isAutopilotOffForOrganization } from "@/lib/autopilot/flag";
 import { generateAutopilotObject } from "@/lib/autopilot/llm";
 import { createAutopilotLogger } from "@/lib/autopilot/log";
 import { rememberFeedback } from "@/lib/autopilot/memory";
@@ -255,14 +255,14 @@ export async function handleAutopilotMention(
   ) {
     return null;
   }
-  const [available, settings] = await Promise.all([
-    isAutopilotEnabledForOrganization(context.organizationId),
+  const [off, settings] = await Promise.all([
+    isAutopilotOffForOrganization(context.organizationId),
     db.query.autopilotSettings.findFirst({
       columns: { enabled: true },
       where: eq(autopilotSettings.organizationId, context.organizationId),
     }),
   ]);
-  if (!(available && settings?.enabled)) {
+  if (off || !settings?.enabled) {
     return null;
   }
   const token = await getGitHubPublishToken(context.integrationId, {

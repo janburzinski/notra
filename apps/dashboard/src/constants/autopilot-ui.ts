@@ -616,3 +616,40 @@ export const AUTOPILOT_PUBLISH_AT_FORMAT = {
   minute: "2-digit",
   hourCycle: "h23",
 } as const;
+
+/** The page a workspace without Autopilot on its plan sees instead of Autopilot. */
+export const AUTOPILOT_UPGRADE_COPY = {
+  eyebrow: "Included in Growth and Scale",
+  title: "Let Notra work for you every day",
+  description:
+    "Every morning Autopilot checks your site, your AI answers and what you shipped, then opens pull requests with fixes and new posts. You get a short brief in Slack and nothing ships until you merge.",
+  examplesHeading: "A morning with Autopilot",
+  examplesBadge: "Example",
+  examplesFooter: "Each one waits as a draft for your review.",
+  automationsHeading: "What Autopilot does",
+  /** Followed by each plan's monthly credits, e.g. "Growth 3,000 · Scale 5,000". */
+  creditsLabel: "Credits a month",
+} as const;
+
+/** Made-up pull requests that show what a morning with Autopilot brings. */
+export const AUTOPILOT_UPGRADE_EXAMPLES = [
+  {
+    kind: "readiness",
+    title: "Add llms.txt and let AI crawlers read your docs",
+    detail: "Fixes 3 failing Agent Readiness checks",
+  },
+  {
+    kind: "comparisons",
+    title: "New page: how you compare to your top competitor",
+    detail: "Answers 4 prompts where AI picks them today",
+  },
+  {
+    kind: "refresh",
+    title: "Refresh the pricing page AI stopped citing",
+    detail: "Cited 38% less than last month",
+  },
+] as const satisfies readonly {
+  kind: AutopilotAutomationKind;
+  title: string;
+  detail: string;
+}[];

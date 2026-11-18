@@ -71,6 +71,13 @@ export function usageBreakdownPoints(
   });
 }
 
+/** Pull request credits, as a count: the plan cards show them that way too. */
+export function creditCountValue(feature: FeatureData, locale: string) {
+  return feature.balance !== null
+    ? new Intl.NumberFormat(locale).format(feature.balance)
+    : "-";
+}
+
 export function creditsValue(feature: FeatureData, locale: string) {
   return feature.balance !== null
     ? formatDollars(feature.balance, locale)

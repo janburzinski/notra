@@ -113,11 +113,15 @@ function tierFeatures(
       text: t("plans.features.longFormPosts", { count: limits.longFormPosts }),
     },
     { text: t("plans.features.unlimitedSocialPosts") },
-    {
-      text: t("plans.features.pullRequestCredits", {
-        amount: limits.pullRequestCredits,
-      }),
-    },
+    ...(limits.pullRequestCredits
+      ? [
+          {
+            text: t("plans.features.pullRequestCredits", {
+              amount: limits.pullRequestCredits,
+            }),
+          },
+        ]
+      : []),
     { text: t("plans.features.projects", { count: limits.projects }) },
     {
       text: t("plans.features.references", { count: limits.references }),

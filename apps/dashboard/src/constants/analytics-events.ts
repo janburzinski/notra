@@ -8,6 +8,7 @@ export const PAYWALL_KINDS = {
   NAV_LOCK: "nav_lock",
   ONBOARDING_PRICING: "onboarding_pricing",
   SITES_LIMIT: "sites_limit",
+  AUTOPILOT_LOCKED: "autopilot_locked",
 } as const;
 
 export const PLAN_SURFACES = {
@@ -18,6 +19,7 @@ export const PLAN_SURFACES = {
   GEO_PAYWALL: "geo_paywall",
   STUDIO_PAYWALL: "studio_paywall",
   SITES_PAYWALL: "sites_paywall",
+  AUTOPILOT_PAYWALL: "autopilot_paywall",
 } as const;
 
 export const UPGRADE_DIALOG_EVENTS = {
@@ -36,6 +38,10 @@ export const UPGRADE_DIALOG_EVENTS = {
   sites: {
     kind: PAYWALL_KINDS.SITES_LIMIT,
     surface: PLAN_SURFACES.SITES_PAYWALL,
+  },
+  autopilot: {
+    kind: PAYWALL_KINDS.AUTOPILOT_LOCKED,
+    surface: PLAN_SURFACES.AUTOPILOT_PAYWALL,
   },
 } as const;
 

@@ -11,6 +11,7 @@ import {
 import { Badge } from "@notra/ui/components/ui/badge";
 import { Skeleton } from "@notra/ui/components/ui/skeleton";
 import { Tabs, TabsList, TabsTrigger } from "@notra/ui/components/ui/tabs";
+import { cn } from "@notra/ui/lib/utils";
 import { useListPlans } from "autumn-js/react";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
@@ -18,7 +19,7 @@ import { useLocale, useTranslations } from "use-intl";
 
 import { PlanCard } from "@/components/billing/plan-card";
 import { UPGRADE_DIALOG_EVENTS } from "@/constants/analytics-events";
-import { FEATURED_PLAN_TIER } from "@/constants/billing";
+import { AUTOPILOT_PLAN_TIERS, FEATURED_PLAN_TIER } from "@/constants/billing";
 import {
   billingInterval,
   planSelectedProperties,
@@ -48,6 +49,7 @@ export function GeoUpgradeDialog({
   entry = "geo",
 }: GeoUpgradeDialogProps) {
   const t = useTranslations("billing.geoUpgrade");
+  const tAutopilot = useTranslations("billing.autopilotUpgrade");
   const tUpgrade = useTranslations("nav.upgrade");
   const tCommon2 = useTranslations("common");
   const tCommon = useTranslations("common.states");
@@ -63,12 +65,36 @@ export function GeoUpgradeDialog({
   const [loading, setLoading] = useState<string | null>(null);
   const popupRef = useRef<HTMLDivElement>(null);
 
-  const planGroups = groupBillingPlans(plans);
+  const isAutopilot = entry === "autopilot";
+  // Autopilot only comes with some tiers, so the others aren't offered.
+  const planGroups = groupBillingPlans(plans).filter(
+    (group) => !isAutopilot || AUTOPILOT_PLAN_TIERS.includes(group.id)
+  );
   const { kind, surface } = UPGRADE_DIALOG_EVENTS[entry];
   const upgradeFlow = entry !== "geo";
+  const planGridClassName = cn(
+    "grid gap-4",
+    isAutopilot ? "lg:grid-cols-2" : "lg:grid-cols-3"
+  );
+  let title = t("title");
+  let description = tCommon2("messages.aiVisibilityTrackingIsIncluded");
+  if (isAutopilot) {
+    title = tAutopilot("title");
+    description = tAutopilot("description");
+  } else if (upgradeFlow) {
+    title = tUpgrade("freeHeading");
+    description = tUpgrade("freeDescription");
+  }
   const intervalLabel = isYearly
     ? tCommon2("labels.year")
     : tCommon2("labels.month");
+
+  function successUrl() {
+    const origin = window.location.origin;
+    return upgradeFlow
+      ? `${origin}/${slug}/settings/billing/success`
+      : `${origin}/${slug}/geo`;
+  }
 
   function handleOpenChange(nextOpen: boolean) {
     if (!nextOpen) {
@@ -107,9 +133,7 @@ export function GeoUpgradeDialog({
         planId,
         includeZdr: false,
         analytics: { surface, paywall_variant: paywall.variant },
-        successUrl: upgradeFlow
-          ? `${window.location.origin}/${slug}/settings/billing/success`
-          : `${window.location.origin}/${slug}/geo`,
+        successUrl: successUrl(),
       });
       if (result.paymentUrl) {
         window.location.assign(result.paymentUrl);
@@ -179,13 +203,9 @@ export function GeoUpgradeDialog({
         ref={popupRef}
       >
         <ResponsiveDialogHeader>
-          <ResponsiveDialogTitle>
-            {upgradeFlow ? tUpgrade("freeHeading") : t("title")}
-          </ResponsiveDialogTitle>
+          <ResponsiveDialogTitle>{title}</ResponsiveDialogTitle>
           <ResponsiveDialogDescription>
-            {upgradeFlow
-              ? tUpgrade("freeDescription")
-              : tCommon2("messages.aiVisibilityTrackingIsIncluded")}
+            {description}
           </ResponsiveDialogDescription>
         </ResponsiveDialogHeader>
         <div className="flex justify-center">
@@ -208,13 +228,13 @@ export function GeoUpgradeDialog({
         </div>
         <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-1">
           {plansLoading ? (
-            <div className="grid gap-4 lg:grid-cols-3">
+            <div className={planGridClassName}>
               <Skeleton className="h-96 rounded-lg" />
               <Skeleton className="h-96 rounded-lg" />
-              <Skeleton className="h-96 rounded-lg" />
+              {isAutopilot ? null : <Skeleton className="h-96 rounded-lg" />}
             </div>
           ) : (
-            <div className="grid gap-4 lg:grid-cols-3">
+            <div className={planGridClassName}>
               {planGroups.map(renderPlanCard)}
             </div>
           )}

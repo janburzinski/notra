@@ -24,7 +24,7 @@ import {
   findFindingByFingerprint,
   rememberOfferComment,
 } from "@/lib/autopilot/findings";
-import { isAutopilotEnabledForOrganization } from "@/lib/autopilot/flag";
+import { isAutopilotOffForOrganization } from "@/lib/autopilot/flag";
 import {
   getInstallationOctokit,
   getRepositoryOctokit,
@@ -75,8 +75,8 @@ async function listEligibleOrganizations(params: {
     commitFilters: AutopilotCommitFilters;
   }[] = [];
   for (const { organizationId } of organizations) {
-    const [available, settings, integration] = await Promise.all([
-      isAutopilotEnabledForOrganization(organizationId),
+    const [off, settings, integration] = await Promise.all([
+      isAutopilotOffForOrganization(organizationId),
       db.query.autopilotSettings.findFirst({
         columns: { enabled: true, jobs: true, commitFilters: true },
         where: eq(autopilotSettings.organizationId, organizationId),
@@ -90,7 +90,7 @@ async function listEligibleOrganizations(params: {
       }),
     ]);
     const jobs = { ...AUTOPILOT_DEFAULT_JOBS, ...settings?.jobs };
-    if (available && settings?.enabled && jobs.commits && integration) {
+    if (!off && settings?.enabled && jobs.commits && integration) {
       eligible.push({
         organizationId,
         commitFilters: toAutopilotCommitFilters(settings.commitFilters),

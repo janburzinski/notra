@@ -11,6 +11,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { and, eq, ne } from "drizzle-orm";
 
 import { getSession } from "@/lib/auth/actions";
+import { isAutopilotEnabledForOrganization } from "@/lib/autopilot/flag";
 import type { UiRouteInput } from "@/types/ui-route";
 
 const ARTIFACT_ID_PATTERN = new RegExp(
@@ -43,6 +44,7 @@ export const loadArtifactPage = createServerFn({ method: "GET" })
         organizationId: organizations.id,
         organizationSlug: organizations.slug,
         organizationName: organizations.name,
+        source: artifacts.source,
       })
       .from(artifacts)
       .innerJoin(organizations, eq(organizations.id, artifacts.organizationId))
@@ -59,7 +61,15 @@ export const loadArtifactPage = createServerFn({ method: "GET" })
     if (!row) {
       throw notFound();
     }
-    return { artifactId, ...row };
+    const { source, ...page } = row;
+    // An Autopilot brief goes with the plan, like its /brief link.
+    if (
+      source === "autopilot" &&
+      !(await isAutopilotEnabledForOrganization(page.organizationId))
+    ) {
+      throw notFound();
+    }
+    return { artifactId, ...page };
   });
 
 export const loadSharedArtifact = createServerFn({ method: "GET" })

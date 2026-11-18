@@ -6323,7 +6323,8 @@
       "workflows": "Workflows",
       "log_retention_7_days": "Log-Aufbewahrung 7 Tage",
       "log_retention_14_days": "Log-Aufbewahrung 14 Tage",
-      "log_retention_30_days": "Log-Aufbewahrung 30 Tage"
+      "log_retention_30_days": "Log-Aufbewahrung 30 Tage",
+      "autopilot": "Autopilot"
     },
     "creditSummary": {
       "included": "von {amount} inklusive",
@@ -6384,6 +6385,10 @@
       "rangeLabel": "Nutzungszeitraum",
       "title": "KI-Antworten pro Tag",
       "empty": "Keine Nutzung von KI-Antworten in diesem Zeitraum"
+    },
+    "autopilotUpgrade": {
+      "description": "Autopilot findet jeden Tag, was es zu schreiben und zu verbessern gibt, und öffnet Pull Requests zur Prüfung. Wechsle zu Growth oder Scale, um ihn zu aktivieren.",
+      "title": "Autopilot ist in Growth und Scale enthalten"
     },
     "geoUpgrade": {
       "title": "Upgrade erforderlich"
@@ -6462,7 +6467,7 @@
         "imageGenerations": "{count, number} Bildgenerierungen / Monat",
         "longFormPosts": "{count, number} Langform-Beiträge / Monat",
         "unlimitedSocialPosts": "Unbegrenzte Social-Beiträge",
-        "pullRequestCredits": "{amount} $ Pull-Request-Credits / Monat",
+        "pullRequestCredits": "{amount, number} Credits / Monat",
         "projects": "{count, plural, one {# Projekt} other {# Projekte}}",
         "references": "{count, number} Referenzen",
         "referencesOverage": "danach {price} $ pro Referenz / Monat",

@@ -2,6 +2,7 @@
 
 import { Skeleton } from "@notra/ui/components/ui/skeleton";
 
+import { AutopilotUpgradeGate } from "@/components/autopilot/autopilot-upgrade-gate";
 import { EmptyState } from "@/components/empty-state";
 import { PageContainer } from "@/components/layout/container";
 import { useOrganizationsContext } from "@/components/providers/organization-provider";
@@ -50,6 +51,20 @@ export function AutopilotPageShell({
           <Skeleton className="h-9 w-80 rounded-lg" />
           <Skeleton className="h-16 w-full rounded-2xl" />
           <Skeleton className="h-72 w-full rounded-2xl" />
+        </div>
+      </PageContainer>
+    );
+  }
+  if (overview.upgradeRequired) {
+    return (
+      <PageContainer className="flex flex-1 flex-col gap-4 py-4 md:gap-6 md:py-6">
+        <div className="w-full px-4 lg:px-6">
+          <AutopilotUpgradeGate
+            onDialogClosed={() => {
+              void query.refetch();
+            }}
+            organizationSlug={organizationSlug}
+          />
         </div>
       </PageContainer>
     );

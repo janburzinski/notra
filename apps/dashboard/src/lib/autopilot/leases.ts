@@ -7,7 +7,7 @@ import {
 import { and, eq } from "drizzle-orm";
 
 import { AUTOPILOT_LEASE_RENEW_INTERVAL_MS } from "@/constants/autopilot";
-import { isAutopilotEnabledForOrganization } from "@/lib/autopilot/flag";
+import { isAutopilotOffForOrganization } from "@/lib/autopilot/flag";
 import type { AutopilotRunContext } from "@/types/autopilot";
 import type { FindingClaim } from "@/types/autopilot-runtime";
 import { withHeartbeat } from "@/utils/autopilot-leases";
@@ -55,9 +55,9 @@ export async function renewAutopilotFindingLease(claim: FindingClaim) {
 }
 
 export async function assertAutopilotFindingLease(claim: FindingClaim) {
-  if (
-    !(await isAutopilotEnabledForOrganization(claim.finding.organizationId))
-  ) {
+  // Checked again just before the pull request opens, after the model calls
+  // are paid for, so a billing blip must not throw the draft away.
+  if (await isAutopilotOffForOrganization(claim.finding.organizationId)) {
     throw new Error("Autopilot is not available for this workspace.");
   }
   const settings = await db.query.autopilotSettings.findFirst({

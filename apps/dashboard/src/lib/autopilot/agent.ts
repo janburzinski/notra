@@ -13,6 +13,10 @@ import { and, desc, eq, inArray, isNull, sql } from "drizzle-orm";
 import type * as z from "zod";
 
 import {
+  AUTOPILOT_ACCESS_CHECK_FAILED_MESSAGE,
+  AUTOPILOT_UPGRADE_REQUIRED_MESSAGE,
+} from "@/constants/autopilot";
+import {
   AUTOPILOT_WORKFLOW_KEY_PREFIX,
   AUTOPILOT_WORKFLOW_NOT_FOUND,
   AUTOPILOT_WORKFLOW_RATE_LIMITED,
@@ -23,7 +27,7 @@ import {
   writeSuggestedFinding,
 } from "@/lib/autopilot/finding-actions";
 import { mergeFinding } from "@/lib/autopilot/findings";
-import { isAutopilotEnabledForOrganization } from "@/lib/autopilot/flag";
+import { resolveAutopilotAvailability } from "@/lib/autopilot/flag";
 import { addRule, deleteRule, listRules } from "@/lib/autopilot/rules";
 import {
   AutopilotSettingsError,
@@ -355,7 +359,14 @@ async function runAction(
 
 export async function handleAutopilotAgentRequest(request: AgentRequest) {
   const { organizationId, slack, action } = request;
-  if (!(await isAutopilotEnabledForOrganization(organizationId))) {
+  const availability = await resolveAutopilotAvailability(organizationId);
+  if (availability === "unavailable") {
+    throw new AutopilotAgentError(503, AUTOPILOT_ACCESS_CHECK_FAILED_MESSAGE);
+  }
+  if (availability === "upgrade_required") {
+    throw new AutopilotAgentError(402, AUTOPILOT_UPGRADE_REQUIRED_MESSAGE);
+  }
+  if (availability !== "enabled") {
     throw new AutopilotAgentError(
       403,
       "Autopilot is not available for this workspace yet."

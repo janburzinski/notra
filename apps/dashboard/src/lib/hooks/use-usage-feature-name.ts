@@ -25,6 +25,7 @@ export function useUsageFeatureName() {
     log_retention_14_days: t("features.log_retention_14_days"),
     log_retention_30_days: t("features.log_retention_30_days"),
     zdr: t("shared.zeroDataRetention"),
+    autopilot: t("features.autopilot"),
   };
   return (feature: Pick<FeatureData, "id" | "name">) =>
     isUsageFeatureId(feature.id) ? labels[feature.id] : feature.name;

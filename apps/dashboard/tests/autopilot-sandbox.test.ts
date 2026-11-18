@@ -60,7 +60,8 @@ if (process.env.NOTRA_AUTOPILOT_SANDBOX_TEST !== "1") {
   mock.module("@notra/db/drizzle", () => ({ db }));
   mock.module("@/lib/autopilot/flag", () => ({
     isAutopilotEnabledForOrganization: async () => startup.flag,
-    autopilotFlagState: async () => (startup.flag ? "enabled" : "disabled"),
+    isAutopilotOffForOrganization: async () => !startup.flag,
+    autopilotAccessState: async () => (startup.flag ? "enabled" : "disabled"),
   }));
   const emptyJob = async () => ({ findingIds: [], insights: [] });
   const notRun = async () => {

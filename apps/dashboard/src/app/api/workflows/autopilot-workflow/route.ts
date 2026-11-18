@@ -2,7 +2,7 @@ import { logError } from "@notra/ai/utils/server-log";
 import { isPgUniqueViolation } from "@notra/db/utils/pg-errors";
 
 import { AUTOPILOT_WORKFLOW_RUN_PATH } from "@/constants/autopilot-workflows";
-import { isAutopilotEnabledForOrganization } from "@/lib/autopilot/flag";
+import { autopilotAccessState } from "@/lib/autopilot/flag";
 import {
   anyAutopilotWorkflowRunLaunched,
   dropStaleAutopilotSchedule,
@@ -52,10 +52,16 @@ export async function POST(request: Request) {
   }
   // A workspace whose Autopilot was switched off keeps its schedules, but
   // they stop running, the same as everywhere else Autopilot is gated.
-  if (
-    !workflow?.enabled ||
-    !(await isAutopilotEnabledForOrganization(workflow.organizationId))
-  ) {
+  if (!workflow?.enabled) {
+    return Response.json({ skipped: true });
+  }
+  const access = await autopilotAccessState(workflow.organizationId);
+  // A failed flag or plan lookup is not a "no": fail the delivery so QStash
+  // retries it instead of dropping the scheduled run.
+  if (access === "unavailable") {
+    return new Response("Autopilot access check unavailable", { status: 503 });
+  }
+  if (access === "disabled") {
     return Response.json({ skipped: true });
   }
   // Each retry of a delivery gets its own run, so a launch that failed can

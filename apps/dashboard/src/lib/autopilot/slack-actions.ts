@@ -12,7 +12,7 @@ import type * as z from "zod";
 import { AUTOPILOT_SLACK_ACTION_STALE_SECONDS } from "@/constants/autopilot-slack";
 import { writeSuggestedFinding } from "@/lib/autopilot/finding-actions";
 import { dismissFinding, mergeFinding } from "@/lib/autopilot/findings";
-import { isAutopilotEnabledForOrganization } from "@/lib/autopilot/flag";
+import { isAutopilotOffForOrganization } from "@/lib/autopilot/flag";
 import { rememberFeedback } from "@/lib/autopilot/memory";
 import { postAutopilotSlackMessage } from "@/lib/autopilot/slack";
 import { resolveSlackMember } from "@/lib/integrations/slack/member";
@@ -47,10 +47,8 @@ async function loadDestination(vote: SlackVote) {
       )
     );
   if (
-    !(
-      destination &&
-      (await isAutopilotEnabledForOrganization(destination.organizationId))
-    )
+    !destination ||
+    (await isAutopilotOffForOrganization(destination.organizationId))
   ) {
     return null;
   }

@@ -106,7 +106,10 @@ if (process.env.NOTRA_AUTOPILOT_AGENT_TEST !== "1") {
   }));
   mock.module("@/lib/autopilot/flag", () => ({
     isAutopilotEnabledForOrganization: async () => state.flag,
-    autopilotFlagState: async () => (state.flag ? "enabled" : "disabled"),
+    isAutopilotOffForOrganization: async () => !state.flag,
+    resolveAutopilotAvailability: async () =>
+      state.flag ? "enabled" : "disabled",
+    autopilotAccessState: async () => (state.flag ? "enabled" : "disabled"),
     isAutopilotWorkflowGraphEnabled: async () => false,
   }));
   const dismissFinding = mock(async () => ({ id: "f1", status: "dismissed" }));

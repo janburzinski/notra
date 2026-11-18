@@ -43,7 +43,7 @@ import {
 } from "@/lib/autopilot/brief-page";
 import { loadRecentDailyNotes } from "@/lib/autopilot/daily-notes";
 import { syncFindingPullRequests } from "@/lib/autopilot/findings";
-import { autopilotFlagState } from "@/lib/autopilot/flag";
+import { autopilotAccessState } from "@/lib/autopilot/flag";
 import {
   withAutopilotRunLease,
   renewAutopilotRunLease,
@@ -199,11 +199,11 @@ export async function buildAutopilotRunContext(
   organizationId: string,
   runId: string
 ): Promise<AutopilotRunContext> {
-  const flag = await autopilotFlagState(organizationId);
-  if (flag === "unavailable") {
+  const access = await autopilotAccessState(organizationId);
+  if (access === "unavailable") {
     throw new Error("Could not check whether Autopilot is available");
   }
-  if (flag === "disabled") {
+  if (access === "disabled") {
     throw new AutopilotUnavailableError(
       "Autopilot is not available for this workspace."
     );

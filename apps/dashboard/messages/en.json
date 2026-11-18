@@ -6323,7 +6323,8 @@
       "workflows": "Workflows",
       "log_retention_7_days": "Log retention 7 days",
       "log_retention_14_days": "Log retention 14 days",
-      "log_retention_30_days": "Log retention 30 days"
+      "log_retention_30_days": "Log retention 30 days",
+      "autopilot": "Autopilot"
     },
     "creditSummary": {
       "included": "of {amount} included",
@@ -6384,6 +6385,10 @@
       "rangeLabel": "Usage range",
       "title": "AI answers per day",
       "empty": "No AI Answers usage in this period"
+    },
+    "autopilotUpgrade": {
+      "description": "Autopilot finds what to write and fix every day and opens pull requests for your review. Upgrade to Growth or Scale to turn it on.",
+      "title": "Autopilot is included in Growth and Scale"
     },
     "geoUpgrade": {
       "title": "Upgrade required"
@@ -6462,7 +6467,7 @@
         "imageGenerations": "{count, number} image generations / mo",
         "longFormPosts": "{count, number} long-form posts / mo",
         "unlimitedSocialPosts": "Unlimited social posts",
-        "pullRequestCredits": "${amount} of pull request credits / mo",
+        "pullRequestCredits": "{amount, number} credits / mo",
         "projects": "{count, plural, one {# project} other {# projects}}",
         "references": "{count, number} references",
         "referencesOverage": "then ${price} per ref / mo",

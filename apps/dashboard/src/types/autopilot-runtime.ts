@@ -212,3 +212,10 @@ export interface AutopilotImpact {
   before: number | null;
   after: number | null;
 }
+
+/** upgrade_required: in the rollout, but the plan doesn't include Autopilot. */
+export type AutopilotAvailability =
+  | "enabled"
+  | "upgrade_required"
+  | "disabled"
+  | "unavailable";

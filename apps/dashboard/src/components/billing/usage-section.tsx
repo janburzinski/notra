@@ -30,6 +30,7 @@ import type {
   UsageSectionBodyProps,
 } from "@/types/hooks/billing";
 import {
+  creditCountValue,
   creditsValue,
   featuresFromBalances,
   meteredUsageFeatures,
@@ -316,7 +317,7 @@ function UsageLimitsCard({
           <UsageRow
             info={t("pullRequestFooter")}
             name={tBillingShared("pullRequestCredits")}
-            value={creditsValue(pullRequestCreditsFeature, locale)}
+            value={creditCountValue(pullRequestCreditsFeature, locale)}
           />
         ) : null}
         {aiCreditsFeature ? (
