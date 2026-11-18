@@ -2,6 +2,7 @@ import type { FinishReason, LanguageModelUsage } from "ai";
 import { Data } from "effect";
 
 import type { GeoSuggestionNotFoundError } from "../schemas/suggestion-errors";
+import type { GeoConversationRunKind } from "../types/geo";
 
 export class GeoScanError extends Data.TaggedError("GeoScanError")<{
   readonly message: string;
@@ -248,6 +249,17 @@ export class GeoPersonaRunUnavailableError extends Data.TaggedError(
   "GeoPersonaRunUnavailableError"
 )<Record<string, never>> {}
 
+/**
+ * Another run of the same conversation or persona is still in flight, so a
+ * second one would answer and bill every prompt twice.
+ */
+export class GeoConversationRunInProgressError extends Data.TaggedError(
+  "GeoConversationRunInProgressError"
+)<{
+  readonly kind: GeoConversationRunKind;
+  readonly id: string;
+}> {}
+
 export class GeoPersonaRunError extends Data.TaggedError("GeoPersonaRunError")<{
   readonly message: string;
   readonly cause?: unknown;
@@ -322,6 +334,7 @@ export type GeoRouterError =
   | GeoContentBriefConflictError
   | GeoContentBriefNotFoundError
   | GeoContentBriefStateError
+  | GeoConversationRunInProgressError
   | GeoDatabaseError
   | GeoDiscoveryError
   | GeoPersonaGenerateError

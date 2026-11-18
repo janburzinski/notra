@@ -1053,6 +1053,7 @@
       "configureTrackingFirst": "Configure your brand tracking settings first",
       "enableTrackingFirst": "Enable brand tracking before starting a scan",
       "scanAlreadyRunning": "A scan is already running for this project",
+      "conversationRunInProgress": "This conversation is already running",
       "selectModel": "Select at least one available model to scan",
       "planChanged": "This plan changed while it was being saved. Try again.",
       "gscBusy": "Google Search Console is temporarily busy. Please try again.",

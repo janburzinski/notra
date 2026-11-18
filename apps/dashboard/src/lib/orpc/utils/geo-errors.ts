@@ -69,6 +69,8 @@ export async function toGeoOrpcError(failure: GeoRouterError): Promise<Error> {
     case "GeoPersonaRunError":
       logError("[GEO] persona run failed", failure);
       return badRequest(t("errors.geo.personaRunFailed"));
+    case "GeoConversationRunInProgressError":
+      return conflict(t("errors.geo.conversationRunInProgress"));
     case "GeoCompetitorLimitError":
       return badRequest(
         t("errors.geo.competitorLimit", { limit: failure.limit })

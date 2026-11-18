@@ -68,6 +68,9 @@ export interface GeoProjectScope {
   includeUnassigned: boolean;
 }
 
+/** What a conversation run plays: a saved sequence or a persona. */
+export type GeoConversationRunKind = "sequence" | "persona";
+
 export interface GeoScopeInput {
   organizationId: string;
   projectId?: string;

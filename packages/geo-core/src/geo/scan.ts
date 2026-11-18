@@ -88,6 +88,7 @@ import {
   isGeoConsumerConversationEngine,
   resolveGeoConversationEngine,
 } from "../utils/geo-conversation-engine";
+import { withGeoConversationRunClaim } from "../utils/geo-conversation-run-claim";
 import { engineModelOf } from "../utils/geo-engine-family";
 import {
   geoScanEmptyEngineSkipReason,
@@ -2258,7 +2259,12 @@ const runGeoSequenceNowProgram = Effect.fn("geo.runSequenceNow")(function* (
 });
 
 export function runGeoSequenceNow(input: GeoScopeInput, sequenceId: string) {
-  return runGeoSequenceNowProgram(input, sequenceId).pipe(
-    Effect.ensuring(flushGeoLogEffect)
-  );
+  return withGeoConversationRunClaim(
+    {
+      kind: "sequence",
+      organizationId: input.organizationId,
+      id: sequenceId,
+    },
+    runGeoSequenceNowProgram(input, sequenceId)
+  ).pipe(Effect.ensuring(flushGeoLogEffect));
 }

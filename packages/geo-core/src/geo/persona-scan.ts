@@ -33,6 +33,7 @@ import type {
   PersonaForScan,
 } from "../types/geo-personas";
 import { resolveGeoConversationEngine } from "../utils/geo-conversation-engine";
+import { withGeoConversationRunClaim } from "../utils/geo-conversation-run-claim";
 import { resolveGeoGroundedZdrMode } from "../utils/geo-engines";
 import { resolveGroundedEngines } from "../utils/geo-grounded-engines";
 import { flushGeoLogEffect, geoLogWarn } from "../utils/geo-log";
@@ -505,7 +506,12 @@ const runGeoPersonaNowProgram = Effect.fn("geo.runPersonaNow")(function* (
 });
 
 export function runGeoPersonaNow(input: GeoScopeInput, personaId: string) {
-  return runGeoPersonaNowProgram(input, personaId).pipe(
-    Effect.ensuring(flushGeoLogEffect)
-  );
+  return withGeoConversationRunClaim(
+    {
+      kind: "persona",
+      organizationId: input.organizationId,
+      id: personaId,
+    },
+    runGeoPersonaNowProgram(input, personaId)
+  ).pipe(Effect.ensuring(flushGeoLogEffect));
 }

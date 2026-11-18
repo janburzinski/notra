@@ -57,6 +57,12 @@ function toGeoFailure(failure: GeoFailureWire): GeoFailure {
         status: 400,
         error: "The persona run failed. Please try again.",
       };
+    case "GeoConversationRunInProgressError":
+      return {
+        status: 409,
+        error:
+          "This run is already in progress. Do not start it again; read its results when it finishes.",
+      };
     case "GeoPersonaGenerateError":
       return {
         status: 400,

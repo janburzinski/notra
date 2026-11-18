@@ -1053,6 +1053,7 @@
       "configureTrackingFirst": "Konfiguriere zuerst deine Einstellungen für das Marken-Tracking",
       "enableTrackingFirst": "Aktiviere das Marken-Tracking, bevor du einen Scan startest",
       "scanAlreadyRunning": "Für dieses Projekt läuft bereits ein Scan",
+      "conversationRunInProgress": "Diese Konversation läuft bereits",
       "selectModel": "Wähle mindestens ein verfügbares Modell für den Scan aus",
       "planChanged": "Dieser Plan wurde beim Speichern geändert. Versuch es nochmal.",
       "gscBusy": "Google Search Console ist gerade ausgelastet. Bitte versuch es nochmal.",
