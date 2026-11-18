@@ -151,6 +151,8 @@ if (process.env.NOTRA_AUTOPILOT_SANDBOX_TEST !== "1") {
   }));
   mock.module("@/lib/integrations/github/content-pull-request", () => ({
     isMergeMethodNotAllowed: () => false,
+    isBaseBranchModified: (error: unknown) =>
+      error instanceof Error && error.message.includes("Base branch"),
     getContentPullRequestState: async () => {
       if (!github.state) {
         throw new Error("Network is forbidden in the sandbox");
@@ -450,6 +452,201 @@ if (process.env.NOTRA_AUTOPILOT_SANDBOX_TEST !== "1") {
     ).toEqual({ published: 0, waiting: 0, cancelled: 0 });
   });
 
+  test("a due publish that loses a race with another merge tries again", async () => {
+    const id = await heldFinding(new Date(now.getTime() - 60_000));
+    github.state = { status: "open", mergedAt: null };
+    github.respond = (route) => {
+      if (route.endsWith("/reviews") || route.endsWith("/comments")) {
+        return [];
+      }
+      if (route.endsWith("/check-runs")) {
+        return { total_count: 0, check_runs: [] };
+      }
+      if (route.endsWith("/status")) {
+        return { total_count: 0, statuses: [] };
+      }
+      return {
+        state: "open",
+        merged: false,
+        draft: false,
+        head: { sha: "abc" },
+        base: { ref: "main" },
+        mergeable: true,
+        mergeable_state: "clean",
+      };
+    };
+    github.onMerge = async () => {
+      throw new Error(
+        "Base branch was modified. Review and try the merge again."
+      );
+    };
+    try {
+      const outcome = await publishDueFindings(
+        "sandbox-org",
+        { posts: "auto", updates: "ask", fixes: "ask" },
+        now
+      );
+      expect(outcome).toEqual({ published: 0, waiting: 1, cancelled: 0 });
+      const row = await readFinding(id);
+      expect(row.status).toBe("proposed");
+      expect(row.publishHoldReason).toBeNull();
+      expect(row.publishAt?.getTime()).toBeGreaterThan(now.getTime());
+      expect(row.evidence.autoPublished).toBeUndefined();
+    } finally {
+      github.onMerge = null;
+    }
+  });
+
+  test("a base merge Autopilot asked for is adopted; anything more counts as a push", async () => {
+    const page = {
+      filename: "blog/post.md",
+      status: "added",
+      additions: 3,
+      deletions: 0,
+      patch: "@@ -0,0 +1,3 @@\n+# Post",
+    };
+    const respondWith =
+      (afterFiles: (typeof page)[]) =>
+      (route: string, params: Record<string, unknown>) => {
+        if (route.endsWith("/reviews") || route.endsWith("/comments")) {
+          return [];
+        }
+        if (route.endsWith("/check-runs")) {
+          return { total_count: 0, check_runs: [] };
+        }
+        if (route.endsWith("/status")) {
+          return { total_count: 0, statuses: [] };
+        }
+        if (route === "GET /repos/{owner}/{repo}/commits/{ref}") {
+          return { parents: [{ sha: "abc" }, { sha: "base1" }] };
+        }
+        if (route.includes("/compare/")) {
+          const basehead = String(params.basehead);
+          if (basehead === "base1...main") {
+            return { status: "ahead", files: [] };
+          }
+          return {
+            status: "ahead",
+            files: basehead.endsWith("...abc")
+              ? [page]
+              : afterFiles.map((file) => ({
+                  ...file,
+                  patch: file.patch.replace("+1,3", "+5,3"),
+                })),
+          };
+        }
+        return {
+          state: "open",
+          merged: false,
+          draft: false,
+          head: { sha: "def" },
+          base: { ref: "main" },
+          mergeable: true,
+          mergeable_state: "clean",
+        };
+      };
+    const asked = async () => {
+      const id = await heldFinding(new Date(now.getTime() - 60_000));
+      const row = await readFinding(id);
+      await db
+        .update(autopilotFindings)
+        .set({ evidence: { ...row.evidence, branchUpdateFrom: "abc" } })
+        .where(eq(autopilotFindings.id, id));
+      return id;
+    };
+    github.state = { status: "open", mergedAt: null };
+    github.onMerge = async () => {
+      github.state = { status: "merged", mergedAt: now };
+    };
+    try {
+      github.respond = respondWith([page]);
+      const adopted = await asked();
+      expect(await publishDueFindings("sandbox-org", autoPosts, now)).toEqual({
+        published: 1,
+        waiting: 0,
+        cancelled: 0,
+      });
+      expect((await readFinding(adopted)).headSha).toBe("def");
+
+      await db
+        .delete(autopilotFindings)
+        .where(eq(autopilotFindings.id, adopted));
+      github.state = { status: "open", mergedAt: null };
+      github.respond = respondWith([
+        page,
+        { ...page, filename: "src/payload.ts", status: "added" },
+      ]);
+      const smuggled = await asked();
+      expect(await publishDueFindings("sandbox-org", autoPosts, now)).toEqual({
+        published: 0,
+        waiting: 0,
+        cancelled: 1,
+      });
+      const row = await readFinding(smuggled);
+      expect(row.headSha).toBe("abc");
+      expect(row.publishHoldReason).toBe("Someone else pushed commits");
+    } finally {
+      github.onMerge = null;
+    }
+  });
+
+  test("a branch behind again right after an adopted update is updated from the new head", async () => {
+    const page = {
+      filename: "blog/post.md",
+      status: "added",
+      additions: 1,
+      deletions: 0,
+      patch: "@@ -0,0 +1 @@\n+# Post",
+    };
+    const updates: unknown[] = [];
+    github.state = { status: "open", mergedAt: null };
+    github.respond = (route, params) => {
+      if (route.includes("/update-branch")) {
+        updates.push(params.expected_head_sha);
+        return {};
+      }
+      if (route.endsWith("/reviews") || route.endsWith("/comments")) {
+        return [];
+      }
+      if (route.endsWith("/check-runs")) {
+        return { total_count: 0, check_runs: [] };
+      }
+      if (route.endsWith("/status")) {
+        return { total_count: 0, statuses: [] };
+      }
+      if (route === "GET /repos/{owner}/{repo}/commits/{ref}") {
+        return { parents: [{ sha: "abc" }, { sha: "base1" }] };
+      }
+      if (route.includes("/compare/")) {
+        return { status: "ahead", files: [page] };
+      }
+      return {
+        state: "open",
+        merged: false,
+        draft: false,
+        head: { sha: "def" },
+        base: { ref: "main" },
+        mergeable: true,
+        mergeable_state: "behind",
+      };
+    };
+    const id = await heldFinding(new Date(now.getTime() - 60_000));
+    const row = await readFinding(id);
+    await db
+      .update(autopilotFindings)
+      .set({ evidence: { ...row.evidence, branchUpdateFrom: "abc" } })
+      .where(eq(autopilotFindings.id, id));
+    expect(await publishDueFindings("sandbox-org", autoPosts, now)).toEqual({
+      published: 0,
+      waiting: 1,
+      cancelled: 0,
+    });
+    expect(updates).toEqual(["def"]);
+    const updated = await readFinding(id);
+    expect(updated.headSha).toBe("def");
+    expect(updated.evidence.branchUpdateFrom).toBe("def");
+  });
+
   const waitingFinding = async (reason: string) => {
     const id = await heldFinding(new Date());
     const row = await readFinding(id);
@@ -532,6 +729,42 @@ if (process.env.NOTRA_AUTOPILOT_SANDBOX_TEST !== "1") {
     expect(resumed.publishAt?.getTime()).toBeGreaterThan(
       now.getTime() + 23 * 60 * 60 * 1000
     );
+  });
+
+  test("a branch protection hold saved under the old wording resumes", async () => {
+    const id = await waitingFinding("Branch protection needs a review");
+    github.state = { status: "open", mergedAt: null };
+    github.respond = (route) => {
+      if (route.endsWith("/reviews") || route.endsWith("/comments")) {
+        return [];
+      }
+      if (route.endsWith("/check-runs")) {
+        return { total_count: 0, check_runs: [] };
+      }
+      if (route.endsWith("/status")) {
+        return { total_count: 0, statuses: [] };
+      }
+      return {
+        state: "open",
+        merged: false,
+        draft: false,
+        head: { sha: "abc" },
+        base: { ref: "main" },
+        mergeable: true,
+        mergeable_state: "clean",
+      };
+    };
+    expect(
+      await resumeClearedHolds({
+        organizationId: "sandbox-org",
+        approvals: autoPosts,
+        timezone: "Europe/Berlin",
+        now,
+      })
+    ).toEqual({ resumed: 1, held: 0 });
+    const row = await readFinding(id);
+    expect(row.publishHoldReason).toBeNull();
+    expect(row.publishAt).not.toBeNull();
   });
 
   test("a cleared hold shows the next reason instead of publishing", async () => {
@@ -711,6 +944,24 @@ if (process.env.NOTRA_AUTOPILOT_SANDBOX_TEST !== "1") {
       await mergeFinding("sandbox-org", scheduled, undefined, undefined, true);
       expect((await readFinding(scheduled)).status).toBe("merged");
       expect(remember).toHaveBeenCalledTimes(1);
+
+      // A person merged it on GitHub before the scheduled publish got to it:
+      // that merge is theirs, and Autopilot learns from it.
+      const mergedByPerson = await proposed("commits:sandbox/app#23", 23);
+      github.state = { status: "merged", mergedAt: now };
+      github.onMerge = async () => {
+        throw new Error("Already merged, nothing to merge");
+      };
+      const settled = await mergeFinding(
+        "sandbox-org",
+        mergedByPerson,
+        undefined,
+        undefined,
+        true
+      );
+      expect(settled.status).toBe("merged");
+      expect(settled.evidence.autoPublished).toBeUndefined();
+      expect(remember).toHaveBeenCalledTimes(2);
     } finally {
       github.state = null;
       github.onMerge = null;

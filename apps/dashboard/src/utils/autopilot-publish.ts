@@ -5,8 +5,10 @@ import type {
 
 import {
   AUTOPILOT_APPROVAL_GROUP_BY_KIND,
+  AUTOPILOT_COMPARE_FILE_LIMIT,
   AUTOPILOT_FACT_FLAG_HEADINGS,
   AUTOPILOT_FAILED_CHECK_CONCLUSIONS,
+  AUTOPILOT_FAILED_STATUS_STATES,
   AUTOPILOT_HOLD_REASONS,
   AUTOPILOT_PUBLISH_HOUR,
   AUTOPILOT_PUBLISH_MIN_HOLD_MS,
@@ -197,8 +199,20 @@ export function autopilotHoldDecision(
   ) {
     return { action: "cancel", reason: AUTOPILOT_HOLD_REASONS.checksFailed };
   }
-  if (checks?.some((check) => check.status !== "completed")) {
+  const { statuses } = input;
+  if (
+    statuses?.some((status) => AUTOPILOT_FAILED_STATUS_STATES.has(status.state))
+  ) {
+    return { action: "cancel", reason: AUTOPILOT_HOLD_REASONS.checksFailed };
+  }
+  if (
+    checks?.some((check) => check.status !== "completed") ||
+    statuses?.some((status) => status.state === "pending")
+  ) {
     return waitOrGiveUp(input);
+  }
+  if (pull.mergeableState === "behind") {
+    return { action: "update" };
   }
   if (pull.mergeableState === "blocked" && checks) {
     return { action: "cancel", reason: AUTOPILOT_HOLD_REASONS.blocked };
@@ -210,4 +224,53 @@ export function autopilotHoldDecision(
     return waitOrGiveUp(input);
   }
   return { action: "publish" };
+}
+
+/** One file in a GitHub compare, as far as a branch's own changes go. */
+export interface AutopilotBranchChange {
+  filename: string;
+  previous_filename?: string;
+  status: string;
+  additions: number;
+  deletions: number;
+  patch?: string;
+  sha?: string | null;
+}
+
+function branchChangeKey(change: AutopilotBranchChange) {
+  // Only the added and removed lines: hunk headers and context lines move
+  // when the base changes the same file elsewhere.
+  const content =
+    change.patch === undefined
+      ? `blob:${change.sha ?? ""}`
+      : change.patch
+          .split("\n")
+          .filter((line) => line.startsWith("+") || line.startsWith("-"))
+          .join("\n");
+  return [
+    change.filename,
+    change.previous_filename ?? "",
+    change.status,
+    change.additions,
+    change.deletions,
+    content,
+  ].join("\0");
+}
+
+/**
+ * Whether a branch still changes exactly what it changed before the base was
+ * merged into it: same files, same lines. Anything more is someone else's work.
+ */
+export function sameBranchChanges(
+  before: AutopilotBranchChange[],
+  after: AutopilotBranchChange[]
+) {
+  if (
+    before.length !== after.length ||
+    before.length >= AUTOPILOT_COMPARE_FILE_LIMIT
+  ) {
+    return false;
+  }
+  const expected = new Set(before.map(branchChangeKey));
+  return after.every((change) => expected.has(branchChangeKey(change)));
 }

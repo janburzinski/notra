@@ -343,6 +343,7 @@ if (process.env.NOTRA_AUTOPILOT_DREAM_TEST !== "1") {
   }));
   mock.module("@/lib/integrations/github/content-pull-request", () => ({
     isMergeMethodNotAllowed: () => false,
+    isBaseBranchModified: () => false,
     getContentPullRequestState: async () => ({ status: "open" }),
     markContentPullRequestReady: async () => undefined,
     mergeContentPullRequest: async () => undefined,

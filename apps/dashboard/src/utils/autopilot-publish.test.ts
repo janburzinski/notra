@@ -9,6 +9,7 @@ import {
   hasFactCheckFlags,
   nextAutopilotPublishAt,
   pullRequestEventHoldReason,
+  sameBranchChanges,
   touchesPathsOutside,
 } from "@/utils/autopilot-publish";
 
@@ -109,6 +110,7 @@ const base: AutopilotHoldInput = {
   humanComments: 0,
   truncated: false,
   checks: [{ status: "completed", conclusion: "success" }],
+  statuses: [],
   waitingSince: new Date("2026-11-10T08:00:00Z"),
   now: new Date("2026-11-10T08:05:00Z"),
 };
@@ -237,6 +239,50 @@ describe("autopilotHoldDecision", () => {
     ).toEqual({ action: "cancel", reason: AUTOPILOT_HOLD_REASONS.checksStuck });
   });
 
+  test("reads commit statuses from deploy tools like checks", () => {
+    expect(decide({ statuses: [{ state: "success" }] })).toEqual({
+      action: "publish",
+    });
+    expect(decide({ statuses: null })).toEqual({ action: "publish" });
+    for (const state of ["failure", "error"]) {
+      expect(
+        decide({
+          pullRequest: { ...base.pullRequest, mergeableState: "unstable" },
+          statuses: [{ state: "success" }, { state }],
+        })
+      ).toEqual({
+        action: "cancel",
+        reason: AUTOPILOT_HOLD_REASONS.checksFailed,
+      });
+    }
+    // A required deploy status still running blocks the merge: wait for it.
+    expect(
+      decide({
+        pullRequest: { ...base.pullRequest, mergeableState: "blocked" },
+        statuses: [{ state: "pending" }],
+      })
+    ).toEqual({ action: "wait" });
+    expect(
+      decide({
+        pullRequest: { ...base.pullRequest, mergeableState: "unstable" },
+        statuses: [{ state: "pending" }],
+        now: new Date("2026-11-18T08:00:00Z"),
+      })
+    ).toEqual({ action: "cancel", reason: AUTOPILOT_HOLD_REASONS.checksStuck });
+  });
+
+  test("brings the base in when protection wants the branch up to date", () => {
+    expect(withPull({ mergeableState: "behind" })).toEqual({
+      action: "update",
+    });
+    expect(
+      decide({
+        pullRequest: { ...base.pullRequest, mergeableState: "behind" },
+        checks: [{ status: "in_progress", conclusion: null }],
+      })
+    ).toEqual({ action: "wait" });
+  });
+
   test("an already merged pull request counts as published", () => {
     expect(withPull({ merged: true, state: "closed" })).toEqual({
       action: "publish",
@@ -307,5 +353,68 @@ describe("hold rules", () => {
     expect(
       touchesPathsOutside(["public/llms.txt", "app/layout.tsx"], [null])
     ).toBe(true);
+  });
+});
+
+describe("sameBranchChanges", () => {
+  const post = {
+    filename: "content/blog/post.md",
+    status: "added",
+    additions: 2,
+    deletions: 0,
+    patch: "@@ -0,0 +1,2 @@\n+# Post\n+Body",
+  };
+
+  test("the same lines at moved line numbers are the same change", () => {
+    expect(
+      sameBranchChanges(
+        [post],
+        [{ ...post, patch: post.patch.replace("+1,2", "+9,2") }]
+      )
+    ).toBe(true);
+  });
+
+  test("context lines the base changed around the same lines don't count", () => {
+    const edit = {
+      filename: "content/blog/hello.md",
+      status: "modified",
+      additions: 1,
+      deletions: 1,
+      patch: "@@ -3,3 +3,3 @@ title\n intro\n-old line\n+new line",
+    };
+    expect(
+      sameBranchChanges(
+        [edit],
+        [
+          {
+            ...edit,
+            patch:
+              "@@ -7,3 +7,3 @@ title\n intro, edited on main\n-old line\n+new line",
+          },
+        ]
+      )
+    ).toBe(true);
+  });
+
+  test("an extra file, an edited line or a missing file is not", () => {
+    expect(
+      sameBranchChanges([post], [post, { ...post, filename: "src/x.ts" }])
+    ).toBe(false);
+    expect(
+      sameBranchChanges([post], [{ ...post, patch: `${post.patch}\n+more` }])
+    ).toBe(false);
+    expect(sameBranchChanges([post], [])).toBe(false);
+  });
+
+  test("binary files compare by blob", () => {
+    const image = {
+      filename: "hero.png",
+      status: "added",
+      additions: 0,
+      deletions: 0,
+      sha: "b1",
+    };
+    expect(sameBranchChanges([image], [image])).toBe(true);
+    expect(sameBranchChanges([image], [{ ...image, sha: "b2" }])).toBe(false);
   });
 });

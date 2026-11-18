@@ -1297,7 +1297,9 @@ export async function mergeFinding(
       )
     )
     .returning();
-  if (updated && !automatic) {
+  // A scheduled publish that finds a person already merged it on GitHub still
+  // learns from that person; only Autopilot's own merge teaches nothing.
+  if (updated && !(automatic && updated.evidence.autoPublished)) {
     await rememberMerge(organizationId, updated);
   }
   return updated ?? loadProposedFinding(organizationId, findingId);

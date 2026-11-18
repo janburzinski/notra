@@ -47,6 +47,8 @@ export interface AutopilotCommitFilters {
 export interface AutopilotFindingEvidence {
   /** Autopilot's scheduled publish merged it, not a person; teaches nothing. */
   autoPublished?: boolean;
+  /** Head Autopilot asked GitHub to merge the base into; the merge lands later. */
+  branchUpdateFrom?: string;
   sourceUrl?: string | null;
   score?: number | null;
   issueId?: string | null;

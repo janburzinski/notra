@@ -19,6 +19,8 @@ export interface AutopilotHoldInput {
   humanComments: number;
   truncated: boolean;
   checks: { status: string; conclusion: string | null }[] | null;
+  /** Commit statuses (Vercel, Netlify and other deploy tools), latest per context. */
+  statuses: { state: string }[] | null;
   waitingSince: Date;
   now: Date;
 }
@@ -26,4 +28,6 @@ export interface AutopilotHoldInput {
 export type AutopilotHoldDecision =
   | { action: "publish" }
   | { action: "wait" }
+  /** Behind a base branch that must be up to date: bring the base in first. */
+  | { action: "update" }
   | { action: "cancel"; reason: AutopilotHoldReason };

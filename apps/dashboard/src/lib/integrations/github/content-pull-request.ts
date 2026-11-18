@@ -21,6 +21,7 @@ const MARK_READY_FOR_REVIEW_MUTATION = `
   }
 `;
 const MERGE_METHOD_NOT_ALLOWED_REGEX = /merge method|not allowed/i;
+const BASE_BRANCH_MODIFIED_REGEX = /base branch was modified/i;
 
 export async function getContentPullRequestState(
   octokit: GitHubClient,
@@ -64,6 +65,15 @@ export function isMergeMethodNotAllowed(error: unknown) {
     hasGitHubStatus(error, 405) &&
     error instanceof Error &&
     MERGE_METHOD_NOT_ALLOWED_REGEX.test(error.message)
+  );
+}
+
+/** GitHub refuses a merge that lands right after another one; it can retry. */
+export function isBaseBranchModified(error: unknown) {
+  return (
+    hasGitHubStatus(error, 405) &&
+    error instanceof Error &&
+    BASE_BRANCH_MODIFIED_REGEX.test(error.message)
   );
 }
 

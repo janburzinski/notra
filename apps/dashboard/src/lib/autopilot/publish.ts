@@ -31,12 +31,17 @@ import {
   AUTOPILOT_RESUMABLE_BEFORE_READY,
   AUTOPILOT_RESUME_BATCH,
 } from "@/constants/autopilot-publish";
-import { mergeFinding, pullRequestRef } from "@/lib/autopilot/findings";
+import {
+  advanceFindingHeadSha,
+  mergeFinding,
+  pullRequestRef,
+} from "@/lib/autopilot/findings";
 import { getRepositoryOctokit } from "@/lib/autopilot/github";
 import { createAutopilotLogger } from "@/lib/autopilot/log";
 import { autopilotBaseBranch } from "@/lib/autopilot/sites";
 import {
   getContentPullRequestState,
+  isBaseBranchModified,
   markContentPullRequestReady,
 } from "@/lib/integrations/github/content-pull-request";
 import { autopilotPullRequestEventSchema } from "@/schemas/autopilot-github";
@@ -58,6 +63,7 @@ import {
   hasFactCheckFlags,
   nextAutopilotPublishAt,
   pullRequestEventHoldReason,
+  sameBranchChanges,
   touchesPathsOutside,
 } from "@/utils/autopilot-publish";
 import { toErrorMessage } from "@/utils/error-message";
@@ -264,6 +270,46 @@ async function recordHoldCancel(
   return cancelled.length > 0;
 }
 
+/**
+ * Whether `newHead` is only the base merged into Autopilot's `oldHead`: a merge
+ * of the two, its base side already on the base branch, and the branch still
+ * changing exactly what Autopilot wrote. Anything else counts as a push.
+ */
+async function isBaseMergeOnly(
+  octokit: AutopilotOctokit,
+  target: { owner: string; repo: string },
+  params: { oldHead: string; newHead: string; baseRef: string }
+) {
+  const { data: commit } = await octokit.request(
+    "GET /repos/{owner}/{repo}/commits/{ref}",
+    { ...target, ref: params.newHead }
+  );
+  const [first, baseSide] = commit.parents;
+  if (
+    commit.parents.length !== 2 ||
+    first?.sha !== params.oldHead ||
+    !baseSide
+  ) {
+    return false;
+  }
+  const compare = (basehead: string) =>
+    octokit
+      .request("GET /repos/{owner}/{repo}/compare/{basehead}", {
+        ...target,
+        basehead,
+      })
+      .then(({ data }) => data);
+  const [onBase, before, after] = await Promise.all([
+    compare(`${baseSide.sha}...${params.baseRef}`),
+    compare(`${baseSide.sha}...${params.oldHead}`),
+    compare(`${baseSide.sha}...${params.newHead}`),
+  ]);
+  return (
+    (onBase.status === "identical" || onBase.status === "ahead") &&
+    sameBranchChanges(before.files ?? [], after.files ?? [])
+  );
+}
+
 async function inspectHold(
   finding: AutopilotFindingRow,
   now: Date,
@@ -287,55 +333,102 @@ async function inspectHold(
       humanComments: 0,
       truncated: false,
       checks: [],
+      statuses: [],
       waitingSince: now,
       now,
     });
   }
   const repository = { owner: ref.owner, name: ref.repo };
+  // Installations granted before Autopilot read checks or statuses can't mint
+  // those scopes; each step down reads less and holds where it can't see.
   const octokit = await getRepositoryOctokit(
     finding.organizationId,
     repository,
-    { checks: "read" }
-  ).catch(() => getRepositoryOctokit(finding.organizationId, repository));
+    { checks: "read", statuses: "read" }
+  )
+    .catch(() =>
+      getRepositoryOctokit(finding.organizationId, repository, {
+        checks: "read",
+      })
+    )
+    .catch(() => getRepositoryOctokit(finding.organizationId, repository));
   const target = { owner: ref.owner, repo: ref.repo };
   const { data: pull } = await octokit.request(
     "GET /repos/{owner}/{repo}/pulls/{pull_number}",
     { ...target, pull_number: ref.pullNumber }
   );
-  const [reviews, issueComments, reviewComments, checks] = await Promise.all([
-    octokit.request("GET /repos/{owner}/{repo}/pulls/{pull_number}/reviews", {
-      ...target,
-      pull_number: ref.pullNumber,
-      per_page: AUTOPILOT_HOLD_PAGE_SIZE,
-    }),
-    octokit.request(
-      "GET /repos/{owner}/{repo}/issues/{issue_number}/comments",
-      {
+  let expectedHeadSha = finding.headSha;
+  if (
+    finding.headSha &&
+    finding.repository &&
+    finding.branch &&
+    pull.head.sha !== finding.headSha &&
+    finding.evidence.branchUpdateFrom === finding.headSha &&
+    (!expectedBaseRef || pull.base.ref === expectedBaseRef) &&
+    (await isBaseMergeOnly(octokit, target, {
+      oldHead: finding.headSha,
+      newHead: pull.head.sha,
+      baseRef: pull.base.ref,
+    }))
+  ) {
+    await advanceFindingHeadSha({
+      organizationId: finding.organizationId,
+      repository: finding.repository,
+      pullRequestNumber: ref.pullNumber,
+      branch: finding.branch,
+      fromSha: finding.headSha,
+      toSha: pull.head.sha,
+    });
+    expectedHeadSha = pull.head.sha;
+  }
+  const [reviews, issueComments, reviewComments, checks, statuses] =
+    await Promise.all([
+      octokit.request("GET /repos/{owner}/{repo}/pulls/{pull_number}/reviews", {
         ...target,
-        issue_number: ref.pullNumber,
+        pull_number: ref.pullNumber,
         per_page: AUTOPILOT_HOLD_PAGE_SIZE,
-      }
-    ),
-    octokit.request("GET /repos/{owner}/{repo}/pulls/{pull_number}/comments", {
-      ...target,
-      pull_number: ref.pullNumber,
-      per_page: AUTOPILOT_HOLD_PAGE_SIZE,
-    }),
-    octokit
-      .request("GET /repos/{owner}/{repo}/commits/{ref}/check-runs", {
-        ...target,
-        ref: pull.head.sha,
-        per_page: AUTOPILOT_HOLD_PAGE_SIZE,
-      })
-      .then(({ data }) => data)
-      .catch(() => null),
-  ]);
+      }),
+      octokit.request(
+        "GET /repos/{owner}/{repo}/issues/{issue_number}/comments",
+        {
+          ...target,
+          issue_number: ref.pullNumber,
+          per_page: AUTOPILOT_HOLD_PAGE_SIZE,
+        }
+      ),
+      octokit.request(
+        "GET /repos/{owner}/{repo}/pulls/{pull_number}/comments",
+        {
+          ...target,
+          pull_number: ref.pullNumber,
+          per_page: AUTOPILOT_HOLD_PAGE_SIZE,
+        }
+      ),
+      octokit
+        .request("GET /repos/{owner}/{repo}/commits/{ref}/check-runs", {
+          ...target,
+          ref: pull.head.sha,
+          per_page: AUTOPILOT_HOLD_PAGE_SIZE,
+        })
+        .then(({ data }) => data)
+        .catch(() => null),
+      octokit
+        .request("GET /repos/{owner}/{repo}/commits/{ref}/status", {
+          ...target,
+          ref: pull.head.sha,
+          per_page: AUTOPILOT_HOLD_PAGE_SIZE,
+        })
+        .then(({ data }) => data)
+        .catch(() => null),
+    ]);
   const truncated =
     [reviews.data, issueComments.data, reviewComments.data].some(
       (page) => page.length >= AUTOPILOT_HOLD_PAGE_SIZE
-    ) || (checks ? checks.total_count > checks.check_runs.length : false);
+    ) ||
+    (checks ? checks.total_count > checks.check_runs.length : false) ||
+    (statuses ? statuses.total_count > statuses.statuses.length : false);
   return autopilotHoldDecision({
-    expectedHeadSha: finding.headSha,
+    expectedHeadSha,
     expectedBaseRef,
     pullRequest: {
       state: pull.state,
@@ -359,6 +452,8 @@ async function inspectHold(
         status: check.status,
         conclusion: check.conclusion ?? null,
       })) ?? null,
+    statuses:
+      statuses?.statuses.map((status) => ({ state: status.state })) ?? null,
     waitingSince: finding.openedAt ?? finding.createdAt,
     now,
   });
@@ -381,6 +476,49 @@ async function isStillScheduled(findingId: string, claimedAt: Date) {
     ),
   });
   return Boolean(row);
+}
+
+/**
+ * Asks GitHub to merge the base into a pull request that must be up to date
+ * before it can merge. GitHub writes that commit in the background; the next
+ * check adopts it (isBaseMergeOnly). Only from the commit Autopilot pushed.
+ */
+async function updateBehindBranch(finding: AutopilotFindingRow) {
+  const ref = pullRequestRef(finding);
+  // Read again: this sweep may just have adopted an earlier base merge.
+  const current = await db.query.autopilotFindings.findFirst({
+    columns: { headSha: true },
+    where: eq(autopilotFindings.id, finding.id),
+  });
+  const headSha = current?.headSha;
+  if (!(ref && headSha)) {
+    return;
+  }
+  // Saved before asking, so a merge that lands after this sweep is still ours.
+  await db
+    .update(autopilotFindings)
+    .set({
+      evidence: sql`${autopilotFindings.evidence} || ${JSON.stringify({ branchUpdateFrom: headSha })}::jsonb`,
+    })
+    .where(
+      and(
+        eq(autopilotFindings.id, finding.id),
+        eq(autopilotFindings.headSha, headSha)
+      )
+    );
+  const octokit = await getRepositoryOctokit(finding.organizationId, {
+    owner: ref.owner,
+    name: ref.repo,
+  });
+  await octokit.request(
+    "PUT /repos/{owner}/{repo}/pulls/{pull_number}/update-branch",
+    {
+      owner: ref.owner,
+      repo: ref.repo,
+      pull_number: ref.pullNumber,
+      expected_head_sha: headSha,
+    }
+  );
 }
 
 async function publishFinding(
@@ -412,8 +550,23 @@ async function publishFinding(
     await recordHoldCancel(finding, decision.reason);
     return "cancelled";
   }
+  if (decision.action === "update") {
+    try {
+      await updateBehindBranch(finding);
+    } catch (error) {
+      logError("[Autopilot] Could not update a held pull request", error, {
+        organizationId: finding.organizationId,
+        findingId: finding.id,
+      });
+      await recordHoldCancel(finding, AUTOPILOT_HOLD_REASONS.mergeFailed);
+      return "cancelled";
+    }
+    // Checks run again on the updated branch; the next attempt merges.
+    return "waiting";
+  }
+  let merged: Awaited<ReturnType<typeof mergeFinding>>;
   try {
-    await mergeFinding(
+    merged = await mergeFinding(
       finding.organizationId,
       finding.id,
       undefined,
@@ -428,6 +581,10 @@ async function publishFinding(
     if (!(await isStillScheduled(finding.id, claimedAt))) {
       return "cancelled";
     }
+    // Another pull request merged a moment ago: try again on the next sweep.
+    if (isBaseBranchModified(error)) {
+      return "waiting";
+    }
     logError("[Autopilot] Scheduled publish failed", error, {
       organizationId: finding.organizationId,
       findingId: finding.id,
@@ -439,9 +596,12 @@ async function publishFinding(
     await createAutopilotLogger(
       { organizationId: finding.organizationId, runId: finding.runId },
       finding.kind
-    ).action(`Published pull request #${finding.pullRequestNumber}`, {
-      url: finding.pullRequestUrl,
-    });
+    ).action(
+      merged.evidence.autoPublished
+        ? `Published pull request #${finding.pullRequestNumber}`
+        : `Pull request #${finding.pullRequestNumber} was merged on GitHub`,
+      { url: finding.pullRequestUrl }
+    );
   }
   return "published";
 }
@@ -538,7 +698,8 @@ async function clearedHold(params: {
   }
   if (AUTOPILOT_RESUMABLE_AFTER_READY.has(params.reason)) {
     const decision = await inspectHold(finding, params.now, params.baseBranch);
-    if (decision.action === "publish") {
+    // Behind the base is fine here: the publish brings the base in first.
+    if (decision.action === "publish" || decision.action === "update") {
       return { ready: true };
     }
     return decision.action === "cancel" && decision.reason !== params.reason
