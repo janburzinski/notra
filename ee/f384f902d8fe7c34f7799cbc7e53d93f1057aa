@@ -1,0 +1,28 @@
+apps/dashboard/src/lib/autopilot/analytics.ts
+  s_395c9414fcd198::t_d4f2e5dbddd7bb 8-18
+  s_395c9414fcd198::t_777631b655599b 142-143
+apps/dashboard/tests/autopilot-schedule.test.ts
+  s_395c9414fcd198::t_946e4fe9475e7c 132-136
+apps/dashboard/src/lib/orpc/routers/autopilot.ts
+  s_395c9414fcd198::t_ab27cb48294a7a 156-174,311
+apps/dashboard/src/lib/autopilot/schedule.ts
+  s_395c9414fcd198::t_946e4fe9475e7c 156
+apps/dashboard/src/lib/autopilot/credits.ts
+  s_395c9414fcd198::t_946e4fe9475e7c 13,21,67,72,90,95-97,99-125,128-129,133-140,142,146-152
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "eef384f902d8fe7c34f7799cbc7e53d93f1057aa",
+  "prompts": {},
+  "sessions": {
+    "s_395c9414fcd198": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "82014d90-dedb-4b0a-8542-695277c56534",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
