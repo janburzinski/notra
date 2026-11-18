@@ -53,7 +53,7 @@ export function NavFooter({ slug }: { slug: string }) {
           />
         </SidebarMenuItem>
       </SidebarMenu>
-      <div className="pt-2">
+      <div className="pt-1">
         <ConnectSlackPill />
         <ConnectAgentPill />
         <SidebarAskAgentButton />
