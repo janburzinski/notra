@@ -60,7 +60,7 @@ export function CreatePostDialog({
   const router = useRouter();
   const slugEditedRef = useRef(false);
   const { projectId, isResolved: isProjectResolved } = useActiveProject();
-  const mutation = useCreatePost(organizationId);
+  const mutation = useCreatePost();
 
   const form = useForm({
     defaultValues: {

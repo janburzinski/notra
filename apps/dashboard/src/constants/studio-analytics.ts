@@ -1,5 +1,4 @@
 export const CONTENT_CREATE_ENTRIES = [
-  "home",
   "content_list",
   "hotkey",
   "nav_primary",
@@ -55,4 +54,3 @@ export const IMAGE_EXPORT_DOWNLOAD_TARGET = "download";
 export const AI_CREDITS_SOURCE_STANDALONE_CHAT = "standalone_chat";
 
 export const AI_CREDITS_SOURCE_CONTENT_CHAT = "chat";
-export const DEFAULT_SIDEBAR_ENTRY_MODE = "studio";

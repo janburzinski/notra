@@ -190,11 +190,6 @@ export interface AgentFeedbackSetupDialogProps {
   triggerVariant?: "default" | "outline";
 }
 
-export interface AgentFeedbackCardProps {
-  item: AgentFeedbackItem;
-  href: string;
-}
-
 export interface AgentFeedbackInboxProps {
   organizationId: string;
   /** Rendered above the list; receives whether the inbox is empty. */
@@ -203,12 +198,6 @@ export interface AgentFeedbackInboxProps {
   emptyState?: ReactNode;
   /** Rendered below the table once there is feedback. */
   footer?: ReactNode;
-}
-
-export interface AgentFeedbackSetupNudgeProps {
-  organizationId: string;
-  /** Drops the table preview, for pages with other sections. */
-  compact?: boolean;
 }
 
 export interface AgentFeedbackDailyCount {
@@ -225,8 +214,4 @@ export interface AgentFeedbackActivityRange {
 
 export interface AgentFeedbackActivityData {
   points: { day: string; value: number }[];
-}
-
-export interface AgentFeedbackActivityCardProps {
-  organizationId: string;
 }

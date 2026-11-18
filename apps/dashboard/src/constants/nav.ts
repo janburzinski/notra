@@ -42,11 +42,8 @@ import type {
   SidebarSwapMotion,
   SidebarSwapMotionConfig,
   NavVisibility,
-  SidebarMode,
-  SidebarModeOption,
 } from "@/types/components/nav";
 
-export const HOME_NAV_LINK = "";
 export const CHAT_NAV_LINK = "/chat";
 const CONTENT_NAV_LINK = "/content";
 export const ANALYTICS_NAV_LINK = "/analytics";
@@ -61,7 +58,6 @@ export const GEO_COMPETITORS_NAV_LINK = "/geo/competitors";
 const GEO_SHELF_SPACE_NAV_LINK = "/geo/shelf-space";
 export const GEO_SETTINGS_NAV_LINK = "/geo/settings";
 
-export const SIDEBAR_DEFAULT_MODE: SidebarMode = "geo";
 export const SIDEBAR_DEFAULT_WIDTH = 256;
 /** Matches `--transition-duration-slow`, the sidebar width transition. */
 export const SIDEBAR_TRANSITION_MS = 300;
@@ -70,26 +66,7 @@ export const SIDEBAR_MAX_WIDTH = 400;
 export const SIDEBAR_RESIZE_STEP = 8;
 export const SIDEBAR_WIDTH_COOKIE_NAME = "sidebar_width";
 
-export const GEO_ROUTE_SECTIONS: ReadonlySet<string> = new Set(["geo"]);
-
-export const SHARED_ROUTE_PREFIXES: readonly string[] = [
-  "content",
-  "automation",
-];
-
-export const STUDIO_ROUTE_SECTIONS: ReadonlySet<string> = new Set([
-  "chat",
-  "collection",
-  "analytics",
-  "brand",
-  "automation",
-  "feedback",
-  "sites",
-  "autopilot",
-]);
-
 export const NAV_MAIN_ITEMS: NavMainItem[] = [
-  { link: HOME_NAV_LINK, icon: Home01Icon, labelKey: "home" },
   { link: CHAT_NAV_LINK, icon: Message01Icon, labelKey: "chat" },
   { link: CONTENT_NAV_LINK, icon: NoteIcon, labelKey: "content" },
   { link: SITES_NAV_LINK, icon: WebDesign01Icon, labelKey: "sites" },
@@ -166,7 +143,7 @@ export const NAV_GROUPS: readonly NavGroup[] = [
     id: "overview",
     icon: Home01Icon,
     labelKey: "overview",
-    links: [GEO_OVERVIEW_NAV_LINK, HOME_NAV_LINK, GEO_TRAFFIC_NAV_LINK],
+    links: [GEO_OVERVIEW_NAV_LINK, GEO_TRAFFIC_NAV_LINK],
   },
   {
     id: "agentChat",

@@ -20,7 +20,6 @@ import { AgentPromptBar } from "@/components/dashboard/agent-prompt-bar";
 import { DashboardSidebar } from "@/components/dashboard/app-sidebar";
 import { DashboardGlobalActions } from "@/components/dashboard/dashboard-global-actions";
 import { SiteHeader } from "@/components/dashboard/header";
-import { RestoreSidebarHome } from "@/components/dashboard/restore-sidebar-home";
 import { RightPanel } from "@/components/dashboard/right-panel";
 import { useRightPanel } from "@/components/dashboard/right-panel-context";
 import { useOrganizationsContext } from "@/components/providers/organization-provider";
@@ -260,7 +259,6 @@ export function DashboardShell({
           )}
         >
           <SiteHeader />
-          <RestoreSidebarHome />
           <DashboardPageViewport>
             <SubscriptionGate>{children}</SubscriptionGate>
           </DashboardPageViewport>

@@ -2,9 +2,7 @@ import type { IconSvgElement } from "@hugeicons/react";
 import type { PostStatus } from "@notra/schemas/dashboard/content";
 import type { ReactNode } from "react";
 
-export type SidebarMode = "geo" | "studio";
 type NavItemLabelKey =
-  | "home"
   | "chat"
   | "content"
   | "sites"
@@ -74,13 +72,6 @@ export interface NavMainItem extends NavItem {
   badge?: NavBadgeKey;
 }
 
-export interface SidebarModeOption {
-  id: SidebarMode;
-  label: string;
-  descriptionKey: "measureVisibility" | "createContent";
-  icon: IconSvgElement;
-}
-
 export interface NavPrimaryActionConfig {
   icon: IconSvgElement;
 }
@@ -89,18 +80,6 @@ export interface NavVisibility {
   autopilot: boolean;
   analytics: boolean;
   sites: boolean;
-}
-
-export interface PendingSidebarMode {
-  mode: SidebarMode;
-  route: string | undefined;
-}
-
-export interface UseSidebarModeResult {
-  mode: SidebarMode;
-  setMode: (mode: SidebarMode) => void;
-  /** Set while the route has not caught up with the user's pick, else null. */
-  pendingMode: SidebarMode | null;
 }
 
 export interface NavLockHintProps {

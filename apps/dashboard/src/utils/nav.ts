@@ -2,12 +2,8 @@ import { AUTOPILOT_NAV_LINK } from "@/constants/autopilot";
 import {
   DEFAULT_NAV_VISIBILITY,
   GEO_OVERVIEW_NAV_LINK,
-  GEO_ROUTE_SECTIONS,
   NAV_GEO_IMPROVE_LINKS,
   NAV_MAIN_ITEMS,
-  SHARED_ROUTE_PREFIXES,
-  SIDEBAR_DEFAULT_MODE,
-  STUDIO_ROUTE_SECTIONS,
 } from "@/constants/nav";
 import { SITES_NAV_LINK } from "@/constants/sites";
 import type {
@@ -15,63 +11,18 @@ import type {
   NavGroupRowState,
   NavMainItem,
   NavVisibility,
-  SidebarMode,
 } from "@/types/components/nav";
 import type { SettingsUrlSearchParams } from "@/types/settings/modal";
-
-import { geoNavHref } from "./geo-paths";
 
 const NAV_ITEMS_BY_LINK = new Map(
   NAV_MAIN_ITEMS.map((item) => [item.link, item])
 );
 
-export function isSidebarMode(value: unknown): value is SidebarMode {
-  return value === "geo" || value === "studio";
-}
-
-export function resolveSidebarMode(
-  route: string | undefined,
-  storedMode: SidebarMode | null
-): SidebarMode {
-  if (route === undefined) {
-    return storedMode ?? "studio";
-  }
-  if (
-    SHARED_ROUTE_PREFIXES.some(
-      (prefix) => route === prefix || route.startsWith(`${prefix}/`)
-    )
-  ) {
-    return storedMode ?? "studio";
-  }
-  const section = route.split("/", 1)[0] ?? route;
-  if (GEO_ROUTE_SECTIONS.has(section)) {
-    return "geo";
-  }
-  if (STUDIO_ROUTE_SECTIONS.has(section)) {
-    return "studio";
-  }
-  return storedMode ?? SIDEBAR_DEFAULT_MODE;
-}
-
-/** Route after the org slug (`/{slug}/geo/prompts` → "geo/prompts"), or undefined on the org root. */
-export function sidebarRouteFromPathname(pathname: string): string | undefined {
-  return pathname.split("/").filter(Boolean).slice(1).join("/") || undefined;
-}
-
-export function isOrgRootPath(pathname: string, slug: string): boolean {
-  return pathname === `/${slug}` || pathname === `/${slug}/`;
-}
-
-/** Path to send a bare dashboard open to, or null to stay on Studio home. */
-export function resolveOrgRootRedirect(
+/** The org root has no page of its own; it opens the overview, keeping the query. */
+export function orgRootRedirectHref(
   slug: string,
-  storedMode: SidebarMode | null,
-  projectId?: string,
   searchParams: SettingsUrlSearchParams = {}
-): string | null {
-  if (storedMode !== "geo") {
-    return null;
-  }
+): string {
   const query = new URLSearchParams();
   for (const [key, value] of Object.entries(searchParams)) {
     for (const item of Array.isArray(value) ? value : [value]) {
@@ -80,10 +31,7 @@ export function resolveOrgRootRedirect(
       }
     }
   }
-  if (projectId) {
-    query.set("project", projectId);
-  }
-  const path = geoNavHref(slug, GEO_OVERVIEW_NAV_LINK);
+  const path = `/${slug}${GEO_OVERVIEW_NAV_LINK}`;
   return query.size ? `${path}?${query}` : path;
 }
 
@@ -139,12 +87,6 @@ export function resolveActiveNavLink(
   let active: string | null = null;
   for (const link of links) {
     const href = `${root}${link}`;
-    if (link === "") {
-      if (pathname === root || pathname === `${root}/`) {
-        active = active ?? link;
-      }
-      continue;
-    }
     const matches = pathname === href || pathname.startsWith(`${href}/`);
     if (matches && (active === null || link.length > active.length)) {
       active = link;

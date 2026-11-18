@@ -19,22 +19,15 @@ import {
 import { useTranslations } from "use-intl";
 
 import { useOrganizationsContext } from "@/components/providers/organization-provider";
-import { HOME_NAV_LINK } from "@/constants/nav";
 import { useGeoAccess } from "@/lib/hooks/use-geo-access";
 import { useSidebarCollapseSettled } from "@/lib/hooks/use-sidebar-collapse-settled";
-import { pickSidebarMode } from "@/lib/hooks/use-sidebar-mode";
-import { usePathname } from "@/lib/navigation";
 import type {
   NavGroup,
   NavMainItem,
   NavVisibility,
 } from "@/types/components/nav";
 import { geoNavHref, isGeoPaywalledPath } from "@/utils/geo-paths";
-import {
-  resolveNavGroupRow,
-  resolveNavItems,
-  sidebarRouteFromPathname,
-} from "@/utils/nav";
+import { resolveNavGroupRow, resolveNavItems } from "@/utils/nav";
 
 import { NavLockHint } from "./nav-lock-hint";
 import { SidebarLabel } from "./sidebar-label";
@@ -65,23 +58,6 @@ function NavBadge({ item }: { item: NavMainItem }) {
   );
 }
 
-/**
- * Studio home is the org root, which restores a stored GEO mode by redirecting
- * to the GEO overview. Picking Studio before the click navigates keeps Home
- * reachable, and prefetching stays off so the redirect is never cached.
- */
-function useHomeLinkProps() {
-  const pathname = usePathname();
-  return (link: string) =>
-    link === HOME_NAV_LINK
-      ? {
-          disablePrefetch: true,
-          onClick: () =>
-            pickSidebarMode("studio", sidebarRouteFromPathname(pathname)),
-        }
-      : {};
-}
-
 function NavGroupRow({
   group,
   slug,
@@ -96,7 +72,6 @@ function NavGroupRow({
   const geoLocked =
     useGeoAccess(getOrganization(slug)?.id ?? "").level === "locked";
   const collapseSettled = useSidebarCollapseSettled();
-  const homeLinkProps = useHomeLinkProps();
   const [first, ...rest] = resolveNavItems(group.links, visibility);
   if (!first) {
     return null;
@@ -133,7 +108,6 @@ function NavGroupRow({
                   <SidebarNavLink
                     aria-current={item.link === activeLink ? "page" : undefined}
                     href={geoNavHref(slug, item.link, projectId)}
-                    {...homeLinkProps(item.link)}
                   />
                 }
               >
@@ -159,10 +133,7 @@ function NavGroupRow({
         }
         isActive={ownPageActive}
         render={
-          <SidebarNavLink
-            href={geoNavHref(slug, first.link, projectId)}
-            {...homeLinkProps(first.link)}
-          >
+          <SidebarNavLink href={geoNavHref(slug, first.link, projectId)}>
             <HugeiconsIcon icon={group.icon} />
             <SidebarLabel>{label}</SidebarLabel>
             {showOwnBadge ? <NavBadge item={first} /> : null}
@@ -192,7 +163,6 @@ function NavGroupRow({
                           item.link === activeLink ? "page" : undefined
                         }
                         href={geoNavHref(slug, item.link, projectId)}
-                        {...homeLinkProps(item.link)}
                       >
                         <span>{tLabels(item.labelKey)}</span>
                         <NavBadge item={item} />

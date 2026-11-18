@@ -8184,16 +8184,7 @@
   },
   "home": {
     "greeting": "{period, select, morning {Good morning} afternoon {Good afternoon} other {Good evening}}!",
-    "greetingWithName": "{period, select, morning {Good morning} afternoon {Good afternoon} other {Good evening}}, {name}!",
-    "todayTitle": "Today's content",
-    "todayDescription": "Latest items created today",
-    "activityDescription": "Your content creation over the year",
-    "emptyAction": "View content",
-    "emptyDescription": "You have no new posts today. Create one now or review your existing drafts on the content page.",
-    "emptyTitle": "No content created today",
-    "feedbackSetupTitle": "Set up feedback",
-    "feedbackSetupDescription": "Connect your AI agent so it can report bugs, questions and requests about your product. Takes about two minutes.",
-    "feedbackDescription": "What AI agents report about your product."
+    "greetingWithName": "{period, select, morning {Good morning} afternoon {Good afternoon} other {Good evening}}, {name}!"
   },
   "ai": {
     "subagent": {

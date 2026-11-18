@@ -56,10 +56,7 @@ import {
   loadPostsAgentReachSummaries,
 } from "@notra/geo-core/geo/post-agent-reach";
 import { POSTHOG_EVENTS } from "@notra/posthog/events";
-import {
-  contentListQuerySchema,
-  dashboardHomeContentQuerySchema,
-} from "@notra/schemas/dashboard/api-params";
+import { contentListQuerySchema } from "@notra/schemas/dashboard/api-params";
 import type {
   ContentResponse,
   PostsResponse,
@@ -108,7 +105,6 @@ import { nanoid } from "nanoid";
 
 import { TAG_SUGGESTIONS_LIMIT } from "@/constants/content-overview";
 import {
-  DASHBOARD_HOME_POST_LIMIT,
   GITHUB_API_MAX_PAGES,
   GITHUB_API_MAX_RESULTS,
   GITHUB_API_PAGE_SIZE,
@@ -639,43 +635,6 @@ async function fetchCommitsPreview(params: {
 
 export const contentRouter = {
   history: contentHistoryRouter,
-  home: {
-    get: baseProcedure
-      .input(
-        contentOrganizationIdInputSchema.and(dashboardHomeContentQuerySchema)
-      )
-      .use(withOrganizationAccess)
-      .handler(async ({ input }) => {
-        const dateRange = getUtcDayRange("today");
-        const filters = [eq(posts.organizationId, input.organizationId)];
-        const collectionIds = projectScopedCollectionIds(
-          input.organizationId,
-          input.projectId
-        );
-
-        if (collectionIds) {
-          filters.push(inArray(posts.collectionId, collectionIds));
-        }
-        if (dateRange) {
-          filters.push(
-            gte(posts.createdAt, dateRange.startDate),
-            lt(posts.createdAt, dateRange.endDate)
-          );
-        }
-
-        const items = await db.query.posts.findMany({
-          where: and(...filters),
-          orderBy: [desc(posts.createdAt), desc(posts.id)],
-          limit: DASHBOARD_HOME_POST_LIMIT,
-          columns: postListColumns,
-          extras: postListExtras,
-        });
-
-        return {
-          posts: items.map((post) => serializePost(post, "dashboard")),
-        };
-      }),
-  },
   recents: contentRecentsProcedure,
   list: baseProcedure
     .input(contentOrganizationIdInputSchema.and(contentListQuerySchema))

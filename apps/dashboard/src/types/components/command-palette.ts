@@ -14,7 +14,6 @@ export type CommandSection =
   | "Settings";
 
 export type CommandRouteId =
-  | "home"
   | "chat"
   | "analytics"
   | "autopilot"

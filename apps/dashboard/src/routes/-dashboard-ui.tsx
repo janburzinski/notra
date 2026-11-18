@@ -31,6 +31,7 @@ import { GeoLiveProvider } from "@/components/providers/geo-live-provider";
 import { GeoProjectQueryProvider } from "@/components/providers/geo-project-provider";
 import { LOGS_SETTINGS_SEARCH_KEYS } from "@/constants/settings";
 import { lazyPage } from "@/utils/lazy-page";
+import { orgRootRedirectHref } from "@/utils/nav";
 import {
   firstSearchParamValue,
   settingsPath,
@@ -39,8 +40,6 @@ import {
 
 import { createAnalyticsUiRoutes } from "./-analytics-ui";
 import {
-  gateDashboardHome,
-  loadDashboardHome,
   loadGeoScope,
   loadOrganizationPage,
   loadOrganizationShell,
@@ -52,12 +51,6 @@ import { UiModalProvider } from "./-ui-modal";
 import { createUiRoute, uiRouteSearch } from "./-ui-route";
 
 const AnalyticsRouteLayout = lazyPage(() => import("./-analytics-layout"));
-const Home = lazyPage(() => import("@/app/(dashboard)/[slug]/page-client"));
-const StudioFreeHome = lazyPage(() =>
-  import("@/components/dashboard/studio-free-home").then((module) => ({
-    default: module.StudioFreeHome,
-  }))
-);
 const Content = lazyPage(
   () => import("@/app/(dashboard)/[slug]/content/page-client")
 );
@@ -251,29 +244,12 @@ export function createDashboardUiRoutes(parent: AnyRoute) {
     createUiRoute({
       parent: organization,
       path: "/",
-      title: { namespace: "dashboard", key: "metaTitle" },
-      loaderSearchKeys: ["project"],
-      loader: (input) => loadDashboardHome({ data: input }),
-      gate: (input) => gateDashboardHome({ data: input }),
-      stream: true,
-      pendingComponent: DashboardLoading,
-      // Free plans render StudioFreeHome inside the same streamed Suspense
-      // fallback, so start its chunk without making paid plans wait for it.
-      preload: () => {
-        void StudioFreeHome.preload().catch(() => undefined);
-        return Home.preload();
+      component: () => null,
+      loader: async ({ params, searchParams }) => {
+        throw redirect({
+          href: orgRootRedirectHref(params.slug ?? "", searchParams),
+        });
       },
-      component: ({ params, data }) =>
-        data.hasAccess ? (
-          <HydrationBoundary state={data.state}>
-            <Home
-              greetingText={data.greetingText}
-              organizationSlug={params.slug}
-            />
-          </HydrationBoundary>
-        ) : (
-          <StudioFreeHome greetingText={data.greetingText} slug={params.slug} />
-        ),
     }),
     createUiRoute({
       parent: organization,

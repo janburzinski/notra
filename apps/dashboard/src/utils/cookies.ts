@@ -3,12 +3,8 @@ import {
   LAST_VISITED_ORGANIZATION_COOKIE_MAX_AGE,
   LAST_VISITED_PROJECT_COOKIE,
   LAST_VISITED_PROJECT_COOKIE_MAX_AGE,
-  SIDEBAR_MODE_COOKIE,
-  SIDEBAR_MODE_COOKIE_MAX_AGE,
 } from "@/constants/cookies";
-import type { SidebarMode } from "@/types/components/nav";
 import type { CookieJar } from "@/types/cookies";
-import { isSidebarMode } from "@/utils/nav";
 
 function parseLastVisitedProject(
   value: string | undefined,
@@ -122,17 +118,3 @@ export const getLastVisitedProjectFromClient = (
     readClientCookie(LAST_VISITED_PROJECT_COOKIE),
     organizationSlug
   );
-
-export const setSidebarModeCookie = async (
-  mode: SidebarMode,
-  maxAge: number = SIDEBAR_MODE_COOKIE_MAX_AGE
-): Promise<void> => {
-  await setClientCookie(SIDEBAR_MODE_COOKIE, mode, maxAge);
-};
-
-export const getSidebarModeFromCookies = (
-  cookies: CookieJar
-): SidebarMode | null => {
-  const value = cookies.get(SIDEBAR_MODE_COOKIE)?.value;
-  return isSidebarMode(value) ? value : null;
-};

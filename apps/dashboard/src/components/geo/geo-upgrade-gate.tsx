@@ -19,10 +19,8 @@ import { trackEvent } from "@/lib/analytics/posthog-client";
 import { toAnalyticsRoute } from "@/lib/analytics/route";
 import { useGeoAccess } from "@/lib/hooks/use-geo-access";
 import { usePaywallVariant } from "@/lib/hooks/use-paywall-variant";
-import { pickSidebarMode } from "@/lib/hooks/use-sidebar-mode";
-import { usePathname, useRouter } from "@/lib/navigation";
+import { usePathname } from "@/lib/navigation";
 import type { GeoUpgradeGateProps } from "@/types/components/geo";
-import { sidebarRouteFromPathname } from "@/utils/nav";
 
 function subscribeToStorage(callback: () => void) {
   window.addEventListener("storage", callback);
@@ -37,7 +35,6 @@ export function GeoUpgradeGate({
 }: GeoUpgradeGateProps) {
   const t = useTranslations("geo.geoUpgradeGate");
   const tCommon = useTranslations("common");
-  const router = useRouter();
   const pathname = usePathname();
   const { activeOrganization, getOrganization } = useOrganizationsContext();
   const organizationId =
@@ -79,7 +76,6 @@ export function GeoUpgradeGate({
         dismissedOrganizationId !== organizationId &&
         !dismissedInStorage));
   const shownForOrganizationRef = useRef<string | null>(null);
-  const navigateAfterCloseRef = useRef(false);
 
   useEffect(() => {
     if (!dialogOpen || shownForOrganizationRef.current === organizationId) {
@@ -128,7 +124,6 @@ export function GeoUpgradeGate({
   }
 
   function handleDismiss(): void {
-    const wasReopened = reopenedOrganizationId === organizationId;
     setDismissedOrganizationId(organizationId);
     setReopenedOrganizationId(null);
     shownForOrganizationRef.current = null;
@@ -140,21 +135,10 @@ export function GeoUpgradeGate({
     } catch {
       // Keep the dialog closed for this visit when storage is unavailable.
     }
-    if (wasReopened) {
-      return;
-    }
-    pickSidebarMode("studio", sidebarRouteFromPathname(pathname));
-    navigateAfterCloseRef.current = true;
   }
 
   const dialog = (
     <GeoUpgradeDialog
-      onOpenChangeComplete={(open) => {
-        if (!open && navigateAfterCloseRef.current) {
-          navigateAfterCloseRef.current = false;
-          router.push(`/${slug}`);
-        }
-      }}
       onOpenChange={(open) => {
         if (!open) {
           handleDismiss();

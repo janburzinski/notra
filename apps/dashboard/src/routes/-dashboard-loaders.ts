@@ -19,10 +19,8 @@ import { validateOrganizationAccess } from "@/lib/auth/actions";
 import { takeCheckoutPlan } from "@/lib/billing/checkout-plan-cookie";
 import { resolveInitialGeoProjectId } from "@/lib/geo/initial-project.server";
 import { getTranslations } from "@/lib/i18n/server";
-import { redirectOrgRootToStoredMode } from "@/lib/nav/org-root-redirect";
 import type { GeoTrafficPageKind } from "@/types/geo-traffic-pages";
 import type { UiRouteInput } from "@/types/ui-route";
-import { getGreetingPeriod } from "@/utils/dashboard-greeting-period";
 import {
   geoProjectRepairPath,
   geoRequestedProjectId,
@@ -69,68 +67,6 @@ export const loadOrganizationShell = createServerFn({
       ),
       demoBannerHidden: getCookie(DEMO_BANNER_COOKIE) === DEMO_BANNER_OFF,
     };
-  });
-
-export const gateDashboardHome = createServerFn({ method: "GET" })
-  .validator((data: UiRouteInput) => data)
-  .handler(async ({ data: { params, searchParams } }) => {
-    await validateOrganizationAccess(params.slug ?? "");
-    await redirectOrgRootToStoredMode(
-      params.slug ?? "",
-      Promise.resolve(searchParams)
-    );
-  });
-
-export const loadDashboardHome = createServerFn({
-  method: "GET",
-  strict: { output: false },
-})
-  .validator((data: UiRouteInput) => data)
-  .handler(async ({ data: { params, searchParams, gated } }) => {
-    const slug = params.slug ?? "";
-    const { organization, user, member } =
-      await validateOrganizationAccess(slug);
-    if (!gated) {
-      await redirectOrgRootToStoredMode(slug, Promise.resolve(searchParams));
-    }
-    const billingPromise = import("@/lib/billing/ai-product-access").then(
-      ({ resolveAiProductAccess }) => resolveAiProductAccess(organization.id)
-    );
-    const greetingPromise = (async () => {
-      const t = await getTranslations("home");
-      const period = getGreetingPeriod(new Date());
-      const name = user.name?.trim();
-      return name
-        ? t("greetingWithName", { period, name })
-        : t("greeting", { period });
-    })();
-    const homePromise = (async () => {
-      const [{ dehydrateDashboardHomeQueries }, projectId, greetingText] =
-        await Promise.all([
-          import("@/utils/dashboard-home-prefetch.server"),
-          resolveInitialGeoProjectId(
-            organization.id,
-            slug,
-            geoRequestedProjectId(searchParams)
-          ),
-          greetingPromise,
-        ]);
-      return {
-        greetingText,
-        state: await dehydrateDashboardHomeQueries(
-          organization.id,
-          projectId,
-          getRequestHeaders(),
-          member && { userId: user.id, id: member.id, role: member.role }
-        ),
-      };
-    })();
-    homePromise.catch(() => undefined);
-    const billing = await billingPromise;
-    if (!billing.hasAccess) {
-      return { hasAccess: false as const, greetingText: await greetingPromise };
-    }
-    return { hasAccess: true as const, ...(await homePromise) };
   });
 
 export const loadOrganizationPage = createServerFn({

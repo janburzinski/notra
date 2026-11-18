@@ -9,7 +9,7 @@ import type {
 
 import { dashboardOrpc } from "../orpc/query";
 
-export function useCreatePost(organizationId: string) {
+export function useCreatePost() {
   const queryClient = useQueryClient();
 
   return useMutation<
@@ -27,11 +27,6 @@ export function useCreatePost(organizationId: string) {
       });
       queryClient.invalidateQueries({
         queryKey: dashboardOrpc.content.collections.list.key(),
-      });
-      queryClient.invalidateQueries({
-        queryKey: dashboardOrpc.content.home.get.queryKey({
-          input: { organizationId },
-        }),
       });
     },
   });

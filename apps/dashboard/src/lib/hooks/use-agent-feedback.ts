@@ -14,7 +14,6 @@ import { useTranslations } from "use-intl";
 
 import { dashboardOrpc } from "@/lib/orpc/query";
 import type {
-  AgentFeedbackActivityRange,
   AgentFeedbackListData,
   AgentFeedbackSetupResponse,
   AgentFeedbackStatusChange,
@@ -128,20 +127,5 @@ export function useAgentFeedbackSetup(organizationId: string) {
     }),
     enabled: !!organizationId,
     retry: false,
-  });
-}
-
-export function useAgentFeedbackActivity(
-  organizationId: string,
-  range: AgentFeedbackActivityRange
-) {
-  const t = useTranslations("feedback.activity");
-  return useQuery({
-    ...dashboardOrpc.agentFeedback.activity.queryOptions({
-      input: { organizationId, ...range },
-    }),
-    enabled: !!organizationId,
-    placeholderData: keepPreviousData,
-    meta: { errorMessage: t("loadFailed") },
   });
 }

@@ -8184,16 +8184,7 @@
   },
   "home": {
     "greeting": "{period, select, morning {Guten Morgen} afternoon {Guten Tag} other {Guten Abend}}!",
-    "greetingWithName": "{period, select, morning {Guten Morgen} afternoon {Guten Tag} other {Guten Abend}}, {name}!",
-    "todayTitle": "Heutige Inhalte",
-    "todayDescription": "Heute erstellte Inhalte",
-    "activityDescription": "Deine Inhaltserstellung im Jahresverlauf",
-    "emptyAction": "Inhalte ansehen",
-    "emptyDescription": "Du hast heute noch keine neuen Beiträge. Erstelle jetzt einen oder sieh dir deine Entwürfe auf der Inhaltsseite an.",
-    "emptyTitle": "Heute noch keine Inhalte erstellt",
-    "feedbackSetupTitle": "Feedback einrichten",
-    "feedbackSetupDescription": "Verbinde deinen KI-Agenten, damit er Bugs, Fragen und Wünsche zu deinem Produkt meldet. Dauert etwa zwei Minuten.",
-    "feedbackDescription": "Was KI-Agenten über dein Produkt melden."
+    "greetingWithName": "{period, select, morning {Guten Morgen} afternoon {Guten Tag} other {Guten Abend}}, {name}!"
   },
   "ai": {
     "subagent": {

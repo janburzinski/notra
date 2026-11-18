@@ -55,10 +55,6 @@ export const contentListQuerySchema = z.object({
   projectId: z.string().min(1).optional(),
 });
 
-export const dashboardHomeContentQuerySchema = z.object({
-  projectId: z.string().min(1).optional(),
-});
-
 export const contentRecentsQuerySchema = z.object({
   projectId: z.string().min(1).optional(),
   limit: z.coerce.number().int().min(1).max(10).default(3),

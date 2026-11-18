@@ -13,9 +13,8 @@ import {
 } from "@/constants/nav";
 import { useGeoProjectQueryState } from "@/lib/hooks/use-geo-project-query";
 import { useNavVisibility } from "@/lib/hooks/use-nav-visibility";
-import { useSidebarMode } from "@/lib/hooks/use-sidebar-mode";
 import { usePathname } from "@/lib/navigation";
-import { resolveActiveNavLink, sidebarRouteFromPathname } from "@/utils/nav";
+import { resolveActiveNavLink } from "@/utils/nav";
 
 import { NavGroupList } from "./nav-group-list";
 
@@ -47,7 +46,6 @@ export function useActiveNavLink(slug: string) {
 
 export function NavJobs() {
   const { activeOrganization } = useOrganizationsContext();
-  const pathname = usePathname();
   const [projectParam] = useGeoProjectQueryState();
   const visibility = useNavVisibility();
   const slug = activeOrganization?.slug;
@@ -58,8 +56,6 @@ export function NavJobs() {
   if (activeLink !== CHAT_NAV_LINK && openLink !== activeLink) {
     setOpenLink(activeLink);
   }
-  // Persists the route's mode so the bare org URL still restores GEO or Studio.
-  useSidebarMode(sidebarRouteFromPathname(pathname));
 
   if (!slug) {
     return null;

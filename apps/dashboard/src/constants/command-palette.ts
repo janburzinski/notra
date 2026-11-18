@@ -12,7 +12,6 @@ import {
   CreditCardIcon,
   Github01Icon,
   Globe02Icon,
-  Home01Icon,
   Key01Icon,
   Layers01Icon,
   LinkSquare02Icon,
@@ -42,7 +41,6 @@ import type {
 } from "@/types/components/command-palette";
 
 export const COMMAND_ROUTE_LABEL_KEYS = {
-  home: "home",
   chat: "chat",
   analytics: "socialAnalytics",
   autopilot: "autopilot",
@@ -88,14 +86,6 @@ export const COMMAND_SECTION_LABEL_KEYS = {
 
 export const COMMAND_ROUTES: CommandRoute[] = [
   {
-    id: "home",
-    label: "Home",
-    keywords: ["dashboard", "start", "overview"],
-    icon: Home01Icon,
-    section: "Navigation",
-    path: (slug) => `/${slug}`,
-  },
-  {
     id: "chat",
     label: "Chat",
     keywords: ["ai", "assistant", "conversation", "message"],
@@ -124,7 +114,16 @@ export const COMMAND_ROUTES: CommandRoute[] = [
   {
     id: "geo",
     label: "Overview",
-    keywords: ["geo", "ai", "mentions", "visibility", "chatgpt"],
+    keywords: [
+      "home",
+      "dashboard",
+      "start",
+      "geo",
+      "ai",
+      "mentions",
+      "visibility",
+      "chatgpt",
+    ],
     icon: AiBrowserIcon,
     section: "GEO",
     path: (slug) => `/${slug}/geo`,
@@ -468,7 +467,7 @@ export const COMMAND_PALETTE_RECENTS_LIMIT = 5;
 
 export const COMMAND_PALETTE_SUGGESTED_ROUTES = {
   geo: ["geo", "geo-prompts", "geo-gaps", "geo-competitors"],
-  studio: ["home", "content", "chat", "automations"],
+  studio: ["geo", "content", "chat", "automations"],
 } as const satisfies Record<string, readonly CommandRouteId[]>;
 
 export const COMMAND_PALETTE_ENTITY_ICONS = {

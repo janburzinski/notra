@@ -28,9 +28,6 @@ export function usePostActions(organizationId: string) {
           queryKey: dashboardOrpc.content.recents.key(),
         }),
         queryClient.invalidateQueries({
-          queryKey: dashboardOrpc.content.home.get.key(),
-        }),
-        queryClient.invalidateQueries({
           queryKey: dashboardOrpc.content.metrics.get.queryKey({
             input: { organizationId },
           }),
