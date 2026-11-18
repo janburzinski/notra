@@ -17,7 +17,7 @@ import {
 import { and, eq, isNotNull, isNull, sql } from "drizzle-orm";
 import { Effect } from "effect";
 
-import { FREE_SCAN_BALANCE_ID, FREE_SCAN_ENGINE } from "@/constants/free-scan";
+import { FREE_SCAN_BALANCE_ID, FREE_SCAN_ENGINES } from "@/constants/free-scan";
 import { runAfterResponse } from "@/lib/after-response";
 import { resolveCompanyDomain } from "@/lib/onboarding/company-domain";
 import type { AuthenticatedUser } from "@/types/auth/organization";
@@ -131,7 +131,7 @@ const runFreeScan = Effect.fn("geo.runFreeScan")(function* (
         customerId: organizationId,
         featureId: FEATURES.AI_ANSWERS,
         balanceId: FREE_SCAN_BALANCE_ID,
-        includedGrant: promptLimit,
+        includedGrant: promptLimit * FREE_SCAN_ENGINES.length,
       }),
     catch: (cause) => new GeoScanStartError({ cause }),
   }).pipe(Effect.tapError(() => release));
@@ -139,7 +139,7 @@ const runFreeScan = Effect.fn("geo.runFreeScan")(function* (
   const { scanId } = yield* startGeoScanScoped(
     scope,
     promptIds,
-    [FREE_SCAN_ENGINE],
+    FREE_SCAN_ENGINES,
     false,
     true
   ).pipe(
