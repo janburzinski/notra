@@ -1,0 +1,21 @@
+apps/console/src/components/autopilot/autopilot-health-tables.tsx
+  s_395c9414fcd198::t_6acb9f2fc637ad 55
+apps/console/src/lib/autopilot/health.ts
+  s_395c9414fcd198::t_6acb9f2fc637ad 140-141,368
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "329164353bb1ccc2ea4a85010b76550a972bad28",
+  "prompts": {},
+  "sessions": {
+    "s_395c9414fcd198": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "82014d90-dedb-4b0a-8542-695277c56534",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
