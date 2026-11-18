@@ -36,6 +36,7 @@ export function toGeoPromptResultSummary(
 ): GeoPromptResultSummary {
   return {
     checkId: row.checkId,
+    scanId: row.scanId,
     promptId: row.promptId,
     engine: row.engine,
     prompt: row.prompt,
@@ -44,6 +45,14 @@ export function toGeoPromptResultSummary(
     position: row.position,
     sentiment: row.sentiment,
     competitors: row.competitors,
+    answerExcerpt: row.excerpt,
+    sourceDomains: [
+      ...new Set(
+        geoAnswerSourcesFor(row.grounding, row.sources)
+          .map(({ domain }) => domain)
+          .filter(Boolean)
+      ),
+    ].slice(0, 10),
     lastCheckedAt: row.lastCheckedAt.toISOString(),
   };
 }

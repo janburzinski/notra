@@ -538,14 +538,18 @@ curl -H "Authorization: Bearer YOUR_API_KEY" \
 
 Visibility and traffic reads accept either `days` (1 to 365, rolling window) or an explicit `from` and `to` (`YYYY-MM-DD`). When you set `from` and `to`, the API ignores `days`. `configured: false` means the project has no GEO settings yet, and you can configure it with `PATCH /v1/projects/{projectId}/geo/settings`.
 
+To read one scan, pass its `scanId` to `/geo/visibility/overview` or `/geo/visibility/prompt-results/summaries`. If you also pass a date range, both filters apply. Each summary includes a short `answerExcerpt` and up to 10 distinct `sourceDomains`; use its `checkId` to open the full answer and sources if needed.
+
 These endpoints need `projects.read` and `visibility.read` plus a GEO plan, and without the plan the API returns `402`.
 
 ## Trigger a GEO scan
 
-A scan checks every tracked prompt against every enabled engine and takes no request body.
+A scan uses the project's configured engines and includes its enabled sequences and personas by default. To run once without turning automatic scans on, use `oneShot: true`. Set `includeSequences: false` to skip prompt sequences.
 
 ```bash
 curl -X POST -H "Authorization: Bearer YOUR_API_KEY" \
+  -H 'Content-Type: application/json' \
+  -d '{"oneShot":true,"includeSequences":false}' \
   "https://api.usenotra.com/v1/projects/proj_123/geo/scans"
 ```
 

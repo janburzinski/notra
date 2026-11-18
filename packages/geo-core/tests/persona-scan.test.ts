@@ -14,6 +14,7 @@ import {
   geoMentionChecks,
   geoPersonaMemories,
   geoPersonas,
+  geoPromptSequences,
   geoScans,
   geoSettings,
 } from "@notra/db/schema";
@@ -299,9 +300,16 @@ describe("planned persona snapshots", () => {
 });
 
 describe("persona languages", () => {
-  const prepare = (scope: { organizationId: string; projectId: string }) =>
+  const prepare = (
+    scope: { organizationId: string; projectId: string },
+    options?: Parameters<typeof prepareGeoScanProject>[2]
+  ) =>
     Effect.runPromise(
-      prepareGeoScanProject(scope.organizationId, scope.projectId).pipe(
+      prepareGeoScanProject(
+        scope.organizationId,
+        scope.projectId,
+        options
+      ).pipe(
         Effect.provideService(GeoContentBillingService, {
           gateContentBilling: () => Effect.succeed(testBillingGate),
           finalizeContentBilling: () => Effect.void,
@@ -317,6 +325,40 @@ describe("persona languages", () => {
         })
       )
     );
+
+  test.each([true, false])(
+    "a paused project's one-shot scan respects includeSequences=%s without excluding personas",
+    async (includeSequences) => {
+      const scope = await seedProject("paused-one-shot", {
+        enabled: false,
+        engines: ["google/gemini"],
+        enforceZdr: false,
+      });
+      await testDb.insert(geoPromptSequences).values({
+        ...scope,
+        id: "sequence-one",
+        name: "Follow-up questions",
+        steps: ["First question", "Follow-up question"],
+      });
+      await Effect.runPromise(
+        persistGeneratedPersonas(scope.organizationId, scope.projectId, {
+          personas: [generatedPersona],
+        })
+      );
+
+      expect(await prepare(scope)).toMatchObject({
+        status: "skipped",
+        reason: "disabled",
+      });
+      const result = await prepare(scope, { oneShot: true, includeSequences });
+      assert.ok(result.status === "planned");
+      expect(result.plan.context.scoped).toBe(true);
+      expect(result.plan.personas.length).toBeGreaterThan(0);
+      expect(result.plan.sequences.map(({ sequenceId }) => sequenceId)).toEqual(
+        includeSequences ? ["sequence-one"] : []
+      );
+    }
+  );
 
   const seedPersonas = async (projectId: string, languages: string[]) => {
     const scope = await seedProject(projectId, {

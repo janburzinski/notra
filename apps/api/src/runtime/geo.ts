@@ -85,7 +85,9 @@ function toGeoFailure(failure: GeoFailureWire): GeoFailure {
     case "GeoSettingsDisabledError":
       return {
         status: 400,
-        error: "Enable brand tracking before starting a scan",
+        code: "GEO_TRACKING_DISABLED",
+        error:
+          "Use oneShot: true for a single scan, or enable brand tracking for recurring scans.",
       };
     case "GeoPromptDuplicateError":
       return { status: 409, error: "That prompt is already tracked" };
@@ -97,11 +99,13 @@ function toGeoFailure(failure: GeoFailureWire): GeoFailure {
     case "GeoScanEnginesEmptyError":
       return {
         status: 400,
+        code: "GEO_SCAN_NO_ENGINES",
         error: "Select at least one available model to scan",
       };
     case "GeoScanEnginesUnknownError":
       return {
         status: 400,
+        code: "GEO_SCAN_UNKNOWN_ENGINES",
         error: failure.message ?? "Unknown engines",
       };
     case "GeoCompetitorLimitError":

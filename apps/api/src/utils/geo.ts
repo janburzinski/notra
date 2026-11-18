@@ -8,19 +8,20 @@ import type { GeoRequestContext } from "../types/geo-context";
 import { setRatelimitHeaders } from "./ratelimit";
 
 export function geoErrorResponse(c: Context, failure: GeoFailure) {
+  const body = { error: failure.error, code: failure.code };
   switch (failure.status) {
     case 400:
-      return c.json({ error: failure.error }, 400);
+      return c.json(body, 400);
     case 402:
-      return c.json({ error: failure.error }, 402);
+      return c.json(body, 402);
     case 404:
-      return c.json({ error: failure.error }, 404);
+      return c.json(body, 404);
     case 409:
-      return c.json({ error: failure.error }, 409);
+      return c.json(body, 409);
     case 503:
-      return c.json({ error: failure.error }, 503);
+      return c.json(body, 503);
     default:
-      return c.json({ error: failure.error }, 500);
+      return c.json(body, 500);
   }
 }
 

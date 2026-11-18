@@ -71,7 +71,7 @@ Turning **Automatic scans** off in Settings stops the schedule, but manual scans
 
 <Visibility for="agents">
 
-You can also start a manual scan from the API.
+To start a manual scan from the API while automatic scans are paused, send `oneShot: true`.
 
 </Visibility>
 
@@ -85,7 +85,9 @@ During onboarding, saving your brand enables GEO tracking with the daily interva
 
 ```bash
 curl -X POST https://api.usenotra.com/v1/projects/$PROJECT_ID/geo/scans \
-  -H "Authorization: Bearer $NOTRA_API_KEY"
+  -H "Authorization: Bearer $NOTRA_API_KEY" \
+  -H 'Content-Type: application/json' \
+  -d '{"oneShot":true,"includeSequences":false}'
 ```
 
 ```json
@@ -97,6 +99,8 @@ curl -X POST https://api.usenotra.com/v1/projects/$PROJECT_ID/geo/scans \
 ```
 
 The response is `202 Accepted`, and the API also returns `statusUrl` as the `Location` header. Poll `GET /v1/projects/{projectId}/geo/scans/{scanId}` until `status` leaves `running` and becomes `completed` or `failed`. While a scan for the project is running, the trigger endpoint answers `409`, and the endpoint allows 4 requests per hour per organization.
+
+`oneShot: true` runs once without enabling automatic scans or changing the next scheduled run. It also works on the prompt rescan endpoint. `includeSequences: false` skips prompt sequences on a project scan; enabled personas can still run. Pass `engines` to select models for this run without changing the tracked list. The project's data-retention policy still applies.
 
 </Visibility>
 

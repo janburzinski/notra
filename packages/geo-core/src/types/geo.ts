@@ -79,6 +79,8 @@ export interface GeoScopeInput {
 export interface GeoScanStartInput extends GeoScopeInput {
   /** This-run engine selection from the catalog. Omitted runs every tracked engine. */
   engines?: readonly string[];
+  oneShot?: boolean;
+  includeSequences?: boolean;
 }
 
 export interface GeoProjectUpdateInput {
@@ -377,7 +379,12 @@ export type GeoPromptResultSummary = Pick<
   | "sentiment"
   | "competitors"
   | "lastCheckedAt"
-> & { checkId: string };
+> & {
+  checkId: string;
+  scanId: string;
+  answerExcerpt: string;
+  sourceDomains: string[];
+};
 
 export interface GeoPromptResultSummariesResponse {
   configured: boolean;
@@ -386,6 +393,7 @@ export interface GeoPromptResultSummariesResponse {
 }
 
 export interface GeoPromptResultSummaryQuery {
+  scanId?: string;
   offset: number;
   limit: number;
   engine?: string;
@@ -405,6 +413,7 @@ export interface GeoPromptHistoryInput extends GeoScopeInput {
 export interface GeoPromptRescanInput extends GeoScopeInput {
   promptId: string;
   engines?: readonly string[];
+  oneShot?: boolean;
 }
 
 export interface GeoCompetitorDomainFillInput extends GeoScopeInput {

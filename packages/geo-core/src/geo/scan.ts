@@ -629,6 +629,7 @@ export const listGeoScanProjects = Effect.fn("geo.listScanProjects")(function* (
     projectIds?: readonly string[];
     claimedAt?: Date;
     manual?: boolean;
+    oneShot?: boolean;
   } = {}
 ) {
   const scopedProjectIds =
@@ -657,7 +658,8 @@ export const listGeoScanProjects = Effect.fn("geo.listScanProjects")(function* (
   // A manual run of a paused project scans that one project anyway.
   const includes = (row: (typeof settingsRows)[number]) =>
     row.enabled ||
-    (options.manual === true && row.projectId === options.projectId);
+    ((options.manual === true || options.oneShot === true) &&
+      row.projectId === options.projectId);
 
   for (const row of settingsRows) {
     if (includes(row) || !isGeoScanRunning(row.scanStartedAt, row.lastScanAt)) {
@@ -705,6 +707,8 @@ export const prepareGeoScanProject = Effect.fn("geo.prepareScanProject")(
       engines?: string[];
       retried?: boolean;
       manual?: boolean;
+      oneShot?: boolean;
+      includeSequences?: boolean;
     } = {}
   ) {
     const billing = yield* GeoContentBillingService;
@@ -731,7 +735,9 @@ export const prepareGeoScanProject = Effect.fn("geo.prepareScanProject")(
     // and runs while automatic scans are paused.
     const manualScope =
       options.manual === true && options.promptIds !== undefined;
-    if (!(settingsRow && (settingsRow.enabled || manualScope))) {
+    if (
+      !(settingsRow && (settingsRow.enabled || manualScope || options.oneShot))
+    ) {
       if (options.claimedAt) {
         yield* releaseGeoScanRun(projectId, options.claimedAt).pipe(
           geoSkip("scan claim release failed")
@@ -850,7 +856,8 @@ export const prepareGeoScanProject = Effect.fn("geo.prepareScanProject")(
         gate,
         claimedAt,
         options.promptIds,
-        options.engines
+        options.engines,
+        options
       ),
       (result) =>
         result.status === "planned"
@@ -889,8 +896,9 @@ const buildGeoScanProjectPlan = Effect.fn("geo.buildScanProjectPlan")(
     runId: string,
     gate: GeoScanProjectContext["gate"],
     claimedAt: Date,
-    promptIds?: readonly string[],
-    requestedEngines?: readonly string[]
+    promptIds: readonly string[] | undefined,
+    requestedEngines: readonly string[] | undefined,
+    options: { oneShot?: boolean; includeSequences?: boolean }
   ) {
     const organizationId = settingsRow.organizationId;
     const catalog = yield* loadGeoModelCatalog(organizationId);
@@ -1072,7 +1080,8 @@ const buildGeoScanProjectPlan = Effect.fn("geo.buildScanProjectPlan")(
     }
 
     const sequenceRows =
-      promptIds && scopedSequenceIds.length === 0
+      options.includeSequences === false ||
+      (promptIds && scopedSequenceIds.length === 0)
         ? []
         : yield* Effect.tryPromise({
             try: () =>
@@ -1267,6 +1276,8 @@ const buildGeoScanProjectPlan = Effect.fn("geo.buildScanProjectPlan")(
         gate: reservedGate,
         startedAtMs: Date.now(),
         scoped:
+          options.oneShot === true ||
+          options.includeSequences === false ||
           promptIds !== undefined ||
           isPartialGeoScanEngineScope(settings.engines, scanEngines),
       },

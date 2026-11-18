@@ -17,6 +17,7 @@ import { projectParamsSchema } from "@notra/schemas/api/geo-params";
 import {
   competitorDetailParamsSchema,
   competitorDetailQuerySchema,
+  geoVisibilityScanQuerySchema,
   geoVisibilityWindowQuerySchema,
   promptResultDetailParamsSchema,
   promptResultSummaryQuerySchema,
@@ -66,7 +67,7 @@ const overviewRoute = createRoute({
   description: `Checks, mentions and average position for every answer engine the project tracks. ${WINDOW_NOTE}`,
   request: {
     params: projectParamsSchema,
-    query: geoVisibilityWindowQuerySchema,
+    query: geoVisibilityScanQuerySchema,
   },
   responses: {
     200: {
@@ -130,7 +131,7 @@ const promptResultSummariesRoute = createRoute({
   operationId: "listGeoPromptResultSummaries",
   summary: "List compact prompt result summaries",
   description:
-    "A filtered, paginated projection of the latest answer per prompt and engine. Full answer text and sources are omitted; use checkId with the detail endpoint.",
+    "Latest answer per prompt and engine, with an excerpt and citation domains. Pass `scanId` to isolate one scan or `checkId` to the detail endpoint for the full answer.",
   request: {
     params: projectParamsSchema,
     query: promptResultSummaryQuerySchema,
@@ -241,11 +242,13 @@ const competitorDetailRoute = createRoute({
 geoVisibilityRoutes.openapi(overviewRoute, async (c) => {
   const base = c.get("geo");
   const { projectId } = c.req.valid("param");
+  const query = c.req.valid("query");
   const outcome = await runGeoEffect(
     "overview",
     loadGeoOverview(
       { organizationId: base.organizationId, projectId },
-      geoWindow(c.req.valid("query"))
+      geoWindow(query),
+      query.scanId
     )
   );
   return geoOutcomeResponse(c, outcome, 200, normalizeOverviewResponse);
@@ -287,6 +290,7 @@ geoVisibilityRoutes.openapi(promptResultSummariesRoute, async (c) => {
       { organizationId: base.organizationId, projectId },
       geoWindow(query),
       {
+        scanId: query.scanId,
         offset: query.cursor ?? 0,
         limit: query.limit,
         engine: query.engine,

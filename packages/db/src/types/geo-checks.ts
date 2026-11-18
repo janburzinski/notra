@@ -6,6 +6,7 @@ export interface GeoCheckScope {
 }
 
 export interface GeoCheckFilterOptions {
+  scanId?: string;
   /** Drop persona and multi-turn rows, keeping only single tracked prompts. */
   trackedPromptsOnly?: boolean;
   /** Keep only rows in the project's prompt language, not its translations. */
@@ -162,9 +163,13 @@ export type GeoCheckPromptSummaryRow = Pick<
   | "sentiment"
   | "competitors"
   | "lastCheckedAt"
-> & { checkId: string };
+  | "excerpt"
+  | "grounding"
+  | "sources"
+> & { checkId: string; scanId: string };
 
 export interface GeoCheckPromptSummaryQuery {
+  scanId?: string;
   offset: number;
   limit: number;
   engine?: string;

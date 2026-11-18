@@ -117,8 +117,12 @@ export const scanResponseSchema = z
   })
   .openapi("GeoScanResponse");
 
-export const createScanRequestSchema = z
+export const createPromptScanRequestSchema = z
   .object({
+    oneShot: z.boolean().optional().openapi({
+      description:
+        "Run once even when brand tracking is paused, without enabling or advancing the schedule or automatically retrying the scan.",
+    }),
     engines: z
       .array(createGeoShortTextSchema())
       .min(1)
@@ -129,6 +133,15 @@ export const createScanRequestSchema = z
           "Run only these engines, using ids from `GET /v1/projects/{projectId}/geo/engines`, for example `[\"openai/chatgpt\"]` for one engine. An engine the project doesn't track can be tried once without tracking it. Omit to run every tracked engine. An unknown id is rejected with a 400. A scan that leaves out tracked engines doesn't count as the project's scheduled scan.",
         example: ["openai/chatgpt"],
       }),
+  })
+  .openapi("CreateGeoPromptScanRequest");
+
+export const createScanRequestSchema = createPromptScanRequestSchema
+  .extend({
+    includeSequences: z.boolean().optional().openapi({
+      description:
+        "Defaults to true. Set to false to omit multi-turn sequences without changing project settings. Persona checks are unaffected.",
+    }),
   })
   .openapi("CreateGeoScanRequest");
 

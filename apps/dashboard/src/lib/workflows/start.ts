@@ -213,6 +213,8 @@ export async function startGeoScanRun(payload: {
   engines?: string[];
   manual?: boolean;
   freeScan?: boolean;
+  oneShot?: boolean;
+  includeSequences?: boolean;
 }): Promise<{ runId: string }> {
   const parsed = geoScanWorkflowPayloadSchema.parse(payload);
   const run = await start(geoScanWorkflow, [parsed]);

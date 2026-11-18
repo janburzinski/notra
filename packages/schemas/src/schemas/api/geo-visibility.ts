@@ -9,6 +9,7 @@ import {
 import type { GeoWindowToMode } from "../../types/api/geo-window";
 import { organizationResponseSchema } from "./content";
 import { projectParamsSchema } from "./geo-params";
+import { resourceIdSchema } from "./ids";
 
 const GEO_WINDOW_MAX_DAYS = 365;
 const GEO_DAY_REGEX = /^\d{4}-\d{2}-\d{2}$/;
@@ -87,6 +88,13 @@ export const geoVisibilityWindowQuerySchema = createGeoWindowQuerySchema(
   null,
   "requiresFrom"
 );
+
+export const geoVisibilityScanQuerySchema =
+  geoVisibilityWindowQuerySchema.extend({
+    scanId: resourceIdSchema("scanId").optional().openapi({
+      description: "Include only checks from this scan in the project.",
+    }),
+  });
 
 export const competitorDetailQuerySchema = createGeoWindowQuerySchema(
   GEO_COMPETITOR_DETAIL_DAYS,
@@ -260,10 +268,18 @@ const promptResultSummarySchema = promptResultSchema
     checkId: z.string().openapi({
       description: "Id of this answer; pass it to getGeoPromptResultDetail.",
     }),
+    scanId: z.string(),
+    answerExcerpt: z.string().openapi({
+      description: "Up to 300 characters of the stored answer excerpt.",
+    }),
+    sourceDomains: z.array(z.string()).max(10).openapi({
+      description:
+        "Up to 10 distinct citation domains. Use the detail endpoint for full sources.",
+    }),
   });
 
 export const promptResultSummaryQuerySchema =
-  geoVisibilityWindowQuerySchema.extend({
+  geoVisibilityScanQuerySchema.extend({
     cursor: z.coerce.number().int().min(0).max(100_000).optional(),
     limit: z.coerce.number().int().min(1).max(100).default(20),
     engine: z.string().trim().min(1).max(GEO_SHORT_FIELD_MAX_LENGTH).optional(),

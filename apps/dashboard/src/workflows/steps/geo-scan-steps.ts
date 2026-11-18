@@ -90,6 +90,7 @@ export async function listGeoScanProjectsStep(
     projectIds?: string[];
     claimedAt?: string;
     manual?: boolean;
+    oneShot?: boolean;
   }
 ): Promise<string[]> {
   "use step";
@@ -99,6 +100,7 @@ export async function listGeoScanProjectsStep(
         projectId: options.projectId,
         claimedAt: parseClaimedAt(options.claimedAt),
         manual: options.manual,
+        oneShot: options.oneShot,
       }).pipe(Effect.provide(geoCoreDashboardLayer))
     );
   } finally {
@@ -116,6 +118,8 @@ export async function prepareGeoScanProjectStep(
     promptIds?: string[];
     engines?: string[];
     manual?: boolean;
+    oneShot?: boolean;
+    includeSequences?: boolean;
   }
 ): Promise<GeoScanProjectPlanResult> {
   "use step";
@@ -129,6 +133,8 @@ export async function prepareGeoScanProjectStep(
         engines: options.engines,
         retried: options.retried,
         manual: options.manual,
+        oneShot: options.oneShot,
+        includeSequences: options.includeSequences,
       }).pipe(Effect.provide(geoCoreDashboardLayer))
     );
     if (result.status === "planned") {

@@ -85,7 +85,8 @@ export const startClaimedGeoScanRun = Effect.fn("geo.startClaimedScanRun")(
     promptIds?: readonly string[],
     engines?: readonly string[],
     manual = false,
-    freeScan = false
+    freeScan = false,
+    options: { oneShot?: boolean; includeSequences?: boolean } = {}
   ) {
     const workflows = yield* GeoWorkflowService;
     const scanId = yield* createGeoScanRow({ organizationId, projectId }).pipe(
@@ -106,6 +107,10 @@ export const startClaimedGeoScanRun = Effect.fn("geo.startClaimedScanRun")(
         ...(engines ? { engines: [...engines] } : {}),
         ...(manual ? { manual } : {}),
         ...(freeScan ? { freeScan } : {}),
+        ...(options.oneShot ? { oneShot: true } : {}),
+        ...(options.includeSequences === false
+          ? { includeSequences: false }
+          : {}),
       })
       .pipe(
         Effect.mapError(

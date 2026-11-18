@@ -120,6 +120,24 @@ function nextClaimRenewalToken(claimedAt: string, now: number): string {
   return new Date(Math.max(now, Date.parse(claimedAt) + 1)).toISOString();
 }
 
+function claimRenewer(projectId: string, state: { claimedAt: string }) {
+  let renewal: Promise<void> | undefined;
+  return () => {
+    const now = Date.now();
+    if (!renewal && isClaimRenewalDue(state.claimedAt, now)) {
+      renewal = renewGeoScanClaimStep(
+        projectId,
+        state.claimedAt,
+        nextClaimRenewalToken(state.claimedAt, now)
+      ).then((claimedAt) => {
+        state.claimedAt = claimedAt;
+        renewal = undefined;
+      });
+    }
+    return renewal;
+  };
+}
+
 type GeoScanBatchSettlement =
   | { index: number; outcome: GeoScanBatchOutcome }
   | { index: number; error: unknown };
@@ -129,7 +147,8 @@ async function runGeoScanBatchWindow<T>(
   items: readonly T[],
   batchSize: number,
   runBatch: GeoScanBatchRunner<T>,
-  state: { claimedAt: string; totals: GeoScanProjectTotals }
+  totals: GeoScanProjectTotals,
+  renewClaim: ReturnType<typeof claimRenewer>
 ): Promise<void> {
   const batches = chunkGeoScanItems(items, batchSize);
   const inFlight = new Map<number, Promise<GeoScanBatchSettlement>>();
@@ -140,20 +159,15 @@ async function runGeoScanBatchWindow<T>(
   const hasPendingBatches = () => !failed && nextIndex < batches.length;
   while (hasPendingBatches() || inFlight.size > 0) {
     while (hasPendingBatches() && inFlight.size < GEO_SCAN_BATCH_CONCURRENCY) {
-      const now = Date.now();
-      if (isClaimRenewalDue(state.claimedAt, now)) {
-        try {
-          // react-doctor-disable-next-line react-doctor/async-await-in-loop -- each renewal depends on the previous claim token
-          state.claimedAt = await renewGeoScanClaimStep(
-            context.projectId,
-            state.claimedAt,
-            nextClaimRenewalToken(state.claimedAt, now)
-          );
-        } catch (error) {
-          failed = true;
-          failure = error;
-          break;
+      try {
+        const renewal = renewClaim();
+        if (renewal) {
+          await renewal;
         }
+      } catch (error) {
+        failed = true;
+        failure = error;
+        break;
       }
       const index = nextIndex;
       nextIndex += 1;
@@ -171,7 +185,7 @@ async function runGeoScanBatchWindow<T>(
     const settled = await Promise.race(inFlight.values());
     inFlight.delete(settled.index);
     if ("outcome" in settled) {
-      addBatchOutcome(state.totals, settled.outcome);
+      addBatchOutcome(totals, settled.outcome);
     } else if (!failed) {
       failed = true;
       failure = settled.error;
@@ -196,10 +210,9 @@ function submitGeoOlostepRound(
  * late results, so missing items get a bounded grace period before retrying.
  */
 async function awaitGeoOlostepRound(
-  context: GeoScanProjectContext,
   queries: GeoOlostepQuery[],
   batchIds: string[],
-  state: { claimedAt: string },
+  renewClaim: ReturnType<typeof claimRenewer>,
   initialResults: GeoOlostepResults = {}
 ): Promise<GeoOlostepResults> {
   if (batchIds.length === 0) {
@@ -209,14 +222,9 @@ async function awaitGeoOlostepRound(
   let settleUntil: number | undefined;
   let results = initialResults;
   for (;;) {
-    const now = Date.now();
-    if (isClaimRenewalDue(state.claimedAt, now)) {
-      // react-doctor-disable-next-line react-doctor/async-await-in-loop -- each renewal depends on the previous claim token
-      state.claimedAt = await renewGeoScanClaimStep(
-        context.projectId,
-        state.claimedAt,
-        nextClaimRenewalToken(state.claimedAt, now)
-      );
+    const renewal = renewClaim();
+    if (renewal) {
+      await renewal;
     }
     // react-doctor-disable-next-line react-doctor/async-await-in-loop -- each poll retains the result handles collected so far
     results = { ...results, ...(await collectGeoOlostepResultsStep(batchIds)) };
@@ -241,17 +249,15 @@ async function awaitGeoOlostepRound(
 
 /** Waits for the first round, then retries failed or unfinished items once. */
 async function resolveGeoOlostepResults(
-  context: GeoScanProjectContext,
   queries: GeoOlostepQuery[],
-  firstBatchIds: string[],
-  state: { claimedAt: string }
+  renewClaim: ReturnType<typeof claimRenewer>
 ): Promise<GeoOlostepResults> {
-  let first = await awaitGeoOlostepRound(
-    context,
+  await renewClaim();
+  const firstBatchIds = await submitGeoOlostepRound(
     queries,
-    firstBatchIds,
-    state
+    queries.map((_, index) => index)
   );
+  let first = await awaitGeoOlostepRound(queries, firstBatchIds, renewClaim);
   if (missingGeoOlostepQueryIndexes(queries, first).length === 0) {
     return first;
   }
@@ -266,13 +272,13 @@ async function resolveGeoOlostepResults(
   if (missing.length === 0) {
     return first;
   }
+  await renewClaim();
   const retryBatchIds = await submitGeoOlostepRound(queries, missing);
   const allBatchIds = [...firstBatchIds, ...retryBatchIds];
   const retry = await awaitGeoOlostepRound(
-    context,
     queries,
     allBatchIds,
-    state,
+    renewClaim,
     first
   );
   // The original batches can recover even while the retry is being awaited.
@@ -433,6 +439,8 @@ async function runGeoScanProjectRun(
     promptIds?: string[];
     engines?: string[];
     manual?: boolean;
+    oneShot?: boolean;
+    includeSequences?: boolean;
     retentionDays?: LogRetentionDays;
   }
 ): Promise<GeoScanProjectOutcome | null> {
@@ -465,65 +473,66 @@ async function runGeoScanProjectRun(
     plan.tasks.length + plan.sequences.length + plan.personas.length;
 
   const olostepQueries = buildGeoOlostepQueries(plan);
+  const renewClaim = claimRenewer(plan.context.projectId, state);
 
   try {
-    // Submitted first so Olostep works through its batches while the API
-    // engines run; the wait comes after so only one loop renews the claim.
-    const olostepBatchIds = await submitGeoOlostepRound(
-      olostepQueries,
-      olostepQueries.map((_, index) => index)
-    );
-    const apiFailure = await runGeoScanBatchWindow(
-      plan.context,
-      plan.tasks.filter((task) => !isGeoOlostepEngine(task.engine)),
-      GEO_SCAN_TASK_BATCH_SIZE,
-      runGeoScanTaskBatchStep,
-      state
-    ).then(
-      () => null,
-      (error: unknown) => ({ error })
-    );
+    const [apiRun, browserRun] = await Promise.allSettled([
+      runGeoScanBatchWindow(
+        plan.context,
+        plan.tasks.filter((task) => !isGeoOlostepEngine(task.engine)),
+        GEO_SCAN_TASK_BATCH_SIZE,
+        runGeoScanTaskBatchStep,
+        totals,
+        renewClaim
+      ),
+      olostepQueries.length > 0
+        ? resolveGeoOlostepResults(olostepQueries, renewClaim)
+        : Promise.resolve({}),
+    ]);
+    if (browserRun.status === "rejected") {
+      throw browserRun.reason;
+    }
     const resolved =
       olostepQueries.length > 0
-        ? applyGeoOlostepResults(
-            plan,
-            await resolveGeoOlostepResults(
-              plan.context,
-              olostepQueries,
-              olostepBatchIds,
-              state
-            )
-          )
+        ? applyGeoOlostepResults(plan, browserRun.value)
         : plan;
-    const runs = (engine: string) => !apiFailure || isGeoOlostepEngine(engine);
+    const runs = (engine: string) =>
+      apiRun.status === "fulfilled" || isGeoOlostepEngine(engine);
     await runGeoScanBatchWindow(
       plan.context,
       resolved.tasks.filter((task) => isGeoOlostepEngine(task.engine)),
       GEO_SCAN_TASK_BATCH_SIZE,
       runGeoScanTaskBatchStep,
-      state
+      totals,
+      renewClaim
     );
     await runGeoScanBatchWindow(
       plan.context,
       resolved.sequences.filter((sequence) => runs(sequence.engine)),
       GEO_SCAN_SEQUENCE_BATCH_SIZE,
       runGeoScanSequenceBatchStep,
-      state
+      totals,
+      renewClaim
     );
     await runGeoScanBatchWindow(
       plan.context,
       resolved.personas.filter((persona) => runs(persona.engine)),
       GEO_SCAN_PERSONA_BATCH_SIZE,
       runGeoScanPersonaBatchStep,
-      state
+      totals,
+      renewClaim
     );
-    if (apiFailure) {
-      throw apiFailure.error;
+    if (apiRun.status === "rejected") {
+      throw apiRun.reason;
     }
   } catch (error) {
     await finalizeProjectRun(plan, totals, "failed", state.claimedAt, {
       retried: options.retried,
-      willRetry: !options.retried && totals.checks === 0 && planned > 0,
+      willRetry:
+        !options.oneShot &&
+        !options.retried &&
+        totals.checks === 0 &&
+        planned > 0,
       failureReason: describeGeoScanFailure(error),
       failure: classifyGeoScanExecutionFailure(error),
       ...(retentionDays ? { retentionDays } : {}),
@@ -541,7 +550,7 @@ async function runGeoScanProjectRun(
   if (totals.checks === 0 && attempted > 0) {
     await finalizeProjectRun(plan, totals, "failed", state.claimedAt, {
       retried: options.retried,
-      willRetry: !options.retried,
+      willRetry: !options.oneShot && !options.retried,
       ...(retentionDays ? { retentionDays } : {}),
     });
     return { totals, attempted, noSuccessfulChecks: true };
@@ -585,12 +594,15 @@ async function runGeoScanWorkflow(
     promptIds,
     engines,
     manual,
+    oneShot,
+    includeSequences,
   } = parseResult.data;
 
   const projectIds = await listGeoScanProjectsStep(organizationId, {
     projectId,
     claimedAt,
     manual,
+    ...(oneShot ? { oneShot } : {}),
   });
   if (projectIds.length === 0) {
     return { status: "skipped" };
@@ -615,6 +627,8 @@ async function runGeoScanWorkflow(
       promptIds,
       engines,
       manual,
+      ...(oneShot ? { oneShot } : {}),
+      ...(includeSequences === false ? { includeSequences } : {}),
       retentionDays,
     });
     if (!outcome) {
@@ -624,6 +638,9 @@ async function runGeoScanWorkflow(
     checks += outcome.totals.checks;
     mentions += outcome.totals.mentions;
     if (outcome.noSuccessfulChecks && outcome.attempted > 0) {
+      if (oneShot) {
+        throw new FatalError("GEO one-shot scan produced no successful checks");
+      }
       retryProjectIds.push(scanProjectId);
     }
   }
@@ -650,6 +667,7 @@ async function runGeoScanWorkflow(
       promptIds,
       engines,
       manual,
+      ...(includeSequences === false ? { includeSequences } : {}),
       retentionDays,
     });
     if (!outcome) {

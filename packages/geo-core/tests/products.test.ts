@@ -21,6 +21,19 @@ import {
 /** Product the sort call files each prompt under, by prompt text. */
 let sortAnswers: Record<string, string> = {};
 let sortCalls = 0;
+let failImportSort = false;
+
+const productSort = await import("../src/geo/product-sort");
+const sortNewPrompts = productSort.sortNewPromptsIntoProducts;
+const sortImportedPrompts = mock<typeof sortNewPrompts>((...args) =>
+  failImportSort
+    ? Effect.die("post-commit sorter failed")
+    : sortNewPrompts(...args)
+);
+mock.module("../src/geo/product-sort", () => ({
+  ...productSort,
+  sortNewPromptsIntoProducts: sortImportedPrompts,
+}));
 
 const actualAi = await import("ai");
 mock.module("ai", () => ({
@@ -67,6 +80,8 @@ afterAll(() => database.postgres.close());
 beforeEach(() => {
   sortAnswers = {};
   sortCalls = 0;
+  failImportSort = false;
+  sortImportedPrompts.mockClear();
   return resetDatabase();
 });
 
@@ -252,6 +267,28 @@ test("an import larger than one sort call is sorted in batches", async () => {
   expect(result.imported).toBe(250);
   expect(sortCalls).toBe(2);
   expect(filed.every((row) => row.productId === "p-main")).toBe(true);
+});
+
+test("reports the committed import even when enrichment fails and skips enrichment on replay", async () => {
+  const scope = await seedProject("import-enrichment-failure");
+  const rows = [{ prompt: "which launcher works offline?" }];
+  failImportSort = true;
+
+  expect(await Effect.runPromise(importGeoPrompts(scope, rows))).toMatchObject({
+    imported: 1,
+    skipped: 0,
+  });
+  expect(await Effect.runPromise(importGeoPrompts(scope, rows))).toMatchObject({
+    imported: 0,
+    skipped: 1,
+  });
+  expect(sortImportedPrompts).toHaveBeenCalledTimes(1);
+  expect(
+    await testDb
+      .select()
+      .from(geoPrompts)
+      .where(eq(geoPrompts.projectId, scope.projectId))
+  ).toHaveLength(1);
 });
 
 test("tracking a suggestion keeps a hand-added prompt's choice of no product", async () => {

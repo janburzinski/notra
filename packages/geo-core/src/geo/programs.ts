@@ -1033,11 +1033,16 @@ export const loadGeoLanguageShare = Effect.fn("geo.languageShare")(function* (
 
 export const loadGeoOverview = Effect.fn("geo.overview")(function* (
   input: GeoScopeInput,
-  window: GeoWindowInput
+  window: GeoWindowInput,
+  scanId?: string
 ) {
   const scope = yield* resolveGeoScope(input);
   const rows = yield* geoDb("overview query failed", () =>
-    queryGeoCheckOverview(geoCheckScope(scope), toGeoCheckWindow(window))
+    queryGeoCheckOverview(
+      geoCheckScope(scope),
+      toGeoCheckWindow(window),
+      scanId
+    )
   );
 
   const engines: GeoOverviewResponse["engines"] = rows.map((row) => ({
@@ -2213,12 +2218,11 @@ const insertPromptsInTransaction = Effect.fn("geo.promptsInsertTx")(function* (
 
 export { insertPromptsInTransaction, reconcileCompetitorsInTransaction };
 
-export const insertGeoPrompts = Effect.fn("geo.promptsInsert")(function* (
-  input: GeoScopeInput,
+const insertGeoPromptsForProject = (
+  scope: { organizationId: string; projectId: string },
   entries: readonly GeoPromptInsert[]
-) {
-  const scope = yield* requireGeoProject(input);
-  return yield* geoTransaction("prompts insert failed", (tx) =>
+) =>
+  geoTransaction("prompts insert failed", (tx) =>
     insertPromptsInTransaction(
       tx,
       scope.organizationId,
@@ -2226,23 +2230,40 @@ export const insertGeoPrompts = Effect.fn("geo.promptsInsert")(function* (
       entries
     )
   );
+
+export const insertGeoPrompts = Effect.fn("geo.promptsInsert")(function* (
+  input: GeoScopeInput,
+  entries: readonly GeoPromptInsert[]
+) {
+  const scope = yield* requireGeoProject(input);
+  return yield* insertGeoPromptsForProject(scope, entries);
 });
 
 export const importGeoPrompts = Effect.fn("geo.promptsImport")(function* (
   input: GeoScopeInput,
   rows: readonly GeoPromptImportRow[]
 ) {
-  const inserted = yield* insertGeoPrompts(input, rows);
   const scope = yield* requireGeoProject(input);
-  yield* sortNewPromptsIntoProducts(
-    scope.organizationId,
-    scope.projectId,
-    inserted.map((row) => row.id)
-  );
-  yield* pickNewGeoPrompts(
-    input,
-    inserted.map((row) => customPromptScanId(row.id))
-  ).pipe(geoSkip("prompt translation pick failed"));
+  const inserted = yield* insertGeoPromptsForProject(scope, rows);
+  if (inserted.length > 0) {
+    yield* sortNewPromptsIntoProducts(
+      scope.organizationId,
+      scope.projectId,
+      inserted.map((row) => row.id)
+    ).pipe(
+      Effect.catchCause((cause) =>
+        Effect.logWarning("GEO import: product sorting failed", cause)
+      )
+    );
+    yield* pickNewGeoPrompts(
+      scope,
+      inserted.map((row) => customPromptScanId(row.id))
+    ).pipe(
+      Effect.catchCause((cause) =>
+        Effect.logWarning("GEO import: prompt translation pick failed", cause)
+      )
+    );
+  }
 
   const result: GeoImportResult = {
     imported: inserted.length,
@@ -2532,7 +2553,8 @@ export const startGeoScanScoped = Effect.fn("geo.startScanScoped")(function* (
   promptIds?: readonly string[],
   engines?: readonly string[],
   manual = false,
-  freeScan = false
+  freeScan = false,
+  options: Pick<GeoScanStartInput, "oneShot" | "includeSequences"> = {}
 ) {
   const scope = yield* requireGeoProject(input);
   const projectId = scope.projectId;
@@ -2550,7 +2572,7 @@ export const startGeoScanScoped = Effect.fn("geo.startScanScoped")(function* (
   }
 
   const manualScope = manual && promptIds !== undefined;
-  if (!(row.enabled || manualScope)) {
+  if (!(row.enabled || manualScope || options.oneShot)) {
     return yield* Effect.fail(new GeoSettingsDisabledError({ projectId }));
   }
 
@@ -2585,7 +2607,8 @@ export const startGeoScanScoped = Effect.fn("geo.startScanScoped")(function* (
     promptIds,
     engines,
     manualScope,
-    freeScan
+    freeScan,
+    options
   );
 });
 
@@ -2631,7 +2654,17 @@ export const startGeoScan = Effect.fn("geo.startScan")(function* (
   input: GeoScanStartInput
 ) {
   yield* requireScannableGeoEngines(input, input.engines);
-  return yield* startGeoScanScoped(input, undefined, input.engines);
+  return yield* startGeoScanScoped(
+    input,
+    undefined,
+    input.engines,
+    false,
+    false,
+    {
+      oneShot: input.oneShot,
+      includeSequences: input.includeSequences,
+    }
+  );
 });
 
 export const startGeoPromptRescan = Effect.fn("geo.rescanPrompt")(function* (
@@ -2650,7 +2683,16 @@ export const startGeoPromptRescan = Effect.fn("geo.rescanPrompt")(function* (
     );
   }
   yield* requireScannableGeoEngines(input, input.engines);
-  const started = yield* startGeoScanScoped(input, [prompt.id], input.engines);
+  const started = yield* startGeoScanScoped(
+    input,
+    [prompt.id],
+    input.engines,
+    false,
+    false,
+    {
+      oneShot: input.oneShot,
+    }
+  );
   return { ...started, prompt: prompt.prompt };
 });
 

@@ -23,13 +23,108 @@ import {
 
 const { loadGeoScanRun, loadGeoScanRuns } =
   await import("../src/geo/scan-history");
-const { loadGeoPromptHistory } = await import("../src/geo/programs");
+const { loadGeoOverview, loadGeoPromptHistory } =
+  await import("../src/geo/programs");
+const { loadGeoPromptResultSummaries } =
+  await import("../src/geo/prompt-results");
 
 beforeAll(initializeDatabase, 30_000);
 afterAll(() => database.postgres.close());
 beforeEach(resetDatabase);
 
 describe("scan history", () => {
+  test("isolates one scan before selecting and paginating its latest prompt results", async () => {
+    const scope = await seedProject("scan-results");
+    const other = await seedProject("foreign-project");
+    await testDb.insert(geoScans).values([
+      { id: "selected", ...scope },
+      { id: "newer", ...scope },
+      { id: "foreign", ...other },
+    ]);
+    await testDb.insert(geoMentionChecks).values(
+      [
+        {
+          id: "first",
+          ...scope,
+          scanId: "selected",
+          promptId: "custom-first",
+          engine: "openai/chatgpt",
+        },
+        {
+          id: "second",
+          ...scope,
+          scanId: "selected",
+          promptId: "custom-second",
+          engine: "openai/chatgpt",
+        },
+        {
+          id: "latest",
+          ...scope,
+          scanId: "newer",
+          promptId: "custom-first",
+          engine: "openai/chatgpt",
+        },
+        {
+          id: "different-engine",
+          ...scope,
+          scanId: "newer",
+          promptId: "custom-first",
+          engine: "anthropic/claude",
+        },
+        {
+          id: "foreign-check",
+          ...other,
+          scanId: "foreign",
+          promptId: "custom-first",
+          engine: "openai/chatgpt",
+        },
+      ].map((row, index) => ({
+        ...row,
+        prompt: row.promptId,
+        answer: "Full answer",
+        excerpt: row.id === "first" ? "" : "a".repeat(500),
+        sources: [
+          { url: "https://example.com/first", title: null },
+          { url: "https://example.com/second", title: null },
+          { url: "https://example.org", title: null },
+        ],
+        mentioned: true,
+        capturedAt: new Date(Date.UTC(2026, 10, 18, 10, index)),
+      }))
+    );
+
+    const overview = await Effect.runPromise(
+      loadGeoOverview(scope, {}, "selected")
+    );
+    expect(
+      overview.engines.map(({ engine, checks }) => [engine, checks])
+    ).toEqual([["openai/chatgpt", 2]]);
+    const query = { scanId: "selected", limit: 1, offset: 0 };
+    const first = await Effect.runPromise(
+      loadGeoPromptResultSummaries(scope, {}, query)
+    );
+    expect(first.nextCursor).toBe("1");
+    expect(first.results).toMatchObject([
+      {
+        checkId: "second",
+        scanId: "selected",
+        answerExcerpt: "a".repeat(300),
+        sourceDomains: ["example.com", "example.org"],
+      },
+    ]);
+    const second = await Effect.runPromise(
+      loadGeoPromptResultSummaries(scope, {}, { ...query, offset: 1 })
+    );
+    expect(second.nextCursor).toBeNull();
+    expect(second.results).toMatchObject([
+      { checkId: "first", answerExcerpt: "Full answer" },
+    ]);
+    const foreign = await Effect.runPromise(
+      loadGeoPromptResultSummaries(scope, {}, { ...query, scanId: "foreign" })
+    );
+    expect(foreign.results).toEqual([]);
+  });
+
   test("scan-specific prompt history includes both languages and excludes other runs and projects", async () => {
     const scope = await seedProject("languages");
     const other = await seedProject("other");

@@ -337,7 +337,7 @@ export const MCP_FALLBACK_TOOL_CARDS: McpToolCard[] = [
   {
     name: "update_geo_settings",
     description:
-      "Change a project's GEO settings and restart the recurring scan schedule.",
+      "Changing GEO settings re-arms the recurring schedule. Supplied lists replace existing lists.",
   },
   {
     name: "list_geo_prompts",
@@ -495,12 +495,13 @@ export const MCP_FALLBACK_TOOL_CARDS: McpToolCard[] = [
   },
   {
     name: "create_geo_scan",
-    description: "Trigger a GEO visibility scan.",
+    description:
+      "Requires enabled brand tracking. Starts a billed scan and returns a scan ID to poll.",
   },
   {
     name: "rescan_geo_prompt",
     description:
-      "Scan a single enabled tracked prompt against the project's answer engines, for example to check whether newly published content changed the answers.",
+      "Requires enabled brand tracking. Starts a billed scan of one enabled prompt.",
   },
   {
     name: "list_geo_scans",

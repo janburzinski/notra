@@ -33,6 +33,11 @@ export const geoScanWorkflowPayloadSchema = geoOrganizationInputSchema
       .optional(),
     manual: boolean().optional(),
     freeScan: boolean().optional(),
+    oneShot: boolean().optional(),
+    includeSequences: boolean().optional(),
+  })
+  .refine((value) => value.oneShot !== true || value.projectId !== undefined, {
+    message: "A one-shot scan requires projectId",
   })
   .refine(
     (value) =>

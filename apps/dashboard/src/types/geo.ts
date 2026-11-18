@@ -404,6 +404,8 @@ export interface GeoScanPayload {
   promptIds?: string[];
   engines?: string[];
   freeScan?: boolean;
+  oneShot?: boolean;
+  includeSequences?: boolean;
 }
 
 export interface GeoGenerateFromWebsiteInput {

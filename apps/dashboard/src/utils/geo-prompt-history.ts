@@ -96,6 +96,9 @@ export function latestPromptResults(
     if (!previous || check.capturedAt > previous.lastCheckedAt) {
       latest.set(check.engine, {
         checkId: check.id,
+        scanId: check.scanId,
+        answerExcerpt: "",
+        sourceDomains: [],
         promptId,
         prompt,
         engine: check.engine,

@@ -344,6 +344,9 @@ function mentionOptionFilters(
   projectId?: string | null
 ): SQL[] {
   const parts: SQL[] = [];
+  if (options?.scanId) {
+    parts.push(eq(geoMentionChecks.scanId, options.scanId));
+  }
   if (options?.trackedPromptsOnly) {
     parts.push(withoutPersonaRows, isNull(geoMentionChecks.sequenceId));
   }
@@ -498,7 +501,8 @@ export async function insertGeoMentionChecksWithSummary(
 
 export async function queryGeoCheckOverview(
   scope: GeoCheckScope,
-  window: GeoCheckWindow | undefined
+  window: GeoCheckWindow | undefined,
+  scanId?: string
 ): Promise<GeoCheckOverviewRow[]> {
   const rows = await withGeoCheckAggregateCache(
     scope,
@@ -517,7 +521,7 @@ export async function queryGeoCheckOverview(
         lastCheckedAt: sql<Date>`max(${geoMentionChecks.capturedAt})`,
       })
       .from(geoMentionChecks)
-      .where(mentionFilters(scope, window))
+      .where(mentionFilters(scope, window, { scanId }))
       .groupBy(geoMentionChecks.engine)
       .orderBy(
         sql`count(distinct ${checkUnit}) filter (where ${isVisible})::numeric / nullif(count(distinct ${checkUnit}), 0) desc`
@@ -682,6 +686,7 @@ export async function queryGeoCheckPromptSummaries(
   const latest = db
     .selectDistinctOn([geoMentionChecks.promptId, geoMentionChecks.engine], {
       checkId: geoMentionChecks.id,
+      scanId: geoMentionChecks.scanId,
       promptId: geoMentionChecks.promptId,
       engine: geoMentionChecks.engine,
       prompt: geoMentionChecks.prompt,
@@ -690,10 +695,21 @@ export async function queryGeoCheckPromptSummaries(
       position: geoMentionChecks.position,
       sentiment: geoMentionChecks.sentiment,
       competitors: geoMentionChecks.competitors,
+      excerpt:
+        sql<string>`left(coalesce(nullif(${geoMentionChecks.excerpt}, ''), ${geoMentionChecks.answer}), 300)`.as(
+          "excerpt"
+        ),
+      grounding: geoMentionChecks.grounding,
+      sources: geoMentionChecks.sources,
       lastCheckedAt: geoMentionChecks.capturedAt,
     })
     .from(geoMentionChecks)
-    .where(mentionFilters(scope, window, PROMPT_LEVEL_FILTERS))
+    .where(
+      mentionFilters(scope, window, {
+        ...PROMPT_LEVEL_FILTERS,
+        scanId: query?.scanId,
+      })
+    )
     .orderBy(
       geoMentionChecks.promptId,
       geoMentionChecks.engine,
@@ -716,12 +732,16 @@ export async function queryGeoCheckPromptSummaries(
       )
     )
     .orderBy(desc(latest.lastCheckedAt), latest.promptId, latest.engine);
-  return query
+  const selected = query
     ? await withGeoCheckAggregateCache(
         scope,
         rows.limit(query.limit + 1).offset(query.offset)
       )
     : await withGeoCheckAggregateCache(scope, rows);
+  return selected.map((row) => ({
+    ...row,
+    grounding: parseGeoCheckGrounding(row.grounding),
+  }));
 }
 
 export async function queryGeoCheckPromptHistory(

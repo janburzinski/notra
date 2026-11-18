@@ -1,11 +1,16 @@
 import { afterEach, describe, expect, mock, test } from "bun:test";
 
+import type { GeoOutcome } from "../src/types/geo";
+
 const organization = { id: "org_1", slug: "acme", name: "Acme", logo: null };
 
-const runGeoEffect = mock(async (_name: string, _effect: unknown) => ({
-  ok: true,
-  value: { scanId: "scan_1" },
-}));
+const scanStarted = { ok: true, value: { scanId: "scan_1" } } as const;
+const runGeoEffect = mock(
+  async (
+    _name: string,
+    _effect: unknown
+  ): Promise<GeoOutcome<{ scanId: string }>> => scanStarted
+);
 const runtime = await import("../src/runtime/geo");
 mock.module("../src/runtime/geo", () => ({ ...runtime, runGeoEffect }));
 
@@ -53,6 +58,7 @@ function post(path: string, body?: unknown) {
 describe("scan triggers with an engine selection", () => {
   afterEach(() => {
     runGeoEffect.mockClear();
+    runGeoEffect.mockResolvedValue(scanStarted);
   });
 
   test("rescans one prompt on every tracked engine without a body", async () => {
@@ -63,7 +69,6 @@ describe("scan triggers with an engine selection", () => {
       organizationId: organization.id,
       projectId: "project_1",
       promptId: "prompt_1",
-      engines: undefined,
     });
   });
 
@@ -96,10 +101,49 @@ describe("scan triggers with an engine selection", () => {
     });
   });
 
+  test("forwards a one-shot scan without sequences", async () => {
+    const response = await post("", { oneShot: true, includeSequences: false });
+
+    expect(response.status).toBe(202);
+    expect(runGeoEffect.mock.calls[0]?.[1]).toEqual({
+      organizationId: organization.id,
+      projectId: "project_1",
+      oneShot: true,
+      includeSequences: false,
+    });
+  });
+
+  test("forwards a one-shot prompt rescan", async () => {
+    const response = await post("/prompts/prompt_1", { oneShot: true });
+
+    expect(response.status).toBe(202);
+    expect(runGeoEffect.mock.calls[0]?.[1]).toMatchObject({
+      promptId: "prompt_1",
+      oneShot: true,
+    });
+  });
+
   test("turns down an empty engine list before starting anything", async () => {
     const response = await post("/prompts/prompt_1", { engines: [] });
 
     expect(response.status).toBe(400);
     expect(runGeoEffect).not.toHaveBeenCalled();
+  });
+
+  test("returns a machine-readable code and message for a rejected trigger", async () => {
+    const failure = {
+      status: 400,
+      code: "GEO_TRACKING_DISABLED",
+      error: "Tracking is disabled",
+    } as const;
+    runGeoEffect.mockResolvedValueOnce({ ok: false, failure });
+
+    const response = await post("");
+
+    expect(response.status).toBe(400);
+    expect(await response.json()).toEqual({
+      code: failure.code,
+      error: failure.error,
+    });
   });
 });

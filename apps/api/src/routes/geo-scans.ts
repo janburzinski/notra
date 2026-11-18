@@ -10,6 +10,7 @@ import {
   scanParamsSchema,
 } from "@notra/schemas/api/geo-params";
 import {
+  createPromptScanRequestSchema,
   createScanRequestSchema,
   createScanResponseSchema,
   listScansQuerySchema,
@@ -46,7 +47,7 @@ const createScanRoute = createRoute({
   operationId: "createGeoScan",
   summary: "Trigger a GEO scan",
   description:
-    "Queues a scan with the Notra dashboard, which owns the model credentials and billing gates. The public API never calls an answer engine itself. Pass `engines` to run only some engines. The scan record is created before the hand-off, so `scanId` is immediately readable via `GET /v1/projects/{projectId}/geo/scans/{scanId}`. Poll `statusUrl` (also returned as the `Location` header) until `status` leaves `running`. Returns 409 while a scan for this project is still in flight, and 402 when the plan or AI credits cannot cover a scan.",
+    "Brand tracking must be enabled unless `oneShot: true`. Set `includeSequences: false` to skip sequences or pass `engines` to narrow the run. Poll `statusUrl` until the scan leaves `running`. Returns 409 if a scan is already running and 402 if billing blocks the scan.",
   request: {
     params: projectParamsSchema,
     body: {
@@ -80,12 +81,14 @@ const createPromptScanRoute = createRoute({
   operationId: "createGeoPromptScan",
   summary: "Rescan a single GEO prompt",
   description:
-    "Queues a scan of one enabled tracked prompt, for example to check a prompt again after publishing content for it. It runs on every tracked engine, or only on the engines in `engines`, such as one engine to compare a single answer. Only that prompt's checks run, so it costs less than a full scan. Otherwise it behaves like `POST /v1/projects/{projectId}/geo/scans`: poll `statusUrl` until `status` leaves `running`, 409 while another scan is in flight, 402 when the plan or AI credits cannot cover it, and it shares that route's rate limit. Returns 404 for a prompt that is unknown or disabled.",
+    "Brand tracking must be enabled unless `oneShot: true`. Rescans one enabled prompt on tracked engines or the requested `engines`. Poll `statusUrl` until the scan leaves `running`. Returns 404 if the prompt is unknown or disabled.",
   request: {
     params: promptParamsSchema,
     body: {
       required: false,
-      content: { "application/json": { schema: createScanRequestSchema } },
+      content: {
+        "application/json": { schema: createPromptScanRequestSchema },
+      },
     },
   },
   responses: {
@@ -184,11 +187,11 @@ geoScansRoutes.openapi(createScanRoute, async (c) => {
     return rateLimited;
   }
 
-  const { engines } = c.req.valid("json") ?? {};
+  const options = c.req.valid("json") ?? {};
 
   const outcome = await runGeoEffect(
     "startScan",
-    startGeoScan({ organizationId: base.organizationId, projectId, engines })
+    startGeoScan({ organizationId: base.organizationId, projectId, ...options })
   );
   return scanStartedResponse(c, projectId, outcome);
 });
@@ -206,7 +209,7 @@ geoScansRoutes.openapi(createPromptScanRoute, async (c) => {
     return rateLimited;
   }
 
-  const { engines } = c.req.valid("json") ?? {};
+  const options = c.req.valid("json") ?? {};
 
   const outcome = await runGeoEffect(
     "startPromptScan",
@@ -214,7 +217,7 @@ geoScansRoutes.openapi(createPromptScanRoute, async (c) => {
       organizationId: base.organizationId,
       projectId,
       promptId,
-      engines,
+      ...options,
     })
   );
   return scanStartedResponse(c, projectId, outcome);

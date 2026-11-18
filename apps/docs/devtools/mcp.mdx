@@ -371,6 +371,8 @@ Start with `get_geo_snapshot`. It returns a compact diagnosis of a project and t
 
 **GEO scans and visibility**
 
+The MCP scan tools require enabled brand tracking. Enabling tracking with `update_geo_settings` starts the recurring schedule; supplied lists replace the existing lists. To scan without enabling the schedule, use `oneShot: true` on the HTTP scan endpoint.
+
 - `create_geo_scan`
 - `rescan_geo_prompt`
 - `list_geo_scans`

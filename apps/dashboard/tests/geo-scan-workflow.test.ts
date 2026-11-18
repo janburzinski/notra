@@ -104,6 +104,16 @@ mock.module("../src/workflows/steps/geo-scan-steps", () => ({
 }));
 const { geoScanWorkflow } = await import("../src/workflows/geo-scan");
 
+function deferred<T>() {
+  let resolve: (value: T) => void = () => {
+    throw new Error("Deferred not initialized");
+  };
+  const promise = new Promise<T>((complete) => {
+    resolve = complete;
+  });
+  return { promise, resolve };
+}
+
 function tick(): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, 0));
 }
@@ -689,6 +699,33 @@ describe("GEO scan workflow orchestration", () => {
       "failed",
     ]);
   });
+
+  test("an empty one-shot scan finalizes without starting another scan", async () => {
+    taskBatch.mockResolvedValue({
+      checks: 0,
+      mentions: 0,
+      dropped: 1,
+      usage: EMPTY_AGENT_TOKEN_USAGE,
+    });
+    await expect(
+      geoScanWorkflow({
+        organizationId: "org-test",
+        projectId: "project-test",
+        oneShot: true,
+        includeSequences: false,
+      })
+    ).rejects.toBeInstanceOf(FatalError);
+    expect(prepare).toHaveBeenCalledTimes(1);
+    expect(prepare.mock.calls[0]?.[2]).toMatchObject({
+      oneShot: true,
+      includeSequences: false,
+    });
+    expect(finalize.mock.calls.map(([, , status]) => status)).toEqual([
+      "failed",
+    ]);
+    expect(trackRetry).not.toHaveBeenCalled();
+    expect(sleep).not.toHaveBeenCalled();
+  });
 });
 
 describe("Olostep late results", () => {
@@ -726,6 +763,56 @@ describe("Olostep late results", () => {
   });
 
   afterEach(() => setSystemTime());
+
+  test("polls browser engines while API checks are in flight and shares the claim renewal", async () => {
+    const plan = scanPlan("project-test", 2);
+    plan.claimedAt = new Date(
+      Date.now() - GEO_SCAN_CLAIM_RENEW_AFTER_MS
+    ).toISOString();
+    const [apiTask, browserTask] = plan.tasks;
+    if (!(apiTask && browserTask)) {
+      throw new Error("Missing test tasks");
+    }
+    browserTask.engine = "microsoft/copilot";
+    prepare.mockResolvedValue({ status: "planned", plan });
+
+    const renewal = deferred<string>();
+    const api = deferred<void>();
+    const browser = deferred<GeoOlostepResults>();
+    renewClaim.mockReturnValueOnce(renewal.promise);
+    taskBatch.mockImplementationOnce(async () => {
+      await api.promise;
+      return {
+        checks: 1,
+        mentions: 0,
+        dropped: 0,
+        usage: EMPTY_AGENT_TOKEN_USAGE,
+      };
+    });
+    collectOlostep.mockReturnValueOnce(browser.promise);
+
+    const run = geoScanWorkflow({ organizationId: "org-test" });
+    await settle(() => renewClaim.mock.calls.length > 0);
+    expect(renewClaim).toHaveBeenCalledTimes(1);
+    const renewedAt = new Date().toISOString();
+    renewal.resolve(renewedAt);
+    await settle(
+      () =>
+        collectOlostep.mock.calls.length > 0 && taskBatch.mock.calls.length > 0
+    );
+    expect(taskBatch.mock.calls[0]?.[1].map((task) => task.engine)).toEqual([
+      apiTask.engine,
+    ]);
+    expect(finalize).not.toHaveBeenCalled();
+
+    api.resolve();
+    await tick();
+    expect(finalize).not.toHaveBeenCalled();
+    browser.resolve({ "0": "browser-answer" });
+    expect(await run).toMatchObject({ status: "completed", checks: 2 });
+    expect(renewClaim).toHaveBeenCalledTimes(1);
+    expect(finalize.mock.calls[0]?.[3]).toBe(renewedAt);
+  });
 
   test("a result arriving after completed does not start a paid retry", async () => {
     const startedAt = Date.now();

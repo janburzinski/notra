@@ -131,6 +131,9 @@ const DESIGN_SYSTEM_GEO_PROMPTS = [
 const DESIGN_SYSTEM_GEO_SEARCH_RESULTS: GeoPromptResultSummary[] =
   DESIGN_SYSTEM_GEO_PROMPTS.map((entry, index) => ({
     checkId: `design-system-check-${index}`,
+    scanId: "design-system-scan",
+    answerExcerpt: "",
+    sourceDomains: [],
     promptId: `design-system-prompt-${index}`,
     engine: "openai/gpt-5.4-grounded",
     prompt: entry.prompt,

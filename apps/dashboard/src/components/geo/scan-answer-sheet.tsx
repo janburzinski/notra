@@ -45,7 +45,15 @@ export function ScanAnswerSheet({
     result && checkId
       ? buildPromptTableRows(
           prompts,
-          [{ ...result, checkId }],
+          [
+            {
+              ...result,
+              checkId,
+              scanId,
+              answerExcerpt: result.excerpt,
+              sourceDomains: result.sources.map(({ domain }) => domain),
+            },
+          ],
           GEO_PROMPT_DEFAULT_FILTERS
         ).find((item) =>
           item.results.some((answer) => answer.promptId === result.promptId)

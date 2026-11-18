@@ -27,6 +27,7 @@ type GeoErrorStatus = 400 | 402 | 404 | 409 | 429 | 500 | 503;
 export interface GeoFailure {
   readonly status: GeoErrorStatus;
   readonly error: string;
+  readonly code?: string;
   /** Set with status 429 when the dashboard's shared org budget is spent. */
   readonly rateLimit?: {
     readonly limit: number;

@@ -25,6 +25,7 @@ import {
 import {
   GeoContentBillingService,
   GeoEntitlementService,
+  GeoModelService,
   GeoWorkflowService,
 } from "../src/deps";
 import { GeoScanError } from "../src/geo/errors";
@@ -38,6 +39,7 @@ import type {
   GeoWorkflowServiceShape,
 } from "../src/types/deps";
 import { EMPTY_AGENT_TOKEN_USAGE } from "../src/utils/token-usage";
+import { fakeModels } from "./constants/geo-boundaries";
 import {
   initializeDatabase,
   database,
@@ -52,6 +54,7 @@ const { nextGeoScanAtAfter, rearmedGeoScanAt, runGeoScanCronSweep } =
   await import("../src/geo/scan-schedule");
 const { loadGeoProjectBrand } = await import("../src/geo/project-brand");
 const { startClaimedGeoScanRun } = await import("../src/geo/scan-handoff");
+const { startGeoScan } = await import("../src/geo/programs");
 const { finalizeGeoScanProject } = await import("../src/geo/scan");
 const {
   claimGeoScanRun,
@@ -159,6 +162,40 @@ describe("scan project brand context", () => {
 });
 
 describe("scheduled GEO scans", () => {
+  test("hands off a one-shot scan without re-enabling a paused schedule", async () => {
+    const scope = await seedProject("paused-one-shot", {
+      enabled: false,
+      nextScanAt: null,
+    });
+    const run = (options: { oneShot?: boolean; includeSequences?: boolean }) =>
+      startGeoScan({ ...scope, ...options }).pipe(
+        Effect.provideService(GeoWorkflowService, workflows),
+        Effect.provideService(GeoEntitlementService, entitlements),
+        Effect.provideService(GeoModelService, fakeModels)
+      );
+
+    expect(await Effect.runPromise(Effect.flip(run({})))).toMatchObject({
+      _tag: "GeoSettingsDisabledError",
+    });
+    expect(startWorkflow).not.toHaveBeenCalled();
+
+    const { scanId } = await Effect.runPromise(
+      run({ oneShot: true, includeSequences: false })
+    );
+    expect(startWorkflow).toHaveBeenCalledTimes(1);
+    expect(startWorkflow.mock.calls[0]?.[0]).toMatchObject({
+      ...scope,
+      scanId,
+      oneShot: true,
+      includeSequences: false,
+    });
+    expect(await settingsFor(scope.projectId)).toMatchObject({
+      enabled: false,
+      nextScanAt: null,
+    });
+    expect(await sweep()).toMatchObject({ started: 0 });
+  });
+
   test("starts due and migrated schedules, persists pollable rows, and leaves disabled/future schedules alone", async () => {
     const future = new Date(Date.now() + 86_400_000);
     await seedProject("due", {
