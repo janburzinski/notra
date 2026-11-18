@@ -93,8 +93,8 @@ function QuestionPane({
         // The shown question sets the height; the one you leave lifts out of
         // the flow and fades as the next fades in, a beat later.
         active
-          ? "duration-normal relative opacity-100 blur-none delay-75 ease-out"
-          : "duration-fast pointer-events-none absolute inset-x-0 top-0 opacity-0 blur-xs ease-out"
+          ? "duration-slow relative opacity-100 blur-none delay-150 ease-out"
+          : "duration-normal pointer-events-none absolute inset-x-0 top-0 opacity-0 blur-xs ease-out"
       )}
       inert={!active}
     >
@@ -210,7 +210,7 @@ function QuestionProgress({
                 className={cn(
                   "duration-fast h-1 w-3.5 rounded-full transition-colors ease-out",
                   index === tab && "bg-foreground/70",
-                  index !== tab && answered(index) && "bg-primary",
+                  index !== tab && answered(index) && "bg-foreground/35",
                   index !== tab && !answered(index) && "bg-border"
                 )}
               />
@@ -233,14 +233,18 @@ function QuestionFooter({
   const shortcut = useIsApplePlatform() ? "⌘" : "Ctrl";
   return (
     <footer className="flex shrink-0 items-center justify-between gap-2 px-3 py-3">
-      <Button
-        aria-keyshortcuts="Escape"
-        onClick={onDismiss}
-        size="sm"
-        variant="ghost"
-      >
-        {t("dismiss")}
-      </Button>
+      {onDismiss ? (
+        <Button
+          aria-keyshortcuts="Escape"
+          onClick={onDismiss}
+          size="sm"
+          variant="ghost"
+        >
+          {t("dismiss")}
+        </Button>
+      ) : (
+        <span />
+      )}
       <div className="flex items-center gap-2">
         {onBack ? (
           <Button onClick={onBack} size="sm" variant="outline">
@@ -422,7 +426,7 @@ export function AgentQuestionDock({
         return;
       }
       window.clearTimeout(advanceTimerRef.current);
-      onDismiss();
+      onDismiss?.();
       return;
     }
     if (typing || event.altKey || event.ctrlKey || event.metaKey) {
@@ -490,7 +494,7 @@ export function AgentQuestionDock({
           className="min-h-0 overflow-y-auto"
           initial={false}
           transition={
-            reduceMotion ? { duration: 0 } : tween("normal", "emphasized")
+            reduceMotion ? { duration: 0 } : tween("slow", "emphasized")
           }
         >
           <div className="relative" ref={contentRef}>
@@ -543,10 +547,14 @@ export function AgentQuestionDock({
         canSubmit={anyAnswered}
         last={last}
         onBack={tab > 0 ? () => go(tab - 1) : undefined}
-        onDismiss={() => {
-          window.clearTimeout(advanceTimerRef.current);
-          onDismiss();
-        }}
+        onDismiss={
+          onDismiss
+            ? () => {
+                window.clearTimeout(advanceTimerRef.current);
+                onDismiss();
+              }
+            : undefined
+        }
         onNext={advance}
       />
     </section>

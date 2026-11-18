@@ -1,5 +1,6 @@
 import "zod/compile";
 import {
+  AUTOPILOT_APPROVAL_GROUPS,
   AUTOPILOT_APPROVAL_MODES,
   AUTOPILOT_AUTOMATION_KINDS,
   AUTOPILOT_DRAFT_EMAIL_MODES,
@@ -78,7 +79,8 @@ export const autopilotRuleInputSchema = autopilotOrganizationInputSchema.extend(
 
 export const autopilotRuleIdInputSchema =
   autopilotOrganizationInputSchema.extend({
-    ruleId: z.string().trim().min(1).max(64),
+    // "autopilot-rule-" and a sha256 hex digest: 79 characters.
+    ruleId: z.string().trim().min(1).max(128),
   });
 
 export const autopilotJobsSchema = z.object({
@@ -153,8 +155,52 @@ export const autopilotSaveInputSchema = autopilotOrganizationInputSchema.extend(
     /** Omit to keep the saved choice. */
     draftEmails: z.enum(AUTOPILOT_DRAFT_EMAIL_MODES).optional(),
     siteId: autopilotSiteIdSchema.nullable().optional(),
+    /** What the team wants from Autopilot, in its words; kept in its memory. */
+    goal: z.string().trim().min(1).max(1500).optional(),
+    /** Sent by Ollie's setup chat: marks the workspace as onboarded. */
+    onboarded: z.literal(true).optional(),
   }
 );
+
+/** Ollie reads up on the workspace before the setup chat starts. */
+export const autopilotOnboardingIntroInputSchema =
+  autopilotOrganizationInputSchema.extend({
+    projectId: z.string().trim().min(1).max(64).optional(),
+  });
+
+const onboardingLineSchema = z.object({
+  from: z.enum(["ollie", "you"]),
+  text: z.string().max(1000),
+});
+
+/**
+ * One answer in the team's own words during Ollie's setup chat, with the
+ * conversation so far and what the setup looks like now.
+ */
+export const autopilotOnboardingTurnInputSchema =
+  autopilotOrganizationInputSchema.extend({
+    question: z.enum([
+      "goal",
+      "audience",
+      "voice",
+      "rival",
+      "repository",
+      "approvals",
+      "slack",
+    ]),
+    questionText: z.string().max(300),
+    answer: z.string().trim().min(1).max(1000),
+    transcript: z.array(onboardingLineSchema).max(40),
+    draft: z.object({
+      goals: z.array(z.string().max(20)).max(5),
+      automations: z.partialRecord(z.enum(AUTOPILOT_JOB_KINDS), z.boolean()),
+      approvals: z.partialRecord(
+        z.enum(AUTOPILOT_APPROVAL_GROUPS),
+        autopilotApprovalModeSchema
+      ),
+      slackChannels: z.array(z.string().max(100)).max(50),
+    }),
+  });
 
 /**
  * Changes only the settings it names; the server merges them into the saved

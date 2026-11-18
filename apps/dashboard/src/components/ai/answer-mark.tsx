@@ -22,7 +22,7 @@ export function AnswerMark({
         "flex size-5 shrink-0 items-center justify-center text-xs font-medium tabular-nums ring-1 ring-inset",
         multiple ? "rounded-md" : "rounded-full",
         picked
-          ? "bg-primary text-primary-foreground ring-primary"
+          ? "bg-foreground text-background ring-foreground"
           : "bg-background text-muted-foreground ring-border",
         className
       )}

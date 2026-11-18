@@ -27,6 +27,16 @@ export function repositoryParentDirectory(path: string) {
   return index > 0 ? path.slice(0, index) : "";
 }
 
+/**
+ * The folders of the Markdown pages an update edits: they count as content,
+ * like a new post's folder does, when no content folder is saved.
+ */
+export function markdownContentFolders(paths: readonly string[]) {
+  return paths
+    .filter((path) => MARKDOWN_EXTENSION.test(path))
+    .map(repositoryParentDirectory);
+}
+
 /** Root files plus directories two levels deep with file counts, so an agent can orient without the full tree. */
 export function summarizeRepositoryTree(paths: string[], maxLines: number) {
   const rootFiles: string[] = [];

@@ -1,6 +1,8 @@
+import { AUTOPILOT_AUTOMATION_KINDS } from "@notra/db/constants/autopilot";
 import * as z from "zod";
 
 import { AUTOPILOT_RULE_MAX_CHARS } from "@/constants/autopilot";
+import { AUTOPILOT_ONBOARDING_GOAL_IDS } from "@/constants/autopilot-onboarding";
 
 export const blogFileSchema = z.object({
   slug: z.string().describe("kebab-case file slug without extension"),
@@ -161,4 +163,81 @@ export const linksReviewSchema = z.object({
       reason: z.string().describe("A few words on why"),
     })
   ),
+});
+
+const approvalModeSchema = z.enum(["ask", "auto"]).nullable();
+
+/** What Ollie makes of an answer in the team's own words. */
+export const autopilotOnboardingTurnSchema = z.object({
+  understood: z
+    .boolean()
+    .describe(
+      "False when the answer decides nothing for this question: unsure, off topic or a question back. The question is then asked again"
+    ),
+  goals: z
+    .array(z.enum(AUTOPILOT_ONBOARDING_GOAL_IDS))
+    .describe("Goal question only: every goal the answer asks for"),
+  automations: z
+    .array(
+      z.object({
+        kind: z.enum(AUTOPILOT_AUTOMATION_KINDS),
+        on: z.boolean(),
+      })
+    )
+    .describe(
+      "Every automation the answer asks for, focuses on or rules out, e.g. winning comparison questions turns comparisons on"
+    ),
+  approvals: z
+    .object({
+      posts: approvalModeSchema,
+      updates: approvalModeSchema,
+      fixes: approvalModeSchema,
+    })
+    .describe(
+      "Approvals per kind the answer decides; null for every kind it doesn't decide"
+    ),
+  slackChannel: z
+    .string()
+    .nullable()
+    .describe(
+      "Slack question only: the listed channel the answer picks, exactly as listed; null for none"
+    ),
+  skipSlack: z
+    .boolean()
+    .describe("Slack question only: the answer wants no brief in Slack"),
+  rules: z
+    .array(z.string())
+    .describe(
+      "Every always or never instruction in the answer, as a short imperative such as 'Never write about pricing'"
+    ),
+  note: z
+    .string()
+    .nullable()
+    .describe(
+      "One sentence of context for every run (audience, priorities, focus), without the rules; null when there is none"
+    ),
+  reply: z
+    .string()
+    .describe(
+      "Written last: Ollie's reply, one or two short warm sentences that say back exactly what the fields above do, and nothing they don't"
+    ),
+});
+
+/** Ollie's opening and the "about you" choices, from what he read up on. */
+export const autopilotOnboardingIntroSchema = z.object({
+  hello: z
+    .string()
+    .describe(
+      "Ollie's first message: greets the person by first name and names one or two concrete facts from the data; at most two short sentences. It doesn't say what Autopilot does or that he has questions: the chat says both right after it"
+    ),
+  audienceOptions: z
+    .array(z.string())
+    .describe(
+      "Three distinct readers this brand most likely writes for, 2 to 5 words each, from the brand data"
+    ),
+  voiceOptions: z
+    .array(z.string())
+    .describe(
+      "Three distinct ways the posts could sound that fit this brand, 2 to 5 words each, e.g. 'Straight to the point'"
+    ),
 });

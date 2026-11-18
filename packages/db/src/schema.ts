@@ -4943,6 +4943,15 @@ export const autopilotSettings = pgTable("autopilot_settings", {
   /** Drafts nobody touched for this many days are closed; null keeps them open. */
   stalePullRequestDays: integer("stale_pull_request_days").default(14),
   lastRunAt: timestamp("last_run_at"),
+  /**
+   * When Ollie's setup chat finished. Turning Autopilot off keeps it, so a
+   * paused workspace isn't onboarded again.
+   */
+  onboardedAt: timestamp("onboarded_at"),
+  /** Who finished it; cleared when that user is deleted. */
+  onboardedBy: text("onboarded_by").references(() => users.id, {
+    onDelete: "set null",
+  }),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at")
     .defaultNow()

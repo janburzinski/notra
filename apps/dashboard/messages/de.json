@@ -10273,7 +10273,15 @@
         "confirmDescription": "Autopilot läuft nicht mehr, bis du ihn wieder einschaltest. Deine Einstellungen bleiben.",
         "confirm": "Ausschalten"
       },
-      "approvalsHint": "Bei Auto wird der Pull Request zur Prüfung freigegeben und am nächsten Werktag um 9:00 veröffentlicht, wenn niemand eingreift."
+      "approvalsHint": "Bei Auto wird der Pull Request zur Prüfung freigegeben und am nächsten Werktag um 9:00 veröffentlicht, wenn niemand eingreift.",
+      "redoOnboarding": {
+        "title": "Onboarding wiederholen",
+        "description": "Nur du siehst das. Pausiert Autopilot und startet Ollies Einrichtungschat von vorne.",
+        "button": "Onboarding wiederholen",
+        "confirmTitle": "Onboarding wiederholen?",
+        "confirmDescription": "Autopilot pausiert, bis du Ollies Einrichtung erneut abschließt. Deine Regeln und dein Verlauf bleiben.",
+        "confirm": "Wiederholen"
+      }
     }
   },
   "artifacts": {

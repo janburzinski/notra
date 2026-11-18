@@ -15,10 +15,8 @@ import type * as z from "zod";
 import type {
   AUTOPILOT_PAGE_TABS,
   AUTOPILOT_SETTINGS_SECTION_IDS,
-  AUTOPILOT_SETUP_STEP_IDS,
 } from "@/constants/autopilot-ui";
 import type { useAutopilotConnections } from "@/lib/hooks/use-autopilot-connections";
-import type { useAutopilotSetup } from "@/lib/hooks/use-autopilot-setup";
 import type { DashboardRouter } from "@/lib/orpc/router";
 import type { autopilotPullRequestEventSchema } from "@/schemas/autopilot-github";
 import type {
@@ -122,7 +120,7 @@ export interface AutopilotPullRequestWorkflowPayload {
   rawBody: string;
 }
 
-type AutopilotOverview =
+export type AutopilotOverview =
   InferRouterOutputs<DashboardRouter>["autopilot"]["get"];
 
 export type AutopilotSettingsView = AutopilotOverview["settings"];
@@ -130,16 +128,6 @@ export type AutopilotSettingsView = AutopilotOverview["settings"];
 export type AutopilotFindingView = AutopilotOverview["findings"][number];
 
 export type AutopilotRunView = AutopilotOverview["runs"][number];
-
-export interface AutopilotSetupFormProps {
-  organizationId: string;
-  callbackPath: string;
-  overview: AutopilotOverview;
-  /** Project in scope; used only until Autopilot has a saved project. */
-  projectId?: string | null;
-  submitLabel: string;
-  onSaved?: () => void;
-}
 
 export interface AutopilotPageClientProps {
   organizationSlug: string;
@@ -302,13 +290,6 @@ export interface AutopilotFindingCandidate {
   picked: boolean;
 }
 
-export interface AutopilotSetupRowProps {
-  icon: ReactNode;
-  title: string;
-  description?: string;
-  children: ReactNode;
-}
-
 export type AutopilotRepositoryOption =
   InferRouterOutputs<DashboardRouter>["autopilot"]["repositories"][number];
 
@@ -323,14 +304,6 @@ export interface AutopilotRepositoryPickerProps {
   label?: string;
   placeholder?: string;
 }
-
-type AutopilotSetupState = ReturnType<typeof useAutopilotSetup>;
-
-export interface AutopilotSetupRowsProps {
-  setup: AutopilotSetupState;
-}
-
-export type AutopilotSetupStepId = (typeof AUTOPILOT_SETUP_STEP_IDS)[number];
 
 export interface AutopilotRunPageClientProps {
   organizationSlug: string;
@@ -608,6 +581,10 @@ export interface AutopilotHousekeepingSettingsProps extends AutopilotSettingsSec
   onPromptCleanupChange: (enabled: boolean) => void;
 }
 
+export interface AutopilotRedoOnboardingRowProps {
+  organizationId: string;
+}
+
 export interface AutopilotTurnOffRowProps {
   onTurnOff: () => Promise<unknown>;
 }
@@ -686,14 +663,6 @@ export interface AutopilotOverviewToolbarProps {
   onRunNow: () => void;
 }
 
-export interface AutopilotOffPageProps {
-  basePath: string;
-  organizationId: string;
-  overview: AutopilotOverview;
-  projectId: string | null;
-  onTurnedOn: () => void;
-}
-
 type AutopilotPageTab = (typeof AUTOPILOT_PAGE_TABS)[number];
 
 export interface AutopilotOverviewTabsListProps {
@@ -712,10 +681,11 @@ export interface AutopilotPullRequestsTabProps {
   timezone: string;
 }
 
-export type AutopilotSettingsTabProps = Pick<
-  AutopilotOffPageProps,
-  "basePath" | "organizationId" | "overview"
->;
+export interface AutopilotSettingsTabProps {
+  basePath: string;
+  organizationId: string;
+  overview: AutopilotOverview;
+}
 
 export interface AutopilotBriefFindingCardProps {
   finding: AutopilotFindingView;

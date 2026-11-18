@@ -120,6 +120,8 @@ export interface AutopilotFactReport {
   unconfirmed: string[];
   /** Prices and figures no source contains. */
   figures: string[];
+  /** Unsourced claims no edit could take out; kept for a person to fix. */
+  uncut: string[];
 }
 
 export interface AutopilotRenderingProblem extends AutopilotRenderingIssue {

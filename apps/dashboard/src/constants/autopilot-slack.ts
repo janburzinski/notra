@@ -1,7 +1,5 @@
 import type { AutopilotJobKind } from "@notra/db/types/autopilot";
 
-export const AUTOPILOT_CREATE_SLACK_CHANNEL_VALUE = "__create_slack_channel__";
-
 /** A 👍 merge or write request not settled by then is treated as stopped. */
 export const AUTOPILOT_SLACK_ACTION_STALE_SECONDS = 300;
 

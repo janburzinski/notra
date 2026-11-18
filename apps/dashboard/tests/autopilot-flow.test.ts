@@ -367,6 +367,7 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
       state.linkedReaction ? { userId: "sandbox-user" } : null,
   }));
   mock.module("@/lib/autopilot/flag", () => ({
+    canResetAutopilotOnboarding: async () => false,
     isAutopilotEnabledForOrganization: async () => state.flag,
     isAutopilotOffForOrganization: async () => !state.flag,
     autopilotAccessState: async () => (state.flag ? "enabled" : "disabled"),

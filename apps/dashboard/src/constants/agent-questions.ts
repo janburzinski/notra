@@ -9,7 +9,7 @@ export const AGENT_QUESTION_DOCK_ATTRIBUTE = "data-agent-question-dock";
 
 /** One answer row in the question dock. */
 export const AGENT_QUESTION_ROW_CLASS =
-  "flex w-full min-w-0 items-start gap-2.5 rounded-xl px-3 py-2.5 text-left ring-1 ring-inset outline-none focus-visible:ring-2 focus-visible:ring-ring/50";
+  "flex w-full min-w-0 items-start gap-2.5 rounded-xl p-3 text-left ring-1 ring-inset outline-none focus-visible:ring-2 focus-visible:ring-ring/50";
 /**
  * Only an idle row eases (hover, and letting go of a pick). A picked row
  * takes its tint at once, so switching answers quickly never leaves two
@@ -17,10 +17,10 @@ export const AGENT_QUESTION_ROW_CLASS =
  */
 export const AGENT_QUESTION_ROW_IDLE_CLASS =
   "bg-muted/40 ring-border/70 hover:bg-muted transition-[background-color,box-shadow] duration-fast ease-out";
-export const AGENT_QUESTION_ROW_PICKED_CLASS = "bg-primary/8 ring-primary/30";
+export const AGENT_QUESTION_ROW_PICKED_CLASS = "bg-muted ring-foreground/25";
 
-/** How long a picked answer shows before a pick-one question moves on. */
-export const AGENT_QUESTION_ADVANCE_DELAY_MS = 180;
+/** How long a picked answer shows before a pick-one question moves on, long enough to see it took. */
+export const AGENT_QUESTION_ADVANCE_DELAY_MS = 450;
 
 /** The chat input fades back in once the questions are answered. */
 export const AGENT_QUESTION_INPUT_RETURN_CLASS =

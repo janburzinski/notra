@@ -39,6 +39,7 @@ if (process.env.NOTRA_ARTIFACTS_TEST !== "1") {
   mock.module("@notra/db/drizzle", () => ({ db }));
   const gate = { on: true };
   mock.module("@/lib/autopilot/flag", () => ({
+    canResetAutopilotOnboarding: async () => false,
     isAutopilotEnabledForOrganization: async () => gate.on,
     isAutopilotOffForOrganization: async () => !gate.on,
     autopilotAccessState: async () => (gate.on ? "enabled" : "disabled"),

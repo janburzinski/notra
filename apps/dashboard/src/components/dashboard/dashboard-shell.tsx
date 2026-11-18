@@ -23,6 +23,7 @@ import { SiteHeader } from "@/components/dashboard/header";
 import { RightPanel } from "@/components/dashboard/right-panel";
 import { useRightPanel } from "@/components/dashboard/right-panel-context";
 import { useOrganizationsContext } from "@/components/providers/organization-provider";
+import { AUTOPILOT_ONBOARDING_LAYER_ID } from "@/constants/autopilot-onboarding";
 import { RIGHT_PANEL_PORTAL_ID } from "@/constants/right-panel";
 import { useAgentPromptBarVisible } from "@/lib/hooks/use-agent-prompt-bar-visible";
 import { useDashboardBanner } from "@/lib/hooks/use-dashboard-banner";
@@ -263,6 +264,7 @@ export function DashboardShell({
             <SubscriptionGate>{children}</SubscriptionGate>
           </DashboardPageViewport>
           <AgentPromptBar />
+          <div className="contents" id={AUTOPILOT_ONBOARDING_LAYER_ID} />
         </SidebarInset>
         <div className="contents" id={RIGHT_PANEL_PORTAL_ID} />
         <DashboardAgentSlot />

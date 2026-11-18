@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 
 import { useRightPanel } from "@/components/dashboard/right-panel-context";
 import { useOrganizationsContext } from "@/components/providers/organization-provider";
+import { useAutopilotOnboardingActive } from "@/lib/hooks/use-autopilot-onboarding-active";
 import { useNavVisibility } from "@/lib/hooks/use-nav-visibility";
 import { usePathname } from "@/lib/navigation";
 import { dashboardOrpc } from "@/lib/orpc/query";
@@ -14,14 +15,16 @@ import {
 
 /**
  * The floating agent composer ships with Autopilot, so it shows only on the
- * Autopilot pages, and steps aside while the agent panel is open or the plan
- * doesn't include Autopilot. An item's page asks for changes to its pull
+ * Autopilot pages, and steps aside while the agent panel is open, the plan
+ * doesn't include Autopilot, or Ollie's setup chat stands in for it. An
+ * item's page asks for changes to its pull
  * request in its own composer instead.
  */
 export function useAgentPromptBarVisible() {
   const pathname = usePathname();
   const { active } = useRightPanel();
   const { autopilot } = useNavVisibility();
+  const onboarding = useAutopilotOnboardingActive();
   const { activeOrganization } = useOrganizationsContext();
   const organizationId = activeOrganization?.id ?? "";
   const onAutopilot =
@@ -38,5 +41,10 @@ export function useAgentPromptBarVisible() {
   );
   // Hidden until the overview says the plan includes Autopilot, so the
   // composer never flashes onto the upgrade page while it loads.
-  return onAutopilot && upgradeRequired === false && active !== "agent";
+  return (
+    onAutopilot &&
+    upgradeRequired === false &&
+    active !== "agent" &&
+    !onboarding
+  );
 }

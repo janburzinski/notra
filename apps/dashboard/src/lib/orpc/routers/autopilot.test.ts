@@ -88,6 +88,7 @@ if (process.env.NOTRA_AUTOPILOT_ROUTER_TEST !== "1") {
     }),
   }));
   mock.module("@/lib/autopilot/flag", () => ({
+    canResetAutopilotOnboarding: async () => false,
     isAutopilotEnabledForOrganization: async () => state.flag,
     isAutopilotOffForOrganization: async () => !state.flag,
     resolveAutopilotAvailability: async () =>

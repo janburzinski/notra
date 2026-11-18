@@ -61,6 +61,7 @@ if (process.env.NOTRA_AUTOPILOT_DREAM_TEST !== "1") {
   const db = sandbox.db;
   mock.module("@notra/db/drizzle", () => ({ db }));
   mock.module("@/lib/autopilot/flag", () => ({
+    canResetAutopilotOnboarding: async () => false,
     isAutopilotEnabledForOrganization: async () => true,
     isAutopilotOffForOrganization: async () => false,
     autopilotAccessState: async () => "enabled",

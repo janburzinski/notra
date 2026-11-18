@@ -31,6 +31,33 @@ function countOccurrences(haystack: string, needle: string) {
   return count;
 }
 
+function isTableRow(line: string) {
+  const trimmed = line.trim();
+  return trimmed.startsWith("|") && trimmed.endsWith("|");
+}
+
+/**
+ * Whether the edit leaves a Markdown table row without its outer pipes, which
+ * renders the rest of the table as a paragraph. Dropping a whole row is fine.
+ */
+function breaksTableRow(content: string, find: string, replace: string) {
+  const start = content.indexOf(find);
+  const lineStart = content.lastIndexOf("\n", start - 1) + 1;
+  const newline = content.indexOf("\n", start + find.length);
+  const lineEnd = newline === -1 ? content.length : newline;
+  if (!content.slice(lineStart, lineEnd).split("\n").some(isTableRow)) {
+    return false;
+  }
+  const after = `${content.slice(lineStart, start)}${replace}${content.slice(start + find.length, lineEnd)}`;
+  // A row missing one of its outer pipes; prose with an inline `a | b` is fine.
+  return after.split("\n").some((line) => {
+    const trimmed = line.trim();
+    return (
+      (trimmed.startsWith("|") || trimmed.endsWith("|")) && !isTableRow(line)
+    );
+  });
+}
+
 /**
  * Applies edits in order, each replacing one exact passage. An edit whose
  * passage is missing or appears more than once is rejected rather than
@@ -57,6 +84,10 @@ export function applyPageEdits(
     }
     if (edit.find === edit.replace) {
       rejected.push({ edit, reason: "The edit changes nothing" });
+      continue;
+    }
+    if (breaksTableRow(content, edit.find, edit.replace)) {
+      rejected.push({ edit, reason: "The edit breaks a table row" });
       continue;
     }
     content = content.replace(edit.find, () => edit.replace);

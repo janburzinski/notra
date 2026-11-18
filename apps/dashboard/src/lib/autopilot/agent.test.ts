@@ -105,6 +105,7 @@ if (process.env.NOTRA_AUTOPILOT_AGENT_TEST !== "1") {
     getSlackIntegrationBotToken: () => "xoxb-fixture",
   }));
   mock.module("@/lib/autopilot/flag", () => ({
+    canResetAutopilotOnboarding: async () => false,
     isAutopilotEnabledForOrganization: async () => state.flag,
     isAutopilotOffForOrganization: async () => !state.flag,
     resolveAutopilotAvailability: async () =>

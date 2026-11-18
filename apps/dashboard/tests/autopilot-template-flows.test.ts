@@ -199,6 +199,7 @@ if (process.env.NOTRA_AUTOPILOT_TEMPLATE_FLOW_TEST !== "1") {
     },
   }));
   mock.module("@/lib/autopilot/flag", () => ({
+    canResetAutopilotOnboarding: async () => false,
     isAutopilotEnabledForOrganization: async () => true,
     isAutopilotOffForOrganization: async () => false,
     autopilotAccessState: async () => "enabled",

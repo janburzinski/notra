@@ -80,7 +80,11 @@ import {
   spotPhrase,
   toInternalLink,
 } from "@/utils/autopilot-links";
-import { findPagePath, isSafeRepositoryPath } from "@/utils/autopilot-paths";
+import {
+  findPagePath,
+  isSafeRepositoryPath,
+  markdownContentFolders,
+} from "@/utils/autopilot-paths";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -588,6 +592,12 @@ export async function openLinksPullRequest(params: {
     pullRequestNumber: pullRequest.number,
     body: linksPullRequestBody(fix),
     paths: fix.files.map((file) => file.path),
+    // Only a workspace without a saved content folder learns it from the
+    // files edited; a saved one keeps its limits.
+    contentFolders:
+      ctx.contentPath || ctx.integrationContentPath
+        ? []
+        : markdownContentFolders(fix.files.map((file) => file.path)),
   });
   return { opened: true as const, url: pullRequest.url };
 }

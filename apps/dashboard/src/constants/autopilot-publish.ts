@@ -65,6 +65,8 @@ export const AUTOPILOT_FACT_FLAG_HEADINGS = {
   unconfirmed: "Please confirm, about your product with no source",
   figures: "Figures no source contains",
   competitors: "Names competitors, no source checks what it says about them",
+  uncut: "Claims no source states that could not be cut",
+  mostlyCut: "Most claims had no source and were cut, please read the post",
 } as const;
 
 export const AUTOPILOT_FAILED_CHECK_CONCLUSIONS: ReadonlySet<string> = new Set([

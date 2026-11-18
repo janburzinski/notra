@@ -50,7 +50,22 @@ export function useAutopilotConnections({
     githubConnected,
     slackIntegration,
     repositories: repositoriesQuery.data ?? [],
+    // A failure counts as loaded: the setup then says so and offers a retry.
+    repositoriesLoaded:
+      !githubConnected ||
+      repositoriesQuery.isSuccess ||
+      repositoriesQuery.isError,
+    repositoriesFailed: githubConnected && repositoriesQuery.isError,
+    retryRepositories: () => {
+      repositoriesQuery.refetch().catch(() => undefined);
+    },
     channels: channelsQuery.data?.channels ?? [],
+    // A first failure counts too: the setup then offers email instead of
+    // waiting out the retries.
+    channelsLoaded:
+      !slackIntegration ||
+      channelsQuery.isFetched ||
+      channelsQuery.failureCount > 0,
     installing,
     installGitHub,
     slackAuthorizeUrl: `/api/integrations/slack/authorize?organizationId=${organizationId}&callbackPath=${encodeURIComponent(callbackPath)}`,

@@ -59,6 +59,7 @@ if (process.env.NOTRA_AUTOPILOT_SANDBOX_TEST !== "1") {
   }));
   mock.module("@notra/db/drizzle", () => ({ db }));
   mock.module("@/lib/autopilot/flag", () => ({
+    canResetAutopilotOnboarding: async () => false,
     isAutopilotEnabledForOrganization: async () => startup.flag,
     isAutopilotOffForOrganization: async () => !startup.flag,
     autopilotAccessState: async () => (startup.flag ? "enabled" : "disabled"),

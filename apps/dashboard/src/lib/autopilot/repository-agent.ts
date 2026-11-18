@@ -267,6 +267,9 @@ export async function runRepositoryAgent<Schema extends z.ZodType>(params: {
         ) {
           return "This issue already has staged changes, so it isn't skipped. Stop calling tools and write your answer.";
         }
+        if (skipped.some((row) => row.issueId === skip.issueId)) {
+          return "This issue is already skipped. If every issue is handled, stop calling tools and write your answer.";
+        }
         skipped.push(skip);
         await log.decision(`Left "${params.issueName(skip.issueId)}" alone`, {
           reason: skip.reason,

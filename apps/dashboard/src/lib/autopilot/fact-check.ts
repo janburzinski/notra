@@ -7,6 +7,7 @@ import {
   AUTOPILOT_FACT_CHECK_INSTRUCTIONS,
   AUTOPILOT_FACT_CHECK_PROVIDER_OPTIONS,
   AUTOPILOT_FACT_MAX_OUTPUT_TOKENS,
+  AUTOPILOT_FACT_MOSTLY_CUT_MIN,
   AUTOPILOT_FACT_REMOVAL_INSTRUCTIONS,
   AUTOPILOT_FACT_SECTION_MAX_CHARS,
   AUTOPILOT_FACT_SOURCE_MAX_CHARS,
@@ -25,10 +26,6 @@ import {
   unsourcedFigures,
   withoutSourceNotes,
 } from "@/utils/autopilot-facts";
-
-class AutopilotFactCheckError extends Error {
-  override name = "AutopilotFactCheckError";
-}
 
 /**
  * The page in sections of a few headings each. One call per section keeps
@@ -203,13 +200,12 @@ export async function factCheckComparison(params: {
     };
     stuck = stuck.filter((claim) => !removed.has(claim.claim));
   }
+  // What no edit could take out stays for a person: the pull request is held
+  // instead of throwing away a finished page.
   if (stuck.length > 0) {
-    await log.error("Fact check found claims it could not remove", {
+    await log.info("Fact check found claims it could not remove", {
       reason: stuck.map((claim) => claim.claim),
     });
-    throw new AutopilotFactCheckError(
-      `Unsupported claims could not be removed: ${stuck.map((claim) => claim.claim).join("; ")}`
-    );
   }
   const report: AutopilotFactReport = {
     checked: claims.length,
@@ -221,6 +217,7 @@ export async function factCheckComparison(params: {
     figures: params.competitorClaimsOnly
       ? []
       : unsourcedFigures(applied.content, sources),
+    uncut: stuck.map((claim) => claim.claim),
   };
   await log.decision(
     `Fact check: ${report.supported} of ${report.checked} claims sourced, ${report.removed.length} removed`,
@@ -233,14 +230,26 @@ export async function factCheckComparison(params: {
 }
 
 export function factCheckSection(report: AutopilotFactReport) {
+  const mostlyCut =
+    report.removed.length >= AUTOPILOT_FACT_MOSTLY_CUT_MIN &&
+    report.removed.length > report.supported;
   return [
     "### Fact check",
     `${report.supported} of ${report.checked} claims are quoted from a source this page was written from.`,
     ...(report.removed.length
       ? [
           "",
-          "**Removed or corrected, no source states them as written**",
+          mostlyCut
+            ? `**${AUTOPILOT_FACT_FLAG_HEADINGS.mostlyCut}**`
+            : "**Removed or corrected, no source states them as written**",
           ...report.removed.map((claim) => `- ${claim}`),
+        ]
+      : []),
+    ...(report.uncut.length
+      ? [
+          "",
+          `**${AUTOPILOT_FACT_FLAG_HEADINGS.uncut}**`,
+          ...report.uncut.map((claim) => `- ${claim}`),
         ]
       : []),
     ...(report.unconfirmed.length

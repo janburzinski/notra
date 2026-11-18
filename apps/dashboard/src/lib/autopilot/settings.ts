@@ -77,7 +77,9 @@ async function loadSiteTarget(organizationId: string, siteId: string) {
 }
 
 export async function saveAutopilotSettings(
-  input: z.infer<typeof autopilotSaveInputSchema>
+  input: z.infer<typeof autopilotSaveInputSchema>,
+  /** The user saving it, recorded when this finishes onboarding. */
+  userId?: string
 ) {
   if (input.slack) {
     await assertSlackConnected(input.organizationId, input.slack.integrationId);
@@ -122,12 +124,25 @@ export async function saveAutopilotSettings(
       : { stalePullRequestDays: input.stalePullRequestDays }),
     ...(input.projectId ? { projectId: input.projectId } : {}),
   };
+  // The first finished onboarding is the one kept.
+  const onboarded = input.onboarded
+    ? {
+        onboardedAt: sql`coalesce(${autopilotSettings.onboardedAt}, now())`,
+        onboardedBy: sql`coalesce(${autopilotSettings.onboardedBy}, ${userId ?? null})`,
+      }
+    : {};
   await db
     .insert(autopilotSettings)
-    .values({ organizationId: input.organizationId, ...values })
+    .values({
+      organizationId: input.organizationId,
+      ...values,
+      ...(input.onboarded
+        ? { onboardedAt: new Date(), onboardedBy: userId ?? null }
+        : {}),
+    })
     .onConflictDoUpdate({
       target: autopilotSettings.organizationId,
-      set: values,
+      set: { ...values, ...onboarded },
     });
   if (input.approvals || !input.enabled) {
     await cancelHoldsAfterSettingsChange(input.organizationId, {
@@ -135,6 +150,22 @@ export async function saveAutopilotSettings(
       approvals: input.approvals ?? AUTOPILOT_DEFAULT_APPROVALS,
     });
   }
+}
+
+/**
+ * Starts onboarding over: Autopilot is paused and the workspace counts as
+ * not onboarded, so Ollie asks everything again. Settings stay until the
+ * new setup saves over them.
+ */
+export async function resetAutopilotOnboarding(organizationId: string) {
+  await db
+    .update(autopilotSettings)
+    .set({ enabled: false, onboardedAt: null, onboardedBy: null })
+    .where(eq(autopilotSettings.organizationId, organizationId));
+  await cancelHoldsAfterSettingsChange(organizationId, {
+    enabled: false,
+    approvals: AUTOPILOT_DEFAULT_APPROVALS,
+  });
 }
 
 export async function setAutopilotJob(

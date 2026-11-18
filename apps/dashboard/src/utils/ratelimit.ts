@@ -132,6 +132,17 @@ export const ratelimit = {
     requests: 5,
     window: "10m",
   }),
+  // Each Autopilot setup chat call is a model call; a real setup needs a few.
+  autopilotOnboardingIntro: createLimiter({
+    prefix: "ratelimit:autopilot-onboarding-intro",
+    requests: 10,
+    window: "10m",
+  }),
+  autopilotOnboardingTurn: createLimiter({
+    prefix: "ratelimit:autopilot-onboarding-turn",
+    requests: 30,
+    window: "10m",
+  }),
   geoPersonasGenerate: createLimiter({
     prefix: "ratelimit:geo-personas-generate",
     requests: 5,

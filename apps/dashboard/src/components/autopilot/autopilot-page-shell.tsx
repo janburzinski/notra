@@ -22,7 +22,10 @@ export function AutopilotPageShell({
 
   if (!overview && query.isError) {
     return (
-      <PageContainer className="flex flex-1 flex-col py-4 md:py-6">
+      <PageContainer
+        variant="default"
+        className="flex flex-1 flex-col py-4 md:py-6"
+      >
         <div className="w-full px-4 lg:px-6">
           <EmptyState
             actionLabel="Try again"
@@ -40,7 +43,10 @@ export function AutopilotPageShell({
   if (!overview) {
     // The page's shape (heading, tabs, a table) so nothing jumps once it loads.
     return (
-      <PageContainer className="flex flex-1 flex-col py-4 md:py-6">
+      <PageContainer
+        variant="default"
+        className="flex flex-1 flex-col py-4 md:py-6"
+      >
         <div
           aria-busy="true"
           aria-label="Loading Autopilot"
@@ -57,7 +63,10 @@ export function AutopilotPageShell({
   }
   if (overview.upgradeRequired) {
     return (
-      <PageContainer className="flex flex-1 flex-col gap-4 py-4 md:gap-6 md:py-6">
+      <PageContainer
+        variant="default"
+        className="flex flex-1 flex-col gap-4 py-4 md:gap-6 md:py-6"
+      >
         <div className="w-full px-4 lg:px-6">
           <AutopilotUpgradeGate
             onDialogClosed={() => {
@@ -71,7 +80,10 @@ export function AutopilotPageShell({
   }
   if (!overview.available) {
     return (
-      <PageContainer className="flex flex-1 flex-col py-4 md:py-6">
+      <PageContainer
+        variant="default"
+        className="flex flex-1 flex-col py-4 md:py-6"
+      >
         <div className="w-full px-4 lg:px-6">
           <EmptyState
             description="Autopilot isn't available for this workspace yet."
@@ -82,7 +94,10 @@ export function AutopilotPageShell({
     );
   }
   return (
-    <PageContainer className="flex flex-1 flex-col gap-4 py-4 md:gap-6 md:py-6">
+    <PageContainer
+      variant="default"
+      className="flex flex-1 flex-col gap-4 py-4 md:gap-6 md:py-6"
+    >
       <div className="w-full space-y-6 px-4 has-[[data-autopilot-fill]]:flex has-[[data-autopilot-fill]]:flex-1 has-[[data-autopilot-fill]]:flex-col lg:px-6">
         {children({ organizationId, overview })}
       </div>

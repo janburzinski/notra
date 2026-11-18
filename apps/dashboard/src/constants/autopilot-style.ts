@@ -17,6 +17,8 @@ export const AUTOPILOT_FACT_REMOVAL_INSTRUCTIONS =
  */
 export const AUTOPILOT_SOURCE_NOTE =
   /(?<=^|[.!?]\s)\s*not (?:stated|mentioned|specified|confirmed) in the (?:materials?|sources?)(?: reviewed| provided)?(?:\.|$)/gi;
+/** A fact check that cuts at least this many claims, more than it could source, is read by a person. */
+export const AUTOPILOT_FACT_MOSTLY_CUT_MIN = 5;
 
 /** A comparison claim must quote its source; shorter quotes prove nothing. */
 export const AUTOPILOT_FACT_MIN_QUOTE_CHARS = 12;

@@ -27,6 +27,8 @@ import {
   autopilotRuleInputSchema,
   autopilotRunInputSchema,
   autopilotRunNowInputSchema,
+  autopilotOnboardingIntroInputSchema,
+  autopilotOnboardingTurnInputSchema,
   autopilotSaveInputSchema,
   autopilotSetCommitFiltersInputSchema,
   autopilotSetJobInputSchema,
@@ -69,6 +71,7 @@ import {
   syncFindingPullRequests,
 } from "@/lib/autopilot/findings";
 import {
+  canResetAutopilotOnboarding,
   isAutopilotWorkflowGraphEnabled,
   resolveAutopilotAvailability,
 } from "@/lib/autopilot/flag";
@@ -83,6 +86,11 @@ import {
   loadAutopilotRunHistory,
 } from "@/lib/autopilot/metrics";
 import {
+  loadOnboardingIntro,
+  rememberAutopilotGoal,
+  runOnboardingTurn,
+} from "@/lib/autopilot/onboarding";
+import {
   cancelHoldsAfterSettingsChange,
   holdFinding,
 } from "@/lib/autopilot/publish";
@@ -95,6 +103,7 @@ import { addRule, deleteRule, listRules } from "@/lib/autopilot/rules";
 import { findAutopilotProject } from "@/lib/autopilot/run";
 import {
   AutopilotSettingsError,
+  resetAutopilotOnboarding,
   saveAutopilotSettings,
   updateAutopilotSettings,
   setAutopilotJob,
@@ -133,6 +142,7 @@ import {
 import type { ORPCContext } from "@/types/orpc/context";
 import { toAutopilotCommitFilters } from "@/utils/autopilot-commit-filters";
 import { canManageAutopilot } from "@/utils/autopilot-permissions";
+import { ratelimit } from "@/utils/ratelimit";
 
 /**
  * Autopilot needs the `autopilot` flag and the `autopilot` plan feature: every
@@ -286,6 +296,7 @@ export const autopilotRouter = {
         rules,
         workflowGraph,
         siteRows,
+        onboardingReset,
       ] = await Promise.all([
         enabled
           ? db.query.autopilotSettings.findFirst({
@@ -323,6 +334,9 @@ export const autopilotRouter = {
         enabled ? listRules(organizationId) : [],
         enabled ? isAutopilotWorkflowGraphEnabled(organizationId) : false,
         enabled ? listAutopilotSites(organizationId) : [],
+        enabled && canManageAutopilot(context.auth.membership.role)
+          ? canResetAutopilotOnboarding(organizationId, context.auth.user)
+          : false,
       ]);
       const [describedRuns, outOfCredits] = await Promise.all([
         describeRuns(organizationId, runs),
@@ -333,8 +347,11 @@ export const autopilotRouter = {
         outOfCredits,
         upgradeRequired: availability === "upgrade_required",
         canManage: canManageAutopilot(context.auth.membership.role),
+        /** Behind a flag: lets this person meet Ollie again. */
+        canResetOnboarding: onboardingReset,
         settings: {
           configured: Boolean(settings),
+          onboarded: Boolean(settings?.onboardedAt),
           enabled: settings?.enabled ?? false,
           projectId: settings?.projectId ?? null,
           repository:
@@ -561,11 +578,91 @@ export const autopilotRouter = {
     .use(withAutopilotFlag)
     .handler(async ({ input, context }) => {
       assertCanManageAutopilot(context);
-      await settingsCall(() => saveAutopilotSettings(input));
+      await settingsCall(() =>
+        saveAutopilotSettings(
+          input,
+          input.onboarded ? context.auth.user.id : undefined
+        )
+      );
+      if (input.goal) {
+        // Memory is a nice-to-have here: setup still counts without it.
+        // Credited to the setup, not a person: memory outlives members.
+        await rememberAutopilotGoal({
+          organizationId: input.organizationId,
+          goal: input.goal,
+          createdBy: "Autopilot setup",
+        }).catch((error: unknown) =>
+          logError("Autopilot goal could not be remembered", error, {
+            organizationId: input.organizationId,
+          })
+        );
+      }
       return { success: true as const };
     }),
 
+  /** Ollie reads up on the workspace before the setup chat starts. */
+  onboardingIntro: authorizedProcedure
+    .input(autopilotOnboardingIntroInputSchema)
+    .use(withOrganizationAccess)
+    .use(withAutopilotFlag)
+    .handler(async ({ input, context }) => {
+      assertCanManageAutopilot(context);
+      const rate = await ratelimit.autopilotOnboardingIntro.limit(
+        input.organizationId
+      );
+      return loadOnboardingIntro({
+        ...input,
+        personName: context.user.name,
+        // Over the limit Ollie still says hello, just without reading up.
+        skipModel: !rate.success,
+      });
+    }),
+
+  /** Ollie reads an answer typed in the team's own words during setup. */
+  onboardingTurn: authorizedProcedure
+    .input(autopilotOnboardingTurnInputSchema)
+    .use(withOrganizationAccess)
+    .use(withAutopilotFlag)
+    .handler(async ({ input, context }) => {
+      assertCanManageAutopilot(context);
+      const rate = await ratelimit.autopilotOnboardingTurn.limit(
+        input.organizationId
+      );
+      if (!rate.success) {
+        throw badRequest(
+          "Ollie needs a short break. Pick one of the answers, or try again in a few minutes."
+        );
+      }
+      try {
+        return await runOnboardingTurn(input);
+      } catch (error) {
+        logError("Autopilot setup answer could not be read", error, {
+          organizationId: input.organizationId,
+        });
+        throw badRequest("Ollie couldn't read that. Try again in a moment.");
+      }
+    }),
+
   /** One settings change, merged into the saved settings on the server. */
+  /** Behind a flag: the workspace isn't onboarded anymore and Ollie starts over. */
+  resetOnboarding: authorizedProcedure
+    .input(autopilotOrganizationInputSchema)
+    .use(withOrganizationAccess)
+    .use(withAutopilotFlag)
+    .handler(async ({ input, context }) => {
+      assertCanManageAutopilot(context);
+      if (
+        !(await canResetAutopilotOnboarding(
+          input.organizationId,
+          context.auth.user
+        ))
+      ) {
+        throw forbidden("Resetting onboarding isn't turned on for you.");
+      }
+      await resetAutopilotOnboarding(input.organizationId);
+      return { success: true as const };
+    }),
+
   update: authorizedProcedure
     .input(autopilotUpdateInputSchema)
     .use(withOrganizationAccess)

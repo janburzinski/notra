@@ -17,16 +17,18 @@ import {
 import { Tabs, TabsContent } from "@notra/ui/components/ui/tabs";
 import { useQuery } from "@tanstack/react-query";
 import { parseAsBoolean, parseAsStringLiteral, useQueryState } from "nuqs";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 
 import { AutopilotAutomationsOverview } from "@/components/autopilot/autopilot-automations-overview";
 import { AutopilotFindingConfirmDialog } from "@/components/autopilot/autopilot-finding-confirm-dialog";
 import { AutopilotFindingTables } from "@/components/autopilot/autopilot-finding-tables";
+import { AutopilotOnboarding } from "@/components/autopilot/autopilot-onboarding";
 import { AutopilotOutOfCreditsNotice } from "@/components/autopilot/autopilot-out-of-credits-notice";
 import { AutopilotPageShell } from "@/components/autopilot/autopilot-page-shell";
+import { AutopilotPaused } from "@/components/autopilot/autopilot-paused";
 import { AutopilotPeriodSelect } from "@/components/autopilot/autopilot-period-select";
+import { AutopilotReveal } from "@/components/autopilot/autopilot-reveal";
 import { AutopilotSettingsPanel } from "@/components/autopilot/autopilot-settings-panel";
-import { AutopilotSetupFlow } from "@/components/autopilot/autopilot-setup-flow";
 import { AutopilotStopButton } from "@/components/autopilot/autopilot-stop-button";
 import {
   AutopilotTemplatesPage,
@@ -37,6 +39,7 @@ import { EmptyState } from "@/components/empty-state";
 import { BackLink } from "@/components/layout/back-link";
 import { TabCount } from "@/components/tab-count";
 import { AUTOPILOT_NAV_LINK } from "@/constants/autopilot";
+import { AUTOPILOT_ONBOARDING_ANCHOR_ATTRIBUTE } from "@/constants/autopilot-onboarding";
 import {
   AUTOPILOT_AUTOMATION_SLUGS,
   AUTOPILOT_PAGE_TABS,
@@ -45,13 +48,13 @@ import { AUTOPILOT_WORKFLOWS_PATH } from "@/constants/autopilot-workflows";
 import { useActiveProject } from "@/lib/hooks/use-active-project";
 import { useAutopilotActions } from "@/lib/hooks/use-autopilot";
 import { useAutopilotLinkedAction } from "@/lib/hooks/use-autopilot-linked-action";
+import { useAutopilotOnboardingSession } from "@/lib/hooks/use-autopilot-onboarding-session";
 import { useRouter } from "@/lib/navigation";
 import { dashboardOrpc } from "@/lib/orpc/query";
 import type {
   AutopilotOverviewPageProps,
   AutopilotFindingView,
   AutopilotPageClientProps,
-  AutopilotOffPageProps,
   AutopilotOverviewTabsListProps,
   AutopilotOverviewToolbarProps,
   AutopilotPullRequestsTabProps,
@@ -78,42 +81,14 @@ export default function PageClient({
     <AutopilotPageShell organizationSlug={organizationSlug}>
       {({ organizationId, overview }) => (
         <AutopilotOverviewPage
+          // A new page per workspace: its setup state doesn't carry over.
+          key={organizationId}
           organizationId={organizationId}
           organizationSlug={organizationSlug}
           overview={overview}
         />
       )}
     </AutopilotPageShell>
-  );
-}
-
-/** Before Autopilot is on: admins set it up, everyone else is told who can. */
-function AutopilotOffPage({
-  basePath,
-  organizationId,
-  overview,
-  projectId,
-  onTurnedOn,
-}: AutopilotOffPageProps) {
-  return (
-    <>
-      <PageHeading title="Autopilot" />
-      {overview.canManage ? (
-        <AutopilotSetupFlow
-          callbackPath={basePath}
-          onSaved={onTurnedOn}
-          organizationId={organizationId}
-          overview={overview}
-          projectId={projectId}
-          submitLabel="Turn on Autopilot"
-        />
-      ) : (
-        <EmptyState
-          description="Ask a workspace admin to turn on Autopilot."
-          title="Autopilot is off"
-        />
-      )}
-    </>
   );
 }
 
@@ -269,6 +244,18 @@ function AutopilotOverviewPage({
   const [closing, setClosing] = useState<AutopilotFindingView | null>(null);
   const basePath = `/${organizationSlug}${AUTOPILOT_NAV_LINK}`;
   const pullRequests = findings.filter(isListedPullRequest);
+  // Ollie sets Autopilot up once per workspace; turned off later, it's
+  // paused rather than set up again.
+  const [onboarding, setOnboarding] = useState(
+    () => !settings.onboarded && canManage
+  );
+  // The dashboard waits under Ollie's chat and rises in as the chat ends.
+  const [revealed, setRevealed] = useState(false);
+  const finishOnboarding = useCallback(() => {
+    setOnboarding(false);
+    setRevealed(false);
+  }, []);
+  const revealDashboard = useCallback(() => setRevealed(true), []);
 
   const workflowsQuery = useQuery(
     dashboardOrpc.autopilot.workflows.list.queryOptions({
@@ -281,15 +268,57 @@ function AutopilotOverviewPage({
   // shows behind its dialog, and stays once it closes.
   const shownTab = linkedAction.pending ? "pull-requests" : tab;
 
+  // Ollie's setup stays on screen until it has folded into the dock, while
+  // the page behind it turns into the dashboard. Same spot in both returns,
+  // so the chat keeps its state when Autopilot turns on.
+  // A setup still running or stuck on an error, from before you left, also
+  // brings Ollie back even though Autopilot was already saved as on.
+  const setupUnfinished =
+    useAutopilotOnboardingSession(organizationId).phase === "setup";
+  const showOnboarding =
+    onboarding || setupUnfinished || (!settings.onboarded && canManage);
+  const underOnboarding = showOnboarding && !revealed;
+  const onboardingLayer = showOnboarding ? (
+    <AutopilotOnboarding
+      basePath={basePath}
+      key="onboarding"
+      onDone={finishOnboarding}
+      onReveal={revealDashboard}
+      organizationId={organizationId}
+      organizationSlug={organizationSlug}
+      overview={overview}
+      projectId={projectId}
+    />
+  ) : null;
+
+  if (!(settings.enabled || showOnboarding) && settings.onboarded) {
+    return (
+      <AutopilotPaused
+        canManage={canManage}
+        organizationId={organizationId}
+        settings={settings}
+      />
+    );
+  }
+
   if (!settings.enabled) {
     return (
-      <AutopilotOffPage
-        basePath={basePath}
-        onTurnedOn={() => runNow.mutate(undefined)}
-        organizationId={organizationId}
-        overview={overview}
-        projectId={projectId}
-      />
+      <>
+        {onboardingLayer}
+        {canManage ? (
+          <div {...{ [AUTOPILOT_ONBOARDING_ANCHOR_ATTRIBUTE]: "" }}>
+            <PageHeading title="Autopilot" />
+          </div>
+        ) : (
+          <>
+            <PageHeading title="Autopilot" />
+            <EmptyState
+              description="Ask a workspace admin to turn on Autopilot."
+              title="Autopilot is off"
+            />
+          </>
+        )}
+      </>
     );
   }
 
@@ -305,6 +334,7 @@ function AutopilotOverviewPage({
   if (templatesView) {
     return (
       <div className="space-y-3">
+        {onboardingLayer}
         <BackLink href={basePath}>Autopilot</BackLink>
         <AutopilotTemplatesPage {...templateActions} />
       </div>
@@ -313,7 +343,10 @@ function AutopilotOverviewPage({
 
   return (
     <>
-      <PageHeading title="Autopilot" />
+      {onboardingLayer}
+      <div {...{ [AUTOPILOT_ONBOARDING_ANCHOR_ATTRIBUTE]: "" }}>
+        <PageHeading title="Autopilot" />
+      </div>
       {overview.outOfCredits ? <AutopilotOutOfCreditsNotice /> : null}
 
       <Tabs
@@ -323,7 +356,11 @@ function AutopilotOverviewPage({
         }}
         value={shownTab}
       >
-        <div className="flex flex-wrap items-center justify-between gap-3">
+        <AutopilotReveal
+          className="flex flex-wrap items-center justify-between gap-3"
+          hidden={underOnboarding}
+          index={0}
+        >
           <div className="max-w-full overflow-x-auto">
             <AutopilotOverviewTabsList
               automationCount={
@@ -345,41 +382,45 @@ function AutopilotOverviewPage({
             running={runNow.isPending || isRunning}
             showPeriod={shownTab === "automations" || shownTab === "analytics"}
           />
-        </div>
+        </AutopilotReveal>
 
         <TabsContent className="mt-4" value="automations">
-          <AutopilotAutomationsOverview
-            canManage={canManage}
-            days={days}
-            isRunning={runs.some((run) => run.status === "running")}
-            jobs={settings.jobs}
-            onAddAutomation={(kind) => setJob.mutate({ kind, enabled: true })}
-            onOpenAutomation={(kind) =>
-              router.push(`${basePath}/${AUTOPILOT_AUTOMATION_SLUGS[kind]}`)
-            }
-            onOpenWorkflow={(workflowId) =>
-              router.push(
-                `${basePath}${AUTOPILOT_WORKFLOWS_PATH}/${workflowId}`
-              )
-            }
-            onRunAutomation={(kind) => runNow.mutate(kind)}
-            onTurnOffAutomation={(kind) =>
-              setJob.mutate({ kind, enabled: false })
-            }
-            organizationId={organizationId}
-            runDisabled={isRunning || runNow.isPending}
-            runningKind={
-              runNow.isPending
-                ? (runNow.variables ?? null)
-                : autopilotRunKind(activeRun)
-            }
-          />
-          <AutopilotTemplatesSection
-            {...templateActions}
-            onMore={() => {
-              void setTemplatesView(true);
-            }}
-          />
+          <AutopilotReveal hidden={underOnboarding} index={1}>
+            <AutopilotAutomationsOverview
+              canManage={canManage}
+              days={days}
+              isRunning={runs.some((run) => run.status === "running")}
+              jobs={settings.jobs}
+              onAddAutomation={(kind) => setJob.mutate({ kind, enabled: true })}
+              onOpenAutomation={(kind) =>
+                router.push(`${basePath}/${AUTOPILOT_AUTOMATION_SLUGS[kind]}`)
+              }
+              onOpenWorkflow={(workflowId) =>
+                router.push(
+                  `${basePath}${AUTOPILOT_WORKFLOWS_PATH}/${workflowId}`
+                )
+              }
+              onRunAutomation={(kind) => runNow.mutate(kind)}
+              onTurnOffAutomation={(kind) =>
+                setJob.mutate({ kind, enabled: false })
+              }
+              organizationId={organizationId}
+              runDisabled={isRunning || runNow.isPending}
+              runningKind={
+                runNow.isPending
+                  ? (runNow.variables ?? null)
+                  : autopilotRunKind(activeRun)
+              }
+            />
+          </AutopilotReveal>
+          <AutopilotReveal hidden={underOnboarding} index={2}>
+            <AutopilotTemplatesSection
+              {...templateActions}
+              onMore={() => {
+                void setTemplatesView(true);
+              }}
+            />
+          </AutopilotReveal>
         </TabsContent>
         <TabsContent className="mt-4" value="pull-requests">
           <AutopilotPullRequestsTab

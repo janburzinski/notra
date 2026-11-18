@@ -4,6 +4,7 @@ import { useState } from "react";
 import type { ReactNode } from "react";
 import { useTranslations } from "use-intl";
 
+import { AutopilotRedoOnboardingRow } from "@/components/autopilot/autopilot-redo-onboarding-row";
 import {
   AutopilotApprovalSettings,
   AutopilotBriefSettings,
@@ -98,6 +99,9 @@ export function AutopilotSettingsPanel({
       <AutopilotTurnOffRow
         onTurnOff={() => save.mutateAsync({ enabled: false })}
       />
+      {loaded.canResetOnboarding ? (
+        <AutopilotRedoOnboardingRow organizationId={organizationId} />
+      ) : null}
     </SiteSettingsList>
   );
 }

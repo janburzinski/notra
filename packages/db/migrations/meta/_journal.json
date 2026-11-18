@@ -1219,6 +1219,13 @@
       "when": 1795007170291,
       "tag": "0173_drop_geo_scan_events",
       "breakpoints": true
+    },
+    {
+      "idx": 174,
+      "version": "7",
+      "when": 1795021736906,
+      "tag": "0174_autopilot_onboarded",
+      "breakpoints": true
     }
   ]
 }

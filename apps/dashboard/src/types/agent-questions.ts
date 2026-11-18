@@ -33,7 +33,8 @@ export interface AgentQuestionCardProps {
 export interface AgentQuestionDockProps {
   questions: AgentQuestion[];
   onSubmit: (answers: AgentQuestionAnswer[]) => void;
-  onDismiss: () => void;
+  /** Without it the question can't be dismissed, only answered. */
+  onDismiss?: () => void;
   /** Lifts the dock off the page when it floats over content. */
   elevated?: boolean;
   className?: string;
@@ -86,7 +87,7 @@ export interface AgentQuestionFooterProps {
   /** Missing on the first question. */
   onBack?: () => void;
   onNext: () => void;
-  onDismiss: () => void;
+  onDismiss?: () => void;
 }
 
 /** One part of a chat message, such as text or a tool call. */

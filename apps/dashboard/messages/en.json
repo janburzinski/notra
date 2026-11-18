@@ -10273,7 +10273,15 @@
         "confirmDescription": "Autopilot stops running until you turn it on again. Your settings stay.",
         "confirm": "Turn off"
       },
-      "approvalsHint": "Auto marks the pull request ready and publishes it the next weekday at 9:00 unless someone steps in."
+      "approvalsHint": "Auto marks the pull request ready and publishes it the next weekday at 9:00 unless someone steps in.",
+      "redoOnboarding": {
+        "title": "Redo onboarding",
+        "description": "Only you see this. Pauses Autopilot and starts Ollie's setup chat again from the beginning.",
+        "button": "Redo onboarding",
+        "confirmTitle": "Redo onboarding?",
+        "confirmDescription": "Autopilot pauses until you finish Ollie's setup again. Your rules and history stay.",
+        "confirm": "Redo onboarding"
+      }
     }
   },
   "artifacts": {

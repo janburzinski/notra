@@ -90,7 +90,10 @@ async function waitForReport(reportId: string) {
   return false;
 }
 
-/** Returns the latest completed report, refreshing it first when it is stale. */
+/**
+ * Returns the latest completed report, refreshing it first when it is stale.
+ * Null when the workspace has no GEO set up: nothing to scan, not a failure.
+ */
 async function loadFreshReadinessReport(
   ctx: AutopilotRunContext,
   log?: AutopilotLogger
@@ -110,9 +113,16 @@ async function loadFreshReadinessReport(
     }
     const started = yield* startAgentReadinessScan(scope);
     return { current, scope, startedReportId: started.reportId };
-  }).pipe(Effect.provide(geoCoreDashboardLayer));
+  }).pipe(
+    Effect.catchTag("GeoSettingsMissingError", () => Effect.succeed(null)),
+    Effect.provide(geoCoreDashboardLayer)
+  );
 
-  const { current, scope, startedReportId } = await Effect.runPromise(load);
+  const loaded = await Effect.runPromise(load);
+  if (!loaded) {
+    return null;
+  }
+  const { current, scope, startedReportId } = loaded;
   if (!startedReportId) {
     await log?.info("Used today's readiness scan", {
       url: current.targetUrl,
@@ -227,6 +237,9 @@ export async function checkReadiness(
     return skip("A readiness pull request is still waiting for review");
   }
   const readiness = await loadFreshReadinessReport(ctx, log);
+  if (!readiness) {
+    return skip("GEO is not set up, so there is no readiness scan to fix");
+  }
   const report = readiness.report;
   if (!report || report.score === null) {
     return skip("No completed readiness scan yet");

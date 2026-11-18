@@ -88,7 +88,11 @@ import {
   tidyBlankLines,
   touchUpdatedDate,
 } from "@/utils/autopilot-edits";
-import { findPagePath, isSafeRepositoryPath } from "@/utils/autopilot-paths";
+import {
+  findPagePath,
+  isSafeRepositoryPath,
+  markdownContentFolders,
+} from "@/utils/autopilot-paths";
 import { brandToneInstruction, forceNoDashes } from "@/utils/autopilot-style";
 
 const percent = (value: number) => `${Math.round(value * 100)}%`;
@@ -808,6 +812,12 @@ export async function openRefreshPullRequest(params: {
     pullRequestNumber: pullRequest.number,
     body: refreshPullRequestBody(check, fix),
     paths: [check.path],
+    // Only a workspace without a saved content folder learns it from the
+    // files edited; a saved one keeps its limits.
+    contentFolders:
+      ctx.contentPath || ctx.integrationContentPath
+        ? []
+        : markdownContentFolders([check.path]),
   });
   return { opened: true as const, url: pullRequest.url };
 }
