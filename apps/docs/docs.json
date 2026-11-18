@@ -127,6 +127,10 @@
     {
       "source": "/sites/integrations/analytics",
       "destination": "/sites/integrations/analytics/overview"
+    },
+    {
+      "source": "/autopilot",
+      "destination": "/autopilot/overview"
     }
   ],
   "api": {
@@ -229,6 +233,53 @@
               "organization/workspace-setup",
               "organization/team-management",
               "organization/billing"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Autopilot",
+        "icon": "rocket",
+        "groups": [
+          {
+            "group": "Get started",
+            "icon": "rocket",
+            "pages": [
+              "autopilot/overview",
+              "autopilot/quickstart",
+              "autopilot/grow",
+              "autopilot/how-it-works"
+            ]
+          },
+          {
+            "group": "Automations",
+            "icon": "layer-group",
+            "pages": [
+              "autopilot/automations/overview",
+              "autopilot/automations/site-fixes",
+              "autopilot/automations/content",
+              "autopilot/automations/releases",
+              "autopilot/workflows"
+            ]
+          },
+          {
+            "group": "Work with Autopilot",
+            "icon": "code-pull-request",
+            "pages": [
+              "autopilot/review-and-publish",
+              "autopilot/daily-brief",
+              "autopilot/slack",
+              "autopilot/learning",
+              "autopilot/results"
+            ]
+          },
+          {
+            "group": "Reference",
+            "icon": "book",
+            "pages": [
+              "autopilot/settings",
+              "autopilot/limits-and-credits",
+              "autopilot/troubleshooting"
             ]
           }
         ]

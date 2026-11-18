@@ -1,0 +1,108 @@
+---
+title: "Automations"
+sidebarTitle: "Overview"
+description: "The eight built-in automations, how to turn them on from a template, run one on demand and read what each one did."
+authors:
+  - handle: jan
+
+docolin:
+  schema_version: 1
+  kind: tools/notra/autopilot/automations
+  type: reference
+  applies_to:
+    - notra
+  language: en
+  difficulty: beginner
+  time_estimate: 5m
+  status: stable
+  aliases:
+    - autopilot templates
+    - autopilot automations
+  next: ./site-fixes.mdx
+---
+
+An automation is one kind of work Autopilot does on every run, like writing for content gaps or fixing agent readiness. You add one by turning on its template, and it joins the next run.
+
+## The templates
+
+Templates come in three groups. In the table, **Hands you** says what you get to review. A post is a new page in your blog folder, and a pull request edits pages or files you already have.
+
+| Template | Reads | Runs | Hands you |
+| --- | --- | --- | --- |
+| **Site fixes** | | | |
+| [Fix agent readiness](/autopilot/automations/site-fixes#fix-agent-readiness) | Agent Readiness scan | Every run | A pull request |
+| [Make pages readable for AI](/autopilot/automations/site-fixes#make-pages-readable-for-ai) | Pages as AI crawlers see them | Every run | A pull request |
+| **Self-updating content** | | | |
+| [Write for content gaps](/autopilot/automations/content#write-for-content-gaps) | Prompts and searches you lose | Every run | A post |
+| [Refresh pages AI stopped citing](/autopilot/automations/content#refresh-pages-ai-stopped-citing) | Your pages in AI citations | When AI citations drop | A pull request |
+| [Write comparison pages](/autopilot/automations/content#write-comparison-pages) | Comparison prompts you lose | Every run | A post |
+| [Add internal links](/autopilot/automations/content#add-internal-links) | Your Search Console rankings | Once a week | A pull request |
+| [Update landing page copy](/autopilot/automations/content#update-landing-page-copy) | Your AI citations and Search Console rankings | When AI citations drop | A pull request |
+| **Releases and docs** | | | |
+| [Write about releases](/autopilot/automations/releases) | Pull requests you ship | When pull requests merge | A post |
+
+Every automation that is on is checked in every daily run. **Once a week** and **When AI citations drop** describe when they act: internal links wait seven days between pull requests, refreshes act only when a page lost AI citations or a post Autopilot wrote didn't move the number, and landing page updates act only when a page lost citations or ranks 4 to 20 in Google.
+
+Autopilot also runs two small jobs that don't open pull requests. Prompt cleanup looks for tracked prompts where, over the last 30 days (with at least 3 scans and 6 answers), no answer named you or a tracked competitor. Those prompts dilute your visibility numbers, so it suggests pausing up to five per run on the **Prompts** page, under "Autopilot suggests" with **Pause** and **Keep**. You can turn this off under **Settings → Housekeeping → Suggest pausing dead prompts**. The competitors job adds a line to the brief naming the competitors that win the prompts you lose most.
+
+## Turn a template on or off
+
+The **Automations** tab lists the templates you haven't added under **Templates**. Press **Browse templates** to see all of them by group, and press a card to read what it does before you add it.
+
+<img
+  src="/images/autopilot/templates-light.webp"
+  alt="The templates page grouped into site fixes, self-updating content, and releases and docs"
+  className="block dark:hidden rounded-lg border"
+/>
+<img
+  src="/images/autopilot/templates-dark.webp"
+  alt="The templates page grouped into site fixes, self-updating content, and releases and docs"
+  className="hidden dark:block rounded-lg border"
+/>
+
+**Use** turns a template on, moves it into the automations table and adds it to the next run. Templates that are already on show **Open automation** instead. You can also add one from **Add automation** in the table, which lists every template that is off, or pick **Describe your own** there to have the agent build a [workflow](/autopilot/workflows).
+
+To turn an automation off, use the **On** switch on its page, or right-click its row and pick **Turn off**. It keeps its history.
+
+Only owners and admins can turn templates on or off. Members see **Admin access required**.
+
+## Run one automation now
+
+Press **Run** on an automation's row, **Run now** on its page, or right-click the row and pick **Run now**. Only that automation runs ("Write for content gaps is running now"), and the daily schedule stays as it is. The automation still follows its limits, so it skips when the open pull request limit is full and, for every automation except content gaps and releases, when its last pull request is still waiting for review.
+
+## Read what an automation did
+
+Open an automation from the table to see its page.
+
+<img
+  src="/images/autopilot/automation-light.webp"
+  alt="The Write for content gaps page with its activity, its pull requests and the outcome of each recent run"
+  className="block dark:hidden rounded-lg border"
+/>
+<img
+  src="/images/autopilot/automation-dark.webp"
+  alt="The Write for content gaps page with its activity, its pull requests and the outcome of each recent run"
+  className="hidden dark:block rounded-lg border"
+/>
+
+**Activity** shows pull requests opened, merged and credits per run for the period you pick. **Pull requests** lists what this automation opened, with **Open ideas** below when it saved any. **Recent decisions** shows the outcome of each run (**Opened**, **Decided**, **Skipped**, **Noted** or **Failed**) and why, for example "Saved … as an idea instead of a pull request" or "3 candidates from 15 content gaps". Runs that ended the same way are grouped under **Repeated**. **How it works** at the bottom sums up when it runs, what it reads, what it produces and in which repository.
+
+When an automation that is on can't do anything, a banner says why: "No repository connected", "3 of 3 pull requests are open" or, for readiness, "Waiting on your review".
+
+In the automations table, **Last 14 days** shows one bar per day: a tall green bar when it opened a pull request, a tall red bar when it failed, a short bar when it ran and found nothing new, and a faint bar when it didn't run.
+
+## What every automation has in common
+
+Every automation needs a website repository, or a [Notra Site](/sites/overview) with a blog, and skips with "No website repository connected" without one. Fix, update and comparison automations open one pull request at a time and wait until it's merged or closed. Content gaps and releases can have several open, one per topic. What they open on their own counts toward the limit of three open Autopilot pull requests, and you're only charged when one opens (see [Limits and credits](/autopilot/limits-and-credits)). When an automation has nothing to do, the run log says why.
+
+<CardGroup cols={3}>
+  <Card title="Site fixes" icon="screwdriver-wrench" href="/autopilot/automations/site-fixes">
+    Agent readiness and AI-readable pages.
+  </Card>
+  <Card title="Self-updating content" icon="arrows-rotate" href="/autopilot/automations/content">
+    Gaps, refreshes, comparisons, links and landing copy.
+  </Card>
+  <Card title="Releases" icon="code-merge" href="/autopilot/automations/releases">
+    Posts about what you ship.
+  </Card>
+</CardGroup>

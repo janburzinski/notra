@@ -1,0 +1,89 @@
+---
+title: "Troubleshooting"
+description: "Why Autopilot opened nothing today, why the brief didn't arrive, why a pull request didn't publish or was closed, and what to do about it."
+authors:
+  - handle: jan
+
+docolin:
+  schema_version: 1
+  kind: tools/notra/autopilot/troubleshooting
+  type: troubleshooting
+  applies_to:
+    - notra
+  language: en
+  difficulty: beginner
+  time_estimate: 6m
+  status: stable
+  aliases:
+    - autopilot not working
+    - autopilot no pull requests
+    - autopilot brief missing
+---
+
+Autopilot logs why it did or didn't do something. Start with the run: open **Analytics → Recent runs**, pick the run and read what each automation did. An automation's own page lists **Recent decisions** with the reason for each.
+
+<AccordionGroup>
+  <Accordion title="Autopilot opened no pull requests today">
+    Look for these in the run log:
+
+    - **"3 of 3 pull requests are still open"**: the limit of open Autopilot pull requests is full. Merge or close one.
+    - **"… is still waiting for review"**: that automation waits until its last pull request is merged or closed.
+    - **"Waiting: …"** or **"Not acting on … yet"**: the planner wants more evidence. A topic needs two independent signals and a content gap from the last 14 days. It often saves an idea instead, so check **Open ideas** on the **Pull requests** tab.
+    - **"… of … automatic pull requests in the last 7 days"**: the weekly budget of automatic posts is used. Merging Autopilot's posts raises it.
+    - **"No page lost AI citations"**, **"No comparison page to write"**, **"Nothing to fix in the repository"**, **"Every checked page is readable for AI crawlers"**: there was nothing to fix or write.
+    - **"No website repository connected"**, **"GEO is not set up, so there are no content gaps to read"**, **"Search Console is not connected"**, **"No completed readiness scan yet"**: something is missing. See [Before you start](/autopilot/quickstart#before-you-start).
+    - **"No credits left"**: add credits. The work is saved as an idea or tried again tomorrow.
+    - **"Turned off in settings"**: the automation is off.
+  </Accordion>
+  <Accordion title="Why is this an idea and not a pull request?">
+    Autopilot wasn't sure enough to open a pull request on its own: its confidence was between 60% and 85%, nobody is asking about the topic yet, the weekly budget or the open pull request limit was full, or credits ran out. To write it anyway, press **Write now** on the idea or **Write it** in the brief, or react 👍 in Slack. Ideas from a pull request also take `@notra write a post` there. Ideas expire after 21 days.
+  </Accordion>
+  <Accordion title="The daily brief didn't arrive">
+    - There is no Slack channel. Without Slack, no brief is written. Set one under **Settings → Daily brief**.
+    - The Notra app isn't in the channel. Invite it.
+    - Nothing happened: "No brief: nothing proposed, merged or worth knowing".
+    - The run happens after your hour in the workspace's timezone, which is saved from the browser at setup. Ask the agent in Slack "what's Autopilot's schedule?" to check it.
+  </Accordion>
+  <Accordion title="A pull request on Auto didn't publish">
+    Its page or the run log says why it waits:
+
+    - **The first post waits for you**: merge one pull request of the group yourself first.
+    - **The fact check flagged claims** or **Changes files outside the content folder**: a person has to review it.
+    - **The feature has not shipped yet**: it publishes once the feature merges.
+    - **Someone commented**, **Someone else pushed commits**, **Changes were requested** or **Held from the dashboard**: a person stepped in, so merge it yourself when it's ready.
+    - **Checks failed**, **Has a merge conflict** or **Checks did not finish**: fix the pull request. Autopilot checks it again every hour.
+    - **Branch protection needs a review**: get the review and merge it yourself.
+    - **Approvals were set to ask** or **Autopilot was turned off**.
+  </Accordion>
+  <Accordion title="Autopilot closed my pull request">
+    - **Nobody worked on it**: "Closed this draft because nobody worked on it for 14 days." Reopen it on GitHub within 30 days and it counts as a draft again, or set **Close untouched drafts** to **Never**.
+    - **The feature pull request was closed without merging**: posts about a feature close with it.
+    - Someone reacted 👎 in Slack or closed it in Notra.
+  </Accordion>
+  <Accordion title="It keeps suggesting things we don't want">
+    Close the next one with a reason that says what you never want, like "we never write about internal tools". Autopilot turns it into a rule. You can also add topics under **Settings → Ignored → Topics to skip**. For release posts, skip authors and limit paths under **Settings → Ignored**. See [How Autopilot learns](/autopilot/learning).
+  </Accordion>
+  <Accordion title="Posts don't match our style">
+    Edit the drafts before you merge, or say it once in a comment on the pull request ("Use sentence case for headings"). Autopilot learns a habit from one comment or the same edit in two pull requests. For voice and language, edit the brand identity. See [Conventions](/autopilot/learning#conventions-your-style-learned-from-edits).
+  </Accordion>
+  <Accordion title="Posts land in the wrong folder">
+    Set **Settings → Publishing → Blog folder** to the folder your posts live in, like `apps/web/content/blog`.
+  </Accordion>
+  <Accordion title="Merging failed">
+    - "The pull request changed since you read it": read the new version, then merge.
+    - "This repository doesn't allow …": pick another merge method in the **Merge** menu.
+    - "The pull request was closed on GitHub": reopen it on GitHub first.
+  </Accordion>
+  <Accordion title="A reaction in Slack did nothing">
+    Only Notra owners and admins can act from Slack, matched by the same verified email in Slack and Notra. If Notra replies that it can't check who reacted, a workspace admin needs to reconnect Slack under **Integrations → Slack**. Reactions on items that already moved on are ignored.
+  </Accordion>
+  <Accordion title="I can't see Settings or Run now">
+    Only owners and admins can manage Autopilot. Ask a workspace admin.
+  </Accordion>
+  <Accordion title="I can't change the number of open pull requests, the timezone or the project">
+    The limit of three open pull requests and the GEO project aren't settings in the dashboard. Change the timezone through the [Notra agent in Slack](/autopilot/slack).
+  </Accordion>
+  <Accordion title="Autopilot isn't available for this workspace">
+    Autopilot isn't on for your workspace yet. Contact us to get access.
+  </Accordion>
+</AccordionGroup>

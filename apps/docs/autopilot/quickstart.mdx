@@ -1,0 +1,113 @@
+---
+title: "Set up Autopilot"
+sidebarTitle: "Set up"
+description: "Pick what Autopilot does, connect your website repository and Slack, and start the first run in a few minutes."
+authors:
+  - handle: jan
+
+docolin:
+  schema_version: 1
+  kind: tools/notra/autopilot/quickstart
+  type: how-to
+  applies_to:
+    - notra
+  language: en
+  difficulty: beginner
+  time_estimate: 5m
+  status: stable
+  aliases:
+    - turn on autopilot
+    - autopilot setup
+  next: ./grow.mdx
+---
+
+Setup takes three steps and ends with a first run. You need to be a workspace owner or admin.
+
+## Before you start
+
+Autopilot works from the data Notra already has, so each connection gives more automations something to act on.
+
+| What | Why Autopilot needs it | Without it |
+| --- | --- | --- |
+| **GitHub** with your website repository | Every post and fix is a pull request there | Setup can't finish. Connect the [GitHub integration](/integrations/github) first. To publish to a [Notra Site](/sites/overview), pick it later under **Settings → Publishing → Site** |
+| **A GEO project** with tracked prompts | Content gaps, comparison pages, refreshes, landing copy, readiness and measuring results | Only **Write about releases** has something to read. See [Projects](/geo/projects) |
+| **A brand identity** on that project | The voice, tone, language and house rules of every post | Posts fall back to a neutral voice. See [Brand voice](/concepts/brand-voice) |
+| **Google Search Console** on the project | Search gaps, **Add internal links**, landing pages that rank 4 to 20 and the indexing follow-up | **Add internal links** skips and says why. The others run without search gaps, rank-based landing pages and the indexing check. See [Google Search Console](/integrations/google-search-console) |
+| **Slack** | The daily brief and acting on it with 👍 and 👎 | No daily brief is sent. Owners get an email for each new draft instead, while **Drafts to review** is on under **Settings → Notifications**. See [Slack](/integrations/slack) |
+| **AI credits** or pull request credits | Each pull request Autopilot opens is charged | Work that would open a pull request is saved as an idea or retried the next day |
+
+<Tip>
+  Run a GEO scan and an [Agent Readiness](/geo/agent-readiness) scan before you turn Autopilot on, so its first run has gaps and issues to act on.
+</Tip>
+
+## Turn on Autopilot
+
+<Steps>
+  <Step title="Open Autopilot">
+    Switch the sidebar to **Studio**, open **Autopilot** and press **Get started**. The first step shows what Autopilot does: it runs once a day at your time, opens draft pull requests with fixes and new posts, and sends a daily brief.
+
+    <img
+      src="/images/autopilot/setup-light.webp"
+      alt="The first step of the Autopilot setup with the Get started button and the list of automations"
+      className="block dark:hidden rounded-lg border"
+    />
+    <img
+      src="/images/autopilot/setup-dark.webp"
+      alt="The first step of the Autopilot setup with the Get started button and the list of automations"
+      className="hidden dark:block rounded-lg border"
+    />
+  </Step>
+  <Step title="Pick the automations">
+    All eight automations are on. Switch off the ones you don't want yet and press **Continue**. You can turn any of them on or off later from the [templates](/autopilot/automations/overview). If you're unsure, see [Grow with Autopilot](/autopilot/grow) for a setup per goal.
+  </Step>
+  <Step title="Connect your repository and Slack">
+    Pick the **website repository**, the repository your site is built from. Autopilot opens its draft pull requests there, on the repository's default branch. Without GitHub, press **Connect GitHub** to install the Notra GitHub App first.
+
+    Under **Slack channel**, pick the channel for the daily brief or choose **Create a channel** (the default name is `notra-autopilot`). Invite the Notra app to an existing channel so it can post there. Without Slack, press **Connect Slack**, or skip it.
+
+    Under **Runs daily at**, pick the hour. Your browser's timezone is shown under it and saved with the hour.
+
+    <img
+      src="/images/autopilot/setup-connect-light.webp"
+      alt="The Connect step with the website repository, the Slack channel and the hour Autopilot runs"
+      className="block dark:hidden rounded-lg border"
+    />
+    <img
+      src="/images/autopilot/setup-connect-dark.webp"
+      alt="The Connect step with the website repository, the Slack channel and the hour Autopilot runs"
+      className="hidden dark:block rounded-lg border"
+    />
+  </Step>
+  <Step title="Turn on Autopilot">
+    Press **Turn on Autopilot**. The first run starts right away ("Autopilot is checking your site now"), and the page switches to the **Automations** tab. Open the run from **Analytics → Recent runs** to watch each automation work.
+  </Step>
+</Steps>
+
+## Defaults from setup
+
+Setup picks a few defaults. Check them in [Settings](/autopilot/settings) if they don't fit.
+
+Approvals start on Auto for new posts, page updates and readiness fixes. The first pull request of each group still waits for a person to merge it. After that, Autopilot marks later pull requests of the group ready and publishes them at 09:00 on the first weekday at least 24 hours away, unless someone steps in. If you want to merge everything yourself, set the groups to **Ask**. See [Approvals](/autopilot/review-and-publish#approvals).
+
+Autopilot looks for your blog folder in places like `content/blog`, `src/content/blog`, `posts` or `_posts`, also under `apps/*` and `packages/*`. If your posts live somewhere else, set **Settings → Publishing → Blog folder**. Release posts read your five most recently pushed repositories until you pick some under **Read from**, and drafts nobody touches close after 14 days (**Settings → Housekeeping**).
+
+Autopilot works with the GEO project that was active during setup, or the workspace's first project, and writes with that project's brand identity.
+
+## After the first run
+
+What the first run opens depends on your data. If the readiness scan found something your repository can fix, expect a readiness fix. If a content gap has enough evidence, expect a post or an idea. Autopilot keeps at most three of its pull requests open at a time, and an automation that did nothing says why in the run log.
+
+<Columns cols={2}>
+  <Card title="Review the first pull request" icon="code-pull-request" href="/autopilot/review-and-publish">
+    Read the post, ask for changes and merge it.
+  </Card>
+  <Card title="Read the daily brief" icon="slack" href="/autopilot/daily-brief">
+    What the brief contains and how to act on it.
+  </Card>
+  <Card title="How a run works" icon="gears" href="/autopilot/how-it-works">
+    Why Autopilot opened what it opened, and what it waits for.
+  </Card>
+  <Card title="Troubleshooting" icon="wrench" href="/autopilot/troubleshooting">
+    The run opened nothing, or the brief didn't arrive.
+  </Card>
+</Columns>

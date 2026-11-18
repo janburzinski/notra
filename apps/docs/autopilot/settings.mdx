@@ -1,0 +1,111 @@
+---
+title: "Settings"
+description: "Every Autopilot setting: where it publishes, the daily brief, approvals, housekeeping, what it ignores and turning it off, with defaults."
+authors:
+  - handle: jan
+
+docolin:
+  schema_version: 1
+  kind: tools/notra/autopilot/settings
+  type: reference
+  applies_to:
+    - notra
+  language: en
+  difficulty: beginner
+  time_estimate: 6m
+  status: stable
+  aliases:
+    - autopilot settings
+    - blog folder
+    - skip authors
+    - turn off autopilot
+  next: ./limits-and-credits.mdx
+---
+
+Open **Autopilot → Settings**. Each row shows a summary and opens to its settings. Every change saves on its own. Only owners and admins see this tab.
+
+<img
+  src="/images/autopilot/settings-publishing-light.webp"
+  alt="Autopilot settings with the Publishing row open, showing the website repository, blog folder, source repositories and reviewers"
+  className="block dark:hidden rounded-lg border"
+/>
+<img
+  src="/images/autopilot/settings-publishing-dark.webp"
+  alt="Autopilot settings with the Publishing row open, showing the website repository, blog folder, source repositories and reviewers"
+  className="hidden dark:block rounded-lg border"
+/>
+
+## Publishing
+
+What Autopilot reads and where its posts go.
+
+| Setting | What it does | Default |
+| --- | --- | --- |
+| **Site** | Publish posts to a [Notra Site](/sites/overview) instead of a repository you pick. Posts are still draft pull requests, against the Site's repository, production branch and blog folder, with a preview link once the Site's preview deploys. Only Sites with a connected repository and a blog are listed. Shown when you have one | None |
+| **Website repository** | The repository Autopilot opens draft pull requests in, on its default branch. Hidden when a Site is picked | Picked at setup |
+| **Blog folder** | Where new posts go. Leave it empty to use your GitHub publishing path, or let Autopilot find it: it looks for `content/blog`, `src/content/blog`, `posts`, `blog`, `content/posts`, `src/pages/blog`, `app/blog`, `src/app/blog` and `_posts`, also under `apps/*` and `packages/*` | Found automatically |
+| **Read from** | The repositories **Write about releases** reads merged pull requests from, up to 15. **Back to automatic** clears the list | The 5 most recently pushed |
+| **Reviewers** | GitHub logins or `org/team` names GitHub asks to review every draft, up to 10. Teams must belong to the repository's organization | None |
+
+## Daily brief
+
+How Autopilot tells you what it found. See [Daily brief](/autopilot/daily-brief).
+
+| Setting | What it does | Default |
+| --- | --- | --- |
+| **Slack channel** | Where the brief goes. Invite the Notra app to the channel | Picked at setup |
+| **Send the brief at** | The hour of the daily run, from 00:00 to 23:00, in your workspace's timezone. The brief arrives a few minutes after | 09:00 |
+| **Email drafts to owners** | **Without Slack**: owners get an email for each new draft only when there's no Slack channel. **Always**: also with Slack. An owner can turn these off for the whole workspace under **Settings → Notifications → Drafts to review** | Without Slack |
+
+The timezone is saved from your browser at setup. To change it, ask the [Notra agent in Slack](/autopilot/slack).
+
+## Approvals
+
+Choose what publishes without asking first. Each group is **Ask** or **Auto**: **New posts**, **Page updates** and **Readiness fixes**. Auto marks the pull request ready and publishes it at 09:00 on the first weekday at least 24 hours later, unless someone steps in. A first setup sets all three to Auto. See [Approvals](/autopilot/review-and-publish#approvals).
+
+## Housekeeping
+
+What Autopilot tidies up on its own.
+
+| Setting | What it does | Default |
+| --- | --- | --- |
+| **Close untouched drafts** | Close Autopilot's drafts nobody worked on after 7, 14 or 30 days, or **Never**. See [Housekeeping](/autopilot/review-and-publish#housekeeping) | After 14 days |
+| **Suggest pausing dead prompts** | Suggests pausing tracked prompts where no answer named you or a tracked competitor in 30 days (with at least three scans and six answers), up to five per run. Suggestions show up on the **Prompts** page | On |
+
+## Ignored
+
+Autopilot never suggests posts for these. Asking `@notra` on a pull request still works.
+
+| Setting | What it does | Default |
+| --- | --- | --- |
+| **Skip authors** | GitHub users and bots whose pull requests never get a release post. Notra suggests bots it saw in your repositories and people whose pull requests are mostly chores | `dependabot[bot]`, `renovate[bot]`, `github-actions[bot]` |
+| **Limit a repository to paths** | Per repository, only changes under these paths count for release posts. A plain path matches everything under it, `*` stays inside one folder, `**` crosses folders, `?` is one character | None |
+| **Topics to skip** | Rules posts and page updates follow, like "Never suggest posts about pricing". Added here, from close reasons, from GitHub or from Slack. See [Rules](/autopilot/learning#rules-what-never-to-write-about) | None |
+
+Skip authors and path limits apply only to **Write about releases**. Topics to skip apply to posts, comparison pages, page refreshes and landing copy. Readiness fixes, AI-readable fixes and internal links don't read them.
+
+## Turn off Autopilot
+
+**Turn off Autopilot** stops the built-in automations and the daily brief, and cancels scheduled publishes. [Workflows](/autopilot/workflows) keep their own schedules, so pause them separately. Your settings, pull requests and memory stay. The Autopilot page shows the setup again, filled in, with **Turn on Autopilot**.
+
+To pause a single automation instead, turn it off on the **Automations** tab.
+
+## Not in the dashboard
+
+| Setting | Value |
+| --- | --- |
+| Open Autopilot pull requests at a time | 3, for work Autopilot opens on its own |
+| Timezone | Saved from your browser at setup. Change it through the Notra agent in Slack |
+| GEO project and brand identity | The project active during setup, or the workspace's first project |
+| Branch | The repository's default branch, or the Site's production branch |
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="Limits and credits" icon="coins" href="/autopilot/limits-and-credits">
+    Cooldowns, caps and what Autopilot costs.
+  </Card>
+  <Card title="Control from Slack" icon="slack" href="/autopilot/slack">
+    Change settings by asking the Notra agent.
+  </Card>
+</CardGroup>

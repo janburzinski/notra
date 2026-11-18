@@ -1,0 +1,97 @@
+---
+title: "Write about releases"
+description: "Autopilot reads the pull requests you merge, picks the changes users need explained and drafts a post, or asks on the pull request first."
+authors:
+  - handle: jan
+
+docolin:
+  schema_version: 1
+  kind: tools/notra/autopilot/automations/releases
+  type: reference
+  applies_to:
+    - notra
+  language: en
+  difficulty: intermediate
+  time_estimate: 6m
+  status: stable
+  aliases:
+    - write about releases
+    - release posts
+    - should i write a post about this
+  next: ../workflows.mdx
+---
+
+Drafts a post when you ship something worth sharing. It reads the pull requests merged in your product repositories and keeps the changes a new user would need explained. The post is written around the question a user would ask about the change.
+
+| | |
+| --- | --- |
+| **Reads** | Pull requests you ship |
+| **Needs** | A website repository to write to, and the GitHub App on the repositories you ship from |
+| **Hands you** | A new post |
+| **Approval group** | New posts |
+
+<Note>
+  This automation writes posts that explain features. For a changelog of everything you ship, use [scheduled changelogs](/automation/scheduled) or [Notra Sites](/sites/overview).
+</Note>
+
+## What it reads
+
+Each run reads pull requests merged in the last seven days. After a release post is merged or closed, the next run reaches back to when that post opened, up to 30 days, so nothing in between is missed.
+
+It reads the repositories you pick under **Settings → Publishing → Read from** (up to 15), or else the five most recently pushed repositories the GitHub App can see.
+
+Pull requests with titles that start with `chore:`, `ci:`, `build:`, `test:`, `style:`, `deps:` or `revert:`, or with "bump", "merge" or "release", are skipped. So are pull requests by `dependabot[bot]`, `renovate[bot]` and `github-actions[bot]`. To skip more authors, add them under **Settings → Ignored → Skip authors**, where Notra suggests bots it saw in your repositories and people whose pull requests are mostly chores.
+
+To count only some folders, go to **Settings → Ignored → Limit a repository to paths**, pick a repository and list the paths that matter, like `apps/web` or `docs/**`. A plain path matches everything under it, `*` stays in one folder and `**` crosses folders.
+Autopilot's own pull requests never count. Of the rest, features (`feat:`) rank first and refactors and docs last, and up to eight go to the planner.
+
+## What is worth a post
+
+A change is worth a post when it gives users a capability they couldn't use before, a new integration or data source, or a substantial change to how a workflow works. Redesigns, reorganized screens or settings, UI polish, copy changes, performance work, bug fixes, chores, dependency bumps, refactors and internal tooling aren't.
+
+Shipped work on its own doesn't show that anyone wants to read about it. With GEO and **Write for content gaps** on, a release topic waits until a content gap shows people ask about it, and then the post uses the shipped pull requests as facts. Without GEO there is no demand to check, so once a release topic has two independent signals it becomes an idea for you to write instead of a pull request. Either way, the planner can overrule this with a stated exception, such as a breaking change users must act on. See [How Autopilot picks what to write](/autopilot/how-it-works#how-autopilot-picks-what-to-write).
+
+The authors of the pull requests a post is about are asked to review it (up to five, bots excluded), next to the reviewers you set in [Settings](/autopilot/settings#publishing).
+
+## Asking on the pull request
+
+When a product pull request from an owner, member or collaborator of the repository is opened (not as a draft), marked ready for review or merged, Autopilot judges once whether it's worth a post. When it is at least 85% sure, it saves an idea and comments on the pull request:
+
+> **Should I write a post about this?** It looks like something your users would want to hear about (91% sure). Reply `@notra write a post` and I'll draft it now, or reply `@notra no` (or react with 👎) and I'll skip it. I won't write it without a reply.
+
+This needs Autopilot and **Write about releases** on, and the repository connected for [GitHub mentions](/integrations/github).
+
+You can reply with:
+
+| Reply | What happens |
+| --- | --- |
+| `@notra is this worth a post?` | Autopilot answers "Worth a post" with how sure it is, or "Probably not worth a post" |
+| `@notra write a post` | Autopilot drafts the post in your website repository and replies "Drafted a post about this change. You can review it in Notra Autopilot." Only owners and admins can ask for this |
+| `@notra no` | Autopilot skips it. When an owner or admin adds why, like "we never post about internal tools", it turns that into a rule. Members can turn down an idea, but only owners and admins can stop a post that is already being written |
+| 👎 on the comment | Within a few minutes, Autopilot skips the idea and adds a note asking why. Only reactions from people whose GitHub account is linked to Notra count, and a draft that's already written stays open |
+
+Replies never link your website repository, so you can use this on public repositories.
+
+When the feature pull request merges while a draft post about it is open, Autopilot marks the post ready for review: "… was merged, so I marked this post ready for review. Merge it to publish." When the feature pull request is closed without merging, the idea or draft about it is closed too. A post about a feature that hasn't merged never publishes on its own.
+
+## When it skips
+
+| Log | Means |
+| --- | --- |
+| Skipped owner/repo#123: … | The pull request is outside your chosen repositories or paths, or its author is skipped |
+| Title marks it as CI, tests, a bump or a merge | A noise title |
+| Only shipped pull requests: no tracked answer or search asks for it | The topic waits for a content gap |
+| Saved "…" as an idea: nobody is asking about it yet | Without GEO, a release topic becomes an idea |
+| … of 2 independent signals | The topic needs more evidence |
+| Could not read repo | The GitHub App lost access to that repository |
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="GitHub integration" icon="github" href="/integrations/github">
+    Install the app and connect repositories for mentions.
+  </Card>
+  <Card title="How Autopilot learns" icon="brain" href="/autopilot/learning">
+    Turn a "no" into a rule Autopilot keeps.
+  </Card>
+</CardGroup>

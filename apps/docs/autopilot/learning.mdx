@@ -1,0 +1,102 @@
+---
+title: "How Autopilot learns"
+description: "Autopilot follows your rules, learns your style from the edits you make to its drafts, and writes in your brand identity's voice. Here is what it remembers and how to correct it."
+authors:
+  - handle: jan
+
+docolin:
+  schema_version: 1
+  kind: tools/notra/autopilot/learning
+  type: explanation
+  applies_to:
+    - notra
+  language: en
+  difficulty: intermediate
+  time_estimate: 7m
+  status: stable
+  aliases:
+    - autopilot memory
+    - autopilot rules
+    - topics to skip
+    - learn from edits
+  next: ./results.mdx
+---
+
+Autopilot's first drafts for you won't match your style perfectly. It keeps a memory for your workspace, and every pull request you merge, edit or close adds to it.
+
+## What Autopilot remembers
+
+| Memory | Comes from | How it's used |
+| --- | --- | --- |
+| **Rules** | Only people: a topic you add in Settings, a close reason that states a lasting preference, an `@notra no …` on GitHub, or the Notra agent in Slack | Read before every post, comparison page, refresh and landing copy update. Rules always win |
+| **Feedback** | 👍 and 👎 in Slack and on GitHub, close reasons that aren't rules, `@notra` comments | A hint about what you like. It doesn't work like a rule and never gives Autopilot permission to write something |
+| **Conventions** | Edits people make to Autopilot's drafts before merging, and their comments | How posts in a repository should look: headings, structure, frontmatter, length |
+| **Topics** | Autopilot's planner | Links the signals it saw across runs, so a topic builds evidence over time |
+| **Daily notes** | Autopilot | What it did and saw on days with activity. The 14 most recent are kept |
+
+Your brand identity sets the voice. See [Voice, tone and language](#voice-tone-and-language).
+
+## Rules: what never to write about
+
+Rules are standing instructions like "Never suggest posts about dependency bumps". The planner and the writers of posts, comparison pages, refreshes and landing copy read all of them, and a post a rule rules out stops with "The team's rules rule this post out".
+
+To add one in the dashboard, go to **Settings → Ignored → Topics to skip**, press **Add a topic**, type a topic after **Never suggest posts about** (like "pricing" or "internal tools") and press **Add**.
+
+Most rules come from closing things. When you close a pull request or idea and your reason states a lasting preference, Autopilot saves it as a rule and says so: `Closed. Autopilot will remember: "Never suggest posts about refactors"`. It uses only what you said, without widening or narrowing it. A reason like "not now" or "not this one" stays one-time feedback.
+
+On GitHub, reply `@notra no, we never post about internal tools` and Autopilot answers `I'll remember: "…". You can change this in Notra Autopilot settings.` In Slack, tell the Notra agent "never write about pricing" or "focus on integrations instead".
+
+Rules from GitHub are labelled **From GitHub**, the rest **From the dashboard**. Remove one with its delete button, or ask the agent in Slack. Rules don't expire. Only owners and admins can add rules, so a member's "no" on GitHub skips one idea without becoming a rule. A workspace can have up to 50 rules of up to 300 characters.
+
+<Tip>
+  Use rules for topics and angles, like "Never suggest posts about our pricing". Style is better taught by editing the drafts, so Autopilot picks up the habit.
+</Tip>
+
+## Conventions: your style, learned from edits
+
+Before each daily run, when something happened since the last one, Autopilot reads its pull requests that people merged or closed in the last 30 days. It looks at the edits people made after its last commit and the comments from members of the repository, and turns them into one-sentence lessons about style, format, structure, frontmatter or length, like "Use sentence case for headings" or "Keep posts under 1,200 words". Typo and fact fixes don't count.
+
+A lesson becomes a convention when the same edit shows up in two different pull requests, or when a person says it once in a comment.
+
+Conventions are kept per repository. New posts, comparison pages and repository fixes follow them, but they never override your rules, the facts or the brief. When your team changes its mind and edits the other way, the new habit replaces the old one. The brief tells you what it learned: "Learned from your edits on acme/website: Use sentence case for headings."
+
+Since nobody reviewed them, auto-published merges don't teach Autopilot anything. Auto-closed drafts don't count as a no either.
+
+## Keeping memory true
+
+In the same step, Autopilot checks its memory against your data, and this step is free. If a post it wrote is gone from your repository, it reopens the topic. If a content gap closed on its own, the idea for it expires. A comparison page you closed can come back early when, since you closed it, that competitor wins at least three more comparison questions and is among the three competitors costing you most. Duplicate topics get merged and duplicate rules removed.
+
+## Voice, tone and language
+
+Autopilot writes with the [brand identity](/concepts/brand-voice) of the GEO project it is connected to. The tone profile or custom tone decides word choice, rhythm and register. It changes how things are phrased, and leaves the facts and structure alone. Every post follows the brand's custom instructions. Writing samples only shape the voice and product vocabulary, and Autopilot never takes facts from them.
+
+New posts are written entirely in the brand's language. Updates to a post keep the page's language, while refreshes and landing copy edits use the brand's language. The brief's headline and summary and the headings on the full brief page follow the brand's language too.
+
+For writing rules, Autopilot uses your workspace's writing skill if your team edited it, otherwise Notra's default. It removes em and en dashes from text it writes and leaves your existing text as it is.
+
+## How to correct Autopilot
+
+| You want | Do this |
+| --- | --- |
+| Never write about a topic | Add a topic under **Settings → Ignored**, close an item with a reason, reply `@notra no, …` on GitHub, or tell the agent in Slack |
+| Undo a rule | Remove it under **Settings → Ignored**, or ask the agent in Slack |
+| Change how posts look | Edit Autopilot's drafts before merging, or say it once in a comment on the pull request |
+| Change one draft | **Ask for changes** on its page, comment `@notra …` on the pull request, or edit the branch |
+| Change voice, tone or language | Edit the brand identity of the GEO project |
+| Skip a bot's or person's pull requests for release posts | **Settings → Ignored → Skip authors** |
+| Only count changes in some folders for release posts | **Settings → Ignored → Limit a repository to paths** |
+
+## Your data
+
+Autopilot's memory is private to your workspace. It keeps no history of changed or removed entries older than seven days, and deleting a workspace deletes its memory. See our [sub-processors](https://www.usenotra.com/subprocessors).
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="Brand voice" icon="microphone" href="/concepts/brand-voice">
+    Set the tone and language Autopilot writes in.
+  </Card>
+  <Card title="Settings" icon="sliders" href="/autopilot/settings#ignored">
+    Rules, skipped authors and path filters.
+  </Card>
+</CardGroup>

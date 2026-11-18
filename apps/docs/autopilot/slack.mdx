@@ -1,0 +1,65 @@
+---
+title: "Control Autopilot from Slack"
+sidebarTitle: "Control from Slack"
+description: "Ask the Notra agent in Slack what Autopilot did, merge or write items, add rules, change settings and run automations."
+authors:
+  - handle: jan
+
+docolin:
+  schema_version: 1
+  kind: tools/notra/autopilot/slack
+  type: how-to
+  applies_to:
+    - notra
+  language: en
+  difficulty: beginner
+  time_estimate: 4m
+  status: stable
+  aliases:
+    - autopilot slack agent
+    - pause autopilot from slack
+  next: ./learning.mdx
+---
+
+You can steer Autopilot by talking to the Notra agent in Slack. Mention it in the brief's thread or any channel it's in, or message it directly. In a brief's thread it reads the brief, so "drop the second one" or "merge it" refers to the items there.
+
+## What you can ask
+
+| Say | What happens |
+| --- | --- |
+| "What has Autopilot done lately?" | Shows whether Autopilot is on, its schedule, automations, repository, channel and reviewers, when it last ran, open items, rules and what happened in the last three days |
+| "Write the idea about GEO tools" | Writes the idea and opens its pull request |
+| "Let's not do this, we don't compare ourselves with Acme" | Dismisses the item with your words as the reason, so Autopilot learns from it |
+| "Merge it" | Merges the pull request |
+| "Focus on integrations instead of pricing" or "Never write about pricing" | Adds a standing rule |
+| "Remove the rule about pricing" | Deletes the rule |
+| "Run Autopilot now" or "Run the content gaps automation" | Starts a full run or one automation |
+| "Stop the run" | Stops a running Autopilot or workflow run |
+| "Pause Autopilot", "Turn off landing page updates" | Turns Autopilot or an automation off. Turn it back on the same way |
+| "Send the brief at 8 in America/New_York" | Changes the hour and timezone |
+| "Add @maria and acme/docs as reviewers" | Changes the reviewers |
+| "Email me drafts even with Slack" | Sets draft emails to **Always** |
+| "Run the competitor watch workflow", "Pause it" | Runs a [workflow](/autopilot/workflows) or turns it on or off |
+
+## Approvals in Slack
+
+Changes that are hard to undo ask for confirmation with buttons first: dismissing or merging an item, pausing Autopilot or turning an automation off, stopping a run, deleting a rule and turning a workflow off. Only the person who asked can approve.
+
+## Who can do what
+
+Anyone in your Notra workspace can ask about Autopilot. Notra links their Slack account to their Notra account by verified email. Only owners and admins can change Autopilot or act on items, and anyone else gets "Only Notra workspace owners and admins can change Autopilot."
+
+This only works in Slack. In the dashboard, use the Autopilot page, and the agent dock for [workflows](/autopilot/workflows).
+
+If the agent says it can't look up Slack users, a workspace admin needs to reconnect Slack under **Integrations → Slack** to grant the newer permissions. See [Slack permissions](/integrations/slack#permissions).
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="Daily brief" icon="newspaper" href="/autopilot/daily-brief">
+    React 👍 and 👎 on items in the brief.
+  </Card>
+  <Card title="Slack integration" icon="slack" href="/integrations/slack">
+    Connect Slack and choose channels.
+  </Card>
+</CardGroup>

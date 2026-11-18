@@ -1,0 +1,146 @@
+---
+title: "Self-updating content"
+description: "Five automations that write posts for the questions you lose, refresh pages AI stopped citing, answer comparison questions, add internal links and update landing page copy."
+authors:
+  - handle: jan
+
+docolin:
+  schema_version: 1
+  kind: tools/notra/autopilot/automations/content
+  type: reference
+  applies_to:
+    - notra
+  language: en
+  difficulty: intermediate
+  time_estimate: 12m
+  status: stable
+  aliases:
+    - write for content gaps
+    - refresh pages ai stopped citing
+    - write comparison pages
+    - add internal links
+    - update landing page copy
+  next: ./releases.mdx
+---
+
+These automations write the posts people are asking for and update pages that stopped working. They read your [GEO](/geo/product-map) data, and some of them also read [Google Search Console](/integrations/google-search-console).
+
+| Automation | Starts from | Approval group |
+| --- | --- | --- |
+| [Write for content gaps](#write-for-content-gaps) | A prompt or search you lose | New posts (Page updates when it updates a page) |
+| [Refresh pages AI stopped citing](#refresh-pages-ai-stopped-citing) | A page whose AI citations halved | Page updates |
+| [Write comparison pages](#write-comparison-pages) | A competitor AI names instead of you | New posts |
+| [Add internal links](#add-internal-links) | Pages ranking 4 to 20 in Google | Page updates |
+| [Update landing page copy](#update-landing-page-copy) | A landing page that lost citations or ranks 4 to 20 | Page updates |
+
+## Write for content gaps
+
+Drafts posts for prompts and searches you lose. Of all the automations, this one adds to your AI visibility most directly. Each post answers one question engines answer without you, which also makes it easy to measure whether the post worked.
+
+| | |
+| --- | --- |
+| **Reads** | [Content gaps](/geo/content-gaps): prompt gaps, AI search gaps and, with Search Console, search gaps |
+| **Needs** | A website repository and a GEO project with scanned prompts |
+| **Hands you** | A new post, or an update to an existing page |
+
+Autopilot collects three kinds of gaps and drops the ones a post wouldn't help:
+
+- **Prompt gaps**: prompts where competitors show up and you don't. Dropped when you already win the prompt, when no competitor shows up either, when you're already in more than 34% of answers, or when a GEO brief exists for it.
+- **AI search gaps**: searches AI engines ran while answering your prompts, without finding you. Same rules, and it needs a tracked prompt to measure on.
+- **Search gaps**: Search Console queries with at least 100 impressions that your content doesn't cover well. Dropped when existing content covers the query.
+
+Prompt gaps are ranked by opportunity and search gaps by impressions. The top eight go to the planner, which decides whether one is ready for a post. See [How Autopilot picks what to write](/autopilot/how-it-works#how-autopilot-picks-what-to-write).
+
+The result is a post titled `Blog: …` in your blog folder that answers the prompt or query directly, in your brand's language and voice. Facts come from your brand, your sitemap and the evidence, and recent pull requests about the topic count as product facts. The pull request lays out the evidence, for example "AI engines answer … without you on 3 of 4 engines (12% mention you), while … show up". Notra adds a generated hero image and checks every link the post adds. When the gap's data says an existing page should be updated instead, and Autopilot finds that page's file in your repository, it updates the page (`Update: …`).
+
+A closed post can come back after 90 days if the gap is still open. Ideas from this automation expire early once their gap closes.
+
+Without GEO, the log says "GEO is not set up, so there are no content gaps to read". When the planner holds off, it says why, like "Waiting: …" or "Not acting on … yet".
+
+## Refresh pages AI stopped citing
+
+Updates pages AI cites less than last month, and posts Autopilot wrote that didn't move the number.
+
+| | |
+| --- | --- |
+| **Reads** | Your pages in AI citations, last 30 days against the 30 days before |
+| **Needs** | A website repository, a GEO project with AI answers, a website on your brand, and the page's Markdown or MDX file in the repository |
+| **Hands you** | A pull request with targeted edits to one page |
+
+A page qualifies when it was cited in at least two answers before, its prompts got at least three answers since, and its citation rate fell by at least half. Posts Autopilot wrote for a prompt (from **Write for content gaps** or **Write comparison pages**) also qualify once, 45 to 180 days after the merge, when your mention share for the post's prompt grew by less than 5 points. Lost citations come first.
+
+To update the page, it reads the pages engines cite instead (up to three) and your own pricing and plan pages for current figures, then goes through the page section by section: keep, update, add or cut. It makes at most 12 edits. It refuses a rewrite (more than 60% of lines) and an edit too small to matter, never edits dates (Notra sets the updated date in frontmatter), drops edits with dead links and follows redirects to their final address. It never invents numbers, customers, quotes or links.
+
+The pull request says what changed and why, for example "Cited in 40% of AI answers to its prompts a month ago, 12% now."
+
+Typical log lines when nothing is refreshed are "No page lost AI citations", "No dropping page has a Markdown source", "The page already answers what the engines look for" or "A page refresh is still waiting for review".
+
+## Write comparison pages
+
+Drafts comparison pages where AI picks a competitor. Buyers ask AI "X vs Y" and "alternatives to X" right before they decide, so these answers are worth a lot.
+
+| | |
+| --- | --- |
+| **Reads** | Comparison prompts you lose, over the last 30 days |
+| **Needs** | A website repository and a GEO project with AI answers |
+| **Hands you** | A new comparison post |
+
+A comparison question asks for "vs", "versus", "alternatives", "compare", "better than", "instead of", "switch from", "best" or "top". A competitor qualifies when AI names it instead of you on at least two different comparison questions, or on one question that names the competitor itself. Autopilot picks the competitor that costs you most, skips ignored competitors and ones you already have a comparison page for, and writes an **alternatives** guide when a question names the competitor and asks for alternatives, a replacement or switching from it, otherwise a **versus** page.
+
+The page is a fair comparison of who each option is for. Facts about the competitor come from its own website (Autopilot reads its homepage and pricing page) and public pages the writer checks, preferring the competitor's own pages over third-party reviews. Prices and limits are marked "as of" the month the page was written. AI answers tell Autopilot what to beat, and it never takes facts from them. Every claim about prices, limits, plans and features is checked against its source. Unsupported claims are removed, and if one can't be removed, the draft fails. The pull request has a **Fact check** section with how many claims were quoted from a source, and anything about your own product without a source, or any figure no source contains, is flagged for you to confirm. A flagged pull request never publishes on its own.
+
+If your repository already has Markdown pages in a comparison folder (`compare`, `comparisons`, `content/compare`, `content/comparisons`, `content/vs` or `content/alternatives`), the page goes there. Otherwise it goes in your blog folder.
+
+Comparison pages don't go through the planner, so they don't wait for two signals, but they count toward the limit of three open pull requests. A closed comparison page can come back after 90 days, or sooner if, since you closed it, that competitor wins at least three more comparison questions and is among the three competitors costing you most.
+
+If there's nothing to write, the log says "No comparison page to write", or "A comparison page is still waiting for review" while the last one is open.
+
+## Add internal links
+
+Links your posts to pages ranking 4 to 20 in Google. A page just off the first page often needs only a few relevant internal links to move up.
+
+| | |
+| --- | --- |
+| **Reads** | Three months of Search Console queries and pages |
+| **Needs** | A website repository, Search Console connected to the GEO project with a property selected, and posts with Markdown files in the repository |
+| **Hands you** | A pull request that adds links, at most once a week |
+
+Each links pull request comes together like this:
+
+1. It finds pages ranking 4 to 20 for queries with at least 10 impressions.
+2. It scans up to 60 of your posts, most seen first, for those exact phrases (two to eight words) where they aren't linked yet.
+3. A review keeps only links that read naturally in their sentence. Wording never changes.
+4. It adds at most three new links per post and one per target page, checks every target against the live page, and opens one pull request with up to 10 files.
+
+Link pairs it proposed or you closed are never offered again. After a links pull request opens, the next one waits seven days so Google can see the change.
+
+Runs without a links pull request log the reason, such as "Search Console is not connected", "No Search Console property is selected for this project", "No page ranks 4 to 20 for a search", "No post mentions a ranking page's searches without a link" or "No candidate link reads naturally where it would go".
+
+## Update landing page copy
+
+Rewrites landing pages AI cites less or Google ranks 4 to 20, changing only text.
+
+| | |
+| --- | --- |
+| **Reads** | Your AI citations, and Search Console rankings when connected |
+| **Needs** | A website repository, a GEO project and a website on your brand. The page's copy must live in JavaScript, TypeScript or JSON files in the repository |
+| **Hands you** | A pull request that changes text on one page, at most every 14 days |
+
+Pages rendered from code (not Markdown, which the refresh and links automations handle) that lost AI citations by the same rule as refreshes come first, then pages ranking 4 to 20. It tries up to three and fetches each one live.
+
+It changes only visible text: headings, paragraphs, button labels, list items, alt text and the page's title and description. Code, links, class names and layout stay byte for byte, and a check rejects anything else. It makes at most 15 text changes and adds at most 250 words across up to five files. Copy in shared layouts only changes on the homepage. Facts come only from the live page, your own pages and the evidence, and it never claims to be the best or fastest.
+
+After a landing page pull request, the next one waits 14 days so its effect can be measured.
+
+A run without an update logs why, for example "No page lost AI citations or ranks 4 to 20 in Google", "Every page losing citations or rankings has a Markdown source", "The page's copy isn't in the repository" (for example when it comes from a CMS) or "None of the landing pages could be fetched".
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="Content gaps" icon="magnifying-glass" href="/geo/content-gaps">
+    How prompt and search gaps are found and ranked.
+  </Card>
+  <Card title="Measure results" icon="chart-line" href="/autopilot/results">
+    See whether a post or update moved the number.
+  </Card>
+</CardGroup>

@@ -1,0 +1,96 @@
+---
+title: "Workflows"
+description: "Describe what Autopilot should keep an eye on, like a competitor passing you in AI answers, and the agent builds a workflow that checks it on a schedule and tells you in Slack."
+authors:
+  - handle: jan
+
+docolin:
+  schema_version: 1
+  kind: tools/notra/autopilot/workflows
+  type: how-to
+  applies_to:
+    - notra
+  language: en
+  difficulty: beginner
+  time_estimate: 5m
+  status: stable
+  aliases:
+    - autopilot workflows
+    - custom automations
+    - competitor alert
+  next: ./review-and-publish.mdx
+---
+
+A workflow is an automation you describe yourself, for things the built-in ones don't watch. "Tell me when a competitor overtakes us in AI answers and draft a comeback plan" is one. "Rescan our pricing prompt every morning and warn me if we drop out" is another. You describe it in plain words, and the agent builds it from a few steps.
+
+<img
+  src="/images/autopilot/workflow-light.webp"
+  alt="A workflow that compares AI visibility every morning, asks whether a competitor is ahead, drafts a comeback plan and posts it to Slack"
+  className="block dark:hidden rounded-lg border"
+/>
+<img
+  src="/images/autopilot/workflow-dark.webp"
+  alt="A workflow that compares AI visibility every morning, asks whether a competitor is ahead, drafts a comeback plan and posts it to Slack"
+  className="hidden dark:block rounded-lg border"
+/>
+
+## Build a workflow
+
+<Steps>
+  <Step title="Describe what to watch">
+    Type into the agent dock at the bottom of the Autopilot page, for example "Every morning, check whether a competitor got more AI mentions than us yesterday. If so, plan what we should publish and post it to Slack." You can also pick **Add automation → Describe your own**, or start from a suggestion like **Watch competitors**, **Weekly visibility digest** or **Plan a comeback**.
+  </Step>
+  <Step title="Answer the agent's questions">
+    When something changes the workflow and the agent can't look it up, like which competitor to watch or how often to check, it asks before building. Each question comes with two to four likely answers.
+  </Step>
+  <Step title="Approve the workflow">
+    The agent shows the workflow step by step. Nothing is saved until you approve it, and you can tell the agent what to change instead.
+  </Step>
+  <Step title="Run it">
+    The agent offers to run it now, which you approve too. After that it runs on its schedule.
+  </Step>
+</Steps>
+
+To change a workflow, open it and tell the agent what to change, like "check twice a week instead" or "only alert me about Acme". It updates the same workflow and keeps everything you didn't mention.
+
+You can also build and change workflows from **Agent Chat**.
+
+## The steps
+
+| Step | What it does |
+| --- | --- |
+| **Trigger** | Starts the workflow on a schedule (daily, weekly or monthly) or by hand. For other rhythms, like every two weeks, the agent picks the closest schedule and tells you. Schedules run in UTC |
+| **Compare AI visibility with competitors** | Counts how often AI engines mentioned you and each competitor over a number of days, and whether a competitor is ahead |
+| **Scan a prompt** | Asks AI engines one tracked prompt again now, on every engine or only the ones you name, and waits up to four minutes for the answers |
+| **Ask the agent** | Runs the Notra agent with your GEO data and web search on instructions that can use earlier results, and returns a short answer written for Slack |
+| **Let the agent decide** | Has the agent answer a yes or no question and follows the **Yes** or **No** branch |
+| **Post to Slack** | Posts a message that can include earlier results to the Slack notifications channel set under **Integrations → Slack**. This is a different setting from the daily brief channel |
+
+A workflow can only post to the [notifications channel](/integrations/slack#notifications-channel) and can't send email. Most workflows have three to six steps.
+
+## Manage workflows
+
+Workflows appear in the automations table on the **Automations** tab, next to the built-in automations. Each one has a page with its schedule, last run, steps and past runs. The **On** switch there turns the schedule on or off, and a workflow that is off shows **Paused** in the table. **Run now** runs it once right away. Right-click a workflow's row to open, run, pause or resume it, or to delete it for good.
+
+Only owners and admins can create, change, run or delete workflows. Members can ask the agent about them. A workspace can have up to 50 workflows, and a run that stops responding is ended after two hours.
+
+## What workflows cost
+
+**Ask the agent** and **Let the agent decide** use AI credits each time they run. Without credits, the step fails and the run stops there, so later steps don't run ("The workspace is out of AI credits, so the agent didn't run"). **Scan a prompt** starts a real scan, like a rescan on the GEO pages. The other steps are free.
+
+## Ideas to start with
+
+A competitor watch compares visibility every morning. When a competitor is ahead, it asks the agent for a comeback plan and posts it to Slack. A weekly digest does the same comparison over seven days every Monday and posts a summary with next steps.
+
+To guard your most valuable prompt, scan it every morning, let the agent decide whether you dropped out of the answers, and post to Slack only when you did. After a launch, scan the prompt about the new feature daily and post how often engines mention it, then pause the workflow once the number settles.
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="Control Autopilot from Slack" icon="slack" href="/autopilot/slack">
+    Turn workflows on or off and run them from Slack.
+  </Card>
+  <Card title="Prompts" icon="comments" href="/geo/prompts">
+    Track the prompts your workflows scan.
+  </Card>
+</CardGroup>

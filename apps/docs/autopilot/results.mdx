@@ -1,0 +1,86 @@
+---
+title: "Measure results"
+description: "See what Autopilot shipped and whether it worked: pull requests and merges over time, the number each pull request was meant to move, and pages followed until Google indexes them."
+authors:
+  - handle: jan
+
+docolin:
+  schema_version: 1
+  kind: tools/notra/autopilot/results
+  type: how-to
+  applies_to:
+    - notra
+  language: en
+  difficulty: beginner
+  time_estimate: 5m
+  status: stable
+  aliases:
+    - autopilot analytics
+    - autopilot impact
+    - before and after
+  next: ./settings.mdx
+---
+
+Most pull requests Autopilot opens target one number, like the share of AI answers that mention you for a prompt. Autopilot reads that number before and after the merge, and what it learns feeds into what it suggests next.
+
+## The Analytics tab
+
+The **Analytics** tab shows Autopilot's output for the last 7, 30 or 90 days, compared with the period before.
+
+<img
+  src="/images/autopilot/analytics-light.webp"
+  alt="The Analytics tab with pull requests opened and merged over time and breakdowns of ideas and runs"
+  className="block dark:hidden rounded-lg border"
+/>
+<img
+  src="/images/autopilot/analytics-dark.webp"
+  alt="The Analytics tab with pull requests opened and merged over time and breakdowns of ideas and runs"
+  className="hidden dark:block rounded-lg border"
+/>
+
+The top row has **PRs opened**, **PRs merged**, **Merge rate** and **Median time to merge**. If the merge rate drops, Autopilot is suggesting things you don't want, and closing the next ones with a reason helps it learn. The **Pull requests** chart shows a running total of pull requests opened and merged.
+
+**Ideas** shows where everything Autopilot found ended up (**Merged**, **In review**, **Suggested**, **Closed**, **Auto-closed** or **Failed**) and how many became a pull request. **Runs** shows how many runs succeeded, how long they took, the credits they used and what started them. Below that are ideas, pull requests, merges and merge rate per automation, and **Recent runs** with a link to each run.
+
+The **Automations** tab shows the same period's **PRs generated**, **PRs merged**, **Avg credits per run** and **Total credits** above the automations table.
+
+## Before and after, per pull request
+
+Open and merged pull requests with a measurable target show **Before → now** on their page, in the unit their automation targets:
+
+| Automation | Measured as |
+| --- | --- |
+| Write for content gaps (prompt gaps) | **AI mentions**: the share of AI answers to the prompt that name you |
+| Write for content gaps (search gaps) | **Google position** of the query, from Search Console |
+| Write comparison pages | **AI mentions** on the comparison questions |
+| Refresh pages AI stopped citing | **AI citations**: the share of answers to the page's prompts that cite the page. A second-chance refresh of an Autopilot post measures **AI mentions** |
+| Add internal links | **Google position** of the target page's query |
+| Update landing page copy | **AI citations** or **Google position**, depending on why the page was picked |
+| Fix agent readiness | **Agent readiness score** from the latest scan since the merge |
+
+Release posts and AI-readable fixes have no single number to measure, so they don't show it.
+
+Before the merge it reads "11% now". After the merge it reads "11% → measuring" until new data arrives, then "11% → 40%", "#14 → #6" or "61 → 78". For AI mentions and citations, the after value covers the time since the merge, up to the last 14 days. Google position comes from the latest Search Console sync after the merge. Measuring reads your existing scans and syncs, so it costs nothing. Keep GEO scans and Search Console syncing for these numbers to move.
+
+## Pages followed until they're indexed
+
+A merged post only helps once it's live and indexed. For 30 days after a merge, Autopilot follows posts and updates from content gaps, releases, comparisons and refreshes, and mentions each one in the brief once when something happens.
+
+If the page still doesn't load three days after the merge, the brief says "… was merged 3 days ago but … doesn't load yet. Check that the site deployed." With Search Console connected, it says "Google indexed … (…)." once Google indexes the page. If Google still hasn't indexed it 14 days after it went live, the brief says "Google hasn't indexed … 14 days after it went live. Link to it from a page Google already ranks or request indexing in Search Console."
+
+## Results shape what comes next
+
+Autopilot looks at its merged posts and updates that are 14 to 180 days old and reads their last 30 days: AI crawler visits, AI assistant fetches, clicks from AI and human views (from [Notra Sites](/sites/overview) or your [AI traffic](/analytics/overview) tracking), and your mention share before and after. The planner uses this to break ties between topics.
+
+Posts that didn't work get one more try. 45 to 180 days after a merge, when your mention share for the post's prompt grew by less than 5 points, **Refresh pages AI stopped citing** updates the post once.
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="Mention rate" icon="gauge" href="/geo/metrics/mention-rate">
+    How AI mentions are counted.
+  </Card>
+  <Card title="Citations" icon="quote-right" href="/geo/metrics/citations">
+    How AI citations are counted.
+  </Card>
+</CardGroup>

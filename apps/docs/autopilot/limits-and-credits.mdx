@@ -1,0 +1,76 @@
+---
+title: "Limits and credits"
+description: "What Autopilot charges for, where the credits come from, and every limit and cooldown that paces its work."
+authors:
+  - handle: jan
+
+docolin:
+  schema_version: 1
+  kind: tools/notra/autopilot/limits-and-credits
+  type: reference
+  applies_to:
+    - notra
+  language: en
+  difficulty: beginner
+  time_estimate: 4m
+  status: stable
+  aliases:
+    - autopilot pricing
+    - autopilot credits
+    - autopilot cooldowns
+  next: ./troubleshooting.mdx
+---
+
+## What Autopilot charges for
+
+Autopilot charges when it opens a pull request. You pay what the model calls for that pull request cost, at least 1 credit, the same way [mentions on GitHub](/integrations/github#what-a-mention-costs) are charged.
+
+| Charged | Free |
+| --- | --- |
+| A post or fix that opens a pull request, from the daily run, a single automation, an idea you write or `@notra write a post` | Planning, rules checks, readiness rescans, measuring results, following pages until indexed, learning from edits and the daily brief |
+| **Ask the agent** and **Let the agent decide** steps in [workflows](/autopilot/workflows), from AI credits | Runs that find nothing to change, writes that fail, and pull requests that don't open |
+| Changes you ask for on a pull request, like a GitHub mention | |
+
+Credits come from your plan's **pull request credits** first, then from your AI credits:
+
+| Plan | Pull request credits |
+| --- | --- |
+| Free | $1, once |
+| Starter | $10 per month |
+| Growth | $15 per month |
+| Scale | $25 per month |
+
+Your remaining budget is under **Settings → Billing → Usage** (see [Billing](/organization/billing)). What each automation costs per run is on its page and on the **Automations** tab.
+
+Running out doesn't stop Autopilot. A post it would have opened is saved as an idea, a fix is tried again the next day without counting as a failure, and writing an idea from the dashboard says "No credits left to write this post. Add AI credits in Notra and try again."
+
+## Limits
+
+| Limit | Value |
+| --- | --- |
+| Open Autopilot pull requests | 3 per workspace for pull requests Autopilot opens on its own. Ideas don't count, and posts you ask for (**Write now**, `@notra write a post`) always open |
+| Open pull requests per fix, update or comparison automation | 1. The next waits until it's merged or closed. Content gap and release posts are limited per topic instead |
+| Automatic post pull requests | 3 per 7 days to start, between 1 and 7 depending on how many you merge |
+| Posts or ideas from the planner | 1 per run |
+| Full runs | 1 at a time, up to 3 scheduled attempts a day |
+| Run length | Ended after 2 hours without progress |
+| Failed writes | Tried up to 3 times, then given up |
+| Internal links | 1 pull request per 7 days, at most 3 new links per post |
+| Landing page copy | 1 pull request per 14 days |
+| Release post sources | Up to 15 repositories, 7 days back (up to 30 after a release post) |
+| Reviewers | 10 |
+| Rules | 50, of up to 300 characters |
+| Workflows | 50 per workspace |
+
+## Cooldowns
+
+| What | Comes back after |
+| --- | --- |
+| Closed content gap post or comparison page | 90 days, or sooner for a comparison page when the competitor keeps winning |
+| Closed readiness fix | 30 days |
+| Merged readiness fix | Its issues are left alone for 14 days while it deploys |
+| Auto-closed draft | 30 days |
+| Idea nobody wrote | Expires after 21 days, can come back |
+| Closed release post, refresh, links, landing copy or AI-readable fix | Never for the same item |
+| Pages followed after a merge | 30 days |
+| Before and after window | The last 14 days since the merge |

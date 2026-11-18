@@ -1,0 +1,79 @@
+---
+title: "Daily brief"
+description: "One Slack message after each run with what to start with, what waits on you, what merged and what is worth knowing, plus a full brief page with every item."
+authors:
+  - handle: jan
+
+docolin:
+  schema_version: 1
+  kind: tools/notra/autopilot/daily-brief
+  type: how-to
+  applies_to:
+    - notra
+  language: en
+  difficulty: beginner
+  time_estimate: 5m
+  status: stable
+  aliases:
+    - autopilot brief
+    - slack brief
+    - react to merge
+  next: ./slack.mdx
+---
+
+The daily brief is Autopilot's report in Slack. It's the last step of the daily run, so it arrives a few minutes after your hour in the channel you picked, and you can handle most of it from there.
+
+<Note>
+  The brief needs a Slack channel. Without one, no brief is written and Autopilot emails workspace owners about each new draft instead. Connect Slack under **Settings → Daily brief**. See [Slack](/integrations/slack).
+</Note>
+
+## What the brief says
+
+The message has six parts:
+
+1. **A headline and summary** of the day, like "Two posts ready for gaps Acme owns".
+2. **Start with**: the one item worth your attention first, and why.
+3. **Waiting on you**: up to five items with their status (**Ready to merge**, **Idea** or **Publishes Tue 09:00**) and their kind, like "Content opportunity" or "Page refresh".
+4. **Merged since your last brief**: what shipped.
+5. **Worth knowing**: things Autopilot noticed but can't fix in your repository, like AI crawlers blocked by a firewall, prompts that measure nothing, the competitors that win your lost prompts, a merged page that doesn't load yet, a page Google just indexed, or a style habit it learned from your edits.
+6. A link to **Read the full brief**.
+
+The headline, the summary and the reason to start with an item are written in your brand's language. The labels stay in English.
+
+Each item is announced once per status: once as an idea, and again when it becomes a pull request. A day with nothing new sends no brief ("No brief: nothing proposed, merged or worth knowing").
+
+## Act on items with reactions
+
+Each of the first five items waiting on you gets its own reply in the brief's thread: its title linking to the item in Notra, its pull request number and, when it's scheduled, when it publishes. Notra adds 👍 and 👎 to each, so voting is one tap.
+
+| Item | 👍 | 👎 |
+| --- | --- | --- |
+| Pull request | Merges it now, also when it was scheduled to publish later | Closes the pull request and dismisses it |
+| Idea | Autopilot writes it and posts the new pull request in the same thread, ready for 👍 | Dismisses the idea |
+
+Notra replies in the thread with what it did, like "@Alex merged PR #52." Two quick 👍 only act once, and a reaction on an item that has moved on does nothing.
+
+Only Notra owners and admins can act this way. Notra matches the person who reacted by their Slack email, so they need the same verified email in Slack and Notra. Anyone else gets a reply saying so. Autopilot also keeps reactions as feedback. A 👎 rejects that one item, and the topic can still come back later.
+
+## The full brief page
+
+**Read the full brief** opens the brief as a page in Notra that members of your workspace can see after signing in. It starts with the item to look at first, groups the rest by theme and ends with what merged and what is worth knowing.
+
+**Why this** on an item lists where it came from, such as the pull requests it's about, the Google position, the share of AI answers that mention you or the domains cited instead. Press an item to read the post its pull request writes without opening GitHub. Pull requests have the **Merge** menu and show when they publish if they're scheduled. Ideas have **Write it** and **Close**.
+
+## Change the channel or time
+
+Under **Settings → Daily brief**, **Slack channel** sets where the brief goes. Invite the Notra app to that channel so it can post. **Send the brief at** sets the hour of the daily run in your workspace's timezone, and the brief follows a few minutes later. **Email drafts to owners** is **Without Slack** by default, or **Always**.
+
+To change the timezone, ask the Notra agent in Slack, for example "run Autopilot at 8 in America/New_York". See [Control Autopilot from Slack](/autopilot/slack).
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="Slack integration" icon="slack" href="/integrations/slack">
+    Connect Slack and the permissions Notra asks for.
+  </Card>
+  <Card title="Review and publish" icon="code-pull-request" href="/autopilot/review-and-publish">
+    Everything you can do with a pull request.
+  </Card>
+</CardGroup>

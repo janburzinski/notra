@@ -76,14 +76,16 @@ When setting up Autopilot, choose an existing channel or select **Create a chann
 
 Existing Slack connections may need to reconnect to grant the `channels:manage` permission. If your workspace restricts channel creation, ask a Slack admin or choose an existing channel and invite Notra to it.
 
-Each brief is one short summary message. Every pull request and idea is a reply in its thread, and you can react to it:
+Each brief is one message with a headline, the item to start with, what is waiting on you, what merged since the last brief and what is worth knowing, plus a link to the full brief in Notra. The first five items waiting on you each get a reply in its thread, and you can react to them:
 
 | Item | 👍 | 👎 |
 | ---- | -- | -- |
-| Pull request | Merges the pull request right away | Dismisses the item and closes the pull request |
+| Pull request | Merges the pull request right away, also when it was scheduled to publish later | Dismisses the item and closes the pull request |
 | Idea | Autopilot writes it (charging credits as usual) and posts the pull request in the same thread, ready for 👍 | Dismisses the idea |
 
 Only owners and admins of your Notra workspace can act this way. Notra matches the person who reacted by their Slack email, so they need the same verified email in Notra. Anyone else gets a reply in the thread saying so, and nothing happens. Slack connections made before this check need to reconnect once to grant `users:read` and `users:read.email` (and `reactions:read` and `reactions:write` if they predate reactions).
+
+Without a Slack channel, Autopilot sends no brief and emails workspace owners about each new draft instead. You can also mention the agent to ask what Autopilot did, merge or write items, add rules and change settings. See [Daily brief](/autopilot/daily-brief) and [Control Autopilot from Slack](/autopilot/slack).
 
 ### Enable, disable, delete
 

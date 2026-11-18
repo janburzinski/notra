@@ -1,0 +1,143 @@
+---
+title: "How a run works"
+description: "When Autopilot runs, the order of a run, how it decides between a pull request, an idea and nothing, and the limits that keep it from flooding your repository."
+authors:
+  - handle: jan
+
+docolin:
+  schema_version: 1
+  kind: tools/notra/autopilot/how-it-works
+  type: explanation
+  applies_to:
+    - notra
+  language: en
+  difficulty: intermediate
+  time_estimate: 9m
+  status: stable
+  aliases:
+    - autopilot daily run
+    - autopilot planner
+    - why autopilot opened a pull request
+  next: ./automations/overview.mdx
+---
+
+Autopilot works in runs. The daily run starts on a schedule and runs every automation that is on. You can also start one yourself or run a single automation, and a GitHub reply or a Slack reaction can start one too.
+
+## When it runs
+
+Autopilot checks every few minutes whether a workspace is due. The daily run starts in the first check after your hour (09:00 by default) in your workspace's timezone, so the brief, which is its last step, arrives a few minutes later.
+
+- **Run now** on the Autopilot page starts a full run right away. A full run that finishes after your hour counts as the day's run. One that finishes before your hour doesn't, so the scheduled run still happens.
+- **Run now** on a single automation runs only that automation and never changes the schedule.
+- Only one full run happens at a time. Starting another while one is running shows "Autopilot is already running".
+- If a run fails without making progress, Autopilot tries again after 30 minutes and then after another hour, at most three times a day.
+- A run that stops making progress for two hours is ended with "Run did not finish in time". **Stop** ends a run by hand; steps that already started finish first.
+
+Each run has a label that tells you how it started:
+
+| Label | Started by |
+| --- | --- |
+| **Daily run** | The schedule |
+| **Manual run** | **Run now**, including the run right after setup |
+| **From GitHub** | An `@notra` reply or a pull request event on GitHub |
+| **Suggestion written** | Someone writing an idea from the dashboard or with 👍 in Slack |
+
+## The order of a run
+
+<Steps>
+  <Step title="Learn from what happened">
+    Autopilot reads the pull requests people merged or closed since the last run, learns the habits your team showed by editing its drafts and keeps its memory in line with your data. It skips this when nothing happened. See [How Autopilot learns](/autopilot/learning).
+  </Step>
+  <Step title="Tidy up">
+    It closes its own drafts nobody touched for the time set under **Housekeeping**, and lets go of ideas nobody picked up in 21 days.
+  </Step>
+  <Step title="Gather signals and run the fixes">
+    In parallel, it collects content gaps, the pull requests you merged, tracked prompts that measure nothing and the competitors in the prompts you lose. At the same time, each fix and update automation that is on checks its own data and opens a pull request if it finds work: agent readiness, AI-readable pages, page refreshes, comparison pages, internal links and landing page copy. It also checks pages it merged earlier until they are live and indexed.
+  </Step>
+  <Step title="Plan and write content">
+    The planner links the signals into topics and decides whether one topic is ready for a post. It writes a draft, saves an idea, or waits. See [How Autopilot picks what to write](#how-autopilot-picks-what-to-write).
+  </Step>
+  <Step title="Brief the team">
+    It posts the daily brief with everything new since the last brief. See [Daily brief](/autopilot/daily-brief).
+  </Step>
+</Steps>
+
+Each step runs on its own, so a failing automation doesn't stop the others. The run's page lists every automation with what it did, skipped or decided, and a full log.
+
+## Pull requests, ideas and the rest
+
+Everything Autopilot finds is an item with a status:
+
+| Status | Means |
+| --- | --- |
+| **Idea** | Worth a post, but Autopilot wasn't sure enough to open a pull request. Waits for you |
+| **Writing** | Autopilot is writing it now |
+| **Open** | A draft pull request is open on GitHub |
+| **Merged** | The pull request was merged |
+| **Closed** | A person closed it or said no |
+| **Auto-closed** | Autopilot closed its own untouched draft, or an idea expired. This doesn't count as a no, and the topic can come back |
+| **Failed** | Writing failed. Later runs try again, and Autopilot gives up after three failed attempts |
+
+Every change is a pull request opened as a **draft** on a branch that starts with `notra/autopilot/`. New posts are titled `Blog: …`, updates to an existing page `Update: …`. Autopilot deletes the branch after a merge or close.
+
+**Ideas** don't take a pull request slot. Write one with **Write now** on its page, **Write it** in the brief, 👍 in Slack, or `@notra write a post` on the pull request a release idea came from. Ideas nobody picks up expire after 21 days.
+
+## How Autopilot picks what to write
+
+The fix and update automations act on clear data, like a failed readiness check or a page that lost half its citations. Whether a post is worth writing is less clear-cut, so for **Write for content gaps** and **Write about releases** a planner decides.
+
+### Demand first
+
+A post starts from a question people ask. A content gap, meaning a prompt AI engines answer without you or a search you show up for but don't win, counts as that demand. A merged pull request gives a post product facts, but on its own it isn't a reason to write one. When you track prompts in GEO and **Write for content gaps** is on, a post about a release waits until people ask about the topic.
+
+Release topics are written up around the question a user would ask. Autopilot avoids announcement posts like "X now supports Y".
+
+### The evidence bar
+
+The planner links signals across runs into **topics**. A topic becomes a pull request only when all of these hold:
+
+| Check | Bar |
+| --- | --- |
+| Signals | At least two independent observations of the topic |
+| Demand | A content gap for it was seen in the last 14 days |
+| Confidence | Notra's classifier is at least 85% sure this action is right |
+| Nothing open | No pull request, draft or idea exists for the topic yet |
+| Budget | Fewer automatic post pull requests than the weekly budget (see below) |
+| Room | Fewer than three Autopilot pull requests are open |
+
+When several topics are ready, Autopilot picks the one where you're mentioned least, competitors are named most, search impressions are highest and the position is closest to page one. How earlier posts performed only breaks ties.
+
+The planner can overrule the signals and demand bars with a stated reason, for example when your brand is missing from nearly every answer to a core question, when AI answers say something false about you, or for a breaking change users must act on. The classifier still has to agree.
+
+### Pull request or idea
+
+When the only checks that fail are the budget, the open pull request limit, demand (when you don't track GEO), or confidence between 60% and 85% on a topic people ask about, the topic becomes an **idea** instead. The log says why: "not sure enough for an automatic pull request", "nobody is asking about it yet" or "no room for an automatic pull request". A run writes at most one post or idea from the planner.
+
+With GEO and **Write for content gaps** on, a post nobody asks for doesn't even become an idea.
+
+### Rules always win
+
+Before writing a post, Autopilot checks your workspace's rules ("Never suggest posts about pricing"). If a rule rules the topic out, it stops with "The team's rules rule this post out". See [How Autopilot learns](/autopilot/learning).
+
+## Limits that keep the queue small
+
+| Limit | Value |
+| --- | --- |
+| Open Autopilot pull requests per workspace | 3 for work Autopilot opens on its own. Ideas don't count, and posts you ask for always open |
+| Open pull requests per fix, update or comparison automation | 1. It waits until its last one is merged or closed. Content gap and release posts are limited per topic |
+| Automatic post pull requests | 3 per 7 days to start. One more for every three net merges in the last 60 days, up to 7. Drops to 1 once people closed at least two more than they merged |
+| Posts or ideas from the planner per run | 1 |
+| Failed writes | Tried up to 3 times, then given up |
+
+Posts you asked for (an idea you wrote, `@notra write a post`) don't count toward the weekly budget. Merging Autopilot's posts raises the budget and closing them lowers it; auto-published merges and auto-closed drafts do neither. When the open limit is full, automations show "3 of 3 pull requests are open. Merge or close a pull request to continue."
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="Automations" icon="layer-group" href="/autopilot/automations/overview">
+    What each automation reads, writes and skips.
+  </Card>
+  <Card title="Limits and credits" icon="coins" href="/autopilot/limits-and-credits">
+    Every cooldown, cap and what a run costs.
+  </Card>
+</CardGroup>

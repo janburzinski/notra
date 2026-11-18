@@ -1,0 +1,97 @@
+---
+title: "Site fixes"
+description: "Fix agent readiness and Make pages readable for AI open pull requests that let AI crawlers and agents read your site."
+authors:
+  - handle: jan
+
+docolin:
+  schema_version: 1
+  kind: tools/notra/autopilot/automations/site-fixes
+  type: reference
+  applies_to:
+    - notra
+  language: en
+  difficulty: intermediate
+  time_estimate: 6m
+  status: stable
+  aliases:
+    - fix agent readiness
+    - make pages readable for ai
+    - llms.txt autopilot
+    - server side rendering ai crawlers
+  next: ./content.mdx
+---
+
+AI engines can only cite pages they can read. These two automations handle the technical side: the files and markup agents look for, and content that only shows up after JavaScript runs.
+
+## Fix agent readiness
+
+Fixes `llms.txt`, AI crawler rules and structured data, based on your [Agent Readiness](/geo/agent-readiness) scan.
+
+| | |
+| --- | --- |
+| **Reads** | Your latest Agent Readiness scan |
+| **Needs** | A website repository and a completed readiness scan of your brand's website |
+| **Hands you** | A pull request with up to 6 changed files |
+| **Approval group** | Readiness fixes |
+
+On each run, it works through these steps:
+
+1. If the last scan is more than 20 hours old, Autopilot rescans your site and waits up to four minutes. If the rescan doesn't finish in time, it uses the last scan.
+2. It sorts the issues into what the repository can fix and what needs product work. Checks like an OpenAPI spec, an MCP server, OAuth or rate limit headers need changes to your product itself, so Autopilot leaves them alone. Bonus checks are skipped, and so are issues you dismissed in the last 30 days or merged in the last 14.
+3. An agent reads your repository and makes the fix: `llms.txt` written from your brand description and site facts, AI crawler rules in `robots.txt`, sitemap references, JSON-LD and metadata. It prefers additive changes, and it edits your framework's own source (like a Next.js `app/robots.ts`) instead of adding a static file that conflicts with it.
+4. It opens a pull request titled after the fix. The body ends with the scan URL, the readiness score and the framework it detected.
+
+It never changes `package.json`, lockfiles, CI or environment files, and never adds dependencies.
+
+When it doesn't open a pull request, the run log says why:
+
+| Log | Means |
+| --- | --- |
+| A readiness pull request is still waiting for review | Merge or close the last fix first |
+| No completed readiness scan yet | Run an Agent Readiness scan |
+| Nothing to fix in the repository | Every open issue needs product work |
+| The repository already has what the checks ask for | The agent found nothing to change. If the scan still fails, check that your latest changes are deployed |
+
+After you merge a fix, its issues are left alone for 14 days while it deploys and the next scan picks it up. Closing a fix keeps Autopilot away from those issues for 30 days.
+
+## Make pages readable for AI
+
+Fixes content AI crawlers can't see without JavaScript. Many AI crawlers don't run JavaScript, so a page that renders in the browser can be nearly empty for them.
+
+| | |
+| --- | --- |
+| **Reads** | Your key pages, fetched the way an AI crawler fetches them |
+| **Needs** | A website repository and a website on your brand identity |
+| **Hands you** | A pull request with up to 4 changed files |
+| **Approval group** | Page updates |
+
+Each run goes like this:
+
+1. It checks up to eight pages: your homepage, the pages AI cites most in the last 30 days, then pages from your sitemap.
+2. It fetches each page as `ChatGPT-User` without JavaScript and compares it with what a browser shows. A page fails when the browser shows at least 150 words and the raw HTML has less than half of them.
+3. It moves the missing content into the server's HTML or the build output, for example by removing `ssr: false`, `client:only` or a guard that only renders after mount.
+4. It adds no copy (at most 20 words where markup needs them). The pull request explains how it checked each page.
+
+When crawlers get a `401`, `403`, `429` or a bot challenge while a browser gets the page, a firewall or CDN rule is blocking them. Autopilot can't change that from your repository, so it tells you in the brief: "AI crawlers get 403 from … while a browser gets the page: a bot wall or firewall rule blocks them. Allow ChatGPT-User, PerplexityBot and Claude-User in your CDN or firewall."
+
+The run log explains every run that didn't open a pull request:
+
+| Log | Means |
+| --- | --- |
+| Every checked page is readable for AI crawlers | Nothing to fix |
+| AI crawlers are blocked outside the repository | See the brief for which pages and what to allow |
+| The cause is outside the repository | The content comes from a CMS, hosting or a third-party script. The brief names the pages |
+| These pages were already fixed, proposed or dismissed | A closed fix isn't offered again for the same pages |
+| The brand has no website to check | Add a website to your brand identity |
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="Agent readiness" icon="robot" href="/geo/agent-readiness">
+    What the scan checks and how the score works.
+  </Card>
+  <Card title="AI crawlers" icon="spider" href="/analytics/crawlers">
+    See which AI crawlers visit your site.
+  </Card>
+</CardGroup>

@@ -1,0 +1,98 @@
+---
+title: "Grow with Autopilot"
+description: "What to connect before you start, which automations fit your goal, how to spend the first month and how to tell it's working."
+authors:
+  - handle: jan
+
+docolin:
+  schema_version: 1
+  kind: tools/notra/autopilot/grow
+  type: tutorial
+  applies_to:
+    - notra
+  language: en
+  difficulty: beginner
+  time_estimate: 7m
+  status: stable
+  aliases:
+    - autopilot best practices
+    - autopilot strategy
+  next: ./how-it-works.mdx
+---
+
+Each merged post can win a question engines answered without you, and each review makes the next draft closer to what you want. Autopilot gets better the more data it has to work from and the faster your team reviews what it opens.
+
+## Start with good data
+
+Autopilot can only act on what Notra measures, so spend an hour on the [first week of GEO](/playbooks/first-30-days#week-1-make-the-data-trustworthy) before you turn it on.
+
+Content gaps come from your [prompts](/geo/prompts), so track the questions your buyers ask. The ones your sales team hears are better than generic ones. Add your brand's aliases too: a missing alias makes you look absent from answers that do mention you, and Autopilot then writes for gaps that don't exist.
+
+Gaps and the brief's competitors line prefer [tracked competitors](/geo/competitors), while comparison pages can go after any competitor AI answers name. Track the competitors you care about and ignore the rest, so Autopilot writes about the right names.
+
+Connecting Search Console adds search gaps, internal links, landing pages that rank 4 to 20 and the indexing follow-up. Fill in your brand identity, because its tone, audience, language and house rules shape every post. Run an Agent Readiness scan as well, so the first run has fixes to make.
+
+## Pick automations for your goal
+
+A first setup turns everything on, and that suits most sites. To start smaller, pick by what you want to improve.
+
+<Tabs>
+  <Tab title="Get mentioned in AI answers">
+    Turn on **Write for content gaps** for a post per question competitors own, and **Write comparison pages**, because buyers ask AI "X vs Y" right before they decide. Add **Fix agent readiness** and **Make pages readable for AI**, since engines can't cite pages they can't read.
+
+    Each post's page shows **Before → now** for the share of AI answers that mention you. Over the following weeks, your [mention rate](/geo/metrics/mention-rate) should move with it.
+  </Tab>
+  <Tab title="Keep what you have">
+    **Refresh pages AI stopped citing** catches pages losing citations before they drop out of answers. **Update landing page copy** keeps your most important pages in line with what engines and searchers look for, and **Add internal links** helps pages ranking 4 to 20 move up in Google.
+
+    On each refresh, **Before → now** shows the share of answers that cite the page. Compare it with your [citations](/geo/metrics/citations) overall.
+  </Tab>
+  <Tab title="Explain what you ship">
+    **Write about releases** writes about the changes users need explained, as the questions they ask. Turn on GitHub mentions for your product repositories and Autopilot asks "Should I write a post about this?" on pull requests that are worth one. Pick the repositories under **Read from**, and skip bots and authors whose pull requests are mostly chores under **Ignored**.
+
+    With GEO tracked and **Write for content gaps** on, a release post waits until people ask about the topic. Turn content gaps off if you want release posts without that wait.
+  </Tab>
+  <Tab title="Make your site agent-ready">
+    **Fix agent readiness** adds `llms.txt`, AI crawler rules, structured data and metadata. **Make pages readable for AI** moves content that only renders with JavaScript into the page's HTML.
+
+    Each fix shows the readiness score under **Before → now**. Watch [AI crawler](/analytics/crawlers) visits over the following weeks.
+  </Tab>
+</Tabs>
+
+## The first month
+
+<Steps>
+  <Step title="Week 1: review everything">
+    The first pull request of each group waits for you even though setup puts approvals on Auto. If you want to see every pull request in the first week, switch the groups to **Ask** under **Settings → Approvals**. Read each draft on its page, ask for changes in a sentence and merge what's good. When you close one, say why. "We don't write about pricing" becomes a rule, and if you edit two drafts down to under 1,000 words, Autopilot picks up the habit.
+  </Step>
+  <Step title="Week 2: let it publish">
+    Once a post, an update and a fix have been merged, switch the groups you trust back to **Auto**. Their next pull requests publish at 09:00 on the first weekday at least 24 hours away unless someone steps in. Anything with flagged claims or files outside the content folder still waits for you.
+  </Step>
+  <Step title="Week 3: tune what it reads">
+    Look at the merge rate in **Analytics**. If it's low, Autopilot is suggesting things you don't want: close those with reasons and add topics to skip. Add reviewers so drafts reach the right people on GitHub, and limit release posts to the repositories and paths that matter.
+  </Step>
+  <Step title="Week 4: measure">
+    Open the merged pull requests and read **Before → now**, and check what the brief said about indexing. With **Refresh pages AI stopped citing** on, a post that didn't move its number gets one refresh 45 to 180 days after the merge.
+  </Step>
+</Steps>
+
+## A daily routine
+
+Start with the brief in Slack and the item it leads with. React 👍 on the pull requests you want merged now and the ideas worth writing, and 👎 on the rest. Open anything that needs a change and ask for it in a sentence. Items under **Worth knowing**, like a firewall blocking AI crawlers or a page Google hasn't indexed, need you to act outside the repository.
+
+Try not to let pull requests sit. With three open, Autopilot stops opening new ones, and drafts nobody touches close after 14 days.
+
+## Signs it's working
+
+Over the first weeks, the merge rate should go up as Autopilot learns your rules and style, and **Before → now** should move on merged posts, refreshes and fixes. On the prompts Autopilot wrote for, your mention rate and share of voice should rise ([What changed](/geo/troubleshooting/numbers-changed#what-changed) shows which prompts moved), and [AI traffic](/analytics/overview) should show AI crawlers and referrals reaching the new pages.
+
+For things only your team watches, like a competitor passing you on your most valuable prompt or a weekly digest, use [workflows](/autopilot/workflows).
+
+<CardGroup cols={2}>
+  <Card title="Your first 30 days of GEO" icon="calendar" href="/playbooks/first-30-days">
+    Set up the data Autopilot works from.
+  </Card>
+  <Card title="Win a prompt" icon="trophy" href="/playbooks/win-a-prompt">
+    What it takes to move one prompt.
+  </Card>
+</CardGroup>
