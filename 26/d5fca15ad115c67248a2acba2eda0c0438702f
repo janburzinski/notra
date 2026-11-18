@@ -1,0 +1,21 @@
+apps/dashboard/src/lib/autopilot/credits.ts
+  ai_agent 69,83
+apps/dashboard/src/components/autopilot/autopilot-out-of-credits-notice.tsx
+  s_395c9414fcd198::t_7873c162a153fa 29
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "26d5fca15ad115c67248a2acba2eda0c0438702f",
+  "prompts": {},
+  "sessions": {
+    "s_395c9414fcd198": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "82014d90-dedb-4b0a-8542-695277c56534",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
