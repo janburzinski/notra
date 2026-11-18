@@ -1,0 +1,19 @@
+apps/ui/src/components/registry-install.tsx
+  s_e8f9cdff77bcde::t_a8cfd8fe47521a 6
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "15aa3844b43a9d4c0e99cfaf8023922952a55500",
+  "prompts": {},
+  "sessions": {
+    "s_e8f9cdff77bcde": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b77e4e94-2008-435f-9048-a580111e2d4e",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
