@@ -3,6 +3,7 @@
 /* Blume inlines this file into .blume/src/generated/ and only rebases @source,
    so the import path is relative to that folder. */
 @import "../../../src/styles/blocks.css";
+@import "../../../../../packages/ui/src/styles/edge-light.css";
 @import "../../../../../packages/ui/src/styles/status.css";
 @source "../../../../packages/ui/src/components/badge-showcase.tsx";
 @source "../../../../packages/ui/src/components/status-badge.tsx";

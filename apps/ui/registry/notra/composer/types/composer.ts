@@ -12,6 +12,8 @@ export interface ComposerFrameProps {
   flat?: boolean;
   /** `sm` is a 36px single-line pill for dense inline composers. Pair it with `Composer.Send size="sm"`. Only applies with `flat`. */
   size?: "default" | "sm";
+  /** A soft light sweeps around the border while a reply streams. */
+  working?: boolean;
   className?: string;
 }
 

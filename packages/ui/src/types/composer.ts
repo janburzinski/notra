@@ -19,6 +19,8 @@ export interface ComposerFrameProps {
    * shell next to other cards. The non-pill composer is always a card.
    */
   surface?: "default" | "card";
+  /** A soft light travels around the input while an answer is on its way. */
+  working?: boolean;
   className?: string;
 }
 

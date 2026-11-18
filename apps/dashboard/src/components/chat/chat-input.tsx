@@ -1870,6 +1870,7 @@ export function ChatInput({
             ) : null
           }
           surface={surface}
+          working={isLoading}
         >
           {/* A tool waiting on you takes the input's place. The input stays
               mounted underneath, so a draft and its attachments survive. */}

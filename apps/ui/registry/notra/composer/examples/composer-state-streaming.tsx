@@ -15,7 +15,7 @@ function noop() {}
 export default function ComposerStateStreaming() {
   return (
     <div className="w-full max-w-xl p-6">
-      <ComposerFrame>
+      <ComposerFrame working>
         <ComposerInput
           aria-label="Message"
           placeholder="Queue a message..."

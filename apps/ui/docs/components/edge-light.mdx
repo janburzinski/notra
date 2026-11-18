@@ -1,0 +1,34 @@
+---
+title: Edge Light
+description: A soft light sweeping around a surface's border while work is in progress.
+---
+
+<Component path="edge-light/examples/edge-light" />
+
+<RegistryInstall name="edge-light" />
+
+The Notra composer runs it while a reply streams. A soft light travels around the border, white on dark and black on light, and a few highlights along the edge catch it as it passes. It fades in when `active` turns on, fades out when it turns off, and leaves the page once it has faded.
+
+Place it inside a positioned, rounded element the size of the surface. It takes that element's radius and sits on top of the surface's own border.
+
+```tsx
+<div className="relative rounded-[10px]">
+  <div className="rounded-[10px] border">...</div>
+  <EdgeLight active={isStreaming} />
+</div>
+```
+
+| Prop | Default | Description |
+| --- | --- | --- |
+| `active` | | Whether the light is travelling. |
+| `className` | | Classes on the root, for example to set `--edge-light-duration`. |
+
+Every moving part turns with `transform`, so the browser's compositor runs it on its own, with no JavaScript, layout or paint on the main thread. A streaming reply keeps the main thread busy, and the light stays smooth through it. The rotating layers cost GPU memory, and only while the light runs. Reduced motion holds it still.
+
+## Used in
+
+<CardGroup cols={2}>
+  <Card title="Composer" href="/components/composer">
+    The chat composer from the Notra dashboard. Pass `working` to run the edge light while a reply streams.
+  </Card>
+</CardGroup>

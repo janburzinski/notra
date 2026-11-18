@@ -30,8 +30,9 @@
     "preview": "blume preview --port 3006",
     "check-types": "blume check",
     "doctor": "blume doctor",
-    "registry:build": "bun scripts/registry-tokens.ts --check && shadcn build",
-    "registry:tokens": "bun scripts/registry-tokens.ts"
+    "registry:build": "bun scripts/registry-tokens.ts --check && bun scripts/registry-css.ts --check && shadcn build",
+    "registry:tokens": "bun scripts/registry-tokens.ts",
+    "registry:css": "bun scripts/registry-css.ts"
   },
   "dependencies": {
     "@base-ui/react": "catalog:",

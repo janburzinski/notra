@@ -18,6 +18,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
 
 import { Button } from "../../button/components/button";
+import { EdgeLight } from "../../edge-light/components/edge-light";
 import {
   Tooltip,
   TooltipContent,
@@ -86,10 +87,11 @@ function CardComposerFrame({
   children,
   nudge,
   connectedTop = false,
+  working = false,
   className,
 }: Pick<
   ComposerFrameProps,
-  "children" | "nudge" | "connectedTop" | "className"
+  "children" | "nudge" | "connectedTop" | "working" | "className"
 >) {
   const hasNudge = Boolean(nudge);
   return (
@@ -117,15 +119,25 @@ function CardComposerFrame({
           ) : null}
         </AnimatePresence>
       </LazyMotion>
+      {/* The edge light sits over the card, not in it, so it can light the
+          card's own border. It takes the radius from this wrapper. */}
       <div
         className={cn(
-          "border-table-card-border bg-table-card shadow-table-card relative z-10 min-w-0 overflow-hidden rounded-[10px] border",
+          "relative z-10 min-w-0 rounded-[10px]",
           hasNudge && "-mt-2",
-          connectedTop && !hasNudge && "rounded-t-none border-t-0"
+          connectedTop && !hasNudge && "rounded-t-none"
         )}
-        data-slot="composer-card"
       >
-        {children}
+        <div
+          className={cn(
+            "border-table-card-border bg-table-card shadow-table-card relative min-w-0 overflow-hidden rounded-[10px] border",
+            connectedTop && !hasNudge && "rounded-t-none border-t-0"
+          )}
+          data-slot="composer-card"
+        >
+          {children}
+        </div>
+        <EdgeLight active={working} />
       </div>
     </div>
   );
@@ -137,6 +149,7 @@ export function ComposerFrame({
   connectedTop = false,
   flat = false,
   size = "default",
+  working = false,
   className,
 }: ComposerFrameProps) {
   if (!flat) {
@@ -145,6 +158,7 @@ export function ComposerFrame({
         className={className}
         connectedTop={connectedTop}
         nudge={nudge}
+        working={working}
       >
         {children}
       </CardComposerFrame>
@@ -178,16 +192,25 @@ export function ComposerFrame({
       </LazyMotion>
       <div
         className={cn(
-          "border-border/70 bg-background min-w-0 overflow-hidden border",
-          // A round send button; the radius is half the single-line height so
-          // wrapped lines keep the button concentric.
-          "**:data-[slot=composer-send]:rounded-full **:data-[slot=composer-send]:[corner-shape:round] **:data-[slot=composer-send]:supports-[corner-shape:squircle]:rounded-full",
+          "relative min-w-0",
           size === "sm" ? "rounded-[18px]" : "rounded-[25px]",
-          connectedTop && !hasNudge && "rounded-t-none border-t-0"
+          connectedTop && !hasNudge && "rounded-t-none"
         )}
-        data-slot="composer-card"
       >
-        {children}
+        <div
+          className={cn(
+            "border-border/70 bg-background min-w-0 overflow-hidden border",
+            // A round send button; the radius is half the single-line height so
+            // wrapped lines keep the button concentric.
+            "**:data-[slot=composer-send]:rounded-full **:data-[slot=composer-send]:[corner-shape:round] **:data-[slot=composer-send]:supports-[corner-shape:squircle]:rounded-full",
+            size === "sm" ? "rounded-[18px]" : "rounded-[25px]",
+            connectedTop && !hasNudge && "rounded-t-none border-t-0"
+          )}
+          data-slot="composer-card"
+        >
+          {children}
+        </div>
+        <EdgeLight active={working} />
       </div>
     </div>
   );

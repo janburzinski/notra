@@ -10,6 +10,7 @@ export default defineMeta({
     "select",
     "marketing-button",
     "shimmer",
+    "edge-light",
     "sonner",
     "step-slider",
     "icon-tabs",

@@ -8,6 +8,7 @@ import {
 import { Button as ButtonPrimitive } from "@base-ui/react/button";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { useUiLabels } from "@notra/ui/components/shared/ui-labels-provider";
+import { EdgeLight } from "@notra/ui/components/ui/edge-light";
 import { Button, type ButtonProps } from "@notra/ui/components/ui/button";
 import { Spinner } from "@notra/ui/components/ui/spinner";
 import { Textarea } from "@notra/ui/components/ui/textarea";
@@ -119,10 +120,11 @@ function CardComposerFrame({
   children,
   nudge,
   connectedTop = false,
+  working = false,
   className,
 }: Pick<
   ComposerFrameProps,
-  "children" | "nudge" | "connectedTop" | "className"
+  "children" | "nudge" | "connectedTop" | "working" | "className"
 >) {
   const hasNudge = Boolean(nudge);
   return (
@@ -149,15 +151,25 @@ function CardComposerFrame({
           ) : null}
         </AnimatePresence>
       </LazyMotion>
+      {/* The edge light sits over the card, not in it, so it can light the
+          card's own border. It takes the radius from this wrapper. */}
       <div
         className={cn(
-          "border-table-card-border bg-table-card shadow-table-card relative z-10 min-w-0 overflow-hidden rounded-[10px] border",
+          "relative z-10 min-w-0 rounded-[10px]",
           hasNudge && "-mt-2",
-          connectedTop && !hasNudge && "rounded-t-none border-t-0"
+          connectedTop && !hasNudge && "rounded-t-none"
         )}
-        data-slot="composer-card"
       >
-        {children}
+        <div
+          className={cn(
+            "border-table-card-border bg-table-card shadow-table-card relative min-w-0 overflow-hidden rounded-[10px] border",
+            connectedTop && !hasNudge && "rounded-t-none border-t-0"
+          )}
+          data-slot="composer-card"
+        >
+          {children}
+        </div>
+        <EdgeLight active={working} />
       </div>
     </div>
   );
@@ -173,6 +185,7 @@ function PillComposerFrame({
   size = "default",
   highlight = false,
   surface = "default",
+  working = false,
   className,
 }: Omit<ComposerFrameProps, "flat">) {
   const hasNudge = Boolean(nudge);
@@ -219,21 +232,30 @@ function PillComposerFrame({
       </LazyMotion>
       <div
         className={cn(
-          "min-w-0 overflow-hidden border",
-          // A card-surface pill uses the shell and card tokens tables use.
-          isCard
-            ? "border-table-card-border bg-table-card"
-            : "border-border/70 bg-background",
-          // A round send button; the radius is half the single-line height so
-          // wrapped lines keep the button concentric.
-          "**:data-[slot=composer-send]:[corner-shape:round] **:data-[slot=composer-send]:rounded-full **:data-[slot=composer-send]:supports-[corner-shape:squircle]:rounded-full",
+          "relative min-w-0",
           size === "sm" ? "rounded-[18px]" : "rounded-[25px]",
-          connectedTop && !hasNudge && "rounded-t-none border-t-0",
-          cardLight({ highlight, lifted: elevated && !hasNudge })
+          connectedTop && !hasNudge && "rounded-t-none"
         )}
-        data-slot="composer-card"
       >
-        {children}
+        <div
+          className={cn(
+            "min-w-0 overflow-hidden border",
+            // A card-surface pill uses the shell and card tokens tables use.
+            isCard
+              ? "border-table-card-border bg-table-card"
+              : "border-border/70 bg-background",
+            // A round send button; the radius is half the single-line height so
+            // wrapped lines keep the button concentric.
+            "**:data-[slot=composer-send]:[corner-shape:round] **:data-[slot=composer-send]:rounded-full **:data-[slot=composer-send]:supports-[corner-shape:squircle]:rounded-full",
+            size === "sm" ? "rounded-[18px]" : "rounded-[25px]",
+            connectedTop && !hasNudge && "rounded-t-none border-t-0",
+            cardLight({ highlight, lifted: elevated && !hasNudge })
+          )}
+          data-slot="composer-card"
+        >
+          {children}
+        </div>
+        <EdgeLight active={working} />
       </div>
     </div>
   );
@@ -248,6 +270,7 @@ function ComposerFrame({ flat = false, ...props }: ComposerFrameProps) {
       className={props.className}
       connectedTop={props.connectedTop}
       nudge={props.nudge}
+      working={props.working}
     >
       {props.children}
     </CardComposerFrame>
