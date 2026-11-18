@@ -1,5 +1,7 @@
 import type { ReactNode } from "react";
 
+import type { PricingPlan } from "@/types/landing/pricing";
+
 type FeatureEngine = "chatgpt" | "claude" | "gemini" | "perplexity";
 
 type FeatureRank = number | null;
@@ -45,6 +47,7 @@ export interface FeatureDetailPageProps {
   children?: ReactNode;
   footer?: ReactNode;
   heroSecondaryCta?: FeatureDetailLink;
+  pricingPlans?: PricingPlan[];
 }
 
 export interface FeatureDetailLink {

@@ -27,6 +27,7 @@ export function FeatureDetailPage({
   overviewVisualFirst = false,
   children,
   footer,
+  pricingPlans,
 }: FeatureDetailPageProps) {
   const ctaT = useTranslations("landing.cta");
   return (
@@ -132,7 +133,11 @@ export function FeatureDetailPage({
 
       {footer}
 
-      <LandingPricingSection className="py-0 sm:py-0" />
+      <LandingPricingSection
+        className="py-0 sm:py-0"
+        plans={pricingPlans}
+        showFreeTier={!pricingPlans}
+      />
 
       <section className="w-full px-6">
         <CtaBanner

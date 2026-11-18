@@ -120,6 +120,16 @@ export function SupportIcon(props: SVGProps<SVGSVGElement>) {
   );
 }
 
+export function AutopilotIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <IconBase {...props}>
+      <path d="M20 12a8 8 0 1 1-2.34-5.66" />
+      <path d="M20 4v4h-4" />
+      <path d="M10.5 9.5v5l4-2.5z" />
+    </IconBase>
+  );
+}
+
 export function PricingGiftIcon(props: SVGProps<SVGSVGElement>) {
   return (
     <svg

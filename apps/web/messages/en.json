@@ -360,6 +360,7 @@
         "references": "{count, number} references",
         "referencesOverage": "then {price} per ref / mo",
         "referencesUnlimited": "Unlimited references",
+        "autopilot": "Autopilot",
         "supportStandard": "Standard support + Slack",
         "supportPriority": "Priority support",
         "supportDedicated": "Dedicated support"

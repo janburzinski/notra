@@ -112,6 +112,7 @@ export const PRICING_PLANS: PricingPlan[] = [
         price: "$0.04",
         icon: "references",
       },
+      { id: "autopilot", icon: "autopilot" },
       { id: "supportStandard", icon: "support" },
     ],
   },
@@ -148,6 +149,7 @@ export const PRICING_PLANS: PricingPlan[] = [
         price: "$0.03",
         icon: "references",
       },
+      { id: "autopilot", icon: "autopilot" },
       { id: "supportPriority", icon: "support" },
     ],
   },
@@ -172,12 +174,12 @@ export const PRICING_PLANS: PricingPlan[] = [
       { id: "social", icon: "social" },
       { id: "projectsUnlimited", icon: "projects" },
       { id: "referencesUnlimited", icon: "references" },
+      { id: "autopilot", icon: "autopilot" },
       { id: "supportDedicated", icon: "support" },
     ],
   },
 ];
 
-export const PRICING_CAROUSEL_PLANS: PricingPlan[] = [
-  ...PRICING_PLANS.filter((plan) => plan.variant === "featured"),
-  ...PRICING_PLANS.filter((plan) => plan.variant !== "featured"),
-];
+export const AUTOPILOT_PRICING_PLANS: PricingPlan[] = PRICING_PLANS.filter(
+  (plan) => plan.features.some((feature) => feature.id === "autopilot")
+);

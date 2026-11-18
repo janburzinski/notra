@@ -11,6 +11,7 @@ import {
   AUTOPILOT_HERO_SECONDARY_CTA,
   AUTOPILOT_PAGE,
 } from "@/constants/feature-pages/autopilot";
+import { AUTOPILOT_PRICING_PLANS } from "@/constants/landing/pricing";
 import { buildFeatureDetailHead } from "@/utils/feature-detail-page";
 
 export const Route = createFileRoute("/_site/features/autopilot")({
@@ -24,6 +25,7 @@ function AutopilotPage() {
       copy={AUTOPILOT_PAGE}
       footer={<FaqSection className="py-0 lg:py-0" content={AUTOPILOT_FAQ} />}
       heroSecondaryCta={AUTOPILOT_HERO_SECONDARY_CTA}
+      pricingPlans={AUTOPILOT_PRICING_PLANS}
       stage={<AutopilotStage />}
       title={AUTOPILOT_HEADLINE.map((line) => (
         <span className="block" key={line}>

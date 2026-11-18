@@ -50,7 +50,7 @@ Once a day at the time you pick, 9:00 by default. Workflows you describe can run
 
 ### What does it cost?
 
-Autopilot uses your workspace's AI credits, and only when it writes something. Runs that find nothing to do are free.
+Autopilot is included in the Growth, Scale and Enterprise plans. It uses your workspace's AI credits, and only when it writes something. Runs that find nothing to do are free.
 
 ### Can I stop it?
 

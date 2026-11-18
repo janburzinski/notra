@@ -12,7 +12,6 @@ import { PricingProShader } from "@/components/landing/pricing-pro-shader";
 import { TrackedSignupLink } from "@/components/tracked-signup-link";
 import {
   PRICING_BILLING_OPTIONS,
-  PRICING_CAROUSEL_PLANS,
   PRICING_DEFAULT_BILLING,
   PRICING_FREE_PLAN,
   PRICING_PLANS,
@@ -375,7 +374,13 @@ function PricingFreeTier() {
 export function LandingPricingSection({
   className,
   showHeader = true,
+  plans = PRICING_PLANS,
+  showFreeTier = true,
 }: LandingPricingSectionProps) {
+  const carouselPlans = [
+    ...plans.filter((plan) => plan.variant === "featured"),
+    ...plans.filter((plan) => plan.variant !== "featured"),
+  ];
   const [billingPeriod, setBillingPeriod] = useState<BillingPeriod>(
     PRICING_DEFAULT_BILLING
   );
@@ -419,12 +424,15 @@ export function LandingPricingSection({
           <div className="flex w-full flex-col items-center gap-4">
             <div
               aria-label={t("carouselLabel")}
-              className="relative -mx-6 flex w-[calc(100%+3rem)] snap-x snap-mandatory scroll-px-6 [scrollbar-width:none] gap-3 overflow-x-auto overscroll-x-contain px-6 sm:mx-0 sm:grid sm:w-full sm:max-w-[48rem] sm:grid-cols-2 sm:gap-4 sm:overflow-visible sm:px-0 lg:max-w-[80rem] lg:grid-cols-4 [&::-webkit-scrollbar]:hidden"
+              className={cn(
+                "relative -mx-6 flex w-[calc(100%+3rem)] snap-x snap-mandatory scroll-px-6 [scrollbar-width:none] gap-3 overflow-x-auto overscroll-x-contain px-6 sm:mx-0 sm:grid sm:w-full sm:max-w-[48rem] sm:grid-cols-2 sm:gap-4 sm:overflow-visible sm:px-0 lg:max-w-[80rem] lg:grid-cols-4 [&::-webkit-scrollbar]:hidden",
+                plans.length === 3 && "lg:max-w-[60rem] lg:grid-cols-3"
+              )}
               onScroll={handleCarouselScroll}
               ref={carouselRef}
               role="region"
             >
-              {PRICING_PLANS.map((plan) => (
+              {plans.map((plan) => (
                 <PricingCard
                   billingPeriod={billingPeriod}
                   key={plan.id}
@@ -433,7 +441,7 @@ export function LandingPricingSection({
               ))}
             </div>
             <div className="flex items-center sm:hidden">
-              {PRICING_CAROUSEL_PLANS.map((plan, index) => (
+              {carouselPlans.map((plan, index) => (
                 <button
                   aria-current={index === activePlan}
                   aria-label={t("carouselDot", { plan: plan.name })}
@@ -452,9 +460,11 @@ export function LandingPricingSection({
             </div>
           </div>
 
-          <div className="w-full sm:max-w-[48rem] lg:max-w-[80rem]">
-            <PricingFreeTier />
-          </div>
+          {showFreeTier ? (
+            <div className="w-full sm:max-w-[48rem] lg:max-w-[80rem]">
+              <PricingFreeTier />
+            </div>
+          ) : null}
         </div>
 
         <TrackedEnginesRow />

@@ -355,7 +355,7 @@ export const AUTOPILOT_FAQ: FaqContent = {
       id: "autopilot-cost",
       question: "What does it cost?",
       answer:
-        "Autopilot uses your workspace’s AI credits, and only when it writes something. Runs that find nothing to do are free.",
+        "Autopilot is included in the Growth, Scale and Enterprise plans. It uses your workspace’s AI credits, and only when it writes something. Runs that find nothing to do are free.",
       defaultOpen: false,
     },
     {

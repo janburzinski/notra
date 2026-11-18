@@ -1,4 +1,5 @@
 import {
+  AutopilotIcon,
   ContentIcon,
   FeedbackIcon,
   ImagesIcon,
@@ -23,4 +24,5 @@ export const PRICING_ICONS: Record<PricingIconKey, PricingIcon> = {
   references: ReferencesIcon,
   retention: RetentionIcon,
   support: SupportIcon,
+  autopilot: AutopilotIcon,
 };

@@ -43,6 +43,7 @@
     "references": "{count, number} Referenzen",
     "referencesOverage": "danach {price} pro Referenz / Monat",
     "referencesUnlimited": "Unbegrenzt viele Referenzen",
+    "autopilot": "Autopilot",
     "supportStandard": "Standard-Support + Slack",
     "supportPriority": "Priorisierter Support",
     "supportDedicated": "Persönlicher Support"

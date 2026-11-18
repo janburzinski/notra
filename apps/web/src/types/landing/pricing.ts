@@ -11,7 +11,8 @@ export type PricingIconKey =
   | "projects"
   | "references"
   | "retention"
-  | "support";
+  | "support"
+  | "autopilot";
 
 export type PricingIcon = ComponentType<SVGProps<SVGSVGElement>>;
 
@@ -77,4 +78,6 @@ export interface PricingBillingToggleProps {
 export interface LandingPricingSectionProps {
   className?: string;
   showHeader?: boolean;
+  plans?: PricingPlan[];
+  showFreeTier?: boolean;
 }
