@@ -168,7 +168,7 @@ export interface DataTableProps<T> {
   isRowClickable?: (row: T) => boolean;
   /** Extra classes for a row, e.g. to animate rows that just arrived. */
   getRowClassName?: (row: T) => string | undefined;
-  /** Menu content shown when a row is opened with the context-menu gesture. */
+  /** Menu content for a row. Return null to keep the browser's context menu. */
   renderRowContextMenu?: (row: T) => ReactNode;
   /** Full-width row rendered under a row; return null to keep it collapsed. */
   renderRowDetail?: (row: T) => ReactNode;

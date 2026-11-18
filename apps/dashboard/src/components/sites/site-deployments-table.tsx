@@ -211,6 +211,36 @@ export function SiteDeploymentsTable({
     },
   ];
 
+  const renderDeploymentMenu = (
+    deployment: SiteDeployment,
+    variant: "context" | "dropdown"
+  ) => {
+    const preview = withActions
+      ? servedPreviewForDeployment(deployment, previewRows)
+      : undefined;
+    return (
+      <SiteDeploymentMenu
+        canRollback={withActions && deployment.canRollback}
+        canPromote={withActions && deployment.canPromote}
+        canUndoRollback={withActions && deployment.canUndoRollback}
+        canRedeploy={
+          withActions && isFromSiteRepository(deployment, detail.site)
+        }
+        deployment={deployment}
+        detailHref={href(deployment)}
+        onRedeploy={() => redeploy.mutate(deployment.id)}
+        onRollback={() => setRollbackTarget(deployment)}
+        onPromote={() => setPromoteOpen(true)}
+        redeployPending={redeploy.isPending}
+        preview={preview}
+        onOpenPreview={preview ? () => openPreview(preview) : undefined}
+        onCopyShareLink={preview ? () => copyShareLink(preview) : undefined}
+        onDeletePreview={preview ? () => setDeleteTarget(preview) : undefined}
+        variant={variant}
+      />
+    );
+  };
+
   if (withActions) {
     columns.push({
       key: "actions",
@@ -218,37 +248,15 @@ export function SiteDeploymentsTable({
       header: <span className="sr-only">{t("columns.actions")}</span>,
       width: "3.25rem",
       align: "right",
-      cell: (deployment) => {
-        const preview = servedPreviewForDeployment(deployment, previewRows);
-        return (
-          <span
-            className="-my-1 flex justify-end"
-            onClick={(event) => event.stopPropagation()}
-            onKeyDown={(event) => event.stopPropagation()}
-          >
-            <SiteDeploymentMenu
-              canRollback={deployment.canRollback}
-              canPromote={deployment.canPromote}
-              canUndoRollback={deployment.canUndoRollback}
-              canRedeploy={isFromSiteRepository(deployment, detail.site)}
-              deployment={deployment}
-              detailHref={href(deployment)}
-              onRedeploy={() => redeploy.mutate(deployment.id)}
-              onRollback={() => setRollbackTarget(deployment)}
-              onPromote={() => setPromoteOpen(true)}
-              redeployPending={redeploy.isPending}
-              preview={preview}
-              onOpenPreview={preview ? () => openPreview(preview) : undefined}
-              onCopyShareLink={
-                preview ? () => copyShareLink(preview) : undefined
-              }
-              onDeletePreview={
-                preview ? () => setDeleteTarget(preview) : undefined
-              }
-            />
-          </span>
-        );
-      },
+      cell: (deployment) => (
+        <span
+          className="-my-1 flex justify-end"
+          onClick={(event) => event.stopPropagation()}
+          onKeyDown={(event) => event.stopPropagation()}
+        >
+          {renderDeploymentMenu(deployment, "dropdown")}
+        </span>
+      ),
     });
   }
 
@@ -279,6 +287,9 @@ export function SiteDeploymentsTable({
                   setPage(Math.min(Math.max(1, next), pageCount)),
               }
             : undefined
+        }
+        renderRowContextMenu={(deployment) =>
+          renderDeploymentMenu(deployment, "context")
         }
         resizable
         rowSizing="content"

@@ -2001,6 +2001,9 @@
       "refresh": "Aktualisieren",
       "done": "Fertig",
       "open": "Öffnen",
+      "viewDetails": "Details anzeigen",
+      "copyId": "ID kopieren",
+      "copyPath": "Pfad kopieren",
       "submit": "Absenden",
       "reset": "Zurücksetzen",
       "clear": "Leeren",
@@ -6316,6 +6319,7 @@
       },
       "manual": "Manuell",
       "openDraft": "Entwurf öffnen",
+      "openAutomation": "Automatisierung öffnen",
       "deletedAutomation": "Gelöschte Automation",
       "empty": {
         "title": "Keine Ausführungen",
@@ -6363,6 +6367,7 @@
       "feeNotice": "Auf Aufladungen wird eine Plattformgebühr von {percent} % erhoben. Im Tarif enthaltene Credits werden zum Selbstkostenpreis berechnet."
     },
     "invoices": {
+      "open": "Rechnung öffnen",
       "statusValue": "{status, select, paid {Bezahlt} open {Offen} draft {Entwurf} void {Storniert} uncollectible {Uneinbringlich} pending {Ausstehend} other {{status}}}",
       "empty": "Noch keine Rechnungen",
       "emptyDescription": "Rechnungen erscheinen hier nach deiner ersten Zahlung."

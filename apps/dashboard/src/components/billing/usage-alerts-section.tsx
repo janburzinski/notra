@@ -8,6 +8,7 @@ import {
 import { HugeiconsIcon } from "@hugeicons/react";
 import { MAX_USAGE_ALERTS } from "@notra/schemas/constants/usage-alerts";
 import { Badge } from "@notra/ui/components/ui/badge";
+import { ContextMenuItem } from "@notra/ui/components/ui/context-menu";
 import { Skeleton } from "@notra/ui/components/ui/skeleton";
 import { Switch } from "@notra/ui/components/ui/switch";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -96,6 +97,14 @@ export function UsageAlertsSection({
   }
 
   const controlsDisabled = membersLoading || !isOwner || mutation.isPending;
+
+  function setAlertEnabled(index: number, enabled: boolean) {
+    return saveAlerts(
+      alerts.map((alert, itemIndex) =>
+        itemIndex === index ? { ...alert, enabled } : alert
+      )
+    );
+  }
   const atAlertLimit = alerts.length >= MAX_USAGE_ALERTS;
   let alertsContent: ReactNode;
 
@@ -215,10 +224,7 @@ export function UsageAlertsSection({
               checked={alert.enabled}
               disabled={controlsDisabled}
               onCheckedChange={(enabled) => {
-                const nextAlerts = alerts.map((item, itemIndex) =>
-                  itemIndex === index ? { ...item, enabled } : item
-                );
-                void saveAlerts(nextAlerts);
+                void setAlertEnabled(index, enabled);
               }}
               size="sm"
             />
@@ -255,6 +261,24 @@ export function UsageAlertsSection({
         }
         onRowClick={
           controlsDisabled ? undefined : ({ alert }) => showEditForm(alert)
+        }
+        renderRowContextMenu={
+          controlsDisabled
+            ? undefined
+            : ({ alert, index }) => (
+                <>
+                  <ContextMenuItem onClick={() => showEditForm(alert)}>
+                    {tCommon("actions.edit")}
+                  </ContextMenuItem>
+                  <ContextMenuItem
+                    onClick={() => setAlertEnabled(index, !alert.enabled)}
+                  >
+                    {tCommon(
+                      alert.enabled ? "actions.disable" : "actions.enable"
+                    )}
+                  </ContextMenuItem>
+                </>
+              )
         }
         autoHeight={rows.length > 0}
         height={rows.length > 0 ? undefined : SETTINGS_TABLE_EMPTY_HEIGHT}

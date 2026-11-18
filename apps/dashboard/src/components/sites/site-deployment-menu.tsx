@@ -12,6 +12,10 @@ import {
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
+  ContextMenuItem,
+  ContextMenuSeparator,
+} from "@notra/ui/components/ui/context-menu";
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -22,10 +26,7 @@ import { useTranslations } from "use-intl";
 
 import { Button } from "@/components/button";
 import { useRouter } from "@/lib/navigation";
-import type {
-  SiteDeploymentMenuProps,
-  SiteDeploymentProductionActionsProps,
-} from "@/types/components/sites";
+import type { SiteDeploymentMenuProps } from "@/types/components/sites";
 import { copyTextToClipboard } from "@/utils/copy-to-clipboard";
 import { isDeploymentInProgress, shortSha } from "@/utils/site-deployments";
 
@@ -44,13 +45,106 @@ export function SiteDeploymentMenu({
   onOpenPreview,
   onCopyShareLink,
   onDeletePreview,
-}: SiteDeploymentMenuProps) {
+  variant = "dropdown",
+}: SiteDeploymentMenuProps & { variant?: "context" | "dropdown" }) {
   const t = useTranslations("sites.deployments.actions");
   const tPage = useTranslations("sites.deploymentsPage.actions");
   const tPreview = useTranslations("sites.previewsPage");
   const router = useRouter();
   const finished = !isDeploymentInProgress(deployment.status);
+  const Item = variant === "context" ? ContextMenuItem : DropdownMenuItem;
+  const Separator =
+    variant === "context" ? ContextMenuSeparator : DropdownMenuSeparator;
+  const items = (
+    <>
+      {detailHref ? (
+        <Item onClick={() => router.push(detailHref)}>
+          <HugeiconsIcon icon={ViewIcon} size={14} strokeWidth={1.75} />
+          {t("view")}
+        </Item>
+      ) : null}
+      {deployment.live && (deployment.kind === "production" || preview) ? (
+        <>
+          <Item
+            onClick={() =>
+              preview && onOpenPreview
+                ? onOpenPreview()
+                : window.open(deployment.url, "_blank", "noopener,noreferrer")
+            }
+          >
+            <HugeiconsIcon
+              icon={ArrowUpRight01Icon}
+              size={14}
+              strokeWidth={1.75}
+            />
+            {t("visit")}
+          </Item>
+          <Item
+            onClick={() =>
+              preview?.visibility === "protected" && onCopyShareLink
+                ? onCopyShareLink()
+                : copyTextToClipboard(deployment.url, tPage("copied"))
+            }
+          >
+            <HugeiconsIcon
+              icon={
+                preview?.visibility === "protected" ? Link04Icon : Copy01Icon
+              }
+              size={14}
+              strokeWidth={1.75}
+            />
+            {preview?.visibility === "protected"
+              ? tPreview("copyShareLink")
+              : tPage("copyUrl")}
+          </Item>
+        </>
+      ) : null}
+      {finished &&
+      (canRedeploy || canRollback || canPromote || canUndoRollback) &&
+      (detailHref || deployment.live) ? (
+        <Separator />
+      ) : null}
+      {finished && canRedeploy ? (
+        <Item disabled={redeployPending} onClick={onRedeploy}>
+          <HugeiconsIcon icon={RefreshIcon} size={14} strokeWidth={1.75} />
+          {t("redeploy")}
+        </Item>
+      ) : null}
+      {canRollback ? (
+        <Item onClick={onRollback}>
+          <HugeiconsIcon
+            icon={ArrowTurnBackwardIcon}
+            size={14}
+            strokeWidth={1.75}
+          />
+          {t("rollback")}
+        </Item>
+      ) : null}
+      {canPromote || canUndoRollback ? (
+        <Item onClick={onPromote}>
+          <HugeiconsIcon
+            icon={ArrowTurnBackwardIcon}
+            size={14}
+            strokeWidth={1.75}
+          />
+          {t(canUndoRollback ? "undoRollback" : "promote")}
+        </Item>
+      ) : null}
+      {preview?.served && onDeletePreview ? (
+        <>
+          <Separator />
+          <Item onClick={onDeletePreview} variant="destructive">
+            <HugeiconsIcon icon={Delete02Icon} size={14} strokeWidth={1.75} />
+            {tPreview("delete")}
+          </Item>
+        </>
+      ) : null}
+    </>
+  );
 
+  if (variant === "context") {
+    return items;
+  }
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
@@ -65,108 +159,8 @@ export function SiteDeploymentMenu({
         <HugeiconsIcon icon={MoreHorizontalIcon} size={16} />
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-52">
-        {detailHref ? (
-          <DropdownMenuItem onClick={() => router.push(detailHref)}>
-            <HugeiconsIcon icon={ViewIcon} size={14} strokeWidth={1.75} />
-            {t("view")}
-          </DropdownMenuItem>
-        ) : null}
-        {deployment.live && (deployment.kind === "production" || preview) ? (
-          <>
-            <DropdownMenuItem
-              onClick={() =>
-                preview && onOpenPreview
-                  ? onOpenPreview()
-                  : window.open(deployment.url, "_blank", "noopener,noreferrer")
-              }
-            >
-              <HugeiconsIcon
-                icon={ArrowUpRight01Icon}
-                size={14}
-                strokeWidth={1.75}
-              />
-              {t("visit")}
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={() =>
-                preview?.visibility === "protected" && onCopyShareLink
-                  ? onCopyShareLink()
-                  : copyTextToClipboard(deployment.url, tPage("copied"))
-              }
-            >
-              <HugeiconsIcon
-                icon={
-                  preview?.visibility === "protected" ? Link04Icon : Copy01Icon
-                }
-                size={14}
-                strokeWidth={1.75}
-              />
-              {preview?.visibility === "protected"
-                ? tPreview("copyShareLink")
-                : tPage("copyUrl")}
-            </DropdownMenuItem>
-          </>
-        ) : null}
-        {finished && (detailHref || deployment.live) ? (
-          <DropdownMenuSeparator />
-        ) : null}
-        {finished && canRedeploy ? (
-          <DropdownMenuItem disabled={redeployPending} onClick={onRedeploy}>
-            <HugeiconsIcon icon={RefreshIcon} size={14} strokeWidth={1.75} />
-            {t("redeploy")}
-          </DropdownMenuItem>
-        ) : null}
-        <ProductionActions
-          canRollback={canRollback}
-          canPromote={canPromote}
-          canUndoRollback={canUndoRollback}
-          onRollback={onRollback}
-          onPromote={onPromote}
-        />
-        {preview?.served && onDeletePreview ? (
-          <>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={onDeletePreview} variant="destructive">
-              <HugeiconsIcon icon={Delete02Icon} size={14} strokeWidth={1.75} />
-              {tPreview("delete")}
-            </DropdownMenuItem>
-          </>
-        ) : null}
+        {items}
       </DropdownMenuContent>
     </DropdownMenu>
-  );
-}
-
-function ProductionActions({
-  canRollback,
-  canPromote,
-  canUndoRollback,
-  onRollback,
-  onPromote,
-}: SiteDeploymentProductionActionsProps) {
-  const t = useTranslations("sites.deployments.actions");
-  return (
-    <>
-      {canRollback ? (
-        <DropdownMenuItem onClick={onRollback}>
-          <HugeiconsIcon
-            icon={ArrowTurnBackwardIcon}
-            size={14}
-            strokeWidth={1.75}
-          />
-          {t("rollback")}
-        </DropdownMenuItem>
-      ) : null}
-      {canPromote || canUndoRollback ? (
-        <DropdownMenuItem onClick={onPromote}>
-          <HugeiconsIcon
-            icon={ArrowTurnBackwardIcon}
-            size={14}
-            strokeWidth={1.75}
-          />
-          {t(canUndoRollback ? "undoRollback" : "promote")}
-        </DropdownMenuItem>
-      ) : null}
-    </>
   );
 }

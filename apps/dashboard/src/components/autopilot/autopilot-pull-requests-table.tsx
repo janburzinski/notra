@@ -8,6 +8,7 @@ import {
 import { HugeiconsIcon } from "@hugeicons/react";
 import { TruncateWithTooltip } from "@notra/ui/components/shared/truncate-with-tooltip";
 import { StatusBadge } from "@notra/ui/components/status-badge";
+import { ContextMenuItem } from "@notra/ui/components/ui/context-menu";
 import { DataTable, type TableColumn } from "ui/table";
 import { useFormatter } from "use-intl";
 
@@ -15,6 +16,7 @@ import { AutopilotFindingStatus } from "@/components/autopilot/autopilot-finding
 import { AutopilotMergeMenu } from "@/components/autopilot/autopilot-merge-menu";
 import { AutopilotTableEmpty } from "@/components/autopilot/autopilot-table-empty";
 import { Button } from "@/components/button";
+import { RowDetailsMenuItems } from "@/components/shared/row-details-menu-items";
 import { AUTOPILOT_FINDING_STATUS_BADGES } from "@/constants/autopilot";
 import {
   AUTOPILOT_EMPTY_TABLE_HEIGHT,
@@ -222,6 +224,32 @@ export function AutopilotPullRequestsTable({
           : AUTOPILOT_EMPTY_TABLE_HEIGHT
       }
       onRowClick={onOpen}
+      renderRowContextMenu={(finding) => (
+        <>
+          <RowDetailsMenuItems onOpen={() => onOpen(finding)} />
+          {finding.pullRequestUrl ? (
+            <ContextMenuItem
+              render={
+                <a
+                  href={finding.pullRequestUrl}
+                  rel="noreferrer"
+                  target="_blank"
+                />
+              }
+            >
+              View on GitHub
+            </ContextMenuItem>
+          ) : null}
+          {!readOnly && onWrite && finding.status === "suggested" ? (
+            <ContextMenuItem
+              disabled={writingId === finding.id}
+              onClick={() => onWrite(finding)}
+            >
+              Open PR
+            </ContextMenuItem>
+          ) : null}
+        </>
+      )}
       rowHeight={TABLE_ROW_HEIGHT}
     />
   );

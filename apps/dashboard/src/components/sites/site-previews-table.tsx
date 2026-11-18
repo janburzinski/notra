@@ -261,6 +261,16 @@ export function SitePreviewsTable({
         }
         onRowClick={(row) => router.push(rowHref(row))}
         onRowPointerEnter={(row) => router.prefetch(rowHref(row))}
+        renderRowContextMenu={(row) => (
+          <SitePreviewRowMenu
+            onCopyShareLink={() => copyShareLink(row)}
+            onDelete={compact ? undefined : () => setDeleteTarget(row)}
+            onOpenPreview={() => openPreview(row)}
+            onViewDeployment={() => router.push(rowHref(row))}
+            row={row}
+            variant="context"
+          />
+        )}
         rowSizing="content"
         scrollFade={false}
       />

@@ -2001,6 +2001,9 @@
       "refresh": "Refresh",
       "done": "Done",
       "open": "Open",
+      "viewDetails": "View details",
+      "copyId": "Copy ID",
+      "copyPath": "Copy path",
       "submit": "Submit",
       "reset": "Reset",
       "clear": "Clear",
@@ -6316,6 +6319,7 @@
       },
       "manual": "Manual",
       "openDraft": "Open draft",
+      "openAutomation": "Open automation",
       "deletedAutomation": "Deleted automation",
       "empty": {
         "title": "No automation runs",
@@ -6363,6 +6367,7 @@
       "feeNotice": "A {percent}% platform fee is added to top-ups. Plan-included credits are charged at cost."
     },
     "invoices": {
+      "open": "Open invoice",
       "statusValue": "{status, select, paid {Paid} open {Open} draft {Draft} void {Void} uncollectible {Uncollectible} pending {Pending} other {{status}}}",
       "empty": "No invoices yet",
       "emptyDescription": "Invoices appear here after your first payment."

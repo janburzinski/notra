@@ -6,6 +6,7 @@ import { DataTable, type TableColumn } from "ui/table";
 import { useFormatter } from "use-intl";
 
 import { AutopilotTableEmpty } from "@/components/autopilot/autopilot-table-empty";
+import { RowDetailsMenuItems } from "@/components/shared/row-details-menu-items";
 import { AUTOPILOT_EMPTY_TABLE_HEIGHT } from "@/constants/autopilot-ui";
 import { AUTOPILOT_WORKFLOW_RUN_STATUS } from "@/constants/autopilot-workflows";
 import { TABLE_ROW_HEIGHT } from "@/constants/table";
@@ -93,6 +94,9 @@ export function AutopilotWorkflowRunsTable({
           : AUTOPILOT_EMPTY_TABLE_HEIGHT
       }
       onRowClick={(run) => onSelect(run.id)}
+      renderRowContextMenu={(run) => (
+        <RowDetailsMenuItems copyId={run.id} onOpen={() => onSelect(run.id)} />
+      )}
       rowHeight={TABLE_ROW_HEIGHT}
     />
   );

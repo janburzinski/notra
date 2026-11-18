@@ -3,6 +3,10 @@
 import { Delete02Icon, SearchIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { COMPETITORS_TABLE_ROW_HEIGHT } from "@notra/geo-core/constants/geo";
+import {
+  ContextMenuItem,
+  ContextMenuSeparator,
+} from "@notra/ui/components/ui/context-menu";
 import { Input } from "@notra/ui/components/ui/input";
 import { parseAsString, useQueryState } from "nuqs";
 import { useState } from "react";
@@ -238,6 +242,7 @@ export function CompetitorsTable({
             COMPETITORS_TABLE_ROW_HEIGHT
           }
           isRowPinned={isOwnBrandRow}
+          isRowClickable={(row) => !row.isOwnBrand}
           onRowClick={(row) => {
             if (row.isOwnBrand) {
               return;
@@ -251,6 +256,37 @@ export function CompetitorsTable({
             prefetchRow(row.name);
           }}
           onSelectionChange={setSelectedIds}
+          renderRowContextMenu={(row) =>
+            row.isOwnBrand ? null : (
+              <>
+                <ContextMenuItem onClick={() => openRow(row.name)}>
+                  {tCommon("actions.viewDetails")}
+                </ContextMenuItem>
+                {row.domain ? (
+                  <ContextMenuItem
+                    render={
+                      <a
+                        href={`https://${row.domain}`}
+                        rel="noopener noreferrer"
+                        target="_blank"
+                      />
+                    }
+                  >
+                    {tCommon("actions.open")}: {row.domain}
+                  </ContextMenuItem>
+                ) : null}
+                <ContextMenuSeparator />
+                <ContextMenuItem
+                  disabled={pendingCompetitorIds.has(row.id)}
+                  onClick={() => requestDelete([row.name])}
+                  variant="destructive"
+                >
+                  <HugeiconsIcon icon={Delete02Icon} size={14} />
+                  {tCommon("actions.remove")}
+                </ContextMenuItem>
+              </>
+            )
+          }
           rowHeight={COMPETITORS_TABLE_ROW_HEIGHT}
           selectable
           selectedRowIds={selectedIds}

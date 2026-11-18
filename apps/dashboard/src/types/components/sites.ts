@@ -382,11 +382,6 @@ export interface SiteDeploymentsTableProps {
   previewRows?: SitePreviewRow[];
 }
 
-export type SiteDeploymentProductionActionsProps = Pick<
-  SiteDeploymentMenuProps,
-  "canRollback" | "canPromote" | "canUndoRollback" | "onRollback" | "onPromote"
->;
-
 export interface SiteDeploymentDetailPageProps {
   deploymentId: string;
 }
@@ -473,9 +468,10 @@ export interface SitePreviewsTableProps extends SiteScope {
 
 export interface SitePreviewRowMenuProps {
   row: SitePreviewRow;
+  onOpenPreview?: () => void;
   onCopyShareLink: () => void;
   onViewDeployment: () => void;
-  onDelete: () => void;
+  onDelete?: () => void;
 }
 
 export interface SitePreviewDeleteDialogProps extends SiteScope {

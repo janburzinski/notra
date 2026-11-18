@@ -26,6 +26,7 @@ export interface DataTableProps<TData> {
   isLoading?: boolean;
   emptyState: ReactNode;
   onRowClick?: (row: TData) => void;
+  renderRowContextMenu?: (row: TData) => ReactNode;
   sort?: SortState | null;
   onSortChange?: (sort: SortState | null) => void;
   totalCount: number;

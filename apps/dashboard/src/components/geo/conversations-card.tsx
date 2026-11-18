@@ -13,6 +13,10 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { GEO_MAX_SEQUENCES } from "@notra/geo-core/constants/geo";
 import type { GeoPromptSequence } from "@notra/geo-core/types/geo";
 import {
+  ContextMenuItem,
+  ContextMenuSeparator,
+} from "@notra/ui/components/ui/context-menu";
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -188,6 +192,8 @@ export function ConversationsCard({
   const t = useTranslations("geo.conversationsCard");
   const tGeoShared = useTranslations("geo.shared");
   const generateSequences = useGeoSequencesGenerate(organizationId);
+  const tActions = useTranslations("common.actions");
+  const tCommon = useTranslations("common");
   const [builderOpen, setBuilderOpen] = useState(false);
   const [editing, setEditing] = useState<GeoPromptSequence | null>(null);
   const [viewing, setViewing] = useState<GeoPromptSequence | null>(null);
@@ -334,6 +340,49 @@ export function ConversationsCard({
           )}
           loading={isLoading}
           onRowClick={setViewing}
+          renderRowContextMenu={(row) => (
+            <>
+              <ContextMenuItem onClick={() => setViewing(row)}>
+                {tActions("viewDetails")}
+              </ContextMenuItem>
+              <ContextMenuItem
+                disabled={runBlocked}
+                onClick={() => runSequence.mutate(row.id)}
+              >
+                <HugeiconsIcon icon={PlayIcon} size={14} />
+                {t("run")}
+              </ContextMenuItem>
+              <ContextMenuItem
+                disabled={pendingSequenceIds.has(row.id)}
+                onClick={() =>
+                  updateSequence(row.id, { enabled: !row.enabled })
+                }
+              >
+                {tCommon(
+                  row.enabled ? "labels.pauseName" : "labels.enableName",
+                  { name: row.name }
+                )}
+              </ContextMenuItem>
+              <ContextMenuItem
+                onClick={() => {
+                  setEditing(row);
+                  setBuilderOpen(true);
+                }}
+              >
+                <HugeiconsIcon icon={PencilEdit02Icon} size={14} />
+                {tActions("edit")}
+              </ContextMenuItem>
+              <ContextMenuSeparator />
+              <ContextMenuItem
+                disabled={pendingSequenceIds.has(row.id)}
+                onClick={() => removeSequence(row.id)}
+                variant="destructive"
+              >
+                <HugeiconsIcon icon={Delete02Icon} size={14} />
+                {tActions("delete")}
+              </ContextMenuItem>
+            </>
+          )}
           resizable
           rowHeight={TABLE_ROW_HEIGHT}
         />

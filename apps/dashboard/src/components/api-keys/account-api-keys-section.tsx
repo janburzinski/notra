@@ -3,9 +3,7 @@
 import {
   Add01Icon,
   AlertCircleIcon,
-  Delete02Icon,
   Dots,
-  Edit02Icon,
   InformationCircleIcon,
   UserCircleIcon,
 } from "@hugeicons/core-free-icons";
@@ -32,9 +30,6 @@ import { Alert, AlertDescription } from "@notra/ui/components/ui/alert";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@notra/ui/components/ui/dropdown-menu";
 import {
@@ -61,6 +56,7 @@ import { toast } from "sonner";
 import { DataTable, type TableColumn } from "ui/table";
 import { useTranslations } from "use-intl";
 
+import { ApiKeyMenuItems } from "@/components/api-keys/api-key-menu-items";
 import { ApiKeyPermissionBadge } from "@/components/api-keys/api-key-permission-badge";
 import { ApiKeyRevealField } from "@/components/api-keys/api-key-reveal-field";
 import { ApiKeyStatusBadge } from "@/components/api-keys/api-key-status-badge";
@@ -293,24 +289,12 @@ export function AccountApiKeysSection() {
             }
           />
           <DropdownMenuContent align="end" className="min-w-44">
-            <DropdownMenuGroup>
-              <DropdownMenuItem
-                disabled={updateMutation.isPending || deleteMutation.isPending}
-                onClick={() => openEditDialog(key)}
-              >
-                <HugeiconsIcon className="size-4" icon={Edit02Icon} />
-                {tApiKeysShared("editApiKey")}
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                disabled={updateMutation.isPending || deleteMutation.isPending}
-                onClick={() => setDeletingKey(key)}
-                variant="destructive"
-              >
-                <HugeiconsIcon className="size-4" icon={Delete02Icon} />
-                {tApiKeysShared("deleteApiKey")}
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
+            <ApiKeyMenuItems
+              disabled={updateMutation.isPending || deleteMutation.isPending}
+              onDelete={() => setDeletingKey(key)}
+              onEdit={() => openEditDialog(key)}
+              variant="dropdown"
+            />
           </DropdownMenuContent>
         </DropdownMenu>
       ),
@@ -397,6 +381,14 @@ export function AccountApiKeysSection() {
           )
         }
         getRowId={(key) => key.keyId}
+        renderRowContextMenu={(key) => (
+          <ApiKeyMenuItems
+            disabled={updateMutation.isPending || deleteMutation.isPending}
+            onDelete={() => setDeletingKey(key)}
+            onEdit={() => openEditDialog(key)}
+            variant="context"
+          />
+        )}
         height={
           isEmpty || showLoadError || isPending
             ? API_KEYS_EMPTY_TABLE_HEIGHT

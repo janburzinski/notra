@@ -6,10 +6,7 @@ import {
   expect,
   test,
 } from "bun:test";
-import { execFileSync } from "node:child_process";
-import { mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { createServer } from "node:http";
-import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -26,20 +23,49 @@ import { MENU_HIGHLIGHT_HTML } from "./constants/menu-highlight";
 let browser: Browser;
 let server: ReturnType<typeof createServer>;
 let baseUrl: string;
-const bundleDirectory = mkdtempSync(join(tmpdir(), "notra-menu-highlight-"));
 
 beforeAll(async () => {
-  const output = join(bundleDirectory, "fixture.js");
-  execFileSync(process.execPath, [
-    "build",
-    fileURLToPath(new URL("fixtures/menu-highlight.tsx", import.meta.url)),
-    "--target=browser",
-    "--define",
-    'process.env.NODE_ENV="production"',
-    "--outfile",
-    output,
-  ]);
-  const script = readFileSync(output, "utf8");
+  let script = "";
+  await build({
+    configFile: false,
+    logLevel: "silent",
+    oxc: { jsx: { runtime: "automatic", development: false } },
+    resolve: {
+      alias: [
+        {
+          find: /^@\/components\/ui\//,
+          replacement: fileURLToPath(
+            new URL("../../../packages/ui/src/components/ui/", import.meta.url)
+          ),
+        },
+      ],
+    },
+    plugins: [
+      {
+        name: "menu-highlight-fixture-js",
+        generateBundle(_options, bundle) {
+          for (const output of Object.values(bundle)) {
+            if (output.type === "chunk") {
+              script += output.code;
+            }
+          }
+        },
+      },
+    ],
+    build: {
+      write: false,
+      lib: {
+        entry: fileURLToPath(
+          new URL("fixtures/menu-highlight.tsx", import.meta.url)
+        ),
+        formats: ["iife"],
+        name: "MenuHighlightFixture",
+      },
+      rolldownOptions: { checks: { moduleLevelDirective: false } },
+    },
+    define: { "process.env.NODE_ENV": JSON.stringify("production") },
+  });
+  expect(script.length).toBeGreaterThan(0);
   const stylesheets = new Map<string, string>();
   for (const theme of ["dashboard", "web"]) {
     let css = "";
@@ -106,7 +132,67 @@ afterEach(async () => {
 afterAll(async () => {
   await browser?.close();
   server?.close();
-  rmSync(bundleDirectory, { recursive: true, force: true });
+});
+
+describe("table row context menus", () => {
+  test("mouse selection acts on the correct row without opening it", async () => {
+    const page = await browser.newPage();
+    await page.goto(`${baseUrl}/dashboard`);
+    await page.getByText("First", { exact: true }).click({ button: "right" });
+    await page.getByRole("menuitem", { name: "Action for First" }).click();
+    await browserExpect(page.getByTestId("row-result")).toHaveText(
+      "Action for First"
+    );
+  });
+
+  test("keyboard opens menus on clickable and menu-only rows", async () => {
+    const page = await browser.newPage();
+    await page.goto(`${baseUrl}/dashboard`);
+    const first = page.getByRole("row").filter({ hasText: "First" });
+    await first.focus();
+    await first.press("Shift+F10");
+    await browserExpect(
+      page.getByRole("menuitem", { name: "Action for First" })
+    ).toBeVisible();
+    await page.keyboard.press("Escape");
+    await browserExpect(page.getByRole("menu")).toBeHidden();
+    await browserExpect(first).toBeFocused();
+    await page.keyboard.press("Enter");
+    await browserExpect(page.getByTestId("row-result")).toHaveText(
+      "Opened First"
+    );
+    const menuOnly = page.getByRole("row").filter({ hasText: "Menu only" });
+    await menuOnly.press("ContextMenu");
+    await browserExpect(
+      page.getByRole("menuitem", { name: "Action for Menu only" })
+    ).toBeVisible();
+    await page.keyboard.press("Escape");
+    await browserExpect(menuOnly).toBeFocused();
+  });
+
+  test("links and selection remain independent and null menus keep native right-click", async () => {
+    const page = await browser.newPage();
+    await page.goto(`${baseUrl}/dashboard`);
+    const first = page.getByRole("row").filter({ hasText: "First" });
+    await first.getByRole("link", { name: "Row link" }).click();
+    await browserExpect(page).toHaveURL(/#first$/);
+    await first.getByRole("checkbox").click();
+    await browserExpect(page.getByTestId("row-selection")).toHaveText("First");
+    await browserExpect(page.getByTestId("row-result")).toBeEmpty();
+    await first.press("Space");
+    await browserExpect(page.getByTestId("row-result")).toHaveText(
+      "Opened First"
+    );
+    const native = page.getByText("Native", { exact: true });
+    expect(
+      await native.evaluate((element) =>
+        element.dispatchEvent(
+          new MouseEvent("contextmenu", { bubbles: true, cancelable: true })
+        )
+      )
+    ).toBe(true);
+    await browserExpect(page.getByRole("menu")).toBeHidden();
+  });
 });
 
 describe.each(["dashboard", "web"])("%s menu highlights", (theme) => {

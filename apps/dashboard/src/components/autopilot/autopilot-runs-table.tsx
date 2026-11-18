@@ -9,6 +9,7 @@ import { DataTable, type TableColumn } from "ui/table";
 import { useFormatter } from "use-intl";
 
 import { AutopilotTableEmpty } from "@/components/autopilot/autopilot-table-empty";
+import { RowDetailsMenuItems } from "@/components/shared/row-details-menu-items";
 import {
   AUTOPILOT_RUN_STATUS_BADGES,
   AUTOPILOT_RUN_TRIGGER_LABELS,
@@ -208,6 +209,9 @@ export function AutopilotRunsTable({
           : AUTOPILOT_EMPTY_TABLE_HEIGHT
       }
       onRowClick={onSelect}
+      renderRowContextMenu={(run) => (
+        <RowDetailsMenuItems copyId={run.id} onOpen={() => onSelect(run)} />
+      )}
       rowHeight={TABLE_ROW_HEIGHT}
     />
   );

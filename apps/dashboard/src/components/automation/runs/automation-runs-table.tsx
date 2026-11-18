@@ -4,6 +4,7 @@ import { ArrowUpRight01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { TruncateWithTooltip } from "@notra/ui/components/shared/truncate-with-tooltip";
 import { StatusBadge } from "@notra/ui/components/status-badge";
+import { ContextMenuItem } from "@notra/ui/components/ui/context-menu";
 import type { ReactNode } from "react";
 import { InfiniteDataTable, type TableColumn } from "ui/table";
 import { useFormatter, useNow, useTranslations } from "use-intl";
@@ -18,6 +19,7 @@ import {
   AUTOMATION_EMPTY_TABLE_HEIGHT,
   TABLE_ROW_HEIGHT,
 } from "@/constants/table";
+import { useRouter } from "@/lib/navigation";
 import type { AutomationRun } from "@/types/automation/runs";
 import { formatGeoRunDuration } from "@/utils/geo-scan-activity";
 import { latest } from "@/utils/latest-date";
@@ -43,6 +45,7 @@ export function AutomationRunsTable({
   loadingMore = false,
 }: AutomationRunsTableProps) {
   const t = useTranslations("automation.runs");
+  const router = useRouter();
   const format = useFormatter();
   // A running row's "x seconds ago" goes stale fast; tick quicker while one runs.
   const now = useNow({
@@ -169,6 +172,32 @@ export function AutomationRunsTable({
       }
       loadingMore={loadingMore}
       onEndReached={loadingMore ? undefined : onLoadMore}
+      renderRowContextMenu={(run) =>
+        automationNames?.has(run.automationId) || run.postId ? (
+          <>
+            {automationNames?.has(run.automationId) ? (
+              <ContextMenuItem
+                onClick={() =>
+                  router.push(
+                    `/${organizationSlug}/automation/${run.automationId}`
+                  )
+                }
+              >
+                {t("openAutomation")}
+              </ContextMenuItem>
+            ) : null}
+            {run.postId ? (
+              <ContextMenuItem
+                onClick={() =>
+                  router.push(`/${organizationSlug}/content/${run.postId}`)
+                }
+              >
+                {t("openDraft")}
+              </ContextMenuItem>
+            ) : null}
+          </>
+        ) : null
+      }
       rowHeight={TABLE_ROW_HEIGHT}
     />
   );

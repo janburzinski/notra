@@ -9,6 +9,7 @@ import {
 import { HugeiconsIcon } from "@hugeicons/react";
 import type { AttachmentFilter } from "@notra/schemas/dashboard/attachments";
 import { ConfirmDialog } from "@notra/ui/components/shared/confirm-dialog";
+import { ContextMenuItem } from "@notra/ui/components/ui/context-menu";
 import {
   Select,
   SelectContent,
@@ -211,6 +212,20 @@ export function AttachmentsSection() {
         height={tableHeightFor(tableRowCount, ATTACHMENT_TABLE_ROW_HEIGHT)}
         loading={isLoading}
         onRowClick={setPreviewAttachment}
+        renderRowContextMenu={(row) => (
+          <>
+            <ContextMenuItem onClick={() => setPreviewAttachment(row)}>
+              {tCommonRoot("labels.preview")}
+            </ContextMenuItem>
+            <ContextMenuItem
+              disabled={deleteManyMutation.isPending}
+              onClick={() => setConfirmKeys([row.key])}
+              variant="destructive"
+            >
+              {tCommon("delete")}
+            </ContextMenuItem>
+          </>
+        )}
         onSelectionChange={setSelectedKeys}
         rowHeight={ATTACHMENT_TABLE_ROW_HEIGHT}
         selectable

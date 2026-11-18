@@ -8,6 +8,7 @@ import {
 import { HugeiconsIcon } from "@hugeicons/react";
 import type { GeoProductSuggestion } from "@notra/geo-core/types/suggestions";
 import { StatusBadge } from "@notra/ui/components/status-badge";
+import { ContextMenuItem } from "@notra/ui/components/ui/context-menu";
 import { Spinner } from "@notra/ui/components/ui/spinner";
 import {
   Tooltip,
@@ -43,6 +44,7 @@ export function ProductPromptSuggestions({
 }: ProductPromptSuggestionsProps) {
   const t = useTranslations("geo.productSuggestions");
   const tGeoShared = useTranslations("geo.shared");
+  const tCommon = useTranslations("common");
   const { projectId } = useGeoProjectScope();
   const { data } = useGeoProductSuggestions(organizationId);
   const generate = useGeoProductSuggestionsGenerate(organizationId);
@@ -217,6 +219,27 @@ export function ProductPromptSuggestions({
         height={tableHeightFor(Math.max(visible.length, generating ? 3 : 1))}
         loading={generating && visible.length === 0}
         onRowClick={(row) => setDetailId(row.id)}
+        renderRowContextMenu={(row) => (
+          <>
+            <ContextMenuItem onClick={() => setDetailId(row.id)}>
+              {tCommon("actions.viewDetails")}
+            </ContextMenuItem>
+            <ContextMenuItem
+              disabled={busyIds.has(row.id) || generating}
+              onClick={() => run(row.id, "track")}
+            >
+              <HugeiconsIcon icon={PlusSignIcon} size={14} />
+              {tGeoShared("track")}
+            </ContextMenuItem>
+            <ContextMenuItem
+              disabled={busyIds.has(row.id) || generating}
+              onClick={() => run(row.id, "dismiss")}
+            >
+              <HugeiconsIcon icon={Cancel01Icon} size={14} />
+              {tCommon("labels.dismiss")}
+            </ContextMenuItem>
+          </>
+        )}
         rowHeight={TABLE_ROW_HEIGHT}
       />
       <ProductSuggestionSheet

@@ -3,9 +3,7 @@
 import {
   Add01Icon,
   Book01Icon,
-  Delete02Icon,
   Dots,
-  Edit02Icon,
   InformationCircleIcon,
   Key01Icon,
 } from "@hugeicons/core-free-icons";
@@ -39,9 +37,6 @@ import { Alert, AlertDescription } from "@notra/ui/components/ui/alert";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@notra/ui/components/ui/dropdown-menu";
 import {
@@ -90,6 +85,7 @@ import { DataTable, type TableColumn } from "ui/table";
 import { useTranslations } from "use-intl";
 import * as z from "zod";
 
+import { ApiKeyMenuItems } from "@/components/api-keys/api-key-menu-items";
 import { ApiKeyPermissionBadge } from "@/components/api-keys/api-key-permission-badge";
 import { ApiKeyRevealField } from "@/components/api-keys/api-key-reveal-field";
 import { ApiKeyStatusBadge } from "@/components/api-keys/api-key-status-badge";
@@ -292,7 +288,17 @@ function ApiKeysTable({
   onEdit: (key: ApiKeyListItem) => void;
 }) {
   const t = useTranslations("apiKeys");
-  const tApiKeysShared = useTranslations("apiKeys.shared");
+  const renderActions = (
+    apiKey: ApiKeyListItem,
+    variant: "context" | "dropdown"
+  ) => (
+    <ApiKeyMenuItems
+      disabled={actionsDisabled}
+      onDelete={() => onDelete(apiKey)}
+      onEdit={() => onEdit(apiKey)}
+      variant={variant}
+    />
+  );
   const tCommon2 = useTranslations("common");
   const now = useApiKeyStatusNow(keys);
   const columns: TableColumn<ApiKeyListItem>[] = [
@@ -387,24 +393,7 @@ function ApiKeysTable({
             }
           />
           <DropdownMenuContent align="end" className="min-w-44">
-            <DropdownMenuGroup>
-              <DropdownMenuItem
-                disabled={actionsDisabled}
-                onClick={() => onEdit(apiKey)}
-              >
-                <HugeiconsIcon className="size-4" icon={Edit02Icon} />
-                {tApiKeysShared("editApiKey")}
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                disabled={actionsDisabled}
-                onClick={() => onDelete(apiKey)}
-                variant="destructive"
-              >
-                <HugeiconsIcon className="size-4" icon={Delete02Icon} />
-                {tApiKeysShared("deleteApiKey")}
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
+            {renderActions(apiKey, "dropdown")}
           </DropdownMenuContent>
         </DropdownMenu>
       ),
@@ -436,6 +425,7 @@ function ApiKeysTable({
         </Empty>
       }
       getRowId={(apiKey) => apiKey.keyId}
+      renderRowContextMenu={(apiKey) => renderActions(apiKey, "context")}
       height={isEmpty ? API_KEYS_EMPTY_TABLE_HEIGHT : (visibleRows + 1) * 48}
       loading={isPending}
       rowHeight={48}

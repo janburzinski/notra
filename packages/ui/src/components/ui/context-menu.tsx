@@ -32,6 +32,8 @@ function ContextMenuTrigger({
         onKeyDown?.(event);
         if (
           !event.defaultPrevented &&
+          event.target instanceof Node &&
+          event.currentTarget.contains(event.target) &&
           (event.key === "ContextMenu" || (event.shiftKey && event.key === "F10"))
         ) {
           event.preventDefault();
@@ -39,6 +41,8 @@ function ContextMenuTrigger({
           event.currentTarget.dispatchEvent(
             new MouseEvent("contextmenu", {
               bubbles: true,
+              cancelable: true,
+              button: 2,
               clientX: bounds.left,
               clientY: bounds.bottom,
             })

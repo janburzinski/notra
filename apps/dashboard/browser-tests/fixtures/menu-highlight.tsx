@@ -16,7 +16,49 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@notra/ui/components/ui/dropdown-menu";
+import { useState } from "react";
 import { createRoot } from "react-dom/client";
+import { DataTable } from "ui/table";
+
+function RowMenuFixture() {
+  const [result, setResult] = useState("");
+  const [selected, setSelected] = useState<string[]>([]);
+  return (
+    <section className="w-[580px]">
+      <DataTable
+        columns={[
+          { key: "name", header: "Name", width: "1fr" },
+          {
+            key: "link",
+            header: "Link",
+            width: "8rem",
+            cell: (row) =>
+              row.name === "First" ? <a href="#first">Row link</a> : null,
+          },
+        ]}
+        data={[{ name: "First" }, { name: "Menu only" }, { name: "Native" }]}
+        getRowId={(row) => row.name}
+        height={200}
+        isRowClickable={(row) => row.name === "First"}
+        onRowClick={(row) => setResult(`Opened ${row.name}`)}
+        onSelectionChange={setSelected}
+        renderRowContextMenu={(row) =>
+          row.name === "Native" ? null : (
+            <ContextMenuItem
+              onClick={() => setResult(`Action for ${row.name}`)}
+            >
+              {`Action for ${row.name}`}
+            </ContextMenuItem>
+          )
+        }
+        selectable
+        selectedRowIds={selected}
+      />
+      <output data-testid="row-result">{result}</output>
+      <output data-testid="row-selection">{selected.join(", ")}</output>
+    </section>
+  );
+}
 
 function MenuHighlightFixture() {
   return (
@@ -47,6 +89,7 @@ function MenuHighlightFixture() {
           </ContextMenuSub>
         </ContextMenuContent>
       </ContextMenu>
+      <RowMenuFixture />
     </main>
   );
 }

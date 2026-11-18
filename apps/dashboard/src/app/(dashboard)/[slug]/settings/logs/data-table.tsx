@@ -21,6 +21,7 @@ export function LogsDataTable<TData>({
   isLoading,
   emptyState,
   onRowClick,
+  renderRowContextMenu,
   sort,
   onSortChange,
   totalCount,
@@ -52,6 +53,7 @@ export function LogsDataTable<TData>({
       height={height}
       loading={isLoading}
       onRowClick={onRowClick}
+      renderRowContextMenu={renderRowContextMenu}
       onSortChange={onSortChange}
       rowHeight={TABLE_ROW_HEIGHT}
       sort={sort}

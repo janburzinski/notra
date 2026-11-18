@@ -26,6 +26,7 @@ import { LogRetentionHint } from "@/components/logs/log-retention-hint";
 import { useOrganizationsContext } from "@/components/providers/organization-provider";
 import { SettingsPane } from "@/components/settings/settings-pane";
 import { SettingsTableEmpty } from "@/components/settings/settings-table-empty";
+import { RowDetailsMenuItems } from "@/components/shared/row-details-menu-items";
 import {
   SOURCE_VALUES,
   STATUS_VALUES,
@@ -34,6 +35,7 @@ import {
 } from "@/constants/logs";
 import { dashboardOrpc } from "@/lib/orpc/query";
 import type { LogSelection } from "@/types/logs/details-sheet";
+import type { Log } from "@/types/webhooks/webhooks";
 import { getLogPage } from "@/utils/log-pagination";
 
 export function LogsSettingsPane() {
@@ -42,6 +44,7 @@ export function LogsSettingsPane() {
   const columns = useLogColumns();
   const { activeOrganization } = useOrganizationsContext();
   const organizationId = activeOrganization?.id ?? "";
+  const openLog = (log: Log) => setSelection({ organizationId, log });
   const [page, setPage] = useQueryState("page", parseAsInteger.withDefault(1));
   const [rawPageSize, setPageSize] = useQueryState(
     "pageSize",
@@ -157,7 +160,13 @@ export function LogsSettingsPane() {
             )
           }
           onPageChange={setPage}
-          onRowClick={(log) => setSelection({ organizationId, log })}
+          onRowClick={openLog}
+          renderRowContextMenu={(log) => (
+            <RowDetailsMenuItems
+              copyId={log.referenceId}
+              onOpen={() => openLog(log)}
+            />
+          )}
           page={result.page}
           pageSize={pageSize}
           onPageSizeChange={setPageSize}

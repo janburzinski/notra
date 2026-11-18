@@ -7,6 +7,7 @@ import {
   formatAiTrafficTimestamp,
   formatGeoSource,
 } from "@notra/geo-core/utils/ai-traffic";
+import { ContextMenuItem } from "@notra/ui/components/ui/context-menu";
 import { useState } from "react";
 import { InstrumentEmpty, InstrumentModule, InstrumentSection } from "ui/card";
 import { InfiniteDataTable, type TableColumn } from "ui/table";
@@ -20,6 +21,7 @@ import { JourneyPathSummary } from "@/components/geo/journey-path-summary";
 import { useGeoProjectScope } from "@/components/providers/geo-project-provider";
 import { TABLE_ROW_HEIGHT } from "@/constants/table";
 import type { JourneysCardProps } from "@/types/geo";
+import { copyTextToClipboard } from "@/utils/copy-to-clipboard";
 import { withGeoProject } from "@/utils/geo-paths";
 import { tableHeightFor } from "@/utils/table";
 
@@ -34,6 +36,7 @@ export function JourneysCard({
   loading = false,
 }: JourneysCardProps) {
   const t = useTranslations("geo.journeysCard");
+  const tDetail = useTranslations("geo.journeyDetailSheet");
   const tCommon = useTranslations("common");
   const tGeoShared = useTranslations("geo.shared");
   const locale = useLocale();
@@ -148,6 +151,20 @@ export function JourneysCard({
         }
         onRowClick={onOpenJourney}
         onRowPointerEnter={onPrefetchJourney}
+        renderRowContextMenu={(row) => (
+          <>
+            <ContextMenuItem onClick={() => onOpenJourney(row)}>
+              {tCommon("actions.viewDetails")}
+            </ContextMenuItem>
+            <ContextMenuItem
+              onClick={() =>
+                copyTextToClipboard(row.journeyId, tCommon("toasts.copied"))
+              }
+            >
+              {tDetail("copyJourneyId")}
+            </ContextMenuItem>
+          </>
+        )}
         visibleRowCount={limit}
         resizable
         rowHeight={TABLE_ROW_HEIGHT}

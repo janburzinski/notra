@@ -17,6 +17,7 @@ function ContextMenuPortal({ ...props }: ContextMenuPrimitive.Portal.Props) {
 
 function ContextMenuTrigger({
   className,
+  onKeyDown,
   ...props
 }: ContextMenuPrimitive.Trigger.Props) {
   return (
@@ -24,6 +25,28 @@ function ContextMenuTrigger({
       data-slot="context-menu-trigger"
       className={cn("select-none", className)}
       {...props}
+      onKeyDown={(event) => {
+        onKeyDown?.(event);
+        if (
+          !event.defaultPrevented &&
+          event.target instanceof Node &&
+          event.currentTarget.contains(event.target) &&
+          (event.key === "ContextMenu" ||
+            (event.shiftKey && event.key === "F10"))
+        ) {
+          event.preventDefault();
+          const bounds = event.currentTarget.getBoundingClientRect();
+          event.currentTarget.dispatchEvent(
+            new MouseEvent("contextmenu", {
+              bubbles: true,
+              cancelable: true,
+              button: 2,
+              clientX: bounds.left,
+              clientY: bounds.bottom,
+            })
+          );
+        }
+      }}
     />
   );
 }

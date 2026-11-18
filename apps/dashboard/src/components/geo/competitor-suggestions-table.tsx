@@ -3,6 +3,7 @@
 import { Cancel01Icon, PlusSignIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { COMPETITORS_TABLE_ROW_HEIGHT } from "@notra/geo-core/constants/geo";
+import { ContextMenuItem } from "@notra/ui/components/ui/context-menu";
 import {
   Tooltip,
   TooltipContent,
@@ -31,6 +32,7 @@ export function CompetitorSuggestionsTable({
   const t = useTranslations("geo.competitorSuggestions");
   const tCommon = useTranslations("common");
   const tGeoShared = useTranslations("geo.shared");
+  const tActions = useTranslations("common.actions");
   const locale = useLocale();
   const ignore = useGeoCompetitorIgnore(organizationId);
   const { openRow, prefetchRow } = useGeoCompetitorRowNavigation(
@@ -140,6 +142,24 @@ export function CompetitorSuggestionsTable({
         }
         onRowClick={(row) => openRow(row.brand)}
         onRowPointerEnter={(row) => prefetchRow(row.brand)}
+        renderRowContextMenu={(row) => (
+          <>
+            <ContextMenuItem onClick={() => openRow(row.brand)}>
+              {tActions("viewDetails")}
+            </ContextMenuItem>
+            <ContextMenuItem onClick={() => onTrack(row.brand)}>
+              <HugeiconsIcon icon={PlusSignIcon} size={14} />
+              {tGeoShared("track")}
+            </ContextMenuItem>
+            <ContextMenuItem
+              disabled={ignore.isPending}
+              onClick={() => ignore.mutate({ name: row.brand, ignored: true })}
+            >
+              <HugeiconsIcon icon={Cancel01Icon} size={14} />
+              {t("dismiss")}
+            </ContextMenuItem>
+          </>
+        )}
         rowHeight={COMPETITORS_TABLE_ROW_HEIGHT}
       />
     </section>

@@ -9,6 +9,7 @@ import {
   trafficLogHostFilter,
 } from "@notra/geo-core/utils/geo-project-domains";
 import { TruncateWithTooltip } from "@notra/ui/components/shared/truncate-with-tooltip";
+import { ContextMenuItem } from "@notra/ui/components/ui/context-menu";
 import { Input } from "@notra/ui/components/ui/input";
 import { parseAsString, useQueryState } from "nuqs";
 import { InstrumentEmpty, InstrumentSection } from "ui/card";
@@ -37,6 +38,7 @@ import {
   filterTrafficPageGroupsByHost,
   groupTrafficPages,
 } from "@/utils/ai-traffic-pages";
+import { copyTextToClipboard } from "@/utils/copy-to-clipboard";
 import { geoCountColumnWidth } from "@/utils/geo-count-column-width";
 import { tableHeightFor } from "@/utils/table";
 
@@ -115,6 +117,7 @@ function TrafficPagesResults({
   isPending,
 }: TrafficPagesResultsProps) {
   const t = useTranslations("geo.trafficPagesCard");
+  const tCommon = useTranslations("common");
   if (filteredGroups.length === 0 && !isPending) {
     return (
       <InstrumentEmpty message={t("noMatch")} seed="geo-traffic-pages-filter" />
@@ -131,6 +134,17 @@ function TrafficPagesResults({
         filteredGroups.length === 0 ? PAGE_SKELETON_ROWS : filteredGroups.length
       )}
       loading={isPending}
+      renderRowContextMenu={(row) =>
+        row.path ? (
+          <ContextMenuItem
+            onClick={() =>
+              copyTextToClipboard(row.path, tCommon("toasts.copied"))
+            }
+          >
+            {tCommon("actions.copyPath")}
+          </ContextMenuItem>
+        ) : null
+      }
       resizable
       rowHeight={TABLE_ROW_HEIGHT}
     />

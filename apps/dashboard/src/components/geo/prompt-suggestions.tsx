@@ -7,6 +7,7 @@ import {
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { ConfirmDialog } from "@notra/ui/components/shared/confirm-dialog";
+import { ContextMenuItem } from "@notra/ui/components/ui/context-menu";
 import { type RefObject, useRef, useState } from "react";
 import { DataTable, type TableColumn } from "ui/table";
 import { useLocale, useTranslations } from "use-intl";
@@ -396,11 +397,12 @@ export function PromptSuggestions({
     loading || hasSuggestions || isSearchConsoleSynced(searchConsoleStatus);
   const detail = suggestions.find((row) => row.id === detailId) ?? null;
   const trackAllPending = trackAll.pending;
-  const detailBusy = isSuggestionBusy(detail, {
+  const rowActionState = {
     blocked: checking || trackAllPending,
     accepting: acceptingSuggestionIds,
     dismissing: dismissingSuggestionIds,
-  });
+  };
+  const detailBusy = isSuggestionBusy(detail, rowActionState);
 
   const columns = suggestionColumns({
     acceptingSuggestionIds,
@@ -456,6 +458,30 @@ export function PromptSuggestions({
           height={tableHeightFor(loading ? 3 : 1)}
           loading={loading}
           onRowClick={(row) => setDetailId(row.id)}
+          renderRowContextMenu={(row) => {
+            const disabled = isSuggestionBusy(row, rowActionState);
+            return (
+              <>
+                <ContextMenuItem onClick={() => setDetailId(row.id)}>
+                  {tCommon2("actions.viewDetails")}
+                </ContextMenuItem>
+                <ContextMenuItem
+                  disabled={disabled}
+                  onClick={() => acceptSuggestion(row.id)}
+                >
+                  <HugeiconsIcon icon={PlusSignIcon} size={14} />
+                  {tGeoShared("track")}
+                </ContextMenuItem>
+                <ContextMenuItem
+                  disabled={disabled}
+                  onClick={() => setConfirmDismiss(row)}
+                >
+                  <HugeiconsIcon icon={Delete02Icon} size={14} />
+                  {tCommon2("actions.remove")}
+                </ContextMenuItem>
+              </>
+            );
+          }}
           resizable
           rowHeight={TABLE_ROW_HEIGHT}
           rowSizing="content"

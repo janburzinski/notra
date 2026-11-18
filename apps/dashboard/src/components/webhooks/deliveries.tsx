@@ -25,6 +25,7 @@ import { DataTable } from "ui/table";
 import { useTranslations } from "use-intl";
 
 import { Button } from "@/components/button";
+import { RowDetailsMenuItems } from "@/components/shared/row-details-menu-items";
 import { useWebhookColumns } from "@/components/webhooks/columns";
 import {
   WEBHOOK_FILTERS,
@@ -102,6 +103,9 @@ export function WebhookDeliveries({
       height={tableHeight}
       loading={loading}
       onRowClick={onSelect}
+      renderRowContextMenu={(row) => (
+        <RowDetailsMenuItems copyId={row.id} onOpen={() => onSelect(row)} />
+      )}
       pagination={{
         mode: "cursor",
         page: Math.floor(offset / WEBHOOK_PAGE_SIZE) + 1,

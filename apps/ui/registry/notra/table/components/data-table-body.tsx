@@ -98,6 +98,7 @@ export function DataTableBodyRow<T>({
   const contentSized = rowSizing === "content";
   const cellBorder = isLastRow ? "border-b-0" : TABLE_ROW_BORDER_CLASS;
   const keyboardActivation = Boolean(onRowClick) && rowKeyboardActivation;
+  const contextMenu = renderRowContextMenu?.(entry.row);
   const tableRow = (
     <TableRow
       className={cn(
@@ -112,7 +113,11 @@ export function DataTableBodyRow<T>({
       onClick={
         onRowClick
           ? (event) => {
-              if (isInteractiveTarget(event.target)) {
+              if (
+                !(event.target instanceof Node) ||
+                !event.currentTarget.contains(event.target) ||
+                isInteractiveTarget(event.target)
+              ) {
                 return;
               }
               onRowClick(entry.row);
@@ -136,7 +141,11 @@ export function DataTableBodyRow<T>({
         onRowPointerEnter ? () => onRowPointerEnter(entry.row) : undefined
       }
       style={contentSized ? { minHeight: rowHeight } : { height: rowHeight }}
-      tabIndex={keyboardActivation ? 0 : undefined}
+      tabIndex={
+        rowKeyboardActivation && (keyboardActivation || contextMenu)
+          ? 0
+          : undefined
+      }
     >
       {selectable ? (
         <TableCell className={cn("h-auto p-0 text-center", cellBorder)}>
@@ -182,14 +191,14 @@ export function DataTableBodyRow<T>({
     </TableRow>
   );
 
-  if (!renderRowContextMenu) {
+  if (!contextMenu) {
     return tableRow;
   }
 
   return (
     <ContextMenu>
       <ContextMenuTrigger render={tableRow} />
-      <ContextMenuContent>{renderRowContextMenu(entry.row)}</ContextMenuContent>
+      <ContextMenuContent>{contextMenu}</ContextMenuContent>
     </ContextMenu>
   );
 }

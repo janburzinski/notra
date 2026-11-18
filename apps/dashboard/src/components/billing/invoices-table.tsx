@@ -2,6 +2,7 @@
 
 import { Invoice01Icon } from "@hugeicons/core-free-icons";
 import { Badge } from "@notra/ui/components/ui/badge";
+import { ContextMenuItem } from "@notra/ui/components/ui/context-menu";
 import { DataTable, type TableColumn } from "ui/table";
 import { useFormatter, useTranslations } from "use-intl";
 
@@ -16,6 +17,11 @@ export function InvoicesTable({ invoices, plans }: InvoicesTableProps) {
   const tCommon = useTranslations("common");
   const tBilling = useTranslations("billing");
   const format = useFormatter();
+  function openInvoice(invoice: BillingInvoice) {
+    if (invoice.hostedInvoiceUrl) {
+      window.open(invoice.hostedInvoiceUrl, "_blank", "noopener,noreferrer");
+    }
+  }
   const columns: TableColumn<BillingInvoice>[] = [
     {
       key: "createdAt",
@@ -89,15 +95,14 @@ export function InvoicesTable({ invoices, plans }: InvoicesTableProps) {
         invoices.length > 0 ? TABLE_MAX_HEIGHT : SETTINGS_TABLE_EMPTY_HEIGHT
       }
       isRowClickable={(invoice) => Boolean(invoice.hostedInvoiceUrl)}
-      onRowClick={(invoice) => {
-        if (invoice.hostedInvoiceUrl) {
-          window.open(
-            invoice.hostedInvoiceUrl,
-            "_blank",
-            "noopener,noreferrer"
-          );
-        }
-      }}
+      onRowClick={openInvoice}
+      renderRowContextMenu={(invoice) =>
+        invoice.hostedInvoiceUrl ? (
+          <ContextMenuItem onClick={() => openInvoice(invoice)}>
+            {t("open")}
+          </ContextMenuItem>
+        ) : null
+      }
       rowHeight={TABLE_ROW_HEIGHT}
       rowSizing="content"
     />
