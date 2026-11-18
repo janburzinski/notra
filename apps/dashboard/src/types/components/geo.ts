@@ -1,4 +1,7 @@
-import type { GeoSuggestionKeyword } from "@notra/geo-core/types/geo";
+import type {
+  GeoProduct,
+  GeoSuggestionKeyword,
+} from "@notra/geo-core/types/geo";
 import type {
   GeoCsvIssue,
   GeoCsvParseResult,
@@ -7,7 +10,7 @@ import type {
 import type { GeoSearchConsoleStatus } from "@notra/geo-core/types/google-search-console";
 import type { ReactNode } from "react";
 
-import type { GeoPromptSuggestion } from "@/types/geo";
+import type { GeoPromptSuggestion, GeoPromptTableRow } from "@/types/geo";
 import type { GeoAccessLevel } from "@/types/geo-access";
 
 export interface PromptSuggestionsProps {
@@ -198,4 +201,16 @@ export interface GeoImportDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   organizationId: string;
+}
+
+export interface PromptProductCellProps {
+  row: GeoPromptTableRow;
+  /** The project's products, main product first. */
+  products: readonly GeoProduct[];
+  disabled: boolean;
+  /** Name of the product being created for this prompt, shown while it saves. */
+  creatingName?: string;
+  onMove: (product: GeoProduct | null) => void;
+  /** Creates a product with this name and moves the prompt into it. */
+  onCreateProduct: (name: string) => void;
 }

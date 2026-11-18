@@ -48,6 +48,7 @@ import type {
   GeoProject,
   GeoPromptHistoryCheck,
   GeoResolvedModelCatalog,
+  GeoProduct,
   GeoPromptIntent,
   GeoPromptReceiptView,
   GeoPromptResult,
@@ -295,6 +296,7 @@ export interface GeoPromptTableRow {
   source: GeoTrackedPrompt["source"];
   tags: string[];
   intent: GeoPromptIntent;
+  product: GeoProduct | null;
   mentioned: number;
   total: number;
   bestPosition: number | null;

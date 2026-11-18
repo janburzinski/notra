@@ -2,10 +2,10 @@ import { DEFAULT_LANGUAGE } from "@notra/ai/constants/languages";
 import { gateway } from "@notra/ai/gateway";
 import { scrapeWebsiteForBrandAnalysis } from "@notra/ai/utils/context-dev";
 import { db } from "@notra/db/drizzle";
-import { geoSettings, projects } from "@notra/db/schema";
+import { geoProducts, geoSettings, projects } from "@notra/db/schema";
 import { bumpGeoCheckGeneration } from "@notra/db/utils/geo-check-cache";
 import { generateText, Output } from "ai";
-import { eq } from "drizzle-orm";
+import { asc, eq, sql } from "drizzle-orm";
 import { Effect } from "effect";
 
 import {
@@ -16,6 +16,7 @@ import {
   GEO_DISCOVERY_CONVERSATIONS,
   GEO_DISCOVERY_MAX_ALIASES,
   GEO_DISCOVERY_MAX_COMPETITORS,
+  GEO_DISCOVERY_MAX_PRODUCTS,
   GEO_DISCOVERY_MAX_PROMPTS,
   GEO_DISCOVERY_MAX_TOKENS,
   GEO_DISCOVERY_MIN_PROMPTS,
@@ -24,14 +25,18 @@ import {
   GEO_GAP_TITLE_MAX_LENGTH,
   GEO_PROMPT_MAX_LENGTH,
   GEO_PROMPT_MIN_LENGTH,
+  GEO_PRODUCT_NAME_MAX_LENGTH,
+  GEO_PRODUCTS_MAX,
+  GEO_PRODUCT_NICHE_MAX_LENGTH,
 } from "../constants/geo";
 import { geoWebsiteDiscoverySchema } from "../schemas/geo";
 import type { DbTransaction } from "../types/db";
 import type {
   GeoCompetitorSeed,
+  GeoDiscoveredProduct,
+  GeoDiscoveredPromptInsert,
   GeoDiscoverWebsiteResult,
   GeoGenerateFromWebsiteResult,
-  GeoPromptInsert,
   GeoScopeInput,
   GeoWebsiteDiscovery,
   GeoWebsiteGenerationWrite,
@@ -49,6 +54,7 @@ import { GeoDiscoveryError } from "./errors";
 import { invalidateGeoIngestHostsCache } from "./ingest-hosts-cache";
 import { toGeoProject } from "./mappers";
 import { loadGeoModelCatalog } from "./model-catalog";
+import { sortPromptsIntoProductsQuietly } from "./product-sort";
 import {
   insertPromptsInTransaction,
   reconcileCompetitorsInTransaction,
@@ -63,12 +69,17 @@ import {
 import { buildBrandTerms, promptMentionsBrand } from "./suggestion-keywords";
 import { geoTransaction } from "./transaction";
 
-function buildDiscoveryPrompt(
+export function buildDiscoveryPrompt(
   url: string,
   content: string,
-  language: string
+  language: string,
+  existingProducts: readonly string[] = []
 ): string {
   const year = new Date().getFullYear();
+  const keepNames =
+    existingProducts.length > 0
+      ? ` This project already tracks: ${existingProducts.map((name) => `"${name}"`).join(", ")}. When one of these still fits, copy its name exactly; add a new name only for something none of them covers.`
+      : "";
   return `Website: ${url}
 
 Website content:
@@ -81,7 +92,9 @@ Return:
 - aliases: up to ${GEO_DISCOVERY_MAX_ALIASES} specific names, spellings or domains for this company. No generic terms.
 - competitors: up to ${GEO_DISCOVERY_MAX_COMPETITORS} real products that replace this one. An integration, sponsor or underlying provider is not a competitor. For an SDK, list other SDKs, not the services it connects to. Include a bare domain only when sure; otherwise use null. Zero competitors is fine.
 - audienceType: "technical" for developer tools, APIs, infrastructure and AI products bought by technical teams; "commerce" for products or services consumers buy, book or visit; "general" for other buyers. Classify the buyer, not the industry they serve. Software sold to shops is not "commerce".
-- prompts: ${GEO_DISCOVERY_MIN_PROMPTS} to ${GEO_DISCOVERY_MAX_PROMPTS} distinct buyer questions, each with a "prompt" and "title". Fewer is fine for a narrow product.
+- products: 1 to ${GEO_DISCOVERY_MAX_PRODUCTS} things this company sells that a buyer would look for on their own, main one first. Separate apps or product lines count. One product that serves clearly different buyers or jobs may be split into niches. Give each a "name" and a "niche": who it is for and the job it does, in under 15 plain words. A company with one product and one audience lists one entry.
+  Use the exact name the site gives the product or product line, such as a model or app name, not a category you describe. A shop lists its main named product lines; never audience segments (men, women, kids), collections, sizes or sales. Plans and tiers (Pro, Teams, Enterprise), add-ons, accessories and single features do not count.${keepNames}
+- prompts: ${GEO_DISCOVERY_MIN_PROMPTS} to ${GEO_DISCOVERY_MAX_PROMPTS} distinct buyer questions, each with a "prompt", "title", "product" (a name from your products list, copied exactly) and "intent". Fewer is fine for a narrow product.
 - conversations: exactly ${GEO_DISCOVERY_CONVERSATIONS} conversations with a "name" and ordered "steps". Follow the rules below.
 
 Write questions someone would actually type into ChatGPT before finding this company. Use their words, not SEO phrases. Ask for options or a way forward; a complaint alone is not enough. Write questions before titles.
@@ -91,9 +104,98 @@ Write questions someone would actually type into ChatGPT before finding this com
 - Never name this company, its products, aliases or domain in a prompt. Do not copy its wording. Mention a direct competitor only when a buyer would naturally compare it.
 - Write every prompt in ${language}, even when the website uses another language. Do not invent claims about prices, legal deadlines, features or release dates. Each prompt must be ${GEO_PROMPT_MIN_LENGTH} to ${GEO_PROMPT_MAX_LENGTH} characters; do not append "${year}".
 
+Spread the questions across the products. Give the main product the most; every product gets at least one "problem" question, and one "list" or "comparison" question when slots allow. Do not add questions to cover more products; the count rules above still apply.
+Intent:
+- "problem": the person describes their situation or symptom and asks what to do, without naming a product type. The product should be a good answer, e.g. "my laptop gets loud and hot on every video call, what can I do about it".
+- "list": asks for options or a recommendation in the product's category.
+- "comparison": weighs named competitors of that product against each other, or asks for an alternative to one.
+- "how_to": asks how to get a specific job done that the product does.
+
 Give each question a useful article title in ${language}, under ${GEO_GAP_TITLE_MAX_LENGTH} characters. Use natural capitalization for that language. Only ranking or comparison titles may include "${year}".
 
 ${geoConversationRules("the company", language)}`;
+}
+
+function discoveredProducts(
+  products: GeoWebsiteDiscovery["products"]
+): GeoDiscoveredProduct[] {
+  const seen = new Set<string>();
+  const result: GeoDiscoveredProduct[] = [];
+  for (const product of products) {
+    const name = product.name.trim().slice(0, GEO_PRODUCT_NAME_MAX_LENGTH);
+    const key = name.toLowerCase();
+    if (name.length === 0 || seen.has(key)) {
+      continue;
+    }
+    seen.add(key);
+    const niche = product.niche.trim().slice(0, GEO_PRODUCT_NICHE_MAX_LENGTH);
+    result.push({ name, niche: niche.length > 0 ? niche : null });
+  }
+  return result;
+}
+
+/**
+ * Upserts discovered products by name and returns name to id. Existing
+ * products keep their id so prompts that already point at them stay linked.
+ */
+async function upsertDiscoveredProducts(
+  tx: DbTransaction,
+  organizationId: string,
+  projectId: string,
+  products: readonly GeoDiscoveredProduct[]
+): Promise<Map<string, string>> {
+  const ids = new Map<string, string>();
+  if (products.length === 0) {
+    return ids;
+  }
+  const existing = await tx
+    .select({ name: geoProducts.name })
+    .from(geoProducts)
+    .where(eq(geoProducts.projectId, projectId));
+  const existingNames = new Map(
+    existing.map((row) => [row.name.toLowerCase(), row.name])
+  );
+  // Existing products are always reused; new ones only fill the room left
+  // under GEO_PRODUCTS_MAX, like products added by hand.
+  let room = GEO_PRODUCTS_MAX - existing.length;
+  const kept = products.flatMap((product, position) => {
+    const known = existingNames.get(product.name.toLowerCase());
+    if (!known) {
+      if (room <= 0) {
+        return [];
+      }
+      room -= 1;
+    }
+    return [{ product, name: known ?? product.name, position }];
+  });
+  if (kept.length === 0) {
+    return ids;
+  }
+  const values = kept.map(({ product, name, position }) => ({
+    id: crypto.randomUUID(),
+    organizationId,
+    projectId,
+    name,
+    niche: product.niche,
+    position,
+  }));
+  const rows = await tx
+    .insert(geoProducts)
+    .values(values)
+    .onConflictDoUpdate({
+      target: [geoProducts.projectId, geoProducts.name],
+      set: { niche: sql`excluded.niche` },
+    })
+    .returning({ id: geoProducts.id, name: geoProducts.name });
+  const idsByName = new Map(rows.map((row) => [row.name, row.id]));
+  // Products left out for lack of room get no id; their prompts stay unfiled.
+  for (const { product, name } of kept) {
+    const id = idsByName.get(name);
+    if (id) {
+      ids.set(product.name, id);
+    }
+  }
+  return ids;
 }
 
 function unionValues(
@@ -149,7 +251,11 @@ const prepareGeoWebsiteGeneration = Effect.fn(
     companyName: discovery.companyName,
     aliases: [companyName, ...existingAliases, ...discovery.aliases],
   });
-  const entries: GeoPromptInsert[] = [];
+  const products = discoveredProducts(discovery.products);
+  const productNames = new Map(
+    products.map((product) => [product.name.toLowerCase(), product.name])
+  );
+  const entries: GeoDiscoveredPromptInsert[] = [];
 
   for (const entry of discovery.prompts) {
     const prompt = entry.prompt.trim();
@@ -161,7 +267,14 @@ const prepareGeoWebsiteGeneration = Effect.fn(
     ) {
       continue;
     }
-    entries.push({ prompt, title: title.length > 0 ? title : null });
+    entries.push({
+      prompt,
+      title: title.length > 0 ? title : null,
+      intent: entry.intent ?? null,
+      productName: entry.product
+        ? (productNames.get(entry.product.trim().toLowerCase()) ?? null)
+        : null,
+    });
   }
 
   if (entries.length === 0) {
@@ -178,7 +291,7 @@ const prepareGeoWebsiteGeneration = Effect.fn(
     GEO_DISCOVERY_CONVERSATIONS
   );
 
-  return { aliases, companyName, entries, conversations };
+  return { aliases, companyName, products, entries, conversations };
 });
 
 const scrapeWebsite = Effect.fn("geo.discover.scrape")(function* (url: string) {
@@ -199,7 +312,8 @@ const extractDiscovery = Effect.fn("geo.discover.extract")(function* (
   organizationId: string,
   url: string,
   content: string,
-  language: string
+  language: string,
+  existingProducts: readonly string[]
 ) {
   const result = yield* Effect.tryPromise({
     try: () =>
@@ -209,7 +323,7 @@ const extractDiscovery = Effect.fn("geo.discover.extract")(function* (
         }),
         providerOptions: { gateway: { tags: ["geo-discovery"] } },
         output: Output.object({ schema: geoWebsiteDiscoverySchema }),
-        prompt: buildDiscoveryPrompt(url, content, language),
+        prompt: buildDiscoveryPrompt(url, content, language, existingProducts),
         instructions: GEO_DISCOVERY_SYSTEM_PROMPT,
         maxOutputTokens: GEO_DISCOVERY_MAX_TOKENS,
       }),
@@ -228,7 +342,8 @@ export const discoverGeoWebsite = Effect.fn("geo.discoverWebsite")(function* (
   organizationId: string,
   url: string,
   fresh = false,
-  language: string = DEFAULT_LANGUAGE
+  language: string = DEFAULT_LANGUAGE,
+  existingProducts: readonly string[] = []
 ) {
   const cacheKey = geoDiscoveryCacheKey(organizationId, url, language);
   const cached = fresh
@@ -243,7 +358,8 @@ export const discoverGeoWebsite = Effect.fn("geo.discoverWebsite")(function* (
     organizationId,
     url,
     content,
-    language
+    language,
+    existingProducts
   );
   yield* writeGeoCache(cacheKey, discovery, GEO_DISCOVERY_CACHE_TTL_SECONDS);
   const result: GeoDiscoverWebsiteResult = { url, discovery };
@@ -273,6 +389,7 @@ const persistGeoWebsiteGeneration = Effect.fn(
     projectId,
     companyName,
     aliases,
+    products,
     entries,
     conversations,
     discoveredCompetitors,
@@ -335,11 +452,21 @@ const persistGeoWebsiteGeneration = Effect.fn(
     );
   }
 
+  const productIds = yield* Effect.tryPromise({
+    try: () =>
+      upsertDiscoveredProducts(tx, organizationId, projectId, products),
+    catch: (cause) =>
+      new GeoDiscoveryError({ message: "Failed to save products", cause }),
+  });
+
   const inserted = yield* insertPromptsInTransaction(
     tx,
     organizationId,
     projectId,
-    entries
+    entries.map(({ productName, ...entry }) => ({
+      ...entry,
+      productId: productName ? (productIds.get(productName) ?? null) : null,
+    }))
   );
 
   const conversationsAdded = yield* Effect.tryPromise({
@@ -418,6 +545,24 @@ const loadExistingSettings = (projectId: string) =>
       }),
   });
 
+/** Product names already tracked, so a re-run keeps the same folders. */
+const loadExistingProductNames = (projectId: string) =>
+  Effect.tryPromise({
+    try: async () => {
+      const rows = await db
+        .select({ name: geoProducts.name })
+        .from(geoProducts)
+        .where(eq(geoProducts.projectId, projectId))
+        .orderBy(asc(geoProducts.position), asc(geoProducts.createdAt));
+      return rows.map((row) => row.name);
+    },
+    catch: (cause) =>
+      new GeoDiscoveryError({
+        message: "Failed to load products",
+        cause,
+      }),
+  });
+
 export const generateGeoFromWebsite = Effect.fn("geo.generateFromWebsite")(
   function* (scopeInput: GeoScopeInput, url: string) {
     const organizationId = scopeInput.organizationId;
@@ -433,11 +578,15 @@ export const generateGeoFromWebsite = Effect.fn("geo.generateFromWebsite")(
     const existing = scope.projectId
       ? yield* loadExistingSettings(scope.projectId)
       : undefined;
+    const existingProducts = scope.projectId
+      ? yield* loadExistingProductNames(scope.projectId)
+      : [];
     const { discovery } = yield* discoverGeoWebsite(
       organizationId,
       url,
       true,
-      existing?.promptLanguage ?? DEFAULT_LANGUAGE
+      existing?.promptLanguage ?? DEFAULT_LANGUAGE,
+      existingProducts
     );
 
     const projectId = yield* ensureGeoProject(
@@ -469,7 +618,7 @@ export const generateGeoFromWebsite = Effect.fn("geo.generateFromWebsite")(
       })
     );
 
-    const { aliases, companyName, entries, conversations } =
+    const { aliases, companyName, products, entries, conversations } =
       yield* prepareGeoWebsiteGeneration(
         discovery,
         existing?.companyName,
@@ -484,6 +633,7 @@ export const generateGeoFromWebsite = Effect.fn("geo.generateFromWebsite")(
         projectId,
         companyName,
         aliases,
+        products,
         entries,
         conversations,
         discoveredCompetitors: discovery.competitors,
@@ -503,6 +653,8 @@ export const generateGeoFromWebsite = Effect.fn("geo.generateFromWebsite")(
     );
     // Cached aggregates group by the brand names saved above.
     yield* Effect.promise(() => bumpGeoCheckGeneration([organizationId]));
+
+    yield* sortPromptsIntoProductsQuietly(organizationId, projectId);
 
     yield* startGeoScanAfterWebsiteGeneration(
       organizationId,
@@ -548,7 +700,7 @@ export const setUpGeoOnProject = Effect.fn("geo.projectSetUp")(function* (
 ) {
   const { seedLanguages, discovery, generation, seedEngines } =
     yield* discoverProjectSeed(organizationId, url, languages);
-  const { aliases, companyName, entries, conversations } = generation;
+  const { aliases, companyName, products, entries, conversations } = generation;
 
   yield* geoTransaction("GEO setup failed", (tx) =>
     persistGeoWebsiteGeneration(tx, {
@@ -556,6 +708,7 @@ export const setUpGeoOnProject = Effect.fn("geo.projectSetUp")(function* (
       projectId,
       companyName,
       aliases,
+      products,
       entries,
       conversations,
       discoveredCompetitors: discovery.competitors,
@@ -594,7 +747,7 @@ export const createGeoProjectFromWebsite = Effect.fn(
 ) {
   const { seedLanguages, discovery, generation, seedEngines } =
     yield* discoverProjectSeed(organizationId, url, languages);
-  const { aliases, companyName, entries, conversations } = generation;
+  const { aliases, companyName, products, entries, conversations } = generation;
 
   const project = yield* geoTransaction("project create failed", (tx) =>
     Effect.gen(function* () {
@@ -624,6 +777,7 @@ export const createGeoProjectFromWebsite = Effect.fn(
         projectId: row.id,
         companyName,
         aliases,
+        products,
         entries,
         conversations,
         discoveredCompetitors: discovery.competitors,

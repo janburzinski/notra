@@ -486,6 +486,7 @@ export const GEO_PROMPT_MAX_LENGTH = 300;
 export const GEO_PROMPT_MAX_TAGS = 20;
 export const GEO_PROMPT_TAG_MAX_LENGTH = 40;
 export const GEO_PROMPT_INTENTS = [
+  "problem",
   "comparison",
   "list",
   "how_to",
@@ -566,6 +567,25 @@ export const GEO_DISCOVERY_MIN_COMPETITORS = 0;
 export const GEO_DISCOVERY_MAX_COMPETITORS = 10;
 export const GEO_DISCOVERY_MIN_PROMPTS = 6;
 export const GEO_DISCOVERY_MAX_PROMPTS = 10;
+/** Products or niches discovery splits a company into; the prompt budget stays shared. */
+export const GEO_DISCOVERY_MAX_PRODUCTS = 4;
+export const GEO_PRODUCT_NAME_MAX_LENGTH = 80;
+export const GEO_PRODUCT_NICHE_MAX_LENGTH = 160;
+/** Products a project can hold, discovered and added by hand together. */
+export const GEO_PRODUCTS_MAX = 10;
+/** Intents discovery labels its prompts with; "question" and "other" stay regex-only. */
+export const GEO_DISCOVERED_PROMPT_INTENTS = [
+  "problem",
+  "list",
+  "comparison",
+  "how_to",
+] as const satisfies readonly GeoPromptIntent[];
+/** Sorts prompts saved before a project had products into those products. */
+export const GEO_PRODUCT_SORT_MODEL = "openai/gpt-6-luna";
+export const GEO_PRODUCT_SORT_MAX_PROMPTS = 200;
+export const GEO_PRODUCT_SORT_MAX_TOKENS = 8000;
+/** Healthy sort calls took up to ~19 s in testing; one stuck call took 6 minutes. */
+export const GEO_PRODUCT_SORT_TIMEOUT_MS = 30_000;
 export const GEO_DISCOVERY_ALIAS_LIMIT = 8;
 export const GEO_DISCOVERY_COMPETITOR_LIMIT = 12;
 export const GEO_DISCOVERY_CACHE_PREFIX = "geo:discovery:v7";

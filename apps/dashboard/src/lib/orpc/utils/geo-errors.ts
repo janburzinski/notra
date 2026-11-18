@@ -19,6 +19,12 @@ export async function toGeoOrpcError(failure: GeoRouterError): Promise<Error> {
       return conflict(t("errors.geo.promptAlreadyTracked"));
     case "GeoPromptNotFoundError":
       return notFound("Prompt not found");
+    case "GeoProductNotFoundError":
+      return notFound("Product not found");
+    case "GeoProductDuplicateError":
+      return conflict(t("errors.geo.productExists", { name: failure.name }));
+    case "GeoProductLimitError":
+      return badRequest(t("errors.geo.productLimit", { limit: failure.limit }));
     case "GeoProjectNotFoundError":
       return notFound("Project not found");
     case "GeoProjectCreateFailedError":

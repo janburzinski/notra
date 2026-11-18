@@ -119,6 +119,7 @@ import {
   refreshSettingsAfterScanStart,
 } from "@/utils/geo-scan-results";
 import { formatGscSiteUrl } from "@/utils/gsc-site-url";
+import { withMinLoading } from "@/utils/min-loading";
 import { loadGeoPromptAnswerThread } from "@/utils/prompt-answer-thread-chunk";
 
 import { dashboardOrpc } from "../orpc/query";
@@ -1891,6 +1892,43 @@ export function useGeoSuggestionsAcceptAll(
     },
     onError: (error) => {
       toast.error(toErrorMessage(error, tToast("addPromptsFailed")));
+    },
+  });
+}
+
+/** The project's products, main product first. */
+export function useGeoProducts(organizationId: string) {
+  const { projectId } = useGeoProjectScope();
+  return useQuery({
+    ...dashboardOrpc.geo.productsList.queryOptions({
+      input: { organizationId, projectId },
+    }),
+    enabled: !!organizationId,
+  });
+}
+
+/** Adds a product by hand; the products list refreshes with it. */
+export function useGeoProductCreate(organizationId: string) {
+  const tToast = useTranslations("geo.toasts");
+  const { projectId } = useGeoProjectScope();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (input: { name: string; niche?: string }) =>
+      withMinLoading(
+        dashboardOrpc.geo.productsCreate.call({
+          organizationId,
+          projectId,
+          ...input,
+        })
+      ),
+    onSuccess: () =>
+      queryClient.invalidateQueries({
+        queryKey: dashboardOrpc.geo.productsList.queryKey({
+          input: { organizationId, projectId },
+        }),
+      }),
+    onError: (error) => {
+      toast.error(toErrorMessage(error, tToast("createProductFailed")));
     },
   });
 }

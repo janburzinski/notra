@@ -20,7 +20,11 @@ import {
   GEO_COMPETITOR_MAX_SYNONYMS,
   GEO_DISCOVERY_MAX_ALIASES,
   GEO_DISCOVERY_MAX_COMPETITORS,
+  GEO_DISCOVERED_PROMPT_INTENTS,
+  GEO_DISCOVERY_MAX_PRODUCTS,
   GEO_DISCOVERY_MAX_PROMPTS,
+  GEO_PRODUCT_NAME_MAX_LENGTH,
+  GEO_PRODUCT_NICHE_MAX_LENGTH,
   GEO_DISCOVERY_MIN_COMPETITORS,
   GEO_DISCOVERY_MIN_PROMPTS,
   GEO_EXCERPT_MAX_LENGTH,
@@ -236,6 +240,16 @@ export const geoTranslationResultSchema = object({
   translations: array(string().min(1)),
 });
 
+export const geoProductSortResultSchema = object({
+  prompts: array(
+    object({
+      index: number().int().min(0),
+      product: string().nullable(),
+      intent: enumType(GEO_DISCOVERED_PROMPT_INTENTS).nullable(),
+    })
+  ),
+});
+
 export const geoSequenceCreateInputSchema = geoOrganizationInputSchema.extend({
   id: string().uuid().optional(),
   name: string().trim().min(1).max(GEO_SHORT_FIELD_MAX_LENGTH),
@@ -340,15 +354,29 @@ export const geoPromptCreateInputSchema = geoOrganizationInputSchema.extend({
   tags: geoPromptTagsSchema.optional(),
 });
 
+export const geoProductCreateInputSchema = geoOrganizationInputSchema.extend({
+  name: string().trim().min(1).max(GEO_PRODUCT_NAME_MAX_LENGTH),
+  niche: string().trim().max(GEO_PRODUCT_NICHE_MAX_LENGTH).optional(),
+});
+
 export const geoPromptUpdateInputSchema = geoOrganizationInputSchema
   .extend({
     promptId: string().min(1),
     enabled: boolean().optional(),
     tags: geoPromptTagsSchema.optional(),
+    productId: string()
+      .min(1)
+      .max(GEO_SHORT_FIELD_MAX_LENGTH)
+      .nullable()
+      .optional(),
   })
-  .refine((value) => value.enabled !== undefined || value.tags !== undefined, {
-    message: "Provide enabled or tags",
-  });
+  .refine(
+    (value) =>
+      value.enabled !== undefined ||
+      value.tags !== undefined ||
+      value.productId !== undefined,
+    { message: "Provide enabled, tags or productId" }
+  );
 
 export const geoAutoPromptToggleInputSchema = geoOrganizationInputSchema.extend(
   {
@@ -475,10 +503,20 @@ export const geoWebsiteDiscoverySchema = object({
   )
     .min(GEO_DISCOVERY_MIN_COMPETITORS)
     .max(GEO_DISCOVERY_MAX_COMPETITORS),
+  products: array(
+    object({
+      name: string().min(1).max(GEO_PRODUCT_NAME_MAX_LENGTH),
+      niche: string().min(1).max(GEO_PRODUCT_NICHE_MAX_LENGTH),
+    })
+  )
+    .min(1)
+    .max(GEO_DISCOVERY_MAX_PRODUCTS),
   prompts: array(
     object({
       prompt: string().min(MIN_PROMPT_LENGTH).max(MAX_PROMPT_LENGTH),
       title: string().min(1).max(GEO_GAP_TITLE_MAX_LENGTH),
+      product: string().min(1),
+      intent: enumType(GEO_DISCOVERED_PROMPT_INTENTS),
     })
   )
     .min(GEO_DISCOVERY_MIN_PROMPTS)

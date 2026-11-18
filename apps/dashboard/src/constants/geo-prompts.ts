@@ -5,6 +5,7 @@ import {
 } from "@hugeicons/core-free-icons";
 import type { GeoPresenceStatus } from "@notra/geo-core/types/geo";
 import { GEO_PROMPT_FILTER_ALL } from "@notra/schemas/constants/dashboard/geo-prompts";
+import type { StatusBadgeAppearance } from "@notra/ui/types/status-badge";
 
 import type { GeoPromptTableFilters } from "@/types/geo";
 
@@ -18,6 +19,28 @@ export const GEO_PROMPT_FILTER_SELECT_CLASS = "w-36";
 
 export const GEO_PROMPT_LABEL_PILL_CLASS =
   "inline-flex h-6 max-w-full items-center gap-1.5 rounded-full border px-2 text-xs font-medium whitespace-nowrap";
+
+/**
+ * Badge variant per product, picked by discovery position. The first two use
+ * colors the presence badges don't, so the common case never reads as status.
+ */
+export const GEO_PRODUCT_BADGE_VARIANTS = [
+  "merged",
+  "info",
+  "success",
+  "warning",
+] as const satisfies readonly StatusBadgeAppearance["variant"][];
+
+/** Menu dots drawn like tiny product badges: the badge's tint and text color. */
+export const GEO_PRODUCT_DOT_CLASSES: Record<
+  (typeof GEO_PRODUCT_BADGE_VARIANTS)[number],
+  string
+> = {
+  merged: "bg-merged/25 ring-badge-merged",
+  info: "bg-info/25 ring-badge-info",
+  success: "bg-success/25 ring-badge-success",
+  warning: "bg-warning/25 ring-badge-warning",
+};
 
 export const GEO_PROMPT_PRESENCE_ICONS: Record<
   GeoPresenceStatus,

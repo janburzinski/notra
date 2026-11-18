@@ -20,6 +20,7 @@ import type { z } from "zod";
 
 import type {
   GEO_AUTO_PROMPT_IDS,
+  GEO_DISCOVERED_PROMPT_INTENTS,
   GEO_TRAFFIC_SITES_MODES,
 } from "../constants/geo";
 import type { GEO_AUDIENCE_TYPES } from "../constants/geo-model-catalog";
@@ -571,6 +572,7 @@ export interface GeoSampleDataClearResponse {
 export type GeoPromptSource = "custom" | "auto";
 
 export type GeoPromptIntent =
+  | "problem"
   | "comparison"
   | "list"
   | "how_to"
@@ -589,6 +591,19 @@ export interface GeoTrackedPrompt {
   source: GeoPromptSource;
   tags: string[];
   createdAt: string | null;
+  /** Product or niche the prompt tracks; null tracks the whole company. */
+  productId?: string | null;
+  product?: GeoProduct | null;
+  /** Intent stored at generation; null falls back to the text rules. */
+  intent?: GeoPromptIntent | null;
+}
+
+export interface GeoProduct {
+  id: string;
+  name: string;
+  niche: string | null;
+  /** Discovery order; the main product comes first. */
+  position: number;
 }
 
 export interface GeoPromptRow {
@@ -597,6 +612,8 @@ export interface GeoPromptRow {
   projectId: string;
   prompt: string;
   tags: string[];
+  productId: string | null;
+  intent: string | null;
   enabled: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -605,6 +622,18 @@ export interface GeoPromptRow {
 export interface GeoPromptUpdateChanges {
   enabled?: boolean;
   tags?: string[];
+  /** Null removes the prompt from its product. */
+  productId?: string | null;
+}
+
+export interface GeoProductCreateInput extends GeoScopeInput {
+  name: string;
+  /** Who the product is for and the job it does; optional. */
+  niche?: string | null;
+}
+
+export interface GeoProductsResponse {
+  products: GeoProduct[];
 }
 
 export interface GeoAutoPromptToggleResult {
@@ -948,6 +977,9 @@ export interface GeoGroundedInvocationOptions {
 export interface GeoDiscoveredPrompt {
   prompt: string;
   title: string;
+  /** Name from the discovered products list; onboarding edits drop it. */
+  product?: string;
+  intent?: (typeof GEO_DISCOVERED_PROMPT_INTENTS)[number];
 }
 
 export type GeoAudienceType = (typeof GEO_AUDIENCE_TYPES)[number];
@@ -957,6 +989,7 @@ export interface GeoWebsiteDiscovery {
   aliases: string[];
   audienceType: GeoAudienceType;
   competitors: GeoCompetitorSeed[];
+  products: { name: string; niche: string }[];
   prompts: GeoDiscoveredPrompt[];
   conversations: GeoGeneratedConversation[];
 }
@@ -1701,6 +1734,18 @@ export interface GeoPromptInsert {
   prompt: string;
   title?: string | null;
   enabled?: boolean;
+  productId?: string | null;
+  intent?: GeoPromptIntent | null;
+}
+
+export interface GeoDiscoveredProduct {
+  name: string;
+  niche: string | null;
+}
+
+/** A discovered prompt before its product name is resolved to a row id. */
+export interface GeoDiscoveredPromptInsert extends GeoPromptInsert {
+  productName: string | null;
 }
 
 export interface GeoInsertedPrompt {
@@ -2164,7 +2209,8 @@ export interface GeoWebsiteGenerationWrite {
   projectId: string;
   companyName: string;
   aliases: string[];
-  entries: readonly GeoPromptInsert[];
+  products: readonly GeoDiscoveredProduct[];
+  entries: readonly GeoDiscoveredPromptInsert[];
   conversations: readonly GeoGeneratedConversation[];
   discoveredCompetitors: readonly GeoCompetitorSeed[];
   /** Null keeps following the default engine set. */

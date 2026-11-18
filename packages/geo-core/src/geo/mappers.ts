@@ -1,12 +1,14 @@
 import { DEFAULT_LANGUAGE } from "@notra/ai/constants/languages";
 import type { GeoTrafficLogRow } from "@notra/analytics/types/tinybird-endpoints";
 
+import { GEO_PROMPT_INTENTS } from "../constants/geo";
 import type {
   GeoCompetitor,
   GeoCompetitorRow,
   GeoModelCatalog,
   GeoProject,
   GeoProjectResponseRow,
+  GeoPromptIntent,
   GeoPromptRow,
   GeoPromptSequence,
   GeoPromptSequenceRow,
@@ -112,7 +114,13 @@ export function toTrackedPrompt(row: GeoPromptRow): GeoTrackedPrompt {
     source: "custom",
     tags: row.tags,
     createdAt: row.createdAt.toISOString(),
+    productId: row.productId,
+    intent: toGeoPromptIntent(row.intent),
   };
+}
+
+function toGeoPromptIntent(value: string | null): GeoPromptIntent | null {
+  return GEO_PROMPT_INTENTS.find((intent) => intent === value) ?? null;
 }
 
 export function toGeoTrafficLogEntry(

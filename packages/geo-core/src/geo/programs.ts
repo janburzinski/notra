@@ -15,6 +15,7 @@ import { db } from "@notra/db/drizzle";
 import {
   brandSettings,
   geoCompetitors,
+  geoProducts,
   geoPrompts,
   geoPromptSuggestions,
   geoScans,
@@ -55,6 +56,7 @@ import {
   GEO_PROMPT_HISTORY_LIMIT,
   GEO_JOURNEY_DETAIL_LIMIT,
   GEO_MAX_COMPETITORS,
+  GEO_PRODUCTS_MAX,
   GEO_MAX_ENGINES,
   GEO_MAX_LANGUAGES,
 } from "../constants/geo";
@@ -99,6 +101,9 @@ import type {
   GeoSettingsUpsertInput,
   GeoTimeseriesResponse,
   GeoTrackedPrompt,
+  GeoProduct,
+  GeoProductCreateInput,
+  GeoProductsResponse,
   GeoTrackedPromptsResponse,
   GeoJourneyDailyPoint,
   GeoJourneySourceDailyPoint,
@@ -164,7 +169,11 @@ import { competitorKey, normalizeCompetitorDomain } from "./domain";
 import { geoDb, geoQuery, geoRequiredQuery, geoSkip } from "./effect";
 import {
   GeoCompetitorLimitError,
+  GeoDatabaseError,
   GeoPromptDuplicateError,
+  GeoProductDuplicateError,
+  GeoProductLimitError,
+  GeoProductNotFoundError,
   GeoPromptNotFoundError,
   GeoScanAlreadyRunningError,
   GeoScanEnginesEmptyError,
@@ -1742,6 +1751,94 @@ export const loadGeoTrafficPages = Effect.fn("geo.trafficPages")(function* (
   return response;
 });
 
+function findGeoProducts(projectId: string) {
+  return geoDb("products lookup failed", () =>
+    db.query.geoProducts.findMany({
+      columns: { id: true, name: true, niche: true, position: true },
+      where: eq(geoProducts.projectId, projectId),
+      orderBy: [asc(geoProducts.position), asc(geoProducts.createdAt)],
+    })
+  );
+}
+
+/** A project's products in discovery order, main product first. */
+export const listGeoProducts = Effect.fn("geo.productsList")(function* (
+  input: GeoScopeInput
+) {
+  const scope = yield* resolveGeoScope(input);
+  const products: GeoProduct[] = scope.projectId
+    ? yield* findGeoProducts(scope.projectId)
+    : [];
+  const response: GeoProductsResponse = { products };
+  return response;
+});
+
+/**
+ * Adds a product by hand after the discovered ones. Names are unique per
+ * project regardless of case, matching how website discovery reuses them.
+ */
+export const createGeoProduct = Effect.fn("geo.productsCreate")(function* (
+  input: GeoProductCreateInput
+) {
+  const scope = yield* requireGeoProject(input);
+  const name = input.name.trim();
+  const niche = input.niche?.trim() || null;
+  return yield* geoTransaction("product create failed", (tx) =>
+    Effect.gen(function* () {
+      yield* lockGeoProject(tx, scope.projectId);
+      const existing = yield* geoDb("products lookup failed", () =>
+        tx
+          .select({ name: geoProducts.name, position: geoProducts.position })
+          .from(geoProducts)
+          .where(eq(geoProducts.projectId, scope.projectId))
+      );
+      const taken = existing.find(
+        (row) => row.name.toLowerCase() === name.toLowerCase()
+      );
+      if (taken) {
+        return yield* Effect.fail(
+          new GeoProductDuplicateError({ name: taken.name })
+        );
+      }
+      if (existing.length >= GEO_PRODUCTS_MAX) {
+        return yield* Effect.fail(
+          new GeoProductLimitError({ limit: GEO_PRODUCTS_MAX })
+        );
+      }
+      const position =
+        existing.reduce((last, row) => Math.max(last, row.position), -1) + 1;
+      const [product] = yield* geoDb("product insert failed", () =>
+        tx
+          .insert(geoProducts)
+          .values({
+            id: crypto.randomUUID(),
+            organizationId: scope.organizationId,
+            projectId: scope.projectId,
+            name,
+            niche,
+            position,
+          })
+          .returning({
+            id: geoProducts.id,
+            name: geoProducts.name,
+            niche: geoProducts.niche,
+            position: geoProducts.position,
+          })
+      );
+      if (!product) {
+        return yield* Effect.fail(
+          new GeoDatabaseError({
+            label: "product insert returned no row",
+            cause: null,
+          })
+        );
+      }
+      const created: GeoProduct = product;
+      return created;
+    })
+  );
+});
+
 export const listGeoPrompts = Effect.fn("geo.promptsList")(function* (
   input: GeoScopeInput
 ) {
@@ -1755,7 +1852,7 @@ export const listGeoPrompts = Effect.fn("geo.promptsList")(function* (
   }
 
   const projectId = scope.projectId;
-  const [customRows, settingsRow] = yield* Effect.all(
+  const [customRows, productRows, settingsRow] = yield* Effect.all(
     [
       geoDb("prompts lookup failed", () =>
         db.query.geoPrompts.findMany({
@@ -1763,12 +1860,20 @@ export const listGeoPrompts = Effect.fn("geo.promptsList")(function* (
           orderBy: [desc(geoPrompts.createdAt)],
         })
       ),
+      findGeoProducts(projectId),
       geoDb("settings lookup failed", () => findGeoSettingsRow(projectId)),
     ],
     { concurrency: "unbounded" }
   );
 
-  const prompts: GeoTrackedPrompt[] = customRows.map(toTrackedPrompt);
+  const products: GeoProduct[] = productRows;
+  const productsById = new Map(
+    products.map((product) => [product.id, product])
+  );
+  const prompts: GeoTrackedPrompt[] = customRows.map((row) => ({
+    ...toTrackedPrompt(row),
+    product: row.productId ? (productsById.get(row.productId) ?? null) : null,
+  }));
 
   if (!settingsRow) {
     const emptyResponse: GeoTrackedPromptsResponse = {
@@ -1869,14 +1974,35 @@ const insertPromptsInTransaction = Effect.fn("geo.promptsInsertTx")(function* (
   yield* lockGeoProject(tx, projectId);
   const existing = yield* geoDb("prompts lookup failed", () =>
     tx.query.geoPrompts.findMany({
-      columns: { prompt: true },
+      columns: { id: true, prompt: true, productId: true, intent: true },
       where: eq(geoPrompts.projectId, projectId),
     })
   );
-  const seen = new Set(existing.map((row) => promptKey(row.prompt)));
+  const existingByKey = new Map(
+    existing.map((row) => [promptKey(row.prompt), row])
+  );
+  const seen = new Set(existingByKey.keys());
+  // A saved prompt that comes back from discovery gets its product and intent
+  // when it has none yet, so it lands in its folder. Set values are kept.
+  const links: {
+    id: string;
+    productId: string | null;
+    intent: string | null;
+  }[] = [];
   const values = entries.flatMap((entry) => {
     const prompt = entry.prompt.trim();
     const key = promptKey(prompt);
+    const saved = existingByKey.get(key);
+    if (
+      saved &&
+      ((entry.productId && !saved.productId) || (entry.intent && !saved.intent))
+    ) {
+      links.push({
+        id: saved.id,
+        productId: saved.productId ?? entry.productId ?? null,
+        intent: saved.intent ?? entry.intent ?? null,
+      });
+    }
     if (prompt.length === 0 || seen.has(key)) {
       return [];
     }
@@ -1889,9 +2015,20 @@ const insertPromptsInTransaction = Effect.fn("geo.promptsInsertTx")(function* (
         prompt,
         title: entry.title ?? null,
         enabled: entry.enabled ?? true,
+        productId: entry.productId ?? null,
+        intent: entry.intent ?? null,
       },
     ];
   });
+
+  for (const link of links) {
+    yield* geoDb("prompt product link failed", () =>
+      tx
+        .update(geoPrompts)
+        .set({ productId: link.productId, intent: link.intent })
+        .where(eq(geoPrompts.id, link.id))
+    );
+  }
 
   if (values.length === 0) {
     const none: GeoInsertedPrompt[] = [];
@@ -2103,12 +2240,31 @@ export const updateGeoPrompt = Effect.fn("geo.promptsUpdate")(function* (
   changes: GeoPromptUpdateChanges
 ) {
   const scope = yield* requireGeoProject(input);
-  const set: { enabled?: boolean; tags?: string[] } = {};
+  const set: { enabled?: boolean; tags?: string[]; productId?: string | null } =
+    {};
   if (changes.enabled !== undefined) {
     set.enabled = changes.enabled;
   }
   if (changes.tags !== undefined) {
     set.tags = normalizePromptTags(changes.tags);
+  }
+  const productId = changes.productId;
+  if (productId) {
+    const product = yield* geoDb("product lookup failed", () =>
+      db.query.geoProducts.findFirst({
+        columns: { id: true },
+        where: and(
+          eq(geoProducts.id, productId),
+          eq(geoProducts.projectId, scope.projectId)
+        ),
+      })
+    );
+    if (!product) {
+      return yield* Effect.fail(new GeoProductNotFoundError({ productId }));
+    }
+  }
+  if (productId !== undefined) {
+    set.productId = productId;
   }
   const rows = yield* geoDb("prompt update failed", () =>
     db

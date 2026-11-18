@@ -85,6 +85,24 @@ export class GeoPromptNotFoundError extends Data.TaggedError(
   readonly promptId: string;
 }> {}
 
+export class GeoProductNotFoundError extends Data.TaggedError(
+  "GeoProductNotFoundError"
+)<{
+  readonly productId: string;
+}> {}
+
+export class GeoProductDuplicateError extends Data.TaggedError(
+  "GeoProductDuplicateError"
+)<{
+  readonly name: string;
+}> {}
+
+export class GeoProductLimitError extends Data.TaggedError(
+  "GeoProductLimitError"
+)<{
+  readonly limit: number;
+}> {}
+
 export class GeoCompetitorLimitError extends Data.TaggedError(
   "GeoCompetitorLimitError"
 )<{
@@ -309,6 +327,9 @@ export type GeoRouterError =
   | GeoProjectNotFoundError
   | GeoPromptDuplicateError
   | GeoPromptNotFoundError
+  | GeoProductNotFoundError
+  | GeoProductDuplicateError
+  | GeoProductLimitError
   | GeoPromptTranslationError
   | GeoSampleDataDisabledError
   | GeoScanAlreadyRunningError

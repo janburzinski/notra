@@ -9,6 +9,7 @@ import { summarizePromptResults } from "@notra/geo-core/utils/geo-presence";
 import { geoPromptIntent } from "@notra/geo-core/utils/geo-prompt-intent";
 import { GEO_PROMPT_FILTER_ALL } from "@notra/schemas/constants/dashboard/geo-prompts";
 
+import { GEO_PRODUCT_BADGE_VARIANTS } from "@/constants/geo-prompts";
 import type {
   EngineFamilyPromptHit,
   GeoLostPromptRow,
@@ -57,6 +58,12 @@ function matchesPromptFilters(
   return fuzzyMatches([prompt.prompt, ...prompt.tags], filters.q.trim());
 }
 
+/** A product's badge variant, stable for its discovery position. */
+export function geoProductBadgeVariant(position: number) {
+  const variants = GEO_PRODUCT_BADGE_VARIANTS;
+  return variants[Math.abs(position) % variants.length] ?? variants[0];
+}
+
 export function buildPromptTableRows(
   prompts: readonly GeoTrackedPrompt[],
   results: readonly GeoPromptResultSummary[],
@@ -72,7 +79,7 @@ export function buildPromptTableRows(
   const rows: GeoPromptTableRow[] = [];
 
   for (const prompt of prompts) {
-    const intent = geoPromptIntent(prompt.prompt);
+    const intent = prompt.intent ?? geoPromptIntent(prompt.prompt);
     if (!matchesPromptFilters(prompt, intent, filters)) {
       continue;
     }
@@ -84,6 +91,7 @@ export function buildPromptTableRows(
       source: prompt.source,
       tags: prompt.tags,
       intent,
+      product: prompt.product ?? null,
       mentioned: summary?.mentioned ?? 0,
       total: summary?.total ?? 0,
       bestPosition: summary?.bestPosition ?? null,
@@ -232,6 +240,7 @@ export function promptTableRowForId(
     source: "auto",
     tags: [],
     intent: geoPromptIntent(first.prompt),
+    product: null,
     mentioned: mentioned.length,
     total: group.length,
     bestPosition: best?.position ?? null,

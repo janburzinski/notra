@@ -2,6 +2,7 @@
 
 import type {
   GeoCompetitor,
+  GeoProduct,
   GeoProject,
   GeoPromptSequence,
   GeoScopeInput,
@@ -134,6 +135,17 @@ export function useGeoPromptsDb(
     );
   };
 
+  const setPromptProduct = (promptId: string, product: GeoProduct | null) => {
+    track(
+      promptId,
+      collection.update(promptId, (draft) => {
+        draft.productId = product?.id ?? null;
+        draft.product = product;
+      }),
+      tToast("moveToProductFailed")
+    );
+  };
+
   const addTagsToPrompts = (promptIds: string[], tags: string[]) => {
     for (const promptId of promptIds) {
       track(
@@ -169,6 +181,7 @@ export function useGeoPromptsDb(
     togglePrompt,
     removePrompts,
     setPromptTags,
+    setPromptProduct,
     addTagsToPrompts,
     addPrompt,
   };

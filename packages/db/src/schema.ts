@@ -1969,6 +1969,38 @@ export const geoContentGapSnapshots = pgTable("geo_content_gap_snapshots", {
   updatedAt: timestamp("updated_at").notNull(),
 });
 
+/**
+ * Products or niches a project's prompts are split by. Discovery creates them
+ * from the website; prompts point at one so visibility can be read per product.
+ */
+export const geoProducts = pgTable(
+  "geo_products",
+  {
+    id: text("id").primaryKey(),
+    organizationId: text("organization_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "cascade" }),
+    projectId: text("project_id")
+      .notNull()
+      .references(() => projects.id, { onDelete: "cascade" }),
+    name: text("name").notNull(),
+    niche: text("niche"),
+    position: integer("position").notNull().default(0),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at")
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (table) => [
+    index("geoProducts_organizationId_idx").on(table.organizationId),
+    uniqueIndex("geoProducts_projectId_name_uidx").on(
+      table.projectId,
+      table.name
+    ),
+  ]
+);
+
 export const geoPrompts = pgTable(
   "geo_prompts",
   {
@@ -1985,6 +2017,12 @@ export const geoPrompts = pgTable(
       .array()
       .notNull()
       .default(sql`ARRAY[]::text[]`),
+    /** Product or niche the prompt tracks. Null means the whole company. */
+    productId: text("product_id").references(() => geoProducts.id, {
+      onDelete: "set null",
+    }),
+    /** Intent set when the prompt was generated; null falls back to the text rules. */
+    intent: text("intent"),
     enabled: boolean("enabled").notNull().default(true),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at")
@@ -1994,6 +2032,7 @@ export const geoPrompts = pgTable(
   },
   (table) => [
     index("geoPrompts_organizationId_idx").on(table.organizationId),
+    index("geoPrompts_productId_idx").on(table.productId),
     index("geoPrompts_projectId_createdAt_idx").on(
       table.projectId,
       table.createdAt.desc()

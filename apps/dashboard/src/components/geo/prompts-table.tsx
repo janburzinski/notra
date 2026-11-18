@@ -54,6 +54,7 @@ import { GeoRemoveDialog } from "@/components/geo/geo-remove-dialog";
 import { PromptPresenceBadge } from "@/components/geo/prompt-badges";
 import { PromptDetailDialog } from "@/components/geo/prompt-detail-dialog";
 import { PromptMentionedInsteadCell } from "@/components/geo/prompt-mentioned-instead-cell";
+import { PromptProductCell } from "@/components/geo/prompt-product-cell";
 import { PromptTagsActionDialog } from "@/components/geo/prompt-tags-action-dialog";
 import { GEO_PROMPT_DETAIL_SURFACES } from "@/constants/geo-analytics";
 import {
@@ -61,7 +62,11 @@ import {
   GEO_PROMPT_DETAIL_QUERY_KEY,
   GEO_PROMPT_FILTER_SELECT_CLASS,
 } from "@/constants/geo-prompts";
-import { usePrefetchGeoPromptAnswer } from "@/lib/hooks/use-geo";
+import {
+  useGeoProductCreate,
+  useGeoProducts,
+  usePrefetchGeoPromptAnswer,
+} from "@/lib/hooks/use-geo";
 import { useGeoCompetitorsDb, useGeoPromptsDb } from "@/lib/hooks/use-geo-db";
 import { useGeoPromptIntentLabel } from "@/lib/hooks/use-geo-prompt-intent-label";
 import { useGeoPromptSourceLabels } from "@/lib/hooks/use-geo-prompt-source-labels";
@@ -191,8 +196,11 @@ export function PromptsTable({
     togglePrompt,
     removePrompts,
     setPromptTags,
+    setPromptProduct,
     addTagsToPrompts,
   } = useGeoPromptsDb(organizationId);
+  const { data: productsData } = useGeoProducts(organizationId);
+  const products = productsData?.products ?? [];
   const [search, setSearch] = useQueryState(
     "q",
     parseAsString.withDefault("").withOptions({ clearOnDefault: true })
@@ -222,6 +230,27 @@ export function PromptsTable({
     null
   );
   const [detail, setDetail] = useState<GeoPromptTableRow | null>(null);
+  const createProduct = useGeoProductCreate(organizationId);
+  // Prompt id to the product name being created for it; several rows can
+  // create at once, so each awaits its own call instead of shared callbacks.
+  const [creatingProducts, setCreatingProducts] = useState<
+    Record<string, string>
+  >({});
+  const handleCreateProduct = async (promptId: string, name: string) => {
+    setCreatingProducts((current) => ({ ...current, [promptId]: name }));
+    try {
+      const product = await createProduct.mutateAsync({ name });
+      setPromptProduct(promptId, product);
+    } catch {
+      // The mutation's onError already showed the toast.
+    } finally {
+      setCreatingProducts((current) =>
+        Object.fromEntries(
+          Object.entries(current).filter(([id]) => id !== promptId)
+        )
+      );
+    }
+  };
   const [linkedPromptId, setLinkedPromptId] = useQueryState(
     GEO_PROMPT_DETAIL_QUERY_KEY,
     parseAsString
@@ -363,6 +392,31 @@ export function PromptsTable({
         </button>
       ),
     },
+    ...(products.length > 0
+      ? [
+          {
+            key: "product",
+            header: t("columns.product"),
+            width: "14rem",
+            minWidth: "8rem",
+            sortable: true,
+            cell: (row: GeoPromptTableRow) => (
+              <PromptProductCell
+                disabled={pendingPromptIds.has(row.id)}
+                creatingName={creatingProducts[row.id]}
+                onCreateProduct={(name) => {
+                  void handleCreateProduct(row.id, name);
+                }}
+                onMove={(product) => setPromptProduct(row.id, product)}
+                products={products}
+                row={row}
+              />
+            ),
+            sortValue: (row: GeoPromptTableRow) =>
+              row.product?.position ?? Number.MAX_SAFE_INTEGER,
+          } satisfies TableColumn<GeoPromptTableRow>,
+        ]
+      : []),
     {
       key: "mentionedInstead",
       header: t("columns.mentionedInstead"),
@@ -407,6 +461,17 @@ export function PromptsTable({
       ),
     },
   ];
+
+  const renderRowContextMenu = (row: GeoPromptTableRow) => (
+    <PromptTableContextMenu
+      isPending={pendingPromptIds.has(row.id)}
+      onDelete={() => requestDelete([row])}
+      onEditTags={() => setTagsTarget({ mode: "edit", rows: [row] })}
+      onOpenDetails={() => setDetail(row)}
+      onEnable={() => togglePrompt(row.id, true)}
+      row={row}
+    />
+  );
 
   if (noPromptsTracked && !isScanning) {
     return (
@@ -561,16 +626,7 @@ export function PromptsTable({
         height={PROMPTS_TABLE_HEIGHT}
         onRowClick={setDetail}
         onSelectionChange={setSelectedIds}
-        renderRowContextMenu={(row) => (
-          <PromptTableContextMenu
-            isPending={pendingPromptIds.has(row.id)}
-            onDelete={() => requestDelete([row])}
-            onEditTags={() => setTagsTarget({ mode: "edit", rows: [row] })}
-            onOpenDetails={() => setDetail(row)}
-            onEnable={() => togglePrompt(row.id, true)}
-            row={row}
-          />
-        )}
+        renderRowContextMenu={renderRowContextMenu}
         resizable
         rowHeight={PROMPTS_TABLE_ROW_HEIGHT}
         selectable

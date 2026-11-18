@@ -1040,6 +1040,8 @@
       "websiteDiscoveryFailed": "We couldn't analyze that website. Check the URL and try again.",
       "writerPlanFailed": "The content plan couldn't be created or saved. Please try again.",
       "promptAlreadyTracked": "This prompt is already tracked",
+      "productExists": "A product named {name} already exists",
+      "productLimit": "A project can have up to {limit} products",
       "lastProjectDelete": "You cannot delete your last project. Create another one first.",
       "projectHasSitesDelete": "This project has hosted sites. Delete its sites before deleting the project.",
       "createBrandIdentityFirst": "Create a brand identity first",
@@ -3407,7 +3409,8 @@
     },
     "promptBadges": {
       "intent": {
-        "how_to": "How to"
+        "how_to": "How to",
+        "problem": "Problem"
       },
       "presence": {
         "training-data": "In knowledge",
@@ -3515,8 +3518,15 @@
       "tagsCustomOnly": "Tags apply to custom prompts. Auto-generated prompts were skipped.",
       "columns": {
         "presence": "Presence",
-        "mentionedInstead": "Mentioned instead"
+        "mentionedInstead": "Mentioned instead",
+        "product": "Product"
       },
+      "noProduct": "No product",
+      "moveTo": "Move to",
+      "moveToPlaceholder": "Move to…",
+      "createProduct": "Create",
+      "noProductMatches": "No matching product",
+      "changeProductAria": "Change product of {prompt}",
       "filterAria": "Filter prompts",
       "filterPlaceholder": "Filter prompts…",
       "filterByIntent": "Filter by intent",
@@ -4463,6 +4473,8 @@
       "updatePromptFailed": "Failed to update prompt",
       "removePromptFailed": "Failed to remove prompt",
       "updateTagsFailed": "Failed to update tags",
+      "moveToProductFailed": "Failed to move prompt",
+      "createProductFailed": "Could not create product",
       "updateProjectBrandIdentityFailed": "Failed to update project brand identity",
       "deleteProjectFailed": "Failed to delete project",
       "saveCompetitorFailed": "Failed to save competitor",

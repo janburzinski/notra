@@ -1040,6 +1040,8 @@
       "websiteDiscoveryFailed": "Wir konnten diese Website nicht analysieren. Prüfe die URL und versuche es erneut.",
       "writerPlanFailed": "Der Inhaltsplan konnte nicht erstellt oder gespeichert werden. Bitte versuche es erneut.",
       "promptAlreadyTracked": "Dieser Prompt wird bereits getrackt",
+      "productExists": "Ein Produkt namens {name} gibt es schon",
+      "productLimit": "Ein Projekt kann bis zu {limit} Produkte haben",
       "lastProjectDelete": "Du kannst dein letztes Projekt nicht löschen. Erstelle zuerst ein weiteres.",
       "projectHasSitesDelete": "Dieses Projekt hat gehostete Seiten. Lösche seine Seiten, bevor du das Projekt löschst.",
       "createBrandIdentityFirst": "Erstelle zuerst eine Markenidentität",
@@ -3407,7 +3409,8 @@
     },
     "promptBadges": {
       "intent": {
-        "how_to": "Anleitung"
+        "how_to": "Anleitung",
+        "problem": "Problem"
       },
       "presence": {
         "training-data": "Im Wissen",
@@ -3515,8 +3518,15 @@
       "tagsCustomOnly": "Tags gelten nur für eigene Prompts. Automatisch erzeugte Prompts wurden übersprungen.",
       "columns": {
         "presence": "Präsenz",
-        "mentionedInstead": "Stattdessen genannt"
+        "mentionedInstead": "Stattdessen genannt",
+        "product": "Produkt"
       },
+      "noProduct": "Kein Produkt",
+      "moveTo": "Verschieben nach",
+      "moveToPlaceholder": "Verschieben nach…",
+      "createProduct": "Erstellen",
+      "noProductMatches": "Kein passendes Produkt",
+      "changeProductAria": "Produkt von {prompt} ändern",
       "filterAria": "Prompts filtern",
       "filterPlaceholder": "Prompts filtern…",
       "filterByIntent": "Nach Intention filtern",
@@ -4463,6 +4473,8 @@
       "updatePromptFailed": "Prompt konnte nicht aktualisiert werden",
       "removePromptFailed": "Prompt konnte nicht entfernt werden",
       "updateTagsFailed": "Tags konnten nicht aktualisiert werden",
+      "moveToProductFailed": "Prompt konnte nicht verschoben werden",
+      "createProductFailed": "Produkt konnte nicht erstellt werden",
       "updateProjectBrandIdentityFailed": "Markenidentität des Projekts konnte nicht aktualisiert werden",
       "deleteProjectFailed": "Projekt konnte nicht gelöscht werden",
       "saveCompetitorFailed": "Wettbewerber konnte nicht gespeichert werden",

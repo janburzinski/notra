@@ -131,7 +131,7 @@ export const geoPromptsCollection = createCollectionFactory<GeoTrackedPrompt>({
       prompt: item.prompt,
       tags: item.tags,
     }),
-  update: (scope, key, modified) =>
+  update: (scope, key, modified, original) =>
     modified.source === "auto" || isGeoAutoPromptId(key)
       ? dashboardOrpc.geo.promptsToggleAuto.call({
           ...scope,
@@ -143,6 +143,9 @@ export const geoPromptsCollection = createCollectionFactory<GeoTrackedPrompt>({
           promptId: key,
           enabled: modified.enabled,
           tags: modified.tags,
+          ...(modified.productId === original.productId
+            ? {}
+            : { productId: modified.productId ?? null }),
         }),
   remove: (scope, original) =>
     dashboardOrpc.geo.promptsDelete.call({ ...scope, promptId: original.id }),
