@@ -3,6 +3,7 @@ export const FEATURE_DETAIL_SLUGS = [
   "conversations",
   "ai-crawler-logs",
   "sites",
+  "free-scan",
 ] as const;
 
 export const FEATURE_DETAIL_PATHS = FEATURE_DETAIL_SLUGS.map(

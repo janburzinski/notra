@@ -54,5 +54,6 @@ export type HeroVariantCopy = HeroHeadlineLineTwo & {
 
 export interface HeroWebsiteFormProps {
   cta: string;
-  onSubmit: () => void;
+  onSubmit?: () => void;
+  source?: string;
 }

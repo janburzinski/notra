@@ -24,6 +24,7 @@ export function FeatureDetailPage({
   copy,
   title,
   stage,
+  heroActions,
   overviewVisual,
   overviewVisualFirst = false,
   children,
@@ -43,22 +44,28 @@ export function FeatureDetailPage({
         subtitle={copy.heroSubtitle}
         title={title}
       >
-        <CtaButton
-          nativeButton={false}
-          render={<TrackedSignupLink source={`${copy.signupSource}_hero`} />}
-          size="lg"
-          variant="primary"
-        >
-          {CTA_BANNER_PRIMARY_LABEL}
-        </CtaButton>
-        <CtaButton
-          nativeButton={false}
-          render={<Link to={CTA_BANNER_CONTACT_HREF} />}
-          size="lg"
-          variant="light"
-        >
-          {CTA_BANNER_SECONDARY_LABEL}
-        </CtaButton>
+        {heroActions ?? (
+          <>
+            <CtaButton
+              nativeButton={false}
+              render={
+                <TrackedSignupLink source={`${copy.signupSource}_hero`} />
+              }
+              size="lg"
+              variant="primary"
+            >
+              {CTA_BANNER_PRIMARY_LABEL}
+            </CtaButton>
+            <CtaButton
+              nativeButton={false}
+              render={<Link to={CTA_BANNER_CONTACT_HREF} />}
+              size="lg"
+              variant="light"
+            >
+              {CTA_BANNER_SECONDARY_LABEL}
+            </CtaButton>
+          </>
+        )}
       </MarketingHeroWash>
 
       {children ?? (

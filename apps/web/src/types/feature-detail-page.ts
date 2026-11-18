@@ -39,6 +39,7 @@ export interface FeatureDetailPageProps {
   copy: FeatureDetailCopy;
   title: ReactNode;
   stage: ReactNode;
+  heroActions?: ReactNode;
   overviewVisual?: ReactNode;
   overviewVisualFirst?: boolean;
   children?: ReactNode;
@@ -128,4 +129,15 @@ export interface FeatureTableCardProps {
   columns: ReactNode;
   head: ReactNode;
   children: ReactNode;
+}
+
+export interface FeatureFreeScanRow {
+  prompt: string;
+  rank: FeatureRank;
+  leader: string;
+}
+
+export interface FeatureFreeScanStat {
+  label: string;
+  value: string;
 }

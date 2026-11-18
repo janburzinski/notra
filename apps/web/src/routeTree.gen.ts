@@ -78,6 +78,7 @@ import { Route as SiteDataIndexDotjsonRouteImport } from './routes/_site/data/in
 import { Route as SiteFeaturesIndexRouteImport } from './routes/_site/features/index'
 import { Route as SiteFeaturesAiCrawlerLogsRouteImport } from './routes/_site/features/ai-crawler-logs'
 import { Route as SiteFeaturesConversationsRouteImport } from './routes/_site/features/conversations'
+import { Route as SiteFeaturesFreeScanRouteImport } from './routes/_site/features/free-scan'
 import { Route as SiteFeaturesPersonasRouteImport } from './routes/_site/features/personas'
 import { Route as SiteFeaturesSitesRouteImport } from './routes/_site/features/sites'
 import { Route as SiteIntegrationsIndexRouteImport } from './routes/_site/integrations/index'
@@ -465,6 +466,11 @@ const SiteFeaturesConversationsRoute =
     path: '/features/conversations',
     getParentRoute: () => SiteRoute,
   } as any)
+const SiteFeaturesFreeScanRoute = SiteFeaturesFreeScanRouteImport.update({
+  id: '/features/free-scan',
+  path: '/features/free-scan',
+  getParentRoute: () => SiteRoute,
+} as any)
 const SiteFeaturesPersonasRoute = SiteFeaturesPersonasRouteImport.update({
   id: '/features/personas',
   path: '/features/personas',
@@ -716,6 +722,7 @@ export interface FileRoutesByFullPath {
   '/data/index.json': typeof SiteDataIndexDotjsonRoute
   '/features/ai-crawler-logs': typeof SiteFeaturesAiCrawlerLogsRoute
   '/features/conversations': typeof SiteFeaturesConversationsRoute
+  '/features/free-scan': typeof SiteFeaturesFreeScanRoute
   '/features/personas': typeof SiteFeaturesPersonasRoute
   '/features/sites': typeof SiteFeaturesSitesRoute
   '/integrations/$id': typeof SiteIntegrationsIdRoute
@@ -818,6 +825,7 @@ export interface FileRoutesByTo {
   '/data/index.json': typeof SiteDataIndexDotjsonRoute
   '/features/ai-crawler-logs': typeof SiteFeaturesAiCrawlerLogsRoute
   '/features/conversations': typeof SiteFeaturesConversationsRoute
+  '/features/free-scan': typeof SiteFeaturesFreeScanRoute
   '/features/personas': typeof SiteFeaturesPersonasRoute
   '/features/sites': typeof SiteFeaturesSitesRoute
   '/integrations/$id': typeof SiteIntegrationsIdRoute
@@ -925,6 +933,7 @@ export interface FileRoutesById {
   '/_site/data/index.json': typeof SiteDataIndexDotjsonRoute
   '/_site/features/ai-crawler-logs': typeof SiteFeaturesAiCrawlerLogsRoute
   '/_site/features/conversations': typeof SiteFeaturesConversationsRoute
+  '/_site/features/free-scan': typeof SiteFeaturesFreeScanRoute
   '/_site/features/personas': typeof SiteFeaturesPersonasRoute
   '/_site/features/sites': typeof SiteFeaturesSitesRoute
   '/_site/integrations/$id': typeof SiteIntegrationsIdRoute
@@ -1029,6 +1038,7 @@ export interface FileRouteTypes {
     | '/data/index.json'
     | '/features/ai-crawler-logs'
     | '/features/conversations'
+    | '/features/free-scan'
     | '/features/personas'
     | '/features/sites'
     | '/integrations/$id'
@@ -1131,6 +1141,7 @@ export interface FileRouteTypes {
     | '/data/index.json'
     | '/features/ai-crawler-logs'
     | '/features/conversations'
+    | '/features/free-scan'
     | '/features/personas'
     | '/features/sites'
     | '/integrations/$id'
@@ -1237,6 +1248,7 @@ export interface FileRouteTypes {
     | '/_site/data/index.json'
     | '/_site/features/ai-crawler-logs'
     | '/_site/features/conversations'
+    | '/_site/features/free-scan'
     | '/_site/features/personas'
     | '/_site/features/sites'
     | '/_site/integrations/$id'
@@ -1813,6 +1825,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SiteFeaturesConversationsRouteImport
       parentRoute: typeof SiteRoute
     }
+    '/_site/features/free-scan': {
+      id: '/_site/features/free-scan'
+      path: '/features/free-scan'
+      fullPath: '/features/free-scan'
+      preLoaderRoute: typeof SiteFeaturesFreeScanRouteImport
+      parentRoute: typeof SiteRoute
+    }
     '/_site/features/personas': {
       id: '/_site/features/personas'
       path: '/features/personas'
@@ -2134,6 +2153,7 @@ interface SiteRouteChildren {
   SiteDataIndexDotjsonRoute: typeof SiteDataIndexDotjsonRoute
   SiteFeaturesAiCrawlerLogsRoute: typeof SiteFeaturesAiCrawlerLogsRoute
   SiteFeaturesConversationsRoute: typeof SiteFeaturesConversationsRoute
+  SiteFeaturesFreeScanRoute: typeof SiteFeaturesFreeScanRoute
   SiteFeaturesPersonasRoute: typeof SiteFeaturesPersonasRoute
   SiteFeaturesSitesRoute: typeof SiteFeaturesSitesRoute
   SiteIntegrationsIdRoute: typeof SiteIntegrationsIdRoute
@@ -2184,6 +2204,7 @@ const SiteRouteChildren: SiteRouteChildren = {
   SiteDataIndexDotjsonRoute: SiteDataIndexDotjsonRoute,
   SiteFeaturesAiCrawlerLogsRoute: SiteFeaturesAiCrawlerLogsRoute,
   SiteFeaturesConversationsRoute: SiteFeaturesConversationsRoute,
+  SiteFeaturesFreeScanRoute: SiteFeaturesFreeScanRoute,
   SiteFeaturesPersonasRoute: SiteFeaturesPersonasRoute,
   SiteFeaturesSitesRoute: SiteFeaturesSitesRoute,
   SiteIntegrationsIdRoute: SiteIntegrationsIdRoute,
@@ -2272,3 +2293,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

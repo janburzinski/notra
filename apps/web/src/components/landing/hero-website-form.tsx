@@ -19,7 +19,11 @@ import {
 import type { HeroWebsiteFormProps } from "@/types/landing/hero";
 import { startSignup } from "@/utils/signup";
 
-export function HeroWebsiteForm({ cta, onSubmit }: HeroWebsiteFormProps) {
+export function HeroWebsiteForm({
+  cta,
+  onSubmit,
+  source = HERO_SIGNUP_SOURCE,
+}: HeroWebsiteFormProps) {
   const [website, setWebsite] = useQueryState(
     HERO_WEBSITE_PARAM,
     parseAsString.withDefault("").withOptions({ history: "replace" })
@@ -34,12 +38,12 @@ export function HeroWebsiteForm({ cta, onSubmit }: HeroWebsiteFormProps) {
       setInvalid(true);
       return;
     }
-    onSubmit();
+    onSubmit?.();
     const href = new URL(AUTH_SIGNUP_URL);
     if (hostname) {
       href.searchParams.set(HERO_WEBSITE_PARAM, hostname);
     }
-    startSignup(HERO_SIGNUP_SOURCE, href.toString());
+    startSignup(source, href.toString());
   }
 
   return (
