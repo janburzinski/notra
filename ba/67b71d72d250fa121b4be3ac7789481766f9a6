@@ -1,0 +1,36 @@
+apps/dashboard/src/lib/autopilot/agent.test.ts
+  s_51485dc008574a::t_147669e5551b7b 108
+apps/dashboard/tests/autopilot-dream.test.ts
+  s_51485dc008574a::t_147669e5551b7b 64
+apps/dashboard/tests/autopilot-template-flows.test.ts
+  s_51485dc008574a::t_147669e5551b7b 202
+apps/dashboard/tests/autopilot-flow.test.ts
+  s_51485dc008574a::t_147669e5551b7b 370
+apps/dashboard/src/lib/hooks/use-autopilot-onboarding.ts
+  s_51485dc008574a::t_d2999b556e416b 714
+  s_51485dc008574a::t_873b2d14e9b67c 642-644,646-648,715
+apps/dashboard/tests/artifacts.test.ts
+  s_51485dc008574a::t_147669e5551b7b 42
+apps/dashboard/tests/autopilot-sandbox.test.ts
+  s_51485dc008574a::t_147669e5551b7b 62
+apps/dashboard/src/lib/orpc/routers/autopilot.test.ts
+  s_51485dc008574a::t_147669e5551b7b 91
+apps/dashboard/tests/autopilot-schedule.test.ts
+  s_51485dc008574a::t_147669e5551b7b 37
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "ba67b71d72d250fa121b4be3ac7789481766f9a6",
+  "prompts": {},
+  "sessions": {
+    "s_51485dc008574a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a92c9619-515f-4397-b2d8-f36b36bf95f4",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
