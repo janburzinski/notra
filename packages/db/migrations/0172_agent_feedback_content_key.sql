@@ -1,0 +1,2 @@
+ALTER TABLE "agent_feedback" ADD COLUMN "content_key" text;--> statement-breakpoint
+CREATE UNIQUE INDEX "agentFeedback_organizationId_contentKey_uidx" ON "agent_feedback" USING btree ("organization_id","content_key");

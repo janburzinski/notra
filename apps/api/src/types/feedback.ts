@@ -18,7 +18,7 @@ import type { DbClient } from "./db";
 
 export type AgentFeedbackRow = typeof agentFeedback.$inferSelect;
 
-type SubmitFeedbackBody = z.infer<typeof submitFeedbackRequestSchema>;
+export type SubmitFeedbackBody = z.infer<typeof submitFeedbackRequestSchema>;
 
 export type FeedbackDomainError =
   | FeedbackOrganizationNotFoundError
@@ -41,7 +41,13 @@ export interface SubmitFeedbackProgramInput extends FeedbackProgramInput {
   body: SubmitFeedbackBody;
   ingestProjectId?: string;
   userAgent?: string | null;
+  /** Credential that sent the request, or null on the public feedback URL. */
+  sender?: string | null;
 }
+
+export type FeedbackDedupKey =
+  | { kind: "client"; key: string }
+  | { kind: "content"; key: string };
 
 export interface ListFeedbackProgramInput extends FeedbackProgramInput {
   query: z.infer<typeof listFeedbackQuerySchema>;
@@ -74,7 +80,7 @@ export interface ListFeedbackProgramSuccess {
 
 export type SerializedAgentFeedback = Omit<
   AgentFeedbackRow,
-  "createdAt" | "updatedAt" | "resolvedAt"
+  "createdAt" | "updatedAt" | "resolvedAt" | "contentKey"
 > & {
   createdAt: string;
   updatedAt: string;

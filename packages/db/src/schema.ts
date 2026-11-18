@@ -1812,6 +1812,7 @@ export const agentFeedback = pgTable(
     contextUrl: text("context_url"),
     externalId: text("external_id"),
     idempotencyKey: text("idempotency_key"),
+    contentKey: text("content_key"),
     metadata: jsonb("metadata").$type<AgentFeedbackMetadata>(),
     resolvedAt: timestamp("resolved_at"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -1833,6 +1834,10 @@ export const agentFeedback = pgTable(
     uniqueIndex("agentFeedback_organizationId_idempotencyKey_uidx").on(
       table.organizationId,
       table.idempotencyKey
+    ),
+    uniqueIndex("agentFeedback_organizationId_contentKey_uidx").on(
+      table.organizationId,
+      table.contentKey
     ),
   ]
 );

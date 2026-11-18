@@ -230,7 +230,7 @@ export const submitFeedbackResponseSchema = z
     feedback: feedbackSchema,
     deduplicated: z.boolean().openapi({
       description:
-        "True when an existing feedback with the same idempotencyKey was returned.",
+        "True when an existing feedback was returned instead of a new one: same idempotencyKey, or without one, an identical submission within 10 minutes.",
     }),
   })
   .openapi("SubmitFeedbackResponse");

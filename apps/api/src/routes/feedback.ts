@@ -202,6 +202,7 @@ async function submitFeedbackHandler(
       body,
       ingestProjectId: getIngestProjectId(c),
       userAgent: c.req.header("user-agent") ?? null,
+      sender: c.get("auth")?.keyId ?? null,
     })
   );
   if (result._tag === "Failure") {

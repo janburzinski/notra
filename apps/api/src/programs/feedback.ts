@@ -1,10 +1,11 @@
 import { hasAiTrafficEventsQuota } from "@notra/ai/billing/ai-traffic-events";
 import { classifyAgentFeedback } from "@notra/ai/jobs/feedback-classifier";
 import { agentFeedback, organizations, projects } from "@notra/db/schema";
-import { and, count, desc, eq } from "drizzle-orm";
+import { and, count, desc, eq, gt, lte, sql } from "drizzle-orm";
 import { Effect } from "effect";
 import { nanoid } from "nanoid";
 
+import { FEEDBACK_CONTENT_DEDUP_WINDOW_SECONDS } from "../constants/feedback";
 import {
   FeedbackDatabaseError,
   FeedbackIdempotencyConflictError,
@@ -14,6 +15,7 @@ import {
   FeedbackQuotaExceededError,
 } from "../errors/feedback";
 import type {
+  FeedbackDedupKey,
   ListFeedbackProgramInput,
   ListFeedbackProgramSuccess,
   NamedFeedbackProgramInput,
@@ -22,6 +24,7 @@ import type {
   SubmitFeedbackProgramSuccess,
   UpdateFeedbackProgramInput,
 } from "../types/feedback";
+import { feedbackContentKey } from "../utils/feedback";
 
 const database = <A>(operation: () => Promise<A>) =>
   Effect.tryPromise({
@@ -44,18 +47,51 @@ const projectExists = (
     })
   ).pipe(Effect.map((project) => project !== undefined));
 
-const findByIdempotencyKey = (
+// Compared in SQL so the window follows the database clock.
+const contentDedupWindowStart = sql`now() - make_interval(secs => ${FEEDBACK_CONTENT_DEDUP_WINDOW_SECONDS})`;
+
+/**
+ * Client keys match forever. Content keys only match an entry from the last
+ * dedup window.
+ */
+const findByDedupKey = (
   db: SubmitFeedbackProgramInput["db"],
   organizationId: string,
-  idempotencyKey: string
+  dedup: FeedbackDedupKey
 ) =>
   database(() =>
     db.query.agentFeedback.findFirst({
-      where: and(
-        eq(agentFeedback.organizationId, organizationId),
-        eq(agentFeedback.idempotencyKey, idempotencyKey)
-      ),
+      where:
+        dedup.kind === "client"
+          ? and(
+              eq(agentFeedback.organizationId, organizationId),
+              eq(agentFeedback.idempotencyKey, dedup.key)
+            )
+          : and(
+              eq(agentFeedback.organizationId, organizationId),
+              eq(agentFeedback.contentKey, dedup.key),
+              gt(agentFeedback.createdAt, contentDedupWindowStart)
+            ),
     })
+  );
+
+/** Frees a content key whose window has passed so a new entry can take it. */
+const releaseExpiredContentKey = (
+  db: SubmitFeedbackProgramInput["db"],
+  organizationId: string,
+  contentKey: string
+) =>
+  database(() =>
+    db
+      .update(agentFeedback)
+      .set({ contentKey: null, updatedAt: sql`${agentFeedback.updatedAt}` })
+      .where(
+        and(
+          eq(agentFeedback.organizationId, organizationId),
+          eq(agentFeedback.contentKey, contentKey),
+          lte(agentFeedback.createdAt, contentDedupWindowStart)
+        )
+      )
   );
 
 const findByOrganizationAndId = (
@@ -196,31 +232,62 @@ const deduplicatedSubmission = (
       } satisfies SubmitFeedbackProgramSuccess)
     : Effect.fail(new FeedbackIdempotencyConflictError());
 
+/**
+ * A content match only proves the caller sent the same submission, so it gets
+ * the entry as it was filed, without the team's triage since.
+ */
+const deduplicatedView = (
+  existing: SubmitFeedbackProgramSuccess["feedback"],
+  dedup: FeedbackDedupKey
+): SubmitFeedbackProgramSuccess["feedback"] =>
+  dedup.kind === "client"
+    ? existing
+    : {
+        ...existing,
+        status: "new",
+        resolvedAt: null,
+        updatedAt: existing.createdAt,
+      };
+
 export const submitFeedback = Effect.fn("feedback.submit")(function* ({
   db,
   organizationId,
   body,
   ingestProjectId,
   userAgent,
+  sender,
 }: SubmitFeedbackProgramInput) {
-  const idempotencyKey = body.idempotencyKey;
-  if (idempotencyKey) {
-    const existing = yield* findByIdempotencyKey(
-      db,
-      organizationId,
-      idempotencyKey
+  const projectId =
+    ingestProjectId === undefined ? (body.projectId ?? null) : ingestProjectId;
+  const resolvedUserAgent = body.userAgent ?? userAgent ?? null;
+
+  // Without a client key, an identical submission from the same sender within
+  // a short window returns the first entry: agents retry or repeat tool calls,
+  // and MCP clients send no key of their own. The key covers every submitted
+  // field, so a match only hands back what the caller already sent.
+  const dedup: FeedbackDedupKey = body.idempotencyKey
+    ? { kind: "client", key: body.idempotencyKey }
+    : {
+        kind: "content",
+        key: feedbackContentKey({
+          sender,
+          projectId,
+          body,
+          userAgent: resolvedUserAgent,
+        }),
+      };
+
+  const existing = yield* findByDedupKey(db, organizationId, dedup);
+  if (existing) {
+    return yield* deduplicatedSubmission(
+      deduplicatedView(existing, dedup),
+      body
     );
-    if (existing) {
-      return yield* deduplicatedSubmission(existing, body);
-    }
   }
 
   if (!(yield* hasAiTrafficEventsQuota(organizationId))) {
     return yield* new FeedbackQuotaExceededError();
   }
-
-  const projectId =
-    ingestProjectId === undefined ? (body.projectId ?? null) : ingestProjectId;
 
   if (
     ingestProjectId === undefined &&
@@ -250,6 +317,10 @@ export const submitFeedback = Effect.fn("feedback.submit")(function* ({
       )
     : null;
 
+  if (dedup.kind === "content") {
+    yield* releaseExpiredContentKey(db, organizationId, dedup.key);
+  }
+
   const [created] = yield* database(() =>
     db
       .insert(agentFeedback)
@@ -265,15 +336,14 @@ export const submitFeedback = Effect.fn("feedback.submit")(function* ({
         agentClient: body.agentClient ?? null,
         agentModel: body.agentModel ?? null,
         toolVersion: body.toolVersion ?? null,
-        userAgent: body.userAgent ?? userAgent ?? null,
+        userAgent: resolvedUserAgent,
         contextUrl: body.contextUrl ?? null,
         externalId: body.externalId ?? null,
-        idempotencyKey: body.idempotencyKey ?? null,
+        idempotencyKey: dedup.kind === "client" ? dedup.key : null,
+        contentKey: dedup.kind === "content" ? dedup.key : null,
         metadata: body.metadata ?? null,
       })
-      .onConflictDoNothing({
-        target: [agentFeedback.organizationId, agentFeedback.idempotencyKey],
-      })
+      .onConflictDoNothing()
       .returning()
   );
 
@@ -284,13 +354,14 @@ export const submitFeedback = Effect.fn("feedback.submit")(function* ({
     } satisfies SubmitFeedbackProgramSuccess;
   }
 
-  const existing = idempotencyKey
-    ? yield* findByIdempotencyKey(db, organizationId, idempotencyKey)
-    : undefined;
+  const concurrent = yield* findByDedupKey(db, organizationId, dedup);
 
-  if (!existing) {
+  if (!concurrent) {
     return yield* new FeedbackNotFoundError();
   }
 
-  return yield* deduplicatedSubmission(existing, body);
+  return yield* deduplicatedSubmission(
+    deduplicatedView(concurrent, dedup),
+    body
+  );
 });

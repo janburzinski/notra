@@ -131,7 +131,7 @@ The endpoint returns `202 Accepted` with the stored entry:
 }
 ```
 
-Pass an `idempotencyKey` to make retries safe, because submitting the same key twice for the same organization returns the original entry with `deduplicated: true`. An unknown organization slug returns `404`.
+Pass an `idempotencyKey` to make retries safe, because submitting the same key twice for the same organization returns the original entry with `deduplicated: true`. Without a key, sending an identical submission again within 10 minutes, with every field the same, also returns the original entry with `deduplicated: true`. An unknown organization slug returns `404`.
 
 ### Automatic classification
 
