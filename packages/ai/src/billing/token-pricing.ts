@@ -235,10 +235,10 @@ export const MODEL_PRICING: Record<string, ModelPricing> = {
     cacheReadPerMillionTokens: 0.05,
     cacheWritePerMillionTokens: 0,
   },
-  "moonshotai/kimi-k2": {
-    inputPerMillionTokens: 0.57,
-    outputPerMillionTokens: 2.3,
-    cacheReadPerMillionTokens: 0,
+  "moonshotai/kimi-k3.1-pro": {
+    inputPerMillionTokens: 2.0,
+    outputPerMillionTokens: 10.0,
+    cacheReadPerMillionTokens: 0.2,
     cacheWritePerMillionTokens: 0,
   },
   "spacexai/grok-4.20-non-reasoning": {

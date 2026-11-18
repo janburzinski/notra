@@ -178,6 +178,24 @@ export function classifyGeoScanExecutionFailure(
   };
 }
 
+/**
+ * A scan whose every check was dropped ends without a thrown error, so it
+ * would otherwise only report the generic execution failure.
+ */
+export function noSuccessfulChecksFailure(
+  engines: readonly string[]
+): GeoScanFailureMetadata {
+  return {
+    errorCode: "scan_no_successful_checks",
+    errorMessage:
+      engines.length > 0
+        ? `No engine returned a usable answer (${engines.join(", ")}).`
+        : "No engine returned a usable answer.",
+    failedStage: "execution",
+    retryable: true,
+  };
+}
+
 /** Whole days for a custom interval, rounded up so partial days stay visible. */
 export function geoScanIntervalDays(intervalHours: number): number {
   return Math.max(1, Math.ceil(intervalHours / GEO_SCAN_HOURS_PER_DAY));

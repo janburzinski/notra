@@ -23,6 +23,7 @@ import {
   GEO_TRANSLATION_MAX_TOKENS,
   GEO_TRANSLATION_MODEL,
 } from "../constants/geo";
+import { GEO_ANSWER_REASONING } from "../constants/geo-engine-policy";
 import {
   GSC_SUGGESTION_MAX_TOKENS,
   GSC_SUGGESTION_MODEL,
@@ -95,12 +96,14 @@ export const geoModelLive = Layer.succeed(
             gateway: input.gateway,
             logContext: input.logContext,
           });
+          const reasoning = GEO_ANSWER_REASONING[input.engine];
           const options = {
             prompt: input.prompt,
             instructions: GEO_ANSWER_SYSTEM_PROMPT,
             maxOutputTokens: GEO_ANSWER_MAX_TOKENS,
             abortSignal: signal,
             providerOptions: { gateway: { tags: ["geo-scan-plain"] } },
+            ...(reasoning ? { reasoning } : {}),
           };
           let result = await generateText({ model, ...options });
           let usage = result.usage;

@@ -1,8 +1,22 @@
 import {
   GEO_CONTEXT_GOOGLE_ORIGIN,
   GEO_CONTEXT_SOURCE_TIMEOUT_MS,
+  GEO_GEMINI_GROUNDING_REDIRECT_ORIGIN,
 } from "../constants/geo-context";
 import { geoContextSourceUrl } from "./geo-context-answer";
+
+function isGoogleRedirect(url: URL): boolean {
+  if (url.username || url.password) {
+    return false;
+  }
+  if (url.origin === GEO_CONTEXT_GOOGLE_ORIGIN) {
+    return ["/goto", "/url"].includes(url.pathname);
+  }
+  return (
+    url.origin === GEO_GEMINI_GROUNDING_REDIRECT_ORIGIN &&
+    url.pathname.startsWith("/grounding-api-redirect/")
+  );
+}
 
 /** Only Google is contacted. Never follow an untrusted citation to its target. */
 export async function resolveGeoContextSource(
@@ -11,19 +25,17 @@ export async function resolveGeoContextSource(
 ): Promise<string> {
   let current = new URL(value);
   for (let redirects = 0; redirects < 4; redirects += 1) {
-    if (current.hostname !== "www.google.com") {
+    if (
+      current.hostname !== "www.google.com" &&
+      current.origin !== GEO_GEMINI_GROUNDING_REDIRECT_ORIGIN
+    ) {
       const resolved = geoContextSourceUrl(current.href);
       if (!resolved || current.hostname === "google.com") {
         throw new Error("Context citation has an invalid destination");
       }
       return resolved;
     }
-    if (
-      current.origin !== GEO_CONTEXT_GOOGLE_ORIGIN ||
-      !["/goto", "/url"].includes(current.pathname) ||
-      current.username ||
-      current.password
-    ) {
+    if (!isGoogleRedirect(current)) {
       throw new Error("Context citation is not a supported Google redirect");
     }
     const response = await fetch(current.href, {

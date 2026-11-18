@@ -284,11 +284,11 @@ export const GEO_MODEL_CATALOG_SEED: readonly GeoModelCatalogEntry[] = [
     gateways: ["vercel", "openrouter"],
   },
   {
-    id: "moonshotai/kimi-k2",
+    id: "moonshotai/kimi-k3.1-pro",
     provider: "moonshotai",
-    label: "Kimi K2 Instruct",
+    label: "Kimi K3.1 Pro",
     zdr: "some",
-    released: "2025-07-11",
+    released: "2026-10-23",
     default: false,
     gateways: ["vercel", "openrouter"],
   },
@@ -778,6 +778,7 @@ export const GEO_MODEL_REPLACED_IDS: Readonly<Record<string, string>> = {
   "codex/gpt-5.6-sol-rei": "codex/gpt-6.1-sol",
   "meta/muse-spark-1.1": "meta/muse-spark-1.3",
   "spacexai/grok-4.6": "spacexai/grok-4.7",
+  "moonshotai/kimi-k2": "moonshotai/kimi-k3.1-pro",
 };
 /**
  * Coding, vision and edge-sized specialities. They are never used to answer

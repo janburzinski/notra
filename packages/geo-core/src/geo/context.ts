@@ -1,7 +1,7 @@
 import { withRateLimitRetry } from "@notra/ai/utils/rate-limit-retry";
 import { GEO_CHECK_GROUNDING_MAX_SOURCES } from "@notra/db/constants/geo-checks";
 import { requireApiKey } from "@notra/utils/require-api-key";
-import { Effect, Stream } from "effect";
+import { Effect, Option, Stream } from "effect";
 import * as FetchHttpClient from "effect/http/FetchHttpClient";
 import * as HttpClient from "effect/http/HttpClient";
 import * as HttpClientRequest from "effect/http/HttpClientRequest";
@@ -14,9 +14,11 @@ import {
   GEO_CONTEXT_PARSER_VERSION,
   GEO_CONTEXT_SOURCE_CONCURRENCY,
   GEO_CONTEXT_TIMEOUT_MS,
+  GEO_GEMINI_API_FALLBACK_ENGINE,
 } from "../constants/geo-context";
+import { GeoModelService } from "../deps";
 import { geoContextResponseSchema } from "../schemas/geo-context";
-import type { GeoEngineAnswer } from "../types/geo";
+import type { GeoEngineAnswer, GeoZdrMode } from "../types/geo";
 import type { GeoContextEngine } from "../types/geo-context";
 import {
   buildGeoContextRequest,
@@ -24,10 +26,14 @@ import {
 } from "../utils/geo-context";
 import { parseGeoContextCapture } from "../utils/geo-context-answer";
 import { resolveGeoContextSource } from "../utils/geo-context-source";
+import { resolveGroundedEngineByKey } from "../utils/geo-grounded-engines";
 import { describeGeoError, geoLogError, geoLogWarn } from "../utils/geo-log";
 import { getReferenceDomain } from "../utils/reference-display";
 import { GeoScanError } from "./errors";
-import { askGeoOlostepAiOverviewAnswer } from "./olostep";
+import {
+  askGeoOlostepAiOverviewAnswer,
+  askGeoOlostepGeminiAnswer,
+} from "./olostep";
 
 /** Only 429s are retried (per Retry-After): submitting a consumer prompt is a paid, non-idempotent operation. */
 const captureContextAnswer = Effect.fn("geo.captureContext")(function* (
@@ -145,10 +151,10 @@ const captureContextAnswer = Effect.fn("geo.captureContext")(function* (
 
 /**
  * Google blocks Context.dev's browser for part of the traffic
- * (WEBSITE_ACCESS_ERROR, unbilled), so an AI Overview capture that fails for
- * any reason is retried once through Olostep's AI Overview parser. Gemini has
- * no Olostep parser and keeps failing the check. A Context page that shows no
- * overview is an answer, not a failure, and is never retried.
+ * (WEBSITE_ACCESS_ERROR, unbilled) and changes the pages our parser reads, so
+ * a capture that fails for any reason is retried once through Olostep's parser
+ * for the same surface. A Context page that shows no overview is an answer,
+ * not a failure, and is never retried.
  */
 export const askGeoContextAnswer = Effect.fn("geo.askContextAnswer")(function* (
   engine: string,
@@ -167,7 +173,7 @@ export const askGeoContextAnswer = Effect.fn("geo.askContextAnswer")(function* (
   const startedMs = performance.now();
   return yield* captureContextAnswer(engine, prompt, language).pipe(
     Effect.catchTag("GeoScanError", (contextError) => {
-      if (engine !== "google/ai-overview" || !olostepFallback) {
+      if (!olostepFallback) {
         return Effect.fail(contextError);
       }
       const contextDurationMs = Math.round(performance.now() - startedMs);
@@ -182,7 +188,11 @@ export const askGeoContextAnswer = Effect.fn("geo.askContextAnswer")(function* (
         contextErrorMessage: contextError.message,
         contextCauseMessage: describeGeoError(contextError).causeMessage,
       };
-      return askGeoOlostepAiOverviewAnswer(prompt, language).pipe(
+      const fallback =
+        engine === "google/gemini"
+          ? askGeoOlostepGeminiAnswer(prompt, language)
+          : askGeoOlostepAiOverviewAnswer(prompt, language);
+      return fallback.pipe(
         Effect.tap(({ answer, requestId }) =>
           geoLogWarn({
             ...fields,
@@ -217,6 +227,116 @@ export const askGeoContextAnswer = Effect.fn("geo.askContextAnswer")(function* (
             })
         )
       );
+    })
+  );
+});
+
+/** API search citations are Google redirects; unresolvable ones are dropped. */
+function withResolvedGeminiSources(answer: GeoEngineAnswer) {
+  return Effect.gen(function* () {
+    const resolved = yield* Effect.forEach(
+      answer.grounding.sources,
+      (source) =>
+        Effect.tryPromise((signal) =>
+          resolveGeoContextSource(source.url, signal)
+        ).pipe(
+          Effect.map((url) => ({
+            ...source,
+            url,
+            domain: getReferenceDomain(url) ?? new URL(url).hostname,
+          })),
+          Effect.option
+        ),
+      { concurrency: GEO_CONTEXT_SOURCE_CONCURRENCY }
+    );
+    const sources = [
+      ...new Map(
+        resolved.flatMap((source) =>
+          Option.isSome(source) ? [[source.value.url, source.value]] : []
+        )
+      ).values(),
+    ];
+    const result: GeoEngineAnswer = {
+      ...answer,
+      sources: sources.map(({ url, title }) => ({ url, title })),
+      grounding: { ...answer.grounding, sources },
+    };
+    return result;
+  });
+}
+
+/**
+ * Scan entry point for the Google consumer surfaces. A Gemini check that
+ * neither Context.dev nor Olostep could capture is answered by the Gemini API
+ * with Google Search, so the check keeps an answer. Such a row has no
+ * `capture` and no `surfaces`, and its usage names the API model.
+ */
+export const askGeoGoogleAnswer = Effect.fn("geo.askGoogleAnswer")(function* (
+  engine: string,
+  prompt: string,
+  language: string,
+  {
+    organizationId,
+    zdr,
+    logFields = {},
+    logContext,
+  }: {
+    organizationId: string;
+    zdr: GeoZdrMode;
+    logFields?: Record<string, unknown>;
+    logContext?: Record<string, unknown>;
+  }
+) {
+  const captured = askGeoContextAnswer(engine, prompt, language, {
+    logFields: { organizationId, ...logFields },
+  });
+  const grounded = resolveGroundedEngineByKey(GEO_GEMINI_API_FALLBACK_ENGINE);
+  if (engine !== "google/gemini" || !grounded) {
+    return yield* captured;
+  }
+  const models = yield* GeoModelService;
+  return yield* captured.pipe(
+    Effect.catchTag("GeoScanError", (captureError) => {
+      const startedMs = performance.now();
+      const fields = {
+        ...logFields,
+        organizationId,
+        engine,
+        language,
+        fallbackModel: grounded.model,
+        captureErrorMessage: captureError.message,
+        captureCauseMessage: describeGeoError(captureError).causeMessage,
+      };
+      return models
+        .groundedAnswer({
+          organizationId,
+          engine: grounded,
+          messages: [{ role: "user", content: prompt }],
+          zdr,
+          logContext,
+        })
+        .pipe(
+          Effect.tap((answer) =>
+            geoLogWarn({
+              ...fields,
+              event: "geo.gemini.api_fallback",
+              status: "success",
+              durationMs: Math.round(performance.now() - startedMs),
+              answerLength: answer.text.length,
+              sourceCount: answer.sources.length,
+            })
+          ),
+          Effect.tapError((apiError) =>
+            geoLogError({
+              ...fields,
+              event: "geo.gemini.api_fallback",
+              status: "error",
+              durationMs: Math.round(performance.now() - startedMs),
+              ...describeGeoError(apiError),
+            })
+          ),
+          Effect.flatMap(withResolvedGeminiSources)
+        );
     })
   );
 });

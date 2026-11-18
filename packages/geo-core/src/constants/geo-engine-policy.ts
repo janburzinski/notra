@@ -1,5 +1,6 @@
 const GEO_CLAUDE_ENGINE_ID = "anthropic/claude-haiku-5.5";
-const GEO_KIMI_ENGINE_ID = "moonshotai/kimi-k2";
+// Kimi K2 lost its last gateway host that does not train on prompts.
+const GEO_KIMI_ENGINE_ID = "moonshotai/kimi-k3.1-pro";
 const GEO_GLM_ENGINE_ID = "zai/glm-5.3-flash";
 const GEO_DEEPSEEK_ENGINE_ID = "deepseek/deepseek-v4-flash";
 const GEO_GROK_ENGINE_ID = "spacexai/grok-4.20-non-reasoning";
@@ -17,6 +18,14 @@ export const GEO_SELF_SERVE_ENGINE_IDS: ReadonlySet<string> = new Set([
   GEO_DEEPSEEK_ENGINE_ID,
   GEO_GROK_ENGINE_ID,
 ]);
+
+/**
+ * Reasoning effort for engines whose default thinking spends the answer's
+ * token budget: Kimi K3.1 Pro often hit it with a cut-off or empty answer.
+ */
+export const GEO_ANSWER_REASONING: Readonly<Record<string, "none">> = {
+  [GEO_KIMI_ENGINE_ID]: "none",
+};
 
 export const GEO_ENGINE_DISPLAY_LABELS: Readonly<Record<string, string>> = {
   [GEO_CLAUDE_ENGINE_ID]: "Claude",

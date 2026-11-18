@@ -11,6 +11,7 @@ import {
   GEO_OLOSTEP_API_KEY_ENV,
   GEO_OLOSTEP_BASE_URL,
   GEO_OLOSTEP_ENGINES,
+  GEO_OLOSTEP_GEMINI_PARSER,
   GEO_OLOSTEP_ITEMS_PAGE_LIMIT,
   GEO_OLOSTEP_NODE_COUNTRIES,
   GEO_OLOSTEP_REQUEST_TIMEOUT_MS,
@@ -277,28 +278,24 @@ export const askGeoOlostepAnswer = Effect.fn("geo.askOlostepAnswer")(function* (
 });
 
 /**
- * Scrapes one Google AI Overview synchronously. Only the Context.dev capture
- * falls back to this, so it runs inside the check instead of a planned batch.
+ * One synchronous Olostep scrape of `url`, read by `parser` into an answer.
+ * Only Context.dev captures fall back to this, so it runs inside the check
+ * instead of a planned batch.
  */
-export const askGeoOlostepAiOverviewAnswer = Effect.fn(
-  "geo.askOlostepAiOverviewAnswer"
-)(function* (prompt: string, language: string) {
-  const locale = geoAiOverviewLocale(language);
-  const country = locale.gl.toUpperCase();
-  const params = new URLSearchParams({
-    q: prompt,
-    hl: locale.hl,
-    gl: locale.gl,
-  });
+const scrapeGeoOlostepAnswer = Effect.fn("geo.scrapeOlostepAnswer")(function* (
+  url: string,
+  parser: string,
+  country: string
+) {
   const scrape = yield* olostepRequest(
     "/scrapes",
     geoOlostepScrapeSchema,
     {
       method: "POST",
       body: {
-        url_to_scrape: `https://www.google.com/search?${params}`,
+        url_to_scrape: url,
         formats: ["json"],
-        parser: { id: GEO_OLOSTEP_AI_OVERVIEW_PARSER },
+        parser: { id: parser },
         ...(GEO_OLOSTEP_NODE_COUNTRIES.has(country) ? { country } : {}),
       },
     },
@@ -311,11 +308,31 @@ export const askGeoOlostepAiOverviewAnswer = Effect.fn(
       ),
     catch: (cause) =>
       new GeoOlostepError({
-        message: "Olostep AI Overview scrape has no parsed answer",
+        message: `Olostep ${parser} scrape has no parsed answer`,
         cause,
       }),
   });
-  const answer = geoOlostepAnswer(payload);
+  return {
+    payload,
+    answer: geoOlostepAnswer(payload),
+    requestId: scrape.id ?? null,
+  };
+});
+
+export const askGeoOlostepAiOverviewAnswer = Effect.fn(
+  "geo.askOlostepAiOverviewAnswer"
+)(function* (prompt: string, language: string) {
+  const locale = geoAiOverviewLocale(language);
+  const params = new URLSearchParams({
+    q: prompt,
+    hl: locale.hl,
+    gl: locale.gl,
+  });
+  const { payload, answer, requestId } = yield* scrapeGeoOlostepAnswer(
+    `https://www.google.com/search?${params}`,
+    GEO_OLOSTEP_AI_OVERVIEW_PARSER,
+    locale.gl.toUpperCase()
+  );
   // A blocked or half-loaded page also has no overview; only a page with
   // organic results proves Google answered and showed none.
   if (answer.absent && !payload.organic_results?.length) {
@@ -339,5 +356,26 @@ export const askGeoOlostepAiOverviewAnswer = Effect.fn(
       })
     );
   }
-  return { answer, requestId: scrape.id ?? null };
+  return { answer, requestId };
+});
+
+export const askGeoOlostepGeminiAnswer = Effect.fn(
+  "geo.askOlostepGeminiAnswer"
+)(function* (prompt: string, language: string) {
+  const locale = geoAiOverviewLocale(language);
+  const params = new URLSearchParams({ q: prompt, hl: locale.hl });
+  const { answer, requestId } = yield* scrapeGeoOlostepAnswer(
+    `https://gemini.google.com/app?${params}`,
+    GEO_OLOSTEP_GEMINI_PARSER,
+    locale.gl.toUpperCase()
+  );
+  // Same bar as a Context capture; Gemini may answer without searching.
+  if (answer.absent || answer.text.length < GEO_AI_OVERVIEW_MIN_ANSWER_LENGTH) {
+    return yield* Effect.fail(
+      new GeoOlostepError({
+        message: "Olostep Gemini scrape returned an empty or incomplete answer",
+      })
+    );
+  }
+  return { answer, requestId };
 });

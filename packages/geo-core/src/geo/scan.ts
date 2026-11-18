@@ -133,7 +133,7 @@ import {
 } from "../utils/token-usage";
 import { judgeAnswer, requireAnswerText } from "./check-evaluation";
 import { requireGeoCodingAgentAccess } from "./coding-agent-access";
-import { askGeoContextAnswer } from "./context";
+import { askGeoGoogleAnswer } from "./context";
 import { runGeoConversation } from "./conversation";
 import { runGeoConversationReplay } from "./conversation-replay";
 import { askCursorEngine } from "./cursor";
@@ -459,8 +459,11 @@ const askEngine = Effect.fn("geo.askEngine")(function* (
   language = DEFAULT_LANGUAGE
 ) {
   if (gatewayPin === "context") {
-    return yield* askGeoContextAnswer(engine, promptText, language, {
-      logFields: { organizationId, ...logContext },
+    return yield* askGeoGoogleAnswer(engine, promptText, language, {
+      organizationId,
+      zdr,
+      logFields: { ...logContext },
+      logContext,
     });
   }
   if (gatewayPin === "olostep") {

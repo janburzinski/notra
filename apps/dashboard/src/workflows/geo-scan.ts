@@ -32,6 +32,7 @@ import {
 } from "@notra/geo-core/utils/geo-olostep-plan";
 import {
   classifyGeoScanExecutionFailure,
+  noSuccessfulChecksFailure,
   chunkGeoScanItems,
   describeGeoScanFailure,
 } from "@notra/geo-core/utils/geo-scan";
@@ -551,6 +552,7 @@ async function runGeoScanProjectRun(
     await finalizeProjectRun(plan, totals, "failed", state.claimedAt, {
       retried: options.retried,
       willRetry: !options.oneShot && !options.retried,
+      failure: noSuccessfulChecksFailure(plan.engines),
       ...(retentionDays ? { retentionDays } : {}),
     });
     return { totals, attempted, noSuccessfulChecks: true };

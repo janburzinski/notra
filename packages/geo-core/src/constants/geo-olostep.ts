@@ -20,6 +20,11 @@ export const GEO_OLOSTEP_SCRAPE_TIMEOUT_MS = 90_000;
 export const GEO_OLOSTEP_AI_OVERVIEW_PARSER =
   "@olostep/google-ai-overview-results";
 /**
+ * Parser for the Gemini app, used only as the fallback when Context.dev
+ * cannot capture a Gemini answer. Olostep activates it per account.
+ */
+export const GEO_OLOSTEP_GEMINI_PARSER = "@olostep/gemini-results";
+/**
  * Countries Olostep has scrape nodes in (its 400 lists them; 2026-11-16).
  * Others, e.g. DE, are rejected, so those scrapes rely on the URL's `hl`/`gl`.
  */

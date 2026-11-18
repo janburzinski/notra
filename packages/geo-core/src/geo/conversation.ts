@@ -30,7 +30,7 @@ import {
   geoCheckWriteUsage,
 } from "../utils/token-usage";
 import { judgeAnswer, requireAnswerText } from "./check-evaluation";
-import { askGeoContextAnswer } from "./context";
+import { askGeoGoogleAnswer } from "./context";
 import { GeoScanError } from "./errors";
 import { askGeoOlostepAnswer } from "./olostep";
 
@@ -90,13 +90,18 @@ export const runGeoConversation = Effect.fn("geo.runConversation")(function* (
         answer = yield* askGeoOlostepAnswer(engine.key, olostepRetrieveId);
       } else if ("context" in engine) {
         const question = geoContextConversationPrompt(source.prompts, index);
-        answer = yield* askGeoContextAnswer(
+        answer = yield* askGeoGoogleAnswer(
           engine.key,
           source.snapshot
             ? geoOlostepPersonaQuery(source.snapshot, question)
             : question,
           language,
-          { logFields: { ...fields, turn: index + 1 } }
+          {
+            organizationId: context.organizationId,
+            zdr,
+            logFields: { ...fields, turn: index + 1 },
+            logContext,
+          }
         );
       } else {
         answer = yield* models.groundedAnswer({

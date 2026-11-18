@@ -5,6 +5,7 @@ import { DomUtils, parseDocument } from "htmlparser2";
 import { GEO_AI_OVERVIEW_MIN_ANSWER_LENGTH } from "../constants/geo-ai-overview";
 import {
   GEO_CONTEXT_BLOCK_TAGS,
+  GEO_CONTEXT_GEMINI_CHIP_CONTAINER_CLASS,
   GEO_CONTEXT_GOOGLE_ORIGIN,
   GEO_CONTEXT_IGNORED_TAGS,
   GEO_CONTEXT_MAX_HTML_BYTES,
@@ -39,7 +40,8 @@ function render(node: GeoContextNode): string {
   if (
     node.type !== "tag" ||
     hidden(node) ||
-    GEO_CONTEXT_IGNORED_TAGS.has(node.name)
+    GEO_CONTEXT_IGNORED_TAGS.has(node.name) ||
+    hasClass(node, GEO_CONTEXT_GEMINI_CHIP_CONTAINER_CLASS)
   ) {
     return "";
   }
@@ -132,8 +134,12 @@ function geminiCapture(
     );
   }
   const root = responses[0];
+  // Gemini renders each chip's buttons in a block-level container that the
+  // captured HTML hoists out of the paragraph, leaving an empty chip behind.
   const chips = DomUtils.findAll(
-    (element) => element.name === "source-inline-chip",
+    (element) =>
+      element.name === "source-inline-chip" ||
+      hasClass(element, GEO_CONTEXT_GEMINI_CHIP_CONTAINER_CLASS),
     root.children
   );
   const sources = chips.flatMap((chip) => {
@@ -141,6 +147,9 @@ function geminiCapture(
       (element) => element.name === "button",
       chip.children
     );
+    if (buttons.length === 0) {
+      return [];
+    }
     const urls = buttons.flatMap((button) => {
       const encoded = /BardVeMetadataKey:([A-Za-z0-9_+/=-]+)/.exec(
         button.attribs.jslog ?? ""
@@ -338,10 +347,12 @@ export function parseGeoContextCapture(
     engine === "google/gemini"
       ? geminiCapture(document, prompt)
       : overviewCapture(document);
+  // Gemini answers from model knowledge without searching, so only an AI
+  // Overview, which is always built from search results, must cite.
   if (
     !result.absent &&
     (result.text.length < GEO_AI_OVERVIEW_MIN_ANSWER_LENGTH ||
-      result.sources.length === 0)
+      (engine === "google/ai-overview" && result.sources.length === 0))
   ) {
     throw new Error(
       "Context answer is empty, incomplete, or missing citations"
