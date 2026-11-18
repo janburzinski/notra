@@ -1,0 +1,27 @@
+apps/dashboard/src/components/autopilot/autopilot-automation-menu-items.tsx
+  s_a37aa5ffda352b::t_9d1c7c135c47fc 61
+apps/dashboard/src/types/autopilot-templates.ts
+  s_a37aa5ffda352b::t_9d1c7c135c47fc 25
+apps/dashboard/src/components/autopilot/autopilot-templates.tsx
+  s_a37aa5ffda352b::t_f6ca38ad2b9089 277,281,284,288,295,298,335-336,347
+  s_a37aa5ffda352b::t_b544aacb85d72a 278,292
+  s_a37aa5ffda352b::t_9d1c7c135c47fc 135,350,354
+apps/dashboard/src/components/autopilot/autopilot-automations-overview.tsx
+  s_a37aa5ffda352b::t_9d1c7c135c47fc 205,368,370
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "161117651ed0c1faccf24667e37f8501b6da7438",
+  "prompts": {},
+  "sessions": {
+    "s_a37aa5ffda352b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c9dba34b-daed-4627-bb7c-3150747084ba",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
