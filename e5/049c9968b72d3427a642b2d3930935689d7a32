@@ -1,0 +1,55 @@
+apps/docs/autopilot/troubleshooting.mdx
+  s_33e63524097acb::t_213fdf65f24b97 39
+  s_33e63524097acb::t_97c5ca385cadfc 23,33
+apps/docs/autopilot/learning.mdx
+  s_33e63524097acb::t_a42516cf4ce483 25,32,43,45-47,52,59,63,67,71-73,75
+apps/docs/autopilot/how-it-works.mdx
+  s_33e63524097acb::t_8ef1828ad686d4 24,87,91,93
+apps/docs/autopilot/results.mdx
+  s_33e63524097acb::t_8fe11ca9d07931 24,41-43,67,69,75
+apps/docs/autopilot/automations/releases.mdx
+  s_33e63524097acb::t_f653b85b08ff1c 46,52,62,73
+  s_33e63524097acb::t_df1da629e35094 24,41,43-45
+apps/docs/autopilot/automations/overview.mdx
+  s_33e63524097acb::t_e856fb3c56758e 24,28,46,63-65,88,96
+apps/docs/autopilot/limits-and-credits.mdx
+  s_33e63524097acb::t_4fec0a963af80c 43,45,56
+  s_33e63524097acb::t_8fe11ca9d07931 26
+apps/docs/autopilot/automations/site-fixes.mdx
+  s_33e63524097acb::t_3969763c835fde 25,38,47,69,78
+  s_33e63524097acb::t_47d0c05fc8cb75 41,76
+apps/docs/autopilot/grow.mdx
+  s_33e63524097acb::t_f7dae3f5f6300a 3,23,27,29-33,37,41,43,46,48,51,56,58,66,69,72,75,79,81,83,87,89
+apps/docs/autopilot/review-and-publish.mdx
+  s_33e63524097acb::t_78a5e88ce0625e 25,59,65,89
+  s_33e63524097acb::t_47d0c05fc8cb75 3
+  s_33e63524097acb::t_1ccc04ac5c05aa 119,132,136,140-142,146-148,150
+apps/docs/autopilot/slack.mdx
+  s_33e63524097acb::t_c41cc45c814b07 24,50-52
+  s_33e63524097acb::t_47d0c05fc8cb75 4
+apps/docs/autopilot/quickstart.mdx
+  s_33e63524097acb::t_c4bc2a3f6a81bb 28,86,88,90-94,98
+apps/docs/autopilot/automations/content.mdx
+  s_33e63524097acb::t_47d0c05fc8cb75 38
+  s_33e63524097acb::t_95b8cabcce210f 54,56,58,76,96,117,135
+  s_33e63524097acb::t_3969763c835fde 26,72,108,131
+  s_33e63524097acb::t_38731e2dba035f 90
+apps/docs/autopilot/daily-brief.mdx
+  s_33e63524097acb::t_cbc5b0098b4c22 24,56,60,62,66
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "e5049c9968b72d3427a642b2d3930935689d7a32",
+  "prompts": {},
+  "sessions": {
+    "s_33e63524097acb": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "bcecfd44-f88f-4203-b447-55ae342dcd8a",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
