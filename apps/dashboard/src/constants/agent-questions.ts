@@ -9,9 +9,14 @@ export const AGENT_QUESTION_DOCK_ATTRIBUTE = "data-agent-question-dock";
 
 /** One answer row in the question dock. */
 export const AGENT_QUESTION_ROW_CLASS =
-  "flex w-full min-w-0 items-start gap-2.5 rounded-xl px-3 py-2.5 text-left ring-1 ring-inset transition-[background-color,box-shadow] duration-fast ease-out outline-none focus-visible:ring-2 focus-visible:ring-ring/50";
+  "flex w-full min-w-0 items-start gap-2.5 rounded-xl px-3 py-2.5 text-left ring-1 ring-inset outline-none focus-visible:ring-2 focus-visible:ring-ring/50";
+/**
+ * Only an idle row eases (hover, and letting go of a pick). A picked row
+ * takes its tint at once, so switching answers quickly never leaves two
+ * half-tinted rows on screen.
+ */
 export const AGENT_QUESTION_ROW_IDLE_CLASS =
-  "bg-muted/40 ring-border/70 hover:bg-muted";
+  "bg-muted/40 ring-border/70 hover:bg-muted transition-[background-color,box-shadow] duration-fast ease-out";
 export const AGENT_QUESTION_ROW_PICKED_CLASS = "bg-primary/8 ring-primary/30";
 
 /** How long a picked answer shows before a pick-one question moves on. */
