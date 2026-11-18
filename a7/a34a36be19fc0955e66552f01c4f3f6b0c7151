@@ -1,0 +1,21 @@
+apps/dashboard/src/utils/autopilot-facts.ts
+  s_0d48d6dd5045a9::t_2584255f5167ff 89-91,93-104,106-107
+apps/dashboard/src/lib/autopilot/fact-check.ts
+  s_0d48d6dd5045a9::t_2584255f5167ff 155,193
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "a7a34a36be19fc0955e66552f01c4f3f6b0c7151",
+  "prompts": {},
+  "sessions": {
+    "s_0d48d6dd5045a9": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "1d864e52-4fea-466d-8627-8a02c0b6797a",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
