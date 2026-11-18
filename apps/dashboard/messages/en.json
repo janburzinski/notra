@@ -6634,6 +6634,15 @@
       "projectSettings": "Project settings",
       "loadingProjects": "Loading projects"
     },
+    "dailyBrief": {
+      "label": "Daily brief",
+      "ready": "Your daily brief is ready",
+      "dismiss": "Hide today's brief",
+      "hidden": "Hidden until tomorrow's brief",
+      "turnOff": "Turn off",
+      "turnedOff": "You won't see the daily brief here anymore",
+      "undo": "Undo"
+    },
     "onboarding": {
       "steps": {
         "prompt": "Add your first prompt",

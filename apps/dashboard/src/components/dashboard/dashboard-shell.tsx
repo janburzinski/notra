@@ -164,6 +164,14 @@ function DashboardAgentSlot() {
   );
 }
 
+const DailyBriefOverlay = dynamic(
+  () =>
+    import("@/components/dashboard/daily-brief-overlay").then(
+      (module) => module.DailyBriefOverlay
+    ),
+  { ssr: false }
+);
+
 function DashboardPageViewport({
   children,
 }: Pick<DashboardShellProps, "children">) {
@@ -268,6 +276,7 @@ export function DashboardShell({
         </SidebarInset>
         <div className="contents" id={RIGHT_PANEL_PORTAL_ID} />
         <DashboardAgentSlot />
+        <DailyBriefOverlay />
       </SidebarProvider>
       <DashboardGlobalActions />
       <AnalyticsImportWatcher />

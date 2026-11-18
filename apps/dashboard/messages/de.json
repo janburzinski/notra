@@ -6634,6 +6634,15 @@
       "projectSettings": "Projekteinstellungen",
       "loadingProjects": "Projekte werden geladen"
     },
+    "dailyBrief": {
+      "label": "Tägliches Briefing",
+      "ready": "Dein tägliches Briefing ist fertig",
+      "dismiss": "Heutiges Briefing ausblenden",
+      "hidden": "Bis zum Briefing von morgen ausgeblendet",
+      "turnOff": "Ausschalten",
+      "turnedOff": "Das tägliche Briefing erscheint hier nicht mehr",
+      "undo": "Rückgängig"
+    },
     "onboarding": {
       "steps": {
         "prompt": "Ersten Prompt hinzufügen",

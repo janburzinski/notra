@@ -39,5 +39,16 @@ export function useStoredDismissal(storageKey: string) {
       listener();
     }
   };
-  return { dismissed, dismiss };
+  const restore = () => {
+    dismissedKeys.delete(storageKey);
+    try {
+      window.localStorage.removeItem(storageKey);
+    } catch {
+      // Nothing was stored, so there is nothing to remove.
+    }
+    for (const listener of listeners) {
+      listener();
+    }
+  };
+  return { dismissed, dismiss, restore };
 }

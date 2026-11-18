@@ -59,6 +59,7 @@ import {
 import { AUTOPILOT_DAILY_WORKFLOW_KEY } from "@/constants/workflow-engine";
 import { loadAutopilotAnalytics } from "@/lib/autopilot/analytics";
 import { listRecentPullRequestAuthors } from "@/lib/autopilot/authors";
+import { loadTodayBrief } from "@/lib/autopilot/brief-today";
 import { resolveAutopilotCredits } from "@/lib/autopilot/credits";
 import {
   dismissFindingWithFeedback,
@@ -395,6 +396,15 @@ export const autopilotRouter = {
         workflowGraph,
       };
     }),
+
+  /**
+   * Today's brief for the sidebar card, or null. Every page asks, so a
+   * workspace without Autopilot gets null instead of an error.
+   */
+  todayBrief: authorizedProcedure
+    .input(autopilotOrganizationInputSchema)
+    .use(withOrganizationAccess)
+    .handler(({ input }) => loadTodayBrief(input.organizationId)),
 
   run: authorizedProcedure
     .input(autopilotRunInputSchema)

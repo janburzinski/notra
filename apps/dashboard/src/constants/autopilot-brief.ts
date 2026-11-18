@@ -14,6 +14,9 @@ export const AUTOPILOT_BRIEF_MAX_OUTPUT_TOKENS = 1500;
 /** Brief ids are nanoids; anything else is a 404 before touching the database. */
 export const AUTOPILOT_BRIEF_ID_PATTERN = /^[A-Za-z0-9_-]{1,64}$/;
 
+/** Items the daily brief card draws from today's brief. */
+export const AUTOPILOT_BRIEF_PREVIEW_ITEMS = 2;
+
 /** Posts and pages a pull request writes, shown rendered in the item modal. */
 export const AUTOPILOT_CONTENT_FILE_PATTERN = /\.mdx?$/i;
 /** Files the item modal reads from one pull request. */

@@ -29,6 +29,10 @@ export const localStorageKeys = {
   connectAgentDismissed: "notra:connect-agent-dismissed:v1",
   connectSlackDismissed: (organizationId: string) =>
     `notra:connect-slack-dismissed:v1:${organizationId}`,
+  dailyBriefDismissed: (briefId: string) =>
+    `notra:daily-brief-dismissed:v1:${briefId}`,
+  dailyBriefOff: (organizationId: string) =>
+    `notra:daily-brief-off:v1:${organizationId}`,
   uiSounds: "notra:ui-sounds:v1",
   siteSettingsGroupCollapsed: (id: string) =>
     `notra:site-settings-group-collapsed:v1:${id}`,
