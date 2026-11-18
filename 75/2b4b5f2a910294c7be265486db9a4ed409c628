@@ -1,0 +1,127 @@
+apps/ui/package.json
+  s_51485dc008574a::t_1becf5f3df67ab 33-35
+apps/ui/registry/notra/composer/components/composer.tsx
+  s_51485dc008574a::t_1becf5f3df67ab 21,90,94,122-123,126,128,131-140,152,161,195,197,200-213
+packages/ui/src/constants/edge-light.ts
+  s_51485dc008574a::t_1becf5f3df67ab 1-2
+apps/ui/registry/notra/edge-light/constants/edge-light.ts
+  s_51485dc008574a::t_1becf5f3df67ab 1-2
+apps/dashboard/src/lib/autopilot/fact-check.ts
+  ai_agent 24-28,146-154,186-191
+apps/ui/registry.json
+  s_51485dc008574a::t_1becf5f3df67ab 1477-1583,1787,1790
+apps/docs/concepts/brand-voice.mdx
+  s_51485dc008574a::t_1becf5f3df67ab 27
+apps/dashboard/src/constants/autopilot-style.ts
+  ai_agent 14-19,47
+packages/ui/src/types/composer.ts
+  s_51485dc008574a::t_1becf5f3df67ab 22-23
+packages/ui/src/components/ui/edge-light.tsx
+  s_51485dc008574a::t_1becf5f3df67ab 1-58
+apps/ui/registry/notra/edge-light/examples/edge-light.tsx
+  s_51485dc008574a::t_1becf5f3df67ab 1-28
+apps/docs/autopilot/results.mdx
+  s_51485dc008574a::t_1becf5f3df67ab 1-86
+apps/dashboard/src/lib/autopilot/writer.ts
+  s_51485dc008574a::t_1becf5f3df67ab 41,283-286,312,316-317,332,336,377-380
+apps/docs/autopilot/limits-and-credits.mdx
+  s_51485dc008574a::t_1becf5f3df67ab 1-76
+apps/ui/src/styles/examples.css
+  s_51485dc008574a::t_1becf5f3df67ab 6
+apps/docs/autopilot/workflows.mdx
+  s_51485dc008574a::t_1becf5f3df67ab 1-96
+apps/docs/automation/overview.mdx
+  s_51485dc008574a::t_1becf5f3df67ab 26-29
+apps/docs/autopilot/how-it-works.mdx
+  s_51485dc008574a::t_1becf5f3df67ab 1-143
+apps/ui/registry/notra/edge-light/types/edge-light.ts
+  s_51485dc008574a::t_1becf5f3df67ab 1-5
+apps/docs/autopilot/learning.mdx
+  s_51485dc008574a::t_1becf5f3df67ab 1-102
+apps/docs/docs.json
+  s_51485dc008574a::t_1becf5f3df67ab 130-133,240-282
+apps/ui/docs/components/meta.ts
+  s_51485dc008574a::t_1becf5f3df67ab 13
+packages/ui/src/types/edge-light.ts
+  s_51485dc008574a::t_1becf5f3df67ab 1-5
+apps/dashboard/src/lib/autopilot/fact-check.test.ts
+  s_51485dc008574a::t_fdfed9abe35b47 41-44,49,74-75,77-78,85-93,95-96
+apps/docs/autopilot/automations/content.mdx
+  s_51485dc008574a::t_1becf5f3df67ab 1-146
+apps/dashboard/src/utils/autopilot-facts.ts
+  s_51485dc008574a::t_1becf5f3df67ab 5,85-115
+apps/docs/autopilot/overview.mdx
+  s_51485dc008574a::t_1becf5f3df67ab 1-105
+apps/docs/autopilot/grow.mdx
+  s_51485dc008574a::t_1becf5f3df67ab 1-98
+apps/ui/registry/notra/edge-light/components/edge-light.tsx
+  s_51485dc008574a::t_1becf5f3df67ab 1-59
+packages/ui/src/styles/edge-light.css
+  s_51485dc008574a::t_1becf5f3df67ab 1-237
+apps/dashboard/src/components/autopilot/autopilot-templates.tsx
+  s_51485dc008574a::t_1becf5f3df67ab 135,277-278,281,284,288,292,295,298,335-336,347,350,354
+apps/docs/autopilot/review-and-publish.mdx
+  s_51485dc008574a::t_1becf5f3df67ab 1-161
+apps/dashboard/src/components/autopilot/autopilot-automations-overview.tsx
+  s_51485dc008574a::t_1becf5f3df67ab 205,368,370
+packages/ui/src/components/ui/composer.tsx
+  s_51485dc008574a::t_1becf5f3df67ab 11,123,127,154-155,158,160,163-172,188,235,237,240-258,273
+apps/ui/docs/components/edge-light.mdx
+  s_51485dc008574a::t_1becf5f3df67ab 1-34
+apps/ui/registry/notra/composer/examples/composer-state-streaming.tsx
+  s_51485dc008574a::t_1becf5f3df67ab 18
+apps/dashboard/src/constants/agent-questions.ts
+  ai_agent 12-17,19
+apps/ui/docs/components/composer.mdx
+  s_51485dc008574a::t_1becf5f3df67ab 55
+apps/docs/autopilot/daily-brief.mdx
+  s_51485dc008574a::t_1becf5f3df67ab 1-79
+apps/ui/scripts/registry-css.ts
+  s_51485dc008574a::t_1becf5f3df67ab 1-116
+apps/dashboard/src/types/autopilot-templates.ts
+  s_51485dc008574a::t_1becf5f3df67ab 25
+apps/docs/autopilot/automations/releases.mdx
+  s_51485dc008574a::t_1becf5f3df67ab 1-97
+apps/docs/autopilot/automations/site-fixes.mdx
+  s_51485dc008574a::t_1becf5f3df67ab 1-97
+apps/docs/autopilot/automations/overview.mdx
+  s_51485dc008574a::t_1becf5f3df67ab 1-108
+apps/dashboard/src/components/chat/chat-input.tsx
+  s_51485dc008574a::t_1becf5f3df67ab 1873
+apps/dashboard/src/components/ai/answer-mark.tsx
+  s_51485dc008574a::t_1becf5f3df67ab 8-10,22
+apps/docs/autopilot/troubleshooting.mdx
+  s_51485dc008574a::t_1becf5f3df67ab 1-89
+apps/dashboard/src/components/autopilot/autopilot-automation-menu-items.tsx
+  s_51485dc008574a::t_1becf5f3df67ab 61
+apps/ui/registry/notra/composer/types/composer.ts
+  s_51485dc008574a::t_1becf5f3df67ab 15-16
+apps/docs/integrations/slack.mdx
+  s_51485dc008574a::t_1becf5f3df67ab 79,83,88
+packages/ui/src/styles/globals.css
+  s_51485dc008574a::t_1becf5f3df67ab 4
+apps/docs/autopilot/settings.mdx
+  s_51485dc008574a::t_1becf5f3df67ab 1-111
+apps/docs/autopilot/quickstart.mdx
+  s_51485dc008574a::t_1becf5f3df67ab 1-113
+apps/dashboard/src/constants/autopilot.ts
+  s_51485dc008574a::t_1becf5f3df67ab 307-317
+apps/docs/autopilot/slack.mdx
+  s_51485dc008574a::t_1becf5f3df67ab 1-65
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "752b4b5f2a910294c7be265486db9a4ed409c628",
+  "prompts": {},
+  "sessions": {
+    "s_51485dc008574a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a92c9619-515f-4397-b2d8-f36b36bf95f4",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
