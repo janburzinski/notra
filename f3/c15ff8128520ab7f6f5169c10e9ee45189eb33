@@ -1,0 +1,58 @@
+apps/dashboard/src/constants/autopilot-brief.ts
+  s_a69441b239a3c3::t_d9ad55368e40de 19
+  s_a69441b239a3c3::t_f146f733d840f7 17-18
+apps/dashboard/src/constants/storage.ts
+  s_a69441b239a3c3::t_357a57b179a259 34-35
+  s_a69441b239a3c3::t_e1c1994d622eed 32-33
+apps/dashboard/src/lib/orpc/routers/autopilot.ts
+  s_a69441b239a3c3::t_d9ad55368e40de 60,383-390
+apps/dashboard/src/components/dashboard/daily-brief-overlay.tsx
+  s_a69441b239a3c3::t_357a57b179a259 20,60-66,70,78,80-94,191
+  s_a69441b239a3c3::t_687586c0a862bc 46-49
+  s_a69441b239a3c3::t_540700ff31e1f8 142,149
+  s_a69441b239a3c3::t_37992f369972ec 113,116,118
+  s_a69441b239a3c3::t_9516a424ccdf45 3-7
+  s_a69441b239a3c3::t_8b836f4bb7b8ad 176
+  s_a69441b239a3c3::t_fdd5d4164ab91a 1-2,8-9,11-19,21-24,26-29,44-45,50-54,57-59,67-69,71-77,79,95-101,106-112,114-115,119,125-126,128-130,187-189,192-201
+  s_a69441b239a3c3::t_aba6f5d0ffffbe 131-136,138-141,143-147,150-163,165-175,177-186
+  s_a69441b239a3c3::t_d7e22db9518a31 103
+  s_a69441b239a3c3::t_f146f733d840f7 164
+  s_a69441b239a3c3::t_0e07b8cdf9d6fd 127
+  s_a69441b239a3c3::t_3f0990649c0eff 38-39,117
+  s_a69441b239a3c3::t_73868b9339bb3d 10,25,55-56,102,104-105,148
+  s_a69441b239a3c3::t_4dad2a8ff0d457 137
+  s_a69441b239a3c3::t_a7fc8845aff267 190
+  s_a69441b239a3c3::t_78db03c4a335dd 30-37,40-43,120-124
+apps/dashboard/src/lib/autopilot/brief-today.ts
+  s_a69441b239a3c3::t_269ede40bb99da 68-69
+  s_a69441b239a3c3::t_504f86917d57c2 1-67,70-73
+apps/dashboard/messages/en.json
+  s_a69441b239a3c3::t_1a7f9ec7520bd8 6635,6637,6643
+  s_a69441b239a3c3::t_e1c1994d622eed 6636
+  s_a69441b239a3c3::t_357a57b179a259 6638-6642
+apps/dashboard/messages/de.json
+  s_a69441b239a3c3::t_357a57b179a259 6638-6642
+  s_a69441b239a3c3::t_e1c1994d622eed 6636
+  s_a69441b239a3c3::t_1a7f9ec7520bd8 6635,6637,6643
+apps/dashboard/src/components/dashboard/dashboard-shell.tsx
+  s_a69441b239a3c3::t_d4b1f874c5dd38 277
+  s_a69441b239a3c3::t_e1c1994d622eed 166-173
+apps/dashboard/src/lib/hooks/use-stored-dismissal.ts
+  s_a69441b239a3c3::t_357a57b179a259 42-53
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "f3c15ff8128520ab7f6f5169c10e9ee45189eb33",
+  "prompts": {},
+  "sessions": {
+    "s_a69441b239a3c3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7b34e9e7-e4ec-4cd6-82a8-4e49009ecceb",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
