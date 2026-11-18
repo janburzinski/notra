@@ -2,17 +2,13 @@
 
 import { AiChat02Icon, ArrowLeft01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import {
-  GEO_CHAT_SKIN_SURFACE,
-  GEO_PROMPT_MAX_TAGS,
-} from "@notra/geo-core/constants/geo";
+import { GEO_CHAT_SKIN_SURFACE } from "@notra/geo-core/constants/geo";
 import type {
   GeoPromptHistoryCheck,
   GeoPromptReceiptView,
   GeoPromptResultSummary,
 } from "@notra/geo-core/types/geo";
 import { formatAiTrafficTimestamp } from "@notra/geo-core/utils/ai-traffic";
-import { normalizePromptTags } from "@notra/geo-core/utils/geo-prompt-tags";
 import { POSTHOG_EVENTS } from "@notra/posthog/events";
 import { DetailSheetContent } from "@notra/ui/components/ui/detail-sheet";
 import {
@@ -35,7 +31,6 @@ import {
   type KeyboardEvent as ReactKeyboardEvent,
   type ReactNode,
   useEffect,
-  useId,
   useRef,
   useState,
 } from "react";
@@ -44,7 +39,6 @@ import { useLocale, useTranslations } from "use-intl";
 import { Button } from "@/components/button";
 import { EngineIcon } from "@/components/geo/engine-icon";
 import { GeoPromptAnswerSkeleton } from "@/components/geo/geo-prompt-answer-skeleton";
-import { GeoTagList } from "@/components/geo/geo-tag-list";
 import { LazyGeoPromptAnswerThread } from "@/components/geo/lazy-geo-prompt-answer-thread";
 import { PromptAnswerContent } from "@/components/geo/prompt-answer-content";
 import { PromptCopyButton } from "@/components/geo/prompt-copy-button";
@@ -66,7 +60,7 @@ import {
   useGeoSettings,
   usePrefetchGeoPromptResultDetail,
 } from "@/lib/hooks/use-geo";
-import { useGeoCompetitorsDb, useGeoPromptsDb } from "@/lib/hooks/use-geo-db";
+import { useGeoCompetitorsDb } from "@/lib/hooks/use-geo-db";
 import { useGeoPromptIntentLabel } from "@/lib/hooks/use-geo-prompt-intent-label";
 import { usePromptAnswerSelection } from "@/lib/hooks/use-prompt-answer-selection";
 import { cn } from "@/lib/utils";
@@ -396,42 +390,9 @@ function PromptAnswerLanguageBar({
   );
 }
 
-function PromptAnswerDetails({
-  tagsInputId,
-  row,
-  tags,
-  pending,
-  onChange,
-  children,
-}: PromptAnswerDetailsProps) {
-  const t = useTranslations("geo.promptDetailDialog");
-  const tGeoShared = useTranslations("geo.shared");
+function PromptAnswerDetails({ children }: PromptAnswerDetailsProps) {
   return (
-    <div className="bg-muted/20 flex flex-col gap-4 px-4 pb-4">
-      <ReceiptSection title={tGeoShared("tags")}>
-        <div className="px-3 py-2">
-          {row.source === "auto" ? (
-            <p className="px-1 py-1 text-sm break-words">
-              {tags.length > 0 ? tags.join(", ") : t("noTags")}
-            </p>
-          ) : (
-            <GeoTagList
-              disabled={pending}
-              id={tagsInputId}
-              inline
-              inputClassName="h-7 min-w-24 flex-1 basis-24 rounded-none border-0 bg-transparent px-1 text-sm shadow-none focus-visible:ring-0 dark:bg-transparent"
-              label={tGeoShared("tags")}
-              labeled={false}
-              max={GEO_PROMPT_MAX_TAGS}
-              onChange={onChange}
-              placeholder={t("addTag")}
-              values={tags}
-            />
-          )}
-        </div>
-      </ReceiptSection>
-      {children}
-    </div>
+    <div className="bg-muted/20 flex flex-col gap-4 px-4 pb-4">{children}</div>
   );
 }
 
@@ -489,12 +450,6 @@ export function PromptAnswerPage({
     initialLanguage,
     initialEngine,
   });
-  const tagsInputId = useId();
-  const { prompts, pendingPromptIds, setPromptTags } = useGeoPromptsDb(
-    organizationId,
-    { enabled: open }
-  );
-  const tags = prompts.find((prompt) => prompt.id === row.id)?.tags ?? row.tags;
   const [view, setView] = useState<GeoPromptReceiptView>("analysis");
   const [selectedCheck, setSelectedCheck] =
     useState<GeoPromptHistoryCheck | null>(null);
@@ -627,15 +582,7 @@ export function PromptAnswerPage({
           />
         )}
         {view === "analysis" && !selectedCheck ? (
-          <PromptAnswerDetails
-            onChange={(nextTags) =>
-              setPromptTags(row.id, normalizePromptTags(nextTags))
-            }
-            pending={pendingPromptIds.has(row.id)}
-            row={row}
-            tags={tags}
-            tagsInputId={tagsInputId}
-          >
+          <PromptAnswerDetails>
             <PromptTranslationsSection
               open={open}
               organizationId={organizationId}

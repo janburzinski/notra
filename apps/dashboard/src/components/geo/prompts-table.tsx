@@ -7,7 +7,6 @@ import {
   PlayIcon,
   PlusSignIcon,
   SearchIcon,
-  Tag01Icon,
   Upload01Icon,
   ViewIcon,
 } from "@hugeicons/core-free-icons";
@@ -16,7 +15,6 @@ import {
   PROMPTS_TABLE_HEIGHT,
   PROMPTS_TABLE_ROW_HEIGHT,
 } from "@notra/geo-core/constants/geo";
-import { collectPromptTags } from "@notra/geo-core/utils/geo-prompt-tags";
 import {
   GEO_PROMPT_FILTER_ALL,
   GEO_PROMPT_INTENT_FILTER_VALUES,
@@ -45,7 +43,6 @@ import {
 } from "@notra/ui/components/ui/select";
 import { parseAsString, parseAsStringLiteral, useQueryState } from "nuqs";
 import { type ReactNode, useEffect, useMemo, useState } from "react";
-import { toast } from "sonner";
 import { DataTable, type TableColumn } from "ui/table";
 import { useTranslations } from "use-intl";
 
@@ -55,7 +52,6 @@ import { PromptPresenceBadge } from "@/components/geo/prompt-badges";
 import { PromptDetailDialog } from "@/components/geo/prompt-detail-dialog";
 import { PromptMentionedInsteadCell } from "@/components/geo/prompt-mentioned-instead-cell";
 import { PromptProductCell } from "@/components/geo/prompt-product-cell";
-import { PromptTagsActionDialog } from "@/components/geo/prompt-tags-action-dialog";
 import { GEO_PROMPT_DETAIL_SURFACES } from "@/constants/geo-analytics";
 import {
   GEO_PROMPT_DEFAULT_FILTERS,
@@ -74,7 +70,6 @@ import type {
   GeoPromptIntentFilter,
   GeoPromptTableFilters,
   GeoPromptTableRow,
-  PromptTagsDialogTarget,
   PromptsTableProps,
 } from "@/types/geo";
 import { copyTextToClipboard } from "@/utils/copy-to-clipboard";
@@ -117,14 +112,12 @@ function PromptTableContextMenu({
   row,
   isPending,
   onOpenDetails,
-  onEditTags,
   onEnable,
   onDelete,
 }: {
   row: GeoPromptTableRow;
   isPending: boolean;
   onOpenDetails: () => void;
-  onEditTags: () => void;
   onEnable: () => void;
   onDelete: () => void;
 }) {
@@ -142,19 +135,14 @@ function PromptTableContextMenu({
         <HugeiconsIcon icon={Copy01Icon} strokeWidth={2} />
         {tGeoShared("copyPrompt")}
       </ContextMenuItem>
-      <ContextMenuSeparator />
-      <ContextMenuItem
-        disabled={isPending || row.source === "auto"}
-        onClick={onEditTags}
-      >
-        <HugeiconsIcon icon={Tag01Icon} strokeWidth={2} />
-        {tGeoShared("editTags")}
-      </ContextMenuItem>
       {row.enabled ? null : (
-        <ContextMenuItem disabled={isPending} onClick={onEnable}>
-          <HugeiconsIcon icon={PlayIcon} strokeWidth={2} />
-          {t("enablePrompt")}
-        </ContextMenuItem>
+        <>
+          <ContextMenuSeparator />
+          <ContextMenuItem disabled={isPending} onClick={onEnable}>
+            <HugeiconsIcon icon={PlayIcon} strokeWidth={2} />
+            {t("enablePrompt")}
+          </ContextMenuItem>
+        </>
       )}
       <ContextMenuSeparator />
       <ContextMenuItem
@@ -195,9 +183,7 @@ export function PromptsTable({
     pendingPromptIds,
     togglePrompt,
     removePrompts,
-    setPromptTags,
     setPromptProduct,
-    addTagsToPrompts,
   } = useGeoPromptsDb(organizationId);
   const { data: productsData } = useGeoProducts(organizationId);
   const products = productsData?.products ?? [];
@@ -211,12 +197,6 @@ export function PromptsTable({
       .withDefault(GEO_PROMPT_FILTER_ALL)
       .withOptions({ clearOnDefault: true })
   );
-  const [tag, setTag] = useQueryState(
-    "tag",
-    parseAsString
-      .withDefault(GEO_PROMPT_FILTER_ALL)
-      .withOptions({ clearOnDefault: true })
-  );
   const [source, setSource] = useQueryState(
     "source",
     parseAsStringLiteral(GEO_PROMPT_SOURCE_FILTER_VALUES)
@@ -226,9 +206,6 @@ export function PromptsTable({
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [pendingDelete, setPendingDelete] = useState<GeoPromptTableRow[]>([]);
-  const [tagsTarget, setTagsTarget] = useState<PromptTagsDialogTarget | null>(
-    null
-  );
   const [detail, setDetail] = useState<GeoPromptTableRow | null>(null);
   const createProduct = useGeoProductCreate(organizationId);
   // Prompt id to the product name being created for it; several rows can
@@ -257,13 +234,9 @@ export function PromptsTable({
   );
 
   const filters = useMemo<GeoPromptTableFilters>(
-    () => ({ q: search, intent, tag, source }),
-    [search, intent, tag, source]
+    () => ({ q: search, intent, source }),
+    [search, intent, source]
   );
-  const tagsInUse = useMemo(() => collectPromptTags(prompts), [prompts]);
-  const activeTagFilterMissing =
-    tag !== GEO_PROMPT_FILTER_ALL && !tagsInUse.includes(tag);
-  const tagOptions = activeTagFilterMissing ? [tag, ...tagsInUse] : tagsInUse;
 
   const rows = useMemo(
     () => buildPromptTableRows(prompts, results, filters),
@@ -301,33 +274,9 @@ export function PromptsTable({
     setDeleteOpen(true);
   };
 
-  const applyTags = (tags: string[]) => {
-    if (!tagsTarget) {
-      return;
-    }
-    if (tagsTarget.mode === "edit") {
-      const target = tagsTarget.rows[0];
-      if (target) {
-        setPromptTags(target.id, tags);
-      }
-      return;
-    }
-    const custom = tagsTarget.rows.filter((row) => row.source === "custom");
-    if (custom.length < tagsTarget.rows.length) {
-      toast.info(t("tagsCustomOnly"));
-    }
-    if (custom.length > 0 && tags.length > 0) {
-      addTagsToPrompts(
-        custom.map((row) => row.id),
-        tags
-      );
-    }
-  };
-
   const clearFilters = () => {
     setSearch(GEO_PROMPT_DEFAULT_FILTERS.q);
     setIntent(GEO_PROMPT_DEFAULT_FILTERS.intent);
-    setTag(GEO_PROMPT_DEFAULT_FILTERS.tag);
     setSource(GEO_PROMPT_DEFAULT_FILTERS.source);
   };
 
@@ -339,9 +288,8 @@ export function PromptsTable({
     }
     void setSearch(GEO_PROMPT_DEFAULT_FILTERS.q);
     void setIntent(GEO_PROMPT_DEFAULT_FILTERS.intent);
-    void setTag(GEO_PROMPT_DEFAULT_FILTERS.tag);
     void setSource(GEO_PROMPT_DEFAULT_FILTERS.source);
-  }, [staleFilters, setSearch, setIntent, setTag, setSource]);
+  }, [staleFilters, setSearch, setIntent, setSource]);
 
   let emptyState: ReactNode = (
     <Empty className="py-8 md:py-8">
@@ -466,7 +414,6 @@ export function PromptsTable({
     <PromptTableContextMenu
       isPending={pendingPromptIds.has(row.id)}
       onDelete={() => requestDelete([row])}
-      onEditTags={() => setTagsTarget({ mode: "edit", rows: [row] })}
       onOpenDetails={() => setDetail(row)}
       onEnable={() => togglePrompt(row.id, true)}
       row={row}
@@ -540,31 +487,6 @@ export function PromptsTable({
               ))}
             </SelectContent>
           </Select>
-          {tagOptions.length > 0 ? (
-            <Select
-              onValueChange={(value) => setTag(value ?? GEO_PROMPT_FILTER_ALL)}
-              value={tag}
-            >
-              <SelectTrigger
-                aria-label={t("filterByTag")}
-                className={GEO_PROMPT_FILTER_SELECT_CLASS}
-              >
-                <SelectValue>
-                  {tag === GEO_PROMPT_FILTER_ALL ? t("allTags") : tag}
-                </SelectValue>
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value={GEO_PROMPT_FILTER_ALL}>
-                  {t("allTags")}
-                </SelectItem>
-                {tagOptions.map((option) => (
-                  <SelectItem key={option} value={option}>
-                    {option}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          ) : null}
           <Select
             onValueChange={(value) => {
               const next = GEO_PROMPT_SOURCE_FILTER_VALUES.find(
@@ -593,18 +515,6 @@ export function PromptsTable({
               {tCommon("clear")}
             </Button>
           ) : null}
-          {selectedRows.length > 0 && (
-            <Button
-              onClick={() =>
-                setTagsTarget({ mode: "bulk", rows: selectedRows })
-              }
-              size="sm"
-              variant="outline"
-            >
-              <HugeiconsIcon icon={Tag01Icon} size={14} />
-              {t("addTagCount", { count: selectedRows.length })}
-            </Button>
-          )}
           {selectedRows.length > 0 && (
             <Button
               onClick={() => requestDelete(selectedRows)}
@@ -652,12 +562,6 @@ export function PromptsTable({
           }
         }}
         open={deleteOpen}
-      />
-      <PromptTagsActionDialog
-        target={tagsTarget}
-        onConfirm={applyTags}
-        onClose={() => setTagsTarget(null)}
-        suggestions={tagsInUse}
       />
       <PromptDetailDialog
         isScanning={isScanning}

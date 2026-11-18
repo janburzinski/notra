@@ -483,8 +483,6 @@ export const GEO_RESCAN_AI_SEARCH_MAX_PROMPTS = 3;
 export const GEO_EXCERPT_MAX_LENGTH = 300;
 export const GEO_PROMPT_MIN_LENGTH = 8;
 export const GEO_PROMPT_MAX_LENGTH = 300;
-export const GEO_PROMPT_MAX_TAGS = 20;
-export const GEO_PROMPT_TAG_MAX_LENGTH = 40;
 export const GEO_PROMPT_INTENTS = [
   "problem",
   "comparison",

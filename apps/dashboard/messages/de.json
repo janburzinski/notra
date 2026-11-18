@@ -2481,7 +2481,6 @@
       "copyPrompt": "Prompt kopieren",
       "bestPosition": "Beste Position",
       "notRanked": "Nicht platziert",
-      "tags": "Tags",
       "outcome": "Ergebnis",
       "whatChanged": "Was sich geändert hat",
       "searchQueries": "Suchanfragen",
@@ -2491,8 +2490,6 @@
       "removePrompt": "{prompt} entfernen",
       "openDetailsPrompt": "Details öffnen: {prompt}",
       "suggestedPrompts": "Vorgeschlagene Prompts",
-      "editTags": "Tags bearbeiten",
-      "addTags": "Tags hinzufügen",
       "openDetails": "Details öffnen",
       "scans": "Scans",
       "tracked": "Getrackt",
@@ -3437,8 +3434,6 @@
       "backToLatest": "Zurück zum neuesten Scan",
       "latestAnswer": "Neueste Antwort jeder KI-Engine",
       "answerLanguage": "Antwortsprache",
-      "noTags": "Keine Tags",
-      "addTag": "Tag hinzufügen…",
       "lastScan": "Letzter Scan"
     },
     "promptDetailStatus": {
@@ -3497,15 +3492,6 @@
       "empty": "Noch keine Vorschläge aus der Google-Suche",
       "askedOnGoogle": "Auf Google gefragt: „{question}“"
     },
-    "promptTagsActionDialog": {
-      "editDescription": "Tags gruppieren Prompts, damit du filtern und Ansichten speichern kannst.",
-      "editConfirm": "Tags speichern",
-      "bulkDescription": "Tags werden zu jedem ausgewählten eigenen Prompt hinzugefügt."
-    },
-    "promptTagsDialog": {
-      "placeholder": "Tag eingeben und Enter drücken",
-      "suggestions": "Verwendete Tags"
-    },
     "promptsTable": {
       "copiedPrompt": "Prompt kopiert",
       "enablePrompt": "Prompt aktivieren",
@@ -3516,7 +3502,6 @@
       "removeAction": "{count, plural, one {Prompt entfernen} other {Prompts entfernen}}",
       "nounSingular": "Prompt",
       "nounPlural": "Prompts",
-      "tagsCustomOnly": "Tags gelten nur für eigene Prompts. Automatisch erzeugte Prompts wurden übersprungen.",
       "columns": {
         "presence": "Präsenz",
         "mentionedInstead": "Stattdessen genannt",
@@ -3531,13 +3516,10 @@
       "filterAria": "Prompts filtern",
       "filterPlaceholder": "Prompts filtern…",
       "filterByIntent": "Nach Intention filtern",
-      "filterByTag": "Nach Tag filtern",
       "allIntents": "Alle Intentionen",
-      "allTags": "Alle Tags",
       "source": {
         "auto": "Automatisch"
       },
-      "addTagCount": "Tag hinzufügen ({count})",
       "emptyIdle": "Füge die Fragen hinzu, die deine Käufer KI-Engines stellen, oder importiere eine Liste als CSV.",
       "noMatches": "Keine Prompts entsprechen diesen Filtern",
       "emptyTitle": "Noch keine Prompts",
@@ -4474,7 +4456,6 @@
       "viewScan": "Ansehen",
       "updatePromptFailed": "Prompt konnte nicht aktualisiert werden",
       "removePromptFailed": "Prompt konnte nicht entfernt werden",
-      "updateTagsFailed": "Tags konnten nicht aktualisiert werden",
       "moveToProductFailed": "Prompt konnte nicht verschoben werden",
       "createProductFailed": "Produkt konnte nicht erstellt werden",
       "updateProjectBrandIdentityFailed": "Markenidentität des Projekts konnte nicht aktualisiert werden",

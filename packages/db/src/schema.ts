@@ -2013,6 +2013,10 @@ export const geoPrompts = pgTable(
       .references(() => projects.id, { onDelete: "cascade" }),
     prompt: text("prompt").notNull(),
     title: text("title"),
+    /**
+     * Unused: tags were removed. The column is dropped in a later release,
+     * once no deployed service still writes it.
+     */
     tags: text("tags")
       .array()
       .notNull()

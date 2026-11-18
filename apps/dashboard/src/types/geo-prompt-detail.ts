@@ -67,11 +67,6 @@ export interface PromptAnswerLanguageBarProps {
 }
 
 export interface PromptAnswerDetailsProps {
-  tagsInputId: string;
-  row: GeoPromptTableRow;
-  tags: string[];
-  pending: boolean;
-  onChange: (nextTags: string[]) => void;
   children?: ReactNode;
 }
 

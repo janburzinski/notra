@@ -1439,7 +1439,7 @@ export const geoRouter = {
   promptsCreate: authorizedProcedure.input(geoPromptCreateInputSchema).handler(
     geoHandler(
       (input) =>
-        createGeoPrompt(input, input.prompt, input.id, input.tags ?? []).pipe(
+        createGeoPrompt(input, input.prompt, input.id).pipe(
           Effect.tap(() => refreshGeoContentGapsBestEffort(input))
         ),
       ({ context, input, output }) => {
@@ -1495,7 +1495,6 @@ export const geoRouter = {
     geoHandler((input) =>
       updateGeoPrompt(input, input.promptId, {
         enabled: input.enabled,
-        tags: input.tags,
         productId: input.productId,
       }).pipe(Effect.tap(() => refreshGeoContentGapsBestEffort(input)))
     )

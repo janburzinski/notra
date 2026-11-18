@@ -112,7 +112,6 @@ export function toTrackedPrompt(row: GeoPromptRow): GeoTrackedPrompt {
     prompt: row.prompt,
     enabled: row.enabled,
     source: "custom",
-    tags: row.tags,
     createdAt: row.createdAt.toISOString(),
     productId: row.productId,
     intent: toGeoPromptIntent(row.intent),

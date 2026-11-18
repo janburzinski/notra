@@ -42,9 +42,7 @@ import {
   GEO_MAX_PROMPTS,
   GEO_ONBOARDING_MAX_PROMPTS,
   GEO_PROMPT_MAX_LENGTH,
-  GEO_PROMPT_MAX_TAGS,
   GEO_PROMPT_MIN_LENGTH,
-  GEO_PROMPT_TAG_MAX_LENGTH,
   GEO_SCAN_MAX_INTERVAL_HOURS,
   GEO_SCAN_MIN_INTERVAL_HOURS,
   GEO_SHORT_FIELD_MAX_LENGTH,
@@ -74,7 +72,6 @@ import {
 } from "../constants/web-analytics";
 import { withAnalyticsRangeCap } from "../utils/analytics-range-cap";
 import { normalizeProjectDomain } from "../utils/geo-project-domains";
-import { normalizePromptTags } from "../utils/geo-prompt-tags";
 import {
   geoCompetitorDomainSchema,
   geoCompetitorImportRowSchema,
@@ -354,16 +351,9 @@ export const geoCompetitorShareInputSchema = geoTimeseriesInputSchema.extend({
   summaryOnly: boolean().optional(),
 });
 
-const geoPromptTagsSchema = array(
-  string().trim().min(1).max(GEO_PROMPT_TAG_MAX_LENGTH)
-)
-  .max(GEO_PROMPT_MAX_TAGS)
-  .transform((values) => normalizePromptTags(values));
-
 export const geoPromptCreateInputSchema = geoOrganizationInputSchema.extend({
   id: string().uuid().optional(),
   prompt: string().min(MIN_PROMPT_LENGTH).max(MAX_PROMPT_LENGTH),
-  tags: geoPromptTagsSchema.optional(),
 });
 
 export const geoProductCreateInputSchema = geoOrganizationInputSchema.extend({
@@ -375,7 +365,6 @@ export const geoPromptUpdateInputSchema = geoOrganizationInputSchema
   .extend({
     promptId: string().min(1),
     enabled: boolean().optional(),
-    tags: geoPromptTagsSchema.optional(),
     productId: string()
       .min(1)
       .max(GEO_SHORT_FIELD_MAX_LENGTH)
@@ -383,11 +372,8 @@ export const geoPromptUpdateInputSchema = geoOrganizationInputSchema
       .optional(),
   })
   .refine(
-    (value) =>
-      value.enabled !== undefined ||
-      value.tags !== undefined ||
-      value.productId !== undefined,
-    { message: "Provide enabled, tags or productId" }
+    (value) => value.enabled !== undefined || value.productId !== undefined,
+    { message: "Provide enabled or productId" }
   );
 
 export const geoAutoPromptToggleInputSchema = geoOrganizationInputSchema.extend(

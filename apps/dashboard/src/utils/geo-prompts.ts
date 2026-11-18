@@ -49,13 +49,7 @@ function matchesPromptFilters(
   if (filters.intent !== GEO_PROMPT_FILTER_ALL && intent !== filters.intent) {
     return false;
   }
-  if (
-    filters.tag !== GEO_PROMPT_FILTER_ALL &&
-    !prompt.tags.includes(filters.tag)
-  ) {
-    return false;
-  }
-  return fuzzyMatches([prompt.prompt, ...prompt.tags], filters.q.trim());
+  return fuzzyMatches([prompt.prompt], filters.q.trim());
 }
 
 /** A product's badge variant, stable for its discovery position. */
@@ -89,7 +83,6 @@ export function buildPromptTableRows(
       prompt: prompt.prompt,
       enabled: prompt.enabled,
       source: prompt.source,
-      tags: prompt.tags,
       intent,
       product: prompt.product ?? null,
       mentioned: summary?.mentioned ?? 0,
@@ -107,7 +100,7 @@ export function buildPromptTableRows(
   return rows
     .map((row) => ({
       row,
-      score: bestFuzzyScore([row.prompt, ...row.tags], query),
+      score: bestFuzzyScore([row.prompt], query),
     }))
     .sort((a, b) => b.score - a.score)
     .map((entry) => entry.row);
@@ -238,7 +231,6 @@ export function promptTableRowForId(
     prompt: first.prompt,
     enabled: true,
     source: "auto",
-    tags: [],
     intent: geoPromptIntent(first.prompt),
     product: null,
     mentioned: mentioned.length,

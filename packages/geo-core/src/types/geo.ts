@@ -589,7 +589,6 @@ export interface GeoTrackedPrompt {
   prompt: string;
   enabled: boolean;
   source: GeoPromptSource;
-  tags: string[];
   createdAt: string | null;
   /** Product or niche the prompt tracks; null tracks the whole company. */
   productId?: string | null;
@@ -611,7 +610,6 @@ export interface GeoPromptRow {
   organizationId: string;
   projectId: string;
   prompt: string;
-  tags: string[];
   productId: string | null;
   intent: string | null;
   enabled: boolean;
@@ -621,7 +619,6 @@ export interface GeoPromptRow {
 
 export interface GeoPromptUpdateChanges {
   enabled?: boolean;
-  tags?: string[];
   /** Null removes the prompt from its product. */
   productId?: string | null;
 }

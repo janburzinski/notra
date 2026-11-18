@@ -1,10 +1,6 @@
 import "zod/compile";
 import { z } from "@hono/zod-openapi";
 import {
-  GEO_PROMPT_MAX_TAGS,
-  GEO_PROMPT_TAG_MAX_LENGTH,
-} from "@notra/geo-core/constants/geo";
-import {
   GEO_CSV_IMPORT_MAX_BYTES,
   GEO_CSV_IMPORT_MAX_ROWS,
 } from "@notra/geo-core/constants/geo-import";
@@ -14,14 +10,6 @@ import { geoPromptTextSchema } from "./geo-fields";
 import { geoImportIssueSchema } from "./geo-import";
 import { projectParamsSchema } from "./geo-params";
 import { resourceIdSchema } from "./ids";
-
-const promptTagsSchema = z
-  .array(z.string().trim().min(1).max(GEO_PROMPT_TAG_MAX_LENGTH))
-  .max(GEO_PROMPT_MAX_TAGS)
-  .openapi({
-    description:
-      "Free-form labels for grouping custom prompts. Lowercased and deduplicated on save.",
-  });
 
 const promptSchema = z
   .object({
@@ -38,7 +26,9 @@ const promptSchema = z
         "`custom` for prompts added by the user, `auto` for prompts Notra generates from the brand settings.",
     }),
     tags: z.array(z.string()).openapi({
-      description: "Labels on custom prompts. Always empty for auto prompts.",
+      deprecated: true,
+      description:
+        "Deprecated: prompt tags were removed. Always empty; a future API version drops the field.",
     }),
     createdAt: z.string().nullable().openapi({
       description: "When the custom prompt was added. `null` for auto prompts.",
@@ -67,21 +57,20 @@ export const promptResponseSchema = z
   })
   .openapi("GeoPromptResponse");
 
+// Strict, so clients that still send the removed `tags` field get a
+// validation error instead of a success that silently drops it.
 export const createPromptRequestSchema = z
   .object({
     prompt: geoPromptTextSchema,
-    tags: promptTagsSchema.optional(),
   })
+  .strict()
   .openapi("CreateGeoPromptRequest");
 
 export const patchPromptRequestSchema = z
   .object({
-    enabled: z.boolean().optional(),
-    tags: promptTagsSchema.optional(),
+    enabled: z.boolean(),
   })
-  .refine((value) => value.enabled !== undefined || value.tags !== undefined, {
-    message: "Provide enabled or tags",
-  })
+  .strict()
   .openapi("PatchGeoPromptRequest");
 
 export const deletePromptResponseSchema = z

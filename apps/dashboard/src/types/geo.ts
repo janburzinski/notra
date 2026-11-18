@@ -294,7 +294,6 @@ export interface GeoPromptTableRow {
   prompt: string;
   enabled: boolean;
   source: GeoTrackedPrompt["source"];
-  tags: string[];
   intent: GeoPromptIntent;
   product: GeoProduct | null;
   mentioned: number;
@@ -316,42 +315,11 @@ export type GeoPromptSourceFilter = GeoPromptSource | "all";
 export interface GeoPromptTableFilters {
   q: string;
   intent: GeoPromptIntentFilter;
-  tag: string;
   source: GeoPromptSourceFilter;
-}
-
-export interface PromptTagsActionDialogProps {
-  target: PromptTagsDialogTarget | null;
-  suggestions: string[];
-  onConfirm: (tags: string[]) => void;
-  onClose: () => void;
-}
-
-export interface PromptTagsDialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  title: string;
-  description: string;
-  confirmLabel: string;
-  initialTags: string[];
-  suggestions: string[];
-  onConfirm: (tags: string[]) => void;
-}
-
-export interface PromptTagsFormProps {
-  formId: string;
-  initialTags: string[];
-  suggestions: string[];
-  onSubmit: (tags: string[]) => void;
 }
 
 export interface PromptPresenceBadgeProps {
   status: GeoPresenceStatus | null;
-}
-
-export interface PromptTagsDialogTarget {
-  mode: "edit" | "bulk";
-  rows: GeoPromptTableRow[];
 }
 
 export interface ConversationRowActionsProps {

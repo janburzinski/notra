@@ -6,7 +6,6 @@ export function promptFiltersActive(filters: GeoPromptTableFilters): boolean {
   return (
     filters.q.trim().length > 0 ||
     filters.intent !== GEO_PROMPT_FILTER_ALL ||
-    filters.tag !== GEO_PROMPT_FILTER_ALL ||
     filters.source !== GEO_PROMPT_FILTER_ALL
   );
 }

@@ -75,7 +75,6 @@ export function toAutoTrackedPrompts(
       prompt: autoPrompt.text,
       enabled: !paused.has(autoPrompt.id),
       source: "auto",
-      tags: [],
       createdAt: null,
     });
   }

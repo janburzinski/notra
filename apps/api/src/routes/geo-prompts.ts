@@ -40,6 +40,7 @@ import {
 import { runGeoEffect } from "../runtime/geo";
 import { trackApiEvent } from "../utils/analytics";
 import { geoOutcomeResponse, refreshGeoGapsAfter } from "../utils/geo";
+import { withDeprecatedTags } from "../utils/geo-prompts";
 import { createOpenApiApp } from "../utils/openapi-app";
 import { rateLimitResponse } from "../utils/openapi-responses";
 import { enforceRatelimit, RATE_LIMITS, ratelimit } from "../utils/ratelimit";
@@ -92,8 +93,7 @@ const patchPromptRoute = createRoute({
   tags: [GEO_OPENAPI_TAG],
   operationId: "updateGeoPrompt",
   summary: "Update a tracked GEO prompt",
-  description:
-    "Enable or disable a tracked prompt, or replace tags on a custom prompt.",
+  description: "Enable or disable a tracked prompt.",
   request: {
     params: promptParamsSchema,
     body: {
@@ -218,7 +218,10 @@ geoPromptsRoutes.openapi(listPromptsRoute, async (c) => {
   const outcome = await runGeoEffect(
     "promptsList",
     listGeoPrompts({ organizationId: base.organizationId, projectId }).pipe(
-      Effect.map(({ configured, prompts }) => ({ configured, prompts }))
+      Effect.map(({ configured, prompts }) => ({
+        configured,
+        prompts: prompts.map(withDeprecatedTags),
+      }))
     )
   );
   return geoOutcomeResponse(c, outcome, 200);
@@ -227,13 +230,13 @@ geoPromptsRoutes.openapi(listPromptsRoute, async (c) => {
 geoPromptsRoutes.openapi(createPromptRoute, async (c) => {
   const base = c.get("geo");
   const { projectId } = c.req.valid("param");
-  const { prompt, tags } = c.req.valid("json");
+  const { prompt } = c.req.valid("json");
   const scope = { organizationId: base.organizationId, projectId };
   const outcome = await runGeoEffect(
     "promptsCreate",
-    createGeoPrompt(scope, prompt, undefined, tags ?? []).pipe(
+    createGeoPrompt(scope, prompt).pipe(
       refreshGeoGapsAfter(scope),
-      Effect.map((created) => ({ prompt: created }))
+      Effect.map((created) => ({ prompt: withDeprecatedTags(created) }))
     )
   );
   return geoOutcomeResponse(c, outcome, 201);
@@ -242,13 +245,13 @@ geoPromptsRoutes.openapi(createPromptRoute, async (c) => {
 geoPromptsRoutes.openapi(patchPromptRoute, async (c) => {
   const base = c.get("geo");
   const { projectId, promptId } = c.req.valid("param");
-  const { enabled, tags } = c.req.valid("json");
+  const { enabled } = c.req.valid("json");
   const scope = { organizationId: base.organizationId, projectId };
   const outcome = await runGeoEffect(
     "promptsUpdate",
-    updateGeoPrompt(scope, promptId, { enabled, tags }).pipe(
+    updateGeoPrompt(scope, promptId, { enabled }).pipe(
       refreshGeoGapsAfter(scope),
-      Effect.map((prompt) => ({ prompt }))
+      Effect.map((prompt) => ({ prompt: withDeprecatedTags(prompt) }))
     )
   );
   return geoOutcomeResponse(c, outcome, 200);
@@ -350,7 +353,9 @@ geoPromptsRoutes.openapi(acceptSuggestionRoute, async (c) => {
       },
     });
   }
-  return geoOutcomeResponse(c, outcome, 200, ({ prompt }) => ({ prompt }));
+  return geoOutcomeResponse(c, outcome, 200, ({ prompt }) => ({
+    prompt: withDeprecatedTags(prompt),
+  }));
 });
 
 geoPromptsRoutes.openapi(dismissSuggestionRoute, async (c) => {

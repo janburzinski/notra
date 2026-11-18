@@ -161,7 +161,6 @@ import {
   trafficLogHostFilter,
 } from "../utils/geo-project-domains";
 import { toGeoPromptResult } from "../utils/geo-prompt-results";
-import { normalizePromptTags } from "../utils/geo-prompt-tags";
 import { groupGeoSparklinePoints } from "../utils/geo-sparkline";
 import { memoizeGeoRequest } from "../utils/request-memo";
 import { loadCompletedImportIds } from "./analytics-imports";
@@ -1906,8 +1905,7 @@ const createPromptInTransaction = Effect.fn("geo.promptsCreateTx")(function* (
   organizationId: string,
   projectId: string,
   prompt: string,
-  id?: string,
-  tags: readonly string[] = []
+  id?: string
 ) {
   yield* lockGeoProject(tx, projectId);
   const duplicate = yield* geoDb("prompt lookup failed", () =>
@@ -1930,7 +1928,6 @@ const createPromptInTransaction = Effect.fn("geo.promptsCreateTx")(function* (
         organizationId,
         projectId,
         prompt,
-        tags: normalizePromptTags(tags),
       })
       .returning()
   );
@@ -1940,8 +1937,7 @@ const createPromptInTransaction = Effect.fn("geo.promptsCreateTx")(function* (
 export const createGeoPrompt = Effect.fn("geo.promptsCreate")(function* (
   input: GeoScopeInput,
   prompt: string,
-  id?: string,
-  tags: readonly string[] = []
+  id?: string
 ) {
   const scope = yield* requireGeoProject(input);
   const row = yield* geoTransaction("prompt create failed", (tx) =>
@@ -1950,8 +1946,7 @@ export const createGeoPrompt = Effect.fn("geo.promptsCreate")(function* (
       scope.organizationId,
       scope.projectId,
       prompt,
-      id,
-      tags
+      id
     )
   );
 
@@ -2088,7 +2083,6 @@ function trackedAutoPrompt(
     prompt: promptId,
     enabled,
     source: "auto",
-    tags: [],
     createdAt: null,
   };
 }
@@ -2240,13 +2234,9 @@ export const updateGeoPrompt = Effect.fn("geo.promptsUpdate")(function* (
   changes: GeoPromptUpdateChanges
 ) {
   const scope = yield* requireGeoProject(input);
-  const set: { enabled?: boolean; tags?: string[]; productId?: string | null } =
-    {};
+  const set: { enabled?: boolean; productId?: string | null } = {};
   if (changes.enabled !== undefined) {
     set.enabled = changes.enabled;
-  }
-  if (changes.tags !== undefined) {
-    set.tags = normalizePromptTags(changes.tags);
   }
   const productId = changes.productId;
   if (productId) {

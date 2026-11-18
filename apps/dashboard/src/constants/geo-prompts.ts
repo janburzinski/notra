@@ -12,7 +12,6 @@ import type { GeoPromptTableFilters } from "@/types/geo";
 export const GEO_PROMPT_DEFAULT_FILTERS: GeoPromptTableFilters = {
   q: "",
   intent: GEO_PROMPT_FILTER_ALL,
-  tag: GEO_PROMPT_FILTER_ALL,
   source: GEO_PROMPT_FILTER_ALL,
 };
 export const GEO_PROMPT_FILTER_SELECT_CLASS = "w-36";

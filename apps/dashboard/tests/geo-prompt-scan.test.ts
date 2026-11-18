@@ -8,7 +8,7 @@ import {
 } from "@/utils/geo-prompt-scan";
 
 function tracked(id: string, prompt: string, enabled = true): GeoTrackedPrompt {
-  return { id, prompt, enabled, source: "custom", tags: [], createdAt: null };
+  return { id, prompt, enabled, source: "custom", createdAt: null };
 }
 
 function matchedId(query: string) {

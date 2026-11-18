@@ -8,7 +8,6 @@ import type {
   GeoScopeInput,
   GeoTrackedPrompt,
 } from "@notra/geo-core/types/geo";
-import { mergePromptTags } from "@notra/geo-core/utils/geo-prompt-tags";
 import type { Transaction } from "@tanstack/react-db";
 import {
   and,
@@ -125,16 +124,6 @@ export function useGeoPromptsDb(
     }
   };
 
-  const setPromptTags = (promptId: string, tags: string[]) => {
-    track(
-      promptId,
-      collection.update(promptId, (draft) => {
-        draft.tags = tags;
-      }),
-      tToast("updateTagsFailed")
-    );
-  };
-
   const setPromptProduct = (promptId: string, product: GeoProduct | null) => {
     track(
       promptId,
@@ -146,18 +135,6 @@ export function useGeoPromptsDb(
     );
   };
 
-  const addTagsToPrompts = (promptIds: string[], tags: string[]) => {
-    for (const promptId of promptIds) {
-      track(
-        promptId,
-        collection.update(promptId, (draft) => {
-          draft.tags = mergePromptTags(draft.tags, tags);
-        }),
-        tToast("updateTagsFailed")
-      );
-    }
-  };
-
   const addPrompt = (prompt: string) => {
     const id = crypto.randomUUID();
     track(
@@ -167,7 +144,6 @@ export function useGeoPromptsDb(
         prompt,
         enabled: true,
         source: "custom",
-        tags: [],
         createdAt: new Date().toISOString(),
       }),
       tToast("addPromptFailed")
@@ -180,9 +156,7 @@ export function useGeoPromptsDb(
     pendingPromptIds: pendingIds,
     togglePrompt,
     removePrompts,
-    setPromptTags,
     setPromptProduct,
-    addTagsToPrompts,
     addPrompt,
   };
 }

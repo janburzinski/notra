@@ -129,7 +129,6 @@ export const geoPromptsCollection = createCollectionFactory<GeoTrackedPrompt>({
       ...scope,
       id: item.id,
       prompt: item.prompt,
-      tags: item.tags,
     }),
   update: (scope, key, modified, original) =>
     modified.source === "auto" || isGeoAutoPromptId(key)
@@ -142,7 +141,6 @@ export const geoPromptsCollection = createCollectionFactory<GeoTrackedPrompt>({
           ...scope,
           promptId: key,
           enabled: modified.enabled,
-          tags: modified.tags,
           ...(modified.productId === original.productId
             ? {}
             : { productId: modified.productId ?? null }),

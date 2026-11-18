@@ -2481,7 +2481,6 @@
       "copyPrompt": "Copy prompt",
       "bestPosition": "Best position",
       "notRanked": "Not ranked",
-      "tags": "Tags",
       "outcome": "Outcome",
       "whatChanged": "What changed",
       "searchQueries": "Search queries",
@@ -2491,8 +2490,6 @@
       "removePrompt": "Remove {prompt}",
       "openDetailsPrompt": "Open details: {prompt}",
       "suggestedPrompts": "Suggested prompts",
-      "editTags": "Edit tags",
-      "addTags": "Add tags",
       "openDetails": "Open details",
       "scans": "Scans",
       "tracked": "Tracked",
@@ -3437,8 +3434,6 @@
       "backToLatest": "Back to latest scan",
       "latestAnswer": "Latest answer from each engine",
       "answerLanguage": "Answer language",
-      "noTags": "No tags",
-      "addTag": "Add a tag…",
       "lastScan": "Last scan"
     },
     "promptDetailStatus": {
@@ -3497,15 +3492,6 @@
       "empty": "No Google Search suggestions yet",
       "askedOnGoogle": "Asked on Google: “{question}”"
     },
-    "promptTagsActionDialog": {
-      "editDescription": "Tags group prompts so you can filter and save views.",
-      "editConfirm": "Save tags",
-      "bulkDescription": "Tags are added to every selected custom prompt."
-    },
-    "promptTagsDialog": {
-      "placeholder": "Type a tag and press Enter",
-      "suggestions": "Tags in use"
-    },
     "promptsTable": {
       "copiedPrompt": "Copied prompt",
       "enablePrompt": "Enable prompt",
@@ -3516,7 +3502,6 @@
       "removeAction": "{count, plural, one {Remove prompt} other {Remove prompts}}",
       "nounSingular": "prompt",
       "nounPlural": "prompts",
-      "tagsCustomOnly": "Tags apply to custom prompts. Auto-generated prompts were skipped.",
       "columns": {
         "presence": "Presence",
         "mentionedInstead": "Mentioned instead",
@@ -3531,13 +3516,10 @@
       "filterAria": "Filter prompts",
       "filterPlaceholder": "Filter prompts…",
       "filterByIntent": "Filter by intent",
-      "filterByTag": "Filter by tag",
       "allIntents": "All intents",
-      "allTags": "All tags",
       "source": {
         "auto": "Auto"
       },
-      "addTagCount": "Add tag ({count})",
       "emptyIdle": "Add the questions your buyers ask AI engines, or import a list from a CSV.",
       "noMatches": "No prompts match these filters",
       "emptyTitle": "No prompts yet",
@@ -4474,7 +4456,6 @@
       "viewScan": "View",
       "updatePromptFailed": "Failed to update prompt",
       "removePromptFailed": "Failed to remove prompt",
-      "updateTagsFailed": "Failed to update tags",
       "moveToProductFailed": "Failed to move prompt",
       "createProductFailed": "Could not create product",
       "updateProjectBrandIdentityFailed": "Failed to update project brand identity",
