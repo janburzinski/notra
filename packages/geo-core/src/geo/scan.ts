@@ -115,17 +115,14 @@ import {
   isGeoScanRunning,
   summarizeGeoEngineAttempts,
 } from "../utils/geo-scan";
-import {
-  batchUsageOf,
-  withGeoScanEvent,
-  withGeoScanStep,
-} from "../utils/geo-scan-event";
+import { withGeoScanStep } from "../utils/geo-scan-event";
 import {
   geoScanAnswerKey,
   geoScanPlanSnapshot,
   geoScanPlanSummary,
   geoScanSequenceTasks,
 } from "../utils/geo-scan-plan";
+import { withGeoTiming } from "../utils/geo-timing";
 import { withPublicUrls } from "../utils/reference-display";
 import {
   addAgentTokenUsage as addTokenUsage,
@@ -858,14 +855,7 @@ export const prepareGeoScanProject = Effect.fn("geo.prepareScanProject")(
         options.promptIds,
         options.engines,
         options
-      ),
-      (result) =>
-        result.status === "planned"
-          ? snapshotUsageByRole(
-              EMPTY_TOKEN_USAGE,
-              result.plan.usage ?? EMPTY_TOKEN_USAGE
-            )
-          : null
+      )
     ).pipe(
       Effect.tapError(() =>
         releaseBilling.pipe(
@@ -1345,8 +1335,7 @@ export const runGeoScanTaskBatch = Effect.fn("geo.runScanTaskBatch")(function* (
   return yield* withGeoScanStep(
     context,
     "task_batch",
-    runGeoScanTaskBatchBody(context, plannedTasks),
-    batchUsageOf
+    runGeoScanTaskBatchBody(context, plannedTasks)
   );
 });
 
@@ -1392,25 +1381,10 @@ const runGeoScanTaskBatchBody = Effect.fn("geo.runScanTaskBatch.body")(
         let failedAttemptUsage = EMPTY_TOKEN_USAGE;
         return updateGeoScanTaskStatus(context, task, "running").pipe(
           Effect.andThen(
-            withGeoScanEvent(
-              runGeoCheck(checkContext, task),
-              {
-                ...fields,
-                event: "geo.check.attempt.completed",
-              },
-              {
-                scanId: context.scanId,
-                runId: context.runId,
-                step: "check",
-                engine: task.engine,
-                taskKey: geoScanAnswerKey(
-                  task.prompt.id,
-                  task.engine,
-                  task.language
-                ),
-                persistSuccess: false,
-              }
-            ).pipe(
+            withGeoTiming(runGeoCheck(checkContext, task), {
+              ...fields,
+              event: "geo.check.attempt.completed",
+            }).pipe(
               Effect.tapError((error) =>
                 (error._tag === "GeoScanError" ||
                   error._tag === "GeoJudgeError") &&
@@ -1548,8 +1522,7 @@ export const runGeoScanSequenceBatch = Effect.fn("geo.runScanSequenceBatch")(
     return yield* withGeoScanStep(
       context,
       "sequence_batch",
-      runGeoScanSequenceBatchBody(context, plannedSequences),
-      batchUsageOf
+      runGeoScanSequenceBatchBody(context, plannedSequences)
     );
   }
 );
@@ -1592,18 +1565,10 @@ const runGeoScanSequenceBatchBody = Effect.fn("geo.runScanSequenceBatch.body")(
                 planned.engine,
                 planned.zdr
               );
-          return yield* withGeoScanEvent(
-            check,
-            { ...fields, event: "geo.check.attempt.completed" },
-            {
-              scanId: context.scanId,
-              runId: context.runId,
-              step: "check",
-              engine,
-              taskKey: planned.sequenceId,
-              persistSuccess: false,
-            }
-          ).pipe(
+          return yield* withGeoTiming(check, {
+            ...fields,
+            event: "geo.check.attempt.completed",
+          }).pipe(
             geoSkip("sequence failed", fields),
             Effect.map((result) => ({ sequence, result }))
           );
@@ -1677,12 +1642,7 @@ export const finalizeGeoScanProject = Effect.fn("geo.finalizeScanProject")(
     return yield* withGeoScanStep(
       context,
       "finalize",
-      finalizeGeoScanProjectBody(context, totals, status, claimToken, failure),
-      () =>
-        snapshotUsageByRole(
-          totals.engineUsage ?? totals.usage,
-          totals.judgeUsage ?? EMPTY_TOKEN_USAGE
-        )
+      finalizeGeoScanProjectBody(context, totals, status, claimToken, failure)
     );
   }
 );

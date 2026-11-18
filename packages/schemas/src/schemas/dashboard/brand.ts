@@ -15,7 +15,6 @@ import {
 import { toneProfileSchema } from "@notra/ai/schemas/tone";
 import { publicWebsiteUrlSchema } from "@notra/geo-core/schemas/url";
 import { organizationIdInputSchema } from "@notra/schemas/dashboard/auth/organization";
-// biome-ignore lint/performance/noNamespaceImport: Zod recommended way to import
 import * as z from "zod";
 
 export function getValidLanguage(value: unknown): SupportedLanguage {

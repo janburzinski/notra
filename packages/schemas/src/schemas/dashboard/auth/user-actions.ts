@@ -1,7 +1,6 @@
 import "zod/compile";
 import { DASHBOARD_LOCALES } from "@notra/schemas/constants/dashboard/locales";
 import { RETURN_TO_MAX_LENGTH } from "@notra/schemas/dashboard/auth/return-to";
-// biome-ignore lint/performance/noNamespaceImport: Zod recommended way to import
 import * as z from "zod";
 
 const USER_NAME_MAX_LENGTH = 100;

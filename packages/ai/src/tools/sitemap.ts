@@ -13,7 +13,6 @@ import {
 } from "@notra/db/schema";
 import { type Tool, tool } from "ai";
 import { and, desc, eq, ilike, inArray, or, sql } from "drizzle-orm";
-// biome-ignore lint/performance/noNamespaceImport: Zod recommended way to import
 import * as z from "zod";
 
 import { isWebSearchAvailable } from "./web-search";

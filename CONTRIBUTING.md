@@ -11,7 +11,7 @@ Notra is a Bun + Turborepo monorepo.
 - Dashboard: **TanStack Start**, **Vite**, **Nitro**
 - Public website: **TanStack Start**, **Vite**, **Nitro**
 - Shared frontend: **React 19**, **Tailwind CSS 4**
-- API: **Hono** on **Cloudflare Workers**
+- API: **Hono** on **Bun**, shipped as a Docker container
 - Database: **Postgres (Neon or PlanetScale Postgres recommended)** with **Drizzle ORM / drizzle-kit**
 - Dashboard auth: **WorkOS AuthKit**
 - Queueing and rate limiting: **Upstash (QStash/Redis)**
@@ -23,7 +23,7 @@ Notra is a Bun + Turborepo monorepo.
 /
 |- apps/
 |  |- ai-traffic-ingest/ # Bun collector (Unkey Compute)
-|  |- api/         # Hono API (Cloudflare Worker)
+|  |- api/         # Hono API (Bun container)
 |  |- dashboard/   # Main Notra product app (TanStack Start)
 |  |- console/     # Companion/admin app (Next.js, port 3003)
 |  |- docs/        # Product docs (Mintlify)
@@ -42,7 +42,7 @@ Notra is a Bun + Turborepo monorepo.
 Install or prepare:
 
 - **Bun** `1.4.4` (the version pinned in `package.json` and required for the Effect lint setup)
-- **Node.js** `>= 24` (used by some tooling)
+- **Node.js** `24.11.1` (the version pinned in `package.json`, used by some tooling)
 - A **Postgres** database (Neon or PlanetScale Postgres recommended)
 - **GitHub** and/or **Google** OAuth app credentials
 - Optional but commonly needed integrations:
@@ -376,10 +376,12 @@ Dashboard production builds validate migrations, build, and prune the build cach
 before migrating the database. Migrations must remain compatible with the running
 app because Vercel has not yet promoted the new deployment at that point.
 
-Seed helpers:
+Seed helpers live in `@notra/db`:
 
 ```bash
-bun run db:seed
+bun run --cwd packages/db seed:brand-identity
+bun run --cwd packages/db seed:chat-attachments
+bun run --cwd packages/db seed:persona-visibility
 ```
 
 ## Brand OG images
@@ -976,11 +978,12 @@ Run the complete suite from the repository root:
 bun run test
 ```
 
-This runs tests in `@notra/ai`, `@notra/geo-core`, and `dashboard`. To focus on
-one area, use `bun run test --filter=@notra/geo-core` (or `--filter=dashboard`,
-`--filter=@notra/ai`). Use `bun run test --force` to bypass Turbo's test cache.
-The **Tests** GitHub Actions job runs the suite and typechecks these packages
-on every push and pull request with a frozen lockfile. No database server, `.env`, API keys, or paid model
+This runs the root deploy-script tests and then every workspace's `test` script
+through Turbo. To focus on one area, use `bun run test --filter=@notra/geo-core`
+(or `--filter=dashboard`, `--filter=@notra/ai`). Use `bun run test --force` to
+bypass Turbo's test cache. The `Quality (tests)` job in the Code quality workflow
+runs the affected workspaces on every pull request and all of them on `main`,
+with a frozen lockfile. `@notra/sites-builder` runs in its own sharded jobs. No database server, `.env`, API keys, or paid model
 calls are required by these tests.
 
 Coverage includes:
@@ -1003,9 +1006,8 @@ Coverage includes:
 - **Content schedule timing:** delayed deliveries, UTC scheduling, leap dates,
   month boundaries, and daylight-saving transitions.
 
-Tests under `tests/` run separately from `src/` in the dashboard and AI package
-because Bun's `mock.module` replacements live for the entire test process.
-Keep infrastructure replacements at the boundary; do not mock the function
+Tests run with `bun test --parallel`, so each file gets its own worker and
+`mock.module` replacements stay inside that file. Keep infrastructure replacements at the boundary; do not mock the function
 being tested. Reset database/emulator state between scenarios and close servers
 in teardown. Import only `bun-types/test` in TypeScript configuration so Bun's
 global `fetch` extensions do not change the application runtime types.
@@ -1021,8 +1023,3 @@ Workflow orchestration tests replace steps and `sleep`; they do not verify
 Vercel's durable runtime, restart recovery, or actual cron delivery. Live model
 answers, billing providers, and the committed database migration chain are also
 outside this suite.
-
-The Code quality job also builds the website and runs `bun run test:production`
-from `apps/web`. This starts the production artifact from an empty directory and
-checks the Markdown endpoints without access to the source tree. Run
-`bun run build --filter=web && (cd apps/web && bun run test:production)` locally.

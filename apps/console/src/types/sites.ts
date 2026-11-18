@@ -24,7 +24,6 @@ import type {
 import type { ChartConfig } from "@notra/ui/components/ui/chart";
 import type { ReactNode } from "react";
 import type { TooltipProps } from "recharts";
-// biome-ignore lint/performance/noNamespaceImport: Zod recommended way to import
 import type * as z from "zod";
 
 import type { siteServingStateSchema } from "@/schemas/sites";

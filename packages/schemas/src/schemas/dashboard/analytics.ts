@@ -1,9 +1,6 @@
 import "zod/compile";
 import { literal, number, object, string, union } from "zod";
 
-const LEADERBOARD_USERNAME_MAX_LENGTH = 30;
-const LEADING_AT_REGEX = /^@/;
-
 export const socialAnalyticsSyncPayloadSchema = object({
   organizationId: string().min(1).optional(),
 });
@@ -43,14 +40,6 @@ export const leaderboardInputSchema = object({
   organizationId: string().min(1),
   days: union([literal(7), literal(30)]).default(7),
   ...analyticsRangeFields,
-});
-
-export const trackAccountInputSchema = object({
-  organizationId: string().min(1),
-  username: string()
-    .min(1)
-    .max(LEADERBOARD_USERNAME_MAX_LENGTH)
-    .transform((value) => value.trim().replace(LEADING_AT_REGEX, "")),
 });
 
 export const untrackAccountInputSchema = object({

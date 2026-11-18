@@ -9,7 +9,6 @@ import {
   AUTOPILOT_REVIEWER_PATTERN,
 } from "@notra/db/constants/autopilot";
 import { organizationIdSchema } from "@notra/schemas/dashboard/auth/organization";
-// biome-ignore lint/performance/noNamespaceImport: Zod recommended way of importing
 import * as z from "zod";
 
 function isValidTimezone(timezone: string) {

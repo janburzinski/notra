@@ -56,20 +56,6 @@ export interface TwitterBatchUsersResponse {
   data?: TwitterBatchUser[];
 }
 
-export interface TwitterUserByUsernameResponse {
-  data?: TwitterBatchUser;
-}
-
-export interface ResolvedTwitterAccount {
-  providerAccountId: string;
-  username: string;
-  displayName: string | null;
-  profileImageUrl: string | null;
-  verified: boolean;
-  verifiedType: string | null;
-  followersCount: number | null;
-}
-
 export interface TwitterTimelineTweet {
   id: string;
   text: string;
@@ -409,10 +395,6 @@ export interface LeaderboardDetailMetric {
     | "bookmarks"
     | "engagementRate";
   value: string;
-}
-
-export interface TrackAccountPreviewResponse {
-  account: ResolvedTwitterAccount | null;
 }
 
 export interface AnalyticsHeroSummary {

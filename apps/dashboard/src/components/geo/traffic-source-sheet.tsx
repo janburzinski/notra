@@ -7,7 +7,6 @@ import {
   formatGeoSource,
   trafficVisitDelta,
 } from "@notra/geo-core/utils/ai-traffic";
-import { resolveEngineIconKey } from "@notra/geo-core/utils/geo-engine-icon";
 import { TruncateWithTooltip } from "@notra/ui/components/shared/truncate-with-tooltip";
 import { Badge } from "@notra/ui/components/ui/badge";
 import {
@@ -17,6 +16,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@notra/ui/components/ui/sheet";
+import { resolveEngineIconKey } from "@notra/utils/geo-engine-icon";
 import { memo, useMemo } from "react";
 import { DataTable, type TableColumn } from "ui/table";
 import { useLocale, useTranslations } from "use-intl";

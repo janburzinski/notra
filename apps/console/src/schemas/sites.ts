@@ -1,5 +1,4 @@
 import { SITE_SUSPENSION_CATEGORIES } from "@notra/sites-core/constants/sites";
-// biome-ignore lint/performance/noNamespaceImport: Zod recommended way to import
 import * as z from "zod";
 
 import {

@@ -204,15 +204,12 @@ function isPrivateOrReservedIpv6(ip: string): boolean {
     return true;
   }
 
-  // biome-ignore lint/suspicious/noBitwiseOperators: bitmask range checks
   if ((h0 & 0xff_c0) === 0xfe_80) {
     return true;
   }
-  // biome-ignore lint/suspicious/noBitwiseOperators: bitmask range checks
   if ((h0 & 0xfe_00) === 0xfc_00) {
     return true;
   }
-  // biome-ignore lint/suspicious/noBitwiseOperators: bitmask range checks
   if ((h0 & 0xff_00) === 0xff_00) {
     return true;
   }

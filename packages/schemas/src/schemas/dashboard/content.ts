@@ -14,7 +14,6 @@ import {
 import { createContentGenerationRequestSchema } from "@notra/content-generation/schemas";
 import { BLOG_POST_SUBTYPES } from "@notra/db/constants/content";
 import type { PostGitHubPublish } from "@notra/db/types/post-github-publish";
-// biome-ignore lint/performance/noNamespaceImport: Zod recommended way to import
 import * as z from "zod";
 
 import {

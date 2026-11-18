@@ -167,7 +167,6 @@ function ChartsField({
           role="group"
         >
           {TRAFFIC_EMBED_CHARTS.map((chart) => (
-            // biome-ignore lint/a11y/noLabelWithoutControl: the checkbox inside is the control
             <label
               className="flex cursor-pointer items-center gap-2 text-sm"
               key={chart}

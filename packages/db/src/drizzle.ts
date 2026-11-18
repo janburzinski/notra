@@ -2,7 +2,6 @@ import { attachDatabasePool } from "@vercel/functions";
 import { upstashCache } from "drizzle-orm/cache/upstash";
 import { drizzle } from "drizzle-orm/node-postgres";
 
-// biome-ignore lint/performance/noNamespaceImport: Required for drizzle-kit
 import * as schema from "./schema";
 import type { Database } from "./types/database";
 

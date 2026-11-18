@@ -1,7 +1,6 @@
 import "zod/compile";
 import { storedIgnoreCommitPatternsSchema } from "@notra/ai/schemas/ignore-commit-patterns";
 import { organizationIdInputSchema } from "@notra/schemas/dashboard/auth/organization";
-// biome-ignore lint/performance/noNamespaceImport: Zod recommended way to import
 import * as z from "zod";
 
 import {

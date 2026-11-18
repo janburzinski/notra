@@ -14,7 +14,6 @@ import {
 } from "@notra/schemas/dashboard/integrations";
 import { type Tool, tool } from "ai";
 import { and, eq } from "drizzle-orm";
-// biome-ignore lint/performance/noNamespaceImport: Zod recommended way to import
 import * as z from "zod";
 
 import {

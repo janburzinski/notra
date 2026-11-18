@@ -5,7 +5,6 @@ import {
   DEMO_ORG_SLUG_PREFIX,
   DEMO_SEEDING_GRACE_MINUTES,
 } from "../constants/demo";
-// biome-ignore lint/performance/noNamespaceImport: drizzle needs the full schema type
 import type * as schema from "../schema";
 
 /**

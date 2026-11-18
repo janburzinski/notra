@@ -69,16 +69,6 @@ export interface Log {
   createdAt: string;
 }
 
-export interface LogsResponse {
-  logs: Log[];
-  pagination: {
-    page: number;
-    pageSize: number;
-    totalCount: number;
-    totalPages: number;
-  };
-}
-
 export interface GithubProcessedEvent {
   type: string;
   action: string;

@@ -3,7 +3,6 @@ import { Effect } from "effect";
 
 import {
   AnalyticsDatabaseError,
-  AnalyticsRequestError,
   AnalyticsTinybirdError,
 } from "@/lib/analytics/errors";
 
@@ -31,16 +30,6 @@ export function analyticsDb<A>(
   return Effect.tryPromise({
     try: run,
     catch: (cause) => new AnalyticsDatabaseError({ label, cause }),
-  });
-}
-
-export function analyticsRequest<A>(
-  label: string,
-  run: () => Promise<A>
-): Effect.Effect<A, AnalyticsRequestError> {
-  return Effect.tryPromise({
-    try: run,
-    catch: (cause) => new AnalyticsRequestError({ label, cause }),
   });
 }
 

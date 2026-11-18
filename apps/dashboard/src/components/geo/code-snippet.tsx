@@ -175,7 +175,6 @@ export function CodeSnippet({
             "scrollbar-floating m-0 overflow-x-auto p-3 pe-10 font-mono text-xs leading-relaxed",
             wrap && "wrap-anywhere whitespace-pre-wrap"
           )}
-          // biome-ignore lint/security/noDangerouslySetInnerHtml: sugar-high escapes the source before tokenizing
           dangerouslySetInnerHTML={{ __html: highlight(code) }}
         />
       </div>

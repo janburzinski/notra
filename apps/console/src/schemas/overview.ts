@@ -1,4 +1,3 @@
-// biome-ignore lint/performance/noNamespaceImport: Zod recommended way to import
 import * as z from "zod";
 
 import { OVERVIEW_DEFAULT_DAYS, OVERVIEW_MAX_DAYS } from "@/constants/overview";

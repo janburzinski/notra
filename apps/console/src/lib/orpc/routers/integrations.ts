@@ -18,7 +18,6 @@ import {
 import { refreshMcpToolIndexForIntegration } from "@notra/ai/integrations/mcp-tool-index";
 import { PublicUrlValidationError } from "@notra/utils/url";
 import { Effect } from "effect";
-// biome-ignore lint/performance/noNamespaceImport: Zod recommended way to import
 import * as z from "zod";
 
 import { assertOrganizationAccess } from "@/lib/auth/organization";

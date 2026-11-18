@@ -7,6 +7,7 @@
     "./auth-redirect": "./src/auth-redirect.ts",
     "./format-compact-number": "./src/format-compact-number.ts",
     "./format-relative": "./src/format-relative.ts",
+    "./geo-engine-icon": "./src/geo-engine-icon.ts",
     "./api-scopes": "./src/api-scopes.ts",
     "./oauth-consent": "./src/oauth-consent.ts",
     "./constants/oauth-consent": "./src/constants/oauth-consent.ts",

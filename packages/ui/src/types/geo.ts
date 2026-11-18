@@ -1,6 +1,11 @@
 import type { Transition } from "motion/react";
 import type { ReactNode } from "react";
 
+export type {
+  EngineIconKey,
+  EngineIconRule,
+} from "@notra/utils/types/geo-engine-icon";
+
 export type GeoPresenceStatus =
   | "training-data"
   | "retrieval-only"
@@ -35,58 +40,6 @@ export interface GeoBarProps {
   className?: string;
   fillClassName?: string;
   fillColor?: string;
-}
-
-export type EngineIconKey =
-  | "openai"
-  | "claude"
-  | "gemini"
-  | "google"
-  | "amazon"
-  | "perplexity"
-  | "mistral"
-  | "deepseek"
-  | "meta"
-  | "instagram"
-  | "grok"
-  | "qwen"
-  | "copilot"
-  | "tencent"
-  | "xiaomi"
-  | "cursor"
-  | "claude-code"
-  | "codex"
-  | "fx"
-  | "apple"
-  | "duckduckgo"
-  | "cloudflare"
-  | "tiktok"
-  | "mozilla"
-  | "manus"
-  | "firecrawl"
-  | "cohere"
-  | "opencode"
-  | "kimi"
-  | "zai"
-  | "exa"
-  | "parallel"
-  | "commoncrawl"
-  | "youcom"
-  | "liner"
-  | "cline"
-  | "devin"
-  | "diffbot"
-  | "tavily"
-  | "timpi"
-  | "huawei"
-  | "kagi"
-  | "agent"
-  | "cli";
-
-export interface EngineIconRule {
-  key: EngineIconKey;
-  patterns: readonly string[];
-  exact?: readonly string[];
 }
 
 export interface EngineIconProps {

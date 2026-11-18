@@ -63,7 +63,6 @@ export const POSTHOG_EVENTS = {
   GEO_PROMPTS_IMPORTED: "geo_prompts_imported",
   GEO_COMPETITORS_IMPORTED: "geo_competitors_imported",
   GEO_CSV_TEMPLATE_DOWNLOADED: "geo_csv_template_downloaded",
-  GEO_PROMPT_TOGGLED: "geo_prompt_toggled",
   GEO_PROMPT_DELETED: "geo_prompt_deleted",
   GEO_COMPETITOR_ADDED: "geo_competitor_added",
   GEO_COMPETITOR_UPDATED: "geo_competitor_updated",

@@ -63,7 +63,6 @@ import { db } from "@notra/db/drizzle";
 import { posts } from "@notra/db/schema";
 import { type Tool, type ToolExecutionOptions, tool } from "ai";
 import { and, eq } from "drizzle-orm";
-// biome-ignore lint/performance/noNamespaceImport: Zod recommended way to import
 import * as z from "zod";
 
 function markCommitted(

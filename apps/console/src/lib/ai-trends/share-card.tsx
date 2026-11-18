@@ -496,7 +496,6 @@ function TitleWord({
           border: `1.5px solid ${theme.cardBorder}`,
         }}
       >
-        {/* biome-ignore lint/performance/noImgElement: satori draws plain img */}
         <img
           alt=""
           height={Math.round(tile * 0.68)}
@@ -614,11 +613,9 @@ export async function renderShareCard(card: AiTrendsShareCard) {
                 background: "#FFFFFF",
               }}
             >
-              {/* biome-ignore lint/performance/noImgElement: satori draws plain img */}
               <img alt="" height={30} src={mark} width={30} />
             </div>
           ) : (
-            // biome-ignore lint/performance/noImgElement: satori draws plain img
             <img alt="" height={34} src={mark} width={34} />
           )}
           <span
@@ -689,7 +686,6 @@ export async function renderShareCard(card: AiTrendsShareCard) {
                       border: `1.5px solid ${theme.cardBorder}`,
                     }}
                   >
-                    {/* biome-ignore lint/performance/noImgElement: satori draws plain img */}
                     <img alt="" height={26} src={src} width={26} />
                   </div>
                 ))}
@@ -855,7 +851,6 @@ export async function renderShareCard(card: AiTrendsShareCard) {
                       border: `1.5px solid ${theme.cardBorder}`,
                     }}
                   >
-                    {/* biome-ignore lint/performance/noImgElement: satori draws plain img */}
                     <img
                       alt=""
                       height={18}

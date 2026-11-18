@@ -279,7 +279,6 @@ export function SiteIntegrationDialog({
             </div>
             <pre
               className="bg-muted/40 border-border/60 scrollbar-floating m-0 overflow-x-auto rounded-lg border p-3 font-mono text-xs leading-relaxed"
-              // biome-ignore lint/security/noDangerouslySetInnerHtml: sugar-high escapes the source before tokenizing
               dangerouslySetInnerHTML={{ __html: highlight(configExample) }}
             />
           </div>

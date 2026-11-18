@@ -2,7 +2,6 @@ import "zod/compile";
 import { organizationIdInputSchema } from "@notra/schemas/dashboard/auth/organization";
 import { githubPersonalAccessTokenSchema } from "@notra/schemas/dashboard/integrations";
 import { isSameOriginPath } from "@notra/utils/auth-redirect";
-// biome-ignore lint/performance/noNamespaceImport: Zod recommended way of importing
 import * as z from "zod";
 
 const GITHUB_INSTALLATION_ID_PATTERN = /^\d{1,20}$/;

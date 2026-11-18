@@ -319,7 +319,6 @@ const TABLE_MARKDOWN: MultilineElementTransformer = {
     regExp: TABLE_ROW_REGEX,
   },
   regExpStart: TABLE_ROW_REGEX,
-  // biome-ignore lint/suspicious/noEmptyBlockStatements: Handled by handleImportAfterStartMatch
   replace: () => {},
   type: "multiline-element",
 };

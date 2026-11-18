@@ -3,7 +3,6 @@ import { gateway } from "@notra/ai/gateway";
 import { withRouterDefaults } from "@notra/ai/provider-options";
 import { buildTelemetryOptions } from "@notra/ai/utils/tcc";
 import { generateText, Output } from "ai";
-// biome-ignore lint/performance/noNamespaceImport: Zod recommended way to import
 import * as z from "zod";
 
 const CONTENT_COMMIT_HEADLINE_MAX_LENGTH = 72;

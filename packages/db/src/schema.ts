@@ -123,12 +123,10 @@ import type {
 } from "./types/geo-personas";
 import type { GeoPromptSuggestionReasonData } from "./types/geo-prompt-suggestions";
 import type { GeoProspectReportJson } from "./types/geo-prospect-report";
-import {
-  GEO_SCAN_EVENT_STATUSES,
-  GEO_SCAN_EVENT_STEPS,
-  type GeoScanPlanSnapshot,
-  type GeoScanPlanSummary,
-  type GeoScanUsageByRole,
+import type {
+  GeoScanPlanSnapshot,
+  GeoScanPlanSummary,
+  GeoScanUsageByRole,
 } from "./types/geo-scan";
 import type { GeoContentBriefJson } from "./types/geo-writer";
 import type { GoogleSearchConsoleQuery } from "./types/google-search-console";
@@ -2433,32 +2431,6 @@ export const geoMentionChecks = pgTable(
   ]
 );
 
-export const geoScanEvents = pgTable(
-  "geo_scan_events",
-  {
-    id: text("id").primaryKey(),
-    scanId: text("scan_id")
-      .notNull()
-      .references(() => geoScans.id, { onDelete: "cascade" }),
-    runId: text("run_id").notNull(),
-    step: text("step", { enum: GEO_SCAN_EVENT_STEPS }).notNull(),
-    status: text("status", { enum: GEO_SCAN_EVENT_STATUSES }).notNull(),
-    startedAt: timestamp("started_at").notNull(),
-    durationMs: integer("duration_ms").notNull(),
-    engine: text("engine"),
-    taskKey: text("task_key"),
-    errorCode: text("error_code"),
-    errorMessage: text("error_message"),
-    usage: jsonb("usage").$type<GeoScanUsageByRole | null>(),
-  },
-  (table) => [
-    index("geoScanEvents_scanId_startedAt_idx").on(
-      table.scanId,
-      table.startedAt
-    ),
-  ]
-);
-
 export const geoAgentReadinessReports = pgTable(
   "geo_agent_readiness_reports",
   {
@@ -3825,14 +3797,6 @@ export const geoScansRelations = relations(geoScans, ({ one, many }) => ({
     references: [projects.id],
   }),
   checks: many(geoMentionChecks),
-  events: many(geoScanEvents),
-}));
-
-export const geoScanEventsRelations = relations(geoScanEvents, ({ one }) => ({
-  scan: one(geoScans, {
-    fields: [geoScanEvents.scanId],
-    references: [geoScans.id],
-  }),
 }));
 
 export const geoMentionChecksRelations = relations(

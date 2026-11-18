@@ -327,10 +327,6 @@ export const geoPromptHistoryInputSchema = geoOrganizationInputSchema.extend({
   promptId: string().min(1).max(GEO_SHORT_FIELD_MAX_LENGTH),
 });
 
-export const geoScanStatusInputSchema = geoOrganizationInputSchema.extend({
-  scanId: string().min(1).max(GEO_SHORT_FIELD_MAX_LENGTH),
-});
-
 export const geoPromptRescanInputSchema = geoOrganizationInputSchema.extend({
   promptId: string().min(1).max(GEO_SHORT_FIELD_MAX_LENGTH),
   engines: array(string().min(1).max(GEO_SHORT_FIELD_MAX_LENGTH))
@@ -404,11 +400,6 @@ export const geoAutoPromptToggleInputSchema = geoOrganizationInputSchema.extend(
 
 export const geoPromptDeleteInputSchema = geoOrganizationInputSchema.extend({
   promptId: string().min(1),
-});
-
-export const geoPromptToggleInputSchema = geoOrganizationInputSchema.extend({
-  promptId: string().min(1),
-  enabled: boolean(),
 });
 
 export const geoPromptsImportInputSchema = geoOrganizationInputSchema.extend({

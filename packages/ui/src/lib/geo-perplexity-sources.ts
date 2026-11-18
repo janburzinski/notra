@@ -3,6 +3,7 @@ import type { PerplexitySearchSource } from "@notra/ui/components/ai-skins/perpl
 const MARKDOWN_LINK = /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g;
 const BARE_URL = /\bhttps?:\/\/[^\s)]+/g;
 const WWW_PREFIX = /^www\./;
+const TRAILING_PUNCTUATION = /[).,;:]+$/;
 
 function sourceDomain(href: string): string | null {
   try {
@@ -23,7 +24,7 @@ export function perplexitySourcesFromExcerpt(
   const sources: PerplexitySearchSource[] = [];
 
   for (const match of excerpt.matchAll(MARKDOWN_LINK)) {
-    const href = match[2] ?? "";
+    const href = (match[2] ?? "").replace(TRAILING_PUNCTUATION, "");
     const domain = sourceDomain(href);
     if (!domain || seen.has(domain)) {
       continue;
@@ -34,7 +35,7 @@ export function perplexitySourcesFromExcerpt(
   }
 
   for (const match of excerpt.matchAll(BARE_URL)) {
-    const href = match[0] ?? "";
+    const href = (match[0] ?? "").replace(TRAILING_PUNCTUATION, "");
     const domain = sourceDomain(href);
     if (!domain || seen.has(domain)) {
       continue;

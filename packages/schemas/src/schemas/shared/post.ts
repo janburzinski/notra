@@ -4,7 +4,6 @@ import {
   postTitleSchema,
 } from "@notra/ai/schemas/limits";
 import { POST_SLUG_MAX_LENGTH } from "@notra/ai/schemas/post";
-// biome-ignore lint/performance/noNamespaceImport: Zod recommended way to import
 import * as z from "zod";
 
 import { MANUAL_POST_CONTENT_TYPES } from "../../constants/content";

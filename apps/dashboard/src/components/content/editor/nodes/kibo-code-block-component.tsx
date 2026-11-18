@@ -90,7 +90,6 @@ export default function KiboCodeBlockComponent({
     setLocalCode(code);
   }
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: localCode triggers resize
   useEffect(() => {
     const textarea = textareaRef.current;
     if (textarea) {
@@ -167,9 +166,6 @@ export default function KiboCodeBlockComponent({
   };
 
   return (
-    // biome-ignore lint/a11y/noStaticElementInteractions: Interactive editor element
-    // biome-ignore lint/a11y/noNoninteractiveElementInteractions: Interactive editor element
-    // biome-ignore lint/a11y/useKeyWithClickEvents: Click focuses textarea
     <div
       className={cn(
         "bg-secondary/50 relative my-4 overflow-hidden rounded-lg border",

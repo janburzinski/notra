@@ -7,7 +7,6 @@ import {
   GEO_MENTION_TREND_AGENT_ICON_LIMIT,
 } from "@notra/geo-core/constants/geo";
 import { engineFamilyOf } from "@notra/geo-core/utils/geo-engine-family";
-import { resolveEngineIconKey } from "@notra/geo-core/utils/geo-engine-icon";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -16,6 +15,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@notra/ui/components/ui/dropdown-menu";
+import { resolveEngineIconKey } from "@notra/utils/geo-engine-icon";
 import { useTranslations } from "use-intl";
 
 import { EngineIcon } from "@/components/geo/engine-icon";

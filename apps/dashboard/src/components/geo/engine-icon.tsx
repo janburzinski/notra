@@ -5,12 +5,12 @@ import {
   Robot01Icon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { resolveEngineIconKey } from "@notra/geo-core/utils/geo-engine-icon";
 import { ModelProviderLogo } from "@notra/ui/components/geo/model-provider-logo";
 import { Gemini } from "@notra/ui/components/ui/svgs/gemini";
 import { MicrosoftCopilot } from "@notra/ui/components/ui/svgs/microsoftCopilot";
 import { Parallel } from "@notra/ui/components/ui/svgs/parallel";
 import { Perplexity } from "@notra/ui/components/ui/svgs/perplexity";
+import { resolveEngineIconKey } from "@notra/utils/geo-engine-icon";
 import type { ComponentType, SVGProps } from "react";
 
 import {

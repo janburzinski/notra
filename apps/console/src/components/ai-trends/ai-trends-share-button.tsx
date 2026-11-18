@@ -172,7 +172,6 @@ export function AiTrendsShareButton({
           </DialogHeader>
           <div className="bg-muted/40 relative aspect-[8/5] w-full overflow-hidden rounded-lg border">
             {image ? (
-              // biome-ignore lint/performance/noImgElement: a local blob URL needs no optimization
               <img
                 alt="Chart as it will be shared"
                 className="size-full object-contain"

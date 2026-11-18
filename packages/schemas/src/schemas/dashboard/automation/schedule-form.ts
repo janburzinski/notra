@@ -9,7 +9,6 @@ import {
   SUPPORTED_AUTOMATION_OUTPUT_TYPES,
 } from "@notra/schemas/dashboard/integrations";
 import { automationNotifySchema } from "@notra/schemas/shared/automation";
-// biome-ignore lint/performance/noNamespaceImport: Zod recommended way to import
 import * as z from "zod";
 
 export const scheduleCronSchema = z

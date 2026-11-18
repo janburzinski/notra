@@ -1,4 +1,3 @@
-// biome-ignore-all lint/suspicious/noBitwiseOperators: Kiwi binary encoding requires explicit bitwise operations.
 import { KIND_ENUM, KIND_MESSAGE, KIND_STRUCT } from "../constants/kiwi";
 import { kiwiRecordSchema } from "../schemas/kiwi";
 import type { Definition, FieldDef, KiwiValue } from "../types/kiwi";

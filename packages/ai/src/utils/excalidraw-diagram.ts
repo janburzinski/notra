@@ -36,7 +36,6 @@ import type {
   ExcalidrawShapeElement,
   ExcalidrawTextElement,
 } from "@notra/ai/types/excalidraw-diagram";
-// biome-ignore lint/performance/noNamespaceImport: Zod recommended way to import
 import * as z from "zod";
 
 type Point = [number, number];

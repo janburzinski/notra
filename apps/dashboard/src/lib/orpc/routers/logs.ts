@@ -1,43 +1,9 @@
-import { webhookLogsQuerySchema } from "@notra/schemas/dashboard/api-params";
 import { organizationIdInputSchema } from "@notra/schemas/dashboard/auth/organization";
-import {
-  listWebhookLogsInputSchema,
-  webhookLogDetailInputSchema,
-} from "@notra/schemas/dashboard/logs";
-// biome-ignore lint/performance/noNamespaceImport: Zod recommended way of importing
-import * as z from "zod";
+import { webhookLogDetailInputSchema } from "@notra/schemas/dashboard/logs";
 
 import { authorizedProcedure, withOrganizationAccess } from "@/lib/orpc/base";
 import { notFound } from "@/lib/orpc/utils/errors";
 import { listWebhookLogs } from "@/lib/webhooks/logging";
-import type { Log, LogsResponse } from "@/types/webhooks/webhooks";
-
-function filterLogs(
-  logs: Log[],
-  filters: {
-    source: z.infer<typeof webhookLogsQuerySchema.shape.source>;
-    status: z.infer<typeof webhookLogsQuerySchema.shape.status>;
-    search: string;
-  }
-) {
-  const search = filters.search.trim().toLowerCase();
-  return logs.filter((log) => {
-    if (filters.source !== "all" && log.integrationType !== filters.source) {
-      return false;
-    }
-    if (filters.status !== "all" && log.status !== filters.status) {
-      return false;
-    }
-    if (search.length > 0) {
-      const inTitle = log.title.toLowerCase().includes(search);
-      const inError = log.errorMessage?.toLowerCase().includes(search) ?? false;
-      if (!(inTitle || inError)) {
-        return false;
-      }
-    }
-    return true;
-  });
-}
 
 export const logsRouter = {
   webhooks: {
@@ -73,39 +39,6 @@ export const logsRouter = {
           );
         }
         return log;
-      }),
-    list: authorizedProcedure
-      .input(listWebhookLogsInputSchema)
-      .use(withOrganizationAccess)
-      .handler(async ({ input }) => {
-        const logs = await listWebhookLogs(
-          input.organizationId,
-          input.integrationType,
-          input.integrationId === "all" ? null : (input.integrationId ?? null)
-        );
-
-        const filteredLogs = filterLogs(logs, {
-          source: input.source,
-          status: input.status,
-          search: input.search,
-        });
-
-        const startIndex = (input.page - 1) * input.pageSize;
-
-        const response: LogsResponse = {
-          logs: filteredLogs.slice(startIndex, startIndex + input.pageSize),
-          pagination: {
-            page: input.page,
-            pageSize: input.pageSize,
-            totalCount: filteredLogs.length,
-            totalPages: Math.max(
-              1,
-              Math.ceil(filteredLogs.length / input.pageSize)
-            ),
-          },
-        };
-
-        return response;
       }),
   },
 };

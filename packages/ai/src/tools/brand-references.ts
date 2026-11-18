@@ -16,7 +16,6 @@ import { db } from "@notra/db/drizzle";
 import { brandReferences, brandSettings } from "@notra/db/schema";
 import { type Tool, tool } from "ai";
 import { and, desc, eq } from "drizzle-orm";
-// biome-ignore lint/performance/noNamespaceImport: Zod recommended way of importing
 import * as z from "zod";
 
 import { getAICachedTools } from "./tool-cache";

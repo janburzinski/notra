@@ -7,7 +7,7 @@ import {
   isCitedTrafficSource,
   trafficDayKey,
 } from "@notra/geo-core/utils/ai-traffic";
-import { resolveEngineIconKey } from "@notra/geo-core/utils/geo-engine-icon";
+import { resolveEngineIconKey } from "@notra/utils/geo-engine-icon";
 
 import type {
   AgentReachEngine,

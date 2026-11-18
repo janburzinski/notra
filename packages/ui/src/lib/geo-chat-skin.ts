@@ -1,5 +1,5 @@
 import type { GeoChatSkin } from "@notra/ui/types/geo";
-import { resolveEngineIconKey } from "@notra/ui/lib/geo-engine-icon";
+import { resolveEngineIconKey } from "@notra/utils/geo-engine-icon";
 
 export function geoChatSkin(engine: string): GeoChatSkin {
   const key = resolveEngineIconKey(engine);

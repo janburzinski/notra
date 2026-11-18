@@ -5,7 +5,6 @@ import {
   analyticsTimeseriesInputSchema,
   analyticsTopPostsInputSchema,
   leaderboardInputSchema,
-  trackAccountInputSchema,
   untrackAccountInputSchema,
 } from "@notra/schemas/dashboard/analytics";
 import { os } from "@orpc/server";
@@ -20,8 +19,6 @@ import {
   loadPostingPerformance,
   loadSocialOverview,
   loadTopPosts,
-  previewTrackedAccount,
-  trackTwitterAccount,
   untrackTwitterAccount,
 } from "@/lib/analytics/programs";
 import { authorizedProcedure } from "@/lib/orpc/base";
@@ -35,7 +32,6 @@ import type {
   PostingPerformanceResponse,
   SocialOverviewResponse,
   TopPostsResponse,
-  TrackAccountPreviewResponse,
 } from "@/types/analytics";
 import type { ORPCContext } from "@/types/orpc/context";
 
@@ -120,24 +116,6 @@ export const analyticsRouter = {
           dateFrom: input.dateFrom,
           dateTo: input.dateTo,
         }),
-        toAnalyticsOrpcError
-      );
-    }),
-  previewTrackAccount: authorizedProcedure
-    .input(trackAccountInputSchema)
-    .use(withAnalyticsAccess)
-    .handler(async ({ input }): Promise<TrackAccountPreviewResponse> => {
-      return await runOrpcEffect(
-        previewTrackedAccount(input.username),
-        toAnalyticsOrpcError
-      );
-    }),
-  trackAccount: authorizedProcedure
-    .input(trackAccountInputSchema)
-    .use(withAnalyticsAccess)
-    .handler(async ({ input }) => {
-      return await runOrpcEffect(
-        trackTwitterAccount(input.organizationId, input.username),
         toAnalyticsOrpcError
       );
     }),

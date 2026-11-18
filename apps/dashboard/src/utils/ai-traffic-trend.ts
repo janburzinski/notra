@@ -11,7 +11,7 @@ import type {
   GeoVisitorType,
 } from "@notra/geo-core/types/geo";
 import { formatDayLabel } from "@notra/geo-core/utils/day-label";
-import { resolveEngineIconKey } from "@notra/geo-core/utils/geo-engine-icon";
+import { resolveEngineIconKey } from "@notra/utils/geo-engine-icon";
 
 import {
   CHART_MUTED_COLOR,

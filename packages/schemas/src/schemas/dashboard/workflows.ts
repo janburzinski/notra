@@ -1,6 +1,5 @@
 import "zod/compile";
 import { LOOKBACK_WINDOWS } from "@notra/content-generation/schemas";
-// biome-ignore lint/performance/noNamespaceImport: Zod recommended way of importing
 import * as z from "zod";
 
 import { triggerOutputConfigSchema } from "./integrations";

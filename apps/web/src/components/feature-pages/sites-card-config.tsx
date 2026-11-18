@@ -14,11 +14,7 @@ export function SitesCardConfig() {
     <MockFrame heading={frame.heading} subhead={frame.subhead}>
       <pre className="m-0 overflow-hidden p-4 font-mono text-xs/5.5">
         {TOKENS.map((token, index) => (
-          <span
-            className={SITES_JSON_TOKEN_CLASS[token.kind]}
-            // biome-ignore lint/suspicious/noArrayIndexKey: tokens are a fixed, ordered list
-            key={index}
-          >
+          <span className={SITES_JSON_TOKEN_CLASS[token.kind]} key={index}>
             {token.text}
           </span>
         ))}

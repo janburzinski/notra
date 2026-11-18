@@ -1727,7 +1727,6 @@ export function EChartsBarChart<TData extends Record<string, unknown>>({
   const hasStrippedBars =
     !isLoading && bars.some((bar) => bar.variant === "stripped");
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: intentionally runs after every render to snapshot the latest values.
   useLayoutEffect(() => {
     live.handlers = {
       onBrushChange: brushSlot.onChange,

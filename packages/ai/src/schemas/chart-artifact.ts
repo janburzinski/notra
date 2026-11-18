@@ -1,5 +1,4 @@
 import { CHART_UNITS } from "@notra/ai/constants/chart-artifact";
-// biome-ignore lint/performance/noNamespaceImport: Zod recommended way to import
 import * as z from "zod";
 
 const chartTitleSchema = z.string().min(1);

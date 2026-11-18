@@ -34,7 +34,6 @@ function readClientCookie(name: string): string | undefined {
   }
 
   const prefix = `${name}=`;
-  // biome-ignore lint/suspicious/noDocumentCookie: The active project must be restored before the next navigation
   const entry = document.cookie
     .split("; ")
     .find((cookie) => cookie.startsWith(prefix));
@@ -70,7 +69,6 @@ async function setClientCookie(
 
   if (typeof document !== "undefined") {
     const secureFlag = isSecure ? "; Secure" : "";
-    // biome-ignore lint/suspicious/noDocumentCookie: Navigation must see the updated cookie synchronously
     document.cookie = `${name}=${value}; max-age=${maxAge}; path=/; SameSite=Lax${secureFlag}`;
   }
 }

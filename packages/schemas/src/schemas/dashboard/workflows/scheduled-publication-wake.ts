@@ -1,5 +1,4 @@
 import "zod/compile";
-// biome-ignore lint/performance/noNamespaceImport: Zod recommended way of importing
 import * as z from "zod";
 
 /** The QStash message that wakes one post's schedule at its due time. */

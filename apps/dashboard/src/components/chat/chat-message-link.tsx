@@ -28,7 +28,6 @@ function LinkFavicon({ host }: { host: string }) {
     return null;
   }
   return (
-    // biome-ignore lint/performance/noImgElement: a 14px favicon from Google needs no image pipeline.
     <img
       alt=""
       className="mr-1 inline-block size-3.5 rounded-[3px] align-[-2px]"

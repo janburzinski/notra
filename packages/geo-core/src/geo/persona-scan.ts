@@ -38,12 +38,9 @@ import { resolveGeoGroundedZdrMode } from "../utils/geo-engines";
 import { resolveGroundedEngines } from "../utils/geo-grounded-engines";
 import { flushGeoLogEffect, geoLogWarn } from "../utils/geo-log";
 import { personaPromptId } from "../utils/geo-personas";
-import {
-  batchUsageOf,
-  withGeoScanEvent,
-  withGeoScanStep,
-} from "../utils/geo-scan-event";
+import { withGeoScanStep } from "../utils/geo-scan-event";
 import { geoScanPersonaTasks } from "../utils/geo-scan-plan";
+import { withGeoTiming } from "../utils/geo-timing";
 import {
   addAgentTokenUsage as addTokenUsage,
   EMPTY_AGENT_TOKEN_USAGE as EMPTY_TOKEN_USAGE,
@@ -245,8 +242,7 @@ export const runGeoScanPersonaBatch = Effect.fn("geo.runScanPersonaBatch")(
     return yield* withGeoScanStep(
       context,
       "persona_batch",
-      runGeoScanPersonaBatchBody(context, plannedPersonas),
-      batchUsageOf
+      runGeoScanPersonaBatchBody(context, plannedPersonas)
     );
   }
 );
@@ -266,18 +262,10 @@ const runGeoScanPersonaBatchBody = Effect.fn("geo.runScanPersonaBatch.body")(
           planned.personaId,
           planned.engine
         );
-        return withGeoScanEvent(
-          runPlannedPersona(checkContext, planned),
-          { ...fields, event: "geo.check.attempt.completed" },
-          {
-            scanId: context.scanId,
-            runId: context.runId,
-            step: "check",
-            engine: planned.engine,
-            taskKey: planned.personaId,
-            persistSuccess: false,
-          }
-        ).pipe(geoSkip("persona conversation failed", fields));
+        return withGeoTiming(runPlannedPersona(checkContext, planned), {
+          ...fields,
+          event: "geo.check.attempt.completed",
+        }).pipe(geoSkip("persona conversation failed", fields));
       },
       { concurrency: GEO_SCAN_CONCURRENCY }
     );

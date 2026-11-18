@@ -1,0 +1,52 @@
+export type EngineIconKey =
+  | "openai"
+  | "claude"
+  | "gemini"
+  | "google"
+  | "amazon"
+  | "perplexity"
+  | "mistral"
+  | "deepseek"
+  | "meta"
+  | "instagram"
+  | "grok"
+  | "qwen"
+  | "copilot"
+  | "tencent"
+  | "xiaomi"
+  | "cursor"
+  | "claude-code"
+  | "codex"
+  | "fx"
+  | "apple"
+  | "duckduckgo"
+  | "cloudflare"
+  | "tiktok"
+  | "mozilla"
+  | "manus"
+  | "firecrawl"
+  | "cohere"
+  | "opencode"
+  | "kimi"
+  | "zai"
+  | "exa"
+  | "parallel"
+  | "commoncrawl"
+  | "youcom"
+  | "liner"
+  | "cline"
+  | "devin"
+  | "diffbot"
+  | "tavily"
+  | "timpi"
+  | "huawei"
+  | "kagi"
+  | "agent"
+  | "cli";
+
+export interface EngineIconRule {
+  key: EngineIconKey;
+  patterns: readonly string[];
+  /** Values that must equal the whole engine string, for short vendor names. */
+  exact?: readonly string[];
+}

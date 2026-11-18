@@ -155,7 +155,6 @@ function LinearIntegrationCard({
                 })}
           </CardDescription>
           <CardAction>
-            {/* biome-ignore lint/a11y/noStaticElementInteractions: Event propagation barrier */}
             <div
               className="flex items-center gap-2"
               data-no-card-click

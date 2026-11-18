@@ -70,7 +70,6 @@
     "drizzle-orm": "catalog:",
     "effect": "catalog:",
     "evlog": "catalog:",
-    "gray-matter": "^4.0.3",
     "hast-util-from-html": "2.0.3",
     "marked": "catalog:",
     "nanoid": "catalog:",

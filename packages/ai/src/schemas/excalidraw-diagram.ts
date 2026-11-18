@@ -8,7 +8,6 @@ import {
   DIAGRAM_MAX_TEXT_LENGTH,
   DIAGRAM_MAX_VIA_POINTS,
 } from "@notra/ai/constants/excalidraw-diagram";
-// biome-ignore lint/performance/noNamespaceImport: Zod recommended way to import
 import * as z from "zod";
 
 const coordinateSchema = z

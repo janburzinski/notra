@@ -203,7 +203,6 @@ function UserMessageEditor({
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const reduceMotion = useReducedMotion();
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: re-measure when value changes (scrollHeight is read from the DOM).
   useEffect(() => {
     const el = textareaRef.current;
     if (!el) {

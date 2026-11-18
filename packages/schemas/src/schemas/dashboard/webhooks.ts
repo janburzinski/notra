@@ -1,5 +1,4 @@
 import "zod/compile";
-// biome-ignore lint/performance/noNamespaceImport: Zod recommended way to import
 import * as z from "zod";
 
 import { INPUT_INTEGRATION_TYPES } from "./integrations";

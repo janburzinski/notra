@@ -1,7 +1,6 @@
 import "zod/compile";
 import { updateChatSessionSchema } from "@notra/ai/schemas/chat";
 import { organizationIdSchema } from "@notra/schemas/dashboard/auth/organization";
-// biome-ignore lint/performance/noNamespaceImport: Zod recommended way of importing
 import * as z from "zod";
 
 import { createChatPostSchema } from "./content";

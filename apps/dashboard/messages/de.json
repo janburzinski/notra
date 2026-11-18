@@ -113,7 +113,6 @@
           "connectX": "X-Konto verbinden",
           "connectLinkedin": "LinkedIn-Konto verbinden",
           "noLinkedin": "Keine LinkedIn-Konten verbunden",
-          "disconnecting": "Wird getrennt…",
           "refreshAccount": "@{username} aktualisieren",
           "refreshTooltip": "Kontodetails aktualisieren",
           "disconnectAccount": "@{username} trennen",
@@ -1095,8 +1094,7 @@
       "tooManyRepositoryChecks": "Zu viele GitHub-Repository-Prüfungen. Bitte versuch es gleich nochmal."
     },
     "analytics": {
-      "unavailable": "Analytics ist für diesen Workspace noch nicht verfügbar.",
-      "xAccountNotFound": "Das X-Konto @{username} wurde nicht gefunden"
+      "unavailable": "Analytics ist für diesen Workspace noch nicht verfügbar."
     },
     "actions": {
       "organizations": {
@@ -3813,7 +3811,6 @@
       "showBreakdown": "Zwecke von {label}: {purposes}, Aufschlüsselung anzeigen"
     },
     "trafficSourceSheet": {
-      "bot": "Bot",
       "bots": "Bots",
       "bands": {
         "cited": "In Antworten zitiert"
@@ -6733,8 +6730,7 @@
       },
       "editor": {
         "placeholder": "Nachricht senden… (@ für Tools, / für Skills)"
-      },
-      "contextUnavailable": "Kontext ist gerade nicht verfügbar."
+      }
     },
     "attachments": {
       "attachFiles": "Dateien anhängen",

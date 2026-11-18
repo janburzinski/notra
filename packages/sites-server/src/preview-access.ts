@@ -7,12 +7,11 @@ import { safePreviewNextPath } from "@notra/sites-core/utils/preview-path";
 import { signSitePreviewToken } from "@notra/sites-core/utils/preview-token";
 
 import { getSitesPreviewSecret } from "./env";
-import { updateSiteSettings } from "./sites";
 import type {
   PreviewAccessUrl,
   PreviewAccessUrlParams,
 } from "./types/preview-access";
-import type { Site, UpdateSiteSettingsResult } from "./types/sites";
+import type { Site } from "./types/sites";
 import { sitePreviewOrigin } from "./utils/urls";
 
 export async function previewAccessUrl(
@@ -43,12 +42,4 @@ export async function previewAccessUrl(
   url.searchParams.set("token", token);
   url.searchParams.set("next", next);
   return { url: url.toString(), expiresAt: new Date(exp * 1000) };
-}
-
-export async function setSitePreviewPassword(
-  site: Site,
-  password: string | null,
-  userId: string
-): Promise<UpdateSiteSettingsResult> {
-  return await updateSiteSettings(site, { previewPassword: password }, userId);
 }

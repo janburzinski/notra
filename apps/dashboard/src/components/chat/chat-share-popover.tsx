@@ -126,7 +126,6 @@ function ChatShareLiveToggle({
   });
   return (
     <div className="flex flex-col gap-0.5">
-      {/* biome-ignore lint/a11y/noLabelWithoutControl: the checkbox inside is the control */}
       <label className="flex w-fit cursor-pointer items-center gap-2 text-xs">
         <Checkbox
           checked={checked}

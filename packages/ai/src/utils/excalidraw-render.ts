@@ -31,7 +31,6 @@ import {
   rotatedBox,
 } from "@notra/ai/utils/excalidraw-diagram";
 import { loadRenderFont } from "@notra/ai/utils/render-font";
-// biome-ignore lint/performance/noNamespaceImport: opentype.js is UMD; see parseFont
 import * as opentype from "opentype.js";
 import type { Font, PathCommand } from "opentype.js";
 import rough from "roughjs";

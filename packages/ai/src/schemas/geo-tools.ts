@@ -13,7 +13,6 @@ import {
   GEO_TOOL_MAX_DAYS,
   GEO_TOOL_MAX_PROMPT_RESULT_LIMIT,
 } from "@notra/ai/constants/geo-tools";
-// biome-ignore lint/performance/noNamespaceImport: Zod recommended way to import
 import * as z from "zod";
 
 const projectIdSchema = z

@@ -10,7 +10,6 @@ import {
   WEBHOOK_EVENT_TYPES,
 } from "@notra/schemas/dashboard/integrations";
 import { automationNotifySchema } from "@notra/schemas/shared/automation";
-// biome-ignore lint/performance/noNamespaceImport: Zod recommended way to import
 import * as z from "zod";
 
 export const IGNORE_COMMIT_PATTERNS_TEXT_MAX_LENGTH =

@@ -1,4 +1,4 @@
-import { resolveEngineIconKey } from "@notra/geo-core/utils/geo-engine-icon";
+import { resolveEngineIconKey } from "@notra/utils/geo-engine-icon";
 import { renderToStaticMarkup } from "react-dom/server";
 
 import { EngineIcon } from "@/components/geo/engine-icon";

@@ -53,7 +53,6 @@ import {
   siteAnalyticsInputSchema,
   siteScopeInputSchema,
   siteVisitorTotalsInputSchema,
-  siteSetPreviewPasswordInputSchema,
   siteStarterInputSchema,
   updatePostPreviewAccessInputSchema,
   updateSiteInputSchema,
@@ -119,7 +118,6 @@ import {
 import { SiteInputError } from "@notra/sites-server/errors/sites";
 import {
   getRepositorySuggestions,
-  getSiteRepositoryOverview,
   siteRepositoryAccess,
 } from "@notra/sites-server/github";
 import {
@@ -137,10 +135,7 @@ import {
   listInthProjects,
 } from "@notra/sites-server/inth";
 import { getSitePlanUsage } from "@notra/sites-server/plan-limits";
-import {
-  previewAccessUrl,
-  setSitePreviewPassword,
-} from "@notra/sites-server/preview-access";
+import { previewAccessUrl } from "@notra/sites-server/preview-access";
 import {
   createBranchPreview,
   deletePreview,
@@ -574,19 +569,6 @@ export const sitesRouter = {
       };
     }),
 
-  repository: sitesProcedure
-    .input(siteScopeInputSchema)
-    .handler(async ({ context, input }) => {
-      const { site } = await requireSite(context, input);
-      return await getSiteRepositoryOverview(site).catch((error: unknown) => {
-        console.warn("sites.repository_overview_failed", {
-          siteId: site.id,
-          error: error instanceof Error ? error.message : String(error),
-        });
-        return null;
-      });
-    }),
-
   analytics: sitesProcedure
     .input(siteAnalyticsInputSchema)
     .handler(async ({ context, input }) => {
@@ -958,22 +940,6 @@ export const sitesRouter = {
             });
           }
         );
-      }),
-
-    setPassword: sitesProcedure
-      .input(siteSetPreviewPasswordInputSchema)
-      .handler(async ({ context, input }) => {
-        assertNotDemo();
-        const { site, userId } = await requireSite(context, input, {
-          admin: true,
-        });
-        const result = await setSitePreviewPassword(
-          site,
-          input.password,
-          userId
-        );
-        dispatchLater([result.syncJobId]);
-        return { passwordSet: input.password !== null };
       }),
   },
 

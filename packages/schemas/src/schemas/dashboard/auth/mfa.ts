@@ -5,7 +5,6 @@ import {
 } from "@notra/schemas/constants/dashboard/auth";
 import { returnToSchema } from "@notra/schemas/dashboard/auth/return-to";
 import { normalizeBackupCode } from "@notra/schemas/utils/auth";
-// biome-ignore lint/performance/noNamespaceImport: Zod recommended way to import
 import * as z from "zod";
 
 const AUTH_TOKEN_MAX_LENGTH = 4096;

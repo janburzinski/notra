@@ -28,8 +28,7 @@
     "@upstash/redis": "catalog:",
     "@vercel/functions": "^3.10.1",
     "drizzle-orm": "catalog:",
-    "pg": "^8.23.1",
-    "zod": "catalog:"
+    "pg": "^8.23.1"
   },
   "devDependencies": {
     "@notra/typescript-config": "workspace:*",

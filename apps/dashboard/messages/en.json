@@ -113,7 +113,6 @@
           "connectX": "Connect X account",
           "connectLinkedin": "Connect LinkedIn account",
           "noLinkedin": "No LinkedIn accounts connected",
-          "disconnecting": "Disconnecting…",
           "refreshAccount": "Refresh @{username}",
           "refreshTooltip": "Refresh account details",
           "disconnectAccount": "Disconnect @{username}",
@@ -1095,8 +1094,7 @@
       "tooManyRepositoryChecks": "Too many GitHub repository checks. Please try again shortly."
     },
     "analytics": {
-      "unavailable": "Analytics is not available for this workspace yet.",
-      "xAccountNotFound": "Could not find the X account @{username}"
+      "unavailable": "Analytics is not available for this workspace yet."
     },
     "actions": {
       "organizations": {
@@ -3813,7 +3811,6 @@
       "showBreakdown": "{label} purposes: {purposes}, show breakdown"
     },
     "trafficSourceSheet": {
-      "bot": "Bot",
       "bots": "Bots",
       "bands": {
         "cited": "Cited in answers"
@@ -6733,8 +6730,7 @@
       },
       "editor": {
         "placeholder": "Send a message… (type @ for tools, / for skills)"
-      },
-      "contextUnavailable": "Context is unavailable right now."
+      }
     },
     "attachments": {
       "attachFiles": "Attach files",

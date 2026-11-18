@@ -22,8 +22,6 @@ import {
   geoPersonasRelations,
   geoPromptSequences,
   geoPromptTranslations,
-  geoScanEvents,
-  geoScanEventsRelations,
   geoScans,
   geoScansRelations,
   users,
@@ -75,8 +73,6 @@ const schema = {
   geoSettings,
   geoScans,
   geoScansRelations,
-  geoScanEvents,
-  geoScanEventsRelations,
 };
 export const database = { postgres: new PGlite() };
 let currentDb = drizzle(database.postgres, { schema });

@@ -1,6 +1,5 @@
 import "zod/compile";
 import { returnToSchema } from "@notra/schemas/dashboard/auth/return-to";
-// biome-ignore lint/performance/noNamespaceImport: Zod recommended way to import
 import * as z from "zod";
 
 export const signupSchema = z.object({

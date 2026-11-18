@@ -1,5 +1,4 @@
 import "zod/compile";
-// biome-ignore lint/performance/noNamespaceImport: Zod recommended way of importing
 import * as z from "zod";
 
 /** The delayed QStash message that repeats a deleted workspace, site or project purge. */

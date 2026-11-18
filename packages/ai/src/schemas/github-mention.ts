@@ -4,7 +4,6 @@ import {
   GITHUB_MENTION_REPOSITORY_READ_LIMITS,
 } from "@notra/ai/constants/github-mention";
 import { CONTENT_PUBLICATION_STATUSES } from "@notra/db/constants/content";
-// biome-ignore lint/performance/noNamespaceImport: Zod recommended way to import
 import * as z from "zod";
 
 const senderSchema = z.object({

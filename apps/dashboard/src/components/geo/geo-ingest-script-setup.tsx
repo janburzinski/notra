@@ -39,7 +39,6 @@ export function GeoIngestScriptSetup({
   // package method; the status lives in step 2 rather than a box below it.
   const options = (
     <div className="flex items-center gap-4 py-1 ps-0.5">
-      {/* biome-ignore lint/a11y/noLabelWithoutControl: the checkbox inside is the control */}
       <label className="text-muted-foreground hover:text-foreground flex cursor-pointer items-center gap-2 text-xs whitespace-nowrap">
         <Checkbox
           checked={pinned}
@@ -47,7 +46,6 @@ export function GeoIngestScriptSetup({
         />
         {t("pinLabel")}
       </label>
-      {/* biome-ignore lint/a11y/noLabelWithoutControl: the checkbox inside is the control */}
       <label className="text-muted-foreground hover:text-foreground flex cursor-pointer items-center gap-2 text-xs whitespace-nowrap">
         <Checkbox
           checked={errors}

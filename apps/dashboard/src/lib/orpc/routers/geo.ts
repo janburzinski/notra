@@ -105,10 +105,8 @@ import {
   loadGeoTrafficLog,
   loadGeoTrafficPages,
   startGeoPromptRescan,
-  loadGeoScanStatus,
   startGeoScan,
   toggleGeoAutoPrompt,
-  toggleGeoPrompt,
   updateGeoProduct,
   updateGeoPrompt,
   upsertGeoCompetitor,
@@ -218,10 +216,8 @@ import {
   geoPromptRescanInputSchema,
   geoPromptGapIgnoreInputSchema,
   geoRejectedHostInputSchema,
-  geoScanStatusInputSchema,
   geoPromptsImportInputSchema,
   geoPromptDeleteInputSchema,
-  geoPromptToggleInputSchema,
   geoProductCreateInputSchema,
   geoProductDeleteInputSchema,
   geoProductUpdateInputSchema,
@@ -1539,22 +1535,6 @@ export const geoRouter = {
         )
       )
     ),
-  promptsToggle: authorizedProcedure.input(geoPromptToggleInputSchema).handler(
-    geoHandler(
-      (input) =>
-        toggleGeoPrompt(input, input.promptId, input.enabled).pipe(
-          Effect.tap(() => refreshGeoContentGapsBestEffort(input))
-        ),
-      ({ context, input }) => {
-        trackGeoRouterEvent({
-          context,
-          input,
-          event: POSTHOG_EVENTS.GEO_PROMPT_TOGGLED,
-          properties: { enabled: input.enabled, prompt_id: input.promptId },
-        });
-      }
-    )
-  ),
   sequencesList: authorizedProcedure
     .input(geoOrganizationInputSchema)
     .handler(geoOpenHandler((input) => listGeoSequences(input))),
@@ -2056,9 +2036,6 @@ export const geoRouter = {
   rescanPrompt: authorizedProcedure
     .input(geoPromptRescanInputSchema)
     .handler(geoHandler((input) => startGeoPromptRescan(input))),
-  scanStatus: authorizedProcedure
-    .input(geoScanStatusInputSchema)
-    .handler(geoOpenHandler((input) => loadGeoScanStatus(input, input.scanId))),
   scanRuns: authorizedProcedure
     .input(geoScanRunsInputSchema)
     .handler(geoOpenHandler((input) => loadGeoScanRuns(input))),

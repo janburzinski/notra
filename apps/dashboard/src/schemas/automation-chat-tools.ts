@@ -14,7 +14,6 @@ import {
   SUPPORTED_AUTOMATION_OUTPUT_TYPES,
   WEBHOOK_EVENT_TYPES,
 } from "@notra/schemas/dashboard/integrations";
-// biome-ignore lint/performance/noNamespaceImport: Zod recommended way to import
 import * as z from "zod";
 
 const automationIdSchema = z

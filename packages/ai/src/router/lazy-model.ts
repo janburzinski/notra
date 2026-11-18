@@ -179,7 +179,6 @@ export class RoutedLanguageModel implements LanguageModelV4 {
     // Lazy thenable: wrappers read `supportedUrls` eagerly, and we must not
     // start route resolution (or leak rejections) before the first call.
     this.supportedUrls = {
-      // biome-ignore lint/suspicious/noThenProperty: intentional lazy thenable so wrappers can read supportedUrls without triggering resolution
       then: (onFulfilled, onRejected) =>
         this.getRoute(this.routeToolIds)
           .then((route) => route.model.supportedUrls)

@@ -34,6 +34,11 @@ import type { ImportCoverage } from "./analytics-imports";
 import type { GscBuyingIntentSection } from "./google-search-console";
 import type { GeoModelTokenUsage } from "./token-usage";
 
+export type {
+  EngineIconKey,
+  EngineIconRule,
+} from "@notra/utils/types/geo-engine-icon";
+
 export interface GeoProject {
   id: string;
   name: string;
@@ -1546,52 +1551,6 @@ export interface GeoTrafficSourceGroupDefinition {
   icon: string | null;
 }
 
-export type EngineIconKey =
-  | "openai"
-  | "claude"
-  | "gemini"
-  | "google"
-  | "amazon"
-  | "perplexity"
-  | "mistral"
-  | "deepseek"
-  | "meta"
-  | "instagram"
-  | "grok"
-  | "qwen"
-  | "copilot"
-  | "tencent"
-  | "xiaomi"
-  | "cursor"
-  | "claude-code"
-  | "codex"
-  | "fx"
-  | "apple"
-  | "duckduckgo"
-  | "cloudflare"
-  | "tiktok"
-  | "mozilla"
-  | "manus"
-  | "firecrawl"
-  | "cohere"
-  | "opencode"
-  | "kimi"
-  | "zai"
-  | "exa"
-  | "parallel"
-  | "commoncrawl"
-  | "youcom"
-  | "liner"
-  | "cline"
-  | "devin"
-  | "diffbot"
-  | "tavily"
-  | "timpi"
-  | "huawei"
-  | "kagi"
-  | "agent"
-  | "cli";
-
 export type GeoChatSkin =
   | "claude"
   | "chatgpt"
@@ -1600,13 +1559,6 @@ export type GeoChatSkin =
   | "opencode"
   | "claude-code"
   | "codex";
-
-export interface EngineIconRule {
-  key: EngineIconKey;
-  patterns: readonly string[];
-  /** Values that must equal the whole engine string, for short vendor names. */
-  exact?: readonly string[];
-}
 
 export type GeoModelProviderId =
   | "anthropic"

@@ -1,7 +1,6 @@
 import "zod/compile";
 import { AUTOMATION_RUN_STATUSES } from "@notra/db/constants/automation-runs";
 import { organizationIdInputSchema } from "@notra/schemas/dashboard/auth/organization";
-// biome-ignore lint/performance/noNamespaceImport: Zod recommended way to import
 import * as z from "zod";
 
 import { AUTOMATION_RUNS_PAGE_SIZE } from "../../../constants/dashboard/automation-runs";

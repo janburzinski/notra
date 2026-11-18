@@ -6,7 +6,6 @@ import {
   organizationNameSchema,
   organizationSlugSchema,
 } from "@notra/schemas/dashboard/organization";
-// biome-ignore lint/performance/noNamespaceImport: Zod recommended way to import
 import * as z from "zod";
 
 const ORGANIZATION_LOGO_MAX_LENGTH = 2048;

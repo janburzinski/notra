@@ -4,7 +4,6 @@ import {
   ARTIFACT_METRIC_TRENDS,
 } from "@notra/ai/constants/artifacts";
 import { chartArtifactSchema } from "@notra/ai/schemas/chart-artifact";
-// biome-ignore lint/performance/noNamespaceImport: Zod recommended way to import
 import * as z from "zod";
 
 const text = (max: number) => z.string().trim().min(1).max(max);

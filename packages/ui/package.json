@@ -35,7 +35,6 @@
     "@streamdown/code": "^2.0.0",
     "@tailwindcss/typography": "^0.5.20",
     "@tanstack/react-form": "catalog:",
-    "@tanstack/react-virtual": "~3.14.20",
     "@toolwind/corner-shape": "^0.0.8-3",
     "ai": "catalog:",
     "class-variance-authority": "^0.7.1",

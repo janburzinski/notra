@@ -1,4 +1,3 @@
-// biome-ignore lint/performance/noNamespaceImport: Zod recommended way to import
 import * as z from "zod";
 
 const RETURN_TO_MAX_LENGTH = 2048;

@@ -1,7 +1,6 @@
 import "zod/compile";
 import { TRAFFIC_EMBED_CHARTS } from "@notra/schemas/constants/dashboard/traffic-embed";
 import { organizationIdSchema } from "@notra/schemas/dashboard/auth/organization";
-// biome-ignore lint/performance/noNamespaceImport: Zod recommended way of importing
 import * as z from "zod";
 
 export const TRAFFIC_EMBED_NAME_MAX_LENGTH = 80;

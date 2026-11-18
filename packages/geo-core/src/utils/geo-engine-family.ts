@@ -1,10 +1,11 @@
+import { resolveEngineIconKey } from "@notra/utils/geo-engine-icon";
+
 import {
   GEO_BRAND_LABELS,
   GEO_ENGINE_LABELS,
   GEO_LEGACY_GROUNDED_MODELS,
 } from "../constants/geo";
 import type { EngineIconKey } from "../types/geo";
-import { resolveEngineIconKey } from "./geo-engine-icon";
 
 const GROUNDED_SUFFIX_PATTERN = /(-direct)?-grounded$/;
 

@@ -6,7 +6,6 @@ import {
   postTagsSchema,
 } from "@notra/ai/schemas/post-metadata";
 import { SITE_AUTHOR_ID } from "@notra/sites-core/constants/site-config";
-// biome-ignore lint/performance/noNamespaceImport: Zod recommended way to import
 import * as z from "zod";
 
 import {

@@ -129,7 +129,6 @@ import { PublicUrlValidationError } from "@notra/utils/url";
 import { ORPCError } from "@orpc/server";
 import { and, eq } from "drizzle-orm";
 import { Effect } from "effect";
-// biome-ignore lint/performance/noNamespaceImport: Zod recommended way of importing
 import * as z from "zod";
 
 import { REPOSITORY_ALREADY_CONNECTED_CODE } from "@/constants/github";

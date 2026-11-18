@@ -9,7 +9,7 @@ import {
 } from "bun:test";
 
 import { geoLog } from "@notra/ai/evlog";
-import { geoMentionChecks, geoScanEvents, geoScans } from "@notra/db/schema";
+import { geoMentionChecks, geoScans } from "@notra/db/schema";
 import { queryGeoCheckOverview } from "@notra/db/utils/geo-checks";
 import { Effect } from "effect";
 
@@ -100,15 +100,6 @@ describe("model service in real scan batches", () => {
           promptId: "bad",
         })
       );
-      const events = await testDb.select().from(geoScanEvents);
-      expect(
-        events.some(
-          (event) =>
-            event.step === "check" &&
-            event.status === "error" &&
-            event.errorMessage?.includes("provider refused")
-        )
-      ).toBe(true);
       const scan = await testDb.query.geoScans.findFirst();
       expect(
         scan?.plan?.taskStates?.[

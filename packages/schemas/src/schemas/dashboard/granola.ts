@@ -1,6 +1,5 @@
 import "zod/compile";
 import { GRANOLA_API_KEY_PREFIX } from "@notra/ai/constants/granola";
-// biome-ignore lint/performance/noNamespaceImport: Zod recommended way to import
 import * as z from "zod";
 
 const granolaApiKeySchema = z

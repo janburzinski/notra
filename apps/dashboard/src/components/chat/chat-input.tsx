@@ -1737,7 +1737,6 @@ export function ChatInput({
 
   const editor = (
     <div className="relative flex min-w-0 flex-1 cursor-text [--lh:1lh]">
-      {/* biome-ignore lint/a11y/useSemanticElements: rich mention editor requires a contentEditable host instead of a native textarea. */}
       <div
         aria-activedescendant={composerActiveDescendant}
         aria-autocomplete={isComposerPopupOpen ? "list" : undefined}

@@ -2695,28 +2695,3 @@ export const startGeoPromptRescan = Effect.fn("geo.rescanPrompt")(function* (
   );
   return { ...started, prompt: prompt.prompt };
 });
-
-export const loadGeoScanStatus = Effect.fn("geo.scanStatus")(function* (
-  input: GeoScopeInput,
-  scanId: string
-) {
-  const scope = yield* requireGeoProject(input);
-  yield* sweepStaleGeoScanRows(scope);
-  const scan = yield* geoDb("scan status lookup failed", () =>
-    db.query.geoScans.findFirst({
-      columns: { id: true, status: true, startedAt: true, finishedAt: true },
-      where: and(
-        eq(geoScans.id, scanId),
-        eq(geoScans.projectId, scope.projectId),
-        eq(geoScans.organizationId, scope.organizationId)
-      ),
-    })
-  );
-  return scan
-    ? {
-        ...scan,
-        startedAt: scan.startedAt.toISOString(),
-        finishedAt: scan.finishedAt?.toISOString() ?? null,
-      }
-    : null;
-});

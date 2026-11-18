@@ -1,5 +1,4 @@
 import type { contentTypeSchema } from "@notra/ai/schemas/content";
-// biome-ignore lint/performance/noNamespaceImport: Zod recommended way of importing
 import * as z from "zod";
 
 import { CONTENT_GENERATION_BRIEF_MAX_LENGTH } from "./constants/limits";

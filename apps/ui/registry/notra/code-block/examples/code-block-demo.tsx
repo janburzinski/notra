@@ -7,20 +7,24 @@ import { CodeBlock, CodeBlockTabs } from "../components/code-block";
 const SNIPPETS = {
   next: {
     file: "proxy.ts",
-    code: `import { withGeo } from "@usenotra/geo/next";
+    code: `import { createGeoProxy } from "@usenotra/sdk/next";
+import { after, NextResponse } from "next/server";
 
-export const proxy = withGeo({
-  token: process.env.NOTRA_GEO_TOKEN,
+const geo = createGeoProxy({
+  token: process.env.NOTRA_GEO_TOKEN!,
 });
 
-export const config = { matcher: ["/((?!_next|api).*)"] };`,
+export function proxy(request: Request) {
+  after(() => geo(request));
+  return NextResponse.next();
+}`,
   },
   astro: {
     file: "src/middleware.ts",
-    code: `import { geoMiddleware } from "@usenotra/geo/astro";
+    code: `import { createGeoMiddleware } from "@usenotra/sdk/astro";
 
-export const onRequest = geoMiddleware({
-  token: import.meta.env.NOTRA_GEO_TOKEN,
+export const onRequest = createGeoMiddleware({
+  token: import.meta.env.NOTRA_GEO_TOKEN!,
 });`,
   },
 } as const;

@@ -207,7 +207,6 @@ export function CodeBlock({
             "m-0 overflow-x-auto bg-transparent p-3 pe-10 font-mono text-xs leading-relaxed [scrollbar-width:thin]",
             wrap && "wrap-anywhere whitespace-pre-wrap"
           )}
-          // biome-ignore lint/security/noDangerouslySetInnerHtml: sugar-high escapes the source before tokenizing
           dangerouslySetInnerHTML={{ __html: html }}
         />
       </div>

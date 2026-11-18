@@ -163,10 +163,6 @@ export const sitePreviewAccessInputSchema = sitePreviewInputSchema.extend({
   next: z.string().max(500).optional(),
 });
 
-export const siteSetPreviewPasswordInputSchema = siteScopeInputSchema.extend({
-  password: previewPassword,
-});
-
 export const addSiteDomainInputSchema = siteScopeInputSchema.extend({
   kind: z.enum(["subdomain", "proxy"]),
   value: z.string().trim().min(3).max(253),

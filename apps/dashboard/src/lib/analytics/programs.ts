@@ -1,9 +1,4 @@
-import { logError } from "@notra/ai/utils/server-log";
 import {
-  ingestSocialAccountStats,
-  ingestSocialAccounts,
-  ingestSocialPostStats,
-  ingestSocialPosts,
   isTinybirdConfigured,
   queryAccountLeaderboard,
   queryEngagementTimeseries,
@@ -21,24 +16,16 @@ import {
   posts,
   trackedSocialAccounts,
 } from "@notra/db/schema";
-import { isDemoMode } from "@notra/utils/demo-mode";
 import { and, asc, eq } from "drizzle-orm";
 import { Effect } from "effect";
 
 import {
   analyticsDb,
   analyticsQuery,
-  analyticsRequest,
   analyticsSideEffect,
 } from "@/lib/analytics/effect";
-import {
-  AnalyticsAccountNotFoundError,
-  TrackedAccountNotFoundError,
-} from "@/lib/analytics/errors";
+import { TrackedAccountNotFoundError } from "@/lib/analytics/errors";
 import { buildLeaderboardEntries } from "@/lib/analytics/leaderboard";
-import { buildAccountRow } from "@/lib/analytics/rows";
-import { resolveTwitterAccount } from "@/lib/analytics/tracked-accounts";
-import { collectTwitterRows } from "@/lib/analytics/twitter-sync";
 import type {
   AnalyticsRangeOptions,
   EngagementTimeseriesResponse,
@@ -50,9 +37,7 @@ import type {
   PostingPerformanceResponse,
   SocialOverviewAccount,
   SocialOverviewResponse,
-  SyncableSocialAccount,
   TopPostsResponse,
-  TrackAccountPreviewResponse,
 } from "@/types/analytics";
 
 function toNullableNumber(value: number | bigint | null): number | null {
@@ -67,30 +52,6 @@ function toRangeParams(range: AnalyticsRangeOptions) {
     date_to: range.dateTo,
   };
 }
-
-const syncTrackedAccountNow = Effect.fn("analytics.syncTrackedAccount")(
-  function* (account: SyncableSocialAccount) {
-    if (isDemoMode()) {
-      return;
-    }
-    const capturedAt = new Date();
-    yield* analyticsRequest("account ingest failed", () =>
-      ingestSocialAccounts([buildAccountRow(account, capturedAt)])
-    );
-    const rows = yield* analyticsRequest("account sync failed", () =>
-      collectTwitterRows([account], capturedAt)
-    );
-    yield* analyticsRequest("account stats ingest failed", () =>
-      ingestSocialAccountStats(rows.accountStats)
-    );
-    yield* analyticsRequest("posts ingest failed", () =>
-      ingestSocialPosts(rows.posts)
-    );
-    yield* analyticsRequest("post stats ingest failed", () =>
-      ingestSocialPostStats(rows.postStats)
-    );
-  }
-);
 
 export const loadSocialOverview = Effect.fn("analytics.overview")(function* (
   organizationId: string
@@ -441,107 +402,6 @@ export const loadLeaderboard = Effect.fn("analytics.leaderboard")(function* (
   };
   return response;
 });
-
-export const previewTrackedAccount = Effect.fn("analytics.previewAccount")(
-  function* (username: string) {
-    const account = yield* analyticsQuery("account preview failed", () =>
-      resolveTwitterAccount(username)
-    );
-
-    const response: TrackAccountPreviewResponse = {
-      account: account ?? null,
-    };
-    return response;
-  }
-);
-
-export const trackTwitterAccount = Effect.fn("analytics.trackAccount")(
-  function* (organizationId: string, username: string) {
-    const resolved = yield* analyticsRequest("account resolve failed", () =>
-      resolveTwitterAccount(username)
-    );
-    if (!resolved) {
-      return yield* Effect.fail(
-        new AnalyticsAccountNotFoundError({ username })
-      );
-    }
-
-    const connectedTwitterAccounts = yield* analyticsDb(
-      "accounts lookup failed",
-      () =>
-        db.query.connectedSocialAccounts.findMany({
-          columns: { providerAccountId: true, username: true },
-          where: and(
-            eq(connectedSocialAccounts.organizationId, organizationId),
-            eq(connectedSocialAccounts.provider, "twitter")
-          ),
-        })
-    );
-    const existingConnected = connectedTwitterAccounts.some(
-      (account) =>
-        account.providerAccountId === resolved.providerAccountId ||
-        account.username.toLowerCase() === resolved.username.toLowerCase()
-    );
-    if (existingConnected) {
-      return { trackedAccountId: null, username: resolved.username };
-    }
-
-    const existingTracked = yield* analyticsDb(
-      "tracked account lookup failed",
-      () =>
-        db.query.trackedSocialAccounts.findFirst({
-          columns: { id: true },
-          where: and(
-            eq(trackedSocialAccounts.organizationId, organizationId),
-            eq(trackedSocialAccounts.provider, "twitter"),
-            eq(
-              trackedSocialAccounts.providerAccountId,
-              resolved.providerAccountId
-            )
-          ),
-        })
-    );
-    if (existingTracked) {
-      return {
-        trackedAccountId: existingTracked.id,
-        username: resolved.username,
-      };
-    }
-
-    const trackedAccountId = crypto.randomUUID();
-    yield* analyticsDb("tracked account insert failed", () =>
-      db.insert(trackedSocialAccounts).values({
-        id: trackedAccountId,
-        organizationId,
-        provider: "twitter",
-        providerAccountId: resolved.providerAccountId,
-        username: resolved.username,
-        displayName: resolved.displayName,
-        profileImageUrl: resolved.profileImageUrl,
-        verified: resolved.verified,
-        verifiedType: resolved.verifiedType,
-      })
-    );
-
-    yield* syncTrackedAccountNow({
-      id: trackedAccountId,
-      organizationId,
-      provider: "twitter",
-      providerAccountId: resolved.providerAccountId,
-      username: resolved.username,
-      displayName: resolved.displayName,
-      profileImageUrl: resolved.profileImageUrl,
-      verified: false,
-    }).pipe(
-      Effect.catch((error) => {
-        logError("[Analytics] tracked account sync failed", error.cause);
-        return Effect.succeed(undefined);
-      })
-    );
-
-    return { trackedAccountId, username: resolved.username };
-  }
-);
 
 export const untrackTwitterAccount = Effect.fn("analytics.untrackAccount")(
   function* (organizationId: string, trackedAccountId: string) {

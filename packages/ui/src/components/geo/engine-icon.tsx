@@ -58,7 +58,7 @@ import type { ComponentType, SVGProps } from "react";
 import { ModelProviderLogo } from "@notra/ui/components/geo/model-provider-logo";
 import { cn } from "@notra/ui/lib/utils";
 import type { EngineIconKey, EngineIconProps } from "@notra/ui/types/geo";
-import { resolveEngineIconKey } from "@notra/ui/lib/geo-engine-icon";
+import { resolveEngineIconKey } from "@notra/utils/geo-engine-icon";
 import { splitModelId } from "@notra/ui/lib/geo-model-display";
 
 export function EngineIcon(props: EngineIconProps) {

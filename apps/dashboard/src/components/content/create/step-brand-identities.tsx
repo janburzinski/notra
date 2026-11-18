@@ -8,7 +8,6 @@ import { cn } from "@notra/ui/lib/utils";
 import { useForm } from "@tanstack/react-form";
 import { toast } from "sonner";
 import { useTranslations } from "use-intl";
-// biome-ignore lint/performance/noNamespaceImport: Zod recommended way of importing
 import * as z from "zod";
 
 import { Button } from "@/components/button";
