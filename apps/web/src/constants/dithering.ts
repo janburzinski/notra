@@ -17,3 +17,6 @@ export const BLOG_CARD_DITHER_RANGES = {
   scale: [0.6, 0.9],
   speed: [0.3, 0.65],
 } as const;
+
+// Paper's Dithering default `size`, in CSS pixels per cell.
+export const DITHER_DEFAULT_CELL_SIZE = 2;
