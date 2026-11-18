@@ -1,0 +1,39 @@
+apps/dashboard/src/lib/autopilot/settings.ts
+  s_51485dc008574a::t_2c6a13dd08b6cd 80-82,127-133,136-142,145
+packages/db/migrations/meta/0172_snapshot.json
+  ai_agent 1-18470
+apps/dashboard/src/app/(dashboard)/[slug]/autopilot/page-client.tsx
+  s_51485dc008574a::t_a20cbc75b59c22 28,245-246,248,277,292-300
+packages/db/src/schema.ts
+  s_51485dc008574a::t_2c6a13dd08b6cd 4977-4985
+packages/schemas/src/schemas/dashboard/autopilot.ts
+  s_51485dc008574a::t_2c6a13dd08b6cd 161-162
+apps/dashboard/src/lib/hooks/use-autopilot-onboarding.ts
+  s_51485dc008574a::t_d16b9ab5e4407f 753
+apps/dashboard/src/components/autopilot/autopilot-paused.tsx
+  s_51485dc008574a::t_a20cbc75b59c22 1-44
+apps/dashboard/src/types/autopilot-onboarding.ts
+  s_51485dc008574a::t_a20cbc75b59c22 204-209
+packages/db/migrations/meta/_journal.json
+  ai_agent 1208-1214
+apps/dashboard/src/lib/orpc/routers/autopilot.ts
+  s_51485dc008574a::t_2c6a13dd08b6cd 346,573-575
+packages/db/migrations/0172_autopilot_onboarded.sql
+  ai_agent 1-6
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "8d9d0966ef45ac8f151f53ecc362047b5dd9eb02",
+  "prompts": {},
+  "sessions": {
+    "s_51485dc008574a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a92c9619-515f-4397-b2d8-f36b36bf95f4",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
