@@ -1,0 +1,457 @@
+apps/agent/agent/subagents/image-designer-agent/tools/bash.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 1-3
+apps/agent/tests/slack-reply.test.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 7,72-73
+apps/agent/agent/subagents/image-designer-agent/tools/edit_file.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 1-3
+apps/dashboard/src/lib/onboarding/submit-workspace-form.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 95
+apps/dashboard/src/types/agent.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 2-3,45-46
+apps/agent/agent/subagents/content-writer-agent/tools/edit_file.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 1-3
+apps/dashboard/src/lib/autopilot/pages.test.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 1-124
+apps/dashboard/tests/autopilot-workflows.test.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 133-192,238-249
+apps/dashboard/src/lib/autopilot/run.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 2-5
+apps/dashboard/messages/de.json
+  s_395c9414fcd198::t_15ea4babfa29a4 130,828,1313-1316,1345,1365,1368,1373,1376,3740-3747,3750,4341-4342,4349,4435-4436,5042-5048,8166-8168
+apps/dashboard/src/lib/hooks/use-traffic-viewed.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 13,26-28,31
+apps/dashboard/src/lib/hooks/use-geo-db.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 241
+apps/dashboard/src/lib/orpc/routers/geo.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 38,110,204,263,364,1820,1822,1828-1832,1834-1845,1847-1851,1872-1876,1881-1908
+packages/ui/src/components/ui/combobox.tsx
+  s_395c9414fcd198::t_15ea4babfa29a4 84,86-87
+apps/dashboard/src/components/geo/traffic-page-shell.tsx
+  s_395c9414fcd198::t_15ea4babfa29a4 15,35-42,57,65-66,82-84,94,101-109,112-116,134-136
+apps/agent/agent/lib/utils/slack-reply.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 1-6,70-90
+apps/agent/agent/subagents/image-designer-agent/hooks/usage.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 1-4
+apps/agent/agent/lib/utils/slack-reactions.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 16,92-93
+apps/agent/agent/subagents/code-researcher-agent/tools/search_repository.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 1-3
+apps/agent/agent/lib/types/content-task.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 2,9-11
+apps/agent/agent/subagents/content-writer-agent/tools/view_post.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 1-3
+apps/console/src/constants/autopilot.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 1-5,55-146
+packages/ai/src/constants/autopilot-planner.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 43-46
+packages/ai/src/utils/autopilot-planner.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 364,469-470,475-478,481-485,533-541,565-569
+apps/agent/agent/subagents/content-writer-agent/tools/web_fetch.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 1-3
+packages/db/src/constants/autopilot.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 31-47
+apps/agent/agent/tools/content-writer.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 1-34
+apps/dashboard/src/app/(dashboard)/[slug]/geo/traffic/web/page-client.tsx
+  s_395c9414fcd198::t_15ea4babfa29a4 27,54-55,64,79
+apps/agent/agent/lib/types/chat-mirror.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 2-3,12-16
+apps/console/src/lib/autopilot/health.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 1-9,11-31,33-35,37,39-40,42-47,49-66,68-73,75-80,82-84,86-92,94-95,97-100,102-108,110-113,115-143,145-170,172-195,197-284,286-287,289-291,293-311,313-355,357-421,423-472,474-498,500-530,532-543
+packages/db/src/types/autopilot.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 81-82,140-146
+apps/dashboard/src/constants/autopilot-ui.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 38,501
+packages/ai/src/types/evaluation.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 3,9
+packages/schemas/src/schemas/dashboard/agent.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 9-13
+apps/agent/tests/slack-controls.test.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 19-34,37-38,80,86-87,93-101,105,122,158
+apps/agent/agent/lib/utils/slack-notifications.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 9,30-31
+apps/dashboard/src/components/onboarding/competitor-choice-row.tsx
+  s_395c9414fcd198::t_15ea4babfa29a4 3,18-19,21-22,25-29,36-41,51,56
+apps/agent/agent/instructions.md
+  s_395c9414fcd198::t_15ea4babfa29a4 11,19
+apps/console/src/types/autopilot.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 1,7,21,127-315
+apps/dashboard/src/lib/autopilot/pages.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 5-8,19,36-37,44,131-145,163-167,170,180,185-242
+apps/dashboard/src/types/autopilot-runtime.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 204-209
+apps/dashboard/src/utils/autopilot-link-check.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 1-163
+packages/tools/package.json
+  s_395c9414fcd198::t_15ea4babfa29a4 22
+apps/dashboard/src/app/onboarding/visibility/visibility-form.tsx
+  s_395c9414fcd198::t_15ea4babfa29a4 14,39,210-225
+apps/dashboard/src/utils/autopilot-citations.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 73-150,158
+apps/web/package.json
+  s_395c9414fcd198::t_15ea4babfa29a4 21
+apps/agent/agent/lib/hooks/usage.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 18,127-152,164-165,264-265,267-272,277,282,284,287,290,299-302,306-307,311,314,317-320,331,341,345
+apps/agent/agent/subagents/content-writer-agent/tools/get_commits_by_timeframe.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 1-8
+apps/dashboard/src/types/geo.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 6-8,108-110,122-123,460-461,768-772,777-778
+apps/agent/agent/subagents/content-writer-agent/tools/get_release_by_tag.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 1-8
+apps/agent/agent/subagents/code-researcher-agent/tools/get_available_integrations.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 1-3
+apps/dashboard/src/lib/autopilot/agent.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 3
+apps/dashboard/src/constants/autopilot-refresh.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 60-61
+apps/dashboard/src/lib/workflow-engine/blocks/autopilot/custom.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 22-26,34,40,156-192
+apps/agent/agent/subagents/code-researcher-agent/tools/read_repository_file.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 1-3
+apps/dashboard/src/constants/autopilot-outcome.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 1-18
+apps/agent/agent/subagents/content-writer-agent/tools/create_post.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 1-8
+apps/dashboard/src/utils/autopilot-outcome.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 1-81
+apps/agent/agent/subagents/image-designer-agent/tools/get_available_integrations.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 1-3
+apps/dashboard/src/lib/autopilot/landing.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 34,65-69,71,454-455
+apps/agent/tests/autopilot-tools.test.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 62-68
+apps/dashboard/src/lib/hooks/use-traffic-page-scope.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 49-53,59,101-104
+apps/dashboard/src/components/geo/geo-setup-button.tsx
+  s_395c9414fcd198::t_15ea4babfa29a4 3,9-10,23-27,33-47
+apps/agent/agent/subagents/code-researcher-agent/tools/write_file.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 1-3
+apps/dashboard/src/types/geo-traffic-pages.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 19,28-37,54-55,79
+apps/dashboard/src/components/geo/traffic-website-setup.tsx
+  s_395c9414fcd198::t_15ea4babfa29a4 1-176
+apps/dashboard/src/types/organizations/actions.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 42
+apps/agent/agent/subagents/code-researcher-agent/tools/get_commits_by_timeframe.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 1-8
+apps/console/src/components/autopilot/autopilot-health-client.tsx
+  s_395c9414fcd198::t_15ea4babfa29a4 1-261
+apps/console/src/components/autopilot/autopilot-page-client.tsx
+  s_395c9414fcd198::t_15ea4babfa29a4 1-70
+apps/dashboard/src/types/autopilot-link-check.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 1-39
+apps/console/src/components/autopilot/autopilot-trace-client.tsx
+  s_395c9414fcd198::t_15ea4babfa29a4 38
+apps/console/src/lib/orpc/routers/autopilot.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 10,12,15-20
+apps/dashboard/package.json
+  s_395c9414fcd198::t_15ea4babfa29a4 18-20,105
+apps/dashboard/src/app/(dashboard)/[slug]/geo/traffic/page-client.tsx
+  s_395c9414fcd198::t_15ea4babfa29a4 29,55,69-70,79,94
+bun.lock
+  ai_agent 51,58,92,115,194-196,281,541,621-622,624-628,753-755,757,934,1142-1143,1159,1181,1183,1185,1187,1189,1191,1193,1195,1197,1201,1203,1205,1207,2703,2705,2707,2709,2711,2713,2715,2717,2719,2721,2723,2725,2727,2729,2731,2733,3603,4309,4545,5295,5749,7077-7078,7093-7094,7115-7116,7221,7223,7247,7307-7308,7425,8239-8272,8297-8298,8375,8377,8379,8381,8383,8385,9151
+apps/agent/agent/lib/types/slack-controls.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 2,11
+apps/agent/agent/subagents/code-researcher-agent/instructions.md
+  s_395c9414fcd198::t_15ea4babfa29a4 17
+apps/console/src/app/(console)/[slug]/autopilot/page.tsx
+  s_395c9414fcd198::t_15ea4babfa29a4 4,11-15,20-25
+apps/agent/agent/lib/schemas/subagent-task.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 1-10
+apps/agent/agent/subagents/code-researcher-agent/tools/read_file.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 1-3
+apps/agent/agent/subagents/content-writer-agent/tools/search_company_knowledge.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 1-3
+apps/agent/agent/subagents/image-designer-agent/tools/web_search.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 1-3
+apps/agent/agent/lib/constants/slack.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 86-93
+apps/agent/tests/slack-channel.test.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 10-13,36-37,41-44,139,142,149,154,156-170,172-176,178,180,187-196,215-243,250-253,255,257,259,262-263,283-289,297,301-302,343,348-357,360-371,379-380,383,393,401,411,436,439,441-444,448-451,455,461-462,478-479,485-486,500-504,506-507,509,511,513,521-523,530-532,534,538,545,553-557,568-569,577-578,584,622,634-637,640,645,661-665,675-676,681-682,685,691-692,696-697,700,706,708,710,724,733,737-740,745,748,751-755,772,778,780-781,796
+apps/agent/agent/subagents/content-writer-agent/tools/read_file.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 1-3
+apps/dashboard/src/components/onboarding/competitor-suggestions-skeleton.tsx
+  s_395c9414fcd198::t_15ea4babfa29a4 2,5,9-25
+apps/dashboard/src/constants/autopilot.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 1,226-242
+apps/agent/agent/subagents/code-researcher-agent/tools/edit_file.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 1-3
+apps/agent/agent/subagents/content-writer-agent/tools/get_skill_by_name.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 1-3
+apps/agent/agent/subagents/content-writer-agent/tools/search_web.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 1-8
+apps/agent/agent/subagents/image-designer-agent/tools/web_fetch.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 1-3
+apps/dashboard/src/constants/storage.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 31-32
+apps/agent/tests/slack-usage-limits.test.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 62,66-73,91,106-107
+apps/agent/agent/lib/utils/slack-renderer.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 1-387
+apps/dashboard/src/constants/autopilot-workflows.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 21,37,171-181
+apps/dashboard/src/lib/organizations/actions.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 328-331
+apps/api/package.json
+  s_395c9414fcd198::t_15ea4babfa29a4 14,37
+apps/api/src/lib/agent/client.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 51
+apps/agent/agent/subagents/code-researcher-agent/hooks/usage.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 1-5
+apps/dashboard/src/lib/hooks/use-geo-active-project.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 29
+apps/agent/README.md
+  s_395c9414fcd198::t_15ea4babfa29a4 22-23,32,69,71,115,117
+apps/dashboard/src/utils/slack-blocks.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 1-5,7-31,33-41,43-45
+packages/schemas/src/schemas/dashboard/organizations/actions.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 46-47
+apps/agent/agent/subagents/content-writer-agent/hooks/usage.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 1-4
+apps/agent/agent/channels/slack.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 7,62,75,79-82,92,96,116-118,156,177-184,223-224,227-229,231-232,235-241,395-398,455,460
+apps/agent/agent/hooks/chat-mirror.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 6,14-22,34
+apps/agent/agent/subagents/code-researcher-agent/tools/web_fetch.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 1-3
+apps/agent/agent/subagents/content-writer-agent/tools/write_file.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 1-3
+apps/dashboard/messages/en.json
+  s_395c9414fcd198::t_15ea4babfa29a4 130,828,1313-1316,1345,1365,1368,1373,1376,3740-3747,3750,4341-4342,4349,4435-4436,5042-5048,8166-8168
+apps/agent/agent/tools/code-researcher.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 1-34
+apps/agent/agent/lib/constants/subagents.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 1-16
+apps/agent/agent/subagents/content-writer-agent/tools/list_available_skills.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 1-3
+apps/dashboard/src/components/geo/geo-language-picker.tsx
+  s_395c9414fcd198::t_15ea4babfa29a4 107-112,125
+apps/dashboard/src/constants/geo-projects.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 2-8
+apps/agent/agent/lib/utils/subagent-result.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 1-26
+apps/agent/tests/usage-hook.test.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 1,4-28,31-85,87-88,90-114,116-139
+apps/dashboard/src/lib/autopilot/workflows/check-links.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 1-263
+apps/agent/agent/subagents/content-writer-agent/tools/get_brand_references.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 1-3
+apps/dashboard/src/lib/orpc/routers/autopilot.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 7-10
+apps/agent/agent/subagents/image-designer-agent/tools/revise_image.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 1-8
+apps/agent/agent/lib/utils/slack-auth.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 4,60-76,86
+apps/agent/agent/lib/utils/slack-input-request.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 9,19,31-32,34-44,46,48-49
+apps/dashboard/tests/autopilot-check-links.test.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 1-308
+packages/geo-core/src/geo/discover.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 517-518,521,532,534-597
+apps/agent/agent/subagents/image-designer-agent/tools/generate_image.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 1-8
+apps/evals/src/fixtures/autopilot-scenarios.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 28-29,37,458-473,1304-1348
+apps/dashboard/src/components/onboarding/competitor-suggestions.tsx
+  s_395c9414fcd198::t_15ea4babfa29a4 4,11,87-112
+apps/agent/agent/subagents/content-writer-agent/tools/get_linear_issues.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 1-8
+apps/agent/agent/tools/edit_file.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 1-3
+apps/agent/agent/subagents/code-researcher-agent/tools/open_repository.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 1-3
+apps/dashboard/src/utils/read-agent-task-stream.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 1,3,29-56,58,60,62,64-65,67-71,73,87-89,94-96,115-120
+apps/dashboard/src/components/geo/geo-web-tracking-status.tsx
+  s_395c9414fcd198::t_15ea4babfa29a4 3,7,48-49
+apps/dashboard/src/types/onboarding.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 46-47,272,317-321
+apps/dashboard/src/components/onboarding/brand-review-loading.tsx
+  s_395c9414fcd198::t_15ea4babfa29a4 33-41
+apps/dashboard/src/components/members/domain-auto-invite-card.tsx
+  s_395c9414fcd198::t_15ea4babfa29a4 51-58
+apps/dashboard/src/components/onboarding/domain-invite-pref.tsx
+  s_395c9414fcd198::t_15ea4babfa29a4 1-45
+package.json
+  s_395c9414fcd198::t_15ea4babfa29a4 11-12,28
+packages/geo-core/src/schemas/geo.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 275-279,287-289
+apps/agent/agent/subagents/code-researcher-agent/agent.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 5,9,15-17
+packages/ui/src/components/ui/autocomplete.tsx
+  s_395c9414fcd198::t_15ea4babfa29a4 22,24-25
+apps/dashboard/tests/autopilot-template-flows.test.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 377-386,388-395,422-424,968,970-997
+apps/dashboard/src/components/dashboard/connect-agent.tsx
+  s_395c9414fcd198::t_15ea4babfa29a4 35,41,52-55
+apps/agent/agent/subagents/code-researcher-agent/tools/show_repository_change.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 1-3
+apps/dashboard/src/app/onboarding/workspace/workspace-form.tsx
+  s_395c9414fcd198::t_15ea4babfa29a4 23,57,95,346-357
+apps/agent/package.json
+  s_395c9414fcd198::t_15ea4babfa29a4 35,42
+packages/ai/src/utils/agent-proxy.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 97-102
+apps/console/src/components/autopilot/autopilot-health-chart.tsx
+  s_395c9414fcd198::t_15ea4babfa29a4 1-90
+apps/dashboard/tests/autopilot-flow.test.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 2092-2204
+apps/console/src/components/autopilot/autopilot-runs-client.tsx
+  s_395c9414fcd198::t_15ea4babfa29a4 56-61,69,215
+packages/schemas/src/schemas/api/agent-chats.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 25-28,31,48,63
+packages/schemas/src/schemas/dashboard/onboarding/workspace.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 27
+apps/agent/agent/agent.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 30
+apps/agent/agent/subagents/image-designer-agent/tools/list_brand_identities.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 1-3
+apps/agent/agent/tools/generate_content.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 9-12,19,50-54,79-84,92
+apps/agent/agent/subagents/content-writer-agent/tools/get_linear_projects.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 1-8
+apps/dashboard/src/lib/agent/content-task.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 27
+apps/agent/agent/subagents/content-writer-agent/tools/web_search.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 1-3
+apps/agent/agent/subagents/image-designer-agent/instructions.md
+  s_395c9414fcd198::t_15ea4babfa29a4 7,10
+apps/agent/tests/chart.test.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 23-26,28,36-38
+apps/dashboard/src/lib/slack/relay.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 17,190-202
+apps/dashboard/tests/traffic-page-shell.test.tsx
+  s_395c9414fcd198::t_15ea4babfa29a4 61-62,74
+apps/agent/agent/subagents/content-writer-agent/instructions.md
+  s_395c9414fcd198::t_15ea4babfa29a4 15,30-31
+apps/agent/agent/subagents/content-writer-agent/tools/search_brand_references.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 1-3
+bunfig.toml
+  s_395c9414fcd198::t_15ea4babfa29a4 9-42
+apps/console/src/components/autopilot/autopilot-health-tables.tsx
+  s_395c9414fcd198::t_15ea4babfa29a4 1-409
+apps/agent/tests/model-affinity.test.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 13,18,20,22
+apps/dashboard/src/components/onboarding/prompt-choice-row.tsx
+  s_395c9414fcd198::t_15ea4babfa29a4 3,15-16,18-19,22-27,30-31,34,36
+apps/dashboard/src/lib/autopilot/pull-request-events.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 7
+apps/dashboard/src/lib/hooks/use-geo.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 79,749-770
+apps/dashboard/src/components/onboarding/selected-competitors.tsx
+  s_395c9414fcd198::t_15ea4babfa29a4 5,31-64
+apps/dashboard/src/lib/autopilot/impact.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 5,10-21,23-33,35,40,42-46,49-50,52-72,74-126,128-129,135-137,140-148,153-157,159-187,192,241-242,245-246,248,251,255,265-309,313-315,317-335,337-346,369-372,379-380,393-415,418,421-443,446
+apps/dashboard/src/utils/autopilot-link-check.test.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 1-142
+apps/agent/agent/subagents/image-designer-agent/tools/read_file.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 1-3
+apps/agent/agent/tools/create_chart.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 1,5-22
+apps/dashboard/src/app/onboarding/competitors/competitors-form.tsx
+  s_395c9414fcd198::t_15ea4babfa29a4 154-158
+apps/dashboard/src/components/dashboard/connect-slack.tsx
+  s_395c9414fcd198::t_15ea4babfa29a4 1-103
+apps/agent/agent/lib/utils/autopilot-approval.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 80,83
+apps/agent/agent/subagents/content-writer-agent/tools/get_linear_cycles.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 1-8
+packages/ai/package.json
+  s_395c9414fcd198::t_15ea4babfa29a4 41-42,44-48
+apps/agent/agent/subagents/code-researcher-agent/tools/bash.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 1-3
+packages/ai/src/prompts/autopilot-planner.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 17,22,41-43
+apps/agent/agent/lib/utils/session-model.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 3,5,12-24,26
+apps/dashboard/src/lib/autopilot/outcomes.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 1-176
+packages/tools/src/analytics/scan-geo-prompt.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 23-30
+apps/dashboard/src/lib/autopilot/planner.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 48-51,263-273,281,294-295,314,320,338,396-399
+apps/agent/agent/subagents/code-researcher-agent/tools/repository_history.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 1-3
+apps/dashboard/src/components/auth/signup-free-scan-banner.tsx
+  s_395c9414fcd198::t_15ea4babfa29a4 8-20
+packages/ai/src/types/autopilot-planner.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 20-24,34,110-113,116-121
+apps/agent/agent/subagents/code-researcher-agent/tools/get_pull_requests.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 1-8
+apps/console/src/utils/autopilot.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 1-14,69-155
+packages/geo-core/package.json
+  s_395c9414fcd198::t_15ea4babfa29a4 22-24,26
+packages/tools/src/assistant/create-skill.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 13-20
+apps/agent/agent/subagents/content-writer-agent/agent.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 7,11,17-19
+apps/agent/agent/tools/image-designer.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 1-34
+apps/console/src/lib/orpc/routers/autopilot.test.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 34-37,50-59
+apps/console/src/schemas/autopilot.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 1-16
+apps/agent/agent/lib/utils/chat-mirror.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 18-23,35-39,43-46,236-253,256,263-270,272-273,275-278,303-304,306-309,315-321,323-338,358-365,367-368,370-373,381,387-389,391,393,396,400,405,408-409,411-416,421-422,424
+apps/agent/agent/lib/utils/model.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 7,34-55,57
+apps/agent/agent/subagents/code-researcher-agent/tools/web_search.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 1-3
+apps/agent/agent/subagents/content-writer-agent/tools/bash.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 1-3
+apps/agent/agent/subagents/image-designer-agent/agent.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 7,11,17-19
+apps/dashboard/src/components/dashboard/nav-footer.tsx
+  s_395c9414fcd198::t_15ea4babfa29a4 18,57
+apps/agent/agent/subagents/image-designer-agent/tools/write_file.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 1-3
+apps/dashboard/src/components/geo/traffic-empty.tsx
+  s_395c9414fcd198::t_15ea4babfa29a4 22,31-33
+apps/agent/agent/subagents/code-researcher-agent/tools/list_repository_files.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 1-3
+apps/dashboard/src/components/integrations/add-slack-integration-dialog.tsx
+  s_395c9414fcd198::t_15ea4babfa29a4 3-4,26-32,53,55-63,70-81
+apps/dashboard/src/lib/agent/client.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 111,174
+apps/dashboard/src/lib/autopilot/refresh.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 60-61,79,97-99,106-107,114-115,125-128,139-152,163,168-169,172,178-179,271,275,281,357,406,449-452,474-475,711
+apps/dashboard/src/lib/autopilot/results.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 31,40,153-154,164,239-242,244,246-250,252,281-283,286-304,307,322-332,334,337,339-340,351-362,365-417
+apps/dashboard/src/schemas/autopilot-workflows.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 9-13,43-59
+apps/dashboard/src/types/slack-relay.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 18-23
+apps/dashboard/src/routes/-onboarding-loaders.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 38-41,214
+apps/dashboard/src/utils/autopilot-workflows.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 47-49,165-171,174-179
+apps/agent/agent/subagents/content-writer-agent/tools/get_pull_requests.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 1-8
+apps/dashboard/src/constants/autopilot-link-check.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 1-49
+apps/api/src/routes/agent-chats.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 191,283
+apps/agent/agent/lib/utils/slack-controls.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 2,38-41,53-68,70-72,74-78
+apps/dashboard/src/lib/autopilot/blog.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 31,47,50,83,91,144-149,617-632,645-651,1400-1421,1423-1439,1442-1445,1447-1450,1452-1456,1464,1466,1471,1476,1479,1487
+apps/agent/tests/geo-scan-tools.test.ts
+  s_395c9414fcd198::t_15ea4babfa29a4 50-55
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "7fabf285ec28ba8a5544ed74b4ffde695f06c0e0",
+  "prompts": {},
+  "sessions": {
+    "s_395c9414fcd198": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "82014d90-dedb-4b0a-8542-695277c56534",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
