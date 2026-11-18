@@ -1,0 +1,20 @@
+apps/dashboard/src/utils/autopilot-stats.ts
+  s_4c59c4360cf3d5::t_104989e18bbd3d 1-3,5,7,23-24,28,33
+  ai_agent 25-27
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "24eb95a1b800402134ff17eb2372b998d3be7cea",
+  "prompts": {},
+  "sessions": {
+    "s_4c59c4360cf3d5": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5f7cadb2-cb4c-42b7-b469-c7133abc601b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
