@@ -1,0 +1,23 @@
+apps/dashboard/src/app/(dashboard)/[slug]/autopilot/page-client.tsx
+  s_51485dc008574a::t_84a7c2462024da 50
+  s_51485dc008574a::t_51577cf1888624 270-275
+apps/dashboard/src/lib/hooks/use-autopilot-onboarding.ts
+  s_51485dc008574a::t_9c8ef031acdcfa 328-331,336-337,669-674,678,681,685
+  s_51485dc008574a::t_51577cf1888624 36
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "cb8ff0bbe7af3b4ade44741f1e9de85a3f0872cd",
+  "prompts": {},
+  "sessions": {
+    "s_51485dc008574a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a92c9619-515f-4397-b2d8-f36b36bf95f4",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
