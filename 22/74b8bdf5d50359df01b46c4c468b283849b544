@@ -1,0 +1,23 @@
+apps/api/src/programs/feedback.ts
+  s_a3bcac14881eee::t_888163b447e237 235-251,282-285,363-366
+apps/api/tests/feedback-program.test.ts
+  s_a3bcac14881eee::t_26644d38946b07 165-167,175-179,197-200,214-221,227
+apps/api/src/utils/feedback.ts
+  s_a3bcac14881eee::t_888163b447e237 3,38-39
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "2274b8bdf5d50359df01b46c4c468b283849b544",
+  "prompts": {},
+  "sessions": {
+    "s_a3bcac14881eee": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8a71c0f3-1554-4fd7-a5c8-6ab0aaa277bf",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
