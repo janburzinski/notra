@@ -1,0 +1,21 @@
+apps/dashboard/src/constants/agent-questions.ts
+  s_80cf506dfea4e7::t_96dd220338e369 12-17,19
+apps/dashboard/src/components/ai/answer-mark.tsx
+  s_80cf506dfea4e7::t_96dd220338e369 8-10,22
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "8d5d1c852fc687f6027873558f2388a25671dd5d",
+  "prompts": {},
+  "sessions": {
+    "s_80cf506dfea4e7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "47de78a9-a030-4b8a-a58c-e02d171e9794",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
