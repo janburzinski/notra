@@ -15,6 +15,7 @@ import {
 } from "@/components/navbar-bento";
 import { NavbarEngineLogo } from "@/components/navbar-engine-logo";
 import { NavbarHref } from "@/components/navbar-href";
+import { AUTOPILOT_BRIEF_CARD } from "@/constants/feature-pages/autopilot";
 import {
   SITES_STAGE_BADGES,
   SITES_STAGE_POSTS,
@@ -285,6 +286,26 @@ function TerminalMock() {
   );
 }
 
+function AutopilotMock() {
+  const brief = AUTOPILOT_BRIEF_CARD;
+  return (
+    <NavbarBentoWindow
+      className="top-3 left-0 w-82.5"
+      label={brief.frame.subhead}
+    >
+      <span className="flex flex-col gap-1 px-3.5 py-3">
+        <span className={CLASSES.mockMeta}>
+          {brief.sender} · {brief.badge} · {brief.time}
+        </span>
+        <span className={CLASSES.mockTitle}>{brief.headline}</span>
+        <span className={CLASSES.mockMeta}>
+          {brief.reply.title} · {brief.reply.meta}
+        </span>
+      </span>
+    </NavbarBentoWindow>
+  );
+}
+
 function ProductMock({ mock }: NavbarBentoMockProps<NavbarProductsMock>) {
   if (mock === "personas") {
     return <PersonasMock />;
@@ -300,6 +321,9 @@ function ProductMock({ mock }: NavbarBentoMockProps<NavbarProductsMock>) {
   }
   if (mock === "integrations") {
     return <IntegrationsMock />;
+  }
+  if (mock === "autopilot") {
+    return <AutopilotMock />;
   }
   return <TerminalMock />;
 }

@@ -12,10 +12,7 @@ import {
   SITES_STAGE_POSTS,
   SITES_STAGE_PUSH,
 } from "@/constants/feature-pages/sites";
-
-// The cards stay white in dark mode, so the badges keep their light tokens.
-const LIGHT_BADGE_TOKENS =
-  "dark:[--background:white] dark:[--badge-secondary:hsl(0_0%_96.1%)] dark:[--badge-success:oklch(0.46_0.109_155)] dark:[--secondary-foreground:hsl(0_0%_9%)] dark:[--success:oklch(0.55_0.109_155)]";
+import { FEATURE_STAGE_LIGHT_BADGE_TOKENS } from "@/constants/feature-pages/stage";
 
 const CONNECTORS = [
   "M536 0 C536 40 160 32 160 76",
@@ -26,7 +23,7 @@ const CONNECTORS = [
 export function SitesStage() {
   return (
     <StageShell
-      className={`flex flex-col items-center bg-center lg:px-16 lg:pt-12 lg:pb-12 ${LIGHT_BADGE_TOKENS}`}
+      className={`flex flex-col items-center bg-center lg:px-16 lg:pt-12 lg:pb-12 ${FEATURE_STAGE_LIGHT_BADGE_TOKENS}`}
       image={SITES_STAGE_IMAGE}
     >
       <div className="flex max-w-full items-center gap-3 rounded-full border border-white/90 bg-white/92 py-3 pr-3 pl-4">

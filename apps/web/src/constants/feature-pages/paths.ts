@@ -3,6 +3,7 @@ export const FEATURE_DETAIL_SLUGS = [
   "conversations",
   "ai-crawler-logs",
   "sites",
+  "autopilot",
   "free-scan",
 ] as const;
 

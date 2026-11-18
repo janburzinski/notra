@@ -44,6 +44,12 @@ export interface FeatureDetailPageProps {
   overviewVisualFirst?: boolean;
   children?: ReactNode;
   footer?: ReactNode;
+  heroSecondaryCta?: FeatureDetailLink;
+}
+
+export interface FeatureDetailLink {
+  label: string;
+  href: string;
 }
 
 export interface FeaturePersona {
@@ -114,6 +120,8 @@ export interface FeatureStageImage {
   author: string;
   authorUrl: string;
   photoUrl: string;
+  /** Where the photo is from. Defaults to Pixabay. */
+  source?: string;
 }
 
 export interface FeatureStageShellProps {

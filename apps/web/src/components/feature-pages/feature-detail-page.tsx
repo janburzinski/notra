@@ -22,6 +22,7 @@ export function FeatureDetailPage({
   title,
   stage,
   heroActions,
+  heroSecondaryCta,
   overviewVisual,
   overviewVisualFirst = false,
   children,
@@ -29,7 +30,7 @@ export function FeatureDetailPage({
 }: FeatureDetailPageProps) {
   const ctaT = useTranslations("landing.cta");
   return (
-    <div className="flex w-full flex-col items-center gap-20 pb-20 antialiased [font-synthesis:none] lg:gap-24 lg:pb-28">
+    <div className="flex w-full flex-col gap-20 pb-20 antialiased [font-synthesis:none] lg:gap-24 lg:pb-28">
       <script
         dangerouslySetInnerHTML={{
           __html: serializeJsonLd(buildFeatureDetailBreadcrumb(copy)),
@@ -56,11 +57,20 @@ export function FeatureDetailPage({
             </CtaButton>
             <CtaButton
               nativeButton={false}
-              render={<Link to={CTA_BANNER_CONTACT_HREF} />}
+              render={
+                heroSecondaryCta ? (
+                  <a
+                    aria-label={heroSecondaryCta.label}
+                    href={heroSecondaryCta.href}
+                  />
+                ) : (
+                  <Link to={CTA_BANNER_CONTACT_HREF} />
+                )
+              }
               size="lg"
               variant="light"
             >
-              {ctaT("secondary")}
+              {heroSecondaryCta?.label ?? ctaT("secondary")}
             </CtaButton>
           </>
         )}
@@ -120,9 +130,9 @@ export function FeatureDetailPage({
         </ol>
       </section>
 
-      <LandingPricingSection className="py-0 sm:py-0" />
-
       {footer}
+
+      <LandingPricingSection className="py-0 sm:py-0" />
 
       <section className="w-full px-6">
         <CtaBanner

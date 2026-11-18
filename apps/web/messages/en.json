@@ -19,6 +19,7 @@
       "personas": "Personas",
       "conversations": "Conversations",
       "sites": "Sites",
+      "autopilot": "Autopilot",
       "freeScan": "Free scan",
       "pricing": "Pricing",
       "compare": "Compare",
@@ -515,6 +516,10 @@
       "reviews": {
         "label": "Reviews",
         "description": "What teams say about Notra."
+      },
+      "autopilot": {
+        "label": "Autopilot",
+        "description": "Draft pull requests on your site every morning."
       }
     },
     "products": {
@@ -530,6 +535,10 @@
         "sites": {
           "label": "Sites",
           "description": "Host your blog and changelog from GitHub."
+        },
+        "autopilot": {
+          "label": "Autopilot",
+          "description": "Draft pull requests on your site every morning."
         }
       },
       "tiles": {
@@ -540,6 +549,10 @@
         "mcp": {
           "label": "MCP & CLI",
           "description": "Bring Notra into your agent."
+        },
+        "autopilot": {
+          "label": "Autopilot",
+          "description": "Draft pull requests on your site every morning."
         }
       },
       "personas": {

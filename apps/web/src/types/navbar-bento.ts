@@ -108,7 +108,8 @@ export type NavbarProductsMock =
   | "crawler"
   | "sites"
   | "integrations"
-  | "terminal";
+  | "terminal"
+  | "autopilot";
 
 export interface NavbarProductsCard {
   id: Extract<keyof NavbarProductsMessages["cards"], string>;

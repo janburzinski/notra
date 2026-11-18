@@ -19,6 +19,7 @@
       "personas": "Personas",
       "conversations": "Konversationen",
       "sites": "Sites",
+      "autopilot": "Autopilot",
       "freeScan": "Kostenloser Scan",
       "pricing": "Preise",
       "compare": "Vergleiche",
@@ -515,6 +516,10 @@
       "reviews": {
         "label": "Bewertungen",
         "description": "Was Teams über Notra sagen."
+      },
+      "autopilot": {
+        "label": "Autopilot",
+        "description": "Erstellt jeden Morgen Pull-Request-Entwürfe für deine Website."
       }
     },
     "products": {
@@ -530,6 +535,10 @@
         "sites": {
           "label": "Sites",
           "description": "Hoste deinen Blog und Changelog direkt aus GitHub."
+        },
+        "autopilot": {
+          "label": "Autopilot",
+          "description": "Erstellt jeden Morgen Pull-Request-Entwürfe für deine Website."
         }
       },
       "tiles": {
@@ -540,6 +549,10 @@
         "mcp": {
           "label": "MCP & CLI",
           "description": "Hol Notra in deinen Agent."
+        },
+        "autopilot": {
+          "label": "Autopilot",
+          "description": "Erstellt jeden Morgen Pull-Request-Entwürfe für deine Website."
         }
       },
       "personas": {

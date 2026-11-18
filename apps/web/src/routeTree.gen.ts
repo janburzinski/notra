@@ -78,6 +78,7 @@ import { Route as SiteDataIndexRouteImport } from './routes/_site/data/index'
 import { Route as SiteDataIndexDotjsonRouteImport } from './routes/_site/data/index[.]json'
 import { Route as SiteFeaturesIndexRouteImport } from './routes/_site/features/index'
 import { Route as SiteFeaturesAiCrawlerLogsRouteImport } from './routes/_site/features/ai-crawler-logs'
+import { Route as SiteFeaturesAutopilotRouteImport } from './routes/_site/features/autopilot'
 import { Route as SiteFeaturesConversationsRouteImport } from './routes/_site/features/conversations'
 import { Route as SiteFeaturesFreeScanRouteImport } from './routes/_site/features/free-scan'
 import { Route as SiteFeaturesPersonasRouteImport } from './routes/_site/features/personas'
@@ -466,6 +467,11 @@ const SiteFeaturesAiCrawlerLogsRoute =
     path: '/features/ai-crawler-logs',
     getParentRoute: () => SiteRoute,
   } as any)
+const SiteFeaturesAutopilotRoute = SiteFeaturesAutopilotRouteImport.update({
+  id: '/features/autopilot',
+  path: '/features/autopilot',
+  getParentRoute: () => SiteRoute,
+} as any)
 const SiteFeaturesConversationsRoute =
   SiteFeaturesConversationsRouteImport.update({
     id: '/features/conversations',
@@ -728,6 +734,7 @@ export interface FileRoutesByFullPath {
   '/contributors/opengraph-image': typeof SiteContributorsOpengraphImageRoute
   '/data/index.json': typeof SiteDataIndexDotjsonRoute
   '/features/ai-crawler-logs': typeof SiteFeaturesAiCrawlerLogsRoute
+  '/features/autopilot': typeof SiteFeaturesAutopilotRoute
   '/features/conversations': typeof SiteFeaturesConversationsRoute
   '/features/free-scan': typeof SiteFeaturesFreeScanRoute
   '/features/personas': typeof SiteFeaturesPersonasRoute
@@ -832,6 +839,7 @@ export interface FileRoutesByTo {
   '/contributors/opengraph-image': typeof SiteContributorsOpengraphImageRoute
   '/data/index.json': typeof SiteDataIndexDotjsonRoute
   '/features/ai-crawler-logs': typeof SiteFeaturesAiCrawlerLogsRoute
+  '/features/autopilot': typeof SiteFeaturesAutopilotRoute
   '/features/conversations': typeof SiteFeaturesConversationsRoute
   '/features/free-scan': typeof SiteFeaturesFreeScanRoute
   '/features/personas': typeof SiteFeaturesPersonasRoute
@@ -941,6 +949,7 @@ export interface FileRoutesById {
   '/_site/contributors/opengraph-image': typeof SiteContributorsOpengraphImageRoute
   '/_site/data/index.json': typeof SiteDataIndexDotjsonRoute
   '/_site/features/ai-crawler-logs': typeof SiteFeaturesAiCrawlerLogsRoute
+  '/_site/features/autopilot': typeof SiteFeaturesAutopilotRoute
   '/_site/features/conversations': typeof SiteFeaturesConversationsRoute
   '/_site/features/free-scan': typeof SiteFeaturesFreeScanRoute
   '/_site/features/personas': typeof SiteFeaturesPersonasRoute
@@ -1047,6 +1056,7 @@ export interface FileRouteTypes {
     | '/contributors/opengraph-image'
     | '/data/index.json'
     | '/features/ai-crawler-logs'
+    | '/features/autopilot'
     | '/features/conversations'
     | '/features/free-scan'
     | '/features/personas'
@@ -1151,6 +1161,7 @@ export interface FileRouteTypes {
     | '/contributors/opengraph-image'
     | '/data/index.json'
     | '/features/ai-crawler-logs'
+    | '/features/autopilot'
     | '/features/conversations'
     | '/features/free-scan'
     | '/features/personas'
@@ -1259,6 +1270,7 @@ export interface FileRouteTypes {
     | '/_site/contributors/opengraph-image'
     | '/_site/data/index.json'
     | '/_site/features/ai-crawler-logs'
+    | '/_site/features/autopilot'
     | '/_site/features/conversations'
     | '/_site/features/free-scan'
     | '/_site/features/personas'
@@ -1837,6 +1849,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SiteFeaturesAiCrawlerLogsRouteImport
       parentRoute: typeof SiteRoute
     }
+    '/_site/features/autopilot': {
+      id: '/_site/features/autopilot'
+      path: '/features/autopilot'
+      fullPath: '/features/autopilot'
+      preLoaderRoute: typeof SiteFeaturesAutopilotRouteImport
+      parentRoute: typeof SiteRoute
+    }
     '/_site/features/conversations': {
       id: '/_site/features/conversations'
       path: '/features/conversations'
@@ -2173,6 +2192,7 @@ interface SiteRouteChildren {
   SiteContributorsOpengraphImageRoute: typeof SiteContributorsOpengraphImageRoute
   SiteDataIndexDotjsonRoute: typeof SiteDataIndexDotjsonRoute
   SiteFeaturesAiCrawlerLogsRoute: typeof SiteFeaturesAiCrawlerLogsRoute
+  SiteFeaturesAutopilotRoute: typeof SiteFeaturesAutopilotRoute
   SiteFeaturesConversationsRoute: typeof SiteFeaturesConversationsRoute
   SiteFeaturesFreeScanRoute: typeof SiteFeaturesFreeScanRoute
   SiteFeaturesPersonasRoute: typeof SiteFeaturesPersonasRoute
@@ -2224,6 +2244,7 @@ const SiteRouteChildren: SiteRouteChildren = {
   SiteContributorsOpengraphImageRoute: SiteContributorsOpengraphImageRoute,
   SiteDataIndexDotjsonRoute: SiteDataIndexDotjsonRoute,
   SiteFeaturesAiCrawlerLogsRoute: SiteFeaturesAiCrawlerLogsRoute,
+  SiteFeaturesAutopilotRoute: SiteFeaturesAutopilotRoute,
   SiteFeaturesConversationsRoute: SiteFeaturesConversationsRoute,
   SiteFeaturesFreeScanRoute: SiteFeaturesFreeScanRoute,
   SiteFeaturesPersonasRoute: SiteFeaturesPersonasRoute,

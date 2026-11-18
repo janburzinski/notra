@@ -34,7 +34,7 @@ export function StageShell({
           rel="noopener noreferrer"
           target="_blank"
         >
-          Pixabay
+          {image.source ?? "Pixabay"}
         </a>
       </p>
     </div>

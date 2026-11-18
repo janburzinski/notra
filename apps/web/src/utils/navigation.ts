@@ -1,4 +1,5 @@
 import {
+  AiMagicIcon,
   AiSearch02Icon,
   BookOpen01Icon,
   BrowserIcon,
@@ -25,6 +26,7 @@ export const MARKETING_NAV: readonly MarketingNavEntryConfig[] = [
         icon: Robot01Icon,
       },
       { id: "sites", href: "/features/sites", icon: BrowserIcon },
+      { id: "autopilot", href: "/features/autopilot", icon: AiMagicIcon },
     ],
     rail: [],
   },

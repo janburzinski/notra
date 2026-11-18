@@ -68,6 +68,13 @@ export const NAVBAR_PRODUCTS_CARDS: readonly NavbarProductsCard[] = [
 
 export const NAVBAR_PRODUCTS_LINK_TILES: readonly NavbarProductsLinkTile[] = [
   {
+    id: "autopilot",
+    href: "/features/autopilot",
+    className: "grow-[1.25]",
+    copyClassName: "w-56",
+    mock: "autopilot",
+  },
+  {
     id: "integrations",
     href: "/integrations",
     className: "grow-[1.25]",
